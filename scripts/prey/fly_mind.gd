@@ -20,6 +20,7 @@ const PreyMath = preload("res://scripts/prey/prey_math.gd")
 const FlySenses = preload("res://scripts/prey/fly_senses.gd")
 const PerchGraph = preload("res://scripts/prey/perch_graph.gd")
 const Fly = preload("res://scripts/prey/fly.gd")
+const RecordMath = preload("res://scripts/persistence/record_math.gd")
 
 const GOALS: Array[StringName] = [&"rest", &"move", &"flee"]
 const RETRY_S := 0.25
@@ -393,3 +394,22 @@ func describe() -> String:
 	if not pending.is_empty():
 		line += " | reacting in %.2f s (%s)" % [maxf(0.0, float(pending["due"]) - fly.world.now), str(pending["kind"])]
 	return line
+
+
+## T09: a reaction waiting out its delay, the perches refused lately and the decision clock, as a plain record. The last scores are for the
+## developer view and are made again at the next decision.
+func to_record() -> Dictionary:
+	var p := RecordMath.plain(pending)
+	return {"pending": p, "blocked": blocked.duplicate(), "next_decision": _next_decision_t, "next_retry": _next_retry_t, "winner": str(winner)}
+
+
+func apply_record(r: Dictionary) -> void:
+	pending = (r["pending"] as Dictionary).duplicate()
+	if pending.has("kind"):
+		pending["kind"] = StringName(str(pending["kind"]))
+	blocked = {}
+	for k: Variant in (r["blocked"] as Dictionary):
+		blocked[str(k)] = float((r["blocked"] as Dictionary)[k])
+	_next_decision_t = float(r["next_decision"])
+	_next_retry_t = float(r["next_retry"])
+	winner = StringName(str(r["winner"]))

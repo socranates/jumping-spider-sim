@@ -39,6 +39,10 @@ const PreyDirector = preload("res://scripts/prey/prey_director.gd")
 const NeedsModel = preload("res://scripts/needs/needs_model.gd")
 const FeedingController = preload("res://scripts/needs/feeding_controller.gd")
 const NeedsHud = preload("res://scripts/presentation/needs_hud.gd")
+const Checkpoint = preload("res://scripts/persistence/checkpoint.gd")
+const CheckpointStore = preload("res://scripts/persistence/checkpoint_store.gd")
+const SupportMath = preload("res://scripts/movement/support_math.gd")
+const MAIN_SCENE_PATH := "res://scenes/main.tscn"
 
 const PROFILE_PATH := "res://data/species/phidippus_audax_prototype.json"
 const SPAWN_LIFT := 0.31  # WU above the floor, just over the 0.3 WU collider radius
@@ -55,6 +59,18 @@ var habitat_loop: Node
 var settings: Node
 ## Optional Transform3D for the spider origin instead of the lab spawn point.
 var spawn_override: Variant = null
+## T09 (S01-C): a validated checkpoint record to build this world from (set before the node enters the tree). Empty: a new world.
+var restore_record: Dictionary = {}
+## Why the restore record was refused (then the world starts new), and whether the world was built from a checkpoint.
+var restore_errors: PackedStringArray = PackedStringArray()
+var restored: bool = false
+## Where checkpoints are kept: the player's save folder in a played world; a test names its own folder, and a test world without one keeps
+## its checkpoint in memory only, so tests never touch the player's saves.
+var checkpoint_dir: String = ""
+var checkpoint_store: CheckpointStore
+## The newest checkpoint this world made or was built from (also kept when there is no store).
+var last_checkpoint: Dictionary = {}
+var last_checkpoint_message: String = ""
 
 var lab: Node3D
 var spider: SpiderMotor
@@ -102,6 +118,12 @@ func _ready() -> void:
 		OS.alert("The surface profiles could not be loaded:\n" + "\n".join(SurfaceProfile.last_errors), "Jumping Spider Sim")
 		get_tree().quit(1)
 		return
+	if checkpoint_dir == "" and interactive:
+		checkpoint_dir = CheckpointStore.DEFAULT_DIR
+	if checkpoint_dir != "":
+		checkpoint_store = CheckpointStore.new(checkpoint_dir)
+	if not restore_record.is_empty():
+		_prepare_restore()
 	lab = (WindowsillScene if use_windowsill else LabScene).instantiate() as Node3D
 	add_child(lab)
 	_check_lab_surfaces()
@@ -142,17 +164,28 @@ func _ready() -> void:
 	prey.captured.connect(sensor.on_capture)
 	add_child(prey)
 	needs = NeedsModel.new()
+	if restored:
+		prey.restore_record = restore_record["prey"]
+		needs.load_dict(restore_record["needs"])
 	feeding = FeedingController.new()
 	feeding.name = "Feeding"
 	feeding.motor = spider
 	feeding.prey = prey
 	feeding.needs = needs
 	feeding.interactive = interactive
+	if restored:
+		var fr: Dictionary = restore_record["feeding"]
+		feeding.meals_started = int(fr["meals_started"])
+		feeding.meals_finished = int(fr["meals_finished"])
+		feeding.taken_total = float(fr["taken_total"])
+		feeding.granted_total = float(fr["granted_total"])
 	add_child(feeding)
 	if use_windowsill:
 		habitat_loop = HabitatLoop.new()
 		habitat_loop.world = self
 		habitat_loop.interactive = interactive
+		if restored:
+			habitat_loop.apply_record(restore_record["habitat"])
 		add_child(habitat_loop)
 	if interactive:
 		controller = PlayerController.new()
@@ -190,6 +223,7 @@ func _ready() -> void:
 		add_child(jump_hud)
 		pause_menu = PauseMenu.new()
 		pause_menu.settings = settings
+		pause_menu.world = self
 		add_child(pause_menu)
 		overlay = DebugOverlay.new()
 		overlay.motor = spider
@@ -256,6 +290,104 @@ func _on_setting_changed(key: String) -> void:
 		spider.set_reach_factor(float(settings.get_value("jump_reach")))
 	if key == "capture_assist" and prey != null:
 		prey.assist = bool(settings.get_value("capture_assist"))
+
+
+## A checkpoint record is checked before anything is built; a valid one decides the habitat, the spider's place and the prey's seed.
+func _prepare_restore() -> void:
+	restore_errors = Checkpoint.validate(restore_record)
+	if not restore_errors.is_empty():
+		push_warning("The checkpoint was refused and a new world started: %s" % "; ".join(restore_errors))
+		restore_record = {}
+		return
+	restored = true
+	use_windowsill = true
+	var pr: Dictionary = restore_record["prey"]
+	prey_seed = String(pr["seed"]).to_int()
+	prey_count = int(pr["target_population"])
+	prey_replenish = bool(pr["replenish"])
+	var player: Dictionary = restore_record["player"]
+	spawn_override = Transform3D(SupportMath.body_basis(_v3(player["normal"]), _v3(player["heading"])), _v3(player["position"]))
+	last_checkpoint = restore_record
+
+
+static func _v3(a: Variant) -> Vector3:
+	return Vector3(float(a[0]), float(a[1]), float(a[2]))
+
+
+# ------------------------------------------------------------------ checkpoints (T09, S01-C, S02)
+
+## Why a checkpoint cannot be made now ("" when it can).
+func checkpoint_problem() -> String:
+	return Checkpoint.boundary_problem(self)
+
+
+## Makes a checkpoint of this world now and keeps it (on disk when there is a store). {"ok", "message", "record", "errors"}.
+func save_checkpoint() -> Dictionary:
+	var why := checkpoint_problem()
+	if why != "":
+		last_checkpoint_message = "No checkpoint: %s." % why
+		return {"ok": false, "message": last_checkpoint_message, "record": {}, "errors": PackedStringArray([why])}
+	var record := Checkpoint.capture(self)
+	var errors := Checkpoint.validate(record)
+	if not errors.is_empty():
+		last_checkpoint_message = "The checkpoint failed its own checks and was not kept."
+		push_error("checkpoint capture failed validation: %s" % "; ".join(errors))
+		return {"ok": false, "message": last_checkpoint_message, "record": {}, "errors": errors}
+	if checkpoint_store != null:
+		var result: Dictionary = checkpoint_store.save(record)
+		last_checkpoint_message = str(result["message"])
+		if not bool(result["ok"]):
+			return {"ok": false, "message": last_checkpoint_message, "record": {}, "errors": result["errors"]}
+	else:
+		last_checkpoint_message = "Checkpoint kept."
+	last_checkpoint = record
+	return {"ok": true, "message": last_checkpoint_message, "record": record, "errors": PackedStringArray()}
+
+
+## The checkpoint "Return to checkpoint" would load: from disk when there is a store (current file, else its backup), else the newest one this
+## world made. {"ok", "record", "source", "message"}.
+func available_checkpoint() -> Dictionary:
+	if checkpoint_store != null:
+		return checkpoint_store.load_best()
+	if not last_checkpoint.is_empty():
+		return {"ok": true, "record": last_checkpoint, "source": "memory", "message": "Checkpoint found.", "errors": PackedStringArray()}
+	return {"ok": false, "record": {}, "source": "", "message": "No checkpoint yet: rest in the silk-lined crack to make one.", "errors": PackedStringArray()}
+
+
+## Discards this whole world and builds the checkpoint's world in its place (whatever the spider is doing now: walking, in the air, on its
+## line, feeding). Returns the new world, or null with the reason in last_checkpoint_message when there is no usable checkpoint (this world
+## is then left exactly as it was). `record` overrides the stored checkpoint (tests).
+func return_to_checkpoint(record: Dictionary = {}) -> Node3D:
+	var rec := record
+	if rec.is_empty():
+		var found := available_checkpoint()
+		if not bool(found["ok"]):
+			last_checkpoint_message = str(found["message"])
+			return null
+		rec = found["record"]
+		last_checkpoint_message = str(found["message"])
+	var errors := Checkpoint.validate(rec)
+	if not errors.is_empty():
+		last_checkpoint_message = "The checkpoint cannot be loaded: " + "; ".join(errors)
+		return null
+	var fresh: Node3D = (load(MAIN_SCENE_PATH) as PackedScene).instantiate()
+	fresh.interactive = interactive
+	fresh.settings = settings
+	fresh.checkpoint_dir = checkpoint_dir
+	fresh.restore_record = rec.duplicate(true)
+	fresh.last_checkpoint_message = last_checkpoint_message
+	var parent := get_parent()
+	var index := get_index()
+	var tree := get_tree()
+	var was_current := tree.current_scene == self
+	tree.paused = false
+	parent.remove_child(self)
+	parent.add_child(fresh)
+	parent.move_child(fresh, index)
+	if was_current:
+		tree.current_scene = fresh
+	queue_free()
+	return fresh
 
 
 ## Returns the spider to the spawn point; the camera snaps with it.

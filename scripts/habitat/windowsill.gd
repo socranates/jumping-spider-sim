@@ -8,6 +8,19 @@ const Layers = preload("res://scripts/core/physics_layers.gd")
 const RETREAT_ID := "sill_crevice"
 const RETREAT_AREA := AABB(Vector3(-27.8, 0.0, 3.0), Vector3(4.5, 1.5, 6.0))
 const SPAWN := Vector3(-22.0, 0.0, 6.0)
+## T09: stable content IDs. A checkpoint names perches, vents and surfaces by these, and is checked against them before any world is built.
+const CONTENT_REVISION := "windowsill-v1"
+const PERCH_POINTS := {
+	"sill_first_hunt": Vector3(-13, 0, 6), "rim_hunt": Vector3(10, 4.6, -3),
+	"leaf_hunt": Vector3(-1, 4.2, -1), "east_hunt": Vector3(23, 0, 7),
+	"west_leaf": Vector3(-15, 4.2, -1), "east_leaf": Vector3(22, 5.4, -2),
+	"under_leaf": Vector3(-12.8, 0, -2), "front_path": Vector3(1, 0, 8),
+	"east_corner": Vector3(27, 0, -7), "back_path": Vector3(-9, 0, -9),
+	"rim_west": Vector3(5, 4.6, -5), "rim_east": Vector3(15, 4.6, -5),
+}
+const VENT_POINTS := {"frame_crack_west": Vector3(-23, 8, -12.5), "frame_crack_east": Vector3(23, 8, -12.5)}
+const SURFACE_IDS: Array[String] = ["sill_floor", "back_frame", "left_frame", "right_frame", "front_lip", "planter", "planter_rim",
+	"leaf_west", "leaf_middle", "leaf_east", "stem_west", "stem_middle", "stem_east", "crevice_back", "crevice_roof", "crevice_north", "crevice_south"]
 var pieces: Dictionary = {}
 var sun: DirectionalLight3D
 var shadow_band: MeshInstance3D
@@ -79,14 +92,7 @@ func in_retreat(world_position: Vector3) -> bool:
 
 func get_prey_perches() -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
-	var points := {
-		"sill_first_hunt": Vector3(-13, 0, 6), "rim_hunt": Vector3(10, 4.6, -3),
-		"leaf_hunt": Vector3(-1, 4.2, -1), "east_hunt": Vector3(23, 0, 7),
-		"west_leaf": Vector3(-15, 4.2, -1), "east_leaf": Vector3(22, 5.4, -2),
-		"under_leaf": Vector3(-12.8, 0, -2), "front_path": Vector3(1, 0, 8),
-		"east_corner": Vector3(27, 0, -7), "back_path": Vector3(-9, 0, -9),
-		"rim_west": Vector3(5, 4.6, -5), "rim_east": Vector3(15, 4.6, -5),
-	}
+	var points := PERCH_POINTS
 	for id: String in points:
 		out.append({"id": id, "position": to_global(points[id]), "normal": Vector3.UP,
 			"shelter": 0.5 if id == "under_leaf" else 0.2, "food": 0.5 if "rim" in id else 0.1,
@@ -94,10 +100,10 @@ func get_prey_perches() -> Array[Dictionary]:
 	return out
 
 func get_prey_vents() -> Array[Dictionary]:
-	return [
-		{"id": "frame_crack_west", "position": to_global(Vector3(-23, 8, -12.5)), "normal": Vector3.BACK},
-		{"id": "frame_crack_east", "position": to_global(Vector3(23, 8, -12.5)), "normal": Vector3.BACK},
-	]
+	var out: Array[Dictionary] = []
+	for id: String in VENT_POINTS:
+		out.append({"id": id, "position": to_global(VENT_POINTS[id]), "normal": Vector3.BACK})
+	return out
 
 func show_disturbance(progress: float) -> void:
 	shadow_band.visible = progress >= 0.0 and progress <= 1.0

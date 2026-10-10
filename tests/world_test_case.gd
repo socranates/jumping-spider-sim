@@ -5,6 +5,7 @@ extends "res://tests/test_case.gd"
 
 const MainScene = preload("res://scenes/main.tscn")
 const SettingsScript = preload("res://scripts/presentation/settings.gd")
+const TEST_SAVE_DIR := "user://jss_test_saves"
 
 var settings: Node
 var world: Node3D
@@ -39,6 +40,8 @@ func spawn_world(spawn: Variant = null, interactive: bool = false) -> Node3D:
 	world.prey_count = prey_count
 	world.prey_seed = prey_seed
 	world.prey_replenish = prey_replenish
+	# T09: an interactive test world keeps checkpoints in a test folder, never the player's saves (a non-interactive one keeps them in memory).
+	world.checkpoint_dir = TEST_SAVE_DIR if interactive else ""
 	sandbox.add_child(world)
 	return world
 

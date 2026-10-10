@@ -25,6 +25,7 @@ const FlyMind = preload("res://scripts/prey/fly_mind.gd")
 const FlyFlight = preload("res://scripts/prey/fly_flight.gd")
 const Population = preload("res://scripts/prey/prey_population.gd")
 const Layers = preload("res://scripts/core/physics_layers.gd")
+const RecordMath = preload("res://scripts/persistence/record_math.gd")
 
 const PROFILE_PATH := "res://data/species/fly_like_prototype.json"
 const PRIORITY := -5
@@ -61,6 +62,10 @@ var sensor: Node
 ## True in a played world: a fly that is lost is replaced (PreyPopulation). Off in the test worlds unless a test asks.
 var replenish: bool = false
 var population: Population
+## T09: a checkpoint's prey record (to_record) to restore instead of starting the default population; applied once the world can be queried.
+var restore_record: Dictionary = {}
+## What the prey side was the moment the restore finished (to_record), for checks that nothing was lost or added.
+var restored_record: Dictionary = {}
 ## What the vents were found to be when the world was checked (PreyPopulation.validate).
 var vent_validation: Dictionary = {}
 ## The perch graph has been checked against the physics world.
@@ -182,7 +187,7 @@ func fly_by_id(fly_id: String) -> Node3D:
 func _physics_process(delta: float) -> void:
 	if not is_world_ready():
 		return
-	if not ready_done and target_population > 0:
+	if not ready_done and (target_population > 0 or not restore_record.is_empty()):
 		ensure_ready()
 	var t0 := Time.get_ticks_usec()
 	tick += 1
@@ -242,6 +247,9 @@ func _become_ready() -> void:
 	population.target = target_population
 	population.enabled = replenish and target_population > 0
 	vent_validation = population.validate(space())
+	if not restore_record.is_empty():
+		_apply_restore(restore_record)
+		return
 	var placed := 0
 	for id in graph.order:
 		if placed >= target_population:
@@ -486,3 +494,74 @@ func _carry_held() -> void:
 ## Lets go of the held prey (it was eaten, or dropped). The fly itself keeps whatever state it has.
 func release_held() -> void:
 	held = null
+
+
+# ------------------------------------------------------------------ persistence (T09, spec 21.3 PreyState, S01-C)
+
+## The prey side of the world as one plain record: the clock, the id counter, every living fly and the one in the jaws (a consumed fly is
+## gone and is not recorded), who sits on or has reserved each perch and vent, the captures made (so an event can never be granted twice),
+## and the replacement schedule with its stream. Call only between ticks, once the director is ready.
+func to_record() -> Dictionary:
+	var fly_records: Array = []
+	for f in flies:
+		if f.is_alive() or (f == held and f.state == Fly.State.CAPTURED):
+			fly_records.append(f.to_record())
+	var perch_records: Array = []
+	for id in graph.order:
+		perch_records.append(_perch_record(graph.perches[id]))
+	for v in population.vents:
+		perch_records.append(_perch_record(v))
+	var captures: Array = []
+	for e: Dictionary in capture_log:
+		captures.append({"id": str(e["id"]), "tick": int(e["tick"]), "t": float(e["t"]), "owner": str(e["owner"]), "prey": str(e["prey"])})
+	return {"seed": str(seed_value), "tick": tick, "now": now, "serial_counter": serial_counter, "target_population": target_population,
+		"replenish": replenish, "held": held.id if held != null and is_instance_valid(held) else "", "captures": captures,
+		"flies": fly_records, "perches": perch_records, "population": population.to_record()}
+
+
+func _perch_record(p: PerchGraph.Perch) -> Dictionary:
+	return {"id": p.id, "occupant": p.occupant, "reserved_by": p.reserved_by, "available": p.available}
+
+
+## A perch of the graph or a vent, by id; null for neither.
+func find_perch(perch_id: String) -> PerchGraph.Perch:
+	var p: PerchGraph.Perch = graph.get_perch(perch_id)
+	if p == null and population != null:
+		p = population.vent_by_id(perch_id)
+	return p
+
+
+## Rebuilds the prey side from a validated record. The flies are made again by their own ids, serials and seeds, then given back their
+## state; nothing is drawn from any stream on the way, so they go on exactly as their streams stood at the checkpoint.
+func _apply_restore(r: Dictionary) -> void:
+	tick = int(r["tick"])
+	now = float(r["now"])
+	serial_counter = int(r["serial_counter"])
+	for pr: Dictionary in r["perches"]:
+		var p := find_perch(str(pr["id"]))
+		if p == null:
+			push_error("checkpoint names a perch the habitat lacks: %s" % str(pr["id"]))
+			continue
+		p.occupant = str(pr["occupant"])
+		p.reserved_by = str(pr["reserved_by"])
+		p.available = bool(pr["available"])
+	population.apply_record(r["population"])
+	for fr: Dictionary in r["flies"]:
+		var f: Node3D = Fly.new()
+		f.setup(profile, self, str(fr["id"]), int(fr["serial"]), String(fr["rng_seed"]).to_int())
+		f.mind = FlyMind.new(f)
+		f.flight = FlyFlight.new(f)
+		add_child(f)
+		f.apply_record(fr, find_perch)
+		flies.append(f)
+	capture_log.clear()
+	_event_ids.clear()
+	for e: Dictionary in r["captures"]:
+		capture_log.append({"id": str(e["id"]), "tick": int(e["tick"]), "t": float(e["t"]), "owner": str(e["owner"]), "prey": str(e["prey"]), "restored": true})
+		_event_ids[str(e["id"])] = true
+	held = fly_by_id(str(r["held"])) if str(r["held"]) != "" else null
+	strike_active = false
+	_strike_end_tick = -1
+	if spider != null:
+		_spider_prev = spider.global_position
+	restored_record = to_record()

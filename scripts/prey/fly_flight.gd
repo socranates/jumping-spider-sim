@@ -12,6 +12,7 @@ extends RefCounted
 const PreyMath = preload("res://scripts/prey/prey_math.gd")
 const PerchGraph = preload("res://scripts/prey/perch_graph.gd")
 const Fly = preload("res://scripts/prey/fly.gd")
+const RecordMath = preload("res://scripts/persistence/record_math.gd")
 
 const MAX_REPLANS := 3
 const LAND_TOLERANCE := 0.06
@@ -184,3 +185,21 @@ func _blocked(now: float) -> void:
 			return
 	retargets_total += 1
 	f.mind.on_flight_blocked(now)
+
+
+## T09: the flight in progress (its swept path, how far along, the perch it has reserved) as a plain record; empty when not flying.
+func to_record() -> Dictionary:
+	return {"path": RecordMath.path_to_array(path), "length": length, "s": s, "speed": speed, "mode": str(mode),
+		"target": target.id if target != null else "", "started_at": started_at, "replans": replans, "blocked_ticks": blocked_ticks}
+
+
+func apply_record(r: Dictionary, find_perch: Callable) -> void:
+	path = RecordMath.array_to_path(r["path"])
+	length = float(r["length"])
+	s = float(r["s"])
+	speed = float(r["speed"])
+	mode = StringName(str(r["mode"]))
+	target = find_perch.call(str(r["target"])) if str(r["target"]) != "" else null
+	started_at = float(r["started_at"])
+	replans = int(r["replans"])
+	blocked_ticks = int(r["blocked_ticks"])

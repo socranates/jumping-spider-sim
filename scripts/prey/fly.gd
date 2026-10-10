@@ -20,6 +20,7 @@ const Perceivable = preload("res://scripts/perception/perceivable.gd")
 const Observation = preload("res://scripts/perception/observation.gd")
 const SupportMath = preload("res://scripts/movement/support_math.gd")
 const Layers = preload("res://scripts/core/physics_layers.gd")
+const RecordMath = preload("res://scripts/persistence/record_math.gd")
 
 enum State { PERCHED, ALERT, TAKEOFF, FLEE, SEEK_PERCH, REPOSITION, CAPTURED, CONSUMED }
 const STATE_NAMES: Array[String] = ["PERCHED", "ALERT", "TAKEOFF", "FLEE", "SEEK_PERCH", "REPOSITION", "CAPTURED", "CONSUMED"]
@@ -414,3 +415,63 @@ func consume(amount: float) -> float:
 ## For the developer views: one line of the fly's state.
 func describe_line() -> String:
 	return "%s %s goal %s awareness %.2f perch %s | %s" % [id, STATE_NAMES[state], str(goal), senses.awareness, perch.id if perch != null else "-", goal_reason]
+
+
+# ------------------------------------------------------------------ persistence (T09, spec 21.3 PreyState)
+
+## The fly as a plain record: its state, place, clocks, both streams, and what its senses, mind and flight are in the middle of. The trace,
+## the event log and the cost counters are developer history and start again after a restore.
+func to_record() -> Dictionary:
+	return {
+		"id": id, "serial": serial, "rng_seed": str(rng.seed), "rng_state": str(rng.state), "cosmetic_rng_state": str(cosmetic_rng.state),
+		"state": STATE_NAMES[state], "state_since": state_since, "goal": str(goal), "goal_since": goal_since, "goal_reason": goal_reason,
+		"perch": perch.id if perch != null else "", "stand": RecordMath.v3(stand), "normal": RecordMath.v3(normal),
+		"heading": RecordMath.v3(heading), "position": RecordMath.v3(global_position), "velocity": RecordMath.v3(velocity),
+		"fatigue": fatigue, "restless_rate": restless_rate, "perched_since": perched_since,
+		"schedule": {"next_fidget": _next_fidget_t, "fidget_t0": _fidget_t0, "fidget_t1": _fidget_t1, "fidget_from": RecordMath.v3(_fidget_from),
+			"fidget_to": RecordMath.v3(_fidget_to), "next_groom": _next_groom_t, "groom_t1": _groom_t1},
+		"senses": senses.to_record(), "mind": mind.to_record(), "flight": flight.to_record(),
+		"captured_by": captured_by, "capture_event_id": capture_event_id, "nutrition_total": nutrition_total, "nutrition_left": nutrition_left,
+	}
+
+
+## Restores a record made by to_record onto a fly that setup() has wired (with the record's seed) and that is in the tree. `find_perch`
+## turns a perch id into the director's perch (or a vent), null when it has none. The record must already have been validated.
+func apply_record(r: Dictionary, find_perch: Callable) -> void:
+	rng.state = String(r["rng_state"]).to_int()
+	cosmetic_rng.state = String(r["cosmetic_rng_state"]).to_int()
+	state = STATE_NAMES.find(str(r["state"]))
+	state_since = float(r["state_since"])
+	goal = StringName(str(r["goal"]))
+	goal_since = float(r["goal_since"])
+	goal_reason = str(r["goal_reason"])
+	perch = find_perch.call(str(r["perch"])) if str(r["perch"]) != "" else null
+	stand = RecordMath.to_v3(r["stand"])
+	normal = RecordMath.to_v3(r["normal"])
+	heading = RecordMath.to_v3(r["heading"])
+	velocity = RecordMath.to_v3(r["velocity"])
+	fatigue = float(r["fatigue"])
+	restless_rate = float(r["restless_rate"])
+	perched_since = float(r["perched_since"])
+	var sch: Dictionary = r["schedule"]
+	_next_fidget_t = float(sch["next_fidget"])
+	_fidget_t0 = float(sch["fidget_t0"])
+	_fidget_t1 = float(sch["fidget_t1"])
+	_fidget_from = RecordMath.to_v3(sch["fidget_from"])
+	_fidget_to = RecordMath.to_v3(sch["fidget_to"])
+	_next_groom_t = float(sch["next_groom"])
+	_groom_t1 = float(sch["groom_t1"])
+	senses.apply_record(r["senses"])
+	mind.apply_record(r["mind"])
+	flight.apply_record(r["flight"], find_perch)
+	captured_by = str(r["captured_by"])
+	capture_event_id = str(r["capture_event_id"])
+	nutrition_total = float(r["nutrition_total"])
+	nutrition_left = float(r["nutrition_left"])
+	global_position = RecordMath.to_v3(r["position"])
+	prev_position = global_position
+	_apply_basis()
+	reset_physics_interpolation()
+	visible = state != State.CONSUMED
+	_now = float(world.now)
+	_pose(_now)

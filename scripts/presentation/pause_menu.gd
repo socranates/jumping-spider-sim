@@ -4,6 +4,10 @@ extends CanvasLayer
 ## Changes are written through to Settings, which saves on every change.
 
 var settings: Node  # Settings autoload, or a test instance
+## T09: the world, for "Return to checkpoint" (null in a menu built on its own).
+var world: Node
+var _checkpoint_button: Button
+var _checkpoint_label: Label
 
 var _dim: ColorRect
 var _panel: PanelContainer
@@ -34,6 +38,7 @@ func set_paused(paused: bool) -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if paused else Input.MOUSE_MODE_CAPTURED
 	if paused:
 		_refresh()
+		_refresh_checkpoint()
 		_resume_button.grab_focus()
 
 
@@ -110,12 +115,24 @@ func _build() -> void:
 	_resume_button.custom_minimum_size = Vector2(140.0, 0.0)
 	_resume_button.pressed.connect(set_paused.bind(false))
 	buttons.add_child(_resume_button)
+	_checkpoint_button = Button.new()
+	_checkpoint_button.name = "ReturnToCheckpoint"
+	_checkpoint_button.text = "Return to checkpoint"
+	_checkpoint_button.pressed.connect(_on_return_to_checkpoint)
+	buttons.add_child(_checkpoint_button)
 	var quit_button := Button.new()
 	quit_button.text = "Quit"
 	quit_button.custom_minimum_size = Vector2(140.0, 0.0)
 	quit_button.pressed.connect(func() -> void: get_tree().quit())
 	buttons.add_child(quit_button)
+	_checkpoint_label = Label.new()
+	_checkpoint_label.name = "CheckpointStatus"
+	_checkpoint_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_checkpoint_label.custom_minimum_size = Vector2(560.0, 0.0)
+	_checkpoint_label.add_theme_font_size_override("font_size", 16)
+	box.add_child(_checkpoint_label)
 	_refresh()
+	_refresh_checkpoint()
 
 
 func _add_slider(parent: Control, key: String, label_text: String, step: float, format: String) -> void:
@@ -168,3 +185,28 @@ func _update_value_label(key: String, value: float) -> void:
 		(_value_labels[key] as Label).text = "%d%%" % roundi(value * 100.0)
 	else:
 		(_value_labels[key] as Label).text = format % value
+
+
+## T09 (S01-C): the checkpoint action says what it does, and is off with the reason when there is nothing to return to. It is recovery of
+## the whole world as it was at the last rest, never "save current position".
+func _refresh_checkpoint() -> void:
+	if _checkpoint_button == null:
+		return
+	if world == null or not world.has_method("available_checkpoint") or not world.use_windowsill:
+		_checkpoint_button.disabled = true
+		_checkpoint_label.text = "Checkpoints: only the windowsill has a retreat to rest in."
+		return
+	var found: Dictionary = world.available_checkpoint()
+	_checkpoint_button.disabled = not bool(found["ok"])
+	if bool(found["ok"]):
+		var note := "" if str(found.get("source", "")) != "backup" else "  (" + str(found["message"]) + ")"
+		_checkpoint_label.text = "Return to checkpoint: the whole sill goes back to how it was when you last rested in the crack; anything since is undone.%s" % note
+	else:
+		_checkpoint_label.text = str(found["message"])
+
+
+func _on_return_to_checkpoint() -> void:
+	if world == null:
+		return
+	set_paused(false)
+	world.call_deferred("return_to_checkpoint")

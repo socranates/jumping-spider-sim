@@ -1,0 +1,32 @@
+# Shared GitHub workflow
+
+Repository: https://github.com/socranates/jumping-spider-sim
+
+Both Chet and Claude can code this project. Work one writer at a time. The repository files and commits are the shared record; chat history may be incomplete.
+
+## Start a session
+
+1. Read `claude/where-we-left-off.md`, the latest `docs/HANDOFF-chunk-*.md`, and Nathan's newest notes.
+2. Inspect `git status` and `git remote -v`. If the checkout is clean, fetch and fast-forward from origin/main before editing. If local work exists, preserve it and inspect divergence; never reset or overwrite it to make pulling easier.
+3. Continue the named next task. Preserve Nathan's approved mechanics unless he requests a change or a demonstrated bug requires one.
+
+## Finish or hand off
+
+1. Run appropriate checks. Record exactly what ran, its evidence ID, and what is deferred. Headless fixed-FPS tests are not graphical timing evidence.
+2. Update `claude/where-we-left-off.md` and the current handoff with completed work, unfinished work, test results, and any reproduction steps.
+3. Commit the work and push it to the shared repository. If remote main advanced, inspect and reconcile changes; never force-push over another agent's work. Use a branch when work needs review or is incomplete, and clearly name that branch in the handoff.
+4. Tell Nathan which commit/branch the other agent should pull. Do not assume another Claude session shares local filesystem access.
+
+## Evidence and local files
+
+Generated `.godot/`, `tests/reports/`, and `godot_path.txt` remain local. Selected frozen reports and preview images live under `docs/verification/` for cloud readers. The snapshot tool excludes `.git/`; Git history is shared through Git, not embedded inside each game archive.
+
+Evidence hashes cover exact bytes. `.gitattributes` preserves bytes for the hashed game/test assets. Do not normalize those files merely for formatting; intentional byte changes should receive a new evidence ID and appropriate validation.
+
+Engine: Godot 4.7.2 standard build, Compatibility renderer, Jolt physics. A fresh cloud session needs that engine to run the supplied tests; if unavailable, report the limitation rather than inventing a pass. Windows launchers find the local engine separately; no personal path is committed.
+
+## Current baseline
+
+Gameplay and project-settings hashes are unchanged from the fully tested chunk-8 build 182235d71390 (481 passed, one deferred save/load test). GitHub setup only changed snapshot tooling and its regression fixture, producing evidence 779a6714b373. The setup check passed 9 tests (the evidence fixtures plus A01 selected by the file filter); see `docs/verification/github-setup-report.txt`. The older full-suite results are preserved under `docs/verification/chunk8/` and are not relabeled as a full run of the new tooling ID.
+
+Next planned implementation: T09, whole-world retreat checkpoints (S01-C) and accessibility, after Nathan's habitat notes.

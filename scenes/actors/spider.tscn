@@ -1,0 +1,16 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/movement/spider_motor.gd" id="1_motor"]
+[ext_resource type="Script" path="res://scripts/presentation/spider_body.gd" id="2_body"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_collider"]
+radius = 0.3
+
+[node name="Spider" type="CharacterBody3D"]
+script = ExtResource("1_motor")
+
+[node name="Collider" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_collider")
+
+[node name="Body" type="Node3D" parent="."]
+script = ExtResource("2_body")

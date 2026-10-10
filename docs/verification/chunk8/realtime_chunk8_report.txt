@@ -1,0 +1,32 @@
+Jumping Spider Sim test report
+timestamp_utc: 2026-10-10T21:37:34Z
+engine: Godot 4.7.2.stable.official.ed1daf0bf
+platform: Windows
+renderer_setting: gl_compatibility
+renderer_active: gl_compatibility
+physics_engine: Jolt Physics
+source_hash_md5: 3a567f74291b3315aeab0092ddd09e0a (scripts, scenes, data)
+settings_hash_md5: 8b6707d4bb26d00c21239d1c75d3aec2 (project.godot)
+tests_hash_md5: e42dda6d5dbaf05235638c5663e1b231 (tests/ scripts and scenes, not tests/reports)
+evidence_id: 182235d71390 (keeps a copy of this state: snapshot.bat writes tests/reports/snapshots/DATE_182235d71390.zip)
+fixture_seed: 20261005
+filter: only=unit,integration,gates files=windowsill,captured_contact
+tests: 13
+passed: 13
+failed: 0
+not_run: 0
+result: PASS
+
+PASS     test_captured_contact.gd::test_bodily_capture_keeps_two_ambiguous_lost_marks  2 checks
+PASS     test_captured_contact.gd::test_capture_does_not_erase_an_old_lost_hypothesis_or_invent_one  3 checks
+PASS     test_captured_contact.gd::test_observed_capture_resolves_mark_without_duplicate_food  8 checks
+PASS     test_windowsill.gd::test_disturbance_warns_passes_once_and_never_moves_collision  10 checks
+PASS     test_windowsill.gd::test_feed_takes_priority_over_rest_and_keeps_its_remaining_nutrition  4 checks
+PASS     test_windowsill.gd::test_front_route_returns_to_physical_retreat_without_teleport  9 checks
+PASS     test_windowsill.gd::test_habitat_capture_and_interrupted_meal_keep_the_same_ownership  9 checks
+PASS     test_windowsill.gd::test_habitat_perches_and_entries_validate_with_four_flies  16 checks
+PASS     test_windowsill.gd::test_pause_freezes_rest_needs_flies_and_disturbance  4 checks
+PASS     test_windowsill.gd::test_rest_restores_only_rest_and_movement_cancels_it  6 checks
+PASS     test_windowsill.gd::test_retreat_refuses_rest_outside_and_cancels_on_jump_preparation  4 checks
+PASS     test_windowsill.gd::test_upper_route_can_be_entered_from_floor_and_camera_clears_the_crevice  3 checks
+PASS     test_windowsill.gd::test_upper_route_jumps_across_the_gap_and_back  40 checks

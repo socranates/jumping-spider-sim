@@ -1,0 +1,176 @@
+extends RefCounted
+## NeedsModel (spec 11, 19.3, 21.3 NeedState): the spider's reserves, and the only place they change. P0 simulates ENERGY and REST
+## and nothing else (hydration, stress and condition are named placeholders in the record, not simulated). It owns the numbers and
+## the rule that they only change through approved calls: time passing (advance) and food (grant_energy). It never reads the world,
+## never decides that anything is eaten, and does not know what a fly is: the feeding controller asks it to grant, and says which
+## source the energy came from, so a ledger can show that no source ever gave more than it had.
+##
+## Energy (P0 sandbox rule, spec 11: "the first hunt should not be timed against starvation"). It drains very slowly with the
+## passing of action time and stops at ENERGY_FLOOR: nothing happens at the floor, nothing is lost, and nothing stops working. The
+## drain is integrated over elapsed action time in steps of UPDATE_PERIOD_S (spec 20: needs update at 1 to 2 Hz), so the same
+## total time drains the same energy at 30, 60 or 144 frames a second and a stall cannot drain more than a capped step.
+## Rest is a second reserve with no consequence in P0: it wears down while the spider is active and builds back while it keeps
+## still. It is here so that the retreat (T08) has something to restore; nothing reads it for a decision yet.
+
+signal energy_changed(old_value: float, new_value: float)
+
+const ENERGY_MAX := 1.0
+const ENERGY_START := 0.55
+## 0.0006 a second: a full reserve would last about 28 minutes, and the start of 0.55 reaches the floor after about 10.
+const ENERGY_DRAIN_PER_S := 0.0006
+const ENERGY_FLOOR := 0.20
+const REST_MAX := 1.0
+const REST_START := 1.0
+const REST_DRAIN_PER_S := 0.0012
+const REST_RECOVER_PER_S := 0.004
+## Spec 20: needs and zones update at 1 to 2 Hz, integrating the action time that actually passed.
+const UPDATE_PERIOD_S := 0.5
+## One call may account for at most this much time (spec 20, time safety: never integrate an arbitrarily large step after a stall).
+const MAX_STEP_S := 0.25
+## "Full" for the purposes of a hint on the screen: feeding is never refused for it (see the feeding controller).
+const FULL_AT := 0.98
+const STAGE_ID := "p0_prototype"
+
+var energy: float = ENERGY_START
+var rest: float = REST_START
+## Total action time accounted for, seconds.
+var elapsed_s: float = 0.0
+## Everything ever granted, and by which source: no source may give more than it had.
+var granted_total: float = 0.0
+var granted_by_source: Dictionary = {}
+var grants_made: int = 0
+var grants_refused: int = 0
+
+var _acc_active: float = 0.0
+var _acc_still: float = 0.0
+
+
+## Changes the numbers for a fixture. Keys: energy, rest. Values outside [0, 1] or not finite are ignored.
+func configure(values: Dictionary) -> void:
+	if values.has("energy") and _unit(values["energy"]):
+		energy = float(values["energy"])
+	if values.has("rest") and _unit(values["rest"]):
+		rest = float(values["rest"])
+
+
+## Lets `dt` seconds of action time pass. `active` is whether the spider spent them moving (walking, leaping, hanging) rather
+## than keeping still. Non-finite or non-positive time is ignored; a long step counts as at most MAX_STEP_S.
+func advance(dt: float, active: bool) -> void:
+	if not is_finite(dt) or dt <= 0.0:
+		return
+	dt = minf(dt, MAX_STEP_S)
+	elapsed_s += dt
+	if active:
+		_acc_active += dt
+	else:
+		_acc_still += dt
+	var total := _acc_active + _acc_still
+	while total >= UPDATE_PERIOD_S - 1e-9:
+		_apply(UPDATE_PERIOD_S, _acc_active / total)
+		var keep := (total - UPDATE_PERIOD_S) / total
+		_acc_active *= keep
+		_acc_still *= keep
+		total -= UPDATE_PERIOD_S
+
+
+func _apply(period: float, active_share: float) -> void:
+	var before := energy
+	if energy > ENERGY_FLOOR:
+		energy = maxf(ENERGY_FLOOR, energy - ENERGY_DRAIN_PER_S * period)
+	rest = clampf(rest + (REST_RECOVER_PER_S * (1.0 - active_share) - REST_DRAIN_PER_S * active_share) * period, 0.0, REST_MAX)
+	if energy != before:
+		energy_changed.emit(before, energy)
+
+
+## Adds food energy from `source_id` (a prey id). Returns what was actually added: nothing for an amount that is not a positive finite
+## number or a source with no name, and never more than the room left below ENERGY_MAX. The caller is the one that decides that
+## the energy is deserved (the feeding controller, only while a held prey is being eaten); this only keeps the books.
+func grant_energy(amount: float, source_id: String) -> float:
+	if source_id == "" or not is_finite(amount) or amount <= 0.0:
+		grants_refused += 1
+		return 0.0
+	var added := minf(amount, room())
+	if added <= 0.0:
+		return 0.0
+	var before := energy
+	energy = minf(ENERGY_MAX, energy + added)
+	added = energy - before
+	granted_total += added
+	granted_by_source[source_id] = float(granted_by_source.get(source_id, 0.0)) + added
+	grants_made += 1
+	energy_changed.emit(before, energy)
+	return added
+
+
+## Energy that could still be added.
+func room() -> float:
+	return maxf(0.0, ENERGY_MAX - energy)
+
+
+## A valid retreat interaction restores rest; it never grants food energy.
+func restore_rest(amount: float) -> void:
+	if is_finite(amount) and amount > 0.0:
+		rest = minf(REST_MAX, rest + amount)
+
+
+func is_full() -> bool:
+	return energy >= FULL_AT
+
+
+## What one source has given so far.
+func granted_from(source_id: String) -> float:
+	return float(granted_by_source.get(source_id, 0.0))
+
+
+## The NeedState record (spec 21.3): the reserves in [0, 1], the update accumulator and the stage. Only the enabled needs are
+## simulated; the others are null, named so that the record has the shape the save will need.
+func to_dict() -> Dictionary:
+	return {
+		"energy": energy, "rest": rest, "hydration": null, "stress": null, "condition": null,
+		"enabled": ["energy", "rest"], "update_accumulator": [_acc_active, _acc_still], "stage_id": STAGE_ID,
+		"elapsed_s": elapsed_s, "granted_total": granted_total, "granted_by_source": granted_by_source.duplicate(),
+	}
+
+
+## Restores a record made by to_dict. False, and nothing changed, for anything that is not one: a missing or non-finite number, a
+## reserve outside [0, 1], an accumulator that is not two non-negative numbers, a grant ledger that does not add up.
+func load_dict(d: Dictionary) -> bool:
+	for key: String in ["energy", "rest", "elapsed_s", "granted_total"]:
+		if not d.has(key) or not (typeof(d[key]) == TYPE_FLOAT or typeof(d[key]) == TYPE_INT) or not is_finite(float(d[key])):
+			return false
+	if not _unit(d["energy"]) or not _unit(d["rest"]) or float(d["elapsed_s"]) < 0.0 or float(d["granted_total"]) < 0.0:
+		return false
+	var acc: Variant = d.get("update_accumulator")
+	if typeof(acc) != TYPE_ARRAY or (acc as Array).size() != 2:
+		return false
+	for v: Variant in acc:
+		if (typeof(v) != TYPE_FLOAT and typeof(v) != TYPE_INT) or not is_finite(float(v)) or float(v) < 0.0:
+			return false
+	var by_source: Variant = d.get("granted_by_source")
+	if typeof(by_source) != TYPE_DICTIONARY:
+		return false
+	var sum := 0.0
+	for k: Variant in (by_source as Dictionary):
+		var v: Variant = (by_source as Dictionary)[k]
+		if typeof(k) != TYPE_STRING or (typeof(v) != TYPE_FLOAT and typeof(v) != TYPE_INT) or not is_finite(float(v)) or float(v) < 0.0:
+			return false
+		sum += float(v)
+	if absf(sum - float(d["granted_total"])) > 1e-6:
+		return false
+	energy = float(d["energy"])
+	rest = float(d["rest"])
+	elapsed_s = float(d["elapsed_s"])
+	granted_total = float(d["granted_total"])
+	granted_by_source = (by_source as Dictionary).duplicate()
+	_acc_active = float((acc as Array)[0])
+	_acc_still = float((acc as Array)[1])
+	return true
+
+
+## Developer text for the F3 overlay.
+func describe() -> String:
+	return "Energy %.3f (drain %.4f/s to a floor of %.2f), rest %.3f; granted %.3f from %d source(s)" % [energy, ENERGY_DRAIN_PER_S, ENERGY_FLOOR, rest, granted_total, granted_by_source.size()]
+
+
+static func _unit(v: Variant) -> bool:
+	return (typeof(v) == TYPE_FLOAT or typeof(v) == TYPE_INT) and is_finite(float(v)) and float(v) >= 0.0 and float(v) <= 1.0

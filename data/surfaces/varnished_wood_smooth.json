@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "id": "varnished_wood_smooth",
+  "attachable": true,
+  "silk_anchor_allowed": true,
+  "adhesion_multiplier": 0.9,
+  "vibration_group": "lab_ramp",
+  "wetness_response_profile": "wood_default"
+}

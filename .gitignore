@@ -1,0 +1,12 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+# Local to each machine
+godot_path.txt
+tests/reports/
+
+# Local environment and credentials
+.env
+.env.*
+!.env.example

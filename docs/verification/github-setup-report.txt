@@ -1,0 +1,28 @@
+Jumping Spider Sim test report
+timestamp_utc: 2026-10-10T21:46:03Z
+engine: Godot 4.7.2.stable.official.ed1daf0bf
+platform: Windows
+renderer_setting: gl_compatibility
+renderer_active: gl_compatibility
+physics_engine: Jolt Physics
+source_hash_md5: 3a567f74291b3315aeab0092ddd09e0a (scripts, scenes, data)
+settings_hash_md5: 8b6707d4bb26d00c21239d1c75d3aec2 (project.godot)
+tests_hash_md5: 847caff0d04db79e1ec65befbd81503a (tests/ scripts and scenes, not tests/reports)
+evidence_id: 779a6714b373 (keeps a copy of this state: snapshot.bat writes tests/reports/snapshots/DATE_779a6714b373.zip)
+fixture_seed: 20261005
+filter: only=unit,integration,gates files=evidence
+tests: 9
+passed: 9
+failed: 0
+not_run: 0
+result: PASS
+
+PASS     test_evidence.gd::test_a_missing_folder_is_reported_not_crashed  1 checks
+PASS     test_evidence.gd::test_files_that_are_not_evidence_change_nothing  4 checks
+PASS     test_evidence.gd::test_hashes_follow_their_own_files_only  13 checks
+PASS     test_evidence.gd::test_the_archive_holds_the_project_except_the_cache_and_the_reports  19 checks
+PASS     test_evidence.gd::test_the_archive_is_written_read_back_and_checked  31 checks
+PASS     test_evidence.gd::test_the_id_is_twelve_hex_digits_made_from_all_three  7 checks
+PASS     test_evidence.gd::test_the_real_project_archive_would_hold_what_matters  10 checks
+PASS     test_evidence.gd::test_the_source_hash_is_the_one_the_report_always_had  2 checks
+PASS     test_a01_fly_evidence.gd::test_a01_a_fly_flees_on_sensed_evidence_not_on_the_jump_button_its_trace_explains_each_step_and_a_capture_happens_once  17 checks

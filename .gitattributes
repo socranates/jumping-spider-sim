@@ -1,0 +1,12 @@
+# Normalize EOL for all files that Git considers text files.
+* text=auto eol=lf
+# Windows batch files need CRLF line endings.
+*.bat text eol=crlf
+
+# Evidence IDs hash exact bytes: keep tested game/test assets identical across clones.
+*.gd -text
+*.tscn -text
+*.tres -text
+*.json -text
+*.gdshader -text
+project.godot -text

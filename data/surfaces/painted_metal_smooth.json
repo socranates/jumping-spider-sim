@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "id": "painted_metal_smooth",
+  "attachable": true,
+  "silk_anchor_allowed": true,
+  "adhesion_multiplier": 0.9,
+  "vibration_group": "lab_platforms",
+  "wetness_response_profile": "metal_default"
+}

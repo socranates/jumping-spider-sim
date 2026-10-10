@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "id": "phidippus_audax_prototype",
+  "biological_status": "approximation_pending_species_review",
+  "body_length_wu": 1.0,
+  "locomotion": {
+    "walk_speed_wu_s": 2.5,
+    "stalk_speed_wu_s": 0.8,
+    "gravity_wu_s2": 35.0,
+    "max_launch_speed_wu_s": 20.0,
+    "flight_time_min_s": 0.35,
+    "flight_time_max_s": 0.9
+  },
+  "perception": {
+    "inspect_cone_degrees": 30.0,
+    "easy_target_inspection_s": 0.4,
+    "fly_like_inspection_s": 1.0,
+    "easy_apparent_size_deg": 3.0,
+    "min_apparent_size_deg": 0.6,
+    "peripheral_cone_degrees": 300.0,
+    "peripheral_sector_degrees": 22.5,
+    "sensor_range_wu": 40.0,
+    "motion_min_speed_wu_s": 0.3,
+    "cue_cooldown_s": 0.8,
+    "broad_query_hz": 10.0,
+    "close_check_range_wu": 4.0,
+    "exposure_grace_s": 0.15,
+    "memory_decay_s": 6.0,
+    "focus_turn_rate_deg_s": 180.0,
+    "gaze_pitch_limit_deg": 35.0,
+    "contact_speed_bound_wu_s": 2.0,
+    "contact_size_ratio": 1.5
+  },
+  "silk": {
+    "max_line_length_wu": 20.0,
+    "reel_speed_wu_s": 1.5
+  },
+  "life_cycle_profile_id": null,
+  "evidence_refs": ["B1", "B2", "B3", "B4"]
+}

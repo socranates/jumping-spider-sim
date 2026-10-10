@@ -27,6 +27,44 @@ var recoil_enabled: bool = true
 ## Where the recoil has put the model, in the physics body's space (zero when it is not recoiling).
 var recoil_offset: Vector3 = Vector3.ZERO
 
+## T09b, the twitchy jumping-spider body (cosmetic, A-018): the model turns in quick snaps instead of a smooth swivel, walks in little
+## stop-and-dart lurches, crouches while aiming, makes small idle flicks when still, and jolts when held prey struggles. Only this child
+## node moves, by at most TWITCH_MAX_WU and SNAP_DEG: the physics body, its heading, the senses (the spider's and every fly's), the camera
+## and the line never see it. "Reduced motion" in the pause panel turns it off (and the catch recoil).
+const SNAP_DEG := 14.0             # the model lags a turn by up to this, then snaps round
+const SNAP_RATE := 28.0            # 1/s: how fast a snap closes the gap
+const SETTLE_S := 0.12             # a turn that has stopped is snapped home after this
+const STRIDE_WU := 0.32            # walking distance per lurch
+const LURCH_WU := 0.07             # how far the model holds back then darts ahead, walking
+const STALK_LURCH_WU := 0.035      # ... and stalking
+const DART_SHARE := 0.3            # the share of each stride spent darting
+const CROUCH_WU := 0.035
+const IDLE_INTERVAL_S := Vector2(0.7, 2.4)
+const IDLE_FLICK_DEG := Vector2(4.0, 9.0)
+const JOLT_DEG := 10.0
+const TWITCH_MAX_WU := 0.1
+var twitch_enabled: bool = true
+## What the twitch adds to the model's place and to its yaw about the body's up (radians).
+var twitch_offset: Vector3 = Vector3.ZERO
+var twitch_yaw: float = 0.0
+var _last_heading: Vector3 = Vector3.ZERO
+var _yaw_lag: float = 0.0
+var _snapping: bool = false
+var _still_turn_s: float = 0.0
+var _stride: float = 0.0
+var _lurch: float = 0.0
+var _crouch: float = 0.0
+var _idle_s: float = 0.0
+var _next_idle_s: float = 1.0
+var _flick: float = 0.0
+var _flick_target: float = 0.0
+var _flick_hold: float = 0.0
+var _bob: float = 0.0
+var _jolt: float = 0.0
+var _jolt_t: float = 0.0
+## Cosmetic stream (never gameplay): the idle flicks.
+var _twitch_rng: RandomNumberGenerator = RandomNumberGenerator.new()
+
 var _mats: Dictionary = {}
 var _recoil_dir: Vector3 = Vector3.ZERO
 var _recoil_amp: float = 0.0
@@ -35,6 +73,7 @@ var _recoiling: bool = false
 
 
 func _ready() -> void:
+	_twitch_rng.seed = 91573
 	_build()
 	var motor := get_parent()
 	if motor != null and motor.has_signal("line_event"):
@@ -57,15 +96,96 @@ func is_recoiling() -> bool:
 
 
 func _physics_process(delta: float) -> void:
-	if not _recoiling:
+	if _recoiling:
+		_recoil_t += delta
+		var envelope := exp(-RECOIL_DAMPING * _recoil_t)
+		recoil_offset = _recoil_dir * _recoil_amp * envelope * sin(TAU * RECOIL_FREQUENCY * _recoil_t)
+		if _recoil_amp * envelope < RECOIL_STOP:
+			_recoiling = false
+			recoil_offset = Vector3.ZERO
+	_twitch(delta)
+	position = recoil_offset + twitch_offset
+	rotation = Vector3(0.0, twitch_yaw, 0.0)
+
+
+## A jolt of the whole model (held prey struggling).
+func jolt(strength: float = 1.0) -> void:
+	if twitch_enabled:
+		_jolt = clampf(strength, 0.0, 1.0)
+		_jolt_t = 0.0
+
+
+func _twitch(delta: float) -> void:
+	var motor := get_parent()
+	var standing: bool = motor != null and motor.has_method("get_heading_vector") and twitch_enabled and delta > 0.0 \
+		and (motor.state == motor.State.ATTACHED or motor.state == motor.State.PREPARING) and not motor.in_transition()
+	if not standing:
+		_last_heading = Vector3.ZERO
+		_yaw_lag = 0.0
+		_snapping = false
+		_lurch = 0.0
+		_crouch = 0.0
+		_flick = 0.0
+		_bob = 0.0
+		_jolt = 0.0
+		twitch_offset = Vector3.ZERO
+		twitch_yaw = 0.0
 		return
-	_recoil_t += delta
-	var envelope := exp(-RECOIL_DAMPING * _recoil_t)
-	recoil_offset = _recoil_dir * _recoil_amp * envelope * sin(TAU * RECOIL_FREQUENCY * _recoil_t)
-	if _recoil_amp * envelope < RECOIL_STOP:
-		_recoiling = false
-		recoil_offset = Vector3.ZERO
-	position = recoil_offset
+	var up: Vector3 = motor.get_visual_up()
+	var h: Vector3 = motor.get_heading_vector()
+	h = (h - up * h.dot(up)).normalized()
+	# Turns: the model keeps its old facing until the gap passes SNAP_DEG (or the turn stops), then snaps round.
+	if _last_heading != Vector3.ZERO:
+		var d := _last_heading.signed_angle_to(h, up)
+		if absf(d) > 0.8:
+			_yaw_lag = 0.0
+		else:
+			_yaw_lag -= d
+		_still_turn_s = _still_turn_s + delta if absf(d) < 1.0e-4 else 0.0
+	_last_heading = h
+	if absf(_yaw_lag) > deg_to_rad(SNAP_DEG) or (_still_turn_s >= SETTLE_S and absf(_yaw_lag) > 1.0e-3):
+		_snapping = true
+	if _snapping:
+		_yaw_lag *= exp(-SNAP_RATE * delta)
+		if absf(_yaw_lag) < deg_to_rad(0.5):
+			_yaw_lag = 0.0
+			_snapping = false
+	# Walking: hold back, then dart ahead, once a stride.
+	var speed: float = motor.velocity.length()
+	if speed > 0.05 and motor.state == motor.State.ATTACHED:
+		_stride += speed * delta / STRIDE_WU
+		var phase := fposmod(_stride, 1.0)
+		var amp := STALK_LURCH_WU if motor.is_stalking() else LURCH_WU
+		var hold := 1.0 - DART_SHARE
+		_lurch = lerpf(amp, -amp, phase / hold) if phase < hold else lerpf(-amp, amp, (phase - hold) / DART_SHARE)
+		_idle_s = 0.0
+		_flick_target = 0.0
+	else:
+		_lurch = move_toward(_lurch, 0.0, 0.8 * delta)
+		_idle_s += delta
+	# Still: now and then a small flick of the body or a bob.
+	if _idle_s >= _next_idle_s:
+		_idle_s = 0.0
+		_next_idle_s = _twitch_rng.randf_range(IDLE_INTERVAL_S.x, IDLE_INTERVAL_S.y)
+		if _twitch_rng.randf() < 0.65:
+			_flick_target = deg_to_rad(_twitch_rng.randf_range(IDLE_FLICK_DEG.x, IDLE_FLICK_DEG.y)) * (1.0 if _twitch_rng.randf() < 0.5 else -1.0)
+			_flick_hold = 0.18
+		else:
+			_bob = -0.025
+	_flick = move_toward(_flick, _flick_target, deg_to_rad(240.0) * delta)
+	if _flick_target != 0.0 and absf(_flick - _flick_target) < 1.0e-4:
+		_flick_hold -= delta
+		if _flick_hold <= 0.0:
+			_flick_target = 0.0
+	_bob = move_toward(_bob, 0.0, 0.25 * delta)
+	_crouch = move_toward(_crouch, -CROUCH_WU if motor.state == motor.State.PREPARING else 0.0, 0.4 * delta)
+	var jolt_yaw := 0.0
+	if _jolt > 0.0:
+		_jolt_t += delta
+		jolt_yaw = deg_to_rad(JOLT_DEG) * _jolt * sin(_jolt_t * 55.0)
+		_jolt = maxf(0.0, _jolt - 4.0 * delta)
+	twitch_offset = Vector3(0.0, _bob + _crouch, -_lurch).limit_length(TWITCH_MAX_WU)
+	twitch_yaw = _yaw_lag + _flick + jolt_yaw
 
 
 func _on_line_event(kind: String, _detail: String) -> void:

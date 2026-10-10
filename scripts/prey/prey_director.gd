@@ -42,6 +42,8 @@ const OWNER_ID := "spider"
 signal fly_spawned(fly: Node3D)
 ## A capture was resolved (once per event id). The dictionary: id, tick, t, owner, prey, distance, reach, assisted, t_closest.
 signal captured(event: Dictionary)
+## T09b: the prey in the jaws tore free before it was subdued; its capture is undone (id, tick, t, prey, reason).
+signal escaped(event: Dictionary)
 
 ## The spider (anything with a global_position; its radius comes from get_body_radius() when it has one) and the lab (perches, vents).
 var spider: Node3D
@@ -79,6 +81,9 @@ var strike_active: bool = false
 var strike_started_tick: int = -1
 var held: Node3D = null
 var capture_log: Array[Dictionary] = []
+## T09b: captures that did not hold (the prey struggled free), and how hard the prey in the jaws is jerking now (0 to 1, drawn only).
+var escape_log: Array[Dictionary] = []
+var held_jerk: float = 0.0
 var refused_log: Array[Dictionary] = []
 ## Cost of the prey tick (microseconds), for the cost report: totals, the largest, and a ring of the latest for percentiles.
 var cpu_us_total: int = 0
@@ -483,6 +488,11 @@ func _carry_held() -> void:
 		var up: Vector3 = spider.get_visual_up()
 		var forward: Vector3 = spider.get_heading_vector()
 		held.global_position = spider.get_eye_position() + forward * 0.2 - up * 0.13
+		if held_jerk > 0.0:
+			# T09b: a struggling fly jerks in the jaws (drawn only).
+			var side: Vector3 = forward.cross(up)
+			held.global_position += (side * sin(now * 61.0) * 0.06 + up * cos(now * 47.0) * 0.04) * held_jerk
+			held_jerk = maxf(0.0, held_jerk - 0.05)
 		held.normal = up
 		held.heading = forward
 		held.velocity = Vector3.ZERO
@@ -494,6 +504,29 @@ func _carry_held() -> void:
 ## Lets go of the held prey (it was eaten, or dropped). The fly itself keeps whatever state it has.
 func release_held() -> void:
 	held = null
+
+
+## T09b: the prey in the jaws tore free before it was subdued. Its capture is undone (removed from the log, so the same fly can be caught
+## again under the same event id; nothing was eaten of it, since a struggling prey cannot be fed on), the fly flees on its own evidence,
+## and a replacement owed for it is no longer owed. Returns false when nothing is held.
+func escape_held(reason: String) -> bool:
+	if held == null or not is_instance_valid(held) or held.state != Fly.State.CAPTURED:
+		return false
+	var f: Node3D = held
+	var event_id: String = f.capture_event_id
+	held = null
+	held_jerk = 0.0
+	for i in range(capture_log.size() - 1, -1, -1):
+		if str(capture_log[i]["id"]) == event_id:
+			capture_log.remove_at(i)
+			break
+	_event_ids.erase(event_id)
+	f.escape_capture(now, reason)
+	population.forget_owed(1)
+	var event := {"id": event_id, "tick": tick, "t": now, "prey": f.id, "reason": reason}
+	escape_log.append(event)
+	escaped.emit(event)
+	return true
 
 
 # ------------------------------------------------------------------ persistence (T09, spec 21.3 PreyState, S01-C)

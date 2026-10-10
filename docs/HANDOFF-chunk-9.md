@@ -64,3 +64,27 @@ New: `scripts/persistence/` — `checkpoint.gd` (boundary check, capture, full v
 1. Nathan: `run_tests.bat` + `snapshot.bat` on Windows. Play: rest in the crack, wander and eat a fly, then Return to checkpoint. Is the fly back, is the energy back, does it feel like recovery and not a cheat? Try remapping one key and the text size, and try the field notes with a controller if you have one.
 2. T09 part 2: controller remapping; reduced-effects and nonvisual cue options (spec 17; there is no audio yet, so "visual alternatives to audio" is trivially met); assisted-play presets; a Windows interrupted-write test. Then the human U01/W01 sessions.
 3. Keep the lab fixtures. Don't revive the arbitrary-state S01 silently.
+
+---
+
+## T09b — the feel of the hunt (same branch, added after Nathan's notes)
+
+Nathan asked for twitchy jumping-spider movement, a fly that looks to and fro while you creep, a tap-to-hold struggle with a depleting bar, hunts that are deliberately slow and challenging, and a leaf on the sill that gives way so the silk can catch you. Decisions T9b-01 … T9b-06.
+
+**Evidence:** **8149fa0be2b8**, full suite **511 / 511 passed** (Linux headless, fixed 60 fps), `docs/verification/t09b/full_report_t09b.txt`. Hunt, struggle, leaf and save tests 37/37 at fixed 30 and 144 fps. Main scene smoke run clean. Stills: `t09b_struggle.png`, `t09b_pause_menu.png`. Tuning measurements: `tuning_run.txt`. **Not run on Windows.** This supersedes the evidence ID in the first half of this file for the branch head.
+
+**How the hunt plays now**
+- Watch the fly. It turns to look one way, then the other, every second or two. **Move while it looks away; freeze when it looks back.** A steady creep in plain view gets you spotted around 4 WU. Patient, timed creeping gets you to striking range in roughly 15–20 s from 7 WU. Quick dashes while it looks away work too, but they're riskier up close.
+- Strike from about 2 WU. A long leap usually fails.
+- **After the catch the fly struggles:** "IT STRUGGLES!" and a grip bar. Tap E / X (about twice a second) to keep the bar up until it goes still (about 3 s). Stop tapping and it tears free and flies off. Holding the button down doesn't count. Esc → "Struggling prey: hold on automatically" if tapping is hard.
+- The spider twitches: snappy turns, stop-and-dart steps, a crouch while aiming, little flicks when still. It's display only. Esc → "Reduced motion" calms it.
+- The pale dry leaf tip past the east leaf (upper route, far end) looks like a landing. Jump at it and it gives way; your silk catches you; W reels you back up. It grows back after 8 s.
+- A checkpoint saved by the first build of this branch still loads (it's upgraded).
+
+**Gates affected:** A01 and L01 still pass. The hunt tests now describe the new design (see T9b-02). U01: the struggle has an automatic option, as spec 17 requires.
+
+**Open / to check by playing**
+- Is ~17 s per approach the right amount of "slow and challenging", or too much? The knobs are four numbers in `data/species/fly_like_prototype.json` (rear_gain, motion_scale_deg_s, loom_scale_deg_s, glance_interval_s).
+- Are two taps a second right for the struggle? Constants at the top of the struggle section in `scripts/needs/feeding_controller.gd`.
+- Is the glance readable at a distance? The fly is small; a visible head turn may need a stronger cue later, e.g. the leg-animation pass, or an optional facing marker.
+- Leg animation is welcome later (A-018 keeps it cosmetic); the twitch layer in `spider_body.gd` is where it would attach.

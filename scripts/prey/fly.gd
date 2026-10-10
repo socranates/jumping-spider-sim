@@ -69,6 +69,7 @@ var transitions_total: int = 0
 var events: Array[Dictionary] = []
 var fidgets_started: int = 0
 var grooms_started: int = 0
+var glances_started: int = 0
 ## Tests: a fly held still does not fidget, groom or decide (it still senses and shows its awareness).
 var fixture_hold: bool = false
 
@@ -86,6 +87,12 @@ var _fidget_from: Vector3 = Vector3.ZERO
 var _fidget_to: Vector3 = Vector3.ZERO
 var _next_groom_t: float = 0.0
 var _groom_t1: float = 0.0
+## T09b: looking to and fro. The way it settled facing (the glances swing either side of it), the turn under way and when the next is due.
+var _home_heading: Vector3 = Vector3.FORWARD
+var _glancing: bool = false
+var _glance_target: Vector3 = Vector3.FORWARD
+var _glance_sign: float = 1.0
+var _next_glance_t: float = 0.0
 var _ray: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.new()
 
 
@@ -156,6 +163,10 @@ func begin_stay(now: float) -> void:
 	_groom_t1 = 0.0
 	_next_fidget_t = now + PreyMath.draw(rng, profile.fidget_interval_s)
 	_next_groom_t = now + PreyMath.draw(rng, profile.groom_interval_s)
+	_home_heading = heading
+	_glancing = false
+	_glance_sign = 1.0 if rng.randf() < 0.5 else -1.0
+	_next_glance_t = now + PreyMath.draw(rng, profile.glance_interval_s)
 
 
 func restlessness(now: float) -> float:
@@ -215,6 +226,16 @@ func grooming(now: float) -> bool:
 	return state == State.PERCHED and now < _groom_t1
 
 
+## True while a perched fly turns to look another way (T09b): the moments a careful hunter waits for or uses.
+func glancing() -> bool:
+	return state == State.PERCHED and _glancing
+
+
+## The direction the fly faces now, for the developer view and the tests.
+func facing() -> Vector3:
+	return heading
+
+
 func fidgeting(now: float) -> bool:
 	return state == State.PERCHED and now < _fidget_t1 and _fidget_t1 > _fidget_t0
 
@@ -225,6 +246,7 @@ func _rest(now: float, dt: float) -> void:
 	if state == State.ALERT:
 		_fidget_t1 = 0.0
 		_groom_t1 = 0.0
+		_glancing = false
 		if senses.has_last_seen:
 			_turn_toward(senses.last_seen_position, dt)
 		return
@@ -237,11 +259,45 @@ func _rest(now: float, dt: float) -> void:
 		stand = _fidget_from.lerp(_fidget_to, smoothstep(0.0, 1.0, u))
 		global_position = stand + normal * profile.hover_wu
 		return
+	if _glancing:
+		if _turn_heading(_glance_target, dt):
+			_glancing = false
+		return
 	if now >= _next_groom_t:
 		begin_groom(now, PreyMath.draw(rng, profile.groom_duration_s))
 		return
+	if now >= _next_glance_t:
+		_start_glance(now)
+		return
 	if now >= _next_fidget_t:
 		_start_fidget(now)
+
+
+## A quick look to one side of the way it settled, then (next time) to the other: the fly's view swings to and fro, so what it can take in
+## of a creeping spider rises and falls (FlySenses weighs motion by where in the field of view it is).
+func _start_glance(now: float) -> void:
+	var angle: float = PreyMath.draw(rng, profile.glance_angle_deg) * _glance_sign
+	_glance_sign = -_glance_sign
+	var home := _home_heading - normal * _home_heading.dot(normal)
+	if home.length_squared() < 1.0e-6:
+		home = heading
+	_glance_target = home.normalized().rotated(normal, deg_to_rad(angle)).normalized()
+	_glancing = true
+	_next_glance_t = now + PreyMath.draw(rng, profile.glance_interval_s)
+	glances_started += 1
+	_log_event({"t": now, "kind": "glance", "angle": angle})
+
+
+## Turns the heading toward a direction on the surface at the fly's turn rate; true once it is there.
+func _turn_heading(target: Vector3, dt: float) -> bool:
+	var to := target - normal * target.dot(normal)
+	if to.length_squared() < 1.0e-6:
+		return true
+	var angle := heading.signed_angle_to(to.normalized(), normal)
+	var limit := deg_to_rad(profile.turn_rate_deg_s) * dt
+	heading = heading.rotated(normal, clampf(angle, -limit, limit)).normalized()
+	_apply_basis()
+	return absf(angle) <= limit + 1.0e-4
 
 
 ## A grooming bout of `duration` seconds from now (the fly's own schedule starts one; a test may start one at a chosen moment).
@@ -399,6 +455,24 @@ func mark_captured(owner_id: String, event_id: String) -> void:
 	velocity = Vector3.ZERO
 
 
+## T09b: it tore free of the jaws before it was subdued. It knows exactly where the spider is (it was in its jaws), is as frightened as it
+## can be, and flees at once from where it is (FlyMind picks where to, as for any flight from danger).
+func escape_capture(now: float, reason: String) -> void:
+	if state != State.CAPTURED:
+		return
+	_now = now
+	captured_by = ""
+	capture_event_id = ""
+	senses.awareness = profile.awareness_max
+	senses.has_last_seen = true
+	senses.last_seen_position = global_position
+	senses.last_seen_time = now
+	prev_position = global_position
+	velocity = Vector3.ZERO
+	if mind != null:
+		mind.escape(now, "escaped: " + reason)
+
+
 ## The spider ate some of it. Returns how much of its nutrition was taken (never more than is left); at nothing left it is CONSUMED.
 func consume(amount: float) -> float:
 	if state != State.CAPTURED or amount <= 0.0 or not is_finite(amount):
@@ -429,7 +503,9 @@ func to_record() -> Dictionary:
 		"heading": RecordMath.v3(heading), "position": RecordMath.v3(global_position), "velocity": RecordMath.v3(velocity),
 		"fatigue": fatigue, "restless_rate": restless_rate, "perched_since": perched_since,
 		"schedule": {"next_fidget": _next_fidget_t, "fidget_t0": _fidget_t0, "fidget_t1": _fidget_t1, "fidget_from": RecordMath.v3(_fidget_from),
-			"fidget_to": RecordMath.v3(_fidget_to), "next_groom": _next_groom_t, "groom_t1": _groom_t1},
+			"fidget_to": RecordMath.v3(_fidget_to), "next_groom": _next_groom_t, "groom_t1": _groom_t1,
+			"home_heading": RecordMath.v3(_home_heading), "glancing": _glancing, "glance_target": RecordMath.v3(_glance_target),
+			"glance_sign": _glance_sign, "next_glance": _next_glance_t},
 		"senses": senses.to_record(), "mind": mind.to_record(), "flight": flight.to_record(),
 		"captured_by": captured_by, "capture_event_id": capture_event_id, "nutrition_total": nutrition_total, "nutrition_left": nutrition_left,
 	}
@@ -461,6 +537,11 @@ func apply_record(r: Dictionary, find_perch: Callable) -> void:
 	_fidget_to = RecordMath.to_v3(sch["fidget_to"])
 	_next_groom_t = float(sch["next_groom"])
 	_groom_t1 = float(sch["groom_t1"])
+	_home_heading = RecordMath.to_v3(sch["home_heading"])
+	_glancing = bool(sch["glancing"])
+	_glance_target = RecordMath.to_v3(sch["glance_target"])
+	_glance_sign = float(sch["glance_sign"])
+	_next_glance_t = float(sch["next_glance"])
 	senses.apply_record(r["senses"])
 	mind.apply_record(r["mind"])
 	flight.apply_record(r["flight"], find_perch)

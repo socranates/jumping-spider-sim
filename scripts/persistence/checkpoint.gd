@@ -19,7 +19,9 @@ const PreyProfile = preload("res://scripts/prey/prey_profile.gd")
 const Fly = preload("res://scripts/prey/fly.gd")
 const HabitatLoop = preload("res://scripts/habitat/habitat_loop.gd")
 
-const SCHEMA_VERSION := 1
+## Schema 2 (T09b): flies record their glances (schedule: home_heading, glancing, glance_target, glance_sign, next_glance) and the
+## habitat's fallen leaf tip is a habitat change. Schema 1 records are upgraded on load (upgrade()); nothing older exists.
+const SCHEMA_VERSION := 2
 const GAME_BUILD := "prototype-0.1.0"
 const KIND := "retreat_checkpoint"
 const PLAYER_ID := "spider"
@@ -48,6 +50,8 @@ static func boundary_problem(world: Node) -> String:
 		return "the spider is moving"
 	if world.feeding.feeding:
 		return "the spider is feeding"
+	if world.feeding.struggling:
+		return "the prey in the jaws is still struggling"
 	if prey.strike_active:
 		return "a strike is still in progress"
 	return ""
@@ -78,9 +82,36 @@ static func capture(world: Node) -> Dictionary:
 		"prey": prey_record,
 		"habitat": loop.to_dict(),
 		"retreats": [{"id": Windowsill.RETREAT_ID, "surface_id": "sill_floor"}],
-		"habitat_changes": [],
+		"habitat_changes": world.lab.changes_record(),
 		"journal": [],
 	}
+
+
+## A record of an older schema brought up to this one (a copy; the original, and any file it came from, are left as they were). A record
+## that is not an older schema this build knows comes back unchanged, for validate() to judge.
+static func upgrade(record: Variant) -> Variant:
+	if typeof(record) != TYPE_DICTIONARY or not RecordMath.is_whole((record as Dictionary).get("schema_version")):
+		return record
+	var r: Dictionary = (record as Dictionary).duplicate(true)
+	if int(r["schema_version"]) == 1:
+		# 1 -> 2: a fly that was perched settled facing the way it faces now and has not yet glanced; its first glance is a second away.
+		var prey: Variant = r.get("prey")
+		var now := float((prey as Dictionary).get("now", 0.0)) if typeof(prey) == TYPE_DICTIONARY else 0.0
+		if typeof(prey) == TYPE_DICTIONARY and typeof((prey as Dictionary).get("flies")) == TYPE_ARRAY:
+			for fv: Variant in prey["flies"]:
+				if typeof(fv) == TYPE_DICTIONARY and typeof((fv as Dictionary).get("schedule")) == TYPE_DICTIONARY:
+					var sch: Dictionary = fv["schedule"]
+					var h: Variant = (fv as Dictionary).get("heading", [0.0, 0.0, -1.0])
+					sch["home_heading"] = h
+					sch["glancing"] = false
+					sch["glance_target"] = h
+					sch["glance_sign"] = 1.0
+					sch["next_glance"] = now + 1.0
+		if typeof(r.get("habitat_changes")) != TYPE_ARRAY:
+			r["habitat_changes"] = []
+		r["schema_version"] = 2
+		r["upgraded_from"] = 1
+	return r
 
 
 ## Everything wrong with `record`; empty when it can be loaded. Nothing is built and nothing is changed.
@@ -117,6 +148,7 @@ static func validate(record: Variant) -> PackedStringArray:
 		e.append("needs: the reserves or their ledger are not a valid record")
 	_check_habitat(r["habitat"], e)
 	_check_prey(r["prey"], r["needs"], e)
+	_check_changes(r.get("habitat_changes"), e)
 	if e.is_empty():
 		var prey: Dictionary = r["prey"]
 		if int(r.get("snapshot_tick", -1)) != int(prey["tick"]):
@@ -350,15 +382,31 @@ static func _check_prey(p: Dictionary, needs: Dictionary, e: PackedStringArray) 
 			e.append("needs: capture %s gave %.5f, more than the %.5f eaten of its fly" % [str(src), given, limit])
 
 
+static func _check_changes(v: Variant, e: PackedStringArray) -> void:
+	if typeof(v) != TYPE_ARRAY:
+		e.append("habitat_changes is not a list")
+		return
+	var seen := {}
+	for c: Variant in v:
+		if typeof(c) != TYPE_DICTIONARY or not Windowsill.DROP_PIECES.has(str((c as Dictionary).get("surface_id", ""))) \
+				or seen.has(str((c as Dictionary).get("surface_id", ""))) or (c as Dictionary).get("available") != false:
+			e.append("habitat_changes: an unknown, repeated or malformed change")
+			continue
+		seen[str(c["surface_id"])] = true
+		_num(c, "returns_in", e, "habitat_changes", 0.0, 600.0)
+
+
 static func _check_schedule(v: Variant, e: PackedStringArray, fw: String) -> void:
 	if typeof(v) != TYPE_DICTIONARY:
 		e.append("%s: no schedule" % fw)
 		return
 	var d: Dictionary = v
-	for key: String in ["next_fidget", "fidget_t0", "fidget_t1", "next_groom", "groom_t1"]:
+	for key: String in ["next_fidget", "fidget_t0", "fidget_t1", "next_groom", "groom_t1", "next_glance"]:
 		_num(d, key, e, fw + " schedule")
-	_vec(d, "fidget_from", e, fw + " schedule")
-	_vec(d, "fidget_to", e, fw + " schedule")
+	_num(d, "glance_sign", e, fw + " schedule", -1.0, 1.0)
+	_bool(d, "glancing", e, fw + " schedule")
+	for key: String in ["fidget_from", "fidget_to", "home_heading", "glance_target"]:
+		_vec(d, key, e, fw + " schedule")
 
 
 static func _check_senses(v: Variant, e: PackedStringArray, fw: String) -> void:

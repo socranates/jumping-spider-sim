@@ -16,10 +16,10 @@
     "full_sensitivity_wu": 3.0,
     "front_half_deg": 90.0,
     "rear_half_deg": 150.0,
-    "rear_gain": 0.35,
+    "rear_gain": 0.12,
     "motion_threshold_deg_s": 10.0,
-    "motion_scale_deg_s": 12.0,
-    "loom_scale_deg_s": 40.0,
+    "motion_scale_deg_s": 6.0,
+    "loom_scale_deg_s": 70.0,
     "appear_motion_deg_s": 18.0,
     "appear_range_wu": 8.0,
     "sample_gap_max_s": 0.4,
@@ -37,7 +37,8 @@
     "vigilance_relaxed": 1.0,
     "vigilance_alert": 1.5,
     "startle_motion_deg_s": 70.0,
-    "startle_range_wu": 7.0
+    "startle_range_wu": 7.0,
+    "startle_rear_gain": 0.5
   },
   "reaction": {
     "delay_startle_alert_s": [0.04, 0.10],
@@ -83,7 +84,9 @@
     "candidates_validated": 4,
     "interrupt_threat": 0.5,
     "block_retry_s": 4.0,
-    "reposition_max_wu": 12.0
+    "reposition_max_wu": 12.0,
+    "glance_interval_s": [0.8, 2.2],
+    "glance_angle_deg": [45.0, 135.0]
   },
   "population": {
     "replenish_delay_s": [25.0, 45.0],

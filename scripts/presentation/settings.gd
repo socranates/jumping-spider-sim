@@ -24,6 +24,8 @@ const DEFAULTS := {
 	"show_gaze": false,        # chunk 6B (A-003): an optional footprint of where the spider is looking; reveals nothing hidden
 	"capture_assist": false,   # chunk 7B: off by default; on, a strike catches a fly within a wider reach (the profile's capture_assist_scale)
 	"ui_scale": 1.0,           # T09 (U01): size of all text and on-screen panels (the window's 2D content scale); the 3D view is unchanged
+	"struggle_auto": false,    # T09b: struggling prey is held with no presses (spec 17: no required rapid tapping)
+	"reduced_motion": false,   # T09b: the spider's model keeps still (no twitchy turns, lurches, flicks, jolts or catch recoil); looks only
 }
 ## Inclusive [min, max] for the numeric settings.
 const LIMITS := {

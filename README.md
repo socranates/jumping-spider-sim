@@ -13,6 +13,8 @@ Claude added these on 2026-10-10 on top of chunk 8 (see `docs/HANDOFF-chunk-9.md
 - **Text and panel size** (Esc), 100–150 %.
 - **Field notes**: H or the controller's View / Back button.
 
+**T09b — the feel of the hunt.** The fly now glances to and fro: move while it looks away, freeze when it looks back. A steady creep in plain view gets you spotted, so hunts are slow on purpose. The spider twitches like a jumping spider (display only; Esc → Reduced motion). After a catch the fly struggles: tap E / X to keep the grip bar up until it goes still, or it tears free (Esc → "Struggling prey: hold on automatically"). The pale leaf tip past the east leaf gives way when you jump at it, so your silk catches you.
+
 ## Chunk 8 — the windowsill
 
 Chet implemented T08 on 2026-10-10. **Run `play.bat` for the windowsill** or `play_lab.bat` for the previous traversal lab. The mechanics and tuning remain unchanged. The sill has four flies, a ground route, an upper leaf/rim route and a physical silk-lined crevice at the west end. Walk into the crevice and press E / controller X to rest; movement, jumping or cancel ends rest immediately. Holding prey gives feeding priority.

@@ -12,7 +12,7 @@ func test_habitat_perches_and_entries_validate_with_four_flies() -> void:
 		var p = director().graph.get_perch(id)
 		check(p.valid, "%s valid: %s" % [id, p.refusal])
 	check_eq(int(director().vent_validation.get("valid", 0)), 2, "both frame cracks validate")
-	check(not world.lab.has_method("on_jump_committed"), "habitat has no disappearing practice perches")
+	check_eq(world.lab.DROP_PIECES, ["leaf_tip"] as Array[String], "the dry leaf tip is the habitat's only piece that gives way (T09b)")
 	check_eq(world.spider.support.surface_id, "sill_floor", "spawn rests on sill")
 
 func test_front_route_returns_to_physical_retreat_without_teleport() -> void:

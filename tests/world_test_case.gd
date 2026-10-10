@@ -14,6 +14,8 @@ var prey_count: int = 0
 var prey_seed: int = 0
 ## Whether the next world replaces a lost fly (off unless the test asks).
 var prey_replenish: bool = false
+## T09b: whether a caught fly struggles in the next world (off unless the test asks).
+var prey_struggle: bool = false
 ## Existing fixtures intentionally keep the lab; habitat tests opt in.
 var use_windowsill: bool = false
 
@@ -22,6 +24,7 @@ func before_each() -> void:
 	prey_count = 0
 	prey_seed = 0
 	prey_replenish = false
+	prey_struggle = false
 	use_windowsill = false
 	settings = SettingsScript.new()
 	settings.autosave = false
@@ -40,6 +43,7 @@ func spawn_world(spawn: Variant = null, interactive: bool = false) -> Node3D:
 	world.prey_count = prey_count
 	world.prey_seed = prey_seed
 	world.prey_replenish = prey_replenish
+	world.prey_struggle = prey_struggle
 	# T09: an interactive test world keeps checkpoints in a test folder, never the player's saves (a non-interactive one keeps them in memory).
 	world.checkpoint_dir = TEST_SAVE_DIR if interactive else ""
 	sandbox.add_child(world)

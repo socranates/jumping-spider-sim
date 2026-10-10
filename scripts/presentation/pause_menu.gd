@@ -118,7 +118,7 @@ func _build() -> void:
 	switches.columns = 2
 	_switches = switches
 	switches.add_theme_constant_override("h_separation", 28)
-	switches.add_theme_constant_override("v_separation", 8)
+	switches.add_theme_constant_override("v_separation", 2)
 	box.add_child(switches)
 	_add_check(switches, "invert_x", "Invert look X")
 	_add_check(switches, "invert_y", "Invert look Y")
@@ -131,6 +131,8 @@ func _build() -> void:
 	_add_check(switches, "show_last_seen", "Show the last-seen mark")
 	_add_check(switches, "show_gaze", "Show where the spider looks")
 	_add_check(switches, "capture_assist", "Strike assist: a wider reach for the bite")
+	_add_check(switches, "struggle_auto", "Struggling prey: hold on automatically")
+	_add_check(switches, "reduced_motion", "Reduced motion (a calmer spider body)")
 	var buttons := HBoxContainer.new()
 	buttons.add_theme_constant_override("separation", 12)
 	box.add_child(buttons)

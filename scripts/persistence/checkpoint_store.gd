@@ -79,6 +79,7 @@ static func decode(text: String) -> Dictionary:
 	if canonical(record).md5_text() != str((data as Dictionary).get("checksum", "")):
 		errors.append("the checksum does not match: the file was changed or damaged after it was written")
 		return {"ok": false, "record": {}, "errors": errors}
+	record = Checkpoint.upgrade(record)  # an older schema is brought up to date in memory; the file is not touched
 	errors.append_array(Checkpoint.validate(record))
 	return {"ok": errors.is_empty(), "record": record if errors.is_empty() else {}, "errors": errors}
 
@@ -153,7 +154,7 @@ func load_best() -> Dictionary:
 	if errors.is_empty():
 		last_message = "No checkpoint yet: rest in the silk-lined crack to make one."
 	else:
-		last_message = "No usable checkpoint: " + "; ".join(errors)
+		last_message = "No usable checkpoint (%s%s). Rest in the crack to make a new one." % [errors[0], "" if errors.size() == 1 else "; and %d more" % (errors.size() - 1)]
 	return {"ok": false, "record": {}, "source": "", "message": last_message, "errors": errors}
 
 

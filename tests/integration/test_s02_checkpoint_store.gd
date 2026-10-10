@@ -183,3 +183,31 @@ func test_the_pause_menu_offers_the_checkpoint_only_when_there_is_one() -> void:
 	check(label.text.contains("anything since is undone"), "and says it is recovery of the whole world, not a save of the present: %s" % label.text)
 	check(not label.text.to_lower().contains("save current"), "never 'save current position'")
 	menu.queue_free()
+
+
+## T09b changed the schema (the flies' glances); a schema 1 checkpoint, as the first T09 build wrote it, is upgraded on load in memory and
+## loads; the file itself is not rewritten until the next rest saves a new checkpoint.
+func test_a_schema_1_checkpoint_is_upgraded_and_loads() -> void:
+	var rec := await make_record(2, 30)
+	var old := rec.duplicate(true)
+	old["schema_version"] = 1
+	for fr: Dictionary in old["prey"]["flies"]:
+		for k: String in ["home_heading", "glancing", "glance_target", "glance_sign", "next_glance"]:
+			(fr["schedule"] as Dictionary).erase(k)
+	DirAccess.make_dir_recursive_absolute(DIR)
+	var text := CheckpointStore.encode(old)
+	write(store.main_path(), text)
+	var got := store.load_best()
+	check(bool(got["ok"]), "the schema 1 file loads: %s" % got["message"])
+	check_eq(int(got["record"]["schema_version"]), Checkpoint.SCHEMA_VERSION, "brought up to schema %d" % Checkpoint.SCHEMA_VERSION)
+	check_eq(read(store.main_path()), text, "the file on disk is left as it was")
+	var fresh: Node3D = world.return_to_checkpoint(got["record"])
+	if check(fresh != null, "and the world is built from it: %s" % world.last_checkpoint_message):
+		world = fresh
+		await wait_until(func() -> bool: return world.prey.ready_done, 60)
+		check_eq(world.prey.living().size(), 2, "with both flies")
+		await run_ticks(60 * 3)
+		var glanced := 0
+		for f in world.prey.flies:
+			glanced += int(f.glances_started)
+		check(glanced > 0, "which go on glancing (%d glances in 3 s)" % glanced)

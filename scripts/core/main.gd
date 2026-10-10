@@ -56,6 +56,8 @@ var habitat_loop: Node
 @export var prey_seed: int = 0
 ## Whether a lost fly is replaced (PreyPopulation: after a delay, through a vent, never in view). On in a played world; test worlds switch it off.
 @export var prey_replenish: bool = true
+## T09b: whether a caught fly struggles and must be held with presses (FeedingController). On in a played world; test worlds switch it off.
+@export var prey_struggle: bool = true
 var settings: Node
 ## Optional Transform3D for the spider origin instead of the lab spawn point.
 var spawn_override: Variant = null
@@ -127,6 +129,8 @@ func _ready() -> void:
 	lab = (WindowsillScene if use_windowsill else LabScene).instantiate() as Node3D
 	add_child(lab)
 	_check_lab_surfaces()
+	if restored and lab.has_method("apply_changes"):
+		lab.apply_changes(restore_record.get("habitat_changes", []))
 	spider = SpiderScene.instantiate() as SpiderMotor
 	spider.profile = profile
 	spider.surfaces = surfaces
@@ -173,6 +177,9 @@ func _ready() -> void:
 	feeding.prey = prey
 	feeding.needs = needs
 	feeding.interactive = interactive
+	feeding.settings = settings
+	feeding.struggle_enabled = prey_struggle
+	feeding.struggle_auto = bool(settings.get_value("struggle_auto"))
 	if restored:
 		var fr: Dictionary = restore_record["feeding"]
 		feeding.meals_started = int(fr["meals_started"])
@@ -180,6 +187,13 @@ func _ready() -> void:
 		feeding.taken_total = float(fr["taken_total"])
 		feeding.granted_total = float(fr["granted_total"])
 	add_child(feeding)
+	prey.captured.connect(feeding.on_captured)
+	var body := spider.get_node_or_null("Body")
+	if body != null:
+		feeding.struggle_changed.connect(func(phase: String) -> void:
+			if phase == "jerk" and is_instance_valid(body):
+				body.jolt())
+	_apply_reduced_motion()
 	if use_windowsill:
 		habitat_loop = HabitatLoop.new()
 		habitat_loop.world = self
@@ -292,9 +306,22 @@ func _apply_ui_scale() -> void:
 		get_tree().root.content_scale_factor = float(settings.get_value("ui_scale"))
 
 
+## T09b: "Reduced motion" keeps the spider's model still (the twitch and the catch recoil are looks only, so nothing else changes).
+func _apply_reduced_motion() -> void:
+	var body := spider.get_node_or_null("Body") if spider != null else null
+	if body != null:
+		var calm := bool(settings.get_value("reduced_motion"))
+		body.twitch_enabled = not calm
+		body.recoil_enabled = not calm
+
+
 func _on_setting_changed(key: String) -> void:
 	if key == "ui_scale":
 		_apply_ui_scale()
+	if key == "reduced_motion":
+		_apply_reduced_motion()
+	if key == "struggle_auto" and feeding != null:
+		feeding.struggle_auto = bool(settings.get_value("struggle_auto"))
 	if key == "jump_reach" and spider != null:
 		spider.set_reach_factor(float(settings.get_value("jump_reach")))
 	if key == "capture_assist" and prey != null:
@@ -303,6 +330,7 @@ func _on_setting_changed(key: String) -> void:
 
 ## A checkpoint record is checked before anything is built; a valid one decides the habitat, the spider's place and the prey's seed.
 func _prepare_restore() -> void:
+	restore_record = Checkpoint.upgrade(restore_record)
 	restore_errors = Checkpoint.validate(restore_record)
 	if not restore_errors.is_empty():
 		push_warning("The checkpoint was refused and a new world started: %s" % "; ".join(restore_errors))
@@ -375,6 +403,7 @@ func return_to_checkpoint(record: Dictionary = {}) -> Node3D:
 			return null
 		rec = found["record"]
 		last_checkpoint_message = str(found["message"])
+	rec = Checkpoint.upgrade(rec)
 	var errors := Checkpoint.validate(rec)
 	if not errors.is_empty():
 		last_checkpoint_message = "The checkpoint cannot be loaded: " + "; ".join(errors)
@@ -382,6 +411,7 @@ func return_to_checkpoint(record: Dictionary = {}) -> Node3D:
 	var fresh: Node3D = (load(MAIN_SCENE_PATH) as PackedScene).instantiate()
 	fresh.interactive = interactive
 	fresh.settings = settings
+	fresh.prey_struggle = prey_struggle
 	fresh.checkpoint_dir = checkpoint_dir
 	fresh.restore_record = rec.duplicate(true)
 	fresh.last_checkpoint_message = last_checkpoint_message

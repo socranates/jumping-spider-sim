@@ -131,3 +131,27 @@ Accepted decisions and amendments to spec v0.1. `docs/SPEC.md` is the frozen bas
 - **T9-07 Keyboard remapping (U01, part).** The pause menu lists 15 actions; choose one, press a key; Esc stops without a change; a key in use is swapped; Esc, F3 and F4 are reserved. Reel and lower follow walk forward and walk back. Controller and mouse buttons are unchanged (controller remapping not yet built). Keys are saved in `settings.cfg` (`[bindings]`) and apply at once.
 - **T9-08 Field notes from a controller.** New `help` action: H, or the controller's View / Back button. On-screen key names follow remapping.
 - **T9-09 Text and panel size.** Setting `ui_scale`, 100–150 %, the window's 2D content scale (the 3D view is unchanged); saved with the settings. The pause panel scrolls when taller than the window and its switches fall to one column on a narrow window. A mouse drag applies the size when released.
+
+## Implementation decisions — Claude, T09b hunt feel (2026-10-10)
+
+Nathan's direction, 2026-10-10: "keep in mind twitchy movements typical of jumping spiders"; "you should also have to tap the button as the prey struggles … a bar that depletes when you stop tapping"; "the fly should sort of look to and fro while you slowly creep making the twitchy quick movements"; "the hunts can be deliberately slow and challenging"; and yes to a leaf on the sill that gives way. This deliberately supersedes C8-01 and A-015/A-023's "keep the hunting tuning" for the fly's senses only. Movement, camera, jump, silk and feeding numbers are unchanged.
+
+- **T9b-01 The fly glances to and fro.** A perched fly that is not grooming, fidgeting or held by a fixture turns quickly (its 720°/s turn rate) to look 45–135° to one side of the way it settled, then the other, every 0.8–2.2 s. The timing comes from its gameplay stream (data: `glance_interval_s`, `glance_angle_deg`). It senses along its facing as before, so a glance changes what it takes in. An alert fly stops glancing and faces where it last saw the spider.
+- **T9b-02 Senses retuned so the glances matter.** `rear_gain` 0.35 → 0.12, `motion_scale_deg_s` 12 → 6, `loom_scale_deg_s` 40 → 70, and new `startle_rear_gain` 0.5 (a big looming leap still startles from behind). Measured (tuning_run.txt, 8 seeds from 7 WU):
+  - a steady stalk in plain view is spotted at about 4.2 WU, every time (before: never spotted, about 6 s);
+  - a stalk that moves only while the fly looks away reaches 2.2 WU unnoticed 8/8, in about 17 s;
+  - walk-speed darts timed to its glances reach it 8/8, in about 13 s;
+  - a walk is spotted at about 6.4 WU (before about 4.5);
+  - a leap from 5.5 WU catches 1/8; from 2.2 WU, 6/8.
+
+  Designed values, no biological claim. `test_prey_hunt` and `test_prey_fly_rest` now state the new design, rather than having their thresholds loosened.
+- **T9b-03 Twitchy spider (looks only).** The model child snaps through turns (it lags up to 14°, then closes the gap), walks in stop-and-dart lurches (0.07 WU walking, 0.035 stalking, once per 0.32 WU), crouches while aiming, flicks or bobs now and then when still (cosmetic stream), and jolts with struggling prey. It stays within 0.1 WU and the snap limit. The physics body, senses, camera and line never see it (A-018). New setting **Reduced motion** turns it off, together with the catch recoil.
+- **T9b-04 The struggle (grip bar).** A caught fly struggles for 2.5–3.5 s (its own stream). The grip starts at 0.6, drains 0.3/s, loses 0.1 at each jerk (every 0.35–0.75 s), and gains 0.25 per press of interact; about two presses a second hold it.
+  - Holding the button counts once. Presses outside the struggle cost nothing.
+  - Grip at 0: the fly tears free, flees, its capture is removed from the log (it can be caught again under the same event id), nothing was eaten, and one owed replacement is dropped.
+  - It cannot be eaten while it struggles, and a checkpoint is refused.
+  - Spec 17 forbids required rapid tapping, so the setting **Struggling prey: hold on automatically** keeps the grip full; Nathan chose tapping as the default.
+  - The HUD shows "IT STRUGGLES!", the key, and the bar, which turns orange-red when low (words, not only colour).
+  - Played worlds struggle; test worlds only on request (`prey_struggle`).
+- **T9b-05 The leaf tip that gives way.** `leaf_tip`, a pale dry leaf past the east leaf (x 25.6–28.4, z −4.2 to −1.8, top 5.35), is the windowsill's only drop piece. A jump aimed at it makes it give way (falls, drawn only). The east leaf's line catches the spider above the sill; reeling returns it; the tip comes back 8 s later once the space is clear. This revises C8-02's "no disappearing practice perches in the habitat" for this one authored teaching spot. The field notes name it.
+- **T9b-06 Checkpoint schema 2.** Flies record their glance state, and a fallen tip is a habitat change (returns_in). Schema 1 records (the first T09 build) are upgraded in memory on load; the file is not rewritten. A refused checkpoint's message now gives the first reason and the count of others.

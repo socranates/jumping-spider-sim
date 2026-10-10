@@ -17,6 +17,8 @@ var _prompt_box: VBoxContainer
 var _prompt_title: Label
 var _prompt_hint: Label
 var _prompt_bar: ColorRect
+var _prompt_back: ColorRect
+const PROMPT_BAR_W := 160.0
 
 
 func _ready() -> void:
@@ -62,12 +64,19 @@ func _ready() -> void:
 	_prompt_hint = _label(16)
 	_prompt_box.add_child(_prompt_title)
 	_prompt_box.add_child(_prompt_hint)
+	# T09b: the bar sits in a dark back, so a gauge that runs down (the grip while prey struggles) reads as one.
+	_prompt_back = ColorRect.new()
+	_prompt_back.name = "PromptGauge"
+	_prompt_back.color = Color(0.0, 0.0, 0.0, 0.4)
+	_prompt_back.custom_minimum_size = Vector2(PROMPT_BAR_W, 7.0)
+	_prompt_back.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_prompt_back.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_prompt_box.add_child(_prompt_back)
 	_prompt_bar = ColorRect.new()
 	_prompt_bar.color = Color(0.95, 0.80, 0.35, 0.85)
-	_prompt_bar.custom_minimum_size = Vector2(0.0, 5.0)
-	_prompt_bar.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_prompt_bar.size = Vector2(0.0, 7.0)
 	_prompt_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_prompt_box.add_child(_prompt_bar)
+	_prompt_back.add_child(_prompt_bar)
 
 
 func _process(_delta: float) -> void:
@@ -85,7 +94,11 @@ func refresh() -> void:
 	if not d.is_empty():
 		_prompt_title.text = str(d["title"])
 		_prompt_hint.text = str(d["hint"])
-		_prompt_bar.custom_minimum_size = Vector2(160.0 * clampf(float(d["left"]), 0.0, 1.0), 5.0)
+		_prompt_bar.size = Vector2(PROMPT_BAR_W * clampf(float(d["left"]), 0.0, 1.0), 7.0)
+		var urgent := bool(d.get("urgent", false))
+		_prompt_bar.color = Color(1.0, 0.45, 0.25, 0.95) if urgent else Color(0.95, 0.80, 0.35, 0.85)
+		_prompt_back.custom_minimum_size = Vector2(PROMPT_BAR_W, 12.0 if d.has("urgent") else 7.0)
+		_prompt_bar.size.y = _prompt_back.custom_minimum_size.y
 
 
 func _label(size: int) -> Label:

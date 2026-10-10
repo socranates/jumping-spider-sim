@@ -133,7 +133,7 @@ func caption() -> String:
 	if notice_seconds > 0.0 and not _show_help:
 		text += "\n" + notice
 	if _show_help:
-		return text + "\nFocus: right mouse / left trigger    Stalk: %s / left shoulder\nHold %s / A to aim; release to jump. Green means reachable ground.\nA fly may leave before you arrive. %s / X: eat or rest    %s / B: cancel\nYour silk can catch a miss. %s / left stick up reels you back.\nHome is the silk-lined crack at the west end. Both routes lead back.\nResting there keeps a checkpoint.\nEsc / Menu: Return to checkpoint, keys, text size." % [
+		return text + "\nFocus: right mouse / left trigger    Stalk: %s / left shoulder\nHold %s / A to aim; release to jump. Green means reachable ground.\nA fly may leave before you arrive. %s / X: eat or rest    %s / B: cancel\nYour silk can catch a miss. %s / left stick up reels you back.\nHome is the silk-lined crack at the west end. Both routes lead back.\nThe pale leaf tip past the east leaf won't hold you. Your silk will.\nResting in the crack keeps a checkpoint.\nEsc / Menu: Return to checkpoint, keys, text size." % [
 			_key_name("stalk", "Shift"), _key_name("prepare_jump", "Space"), _key_name("interact", "E"), _key_name("cancel", "Q"), _key_name("move_forward", "W")]
 	if resting:
 		return text + "\nResting in the silk-lined crack. Move, %s or %s to leave." % [_key_name("interact", "E"), _key_name("cancel", "Q")]

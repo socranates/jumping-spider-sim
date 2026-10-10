@@ -349,6 +349,16 @@ func apply_record(r: Dictionary) -> void:
 	entries_total = int(r["entries_total"])
 
 
+## T09b: a fly that was lost came back (it struggled free): up to `count` replacements still owed are no longer owed, the latest first,
+## so the room never keeps more than its target.
+func forget_owed(count: int) -> void:
+	var extra := free_count() + pending.size() - target
+	var n := mini(count, extra)
+	while n > 0 and not pending.is_empty():
+		pending.pop_back()
+		n -= 1
+
+
 func vent_by_id(vent_id: String) -> PerchGraph.Perch:
 	for v in vents:
 		if v.id == vent_id:

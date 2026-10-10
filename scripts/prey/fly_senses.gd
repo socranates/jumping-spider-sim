@@ -141,7 +141,7 @@ func update(space: PhysicsDirectSpaceState3D, eye: Vector3, facing: Vector3, up:
 	ev["motion_deg_s"] = motion
 	ev["appeared"] = appeared
 	ev["gain_per_s"] = gain
-	ev["startle"] = PreyMath.is_startle(motion * w_face * vf, vdist, p.startle_motion_deg_s, p.startle_range_wu)
+	ev["startle"] = PreyMath.is_startle(motion * maxf(w_face, p.startle_rear_gain) * vf, vdist, p.startle_motion_deg_s, p.startle_range_wu)
 	ev["seen"] = true
 	_has_last = true
 	_last_point = centre

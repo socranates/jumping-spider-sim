@@ -981,3 +981,8 @@ Chet reviews this entry, `docs/HANDOFF-chunk-7.md` and the tests named above. Na
 - Built the S01-C retreat checkpoint, the S02 safe store, keyboard remapping, the controller help button and text size (decisions T9-01 to T9-09). The L01 save/load test now runs.
 - Final: evidence 4267a104376a, 502 of 502 passed (fixed 60 fps, Linux headless); the new tests 22 of 22 at fixed 30 and 144; main scene 180 frames clean. Reports and stills are in `docs/verification/t09/`. Not run on Windows yet.
 - Handoff: `docs/HANDOFF-chunk-9.md`; branch `claude/jolly-bell-gq3mm8`.
+
+### 2026-10-10: T09b hunt feel (Claude, cloud session)
+- Nathan: twitchy jumping-spider movement; tap as the prey struggles (a bar that depletes when you stop tapping); the fly looks to and fro while you creep; hunts deliberately slow and challenging; a leaf on the sill that gives way. Decisions T9b-01 to T9b-06.
+- Fly senses retuned after a measured sweep (`docs/verification/t09b/tuning_run.txt`). Three balance tests now state the new design. Checkpoint schema 2 with an upgrade from 1, found when a schema 1 checkpoint from the earlier build was refused in a still.
+- Final: evidence 8149fa0be2b8, 511 of 511 (fixed 60 fps, Linux headless); hunt/struggle/leaf/save tests 37 of 37 at fixed 30 and 144; smoke run clean. Not run on Windows.

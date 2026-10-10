@@ -372,6 +372,12 @@ func _retarget(now: float, why: String) -> void:
 		f.transition(Fly.State.SEEK_PERCH, "%s: new target %s" % [why, c.id])
 
 
+## T09b: it struggled free of the jaws: it flies at once (it needs no reaction delay to know what happened).
+func escape(now: float, reason: String) -> void:
+	pending = {}
+	_begin_flee(now, reason)
+
+
 ## The fly's perch left the world under it: it flies at once (no delay: the floor is gone).
 func on_perch_lost() -> void:
 	var f := fly

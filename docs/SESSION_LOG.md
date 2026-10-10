@@ -975,3 +975,9 @@ Chet reviews this entry, `docs/HANDOFF-chunk-7.md` and the tests named above. Na
 - Windows report 2026-10-10T10:57:14Z for evidence id 5ebea0fc6270: 469 tests, 468 passed, 1 not run (the save/load half of L01, by design).
 - Nathan: "Its coming along great" (general feedback).
 - docs/HANDOFF-chunk-7.md: A-range reference corrected to A-023 to A-031; Nathan's note added; handback going to Chet.
+
+### 2026-10-10: T09 part 1 (Claude, cloud session)
+- Started from GitHub main 9f95de0 (Chet's chunk 8 + GitHub setup). Godot 4.7.2 Linux was downloaded into the cloud container; the baseline reproduced Chet's numbers (482 tests, 481 passed, 1 not run, evidence 779a6714b373).
+- Built the S01-C retreat checkpoint, the S02 safe store, keyboard remapping, the controller help button and text size (decisions T9-01 to T9-09). The L01 save/load test now runs.
+- Final: evidence 4267a104376a, 502 of 502 passed (fixed 60 fps, Linux headless); the new tests 22 of 22 at fixed 30 and 144; main scene 180 frames clean. Reports and stills are in `docs/verification/t09/`. Not run on Windows yet.
+- Handoff: `docs/HANDOFF-chunk-9.md`; branch `claude/jolly-bell-gq3mm8`.

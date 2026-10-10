@@ -268,6 +268,7 @@ func _ready() -> void:
 		tether_debug.motor = spider
 		support_debug.add_child(tether_debug)
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+		_apply_ui_scale()
 
 
 func _resolved_prey_seed() -> int:
@@ -285,7 +286,15 @@ func _exit_tree() -> void:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 
+## T09 (U01): the size of all text and panels (the window's 2D content scale; the 3D view keeps its size). Played worlds only.
+func _apply_ui_scale() -> void:
+	if interactive and is_inside_tree():
+		get_tree().root.content_scale_factor = float(settings.get_value("ui_scale"))
+
+
 func _on_setting_changed(key: String) -> void:
+	if key == "ui_scale":
+		_apply_ui_scale()
 	if key == "jump_reach" and spider != null:
 		spider.set_reach_factor(float(settings.get_value("jump_reach")))
 	if key == "capture_assist" and prey != null:

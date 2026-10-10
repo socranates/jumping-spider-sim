@@ -1,0 +1,24 @@
+PASS     test_l01_feeding.gd::test_l01_feeding_increases_energy_only_while_valid_and_canceling_cannot_duplicate_prey_or_consumption  [1221 ms]  16 checks
+PASS     test_l01_feeding.gd::test_l01_saving_and_loading_cannot_duplicate_prey_or_consumption  [513 ms]  39 checks
+PASS     test_s01c_checkpoint.gd::test_a_refused_record_never_replaces_the_world  [16 ms]  5 checks
+PASS     test_s01c_checkpoint.gd::test_loading_twice_gives_the_same_world_and_duplicates_nothing  [292 ms]  9 checks
+PASS     test_s01c_checkpoint.gd::test_loading_while_airborne_or_preparing_discards_the_current_world  [108 ms]  14 checks
+PASS     test_s01c_checkpoint.gd::test_loading_while_feeding_undoes_the_meal_since_the_checkpoint  [124 ms]  14 checks
+PASS     test_s01c_checkpoint.gd::test_no_checkpoint_outside_the_windowsill_or_off_a_surface  [16 ms]  4 checks
+PASS     test_s01c_checkpoint.gd::test_resting_makes_a_checkpoint_that_restores_the_whole_sill  [692 ms]  18 checks
+PASS     test_s01c_checkpoint.gd::test_two_restored_worlds_go_on_the_same_way  [603 ms]  21 checks
+PASS     test_s02_checkpoint_store.gd::test_a_changed_number_fails_the_checksum  [72 ms]  3 checks
+PASS     test_s02_checkpoint_store.gd::test_a_newer_schema_is_reported_and_left_untouched  [27 ms]  4 checks
+PASS     test_s02_checkpoint_store.gd::test_a_record_that_contradicts_itself_is_refused_with_a_reason  [45 ms]  15 checks
+PASS     test_s02_checkpoint_store.gd::test_a_truncated_checkpoint_falls_back_to_the_previous_and_is_not_touched  [91 ms]  5 checks
+PASS     test_s02_checkpoint_store.gd::test_an_interrupted_write_never_costs_the_last_good_checkpoint  [102 ms]  6 checks
+PASS     test_s02_checkpoint_store.gd::test_save_and_load_round_trip_and_keep_the_previous_as_backup  [118 ms]  8 checks
+PASS     test_s02_checkpoint_store.gd::test_the_pause_menu_offers_the_checkpoint_only_when_there_is_one  [40 ms]  5 checks
+PASS     test_u01_access.gd::test_a_remapped_key_drives_the_action_and_survives_a_restart  [2 ms]  6 checks
+PASS     test_u01_access.gd::test_every_action_of_the_loop_and_the_field_notes_have_a_controller_input  [13 ms]  21 checks
+PASS     test_u01_access.gd::test_text_size_survives_a_restart_and_is_bounded  [2 ms]  3 checks
+PASS     test_u01_access.gd::test_the_pause_menu_remaps_a_key_and_fits_larger_text  [19 ms]  10 checks
+PASS     test_u01_access.gd::test_the_windowsill_names_the_keys_the_player_chose  [19 ms]  1 checks
+PASS     test_u01_access.gd::test_walk_forward_carries_reel_with_it_and_a_used_key_is_swapped  [6 ms]  8 checks
+evidence_id: 4267a104376a (source c3cf797e, settings 8b6707d4, tests 46b6a141)
+SUMMARY tests=22 passed=22 failed=0 not_run=0 seed=20261005 filter=only=unit,integration,gates,files=test_s01c,test_s02,test_u01,test_l01 result=PASS

@@ -8,6 +8,16 @@ var settings: Node  # Settings autoload, or a test instance
 var world: Node
 var _checkpoint_button: Button
 var _checkpoint_label: Label
+## T09 (U01): keyboard remapping. The action waiting for a key ("" when none), its buttons and the line that says what happened.
+var _listening: String = ""
+var _key_buttons: Dictionary = {}  # action -> Button
+var _keys_box: Control
+var _keys_toggle: Button
+var _keys_status: Label
+var _scroll: ScrollContainer
+var _switches: GridContainer
+var _dragging: Dictionary = {}  # setting key -> true while the mouse drags that slider
+var _content: VBoxContainer
 
 var _dim: ColorRect
 var _panel: PanelContainer
@@ -27,6 +37,9 @@ func _ready() -> void:
 
 
 func _input(event: InputEvent) -> void:
+	if _listening != "" and visible:
+		_listen(event)
+		return
 	if event.is_action_pressed("pause"):
 		set_paused(not get_tree().paused)
 		get_viewport().set_input_as_handled()
@@ -39,7 +52,11 @@ func set_paused(paused: bool) -> void:
 	if paused:
 		_refresh()
 		_refresh_checkpoint()
+		_refresh_keys()
+		_fit_to_screen()
 		_resume_button.grab_focus()
+	else:
+		_listening = ""
 
 
 func _refresh() -> void:
@@ -78,9 +95,14 @@ func _build() -> void:
 	for side in ["left", "right", "top", "bottom"]:
 		margin.add_theme_constant_override("margin_" + side, 24)
 	_panel.add_child(margin)
+	# T09: the panel scrolls when it is taller than the window (larger text, the key list).
+	_scroll = ScrollContainer.new()
+	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	margin.add_child(_scroll)
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 12)
-	margin.add_child(box)
+	_scroll.add_child(box)
+	_content = box
 	var title := Label.new()
 	title.text = "Paused"
 	title.add_theme_font_size_override("font_size", 30)
@@ -89,10 +111,12 @@ func _build() -> void:
 	_add_slider(box, "fov_degrees", "Field of view", 1.0, "%d deg")
 	_add_slider(box, "camera_distance", "Camera distance", 0.1, "%.1f WU")
 	_add_slider(box, "jump_reach", "Jump reach (playtest)", 0.05, "pct")
+	_add_slider(box, "ui_scale", "Text and panel size", 0.05, "pct")
 	# The switches go in two columns so the panel stays inside a 720 px window (chunk 6B added three, chunk 7A one).
 	var switches := GridContainer.new()
 	switches.name = "Switches"
 	switches.columns = 2
+	_switches = switches
 	switches.add_theme_constant_override("h_separation", 28)
 	switches.add_theme_constant_override("v_separation", 8)
 	box.add_child(switches)
@@ -120,6 +144,16 @@ func _build() -> void:
 	_checkpoint_button.text = "Return to checkpoint"
 	_checkpoint_button.pressed.connect(_on_return_to_checkpoint)
 	buttons.add_child(_checkpoint_button)
+	_keys_toggle = Button.new()
+	_keys_toggle.name = "KeysToggle"
+	_keys_toggle.text = "Keyboard keys..."
+	_keys_toggle.pressed.connect(func() -> void:
+		_keys_box.visible = not _keys_box.visible
+		_keys_toggle.text = "Hide keys" if _keys_box.visible else "Keyboard keys..."
+		_fit_to_screen()
+		if _keys_box.visible:
+			_scroll.call_deferred("ensure_control_visible", _keys_box))
+	buttons.add_child(_keys_toggle)
 	var quit_button := Button.new()
 	quit_button.text = "Quit"
 	quit_button.custom_minimum_size = Vector2(140.0, 0.0)
@@ -131,6 +165,7 @@ func _build() -> void:
 	_checkpoint_label.custom_minimum_size = Vector2(560.0, 0.0)
 	_checkpoint_label.add_theme_font_size_override("font_size", 16)
 	box.add_child(_checkpoint_label)
+	_build_keys(box)
 	_refresh()
 	_refresh_checkpoint()
 
@@ -155,8 +190,15 @@ func _add_slider(parent: Control, key: String, label_text: String, step: float, 
 	row.add_child(value_label)
 	slider.set_meta("format", format)
 	slider.value_changed.connect(func(v: float) -> void:
-		settings.set_value(key, v)
-		_update_value_label(key, v))
+		_update_value_label(key, v)
+		# T09: the text size is applied when a mouse drag ends (the panel would otherwise resize under the pointer mid-drag).
+		if not (key == "ui_scale" and _dragging.get(key, false)):
+			settings.set_value(key, v))
+	slider.drag_started.connect(func() -> void: _dragging[key] = true)
+	slider.drag_ended.connect(func(_changed: bool) -> void:
+		_dragging[key] = false
+		settings.set_value(key, slider.value)
+		_fit_to_screen())
 	_sliders[key] = slider
 	_value_labels[key] = value_label
 	parent.add_child(row)
@@ -200,7 +242,7 @@ func _refresh_checkpoint() -> void:
 	_checkpoint_button.disabled = not bool(found["ok"])
 	if bool(found["ok"]):
 		var note := "" if str(found.get("source", "")) != "backup" else "  (" + str(found["message"]) + ")"
-		_checkpoint_label.text = "Return to checkpoint: the whole sill goes back to how it was when you last rested in the crack; anything since is undone.%s" % note
+		_checkpoint_label.text = "Return to checkpoint: the whole sill as it was at your last rest in the crack; anything since is undone.%s" % note
 	else:
 		_checkpoint_label.text = str(found["message"])
 
@@ -210,3 +252,100 @@ func _on_return_to_checkpoint() -> void:
 		return
 	set_paused(false)
 	world.call_deferred("return_to_checkpoint")
+
+
+# ------------------------------------------------------------------ keys (T09, U01)
+
+func _build_keys(parent: Control) -> void:
+	var keys := VBoxContainer.new()
+	keys.name = "Keys"
+	keys.visible = false
+	_keys_box = keys
+	parent.add_child(keys)
+	var note := Label.new()
+	note.text = "Choose an action, then press the key you want for it. Esc stops without changing anything. A key that is in use is swapped. Controller buttons stay as they are."
+	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	note.custom_minimum_size = Vector2(560.0, 0.0)
+	note.add_theme_font_size_override("font_size", 16)
+	keys.add_child(note)
+	var grid := GridContainer.new()
+	grid.columns = 4
+	grid.add_theme_constant_override("h_separation", 12)
+	grid.add_theme_constant_override("v_separation", 6)
+	keys.add_child(grid)
+	for action: String in settings.REMAPPABLE:
+		var label := Label.new()
+		label.text = String(settings.ACTION_NAMES[action])
+		label.custom_minimum_size = Vector2(190.0, 0.0)
+		grid.add_child(label)
+		var button := Button.new()
+		button.name = "Key_" + action
+		button.custom_minimum_size = Vector2(96.0, 0.0)
+		button.pressed.connect(_start_listening.bind(action))
+		grid.add_child(button)
+		_key_buttons[action] = button
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 12)
+	keys.add_child(row)
+	var reset := Button.new()
+	reset.name = "ResetKeys"
+	reset.text = "Reset keys"
+	reset.pressed.connect(func() -> void:
+		_listening = ""
+		settings.reset_keys()
+		_keys_status.text = "Keys are back to their defaults."
+		_refresh_keys())
+	row.add_child(reset)
+	_keys_status = Label.new()
+	_keys_status.name = "KeysStatus"
+	_keys_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_keys_status.custom_minimum_size = Vector2(420.0, 0.0)
+	_keys_status.add_theme_font_size_override("font_size", 16)
+	row.add_child(_keys_status)
+	_refresh_keys()
+
+
+func _refresh_keys() -> void:
+	for action: String in _key_buttons:
+		var code: int = settings.get_key(action)
+		var b: Button = _key_buttons[action]
+		b.text = "press a key" if action == _listening else (OS.get_keycode_string(code as Key) if code > 0 else "none")
+
+
+func _start_listening(action: String) -> void:
+	_listening = action
+	_keys_status.text = "Press a key for %s (Esc to stop)." % String(settings.ACTION_NAMES[action])
+	_refresh_keys()
+
+
+## While an action waits for its key: a key press assigns it (Esc stops); anything else is ignored. The event goes no further.
+func _listen(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo:
+		var code := int((event as InputEventKey).physical_keycode)
+		if code == KEY_ESCAPE:
+			_keys_status.text = "Nothing was changed."
+		else:
+			var result: Dictionary = settings.set_key(_listening, code)
+			_keys_status.text = str(result["message"])
+		var action := _listening
+		_listening = ""
+		_refresh_keys()
+		if _key_buttons.has(action):
+			(_key_buttons[action] as Button).grab_focus()
+		get_viewport().set_input_as_handled()
+	elif event is InputEventJoypadButton and event.pressed:
+		_keys_status.text = "Controller buttons are not remapped here; press a keyboard key, or Esc."
+		get_viewport().set_input_as_handled()
+	elif event is InputEventMouseButton:
+		pass  # clicking another row is handled by that button
+
+
+## The panel never grows past the window: it scrolls instead.
+func _fit_to_screen() -> void:
+	if _scroll == null or not is_inside_tree():
+		return
+	if _switches != null:
+		_switches.columns = 2 if get_viewport().get_visible_rect().size.x >= 1000.0 else 1
+	var want := _content.get_combined_minimum_size().y
+	var room := get_viewport().get_visible_rect().size.y - 56.0
+	_scroll.custom_minimum_size = Vector2(_content.get_combined_minimum_size().x, clampf(want, 120.0, maxf(room, 120.0)))

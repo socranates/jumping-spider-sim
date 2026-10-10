@@ -23,6 +23,7 @@ const DEFAULTS := {
 	"show_last_seen": true,    # chunk 6B (A-002): a faint mark at the last place a target was sensed, going stale with time
 	"show_gaze": false,        # chunk 6B (A-003): an optional footprint of where the spider is looking; reveals nothing hidden
 	"capture_assist": false,   # chunk 7B: off by default; on, a strike catches a fly within a wider reach (the profile's capture_assist_scale)
+	"ui_scale": 1.0,           # T09 (U01): size of all text and on-screen panels (the window's 2D content scale); the 3D view is unchanged
 }
 ## Inclusive [min, max] for the numeric settings.
 const LIMITS := {
@@ -30,12 +31,30 @@ const LIMITS := {
 	"fov_degrees": [50.0, 90.0],
 	"camera_distance": [4.0, 7.0],
 	"jump_reach": [0.5, 1.5],
+	"ui_scale": [1.0, 1.5],
 }
+## T09 (U01): keyboard keys the player may change, in the order the pause menu lists them, with their names there. The controller
+## buttons and the mouse buttons stay as they are. Reel and lower follow walk forward and walk back (spec 17: W/S with a context override).
+const REMAPPABLE: Array[String] = ["move_forward", "move_back", "move_left", "move_right", "prepare_jump", "focus", "stalk", "interact",
+	"cancel", "recenter", "help", "look_left", "look_right", "look_up", "look_down"]
+const ACTION_NAMES := {
+	"move_forward": "Walk forward / reel in", "move_back": "Walk back / lower", "move_left": "Walk left", "move_right": "Walk right",
+	"prepare_jump": "Aim and jump", "focus": "Focus", "stalk": "Stalk", "interact": "Eat / rest", "cancel": "Cancel / let go",
+	"recenter": "Recenter view", "help": "Field notes", "look_left": "Look left", "look_right": "Look right", "look_up": "Look up",
+	"look_down": "Look down",
+}
+const LINKED := {"move_forward": "reel", "move_back": "lower"}
+## Keys that cannot be given to an action: pause (the way out of every menu) and the developer views.
+const RESERVED_KEYS: Array[int] = [KEY_ESCAPE, KEY_F3, KEY_F4]
+const BINDINGS_SECTION := "bindings"
+const InputSetupScript = preload("res://scripts/core/input_setup.gd")
 
 ## Tests point this at a temporary file; the autoload keeps the default.
 var config_path: String = DEFAULT_PATH
 var autosave: bool = true
 var _values: Dictionary = DEFAULTS.duplicate()
+## Remapped keyboard keys: action -> physical keycode. Only actions the player changed are here.
+var _keys: Dictionary = {}
 
 var look_sensitivity: float:
 	get: return _values["look_sensitivity"]
@@ -122,15 +141,68 @@ func reset_to_defaults() -> void:
 		set_value(key, DEFAULTS[key])
 
 
-## Hook for a future remapping screen: {action: Array of InputEvent}. Empty for now.
+## {action: Array of InputEvent} for every remapped action (and the action that follows it), for InputSetup.register_actions.
 func get_binding_overrides() -> Dictionary:
-	return {}
+	var out := {}
+	for action: String in _keys:
+		out[action] = InputSetupScript.events_for(action, int(_keys[action]))
+		if LINKED.has(action):
+			out[LINKED[action]] = InputSetupScript.events_for(LINKED[action], int(_keys[action]))
+	return out
+
+
+## The keyboard key an action answers to now (its remapped key, else its default; 0 for none).
+func get_key(action: String) -> int:
+	return int(_keys.get(action, InputSetupScript.default_key(action)))
+
+
+## Gives `action` the key `keycode`. A key another action already uses is swapped: that action gets this one's old key, so no two actions
+## share a key by accident and nothing is left without one. Returns {"ok", "message", "swapped"} (swapped: the other action, or "").
+func set_key(action: String, keycode: int) -> Dictionary:
+	if not REMAPPABLE.has(action):
+		return {"ok": false, "message": "%s cannot be changed" % action, "swapped": ""}
+	if keycode <= 0 or RESERVED_KEYS.has(keycode):
+		return {"ok": false, "message": "%s is kept for the pause menu and the developer views" % OS.get_keycode_string(keycode as Key), "swapped": ""}
+	var old := get_key(action)
+	if old == keycode:
+		return {"ok": true, "message": "%s: %s" % [ACTION_NAMES[action], OS.get_keycode_string(keycode as Key)], "swapped": ""}
+	var swapped := ""
+	for other: String in REMAPPABLE:
+		if other != action and get_key(other) == keycode:
+			swapped = other
+			_store_key(other, old)
+	_store_key(action, keycode)
+	setting_changed.emit("bindings")
+	if autosave:
+		save_settings()
+	var message := "%s: %s" % [ACTION_NAMES[action], OS.get_keycode_string(keycode as Key)]
+	if swapped != "":
+		message += " (%s now uses %s)" % [ACTION_NAMES[swapped], OS.get_keycode_string(old as Key) if old > 0 else "no key"]
+	return {"ok": true, "message": message, "swapped": swapped}
+
+
+func _store_key(action: String, keycode: int) -> void:
+	if keycode == InputSetupScript.default_key(action):
+		_keys.erase(action)
+	else:
+		_keys[action] = keycode
+
+
+func reset_keys() -> void:
+	if _keys.is_empty():
+		return
+	_keys.clear()
+	setting_changed.emit("bindings")
+	if autosave:
+		save_settings()
 
 
 func save_settings() -> Error:
 	var cfg := ConfigFile.new()
 	for key: String in DEFAULTS:
 		cfg.set_value(SECTION, key, _values[key])
+	for action: String in _keys:
+		cfg.set_value(BINDINGS_SECTION, action, int(_keys[action]))
 	var err := cfg.save(config_path)
 	if err != OK:
 		push_warning("Settings: could not save %s (error %d)" % [config_path, err])
@@ -141,9 +213,15 @@ func save_settings() -> Error:
 ## corrupt or invalid keeps its default.
 func load_settings() -> bool:
 	_values = DEFAULTS.duplicate()
+	_keys = {}
 	var cfg := ConfigFile.new()
 	if cfg.load(config_path) != OK:
 		return false
+	if cfg.has_section(BINDINGS_SECTION):
+		for action: String in cfg.get_section_keys(BINDINGS_SECTION):
+			var code: Variant = cfg.get_value(BINDINGS_SECTION, action)
+			if REMAPPABLE.has(action) and typeof(code) == TYPE_INT and int(code) > 0 and not RESERVED_KEYS.has(int(code)):
+				_store_key(action, int(code))
 	for key: String in DEFAULTS:
 		if cfg.has_section_key(SECTION, key):
 			var coerced: Variant = _coerce(key, cfg.get_value(SECTION, key))

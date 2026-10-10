@@ -1,15 +1,20 @@
-# Where we left off — Chet, 2026-10-10
+# Where we left off — Claude, 2026-10-10 (T09 part 1)
 
-Nathan asked Chet to code this run so he can switch between Chet and Claude at usage limits. Chet implemented chunk 8, the T08 windowsill habitat, preserving the mechanics Nathan approved.
+Nathan asked Claude to continue from Chet's chunk 8 with **T09**, finish the deferred L01 save/load test, and keep the approved movement, camera and hunting mechanics. Claude worked in a claude.ai cloud session on a fresh clone of GitHub `main` (9f95de0). It downloaded Godot 4.7.2 (Linux, headless) there; nothing touched Nathan's PC.
 
-Current GitHub baseline: **779a6714b373**. Gameplay/settings are unchanged from chunk 8; only Git-safe snapshot tooling and its fixture changed (9 setup checks passed). Read `docs/SHARED_WORKFLOW.md` for synchronization and `docs/verification/` for committed reports. Repository: https://github.com/socranates/jumping-spider-sim
+**Branch:** `claude/jolly-bell-gq3mm8` (draft PR against `main`). Pull that branch, or `main` after the PR is merged. Read **docs/HANDOFF-chunk-9.md** first; chunk 8's handoff still describes the habitat.
 
-Read **docs/HANDOFF-chunk-8.md** first. Build evidence: **182235d71390**. `play.bat` now opens the sill; `play_lab.bat` retains the old lab. The project files are the authority, even if a conversation was retried or interrupted.
+**Evidence:** 4267a104376a (Linux headless, fixed 60 fps): 502 tests, 502 passed, 0 failed, 0 not run. Nothing is deferred any more: the L01 save/load test runs and passes. Report and stills are in `docs/verification/t09/`. **Not yet run on Windows.**
 
-New: authored ground and upper routes, four flies/12 perches/two entry cracks, physical cancelable retreat rest, field notes on H, one harmless pause-aware room-shadow event, captured-contact cleanup and corrected paired performance measurements. No movement, camera or prey tuning changes. No save system yet.
+Done in T09 part 1:
+- **S01-C retreat checkpoint.** Resting in the crack saves the whole sill. Esc → Return to checkpoint discards the current world (any state) and rebuilds the checkpoint's.
+- **S02 safe store.** Temp write, read back, checksum, backup rotation; a damaged or newer file is refused and left untouched.
+- **Accessibility, first pieces.** Keyboard remapping in the pause menu, the field notes on H or the controller's View/Back button, and a 100–150 % text/panel size. The pause panel scrolls.
+- Decisions T9-01 … T9-09 appended to `docs/DECISIONS.md`.
 
-Next: Nathan plays the habitat. Make local fixes if his notes identify a problem, otherwise begin **T09: S01-C whole-world retreat checkpoints and accessibility**. Preserve single ownership and partially eaten prey on restore. Keep the lab fixtures. Formal E02, graphical M04, U01 and F01 remain open as detailed in the handoff.
+Unfinished (T09 part 2 and the human gates):
+- Controller remapping, reduced-effects and nonvisual cue options, assisted-play presets, and a Windows interrupted-write test.
+- Human U01: the loop with controller only, remapped keys, toggle preparation and sound muted. Human W01, E02, graphical M04 and F01 are still open.
+- Nathan's notes on the habitat (chunk 8) and on checkpoints (this part).
 
-Do not duplicate the review-3 ledger block. Append only new accepted decisions. Do not restart chunk 7 or chunk 8 because chat history is missing. Do not run two agents as simultaneous writers to this folder.
-
-Verified: full Windows suite 481 passed / 0 failed / 1 deferred out of 482; all 13 new checks also passed at normal speed and fixed 30/144. Full report is `tests/reports/full_report_chunk8.txt`; normal-speed report is `realtime_chunk8_report.txt`. Snapshot: `tests/reports/snapshots/2026-10-10_182235d71390.zip`.
+Rules carried forward: one writer at a time. Don't restart chunks because chat history is missing. Don't revive the arbitrary-state S01 silently. Keep the lab fixtures. Append, never rewrite, decisions.

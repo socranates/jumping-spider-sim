@@ -30,3 +30,7 @@ Engine: Godot 4.7.2 standard build, Compatibility renderer, Jolt physics. A fres
 Gameplay and project-settings hashes are unchanged from the fully tested chunk-8 build 182235d71390 (481 passed, one deferred save/load test). GitHub setup only changed snapshot tooling and its regression fixture, producing evidence 779a6714b373. The setup check passed 9 tests (the evidence fixtures plus A01 selected by the file filter); see `docs/verification/github-setup-report.txt`. The older full-suite results are preserved under `docs/verification/chunk8/` and are not relabeled as a full run of the new tooling ID.
 
 Next planned implementation: T09, whole-world retreat checkpoints (S01-C) and accessibility, after Nathan's habitat notes.
+
+### Update 2026-10-10 (Claude, T09 part 1)
+
+T09 part 1 (checkpoints S01-C/S02, keyboard remapping, controller help, text size) is on branch `claude/jolly-bell-gq3mm8`, evidence 4267a104376a, 502 tests, 502 passed, 0 failed, 0 not run on Linux headless (fixed 60 fps). See `docs/HANDOFF-chunk-9.md` and `docs/verification/t09/`. Claude ran in a claude.ai cloud container with its own downloaded Godot 4.7.2, not on Nathan's PC. Its runs are Linux headless evidence, not Windows or GPU evidence.

@@ -999,4 +999,5 @@ Chet reviews this entry, `docs/HANDOFF-chunk-7.md` and the tests named above. Na
 - Chet ran out of usage partway through wiring the leg prototype into the live spider; his work is uncommitted on Nathan's PC. Nathan: "ill let him work on that when he comes back." Claude took the rest of T09 part 2 that doesn't touch Chet's files. Nathan: "my son really loves this so far by the way, hes 6 in november."
 - Controller buttons and triggers are remappable in the pause menu, and prompts name them. Four assisted-play presets: Standard, Guided hunting, No held buttons, Most help. Decisions T9d-01 to T9d-05.
 - Final: evidence 3fb300501a68, 530 of 530 (fixed 60 fps, Linux headless); access and prompt tests at fixed 30 and 144. Not run on Windows.
+- Nathan after updating: "its so fun, I love the twitchy ness. They almost look like they glitch in real life." The twitch layer stays when the legs are wired in.
 

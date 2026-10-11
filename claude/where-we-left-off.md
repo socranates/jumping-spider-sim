@@ -21,7 +21,7 @@ Done in T09 part 1:
 
 Chet's PR #2 (Windows/web export presets, a standalone leg prototype, review 5) is merged too. The leg prototype isn't wired into gameplay yet; when it is, it replaces the static legs in `spider_body.gd` and keeps the twitch layer.
 
-**Nathan's playtest, 2026-10-11** (after `git pull` of `main`): "now its updated and is looking very good now with the changes. the mechanics are working well." He had first played an old local copy: his folder had not been pulled, so the struggle mini-game was missing. Remind him to run `git checkout main` then `git pull` after each handoff.
+**Nathan's playtest, 2026-10-11** (after `git pull` of `main`): "now its updated and is looking very good now with the changes. the mechanics are working well." He had first played an old local copy: his folder had not been pulled, so the struggle mini-game was missing. Remind him to run `git checkout main` then `git pull` after each handoff. Later the same day: "its so fun, I love the twitchy ness. They almost look like they glitch in real life." **Keep the twitch** (spider_body.gd's snap turns, lurches and flicks) when the live legs go in: the legs should move with it, not smooth it out. His son (almost 6) loves it too.
 
 **Updating Nathan's laptop:** after each turn, the agent on his PC runs `update.bat` there. Claude (cloud) tells him to double-click `update.bat`, then `play.bat`. `update.bat` (2026-10-11) runs fetch, checkout of main and a fast-forward pull, and stops without changing anything if tracked files were edited locally. It is not yet run on Windows, so ask Nathan whether it worked.
 

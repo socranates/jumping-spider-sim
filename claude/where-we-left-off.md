@@ -23,6 +23,8 @@ Native AMD Radeon screenshots show the real windowsill spider's corrected legs, 
 
 ## Next
 
+**Nathan, 2026-10-11 (after the legs):** "we can move on to the next thing. Eventually i want to add a first person spider eye mode so its more immersive." And: "we are going for scientific realism in terms of vision and movement and all." See DECISIONS T9e-03. Claude proposed a first-person eye mode grounded in salticid vision research and asked whether to start it now. Global slow time is deferred (T9e-01: it needs one simulation clock) and survival pressure waits for needs with consequences (T9e-02).
+
 Nathan should try walking, slow stalking, aiming/jumping, catching a fly, and the Reduced motion switch. The gait remains a cosmetic prototype: no individual foot contact IK, world-space planted feet, turn-in-place steps or transition blending. Surface overlap/sliding during twitch and at edges is possible; physics and sensing are unchanged.
 
 Remaining T09 work: global slow time, a separate survival-pressure setting, and a Windows interrupted-write test. Human U01/W01/E02/M04/F01 checks and the full Web platform playtest remain open. The live-leg work no longer reserves `main.gd`.

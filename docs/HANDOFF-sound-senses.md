@@ -39,7 +39,18 @@ ROADMAP step 3, built on T11b (`main` at fda7566). Nathan: "get done what you wa
 
 ## Verification
 
-Filled in at merge (end of this file).
+- **Evidence 4daaf055b746**: 565 / 565 (Linux headless, fixed 60 fps), including 8 new tests (`docs/verification/t12a/full_report_t12a.txt`).
+- The sense, slow-motion, struggle, U01 and A01 tests pass at fixed 30 and 144 fps, 24 / 24 each.
+- The tests check that:
+  - the buzz's note is 195 Hz and the hum's is 60 Hz, and the loops join;
+  - the buses follow the settings;
+  - flies buzz only in flight or while struggling;
+  - vibration is felt through the same floor and through a block standing on it (one joint), but not through a slab across an air gap, nor 20 WU away, nor with the spider in the air;
+  - a real walking fly is felt as footsteps from behind;
+  - muted play shows captions and a ripple on the right side;
+  - slow motion slows the sounds.
+- Smoke run clean. Still: `t12a_felt_vibration_and_captions.png`.
+- **Not run on Windows, and the sounds have not been heard by a person yet.** Headless runs use a silent audio driver, so loudness and mix balance are untested. Nathan's ears are the check.
 
 ## Not done / for later
 

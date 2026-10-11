@@ -326,5 +326,5 @@ Nathan: "get done what you want to work on next and then chet can have the next 
   - The output is a direction, never a place. The same event gives a thrum, a ripple, a caption and an optional rumble.
   - It is presentation only for now: no sense, memory or fly decision uses it.
 - **SOUND-04 Captions on by default** (spec 16, U01). Every meaningful cue gets a bracketed caption with a direction relative to the spider, so muted play loses nothing. A ripple on the screen shows a felt vibration's side.
-- **SOUND-05 Slow motion slows sound.** `AudioServer.playback_speed_scale` follows the game speed.
+- **SOUND-05 Slow motion slows sound.** `AudioServer.playback_speed_scale` follows the game speed.- **SOUND-06 Evidence.** 4daaf055b746: 565 / 565 (Linux headless, fixed 60 fps). The sense tests pass at fixed 30 and 144 fps. Loudness and mix are unheard: headless runs use a silent audio driver.
 

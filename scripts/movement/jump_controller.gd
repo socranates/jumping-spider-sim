@@ -19,6 +19,7 @@ extends Node
 ## kind one of "launched", "cancelled", "refused" (a release on an invalid target), "invalid_press"
 ## (toggle mode), "hop_refused" and "out_of_bounds".
 
+const SimClock = preload("res://scripts/core/sim_clock.gd")  # one game clock: count in its ticks, never the engine rate
 const Layers = preload("res://scripts/core/physics_layers.gd")
 const JumpPlan = preload("res://scripts/movement/jump_plan.gd")
 
@@ -153,7 +154,7 @@ func _physics_process(_delta: float) -> void:
 
 
 func _hold_ticks() -> int:
-	return maxi(1, ceili(HOLD_SECONDS * float(Engine.physics_ticks_per_second) - 1e-6))
+	return maxi(1, ceili(HOLD_SECONDS * float(SimClock.HZ) - 1e-6))
 
 
 func _on_press() -> void:

@@ -274,3 +274,25 @@ Nathan: "yeah go ahead please" (to building a first-person eye mode now), "you c
 - **EYE-08 Do not infer UV from RGB blue.** Supersedes EYE-05's blue-as-UV mapping and the blanket "no red" wording. The visible picture uses illustrative green-weighted brightness with red relatively dim. The permanent label says UV is not simulated. Related P. regius receptor evidence is not presented as a measured P. audax response or literal colour experience. UV material/lighting data and depth-from-defocus remain deferred.
 - **EYE-09 Evidence.** Windows fixed-60 suite 548/548, normal-speed eye tests 12/12, evidence 829573aaf835. Native AMD Compatibility rendering captured three scan phases with no reported errors. No sustained performance or player comfort claim; no new export packages.
 
+## T11a — one game clock, slow motion, the view switch (Claude, 2026-10-11)
+
+Nathan: "the slomo thing sounds cool" (to ROADMAP step 2), "add a button that can easily swtch between first and 3rd person", and that his son needs no more help than Most help gives.
+
+- **CLOCK-01 One game clock.** `SimClock.HZ` (60) and `DT` (1/60 s) replace every read of `Engine.physics_ticks_per_second` in the motor, the jump and line controllers and the senses. This supersedes T9e-01's deferral. `set_speed(s)` runs `60 × s` ticks a real second with `time_scale = s`, so each tick's delta stays exactly 1/60 s. A test plays a stalk and a strike at full and half speed, and the spider and the fly match tick for tick (within 1e-5 WU) with the same outcome and the same fly decisions.
+- **CLOCK-02 Slow motion is the player's tool.**
+  - Settings: `slow_motion` (saved) and `slow_speed` (25–75 %, default 50 %). It is switched by T or the right trigger (remappable), or from the Esc menu.
+  - It applies in played worlds only, and every world puts the clock back to normal when it ends.
+  - It is not part of the presets: Nathan's son does not need it as an assist, and it is fun on its own.
+- **CLOCK-03 What does not slow.**
+  - The player's looking about (stick look, recenter, the aim's return, the eye view's recenter) runs in real time through `SimClock.real_delta()`.
+  - That function divides by the scale the engine used for the current frame, so a change made mid-frame does not jerk the view.
+  - Everything in the world slows: the twitch, the legs, the retinal scan and HUD fades.
+  - Holding Space to aim counts game ticks; that needs checking in play.
+- **CLOCK-04 An easy view switch.** V / Y was already the key. Now:
+  - a line in third person names it;
+  - the eye view's tag names the way back ("third person");
+  - the Esc menu has a "First person / Third person" button;
+  - the field notes list it.
+
+  The pause menu's buttons wrap onto a second row when there is not room.
+

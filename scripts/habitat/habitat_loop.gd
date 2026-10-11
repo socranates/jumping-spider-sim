@@ -134,9 +134,10 @@ func caption() -> String:
 	if notice_seconds > 0.0 and not _show_help:
 		text += "\n" + notice
 	if _show_help:
-		return text + "\nFocus: %s    Stalk: %s\nHold %s to aim; release to jump. Green means reachable ground.\nA fly may leave before you arrive. %s: eat or rest    %s: cancel\nYour silk can catch a miss. %s / left stick up reels you back.    %s: spider-eye view\nHome is the silk-lined crack at the west end. Both routes lead back.\nThe pale leaf tip past the east leaf won't hold you. Your silk will.\nResting in the crack keeps a checkpoint.\nEsc / Menu: Return to checkpoint, keys, text size." % [
+		return text + "\nFocus: %s    Stalk: %s\nHold %s to aim; release to jump. Green means reachable ground.\nA fly may leave before you arrive. %s: eat or rest    %s: cancel\nYour silk can catch a miss. %s / left stick up reels you back.\n%s: spider-eye view (first person)    %s: slow motion\nHome is the silk-lined crack at the west end. Both routes lead back.\nThe pale leaf tip past the east leaf won't hold you. Your silk will.\nResting in the crack keeps a checkpoint.\nEsc / Menu: Return to checkpoint, keys, text size." % [
 			_both("focus", "right mouse", "left trigger"), _both("stalk", "Shift", "left shoulder"), _both("prepare_jump", "Space", "A"),
-			_both("interact", "E", "X"), _both("cancel", "Q", "B"), _key_name("move_forward", "W"), _both("eye_view", "V", "Y")]
+			_both("interact", "E", "X"), _both("cancel", "Q", "B"), _key_name("move_forward", "W"), _both("eye_view", "V", "Y"),
+			_both("slow_motion", "T", "right trigger")]
 	if resting:
 		return text + "\nResting in the silk-lined crack. Move, %s or %s to leave." % [_both("interact", "E", "X"), _both("cancel", "Q", "B")]
 	if can_rest():

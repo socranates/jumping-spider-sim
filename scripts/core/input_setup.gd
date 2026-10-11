@@ -31,6 +31,8 @@ const BINDINGS := {
 	"help": {"keys": [KEY_H], "buttons": [JOY_BUTTON_BACK], "dead": BUTTON_DEADZONE},
 	# T10a: the spider-eye (first-person) view, on and off.
 	"eye_view": {"keys": [KEY_V], "buttons": [JOY_BUTTON_Y], "dead": BUTTON_DEADZONE},
+	# T11a: slow motion on and off (the whole world slows evenly; SimClock).
+	"slow_motion": {"keys": [KEY_T], "axes": [[JOY_AXIS_TRIGGER_RIGHT, 1.0]], "dead": BUTTON_DEADZONE},
 	"debug_overlay": {"keys": [KEY_F3], "dead": BUTTON_DEADZONE},
 	"debug_support": {"keys": [KEY_F4], "dead": BUTTON_DEADZONE},
 }

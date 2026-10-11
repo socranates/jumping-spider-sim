@@ -38,6 +38,7 @@ extends Node
 ## physics tick is invisible to queries until that tick is over): a ray cast earlier would find an empty world and
 ## everything would look in plain view.
 
+const SimClock = preload("res://scripts/core/sim_clock.gd")  # one game clock: count in its ticks, never the engine rate
 const Observation = preload("res://scripts/perception/observation.gd")
 const ObservationMemory = preload("res://scripts/perception/observation_memory.gd")
 const PerceptionMath = preload("res://scripts/perception/perception_math.gd")
@@ -161,7 +162,7 @@ func configure_from(profile: RefCounted) -> void:
 ## The memory's timing follows the sensor's: a cue repeats every cooldown, so a peripheral contact is held a little
 ## longer than that; an inspection comes every tick, so it is held for the exposure grace.
 func apply_to_memory() -> void:
-	memory.configure(float(Engine.physics_ticks_per_second), decay_s, grace_s, cue_cooldown_s + 0.2)
+	memory.configure(float(SimClock.HZ), decay_s, grace_s, cue_cooldown_s + 0.2)
 
 
 ## True once queries can see the bodies that were in the scene when the sensor entered it (see the header).
@@ -200,7 +201,7 @@ func on_capture(event: Dictionary) -> void:
 		var matches: Array[String] = []
 		var size := float(event["contact_radius"]) * 2.0
 		for c: ObservationMemory.Contact in memory.marks():
-			var age := float(tick - c.position_tick) / float(Engine.physics_ticks_per_second)
+			var age := float(tick - c.position_tick) / float(SimClock.HZ)
 			var radius := PerceptionMath.plausible_radius(c.size_wu, size, age, contact_speed_bound, c.speed_wu_s)
 			if c.position.distance_to(event["contact_position"]) <= radius and PerceptionMath.sizes_compatible(c.size_wu, size, contact_size_ratio):
 				matches.append(c.track_id)
@@ -269,7 +270,7 @@ func _physics_process(delta: float) -> void:
 	var space: PhysicsDirectSpaceState3D = observer.get_world_3d().direct_space_state
 	var broad_due := tick >= _next_broad_tick
 	if broad_due:
-		_next_broad_tick = tick + maxi(1, roundi(float(Engine.physics_ticks_per_second) / maxf(broad_hz, 0.1)))
+		_next_broad_tick = tick + maxi(1, roundi(float(SimClock.HZ) / maxf(broad_hz, 0.1)))
 		broad_scans += 1
 	for t: Track in _tracks.values():
 		t.gap_s += delta
@@ -426,7 +427,7 @@ func _inspection_contact(t: Track, matched: String) -> String:
 ## went), looks about as big, and is not finer in appearance than what was learned. Only a focused sighting is ever asked: a bearing cue
 ## says nothing about which remembered place this is.
 func _lost_candidates(estimate: Vector3, size_wu: float, cap: StringName) -> Array[String]:
-	var hz := float(Engine.physics_ticks_per_second)
+	var hz := float(SimClock.HZ)
 	var found: Array[String] = []
 	for m: ObservationMemory.Contact in memory.marks():
 		var elapsed := float(tick - m.position_tick) / hz
@@ -508,7 +509,7 @@ func _inspect(t: Track, p: Dictionary, estimate: Vector3, est_dir: Vector3, appa
 
 
 func _cue(t: Track, est_dir: Vector3, forward: Vector3, up: Vector3, dist: float) -> void:
-	t.next_cue_tick = tick + roundi(cue_cooldown_s * float(Engine.physics_ticks_per_second))
+	t.next_cue_tick = tick + roundi(cue_cooldown_s * float(SimClock.HZ))
 	var obs := Observation.new()
 	obs.observer_id = observer_id
 	obs.track_id = _cue_contact(t)

@@ -72,6 +72,7 @@ extends CharacterBody3D
 ## separate, labelled debug fallback, never presented as silk breaking. HANGING and REELING are spec 6.2
 ## names; release_line() lets go (FALLING). The body hangs head down from its spinnerets (cosmetic pose).
 
+const SimClock = preload("res://scripts/core/sim_clock.gd")  # one game clock: count in its ticks, never the engine rate
 const SpeciesProfile = preload("res://scripts/core/species_profile.gd")
 const SurfaceProfile = preload("res://scripts/core/surface_profile.gd")
 const SupportMath = preload("res://scripts/movement/support_math.gd")
@@ -621,7 +622,7 @@ func commit_jump(plan: RefCounted) -> bool:
 		return false
 	if global_position.distance_to(plan.origin) > COMMIT_ORIGIN_TOLERANCE:
 		return false
-	if absf(plan.dt - 1.0 / float(Engine.physics_ticks_per_second)) > 1e-9:
+	if absf(plan.dt - 1.0 / float(SimClock.HZ)) > 1e-9:
 		return false
 	if plan.velocity.dot(support.normal) <= 0.0 or not plan.velocity.is_finite():
 		return false
@@ -661,7 +662,7 @@ func get_jump_planner() -> RefCounted:
 	if _planner == null:
 		_planner = JumpPlanner.new()
 		if profile != null:
-			_planner.configure(profile, _radius + SKIN, surfaces, 1.0 / float(Engine.physics_ticks_per_second), reach_factor)
+			_planner.configure(profile, _radius + SKIN, surfaces, 1.0 / float(SimClock.HZ), reach_factor)
 	return _planner
 
 
@@ -669,7 +670,7 @@ func get_jump_planner() -> RefCounted:
 func set_reach_factor(k: float) -> void:
 	reach_factor = clampf(k, 0.5, 1.5) if is_finite(k) else 1.0
 	if _planner != null and profile != null:
-		_planner.configure(profile, _radius + SKIN, surfaces, 1.0 / float(Engine.physics_ticks_per_second), reach_factor)
+		_planner.configure(profile, _radius + SKIN, surfaces, 1.0 / float(SimClock.HZ), reach_factor)
 
 
 ## Plans a jump from the current body position and support to `target` ({"point", "normal",
@@ -712,7 +713,7 @@ func _refusal(kind: JumpPlan.Kind, reason: String, point: Vector3, normal: Vecto
 	p.target_point = point
 	p.target_normal = normal
 	p.seat = point + normal * (_radius + SKIN)
-	p.dt = 1.0 / float(Engine.physics_ticks_per_second)
+	p.dt = 1.0 / float(SimClock.HZ)
 	p.gravity = Vector3(0.0, -_gravity, 0.0)
 	return p
 

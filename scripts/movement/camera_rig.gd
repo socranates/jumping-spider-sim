@@ -68,6 +68,7 @@ const BoomMath = preload("res://scripts/movement/boom_math.gd")
 const Layers = preload("res://scripts/core/physics_layers.gd")
 const SurfaceInput = preload("res://scripts/movement/surface_input.gd")
 const SupportMath = preload("res://scripts/movement/support_math.gd")
+const SimClock = preload("res://scripts/core/sim_clock.gd")
 
 const PIVOT_HEIGHT := 0.45          # WU from the spider origin along its smoothed normal
 const BOOM_RADIUS := 0.15           # WU, radius of the cast sphere
@@ -367,16 +368,19 @@ func _physics_process(delta: float) -> void:
 func _process(delta: float) -> void:
 	if target == null:
 		return
+	# The player's own looking, recentring and the aim's return run in real time, so slow motion never makes them sluggish
+	# (SimClock.real_delta). The boom's casts and recovery are part of the world and run per physics tick.
+	var real := SimClock.real_delta(delta)
 	var v := Input.get_vector("look_left", "look_right", "look_up", "look_down")
 	if v != Vector2.ZERO:
-		look(v.x * STICK_DEG_PER_SECOND * delta, v.y * STICK_DEG_PER_SECOND * delta)
+		look(v.x * STICK_DEG_PER_SECOND * real, v.y * STICK_DEG_PER_SECOND * real)
 	if eye_view:
-		_update_eye_recenter(delta)
+		_update_eye_recenter(real)
 		_place_eye(Engine.get_physics_interpolation_fraction())
 		return
-	_update_recenter(delta)
+	_update_recenter(real)
 	if not aiming and aim_pitch != 0.0:
-		aim_pitch = BoomMath.ease_offset(aim_pitch, 0.0, delta, AIM_RETURN_SECONDS, AIM_RETURN_SECONDS)
+		aim_pitch = BoomMath.ease_offset(aim_pitch, 0.0, real, AIM_RETURN_SECONDS, AIM_RETURN_SECONDS)
 	# Interpolate recovery between physics ticks; a retract is taken at once (min).
 	var frac := Engine.get_physics_interpolation_fraction()
 	var origin := target.get_global_transform_interpolated().origin

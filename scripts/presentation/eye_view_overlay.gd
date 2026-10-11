@@ -74,6 +74,7 @@ var _material: ShaderMaterial
 var _tag: Label
 var _notice: Label
 var _was_on: bool = false
+var _orbit_hint: Label
 var scan_time: float = 0.0
 var left_scan_deg := Vector2(-2.5, 0.0)
 var right_scan_deg := Vector2(2.5, 0.0)
@@ -99,6 +100,10 @@ func _ready() -> void:
 	_notice.name = "EyeViewNotice"
 	_notice.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_notice.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	# Nathan, 2026-10-11: "a button that can easily switch between first and 3rd person". In the orbit view a small line names it.
+	_orbit_hint = _label(16)
+	_orbit_hint.name = "ViewHint"
+	_orbit_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	_set_visible(false)
 
 
@@ -127,6 +132,7 @@ func _process(delta: float) -> void:
 			principal = target_principal()
 			scan_time = 0.0
 	if not on:
+		_place_orbit_hint()
 		return
 	# Local elapsed time pauses with the tree. Reduced motion holds current pose.
 	if settings == null or not bool(settings.get_value("reduced_motion")):
@@ -160,7 +166,7 @@ func refresh() -> void:
 	_material.set_shader_parameter("tan_half_fov", tan(fov * 0.5))
 	_material.set_shader_parameter("aspect", size.x / maxf(size.y, 1.0))
 	_material.set_shader_parameter("principal", principal)
-	_tag.text = KeyNames.apply("SPIDER-EYE VIEW (an impression)    V / Y: switch back", settings)
+	_tag.text = KeyNames.apply("SPIDER-EYE VIEW (an impression)    V / Y: third person", settings)
 	_tag.text += "\nGreen-sensitive approximation | UV not simulated"
 	if principal < 0.5:
 		_tag.text += "\nOut of the principal eyes' reach: stand still and the spider turns to look."
@@ -185,7 +191,17 @@ static func scan_pose(seconds: float) -> Dictionary:
 		"torsion": deg_to_rad(TORSION_DEG) * sin(TAU * seconds / TORSION_PERIOD_S)}
 
 
+## The orbit view's line: which key gives the spider-eye view.
+func _place_orbit_hint() -> void:
+	_orbit_hint.text = KeyNames.apply("V / Y: first person (spider-eye view)", settings)
+	var size := _orbit_hint.get_viewport_rect().size
+	var want := _orbit_hint.get_minimum_size()
+	_orbit_hint.size = want
+	_orbit_hint.position = Vector2(size.x - want.x - 18.0, 14.0)
+
+
 func _set_visible(on: bool) -> void:
 	_rect.visible = on
 	_tag.visible = on
+	_orbit_hint.visible = not on
 	_notice.visible = on and notice_left > 0.0

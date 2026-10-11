@@ -65,11 +65,11 @@ Each step is one handoff: one agent at a time, start from `main`, finish into `m
 
 Keep the twitch.
 
-**5. Vision realism, part 2 (Claude, building on Chet's current work).**
-- **Depth from defocus** (Nagata et al. 2012): how sure the landing marker is depends on green light and distance.
-- **UV markings** on flies and leaves, visible only in the sharp window. This needs authored, evidence-based UV reflectance for each material (EYE-08), not a guess from screen colour.
-- A **motion-sensitive edge**: a moving thing flickers in the blurry part before you can tell what it is.
-- **Comfort options:** a level horizon in the eye view, and a colour-free variant.
+**5. Vision realism, part 2 (Claude, T13a).** See `docs/HANDOFF-vision-2.md`.
+- Done: a **motion-sensitive edge**. A moving thing shimmers in the blurry surround before the sharp eyes can tell what it is.
+- Done: **comfort options**, a level horizon in the eye view and a grey (colour-free) variant.
+- Waiting on Nathan: **depth from defocus** (Nagata et al. 2012). Done faithfully, jumps would be less accurate in poor or reddish light and at long range. That changes how the game plays, so it is his call (EYE-13).
+- **UV markings:** see EYE-14 for what the evidence supports.
 
 **6. Hand back the slice (spec T10; Chet on Windows, Claude on docs).**
 - Measure frame time on Nathan's laptop (F01).

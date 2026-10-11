@@ -20,8 +20,9 @@ const Fly = preload("res://scripts/prey/fly.gd")
 const HabitatLoop = preload("res://scripts/habitat/habitat_loop.gd")
 
 ## Schema 2 (T09b): flies record their glances (schedule: home_heading, glancing, glance_target, glance_sign, next_glance) and the
-## habitat's fallen leaf tip is a habitat change. Schema 1 records are upgraded on load (upgrade()); nothing older exists.
-const SCHEMA_VERSION := 2
+## habitat's fallen leaf tip is a habitat change. Schema 3 (T09c): flies record their walks (schedule: walking, walk_target, walk_speed,
+## burst_left, pause_left, next_walk, rest_spot). Older records are upgraded on load (upgrade()), one schema at a time.
+const SCHEMA_VERSION := 3
 const GAME_BUILD := "prototype-0.1.0"
 const KIND := "retreat_checkpoint"
 const PLAYER_ID := "spider"
@@ -111,6 +112,25 @@ static func upgrade(record: Variant) -> Variant:
 			r["habitat_changes"] = []
 		r["schema_version"] = 2
 		r["upgraded_from"] = 1
+	if int(r["schema_version"]) == 2:
+		# 2 -> 3: no fly is mid-walk; each settled where it stands and walks again in a moment.
+		var prey3: Variant = r.get("prey")
+		var now3 := float((prey3 as Dictionary).get("now", 0.0)) if typeof(prey3) == TYPE_DICTIONARY else 0.0
+		if typeof(prey3) == TYPE_DICTIONARY and typeof((prey3 as Dictionary).get("flies")) == TYPE_ARRAY:
+			for fv: Variant in prey3["flies"]:
+				if typeof(fv) == TYPE_DICTIONARY and typeof((fv as Dictionary).get("schedule")) == TYPE_DICTIONARY:
+					var sch3: Dictionary = fv["schedule"]
+					var st: Variant = (fv as Dictionary).get("stand", [0.0, 0.0, 0.0])
+					sch3["walking"] = false
+					sch3["walk_target"] = st
+					sch3["walk_speed"] = 0.0
+					sch3["burst_left"] = 0.0
+					sch3["pause_left"] = 0.0
+					sch3["next_walk"] = now3 + 1.5
+					sch3["rest_spot"] = st
+		r["schema_version"] = 3
+		if not r.has("upgraded_from"):
+			r["upgraded_from"] = 2
 	return r
 
 
@@ -401,11 +421,13 @@ static func _check_schedule(v: Variant, e: PackedStringArray, fw: String) -> voi
 		e.append("%s: no schedule" % fw)
 		return
 	var d: Dictionary = v
-	for key: String in ["next_fidget", "fidget_t0", "fidget_t1", "next_groom", "groom_t1", "next_glance"]:
+	for key: String in ["next_fidget", "fidget_t0", "fidget_t1", "next_groom", "groom_t1", "next_glance", "next_walk", "burst_left", "pause_left"]:
 		_num(d, key, e, fw + " schedule")
 	_num(d, "glance_sign", e, fw + " schedule", -1.0, 1.0)
+	_num(d, "walk_speed", e, fw + " schedule", 0.0, 50.0)
 	_bool(d, "glancing", e, fw + " schedule")
-	for key: String in ["fidget_from", "fidget_to", "home_heading", "glance_target"]:
+	_bool(d, "walking", e, fw + " schedule")
+	for key: String in ["fidget_from", "fidget_to", "home_heading", "glance_target", "walk_target", "rest_spot"]:
 		_vec(d, key, e, fw + " schedule")
 
 

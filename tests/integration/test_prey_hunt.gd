@@ -10,7 +10,7 @@ extends "res://tests/prey_test_case.gd"
 const FLY_PERCH := "floor_east_open"
 const FLY_X := 4.0
 const FLY_Z := 11.0
-## A stalk of 0.8 WU/s is let to stop this far from the fly (flat distance): from here a fly is still unalarmed; closer in it is alerted (1.8 WU)
+## A stalk (0.65 WU/s since T09c) is let to stop this far from the fly (flat distance): from here a fly is still unalarmed; closer in it is alerted (1.8 WU)
 ## and then gone (1.5 WU), so the range to strike from is about 2 to 3 WU.
 const STRIKING_RANGE := 2.2
 
@@ -68,9 +68,9 @@ func test_a_stalk_timed_to_the_flys_glances_reaches_striking_range_and_a_steady_
 		f = await _hunt_world(7.0, seed_value)
 		var peak := 0.0
 		var ticks := 0
-		while ticks < 60 * 40 and flat_distance(world.spider.global_position, f.global_position) > STRIKING_RANGE and f.state < Fly.State.TAKEOFF:
+		while ticks < 60 * 60 and flat_distance(world.spider.global_position, f.global_position) > STRIKING_RANGE and f.state < Fly.State.TAKEOFF:
 			var go: bool = f.state == Fly.State.PERCHED and _looking_away(f)
-			var flat: Vector3 = Vector3(FLY_X, 0.0, FLY_Z) - world.spider.global_position
+			var flat: Vector3 = f.global_position - world.spider.global_position   # T09c: it walks about: go where it is
 			flat.y = 0.0
 			world.spider.set_intent(flat.normalized() if go else Vector3.ZERO, STALK)
 			await physics_frames(1)
@@ -83,10 +83,10 @@ func test_a_stalk_timed_to_the_flys_glances_reaches_striking_range_and_a_steady_
 		check(ticks > 60 * 8, "seed %d: and it is slow: %.1f s from 7 WU (a steady stalk would take 6)" % [seed_value, ticks / 60.0])
 		check_eq(f.flight.flights_total, 0, "seed %d: the fly never took off" % seed_value)
 		check(peak < f.profile.awareness_flee * 0.5, "seed %d: its awareness stayed low (%.2f of the %.2f that sends it off)" % [seed_value, peak, f.profile.awareness_flee])
-		if await _strike(f, FLY_X, FLY_Z):
+		if await _strike(f, f.global_position.x, f.global_position.z):
 			caught += 1
 		await _free_world()
-	check(caught >= 1, "a strike from there catches it (%d of 2; the T09b tuning run caught 6 of 8 from 2.2 WU)" % caught)
+	check(caught >= 1, "a strike from there, at where the fly is now, catches it (%d of 2; the T09b tuning run caught 6 of 8 from 2.2 WU)" % caught)
 
 
 func test_a_walk_up_to_the_same_fly_alerts_it_early_and_it_leaves_before_the_spider_is_near() -> void:

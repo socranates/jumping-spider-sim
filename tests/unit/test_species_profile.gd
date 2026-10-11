@@ -33,7 +33,7 @@ func test_shipped_profile_loads_with_spec_values() -> void:
 	check_eq(p.id, "phidippus_audax_prototype", "id")
 	check_near(p.body_length_wu, 1.0, 1e-6, "body length")
 	check_near(p.walk_speed_wu_s, 2.5, 1e-6, "walk speed")
-	check_near(p.stalk_speed_wu_s, 0.8, 1e-6, "stalk speed")
+	check_near(p.stalk_speed_wu_s, 0.65, 1e-6, "stalk speed (T09c: 0.8 -> 0.65, a slower creep)")
 	check_near(p.gravity_wu_s2, 35.0, 1e-6, "gravity")
 	check_near(p.flight_time_min_s, 0.35, 1e-6, "flight time min")
 	check_near(p.flight_time_max_s, 0.9, 1e-6, "flight time max (chunk 5)")

@@ -70,6 +70,8 @@ var events: Array[Dictionary] = []
 var fidgets_started: int = 0
 var grooms_started: int = 0
 var glances_started: int = 0
+var walks_started: int = 0
+var walked_wu: float = 0.0
 ## Tests: a fly held still does not fidget, groom or decide (it still senses and shows its awareness).
 var fixture_hold: bool = false
 
@@ -78,6 +80,8 @@ var captured_by: String = ""
 var capture_event_id: String = ""
 var nutrition_total: float = 0.0
 var nutrition_left: float = 0.0
+## T09c: true while it fights the jaws (drawn: buzzing wings, kicking legs). Set by the feeding controller.
+var struggling: bool = false
 
 var _now: float = 0.0
 var _next_fidget_t: float = 0.0
@@ -93,6 +97,18 @@ var _glancing: bool = false
 var _glance_target: Vector3 = Vector3.FORWARD
 var _glance_sign: float = 1.0
 var _next_glance_t: float = 0.0
+## T09c: walking about its spot. Where the walk is going, how fast, the stop-start bursts, when the next walk is due, and the spot it last
+## settled on (the anchor of its little fidgets).
+var _walking: bool = false
+var _walk_target: Vector3 = Vector3.ZERO
+var _walk_speed: float = 0.0
+var _burst_left: float = 0.0
+var _pause_left: float = 0.0
+var _next_walk_t: float = 0.0
+var _rest_spot: Vector3 = Vector3.ZERO
+const WALK_SAMPLE_WU := 0.15
+const WALK_MIN_WU := 0.2
+const WALK_FACE_DEG := 20.0
 var _ray: PhysicsRayQueryParameters3D = PhysicsRayQueryParameters3D.new()
 
 
@@ -167,6 +183,9 @@ func begin_stay(now: float) -> void:
 	_glancing = false
 	_glance_sign = 1.0 if rng.randf() < 0.5 else -1.0
 	_next_glance_t = now + PreyMath.draw(rng, profile.glance_interval_s)
+	_walking = false
+	_rest_spot = stand
+	_next_walk_t = now + PreyMath.draw(rng, profile.walk_interval_s)
 
 
 func restlessness(now: float) -> float:
@@ -247,6 +266,8 @@ func _rest(now: float, dt: float) -> void:
 		_fidget_t1 = 0.0
 		_groom_t1 = 0.0
 		_glancing = false
+		if _walking:
+			_end_walk(now)
 		if senses.has_last_seen:
 			_turn_toward(senses.last_seen_position, dt)
 		return
@@ -263,14 +284,100 @@ func _rest(now: float, dt: float) -> void:
 		if _turn_heading(_glance_target, dt):
 			_glancing = false
 		return
+	if _walking:
+		_walk_step(now, dt)
+		return
 	if now >= _next_groom_t:
 		begin_groom(now, PreyMath.draw(rng, profile.groom_duration_s))
 		return
 	if now >= _next_glance_t:
 		_start_glance(now)
 		return
+	if now >= _next_walk_t:
+		_start_walk(now)
+		return
 	if now >= _next_fidget_t:
 		_start_fidget(now)
+
+
+## T09c: a walk across its surface, the way flies walk: turn, a few quick steps, a stop, a few more. Mostly onward, a little to either side;
+## back toward its perch when it has wandered more than about half its wander radius. The way is checked before it sets off: surface under
+## every sample (never off an edge) and nothing standing in the way; a blocked walk stops short where the way was still good.
+func _start_walk(now: float) -> void:
+	_next_walk_t = now + PreyMath.draw(rng, profile.walk_interval_s)
+	var dir: Vector3 = heading.rotated(normal, deg_to_rad(rng.randf_range(-100.0, 100.0)))
+	var home := perch.position - stand if perch != null else Vector3.ZERO
+	home -= normal * home.dot(normal)
+	if home.length() > profile.wander_radius_wu * 0.5:
+		dir = home.normalized().rotated(normal, deg_to_rad(rng.randf_range(-40.0, 40.0)))
+	dir = (dir - normal * dir.dot(normal)).normalized()
+	var want: float = PreyMath.draw(rng, profile.walk_distance_wu)
+	var speed: float = PreyMath.draw(rng, profile.walk_speed_wu_s)
+	var good := 0.0
+	var d := WALK_SAMPLE_WU
+	while d <= want + 1.0e-6:
+		var p := stand + dir * d
+		if perch != null and (p - perch.position).length() > profile.wander_radius_wu:
+			break
+		if not surface_under(p) or not _clear_walk(stand + dir * (d - WALK_SAMPLE_WU), p):
+			break
+		good = d
+		d += WALK_SAMPLE_WU
+	if good < WALK_MIN_WU:
+		return
+	_walk_target = stand + dir * good
+	_walk_speed = speed
+	_walking = true
+	_burst_left = PreyMath.draw(rng, profile.walk_burst_s)
+	_pause_left = 0.0
+	walks_started += 1
+	_log_event({"t": now, "kind": "walk", "distance": good})
+
+
+## Nothing solid between two points on the surface at the fly's body height.
+func _clear_walk(a: Vector3, b: Vector3) -> bool:
+	_ray.from = a + normal * profile.hover_wu
+	_ray.to = b + normal * profile.hover_wu
+	return world.space().intersect_ray(_ray).is_empty()
+
+
+func _walk_step(now: float, dt: float) -> void:
+	var to := _walk_target - stand
+	to -= normal * to.dot(normal)
+	var left := to.length()
+	if left <= 1.0e-3:
+		_end_walk(now)
+		return
+	var dir := to / left
+	if rad_to_deg(heading.angle_to(dir)) > WALK_FACE_DEG:
+		_turn_heading(dir, dt)  # face the way first, quickly
+		return
+	if _pause_left > 0.0:
+		_pause_left -= dt
+		if _pause_left <= 0.0:
+			_burst_left = PreyMath.draw(rng, profile.walk_burst_s)
+		return
+	var step := minf(_walk_speed * dt, left)
+	stand += dir * step
+	walked_wu += step
+	heading = heading.slerp(dir, 0.3).normalized()
+	global_position = stand + normal * profile.hover_wu
+	_apply_basis()
+	_burst_left -= dt
+	if _burst_left <= 0.0:
+		_pause_left = PreyMath.draw(rng, profile.walk_pause_s)
+
+
+func _end_walk(now: float) -> void:
+	_walking = false
+	_rest_spot = stand
+	_home_heading = heading
+	_next_walk_t = maxf(_next_walk_t, now + PreyMath.draw(rng, profile.walk_interval_s) * 0.5)
+
+
+## True while it walks (and is not in one of its little stops): drawn with stepping legs.
+func walking_now() -> bool:
+	return state == State.PERCHED and _walking and _pause_left <= 0.0
 
 
 ## A quick look to one side of the way it settled, then (next time) to the other: the fly's view swings to and fro, so what it can take in
@@ -313,10 +420,10 @@ func _start_fidget(now: float) -> void:
 	var dist: float = PreyMath.draw(rng, profile.fidget_distance_wu)
 	var dur: float = PreyMath.draw(rng, profile.fidget_duration_s)
 	_next_fidget_t = now + dur + PreyMath.draw(rng, profile.fidget_interval_s)
-	var away := stand + dir * dist - perch.position
+	var away := stand + dir * dist - _rest_spot
 	away -= normal * away.dot(normal)
 	if away.length() > profile.perch_radius_wu:
-		var home := perch.position - stand
+		var home := _rest_spot - stand
 		home -= normal * home.dot(normal)
 		if home.length_squared() > 1.0e-6:
 			dir = home.normalized()
@@ -428,11 +535,13 @@ func _pose(now: float) -> void:
 		State.TAKEOFF, State.FLEE, State.SEEK_PERCH, State.REPOSITION:
 			mode = FlyBody.Mode.FLYING
 		State.CAPTURED:
-			mode = FlyBody.Mode.HELD
+			mode = FlyBody.Mode.STRUGGLING if struggling else FlyBody.Mode.HELD
 		_:
 			if now < _groom_t1:
 				mode = FlyBody.Mode.GROOMING
 				groom = 1.0
+			elif walking_now():
+				mode = FlyBody.Mode.WALKING
 	body.pose(mode, 1.0, groom, now)
 
 
@@ -505,7 +614,9 @@ func to_record() -> Dictionary:
 		"schedule": {"next_fidget": _next_fidget_t, "fidget_t0": _fidget_t0, "fidget_t1": _fidget_t1, "fidget_from": RecordMath.v3(_fidget_from),
 			"fidget_to": RecordMath.v3(_fidget_to), "next_groom": _next_groom_t, "groom_t1": _groom_t1,
 			"home_heading": RecordMath.v3(_home_heading), "glancing": _glancing, "glance_target": RecordMath.v3(_glance_target),
-			"glance_sign": _glance_sign, "next_glance": _next_glance_t},
+			"glance_sign": _glance_sign, "next_glance": _next_glance_t,
+			"walking": _walking, "walk_target": RecordMath.v3(_walk_target), "walk_speed": _walk_speed, "burst_left": _burst_left,
+			"pause_left": _pause_left, "next_walk": _next_walk_t, "rest_spot": RecordMath.v3(_rest_spot)},
 		"senses": senses.to_record(), "mind": mind.to_record(), "flight": flight.to_record(),
 		"captured_by": captured_by, "capture_event_id": capture_event_id, "nutrition_total": nutrition_total, "nutrition_left": nutrition_left,
 	}
@@ -542,6 +653,13 @@ func apply_record(r: Dictionary, find_perch: Callable) -> void:
 	_glance_target = RecordMath.to_v3(sch["glance_target"])
 	_glance_sign = float(sch["glance_sign"])
 	_next_glance_t = float(sch["next_glance"])
+	_walking = bool(sch["walking"])
+	_walk_target = RecordMath.to_v3(sch["walk_target"])
+	_walk_speed = float(sch["walk_speed"])
+	_burst_left = float(sch["burst_left"])
+	_pause_left = float(sch["pause_left"])
+	_next_walk_t = float(sch["next_walk"])
+	_rest_spot = RecordMath.to_v3(sch["rest_spot"])
 	senses.apply_record(r["senses"])
 	mind.apply_record(r["mind"])
 	flight.apply_record(r["flight"], find_perch)

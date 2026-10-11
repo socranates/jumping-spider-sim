@@ -58,6 +58,9 @@ const SCHEMA := {
 		"fatigue_up_per_s": ["f", 0.0, 5.0], "fatigue_down_per_s": ["f", 0.0, 5.0], "candidates_validated": ["i", 1.0, 32.0],
 		"interrupt_threat": ["f", 0.0, 1.0], "block_retry_s": ["f", 0.0, 120.0], "reposition_max_wu": ["f", 0.5, 500.0],
 		"glance_interval_s": ["p", 0.1, 60.0], "glance_angle_deg": ["p", 0.0, 180.0],
+		"walk_interval_s": ["p", 0.1, 120.0], "walk_distance_wu": ["p", 0.05, 20.0], "walk_speed_wu_s": ["p", 0.05, 20.0],
+		"walk_burst_s": ["p", 0.02, 10.0], "walk_pause_s": ["p", 0.0, 10.0], "wander_radius_wu": ["f", 0.1, 50.0],
+		"wander_flight_chance": ["f", 0.0, 1.0],
 	},
 	"population": {
 		"replenish_delay_s": ["p", 0.1, 3600.0], "replenish_retry_s": ["f", 0.05, 60.0], "vent_view_margin_deg": ["f", 0.0, 90.0],
@@ -164,6 +167,15 @@ class Profile extends RefCounted:
 	## T09b: a perched fly looks to and fro: a quick turn every glance_interval_s, alternately each side of the way it settled facing.
 	var glance_interval_s: Vector2 = Vector2.ZERO
 	var glance_angle_deg: Vector2 = Vector2.ZERO
+	## T09c: a perched fly walks about its spot in stop-start bursts (Nathan: "actively walk around more naturally like a real fly"), and a
+	## spontaneous move is often a looping flight through the open air before it lands ("take off and fly randomly sometimes").
+	var walk_interval_s: Vector2 = Vector2.ZERO
+	var walk_distance_wu: Vector2 = Vector2.ZERO
+	var walk_speed_wu_s: Vector2 = Vector2.ZERO
+	var walk_burst_s: Vector2 = Vector2.ZERO
+	var walk_pause_s: Vector2 = Vector2.ZERO
+	var wander_radius_wu: float = 0.0
+	var wander_flight_chance: float = 0.0
 	# population (the P0 replenishment rule, PreyPopulation)
 	## How long after a fly leaves the living population its replacement falls due, seconds, drawn for each from the population's stream.
 	var replenish_delay_s: Vector2 = Vector2.ZERO

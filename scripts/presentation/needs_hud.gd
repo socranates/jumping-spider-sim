@@ -90,10 +90,13 @@ func refresh() -> void:
 		_energy_label.text = "Energy %d%%" % roundi(e * 100.0)
 		_bar_fill.size = Vector2(BAR_SIZE.x * clampf(e / needs.ENERGY_MAX, 0.0, 1.0), BAR_SIZE.y)
 	var d: Dictionary = feeding.prompt() if feeding != null else {}
+	if d.is_empty() and feeding != null and float(feeding.get("note_left") if feeding.get("note_left") != null else 0.0) > 0.0:
+		d = {"title": str(feeding.note), "hint": "", "left": 0.0, "no_bar": true}   # T09c: how a struggle ended
 	_prompt_box.visible = not d.is_empty()
 	if not d.is_empty():
 		_prompt_title.text = str(d["title"])
 		_prompt_hint.text = str(d["hint"])
+		_prompt_back.visible = not bool(d.get("no_bar", false))
 		_prompt_bar.size = Vector2(PROMPT_BAR_W * clampf(float(d["left"]), 0.0, 1.0), 7.0)
 		var urgent := bool(d.get("urgent", false))
 		_prompt_bar.color = Color(1.0, 0.45, 0.25, 0.95) if urgent else Color(0.95, 0.80, 0.35, 0.85)

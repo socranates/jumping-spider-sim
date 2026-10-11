@@ -13,6 +13,8 @@ Claude added these on 2026-10-10 on top of chunk 8 (see `docs/HANDOFF-chunk-9.md
 - **Text and panel size** (Esc), 100–150 %.
 - **Field notes**: H or the controller's View / Back button.
 
+**T09c — living flies (2026-10-11).** Flies walk about in quick stop-start bursts and sometimes take off by themselves, looping through the air before landing elsewhere. Shift creeps more slowly (0.65). After a catch, **tap Space** (or E) to keep your grip: the fly buzzes and kicks in front of the spider's head. When it goes still the spider starts eating by itself; if the grip runs out it tears free.
+
 **T09b — the feel of the hunt.** The fly now glances to and fro: move while it looks away, freeze when it looks back. A steady creep in plain view gets you spotted, so hunts are slow on purpose. The spider twitches like a jumping spider (display only; Esc → Reduced motion). After a catch the fly struggles: tap E / X to keep the grip bar up until it goes still, or it tears free (Esc → "Struggling prey: hold on automatically"). The pale leaf tip past the east leaf gives way when you jump at it, so your silk catches you.
 
 ## Chunk 8 — the windowsill

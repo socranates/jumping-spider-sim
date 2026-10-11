@@ -191,8 +191,12 @@ func _ready() -> void:
 	var body := spider.get_node_or_null("Body")
 	if body != null:
 		feeding.struggle_changed.connect(func(phase: String) -> void:
-			if phase == "jerk" and is_instance_valid(body):
-				body.jolt())
+			if not is_instance_valid(body):
+				return
+			if phase == "jerk":
+				body.jolt()
+			elif phase == "tap":
+				body.jolt(0.35))
 	_apply_reduced_motion()
 	if use_windowsill:
 		habitat_loop = HabitatLoop.new()
@@ -212,6 +216,7 @@ func _ready() -> void:
 		jump_controller.motor = spider
 		jump_controller.camera_rig = camera_rig
 		jump_controller.settings = settings
+		jump_controller.feeding = feeding
 		add_child(jump_controller)
 		controller.jump_controller = jump_controller
 		tether_controller = TetherController.new()

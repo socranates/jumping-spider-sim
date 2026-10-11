@@ -488,6 +488,9 @@ func _carry_held() -> void:
 		var up: Vector3 = spider.get_visual_up()
 		var forward: Vector3 = spider.get_heading_vector()
 		held.global_position = spider.get_eye_position() + forward * 0.2 - up * 0.13
+		if held.struggling:
+			# T09c: a fighting fly is held out in front at head height, so its buzzing wings show past the spider from the camera behind.
+			held.global_position = spider.get_eye_position() + forward * 0.42 + up * 0.04
 		if held_jerk > 0.0:
 			# T09b: a struggling fly jerks in the jaws (drawn only).
 			var side: Vector3 = forward.cross(up)

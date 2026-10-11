@@ -192,7 +192,8 @@ func test_a_schema_1_checkpoint_is_upgraded_and_loads() -> void:
 	var old := rec.duplicate(true)
 	old["schema_version"] = 1
 	for fr: Dictionary in old["prey"]["flies"]:
-		for k: String in ["home_heading", "glancing", "glance_target", "glance_sign", "next_glance"]:
+		for k: String in ["home_heading", "glancing", "glance_target", "glance_sign", "next_glance",
+				"walking", "walk_target", "walk_speed", "burst_left", "pause_left", "next_walk", "rest_spot"]:
 			(fr["schedule"] as Dictionary).erase(k)
 	DirAccess.make_dir_recursive_absolute(DIR)
 	var text := CheckpointStore.encode(old)
@@ -211,3 +212,53 @@ func test_a_schema_1_checkpoint_is_upgraded_and_loads() -> void:
 		for f in world.prey.flies:
 			glanced += int(f.glances_started)
 		check(glanced > 0, "which go on glancing (%d glances in 3 s)" % glanced)
+
+
+## T09c (Chet review 5, P1): a checkpoint this build cannot read is never deleted by a save. One made by a newer version, refused on load,
+## is set aside unchanged when the next rest saves; a damaged one likewise; a good backup survives both.
+func test_a_save_never_deletes_a_checkpoint_this_build_cannot_read() -> void:
+	var first := await make_record(1, 20)
+	check(bool(store.save(first)["ok"]), "a first checkpoint")
+	await run_ticks(20)
+	check(bool(store.save(Checkpoint.capture(world))["ok"]), "a second, the first now the backup")
+	var data: Dictionary = JSON.parse_string(read(store.main_path()))
+	data["checkpoint"]["schema_version"] = Checkpoint.SCHEMA_VERSION + 1
+	var newer := JSON.stringify(data, "", true, true)
+	write(store.main_path(), newer)
+	check(not bool(store.load_best()["ok"]) or str(store.load_best()["source"]) == "backup", "loading refuses the newer file")
+	await run_ticks(10)
+	var r: Dictionary = store.save(Checkpoint.capture(world))
+	check(bool(r["ok"]), "the next rest still saves: %s" % r["message"])
+	check(str(r["message"]).contains("checkpoint.newer.json"), "and says where the newer one went: %s" % r["message"])
+	check_eq(read(DIR.path_join("checkpoint.newer.json")), newer, "the newer checkpoint is kept, byte for byte")
+	check(bool(CheckpointStore.decode(read(store.backup_path()))["ok"]), "the good backup is still there")
+	write(store.main_path(), "{\"format\": \"jumping-spider-sim checkpoint\", \"chec")
+	await run_ticks(10)
+	var r2: Dictionary = store.save(Checkpoint.capture(world))
+	check(bool(r2["ok"]) and str(r2["message"]).contains("checkpoint.damaged.json"), "a damaged current file is set aside too: %s" % r2["message"])
+	check_eq(read(DIR.path_join("checkpoint.newer.json")), newer, "and the newer one is still untouched")
+	check(bool(CheckpointStore.decode(read(store.backup_path()))["ok"]), "and the backup still good")
+
+
+## T09c: schema 2 (T09b) records upgrade to 3 (fly walks) on load.
+func test_a_schema_2_checkpoint_is_upgraded_and_its_flies_walk() -> void:
+	var rec := await make_record(2, 30)
+	var old := rec.duplicate(true)
+	old["schema_version"] = 2
+	for fr: Dictionary in old["prey"]["flies"]:
+		for k: String in ["walking", "walk_target", "walk_speed", "burst_left", "pause_left", "next_walk", "rest_spot"]:
+			(fr["schedule"] as Dictionary).erase(k)
+	DirAccess.make_dir_recursive_absolute(DIR)
+	write(store.main_path(), CheckpointStore.encode(old))
+	var got := store.load_best()
+	check(bool(got["ok"]) and int(got["record"]["schema_version"]) == Checkpoint.SCHEMA_VERSION, "the schema 2 file loads as schema %d: %s" % [Checkpoint.SCHEMA_VERSION, got["message"]])
+	var fresh: Node3D = world.return_to_checkpoint(got["record"])
+	if check(fresh != null, "the world is built from it"):
+		world = fresh
+		await wait_until(func() -> bool: return world.prey.ready_done, 60)
+		await run_ticks(60 * 6)
+		var walked := 0.0
+		for f in world.prey.flies:
+			walked += float(f.walked_wu)
+		check(walked > 0.0, "and its flies walk (%.1f WU in 6 s)" % walked)
+

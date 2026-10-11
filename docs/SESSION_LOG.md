@@ -986,3 +986,9 @@ Chet reviews this entry, `docs/HANDOFF-chunk-7.md` and the tests named above. Na
 - Nathan: twitchy jumping-spider movement; tap as the prey struggles (a bar that depletes when you stop tapping); the fly looks to and fro while you creep; hunts deliberately slow and challenging; a leaf on the sill that gives way. Decisions T9b-01 to T9b-06.
 - Fly senses retuned after a measured sweep (`docs/verification/t09b/tuning_run.txt`). Three balance tests now state the new design. Checkpoint schema 2 with an upgrade from 1, found when a schema 1 checkpoint from the earlier build was refused in a still.
 - Final: evidence 8149fa0be2b8, 511 of 511 (fixed 60 fps, Linux headless); hunt/struggle/leaf/save tests 37 of 37 at fixed 30 and 144; smoke run clean. Not run on Windows.
+
+### 2026-10-11: T09c living flies (Claude, cloud session)
+- Nathan after playing: the approach can be slower; the tapping wasn't working; flies should walk and fly about like real flies; Space for the taps. Chet's PR #2 brought packaging, a leg prototype, review 5 (two findings) and a native Windows full run (510/511, the F4 support-view test).
+- A played-world diagnosis with real key events found the struggle's problems: taps after the subdue toggled the meal, the grip drained in mid-air, and the fly was hidden behind the spider. All three are fixed. Space is the grip. Flies walk in stop-start bursts and loop through the air on spontaneous flights. The stalk is 0.65 (measured: `docs/verification/t09c/tuning_run.txt`). Checkpoint schema 3. Chet's P1 and P2 are fixed with regression tests. The F4 view draws on toggle.
+- Final: evidence 25d403c1ee02, 519 of 519 (fixed 60 fps, Linux headless); hunt/struggle/save/support 116 of 116 at fixed 30 and 144; smoke clean. Not run on Windows.
+

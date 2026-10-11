@@ -20,6 +20,7 @@ extends CanvasLayer
 ## A pure function of the memory, the camera and the settings builds the picture (build_view), so tests can check it without
 ## looking at pixels; _process only draws what it returns.
 
+const KeyNames = preload("res://scripts/presentation/key_names.gd")
 const Observation = preload("res://scripts/perception/observation.gd")
 const PerceptionText = preload("res://scripts/presentation/perception_text.gd")
 const JumpHud = preload("res://scripts/presentation/jump_hud.gd")
@@ -177,7 +178,7 @@ static func ring_radius_px(cam: Camera3D, at: Vector3, size_wu: float) -> float:
 func focus_note() -> String:
 	if controller == null or not is_instance_valid(controller) or not controller.has_method("is_focus_latched") or not controller.is_focus_latched():
 		return ""
-	var stop: String = PerceptionText.FOCUS_STOP_OR_CANCEL if controller.cancel_stops_focus() else PerceptionText.FOCUS_STOP
+	var stop: String = KeyNames.apply(PerceptionText.FOCUS_STOP_OR_CANCEL if controller.cancel_stops_focus() else PerceptionText.FOCUS_STOP, settings)
 	return "%s    %s" % [PerceptionText.FOCUS_ON, stop]
 
 

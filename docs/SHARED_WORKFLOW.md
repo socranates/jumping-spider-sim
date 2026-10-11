@@ -36,3 +36,6 @@ Next planned implementation: T09, whole-world retreat checkpoints (S01-C) and ac
 T09 part 1 (checkpoints S01-C/S02, keyboard remapping, controller help, text size) is on branch `claude/jolly-bell-gq3mm8`, evidence 4267a104376a, 502 tests, 502 passed, 0 failed, 0 not run on Linux headless (fixed 60 fps). See `docs/HANDOFF-chunk-9.md` and `docs/verification/t09/`. Claude ran in a claude.ai cloud container with its own downloaded Godot 4.7.2, not on Nathan's PC. Its runs are Linux headless evidence, not Windows or GPU evidence.
 
 T09b (hunt feel, same branch) moved the branch head to evidence 8149fa0be2b8, 511/511 on Linux headless; see the T09b section of `docs/HANDOFF-chunk-9.md`.
+
+T09c (2026-10-11) moved the branch head to evidence 25d403c1ee02, 519/519 on Linux headless. Chet's `codex/packaging-spider-legs` (PR #2) is based on 3da4727 and adds files only; merge PR #1, then PR #2.
+

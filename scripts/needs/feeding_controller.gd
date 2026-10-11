@@ -69,6 +69,17 @@ var struggle_log: Array[String] = []
 var struggles_won: int = 0
 var struggles_lost: int = 0
 var _until_jerk: float = 0.0
+## T09c (Nathan: "the tapping mechanic ... isnt working properly"): the grip starts to drain only once the spider has landed (a catch is
+## usually made in the air), taps for a moment after the fly is subdued are swallowed instead of toggling the meal, and the meal then starts
+## by itself when the spider can eat. A short line says how it ended ("Subdued." / "It tore free!").
+const LANDING_WAIT_MAX_S := 1.0
+const SWALLOW_S := 1.0
+var note: String = ""
+var note_left: float = 0.0
+var _landing_wait: float = 0.0
+var _swallow_left: float = 0.0
+## The jump button (Space, the south button) pressed this tick: during a struggle it is the grip, like interact.
+var _jump_pressed: bool = false
 
 
 func _ready() -> void:
@@ -81,6 +92,7 @@ func _physics_process(delta: float) -> void:
 	if interactive:
 		press = Input.is_action_just_pressed("interact")
 		cancel = Input.is_action_just_pressed("cancel")
+		_jump_pressed = Input.is_action_just_pressed("prepare_jump")
 	step(delta, press, cancel)
 
 
@@ -88,9 +100,16 @@ func _physics_process(delta: float) -> void:
 func step(delta: float, press: bool, cancel: bool) -> void:
 	if needs != null:
 		needs.advance(delta, spider_active())
+	if note_left > 0.0:
+		note_left = maxf(0.0, note_left - delta)
 	if struggling:
-		_step_struggle(delta, press)
+		_step_struggle(delta, press or _jump_pressed)
 		return  # the press was the grip; nothing is eaten until the prey is subdued
+	if _swallow_left > 0.0:
+		_swallow_left -= delta
+		press = false  # the last taps of a struggle do not start and stop the meal
+		if not feeding and invalid_reason() == "":
+			begin()   # the subdued prey is eaten at once, as a spider does
 	if feeding and cancel:
 		stop("cancelled")
 	elif press:
@@ -190,14 +209,16 @@ func prompt() -> Dictionary:
 	if held == null or not is_instance_valid(held) or held.state != held.State.CAPTURED:
 		return {}
 	if struggling:
-		var hint := "holding on (automatic)" if struggle_auto else "tap %s / X to keep your grip" % _key("interact", "E")
+		var hint := "holding on (automatic)" if struggle_auto else "tap %s / A (or %s / X) to keep your grip" % [_key("prepare_jump", "Space"), _key("interact", "E")]
 		return {"title": "IT STRUGGLES!", "hint": hint, "left": grip, "urgent": grip < 0.3}
+	var eat := "%s / X" % _key("interact", "E")
+	var stop := "%s / B" % _key("cancel", "Q")
 	if feeding:
-		return {"title": "Eating", "hint": "keep still    E or Q to stop", "left": held.nutrition_left / maxf(held.nutrition_total, 1.0e-6)}
+		return {"title": "Eating", "hint": "keep still    %s or %s to stop" % [eat, stop], "left": held.nutrition_left / maxf(held.nutrition_total, 1.0e-6)}
 	var why := invalid_reason()
 	if why == "":
-		return {"title": "Holding prey", "hint": "E to eat", "left": held.nutrition_left / maxf(held.nutrition_total, 1.0e-6)}
-	return {"title": "Holding prey", "hint": "stand still on a surface, then E to eat", "left": held.nutrition_left / maxf(held.nutrition_total, 1.0e-6)}
+		return {"title": "Holding prey", "hint": "%s to eat" % eat, "left": held.nutrition_left / maxf(held.nutrition_total, 1.0e-6)}
+	return {"title": "Holding prey", "hint": "stand still on a surface, then %s to eat" % eat, "left": held.nutrition_left / maxf(held.nutrition_total, 1.0e-6)}
 
 
 # ------------------------------------------------------------------ the struggle (T09b)
@@ -213,6 +234,8 @@ func on_captured(_event: Dictionary) -> void:
 	struggle_taps = 0
 	struggle_jerks = 0
 	_until_jerk = PreyMath.draw(f.rng, JERK_GAP_S) * 0.5
+	_landing_wait = 0.0
+	f.struggling = true
 	struggle_log.append("start %s (%.2f s)" % [f.id, struggle_left])
 	struggle_changed.emit("start")
 
@@ -226,6 +249,10 @@ func _step_struggle(delta: float, press: bool) -> void:
 		struggle_taps += 1
 		grip = minf(1.0, grip + GRIP_TAP)
 		struggle_changed.emit("tap")
+	# Caught in mid-air: the fight starts in earnest once the spider is down (or after a second at most).
+	if motor != null and motor.state != motor.State.ATTACHED and _landing_wait < LANDING_WAIT_MAX_S:
+		_landing_wait += delta
+		return
 	grip -= GRIP_DRAIN_PER_S * delta
 	_until_jerk -= delta
 	if _until_jerk <= 0.0:
@@ -243,16 +270,35 @@ func _step_struggle(delta: float, press: bool) -> void:
 		_end_struggle()
 		prey.escape_held("it tore free of the jaws (%d taps, %d jerks)" % [struggle_taps, struggle_jerks])
 		struggle_log.append("escaped")
+		_say("It tore free!")
 		struggle_changed.emit("escaped")
 	elif struggle_left <= 0.0:
 		struggles_won += 1
 		_end_struggle()
 		struggle_log.append("subdued")
+		_swallow_left = SWALLOW_S
+		_say("Subdued.")
 		struggle_changed.emit("subdued")
+
+
+## True while the jump button belongs to the grip (a struggle, and the moment after it), so the jump controller leaves it alone.
+func jump_button_is_grip() -> bool:
+	return struggling or _swallow_left > 0.0
 
 
 func _end_struggle() -> void:
 	struggling = false
+	var f: Node3D = prey.held if prey != null else null
+	if f != null and is_instance_valid(f):
+		f.struggling = false
+	if prey != null:
+		for g in prey.flies:
+			g.struggling = false
+
+
+func _say(text: String) -> void:
+	note = text
+	note_left = 2.0
 
 
 func _key(action: String, fallback: String) -> String:

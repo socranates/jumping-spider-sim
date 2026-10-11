@@ -57,7 +57,10 @@ func test_fidgets_and_grooming_show_that_it_is_alive() -> void:
 	await run_ticks(60 * 12, func() -> void: farthest[0] = maxf(farthest[0], flat_distance(f.global_position, p.position)))
 	check(f.fidgets_started >= 3, "it shuffles now and then (%d fidgets in 12 s)" % f.fidgets_started)
 	check(f.grooms_started >= 1, "it grooms now and then (%d bouts in 12 s)" % f.grooms_started)
-	check(float(farthest[0]) <= f.profile.perch_radius_wu + 0.02, "and stays within its patch of the perch (%.2f WU)" % float(farthest[0]))
+	# T09c: it also walks about its spot, never farther than its wander radius from the perch (and never off the surface).
+	check(f.walks_started >= 1 and f.walked_wu > 0.3, "it walks about its spot (%d walks, %.1f WU in 12 s)" % [f.walks_started, f.walked_wu])
+	check(float(farthest[0]) <= f.profile.wander_radius_wu + f.profile.perch_radius_wu + 0.02, "and stays near its perch (%.2f WU at most; wander radius %.1f)" % [float(farthest[0]), f.profile.wander_radius_wu])
+	check(f.surface_under(f.stand), "standing on the surface wherever it walked")
 	check(world.sensor.cues_made >= 1, "the small shuffles are what the spider's side vision picks up (%d cues)" % world.sensor.cues_made)
 	check_eq(f.state, Fly.State.PERCHED, "nothing here disturbs it")
 

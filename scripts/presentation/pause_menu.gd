@@ -3,6 +3,8 @@ extends CanvasLayer
 ## Pausing sets get_tree().paused and shows the mouse; resuming hides it again.
 ## Changes are written through to Settings, which saves on every change.
 
+const KeyNames = preload("res://scripts/presentation/key_names.gd")
+
 var settings: Node  # Settings autoload, or a test instance
 ## T09: the world, for "Return to checkpoint" (null in a menu built on its own).
 var world: Node
@@ -68,6 +70,7 @@ func _refresh() -> void:
 		var check: CheckBox = _checks[key]
 		var on: bool = settings.get_value(key)
 		check.set_pressed_no_signal(on)
+		check.set_meta("label", KeyNames.apply(String(check.get_meta("default_label", check.get_meta("label"))), settings))
 		check.text = _check_text(String(check.get_meta("label")), on)
 
 
@@ -209,10 +212,11 @@ func _add_slider(parent: Control, key: String, label_text: String, step: float, 
 func _add_check(parent: Control, key: String, label_text: String) -> void:
 	var check := CheckBox.new()
 	check.set_meta("label", label_text)
+	check.set_meta("default_label", label_text)
 	check.text = _check_text(label_text, false)
 	check.toggled.connect(func(on: bool) -> void:
 		settings.set_value(key, on)
-		check.text = _check_text(label_text, on))
+		check.text = _check_text(String(check.get_meta("label")), on))
 	_checks[key] = check
 	parent.add_child(check)
 
@@ -329,6 +333,7 @@ func _listen(event: InputEvent) -> void:
 		else:
 			var result: Dictionary = settings.set_key(_listening, code)
 			_keys_status.text = str(result["message"])
+			_refresh()  # labels that name keys follow the change
 		var action := _listening
 		_listening = ""
 		_refresh_keys()

@@ -155,3 +155,41 @@ Nathan's direction, 2026-10-10: "keep in mind twitchy movements typical of jumpi
   - Played worlds struggle; test worlds only on request (`prey_struggle`).
 - **T9b-05 The leaf tip that gives way.** `leaf_tip`, a pale dry leaf past the east leaf (x 25.6–28.4, z −4.2 to −1.8, top 5.35), is the windowsill's only drop piece. A jump aimed at it makes it give way (falls, drawn only). The east leaf's line catches the spider above the sill; reeling returns it; the tip comes back 8 s later once the space is clear. This revises C8-02's "no disappearing practice perches in the habitat" for this one authored teaching spot. The field notes name it.
 - **T9b-06 Checkpoint schema 2.** Flies record their glance state, and a fallen tip is a habitat change (returns_in). Schema 1 records (the first T09 build) are upgraded in memory on load; the file is not rewritten. A refused checkpoint's message now gives the first reason and the count of others.
+
+## Implementation decisions — Claude, T09c living flies and the struggle fixed (2026-10-11)
+
+Nathan, after playing T09b: "the approach can be slower"; "the tapping mechanic is not what happens or isnt working properly when i catch a fly"; "i can tell the fly direction"; flies "should actively walk around more naturally like a real fly, take off and fly randomly sometimes … i really want this to feel real"; "maybe the space bar can be used for the tapping". Chet's review 5 (P1, P2) and his native Windows run are addressed here too.
+
+- **T9c-01 The struggle, fixed.** A played-world diagnosis with real key events found three problems:
+  - after the fly was subdued, the player's next taps started and stopped the meal;
+  - the grip drained during the spider's flight, before the player had landed or could read the prompt;
+  - from the camera behind, the fly in the jaws was hidden by the spider's body.
+
+  Now:
+  - the grip waits until the spider is on a surface (at most 1 s);
+  - once subdued, the fly is eaten at once, taps for 1 s afterwards are swallowed, and "Subdued." or "It tore free!" is shown;
+  - a struggling fly is held out in front at head height, buzzing its wings in bursts and kicking its legs;
+  - each tap tugs the spider's model.
+- **T9c-02 Space is the grip.** While prey struggles, and for 1 s after, the jump button (Space, A) presses the grip like interact (E, X) and neither hops nor aims. The prompt names both.
+- **T9c-03 Flies walk.** A perched fly walks about its spot every 1.5–5 s:
+  - 0.4–1.8 WU at 0.9–1.8 WU/s, in stop-start bursts (0.12–0.35 s moving, 0.05–0.25 s still);
+  - it turns to face the way first, and walks on its surface only;
+  - the way is checked before it sets off, so it never goes off an edge or through anything;
+  - it stays within 3 WU of its perch, heading back when it has wandered half that;
+  - it stops walking when alert;
+  - its fidgets now centre on where it last settled.
+
+  Walking is drawn with a tripod leg shuffle and comes from its gameplay stream (data: `walk_*`, `wander_radius_wu`).
+- **T9c-04 Flies fly about on their own.**
+  - `restless_per_s` 0.012 → 0.03, so a fly moves of its own accord about every half minute instead of every minute and a half.
+  - 60 % of such moves (`wander_flight_chance`) loop out to a random swept point in the open air, then come in to land.
+  - The drawn body wobbles a little in flight (looks only).
+- **T9c-05 Slower approach.**
+  - The spider's stalk speed is 0.8 → 0.65 WU/s (species data), and the fly's `loom_scale_deg_s` 70 → 80.
+  - Measured with walking flies (t09c/tuning_run.txt): a careful timed creep reaches striking range 6/8 in about 20 s (before 7/8 in 17 s); a steady stalk is spotted at about 3.9 WU; a walk at about 6.2 WU.
+  - Slowing to 0.55 made a careful approach fail 6/8, and sharper senses made it fail more without making it longer, so both were rejected.
+  - Four tests that state the stalk speed now say 0.65.
+- **T9c-06 Checkpoint schema 3.** Flies record their walk. Schema 2 upgrades to 3 and schema 1 through 2 to 3, in memory only.
+- **T9c-07 A save never deletes an unreadable checkpoint** (Chet review 5, P1). A current or backup file this build cannot read is set aside unchanged as `checkpoint.newer.json` or `checkpoint.damaged.json` (numbered if taken) before the new file goes in. The message names it, and a regression test covers save-after-refusal.
+- **T9c-08 Prompts name the chosen keys** (Chet review 5, P2). `KeyNames.apply` rewrites the default keys in a hint to the player's: the feeding prompts, the line and aim hints, the Focus hint, and the pause menu's "Hold Q / B to let go of the line" label.
+- **T9c-09 F4 view draws at once.** The support view draws on the toggle rather than the next frame. This is the likely cause of Chet's native Windows failure of `test_support_view_toggles_with_f4_and_draws_the_normal`, but it was not reproduced on Linux at fixed or normal speed, so the cause on Windows is unconfirmed until Nathan's next `run_tests.bat`.

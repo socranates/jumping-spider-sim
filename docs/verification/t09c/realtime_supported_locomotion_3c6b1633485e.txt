@@ -1,0 +1,13 @@
+PASS     test_supported_locomotion.gd::test_coated_panel_cannot_be_climbed  [2476 ms]  6 checks
+PASS     test_supported_locomotion.gd::test_coplanar_seam_does_not_jitter  [1917 ms]  6 checks
+PASS     test_supported_locomotion.gd::test_floor_to_wall_climbs_at_a_concave_corner  [2082 ms]  9 checks
+PASS     test_supported_locomotion.gd::test_gap_is_crossed_only_along_surfaces  [6076 ms]  6 checks
+PASS     test_supported_locomotion.gd::test_gap_with_nothing_reachable_falls  [978 ms]  5 checks
+PASS     test_supported_locomotion.gd::test_inside_corner_of_two_walls_does_not_oscillate  [3082 ms]  6 checks
+PASS     test_supported_locomotion.gd::test_support_view_toggles_with_f4_and_draws_the_normal  [115 ms]  7 checks
+PASS     test_supported_locomotion.gd::test_thin_shelf_is_wrapped_never_crossed  [2876 ms]  6 checks
+PASS     test_supported_locomotion.gd::test_walking_off_an_edge_at_a_shallow_angle_still_wraps  [3415 ms]  4 checks
+PASS     test_supported_locomotion.gd::test_wall_to_top_over_a_convex_edge  [2850 ms]  7 checks
+PASS     test_supported_locomotion.gd::test_wall_to_underside_and_back  [4931 ms]  10 checks
+evidence_id: 3c6b1633485e (source ad92177a, settings 8b6707d4, tests 7c0f7145)
+SUMMARY tests=11 passed=11 failed=0 not_run=0 seed=20261005 filter=only=unit,integration,gates,files=supported_locomotion result=PASS

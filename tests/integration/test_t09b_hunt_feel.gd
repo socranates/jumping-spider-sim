@@ -37,7 +37,7 @@ func test_a_perched_fly_glances_to_and_fro_from_its_own_stream() -> void:
 				mine.append(snappedf(float(e["angle"]), 0.001))
 		angles.append(mine)
 		if run == 0:
-			check(mine.size() >= 5, "it glanced %d times in 12 s" % mine.size())
+			check(mine.size() >= 3, "it glanced %d times in 12 s (between its walks)" % mine.size())
 			var alternating := true
 			for i in range(1, mine.size()):
 				alternating = alternating and signf(float(mine[i])) != signf(float(mine[i - 1]))

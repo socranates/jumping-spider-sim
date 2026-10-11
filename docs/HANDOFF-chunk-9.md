@@ -88,3 +88,34 @@ Nathan asked for twitchy jumping-spider movement, a fly that looks to and fro wh
 - Are two taps a second right for the struggle? Constants at the top of the struggle section in `scripts/needs/feeding_controller.gd`.
 - Is the glance readable at a distance? The fly is small; a visible head turn may need a stronger cue later, e.g. the leg-animation pass, or an optional facing marker.
 - Leg animation is welcome later (A-018 keeps it cosmetic); the twitch layer in `spider_body.gd` is where it would attach.
+
+---
+
+## T09c — living flies, the struggle fixed, a slower approach (2026-10-11)
+
+After Nathan played T09b: the approach can be slower; the tapping wasn't working; flies should walk and fly about like real flies; Space for the taps. Chet's review 5 and native Windows run are folded in. Decisions T9c-01 … T9c-09.
+
+**Evidence:** **25d403c1ee02**, full suite **519 / 519 passed** (Linux headless, fixed 60 fps), `docs/verification/t09c/full_report_t09c.txt`. Hunt, struggle, save and support tests 116/116 at each of fixed 30 and 144 fps; the F4 test file 11/11 at normal speed (on 3c6b1633485e, the same code but for where a struggling fly is drawn); main scene smoke run clean. Tuning: `docs/verification/t09c/tuning_run.txt`. Still: `t09c_struggle.png`. **Not run on Windows**, so please rerun `run_tests.bat`, especially for the F4 test Chet saw fail.
+
+**What changed for the player**
+- **Flies are alive.**
+  - They walk about their spot in quick stop-start bursts, turning as they go, then stop to glance around, groom or fidget.
+  - Every half minute or so one takes off by itself, often looping out through the open air before it lands somewhere else.
+  - In flight they wobble a little.
+  - A walking fly is a moving target: watch where it is, not where it was.
+- **The approach is slower.** Shift creeps at 0.65 instead of 0.8, and flies notice looming a little more. Move while it looks away, freeze when it looks back. A careful approach takes about 20 s from 7 WU.
+- **The struggle works.**
+  - After a catch, tap **Space** (or E; A or X on a controller) to keep the grip bar up. It waits until you've landed.
+  - You can see the fly buzzing and kicking in front of the spider's head.
+  - When it goes still, the spider starts eating by itself ("Subdued."), and your last few taps don't hop or stop the meal.
+  - Let the grip run out and "It tore free!" shows as the fly escapes.
+- Prompts name your remapped keys everywhere.
+- A newer-version or damaged checkpoint is never deleted. It's kept aside as `checkpoint.newer.json` or `checkpoint.damaged.json`.
+
+**Chet's branch** (`codex/packaging-spider-legs`, PR #2) adds Windows and web export presets, a standalone leg prototype and his review. It's based on this branch's 3da4727 and touches no files of this round, so merging PR #1 first and then #2 should be clean. The leg prototype isn't wired in yet; when it is, it replaces the static legs in `spider_body.gd` and should keep the twitch layer.
+
+**Open / to check by playing**
+- Do the flies feel real now? Things to tune: walk frequency and distance, how often they fly off, and how wide the loops are.
+- Is about 20 s per approach right?
+- Is the struggle readable and fun with Space? Its constants are at the top of the struggle section in `feeding_controller.gd`.
+

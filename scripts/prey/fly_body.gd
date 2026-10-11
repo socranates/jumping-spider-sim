@@ -7,7 +7,9 @@ extends Node3D
 ##   * alert: raised on its legs, head up, wings lifted, still;
 ##   * grooming: the front legs rub together;
 ##   * flying: the wings beat, the legs tuck in;
-##   * held: limp, wings closed (the spider carries it).
+##   * held: limp, wings closed (the spider carries it);
+##   * struggling (T09c): in the jaws, wings buzzing in bursts and legs kicking;
+##   * walking (T09c): legs stepping in a quick tripod shuffle.
 
 const BODY_COLOR := Color(0.13, 0.11, 0.10)
 const HEAD_COLOR := Color(0.18, 0.15, 0.13)
@@ -15,7 +17,7 @@ const EYE_COLOR := Color(0.85, 0.14, 0.08)
 const WING_COLOR := Color(0.88, 0.93, 1.0, 0.5)
 const LEG_COLOR := Color(0.09, 0.08, 0.08)
 
-enum Mode { PERCHED, ALERT, GROOMING, FLYING, HELD }
+enum Mode { PERCHED, ALERT, GROOMING, FLYING, HELD, STRUGGLING, WALKING }
 
 var _wing_pivots: Array[Node3D] = []
 var _legs: Array[Node3D] = []
@@ -92,8 +94,11 @@ func pose(mode: int, alert: float, groom: float, beat: float) -> void:
 	_mode = mode
 	var flying := mode == Mode.FLYING
 	var held := mode == Mode.HELD
+	var fighting := mode == Mode.STRUGGLING
 	for leg in _legs:
 		leg.visible = not flying and not held
+	# T09c: a fly's flight is never a ruler line: the drawn body wobbles a little about the flown path (looks only).
+	position = Vector3(sin(beat * 7.3 + _phase) * 0.07, sin(beat * 11.1 + _phase * 1.7) * 0.05, sin(beat * 5.1 + _phase) * 0.04) if flying else Vector3.ZERO
 	var up := alert if mode == Mode.ALERT else 0.0
 	_torso.rotation = Vector3(deg_to_rad(-12.0 * up), 0.0, 0.0)
 	_torso.position = Vector3(0.0, 0.03 * up, 0.0)
@@ -106,6 +111,9 @@ func pose(mode: int, alert: float, groom: float, beat: float) -> void:
 		var angle := fold
 		if flying:
 			angle = 38.0 + 52.0 * sin(TAU * 24.0 * beat + _phase)
+		elif fighting:
+			# buzzing in bursts: fast beats, now wide, now small
+			angle = 30.0 + (45.0 + 25.0 * sin(TAU * 2.3 * beat + _phase)) * sin(TAU * 30.0 * beat + _phase)
 		elif held:
 			angle = 0.0
 		_wing_pivots[i].rotation = Vector3(0.0, 0.0, deg_to_rad(-angle * sx))
@@ -115,6 +123,15 @@ func pose(mode: int, alert: float, groom: float, beat: float) -> void:
 		if mode == Mode.GROOMING:
 			rub = 28.0 * groom * sin(TAU * 7.0 * beat + _phase + float(i))
 		_front_legs[i].rotation = Vector3(deg_to_rad(-35.0 * groom + rub), 0.0, deg_to_rad(-34.0 * side + 20.0 * groom * side))
+	if fighting or mode == Mode.WALKING:
+		# kicking (struggling) or a tripod shuffle (walking): alternate legs swing back and forth
+		var rate := 11.0 if fighting else 9.0
+		var reach := 40.0 if fighting else 22.0
+		for i in _legs.size():
+			var side := -1.0 if i < 3 else 1.0
+			var k := i % 3
+			var tripod := 1.0 if ((k + (0 if side < 0.0 else 1)) % 2 == 0) else -1.0
+			_legs[i].rotation = Vector3(deg_to_rad(reach * tripod * sin(TAU * rate * beat + _phase)), 0.0, deg_to_rad(-34.0 * side))
 
 
 func _ellipsoid(part_name: String, radii: Vector3, at: Vector3, material: Material) -> MeshInstance3D:

@@ -122,6 +122,13 @@ var last_eye: Vector3 = Vector3.ZERO
 var last_axis: Vector3 = Vector3.FORWARD
 var last_up: Vector3 = Vector3.UP
 
+## T13a, the lateral eyes' motion sense, for the spider-eye picture only (a shimmer in its soft surround). Each thing the eyes could see
+## moving on its last check, under the world's id for it: {"direction": the sensed direction from the eye, "distance": WU, "apparent":
+## degrees across, "tick"}. An entry stays MOTION_HOLD_TICKS after the thing was last seen moving. It is presentation: nothing reads it to
+## decide anything, the memory never sees it, and it holds only what the sightline checks found (a hidden thing never appears).
+const MOTION_HOLD_TICKS := 15
+var motion_seen: Dictionary = {}
+
 var _tracks: Dictionary = {}   # percept id -> Track
 var _serial: int = 0
 var _next_broad_tick: int = 0
@@ -246,6 +253,7 @@ func describe_tracks() -> Array[Dictionary]:
 ## Forget everything about what is being tracked (the memory is cleared separately).
 func reset() -> void:
 	_tracks.clear()
+	motion_seen.clear()
 	_spots.clear()
 	_kept.clear()
 	_next_broad_tick = 0
@@ -295,6 +303,9 @@ func _physics_process(delta: float) -> void:
 	_check_spots(eye, axis, up, space, delta, inspected)
 	memory.advance(tick)
 	_forget_gone(present)
+	for id: String in motion_seen.keys():
+		if not present.has(id) or tick - int(motion_seen[id]["tick"]) > MOTION_HOLD_TICKS:
+			motion_seen.erase(id)
 	max_rays_in_a_tick = maxi(max_rays_in_a_tick, rays_this_tick)
 	_record_cost(Time.get_ticks_usec() - t0)
 
@@ -469,6 +480,8 @@ func _sense(t: Track, p: Dictionary, eye: Vector3, axis: Vector3, up: Vector3, f
 	t.last_check["in_cone"] = in_cone
 	t.last_check["apparent_deg"] = apparent
 	var visible_fraction := float(seen.size()) / float(SAMPLE_COUNT)
+	if (p["velocity"] as Vector3).length() >= motion_min_speed:
+		motion_seen[str(p["id"])] = {"direction": est_dir, "distance": dist, "apparent": apparent, "tick": tick}
 	if in_cone and apparent >= min_apparent_deg:
 		sightings.append({"t": t, "p": p, "estimate": estimate, "est_dir": est_dir, "apparent": apparent, "visible_fraction": visible_fraction})
 		inspected.append({"position": estimate, "radius": radius})

@@ -159,6 +159,8 @@ var gaze: Vector3 = Vector3.FORWARD
 var _gaze_up: Vector3 = Vector3.UP
 var _gaze_up_prev: Vector3 = Vector3.UP
 var _eye_recenter_from: Vector3 = Vector3.FORWARD
+## T13a, the comfort switch "eye_level_horizon": the view's up as last placed, so it changes smoothly where the world's up says little.
+var _level_up: Vector3 = Vector3.UP
 
 
 func _ready() -> void:
@@ -684,10 +686,14 @@ func _reset_gaze() -> void:
 	gaze = _clamp_gaze(_body_gaze(), _gaze_up)
 
 
-## Turns the gaze: yaw about the body's up (positive looks right), pitch about the view's right (positive looks down).
+## Turns the gaze: yaw about the body's up (positive looks right), pitch about the view's right (positive looks down). With a level
+## horizon the view's own up and right are used instead, so the mouse and stick move the picture the way they look on screen.
 func _look_eye(yaw_rad: float, pitch_rad: float) -> void:
-	var g := gaze.rotated(_gaze_up, -yaw_rad)
-	var right := g.cross(_gaze_up)
+	var turn_up := _gaze_up
+	if _level_horizon():
+		turn_up = global_transform.basis.y.normalized()
+	var g := gaze.rotated(turn_up, -yaw_rad)
+	var right := g.cross(turn_up)
 	if right.length_squared() > 1e-10:
 		g = g.rotated(right.normalized(), -pitch_rad)
 	gaze = _clamp_gaze(g, _gaze_up)
@@ -702,6 +708,31 @@ func _carry_gaze(delta: float) -> void:
 		gaze = Quaternion(_gaze_up, up) * gaze
 	_gaze_up = up
 	gaze = _clamp_gaze(gaze, up)
+
+
+func _level_horizon() -> bool:
+	return settings != null and bool(settings.get_value("eye_level_horizon"))
+
+
+## The spider-eye view's up for a gaze `g`. Normally the body's (the view turns with the spider on a wall, as its eyes do). With the
+## comfort switch "eye_level_horizon" (T13a) it is the world's up laid square to the gaze, so the picture never rolls; looking nearly
+## straight up or down, where the world's up says little about roll, it holds the up it last had.
+func view_up(g: Vector3, body_up: Vector3) -> Vector3:
+	if not _level_horizon():
+		_level_up = body_up
+		return body_up
+	var world := Vector3.UP - g * g.dot(Vector3.UP)
+	var held := _level_up - g * g.dot(_level_up)
+	if held.length_squared() < 1e-6:
+		held = body_up - g * g.dot(body_up)
+	if held.length_squared() < 1e-6:
+		held = SupportMath.any_perpendicular(g)
+	var w := smoothstep(0.1, 0.35, world.length())
+	var v := (world.normalized() * w if w > 0.0 else Vector3.ZERO) + held.normalized() * (1.0 - w)
+	if v.length_squared() < 1e-6:
+		v = held
+	_level_up = v.normalized()
+	return _level_up
 
 
 ## The gaze kept at least EYE_PITCH_LIMIT_DEG from the normal either way, and of unit length.
@@ -737,6 +768,6 @@ func _place_eye(frac: float) -> void:
 	var xf := target.get_global_transform_interpolated() if target.is_inside_tree() else target.global_transform
 	var up := _gaze_up_prev.slerp(_gaze_up, clampf(frac, 0.0, 1.0)).normalized()
 	var eye := xf.origin + SupportMath.body_basis(up, _body_forward()) * Vector3(0.0, EYE_HEIGHT, -EYE_AHEAD)
-	global_transform = Transform3D(Basis.looking_at(gaze, up), eye)
+	global_transform = Transform3D(Basis.looking_at(gaze, view_up(gaze, up)), eye)
 	camera.transform = Transform3D.IDENTITY
 	boom_length = 0.0

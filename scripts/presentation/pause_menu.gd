@@ -155,6 +155,8 @@ func _build() -> void:
 	_add_check(switches, "struggle_auto", "Struggling prey: hold on automatically")
 	_add_check(switches, "reduced_motion", "Reduced motion (a calmer spider body)")
 	_add_check(switches, "eye_view", "Spider-eye view (first person, V / Y)")
+	_add_check(switches, "eye_level_horizon", "Spider-eye view: level horizon (no roll on walls)")
+	_add_check(switches, "eye_colour_free", "Spider-eye view: grey instead of green")
 	_add_check(switches, "slow_motion", "Slow motion (T / right trigger)")
 	_add_check(switches, "captions", "Captions for sounds and vibrations")
 	_add_check(switches, "haptics", "Controller rumble for vibrations")

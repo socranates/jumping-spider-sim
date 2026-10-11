@@ -4,6 +4,12 @@ A third-person prototype about living as a jumping spider. The design is in `doc
 
 Shared development: see [the agent handoff](claude/where-we-left-off.md), [GitHub workflow](docs/SHARED_WORKFLOW.md), and [verification reports](docs/verification/).
 
+## New: the spider-eye view, part 2 (2026-10-11)
+
+- In the spider-eye view (V / Y), a fly or anything else moving in the blurry surround now **shimmers**: a pulsing ring where it is, before the sharp front eyes can tell what it is. Real jumping spiders' side eyes are motion detectors that do exactly this job. Nothing that stands still or is hidden shimmers.
+- Two comfort switches in the Esc menu: **level horizon** (the view doesn't roll when the spider walks up a wall or under a leaf) and **grey instead of green**.
+- The eye view's opening note now sits near the top, so it no longer covers the sound captions.
+
 ## New: sound and the spider's other senses (2026-10-11)
 
 - The room hums, flies buzz from where they are, and a fly struggling in the jaws buzzes louder.

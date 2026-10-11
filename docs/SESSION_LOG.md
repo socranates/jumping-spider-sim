@@ -1051,3 +1051,10 @@ Chet reviews this entry, `docs/HANDOFF-chunk-7.md` and the tests named above. Na
 - Fixed repeated stepping onto the same narrow-edge contact during verification. Native captures exposed detached-looking spinnerets; replaced their independent translation with an attached abdomen dip.
 - Added eight integration tests and updated obsolete exact-local-neutral/catch-recoil assertions. Final 576/576 Windows fixed60; targeted 46/46 at each of 30/60/144. Evidence 5b1adc6e6a6b. Native AMD/OpenGL quarter-speed screenshots and test reports: docs/verification/movement2/.
 - Handoff and ROADMAP updated. Finish into main, then update Nathan's playable laptop checkout and confirm commit in chat. No export/port or sustained frame-time benchmark in this round.
+
+### 2026-10-11: T13a vision realism part 2 (Claude, cloud session)
+- Chet finished movement realism part 2 (576/576 on Windows; it also passes 576/576 here). Nathan: "its freakin amazing ... shall we continue?"
+- Built: a motion-sensitive surround in the eye view (the lateral eyes' motion sense: a pulsing ring on moving things, none inside the sharp fields), a level-horizon switch, a grey-picture switch. The eye view's opening notice was covering the captions; moved it up.
+- Researched: Zurek et al. 2010, Zurek & Nelson 2012 (lateral eyes), Nagata et al. 2012 (depth from defocus). A background research pass on UV reflectance found glass and leaf data but none for flies, so UV stays unsimulated. Depth from defocus is Nathan's call because it changes jumps. EYE-10 to EYE-15.
+- A flawed test that compared two separately spawned worlds was dropped (the stage fixture is not identical across spawns).
+- Final: evidence db112e2fa006, 585 of 585 (fixed 60 fps, Linux headless); eye and sensor tests 69 of 69 at fixed 30 and 144. Not run on Windows.

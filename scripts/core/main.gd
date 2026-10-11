@@ -281,6 +281,7 @@ func _ready() -> void:
 		eye_overlay.camera_rig = camera_rig
 		eye_overlay.motor = spider
 		eye_overlay.settings = settings
+		eye_overlay.sensor = sensor
 		add_child(eye_overlay)
 		slow_motion_hud = SlowMotionHud.new()
 		slow_motion_hud.settings = settings

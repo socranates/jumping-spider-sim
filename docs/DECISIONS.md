@@ -352,3 +352,31 @@ Nathan, after playing T11b: "yes excellent it all works great now. the tapping s
 - **LEG-06 Illustrate rear extension with biological limits.** Pairs III/IV straighten during the launch display; the source is Nabawy et al. 2018 (https://doi.org/10.1038/s41598-018-25227-9). Their P. regius observations do not establish each pair's force contribution, and muscle power can meet the calculated jump requirement; do not call this exclusively hydraulic or universal across salticids. The two-rod rig and gait timing remain authored approximations, not anatomical IK.
 - **LEG-07 Visible attachment without input delay.** Chen et al. 2013 (https://pmc.ncbi.nlm.nih.gov/articles/PMC3758018/) motivates an abdomen/spinneret dip before visual push-off. For instant hops only the third-person model has a 0.067-second contact lead-in and subsequent catch-up; the simulation launches immediately. Silk rendering follows that model during the sequence while line physics stays unchanged. First-person camera timing is preserved. All animations use SimClock.DT; landing compression lasts 0.24 game seconds.
 - **LEG-08 Comfort and evidence.** Preserve twitch, idle flicks, lurch and recoil. Reduced motion clears new phases and keeps neutral legs. A fixed first-person distal-front-leg mask avoids proximal geometry near the camera, with no distance-based visibility toggling. Verification and limitations: docs/HANDOFF-surface-legs.md and docs/verification/movement2/.
+
+## T13a — vision realism part 2 (Claude, 2026-10-11)
+
+Nathan: "chet just finished and its freakin amazing you guys are making this so goood!! shall we continue?" ROADMAP step 5. Handoff: `docs/HANDOFF-vision-2.md`; research: `docs/VISION_RESEARCH.md`.
+
+- **EYE-10 The surround shows motion.**
+  - The secondary eyes are motion detectors (Zurek et al. 2010; Zurek & Nelson 2012). The sensor keeps a presentation-only record of what its sightline checks found moving, at or above the existing motion threshold.
+  - In the spider-eye view each moving thing gets a ring that pulses at 3 Hz and a faint halo where it is drawn. A thing inside the sharp retinal fields gets less or none. It fades 15 ticks after the thing stops. Hidden things never appear.
+  - Reduced motion holds the ring steady. The orbit view has none.
+  - Nothing but the picture reads the record: the memory, cues and behaviour are unchanged.
+- **EYE-11 Comfort switches, off by default.**
+  - `eye_level_horizon`: the view keeps the world's up; near-vertical gazes hold the last up, so it never flips. Look controls then turn the picture about the view's own axes.
+  - `eye_colour_free`: the same green-weighted brightness, in grey; the label says so.
+  - Both are labelled as comfort, not biology: a spider's eyes roll with its body.
+- **EYE-12 The eye view's opening notice sits under the top lines.** At 70 % of the screen's height it covered the sound captions for its first seven seconds.
+- **EYE-13 Depth from defocus waits for Nathan.**
+  - Nagata et al. 2012: jumping spiders judge distance from image defocus, and jump short in red light.
+  - A faithful version makes jumps less accurate in poor or reddish light and at long range. That changes gameplay and the M01–M03 movement gates.
+  - A marker that only looked unsure would mislead. Proposed, if wanted: an option, off by default, so Most help is unaffected.
+- **EYE-14 UV stays unsimulated.**
+  - A literature search found good numbers for clear glass (about 85–88 % at 380 nm) and green leaves (about 5 % UV against 13–17 % green).
+  - It found only a qualitative result for white TiO2 paint (dark in UV), and none for the house fly's body or wings, *P. audax* markings or several sill materials.
+  - Building UV with the prey guessed would repeat EYE-08's mistake. The label "UV not simulated" stays. What is known, and what is missing, is in VISION_RESEARCH.md.
+- **EYE-15 Evidence.**
+  - db112e2fa006: 585 / 585 (Linux headless, fixed 60 fps), including 9 new tests (`test_t13a_motion_surround.gd`, `test_t13a_eye_comfort.gd`).
+  - Eye, sensor, perception and sense tests: 69 / 69 at fixed 30 and 144 fps.
+  - Stills and reports are in `docs/verification/t13a/`.
+  - Not run on Windows, and not played yet.

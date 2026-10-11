@@ -27,6 +27,8 @@ const DEFAULTS := {
 	"struggle_auto": false,    # T09b: struggling prey is held with no presses (spec 17: no required rapid tapping)
 	"reduced_motion": false,   # T09b: the spider's model keeps still (no twitchy turns, lurches, flicks, jolts or catch recoil); looks only
 	"eye_view": false,         # T10a: see through the spider's eyes (first person) instead of the orbit camera; V or Y switches it
+	"eye_level_horizon": false,  # T13a (comfort): the spider-eye view keeps the world's up, so it does not roll on walls and undersides
+	"eye_colour_free": false,  # T13a (comfort): the spider-eye picture in grey instead of a green tint (the same brightness)
 	"slow_motion": false,      # T11a: the whole world runs at slow_speed (SimClock: the same ticks, fewer each second); T or RT switches it
 	"slow_speed": 0.5,         # T11a: how slow slow motion is (25, 50 or 75 per cent)
 	"volume_master": 0.8,      # T12a: all sound

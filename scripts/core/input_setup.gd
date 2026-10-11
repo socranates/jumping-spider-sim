@@ -29,6 +29,8 @@ const BINDINGS := {
 	"pause": {"keys": [KEY_ESCAPE], "buttons": [JOY_BUTTON_START], "dead": BUTTON_DEADZONE},
 	# T09 (U01): the habitat's field notes, from the keyboard or the controller's View / Back button.
 	"help": {"keys": [KEY_H], "buttons": [JOY_BUTTON_BACK], "dead": BUTTON_DEADZONE},
+	# T10a: the spider-eye (first-person) view, on and off.
+	"eye_view": {"keys": [KEY_V], "buttons": [JOY_BUTTON_Y], "dead": BUTTON_DEADZONE},
 	"debug_overlay": {"keys": [KEY_F3], "dead": BUTTON_DEADZONE},
 	"debug_support": {"keys": [KEY_F4], "dead": BUTTON_DEADZONE},
 }

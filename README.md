@@ -4,6 +4,10 @@ A third-person prototype about living as a jumping spider. The design is in `doc
 
 Shared development: see [the agent handoff](claude/where-we-left-off.md), [GitHub workflow](docs/SHARED_WORKFLOW.md), and [verification reports](docs/verification/).
 
+## New: spider-eye view (2026-10-11)
+
+Press **V** (controller **Y**), or Esc → **Spider-eye view**, to see through the spider's eyes. Only a small oval in the middle is sharp: that is where the two big front eyes point, and they see green and ultraviolet but no red. The rest is soft and nearly colourless, as the six other eyes see it. Look further than the front eyes can reach and the spider turns to face it. It's an impression, not a recording of what a spider sees (`docs/HANDOFF-eye-view.md`). Press V again for the normal camera.
+
 ## Getting the latest version
 
 After Claude or ChatGPT says their work is done, **double-click `update.bat`**. It downloads the newest version from GitHub into this folder; then double-click `play.bat`. It never throws away your own changes: if it finds any, it stops and shows them. (By hand, in a command window in this folder: `git checkout main` then `git pull`.)

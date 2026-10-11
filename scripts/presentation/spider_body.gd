@@ -235,6 +235,14 @@ func _build() -> void:
 	add_child(legs)
 
 
+## T10a, spider-eye view: the camera sits at the principal eyes, so the head, abdomen, eyes and fangs are hidden (they would fill or
+## cut the view); the legs stay, as a jumping spider's front legs and palps are in front of its eyes.
+func set_eye_view(on: bool) -> void:
+	for child in get_children():
+		if child is MeshInstance3D:
+			(child as MeshInstance3D).visible = not on
+
+
 func _material(kind: String) -> StandardMaterial3D:
 	if _mats.has(kind):
 		return _mats[kind]

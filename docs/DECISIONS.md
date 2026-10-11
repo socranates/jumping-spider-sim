@@ -233,3 +233,38 @@ Done while Chet's live-legs work waited for his usage to reset. No file in his o
 ## Cross-device planning — Nathan and Chet, 2026-10-10 (America/Chicago)
 
 - **PLATFORM-01 Goal and decision pending.** Nathan wants to play the spider game on PlayStation and other devices; Roblox was raised as a possible route. His direction: "lets keep this in mind going forward and we can decide with claude how to approach." Continue the Godot project with this goal in mind. No platform switch, port or rewrite is authorized by this planning note. Nathan, Chet and Claude will decide the route and timing together. A solid Godot core followed by a small Roblox movement/silk/hunting feasibility prototype is Chet's recommendation, not a settled plan. Preserve the desired movement feel, twitchiness, accessibility and scientific-realism direction when comparing options.
+
+## T10a — the spider-eye view (Claude, 2026-10-11)
+
+Nathan: "yeah go ahead please" (to building a first-person eye mode now), "you can mess with any approved code its ok", and the realism direction in T9e-03.
+
+- **EYE-01 An optional first-person view, off by default.** The setting `eye_view` (pause menu "Spider-eye view (first person, V / Y)"; the action `eye_view`, V or the controller's Y, remappable) switches between it and the orbit camera of spec 6.4, which is unchanged. The choice is saved.
+- **EYE-02 Where the camera is and what it shows.**
+  - The camera sits just ahead of the model's principal eyes (0.53 WU forward, 0.09 WU up) and looks along `gaze`, which the mouse or right stick turns.
+  - Its vertical field is 80 degrees.
+  - The head, abdomen, eyes and fangs are hidden; the legs are not, so the front legs come into view as on a real spider.
+  - The aim ray is the eyes' line of sight, so aiming a jump is looking at where to land.
+- **EYE-03 The view turns with the body.**
+  - Its up is the body's up, so on a wall or an underside the view is the spider's.
+  - It follows at most 240 degrees a second (a 90 degree edge takes about 0.4 s); the body's own 10 degrees a tick was a jolt in first person.
+  - The gaze is carried through the same turn, so walking up a wall carries the view up the wall.
+  - Walking is relative to the gaze laid on the surface.
+- **EYE-04 Movable principal-eye retinas** (Land 1969; Tarsitano and Jackson 1992).
+  - In the eye view the inspection cone (the senses' gaze) points where the player looks, within `PRINCIPAL_SCAN_DEG` (30 degrees) of the body's gaze, without turning the body.
+  - The cephalothorax tilts toward the gaze within the species' gaze limit (35 degrees), so the floor ahead is in reach.
+  - Beyond that reach, standing still with the stick idle, the body turns to face the gaze (as Focus does, at the species' focus rate) and stops within 4 degrees. Walking never fights it.
+  - The orbit view keeps its old rule: only Focus and moving turn the body.
+- **EYE-05 The picture is an impression, and says so.**
+  - The principal eyes are drawn as a sharp oval window, 16 by 24 degrees, at the gaze. That is wider than one eye's instant field of about 10 degrees, to stand for both eyes and their scanning.
+  - The window is two-colour: green-weighted brightness plus one contrast, "UV" against green, with blue standing in for UV. No red receptor is known in *Phidippus* (De Voe 1975, *P. regius*).
+  - The rest of the view is the secondary eyes: coarse, soft and one-colour (green), as their pigments are mostly green-sensitive.
+  - The window fades when the gaze is out of the principal eyes' reach. Movement is still shown by the senses' existing cue markers.
+  - Text: "SPIDER-EYE VIEW (an impression)". On switching on, a short explanation is shown for seven seconds.
+  - The overlay is a full-screen canvas shader on layer -1, under every HUD. It works in the Compatibility renderer.
+- **EYE-06 Not yet.**
+  - Depth from defocus (Nagata et al. 2012): it could later set how sure the landing marker is.
+  - UV markings on flies and leaves.
+  - A frame-difference motion effect in the secondary eyes.
+  - An option to keep the horizon level in the eye view.
+  - A colour-free accessibility variant of the picture.
+

@@ -1,4 +1,18 @@
-# Current handoff - Chet, 2026-10-11
+# Current handoff - Claude, 2026-10-11 (T13a)
+
+**Latest: vision realism part 2, ROADMAP step 5.** Start from main and read **docs/HANDOFF-vision-2.md**.
+- In the spider-eye view, things moving in the soft surround shimmer: the lateral eyes' motion sense, presentation only.
+- Two comfort switches, off by default: level horizon and grey picture.
+- The eye view's notice no longer covers the sound captions.
+- Depth from defocus waits for Nathan's decision (EYE-13). It would change jump accuracy.
+- UV stays unsimulated (EYE-14): no published UV data for the house fly.
+
+Evidence **db112e2fa006**: 585/585 (Linux headless), after Chet's 576/576 on Windows (5b1adc6e6a6b), which also passes on Linux. Not run on Windows. Next: Nathan plays; then ROADMAP step 6, handing back the slice.
+
+---
+
+## Chet's movement handoff (previous)
+
 
 **Latest: movement realism part 2, ROADMAP step 4.** Start from main and read **docs/HANDOFF-surface-legs.md**. Added world-planted feet, steps during turns, rear-pair extension, abdomen/spinneret touchdown before visual launch, and landing absorption. Twitch stays. Reduced motion stays neutral. All new animation follows SimClock.DT; movement, jump and tether physics are unchanged. Instant hops use a short third-person presentation lead-in while the motor launches immediately; first-person camera timing is unchanged. Sources and approximation limits are in the handoff and DECISIONS LEG-05 through LEG-08.
 

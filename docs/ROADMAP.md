@@ -69,7 +69,7 @@ Keep the twitch.
 - Done: a **motion-sensitive edge**. A moving thing shimmers in the blurry surround before the sharp eyes can tell what it is.
 - Done: **comfort options**, a level horizon in the eye view and a grey (colour-free) variant.
 - Waiting on Nathan: **depth from defocus** (Nagata et al. 2012). Done faithfully, jumps would be less accurate in poor or reddish light and at long range. That changes how the game plays, so it is his call (EYE-13).
-- **UV markings:** see EYE-14 for what the evidence supports.
+- **UV markings:** kept unsimulated. Published numbers exist for glass and leaves, but none for the house fly, so it waits for that data (EYE-14).
 
 **6. Hand back the slice (spec T10; Chet on Windows, Claude on docs).**
 - Measure frame time on Nathan's laptop (F01).

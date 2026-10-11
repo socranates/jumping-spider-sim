@@ -13,13 +13,13 @@ ROADMAP step 5, after Chet's movement round (1d2fb44). Nathan: "chet just finish
 ## Deliberately not done
 
 - **Depth from defocus** (EYE-13). A faithful version changes jump accuracy with light and distance, and so changes approved gameplay and the movement gates. It needs Nathan's decision. See VISION_RESEARCH.md.
-- **UV** (EYE-14). See DECISIONS for what the evidence supports.
+- **UV** (EYE-14). A literature search found numbers for glass and leaves but none for the house fly, the prey that matters, so UV stays unsimulated and labelled. What is known and missing is in VISION_RESEARCH.md.
 
 ## Verification
 
 - New tests: `tests/integration/test_t13a_motion_surround.gd` (5) and `tests/integration/test_t13a_eye_comfort.gd` (4).
 - The eye, sensor, perception and sense tests pass 69/69 at fixed 30, 60 and 144 fps.
-- Full-suite result and evidence: DECISIONS EYE-15.
+- Full suite: **585/585**, evidence **db112e2fa006** (Linux headless, fixed 60 fps).
 - Stills: `docs/verification/t13a/`:
   - `eye_motion_shimmer.png`: a fly taking off in the surround;
   - `eye_grey.png`;

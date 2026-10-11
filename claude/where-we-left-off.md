@@ -25,7 +25,7 @@ Native AMD Radeon screenshots show the real windowsill spider's corrected legs, 
 
 ## Next
 
-**Latest (Claude, 2026-10-11, T11b):** Nathan played the whole checklist: everything works, "really fun, camera works great, 1st person is super cool". The struggle is harder and ends the moment the grip bar is full (STRUGGLE-01). Results in `docs/PLAYTEST.md`. U01's controller-only part is still open (no controller). Next by the plan: step 3, sound and the spider's other senses, unless Nathan picks otherwise.
+**Latest (Claude, 2026-10-11, T11b):** Nathan played the whole checklist: everything works, "really fun, camera works great, 1st person is super cool". The struggle is harder and ends the moment the grip bar is full (STRUGGLE-01). Evidence **d9ed40eeeecf**: 557/557 (Linux headless); not run on Windows. Results in `docs/PLAYTEST.md`. U01's controller-only part is still open (no controller). Next by the plan: step 3, sound and the spider's other senses, unless Nathan picks otherwise.
 
 **Latest (Claude, 2026-10-11, T11a):** one game clock and slow motion (T / RT), an easy first/third-person switch (V / Y, a line on screen, an Esc-menu button), and the playtest checklist `docs/PLAYTEST.md`. Evidence **e530e2f0810d**: 553/553 (Linux headless, fixed 60 fps); not run on Windows. Read `docs/HANDOFF-slow-motion.md`; the plan is `docs/ROADMAP.md`. Nathan's son needs no more help than Most help. The next step is Nathan's playtest.
 

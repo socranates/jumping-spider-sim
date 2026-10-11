@@ -308,5 +308,5 @@ Nathan: "the slomo thing sounds cool" (to ROADMAP step 2), "add a button that ca
   - Kicks shrink with the fly's strength (the jolt the HUD and body show).
 - **PLAYTEST-01 Nathan's checklist run (2026-10-11).** Everything on `docs/PLAYTEST.md` worked as it should, by his report. This counts as human evidence for W01 (shadow warning, pause), M04 (the camera, graphical) and E02 (he could say why hunts worked).
   - U01 is met for remapped keys, toggle preparation and mute.
-  - U01's controller-only part is open until someone plays with a controller: Nathan has said he has none for the PC.
+  - U01's controller-only part is open until someone plays with a controller: Nathan has said he has none for the PC.- **STRUGGLE-02 Evidence.** d9ed40eeeecf: 557 / 557 (Linux headless, fixed 60 fps), including 4 new tests (`tests/integration/test_t11b_struggle.gd`). The struggle, hunt-feel, living-fly and feeding tests pass at fixed 30 and 144 fps, 20 / 20 each. Reports are in `docs/verification/t11b/`. Not run on Windows.
 

@@ -25,6 +25,7 @@ static func set_speed(speed: float) -> void:
 	_changed_on_frame = Engine.get_process_frames()
 	Engine.physics_ticks_per_second = maxi(1, roundi(float(HZ) * s))
 	Engine.time_scale = float(Engine.physics_ticks_per_second) / float(HZ)
+	AudioServer.playback_speed_scale = Engine.time_scale  # T12a: the world's sounds slow (and drop in pitch) with it
 
 
 static func speed() -> float:

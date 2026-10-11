@@ -451,6 +451,11 @@ func in_transition() -> bool:
 	return _arc_active
 
 
+## T12a: the solid piece under the spider's feet (null when it has no support), for the vibration sense.
+func get_support_body() -> Object:
+	return _support_body if is_supported() and is_instance_valid(_support_body) else null
+
+
 ## Normal of the support frame (hysteresis applied); the last one while falling.
 func get_support_normal() -> Vector3:
 	return support.normal

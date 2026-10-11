@@ -31,6 +31,9 @@ const PerceptionHud = preload("res://scripts/presentation/perception_hud.gd")
 const GazeOverlay = preload("res://scripts/presentation/gaze_overlay.gd")
 const EyeViewOverlay = preload("res://scripts/presentation/eye_view_overlay.gd")
 const SlowMotionHud = preload("res://scripts/presentation/slow_motion_hud.gd")
+const Soundscape = preload("res://scripts/audio/soundscape.gd")
+const SenseHud = preload("res://scripts/presentation/sense_hud.gd")
+const VibrationSense = preload("res://scripts/perception/vibration_sense.gd")
 const SimClock = preload("res://scripts/core/sim_clock.gd")
 const PerceptionDebug = preload("res://scripts/presentation/perception_debug.gd")
 const PreyDebug = preload("res://scripts/presentation/prey_debug.gd")
@@ -105,6 +108,9 @@ var perception_hud: PerceptionHud
 var gaze_overlay: GazeOverlay
 var eye_overlay: CanvasLayer  # T10a: the spider-eye view's picture (played worlds only)
 var slow_motion_hud: CanvasLayer  # T11a: says when slow motion is on, and switches it (played worlds only)
+var vibration: Node  # T12a: what the spider feels through its feet (every world)
+var soundscape: Node3D  # T12a: room and fly sounds (played worlds only)
+var sense_hud: CanvasLayer  # T12a: captions and vibration ripples (played worlds only)
 var perception_debug: PerceptionDebug
 var prey_debug: PreyDebug
 ## Surface profiles by id (data/surfaces).
@@ -210,6 +216,13 @@ func _ready() -> void:
 		if restored:
 			habitat_loop.apply_record(restore_record["habitat"])
 		add_child(habitat_loop)
+	vibration = VibrationSense.new()
+	vibration.name = "VibrationSense"
+	vibration.spider = spider
+	vibration.prey = prey
+	vibration.lab = lab
+	vibration.settings = settings
+	add_child(vibration)
 	if interactive:
 		controller = PlayerController.new()
 		controller.motor = spider
@@ -272,6 +285,22 @@ func _ready() -> void:
 		slow_motion_hud = SlowMotionHud.new()
 		slow_motion_hud.settings = settings
 		add_child(slow_motion_hud)
+		sense_hud = SenseHud.new()
+		sense_hud.settings = settings
+		sense_hud.camera_rig = camera_rig
+		sense_hud.spider = spider
+		add_child(sense_hud)
+		vibration.felt.connect(sense_hud.on_felt)
+		soundscape = Soundscape.new()
+		soundscape.name = "Soundscape"
+		soundscape.settings = settings
+		soundscape.prey = prey
+		soundscape.spider = spider
+		soundscape.habitat_loop = habitat_loop
+		soundscape.vibration = vibration
+		soundscape.seed_value = int(prey.seed_value)
+		add_child(soundscape)
+		soundscape.caption.connect(sense_hud.show_caption)
 		overlay.sensor = sensor
 		overlay.memory = memory
 		overlay.prey = prey

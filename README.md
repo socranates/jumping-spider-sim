@@ -4,6 +4,13 @@ A third-person prototype about living as a jumping spider. The design is in `doc
 
 Shared development: see [the agent handoff](claude/where-we-left-off.md), [GitHub workflow](docs/SHARED_WORKFLOW.md), and [verification reports](docs/verification/).
 
+## New: sound and the spider's other senses (2026-10-11)
+
+- The room hums, flies buzz from where they are, and a fly struggling in the jaws buzzes louder.
+- When a fly lands, takes off or walks on a surface joined to the spider's, the spider **feels** it: a low thrum, a ripple on that side of the screen, and a caption such as "[felt: footsteps, behind-left]". It never crosses an air gap.
+- Captions show every cue, so the game works muted.
+- Esc menu: Volume, Room sounds, Flies and vibrations, Captions, Controller rumble.
+
 ## New: slow motion, and an easy view switch (2026-10-11)
 
 - **Slow motion:** press **T** (controller **right trigger**). The whole world slows evenly: the spider, the flies and the jump. Press again for normal speed. Esc → Slow-motion speed: 25, 50 or 75 %.

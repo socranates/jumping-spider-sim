@@ -23,7 +23,7 @@ Native AMD Radeon screenshots show the real windowsill spider's corrected legs, 
 
 ## Next
 
-**Spider-eye view (T10a, Claude, 2026-10-11):** built at Nathan's request. Read `docs/HANDOFF-eye-view.md`. V or Y switches between a first-person view from the principal eyes and the orbit camera. Decisions EYE-01 … EYE-06. Nathan also said: "you can mess with any approved code its ok", and that his laptop is the shared home for him, Chet and Claude ("absolute permission for anything"). Claude itself works in a cloud copy and reaches the laptop only through GitHub and `update.bat`.
+**Spider-eye view (T10a, Claude, 2026-10-11):** built at Nathan's request. Read `docs/HANDOFF-eye-view.md`. V or Y switches between a first-person view from the principal eyes and the orbit camera. Decisions EYE-01 … EYE-06. Evidence **7169ecfd3663**: 544/544 (Linux headless, fixed 60 fps); not yet run on Windows or played. Nathan also said: "you can mess with any approved code its ok", and that his laptop is the shared home for him, Chet and Claude ("absolute permission for anything"). Claude itself works in a cloud copy and reaches the laptop only through GitHub and `update.bat`.
 
 **Cross-device goal (Nathan, 2026-10-10 America/Chicago):** Nathan wants to play on PlayStation and other devices. Keep this in mind during Godot development. Roblox is a possible route, not a selected platform or an authorized port. Nathan, Chet and Claude will decide the approach and timing together. Chet suggested a solid Godot core followed by a small Roblox feasibility prototype before extensive additional content; this is a proposal, not an agreed milestone. See DECISIONS PLATFORM-01.
 

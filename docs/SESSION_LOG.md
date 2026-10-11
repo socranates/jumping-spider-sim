@@ -1013,4 +1013,5 @@ Chet reviews this entry, `docs/HANDOFF-chunk-7.md` and the tests named above. Na
 - Nathan: "yeah go ahead please" (the first-person eye mode), "you can mess with any approved code its ok". Chet and Nathan added the cross-device goal (PLATFORM-01) meanwhile; merged in.
 - Built: first-person view at the principal eyes; movable-retina scanning drives the senses within 30 degrees; turning to look beyond it; head tilt; the view carried over edges at most 240 degrees a second; a sharp oval principal-eye window (green and "UV", no red) in a coarse one-colour secondary-eye view; words that call it an impression. Decisions EYE-01 to EYE-06.
 - A first full run found one T09d test that remapped aiming to Y, now the eye view's button; the test uses the right shoulder instead. A still showed the window as a green box; it became a neutral oval with colour only where green and "UV" differ.
+- Final: evidence 7169ecfd3663, 544 of 544 (fixed 60 fps, Linux headless); eye/camera/controller tests 56 of 56 at fixed 30 and 144 (the roll check now counts per physics tick); smoke clean. Not run on Windows.
 

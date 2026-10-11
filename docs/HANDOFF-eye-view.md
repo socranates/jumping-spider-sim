@@ -24,7 +24,16 @@ Nathan asked for "a first person spider eye mode so its more immersive", with "s
 
 ## Verification
 
-See the end of this file, filled in at merge.
+- **Evidence 7169ecfd3663**: the full suite passes 544 / 544 (Linux headless, fixed 60 fps, Godot 4.7.2), including 8 new eye-view tests (`docs/verification/t10a/full_report_t10a.txt`).
+- The eye-view, camera, Focus, T09d and U01 tests also pass at fixed 30 and 144 fps, 56 / 56 each (`fps30_eye_camera_tests.txt`, `fps144_eye_camera_tests.txt`).
+- The main scene smoke run is clean.
+- Stills come from the real windowsill in the Compatibility renderer under software OpenGL (`docs/verification/t10a/`):
+  - `t10a_orbit_view_before.png`: the normal camera.
+  - `t10a_hunting_view.png`: a fly and the cues through the eyes.
+  - `t10a_turning_to_look_first_frame.png`: looking 70 degrees aside, with a front leg in view and the explanation on screen.
+  - `t10a_turned_to_look.png`: the body has turned.
+  - `t10a_head_tilted_down.png`: looking down; the head tilts and the window stays.
+- **Not run on Windows, and no human has played it yet.** Nathan's judgement of the feel is the real test.
 
 ## For the next owner
 

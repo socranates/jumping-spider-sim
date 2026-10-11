@@ -1022,3 +1022,7 @@ Chet reviews this entry, `docs/HANDOFF-chunk-7.md` and the tests named above. Na
 - Nathan, mid-session: "eventually i want to add all the different species of jumping spiders and make this look realistic, add peacock spiders and little dances". Recorded as SPECIES-01 and in ROADMAP (Long term).
 - Final: evidence e530e2f0810d, 553 of 553 (fixed 60 fps, Linux headless); clock and view tests 47 of 47 at fixed 30 and 144; smoke clean. The slow-motion line moved to the bottom-right after a still showed it over the windowsill caption. Not run on Windows.
 
+### 2026-10-11: Nathan's playtest, T11b struggle (Claude, cloud session)
+- Nathan ran `docs/PLAYTEST.md`: "everthing on the checklist functions the way it should. It is really fun, camera works great, 1st person is super cool." He asked: "the tapping when catching a fly should be a bit harder and just stop when it is full".
+- A tap-rate sweep showed the old bar filled in about a second at 2.5 presses a second, then waited on a timer. New rules: a full bar wins at once; harder taps; the fly weakens as the venom works; automatic hold fills by itself. STRUGGLE-01, PLAYTEST-01.
+

@@ -297,3 +297,16 @@ Nathan: "the slomo thing sounds cool" (to ROADMAP step 2), "add a button that ca
   The pause menu's buttons wrap onto a second row when there is not room.
 - **SPECIES-01 Direction (Nathan, 2026-10-11):** "eventually ... all the different species of jumping spiders", realistic looks, and peacock spiders with "little dances". It is recorded in ROADMAP (Long term) as a direction, not a scheduled task. New species are data profiles, models and behaviours, each with its own vision review. Peacock-spider courtship belongs with spec phase 5 (courtship), and realistic models with phase 6 (production art).
 
+## T11b — the struggle, after Nathan's playtest (Claude, 2026-10-11)
+
+- **STRUGGLE-01 A full bar wins; tapping is harder; the fly weakens.** Nathan: "the tapping when catching a fly should be a bit harder and just stop when it is full."
+  - A full grip bar subdues the fly on that tick. The old 2.5–3.5 s timer is gone: it let the bar sit full while the player kept tapping.
+  - New numbers: start 0.45, 0.10 a press, drain 0.28/s, a jerk 0.10.
+  - The fly's struggles weaken as the bite's venom works, to 40 % of their strength over 5–7 s (a draw from the fly's own stream, in place of the old timer's draw, so the random sequence is unchanged). After 12 s the venom has subdued it whatever the bar shows.
+  - Measured on a sweep (`docs/verification/t11b/struggle_tuning.txt`): two presses a second loses the fly; four wins in about 6 s; five in about 4; seven in about 2. Before, about two presses a second held a fly, and 2.5 filled the bar in about a second.
+  - "Hold on automatically" now fills the bar by itself in about 1.4 s while the fly still kicks, instead of pinning it full.
+  - Kicks shrink with the fly's strength (the jolt the HUD and body show).
+- **PLAYTEST-01 Nathan's checklist run (2026-10-11).** Everything on `docs/PLAYTEST.md` worked as it should, by his report. This counts as human evidence for W01 (shadow warning, pause), M04 (the camera, graphical) and E02 (he could say why hunts worked).
+  - U01 is met for remapped keys, toggle preparation and mute.
+  - U01's controller-only part is open until someone plays with a controller: Nathan has said he has none for the PC.- **STRUGGLE-02 Evidence.** d9ed40eeeecf: 557 / 557 (Linux headless, fixed 60 fps), including 4 new tests (`tests/integration/test_t11b_struggle.gd`). The struggle, hunt-feel, living-fly and feeding tests pass at fixed 30 and 144 fps, 20 / 20 each. Reports are in `docs/verification/t11b/`. Not run on Windows.
+

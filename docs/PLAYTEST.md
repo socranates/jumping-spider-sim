@@ -50,3 +50,11 @@ Before starting: double-click `update.bat`, then `play.bat`.
 - The most annoying moment.
 - What you would change first.
 - For the eye view: keep it, change it, or both?
+
+## Results
+
+**2026-10-11, Nathan:**
+- "everthing on the checklist functions the way it should. It is really fun, camera works great, 1st person is super cool."
+- One change asked for: "the tapping when catching a fly should be a bit harder and just stop when it is full". Done in T11b.
+- Not confirmed: whether section 4 was played with a controller. Earlier Nathan had no controller for the PC. U01's controller-only part therefore stays open until someone plays with one.
+

@@ -48,14 +48,22 @@ var refusals: Dictionary = {}
 ## T09b, the struggle (Nathan: "you should have to tap the button as the prey struggles"; "a bar that depletes when you stop tapping"). A
 ## caught fly is not yet subdued: for STRUGGLE_S (a draw of its own stream) it fights the jaws. The grip bar drains on its own and each jerk
 ## of the fly knocks a piece off; every press of interact adds to it. If the grip runs out the fly tears free; if it lasts until the fly is
-## subdued, the fly is the spider's and can be eaten. About two presses a second are enough, and holding the button does nothing on its own,
-## so "Struggling prey: automatic" in the pause panel (spec 17: no required rapid tapping) keeps the grip full with no presses.
+## subdued, the fly is the spider's and can be eaten. Holding the button does nothing on its own, so "Struggling prey: automatic" in the
+## pause panel (spec 17: no required rapid tapping) fills the grip with no presses.
+## T11b (Nathan's playtest, 2026-10-11: "the tapping when catching a fly should be a bit harder and just stop when it is full"): a full grip
+## bar subdues the fly at once; there is no timer to wait out. Each press adds less, so a steady rhythm of about four presses a second or
+## more is needed (two or so loses the fly; five fills the bar in about four seconds, seven in about two). The fly's struggles weaken as the
+## bite's venom works, to VENOM_FLOOR of their strength over its own VENOM_S, so a long fight gets easier; after STRUGGLE_MAX_S the venom
+## has subdued it whatever the bar shows. The numbers come from a sweep of tap rates (docs/verification/t11b/struggle_tuning.txt).
 ## Played worlds struggle; test worlds only when a test asks.
-const GRIP_START := 0.6
-const GRIP_TAP := 0.25
-const GRIP_DRAIN_PER_S := 0.3
-const GRIP_JERK := 0.1
-const STRUGGLE_S := Vector2(2.5, 3.5)
+const GRIP_START := 0.45
+const GRIP_TAP := 0.10
+const GRIP_DRAIN_PER_S := 0.28
+const GRIP_JERK := 0.10
+const VENOM_S := Vector2(5.0, 7.0)
+const VENOM_FLOOR := 0.4
+const STRUGGLE_MAX_S := 12.0
+const AUTO_FILL_PER_S := 0.4
 const JERK_GAP_S := Vector2(0.35, 0.75)
 var struggle_enabled: bool = false
 var struggle_auto: bool = false
@@ -63,7 +71,9 @@ var struggle_auto: bool = false
 var settings: Node
 var struggling: bool = false
 var grip: float = 0.0
-var struggle_left: float = 0.0
+## T11b: how long this fly's struggle has lasted (game seconds since the spider landed) and how long its venom takes to weaken it.
+var struggle_time: float = 0.0
+var venom_s: float = 6.0
 var struggle_taps: int = 0
 var struggle_jerks: int = 0
 var struggle_log: Array[String] = []
@@ -210,7 +220,7 @@ func prompt() -> Dictionary:
 	if held == null or not is_instance_valid(held) or held.state != held.State.CAPTURED:
 		return {}
 	if struggling:
-		var hint := "holding on (automatic)" if struggle_auto else "tap %s (or %s) to keep your grip" % [KeyNames.both(settings, "prepare_jump", "Space", "A"), KeyNames.both(settings, "interact", "E", "X")]
+		var hint := "holding on (automatic)" if struggle_auto else "tap %s (or %s) fast to fill the grip" % [KeyNames.both(settings, "prepare_jump", "Space", "A"), KeyNames.both(settings, "interact", "E", "X")]
 		return {"title": "IT STRUGGLES!", "hint": hint, "left": grip, "urgent": grip < 0.3}
 	var eat := KeyNames.both(settings, "interact", "E", "X")
 	var stop := KeyNames.both(settings, "cancel", "Q", "B")
@@ -230,14 +240,15 @@ func on_captured(_event: Dictionary) -> void:
 		return
 	var f: Node3D = prey.held
 	struggling = true
-	grip = 1.0 if struggle_auto else GRIP_START
-	struggle_left = PreyMath.draw(f.rng, STRUGGLE_S)
+	grip = GRIP_START
+	struggle_time = 0.0
+	venom_s = PreyMath.draw(f.rng, VENOM_S)
 	struggle_taps = 0
 	struggle_jerks = 0
 	_until_jerk = PreyMath.draw(f.rng, JERK_GAP_S) * 0.5
 	_landing_wait = 0.0
 	f.struggling = true
-	struggle_log.append("start %s (%.2f s)" % [f.id, struggle_left])
+	struggle_log.append("start %s (venom %.2f s)" % [f.id, venom_s])
 	struggle_changed.emit("start")
 
 
@@ -250,22 +261,32 @@ func _step_struggle(delta: float, press: bool) -> void:
 		struggle_taps += 1
 		grip = minf(1.0, grip + GRIP_TAP)
 		struggle_changed.emit("tap")
+	if grip >= 1.0:
+		_subdue("the grip is full")
+		return
 	# Caught in mid-air: the fight starts in earnest once the spider is down (or after a second at most).
 	if motor != null and motor.state != motor.State.ATTACHED and _landing_wait < LANDING_WAIT_MAX_S:
 		_landing_wait += delta
 		return
-	grip -= GRIP_DRAIN_PER_S * delta
+	struggle_time += delta
+	var strength := venom_strength()
 	_until_jerk -= delta
 	if _until_jerk <= 0.0:
 		_until_jerk = PreyMath.draw(f.rng, JERK_GAP_S)
 		struggle_jerks += 1
-		grip -= GRIP_JERK
-		prey.held_jerk = 1.0
+		if not struggle_auto:
+			grip -= GRIP_JERK * strength
+		prey.held_jerk = strength
 		struggle_changed.emit("jerk")
 	if struggle_auto:
-		grip = 1.0
-	struggle_left -= delta
-	if grip <= 0.0:
+		grip = minf(1.0, grip + AUTO_FILL_PER_S * delta)   # holding on by itself: the bar fills steadily, and the fly still kicks
+	else:
+		grip -= GRIP_DRAIN_PER_S * strength * delta
+	if grip >= 1.0:
+		_subdue("the grip is full")
+	elif struggle_time >= STRUGGLE_MAX_S and grip > 0.0:
+		_subdue("the venom has worked")
+	elif grip <= 0.0:
 		grip = 0.0
 		struggles_lost += 1
 		_end_struggle()
@@ -273,13 +294,22 @@ func _step_struggle(delta: float, press: bool) -> void:
 		struggle_log.append("escaped")
 		_say("It tore free!")
 		struggle_changed.emit("escaped")
-	elif struggle_left <= 0.0:
-		struggles_won += 1
-		_end_struggle()
-		struggle_log.append("subdued")
-		_swallow_left = SWALLOW_S
-		_say("Subdued.")
-		struggle_changed.emit("subdued")
+
+
+## How hard the fly still fights, 1 at the start falling to VENOM_FLOOR over its venom time (T11b).
+func venom_strength() -> float:
+	return lerpf(1.0, VENOM_FLOOR, clampf(struggle_time / maxf(venom_s, 0.01), 0.0, 1.0))
+
+
+func _subdue(why: String) -> void:
+	grip = minf(grip, 1.0)
+	struggles_won += 1
+	_end_struggle()
+	struggle_log.append("subdued")
+	struggle_log.append("subdued: %s (%.2f s, %d taps)" % [why, struggle_time, struggle_taps])
+	_swallow_left = SWALLOW_S
+	_say("Subdued.")
+	struggle_changed.emit("subdued")
 
 
 ## True while the jump button belongs to the grip (a struggle, and the moment after it), so the jump controller leaves it alone.

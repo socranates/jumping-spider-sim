@@ -1005,3 +1005,7 @@ Chet reviews this entry, `docs/HANDOFF-chunk-7.md` and the tests named above. Na
 - Nathan approved option 1. Static legs replaced by the cosmetic gait rig; body twitch preserved; Reduced motion controls the rig and stops an active catch recoil. Fixed local-axis cylinder scaling and included the live script in both exports.
 - Resumed after T09d, rebased onto `eacec52`. Combined Windows evidence `cfdc7fac7ce0`: 536/536 at fixed 60 fps, 28/28 leg/support/T09d tests at normal speed. Earlier original baseline: 522/522 normal-speed, including F4. See `HANDOFF-live-legs.md`.
 
+### 2026-10-11: after the live legs (Claude, cloud session)
+- Chet finished the live legs (536/536 on Windows, evidence cfdc7fac7ce0). Nathan: move on to the next thing; eventually a first-person spider-eye mode; "scientific realism in terms of vision and movement".
+- Global slow time checked and deferred (T9e-01): `Engine.time_scale` would desynchronise systems that count fixed 1/60 s ticks. Survival pressure has nothing to scale yet (T9e-02). Direction recorded (T9e-03).
+

@@ -84,6 +84,24 @@ Keep the twitch.
 - **One predator.** A windowsill candidate is a cellar spider (*Pholcus*), which is known to eat other spiders. A house centipede is another option. The choice should be checked against the literature first.
 - **Death and continuation**, as spec 11 describes. No grind, and no forced breeding.
 
+## Long term: many species (Nathan, 2026-10-11)
+
+"Eventually i want to add all the different species of jumping spiders and make this look realistic, add peacock spiders and little dances."
+
+- **The project is already shaped for it.**
+  - A species is a data file (`data/species/*.json`: size, speeds, jump reach, senses), and code reads the profile, not hard-coded numbers.
+  - A new species needs:
+    - a profile;
+    - a realistic model and its colours;
+    - its own behaviour;
+    - a review of its vision, since species differ. Some *Habronattus* have red-sensitive filters, for example, so the eye view must not copy the *Phidippus* picture without checking (VISION_RESEARCH.md).
+- **Peacock spiders (*Maratus*).**
+  - The males' courtship display is a raised, colourful abdominal fan, waving third legs and a vibratory "song" through the ground.
+  - Courtship is part of spec phase 5, so the dances belong there.
+  - Their iridescent colours would need proper materials, not flat paint.
+- **Realistic looks.** Moving from primitive shapes to detailed, accurate models (hairs, eye arrangement, markings) is spec phase 6 ("production art"). It can start with the player's own species.
+- **A sensible order.** One finished life (phase 4) first. Then a second species chosen to test the system, ideally one that lives in the same windowsill. Then peacock spiders and courtship (phase 5), which need mates, displays and the vibration sense from step 3.
+
 ## The platform question (PLATFORM-01, to decide together)
 
 - **What Godot does now.** Exports to Windows, Mac, Linux, Android, iOS and the web. The game already runs in the renderer the web build uses, and it supports a controller.

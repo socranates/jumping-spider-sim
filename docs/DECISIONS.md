@@ -295,4 +295,5 @@ Nathan: "the slomo thing sounds cool" (to ROADMAP step 2), "add a button that ca
   - the field notes list it.
 
   The pause menu's buttons wrap onto a second row when there is not room.
+- **SPECIES-01 Direction (Nathan, 2026-10-11):** "eventually ... all the different species of jumping spiders", realistic looks, and peacock spiders with "little dances". It is recorded in ROADMAP (Long term) as a direction, not a scheduled task. New species are data profiles, models and behaviours, each with its own vision review. Peacock-spider courtship belongs with spec phase 5 (courtship), and realistic models with phase 6 (production art).
 

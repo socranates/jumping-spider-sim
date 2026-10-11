@@ -124,7 +124,7 @@ After Nathan played T09b: the approach can be slower; the tapping wasn't working
 
 Claude did this while Chet's live-legs work waited for his usage to reset. Nathan's son (almost 6) plays, so Most help is meant for him. Decisions T9d-01 … T9d-05.
 
-**Evidence:** **EVIDENCE_ID**, full suite **TOTAL_TESTS passed** (Linux headless, fixed 60 fps), `docs/verification/t09d/full_report_t09d.txt`. The new tests, the U01 tests and the T09c prompt tests pass at fixed 30 and 144 fps too (`fps30_access_tests.txt`, `fps144_access_tests.txt`). Stills: `t09d_pause_most_help.png`, `t09d_keys_and_buttons.png` (100 %), `t09d_keys_and_buttons_150.png`, `t09d_field_notes.png` (a remapped button named in the notes). **Not run on Windows.**
+**Evidence:** **3fb300501a68**, full suite **530 / 530 passed** (Linux headless, fixed 60 fps), `docs/verification/t09d/full_report_t09d.txt`. The new tests, the U01 tests and the T09c prompt tests pass at fixed 30 and 144 fps too (`fps30_access_tests.txt`, `fps144_access_tests.txt`). Stills: `t09d_pause_most_help.png`, `t09d_keys_and_buttons.png` (100 %), `t09d_keys_and_buttons_150.png`, `t09d_field_notes.png` (a remapped button named in the notes). **Not run on Windows.**
 
 **What changed for the player**
 - **Assisted play** at the top of the pause menu: Standard, Guided hunting, No held buttons, Most help. The line under it says what the chosen one does; change any switch and it says "Custom". Presets leave the camera, the text size, Reduced motion and the jump reach alone.

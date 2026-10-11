@@ -1019,4 +1019,6 @@ Chet reviews this entry, `docs/HANDOFF-chunk-7.md` and the tests named above. Na
 - Chet finished T10b (retinal scanning, an honest colour label; he corrected Claude's blue-as-UV shortcut). Nathan: "it is really starting to be super cool". His son needs no more help; slow motion "sounds cool". Mid-session: "add a button that can easily swtch between first and 3rd person".
 - Built: SimClock (one tick length at every speed), slow motion (T / RT, 25–75 %), real-time camera controls, a line naming the view switch, an Esc-menu view button, the playtest checklist (`docs/PLAYTEST.md`). Decisions CLOCK-01 to CLOCK-04.
 - Found and fixed: the camera jumped for one frame when the speed changed mid-frame (the engine applies a new time scale from the next frame).
+- Nathan, mid-session: "eventually i want to add all the different species of jumping spiders and make this look realistic, add peacock spiders and little dances". Recorded as SPECIES-01 and in ROADMAP (Long term).
+- Final: evidence e530e2f0810d, 553 of 553 (fixed 60 fps, Linux headless); clock and view tests 47 of 47 at fixed 30 and 144; smoke clean. The slow-motion line moved to the bottom-right after a still showed it over the windowsill caption. Not run on Windows.
 

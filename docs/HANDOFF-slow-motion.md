@@ -4,7 +4,7 @@ Built on Chet's T10b (`main` at 5789ca7). ROADMAP step 2, plus Nathan's "add a b
 
 ## For the player
 
-- **Slow motion.** Press **T** (controller **right trigger**), or tick it in the Esc menu. The whole world slows evenly: the spider, the flies and the jump. Looking around does not slow. Esc → Slow-motion speed picks 25, 50 or 75 %. While it is on, a line at the top says "SLOW MOTION 50%" and names the key to end it. The choice is saved.
+- **Slow motion.** Press **T** (controller **right trigger**), or tick it in the Esc menu. The whole world slows evenly: the spider, the flies and the jump. Looking around does not slow. Esc → Slow-motion speed picks 25, 50 or 75 %. While it is on, a line in the bottom-right corner says "SLOW MOTION 50%" and names the key to end it. The choice is saved.
 - **Switching views.** **V** (controller **Y**) switches between first person (spider-eye view) and third person.
   - In third person, a line at the top right says "V / Y: first person (spider-eye view)".
   - In first person, the tag says "V / Y: third person".
@@ -23,7 +23,12 @@ Built on Chet's T10b (`main` at 5789ca7). ROADMAP step 2, plus Nathan's "add a b
 
 ## Verification
 
-Filled in at merge (see the end of this file).
+- **Evidence e530e2f0810d**: 553 / 553 (Linux headless, fixed 60 fps), including 5 new tests in `tests/integration/test_t11a_slow_motion.gd` (`docs/verification/t11a/full_report_t11a.txt`).
+- The slow-motion, eye-view, retinal-scan, camera and controller tests pass at fixed 30 and 144 fps, 47 / 47 each.
+- The determinism test matches every tick of a stalk and a strike at full and half speed within 1e-5 WU. A real V key press switches the view.
+- The smoke run is clean.
+- Stills: `t11a_slow_motion_third_person.png` (the slow-motion line and the view hint) and `t11a_pause_menu.png`.
+- **Not run on Windows, and not played yet.**
 
 ## For the next owner
 

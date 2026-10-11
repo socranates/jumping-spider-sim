@@ -2,6 +2,22 @@
 
 Claude, 2026-10-11, at Nathan's request ("do you want to make a revised plan for moving forward"). It is a proposal: Nathan decides the order, and Nathan, Chet and Claude decide the platform together (PLATFORM-01). Update it when a step is done or the order changes. `docs/SPEC.md` section 26 is still the long-range roadmap; this file is the next few steps.
 
+## The goal: release "The Windowsill" (Nathan, 2026-10-11; RELEASE-01)
+
+"i definitely want to put it in the world, i love these little guys so much and many do. I dont want to get rich or anything but i want people to play it. I am willing to give it all the time it needs if you and chet are with me"
+
+The first release is one complete, calm, true-to-life game:
+- **What it is:** one windowsill done beautifully; one species (*Phidippus audax*); one whole life (hunting, resting, moulting, one predator); a field notebook of short, sourced facts that open as you play (LEARN-01); calm by default, with the help presets for younger players.
+- **Where:** a Windows build and a web build. Free, or pay-what-you-want, on itch.io first. Steam later if people want it.
+- **Size:** about 2–4 hours to see everything, plus open-ended play. More species and habitats (peacock spiders, the garden) come after, as updates or a second game; the project is already built for that.
+- **The road there, in order:**
+  1. **Hand back the slice** (step 6 below): measure speed on Nathan's laptop, make the first Windows and web builds, and let a few friends play.
+  2. **One whole life** (spec phase 4): needs that matter, moulting, one predator, death and continuing as a new spider.
+  3. **The field notebook and honesty fixes:** decide tuned gravity and depth from defocus; make the prey a real species; label every simplification.
+  4. **Looks:** a realistic, detailed windowsill and spider. This needs an asset plan (free public-domain scans and textures where they fit, bought assets or an artist for the spider). Every asset's licence is recorded.
+  5. **Release:** a store page, credits (including the research the game draws on), a final playtest, and 1.0 on itch.io.
+- **Not goals:** getting rich, ads, data collection, pressure to keep playing.
+
 ## Where we are
 
 - **Playable slice:**

@@ -388,3 +388,11 @@ Nathan: "chet just finished and its freakin amazing you guys are making this so 
   - Facts would come through the spec's field notebook as the player first does things: short, optional, each with its source.
   - Before anything is taught as fact, the game's deliberate simplifications get fixed or plainly labelled: tuned gravity, the "fly-like" prey, UV and depth from defocus.
   - Keep the true scale (1 WU = 1 cm) and the slow, pressure-free default.
+
+## Release goal (Nathan, 2026-10-11)
+
+- **RELEASE-01 Put it in the world.** Nathan: "i definitely want to put it in the world, i love these little guys so much and many do. I dont want to get rich or anything but i want people to play it. I am willing to give it all the time it needs if you and chet are with me."
+  - The target is a first release, "The Windowsill": one habitat, one species, one whole life, the field notebook, calm by default.
+  - Windows and web builds, free or pay-what-you-want on itch.io first.
+  - The order of work is in ROADMAP ("The goal"). More species and habitats follow the first release.
+  - Not goals: profit, ads, data collection, engagement pressure.

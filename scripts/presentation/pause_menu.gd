@@ -147,6 +147,7 @@ func _build() -> void:
 	_add_check(switches, "capture_assist", "Strike assist: a wider reach for the bite")
 	_add_check(switches, "struggle_auto", "Struggling prey: hold on automatically")
 	_add_check(switches, "reduced_motion", "Reduced motion (a calmer spider body)")
+	_add_check(switches, "eye_view", "Spider-eye view (first person, V / Y)")
 	var buttons := HBoxContainer.new()
 	buttons.add_theme_constant_override("separation", 12)
 	box.add_child(buttons)

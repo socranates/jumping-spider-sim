@@ -1009,3 +1009,9 @@ Chet reviews this entry, `docs/HANDOFF-chunk-7.md` and the tests named above. Na
 - Chet finished the live legs (536/536 on Windows, evidence cfdc7fac7ce0). Nathan: move on to the next thing; eventually a first-person spider-eye mode; "scientific realism in terms of vision and movement".
 - Global slow time checked and deferred (T9e-01): `Engine.time_scale` would desynchronise systems that count fixed 1/60 s ticks. Survival pressure has nothing to scale yet (T9e-02). Direction recorded (T9e-03).
 
+### 2026-10-11: T10a spider-eye view (Claude, cloud session)
+- Nathan: "yeah go ahead please" (the first-person eye mode), "you can mess with any approved code its ok". Chet and Nathan added the cross-device goal (PLATFORM-01) meanwhile; merged in.
+- Built: first-person view at the principal eyes; movable-retina scanning drives the senses within 30 degrees; turning to look beyond it; head tilt; the view carried over edges at most 240 degrees a second; a sharp oval principal-eye window (green and "UV", no red) in a coarse one-colour secondary-eye view; words that call it an impression. Decisions EYE-01 to EYE-06.
+- A first full run found one T09d test that remapped aiming to Y, now the eye view's button; the test uses the right shoulder instead. A still showed the window as a green box; it became a neutral oval with colour only where green and "UV" differ.
+- Final: evidence 7169ecfd3663, 544 of 544 (fixed 60 fps, Linux headless); eye/camera/controller tests 56 of 56 at fixed 30 and 144 (the roll check now counts per physics tick); smoke clean. Not run on Windows.
+

@@ -10,3 +10,6 @@ tests/reports/
 .env
 .env.*
 !.env.example
+
+# Godot import files for the pictures in docs (made on each machine, never needed)
+docs/**/*.import

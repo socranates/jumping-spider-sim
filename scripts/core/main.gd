@@ -29,6 +29,7 @@ const SensorSystem = preload("res://scripts/perception/sensor_system.gd")
 const ObservationMemory = preload("res://scripts/perception/observation_memory.gd")
 const PerceptionHud = preload("res://scripts/presentation/perception_hud.gd")
 const GazeOverlay = preload("res://scripts/presentation/gaze_overlay.gd")
+const EyeViewOverlay = preload("res://scripts/presentation/eye_view_overlay.gd")
 const PerceptionDebug = preload("res://scripts/presentation/perception_debug.gd")
 const PreyDebug = preload("res://scripts/presentation/prey_debug.gd")
 const LabScene = preload("res://scenes/testbeds/traversal_lab.tscn")
@@ -100,6 +101,7 @@ var feeding: FeedingController
 var needs_hud: NeedsHud
 var perception_hud: PerceptionHud
 var gaze_overlay: GazeOverlay
+var eye_overlay: CanvasLayer  # T10a: the spider-eye view's picture (played worlds only)
 var perception_debug: PerceptionDebug
 var prey_debug: PreyDebug
 ## Surface profiles by id (data/surfaces).
@@ -259,6 +261,11 @@ func _ready() -> void:
 		gaze_overlay.sensor = sensor
 		gaze_overlay.settings = settings
 		add_child(gaze_overlay)
+		eye_overlay = EyeViewOverlay.new()
+		eye_overlay.camera_rig = camera_rig
+		eye_overlay.motor = spider
+		eye_overlay.settings = settings
+		add_child(eye_overlay)
 		overlay.sensor = sensor
 		overlay.memory = memory
 		overlay.prey = prey

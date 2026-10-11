@@ -55,8 +55,19 @@ extends Node3D
 ## frame rate: several physics ticks can run between two rendered frames (a slow frame, a low --fixed-fps), and
 ## _process, the only other place the camera is placed, may not run in between.
 
+##
+## Spider-eye view (T10a; Nathan, 2026-10-11: "a first person spider eye mode so its more immersive", "scientific realism"). An
+## optional mode, off by default (the setting "eye_view"; V or the controller's Y switches it). The camera sits just in front of the
+## principal eyes and looks along `gaze`, a world direction the player turns with the mouse or the right stick. Its up is the body's
+## smoothed up, so on a wall or an underside the view turns with the spider, as its eyes do. It never turns suddenly: the view's up
+## follows the body's at most EYE_ROLL_DEG_S (the body's own visual up turns faster, 10 degrees a tick, which in first person is a
+## jolt). Every physics tick the gaze is carried through the same turn as the view's up, so an edge carries the view over with the body. Walking is relative to the gaze (map_stick). The boom, the auto-pitch and the line framing are not used;
+## switching back snaps the orbit camera behind the spider. The aim ray is the camera's centre ray, as before.
+
 const BoomMath = preload("res://scripts/movement/boom_math.gd")
 const Layers = preload("res://scripts/core/physics_layers.gd")
+const SurfaceInput = preload("res://scripts/movement/surface_input.gd")
+const SupportMath = preload("res://scripts/movement/support_math.gd")
 
 const PIVOT_HEIGHT := 0.45          # WU from the spider origin along its smoothed normal
 const BOOM_RADIUS := 0.15           # WU, radius of the cast sphere
@@ -85,6 +96,11 @@ const ASSIST_STEP_DEG := 15.0       # line framing: the turns tried, smallest fi
 const FRAMING_MAX_TURN_DEG := 45.0  # line framing: the largest turn it may add (chunk 6B, Chet's temporary cap; was a half turn)
 const SIGHT_TOLERANCE := 0.06       # WU: a ray that stops this short of its end still saw it (the lip sits a hair off its edge)
 const ASSIST_SMOOTH_SECONDS := 0.12 # about how long the framing turn takes: a critically damped spring, gentle at both ends
+const EYE_FOV_DEG := 80.0           # spider-eye view: vertical field of view (the secondary eyes see nearly all round; a screen shows a part)
+const EYE_AHEAD := 0.53             # WU ahead of the body centre: just in front of the model's principal eyes
+const EYE_HEIGHT := 0.09            # WU along the body's up: the principal eyes' height on the model
+const EYE_PITCH_LIMIT_DEG := 80.0   # the gaze stays at least this far from the surface's normal, either way
+const EYE_ROLL_DEG_S := 240.0       # the eye view's up follows the body's up at most this fast: a 90 degree edge takes about 0.4 s
 
 var target: Node3D                  # the spider
 var settings: Node                  # Settings autoload, or a test instance
@@ -136,6 +152,12 @@ var _recenter_elev0: float = 0.0
 var _world_ready: bool = false      # true once physics queries can see the world (see is_world_ready()); casts are not trusted before
 var _born_physics_frames: int = 0   # Engine.get_physics_frames() when the rig entered the tree
 var _born_in_physics: bool = false  # the rig entered the tree inside a physics tick
+## Spider-eye view (see the header): on or off, where it looks, and the up it is carried by.
+var eye_view: bool = false
+var gaze: Vector3 = Vector3.FORWARD
+var _gaze_up: Vector3 = Vector3.UP
+var _gaze_up_prev: Vector3 = Vector3.UP
+var _eye_recenter_from: Vector3 = Vector3.FORWARD
 
 
 func _ready() -> void:
@@ -157,6 +179,8 @@ func _ready() -> void:
 	_born_in_physics = Engine.is_in_physics_frame()
 	if target != null:
 		snap_to_target()
+	if bool(settings.get_value("eye_view")):
+		set_eye_view(true)
 
 
 func desired_distance() -> float:
@@ -242,10 +266,17 @@ func snap_to_target() -> void:
 	_cast_elevation = elev
 	_cast_dir = _pivot_dir
 	_place(origin, _pivot, elev, _boom, _pivot_dir)
+	if eye_view:
+		_reset_gaze()
+		_place_eye(1.0)
 
 
 func start_recenter() -> void:
 	if target == null or aiming:
+		return
+	if eye_view:
+		_eye_recenter_from = gaze
+		_recenter_t = 0.0
 		return
 	_take_over_assist()
 	if _on_line():
@@ -256,6 +287,10 @@ func start_recenter() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("eye_view"):
+		settings.set_value("eye_view", not eye_view)  # the setting applies it (_on_setting_changed), so the pause menu agrees
+		get_viewport().set_input_as_handled()
+		return
 	if event is InputEventMouseMotion:
 		if require_captured_mouse and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
 			return
@@ -272,6 +307,11 @@ func look(dx_deg: float, dy_deg: float) -> void:
 	var s: float = settings.look_sensitivity
 	var ix := -1.0 if settings.invert_x else 1.0
 	var iy := -1.0 if settings.invert_y else 1.0
+	if eye_view:
+		_look_eye(deg_to_rad(dx_deg * s * ix), deg_to_rad(dy_deg * s * iy))
+		if _recenter_t >= 0.0 and absf(dx_deg) + absf(dy_deg) > 1.5:
+			_recenter_t = -1.0
+		return
 	if dx_deg != 0.0 or dy_deg != 0.0:
 		_take_over_assist()
 		if _on_line():
@@ -293,6 +333,9 @@ func _physics_process(delta: float) -> void:
 			return  # made inside this tick: the world is not visible to queries yet, so nothing is cast and nothing moves
 		_world_ready = true
 		snap_to_target()
+		return
+	if eye_view:
+		_carry_gaze(delta)
 		return
 	_pivot_prev = _pivot
 	_boom_prev = _boom
@@ -327,6 +370,10 @@ func _process(delta: float) -> void:
 	var v := Input.get_vector("look_left", "look_right", "look_up", "look_down")
 	if v != Vector2.ZERO:
 		look(v.x * STICK_DEG_PER_SECOND * delta, v.y * STICK_DEG_PER_SECOND * delta)
+	if eye_view:
+		_update_eye_recenter(delta)
+		_place_eye(Engine.get_physics_interpolation_fraction())
+		return
 	_update_recenter(delta)
 	if not aiming and aim_pitch != 0.0:
 		aim_pitch = BoomMath.ease_offset(aim_pitch, 0.0, delta, AIM_RETURN_SECONDS, AIM_RETURN_SECONDS)
@@ -552,11 +599,140 @@ func _cast_fraction(from: Vector3, motion: Vector3) -> float:
 
 
 func _on_setting_changed(key: String) -> void:
-	if key == "fov_degrees":
+	if key == "eye_view":
+		set_eye_view(bool(settings.get_value("eye_view")))
+	elif key == "fov_degrees":
 		_apply_fov()
 	elif key == "frame_line_after_catch" and not framing_enabled():
 		_take_over_assist()  # switched off while a turn is held: the view stays where it is, it does not swing back
 
 
 func _apply_fov() -> void:
-	camera.fov = settings.fov_degrees
+	camera.fov = EYE_FOV_DEG if eye_view else settings.fov_degrees
+
+
+# ------------------------------------------------------------------ spider-eye view (T10a)
+
+## Switches the spider-eye view on or off. On: the gaze starts along the body's own gaze. Off: the orbit camera snaps behind the spider.
+func set_eye_view(on: bool) -> void:
+	if on == eye_view:
+		return
+	eye_view = on
+	_recenter_t = -1.0
+	_apply_fov()
+	var body := target.get_node_or_null("Body") if target != null else null
+	if body != null and body.has_method("set_eye_view"):
+		body.set_eye_view(on)
+	if target == null:
+		return
+	if on:
+		_take_over_assist(false)
+		aim_pitch = 0.0
+		_reset_gaze()
+		_place_eye(1.0)
+	else:
+		if body != null:
+			(body as Node3D).visible = true
+		snap_to_target()
+
+
+## Walking, relative to the view: in the orbit view as before (SurfaceInput); in the spider-eye view, forward is the gaze laid on the
+## surface and right is the view's right on it.
+func map_stick(stick: Vector2, n: Vector3) -> Vector3:
+	if not eye_view:
+		return SurfaceInput.map_stick(stick, view_yaw(), get_view_elevation(), n)
+	if not stick.is_finite() or stick.length_squared() < 1e-12:
+		return Vector3.ZERO
+	var forward := gaze - n * gaze.dot(n)
+	if forward.length_squared() < 1e-6:
+		forward = _body_forward() - n * _body_forward().dot(n)
+	if forward.length_squared() < 1e-6:
+		return Vector3.ZERO
+	forward = forward.normalized()
+	var right := forward.cross(n).normalized()
+	var s := stick.limit_length(1.0)
+	return right * s.x + forward * s.y
+
+
+## How far the gaze is from where the body's principal eyes point with their retinas centred, in degrees (0 outside the spider-eye view).
+func principal_offset_deg() -> float:
+	if not eye_view or target == null:
+		return 0.0
+	var axis := _body_gaze()
+	return rad_to_deg(axis.angle_to(gaze)) if axis != Vector3.ZERO else 0.0
+
+
+func _body_gaze() -> Vector3:
+	if target.has_method("get_body_gaze_direction"):
+		return target.get_body_gaze_direction()
+	return _body_forward()
+
+
+func _body_forward() -> Vector3:
+	if target.has_method("get_heading_vector"):
+		return target.get_heading_vector()
+	return -target.global_transform.basis.z
+
+
+func _reset_gaze() -> void:
+	_gaze_up = _target_up()
+	_gaze_up_prev = _gaze_up
+	gaze = _clamp_gaze(_body_gaze(), _gaze_up)
+
+
+## Turns the gaze: yaw about the body's up (positive looks right), pitch about the view's right (positive looks down).
+func _look_eye(yaw_rad: float, pitch_rad: float) -> void:
+	var g := gaze.rotated(_gaze_up, -yaw_rad)
+	var right := g.cross(_gaze_up)
+	if right.length_squared() > 1e-10:
+		g = g.rotated(right.normalized(), -pitch_rad)
+	gaze = _clamp_gaze(g, _gaze_up)
+
+
+## One physics tick: the view's up turns toward the body's (at most EYE_ROLL_DEG_S) and the gaze turns with it, so it keeps its place
+## relative to the body over an edge.
+func _carry_gaze(delta: float) -> void:
+	_gaze_up_prev = _gaze_up
+	var up := SupportMath.rotate_toward(_gaze_up, _target_up(), deg_to_rad(EYE_ROLL_DEG_S) * delta)
+	if up.angle_to(_gaze_up) > 1e-6:
+		gaze = Quaternion(_gaze_up, up) * gaze
+	_gaze_up = up
+	gaze = _clamp_gaze(gaze, up)
+
+
+## The gaze kept at least EYE_PITCH_LIMIT_DEG from the normal either way, and of unit length.
+func _clamp_gaze(g: Vector3, up: Vector3) -> Vector3:
+	if not g.is_finite() or g.length_squared() < 1e-10:
+		g = _body_forward()
+	g = g.normalized()
+	var tangent := g - up * g.dot(up)
+	if tangent.length_squared() < 1e-8:
+		tangent = _body_forward() - up * _body_forward().dot(up)
+		if tangent.length_squared() < 1e-8:
+			tangent = SupportMath.any_perpendicular(up)
+	tangent = tangent.normalized()
+	var limit := deg_to_rad(EYE_PITCH_LIMIT_DEG)
+	var elev := clampf(asin(clampf(g.dot(up), -1.0, 1.0)), -limit, limit)
+	return (tangent * cos(elev) + up * sin(elev)).normalized()
+
+
+## A recenter in the spider-eye view turns the gaze back to where the body's eyes point, over RECENTER_SECONDS.
+func _update_eye_recenter(delta: float) -> void:
+	if _recenter_t < 0.0:
+		return
+	_recenter_t += delta
+	var k := clampf(_recenter_t / RECENTER_SECONDS, 0.0, 1.0)
+	var s := k * k * (3.0 - 2.0 * k)
+	gaze = _clamp_gaze(_eye_recenter_from.slerp(_body_gaze(), s), _gaze_up)
+	if k >= 1.0:
+		_recenter_t = -1.0
+
+
+## Places the camera at the eyes, from the body as drawn (interpolated), looking along the gaze with the body's up.
+func _place_eye(frac: float) -> void:
+	var xf := target.get_global_transform_interpolated() if target.is_inside_tree() else target.global_transform
+	var up := _gaze_up_prev.slerp(_gaze_up, clampf(frac, 0.0, 1.0)).normalized()
+	var eye := xf.origin + SupportMath.body_basis(up, _body_forward()) * Vector3(0.0, EYE_HEIGHT, -EYE_AHEAD)
+	global_transform = Transform3D(Basis.looking_at(gaze, up), eye)
+	camera.transform = Transform3D.IDENTITY
+	boom_length = 0.0

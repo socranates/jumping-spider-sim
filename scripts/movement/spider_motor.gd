@@ -150,6 +150,8 @@ const ACQUIRE_REACH := 0.3       # WU below the body searched for support after 
 const ACQUIRE_TICKS := 3         # ticks a spawned spider waits for the world to become visible to queries
 const BACKTRACK_COOLDOWN_TICKS := 8
 const PREPARE_TURN_RATE_DEG_S := 360.0  # cosmetic: how fast the body turns toward the aim point while preparing
+## T10a: how far either way of the body's gaze the principal eyes' retinas can point the sharp field (see set_scan_direction).
+const PRINCIPAL_SCAN_DEG := 30.0
 const EYE_FORWARD := 0.18               # WU from the body centre along the facing, and EYE_UP along the body's up: where the
 const EYE_UP := 0.08                    # eyes are. Both inside the 0.3 WU collider, so a ray from the eye never starts in the world
 const FOCUS_TURN_FALLBACK_DEG_S := 180.0  # used when there is no species profile: see the profile's perception section
@@ -230,6 +232,7 @@ var _visual_up: Vector3 = Vector3.UP
 var _tick: int = 0
 var _focus_on: bool = false          # Focus is held (spec 7): the body turns toward _focus_dir
 var _focus_dir: Vector3 = Vector3.ZERO
+var _scan_dir: Vector3 = Vector3.ZERO   # T10a: where the spider-eye view points the principal eyes; ZERO: straight ahead
 var _focus_rate: float = deg_to_rad(FOCUS_TURN_FALLBACK_DEG_S)
 var _gaze_limit: float = deg_to_rad(GAZE_PITCH_FALLBACK_DEG)
 var _gaze_pitch: float = 0.0         # how far the gaze is tilted off the support plane, radians, up positive
@@ -484,10 +487,38 @@ func get_focus_direction() -> Vector3:
 	return _focus_dir
 
 
-## The axis of the inspection cone: the facing, tilted by the gaze pitch about the body's right.
+## The axis of the inspection cone. The body's own gaze (the facing tilted by the gaze pitch), unless the spider-eye view has pointed
+## the principal eyes' retinas elsewhere (set_scan_direction): then that direction, held within PRINCIPAL_SCAN_DEG of the body's gaze.
 func get_gaze_direction() -> Vector3:
+	var axis := get_body_gaze_direction()
+	if _scan_dir == Vector3.ZERO:
+		return axis
+	var angle := axis.angle_to(_scan_dir)
+	var reach := deg_to_rad(PRINCIPAL_SCAN_DEG)
+	if angle <= reach:
+		return _scan_dir
+	var turn_axis := axis.cross(_scan_dir)
+	if turn_axis.length_squared() < 1e-10:
+		return axis
+	return axis.rotated(turn_axis.normalized(), reach).normalized()
+
+
+## The facing tilted by the gaze pitch about the body's right: where the eyes point with the retinas centred.
+func get_body_gaze_direction() -> Vector3:
 	var b := SupportMath.body_basis(_visual_up, _heading)
 	return ((-b.z) * cos(_gaze_pitch) + b.y * sin(_gaze_pitch)).normalized()
+
+
+## T10a, the spider-eye view: where the player points the principal eyes (a world direction; ZERO: straight ahead). Salticid principal
+## eyes are fixed lenses in front of movable retinas, which six muscles swing through about 50 degrees (Land 1969), so the sharp
+## field can be pointed without turning the body, over a field of about 60 by 60 degrees (Tarsitano and Jackson 1992). Beyond that
+## the body has to turn. Nothing else changes: facing, walking and jumping are as before.
+func set_scan_direction(world_dir: Vector3) -> void:
+	_scan_dir = world_dir.normalized() if world_dir.is_finite() and world_dir.length_squared() > 1e-8 else Vector3.ZERO
+
+
+func get_scan_direction() -> Vector3:
+	return _scan_dir
 
 
 func get_gaze_pitch() -> float:
@@ -1181,13 +1212,16 @@ func _turn_heading(delta: float) -> void:
 
 
 ## The gaze tilts toward the focus direction (within the gaze limit) while Focus is held on a support, and settles back to the
-## support plane, at half that rate, when it is not.
+## support plane, at half that rate, when it is not. T10a: in the spider-eye view it tilts, at that half rate, toward the scan direction.
 func _update_gaze(delta: float) -> void:
 	var wanted := 0.0
 	var rate := _focus_rate * 0.5
 	if _focus_on and is_supported():
 		wanted = clampf(asin(clampf(_focus_dir.dot(support.normal), -1.0, 1.0)), -_gaze_limit, _gaze_limit)
 		rate = _focus_rate
+	elif _scan_dir != Vector3.ZERO and is_supported():
+		# T10a: in the spider-eye view the cephalothorax tilts toward where the principal eyes are pointed, within the same limit.
+		wanted = clampf(asin(clampf(_scan_dir.dot(support.normal), -1.0, 1.0)), -_gaze_limit, _gaze_limit)
 	_gaze_pitch = move_toward(_gaze_pitch, wanted, rate * delta)
 
 

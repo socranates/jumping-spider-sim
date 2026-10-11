@@ -23,6 +23,10 @@ const CARRY_STICK_DEG := 30.0
 const CARRY_AGREE_DEG := 25.0
 ## How far the camera's aim ray looks for the point Focus turns the body toward (WU).
 const FOCUS_RANGE := 60.0
+## T10a, spider-eye view: standing still, the body turns to face the gaze once the gaze is further than the principal eyes can point
+## (the motor's PRINCIPAL_SCAN_DEG, measured on the surface), and stops when it is within EYE_SETTLE_DEG. Real salticids turn to face
+## what the secondary eyes catch, then inspect it with the principal eyes. Walking turns the body as before.
+const EYE_SETTLE_DEG := 4.0
 
 var motor: Node3D        # SpiderMotor
 var camera_rig: Node3D   # supplies the camera yaw and pitch
@@ -45,6 +49,7 @@ var _focus_cancel_pending: bool = false
 var _carrying: bool = false
 var _carry_stick: Vector2 = Vector2.ZERO
 var _last_serial: int = 0
+var _eye_turning: bool = false
 
 
 func _ready() -> void:
@@ -66,12 +71,56 @@ func _physics_process(_delta: float) -> void:
 		return
 	var raw: Vector2 = stick_override if stick_override is Vector2 else Input.get_vector("move_left", "move_right", "move_forward", "move_back")
 	var stick := Vector2(raw.x, -raw.y)  # x right, y forward
-	var yaw: float = camera_rig.view_yaw() if camera_rig != null else 0.0
-	var pitch: float = camera_rig.get_view_elevation() if camera_rig != null and camera_rig.has_method("get_view_elevation") else 0.0
-	var fresh := SurfaceInput.map_stick(stick, yaw, pitch, motor.get_support_normal())
+	var fresh: Vector3
+	if camera_rig != null and camera_rig.has_method("map_stick"):
+		fresh = camera_rig.map_stick(stick, motor.get_support_normal())
+	else:
+		var yaw: float = camera_rig.view_yaw() if camera_rig != null else 0.0
+		var pitch: float = camera_rig.get_view_elevation() if camera_rig != null and camera_rig.has_method("get_view_elevation") else 0.0
+		fresh = SurfaceInput.map_stick(stick, yaw, pitch, motor.get_support_normal())
 	motor.set_intent(_carry(stick, fresh), _read_stalk())
 	var focusing := _read_focus()
-	motor.set_focus(focusing, focus_direction() if focusing else Vector3.ZERO)
+	var dir := focus_direction() if focusing else Vector3.ZERO
+	if _eye_view():
+		var gaze: Vector3 = camera_rig.gaze
+		if motor.has_method("set_scan_direction"):
+			motor.set_scan_direction(gaze)
+		if not focusing and _eye_turn(stick, gaze):
+			focusing = true
+			dir = gaze
+	else:
+		_eye_turning = false
+		if motor.has_method("set_scan_direction"):
+			motor.set_scan_direction(Vector3.ZERO)
+	motor.set_focus(focusing, dir)
+
+
+func _eye_view() -> bool:
+	return camera_rig != null and camera_rig.get("eye_view") == true  # a stand-in rig without the eye view is never in it
+
+
+## True while the spider-eye view turns the body toward the gaze (see EYE_SETTLE_DEG). Only standing on a surface with the stick idle.
+func _eye_turn(stick: Vector2, gaze: Vector3) -> bool:
+	if stick.length() > 0.05 or not _on_surface():
+		_eye_turning = false
+		return false
+	var n: Vector3 = motor.get_support_normal()
+	var look := gaze - n * gaze.dot(n)
+	if look.length_squared() < 1e-6:
+		_eye_turning = false
+		return false
+	var heading: Vector3 = motor.get_heading_vector()
+	var off := rad_to_deg(absf(heading.signed_angle_to(look.normalized(), n)))
+	if not _eye_turning and off > float(motor.PRINCIPAL_SCAN_DEG):
+		_eye_turning = true
+	elif _eye_turning and off < EYE_SETTLE_DEG:
+		_eye_turning = false
+	return _eye_turning
+
+
+## True while the body is turning on its own to face the spider-eye view's gaze.
+func is_eye_turning() -> bool:
+	return _eye_turning
 
 
 ## True while a toggled Focus is on (never in hold mode: there the button is the state).

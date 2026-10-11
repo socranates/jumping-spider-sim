@@ -10,7 +10,11 @@ Nathan runs **one agent at a time** and hands off back and forth; he does not me
 
 1. **Start from `main`.** Fetch, check out `main` (or branch from it), and read `claude/where-we-left-off.md` and the newest handoff.
 2. **Finish into `main`.** When your turn ends, run the checks, update `claude/where-we-left-off.md` and your handoff, and put your work into `main` yourself (a branch plus a pull request you merge, or a direct push if your setup allows it). Never leave the other agent's starting point on a side branch.
-3. **Nathan only says who is up** ("Claude, hand off" / "Chet, pick up from main"). To play the newest build he runs `git checkout main` then `git pull` (or asks the agent to).
+3. **Nathan only says who is up** ("Claude, hand off" / "Chet, pick up from main").
+4. **Nathan's laptop gets the latest too.** Nathan asked (2026-10-11) that both GitHub and his laptop be updated after each turn.
+   - An agent working on his PC (Chet) runs `update.bat` in his project folder itself (or `git checkout main` and `git pull --ff-only`) after merging, and confirms the folder is on the new commit.
+   - An agent in the cloud (Claude) cannot reach his PC. It ends every turn by telling him: "double-click `update.bat`, then `play.bat`".
+   - `update.bat` refuses to touch local changes to tracked files and says so.
 
 The rules below about inspecting local work and never force-pushing over another agent still apply.
 

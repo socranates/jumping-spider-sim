@@ -19,6 +19,8 @@ Chet's PR #2 (Windows/web export presets, a standalone leg prototype, review 5) 
 
 **Nathan's playtest, 2026-10-11** (after `git pull` of `main`): "now its updated and is looking very good now with the changes. the mechanics are working well." He had first played an old local copy: his folder had not been pulled, so the struggle mini-game was missing. Remind him to run `git checkout main` then `git pull` after each handoff.
 
+**Updating Nathan's laptop:** after each turn, the agent on his PC runs `update.bat` there. Claude (cloud) tells him to double-click `update.bat`, then `play.bat`. `update.bat` (2026-10-11) runs fetch, checkout of main and a fast-forward pull, and stops without changing anything if tracked files were edited locally. It is not yet run on Windows, so ask Nathan whether it worked.
+
 Unfinished (T09 part 2 and the human gates):
 - Controller remapping, reduced-effects and nonvisual cue options, assisted-play presets, and a Windows interrupted-write test.
 - Human U01: the loop with controller only, remapped keys, toggle preparation and sound muted. Human W01, E02, graphical M04 and F01 are still open.

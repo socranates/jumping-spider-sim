@@ -4,6 +4,10 @@ A third-person prototype about living as a jumping spider. The design is in `doc
 
 Shared development: see [the agent handoff](claude/where-we-left-off.md), [GitHub workflow](docs/SHARED_WORKFLOW.md), and [verification reports](docs/verification/).
 
+## Getting the latest version
+
+After Claude or ChatGPT says their work is done, **double-click `update.bat`**. It downloads the newest version from GitHub into this folder; then double-click `play.bat`. It never throws away your own changes: if it finds any, it stops and shows them. (By hand, in a command window in this folder: `git checkout main` then `git pull`.)
+
 ## Current build: T09 part 1 — checkpoints and first accessibility pieces
 
 Claude added these on 2026-10-10 on top of chunk 8 (see `docs/HANDOFF-chunk-9.md`). Movement, camera, hunting and feeding are unchanged.

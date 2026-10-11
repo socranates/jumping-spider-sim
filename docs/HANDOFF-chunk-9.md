@@ -136,3 +136,7 @@ Claude did this while Chet's live-legs work waited for his usage to reset. Natha
 **For Chet (live legs).** None of your open files was touched: `main.gd`, `spider_body.gd`, `spider_legs.gd`, `test_spider_legs.gd`, `test_live_spider_legs.gd`, and your capture script. Commit your work on a branch, then merge `main` into it; there should be no conflicts. The evidence id will change because the scripts and tests changed.
 
 **Still open from T09 part 2:** global slow time and a separate survival-pressure setting (they need `main.gd`, so after the legs are merged); a Windows interrupted-write test; the human U01, W01, E02, M04 and F01 sessions.
+
+## Chet continuation — live legs (2026-10-10, America/Chicago)
+
+The live leg rig is integrated on top of T09d, retaining the twitch and Reduced motion. See `HANDOFF-live-legs.md` for the current handoff. Combined evidence **cfdc7fac7ce0**, **536/536** on Windows headless at fixed 60 fps; leg/support/T09d tests **28/28** at normal speed. The old F4 failure is cleared: it also passed in the original 522-test baseline's normal-speed Windows run. `main.gd` is available for the next T09 work after this handback.

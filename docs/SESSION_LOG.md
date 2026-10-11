@@ -1001,3 +1001,7 @@ Chet reviews this entry, `docs/HANDOFF-chunk-7.md` and the tests named above. Na
 - Final: evidence 3fb300501a68, 530 of 530 (fixed 60 fps, Linux headless); access and prompt tests at fixed 30 and 144. Not run on Windows.
 - Nathan after updating: "its so fun, I love the twitchy ness. They almost look like they glitch in real life." The twitch layer stays when the legs are wired in.
 
+### 2026-10-10 (America/Chicago): Chet completes live legs
+- Nathan approved option 1. Static legs replaced by the cosmetic gait rig; body twitch preserved; Reduced motion controls the rig and stops an active catch recoil. Fixed local-axis cylinder scaling and included the live script in both exports.
+- Resumed after T09d, rebased onto `eacec52`. Combined Windows evidence `cfdc7fac7ce0`: 536/536 at fixed 60 fps, 28/28 leg/support/T09d tests at normal speed. Earlier original baseline: 522/522 normal-speed, including F4. See `HANDOFF-live-legs.md`.
+

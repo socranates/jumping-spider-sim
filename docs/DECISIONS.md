@@ -216,3 +216,10 @@ Done while Chet's live-legs work waited for his usage to reset. No file in his o
   - Reduced motion is still the only "reduced effects" setting; the game has no camera shake, blur or depth of field to turn off.
   - There is no audio yet, so the nonvisual-cue options have nothing to replace.
 
+## Live legs — Chet, 2026-10-10 (America/Chicago)
+
+- **LEG-01 Live cosmetic rig.** Nathan approved option 1. Replace the static legs with the existing alternating four-leg rig under the body child, retaining all twitch/recoil behavior and the live material. Feed support-tangent motor velocity in the model's local frame once per physics tick. No gameplay state, physics, camera, senses or gameplay RNG changes.
+- **LEG-02 Reduced motion.** The setting holds the legs in their neutral stance and disables twitch/recoil. Switching it on clears an already active recoil on the next tick. Presets keep their T09d behavior and leave this preference alone.
+- **LEG-03 Connected geometry and packages.** Scale each cylinder along its local length axis, not world Y; a regression checks the actual mesh endpoints. Include the leg script in both export presets now that the live body requires it; keep standalone preview scenes excluded.
+- **LEG-04 Scope.** Individual surface-contact IK, planted world-space feet, turning steps and transition blending remain outside this cosmetic integration. Nathan's gait-feel approval and sustained graphical performance checks remain separate from automated tests.
+

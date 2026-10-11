@@ -1,0 +1,11 @@
+Found Godot and saved its path to godot_path.txt
+Godot: C:\Users\natha\Downloads\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe
+Writing a snapshot of the whole project, except .godot and tests\reports.
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+evidence_id: cfdc7fac7ce0 (source b62a1278, settings 8b6707d4, tests 2c47e7aa)
+SNAPSHOT C:/Users/natha/.codex/.chatgpt-projects/g-p-6ac2f32f82a48191b0c7151a11eab0fd/legs_integration/tests/reports/snapshots/2026-10-11_cfdc7fac7ce0.zip files=427 (plus SNAPSHOT.txt) bytes=5324411 evidence_id=cfdc7fac7ce0 verified=yes
+
+Snapshot written and read back with every file identical.
+The file name is the UTC date and the evidence id. The same id is in tests\reports\last_report.txt.
+Folder: C:\Users\natha\.codex\.chatgpt-projects\g-p-6ac2f32f82a48191b0c7151a11eab0fd\legs_integration\tests\reports\snapshots

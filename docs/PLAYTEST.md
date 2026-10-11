@@ -56,5 +56,6 @@ Before starting: double-click `update.bat`, then `play.bat`.
 **2026-10-11, Nathan:**
 - "everthing on the checklist functions the way it should. It is really fun, camera works great, 1st person is super cool."
 - One change asked for: "the tapping when catching a fly should be a bit harder and just stop when it is full". Done in T11b.
+- After playing T11b: "yes excellent it all works great now. the tapping should be harder still", and "also make the bar bright red". Done in T11c: five presses a second or more, and a bright red grip bar.
 - Not confirmed: whether section 4 was played with a controller. Earlier Nathan had no controller for the PC. U01's controller-only part therefore stays open until someone plays with one.
 

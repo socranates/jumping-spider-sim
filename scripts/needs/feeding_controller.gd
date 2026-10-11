@@ -55,13 +55,16 @@ var refusals: Dictionary = {}
 ## more is needed (two or so loses the fly; five fills the bar in about four seconds, seven in about two). The fly's struggles weaken as the
 ## bite's venom works, to VENOM_FLOOR of their strength over its own VENOM_S, so a long fight gets easier; after STRUGGLE_MAX_S the venom
 ## has subdued it whatever the bar shows. The numbers come from a sweep of tap rates (docs/verification/t11b/struggle_tuning.txt).
+## T11c (Nathan, after playing T11b: "the tapping should be harder still"): a steady five presses a second or more is needed now. Four
+## loses the fly; five fills the bar in about nine seconds, six in about six, seven in about four, eight in about two and a half. The fly
+## starts with the bar lower, fights harder and tires more slowly (to half its strength over 6-8 s).
 ## Played worlds struggle; test worlds only when a test asks.
-const GRIP_START := 0.45
-const GRIP_TAP := 0.10
-const GRIP_DRAIN_PER_S := 0.28
-const GRIP_JERK := 0.10
-const VENOM_S := Vector2(5.0, 7.0)
-const VENOM_FLOOR := 0.4
+const GRIP_START := 0.40
+const GRIP_TAP := 0.085
+const GRIP_DRAIN_PER_S := 0.32
+const GRIP_JERK := 0.12
+const VENOM_S := Vector2(6.0, 8.0)
+const VENOM_FLOOR := 0.5
 const STRUGGLE_MAX_S := 12.0
 const AUTO_FILL_PER_S := 0.4
 const JERK_GAP_S := Vector2(0.35, 0.75)

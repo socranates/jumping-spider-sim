@@ -19,6 +19,12 @@ var _prompt_hint: Label
 var _prompt_bar: ColorRect
 var _prompt_back: ColorRect
 const PROMPT_BAR_W := 160.0
+## T11c (Nathan: "also make the bar bright red"): the grip bar while a caught fly struggles. When the grip runs low the bar pulses
+## lighter twice a second, so the warning does not rest on colour alone. The other gauges (eating) keep the soft yellow.
+const STRUGGLE_RED := Color(1.0, 0.06, 0.04, 1.0)
+const STRUGGLE_PULSE := Color(1.0, 0.62, 0.55, 1.0)
+const GAUGE_YELLOW := Color(0.95, 0.80, 0.35, 0.85)
+var _pulse_t: float = 0.0
 
 
 func _ready() -> void:
@@ -73,13 +79,14 @@ func _ready() -> void:
 	_prompt_back.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_prompt_box.add_child(_prompt_back)
 	_prompt_bar = ColorRect.new()
-	_prompt_bar.color = Color(0.95, 0.80, 0.35, 0.85)
+	_prompt_bar.color = GAUGE_YELLOW
 	_prompt_bar.size = Vector2(0.0, 7.0)
 	_prompt_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_prompt_back.add_child(_prompt_bar)
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
+	_pulse_t += delta
 	refresh()
 
 
@@ -98,10 +105,23 @@ func refresh() -> void:
 		_prompt_hint.text = str(d["hint"])
 		_prompt_back.visible = not bool(d.get("no_bar", false))
 		_prompt_bar.size = Vector2(PROMPT_BAR_W * clampf(float(d["left"]), 0.0, 1.0), 7.0)
-		var urgent := bool(d.get("urgent", false))
-		_prompt_bar.color = Color(1.0, 0.45, 0.25, 0.95) if urgent else Color(0.95, 0.80, 0.35, 0.85)
+		_prompt_bar.color = bar_colour(d)
 		_prompt_back.custom_minimum_size = Vector2(PROMPT_BAR_W, 12.0 if d.has("urgent") else 7.0)
 		_prompt_bar.size.y = _prompt_back.custom_minimum_size.y
+
+
+## The gauge's colour for a prompt: bright red while prey struggles (pulsing lighter when the grip is low), soft yellow otherwise.
+func bar_colour(d: Dictionary) -> Color:
+	if not d.has("urgent"):
+		return GAUGE_YELLOW
+	if not bool(d["urgent"]):
+		return STRUGGLE_RED
+	var k := 0.5 + 0.5 * sin(_pulse_t * TAU * 2.0)
+	return STRUGGLE_RED.lerp(STRUGGLE_PULSE, k)
+
+
+func prompt_bar_colour() -> Color:
+	return _prompt_bar.color
 
 
 func _label(size: int) -> Label:

@@ -25,6 +25,8 @@ Native AMD Radeon screenshots show the real windowsill spider's corrected legs, 
 
 ## Next
 
+**Latest (Claude, 2026-10-11, T12b):** Nathan heard nothing. A recording proved the mix was too low-pitched and quiet for laptop speakers. It has been rebuilt brighter and louder, with birds outside, and an Esc-menu **Headphones** switch (off: speaker tuning). Evidence **0c295e07077e**: 567/567 (Linux headless). See the T12b section of `docs/HANDOFF-sound-senses.md`. Chet still has the next round (step 4).
+
 **Latest (Claude, 2026-10-11, T12a):** sound and the spider's other senses. There is a generated soundscape (room, flies, the shadow), a vibration sense through touching solids only, captions with directions, ripples, rumble, and volume sliders. Evidence **4daaf055b746**: 565/565 (Linux headless); not run on Windows, and nobody has listened yet. Read `docs/HANDOFF-sound-senses.md`. **Chet has the next round: ROADMAP step 4, movement realism part 2** (the handoff ends with the list).
 
 **Latest (Claude, 2026-10-11, T11b):** Nathan played the whole checklist: everything works, "really fun, camera works great, 1st person is super cool". The struggle is harder and ends the moment the grip bar is full (STRUGGLE-01). Evidence **d9ed40eeeecf**: 557/557 (Linux headless); not run on Windows. Results in `docs/PLAYTEST.md`. U01's controller-only part is still open (no controller). Next by the plan: step 3, sound and the spider's other senses, unless Nathan picks otherwise.

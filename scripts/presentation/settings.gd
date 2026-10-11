@@ -34,6 +34,7 @@ const DEFAULTS := {
 	"volume_cues": 0.9,        # T12a: the spider's world (flies, felt vibrations)
 	"captions": true,          # T12a: a line for each sound cue, with its direction (works muted)
 	"haptics": true,           # T12a: a controller rumbles when the spider feels a vibration
+	"headphones": false,       # T12b: off: shaped for laptop speakers (no deep bass, more presence); on: the full, deep range
 }
 ## Inclusive [min, max] for the numeric settings.
 const LIMITS := {

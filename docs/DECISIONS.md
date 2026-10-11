@@ -380,3 +380,11 @@ Nathan: "chet just finished and its freakin amazing you guys are making this so 
   - Eye, sensor, perception and sense tests: 69 / 69 at fixed 30 and 144 fps.
   - Stills and reports are in `docs/verification/t13a/`.
   - Not run on Windows, and not played yet.
+
+## Direction — a calm game that teaches (Nathan, 2026-10-11)
+
+- **LEARN-01 Teach through play, truthfully.** Nathan: "this could also teach people about jumping spiders right? it will be like a super beautiful, serene, slow play. Hyper real environment to slowly explore, very detailed and proportionate to tiny spiders, just super natural, presenting facts maybe as you learn to play etc. something to keep in mind."
+  - Recorded as a long-term direction (ROADMAP, Long term), not a current task.
+  - Facts would come through the spec's field notebook as the player first does things: short, optional, each with its source.
+  - Before anything is taught as fact, the game's deliberate simplifications get fixed or plainly labelled: tuned gravity, the "fly-like" prey, UV and depth from defocus.
+  - Keep the true scale (1 WU = 1 cm) and the slow, pressure-free default.

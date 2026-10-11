@@ -115,12 +115,12 @@ func test_over_an_edge_the_view_is_carried_with_the_body_and_never_turns_suddenl
 	settings.set_value("eye_view", true)
 	await physics_frames(3)
 	var rig := _rig()
-	var worst := [0.0, 0.0]   # largest turn of the camera's up in one frame (degrees), largest gaze elevation off the surface
-	var last_up := [rig.camera.global_transform.basis.y]
+	var worst := [0.0, 0.0]   # largest turn of the view's up in one physics tick (degrees), the gaze's final angle off the surface
+	var last_up := [rig._gaze_up]
 	world.controller.stick_override = Vector2(0.0, -1.0)
 	for i in 300:
 		await physics_frames(1)
-		var up: Vector3 = rig.camera.global_transform.basis.y
+		var up: Vector3 = rig._gaze_up
 		worst[0] = maxf(float(worst[0]), rad_to_deg(up.angle_to(last_up[0] as Vector3)))
 		last_up[0] = up
 	world.controller.stick_override = null
@@ -131,7 +131,9 @@ func test_over_an_edge_the_view_is_carried_with_the_body_and_never_turns_suddenl
 	check(on_wall, "the spider climbed onto the wall (normal %s)" % str(world.spider.get_support_normal()))
 	check(rig.gaze.dot(Vector3.UP) > 0.8, "and the view went up the wall with it (gaze %s)" % str(rig.gaze))
 	check(float(worst[1]) < 5.0, "the gaze ends along the wall, as the eyes do (%.1f degrees off it)" % float(worst[1]))
-	check(float(worst[0]) <= rig.EYE_ROLL_DEG_S / 60.0 + 0.1, "the view never turned suddenly (at most %.1f degrees in a frame)" % float(worst[0]))
+	check(float(worst[0]) <= rig.EYE_ROLL_DEG_S / float(Engine.physics_ticks_per_second) + 0.1, "the view never turned suddenly (at most %.1f degrees a tick; drawn frames interpolate between ticks)" % float(worst[0]))
+	var cam_up: Vector3 = rig.camera.global_transform.basis.y
+	check(cam_up.angle_to(rig._gaze_up) < deg_to_rad(5.0), "and the drawn view is that up")
 
 
 # ------------------------------------------------------------------ the principal eyes

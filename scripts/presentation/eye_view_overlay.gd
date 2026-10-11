@@ -108,7 +108,7 @@ func _label(size: int) -> Label:
 
 
 func is_on() -> bool:
-	return camera_rig != null and is_instance_valid(camera_rig) and bool(camera_rig.get("eye_view"))
+	return camera_rig != null and is_instance_valid(camera_rig) and camera_rig.get("eye_view") == true
 
 
 func _process(delta: float) -> void:

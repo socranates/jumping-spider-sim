@@ -96,7 +96,7 @@ func _physics_process(_delta: float) -> void:
 
 
 func _eye_view() -> bool:
-	return camera_rig != null and bool(camera_rig.get("eye_view"))
+	return camera_rig != null and camera_rig.get("eye_view") == true  # a stand-in rig without the eye view is never in it
 
 
 ## True while the spider-eye view turns the body toward the gaze (see EYE_SETTLE_DEG). Only standing on a surface with the stick idle.

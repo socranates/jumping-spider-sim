@@ -311,13 +311,14 @@ func _apply_ui_scale() -> void:
 		get_tree().root.content_scale_factor = float(settings.get_value("ui_scale"))
 
 
-## T09b: "Reduced motion" keeps the spider's model still (the twitch and the catch recoil are looks only, so nothing else changes).
+## "Reduced motion" keeps the model still: neutral legs, no twitch or catch recoil.
 func _apply_reduced_motion() -> void:
 	var body := spider.get_node_or_null("Body") if spider != null else null
 	if body != null:
 		var calm := bool(settings.get_value("reduced_motion"))
 		body.twitch_enabled = not calm
 		body.recoil_enabled = not calm
+		body.gait_enabled = not calm
 
 
 func _on_setting_changed(key: String) -> void:

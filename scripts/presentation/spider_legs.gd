@@ -1,5 +1,5 @@
 extends Node3D
-## Standalone cosmetic gait prototype. +Y is support-up, -Z is forward.
+## Cosmetic gait used by the live spider and the standalone preview. +Y is support-up, -Z is forward.
 ## The caller supplies velocity in this node's local support frame. No motor,
 ## input, settings, RNG, collision, rays or save state are read or changed here.
 ## Call advance_pose once per physics tick, after updating the body's frame.
@@ -16,12 +16,15 @@ const STANCE_SHARE := 0.65
 var _phase: float = 0.0
 var _feet: Array[Vector3] = []
 var _segments: Array[MeshInstance3D] = []
+## Supply before adding to the tree to match the caller's body material.
+var material: StandardMaterial3D
 
 
 func _ready() -> void:
-	var material := StandardMaterial3D.new()
-	material.albedo_color = Color("594034")
-	material.roughness = 0.8
+	if material == null:
+		material = StandardMaterial3D.new()
+		material.albedo_color = Color("594034")
+		material.roughness = 0.8
 	for i in 16:
 		var mesh := CylinderMesh.new()
 		mesh.top_radius = 0.026 if i % 2 == 0 else 0.020
@@ -95,4 +98,7 @@ func foot_positions() -> Array[Vector3]:
 func _place_segment(segment: MeshInstance3D, from: Vector3, to: Vector3) -> void:
 	var direction := to - from
 	var basis := Basis(Quaternion(Vector3.UP, direction.normalized()))
-	segment.transform = Transform3D(basis.scaled(Vector3(1.0, direction.length(), 1.0)), (from + to) * 0.5)
+	# Scale the cylinder's LOCAL length axis. World-axis scaling skews a tilted rod
+	# and leaves its ends sticking through (or falling short of) the knee.
+	basis.y *= direction.length()
+	segment.transform = Transform3D(basis, (from + to) * 0.5)

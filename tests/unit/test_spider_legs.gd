@@ -1,6 +1,21 @@
 extends "res://tests/test_case.gd"
 const Legs = preload("res://scripts/presentation/spider_legs.gd")
 
+func test_rendered_rods_join_at_knees_and_end_at_the_reported_feet() -> void:
+	var legs := Legs.new()
+	sandbox.add_child(legs)
+	for mode in 5:
+		legs.advance_pose(0.07, Vector3.ZERO if mode == 4 else Vector3(1, 0, -2), mode != 2, mode == 1, mode == 3)
+		var feet := legs.foot_positions()
+		for i in 8:
+			var upper: MeshInstance3D = legs.get_child(i * 2)
+			var lower: MeshInstance3D = legs.get_child(i * 2 + 1)
+			var hip := Vector3((-1.0 if i < 4 else 1.0) * 0.16, 0.02, Legs.HIP_Z[i % 4])
+			check_vec_near(upper.transform * Vector3(0, -0.5, 0), hip, 1e-6, "upper rod starts at the hip")
+			check_vec_near(upper.transform * Vector3(0, 0.5, 0), lower.transform * Vector3(0, -0.5, 0), 1e-6, "rods meet at the knee")
+			check_vec_near(lower.transform * Vector3(0, 0.5, 0), feet[i], 1e-6, "lower rod ends at the foot")
+	legs.free()
+
 func test_cosmetic_pose_is_bounded_and_does_not_move_its_parent() -> void:
 	var parent := Node3D.new()
 	var legs := Legs.new()

@@ -14,7 +14,7 @@ Windows: distribute `JumpingSpiderSim.exe` and `JumpingSpiderSim.pck` together. 
 
 Web: distribute the **entire generated web folder**, preserving names, with `index.html` as the entry point. Serve over HTTPS (or localhost for testing), not by opening the HTML as a local file. The preset uses a single thread, no extensions and no PWA. It does not require cross-origin isolation headers. The current game needs desktop keyboard/mouse or a controller; this is not a touch-control port. Browser saves depend on persistent browser storage and are not synchronized with the Windows game.
 
-Only game resources and the JSON tuning data are packaged. Tests, evidence screenshots, handoff documents and the standalone leg prototype are excluded. Keep the renderer and physics settings unchanged; web performance, browser save recovery, pointer lock and controller behavior still require platform playtesting before distribution as a supported release.
+Only game resources and the JSON tuning data are packaged, including the live spider's leg rig. Tests, evidence screenshots, handoff documents and the standalone leg preview scene are excluded. Keep the renderer and physics settings unchanged; web performance, browser save recovery, pointer lock and controller behavior still require platform playtesting before distribution as a supported release.
 
 Official references: [Windows export](https://docs.godotengine.org/en/stable/tutorials/export/exporting_for_windows.html), [web export and browser restrictions](https://docs.godotengine.org/en/stable/tutorials/export/exporting_for_web.html).
 
@@ -32,4 +32,4 @@ Right arrow selects a pose; Space toggles automatic cycling. Walking, stalking, 
 
 This is a prototype of alternating four-leg motion, not anatomical gait research or surface IK. It has no individual foot raycasts, turning-in-place steps, world-space foot planting or smooth transition blend. Stop/reduced-motion resets immediately to the neutral stance. These limits are deliberate until Nathan approves the look.
 
-Future integration belongs under `spider_body.gd`'s cosmetic twitch layer: replace its existing static leg meshes, then feed this node the support-frame movement. Do not simply add it beside the existing legs (that would draw sixteen legs). Coordinate first before changing the body or any shared gameplay code; this branch does not attach the prototype to the game.
+The rig is now integrated under `spider_body.gd`'s cosmetic twitch layer, replacing the static legs. The body supplies movement in its local frame and preparation/support state once per physics tick. Reduced motion holds the neutral stance and stops twitch/recoil. Both export presets include the rig; only the isolated preview remains excluded. See `docs/HANDOFF-live-legs.md` for verification and remaining visual limitations.

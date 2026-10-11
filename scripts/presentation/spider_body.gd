@@ -1,7 +1,9 @@
 extends Node3D
-## Cosmetic placeholder spider, built from primitive meshes. About 1 WU long with the head
-## toward -Z. Static pose: leg tips sit 0.3 WU below the origin, which is the centre of the
-## 0.3 WU sphere collider, so the spider appears to stand on the surface it touches.
+## Cosmetic spider, built from primitive meshes. About 1 WU long, head toward -Z.
+## The leg rig inherits the twitch/recoil and uses movement in the model's local frame.
+## Neutral tips sit 0.3 WU below the origin, at the sphere collider's support plane.
+
+const SpiderLegs = preload("res://scripts/presentation/spider_legs.gd")
 
 const BODY_COLOR := Color(0.14, 0.11, 0.10)
 const LEG_COLOR := Color(0.19, 0.15, 0.13)
@@ -9,10 +11,8 @@ const EYE_COLOR := Color(0.01, 0.01, 0.01)
 const SPOT_COLOR := Color(0.92, 0.9, 0.84)
 const FANG_COLOR := Color(0.16, 0.58, 0.47)
 
-# Legs, front pair to back pair (left side; the right side mirrors x).
-const HIP_Z := [-0.36, -0.24, -0.12, 0.0]
-const KNEE_Z := [-0.62, -0.38, -0.06, 0.30]
-const TIP_Z := [-0.82, -0.52, 0.12, 0.62]
+var gait_enabled: bool = true
+var legs: Node3D
 
 ## Catch recoil (A-018, cosmetic): when the line catches the spider, the model is thrown a little way along the line, away
 ## from the anchor, and settles back in a damped bounce of about a third of a second. It moves only this node, a child of the
@@ -96,6 +96,9 @@ func is_recoiling() -> bool:
 
 
 func _physics_process(delta: float) -> void:
+	if not recoil_enabled:
+		_recoiling = false
+		recoil_offset = Vector3.ZERO
 	if _recoiling:
 		_recoil_t += delta
 		var envelope := exp(-RECOIL_DAMPING * _recoil_t)
@@ -106,6 +109,23 @@ func _physics_process(delta: float) -> void:
 	_twitch(delta)
 	position = recoil_offset + twitch_offset
 	rotation = Vector3(0.0, twitch_yaw, 0.0)
+	_update_legs(delta)
+
+
+func _update_legs(delta: float) -> void:
+	var motor := get_parent()
+	if legs == null or motor == null or not motor.has_method("is_supported"):
+		return
+	var grounded: bool = motor.is_supported()
+	var travel: Vector3 = motor.velocity
+	if grounded:
+		var normal: Vector3 = motor.get_support_normal()
+		travel -= normal * travel.dot(normal)
+	# Convert world travel after the motor's frame and this child's twitch have updated.
+	# No extra phase from cosmetic lurches, idle flicks or catch recoil.
+	var local_velocity: Vector3 = global_basis.inverse() * travel
+	legs.advance_pose(delta, local_velocity, grounded,
+		motor.state == motor.State.PREPARING, not gait_enabled)
 
 
 ## A jolt of the whole model (held prey struggling).
@@ -209,12 +229,10 @@ func _build() -> void:
 		_ellipsoid(Vector3(side * 0.12, 0.15, -0.16), Vector3(0.05, 0.05, 0.05), "eye")       # posterior lateral
 		_ellipsoid(Vector3(side * 0.06, 0.185, -0.20), Vector3(0.022, 0.022, 0.022), "eye")   # posterior median
 		_ellipsoid(Vector3(side * 0.05, -0.05, -0.46), Vector3(0.045, 0.045, 0.045), "fang")
-		for i in 4:
-			var hip := Vector3(side * 0.16, 0.02, HIP_Z[i])
-			var knee := Vector3(side * 0.50, 0.26, KNEE_Z[i])
-			var tip := Vector3(side * 0.78, -0.30, TIP_Z[i])
-			_segment(hip, knee, 0.035)
-			_segment(knee, tip, 0.028)
+	legs = SpiderLegs.new()
+	legs.name = "Legs"
+	legs.material = _material("leg")
+	add_child(legs)
 
 
 func _material(kind: String) -> StandardMaterial3D:
@@ -254,25 +272,4 @@ func _ellipsoid(center: Vector3, radii: Vector3, kind: String) -> void:
 	mi.material_override = _material(kind)
 	mi.position = center
 	mi.scale = radii
-	add_child(mi)
-
-
-func _segment(from: Vector3, to: Vector3, radius: float) -> void:
-	var dir := to - from
-	var length := dir.length()
-	var mesh := CylinderMesh.new()
-	mesh.bottom_radius = radius
-	mesh.top_radius = radius * 0.75
-	mesh.height = length
-	mesh.radial_segments = 6
-	mesh.rings = 1
-	var mi := MeshInstance3D.new()
-	mi.mesh = mesh
-	mi.material_override = _material("leg")
-	var unit := dir / length
-	var axis := Vector3.UP.cross(unit)
-	var basis := Basis.IDENTITY
-	if axis.length() > 0.0001:
-		basis = Basis(axis.normalized(), Vector3.UP.angle_to(unit))
-	mi.transform = Transform3D(basis, (from + to) * 0.5)
 	add_child(mi)

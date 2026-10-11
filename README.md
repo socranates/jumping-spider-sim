@@ -9,7 +9,7 @@ Shared development: see [the agent handoff](claude/where-we-left-off.md), [GitHu
 - The room hums, flies buzz from where they are, and a fly struggling in the jaws buzzes louder.
 - When a fly lands, takes off or walks on a surface joined to the spider's, the spider **feels** it: a low thrum, a ripple on that side of the screen, and a caption such as "[felt: footsteps, behind-left]". It never crosses an air gap.
 - Captions show every cue, so the game works muted.
-- Esc menu: Volume, Room sounds, Flies and vibrations, Captions, Controller rumble.
+- Esc menu: Volume, Room sounds, Flies and vibrations, Captions, Controller rumble, and **Headphones**. Off by default, which is tuned for laptop speakers; turn it on with headphones for the deep, full sound.
 
 ## New: slow motion, and an easy view switch (2026-10-11)
 

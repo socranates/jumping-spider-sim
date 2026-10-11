@@ -158,6 +158,7 @@ func _build() -> void:
 	_add_check(switches, "slow_motion", "Slow motion (T / right trigger)")
 	_add_check(switches, "captions", "Captions for sounds and vibrations")
 	_add_check(switches, "haptics", "Controller rumble for vibrations")
+	_add_check(switches, "headphones", "Headphones (deep, full sound; off: tuned for speakers)")
 	var buttons := HFlowContainer.new()  # wraps onto a second row on a narrow window or with large text
 	buttons.add_theme_constant_override("h_separation", 12)
 	buttons.add_theme_constant_override("v_separation", 8)

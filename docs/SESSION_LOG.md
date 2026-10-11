@@ -1029,3 +1029,6 @@ Chet reviews this entry, `docs/HANDOFF-chunk-7.md` and the tests named above. Na
 ### 2026-10-11: T12a sound and the spider's other senses (Claude, cloud session)
 - Nathan: "get done what you want to work on next and then chet can have the next round". Built ROADMAP step 3: generated sounds (room hum, fly buzz at 195 Hz, take-off, thrum, thud, whoosh), soundscape buses and volumes, a vibration sense through touching solids only, captions with directions, ripples, controller rumble, and slow motion slowing sound. Research: Shamble et al. 2016 (P. audax hears 80–380 Hz), house-fly wingbeat about 190–200 Hz, spider slit sensilla. Decisions SOUND-01 to SOUND-05.
 
+### 2026-10-11: T12b audible sound (Claude, cloud session)
+- Nathan: "i dont hear anything while playing"; then "you can optomize for headphones or have a setting for switvhing". Recorded the game's own mix with --write-movie: RMS −30 dBFS, 91 % of energy under 400 Hz (laptop speakers cannot play it). Rebuilt the sounds brighter, raised the levels, added birds, added a speaker/headphone switch with a limiter. Re-measured: −21 dBFS, 41 % above 400 Hz on speakers. SOUND-07, SOUND-08.
+

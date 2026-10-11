@@ -60,6 +60,31 @@ ROADMAP step 3, built on T11b (`main` at fda7566). Nathan: "get done what you wa
 - A sound for the strike and the bite. Real ones are near silent; it could be a soft tick.
 - Real recordings could replace the generated sounds later.
 
+## T12b — audible on laptop speakers, and a headphones switch (2026-10-11)
+
+Nathan: "i dont hear anything while playing", and "you can optomize for headphones or have a setting for switvhing".
+
+- **The cause was measured, not guessed.** A recording of the game's own mix (`--write-movie`) was very quiet (RMS −30 dBFS), with 91 % of its energy below 400 Hz and almost none above 1 kHz. The hum, thrum and thud were mostly 55–120 Hz, which laptop speakers barely play, and flies only buzz in flight. See `docs/verification/t12b/audio_measurements.txt`.
+- **The fix.** Every sound now has audible upper content, and the deep parts stay for headphones:
+  - the fly's buzz has 20 overtones, its real "zzz";
+  - the thrum and thud have a click and a knock;
+  - the room has air and the compressor's higher whine;
+  - birds chirp outside the window every 9–30 s.
+
+  Levels are higher, and flies are heard further away.
+- **Esc → "Headphones (deep, full sound; off: tuned for speakers)".** It is off by default, which tunes the sound for speakers: Master cuts below about 110 Hz, lifts 1–3 kHz and adds 3 dB. On, it plays the full range. A hard limiter at −1 dBFS stays on in both modes; the first speaker recording peaked at 0 dBFS.
+- **After.**
+
+  | | Before | Speakers | Headphones |
+  |---|---|---|---|
+  | Overall RMS | −30 dBFS | −21 dBFS | −22 dBFS |
+  | Loudest seconds | | about −17 dBFS | |
+  | Energy above 400 Hz | 9 % | 41 % | 24 % |
+
+  These recordings were made before the thud got its knock. Every sound's effective brightness is now 420 Hz or more; before, the thrum was 133 Hz and the thud 238 Hz.
+- **Known, harmless:** Godot sometimes prints "2 ObjectDB instances were leaked at exit" (a sound's playback still in the mixer as the game closes). It has happened since T12a, and the soundscape now stops its sounds on exit. It does not affect play or tests.
+- **Still to do: Nathan's ears.** The numbers say it is audible. Whether it sounds good is his call, on speakers and on headphones.
+
 ## Next round: Chet (ROADMAP step 4, movement realism part 2)
 
 - Feet that plant and stay on the surface.

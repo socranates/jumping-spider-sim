@@ -92,15 +92,15 @@ func _key(code: int) -> InputEventKey:
 func test_a_remapped_controller_button_drives_the_action_and_survives_a_restart() -> void:
 	var s := _fresh_settings()
 	check_eq(s.get_pad("prepare_jump"), JOY_BUTTON_A, "aiming starts on A")
-	var r: Dictionary = s.set_pad("prepare_jump", JOY_BUTTON_Y)
-	check(bool(r["ok"]) and str(r["message"]) == "Aim and jump: Y", "aiming takes Y: %s" % r["message"])
+	var r: Dictionary = s.set_pad("prepare_jump", JOY_BUTTON_RIGHT_SHOULDER)
+	check(bool(r["ok"]) and str(r["message"]) == "Aim and jump: right shoulder", "aiming takes the right shoulder (a free button; T10a gave Y to the eye view): %s" % r["message"])
 	_register(s)
-	check(_has_button("prepare_jump", JOY_BUTTON_Y) and not _has_button("prepare_jump", JOY_BUTTON_A), "aiming answers Y, not A")
+	check(_has_button("prepare_jump", JOY_BUTTON_RIGHT_SHOULDER) and not _has_button("prepare_jump", JOY_BUTTON_A), "aiming answers the right shoulder, not A")
 	check(_has_key("prepare_jump", KEY_SPACE), "the keyboard key stays")
-	check(_button(JOY_BUTTON_Y).is_action_pressed("prepare_jump"), "a press of Y is the aim-and-jump action")
+	check(_button(JOY_BUTTON_RIGHT_SHOULDER).is_action_pressed("prepare_jump"), "a press of it is the aim-and-jump action")
 	check(_has_axis("move_forward", JOY_AXIS_LEFT_Y) and _has_axis("look_left", JOY_AXIS_RIGHT_X), "the sticks are untouched")
 	var again := _fresh_settings()
-	check_eq(again.get_pad("prepare_jump"), JOY_BUTTON_Y, "the button survives a restart")
+	check_eq(again.get_pad("prepare_jump"), JOY_BUTTON_RIGHT_SHOULDER, "the button survives a restart")
 	check_eq(again.get_pad("cancel"), JOY_BUTTON_B, "the others keep their defaults")
 
 

@@ -4,6 +4,12 @@ A third-person prototype about living as a jumping spider. The design is in `doc
 
 Shared development: see [the agent handoff](claude/where-we-left-off.md), [GitHub workflow](docs/SHARED_WORKFLOW.md), and [verification reports](docs/verification/).
 
+## New: slow motion, and an easy view switch (2026-10-11)
+
+- **Slow motion:** press **T** (controller **right trigger**). The whole world slows evenly: the spider, the flies and the jump. Press again for normal speed. Esc → Slow-motion speed: 25, 50 or 75 %.
+- **First or third person:** press **V** (controller **Y**), or use the button in the Esc menu. A line at the top right says which key does it.
+- A 20-minute playtest checklist is in `docs/PLAYTEST.md`.
+
 ## New: spider-eye view (2026-10-11)
 
 Press **V** (controller **Y**), or Esc → **Spider-eye view**, to see through the spider's eyes. Only a small oval in the middle is sharp: that is where the two big front eyes point, and they see green and ultraviolet but no red. The rest is soft and nearly colourless, as the six other eyes see it. Look further than the front eyes can reach and the spider turns to face it. It's an impression, not a recording of what a spider sees (`docs/HANDOFF-eye-view.md`). Press V again for the normal camera.

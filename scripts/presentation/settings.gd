@@ -27,6 +27,8 @@ const DEFAULTS := {
 	"struggle_auto": false,    # T09b: struggling prey is held with no presses (spec 17: no required rapid tapping)
 	"reduced_motion": false,   # T09b: the spider's model keeps still (no twitchy turns, lurches, flicks, jolts or catch recoil); looks only
 	"eye_view": false,         # T10a: see through the spider's eyes (first person) instead of the orbit camera; V or Y switches it
+	"slow_motion": false,      # T11a: the whole world runs at slow_speed (SimClock: the same ticks, fewer each second); T or RT switches it
+	"slow_speed": 0.5,         # T11a: how slow slow motion is (25, 50 or 75 per cent)
 }
 ## Inclusive [min, max] for the numeric settings.
 const LIMITS := {
@@ -35,15 +37,16 @@ const LIMITS := {
 	"camera_distance": [4.0, 7.0],
 	"jump_reach": [0.5, 1.5],
 	"ui_scale": [1.0, 1.5],
+	"slow_speed": [0.25, 0.75],
 }
 ## T09 (U01): keyboard keys the player may change, in the order the pause menu lists them, with their names there. The mouse buttons
 ## stay as they are. Reel and lower follow walk forward and walk back (spec 17: W/S with a context override).
 const REMAPPABLE: Array[String] = ["move_forward", "move_back", "move_left", "move_right", "prepare_jump", "focus", "stalk", "interact",
-	"cancel", "recenter", "help", "eye_view", "look_left", "look_right", "look_up", "look_down"]
+	"cancel", "recenter", "help", "eye_view", "slow_motion", "look_left", "look_right", "look_up", "look_down"]
 const ACTION_NAMES := {
 	"move_forward": "Walk forward / reel in", "move_back": "Walk back / lower", "move_left": "Walk left", "move_right": "Walk right",
 	"prepare_jump": "Aim and jump", "focus": "Focus", "stalk": "Stalk", "interact": "Eat / rest", "cancel": "Cancel / let go",
-	"recenter": "Recenter view", "help": "Field notes", "eye_view": "Spider-eye view", "look_left": "Look left", "look_right": "Look right", "look_up": "Look up",
+	"recenter": "Recenter view", "help": "Field notes", "eye_view": "Spider-eye view", "slow_motion": "Slow motion", "look_left": "Look left", "look_right": "Look right", "look_up": "Look up",
 	"look_down": "Look down",
 }
 const LINKED := {"move_forward": "reel", "move_back": "lower"}
@@ -52,7 +55,7 @@ const RESERVED_KEYS: Array[int] = [KEY_ESCAPE, KEY_F3, KEY_F4]
 const BINDINGS_SECTION := "bindings"
 ## T09d (U01): the controller buttons and triggers the player may change (the sticks stay: walking and looking). Menu (pause, the way out
 ## of every menu) and Guide (the system's) are kept.
-const PAD_REMAPPABLE: Array[String] = ["prepare_jump", "focus", "stalk", "interact", "cancel", "recenter", "help", "eye_view"]
+const PAD_REMAPPABLE: Array[String] = ["prepare_jump", "focus", "stalk", "interact", "cancel", "recenter", "help", "eye_view", "slow_motion"]
 const RESERVED_PADS: Array[int] = [JOY_BUTTON_START, JOY_BUTTON_GUIDE]
 const PAD_SECTION := "pad_bindings"
 ## T09d (spec 17: "assisted play presets"; "adjustable aim/capture assistance"; "no shame labels"): each preset sets these switches at

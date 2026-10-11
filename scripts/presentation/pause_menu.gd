@@ -23,6 +23,7 @@ var _preset_buttons: Dictionary = {}  # preset id -> Button
 var _preset_note: Label
 var _keys_box: Control
 var _keys_toggle: Button
+var _view_button: Button
 var _keys_status: Label
 var _scroll: ScrollContainer
 var _switches: GridContainer
@@ -82,6 +83,8 @@ func _refresh() -> void:
 		check.set_meta("label", KeyNames.apply(String(check.get_meta("default_label", check.get_meta("label"))), settings))
 		check.text = _check_text(String(check.get_meta("label")), on)
 	_refresh_presets()
+	if _view_button != null:
+		_view_button.text = KeyNames.apply("Third person (V / Y)" if bool(settings.get_value("eye_view")) else "First person (V / Y)", settings)
 
 
 func _build() -> void:
@@ -126,6 +129,7 @@ func _build() -> void:
 	_add_slider(box, "camera_distance", "Camera distance", 0.1, "%.1f WU")
 	_add_slider(box, "jump_reach", "Jump reach (playtest)", 0.05, "pct")
 	_add_slider(box, "ui_scale", "Text and panel size", 0.05, "pct")
+	_add_slider(box, "slow_speed", "Slow-motion speed", 0.25, "pct")
 	# The switches go in two columns so the panel stays inside a 720 px window (chunk 6B added three, chunk 7A one).
 	var switches := GridContainer.new()
 	switches.name = "Switches"
@@ -148,8 +152,10 @@ func _build() -> void:
 	_add_check(switches, "struggle_auto", "Struggling prey: hold on automatically")
 	_add_check(switches, "reduced_motion", "Reduced motion (a calmer spider body)")
 	_add_check(switches, "eye_view", "Spider-eye view (first person, V / Y)")
-	var buttons := HBoxContainer.new()
-	buttons.add_theme_constant_override("separation", 12)
+	_add_check(switches, "slow_motion", "Slow motion (T / right trigger)")
+	var buttons := HFlowContainer.new()  # wraps onto a second row on a narrow window or with large text
+	buttons.add_theme_constant_override("h_separation", 12)
+	buttons.add_theme_constant_override("v_separation", 8)
 	box.add_child(buttons)
 	_resume_button = Button.new()
 	_resume_button.text = "Resume"
@@ -161,6 +167,13 @@ func _build() -> void:
 	_checkpoint_button.text = "Return to checkpoint"
 	_checkpoint_button.pressed.connect(_on_return_to_checkpoint)
 	buttons.add_child(_checkpoint_button)
+	# Nathan, 2026-10-11: "a button that can easily switch between first and 3rd person".
+	_view_button = Button.new()
+	_view_button.name = "ViewSwitch"
+	_view_button.pressed.connect(func() -> void:
+		settings.set_value("eye_view", not bool(settings.get_value("eye_view")))
+		_refresh())
+	buttons.add_child(_view_button)
 	_keys_toggle = Button.new()
 	_keys_toggle.name = "KeysToggle"
 	_keys_toggle.text = "Keys and buttons..."

@@ -30,6 +30,8 @@ const ObservationMemory = preload("res://scripts/perception/observation_memory.g
 const PerceptionHud = preload("res://scripts/presentation/perception_hud.gd")
 const GazeOverlay = preload("res://scripts/presentation/gaze_overlay.gd")
 const EyeViewOverlay = preload("res://scripts/presentation/eye_view_overlay.gd")
+const SlowMotionHud = preload("res://scripts/presentation/slow_motion_hud.gd")
+const SimClock = preload("res://scripts/core/sim_clock.gd")
 const PerceptionDebug = preload("res://scripts/presentation/perception_debug.gd")
 const PreyDebug = preload("res://scripts/presentation/prey_debug.gd")
 const LabScene = preload("res://scenes/testbeds/traversal_lab.tscn")
@@ -102,6 +104,7 @@ var needs_hud: NeedsHud
 var perception_hud: PerceptionHud
 var gaze_overlay: GazeOverlay
 var eye_overlay: CanvasLayer  # T10a: the spider-eye view's picture (played worlds only)
+var slow_motion_hud: CanvasLayer  # T11a: says when slow motion is on, and switches it (played worlds only)
 var perception_debug: PerceptionDebug
 var prey_debug: PreyDebug
 ## Surface profiles by id (data/surfaces).
@@ -266,6 +269,9 @@ func _ready() -> void:
 		eye_overlay.motor = spider
 		eye_overlay.settings = settings
 		add_child(eye_overlay)
+		slow_motion_hud = SlowMotionHud.new()
+		slow_motion_hud.settings = settings
+		add_child(slow_motion_hud)
 		overlay.sensor = sensor
 		overlay.memory = memory
 		overlay.prey = prey
@@ -295,6 +301,7 @@ func _ready() -> void:
 		support_debug.add_child(tether_debug)
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 		_apply_ui_scale()
+		_apply_game_speed()
 
 
 func _resolved_prey_seed() -> int:
@@ -310,6 +317,13 @@ func _resolved_prey_seed() -> int:
 func _exit_tree() -> void:
 	if interactive:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+		SimClock.set_speed(1.0)  # the next world (a checkpoint's, a test's) starts at normal speed and applies its own
+
+
+## T11a: slow motion (SimClock): the same ticks, fewer of them each real second. Played worlds only; tests set the clock themselves.
+func _apply_game_speed() -> void:
+	if interactive and is_inside_tree():
+		SimClock.set_speed(float(settings.get_value("slow_speed")) if bool(settings.get_value("slow_motion")) else 1.0)
 
 
 ## T09 (U01): the size of all text and panels (the window's 2D content scale; the 3D view keeps its size). Played worlds only.
@@ -331,6 +345,8 @@ func _apply_reduced_motion() -> void:
 func _on_setting_changed(key: String) -> void:
 	if key == "ui_scale":
 		_apply_ui_scale()
+	if key == "slow_motion" or key == "slow_speed":
+		_apply_game_speed()
 	if key == "reduced_motion":
 		_apply_reduced_motion()
 	if key == "struggle_auto" and feeding != null:

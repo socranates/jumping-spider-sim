@@ -1,4 +1,5 @@
 extends Node
+const SimClock = preload("res://scripts/core/sim_clock.gd")  # one game clock: count in its ticks, never the engine rate
 ## Safety-line input (spec 9.1, 17): reel in, lower and let go while the spider is on its line.
 ##
 ## While the motor is on its line (is_on_line(): falling on a locked line, HANGING or REELING), the `reel`
@@ -74,7 +75,7 @@ func _physics_process(_delta: float) -> void:
 		return
 	var on_line: bool = motor.is_on_line()
 	_on_line_ticks = _on_line_ticks + 1 if on_line else 0
-	var ticks_per_second := float(Engine.physics_ticks_per_second)
+	var ticks_per_second := float(SimClock.HZ)
 	var hold: bool = settings == null or settings.release_hold
 	while not _events.is_empty():
 		if _events.pop_front() == "down":

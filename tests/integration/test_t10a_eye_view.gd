@@ -199,7 +199,7 @@ func test_the_picture_is_sharp_where_the_eyes_reach_and_says_it_is_an_impression
 	check((overlay.get_node("EyeView") as Control).visible, "the eye picture is drawn in the eye view")
 	check(overlay.layer < 4, "under every HUD, so words and markers stay sharp")
 	var tag := overlay.get_node("EyeViewTag") as Label
-	check(tag.text.contains("an impression") and tag.text.contains("G / Y: switch back"), "the view says it is an impression and names the key: %s" % tag.text)
+	check(tag.text.contains("an impression") and tag.text.contains("G / Y: third person"), "the view says it is an impression and names the key: %s" % tag.text)
 	var notice := overlay.get_node("EyeViewNotice") as Label
 	check(notice.visible and notice.text.contains("no dedicated red receptor"), "and briefly what it shows")
 	var screen: Vector2 = overlay.get_viewport().get_visible_rect().size

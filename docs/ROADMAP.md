@@ -37,12 +37,12 @@ Each step is one handoff: one agent at a time, start from `main`, finish into `m
 
 **0. Completed: vision details (Chet).** Two narrow principal-eye detail fields sweep and twist within a stable view; Reduced motion freezes them. The blue-as-UV shortcut is removed and the green-weighted picture explicitly labels UV as unimplemented. See `HANDOFF-retinal-scan.md` and `VISION_RESEARCH.md`. Native Windows rendering checked; player comfort/readability belongs to step 1.
 
-**1. Playtest round (Nathan and his son, about 20 minutes; Claude writes the checklist).**
+**1. Playtest round (Nathan and his son, about 20 minutes).** The checklist is written: `docs/PLAYTEST.md`. Waiting for the playtest.
 - A short script to follow: hunt in the normal view and in the eye view, try Most help, catch a fly with a controller only, play muted, rest in the crack and use Return to checkpoint.
 - Noting what felt wrong is the most useful output. It also covers most of the human gates (U01, W01, E02, M04) without extra work.
 - Fixes from it come before anything below.
 
-**2. One game clock (Claude).**
+**2. Completed: one game clock and slow motion (Claude, T11a).** `scripts/core/sim_clock.gd`. T or the right trigger switches slow motion (25, 50 or 75 per cent). A test shows a whole stalk and strike at half speed matching full speed tick for tick. Nathan also asked for an easy switch between first and third person: V / Y, with a line on screen naming it and a button in the Esc menu. See `docs/HANDOFF-slow-motion.md`.
 - Every system (jumps, the silk line, the senses, the flies, needs) reads one simulation clock that counts fixed ticks.
 - This makes a correct **slow-motion setting** possible (T9e-01), which will help Nathan's son.
 - It also makes pausing, replays and any later port sturdier.
@@ -67,7 +67,7 @@ Keep the twitch.
 
 **5. Vision realism, part 2 (Claude, building on Chet's current work).**
 - **Depth from defocus** (Nagata et al. 2012): how sure the landing marker is depends on green light and distance.
-- **UV markings** on flies and leaves, visible only in the sharp window.
+- **UV markings** on flies and leaves, visible only in the sharp window. This needs authored, evidence-based UV reflectance for each material (EYE-08), not a guess from screen colour.
 - A **motion-sensitive edge**: a moving thing flickers in the blurry part before you can tell what it is.
 - **Comfort options:** a level horizon in the eye view, and a colour-free variant.
 
@@ -84,6 +84,24 @@ Keep the twitch.
 - **One predator.** A windowsill candidate is a cellar spider (*Pholcus*), which is known to eat other spiders. A house centipede is another option. The choice should be checked against the literature first.
 - **Death and continuation**, as spec 11 describes. No grind, and no forced breeding.
 
+## Long term: many species (Nathan, 2026-10-11)
+
+"Eventually i want to add all the different species of jumping spiders and make this look realistic, add peacock spiders and little dances."
+
+- **The project is already shaped for it.**
+  - A species is a data file (`data/species/*.json`: size, speeds, jump reach, senses), and code reads the profile, not hard-coded numbers.
+  - A new species needs:
+    - a profile;
+    - a realistic model and its colours;
+    - its own behaviour;
+    - a review of its vision, since species differ. Some *Habronattus* have red-sensitive filters, for example, so the eye view must not copy the *Phidippus* picture without checking (VISION_RESEARCH.md).
+- **Peacock spiders (*Maratus*).**
+  - The males' courtship display is a raised, colourful abdominal fan, waving third legs and a vibratory "song" through the ground.
+  - Courtship is part of spec phase 5, so the dances belong there.
+  - Their iridescent colours would need proper materials, not flat paint.
+- **Realistic looks.** Moving from primitive shapes to detailed, accurate models (hairs, eye arrangement, markings) is spec phase 6 ("production art"). It can start with the player's own species.
+- **A sensible order.** One finished life (phase 4) first. Then a second species chosen to test the system, ideally one that lives in the same windowsill. Then peacock spiders and courtship (phase 5), which need mates, displays and the vibration sense from step 3.
+
 ## The platform question (PLATFORM-01, to decide together)
 
 - **What Godot does now.** Exports to Windows, Mac, Linux, Android, iOS and the web. The game already runs in the renderer the web build uses, and it supports a controller.
@@ -94,5 +112,5 @@ Keep the twitch.
 ## Decisions Nathan can make now
 
 1. The order of steps 2–5. Proposed: playtest, clock (slow motion), sound, movement, vision.
-2. Whether his son's experience gets its own step: bigger text, picture hints instead of words, a "show me" helper.
+2. Answered (2026-10-11): his son doesn't need more help than Most help gives, so there is no separate step. Slow motion "sounds cool", and it is now built.
 3. Nothing about platforms yet; that waits until step 6.

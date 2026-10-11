@@ -193,3 +193,26 @@ Nathan, after playing T09b: "the approach can be slower"; "the tapping mechanic 
 - **T9c-07 A save never deletes an unreadable checkpoint** (Chet review 5, P1). A current or backup file this build cannot read is set aside unchanged as `checkpoint.newer.json` or `checkpoint.damaged.json` (numbered if taken) before the new file goes in. The message names it, and a regression test covers save-after-refusal.
 - **T9c-08 Prompts name the chosen keys** (Chet review 5, P2). `KeyNames.apply` rewrites the default keys in a hint to the player's: the feeding prompts, the line and aim hints, the Focus hint, and the pause menu's "Hold Q / B to let go of the line" label.
 - **T9c-09 F4 view draws at once.** The support view draws on the toggle rather than the next frame. This is the likely cause of Chet's native Windows failure of `test_support_view_toggles_with_f4_and_draws_the_normal`, but it was not reproduced on Linux at fixed or normal speed, so the cause on Windows is unconfirmed until Nathan's next `run_tests.bat`.
+
+## T09d — controller buttons and assisted-play presets (Claude, 2026-10-11)
+
+Done while Chet's live-legs work waited for his usage to reset. No file in his open diff (`main.gd`, `spider_body.gd`, `spider_legs.gd`, `test_spider_legs.gd`, `test_live_spider_legs.gd`) was touched.
+
+- **T9d-01 Controller buttons can be remapped** (spec 17: "Inputs are remappable actions"; U01).
+  - Aim and jump, Focus, Stalk, Eat / rest, Cancel / let go, Recenter and Field notes can each be given any controller button or either trigger, in the pause menu's key list (now "Keys and buttons...").
+  - Walking and looking stay on the sticks. Menu (pause, the way out of every menu) and Guide (the system's) can't be given away.
+  - A button in use is swapped, as keys are. The keyboard key and the mouse button of an action stay when its button changes; a trigger an action gives up is removed from it.
+  - Saved in `settings.cfg` under `[pad_bindings]` as one number per action: a button is its `JoyButton`, a trigger is 100 + its `JoyAxis`. A bad line (reserved, unknown, not a number, a stick action) is ignored and that action keeps its default.
+  - One "Reset keys and buttons" restores both.
+- **T9d-02 Prompts name the chosen buttons.** `KeyNames.apply` now swaps the default controller button of a hint too ("Q / B" becomes the player's key and button), in two passes so an action named for one token is never renamed again as another. The windowsill's caption and field notes and the feeding prompts use `KeyNames.both`.
+- **T9d-03 Assisted-play presets** (spec 17: "adjustable aim/capture assistance"; "no shame labels").
+  - Four presets at the top of the pause menu set eight switches at once: strike assist, the jump arc, where the spider looks, holding a struggling fly automatically, the three toggles (aim, stalk, Focus) and hold-to-let-go.
+  - Standard is the defaults. Guided hunting adds the wider bite, the arc, the gaze footprint and the automatic hold. No held buttons makes aim, stalk and Focus press-to-start, press-to-stop, holds the fly for you and lets go of the line on one press. Most help is both.
+  - Names say what a preset does, not how good the player is; the line under them says it in words. Change any switch and the menu says "Custom".
+  - Presets leave the camera, the text size, Reduced motion and the playtest jump reach alone.
+- **T9d-04 Most help keeps hold-to-let-go.** It is the preset for a young or new player (Nathan's son, almost 6, plays), and spec 17 asks that an accidental press must not drop the spider. No held buttons gives it up, for players who can't hold a button, and says so.
+- **T9d-05 Left for later.**
+  - Global slow time and a separate survival-pressure setting (spec 17) need wiring in `main.gd`. They wait until Chet's live-legs work is merged, so the two don't collide.
+  - Reduced motion is still the only "reduced effects" setting; the game has no camera shake, blur or depth of field to turn off.
+  - There is no audio yet, so the nonvisual-cue options have nothing to replace.
+

@@ -15,6 +15,10 @@ Done in T09 part 1:
 
 - **T09c (2026-10-11):** living flies (walking bursts, spontaneous looping flights), the struggle fixed and on Space, a slower approach, prompts follow remapped keys, unreadable checkpoints set aside instead of deleted, the F4 view draws at once. Decisions T9c-01 … T9c-09.
 
+- **T09d (2026-10-11, while Chet was out of usage):** controller buttons and triggers can be remapped in the pause menu, prompts name the chosen buttons, and four assisted-play presets (Standard, Guided hunting, No held buttons, Most help) sit at the top of the pause menu. Decisions T9d-01 … T9d-05. Evidence EVIDENCE_ID, TOTAL_TESTS. Nathan's son (almost 6) plays; Most help is for him.
+
+**Chet's live-legs work (in progress, 2026-10-11).** Chet was wiring `spider_legs.gd` into the live spider (`main.gd`, `spider_body.gd`, `spider_legs.gd`, `test_spider_legs.gd`, a new `tests/integration/test_live_spider_legs.gd`, a capture script) when his usage ran out. It is uncommitted in his own folder on Nathan's PC, not on GitHub. T09d touched none of those files. When he resumes: commit it on a branch (e.g. `codex/live-legs`), merge `main` in, finish, merge into `main`.
+
 Chet's PR #2 (Windows/web export presets, a standalone leg prototype, review 5) is merged too. The leg prototype isn't wired into gameplay yet; when it is, it replaces the static legs in `spider_body.gd` and keeps the twitch layer.
 
 **Nathan's playtest, 2026-10-11** (after `git pull` of `main`): "now its updated and is looking very good now with the changes. the mechanics are working well." He had first played an old local copy: his folder had not been pulled, so the struggle mini-game was missing. Remind him to run `git checkout main` then `git pull` after each handoff.
@@ -22,7 +26,7 @@ Chet's PR #2 (Windows/web export presets, a standalone leg prototype, review 5) 
 **Updating Nathan's laptop:** after each turn, the agent on his PC runs `update.bat` there. Claude (cloud) tells him to double-click `update.bat`, then `play.bat`. `update.bat` (2026-10-11) runs fetch, checkout of main and a fast-forward pull, and stops without changing anything if tracked files were edited locally. It is not yet run on Windows, so ask Nathan whether it worked.
 
 Unfinished (T09 part 2 and the human gates):
-- Controller remapping, reduced-effects and nonvisual cue options, assisted-play presets, and a Windows interrupted-write test.
+- Global slow time and a separate survival-pressure setting (they need `main.gd`: after the live legs are merged), a Windows interrupted-write test. Reduced effects and nonvisual cues have nothing more to cover until there is audio or camera effects.
 - Human U01: the loop with controller only, remapped keys, toggle preparation and sound muted. Human W01, E02, graphical M04 and F01 are still open.
 - Nathan's notes on the habitat (chunk 8) and on checkpoints (this part).
 - A Windows rerun of `run_tests.bat` on `main` (evidence 27b60f6974e8) to confirm the F4 support-view test now passes natively (Chet saw it fail at normal speed on 8149fa0be2b8).

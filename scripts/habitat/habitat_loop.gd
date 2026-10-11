@@ -5,6 +5,7 @@ extends Node
 ## world's save_checkpoint. One checkpoint per rest; the caption says whether it was kept. Rest itself still grants only rest.
 signal rest_changed(active: bool)
 signal checkpoint_made(result: Dictionary)
+const KeyNames = preload("res://scripts/presentation/key_names.gd")
 const EVENT_ID := "room_shadow_01"
 const EVENT_DELAY := 60.0
 const WARNING_S := 5.0
@@ -129,16 +130,17 @@ func show_notice(text: String) -> void:
 	notice_seconds = NOTICE_S
 
 func caption() -> String:
-	var text := "THE WINDOWSILL    ·    %s / View: field notes" % _key_name("help", "H")
+	var text := "THE WINDOWSILL    ·    %s: field notes" % _both("help", "H", "View")
 	if notice_seconds > 0.0 and not _show_help:
 		text += "\n" + notice
 	if _show_help:
-		return text + "\nFocus: right mouse / left trigger    Stalk: %s / left shoulder\nHold %s / A to aim; release to jump. Green means reachable ground.\nA fly may leave before you arrive. %s / X: eat or rest    %s / B: cancel\nYour silk can catch a miss. %s / left stick up reels you back.\nHome is the silk-lined crack at the west end. Both routes lead back.\nThe pale leaf tip past the east leaf won't hold you. Your silk will.\nResting in the crack keeps a checkpoint.\nEsc / Menu: Return to checkpoint, keys, text size." % [
-			_key_name("stalk", "Shift"), _key_name("prepare_jump", "Space"), _key_name("interact", "E"), _key_name("cancel", "Q"), _key_name("move_forward", "W")]
+		return text + "\nFocus: %s    Stalk: %s\nHold %s to aim; release to jump. Green means reachable ground.\nA fly may leave before you arrive. %s: eat or rest    %s: cancel\nYour silk can catch a miss. %s / left stick up reels you back.\nHome is the silk-lined crack at the west end. Both routes lead back.\nThe pale leaf tip past the east leaf won't hold you. Your silk will.\nResting in the crack keeps a checkpoint.\nEsc / Menu: Return to checkpoint, keys, text size." % [
+			_both("focus", "right mouse", "left trigger"), _both("stalk", "Shift", "left shoulder"), _both("prepare_jump", "Space", "A"),
+			_both("interact", "E", "X"), _both("cancel", "Q", "B"), _key_name("move_forward", "W")]
 	if resting:
-		return text + "\nResting in the silk-lined crack. Move, %s or %s to leave." % [_key_name("interact", "E"), _key_name("cancel", "Q")]
+		return text + "\nResting in the silk-lined crack. Move, %s or %s to leave." % [_both("interact", "E", "X"), _both("cancel", "Q", "B")]
 	if can_rest():
-		return text + "\nThe silk-lined crack    ·    %s / X to rest" % _key_name("interact", "E")
+		return text + "\nThe silk-lined crack    ·    %s to rest" % _both("interact", "E", "X")
 	if event_phase == "warning":
 		return text + "\nLight shifts at the window. A shadow is approaching."
 	if event_phase == "passing":
@@ -171,6 +173,11 @@ func apply_record(r: Dictionary) -> void:
 	checkpoint_due = false
 	_restore_grace = RESTORE_GRACE_TICKS
 	show_notice("Returned to the checkpoint: the sill as it was when you rested in the crack. This is checkpoint recovery, not an exact resume.")
+
+
+## "Key / button" an action answers to now (T09d: the controller button follows its remapping too).
+func _both(action: String, key_fallback: String, pad_fallback: String) -> String:
+	return KeyNames.both(world.settings if world != null else null, action, key_fallback, pad_fallback)
 
 
 ## The keyboard key an action answers to now (remapping, T09), for the words on the screen.

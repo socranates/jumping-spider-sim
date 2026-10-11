@@ -33,6 +33,20 @@ const BINDINGS := {
 	"debug_support": {"keys": [KEY_F4], "dead": BUTTON_DEADZONE},
 }
 
+## T09d (U01): a controller input an action can be given, as one number: a button is its JoyButton, a trigger is PAD_TRIGGER plus its
+## JoyAxis. NO_PAD: none. The sticks are not given this way (walking and looking stay on them).
+const PAD_TRIGGER := 100
+const NO_PAD := -1
+## The names the screen uses for them (the layout of spec 17's controller column: A, B, X, Y, View, Menu).
+const PAD_NAMES := {
+	JOY_BUTTON_A: "A", JOY_BUTTON_B: "B", JOY_BUTTON_X: "X", JOY_BUTTON_Y: "Y", JOY_BUTTON_BACK: "View", JOY_BUTTON_GUIDE: "Guide",
+	JOY_BUTTON_START: "Menu", JOY_BUTTON_LEFT_STICK: "left stick click", JOY_BUTTON_RIGHT_STICK: "right stick click",
+	JOY_BUTTON_LEFT_SHOULDER: "left shoulder", JOY_BUTTON_RIGHT_SHOULDER: "right shoulder", JOY_BUTTON_DPAD_UP: "D-pad up",
+	JOY_BUTTON_DPAD_DOWN: "D-pad down", JOY_BUTTON_DPAD_LEFT: "D-pad left", JOY_BUTTON_DPAD_RIGHT: "D-pad right", JOY_BUTTON_MISC1: "Share",
+	JOY_BUTTON_PADDLE1: "paddle 1", JOY_BUTTON_PADDLE2: "paddle 2", JOY_BUTTON_PADDLE3: "paddle 3", JOY_BUTTON_PADDLE4: "paddle 4",
+	JOY_BUTTON_TOUCHPAD: "touchpad", PAD_TRIGGER + JOY_AXIS_TRIGGER_LEFT: "left trigger", PAD_TRIGGER + JOY_AXIS_TRIGGER_RIGHT: "right trigger",
+}
+
 ## Actions from spec 17 (everything except the developer overlay and support view).
 const GAME_ACTIONS: Array[String] = [
 	"move_forward", "move_back", "move_left", "move_right",
@@ -96,18 +110,72 @@ static func defaults_of(action: String) -> Array[InputEvent]:
 	return out
 
 
-## T09 (remapping): the default events of `action` with its keyboard key replaced by `keycode` (the mouse buttons and controller inputs
-## stay). Used by Settings to turn a remapped key into the action's full list.
-static func events_for(action: String, keycode: int) -> Array[InputEvent]:
+## T09 (remapping): the default events of `action` with its keyboard key replaced by `keycode` (0: no key) and, T09d, its controller button
+## or trigger replaced by `pad` (NO_PAD: the default stays). The mouse buttons and the sticks stay. Used by Settings to turn the player's
+## choices into the action's full list.
+static func events_for(action: String, keycode: int, pad: int = NO_PAD) -> Array[InputEvent]:
 	var out: Array[InputEvent] = []
-	var k := InputEventKey.new()
-	k.physical_keycode = keycode as Key
-	k.device = -1
-	out.append(k)
+	if keycode > 0:
+		var k := InputEventKey.new()
+		k.physical_keycode = keycode as Key
+		k.device = -1
+		out.append(k)
 	for e in defaults_of(action):
-		if not e is InputEventKey:
-			out.append(e)
+		if e is InputEventKey:
+			continue
+		if pad != NO_PAD and (e is InputEventJoypadButton or (e is InputEventJoypadMotion and _is_trigger((e as InputEventJoypadMotion).axis))):
+			continue
+		out.append(e)
+	if pad != NO_PAD:
+		out.append(pad_event(pad))
 	return out
+
+
+## T09d: the default controller button or trigger of an action (NO_PAD when it has none, as for the sticks).
+static func default_pad(action: String) -> int:
+	var b: Dictionary = BINDINGS.get(action, {})
+	var buttons: Array = b.get("buttons", [])
+	if not buttons.is_empty():
+		return int(buttons[0])
+	for pair: Array in b.get("axes", []):
+		if _is_trigger(int(pair[0])):
+			return PAD_TRIGGER + int(pair[0])
+	return NO_PAD
+
+
+## T09d: a button or a trigger from its number (see PAD_TRIGGER).
+static func pad_event(pad: int) -> InputEvent:
+	if pad >= PAD_TRIGGER:
+		var ja := InputEventJoypadMotion.new()
+		ja.axis = (pad - PAD_TRIGGER) as JoyAxis
+		ja.axis_value = 1.0
+		ja.device = -1
+		return ja
+	var jb := InputEventJoypadButton.new()
+	jb.button_index = pad as JoyButton
+	jb.device = -1
+	return jb
+
+
+## T09d: the number of a pressed button or a pulled trigger (NO_PAD for anything else: a stick, a release, a light touch on a trigger).
+static func pad_of_event(event: InputEvent) -> int:
+	if event is InputEventJoypadButton and (event as InputEventJoypadButton).pressed:
+		return int((event as InputEventJoypadButton).button_index)
+	if event is InputEventJoypadMotion and _is_trigger((event as InputEventJoypadMotion).axis) and (event as InputEventJoypadMotion).axis_value >= 0.6:
+		return PAD_TRIGGER + int((event as InputEventJoypadMotion).axis)
+	return NO_PAD
+
+
+static func pad_name(pad: int) -> String:
+	return str(PAD_NAMES.get(pad, "button %d" % pad)) if pad != NO_PAD else "none"
+
+
+static func is_pad(pad: int) -> bool:
+	return PAD_NAMES.has(pad)
+
+
+static func _is_trigger(axis: int) -> bool:
+	return axis == JOY_AXIS_TRIGGER_LEFT or axis == JOY_AXIS_TRIGGER_RIGHT
 
 
 ## The default keyboard key of an action, 0 when it has none.

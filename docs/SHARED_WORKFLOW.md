@@ -4,6 +4,16 @@ Repository: https://github.com/socranates/jumping-spider-sim
 
 Both Chet and Claude can code this project. Work one writer at a time. The repository files and commits are the shared record; chat history may be incomplete.
 
+## Handoff rule (Nathan, 2026-10-11)
+
+Nathan runs **one agent at a time** and hands off back and forth; he does not merge anything himself.
+
+1. **Start from `main`.** Fetch, check out `main` (or branch from it), and read `claude/where-we-left-off.md` and the newest handoff.
+2. **Finish into `main`.** When your turn ends, run the checks, update `claude/where-we-left-off.md` and your handoff, and put your work into `main` yourself (a branch plus a pull request you merge, or a direct push if your setup allows it). Never leave the other agent's starting point on a side branch.
+3. **Nathan only says who is up** ("Claude, hand off" / "Chet, pick up from main"). To play the newest build he runs `git checkout main` then `git pull` (or asks the agent to).
+
+The rules below about inspecting local work and never force-pushing over another agent still apply.
+
 ## Start a session
 
 1. Read `claude/where-we-left-off.md`, the latest `docs/HANDOFF-chunk-*.md`, and Nathan's newest notes.
@@ -38,4 +48,8 @@ T09 part 1 (checkpoints S01-C/S02, keyboard remapping, controller help, text siz
 T09b (hunt feel, same branch) moved the branch head to evidence 8149fa0be2b8, 511/511 on Linux headless; see the T09b section of `docs/HANDOFF-chunk-9.md`.
 
 T09c (2026-10-11) moved the branch head to evidence 25d403c1ee02, 519/519 on Linux headless. Chet's `codex/packaging-spider-legs` (PR #2) is based on 3da4727 and adds files only; merge PR #1, then PR #2.
+
+### Update 2026-10-11 (merge)
+
+PR #1 (T09, T09b, T09c) and PR #2 (Chet's packaging and leg prototype) are merged into `main` (merge commit 41808ac). The merged state was verified before merging: **522/522** on Linux headless at fixed 60 fps, evidence **27b60f6974e8**. Not yet run on Windows.
 

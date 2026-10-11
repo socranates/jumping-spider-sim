@@ -15,6 +15,7 @@ Nathan runs **one agent at a time** and hands off back and forth; he does not me
    - An agent working on his PC (Chet) runs `update.bat` in his project folder itself (or `git checkout main` and `git pull --ff-only`) after merging, and confirms the folder is on the new commit.
    - An agent in the cloud (Claude) cannot reach his PC. It ends every turn by telling him: "double-click `update.bat`, then `play.bat`".
    - `update.bat` refuses to touch local changes to tracked files and says so.
+   - **Commit every new script's `.uid` file (and every new picture's `.import`, if the folder tracks them) in the same commit as the file.** Run `godot --headless --import` before committing so Godot writes them, then check that no tracked `.gd` lacks a tracked `.gd.uid`. Otherwise Godot on Nathan's PC makes its own copy, a later commit brings the same path, and `git pull` stops ("untracked working tree files would be overwritten"). That happened on 2026-10-11 with `test_t11a_slow_motion.gd.uid`. `update.bat` now replaces such Godot-made duplicates with GitHub's copy, but only once the new `update.bat` has itself arrived.
 
 The rules below about inspecting local work and never force-pushing over another agent still apply.
 

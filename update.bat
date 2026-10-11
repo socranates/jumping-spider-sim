@@ -36,6 +36,10 @@ git fetch origin
 if errorlevel 1 goto :fail
 git checkout main
 if errorlevel 1 goto :fail
+rem Godot writes a .uid file beside each new script (and an .import file beside each picture) on this machine. If the same file then
+rem arrives from GitHub, git will not overwrite the local copy and the update stops. GitHub's copy is the right one and the local one is
+rem only Godot's, so a local copy of any such file that GitHub is adding is removed first. Nothing else is touched.
+for /f "delims=" %%F in ('git diff --name-only --diff-filter=A HEAD origin/main') do call :drop_generated "%%F"
 git pull --ff-only origin main
 if errorlevel 1 goto :fail
 
@@ -54,3 +58,15 @@ echo The update did not finish. Copy the messages above and paste them to Claude
 echo.
 pause
 exit /b 1
+
+rem One file GitHub is adding: removed here only if it is a Godot-made .uid or .import file that exists here and git does not track.
+:drop_generated
+if /i not "%~x1"==".uid" if /i not "%~x1"==".import" exit /b 0
+set "JSS_FILE=%~1"
+set "JSS_FILE=%JSS_FILE:/=\%"
+if not exist "%JSS_FILE%" exit /b 0
+git ls-files --error-unmatch -- "%~1" >nul 2>nul
+if not errorlevel 1 exit /b 0
+echo Using GitHub's copy of %~1 (Godot had made one here too).
+del /q "%JSS_FILE%"
+exit /b 0

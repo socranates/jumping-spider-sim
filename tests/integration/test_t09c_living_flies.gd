@@ -119,7 +119,7 @@ func test_space_is_the_grip_while_the_fly_struggles_and_never_hops() -> void:
 	for i in 400:
 		if not fc.struggling:
 			break
-		if i % 22 == 0:
+		if i % 9 == 0:   # T11b: a fast rhythm fills the bar
 			await _press("prepare_jump")
 		else:
 			await physics_frames(1)

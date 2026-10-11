@@ -112,8 +112,8 @@ func test_tapping_keeps_the_grip_until_the_fly_is_subdued() -> void:
 	for i in 400:
 		if not fc.struggling:
 			break
-		if i % 24 == 0:
-			await _tap()   # two and a half presses a second
+		if i % 9 == 0:
+			await _tap()   # about seven presses a second (T11b: a full bar wins, and a slow rhythm no longer does)
 		else:
 			await physics_frames(1)
 		if fc.struggling:
@@ -121,6 +121,7 @@ func test_tapping_keeps_the_grip_until_the_fly_is_subdued() -> void:
 	check(not fc.struggling and director().held == f, "held on: the fly is subdued and still in the jaws")
 	check(lowest > 0.0, "the grip never ran out (lowest %.2f)" % lowest)
 	check(fc.struggle_log.has("subdued"), "the log says subdued")
+	check(fc.struggle_log.has("subdued: the grip is full (%.2f s, %d taps)" % [fc.struggle_time, fc.struggle_taps]), "because the grip bar filled: %s" % str(fc.struggle_log))
 	check(fc.request_feed(), "now it can be eaten")
 
 

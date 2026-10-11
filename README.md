@@ -9,6 +9,7 @@ Shared development: see [the agent handoff](claude/where-we-left-off.md), [GitHu
 - **Slow motion:** press **T** (controller **right trigger**). The whole world slows evenly: the spider, the flies and the jump. Press again for normal speed. Esc → Slow-motion speed: 25, 50 or 75 %.
 - **First or third person:** press **V** (controller **Y**), or use the button in the Esc menu. A line at the top right says which key does it.
 - A 20-minute playtest checklist is in `docs/PLAYTEST.md`.
+- **The struggle (after Nathan's playtest):** tap fast to fill the grip bar. A full bar subdues the fly at once. Two taps a second isn't enough any more, and the fly weakens as the bite's venom works.
 
 ## New: spider-eye view (2026-10-11)
 

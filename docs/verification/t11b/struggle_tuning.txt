@@ -1,0 +1,24 @@
+T11b struggle tuning (a sweep of steady tap rates, 40 flies each, 60 ticks a second; jerks every 0.35-0.75 s)
+Old rules (start 0.6, tap 0.25, drain 0.3/s, jerk 0.1, and a 2.5-3.5 s timer): about 2 presses a second held a fly, and the bar
+filled in about a second at 2.5 a second, then the player waited for the timer. If a full bar had ended it:
+(0.6, 0.25, 0.3, 0.1, 1000000000.0, 1.0)
+   2.0/s: won 35 (avg  7.0s) lost  0 timeout  5
+   2.5/s: won 40 (avg  1.0s) lost  0 timeout  0
+   3.0/s: won 40 (avg  0.7s) lost  0 timeout  0
+   4.0/s: won 40 (avg  0.4s) lost  0 timeout  0
+   5.0/s: won 40 (avg  0.3s) lost  0 timeout  0
+   6.0/s: won 40 (avg  0.2s) lost  0 timeout  0
+   7.0/s: won 40 (avg  0.1s) lost  0 timeout  0
+   8.0/s: won 40 (avg  0.1s) lost  0 timeout  0
+
+Chosen (start 0.45, tap 0.10, drain 0.28/s, jerk 0.10, venom weakens the fly to 40% over 6 s; 'won' = the bar filled;
+'timeout' = still fighting at 12 s, when the game counts the venom as having subdued it):
+(0.45, 0.1, 0.28, 0.1, 6.0, 0.4)
+   2.0/s: won  0 (avg  0.0s) lost 40 timeout  0
+   2.5/s: won  0 (avg  0.0s) lost 32 timeout  8
+   3.0/s: won 36 (avg 11.0s) lost  0 timeout  4
+   4.0/s: won 40 (avg  6.1s) lost  0 timeout  0
+   5.0/s: won 40 (avg  3.7s) lost  0 timeout  0
+   6.0/s: won 40 (avg  2.4s) lost  0 timeout  0
+   7.0/s: won 40 (avg  1.7s) lost  0 timeout  0
+   8.0/s: won 40 (avg  1.3s) lost  0 timeout  0

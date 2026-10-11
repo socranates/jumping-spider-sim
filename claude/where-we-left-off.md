@@ -25,6 +25,8 @@ Native AMD Radeon screenshots show the real windowsill spider's corrected legs, 
 
 ## Next
 
+**Latest (Claude, 2026-10-11, T11b):** Nathan played the whole checklist: everything works, "really fun, camera works great, 1st person is super cool". The struggle is harder and ends the moment the grip bar is full (STRUGGLE-01). Results in `docs/PLAYTEST.md`. U01's controller-only part is still open (no controller). Next by the plan: step 3, sound and the spider's other senses, unless Nathan picks otherwise.
+
 **Latest (Claude, 2026-10-11, T11a):** one game clock and slow motion (T / RT), an easy first/third-person switch (V / Y, a line on screen, an Esc-menu button), and the playtest checklist `docs/PLAYTEST.md`. Evidence **e530e2f0810d**: 553/553 (Linux headless, fixed 60 fps); not run on Windows. Read `docs/HANDOFF-slow-motion.md`; the plan is `docs/ROADMAP.md`. Nathan's son needs no more help than Most help. The next step is Nathan's playtest.
 
 **Spider-eye view (T10a, Claude, 2026-10-11):** built at Nathan's request. Read `docs/HANDOFF-eye-view.md`. V or Y switches between a first-person view from the principal eyes and the orbit camera. Decisions EYE-01 … EYE-06. Evidence **7169ecfd3663**: 544/544 (Linux headless, fixed 60 fps); not yet run on Windows or played. Nathan also said: "you can mess with any approved code its ok", and that his laptop is the shared home for him, Chet and Claude ("absolute permission for anything"). Claude itself works in a cloud copy and reaches the laptop only through GitHub and `update.bat`.

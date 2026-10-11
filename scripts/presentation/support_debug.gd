@@ -66,6 +66,10 @@ func _ready() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("debug_support"):
 		visible = not visible
+		# T09c: draw at once, not on the next frame (Chet's native Windows run caught the view shown but not yet drawn; spec 19 developer
+		# views should never show a stale picture).
+		if visible and motor != null:
+			refresh()
 
 
 func _process(_delta: float) -> void:

@@ -1,0 +1,32 @@
+T09b fly tuning run (Claude, 2026-10-10; Linux headless, fixed 60 fps, lab world, fly on floor_east_open, seeds 1-8).
+A throwaway harness (not committed) approached from 7 WU four ways and struck from 5.5 and 2.2 WU. 'reached-calm' = got to 2.35 WU with the fly still perched; 'alerted_at' = distance when it went ALERT (-1 never), x = it took off.
+Modes: stalk = steady stalk; timed = stalk only while the fly looks >110 deg away and is calm, freeze otherwise; walk; dart = walk-speed bursts only while it looks away.
+
+BEFORE (with glances, old senses: rear 0.35, motion scale 12, loom 40):
+TUNE PARAMS rear=0.35 scale=12.0 startle_rear=0.35
+TUNE MODE stalk reached-calm 8/8 avg 6.0s alerted_at -1.0 -1.0 -1.0 -1.0 -1.0 -1.0 -1.0 -1.0
+TUNE MODE timed reached-calm 8/8 avg 15.4s alerted_at -1.0 -1.0 -1.0 -1.0 -1.0 -1.0 -1.0 -1.0
+TUNE MODE walk reached-calm 0/8 avg 1.6s alerted_at 4.9x 5.0x 4.0x 4.5x 5.0x 3.6x 4.3x 4.4x
+TUNE STRIKE far5.5 1/8  near2.2 6/8 (facing away at launch 4, caught of those 3)
+
+SHIPPED (rear 0.12, motion scale 6, startle rear 0.5, loom 70):
+TUNE PARAMS rear=0.12 scale=6.0 startle_rear=0.50 loom=70
+TUNE MODE stalk reached-calm 0/8 avg 4.1s alerted_at 4.2x 4.3x 4.3x 4.1x 4.3x 4.3x 3.9x 4.3x
+TUNE MODE timed reached-calm 8/8 avg 16.7s alerted_at -1.0 -1.0 -1.0 -1.0 -1.0 -1.0 -1.0 -1.0
+TUNE MODE walk reached-calm 0/8 avg 0.8s alerted_at 6.4x 6.5x 6.4x 6.1x 6.5x 4.5x 4.9x 6.2x
+TUNE MODE dart reached-calm 8/8 avg 13.4s alerted_at -1.0 2.3 -1.0 -1.0 -1.0 -1.0 -1.0 -1.0
+TUNE STRIKE far5.5 1/8  near2.2 6/8 (facing away at launch 4, caught of those 3)
+
+Other candidates tried:
+TUNE PARAMS rear=0.15 scale=6.0 startle_rear=0.50 loom=90
+TUNE MODE stalk reached-calm 0/8 avg 2.8s alerted_at 5.5x 5.4x 5.2x 5.4x 5.2x 5.1x 5.5x 5.2x
+TUNE MODE timed reached-calm 8/8 avg 20.0s alerted_at -1.0 -1.0 -1.0 -1.0 -1.0 -1.0 -1.0 -1.0
+TUNE MODE walk reached-calm 0/8 avg 0.8s alerted_at 6.6x 6.6x 6.6x 6.3x 6.6x 5.3x 5.3x 6.4x
+TUNE MODE dart reached-calm 7/8 avg 19.6s alerted_at -1.0 3.1 -1.0 -1.0 2.8 2.2 2.7 2.5
+TUNE STRIKE far5.5 1/8  near2.2 6/8 (facing away at launch 4, caught of those 3)
+TUNE PARAMS rear=0.12 scale=8.0 startle_rear=0.50 loom=60
+TUNE MODE stalk reached-calm 0/8 avg 5.4s alerted_at 3.4x 3.5x 3.0x 2.7x 3.0x 3.0x 3.4x 3.5x
+TUNE MODE timed reached-calm 8/8 avg 16.0s alerted_at -1.0 -1.0 -1.0 -1.0 -1.0 -1.0 -1.0 -1.0
+TUNE MODE walk reached-calm 0/8 avg 1.1s alerted_at 6.1x 6.2x 5.4x 5.6x 6.2x 3.6x 4.8x 5.8x
+TUNE MODE dart reached-calm 8/8 avg 9.9s alerted_at -1.0 -1.0 -1.0 -1.0 -1.0 -1.0 -1.0 -1.0
+TUNE STRIKE far5.5 1/8  near2.2 6/8 (facing away at launch 4, caught of those 3)

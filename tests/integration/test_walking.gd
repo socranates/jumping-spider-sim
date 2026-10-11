@@ -38,7 +38,7 @@ func test_stalk_is_slower_than_walk() -> void:
 	await _settle()
 	spider.set_intent(Vector3.RIGHT, true)
 	await physics_frames(60)
-	check_near(Vector3(spider.velocity.x, 0.0, spider.velocity.z).length(), 0.8, 0.08, "stalk speed 0.8 WU/s")
+	check_near(Vector3(spider.velocity.x, 0.0, spider.velocity.z).length(), 0.65, 0.08, "stalk speed 0.65 WU/s (T09c)")
 
 
 func test_zero_intent_does_not_drift() -> void:

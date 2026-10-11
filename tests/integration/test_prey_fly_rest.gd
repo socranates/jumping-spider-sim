@@ -2,8 +2,8 @@ extends "res://tests/prey_test_case.gd"
 ## Chunk 7B, milestone 3: a fly at rest and its senses. The authored perches are checked against the physics world; a fly sits a leg's
 ## length above its perch and is a percept the spider's senses can read like any other; its fidgets and grooming are timed by a seeded
 ## stream of its own (the same seed gives the same fly, another seed another); what it takes in is only what its own eyes could see of
-## the spider's body (a wall hides the spider's motion completely, a slow stalk gives it very little, a walk plenty), and what it has
-## taken in drains when there is nothing more to see.
+## the spider's body (a wall hides the spider's motion completely; a slow stalk gives it little while it looks the other way and enough to
+## notice while it looks straight at it (T09b); a walk plenty), and what it has taken in drains when there is nothing more to see.
 
 
 func test_the_authored_perches_are_checked_against_the_world() -> void:
@@ -57,7 +57,10 @@ func test_fidgets_and_grooming_show_that_it_is_alive() -> void:
 	await run_ticks(60 * 12, func() -> void: farthest[0] = maxf(farthest[0], flat_distance(f.global_position, p.position)))
 	check(f.fidgets_started >= 3, "it shuffles now and then (%d fidgets in 12 s)" % f.fidgets_started)
 	check(f.grooms_started >= 1, "it grooms now and then (%d bouts in 12 s)" % f.grooms_started)
-	check(float(farthest[0]) <= f.profile.perch_radius_wu + 0.02, "and stays within its patch of the perch (%.2f WU)" % float(farthest[0]))
+	# T09c: it also walks about its spot, never farther than its wander radius from the perch (and never off the surface).
+	check(f.walks_started >= 1 and f.walked_wu > 0.3, "it walks about its spot (%d walks, %.1f WU in 12 s)" % [f.walks_started, f.walked_wu])
+	check(float(farthest[0]) <= f.profile.wander_radius_wu + f.profile.perch_radius_wu + 0.02, "and stays near its perch (%.2f WU at most; wander radius %.1f)" % [float(farthest[0]), f.profile.wander_radius_wu])
+	check(f.surface_under(f.stand), "standing on the surface wherever it walked")
 	check(world.sensor.cues_made >= 1, "the small shuffles are what the spider's side vision picks up (%d cues)" % world.sensor.cues_made)
 	check_eq(f.state, Fly.State.PERCHED, "nothing here disturbs it")
 
@@ -107,21 +110,24 @@ func test_a_wall_hides_the_spiders_motion_from_the_fly_completely() -> void:
 	check_eq(str(f.senses.evidence.get("reason", "")), "no line of sight", "and knows why")
 
 
-func test_a_slow_stalk_gives_the_fly_little_to_see_and_a_walk_gives_it_plenty() -> void:
+## T09b (Nathan: hunts "deliberately slow and challenging"; the fly "looks to and fro"): where the fly is looking decides how much of a
+## stalk it takes in. A steady stalk straight at a fly that is looking at the spider is noticed before 3 WU; the same stalk while it looks
+## the other way stays under the alert level; a walk is too much either way.
+func test_what_a_fly_takes_in_of_a_stalk_depends_on_where_it_is_looking() -> void:
 	var peaks := {}
-	for mode: bool in [STALK, WALK]:
+	for c: Array in [["stalk, looking at it", STALK, Vector3.LEFT], ["stalk, looking away", STALK, Vector3.RIGHT], ["walk, looking at it", WALK, Vector3.LEFT]]:
 		await spawn_prey_world(floor_pose(-2.0, 11.0, -90.0))
 		var f := add_fly("floor_east_open", 3, true)
-		f.face(Vector3.LEFT)   # looking straight at the spider as it comes
+		f.face(c[2])
 		var peak := [0.0]
-		var steps := await walk_toward(f.global_position, mode, 3.0, 900, func() -> void: peak[0] = maxf(peak[0], f.senses.awareness))
-		peaks[mode] = float(peak[0])
-		check(flat_distance(world.spider.global_position, f.global_position) <= 3.2, "the spider got to 3 WU of it (%s, %d ticks)" % ["stalking" if mode else "walking", steps])
-		sandbox.get_child(sandbox.get_child_count() - 1)
+		var steps := await walk_toward(f.global_position, c[1], 3.0, 900, func() -> void: peak[0] = maxf(peak[0], f.senses.awareness))
+		peaks[c[0]] = float(peak[0])
+		check(flat_distance(world.spider.global_position, f.global_position) <= 3.2, "the spider got to 3 WU of it (%s, %d ticks)" % [c[0], steps])
 		world.queue_free()
 		await physics_frames(2)
-	check(float(peaks[STALK]) < 0.3, "stalking in plain view and head on stays under the alert level (%.2f)" % float(peaks[STALK]))
-	check(float(peaks[WALK]) >= 1.0, "walking up to it does not (%.2f)" % float(peaks[WALK]))
+	check(float(peaks["stalk, looking at it"]) >= 0.3, "a steady stalk head on, in plain view, is noticed (%.2f; alert at 0.30)" % float(peaks["stalk, looking at it"]))
+	check(float(peaks["stalk, looking away"]) < 0.3, "the same stalk while it looks the other way stays under the alert level (%.2f)" % float(peaks["stalk, looking away"]))
+	check(float(peaks["walk, looking at it"]) >= 1.0, "walking up to it is plain to see (%.2f)" % float(peaks["walk, looking at it"]))
 
 
 func test_what_it_has_taken_in_drains_when_the_spider_keeps_still() -> void:

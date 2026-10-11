@@ -1,6 +1,7 @@
 extends "res://tests/prey_test_case.gd"
-## Chunk 7B, milestone 9, the hunt: what a player can learn about a living fly by trying. A slow stalk reaches striking range of a perched fly
-## without startling it and the strike catches it; a walk startles it from far off; a jump from far off is seen coming and the fly is gone
+## Chunk 7B, milestone 9, the hunt: what a player can learn about a living fly by trying. T09b (Nathan: hunts "deliberately slow and
+## challenging"; the fly looks to and fro): a stalk that moves only while the fly looks away, and keeps still while it looks back, reaches
+## striking range unnoticed and the strike catches it, while a steady stalk in plain view is spotted; a walk startles it from far off; a jump from far off is seen coming and the fly is gone
 ## when it lands; from close by it is caught; a fly that is grooming is the moment to strike; and a strike that misses (here: off a cliff
 ## whose far perch gives way) lets the fly escape while the spider hangs on its line. Every trial is a fixed seed, so the numbers are
 ## repeatable; they are the same numbers the tuning notes give (a still spider, a strike aimed at the fly's perch).
@@ -9,7 +10,7 @@ extends "res://tests/prey_test_case.gd"
 const FLY_PERCH := "floor_east_open"
 const FLY_X := 4.0
 const FLY_Z := 11.0
-## A stalk of 0.8 WU/s is let to stop this far from the fly (flat distance): from here a fly is still unalarmed; closer in it is alerted (1.8 WU)
+## A stalk (0.65 WU/s since T09c) is let to stop this far from the fly (flat distance): from here a fly is still unalarmed; closer in it is alerted (1.8 WU)
 ## and then gone (1.5 WU), so the range to strike from is about 2 to 3 WU.
 const STRIKING_RANGE := 2.2
 
@@ -42,22 +43,50 @@ func _free_world() -> void:
 	await physics_frames(2)
 
 
-func test_a_slow_stalk_reaches_striking_range_unnoticed_and_a_strike_from_there_catches_the_fly() -> void:
+## True while the fly looks away from the spider (more than 110 degrees off): what a player sees of a glance.
+func _looking_away(f: Node3D) -> bool:
+	var to: Vector3 = world.spider.global_position - f.global_position
+	to.y = 0.0
+	var h: Vector3 = f.heading
+	h.y = 0.0
+	return h.normalized().dot(to.normalized()) < cos(deg_to_rad(110.0))
+
+
+func test_a_stalk_timed_to_the_flys_glances_reaches_striking_range_and_a_steady_one_in_plain_view_is_spotted() -> void:
 	var caught := 0
 	for seed_value in [3, 4]:
+		# Steady: the stalk goes on whichever way the fly looks.
 		var f: Node3D = await _hunt_world(7.0, seed_value)
-		check_eq(f.state, Fly.State.PERCHED, "seed %d: the fly sits on its perch" % seed_value)
-		var peak := [0.0]
-		var note := func() -> void: peak[0] = maxf(float(peak[0]), f.senses.awareness)
-		var used := await walk_toward(Vector3(FLY_X, 0.0, FLY_Z), STALK, STRIKING_RANGE, 60 * 14, note)
-		check(flat_distance(world.spider.global_position, f.global_position) <= STRIKING_RANGE + 0.1, "seed %d: the spider is in striking range after %.1f s (%.1f WU from the fly)" % [seed_value, used / 60.0, flat_distance(world.spider.global_position, f.global_position)])
-		check_eq(f.state, Fly.State.PERCHED, "seed %d: and the fly has not so much as been alerted" % seed_value)
-		check_eq(f.flight.flights_total, 0, "seed %d: it never took off" % seed_value)
-		check(float(peak[0]) < f.profile.awareness_flee * 0.5, "seed %d: its awareness stayed low (%.2f of the %.2f that sends it off)" % [seed_value, float(peak[0]), f.profile.awareness_flee])
-		if await _strike(f, FLY_X, FLY_Z):
+		var spotted := [-1.0]
+		var note_alert := func() -> void:
+			if float(spotted[0]) < 0.0 and f.state >= Fly.State.ALERT:
+				spotted[0] = flat_distance(world.spider.global_position, f.global_position)
+		await walk_toward(Vector3(FLY_X, 0.0, FLY_Z), STALK, STRIKING_RANGE, 60 * 14, note_alert, func() -> bool: return f.state >= Fly.State.TAKEOFF)
+		check(float(spotted[0]) > STRIKING_RANGE + 0.5, "seed %d: a steady stalk in plain view is spotted %.1f WU out, before striking range" % [seed_value, float(spotted[0])])
+		await _free_world()
+		# Timed: move only while it looks away (and is not alert); keep still while it looks back.
+		f = await _hunt_world(7.0, seed_value)
+		var peak := 0.0
+		var ticks := 0
+		while ticks < 60 * 60 and flat_distance(world.spider.global_position, f.global_position) > STRIKING_RANGE and f.state < Fly.State.TAKEOFF:
+			var go: bool = f.state == Fly.State.PERCHED and _looking_away(f)
+			var flat: Vector3 = f.global_position - world.spider.global_position   # T09c: it walks about: go where it is
+			flat.y = 0.0
+			world.spider.set_intent(flat.normalized() if go else Vector3.ZERO, STALK)
+			await physics_frames(1)
+			ticks += 1
+			peak = maxf(peak, f.senses.awareness)
+		world.spider.set_intent(Vector3.ZERO, false)
+		await physics_frames(2)
+		var d := flat_distance(world.spider.global_position, f.global_position)
+		check(d <= STRIKING_RANGE + 0.15, "seed %d: timed to its glances, the stalk reaches striking range (%.1f WU, %.1f s)" % [seed_value, d, ticks / 60.0])
+		check(ticks > 60 * 8, "seed %d: and it is slow: %.1f s from 7 WU (a steady stalk would take 6)" % [seed_value, ticks / 60.0])
+		check_eq(f.flight.flights_total, 0, "seed %d: the fly never took off" % seed_value)
+		check(peak < f.profile.awareness_flee * 0.5, "seed %d: its awareness stayed low (%.2f of the %.2f that sends it off)" % [seed_value, peak, f.profile.awareness_flee])
+		if await _strike(f, f.global_position.x, f.global_position.z):
 			caught += 1
 		await _free_world()
-	check(caught >= 1, "a strike from there catches it (%d of 2; the tuning notes have 5 of 8 seeds from 2.2 WU, 1 of 8 from 1.8 WU, where the fly is already alerted)" % caught)
+	check(caught >= 1, "a strike from there, at where the fly is now, catches it (%d of 2; the T09b tuning run caught 6 of 8 from 2.2 WU)" % caught)
 
 
 func test_a_walk_up_to_the_same_fly_alerts_it_early_and_it_leaves_before_the_spider_is_near() -> void:
@@ -86,7 +115,7 @@ func test_a_jump_from_far_off_is_seen_coming_and_one_from_close_by_is_not() -> v
 	var far_caught := 0
 	var near_caught := 0
 	var far_fled := 0
-	for seed_value in [1, 2, 3]:
+	for seed_value in [1, 2, 3, 4, 5, 6, 7, 8]:
 		var f := await _hunt_world(5.5, seed_value)
 		if await _strike(f, FLY_X, FLY_Z):
 			far_caught += 1
@@ -100,9 +129,10 @@ func test_a_jump_from_far_off_is_seen_coming_and_one_from_close_by_is_not() -> v
 		if await _strike(f, FLY_X, FLY_Z):
 			near_caught += 1
 		await _free_world()
-	check_eq(far_caught, 0, "from 5.5 WU no strike of three catches a calm fly: it saw the leap coming")
-	check_eq(far_fled, 3, "and each of the three was gone (or going) by the time the spider landed, its own trace saying it noticed")
-	check(near_caught >= 2, "from 2 WU at least two of three catch it (%d of 3)" % near_caught)
+	# T09b: a fly that happens to be looking away or grooming can now be caught by a long leap now and then: rare, not reliable.
+	check(far_caught <= 2, "from 5.5 WU a long leap rarely catches a calm fly: %d of 8 (the T09b tuning run: 1 of 8)" % far_caught)
+	check(far_fled >= 8 - far_caught - 1, "and the others were gone (or going) by the time the spider landed, their own traces saying they noticed (%d of %d)" % [far_fled, 8 - far_caught])
+	check(near_caught >= 5, "from 2 WU most strikes catch it (%d of 8)" % near_caught)
 
 
 func test_a_grooming_fly_is_the_moment_to_strike() -> void:

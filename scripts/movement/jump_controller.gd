@@ -56,7 +56,15 @@ func _ready() -> void:
 		motor.out_of_bounds_reset.connect(_on_out_of_bounds)
 
 
+## T09c (Nathan: "the space bar can be used for the tapping instead when you have a fly"): while held prey struggles, and for a moment
+## after it is subdued, the jump button is the grip (FeedingController reads it); it neither hops nor aims.
+var feeding: Node
+
+
 func _unhandled_input(event: InputEvent) -> void:
+	if feeding != null and feeding.has_method("jump_button_is_grip") and feeding.jump_button_is_grip() \
+			and (event.is_action("prepare_jump")):
+		return
 	if event.is_action_pressed("prepare_jump"):
 		press()
 	elif event.is_action_released("prepare_jump"):

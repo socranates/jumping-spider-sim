@@ -1,0 +1,891 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[   0% ] [90m[1mfirst_scan_filesystem[22m | Started Project initialization (5 steps)[39m[0m
+[   0% ] [90m[1mfirst_scan_filesystem[22m | Scanning file structure...[39m[0m
+[  16% ] [90m[1mfirst_scan_filesystem[22m | Loading global class names...[39m[0m
+[  33% ] [90m[1mfirst_scan_filesystem[22m | Verifying GDExtensions...[39m[0m
+[  50% ] [90m[1mfirst_scan_filesystem[22m | Creating autoload scripts...[39m[0m
+[  66% ] [90m[1mfirst_scan_filesystem[22m | Initializing plugins...[39m[0m
+[  83% ] [90m[1mfirst_scan_filesystem[22m | Starting file scan...[39m[0m
+[92m[ DONE ][39m [1mfirst_scan_filesystem[22m
+[0m
+[   0% ] [90m[1mupdate_scripts_classes[22m | Started Registering global classes... (141 steps)[39m[0m
+[   0% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   0% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   1% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   2% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   2% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   3% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   4% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   4% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   5% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   6% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   7% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   7% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   8% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   9% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[   9% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  10% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  11% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  11% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  12% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  13% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  14% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  14% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  15% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  16% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  16% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  17% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  18% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  19% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  19% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  20% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  21% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  21% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  22% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  23% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  23% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  24% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  25% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  26% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  26% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  27% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  28% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  28% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  29% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  30% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  30% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  31% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  32% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  33% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  33% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  34% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  35% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  35% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  36% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  37% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  38% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  38% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  39% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  40% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  40% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  41% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  42% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  42% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  43% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  44% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  45% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  45% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  46% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  47% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  47% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  48% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  49% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  50% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  50% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  51% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  52% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  52% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  53% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  54% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  54% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  55% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  56% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  57% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  57% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  58% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  59% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  59% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  60% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  61% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  61% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  62% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  63% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  64% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  64% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  65% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  66% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  66% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  67% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  68% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  69% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  69% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  70% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  71% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  71% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  72% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  73% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  73% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  74% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  75% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  76% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  76% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  77% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  78% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  78% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  79% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  80% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  80% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  81% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  82% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  83% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  83% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  84% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  85% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  85% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  86% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  87% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  88% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  88% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  89% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  90% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  90% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  91% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  92% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  92% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  93% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  94% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  95% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  95% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  96% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  97% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  97% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  98% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[92m[ DONE ][39m [1mupdate_scripts_classes[22m
+[0m
+[   0% ] [90m[1m_update_scan_actions[22m | Started Scanning actions... (10 steps)[39m[0m
+[   0% ] [90m[1m_update_scan_actions[22m | t08_overview.png[39m[0m
+[   9% ] [90m[1m_update_scan_actions[22m | t08_spawn.png[39m[0m
+[  18% ] [90m[1m_update_scan_actions[22m | t09_field_notes.png[39m[0m
+[  27% ] [90m[1m_update_scan_actions[22m | t09_keys_150.png[39m[0m
+[  36% ] [90m[1m_update_scan_actions[22m | t09_pause_menu.png[39m[0m
+[  45% ] [90m[1m_update_scan_actions[22m | t09_rest_checkpoint.png[39m[0m
+[  54% ] [90m[1m_update_scan_actions[22m | t09_returned.png[39m[0m
+[  63% ] [90m[1m_update_scan_actions[22m | t09b_pause_menu.png[39m[0m
+[  72% ] [90m[1m_update_scan_actions[22m | t09b_struggle.png[39m[0m
+[  81% ] [90m[1m_update_scan_actions[22m | icon.svg[39m[0m
+[92m[ DONE ][39m [1m_update_scan_actions[22m
+[0m
+[   0% ] [90m[1mreimport[22m | Started (Re)Importing Assets (10 steps)[39m[0m
+[   0% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   9% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  18% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  27% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  36% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  45% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  54% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  63% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  72% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  81% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   0% ] [90m[1mreimport[22m | Executing pre-reimport operations...[39m[0m
+[   0% ] [90m[1mreimport[22m | t08_overview.png[39m[0m
+[   9% ] [90m[1mreimport[22m | t08_spawn.png[39m[0m
+[  18% ] [90m[1mreimport[22m | t09_field_notes.png[39m[0m
+[  27% ] [90m[1mreimport[22m | t09_keys_150.png[39m[0m
+[  36% ] [90m[1mreimport[22m | t09_pause_menu.png[39m[0m
+[  45% ] [90m[1mreimport[22m | t09_rest_checkpoint.png[39m[0m
+[  54% ] [90m[1mreimport[22m | t09_returned.png[39m[0m
+[  63% ] [90m[1mreimport[22m | t09b_pause_menu.png[39m[0m
+[  72% ] [90m[1mreimport[22m | t09b_struggle.png[39m[0m
+[  81% ] [90m[1mreimport[22m | icon.svg[39m[0m
+[  90% ] [90m[1mreimport[22m | Finalizing Asset Import...[39m[0m
+[92m[ DONE ][39m [1mreimport[22m
+[0m
+[   0% ] [90m[1mreimport[22m | Started (Re)Importing Assets (10 steps)[39m[0m
+[   0% ] [90m[1mreimport[22m | Executing post-reimport operations...[39m[0m
+[92m[ DONE ][39m [1mreimport[22m
+[0m
+[   0% ] [90m[1mloading_editor_layout[22m | Started Loading editor (5 steps)[39m[0m
+[   0% ] [90m[1mloading_editor_layout[22m | Loading editor layout...[39m[0m
+[  16% ] [90m[1mloading_editor_layout[22m | Loading docks...[39m[0m
+[92m[ DONE ][39m [1mloading_editor_layout[22m
+[0m
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS     test_boom_math.gd::test_allowed_length_from_cast_fraction  [1 ms]  4 checks
+PASS     test_boom_math.gd::test_hit_retracts_immediately  [0 ms]  3 checks
+PASS     test_boom_math.gd::test_invariants_hold_for_random_inputs  [8 ms]  500 checks
+PASS     test_boom_math.gd::test_non_finite_input_returns_the_pivot  [0 ms]  3 checks
+PASS     test_boom_math.gd::test_orbit_basis_never_rolls  [16 ms]  2000 checks
+PASS     test_boom_math.gd::test_pitch_ease_is_quick_in_slow_out_and_never_overshoots  [0 ms]  47 checks
+PASS     test_boom_math.gd::test_pitch_ease_treats_negative_offsets_like_positive_ones  [1 ms]  45 checks
+PASS     test_boom_math.gd::test_pitch_offset_rejects_bad_input  [1 ms]  4 checks
+PASS     test_boom_math.gd::test_pitch_offset_takes_the_smallest_comfortable_change  [0 ms]  6 checks
+PASS     test_boom_math.gd::test_pitch_offset_works_down_the_list_in_the_order_tried_including_negative_offsets  [0 ms]  4 checks
+PASS     test_boom_math.gd::test_recovery_converges_without_overshoot  [0 ms]  53 checks
+PASS     test_boom_math.gd::test_recovery_is_bounded_per_step  [0 ms]  5 checks
+PASS     test_boom_math.gd::test_smooth_damp_arrives_without_overshoot_and_starts_gently  [1 ms]  48 checks
+PASS     test_boom_math.gd::test_smooth_damp_works_in_both_directions_and_from_a_moving_start  [2 ms]  206 checks
+PASS     test_boom_math.gd::test_yaw_convention  [0 ms]  3 checks
+PASS     test_evidence.gd::test_a_missing_folder_is_reported_not_crashed  [284 ms]  1 checks
+PASS     test_evidence.gd::test_files_that_are_not_evidence_change_nothing  [317 ms]  4 checks
+PASS     test_evidence.gd::test_hashes_follow_their_own_files_only  [268 ms]  13 checks
+PASS     test_evidence.gd::test_the_archive_holds_the_project_except_the_cache_and_the_reports  [187 ms]  19 checks
+PASS     test_evidence.gd::test_the_archive_is_written_read_back_and_checked  [346 ms]  31 checks
+PASS     test_evidence.gd::test_the_id_is_twelve_hex_digits_made_from_all_three  [166 ms]  7 checks
+PASS     test_evidence.gd::test_the_real_project_archive_would_hold_what_matters  [206 ms]  10 checks
+PASS     test_evidence.gd::test_the_source_hash_is_the_one_the_report_always_had  [550 ms]  2 checks
+PASS     test_input_map.gd::test_debug_overlay_action_is_bound_to_f3  [0 ms]  2 checks
+PASS     test_input_map.gd::test_default_bindings_match_the_action_map  [0 ms]  11 checks
+PASS     test_input_map.gd::test_every_section_17_action_has_keyboard_or_mouse_and_joypad_events  [0 ms]  52 checks
+PASS     test_input_map.gd::test_saved_overrides_replace_defaults_and_can_be_reset  [1 ms]  4 checks
+PASS     test_jump_feedback.gd::test_each_kind_has_its_own_shape_colour_and_words  [1 ms]  8 checks
+PASS     test_jump_feedback.gd::test_every_reason_the_solver_can_give_has_words  [0 ms]  12 checks
+PASS     test_jump_feedback.gd::test_the_aim_label_says_what_a_release_does  [0 ms]  9 checks
+PASS     test_jump_feedback.gd::test_the_hidden_anchor_note_names_the_edge_only_when_the_line_bends_over_one  [0 ms]  3 checks
+PASS     test_jump_feedback.gd::test_toasts_for_each_outcome  [1 ms]  7 checks
+PASS     test_jump_math.gd::test_arrival_must_go_into_the_target_surface  [2 ms]  22 checks
+PASS     test_jump_math.gd::test_every_launch_leaves_the_surface  [1 ms]  56 checks
+PASS     test_jump_math.gd::test_height_limits_the_reach  [0 ms]  4 checks
+PASS     test_jump_math.gd::test_reach_is_about_two_to_five_body_lengths_on_the_level  [1 ms]  7 checks
+PASS     test_jump_math.gd::test_solutions_are_ordered_lowest_launch_speed_first_and_respect_the_limit  [0 ms]  69 checks
+PASS     test_jump_math.gd::test_standing_surfaces_follow_the_45_degree_rule  [0 ms]  7 checks
+PASS     test_jump_math.gd::test_step_range_is_the_whole_ticks_inside_the_profile_range  [0 ms]  5 checks
+PASS     test_jump_math.gd::test_the_continuous_formula_would_miss_by_a_visible_amount  [0 ms]  3 checks
+PASS     test_jump_math.gd::test_the_launch_velocity_reaches_the_seat_exactly_in_the_tick_loop  [3 ms]  302 checks
+PASS     test_jump_math.gd::test_unreachable_inputs_are_rejected_with_a_reason  [0 ms]  4 checks
+PASS     test_jump_planner.gd::test_a_clear_target_is_reachable_and_the_plan_is_complete  [30 ms]  16 checks
+PASS     test_jump_planner.gd::test_a_surface_that_cannot_hold_the_spider_is_ineligible  [20 ms]  5 checks
+PASS     test_jump_planner.gd::test_an_arc_that_would_only_graze_is_not_offered  [21 ms]  3 checks
+PASS     test_jump_planner.gd::test_every_arc_blocked_is_obstructed_and_shows_where  [22 ms]  8 checks
+PASS     test_jump_planner.gd::test_leaving_the_surface_is_required  [20 ms]  2 checks
+PASS     test_jump_planner.gd::test_no_room_at_the_landing_is_obstructed_even_when_a_point_ray_is_clear  [21 ms]  4 checks
+PASS     test_jump_planner.gd::test_no_target_is_reported_for_missing_or_broken_aim_data  [24 ms]  5 checks
+PASS     test_jump_planner.gd::test_the_lowest_speed_arc_goes_first_and_higher_arcs_follow_when_it_is_blocked  [26 ms]  15 checks
+PASS     test_jump_planner.gd::test_tuning_comes_from_the_species_profile  [22 ms]  5 checks
+PASS     test_jump_planner.gd::test_unreachable_is_not_obstructed_and_costs_no_sweeps  [22 ms]  6 checks
+PASS     test_needs_model.gd::test_a_grant_that_is_not_one_changes_nothing  [1 ms]  9 checks
+PASS     test_needs_model.gd::test_a_stall_cannot_drain_more_than_a_capped_step  [0 ms]  2 checks
+PASS     test_needs_model.gd::test_configure_ignores_values_outside_the_unit_range  [0 ms]  4 checks
+PASS     test_needs_model.gd::test_energy_changed_is_announced_once_per_change  [0 ms]  3 checks
+PASS     test_needs_model.gd::test_energy_drains_slowly_and_only_with_time  [2 ms]  3 checks
+PASS     test_needs_model.gd::test_grants_fill_the_reserve_and_never_past_it  [0 ms]  8 checks
+PASS     test_needs_model.gd::test_it_starts_a_little_hungry_and_rested  [0 ms]  4 checks
+PASS     test_needs_model.gd::test_rest_wears_down_while_active_and_builds_while_still  [41 ms]  3 checks
+PASS     test_needs_model.gd::test_the_drain_stops_at_the_floor_and_nothing_goes_negative  [86 ms]  3 checks
+PASS     test_needs_model.gd::test_the_record_round_trips_and_rejects_nonsense  [1 ms]  12 checks
+PASS     test_needs_model.gd::test_the_same_time_drains_the_same_at_every_frame_rate  [121 ms]  8 checks
+PASS     test_observation.gd::test_a_peripheral_observation_carries_no_position_label_or_target  [0 ms]  5 checks
+PASS     test_observation.gd::test_each_rule_of_the_record_is_checked  [1 ms]  26 checks
+PASS     test_observation.gd::test_good_records_have_no_problems  [0 ms]  2 checks
+PASS     test_observation.gd::test_the_record_keeps_the_fields_of_the_spec  [0 ms]  9 checks
+PASS     test_observation_memory.gd::test_a_contact_known_only_from_cues_can_be_folded_into_a_lost_one  [0 ms]  8 checks
+PASS     test_observation_memory.gd::test_a_contact_that_expired_comes_back_as_a_new_one  [1 ms]  3 checks
+PASS     test_observation_memory.gd::test_a_contact_that_was_only_ever_a_cue_comes_back_on_a_cue  [1 ms]  2 checks
+PASS     test_observation_memory.gd::test_a_cue_makes_a_contact_with_a_bearing_and_nothing_else  [0 ms]  6 checks
+PASS     test_observation_memory.gd::test_a_cue_never_takes_back_what_an_inspection_found  [0 ms]  11 checks
+PASS     test_observation_memory.gd::test_a_lost_inspected_contact_leaves_a_mark_that_never_moves  [1 ms]  4 checks
+PASS     test_observation_memory.gd::test_a_peripheral_contact_is_held_for_the_cue_hold_and_then_lost  [0 ms]  4 checks
+PASS     test_observation_memory.gd::test_an_inspection_is_held_for_the_grace_only  [0 ms]  2 checks
+PASS     test_observation_memory.gd::test_an_invalid_record_is_refused_and_changes_nothing  [0 ms]  4 checks
+PASS     test_observation_memory.gd::test_confidence_falls_in_a_straight_line_and_the_contact_expires  [1 ms]  7 checks
+PASS     test_observation_memory.gd::test_familiarity_is_one_while_live_then_fades_then_is_nothing  [1 ms]  4 checks
+PASS     test_observation_memory.gd::test_inspecting_the_empty_spot_drops_the_mark_and_only_a_lost_contact_has_one  [0 ms]  8 checks
+PASS     test_observation_memory.gd::test_only_a_contact_without_a_place_is_folded_and_never_into_itself  [1 ms]  4 checks
+PASS     test_observation_memory.gd::test_only_an_inspection_reacquires_and_it_updates_the_record  [1 ms]  9 checks
+PASS     test_observation_memory.gd::test_several_contacts_are_kept_apart  [0 ms]  6 checks
+PASS     test_observation_memory.gd::test_the_hold_times_are_the_ones_the_memory_loses_contacts_by  [0 ms]  4 checks
+PASS     test_observation_memory.gd::test_the_speed_a_thing_was_seen_moving_at_is_kept_with_the_place  [0 ms]  2 checks
+PASS     test_observation_memory.gd::test_time_alone_never_changes_a_position_or_a_category  [0 ms]  8 checks
+PASS     test_perception_math.gd::test_a_cue_gives_a_sector_and_a_band_and_no_more  [1 ms]  30 checks
+PASS     test_perception_math.gd::test_a_cue_is_weak_and_a_little_stronger_when_near  [0 ms]  3 checks
+PASS     test_perception_math.gd::test_a_lost_contact_fades_in_a_straight_line_to_nothing  [0 ms]  8 checks
+PASS     test_perception_math.gd::test_apparent_size_is_the_angle_a_thing_covers  [0 ms]  4 checks
+PASS     test_perception_math.gd::test_classification_refines_with_continuous_exposure  [0 ms]  11 checks
+PASS     test_perception_math.gd::test_coarseness_is_real_two_nearby_bearings_give_the_same_answer  [0 ms]  2 checks
+PASS     test_perception_math.gd::test_cone_and_angle_helpers  [0 ms]  5 checks
+PASS     test_perception_math.gd::test_exposure_needed_grows_as_a_thing_looks_smaller  [0 ms]  4 checks
+PASS     test_perception_math.gd::test_inspection_confidence_rises_with_exposure_and_falls_with_hiding  [0 ms]  6 checks
+PASS     test_perception_math.gd::test_sizes_and_categories_that_can_be_one_thing  [0 ms]  8 checks
+PASS     test_perception_math.gd::test_the_categories_are_ordered_and_never_name_a_species  [0 ms]  6 checks
+PASS     test_perception_math.gd::test_the_plausible_region_grows_with_time_and_uses_nothing_but_what_was_seen  [0 ms]  5 checks
+PASS     test_perception_math.gd::test_the_sight_allowance_follows_the_size_of_the_thing_and_never_hides_a_whole_speck  [0 ms]  12 checks
+PASS     test_perception_text.gd::test_a_contacts_label_is_its_category_while_live_and_lost_sight_after  [0 ms]  3 checks
+PASS     test_perception_text.gd::test_an_unknown_category_is_called_movement_the_safest_thing_to_say  [0 ms]  2 checks
+PASS     test_perception_text.gd::test_no_word_has_a_number_or_a_species_in_it  [0 ms]  15 checks
+PASS     test_perception_text.gd::test_the_three_categories_have_their_words  [0 ms]  4 checks
+PASS     test_prey_math.gd::test_a_draw_stays_in_its_pair_and_follows_the_seed  [2 ms]  202 checks
+PASS     test_prey_math.gd::test_a_sweep_finds_a_head_on_pass_that_a_per_tick_check_would_miss  [0 ms]  2 checks
+PASS     test_prey_math.gd::test_a_sweep_of_things_moving_together_does_not_change_their_distance  [0 ms]  1 checks
+PASS     test_prey_math.gd::test_a_sweep_of_two_things_that_do_not_move_is_their_distance  [0 ms]  1 checks
+PASS     test_prey_math.gd::test_a_sweep_where_the_closest_moment_is_an_end_uses_that_end  [0 ms]  4 checks
+PASS     test_prey_math.gd::test_a_sweep_with_both_things_moving_uses_the_relative_motion  [0 ms]  2 checks
+PASS     test_prey_math.gd::test_apparent_angle_and_bearing_rate  [0 ms]  6 checks
+PASS     test_prey_math.gd::test_awareness_integrates_by_the_time_that_passed_and_stays_in_range  [0 ms]  6 checks
+PASS     test_prey_math.gd::test_awareness_needs_motion_above_the_threshold_and_is_scaled_by_the_weights  [0 ms]  8 checks
+PASS     test_prey_math.gd::test_distance_and_facing_weights  [0 ms]  8 checks
+PASS     test_prey_math.gd::test_distance_to_a_path  [0 ms]  4 checks
+PASS     test_prey_math.gd::test_flee_is_worth_nothing_without_a_threat  [3 ms]  5 checks
+PASS     test_prey_math.gd::test_hysteresis_keeps_the_present_goal_in_a_close_call  [0 ms]  5 checks
+PASS     test_prey_math.gd::test_in_view_is_the_camera_cone_with_a_margin  [0 ms]  12 checks
+PASS     test_prey_math.gd::test_loom_is_the_relative_swelling_and_only_for_things_that_grow  [0 ms]  4 checks
+PASS     test_prey_math.gd::test_path_length_point_and_direction  [0 ms]  10 checks
+PASS     test_prey_math.gd::test_rest_wins_when_calm_and_loses_when_threatened  [2 ms]  5 checks
+PASS     test_prey_math.gd::test_speed_eases_down_into_a_landing_and_climbs_at_the_acceleration  [0 ms]  6 checks
+PASS     test_prey_math.gd::test_startle_needs_both_a_lot_of_motion_and_nearness  [0 ms]  4 checks
+PASS     test_prey_math.gd::test_threat_runs_from_calm_to_flee  [0 ms]  4 checks
+PASS     test_prey_profile.gd::test_a_missing_file_is_rejected  [0 ms]  2 checks
+PASS     test_prey_profile.gd::test_every_field_is_required_and_named_when_missing  [299 ms]  197 checks
+PASS     test_prey_profile.gd::test_the_relations_between_values_are_enforced  [13 ms]  5 checks
+PASS     test_prey_profile.gd::test_the_shipped_profile_loads_with_the_designed_numbers  [3 ms]  14 checks
+PASS     test_prey_profile.gd::test_unknown_fields_are_rejected  [6 ms]  3 checks
+PASS     test_prey_profile.gd::test_wrong_types_and_out_of_range_values_are_rejected  [17 ms]  8 checks
+ERROR: ConfigFile parse error at user://jss_test_settings.cfg:1: Expected value, got ''=''.
+   at: _parse (core/io/config_file.cpp:293)
+   GDScript backtrace (most recent call first):
+       [0] load_settings (res://scripts/presentation/settings.gd:220)
+       [1] test_corrupt_file_falls_back_to_defaults (res://tests/unit/test_settings.gd:106)
+       [2] _run_one (res://tests/test_runner.gd:217)
+       [3] _run (res://tests/test_runner.gd:143)
+PASS     test_settings.gd::test_corrupt_file_falls_back_to_defaults  [10 ms]  3 checks, 1 expected engine error(s) printed above
+PASS     test_settings.gd::test_defaults  [1 ms]  14 checks
+PASS     test_settings.gd::test_every_change_is_saved  [30 ms]  2 checks
+PASS     test_settings.gd::test_invalid_saved_values_fall_back_or_clamp  [5 ms]  6 checks
+PASS     test_settings.gd::test_missing_file_falls_back_to_defaults  [2 ms]  3 checks
+PASS     test_settings.gd::test_round_trip_through_a_temp_file  [39 ms]  11 checks
+ERROR: Settings: invalid value for 'fov_degrees'
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] set_value (res://scripts/presentation/settings.gd:126)
+       [1] test_setters_clamp_notify_and_reject_bad_types (res://tests/unit/test_settings.gd:137)
+       [2] _run_one (res://tests/test_runner.gd:217)
+       [3] _run (res://tests/test_runner.gd:143)
+PASS     test_settings.gd::test_setters_clamp_notify_and_reject_bad_types  [4 ms]  8 checks, 1 expected engine error(s) printed above
+PASS     test_silk.gd::test_a_line_pointing_at_the_camera_or_with_no_length_still_makes_a_finite_strip  [1 ms]  9 checks
+PASS     test_silk.gd::test_a_line_that_is_not_locked_is_drawn_straight  [0 ms]  1 checks
+PASS     test_silk.gd::test_a_pixel_has_a_world_size_that_follows_depth_and_the_picture_height  [0 ms]  5 checks
+PASS     test_silk.gd::test_a_slack_line_hangs_in_a_parabola_in_its_last_span  [0 ms]  6 checks
+PASS     test_silk.gd::test_a_taut_line_is_drawn_straight_wherever_the_spinnerets_are_on_the_body  [0 ms]  12 checks
+PASS     test_silk.gd::test_close_up_the_core_keeps_some_body_and_the_strip_is_never_thinner_than_asked  [0 ms]  12 checks
+PASS     test_silk.gd::test_over_a_bend_only_the_last_span_sags_and_a_taut_line_is_straight_everywhere  [0 ms]  5 checks
+PASS     test_silk.gd::test_the_strip_faces_the_camera  [0 ms]  12 checks
+PASS     test_silk.gd::test_the_strip_is_the_same_width_on_screen_at_any_distance_beyond_a_few_wu  [1 ms]  20 checks
+PASS     test_silk.gd::test_widths_are_given_at_1080p_and_follow_the_screen_height  [0 ms]  7 checks
+PASS     test_species_profile.gd::test_every_perception_field_is_required_and_checked  [94 ms]  54 checks
+PASS     test_species_profile.gd::test_inconsistent_perception_values_are_rejected  [16 ms]  9 checks
+PASS     test_species_profile.gd::test_malformed_json_is_rejected  [0 ms]  5 checks
+PASS     test_species_profile.gd::test_missing_field_is_rejected_and_named  [3 ms]  4 checks
+PASS     test_species_profile.gd::test_missing_file_is_rejected  [0 ms]  2 checks
+PASS     test_species_profile.gd::test_non_finite_numbers_are_rejected  [0 ms]  5 checks
+PASS     test_species_profile.gd::test_out_of_range_and_inconsistent_values_are_rejected  [11 ms]  6 checks
+PASS     test_species_profile.gd::test_shipped_profile_loads_with_spec_values  [2 ms]  13 checks
+PASS     test_species_profile.gd::test_the_perception_section_loads_and_keeps_the_spec_numbers  [2 ms]  13 checks
+PASS     test_species_profile.gd::test_wrong_types_are_rejected  [12 ms]  7 checks
+PASS     test_spider_motor_intent.gd::test_collider_is_a_sphere_of_radius_0_3  [8 ms]  2 checks
+PASS     test_spider_motor_intent.gd::test_intent_keeps_its_direction_and_is_limited  [0 ms]  5 checks
+PASS     test_spider_motor_intent.gd::test_states_are_the_t04_subset_of_spec_6_2  [1 ms]  1 checks
+PASS     test_support_math.gd::test_edge_line_of_two_faces  [0 ms]  6 checks
+PASS     test_support_math.gd::test_hysteresis_keeps_the_normal_across_a_seam  [1 ms]  5 checks
+PASS     test_support_math.gd::test_rotations_and_body_frame  [0 ms]  9 checks
+PASS     test_surface_input.gd::test_floor_forward_and_right_go_where_the_screen_says  [1 ms]  12 checks
+PASS     test_surface_input.gd::test_floor_mapping_is_the_chunk_2_mapping  [1 ms]  32 checks
+PASS     test_surface_input.gd::test_mapping_is_unit_perpendicular_and_keeps_the_stick_length  [1 ms]  66 checks
+PASS     test_surface_input.gd::test_mapping_turns_smoothly_as_a_floor_tilts_into_a_wall  [0 ms]  1 checks
+PASS     test_surface_input.gd::test_underside_forward_moves_away_from_the_camera  [0 ms]  18 checks
+PASS     test_surface_input.gd::test_wall_forward_climbs_and_right_goes_right  [1 ms]  81 checks
+PASS     test_surface_profile.gd::test_eligibility_rule  [3 ms]  12 checks
+PASS     test_surface_profile.gd::test_folder_loading_is_all_or_nothing  [29 ms]  5 checks
+PASS     test_surface_profile.gd::test_shipped_profiles_load  [20 ms]  13 checks
+PASS     test_surface_profile.gd::test_validation_names_the_problem  [4 ms]  18 checks
+PASS     test_tether.gd::test_a_bend_point_splits_the_path_and_shortens_the_free_length  [0 ms]  7 checks
+PASS     test_tether.gd::test_a_pendulum_stepped_with_it_settles_with_damping_and_stays_on_its_length  [3 ms]  604 checks
+PASS     test_tether.gd::test_a_slack_line_changes_nothing  [6 ms]  600 checks
+PASS     test_tether.gd::test_a_taut_line_only_removes_the_excess_and_outward_speed_and_never_pushes  [22 ms]  4500 checks
+PASS     test_tether.gd::test_drawing_and_accounting_helpers  [0 ms]  7 checks
+PASS     test_tether.gd::test_the_constraint_residuals_are_float32_rounding_not_a_push  [53 ms]  4 checks
+PASS     test_tether.gd::test_the_state_record_has_the_spec_fields_and_bounded_lengths  [1 ms]  17 checks
+PASS     test_toolchain.gd::test_autoloads_are_registered  [0 ms]  2 checks
+PASS     test_toolchain.gd::test_pinned_engine_and_project_settings  [0 ms]  9 checks
+A01 result: 5 of 5 fixtures passed: the fly fled on what it sensed and not on the jump button; its trace explained every step; the capture happened once
+PASS     test_a01_fly_evidence.gd::test_a01_a_fly_flees_on_sensed_evidence_not_on_the_jump_button_its_trace_explains_each_step_and_a_capture_happens_once  [27229 ms]  17 checks
+PASS     test_camera.gd::test_aiming_tilts_the_camera_about_itself_and_leaves_the_orbit_and_the_walking_view_alone  [1379 ms]  15 checks
+PASS     test_camera.gd::test_auto_pitch_eases_in_against_a_wall_and_out_when_space_clears  [3498 ms]  9 checks
+PASS     test_camera.gd::test_boom_retracts_at_once_and_recovers_gradually  [2122 ms]  6 checks
+PASS     test_camera.gd::test_camera_follows_the_walking_spider  [2165 ms]  3 checks
+PASS     test_camera.gd::test_camera_is_clear_on_the_first_frame_at_every_wall_and_heading  [1590 ms]  161 checks
+PASS     test_camera.gd::test_camera_starts_clear_in_a_corner  [83 ms]  6 checks
+PASS     test_camera.gd::test_camera_starts_clear_with_the_spider_backed_against_a_wall  [564 ms]  10 checks
+PASS     test_camera.gd::test_camera_starts_clear_with_the_spider_facing_a_wall  [65 ms]  7 checks
+PASS     test_camera.gd::test_camera_under_the_overhang_stays_below_the_underside  [993 ms]  5 checks
+PASS     test_camera.gd::test_fast_yaw_sweeps_near_walls_never_put_the_camera_in_geometry  [5403 ms]  2880 checks
+PASS     test_camera.gd::test_fov_and_distance_settings_apply  [1202 ms]  7 checks
+PASS     test_camera.gd::test_horizon_stays_level_while_orbiting  [345 ms]  40 checks
+PASS     test_camera.gd::test_look_applies_sensitivity_invert_and_pitch_clamp  [40 ms]  7 checks
+PASS     test_camera.gd::test_mouse_motion_events_turn_the_camera  [38 ms]  3 checks
+PASS     test_camera.gd::test_on_an_underside_the_camera_goes_lower_and_still_reaches_the_comfortable_boom  [1913 ms]  36 checks
+PASS     test_camera.gd::test_recenter_action_starts_a_recenter  [472 ms]  1 checks
+PASS     test_camera.gd::test_recenter_turns_behind_the_spider_over_about_a_quarter_second  [529 ms]  4 checks
+PASS     test_camera.gd::test_spider_body_is_hidden_only_while_the_camera_is_closer_than_the_hide_length  [76 ms]  2 checks
+PASS     test_camera.gd::test_spider_stays_in_frame_with_its_back_to_a_wall  [3348 ms]  50 checks
+PASS     test_camera.gd::test_the_underside_offset_eases_in_and_out_without_snapping  [3820 ms]  3 checks
+PASS     test_camera.gd::test_the_upward_search_only_runs_when_no_downward_pitch_is_comfortable  [1320 ms]  2 checks
+PASS     test_camera.gd::test_the_whole_view_stays_short_of_straight_down_while_aiming  [247 ms]  2 checks
+prey seed 66575431
+PASS     test_camera_framing.gd::test_a_look_input_wins_and_nothing_jumps  [7730 ms]  10 checks
+prey seed 74328529
+PASS     test_camera_framing.gd::test_a_recenter_and_aiming_take_the_view_as_well  [3826 ms]  7 checks
+prey seed 78158639
+PASS     test_camera_framing.gd::test_any_look_input_cancels_a_turn_in_progress_at_once  [2851 ms]  6 checks
+prey seed 81021996
+PASS     test_camera_framing.gd::test_no_framing_where_the_view_is_already_good  [2847 ms]  4 checks
+prey seed 83875288
+PASS     test_camera_framing.gd::test_no_framing_without_a_line  [1658 ms]  2 checks
+prey seed 85544540
+PASS     test_camera_framing.gd::test_the_look_stick_wins_too  [3362 ms]  4 checks
+prey seed 88922851
+prey seed 91267403
+PASS     test_camera_framing.gd::test_the_turn_is_a_setting_and_switching_it_off_leaves_the_view_where_it_is  [5691 ms]  10 checks
+prey seed 94622554
+prey seed 96972605
+prey seed 99331401
+prey seed 101692784
+PASS     test_camera_framing.gd::test_the_turn_never_exceeds_the_cap_and_the_cap_is_what_stops_it  [9389 ms]  7 checks
+prey seed 104032338
+PASS     test_camera_framing.gd::test_the_view_turns_to_the_open_side_by_the_smallest_turn_and_holds_it  [4840 ms]  10 checks
+prey seed 108900575
+PASS     test_camera_framing.gd::test_the_walking_controls_steer_by_the_view  [650 ms]  2 checks
+PASS     test_camera_ordering.gd::test_a_snap_before_the_rig_can_see_the_world_keeps_the_camera_at_the_pivot  [86 ms]  14 checks
+PASS     test_camera_ordering.gd::test_a_spawn_inside_a_physics_tick_never_shows_a_camera_from_an_uncast_boom  [901 ms]  204 checks
+PASS     test_camera_ordering.gd::test_a_spawn_made_outside_the_physics_step_can_be_cast_from_the_first_tick  [244 ms]  78 checks
+PASS     test_camera_ordering.gd::test_rendered_frames_before_the_first_tick_draw_nothing_from_a_cast  [213 ms]  48 checks
+PASS     test_camera_ordering.gd::test_several_physics_ticks_between_two_rendered_frames_leave_no_stale_placement  [445 ms]  72 checks
+PASS     test_captured_contact.gd::test_bodily_capture_keeps_two_ambiguous_lost_marks  [1612 ms]  2 checks
+PASS     test_captured_contact.gd::test_capture_does_not_erase_an_old_lost_hypothesis_or_invent_one  [1708 ms]  3 checks
+PASS     test_captured_contact.gd::test_observed_capture_resolves_mark_without_duplicate_food  [3142 ms]  8 checks
+prey seed 118292208
+prey seed 123248966
+prey seed 130172362
+prey seed 135106881
+prey seed 142096377
+prey seed 147064647
+PASS     test_catch_camera.gd::test_the_cliff_cap_catch_and_grab_with_no_camera_input  [36151 ms]  50 checks
+prey seed 154453719
+prey seed 159451544
+PASS     test_catch_camera.gd::test_the_cliff_cap_catch_from_a_view_45_degrees_off_is_framed_within_the_cap  [10389 ms]  14 checks
+prey seed 164856460
+prey seed 170353423
+PASS     test_catch_camera.gd::test_the_slab_edge_catch_is_not_made_worse  [11254 ms]  6 checks
+PASS     test_edge_arc.gd::test_edge_arc_keeps_support_every_tick  [977 ms]  8 checks
+PASS     test_edge_arc.gd::test_the_arc_time_follows_the_speed_so_stalking_rounds_an_edge_slowly  [2407 ms]  4 checks
+prey seed 179636203
+PASS     test_focus_toggle.gd::test_a_button_already_down_when_play_resumes_is_not_a_press  [452 ms]  4 checks
+prey seed 180095770
+PASS     test_focus_toggle.gd::test_a_committed_jump_ends_a_toggled_focus_and_a_press_in_flight_does_nothing  [937 ms]  10 checks
+prey seed 181051104
+PASS     test_focus_toggle.gd::test_a_tap_that_is_over_before_the_next_tick_still_counts  [179 ms]  4 checks
+prey seed 181248060
+PASS     test_focus_toggle.gd::test_a_toggled_focus_cannot_get_in_the_way_of_a_recovery_on_the_line  [2383 ms]  9 checks
+prey seed 183638802
+PASS     test_focus_toggle.gd::test_a_toggled_focus_is_clearly_indicated_on_the_screen  [264 ms]  9 checks
+prey seed 183926691
+PASS     test_focus_toggle.gd::test_a_toggled_focus_starts_with_a_press_and_stops_with_the_next  [1325 ms]  4 checks
+prey seed 185259354
+prey seed 186612325
+PASS     test_focus_toggle.gd::test_a_toggled_focus_turns_the_body_as_a_held_one_does  [2772 ms]  6 checks
+prey seed 188044862
+PASS     test_focus_toggle.gd::test_an_analog_trigger_that_reports_many_values_is_one_press  [392 ms]  4 checks
+prey seed 188441650
+PASS     test_focus_toggle.gd::test_cancel_belongs_to_an_aim_or_a_press_first  [939 ms]  11 checks
+prey seed 189419162
+PASS     test_focus_toggle.gd::test_hold_mode_is_unchanged_and_the_toggle_is_off_by_default  [868 ms]  9 checks
+prey seed 190280124
+PASS     test_focus_toggle.gd::test_the_cancel_button_stops_a_toggled_focus_when_it_has_nothing_else_to_do  [331 ms]  3 checks
+prey seed 190632285
+PASS     test_focus_toggle.gd::test_turning_the_option_off_while_focus_is_toggled_on_gives_hold_mode_back  [292 ms]  3 checks
+prey seed 191075087
+PASS     test_gaze_overlay.gd::test_a_wall_in_the_way_is_where_it_stops_and_what_is_behind_it_changes_nothing  [201 ms]  5 checks
+prey seed 191272909
+PASS     test_gaze_overlay.gd::test_it_goes_where_the_body_looks_and_only_the_body_moves_it  [1630 ms]  4 checks
+PASS     test_gaze_overlay.gd::test_it_has_no_way_to_ask_what_has_been_sensed_or_where_anything_is  [3 ms]  8 checks
+prey seed 192906837
+PASS     test_gaze_overlay.gd::test_it_is_off_by_default_and_draws_only_when_switched_on  [132 ms]  4 checks
+prey seed 193052822
+PASS     test_gaze_overlay.gd::test_the_footprint_lies_on_the_first_surface_the_gaze_reaches_as_wide_as_the_cone  [93 ms]  5 checks
+PASS     test_gaze_overlay.gd::test_the_footprint_maths  [50 ms]  13 checks
+prey seed 193198924
+PASS     test_gaze_overlay.gd::test_the_gaze_that_meets_nothing_within_reach_draws_nothing  [1584 ms]  2 checks
+PASS     test_jump_flight.gd::test_a_late_obstacle_is_a_miss_that_still_lands_on_another_eligible_surface  [383 ms]  7 checks
+PASS     test_jump_flight.gd::test_a_plan_that_is_not_reachable_is_refused_and_changes_nothing  [442 ms]  11 checks
+PASS     test_jump_flight.gd::test_an_obstruction_that_cannot_hold_the_spider_leaves_it_falling_to_the_floor  [707 ms]  6 checks
+PASS     test_jump_flight.gd::test_floor_to_ledge_the_flight_is_the_prediction  [679 ms]  14 checks
+PASS     test_jump_flight.gd::test_floor_to_wall_attaches_with_the_wall_normal  [1167 ms]  10 checks
+PASS     test_jump_flight.gd::test_jump_signals_fire_once_each  [707 ms]  4 checks
+PASS     test_jump_flight.gd::test_leaving_the_play_bounds_returns_the_spider_to_its_last_supported_position  [364 ms]  6 checks
+PASS     test_jump_flight.gd::test_ledge_to_floor  [751 ms]  7 checks
+PASS     test_jump_flight.gd::test_nothing_steers_the_body_in_the_air  [608 ms]  6 checks
+PASS     test_jump_flight.gd::test_prepare_then_cancel_leaves_the_spider_unchanged  [504 ms]  13 checks
+PASS     test_jump_flight.gd::test_preparing_ignores_the_walking_intent_and_turns_toward_the_aim_at_a_capped_rate  [650 ms]  4 checks
+PASS     test_jump_flight.gd::test_preparing_needs_a_standing_spider  [687 ms]  4 checks
+PASS     test_jump_flight.gd::test_the_committed_impulse_is_frozen  [584 ms]  6 checks
+prey seed 203292579
+PASS     test_jump_input.gd::test_a_hold_aims_and_the_release_commits  [821 ms]  16 checks
+prey seed 204128085
+PASS     test_jump_input.gd::test_a_ledge_top_higher_than_the_pivot_is_aimed_at_by_tilting_the_camera  [2621 ms]  9 checks
+prey seed 206766170
+PASS     test_jump_input.gd::test_a_tap_of_the_jump_button_is_a_short_hop_forward  [631 ms]  8 checks
+PASS     test_jump_input.gd::test_every_kind_has_its_own_shape_and_its_own_colour  [2 ms]  6 checks
+prey seed 207416562
+PASS     test_jump_input.gd::test_hops_are_refused_with_a_reason_and_never_launch  [1466 ms]  10 checks
+prey seed 208895312
+PASS     test_jump_input.gd::test_leaving_the_habitat_says_so_and_ends_the_aim  [343 ms]  4 checks
+prey seed 209246271
+PASS     test_jump_input.gd::test_obstructed_and_ineligible_targets_show_their_own_shapes_and_do_not_launch  [1660 ms]  9 checks
+prey seed 210930213
+PASS     test_jump_input.gd::test_pausing_drops_an_aim_in_progress_so_it_cannot_get_stuck  [842 ms]  8 checks
+prey seed 211783278
+PASS     test_jump_input.gd::test_q_cancels_a_press_and_a_preparation_with_no_penalty  [690 ms]  10 checks
+prey seed 212489130
+PASS     test_jump_input.gd::test_releasing_on_an_unreachable_target_cancels_with_feedback_and_launches_nothing  [1445 ms]  13 checks
+prey seed 213951360
+PASS     test_jump_input.gd::test_the_aim_is_the_cameras_centre_ray_and_vertical_look_tilts_the_camera_only  [1903 ms]  11 checks
+prey seed 215862434
+PASS     test_jump_input.gd::test_the_camera_stays_put_while_the_body_turns_toward_the_aim  [780 ms]  5 checks
+prey seed 216661423
+PASS     test_jump_input.gd::test_the_real_jump_and_cancel_actions_are_wired  [1162 ms]  4 checks
+prey seed 217844255
+PASS     test_jump_input.gd::test_toggle_mode_press_to_aim_press_to_jump_and_q_to_cancel  [1245 ms]  12 checks
+PASS     test_jump_planning.gd::test_a_surface_that_cannot_hold_the_spider_is_ineligible  [41 ms]  3 checks
+PASS     test_jump_planning.gd::test_a_tall_wall_between_the_spider_and_the_target_obstructs_every_arc  [66 ms]  7 checks
+PASS     test_jump_planning.gd::test_a_wall_is_a_valid_target_and_the_arrival_goes_into_it  [88 ms]  4 checks
+PASS     test_jump_planning.gd::test_floor_to_ledge_tops_are_reachable_and_the_highest_ledge_is_not  [131 ms]  8 checks
+PASS     test_jump_planning.gd::test_level_floor_jumps_of_two_to_eleven_body_lengths_are_reachable  [103 ms]  24 checks
+PASS     test_jump_planning.gd::test_no_room_for_the_body_at_the_foot_of_a_wall_even_when_the_point_is_visible  [87 ms]  3 checks
+PASS     test_jump_planning.gd::test_no_surface_under_the_aim_is_no_target  [93 ms]  2 checks
+PASS     test_jump_planning.gd::test_planning_is_repeatable_and_moves_nothing  [184 ms]  5 checks
+PASS     test_jump_planning.gd::test_the_jump_reach_setting_scales_speed_and_flight_time_by_its_square_root  [90 ms]  10 checks
+PASS     test_jump_planning.gd::test_the_planned_path_is_clear_for_the_real_body  [89 ms]  2 checks
+prey seed 220328972
+PASS     test_jump_presentation.gd::test_f4_shows_the_predicted_and_the_actual_path_of_the_last_jump  [850 ms]  9 checks
+prey seed 221179632
+PASS     test_jump_presentation.gd::test_the_detailed_arc_is_off_by_default_and_draws_the_predicted_arc_when_on  [384 ms]  5 checks
+prey seed 221584982
+PASS     test_jump_presentation.gd::test_the_patch_lies_on_the_aimed_surface_in_the_shape_and_colour_of_its_kind  [103 ms]  26 checks
+prey seed 221684941
+PASS     test_jump_presentation.gd::test_the_ring_keeps_its_size_on_screen_at_distance_with_a_minimum_world_size  [263 ms]  12 checks
+prey seed 221956379
+PASS     test_jump_presentation.gd::test_the_shapes_really_differ  [85 ms]  6 checks
+prey seed 222055129
+PASS     test_jump_presentation.gd::test_the_toast_goes_after_a_few_seconds  [3349 ms]  2 checks
+L01 result: 4 of 4 fixtures passed: feeding raised the energy only while valid and canceling never duplicated prey or consumption; save/load not run (no save system yet)
+PASS     test_l01_feeding.gd::test_l01_feeding_increases_energy_only_while_valid_and_canceling_cannot_duplicate_prey_or_consumption  [25234 ms]  16 checks
+PASS     test_l01_feeding.gd::test_l01_saving_and_loading_cannot_duplicate_prey_or_consumption  [12333 ms]  39 checks
+PASS     test_lab.gd::test_a_dropped_piece_is_drawn_see_through_in_every_renderer  [77 ms]  7 checks
+PASS     test_lab.gd::test_each_surface_kind_has_its_own_flat_colour  [71 ms]  66 checks
+PASS     test_lab.gd::test_floor_is_at_least_60_by_35  [72 ms]  2 checks
+PASS     test_lab.gd::test_lab_pieces_are_boxes_with_surface_metadata  [68 ms]  94 checks
+PASS     test_lab.gd::test_spawn_point_is_clear_of_walls  [64 ms]  1 checks
+M01 run 01 PASS start (5.57, 6.90) heading -88.5 deg: route complete in 12.55 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+M01 run 02 PASS start (5.68, 7.28) heading -91.6 deg: route complete in 12.50 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+M01 run 03 PASS start (5.29, 7.99) heading -91.7 deg: route complete in 12.65 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+M01 run 04 PASS start (5.68, 6.76) heading -90.5 deg: route complete in 12.50 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+M01 run 05 PASS start (5.39, 6.26) heading -89.2 deg: route complete in 12.62 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+M01 run 06 PASS start (5.62, 7.02) heading -90.4 deg: route complete in 12.52 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+M01 run 07 PASS start (5.60, 7.38) heading -90.5 deg: route complete in 12.53 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+M01 run 08 PASS start (5.56, 7.88) heading -91.2 deg: route complete in 12.55 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+M01 run 09 PASS start (5.53, 5.85) heading -90.0 deg: route complete in 12.55 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+M01 run 10 PASS start (5.58, 6.65) heading -88.3 deg: route complete in 12.53 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+M01 run 11 PASS start (5.40, 6.32) heading -88.1 deg: route complete in 12.62 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+M01 run 12 PASS start (5.28, 6.19) heading -90.6 deg: route complete in 12.65 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+M01 run 13 PASS start (5.31, 6.00) heading -90.0 deg: route complete in 12.65 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+M01 run 14 PASS start (5.57, 6.60) heading -89.3 deg: route complete in 12.55 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+M01 run 15 PASS start (5.70, 6.36) heading -91.2 deg: route complete in 12.48 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+M01 run 16 PASS start (5.63, 7.53) heading -91.5 deg: route complete in 12.52 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+M01 run 17 PASS start (5.26, 6.90) heading -91.7 deg: route complete in 12.67 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+M01 run 18 PASS start (5.40, 6.97) heading -89.6 deg: route complete in 12.62 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+M01 run 19 PASS start (5.59, 6.44) heading -88.6 deg: route complete in 12.53 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+M01 run 20 PASS start (5.73, 7.42) heading -92.0 deg: route complete in 12.48 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+M01 result: 20 of 20 runs passed
+PASS     test_m01_route.gd::test_m01_route_twenty_runs  [13519 ms]  81 checks
+prey seed 277356099
+M02 result: 100 of 100 jumps within 0.25 WU; contact error max 0.0200 WU mean 0.0123 WU; settled error max 0.0175 WU mean 0.0075 WU; worst path deviation 0.00002 WU
+M02 invalid candidates: 8 of 8 showed invalid feedback and did not launch
+PASS     test_m02_jumps.gd::test_m02_planned_and_actual_landing_centres_agree_and_invalid_candidates_say_so  [12387 ms]  773 checks
+M03 result: 10 of 10 fixtures caught and recovered or reported blockage, with no overlap, no push and no unexplained energy gain within the documented allowances
+PASS     test_m03_tether.gd::test_m03_the_line_catches_ten_recoverable_misses_and_recovery_reaches_a_surface_or_reports_blockage  [8256 ms]  11 checks
+prey seed 298499044
+prey seed 302541481
+prey seed 307632342
+prey seed 311769570
+prey seed 319075758
+prey seed 328812093
+prey seed 336354688
+prey seed 338144171
+prey seed 342184026
+prey seed 346155096
+prey seed 349486853
+P01 result: 8 of 8 fixtures passed: a hidden target left the classified observation untouched; turning toward a visible cue improved the classification after the configured inspection period
+PASS     test_p01_perception.gd::test_p01_hidden_prey_does_not_update_a_classified_observation_and_turning_toward_a_visible_cue_improves_classification  [54652 ms]  8 checks
+PASS     test_pause_menu.gd::test_panel_controls_write_through_to_saved_settings  [302 ms]  20 checks
+PASS     test_pause_menu.gd::test_pause_toggles_the_tree_and_shows_the_panel  [69 ms]  4 checks
+PASS     test_pause_menu.gd::test_the_pause_action_toggles_pause  [112 ms]  2 checks
+PASS     test_perception_debug.gd::test_it_prints_nothing_for_a_memory_that_is_empty_but_the_summary  [516 ms]  4 checks
+prey seed 354632390
+PASS     test_perception_debug.gd::test_the_developer_view_shows_the_cone_with_the_body_and_the_truth_where_the_memory_is_not  [3627 ms]  13 checks
+PASS     test_perception_debug.gd::test_the_senses_lines_report_the_counters_and_what_the_memory_holds  [2721 ms]  9 checks
+prey seed 361113395
+PASS     test_perception_hud.gd::test_a_cue_is_a_soft_marker_on_the_edge_toward_it_that_fades_away  [1787 ms]  10 checks
+prey seed 362947878
+PASS     test_perception_hud.gd::test_a_mark_over_cover_is_drawn_fainter_and_never_at_where_the_thing_really_is  [2501 ms]  10 checks
+PASS     test_perception_hud.gd::test_a_ring_is_as_large_as_the_thing_looks_between_a_readable_minimum_and_a_maximum  [1 ms]  3 checks
+prey seed 365423390
+PASS     test_perception_hud.gd::test_a_thing_being_inspected_has_a_ring_and_words_and_no_edge_marker  [437 ms]  4 checks
+prey seed 365875347
+PASS     test_perception_hud.gd::test_a_thing_the_camera_sees_but_the_spider_never_sensed_gets_nothing  [2069 ms]  4 checks
+prey seed 367950508
+PASS     test_perception_hud.gd::test_a_word_stays_with_the_spot_it_was_observed_at_when_the_camera_moves  [1230 ms]  2 checks
+PASS     test_perception_hud.gd::test_an_edge_marker_rises_quickly_fades_slowly_and_is_gone_after_a_moment  [1 ms]  7 checks
+prey seed 369196581
+PASS     test_perception_hud.gd::test_losing_sight_says_so_where_it_was_and_the_mark_fades_and_breaks_up  [7995 ms]  19 checks
+PASS     test_perception_hud.gd::test_the_edge_marker_sits_on_the_side_of_the_bearing_inside_the_screen  [1 ms]  12 checks
+prey seed 377195691
+PASS     test_perception_hud.gd::test_the_mark_can_be_switched_off_and_the_words_stay  [1486 ms]  6 checks
+prey seed 378708158
+PASS     test_perception_hud.gd::test_the_marker_follows_the_camera_not_the_body  [110 ms]  2 checks
+prey seed 378864296
+PASS     test_perception_hud.gd::test_the_words_get_finer_in_order_and_never_carry_a_number  [1713 ms]  8 checks
+PASS     test_perception_memory.gd::test_a_cue_does_not_take_back_what_was_found_or_bring_back_a_lost_contact  [3896 ms]  11 checks
+PASS     test_perception_memory.gd::test_a_spot_the_world_hides_cannot_be_called_empty  [4222 ms]  6 checks
+PASS     test_perception_memory.gd::test_a_thing_forgotten_has_to_be_classified_again  [8130 ms]  6 checks
+PASS     test_perception_memory.gd::test_looking_at_the_empty_spot_drops_the_mark_and_not_looking_does_not  [5021 ms]  8 checks
+PASS     test_perception_memory.gd::test_seeing_it_again_updates_the_same_record  [2230 ms]  9 checks
+PASS     test_perception_memory.gd::test_the_mark_expires_when_the_memory_does_and_not_before  [9728 ms]  6 checks
+PASS     test_perception_memory.gd::test_the_mark_stays_put_while_the_thing_moves_on_behind_cover  [7040 ms]  11 checks
+PASS     test_perception_memory.gd::test_two_look_alike_markers_are_not_told_apart_by_their_names  [6527 ms]  6 checks
+prey seed 427564728
+PASS     test_player_input.gd::test_debug_overlay_is_off_by_default_and_toggles_with_f3  [164 ms]  12 checks
+prey seed 427740719
+PASS     test_player_input.gd::test_look_actions_turn_the_camera  [593 ms]  2 checks
+prey seed 428346189
+PASS     test_player_input.gd::test_move_actions_are_relative_to_the_camera  [4659 ms]  3 checks
+prey seed 433023169
+PASS     test_player_input.gd::test_stalk_hold_slows_the_spider  [2657 ms]  3 checks
+prey seed 435687858
+PASS     test_player_input.gd::test_stalk_toggle_mode_latches  [2120 ms]  2 checks
+prey seed 437812432
+PASS     test_player_input.gd::test_stick_magnitude_scales_speed  [1658 ms]  1 checks
+PASS     test_prey_capture.gd::test_a_strike_that_reaches_a_fly_catches_it_once  [2058 ms]  19 checks
+PASS     test_prey_capture.gd::test_classification_never_gates_astrike_at  [3860 ms]  11 checks
+PASS     test_prey_capture.gd::test_nothing_is_caught_through_a_wall  [220 ms]  3 checks
+PASS     test_prey_capture.gd::test_only_one_prey_is_held_and_the_second_is_refused  [640 ms]  9 checks
+PASS     test_prey_capture.gd::test_the_reach_is_the_bodies_together_and_assist_widens_it  [1366 ms]  10 checks
+PASS     test_prey_cost.gd::test_six_flies_stay_inside_the_budget_and_the_numbers_are_written_down  [15962 ms]  10 checks
+PASS     test_prey_feeding.gd::test_a_capture_grants_nothing_and_feeding_grants_gradually  [4048 ms]  16 checks
+PASS     test_prey_feeding.gd::test_a_full_reserve_does_not_trap_the_player  [4145 ms]  8 checks
+PASS     test_prey_feeding.gd::test_cancel_returns_control_at_once_and_nothing_is_granted_twice  [5145 ms]  13 checks
+PASS     test_prey_feeding.gd::test_it_cannot_start_when_it_is_not_valid  [1205 ms]  10 checks
+PASS     test_prey_feeding.gd::test_moving_or_jumping_or_falling_ends_it_and_the_controls_work  [1795 ms]  12 checks
+PASS     test_prey_feeding.gd::test_the_needs_clock_runs_with_the_spider_and_drains_slowly  [10044 ms]  2 checks
+PASS     test_prey_fly_behavior.gd::test_a_blocked_flight_is_replanned_and_the_fly_never_jumps  [5359 ms]  7 checks
+PASS     test_prey_fly_behavior.gd::test_a_danger_it_sees_in_flight_interrupts_the_flight  [2072 ms]  4 checks
+PASS     test_prey_fly_behavior.gd::test_a_fly_that_is_only_watched_settles_again  [2404 ms]  4 checks
+PASS     test_prey_fly_behavior.gd::test_a_fly_that_is_walked_up_to_notices_it_leaves_and_every_step_has_a_reason  [3314 ms]  15 checks
+PASS     test_prey_fly_behavior.gd::test_a_perch_that_leaves_the_world_sends_its_fly_off  [1074 ms]  7 checks
+PASS     test_prey_fly_behavior.gd::test_a_restless_fly_moves_on_by_itself_to_a_better_place  [4357 ms]  6 checks
+PASS     test_prey_fly_behavior.gd::test_perch_validation_refuses_blocked_perches  [101 ms]  13 checks
+PASS     test_prey_fly_rest.gd::test_a_fly_rests_a_leg_above_its_perch_and_the_spider_can_sense_it  [2435 ms]  9 checks
+PASS     test_prey_fly_rest.gd::test_a_wall_hides_the_spiders_motion_from_the_fly_completely  [8154 ms]  4 checks
+PASS     test_prey_fly_rest.gd::test_fidgets_and_grooming_show_that_it_is_alive  [12046 ms]  5 checks
+PASS     test_prey_fly_rest.gd::test_the_authored_perches_are_checked_against_the_world  [58 ms]  24 checks
+PASS     test_prey_fly_rest.gd::test_the_same_seed_gives_the_same_fly_and_another_seed_another  [12034 ms]  4 checks
+PASS     test_prey_fly_rest.gd::test_what_a_fly_takes_in_of_a_stalk_depends_on_where_it_is_looking  [9036 ms]  6 checks
+PASS     test_prey_fly_rest.gd::test_what_it_has_taken_in_drains_when_the_spider_keeps_still  [8515 ms]  2 checks
+PASS     test_prey_hunt.gd::test_a_grooming_fly_is_the_moment_to_strike  [7646 ms]  4 checks
+PASS     test_prey_hunt.gd::test_a_jump_from_far_off_is_seen_coming_and_one_from_close_by_is_not  [35402 ms]  3 checks
+PASS     test_prey_hunt.gd::test_a_missed_strike_lets_the_fly_escape_while_the_spider_hangs_on_its_line  [7638 ms]  10 checks
+PASS     test_prey_hunt.gd::test_a_stalk_timed_to_the_flys_glances_reaches_striking_range_and_a_steady_one_in_plain_view_is_spotted  [43855 ms]  11 checks
+PASS     test_prey_hunt.gd::test_a_walk_up_to_the_same_fly_alerts_it_early_and_it_leaves_before_the_spider_is_near  [2280 ms]  4 checks
+PASS     test_prey_population.gd::test_a_lost_fly_is_replaced_after_a_delay_by_one_that_flies_in  [6178 ms]  26 checks
+PASS     test_prey_population.gd::test_a_vent_the_world_refuses_is_never_used  [3966 ms]  10 checks
+PASS     test_prey_population.gd::test_nothing_comes_in_while_the_only_open_vent_is_in_view_and_it_waits_for_a_quiet_half_second  [3749 ms]  10 checks
+PASS     test_prey_population.gd::test_over_many_entries_not_one_comes_in_view_or_in_sight  [12053 ms]  7 checks
+PASS     test_prey_population.gd::test_replenishment_is_off_unless_the_world_asks_for_it  [2169 ms]  4 checks
+PASS     test_prey_population.gd::test_the_labelled_test_marker_stays_separate_from_the_flies  [181 ms]  6 checks
+PASS     test_prey_population.gd::test_the_margin_keeps_a_vent_just_outside_the_picture_from_being_used  [72 ms]  4 checks
+PASS     test_prey_population.gd::test_the_same_seed_brings_the_same_replacement_and_another_seed_another  [3819 ms]  3 checks
+PASS     test_prey_population.gd::test_the_shipped_numbers_and_the_developer_line  [93 ms]  5 checks
+PASS     test_prey_population.gd::test_three_and_four_flies_each_have_a_perch_of_their_own  [5177 ms]  8 checks
+PASS     test_prey_two_flies.gd::test_a_fly_that_cannot_see_the_spider_is_not_moved_by_one_that_can  [5316 ms]  6 checks
+PASS     test_prey_two_flies.gd::test_a_lone_fly_that_comes_back_where_only_it_could_be_is_the_one_remembered_under_any_name  [4927 ms]  7 checks
+PASS     test_prey_two_flies.gd::test_two_look_alikes_exchanged_while_hidden_come_out_as_strangers_whatever_they_are_called  [10939 ms]  14 checks
+PASS     test_prey_two_flies.gd::test_what_a_fly_takes_in_does_not_depend_on_another_fly_being_there  [7692 ms]  9 checks
+PASS     test_s01c_checkpoint.gd::test_a_refused_record_never_replaces_the_world  [68 ms]  5 checks
+PASS     test_s01c_checkpoint.gd::test_loading_twice_gives_the_same_world_and_duplicates_nothing  [4538 ms]  9 checks
+PASS     test_s01c_checkpoint.gd::test_loading_while_airborne_or_preparing_discards_the_current_world  [1407 ms]  14 checks
+PASS     test_s01c_checkpoint.gd::test_loading_while_feeding_undoes_the_meal_since_the_checkpoint  [2667 ms]  14 checks
+PASS     test_s01c_checkpoint.gd::test_no_checkpoint_outside_the_windowsill_or_off_a_surface  [46 ms]  4 checks
+PASS     test_s01c_checkpoint.gd::test_resting_makes_a_checkpoint_that_restores_the_whole_sill  [13007 ms]  18 checks
+PASS     test_s01c_checkpoint.gd::test_two_restored_worlds_go_on_the_same_way  [10609 ms]  21 checks
+PASS     test_s02_checkpoint_store.gd::test_a_changed_number_fails_the_checksum  [1062 ms]  3 checks
+PASS     test_s02_checkpoint_store.gd::test_a_newer_schema_is_reported_and_left_untouched  [212 ms]  4 checks
+PASS     test_s02_checkpoint_store.gd::test_a_record_that_contradicts_itself_is_refused_with_a_reason  [500 ms]  15 checks
+PASS     test_s02_checkpoint_store.gd::test_a_schema_1_checkpoint_is_upgraded_and_loads  [3549 ms]  6 checks
+PASS     test_s02_checkpoint_store.gd::test_a_truncated_checkpoint_falls_back_to_the_previous_and_is_not_touched  [1130 ms]  5 checks
+PASS     test_s02_checkpoint_store.gd::test_an_interrupted_write_never_costs_the_last_good_checkpoint  [889 ms]  6 checks
+PASS     test_s02_checkpoint_store.gd::test_save_and_load_round_trip_and_keep_the_previous_as_backup  [1521 ms]  8 checks
+PASS     test_s02_checkpoint_store.gd::test_the_pause_menu_offers_the_checkpoint_only_when_there_is_one  [87 ms]  5 checks
+prey seed 767839258
+PASS     test_sensor.gd::test_a_camera_that_looks_away_does_not_take_the_cone_off_what_is_ahead  [984 ms]  2 checks
+PASS     test_sensor.gd::test_a_marker_that_looks_too_small_is_not_inspected  [2918 ms]  6 checks
+PASS     test_sensor.gd::test_a_marker_that_never_looks_like_prey_is_never_refined  [1565 ms]  3 checks
+PASS     test_sensor.gd::test_a_moving_thing_in_the_periphery_gives_a_coarse_cue_and_nothing_else  [721 ms]  10 checks
+prey seed 774054412
+PASS     test_sensor.gd::test_a_thing_that_is_never_sensed_leaves_no_trace_anywhere  [3067 ms]  5 checks
+PASS     test_sensor.gd::test_broad_queries_run_at_ten_hertz_and_close_things_are_checked_every_tick  [4049 ms]  4 checks
+PASS     test_sensor.gd::test_cues_come_at_most_once_per_cooldown  [4058 ms]  5 checks
+prey seed 785261438
+PASS     test_sensor.gd::test_focus_tilts_the_gaze_toward_what_the_camera_aims_at_within_its_limit  [2561 ms]  4 checks
+prey seed 787827516
+PASS     test_sensor.gd::test_focus_turns_the_body_toward_the_camera_aim_at_a_capped_rate  [2109 ms]  7 checks
+PASS     test_sensor.gd::test_the_cone_refines_a_category_with_continuous_exposure  [1294 ms]  7 checks
+PASS     test_sensor.gd::test_the_sensor_takes_its_numbers_from_the_species_profile  [49 ms]  8 checks
+PASS     test_sensor.gd::test_the_world_hides_what_it_stands_in_front_of  [1575 ms]  7 checks
+prey seed 792890351
+PASS     test_sensor.gd::test_turning_the_camera_never_turns_the_cone  [3060 ms]  185 checks
+PASS     test_sensor_association.gd::test_a_brief_gap_keeps_the_contact_and_a_long_one_does_not  [2025 ms]  7 checks
+PASS     test_sensor_association.gd::test_a_loss_of_sight_never_updates_the_remembered_place  [4082 ms]  7 checks
+PASS     test_sensor_association.gd::test_a_mark_is_dropped_when_its_place_is_seen_empty_and_a_hidden_one_is_not  [7824 ms]  6 checks
+PASS     test_sensor_association.gd::test_a_place_two_newcomers_could_each_be_is_taken_by_neither_in_whatever_order  [7666 ms]  15 checks
+PASS     test_sensor_association.gd::test_a_thing_gone_from_the_world_is_forgotten_by_the_sensor_but_its_mark_expires_on_its_own  [8367 ms]  8 checks
+PASS     test_sensor_association.gd::test_a_thing_of_another_size_is_not_the_remembered_one  [2156 ms]  4 checks
+PASS     test_sensor_association.gd::test_a_thing_seen_again_where_only_it_could_be_is_the_one_remembered  [4913 ms]  9 checks
+PASS     test_sensor_association.gd::test_a_thing_seen_only_in_the_periphery_never_joins_a_lost_contact  [2999 ms]  6 checks
+PASS     test_sensor_association.gd::test_a_thing_that_cannot_look_like_what_was_learned_is_not_the_remembered_one  [2164 ms]  5 checks
+PASS     test_sensor_association.gd::test_a_thing_that_fits_one_place_alone_still_takes_it_while_a_stranger_is_in_view  [1969 ms]  4 checks
+PASS     test_sensor_association.gd::test_swapping_only_the_hidden_world_ids_changes_nothing_the_player_could_see  [13027 ms]  9 checks
+PASS     test_sensor_association.gd::test_the_live_link_to_the_world_ends_with_the_sight  [1826 ms]  4 checks
+PASS     test_sensor_association.gd::test_the_name_does_not_make_a_distant_thing_the_remembered_one  [3256 ms]  8 checks
+PASS     test_sensor_association.gd::test_the_region_a_lost_thing_could_have_reached_grows_with_the_time  [4297 ms]  3 checks
+PASS     test_sensor_association.gd::test_the_speed_bound_is_the_species_number_and_not_a_guess_in_the_code  [4295 ms]  4 checks
+PASS     test_sensor_association.gd::test_two_look_alikes_cross_behind_cover_and_come_out_as_new_contacts  [8001 ms]  17 checks
+PASS     test_sensor_association.gd::test_two_look_alikes_that_come_into_view_together_are_strangers_whatever_order_they_are_listed_in  [3939 ms]  14 checks
+PASS     test_sensor_occlusion.gd::test_a_speck_partly_in_view_is_sensed_from_the_points_that_are  [618 ms]  4 checks
+PASS     test_sensor_occlusion.gd::test_a_speck_wholly_behind_a_barrier_is_hidden_whatever_its_size  [2331 ms]  21 checks
+PASS     test_sensor_occlusion.gd::test_a_speck_wholly_behind_a_thin_barrier_is_not_sensed  [1047 ms]  8 checks
+PASS     test_sensor_occlusion.gd::test_a_spot_behind_the_barrier_is_not_called_empty  [10666 ms]  5 checks
+PASS     test_sensor_occlusion.gd::test_a_thing_resting_in_a_surface_is_not_lost_and_found_again_by_chance  [2993 ms]  4 checks
+PASS     test_sensor_occlusion.gd::test_a_thing_resting_in_a_surface_keeps_the_points_in_the_surfaces_skin  [695 ms]  7 checks
+PASS     test_sensor_occlusion.gd::test_the_same_speck_with_the_barrier_taken_away_is_sensed_and_refined  [4000 ms]  6 checks
+PASS     test_sensor_occlusion.gd::test_the_same_spot_in_plain_view_is_called_empty  [4609 ms]  4 checks
+PASS     test_sensor_occlusion.gd::test_what_is_hidden_does_not_flicker_at_the_edge_of_a_barrier  [764 ms]  2 checks
+prey seed 907359939
+PASS     test_silk.gd::test_a_taut_or_reeling_line_is_heavier_and_none_is_thinner_than_two_pixels_at_1080p  [3259 ms]  12 checks
+prey seed 910598948
+PASS     test_silk.gd::test_point_hidden_means_the_world_is_in_the_way_not_that_the_point_is_off_screen  [580 ms]  6 checks
+prey seed 911199423
+prey seed 912758968
+PASS     test_silk.gd::test_the_catch_recoil_moves_only_the_model_and_the_silk_follows_it  [3145 ms]  12 checks
+prey seed 914349242
+PASS     test_silk.gd::test_the_hud_says_when_the_anchor_is_out_of_sight_and_stops_when_it_is_back_in_view  [5027 ms]  13 checks
+prey seed 919455064
+PASS     test_silk.gd::test_the_line_is_depth_tested_like_any_object_so_the_world_hides_it  [652 ms]  5 checks
+prey seed 920114243
+PASS     test_silk.gd::test_the_load_bearing_line_is_dark_with_a_light_rim_and_old_silk_is_pale_thin_and_fainter  [2122 ms]  14 checks
+prey seed 922206906
+PASS     test_silk.gd::test_with_the_real_camera_and_no_camera_input_the_note_matches_what_the_camera_sees  [4527 ms]  3 checks
+PASS     test_supported_locomotion.gd::test_coated_panel_cannot_be_climbed  [2483 ms]  6 checks
+PASS     test_supported_locomotion.gd::test_coplanar_seam_does_not_jitter  [1912 ms]  6 checks
+PASS     test_supported_locomotion.gd::test_floor_to_wall_climbs_at_a_concave_corner  [2076 ms]  9 checks
+PASS     test_supported_locomotion.gd::test_gap_is_crossed_only_along_surfaces  [6073 ms]  6 checks
+PASS     test_supported_locomotion.gd::test_gap_with_nothing_reachable_falls  [975 ms]  5 checks
+PASS     test_supported_locomotion.gd::test_inside_corner_of_two_walls_does_not_oscillate  [3083 ms]  6 checks
+prey seed 943457805
+FAIL     test_supported_locomotion.gd::test_support_view_toggles_with_f4_and_draws_the_normal  [155 ms]  from the contact point (expected (-22.0, 0.0, 12.0) +/- 0.0001, got (0.0, 0.0, 0.0)); one rod per probe ray of the last tick (expected 1, got 0)
+PASS     test_supported_locomotion.gd::test_thin_shelf_is_wrapped_never_crossed  [2865 ms]  6 checks
+PASS     test_supported_locomotion.gd::test_walking_off_an_edge_at_a_shallow_angle_still_wraps  [3406 ms]  4 checks
+PASS     test_supported_locomotion.gd::test_wall_to_top_over_a_convex_edge  [2831 ms]  7 checks
+PASS     test_supported_locomotion.gd::test_wall_to_underside_and_back  [4930 ms]  10 checks
+prey seed 957772832
+PASS     test_surface_controls.gd::test_holding_forward_over_an_edge_never_oscillates  [2946 ms]  4 checks
+prey seed 960712677
+PASS     test_surface_controls.gd::test_on_a_wall_forward_climbs_and_right_goes_to_the_cameras_right  [2989 ms]  7 checks
+prey seed 963713445
+PASS     test_surface_controls.gd::test_on_the_underside_forward_moves_away_from_the_camera  [1991 ms]  9 checks
+prey seed 965716197
+PASS     test_surface_controls.gd::test_recenter_on_a_wall_turns_the_camera_to_face_it  [609 ms]  2 checks
+PASS     test_t09b_hunt_feel.gd::test_a_checkpoint_keeps_the_fallen_tip_down  [8581 ms]  6 checks
+PASS     test_t09b_hunt_feel.gd::test_a_perched_fly_glances_to_and_fro_from_its_own_stream  [24159 ms]  12 checks
+PASS     test_t09b_hunt_feel.gd::test_automatic_struggle_holds_on_with_no_presses  [3647 ms]  6 checks
+PASS     test_t09b_hunt_feel.gd::test_holding_the_button_down_is_not_a_grip  [2283 ms]  4 checks
+PASS     test_t09b_hunt_feel.gd::test_stop_tapping_and_the_grip_runs_out_and_the_fly_tears_free  [6790 ms]  11 checks
+PASS     test_t09b_hunt_feel.gd::test_tapping_keeps_the_grip_until_the_fly_is_subdued  [3642 ms]  10 checks
+PASS     test_t09b_hunt_feel.gd::test_the_dry_leaf_tip_gives_way_and_the_silk_catches_the_spider  [8098 ms]  9 checks
+PASS     test_t09b_hunt_feel.gd::test_the_twitch_is_looks_only_bounded_and_can_be_turned_off  [4194 ms]  7 checks
+PASS     test_test_target.gd::test_a_fixture_can_remove_hold_move_and_release_it  [5012 ms]  15 checks
+PASS     test_test_target.gd::test_it_has_no_senses_no_goals_and_does_not_react_to_the_spider  [7987 ms]  6 checks
+PASS     test_test_target.gd::test_it_walks_its_path_to_and_fro_pauses_at_the_ends_and_passes_behind_the_screen  [13403 ms]  7 checks
+PASS     test_test_target.gd::test_the_stage_carries_a_sign_that_says_what_the_marker_is  [58 ms]  5 checks
+PASS     test_tether.gd::test_a_glancing_contact_locks_the_line_and_it_catches  [478 ms]  5 checks
+PASS     test_tether.gd::test_a_jump_that_needs_more_line_than_the_maximum_gets_none  [95 ms]  5 checks
+PASS     test_tether.gd::test_a_leap_anchors_a_line_at_takeoff_and_pays_it_out_without_touching_the_arc  [831 ms]  103 checks
+prey seed 1056442872
+PASS     test_tether.gd::test_a_line_across_an_obstacle_snags_and_reeling_reports_it_and_never_pulls_through  [7445 ms]  9 checks
+PASS     test_tether.gd::test_a_miss_is_caught_hangs_below_the_lip_and_settles_without_endless_oscillation  [6973 ms]  16 checks
+prey seed 1070866427
+PASS     test_tether.gd::test_a_plate_over_part_of_the_body_lets_it_slide_out_and_its_energy_is_still_accounted_for  [7611 ms]  5 checks
+prey seed 1078502261
+PASS     test_tether.gd::test_a_player_can_miss_on_purpose_recover_and_try_again  [8647 ms]  14 checks
+prey seed 1087156182
+PASS     test_tether.gd::test_a_reel_the_body_cannot_follow_stops_with_a_cue_and_gives_the_line_back  [6830 ms]  8 checks
+prey seed 1094002254
+PASS     test_tether.gd::test_a_resting_spider_wakes_when_lowered_and_ignores_a_surface_that_goes_away_elsewhere  [3929 ms]  7 checks
+prey seed 1097947548
+PASS     test_tether.gd::test_a_spider_resting_against_something_wakes_when_a_surface_goes_away  [6741 ms]  7 checks
+prey seed 1104705375
+PASS     test_tether.gd::test_a_surface_that_cannot_hold_silk_is_shown_before_commit_and_the_jump_is_the_same  [1301 ms]  13 checks
+prey seed 1106023205
+PASS     test_tether.gd::test_completed_lines_fade_and_no_more_than_six_are_kept  [10176 ms]  14 checks
+prey seed 1116224615
+PASS     test_tether.gd::test_f3_and_f4_show_the_line_and_its_constraint  [1075 ms]  6 checks
+prey seed 1117303438
+PASS     test_tether.gd::test_letting_go_needs_a_hold_and_an_accidental_double_press_does_nothing  [2694 ms]  9 checks
+prey seed 1120016591
+PASS     test_tether.gd::test_lowering_and_reeling_change_the_rest_length_at_the_species_rate  [5498 ms]  9 checks
+prey seed 1125521672
+PASS     test_tether.gd::test_reeling_up_under_the_lip_takes_hold_and_the_spider_climbs_on  [2917 ms]  7 checks
+prey seed 1128455412
+PASS     test_tether.gd::test_the_controller_lowers_reels_and_lets_go_through_the_real_actions  [4453 ms]  8 checks
+prey seed 1132930555
+WARNING: SpiderMotor: line solver fallback (debug): forced by the test
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] _tether_fallback (res://scripts/movement/spider_motor.gd:1704)
+       [1] debug_force_tether_fallback (res://scripts/movement/spider_motor.gd:442)
+       [2] test_the_debug_fallback_is_labelled_and_is_not_silk_breaking (res://tests/integration/test_tether.gd:401)
+       [3] miss_off_the_cliff (res://tests/tether_test_case.gd:35)
+       [4] wait_until (res://tests/test_case.gd:68)
+PASS     test_tether.gd::test_the_debug_fallback_is_labelled_and_is_not_silk_breaking  [606 ms]  7 checks
+prey seed 1133536228
+PASS     test_tether.gd::test_the_keyboard_lowers_reels_and_lets_go_through_the_real_actions  [4612 ms]  8 checks
+prey seed 1138195969
+PASS     test_tether.gd::test_the_line_comes_loose_safely_when_its_anchor_goes_away  [1004 ms]  8 checks
+prey seed 1139193917
+PASS     test_tether.gd::test_the_line_has_its_own_prompts_distinct_from_cancelling_an_aim  [836 ms]  9 checks
+prey seed 1140091040
+PASS     test_tether.gd::test_without_the_hold_option_a_fresh_press_lets_go_but_not_one_inside_the_grace  [1199 ms]  3 checks
+PASS     test_u01_access.gd::test_a_remapped_key_drives_the_action_and_survives_a_restart  [45 ms]  6 checks
+PASS     test_u01_access.gd::test_every_action_of_the_loop_and_the_field_notes_have_a_controller_input  [92 ms]  21 checks
+PASS     test_u01_access.gd::test_text_size_survives_a_restart_and_is_bounded  [35 ms]  3 checks
+PASS     test_u01_access.gd::test_the_pause_menu_remaps_a_key_and_fits_larger_text  [107 ms]  10 checks
+PASS     test_u01_access.gd::test_the_windowsill_names_the_keys_the_player_chose  [82 ms]  1 checks
+PASS     test_u01_access.gd::test_walk_forward_carries_reel_with_it_and_a_used_key_is_swapped  [35 ms]  8 checks
+PASS     test_walking.gd::test_acceleration_is_quick_but_not_instant  [1107 ms]  2 checks
+PASS     test_walking.gd::test_body_turns_toward_movement_at_a_capped_rate  [1659 ms]  3 checks
+PASS     test_walking.gd::test_forward_intent_walks_forward_on_the_floor  [2664 ms]  7 checks
+PASS     test_walking.gd::test_stalk_is_slower_than_walk  [1648 ms]  1 checks
+PASS     test_walking.gd::test_walking_off_a_ledge_wraps_down_its_side_face  [3205 ms]  6 checks
+PASS     test_walking.gd::test_walking_off_the_coated_platform_falls_then_lands  [2256 ms]  8 checks
+PASS     test_walking.gd::test_walking_stops_when_intent_stops  [2668 ms]  2 checks
+PASS     test_walking.gd::test_walks_up_the_ramp_onto_the_block_without_falling  [6159 ms]  5 checks
+PASS     test_walking.gd::test_zero_intent_does_not_drift  [2655 ms]  2 checks
+PASS     test_windowsill.gd::test_disturbance_warns_passes_once_and_never_moves_collision  [56 ms]  10 checks
+PASS     test_windowsill.gd::test_feed_takes_priority_over_rest_and_keeps_its_remaining_nutrition  [926 ms]  4 checks
+PASS     test_windowsill.gd::test_front_route_returns_to_physical_retreat_without_teleport  [37713 ms]  9 checks
+PASS     test_windowsill.gd::test_habitat_capture_and_interrupted_meal_keep_the_same_ownership  [6781 ms]  9 checks
+PASS     test_windowsill.gd::test_habitat_perches_and_entries_validate_with_four_flies  [54 ms]  16 checks
+PASS     test_windowsill.gd::test_pause_freezes_rest_needs_flies_and_disturbance  [171 ms]  4 checks
+PASS     test_windowsill.gd::test_rest_restores_only_rest_and_movement_cancels_it  [1072 ms]  6 checks
+PASS     test_windowsill.gd::test_retreat_refuses_rest_outside_and_cancels_on_jump_preparation  [98 ms]  4 checks
+PASS     test_windowsill.gd::test_upper_route_can_be_entered_from_floor_and_camera_clears_the_crevice  [1784 ms]  3 checks
+PASS     test_windowsill.gd::test_upper_route_jumps_across_the_gap_and_back  [13647 ms]  40 checks
+evidence_id: 8149fa0be2b8 (source 653d5e05, settings 8b6707d4, tests 4e515780)
+SUMMARY tests=511 passed=510 failed=1 not_run=0 seed=20261005 filter=all result=FAIL

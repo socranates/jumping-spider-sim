@@ -8,6 +8,7 @@ extends CanvasLayer
 ## panel at the bottom gives the line's own prompts (reel in, lower, let go: distinct from cancelling an
 ## aim), why reeling stopped if it did, and the hold-to-let-go progress. Line events get toasts.
 
+const KeyNames = preload("res://scripts/presentation/key_names.gd")
 const JumpFeedback = preload("res://scripts/presentation/jump_feedback.gd")
 const Layers = preload("res://scripts/core/physics_layers.gd")
 
@@ -102,7 +103,7 @@ func _process(delta: float) -> void:
 		var plan: RefCounted = controller.plan
 		var d := JumpFeedback.describe(plan, toggle)
 		_title.text = d["title"]
-		_hint.text = d["hint"] if toggle else "%s    %s" % [d["hint"], JumpFeedback.AIM_CANCEL_HINT]
+		_hint.text = KeyNames.apply(d["hint"] if toggle else "%s    %s" % [d["hint"], JumpFeedback.AIM_CANCEL_HINT], settings)
 		var color := JumpFeedback.color_for(plan.kind_name() if plan != null else "none")
 		_title.add_theme_color_override("font_color", color)
 		_update_anchor_label(plan)
@@ -180,7 +181,7 @@ func _update_line_panel(delta: float) -> void:
 	var reeling: bool = motor.state == motor.State.REELING
 	_line_title.text = JumpFeedback.LINE_TITLE_REELING if reeling else JumpFeedback.LINE_TITLE
 	var hold: bool = settings == null or settings.release_hold
-	_line_hint.text = JumpFeedback.LINE_HINT_HOLD if hold else JumpFeedback.LINE_HINT_PRESS
+	_line_hint.text = KeyNames.apply(JumpFeedback.LINE_HINT_HOLD if hold else JumpFeedback.LINE_HINT_PRESS, settings)
 	var cue := ""
 	var progress: float = tether_controller.release_progress if tether_controller != null else 0.0
 	if progress > 0.0:

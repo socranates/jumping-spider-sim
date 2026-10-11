@@ -213,10 +213,11 @@ func _hidden_run(move: bool, with_control: bool) -> Dictionary:
 	await physics_frames(3)
 	var spider: Node3D = world.spider
 	var fly := add_fly("floor_east_open", 9)
-	var rec := {"aw": [], "pos": [], "seen": 0, "checks0": 0}
+	var rec := {"aw": [], "pos": [], "by_tick": {}, "seen": 0, "checks0": 0}
 	var sample := func() -> void:
 		(rec["aw"] as Array).append(fly.senses.awareness)
 		(rec["pos"] as Array).append(fly.global_position)
+		(rec["by_tick"] as Dictionary)[int(director().tick)] = fly.global_position
 		if not fly.senses.evidence.is_empty() and bool(fly.senses.evidence.get("seen", false)) and director().now - float(fly.senses.evidence.get("t", -1.0e9)) < 0.3:
 			rec["seen"] = int(rec["seen"]) + 1
 	await run_ticks(30, sample)
@@ -226,7 +227,7 @@ func _hidden_run(move: bool, with_control: bool) -> Dictionary:
 		await walk_toward(Vector3(1.5, 0.31, 6.5), WALK, 0.2, 200, sample)    # and back
 		await strike_at(7.0, 6.5)                                              # a real leap along the wall
 	else:
-		await run_ticks(260, sample)
+		await run_ticks(420, sample)   # long enough to cover every tick of the moving run (T09c: compared tick by tick)
 	await run_ticks(20, sample)
 	rec["state"] = fly.state_name()
 	rec["trace_n"] = fly.trace.size()
@@ -258,9 +259,15 @@ func _f2_occluded() -> GateFixture:
 	fx.need(peak <= 1.0e-6 and int(moving["trace_n"]) == 0 and str(moving["state"]) == "PERCHED", "its awareness stayed at %.3f, it made %d transitions and is %s" % [peak, int(moving["trace_n"]), str(moving["state"])], "the fly stirred: awareness peaked at %.3f, %d transitions, state %s" % [peak, int(moving["trace_n"]), str(moving["state"])])
 	fx.need(not bool(moving["has_last_seen"]), "and it holds no memory of where the spider is: it has never seen it", "the fly remembers a place it should not know")
 	fx.need(int(moving["captures"]) == 0, "nothing was caught by the leap", "the leap behind the wall caught %d" % int(moving["captures"]))
-	var gap := _max_gap(moving["pos"], still["pos"])
-	var n := mini((moving["pos"] as Array).size(), (still["pos"] as Array).size())
-	fx.need(gap < 1.0e-4 and n > 250, "the spider standing still in the same place: the fly did the very same thing, to %.6f WU over %d ticks (all it does is its own fidgeting and grooming)" % [gap, n], "what the hidden spider did changed the fly by %.4f WU" % gap)
+	# T09c: compared at the same prey ticks (the strike's own waits take no samples, and a fly that walks about its spot made the
+	# comparison by sample index drift; the fly's behaviour itself is the same tick for tick).
+	var gap := 0.0
+	var n := 0
+	for t: int in (moving["by_tick"] as Dictionary):
+		if (still["by_tick"] as Dictionary).has(t):
+			gap = maxf(gap, ((moving["by_tick"] as Dictionary)[t] as Vector3).distance_to((still["by_tick"] as Dictionary)[t] as Vector3))
+			n += 1
+	fx.need(gap < 1.0e-4 and n > 250, "the spider standing still in the same place: the fly did the very same thing, to %.6f WU over %d ticks (all it does is its own walking, fidgeting and grooming)" % [gap, n], "what the hidden spider did changed the fly by %.4f WU (%d common ticks)" % [gap, n])
 	var ct: Array = moving.get("control_trace", [])
 	fx.need(not ct.is_empty(), "the wall came down and the same leap in plain view moved the fly: %s" % (str((ct[0] as Dictionary)["reason"]).substr(0, 140) if not ct.is_empty() else ""), "with the wall down the leap did not move the fly")
 	if not ct.is_empty():

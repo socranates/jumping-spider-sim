@@ -5,7 +5,7 @@
   "body_length_wu": 1.0,
   "locomotion": {
     "walk_speed_wu_s": 2.5,
-    "stalk_speed_wu_s": 0.8,
+    "stalk_speed_wu_s": 0.65,
     "gravity_wu_s2": 35.0,
     "max_launch_speed_wu_s": 20.0,
     "flight_time_min_s": 0.35,

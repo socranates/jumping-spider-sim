@@ -15,6 +15,7 @@ extends RefCounted
 const PreyMath = preload("res://scripts/prey/prey_math.gd")
 const PerceptionMath = preload("res://scripts/perception/perception_math.gd")
 const Layers = preload("res://scripts/core/physics_layers.gd")
+const RecordMath = preload("res://scripts/persistence/record_math.gd")
 
 const SAMPLES := 3
 const SAMPLE_SPREAD := 0.8
@@ -140,7 +141,7 @@ func update(space: PhysicsDirectSpaceState3D, eye: Vector3, facing: Vector3, up:
 	ev["motion_deg_s"] = motion
 	ev["appeared"] = appeared
 	ev["gain_per_s"] = gain
-	ev["startle"] = PreyMath.is_startle(motion * w_face * vf, vdist, p.startle_motion_deg_s, p.startle_range_wu)
+	ev["startle"] = PreyMath.is_startle(motion * maxf(w_face, p.startle_rear_gain) * vf, vdist, p.startle_motion_deg_s, p.startle_range_wu)
 	ev["seen"] = true
 	_has_last = true
 	_last_point = centre
@@ -194,3 +195,27 @@ static func describe(ev: Dictionary) -> String:
 	return "sees it %.1f WU away, %.0f deg off its facing, %.0f%% of it; bearing %.0f, loom %.0f deg/s%s%s; awareness %.2f" % [
 		float(ev["distance"]), float(ev["off_deg"]), float(ev["visible_fraction"]) * 100.0, float(ev["bearing_deg_s"]), float(ev["loom_deg_s"]),
 		", appeared" if bool(ev["appeared"]) else "", ", startling" if bool(ev["startle"]) else "", float(ev["awareness"])]
+
+
+## T09: the fly's own memory and look schedule as a plain record. The evidence keeps only its plain values (it is read for the trace and
+## for whether a sighting is from this very tick); cost counters start again.
+func to_record() -> Dictionary:
+	return {"awareness": awareness, "evidence": RecordMath.plain(evidence), "has_last_seen": has_last_seen,
+		"last_seen_position": RecordMath.v3(last_seen_position), "last_seen_time": last_seen_time, "started": _started, "has_last": _has_last,
+		"last_point": RecordMath.v3(_last_point), "last_time": _last_time, "last_mask": _last_mask, "last_check_time": _last_check_time,
+		"next_check_time": _next_check_time}
+
+
+func apply_record(r: Dictionary) -> void:
+	awareness = float(r["awareness"])
+	evidence = (r["evidence"] as Dictionary).duplicate()
+	has_last_seen = bool(r["has_last_seen"])
+	last_seen_position = RecordMath.to_v3(r["last_seen_position"])
+	last_seen_time = float(r["last_seen_time"])
+	_started = bool(r["started"])
+	_has_last = bool(r["has_last"])
+	_last_point = RecordMath.to_v3(r["last_point"])
+	_last_time = float(r["last_time"])
+	_last_mask = int(r["last_mask"])
+	_last_check_time = float(r["last_check_time"])
+	_next_check_time = float(r["next_check_time"])

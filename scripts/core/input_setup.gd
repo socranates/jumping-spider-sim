@@ -27,6 +27,8 @@ const BINDINGS := {
 	"cancel": {"keys": [KEY_Q], "buttons": [JOY_BUTTON_B], "dead": BUTTON_DEADZONE},
 	"recenter": {"keys": [KEY_R], "mouse": [MOUSE_BUTTON_MIDDLE], "buttons": [JOY_BUTTON_RIGHT_STICK], "dead": BUTTON_DEADZONE},
 	"pause": {"keys": [KEY_ESCAPE], "buttons": [JOY_BUTTON_START], "dead": BUTTON_DEADZONE},
+	# T09 (U01): the habitat's field notes, from the keyboard or the controller's View / Back button.
+	"help": {"keys": [KEY_H], "buttons": [JOY_BUTTON_BACK], "dead": BUTTON_DEADZONE},
 	"debug_overlay": {"keys": [KEY_F3], "dead": BUTTON_DEADZONE},
 	"debug_support": {"keys": [KEY_F4], "dead": BUTTON_DEADZONE},
 }
@@ -44,6 +46,10 @@ func _ready() -> void:
 	var settings := get_node_or_null("/root/Settings")
 	if settings != null and settings.has_method("get_binding_overrides"):
 		overrides = settings.get_binding_overrides()
+		# T09: a key changed in the pause menu takes effect at once.
+		settings.setting_changed.connect(func(key: String) -> void:
+			if key == "bindings":
+				register_actions(settings.get_binding_overrides()))
 	register_actions(overrides)
 
 
@@ -60,6 +66,10 @@ func register_actions(overrides: Dictionary = {}) -> void:
 
 
 func default_events(action: String) -> Array[InputEvent]:
+	return defaults_of(action)
+
+
+static func defaults_of(action: String) -> Array[InputEvent]:
 	var out: Array[InputEvent] = []
 	var b: Dictionary = BINDINGS.get(action, {})
 	for code: int in b.get("keys", []):
@@ -84,3 +94,23 @@ func default_events(action: String) -> Array[InputEvent]:
 		ja.device = -1
 		out.append(ja)
 	return out
+
+
+## T09 (remapping): the default events of `action` with its keyboard key replaced by `keycode` (the mouse buttons and controller inputs
+## stay). Used by Settings to turn a remapped key into the action's full list.
+static func events_for(action: String, keycode: int) -> Array[InputEvent]:
+	var out: Array[InputEvent] = []
+	var k := InputEventKey.new()
+	k.physical_keycode = keycode as Key
+	k.device = -1
+	out.append(k)
+	for e in defaults_of(action):
+		if not e is InputEventKey:
+			out.append(e)
+	return out
+
+
+## The default keyboard key of an action, 0 when it has none.
+static func default_key(action: String) -> int:
+	var keys: Array = (BINDINGS.get(action, {}) as Dictionary).get("keys", [])
+	return int(keys[0]) if not keys.is_empty() else 0

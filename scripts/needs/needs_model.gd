@@ -67,7 +67,7 @@ func advance(dt: float, active: bool) -> void:
 	var total := _acc_active + _acc_still
 	while total >= UPDATE_PERIOD_S - 1e-9:
 		_apply(UPDATE_PERIOD_S, _acc_active / total)
-		var keep := (total - UPDATE_PERIOD_S) / total
+		var keep := maxf(0.0, (total - UPDATE_PERIOD_S) / total)  # T09: never a tiny negative remainder (it made the record unloadable)
 		_acc_active *= keep
 		_acc_still *= keep
 		total -= UPDATE_PERIOD_S

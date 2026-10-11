@@ -1,0 +1,30 @@
+Jumping Spider Sim test report
+timestamp_utc: 2026-10-10T23:47:57Z
+engine: Godot 4.7.2.stable.official.ed1daf0bf
+platform: Windows
+renderer_setting: gl_compatibility
+renderer_active: gl_compatibility
+physics_engine: Jolt Physics
+source_hash_md5: 8975f46d591de6782a71f6356bb64266 (scripts, scenes, data)
+settings_hash_md5: 8b6707d4bb26d00c21239d1c75d3aec2 (project.godot)
+tests_hash_md5: 4e890af54849a61b345a3fac399afc9a (tests/ scripts and scenes, not tests/reports)
+evidence_id: 838e9a1472e2 (keeps a copy of this state: snapshot.bat writes tests/reports/snapshots/DATE_838e9a1472e2.zip)
+fixture_seed: 20261005
+filter: only=unit,integration,gates files=supported_locomotion
+tests: 11
+passed: 10
+failed: 1
+not_run: 0
+result: FAIL
+
+PASS     test_supported_locomotion.gd::test_coated_panel_cannot_be_climbed  6 checks
+PASS     test_supported_locomotion.gd::test_coplanar_seam_does_not_jitter  6 checks
+PASS     test_supported_locomotion.gd::test_floor_to_wall_climbs_at_a_concave_corner  9 checks
+PASS     test_supported_locomotion.gd::test_gap_is_crossed_only_along_surfaces  6 checks
+PASS     test_supported_locomotion.gd::test_gap_with_nothing_reachable_falls  5 checks
+PASS     test_supported_locomotion.gd::test_inside_corner_of_two_walls_does_not_oscillate  6 checks
+FAIL     test_supported_locomotion.gd::test_support_view_toggles_with_f4_and_draws_the_normal  from the contact point (expected (-22.0, 0.0, 12.0) +/- 0.0001, got (0.0, 0.0, 0.0)); one rod per probe ray of the last tick (expected 1, got 0)
+PASS     test_supported_locomotion.gd::test_thin_shelf_is_wrapped_never_crossed  6 checks
+PASS     test_supported_locomotion.gd::test_walking_off_an_edge_at_a_shallow_angle_still_wraps  4 checks
+PASS     test_supported_locomotion.gd::test_wall_to_top_over_a_convex_edge  7 checks
+PASS     test_supported_locomotion.gd::test_wall_to_underside_and_back  10 checks

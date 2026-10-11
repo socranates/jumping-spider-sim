@@ -20,6 +20,7 @@ const PreyMath = preload("res://scripts/prey/prey_math.gd")
 const FlySenses = preload("res://scripts/prey/fly_senses.gd")
 const PerchGraph = preload("res://scripts/prey/perch_graph.gd")
 const Fly = preload("res://scripts/prey/fly.gd")
+const RecordMath = preload("res://scripts/persistence/record_math.gd")
 
 const GOALS: Array[StringName] = [&"rest", &"move", &"flee"]
 const RETRY_S := 0.25
@@ -254,9 +255,50 @@ func _begin_reposition(now: float, reason: String) -> void:
 	if choice.is_empty():
 		return
 	var c: PerchGraph.Perch = choice["perch"]
-	f.flight.begin(choice["flight"], c, &"move", now, false)
+	var plan: PerchGraph.Flight = choice["flight"]
+	var how := ""
+	# T09c: a fly that moves of its own accord often takes the long way: out into the open air, round, and in to land.
+	if f.rng.randf() < float(f.profile.wander_flight_chance):
+		var looped := _wander_plan(origin, f.normal, c)
+		if looped != null:
+			plan = looped
+			how = ", looping through the open air"
+	f.flight.begin(plan, c, &"move", now, false)
 	f.set_goal(&"move", reason)
-	f.transition(Fly.State.REPOSITION, "%s -> %s (%.1f WU, food %.2f, shelter %.2f)" % [reason, c.id, origin.distance_to(c.position), c.food, c.shelter])
+	f.transition(Fly.State.REPOSITION, "%s -> %s (%.1f WU, food %.2f, shelter %.2f%s)" % [reason, c.id, origin.distance_to(c.position), c.food, c.shelter, how])
+
+
+## A flight out to a random point in the open air and from there in to `to`, every leg swept like any planned flight; null when no such
+## loop can be flown from here (the fly then goes straight).
+func _wander_plan(origin: Vector3, start_normal: Vector3, to: PerchGraph.Perch) -> PerchGraph.Flight:
+	var f := fly
+	var p: RefCounted = f.profile
+	var g: PerchGraph = f.world.graph
+	var space: PhysicsDirectSpaceState3D = f.world.space()
+	var r: float = p.clearance_radius_wu
+	var lifted: Vector3 = origin + start_normal * float(p.lift_wu)
+	if not g.sweep_clear(space, origin, lifted, r):
+		return null
+	for i in 4:
+		var ang: float = f.rng.randf() * TAU
+		var w: Vector3 = lifted + Vector3(cos(ang), 0.0, sin(ang)) * float(f.rng.randf_range(2.5, 6.0))
+		w.y = clampf(lifted.y + float(f.rng.randf_range(0.5, 3.5)), 0.8, PerchGraph.CEILING_Y - 1.0)
+		if not g.sweep_clear(space, lifted, w, r):
+			continue
+		var tail: PerchGraph.Flight = g.plan(space, w, Vector3.ZERO, to, p, null)
+		if not tail.ok:
+			continue
+		var loop := PerchGraph.Flight.new()
+		loop.points = PackedVector3Array([origin, lifted])
+		loop.points.append_array(tail.points)
+		loop.length = PreyMath.path_length(loop.points)
+		if loop.length > float(p.max_flight_wu) * 1.6:
+			continue
+		loop.ok = true
+		loop.reason = "wander"
+		loop.target_id = to.id
+		return loop
+	return null
 
 
 ## A replacement fly sets off from the vent it came in through to the perch the population chose, by a flight the planner has swept
@@ -371,6 +413,12 @@ func _retarget(now: float, why: String) -> void:
 		f.transition(Fly.State.SEEK_PERCH, "%s: new target %s" % [why, c.id])
 
 
+## T09b: it struggled free of the jaws: it flies at once (it needs no reaction delay to know what happened).
+func escape(now: float, reason: String) -> void:
+	pending = {}
+	_begin_flee(now, reason)
+
+
 ## The fly's perch left the world under it: it flies at once (no delay: the floor is gone).
 func on_perch_lost() -> void:
 	var f := fly
@@ -393,3 +441,22 @@ func describe() -> String:
 	if not pending.is_empty():
 		line += " | reacting in %.2f s (%s)" % [maxf(0.0, float(pending["due"]) - fly.world.now), str(pending["kind"])]
 	return line
+
+
+## T09: a reaction waiting out its delay, the perches refused lately and the decision clock, as a plain record. The last scores are for the
+## developer view and are made again at the next decision.
+func to_record() -> Dictionary:
+	var p := RecordMath.plain(pending)
+	return {"pending": p, "blocked": blocked.duplicate(), "next_decision": _next_decision_t, "next_retry": _next_retry_t, "winner": str(winner)}
+
+
+func apply_record(r: Dictionary) -> void:
+	pending = (r["pending"] as Dictionary).duplicate()
+	if pending.has("kind"):
+		pending["kind"] = StringName(str(pending["kind"]))
+	blocked = {}
+	for k: Variant in (r["blocked"] as Dictionary):
+		blocked[str(k)] = float((r["blocked"] as Dictionary)[k])
+	_next_decision_t = float(r["next_decision"])
+	_next_retry_t = float(r["next_retry"])
+	winner = StringName(str(r["winner"]))

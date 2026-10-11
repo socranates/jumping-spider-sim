@@ -22,6 +22,7 @@ extends RefCounted
 
 const PreyMath = preload("res://scripts/prey/prey_math.gd")
 const PerchGraph = preload("res://scripts/prey/perch_graph.gd")
+const RecordMath = preload("res://scripts/persistence/record_math.gd")
 
 ## A vent rests this long after a fly came in through it.
 const VENT_REST_S := 6.0
@@ -312,3 +313,54 @@ func describe(now: float) -> String:
 		var h: Dictionary = history[history.size() - 1]
 		s += "; last %s via %s at %.0f s" % [str(h["fly"]), str(h["vent"]), float(h["t"])]
 	return s
+
+
+# ------------------------------------------------------------------ persistence (T09)
+
+## The replacement schedule as a plain record: the stream, the replacements still owed and when, which vents are resting, and the ask
+## clock. The entry history and the deferrals are developer history and start again after a restore (their counts are kept).
+func to_record() -> Dictionary:
+	var owed: Array = []
+	for rec: Dictionary in pending:
+		owed.append({"lost": float(rec["lost"]), "delay": float(rec["delay"]), "due": float(rec["due"])})
+	return {"enabled": enabled, "target": target, "rng_state": str(rng.state), "pending": owed, "vent_free_at": _vent_free_at.duplicate(),
+		"ok_before": _ok_before.keys(), "last_ask_t": _last_ask_t, "next_ask": _next_ask, "losses_noticed": losses_noticed,
+		"asks_total": asks_total, "deferred_total": deferred_total, "entries_total": entries_total}
+
+
+func apply_record(r: Dictionary) -> void:
+	enabled = bool(r["enabled"])
+	target = int(r["target"])
+	rng.state = String(r["rng_state"]).to_int()
+	pending.clear()
+	for rec: Dictionary in r["pending"]:
+		pending.append({"lost": float(rec["lost"]), "delay": float(rec["delay"]), "due": float(rec["due"])})
+	_vent_free_at = {}
+	for k: Variant in (r["vent_free_at"] as Dictionary):
+		_vent_free_at[str(k)] = float((r["vent_free_at"] as Dictionary)[k])
+	_ok_before = {}
+	for k: Variant in r["ok_before"]:
+		_ok_before[str(k)] = true
+	_last_ask_t = float(r["last_ask_t"])
+	_next_ask = float(r["next_ask"])
+	losses_noticed = int(r["losses_noticed"])
+	asks_total = int(r["asks_total"])
+	deferred_total = int(r["deferred_total"])
+	entries_total = int(r["entries_total"])
+
+
+## T09b: a fly that was lost came back (it struggled free): up to `count` replacements still owed are no longer owed, the latest first,
+## so the room never keeps more than its target.
+func forget_owed(count: int) -> void:
+	var extra := free_count() + pending.size() - target
+	var n := mini(count, extra)
+	while n > 0 and not pending.is_empty():
+		pending.pop_back()
+		n -= 1
+
+
+func vent_by_id(vent_id: String) -> PerchGraph.Perch:
+	for v in vents:
+		if v.id == vent_id:
+			return v
+	return null

@@ -1,0 +1,344 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[   0% ] [90m[1mfirst_scan_filesystem[22m | Started Project initialization (5 steps)[39m[0m
+[   0% ] [90m[1mfirst_scan_filesystem[22m | Scanning file structure...[39m[0m
+[  16% ] [90m[1mfirst_scan_filesystem[22m | Loading global class names...[39m[0m
+[  33% ] [90m[1mfirst_scan_filesystem[22m | Verifying GDExtensions...[39m[0m
+[  50% ] [90m[1mfirst_scan_filesystem[22m | Creating autoload scripts...[39m[0m
+[  66% ] [90m[1mfirst_scan_filesystem[22m | Initializing plugins...[39m[0m
+[  83% ] [90m[1mfirst_scan_filesystem[22m | Starting file scan...[39m[0m
+[92m[ DONE ][39m [1mfirst_scan_filesystem[22m
+[0m
+[   0% ] [90m[1mloading_editor_layout[22m | Started Loading editor (5 steps)[39m[0m
+[   0% ] [90m[1mloading_editor_layout[22m | Loading editor layout...[39m[0m
+[  16% ] [90m[1mloading_editor_layout[22m | Loading docks...[39m[0m
+[92m[ DONE ][39m [1mloading_editor_layout[22m
+[0m
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[   0% ] [90m[1mfirst_scan_filesystem[22m | Started Project initialization (5 steps)[39m[0m
+[   0% ] [90m[1mfirst_scan_filesystem[22m | Scanning file structure...[39m[0m
+[  16% ] [90m[1mfirst_scan_filesystem[22m | Loading global class names...[39m[0m
+[  33% ] [90m[1mfirst_scan_filesystem[22m | Verifying GDExtensions...[39m[0m
+[  50% ] [90m[1mfirst_scan_filesystem[22m | Creating autoload scripts...[39m[0m
+[  66% ] [90m[1mfirst_scan_filesystem[22m | Initializing plugins...[39m[0m
+[  83% ] [90m[1mfirst_scan_filesystem[22m | Starting file scan...[39m[0m
+[92m[ DONE ][39m [1mfirst_scan_filesystem[22m
+[0m
+[   0% ] [90m[1msavepack[22m | Started Packing (102 steps)[39m[0m
+[   1% ] [90m[1msavepack[22m | Storing File: res://data/species/fly_like_prototype.json[39m[0m
+[   2% ] [90m[1msavepack[22m | Storing File: res://data/species/phidippus_audax_prototype.json[39m[0m
+[   3% ] [90m[1msavepack[22m | Storing File: res://data/surfaces/bare_wood_rough.json[39m[0m
+[   4% ] [90m[1msavepack[22m | Storing File: res://data/surfaces/brick_rough.json[39m[0m
+[   6% ] [90m[1msavepack[22m | Storing File: res://data/surfaces/glass_clean.json[39m[0m
+[   7% ] [90m[1msavepack[22m | Storing File: res://data/surfaces/leaf_dry_prototype.json[39m[0m
+[   8% ] [90m[1msavepack[22m | Storing File: res://data/surfaces/painted_ceiling.json[39m[0m
+[   9% ] [90m[1msavepack[22m | Storing File: res://data/surfaces/painted_metal_smooth.json[39m[0m
+[  11% ] [90m[1msavepack[22m | Storing File: res://data/surfaces/painted_wood_dry.json[39m[0m
+[  12% ] [90m[1msavepack[22m | Storing File: res://data/surfaces/plaster_matte.json[39m[0m
+[  13% ] [90m[1msavepack[22m | Storing File: res://data/surfaces/ptfe_coated.json[39m[0m
+[  14% ] [90m[1msavepack[22m | Storing File: res://data/surfaces/varnished_wood_smooth.json[39m[0m
+[  16% ] [90m[1msavepack[22m | Storing File: res://.godot/imported/icon.svg-218a8f2b3041327d8a5756f3a245f83b.ctex[39m[0m
+[  16% ] [90m[1msavepack[22m | Storing File: res://icon.svg.import[39m[0m
+[  17% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/fly.gdc[39m[0m
+[  18% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/prey_profile.gdc[39m[0m
+[  19% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/prey_population.gdc[39m[0m
+[  21% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/prey_math.gdc[39m[0m
+[  22% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/prey_director.gdc[39m[0m
+[  23% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/perch_graph.gdc[39m[0m
+[  25% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/fly_senses.gdc[39m[0m
+[  26% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/fly_mind.gdc[39m[0m
+[  27% ] [90m[1msavepack[22m | Storing File: res://.godot/exported/133200997/export-b95fd15aa003bd8521a87a6db7b1c5e8-spider.scn[39m[0m
+[  28% ] [90m[1msavepack[22m | Storing File: res://.godot/exported/133200997/export-310c8628494a0ac1a7aa78b9e2577fbc-windowsill.scn[39m[0m
+[  30% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/fly_flight.gdc[39m[0m
+[  31% ] [90m[1msavepack[22m | Storing File: res://.godot/exported/133200997/export-73e4d8e9c8c561ee4e30cdcce070428a-play_lab.scn[39m[0m
+[  32% ] [90m[1msavepack[22m | Storing File: res://.godot/exported/133200997/export-1fd85e016af8bd01f2ceb67dae0f4c7c-traversal_lab.scn[39m[0m
+[  33% ] [90m[1msavepack[22m | Storing File: res://.godot/exported/133200997/export-3ad5c15c4f3250da0cc7c1af1770d85f-main.scn[39m[0m
+[  34% ] [90m[1msavepack[22m | Storing File: res://scripts/core/input_setup.gdc[39m[0m
+[  35% ] [90m[1msavepack[22m | Storing File: res://scripts/core/main.gdc[39m[0m
+[  36% ] [90m[1msavepack[22m | Storing File: res://scripts/core/physics_layers.gdc[39m[0m
+[  37% ] [90m[1msavepack[22m | Storing File: res://scripts/core/species_profile.gdc[39m[0m
+[  39% ] [90m[1msavepack[22m | Storing File: res://scripts/core/surface_profile.gdc[39m[0m
+[  40% ] [90m[1msavepack[22m | Storing File: res://scripts/habitat/habitat_loop.gdc[39m[0m
+[  41% ] [90m[1msavepack[22m | Storing File: res://scripts/habitat/test_target.gdc[39m[0m
+[  43% ] [90m[1msavepack[22m | Storing File: res://scripts/habitat/traversal_lab.gdc[39m[0m
+[  44% ] [90m[1msavepack[22m | Storing File: res://scripts/habitat/windowsill.gdc[39m[0m
+[  45% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/boom_math.gdc[39m[0m
+[  46% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/camera_rig.gdc[39m[0m
+[  48% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/jump_controller.gdc[39m[0m
+[  49% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/jump_math.gdc[39m[0m
+[  50% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/jump_plan.gdc[39m[0m
+[  51% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/jump_planner.gdc[39m[0m
+[  53% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/player_controller.gdc[39m[0m
+[  54% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/spider_motor.gdc[39m[0m
+[  55% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/support_math.gdc[39m[0m
+[  56% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/surface_input.gdc[39m[0m
+[  58% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/tether.gdc[39m[0m
+[  59% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/tether_controller.gdc[39m[0m
+[  60% ] [90m[1msavepack[22m | Storing File: res://scripts/needs/feeding_controller.gdc[39m[0m
+[  62% ] [90m[1msavepack[22m | Storing File: res://scripts/needs/needs_model.gdc[39m[0m
+[  63% ] [90m[1msavepack[22m | Storing File: res://scripts/perception/observation.gdc[39m[0m
+[  64% ] [90m[1msavepack[22m | Storing File: res://scripts/perception/observation_memory.gdc[39m[0m
+[  65% ] [90m[1msavepack[22m | Storing File: res://scripts/perception/perceivable.gdc[39m[0m
+[  66% ] [90m[1msavepack[22m | Storing File: res://scripts/perception/perception_math.gdc[39m[0m
+[  67% ] [90m[1msavepack[22m | Storing File: res://scripts/perception/sensor_system.gdc[39m[0m
+[  68% ] [90m[1msavepack[22m | Storing File: res://scripts/persistence/checkpoint.gdc[39m[0m
+[  69% ] [90m[1msavepack[22m | Storing File: res://scripts/persistence/checkpoint_store.gdc[39m[0m
+[  71% ] [90m[1msavepack[22m | Storing File: res://scripts/persistence/record_math.gdc[39m[0m
+[  72% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/anchor_cue.gdc[39m[0m
+[  73% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/debug_overlay.gdc[39m[0m
+[  74% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/gaze_overlay.gdc[39m[0m
+[  76% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/jump_arc.gdc[39m[0m
+[  77% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/jump_debug.gdc[39m[0m
+[  78% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/jump_feedback.gdc[39m[0m
+[  80% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/jump_hud.gdc[39m[0m
+[  81% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/landing_patch.gdc[39m[0m
+[  82% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/needs_hud.gdc[39m[0m
+[  83% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/pause_menu.gdc[39m[0m
+[  85% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/perception_debug.gdc[39m[0m
+[  86% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/perception_hud.gdc[39m[0m
+[  87% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/perception_text.gdc[39m[0m
+[  88% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/prey_debug.gdc[39m[0m
+[  90% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/settings.gdc[39m[0m
+[  91% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/silk.gdshader[39m[0m
+[  92% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/silk_lines.gdc[39m[0m
+[  93% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/spider_body.gdc[39m[0m
+[  95% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/fly_body.gdc[39m[0m
+[  96% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/support_debug.gdc[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/tether_debug.gdc[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/fly.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/prey_profile.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/prey_population.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/prey_math.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/prey_director.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/perch_graph.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/fly_senses.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/fly_mind.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scenes/actors/spider.tscn.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scenes/habitats/windowsill.tscn.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/fly_flight.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scenes/testbeds/play_lab.tscn.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scenes/testbeds/traversal_lab.tscn.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scenes/main.tscn.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/core/input_setup.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/core/main.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/core/physics_layers.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/core/species_profile.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/core/surface_profile.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/habitat/habitat_loop.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/habitat/test_target.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/habitat/traversal_lab.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/habitat/windowsill.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/boom_math.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/camera_rig.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/jump_controller.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/jump_math.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/jump_plan.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/jump_planner.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/player_controller.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/spider_motor.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/support_math.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/surface_input.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/tether.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/tether_controller.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/needs/feeding_controller.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/needs/needs_model.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/perception/observation.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/perception/observation_memory.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/perception/perceivable.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/perception/perception_math.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/perception/sensor_system.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/persistence/checkpoint.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/persistence/checkpoint_store.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/persistence/record_math.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/anchor_cue.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/debug_overlay.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/gaze_overlay.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/jump_arc.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/jump_debug.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/jump_feedback.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/jump_hud.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/landing_patch.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/needs_hud.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/pause_menu.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/perception_debug.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/perception_hud.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/perception_text.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/prey_debug.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/settings.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/silk_lines.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/spider_body.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/fly_body.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/support_debug.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/tether_debug.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://.godot/global_script_class_cache.cfg[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://icon.svg[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://.godot/uid_cache.bin[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://project.binary[39m[0m
+[92m[ DONE ][39m [1msavepack[22m
+[0m
+Built C:\Users\natha\.codex\.chatgpt-projects\g-p-6ac2f32f82a48191b0c7151a11eab0fd\builds\windows\JumpingSpiderSim.exe
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[   0% ] [90m[1mfirst_scan_filesystem[22m | Started Project initialization (5 steps)[39m[0m
+[   0% ] [90m[1mfirst_scan_filesystem[22m | Scanning file structure...[39m[0m
+[  16% ] [90m[1mfirst_scan_filesystem[22m | Loading global class names...[39m[0m
+[  33% ] [90m[1mfirst_scan_filesystem[22m | Verifying GDExtensions...[39m[0m
+[  50% ] [90m[1mfirst_scan_filesystem[22m | Creating autoload scripts...[39m[0m
+[  66% ] [90m[1mfirst_scan_filesystem[22m | Initializing plugins...[39m[0m
+[  83% ] [90m[1mfirst_scan_filesystem[22m | Starting file scan...[39m[0m
+[92m[ DONE ][39m [1mfirst_scan_filesystem[22m
+[0m
+[   0% ] [90m[1msavepack[22m | Started Packing (102 steps)[39m[0m
+[   1% ] [90m[1msavepack[22m | Storing File: res://data/species/fly_like_prototype.json[39m[0m
+[   2% ] [90m[1msavepack[22m | Storing File: res://data/species/phidippus_audax_prototype.json[39m[0m
+[   3% ] [90m[1msavepack[22m | Storing File: res://data/surfaces/bare_wood_rough.json[39m[0m
+[   4% ] [90m[1msavepack[22m | Storing File: res://data/surfaces/brick_rough.json[39m[0m
+[   6% ] [90m[1msavepack[22m | Storing File: res://data/surfaces/glass_clean.json[39m[0m
+[   7% ] [90m[1msavepack[22m | Storing File: res://data/surfaces/leaf_dry_prototype.json[39m[0m
+[   8% ] [90m[1msavepack[22m | Storing File: res://data/surfaces/painted_ceiling.json[39m[0m
+[   9% ] [90m[1msavepack[22m | Storing File: res://data/surfaces/painted_metal_smooth.json[39m[0m
+[  11% ] [90m[1msavepack[22m | Storing File: res://data/surfaces/painted_wood_dry.json[39m[0m
+[  12% ] [90m[1msavepack[22m | Storing File: res://data/surfaces/plaster_matte.json[39m[0m
+[  13% ] [90m[1msavepack[22m | Storing File: res://data/surfaces/ptfe_coated.json[39m[0m
+[  14% ] [90m[1msavepack[22m | Storing File: res://data/surfaces/varnished_wood_smooth.json[39m[0m
+[  16% ] [90m[1msavepack[22m | Storing File: res://.godot/imported/icon.svg-218a8f2b3041327d8a5756f3a245f83b.ctex[39m[0m
+[  16% ] [90m[1msavepack[22m | Storing File: res://icon.svg.import[39m[0m
+[  17% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/fly.gdc[39m[0m
+[  18% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/prey_profile.gdc[39m[0m
+[  19% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/prey_population.gdc[39m[0m
+[  21% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/prey_math.gdc[39m[0m
+[  22% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/prey_director.gdc[39m[0m
+[  23% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/perch_graph.gdc[39m[0m
+[  25% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/fly_senses.gdc[39m[0m
+[  26% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/fly_mind.gdc[39m[0m
+[  27% ] [90m[1msavepack[22m | Storing File: res://.godot/exported/133200997/export-b95fd15aa003bd8521a87a6db7b1c5e8-spider.scn[39m[0m
+[  28% ] [90m[1msavepack[22m | Storing File: res://.godot/exported/133200997/export-310c8628494a0ac1a7aa78b9e2577fbc-windowsill.scn[39m[0m
+[  30% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/fly_flight.gdc[39m[0m
+[  31% ] [90m[1msavepack[22m | Storing File: res://.godot/exported/133200997/export-73e4d8e9c8c561ee4e30cdcce070428a-play_lab.scn[39m[0m
+[  32% ] [90m[1msavepack[22m | Storing File: res://.godot/exported/133200997/export-1fd85e016af8bd01f2ceb67dae0f4c7c-traversal_lab.scn[39m[0m
+[  33% ] [90m[1msavepack[22m | Storing File: res://.godot/exported/133200997/export-3ad5c15c4f3250da0cc7c1af1770d85f-main.scn[39m[0m
+[  34% ] [90m[1msavepack[22m | Storing File: res://scripts/core/input_setup.gdc[39m[0m
+[  35% ] [90m[1msavepack[22m | Storing File: res://scripts/core/main.gdc[39m[0m
+[  36% ] [90m[1msavepack[22m | Storing File: res://scripts/core/physics_layers.gdc[39m[0m
+[  37% ] [90m[1msavepack[22m | Storing File: res://scripts/core/species_profile.gdc[39m[0m
+[  39% ] [90m[1msavepack[22m | Storing File: res://scripts/core/surface_profile.gdc[39m[0m
+[  40% ] [90m[1msavepack[22m | Storing File: res://scripts/habitat/habitat_loop.gdc[39m[0m
+[  41% ] [90m[1msavepack[22m | Storing File: res://scripts/habitat/test_target.gdc[39m[0m
+[  43% ] [90m[1msavepack[22m | Storing File: res://scripts/habitat/traversal_lab.gdc[39m[0m
+[  44% ] [90m[1msavepack[22m | Storing File: res://scripts/habitat/windowsill.gdc[39m[0m
+[  45% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/boom_math.gdc[39m[0m
+[  46% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/camera_rig.gdc[39m[0m
+[  48% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/jump_controller.gdc[39m[0m
+[  49% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/jump_math.gdc[39m[0m
+[  50% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/jump_plan.gdc[39m[0m
+[  51% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/jump_planner.gdc[39m[0m
+[  53% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/player_controller.gdc[39m[0m
+[  54% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/spider_motor.gdc[39m[0m
+[  55% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/support_math.gdc[39m[0m
+[  56% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/surface_input.gdc[39m[0m
+[  58% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/tether.gdc[39m[0m
+[  59% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/tether_controller.gdc[39m[0m
+[  60% ] [90m[1msavepack[22m | Storing File: res://scripts/needs/feeding_controller.gdc[39m[0m
+[  62% ] [90m[1msavepack[22m | Storing File: res://scripts/needs/needs_model.gdc[39m[0m
+[  63% ] [90m[1msavepack[22m | Storing File: res://scripts/perception/observation.gdc[39m[0m
+[  64% ] [90m[1msavepack[22m | Storing File: res://scripts/perception/observation_memory.gdc[39m[0m
+[  65% ] [90m[1msavepack[22m | Storing File: res://scripts/perception/perceivable.gdc[39m[0m
+[  66% ] [90m[1msavepack[22m | Storing File: res://scripts/perception/perception_math.gdc[39m[0m
+[  67% ] [90m[1msavepack[22m | Storing File: res://scripts/perception/sensor_system.gdc[39m[0m
+[  68% ] [90m[1msavepack[22m | Storing File: res://scripts/persistence/checkpoint.gdc[39m[0m
+[  69% ] [90m[1msavepack[22m | Storing File: res://scripts/persistence/checkpoint_store.gdc[39m[0m
+[  71% ] [90m[1msavepack[22m | Storing File: res://scripts/persistence/record_math.gdc[39m[0m
+[  72% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/anchor_cue.gdc[39m[0m
+[  73% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/debug_overlay.gdc[39m[0m
+[  74% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/gaze_overlay.gdc[39m[0m
+[  76% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/jump_arc.gdc[39m[0m
+[  77% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/jump_debug.gdc[39m[0m
+[  78% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/jump_feedback.gdc[39m[0m
+[  80% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/jump_hud.gdc[39m[0m
+[  81% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/landing_patch.gdc[39m[0m
+[  82% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/needs_hud.gdc[39m[0m
+[  83% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/pause_menu.gdc[39m[0m
+[  85% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/perception_debug.gdc[39m[0m
+[  86% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/perception_hud.gdc[39m[0m
+[  87% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/perception_text.gdc[39m[0m
+[  88% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/prey_debug.gdc[39m[0m
+[  90% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/settings.gdc[39m[0m
+[  91% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/silk.gdshader[39m[0m
+[  92% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/silk_lines.gdc[39m[0m
+[  93% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/spider_body.gdc[39m[0m
+[  95% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/fly_body.gdc[39m[0m
+[  96% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/support_debug.gdc[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/tether_debug.gdc[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/fly.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/prey_profile.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/prey_population.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/prey_math.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/prey_director.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/perch_graph.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/fly_senses.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/fly_mind.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scenes/actors/spider.tscn.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scenes/habitats/windowsill.tscn.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/fly_flight.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scenes/testbeds/play_lab.tscn.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scenes/testbeds/traversal_lab.tscn.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scenes/main.tscn.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/core/input_setup.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/core/main.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/core/physics_layers.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/core/species_profile.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/core/surface_profile.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/habitat/habitat_loop.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/habitat/test_target.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/habitat/traversal_lab.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/habitat/windowsill.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/boom_math.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/camera_rig.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/jump_controller.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/jump_math.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/jump_plan.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/jump_planner.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/player_controller.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/spider_motor.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/support_math.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/surface_input.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/tether.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/movement/tether_controller.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/needs/feeding_controller.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/needs/needs_model.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/perception/observation.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/perception/observation_memory.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/perception/perceivable.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/perception/perception_math.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/perception/sensor_system.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/persistence/checkpoint.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/persistence/checkpoint_store.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/persistence/record_math.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/anchor_cue.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/debug_overlay.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/gaze_overlay.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/jump_arc.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/jump_debug.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/jump_feedback.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/jump_hud.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/landing_patch.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/needs_hud.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/pause_menu.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/perception_debug.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/perception_hud.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/perception_text.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/prey_debug.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/settings.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/silk_lines.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/spider_body.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/prey/fly_body.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/support_debug.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://scripts/presentation/tether_debug.gd.remap[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://.godot/global_script_class_cache.cfg[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://icon.svg[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://.godot/uid_cache.bin[39m[0m
+[  97% ] [90m[1msavepack[22m | Storing File: res://project.binary[39m[0m
+[92m[ DONE ][39m [1msavepack[22m
+[0m
+Built C:\Users\natha\.codex\.chatgpt-projects\g-p-6ac2f32f82a48191b0c7151a11eab0fd\builds\web\index.html

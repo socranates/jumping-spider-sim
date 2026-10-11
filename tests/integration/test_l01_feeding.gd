@@ -1,7 +1,7 @@
 extends "res://tests/prey_test_case.gd"
 ## Gate L01 (spec 25, T07; A-028): feeding increases energy only while it is valid, and canceling cannot duplicate prey or consumption.
-## The part about saving and loading cannot be tested yet: there is no save system until T09 (it is a test of its own that is reported as
-## not run, and the report says so, rather than a fixture that pretends).
+## The part about saving and loading is a test of its own (T09): it uses the retreat checkpoint (S01-C), the only save P0 has, in the
+## windowsill, and its result is in the runner's report.
 ##
 ## Everything here uses the real spider, the real prey director, the real feeding controller and the real needs model. The spider holds a
 ## captured fly (a real strike) and the checks audit every tick: the energy, the ledger of what each source has given, the controller's
@@ -57,7 +57,7 @@ func test_l01_feeding_increases_energy_only_while_valid_and_canceling_cannot_dup
 		for pr in f.problems:
 			lines.append("    PROBLEM: %s" % pr)
 		check(f.ok(), "%s: %s" % [f.name, "; ".join(f.problems)])
-	lines.append("NOT RUN  saving and loading cannot duplicate prey or consumption: there is no save system yet (T09). What exists is the needs model's record (NeedsModel.to_dict and load_dict, with their own unit tests), which nothing saves or loads, and no record of the prey. This part of L01 is not claimed.")
+	lines.append("saving and loading cannot duplicate prey or consumption: checked by test_l01_saving_and_loading_cannot_duplicate_prey_or_consumption (T09, through the S01-C retreat checkpoint in the windowsill); its result is in the runner's report, not here.")
 	var summary := "L01 result: %d of %d fixtures passed: feeding raised the energy only while valid and canceling never duplicated prey or consumption; save/load not run (no save system yet)" % [passed, _results.size()]
 	lines.append("")
 	lines.append(summary)
@@ -69,8 +69,65 @@ func test_l01_feeding_increases_energy_only_while_valid_and_canceling_cannot_dup
 		file.close()
 
 
+## T09: the save/load half of L01, through the S01-C checkpoint (the only save P0 has; DECISIONS A-001). In the shipped windowsill the spider
+## catches a fly with a real strike, eats part of it and stops; a checkpoint is made then (standing still, holding the part-eaten fly). It then
+## finishes the meal, and the checkpoint is loaded: the fly is in the jaws again with exactly what was left, the energy and the ledger are the
+## checkpoint's, and finishing it again grants its nutrition once in all. Loading again, and loading twice in a row, changes none of that:
+## no second fly, no second capture, no energy from nowhere.
 func test_l01_saving_and_loading_cannot_duplicate_prey_or_consumption() -> void:
-	skip("not run (no save system yet): saving and loading arrive with T09; nothing here pretends otherwise")
+	use_windowsill = true
+	await spawn_prey_world(floor_pose(-16, 6, -90))
+	var f := add_fly("sill_first_hunt", 1, true)
+	await run_ticks(100)
+	await strike_at(-13, 6)
+	if not check(director().held == f, "the spider holds the fly it caught"):
+		return
+	var fid: String = f.id
+	var event_id: String = f.capture_event_id
+	var total: float = f.nutrition_total
+	check(world.feeding.request_feed(), "eating starts")
+	await run_ticks(15)
+	world.feeding.request_cancel()
+	await run_ticks(3)
+	var left: float = f.nutrition_left
+	check(left > 0.0 and left < total, "part of the fly is eaten (%.4f of %.4f left)" % [left, total])
+	var saved: Dictionary = world.save_checkpoint()
+	if not check(bool(saved["ok"]), "a checkpoint is made standing still with the fly in the jaws: %s" % str(saved["message"])):
+		return
+	var rec: Dictionary = saved["record"]
+	var energy_at: float = world.needs.energy
+	var granted_at: float = world.needs.granted_from(event_id)
+	check_near(granted_at, total - left, 1.0e-9, "what was granted so far is what was eaten so far")
+	# finish the meal after the checkpoint
+	check(world.feeding.request_feed(), "eating again")
+	await wait_until(func() -> bool: return not world.feeding.feeding, 400)
+	check_near(world.needs.granted_from(event_id), total, 1.0e-6, "the whole fly was eaten once before loading")
+	for n in 3:
+		var fresh: Node3D = world.return_to_checkpoint(rec if n == 2 else {})
+		if not check(fresh != null, "load %d: %s" % [n + 1, world.last_checkpoint_message]):
+			return
+		world = fresh
+		await wait_until(func() -> bool: return world.prey.ready_done and world.spider.state == world.spider.State.ATTACHED, 60)
+		var held: Node3D = director().held
+		check(held != null and held.id == fid, "load %d: the same fly is in the jaws" % [n + 1])
+		if held == null:
+			return
+		check_near(held.nutrition_left, left, 1.0e-9, "load %d: with exactly what was left at the checkpoint" % [n + 1])
+		check_eq(director().capture_log.size(), 1, "load %d: one capture, not two" % [n + 1])
+		var copies := 0
+		for g in director().flies:
+			if g.id == fid:
+				copies += 1
+		check_eq(copies, 1, "load %d: one fly by that id" % [n + 1])
+		check_near(world.needs.energy, energy_at, 1.0e-9, "load %d: the energy is the checkpoint's" % [n + 1])
+		check_near(world.needs.granted_from(event_id), granted_at, 1.0e-9, "load %d: the ledger is the checkpoint's" % [n + 1])
+		if n == 1:
+			continue  # load straight again without eating: nothing may change
+		check(world.feeding.request_feed(), "load %d: the meal goes on" % [n + 1])
+		await wait_until(func() -> bool: return not world.feeding.feeding, 400)
+		check_near(world.needs.granted_from(event_id), total, 1.0e-6, "load %d: the fly gave its nutrition once in all" % [n + 1])
+		check(world.needs.granted_total <= total + 1.0e-6, "load %d: nothing else was granted" % [n + 1])
+		check_eq(held.state_name(), "CONSUMED", "load %d: eaten" % [n + 1])
 
 
 # ------------------------------------------------------------------ helpers

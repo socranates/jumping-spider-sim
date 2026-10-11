@@ -36,7 +36,7 @@ const SCHEMA := {
 		"decay_relaxed_per_s": ["f", 0.0, 10.0], "decay_alert_per_s": ["f", 0.0, 10.0],
 		"unseen_decay_mult": ["f", 1.0, 50.0], "threat_memory_s": ["f", 0.5, 60.0],
 		"vigilance_grooming": ["f", 0.0, 10.0], "vigilance_relaxed": ["f", 0.0, 10.0], "vigilance_alert": ["f", 0.0, 10.0],
-		"startle_motion_deg_s": ["f", 1.0, 5000.0], "startle_range_wu": ["f", 0.1, 200.0],
+		"startle_motion_deg_s": ["f", 1.0, 5000.0], "startle_range_wu": ["f", 0.1, 200.0], "startle_rear_gain": ["f", 0.0, 1.0],
 	},
 	"reaction": {
 		"delay_startle_alert_s": ["p", 0.0, 5.0], "delay_startle_relaxed_s": ["p", 0.0, 5.0],
@@ -57,6 +57,10 @@ const SCHEMA := {
 		"decision_hz": ["f", 1.0, 60.0], "restless_per_s": ["f", 0.0, 1.0], "restless_spread": ["f", 0.0, 0.95],
 		"fatigue_up_per_s": ["f", 0.0, 5.0], "fatigue_down_per_s": ["f", 0.0, 5.0], "candidates_validated": ["i", 1.0, 32.0],
 		"interrupt_threat": ["f", 0.0, 1.0], "block_retry_s": ["f", 0.0, 120.0], "reposition_max_wu": ["f", 0.5, 500.0],
+		"glance_interval_s": ["p", 0.1, 60.0], "glance_angle_deg": ["p", 0.0, 180.0],
+		"walk_interval_s": ["p", 0.1, 120.0], "walk_distance_wu": ["p", 0.05, 20.0], "walk_speed_wu_s": ["p", 0.05, 20.0],
+		"walk_burst_s": ["p", 0.02, 10.0], "walk_pause_s": ["p", 0.0, 10.0], "wander_radius_wu": ["f", 0.1, 50.0],
+		"wander_flight_chance": ["f", 0.0, 1.0],
 	},
 	"population": {
 		"replenish_delay_s": ["p", 0.1, 3600.0], "replenish_retry_s": ["f", 0.05, 60.0], "vent_view_margin_deg": ["f", 0.0, 90.0],
@@ -114,6 +118,9 @@ class Profile extends RefCounted:
 	var vigilance_alert: float = 0.0
 	var startle_motion_deg_s: float = 0.0
 	var startle_range_wu: float = 0.0
+	## T09b: how much a sudden big motion behind the fly still counts toward a startle (its rear view is poor for a slow creep, but a looming
+	## leap is caught over a wide field). Ordinary awareness behind it uses rear_gain.
+	var startle_rear_gain: float = 0.0
 	# reaction delays, seconds, each a Vector2(low, high)
 	var delay_startle_alert_s: Vector2 = Vector2.ZERO
 	var delay_startle_relaxed_s: Vector2 = Vector2.ZERO
@@ -157,6 +164,18 @@ class Profile extends RefCounted:
 	var interrupt_threat: float = 0.0
 	var block_retry_s: float = 0.0
 	var reposition_max_wu: float = 0.0
+	## T09b: a perched fly looks to and fro: a quick turn every glance_interval_s, alternately each side of the way it settled facing.
+	var glance_interval_s: Vector2 = Vector2.ZERO
+	var glance_angle_deg: Vector2 = Vector2.ZERO
+	## T09c: a perched fly walks about its spot in stop-start bursts (Nathan: "actively walk around more naturally like a real fly"), and a
+	## spontaneous move is often a looping flight through the open air before it lands ("take off and fly randomly sometimes").
+	var walk_interval_s: Vector2 = Vector2.ZERO
+	var walk_distance_wu: Vector2 = Vector2.ZERO
+	var walk_speed_wu_s: Vector2 = Vector2.ZERO
+	var walk_burst_s: Vector2 = Vector2.ZERO
+	var walk_pause_s: Vector2 = Vector2.ZERO
+	var wander_radius_wu: float = 0.0
+	var wander_flight_chance: float = 0.0
 	# population (the P0 replenishment rule, PreyPopulation)
 	## How long after a fly leaves the living population its replacement falls due, seconds, drawn for each from the population's stream.
 	var replenish_delay_s: Vector2 = Vector2.ZERO

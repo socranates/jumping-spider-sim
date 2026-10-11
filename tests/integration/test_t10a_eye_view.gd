@@ -201,7 +201,7 @@ func test_the_picture_is_sharp_where_the_eyes_reach_and_says_it_is_an_impression
 	var tag := overlay.get_node("EyeViewTag") as Label
 	check(tag.text.contains("an impression") and tag.text.contains("G / Y: switch back"), "the view says it is an impression and names the key: %s" % tag.text)
 	var notice := overlay.get_node("EyeViewNotice") as Label
-	check(notice.visible and notice.text.contains("no red"), "and briefly what it shows")
+	check(notice.visible and notice.text.contains("no dedicated red receptor"), "and briefly what it shows")
 	var screen: Vector2 = overlay.get_viewport().get_visible_rect().size
 	for l: Label in [tag, notice]:
 		check(l.position.x >= 0.0 and l.position.x + l.size.x <= screen.x + 0.5, "%s stays on the screen" % l.name)

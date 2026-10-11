@@ -268,3 +268,9 @@ Nathan: "yeah go ahead please" (to building a first-person eye mode now), "you c
   - An option to keep the horizon level in the eye view.
   - A colour-free accessibility variant of the picture.
 
+## T10b — retinal sweep and colour limits (Chet, 2026-10-10 America/Chicago)
+
+- **EYE-07 Scanning within a stable view.** Nathan requested more scientific accuracy, specifically the two front eyes sweeping and colouring the world. Replace EYE-05's static oval with two narrow softened boomerang-shaped acuity fields. Conjugate horizontal sweep (1.6 s) and slower torsion (8 s, ±25 degrees) use research-informed timescales; geometry, separation and continuous sinusoid are illustrative. No automatic camera shake, no changes to movement, aim, sensing or RNG. Pause stops the clock; Reduced motion holds the current pose. See VISION_RESEARCH.md for primary references and species limitations.
+- **EYE-08 Do not infer UV from RGB blue.** Supersedes EYE-05's blue-as-UV mapping and the blanket "no red" wording. The visible picture uses illustrative green-weighted brightness with red relatively dim. The permanent label says UV is not simulated. Related P. regius receptor evidence is not presented as a measured P. audax response or literal colour experience. UV material/lighting data and depth-from-defocus remain deferred.
+- **EYE-09 Evidence.** Windows fixed-60 suite 548/548, normal-speed eye tests 12/12, evidence 829573aaf835. Native AMD Compatibility rendering captured three scan phases with no reported errors. No sustained performance or player comfort claim; no new export packages.
+

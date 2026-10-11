@@ -15,7 +15,7 @@ Claude, 2026-10-11, at Nathan's request ("do you want to make a revised plan for
     - text size;
     - Reduced motion.
   - The spider-eye view (V / Y).
-- **Tests:** 544 automated tests pass (evidence 7169ecfd3663). Chet runs them on Windows; Claude runs them on Linux.
+- **Tests:** 548 automated tests pass on Windows after T10b (evidence 829573aaf835); the 12 eye-view tests also pass at normal speed. Claude's prior Linux baseline was 544/544 (7169ecfd3663).
 - **Gates (spec 25):**
 
   | Status | Gates |
@@ -35,7 +35,7 @@ Claude, 2026-10-11, at Nathan's request ("do you want to make a revised plan for
 
 Each step is one handoff: one agent at a time, start from `main`, finish into `main`, then Nathan runs `update.bat`. The owner shown is a suggestion. Chet has the Windows laptop and its GPU; Claude works in a cloud copy.
 
-**0. Now: vision details (Chet).** In progress. When it is done, Chet merges into `main` and the next step starts from there.
+**0. Completed: vision details (Chet).** Two narrow principal-eye detail fields sweep and twist within a stable view; Reduced motion freezes them. The blue-as-UV shortcut is removed and the green-weighted picture explicitly labels UV as unimplemented. See `HANDOFF-retinal-scan.md` and `VISION_RESEARCH.md`. Native Windows rendering checked; player comfort/readability belongs to step 1.
 
 **1. Playtest round (Nathan and his son, about 20 minutes; Claude writes the checklist).**
 - A short script to follow: hunt in the normal view and in the eye view, try Most help, catch a fly with a controller only, play muted, rest in the crack and use Return to checkpoint.

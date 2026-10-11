@@ -1,0 +1,31 @@
+Jumping Spider Sim test report
+timestamp_utc: 2026-10-11T04:41:23Z
+engine: Godot 4.7.2.stable.official.ed1daf0bf
+platform: Windows
+renderer_setting: gl_compatibility
+renderer_active: gl_compatibility
+physics_engine: Jolt Physics
+source_hash_md5: 397ee1a2679087a51b491482880eae3b (scripts, scenes, data)
+settings_hash_md5: 8b6707d4bb26d00c21239d1c75d3aec2 (project.godot)
+tests_hash_md5: 941389a2d916522d535dc64226fe7d54 (tests/ scripts and scenes, not tests/reports)
+evidence_id: 829573aaf835 (keeps a copy of this state: snapshot.bat writes tests/reports/snapshots/DATE_829573aaf835.zip)
+fixture_seed: 20261005
+filter: only=unit,integration,gates files=t10a,t10b
+tests: 12
+passed: 12
+failed: 0
+not_run: 0
+result: PASS
+
+PASS     test_t10a_eye_view.gd::test_a_world_started_with_the_setting_on_starts_in_the_eye_view  2 checks
+PASS     test_t10a_eye_view.gd::test_over_an_edge_the_view_is_carried_with_the_body_and_never_turns_suddenly  5 checks
+PASS     test_t10a_eye_view.gd::test_the_eye_view_switches_on_and_off_and_survives_a_restart  13 checks
+PASS     test_t10a_eye_view.gd::test_the_pause_menu_and_the_field_notes_offer_the_eye_view  3 checks
+PASS     test_t10a_eye_view.gd::test_the_picture_is_sharp_where_the_eyes_reach_and_says_it_is_an_impression  10 checks
+PASS     test_t10a_eye_view.gd::test_the_retinas_point_the_inspection_without_turning_within_their_reach  9 checks
+PASS     test_t10a_eye_view.gd::test_walking_goes_where_the_eyes_look  4 checks
+PASS     test_t10a_eye_view.gd::test_walking_never_fights_the_turn_and_the_head_tilts_toward_the_gaze  4 checks
+PASS     test_t10b_retinal_scan.gd::test_reduced_motion_holds_scan_and_orbit_does_not_advance_it  5 checks
+PASS     test_t10b_retinal_scan.gd::test_scan_is_frame_rate_independent_and_stays_bounded  938 checks
+PASS     test_t10b_retinal_scan.gd::test_scanning_changes_detail_without_changing_camera_or_sensing  7 checks
+PASS     test_t10b_retinal_scan.gd::test_tree_pause_freezes_automatic_scan  1 checks

@@ -1,24 +1,16 @@
 extends CanvasLayer
-## T10a, the spider-eye view's picture (Nathan, 2026-10-11: "scientific realism in terms of vision"). It is an impression, and the screen
-## says so: nobody can show what a spider experiences. It shows, from salticid research, where seeing is sharp and in what colours:
-##
-##   * Principal eyes (the two big front eyes): long telephoto eyes with high acuity in a narrow field, about 10 degrees across at an
-##     instant (Land 1969). Their retinas move behind fixed lenses, which is the gaze here (see CameraRig, SpiderMotor.set_scan_direction).
-##     Drawn as a sharp window SHARP_DEG across at the centre of the view, where the gaze is, a little wider than one eye's instant field
-##     (both eyes, and the scanning they do). Receptors for green and ultraviolet; none for red has been found in Phidippus (De Voe
-##     1975 on P. regius). So the window is two-colour: green against "UV". A screen has no UV, so blue stands in for it, and reds go dark.
-##   * Secondary eyes (the six others): together nearly all round, lower acuity, chiefly motion detectors, dominated by green-sensitive
-##     pigment. Drawn as the rest of the view: coarse, soft and one-colour (green light). What moves there is found by the senses, and the
-##     perception HUD's cue marks it, as before.
-##   * When the gaze is further than the principal eyes can point (SpiderMotor.PRINCIPAL_SCAN_DEG from the body's gaze) the window fades:
-##     everything is secondary-eye view until the body turns (the controller turns it when the spider stands still).
-##
-## The layer sits under every HUD (layer -1: after the 3D, before any panel), so words and markers stay crisp.
+## Research-informed retinal scanning, not a literal spider's subjective view.
+## Fixed lenses; two narrow fields scan and twist within a stable view.
+## See docs/VISION_RESEARCH.md for evidence, species limits and UV limitations.
+## Never moves the camera, aim, inspection axis or gameplay RNG. HUD stays crisp.
 
 const KeyNames = preload("res://scripts/presentation/key_names.gd")
 
-const SHARP_DEG := Vector2(16.0, 24.0)   # the sharp window, full width and height in degrees
-const SOFT_DEG := Vector2(10.0, 14.0)    # its soft edge, added on each side
+const SHARP_DEG := Vector2(5.0, 20.0) # each stylized field, full degrees
+const SWEEP_PERIOD_S := 1.6
+const TORSION_PERIOD_S := 8.0
+const SWEEP_DEG := 4.0
+const TORSION_DEG := 25.0
 const FADE_DEG := 10.0                   # past the principal eyes' reach, the window fades over this many degrees
 const FADE_RATE := 6.0                   # 1/s, how fast the window follows (it takes a few frames, never a pop)
 const NOTICE_S := 7.0
@@ -26,17 +18,30 @@ const SHADER := """
 shader_type canvas_item;
 uniform sampler2D screen_tex : hint_screen_texture, filter_linear, repeat_disable;
 uniform float principal = 1.0;            // 0..1: the principal eyes reach the gaze
-uniform vec2 window = vec2(0.06, 0.12);   // half size of the sharp field, in screen UV
-uniform vec2 soft = vec2(0.04, 0.07);     // width of its soft edge, in screen UV
+uniform vec2 retinal_half_deg = vec2(2.5, 10.0);
+uniform vec2 left_deg = vec2(-2.5, 0.0);
+uniform vec2 right_deg = vec2(2.5, 0.0);
+uniform float torsion = 0.0;
+uniform float tan_half_fov = 0.8391;
+uniform float aspect = 1.7778;
 uniform float blur_px = 7.0;              // radius of the secondary eyes' blur, in pixels
 uniform float grain_px = 3.0;             // their coarser sampling, in pixels
+
+// Soft bent strips suggest boomerang-shaped retinas in one fused view.
+float retina(vec2 angle, vec2 centre, float bend) {
+    vec2 p = angle - centre;
+    float c = cos(torsion);
+    float s = sin(torsion);
+    p = vec2(c * p.x + s * p.y, -s * p.x + c * p.y);
+    p.x -= bend * abs(p.y) * 0.18;
+    return 1.0 - smoothstep(0.85, 1.7, length(p / retinal_half_deg));
+}
 
 void fragment() {
 	vec2 uv = SCREEN_UV;
 	vec2 px = SCREEN_PIXEL_SIZE;
-	// An oval window (the retinas' field is taller than wide), fading out over its soft edge.
-	float r = length((uv - vec2(0.5)) / window);
-	float sharp = principal * (1.0 - smoothstep(1.0, 1.0 + soft.y / window.y, r));
+    vec2 angle = degrees(atan((uv - vec2(0.5)) * 2.0 * tan_half_fov * vec2(aspect, 1.0)));
+    float sharp = principal * max(retina(angle, left_deg, -1.0), retina(angle, right_deg, 1.0));
 	// Secondary eyes: coarse cells, then a soft disc around each.
 	vec2 cell = px * grain_px;
 	vec2 base = (floor(uv / cell) + 0.5) * cell;
@@ -47,16 +52,13 @@ void fragment() {
 		acc += texture(screen_tex, base + vec2(cos(a), sin(a)) * r * px).rgb;
 	}
 	vec3 coarse = acc / 12.0;
-	vec3 tint = vec3(0.93, 1.0, 0.95);
-	float green_side = dot(coarse, vec3(0.12, 0.76, 0.12));
-	vec3 side = vec3(green_side) * tint;
-	// Principal eyes: the same green-weighted brightness, sharp, plus one colour contrast, "UV" against green (blue stands in for
-	// UV; there is no red receptor, so red adds almost nothing). Neutral where the two agree; violet where "UV" is strong, yellow-green
-	// where green is.
-	vec3 clear = texture(screen_tex, uv).rgb;
-	float g = dot(clear, vec3(0.15, 0.75, 0.10));
-	float u = clear.b;
-	vec3 centre = clamp(vec3(g) * tint + (u - g) * vec3(0.30, -0.12, 0.50), 0.0, 1.0);
+    // RGB has no UV data: blue is NOT ultraviolet. Illustrative green-weighted
+    // brightness, not calibrated spectral sensitivity. Red is dim, not absent.
+    vec3 weights = vec3(0.08, 0.84, 0.08);
+    float green_side = dot(coarse, weights);
+    vec3 side = vec3(green_side) * vec3(0.94, 1.0, 0.94);
+    float green_centre = dot(texture(screen_tex, uv).rgb, weights);
+    vec3 centre = green_centre * vec3(0.88, 1.0, 0.76);
 	COLOR = vec4(mix(side, centre, sharp), 1.0);
 }
 """
@@ -72,6 +74,10 @@ var _material: ShaderMaterial
 var _tag: Label
 var _notice: Label
 var _was_on: bool = false
+var scan_time: float = 0.0
+var left_scan_deg := Vector2(-2.5, 0.0)
+var right_scan_deg := Vector2(2.5, 0.0)
+var scan_torsion: float = 0.0
 
 
 func _ready() -> void:
@@ -119,8 +125,12 @@ func _process(delta: float) -> void:
 		if on:
 			notice_left = NOTICE_S
 			principal = target_principal()
+			scan_time = 0.0
 	if not on:
 		return
+	# Local elapsed time pauses with the tree. Reduced motion holds current pose.
+	if settings == null or not bool(settings.get_value("reduced_motion")):
+		scan_time = fposmod(scan_time + maxf(delta, 0.0), TORSION_PERIOD_S)
 	principal = move_toward(principal, target_principal(), FADE_RATE * delta)
 	notice_left = maxf(notice_left - delta, 0.0)
 	refresh()
@@ -139,14 +149,19 @@ func target_principal() -> float:
 func refresh() -> void:
 	var size := _rect.get_viewport_rect().size
 	var fov := deg_to_rad(float(camera_rig.camera.fov)) if camera_rig != null and camera_rig.get("camera") != null else deg_to_rad(80.0)
-	var half_h := tan(fov * 0.5)
-	var aspect := size.x / maxf(size.y, 1.0)
-	var to_uv := func(deg: Vector2) -> Vector2:
-		return Vector2(tan(deg_to_rad(deg.x * 0.5)) / (half_h * aspect), tan(deg_to_rad(deg.y * 0.5)) / half_h) * 0.5
-	_material.set_shader_parameter("window", to_uv.call(SHARP_DEG))
-	_material.set_shader_parameter("soft", to_uv.call(SHARP_DEG + SOFT_DEG * 2.0) - to_uv.call(SHARP_DEG))
+	var pose := scan_pose(scan_time)
+	left_scan_deg = pose["left"]
+	right_scan_deg = pose["right"]
+	scan_torsion = pose["torsion"]
+	_material.set_shader_parameter("retinal_half_deg", SHARP_DEG * 0.5)
+	_material.set_shader_parameter("left_deg", left_scan_deg)
+	_material.set_shader_parameter("right_deg", right_scan_deg)
+	_material.set_shader_parameter("torsion", scan_torsion)
+	_material.set_shader_parameter("tan_half_fov", tan(fov * 0.5))
+	_material.set_shader_parameter("aspect", size.x / maxf(size.y, 1.0))
 	_material.set_shader_parameter("principal", principal)
 	_tag.text = KeyNames.apply("SPIDER-EYE VIEW (an impression)    V / Y: switch back", settings)
+	_tag.text += "\nGreen-sensitive approximation | UV not simulated"
 	if principal < 0.5:
 		_tag.text += "\nOut of the principal eyes' reach: stand still and the spider turns to look."
 	_notice.visible = notice_left > 0.0
@@ -158,7 +173,16 @@ func refresh() -> void:
 	_notice.custom_minimum_size = Vector2(width, 0.0)
 	_notice.size = Vector2(width, 0.0)
 	_notice.position = Vector2((size.x - width) * 0.5, size.y * 0.70)
-	_notice.text = "Sharp only where the two big front eyes point, and they see green and ultraviolet but no red. The rest is the six other eyes: wide, coarse and quick to catch movement. Look further than the front eyes reach and the spider turns to face it."
+	_notice.text = "Two narrow retinas sweep and twist behind fixed front lenses. The softer surround suggests the secondary eyes. Related Phidippus have green and UV receptors, with no dedicated red receptor shown. This green-weighted picture cannot recover UV from ordinary colours. Reduced motion holds the scan still."
+
+
+## Conjugate horizontal sweep plus slower torsion. Periods within Land's reported
+## ranges; geometry and continuous cycle are a presentation approximation.
+static func scan_pose(seconds: float) -> Dictionary:
+	var sweep := SWEEP_DEG * sin(TAU * seconds / SWEEP_PERIOD_S)
+	return {"left": Vector2(sweep - 2.5, 0.0),
+		"right": Vector2(sweep + 2.5, 0.0),
+		"torsion": deg_to_rad(TORSION_DEG) * sin(TAU * seconds / TORSION_PERIOD_S)}
 
 
 func _set_visible(on: bool) -> void:

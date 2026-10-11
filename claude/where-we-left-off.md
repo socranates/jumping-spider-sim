@@ -1,5 +1,7 @@
 # Where we left off — Chet, 2026-10-10 (America/Chicago)
 
+**Latest: T10b, scientific eye-view refinement.** Start from `main` and read **docs/HANDOFF-retinal-scan.md** and **docs/VISION_RESEARCH.md** before the older handoffs below. Built on Claude's `2d6ea80`: two narrow principal-eye detail regions sweep together and twist behind fixed lenses; the camera/aim/senses stay unchanged. Removed the blue-as-UV shortcut; the green-weighted picture explicitly says UV is not simulated. Reduced motion freezes scanning; pause stops its clock. Windows full suite **548/548**, evidence **829573aaf835**; normal-speed eye tests **12/12**; native AMD/OpenGL captures in `docs/verification/t10b/`. Research-backed illustration, not a literal spider's colour experience. Nathan's playtest is still needed. The previous live-legs and T10a sections below are historical context.
+
 **Start from `main`.** Nathan approved wiring the leg prototype into the real spider. The live-leg implementation is commit `a51d639`, based on Claude's `eacec52` (T09d controller remapping, assist presets, and Nathan's request to keep the twitch). Read **docs/HANDOFF-live-legs.md** first, then **docs/HANDOFF-chunk-9.md** for T09–T09d. Follow the one-agent/start-main/finish-main/laptop-update rule in **docs/SHARED_WORKFLOW.md**.
 
 ## Current result

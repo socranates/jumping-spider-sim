@@ -13,9 +13,11 @@ After Claude or ChatGPT says their work is done, **double-click `update.bat`**. 
 Claude added these on 2026-10-10 on top of chunk 8 (see `docs/HANDOFF-chunk-9.md`). Movement, camera, hunting and feeding are unchanged.
 
 - **Checkpoint.** Resting in the silk-lined crack (E / X) keeps a checkpoint of the whole sill: the spider, its energy, every fly and the shadow event. The caption says "Checkpoint kept." **Esc → Return to checkpoint** puts the whole sill back to that moment from any state (walking, in the air, on silk, eating). It is recovery, not an exact resume. Checkpoints are in `%APPDATA%\Godot\app_userdata\Jumping Spider Sim\saves\` (`checkpoint.json` and the previous one, `checkpoint.bak.json`). A damaged file falls back to the backup and is never overwritten by loading.
-- **Keys.** Esc → **Keyboard keys...**: choose an action, press a key (Esc stops). A key in use is swapped. Reset keys restores the defaults. Controller buttons are unchanged.
+- **Keys and buttons.** Esc → **Keys and buttons...**: choose an action's key or controller button, then press the key, button or trigger you want (Esc or Menu stops). One in use is swapped. Walking and looking stay on the sticks. Reset keys and buttons restores the defaults.
 - **Text and panel size** (Esc), 100–150 %.
 - **Field notes**: H or the controller's View / Back button.
+
+**T09d — assisted play (2026-10-11).** Esc → **Assisted play** sets several switches at once, and the line under it says what each does. **Standard** is the hunt as designed. **Guided hunting** adds a wider reach for the bite, shows the jump arc and where the spider looks, and holds a struggling fly for you. **No held buttons** turns aiming, stalking and Focus into press-to-start, press-to-stop. **Most help** combines both and is a good start for young players. Controller buttons can now be remapped too (above).
 
 **T09c — living flies (2026-10-11).** Flies walk about in quick stop-start bursts and sometimes take off by themselves, looping through the air before landing elsewhere. Shift creeps more slowly (0.65). After a catch, **tap Space** (or E) to keep your grip: the fly buzzes and kicks in front of the spider's head. When it goes still the spider starts eating by itself; if the grip runs out it tears free.
 

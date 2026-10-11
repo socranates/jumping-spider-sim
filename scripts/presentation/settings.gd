@@ -35,8 +35,8 @@ const LIMITS := {
 	"jump_reach": [0.5, 1.5],
 	"ui_scale": [1.0, 1.5],
 }
-## T09 (U01): keyboard keys the player may change, in the order the pause menu lists them, with their names there. The controller
-## buttons and the mouse buttons stay as they are. Reel and lower follow walk forward and walk back (spec 17: W/S with a context override).
+## T09 (U01): keyboard keys the player may change, in the order the pause menu lists them, with their names there. The mouse buttons
+## stay as they are. Reel and lower follow walk forward and walk back (spec 17: W/S with a context override).
 const REMAPPABLE: Array[String] = ["move_forward", "move_back", "move_left", "move_right", "prepare_jump", "focus", "stalk", "interact",
 	"cancel", "recenter", "help", "look_left", "look_right", "look_up", "look_down"]
 const ACTION_NAMES := {
@@ -49,6 +49,34 @@ const LINKED := {"move_forward": "reel", "move_back": "lower"}
 ## Keys that cannot be given to an action: pause (the way out of every menu) and the developer views.
 const RESERVED_KEYS: Array[int] = [KEY_ESCAPE, KEY_F3, KEY_F4]
 const BINDINGS_SECTION := "bindings"
+## T09d (U01): the controller buttons and triggers the player may change (the sticks stay: walking and looking). Menu (pause, the way out
+## of every menu) and Guide (the system's) are kept.
+const PAD_REMAPPABLE: Array[String] = ["prepare_jump", "focus", "stalk", "interact", "cancel", "recenter", "help"]
+const RESERVED_PADS: Array[int] = [JOY_BUTTON_START, JOY_BUTTON_GUIDE]
+const PAD_SECTION := "pad_bindings"
+## T09d (spec 17: "assisted play presets"; "adjustable aim/capture assistance"; "no shame labels"): each preset sets these switches at
+## once and says plainly what it does. The player can still change any switch afterwards; the menu then says "Custom". Presets leave the
+## camera, the text size, Reduced motion and the playtest jump reach alone.
+const PRESET_KEYS: Array[String] = ["capture_assist", "detailed_arc", "show_gaze", "struggle_auto", "prepare_toggle", "stalk_toggle",
+	"focus_toggle", "release_hold"]
+const PRESETS: Array[Dictionary] = [
+	{"id": "standard", "name": "Standard",
+		"note": "The hunt as designed: hold to aim, stalk and focus; keep tapping to hold a struggling fly; hold Q / B to let go of the line.",
+		"values": {"capture_assist": false, "detailed_arc": false, "show_gaze": false, "struggle_auto": false, "prepare_toggle": false,
+			"stalk_toggle": false, "focus_toggle": false, "release_hold": true}},
+	{"id": "guided", "name": "Guided hunting",
+		"note": "A wider reach for the bite, the jump arc and where the spider looks are shown, and a struggling fly is held for you.",
+		"values": {"capture_assist": true, "detailed_arc": true, "show_gaze": true, "struggle_auto": true, "prepare_toggle": false,
+			"stalk_toggle": false, "focus_toggle": false, "release_hold": true}},
+	{"id": "no_holding", "name": "No held buttons",
+		"note": "Aim, stalk and focus each start with one press and stop with another, a struggling fly is held for you, and one press of Q / B lets go of the line.",
+		"values": {"capture_assist": false, "detailed_arc": false, "show_gaze": false, "struggle_auto": true, "prepare_toggle": true,
+			"stalk_toggle": true, "focus_toggle": true, "release_hold": false}},
+	{"id": "most_help", "name": "Most help",
+		"note": "Everything in Guided hunting, and aim, stalk and focus by single presses. Letting go of the line is still a hold of Q / B, so it does not happen by accident.",
+		"values": {"capture_assist": true, "detailed_arc": true, "show_gaze": true, "struggle_auto": true, "prepare_toggle": true,
+			"stalk_toggle": true, "focus_toggle": true, "release_hold": true}},
+]
 const InputSetupScript = preload("res://scripts/core/input_setup.gd")
 
 ## Tests point this at a temporary file; the autoload keeps the default.
@@ -57,6 +85,8 @@ var autosave: bool = true
 var _values: Dictionary = DEFAULTS.duplicate()
 ## Remapped keyboard keys: action -> physical keycode. Only actions the player changed are here.
 var _keys: Dictionary = {}
+## T09d: remapped controller inputs: action -> InputSetup pad number. Only actions the player changed are here.
+var _pads: Dictionary = {}
 
 var look_sensitivity: float:
 	get: return _values["look_sensitivity"]
@@ -146,10 +176,14 @@ func reset_to_defaults() -> void:
 ## {action: Array of InputEvent} for every remapped action (and the action that follows it), for InputSetup.register_actions.
 func get_binding_overrides() -> Dictionary:
 	var out := {}
-	for action: String in _keys:
-		out[action] = InputSetupScript.events_for(action, int(_keys[action]))
+	var changed: Array[String] = []
+	for action: String in _keys.keys() + _pads.keys():
+		if not changed.has(action):
+			changed.append(action)
+	for action: String in changed:
+		out[action] = InputSetupScript.events_for(action, get_key(action), int(_pads.get(action, InputSetupScript.NO_PAD)))
 		if LINKED.has(action):
-			out[LINKED[action]] = InputSetupScript.events_for(LINKED[action], int(_keys[action]))
+			out[LINKED[action]] = InputSetupScript.events_for(LINKED[action], get_key(action))
 	return out
 
 
@@ -190,10 +224,52 @@ func _store_key(action: String, keycode: int) -> void:
 		_keys[action] = keycode
 
 
+## T09d: the controller button or trigger an action answers to now (InputSetup's pad number; NO_PAD for none).
+func get_pad(action: String) -> int:
+	return int(_pads.get(action, InputSetupScript.default_pad(action)))
+
+
+func pad_name(action: String) -> String:
+	return InputSetupScript.pad_name(get_pad(action))
+
+
+## T09d: gives `action` the controller button or trigger `pad`, swapping with an action that already uses it, as set_key does.
+func set_pad(action: String, pad: int) -> Dictionary:
+	if not PAD_REMAPPABLE.has(action):
+		return {"ok": false, "message": "%s stays on its stick" % String(ACTION_NAMES.get(action, action)), "swapped": ""}
+	if not InputSetupScript.is_pad(pad) or RESERVED_PADS.has(pad):
+		return {"ok": false, "message": "%s is kept for the pause menu and the system" % InputSetupScript.pad_name(pad), "swapped": ""}
+	var old := get_pad(action)
+	var message := "%s: %s" % [ACTION_NAMES[action], InputSetupScript.pad_name(pad)]
+	if old == pad:
+		return {"ok": true, "message": message, "swapped": ""}
+	var swapped := ""
+	for other: String in PAD_REMAPPABLE:
+		if other != action and get_pad(other) == pad:
+			swapped = other
+			_store_pad(other, old)
+	_store_pad(action, pad)
+	setting_changed.emit("bindings")
+	if autosave:
+		save_settings()
+	if swapped != "":
+		message += " (%s now uses %s)" % [ACTION_NAMES[swapped], InputSetupScript.pad_name(old)]
+	return {"ok": true, "message": message, "swapped": swapped}
+
+
+func _store_pad(action: String, pad: int) -> void:
+	if pad == InputSetupScript.default_pad(action):
+		_pads.erase(action)
+	else:
+		_pads[action] = pad
+
+
+## Every key and controller input back to its default (T09d: the controller's too).
 func reset_keys() -> void:
-	if _keys.is_empty():
+	if _keys.is_empty() and _pads.is_empty():
 		return
 	_keys.clear()
+	_pads.clear()
 	setting_changed.emit("bindings")
 	if autosave:
 		save_settings()
@@ -205,6 +281,8 @@ func save_settings() -> Error:
 		cfg.set_value(SECTION, key, _values[key])
 	for action: String in _keys:
 		cfg.set_value(BINDINGS_SECTION, action, int(_keys[action]))
+	for action: String in _pads:
+		cfg.set_value(PAD_SECTION, action, int(_pads[action]))
 	var err := cfg.save(config_path)
 	if err != OK:
 		push_warning("Settings: could not save %s (error %d)" % [config_path, err])
@@ -216,6 +294,7 @@ func save_settings() -> Error:
 func load_settings() -> bool:
 	_values = DEFAULTS.duplicate()
 	_keys = {}
+	_pads = {}
 	var cfg := ConfigFile.new()
 	if cfg.load(config_path) != OK:
 		return false
@@ -224,11 +303,52 @@ func load_settings() -> bool:
 			var code: Variant = cfg.get_value(BINDINGS_SECTION, action)
 			if REMAPPABLE.has(action) and typeof(code) == TYPE_INT and int(code) > 0 and not RESERVED_KEYS.has(int(code)):
 				_store_key(action, int(code))
+	if cfg.has_section(PAD_SECTION):
+		for action: String in cfg.get_section_keys(PAD_SECTION):
+			var pad: Variant = cfg.get_value(PAD_SECTION, action)
+			if PAD_REMAPPABLE.has(action) and typeof(pad) == TYPE_INT and InputSetupScript.is_pad(int(pad)) and not RESERVED_PADS.has(int(pad)):
+				_store_pad(action, int(pad))
 	for key: String in DEFAULTS:
 		if cfg.has_section_key(SECTION, key):
 			var coerced: Variant = _coerce(key, cfg.get_value(SECTION, key))
 			if coerced != null:
 				_values[key] = coerced
+	return true
+
+
+# ------------------------------------------------------------------ assisted-play presets (T09d)
+
+## The preset the switches match now ("custom" when they match none).
+func current_preset() -> String:
+	for p: Dictionary in PRESETS:
+		var same := true
+		for key: String in (p["values"] as Dictionary):
+			same = same and _values[key] == (p["values"] as Dictionary)[key]
+		if same:
+			return str(p["id"])
+	return "custom"
+
+
+func preset(id: String) -> Dictionary:
+	for p: Dictionary in PRESETS:
+		if str(p["id"]) == id:
+			return p
+	return {}
+
+
+## Sets every switch of the preset (each announced as usual) and saves once. Returns false for an unknown preset.
+func apply_preset(id: String) -> bool:
+	var p := preset(id)
+	if p.is_empty():
+		push_error("Settings: unknown preset '%s'" % id)
+		return false
+	var was := autosave
+	autosave = false
+	for key: String in (p["values"] as Dictionary):
+		set_value(key, (p["values"] as Dictionary)[key])
+	autosave = was
+	if autosave:
+		save_settings()
 	return true
 
 

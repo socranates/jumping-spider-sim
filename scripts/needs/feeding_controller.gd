@@ -14,6 +14,7 @@ extends Node
 
 const NeedsModel = preload("res://scripts/needs/needs_model.gd")
 const PreyMath = preload("res://scripts/prey/prey_math.gd")
+const KeyNames = preload("res://scripts/presentation/key_names.gd")
 
 signal feeding_started(event_id: String)
 ## reason: "finished", "cancelled", "moved", "jumped", "lost footing", "no prey", ...; summary: nutrition taken and energy granted this meal.
@@ -209,10 +210,10 @@ func prompt() -> Dictionary:
 	if held == null or not is_instance_valid(held) or held.state != held.State.CAPTURED:
 		return {}
 	if struggling:
-		var hint := "holding on (automatic)" if struggle_auto else "tap %s / A (or %s / X) to keep your grip" % [_key("prepare_jump", "Space"), _key("interact", "E")]
+		var hint := "holding on (automatic)" if struggle_auto else "tap %s (or %s) to keep your grip" % [KeyNames.both(settings, "prepare_jump", "Space", "A"), KeyNames.both(settings, "interact", "E", "X")]
 		return {"title": "IT STRUGGLES!", "hint": hint, "left": grip, "urgent": grip < 0.3}
-	var eat := "%s / X" % _key("interact", "E")
-	var stop := "%s / B" % _key("cancel", "Q")
+	var eat := KeyNames.both(settings, "interact", "E", "X")
+	var stop := KeyNames.both(settings, "cancel", "Q", "B")
 	if feeding:
 		return {"title": "Eating", "hint": "keep still    %s or %s to stop" % [eat, stop], "left": held.nutrition_left / maxf(held.nutrition_total, 1.0e-6)}
 	var why := invalid_reason()
@@ -299,13 +300,6 @@ func _end_struggle() -> void:
 func _say(text: String) -> void:
 	note = text
 	note_left = 2.0
-
-
-func _key(action: String, fallback: String) -> String:
-	if settings == null or not settings.has_method("get_key"):
-		return fallback
-	var code: int = settings.get_key(action)
-	return OS.get_keycode_string(code as Key) if code > 0 else fallback
 
 
 ## Developer line for the F3 overlay.

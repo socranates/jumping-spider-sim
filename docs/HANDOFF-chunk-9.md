@@ -119,3 +119,20 @@ After Nathan played T09b: the approach can be slower; the tapping wasn't working
 - Is about 20 s per approach right?
 - Is the struggle readable and fun with Space? Its constants are at the top of the struggle section in `feeding_controller.gd`.
 
+
+## T09d — controller buttons and assisted-play presets (2026-10-11)
+
+Claude did this while Chet's live-legs work waited for his usage to reset. Nathan's son (almost 6) plays, so Most help is meant for him. Decisions T9d-01 … T9d-05.
+
+**Evidence:** **3fb300501a68**, full suite **530 / 530 passed** (Linux headless, fixed 60 fps), `docs/verification/t09d/full_report_t09d.txt`. The new tests, the U01 tests and the T09c prompt tests pass at fixed 30 and 144 fps too (`fps30_access_tests.txt`, `fps144_access_tests.txt`). Stills: `t09d_pause_most_help.png`, `t09d_keys_and_buttons.png` (100 %), `t09d_keys_and_buttons_150.png`, `t09d_field_notes.png` (a remapped button named in the notes). **Not run on Windows.**
+
+**What changed for the player**
+- **Assisted play** at the top of the pause menu: Standard, Guided hunting, No held buttons, Most help. The line under it says what the chosen one does; change any switch and it says "Custom". Presets leave the camera, the text size, Reduced motion and the jump reach alone.
+- **Controller buttons can be remapped.** Esc → **Keys and buttons...** now has a controller column. Choose a button, then press the controller button or pull the trigger you want (Esc or Menu stops). Walking and looking stay on the sticks; Menu and Guide can't be given away. **Reset keys and buttons** restores both.
+- Every prompt names the player's key and button (the field notes, the rest prompt, the struggle and the eat prompts, the line and aim hints, the pause menu's labels).
+
+**Files.** `scripts/core/input_setup.gd` (pad numbers and names, `events_for` with a pad), `scripts/presentation/settings.gd` (`get_pad`/`set_pad`, `[pad_bindings]`, `PRESETS`, `apply_preset`, `current_preset`), `scripts/presentation/key_names.gd` (buttons, two-pass replace, `both`), `scripts/presentation/pause_menu.gd` (presets row, controller column), `scripts/habitat/habitat_loop.gd` and `scripts/needs/feeding_controller.gd` (prompts), new `tests/integration/test_t09d_controller_presets.gd` (8 tests).
+
+**For Chet (live legs).** None of your open files was touched: `main.gd`, `spider_body.gd`, `spider_legs.gd`, `test_spider_legs.gd`, `test_live_spider_legs.gd`, and your capture script. Commit your work on a branch, then merge `main` into it; there should be no conflicts. The evidence id will change because the scripts and tests changed.
+
+**Still open from T09 part 2:** global slow time and a separate survival-pressure setting (they need `main.gd`, so after the legs are merged); a Windows interrupted-write test; the human U01, W01, E02, M04 and F01 sessions.

@@ -396,3 +396,17 @@ Nathan: "chet just finished and its freakin amazing you guys are making this so 
   - Windows and web builds, free or pay-what-you-want on itch.io first.
   - The order of work is in ROADMAP ("The goal"). More species and habitats follow the first release.
   - Not goals: profit, ads, data collection, engagement pressure.
+
+## LEARN-01, first notebook — Claude, 2026-10-11
+
+Built while Chet's round (ROADMAP step 6) was paused; kept on Claude's branch until his round is in main.
+
+- **LEARN-02 The naturalist's notebook, first version.** Spec 4 calls for "an optional naturalist notebook with sourced facts, separated from in-world perception".
+  - **Pages:** fourteen, in `data/notebook/pages.json`. Each page is a few true sentences, an "In this game" line where the game simplifies, and full sources.
+  - **When pages open:** the first time something happens in play: the start, a jump, a far jump and a long one, the spider-eye view, 20 s and 60 s in it, the motion shimmer, a fly recognised, a catch, a meal, a felt vibration, a buzz, a rest.
+  - **Where it is kept:** the notebook belongs to the player. It lives in its own file, `user://notebook.cfg`, and only when settings are saved, never in a test's world. It survives checkpoints and new lives, and is never part of the world's snapshot. It decides nothing in the game.
+  - **On screen:** N (controller: D-pad up), or "Notebook" in the Esc menu, opens it and the game waits. Esc, B or N closes it.
+  - **No checklist:** only found pages are listed, with no count of pages left (spec 4: discovery must not become a completion checklist).
+  - **New-page note:** a short note at the bottom left says when a page opens; the setting "notebook_notes" turns it off.
+  - **Remapping:** the key and the button can be changed like the others.
+- **LEARN-03 Sources and honesty.** `docs/NOTEBOOK_SOURCES.md` records how far each source was checked. Citations were confirmed, but no paper was read in full this round, so the pages stay within what abstracts and textbooks state. Each source should be read before a public release. Several pages name what the game simplifies: depth from defocus, UV, the retreat not yet spun, the venom's timing.

@@ -1058,3 +1058,7 @@ Chet reviews this entry, `docs/HANDOFF-chunk-7.md` and the tests named above. Na
 - Researched: Zurek et al. 2010, Zurek & Nelson 2012 (lateral eyes), Nagata et al. 2012 (depth from defocus). A background research pass on UV reflectance found glass and leaf data but none for flies, so UV stays unsimulated. Depth from defocus is Nathan's call because it changes jumps. EYE-10 to EYE-15.
 - A flawed test that compared two separately spawned worlds was dropped (the stage fixture is not identical across spawns).
 - Final: evidence db112e2fa006, 585 of 585 (fixed 60 fps, Linux headless); eye and sensor tests 69 of 69 at fixed 30 and 144. Not run on Windows.
+
+### 2026-10-11: LEARN-01 naturalist's notebook (Claude, cloud session)
+- Chet timed out mid-round (ROADMAP step 6); nothing of it was pushed. Nathan: "Do you wanna run some stuff in the meantime?" Built the notebook from Nathan's teaching idea, on Claude's branch only, to merge after Chet's round lands.
+- 14 pages opened by first events in play, each with an "In this game" honesty line and sources (citations checked by web search; papers not read in full: docs/NOTEBOOK_SOURCES.md). N / D-pad up or the Esc menu opens it; the game waits; no count of pages left; a short new-page note that can be turned off. Player-owned file, never written by tests. LEARN-02, LEARN-03.

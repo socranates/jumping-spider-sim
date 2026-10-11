@@ -37,7 +37,7 @@ Each step is one handoff: one agent at a time, start from `main`, finish into `m
 
 **0. Completed: vision details (Chet).** Two narrow principal-eye detail fields sweep and twist within a stable view; Reduced motion freezes them. The blue-as-UV shortcut is removed and the green-weighted picture explicitly labels UV as unimplemented. See `HANDOFF-retinal-scan.md` and `VISION_RESEARCH.md`. Native Windows rendering checked; player comfort/readability belongs to step 1.
 
-**1. Completed: playtest round (Nathan, 2026-10-11).** "everthing on the checklist functions the way it should. It is really fun, camera works great, 1st person is super cool." The one change asked for, a harder struggle that ends when the bar is full, is done (T11b). The controller-only part of U01 is unconfirmed. Results are in `docs/PLAYTEST.md`.
+**1. Completed: playtest round (Nathan, 2026-10-11).** "everthing on the checklist functions the way it should. It is really fun, camera works great, 1st person is super cool." The one change asked for, a harder struggle that ends when the bar is full, is done (T11b); after playing it Nathan asked for harder still and a bright red bar (T11c, done). The controller-only part of U01 is unconfirmed. Results are in `docs/PLAYTEST.md`.
 - A short script to follow: hunt in the normal view and in the eye view, try Most help, catch a fly with a controller only, play muted, rest in the crack and use Return to checkpoint.
 - Noting what felt wrong is the most useful output. It also covers most of the human gates (U01, W01, E02, M04) without extra work.
 - Fixes from it come before anything below.

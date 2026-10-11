@@ -1,0 +1,20 @@
+T11c struggle tuning (Nathan: "the tapping should be harder still"). A sweep of steady tap rates, 40 flies each, 60 ticks a second;
+jerks every 0.35-0.75 s; each fly's venom time drawn from its range. 'won' = the bar filled; 'timeout' = still fighting at 12 s,
+when the game counts the venom as having subdued it. Parameters: (start, tap, drain/s, jerk).
+
+T11b (in the game until now):
+(0.45, 0.1, 0.28, 0.1) venom over 5-7 s to 40 %
+    3.0/s: won 33 (avg 10.8s) lost  0 timeout  7
+    4.0/s: won 40 (avg  6.0s) lost  0 timeout  0
+    5.0/s: won 40 (avg  3.7s) lost  0 timeout  0
+    6.0/s: won 40 (avg  2.4s) lost  0 timeout  0
+    7.0/s: won 40 (avg  1.7s) lost  0 timeout  0
+    8.0/s: won 40 (avg  1.3s) lost  0 timeout  0
+T11c (chosen):
+(0.4, 0.085, 0.32, 0.12) venom over 6-8 s to 50 %
+    3.0/s: won  0 (avg  0.0s) lost 40 timeout  0
+    4.0/s: won  0 (avg  0.0s) lost 39 timeout  1
+    5.0/s: won 40 (avg  9.3s) lost  0 timeout  0
+    6.0/s: won 40 (avg  6.0s) lost  0 timeout  0
+    7.0/s: won 40 (avg  3.9s) lost  0 timeout  0
+    8.0/s: won 40 (avg  2.6s) lost  0 timeout  0

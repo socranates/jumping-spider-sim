@@ -308,7 +308,8 @@ Nathan: "the slomo thing sounds cool" (to ROADMAP step 2), "add a button that ca
   - Kicks shrink with the fly's strength (the jolt the HUD and body show).
 - **PLAYTEST-01 Nathan's checklist run (2026-10-11).** Everything on `docs/PLAYTEST.md` worked as it should, by his report. This counts as human evidence for W01 (shadow warning, pause), M04 (the camera, graphical) and E02 (he could say why hunts worked).
   - U01 is met for remapped keys, toggle preparation and mute.
-  - U01's controller-only part is open until someone plays with a controller: Nathan has said he has none for the PC.- **STRUGGLE-02 Evidence.** d9ed40eeeecf: 557 / 557 (Linux headless, fixed 60 fps), including 4 new tests (`tests/integration/test_t11b_struggle.gd`). The struggle, hunt-feel, living-fly and feeding tests pass at fixed 30 and 144 fps, 20 / 20 each. Reports are in `docs/verification/t11b/`. Not run on Windows.
+  - U01's controller-only part is open until someone plays with a controller: Nathan has said he has none for the PC.
+- **STRUGGLE-02 Evidence.** d9ed40eeeecf: 557 / 557 (Linux headless, fixed 60 fps), including 4 new tests (`tests/integration/test_t11b_struggle.gd`). The struggle, hunt-feel, living-fly and feeding tests pass at fixed 30 and 144 fps, 20 / 20 each. Reports are in `docs/verification/t11b/`. Not run on Windows.
 
 ## T12a — sound and the spider's other senses (Claude, 2026-10-11)
 
@@ -326,6 +327,20 @@ Nathan: "get done what you want to work on next and then chet can have the next 
   - The output is a direction, never a place. The same event gives a thrum, a ripple, a caption and an optional rumble.
   - It is presentation only for now: no sense, memory or fly decision uses it.
 - **SOUND-04 Captions on by default** (spec 16, U01). Every meaningful cue gets a bracketed caption with a direction relative to the spider, so muted play loses nothing. A ripple on the screen shows a felt vibration's side.
-- **SOUND-05 Slow motion slows sound.** `AudioServer.playback_speed_scale` follows the game speed.- **SOUND-06 Evidence.** 4daaf055b746: 565 / 565 (Linux headless, fixed 60 fps). The sense tests pass at fixed 30 and 144 fps. Loudness and mix are unheard: headless runs use a silent audio driver.- **SOUND-07 Audible on laptop speakers** (T12b; Nathan: "i dont hear anything while playing"). Measured: the T12a mix had 91 % of its energy below 400 Hz, at RMS −30 dBFS. Every sound now has audible upper content, its effective brightness at 420 Hz or more. Levels are higher, and there are birds outside the window. A test holds each sound at 350 Hz or more.
-- **SOUND-08 Speakers or headphones** (Nathan: "have a setting for switvhing"). `headphones` is off by default: Master shapes for speakers (EQ6 cut at 32 and 100 Hz, lift at 1–3.2 kHz, +3 dB). On, it plays the full range. A hard limiter at −1 dBFS is always on.- **SOUND-09 Evidence.** 0c295e07077e: 567 / 567 (Linux headless, fixed 60 fps), including 2 new tests (`test_t12b_audible.gd`). The measurements are in `docs/verification/t12b/`. Not run on Windows, and not heard by a person yet.
+- **SOUND-05 Slow motion slows sound.** `AudioServer.playback_speed_scale` follows the game speed.
+- **SOUND-06 Evidence.** 4daaf055b746: 565 / 565 (Linux headless, fixed 60 fps). The sense tests pass at fixed 30 and 144 fps. Loudness and mix are unheard: headless runs use a silent audio driver.
+- **SOUND-07 Audible on laptop speakers** (T12b; Nathan: "i dont hear anything while playing"). Measured: the T12a mix had 91 % of its energy below 400 Hz, at RMS −30 dBFS. Every sound now has audible upper content, its effective brightness at 420 Hz or more. Levels are higher, and there are birds outside the window. A test holds each sound at 350 Hz or more.
+- **SOUND-08 Speakers or headphones** (Nathan: "have a setting for switvhing"). `headphones` is off by default: Master shapes for speakers (EQ6 cut at 32 and 100 Hz, lift at 1–3.2 kHz, +3 dB). On, it plays the full range. A hard limiter at −1 dBFS is always on.
+- **SOUND-09 Evidence.** 0c295e07077e: 567 / 567 (Linux headless, fixed 60 fps), including 2 new tests (`test_t12b_audible.gd`). The measurements are in `docs/verification/t12b/`. Not run on Windows, and not heard by a person yet.
 
+
+## T11c — the struggle, harder still (Claude, 2026-10-11)
+
+Nathan, after playing T11b: "yes excellent it all works great now. the tapping should be harder still", then "also make the bar bright red".
+
+- **STRUGGLE-03 Five presses a second, and a red bar.**
+  - New numbers: start 0.40, 0.085 a press, drain 0.32/s, a jerk 0.12. The venom weakens the fly more slowly: to 50 % of its strength over 6–8 s. After 12 s the venom has still subdued it whatever the bar shows.
+  - Measured on a sweep of 40 flies a rate (`docs/verification/t11c/struggle_tuning.txt`): four presses a second now loses the fly; five wins in about 9 s; six in about 6; seven in about 4; eight in about 2.5. Under T11b four won in about 6 s, and most players at three a second won in about 11.
+  - The grip bar is bright red while a fly struggles. When the grip runs low it pulses lighter twice a second, so the warning does not rest on colour. The eating gauge and the energy bar keep their yellow.
+  - "Hold on automatically" (in the Guided hunting, No held buttons and Most help presets) is as before: the bar fills by itself in 1.5 s, where it took about 1.4 s (measured in a played world). Nathan's son keeps the easy struggle.
+- **STRUGGLE-04 Evidence.** 77c9ef3b3bc6: 568 / 568 (Linux headless, fixed 60 fps), including 1 new test (the bar's colour) and 3 retuned ones in `tests/integration/test_t11b_struggle.gd`. The struggle, hunt-feel, living-fly, feeding and sense tests pass at fixed 30 and 144 fps, 35 / 35 each. Stills of the red bar, full and low, and the reports are in `docs/verification/t11c/`. Not run on Windows.

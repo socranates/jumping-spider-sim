@@ -1,0 +1,40 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+L01 result: 4 of 4 fixtures passed: feeding raised the energy only while valid and canceling never duplicated prey or consumption; save/load not run (no save system yet)
+PASS     test_l01_feeding.gd::test_l01_feeding_increases_energy_only_while_valid_and_canceling_cannot_duplicate_prey_or_consumption  [1791 ms]  16 checks
+PASS     test_l01_feeding.gd::test_l01_saving_and_loading_cannot_duplicate_prey_or_consumption  [584 ms]  39 checks
+PASS     test_prey_feeding.gd::test_a_capture_grants_nothing_and_feeding_grants_gradually  [189 ms]  16 checks
+PASS     test_prey_feeding.gd::test_a_full_reserve_does_not_trap_the_player  [189 ms]  8 checks
+PASS     test_prey_feeding.gd::test_cancel_returns_control_at_once_and_nothing_is_granted_twice  [233 ms]  13 checks
+PASS     test_prey_feeding.gd::test_it_cannot_start_when_it_is_not_valid  [61 ms]  10 checks
+PASS     test_prey_feeding.gd::test_moving_or_jumping_or_falling_ends_it_and_the_controls_work  [90 ms]  12 checks
+PASS     test_prey_feeding.gd::test_the_needs_clock_runs_with_the_spider_and_drains_slowly  [375 ms]  2 checks
+PASS     test_t09b_hunt_feel.gd::test_a_checkpoint_keeps_the_fallen_tip_down  [368 ms]  6 checks
+PASS     test_t09b_hunt_feel.gd::test_a_perched_fly_glances_to_and_fro_from_its_own_stream  [1154 ms]  8 checks
+PASS     test_t09b_hunt_feel.gd::test_automatic_struggle_holds_on_with_no_presses  [99 ms]  6 checks
+PASS     test_t09b_hunt_feel.gd::test_holding_the_button_down_is_not_a_grip  [73 ms]  4 checks
+PASS     test_t09b_hunt_feel.gd::test_stop_tapping_and_the_grip_runs_out_and_the_fly_tears_free  [283 ms]  11 checks
+PASS     test_t09b_hunt_feel.gd::test_tapping_keeps_the_grip_until_the_fly_is_subdued  [206 ms]  11 checks
+PASS     test_t09b_hunt_feel.gd::test_the_dry_leaf_tip_gives_way_and_the_silk_catches_the_spider  [515 ms]  9 checks
+PASS     test_t09b_hunt_feel.gd::test_the_twitch_is_looks_only_bounded_and_can_be_turned_off  [201 ms]  7 checks
+PASS     test_t09c_living_flies.gd::test_a_fly_does_not_walk_through_a_wall  [704 ms]  1 checks
+PASS     test_t09c_living_flies.gd::test_a_fly_sometimes_loops_through_the_air_before_landing  [1734 ms]  3 checks
+PASS     test_t09c_living_flies.gd::test_a_fly_walks_about_its_spot_like_a_fly  [1523 ms]  5 checks
+PASS     test_t09c_living_flies.gd::test_every_prompt_names_the_keys_the_player_chose  [47 ms]  9 checks
+PASS     test_t09c_living_flies.gd::test_space_is_the_grip_while_the_fly_struggles_and_never_hops  [555 ms]  10 checks
+PASS     test_t09c_living_flies.gd::test_the_grip_waits_for_the_landing_and_the_end_is_said  [263 ms]  4 checks
+PASS     test_t11b_struggle.gd::test_a_full_bar_subdues_the_fly_at_once  [195 ms]  10 checks
+PASS     test_t11b_struggle.gd::test_a_slow_rhythm_no_longer_holds_a_fly  [164 ms]  5 checks
+PASS     test_t11b_struggle.gd::test_a_steady_rhythm_wins_as_the_venom_weakens_the_fly  [264 ms]  6 checks
+PASS     test_t11b_struggle.gd::test_holding_on_automatically_fills_the_bar_by_itself  [118 ms]  6 checks
+PASS     test_t11b_struggle.gd::test_the_grip_bar_is_bright_red  [47 ms]  8 checks
+PASS     test_t12a_senses.gd::test_a_flying_fly_buzzes_and_a_perched_one_is_silent  [508 ms]  5 checks
+PASS     test_t12a_senses.gd::test_a_struggling_fly_buzzes_louder_and_higher  [455 ms]  7 checks
+PASS     test_t12a_senses.gd::test_a_walking_fly_is_felt_as_footsteps_from_its_direction  [209 ms]  3 checks
+PASS     test_t12a_senses.gd::test_muted_every_cue_still_shows_as_words_and_ripples  [60 ms]  5 checks
+PASS     test_t12a_senses.gd::test_slow_motion_slows_the_sounds_and_the_menu_has_the_settings  [32 ms]  7 checks
+PASS     test_t12a_senses.gd::test_the_buses_follow_the_volume_settings  [62 ms]  5 checks
+PASS     test_t12a_senses.gd::test_the_sounds_are_made_in_code_and_are_what_they_say  [1539 ms]  16 checks
+PASS     test_t12a_senses.gd::test_vibration_travels_through_touching_pieces_only  [28 ms]  9 checks
+evidence_id: 77c9ef3b3bc6 (source ad6dc114, settings 8b6707d4, tests 61e896c4)
+SUMMARY tests=35 passed=35 failed=0 not_run=0 seed=20261005 filter=only=unit,integration,gates,files=test_t11b_struggle.gd,test_t09b_hunt_feel.gd,test_t09c_living_flies.gd,test_l01_feeding.gd,test_prey_feeding.gd,test_t12a_senses.gd result=PASS

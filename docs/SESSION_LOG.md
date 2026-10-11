@@ -1036,3 +1036,8 @@ Chet reviews this entry, `docs/HANDOFF-chunk-7.md` and the tests named above. Na
 - Nathan's screenshot: "error: The following untracked working tree files would be overwritten by merge: tests/integration/test_t11a_slow_motion.gd.uid". His folder was still on T11a (e5ab79e), 8 commits behind, so he had never received T11b, T12a or T12b. His "i dont hear anything" was partly that: the version he played had no sound at all.
 - Cause: the T11a test was committed without its `.uid`. Godot made one on his PC, and T12a then added it. Fixes: the two other missing `.uid` files committed; `update.bat` now replaces a Godot-made `.uid`/`.import` that GitHub is adding; a workflow rule added (SHARED_WORKFLOW).
 
+
+### 2026-10-11: T11c struggle harder still, red bar (Claude, cloud session)
+- Nathan, after updating: "yes excellent it all works great now. the tapping should be harder still", then "also make the bar bright red".
+- Retuned from a tap-rate sweep: four presses a second now loses the fly; five wins in about 9 s, eight in about 2.5. The grip bar is bright red and pulses lighter when low. "Hold on automatically" still takes 1.5 s. Fixed three run-together lines in DECISIONS. STRUGGLE-03, STRUGGLE-04.
+- Final: evidence 77c9ef3b3bc6, 568 of 568 (fixed 60 fps, Linux headless); struggle-related tests 35 of 35 at fixed 30 and 144. Not run on Windows.

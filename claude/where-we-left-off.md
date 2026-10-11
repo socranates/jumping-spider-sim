@@ -25,6 +25,8 @@ Native AMD Radeon screenshots show the real windowsill spider's corrected legs, 
 
 ## Next
 
+**Latest (Claude, 2026-10-11, T11c):** Nathan: "it all works great now. the tapping should be harder still", and "also make the bar bright red". A steady five presses a second is needed now (four loses the fly), and the grip bar is bright red, pulsing lighter when low (STRUGGLE-03). "Hold on automatically" is unchanged for his son. Evidence **77c9ef3b3bc6**: 568/568 (Linux headless). **Chet still has the next round: ROADMAP step 4, movement realism part 2** (list at the end of `docs/HANDOFF-sound-senses.md`).
+
 **Latest (Claude, 2026-10-11, T12b):** Nathan heard nothing. A recording proved the mix was too low-pitched and quiet for laptop speakers. It has been rebuilt brighter and louder, with birds outside, and an Esc-menu **Headphones** switch (off: speaker tuning). Evidence **0c295e07077e**: 567/567 (Linux headless). See the T12b section of `docs/HANDOFF-sound-senses.md`. Chet still has the next round (step 4).
 
 **Latest (Claude, 2026-10-11, T12a):** sound and the spider's other senses. There is a generated soundscape (room, flies, the shadow), a vibration sense through touching solids only, captions with directions, ripples, rumble, and volume sliders. Evidence **4daaf055b746**: 565/565 (Linux headless); not run on Windows, and nobody has listened yet. Read `docs/HANDOFF-sound-senses.md`. **Chet has the next round: ROADMAP step 4, movement realism part 2** (the handoff ends with the list).

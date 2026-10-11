@@ -23,6 +23,8 @@ Native AMD Radeon screenshots show the real windowsill spider's corrected legs, 
 
 ## Next
 
+**Cross-device goal (Nathan, 2026-10-10 America/Chicago):** Nathan wants to play on PlayStation and other devices. Keep this in mind during Godot development. Roblox is a possible route, not a selected platform or an authorized port. Nathan, Chet and Claude will decide the approach and timing together. Chet suggested a solid Godot core followed by a small Roblox feasibility prototype before extensive additional content; this is a proposal, not an agreed milestone. See DECISIONS PLATFORM-01.
+
 **Nathan, 2026-10-11 (after the legs):** "we can move on to the next thing. Eventually i want to add a first person spider eye mode so its more immersive." And: "we are going for scientific realism in terms of vision and movement and all." See DECISIONS T9e-03. Claude proposed a first-person eye mode grounded in salticid vision research and asked whether to start it now. Global slow time is deferred (T9e-01: it needs one simulation clock) and survival pressure waits for needs with consequences (T9e-02).
 
 Nathan should try walking, slow stalking, aiming/jumping, catching a fly, and the Reduced motion switch. The gait remains a cosmetic prototype: no individual foot contact IK, world-space planted feet, turn-in-place steps or transition blending. Surface overlap/sliding during twitch and at edges is possible; physics and sensing are unchanged.

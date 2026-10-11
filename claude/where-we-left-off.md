@@ -17,6 +17,8 @@ Done in T09 part 1:
 
 Chet's PR #2 (Windows/web export presets, a standalone leg prototype, review 5) is merged too. The leg prototype isn't wired into gameplay yet; when it is, it replaces the static legs in `spider_body.gd` and keeps the twitch layer.
 
+**Nathan's playtest, 2026-10-11** (after `git pull` of `main`): "now its updated and is looking very good now with the changes. the mechanics are working well." He had first played an old local copy: his folder had not been pulled, so the struggle mini-game was missing. Remind him to run `git checkout main` then `git pull` after each handoff.
+
 Unfinished (T09 part 2 and the human gates):
 - Controller remapping, reduced-effects and nonvisual cue options, assisted-play presets, and a Windows interrupted-write test.
 - Human U01: the loop with controller only, remapped keys, toggle preparation and sound muted. Human W01, E02, graphical M04 and F01 are still open.

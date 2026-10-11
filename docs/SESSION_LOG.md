@@ -992,3 +992,6 @@ Chet reviews this entry, `docs/HANDOFF-chunk-7.md` and the tests named above. Na
 - A played-world diagnosis with real key events found the struggle's problems: taps after the subdue toggled the meal, the grip drained in mid-air, and the fly was hidden behind the spider. All three are fixed. Space is the grip. Flies walk in stop-start bursts and loop through the air on spontaneous flights. The stalk is 0.65 (measured: `docs/verification/t09c/tuning_run.txt`). Checkpoint schema 3. Chet's P1 and P2 are fixed with regression tests. The F4 view draws on toggle.
 - Final: evidence 25d403c1ee02, 519 of 519 (fixed 60 fps, Linux headless); hunt/struggle/save/support 116 of 116 at fixed 30 and 144; smoke clean. Not run on Windows.
 
+### 2026-10-11: Nathan plays merged main
+- At first the struggle mini-game was missing: his local folder had not been pulled. After `git checkout main` and `git pull`: "looking very good now with the changes. the mechanics are working well."
+

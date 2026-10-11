@@ -1,0 +1,202 @@
+Jumping Spider Sim test report
+timestamp_utc: 2026-10-10T23:46:30Z
+engine: Godot 4.7.2.stable.official.ed1daf0bf
+platform: Windows
+renderer_setting: gl_compatibility
+renderer_active: gl_compatibility
+physics_engine: Jolt Physics
+source_hash_md5: 8975f46d591de6782a71f6356bb64266 (scripts, scenes, data)
+settings_hash_md5: 8b6707d4bb26d00c21239d1c75d3aec2 (project.godot)
+tests_hash_md5: 4e890af54849a61b345a3fac399afc9a (tests/ scripts and scenes, not tests/reports)
+evidence_id: 838e9a1472e2 (keeps a copy of this state: snapshot.bat writes tests/reports/snapshots/DATE_838e9a1472e2.zip)
+fixture_seed: 20261005
+filter: only=unit
+tests: 183
+passed: 183
+failed: 0
+not_run: 0
+result: PASS
+
+PASS     test_boom_math.gd::test_allowed_length_from_cast_fraction  4 checks
+PASS     test_boom_math.gd::test_hit_retracts_immediately  3 checks
+PASS     test_boom_math.gd::test_invariants_hold_for_random_inputs  500 checks
+PASS     test_boom_math.gd::test_non_finite_input_returns_the_pivot  3 checks
+PASS     test_boom_math.gd::test_orbit_basis_never_rolls  2000 checks
+PASS     test_boom_math.gd::test_pitch_ease_is_quick_in_slow_out_and_never_overshoots  47 checks
+PASS     test_boom_math.gd::test_pitch_ease_treats_negative_offsets_like_positive_ones  45 checks
+PASS     test_boom_math.gd::test_pitch_offset_rejects_bad_input  4 checks
+PASS     test_boom_math.gd::test_pitch_offset_takes_the_smallest_comfortable_change  6 checks
+PASS     test_boom_math.gd::test_pitch_offset_works_down_the_list_in_the_order_tried_including_negative_offsets  4 checks
+PASS     test_boom_math.gd::test_recovery_converges_without_overshoot  53 checks
+PASS     test_boom_math.gd::test_recovery_is_bounded_per_step  5 checks
+PASS     test_boom_math.gd::test_smooth_damp_arrives_without_overshoot_and_starts_gently  48 checks
+PASS     test_boom_math.gd::test_smooth_damp_works_in_both_directions_and_from_a_moving_start  206 checks
+PASS     test_boom_math.gd::test_yaw_convention  3 checks
+PASS     test_evidence.gd::test_a_missing_folder_is_reported_not_crashed  1 checks
+PASS     test_evidence.gd::test_files_that_are_not_evidence_change_nothing  4 checks
+PASS     test_evidence.gd::test_hashes_follow_their_own_files_only  13 checks
+PASS     test_evidence.gd::test_the_archive_holds_the_project_except_the_cache_and_the_reports  19 checks
+PASS     test_evidence.gd::test_the_archive_is_written_read_back_and_checked  31 checks
+PASS     test_evidence.gd::test_the_id_is_twelve_hex_digits_made_from_all_three  7 checks
+PASS     test_evidence.gd::test_the_real_project_archive_would_hold_what_matters  10 checks
+PASS     test_evidence.gd::test_the_source_hash_is_the_one_the_report_always_had  2 checks
+PASS     test_input_map.gd::test_debug_overlay_action_is_bound_to_f3  2 checks
+PASS     test_input_map.gd::test_default_bindings_match_the_action_map  11 checks
+PASS     test_input_map.gd::test_every_section_17_action_has_keyboard_or_mouse_and_joypad_events  52 checks
+PASS     test_input_map.gd::test_saved_overrides_replace_defaults_and_can_be_reset  4 checks
+PASS     test_jump_feedback.gd::test_each_kind_has_its_own_shape_colour_and_words  8 checks
+PASS     test_jump_feedback.gd::test_every_reason_the_solver_can_give_has_words  12 checks
+PASS     test_jump_feedback.gd::test_the_aim_label_says_what_a_release_does  9 checks
+PASS     test_jump_feedback.gd::test_the_hidden_anchor_note_names_the_edge_only_when_the_line_bends_over_one  3 checks
+PASS     test_jump_feedback.gd::test_toasts_for_each_outcome  7 checks
+PASS     test_jump_math.gd::test_arrival_must_go_into_the_target_surface  22 checks
+PASS     test_jump_math.gd::test_every_launch_leaves_the_surface  56 checks
+PASS     test_jump_math.gd::test_height_limits_the_reach  4 checks
+PASS     test_jump_math.gd::test_reach_is_about_two_to_five_body_lengths_on_the_level  7 checks
+PASS     test_jump_math.gd::test_solutions_are_ordered_lowest_launch_speed_first_and_respect_the_limit  69 checks
+PASS     test_jump_math.gd::test_standing_surfaces_follow_the_45_degree_rule  7 checks
+PASS     test_jump_math.gd::test_step_range_is_the_whole_ticks_inside_the_profile_range  5 checks
+PASS     test_jump_math.gd::test_the_continuous_formula_would_miss_by_a_visible_amount  3 checks
+PASS     test_jump_math.gd::test_the_launch_velocity_reaches_the_seat_exactly_in_the_tick_loop  302 checks
+PASS     test_jump_math.gd::test_unreachable_inputs_are_rejected_with_a_reason  4 checks
+PASS     test_jump_planner.gd::test_a_clear_target_is_reachable_and_the_plan_is_complete  16 checks
+PASS     test_jump_planner.gd::test_a_surface_that_cannot_hold_the_spider_is_ineligible  5 checks
+PASS     test_jump_planner.gd::test_an_arc_that_would_only_graze_is_not_offered  3 checks
+PASS     test_jump_planner.gd::test_every_arc_blocked_is_obstructed_and_shows_where  8 checks
+PASS     test_jump_planner.gd::test_leaving_the_surface_is_required  2 checks
+PASS     test_jump_planner.gd::test_no_room_at_the_landing_is_obstructed_even_when_a_point_ray_is_clear  4 checks
+PASS     test_jump_planner.gd::test_no_target_is_reported_for_missing_or_broken_aim_data  5 checks
+PASS     test_jump_planner.gd::test_the_lowest_speed_arc_goes_first_and_higher_arcs_follow_when_it_is_blocked  15 checks
+PASS     test_jump_planner.gd::test_tuning_comes_from_the_species_profile  5 checks
+PASS     test_jump_planner.gd::test_unreachable_is_not_obstructed_and_costs_no_sweeps  6 checks
+PASS     test_needs_model.gd::test_a_grant_that_is_not_one_changes_nothing  9 checks
+PASS     test_needs_model.gd::test_a_stall_cannot_drain_more_than_a_capped_step  2 checks
+PASS     test_needs_model.gd::test_configure_ignores_values_outside_the_unit_range  4 checks
+PASS     test_needs_model.gd::test_energy_changed_is_announced_once_per_change  3 checks
+PASS     test_needs_model.gd::test_energy_drains_slowly_and_only_with_time  3 checks
+PASS     test_needs_model.gd::test_grants_fill_the_reserve_and_never_past_it  8 checks
+PASS     test_needs_model.gd::test_it_starts_a_little_hungry_and_rested  4 checks
+PASS     test_needs_model.gd::test_rest_wears_down_while_active_and_builds_while_still  3 checks
+PASS     test_needs_model.gd::test_the_drain_stops_at_the_floor_and_nothing_goes_negative  3 checks
+PASS     test_needs_model.gd::test_the_record_round_trips_and_rejects_nonsense  12 checks
+PASS     test_needs_model.gd::test_the_same_time_drains_the_same_at_every_frame_rate  8 checks
+PASS     test_observation.gd::test_a_peripheral_observation_carries_no_position_label_or_target  5 checks
+PASS     test_observation.gd::test_each_rule_of_the_record_is_checked  26 checks
+PASS     test_observation.gd::test_good_records_have_no_problems  2 checks
+PASS     test_observation.gd::test_the_record_keeps_the_fields_of_the_spec  9 checks
+PASS     test_observation_memory.gd::test_a_contact_known_only_from_cues_can_be_folded_into_a_lost_one  8 checks
+PASS     test_observation_memory.gd::test_a_contact_that_expired_comes_back_as_a_new_one  3 checks
+PASS     test_observation_memory.gd::test_a_contact_that_was_only_ever_a_cue_comes_back_on_a_cue  2 checks
+PASS     test_observation_memory.gd::test_a_cue_makes_a_contact_with_a_bearing_and_nothing_else  6 checks
+PASS     test_observation_memory.gd::test_a_cue_never_takes_back_what_an_inspection_found  11 checks
+PASS     test_observation_memory.gd::test_a_lost_inspected_contact_leaves_a_mark_that_never_moves  4 checks
+PASS     test_observation_memory.gd::test_a_peripheral_contact_is_held_for_the_cue_hold_and_then_lost  4 checks
+PASS     test_observation_memory.gd::test_an_inspection_is_held_for_the_grace_only  2 checks
+PASS     test_observation_memory.gd::test_an_invalid_record_is_refused_and_changes_nothing  4 checks
+PASS     test_observation_memory.gd::test_confidence_falls_in_a_straight_line_and_the_contact_expires  7 checks
+PASS     test_observation_memory.gd::test_familiarity_is_one_while_live_then_fades_then_is_nothing  4 checks
+PASS     test_observation_memory.gd::test_inspecting_the_empty_spot_drops_the_mark_and_only_a_lost_contact_has_one  8 checks
+PASS     test_observation_memory.gd::test_only_a_contact_without_a_place_is_folded_and_never_into_itself  4 checks
+PASS     test_observation_memory.gd::test_only_an_inspection_reacquires_and_it_updates_the_record  9 checks
+PASS     test_observation_memory.gd::test_several_contacts_are_kept_apart  6 checks
+PASS     test_observation_memory.gd::test_the_hold_times_are_the_ones_the_memory_loses_contacts_by  4 checks
+PASS     test_observation_memory.gd::test_the_speed_a_thing_was_seen_moving_at_is_kept_with_the_place  2 checks
+PASS     test_observation_memory.gd::test_time_alone_never_changes_a_position_or_a_category  8 checks
+PASS     test_perception_math.gd::test_a_cue_gives_a_sector_and_a_band_and_no_more  30 checks
+PASS     test_perception_math.gd::test_a_cue_is_weak_and_a_little_stronger_when_near  3 checks
+PASS     test_perception_math.gd::test_a_lost_contact_fades_in_a_straight_line_to_nothing  8 checks
+PASS     test_perception_math.gd::test_apparent_size_is_the_angle_a_thing_covers  4 checks
+PASS     test_perception_math.gd::test_classification_refines_with_continuous_exposure  11 checks
+PASS     test_perception_math.gd::test_coarseness_is_real_two_nearby_bearings_give_the_same_answer  2 checks
+PASS     test_perception_math.gd::test_cone_and_angle_helpers  5 checks
+PASS     test_perception_math.gd::test_exposure_needed_grows_as_a_thing_looks_smaller  4 checks
+PASS     test_perception_math.gd::test_inspection_confidence_rises_with_exposure_and_falls_with_hiding  6 checks
+PASS     test_perception_math.gd::test_sizes_and_categories_that_can_be_one_thing  8 checks
+PASS     test_perception_math.gd::test_the_categories_are_ordered_and_never_name_a_species  6 checks
+PASS     test_perception_math.gd::test_the_plausible_region_grows_with_time_and_uses_nothing_but_what_was_seen  5 checks
+PASS     test_perception_math.gd::test_the_sight_allowance_follows_the_size_of_the_thing_and_never_hides_a_whole_speck  12 checks
+PASS     test_perception_text.gd::test_a_contacts_label_is_its_category_while_live_and_lost_sight_after  3 checks
+PASS     test_perception_text.gd::test_an_unknown_category_is_called_movement_the_safest_thing_to_say  2 checks
+PASS     test_perception_text.gd::test_no_word_has_a_number_or_a_species_in_it  15 checks
+PASS     test_perception_text.gd::test_the_three_categories_have_their_words  4 checks
+PASS     test_prey_math.gd::test_a_draw_stays_in_its_pair_and_follows_the_seed  202 checks
+PASS     test_prey_math.gd::test_a_sweep_finds_a_head_on_pass_that_a_per_tick_check_would_miss  2 checks
+PASS     test_prey_math.gd::test_a_sweep_of_things_moving_together_does_not_change_their_distance  1 checks
+PASS     test_prey_math.gd::test_a_sweep_of_two_things_that_do_not_move_is_their_distance  1 checks
+PASS     test_prey_math.gd::test_a_sweep_where_the_closest_moment_is_an_end_uses_that_end  4 checks
+PASS     test_prey_math.gd::test_a_sweep_with_both_things_moving_uses_the_relative_motion  2 checks
+PASS     test_prey_math.gd::test_apparent_angle_and_bearing_rate  6 checks
+PASS     test_prey_math.gd::test_awareness_integrates_by_the_time_that_passed_and_stays_in_range  6 checks
+PASS     test_prey_math.gd::test_awareness_needs_motion_above_the_threshold_and_is_scaled_by_the_weights  8 checks
+PASS     test_prey_math.gd::test_distance_and_facing_weights  8 checks
+PASS     test_prey_math.gd::test_distance_to_a_path  4 checks
+PASS     test_prey_math.gd::test_flee_is_worth_nothing_without_a_threat  5 checks
+PASS     test_prey_math.gd::test_hysteresis_keeps_the_present_goal_in_a_close_call  5 checks
+PASS     test_prey_math.gd::test_in_view_is_the_camera_cone_with_a_margin  12 checks
+PASS     test_prey_math.gd::test_loom_is_the_relative_swelling_and_only_for_things_that_grow  4 checks
+PASS     test_prey_math.gd::test_path_length_point_and_direction  10 checks
+PASS     test_prey_math.gd::test_rest_wins_when_calm_and_loses_when_threatened  5 checks
+PASS     test_prey_math.gd::test_speed_eases_down_into_a_landing_and_climbs_at_the_acceleration  6 checks
+PASS     test_prey_math.gd::test_startle_needs_both_a_lot_of_motion_and_nearness  4 checks
+PASS     test_prey_math.gd::test_threat_runs_from_calm_to_flee  4 checks
+PASS     test_prey_profile.gd::test_a_missing_file_is_rejected  2 checks
+PASS     test_prey_profile.gd::test_every_field_is_required_and_named_when_missing  197 checks
+PASS     test_prey_profile.gd::test_the_relations_between_values_are_enforced  5 checks
+PASS     test_prey_profile.gd::test_the_shipped_profile_loads_with_the_designed_numbers  14 checks
+PASS     test_prey_profile.gd::test_unknown_fields_are_rejected  3 checks
+PASS     test_prey_profile.gd::test_wrong_types_and_out_of_range_values_are_rejected  8 checks
+PASS     test_settings.gd::test_corrupt_file_falls_back_to_defaults  3 checks, 1 expected engine error(s) printed above
+PASS     test_settings.gd::test_defaults  14 checks
+PASS     test_settings.gd::test_every_change_is_saved  2 checks
+PASS     test_settings.gd::test_invalid_saved_values_fall_back_or_clamp  6 checks
+PASS     test_settings.gd::test_missing_file_falls_back_to_defaults  3 checks
+PASS     test_settings.gd::test_round_trip_through_a_temp_file  11 checks
+PASS     test_settings.gd::test_setters_clamp_notify_and_reject_bad_types  8 checks, 1 expected engine error(s) printed above
+PASS     test_silk.gd::test_a_line_pointing_at_the_camera_or_with_no_length_still_makes_a_finite_strip  9 checks
+PASS     test_silk.gd::test_a_line_that_is_not_locked_is_drawn_straight  1 checks
+PASS     test_silk.gd::test_a_pixel_has_a_world_size_that_follows_depth_and_the_picture_height  5 checks
+PASS     test_silk.gd::test_a_slack_line_hangs_in_a_parabola_in_its_last_span  6 checks
+PASS     test_silk.gd::test_a_taut_line_is_drawn_straight_wherever_the_spinnerets_are_on_the_body  12 checks
+PASS     test_silk.gd::test_close_up_the_core_keeps_some_body_and_the_strip_is_never_thinner_than_asked  12 checks
+PASS     test_silk.gd::test_over_a_bend_only_the_last_span_sags_and_a_taut_line_is_straight_everywhere  5 checks
+PASS     test_silk.gd::test_the_strip_faces_the_camera  12 checks
+PASS     test_silk.gd::test_the_strip_is_the_same_width_on_screen_at_any_distance_beyond_a_few_wu  20 checks
+PASS     test_silk.gd::test_widths_are_given_at_1080p_and_follow_the_screen_height  7 checks
+PASS     test_species_profile.gd::test_every_perception_field_is_required_and_checked  54 checks
+PASS     test_species_profile.gd::test_inconsistent_perception_values_are_rejected  9 checks
+PASS     test_species_profile.gd::test_malformed_json_is_rejected  5 checks
+PASS     test_species_profile.gd::test_missing_field_is_rejected_and_named  4 checks
+PASS     test_species_profile.gd::test_missing_file_is_rejected  2 checks
+PASS     test_species_profile.gd::test_non_finite_numbers_are_rejected  5 checks
+PASS     test_species_profile.gd::test_out_of_range_and_inconsistent_values_are_rejected  6 checks
+PASS     test_species_profile.gd::test_shipped_profile_loads_with_spec_values  13 checks
+PASS     test_species_profile.gd::test_the_perception_section_loads_and_keeps_the_spec_numbers  13 checks
+PASS     test_species_profile.gd::test_wrong_types_are_rejected  7 checks
+PASS     test_spider_legs.gd::test_cosmetic_pose_is_bounded_and_does_not_move_its_parent  2178 checks
+PASS     test_spider_legs.gd::test_gait_phase_uses_distance_not_render_frame_count  8 checks
+PASS     test_spider_legs.gd::test_reduced_motion_and_idle_restore_neutral_pose  5 checks
+PASS     test_spider_motor_intent.gd::test_collider_is_a_sphere_of_radius_0_3  2 checks
+PASS     test_spider_motor_intent.gd::test_intent_keeps_its_direction_and_is_limited  5 checks
+PASS     test_spider_motor_intent.gd::test_states_are_the_t04_subset_of_spec_6_2  1 checks
+PASS     test_support_math.gd::test_edge_line_of_two_faces  6 checks
+PASS     test_support_math.gd::test_hysteresis_keeps_the_normal_across_a_seam  5 checks
+PASS     test_support_math.gd::test_rotations_and_body_frame  9 checks
+PASS     test_surface_input.gd::test_floor_forward_and_right_go_where_the_screen_says  12 checks
+PASS     test_surface_input.gd::test_floor_mapping_is_the_chunk_2_mapping  32 checks
+PASS     test_surface_input.gd::test_mapping_is_unit_perpendicular_and_keeps_the_stick_length  66 checks
+PASS     test_surface_input.gd::test_mapping_turns_smoothly_as_a_floor_tilts_into_a_wall  1 checks
+PASS     test_surface_input.gd::test_underside_forward_moves_away_from_the_camera  18 checks
+PASS     test_surface_input.gd::test_wall_forward_climbs_and_right_goes_right  81 checks
+PASS     test_surface_profile.gd::test_eligibility_rule  12 checks
+PASS     test_surface_profile.gd::test_folder_loading_is_all_or_nothing  5 checks
+PASS     test_surface_profile.gd::test_shipped_profiles_load  13 checks
+PASS     test_surface_profile.gd::test_validation_names_the_problem  18 checks
+PASS     test_tether.gd::test_a_bend_point_splits_the_path_and_shortens_the_free_length  7 checks
+PASS     test_tether.gd::test_a_pendulum_stepped_with_it_settles_with_damping_and_stays_on_its_length  604 checks
+PASS     test_tether.gd::test_a_slack_line_changes_nothing  600 checks
+PASS     test_tether.gd::test_a_taut_line_only_removes_the_excess_and_outward_speed_and_never_pushes  4500 checks
+PASS     test_tether.gd::test_drawing_and_accounting_helpers  7 checks
+PASS     test_tether.gd::test_the_constraint_residuals_are_float32_rounding_not_a_push  4 checks
+PASS     test_tether.gd::test_the_state_record_has_the_spec_fields_and_bounded_lengths  17 checks
+PASS     test_toolchain.gd::test_autoloads_are_registered  2 checks
+PASS     test_toolchain.gd::test_pinned_engine_and_project_settings  9 checks

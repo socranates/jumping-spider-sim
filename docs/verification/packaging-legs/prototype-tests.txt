@@ -1,0 +1,22 @@
+Jumping Spider Sim test report
+timestamp_utc: 2026-10-10T23:34:43Z
+engine: Godot 4.7.2.stable.official.ed1daf0bf
+platform: Windows
+renderer_setting: gl_compatibility
+renderer_active: gl_compatibility
+physics_engine: Jolt Physics
+source_hash_md5: 8975f46d591de6782a71f6356bb64266 (scripts, scenes, data)
+settings_hash_md5: 8b6707d4bb26d00c21239d1c75d3aec2 (project.godot)
+tests_hash_md5: 4e890af54849a61b345a3fac399afc9a (tests/ scripts and scenes, not tests/reports)
+evidence_id: 838e9a1472e2 (keeps a copy of this state: snapshot.bat writes tests/reports/snapshots/DATE_838e9a1472e2.zip)
+fixture_seed: 20261005
+filter: only=unit,integration,gates files=spider_legs
+tests: 3
+passed: 3
+failed: 0
+not_run: 0
+result: PASS
+
+PASS     test_spider_legs.gd::test_cosmetic_pose_is_bounded_and_does_not_move_its_parent  2178 checks
+PASS     test_spider_legs.gd::test_gait_phase_uses_distance_not_render_frame_count  8 checks
+PASS     test_spider_legs.gd::test_reduced_motion_and_idle_restore_neutral_pose  5 checks

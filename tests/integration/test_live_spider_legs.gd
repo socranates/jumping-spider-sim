@@ -35,9 +35,9 @@ func test_live_walk_stalk_and_stop_drive_the_single_leg_rig() -> void:
 		_check_rig(body)
 	spider.set_intent(Vector3.ZERO, false)
 	await physics_frames(40)
-	check(body.legs.foot_positions() == neutral, "stopping settles the feet")
+	check(spider.velocity.length() < 0.1, "stopping settles the motor while feet retain their contacts")
 	await physics_frames(150)
-	check(body.legs.foot_positions() == neutral, "idle twitch does not walk the feet")
+	check(body.legs.steps_started < 100, "idle twitch does not cause continuous stepping")
 	_check_rig(body)
 
 
@@ -82,7 +82,7 @@ func test_prepare_flight_and_landing_switch_leg_poses() -> void:
 	check(prepared != neutral, "preparing spreads the feet")
 	check(body.twitch_offset.y < 0.0, "the existing body crouch remains")
 	check(spider.commit_jump(plan), "launch")
-	await physics_frames(3)
+	await physics_frames(15)
 	check_eq(spider.get_state_name(), "AIRBORNE", "sample during flight")
 	var flying: Array = body.legs.foot_positions()
 	check(flying != prepared and flying != neutral, "airborne pose replaces the crouch")
@@ -90,14 +90,17 @@ func test_prepare_flight_and_landing_switch_leg_poses() -> void:
 		check(absf(foot.x) < 0.6, "legs fold toward the body in flight")
 	await settle(spider)
 	await physics_frames(3)
-	check(body.legs.foot_positions() == neutral, "landing restores the resting stance")
+	check(body.legs.contacts.size() == 8, "landing restores surface contacts")
 	_check_rig(body)
 
 
 func test_reduced_motion_toggle_stops_gait_twitch_and_active_recoil() -> void:
 	var spider := await _start(floor_pose(-22.0, 12.0, -90.0))
 	var body: Node3D = spider.get_node("Body")
-	var neutral: Array = body.legs.foot_positions()
+	var prototype = load("res://scripts/presentation/spider_legs.gd").new()
+	prototype.reset_pose()
+	var neutral: Array = prototype.foot_positions()
+	prototype.free()
 	spider.set_intent(Vector3.RIGHT, false)
 	body.start_recoil(Vector3.BACK)
 	await physics_frames(3)

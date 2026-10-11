@@ -1041,3 +1041,13 @@ Chet reviews this entry, `docs/HANDOFF-chunk-7.md` and the tests named above. Na
 - Nathan, after updating: "yes excellent it all works great now. the tapping should be harder still", then "also make the bar bright red".
 - Retuned from a tap-rate sweep: four presses a second now loses the fly; five wins in about 9 s, eight in about 2.5. The grip bar is bright red and pulses lighter when low. "Hold on automatically" still takes 1.5 s. Fixed three run-together lines in DECISIONS. STRUGGLE-03, STRUGGLE-04.
 - Final: evidence 77c9ef3b3bc6, 568 of 568 (fixed 60 fps, Linux headless); struggle-related tests 35 of 35 at fixed 30 and 144. Not run on Windows.
+
+
+## 2026-10-11 - Chet - Movement realism part 2
+
+- Started by updating Nathan's laptop to main 17db650 and reading Claude's handoffs/workflow. Confirmed unchanged Windows baseline 568/568 (77c9ef3b3bc6) before editing.
+- Implemented collider-local foot contacts, world-space stance rendering, inward foothold searches on narrow edges, turn steps, rear-pair push, attached abdomen/spinneret dip, and landing compression. Preserved twitch and neutral Reduced motion. Kept gameplay physics and first-person camera timing unchanged; documented the visual-only instant-hop lead-in.
+- Checked Nabawy et al. 2018 and Chen et al. 2013; recorded hydraulic/muscle and species limits in LEG-05 through LEG-08 and HANDOFF-surface-legs.md.
+- Fixed repeated stepping onto the same narrow-edge contact during verification. Native captures exposed detached-looking spinnerets; replaced their independent translation with an attached abdomen dip.
+- Added eight integration tests and updated obsolete exact-local-neutral/catch-recoil assertions. Final 576/576 Windows fixed60; targeted 46/46 at each of 30/60/144. Evidence 5b1adc6e6a6b. Native AMD/OpenGL quarter-speed screenshots and test reports: docs/verification/movement2/.
+- Handoff and ROADMAP updated. Finish into main, then update Nathan's playable laptop checkout and confirm commit in chat. No export/port or sustained frame-time benchmark in this round.

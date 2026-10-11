@@ -96,6 +96,9 @@ func refresh() -> void:
 ## How far the catch recoil has moved the model from the body, in the world: the line's end goes with it.
 func _recoil_shift() -> Vector3:
 	var model := motor.get_node_or_null("Body")
+	if model != null and model.get("launch_time") != null and model.launch_time >= 0.0:
+		# Presentation lead-in only: the solver keeps its original anchor/length.
+		return model.visual_spinneret_point() - motor.line_end_point()
 	if model == null or not model.has_method("is_recoiling") or not model.is_recoiling():
 		return Vector3.ZERO
 	return motor.get_global_transform_interpolated().basis * model.recoil_offset

@@ -1,3 +1,15 @@
+# Current handoff - Chet, 2026-10-11
+
+**Latest: movement realism part 2, ROADMAP step 4.** Start from main and read **docs/HANDOFF-surface-legs.md**. Added world-planted feet, steps during turns, rear-pair extension, abdomen/spinneret touchdown before visual launch, and landing absorption. Twitch stays. Reduced motion stays neutral. All new animation follows SimClock.DT; movement, jump and tether physics are unchanged. Instant hops use a short third-person presentation lead-in while the motor launches immediately; first-person camera timing is unchanged. Sources and approximation limits are in the handoff and DECISIONS LEG-05 through LEG-08.
+
+Windows baseline on Claude's 17db650: **568/568**, evidence **77c9ef3b3bc6**. Final Windows full suite: **576/576**, evidence **5b1adc6e6a6b**. Touched leg/silk/eye checks: **46/46 at fixed 30, 60 and 144 fps**. Native quarter-speed screenshots and frozen reports are in **docs/verification/movement2/**. Every new script includes its .uid. Player settings/saves were isolated from testing.
+
+Nathan can play the updated main and judge the gait, particularly short hops, turning and first-person view changes. Proposed next round is Claude's ROADMAP step 5 (vision realism part 2), subject to Nathan's choice. Full anatomical/species-specific rigs and a sustained laptop performance benchmark remain future work. Chet finishes by pushing main and running the laptop update.bat; the final chat message confirms the resulting commit.
+
+---
+
+## Earlier handoffs (historical)
+
 # Where we left off — Chet, 2026-10-10 (America/Chicago)
 
 **Latest: T10b, scientific eye-view refinement.** Start from `main` and read **docs/HANDOFF-retinal-scan.md** and **docs/VISION_RESEARCH.md** before the older handoffs below. Built on Claude's `2d6ea80`: two narrow principal-eye detail regions sweep together and twist behind fixed lenses; the camera/aim/senses stay unchanged. Removed the blue-as-UV shortcut; the green-weighted picture explicitly says UV is not simulated. Reduced motion freezes scanning; pause stops its clock. Windows full suite **548/548**, evidence **829573aaf835**; normal-speed eye tests **12/12**; native AMD/OpenGL captures in `docs/verification/t10b/`. Research-backed illustration, not a literal spider's colour experience. Nathan's playtest is still needed. The previous live-legs and T10a sections below are historical context.

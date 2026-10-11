@@ -1,0 +1,65 @@
+Jumping Spider Sim test report
+timestamp_utc: 2026-10-11T07:07:37Z
+engine: Godot 4.7.2.stable.official.ed1daf0bf
+platform: Windows
+renderer_setting: gl_compatibility
+renderer_active: gl_compatibility
+physics_engine: Jolt Physics
+source_hash_md5: d9480321b77557579d8a9ed68f2b2dc0 (scripts, scenes, data)
+settings_hash_md5: 8b6707d4bb26d00c21239d1c75d3aec2 (project.godot)
+tests_hash_md5: d29cd4d42e13319d36408ddff27b7290 (tests/ scripts and scenes, not tests/reports)
+evidence_id: 5b1adc6e6a6b (keeps a copy of this state: snapshot.bat writes tests/reports/snapshots/DATE_5b1adc6e6a6b.zip)
+fixture_seed: 20261005
+filter: only=unit,integration,gates files=surface_legs,live_spider_legs,spider_legs,silk,t10a_eye_view,t10b_retinal_scan
+tests: 46
+passed: 46
+failed: 0
+not_run: 0
+result: PASS
+
+PASS     test_silk.gd::test_a_line_pointing_at_the_camera_or_with_no_length_still_makes_a_finite_strip  9 checks
+PASS     test_silk.gd::test_a_line_that_is_not_locked_is_drawn_straight  1 checks
+PASS     test_silk.gd::test_a_pixel_has_a_world_size_that_follows_depth_and_the_picture_height  5 checks
+PASS     test_silk.gd::test_a_slack_line_hangs_in_a_parabola_in_its_last_span  6 checks
+PASS     test_silk.gd::test_a_taut_line_is_drawn_straight_wherever_the_spinnerets_are_on_the_body  12 checks
+PASS     test_silk.gd::test_close_up_the_core_keeps_some_body_and_the_strip_is_never_thinner_than_asked  12 checks
+PASS     test_silk.gd::test_over_a_bend_only_the_last_span_sags_and_a_taut_line_is_straight_everywhere  5 checks
+PASS     test_silk.gd::test_the_strip_faces_the_camera  12 checks
+PASS     test_silk.gd::test_the_strip_is_the_same_width_on_screen_at_any_distance_beyond_a_few_wu  20 checks
+PASS     test_silk.gd::test_widths_are_given_at_1080p_and_follow_the_screen_height  7 checks
+PASS     test_spider_legs.gd::test_cosmetic_pose_is_bounded_and_does_not_move_its_parent  2178 checks
+PASS     test_spider_legs.gd::test_gait_phase_uses_distance_not_render_frame_count  8 checks
+PASS     test_spider_legs.gd::test_reduced_motion_and_idle_restore_neutral_pose  5 checks
+PASS     test_spider_legs.gd::test_rendered_rods_join_at_knees_and_end_at_the_reported_feet  120 checks
+PASS     test_live_spider_legs.gd::test_checkpoint_rebuild_has_one_rig_and_honours_reduced_motion  58 checks
+PASS     test_live_spider_legs.gd::test_legs_follow_wall_and_underside_without_changing_the_route  831 checks
+PASS     test_live_spider_legs.gd::test_live_walk_stalk_and_stop_drive_the_single_leg_rig  170 checks
+PASS     test_live_spider_legs.gd::test_prepare_flight_and_landing_switch_leg_poses  69 checks
+PASS     test_live_spider_legs.gd::test_reduced_motion_toggle_stops_gait_twitch_and_active_recoil  7 checks
+PASS     test_silk.gd::test_a_taut_or_reeling_line_is_heavier_and_none_is_thinner_than_two_pixels_at_1080p  12 checks
+PASS     test_silk.gd::test_point_hidden_means_the_world_is_in_the_way_not_that_the_point_is_off_screen  6 checks
+PASS     test_silk.gd::test_the_catch_recoil_moves_only_the_model_and_the_silk_follows_it  12 checks
+PASS     test_silk.gd::test_the_hud_says_when_the_anchor_is_out_of_sight_and_stops_when_it_is_back_in_view  13 checks
+PASS     test_silk.gd::test_the_line_is_depth_tested_like_any_object_so_the_world_hides_it  5 checks
+PASS     test_silk.gd::test_the_load_bearing_line_is_dark_with_a_light_rim_and_old_silk_is_pale_thin_and_fainter  14 checks
+PASS     test_silk.gd::test_with_the_real_camera_and_no_camera_input_the_note_matches_what_the_camera_sees  3 checks
+PASS     test_surface_legs.gd::test_eye_view_uses_a_stable_distal_leg_mask_and_reduced_motion_clears_launch  19 checks
+PASS     test_surface_legs.gd::test_leaf_edge_retracts_feet_onto_the_leaf_and_sill_contacts_hold  33 checks
+PASS     test_surface_legs.gd::test_push_straightens_rear_knees_with_feet_still_planted  12 checks
+PASS     test_surface_legs.gd::test_quarter_speed_keeps_the_same_gait_per_simulation_tick  320 checks
+PASS     test_surface_legs.gd::test_stance_is_fixed_in_world_space_despite_travel_and_twitch  326 checks
+PASS     test_surface_legs.gd::test_surface_contacts_on_wall_and_underside_are_on_real_geometry  1117 checks
+PASS     test_surface_legs.gd::test_tap_jump_displays_attachment_before_rear_push_and_absorbs_landing  10 checks
+PASS     test_surface_legs.gd::test_turning_on_the_spot_takes_steps  2 checks
+PASS     test_t10a_eye_view.gd::test_a_world_started_with_the_setting_on_starts_in_the_eye_view  2 checks
+PASS     test_t10a_eye_view.gd::test_over_an_edge_the_view_is_carried_with_the_body_and_never_turns_suddenly  5 checks
+PASS     test_t10a_eye_view.gd::test_the_eye_view_switches_on_and_off_and_survives_a_restart  13 checks
+PASS     test_t10a_eye_view.gd::test_the_pause_menu_and_the_field_notes_offer_the_eye_view  3 checks
+PASS     test_t10a_eye_view.gd::test_the_picture_is_sharp_where_the_eyes_reach_and_says_it_is_an_impression  10 checks
+PASS     test_t10a_eye_view.gd::test_the_retinas_point_the_inspection_without_turning_within_their_reach  9 checks
+PASS     test_t10a_eye_view.gd::test_walking_goes_where_the_eyes_look  4 checks
+PASS     test_t10a_eye_view.gd::test_walking_never_fights_the_turn_and_the_head_tilts_toward_the_gaze  4 checks
+PASS     test_t10b_retinal_scan.gd::test_reduced_motion_holds_scan_and_orbit_does_not_advance_it  5 checks
+PASS     test_t10b_retinal_scan.gd::test_scan_is_frame_rate_independent_and_stays_bounded  938 checks
+PASS     test_t10b_retinal_scan.gd::test_scanning_changes_detail_without_changing_camera_or_sensing  7 checks
+PASS     test_t10b_retinal_scan.gd::test_tree_pause_freezes_automatic_scan  1 checks

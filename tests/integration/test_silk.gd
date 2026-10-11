@@ -218,7 +218,9 @@ func _catch_run(recoil: bool) -> Dictionary:
 		trace.append(spider.global_position)
 		if caught_tick < 0 and events.has("caught"):
 			caught_tick = i
-		peak = maxf(peak, model.position.length())
+		# The separate launch lead-in is not catch recoil. Measure after it ends.
+		if model.launch_time < 0.0:
+			peak = maxf(peak, model.position.length())
 		if model.is_recoiling() and spider.tether.is_active():
 			silk.refresh()
 			var end: Vector3 = silk.shown_points[silk.shown_points.size() - 1]

@@ -56,7 +56,7 @@ Each step is one handoff: one agent at a time, start from `main`, finish into `m
   - vibration through the surface when something walks on the same leaf or sill. Jumping spiders feel this through their legs; it would be heard as a low thrum and shown as a faint ripple, and only along connected surfaces (spec 7).
 - Every meaningful sound also gets a caption or visual cue, so muted play still works (U01).
 
-**4. Next, Chet's round: movement realism, part 2.** The legs today are a cosmetic cycle (LEG-04). Next:
+**4. Implemented by Chet: movement realism, part 2.** See `docs/HANDOFF-surface-legs.md` for Windows evidence and the display-only timing compromise. Nathan's playtest is next. Added:
 - feet that plant and stay on the surface;
 - steps when turning in place;
 - the back legs (pairs 3 and 4) pushing at take-off;

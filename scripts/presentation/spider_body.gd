@@ -3,7 +3,8 @@ extends Node3D
 ## The leg rig inherits the twitch/recoil and uses movement in the model's local frame.
 ## Neutral tips sit 0.3 WU below the origin, at the sphere collider's support plane.
 
-const SpiderLegs = preload("res://scripts/presentation/spider_legs.gd")
+const SpiderLegs = preload("res://scripts/presentation/surface_legs.gd")
+const SimClock = preload("res://scripts/core/sim_clock.gd")
 
 const BODY_COLOR := Color(0.14, 0.11, 0.10)
 const LEG_COLOR := Color(0.19, 0.15, 0.13)
@@ -13,6 +14,23 @@ const FANG_COLOR := Color(0.16, 0.58, 0.47)
 
 var gait_enabled: bool = true
 var legs: Node3D
+# Visual timeline only: the motor commits immediately and flies its original plan.
+const ATTACH_S := 0.067
+const PUSH_S := 0.067
+const RECOVER_S := 0.10
+const LAND_S := 0.24
+var launch_time := -1.0
+var landing_time := -1.0
+var landing_depth := 0.0
+var push_amount := 0.0
+var attachment_amount := 0.0
+var _launch_frame := Transform3D.IDENTITY
+var _launch_dip := 0.0
+var _eye_view := false
+var _spinnerets: Node3D
+var _abdomen: Node3D
+var _prepare_time := 0.0
+
 
 ## Catch recoil (A-018, cosmetic): when the line catches the spider, the model is thrown a little way along the line, away
 ## from the anchor, and settles back in a damped bounce of about a third of a second. It moves only this node, a child of the
@@ -78,6 +96,9 @@ func _ready() -> void:
 	var motor := get_parent()
 	if motor != null and motor.has_signal("line_event"):
 		motor.line_event.connect(_on_line_event)
+		motor.jump_committed.connect(_on_jump_committed)
+		motor.state_changed.connect(_on_motor_state)
+		motor.out_of_bounds_reset.connect(func(_a: Vector3, _b: Vector3) -> void: _clear_jump_pose())
 
 
 ## Throws the model along `direction` (in the physics body's space) and lets it settle. `strength` is 0 to 1 of the
@@ -95,7 +116,8 @@ func is_recoiling() -> bool:
 	return _recoiling
 
 
-func _physics_process(delta: float) -> void:
+func _physics_process(_delta: float) -> void:
+	var delta := SimClock.DT
 	if not recoil_enabled:
 		_recoiling = false
 		recoil_offset = Vector3.ZERO
@@ -109,6 +131,7 @@ func _physics_process(delta: float) -> void:
 	_twitch(delta)
 	position = recoil_offset + twitch_offset
 	rotation = Vector3(0.0, twitch_yaw, 0.0)
+	_jump_pose(delta)
 	_update_legs(delta)
 
 
@@ -116,16 +139,82 @@ func _update_legs(delta: float) -> void:
 	var motor := get_parent()
 	if legs == null or motor == null or not motor.has_method("is_supported"):
 		return
-	var grounded: bool = motor.is_supported()
-	var travel: Vector3 = motor.velocity
-	if grounded:
-		var normal: Vector3 = motor.get_support_normal()
-		travel -= normal * travel.dot(normal)
-	# Convert world travel after the motor's frame and this child's twitch have updated.
-	# No extra phase from cosmetic lurches, idle flicks or catch recoil.
-	var local_velocity: Vector3 = global_basis.inverse() * travel
-	legs.advance_pose(delta, local_velocity, grounded,
-		motor.state == motor.State.PREPARING, not gait_enabled)
+	var lead_in := launch_time >= 0.0 and launch_time < ATTACH_S + PUSH_S
+	if gait_enabled and (motor.is_supported() or lead_in) and not _eye_view:
+		legs.advance_surface(motor, delta, push_amount)
+	elif gait_enabled and motor.is_supported():
+		legs.advance_surface(motor, delta, push_amount)
+	else:
+		legs.advance_free(delta, not gait_enabled)
+
+
+func _clear_jump_pose() -> void:
+	launch_time = -1.0
+	landing_time = -1.0
+	landing_depth = 0.0
+	push_amount = 0.0
+	attachment_amount = 0.0
+	_prepare_time = 0.0
+	if legs != null:
+		legs.clear_contacts()
+
+
+func _on_motor_state(old: int, state: int) -> void:
+	var motor := get_parent()
+	if state == motor.State.LANDING:
+		landing_time = 0.0
+		launch_time = -1.0
+	elif state == motor.State.FALLING and old != motor.State.AIRBORNE:
+		_clear_jump_pose()
+
+
+func _on_jump_committed(_plan: RefCounted) -> void:
+	if not gait_enabled:
+		return
+	_launch_frame = global_transform
+	_launch_dip = maxf(0.0, 0.035 + position.y)
+	launch_time = 0.0
+	landing_time = -1.0
+	attachment_amount = 0.0
+	# Do not wait for a render frame: tap/release and scripted jumps use this too.
+
+
+func _jump_pose(dt: float) -> void:
+	push_amount = 0.0
+	attachment_amount = 0.0
+	landing_depth = 0.0
+	if not gait_enabled:
+		_clear_jump_pose()
+		_abdomen.rotation.x = 0.0
+		return
+	var motor := get_parent()
+	if motor.state == motor.State.PREPARING:
+		_prepare_time += dt
+		attachment_amount = smoothstep(0.0, ATTACH_S, _prepare_time)
+	else:
+		_prepare_time = 0.0
+	if launch_time >= 0.0:
+		launch_time += dt
+		if launch_time < ATTACH_S:
+			attachment_amount = smoothstep(0.0, ATTACH_S, launch_time)
+		elif launch_time < ATTACH_S + PUSH_S:
+			push_amount = smoothstep(0.0, PUSH_S, launch_time - ATTACH_S)
+			attachment_amount = 1.0 - push_amount
+		var catch_up := smoothstep(ATTACH_S, ATTACH_S + PUSH_S + RECOVER_S, launch_time)
+		# Only the visible third-person model waits at the launch point. First
+		# person keeps its existing camera/motor relation, with a local rear push.
+		if not _eye_view:
+			global_transform = _launch_frame.interpolate_with(global_transform, catch_up)
+			global_position -= _launch_frame.basis.y * _launch_dip * attachment_amount
+		if launch_time >= ATTACH_S + PUSH_S + RECOVER_S:
+			launch_time = -1.0
+	if landing_time >= 0.0:
+		landing_time += dt
+		landing_depth = 0.065 * sin(PI * clampf(landing_time / LAND_S, 0.0, 1.0))
+		position.y -= landing_depth
+		if landing_time >= LAND_S:
+			landing_time = -1.0
+	_abdomen.rotation.x = 0.55 * attachment_amount
 
 
 ## A jolt of the whole model (held prey struggling).
@@ -220,10 +309,13 @@ func _on_line_event(kind: String, _detail: String) -> void:
 
 func _build() -> void:
 	_ellipsoid(Vector3(0.0, 0.02, -0.22), Vector3(0.22, 0.17, 0.26), "body")  # cephalothorax
-	_ellipsoid(Vector3(0.0, 0.04, 0.20), Vector3(0.21, 0.19, 0.30), "body")   # abdomen
-	_ellipsoid(Vector3(0.0, 0.225, 0.12), Vector3(0.05, 0.012, 0.05), "spot")
+	_abdomen = Node3D.new()
+	_abdomen.name = "Abdomen"
+	add_child(_abdomen)
+	_ellipsoid(Vector3(0.0, 0.04, 0.20), Vector3(0.21, 0.19, 0.30), "body").reparent(_abdomen)   # abdomen
+	_ellipsoid(Vector3(0.0, 0.225, 0.12), Vector3(0.05, 0.012, 0.05), "spot").reparent(_abdomen)
 	for side in [-1.0, 1.0]:
-		_ellipsoid(Vector3(side * 0.07, 0.205, 0.30), Vector3(0.05, 0.012, 0.05), "spot")
+		_ellipsoid(Vector3(side * 0.07, 0.205, 0.30), Vector3(0.05, 0.012, 0.05), "spot").reparent(_abdomen)
 		_ellipsoid(Vector3(side * 0.075, 0.09, -0.45), Vector3(0.075, 0.075, 0.075), "eye")   # principal
 		_ellipsoid(Vector3(side * 0.17, 0.10, -0.34), Vector3(0.045, 0.045, 0.045), "eye")    # anterior lateral
 		_ellipsoid(Vector3(side * 0.12, 0.15, -0.16), Vector3(0.05, 0.05, 0.05), "eye")       # posterior lateral
@@ -233,11 +325,26 @@ func _build() -> void:
 	legs.name = "Legs"
 	legs.material = _material("leg")
 	add_child(legs)
+	_spinnerets = Node3D.new()
+	_spinnerets.name = "Spinnerets"
+	_abdomen.add_child(_spinnerets)
+	for side in [-1.0, 1.0]:
+		var spinneret := MeshInstance3D.new()
+		var mesh := SphereMesh.new()
+		mesh.radius = 0.028
+		mesh.height = 0.08
+		spinneret.mesh = mesh
+		spinneret.material_override = _material("leg")
+		spinneret.position = Vector3(side * 0.028, 0.02, 0.48)
+		_spinnerets.add_child(spinneret)
 
 
 ## T10a, spider-eye view: the camera sits at the principal eyes, so the head, abdomen, eyes and fangs are hidden (they would fill or
 ## cut the view); the legs stay, as a jumping spider's front legs and palps are in front of its eyes.
 func set_eye_view(on: bool) -> void:
+	_eye_view = on
+	legs.eye_view = on
+	_abdomen.visible = not on
 	for child in get_children():
 		if child is MeshInstance3D:
 			(child as MeshInstance3D).visible = not on
@@ -269,7 +376,7 @@ func _material(kind: String) -> StandardMaterial3D:
 	return m
 
 
-func _ellipsoid(center: Vector3, radii: Vector3, kind: String) -> void:
+func _ellipsoid(center: Vector3, radii: Vector3, kind: String) -> MeshInstance3D:
 	var mesh := SphereMesh.new()
 	mesh.radius = 1.0
 	mesh.height = 2.0
@@ -281,3 +388,8 @@ func _ellipsoid(center: Vector3, radii: Vector3, kind: String) -> void:
 	mi.position = center
 	mi.scale = radii
 	add_child(mi)
+	return mi
+
+
+func visual_spinneret_point() -> Vector3:
+	return _spinnerets.get_global_transform_interpolated() * Vector3(0.0, 0.02, 0.48)

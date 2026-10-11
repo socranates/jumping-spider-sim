@@ -1,0 +1,26 @@
+PASS     test_a01_fly_evidence.gd::test_a01_a_fly_flees_on_sensed_evidence_not_on_the_jump_button_its_trace_explains_each_step_and_a_capture_happens_once  [2468 ms]  17 checks
+PASS     test_t11a_slow_motion.gd::test_a_hunt_plays_out_the_same_in_slow_motion_only_slower  [529 ms]  12 checks
+PASS     test_t11a_slow_motion.gd::test_every_tick_is_the_same_length_at_every_speed  [1 ms]  15 checks
+PASS     test_t11a_slow_motion.gd::test_looking_about_is_not_slowed  [92 ms]  2 checks
+PASS     test_t11a_slow_motion.gd::test_the_setting_and_its_key_slow_a_played_world_and_the_screen_says_so  [108 ms]  8 checks
+PASS     test_t11a_slow_motion.gd::test_the_view_switch_is_easy_to_find_and_works_from_the_keyboard  [81 ms]  13 checks
+PASS     test_t11b_struggle.gd::test_a_full_bar_subdues_the_fly_at_once  [102 ms]  10 checks
+PASS     test_t11b_struggle.gd::test_a_slow_rhythm_no_longer_holds_a_fly  [152 ms]  5 checks
+PASS     test_t11b_struggle.gd::test_a_steady_rhythm_wins_as_the_venom_weakens_the_fly  [274 ms]  6 checks
+PASS     test_t11b_struggle.gd::test_holding_on_automatically_fills_the_bar_by_itself  [103 ms]  6 checks
+PASS     test_t12a_senses.gd::test_a_flying_fly_buzzes_and_a_perched_one_is_silent  [481 ms]  5 checks
+PASS     test_t12a_senses.gd::test_a_struggling_fly_buzzes_louder_and_higher  [256 ms]  7 checks
+PASS     test_t12a_senses.gd::test_a_walking_fly_is_felt_as_footsteps_from_its_direction  [208 ms]  3 checks
+PASS     test_t12a_senses.gd::test_muted_every_cue_still_shows_as_words_and_ripples  [72 ms]  5 checks
+PASS     test_t12a_senses.gd::test_slow_motion_slows_the_sounds_and_the_menu_has_the_settings  [39 ms]  7 checks
+PASS     test_t12a_senses.gd::test_the_buses_follow_the_volume_settings  [56 ms]  5 checks
+PASS     test_t12a_senses.gd::test_the_sounds_are_made_in_code_and_are_what_they_say  [1427 ms]  15 checks
+PASS     test_t12a_senses.gd::test_vibration_travels_through_touching_pieces_only  [26 ms]  9 checks
+PASS     test_u01_access.gd::test_a_remapped_key_drives_the_action_and_survives_a_restart  [2 ms]  6 checks
+PASS     test_u01_access.gd::test_every_action_of_the_loop_and_the_field_notes_have_a_controller_input  [20 ms]  21 checks
+PASS     test_u01_access.gd::test_text_size_survives_a_restart_and_is_bounded  [3 ms]  3 checks
+PASS     test_u01_access.gd::test_the_pause_menu_remaps_a_key_and_fits_larger_text  [53 ms]  10 checks
+PASS     test_u01_access.gd::test_the_windowsill_names_the_keys_the_player_chose  [24 ms]  1 checks
+PASS     test_u01_access.gd::test_walk_forward_carries_reel_with_it_and_a_used_key_is_swapped  [5 ms]  8 checks
+evidence_id: 4daaf055b746 (source 1eed4432, settings 8b6707d4, tests cfd9202a)
+SUMMARY tests=24 passed=24 failed=0 not_run=0 seed=20261005 filter=only=unit,integration,gates,files=test_t12a_senses.gd,test_t11a_slow_motion.gd,test_t11b_struggle.gd,test_u01_access.gd,test_a01_fly_evidence.gd result=PASS

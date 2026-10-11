@@ -130,6 +130,9 @@ func _build() -> void:
 	_add_slider(box, "jump_reach", "Jump reach (playtest)", 0.05, "pct")
 	_add_slider(box, "ui_scale", "Text and panel size", 0.05, "pct")
 	_add_slider(box, "slow_speed", "Slow-motion speed", 0.25, "pct")
+	_add_slider(box, "volume_master", "Volume", 0.05, "pct")
+	_add_slider(box, "volume_ambience", "Room sounds", 0.05, "pct")
+	_add_slider(box, "volume_cues", "Flies and vibrations", 0.05, "pct")
 	# The switches go in two columns so the panel stays inside a 720 px window (chunk 6B added three, chunk 7A one).
 	var switches := GridContainer.new()
 	switches.name = "Switches"
@@ -153,6 +156,8 @@ func _build() -> void:
 	_add_check(switches, "reduced_motion", "Reduced motion (a calmer spider body)")
 	_add_check(switches, "eye_view", "Spider-eye view (first person, V / Y)")
 	_add_check(switches, "slow_motion", "Slow motion (T / right trigger)")
+	_add_check(switches, "captions", "Captions for sounds and vibrations")
+	_add_check(switches, "haptics", "Controller rumble for vibrations")
 	var buttons := HFlowContainer.new()  # wraps onto a second row on a narrow window or with large text
 	buttons.add_theme_constant_override("h_separation", 12)
 	buttons.add_theme_constant_override("v_separation", 8)

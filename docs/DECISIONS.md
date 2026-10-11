@@ -310,3 +310,21 @@ Nathan: "the slomo thing sounds cool" (to ROADMAP step 2), "add a button that ca
   - U01 is met for remapped keys, toggle preparation and mute.
   - U01's controller-only part is open until someone plays with a controller: Nathan has said he has none for the PC.- **STRUGGLE-02 Evidence.** d9ed40eeeecf: 557 / 557 (Linux headless, fixed 60 fps), including 4 new tests (`tests/integration/test_t11b_struggle.gd`). The struggle, hunt-feel, living-fly and feeding tests pass at fixed 30 and 144 fps, 20 / 20 each. Reports are in `docs/verification/t11b/`. Not run on Windows.
 
+## T12a — sound and the spider's other senses (Claude, 2026-10-11)
+
+Nathan: "get done what you want to work on next and then chet can have the next round". ROADMAP step 3.
+
+- **SOUND-01 Two layers, own volumes** (spec 16).
+  - Ambience is human scale: a fridge hum, room tone, distant thuds, and air at the window during the shadow.
+  - Cues are the spider's world: fly buzzes, take-offs, a struggling fly, felt vibrations.
+  - Master, Room sounds, and Flies and vibrations sliders sit in the Esc menu. 0 mutes.
+- **SOUND-02 Generated, not recorded.** All six sounds are synthesised in code at 22 050 Hz with fixed seeds. The fly's buzz is at 195 Hz, within the reported house-fly wingbeat (about 190–200 Hz), and is also inside *P. audax*'s reported auditory range (80–380 Hz; Shamble et al. 2016). The game never claims the player hears what the spider hears.
+- **SOUND-03 Vibration through touching solids only** (spec 7).
+  - Fly landings (1.0), take-offs (0.8) and footsteps (0.45) are felt through the piece under the fly, then touching habitat boxes, to the piece under the spider's feet.
+  - Strength falls to 1/e per 4 WU and halves at each joint. Under 0.08 is not felt.
+  - Nothing crosses an air gap, and nothing is felt in the air or on the line.
+  - The output is a direction, never a place. The same event gives a thrum, a ripple, a caption and an optional rumble.
+  - It is presentation only for now: no sense, memory or fly decision uses it.
+- **SOUND-04 Captions on by default** (spec 16, U01). Every meaningful cue gets a bracketed caption with a direction relative to the spider, so muted play loses nothing. A ripple on the screen shows a felt vibration's side.
+- **SOUND-05 Slow motion slows sound.** `AudioServer.playback_speed_scale` follows the game speed.- **SOUND-06 Evidence.** 4daaf055b746: 565 / 565 (Linux headless, fixed 60 fps). The sense tests pass at fixed 30 and 144 fps. Loudness and mix are unheard: headless runs use a silent audio driver.
+

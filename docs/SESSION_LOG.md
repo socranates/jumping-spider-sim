@@ -1026,3 +1026,6 @@ Chet reviews this entry, `docs/HANDOFF-chunk-7.md` and the tests named above. Na
 - Nathan ran `docs/PLAYTEST.md`: "everthing on the checklist functions the way it should. It is really fun, camera works great, 1st person is super cool." He asked: "the tapping when catching a fly should be a bit harder and just stop when it is full".
 - A tap-rate sweep showed the old bar filled in about a second at 2.5 presses a second, then waited on a timer. New rules: a full bar wins at once; harder taps; the fly weakens as the venom works; automatic hold fills by itself. STRUGGLE-01, PLAYTEST-01.
 
+### 2026-10-11: T12a sound and the spider's other senses (Claude, cloud session)
+- Nathan: "get done what you want to work on next and then chet can have the next round". Built ROADMAP step 3: generated sounds (room hum, fly buzz at 195 Hz, take-off, thrum, thud, whoosh), soundscape buses and volumes, a vibration sense through touching solids only, captions with directions, ripples, controller rumble, and slow motion slowing sound. Research: Shamble et al. 2016 (P. audax hears 80–380 Hz), house-fly wingbeat about 190–200 Hz, spider slit sensilla. Decisions SOUND-01 to SOUND-05.
+

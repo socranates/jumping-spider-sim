@@ -29,6 +29,11 @@ const DEFAULTS := {
 	"eye_view": false,         # T10a: see through the spider's eyes (first person) instead of the orbit camera; V or Y switches it
 	"slow_motion": false,      # T11a: the whole world runs at slow_speed (SimClock: the same ticks, fewer each second); T or RT switches it
 	"slow_speed": 0.5,         # T11a: how slow slow motion is (25, 50 or 75 per cent)
+	"volume_master": 0.8,      # T12a: all sound
+	"volume_ambience": 0.6,    # T12a: the room (hum, the house, the air at the window)
+	"volume_cues": 0.9,        # T12a: the spider's world (flies, felt vibrations)
+	"captions": true,          # T12a: a line for each sound cue, with its direction (works muted)
+	"haptics": true,           # T12a: a controller rumbles when the spider feels a vibration
 }
 ## Inclusive [min, max] for the numeric settings.
 const LIMITS := {
@@ -38,6 +43,9 @@ const LIMITS := {
 	"jump_reach": [0.5, 1.5],
 	"ui_scale": [1.0, 1.5],
 	"slow_speed": [0.25, 0.75],
+	"volume_master": [0.0, 1.0],
+	"volume_ambience": [0.0, 1.0],
+	"volume_cues": [0.0, 1.0],
 }
 ## T09 (U01): keyboard keys the player may change, in the order the pause menu lists them, with their names there. The mouse buttons
 ## stay as they are. Reel and lower follow walk forward and walk back (spec 17: W/S with a context override).

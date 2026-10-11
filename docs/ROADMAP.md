@@ -102,6 +102,29 @@ Keep the twitch.
 - **Realistic looks.** Moving from primitive shapes to detailed, accurate models (hairs, eye arrangement, markings) is spec phase 6 ("production art"). It can start with the player's own species.
 - **A sensible order.** One finished life (phase 4) first. Then a second species chosen to test the system, ideally one that lives in the same windowsill. Then peacock spiders and courtship (phase 5), which need mates, displays and the vibration sense from step 3.
 
+## Long term: calm, true to life, and a way to learn (Nathan, 2026-10-11)
+
+"this could also teach people about jumping spiders right? it will be like a super beautiful, serene, slow play. Hyper real environment to slowly explore, very detailed and proportionate to tiny spiders, just super natural, presenting facts maybe as you learn to play etc. something to keep in mind." (LEARN-01)
+
+- **Already pointing that way.**
+  - The world is built at true scale: 1 WU = 1 cm, and the spider's body is about 1 cm long (spec section 6).
+  - Hunts are slow on purpose, and slow motion exists.
+  - The spec already plans a field notebook that belongs to the player (spec section 4).
+  - Every vision and movement choice has a written source (`VISION_RESEARCH.md`, the leg handoffs).
+- **Facts as you play.** A field-notebook page could open the first time the player does something:
+  - the first jump: the dragline, Chen et al. 2013;
+  - the first time in the eye view: the moving retinas, Land 1969;
+  - the first fly that shimmers in the surround: the lateral eyes, Zurek et al. 2010.
+
+  Short, optional, never in the way, and each with its source.
+- **Honesty first.** A game that teaches must not teach what it fakes. Before facts are presented as facts:
+  - the tuned gravity (35 WU/s² against a real 981) and its effect on jumps need a decision;
+  - the "fly-like" prey becomes a real species (spec section 8);
+  - the UV and depth-from-defocus gaps stay labelled.
+
+  The notebook can say plainly where the game simplifies.
+- **Hyper-real, serene environment.** Detailed, accurately proportioned surfaces, light and plants are spec phase 6 (production art), together with realistic spider models (SPECIES-01). Calm ambience and the slow pace come first; no timers or pressure by default.
+
 ## The platform question (PLATFORM-01, to decide together)
 
 - **What Godot does now.** Exports to Windows, Mac, Linux, Android, iOS and the web. The game already runs in the renderer the web build uses, and it supports a controller.

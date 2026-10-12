@@ -1,0 +1,14 @@
+[
+  {
+    "level": "error",
+    "message": "WrongDocumentError: The root document of this element is not valid for pointer lock.",
+    "timestamp": "2026-10-12T12:00:04.950Z",
+    "url": "http://127.0.0.1:8765/"
+  },
+  {
+    "level": "error",
+    "message": "UnknownError: If you see this error we have a bug. Please report this bug to chromium.",
+    "timestamp": "2026-10-12T12:00:36.348Z",
+    "url": "http://127.0.0.1:8765/"
+  }
+]

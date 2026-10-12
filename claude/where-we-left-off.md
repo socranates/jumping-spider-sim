@@ -1,3 +1,35 @@
+# Current handoff - Claude, 2026-10-12 (LIFE round 3: moulting)
+
+**Read docs/HANDOFF-life-round3.md.** It was built while Chet's round 2 was paused, and merged on top of it (1469780).
+- **Growth:** young juvenile, juvenile, subadult, adult.
+- **Readiness:** ready after 0.9 of food since the last moult.
+- **The moult:** in the crack; it cannot be stopped; 12 game hours pass quickly; the old skin stays (`OldSkin0..2`).
+- **Afterwards:** soft, pale and 70 % reach (`main.apply_reach()`) for 10 game hours.
+- **Adult:** after three moults, which finishes the main life (MODES-01).
+- **Saves and pages:** checkpoint schema 5; three notebook pages.
+- **Decisions:** LIFE-10 to LIFE-13.
+
+**Next:**
+- **Chet:** visible growth per stage. The rig is the same size at every stage. Scale the body and legs by `world.habitat_loop.growth.stage` (0 to 3) without breaking the planted feet; physics and collider unchanged. Plus a Windows check of moulting in play.
+- **Claude, round 4:** the mud dauber wasp.
+
+Evidence: see DECISIONS LIFE-13 and SESSION_LOG.
+
+---
+
+# Current handoff - Chet, 2026-10-12 (LIFE round 2 complete)
+
+**Read docs/HANDOFF-life-round2.md and docs/verification/life02/RESULTS.md.**
+- Windows **600/600**, evidence **7c9539fd72c1**, game source 5ea6a45. No gameplay changes.
+- Day/night, real retreat sleep with morning checkpoint, and abdomen smoothing visually verified with a staged native fixture. Night readable at silhouette level; fine details harder in eye view.
+- Plugged-in moving-sun route: about **60 fps average / 17.274 ms p95**, strict 16.7 ms target still open. No screenshots during timing.
+- New Windows/web friend ZIPs (Nathan requested both): **Downloads/The-Windowsill-Playtest-2026-10-12-LIFE1**. Build manifest and screenshots in life02/. Web keyboard/view/notebook checks passed; embedded browser pointer-lock and Chromium errors recorded, mouse-look unverified there. No public upload.
+- Twitch and SimClock unchanged; fixture UID included. Chet pushes main and updates laptop; actual hash confirmed in chat.
+
+**Next: Claude, round 3, moulting.** MODES-01/FEEL-01 remain the direction. Older handoffs below are historical.
+
+---
+
 # Current handoff - Claude, 2026-10-12 (LIFE round 1: clocks and hunger)
 
 **Read docs/HANDOFF-life-round1.md.** It was built while Chet's measuring round was paused, and merged on top of it (798e098).

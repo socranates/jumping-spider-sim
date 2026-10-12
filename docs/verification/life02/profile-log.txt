@@ -1,0 +1,13 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 Core Profile Context 25.10.42.01.260515 - Compatibility - Using Device: ATI Technologies Inc. - AMD Radeon(TM) Graphics
+
+LIFE02_START {"gpu":"AMD Radeon(TM) Graphics","size":"(1280, 720)","vsync":1}
+LIFE02_PHASE morning_orbit {"hour":8.0,"sun":"(-34.0537, 25.0, 0.0)"}
+LIFE02_PHASE morning_eye {"hour":8.0,"sun":"(-34.0537, 25.0, 0.0)"}
+LIFE02_PHASE midday_orbit {"hour":13.0,"sun":"(-55.0, 25.0, 0.0)"}
+LIFE02_PHASE midday_eye {"hour":13.0,"sun":"(-55.0, 25.0, 0.0)"}
+LIFE02_PHASE dusk_orbit {"hour":19.6,"sun":"(-21.31665, 25.0, 0.0)"}
+LIFE02_PHASE dusk_eye {"hour":19.6,"sun":"(-21.31665, 25.0, 0.0)"}
+LIFE02_PHASE night_orbit {"hour":23.0,"sun":"(-18.0, 25.0, 0.0)"}
+LIFE02_PHASE night_eye {"hour":23.0,"sun":"(-18.0, 25.0, 0.0)"}
+LIFE02_END {"frames":14391,"seconds":240.009088}

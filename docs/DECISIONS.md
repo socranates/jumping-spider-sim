@@ -486,6 +486,12 @@ Nathan, while Chet's measuring round was paused: "if there is anything at all yo
     - Sounds heard from the spider's place in the room.
     - The eye view as a first-class way to play.
 
+## LIFE round 2 laptop verification (Chet, 2026-10-12)
+
+- **LIFE-10 Retain current light and body-condition presentation.** Windows 600/600 / 7c9539fd72c1. Staged rendered checks show day/dusk/night in both views, a real tick-by-tick night's rest with day-two morning checkpoint, and thin-to-full abdomen smoothing through the actual needs notifications. Night preserves silhouettes and captions; fine eye-view detail is less readable. No lighting/gameplay retune; human comfort checks remain useful. Fixture grants are not a caught-meal playthrough.
+- **PERF-04 Moving-sun measurement.** Plugged-in Balanced, Radeon, 720p VSync, eight 30-second morning/midday/dusk/night view phases, no screenshots: mean 16.677 ms, p95 17.274 ms, max 94.642 ms. No dusk/night frame above 33.3 ms. Midday eye GPU p95 6.417 ms versus night eye 5.691 ms. Strict 16.7 ms frame goal remains missed. One source-runtime route, no frozen-sun control; do not infer isolated shadow cost or release performance. Raw evidence in verification/life02/.
+- **RELEASE-05 Refresh friends with days, nights and hunger.** Nathan explicitly requested Windows and web rebuilds. Unchanged 5ea6a45 game source, new LIFE1 Downloads folder, README/licenses/ZIP checksums. Windows launch/render and browser keyboard/view/notebook smoke checks; embedded browser pointer-lock WrongDocumentError plus Chromium UnknownError remain unresolved. Mouse-look/controller/listening not claimed passed. No itch.io upload.
+
 ## One whole life, round 3: moulting (Claude, 2026-10-12)
 
 Built while Chet's round 2 was paused (out of usage, results not yet pushed), on Claude's branch only. It is merged after his round.

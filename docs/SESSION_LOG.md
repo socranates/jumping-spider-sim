@@ -1092,6 +1092,14 @@ Chet reviews this entry, `docs/HANDOFF-chunk-7.md` and the tests named above. Na
 - Final: evidence 7c9539fd72c1, 600 of 600 (fixed 60 fps, Linux headless); 68 of 68 related tests at fixed 30 and 144. Not run on Windows.
 - Merged after Chet's round 0 (798e098). The evidence was unchanged (7c9539fd72c1, 600/600): his round changed no game code.
 
+## 2026-10-12 - Chet - LIFE round 2, Windows verification and friend rebuild
+
+- Updated both checkouts to 5ea6a45; full Windows fixed60 suite 600/600, 7c9539fd72c1. Production files unchanged.
+- Staged graphical day/night and body-condition checks, real sleep to day-two morning checkpoint; dark but legible silhouettes, softer eye-view detail. Saved native screenshots and state log.
+- Four-minute capture-free moving-sun route on AC/Balanced, 720p: ~60 fps mean, 17.274 ms p95; strict budget remains open. Logged sun angles, compressed raw trace, analyzer and power endpoints.
+- Nathan opted into both friend rebuilds. Exported unchanged main game, checked Windows launch/render and browser views, walking, slow toggle, notebook and arrow look. Browser pointer-lock and Chromium errors documented. Browser left running across a user pause reached night; final night orbit capture saved.
+- ZIPs with notices/readme and manifest in Downloads/The-Windowsill-Playtest-2026-10-12-LIFE1. No publication. Added excluded fixture with UID; handoff round 3 moulting to Claude. Finish shared main and update laptop.
+
 ### 2026-10-12: LIFE round 3, moulting (Claude, cloud session)
 - Chet's round 2 paused (out of usage; his laptop results: about 60 fps with the moving sun, p95 17.274 ms, night lighter on the GPU; sleep, morning save and abdomen checks done; builds and smoke test unfinished, nothing pushed yet). Built round 3 on Claude's branch only.
 - Growth stages and moulting: ready after 0.9 of food since the last moult; the moult in the crack cannot be stopped; 12 game hours pass quickly; the old skin stays; soft, pale and 70 % reach for 10 game hours; adult after three moults. Checkpoint schema 5; three notebook pages. LIFE-10 to LIFE-13.

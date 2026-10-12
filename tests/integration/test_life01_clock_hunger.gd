@@ -207,7 +207,7 @@ func test_checkpoints_keep_the_day_and_older_ones_are_brought_up() -> void:
 	var rec: Dictionary = world.last_checkpoint
 	if not check(not rec.is_empty(), "a checkpoint was kept"):
 		return
-	check_eq(int(rec["schema_version"]), 4, "schema 4")
+	check(int(rec["schema_version"]) >= 4 and rec.has("life"), "schema 4 or later, with the life clock")
 	check(Checkpoint.validate(rec).is_empty(), "valid: %s" % "; ".join(Checkpoint.validate(rec)))
 	var fresh: Node3D = world.return_to_checkpoint(rec)
 	if not check(fresh != null, "it loads"):

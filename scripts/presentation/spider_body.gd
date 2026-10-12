@@ -35,6 +35,9 @@ var _abdomen: Node3D
 var condition: float = 0.55
 var shown_condition: float = 0.55
 const CONDITION_FOLLOW_PER_S := 0.5
+## LIFE_DESIGN round 3: a newly moulted spider is pale and soft; the colour darkens back as the skin hardens. 1 just moulted, 0 hard.
+var softness: float = 0.0
+const PALE := Color(0.78, 0.70, 0.56)
 var _prepare_time := 0.0
 
 
@@ -223,6 +226,14 @@ func _jump_pose(dt: float) -> void:
 		if landing_time >= LAND_S:
 			landing_time = -1.0
 	_abdomen.rotation.x = 0.55 * attachment_amount
+
+
+func set_softness(s: float) -> void:
+	if not is_finite(s):
+		return
+	softness = clampf(s, 0.0, 1.0)
+	_material("body").albedo_color = BODY_COLOR.lerp(PALE, softness * 0.75)
+	_material("leg").albedo_color = LEG_COLOR.lerp(PALE, softness * 0.6)
 
 
 func set_condition(energy: float) -> void:

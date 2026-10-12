@@ -47,6 +47,16 @@ func advance(seconds: float, asleep: bool) -> float:
 	return hours
 
 
+## A moult passing (LIFE_DESIGN round 3): the hours run at the sleeping rate and do not stop at morning. Returns the hours that passed.
+func advance_moult(seconds: float) -> float:
+	if not is_finite(seconds) or seconds <= 0.0:
+		return 0.0
+	sleeping = false
+	var hours := seconds * SLEEP_HOURS_PER_S
+	_add_hours(hours)
+	return hours
+
+
 func _add_hours(hours: float) -> void:
 	hour += hours
 	while hour >= 24.0:

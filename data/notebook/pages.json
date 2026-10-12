@@ -174,6 +174,38 @@
 				"Jakob, E. M., Marshall, S. D. & Uetz, G. W. (1996). Estimating fitness: a comparison of body condition indices. Oikos 77: 61-67.",
 				"Foelix, R. F. (2011). Biology of Spiders, 3rd edition. Oxford University Press."
 			]
+		},
+		{
+			"id": "outgrowing_a_skin",
+			"trigger": "moult_ready",
+			"title": "Outgrowing a skin",
+			"text": "A spider's hard outer skin cannot stretch, so to grow it must shed it. This is called moulting. Spiders of the related species Phidippus johnsoni stay in their silk nest for about six days before a moult and two days after it.",
+			"game": "Rest in the crack when your spider is ready. Real spiders usually stop eating before a moult; here the spider can still eat, and the days are compressed.",
+			"sources": [
+				"Foelix, R. F. (2011). Biology of Spiders, 3rd edition. Oxford University Press.",
+				"Jackson, R. R. (1979). Nests of Phidippus johnsoni (Araneae, Salticidae): characteristics, pattern of occupation, and function. Journal of Arachnology 7: 47-58."
+			]
+		},
+		{
+			"id": "new_skin",
+			"trigger": "moulted",
+			"title": "A new skin",
+			"text": "In a moult the spider pulls itself out of its old skin and leaves an empty husk behind. The new skin is pale and soft at first and hardens over the following hours. Until it does, the spider is more easily hurt.",
+			"game": "Your spider is paler and its jumps shorter while the new skin hardens. How long that takes for a jumping spider has not been measured; the game's timing is a guess. Look for the old skin in the crack.",
+			"sources": [
+				"Foelix, R. F. (2011). Biology of Spiders, 3rd edition. Oxford University Press."
+			]
+		},
+		{
+			"id": "grown_up",
+			"trigger": "adult",
+			"title": "Grown up",
+			"text": "Jumping spiders moult several times before they are adults. In the field, males of the related Phidippus johnsoni became adult after about six to eight moults and females after about seven to nine. Bold jumping spiders spend the winter as juveniles and become adults in spring.",
+			"game": "Your spider is an adult: you have finished the main life. The game shows only its last three moults.",
+			"sources": [
+				"Jackson, R. R. (1978). The life history of Phidippus johnsoni (Araneae, Salticidae). Journal of Arachnology 6: 1-29.",
+				"Taylor, B. B. & Peck, W. B. (1975). A comparison of northern and southern forms of Phidippus audax. Journal of Arachnology 2: 89-99."
+			]
 		}
 	]
 }

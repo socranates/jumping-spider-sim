@@ -44,6 +44,12 @@ func _ready() -> void:
 		soundscape.caption.connect(func(text: String) -> void:
 			if text.begins_with("[buzzing"):
 				notebook.notice("buzz"))
+	if habitat_loop != null and habitat_loop.has_signal("moulted"):
+		habitat_loop.moult_ready.connect(func() -> void: notebook.notice("moult_ready"))
+		habitat_loop.moulted.connect(func(stage: int) -> void:
+			notebook.notice("moulted")
+			if stage >= 3:
+				notebook.notice("adult"))
 	if habitat_loop != null and habitat_loop.has_signal("woke"):
 		habitat_loop.woke.connect(func(_day: int) -> void: notebook.notice("sleep"))
 	if needs != null and needs.has_signal("energy_changed"):

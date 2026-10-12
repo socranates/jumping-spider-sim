@@ -232,6 +232,7 @@ func _ready() -> void:
 		if restored:
 			habitat_loop.apply_record(restore_record["habitat"])
 			habitat_loop.clock.load_dict(restore_record["life"])
+			habitat_loop.growth.load_dict(restore_record["growth"])
 		add_child(habitat_loop)
 	vibration = VibrationSense.new()
 	vibration.name = "VibrationSense"
@@ -352,6 +353,15 @@ func _ready() -> void:
 		_apply_game_speed()
 
 
+## The spider's jump reach: the player's "Jump reach" setting, times the growth's (LIFE_DESIGN round 3: a newly moulted, soft spider
+## jumps less far until its skin hardens).
+func apply_reach() -> void:
+	if spider == null:
+		return
+	var growth_factor: float = habitat_loop.growth.reach_factor() if habitat_loop != null else 1.0
+	spider.set_reach_factor(float(settings.get_value("jump_reach")) * growth_factor)
+
+
 ## The notebook comes after the pause menu in the tree, so its keys are read first while it is open (Esc closes the notebook, not the menu).
 func _add_notebook() -> void:
 	notebook = FieldNotebook.new()
@@ -426,7 +436,7 @@ func _on_setting_changed(key: String) -> void:
 	if key == "struggle_auto" and feeding != null:
 		feeding.struggle_auto = bool(settings.get_value("struggle_auto"))
 	if key == "jump_reach" and spider != null:
-		spider.set_reach_factor(float(settings.get_value("jump_reach")))
+		apply_reach()
 	if key == "capture_assist" and prey != null:
 		prey.assist = bool(settings.get_value("capture_assist"))
 

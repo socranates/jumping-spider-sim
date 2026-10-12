@@ -31,6 +31,7 @@ uniform vec2 retinal_half_deg = vec2(2.5, 10.0);
 uniform vec2 left_deg = vec2(-2.5, 0.0);
 uniform vec2 right_deg = vec2(2.5, 0.0);
 uniform float torsion = 0.0;
+uniform vec2 torsion_cs = vec2(1.0, 0.0);   // cos and sin of the torsion, worked out once a frame rather than per pixel
 uniform float tan_half_fov = 0.8391;
 uniform float aspect = 1.7778;
 uniform float blur_px = 7.0;              // radius of the secondary eyes' blur, in pixels
@@ -41,10 +42,13 @@ uniform float flicker = 1.0;              // 0..1, the shimmer's pulse now
 uniform bool colour_free = false;         // comfort: the same brightness, shown grey
 
 // Soft bent strips suggest boomerang-shaped retinas in one fused view.
+// The six blur reads: a golden-angle spiral over the unit disc (fixed, so no trigonometry per pixel).
+const vec2 TAPS[6] = vec2[](vec2(0.23825, 0.16300), vec2(-0.49499, 0.07058), vec2(0.40965, -0.49885), vec2(0.04130, 0.76265), vec2(-0.61867, -0.60601), vec2(0.95689, 0.03200));
+
 float retina(vec2 angle, vec2 centre, float bend) {
     vec2 p = angle - centre;
-    float c = cos(torsion);
-    float s = sin(torsion);
+    float c = torsion_cs.x;
+    float s = torsion_cs.y;
     p = vec2(c * p.x + s * p.y, -s * p.x + c * p.y);
     p.x -= bend * abs(p.y) * 0.18;
     return 1.0 - smoothstep(0.85, 1.7, length(p / retinal_half_deg));
@@ -55,22 +59,22 @@ void fragment() {
 	vec2 px = SCREEN_PIXEL_SIZE;
     vec2 angle = degrees(atan((uv - vec2(0.5)) * 2.0 * tan_half_fov * vec2(aspect, 1.0)));
     float sharp = principal * max(retina(angle, left_deg, -1.0), retina(angle, right_deg, 1.0));
-	// Secondary eyes: coarse cells, then a soft disc around each.
+	// Secondary eyes: coarse cells, then a soft disc around each. T13b (PERF-01): six reads instead of twelve, spread over the same
+	// disc (each read is already a 2 x 2 average), for about the same softness at half the reads.
 	vec2 cell = px * grain_px;
 	vec2 base = (floor(uv / cell) + 0.5) * cell;
 	vec3 acc = vec3(0.0);
-	for (int i = 0; i < 12; i++) {
-		float a = float(i) * 2.39996;
-		float r = sqrt((float(i) + 0.5) / 12.0) * blur_px;
-		acc += texture(screen_tex, base + vec2(cos(a), sin(a)) * r * px).rgb;
+	for (int i = 0; i < 6; i++) {
+		acc += texture(screen_tex, base + TAPS[i] * blur_px * px).rgb;
 	}
-	vec3 coarse = acc / 12.0;
+	vec3 coarse = acc / 6.0;
     // RGB has no UV data: blue is NOT ultraviolet. Illustrative green-weighted
     // brightness, not calibrated spectral sensitivity. Red is dim, not absent.
     vec3 weights = vec3(0.08, 0.84, 0.08);
     float green_side = dot(coarse, weights);
     vec3 side = vec3(green_side) * (colour_free ? vec3(0.97) : vec3(0.94, 1.0, 0.94));
-    float green_centre = dot(texture(screen_tex, uv).rgb, weights);
+    // The full-size picture is read only where some of it shows (the sharp retinal fields), not over the whole soft surround.
+    float green_centre = sharp > 0.001 ? dot(texture(screen_tex, uv).rgb, weights) : 0.0;
     vec3 centre = green_centre * (colour_free ? vec3(1.0) : vec3(0.88, 1.0, 0.76));
     vec3 col = mix(side, centre, sharp);
     // Motion in the surround: a soft halo and a ring that pulse against the local brightness, so they read on pale and dark ground.
@@ -204,6 +208,7 @@ func refresh() -> void:
 	_material.set_shader_parameter("left_deg", left_scan_deg)
 	_material.set_shader_parameter("right_deg", right_scan_deg)
 	_material.set_shader_parameter("torsion", scan_torsion)
+	_material.set_shader_parameter("torsion_cs", Vector2(cos(scan_torsion), sin(scan_torsion)))
 	_material.set_shader_parameter("tan_half_fov", tan(fov * 0.5))
 	_material.set_shader_parameter("aspect", size.x / maxf(size.y, 1.0))
 	_material.set_shader_parameter("principal", principal)

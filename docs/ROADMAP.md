@@ -92,6 +92,8 @@ See [handoff](HANDOFF-release-slice.md), [export limitations](verification/relea
 
 ## After that: one whole life (spec phase 4)
 
+**The plan, with the biology and the order of rounds: `docs/LIFE_DESIGN.md` (Claude, 2026-10-12). Death decided by Nathan: LIFE-01.**
+
 - **Needs that matter:** hunger has consequences, and rest matters. The survival-pressure setting becomes useful then (T9e-02).
 - **Growth and moulting:** a few instars, with a vulnerable moult in the retreat.
 - **One predator.** A windowsill candidate is a cellar spider (*Pholcus*), which is known to eat other spiders. A house centipede is another option. The choice should be checked against the literature first.

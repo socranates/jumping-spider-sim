@@ -11,7 +11,7 @@
 
 Then Claude does clocks and hunger. Nathan has four questions at the end of `docs/LIFE_DESIGN.md`.
 
-Evidence: see DECISIONS PERF-02 and SESSION_LOG.
+Evidence **2c7264139c03**: 591/591 (Linux headless, fixed 60 fps). Not run on Windows.
 
 ---
 

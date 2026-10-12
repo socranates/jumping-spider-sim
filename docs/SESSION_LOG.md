@@ -1077,3 +1077,4 @@ Chet reviews this entry, `docs/HANDOFF-chunk-7.md` and the tests named above. Na
 - Nathan: "death can be real and jarring. not sensationalized but my kids are allowed to encounter reality. do whatever you think needs done before another handoff to chet". LIFE-01.
 - The eye picture is cheaper: 12 to 6 blur reads, and no full-size read outside the sharp fields. On llvmpipe its cost fell from about 32 to about 22 ms at 720p; the look is within about 2/255. A mipmap variant was slower on llvmpipe; it is left for a laptop trial. PERF-02.
 - A background literature search on *P. audax* life history, moulting, starvation, predators and escape behaviour went into `docs/LIFE_DESIGN.md` (LIFE-02). The mud dauber wasp is the best-supported windowsill predator. Most numbers come from excerpts and are marked to be read before they are taught.
+- Final: evidence 2c7264139c03, 591 of 591 (fixed 60 fps, Linux headless); eye tests 21 of 21. Not run on Windows.

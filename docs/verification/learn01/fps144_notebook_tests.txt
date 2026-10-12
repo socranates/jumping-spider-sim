@@ -1,0 +1,32 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS     test_learn01_notebook.gd::test_a_new_page_says_so_unless_turned_off  [9 ms]  4 checks
+PASS     test_learn01_notebook.gd::test_a_page_opens_once_and_the_notebook_keeps_them  [4 ms]  12 checks
+PASS     test_learn01_notebook.gd::test_every_page_is_complete_short_and_sourced  [1 ms]  61 checks
+PASS     test_learn01_notebook.gd::test_play_opens_pages  [374 ms]  14 checks
+PASS     test_learn01_notebook.gd::test_the_key_and_button_can_be_changed_and_the_menu_offers_it  [48 ms]  6 checks
+PASS     test_learn01_notebook.gd::test_the_panel_opens_pauses_lists_only_found_pages_and_closes  [11 ms]  10 checks
+PASS     test_pause_menu.gd::test_panel_controls_write_through_to_saved_settings  [26 ms]  20 checks
+PASS     test_pause_menu.gd::test_pause_toggles_the_tree_and_shows_the_panel  [20 ms]  4 checks
+PASS     test_pause_menu.gd::test_the_pause_action_toggles_pause  [23 ms]  2 checks
+PASS     test_t09d_controller_presets.gd::test_a_button_in_use_is_swapped_and_menu_guide_and_sticks_are_kept  [4 ms]  14 checks
+PASS     test_t09d_controller_presets.gd::test_a_damaged_bindings_file_keeps_the_default_buttons  [0 ms]  5 checks
+PASS     test_t09d_controller_presets.gd::test_a_preset_changes_the_running_game  [18 ms]  5 checks
+ERROR: Settings: unknown preset 'nonsense'
+   at: push_error (core/variant/variant_utility.cpp:1023)
+   GDScript backtrace (most recent call first):
+       [0] apply_preset (res://scripts/presentation/settings.gd:360)
+       [1] test_a_preset_sets_its_switches_and_survives_a_restart (res://tests/integration/test_t09d_controller_presets.gd:255)
+       [2] _run_one (res://tests/test_runner.gd:217)
+       [3] _run (res://tests/test_runner.gd:143)
+       [4] _run_one (res://tests/test_runner.gd:239)
+       [5] test_a_preset_changes_the_running_game (res://tests/integration/test_t09d_controller_presets.gd:296)
+       [6] spawn_prey_world (res://tests/prey_test_case.gd:24)
+       [7] wait_until (res://tests/test_case.gd:68)
+PASS     test_t09d_controller_presets.gd::test_a_preset_sets_its_switches_and_survives_a_restart  [4 ms]  45 checks, 1 expected engine error(s) printed above
+PASS     test_t09d_controller_presets.gd::test_a_remapped_controller_button_drives_the_action_and_survives_a_restart  [1 ms]  8 checks
+PASS     test_t09d_controller_presets.gd::test_every_prompt_names_the_controller_buttons_the_player_chose  [51 ms]  8 checks
+PASS     test_t09d_controller_presets.gd::test_the_pause_menu_offers_the_presets_in_words  [25 ms]  10 checks
+PASS     test_t09d_controller_presets.gd::test_the_pause_menu_remaps_a_controller_button_or_trigger  [26 ms]  20 checks
+evidence_id: 9d96a61e810c (source f2251bd8, settings 8b6707d4, tests 8d07ff67)
+SUMMARY tests=17 passed=17 failed=0 not_run=0 seed=20261005 filter=only=unit,integration,gates,files=test_learn01_notebook.gd,test_pause_menu.gd,test_t09d_controller_presets.gd result=PASS

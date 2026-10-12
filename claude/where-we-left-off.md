@@ -1,3 +1,20 @@
+# Current handoff - Claude, 2026-10-12 (naturalist's notebook)
+
+**Latest: the naturalist's notebook (LEARN-02 to LEARN-04).**
+- Built while Chet's round was paused, kept on Claude's branch, and merged after his friends-slice round.
+- 14 short, sourced pages open the first time things happen in play. N / D-pad up, or the Esc menu, opens the notebook.
+- Pages are in `data/notebook/pages.json`; how far each source was checked is in `docs/NOTEBOOK_SOURCES.md`.
+- It is the player's own file (`user://notebook.cfg`). Tests never write it.
+- The friend ZIPs Chet made (from 48b84a0) do **not** include the notebook. A rebuild is needed if friends should see it.
+- Evidence after the merge: see DECISIONS LEARN-04 and SESSION_LOG.
+
+Next, by the release road (ROADMAP, "The goal"):
+1. Read the friends' feedback (`docs/FRIEND_PLAYTEST.md`).
+2. The eye-view shader is the first measured performance target (`docs/verification/release-slice/PERFORMANCE.md`).
+3. Then "one whole life".
+
+---
+
 # Current handoff - Chet, 2026-10-12 (friends slice)
 
 **Read docs/HANDOFF-release-slice.md first.** Game remains 48b84a0/T13a;

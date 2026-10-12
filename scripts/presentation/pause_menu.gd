@@ -24,6 +24,7 @@ var _preset_note: Label
 var _keys_box: Control
 var _keys_toggle: Button
 var _view_button: Button
+var _notebook_button: Button
 var _keys_status: Label
 var _scroll: ScrollContainer
 var _switches: GridContainer
@@ -85,6 +86,9 @@ func _refresh() -> void:
 	_refresh_presets()
 	if _view_button != null:
 		_view_button.text = KeyNames.apply("Third person (V / Y)" if bool(settings.get_value("eye_view")) else "First person (V / Y)", settings)
+	if _notebook_button != null:
+		_notebook_button.text = KeyNames.apply("Notebook (N / D-pad up)", settings)
+		_notebook_button.visible = world != null and world.get("notebook_panel") != null
 
 
 func _build() -> void:
@@ -161,6 +165,7 @@ func _build() -> void:
 	_add_check(switches, "captions", "Captions for sounds and vibrations")
 	_add_check(switches, "haptics", "Controller rumble for vibrations")
 	_add_check(switches, "headphones", "Headphones (deep, full sound; off: tuned for speakers)")
+	_add_check(switches, "notebook_notes", "Say when a new notebook page opens")
 	var buttons := HFlowContainer.new()  # wraps onto a second row on a narrow window or with large text
 	buttons.add_theme_constant_override("h_separation", 12)
 	buttons.add_theme_constant_override("v_separation", 8)
@@ -182,6 +187,14 @@ func _build() -> void:
 		settings.set_value("eye_view", not bool(settings.get_value("eye_view")))
 		_refresh())
 	buttons.add_child(_view_button)
+	# LEARN-01: the naturalist's notebook (shown only in a world that has one).
+	_notebook_button = Button.new()
+	_notebook_button.name = "Notebook"
+	_notebook_button.pressed.connect(func() -> void:
+		var panel: Variant = world.get("notebook_panel") if world != null else null
+		if panel != null:
+			panel.open("", _notebook_button))
+	buttons.add_child(_notebook_button)
 	_keys_toggle = Button.new()
 	_keys_toggle.name = "KeysToggle"
 	_keys_toggle.text = "Keys and buttons..."

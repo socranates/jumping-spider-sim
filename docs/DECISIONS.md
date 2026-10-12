@@ -403,3 +403,18 @@ Nathan: "chet just finished and its freakin amazing you guys are making this so 
 - **RELEASE-02 Label test builds and preserve evidence scope.** Package Windows x64 and web from unchanged game source 48b84a0 (585/585 Windows, db112e2fa006), with controls, engine notices and checksums. No public release or itch.io upload yet. Binary ZIPs stay outside Git; reproducible instructions and evidence stay in Git.
 - **PERF-01 Measure before simplifying.** Five-minute real rendered, scripted windowsill run at 720p on battery: 56.8 fps average, 21.448 ms p95; eye view is slowest. F01's measured-misses/report alternative is satisfied, not its 16.7 ms target. Retain capture/setup spikes and state instrumentation limits. Next: capture-free release A/B, eye blur cost, named physics timers and first-use hunt work. No twitch, SimClock or game-physics change.
 - **RELEASE-03 Do not turn automation limits into a pass.** Both exports render; browser inputs and preference reload worked. Native tool gives V/Escape the same wrong physical code, so native keyboard play is inconclusive. Controller-only play and sound listening need people/hardware. Browser UnknownError remains unexplained. Every gate is labelled in verification/release-slice/GATES.md, including superseded S01 and open human gates.
+
+## LEARN-01, first notebook — Claude, 2026-10-11
+
+Built while Chet's round (ROADMAP step 6) was paused; kept on Claude's branch until his round is in main.
+
+- **LEARN-02 The naturalist's notebook, first version.** Spec 4 calls for "an optional naturalist notebook with sourced facts, separated from in-world perception".
+  - **Pages:** fourteen, in `data/notebook/pages.json`. Each page is a few true sentences, an "In this game" line where the game simplifies, and full sources.
+  - **When pages open:** the first time something happens in play: the start, a jump, a far jump and a long one, the spider-eye view, 20 s and 60 s in it, the motion shimmer, a fly recognised, a catch, a meal, a felt vibration, a buzz, a rest.
+  - **Where it is kept:** the notebook belongs to the player. It lives in its own file, `user://notebook.cfg`, and only when settings are saved, never in a test's world. It survives checkpoints and new lives, and is never part of the world's snapshot. It decides nothing in the game.
+  - **On screen:** N (controller: D-pad up), or "Notebook" in the Esc menu, opens it and the game waits. Esc, B or N closes it.
+  - **No checklist:** only found pages are listed, with no count of pages left (spec 4: discovery must not become a completion checklist).
+  - **New-page note:** a short note at the bottom left says when a page opens; the setting "notebook_notes" turns it off.
+  - **Remapping:** the key and the button can be changed like the others.
+- **LEARN-03 Sources and honesty.** `docs/NOTEBOOK_SOURCES.md` records how far each source was checked. Citations were confirmed, but no paper was read in full this round, so the pages stay within what abstracts and textbooks state. Each source should be read before a public release. Several pages name what the game simplifies: depth from defocus, UV, the retreat not yet spun, the venom's timing.
+- **LEARN-04 Evidence.** 9d96a61e810c: 591 / 591 (Linux headless, fixed 60 fps; the same after merging Chet's friends-slice round, which changed no game code), including 6 new tests (`tests/integration/test_learn01_notebook.gd`). Notebook, pause-menu and controller tests: 17 / 17 at fixed 30 and 144 fps. Stills and reports are in `docs/verification/learn01/`. Not run on Windows.

@@ -48,6 +48,9 @@ const NeedsHud = preload("res://scripts/presentation/needs_hud.gd")
 const Checkpoint = preload("res://scripts/persistence/checkpoint.gd")
 const CheckpointStore = preload("res://scripts/persistence/checkpoint_store.gd")
 const SupportMath = preload("res://scripts/movement/support_math.gd")
+const FieldNotebook = preload("res://scripts/learning/field_notebook.gd")
+const NotebookWatch = preload("res://scripts/learning/notebook_watch.gd")
+const NotebookPanel = preload("res://scripts/presentation/notebook_panel.gd")
 const MAIN_SCENE_PATH := "res://scenes/main.tscn"
 
 const PROFILE_PATH := "res://data/species/phidippus_audax_prototype.json"
@@ -111,6 +114,12 @@ var slow_motion_hud: CanvasLayer  # T11a: says when slow motion is on, and switc
 var vibration: Node  # T12a: what the spider feels through its feet (every world)
 var soundscape: Node3D  # T12a: room and fly sounds (played worlds only)
 var sense_hud: CanvasLayer  # T12a: captions and vibration ripples (played worlds only)
+## LEARN-01: the naturalist's notebook, what opens its pages, and its pages on screen (played worlds only). It is the player's: kept in
+## NOTEBOOK_PATH when settings are saved (never in a test's or a capture's world), and never part of the world's checkpoint.
+const NOTEBOOK_PATH := "user://notebook.cfg"
+var notebook: Node
+var notebook_watch: Node
+var notebook_panel: CanvasLayer
 var perception_debug: PerceptionDebug
 var prey_debug: PreyDebug
 ## Surface profiles by id (data/surfaces).
@@ -329,9 +338,35 @@ func _ready() -> void:
 		tether_debug = TetherDebug.new()
 		tether_debug.motor = spider
 		support_debug.add_child(tether_debug)
+		_add_notebook()
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 		_apply_ui_scale()
 		_apply_game_speed()
+
+
+## The notebook comes after the pause menu in the tree, so its keys are read first while it is open (Esc closes the notebook, not the menu).
+func _add_notebook() -> void:
+	notebook = FieldNotebook.new()
+	notebook.name = "Notebook"
+	notebook.path = NOTEBOOK_PATH if bool(settings.get("autosave")) else ""
+	notebook.load_saved()
+	add_child(notebook)
+	notebook_panel = NotebookPanel.new()
+	notebook_panel.notebook = notebook
+	notebook_panel.settings = settings
+	add_child(notebook_panel)
+	notebook_watch = NotebookWatch.new()
+	notebook_watch.notebook = notebook
+	notebook_watch.spider = spider
+	notebook_watch.camera_rig = camera_rig
+	notebook_watch.eye_overlay = eye_overlay
+	notebook_watch.memory = memory
+	notebook_watch.prey = prey
+	notebook_watch.feeding = feeding
+	notebook_watch.vibration = vibration
+	notebook_watch.soundscape = soundscape
+	notebook_watch.habitat_loop = habitat_loop
+	add_child(notebook_watch)
 
 
 func _resolved_prey_seed() -> int:

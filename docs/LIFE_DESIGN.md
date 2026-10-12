@@ -103,10 +103,10 @@ Courtship and eggs (phase 5), seasons and overwintering, drinking (no jumping-sp
 | Mode | World rules | Available | Counts toward finishing |
 |---|---|---|---|
 | The Windowsill (the main life) | Standard: hunger, the wasp, real death (LIFE-01) | From the start | Yes |
-| The Windowsill on Easy | Gentle: no death, forgiving hunger | After finishing the main life once | Proposed: no |
+| The Windowsill on Easy | Gentle: no death, forgiving hunger | After finishing the main life once | No |
 | Free play | Easy and relaxed, its own save | From the start | No |
 
-Control helps (Most help and the other presets, slow motion, Reduced motion) stay available in every mode; only the world's rules are locked (proposed, see MODES-01). "Finishing" proposed as one spider reaching adulthood. Death and continuing (round 5) builds these modes and the unlock.
+Control helps (Most help and the other presets, slow motion, Reduced motion) stay available in every mode; only the world's rules are locked. "Finishing" is one spider reaching adulthood. Both confirmed by Nathan (MODES-01). Death and continuing (round 5) builds these modes and the unlock.
 
 ## Order of work
 

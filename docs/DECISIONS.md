@@ -472,3 +472,11 @@ Nathan, while Chet's measuring round was paused: "if there is anything at all yo
   - **Free play:** a separate mode for easy, relaxed play on the sill, with its own save. It does not count toward finishing the main life. It can be played from the start.
   - **Proposed, for Nathan to confirm.** What is locked is how hard the world is: survival pressure, the predator, death. How the controls help is not locked: aim help, holding prey automatically, toggles, slow motion, Reduced motion and text size stay available everywhere. Spec 17 keeps "survival pressure and execution difficulty" independent, and locking control helps would shut out players who need them, including Nathan's son, who uses Most help.
   - **Proposed:** "finishing the game" means bringing one spider through its whole life to adulthood (LIFE_DESIGN.md: three moults). Courtship and eggs come later, in phase 5.
+- **FEEL-01 It must feel like being the little spider.** Nathan, 2026-10-12: "it needs to feel really like being the little spider." This is a test for every feature, alongside scientific realism.
+  - Does it put the player at the spider's size, in its senses, its caution and its vulnerability? Or does it feel like a person looking down at a toy?
+  - Consequences to weigh as we build:
+    - The camera low and close.
+    - Scale cues from the human world: a mug, a pencil, a hand or footsteps through the sill.
+    - A predator that is huge and fast at this size.
+    - Sounds heard from the spider's place in the room.
+    - The eye view as a first-class way to play.

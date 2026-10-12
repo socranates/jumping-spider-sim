@@ -1,0 +1,19 @@
+{
+  "game_source_commit": "fa32368",
+  "evidence_id": "2c7264139c03",
+  "windows_tests_passed": 591,
+  "engine": "Godot 4.7.2 stable official",
+  "date": "2026-10-12",
+  "files": [
+    {
+      "name": "The-Windowsill-web-fa32368.zip",
+      "bytes": 10763156,
+      "sha256": "f8438c7959d4babe3103535de6326c42a3036e288dd457fd9d155596953fa52d"
+    },
+    {
+      "name": "The-Windowsill-windows-fa32368.zip",
+      "bytes": 38593820,
+      "sha256": "45b97010ba27a8a8801d257dd38dd9949461c69e9600ae67ab985c61f7608f8f"
+    }
+  ]
+}

@@ -37,6 +37,9 @@ func run() -> void:
 	world.checkpoint_dir = "user://profile_only_checkpoint"
 	world.prey_seed = 4242
 	root.add_child(world)
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--shader-file="):
+			world.eye_overlay.get_node("EyeView").material.shader.code = FileAccess.get_file_as_string(arg.trim_prefix("--shader-file="))
 	var layer := CanvasLayer.new()
 	root.add_child(layer)
 	label = Label.new()
@@ -70,7 +73,8 @@ func _process(_delta: float) -> bool:
 			world.spider.teleport_to(Transform3D(Basis(Vector3.UP, -PI / 2), Vector3(-15.5, 0.31, 6)))
 			# A reproducible hunt encounter; normal fly senses/flight remain enabled.
 			world.prey.spawn_fly("sill_first_hunt", 4243)
-		capture_phase.call_deferred(phase)
+		if "--no-screenshots" not in OS.get_cmdline_user_args():
+			capture_phase.call_deferred(phase)
 	label.text = "REAL-TIME PROFILE / %s / %ds of 300s" % [["orbit route", "eye route", "eye 25%", "orbit 25%", "hunt attempts"][phase], int(elapsed)]
 	var vp := root.get_viewport_rid()
 	rows.append("%.6f,%d,%.4f,%.4f,%.4f,%.4f,%.4f,%d,%d,%d,%d,%s" % [elapsed, phase,

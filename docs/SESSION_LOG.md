@@ -1079,6 +1079,13 @@ Chet reviews this entry, `docs/HANDOFF-chunk-7.md` and the tests named above. Na
 - A background literature search on *P. audax* life history, moulting, starvation, predators and escape behaviour went into `docs/LIFE_DESIGN.md` (LIFE-02). The mud dauber wasp is the best-supported windowsill predator. Most numbers come from excerpts and are marked to be read before they are taught.
 - Final: evidence 2c7264139c03, 591 of 591 (fixed 60 fps, Linux headless); eye tests 21 of 21. Not run on Windows.
 
+## 2026-10-12 - Chet - LIFE round 0, laptop eye comparison and rebuild
+
+- Updated laptop and working main to fa32368. Confirmed 591/591 Windows fixed60, evidence 2c7264139c03. No game-code changes.
+- Ran old/T13b five-minute live graphical routes sequentially, plugged in, no screenshot readback. Eye GPU p95 down 16-19%; overall frame p95 18.109 ms still misses target. Both hunts captured/subdued prey. Frozen-view screen rejected four-read mipmap candidate; retained production six-read shader.
+- Rebuilt Windows/web release friend ZIPs including notebook, controls/readme and licenses. Verified ZIP CRCs/layout, native executable rendering, browser eye rendering, W/V/T and N notebook. Preserved persistent Chromium error and native physical-input/listening limitations.
+- Saved raw compressed traces, logs, power records, summaries, screenshots and checksums in verification/eye-perf/. Added measurement script UID and capture-free profiling option; production twitch/SimClock unchanged. Updated handoff, plan and decisions. Finish on main and update laptop; final commit in chat.
+
 ### 2026-10-12: LIFE round 1, clocks and hunger (Claude, cloud session)
 - Chet's measuring round paused (out of usage). Nathan: "if there is anything at all you can think of to do feel free". Built LIFE_DESIGN round 1 on Claude's branch only; it is merged after Chet's round.
 - Life clock (day, hour; about 12 waking hours in 15 minutes); sleeping in the retreat from 18:00 to 07:00 in bounded steps, with a morning checkpoint; hunger by game hours in life mode (no floor, starving hours counted, no death yet); day and night light; 30 % sight at night; the abdomen shows condition; checkpoint schema 4; three notebook pages. LIFE-04 to LIFE-09.

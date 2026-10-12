@@ -31,7 +31,7 @@ The first release is one complete, calm, true-to-life game:
     - text size;
     - Reduced motion.
   - The spider-eye view (V / Y).
-- **Tests:** 585/585 on Windows after T13a, evidence db112e2fa006 (Chet, tested 2026-10-11).
+- **Tests:** 591/591 on Windows after T13b/notebook, evidence 2c7264139c03 (Chet, 2026-10-12).
 - **Gate audit:** [every gate and its evidence](verification/release-slice/GATES.md).
   - Passed regression gates: M01-M03, P01, A01, L01, S01-C, S02; W01 has automated pause plus rendered warning evidence.
   - F01 measurement/report clause completed; strict 16.7 ms p95 budget missed on this laptop. See [measurements and reduction plan](verification/release-slice/PERFORMANCE.md).
@@ -89,6 +89,8 @@ See [handoff](HANDOFF-release-slice.md), [export limitations](verification/relea
 - Package a Windows build and a web build and play both.
 - Mark every gate passed, failed or not run, with evidence.
 - Phase 3 is not declared fully closed until the remaining gate evidence is obtained.
+
+LIFE round 0 complete: [laptop eye comparison and refreshed notebook friend builds](HANDOFF-eye-perf-windows.md). Six-read T13b retained; GPU cost lower, strict frame-pacing target remains open. Claude: clocks and hunger next.
 
 ## After that: one whole life (spec phase 4)
 

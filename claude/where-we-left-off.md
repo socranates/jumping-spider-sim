@@ -1,3 +1,36 @@
+# Current handoff - Claude, 2026-10-12 (LIFE round 1: clocks and hunger)
+
+**Read docs/HANDOFF-life-round1.md.** It was built while Chet's measuring round was paused, and merged on top of it (798e098).
+- **Days and nights:** the life clock, a night's sleep in the crack from 18:00 with a morning checkpoint, day and night light, and the eyes reaching 30 % as far at night.
+- **Hunger:** by game hours on the windowsill (life mode, no floor, starving hours counted; no death yet). The abdomen shows condition.
+- **Saves and pages:** checkpoint schema 4; three notebook pages.
+- **Decisions:** LIFE-04 to LIFE-09.
+
+**Nathan's decisions this round:**
+- **MODES-01:** the main life is Standard until one spider reaches adulthood. Then Easy unlocks for it. Free play is separate and open from the start. Only the world's dangers are locked; control helps (Most help and the rest) work everywhere.
+- **FEEL-01:** "it needs to feel really like being the little spider".
+
+**Next (LIFE_DESIGN, "Order of work"):**
+- **Round 2, Chet:** play days and nights on the laptop. Check night light, the abdomen and frame time with the moving sun, and rebuild the friend ZIPs if Nathan wants them current.
+- **Round 3, Claude:** moulting.
+
+Evidence: see DECISIONS LIFE-09 and SESSION_LOG (merged result there too).
+
+---
+
+# Current handoff - Chet, 2026-10-12 (LIFE round 0 complete)
+
+**Read docs/HANDOFF-eye-perf-windows.md and docs/verification/eye-perf/WINDOWS-T13b.md.**
+
+- Windows **591/591**, evidence **2c7264139c03**. Game remains fa32368/T13b; this round changes docs and excluded measurement fixtures only.
+- Plugged-in screenshot-free live A/B: eye GPU p95 down **16-19%**. Whole-run frame p95 **18.109 ms**, still above 16.7 ms. Near 60 fps average for both under VSync. Keep six-read shader; four-read mipmap candidate was slower.
+- Fresh Windows/web ZIPs **include notebook N**, in Downloads/The-Windowsill-Playtest-2026-10-12-T13b. Manifest and screenshots in eye-perf/. Web eye view/notebook checked; Windows export launches/renders. No itch.io publication.
+- Browser Chromium UnknownError persists; native physical-key/controller play and sound listening remain human checks. No game physics, twitch or SimClock change.
+
+**Next: Claude, LIFE_DESIGN round 1, clocks and hunger.** Nathan's LIFE-03 answers stand. Chet pushes main and runs laptop update.bat; actual final commit is confirmed in chat. Older sections below are historical.
+
+---
+
 # Current handoff - Claude, 2026-10-12 (before Chet's measuring round)
 
 **Latest:**

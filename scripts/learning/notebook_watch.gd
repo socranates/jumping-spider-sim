@@ -15,7 +15,8 @@ var prey: Node3D             # PreyDirector: captured
 var feeding: Node            # FeedingController: feeding_ended
 var vibration: Node          # VibrationSense: felt
 var soundscape: Node         # caption
-var habitat_loop: Node       # rest_changed (the windowsill only)
+var habitat_loop: Node       # rest_changed, woke (the windowsill only)
+var needs: RefCounted        # NeedsModel: energy_changed (hungry, well fed)
 
 
 func _ready() -> void:
@@ -43,6 +44,14 @@ func _ready() -> void:
 		soundscape.caption.connect(func(text: String) -> void:
 			if text.begins_with("[buzzing"):
 				notebook.notice("buzz"))
+	if habitat_loop != null and habitat_loop.has_signal("woke"):
+		habitat_loop.woke.connect(func(_day: int) -> void: notebook.notice("sleep"))
+	if needs != null and needs.has_signal("energy_changed"):
+		needs.energy_changed.connect(func(_old: float, now: float) -> void:
+			if now <= notebook.HUNGRY_AT:
+				notebook.notice("hungry")
+			elif now >= notebook.WELL_FED_AT:
+				notebook.notice("well_fed"))
 	if habitat_loop != null and habitat_loop.has_signal("rest_changed"):
 		habitat_loop.rest_changed.connect(func(active: bool) -> void:
 			if active:

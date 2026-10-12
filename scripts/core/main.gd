@@ -191,6 +191,7 @@ func _ready() -> void:
 	if restored:
 		prey.restore_record = restore_record["prey"]
 		needs.load_dict(restore_record["needs"])
+	needs.life_mode = use_windowsill   # LIFE_DESIGN.md round 1: on the windowsill hunger runs by the life clock's hours
 	feeding = FeedingController.new()
 	feeding.name = "Feeding"
 	feeding.motor = spider
@@ -209,6 +210,12 @@ func _ready() -> void:
 	add_child(feeding)
 	prey.captured.connect(feeding.on_captured)
 	var body := spider.get_node_or_null("Body")
+	if body != null and body.has_method("set_condition"):
+		body.set_condition(needs.energy)
+		body.shown_condition = needs.energy
+		needs.energy_changed.connect(func(_old: float, now: float) -> void:
+			if is_instance_valid(body):
+				body.set_condition(now))
 	if body != null:
 		feeding.struggle_changed.connect(func(phase: String) -> void:
 			if not is_instance_valid(body):
@@ -224,6 +231,7 @@ func _ready() -> void:
 		habitat_loop.interactive = interactive
 		if restored:
 			habitat_loop.apply_record(restore_record["habitat"])
+			habitat_loop.clock.load_dict(restore_record["life"])
 		add_child(habitat_loop)
 	vibration = VibrationSense.new()
 	vibration.name = "VibrationSense"
@@ -366,6 +374,7 @@ func _add_notebook() -> void:
 	notebook_watch.vibration = vibration
 	notebook_watch.soundscape = soundscape
 	notebook_watch.habitat_loop = habitat_loop
+	notebook_watch.needs = needs
 	add_child(notebook_watch)
 
 

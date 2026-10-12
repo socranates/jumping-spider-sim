@@ -33,6 +33,19 @@ var _falling: Dictionary = {}  # piece -> seconds since it gave way (the mesh's 
 var pieces: Dictionary = {}
 var sun: DirectionalLight3D
 var shadow_band: MeshInstance3D
+## LIFE_DESIGN.md round 1: the light of the hour (set_daylight), 0 night to 1 day, and what makes it: the sun, the room's ambient light,
+## the sky behind the glass and the window's glow. Night is dim and blue, never black, so the sill can still be found.
+var daylight: float = 1.0
+var _env: Environment
+var _window_glow: MeshInstance3D
+var _disturbance: float = -1.0
+const SUN_DAY := 0.55
+const AMBIENT_DAY := 0.40
+const AMBIENT_NIGHT := 0.10
+const SKY_DAY := Color("9fb6bc")
+const SKY_NIGHT := Color("1d2633")
+const GLOW_DAY := Color("a9c2c1")
+const GLOW_NIGHT := Color("2c3747")
 
 func _ready() -> void:
 	box("sill_floor", Vector3(-30, -1, -12.5), Vector3(30, 0, 12.5), "painted_wood_dry", Color("b6a082"))
@@ -62,7 +75,7 @@ func _ready() -> void:
 	for z in [-10.0, -5.0, 0.0, 5.0, 10.0]:
 		visual_box("grain", Vector3(59, 0.008, 0.035), Vector3(0, 0.008, z), Color("a48d70"))
 	# A pale window above the rear wood trim establishes scale without glare.
-	visual_box("window_glow", Vector3(55, 10, 0.04), Vector3(0, 8, -12.44), Color("a9c2c1"))
+	_window_glow = visual_box("window_glow", Vector3(55, 10, 0.04), Vector3(0, 8, -12.44), GLOW_DAY)
 	for x in [-10.0, 10.0]:
 		visual_box("mullion", Vector3(0.7, 12, 0.1), Vector3(x, 8, -12.35), Color("e2dbc7"))
 	for d in get_prey_vents():
@@ -79,6 +92,7 @@ func _ready() -> void:
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	env.ambient_light_color = Color("dfddce")
 	env.ambient_light_energy = 0.40
+	_env = env
 	var background := WorldEnvironment.new()
 	background.environment = env
 	add_child(background)
@@ -200,11 +214,30 @@ func apply_changes(changes: Array) -> void:
 
 func show_disturbance(progress: float) -> void:
 	shadow_band.visible = progress >= 0.0 and progress <= 1.0
+	_disturbance = progress if shadow_band.visible else -1.0
 	if shadow_band.visible:
 		shadow_band.position.x = lerpf(-36, 36, progress)
-		sun.light_energy = 0.55 - 0.18 * sin(progress * PI)
-	else:
-		sun.light_energy = 0.55
+	_apply_light()
+
+
+## The light of the hour: `light` 0 (night) to 1 (day) from the life clock, and the sun lower in the sky early and late.
+func set_daylight(light: float, hour: float) -> void:
+	daylight = clampf(light, 0.0, 1.0)
+	var height := clampf(sin(PI * (hour - 6.0) / 14.0), 0.0, 1.0)
+	sun.rotation_degrees = Vector3(-lerpf(18.0, 55.0, height), 25.0, 0.0)
+	_apply_light()
+
+
+func _apply_light() -> void:
+	var shade := 0.18 * sin(_disturbance * PI) if _disturbance >= 0.0 else 0.0
+	sun.light_energy = maxf(0.0, (SUN_DAY - shade) * daylight)
+	sun.light_color = Color(1.0, 0.82, 0.66).lerp(Color.WHITE, smoothstep(0.0, 0.6, daylight))
+	if _env != null:
+		_env.ambient_light_energy = lerpf(AMBIENT_NIGHT, AMBIENT_DAY, daylight)
+		_env.ambient_light_color = Color("8fa3c4").lerp(Color("dfddce"), daylight)
+		_env.background_color = SKY_NIGHT.lerp(SKY_DAY, daylight)
+	if _window_glow != null:
+		(_window_glow.material_override as StandardMaterial3D).albedo_color = GLOW_NIGHT.lerp(GLOW_DAY, daylight)
 
 func box(id: String, lo: Vector3, hi: Vector3, profile: String, color: Color) -> void:
 	var body := StaticBody3D.new()

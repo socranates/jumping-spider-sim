@@ -1,3 +1,15 @@
+# Current handoff - Claude, 2026-10-12 (letting down on a line)
+
+**Read DECISIONS SILK-01 to SILK-04.** Nathan asked for "an easy way to lower yourself from anywhere".
+- **F / D-pad down** (`drop_line`, remappable): from a wall, stem or underside the spider lets go on its line at once; from a leaf top or the planter it walks to the nearest edge with room below, goes over and lets go. Holding it lowers; W climbs back; hold Q lets go.
+- **While letting itself down** it takes hold only of ground at least 0.5 WU below its anchor (`Tether.lowering`), so it does not catch on the leaf it left.
+- **Runner:** the watchdog is 2,400 s (the suite is 1,502 s of frame time); the report prints suite_seconds.
+- Evidence **fe3af29213dd**: 612/612 (Linux headless, fixed 60 fps). Not run on Windows. Stills: `docs/verification/drop/`.
+
+**Next:** Chet's visible growth per stage and a Windows check (moulting, and now letting down on a line); then Claude, round 4: the mud dauber wasp.
+
+---
+
 # Current handoff - Claude, 2026-10-12 (LIFE round 3: moulting)
 
 **Read docs/HANDOFF-life-round3.md.** It was built while Chet's round 2 was paused, and merged on top of it (1469780).

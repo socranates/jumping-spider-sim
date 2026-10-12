@@ -170,6 +170,8 @@ func _cancel_has_other_work() -> bool:
 		return false
 	if motor.is_preparing() or motor.is_airborne() or motor.is_on_line():
 		return true
+	if motor.has_method("is_drop_walking") and motor.is_drop_walking():
+		return true
 	if feeding_controller != null and feeding_controller.feeding:
 		return true
 	return jump_controller != null and jump_controller.has_method("is_busy") and jump_controller.is_busy()

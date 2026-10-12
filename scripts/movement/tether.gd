@@ -52,6 +52,8 @@ var snagged: bool = false
 var anchored_tick: int = -1
 ## First tick the line took the load after a miss (-1 until then).
 var caught_tick: int = -1
+## The spider let itself down on this line on purpose (SpiderMotor.begin_drop), rather than being caught by it after a miss.
+var lowering: bool = false
 
 
 func is_active() -> bool:
@@ -108,6 +110,7 @@ func clear() -> void:
 	block_reason = ""
 	snagged = false
 	caught_tick = -1
+	lowering = false
 
 
 ## Spec 21.3: lengths nonnegative and bounded, everything finite.
@@ -128,7 +131,7 @@ func to_dict() -> Dictionary:
 		"mode": mode_name(), "anchor_surface_id": anchor_surface_id, "anchor_local": anchor_local,
 		"paid_length": paid_length, "rest_length": rest_length, "max_length": max_length, "taut": taut,
 		"bend": bend_point if has_bend else null, "bend_surface_id": bend_surface_id if has_bend else "",
-		"reel_intent": reel_intent, "block_reason": block_reason, "snagged": snagged,
+		"reel_intent": reel_intent, "block_reason": block_reason, "snagged": snagged, "lowering": lowering,
 	}
 
 

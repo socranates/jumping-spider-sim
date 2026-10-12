@@ -104,12 +104,30 @@ static func anchor_hidden_text(has_bend: bool) -> String:
 	return ANCHOR_HIDDEN_BEND if has_bend else ANCHOR_HIDDEN
 
 
+## Letting down on a line (SpiderMotor.begin_drop): why it could not, by plan_drop()'s reason. A reason not listed says nothing (on
+## the line, holding the button lowers instead).
+const DROP_REFUSED := {
+	"no_edge": "Nothing below to let yourself down into from here",
+	"no_silk": "This surface won't hold your silk",
+	"stuck": "Couldn't get to the edge",
+}
+const DROP_WALK := "To the edge, to let yourself down"
+const DROPPED := "Letting yourself down: hold F / D-pad down to lower, W / stick up to climb"
+
+
 ## The toast for a SpiderMotor.line_event, "" when it needs none. `after_miss` says whether the line had been
-## locked by a miss, so an ordinary landing (which also completes a line) says nothing.
-static func line_toast(kind: String, detail: String, after_miss: bool) -> String:
+## locked by a miss, so an ordinary landing (which also completes a line) says nothing. `dropped` says the spider let itself
+## down on this line, so the line taking its weight is no surprise and says nothing.
+static func line_toast(kind: String, detail: String, after_miss: bool, dropped: bool = false) -> String:
 	match kind:
 		"caught":
-			return "Caught by your line"
+			return "" if dropped else "Caught by your line"
+		"drop_walk":
+			return DROP_WALK
+		"dropped":
+			return DROPPED
+		"drop_refused":
+			return str(DROP_REFUSED.get(detail, ""))
 		"completed":
 			return "Holding on again. The line stays behind for a moment" if after_miss else ""
 		"released":

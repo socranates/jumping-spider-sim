@@ -512,3 +512,21 @@ Built while Chet's round 2 was paused (out of usage, results not yet pushed), on
   - Checkpoints keep growth (stage, food since the last moult, readiness, the moult and the soft skin still to pass, where the old skins lie). Schema 4 upgrades to a young juvenile.
   - New pages: "Outgrowing a skin" (ready), "A new skin" (moulted), "Grown up" (adult). Sources are in NOTEBOOK_SOURCES.md.
 - **LIFE-13 Evidence.** f82620887f67: 605 / 605 (Linux headless, fixed 60 fps), including 5 new tests (`tests/integration/test_life03_moulting.gd`). Moulting, life, notebook, windowsill, checkpoint and jump-input tests: 61 / 61 at fixed 30 and 144 fps. Reports and stills are in `docs/verification/life03/`. Not run on Windows.
+
+## Letting down on a line (Claude, 2026-10-12)
+
+Nathan, after finding the dragline only by a missed jump at the dry leaf tip: "can you add an easy way to lower yourself from anywhere". Built on Claude's branch while Nathan tested moulting.
+
+- **SILK-01 One button lets the spider down on its line** (`SpiderMotor.begin_drop()`; the `drop_line` action, F and D-pad down, both remappable).
+  - **From a wall, a stem or an underside** it lets go at once.
+  - **From ground** (a leaf top, the planter, anything it stands on), it walks itself to the nearest edge with at least 1 WU of room below, goes over it as walking does, and lets go there. Of two edges equally near, the one it faces wins. Moving the stick or pressing cancel stops the walk.
+  - **The line** is anchored where it held on, and 0.5 WU of it runs out at once. After that it is the same line as after a miss: hold the button (or S / stick down) to lower, W / stick up to climb back, hold Q / B to let go.
+  - **Refused, and said so:** on the floor or the front lip (nothing below, or only a small step), on a surface that will not hold silk, and while feeding or resting.
+- **SILK-02 Letting itself down, it does not catch on what it brushes.** After a miss the spider takes hold of any face it touches. A spider that let itself down would then catch on the leaf it has just left. So, unless it is reeling in, it takes hold only of ground at least 0.5 WU below its anchor (the floor, a lower leaf), and slides past the rest. Reeling in, it takes hold of anything, as before.
+- **SILK-03 Biology.** No new claim is taught. Jumping spiders do let themselves down on draglines, but no source has been read for it yet, so the notebook's dragline page only gains a line about the game's button.
+- **SILK-04 Evidence.**
+  - fe3af29213dd: 612 / 612 (Linux headless, fixed 60 fps), including 7 new tests (`tests/integration/test_drop_line.gd`).
+  - The drop, line, silk, notebook and pause-menu tests: 63 / 63 at fixed 30 and 144 fps.
+  - Stills and a tick trace: `docs/verification/drop/`. Not run on Windows.
+  - The suite now runs past 1,500 s of frame time (1,502 s), so the runner's watchdog fired on a passing test. It is 2,400 s now, and the report prints `suite_seconds`.
+- The "New in your notebook" note now wraps at the bottom left, clear of the prompts centred at the bottom of the screen, which it used to overlap.

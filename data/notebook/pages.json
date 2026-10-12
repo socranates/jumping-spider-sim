@@ -16,7 +16,7 @@
 			"trigger": "jump",
 			"title": "A line before every leap",
 			"text": "Before it jumps, a jumping spider usually fixes a silk line to the surface behind it. In the air the line helps keep its body steady, and if it misses, it can hang from the line and climb back. Spiders of the species Hasarius adansoni landed more steadily when they had their line.",
-			"game": "The spider here dips its abdomen to fix the line, and a missed jump leaves it hanging. Reel in with W / stick up; let go with Q / B.",
+			"game": "The spider here dips its abdomen to fix the line, and a missed jump leaves it hanging. Reel in with W / stick up; let go with Q / B. F / D-pad down lets it down on its line from anywhere; hold it to keep lowering.",
 			"sources": [
 				"Chen, Y.-K., Liao, C.-P., Tsai, F.-Y. & Chi, K.-J. (2013). More than a safety line: jump-stabilizing silk of salticids. Journal of the Royal Society Interface 10: 20130572. https://pmc.ncbi.nlm.nih.gov/articles/PMC3758018/"
 			]

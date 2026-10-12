@@ -8,6 +8,8 @@ extends CanvasLayer
 const KeyNames = preload("res://scripts/presentation/key_names.gd")
 
 const NOTE_S := 6.0
+## Half the width of the prompts centred at the bottom of the screen (JumpHud's line panel, NeedsHud's prey prompts): the note stays left of them.
+const NOTE_CLEAR := 380.0
 const KEY_HINT := "N / D-pad up"
 
 var notebook: Node     # FieldNotebook
@@ -122,16 +124,19 @@ func _on_page_opened(id: String) -> void:
 	if settings != null and not bool(settings.get_value("notebook_notes")):
 		return
 	var p: Dictionary = notebook.page(id)
-	_note.text = KeyNames.apply("New in your notebook: %s    (%s to read)" % [str(p.get("title", "")), KEY_HINT], settings)
+	_note.text = KeyNames.apply("New in your notebook: %s\n(%s to read)" % [str(p.get("title", "")), KEY_HINT], settings)
 	note_left = NOTE_S
 	_note.visible = not is_open()
 	_place_note()
 
 
+## Bottom left, above the energy bar, and wrapped to stay left of the prompts centred at the bottom (the line's controls, eating
+## and resting), which are NOTE_CLEAR either side of the centre.
 func _place_note() -> void:
 	var size := _note.get_viewport_rect().size
+	_note.size = Vector2(maxf(size.x * 0.5 - NOTE_CLEAR - 40.0, 160.0), 0.0)
 	var want := _note.get_minimum_size()
-	_note.size = want
+	_note.size = Vector2(_note.size.x, want.y)
 	_note.position = Vector2(24.0, size.y - 64.0 - want.y)
 
 
@@ -244,6 +249,7 @@ func _build() -> void:
 	_note.add_theme_color_override("font_outline_color", Color(0.0, 0.0, 0.0, 0.9))
 	_note.add_theme_constant_override("outline_size", 6)
 	_note.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_note.visible = false
 	add_child(_note)
 

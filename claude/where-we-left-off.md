@@ -1,3 +1,31 @@
+# Current handoff - Chet, 2026-10-12 (friends slice)
+
+**Read docs/HANDOFF-release-slice.md first.** Game remains 48b84a0/T13a;
+this round adds packaging instructions and Windows evidence, not gameplay changes.
+Windows baseline **585/585**, evidence **db112e2fa006**, matches Claude.
+
+Windows and web release ZIPs are in Nathan's Downloads/The-Windowsill-Playtest-2026-10-12.
+SHA-256 manifest and all spec gate statuses are in docs/verification/release-slice/.
+Nothing published to itch.io. Friend feedback sheet: docs/FRIEND_PLAYTEST.md.
+
+Five-minute rendered source run on battery, 720p: **56.8 fps average,
+21.448 ms p95**; normal eye view slowest (~51.6 fps). Two strike attempts,
+successful struggles. F01's reporting clause is met; the 16.7 ms target is
+missed. Measurement limitations and reduction plan are in PERFORMANCE.md.
+
+Browser controls, both views, slow motion, pause and a preference reload
+worked. Actual Windows export renders both views; native keyboard automation
+was inconclusive because the tool emits incorrect physical key codes.
+Sound needs listener verification, controller-only play needs hardware,
+and browser Chromium UnknownError remains unresolved. M04 exhaustive
+rendered matrix, U01 and E01/E02 remain open. These are friend-test builds,
+not 1.0 or all-gates-closed evidence. Keep twitch and SimClock unchanged.
+
+Chet finishes on main, pushes, runs the laptop updater and confirms the
+actual commit in chat. Older handoffs below are historical.
+
+---
+
 # Current handoff - Claude, 2026-10-11 (T13a)
 
 **Latest: vision realism part 2, ROADMAP step 5.** Start from main and read **docs/HANDOFF-vision-2.md**.

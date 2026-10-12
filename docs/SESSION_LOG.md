@@ -1058,3 +1058,12 @@ Chet reviews this entry, `docs/HANDOFF-chunk-7.md` and the tests named above. Na
 - Researched: Zurek et al. 2010, Zurek & Nelson 2012 (lateral eyes), Nagata et al. 2012 (depth from defocus). A background research pass on UV reflectance found glass and leaf data but none for flies, so UV stays unsimulated. Depth from defocus is Nathan's call because it changes jumps. EYE-10 to EYE-15.
 - A flawed test that compared two separately spawned worlds was dropped (the stage fixture is not identical across spawns).
 - Final: evidence db112e2fa006, 585 of 585 (fixed 60 fps, Linux headless); eye and sensor tests 69 of 69 at fixed 30 and 144. Not run on Windows.
+
+
+## 2026-10-12 - Chet - Friends slice handback
+
+- Started on main 48b84a0 after laptop update. Read T13a/workflow/roadmap; Windows baseline on 2026-10-11: 585/585, db112e2fa006. No game-code changes.
+- Exported official Godot 4.7.2 Windows x64 and single-threaded web release builds. Native both-view rendering and browser walking/hop/V/T/pause/preference reload checked. Native physical-key automation diagnosed as incorrect scan codes; did not claim a full physical-input playthrough. Sound listening and controller checks remain open; browser emitted nonfatal Chromium UnknownError.
+- Completed 300.006896 s rendered source/debug route, both views and quarter speed, arranged live hunt with two strikes and successful struggles. Battery/Balanced, 1280x720: 56.8 fps average / 21.448 ms p95. Strict frame budget missed; reduction plan and raw trace preserved.
+- Added all-gate audit, screenshots, baseline reports, friend instructions, engine notices and artifact checksums. Friends ZIPs in Downloads/The-Windowsill-Playtest-2026-10-12. No publication.
+- Added developer-only profiling/input-diagnostic fixtures with UIDs. Keep source and laptop on shared main at handback; final chat confirms actual commit.

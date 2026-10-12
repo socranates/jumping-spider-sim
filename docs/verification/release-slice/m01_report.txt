@@ -1,0 +1,26 @@
+M01 route report (spec 25): floor, post west face, slab top, slab end, slab underside, post east face, floor
+timestamp_utc: 2026-10-11T10:17:48Z
+evidence_id: db112e2fa006 (source 41a0fc76, settings 8b6707d4, tests 2a1e2838)
+engine: 4.7.2-stable (official)
+fixture_seed: 20261005
+run 01 PASS start (5.57, 6.90) heading -88.5 deg: route complete in 12.55 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+run 02 PASS start (5.68, 7.28) heading -91.6 deg: route complete in 12.50 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+run 03 PASS start (5.29, 7.99) heading -91.7 deg: route complete in 12.65 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+run 04 PASS start (5.68, 6.76) heading -90.5 deg: route complete in 12.50 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+run 05 PASS start (5.39, 6.26) heading -89.2 deg: route complete in 12.62 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+run 06 PASS start (5.62, 7.02) heading -90.4 deg: route complete in 12.52 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+run 07 PASS start (5.60, 7.38) heading -90.5 deg: route complete in 12.53 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+run 08 PASS start (5.56, 7.88) heading -91.2 deg: route complete in 12.55 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+run 09 PASS start (5.53, 5.85) heading -90.0 deg: route complete in 12.55 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+run 10 PASS start (5.58, 6.65) heading -88.3 deg: route complete in 12.53 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+run 11 PASS start (5.40, 6.32) heading -88.1 deg: route complete in 12.62 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+run 12 PASS start (5.28, 6.19) heading -90.6 deg: route complete in 12.65 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+run 13 PASS start (5.31, 6.00) heading -90.0 deg: route complete in 12.65 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+run 14 PASS start (5.57, 6.60) heading -89.3 deg: route complete in 12.55 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+run 15 PASS start (5.70, 6.36) heading -91.2 deg: route complete in 12.48 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+run 16 PASS start (5.63, 7.53) heading -91.5 deg: route complete in 12.52 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+run 17 PASS start (5.26, 6.90) heading -91.7 deg: route complete in 12.67 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+run 18 PASS start (5.40, 6.97) heading -89.6 deg: route complete in 12.62 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+run 19 PASS start (5.59, 6.44) heading -88.6 deg: route complete in 12.53 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+run 20 PASS start (5.73, 7.42) heading -92.0 deg: route complete in 12.48 s, lost-support ticks 0, penetrating ticks 0, camera roll ticks 0, camera within 0.1 WU of geometry 0 ticks
+result: 20 of 20 runs passed

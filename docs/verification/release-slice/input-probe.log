@@ -1,0 +1,12 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 Core Profile Context 25.10.42.01.260515 - Compatibility - Using Device: ATI Technologies Inc. - AMD Radeon(TM) Graphics
+
+prey seed 4427114
+KEY_PROBE V physical=4194313 logical=86 pressed=true
+KEY_PROBE V physical=4194313 logical=86 pressed=false
+KEY_PROBE Escape physical=4194313 logical=4194305 pressed=true
+KEY_PROBE Escape physical=4194313 logical=4194305 pressed=false
+KEY_PROBE Alt physical=4194313 logical=4194328 pressed=true
+KEY_PROBE Alt+F4 physical=4194313 logical=4194335 pressed=true
+KEY_PROBE Alt+F4 physical=4194313 logical=4194335 pressed=false
+KEY_PROBE Alt physical=4194313 logical=4194328 pressed=false

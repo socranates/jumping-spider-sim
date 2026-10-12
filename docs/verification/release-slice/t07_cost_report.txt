@@ -1,0 +1,18 @@
+T07 cost with 6 flies (chunk 7B, milestone 10)
+Measured on Windows, display headless, Godot 4.7.2-stable (official), 60 physics ticks/s. Timing arguments: ["res://tests/test_runner.tscn"]. Not a graphical frame-pacing gate.
+Timing mode supplied by launcher: unspecified; see invocation log (engine flags can be stripped from OS arguments)
+Window: 900 ticks (15.0 s). The spider walked a route among the perches; flies noticed it, left, landed again; 1 were replaced through the vents (the wait shortened to 2-3 s for the measurement); 0 strike attempted, 0 capture.
+
+CPU per tick, microseconds (spec 24: about 2000 at the 95th percentile for the AI and perception)
+  prey tick   (flies' senses, minds, flights, population, capture stage): avg 221, p50 212, p95 384, p99 483, max 1419
+  sensor tick (the spider's eyes on everything): avg 179, p50 160, p95 330, p99 404, max 1199
+  the two together: paired per-tick p95 673 against 2000
+
+What the flies considered and asked of the world, over the window
+  decisions 577 (0.64 a tick); candidate perches considered 1070 (1.19 a tick); flights planned with sweeps 3 (4 in the graph)
+  fly sight: 955 checks, 888 rays (0.99 rays a tick); flight sweeps 354 (0.39 a tick); planner sweeps 382
+  sensor: 2132 checks, 10685 rays (11.87 a tick), largest tick 35 rays; memory-spot checks 3 with 15 rays (counted in the sensor's rays)
+  population: 2 asks, 1 deferred, 1 entries, 8 view checks, 4 sensor checks
+  perch clashes between flies: 0; the largest step of any fly in a tick: 0.250 WU
+
+Verdict on this machine: inside the budget (673 of 2000 microseconds at p95, paired ticks together).

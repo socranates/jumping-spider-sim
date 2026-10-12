@@ -1,11 +1,17 @@
 extends Node
 ## T08: cancelable rest and one harmless, telegraphed shadow encounter.
 ## No forces, camera commands, starvation, teleport or time skip. Tree pause freezes it.
+## LIFE_DESIGN.md round 1: the life clock (time of day, the spider's age in days) runs here. Resting in the retreat in the evening or at
+## night sleeps until morning, the hours passing quickly in bounded steps; moving, or anything that ends the rest, wakes the spider. The
+## morning keeps a new checkpoint. The light follows the hour, and the spider's eyes see less far in the dark.
 ## T09 (S01-C): starting a rest in the retreat makes the retreat checkpoint, at the end of that tick (this node runs last), through the
 ## world's save_checkpoint. One checkpoint per rest; the caption says whether it was kept. Rest itself still grants only rest.
 signal rest_changed(active: bool)
 signal checkpoint_made(result: Dictionary)
 const KeyNames = preload("res://scripts/presentation/key_names.gd")
+const LifeClock = preload("res://scripts/life/life_clock.gd")
+## The sensor's reach at night, as a share of its daytime reach (jumping spiders hunt by sight, in daylight).
+const NIGHT_SIGHT := 0.3
 const EVENT_ID := "room_shadow_01"
 const EVENT_DELAY := 60.0
 const WARNING_S := 5.0
@@ -29,9 +35,15 @@ const RESTORE_GRACE_TICKS := 30
 var _restore_grace := 0
 var _label: Label
 var _show_help := false
+## The life clock, and whether the spider is asleep now (a night's rest in the retreat).
+var clock := LifeClock.new()
+var asleep := false
+signal woke(day: int)
+var _morning_text := ""
 
 func _ready() -> void:
 	process_physics_priority = 12
+	apply_light()
 	if interactive:
 		var canvas := CanvasLayer.new()
 		add_child(canvas)
@@ -92,6 +104,7 @@ func step(delta: float, interact_pressed: bool = false, cancel_pressed: bool = f
 	if resting:
 		rest_seconds += delta
 		world.needs.restore_rest(delta * 0.10)
+	_step_life(delta)
 	# Start only outside a meal and rest; after starting it is one uninterrupted event.
 	if event_phase == "waiting":
 		if elapsed >= EVENT_DELAY and not resting and not world.feeding.feeding:
@@ -117,10 +130,40 @@ func step(delta: float, interact_pressed: bool = false, cancel_pressed: bool = f
 			make_checkpoint()
 
 
+## The life clock's tick: a rest that begins in the evening or at night is a night's sleep until morning.
+func _step_life(delta: float) -> void:
+	var was_asleep := asleep
+	asleep = resting and (clock.sleeping or clock.is_sleep_time())
+	var hours := clock.advance(delta, asleep)
+	if asleep and not clock.sleeping:
+		# The morning came during this tick: awake, still resting in the crack. The new day keeps a checkpoint.
+		asleep = false
+		checkpoint_due = true
+		_morning_text = "Morning, day %d. Rested through the night in the crack." % clock.day
+		show_notice(_morning_text)
+		woke.emit(clock.day)
+	elif was_asleep and not asleep:
+		show_notice("Awake before morning: it is still %s." % clock.part_of_day())
+	world.needs.add_hours(hours, asleep)
+	apply_light()
+
+
+## The light of the hour on the sill, and how far the spider's eyes reach in it.
+func apply_light() -> void:
+	var light := clock.daylight()
+	if world.lab.has_method("set_daylight"):
+		world.lab.set_daylight(light, clock.hour)
+	if world.get("sensor") != null:
+		world.sensor.range_scale = lerpf(NIGHT_SIGHT, 1.0, light)
+
+
 ## The retreat checkpoint, now (the end of a tick). The world refuses it unless the spider stands still on a surface, not feeding.
 func make_checkpoint() -> Dictionary:
 	checkpoint_result = world.save_checkpoint()
 	show_notice(str(checkpoint_result["message"]) if bool(checkpoint_result["ok"]) else "Resting, but the checkpoint was not kept: %s" % str(checkpoint_result["message"]))
+	if _morning_text != "":
+		show_notice(_morning_text + " " + notice)
+		_morning_text = ""
 	checkpoint_made.emit(checkpoint_result)
 	return checkpoint_result
 
@@ -130,7 +173,7 @@ func show_notice(text: String) -> void:
 	notice_seconds = NOTICE_S
 
 func caption() -> String:
-	var text := "THE WINDOWSILL    ·    %s: field notes" % _both("help", "H", "View")
+	var text := "THE WINDOWSILL    ·    Day %d, %s    ·    %s: field notes" % [clock.day, clock.part_of_day(), _both("help", "H", "View")]
 	if notice_seconds > 0.0 and not _show_help:
 		text += "\n" + notice
 	if _show_help:
@@ -138,10 +181,18 @@ func caption() -> String:
 			_both("focus", "right mouse", "left trigger"), _both("stalk", "Shift", "left shoulder"), _both("prepare_jump", "Space", "A"),
 			_both("interact", "E", "X"), _both("cancel", "Q", "B"), _key_name("move_forward", "W"), _both("eye_view", "V", "Y"),
 			_both("slow_motion", "T", "right trigger"), _both("notebook", "N", "D-pad up")]
+	if asleep:
+		return text + "\nAsleep in the silk-lined crack. The night passes. Move, %s or %s to wake." % [_both("interact", "E", "X"), _both("cancel", "Q", "B")]
 	if resting:
 		return text + "\nResting in the silk-lined crack. Move, %s or %s to leave." % [_both("interact", "E", "X"), _both("cancel", "Q", "B")]
 	if can_rest():
+		if clock.is_sleep_time():
+			return text + "\nThe silk-lined crack    ·    %s to sleep until morning" % _both("interact", "E", "X")
 		return text + "\nThe silk-lined crack    ·    %s to rest" % _both("interact", "E", "X")
+	if clock.part_of_day() == "night":
+		return text + "\nIt is dark, and your eyes reach only a little way. Home is the silk-lined crack at the west end."
+	if clock.part_of_day() == "evening":
+		return text + "\nEvening. Jumping spiders go into their silk retreat before dark."
 	if event_phase == "warning":
 		return text + "\nLight shifts at the window. A shadow is approaching."
 	if event_phase == "passing":

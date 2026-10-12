@@ -83,6 +83,9 @@ var cone_deg: float = 30.0
 var peripheral_cone_deg: float = 300.0
 var sector_deg: float = 22.5
 var range_wu: float = 40.0
+## LIFE_DESIGN.md round 1: how far the eyes reach now, as a share of range_wu (1 in daylight; the windowsill's life clock lowers it at
+## night, since jumping spiders hunt by sight in daylight). reach_wu() is the range every check uses.
+var range_scale: float = 1.0
 var easy_s: float = 0.4
 var fly_s: float = 1.0
 var easy_apparent_deg: float = 3.0
@@ -227,7 +230,7 @@ func could_sense(center: Vector3, radius: float) -> bool:
 	var eye: Vector3 = observer.get_eye_position()
 	var to := center - eye
 	var dist := to.length()
-	if dist > range_wu:
+	if dist > reach_wu():
 		return false
 	if dist < MIN_DISTANCE:
 		return true
@@ -251,6 +254,10 @@ func describe_tracks() -> Array[Dictionary]:
 
 
 ## Forget everything about what is being tracked (the memory is cleared separately).
+func reach_wu() -> float:
+	return range_wu * clampf(range_scale, 0.0, 1.0)
+
+
 func reset() -> void:
 	_tracks.clear()
 	motion_seen.clear()
@@ -458,8 +465,8 @@ func _sense(t: Track, p: Dictionary, eye: Vector3, axis: Vector3, up: Vector3, f
 	var radius := maxf(float(p["radius"]), 0.01)
 	var to := center - eye
 	var dist := to.length()
-	t.last_check = {"in_range": dist <= range_wu, "distance": dist}
-	if dist > range_wu or dist < MIN_DISTANCE:
+	t.last_check = {"in_range": dist <= reach_wu(), "distance": dist}
+	if dist > reach_wu() or dist < MIN_DISTANCE:
 		return
 	var dir := to / dist
 	var off_axis := axis.angle_to(dir)
@@ -529,7 +536,7 @@ func _cue(t: Track, est_dir: Vector3, forward: Vector3, up: Vector3, dist: float
 	obs.modality = Observation.PERIPHERAL
 	obs.has_position = false
 	obs.direction = PerceptionMath.quantize_direction(est_dir, forward, up, sector_deg)
-	obs.confidence = PerceptionMath.peripheral_confidence(dist, range_wu)
+	obs.confidence = PerceptionMath.peripheral_confidence(dist, reach_wu())
 	obs.observed_tick = tick
 	obs.category = Observation.MOVEMENT
 	if memory.ingest(obs) != null:
@@ -603,7 +610,7 @@ func _check_spots(eye: Vector3, axis: Vector3, up: Vector3, space: PhysicsDirect
 		var size := maxf(m.size_wu, 0.2)
 		var apparent := PerceptionMath.apparent_size_deg(size, dist)
 		var plain := false
-		if dist >= MIN_DISTANCE and dist <= range_wu and axis.angle_to(to / dist) <= half and apparent >= min_apparent_deg:
+		if dist >= MIN_DISTANCE and dist <= reach_wu() and axis.angle_to(to / dist) <= half and apparent >= min_apparent_deg:
 			plain = _all_visible(space, eye, m.position, size * 0.5, up)
 			if plain:
 				for q: Dictionary in inspected:

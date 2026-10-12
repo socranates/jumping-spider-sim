@@ -1085,3 +1085,9 @@ Chet reviews this entry, `docs/HANDOFF-chunk-7.md` and the tests named above. Na
 - Ran old/T13b five-minute live graphical routes sequentially, plugged in, no screenshot readback. Eye GPU p95 down 16-19%; overall frame p95 18.109 ms still misses target. Both hunts captured/subdued prey. Frozen-view screen rejected four-read mipmap candidate; retained production six-read shader.
 - Rebuilt Windows/web release friend ZIPs including notebook, controls/readme and licenses. Verified ZIP CRCs/layout, native executable rendering, browser eye rendering, W/V/T and N notebook. Preserved persistent Chromium error and native physical-input/listening limitations.
 - Saved raw compressed traces, logs, power records, summaries, screenshots and checksums in verification/eye-perf/. Added measurement script UID and capture-free profiling option; production twitch/SimClock unchanged. Updated handoff, plan and decisions. Finish on main and update laptop; final commit in chat.
+
+### 2026-10-12: LIFE round 1, clocks and hunger (Claude, cloud session)
+- Chet's measuring round paused (out of usage). Nathan: "if there is anything at all you can think of to do feel free". Built LIFE_DESIGN round 1 on Claude's branch only; it is merged after Chet's round.
+- Life clock (day, hour; about 12 waking hours in 15 minutes); sleeping in the retreat from 18:00 to 07:00 in bounded steps, with a morning checkpoint; hunger by game hours in life mode (no floor, starving hours counted, no death yet); day and night light; 30 % sight at night; the abdomen shows condition; checkpoint schema 4; three notebook pages. LIFE-04 to LIFE-09.
+- Final: evidence 7c9539fd72c1, 600 of 600 (fixed 60 fps, Linux headless); 68 of 68 related tests at fixed 30 and 144. Not run on Windows.
+- Merged after Chet's round 0 (798e098). The evidence was unchanged (7c9539fd72c1, 600/600): his round changed no game code.

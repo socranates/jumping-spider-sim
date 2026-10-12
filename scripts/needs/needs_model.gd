@@ -9,6 +9,10 @@ extends RefCounted
 ## passing of action time and stops at ENERGY_FLOOR: nothing happens at the floor, nothing is lost, and nothing stops working. The
 ## drain is integrated over elapsed action time in steps of UPDATE_PERIOD_S (spec 20: needs update at 1 to 2 Hz), so the same
 ## total time drains the same energy at 30, 60 or 144 frames a second and a stall cannot drain more than a capped step.
+## Life mode (LIFE_DESIGN.md round 1; the windowsill, where the life clock runs): energy no longer drains with action seconds and has
+## no floor. It drains with the game hours the life clock reports (add_hours), faster awake than asleep, and it can run out: the hours
+## spent at zero are counted (starving_hours). Nothing else follows from them yet; death is a later round. The hours are applied at the
+## same 2 Hz update as before, so a checkpoint taken between updates keeps them (hour_accumulator) and loads to the same energy.
 ## Rest is a second reserve with no consequence in P0: it wears down while the spider is active and builds back while it keeps
 ## still. It is here so that the retreat (T08) has something to restore; nothing reads it for a decision yet.
 
@@ -29,6 +33,11 @@ const UPDATE_PERIOD_S := 0.5
 const MAX_STEP_S := 0.25
 ## "Full" for the purposes of a hint on the screen: feeding is never refused for it (see the feeding controller).
 const FULL_AT := 0.98
+## Life mode: a full reserve lasts about three game days without food (about 12 hours awake and 12 asleep each), and one fly (0.35)
+## feeds the spider for about a day. A real Phidippus goes much longer without food (adult female P. johnsoni were kept 25 to 31 days
+## unfed); the game compresses time on purpose (LIFE_DESIGN.md).
+const LIFE_DRAIN_AWAKE_PER_H := 0.021
+const LIFE_DRAIN_ASLEEP_PER_H := 0.007
 const STAGE_ID := "p0_prototype"
 
 var energy: float = ENERGY_START
@@ -43,6 +52,11 @@ var grants_refused: int = 0
 
 var _acc_active: float = 0.0
 var _acc_still: float = 0.0
+## Life mode (see above).
+var life_mode: bool = false
+var starving_hours: float = 0.0
+var _acc_hours_awake: float = 0.0
+var _acc_hours_asleep: float = 0.0
 
 
 ## Changes the numbers for a fixture. Keys: energy, rest. Values outside [0, 1] or not finite are ignored.
@@ -73,9 +87,34 @@ func advance(dt: float, active: bool) -> void:
 		total -= UPDATE_PERIOD_S
 
 
+## Life mode: `hours` of game time passed, asleep or awake. They are used up at the next 2 Hz update.
+func add_hours(hours: float, asleep: bool) -> void:
+	if not life_mode or not is_finite(hours) or hours <= 0.0:
+		return
+	if asleep:
+		_acc_hours_asleep += hours
+	else:
+		_acc_hours_awake += hours
+
+
+## Whether the reserve has run out (life mode).
+func is_starving() -> bool:
+	return life_mode and energy <= 0.0
+
+
 func _apply(period: float, active_share: float) -> void:
 	var before := energy
-	if energy > ENERGY_FLOOR:
+	if life_mode:
+		var need := _acc_hours_awake * LIFE_DRAIN_AWAKE_PER_H + _acc_hours_asleep * LIFE_DRAIN_ASLEEP_PER_H
+		var hours := _acc_hours_awake + _acc_hours_asleep
+		_acc_hours_awake = 0.0
+		_acc_hours_asleep = 0.0
+		if need > 0.0:
+			var used := minf(energy, need)
+			energy -= used
+			if need > used and need > 0.0:
+				starving_hours += hours * (need - used) / need
+	elif energy > ENERGY_FLOOR:
 		energy = maxf(ENERGY_FLOOR, energy - ENERGY_DRAIN_PER_S * period)
 	rest = clampf(rest + (REST_RECOVER_PER_S * (1.0 - active_share) - REST_DRAIN_PER_S * active_share) * period, 0.0, REST_MAX)
 	if energy != before:
@@ -129,6 +168,7 @@ func to_dict() -> Dictionary:
 		"energy": energy, "rest": rest, "hydration": null, "stress": null, "condition": null,
 		"enabled": ["energy", "rest"], "update_accumulator": [_acc_active, _acc_still], "stage_id": STAGE_ID,
 		"elapsed_s": elapsed_s, "granted_total": granted_total, "granted_by_source": granted_by_source.duplicate(),
+		"life_mode": life_mode, "starving_hours": starving_hours, "hour_accumulator": [_acc_hours_awake, _acc_hours_asleep],
 	}
 
 
@@ -157,6 +197,21 @@ func load_dict(d: Dictionary) -> bool:
 		sum += float(v)
 	if absf(sum - float(d["granted_total"])) > 1e-6:
 		return false
+	# Life mode (optional in older records: none of them had it).
+	var lm: Variant = d.get("life_mode", false)
+	var sh: Variant = d.get("starving_hours", 0.0)
+	var ha: Variant = d.get("hour_accumulator", [0.0, 0.0])
+	if typeof(lm) != TYPE_BOOL or (typeof(sh) != TYPE_FLOAT and typeof(sh) != TYPE_INT) or not is_finite(float(sh)) or float(sh) < 0.0:
+		return false
+	if typeof(ha) != TYPE_ARRAY or (ha as Array).size() != 2:
+		return false
+	for v: Variant in ha:
+		if (typeof(v) != TYPE_FLOAT and typeof(v) != TYPE_INT) or not is_finite(float(v)) or float(v) < 0.0:
+			return false
+	life_mode = bool(lm)
+	starving_hours = float(sh)
+	_acc_hours_awake = float((ha as Array)[0])
+	_acc_hours_asleep = float((ha as Array)[1])
 	energy = float(d["energy"])
 	rest = float(d["rest"])
 	elapsed_s = float(d["elapsed_s"])
@@ -169,6 +224,8 @@ func load_dict(d: Dictionary) -> bool:
 
 ## Developer text for the F3 overlay.
 func describe() -> String:
+	if life_mode:
+		return "Energy %.3f (life mode: %.3f a waking hour, %.3f asleep; %.1f h starving), rest %.3f; granted %.3f from %d source(s)" % [energy, LIFE_DRAIN_AWAKE_PER_H, LIFE_DRAIN_ASLEEP_PER_H, starving_hours, rest, granted_total, granted_by_source.size()]
 	return "Energy %.3f (drain %.4f/s to a floor of %.2f), rest %.3f; granted %.3f from %d source(s)" % [energy, ENERGY_DRAIN_PER_S, ENERGY_FLOOR, rest, granted_total, granted_by_source.size()]
 
 

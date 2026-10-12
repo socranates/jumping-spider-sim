@@ -29,6 +29,12 @@ var _launch_dip := 0.0
 var _eye_view := false
 var _spinnerets: Node3D
 var _abdomen: Node3D
+## LIFE_DESIGN.md round 1: body condition you can see. The abdomen is plumper when the spider is well fed and thinner when it is hungry;
+## abdomen size against the rest of the body is how a spider's condition is usually judged (Jakob, Marshall & Uetz 1996). Display only:
+## the motor, the jumps and the collider never read it. `condition` is the energy reserve (0 to 1); the drawn size follows it slowly.
+var condition: float = 0.55
+var shown_condition: float = 0.55
+const CONDITION_FOLLOW_PER_S := 0.5
 var _prepare_time := 0.0
 
 
@@ -133,6 +139,8 @@ func _physics_process(_delta: float) -> void:
 	rotation = Vector3(0.0, twitch_yaw, 0.0)
 	_jump_pose(delta)
 	_update_legs(delta)
+	shown_condition = move_toward(shown_condition, condition, CONDITION_FOLLOW_PER_S * delta)
+	_abdomen.scale = abdomen_scale(shown_condition)
 
 
 func _update_legs(delta: float) -> void:
@@ -215,6 +223,17 @@ func _jump_pose(dt: float) -> void:
 		if landing_time >= LAND_S:
 			landing_time = -1.0
 	_abdomen.rotation.x = 0.55 * attachment_amount
+
+
+func set_condition(energy: float) -> void:
+	if is_finite(energy):
+		condition = clampf(energy, 0.0, 1.0)
+
+
+## The abdomen's size for a condition: wider and deeper as it fills, a little longer too. About its present size at the start (0.55).
+static func abdomen_scale(c: float) -> Vector3:
+	var w := 0.84 + 0.30 * c
+	return Vector3(w, w, 0.93 + 0.12 * c)
 
 
 ## A jolt of the whole model (held prey struggling).

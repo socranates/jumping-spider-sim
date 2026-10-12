@@ -445,3 +445,43 @@ Built while Chet's round (ROADMAP step 6) was paused; kept on Claude's branch un
 
 - **PERF-03 Keep six reads on the laptop.** Plugged-in 720p, before shader 4c07efa versus T13b 40aceee inside the same fa32368 scene: live normal-eye GPU p95 7.878 -> 6.612 ms, quarter-speed 7.768 -> 6.279 ms. Overall frame p95 18.036 -> 18.109 ms under VSync: reduced GPU work, no demonstrated whole-game FPS increase and strict 16.7 ms goal still missed. No screenshots during timing. A four-read mipmap implementation was slower in the frozen-view screen (5.120 ms versus T13b 4.823 ms picture-on), so do not ship it. Single live runs, phase/setup spikes retained, source/debug runtime scope explicit; raw traces and exact shader fixtures in verification/eye-perf/.
 - **RELEASE-04 Refresh friend packages with notebook and T13b.** fa32368 game source, Windows 591/591 / 2c7264139c03. Windows/web ZIPs in Downloads/The-Windowsill-Playtest-2026-10-12-T13b; checksums in eye-perf/friend-builds.json. Web eye view and N notebook verified, native launch/render smoke check passed. Existing Chromium error and human acceptance checks remain open. No publication or gameplay changes. LIFE_DESIGN round 0 complete; clocks/hunger next.
+
+## One whole life, round 1: clocks and hunger (Claude, 2026-10-12)
+
+Nathan, while Chet's measuring round was paused: "if there is anything at all you can think of to do feel free". Kept on Claude's branch until Chet's round is in main.
+
+- **LIFE-04 Three clocks, and nights in the retreat.**
+  - `scripts/life/life_clock.gd` holds the windowsill's time of day and the spider's age in days, separate from SimClock. It moves only with action time, in the habitat loop, so pausing never passes time, and it never touches jumps.
+  - About 12 waking hours pass in about 15 minutes of play (LIFE-03: about 10 days in 2–3 hours).
+  - A rest in the retreat from 18:00 until 07:00 is a night's sleep. The hours pass at 1.4 an action second, never more than one tick's worth at a time, until 07:00. Moving, or anything that ends the rest, wakes the spider. The morning keeps a new checkpoint and says "Morning, day N".
+  - A rest by day passes no extra time.
+  - The caption names the day and part of the day. Evening and night have their own lines; the crack offers "sleep until morning".
+- **LIFE-05 Hunger by the hour (life mode).**
+  - On the windowsill, energy drains with game hours: 0.021 an hour awake, 0.007 asleep. A full reserve lasts about three days without food, and one fly (0.35) feeds the spider for about a day. The 0.20 floor is gone: the reserve can run out, and the hours at zero are counted (`starving_hours`). Nothing follows from them yet; death is round 5.
+  - The old slow per-second drain with its floor stays wherever there is no life clock (the lab, tests that build a NeedsModel alone).
+  - The compression is on purpose: real *Phidippus* go weeks without food. The notebook says so.
+- **LIFE-06 Day and night on the sill.**
+  - The sun's strength, colour and height, the room's ambient light, the sky and the window's glow follow the hour. Night is dim and blue, never black. The passing shadow still dims the sun.
+  - The sensor's reach is 30 % of its daytime range at night (`SensorSystem.range_scale`, `reach_wu()`): jumping spiders hunt by sight in daylight.
+- **LIFE-07 Body condition you can see.** The abdomen is drawn wider and longer as the reserve fills and narrower as it empties: 0.84 to 1.14 of its width, about today's size at the start (0.55). It is display only (Jakob, Marshall & Uetz 1996; Foelix 2011).
+- **LIFE-08 Checkpoint schema 4 and three notebook pages.**
+  - Checkpoints keep the clock (`life`) and life mode's numbers (`starving_hours`, `hour_accumulator`), so a checkpoint loads to the same energy.
+  - A schema-3 checkpoint upgrades to day 1, 09:00.
+  - New pages: "Home before dark" (first morning), "Hungry, yet at home" (first low reserve), "A full abdomen" (first full reserve). Sources are in NOTEBOOK_SOURCES.md.
+- **LIFE-09 Evidence.** 7c9539fd72c1: 600 / 600 (Linux headless, fixed 60 fps), including 9 new tests (`tests/integration/test_life01_clock_hunger.gd`). Life, notebook, windowsill, checkpoint, needs, feeding and sensor tests: 68 / 68 at fixed 30 and 144 fps. Reports and stills are in `docs/verification/life01/`. Not run on Windows.
+
+## Modes and how they unlock (Nathan, 2026-10-12)
+
+- **MODES-01 The main life is Standard until you finish it; Easy is earned; Free play is separate.** Nathan: "the difficulty default for 'story' progression or however it goes is the standard mode only until you beat the game then you can play on easy, then we can have a play mode for easy fun play that is seperate from the main experience. I think that will be rewarding gameplay."
+  - **The main life ("The Windowsill"):** played on Standard, the "Natural" rules of LIFE-01, until the player has finished it once. After that, Easy can be chosen for later lives. This supersedes LIFE-01's "Gentle is always available as a separate choice" for the main life.
+  - **Free play:** a separate mode for easy, relaxed play on the sill, with its own save. It does not count toward finishing the main life. It can be played from the start.
+  - **Confirmed by Nathan ("I agree with your suggestions"):** what is locked is how hard the world is: survival pressure, the predator, death. How the controls help is not locked: aim help, holding prey automatically, toggles, slow motion, Reduced motion and text size stay available everywhere. Spec 17 keeps "survival pressure and execution difficulty" independent, and locking control helps would shut out players who need them, including Nathan's son, who uses Most help.
+  - **Confirmed:** "finishing the game" means bringing one spider through its whole life to adulthood (LIFE_DESIGN.md: three moults). Courtship and eggs come later, in phase 5.
+- **FEEL-01 It must feel like being the little spider.** Nathan, 2026-10-12: "it needs to feel really like being the little spider." This is a test for every feature, alongside scientific realism.
+  - Does it put the player at the spider's size, in its senses, its caution and its vulnerability? Or does it feel like a person looking down at a toy?
+  - Consequences to weigh as we build:
+    - The camera low and close.
+    - Scale cues from the human world: a mug, a pencil, a hand or footsteps through the sill.
+    - A predator that is huge and fast at this size.
+    - Sounds heard from the spider's place in the room.
+    - The eye view as a first-class way to play.

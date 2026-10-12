@@ -4,6 +4,14 @@ A third-person prototype about living as a jumping spider. The design is in `doc
 
 Shared development: see [the agent handoff](claude/where-we-left-off.md), [GitHub workflow](docs/SHARED_WORKFLOW.md), and [verification reports](docs/verification/).
 
+## New: days and nights, and hunger you can see (2026-10-12)
+
+- **Time passes on the windowsill.** Morning light, midday, a warm evening and a dim blue night. The top line says which day it is and what time of day.
+- **Sleep through the night.** In the evening, rest in the silk-lined crack (E / X) to sleep until morning. Each morning keeps a checkpoint. Moving wakes you.
+- **Hunger is real now.** The spider gets hungrier as the hours pass, and you can **see** it: its abdomen grows plump after a meal and slowly thins. A well-fed spider can go about three days without food. Running out doesn't end a life yet; that comes later.
+- **Night is for resting.** In the dark the spider's eyes reach only a short way, as real jumping spiders hunt by daylight.
+- Three new notebook pages: home before dark, hungry at home, and a full abdomen.
+
 ## New: the naturalist's notebook (2026-10-11)
 
 - As you play, short true pages about jumping spiders open in your **notebook**: the first time you jump, look through the spider's eyes, feel a vibration, catch a fly, rest, and more. Each page says where the game simplifies and names its sources.

@@ -98,6 +98,16 @@ The best-supported predator for a windowsill. It is a warning-rich, fair threat:
 
 Courtship and eggs (phase 5), seasons and overwintering, drinking (no jumping-spider data), injuries and lost legs, and more predators.
 
+## Modes (MODES-01, Nathan, 2026-10-12)
+
+| Mode | World rules | Available | Counts toward finishing |
+|---|---|---|---|
+| The Windowsill (the main life) | Standard: hunger, the wasp, real death (LIFE-01) | From the start | Yes |
+| The Windowsill on Easy | Gentle: no death, forgiving hunger | After finishing the main life once | No |
+| Free play | Easy and relaxed, its own save | From the start | No |
+
+Control helps (Most help and the other presets, slow motion, Reduced motion) stay available in every mode; only the world's rules are locked. "Finishing" is one spider reaching adulthood. Both confirmed by Nathan (MODES-01). Death and continuing (round 5) builds these modes and the unlock.
+
 ## Order of work
 
 Each round is one handoff: start from `main` and finish into `main`.
@@ -107,7 +117,7 @@ Each round is one handoff: start from `main` and finish into `main`.
    - Time the cheaper eye shader (T13b) on the laptop against the previous one.
    - Try the mipmap variant noted in `docs/verification/eye-perf/results.txt`.
    - Rebuild the friend ZIPs with the notebook, so friends play the current game.
-1. **Claude: clocks and hunger.** Time of day and age; the night passing at rest; energy over days; abdomen size from condition; a starvation timeline with no death yet; notebook pages. Tests at 30, 60 and 144 fps.
+1. **Done (Claude, 2026-10-12, LIFE-04 to LIFE-08): clocks and hunger.** Time of day and age; the night passing at rest; energy over days; abdomen size from condition; a starvation timeline with no death yet; notebook pages. Tests at 30, 60 and 144 fps.
 2. **Chet: Windows check.** Night lighting and the abdomen in play, and frame time with the new light.
 3. **Claude: moulting.** Readiness, the retreat, time passing, a bigger and soft spider, species data per instar, tests.
 4. **Claude and Chet: the wasp.** Its behaviour and warnings (Claude); model, animation, sound and Windows feel (Chet); the spider backing away from it.

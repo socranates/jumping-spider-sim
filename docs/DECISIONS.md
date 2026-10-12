@@ -435,3 +435,8 @@ Built while Chet's round (ROADMAP step 6) was paused; kept on Claude's branch un
 
   The biology comes from a literature search (most papers not read in full). The four questions at its end are Nathan's to answer.
 - **PERF-02 A cheaper eye picture (T13b; evidence 2c7264139c03, 591 / 591, Linux headless).** The soft surround reads the picture six times instead of twelve, and the full-size picture only where the sharp retinal fields show. On software rendering the picture costs about a third less (32 ms down to 21–23 ms); its look changes by about 2/255 (`docs/verification/eye-perf/`). A mipmap version was slower on software rendering and is left for Chet to try on the laptop. Laptop timing is Chet's next round.
+- **LIFE-03 Nathan's answers to the life plan** (2026-10-12): "your suggestions work great and your assumptions are accurate."
+  - One life takes about 2–3 hours over roughly 10 game days, with 3 moults.
+  - The mud dauber wasp is the first predator.
+  - After a death, continue as an unrelated young juvenile elsewhere on the sill.
+  - The notebook says plainly that the wasp paralyses the spider to feed its young.

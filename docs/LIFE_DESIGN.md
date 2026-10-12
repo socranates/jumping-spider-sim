@@ -113,7 +113,15 @@ Each round is one handoff: start from `main` and finish into `main`.
 5. **Claude: death and continuing.** Natural and Gentle, the summary, the choice, the new spider, the notebook carried over; tests that every death has a warning.
 6. **Nathan, his son and friends play a whole life.**
 
-## Questions for Nathan
+## Nathan's answers (2026-10-12, LIFE-03)
+
+"your suggestions work great and your assumptions are accurate." All four proposals below are accepted:
+1. One life takes about 2–3 hours to play, over roughly 10 game days, with 3 moults from juvenile to adult.
+2. The mud dauber wasp is the first predator.
+3. Continuing after a death: a young juvenile somewhere new on the sill, labelled honestly as unrelated.
+4. The notebook tells the whole truth about the wasp, plainly: the spider is paralysed, not killed, and fed to the wasp's young.
+
+## Questions for Nathan (answered above)
 
 1. **How long should one life take to play?** Proposed: about 2–3 hours, over roughly 10 game days, with 3 moults from juvenile to adult.
 2. **Which predator first?** Proposed: the mud dauber wasp. The cellar spider is less certain from the evidence.

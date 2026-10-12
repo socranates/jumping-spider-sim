@@ -98,6 +98,16 @@ The best-supported predator for a windowsill. It is a warning-rich, fair threat:
 
 Courtship and eggs (phase 5), seasons and overwintering, drinking (no jumping-spider data), injuries and lost legs, and more predators.
 
+## Modes (MODES-01, Nathan, 2026-10-12)
+
+| Mode | World rules | Available | Counts toward finishing |
+|---|---|---|---|
+| The Windowsill (the main life) | Standard: hunger, the wasp, real death (LIFE-01) | From the start | Yes |
+| The Windowsill on Easy | Gentle: no death, forgiving hunger | After finishing the main life once | Proposed: no |
+| Free play | Easy and relaxed, its own save | From the start | No |
+
+Control helps (Most help and the other presets, slow motion, Reduced motion) stay available in every mode; only the world's rules are locked (proposed, see MODES-01). "Finishing" proposed as one spider reaching adulthood. Death and continuing (round 5) builds these modes and the unlock.
+
 ## Order of work
 
 Each round is one handoff: start from `main` and finish into `main`.

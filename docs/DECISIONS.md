@@ -464,3 +464,11 @@ Nathan, while Chet's measuring round was paused: "if there is anything at all yo
   - A schema-3 checkpoint upgrades to day 1, 09:00.
   - New pages: "Home before dark" (first morning), "Hungry, yet at home" (first low reserve), "A full abdomen" (first full reserve). Sources are in NOTEBOOK_SOURCES.md.
 - **LIFE-09 Evidence.** 7c9539fd72c1: 600 / 600 (Linux headless, fixed 60 fps), including 9 new tests (`tests/integration/test_life01_clock_hunger.gd`). Life, notebook, windowsill, checkpoint, needs, feeding and sensor tests: 68 / 68 at fixed 30 and 144 fps. Reports and stills are in `docs/verification/life01/`. Not run on Windows.
+
+## Modes and how they unlock (Nathan, 2026-10-12)
+
+- **MODES-01 The main life is Standard until you finish it; Easy is earned; Free play is separate.** Nathan: "the difficulty default for 'story' progression or however it goes is the standard mode only until you beat the game then you can play on easy, then we can have a play mode for easy fun play that is seperate from the main experience. I think that will be rewarding gameplay."
+  - **The main life ("The Windowsill"):** played on Standard, the "Natural" rules of LIFE-01, until the player has finished it once. After that, Easy can be chosen for later lives. This supersedes LIFE-01's "Gentle is always available as a separate choice" for the main life.
+  - **Free play:** a separate mode for easy, relaxed play on the sill, with its own save. It does not count toward finishing the main life. It can be played from the start.
+  - **Proposed, for Nathan to confirm.** What is locked is how hard the world is: survival pressure, the predator, death. How the controls help is not locked: aim help, holding prey automatically, toggles, slow motion, Reduced motion and text size stay available everywhere. Spec 17 keeps "survival pressure and execution difficulty" independent, and locking control helps would shut out players who need them, including Nathan's son, who uses Most help.
+  - **Proposed:** "finishing the game" means bringing one spider through its whole life to adulthood (LIFE_DESIGN.md: three moults). Courtship and eggs come later, in phase 5.

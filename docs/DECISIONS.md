@@ -440,3 +440,26 @@ Built while Chet's round (ROADMAP step 6) was paused; kept on Claude's branch un
   - The mud dauber wasp is the first predator.
   - After a death, continue as an unrelated young juvenile elsewhere on the sill.
   - The notebook says plainly that the wasp paralyses the spider to feed its young.
+
+## One whole life, round 1: clocks and hunger (Claude, 2026-10-12)
+
+Nathan, while Chet's measuring round was paused: "if there is anything at all you can think of to do feel free". Kept on Claude's branch until Chet's round is in main.
+
+- **LIFE-04 Three clocks, and nights in the retreat.**
+  - `scripts/life/life_clock.gd` holds the windowsill's time of day and the spider's age in days, separate from SimClock. It moves only with action time, in the habitat loop, so pausing never passes time, and it never touches jumps.
+  - About 12 waking hours pass in about 15 minutes of play (LIFE-03: about 10 days in 2–3 hours).
+  - A rest in the retreat from 18:00 until 07:00 is a night's sleep. The hours pass at 1.4 an action second, never more than one tick's worth at a time, until 07:00. Moving, or anything that ends the rest, wakes the spider. The morning keeps a new checkpoint and says "Morning, day N".
+  - A rest by day passes no extra time.
+  - The caption names the day and part of the day. Evening and night have their own lines; the crack offers "sleep until morning".
+- **LIFE-05 Hunger by the hour (life mode).**
+  - On the windowsill, energy drains with game hours: 0.021 an hour awake, 0.007 asleep. A full reserve lasts about three days without food, and one fly (0.35) feeds the spider for about a day. The 0.20 floor is gone: the reserve can run out, and the hours at zero are counted (`starving_hours`). Nothing follows from them yet; death is round 5.
+  - The old slow per-second drain with its floor stays wherever there is no life clock (the lab, tests that build a NeedsModel alone).
+  - The compression is on purpose: real *Phidippus* go weeks without food. The notebook says so.
+- **LIFE-06 Day and night on the sill.**
+  - The sun's strength, colour and height, the room's ambient light, the sky and the window's glow follow the hour. Night is dim and blue, never black. The passing shadow still dims the sun.
+  - The sensor's reach is 30 % of its daytime range at night (`SensorSystem.range_scale`, `reach_wu()`): jumping spiders hunt by sight in daylight.
+- **LIFE-07 Body condition you can see.** The abdomen is drawn wider and longer as the reserve fills and narrower as it empties: 0.84 to 1.14 of its width, about today's size at the start (0.55). It is display only (Jakob, Marshall & Uetz 1996; Foelix 2011).
+- **LIFE-08 Checkpoint schema 4 and three notebook pages.**
+  - Checkpoints keep the clock (`life`) and life mode's numbers (`starving_hours`, `hour_accumulator`), so a checkpoint loads to the same energy.
+  - A schema-3 checkpoint upgrades to day 1, 09:00.
+  - New pages: "Home before dark" (first morning), "Hungry, yet at home" (first low reserve), "A full abdomen" (first full reserve). Sources are in NOTEBOOK_SOURCES.md.

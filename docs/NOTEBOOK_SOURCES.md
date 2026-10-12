@@ -25,3 +25,6 @@ Before a public release, someone should read each one and confirm the page.
 | A silk retreat | Foelix 2011 | Book | Textbook knowledge |
 | Judging distance by blur | Nagata et al. 2012, *Science* 335: 469–471 | Yes | Abstract and coverage: layered retina, defocus; short jumps under red light (*Hasarius adansoni*) |
 | Green and ultraviolet | DeVoe 1975, *J. Gen. Physiol.* 66: 193–207; Zurek et al. 2015, *Curr. Biol.* 25: R403–R404 | Yes | DeVoe: UV and green receptors in *P. regius*; Zurek 2015: a red filter in *Habronattus* |
+| Home before dark | Jackson 1979, *J. Arachnol.* 7: 47–58 | Yes | Title and a research summary's excerpt: *P. johnsoni* enters its nest before dark and stays overnight and in bad weather |
+| Hungry, yet at home | Okuyama 2011, *Naturwissenschaften* 98: 15–22 | Yes | Abstract: most *P. audax* stayed in nests by day; those in nests were hungrier; a hunger-driven two-phase model |
+| A full abdomen | Jakob, Marshall & Uetz 1996, *Oikos* 77: 61–67; Foelix 2011 | Yes | Body-condition indices compare abdomen size with body size; textbook knowledge that the abdomen swells with feeding |

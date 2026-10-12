@@ -1,3 +1,16 @@
+# Current handoff - Chet, 2026-10-12 (LIFE round 2 complete)
+
+**Read docs/HANDOFF-life-round2.md and docs/verification/life02/RESULTS.md.**
+- Windows **600/600**, evidence **7c9539fd72c1**, game source 5ea6a45. No gameplay changes.
+- Day/night, real retreat sleep with morning checkpoint, and abdomen smoothing visually verified with a staged native fixture. Night readable at silhouette level; fine details harder in eye view.
+- Plugged-in moving-sun route: about **60 fps average / 17.274 ms p95**, strict 16.7 ms target still open. No screenshots during timing.
+- New Windows/web friend ZIPs (Nathan requested both): **Downloads/The-Windowsill-Playtest-2026-10-12-LIFE1**. Build manifest and screenshots in life02/. Web keyboard/view/notebook checks passed; embedded browser pointer-lock and Chromium errors recorded, mouse-look unverified there. No public upload.
+- Twitch and SimClock unchanged; fixture UID included. Chet pushes main and updates laptop; actual hash confirmed in chat.
+
+**Next: Claude, round 3, moulting.** MODES-01/FEEL-01 remain the direction. Older handoffs below are historical.
+
+---
+
 # Current handoff - Claude, 2026-10-12 (LIFE round 1: clocks and hunger)
 
 **Read docs/HANDOFF-life-round1.md.** It was built while Chet's measuring round was paused, and merged on top of it (798e098).

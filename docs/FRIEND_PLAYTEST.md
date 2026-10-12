@@ -1,9 +1,9 @@
 # Friend playtest instructions
 
-THE WINDOWSILL - Friends playtest, 2026-10-12 - notebook / T13b
+THE WINDOWSILL - Friends playtest, 2026-10-12 - days, nights and hunger / LIFE round 1
 
 This is the playable prototype, not the finished whole-life release.
-Built from main fa32368; game/test evidence 2c7264139c03; Godot 4.7.2.
+Built from main 5ea6a45; game/test evidence 7c9539fd72c1; Godot 4.7.2.
 
 WINDOWS: Extract the entire ZIP, then run TheWindowsill.exe. Keep its
 TheWindowsill.pck beside it. Godot does not need to be installed.
@@ -20,6 +20,9 @@ Tap Space to hop; hold Space to aim, release to jump. Q cancels aiming.
 V switches first/third person. T toggles slow motion (speed in Esc menu).
 After catching a fly, tap Space or E quickly until the red grip bar fills.
 E rests in the silk-lined starting retreat and keeps a checkpoint.
+From evening (18:00), resting there sleeps until morning and saves again.
+The day passes slowly while active. Hunger thins the abdomen; meals fill it.
+Starvation death and moulting are not implemented yet.
 On a safety line: W reels up, S lowers; hold Q to let go.
 R recenters the camera. H opens field notes. N opens the naturalist notebook
 (controller D-pad up); pages open as you discover things. Esc pauses and
@@ -30,6 +33,7 @@ level eye-view horizon, grey eye view, volume and remapping are in Esc.
 TRY THIS
 Explore the sill and leaves, stalk a fly while it looks away, try a jump,
 and return to the silk-lined retreat to rest. Check both camera views.
+Stay through dusk and try a night in the crack. Is the dark still readable?
 The pale leaf tip beyond the eastern leaf gives way: the dragline catches
 you. Use W to reel back. Checkpoints rewind the whole sill; they are not
 an exact resume of an airborne/feeding moment.
@@ -47,13 +51,14 @@ prey is still a fly-like prototype and jump gravity is tuned for play.
 Engine and third-party notices: GODOT-LICENSES.txt.
 
 VERIFICATION LIMITS
-591 automated Windows tests pass. This rebuild: browser eye rendering,
-view switching, walking, slow motion and notebook opening/closing checked;
-Windows executable launch/rendering checked. Earlier build also had browser
-hop, pause and preference reload checks. Native physical keyboard/controller
-play still needs a person because automated native keys had incorrect codes.
-Sound needs listener verification. The browser still logs a nonfatal
-Chromium UnknownError; its cause remains unresolved. Plugged-in laptop:
-T13b eye GPU p95 is 16-19% lower, but whole-run frame p95 is 18.109 ms;
-the strict 16.7 ms goal is still missed. Performance data is from the rendered
-source runtime, not a release-executable benchmark.
+600 automated Windows tests pass. Staged native day/night, sleep and body
+condition checks passed; the morning checkpoint was kept. Night preserves
+large shapes but makes small ground details harder to see, especially in
+the eye view. A separate moving-sun frame-time report is in the repository.
+Native physical keyboard/controller play and sound listening need people.
+This web build: eye view, notebook, walking, view switch, slow motion and
+arrow look checked. Embedded browser reported pointer-lock WrongDocumentError
+and Chromium UnknownError; mouse-look remains unverified there.
+Moving-sun run: about 60 fps average, 17.274 ms p95; strict 16.7 ms target
+still missed. Timings are from the source runtime, not the release EXE.
+This remains a friend-test prototype, not the full-life release.

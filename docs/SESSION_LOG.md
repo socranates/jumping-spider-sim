@@ -1091,3 +1091,11 @@ Chet reviews this entry, `docs/HANDOFF-chunk-7.md` and the tests named above. Na
 - Life clock (day, hour; about 12 waking hours in 15 minutes); sleeping in the retreat from 18:00 to 07:00 in bounded steps, with a morning checkpoint; hunger by game hours in life mode (no floor, starving hours counted, no death yet); day and night light; 30 % sight at night; the abdomen shows condition; checkpoint schema 4; three notebook pages. LIFE-04 to LIFE-09.
 - Final: evidence 7c9539fd72c1, 600 of 600 (fixed 60 fps, Linux headless); 68 of 68 related tests at fixed 30 and 144. Not run on Windows.
 - Merged after Chet's round 0 (798e098). The evidence was unchanged (7c9539fd72c1, 600/600): his round changed no game code.
+
+## 2026-10-12 - Chet - LIFE round 2, Windows verification and friend rebuild
+
+- Updated both checkouts to 5ea6a45; full Windows fixed60 suite 600/600, 7c9539fd72c1. Production files unchanged.
+- Staged graphical day/night and body-condition checks, real sleep to day-two morning checkpoint; dark but legible silhouettes, softer eye-view detail. Saved native screenshots and state log.
+- Four-minute capture-free moving-sun route on AC/Balanced, 720p: ~60 fps mean, 17.274 ms p95; strict budget remains open. Logged sun angles, compressed raw trace, analyzer and power endpoints.
+- Nathan opted into both friend rebuilds. Exported unchanged main game, checked Windows launch/render and browser views, walking, slow toggle, notebook and arrow look. Browser pointer-lock and Chromium errors documented. Browser left running across a user pause reached night; final night orbit capture saved.
+- ZIPs with notices/readme and manifest in Downloads/The-Windowsill-Playtest-2026-10-12-LIFE1. No publication. Added excluded fixture with UID; handoff round 3 moulting to Claude. Finish shared main and update laptop.

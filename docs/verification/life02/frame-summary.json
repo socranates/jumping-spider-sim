@@ -1,0 +1,193 @@
+{
+  "all": {
+    "frames": 14391,
+    "mean_ms": 16.677,
+    "p95_ms": 17.274,
+    "p99_ms": 18.108,
+    "max_ms": 94.642,
+    "over_33_3ms": 3,
+    "over_50ms": 2,
+    "process_ms_p95": 18.785,
+    "physics_ms_p95": 2.764,
+    "render_cpu_ms_p95": 1.28,
+    "render_gpu_ms_p95": 6.018,
+    "hour_start_end": [
+      8.0,
+      23.399778
+    ],
+    "sun_x_start_end": [
+      -34.053696,
+      -18.0
+    ]
+  },
+  "phases": {
+    "morning_orbit": {
+      "frames": 1797,
+      "mean_ms": 16.694,
+      "p95_ms": 17.38,
+      "p99_ms": 18.956,
+      "max_ms": 61.098,
+      "over_33_3ms": 1,
+      "over_50ms": 1,
+      "process_ms_p95": 24.416,
+      "physics_ms_p95": 2.973,
+      "render_cpu_ms_p95": 1.393,
+      "render_gpu_ms_p95": 6.042,
+      "hour_start_end": [
+        8.0,
+        8.399778
+      ],
+      "sun_x_start_end": [
+        -34.053696,
+        -36.975689
+      ]
+    },
+    "morning_eye": {
+      "frames": 1799,
+      "mean_ms": 16.676,
+      "p95_ms": 17.262,
+      "p99_ms": 18.106,
+      "max_ms": 42.037,
+      "over_33_3ms": 1,
+      "over_50ms": 0,
+      "process_ms_p95": 19.759,
+      "physics_ms_p95": 2.624,
+      "render_cpu_ms_p95": 1.231,
+      "render_gpu_ms_p95": 6.26,
+      "hour_start_end": [
+        8.0,
+        8.399778
+      ],
+      "sun_x_start_end": [
+        -34.053696,
+        -36.975689
+      ]
+    },
+    "midday_orbit": {
+      "frames": 1795,
+      "mean_ms": 16.712,
+      "p95_ms": 17.43,
+      "p99_ms": 18.679,
+      "max_ms": 94.642,
+      "over_33_3ms": 1,
+      "over_50ms": 1,
+      "process_ms_p95": 22.075,
+      "physics_ms_p95": 3.199,
+      "render_cpu_ms_p95": 1.404,
+      "render_gpu_ms_p95": 6.361,
+      "hour_start_end": [
+        13.0,
+        13.399778
+      ],
+      "sun_x_start_end": [
+        -54.999996,
+        -54.851212
+      ]
+    },
+    "midday_eye": {
+      "frames": 1800,
+      "mean_ms": 16.666,
+      "p95_ms": 17.3,
+      "p99_ms": 17.847,
+      "max_ms": 19.913,
+      "over_33_3ms": 0,
+      "over_50ms": 0,
+      "process_ms_p95": 17.587,
+      "physics_ms_p95": 2.487,
+      "render_cpu_ms_p95": 1.295,
+      "render_gpu_ms_p95": 6.417,
+      "hour_start_end": [
+        13.0,
+        13.399556
+      ],
+      "sun_x_start_end": [
+        -54.999996,
+        -54.851376
+      ]
+    },
+    "dusk_orbit": {
+      "frames": 1800,
+      "mean_ms": 16.666,
+      "p95_ms": 17.178,
+      "p99_ms": 17.54,
+      "max_ms": 18.892,
+      "over_33_3ms": 0,
+      "over_50ms": 0,
+      "process_ms_p95": 16.886,
+      "physics_ms_p95": 2.248,
+      "render_cpu_ms_p95": 0.857,
+      "render_gpu_ms_p95": 4.553,
+      "hour_start_end": [
+        19.6,
+        19.999778
+      ],
+      "sun_x_start_end": [
+        -21.316652,
+        -18.001844
+      ]
+    },
+    "dusk_eye": {
+      "frames": 1800,
+      "mean_ms": 16.666,
+      "p95_ms": 17.219,
+      "p99_ms": 17.978,
+      "max_ms": 19.824,
+      "over_33_3ms": 0,
+      "over_50ms": 0,
+      "process_ms_p95": 17.41,
+      "physics_ms_p95": 2.6,
+      "render_cpu_ms_p95": 0.697,
+      "render_gpu_ms_p95": 5.558,
+      "hour_start_end": [
+        19.6,
+        19.999778
+      ],
+      "sun_x_start_end": [
+        -21.316652,
+        -18.001844
+      ]
+    },
+    "night_orbit": {
+      "frames": 1800,
+      "mean_ms": 16.666,
+      "p95_ms": 17.245,
+      "p99_ms": 17.894,
+      "max_ms": 19.847,
+      "over_33_3ms": 0,
+      "over_50ms": 0,
+      "process_ms_p95": 17.414,
+      "physics_ms_p95": 2.846,
+      "render_cpu_ms_p95": 0.955,
+      "render_gpu_ms_p95": 4.606,
+      "hour_start_end": [
+        23.0,
+        23.399778
+      ],
+      "sun_x_start_end": [
+        -18.0,
+        -18.0
+      ]
+    },
+    "night_eye": {
+      "frames": 1800,
+      "mean_ms": 16.666,
+      "p95_ms": 17.25,
+      "p99_ms": 17.944,
+      "max_ms": 24.174,
+      "over_33_3ms": 0,
+      "over_50ms": 0,
+      "process_ms_p95": 18.054,
+      "physics_ms_p95": 2.764,
+      "render_cpu_ms_p95": 0.966,
+      "render_gpu_ms_p95": 5.691,
+      "hour_start_end": [
+        23.0,
+        23.399778
+      ],
+      "sun_x_start_end": [
+        -18.0,
+        -18.0
+      ]
+    }
+  }
+}

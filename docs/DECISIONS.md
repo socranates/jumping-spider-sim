@@ -485,3 +485,23 @@ Nathan, while Chet's measuring round was paused: "if there is anything at all yo
     - A predator that is huge and fast at this size.
     - Sounds heard from the spider's place in the room.
     - The eye view as a first-class way to play.
+
+## One whole life, round 3: moulting (Claude, 2026-10-12)
+
+Built while Chet's round 2 was paused (out of usage, results not yet pushed), on Claude's branch only. It is merged after his round.
+
+- **LIFE-10 Growth by moulting** (`scripts/life/growth.gd`, run by the habitat loop).
+  - **Stages:** young juvenile, juvenile, subadult and adult: three moults in one life (LIFE-03).
+  - **Ready:** 0.9 of energy eaten since the last moult (about two and a half flies, read from the needs' ledger) makes the spider ready. The screen and the caption say so.
+  - **The moult:** resting in the crack while ready begins it. It cannot be stopped. Its 12 game hours pass at the sleeping rate, a tick's worth at a time, and do not stop at morning.
+  - **Afterwards:** the stage advances, the old skin stays where the moult happened (drawn as a pale husk, saved), and a checkpoint is kept.
+  - **The soft skin:** for 10 game hours the spider is pale and its jumps reach 70 % as far, through the same reach factor as the "Jump reach" setting, via `main.apply_reach()`. Then the skin hardens.
+  - **Adult:** the third moult makes an adult, which finishes the main life (MODES-01; the unlock itself is round 5).
+- **LIFE-11 What is simplified, and said so.**
+  - Real spiders usually stop eating before a moult and stay in the nest for days (*P. johnsoni*: about 6 before and 2 after, Jackson 1979). The game does not stop the spider eating, and it compresses the days.
+  - The soft period's length is a design assumption: no measurement was found.
+  - The body is drawn the same size at every stage, and the physics never changes. Drawing the growth is left to the rig's owner (Chet), so that the planted feet stay right.
+  - The notebook pages say all of this.
+- **LIFE-12 Checkpoint schema 5 and three notebook pages.**
+  - Checkpoints keep growth (stage, food since the last moult, readiness, the moult and the soft skin still to pass, where the old skins lie). Schema 4 upgrades to a young juvenile.
+  - New pages: "Outgrowing a skin" (ready), "A new skin" (moulted), "Grown up" (adult). Sources are in NOTEBOOK_SOURCES.md.

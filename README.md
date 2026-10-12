@@ -4,6 +4,14 @@ A third-person prototype about living as a jumping spider. The design is in `doc
 
 Shared development: see [the agent handoff](claude/where-we-left-off.md), [GitHub workflow](docs/SHARED_WORKFLOW.md), and [verification reports](docs/verification/).
 
+## New: moulting, growing up (2026-10-12)
+
+- Your spider starts as a **young juvenile**. The top line shows its stage.
+- After it has eaten about two or three flies, it is **ready to moult**. Rest in the silk-lined crack and it sheds its old skin; this can't be hurried or stopped.
+- Afterwards it is a stage older, **pale and soft**, and its jumps are shorter until the new skin hardens. The **old skin** stays in the crack.
+- Three moults make it an **adult**: that finishes the main life.
+- Three new notebook pages about moulting.
+
 ## New: days and nights, and hunger you can see (2026-10-12)
 
 - **Time passes on the windowsill.** Morning light, midday, a warm evening and a dim blue night. The top line says which day it is and what time of day.

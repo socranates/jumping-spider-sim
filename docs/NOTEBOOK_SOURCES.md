@@ -28,3 +28,6 @@ Before a public release, someone should read each one and confirm the page.
 | Home before dark | Jackson 1979, *J. Arachnol.* 7: 47–58 | Yes | Title and a research summary's excerpt: *P. johnsoni* enters its nest before dark and stays overnight and in bad weather |
 | Hungry, yet at home | Okuyama 2011, *Naturwissenschaften* 98: 15–22 | Yes | Abstract: most *P. audax* stayed in nests by day; those in nests were hungrier; a hunger-driven two-phase model |
 | A full abdomen | Jakob, Marshall & Uetz 1996, *Oikos* 77: 61–67; Foelix 2011 | Yes | Body-condition indices compare abdomen size with body size; textbook knowledge that the abdomen swells with feeding |
+| Outgrowing a skin | Foelix 2011; Jackson 1979 | Book; yes | Textbook knowledge of moulting; a research summary's excerpt: about 6 days in the nest before a moult and 2 after (*P. johnsoni*) |
+| A new skin | Foelix 2011 | Book | Textbook knowledge: the exuvia left behind, the soft, pale new cuticle |
+| Grown up | Jackson 1978, *J. Arachnol.* 6: 1–29; Taylor & Peck 1975, *J. Arachnol.* 2: 89–99 | Yes (titles and pages from bibliographies) | Excerpts: moults to adulthood in *P. johnsoni*; *P. audax* overwinters as a juvenile and matures in spring |

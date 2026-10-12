@@ -247,7 +247,7 @@ func make_checkpoint() -> Dictionary:
 	checkpoint_result = world.save_checkpoint()
 	show_notice(str(checkpoint_result["message"]) if bool(checkpoint_result["ok"]) else "Resting, but the checkpoint was not kept: %s" % str(checkpoint_result["message"]))
 	if _morning_text != "":
-		show_notice(_morning_text + " " + notice)
+		show_notice(_morning_text + "\n" + notice)
 		_morning_text = ""
 	checkpoint_made.emit(checkpoint_result)
 	return checkpoint_result

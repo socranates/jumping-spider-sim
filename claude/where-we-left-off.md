@@ -14,7 +14,7 @@
 - **Round 2, Chet:** play days and nights on the laptop. Check night light, the abdomen and frame time with the moving sun, and rebuild the friend ZIPs if Nathan wants them current.
 - **Round 3, Claude:** moulting.
 
-Evidence: see DECISIONS LIFE-09 and SESSION_LOG (merged result there too).
+Evidence **7c9539fd72c1**: 600/600 (Linux headless, fixed 60 fps), the same after merging Chet's round. Not run on Windows.
 
 ---
 

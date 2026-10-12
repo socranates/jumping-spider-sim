@@ -119,7 +119,7 @@ Each round is one handoff: start from `main` and finish into `main`.
    - Rebuild the friend ZIPs with the notebook, so friends play the current game.
 1. **Done (Claude, 2026-10-12, LIFE-04 to LIFE-08): clocks and hunger.** Time of day and age; the night passing at rest; energy over days; abdomen size from condition; a starvation timeline with no death yet; notebook pages. Tests at 30, 60 and 144 fps.
 2. **Chet: Windows check complete (2026-10-12).** 600/600, day/night and abdomen checked; moving-sun p95 17.274 ms; friend ZIPs rebuilt. See `HANDOFF-life-round2.md`.
-3. **Claude: moulting.** Readiness, the retreat, time passing, a bigger and soft spider, species data per instar, tests.
+3. **Done (Claude, 2026-10-12, LIFE-10 to LIFE-13): moulting.** Readiness, the retreat, time passing, a soft and pale spider, old skins, tests. The rig's drawn growth is left for Chet.
 4. **Claude and Chet: the wasp.** Its behaviour and warnings (Claude); model, animation, sound and Windows feel (Chet); the spider backing away from it.
 5. **Claude: death and continuing.** Natural and Gentle, the summary, the choice, the new spider, the notebook carried over; tests that every death has a warning.
 6. **Nathan, his son and friends play a whole life.**

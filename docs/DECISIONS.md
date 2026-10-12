@@ -491,3 +491,24 @@ Nathan, while Chet's measuring round was paused: "if there is anything at all yo
 - **LIFE-10 Retain current light and body-condition presentation.** Windows 600/600 / 7c9539fd72c1. Staged rendered checks show day/dusk/night in both views, a real tick-by-tick night's rest with day-two morning checkpoint, and thin-to-full abdomen smoothing through the actual needs notifications. Night preserves silhouettes and captions; fine eye-view detail is less readable. No lighting/gameplay retune; human comfort checks remain useful. Fixture grants are not a caught-meal playthrough.
 - **PERF-04 Moving-sun measurement.** Plugged-in Balanced, Radeon, 720p VSync, eight 30-second morning/midday/dusk/night view phases, no screenshots: mean 16.677 ms, p95 17.274 ms, max 94.642 ms. No dusk/night frame above 33.3 ms. Midday eye GPU p95 6.417 ms versus night eye 5.691 ms. Strict 16.7 ms frame goal remains missed. One source-runtime route, no frozen-sun control; do not infer isolated shadow cost or release performance. Raw evidence in verification/life02/.
 - **RELEASE-05 Refresh friends with days, nights and hunger.** Nathan explicitly requested Windows and web rebuilds. Unchanged 5ea6a45 game source, new LIFE1 Downloads folder, README/licenses/ZIP checksums. Windows launch/render and browser keyboard/view/notebook smoke checks; embedded browser pointer-lock WrongDocumentError plus Chromium UnknownError remain unresolved. Mouse-look/controller/listening not claimed passed. No itch.io upload.
+
+## One whole life, round 3: moulting (Claude, 2026-10-12)
+
+Built while Chet's round 2 was paused (out of usage, results not yet pushed), on Claude's branch only. It is merged after his round.
+
+- **LIFE-10 Growth by moulting** (`scripts/life/growth.gd`, run by the habitat loop).
+  - **Stages:** young juvenile, juvenile, subadult and adult: three moults in one life (LIFE-03).
+  - **Ready:** 0.9 of energy eaten since the last moult (about two and a half flies, read from the needs' ledger) makes the spider ready. The screen and the caption say so.
+  - **The moult:** resting in the crack while ready begins it. It cannot be stopped. Its 12 game hours pass at the sleeping rate, a tick's worth at a time, and do not stop at morning.
+  - **Afterwards:** the stage advances, the old skin stays where the moult happened (drawn as a pale husk, saved), and a checkpoint is kept.
+  - **The soft skin:** for 10 game hours the spider is pale and its jumps reach 70 % as far, through the same reach factor as the "Jump reach" setting, via `main.apply_reach()`. Then the skin hardens.
+  - **Adult:** the third moult makes an adult, which finishes the main life (MODES-01; the unlock itself is round 5).
+- **LIFE-11 What is simplified, and said so.**
+  - Real spiders usually stop eating before a moult and stay in the nest for days (*P. johnsoni*: about 6 before and 2 after, Jackson 1979). The game does not stop the spider eating, and it compresses the days.
+  - The soft period's length is a design assumption: no measurement was found.
+  - The body is drawn the same size at every stage, and the physics never changes. Drawing the growth is left to the rig's owner (Chet), so that the planted feet stay right.
+  - The notebook pages say all of this.
+- **LIFE-12 Checkpoint schema 5 and three notebook pages.**
+  - Checkpoints keep growth (stage, food since the last moult, readiness, the moult and the soft skin still to pass, where the old skins lie). Schema 4 upgrades to a young juvenile.
+  - New pages: "Outgrowing a skin" (ready), "A new skin" (moulted), "Grown up" (adult). Sources are in NOTEBOOK_SOURCES.md.
+- **LIFE-13 Evidence.** f82620887f67: 605 / 605 (Linux headless, fixed 60 fps), including 5 new tests (`tests/integration/test_life03_moulting.gd`). Moulting, life, notebook, windowsill, checkpoint and jump-input tests: 61 / 61 at fixed 30 and 144 fps. Reports and stills are in `docs/verification/life03/`. Not run on Windows.

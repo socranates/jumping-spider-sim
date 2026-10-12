@@ -1,3 +1,22 @@
+# Current handoff - Claude, 2026-10-12 (LIFE round 3: moulting)
+
+**Read docs/HANDOFF-life-round3.md.** It was built while Chet's round 2 was paused, and merged on top of it (1469780).
+- **Growth:** young juvenile, juvenile, subadult, adult.
+- **Readiness:** ready after 0.9 of food since the last moult.
+- **The moult:** in the crack; it cannot be stopped; 12 game hours pass quickly; the old skin stays (`OldSkin0..2`).
+- **Afterwards:** soft, pale and 70 % reach (`main.apply_reach()`) for 10 game hours.
+- **Adult:** after three moults, which finishes the main life (MODES-01).
+- **Saves and pages:** checkpoint schema 5; three notebook pages.
+- **Decisions:** LIFE-10 to LIFE-13.
+
+**Next:**
+- **Chet:** visible growth per stage. The rig is the same size at every stage. Scale the body and legs by `world.habitat_loop.growth.stage` (0 to 3) without breaking the planted feet; physics and collider unchanged. Plus a Windows check of moulting in play.
+- **Claude, round 4:** the mud dauber wasp.
+
+Evidence **f82620887f67**: 605/605 (Linux headless, fixed 60 fps), the same after merging Chet's round 2. Not run on Windows.
+
+---
+
 # Current handoff - Chet, 2026-10-12 (LIFE round 2 complete)
 
 **Read docs/HANDOFF-life-round2.md and docs/verification/life02/RESULTS.md.**

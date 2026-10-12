@@ -19,12 +19,15 @@ const PreyProfile = preload("res://scripts/prey/prey_profile.gd")
 const Fly = preload("res://scripts/prey/fly.gd")
 const HabitatLoop = preload("res://scripts/habitat/habitat_loop.gd")
 const LifeClock = preload("res://scripts/life/life_clock.gd")
+const Growth = preload("res://scripts/life/growth.gd")
 
 ## Schema 2 (T09b): flies record their glances (schedule: home_heading, glancing, glance_target, glance_sign, next_glance) and the
 ## habitat's fallen leaf tip is a habitat change. Schema 3 (T09c): flies record their walks (schedule: walking, walk_target, walk_speed,
 ## burst_left, pause_left, next_walk, rest_spot). Schema 4 (LIFE_DESIGN.md round 1): the life clock (life: day, hour, sleeping) and
-## the needs' life mode (life_mode, starving_hours, hour_accumulator). Older records are upgraded on load (upgrade()), one schema at a time.
-const SCHEMA_VERSION := 4
+## the needs' life mode (life_mode, starving_hours, hour_accumulator). Schema 5 (round 3): growth (stage, food since the last moult,
+## readiness, the moult and the soft skin still to pass, where the old skins lie). Older records are upgraded on load (upgrade()), one
+## schema at a time.
+const SCHEMA_VERSION := 5
 const GAME_BUILD := "prototype-0.1.0"
 const KIND := "retreat_checkpoint"
 const PLAYER_ID := "spider"
@@ -85,6 +88,7 @@ static func capture(world: Node) -> Dictionary:
 		"prey": prey_record,
 		"habitat": loop.to_dict(),
 		"life": loop.clock.to_dict(),
+		"growth": loop.growth.to_dict(),
 		"retreats": [{"id": Windowsill.RETREAT_ID, "surface_id": "sill_floor"}],
 		"habitat_changes": world.lab.changes_record(),
 		"journal": [],
@@ -145,6 +149,12 @@ static func upgrade(record: Variant) -> Variant:
 		r["schema_version"] = 4
 		if not r.has("upgraded_from"):
 			r["upgraded_from"] = 3
+	if int(r["schema_version"]) == 4:
+		# 4 -> 5: a young juvenile that has not yet eaten toward its next moult.
+		r["growth"] = Growth.new().to_dict()
+		r["schema_version"] = 5
+		if not r.has("upgraded_from"):
+			r["upgraded_from"] = 4
 	return r
 
 
@@ -171,7 +181,7 @@ static func validate(record: Variant) -> PackedStringArray:
 		e.append("the checkpoint belongs to habitat content '%s', not '%s'" % [str(r.get("content_revision", "")), Windowsill.CONTENT_REVISION])
 	if str(r.get("player_id", "")) != PLAYER_ID:
 		e.append("the checkpoint names no player")
-	for key: String in ["player", "needs", "feeding", "prey", "habitat", "clocks", "life"]:
+	for key: String in ["player", "needs", "feeding", "prey", "habitat", "clocks", "life", "growth"]:
 		if typeof(r.get(key)) != TYPE_DICTIONARY:
 			e.append("missing section '%s'" % key)
 	if not e.is_empty():
@@ -182,6 +192,7 @@ static func validate(record: Variant) -> PackedStringArray:
 		e.append("needs: the reserves or their ledger are not a valid record")
 	_check_habitat(r["habitat"], e)
 	e.append_array(LifeClock.problems(r["life"]))
+	e.append_array(Growth.problems(r["growth"]))
 	_check_prey(r["prey"], r["needs"], e)
 	_check_changes(r.get("habitat_changes"), e)
 	if e.is_empty():

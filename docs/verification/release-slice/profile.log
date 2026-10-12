@@ -1,0 +1,15 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 Core Profile Context 25.10.42.01.260515 - Compatibility - Using Device: ATI Technologies Inc. - AMD Radeon(TM) Graphics
+
+PROFILE_START {"gpu":"AMD Radeon(TM) Graphics","os":"Windows","seed":4242,"size":"(1280, 720)","texture":"(1280.0, 720.0)","vsync":1}
+PROFILE_PHASE 0 at 0.029523
+PROFILE_STATE {"flies":["(-12.8, 0.16, -2.0)","(9.190598, 4.76, -2.331144)","(-1.660686, 4.36, -1.7425)","(23.40288, 0.16, 7.198358)"],"phase":0,"spider":"(-17.09452, 0.31, 6.0)"}
+PROFILE_PHASE 1 at 60.015381
+PROFILE_STATE {"flies":["(-9.0, 0.16, -9.0)","(9.726043, 4.76, -3.697802)","(5.949529, 4.76, -5.756159)","(23.00256, 0.16, 6.886037)"],"phase":1,"spider":"(-10.21116, 0.31, 6.0)"}
+PROFILE_PHASE 2 at 120.015021
+PROFILE_STATE {"flies":["(-8.808467, 0.16, -8.887509)","(9.108206, 4.76, -2.60381)","(4.680873, 4.76, -6.724048)","(23.00429, 0.16, 7.332004)"],"phase":2,"spider":"(-16.84452, 0.31, 6.0)"}
+PROFILE_PHASE 3 at 180.010865
+PROFILE_STATE {"flies":["(-8.978787, 0.16, -9.289083)","(9.015549, 4.76, -2.431328)","(3.891431, 4.76, -6.285311)","(21.87004, 0.16, 7.307188)"],"phase":3,"spider":"(-13.38618, 0.31, 6.0)"}
+PROFILE_PHASE 4 at 240.008636
+PROFILE_STATE {"flies":["(-12.8, 0.16, -2.0)","(8.684156, 4.76, -1.39726)","(6.067796, 4.76, -6.901688)","(21.97856, 0.16, 6.867455)"],"phase":4,"spider":"(-12.99024, 0.31, 6.0)"}
+PROFILE_END {"audio_peak":0.891334176063538,"captures_seen":1,"frames":17025,"hunt_attempts":2,"path":"C:/Users/natha/.codex/.chatgpt-projects/g-p-6ac2f32f82a48191b0c7151a11eab0fd/release_measured_runtime/Roaming/Godot/app_userdata/Jumping Spider Sim/profile_frames.csv","seconds":300.006896,"struggles_won":2}

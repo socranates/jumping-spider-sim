@@ -1,0 +1,45 @@
+L01 feeding report (spec 25): feeding increases energy only while valid; canceling cannot duplicate prey or consumption
+timestamp_utc: 2026-10-11T10:17:41Z
+evidence_id: db112e2fa006 (source 41a0fc76, settings 8b6707d4, tests 2a1e2838)
+engine: 4.7.2-stable (official)
+numbers: a fly gives 0.35 of the reserve in all, eaten at 0.10 a second (3.5 s for a whole fly); the reserve is 0..1 and starts at 0.55; it drains by 0.0006 a second down to a floor of 0.20, so a meal is never needed to survive the first hunt
+setup: the lab's own world, the real spider, prey director, feeding controller and needs model; the spider holds a fly it caught with a real strike (F4 sets the catch up directly and presses the real buttons); the audit reads the truth
+PASS F1 a whole meal, audited tick by tick: energy rises only while the meal is valid
+    the capture: the fly is CAPTURED and held, and no energy has been granted (0 grants, 0.550)
+    holding the prey for a second grants nothing: the reserve only drained, 0.5497 to 0.5491
+    E starts the meal
+    1.5 s of feeding raised the reserve by 0.149 (the data says 0.150), never more than 0.0017 in a tick
+    and the ledger shows what the fly gave up (0.1500 of 0.35) and nothing else
+    the spider took a step: the meal ended on that very tick ('moved') and nothing more was granted while it walked
+    standing still again without pressing E grants nothing: a meal is something the player starts
+    pressing the jump ended it ('jumped') within a tick, and nothing was granted during the aim
+    the meal went on to the end: the fly is CONSUMED and the jaws are empty (<null>)
+    in all it granted 0.3500, the fly's whole nutrition, once
+    over the whole run the energy rose in 210 ticks and every one was inside a valid meal, with no gain the ledger does not explain
+PASS F2 canceling at any moment, by any route, again and again, cannot duplicate the prey or its consumption
+    8 meals were started and cancelled at random moments: 1 by the button, 2 by cancel, 1 by a step, 4 by a jump press
+    after all of them the ledger holds 0.2600, exactly what the fly gave up, and the fly still has 0.0900 of its 0.35
+    there is still one fly, held, captured once: canceling made no second fly and no second capture
+    a cancel on the very tick of the last bite wins: that bite is not taken and not granted (0.00167 is left)
+    the next meal took it: CONSUMED, and the ledger holds 0.3500, its whole nutrition and no more
+    pressing E and cancel on an eaten fly grants nothing and brings nothing back: no living fly, empty jaws
+    one source in the books, and every tick of every meal was valid with nothing unexplained (210 energy ticks)
+PASS F3 what is refused grants nothing, and says why; a full reserve is not overfilled
+    with nothing in the jaws E is refused: 'no prey'
+    a strike that missed (the fly was FLEE) leaves nothing to eat: refused, and no energy granted
+    walking: refused ('moved')
+    aiming a jump: refused ('jumped')
+    none of the refusals took a bite or granted anything (refused 2 times for: moved 1, jumped 1)
+    with the reserve nearly full the meal still ends by itself, so the player is never trapped holding prey
+    and the reserve is not overfilled: 1.0000, having been granted only 0.0121 of the 0.35 the fly had (the rest had no room)
+PASS F4 the real buttons: interact starts the meal, interact or cancel stops it, and the controls are the player's again at once
+    E started the meal and the reserve rose, 0.550 to 0.601 in half a second
+    Q stopped it
+    and nothing more was granted (-0.0003)
+    the stick works at once: the spider walked 1.07 WU after the meal was cancelled
+    E while walking did nothing; E when still started the next meal
+    E again stops it too
+    after three presses the ledger is exactly what was eaten (0.0733 of 0.35)
+saving and loading cannot duplicate prey or consumption: checked by test_l01_saving_and_loading_cannot_duplicate_prey_or_consumption (T09, through the S01-C retreat checkpoint in the windowsill); its result is in the runner's report, not here.
+
+L01 result: 4 of 4 fixtures passed: feeding raised the energy only while valid and canceling never duplicated prey or consumption; save/load not run (no save system yet)

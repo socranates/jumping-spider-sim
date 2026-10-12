@@ -1,3 +1,48 @@
+# Current handoff - Claude, 2026-10-12 (naturalist's notebook)
+
+**Latest: the naturalist's notebook (LEARN-02 to LEARN-04).**
+- Built while Chet's round was paused, kept on Claude's branch, and merged after his friends-slice round.
+- 14 short, sourced pages open the first time things happen in play. N / D-pad up, or the Esc menu, opens the notebook.
+- Pages are in `data/notebook/pages.json`; how far each source was checked is in `docs/NOTEBOOK_SOURCES.md`.
+- It is the player's own file (`user://notebook.cfg`). Tests never write it.
+- The friend ZIPs Chet made (from 48b84a0) do **not** include the notebook. A rebuild is needed if friends should see it.
+- Evidence after the merge: see DECISIONS LEARN-04 and SESSION_LOG.
+
+Next, by the release road (ROADMAP, "The goal"):
+1. Read the friends' feedback (`docs/FRIEND_PLAYTEST.md`).
+2. The eye-view shader is the first measured performance target (`docs/verification/release-slice/PERFORMANCE.md`).
+3. Then "one whole life".
+
+---
+
+# Current handoff - Chet, 2026-10-12 (friends slice)
+
+**Read docs/HANDOFF-release-slice.md first.** Game remains 48b84a0/T13a;
+this round adds packaging instructions and Windows evidence, not gameplay changes.
+Windows baseline **585/585**, evidence **db112e2fa006**, matches Claude.
+
+Windows and web release ZIPs are in Nathan's Downloads/The-Windowsill-Playtest-2026-10-12.
+SHA-256 manifest and all spec gate statuses are in docs/verification/release-slice/.
+Nothing published to itch.io. Friend feedback sheet: docs/FRIEND_PLAYTEST.md.
+
+Five-minute rendered source run on battery, 720p: **56.8 fps average,
+21.448 ms p95**; normal eye view slowest (~51.6 fps). Two strike attempts,
+successful struggles. F01's reporting clause is met; the 16.7 ms target is
+missed. Measurement limitations and reduction plan are in PERFORMANCE.md.
+
+Browser controls, both views, slow motion, pause and a preference reload
+worked. Actual Windows export renders both views; native keyboard automation
+was inconclusive because the tool emits incorrect physical key codes.
+Sound needs listener verification, controller-only play needs hardware,
+and browser Chromium UnknownError remains unresolved. M04 exhaustive
+rendered matrix, U01 and E01/E02 remain open. These are friend-test builds,
+not 1.0 or all-gates-closed evidence. Keep twitch and SimClock unchanged.
+
+Chet finishes on main, pushes, runs the laptop updater and confirms the
+actual commit in chat. Older handoffs below are historical.
+
+---
+
 # Current handoff - Claude, 2026-10-11 (T13a)
 
 **Latest: vision realism part 2, ROADMAP step 5.** Start from main and read **docs/HANDOFF-vision-2.md**.

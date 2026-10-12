@@ -31,15 +31,11 @@ The first release is one complete, calm, true-to-life game:
     - text size;
     - Reduced motion.
   - The spider-eye view (V / Y).
-- **Tests:** 548 automated tests pass on Windows after T10b (evidence 829573aaf835); the 12 eye-view tests also pass at normal speed. Claude's prior Linux baseline was 544/544 (7169ecfd3663).
-- **Gates (spec 25):**
-
-  | Status | Gates |
-  |---|---|
-  | Pass (automated) | M01–M03, P01, A01, L01, S01-C, S02 |
-  | Needs a person to play | U01 (controller only, remapped, muted), W01, E02, M04 (graphical) |
-  | Needs a measurement | F01 (frame time on Nathan's laptop) |
-  | Partly met | E01: Nathan and his son already play |
+- **Tests:** 585/585 on Windows after T13a, evidence db112e2fa006 (Chet, tested 2026-10-11).
+- **Gate audit:** [every gate and its evidence](verification/release-slice/GATES.md).
+  - Passed regression gates: M01-M03, P01, A01, L01, S01-C, S02; W01 has automated pause plus rendered warning evidence.
+  - F01 measurement/report clause completed; strict 16.7 ms p95 budget missed on this laptop. See [measurements and reduction plan](verification/release-slice/PERFORMANCE.md).
+  - Not fully run: M04 graphical 30/60/144 matrix, U01 physical controller-only loop, E01 five-person study, E02 causal hunt feedback. Original S01 exact resume is superseded, not passed.
 
 - **Direction from Nathan:**
   - scientific realism in vision and movement;
@@ -87,11 +83,12 @@ Keep the twitch.
 - Waiting on Nathan: **depth from defocus** (Nagata et al. 2012). Done faithfully, jumps would be less accurate in poor or reddish light and at long range. That changes how the game plays, so it is his call (EYE-13).
 - **UV markings:** kept unsimulated. Published numbers exist for glass and leaves, but none for the house fly, so it waits for that data (EYE-14).
 
-**6. Hand back the slice (spec T10; Chet on Windows, Claude on docs).**
+**6. Friends slice packaged (Chet, 2026-10-12); remaining acceptance checks explicit.**
+See [handoff](HANDOFF-release-slice.md), [export limitations](verification/release-slice/EXPORT-CHECKS.md), and [friend checklist](FRIEND_PLAYTEST.md). Windows/web ZIPs are on Nathan's laptop; nothing published. Native physical-key automation could not verify a full playthrough; sound/controller and human studies remain open.
 - Measure frame time on Nathan's laptop (F01).
 - Package a Windows build and a web build and play both.
 - Mark every gate passed, failed or not run, with evidence.
-- This closes spec phase 3, the complete slice.
+- Phase 3 is not declared fully closed until the remaining gate evidence is obtained.
 
 ## After that: one whole life (spec phase 4)
 

@@ -1,0 +1,56 @@
+A01 prey report (spec 25): a fly flees based on sensed evidence, not jump-button state; its debug trace explains each transition; capture triggers once
+timestamp_utc: 2026-10-11T10:17:21Z
+evidence_id: db112e2fa006 (source 41a0fc76, settings 8b6707d4, tests 2a1e2838)
+engine: 4.7.2-stable (official)
+prey: the prototype's one archetype, fly-like prey (no species claim), data/species/fly_like_prototype.json; the prey seed is fixed, so a run is repeatable
+setup: the lab's own world, the real spider, sensor and prey director; the spider is driven by its movement intent or the real controller; the checks read the truth, the fly never does
+numbers (from the species data): awareness calm 0.10, alert 0.30, flee 1.00; a startle is 70 deg/s of apparent motion within 7 WU; reaction delays (s) alert 0.04 to 0.10, relaxed 0.16 to 0.36, grooming 0.28 to 0.48; take-off 80 WU/s2, flight 15 WU/s; capture radius 0.40 WU plus the spider's 0.30
+PASS F1 pressing the jump button, Focus, the camera and interact changes nothing for the fly; walking at it does
+    the jump button was down and the spider was aiming for 83 ticks (the controller took it)
+    Focus and the camera did take effect: the body turned 100 degrees
+    interact was pressed and answered 'no prey'
+    and the spider did not move (0.000 WU) and did not leap
+    the fly's awareness stayed at 0.000 (calm is 0.10) and it made 0 transitions
+    it stayed PERCHED throughout
+    the same world, the same fly and no buttons at all: the fly did the very same thing, to 0.000000 WU over 272 ticks
+    and its awareness stayed at nothing there too
+    then the spider walked at the same fly: it left its rest after 0.2 s, with the spider 5.0 WU away, and was ALERT
+    its first transition was PERCHED -> ALERT: noticed: awareness 0.33 reached the alert level 0.30, sees it 5.1 WU away, 47 deg off its facing, 100% of it; bearing 3, loom 39 deg/s; awareness 0.33
+    and the reason carries the evidence (an angular speed and a distance)
+PASS F2 occluded spider motion does not startle the fly; the same motion in plain view does
+    behind the wall the spider walked east and back at 2.5 WU/s and then leapt along it (to x = 7.0), 4.5 WU from the fly
+    the fly looked 44 times and saw it in none of them (147 rays)
+    its awareness stayed at 0.000, it made 0 transitions and is PERCHED
+    and it holds no memory of where the spider is: it has never seen it
+    nothing was caught by the leap
+    the spider standing still in the same place: the fly did the very same thing, to 0.000000 WU over 251 ticks (all it does is its own walking, fidgeting and grooming)
+    the wall came down and the same leap in plain view moved the fly: noticed: awareness 0.32 reached the alert level 0.30, sees it 6.5 WU away, 127 deg off its facing, 100% of it; bearing 102, loom 44 deg/s; a
+    and its reason is the evidence: an angular speed over the limit at a distance
+PASS F3 a fly that is walked up to flees, and its trace and the developer's label explain every step
+    it walked at the fly and the fly went ALERT -> TAKEOFF -> FLEE -> SEEK_PERCH -> PERCHED
+    t 0.45 s  PERCHED -> ALERT: noticed: awareness 0.34 reached the alert level 0.30, sees it 8.1 WU away, 0 deg off its facing, 100% of it; bearing 0, loom 24 de
+    t 0.98 s  ALERT -> TAKEOFF: utility: flee wins (rest 0.42, flee 0.77; threat 0.69); reaction delay 0.20 s (alert) -> to ptfe_top (10.7 WU, shelter 0.20)
+    t 1.17 s  TAKEOFF -> FLEE: airborne after 0.18 s, 15.0 WU/s
+    t 1.75 s  FLEE -> SEEK_PERCH: 1.8 WU from ptfe_top, easing in
+    t 2.13 s  SEEK_PERCH -> PERCHED: landed on ptfe_top after a flee flight of 1.1 s (0 re-plans)
+    every transition carries a reason, the tick, the goal, the awareness and the evidence the fly had
+    the first says what it saw (bearing, looming, distance, how much of the spider)
+    the take-off waited out a reaction delay, which the reason states
+    and the alert posture lasted 0.53 s: long enough to be seen
+    and the last says where it landed
+    the flight never moved more than its top speed allows in a tick (0.250 WU): no jump, no teleport
+    F4 shows, for each fly, its id, state, goal, awareness, perch and the reason of its last transition, e.g. while fleeing: fly_1 FLEE  goal flee  aw 1.50 | perch floor_east_open  -> ptfe_top | winner flee | rest 0.41, flee 0.81 | airborne after 0.18 s, 15.0 WU/s
+    F3 lists the fly with its state and awareness, and the energy and feeding lines
+PASS F4 a capture is resolved once, with a stable id and an owner, before any energy exists
+    one strike, one capture event: capture:spider:fly_1 (owner spider, 0.63 WU from the fly with a reach of 0.70)
+    its id is stable: it names who took what
+    at the moment of the capture the prey was CAPTURED and the spider's energy was untouched (0 grants, 0.550)
+    the spider owns it and holds it
+    sixty ticks later the capture alone has still granted nothing: only feeding does
+    a second strike through the same place and twelve more tests of the world caught nothing more: still one event, none refused
+PASS F5 nothing of the player's reaches the fly: its code names no control, no aim and no spider, and the world offers it one stimulus
+    the 1725 lines of the fly's scripts (fly.gd, fly_senses.gd, fly_mind.gd, fly_flight.gd, fly_body.gd) name no input, jump, Focus, camera, aim, feeding, needs or spider
+    the only parts of the world a fly reads are stimulus, space, tick, now, graph
+    the world's stimulus is a position and a radius (["position", "radius"]) and the fly's own rays decide what of it can be seen
+
+A01 result: 5 of 5 fixtures passed: the fly fled on what it sensed and not on the jump button; its trace explained every step; the capture happened once

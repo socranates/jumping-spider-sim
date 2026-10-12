@@ -1059,6 +1059,15 @@ Chet reviews this entry, `docs/HANDOFF-chunk-7.md` and the tests named above. Na
 - A flawed test that compared two separately spawned worlds was dropped (the stage fixture is not identical across spawns).
 - Final: evidence db112e2fa006, 585 of 585 (fixed 60 fps, Linux headless); eye and sensor tests 69 of 69 at fixed 30 and 144. Not run on Windows.
 
+
+## 2026-10-12 - Chet - Friends slice handback
+
+- Started on main 48b84a0 after laptop update. Read T13a/workflow/roadmap; Windows baseline on 2026-10-11: 585/585, db112e2fa006. No game-code changes.
+- Exported official Godot 4.7.2 Windows x64 and single-threaded web release builds. Native both-view rendering and browser walking/hop/V/T/pause/preference reload checked. Native physical-key automation diagnosed as incorrect scan codes; did not claim a full physical-input playthrough. Sound listening and controller checks remain open; browser emitted nonfatal Chromium UnknownError.
+- Completed 300.006896 s rendered source/debug route, both views and quarter speed, arranged live hunt with two strikes and successful struggles. Battery/Balanced, 1280x720: 56.8 fps average / 21.448 ms p95. Strict frame budget missed; reduction plan and raw trace preserved.
+- Added all-gate audit, screenshots, baseline reports, friend instructions, engine notices and artifact checksums. Friends ZIPs in Downloads/The-Windowsill-Playtest-2026-10-12. No publication.
+- Added developer-only profiling/input-diagnostic fixtures with UIDs. Keep source and laptop on shared main at handback; final chat confirms actual commit.
+
 ### 2026-10-11: LEARN-01 naturalist's notebook (Claude, cloud session)
 - Chet timed out mid-round (ROADMAP step 6); nothing of it was pushed. Nathan: "Do you wanna run some stuff in the meantime?" Built the notebook from Nathan's teaching idea, on Claude's branch only, to merge after Chet's round lands.
 - 14 pages opened by first events in play, each with an "In this game" honesty line and sources (citations checked by web search; papers not read in full: docs/NOTEBOOK_SOURCES.md). N / D-pad up or the Esc menu opens it; the game waits; no count of pages left; a short new-page note that can be turned off. Player-owned file, never written by tests. LEARN-02, LEARN-03.

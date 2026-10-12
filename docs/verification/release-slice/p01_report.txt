@@ -1,0 +1,74 @@
+P01 perception report (spec 25): hidden prey does not update a classified observation; turning toward a visible cue improves classification after the configured inspection period
+timestamp_utc: 2026-10-11T10:18:09Z
+evidence_id: db112e2fa006 (source 41a0fc76, settings 8b6707d4, tests 2a1e2838)
+engine: 4.7.2-stable (official)
+target: the labelled test target (A-010), a magenta marker on a rod and base that walks a path at 0.8 WU/s, goes behind a 3 WU screen and comes out; it is not a fly and has no AI
+setup: the spider on the 2 WU ledge facing the stage, interactive worlds (camera rig, player controller, perception HUD); what the player does comes only from the memory; checks read the truth
+numbers (from the species profile): inspection cone 30 deg; continuous exposure 0.40 s for possible prey and 1.00 s for fly-like prey; cue cooldown 0.8 s; broad scan 10 Hz, close checks every tick within 4 WU; memory 6 s; Focus turns at most 180 deg/s
+PASS F1 visible motion in the periphery gives a coarse cue and nothing finer
+    the marker walks in view, off to the right of the cone
+    5 cues in 4 s
+    cues are 0.80 s apart at the least (configured cooldown 0.80 s)
+    every cue is a valid observation record (spec 21.3)
+    no cue carries a position or a category beyond movement
+    the bearing is within 10.2 degrees of the truth (a 22.5 degree sector, a 30 degree band)
+    the record knows only 'movement', coming from that side: no position, no refinement
+    no inspection was made: the cone never touched it
+    the screen shows an edge marker only (no ring, no words, no place)
+PASS F2 orbiting the camera toward the cue, without Focus, grants no inspection
+    a cue arrived
+    the player swung the camera 45 degrees to look straight at the cue's bearing
+    for 5 s the body's heading did not change (0.000000 degrees)
+    and the sensor's cone axis did not move
+    the thing is still only 'movement': no inspection, no position, no refinement, though the camera looked straight at it
+PASS F3 holding Focus toward the visible cue improves classification after the configured inspection period
+    a cue arrived; the thing is 'movement' only
+    the cone reached it 0.17 s after Focus was pressed
+    the body turned 45 degrees toward the cue
+    at no more than 3.00 degrees a tick (cap 180 degrees/s = 3.00 a tick)
+    possible prey after 0.40 s of continuous inspection (configured 0.40 s), not before
+    fly-like prey after 1.00 s (configured 1.00 s), not before
+    classification improved: movement -> fly_like_prey
+    and the record has a position within 0.01 WU of the marker
+    the screen says so, in words: "fly-like prey"
+PASS F4 a hidden target does not update the classified observation, and no coordinates of it reach the HUD
+    classified as fly-like prey, then lost behind the screen: it has a mark
+    the marker stayed hidden for 215 ticks (3.6 s) while it walked on 2.9 WU
+    through all of it the record did not change: position, tick observed, category and modality as at the loss, and no observation was ingested
+    only its confidence fell, 0.68 to 0.27
+    the marker is 3.4 WU from where the memory has it
+    from a second viewpoint, on the west side of the stage, the camera sees the marker in the open (22 of the samples) and the HUD drew the remembered place 44 times
+    every ring was at the projection of the last observed place and none at the marker, no label near the marker, no edge marker: no coordinates of the hidden target reached the HUD
+PASS F5 the last-seen mark stays put, goes stale and expires
+    half the memory time (3.0 s) after the loss the mark is exactly where it was ((-26.31975, 1.4, -7.80275))
+    stale: 0.50 of the way to forgotten
+    confidence has fallen from 0.68 to 0.34, a straight line to nothing at 6.0 s
+    seen from the west side of the stage the mark is a ring
+    fainter and more broken (strength 0.36 of 0.60 when fresh, dash 0.65 of 1)
+    at the place it was last seen, fixed in the world
+    one tick before the memory time (5.98 s) it is still just there
+    at 6.0 s it expired and the contact with it (reason ["expired"])
+    and nothing of it is left on the screen
+PASS F6 seen again after turning toward its cue: the one remembered place it could be is updated (reacquisition by evidence, not by name)
+    the marker came out on the far side and was inspected again
+    it came out 3.60 s after the loss; the cone had it again 0.22 s later
+    first came a cue (1 new) from its new side, which did not bring the record back by itself
+    it is the same record and the same track (trk_1), not a new one, although the world now calls the marker by another name
+    reacquired once, live, the mark gone
+    its position is updated to where it is now (0.35 WU from the marker, 3.9 WU from the old mark)
+    observed again after the loss, and still known as fly_like_prey (something seen a moment ago is not a stranger)
+PASS F7 inspecting the remembered spot and finding it empty drops the mark; looking away, or a spot the world hides, does not
+    (a) classified as fly-like prey at the west spot
+    (a) taken away, lost, and 0.40 s of looking at the empty spot dropped the mark (reason empty, not expiry)
+    (a) and not sooner than the 0.40 s the check needs
+    (b) with the body turned away the marker was taken away unseen: 2.5 s later the mark is still there (nobody has looked)
+    (c) behind a wall 2.5 s of looking at the wall did not call the place behind it empty: the mark stays
+PASS F8 a target the spider never sensed leaves nothing in the presentation, even where the camera sees it
+    (a) the marker walks behind the spider, and the camera, turned round, has it on the screen
+    (a) the spider has sensed nothing: no cue, no inspection, not even a track id
+    (a) so no edge marker, ring, label or mark is drawn for it (spec 6.4)
+    (b) the marker stands dead ahead behind the screen: hidden, and never sensed
+    (b) the gaze overlay lies on the screen's face ((-24.5, 2.39, -5.8)) and is exactly the same with the marker taken away: it reveals nothing hidden
+    (b) and the HUD is empty
+
+P01 result: 8 of 8 fixtures passed: a hidden target left the classified observation untouched; turning toward a visible cue improved the classification after the configured inspection period

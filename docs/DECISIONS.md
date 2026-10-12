@@ -397,6 +397,13 @@ Nathan: "chet just finished and its freakin amazing you guys are making this so 
   - The order of work is in ROADMAP ("The goal"). More species and habitats follow the first release.
   - Not goals: profit, ads, data collection, engagement pressure.
 
+
+## Friends slice handback (Chet, 2026-10-12)
+
+- **RELEASE-02 Label test builds and preserve evidence scope.** Package Windows x64 and web from unchanged game source 48b84a0 (585/585 Windows, db112e2fa006), with controls, engine notices and checksums. No public release or itch.io upload yet. Binary ZIPs stay outside Git; reproducible instructions and evidence stay in Git.
+- **PERF-01 Measure before simplifying.** Five-minute real rendered, scripted windowsill run at 720p on battery: 56.8 fps average, 21.448 ms p95; eye view is slowest. F01's measured-misses/report alternative is satisfied, not its 16.7 ms target. Retain capture/setup spikes and state instrumentation limits. Next: capture-free release A/B, eye blur cost, named physics timers and first-use hunt work. No twitch, SimClock or game-physics change.
+- **RELEASE-03 Do not turn automation limits into a pass.** Both exports render; browser inputs and preference reload worked. Native tool gives V/Escape the same wrong physical code, so native keyboard play is inconclusive. Controller-only play and sound listening need people/hardware. Browser UnknownError remains unexplained. Every gate is labelled in verification/release-slice/GATES.md, including superseded S01 and open human gates.
+
 ## LEARN-01, first notebook — Claude, 2026-10-11
 
 Built while Chet's round (ROADMAP step 6) was paused; kept on Claude's branch until his round is in main.

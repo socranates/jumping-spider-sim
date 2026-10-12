@@ -1,0 +1,33 @@
+M03 tether report (spec 25): ten recoverable misses caught by the safety line, recovery by reeling, lowering or letting go
+timestamp_utc: 2026-10-11T10:18:05Z
+evidence_id: db112e2fa006 (source 41a0fc76, settings 8b6707d4, tests 2a1e2838)
+engine: 4.7.2-stable (official)
+fixture_seed: 20261005
+checked every tick on a line: no overlap with the world (sphere 0.005 WU under the collider); 0 <= paid <= rest <= max;
+  path <= rest + 0.01 WU; the constraint only removes outward radial speed (no push, tangential speed kept);
+  energy (0.5 v^2 + g y per unit mass) <= start of tick + reel work + the seat step when the legs take hold + the engine's
+  collision recovery (at most 0.002 WU = 0.02 mm of lift a tick, 1 WU = 1 cm = 10 mm; measured per fixture below) + 2e-4;
+  reel work <= shortening x (g + v^2 / L); the line clear of geometry except on ticks flagged as snagged
+energy gate (A-019): no unexplained energy gain within the documented allowances (reel work, the seat step, the engine's collision recovery, 2e-4)
+PASS F01 miss off a ledge edge: the practice bridge between the towers drops
+    jump 5.1 WU to drop_bridge; outcome missed, caught 0.63 s after launch with 6.01 WU of line, over a bend on tower_w; the swing carried it onto tower_w, which it took hold of, 0.68 s after the catch. 73 ticks traced, 0 held at rest, 0 with the line snagged (flagged), 0 energy-limit ticks, engine contact recovery on 0 ticks (at most 0.000000 WU = 0.00000 mm); events: anchored:tower_w, locked, caught, completed
+PASS F02 long-jump miss: 8.5 WU off tower_e
+    jump 8.5 WU to m03_perch_02; outcome missed, caught 0.80 s after launch with 9.58 WU of line, over a bend on tower_e; the swing carried it onto tower_e, which it took hold of, 1.00 s after the catch. 102 ticks traced, 0 held at rest, 0 with the line snagged (flagged), 0 energy-limit ticks, engine contact recovery on 0 ticks (at most 0.000000 WU = 0.00000 mm); events: anchored:tower_e, locked, caught, completed
+PASS F03 miss off the cliff cap: hang below its lip clear of the coating, reel up
+    jump 2.7 WU to drop_perch; outcome missed, caught 0.48 s after launch with 3.53 WU of line, over a bend on cliff_cap; came to rest 2.40 s after the catch, 3.42 WU above the floor; reeled in for 1.42 s and took hold of cliff_cap. 252 ticks traced, 1 held at rest, 0 with the line snagged (flagged), 0 energy-limit ticks, engine contact recovery on 0 ticks (at most 0.000000 WU = 0.00000 mm); events: anchored:cliff_cap, locked, caught, completed
+PASS F04 miss off the slab's edge: hang below it, reel up into its underside
+    jump 2.5 WU to m03_perch_04; outcome missed, caught 0.47 s after launch with 3.22 WU of line, over a bend on arch_slab; came to rest 5.73 s after the catch, 2.13 WU above the floor; reeled in for 0.95 s and took hold of arch_slab. 423 ticks traced, 1 held at rest, 86 with the line snagged (flagged), 0 energy-limit ticks, engine contact recovery on 0 ticks (at most 0.000000 WU = 0.00000 mm); events: anchored:arch_slab, locked, caught, snagged, snagged, completed
+PASS F05 overshoot the cliff cap from the east wall: caught over its far lip, reel up
+    jump 10.0 WU to m03_perch_05; outcome missed, caught 0.83 s after launch with 11.66 WU of line, over a bend on cliff_cap; came to rest 2.78 s after the catch, 4.02 WU above the floor; reeled in for 1.02 s and took hold of cliff_cap. 272 ticks traced, 1 held at rest, 0 with the line snagged (flagged), 0 energy-limit ticks, engine contact recovery on 0 ticks (at most 0.000000 WU = 0.00000 mm); events: anchored:wall_east, locked, caught, completed
+PASS F06 glancing contact: a coated plate moves into the path
+    jump 5.0 WU to m03_perch_06; outcome ineligible, caught 0.72 s after launch with 3.65 WU of line, over a bend on tower_w; the swing carried it onto tower_w, which it took hold of, 0.32 s after the catch. 56 ticks traced, 0 held at rest, 0 with the line snagged (flagged), 0 energy-limit ticks, engine contact recovery on 0 ticks (at most 0.000000 WU = 0.00000 mm); events: anchored:tower_w, locked, caught, completed
+PASS F07 falling past a wall: jump away from the north wall
+    jump 4.2 WU to m03_perch_07; outcome missed, caught 0.58 s after launch with 5.52 WU of line; the swing carried it onto wall_north, which it took hold of, 0.68 s after the catch. 70 ticks traced, 0 held at rest, 0 with the line snagged (flagged), 0 energy-limit ticks, engine contact recovery on 0 ticks (at most 0.000000 WU = 0.00000 mm); events: anchored:wall_north, locked, caught, completed
+PASS F08 a line snagged by an obstacle: reeling reports it, lower, let go
+    jump 2.5 WU to m03_perch_08; outcome missed, caught 0.47 s after launch with 3.22 WU of line, over a bend on arch_slab; came to rest 5.73 s after the catch, 2.13 WU above the floor; a coated plate across the line: snagged true, reeling refused true, lowered true, let go true, landed on floor. 435 ticks traced, 14 held at rest, 148 with the line snagged (flagged), 0 energy-limit ticks, engine contact recovery on 0 ticks (at most 0.000000 WU = 0.00000 mm); events: anchored:arch_slab, locked, caught, snagged, snagged, snagged, released
+PASS F09 a line anchored on clean glass: jump away from the pane
+    jump 2.2 WU to m03_perch_09; outcome missed, caught 0.45 s after launch with 3.23 WU of line; the swing carried it onto floor, which it took hold of, 0.45 s after the catch. 48 ticks traced, 0 held at rest, 0 with the line snagged (flagged), 0 energy-limit ticks, engine contact recovery on 0 ticks (at most 0.000000 WU = 0.00000 mm); events: anchored:glass_pane, locked, caught, completed
+PASS F10 miss off the slab's edge, then lower to the floor
+    jump 2.5 WU to m03_perch_10; outcome missed, caught 0.47 s after launch with 3.22 WU of line, over a bend on arch_slab; came to rest 5.73 s after the catch, 2.13 WU above the floor; lowered for 1.55 s and took hold of the floor. 459 ticks traced, 1 held at rest, 86 with the line snagged (flagged), 0 energy-limit ticks, engine contact recovery on 0 ticks (at most 0.000000 WU = 0.00000 mm); events: anchored:arch_slab, locked, caught, snagged, snagged, completed
+
+M03 result: 10 of 10 fixtures caught and recovered or reported blockage, with no overlap, no push and no unexplained energy gain within the documented allowances

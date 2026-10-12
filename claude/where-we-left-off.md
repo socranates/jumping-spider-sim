@@ -9,7 +9,7 @@
 - On the laptop, time the eye view before and after T13b. Try the mipmap variant described in `docs/verification/eye-perf/results.txt` if it looks worth it.
 - Rebuild the friend ZIPs from the new main.
 
-Then Claude does clocks and hunger. Nathan has four questions at the end of `docs/LIFE_DESIGN.md`.
+Then Claude does clocks and hunger. Nathan answered the four questions in `docs/LIFE_DESIGN.md`: all proposals accepted (LIFE-03).
 
 Evidence **2c7264139c03**: 591/591 (Linux headless, fixed 60 fps). Not run on Windows.
 

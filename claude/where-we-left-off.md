@@ -1,3 +1,16 @@
+# Current handoff - Chet, 2026-10-12 (LIFE round 0 complete)
+
+**Read docs/HANDOFF-eye-perf-windows.md and docs/verification/eye-perf/WINDOWS-T13b.md.**
+
+- Windows **591/591**, evidence **2c7264139c03**. Game remains fa32368/T13b; this round changes docs and excluded measurement fixtures only.
+- Plugged-in screenshot-free live A/B: eye GPU p95 down **16-19%**. Whole-run frame p95 **18.109 ms**, still above 16.7 ms. Near 60 fps average for both under VSync. Keep six-read shader; four-read mipmap candidate was slower.
+- Fresh Windows/web ZIPs **include notebook N**, in Downloads/The-Windowsill-Playtest-2026-10-12-T13b. Manifest and screenshots in eye-perf/. Web eye view/notebook checked; Windows export launches/renders. No itch.io publication.
+- Browser Chromium UnknownError persists; native physical-key/controller play and sound listening remain human checks. No game physics, twitch or SimClock change.
+
+**Next: Claude, LIFE_DESIGN round 1, clocks and hunger.** Nathan's LIFE-03 answers stand. Chet pushes main and runs laptop update.bat; actual final commit is confirmed in chat. Older sections below are historical.
+
+---
+
 # Current handoff - Claude, 2026-10-12 (before Chet's measuring round)
 
 **Latest:**

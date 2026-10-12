@@ -1078,3 +1078,10 @@ Chet reviews this entry, `docs/HANDOFF-chunk-7.md` and the tests named above. Na
 - The eye picture is cheaper: 12 to 6 blur reads, and no full-size read outside the sharp fields. On llvmpipe its cost fell from about 32 to about 22 ms at 720p; the look is within about 2/255. A mipmap variant was slower on llvmpipe; it is left for a laptop trial. PERF-02.
 - A background literature search on *P. audax* life history, moulting, starvation, predators and escape behaviour went into `docs/LIFE_DESIGN.md` (LIFE-02). The mud dauber wasp is the best-supported windowsill predator. Most numbers come from excerpts and are marked to be read before they are taught.
 - Final: evidence 2c7264139c03, 591 of 591 (fixed 60 fps, Linux headless); eye tests 21 of 21. Not run on Windows.
+
+## 2026-10-12 - Chet - LIFE round 0, laptop eye comparison and rebuild
+
+- Updated laptop and working main to fa32368. Confirmed 591/591 Windows fixed60, evidence 2c7264139c03. No game-code changes.
+- Ran old/T13b five-minute live graphical routes sequentially, plugged in, no screenshot readback. Eye GPU p95 down 16-19%; overall frame p95 18.109 ms still misses target. Both hunts captured/subdued prey. Frozen-view screen rejected four-read mipmap candidate; retained production six-read shader.
+- Rebuilt Windows/web release friend ZIPs including notebook, controls/readme and licenses. Verified ZIP CRCs/layout, native executable rendering, browser eye rendering, W/V/T and N notebook. Preserved persistent Chromium error and native physical-input/listening limitations.
+- Saved raw compressed traces, logs, power records, summaries, screenshots and checksums in verification/eye-perf/. Added measurement script UID and capture-free profiling option; production twitch/SimClock unchanged. Updated handoff, plan and decisions. Finish on main and update laptop; final commit in chat.

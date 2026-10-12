@@ -1,0 +1,8 @@
+[
+  {
+    "level": "error",
+    "message": "UnknownError: If you see this error we have a bug. Please report this bug to chromium.",
+    "timestamp": "2026-10-12T11:40:52.553Z",
+    "url": "http://127.0.0.1:8765/"
+  }
+]

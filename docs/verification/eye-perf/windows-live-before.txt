@@ -1,0 +1,10 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 Core Profile Context 25.10.42.01.260515 - Compatibility - Using Device: ATI Technologies Inc. - AMD Radeon(TM) Graphics
+
+PROFILE_START {"gpu":"AMD Radeon(TM) Graphics","os":"Windows","seed":4242,"size":"(1280, 720)","texture":"(1280.0, 720.0)","vsync":1}
+PROFILE_PHASE 0 at 0.017109
+PROFILE_PHASE 1 at 60.000322
+PROFILE_PHASE 2 at 120.014199
+PROFILE_PHASE 3 at 180.010877
+PROFILE_PHASE 4 at 240.010074
+PROFILE_END {"audio_peak":0.891445815563202,"captures_seen":1,"frames":17973,"hunt_attempts":1,"path":"C:/Users/natha/.codex/.chatgpt-projects/g-p-6ac2f32f82a48191b0c7151a11eab0fd/eye_live_before/Roaming/Godot/app_userdata/Jumping Spider Sim/profile_frames.csv","seconds":300.009435,"struggles_won":1}

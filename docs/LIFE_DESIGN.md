@@ -102,7 +102,8 @@ Courtship and eggs (phase 5), seasons and overwintering, drinking (no jumping-sp
 
 Each round is one handoff: start from `main` and finish into `main`.
 
-0. **Chet, now: measure and rebuild.**
+0. **Chet, complete 2026-10-12: measure and rebuild.**
+   - Results: `HANDOFF-eye-perf-windows.md`; six-read T13b retained, Windows 591/591; new notebook friend ZIPs delivered.
    - Time the cheaper eye shader (T13b) on the laptop against the previous one.
    - Try the mipmap variant noted in `docs/verification/eye-perf/results.txt`.
    - Rebuild the friend ZIPs with the notebook, so friends play the current game.

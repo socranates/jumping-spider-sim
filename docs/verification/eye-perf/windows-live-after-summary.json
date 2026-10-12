@@ -1,0 +1,88 @@
+{
+  "all": {
+    "frames": 17952,
+    "mean_ms": 16.712,
+    "p50_ms": 16.665,
+    "p95_ms": 18.109,
+    "p99_ms": 18.741,
+    "max_ms": 263.034,
+    "over_33_3ms": 9,
+    "over_50ms": 3,
+    "process_ms_p95": 20.677,
+    "physics_ms_p95": 2.572,
+    "render_cpu_ms_p95": 1.362,
+    "render_gpu_ms_p95": 6.348
+  },
+  "phases": {
+    "0": {
+      "frames": 3592,
+      "mean_ms": 16.703,
+      "p50_ms": 16.671,
+      "p95_ms": 17.29,
+      "p99_ms": 19.192,
+      "max_ms": 62.032,
+      "over_33_3ms": 2,
+      "over_50ms": 1,
+      "process_ms_p95": 21.649,
+      "physics_ms_p95": 2.673,
+      "render_cpu_ms_p95": 1.454,
+      "render_gpu_ms_p95": 6.356
+    },
+    "1": {
+      "frames": 3586,
+      "mean_ms": 16.731,
+      "p50_ms": 16.688,
+      "p95_ms": 17.261,
+      "p99_ms": 18.632,
+      "max_ms": 96.272,
+      "over_33_3ms": 4,
+      "over_50ms": 1,
+      "process_ms_p95": 35.532,
+      "physics_ms_p95": 2.572,
+      "render_cpu_ms_p95": 1.28,
+      "render_gpu_ms_p95": 6.612
+    },
+    "2": {
+      "frames": 3600,
+      "mean_ms": 16.666,
+      "p50_ms": 16.638,
+      "p95_ms": 18.163,
+      "p99_ms": 18.453,
+      "max_ms": 26.218,
+      "over_33_3ms": 0,
+      "over_50ms": 0,
+      "process_ms_p95": 19.325,
+      "physics_ms_p95": 2.195,
+      "render_cpu_ms_p95": 1.325,
+      "render_gpu_ms_p95": 6.279
+    },
+    "3": {
+      "frames": 3587,
+      "mean_ms": 16.726,
+      "p50_ms": 16.659,
+      "p95_ms": 18.466,
+      "p99_ms": 19.537,
+      "max_ms": 39.638,
+      "over_33_3ms": 2,
+      "over_50ms": 0,
+      "process_ms_p95": 28.312,
+      "physics_ms_p95": 2.526,
+      "render_cpu_ms_p95": 1.391,
+      "render_gpu_ms_p95": 6.371
+    },
+    "4": {
+      "frames": 3587,
+      "mean_ms": 16.732,
+      "p50_ms": 16.665,
+      "p95_ms": 17.147,
+      "p99_ms": 17.436,
+      "max_ms": 263.034,
+      "over_33_3ms": 1,
+      "over_50ms": 1,
+      "process_ms_p95": 17.286,
+      "physics_ms_p95": 2.789,
+      "render_cpu_ms_p95": 1.254,
+      "render_gpu_ms_p95": 6.135
+    }
+  }
+}

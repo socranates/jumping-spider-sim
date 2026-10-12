@@ -1,0 +1,69 @@
+
+shader_type canvas_item;
+uniform sampler2D screen_tex : hint_screen_texture, filter_linear, repeat_disable;
+uniform float principal = 1.0;            // 0..1: the principal eyes reach the gaze
+uniform vec2 retinal_half_deg = vec2(2.5, 10.0);
+uniform vec2 left_deg = vec2(-2.5, 0.0);
+uniform vec2 right_deg = vec2(2.5, 0.0);
+uniform float torsion = 0.0;
+uniform float tan_half_fov = 0.8391;
+uniform float aspect = 1.7778;
+uniform float blur_px = 7.0;              // radius of the secondary eyes' blur, in pixels
+uniform float grain_px = 3.0;             // their coarser sampling, in pixels
+uniform vec4 movers[8];                   // T13a: x, y (degrees from the centre of view), radius (degrees), strength 0..1
+uniform int mover_count = 0;
+uniform float flicker = 1.0;              // 0..1, the shimmer's pulse now
+uniform bool colour_free = false;         // comfort: the same brightness, shown grey
+
+// Soft bent strips suggest boomerang-shaped retinas in one fused view.
+float retina(vec2 angle, vec2 centre, float bend) {
+    vec2 p = angle - centre;
+    float c = cos(torsion);
+    float s = sin(torsion);
+    p = vec2(c * p.x + s * p.y, -s * p.x + c * p.y);
+    p.x -= bend * abs(p.y) * 0.18;
+    return 1.0 - smoothstep(0.85, 1.7, length(p / retinal_half_deg));
+}
+
+void fragment() {
+	vec2 uv = SCREEN_UV;
+	vec2 px = SCREEN_PIXEL_SIZE;
+    vec2 angle = degrees(atan((uv - vec2(0.5)) * 2.0 * tan_half_fov * vec2(aspect, 1.0)));
+    float sharp = principal * max(retina(angle, left_deg, -1.0), retina(angle, right_deg, 1.0));
+	// Secondary eyes: coarse cells, then a soft disc around each.
+	vec2 cell = px * grain_px;
+	vec2 base = (floor(uv / cell) + 0.5) * cell;
+	vec3 acc = vec3(0.0);
+	for (int i = 0; i < 12; i++) {
+		float a = float(i) * 2.39996;
+		float r = sqrt((float(i) + 0.5) / 12.0) * blur_px;
+		acc += texture(screen_tex, base + vec2(cos(a), sin(a)) * r * px).rgb;
+	}
+	vec3 coarse = acc / 12.0;
+    // RGB has no UV data: blue is NOT ultraviolet. Illustrative green-weighted
+    // brightness, not calibrated spectral sensitivity. Red is dim, not absent.
+    vec3 weights = vec3(0.08, 0.84, 0.08);
+    float green_side = dot(coarse, weights);
+    vec3 side = vec3(green_side) * (colour_free ? vec3(0.97) : vec3(0.94, 1.0, 0.94));
+    float green_centre = dot(texture(screen_tex, uv).rgb, weights);
+    vec3 centre = green_centre * (colour_free ? vec3(1.0) : vec3(0.88, 1.0, 0.76));
+    vec3 col = mix(side, centre, sharp);
+    // Motion in the surround: a soft halo and a ring that pulse against the local brightness, so they read on pale and dark ground.
+    float shimmer = 0.0;
+    for (int i = 0; i < 8; i++) {
+        if (i >= mover_count) {
+            break;
+        }
+        vec4 m = movers[i];
+        float d = length(angle - m.xy);
+        float halo = 1.0 - smoothstep(m.z * 0.5, m.z * 1.1, d);
+        float ring = smoothstep(m.z * 1.0, m.z * 1.15, d) * (1.0 - smoothstep(m.z * 1.15, m.z * 1.4, d));
+        shimmer = max(shimmer, max(halo * 0.18, ring) * m.w);
+    }
+    vec3 against = green_side > 0.5 ? vec3(0.06, 0.08, 0.06) : vec3(0.95, 1.0, 0.95);
+    if (colour_free) {
+        against = vec3(dot(against, vec3(0.333)));
+    }
+    col = mix(col, against, clamp(shimmer * flicker * (1.0 - sharp), 0.0, 1.0) * 0.65);
+	COLOR = vec4(col, 1.0);
+}

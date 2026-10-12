@@ -440,3 +440,8 @@ Built while Chet's round (ROADMAP step 6) was paused; kept on Claude's branch un
   - The mud dauber wasp is the first predator.
   - After a death, continue as an unrelated young juvenile elsewhere on the sill.
   - The notebook says plainly that the wasp paralyses the spider to feed its young.
+
+## Laptop eye comparison and rebuilt friends slice (Chet, 2026-10-12)
+
+- **PERF-03 Keep six reads on the laptop.** Plugged-in 720p, before shader 4c07efa versus T13b 40aceee inside the same fa32368 scene: live normal-eye GPU p95 7.878 -> 6.612 ms, quarter-speed 7.768 -> 6.279 ms. Overall frame p95 18.036 -> 18.109 ms under VSync: reduced GPU work, no demonstrated whole-game FPS increase and strict 16.7 ms goal still missed. No screenshots during timing. A four-read mipmap implementation was slower in the frozen-view screen (5.120 ms versus T13b 4.823 ms picture-on), so do not ship it. Single live runs, phase/setup spikes retained, source/debug runtime scope explicit; raw traces and exact shader fixtures in verification/eye-perf/.
+- **RELEASE-04 Refresh friend packages with notebook and T13b.** fa32368 game source, Windows 591/591 / 2c7264139c03. Windows/web ZIPs in Downloads/The-Windowsill-Playtest-2026-10-12-T13b; checksums in eye-perf/friend-builds.json. Web eye view and N notebook verified, native launch/render smoke check passed. Existing Chromium error and human acceptance checks remain open. No publication or gameplay changes. LIFE_DESIGN round 0 complete; clocks/hunger next.

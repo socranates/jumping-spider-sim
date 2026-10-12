@@ -1071,3 +1071,4 @@ Chet reviews this entry, `docs/HANDOFF-chunk-7.md` and the tests named above. Na
 ### 2026-10-11: LEARN-01 naturalist's notebook (Claude, cloud session)
 - Chet timed out mid-round (ROADMAP step 6); nothing of it was pushed. Nathan: "Do you wanna run some stuff in the meantime?" Built the notebook from Nathan's teaching idea, on Claude's branch only, to merge after Chet's round lands.
 - 14 pages opened by first events in play, each with an "In this game" honesty line and sources (citations checked by web search; papers not read in full: docs/NOTEBOOK_SOURCES.md). N / D-pad up or the Esc menu opens it; the game waits; no count of pages left; a short new-page note that can be turned off. Player-owned file, never written by tests. LEARN-02, LEARN-03.
+- Merged after Chet's friends-slice round (7e5c49d). The evidence was unchanged (9d96a61e810c, 591/591): his round changed no game code. The friend ZIPs on Nathan's laptop were built before the notebook.

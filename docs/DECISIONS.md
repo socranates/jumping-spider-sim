@@ -505,3 +505,4 @@ Built while Chet's round 2 was paused (out of usage, results not yet pushed), on
 - **LIFE-12 Checkpoint schema 5 and three notebook pages.**
   - Checkpoints keep growth (stage, food since the last moult, readiness, the moult and the soft skin still to pass, where the old skins lie). Schema 4 upgrades to a young juvenile.
   - New pages: "Outgrowing a skin" (ready), "A new skin" (moulted), "Grown up" (adult). Sources are in NOTEBOOK_SOURCES.md.
+- **LIFE-13 Evidence.** f82620887f67: 605 / 605 (Linux headless, fixed 60 fps), including 5 new tests (`tests/integration/test_life03_moulting.gd`). Moulting, life, notebook, windowsill, checkpoint and jump-input tests: 61 / 61 at fixed 30 and 144 fps. Reports and stills are in `docs/verification/life03/`. Not run on Windows.

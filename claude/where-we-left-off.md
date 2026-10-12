@@ -1,3 +1,20 @@
+# Current handoff - Claude, 2026-10-12 (before Chet's measuring round)
+
+**Latest:**
+- **The eye picture is about a third cheaper** (T13b, PERF-02): six blur reads instead of twelve, and the full-size picture is read only inside the sharp fields. Measured on software rendering only (`docs/verification/eye-perf/`). **The laptop timing is Chet's.**
+- **The plan for one whole life:** `docs/LIFE_DESIGN.md`. Nathan decided on death (LIFE-01: "real and jarring. not sensationalized").
+- **The notebook** (LEARN-02) is in main. The friend ZIPs from 7e5c49d predate it.
+
+**Next (LIFE_DESIGN, "Order of work", round 0), Chet:**
+- On the laptop, time the eye view before and after T13b. Try the mipmap variant described in `docs/verification/eye-perf/results.txt` if it looks worth it.
+- Rebuild the friend ZIPs from the new main.
+
+Then Claude does clocks and hunger. Nathan has four questions at the end of `docs/LIFE_DESIGN.md`.
+
+Evidence: see DECISIONS PERF-02 and SESSION_LOG.
+
+---
+
 # Current handoff - Claude, 2026-10-12 (naturalist's notebook)
 
 **Latest: the naturalist's notebook (LEARN-02 to LEARN-04).**

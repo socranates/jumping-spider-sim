@@ -1,0 +1,121 @@
+# One whole life: the plan
+
+Claude, 2026-10-12. This is ROADMAP "The goal", step 2 (spec phase 4, spec sections 11 and 13). It is a plan for Nathan, Chet and Claude: Nathan decides the open questions at the end. Update it as rounds finish.
+
+## What Nathan has decided
+
+- **LIFE-01:** "death can be real and jarring. not sensationalized but my kids are allowed to encounter reality."
+  - Natural is the default: a spider can die, and the player goes on as another spider or back to the last rest.
+  - Gentle is a separate choice, not part of Most help.
+  - A death is shown plainly and briefly, then a short summary of the life. No gore, no lingering, no score.
+- **RELEASE-01:** the first release is one windowsill, one species, one whole life, the notebook, calm by default.
+
+## What the biology says
+
+The sources were found by a web search, but most papers could not be opened, so many numbers come from abstracts or quoted excerpts. Each should be read before any of it is presented as fact in the game (LEARN-03).
+
+**Ratings:**
+- **Strong:** a study of *Phidippus audax* or another *Phidippus*.
+- **Weak:** another jumping spider, or spiders in general.
+- **Missing:** no source found.
+
+| Topic | What we found | Strength | Source |
+|---|---|---|---|
+| Moults to adult | Males 5–7 in the lab and 6–8 in the field; females 6–8 in the lab and 7–9 in the field (*P. johnsoni*) | Strong (relative) | Jackson 1978, *J. Arachnol.* 6: 1–29 |
+| Life length | One generation a year. *P. audax* overwinters as a juvenile, often in the instar before adult, and matures in spring | Strong | Taylor & Peck 1975, *J. Arachnol.* 2: 89–99; Jackson 1978; Penn State Extension |
+| Adult life | About 3–4 months in the lab (*P. johnsoni*) | Strong (relative), excerpt | Jackson 1978 |
+| Moulting | Inside a dense silk nest; about 6 days in the nest before a moult and 2 after (*P. johnsoni*) | Strong (relative), excerpt | Jackson 1979, *J. Arachnol.* 7: 47–58 |
+| Hunting around a moult | Stops for about 12 days around a moult; failed catches before it (*Trite auricoma*) | Weak | Forster 1977, *NZ J. Zool.* 4: 435–443 |
+| Moult duration, soft period | — | Missing | — |
+| Hunger and activity | *P. audax* switches between staying in the nest and going out to hunt by how hungry it is; spiders in nests were hungrier | Strong | Okuyama 2011, *Naturwissenschaften* 98: 15–22 |
+| Going without food | Adult female *P. johnsoni* kept 25–31 days unfed; juveniles in the cold last months | Strong (relative), excerpt | Jackson 1978, 1980 |
+| Starvation limit | Other spider families: 208–276 days | Weak | Anderson 1974, *Ecology* 55: 576–585 |
+| Body condition | Abdomen size against the carapace is the usual measure of how well fed a spider is | Weak (general) | Jakob, Marshall & Uetz 1996, *Oikos* 77: 61–67 |
+| Hunger and hunting skill | Food-restricted spiders spent more time out, noticed prey sooner and caught more (*Phintelloides versicolor*) | Weak | Li et al. 2021, *Ecology and Evolution* |
+| Drinking | Wolf spiders try to drink after losing about 10 % of their weight; jumping spiders unknown | Weak / missing | Parry 1954 |
+| Predator | The black-and-yellow mud dauber (*Sceliphron caementarium*) nests on houses and window frames. It stocks each cell with paralysed spiders, jumping spiders among them. It finds a spider by sight, checks it by touch, stings it and carries it off. The spider is paralysed, not killed, and the wasp's larva eats it | Strong for jumping spiders; missing for *P. audax* itself | Powell & Taylor 2017, *Behav. Ecol.* 28: 890–898; Uma et al. 2013, *PLoS ONE* 8: e79660; UF/IFAS |
+| Cellar spider | Eats other spiders in or near its web. In tests, jumping spiders were more often the predators of cellar spiders | Weak | Jackson & Brassington 1987; Jackson 1990 |
+| Escaping | *P. audax* backs away from something looming toward it, often with its front legs raised; its side eyes drive this | Strong | Spano, Long & Jakob 2012, *Biol. Lett.* |
+| Night | *Phidippus* goes into its silk nest before dark and stays overnight and in bad weather | Strong (relative) | Jackson 1978, 1979 |
+
+**Missing, and needed before we claim them:**
+- *P. audax*'s own instar count, time to maturity and lifespan (Bailey 1968, a thesis, probably has them).
+- How long a moult takes, and how long the spider stays soft afterwards.
+- Whether hunger makes a jumping spider bolder near predators.
+- Whether jumping spiders recognise wasps.
+
+## The design
+
+### 1. Three clocks, and time passing at rest (spec 13)
+
+Three clocks run separately:
+- **The action clock:** SimClock, unchanged; jumps are never shortened.
+- **The time of day:** morning to evening light on the sill.
+- **The spider's age in days.**
+
+Time passes slowly while the spider is active. **Resting in the retreat** can pass the night, or wait out a moult, in bounded steps that stop if anything important happens. Pausing never passes time, and menus never starve the spider.
+
+The game compresses time on purpose. A real *P. audax* lives about a year; one life in the game should take a few hours to play. The notebook says so.
+
+### 2. Hunger you can see
+
+- **Reserve:** energy keeps its role. It now drains with the days, not just the minutes.
+- **Body condition you can see:** the abdomen is plumper when well fed and thinner when hungry (Jakob et al. 1996). There is no hunger bar to watch; the existing small energy bar stays for those who want it.
+- **Behaviour:** a hungry spider is not made weaker at jumping, since there is no evidence for that. It must hunt to moult, and starvation is possible only after many days without food, with clear signs on the way.
+- **Settling:** a well-fed spider may prefer to stay in its nest (Okuyama 2011). A gentle prompt could say so; it never forces anything.
+
+### 3. Moulting
+
+1. After enough meals in an instar, the spider shows it is getting ready: it stops hunting and wants the retreat.
+2. The moult happens in the retreat, as time passes at rest. Following Jackson 1979, it takes some days there, compressed.
+3. Afterwards the spider is bigger, and stays soft for a while, with shorter jumps and more caution.
+   - The soft period is a **design assumption** until a source is found, and the notebook says so.
+4. A few moults take the spider from a mid-sized juvenile to an adult over one life.
+
+### 4. One predator: the mud dauber wasp
+
+The best-supported predator for a windowsill. It is a warning-rich, fair threat:
+- **Warnings:** you hear its buzz before it arrives (a new sound), its shadow crosses the sill, and the spider feels it land.
+- **Search:** it searches surfaces by sight, then checks what it finds.
+- **Escape:** the player can stay still in cover, back away (as *P. audax* does from something looming), retreat into the crack, or jump clear.
+- **If caught:** the wasp stings, the spider goes still, and the wasp carries it away. That is the death, shown plainly in a few seconds.
+  - The notebook can say what happens next (the paralysed spider feeds the wasp's larva).
+  - This is real and it is grim. It is written plainly, never dwelt on.
+- **Pressure:** visits are rare and announced. It never appears during the first hunt, or while the player is learning (spec 11).
+
+### 5. Death, the summary, and continuing
+
+- **Natural (default):**
+  1. When the spider dies, the world goes quiet for a moment and one plain line says what happened.
+  2. Then a short summary: days lived, moults, meals, places it rested, times it escaped. No score or kill count, and the player can skip it.
+  3. Then a choice: **go back to your last rest** (the checkpoint), or **continue as another spider**: a juvenile *P. audax* somewhere else on the sill.
+     - The new spider is labelled honestly as unrelated: there are no offspring until courtship and eggs exist (phase 5).
+     - The notebook carries over; the new spider's memory does not.
+- **Gentle:** the wasp gives up or the spider drops free; starvation cannot kill.
+- **Lineage challenge** (irreversible deaths) waits until there are generations.
+
+### 6. What stays out of this phase
+
+Courtship and eggs (phase 5), seasons and overwintering, drinking (no jumping-spider data), injuries and lost legs, and more predators.
+
+## Order of work
+
+Each round is one handoff: start from `main` and finish into `main`.
+
+0. **Chet, now: measure and rebuild.**
+   - Time the cheaper eye shader (T13b) on the laptop against the previous one.
+   - Try the mipmap variant noted in `docs/verification/eye-perf/results.txt`.
+   - Rebuild the friend ZIPs with the notebook, so friends play the current game.
+1. **Claude: clocks and hunger.** Time of day and age; the night passing at rest; energy over days; abdomen size from condition; a starvation timeline with no death yet; notebook pages. Tests at 30, 60 and 144 fps.
+2. **Chet: Windows check.** Night lighting and the abdomen in play, and frame time with the new light.
+3. **Claude: moulting.** Readiness, the retreat, time passing, a bigger and soft spider, species data per instar, tests.
+4. **Claude and Chet: the wasp.** Its behaviour and warnings (Claude); model, animation, sound and Windows feel (Chet); the spider backing away from it.
+5. **Claude: death and continuing.** Natural and Gentle, the summary, the choice, the new spider, the notebook carried over; tests that every death has a warning.
+6. **Nathan, his son and friends play a whole life.**
+
+## Questions for Nathan
+
+1. **How long should one life take to play?** Proposed: about 2–3 hours, over roughly 10 game days, with 3 moults from juvenile to adult.
+2. **Which predator first?** Proposed: the mud dauber wasp. The cellar spider is less certain from the evidence.
+3. **When you continue as another spider, where should it start?** Proposed: as a young juvenile somewhere new on the sill, labelled as unrelated.
+4. **Should the notebook tell the whole truth about the wasp?** That the spider is paralysed, not killed, and fed to the wasp's young. Proposed: yes, plainly, since you said your kids are allowed to encounter reality.

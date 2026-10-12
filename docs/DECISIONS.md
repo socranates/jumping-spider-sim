@@ -426,3 +426,12 @@ Built while Chet's round (ROADMAP step 6) was paused; kept on Claude's branch un
   - **Gentle:** stays available as an explicit choice. It is not switched on by "Most help", which changes how the game is played, not what can happen in it.
   - **Presentation:** a death is shown plainly and briefly: what happened, a quiet moment, then the life's summary (places, escapes, rests, meals, moults; no kill count or score). No gore, slow motion lingering, shock sound or dramatic music.
   - **Fairness:** every death can be explained with information the player could have learned (spec 11): warnings, the predator's approach, the spider's hunger.
+- **LIFE-02 The plan for one whole life.** `docs/LIFE_DESIGN.md`:
+  - Three clocks, with time passing at rest.
+  - Hunger shown by the abdomen's size, not a bar to watch.
+  - Moulting in the retreat.
+  - One predator, the mud dauber wasp, the best-supported for a windowsill.
+  - Death shown plainly, then a summary, then a choice to go back to the last rest or continue as an unrelated spider.
+
+  The biology comes from a literature search (most papers not read in full). The four questions at its end are Nathan's to answer.
+- **PERF-02 A cheaper eye picture (T13b).** The soft surround reads the picture six times instead of twelve, and the full-size picture only where the sharp retinal fields show. On software rendering the picture costs about a third less (32 ms down to 21–23 ms); its look changes by about 2/255 (`docs/verification/eye-perf/`). A mipmap version was slower on software rendering and is left for Chet to try on the laptop. Laptop timing is Chet's next round.

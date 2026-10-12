@@ -38,6 +38,7 @@ var _line_hint: Label
 var _line_note: Label
 var _line_cue: Label
 var _after_miss: bool = false
+var _dropped: bool = false  # the spider let itself down on the line it is on (no "caught" toast)
 var _hidden_for: float = 0.0
 var _clear_for: float = 0.0
 var _note_on: bool = false
@@ -236,11 +237,15 @@ func _on_feedback(kind: String, plan: RefCounted) -> void:
 func _on_line_event(kind: String, detail: String) -> void:
 	if kind == "locked":
 		_after_miss = true
-	var text := JumpFeedback.line_toast(kind, detail, _after_miss)
+	elif kind == "dropped":
+		_dropped = true
+	var text := JumpFeedback.line_toast(kind, detail, _after_miss, _dropped)
 	if kind == "completed" or kind == "released" or kind == "lost" or kind == "fallback" or kind == "anchored":
 		_after_miss = false
+		_dropped = false
 	if text != "":
-		_show_toast(text, JumpFeedback.ANCHOR_REFUSED_COLOR if kind in ["blocked", "snagged", "lost", "fallback"] else JumpFeedback.ANCHOR_OK_COLOR)
+		var warn: bool = kind in ["blocked", "snagged", "lost", "fallback", "drop_refused"]
+		_show_toast(KeyNames.apply(text, settings), JumpFeedback.ANCHOR_REFUSED_COLOR if warn else JumpFeedback.ANCHOR_OK_COLOR)
 
 
 func _show_toast(text: String, color: Color) -> void:

@@ -71,6 +71,13 @@ extends CharacterBody3D
 ## state the line solver cannot resolve (non-finite numbers, or the constraint unmet for FALLBACK_TICKS) is a
 ## separate, labelled debug fallback, never presented as silk breaking. HANGING and REELING are spec 6.2
 ## names; release_line() lets go (FALLING). The body hangs head down from its spinnerets (cosmetic pose).
+##
+## Letting down on a line (Nathan, 2026-10-12: "an easy way to lower yourself from anywhere"; begin_drop()). From a wall, a stem or
+## an underside the spider lets go at once; from ground (a face it could stand on) it first walks to the nearest edge with room
+## below, goes over it as walking does, and lets go there. The line is anchored where it held on, DROP_SLACK of it runs out, and from
+## then on it is the same locked line as after a miss: lower, reel in, let go. One difference while it lets itself down (the line's
+## `lowering`): it slides past what it brushes and takes hold only of ground at least DROP_LAND_BELOW under its anchor, so it does
+## not catch on the leaf it has just left; reeling in, it takes hold of anything as usual.
 
 const SimClock = preload("res://scripts/core/sim_clock.gd")  # one game clock: count in its ticks, never the engine rate
 const SpeciesProfile = preload("res://scripts/core/species_profile.gd")
@@ -182,6 +189,16 @@ const COMPLETED_LINE_SECONDS := 6.0     # a completed line stays this long (it f
 const MAX_COMPLETED_LINES := 6
 const FALLBACK_TICKS := 30              # ticks the constraint may stay unmet before the debug fallback
 const FALLBACK_OVERSTRETCH := 0.25      # WU beyond the rest length that counts as unmet
+const DROP_SLACK := 0.5                 # WU of line that runs out at once when the spider lets itself down
+const DROP_PUSH := 0.6                  # WU/s off its surface as it lets go, so it clears what it held
+const DROP_MIN_FALL := 1.0              # WU of room below that a drop needs (less is a step, not a drop)
+const DROP_LAND_BELOW := 0.5            # WU: letting itself down, it takes hold only of ground at least this far below its anchor
+const DROP_SEARCH := 6.0                # WU along the surface it looks for an edge to let itself down from
+const DROP_STEP := 0.1                  # WU between the edge probes
+const DROP_DIRECTIONS := 16
+const DROP_WALK_SPARE_S := 1.5          # seconds beyond the walk's own time before a walk that has not reached its edge gives up
+const DROP_STUCK_TICKS := 20            # ticks without moving that end a walk to the edge
+const DROP_TAKEOVER := 0.2              # a stick pushed this far takes over from a walk to the edge
 
 ## Injected before the node enters the tree. Tuning comes from this profile only.
 var profile: SpeciesProfile.Profile
@@ -285,6 +302,11 @@ var _rest_touching: bool = false     # it rests touching something (else only th
 var _rest_anchor: Vector3 = Vector3.ZERO
 var _rest_pivot: Vector3 = Vector3.ZERO
 var _rest_length: float = 0.0
+var _drop_walking: bool = false      # walking to an edge to let itself down (begin_drop)
+var _drop_dir: Vector3 = Vector3.ZERO
+var _drop_ticks_left: int = 0
+var _drop_stuck: int = 0
+var _drop_last: Vector3 = Vector3.ZERO
 
 
 func _ready() -> void:
@@ -315,6 +337,10 @@ func _ready() -> void:
 ## projected onto the support's tangent plane. Held until the next call; the motor rotates it with
 ## the support when the support turns sharply.
 func set_intent(world_dir: Vector3, stalk: bool) -> void:
+	if _drop_walking:
+		if not world_dir.is_finite() or world_dir.length() < DROP_TAKEOVER:
+			return  # walking itself to the edge: an idle stick leaves it to it
+		cancel_drop()  # the player takes over
 	_intent = world_dir.limit_length(1.0) if world_dir.is_finite() else Vector3.ZERO
 	_stalk = stalk
 
@@ -428,6 +454,92 @@ func release_line() -> bool:
 	if state != State.FALLING:
 		_set_state(State.FALLING)
 	return true
+
+
+## Letting down on a line (see the class comment): what begin_drop() would do from here. {"ok", "reason", "walk_dir",
+## "walk_distance", "fall"}. reason: "ok"; "no_support" (not standing still on a surface: in the air, on the line, aiming, rounding an
+## edge); "no_silk" (this surface will not hold silk); "no_edge" (nothing below to let itself down into within DROP_SEARCH: on the
+## ground, or only a small step). walk_dir is ZERO when it lets go where it is (a wall, a stem, an underside), else the way to the
+## nearest edge, walk_distance WU off. fall: the room below where it will let go.
+func plan_drop() -> Dictionary:
+	var out := {"ok": false, "reason": "no_support", "walk_dir": Vector3.ZERO, "walk_distance": 0.0, "fall": 0.0}
+	if state != State.ATTACHED or not support.is_valid() or _arc_active or not is_instance_valid(_support_body):
+		return out
+	var prof: SurfaceProfile.Profile = surfaces.get(support.profile_id)
+	if prof == null or not prof.silk_anchor_allowed:
+		out["reason"] = "no_silk"
+		return out
+	out["reason"] = "no_edge"
+	var n := support.normal
+	if not _is_ground(n):
+		var room := _drop_room(global_position + n * SKIN)
+		if room >= DROP_MIN_FALL:
+			out.merge({"ok": true, "reason": "ok", "fall": room}, true)
+		return out
+	var p := global_position
+	var seat := _radius + SKIN
+	var ahead := SupportMath.tangent_dir(_heading, n)
+	if ahead == Vector3.ZERO:
+		ahead = SupportMath.any_perpendicular(n)
+	var best := INF
+	for i in DROP_DIRECTIONS:
+		# Straight ahead first, so of two edges equally near the one the spider faces wins.
+		var d := ahead.rotated(n, TAU * float(i) / float(DROP_DIRECTIONS))
+		var free := DROP_SEARCH
+		var col := KinematicCollision3D.new()
+		if test_move(global_transform, d * DROP_SEARCH, col):
+			free = col.get_travel().length()  # a wall or a step up this way: it can walk only so far
+		var s := DROP_STEP
+		while s <= minf(free, best):
+			var q := p + d * s
+			if _query_ray(q, q - n * (seat + SEAT_TOLERANCE)).is_empty():
+				# The surface ends here. Room below, a body's width beyond it, makes it a place to let down from.
+				var room := _drop_room(q + d * seat)
+				if room >= DROP_MIN_FALL and s < best:
+					best = s
+					out.merge({"ok": true, "reason": "ok", "walk_dir": d, "walk_distance": s, "fall": room}, true)
+				break
+			s += DROP_STEP
+	return out
+
+
+## Lets the spider down on a line from where it stands (see the class comment and plan_drop()). Returns plan_drop()'s answer.
+## line_event says "drop_walk" when it sets off for an edge, "dropped" (detail: the anchor's surface) when it lets go, and
+## "drop_refused" (detail: the reason) when it cannot.
+func begin_drop() -> Dictionary:
+	if _drop_walking:
+		return {"ok": true, "reason": "ok", "walk_dir": _drop_dir, "walk_distance": 0.0, "fall": 0.0}
+	var plan := plan_drop()
+	if not plan["ok"]:
+		line_event.emit("drop_refused", str(plan["reason"]))
+		return plan
+	var dir: Vector3 = plan["walk_dir"]
+	if dir == Vector3.ZERO:
+		_start_drop(support.normal * DROP_PUSH, false)
+		return plan
+	_drop_walking = true
+	_drop_dir = dir
+	_intent = dir
+	_stalk = false
+	_drop_stuck = 0
+	_drop_last = global_position
+	_drop_ticks_left = ceili((float(plan["walk_distance"]) / _walk_speed + DROP_WALK_SPARE_S) * float(SimClock.HZ))
+	line_event.emit("drop_walk", "")
+	return plan
+
+
+## Stops a walk to the edge (the player took over, aimed or pressed cancel). False when there was none.
+func cancel_drop() -> bool:
+	if not _drop_walking:
+		return false
+	_drop_walking = false
+	_intent = Vector3.ZERO
+	return true
+
+
+## True while the spider walks itself to an edge to let itself down.
+func is_drop_walking() -> bool:
+	return _drop_walking
 
 
 ## The world says a surface left (available false) or came back (spec 21.2). A line anchored to a surface
@@ -562,6 +674,7 @@ func teleport_to(xform: Transform3D) -> void:
 	_intent = Vector3.ZERO
 	_arc_active = false
 	_aim_dir = Vector3.ZERO
+	_drop_walking = false
 	tether.clear()
 	_asleep = false
 	_anchor_body = null
@@ -768,6 +881,8 @@ func _physics_process(delta: float) -> void:
 			# Took hold of a surface from the line and is attached: the line stays behind. Until now it was
 			# kept, so a hold that failed during LANDING would still be caught by it.
 			_complete_line(support.contact_point)
+	if _drop_walking:
+		_tick_drop_walk()
 	_age_completed_lines(delta)
 	_remember_safe_spot()
 	_update_body_frame(delta)
@@ -805,6 +920,10 @@ func _tick_supported(delta: float) -> void:
 		_turn_heading(delta)
 		return
 	if m != Vector3.ZERO and _try_convex(n, m):
+		return
+	if _drop_walking:
+		# Walking to let itself down, it went over an edge with no face beyond to hold: it lets go here, out over the edge.
+		_start_drop(_drop_dir * DROP_PUSH, true)
 		return
 	_start_falling()
 
@@ -1542,6 +1661,9 @@ func _grab_from_line(col: KinematicCollision3D) -> bool:
 	if hit.is_empty():
 		return false
 	var fn: Vector3 = hit["normal"]
+	if tether.lowering and tether.reel_intent <= 0.0 \
+			and not (_is_ground(fn) and (hit["position"] as Vector3).y <= tether.anchor_point.y - DROP_LAND_BELOW):
+		return false  # letting itself down: it slides past what it brushes and takes hold of the ground below
 	var approach := maxf(-velocity.dot(fn), 0.0)
 	var y_before := global_position.y
 	_land(hit, fn, approach)
@@ -1586,6 +1708,65 @@ func _find_grab_face(col: KinematicCollision3D) -> Dictionary:
 		if offset == Vector3.ZERO and angle <= deg_to_rad(FACE_MATCH_DEG):
 			break
 	return best
+
+
+## Walking itself to an edge to let itself down (begin_drop): over the edge, onto a face it does not stand on, it lets go.
+func _tick_drop_walk() -> void:
+	if state != State.ATTACHED or not support.is_valid():
+		cancel_drop()  # it aimed, jumped, fell or was moved
+		return
+	if _arc_active:
+		return
+	if not _is_ground(support.normal):
+		_start_drop(support.normal * DROP_PUSH, false)
+		return
+	_drop_ticks_left -= 1
+	_drop_stuck = _drop_stuck + 1 if global_position.distance_to(_drop_last) < 1e-3 else 0
+	_drop_last = global_position
+	if _drop_ticks_left <= 0 or _drop_stuck >= DROP_STUCK_TICKS:
+		cancel_drop()
+		line_event.emit("drop_refused", "stuck")
+
+
+## Lets go of the surface on a line anchored where it held on, with DROP_SLACK run out, moving off at `push`. A surface that will
+## not hold silk refuses it: the spider stays, or, when it is already out over an edge (`must_leave`), falls without a line.
+func _start_drop(push: Vector3, must_leave: bool) -> void:
+	_drop_walking = false
+	_intent = Vector3.ZERO
+	var anchor := get_anchor_preview()
+	if not anchor["ok"]:
+		line_event.emit("drop_refused", str(anchor["reason"]))
+		if must_leave:
+			_start_falling()
+		return
+	var body: Variant = _support_body
+	var n := support.normal
+	_clear_support()
+	_set_state(State.FALLING)
+	velocity = push
+	_anchor_line(body, anchor["point"], n)
+	if not tether.is_active():
+		return  # _anchor_line said why; it falls as any fall does
+	tether.lowering = true
+	_lock_line(DROP_SLACK)
+	line_event.emit("dropped", tether.anchor_surface_id)
+
+
+## How far the body could fall straight down from `from` before it meets something. 0 when nothing is below within the line's
+## length, or what is below is out of bounds: it would hang over nothing.
+func _drop_room(from: Vector3) -> float:
+	var col := KinematicCollision3D.new()
+	if not test_move(Transform3D(Basis.IDENTITY, from), Vector3.DOWN * get_line_max_length(), col):
+		return 0.0
+	var travel := col.get_travel().length()
+	if bounds_enabled and not play_bounds.has_point(from + Vector3.DOWN * travel):
+		return 0.0
+	return travel
+
+
+## A face the spider stands on rather than holds (within STAND_MAX_DEG of world up).
+static func _is_ground(n: Vector3) -> bool:
+	return n.dot(Vector3.UP) >= cos(deg_to_rad(SurfaceProfile.STAND_MAX_DEG)) - 1e-6
 
 
 ## Back on a surface: the line stays behind from its anchor (over its bend) to `end`, fades, and goes.

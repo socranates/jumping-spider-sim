@@ -9,6 +9,7 @@ const TOKENS := [
 	["W / stick up", "move_forward", false], ["S / stick down", "move_back", false],
 	["Q / B", "cancel", true], ["E / X", "interact", true], ["Space / A", "prepare_jump", true], ["H / View", "help", true],
 	["V / Y", "eye_view", true], ["T / right trigger", "slow_motion", true], ["N / D-pad up", "notebook", true],
+	["F / D-pad down", "drop_line", true],
 ]
 
 

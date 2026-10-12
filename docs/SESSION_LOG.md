@@ -1105,3 +1105,9 @@ Chet reviews this entry, `docs/HANDOFF-chunk-7.md` and the tests named above. Na
 - Growth stages and moulting: ready after 0.9 of food since the last moult; the moult in the crack cannot be stopped; 12 game hours pass quickly; the old skin stays; soft, pale and 70 % reach for 10 game hours; adult after three moults. Checkpoint schema 5; three notebook pages. LIFE-10 to LIFE-13.
 - Final: evidence f82620887f67, 605 of 605 (fixed 60 fps, Linux headless); 61 of 61 related tests at fixed 30 and 144. Not run on Windows.
 - Merged after Chet's round 2 (1469780). The evidence was unchanged (f82620887f67, 605/605): his round changed no game code.
+
+### 2026-10-12: Letting down on a line (Claude, cloud session)
+- Nathan found hanging on the line only through the dry leaf tip, and asked for "an easy way to lower yourself from anywhere". Built on Claude's branch while he tested moulting.
+- F / D-pad down: from a wall, a stem or an underside the spider lets go on its line at once; from a leaf top or the planter it walks to the nearest edge with room below, goes over it and lets go there. Holding the button lowers; W climbs back. While letting itself down it takes hold only of ground below its anchor. SILK-01 to SILK-04.
+- The runner's watchdog fired on a passing test (the suite ran 1,502 s of frame time against a 1,500 s limit); raised to 2,400 s, and the report prints suite_seconds. The notebook's new-page note no longer overlaps the line prompts.
+- Final: evidence fe3af29213dd, 612 of 612 (fixed 60 fps, Linux headless); 63 of 63 related tests at fixed 30 and 144. Not run on Windows.

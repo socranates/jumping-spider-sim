@@ -42,7 +42,9 @@ const GROUPS := ["unit", "integration", "gates"]
 const DEFAULT_SEED := 20261005
 ## The whole suite takes about 980 s of real time in the Linux VM (chunk 7B: unit 1 s, integration 843 s, gates 138 s; it was 676 s in chunk 7A,
 ## 560 s in 6B and 345 s in 6A, and this was 900 s, 600 s and 420 s then), so this is set well above it: a slower PC still has room before it fires.
-const WATCHDOG_SECONDS := 1500.0
+## The watchdog counts the frames' delta, which is game time under --fixed-fps. 2026-10-12 (612 tests, letting down on a line added): the
+## suite passed 1500 s of that and the watchdog fired on a passing test, so it is 2400 s now; the report gives suite_seconds to watch it.
+const WATCHDOG_SECONDS := 2400.0
 
 
 ## Counts engine errors (push_error, script errors) so a test that trips one cannot pass quietly.
@@ -286,6 +288,7 @@ func _finish() -> void:
 	var v := Engine.get_version_info()
 	lines.append("engine: Godot %d.%d.%d.%s.%s.%s" % [v["major"], v["minor"], v["patch"], v["status"], v["build"], str(v["hash"]).substr(0, 9)])
 	lines.append("platform: %s" % OS.get_name())
+	lines.append("suite_seconds: %.0f (frame time; the watchdog fires at %.0f)" % [_elapsed, WATCHDOG_SECONDS])
 	lines.append("renderer_setting: %s" % str(ProjectSettings.get_setting("rendering/renderer/rendering_method")))
 	lines.append("renderer_active: %s" % RenderingServer.get_current_rendering_method())
 	lines.append("physics_engine: %s" % str(ProjectSettings.get_setting("physics/3d/physics_engine")))

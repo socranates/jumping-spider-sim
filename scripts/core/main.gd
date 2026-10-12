@@ -258,6 +258,8 @@ func _ready() -> void:
 		tether_controller = TetherController.new()
 		tether_controller.motor = spider
 		tether_controller.settings = settings
+		tether_controller.feeding = feeding
+		tether_controller.habitat_loop = habitat_loop
 		add_child(tether_controller)
 		silk_lines = SilkLines.new()
 		silk_lines.motor = spider

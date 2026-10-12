@@ -13,6 +13,10 @@ const SimClock = preload("res://scripts/core/sim_clock.gd")  # one game clock: c
 ## the button must then be held for RELEASE_HOLD_SECONDS, so a tap, or two, does nothing; with it off a
 ## counted press lets go at once. release_progress (0 to 1) is shown by the HUD. Button events are applied at
 ## the next physics tick, so timing is counted in ticks.
+##
+## Letting down on a line (Nathan, 2026-10-12: "an easy way to lower yourself from anywhere"): `drop_line` (F, D-pad down) asks the
+## motor to let the spider down from where it stands (SpiderMotor.begin_drop), unless it is feeding or resting. Held while on the
+## line, it lowers, like `lower`. Cancel stops a walk to the edge.
 
 signal let_go()
 
@@ -21,9 +25,13 @@ const RELEASE_HOLD_SECONDS := 0.6
 
 var motor: Node3D       # SpiderMotor
 var settings: Node      # Settings autoload, or a test instance
+var feeding: Node       # FeedingController, optional: no letting down while it feeds
+var habitat_loop: Node  # HabitatLoop, optional: no letting down while resting (or moulting) in the retreat
 ## Tests and scripted runs: a number here replaces the reel and lower actions (+1 reel in, -1 lower).
 ## null reads the real input.
 var reel_override: Variant = null
+## Tests and scripted runs: true or false here replaces holding the drop_line action. null reads the real input.
+var drop_override: Variant = null
 ## 0 to 1 while a counted press is being held to let go (hold mode).
 var release_progress: float = 0.0
 
@@ -44,6 +52,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		cancel_down()
 	elif event.is_action_released("cancel"):
 		cancel_up()
+	elif event.is_action_pressed("drop_line"):
+		drop_pressed()
 
 
 func _notification(what: int) -> void:
@@ -65,6 +75,20 @@ func cancel_up() -> void:
 	_events.append("up")
 
 
+## The drop_line button was pressed. Applied at the next physics tick.
+func drop_pressed() -> void:
+	_events.append("drop")
+
+
+## Why the spider may not let itself down now: "" when it may.
+func drop_blocked() -> String:
+	if feeding != null and feeding.get("feeding") == true:
+		return "feeding"
+	if habitat_loop != null and habitat_loop.get("resting") == true:
+		return "resting"
+	return ""
+
+
 ## True while a press is being held toward letting go.
 func is_releasing() -> bool:
 	return _press_counts and _button_down and release_progress > 0.0
@@ -78,7 +102,14 @@ func _physics_process(_delta: float) -> void:
 	var ticks_per_second := float(SimClock.HZ)
 	var hold: bool = settings == null or settings.release_hold
 	while not _events.is_empty():
-		if _events.pop_front() == "down":
+		var ev: String = _events.pop_front()
+		if ev == "drop":
+			if drop_blocked() == "" and motor.has_method("begin_drop"):
+				motor.begin_drop()
+			continue
+		if ev == "down" and motor.has_method("cancel_drop") and motor.cancel_drop():
+			continue  # the press stopped a walk to the edge; it is nothing else's
+		if ev == "down":
 			_button_down = true
 			_held_ticks = 0
 			_press_counts = on_line and float(_on_line_ticks) >= GRACE_SECONDS * ticks_per_second
@@ -113,4 +144,5 @@ func _let_go() -> void:
 func _reel_amount() -> float:
 	if reel_override is float or reel_override is int:
 		return clampf(float(reel_override), -1.0, 1.0)
-	return Input.get_action_strength("reel") - Input.get_action_strength("lower")
+	var drop_held: float = (1.0 if drop_override else 0.0) if drop_override is bool else Input.get_action_strength("drop_line")
+	return Input.get_action_strength("reel") - maxf(Input.get_action_strength("lower"), drop_held)

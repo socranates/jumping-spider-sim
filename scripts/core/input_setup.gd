@@ -35,6 +35,8 @@ const BINDINGS := {
 	"slow_motion": {"keys": [KEY_T], "axes": [[JOY_AXIS_TRIGGER_RIGHT, 1.0]], "dead": BUTTON_DEADZONE},
 	# LEARN-01: the naturalist's notebook (the D-pad also moves through its pages once it is open).
 	"notebook": {"keys": [KEY_N], "buttons": [JOY_BUTTON_DPAD_UP], "dead": BUTTON_DEADZONE},
+	# Let down on a line from anywhere (Nathan, 2026-10-12); held while on the line, it keeps lowering.
+	"drop_line": {"keys": [KEY_F], "buttons": [JOY_BUTTON_DPAD_DOWN], "dead": BUTTON_DEADZONE},
 	"debug_overlay": {"keys": [KEY_F3], "dead": BUTTON_DEADZONE},
 	"debug_support": {"keys": [KEY_F4], "dead": BUTTON_DEADZONE},
 }

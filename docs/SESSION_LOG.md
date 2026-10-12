@@ -1104,3 +1104,4 @@ Chet reviews this entry, `docs/HANDOFF-chunk-7.md` and the tests named above. Na
 - Chet's round 2 paused (out of usage; his laptop results: about 60 fps with the moving sun, p95 17.274 ms, night lighter on the GPU; sleep, morning save and abdomen checks done; builds and smoke test unfinished, nothing pushed yet). Built round 3 on Claude's branch only.
 - Growth stages and moulting: ready after 0.9 of food since the last moult; the moult in the crack cannot be stopped; 12 game hours pass quickly; the old skin stays; soft, pale and 70 % reach for 10 game hours; adult after three moults. Checkpoint schema 5; three notebook pages. LIFE-10 to LIFE-13.
 - Final: evidence f82620887f67, 605 of 605 (fixed 60 fps, Linux headless); 61 of 61 related tests at fixed 30 and 144. Not run on Windows.
+- Merged after Chet's round 2 (1469780). The evidence was unchanged (f82620887f67, 605/605): his round changed no game code.

@@ -13,7 +13,7 @@
 - **Chet:** visible growth per stage. The rig is the same size at every stage. Scale the body and legs by `world.habitat_loop.growth.stage` (0 to 3) without breaking the planted feet; physics and collider unchanged. Plus a Windows check of moulting in play.
 - **Claude, round 4:** the mud dauber wasp.
 
-Evidence: see DECISIONS LIFE-13 and SESSION_LOG.
+Evidence **f82620887f67**: 605/605 (Linux headless, fixed 60 fps), the same after merging Chet's round 2. Not run on Windows.
 
 ---
 

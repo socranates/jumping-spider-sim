@@ -1078,3 +1078,8 @@ Chet reviews this entry, `docs/HANDOFF-chunk-7.md` and the tests named above. Na
 - The eye picture is cheaper: 12 to 6 blur reads, and no full-size read outside the sharp fields. On llvmpipe its cost fell from about 32 to about 22 ms at 720p; the look is within about 2/255. A mipmap variant was slower on llvmpipe; it is left for a laptop trial. PERF-02.
 - A background literature search on *P. audax* life history, moulting, starvation, predators and escape behaviour went into `docs/LIFE_DESIGN.md` (LIFE-02). The mud dauber wasp is the best-supported windowsill predator. Most numbers come from excerpts and are marked to be read before they are taught.
 - Final: evidence 2c7264139c03, 591 of 591 (fixed 60 fps, Linux headless); eye tests 21 of 21. Not run on Windows.
+
+### 2026-10-12: LIFE round 1, clocks and hunger (Claude, cloud session)
+- Chet's measuring round paused (out of usage). Nathan: "if there is anything at all you can think of to do feel free". Built LIFE_DESIGN round 1 on Claude's branch only; it is merged after Chet's round.
+- Life clock (day, hour; about 12 waking hours in 15 minutes); sleeping in the retreat from 18:00 to 07:00 in bounded steps, with a morning checkpoint; hunger by game hours in life mode (no floor, starving hours counted, no death yet); day and night light; 30 % sight at night; the abdomen shows condition; checkpoint schema 4; three notebook pages. LIFE-04 to LIFE-09.
+- Final: evidence 7c9539fd72c1, 600 of 600 (fixed 60 fps, Linux headless); 68 of 68 related tests at fixed 30 and 144. Not run on Windows.

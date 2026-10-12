@@ -463,3 +463,4 @@ Nathan, while Chet's measuring round was paused: "if there is anything at all yo
   - Checkpoints keep the clock (`life`) and life mode's numbers (`starving_hours`, `hour_accumulator`), so a checkpoint loads to the same energy.
   - A schema-3 checkpoint upgrades to day 1, 09:00.
   - New pages: "Home before dark" (first morning), "Hungry, yet at home" (first low reserve), "A full abdomen" (first full reserve). Sources are in NOTEBOOK_SOURCES.md.
+- **LIFE-09 Evidence.** 7c9539fd72c1: 600 / 600 (Linux headless, fixed 60 fps), including 9 new tests (`tests/integration/test_life01_clock_hunger.gd`). Life, notebook, windowsill, checkpoint, needs, feeding and sensor tests: 68 / 68 at fixed 30 and 144 fps. Reports and stills are in `docs/verification/life01/`. Not run on Windows.

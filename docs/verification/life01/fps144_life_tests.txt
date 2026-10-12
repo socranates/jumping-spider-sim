@@ -1,0 +1,78 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS     test_needs_model.gd::test_a_grant_that_is_not_one_changes_nothing  [0 ms]  9 checks
+PASS     test_needs_model.gd::test_a_stall_cannot_drain_more_than_a_capped_step  [0 ms]  2 checks
+PASS     test_needs_model.gd::test_configure_ignores_values_outside_the_unit_range  [0 ms]  4 checks
+PASS     test_needs_model.gd::test_energy_changed_is_announced_once_per_change  [0 ms]  3 checks
+PASS     test_needs_model.gd::test_energy_drains_slowly_and_only_with_time  [2 ms]  3 checks
+PASS     test_needs_model.gd::test_grants_fill_the_reserve_and_never_past_it  [0 ms]  8 checks
+PASS     test_needs_model.gd::test_it_starts_a_little_hungry_and_rested  [0 ms]  4 checks
+PASS     test_needs_model.gd::test_rest_wears_down_while_active_and_builds_while_still  [22 ms]  3 checks
+PASS     test_needs_model.gd::test_the_drain_stops_at_the_floor_and_nothing_goes_negative  [41 ms]  3 checks
+PASS     test_needs_model.gd::test_the_record_round_trips_and_rejects_nonsense  [1 ms]  12 checks
+PASS     test_needs_model.gd::test_the_same_time_drains_the_same_at_every_frame_rate  [43 ms]  8 checks
+L01 result: 4 of 4 fixtures passed: feeding raised the energy only while valid and canceling never duplicated prey or consumption; save/load not run (no save system yet)
+PASS     test_l01_feeding.gd::test_l01_feeding_increases_energy_only_while_valid_and_canceling_cannot_duplicate_prey_or_consumption  [1525 ms]  16 checks
+PASS     test_l01_feeding.gd::test_l01_saving_and_loading_cannot_duplicate_prey_or_consumption  [542 ms]  39 checks
+PASS     test_learn01_notebook.gd::test_a_new_page_says_so_unless_turned_off  [3 ms]  4 checks
+PASS     test_learn01_notebook.gd::test_a_page_opens_once_and_the_notebook_keeps_them  [4 ms]  12 checks
+PASS     test_learn01_notebook.gd::test_every_page_is_complete_short_and_sourced  [1 ms]  74 checks
+PASS     test_learn01_notebook.gd::test_play_opens_pages  [125 ms]  14 checks
+PASS     test_learn01_notebook.gd::test_the_key_and_button_can_be_changed_and_the_menu_offers_it  [58 ms]  6 checks
+PASS     test_learn01_notebook.gd::test_the_panel_opens_pauses_lists_only_found_pages_and_closes  [12 ms]  10 checks
+PASS     test_life01_clock_hunger.gd::test_an_evening_rest_sleeps_until_morning_and_keeps_a_checkpoint  [322 ms]  8 checks
+PASS     test_life01_clock_hunger.gd::test_checkpoints_keep_the_day_and_older_ones_are_brought_up  [26 ms]  10 checks
+PASS     test_life01_clock_hunger.gd::test_daylight_and_the_words_for_the_day  [0 ms]  9 checks
+PASS     test_life01_clock_hunger.gd::test_hunger_runs_by_the_hour_and_can_run_out  [11 ms]  10 checks
+PASS     test_life01_clock_hunger.gd::test_moving_wakes_the_spider_and_a_day_rest_passes_no_extra_time  [115 ms]  7 checks
+PASS     test_life01_clock_hunger.gd::test_the_abdomen_shows_the_spider_condition  [31 ms]  5 checks
+PASS     test_life01_clock_hunger.gd::test_the_day_passes_with_action_time_and_never_while_paused  [79 ms]  7 checks
+PASS     test_life01_clock_hunger.gd::test_the_light_and_the_reach_of_the_eyes_follow_the_hour  [10 ms]  7 checks
+PASS     test_life01_clock_hunger.gd::test_the_notebook_opens_the_life_pages  [92 ms]  4 checks
+PASS     test_s01c_checkpoint.gd::test_a_refused_record_never_replaces_the_world  [17 ms]  5 checks
+PASS     test_s01c_checkpoint.gd::test_loading_twice_gives_the_same_world_and_duplicates_nothing  [312 ms]  9 checks
+PASS     test_s01c_checkpoint.gd::test_loading_while_airborne_or_preparing_discards_the_current_world  [130 ms]  14 checks
+PASS     test_s01c_checkpoint.gd::test_loading_while_feeding_undoes_the_meal_since_the_checkpoint  [147 ms]  14 checks
+PASS     test_s01c_checkpoint.gd::test_no_checkpoint_outside_the_windowsill_or_off_a_surface  [13 ms]  4 checks
+PASS     test_s01c_checkpoint.gd::test_resting_makes_a_checkpoint_that_restores_the_whole_sill  [760 ms]  18 checks
+PASS     test_s01c_checkpoint.gd::test_two_restored_worlds_go_on_the_same_way  [624 ms]  21 checks
+PASS     test_s02_checkpoint_store.gd::test_a_changed_number_fails_the_checksum  [71 ms]  3 checks
+PASS     test_s02_checkpoint_store.gd::test_a_newer_schema_is_reported_and_left_untouched  [26 ms]  4 checks
+PASS     test_s02_checkpoint_store.gd::test_a_record_that_contradicts_itself_is_refused_with_a_reason  [45 ms]  15 checks
+PASS     test_s02_checkpoint_store.gd::test_a_save_never_deletes_a_checkpoint_this_build_cannot_read  [84 ms]  10 checks
+PASS     test_s02_checkpoint_store.gd::test_a_schema_1_checkpoint_is_upgraded_and_loads  [196 ms]  6 checks
+PASS     test_s02_checkpoint_store.gd::test_a_schema_2_checkpoint_is_upgraded_and_its_flies_walk  [370 ms]  3 checks
+PASS     test_s02_checkpoint_store.gd::test_a_truncated_checkpoint_falls_back_to_the_previous_and_is_not_touched  [78 ms]  5 checks
+PASS     test_s02_checkpoint_store.gd::test_an_interrupted_write_never_costs_the_last_good_checkpoint  [88 ms]  6 checks
+PASS     test_s02_checkpoint_store.gd::test_save_and_load_round_trip_and_keep_the_previous_as_backup  [109 ms]  8 checks
+PASS     test_s02_checkpoint_store.gd::test_the_pause_menu_offers_the_checkpoint_only_when_there_is_one  [32 ms]  5 checks
+prey seed 7539203
+PASS     test_sensor.gd::test_a_camera_that_looks_away_does_not_take_the_cone_off_what_is_ahead  [113 ms]  2 checks
+PASS     test_sensor.gd::test_a_marker_that_looks_too_small_is_not_inspected  [141 ms]  6 checks
+PASS     test_sensor.gd::test_a_marker_that_never_looks_like_prey_is_never_refined  [75 ms]  3 checks
+PASS     test_sensor.gd::test_a_moving_thing_in_the_periphery_gives_a_coarse_cue_and_nothing_else  [35 ms]  10 checks
+prey seed 7917826
+PASS     test_sensor.gd::test_a_thing_that_is_never_sensed_leaves_no_trace_anywhere  [250 ms]  5 checks
+PASS     test_sensor.gd::test_broad_queries_run_at_ten_hertz_and_close_things_are_checked_every_tick  [163 ms]  4 checks
+PASS     test_sensor.gd::test_cues_come_at_most_once_per_cooldown  [159 ms]  5 checks
+prey seed 8502151
+PASS     test_sensor.gd::test_focus_tilts_the_gaze_toward_what_the_camera_aims_at_within_its_limit  [217 ms]  4 checks
+prey seed 8730465
+PASS     test_sensor.gd::test_focus_turns_the_body_toward_the_camera_aim_at_a_capped_rate  [206 ms]  7 checks
+PASS     test_sensor.gd::test_the_cone_refines_a_category_with_continuous_exposure  [74 ms]  7 checks
+PASS     test_sensor.gd::test_the_sensor_takes_its_numbers_from_the_species_profile  [10 ms]  8 checks
+PASS     test_sensor.gd::test_the_world_hides_what_it_stands_in_front_of  [58 ms]  7 checks
+prey seed 9091869
+PASS     test_sensor.gd::test_turning_the_camera_never_turns_the_cone  [255 ms]  185 checks
+PASS     test_windowsill.gd::test_disturbance_warns_passes_once_and_never_moves_collision  [12 ms]  10 checks
+PASS     test_windowsill.gd::test_feed_takes_priority_over_rest_and_keeps_its_remaining_nutrition  [48 ms]  4 checks
+PASS     test_windowsill.gd::test_front_route_returns_to_physical_retreat_without_teleport  [1448 ms]  9 checks
+PASS     test_windowsill.gd::test_habitat_capture_and_interrupted_meal_keep_the_same_ownership  [290 ms]  9 checks
+PASS     test_windowsill.gd::test_habitat_perches_and_entries_validate_with_four_flies  [13 ms]  16 checks
+PASS     test_windowsill.gd::test_pause_freezes_rest_needs_flies_and_disturbance  [19 ms]  4 checks
+PASS     test_windowsill.gd::test_rest_restores_only_rest_and_movement_cancels_it  [51 ms]  6 checks
+PASS     test_windowsill.gd::test_retreat_refuses_rest_outside_and_cancels_on_jump_preparation  [12 ms]  4 checks
+PASS     test_windowsill.gd::test_upper_route_can_be_entered_from_floor_and_camera_clears_the_crevice  [78 ms]  3 checks
+PASS     test_windowsill.gd::test_upper_route_jumps_across_the_gap_and_back  [455 ms]  40 checks
+evidence_id: 7c9539fd72c1 (source 9336b161, settings 8b6707d4, tests 2b7ffc2f)
+SUMMARY tests=68 passed=68 failed=0 not_run=0 seed=20261005 filter=only=unit,integration,gates,files=test_life01_clock_hunger.gd,test_learn01_notebook.gd,test_windowsill.gd,test_s01c_checkpoint.gd,test_s02_checkpoint_store.gd,test_needs_model.gd,test_l01_feeding.gd,test_sensor.gd result=PASS

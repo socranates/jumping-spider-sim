@@ -418,3 +418,11 @@ Built while Chet's round (ROADMAP step 6) was paused; kept on Claude's branch un
   - **Remapping:** the key and the button can be changed like the others.
 - **LEARN-03 Sources and honesty.** `docs/NOTEBOOK_SOURCES.md` records how far each source was checked. Citations were confirmed, but no paper was read in full this round, so the pages stay within what abstracts and textbooks state. Each source should be read before a public release. Several pages name what the game simplifies: depth from defocus, UV, the retreat not yet spun, the venom's timing.
 - **LEARN-04 Evidence.** 9d96a61e810c: 591 / 591 (Linux headless, fixed 60 fps; the same after merging Chet's friends-slice round, which changed no game code), including 6 new tests (`tests/integration/test_learn01_notebook.gd`). Notebook, pause-menu and controller tests: 17 / 17 at fixed 30 and 144 fps. Stills and reports are in `docs/verification/learn01/`. Not run on Windows.
+
+## One whole life: death (Nathan, 2026-10-12)
+
+- **LIFE-01 Death is real.** Nathan: "death can be real and jarring. not sensationalized but my kids are allowed to encounter reality."
+  - **Default preset:** "Natural" (spec 11): the individual can die, and the player continues as another spider in the same windowsill, or goes back to the last rest.
+  - **Gentle:** stays available as an explicit choice. It is not switched on by "Most help", which changes how the game is played, not what can happen in it.
+  - **Presentation:** a death is shown plainly and briefly: what happened, a quiet moment, then the life's summary (places, escapes, rests, meals, moults; no kill count or score). No gore, slow motion lingering, shock sound or dramatic music.
+  - **Fairness:** every death can be explained with information the player could have learned (spec 11): warnings, the predator's approach, the spider's hunger.

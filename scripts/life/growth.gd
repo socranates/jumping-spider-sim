@@ -9,7 +9,7 @@ extends RefCounted
 ## In Phidippus johnsoni, spiders stay in their nests about six days before a moult and two after (Jackson 1979, from an excerpt); real
 ## spiders also usually stop eating for a while before moulting. The game compresses both and does not stop the spider eating; the
 ## notebook says so. How long the new cuticle stays soft is a design assumption: no measurement was found (LIFE_DESIGN.md).
-## The spider's body is drawn the same size at every stage for now (its physics never changes); the rig's growth is a later round.
+## Presentation scales the rig per stage; the physics body and collider never grow.
 
 const STAGES: Array[String] = ["young juvenile", "juvenile", "subadult", "adult"]
 const ADULT := 3

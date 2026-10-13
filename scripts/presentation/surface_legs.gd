@@ -53,8 +53,8 @@ func _target(motor: Node3D, i: int) -> Dictionary:
 	# extension of the support plane. The same construction works upside down.
 	for reach in [1.0, 0.65, 0.35, 0.12]:
 		var point := to_global(Vector3(rest.x * reach, 0.0, rest.z * reach))
-		var query := PhysicsRayQueryParameters3D.create(point + up * 0.35,
-			point - up * 0.65, Layers.WORLD, [motor.get_rid()])
+		var query := PhysicsRayQueryParameters3D.create(point + up * 0.35 * global_basis.get_scale().x,
+			point - up * 0.65 * global_basis.get_scale().x, Layers.WORLD, [motor.get_rid()])
 		var hit := get_world_3d().direct_space_state.intersect_ray(query)
 		if not hit.is_empty() and (hit.normal as Vector3).dot(up) > 0.35:
 			return hit
@@ -79,12 +79,14 @@ func advance_surface(motor: Node3D, dt: float, push: float = 0.0) -> void:
 	for c in contacts:
 		swinging = swinging or c.swing >= 0.0
 	if not swinging and not first:
-		var worst := STEP_ERROR
+		var size := global_basis.get_scale().x
+		var worst := STEP_ERROR * size
 		for i in 8:
 			var error := to_global(_rest(i)).distance_to(_world_feet[i])
 			if error > worst:
 				worst = error
 				_group = (i % 4 + i / 4) % 2
+	var size := global_basis.get_scale().x
 	var started := false
 	for i in 8:
 		var c := contacts[i]
@@ -97,7 +99,7 @@ func advance_surface(motor: Node3D, dt: float, push: float = 0.0) -> void:
 			var anchor: Vector3 = (c.body as Node3D).to_global(c.local)
 			if c.swing >= 0.0:
 				c.swing = minf(1.0, c.swing + dt / SWING_SECONDS)
-				_world_feet[i] = (c.from as Vector3).lerp(anchor, smoothstep(0.0, 1.0, c.swing)) + (c.up as Vector3) * sin(PI * c.swing) * STEP_HEIGHT
+				_world_feet[i] = (c.from as Vector3).lerp(anchor, smoothstep(0.0, 1.0, c.swing)) + (c.up as Vector3) * sin(PI * c.swing) * STEP_HEIGHT * size
 				if c.swing >= 1.0:
 					c.swing = -1.0
 					_world_feet[i] = anchor
@@ -105,9 +107,9 @@ func advance_surface(motor: Node3D, dt: float, push: float = 0.0) -> void:
 				_world_feet[i] = anchor
 				var error := rest_world.distance_to(anchor)
 				var group := (i % 4 + i / 4) % 2
-				if push <= 0.0 and error > STEP_ERROR and (not swinging and group == _group or error > 0.60):
+				if push <= 0.0 and error > STEP_ERROR * size and (not swinging and group == _group or error > 0.60 * size):
 					var hit := _target(motor, i)
-					if not hit.is_empty() and anchor.distance_to(hit.position) > 0.12:
+					if not hit.is_empty() and anchor.distance_to(hit.position) > 0.12 * size:
 						c.from = anchor
 						_seat(i, hit)
 						c.swing = 0.0
@@ -147,6 +149,12 @@ func _draw_contacts(xf: Transform3D, fraction: float) -> void:
 			segment.top_level = true
 			segment.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
 			_place_segment(segment, hip if j == 0 else knee, knee if j == 0 else foot)
+			# These rods are top-level world transforms, so inherited scale does
+			# not resize their thickness (free legs inherit it normally).
+			var rod_basis := segment.basis
+			rod_basis.x *= xf.basis.get_scale().x
+			rod_basis.z *= xf.basis.get_scale().z
+			segment.basis = rod_basis
 			# Only distal front legs enter the eye view. Proximal rods can cross
 			# the eye during snap turns; this stable mask avoids near-plane popping.
 			segment.visible = not eye_view or (pair == 0 and j == 1)

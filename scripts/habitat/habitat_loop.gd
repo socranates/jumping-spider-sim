@@ -206,6 +206,8 @@ func _apply_growth(reach: bool = true) -> void:
 	var body: Node = world.spider.get_node_or_null("Body") if world.spider != null else null
 	if body != null and body.has_method("set_softness"):
 		body.set_softness(growth.softness())
+		if body.has_method("set_growth_stage"):
+			body.set_growth_stage(growth.stage)
 
 
 ## The old skins left in the habitat, drawn as pale empty husks where each moult happened.

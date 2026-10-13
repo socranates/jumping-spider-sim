@@ -36,6 +36,23 @@ var condition: float = 0.55
 var shown_condition: float = 0.55
 const CONDITION_FOLLOW_PER_S := 0.5
 ## LIFE_DESIGN round 3: a newly moulted spider is pale and soft; the colour darkens back as the skin hardens. 1 just moulted, 0 hard.
+# Artistic stage ratios, not measured instar sizes. Physics remains unchanged.
+const STAGE_SCALES := [1.0, 1.15, 1.32, 1.50]
+var growth_stage := 0
+var visual_size := 1.0
+
+func set_growth_stage(stage: int) -> void:
+	var next := clampi(stage, 0, STAGE_SCALES.size() - 1)
+	if next == growth_stage:
+		return
+	var old_lift := 0.30 * (visual_size - 1.0)
+	growth_stage = next
+	visual_size = STAGE_SCALES[next]
+	scale = Vector3.ONE * visual_size
+	# Scale about the support plane, including on walls and undersides. Do not
+	# discard world-space foot contacts: let the normal gait replace them.
+	position.y += 0.30 * (visual_size - 1.0) - old_lift
+
 var softness: float = 0.0
 const PALE := Color(0.78, 0.70, 0.56)
 var _prepare_time := 0.0
@@ -138,7 +155,7 @@ func _physics_process(_delta: float) -> void:
 			_recoiling = false
 			recoil_offset = Vector3.ZERO
 	_twitch(delta)
-	position = recoil_offset + twitch_offset
+	position = recoil_offset + twitch_offset + Vector3.UP * (0.30 * (visual_size - 1.0))
 	rotation = Vector3(0.0, twitch_yaw, 0.0)
 	_jump_pose(delta)
 	_update_legs(delta)
@@ -183,7 +200,7 @@ func _on_jump_committed(_plan: RefCounted) -> void:
 	if not gait_enabled:
 		return
 	_launch_frame = global_transform
-	_launch_dip = maxf(0.0, 0.035 + position.y)
+	_launch_dip = maxf(0.0, 0.035 + position.y - 0.30 * (visual_size - 1.0))
 	launch_time = 0.0
 	landing_time = -1.0
 	attachment_amount = 0.0

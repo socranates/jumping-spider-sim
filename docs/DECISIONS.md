@@ -644,4 +644,4 @@ Built after Chet's wasp presentation (main 5c56ef8, 632/632 here too). Plan: LIF
     - the notebook, and Quit (hidden on the web).
   - The top line names the mode: THE WINDOWSILL, THE WINDOWSILL (EASY), FREE PLAY.
   - Control helps stay in the pause menu in every mode.
-- **LIFE-24 Evidence.** 8 new tests (`tests/integration/test_life05_death.gd`). Round 5 and related tests: 79 / 79 at fixed 30, 60 and 144 fps. Stills: `docs/verification/life05/`.
+- **LIFE-24 Evidence.** 8 new tests (`tests/integration/test_life05_death.gd`). Round 5 and related tests: 79 / 79 at fixed 30, 60 and 144 fps. Full suite: evidence a4165eb2beb4, 640 / 640 (Linux headless, fixed 60 fps; 1,726 s of frame time). A normal launch was checked to open the start menu. Stills: `docs/verification/life05/`. Not run on Windows.

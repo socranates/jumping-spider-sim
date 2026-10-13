@@ -1,3 +1,20 @@
+# Current handoff - Claude, 2026-10-13 (LIFE round 5: death and continuing)
+
+**Read docs/HANDOFF-life-round5.md.** Built on Chet's wasp presentation (5c56ef8). Decisions LIFE-19 to LIFE-24.
+- **Rules:** Standard (the main life) can kill. Gentle (Easy, free play) never does: the wasp only touches the spider, and hunger forgives. Checkpoint schema 7 keeps `life_rules`.
+- **Starving:** starving, then a whole day of "will not last another day" (too hungry to sleep), then death.
+- **The end:** a plain line and a summary with no score, then back to the last rest or on as another spider (unrelated, somewhere new).
+- **Progress:** kept in `user://progress.cfg`. An adult of the main life opens Easy.
+- **Start menu:** opens at launch and from the pause menu. It offers continue, a new life, Easy when earned, and free play with its own save.
+
+**Next:**
+- **Chet:** a Windows check of the start menu, the end screen and continuing, with controller focus and large text; the wasp's first-arrival hitch; and the friend ZIPs.
+- **Then round 6:** Nathan, his son and friends play a whole life.
+
+Evidence **a4165eb2beb4**: 640/640 (Linux headless, fixed 60 fps). Not run on Windows.
+
+---
+
 # Current handoff — Chet, 2026-10-13 (wasp presentation)
 
 Read **docs/HANDOFF-wasp-presentation.md** and **docs/verification/wasp-windows/RESULTS.md**.

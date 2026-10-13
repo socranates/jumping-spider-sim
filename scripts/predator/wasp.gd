@@ -4,6 +4,7 @@ extends Node3D
 ## anything, and the director keeps its paths clear of the world. The spider sees it as movement (the "perceivable" group) and never as
 ## prey: its percept is capped at MOVEMENT, so no aim, capture or inspection ever treats it as something to catch.
 
+const SimClock = preload("res://scripts/core/sim_clock.gd")
 const Perceivable = preload("res://scripts/perception/perceivable.gd")
 const Observation = preload("res://scripts/perception/observation.gd")
 const WaspBody = preload("res://scripts/predator/wasp_body.gd")
@@ -65,8 +66,8 @@ func get_percept() -> Dictionary:
 	return Perceivable.make(id, global_position, SENSED_RADIUS, velocity, Observation.MOVEMENT)
 
 
-func _process(delta: float) -> void:
+func _physics_process(_delta: float) -> void:
 	if not visible:
 		return
-	_beat += delta
+	_beat += SimClock.DT
 	body.pose(mode, _beat, search)

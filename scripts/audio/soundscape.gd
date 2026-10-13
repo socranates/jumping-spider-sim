@@ -36,8 +36,8 @@ const SPEAKER_EFFECTS := 2                 # the first two effects on Master are
 const LIMIT_DB := -1.0                     # nothing louder than this leaves the game (a recording of speaker mode peaked at 0 dBFS)
 const HEAR_WU := 10.0          # a fly taking off this close gets a caption
 ## LIFE round 4: the wasp's hum, louder and heard from farther than a fly's (it is a much bigger insect).
-const WASP_DB := 6.0
-const WASP_UNIT := 26.0
+const WASP_DB := 3.0
+const WASP_UNIT := 40.0
 ## Its captions, by the visit's turns. None begins "[buzzing", which is the flies' (the notebook's buzz page answers to that).
 const WASP_CAPTIONS := {
 	"arriving": "[a deep, heavy hum outside, coming closer]",
@@ -247,6 +247,9 @@ func _update_wasp() -> void:
 		_wasp_hum.bus = "Cues"
 		_wasp_hum.volume_db = WASP_DB
 		_wasp_hum.unit_size = WASP_UNIT
+		_wasp_hum.max_db = -3.0  # cap the near-field warning rather than a loud sting
+		_wasp_hum.attenuation_filter_cutoff_hz = 4000.0
+		_wasp_hum.attenuation_filter_db = -6.0  # retain warning harmonics at arrival distance
 		_wasp_hum.max_distance = 120.0
 		_wasp_hum.attenuation_model = AudioStreamPlayer3D.ATTENUATION_INVERSE_DISTANCE
 		add_child(_wasp_hum)

@@ -160,6 +160,23 @@ func _draw_contacts(xf: Transform3D, fraction: float) -> void:
 			segment.visible = not eye_view or (pair == 0 and j == 1)
 
 
+## Static drawn-in posture; does not read or alter the motor.
+func pose_seized() -> void:
+	clear_contacts()
+	_feet.clear()
+	for i in 8:
+		var side := -1.0 if i < 4 else 1.0
+		var pair := i % 4
+		var hip := Vector3(side * 0.16, 0.02, HIP_Z[pair])
+		var knee := Vector3(side * 0.34, -0.17, KNEE_Z[pair] * 0.65)
+		var foot := Vector3(side * 0.10, -0.26, HIP_Z[pair])
+		_feet.append(foot)
+		_place_segment(_segments[i * 2], hip, knee)
+		_place_segment(_segments[i * 2 + 1], knee, foot)
+		_segments[i * 2].visible = not eye_view
+		_segments[i * 2 + 1].visible = not eye_view
+
+
 func advance_free(dt: float, reduced: bool) -> void:
 	clear_contacts()
 	advance_pose(dt, Vector3.ZERO, false, false, reduced)

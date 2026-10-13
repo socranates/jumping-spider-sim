@@ -170,7 +170,10 @@ static func _wasp() -> PackedFloat32Array:
 	for i in n:
 		var t := float(i) / float(RATE)
 		var phase := TAU * f0 * t + beta * sin(TAU * 5.0 * t)
-		out[i] = (_wings(t, f0, phase) + 0.6 * sin(phase)) * (1.0 + 0.25 * sin(TAU * 3.0 * t))
+		# Deliberate 480-1440 Hz presence: laptops lose the 120 Hz fundamental.
+		# Whole cycles preserve a seamless loop; these are designed, not recorded.
+		var presence := 0.8*sin(TAU*480.0*t)+0.65*sin(TAU*720.0*t+0.3)+0.5*sin(TAU*960.0*t)+0.3*sin(TAU*1440.0*t)
+		out[i] = (0.55*_wings(t, f0, phase) + 0.25*sin(phase) + presence) * (1.0 + 0.16*sin(TAU*3.0*t))
 	return _normalize(out, 0.9)
 
 

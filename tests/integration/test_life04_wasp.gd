@@ -255,6 +255,7 @@ func test_caught_the_screen_says_so_plainly_and_offers_the_way_back() -> void:
 	check(await wait_until(func() -> bool: return panel.is_showing(), 60 * 12), "caught and carried off, the screen shows it")
 	check(nb.is_open("what_the_wasp_does"), "the notebook tells what the wasp does")
 	check(get_tree_paused(), "and the game waits")
+	check(not world.needs_hud.visible, "live HUD does not clutter the catch screen")
 	await wait_until(func() -> bool: return panel.shown_seconds >= CaughtPanel.QUIET_S + CaughtPanel.LINE_S + 0.1, 60 * 6)
 	check(panel.find_child("Back", true, false).is_visible_in_tree(), "then the way on")
 	check_eq((panel.find_child("Back", true, false) as Button).text, CaughtPanel.AGAIN, "no rest yet: a new life")

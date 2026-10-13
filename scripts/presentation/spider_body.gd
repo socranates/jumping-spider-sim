@@ -144,6 +144,18 @@ func is_recoiling() -> bool:
 
 func _physics_process(_delta: float) -> void:
 	var delta := SimClock.DT
+	if get_parent().get("seized") == true:
+		# Paralysis is a static carrying pose, including with Reduced motion.
+		_recoiling = false
+		recoil_offset = Vector3.ZERO
+		twitch_offset = Vector3.ZERO
+		twitch_yaw = 0.0
+		_clear_jump_pose()
+		position = Vector3.UP * (0.30 * (visual_size - 1.0))
+		rotation = Vector3.ZERO
+		_abdomen.rotation = Vector3.ZERO
+		legs.pose_seized()
+		return
 	if not recoil_enabled:
 		_recoiling = false
 		recoil_offset = Vector3.ZERO

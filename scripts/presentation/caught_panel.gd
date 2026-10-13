@@ -24,6 +24,7 @@ var _sub: Label
 var _buttons: HBoxContainer
 var _back: Button
 var _notebook: Button
+var _hidden_hud: Array[CanvasLayer] = []
 
 
 func _ready() -> void:
@@ -39,6 +40,12 @@ func is_showing() -> bool:
 
 ## The wasp has carried the spider off: the quiet, the line, then the choices.
 func show_caught() -> void:
+	# Large text can overlap in the live HUD. The catch has its own message;
+	# keep that quiet screen clear, while leaving the notebook above it usable.
+	for node in world.find_children("*", "CanvasLayer", true, false) if world != null else []:
+		if node != self and node.layer < layer and node.visible:
+			_hidden_hud.append(node)
+			node.visible = false
 	visible = true
 	shown_seconds = 0.0
 	_dim.color.a = 0.0
@@ -80,6 +87,10 @@ func _input(event: InputEvent) -> void:
 func go_on() -> Node3D:
 	if world == null:
 		return null
+	for hud in _hidden_hud:
+		if is_instance_valid(hud):
+			hud.visible = true
+	_hidden_hud.clear()
 	visible = false
 	if bool(_back.get_meta("has_rest", false)):
 		var back: Node3D = world.return_to_checkpoint()

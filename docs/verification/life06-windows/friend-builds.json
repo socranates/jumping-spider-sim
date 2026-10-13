@@ -1,0 +1,21 @@
+{
+  "game_source_commit": "7045e8d037cd4057de98c4919bcb38f1e971a643",
+  "evidence_id": "2c1c789ef545",
+  "windows_tests_passed": 644,
+  "related_tests": "27/27 at 30, 60 and 144 fps",
+  "engine": "Godot 4.7.2 official",
+  "date": "2026-10-13",
+  "delivery_folder": "Downloads/The-Windowsill-Playtest-2026-10-13-Whole-Life",
+  "files": [
+    {
+      "name": "The-Windowsill-windows-7045e8d.zip",
+      "bytes": 38670803,
+      "sha256": "fbc16ca9afd2e72b99b18c2401ffb448ed59df326ee33055e0b85412ca23c468"
+    },
+    {
+      "name": "The-Windowsill-web-7045e8d.zip",
+      "bytes": 10840139,
+      "sha256": "93d99a36261a725562a479383a8d00fd548fc7041dbdca0f7714df9b2df0525b"
+    }
+  ]
+}

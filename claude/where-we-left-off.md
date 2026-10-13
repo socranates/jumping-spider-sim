@@ -5,7 +5,7 @@ Read **docs/HANDOFF-life-windows.md** and **docs/verification/life06-windows/RES
 - Start/end menu focus, notebook stacking, large-text panels and mode-specific confirmation fixed.
 - Wasp prewarm at load: arrival worst ~108–113 ms before, ~20–22 ms after. F01 still open.
 - Staged whole-life transitions checked; Windows/Web release menu and Web eye view checked.
-- New friend ZIPs: **Downloads/The-Windowsill-Playtest-2026-10-13-Whole-Life**. Source/hashes in friend-builds.json.
+- Game source **7045e8d**. New friend ZIPs: **Downloads/The-Windowsill-Playtest-2026-10-13-Whole-Life**. Source/hashes in friend-builds.json.
 - Hardware controller, sound listening, embedded-browser mouse-look and full-life human play remain. No new mechanics or twitch/SimClock changes.
 
 **Next: LIFE round 6 — Nathan, his son and friends play a whole life.** Record feedback in docs/PLAYTEST.md.

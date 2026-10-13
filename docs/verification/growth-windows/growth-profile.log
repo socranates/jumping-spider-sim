@@ -1,0 +1,51 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 Core Profile Context 25.10.42.01.260515 - Compatibility - Using Device: ATI Technologies Inc. - AMD Radeon(TM) Graphics
+
+STATE stage0 {"caption":"THE WINDOWSILL    ·    Day 1, morning    ·    young juvenile    ·    H / View: field notes\nThe silk-lined crack    ·    E / X to rest","position":"(-25.0, 0.31, 6.0)","scale":"(1.0, 1.0, 1.0)","skins":0,"stage":0,"state":"ATTACHED","surface":"sill_floor"}
+MEAL 0/0 consumed=true granted=0.35
+MEAL 0/1 consumed=true granted=0.35
+MEAL 0/2 consumed=true granted=0.35
+STATE ready0 {"caption":"THE WINDOWSILL    ·    Day 1, morning    ·    young juvenile    ·    H / View: field notes\nYour spider is ready to moult. Rest in the silk-lined crack.\nReady to moult    ·    E / X to rest and moult","position":"(-25.0, 0.31, 6.0)","scale":"(1.0, 1.0, 1.0)","skins":0,"stage":0,"state":"ATTACHED","surface":"sill_floor"}
+REST_ACCEPTED true
+STATE moulting0 {"caption":"THE WINDOWSILL    ·    Day 1, midday    ·    young juvenile    ·    H / View: field notes\nCheckpoint kept.\nMoulting in the silk-lined crack. The old skin splits and the spider slowly pulls free; it cannot be hurried.","position":"(-25.0, 0.31, 6.0)","scale":"(1.0, 1.0, 1.0)","skins":0,"stage":0,"state":"ATTACHED","surface":"sill_floor"}
+STATE stage1_soft {"caption":"THE WINDOWSILL    ·    Day 1, night    ·    juvenile    ·    H / View: field notes\nMoulted: now a juvenile (stage 2 of 4). The new skin is soft for a while.\nCheckpoint kept.\nAsleep in the silk-lined crack. The night passes. Move, E / X or Q / B to wake.","position":"(-25.0, 0.31, 6.0)","scale":"(1.15, 1.15, 1.15)","skins":1,"stage":1,"state":"ATTACHED","surface":"sill_floor"}
+CHECKPOINT_STAGE 1
+MEAL 1/0 consumed=true granted=0.35
+MEAL 1/1 consumed=true granted=0.35
+MEAL 1/2 consumed=true granted=0.35
+STATE ready1 {"caption":"THE WINDOWSILL    ·    Day 1, night    ·    juvenile    ·    H / View: field notes\nYour spider is ready to moult. Rest in the silk-lined crack.\nReady to moult    ·    E / X to rest and moult","position":"(-25.0, 0.31, 6.0)","scale":"(1.15, 1.15, 1.15)","skins":1,"stage":1,"state":"ATTACHED","surface":"sill_floor"}
+REST_ACCEPTED true
+STATE moulting1 {"caption":"THE WINDOWSILL    ·    Day 2, night    ·    juvenile    ·    H / View: field notes\nCheckpoint kept.\nMoulting in the silk-lined crack. The old skin splits and the spider slowly pulls free; it cannot be hurried.","position":"(-25.0, 0.31, 6.0)","scale":"(1.15, 1.15, 1.15)","skins":1,"stage":1,"state":"ATTACHED","surface":"sill_floor"}
+STATE stage2_soft {"caption":"THE WINDOWSILL    ·    Day 2, midday    ·    subadult    ·    H / View: field notes\nMoulted: now a subadult (stage 3 of 4). The new skin is soft for a while.\nCheckpoint kept.\nResting in the silk-lined crack. Move, E / X or Q / B to leave.","position":"(-25.0, 0.31, 6.0)","scale":"(1.32, 1.32, 1.32)","skins":2,"stage":2,"state":"ATTACHED","surface":"sill_floor"}
+CHECKPOINT_STAGE 2
+MEAL 2/0 consumed=true granted=0.35
+MEAL 2/1 consumed=true granted=0.35
+MEAL 2/2 consumed=true granted=0.35
+STATE ready2 {"caption":"THE WINDOWSILL    ·    Day 2, midday    ·    subadult    ·    H / View: field notes\nYour spider is ready to moult. Rest in the silk-lined crack.\nReady to moult    ·    E / X to rest and moult","position":"(-25.0, 0.31, 6.0)","scale":"(1.32, 1.32, 1.32)","skins":2,"stage":2,"state":"ATTACHED","surface":"sill_floor"}
+REST_ACCEPTED true
+STATE moulting2 {"caption":"THE WINDOWSILL    ·    Day 2, midday    ·    subadult    ·    H / View: field notes\nCheckpoint kept.\nMoulting in the silk-lined crack. The old skin splits and the spider slowly pulls free; it cannot be hurried.","position":"(-25.0, 0.31, 6.0)","scale":"(1.32, 1.32, 1.32)","skins":2,"stage":2,"state":"ATTACHED","surface":"sill_floor"}
+STATE stage3_soft {"caption":"THE WINDOWSILL    ·    Day 2, night    ·    adult    ·    H / View: field notes\nMoulted for the last time: your spider is an adult.\nCheckpoint kept.\nAsleep in the silk-lined crack. The night passes. Move, E / X or Q / B to wake.","position":"(-25.0, 0.31, 6.0)","scale":"(1.5, 1.5, 1.5)","skins":3,"stage":3,"state":"ATTACHED","surface":"sill_floor"}
+CHECKPOINT_STAGE 3
+STATE size0 {"caption":"THE WINDOWSILL    ·    Day 2, midday    ·    young juvenile    ·    H / View: field notes\nAwake before morning: it is still midday.\nA shadow passes across the sill.","position":"(-16.5, 0.31, 6.0)","scale":"(1.0, 1.0, 1.0)","skins":3,"stage":0,"state":"ATTACHED","surface":"sill_floor"}
+STATE size1 {"caption":"THE WINDOWSILL    ·    Day 2, midday    ·    juvenile    ·    H / View: field notes\nAwake before morning: it is still midday.","position":"(-16.5, 0.31, 6.0)","scale":"(1.15, 1.15, 1.15)","skins":3,"stage":1,"state":"ATTACHED","surface":"sill_floor"}
+STATE size2 {"caption":"THE WINDOWSILL    ·    Day 2, midday    ·    subadult    ·    H / View: field notes\nAwake before morning: it is still midday.","position":"(-16.5, 0.31, 6.0)","scale":"(1.32, 1.32, 1.32)","skins":3,"stage":2,"state":"ATTACHED","surface":"sill_floor"}
+STATE size3 {"caption":"THE WINDOWSILL    ·    Day 2, midday    ·    adult    ·    H / View: field notes\nAwake before morning: it is still midday.","position":"(-16.5, 0.31, 6.0)","scale":"(1.5, 1.5, 1.5)","skins":3,"stage":3,"state":"ATTACHED","surface":"sill_floor"}
+DROP_PLAN leaf_floor { "ok": true, "reason": "ok", "walk_dir": (0.0, 0.0, 1.0), "walk_distance": 1.1, "fall": 4.208984375 }
+STATE leaf_floor_hanging {"caption":"THE WINDOWSILL    ·    Day 1, morning    ·    adult    ·    H / View: field notes\nA small world, and time to look. Focus on movement; Shift to creep closer.","position":"(-1.0, 3.457433, 1.403402)","scale":"(1.5, 1.5, 1.5)","skins":0,"stage":3,"state":"HANGING","surface":""}
+STATE leaf_floor_end {"caption":"THE WINDOWSILL    ·    Day 1, morning    ·    adult    ·    H / View: field notes\nA small world, and time to look. Focus on movement; Shift to creep closer.","position":"(-1.0, 0.31, 0.646164)","scale":"(1.5, 1.5, 1.5)","skins":0,"stage":3,"state":"ATTACHED","surface":"sill_floor"}
+DROP_PLAN leaf_return { "ok": true, "reason": "ok", "walk_dir": (0.0, 0.0, 1.0), "walk_distance": 1.1, "fall": 4.208984375 }
+STATE leaf_return_hanging {"caption":"THE WINDOWSILL    ·    Day 1, morning    ·    adult    ·    H / View: field notes\nA small world, and time to look. Focus on movement; Shift to creep closer.","position":"(-1.0, 3.457433, 1.403402)","scale":"(1.5, 1.5, 1.5)","skins":0,"stage":3,"state":"HANGING","surface":""}
+STATE leaf_return_end {"caption":"THE WINDOWSILL    ·    Day 1, morning    ·    adult    ·    H / View: field notes\nA small world, and time to look. Focus on movement; Shift to creep closer.","position":"(-1.0, 3.505981, 1.10873)","scale":"(1.5, 1.5, 1.5)","skins":0,"stage":3,"state":"ATTACHED","surface":"leaf_middle"}
+DROP_PLAN wall_floor { "ok": true, "reason": "ok", "walk_dir": (0.0, 0.0, 0.0), "walk_distance": 0.0, "fall": 5.699462890625 }
+STATE wall_floor_hanging {"caption":"THE WINDOWSILL    ·    Day 1, morning    ·    adult    ·    H / View: field notes\nA small world, and time to look. Focus on movement; Shift to creep closer.","position":"(-8.0, 5.295393, -12.10046)","scale":"(1.5, 1.5, 1.5)","skins":0,"stage":3,"state":"HANGING","surface":""}
+STATE wall_floor_end {"caption":"THE WINDOWSILL    ·    Day 1, morning    ·    adult    ·    H / View: field notes\nA small world, and time to look. Focus on movement; Shift to creep closer.","position":"(-8.0, 0.31, -12.20014)","scale":"(1.5, 1.5, 1.5)","skins":0,"stage":3,"state":"ATTACHED","surface":"sill_floor"}
+DROP_PLAN wall_return { "ok": true, "reason": "ok", "walk_dir": (0.0, 0.0, 0.0), "walk_distance": 0.0, "fall": 5.699462890625 }
+STATE wall_return_hanging {"caption":"THE WINDOWSILL    ·    Day 1, morning    ·    adult    ·    H / View: field notes\nA small world, and time to look. Focus on movement; Shift to creep closer.","position":"(-8.0, 5.295393, -12.10046)","scale":"(1.5, 1.5, 1.5)","skins":0,"stage":3,"state":"HANGING","surface":""}
+STATE wall_return_end {"caption":"THE WINDOWSILL    ·    Day 1, morning    ·    adult    ·    H / View: field notes\nA small world, and time to look. Focus on movement; Shift to creep closer.","position":"(-8.0, 5.302864, -12.19)","scale":"(1.5, 1.5, 1.5)","skins":0,"stage":3,"state":"ATTACHED","surface":"back_frame"}
+DROP_PLAN planter_floor { "ok": true, "reason": "ok", "walk_dir": (0.0, 0.0, 1.0), "walk_distance": 0.6, "fall": 4.6099853515625 }
+STATE planter_floor_hanging {"caption":"THE WINDOWSILL    ·    Day 1, morning    ·    adult    ·    H / View: field notes\nA small world, and time to look. Focus on movement; Shift to creep closer.","position":"(10.0, 3.857434, 0.903401)","scale":"(1.5, 1.5, 1.5)","skins":0,"stage":3,"state":"HANGING","surface":""}
+STATE planter_floor_end {"caption":"THE WINDOWSILL    ·    Day 1, morning    ·    adult    ·    H / View: field notes\nA small world, and time to look. Focus on movement; Shift to creep closer.","position":"(10.0, 0.31, 0.659753)","scale":"(1.5, 1.5, 1.5)","skins":0,"stage":3,"state":"ATTACHED","surface":"sill_floor"}
+DROP_PLAN planter_return { "ok": true, "reason": "ok", "walk_dir": (0.0, 0.0, 1.0), "walk_distance": 0.6, "fall": 4.6099853515625 }
+STATE planter_return_hanging {"caption":"THE WINDOWSILL    ·    Day 1, morning    ·    adult    ·    H / View: field notes\nA small world, and time to look. Focus on movement; Shift to creep closer.","position":"(10.0, 3.857434, 0.903401)","scale":"(1.5, 1.5, 1.5)","skins":0,"stage":3,"state":"HANGING","surface":""}
+STATE planter_return_end {"caption":"THE WINDOWSILL    ·    Day 1, morning    ·    adult    ·    H / View: field notes\nA small world, and time to look. Focus on movement; Shift to creep closer.","position":"(10.0, 3.815814, 0.75056)","scale":"(1.5, 1.5, 1.5)","skins":0,"stage":3,"state":"ATTACHED","surface":"planter_rim"}
+CHECK_COMPLETE

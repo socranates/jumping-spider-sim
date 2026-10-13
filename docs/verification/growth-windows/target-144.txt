@@ -1,0 +1,46 @@
+Jumping Spider Sim test report
+timestamp_utc: 2026-10-12T21:54:33Z
+engine: Godot 4.7.2.stable.official.ed1daf0bf
+platform: Windows
+suite_seconds: 84 (frame time; the watchdog fires at 2400)
+renderer_setting: gl_compatibility
+renderer_active: gl_compatibility
+physics_engine: Jolt Physics
+source_hash_md5: 64db11027beae769423d2e528931551e (scripts, scenes, data)
+settings_hash_md5: 8b6707d4bb26d00c21239d1c75d3aec2 (project.godot)
+tests_hash_md5: 0cd4c804c8a0b936c81663bd3ea41a5a (tests/ scripts and scenes, not tests/reports)
+evidence_id: baedf0eb21d9 (keeps a copy of this state: snapshot.bat writes tests/reports/snapshots/DATE_baedf0eb21d9.zip)
+fixture_seed: 20261005
+filter: only=unit,integration,gates files=test_drawn_growth,test_surface_legs,test_life03_moulting,test_drop_line
+tests: 26
+passed: 26
+failed: 0
+not_run: 0
+result: PASS
+
+PASS     test_drawn_growth.gd::test_adult_contacts_follow_floor_wall_and_underside_geometry  1221 checks
+PASS     test_drawn_growth.gd::test_adult_reduced_motion_keeps_neutral_feet_at_support_height  10 checks
+PASS     test_drawn_growth.gd::test_adult_turning_steps_and_eye_mask_remain_stable  18 checks
+PASS     test_drawn_growth.gd::test_checkpoint_restores_size_softness_and_condition_together  6 checks
+PASS     test_drawn_growth.gd::test_every_stage_keeps_stance_fixed_and_takes_walking_steps  1610 checks
+PASS     test_drawn_growth.gd::test_stages_grow_visuals_without_changing_motor_or_collider  54 checks
+PASS     test_drop_line.gd::test_from_a_leaf_it_walks_to_the_edge_and_lets_itself_down  21 checks
+PASS     test_drop_line.gd::test_from_a_wall_it_lets_go_at_once  5 checks
+PASS     test_drop_line.gd::test_from_every_raised_place_it_reaches_the_floor_and_the_lip_refuses  27 checks
+PASS     test_drop_line.gd::test_on_the_floor_there_is_nothing_below  4 checks
+PASS     test_drop_line.gd::test_reeling_in_after_a_drop_takes_hold_of_the_leaf_again  4 checks
+PASS     test_drop_line.gd::test_the_button_can_be_changed_and_the_screen_names_it  4 checks
+PASS     test_drop_line.gd::test_the_button_lets_it_down_holds_to_lower_and_cancel_stops_the_walk  5 checks
+PASS     test_life03_moulting.gd::test_a_ready_spider_moults_in_the_crack  17 checks
+PASS     test_life03_moulting.gd::test_checkpoints_keep_growth_and_older_ones_are_brought_up  8 checks
+PASS     test_life03_moulting.gd::test_food_from_the_needs_ledger_counts_toward_a_moult  2 checks
+PASS     test_life03_moulting.gd::test_the_growth_rules  15 checks
+PASS     test_life03_moulting.gd::test_three_moults_make_an_adult_and_finish_the_main_life  7 checks
+PASS     test_surface_legs.gd::test_eye_view_uses_a_stable_distal_leg_mask_and_reduced_motion_clears_launch  19 checks
+PASS     test_surface_legs.gd::test_leaf_edge_retracts_feet_onto_the_leaf_and_sill_contacts_hold  33 checks
+PASS     test_surface_legs.gd::test_push_straightens_rear_knees_with_feet_still_planted  12 checks
+PASS     test_surface_legs.gd::test_quarter_speed_keeps_the_same_gait_per_simulation_tick  320 checks
+PASS     test_surface_legs.gd::test_stance_is_fixed_in_world_space_despite_travel_and_twitch  326 checks
+PASS     test_surface_legs.gd::test_surface_contacts_on_wall_and_underside_are_on_real_geometry  1117 checks
+PASS     test_surface_legs.gd::test_tap_jump_displays_attachment_before_rear_push_and_absorbs_landing  10 checks
+PASS     test_surface_legs.gd::test_turning_on_the_spot_takes_steps  2 checks

@@ -1111,3 +1111,14 @@ Chet reviews this entry, `docs/HANDOFF-chunk-7.md` and the tests named above. Na
 - F / D-pad down: from a wall, a stem or an underside the spider lets go on its line at once; from a leaf top or the planter it walks to the nearest edge with room below, goes over it and lets go there. Holding the button lowers; W climbs back. While letting itself down it takes hold only of ground below its anchor. SILK-01 to SILK-04.
 - The runner's watchdog fired on a passing test (the suite ran 1,502 s of frame time against a 1,500 s limit); raised to 2,400 s, and the report prints suite_seconds. The notebook's new-page note no longer overlaps the line prompts.
 - Final: evidence fe3af29213dd, 612 of 612 (fixed 60 fps, Linux headless); 63 of 63 related tests at fixed 30 and 144. Not run on Windows.
+
+
+## 2026-10-12 — Chet: drawn growth and Windows moulting/silk verification
+
+Implemented visual growth with planted-foot support and unchanged physics;
+softness/condition/restore and reduced-motion coverage. Game commit 537d1ce.
+Windows baseline 612/612, final 618/618 (baedf0eb21d9); relevant 26/26 at
+30/60/144. Native staged feeding through three moults, checkpoint stage saves,
+three old skins, adult leaf/wall/planter descent and separate reel returns.
+Battery moult profile and fresh Windows/web friend ZIPs recorded in
+verification/growth-windows. Next Claude: mud dauber wasp.

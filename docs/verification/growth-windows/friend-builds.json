@@ -1,0 +1,19 @@
+{
+  "source_commit": "537d1ce",
+  "evidence": "baedf0eb21d9",
+  "windows_tests": "618/618",
+  "builds": [
+    {
+      "file": "The-Windowsill-windows-537d1ce.zip",
+      "bytes": 38616731,
+      "sha256": "c550d371a24b69ab27d2d7fdc346a876910e0eae4c03f6fe8a25e1b116344572",
+      "crc": "passed"
+    },
+    {
+      "file": "The-Windowsill-web-537d1ce.zip",
+      "bytes": 10786066,
+      "sha256": "66911783060a51d3c12cb97bdfdc8edbbd3f2ce0d07a69d200db4335db2aad4d",
+      "crc": "passed"
+    }
+  ]
+}

@@ -530,3 +530,21 @@ Nathan, after finding the dragline only by a missed jump at the dry leaf tip: "c
   - Stills and a tick trace: `docs/verification/drop/`. Not run on Windows.
   - The suite now runs past 1,500 s of frame time (1,502 s), so the runner's watchdog fired on a passing test. It is 2,400 s now, and the report prints `suite_seconds`.
 - The "New in your notebook" note now wraps at the bottom left, clear of the prompts centred at the bottom of the screen, which it used to overlap.
+
+
+## Drawn growth (Chet, 2026-10-12)
+
+- **GROW-01 Visual scale only.** Stages 0–3 use 1.0, 1.15, 1.32, 1.50.
+  Artistic readability factors, not measured biological instars. This supersedes
+  LIFE-11's same-size drawing limitation. Motor, collider, jump and silk rules
+  remain unchanged. Scale around the existing support plane; compose the
+  growth lift with twitch/recoil so feet retain their world-space anchors.
+- **GROW-02 Scale the gait with the drawing.** Contact probes, step thresholds,
+  swing lift and top-level world-space rods follow visual size. Growth does
+  not reset all planted contacts. Habitat application updates size on both
+  moult and checkpoint restoration; softness/abdomen condition remain separate.
+- **GROW-03 Windows evidence.** Baseline 612/612; final 618/618, baedf0eb21d9;
+  targeted 26/26 at fixed 30/60/144. Staged native three-moult and adult silk
+  checks complete. Battery-only moult timing ~59–60 fps mean, p95 17.58–17.88 ms,
+  max 71.50 ms, not an F01 pass. Friend Windows/web ZIPs from 537d1ce rebuilt.
+  See verification/growth-windows/RESULTS.md for method, caveats and screenshots.

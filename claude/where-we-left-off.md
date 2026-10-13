@@ -1,3 +1,20 @@
+# Current handoff — Chet, 2026-10-12 (drawn growth complete)
+
+Read **docs/HANDOFF-drawn-growth.md** and **docs/verification/growth-windows/RESULTS.md**.
+- Drawn stages now grow 1.0 / 1.15 / 1.32 / 1.50; artistic sizes, unchanged
+  collider/physics. Planted legs, softness, abdomen condition and restore tested.
+- Windows **618/618**, evidence **baedf0eb21d9**; relevant tests 26/26 at
+  30/60/144 fps. Game source `537d1ce`; subsequent work is docs/evidence.
+- Staged native three-moult adult and silk checks complete. Reel before floor
+  landing; landing completes the trail. Underside orbit framing remains rough.
+- Battery moult timing: ~59–60 fps, p95 17.58–17.88 ms, spikes to 71.50 ms.
+- Friend ZIPs rebuilt: Downloads/The-Windowsill-Playtest-2026-10-12-Growth.
+  Windows launch/web eye/notebook checked; embedded mouse pointer-lock fails.
+- **Next: Claude, mud dauber wasp (LIFE round 4).** Chet pushes main and
+  updates the laptop; exact finish hash reported in chat.
+
+---
+
 # Current handoff - Claude, 2026-10-12 (letting down on a line)
 
 **Read DECISIONS SILK-01 to SILK-04.** Nathan asked for "an easy way to lower yourself from anywhere".

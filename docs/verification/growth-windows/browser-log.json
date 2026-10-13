@@ -1,0 +1,8 @@
+[
+  {
+    "level": "error",
+    "message": "WrongDocumentError: The root document of this element is not valid for pointer lock.",
+    "timestamp": "2026-10-13T01:32:47.152Z",
+    "url": "http://127.0.0.1:8765/"
+  }
+]

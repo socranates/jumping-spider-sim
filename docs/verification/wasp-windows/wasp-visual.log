@@ -1,0 +1,15 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+OpenGL API 3.3.0 Core Profile Context 25.10.42.01.260515 - Compatibility - Using Device: ATI Technologies Inc. - AMD Radeon(TM) Graphics
+
+SHOT model_0
+SHOT model_1
+SHOT model_2
+ARRIVAL_END 7.98333333333331 arriving HUM true
+SHOT arrival_end
+SHOT inspection
+SHOT eye_inspection
+SHOT carrying
+VISIT_EVENTS [{"kind":"warning","t":0.0},{"kind":"searching","t":8.01666666666664},{"kind":"noticed","t":9.80000000000007},{"kind":"strike","t":12.4833333333335},{"kind":"caught","t":12.8333333333336}]
+SHOT caught
+PANEL [P: (220.0, 270.0), S: (840.0, 210.0)] VIEW [P: (0.0, 0.0), S: (1280.0, 720.0)]
+CHECK_COMPLETE

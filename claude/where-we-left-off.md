@@ -1,3 +1,20 @@
+# Current handoff — Chet, 2026-10-13 (wasp presentation)
+
+Read **docs/HANDOFF-wasp-presentation.md** and **docs/verification/wasp-windows/RESULTS.md**.
+- New wasp silhouette, jointed legs, smoky tapered wings and antenna animation.
+  Public API unchanged; animation follows SimClock. Stylised original geometry.
+- Warning hum has small-speaker harmonics and capped nearby gain. Eight-second
+  warning stays. Digital recording checked; actual speaker listening remains.
+- Seized spider is still with tucked legs. Max-text catch screen hides live HUD.
+- Windows **632/632**, evidence **a45591fefdf2**; targeted 28/28 at 30/60/144.
+  Game source **373c7cf**; fresh ZIPs in Downloads/The-Windowsill-Playtest-2026-10-13-Wasp. Full result and
+  build manifest live in wasp-windows/. No physics or visit-rule changes.
+- Battery 1080p visit: mean 54.5 fps, p95 22.07 ms, arrival hitch 184 ms;
+  F01 remains open. Children's comfort needs their playtest.
+- **Claude next: death and continuing, LIFE round 5.**
+
+---
+
 # Current handoff - Claude, 2026-10-13 (LIFE round 4: the mud dauber wasp)
 
 **Read docs/HANDOFF-life-round4.md.** Built on Chet's drawn growth (6c51cca). Decisions LIFE-14 to LIFE-18.

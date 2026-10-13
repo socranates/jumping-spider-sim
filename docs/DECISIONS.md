@@ -580,3 +580,30 @@ Built after Chet's drawn-growth round (main 6c51cca, 618/618 here too). Plan: LI
   - Three notebook pages: "A hunter of spiders", "What the wasp does" and "Getting away". Their sources could be checked only at snippet and abstract level, because the build environment's network refused the sites; NOTEBOOK_SOURCES.md says which.
   - Tests: 10 new (`tests/integration/test_life04_wasp.gd`), including "every catch comes at least 8 s after the warning and 1.5 s after a visible look". Wasp and related tests: 72 / 72 at fixed 30, 60 and 144 fps. Stills: `docs/verification/life04/`.
   - Evidence e962dffc61cb: 628 / 628 (Linux headless, fixed 60 fps; 1,701 s of frame time against the 2,400 s watchdog). Not run on Windows.
+
+
+## Wasp presentation and Windows check (Chet, 2026-10-13)
+
+- **WASP-01 Drawn Sceliphron.** Replace single-rod legs and box wings with
+  jointed black/yellow legs, smoky tapered membranes with simplified veins,
+  bent antennae and a narrow yellow petiole. Head-to-abdomen length ~2.47 WU.
+  Keep pose(mode, beat, search), -Z forward and all AI/physics rules. Geometry
+  remains stylised and original; species references and simplifications in
+  verification/wasp-windows/RESULTS.md. Wing/step beat now uses SimClock.DT.
+- **WASP-02 Audible warning design.** Preserve the 120 Hz designed base, add
+  480–1440 Hz harmonics for small speakers, use 40 WU unit distance, +3 dB
+  source level and a -3 dB near-field cap. Retain cue mute, speaker EQ and
+  limiter. Digital recording and harmonic checks pass; actual laptop-speaker
+  loudness and children's comfort still need human listening. No biological
+  wingbeat-frequency claim and no extra sting impact sound.
+- **WASP-03 Seized means still.** Draw legs inward, clear stance anchors and
+  stop visual recoil/twitch/jump animation while seized. Keep growth/tint and
+  physics untouched. Hide lower gameplay HUD layers on the catch screen so
+  maximum text is clear; notebook remains available. Optional looming response
+  deferred; player control is unchanged.
+- **WASP-04 Evidence.** Baseline Windows 628/628 (e962dffc61cb); targeted 28/28
+  at 30/60/144 (a45591fefdf2). See the full report in wasp-windows for the final
+  full-suite result. Native staged warning/search/inspection/carry/catch at
+  1080p and 150% text checked. Battery visit averages 54.5 fps, p95 22.069 ms,
+  worst 183.558 ms in arrival. Strict F01 remains open. No physical controller
+  or child playtest claimed.

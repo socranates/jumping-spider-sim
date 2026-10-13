@@ -1,0 +1,48 @@
+Jumping Spider Sim test report
+timestamp_utc: 2026-10-13T11:35:00Z
+engine: Godot 4.7.2.stable.official.ed1daf0bf
+platform: Windows
+suite_seconds: 211 (frame time; the watchdog fires at 2400)
+renderer_setting: gl_compatibility
+renderer_active: gl_compatibility
+physics_engine: Jolt Physics
+source_hash_md5: 61d1b285367f05575f6d7f145aa6d9ba (scripts, scenes, data)
+settings_hash_md5: 8b6707d4bb26d00c21239d1c75d3aec2 (project.godot)
+tests_hash_md5: 8ff1eac60e0e58e23faca20ea7e1e21f (tests/ scripts and scenes, not tests/reports)
+evidence_id: a45591fefdf2 (keeps a copy of this state: snapshot.bat writes tests/reports/snapshots/DATE_a45591fefdf2.zip)
+fixture_seed: 20261005
+filter: only=unit,integration,gates files=test_wasp_presentation,test_life04_wasp,test_drawn_growth,test_surface_legs
+tests: 28
+passed: 28
+failed: 0
+not_run: 0
+result: PASS
+
+PASS     test_drawn_growth.gd::test_adult_contacts_follow_floor_wall_and_underside_geometry  1221 checks
+PASS     test_drawn_growth.gd::test_adult_reduced_motion_keeps_neutral_feet_at_support_height  10 checks
+PASS     test_drawn_growth.gd::test_adult_turning_steps_and_eye_mask_remain_stable  18 checks
+PASS     test_drawn_growth.gd::test_checkpoint_restores_size_softness_and_condition_together  6 checks
+PASS     test_drawn_growth.gd::test_every_stage_keeps_stance_fixed_and_takes_walking_steps  1610 checks
+PASS     test_drawn_growth.gd::test_stages_grow_visuals_without_changing_motor_or_collider  54 checks
+PASS     test_life04_wasp.gd::test_a_drop_or_a_jump_breaks_its_approach  9 checks
+PASS     test_life04_wasp.gd::test_a_moving_spider_in_the_open_is_found_looked_at_and_caught  10 checks
+PASS     test_life04_wasp.gd::test_a_still_spider_is_found_slowly_and_the_crack_never  8 checks
+PASS     test_life04_wasp.gd::test_caught_after_resting_goes_back_to_the_rest  7 checks
+PASS     test_life04_wasp.gd::test_caught_the_screen_says_so_plainly_and_offers_the_way_back  15 checks
+PASS     test_life04_wasp.gd::test_checkpoints_keep_the_wasp_and_older_ones_are_brought_up  10 checks
+PASS     test_life04_wasp.gd::test_it_is_heard_before_it_can_look  6 checks
+PASS     test_life04_wasp.gd::test_the_spider_feels_it_land  2 checks
+PASS     test_life04_wasp.gd::test_what_the_spider_senses_of_it_and_where_it_flies  65 checks
+PASS     test_life04_wasp.gd::test_when_it_comes  68 checks
+PASS     test_surface_legs.gd::test_eye_view_uses_a_stable_distal_leg_mask_and_reduced_motion_clears_launch  19 checks
+PASS     test_surface_legs.gd::test_leaf_edge_retracts_feet_onto_the_leaf_and_sill_contacts_hold  33 checks
+PASS     test_surface_legs.gd::test_push_straightens_rear_knees_with_feet_still_planted  12 checks
+PASS     test_surface_legs.gd::test_quarter_speed_keeps_the_same_gait_per_simulation_tick  320 checks
+PASS     test_surface_legs.gd::test_stance_is_fixed_in_world_space_despite_travel_and_twitch  326 checks
+PASS     test_surface_legs.gd::test_surface_contacts_on_wall_and_underside_are_on_real_geometry  1117 checks
+PASS     test_surface_legs.gd::test_tap_jump_displays_attachment_before_rear_push_and_absorbs_landing  10 checks
+PASS     test_surface_legs.gd::test_turning_on_the_spot_takes_steps  2 checks
+PASS     test_wasp_presentation.gd::test_jointed_wasp_modes_are_finite_repeatable_and_do_not_add_meshes  306 checks
+PASS     test_wasp_presentation.gd::test_seized_spider_stays_tucked_at_every_growth_stage  76 checks
+PASS     test_wasp_presentation.gd::test_warning_hum_starts_in_arrival_and_stops_after_visit  4 checks
+PASS     test_wasp_presentation.gd::test_wasp_sample_is_looped_and_has_small_speaker_harmonics  2 checks

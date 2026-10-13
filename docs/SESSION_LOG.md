@@ -1128,3 +1128,14 @@ verification/growth-windows. Next Claude: mud dauber wasp.
 - The wasp: one visit a day at most, by day, never on day 1, before the first meal or during a rest; heard 8 s before it can look; a search by sight over 15 places, where movement is noticed far faster than stillness and the crack is never searched into; a 1.5 s look before a short lunge; a jump, a drop or getting out of sight breaks its approach; caught, the spider goes still and is carried off, and a plain screen offers the last rest (or a new life) and the notebook. Checkpoint schema 6; three notebook pages (sources checked only at snippet level: the environment's network refused the sites). LIFE-14 to LIFE-18.
 - Final: evidence e962dffc61cb, 628 of 628 (fixed 60 fps, Linux headless); 72 of 72 wasp and related tests at fixed 30, 60 and 144. Not run on Windows.
 
+
+
+## 2026-10-13 — Chet: wasp presentation and Windows check
+
+Started from 7fa4bd1, confirmed Windows 628/628. Rebuilt procedural wasp with
+jointed legs and shaped wings; strengthened hum's upper harmonics; seized
+spider stays tucked/still. Cleared gameplay HUD from the catch screen.
+Targeted 28/28 at 30/60/144. 1080p staged visit, max-text catch, digital audio
+recording and screenshot-free battery timing retained in wasp-windows/.
+Final full suite/build details: verification/wasp-windows/RESULTS.md.
+Next Claude: death and continuing. Human listening/child comfort remain open.

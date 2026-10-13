@@ -579,3 +579,4 @@ Built after Chet's drawn-growth round (main 6c51cca, 618/618 here too). Plan: LI
   - Checkpoint schema 6 keeps the wasp's record: the day of its last visit, and this life's visits and escapes. A visit going on is not kept, because the spider rests in the crack where the wasp cannot find it. Schema 5 upgrades to "no visits yet".
   - Three notebook pages: "A hunter of spiders", "What the wasp does" and "Getting away". Their sources could be checked only at snippet and abstract level, because the build environment's network refused the sites; NOTEBOOK_SOURCES.md says which.
   - Tests: 10 new (`tests/integration/test_life04_wasp.gd`), including "every catch comes at least 8 s after the warning and 1.5 s after a visible look". Wasp and related tests: 72 / 72 at fixed 30, 60 and 144 fps. Stills: `docs/verification/life04/`.
+  - Evidence e962dffc61cb: 628 / 628 (Linux headless, fixed 60 fps; 1,701 s of frame time against the 2,400 s watchdog). Not run on Windows.

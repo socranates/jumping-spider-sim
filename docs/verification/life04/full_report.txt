@@ -1,0 +1,3 @@
+evidence_id: e962dffc61cb (source d87717a7, settings 8b6707d4, tests 535be241)
+SUMMARY tests=628 passed=628 failed=0 not_run=0 seed=20261005 filter=all result=PASS
+suite_seconds: 1701 (frame time; the watchdog fires at 2400)

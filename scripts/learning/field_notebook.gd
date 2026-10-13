@@ -14,7 +14,7 @@ const SECTION := "notebook"
 ## Triggers a page may name. "eye_time_N": N seconds in the spider-eye view, all told.
 const TRIGGERS: Array[String] = ["start", "jump", "jump_far", "jump_long", "eye_view", "eye_time_20", "eye_time_60", "shimmer",
 	"fly_recognised", "catch", "meal", "felt", "buzz", "rest", "sleep", "hungry", "well_fed",
-	"moult_ready", "moulted", "adult"]
+	"moult_ready", "moulted", "adult", "wasp", "wasp_escaped", "wasp_caught"]
 ## LIFE_DESIGN.md round 1: the reserve at or under HUNGRY_AT is "hungry"; at or over WELL_FED_AT, "well_fed".
 const HUNGRY_AT := 0.25
 const WELL_FED_AT := 0.85

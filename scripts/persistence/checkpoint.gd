@@ -20,14 +20,16 @@ const Fly = preload("res://scripts/prey/fly.gd")
 const HabitatLoop = preload("res://scripts/habitat/habitat_loop.gd")
 const LifeClock = preload("res://scripts/life/life_clock.gd")
 const Growth = preload("res://scripts/life/growth.gd")
+const WaspDirector = preload("res://scripts/predator/wasp_director.gd")
 
 ## Schema 2 (T09b): flies record their glances (schedule: home_heading, glancing, glance_target, glance_sign, next_glance) and the
 ## habitat's fallen leaf tip is a habitat change. Schema 3 (T09c): flies record their walks (schedule: walking, walk_target, walk_speed,
 ## burst_left, pause_left, next_walk, rest_spot). Schema 4 (LIFE_DESIGN.md round 1): the life clock (life: day, hour, sleeping) and
 ## the needs' life mode (life_mode, starving_hours, hour_accumulator). Schema 5 (round 3): growth (stage, food since the last moult,
-## readiness, the moult and the soft skin still to pass, where the old skins lie). Older records are upgraded on load (upgrade()), one
-## schema at a time.
-const SCHEMA_VERSION := 5
+## readiness, the moult and the soft skin still to pass, where the old skins lie). Schema 6 (round 4): the wasp (the day of its last
+## visit, and this life's visits and escapes; a visit going on is not kept: the spider rests in the crack, where the wasp cannot find
+## it, and the world that comes back has the wasp away). Older records are upgraded on load (upgrade()), one schema at a time.
+const SCHEMA_VERSION := 6
 const GAME_BUILD := "prototype-0.1.0"
 const KIND := "retreat_checkpoint"
 const PLAYER_ID := "spider"
@@ -89,6 +91,7 @@ static func capture(world: Node) -> Dictionary:
 		"habitat": loop.to_dict(),
 		"life": loop.clock.to_dict(),
 		"growth": loop.growth.to_dict(),
+		"wasp": world.wasp_director.to_dict() if world.get("wasp_director") != null else WaspDirector.default_record(),
 		"retreats": [{"id": Windowsill.RETREAT_ID, "surface_id": "sill_floor"}],
 		"habitat_changes": world.lab.changes_record(),
 		"journal": [],
@@ -155,6 +158,12 @@ static func upgrade(record: Variant) -> Variant:
 		r["schema_version"] = 5
 		if not r.has("upgraded_from"):
 			r["upgraded_from"] = 4
+	if int(r["schema_version"]) == 5:
+		# 5 -> 6: the wasp has not yet come in this life.
+		r["wasp"] = WaspDirector.default_record()
+		r["schema_version"] = 6
+		if not r.has("upgraded_from"):
+			r["upgraded_from"] = 5
 	return r
 
 
@@ -181,7 +190,7 @@ static func validate(record: Variant) -> PackedStringArray:
 		e.append("the checkpoint belongs to habitat content '%s', not '%s'" % [str(r.get("content_revision", "")), Windowsill.CONTENT_REVISION])
 	if str(r.get("player_id", "")) != PLAYER_ID:
 		e.append("the checkpoint names no player")
-	for key: String in ["player", "needs", "feeding", "prey", "habitat", "clocks", "life", "growth"]:
+	for key: String in ["player", "needs", "feeding", "prey", "habitat", "clocks", "life", "growth", "wasp"]:
 		if typeof(r.get(key)) != TYPE_DICTIONARY:
 			e.append("missing section '%s'" % key)
 	if not e.is_empty():
@@ -193,6 +202,7 @@ static func validate(record: Variant) -> PackedStringArray:
 	_check_habitat(r["habitat"], e)
 	e.append_array(LifeClock.problems(r["life"]))
 	e.append_array(Growth.problems(r["growth"]))
+	e.append_array(WaspDirector.problems(r["wasp"]))
 	_check_prey(r["prey"], r["needs"], e)
 	_check_changes(r.get("habitat_changes"), e)
 	if e.is_empty():

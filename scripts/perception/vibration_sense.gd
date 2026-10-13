@@ -15,7 +15,8 @@ signal felt(event: Dictionary)
 
 const Layers = preload("res://scripts/core/physics_layers.gd")
 
-const STRENGTH := {"landing": 1.0, "take-off": 0.8, "footsteps": 0.45}
+## LIFE round 4: the wasp, about four times a fly's length, lands and walks heavier (a design choice: no measurement was found).
+const STRENGTH := {"landing": 1.0, "take-off": 0.8, "footsteps": 0.45, "heavy landing": 1.6, "heavy footsteps": 0.7}
 const FADE_WU := 4.0          # the shake falls to 1/e over this distance
 const JOINT_LOSS := 0.5       # and to this share at each joint between pieces
 const THRESHOLD := 0.08       # weaker than this is not felt

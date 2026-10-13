@@ -51,6 +51,8 @@ const SupportMath = preload("res://scripts/movement/support_math.gd")
 const FieldNotebook = preload("res://scripts/learning/field_notebook.gd")
 const NotebookWatch = preload("res://scripts/learning/notebook_watch.gd")
 const NotebookPanel = preload("res://scripts/presentation/notebook_panel.gd")
+const WaspDirector = preload("res://scripts/predator/wasp_director.gd")
+const CaughtPanel = preload("res://scripts/presentation/caught_panel.gd")
 const MAIN_SCENE_PATH := "res://scenes/main.tscn"
 
 const PROFILE_PATH := "res://data/species/phidippus_audax_prototype.json"
@@ -67,6 +69,8 @@ var habitat_loop: Node
 @export var prey_replenish: bool = true
 ## T09b: whether a caught fly struggles and must be held with presses (FeedingController). On in a played world; test worlds switch it off.
 @export var prey_struggle: bool = true
+## LIFE round 4: whether the mud dauber comes by itself (on the windowsill). On in a played world; test worlds switch it off.
+@export var wasp_enabled: bool = true
 var settings: Node
 ## Optional Transform3D for the spider origin instead of the lab spawn point.
 var spawn_override: Variant = null
@@ -112,6 +116,8 @@ var gaze_overlay: GazeOverlay
 var eye_overlay: CanvasLayer  # T10a: the spider-eye view's picture (played worlds only)
 var slow_motion_hud: CanvasLayer  # T11a: says when slow motion is on, and switches it (played worlds only)
 var vibration: Node  # T12a: what the spider feels through its feet (every world)
+var wasp_director: Node  # LIFE round 4: the mud dauber's visits (the windowsill only)
+var caught_panel: CanvasLayer  # what follows when the wasp catches the spider (played worlds only)
 var soundscape: Node3D  # T12a: room and fly sounds (played worlds only)
 var sense_hud: CanvasLayer  # T12a: captions and vibration ripples (played worlds only)
 ## LEARN-01: the naturalist's notebook, what opens its pages, and its pages on screen (played worlds only). It is the player's: kept in
@@ -241,6 +247,15 @@ func _ready() -> void:
 	vibration.lab = lab
 	vibration.settings = settings
 	add_child(vibration)
+	if use_windowsill:
+		wasp_director = WaspDirector.new()
+		wasp_director.name = "WaspDirector"
+		wasp_director.world = self
+		wasp_director.enabled = wasp_enabled
+		wasp_director.seed_value = int(prey.seed_value)
+		if restored:
+			wasp_director.load_dict(restore_record["wasp"])
+		add_child(wasp_director)
 	if interactive:
 		controller = PlayerController.new()
 		controller.motor = spider
@@ -319,6 +334,7 @@ func _ready() -> void:
 		soundscape.spider = spider
 		soundscape.habitat_loop = habitat_loop
 		soundscape.vibration = vibration
+		soundscape.wasp_director = wasp_director
 		soundscape.seed_value = int(prey.seed_value)
 		add_child(soundscape)
 		soundscape.caption.connect(sense_hud.show_caption)
@@ -350,6 +366,13 @@ func _ready() -> void:
 		tether_debug.motor = spider
 		support_debug.add_child(tether_debug)
 		_add_notebook()
+		if wasp_director != null:
+			caught_panel = CaughtPanel.new()
+			caught_panel.name = "CaughtPanel"
+			caught_panel.world = self
+			caught_panel.settings = settings
+			add_child(caught_panel)
+			wasp_director.carried_off.connect(caught_panel.show_caught)
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 		_apply_ui_scale()
 		_apply_game_speed()
@@ -387,6 +410,7 @@ func _add_notebook() -> void:
 	notebook_watch.soundscape = soundscape
 	notebook_watch.habitat_loop = habitat_loop
 	notebook_watch.needs = needs
+	notebook_watch.wasp = wasp_director
 	add_child(notebook_watch)
 
 
@@ -527,9 +551,37 @@ func return_to_checkpoint(record: Dictionary = {}) -> Node3D:
 	fresh.interactive = interactive
 	fresh.settings = settings
 	fresh.prey_struggle = prey_struggle
+	fresh.wasp_enabled = wasp_enabled
 	fresh.checkpoint_dir = checkpoint_dir
 	fresh.restore_record = rec.duplicate(true)
 	fresh.last_checkpoint_message = last_checkpoint_message
+	var parent := get_parent()
+	var index := get_index()
+	var tree := get_tree()
+	var was_current := tree.current_scene == self
+	tree.paused = false
+	parent.remove_child(self)
+	parent.add_child(fresh)
+	parent.move_child(fresh, index)
+	if was_current:
+		tree.current_scene = fresh
+	queue_free()
+	return fresh
+
+
+## A new world in place of this one: a new spider in the crack at the start of its life (LIFE round 4: after the wasp, when there is no
+## checkpoint to go back to). The notebook is the player's and stays. Returns the new world.
+func start_new_life() -> Node3D:
+	var fresh: Node3D = (load(MAIN_SCENE_PATH) as PackedScene).instantiate()
+	fresh.interactive = interactive
+	fresh.settings = settings
+	fresh.use_windowsill = use_windowsill
+	fresh.prey_count = prey_count
+	fresh.prey_seed = 0
+	fresh.prey_replenish = prey_replenish
+	fresh.prey_struggle = prey_struggle
+	fresh.wasp_enabled = wasp_enabled
+	fresh.checkpoint_dir = checkpoint_dir
 	var parent := get_parent()
 	var index := get_index()
 	var tree := get_tree()

@@ -146,7 +146,7 @@ func test_checkpoints_keep_growth_and_older_ones_are_brought_up() -> void:
 	loop.growth.exuviae = [HOME, HOME + Vector3(0.5, 0, 0)] as Array[Vector3]
 	_rest()
 	var rec: Dictionary = world.last_checkpoint
-	check_eq(int(rec["schema_version"]), 5, "schema 5")
+	check_eq(int(rec["schema_version"]), Checkpoint.SCHEMA_VERSION, "the current schema")
 	check(Checkpoint.validate(rec).is_empty(), "valid: %s" % "; ".join(Checkpoint.validate(rec)))
 	var fresh: Node3D = world.return_to_checkpoint(rec)
 	if not check(fresh != null, "it loads"):
@@ -161,5 +161,5 @@ func test_checkpoints_keep_growth_and_older_ones_are_brought_up() -> void:
 	old["schema_version"] = 4
 	old.erase("growth")
 	var up: Variant = Checkpoint.upgrade(old)
-	check(Checkpoint.validate(up).is_empty(), "a schema 4 checkpoint is brought up to 5: %s" % "; ".join(Checkpoint.validate(up)))
+	check(Checkpoint.validate(up).is_empty(), "a schema 4 checkpoint is brought up to date: %s" % "; ".join(Checkpoint.validate(up)))
 	check_eq(int(up["growth"]["stage"]), 0, "as a young juvenile")

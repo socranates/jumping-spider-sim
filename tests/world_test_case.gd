@@ -18,6 +18,8 @@ var prey_replenish: bool = false
 var prey_struggle: bool = false
 ## Existing fixtures intentionally keep the lab; habitat tests opt in.
 var use_windowsill: bool = false
+## LIFE round 4: whether the mud dauber comes by itself in the next world (off unless the test asks; force_visit brings it anyway).
+var wasp_enabled: bool = false
 
 
 func before_each() -> void:
@@ -26,6 +28,7 @@ func before_each() -> void:
 	prey_replenish = false
 	prey_struggle = false
 	use_windowsill = false
+	wasp_enabled = false
 	settings = SettingsScript.new()
 	settings.autosave = false
 	settings.config_path = "user://jss_test_never_written.cfg"
@@ -44,6 +47,7 @@ func spawn_world(spawn: Variant = null, interactive: bool = false) -> Node3D:
 	world.prey_seed = prey_seed
 	world.prey_replenish = prey_replenish
 	world.prey_struggle = prey_struggle
+	world.wasp_enabled = wasp_enabled
 	# T09: an interactive test world keeps checkpoints in a test folder, never the player's saves (a non-interactive one keeps them in memory).
 	world.checkpoint_dir = TEST_SAVE_DIR if interactive else ""
 	sandbox.add_child(world)

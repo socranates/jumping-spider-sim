@@ -17,6 +17,7 @@ var vibration: Node          # VibrationSense: felt
 var soundscape: Node         # caption
 var habitat_loop: Node       # rest_changed, woke (the windowsill only)
 var needs: RefCounted        # NeedsModel: energy_changed (hungry, well fed)
+var wasp: Node               # WaspDirector: visit_started, left, caught (the windowsill only)
 
 
 func _ready() -> void:
@@ -58,6 +59,12 @@ func _ready() -> void:
 				notebook.notice("hungry")
 			elif now >= notebook.WELL_FED_AT:
 				notebook.notice("well_fed"))
+	if wasp != null:
+		wasp.visit_started.connect(func(_first: bool) -> void: notebook.notice("wasp"))
+		wasp.left.connect(func(escaped: bool) -> void:
+			if escaped:
+				notebook.notice("wasp_escaped"))
+		wasp.caught.connect(func() -> void: notebook.notice("wasp_caught"))
 	if habitat_loop != null and habitat_loop.has_signal("rest_changed"):
 		habitat_loop.rest_changed.connect(func(active: bool) -> void:
 			if active:

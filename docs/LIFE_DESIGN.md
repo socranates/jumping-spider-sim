@@ -120,7 +120,7 @@ Each round is one handoff: start from `main` and finish into `main`.
 1. **Done (Claude, 2026-10-12, LIFE-04 to LIFE-08): clocks and hunger.** Time of day and age; the night passing at rest; energy over days; abdomen size from condition; a starvation timeline with no death yet; notebook pages. Tests at 30, 60 and 144 fps.
 2. **Chet: Windows check complete (2026-10-12).** 600/600, day/night and abdomen checked; moving-sun p95 17.274 ms; friend ZIPs rebuilt. See `HANDOFF-life-round2.md`.
 3. **Done (Claude, 2026-10-12, LIFE-10 to LIFE-13): moulting.** Readiness, the retreat, time passing, a soft and pale spider, old skins, tests. Drawn growth completed by Chet: four visual sizes, unchanged physics; Windows 618/618. See HANDOFF-drawn-growth.md.
-4. **Claude and Chet: the wasp.** Its behaviour and warnings (Claude); model, animation, sound and Windows feel (Chet); the spider backing away from it.
+4. **The wasp. Claude's part done (2026-10-13, LIFE-14 to LIFE-18):** its visits, warnings, search by sight, escapes, the catch and the screen after it, checkpoint schema 6, three notebook pages. **Chet's part next:** model, animation, sound and Windows feel; the spider's still pose when stung; optionally the spider backing away from it. See `HANDOFF-life-round4.md`.
 5. **Claude: death and continuing.** Natural and Gentle, the summary, the choice, the new spider, the notebook carried over; tests that every death has a warning.
 6. **Nathan, his son and friends play a whole life.**
 

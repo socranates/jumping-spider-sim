@@ -206,6 +206,41 @@
 				"Jackson, R. R. (1978). The life history of Phidippus johnsoni (Araneae, Salticidae). Journal of Arachnology 6: 1-29.",
 				"Taylor, B. B. & Peck, W. B. (1975). A comparison of northern and southern forms of Phidippus audax. Journal of Arachnology 2: 89-99."
 			]
+		},
+		{
+			"id": "mud_dauber",
+			"trigger": "wasp",
+			"title": "A hunter of spiders",
+			"text": "The black-and-yellow mud dauber, Sceliphron caementarium, is a wasp about 2 to 3 centimetres long. It builds nests of mud in sheltered places on buildings, such as under eaves, and it is active by day in spring and summer. It hunts spiders, jumping spiders among them. It finds a spider by sight, then touches it with its antennae before it stings.",
+			"game": "You hear the wasp before it reaches the sill, see its shadow, and feel it land. The silk-lined crack is safe. Keeping still makes you hard to notice, and a jump or a drop on your line breaks its approach.",
+			"sources": [
+				"Powell, E. C. & Taylor, L. A. Black and yellow mud dauber, Sceliphron caementarium (Drury, 1773). Featured Creatures EENY-654 / IN1478, University of Florida IFAS Extension. https://ask.ifas.ufl.edu/publication/IN1478",
+				"Grissell, E. E. (1973). Sceliphron caementarium (Drury), a mud daubing wasp. Entomology Circular 136, Florida Department of Agriculture and Consumer Services, Division of Plant Industry.",
+				"Uma, D., Durkee, C., Herzner, G. & Weiss, M. (2013). Double deception: ant-mimicking spiders elude both visually- and chemically-oriented predators. PLoS ONE 8(11): e79660."
+			]
+		},
+		{
+			"id": "what_the_wasp_does",
+			"trigger": "wasp_caught",
+			"title": "What the wasp does",
+			"text": "The wasp's sting does not kill a spider: it paralyses it. The wasp carries the spider to a cell in its mud nest and fills the cell with paralysed spiders, up to twenty or more. It lays an egg on one of them and seals the cell with mud. When the larva hatches, it feeds on the spiders, which have stayed fresh because they are still alive.",
+			"game": "Being caught ends this spider's life. You go back to your last rest.",
+			"sources": [
+				"Powell, E. C. & Taylor, L. A. Black and yellow mud dauber, Sceliphron caementarium (Drury, 1773). Featured Creatures EENY-654 / IN1478, University of Florida IFAS Extension. https://ask.ifas.ufl.edu/publication/IN1478",
+				"Grissell, E. E. (1973). Sceliphron caementarium (Drury), a mud daubing wasp. Entomology Circular 136, Florida Department of Agriculture and Consumer Services, Division of Plant Industry.",
+				"Long, R. F. (2018). Why mud daubers are on spider patrol. UC ANR Green Blog, University of California Agriculture and Natural Resources."
+			]
+		},
+		{
+			"id": "getting_away",
+			"trigger": "wasp_escaped",
+			"title": "Getting away",
+			"text": "Jumping spiders watch what moves around them. When something looms toward a bold jumping spider, it backs away, and experiments showed that its side eyes, the anterior lateral eyes, are what tell it to. Not being seen matters most: the mud dauber finds its prey by sight.",
+			"game": "The wasp lost you, or gave up. Here a jump, a drop on your line or getting out of sight breaks its approach, and the crack is always safe. Dropping on a line to escape is the game's choice: it is not known to be what jumping spiders do.",
+			"sources": [
+				"Spano, L., Long, S. M. & Jakob, E. M. (2012). Secondary eyes mediate the response to looming objects in jumping spiders (Phidippus audax, Salticidae). Biology Letters 8(6): 949-951.",
+				"Uma, D., Durkee, C., Herzner, G. & Weiss, M. (2013). Double deception: ant-mimicking spiders elude both visually- and chemically-oriented predators. PLoS ONE 8(11): e79660."
+			]
 		}
 	]
 }

@@ -257,14 +257,14 @@ func test_caught_the_screen_says_so_plainly_and_offers_the_way_back() -> void:
 	check(get_tree_paused(), "and the game waits")
 	check(not world.needs_hud.visible, "live HUD does not clutter the catch screen")
 	await wait_until(func() -> bool: return panel.shown_seconds >= CaughtPanel.QUIET_S + CaughtPanel.LINE_S + 0.1, 60 * 6)
-	check(panel.find_child("Back", true, false).is_visible_in_tree(), "then the way on")
-	check_eq((panel.find_child("Back", true, false) as Button).text, CaughtPanel.AGAIN, "no rest yet: a new life")
+	check(panel.find_child("Another", true, false).is_visible_in_tree(), "then the way on")
+	check(not panel.find_child("Back", true, false).is_visible_in_tree(), "no rest yet: on as another spider")
 	var fresh: Node3D = panel.go_on()
 	if not check(fresh != null, "a new world"):
 		return
 	world = fresh
 	await wait_until(func() -> bool: return world.is_node_ready() and world.spider.state == world.spider.State.ATTACHED, 120)
-	check(not world.restored and not world.spider.seized, "a new spider at the start of its life")
+	check(not world.restored and not world.spider.seized and world.new_spider, "another spider at the start of its life")
 	check(not sandbox.get_tree().paused, "and the game goes on")
 
 
@@ -302,7 +302,7 @@ func test_checkpoints_keep_the_wasp_and_older_ones_are_brought_up() -> void:
 	world.habitat_loop.request_rest()
 	await physics_frames(3)
 	var rec: Dictionary = world.last_checkpoint
-	check_eq(int(rec["schema_version"]), 6, "schema 6")
+	check_eq(int(rec["schema_version"]), Checkpoint.SCHEMA_VERSION, "the current schema")
 	check(Checkpoint.validate(rec).is_empty(), "valid: %s" % "; ".join(Checkpoint.validate(rec)))
 	check_eq(rec["wasp"], {"last_visit_day": 4, "visits": 3, "escapes": 2}, "the wasp's record is kept")
 	var fresh: Node3D = world.return_to_checkpoint(rec)

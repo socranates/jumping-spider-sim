@@ -55,6 +55,8 @@ func _ready() -> void:
 		habitat_loop.woke.connect(func(_day: int) -> void: notebook.notice("sleep"))
 	if needs != null and needs.has_signal("energy_changed"):
 		needs.energy_changed.connect(func(_old: float, now: float) -> void:
+			if now <= 0.0 and not bool(needs.get("gentle")):
+				notebook.notice("starving")
 			if now <= notebook.HUNGRY_AT:
 				notebook.notice("hungry")
 			elif now >= notebook.WELL_FED_AT:

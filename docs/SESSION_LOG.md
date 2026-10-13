@@ -1139,3 +1139,9 @@ Targeted 28/28 at 30/60/144. 1080p staged visit, max-text catch, digital audio
 recording and screenshot-free battery timing retained in wasp-windows/.
 Final full suite/build details: verification/wasp-windows/RESULTS.md.
 Next Claude: death and continuing. Human listening/child comfort remain open.
+
+### 2026-10-13: LIFE round 5, death and continuing (Claude, cloud session)
+- Chet finished the wasp's presentation (5c56ef8). Merged into Claude's branch: 632/632 on Linux, evidence a45591fefdf2, the same as his Windows run.
+- Standard and Gentle rules: under Gentle the wasp only touches the spider, and hunger forgives. Starving shows every stage on the screen: starving, then a whole day of "will not last another day", then death. The end of a life is a plain line and a summary with no score, then back to the last rest or on as another spider (unrelated, somewhere new, the notebook kept, the old life put away). The player's progress opens Easy when an adult of the main life is reached. A start menu offers continue, a new life, Easy when earned, and free play with its own save. Checkpoint schema 7. LIFE-19 to LIFE-24.
+- Final: evidence a4165eb2beb4, 640 of 640 (fixed 60 fps, Linux headless); 79 of 79 round-5 and related tests at fixed 30, 60 and 144. Not run on Windows.
+

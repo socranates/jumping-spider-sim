@@ -607,3 +607,41 @@ Built after Chet's drawn-growth round (main 6c51cca, 618/618 here too). Plan: LI
   1080p and 150% text checked. Battery visit averages 54.5 fps, p95 22.069 ms,
   worst 183.558 ms in arrival. Strict F01 remains open. No physical controller
   or child playtest claimed.
+
+## One whole life, round 5: death and continuing (Claude, 2026-10-13)
+
+Built after Chet's wasp presentation (main 5c56ef8, 632/632 here too). Plan: LIFE_DESIGN section 5. Nathan's direction: LIFE-01, LIFE-03 (continue as an unrelated young juvenile), MODES-01 (Standard until the main life is finished, then Easy; free play apart; control helps never locked).
+
+- **LIFE-19 Two sets of rules.**
+  - **Standard ("Natural")** is the main life's rules: hunger and the wasp can kill.
+  - **Gentle** is Easy's and free play's rules, and nothing kills:
+    - the wasp still visits, warns and looks, but its strike is a touch with the antennae, and then it leaves;
+    - hunger drains at half the rate and never falls below 0.1, so a gentle spider is hungry at worst.
+  - Each world has a mode ("main" or "free") and rules ("standard" or "gentle"); free play is always gentle. Checkpoint schema 7 keeps both (`life_rules`). Older checkpoints are the main life on Standard.
+- **LIFE-20 Starving, with every stage on the screen.**
+  - A full reserve lasts about three game days.
+  - At zero, the top line says "Starving". After 24 hours at zero it says the spider "will not last another day", and the spider is too hungry to sleep: it rests but stays awake.
+  - After 48 hours at zero it dies (`NeedsModel.starving_streak_h`; any meal resets it). "Weak" therefore always shows for at least a whole game day before death, about half an hour of waking play.
+  - A notebook page, "Going without food", says what is known and how the game compresses it.
+- **LIFE-21 The end of a life** (`main.end_life`, `caught_panel.gd`).
+  - **The screen:** quiet and dim, then one plain line by cause ("The spider starved." or the wasp's line) and a second plain line.
+  - **The summary:** how long it lived, the stage and moults, its meals, and the wasp's visits and escapes. No score, rank or count of kills. Choosing at once skips it.
+  - **The way on:** "Back to your last rest" (when there is one), "Continue as another spider", or the notebook.
+  - Gentle rules never end a life.
+- **LIFE-22 Another spider** (LIFE-03, `main.continue_as_another`).
+  - A young juvenile on day 1, on the floor somewhere new, away from the crack. Four spots, taken in turn.
+  - The top line says plainly, for 12 s, that it is not related to the last.
+  - The life that ended is kept in the player's progress. Its checkpoints are put away, so "Continue" never brings the dead spider back.
+  - The notebook goes on; the spider's memory does not.
+- **LIFE-23 Modes and the start menu** (MODES-01, `start_menu.gd`, `scripts/life/progress.gd`).
+  - **The progress record:** the player's progress (the main life finished, deaths, the lives that ended) is the player's, like the notebook. It is kept in `user://progress.cfg` only when settings are saved, and never in a checkpoint.
+  - **Finishing:** an adult of the main life on Standard finishes the main life and opens Easy, and the screen says so. Easy lives and free play never count.
+  - **The start menu** opens at launch, and from the pause menu ("Start menu"). It offers:
+    - continue the main life's last rest;
+    - begin a new life (a second press confirms when a life is going on, which is then put away);
+    - a new life on Easy, once earned; until then a line says how it opens;
+    - free play, with its own save in `saves/free`;
+    - the notebook, and Quit (hidden on the web).
+  - The top line names the mode: THE WINDOWSILL, THE WINDOWSILL (EASY), FREE PLAY.
+  - Control helps stay in the pause menu in every mode.
+- **LIFE-24 Evidence.** 8 new tests (`tests/integration/test_life05_death.gd`). Round 5 and related tests: 79 / 79 at fixed 30, 60 and 144 fps. Full suite: evidence a4165eb2beb4, 640 / 640 (Linux headless, fixed 60 fps; 1,726 s of frame time). A normal launch was checked to open the start menu. Stills: `docs/verification/life05/`. Not run on Windows.

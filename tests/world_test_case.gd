@@ -20,6 +20,10 @@ var prey_struggle: bool = false
 var use_windowsill: bool = false
 ## LIFE round 4: whether the mud dauber comes by itself in the next world (off unless the test asks; force_visit brings it anyway).
 var wasp_enabled: bool = false
+## LIFE round 5: the next world's mode and rules, and whether the start menu opens over it.
+var world_mode: String = "main"
+var world_rules: String = "standard"
+var show_start_menu: bool = false
 
 
 func before_each() -> void:
@@ -29,6 +33,9 @@ func before_each() -> void:
 	prey_struggle = false
 	use_windowsill = false
 	wasp_enabled = false
+	world_mode = "main"
+	world_rules = "standard"
+	show_start_menu = false
 	settings = SettingsScript.new()
 	settings.autosave = false
 	settings.config_path = "user://jss_test_never_written.cfg"
@@ -48,6 +55,9 @@ func spawn_world(spawn: Variant = null, interactive: bool = false) -> Node3D:
 	world.prey_replenish = prey_replenish
 	world.prey_struggle = prey_struggle
 	world.wasp_enabled = wasp_enabled
+	world.mode = world_mode
+	world.rules = world_rules
+	world.show_start_menu = show_start_menu
 	# T09: an interactive test world keeps checkpoints in a test folder, never the player's saves (a non-interactive one keeps them in memory).
 	world.checkpoint_dir = TEST_SAVE_DIR if interactive else ""
 	sandbox.add_child(world)

@@ -114,6 +114,8 @@ var search_left := 0.0
 var notice := 0.0
 var confused_s := 0.0
 var noticed_this_visit := false
+## Gentle rules: this visit's strike was a touch, and the wasp gave up.
+var spared_this_visit := false
 ## Kept in checkpoints: the day of the last visit, and how many visits and escapes this life has had.
 var last_visit_day := 0
 var visits := 0
@@ -278,6 +280,7 @@ func begin_visit(day: int, first: int = -1) -> void:
 	notice = 0.0
 	confused_s = 0.0
 	noticed_this_visit = false
+	spared_this_visit = false
 	search_left = SEARCH_S
 	_recent.clear()
 	_loss_pos = Vector3.INF
@@ -494,9 +497,24 @@ func _strike(delta: float) -> void:
 	var s: Node3D = world.spider
 	if wasp.global_position.distance_to(s.global_position) <= CATCH_WU and not world.lab.in_retreat(s.global_position) \
 			and s.state != s.State.AIRBORNE:
-		_catch()
+		if gentle():
+			_spare()
+		else:
+			_catch()
 	else:
 		_lose("missed")
+
+
+## Gentle rules (round 5: Easy and free play, MODES-01): the wasp touches the spider with its antennae and gives up on it, and leaves.
+func gentle() -> bool:
+	return world != null and str(world.get("rules")) == "gentle"
+
+
+func _spare() -> void:
+	spared_this_visit = true
+	_log("spared")
+	lost.emit("spared")
+	_begin_leaving()
 
 
 func _catch() -> void:

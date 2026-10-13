@@ -205,6 +205,16 @@ func _build() -> void:
 		if _keys_box.visible:
 			_scroll.call_deferred("ensure_control_visible", _keys_box))
 	buttons.add_child(_keys_toggle)
+	# LIFE round 5 (MODES-01): the start menu, for another way to play (a new life, Easy once earned, free play).
+	var start_button := Button.new()
+	start_button.name = "StartMenu"
+	start_button.text = "Start menu"
+	start_button.pressed.connect(func() -> void:
+		if world != null and world.has_method("open_start_menu"):
+			set_paused(false)
+			world.call_deferred("open_start_menu"))
+	start_button.visible = world != null and world.get("habitat_loop") != null
+	buttons.add_child(start_button)
 	var quit_button := Button.new()
 	quit_button.text = "Quit"
 	quit_button.custom_minimum_size = Vector2(140.0, 0.0)

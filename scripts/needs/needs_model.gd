@@ -13,6 +13,9 @@ extends RefCounted
 ## no floor. It drains with the game hours the life clock reports (add_hours), faster awake than asleep, and it can run out: the hours
 ## spent at zero are counted (starving_hours). Nothing else follows from them yet; death is a later round. The hours are applied at the
 ## same 2 Hz update as before, so a checkpoint taken between updates keeps them (hour_accumulator) and loads to the same energy.
+## LIFE round 5: the hours at zero since the spider last ate (starving_streak_h) are what can kill it in the main life's Standard rules
+## (the habitat loop decides that, after clear warnings). Gentle rules (Easy and free play, MODES-01) are forgiving: the reserve drains at
+## GENTLE_DRAIN of the rate and never falls below GENTLE_FLOOR, so a gentle spider is hungry at worst, never starving.
 ## Rest is a second reserve with no consequence in P0: it wears down while the spider is active and builds back while it keeps
 ## still. It is here so that the retreat (T08) has something to restore; nothing reads it for a decision yet.
 
@@ -38,6 +41,9 @@ const FULL_AT := 0.98
 ## unfed); the game compresses time on purpose (LIFE_DESIGN.md).
 const LIFE_DRAIN_AWAKE_PER_H := 0.021
 const LIFE_DRAIN_ASLEEP_PER_H := 0.007
+## Gentle rules (round 5).
+const GENTLE_DRAIN := 0.5
+const GENTLE_FLOOR := 0.1
 const STAGE_ID := "p0_prototype"
 
 var energy: float = ENERGY_START
@@ -55,6 +61,10 @@ var _acc_still: float = 0.0
 ## Life mode (see above).
 var life_mode: bool = false
 var starving_hours: float = 0.0
+## Hours at zero since the last food (reset by any grant).
+var starving_streak_h: float = 0.0
+## Gentle rules (set by the world from its life's rules; not part of the record).
+var gentle: bool = false
 var _acc_hours_awake: float = 0.0
 var _acc_hours_asleep: float = 0.0
 
@@ -109,11 +119,16 @@ func _apply(period: float, active_share: float) -> void:
 		var hours := _acc_hours_awake + _acc_hours_asleep
 		_acc_hours_awake = 0.0
 		_acc_hours_asleep = 0.0
+		if gentle:
+			need *= GENTLE_DRAIN
 		if need > 0.0:
-			var used := minf(energy, need)
+			var floor_left := maxf(energy - GENTLE_FLOOR, 0.0) if gentle else energy
+			var used := minf(floor_left, need)
 			energy -= used
-			if need > used and need > 0.0:
-				starving_hours += hours * (need - used) / need
+			if need > used and not gentle:
+				var starved := hours * (need - used) / need
+				starving_hours += starved
+				starving_streak_h += starved
 	elif energy > ENERGY_FLOOR:
 		energy = maxf(ENERGY_FLOOR, energy - ENERGY_DRAIN_PER_S * period)
 	rest = clampf(rest + (REST_RECOVER_PER_S * (1.0 - active_share) - REST_DRAIN_PER_S * active_share) * period, 0.0, REST_MAX)
@@ -137,6 +152,7 @@ func grant_energy(amount: float, source_id: String) -> float:
 	granted_total += added
 	granted_by_source[source_id] = float(granted_by_source.get(source_id, 0.0)) + added
 	grants_made += 1
+	starving_streak_h = 0.0
 	energy_changed.emit(before, energy)
 	return added
 
@@ -169,6 +185,7 @@ func to_dict() -> Dictionary:
 		"enabled": ["energy", "rest"], "update_accumulator": [_acc_active, _acc_still], "stage_id": STAGE_ID,
 		"elapsed_s": elapsed_s, "granted_total": granted_total, "granted_by_source": granted_by_source.duplicate(),
 		"life_mode": life_mode, "starving_hours": starving_hours, "hour_accumulator": [_acc_hours_awake, _acc_hours_asleep],
+		"starving_streak_h": starving_streak_h,
 	}
 
 
@@ -201,6 +218,9 @@ func load_dict(d: Dictionary) -> bool:
 	var lm: Variant = d.get("life_mode", false)
 	var sh: Variant = d.get("starving_hours", 0.0)
 	var ha: Variant = d.get("hour_accumulator", [0.0, 0.0])
+	var streak: Variant = d.get("starving_streak_h", 0.0)
+	if (typeof(streak) != TYPE_FLOAT and typeof(streak) != TYPE_INT) or not is_finite(float(streak)) or float(streak) < 0.0:
+		return false
 	if typeof(lm) != TYPE_BOOL or (typeof(sh) != TYPE_FLOAT and typeof(sh) != TYPE_INT) or not is_finite(float(sh)) or float(sh) < 0.0:
 		return false
 	if typeof(ha) != TYPE_ARRAY or (ha as Array).size() != 2:
@@ -210,6 +230,7 @@ func load_dict(d: Dictionary) -> bool:
 			return false
 	life_mode = bool(lm)
 	starving_hours = float(sh)
+	starving_streak_h = float(streak)
 	_acc_hours_awake = float((ha as Array)[0])
 	_acc_hours_asleep = float((ha as Array)[1])
 	energy = float(d["energy"])

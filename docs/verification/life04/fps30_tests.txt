@@ -1,0 +1,1 @@
+SUMMARY tests=72 passed=72 failed=0 not_run=0 seed=20261005 filter=only=unit,integration,gates,files=test_life04_wasp.gd,test_life03_moulting.gd,test_life01_clock_hunger.gd,test_windowsill.gd,test_s02_checkpoint_store.gd,test_s01c_checkpoint.gd,test_learn01_notebook.gd,test_t12a_senses.gd,test_drop_line.gd result=PASS

@@ -548,3 +548,35 @@ Nathan, after finding the dragline only by a missed jump at the dry leaf tip: "c
   checks complete. Battery-only moult timing ~59–60 fps mean, p95 17.58–17.88 ms,
   max 71.50 ms, not an F01 pass. Friend Windows/web ZIPs from 537d1ce rebuilt.
   See verification/growth-windows/RESULTS.md for method, caveats and screenshots.
+
+## One whole life, round 4: the mud dauber wasp (Claude, 2026-10-13)
+
+Built after Chet's drawn-growth round (main 6c51cca, 618/618 here too). Plan: LIFE_DESIGN section 4. Nathan's direction: LIFE-01 ("death can be real and jarring. not sensationalized"), LIFE-03 (the mud dauber first; the notebook tells the plain truth), MODES-01.
+
+- **LIFE-14 When it comes** (`scripts/predator/wasp_director.gd`).
+  - At most one visit a day, between 10:00 and 15:30, on about 60 % of days.
+  - Never on the first day, never before the spider has finished its first meal, and never while it rests or moults in the crack.
+  - Whether a day has a visit, and at what hour, follows from the world's seed and the day alone, so a return to a checkpoint meets the same wasp.
+- **LIFE-15 Warned, then searched for by sight.**
+  - **Warning:** the wasp is heard for 8 s, coming in over the window frame, before it can look for anything. Its own shadow crosses the sill, and the spider feels it land when they share connected surfaces ("heavy landing", "heavy footsteps").
+  - **Search:** it moves between 15 authored places where a spider might be. It hovers and looks, and on open surfaces it sometimes lands and walks with its antennae flicking. Where it goes never depends on where the spider is.
+  - **Noticing:** while it can see the spider (within 7 WU, a clear line, not in the retreat), its notice grows. Movement makes it grow far faster (0.25/s still against 1.85/s walking, at point-blank range, falling off with distance). Out of sight, notice fades.
+  - **Before a strike:** once it has seen the spider, it turns toward it, comes to 1.2 WU, and looks for 1.5 s.
+  - To the spider's senses it is movement (shimmer in the eye view), never prey: its percept is capped at MOVEMENT.
+- **LIFE-16 Escapes and the catch.**
+  - **The crack is safe:** nothing in the retreat is ever seen.
+  - **Breaking the approach:** a jump, a drop on the line, the retreat, or getting out of sight. Then the wasp is confused for 4 s and searches at least 6 WU away.
+  - **The strike** is a 0.35 s lunge at where the spider was, so a spider that moves off is missed.
+  - **Leaving:** after 45 s of searching it gives up and flies away. It also gives up on a spider it cannot reach within 6 s.
+  - **Caught:** the spider goes still (`SpiderMotor.seize`) and is carried up and over the frame. Then the screen dims, one plain line says what happened, and it offers "Back to your last rest" ("Start a new life" when there is none) and the notebook (`scripts/presentation/caught_panel.gd`). No gore, no score.
+  - Round 5 builds death and continuing (the summary, another spider, Natural and Gentle, the modes) on this.
+- **LIFE-17 What is simplified, and said so.**
+  - The wasp's numbers are design choices tuned for fairness, not measurements: sight range, notice rates, timings, its 120 Hz hum and its heavier footsteps.
+  - The retreat being completely safe is a design choice.
+  - Dropping on a line to escape is the game's choice. No source shows jumping spiders doing it, and the "Getting away" page says so.
+  - The wasp is a placeholder drawn from primitives, for Chet's model.
+- **LIFE-18 Saves, pages and evidence.**
+  - Checkpoint schema 6 keeps the wasp's record: the day of its last visit, and this life's visits and escapes. A visit going on is not kept, because the spider rests in the crack where the wasp cannot find it. Schema 5 upgrades to "no visits yet".
+  - Three notebook pages: "A hunter of spiders", "What the wasp does" and "Getting away". Their sources could be checked only at snippet and abstract level, because the build environment's network refused the sites; NOTEBOOK_SOURCES.md says which.
+  - Tests: 10 new (`tests/integration/test_life04_wasp.gd`), including "every catch comes at least 8 s after the warning and 1.5 s after a visible look". Wasp and related tests: 72 / 72 at fixed 30, 60 and 144 fps. Stills: `docs/verification/life04/`.
+  - Evidence e962dffc61cb: 628 / 628 (Linux headless, fixed 60 fps; 1,701 s of frame time against the 2,400 s watchdog). Not run on Windows.

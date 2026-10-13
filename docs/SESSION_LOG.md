@@ -1122,3 +1122,9 @@ Windows baseline 612/612, final 618/618 (baedf0eb21d9); relevant 26/26 at
 three old skins, adult leaf/wall/planter descent and separate reel returns.
 Battery moult profile and fresh Windows/web friend ZIPs recorded in
 verification/growth-windows. Next Claude: mud dauber wasp.
+
+### 2026-10-13: LIFE round 4, the mud dauber wasp (Claude, cloud session)
+- Chet finished drawn growth (6c51cca). Merged into Claude's branch: 618/618 on Linux, evidence baedf0eb21d9, the same as his Windows run.
+- The wasp: one visit a day at most, by day, never on day 1, before the first meal or during a rest; heard 8 s before it can look; a search by sight over 15 places, where movement is noticed far faster than stillness and the crack is never searched into; a 1.5 s look before a short lunge; a jump, a drop or getting out of sight breaks its approach; caught, the spider goes still and is carried off, and a plain screen offers the last rest (or a new life) and the notebook. Checkpoint schema 6; three notebook pages (sources checked only at snippet level: the environment's network refused the sites). LIFE-14 to LIFE-18.
+- Final: evidence e962dffc61cb, 628 of 628 (fixed 60 fps, Linux headless); 72 of 72 wasp and related tests at fixed 30, 60 and 144. Not run on Windows.
+

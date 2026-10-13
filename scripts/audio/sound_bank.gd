@@ -14,6 +14,8 @@ extends RefCounted
 ##   * "thud"     0.6 s: something far off in the house (a door, a footstep). Human scale.
 ##   * "whoosh"   2.5 s: air moving as a large shape passes the window (the shadow event).
 ##   * "birds"    1.2 s: a few chirps from outside the window, now and then. Human scale.
+##   * "wasp"     1 s loop (LIFE round 4): the mud dauber's wings, deeper and heavier than a fly's. A design choice: no measurement of this
+##                wasp's wingbeat was found, so it is pitched at 120 Hz with a slow swell, inside the range the spider's neurons answered to.
 ##
 ## T12b (Nathan: "i dont hear anything while playing"): a recording of the game's own mix showed 91 % of its energy below 400 Hz, which
 ## laptop speakers barely play. Every sound now also has audible upper content: the buzz its bright overtones (a real fly's "zzz"), the
@@ -30,7 +32,7 @@ static func stream(sound_name: String) -> AudioStreamWAV:
 
 
 static func names() -> Array[String]:
-	return ["room", "buzz", "takeoff", "thrum", "thud", "whoosh", "birds"]
+	return ["room", "buzz", "takeoff", "thrum", "thud", "whoosh", "birds", "wasp"]
 
 
 static func _make(sound_name: String) -> AudioStreamWAV:
@@ -49,6 +51,8 @@ static func _make(sound_name: String) -> AudioStreamWAV:
 			return _wav(_whoosh(), false)
 		"birds":
 			return _wav(_birds(), false)
+		"wasp":
+			return _wav(_wasp(), true)
 	push_error("SoundBank: no sound '%s'" % sound_name)
 	return _wav(PackedFloat32Array([0.0]), false)
 
@@ -155,6 +159,19 @@ static func _buzz() -> PackedFloat32Array:
 		var phase := TAU * f0 * t + beta * sin(TAU * 7.0 * t)
 		out[i] = _wings(t, f0, phase) * (1.0 + 0.15 * sin(TAU * 11.0 * t))
 	return _normalize(out, 0.8)
+
+
+static func _wasp() -> PackedFloat32Array:
+	var n := RATE  # 1 s: 120, 5 and 3 Hz all complete whole cycles
+	var out := PackedFloat32Array()
+	out.resize(n)
+	var f0 := 120.0
+	var beta := 0.03 * f0 / 5.0
+	for i in n:
+		var t := float(i) / float(RATE)
+		var phase := TAU * f0 * t + beta * sin(TAU * 5.0 * t)
+		out[i] = (_wings(t, f0, phase) + 0.6 * sin(phase)) * (1.0 + 0.25 * sin(TAU * 3.0 * t))
+	return _normalize(out, 0.9)
 
 
 static func _takeoff() -> PackedFloat32Array:

@@ -302,6 +302,8 @@ var _rest_touching: bool = false     # it rests touching something (else only th
 var _rest_anchor: Vector3 = Vector3.ZERO
 var _rest_pivot: Vector3 = Vector3.ZERO
 var _rest_length: float = 0.0
+## LIFE round 4: taken by the wasp. The motor has let go of everything and stopped; the wasp moves the body (seize()).
+var seized: bool = false
 var _drop_walking: bool = false      # walking to an edge to let itself down (begin_drop)
 var _drop_dir: Vector3 = Vector3.ZERO
 var _drop_ticks_left: int = 0
@@ -526,6 +528,24 @@ func begin_drop() -> Dictionary:
 	_drop_ticks_left = ceili((float(plan["walk_distance"]) / _walk_speed + DROP_WALK_SPARE_S) * float(SimClock.HZ))
 	line_event.emit("drop_walk", "")
 	return plan
+
+
+## Taken by a predator (LIFE round 4): the spider lets go of its surface and its line, takes no more input, and the motor stops. Whatever
+## took it moves the body from now on. Nothing undoes it: the world that follows is a checkpoint's or a new one.
+func seize() -> void:
+	seized = true
+	_drop_walking = false
+	_intent = Vector3.ZERO
+	_arc_active = false
+	_aim_dir = Vector3.ZERO
+	tether.clear()
+	_asleep = false
+	_anchor_body = null
+	_bend_body = null
+	velocity = Vector3.ZERO
+	_clear_support()
+	_set_state(State.FALLING)
+	set_physics_process(false)
 
 
 ## Stops a walk to the edge (the player took over, aimed or pressed cancel). False when there was none.

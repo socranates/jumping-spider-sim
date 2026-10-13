@@ -275,6 +275,9 @@ func caption() -> String:
 		return text + "\nAsleep in the silk-lined crack. The night passes. Move, %s or %s to wake." % [_both("interact", "E", "X"), _both("cancel", "Q", "B")]
 	if resting:
 		return text + "\nResting in the silk-lined crack. Move, %s or %s to leave." % [_both("interact", "E", "X"), _both("cancel", "Q", "B")]
+	var wasp_line := _wasp_line()
+	if wasp_line != "":
+		return text + "\n" + wasp_line
 	if growth.ready and not resting:
 		return text + ("\nReady to moult    ·    %s to rest and moult" % _both("interact", "E", "X") if can_rest() else "\nYour spider is ready to moult. Rest in the silk-lined crack at the west end.")
 	if can_rest():
@@ -300,6 +303,28 @@ func caption() -> String:
 	if elapsed < 40.0:
 		return text + "\nAlong the sill or across the leaves: choose your way to the planter."
 	return text
+
+## LIFE round 4: what the top line says while the wasp visits ("" when it is away). The first visit says what wasps do and how to get away.
+func _wasp_line() -> String:
+	var w: Node = world.get("wasp_director")
+	if w == null or not w.is_visiting():
+		return ""
+	match w.phase_name():
+		"arriving":
+			if int(w.visits) <= 1:
+				return "A deep hum outside: a wasp is coming, and wasps hunt spiders. Hide in the crack, keep still, or let yourself down on your line (%s)." % _both("drop_line", "F", "D-pad down")
+			return "A deep hum outside: a wasp is coming. Hide in the crack, keep still, or drop on your line."
+		"searching":
+			if float(w.confused_s) > 0.0:
+				return "The wasp has lost you. Get out of sight."
+			return "A wasp is searching the sill. Keep still, keep out of sight, or get home to the crack."
+		"inspecting", "striking":
+			return "The wasp has seen you! Get away: jump, drop on your line, or reach the crack."
+		"carrying":
+			return "Stung, the spider cannot move. The wasp carries it away."
+		"leaving":
+			return "The wasp is leaving."
+	return ""
 
 func to_dict() -> Dictionary:
 	return {"retreat_id": world.lab.RETREAT_ID, "resting": resting, "rest_seconds": rest_seconds,

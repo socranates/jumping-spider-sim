@@ -1,3 +1,21 @@
+# Current handoff - Claude, 2026-10-13 (LIFE round 4: the mud dauber wasp)
+
+**Read docs/HANDOFF-life-round4.md.** Built on Chet's drawn growth (6c51cca). Decisions LIFE-14 to LIFE-18.
+- **Visits:** at most one a day by day; never on day 1, before the first meal, or during a rest. Each is heard 8 s before the wasp can look.
+- **The search:** by sight over 15 places. Movement is noticed fast and stillness slowly; the crack is always safe.
+- **Before a catch:** a 1.5 s look, then a 0.35 s lunge. A jump, a drop or getting out of sight breaks its approach.
+- **Caught:** the spider goes still (`SpiderMotor.seize`) and is carried off. A plain screen (`caught_panel.gd`) offers the last rest or a new life, and the notebook.
+- **Saves and pages:** checkpoint schema 6; three notebook pages, with sources at snippet level only.
+- Test worlds have the wasp off (`wasp_enabled`); `force_visit(at)` brings it.
+
+**Next:**
+- **Chet:** the wasp's model and animation (keep `wasp_body.gd`'s pose API), its hum, the stung spider's still pose, optionally backing away, and the Windows feel.
+- **Claude, round 5:** death and continuing (Natural and Gentle, the summary, another spider, the modes and the unlock).
+
+Evidence **e962dffc61cb**: 628/628 (Linux headless, fixed 60 fps). Not run on Windows.
+
+---
+
 # Current handoff — Chet, 2026-10-12 (drawn growth complete)
 
 Read **docs/HANDOFF-drawn-growth.md** and **docs/verification/growth-windows/RESULTS.md**.

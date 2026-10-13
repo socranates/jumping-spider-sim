@@ -35,11 +35,21 @@ const SPEAKER_GAIN_DB := 3.0
 const SPEAKER_EFFECTS := 2                 # the first two effects on Master are the speaker shaping; the limiter after them is always on
 const LIMIT_DB := -1.0                     # nothing louder than this leaves the game (a recording of speaker mode peaked at 0 dBFS)
 const HEAR_WU := 10.0          # a fly taking off this close gets a caption
+## LIFE round 4: the wasp's hum, louder and heard from farther than a fly's (it is a much bigger insect).
+const WASP_DB := 6.0
+const WASP_UNIT := 26.0
+## Its captions, by the visit's turns. None begins "[buzzing", which is the flies' (the notebook's buzz page answers to that).
+const WASP_CAPTIONS := {
+	"arriving": "[a deep, heavy hum outside, coming closer]",
+	"inspecting": "[the deep hum turns toward you]",
+	"leaving": "[the deep hum fades away]",
+}
 
 var settings: Node
 var prey: Node3D          # PreyDirector
 var spider: Node3D        # SpiderMotor
 var habitat_loop: Node    # the windowsill's loop (null in the lab)
+var wasp_director: Node   # the mud dauber's visits (the windowsill only)
 var vibration: Node       # VibrationSense
 var seed_value: int = 1
 
@@ -53,6 +63,8 @@ var _was_flying: Dictionary = {}  # fly id -> bool
 var _rng := RandomNumberGenerator.new()
 var _thud_in: float = 0.0
 var _phase := ""
+var _wasp_hum: AudioStreamPlayer3D
+var _wasp_phase := "away"
 
 
 func _ready() -> void:
@@ -144,6 +156,7 @@ func _player(sound: String, bus: String, db: float) -> AudioStreamPlayer:
 
 func _process(delta: float) -> void:
 	_update_flies()
+	_update_wasp()
 	_thud_in -= delta
 	if _thud_in <= 0.0:
 		_thud_in = _rng.randf_range(THUD_EVERY_S.x, THUD_EVERY_S.y)
@@ -220,6 +233,40 @@ func _take_off(f: Node3D) -> void:
 	p.play()
 	if spider != null and is_instance_valid(spider) and f.global_position.distance_to(spider.global_position) <= HEAR_WU:
 		caption.emit("[buzzing, %s]" % VibrationSense.direction_word(spider, f.global_position))
+
+
+## The wasp hums wherever it flies on a visit (not while it walks), and its visit's turns are captioned.
+func _update_wasp() -> void:
+	if wasp_director == null or not is_instance_valid(wasp_director):
+		return
+	var w: Node3D = wasp_director.wasp
+	if _wasp_hum == null:
+		_wasp_hum = AudioStreamPlayer3D.new()
+		_wasp_hum.name = "WaspHum"
+		_wasp_hum.stream = SoundBank.stream("wasp")
+		_wasp_hum.bus = "Cues"
+		_wasp_hum.volume_db = WASP_DB
+		_wasp_hum.unit_size = WASP_UNIT
+		_wasp_hum.max_distance = 120.0
+		_wasp_hum.attenuation_model = AudioStreamPlayer3D.ATTENUATION_INVERSE_DISTANCE
+		add_child(_wasp_hum)
+	var flying: bool = w != null and w.visible and int(w.mode) != 1   # WaspBody.Mode.WALKING
+	if flying:
+		_wasp_hum.global_position = w.global_position
+	if flying and not _wasp_hum.playing:
+		_wasp_hum.play()
+	elif not flying and _wasp_hum.playing:
+		_wasp_hum.stop()
+	var phase: String = wasp_director.phase_name()
+	if phase != _wasp_phase:
+		if WASP_CAPTIONS.has(phase):
+			caption.emit(str(WASP_CAPTIONS[phase]))
+		_wasp_phase = phase
+
+
+## True while the wasp's hum is playing (tests).
+func wasp_humming() -> bool:
+	return _wasp_hum != null and _wasp_hum.playing
 
 
 ## A felt vibration: a low thrum from its direction (a short distance out from the spider that way), and a caption.

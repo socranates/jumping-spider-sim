@@ -53,6 +53,9 @@ const NotebookWatch = preload("res://scripts/learning/notebook_watch.gd")
 const NotebookPanel = preload("res://scripts/presentation/notebook_panel.gd")
 const WaspDirector = preload("res://scripts/predator/wasp_director.gd")
 const CaughtPanel = preload("res://scripts/presentation/caught_panel.gd")
+const Progress = preload("res://scripts/life/progress.gd")
+const StartMenu = preload("res://scripts/presentation/start_menu.gd")
+const Growth = preload("res://scripts/life/growth.gd")
 const MAIN_SCENE_PATH := "res://scenes/main.tscn"
 
 const PROFILE_PATH := "res://data/species/phidippus_audax_prototype.json"
@@ -71,6 +74,27 @@ var habitat_loop: Node
 @export var prey_struggle: bool = true
 ## LIFE round 4: whether the mud dauber comes by itself (on the windowsill). On in a played world; test worlds switch it off.
 @export var wasp_enabled: bool = true
+## LIFE round 5 (MODES-01). The mode: "main" (the main life, which can be finished) or "free" (free play: its own save, never counts).
+## The rules: "standard" (Natural: hunger and the wasp can kill) or "gentle" (Easy and free play: nothing kills, hunger forgives).
+@export var mode: String = "main"
+@export var rules: String = "standard"
+## The player's progress across lives (shared by every world this one leads to; kept in PROGRESS_PATH when settings are saved).
+const PROGRESS_PATH := "user://progress.cfg"
+var progress: RefCounted
+## Show the start menu over this world: a played world launched as the main scene shows it by itself (start_menu_on_launch).
+var show_start_menu := false
+var start_menu_on_launch := true
+var start_menu: CanvasLayer
+## This world's spider is another spider after a death (LIFE-03): somewhere new on the sill, unrelated to the last.
+var new_spider := false
+## The notebook to carry into this world when it has no file of its own (tests and captures: the notebook is kept in memory).
+var carry_notebook: Dictionary = {}
+## The life has ended (a death); end_life says how, once.
+var life_ended := false
+var end_summary: Dictionary = {}
+signal life_ended_signal(cause: String, summary: Dictionary)
+## Where another spider starts (on the floor, away from the crack and from each other).
+const NEW_SPIDER_SPOTS: Array[Vector3] = [Vector3(12.0, 0.31, 9.0), Vector3(-8.0, 0.31, -10.0), Vector3(24.0, 0.31, 8.0), Vector3(-2.0, 0.31, 10.0)]
 var settings: Node
 ## Optional Transform3D for the spider origin instead of the lab spawn point.
 var spawn_override: Variant = null
@@ -148,10 +172,19 @@ func _ready() -> void:
 		return
 	if checkpoint_dir == "" and interactive:
 		checkpoint_dir = CheckpointStore.DEFAULT_DIR
-	if checkpoint_dir != "":
-		checkpoint_store = CheckpointStore.new(checkpoint_dir)
 	if not restore_record.is_empty():
 		_prepare_restore()
+	if mode == "free":
+		rules = "gentle"
+	if checkpoint_dir != "":
+		checkpoint_store = CheckpointStore.new(store_dir())
+	if progress == null:
+		progress = Progress.new()
+		progress.path = PROGRESS_PATH if bool(settings.get("autosave")) else ""
+		progress.load_saved()
+	if new_spider and spawn_override == null:
+		var spot: Vector3 = NEW_SPIDER_SPOTS[int(progress.lives.size()) % NEW_SPIDER_SPOTS.size()]
+		spawn_override = Transform3D(Basis(Vector3.UP, deg_to_rad(90.0)), spot)
 	lab = (WindowsillScene if use_windowsill else LabScene).instantiate() as Node3D
 	add_child(lab)
 	_check_lab_surfaces()
@@ -198,6 +231,7 @@ func _ready() -> void:
 		prey.restore_record = restore_record["prey"]
 		needs.load_dict(restore_record["needs"])
 	needs.life_mode = use_windowsill   # LIFE_DESIGN.md round 1: on the windowsill hunger runs by the life clock's hours
+	needs.gentle = rules == "gentle"   # LIFE round 5: Easy and free play forgive hunger
 	feeding = FeedingController.new()
 	feeding.name = "Feeding"
 	feeding.motor = spider
@@ -256,6 +290,14 @@ func _ready() -> void:
 		if restored:
 			wasp_director.load_dict(restore_record["wasp"])
 		add_child(wasp_director)
+		wasp_director.carried_off.connect(func() -> void: end_life("wasp"))
+	if habitat_loop != null:
+		habitat_loop.moulted.connect(func(stage: int) -> void:
+			if stage >= Growth.ADULT:
+				_on_adult())
+		if new_spider:
+			habitat_loop.show_notice("Another bold jumping spider, a young juvenile. It is not related to the last. Home is the silk-lined crack at the west end.")
+			habitat_loop.notice_seconds = 12.0  # longer than an ordinary notice: a new life begins
 	if interactive:
 		controller = PlayerController.new()
 		controller.motor = spider
@@ -372,7 +414,12 @@ func _ready() -> void:
 			caught_panel.world = self
 			caught_panel.settings = settings
 			add_child(caught_panel)
-			wasp_director.carried_off.connect(caught_panel.show_caught)
+		if habitat_loop != null and (show_start_menu or (start_menu_on_launch and not restored and not new_spider and get_tree().current_scene == self)):
+			start_menu = StartMenu.new()
+			start_menu.name = "StartMenu"
+			start_menu.world = self
+			start_menu.settings = settings
+			add_child(start_menu)
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 		_apply_ui_scale()
 		_apply_game_speed()
@@ -393,6 +440,11 @@ func _add_notebook() -> void:
 	notebook.name = "Notebook"
 	notebook.path = NOTEBOOK_PATH if bool(settings.get("autosave")) else ""
 	notebook.load_saved()
+	if notebook.path == "" and not carry_notebook.is_empty():
+		for id: Variant in carry_notebook.get("opened", []):
+			if not notebook.opened.has(str(id)) and not notebook.page(str(id)).is_empty():
+				notebook.opened.append(str(id))
+		notebook.eye_seconds = float(carry_notebook.get("eye_seconds", 0.0))
 	add_child(notebook)
 	notebook_panel = NotebookPanel.new()
 	notebook_panel.notebook = notebook
@@ -477,6 +529,9 @@ func _prepare_restore() -> void:
 		return
 	restored = true
 	use_windowsill = true
+	var lr: Dictionary = restore_record.get("life_rules", {})
+	mode = str(lr.get("mode", "main"))
+	rules = str(lr.get("rules", "standard"))
 	var pr: Dictionary = restore_record["prey"]
 	prey_seed = String(pr["seed"]).to_int()
 	prey_count = int(pr["target_population"])
@@ -547,31 +602,120 @@ func return_to_checkpoint(record: Dictionary = {}) -> Node3D:
 	if not errors.is_empty():
 		last_checkpoint_message = "The checkpoint cannot be loaded: " + "; ".join(errors)
 		return null
-	var fresh: Node3D = (load(MAIN_SCENE_PATH) as PackedScene).instantiate()
-	fresh.interactive = interactive
-	fresh.settings = settings
-	fresh.prey_struggle = prey_struggle
-	fresh.wasp_enabled = wasp_enabled
-	fresh.checkpoint_dir = checkpoint_dir
+	var fresh := _fresh_world()
 	fresh.restore_record = rec.duplicate(true)
 	fresh.last_checkpoint_message = last_checkpoint_message
-	var parent := get_parent()
-	var index := get_index()
-	var tree := get_tree()
-	var was_current := tree.current_scene == self
-	tree.paused = false
-	parent.remove_child(self)
-	parent.add_child(fresh)
-	parent.move_child(fresh, index)
-	if was_current:
-		tree.current_scene = fresh
-	queue_free()
-	return fresh
+	return _swap_in(fresh)
 
 
 ## A new world in place of this one: a new spider in the crack at the start of its life (LIFE round 4: after the wasp, when there is no
 ## checkpoint to go back to). The notebook is the player's and stays. Returns the new world.
 func start_new_life() -> Node3D:
+	var fresh := _fresh_world()
+	fresh.mode = mode
+	fresh.rules = rules
+	return _swap_in(fresh)
+
+
+# ------------------------------------------------------------------ lives and modes (LIFE round 5, MODES-01)
+
+## The top line's title: the main life, the main life on Easy, or free play.
+func mode_title() -> String:
+	if mode == "free":
+		return "FREE PLAY"
+	return "THE WINDOWSILL (EASY)" if rules == "gentle" else "THE WINDOWSILL"
+
+
+## Where this world's checkpoints are kept: the main life's folder, or free play's own inside it.
+func store_dir() -> String:
+	return checkpoint_dir.path_join("free") if mode == "free" else checkpoint_dir
+
+
+## The spider's life has ended (Standard rules only: "wasp" or "starved"). Once: the player's progress counts it, and the end-of-life
+## screen shows the plain line, the life's summary and the way on.
+func end_life(cause: String) -> void:
+	if life_ended or rules == "gentle":
+		return
+	life_ended = true
+	progress.record_death()
+	var summary := life_summary(cause)
+	end_summary = summary
+	life_ended_signal.emit(cause, summary)
+	if caught_panel != null:
+		caught_panel.show_end(cause, summary)
+
+
+## What the end-of-life screen tells (no score): how long it lived, how far it grew, what it ate, the wasp's visits it lived through.
+func life_summary(cause: String) -> Dictionary:
+	var out := {"cause": cause, "mode": mode, "rules": rules, "hours": 0.0, "stage": 0, "stage_name": "", "meals": 0,
+		"wasp_visits": 0, "wasp_escapes": 0}
+	if habitat_loop != null:
+		out["hours"] = maxf(float(habitat_loop.clock.day - 1) * 24.0 + float(habitat_loop.clock.hour) - 9.0, 0.0)
+		out["stage"] = int(habitat_loop.growth.stage)
+		out["stage_name"] = str(habitat_loop.growth.stage_name())
+	if feeding != null:
+		out["meals"] = int(feeding.meals_finished)
+	if wasp_director != null:
+		out["wasp_visits"] = int(wasp_director.visits)
+		out["wasp_escapes"] = int(wasp_director.escapes)
+	return out
+
+
+## After a death: the player goes on as another spider (LIFE-03), a young juvenile somewhere new on the sill and unrelated to the last.
+## The life that ended is kept in the player's progress and its checkpoints are put away, so "Continue" never brings the dead spider
+## back; the notebook goes on. Returns the new world.
+func continue_as_another() -> Node3D:
+	progress.record_life(end_summary if not end_summary.is_empty() else life_summary("ended"))
+	if checkpoint_store != null:
+		checkpoint_store.wipe()
+	var fresh := _fresh_world()
+	fresh.mode = mode
+	fresh.rules = rules
+	fresh.new_spider = true
+	return _swap_in(fresh)
+
+
+## The start menu's new life in this (fresh) world: the main life on Standard, or on Easy once it has been earned. A life that was going
+## on in the main life's folder is put away first.
+func begin_new_life(easy: bool) -> void:
+	mode = "main"
+	rules = "gentle" if easy and progress.easy_unlocked() else "standard"
+	if needs != null:
+		needs.gentle = rules == "gentle"
+	if checkpoint_store != null:
+		checkpoint_store.wipe()
+
+
+## Free play: its own world with gentle rules and its own save (the last free-play rest, if there is one). Returns the new world.
+func start_free_play() -> Node3D:
+	var free_store := CheckpointStore.new(checkpoint_dir.path_join("free")) if checkpoint_dir != "" else null
+	if free_store != null:
+		var found: Dictionary = free_store.load_best()
+		if bool(found["ok"]):
+			return return_to_checkpoint(found["record"])
+	var fresh := _fresh_world()
+	fresh.mode = "free"
+	fresh.rules = "gentle"
+	return _swap_in(fresh)
+
+
+## Back to the start menu: a fresh world of the main life with the menu over it. Returns the new world.
+func open_start_menu() -> Node3D:
+	var fresh := _fresh_world()
+	fresh.show_start_menu = true
+	return _swap_in(fresh)
+
+
+## The main life was finished: a spider of the main life, on Standard, reached adulthood. Easy opens for later lives.
+func _on_adult() -> void:
+	if mode != "main" or rules != "standard":
+		return
+	if progress.finish_main_life() and habitat_loop != null:
+		habitat_loop.show_notice("You brought a spider through its whole life. From now on a new life can also be played on Easy (start menu).")
+
+
+## A new world like this one (same player, settings, saves and progress), not yet in the tree.
+func _fresh_world() -> Node3D:
 	var fresh: Node3D = (load(MAIN_SCENE_PATH) as PackedScene).instantiate()
 	fresh.interactive = interactive
 	fresh.settings = settings
@@ -582,6 +726,15 @@ func start_new_life() -> Node3D:
 	fresh.prey_struggle = prey_struggle
 	fresh.wasp_enabled = wasp_enabled
 	fresh.checkpoint_dir = checkpoint_dir
+	fresh.progress = progress
+	fresh.start_menu_on_launch = false
+	if notebook != null:
+		fresh.carry_notebook = {"opened": notebook.opened.duplicate(), "eye_seconds": notebook.eye_seconds}
+	return fresh
+
+
+## Puts `fresh` where this world is and frees this one.
+func _swap_in(fresh: Node3D) -> Node3D:
 	var parent := get_parent()
 	var index := get_index()
 	var tree := get_tree()

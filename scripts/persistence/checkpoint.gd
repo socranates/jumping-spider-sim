@@ -28,8 +28,11 @@ const WaspDirector = preload("res://scripts/predator/wasp_director.gd")
 ## the needs' life mode (life_mode, starving_hours, hour_accumulator). Schema 5 (round 3): growth (stage, food since the last moult,
 ## readiness, the moult and the soft skin still to pass, where the old skins lie). Schema 6 (round 4): the wasp (the day of its last
 ## visit, and this life's visits and escapes; a visit going on is not kept: the spider rests in the crack, where the wasp cannot find
-## it, and the world that comes back has the wasp away). Older records are upgraded on load (upgrade()), one schema at a time.
-const SCHEMA_VERSION := 6
+## it, and the world that comes back has the wasp away). Schema 7 (round 5): the life's rules (life_rules: the mode, "main" or "free", and
+## the rules, "standard" or "gentle"; free play is always gentle). Older records are upgraded on load (upgrade()), one schema at a time.
+const SCHEMA_VERSION := 7
+const MODES: Array[String] = ["main", "free"]
+const RULES: Array[String] = ["standard", "gentle"]
 const GAME_BUILD := "prototype-0.1.0"
 const KIND := "retreat_checkpoint"
 const PLAYER_ID := "spider"
@@ -92,6 +95,8 @@ static func capture(world: Node) -> Dictionary:
 		"life": loop.clock.to_dict(),
 		"growth": loop.growth.to_dict(),
 		"wasp": world.wasp_director.to_dict() if world.get("wasp_director") != null else WaspDirector.default_record(),
+		"life_rules": {"mode": str(world.get("mode")) if world.get("mode") != null else "main",
+			"rules": str(world.get("rules")) if world.get("rules") != null else "standard"},
 		"retreats": [{"id": Windowsill.RETREAT_ID, "surface_id": "sill_floor"}],
 		"habitat_changes": world.lab.changes_record(),
 		"journal": [],
@@ -164,6 +169,12 @@ static func upgrade(record: Variant) -> Variant:
 		r["schema_version"] = 6
 		if not r.has("upgraded_from"):
 			r["upgraded_from"] = 5
+	if int(r["schema_version"]) == 6:
+		# 6 -> 7: every older life was the main life on Standard.
+		r["life_rules"] = {"mode": "main", "rules": "standard"}
+		r["schema_version"] = 7
+		if not r.has("upgraded_from"):
+			r["upgraded_from"] = 6
 	return r
 
 
@@ -190,7 +201,7 @@ static func validate(record: Variant) -> PackedStringArray:
 		e.append("the checkpoint belongs to habitat content '%s', not '%s'" % [str(r.get("content_revision", "")), Windowsill.CONTENT_REVISION])
 	if str(r.get("player_id", "")) != PLAYER_ID:
 		e.append("the checkpoint names no player")
-	for key: String in ["player", "needs", "feeding", "prey", "habitat", "clocks", "life", "growth", "wasp"]:
+	for key: String in ["player", "needs", "feeding", "prey", "habitat", "clocks", "life", "growth", "wasp", "life_rules"]:
 		if typeof(r.get(key)) != TYPE_DICTIONARY:
 			e.append("missing section '%s'" % key)
 	if not e.is_empty():
@@ -203,6 +214,11 @@ static func validate(record: Variant) -> PackedStringArray:
 	e.append_array(LifeClock.problems(r["life"]))
 	e.append_array(Growth.problems(r["growth"]))
 	e.append_array(WaspDirector.problems(r["wasp"]))
+	var lr: Dictionary = r["life_rules"]
+	if not MODES.has(str(lr.get("mode", ""))) or not RULES.has(str(lr.get("rules", ""))):
+		e.append("life_rules: an unknown mode or rules (%s, %s)" % [str(lr.get("mode", "")), str(lr.get("rules", ""))])
+	elif str(lr["mode"]) == "free" and str(lr["rules"]) != "gentle":
+		e.append("life_rules: free play is always gentle")
 	_check_prey(r["prey"], r["needs"], e)
 	_check_changes(r.get("habitat_changes"), e)
 	if e.is_empty():

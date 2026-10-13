@@ -46,6 +46,14 @@ var growth := Growth.new()
 signal moult_ready()
 signal moulted(stage: int)
 var _granted_seen: float = -1.0
+## LIFE round 5, Standard rules: starvation. The reserve runs out after about three game days without food. After WEAK_AFTER_H hours at
+## zero the spider is too hungry to sleep and the top line says it will not last another day; after STARVE_AFTER_H it dies (the world's
+## end_life). Gentle rules never starve (NeedsModel.gentle). Every stage is on the screen long before the next.
+const WEAK_AFTER_H := 24.0
+const STARVE_AFTER_H := 48.0
+const HUNGRY_AT := 0.25
+## The life has ended here (no second ending).
+var life_over := false
 var _skins: Array[Node3D] = []
 
 func _ready() -> void:
@@ -147,7 +155,9 @@ func _step_life(delta: float) -> void:
 		_apply_growth()
 	var was_asleep := asleep
 	var moulting := growth.is_moulting()
-	asleep = resting and not moulting and (clock.sleeping or clock.is_sleep_time())
+	asleep = resting and not moulting and (clock.sleeping or clock.is_sleep_time()) and not too_hungry_to_sleep()
+	if was_asleep and not asleep and too_hungry_to_sleep():
+		show_notice("Too hungry to sleep: your spider must find food, even in the dark.")
 	var hours := clock.advance_moult(delta) if moulting else clock.advance(delta, asleep)
 	var what := growth.pass_hours(hours, world.spider.global_position)
 	if what == "moulted":
@@ -168,6 +178,23 @@ func _step_life(delta: float) -> void:
 		show_notice("Awake before morning: it is still %s." % clock.part_of_day())
 	world.needs.add_hours(hours, asleep or moulting)
 	apply_light()
+	if not life_over and starved() and not moulting:
+		life_over = true
+		if world.has_method("end_life"):
+			world.end_life("starved")
+
+
+## Standard rules: hours at zero since the spider last ate (0 under Gentle rules, which never starve).
+func starving_for() -> float:
+	return 0.0 if world.needs.gentle else float(world.needs.starving_streak_h)
+
+
+func too_hungry_to_sleep() -> bool:
+	return starving_for() >= WEAK_AFTER_H
+
+
+func starved() -> bool:
+	return starving_for() >= STARVE_AFTER_H
 
 
 ## The food eaten since the last tick, from the needs' ledger (energy actually granted).
@@ -260,7 +287,8 @@ func show_notice(text: String) -> void:
 	notice_seconds = NOTICE_S
 
 func caption() -> String:
-	var text := "THE WINDOWSILL    ·    Day %d, %s    ·    %s    ·    %s: field notes" % [clock.day, clock.part_of_day(), growth.stage_name(), _both("help", "H", "View")]
+	var title := str(world.call("mode_title")) if world.has_method("mode_title") else "THE WINDOWSILL"
+	var text := "%s    ·    Day %d, %s    ·    %s    ·    %s: field notes" % [title, clock.day, clock.part_of_day(), growth.stage_name(), _both("help", "H", "View")]
 	if notice_seconds > 0.0 and not _show_help:
 		text += "\n" + notice
 	if _show_help:
@@ -278,12 +306,18 @@ func caption() -> String:
 	var wasp_line := _wasp_line()
 	if wasp_line != "":
 		return text + "\n" + wasp_line
+	if too_hungry_to_sleep():
+		return text + "\nWeak from hunger: without food your spider will not last another day."
+	if world.needs.is_starving() and not world.needs.gentle:
+		return text + "\nStarving: your spider's reserve is gone. It must eat soon."
 	if growth.ready and not resting:
 		return text + ("\nReady to moult    ·    %s to rest and moult" % _both("interact", "E", "X") if can_rest() else "\nYour spider is ready to moult. Rest in the silk-lined crack at the west end.")
 	if can_rest():
 		if clock.is_sleep_time():
 			return text + "\nThe silk-lined crack    ·    %s to sleep until morning" % _both("interact", "E", "X")
 		return text + "\nThe silk-lined crack    ·    %s to rest" % _both("interact", "E", "X")
+	if world.needs.life_mode and world.needs.energy <= HUNGRY_AT:
+		return text + "\nHungry: time to hunt."
 	if clock.part_of_day() == "night":
 		return text + "\nIt is dark, and your eyes reach only a little way. Home is the silk-lined crack at the west end."
 	if clock.part_of_day() == "evening":
@@ -323,6 +357,8 @@ func _wasp_line() -> String:
 		"carrying":
 			return "Stung, the spider cannot move. The wasp carries it away."
 		"leaving":
+			if bool(w.spared_this_visit):
+				return "The wasp touched you with its antennae, gave up, and is leaving."
 			return "The wasp is leaving."
 	return ""
 

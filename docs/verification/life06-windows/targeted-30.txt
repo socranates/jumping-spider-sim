@@ -1,0 +1,35 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS     test_life04_wasp.gd::test_a_drop_or_a_jump_breaks_its_approach  [897 ms]  9 checks
+PASS     test_life04_wasp.gd::test_a_moving_spider_in_the_open_is_found_looked_at_and_caught  [660 ms]  10 checks
+PASS     test_life04_wasp.gd::test_a_still_spider_is_found_slowly_and_the_crack_never  [2918 ms]  8 checks
+PASS     test_life04_wasp.gd::test_caught_after_resting_goes_back_to_the_rest  [1417 ms]  7 checks
+prey seed 8824439
+PASS     test_life04_wasp.gd::test_caught_the_screen_says_so_plainly_and_offers_the_way_back  [1084 ms]  15 checks
+PASS     test_life04_wasp.gd::test_checkpoints_keep_the_wasp_and_older_ones_are_brought_up  [49 ms]  10 checks
+PASS     test_life04_wasp.gd::test_it_is_heard_before_it_can_look  [387 ms]  6 checks
+PASS     test_life04_wasp.gd::test_the_spider_feels_it_land  [1608 ms]  2 checks
+PASS     test_life04_wasp.gd::test_what_the_spider_senses_of_it_and_where_it_flies  [21 ms]  65 checks
+PASS     test_life04_wasp.gd::test_when_it_comes  [33 ms]  68 checks
+prey seed 11319765
+PASS     test_life05_death.gd::test_back_to_the_last_rest_after_a_death_and_continuing_puts_the_old_life_away  [248 ms]  5 checks
+PASS     test_life05_death.gd::test_checkpoints_keep_the_mode_and_rules  [53 ms]  6 checks
+PASS     test_life05_death.gd::test_finishing_the_main_life_opens_easy_and_nothing_else_does  [20 ms]  6 checks
+PASS     test_life05_death.gd::test_gentle_rules_never_starve_and_the_wasp_only_touches  [469 ms]  8 checks
+PASS     test_life05_death.gd::test_starving_is_warned_long_before_it_kills  [26 ms]  11 checks
+prey seed 12034680
+PASS     test_life05_death.gd::test_the_end_is_plain_and_another_spider_goes_on  [145 ms]  23 checks
+PASS     test_life05_death.gd::test_the_players_progress_is_kept_only_when_saved  [9 ms]  4 checks
+prey seed 12254784
+PASS     test_life05_death.gd::test_the_start_menu_offers_lives_easy_when_earned_and_free_play  [197 ms]  16 checks
+PASS     test_life06_ui.gd::test_end_screen_a_activates_notebook_instead_of_default_continuation  [88 ms]  2 checks
+PASS     test_life06_ui.gd::test_large_menu_with_continue_and_easy_and_end_stay_on_screen  [146 ms]  2 checks
+PASS     test_life06_ui.gd::test_new_life_confirmation_belongs_to_the_selected_mode  [142 ms]  3 checks
+PASS     test_life06_ui.gd::test_start_menu_keyboard_dpad_stick_and_a_reach_the_focused_action  [80 ms]  5 checks
+PASS     test_live_spider_legs.gd::test_checkpoint_rebuild_has_one_rig_and_honours_reduced_motion  [57 ms]  58 checks
+PASS     test_live_spider_legs.gd::test_legs_follow_wall_and_underside_without_changing_the_route  [442 ms]  831 checks
+PASS     test_live_spider_legs.gd::test_live_walk_stalk_and_stop_drive_the_single_leg_rig  [186 ms]  170 checks
+PASS     test_live_spider_legs.gd::test_prepare_flight_and_landing_switch_leg_poses  [72 ms]  69 checks
+PASS     test_live_spider_legs.gd::test_reduced_motion_toggle_stops_gait_twitch_and_active_recoil  [52 ms]  7 checks
+evidence_id: 2c1c789ef545 (source 86cd8ef0, settings 8b6707d4, tests 9b518f7a)
+SUMMARY tests=27 passed=27 failed=0 not_run=0 seed=20261005 filter=only=unit,integration,gates,files=test_life06_ui,test_life05_death,test_life04_wasp,test_live_spider_legs result=PASS

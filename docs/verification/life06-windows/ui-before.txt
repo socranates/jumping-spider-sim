@@ -1,0 +1,9 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+prey seed 1938641
+FAIL     test_life06_ui.gd::test_end_screen_a_activates_notebook_instead_of_default_continuation  [427 ms]  A must not replace this world when Notebook has focus
+FAIL     test_life06_ui.gd::test_large_menu_with_continue_and_easy_and_end_stay_on_screen  [138 ms]  all-options menu fits; end summary and three choices fit
+FAIL     test_life06_ui.gd::test_new_life_confirmation_belongs_to_the_selected_mode  [121 ms]  switching to Standard asks again
+FAIL     test_life06_ui.gd::test_start_menu_keyboard_dpad_stick_and_a_reach_the_focused_action  [66 ms]  A activates focused Notebook; notebook draws above start menu
+evidence_id: cecf11b28273 (source 42db5d35, settings 8b6707d4, tests f16c77be)
+SUMMARY tests=4 passed=0 failed=4 not_run=0 seed=20261005 filter=only=unit,integration,gates,files=test_life06_ui result=FAIL

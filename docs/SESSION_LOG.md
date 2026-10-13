@@ -1145,3 +1145,8 @@ Next Claude: death and continuing. Human listening/child comfort remain open.
 - Standard and Gentle rules: under Gentle the wasp only touches the spider, and hunger forgives. Starving shows every stage on the screen: starving, then a whole day of "will not last another day", then death. The end of a life is a plain line and a summary with no score, then back to the last rest or on as another spider (unrelated, somewhere new, the notebook kept, the old life put away). The player's progress opens Easy when an adult of the main life is reached. A start menu offers continue, a new life, Easy when earned, and free play with its own save. Checkpoint schema 7. LIFE-19 to LIFE-24.
 - Final: evidence a4165eb2beb4, 640 of 640 (fixed 60 fps, Linux headless); 79 of 79 round-5 and related tests at fixed 30, 60 and 144. Not run on Windows.
 
+
+
+## 2026-10-13 — Chet: Windows whole-life handback
+
+Started main 120abc5, updated laptop, confirmed baseline 640/640. Fixed menu focus/notebook layering, max-text layout and cross-mode confirmation. Offscreen wasp draw removed the repeated ~110 ms arrival spike; F01 still open. Final Windows 644/644 (2c1c789ef545), related 27/27 at 30/60/144. Corrected test pause cleanup before final pass. Native staged life transitions and release menu/browser checks recorded in verification/life06-windows. Rebuilt both friend ZIPs. Next: round 6 human playtest; HANDOFF-life-windows.md lists limits and follow-ups.

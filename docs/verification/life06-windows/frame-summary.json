@@ -1,0 +1,257 @@
+{
+  "before1": {
+    "all": {
+      "frames": 973,
+      "mean_ms": 16.754,
+      "p95_ms": 17.325,
+      "max_ms": 112.815,
+      "frames_above_33ms": 2
+    },
+    "arriving": {
+      "frames": 475,
+      "mean_ms": 16.842,
+      "p95_ms": 17.334,
+      "max_ms": 112.815,
+      "frames_above_33ms": 1
+    },
+    "away": {
+      "frames": 1,
+      "mean_ms": 18.802,
+      "p95_ms": 18.802,
+      "max_ms": 18.802,
+      "frames_above_33ms": 0
+    },
+    "carrying": {
+      "frames": 211,
+      "mean_ms": 16.666,
+      "p95_ms": 17.201,
+      "max_ms": 17.919,
+      "frames_above_33ms": 0
+    },
+    "inspecting": {
+      "frames": 160,
+      "mean_ms": 16.666,
+      "p95_ms": 17.495,
+      "max_ms": 39.233,
+      "frames_above_33ms": 1
+    },
+    "searching": {
+      "frames": 105,
+      "mean_ms": 16.669,
+      "p95_ms": 17.35,
+      "max_ms": 18.081,
+      "frames_above_33ms": 0
+    },
+    "striking": {
+      "frames": 21,
+      "mean_ms": 16.648,
+      "p95_ms": 17.129,
+      "max_ms": 17.153,
+      "frames_above_33ms": 0
+    }
+  },
+  "before2": {
+    "all": {
+      "frames": 973,
+      "mean_ms": 16.738,
+      "p95_ms": 17.501,
+      "max_ms": 107.593,
+      "frames_above_33ms": 2
+    },
+    "arriving": {
+      "frames": 475,
+      "mean_ms": 16.807,
+      "p95_ms": 17.44,
+      "max_ms": 107.593,
+      "frames_above_33ms": 1
+    },
+    "away": {
+      "frames": 1,
+      "mean_ms": 19.55,
+      "p95_ms": 19.55,
+      "max_ms": 19.55,
+      "frames_above_33ms": 0
+    },
+    "carrying": {
+      "frames": 211,
+      "mean_ms": 16.668,
+      "p95_ms": 17.696,
+      "max_ms": 18.586,
+      "frames_above_33ms": 0
+    },
+    "inspecting": {
+      "frames": 160,
+      "mean_ms": 16.665,
+      "p95_ms": 17.732,
+      "max_ms": 39.199,
+      "frames_above_33ms": 1
+    },
+    "searching": {
+      "frames": 105,
+      "mean_ms": 16.669,
+      "p95_ms": 17.38,
+      "max_ms": 18.842,
+      "frames_above_33ms": 0
+    },
+    "striking": {
+      "frames": 21,
+      "mean_ms": 16.648,
+      "p95_ms": 17.245,
+      "max_ms": 17.276,
+      "frames_above_33ms": 0
+    }
+  },
+  "warm1": {
+    "all": {
+      "frames": 977,
+      "mean_ms": 16.686,
+      "p95_ms": 17.454,
+      "max_ms": 44.729,
+      "frames_above_33ms": 1
+    },
+    "arriving": {
+      "frames": 480,
+      "mean_ms": 16.666,
+      "p95_ms": 17.612,
+      "max_ms": 19.923,
+      "frames_above_33ms": 0
+    },
+    "away": {
+      "frames": 1,
+      "mean_ms": 19.576,
+      "p95_ms": 19.576,
+      "max_ms": 19.576,
+      "frames_above_33ms": 0
+    },
+    "carrying": {
+      "frames": 211,
+      "mean_ms": 16.664,
+      "p95_ms": 17.385,
+      "max_ms": 17.927,
+      "frames_above_33ms": 0
+    },
+    "inspecting": {
+      "frames": 159,
+      "mean_ms": 16.769,
+      "p95_ms": 17.701,
+      "max_ms": 44.729,
+      "frames_above_33ms": 1
+    },
+    "searching": {
+      "frames": 105,
+      "mean_ms": 16.67,
+      "p95_ms": 17.291,
+      "max_ms": 18.022,
+      "frames_above_33ms": 0
+    },
+    "striking": {
+      "frames": 21,
+      "mean_ms": 16.674,
+      "p95_ms": 17.199,
+      "max_ms": 17.298,
+      "frames_above_33ms": 0
+    }
+  },
+  "warm2": {
+    "all": {
+      "frames": 978,
+      "mean_ms": 16.669,
+      "p95_ms": 17.676,
+      "max_ms": 38.108,
+      "frames_above_33ms": 1
+    },
+    "arriving": {
+      "frames": 480,
+      "mean_ms": 16.666,
+      "p95_ms": 17.679,
+      "max_ms": 21.622,
+      "frames_above_33ms": 0
+    },
+    "away": {
+      "frames": 1,
+      "mean_ms": 18.031,
+      "p95_ms": 18.031,
+      "max_ms": 18.031,
+      "frames_above_33ms": 0
+    },
+    "carrying": {
+      "frames": 211,
+      "mean_ms": 16.674,
+      "p95_ms": 17.46,
+      "max_ms": 18.336,
+      "frames_above_33ms": 0
+    },
+    "inspecting": {
+      "frames": 160,
+      "mean_ms": 16.668,
+      "p95_ms": 18.022,
+      "max_ms": 38.108,
+      "frames_above_33ms": 1
+    },
+    "searching": {
+      "frames": 105,
+      "mean_ms": 16.667,
+      "p95_ms": 17.428,
+      "max_ms": 18.899,
+      "frames_above_33ms": 0
+    },
+    "striking": {
+      "frames": 21,
+      "mean_ms": 16.662,
+      "p95_ms": 17.179,
+      "max_ms": 17.179,
+      "frames_above_33ms": 0
+    }
+  },
+  "final": {
+    "all": {
+      "frames": 977,
+      "mean_ms": 16.669,
+      "p95_ms": 17.361,
+      "max_ms": 37.753,
+      "frames_above_33ms": 1
+    },
+    "arriving": {
+      "frames": 480,
+      "mean_ms": 16.667,
+      "p95_ms": 17.338,
+      "max_ms": 19.848,
+      "frames_above_33ms": 0
+    },
+    "away": {
+      "frames": 1,
+      "mean_ms": 19.198,
+      "p95_ms": 19.198,
+      "max_ms": 19.198,
+      "frames_above_33ms": 0
+    },
+    "carrying": {
+      "frames": 211,
+      "mean_ms": 16.665,
+      "p95_ms": 17.279,
+      "max_ms": 18.337,
+      "frames_above_33ms": 0
+    },
+    "inspecting": {
+      "frames": 159,
+      "mean_ms": 16.663,
+      "p95_ms": 18.323,
+      "max_ms": 37.753,
+      "frames_above_33ms": 1
+    },
+    "searching": {
+      "frames": 105,
+      "mean_ms": 16.669,
+      "p95_ms": 17.41,
+      "max_ms": 17.821,
+      "frames_above_33ms": 0
+    },
+    "striking": {
+      "frames": 21,
+      "mean_ms": 16.652,
+      "p95_ms": 17.349,
+      "max_ms": 17.441,
+      "frames_above_33ms": 0
+    }
+  }
+}

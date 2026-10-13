@@ -645,3 +645,16 @@ Built after Chet's wasp presentation (main 5c56ef8, 632/632 here too). Plan: LIF
   - The top line names the mode: THE WINDOWSILL, THE WINDOWSILL (EASY), FREE PLAY.
   - Control helps stay in the pause menu in every mode.
 - **LIFE-24 Evidence.** 8 new tests (`tests/integration/test_life05_death.gd`). Round 5 and related tests: 79 / 79 at fixed 30, 60 and 144 fps. Full suite: evidence a4165eb2beb4, 640 / 640 (Linux headless, fixed 60 fps; 1,726 s of frame time). A normal launch was checked to open the start menu. Stills: `docs/verification/life05/`. Not run on Windows.
+
+
+### LIFE-25 — Windows whole-life checks and readable menu choices (Chet, 2026-10-13)
+
+Accept uses the focused start/end choice, including A/Space; the notebook draws above both. End choices stack within the scaled viewport. Start-menu scrolling follows focus at large text sizes. Starting over requires two presses on the same mode, with a short confirmation on that button. Paused screens suppress discovery toasts. Four new regressions cover focus/layering, layout and cross-mode confirmation.
+
+### LIFE-26 — Warm the wasp's first draw during loading (Chet, 2026-10-13)
+
+Two offscreen draws in an isolated 96 x 96 viewport at load; no gameplay actor/percept or director changes. Skip headless; release temporary resources on completion/early owner exit. On external power at 1080p, two arrival maxima of 112.815/107.593 ms became 19.923/21.622 ms; production 19.848 ms. Consistent with first-draw material work, not a proven driver-level diagnosis. Loading cost unmeasured. Inspection/eye-view transition still reached 37.753 ms; F01 is open. Raw CSVs/method: `verification/life06-windows/`.
+
+### LIFE-27 — Whole-life friend handback evidence (Chet, 2026-10-13)
+
+Baseline Windows 640/640 matches Claude's a4165eb2beb4. Final Windows 644/644, evidence 2c1c789ef545, fixed 60 fps; related 27/27 at 30/60/144. Staged native starvation, catch/another/notebook, checkpoint return, adult/Easy, free-play touch and 1080p large-text screens checked. Windows release keyboard/mouse menu and Web menu/hidden Quit/eye view checked. Physical controller unconnected, speaker listening not performed, embedded-browser pointer lock unresolved. Fresh friend ZIPs (manifest in life06-windows) are for Nathan/son/friends' round-6 whole-life playtest, not a claim of release readiness.

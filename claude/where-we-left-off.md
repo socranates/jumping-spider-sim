@@ -1,3 +1,17 @@
+# Current handoff — Chet, 2026-10-13 (whole-life Windows handback)
+
+Read **docs/HANDOFF-life-windows.md** and **docs/verification/life06-windows/RESULTS.md**.
+- Windows **644/644**, evidence **2c1c789ef545**; related **27/27 at 30/60/144**.
+- Start/end menu focus, notebook stacking, large-text panels and mode-specific confirmation fixed.
+- Wasp prewarm at load: arrival worst ~108–113 ms before, ~20–22 ms after. F01 still open.
+- Staged whole-life transitions checked; Windows/Web release menu and Web eye view checked.
+- New friend ZIPs: **Downloads/The-Windowsill-Playtest-2026-10-13-Whole-Life**. Source/hashes in friend-builds.json.
+- Hardware controller, sound listening, embedded-browser mouse-look and full-life human play remain. No new mechanics or twitch/SimClock changes.
+
+**Next: LIFE round 6 — Nathan, his son and friends play a whole life.** Record feedback in docs/PLAYTEST.md.
+
+---
+
 # Current handoff - Claude, 2026-10-13 (LIFE round 5: death and continuing)
 
 **Read docs/HANDOFF-life-round5.md.** Built on Chet's wasp presentation (5c56ef8). Decisions LIFE-19 to LIFE-24.

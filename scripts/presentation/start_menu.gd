@@ -14,7 +14,7 @@ const SUBTITLE := "The life of a bold jumping spider"
 const CONTINUE := "Continue this life"
 const NEW_LIFE := "Begin a new life"
 const NEW_LIFE_EASY := "Begin a new life on Easy"
-const CONFIRM := "Begin a new life? Your spider's story so far ends (press again)"
+const CONFIRM := "End this life? Press again to begin."
 const FREE := "Free play"
 const NOTEBOOK := "Notebook"
 const QUIT := "Quit"
@@ -30,13 +30,16 @@ var _easy: Button
 var _free: Button
 var _notebook: Button
 var _locked: Label
-var _confirming := false
+var _confirming_mode := -1
+var _scroll: ScrollContainer
+var _content: VBoxContainer
 
 
 func _ready() -> void:
-	layer = 24
+	layer = 20  # the notebook (21) must open above the menu
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_build()
+	get_viewport().size_changed.connect(_fit)
 	call_deferred("open")
 
 
@@ -46,8 +49,9 @@ func is_open() -> bool:
 
 func open() -> void:
 	visible = true
-	_confirming = false
+	_confirming_mode = -1
 	_new.text = NEW_LIFE
+	_easy.text = NEW_LIFE_EASY
 	var has_life: bool = world != null and bool(world.available_checkpoint()["ok"])
 	_continue.visible = has_life
 	var easy: bool = world != null and world.progress != null and world.progress.easy_unlocked()
@@ -56,6 +60,7 @@ func open() -> void:
 	get_tree().paused = true
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	(_continue if has_life else _new).grab_focus()
+	_fit.call_deferred()
 
 
 func _close() -> void:
@@ -76,9 +81,12 @@ func continue_life() -> Node3D:
 ## A new main life in this world, on Standard or (when earned) on Easy. A life going on asks for a second press first. True when it began.
 func new_life(easy: bool = false) -> bool:
 	var has_life: bool = bool(world.available_checkpoint()["ok"])
-	if has_life and not _confirming:
-		_confirming = true
-		_new.text = CONFIRM
+	if has_life and _confirming_mode != int(easy):
+		_confirming_mode = int(easy)
+		_new.text = NEW_LIFE
+		_easy.text = NEW_LIFE_EASY
+		(_easy if easy else _new).text = CONFIRM
+		_fit.call_deferred()
 		return false
 	world.begin_new_life(easy)
 	_close()
@@ -99,6 +107,11 @@ func _input(event: InputEvent) -> void:
 		return
 	if event.is_action_pressed("pause"):
 		get_viewport().set_input_as_handled()  # the pause menu stays shut while choosing how to play
+	elif (event.is_action_pressed("ui_accept") or event.is_action_pressed("prepare_jump")) and not event.is_echo():
+		var focused := get_viewport().gui_get_focus_owner()
+		if focused is Button and _panel.is_ancestor_of(focused):
+			get_viewport().set_input_as_handled()
+			focused.pressed.emit()
 
 
 func _build() -> void:
@@ -117,10 +130,16 @@ func _build() -> void:
 	style.set_content_margin_all(28)
 	_panel.add_theme_stylebox_override("panel", style)
 	center.add_child(_panel)
+	_scroll = ScrollContainer.new()
+	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_scroll.follow_focus = true
+	_panel.add_child(_scroll)
 	var box := VBoxContainer.new()
+	_content = box
+	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	box.add_theme_constant_override("separation", 12)
 	box.custom_minimum_size = Vector2(460.0, 0.0)
-	_panel.add_child(box)
+	_scroll.add_child(box)
 	box.add_child(_label(TITLE, 34, Color(0.96, 0.93, 0.84)))
 	box.add_child(_label(SUBTITLE, 18, Color(0.78, 0.8, 0.72)))
 	_continue = _button("Continue", CONTINUE, func() -> void: continue_life())
@@ -141,6 +160,13 @@ func _build() -> void:
 	var quit := _button("Quit", QUIT, func() -> void: get_tree().quit())
 	quit.visible = not OS.has_feature("web")  # a page cannot close itself; the browser tab is the way out
 	box.add_child(quit)
+
+
+## Limit height at large text sizes; focused choices scroll into view.
+func _fit() -> void:
+	if not is_inside_tree() or _content == null:
+		return
+	_panel.custom_minimum_size = Vector2(516.0, minf(_content.get_combined_minimum_size().y + 56.0, get_viewport().get_visible_rect().size.y - 24.0))
 
 
 func _button(node_name: String, text: String, on_press: Callable) -> Button:

@@ -114,7 +114,7 @@ func _process(delta: float) -> void:
 	if note_left > 0.0:
 		note_left = maxf(note_left - delta, 0.0)
 		_note.modulate.a = clampf(note_left / 0.8, 0.0, 1.0)
-		_note.visible = note_left > 0.0 and not is_open()
+		_note.visible = note_left > 0.0 and not is_open() and not get_tree().paused
 		_place_note()
 
 
@@ -126,7 +126,7 @@ func _on_page_opened(id: String) -> void:
 	var p: Dictionary = notebook.page(id)
 	_note.text = KeyNames.apply("New in your notebook: %s\n(%s to read)" % [str(p.get("title", "")), KEY_HINT], settings)
 	note_left = NOTE_S
-	_note.visible = not is_open()
+	_note.visible = not is_open() and not get_tree().paused
 	_place_note()
 
 

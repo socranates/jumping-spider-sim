@@ -31,7 +31,7 @@ var _box: VBoxContainer
 var _line: Label
 var _sub: Label
 var _summary: Label
-var _buttons: HBoxContainer
+var _buttons: VBoxContainer
 var _back: Button
 var _another: Button
 var _notebook: Button
@@ -114,6 +114,12 @@ func _process(delta: float) -> void:
 		_summary.visible = _summary.text != ""
 		_buttons.visible = true
 		(_back if _back.visible else _another).grab_focus()
+	var width := minf(880.0, get_viewport().get_visible_rect().size.x - 48.0)
+	_box.offset_left = -width * 0.5
+	_box.offset_right = width * 0.5
+	var height := maxf(340.0, _box.get_combined_minimum_size().y)
+	_box.offset_top = -height * 0.5
+	_box.offset_bottom = height * 0.5
 
 
 func _input(event: InputEvent) -> void:
@@ -124,9 +130,13 @@ func _input(event: InputEvent) -> void:
 		return
 	if event.is_action_pressed("pause"):
 		get_viewport().set_input_as_handled()  # the pause menu stays shut: the choice is here
-	elif _buttons.visible and (event.is_action_pressed("interact") or event.is_action_pressed("prepare_jump")) and not event.is_echo():
+	elif _buttons.visible and (event.is_action_pressed("ui_accept") or event.is_action_pressed("interact") or event.is_action_pressed("prepare_jump")) and not event.is_echo():
 		get_viewport().set_input_as_handled()
-		go_on()
+		var focused := get_viewport().gui_get_focus_owner()
+		if focused is Button and _buttons.is_ancestor_of(focused):
+			focused.pressed.emit()
+		else:
+			go_on()
 
 
 ## Takes the first choice: back to the last rest, or on as another spider when there is none. Returns the new world.
@@ -188,7 +198,7 @@ func _build() -> void:
 	_summary = _label("", 18, Color(0.88, 0.86, 0.8))
 	_summary.name = "Summary"
 	_box.add_child(_summary)
-	_buttons = HBoxContainer.new()
+	_buttons = VBoxContainer.new()
 	_buttons.alignment = BoxContainer.ALIGNMENT_CENTER
 	_buttons.add_theme_constant_override("separation", 16)
 	_box.add_child(_buttons)

@@ -36,6 +36,32 @@ func _ready() -> void:
 	add_child(body)
 	visible = false
 	_prev = global_position
+	if DisplayServer.get_name() != "headless":
+		_warm_graphics.call_deferred()
+
+
+## Compile the visible body/material variants at load, before the first visit.
+## A separate offscreen world cannot appear to the spider or change the director.
+func _warm_graphics() -> void:
+	var viewport := SubViewport.new()
+	viewport.size = Vector2i(96, 96)
+	viewport.own_world_3d = true
+	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	get_tree().root.add_child(viewport)
+	tree_exiting.connect(viewport.queue_free, CONNECT_ONE_SHOT)
+	viewport.add_child(WaspBody.new(0.37))
+	var camera := Camera3D.new()
+	viewport.add_child(camera)
+	camera.position = Vector3(3, 2, 3)
+	camera.look_at(Vector3.ZERO)
+	camera.current = true
+	var light := DirectionalLight3D.new()
+	light.shadow_enabled = true
+	light.rotation_degrees = Vector3(-50, 30, 0)
+	viewport.add_child(light)
+	await RenderingServer.frame_post_draw
+	await RenderingServer.frame_post_draw
+	viewport.queue_free()
 
 
 ## Places it and faces it along `dir` (flattened), and works out its velocity from where it was.

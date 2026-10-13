@@ -31,7 +31,7 @@ The first release is one complete, calm, true-to-life game:
     - text size;
     - Reduced motion.
   - The spider-eye view (V / Y).
-- **Tests:** 632/632 on Windows after wasp presentation, evidence a45591fefdf2 (Chet, 2026-10-13).
+- **Tests:** 644/644 on Windows after the whole-life handback, evidence 2c1c789ef545 (Chet, 2026-10-13). Next: LIFE round 6, Nathan/son/friends play a whole life; see HANDOFF-life-windows.md.
 - **Gate audit:** [every gate and its evidence](verification/release-slice/GATES.md).
   - Passed regression gates: M01-M03, P01, A01, L01, S01-C, S02; W01 has automated pause plus rendered warning evidence.
   - F01 measurement/report clause completed; strict 16.7 ms p95 budget missed on this laptop. See [measurements and reduction plan](verification/release-slice/PERFORMANCE.md).

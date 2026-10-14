@@ -171,5 +171,170 @@ for _=1,30 do Tether.releaseTick(release,true,false) end
 for _=1,12 do Tether.releaseTick(release,true,true) end
 Tether.releaseTick(release,true,false)
 check(release.progress==0,"tap release resets progress")
+
+-- ---------------------------------------------------------------- ROBLOX-08: one control scheme for every device
+-- InputState: a key, a controller button and a finger can hold the same action; each press and release is heard once.
+do
+	local st = InputState.new()
+	local w1, n1 = st:set("Cancel", true, "KeyQ")
+	local w2, n2 = st:set("Cancel", true, "touch1")
+	local w3, n3 = st:set("Cancel", false, "KeyQ")
+	check(not w1 and n1 and w2 and n2 and w3 and n3 and st.held.Cancel == true, "a key and a finger hold one action together; releasing one keeps it held")
+	local w4, n4 = st:set("Cancel", false, "touch1")
+	check(w4 and not n4 and st.held.Cancel == nil, "releasing the last source releases the action")
+	local a, b = st:set("Jump", true, "Space")
+	local c, d = st:set("Jump", true, "Space")
+	check(not a and b and c and d and st:count("Jump") == 1, "a repeated down from one source is still one press")
+	st:set("Focus", true, "MouseButton2"); st:set("Creep", true, "ButtonL1")
+	st:clear()
+	local e, f = st:set("Focus", false, "MouseButton2")
+	check(not e and not f and st.held.Creep == nil and st:count("Focus") == 0, "focus loss drops every source of every action")
+	st:set("Forward", true); st:stick(-1, 0)
+	local x, y = st:axes()
+	check(near(x * x + y * y, 1, 1e-9) and x < 0 and y > 0, "keys and the stick combine, within unit length")
+end
+
+-- JumpInput (port of jump_controller.gd, hold mode) against a stand-in motor.
+local JumpInput = require("../src/Shared/Movement/JumpInput")
+local function fakeMotor()
+	local m = { attached = true, preparing = false, commits = {}, aims = 0,
+		hop = { kind = "reachable", reason = "ok", name = "hop" }, aim = { kind = "reachable", reason = "ok", name = "aim" } }
+	function m.canPrepare(self) return self.attached end
+	function m.beginPrepare(self) if not self.attached then return false end self.preparing = true return true end
+	function m.cancelPrepare(self) self.preparing = false end
+	function m.isPreparing(self) return self.preparing and self.attached end
+	function m.clearAimTarget(_self) end
+	function m.hopPlan(self) return self.hop end
+	function m.aimPlan(self) self.aims += 1 return self.aim end
+	function m.commit(self, plan)
+		if plan.kind ~= "reachable" or not self.attached then return false end
+		table.insert(self.commits, plan); self.preparing = false; self.attached = false
+		return true
+	end
+	return m
+end
+local function jumpWith(m)
+	local j = JumpInput.new()
+	local aims = {}
+	j.onAim = function(on) table.insert(aims, on) end
+	return j, aims
+end
+do
+	local m = fakeMotor(); local j, aims = jumpWith(m)
+	j:press(); for _ = 1, 3 do j:step(m) end; j:release(); j:step(m)
+	check(#m.commits == 1 and m.commits[1].name == "hop" and #aims == 0 and j.last.kind == "launched", "a tap is a hop, planned like a leap, with no aim")
+	m = fakeMotor(); j, aims = jumpWith(m)
+	j:press(); for _ = 1, 8 do j:step(m) end
+	local before = j.phase
+	j:step(m)
+	check(JumpInput.HOLD_TICKS == math.max(1, math.ceil(0.15 * 60 - 1e-6)) and before == "pressed" and j.phase == "aiming" and m.preparing
+		and aims[1] == true and #aims == 1, "held for 9 ticks (Godot's 0.15 s) it aims and the spider holds still")
+	j:release(); j:step(m)
+	check(#m.commits == 1 and m.commits[1].name == "aim" and j.phase == "idle" and aims[2] == false, "release on a reachable patch leaps with the plan the patch showed")
+	m = fakeMotor(); j, aims = jumpWith(m)
+	m.aim = { kind = "unreachable", reason = "too_far" }
+	j:press(); for _ = 1, 12 do j:step(m) end; j:release(); j:step(m)
+	local flashed = j.flash == m.aim and j.last.kind == "refused"
+	for _ = 1, JumpInput.FLASH_TICKS - 2 do j:step(m) end
+	local still = j.flash ~= nil
+	j:step(m)
+	check(#m.commits == 0 and flashed and still and j.flash == nil and not m.preparing, "release off a reachable patch launches nothing and shows why for 60 ticks")
+	m = fakeMotor(); j, aims = jumpWith(m)
+	j:press(); for _ = 1, 12 do j:step(m) end; j:cancel(); j:step(m); j:release(); j:step(m)
+	check(#m.commits == 0 and j.phase == "idle" and j.last.kind == "cancelled" and not m.preparing and aims[#aims] == false, "Q cancels an aim with no penalty and the later release does nothing")
+	m = fakeMotor(); j = jumpWith(m)
+	j:press(); for _ = 1, 3 do j:step(m) end; j:cancel(); j:step(m); j:release(); j:step(m)
+	check(#m.commits == 0 and j.last.kind == "cancelled", "Q during a press, before the aim, cancels the hop too")
+	m = fakeMotor(); j, aims = jumpWith(m)
+	j:press(); for _ = 1, 12 do j:step(m) end
+	j:drop(m); j:release(); j:step(m); j:press(); j:step(m)
+	check(#m.commits == 0 and j.last == nil and not m.preparing and aims[#aims] == false and j.phase == "pressed", "focus loss ends an aim quietly; a release afterwards never leaps; the next press works")
+	m = fakeMotor(); j = jumpWith(m)
+	m.attached = false
+	j:press(); for _ = 1, 12 do j:step(m) end; j:release(); j:step(m)
+	check(#m.commits == 0 and j.phase == "idle" and j.last == nil, "a press in the air or on the line does nothing")
+	m = fakeMotor(); j, aims = jumpWith(m)
+	j:press(); for _ = 1, 12 do j:step(m) end
+	m.attached = false; j:step(m)
+	check(j.phase == "idle" and aims[#aims] == false, "losing the surface during an aim ends it")
+	m = fakeMotor(); j = jumpWith(m)
+	j:press(); j:release(); j:step(m)
+	check(#m.commits == 1 and m.commits[1].name == "hop", "a press and release inside one tick still hop (events apply in order)")
+	m = fakeMotor(); j = jumpWith(m)
+	m.hop = { kind = "obstructed", reason = "hop_blocked", point = Vector3.zero }
+	j:press(); j:step(m); j:release(); j:step(m)
+	check(#m.commits == 0 and j.last.kind == "hop_refused" and j.flash == m.hop and not m.preparing, "a refused hop says why and leaves the spider standing")
+end
+
+-- ControlText: the words name only the device in use; texts are Godot's.
+local ControlText = require("../src/Shared/UI/ControlText")
+do
+	check(ControlText.deviceFor("Touch", "keyboard") == "touch" and ControlText.deviceFor("Gamepad1", "touch") == "gamepad"
+		and ControlText.deviceFor("MouseMovement", "gamepad") == "keyboard" and ControlText.deviceFor("Keyboard", "touch") == "keyboard"
+		and ControlText.deviceFor("Focus", "gamepad") == "gamepad", "the last input decides the device; window focus keeps it")
+	check(ControlText.initialDevice(true, false, false) == "touch" and ControlText.initialDevice(false, false, true) == "gamepad"
+		and ControlText.initialDevice(true, true, true) == "keyboard", "before any input: touch-only shows touch, a console the controller")
+	local function has(s, part) return string.find(s, part, 1, true) ~= nil end
+	local _, kb = ControlText.linePanel({ reeling = false, progress = 0, snagged = false, block = "" }, "keyboard")
+	local _, pad = ControlText.linePanel({ reeling = false, progress = 0, snagged = false, block = "" }, "gamepad")
+	local _, touch = ControlText.linePanel({ reeling = false, progress = 0, snagged = false, block = "" }, "touch")
+	check(kb == "W: reel in    S: lower    hold Q: let go" and pad == "Stick up: reel in    Stick down: lower    hold B: let go"
+		and touch == "↑: reel in    ↓: lower    hold Let go: let go", "the line's prompts name each device's own controls")
+	local title, hint = ControlText.describe({ kind = "reachable", reason = "ok" }, "keyboard")
+	local _, padHint = ControlText.describe({ kind = "reachable", reason = "ok" }, "gamepad")
+	check(title == "Reachable" and hint == "release to leap    Q: cancel the jump" and padHint == "release to leap    B: cancel the jump",
+		"Q / B cancels an aim (the same button lets go of the line only when held)")
+	local t1 = ControlText.describe({ kind = "obstructed", reason = "no_room" }, "keyboard")
+	local t2, h2 = ControlText.describe({ kind = "unreachable", reason = "too_far" }, "touch")
+	local t3 = ControlText.describe({ kind = "ineligible", reason = "ineligible_surface" }, "keyboard")
+	local t4 = ControlText.describe(nil, "keyboard")
+	check(t1 == "Blocked: no room to land" and t2 == "Out of reach: too far or too high" and h2 == "release to cancel    Cancel: cancel the jump"
+		and t3 == "Can't land there: the spider cannot hold on there" and t4 == "No surface in view", "the patch's titles and reasons are Godot's")
+	check(ControlText.toast("refused", { reason = "graze" }) == "Jump cancelled: it would only graze the surface"
+		and ControlText.toast("hop_refused", { reason = "no_ground" }) == "No hop: nothing to land on ahead"
+		and ControlText.toast("cancelled", nil) == "Jump cancelled" and ControlText.toast("launched", nil) == "", "jump toasts are Godot's")
+	check(ControlText.lineToast("caught", "", true, false, "keyboard") == "Caught by your line" and ControlText.lineToast("caught", "", false, true, "keyboard") == ""
+		and ControlText.lineToast("completed", "", true, false, "keyboard") == "Holding on again. The line stays behind for a moment"
+		and ControlText.lineToast("completed", "", false, false, "keyboard") == ""
+		and ControlText.lineToast("dropped", "", false, true, "keyboard") == "Letting yourself down: hold F to lower, W to climb"
+		and ControlText.lineToast("dropped", "", false, true, "gamepad") == "Letting yourself down: hold X to lower, Stick up to climb"
+		and ControlText.lineToast("drop_refused", "no_silk", false, false, "touch") == "This surface won't hold your silk"
+		and ControlText.lineToast("released", "", true, false, "touch") == "You let go of the line", "line toasts are Godot's, with the device's keys")
+	local _, _, c1 = ControlText.linePanel({ progress = 0.4, snagged = true, block = "blocked" }, "keyboard")
+	local _, _, c2 = ControlText.linePanel({ progress = 0, snagged = true, block = "" }, "keyboard")
+	local _, _, c3 = ControlText.linePanel({ progress = 0, snagged = false, block = "blocked" }, "keyboard")
+	local t5 = ControlText.linePanel({ reeling = true, progress = 0, block = "" }, "keyboard")
+	check(c1 == "Letting go... 40%" and has(c2, "caught on a second edge") and has(c3, "something is in the way") and t5 == "On your line: reeling in",
+		"the line panel's cue: the let-go hold first, then a snag, then a blocked reel")
+	check(ControlText.touchCancelLabel(true) == "Let go\n(hold)" and ControlText.touchCancelLabel(false) == "Cancel", "the touch Cancel button is Let go on the line")
+	check(has(ControlText.helpCard("keyboard"), "Hold Space") and has(ControlText.helpCard("gamepad"), "Hold A") and has(ControlText.helpCard("touch"), "Hold Jump")
+		and has(ControlText.walkHint("gamepad"), "X: let yourself down") and has(ControlText.edgeWalkHint("touch"), "Cancel or move: stop"),
+		"the controls card and reminders are written for each device")
+end
+
+-- HudLayout: prompts never under a touch button, wide enough to read, at phone, tablet and desktop sizes.
+local HudLayout = require("../src/Shared/UI/HudLayout")
+do
+	local sizes = { { 568, 320 }, { 667, 375 }, { 844, 390 }, { 932, 430 }, { 1024, 768 }, { 1180, 820 }, { 1366, 1024 }, { 390, 844 }, { 768, 1024 } }
+	local clear, wide, inside, apart = true, true, true, true
+	for _, sz in sizes do
+		local w, h = sz[1], sz[2]
+		local rects = {}
+		for _, b in HudLayout.TOUCH_BUTTONS do table.insert(rects, HudLayout.buttonRect(b, w, h)) end
+		local x0, x1, bottom = HudLayout.promptSpan(w, h, "touch")
+		local panel = { x0 = x0, y0 = bottom - 120, x1 = x1, y1 = bottom } -- three wrapped lines and a title
+		for i, r in rects do
+			if HudLayout.overlaps(panel, r) then clear = false; print("overlap", w, h, i) end
+			if r.x0 < 0 or r.y0 < 0 or r.x1 > w or r.y1 > h then inside = false end
+			for k = i + 1, #rects do if HudLayout.overlaps(r, rects[k]) then apart = false end end
+		end
+		if x1 - x0 < 260 then wide = false; print("narrow", w, h, x1 - x0) end
+	end
+	check(clear and wide, "touch prompts sit between or above the thumb buttons, at least 260 px wide, at phone and tablet sizes")
+	check(inside and apart, "touch buttons stay inside the safe area and never overlap")
+	local x0, x1, bottom = HudLayout.promptSpan(1920, 1080, "keyboard")
+	check(near(x1 - x0, 760, 1e-9) and near((x0 + x1) / 2, 960, 1e-9) and bottom == 1064, "keyboard and controller prompts are centred, at most 760 px wide")
+end
+
 print(`SUMMARY passed={passed} failed={failed}`)
 if failed > 0 then error("port check failed") end

@@ -1,33 +1,79 @@
 #!/usr/bin/env python3
-"""Runs tests/run.luau under the plain `luau` CLI. The CLI sandboxes globals per module, so this bundles the Vector3/CFrame
-shim and the pure shared modules into one chunk where they are ordinary upvalues. Usage (from roblox_port/):
-    python3 tests/run.py [path/to/luau]"""
+"""Runs the pure Luau checks under the plain `luau` CLI (no Roblox engine).
+The CLI sandboxes globals per module, so this bundles the Vector3/CFrame shim (tests/shim.luau), the Godot-exported
+reference tables and the shared modules into one chunk, where each module is an ordinary local value. Then it runs
+tests/run.luau (pure logic and goldens) and, when present, tests/scenarios.luau (recovery scenarios against a box-world
+emulation of raycasts and sphere casts: a smoke test of the real motor code, not the Roblox engine).
+Usage (from roblox_port/):  python3 tests/run.py [path/to/luau]"""
 import pathlib, re, subprocess, sys, tempfile
 
 HERE = pathlib.Path(__file__).resolve().parent
 SRC = HERE.parent / "src" / "Shared"
+
+# Shared modules in dependency order: name -> path under src/Shared.
+MODULES = [
+    ("Appearances", "Data/Appearances.luau"),
+    ("Species", "Data/Species.luau"),
+    ("Surfaces", "Data/Surfaces.luau"),
+    ("WindowsillLayout", "Habitat/WindowsillLayout.luau"),
+    ("JumpMath", "Movement/JumpMath.luau"),
+    ("SupportMath", "Movement/SupportMath.luau"),
+    ("TetherMath", "Movement/TetherMath.luau"),
+    ("CameraMath", "Movement/CameraMath.luau"),
+    ("LineFraming", "Movement/LineFraming.luau"),
+    ("InputState", "Movement/InputState.luau"),
+    ("JumpInput", "Movement/JumpInput.luau"),
+    ("SilkController", "Movement/SilkController.luau"),
+    ("SpiderMotor", "Movement/SpiderMotor.luau"),
+    ("ControlText", "UI/ControlText.luau"),
+    ("HudLayout", "UI/HudLayout.luau"),
+    ("Setae", "Rig/Setae.luau"),
+]
+REFERENCES = ["jump_reference", "tether_reference", "camera_reference", "framing_reference"]
+NAMES = {name for name, _ in MODULES}
+
+
+def requires(text):
+    """Every require of a shared module, in any of the spellings the sources use, becomes the bundled local."""
+    text = re.sub(r'require\(script\.Parent(?:\.Parent\.\w+)?\.(\w+)\)', lambda m: f"__mods.{m.group(1)}" if m.group(1) in NAMES else m.group(0), text)
+    text = re.sub(r'require\("\.\./src/Shared/\w+/(\w+)"\)', lambda m: f"__mods.{m.group(1)}", text)
+    text = re.sub(r'require\("\./(\w+)"\)', lambda m: f"__refs.{m.group(1)}" if m.group(1) in REFERENCES else m.group(0), text)
+    return text
 
 
 def chunk(path):
     text = path.read_text(encoding="utf-8")
     text = re.sub(r"^--!strict\n", "", text)
     text = re.sub(r"^export type", "type", text, flags=re.M)
-    return f"(function()\n{text}\nend)()"
+    return f"(function()\n{requires(text)}\nend)()"
 
 
-body = (HERE / "run.luau").read_text(encoding="utf-8")
-body = body.replace('local shim = require("./shim")', "local shim = " + chunk(HERE / "shim.luau"))
-body = body.replace('_G.Vector3 = shim.Vector3', 'Vector3 = shim.Vector3')
-body = body.replace('_G.CFrame = shim.CFrame', 'CFrame = shim.CFrame')
-body = body.replace('require("../src/Shared/Movement/JumpMath")', chunk(SRC / "Movement" / "JumpMath.luau"))
-body = body.replace('require("../src/Shared/Movement/SupportMath")', chunk(SRC / "Movement" / "SupportMath.luau"))
-body = body.replace('require("./jump_reference")', chunk(HERE / "jump_reference.luau"))
-body = body.replace('require("./camera_reference")', chunk(HERE / "camera_reference.luau"))
-for name, folder in [("Appearances", "Data"), ("InputState", "Movement"), ("TetherMath", "Movement"), ("CameraMath", "Movement"), ("Setae", "Rig")]:
-    body = body.replace(f'require("../src/Shared/{folder}/{name}")', chunk(SRC / folder / (name + ".luau")))
-body = body.replace('require("./tether_reference")', chunk(HERE / "tether_reference.luau"))
-body = "local Vector3, CFrame\n" + body.replace("\nVector3 = shim", "\nVector3 = shim").replace("_G.", "")
-with tempfile.NamedTemporaryFile("w", suffix=".luau", encoding="utf-8", delete=False) as f:
-    f.write(body)
+def bundle(test_file):
+    parts = ["local Vector3, CFrame, Color3, workspace, Instance, Enum, RaycastParams, OverlapParams, BoxWorld",
+             "local shim = " + chunk(HERE / "shim.luau"),
+             "Vector3, CFrame, Color3, workspace, Instance, Enum, RaycastParams, OverlapParams, BoxWorld = shim.Vector3, shim.CFrame, shim.Color3, shim.workspace, shim.Instance, shim.Enum, shim.RaycastParams, shim.OverlapParams, shim.BoxWorld",
+             "local __refs, __mods = {}, {}"]
+    for ref in REFERENCES:
+        path = HERE / (ref + ".luau")
+        if path.exists():
+            parts.append(f"__refs.{ref} = " + chunk(path))
+    for name, rel in MODULES:
+        path = SRC / rel
+        if path.exists():
+            parts.append(f"__mods.{name} = " + chunk(path))
+    body = (HERE / test_file).read_text(encoding="utf-8")
+    body = body.replace('local shim = require("./shim")', "")
+    body = re.sub(r"^_G\.\w+ = shim\.\w+\n", "", body, flags=re.M)
+    parts.append(requires(body))
+    return "\n".join(parts) + "\n"
+
+
 luau = sys.argv[1] if len(sys.argv) > 1 else "luau"
-sys.exit(subprocess.call([luau, f.name]))
+status = 0
+for test_file in ["run.luau", "scenarios.luau"]:
+    if not (HERE / test_file).exists():
+        continue
+    with tempfile.NamedTemporaryFile("w", suffix=".luau", encoding="utf-8", delete=False) as f:
+        f.write(bundle(test_file))
+    status = subprocess.call([luau, f.name]) or status
+sys.exit(status)

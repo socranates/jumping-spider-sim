@@ -705,46 +705,87 @@ return CameraMath
             <string name="Source"><![CDATA[--!strict
 -- Pure input state: test without Studio. +Y is forward on the control pad; look +X is right, +Y is down
 -- (the Godot camera rig's convention: look(dx, dy) with dy > 0 looking down).
+-- A button action can be held by several sources at once: a key, a controller button, a finger on a touch button. It is
+-- held while any of them is down, so keyboard, controller and touch work together and releasing one never cancels another
+-- (ROBLOX-08). set() returns the held state before and after, so callers act once per press and once per release.
 local InputState = {}
 InputState.__index = InputState
 
 local MOVE_DEAD = 0.2
 local LOOK_DEAD = 0.15
 
-function InputState.new()
-	return setmetatable({ held = {} :: {[string]: boolean}, x = 0, y = 0, lx = 0, ly = 0 }, InputState)
+export type InputState = typeof(setmetatable({} :: {
+	held: { [string]: boolean? },
+	sources: { [string]: { [any]: boolean } },
+	x: number,
+	y: number,
+	lx: number,
+	ly: number,
+}, InputState))
+
+function InputState.new(): InputState
+	return setmetatable({ held = {}, sources = {}, x = 0, y = 0, lx = 0, ly = 0 }, InputState)
 end
-function InputState.set(self: any, action: string, down: boolean)
-	self.held[action] = down
+
+-- One source's state of an action (source nil: a single default source). Returns (held before, held now).
+function InputState.set(self: InputState, action: string, down: boolean, source: any?): (boolean, boolean)
+	local key: any = if source == nil then "default" else source
+	local was = self.held[action] == true
+	local set = self.sources[action]
+	if down then
+		if not set then
+			set = {}
+			self.sources[action] = set
+		end
+		set[key] = true
+	elseif set then
+		set[key] = nil
+	end
+	local now = set ~= nil and next(set) ~= nil
+	self.held[action] = if now then true else nil
+	return was, now
 end
+
+-- How many sources hold the action now.
+function InputState.count(self: InputState, action: string): number
+	local n = 0
+	local set: { [any]: boolean } = self.sources[action] or {}
+	for _ in set do
+		n += 1
+	end
+	return n
+end
+
 local function radial(x: number, y: number, dead: number): (number, number)
-	local length = math.sqrt(x*x + y*y)
+	local length = math.sqrt(x * x + y * y)
 	local strength = math.clamp((length - dead) / (1 - dead), 0, 1)
 	if length <= 0 then return 0, 0 end
 	return x / length * strength, y / length * strength
 end
-function InputState.stick(self: any, x: number, y: number)
+function InputState.stick(self: InputState, x: number, y: number)
 	self.x, self.y = radial(x, y, MOVE_DEAD)
 end
 -- Right stick: Roblox reports +Y up; store it as look-down positive.
-function InputState.look(self: any, x: number, y: number)
+function InputState.look(self: InputState, x: number, y: number)
 	local rx, ry = radial(x, y, LOOK_DEAD)
 	self.lx, self.ly = rx, -ry
 end
-function InputState.axes(self: any): (number, number)
+function InputState.axes(self: InputState): (number, number)
 	local x = self.x + (if self.held.Right then 1 else 0) - (if self.held.Left then 1 else 0)
 	local y = self.y + (if self.held.Forward then 1 else 0) - (if self.held.Back then 1 else 0)
-	local length = math.max(1, math.sqrt(x*x + y*y))
+	local length = math.max(1, math.sqrt(x * x + y * y))
 	return x / length, y / length
 end
 -- Look rate in -1..1 per axis: right stick plus arrow keys.
-function InputState.lookAxes(self: any): (number, number)
+function InputState.lookAxes(self: InputState): (number, number)
 	local x = self.lx + (if self.held.LookRight then 1 else 0) - (if self.held.LookLeft then 1 else 0)
 	local y = self.ly + (if self.held.LookDown then 1 else 0) - (if self.held.LookUp then 1 else 0)
 	return math.clamp(x, -1, 1), math.clamp(y, -1, 1)
 end
-function InputState.clear(self: any)
+-- Focus loss, the Roblox menu, a text box, a lost controller: nothing stays held.
+function InputState.clear(self: InputState)
 	table.clear(self.held)
+	table.clear(self.sources)
 	self.x, self.y, self.lx, self.ly = 0, 0, 0, 0
 end
 return InputState
@@ -752,6 +793,177 @@ return InputState
           </Properties>
         </Item>
         <Item class="ModuleScript" referent="13">
+          <Properties>
+            <string name="Name">JumpInput</string>
+            <string name="Source"><![CDATA[--!strict
+-- Jump input: a port of the frozen Godot scripts/movement/jump_controller.gd (c87ce00, hold mode). Pure: the motor is passed
+-- in, so tests/run.luau checks the same rules without Roblox.
+--
+-- A tap of the jump button (Space, A, touch Jump) is a short hop forward. Holding it for HOLD_TICKS (0.15 s) starts aiming:
+-- the spider holds still and the landing patch shows the plan for whatever the screen centre is on. Releasing commits the
+-- plan the patch shows when it is reachable; on anything else nothing is launched and the reason flashes for FLASH_TICKS.
+-- Cancel (Q, B, touch Cancel) leaves a press or an aim with no penalty. drop() is focus loss or the Roblox menu: an aim in
+-- progress ends quietly, so a button released while away can never leap later (Godot's _drop_input). Events are queued and
+-- applied at the start of the next fixed tick, so timing is counted in ticks and does not depend on the frame rate.
+-- `last` records the latest outcome for the HUD and tests: launched, cancelled, refused or hop_refused.
+local JumpInput = {}
+JumpInput.__index = JumpInput
+
+JumpInput.HOLD_TICKS = 9 -- math.max(1, math.ceil(0.15 * 60 - 1e-6)), as jump_controller._hold_ticks()
+JumpInput.FLASH_TICKS = 60
+
+export type Phase = "idle" | "pressed" | "aiming"
+
+function JumpInput.new()
+	return setmetatable({
+		phase = "idle" :: Phase,
+		heldTicks = 0,
+		events = {} :: { string },
+		plan = nil :: any,
+		flash = nil :: any,
+		flashLeft = 0,
+		last = nil :: any,
+		tick = 0,
+		onAim = nil :: ((boolean) -> ())?,
+	}, JumpInput)
+end
+
+function JumpInput.press(self: any) table.insert(self.events, "press") end
+function JumpInput.release(self: any) table.insert(self.events, "release") end
+function JumpInput.cancel(self: any) table.insert(self.events, "cancel") end
+
+-- Focus loss or the menu: forget queued presses and end an aim with no message (applied at once).
+function JumpInput.drop(self: any, motor: any)
+	table.clear(self.events)
+	if self.phase == "aiming" then
+		if motor then motor:cancelPrepare() end
+		self:_endAim(motor)
+	end
+	self.phase = "idle"
+	self.heldTicks = 0
+end
+
+function JumpInput.isAiming(self: any): boolean return self.phase == "aiming" end
+-- True while a press or an aim is in progress: the cancel button belongs to it then.
+function JumpInput.isBusy(self: any): boolean return self.phase ~= "idle" end
+
+function JumpInput._record(self: any, kind: string, plan: any)
+	self.last = { kind = kind, plan = plan, tick = self.tick }
+end
+
+function JumpInput._flash(self: any, plan: any)
+	if plan ~= nil and plan.kind ~= "none" then
+		self.flash = plan
+		self.flashLeft = JumpInput.FLASH_TICKS
+	end
+end
+
+function JumpInput._setAiming(self: any, on: boolean)
+	local f = self.onAim
+	if f then f(on) end
+end
+
+function JumpInput._endAim(self: any, motor: any)
+	self.phase = "idle"
+	self.heldTicks = 0
+	self.plan = nil
+	if motor then motor:clearAimTarget() end
+	self:_setAiming(false)
+end
+
+function JumpInput._beginAim(self: any, motor: any)
+	if not motor:beginPrepare() then
+		self.phase = "idle"
+		return
+	end
+	self.phase = "aiming"
+	self.plan = nil
+	self:_setAiming(true)
+	self.plan = motor:aimPlan()
+end
+
+-- Commit the plan the patch is showing; anything not reachable is refused, with its reason, and launches nothing.
+function JumpInput._confirm(self: any, motor: any)
+	local shown = self.plan or motor:aimPlan() -- exactly what the patch showed at the last tick
+	if shown ~= nil and shown.kind == "reachable" and motor:commit(shown) then
+		self:_endAim(motor)
+		self:_record("launched", shown)
+		return
+	end
+	self:_flash(shown)
+	motor:cancelPrepare()
+	self:_endAim(motor)
+	self:_record("refused", shown)
+end
+
+function JumpInput._hop(self: any, motor: any)
+	local hop = motor:hopPlan()
+	if hop ~= nil and hop.kind == "reachable" and motor:beginPrepare() then
+		if motor:commit(hop) then
+			self:_record("launched", hop)
+			return
+		end
+		motor:cancelPrepare()
+	end
+	self:_flash(hop)
+	self:_record("hop_refused", hop)
+end
+
+-- One fixed tick: apply the queued events, then count the hold and keep the aim's plan current.
+function JumpInput.step(self: any, motor: any)
+	self.tick += 1
+	local queued = self.events
+	self.events = {}
+	for _, e in queued do
+		if e == "press" then
+			if self.phase == "idle" and motor:canPrepare() then
+				self.phase = "pressed"
+				self.heldTicks = 0
+			end
+		elseif e == "release" then
+			if self.phase == "pressed" then
+				self.phase = "idle"
+				self:_hop(motor)
+			elseif self.phase == "aiming" then
+				self:_confirm(motor)
+			end
+		elseif e == "cancel" then
+			if self.phase == "pressed" then
+				self.phase = "idle"
+				self:_record("cancelled", nil)
+			elseif self.phase == "aiming" then
+				motor:cancelPrepare()
+				self:_endAim(motor)
+				self:_record("cancelled", nil)
+			end
+		end
+	end
+	if self.flashLeft > 0 then
+		self.flashLeft -= 1
+		if self.flashLeft == 0 then self.flash = nil end
+	end
+	if self.phase == "pressed" then
+		if not motor:canPrepare() then
+			self.phase = "idle"
+		else
+			self.heldTicks += 1
+			if self.heldTicks >= JumpInput.HOLD_TICKS then self:_beginAim(motor) end
+		end
+	end
+	if self.phase == "aiming" then
+		if motor:isPreparing() then
+			self.plan = motor:aimPlan()
+		else
+			self:_endAim(motor) -- the spider lost its support, or was put somewhere else
+		end
+	end
+end
+
+return JumpInput
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="14">
           <Properties>
             <string name="Name">JumpMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -909,7 +1121,7 @@ return JumpMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="14">
+        <Item class="ModuleScript" referent="15">
           <Properties>
             <string name="Name">SilkController</string>
             <string name="Source"><![CDATA[--!strict
@@ -1137,7 +1349,639 @@ return Silk
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="15">
+        <Item class="ModuleScript" referent="16">
+          <Properties>
+            <string name="Name">SpiderMotor</string>
+            <string name="Source"><![CDATA[--!strict
+-- The spider's body on the windowsill: a kinematic port of the frozen Godot motor's core (scripts/movement/spider_motor.gd,
+-- jump_planner.gd and the jump/line parts of player_controller.gd and tether_controller.gd, c87ce00). It walks on any
+-- attachable surface (floor, walls, undersides, over edges), plans hops and aimed leaps with the shared JumpMath at a fixed
+-- 60 Hz tick, flies them, pays out a safety line from silk-holding ground (SilkController: catch, hang, reel, lower,
+-- edge-first lowering, deliberate let-go) and reports line events for the HUD.
+--
+-- No input devices, camera or drawing here: the client passes a TickInput each fixed tick and an aim ray, so Studio specs
+-- (tests/studio/RecoverySpec.luau) run the same motor deterministically, tick by tick, against real geometry. Engine
+-- queries only: Workspace raycasts, sphere casts and one overlap query (the room probe).
+local JumpMath = require(script.Parent.JumpMath)
+local SupportMath = require(script.Parent.SupportMath)
+local SilkController = require(script.Parent.SilkController)
+
+local Motor = {}
+Motor.__index = Motor
+
+local DT = 1 / 60
+Motor.DT = DT
+Motor.HEIGHT = 0.31 -- body centre above the support plane: radius 0.3 + skin 0.01 (Godot seat distance)
+local HEIGHT = Motor.HEIGHT
+local SWEEP_RADIUS = 0.303 -- body radius + JumpPlanner.SWEEP_MARGIN
+local TURN_RATE = math.rad(540)
+local FOCUS_RATE = math.rad(180) -- Godot FOCUS_TURN_FALLBACK_DEG_S
+local PREPARE_TURN_RATE = math.rad(360) -- SpiderMotor.PREPARE_TURN_RATE_DEG_S: cosmetic turn toward the aim point
+local AIM_RANGE = 60
+Motor.AIM_RANGE = AIM_RANGE
+local HOP_DISTANCE = 1.5
+local HOP_PROBE_UP, HOP_PROBE_DOWN = 0.5, 1.2
+local MAX_DRIFT = 0.15
+local CONTACT_EXTRA_STEPS = 8
+local EYE_TURN_START_DEG, EYE_TURN_STOP_DEG = 30, 4 -- CameraMath.PRINCIPAL_SCAN_DEG, EYE_SETTLE_DEG
+local FREE_UP_RATE = math.rad(240) -- the drawn up turns to world up while falling or on the line (Godot VISUAL_TURN)
+
+export type TickInput = {
+	wish: Vector3, -- walking direction on the support plane (unit or zero), from the view
+	creep: boolean,
+	reel: number, -- on the line: +1 reels in, -1 lowers
+	dropHeld: boolean, -- F / X / Silk held: lowers on the line
+	releaseHeld: boolean, -- Q / B / Let go held: a deliberate let-go after the grace
+	focusPoint: Vector3?, -- Focus held: the body turns toward this point
+	gaze: Vector3?, -- spider-eye view: the body turns to face a gaze beyond 30 degrees
+}
+
+export type Config = {
+	world: Instance,
+	surfaces: any,
+	profile: any,
+	spawn: Vector3, -- the support point under the body
+	heading: Vector3,
+	boundsMin: Vector3,
+	boundsMax: Vector3,
+	probeParent: Instance?,
+}
+
+function Motor.idleInput(): TickInput
+	return { wish = Vector3.zero, creep = false, reel = 0, dropHeld = false, releaseHeld = false }
+end
+
+function Motor.new(config: Config): any
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Include
+	params.FilterDescendantsInstances = { config.world }
+	local overlap = OverlapParams.new()
+	overlap.FilterType = Enum.RaycastFilterType.Include
+	overlap.FilterDescendantsInstances = { config.world }
+	local probe = Instance.new("Part")
+	probe.Name = "RoomProbe"
+	probe.Shape = Enum.PartType.Ball
+	probe.Size = Vector3.one * (SWEEP_RADIUS * 2)
+	probe.Anchored = true
+	probe.CanCollide = false
+	probe.CanQuery = false
+	probe.CanTouch = false
+	probe.Transparency = 1
+	probe.Parent = config.probeParent or workspace
+	local loco = config.profile.locomotion
+	local self = setmetatable({
+		config = config,
+		surfaces = config.surfaces,
+		loco = loco,
+		gravity = Vector3.new(0, -loco.gravity_wu_s2, 0),
+		params = params,
+		overlap = overlap,
+		probe = probe,
+		silk = SilkController.new(config.world, config.surfaces, config.profile.silk, loco.gravity_wu_s2) :: any,
+		mode = "attached",
+		pos = config.spawn + Vector3.new(0, HEIGHT, 0),
+		up = Vector3.yAxis,
+		heading = config.heading,
+		vel = Vector3.zero,
+		moving = false,
+		preparing = false,
+		aimTarget = nil :: Vector3?,
+		aimOrigin = Vector3.zero,
+		aimDirection = -Vector3.zAxis,
+		planKey = "",
+		plan = nil :: any,
+		flightTicks = 0,
+		flightLimit = 0,
+		eyeTurning = false,
+		ticks = 0,
+		lineSerial = 0, -- counts lines started, so the drawing knows a new one began
+		afterMiss = false,
+		dropped = false,
+		caught = false,
+		safe = { pos = config.spawn + Vector3.new(0, HEIGHT, 0), up = Vector3.yAxis, heading = config.heading },
+		events = {} :: { { kind: string, detail: string } },
+	}, Motor)
+	return self
+end
+
+function Motor.destroy(self: any)
+	self.probe:Destroy()
+end
+
+function Motor._event(self: any, kind: string, detail: string?)
+	table.insert(self.events, { kind = kind, detail = detail or "" })
+end
+
+-- The line and jump events since the last call (for the HUD's toasts), oldest first.
+function Motor.drainEvents(self: any): { { kind: string, detail: string } }
+	local out = self.events
+	self.events = {}
+	return out
+end
+
+function Motor.profileOf(self: any, inst: Instance?): any
+	if not inst then return nil end
+	local id = inst:GetAttribute("ProfileId")
+	return if typeof(id) == "string" then self.surfaces[id] else nil
+end
+
+function Motor.attachable(self: any, hit: RaycastResult?): boolean
+	if not hit then return false end
+	local p = self:profileOf(hit.Instance)
+	return p ~= nil and p.attachable == true
+end
+
+-- SurfaceProfile.supports: an attachable surface, or any floor flat enough to stand on.
+local STAND_COS = math.cos(math.rad(JumpMath.STAND_MAX_DEG)) - 1e-6
+function Motor.supports(_self: any, p: any, normal: Vector3): boolean
+	if p ~= nil and p.attachable then return true end
+	return normal.Magnitude > 1e-5 and normal.Unit:Dot(Vector3.yAxis) >= STAND_COS
+end
+
+local function rotationBetween(a: Vector3, b: Vector3): CFrame
+	local angle = SupportMath.angleTo(a, b)
+	if angle < 1e-6 then return CFrame.identity end
+	local axis = a:Cross(b)
+	if axis:Dot(axis) < 1e-12 then axis = SupportMath.anyPerpendicular(a) end
+	return CFrame.fromAxisAngle(axis.Unit, angle)
+end
+
+function Motor._setSupport(self: any, hit: RaycastResult)
+	local turn = rotationBetween(self.up, hit.Normal)
+	self.heading = SupportMath.tangentDir(turn * self.heading, hit.Normal)
+	if self.heading == Vector3.zero then self.heading = SupportMath.anyPerpendicular(hit.Normal) end
+	self.up = hit.Normal
+	self.pos = hit.Position + hit.Normal * HEIGHT
+end
+
+function Motor._ray(self: any, from: Vector3, motion: Vector3): RaycastResult?
+	return workspace:Raycast(from, motion, self.params)
+end
+
+-- Puts the spider somewhere (a reset, a test fixture). Every line, aim and walk ends.
+function Motor.place(self: any, position: Vector3, up: Vector3?, heading: Vector3?)
+	self.mode = "attached"
+	self.pos = position
+	self.up = up or Vector3.yAxis
+	self.heading = SupportMath.tangentDir(heading or self.config.heading, self.up)
+	if self.heading == Vector3.zero then self.heading = SupportMath.anyPerpendicular(self.up) end
+	self.vel = Vector3.zero
+	self.moving = false
+	self.preparing = false
+	self.aimTarget = nil
+	self.plan = nil
+	self.planKey = ""
+	self.silk:clear()
+	self.afterMiss, self.dropped, self.caught = false, false, false
+	self.safe = { pos = self.pos, up = self.up, heading = self.heading }
+end
+
+function Motor.respawn(self: any)
+	self:place(self.config.spawn + Vector3.new(0, HEIGHT, 0), Vector3.yAxis, self.config.heading)
+end
+
+-- ---------------------------------------------------------------- the planner (port of jump_planner.gd)
+function Motor._sweep(self: any, a: Vector3, b: Vector3): Vector3?
+	local d = b - a
+	if d.Magnitude < 1e-6 then return nil end
+	local hit = workspace:Spherecast(a, SWEEP_RADIUS, d, self.params)
+	return if hit then a + d.Unit * hit.Distance else nil
+end
+
+function Motor._fits(self: any, center: Vector3): boolean
+	self.probe.CFrame = CFrame.new(center)
+	return #workspace:GetPartsInPart(self.probe, self.overlap) == 0
+end
+
+function Motor._tryCandidate(self: any, origin: Vector3, seat: Vector3, c: any): (boolean, string, { Vector3 }, Vector3?)
+	local G = self.gravity
+	local pts = JumpMath.path(origin, c.velocity, G, DT, c.steps)
+	for k = 2, #pts do
+		local at = self:_sweep(pts[k - 1], pts[k])
+		if at then
+			local cut = table.move(pts, 1, k - 1, 1, {})
+			table.insert(cut, at)
+			return false, "path_blocked", cut, at
+		end
+	end
+	local v = JumpMath.velocityAfter(c.velocity, G, DT, c.steps)
+	local p = pts[#pts]
+	for _ = 1, CONTACT_EXTRA_STEPS do
+		v += G * DT
+		local nextP = p + v * DT
+		local at = self:_sweep(p, nextP)
+		if at then
+			if (at - seat).Magnitude <= MAX_DRIFT then return true, "ok", pts, nil end
+			return false, "graze", pts, at
+		end
+		p = nextP
+	end
+	return false, "graze", pts, seat
+end
+
+-- A plan for a target surface point (JumpPlanner.plan): kind reachable / obstructed / unreachable / ineligible / none, with
+-- the reason, the drawn path and, when reachable, the launch velocity and ticks. origin is where the body was.
+function Motor.planJump(self: any, point: Vector3?, normal: Vector3?, inst: Instance?): any
+	if not point or not normal then return { kind = "none", reason = "no_target" } end
+	local loco = self.loco
+	local plan: any = { point = point, normal = normal, seat = point + normal * HEIGHT, kind = "unreachable", reason = "", origin = self.pos }
+	if not self:supports(self:profileOf(inst), normal) then
+		plan.kind, plan.reason = "ineligible", "ineligible_surface"
+		return plan
+	end
+	local solved = JumpMath.solve(self.pos, plan.seat, self.up, normal, self.gravity, DT, loco.flight_time_min_s, loco.flight_time_max_s, loco.max_launch_speed_wu_s)
+	if #solved.valid == 0 then
+		plan.reason = solved.reason
+		return plan
+	end
+	if not self:_fits(plan.seat) then
+		plan.kind, plan.reason = "obstructed", "no_room"
+		plan.path = JumpMath.path(self.pos, solved.valid[1].velocity, self.gravity, DT, solved.valid[1].steps)
+		plan.blockedAt = plan.seat
+		return plan
+	end
+	local firstPath, firstAt, anyBlocked = nil, nil, false
+	for _, c in solved.valid do
+		local ok, why, path, at = self:_tryCandidate(self.pos, plan.seat, c)
+		if ok then
+			plan.kind, plan.reason, plan.path, plan.velocity, plan.steps = "reachable", "ok", path, c.velocity, c.steps
+			return plan
+		end
+		if not firstPath then firstPath, firstAt = path, at end
+		if why == "path_blocked" then anyBlocked = true end
+	end
+	plan.path, plan.blockedAt = firstPath, firstAt
+	plan.kind, plan.reason = if anyBlocked then "obstructed" else "unreachable", if anyBlocked then "path_blocked" else "graze"
+	return plan
+end
+
+-- The aim ray the client last gave (the camera's centre ray).
+function Motor.setAimRay(self: any, origin: Vector3, direction: Vector3)
+	self.aimOrigin, self.aimDirection = origin, direction
+end
+
+-- The aim: whatever the centre ray meets (no target magnet). Re-planned only when the aim or the spider moves.
+function Motor.aimPlan(self: any): any
+	local hit = self:_ray(self.aimOrigin, self.aimDirection * AIM_RANGE)
+	local key = if hit
+		then string.format("%.3f,%.3f,%.3f|%.3f,%.3f,%.3f|%.3f,%.3f,%.3f|%.3f,%.3f,%.3f", hit.Position.X, hit.Position.Y, hit.Position.Z, hit.Normal.X, hit.Normal.Y, hit.Normal.Z, self.pos.X, self.pos.Y, self.pos.Z, self.up.X, self.up.Y, self.up.Z)
+		else "none"
+	if key ~= self.planKey or not self.plan then
+		self.planKey = key
+		self.plan = if hit then self:planJump(hit.Position, hit.Normal, hit.Instance) else self:planJump(nil, nil, nil)
+	end
+	if self.preparing then
+		self.aimTarget = if hit then hit.Position else nil
+	end
+	return self.plan
+end
+
+-- JumpMotor.plan_hop: the ground HOP_DISTANCE ahead, planned and checked exactly like an aimed jump.
+function Motor.hopPlan(self: any): any
+	local n = self.up
+	local h = SupportMath.tangentDir(self.heading, n)
+	if h == Vector3.zero then h = SupportMath.anyPerpendicular(n) end
+	local ahead = self:_ray(self.pos, h * (HOP_DISTANCE + HEIGHT))
+	if ahead then
+		return { kind = "obstructed", reason = "hop_blocked", point = ahead.Position, normal = ahead.Normal, origin = self.pos }
+	end
+	local finish = self.pos + h * HOP_DISTANCE
+	local ground = self:_ray(finish + n * HOP_PROBE_UP, -n * (HOP_PROBE_UP + HOP_PROBE_DOWN))
+	if not ground then
+		return { kind = "unreachable", reason = "no_ground", point = finish - n * HEIGHT, normal = n, origin = self.pos }
+	end
+	return self:planJump(ground.Position, ground.Normal, ground.Instance)
+end
+
+-- What a leap from here does with the line (SpiderMotor.get_anchor_preview): "ok", "no_silk", "too_long" or "no_support".
+function Motor.anchorPreview(self: any, plan: any): string
+	if self.mode ~= "attached" then return "no_support" end
+	local hit = self:_ray(self.pos, -self.up * (HEIGHT + 0.1))
+	local p = if hit then self:profileOf(hit.Instance) else nil
+	if not p then return "no_support" end
+	if not p.silk_anchor_allowed then return "no_silk" end
+	if plan and plan.seat and (plan.seat - self.pos).Magnitude > self.silk.maximum then return "too_long" end
+	return "ok"
+end
+
+-- ---------------------------------------------------------------- the jump controller's view of the motor (JumpInput)
+-- Standing on a surface and not walking itself to an edge's drop: a press or an aim may start.
+function Motor.canPrepare(self: any): boolean
+	return self.mode == "attached"
+end
+
+-- ATTACHED to PREPARING: the spider holds still; a walk to the edge stops (the player took over).
+function Motor.beginPrepare(self: any): boolean
+	if not self:canPrepare() then return false end
+	if self.silk.walk then self:cancelWalk() end
+	self.preparing = true
+	self.vel = Vector3.zero
+	return true
+end
+
+function Motor.cancelPrepare(self: any)
+	self.preparing = false
+	self.aimTarget = nil
+end
+
+function Motor.isPreparing(self: any): boolean
+	return self.preparing and self.mode == "attached"
+end
+
+function Motor.clearAimTarget(self: any)
+	self.aimTarget = nil
+end
+
+-- Commits a reachable plan made from where the body is now. Anything else changes nothing.
+function Motor.commit(self: any, plan: any): boolean
+	if plan == nil or plan.kind ~= "reachable" or self.mode ~= "attached" then return false end
+	if plan.origin and (plan.origin - self.pos).Magnitude > 1e-3 then return false end
+	self:_launch(plan.velocity, plan.steps)
+	return true
+end
+
+-- A committed leap anchors a safety line at takeoff where the ground holds silk (SilkController pays it out).
+function Motor._launch(self: any, velocity: Vector3, steps: number)
+	local floorHit = self:_ray(self.pos, -self.up * (HEIGHT + 0.1))
+	self.afterMiss, self.dropped, self.caught = false, false, false
+	if self.silk:anchorAt(floorHit, self.pos) then
+		self.lineSerial += 1
+		self:_event("anchored")
+	end
+	self.preparing = false
+	self.aimTarget = nil
+	self.flightTicks, self.flightLimit = 0, steps + 4
+	self.vel = velocity
+	self.mode = "air"
+	self:_event("launched")
+end
+
+-- ---------------------------------------------------------------- letting down on a line (F / X / Silk)
+function Motor._beginDrop(self: any, push: Vector3): boolean
+	if not self.silk:startDrop(self.pos, self.up, push) then return false end
+	self.lineSerial += 1
+	self.afterMiss, self.dropped, self.caught = false, true, false
+	self.vel = push * 0.6
+	self.mode = "air"
+	self.preparing = false
+	self.aimTarget = nil
+	self:_event("dropped")
+	return true
+end
+
+-- Godot SpiderMotor.begin_drop: on a wall or underside let down at once; on top of a leaf, walk to the nearest usable
+-- edge first. Returns whether something started; a refusal says why in an event.
+function Motor.requestDrop(self: any): boolean
+	if self.mode ~= "attached" or self.preparing or self.silk.walk then return false end
+	local plan, message = self.silk:planDrop(self.pos, self.up, self.heading)
+	if not plan then
+		self.silk.message = message
+		local reason = if message == "This surface cannot hold silk" then "no_silk" elseif message == "No supporting surface" then "no_support" else "no_edge"
+		self:_event("drop_refused", reason)
+		return false
+	end
+	if plan.direction.Magnitude < 1e-6 then
+		if self:_beginDrop(self.up) then self.pos += self.up * 0.01 end
+	else
+		self.silk.walk = { direction = plan.direction, ticks = math.ceil((plan.distance / self.loco.walk_speed_wu_s + 1.5) * 60) }
+		self.silk.message = "Walking to the edge — move or cancel to stop"
+		self:_event("drop_walk")
+	end
+	return true
+end
+
+-- Stops a walk to the edge (the player moved, aimed or pressed cancel). False when there was none.
+function Motor.cancelWalk(self: any): boolean
+	if not self.silk.walk then return false end
+	self.silk.walk = nil
+	self.silk.message = "Edge walk cancelled"
+	return true
+end
+
+-- True while hanging or reeling on a locked line (Godot is_on_line).
+function Motor.onLine(self: any): boolean
+	return self.mode == "air" and self.silk.mode == "locked"
+end
+
+-- Where the spider will hang (the line's rest point below its pivot) and the lip the line leaves its support at: the
+-- camera frames the recovery from these (camera_rig._wanted_yaw_assist, A-017).
+function Motor.lineRestPoint(self: any): Vector3
+	if self.silk.mode ~= "locked" then return self.pos end
+	local pivot = self.silk:pivot()
+	return pivot - Vector3.yAxis * math.max(self.silk.rest - self.silk:prefix(), 0)
+end
+
+function Motor.lineLip(self: any): Vector3
+	return self.silk.bend or (self.silk.anchor + self.silk.normal * 0.04)
+end
+
+-- ---------------------------------------------------------------- the fixed tick
+function Motor._turnToward(self: any, dir: Vector3, rate: number)
+	local t = SupportMath.tangentDir(dir, self.up)
+	if t ~= Vector3.zero then
+		self.heading = SupportMath.tangentDir(SupportMath.rotateToward(self.heading, t, rate * DT), self.up)
+	end
+end
+
+-- Focus (PlayerController.focus_direction) and the spider-eye turn: standing still, the body turns to look.
+function Motor._lookTurns(self: any, input: TickInput, stickIdle: boolean)
+	if input.focusPoint then
+		local eye = self.pos + self.heading * 0.45
+		local to = input.focusPoint - eye
+		if to.Magnitude > 0.2 then self:_turnToward(to, FOCUS_RATE) end
+		self.eyeTurning = false
+		return
+	end
+	if not input.gaze or not stickIdle then
+		self.eyeTurning = false
+		return
+	end
+	local look = SupportMath.tangentDir(input.gaze, self.up)
+	if look == Vector3.zero then return end
+	local off = math.deg(SupportMath.angleTo(self.heading, look))
+	if not self.eyeTurning and off > EYE_TURN_START_DEG then
+		self.eyeTurning = true
+	elseif self.eyeTurning and off < EYE_TURN_STOP_DEG then
+		self.eyeTurning = false
+	end
+	if self.eyeTurning then self:_turnToward(look, FOCUS_RATE) end
+end
+
+function Motor._outOfBounds(self: any, p: Vector3): boolean
+	local lo, hi = self.config.boundsMin, self.config.boundsMax
+	return p.X < lo.X or p.Y < lo.Y or p.Z < lo.Z or p.X > hi.X or p.Y > hi.Y or p.Z > hi.Z
+end
+
+-- Leaving the play area puts the spider back at its last supported spot (Godot _reset_out_of_bounds).
+function Motor._backToSafety(self: any)
+	local safe = self.safe
+	self:place(safe.pos, safe.up, safe.heading)
+	self:_event("out_of_bounds")
+end
+
+function Motor._tickAttached(self: any, input: TickInput)
+	local silk = self.silk
+	local preparing = self.preparing
+	local manual = if preparing then Vector3.zero else input.wish
+	if silk.walk and manual.Magnitude > 0 then self:cancelWalk() end
+	local dir = if preparing then Vector3.zero elseif silk.walk then silk.walk.direction else manual
+	if silk.walk then
+		silk.walk.ticks -= 1
+		if silk.walk.ticks <= 0 then
+			silk.walk = nil
+			silk.message = "Edge walk stopped"
+			self:_event("drop_refused", "stuck")
+			return
+		end
+	end
+	self.moving = dir ~= Vector3.zero
+	if preparing then
+		local target = self.aimTarget
+		if target then self:_turnToward(target - self.pos, PREPARE_TURN_RATE) end
+	elseif not silk.walk then
+		self:_lookTurns(input, not self.moving)
+	end
+	if not self.moving then
+		-- Re-seat on the support so a vanished or moved surface is noticed.
+		local below = self:_ray(self.pos + self.up * 0.1, -self.up * (HEIGHT + 0.35))
+		if not self:attachable(below) and not (below and self:supports(self:profileOf(below.Instance), below.Normal)) then
+			self.mode = "air"
+			self.vel = Vector3.zero
+			self.preparing = false
+			self.flightTicks, self.flightLimit = 0, 0
+		else
+			self.safe = { pos = self.pos, up = self.up, heading = self.heading }
+		end
+		return
+	end
+	local stalk = input.creep and not silk.walk
+	local speed = if stalk then self.loco.stalk_speed_wu_s else self.loco.walk_speed_wu_s
+	self.heading = SupportMath.tangentDir(SupportMath.rotateToward(self.heading, dir, TURN_RATE * DT), self.up)
+	local step = dir * speed * DT
+	-- Concave corner: a wall (or a leaf's edge, a stem) ahead becomes the new support.
+	local ahead = self:_ray(self.pos, dir * (HEIGHT + step.Magnitude + 0.02))
+	if ahead and self:attachable(ahead) and SupportMath.angleTo(ahead.Normal, self.up) > math.rad(20) then
+		self:_setSupport(ahead)
+		return
+	end
+	local nextPos = self.pos + step
+	local below = self:_ray(nextPos + self.up * 0.25, -self.up * (HEIGHT + 0.5))
+	if below and self:attachable(below) and SupportMath.angleTo(below.Normal, self.up) < math.rad(60) then
+		local n = SupportMath.filterNormal(self.up, below.Normal, 2.0)
+		self.up = n
+		self.pos = below.Position + n * HEIGHT
+		self.heading = SupportMath.tangentDir(self.heading, n)
+		self.safe = { pos = self.pos, up = self.up, heading = self.heading }
+		return
+	end
+	if silk.walk then
+		-- The walk reached the edge: let down from here (edge-first lowering).
+		if self:_beginDrop(dir) then self.pos = nextPos + dir * (HEIGHT + 0.02) end
+		return
+	end
+	-- Convex edge: wrap over it onto the face beyond (sill edge, leaf rim, the top of a wall).
+	local around = self:_ray(nextPos - self.up * (HEIGHT + 0.15), -dir * 1.0)
+	if around and self:attachable(around) then
+		self:_setSupport(around)
+		return
+	end
+	self.mode = "air"
+	self.vel = dir * speed
+	self.flightTicks, self.flightLimit = 0, 0
+end
+
+function Motor._tickLine(self: any, input: TickInput)
+	local silk = self.silk
+	-- On the line (spec 17's context override): forward reels in, back lowers, F held lowers, a held Q lets go.
+	local intent = if input.dropHeld then math.min(input.reel, 0) - 1 else input.reel
+	local p, v, hit = silk:step(self.pos, self.vel, math.clamp(intent, -1, 1), input.releaseHeld == true)
+	self.pos, self.vel = p, v
+	if hit then
+		self:_setSupport(hit)
+		self.vel = Vector3.zero
+		self.mode = "attached"
+		silk:clear()
+		self:_event("completed")
+		self.safe = { pos = self.pos, up = self.up, heading = self.heading }
+		return
+	end
+	if silk.mode == "none" then
+		self:_event(if silk.message == "Silk anchor lost" then "lost" else "released")
+		self.flightTicks, self.flightLimit = 0, 0
+		return
+	end
+	if silk.taut and not self.caught then
+		self.caught = true
+		self:_event("caught")
+	end
+	if silk.snagged and not self.snagSeen then self:_event("snagged") end
+	self.snagSeen = silk.snagged
+	self.up = SupportMath.rotateToward(self.up, Vector3.yAxis, FREE_UP_RATE * DT)
+	if self:_outOfBounds(self.pos) then self:_backToSafety() end
+end
+
+function Motor._lock(self: any, at: Vector3)
+	self.silk:lock(at, 0.25)
+	self.afterMiss = true
+	self.caught = false
+	self:_event("locked")
+end
+
+function Motor._tickAir(self: any, input: TickInput)
+	local silk = self.silk
+	if silk.mode == "locked" then
+		self:_tickLine(input)
+		return
+	end
+	self.flightTicks += 1
+	local from = self.pos
+	self.vel += self.gravity * DT
+	local to = from + self.vel * DT
+	local travel = to - from
+	local dir = if travel.Magnitude > 1e-6 then travel.Unit else -self.up
+	local hit = self:_ray(from, dir * (travel.Magnitude + HEIGHT))
+	if hit then
+		local approach = -self.vel:Dot(hit.Normal)
+		if self:supports(self:profileOf(hit.Instance), hit.Normal) and approach >= JumpMath.minApproach(hit.Normal) then
+			local heading = SupportMath.tangentDir(self.vel, hit.Normal)
+			self:_setSupport(hit)
+			if heading ~= Vector3.zero then self.heading = heading end
+			self.vel = Vector3.zero
+			self.mode = "attached"
+			if silk.mode ~= "none" then self:_event("landed") end
+			silk:clear()
+			self.safe = { pos = self.pos, up = self.up, heading = self.heading }
+			return
+		end
+		-- Not landable here: the line locks (a miss), and the body slides along it.
+		if silk.mode == "payout" then self:_lock(self.pos) end
+		self.vel -= hit.Normal * math.min(0, self.vel:Dot(hit.Normal))
+		to = hit.Position + hit.Normal * HEIGHT
+	end
+	self.pos = to
+	silk:payout(to)
+	if silk.mode == "payout" and self.flightTicks >= self.flightLimit then self:_lock(to) end
+	-- The drawn body turns upright while falling.
+	self.up = SupportMath.rotateToward(self.up, Vector3.yAxis, FREE_UP_RATE * DT)
+	if self:_outOfBounds(to) then self:_backToSafety() end
+end
+
+-- One fixed 1/60 s tick of the body.
+function Motor.tick(self: any, input: TickInput)
+	self.ticks += 1
+	if self.mode == "attached" then
+		self:_tickAttached(input)
+	else
+		self.preparing = false
+		self:_tickAir(input)
+	end
+end
+
+return Motor
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="17">
           <Properties>
             <string name="Name">SupportMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -1219,7 +2063,7 @@ return SupportMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="16">
+        <Item class="ModuleScript" referent="18">
           <Properties>
             <string name="Name">TetherMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -1288,11 +2132,11 @@ return T
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="17">
+      <Item class="Folder" referent="19">
         <Properties>
           <string name="Name">Rig</string>
         </Properties>
-        <Item class="ModuleScript" referent="18">
+        <Item class="ModuleScript" referent="20">
           <Properties>
             <string name="Name">Setae</string>
             <string name="Source"><![CDATA[--!strict
@@ -1423,7 +2267,7 @@ return Setae
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="19">
+        <Item class="ModuleScript" referent="21">
           <Properties>
             <string name="Name">SpiderRig</string>
             <string name="Source"><![CDATA[--!strict
@@ -1936,25 +2780,328 @@ return SpiderRig
           </Properties>
         </Item>
       </Item>
+      <Item class="Folder" referent="22">
+        <Properties>
+          <string name="Name">UI</string>
+        </Properties>
+        <Item class="ModuleScript" referent="23">
+          <Properties>
+            <string name="Name">ControlText</string>
+            <string name="Source"><![CDATA[--!strict
+-- Words on the screen, written for the device the player is using now: keyboard and mouse, a controller, or touch.
+-- The texts are the frozen Godot game's (scripts/presentation/jump_feedback.gd, key_names.gd and jump_hud.gd at c87ce00);
+-- where Godot wrote both keys ("Q / B"), each device here names only its own key or button. Pure: tests/run.luau checks
+-- every prompt without Roblox.
+local ControlText = {}
+
+export type Device = "keyboard" | "gamepad" | "touch"
+
+ControlText.TITLES = {
+	reachable = "Reachable",
+	obstructed = "Blocked",
+	unreachable = "Out of reach",
+	ineligible = "Can't land there",
+	none = "No surface in view",
+}
+ControlText.REASONS = {
+	ok = "",
+	no_target = "no surface in view",
+	ineligible_surface = "the spider cannot hold on there",
+	too_far = "too far or too high",
+	no_launch = "no way to leave this surface toward there",
+	no_arrival = "it can't land from that angle",
+	no_durations = "out of range",
+	no_room = "no room to land",
+	path_blocked = "something is in the way",
+	graze = "it would only graze the surface",
+	hop_blocked = "something is in the way",
+	no_ground = "nothing to land on ahead",
+}
+ControlText.ANCHOR_TEXT = {
+	ok = "Safety line: anchored here",
+	no_silk = "No safety line: this surface won't hold silk",
+	too_long = "No safety line: this jump needs more line than you have",
+	no_support = "",
+}
+ControlText.LINE_TITLE = "On your line"
+ControlText.LINE_TITLE_REELING = "On your line: reeling in"
+ControlText.LINE_BLOCKED = {
+	blocked = "Can't reel in: something is in the way. Lower, or let go",
+	shortest = "Reeled in as far as it goes",
+	snagged = "The line is caught on a second edge and can't be reeled in. Lower, or let go",
+}
+ControlText.DROP_REFUSED = {
+	no_edge = "Nothing below to let yourself down into from here",
+	no_silk = "This surface won't hold your silk",
+	no_support = "",
+	stuck = "Couldn't get to the edge",
+}
+ControlText.DROP_WALK = "To the edge, to let yourself down"
+
+-- What each device calls the controls. Godot's input_setup.gd bindings; the port keeps the D-pad for walking, so lowering on
+-- silk is X on a controller (ROBLOX-05). Touch names are the on-screen buttons.
+local NAMES: { [string]: { [string]: string } } = {
+	keyboard = {
+		jump = "Space", cancel = "Q", letGo = "Q", drop = "F", reel = "W", lower = "S", walk = "WASD", look = "Mouse",
+		creep = "Shift", focus = "Right mouse", eye = "V", recenter = "R", slow = "T", reset = "Backspace", help = "H", zoom = "Wheel",
+	},
+	gamepad = {
+		jump = "A", cancel = "B", letGo = "B", drop = "X", reel = "Stick up", lower = "Stick down", walk = "Left stick",
+		look = "Right stick", creep = "LB", focus = "LT", eye = "Y", recenter = "Right-stick click", slow = "RT", reset = "View",
+		help = "", zoom = "",
+	},
+	touch = {
+		jump = "Jump", cancel = "Cancel", letGo = "Let go", drop = "Silk", reel = "↑", lower = "↓", walk = "Arrows",
+		look = "Drag", creep = "Creep", focus = "", eye = "Eye", recenter = "Recenter", slow = "", reset = "", help = "", zoom = "",
+	},
+}
+
+function ControlText.name(device: Device, action: string): string
+	return (NAMES[device] or NAMES.keyboard)[action] or ""
+end
+
+-- The device whose names to show after an input of this UserInputType (its Enum name). Anything else keeps the previous one.
+function ControlText.deviceFor(inputType: string, previous: Device): Device
+	if inputType == "Touch" then return "touch" end
+	if string.sub(inputType, 1, 7) == "Gamepad" then return "gamepad" end
+	if inputType == "Keyboard" or inputType == "TextInput" or string.sub(inputType, 1, 5) == "Mouse" then return "keyboard" end
+	return previous
+end
+
+-- Before any input: a touch-only device shows touch, a controller without a keyboard (a console) shows the controller.
+function ControlText.initialDevice(touch: boolean, keyboard: boolean, gamepad: boolean): Device
+	if touch and not keyboard then return "touch" end
+	if gamepad and not keyboard then return "gamepad" end
+	return "keyboard"
+end
+
+function ControlText.reason(plan: any): string
+	if plan == nil then return "" end
+	return ControlText.REASONS[plan.reason] or tostring(plan.reason or "")
+end
+
+-- The two lines at the reticle while aiming (JumpFeedback.describe, hold mode) and Godot's cancel hint beside the second.
+function ControlText.describe(plan: any, device: Device): (string, string)
+	local cancel = ControlText.name(device, "cancel") .. ": cancel the jump"
+	if plan == nil then
+		return ControlText.TITLES.none, "release to cancel    " .. cancel
+	end
+	local kind = plan.kind
+	local valid = kind == "reachable"
+	local title = ControlText.TITLES[kind] or kind
+	if not valid and kind ~= "none" then
+		local why = ControlText.reason(plan)
+		if why ~= "" then title = title .. ": " .. why end
+	end
+	return title, (if valid then "release to leap" else "release to cancel") .. "    " .. cancel
+end
+
+function ControlText.anchorText(reason: string): string
+	return ControlText.ANCHOR_TEXT[reason] or ""
+end
+
+-- The toast for a jump outcome (JumpFeedback.toast): "" for outcomes that need none.
+function ControlText.toast(kind: string, plan: any): string
+	local why = ControlText.reason(plan)
+	if kind == "refused" then
+		return "Jump cancelled: " .. (if why ~= "" then why else "nothing to land on")
+	elseif kind == "hop_refused" then
+		return "No hop: " .. (if why ~= "" then why else "nowhere to land")
+	elseif kind == "cancelled" then
+		return "Jump cancelled"
+	elseif kind == "out_of_bounds" then
+		return "Out of bounds: back to the last safe spot"
+	end
+	return ""
+end
+
+-- The toast for a line event (JumpFeedback.line_toast). afterMiss: the line had been locked by a miss; dropped: the spider
+-- let itself down on this line (the line taking its weight is no surprise then).
+function ControlText.lineToast(kind: string, detail: string, afterMiss: boolean, dropped: boolean, device: Device): string
+	if kind == "caught" then
+		return if dropped then "" else "Caught by your line"
+	elseif kind == "drop_walk" then
+		return ControlText.DROP_WALK
+	elseif kind == "dropped" then
+		return `Letting yourself down: hold {ControlText.name(device, "drop")} to lower, {ControlText.name(device, "reel")} to climb`
+	elseif kind == "drop_refused" then
+		return ControlText.DROP_REFUSED[detail] or ""
+	elseif kind == "completed" then
+		return if afterMiss then "Holding on again. The line stays behind for a moment" else ""
+	elseif kind == "released" then
+		return "You let go of the line"
+	elseif kind == "lost" then
+		return "Your line came loose: its anchor is gone"
+	elseif kind == "blocked" then
+		return ControlText.LINE_BLOCKED[detail] or ""
+	elseif kind == "snagged" then
+		return ControlText.LINE_BLOCKED.snagged
+	end
+	return ""
+end
+
+-- The panel at the bottom while on the line: its title, the line's own prompts (distinct from cancelling an aim) and a cue.
+-- ctx: reeling, progress (0..1 of a deliberate let-go hold), snagged, block ("", "blocked", "shortest").
+function ControlText.linePanel(ctx: any, device: Device): (string, string, string)
+	local title = if ctx.reeling then ControlText.LINE_TITLE_REELING else ControlText.LINE_TITLE
+	local hint = `{ControlText.name(device, "reel")}: reel in    {ControlText.name(device, "lower")}: lower    hold {ControlText.name(device, "letGo")}: let go`
+	local cue = ""
+	if (ctx.progress or 0) > 0 then
+		cue = `Letting go... {math.floor(ctx.progress * 100 + 0.5)}%`
+	elseif ctx.snagged then
+		cue = ControlText.LINE_BLOCKED.snagged
+	elseif ctx.block and ctx.block ~= "" then
+		cue = ControlText.LINE_BLOCKED[ctx.block] or ""
+	end
+	return title, hint, cue
+end
+
+-- Walking (port-only reminder, shown small): how to jump and how to let down on silk.
+function ControlText.walkHint(device: Device): string
+	local j = ControlText.name(device, "jump")
+	return `Tap {j}: hop    hold {j}: aim a leap    {ControlText.name(device, "drop")}: let yourself down on silk`
+end
+
+-- Walking to an edge to let down: what stops it.
+function ControlText.edgeWalkHint(device: Device): string
+	return `{ControlText.DROP_WALK}    {ControlText.name(device, "cancel")} or move: stop`
+end
+
+-- The touch Cancel button's words: on the line it is the let-go button (held), elsewhere it cancels.
+function ControlText.touchCancelLabel(onLine: boolean): string
+	return if onLine then "Let go\n(hold)" else "Cancel"
+end
+
+-- The controls card (H): the device's own bindings, one action per line pair.
+function ControlText.helpCard(device: Device): string
+	if device == "gamepad" then
+		return table.concat({
+			"Left stick walk   Right stick look   LB creep",
+			"Tap A hop   Hold A aim, release to leap   B cancel",
+			"X lower on silk   On the line: stick up reel, down lower, hold B let go",
+			"Y spider-eye view   Right-stick click recenter   LT focus   RT slow motion",
+			"View back to the start",
+		}, "\n")
+	elseif device == "touch" then
+		return table.concat({
+			"Arrows walk   Drag to look   Creep (hold)",
+			"Tap Jump hop   Hold Jump aim, release to leap   Cancel",
+			"Silk lowers on silk   On the line: ↑ reel, ↓ lower, hold Let go",
+			"Eye spider-eye view   Recenter",
+		}, "\n")
+	end
+	return table.concat({
+		"WASD walk   Mouse look   Shift creep",
+		"Tap Space hop   Hold Space aim, release to leap   Q cancel",
+		"F lower on silk   On the line: W reel, S lower, hold Q let go",
+		"V spider-eye view   R recenter   Right mouse focus   T slow motion",
+		"Wheel zoom   Backspace back to start   G gait   H hide this",
+	}, "\n")
+end
+
+return ControlText
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="24">
+          <Properties>
+            <string name="Name">HudLayout</string>
+            <string name="Source"><![CDATA[--!strict
+-- Where the on-screen controls and the prompt panel go, in the safe area (ScreenInsets.CoreUISafeInsets: clear of notches,
+-- the home bar and Roblox's top bar). Pure, so tests/run.luau checks that prompts never sit under a touch button and stay
+-- wide enough to read, at phone, tablet and desktop sizes. SpiderInput builds the touch buttons from TOUCH_BUTTONS.
+local HudLayout = {}
+
+export type Button = { action: string, label: string, x: number, y: number, size: number, right: boolean, textSize: number? }
+export type Rect = { x0: number, y0: number, x1: number, y1: number }
+
+-- x, y: the button's top-left corner as an offset from the safe area's bottom-left (right = false) or bottom-right corner.
+HudLayout.TOUCH_BUTTONS = {
+	{ action = "Forward", label = "↑", x = 78, y = -188, size = 52, right = false },
+	{ action = "Left", label = "←", x = 22, y = -132, size = 52, right = false },
+	{ action = "Back", label = "↓", x = 78, y = -76, size = 52, right = false },
+	{ action = "Right", label = "→", x = 134, y = -132, size = 52, right = false },
+	{ action = "Jump", label = "Jump\n(hold)", x = -92, y = -102, size = 72, right = true },
+	{ action = "Cancel", label = "Cancel", x = -166, y = -92, size = 60, right = true, textSize = 16 },
+	{ action = "Creep", label = "Creep", x = -86, y = -172, size = 60, right = true },
+	{ action = "Drop", label = "Silk", x = -86, y = -242, size = 60, right = true },
+	{ action = "Recenter", label = "Re-\ncenter", x = -160, y = -168, size = 52, right = true, textSize = 14 },
+	{ action = "Eye", label = "Eye", x = -156, y = -242, size = 60, right = true },
+} :: { Button }
+
+HudLayout.GAP = 12
+HudLayout.MIN_PROMPT_WIDTH = 260
+HudLayout.MAX_PROMPT_WIDTH = 760
+
+function HudLayout.buttonRect(b: Button, width: number, height: number): Rect
+	local x0 = if b.right then width + b.x else b.x
+	local y0 = height + b.y
+	return { x0 = x0, y0 = y0, x1 = x0 + b.size, y1 = y0 + b.size }
+end
+
+-- The touch buttons' combined top edge and the inner edges of the two thumb clusters.
+local function clusters(width: number, height: number): (number, number, number)
+	local leftEdge, rightEdge, top = 0, width, height
+	for _, b in HudLayout.TOUCH_BUTTONS do
+		local r = HudLayout.buttonRect(b, width, height)
+		if b.right then rightEdge = math.min(rightEdge, r.x0) else leftEdge = math.max(leftEdge, r.x1) end
+		top = math.min(top, r.y0)
+	end
+	return leftEdge, rightEdge, top
+end
+
+-- The prompt panel's horizontal span and its bottom edge (it grows upward as it wraps) for a safe area of this size.
+-- Keyboard and controller: centred near the bottom. Touch: between the thumb clusters when that leaves room to read,
+-- otherwise above them.
+function HudLayout.promptSpan(width: number, height: number, device: string): (number, number, number)
+	local gap = HudLayout.GAP
+	local x0, x1, bottom
+	if device == "touch" then
+		local leftEdge, rightEdge, top = clusters(width, height)
+		if rightEdge - leftEdge - 2 * gap >= HudLayout.MIN_PROMPT_WIDTH then
+			x0, x1, bottom = leftEdge + gap, rightEdge - gap, height - gap
+		else
+			x0, x1, bottom = gap, width - gap, top - gap
+		end
+	else
+		x0, x1, bottom = 24, width - 24, height - 16
+	end
+	local extra = (x1 - x0) - HudLayout.MAX_PROMPT_WIDTH
+	if extra > 0 then
+		x0 += extra / 2
+		x1 -= extra / 2
+	end
+	return x0, x1, bottom
+end
+
+function HudLayout.overlaps(a: Rect, b: Rect): boolean
+	return a.x0 < b.x1 and b.x0 < a.x1 and a.y0 < b.y1 and b.y0 < a.y1
+end
+
+return HudLayout
+]]></string>
+          </Properties>
+        </Item>
+      </Item>
     </Item>
   </Item>
-  <Item class="ServerScriptService" referent="20">
+  <Item class="ServerScriptService" referent="25">
     <Properties>
       <string name="Name">ServerScriptService</string>
     </Properties>
-    <Item class="Folder" referent="21">
+    <Item class="Folder" referent="26">
       <Properties>
         <string name="Name">PortTests</string>
       </Properties>
-      <Item class="ModuleScript" referent="22">
+      <Item class="ModuleScript" referent="27">
         <Properties>
           <string name="Name">BuildInfo</string>
           <string name="Source"><![CDATA[-- Generated by tools/build.py; do not edit.
-return { id = "9ecf8affd5a3e2b2" }
+return { id = "bc55c36ded6a9137" }
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Script" referent="23">
+      <Item class="Script" referent="28">
         <Properties>
           <string name="Name">Runner</string>
           <token name="RunContext">0</token>
@@ -1989,7 +3136,7 @@ if failed > 0 then warn("PORT_TEST_FAIL") end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="24">
+      <Item class="ModuleScript" referent="29">
         <Properties>
           <string name="Name">SilkSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -2105,7 +3252,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="25">
+      <Item class="ModuleScript" referent="30">
         <Properties>
           <string name="Name">Spec</string>
           <string name="Source"><![CDATA[--!strict
@@ -2195,11 +3342,11 @@ end
         </Properties>
       </Item>
     </Item>
-    <Item class="Folder" referent="26">
+    <Item class="Folder" referent="31">
       <Properties>
         <string name="Name">Server</string>
       </Properties>
-      <Item class="Script" referent="27">
+      <Item class="Script" referent="32">
         <Properties>
           <string name="Name">Main</string>
           <token name="RunContext">0</token>
@@ -2341,19 +3488,19 @@ dof.InFocusRadius = 3.5
       </Item>
     </Item>
   </Item>
-  <Item class="StarterPlayer" referent="28">
+  <Item class="StarterPlayer" referent="33">
     <Properties>
       <string name="Name">StarterPlayer</string>
     </Properties>
-    <Item class="StarterPlayerScripts" referent="29">
+    <Item class="StarterPlayerScripts" referent="34">
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="Folder" referent="30">
+      <Item class="Folder" referent="35">
         <Properties>
           <string name="Name">Client</string>
         </Properties>
-        <Item class="ModuleScript" referent="31">
+        <Item class="ModuleScript" referent="36">
           <Properties>
             <string name="Name">SpiderCamera</string>
             <string name="Source"><![CDATA[--!strict
@@ -2625,219 +3772,83 @@ return SpiderCamera
 ]]></string>
           </Properties>
         </Item>
-        <Item class="LocalScript" referent="32">
+        <Item class="LocalScript" referent="37">
           <Properties>
             <string name="Name">SpiderClient</string>
             <string name="Source"><![CDATA[--!strict
--- The playable spider: a client-side, kinematic port of the Godot motor's core (scripts/movement/spider_motor.gd,
--- jump_controller.gd, jump_planner.gd, player_controller.gd and tether_controller.gd at the frozen c87ce00). It walks on
--- any attachable surface (floor, walls, undersides, over edges), plans, aims and flies jumps solved by the shared JumpMath
--- at a fixed 60 Hz tick, pays out a safety line from every leap off silk-holding ground (SilkController: catch, hang,
--- reel, lower, edge-first lowering, deliberate let-go), and drives the procedural SpiderRig. The camera is SpiderCamera
--- (a port of camera_rig.gd).
+-- The playable spider. Wires one control scheme (SpiderInput: keyboard and mouse, controller and touch together) to the
+-- Godot jump controller's phases (Shared/Movement/JumpInput), the body (Shared/Movement/SpiderMotor: walking on any
+-- surface, hops and aimed leaps, the safety line), the camera (SpiderCamera, a port of camera_rig.gd), the drawn spider
+-- (SpiderRig) and the screen (SpiderHud, words from Shared/UI/ControlText for the device in use). Ports the frozen Godot
+-- game at c87ce00: scripts/core/input_setup.gd, player_controller.gd, jump_controller.gd, tether_controller.gd.
 --
--- Controls (as the Godot game, see SpiderInput): WASD walk relative to the view, mouse looks, Shift creeps.
--- Tap Space: a short hop. Hold Space (0.15 s): the spider holds still and the reticle aims at any surface; the landing patch
--- says Reachable / Blocked / Out of reach / Can't land there; release to leap, Q cancels. F lowers on silk; on the line
--- W reels in, S lowers, hold Q lets go. V spider-eye view, R recenter, right mouse Focus (turn to look where the camera
--- points), T slow motion, H controls card, Backspace back to the start.
+-- Controls (README.md has the full table): WASD walk relative to the view, mouse looks, Shift creeps. Tap Space: a short
+-- hop. Hold Space (0.15 s): the spider holds still and turns toward the centre dot; the landing patch says Reachable /
+-- Blocked / Out of reach / Can't land there; release to leap, Q cancels. F lets down on silk (to the nearest edge first on
+-- top of a leaf). On the line W reels in, S lowers and holding Q lets go. V spider-eye view, R recenter, right mouse Focus,
+-- T slow motion, H controls card, Backspace back to the start, Esc the Roblox menu (the game waits).
 
+local GuiService = game:GetService("GuiService")
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
 local Workspace = game:GetService("Workspace")
 local SpiderInput = require(script.Parent.SpiderInput)
 local SpiderCamera = require(script.Parent.SpiderCamera)
+local SpiderHud = require(script.Parent.SpiderHud)
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
-local JumpMath = require(Shared:WaitForChild("Movement"):WaitForChild("JumpMath"))
-local SupportMath = require(Shared:WaitForChild("Movement"):WaitForChild("SupportMath"))
-local SilkController = require(Shared:WaitForChild("Movement"):WaitForChild("SilkController"))
+local Movement = Shared:WaitForChild("Movement")
+local SupportMath = require(Movement:WaitForChild("SupportMath"))
+local SpiderMotor = require(Movement:WaitForChild("SpiderMotor"))
+local JumpInput = require(Movement:WaitForChild("JumpInput"))
+local ControlText = require(Shared:WaitForChild("UI"):WaitForChild("ControlText"))
 local Species = require(Shared:WaitForChild("Data"):WaitForChild("Species"))
 local Surfaces = require(Shared:WaitForChild("Data"):WaitForChild("Surfaces"))
 local Layout = require(Shared:WaitForChild("Habitat"):WaitForChild("WindowsillLayout"))
 local SpiderRig = require(Shared:WaitForChild("Rig"):WaitForChild("SpiderRig"))
 
-local profile = Species.phidippus_audax_prototype
-local LOCO = profile.locomotion
-local DT = 1 / 60
-local G = Vector3.new(0, -LOCO.gravity_wu_s2, 0)
-local HEIGHT = 0.31 -- body centre above the support plane: radius 0.3 + skin 0.01 (Godot seat distance)
-local SWEEP_RADIUS = 0.303 -- body radius + JumpPlanner.SWEEP_MARGIN
-local TURN_RATE = math.rad(540)
-local FOCUS_RATE = math.rad(180) -- Godot FOCUS_TURN_FALLBACK_DEG_S
-local HOLD_TICKS = 9 -- JumpController.HOLD_SECONDS 0.15 at 60 Hz: a shorter press is a hop
-local AIM_RANGE = 60
-local HOP_DISTANCE = 1.5
-local HOP_PROBE_UP, HOP_PROBE_DOWN = 0.5, 1.2
-local MAX_DRIFT = 0.15
-local CONTACT_EXTRA_STEPS = 8
-local FLASH_TICKS = 60
+local DT = SpiderMotor.DT
 local SLOW_SPEED = 0.5
 local MAX_DRAGLINES = 24 -- two segments per one-bend line
-local STAND_COS = math.cos(math.rad(JumpMath.STAND_MAX_DEG)) - 1e-6
-
-local player = Players.LocalPlayer
-local camera = Workspace.CurrentCamera
-local sill = Workspace:WaitForChild("Windowsill")
-
-local params = RaycastParams.new()
-params.FilterType = Enum.RaycastFilterType.Include
-params.FilterDescendantsInstances = { sill }
-local overlap = OverlapParams.new()
-overlap.FilterType = Enum.RaycastFilterType.Include
-overlap.FilterDescendantsInstances = { sill }
-
-local UIS = game:GetService("UserInputService")
--- Touch-only devices get the lighter fuzz until a real tablet frame-time check (ROBLOX_PORT.md).
-local rig = SpiderRig.new(Workspace, sill, nil, if UIS.TouchEnabled and not UIS.KeyboardEnabled then "low" else "full")
-local silk: any = SilkController.new(sill, Surfaces, profile.silk, LOCO.gravity_wu_s2)
-local cam: any = nil
-
-type Mode = "attached" | "air"
-type Phase = "idle" | "pressed" | "aiming"
-local state = {
-	mode = "attached" :: Mode,
-	pos = Layout.SPAWN + Vector3.new(0, HEIGHT, 0),
-	up = Vector3.yAxis,
-	heading = Layout.SPAWN_HEADING,
-	vel = Vector3.zero,
-	drawnUp = Vector3.yAxis,
-	moving = false,
-	phase = "idle" :: Phase,
-	heldTicks = 0,
-	plan = nil :: any,
-	planKey = "",
-	flash = nil :: any,
-	flashLeft = 0,
-	flightTicks = 0,
-	flightLimit = 0,
-	eyeTurning = false,
-	slow = false,
-}
-local events: { string } = {}
-
-local function profileOf(inst: Instance?): any
-	if not inst then return nil end
-	local id = inst:GetAttribute("ProfileId")
-	return if typeof(id) == "string" then Surfaces[id] else nil
-end
-
-local function attachable(hit: RaycastResult?): boolean
-	if not hit then return false end
-	local p = profileOf(hit.Instance)
-	return p ~= nil and p.attachable == true
-end
-
--- SurfaceProfile.supports: an attachable surface, or any floor flat enough to stand on.
-local function supports(p: any, normal: Vector3): boolean
-	if p ~= nil and p.attachable then return true end
-	return normal.Magnitude > 1e-5 and normal.Unit:Dot(Vector3.yAxis) >= STAND_COS
-end
-
-local function rotationBetween(a: Vector3, b: Vector3): CFrame
-	local angle = SupportMath.angleTo(a, b)
-	if angle < 1e-6 then return CFrame.identity end
-	local axis = a:Cross(b)
-	if axis:Dot(axis) < 1e-12 then axis = SupportMath.anyPerpendicular(a) end
-	return CFrame.fromAxisAngle(axis.Unit, angle)
-end
-
-local function setSupport(hit: RaycastResult)
-	local turn = rotationBetween(state.up, hit.Normal)
-	state.heading = SupportMath.tangentDir(turn * state.heading, hit.Normal)
-	if state.heading == Vector3.zero then state.heading = SupportMath.anyPerpendicular(hit.Normal) end
-	state.up = hit.Normal
-	state.pos = hit.Position + hit.Normal * HEIGHT
-end
-
--- ---------------------------------------------------------------- HUD: reticle, aim feedback, status, controls card
-local hud = Instance.new("ScreenGui")
-hud.Name = "SpiderHud"
-hud.ResetOnSpawn = false
-hud.IgnoreGuiInset = true
-hud.Parent = player:WaitForChild("PlayerGui")
-local function label(name: string, pos: UDim2, anchor: Vector2, size: UDim2, textSize: number): TextLabel
-	local l = Instance.new("TextLabel")
-	l.Name = name
-	l.BackgroundColor3 = Color3.new(0, 0, 0)
-	l.BackgroundTransparency = 0.45
-	l.TextColor3 = Color3.new(1, 1, 1)
-	l.Font = Enum.Font.GothamMedium
-	l.TextSize = textSize
-	l.TextWrapped = false -- lines are broken by hand; wrapping with automatic size would collapse the label
-	l.AnchorPoint = anchor
-	l.Position = pos
-	l.Size = size
-	l.AutomaticSize = Enum.AutomaticSize.XY
-	l.Visible = false
-	local pad = Instance.new("UIPadding")
-	pad.PaddingLeft, pad.PaddingRight = UDim.new(0, 10), UDim.new(0, 10)
-	pad.PaddingTop, pad.PaddingBottom = UDim.new(0, 5), UDim.new(0, 5)
-	pad.Parent = l
-	local c = Instance.new("UICorner")
-	c.CornerRadius = UDim.new(0, 8)
-	c.Parent = l
-	l.Parent = hud
-	return l
-end
-local reticle = Instance.new("Frame")
-reticle.Name = "Reticle"
-reticle.AnchorPoint = Vector2.new(0.5, 0.5)
-reticle.Position = UDim2.fromScale(0.5, 0.5)
-reticle.Size = UDim2.fromOffset(6, 6)
-reticle.BackgroundColor3 = Color3.new(1, 1, 1)
-reticle.Visible = false
-local rc = Instance.new("UICorner")
-rc.CornerRadius = UDim.new(1, 0)
-rc.Parent = reticle
-local stroke = Instance.new("UIStroke")
-stroke.Color = Color3.new(0, 0, 0)
-stroke.Thickness = 1.5
-stroke.Parent = reticle
-reticle.Parent = hud
-local ticks: { Frame } = {}
-for i, off in { Vector2.new(-16, 0), Vector2.new(16, 0), Vector2.new(0, -16), Vector2.new(0, 16) } do
-	local t = Instance.new("Frame")
-	t.AnchorPoint = Vector2.new(0.5, 0.5)
-	t.Position = UDim2.new(0.5, off.X, 0.5, off.Y)
-	t.Size = if i <= 2 then UDim2.fromOffset(8, 2) else UDim2.fromOffset(2, 8)
-	t.BackgroundColor3 = Color3.new(1, 1, 1)
-	t.BorderSizePixel = 0
-	t.Visible = false
-	t.Parent = hud
-	ticks[i] = t
-end
-local aimLabel = label("AimFeedback", UDim2.new(0.5, 0, 0.5, 28), Vector2.new(0.5, 0), UDim2.fromOffset(0, 0), 17)
-local statusLabel = label("Status", UDim2.new(0.5, 0, 0, 58), Vector2.new(0.5, 0), UDim2.fromOffset(0, 0), 16)
-local silkLabel = label("SilkStatus", UDim2.new(0.5, 0, 1, -18), Vector2.new(0.5, 1), UDim2.fromOffset(0, 0), 16)
-local help = label("Controls", UDim2.new(0, 14, 1, -14), Vector2.new(0, 1), UDim2.fromOffset(0, 0), 15)
-help.TextXAlignment = Enum.TextXAlignment.Left
-help.Text = table.concat({
-	"WASD walk   Mouse look   Shift creep",
-	"Tap Space hop   Hold Space aim, release to leap   Q cancel",
-	"F lower on silk   On the line: W reel, S lower, hold Q let go",
-	"V spider-eye view   R recenter   Right mouse focus   T slow motion",
-	"Wheel zoom   Backspace back to start   G gait   H hide this",
-	"Controller: sticks, A jump, B cancel, X silk, Y eye view, LB creep, LT focus, RT slow",
-}, "\n")
-help.Visible = true
-local helpUntil = os.clock() + 20
-
-local TITLES = { reachable = "Reachable", obstructed = "Blocked", unreachable = "Out of reach", ineligible = "Can't land there", none = "No surface in view" }
-local REASONS = {
-	ok = "", no_target = "no surface in view", ineligible_surface = "the spider cannot hold on there", too_far = "too far or too high",
-	no_launch = "no way to leave this surface toward there", no_arrival = "it can't land from that angle", no_durations = "out of range",
-	no_room = "no room to land", path_blocked = "something is in the way", graze = "it would only graze the surface",
-	hop_blocked = "something is in the way", no_ground = "nothing to land on ahead",
-}
+local WALK_HINT_SECONDS = 60
+local PATCH_GROW_FROM = 6 -- studs from the camera; beyond it the patch grows with distance (up to 4x), as in Godot
 local COLORS = {
 	reachable = Color3.new(0.25, 0.92, 0.38), obstructed = Color3.new(1.0, 0.72, 0.1),
 	unreachable = Color3.new(1.0, 0.32, 0.28), ineligible = Color3.new(0.72, 0.45, 1.0), none = Color3.new(0.8, 0.8, 0.8),
 }
+local WARN_EVENTS = { drop_refused = true, snagged = true, lost = true, blocked = true }
 
--- ---------------------------------------------------------------- safety-line rendering (mechanics in SilkController)
+local player = Players.LocalPlayer
+local camera = Workspace.CurrentCamera
+local sill = Workspace:WaitForChild("Windowsill")
+local params = RaycastParams.new()
+params.FilterType = Enum.RaycastFilterType.Include
+params.FilterDescendantsInstances = { sill }
+
+local arc = Instance.new("Folder")
+arc.Name = "JumpArc"
+arc.Parent = Workspace
+local motor: any = SpiderMotor.new({
+	world = sill, surfaces = Surfaces, profile = Species.phidippus_audax_prototype,
+	spawn = Layout.SPAWN, heading = Layout.SPAWN_HEADING,
+	boundsMin = Layout.PLAY_BOUNDS_MIN, boundsMax = Layout.PLAY_BOUNDS_MAX, probeParent = arc,
+})
+local jump: any = JumpInput.new()
+-- Touch-only devices get the lighter fuzz until a real tablet frame-time check (ROBLOX_PORT.md).
+local rig = SpiderRig.new(Workspace, sill, nil, if UIS.TouchEnabled and not UIS.KeyboardEnabled then "low" else "full")
+local hud = SpiderHud.new(player:WaitForChild("PlayerGui"))
+local device: ControlText.Device = ControlText.initialDevice(UIS.TouchEnabled, UIS.KeyboardEnabled, UIS.GamepadEnabled)
+local drawnUp = Vector3.yAxis
+local slow = false
+local helpVisible, helpUntil = true, os.clock() + 20
+local started = os.clock()
+local afterMiss, dropped = false, false
+local lastFeedback: any = nil
+
+-- ---------------------------------------------------------------- the safety line as drawn (mechanics in SilkController)
 local lines = Instance.new("Folder")
 lines.Name = "Draglines"
 lines.Parent = Workspace
@@ -2874,10 +3885,15 @@ local function beginStrands()
 	bendLine = bend
 end
 
+local function dropStrands(keep: boolean)
+	if not keep then
+		if liveLine then liveLine:Destroy() end
+		if bendLine then bendLine:Destroy() end
+	end
+	liveLine, bendLine = nil, nil
+end
+
 -- ---------------------------------------------------------------- jump preview: arc and landing patch
-local arc = Instance.new("Folder")
-arc.Name = "JumpArc"
-arc.Parent = Workspace
 local dots: { Part } = {}
 local function display(p: Part)
 	p.Anchored = true
@@ -2900,16 +3916,13 @@ end
 local patch = Instance.new("Part")
 patch.Name = "LandingPatch"
 patch.Shape = Enum.PartType.Cylinder
-patch.Size = Vector3.new(0.02, 0.9, 0.9)
 display(patch)
 local ring = Instance.new("Part")
 ring.Name = "LandingRing"
 ring.Shape = Enum.PartType.Cylinder
-ring.Size = Vector3.new(0.012, 1.15, 1.15)
 display(ring)
 local cross = Instance.new("Part")
 cross.Name = "BlockedMark"
-cross.Size = Vector3.new(0.5, 0.05, 0.05)
 display(cross)
 
 local function hidePreview()
@@ -2919,8 +3932,14 @@ end
 
 local function showPlan(plan: any)
 	hidePreview()
-	if not plan or plan.kind == "none" then return end
-	local color = COLORS[plan.kind]
+	if not plan or plan.kind == "none" or not plan.point then return end
+	local color = COLORS[plan.kind] or COLORS.none
+	-- Beyond 6 studs from the camera the whole patch grows with the distance (up to four times), so it stays readable;
+	-- its centre is still the exact landing point.
+	local grow = math.clamp((camera.CFrame.Position - plan.point).Magnitude / PATCH_GROW_FROM, 1, 4)
+	patch.Size = Vector3.new(0.02, 0.9 * grow, 0.9 * grow)
+	ring.Size = Vector3.new(0.012, 1.15 * grow, 1.15 * grow)
+	cross.Size = Vector3.new(0.5 * grow, 0.05 * grow, 0.05 * grow)
 	local face = CFrame.lookAt(plan.point + plan.normal * 0.012, plan.point + plan.normal * 2) * CFrame.Angles(0, math.pi / 2, 0)
 	patch.Color, ring.Color = color, color
 	patch.CFrame = face
@@ -2943,491 +3962,201 @@ local function showPlan(plan: any)
 	end
 end
 
--- ---------------------------------------------------------------- the planner (port of jump_planner.gd)
-local fitBall = Instance.new("Part")
-fitBall.Shape = Enum.PartType.Ball
-fitBall.Size = Vector3.one * (SWEEP_RADIUS * 2)
-fitBall.Anchored = true
-fitBall.CanCollide = false
-fitBall.CanQuery = false
-fitBall.CanTouch = false
-fitBall.Transparency = 1
-fitBall.Name = "RoomProbe"
-fitBall.Parent = arc
-
-local function sweep(a: Vector3, b: Vector3): Vector3?
-	local d = b - a
-	if d.Magnitude < 1e-6 then return nil end
-	local hit = Workspace:Spherecast(a, SWEEP_RADIUS, d, params)
-	return if hit then a + d.Unit * hit.Distance else nil
-end
-
-local function fits(center: Vector3): boolean
-	fitBall.CFrame = CFrame.new(center)
-	return #Workspace:GetPartsInPart(fitBall, overlap) == 0
-end
-
-local function tryCandidate(origin: Vector3, seat: Vector3, c: any): (boolean, string, { Vector3 }, Vector3?)
-	local pts = JumpMath.path(origin, c.velocity, G, DT, c.steps)
-	for k = 2, #pts do
-		local at = sweep(pts[k - 1], pts[k])
-		if at then
-			local cut = table.move(pts, 1, k - 1, 1, {})
-			table.insert(cut, at)
-			return false, "path_blocked", cut, at
-		end
-	end
-	local v = JumpMath.velocityAfter(c.velocity, G, DT, c.steps)
-	local p = pts[#pts]
-	for _ = 1, CONTACT_EXTRA_STEPS do
-		v += G * DT
-		local nextP = p + v * DT
-		local at = sweep(p, nextP)
-		if at then
-			if (at - seat).Magnitude <= MAX_DRIFT then return true, "ok", pts, nil end
-			return false, "graze", pts, at
-		end
-		p = nextP
-	end
-	return false, "graze", pts, seat
-end
-
--- target: the surface point, its normal and the part it belongs to (nil inst: no surface).
-local function planJump(point: Vector3?, normal: Vector3?, inst: Instance?): any
-	if not point or not normal then return { kind = "none", reason = "no_target" } end
-	local plan: any = { point = point, normal = normal, seat = point + normal * HEIGHT, kind = "unreachable", reason = "" }
-	if not supports(profileOf(inst), normal) then
-		plan.kind, plan.reason = "ineligible", "ineligible_surface"
-		return plan
-	end
-	local solved = JumpMath.solve(state.pos, plan.seat, state.up, normal, G, DT, LOCO.flight_time_min_s, LOCO.flight_time_max_s, LOCO.max_launch_speed_wu_s)
-	if #solved.valid == 0 then
-		plan.reason = solved.reason
-		return plan
-	end
-	if not fits(plan.seat) then
-		plan.kind, plan.reason = "obstructed", "no_room"
-		plan.path = JumpMath.path(state.pos, solved.valid[1].velocity, G, DT, solved.valid[1].steps)
-		plan.blockedAt = plan.seat
-		return plan
-	end
-	local firstPath, firstAt, anyBlocked = nil, nil, false
-	for _, c in solved.valid do
-		local ok, why, path, at = tryCandidate(state.pos, plan.seat, c)
-		if ok then
-			plan.kind, plan.reason, plan.path, plan.velocity, plan.steps = "reachable", "ok", path, c.velocity, c.steps
-			return plan
-		end
-		if not firstPath then firstPath, firstAt = path, at end
-		if why == "path_blocked" then anyBlocked = true end
-	end
-	plan.path, plan.blockedAt = firstPath, firstAt
-	plan.kind, plan.reason = if anyBlocked then "obstructed" else "unreachable", if anyBlocked then "path_blocked" else "graze"
-	return plan
-end
-
--- The aim: whatever the screen-centre ray meets (no target magnet). Re-planned only when the aim or the spider moves.
-local function aimPlan(): any
-	local origin, dir = cam:aimRay()
-	local hit = Workspace:Raycast(origin, dir * AIM_RANGE, params)
-	local key = if hit
-		then string.format("%.3f,%.3f,%.3f|%.3f,%.3f,%.3f|%.3f,%.3f,%.3f", hit.Position.X, hit.Position.Y, hit.Position.Z, hit.Normal.X, hit.Normal.Y, hit.Normal.Z, state.pos.X, state.pos.Y, state.pos.Z)
-		else "none"
-	if key ~= state.planKey or not state.plan then
-		state.planKey = key
-		state.plan = if hit then planJump(hit.Position, hit.Normal, hit.Instance) else planJump(nil, nil, nil)
-	end
-	return state.plan
-end
-
--- JumpMotor.plan_hop: the ground HOP_DISTANCE ahead, planned and checked exactly like an aimed jump.
-local function hopPlan(): any
-	local n = state.up
-	local h = SupportMath.tangentDir(state.heading, n)
-	if h == Vector3.zero then h = SupportMath.anyPerpendicular(n) end
-	local ahead = Workspace:Raycast(state.pos, h * (HOP_DISTANCE + HEIGHT), params)
-	if ahead then
-		return { kind = "obstructed", reason = "hop_blocked", point = ahead.Position, normal = ahead.Normal }
-	end
-	local finish = state.pos + h * HOP_DISTANCE
-	local ground = Workspace:Raycast(finish + n * HOP_PROBE_UP, -n * (HOP_PROBE_UP + HOP_PROBE_DOWN), params)
-	if not ground then
-		return { kind = "unreachable", reason = "no_ground", point = finish - n * HEIGHT, normal = n }
-	end
-	return planJump(ground.Position, ground.Normal, ground.Instance)
-end
-
-local function feedback(plan: any)
-	state.flash = plan
-	state.flashLeft = FLASH_TICKS
-end
-
-local function endAim()
-	state.phase = "idle"
-	state.heldTicks = 0
-	state.plan = nil
-	state.planKey = ""
-	cam:setAiming(false)
-	hidePreview()
-end
-
--- A committed leap anchors a safety line at takeoff where the ground holds silk (SilkController pays it out).
-local function launch(velocity: Vector3, steps: number)
-	local floorHit = Workspace:Raycast(state.pos, -state.up * (HEIGHT + 0.1), params)
-	if silk:anchorAt(floorHit, state.pos) then beginStrands() end
-	state.flightTicks, state.flightLimit = 0, steps + 4
-	state.vel = velocity
-	state.mode = "air"
-	hidePreview()
-end
-
-local function beginDrop(push: Vector3): boolean
-	if not silk:startDrop(state.pos, state.up, push) then return false end
-	beginStrands()
-	state.vel = push * 0.6
-	state.mode = "air"
-	endAim()
-	return true
-end
-
-local function requestDrop()
-	if state.mode ~= "attached" or state.phase == "aiming" or silk.walk then return end
-	local plan, message = silk:planDrop(state.pos, state.up, state.heading)
-	if not plan then silk.message = message; return end
-	if plan.direction.Magnitude < 1e-6 then
-		if beginDrop(state.up) then state.pos += state.up * 0.01 end
-	else
-		silk.walk = { direction = plan.direction, ticks = math.ceil((plan.distance / LOCO.walk_speed_wu_s + 1.5) * 60) }
-		silk.message = "Walking to the edge — move or cancel to stop"
-	end
-end
-
--- Jump input events are applied at the start of the next tick, so timing is counted in ticks.
-local function applyJumpEvents()
-	for _, e in events do
-		if e == "press" then
-			if state.mode == "attached" then
-				state.phase, state.heldTicks = "pressed", 0
-			end
-		elseif e == "release" then
-			if state.phase == "pressed" and state.mode == "attached" then
-				local plan = hopPlan()
-				if plan.kind == "reachable" then launch(plan.velocity, plan.steps) else feedback(plan) end
-				state.phase = "idle"
-			elseif state.phase == "aiming" then
-				local plan = aimPlan()
-				local attached = (state.mode :: string) == "attached"
-				endAim()
-				if plan.kind == "reachable" and attached then launch(plan.velocity, plan.steps) else feedback(plan) end
-			else
-				state.phase = "idle"
-			end
-		elseif e == "cancel" then
-			if state.phase == "aiming" then
-				endAim()
-				feedback({ kind = "none", reason = "cancelled" })
-			end
-			state.phase = "idle"
-		elseif e == "drop" then
-			endAim()
-		end
-	end
-	table.clear(events)
-end
-
-local function respawn()
-	state.mode = "attached"
-	state.pos = Layout.SPAWN + Vector3.new(0, HEIGHT, 0)
-	state.up = Vector3.yAxis
-	state.drawnUp = Vector3.yAxis
-	state.heading = Layout.SPAWN_HEADING
-	state.vel = Vector3.zero
-	silk:clear()
-	liveLine, bendLine = nil, nil
-	endAim()
-	cam:snap()
-end
-
--- ---------------------------------------------------------------- the fixed tick
-local controls: any = nil
-
-local function wish(): Vector3
-	local r, f = controls:axes()
-	if f == 0 and r == 0 then return Vector3.zero end
-	local d = cam:mapStick(r, f, state.up)
-	return if d.Magnitude > 1e-6 then d.Unit else Vector3.zero
-end
-
-local function turnToward(dir: Vector3, rate: number)
-	local t = SupportMath.tangentDir(dir, state.up)
-	if t ~= Vector3.zero then
-		state.heading = SupportMath.tangentDir(SupportMath.rotateToward(state.heading, t, rate * DT), state.up)
-	end
-end
-
--- Focus (PlayerController.focus_direction) and the spider-eye turn: standing still, the body turns to look.
-local function lookTurns(stickIdle: boolean)
-	if controls.held.Focus then
-		local origin, dir = cam:aimRay()
-		local hit = Workspace:Raycast(origin, dir * 60, params)
-		local eye = state.pos + state.heading * 0.45
-		local to = if hit then hit.Position - eye else dir
-		turnToward(if to.Magnitude > 0.2 then to else dir, FOCUS_RATE)
-		state.eyeTurning = false
-		return
-	end
-	if not cam.eyeView or not stickIdle then
-		state.eyeTurning = false
-		return
-	end
-	local look = SupportMath.tangentDir(cam.gaze, state.up)
-	if look == Vector3.zero then return end
-	local off = math.deg(SupportMath.angleTo(state.heading, look))
-	if not state.eyeTurning and off > 30 then
-		state.eyeTurning = true
-	elseif state.eyeTurning and off < 4 then
-		state.eyeTurning = false
-	end
-	if state.eyeTurning then turnToward(look, FOCUS_RATE) end
-end
-
-local function tickAttached()
-	local preparing = state.phase == "aiming"
-	local manual = if preparing then Vector3.zero else wish()
-	if silk.walk and manual.Magnitude > 0 then silk.walk = nil; silk.message = "Edge walk cancelled" end
-	local dir = if preparing then Vector3.zero elseif silk.walk then silk.walk.direction else manual
-	if silk.walk then
-		silk.walk.ticks -= 1
-		if silk.walk.ticks <= 0 then silk.walk = nil; silk.message = "Edge walk stopped"; return end
-	end
-	state.moving = dir ~= Vector3.zero
-	if not preparing and not silk.walk then lookTurns(not state.moving) end
-	if not state.moving then
-		-- Re-seat on the support so a vanished or moved surface is noticed.
-		local below = Workspace:Raycast(state.pos + state.up * 0.1, -state.up * (HEIGHT + 0.35), params)
-		if not attachable(below) and not (below and supports(profileOf(below.Instance), below.Normal)) then
-			state.mode = "air"
-			state.vel = Vector3.zero
-			events = { "drop" }
-		end
-		return
-	end
-	local stalk = controls.held.Creep == true and not silk.walk
-	local speed = if stalk then LOCO.stalk_speed_wu_s else LOCO.walk_speed_wu_s
-	state.heading = SupportMath.tangentDir(SupportMath.rotateToward(state.heading, dir, TURN_RATE * DT), state.up)
-	local step = dir * speed * DT
-	-- Concave corner: a wall (or a leaf's edge, a stem) ahead becomes the new support.
-	local ahead = Workspace:Raycast(state.pos, dir * (HEIGHT + step.Magnitude + 0.02), params)
-	if ahead and attachable(ahead) and SupportMath.angleTo(ahead.Normal, state.up) > math.rad(20) then
-		setSupport(ahead)
-		return
-	end
-	local nextPos = state.pos + step
-	local below = Workspace:Raycast(nextPos + state.up * 0.25, -state.up * (HEIGHT + 0.5), params)
-	if below and attachable(below) and SupportMath.angleTo(below.Normal, state.up) < math.rad(60) then
-		local n = SupportMath.filterNormal(state.up, below.Normal, 2.0)
-		state.up = n
-		state.pos = below.Position + n * HEIGHT
-		state.heading = SupportMath.tangentDir(state.heading, n)
-		return
-	end
-	if silk.walk then
-		-- The walk to the edge reached it: let down from here (edge-first lowering, SilkController).
-		if beginDrop(dir) then state.pos = nextPos + dir * (HEIGHT + 0.02) end
-		return
-	end
-	-- Convex edge: wrap over it onto the face beyond (sill edge, leaf rim, the top of a wall).
-	local around = Workspace:Raycast(nextPos - state.up * (HEIGHT + 0.15), -dir * 1.0, params)
-	if around and attachable(around) then
-		setSupport(around)
-		return
-	end
-	state.mode = "air"
-	state.vel = dir * speed
-end
-
-local function tickAir()
-	if silk.mode == "locked" then
-		-- On the line (spec 17's context override): forward reels in, back lowers, F held lowers, a held Q lets go.
-		local _, forward = controls:axes()
-		local intent = if controls.held.Drop then math.min(forward, 0) - 1 else forward
-		local hit
-		state.pos, state.vel, hit = silk:step(state.pos, state.vel, math.clamp(intent, -1, 1), controls.held.Cancel == true)
-		if hit then
-			setSupport(hit)
-			state.vel = Vector3.zero
-			state.mode = "attached"
-			silk:clear()
-			liveLine, bendLine = nil, nil
-		end
-		return
-	end
-	state.flightTicks += 1
-	local from = state.pos
-	state.vel += G * DT
-	local to = from + state.vel * DT
-	local travel = to - from
-	local dir = if travel.Magnitude > 1e-6 then travel.Unit else -state.up
-	local hit = Workspace:Raycast(from, dir * (travel.Magnitude + HEIGHT), params)
-	if hit then
-		local approach = -state.vel:Dot(hit.Normal)
-		if supports(profileOf(hit.Instance), hit.Normal) and approach >= JumpMath.minApproach(hit.Normal) then
-			local heading = SupportMath.tangentDir(state.vel, hit.Normal)
-			setSupport(hit)
-			if heading ~= Vector3.zero then state.heading = heading end
-			state.vel = Vector3.zero
-			state.mode = "attached"
-			liveLine, bendLine = nil, nil
-			silk:clear()
-			return
-		end
-		-- Not landable here: the line locks (a miss), and the body slides along it.
-		if silk.mode == "payout" then silk:lock(state.pos, 0.25) end
-		state.vel -= hit.Normal * math.min(0, state.vel:Dot(hit.Normal))
-		to = hit.Position + hit.Normal * HEIGHT
-	end
-	state.pos = to
-	silk:payout(to)
-	if silk.mode == "payout" and state.flightTicks >= state.flightLimit then silk:lock(to, 0.25) end
-	-- The drawn body turns upright while falling.
-	state.up = SupportMath.rotateToward(state.up, Vector3.yAxis, math.rad(240) * DT)
-	local lo, hi = Layout.PLAY_BOUNDS_MIN, Layout.PLAY_BOUNDS_MAX
-	if to.X < lo.X or to.Y < lo.Y or to.Z < lo.Z or to.X > hi.X or to.Y > hi.Y or to.Z > hi.Z then
-		respawn()
-	end
-end
-
-local function tick()
-	applyJumpEvents()
-	if state.mode == "attached" then
-		if state.phase == "pressed" then
-			state.heldTicks += 1
-			if state.heldTicks >= HOLD_TICKS then
-				state.phase = "aiming"
-				state.plan = nil
-				state.planKey = ""
-				cam:setAiming(true)
-			end
-		end
-		tickAttached()
-	else
-		if state.phase ~= "idle" then endAim() end
-		tickAir()
-	end
-	if state.flashLeft > 0 then
-		state.flashLeft -= 1
-		if state.flashLeft == 0 then state.flash = nil end
-	end
-end
-
 -- ---------------------------------------------------------------- camera and input
-cam = SpiderCamera.new(camera, params, function()
-	return { pos = state.pos, drawnUp = state.drawnUp, heading = state.heading }
+local cam: any = SpiderCamera.new(camera, params, function()
+	return {
+		pos = motor.pos, drawnUp = drawnUp, heading = motor.heading,
+		onLine = motor:onLine(), rest = motor:lineRestPoint(), lip = motor:lineLip(),
+	}
 end, function(on: boolean)
 	rig:setEyeView(on)
 end)
 cam.hide = function(hidden: boolean)
 	rig:setBodyHidden(hidden)
 end
+jump.onAim = function(on: boolean)
+	cam:setAiming(on)
+end
 
-controls = SpiderInput.bind({
+-- Everything held is dropped with no penalty and no message: focus loss, the Roblox menu, a text box, a lost controller.
+local function dropAll()
+	jump:drop(motor)
+	local release = motor.silk.release
+	release.down, release.counts, release.held, release.progress = true, false, 0, 0
+	motor:cancelWalk()
+end
+
+local function backToStart()
+	jump:drop(motor)
+	motor:respawn()
+	dropStrands(false)
+	drawnUp = motor.up
+	cam:snap()
+end
+
+local controls: any = SpiderInput.bind({
 	jump = function(phase: string)
-		if phase == "begin" and silk.walk then silk.walk = nil; silk.message = "Edge walk cancelled" end
-		table.insert(events, if phase == "begin" then "press" elseif phase == "end" then "release" else "cancel")
+		if phase == "begin" then
+			motor:cancelWalk() -- a jump press takes over from a walk to the edge
+			jump:press()
+		elseif phase == "end" then
+			jump:release()
+		else
+			jump:cancel()
+		end
 	end,
-	-- Q / B / touch: the same button cancels an aim, stops a walk to the edge (and is nothing else's then), and, held on
-	-- the line, lets go (SilkController counts only a fresh press after the grace, held 0.6 s).
+	-- Q / B / touch Cancel (Let go on the line): the same button cancels an aim, stops a walk to the edge (and is nothing
+	-- else's then) and, held on the line, lets go; SilkController counts only a fresh press after the 0.4 s grace, held 0.6 s.
 	cancel = function(phase: string)
 		if phase ~= "begin" then return end
-		if silk.walk then
-			silk.walk = nil
-			silk.message = "Edge walk cancelled"
-			return
-		end
-		table.insert(events, "cancel")
+		if motor:cancelWalk() then return end
+		jump:cancel()
 	end,
-	drop = function() requestDrop() end,
-	-- Focus loss, a text box, a lost controller: every press and hold is dropped, with no penalty and no message.
-	clear = function()
-		table.clear(events)
-		table.insert(events, "drop")
-		silk.release.down = true
-		silk.release.counts = false
-		silk.release.held = 0
-		silk.release.progress = 0
-		silk.walk = nil
-	end,
-	reset = respawn,
+	drop = function() motor:requestDrop() end,
+	clear = dropAll,
+	reset = backToStart,
 	gait = function() rig.gaitMode = if rig.gaitMode == "Tetrapod" then "Unilateral" else "Tetrapod" end,
 	eye = function() cam:toggleEyeView() end,
 	recenter = function() cam:startRecenter() end,
-	slow = function() state.slow = not state.slow end,
+	slow = function() slow = not slow end,
 	touchLook = function(delta: Vector2) cam:touchLook(delta) end,
 	help = function()
-		help.Visible = not help.Visible
+		helpVisible = not helpVisible
 		helpUntil = math.huge
+	end,
+	device = function(name: string)
+		device = ControlText.deviceFor(name, device)
 	end,
 })
 
-local function updateHud()
-	local aiming = state.phase == "aiming"
-	reticle.Visible = aiming or controls.held.Focus == true or cam.eyeView
-	for _, t in ticks do t.Visible = controls.held.Focus == true end
-	local shown = if aiming then state.plan else state.flash
-	if shown then
-		local title = TITLES[shown.kind] or ""
-		local why = REASONS[shown.reason] or ""
-		if shown.reason == "cancelled" then
-			aimLabel.Text = "Jump cancelled"
-		elseif aiming then
-			local hint = if shown.kind == "reachable" then "release to leap   Q cancels" else "release to cancel"
-			aimLabel.Text = (if why ~= "" and shown.kind ~= "reachable" then title .. ": " .. why else title) .. "\n" .. hint
-		else
-			aimLabel.Text = if why ~= "" then title .. ": " .. why else title
-		end
-		aimLabel.TextColor3 = COLORS[shown.kind] or COLORS.none
-		aimLabel.Visible = true
-	else
-		aimLabel.Visible = false
+-- One fixed tick's intent from the controls, for the motor.
+local function tickInput(): any
+	local r, f = controls:axes()
+	local wish = Vector3.zero
+	if r ~= 0 or f ~= 0 then
+		local d = cam:mapStick(r, f, motor.up)
+		if d.Magnitude > 1e-6 then wish = d.Unit end
 	end
-	if aiming then showPlan(state.plan) elseif state.flash and state.flash.point then showPlan(state.flash) else hidePreview() end
-	local status = {}
-	if cam.eyeView then table.insert(status, "SPIDER-EYE VIEW    V / Y: back") end
-	if state.slow then table.insert(status, `SLOW MOTION {math.floor(SLOW_SPEED * 100)}%    T / RT: normal speed`) end
-	statusLabel.Text = table.concat(status, "\n")
-	statusLabel.Visible = #status > 0
-	local progress = silk.release.progress
-	silkLabel.Text = if silk.mode == "locked" then silk.message .. "\nW / ↑: reel   S / ↓: lower   hold Q / B / Let go" .. (if progress > 0 then ` ({math.floor(progress * 100)}%)` else "")
-		elseif silk.walk then silk.message
-		else (if silk.message ~= "" then silk.message .. "\n" else "") .. "F / X / Silk: lower on silk"
-	silkLabel.Visible = state.phase ~= "aiming"
-	if os.clock() > helpUntil and help.Visible then help.Visible = false end
+	local focusPoint: Vector3? = nil
+	if controls.held.Focus then
+		local origin, dir = cam:aimRay()
+		local hit = Workspace:Raycast(origin, dir * SpiderMotor.AIM_RANGE, params)
+		focusPoint = if hit then hit.Position else origin + dir * SpiderMotor.AIM_RANGE
+	end
+	return {
+		wish = wish, creep = controls.held.Creep == true, reel = f,
+		dropHeld = controls.held.Drop == true, releaseHeld = controls.held.Cancel == true,
+		focusPoint = focusPoint, gaze = if cam.eyeView then cam.gaze else nil,
+	}
 end
 
+-- ---------------------------------------------------------------- the screen
+local function handleEvents()
+	for _, e in motor:drainEvents() do
+		local kind = if e.kind == "landed" then "completed" else e.kind
+		if kind == "locked" then afterMiss = true elseif kind == "dropped" then dropped = true end
+		if kind == "anchored" or kind == "dropped" then beginStrands() end
+		if kind == "completed" then dropStrands(true) end
+		if kind == "released" or kind == "lost" or kind == "out_of_bounds" then dropStrands(false) end
+		if kind == "out_of_bounds" then
+			hud:toast(ControlText.toast("out_of_bounds", nil), true)
+			drawnUp = motor.up
+			cam:snap()
+		else
+			hud:toast(ControlText.lineToast(kind, e.detail, afterMiss, dropped, device), WARN_EVENTS[kind] == true)
+		end
+		if kind == "completed" or kind == "released" or kind == "lost" or kind == "anchored" then
+			afterMiss, dropped = false, false
+		end
+	end
+	local last = jump.last
+	if last and last ~= lastFeedback then
+		lastFeedback = last
+		hud:toast(ControlText.toast(last.kind, last.plan), last.kind ~= "cancelled")
+	end
+end
+
+local function updateHud(frameDt: number)
+	handleEvents()
+	local aiming = jump:isAiming()
+	local view: any = {
+		device = device, aiming = aiming, focus = controls.held.Focus == true, eyeView = cam.eyeView,
+		status = {}, helpVisible = helpVisible, helpText = ControlText.helpCard(device),
+	}
+	if aiming then
+		local plan = jump.plan
+		local title, hint = ControlText.describe(plan, device)
+		view.aimTitle, view.aimHint = title, hint
+		view.aimColor = COLORS[if plan then plan.kind else "none"] or COLORS.none
+		local reason = motor:anchorPreview(plan)
+		view.anchorText, view.anchorOk = ControlText.anchorText(reason), reason == "ok"
+		showPlan(plan)
+	elseif jump.flash then
+		showPlan(jump.flash)
+	else
+		hidePreview()
+	end
+	if cam.eyeView then table.insert(view.status, `SPIDER-EYE VIEW    {ControlText.name(device, "eye")}: back`) end
+	if slow then
+		local key = ControlText.name(device, "slow")
+		table.insert(view.status, `SLOW MOTION {math.floor(SLOW_SPEED * 100)}%` .. (if key ~= "" then `    {key}: normal speed` else ""))
+	end
+	local silk = motor.silk
+	local onLine = motor:onLine()
+	if onLine then
+		local _, f = controls:axes()
+		local title, hint, cue = ControlText.linePanel({
+			reeling = f > 0.2 and silk.block == "" and not silk.snagged,
+			progress = silk.release.progress, snagged = silk.snagged, block = silk.block,
+		}, device)
+		view.prompt = { title = title, hint = hint, cue = cue }
+	elseif silk.walk then
+		view.prompt = { hint = ControlText.edgeWalkHint(device) }
+	elseif motor.mode == "attached" and not aiming and (helpVisible or os.clock() - started < WALK_HINT_SECONDS) then
+		view.prompt = { hint = ControlText.walkHint(device) }
+	end
+	if os.clock() > helpUntil and helpVisible then helpVisible = false end
+	controls:setTouchLabel("Cancel", ControlText.touchCancelLabel(onLine))
+	controls:setTouchVisible("Jump", not onLine)
+	controls:setTouchVisible("Creep", not onLine)
+	hud:update(view, frameDt)
+end
+
+-- ---------------------------------------------------------------- the frame
 local accumulator = 0
 RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, function(frameDt: number)
-	local simDt = frameDt * (if state.slow then SLOW_SPEED else 1)
-	accumulator = math.min(accumulator + simDt, 0.25)
-	while accumulator >= DT do
-		accumulator -= DT
-		tick()
-		cam:tick(DT)
-		if state.phase == "aiming" then aimPlan() end
+	if GuiService.MenuIsOpen then
+		accumulator = 0 -- the Roblox menu is Godot's pause: the world waits
+	else
+		local simDt = frameDt * (if slow then SLOW_SPEED else 1)
+		accumulator = math.min(accumulator + simDt, 0.25)
+		local origin, dir = cam:aimRay()
+		motor:setAimRay(origin, dir)
+		while accumulator >= DT do
+			accumulator -= DT
+			jump:step(motor)
+			motor:tick(tickInput())
+			cam:tick(DT)
+		end
 	end
 	-- Drawn frame: the up vector eases so walls and edges do not snap.
-	state.drawnUp = state.drawnUp:Lerp(state.up, 1 - math.exp(-24 * simDt)).Unit
-	local body = SupportMath.bodyCFrame(state.pos, state.drawnUp, state.heading)
-	rig:update(body, simDt, state.mode == "attached", state.moving)
+	local simFrame = frameDt * (if slow then SLOW_SPEED else 1)
+	drawnUp = drawnUp:Lerp(motor.up, 1 - math.exp(-24 * simFrame)).Unit
+	local body = SupportMath.bodyCFrame(motor.pos, drawnUp, motor.heading)
+	rig:update(body, simFrame, motor.mode == "attached", motor.moving)
+	updateHud(frameDt)
+	local silk = motor.silk
 	local live, bend = liveLine, bendLine
 	if live and bend and silk.mode ~= "none" then
 		local tip = rig:spinneretPoint(body)
 		strand(silk.anchor, silk.bend or tip, live)
 		live.Transparency = 0.35
-		if silk.bend then strand(silk.bend, tip, bend); bend.Transparency = 0.35 else bend.Transparency = 1 end
-	elseif live then
-		live:Destroy()
-		liveLine = nil
-		if bend then bend:Destroy(); bendLine = nil end
+		if silk.bend then
+			strand(silk.bend, tip, bend)
+			bend.Transparency = 0.35
+		else
+			bend.Transparency = 1
+		end
 	end
 	for _, line in lines:GetChildren() do
 		if line ~= liveLine and line ~= bendLine and line:IsA("BasePart") then
@@ -3439,10 +4168,9 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	-- Looking runs in real time, so slow motion never makes the camera sluggish.
 	local lx, ly = controls:lookAxes()
 	cam:render(frameDt, lx, ly)
-	updateHud()
 	local dof = Lighting:FindFirstChild("MacroDOF")
 	if dof and dof:IsA("DepthOfFieldEffect") then
-		local focus = (camera.CFrame.Position - state.pos).Magnitude
+		local focus = (camera.CFrame.Position - motor.pos).Magnitude
 		if cam.eyeView then
 			local origin, dir = cam:aimRay()
 			local hit = Workspace:Raycast(origin, dir * 40, params)
@@ -3457,39 +4185,296 @@ local playback = script.Parent:FindFirstChild("SilkPlayback")
 if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
 	task.spawn(function()
 		local run: any = (require :: any)(playback)
-		run({input = controls, drop = requestDrop,
+		run({
+			input = controls,
+			drop = function() motor:requestDrop() end,
+			jump = jump,
+			motor = motor,
+			camera = cam,
 			place = function(position: Vector3)
-				controls:clear(); respawn(); state.pos = position; state.up = Vector3.yAxis; state.heading = Vector3.zAxis
+				controls:clear()
+				jump:drop(motor)
+				motor:place(position, Vector3.yAxis, Vector3.zAxis)
+				dropStrands(false)
+				drawnUp = motor.up
 				cam:snap()
 			end,
-			get = function() return {mode = state.mode, line = silk.mode, taut = silk.taut, position = state.pos, walking = silk.walk ~= nil} end})
+			get = function()
+				return { mode = motor.mode, line = motor.silk.mode, taut = motor.silk.taut, position = motor.pos, walking = motor.silk.walk ~= nil }
+			end,
+		})
 	end)
 end
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="33">
+        <Item class="ModuleScript" referent="38">
+          <Properties>
+            <string name="Name">SpiderHud</string>
+            <string name="Source"><![CDATA[--!strict
+-- The spider's screen: the centre dot and Focus ticks, the aim's words under them (Godot jump_hud.gd), a status line and
+-- short toasts at the top, the controls card, and the prompt panel at the bottom (the line's own prompts while hanging,
+-- what stops a walk to the edge, or a small reminder while walking). Words come from Shared/UI/ControlText for the device
+-- in use. Everything but the centre dot sits in the safe area (ScreenInsets.CoreUISafeInsets) and wraps; the prompt panel
+-- keeps clear of the touch buttons (Shared/UI/HudLayout).
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local HudLayout = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("UI"):WaitForChild("HudLayout"))
+
+local Hud = {}
+Hud.__index = Hud
+
+local TOAST_SECONDS = 2.6
+local OK_COLOR = Color3.new(0.92, 0.94, 0.98)
+local WARN_COLOR = Color3.new(1.0, 0.72, 0.1)
+
+local function corner(parent: Instance, r: number)
+	local c = Instance.new("UICorner")
+	c.CornerRadius = UDim.new(0, r)
+	c.Parent = parent
+end
+
+local function pad(parent: Instance, x: number, y: number)
+	local p = Instance.new("UIPadding")
+	p.PaddingLeft, p.PaddingRight = UDim.new(0, x), UDim.new(0, x)
+	p.PaddingTop, p.PaddingBottom = UDim.new(0, y), UDim.new(0, y)
+	p.Parent = parent
+end
+
+-- A label that keeps its width and wraps, growing downward (the safe way to wrap with AutomaticSize).
+local function wrapLabel(name: string, parent: Instance, textSize: number, order: number): TextLabel
+	local l = Instance.new("TextLabel")
+	l.Name = name
+	l.BackgroundColor3 = Color3.new(0, 0, 0)
+	l.BackgroundTransparency = 0.4
+	l.TextColor3 = Color3.new(1, 1, 1)
+	l.Font = Enum.Font.GothamMedium
+	l.TextSize = textSize
+	l.TextWrapped = true
+	l.RichText = false
+	l.Size = UDim2.new(1, 0, 0, 0)
+	l.AutomaticSize = Enum.AutomaticSize.Y
+	l.LayoutOrder = order
+	l.Visible = false
+	pad(l, 10, 5)
+	corner(l, 8)
+	l.Parent = parent
+	return l
+end
+
+-- A short label sized to its text (single lines broken by hand), for the aim words at the centre.
+local function pill(name: string, parent: Instance, textSize: number, order: number): TextLabel
+	local l = Instance.new("TextLabel")
+	l.Name = name
+	l.BackgroundColor3 = Color3.new(0, 0, 0)
+	l.BackgroundTransparency = 0.45
+	l.TextColor3 = Color3.new(1, 1, 1)
+	l.Font = Enum.Font.GothamMedium
+	l.TextSize = textSize
+	l.TextWrapped = false
+	l.AutomaticSize = Enum.AutomaticSize.XY
+	l.Size = UDim2.fromOffset(0, 0)
+	l.LayoutOrder = order
+	l.Visible = false
+	pad(l, 10, 4)
+	corner(l, 8)
+	l.Parent = parent
+	return l
+end
+
+local function column(name: string, parent: Instance, anchor: Vector2, position: UDim2, align: Enum.VerticalAlignment): Frame
+	local f = Instance.new("Frame")
+	f.Name = name
+	f.BackgroundTransparency = 1
+	f.AnchorPoint = anchor
+	f.Position = position
+	f.Size = UDim2.new(1, -32, 0, 0)
+	f.AutomaticSize = Enum.AutomaticSize.Y
+	local list = Instance.new("UIListLayout")
+	list.FillDirection = Enum.FillDirection.Vertical
+	list.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	list.VerticalAlignment = align
+	list.SortOrder = Enum.SortOrder.LayoutOrder
+	list.Padding = UDim.new(0, 6)
+	list.Parent = f
+	local limit = Instance.new("UISizeConstraint")
+	limit.MaxSize = Vector2.new(HudLayout.MAX_PROMPT_WIDTH, math.huge)
+	limit.Parent = f
+	f.Parent = parent
+	return f
+end
+
+function Hud.new(playerGui: Instance): any
+	-- The centre dot must be at the true viewport centre (the camera's aim ray), so this layer ignores the insets.
+	local centre = Instance.new("ScreenGui")
+	centre.Name = "SpiderHud"
+	centre.ResetOnSpawn = false
+	centre.IgnoreGuiInset = true
+	centre.ScreenInsets = Enum.ScreenInsets.None
+	centre.Parent = playerGui
+	local reticle = Instance.new("Frame")
+	reticle.Name = "Reticle"
+	reticle.AnchorPoint = Vector2.new(0.5, 0.5)
+	reticle.Position = UDim2.fromScale(0.5, 0.5)
+	reticle.Size = UDim2.fromOffset(6, 6)
+	reticle.BackgroundColor3 = Color3.new(1, 1, 1)
+	reticle.Visible = false
+	corner(reticle, 3)
+	local stroke = Instance.new("UIStroke")
+	stroke.Color = Color3.new(0, 0, 0)
+	stroke.Thickness = 1.5
+	stroke.Parent = reticle
+	reticle.Parent = centre
+	local ticks: { Frame } = {}
+	for i, off in { Vector2.new(-16, 0), Vector2.new(16, 0), Vector2.new(0, -16), Vector2.new(0, 16) } do
+		local t = Instance.new("Frame")
+		t.AnchorPoint = Vector2.new(0.5, 0.5)
+		t.Position = UDim2.new(0.5, off.X, 0.5, off.Y)
+		t.Size = if i <= 2 then UDim2.fromOffset(8, 2) else UDim2.fromOffset(2, 8)
+		t.BackgroundColor3 = Color3.new(1, 1, 1)
+		t.BorderSizePixel = 0
+		t.Visible = false
+		t.Parent = centre
+		ticks[i] = t
+	end
+	local aimBox = Instance.new("Frame")
+	aimBox.Name = "AimBox"
+	aimBox.BackgroundTransparency = 1
+	aimBox.AnchorPoint = Vector2.new(0.5, 0)
+	aimBox.Position = UDim2.new(0.5, 0, 0.5, 24)
+	aimBox.Size = UDim2.fromOffset(0, 0)
+	aimBox.AutomaticSize = Enum.AutomaticSize.XY
+	local aimList = Instance.new("UIListLayout")
+	aimList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	aimList.SortOrder = Enum.SortOrder.LayoutOrder
+	aimList.Padding = UDim.new(0, 3)
+	aimList.Parent = aimBox
+	aimBox.Parent = centre
+	local aimTitle = pill("AimTitle", aimBox, 18, 1)
+	local aimHint = pill("AimHint", aimBox, 15, 2)
+	local anchorLabel = pill("Anchor", aimBox, 14, 3)
+
+	-- Everything else: inside the safe area.
+	local safe = Instance.new("ScreenGui")
+	safe.Name = "SpiderPrompts"
+	safe.ResetOnSpawn = false
+	safe.IgnoreGuiInset = false
+	safe.ScreenInsets = Enum.ScreenInsets.CoreUISafeInsets
+	safe.Parent = playerGui
+	local top = column("Top", safe, Vector2.new(0.5, 0), UDim2.new(0.5, 0, 0, 8), Enum.VerticalAlignment.Top)
+	local status = wrapLabel("Status", top, 16, 1)
+	local toast = wrapLabel("Toast", top, 17, 2)
+	local help = wrapLabel("Controls", top, 15, 3)
+	help.TextXAlignment = Enum.TextXAlignment.Left
+	local panel = Instance.new("Frame")
+	panel.Name = "PromptPanel"
+	panel.BackgroundTransparency = 1
+	panel.AnchorPoint = Vector2.new(0, 1)
+	panel.AutomaticSize = Enum.AutomaticSize.Y
+	local plist = Instance.new("UIListLayout")
+	plist.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	plist.VerticalAlignment = Enum.VerticalAlignment.Bottom
+	plist.SortOrder = Enum.SortOrder.LayoutOrder
+	plist.Padding = UDim.new(0, 4)
+	plist.Parent = panel
+	panel.Parent = safe
+	local promptTitle = wrapLabel("PromptTitle", panel, 17, 1)
+	promptTitle.Font = Enum.Font.GothamBold
+	local promptHint = wrapLabel("PromptHint", panel, 16, 2)
+	local promptCue = wrapLabel("PromptCue", panel, 16, 3)
+	promptCue.TextColor3 = WARN_COLOR
+	local self = setmetatable({
+		centre = centre, safe = safe, reticle = reticle, ticks = ticks,
+		aimTitle = aimTitle, aimHint = aimHint, anchorLabel = anchorLabel,
+		status = status, toastLabel = toast, help = help,
+		panel = panel, promptTitle = promptTitle, promptHint = promptHint, promptCue = promptCue,
+		toastLeft = 0, device = "keyboard", lastSpan = "",
+	}, Hud)
+	return self
+end
+
+function Hud.toast(self: any, text: string, warn: boolean?)
+	if text == "" then return end
+	self.toastLabel.Text = text
+	self.toastLabel.TextColor3 = if warn then WARN_COLOR else OK_COLOR
+	self.toastLabel.Visible = true
+	self.toastLeft = TOAST_SECONDS
+end
+
+local function show(label: TextLabel, text: string?)
+	local t = text or ""
+	if label.Text ~= t then label.Text = t end
+	label.Visible = t ~= ""
+end
+
+-- Places the prompt panel for the safe area's size and the device (HudLayout.promptSpan).
+function Hud._place(self: any)
+	local size = self.safe.AbsoluteSize
+	local x0, x1, bottom = HudLayout.promptSpan(size.X, size.Y, self.device)
+	local key = string.format("%.1f,%.1f,%.1f", x0, x1, bottom)
+	if key == self.lastSpan then return end
+	self.lastSpan = key
+	self.panel.Position = UDim2.fromOffset(x0, bottom)
+	self.panel.Size = UDim2.fromOffset(math.max(x1 - x0, 0), 0)
+end
+
+-- view: device, aiming, focus, eyeView, aimTitle, aimHint, aimColor, anchorText, anchorOk, status ({string}),
+-- prompt ({title, hint, cue} or nil), helpVisible, helpText.
+function Hud.update(self: any, view: any, dt: number)
+	self.device = view.device
+	self:_place()
+	self.reticle.Visible = view.aiming or view.focus or view.eyeView
+	for _, t in self.ticks do t.Visible = view.focus == true end
+	show(self.aimTitle, view.aimTitle)
+	if view.aimColor then self.aimTitle.TextColor3 = view.aimColor end
+	show(self.aimHint, view.aimHint)
+	show(self.anchorLabel, view.anchorText)
+	self.anchorLabel.TextColor3 = if view.anchorOk then OK_COLOR else WARN_COLOR
+	show(self.status, table.concat(view.status or {}, "\n"))
+	local prompt = view.prompt
+	show(self.promptTitle, if prompt then prompt.title else nil)
+	show(self.promptHint, if prompt then prompt.hint else nil)
+	show(self.promptCue, if prompt then prompt.cue else nil)
+	if view.helpVisible then show(self.help, view.helpText) else show(self.help, nil) end
+	if self.toastLeft > 0 then
+		self.toastLeft -= dt
+		if self.toastLeft <= 0 then self.toastLabel.Visible = false end
+	end
+end
+
+return Hud
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="39">
           <Properties>
             <string name="Name">SpiderInput</string>
             <string name="Source"><![CDATA[--!strict
--- One action path for keyboard, mouse, gamepad and held on-screen touch buttons.
+-- One action path for keyboard, mouse, gamepad and held on-screen touch buttons, all at once.
 -- Bindings follow the frozen Godot game's scripts/core/input_setup.gd wherever the action exists in the port:
---   walk WASD / left stick (D-pad too), look mouse / arrow keys / right stick, creep Shift / LB,
+--   walk WASD / left stick (D-pad too), look mouse / arrow keys / right stick / touch drag, creep Shift / LB,
 --   jump Space / A (tap hop, hold aim, release leap), cancel Q / B (cancels an aim or a walk to the edge; held on the
---   line it lets go, ROBLOX-05), focus right mouse / LT, spider-eye view V / Y, recenter R / middle mouse / right-stick
---   click, slow motion T / RT, lower on silk F / X (Godot: F / D-pad down; the port keeps the D-pad for walking).
+--   line it lets go), focus right mouse / LT, spider-eye view V / Y, recenter R / middle mouse / right-stick click,
+--   slow motion T / RT, lower on silk F / X (Godot: F / D-pad down; the port keeps the D-pad for walking, ROBLOX-05).
+--   Esc / Menu open Roblox's own menu: the game drops every press and hold and waits (Godot's pause).
 -- Port-only: reset to the start Backspace / View (Select), gait toggle G, controls card H (Godot's H is the field notes).
+--
+-- Every button action is held while any source holds it (InputState): a key, a controller button, a finger. Handlers hear
+-- one "begin" when the first source goes down and one "end" when the last comes up, so a touch hold and a key or button
+-- held at the same time never cancel each other.
 local CAS = game:GetService("ContextActionService")
+local GuiService = game:GetService("GuiService")
 local UIS = game:GetService("UserInputService")
 local Players = game:GetService("Players")
-local InputState = require(game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Movement"):WaitForChild("InputState"))
+local Shared = game:GetService("ReplicatedStorage"):WaitForChild("Shared")
+local InputState = require(Shared:WaitForChild("Movement"):WaitForChild("InputState"))
+local HudLayout = require(Shared:WaitForChild("UI"):WaitForChild("HudLayout"))
 local SpiderInput = {}
 
 export type Handlers = {
-	jump: (string) -> (),
+	jump: (string) -> (), -- "begin", "end", or "cancel" (the engine took the input away)
 	cancel: (string) -> (),
 	drop: () -> (),
-	clear: () -> (),
+	clear: () -> (), -- focus loss, the Roblox menu, a text box, a lost controller
 	reset: () -> (),
 	gait: () -> (),
 	eye: () -> (),
@@ -3497,49 +4482,59 @@ export type Handlers = {
 	slow: () -> (),
 	help: () -> (),
 	touchLook: (Vector2) -> (),
+	device: ((string) -> ())?, -- the last input's UserInputType name
 }
 
-local function phaseName(phase: Enum.UserInputState): string
-	return if phase == Enum.UserInputState.Begin then "begin" elseif phase == Enum.UserInputState.End then "end" else "cancel"
+local ONE_SHOT = { Reset = "reset", Gait = "gait", Eye = "eye", Recenter = "recenter", Slow = "slow", Help = "help" }
+
+-- Bindings by action. Exported for tests and the controls table in README.md.
+SpiderInput.BINDINGS = {
+	Forward = { Enum.KeyCode.W, Enum.KeyCode.DPadUp }, Back = { Enum.KeyCode.S, Enum.KeyCode.DPadDown },
+	Left = { Enum.KeyCode.A, Enum.KeyCode.DPadLeft }, Right = { Enum.KeyCode.D, Enum.KeyCode.DPadRight },
+	LookLeft = { Enum.KeyCode.Left }, LookRight = { Enum.KeyCode.Right }, LookUp = { Enum.KeyCode.Up }, LookDown = { Enum.KeyCode.Down },
+	Jump = { Enum.KeyCode.Space, Enum.KeyCode.ButtonA }, Cancel = { Enum.KeyCode.Q, Enum.KeyCode.ButtonB },
+	Drop = { Enum.KeyCode.F, Enum.KeyCode.ButtonX },
+	Creep = { Enum.KeyCode.LeftShift, Enum.KeyCode.RightShift, Enum.KeyCode.ButtonL1 },
+	Focus = { Enum.UserInputType.MouseButton2, Enum.KeyCode.ButtonL2 },
+	Eye = { Enum.KeyCode.V, Enum.KeyCode.ButtonY },
+	Recenter = { Enum.KeyCode.R, Enum.UserInputType.MouseButton3, Enum.KeyCode.ButtonR3 },
+	Slow = { Enum.KeyCode.T, Enum.KeyCode.ButtonR2 }, Help = { Enum.KeyCode.H },
+	Reset = { Enum.KeyCode.Backspace, Enum.KeyCode.ButtonSelect }, Gait = { Enum.KeyCode.G },
+} :: { [string]: { any } }
+
+local function sourceOf(input: InputObject?): any
+	if input == nil then return "default" end
+	local t = input.UserInputType
+	if t == Enum.UserInputType.Touch then return input end -- each finger is its own source
+	if t == Enum.UserInputType.Keyboard or string.sub(t.Name, 1, 7) == "Gamepad" then return input.KeyCode end
+	return t -- a mouse button
 end
 
 function SpiderInput.bind(h: Handlers)
 	local state = InputState.new()
-	local function act(action: string, phase: Enum.UserInputState)
-		local down = phase == Enum.UserInputState.Begin
+	local handlers: { [string]: any } = h :: any
+	-- One source of one action went down (down) or up; "cancel" means the engine took the input away (treated as up).
+	local function act(action: string, down: boolean, source: any, cancelled: boolean?)
+		local was, now = state:set(action, down, source)
+		if was == now then return end
 		if action == "Jump" then
-			h.jump(phaseName(phase))
+			h.jump(if now then "begin" elseif cancelled then "cancel" else "end")
 		elseif action == "Cancel" then
-			state:set(action, down)
-			h.cancel(phaseName(phase))
+			h.cancel(if now then "begin" else "end")
 		elseif action == "Drop" then
-			state:set(action, down)
-			if down then h.drop() end
-		elseif action == "Reset" then if down then h.reset() end
-		elseif action == "Gait" then if down then h.gait() end
-		elseif action == "Eye" then if down then h.eye() end
-		elseif action == "Recenter" then if down then h.recenter() end
-		elseif action == "Slow" then if down then h.slow() end
-		elseif action == "Help" then if down then h.help() end
-		else state:set(action, down) end
+			if now then h.drop() end
+		elseif ONE_SHOT[action] then
+			if now then handlers[ONE_SHOT[action]]() end
+		end
 	end
-	local bindings: {[string]: {any}} = {
-		Forward = {Enum.KeyCode.W, Enum.KeyCode.DPadUp}, Back = {Enum.KeyCode.S, Enum.KeyCode.DPadDown},
-		Left = {Enum.KeyCode.A, Enum.KeyCode.DPadLeft}, Right = {Enum.KeyCode.D, Enum.KeyCode.DPadRight},
-		LookLeft = {Enum.KeyCode.Left}, LookRight = {Enum.KeyCode.Right}, LookUp = {Enum.KeyCode.Up}, LookDown = {Enum.KeyCode.Down},
-		Jump = {Enum.KeyCode.Space, Enum.KeyCode.ButtonA}, Cancel = {Enum.KeyCode.Q, Enum.KeyCode.ButtonB},
-		Drop = {Enum.KeyCode.F, Enum.KeyCode.ButtonX},
-		Creep = {Enum.KeyCode.LeftShift, Enum.KeyCode.RightShift, Enum.KeyCode.ButtonL1},
-		Focus = {Enum.UserInputType.MouseButton2, Enum.KeyCode.ButtonL2},
-		Eye = {Enum.KeyCode.V, Enum.KeyCode.ButtonY},
-		Recenter = {Enum.KeyCode.R, Enum.UserInputType.MouseButton3, Enum.KeyCode.ButtonR3},
-		Slow = {Enum.KeyCode.T, Enum.KeyCode.ButtonR2}, Help = {Enum.KeyCode.H},
-		Reset = {Enum.KeyCode.Backspace, Enum.KeyCode.ButtonSelect}, Gait = {Enum.KeyCode.G},
-	}
-	for action, keys in bindings do
-		CAS:BindActionAtPriority("Spider" .. action, function(_, phase)
+	for action, keys in SpiderInput.BINDINGS do
+		CAS:BindActionAtPriority("Spider" .. action, function(_, phase, input)
 			if UIS:GetFocusedTextBox() then return Enum.ContextActionResult.Pass end
-			act(action, phase)
+			if phase == Enum.UserInputState.Begin then
+				act(action, true, sourceOf(input))
+			elseif phase == Enum.UserInputState.End or phase == Enum.UserInputState.Cancel then
+				act(action, false, sourceOf(input), phase == Enum.UserInputState.Cancel)
+			end
 			return Enum.ContextActionResult.Sink
 		end, false, 3000, table.unpack(keys))
 	end
@@ -3554,12 +4549,16 @@ function SpiderInput.bind(h: Handlers)
 		return Enum.ContextActionResult.Sink
 	end, false, 3000, Enum.KeyCode.Thumbstick2)
 
+	-- Roblox's own touch thumbstick and jump button would sit under ours: this game has its own touch controls.
+	pcall(function() GuiService.TouchControlsEnabled = false end)
 	local gui = Instance.new("ScreenGui")
 	gui.Name = "SpiderTouch"
 	gui.ResetOnSpawn = false
+	gui.ScreenInsets = Enum.ScreenInsets.CoreUISafeInsets -- clear of notches, the home bar and Roblox's top bar
 	gui.Enabled = UIS.TouchEnabled
 	gui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
-	local active: {[InputObject]: string} = {}
+	local active: { [InputObject]: string } = {}
+	local buttons: { [string]: TextButton } = {}
 	local function clear()
 		state:clear()
 		table.clear(active)
@@ -3570,11 +4569,13 @@ function SpiderInput.bind(h: Handlers)
 		b.Name = action
 		b.Text = label
 		b.TextSize = textSize or 18
+		b.TextWrapped = true
 		b.TextColor3 = Color3.new(1, 1, 1)
 		b.BackgroundColor3 = Color3.new(0.06, 0.06, 0.06)
 		b.BackgroundTransparency = 0.15
 		b.Size = UDim2.fromOffset(size, size)
 		b.Position = position
+		b.AutoButtonColor = true
 		b.Parent = gui
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(0, 14)
@@ -3582,22 +4583,22 @@ function SpiderInput.bind(h: Handlers)
 		b.InputBegan:Connect(function(input)
 			if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
 				active[input] = action
-				act(action, Enum.UserInputState.Begin)
+				act(action, true, input)
 			end
 		end)
+		buttons[action] = b
 	end
-	button("Forward", "↑", UDim2.new(0, 78, 1, -188), 52)
-	button("Left", "←", UDim2.new(0, 22, 1, -132), 52)
-	button("Back", "↓", UDim2.new(0, 78, 1, -76), 52)
-	button("Right", "→", UDim2.new(0, 134, 1, -132), 52)
-	button("Jump", "Jump\n(hold)", UDim2.new(1, -92, 1, -102), 72)
-	button("Creep", "Creep", UDim2.new(1, -86, 1, -172), 60)
-	button("Drop", "Silk", UDim2.new(1, -86, 1, -242), 60)
-	button("Cancel", "Cancel\nLet go", UDim2.new(1, -166, 1, -92), 60, 14)
-	button("Eye", "Eye", UDim2.new(1, -156, 1, -242), 60)
+	-- Left thumb: walking. Right thumb: jump (largest, nearest the corner), cancel / let go beside it, then creep, silk,
+	-- recenter and the eye view further in. Offsets from the safe area's bottom corners (HudLayout, checked in tests).
+	for _, b in HudLayout.TOUCH_BUTTONS do
+		button(b.action, b.label, if b.right then UDim2.new(1, b.x, 1, b.y) else UDim2.new(0, b.x, 1, b.y), b.size, b.textSize)
+	end
 	UIS.InputEnded:Connect(function(input)
 		local action = active[input]
-		if action then active[input] = nil; act(action, Enum.UserInputState.End) end
+		if action then
+			active[input] = nil
+			act(action, false, input)
+		end
 	end)
 	-- Touch look: a drag anywhere that is not on a button turns the view (Roblox marks button touches processed).
 	UIS.TouchMoved:Connect(function(input, processed)
@@ -3606,14 +4607,41 @@ function SpiderInput.bind(h: Handlers)
 	UIS.WindowFocusReleased:Connect(clear)
 	UIS.TextBoxFocused:Connect(clear)
 	UIS.GamepadDisconnected:Connect(clear)
+	GuiService.MenuOpened:Connect(clear)
 	UIS:GetPropertyChangedSignal("TouchEnabled"):Connect(function() gui.Enabled = UIS.TouchEnabled end)
-	return state
+	local deviceHandler = h.device
+	if deviceHandler then
+		UIS.LastInputTypeChanged:Connect(function(t: Enum.UserInputType) deviceHandler(t.Name) end)
+	end
+
+	-- The client relabels and shows/hides touch buttons with the state (the Cancel button is Let go on the line).
+	local api: any = state
+	function api.setTouchLabel(_self: any, action: string, text: string)
+		local b = buttons[action]
+		if b and b.Text ~= text then b.Text = text end
+	end
+	function api.setTouchVisible(_self: any, action: string, visible: boolean)
+		local b = buttons[action]
+		if b and b.Visible ~= visible then
+			b.Visible = visible
+			if not visible then
+				for input, a in active do
+					if a == action then
+						active[input] = nil
+						act(action, false, input)
+					end
+				end
+			end
+		end
+	end
+	api.touchGui = gui
+	return api
 end
 return SpiderInput
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="34">
+        <Item class="ModuleScript" referent="40">
           <Properties>
             <string name="Name">SilkPlayback</string>
             <string name="Source"><![CDATA[--!strict
@@ -3662,7 +4690,7 @@ end
       </Item>
     </Item>
   </Item>
-  <Item class="Workspace" referent="35">
+  <Item class="Workspace" referent="41">
     <Properties>
       <string name="Name">Workspace</string>
       <float name="Gravity">35</float>

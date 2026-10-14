@@ -66,11 +66,13 @@ local KNOBS = {
 	"palp.x", "palp.drop", "palp.reach", "palp.spread", "palp.stalk", "palp.club", "palp.tipRadii", "palp.fluff.hairs", "palp.fluff.length",
 	"palp.drumHz", "palp.drumDeg",
 	"limbs.hipX", "limbs.hipZ", "limbs.tipZ", "limbs.diameters", "limbs.thickness", "limbs.stance.x", "limbs.kneeLift", "limbs.pad",
-	"fuzz.enabled", "fuzz.locks.abdomen", "fuzz.locks.head", "fuzz.locks.length", "fuzz.locks.width", "fuzz.locks.flat", "fuzz.locks.lieBack",
-	"fuzz.locks.transparency", "fuzz.guard.abdomen", "fuzz.guard.length", "fuzz.guard.width", "fuzz.guard.transparency",
-	"fuzz.dark", "fuzz.grey", "fuzz.frost", "fuzz.shellColor", "fuzz.shells", "fuzz.headShell.zScale",
+	"fuzz.enabled", "fuzz.locks.abdomen", "fuzz.locks.head", "fuzz.locks.length", "fuzz.locks.width", "fuzz.locks.flat", "fuzz.locks.lift",
+	"fuzz.locks.yaw", "fuzz.locks.black", "fuzz.locks.transparency", "fuzz.guard.abdomen", "fuzz.guard.head", "fuzz.guard.length", "fuzz.guard.width",
+	"fuzz.guard.lift", "fuzz.guard.transparency", "fuzz.fringe.abdomen", "fuzz.fringe.side", "fuzz.fringe.lift",
+	"fuzz.pale.density", "fuzz.pale.length", "fuzz.pale.margin", "fuzz.clear",
+	"fuzz.black", "fuzz.dark", "fuzz.grey", "fuzz.frost", "fuzz.shellColor", "fuzz.shells", "fuzz.headShell.zScale",
 	"fuzz.tuftHairs", "fuzz.tuftLength", "fuzz.tuft.fan", "fuzz.tuft.width", "fuzz.ruff.hairs", "fuzz.ruff.length",
-	"fuzz.legHairs", "fuzz.legLength", "fuzz.legWidth", "fuzz.legTransparency",
+	"fuzz.legHairs", "fuzz.legLength", "fuzz.legWidth", "fuzz.legTransparency", "fuzz.legBlack",
 	"idle.riseSeconds", "idle.fallSeconds", "idle.breathe.period", "idle.breathe.bodyLift", "idle.breathe.lift", "idle.breathe.pitchDeg",
 	"idle.tilt.rollDeg", "idle.tilt.yawDeg", "idle.tilt.pitchDeg", "idle.tilt.periods",
 	"detail.full.every.lock", "detail.full.shells", "detail.full.idle", "detail.low.every.guard", "detail.low.shells", "detail.low.idle",
@@ -146,16 +148,116 @@ for _, h in hairs do
 end
 check(kinds.tuft == 2 * look.fuzz.tuftHairs and tuftsOk, "bold-jumper tufts: a fan on each side, behind and above the eyes, not brows")
 check(nearEye > ame.radii[1], "tufts do not cover the front eyes")
-check((kinds.lock or 0) >= 100 and (kinds.guard or 0) >= 150 and (kinds.fringe or 0) >= 40,
-	`the coat has locks ({kinds.lock}), guard hairs ({kinds.guard}) and a fringe ({kinds.fringe})`)
-local fringeOk = true
+-- ---------------------------------------------------------------- the coat (ROBLOX-13, second pass)
+-- Short and thin hairs that lie nearly flat and are combed toward the rear; only a few short guard hairs stand up. Every hair has
+-- the colour of the pattern it grows from: black on the black areas, white only inside the white spots and the band.
+local COAT = { lock = true, guard = true, fringe = true, pale = true }
+local function liftOf(h): number return math.deg(math.asin(math.clamp(h.dir:Dot(h.normal), -1, 1))) end
+local coat, upright, longest, widest, lengthSum = 0, {}, 0, 0, 0
+for _, h in hairs do
+	if COAT[h.kind] then
+		coat += 1
+		longest, widest, lengthSum = math.max(longest, h.length), math.max(widest, h.width), lengthSum + h.length
+		if liftOf(h) > 40 then table.insert(upright, h) end
+	end
+end
+check((kinds.lock or 0) >= 150 and (kinds.fringe or 0) >= 20 and (kinds.pale or 0) >= 15,
+	`the coat has locks ({kinds.lock}), a fringe ({kinds.fringe}) and white hairs ({kinds.pale})`)
+check(longest <= 0.05 and lengthSum / coat <= 0.04 and widest <= 0.02,
+	`coat hairs are short and thin (longest {string.format("%.3f", longest)}, mean {string.format("%.3f", lengthSum / coat)}, widest {string.format("%.3f", widest)} studs)`)
+local standingAreGuards = true
+for _, h in upright do standingAreGuards = standingAreGuards and h.kind == "guard" end
+check(standingAreGuards and #upright == (kinds.guard or 0) and #upright >= 10 and #upright * 8 <= coat, `only a few short guard hairs stand up ({#upright} of {coat})`)
+local flatOk, combed, locks = true, 0, 0
+for _, h in hairs do
+	local lift = liftOf(h)
+	if h.kind == "lock" or h.kind == "pale" then flatOk = flatOk and lift <= 15 end
+	if h.kind == "fringe" then flatOk = flatOk and lift <= 35 end
+	if h.kind == "lock" then
+		locks += 1
+		if h.dir.Z > 0.3 then combed += 1 end
+	end
+end
+check(flatOk, "locks and white hairs lie within 15 degrees of the surface, the fringe within 35")
+check(combed >= locks * 0.9, `locks are combed toward the rear ({combed} of {locks})`)
+
+-- The white as the rig draws it: the AbdomenSpot, FrontBand and PaleCheek parts, read back from the rig (offset in the body frame, size).
+local drawn, cheeks = {}, {}
+for _, f in fullRig._fixed do
+	if f.part.Name == "AbdomenSpot" or f.part.Name == "FrontBand" then table.insert(drawn, f) end
+	if f.part.Name == "PaleCheek" then table.insert(cheeks, f) end
+end
+check(#drawn == #look.spots + look.band.count and #cheeks == 2, "the rig draws the five spots, the band's dabs and the two pale cheeks")
+-- The smallest ellipse radius at p over the drawn markings seen from above (below 1: inside one), and the gap to the nearest edge
+-- in studs, at least (radius - 1) times the smaller half-axis.
+local function overWhite(p: Vector3): (number, number)
+	local best, gap = math.huge, math.huge
+	for _, f in drawn do
+		local q = f.offset:PointToObjectSpace(p)
+		local a, b = f.part.Size.X / 2, f.part.Size.Z / 2
+		local r = math.sqrt((q.X / a) ^ 2 + (q.Z / b) ^ 2)
+		best = math.min(best, r)
+		gap = math.min(gap, (r - 1) * math.min(a, b))
+	end
+	return best, gap
+end
+local ac = A.abdomenCenter
+local paleIn, paleCount, blackClear, blackCount, toneOk, whiteOnlyOnWhite = true, 0, true, 0, true, true
+local worstGap = math.huge
+for _, h in hairs do
+	local points = { h.at, h.at + h.dir * (h.length * 0.5), h.at + h.dir * h.length }
+	if h.kind == "pale" then
+		paleCount += 1
+		toneOk = toneOk and h.tone == "white"
+		for _, p in points do paleIn = paleIn and (overWhite(p)) < 1 end -- the whole hair stays inside a marking
+	elseif COAT[h.kind] then
+		toneOk = toneOk and (h.tone == "black" or h.tone == "dark") -- nothing grey or frosted in the body coat
+		if h.group == "abdomen" and h.at.Y >= ac.Y + 0.02 then
+			blackCount += 1
+			for _, p in points do
+				local _, gap = overWhite(p)
+				worstGap = math.min(worstGap, gap)
+			end
+		end
+	end
+	if h.white and h.kind ~= "pale" and h.kind ~= "ruff" then whiteOnlyOnWhite = false end
+end
+blackClear = worstGap >= 0.002
+check(paleCount >= 15 and paleIn, `white coat hairs stay inside the white spots and the band ({paleCount} hairs)`)
+check(blackCount >= 100 and blackClear, `black coat hairs keep off every white marking ({blackCount} hairs, at least {string.format("%.4f", worstGap)} studs clear)`)
+check(toneOk and whiteOnlyOnWhite, "white hairs are only on the white (and the face's ruff), every other coat hair is black or dark")
+local offCheek, cheekHairs = true, 0
+for _, h in hairs do
+	if COAT[h.kind] and h.group == "head" then
+		cheekHairs += 1
+		for _, along in { 0, 0.5, 1 } do
+			local p = h.at + h.dir * (h.length * along)
+			for _, c in cheeks do
+				local q = c.offset:PointToObjectSpace(p)
+				offCheek = offCheek and math.sqrt((q.X / (c.part.Size.X / 2)) ^ 2 + (q.Y / (c.part.Size.Y / 2)) ^ 2 + (q.Z / (c.part.Size.Z / 2)) ^ 2) > 1.1
+			end
+		end
+	end
+end
+check(cheekHairs >= 20 and offCheek, `no black hair lies on the pale cheeks ({cheekHairs} head coat hairs)`)
+
+-- The softness comes from the fur shells: several, dark, faint (together they tint the body by less than a third).
+local tint, shellMax = 1, 0
+for _, shell in look.fuzz.shells do tint *= shell.transparency end
+for _, v in look.fuzz.shellColor do shellMax = math.max(shellMax, v) end
+check(#look.fuzz.shells >= 3 and 1 - tint <= 0.3 and shellMax <= 0.15, `fur shells: {#look.fuzz.shells} dark and faint ones (body tint {string.format("%.2f", 1 - tint)})`)
+check(look.fuzz.shells[#look.fuzz.shells].scale >= 1.12, "the outer fur shell stands far enough off the body to make a soft halo")
+check(look.detail.low.every.guard == 0 and look.detail.low.shells == 1, "low detail has no standing guard hairs and one fur shell")
+local fringeOk, lean, fringeN = true, 0, 0
 for _, h in hairs do
 	if h.kind == "fringe" then
 		local out = if h.at.X >= 0 then 1 else -1
-		fringeOk = fringeOk and math.abs(h.at.X) >= 0.15 and h.dir.X * out > 0.3 -- at the sides, standing out sideways
+		fringeOk = fringeOk and math.abs(h.at.X) >= 0.15 and liftOf(h) >= 10 -- at the sides, lifted a little
+		lean += h.dir.X * out
+		fringeN += 1
 	end
 end
-check(fringeOk, "the fringe grows at the sides and stands out sideways, so the outline is fuzzy")
+check(fringeOk and fringeN > 0 and lean / fringeN > 0.15, "the fringe grows at the sides, lifted a little and leaning out, so the outline is soft")
 local covered = false
 for _, h in hairs do
 	for _, e in A.eyes do
@@ -173,6 +275,22 @@ local function with(edit: (any) -> ()): any
 end
 check(#Setae.body(with(function(l) l.fuzz.enabled = false end)) == 0, "fuzz.enabled turns the coat off")
 check(#Setae.body(with(function(l) l.fuzz.locks.abdomen = 0 end)) < #hairs - 40, "fuzz.locks.abdomen sets the number of locks")
+local function countKind(list: { any }, kind: string): number
+	local n = 0
+	for _, h in list do if h.kind == kind then n += 1 end end
+	return n
+end
+check(countKind(Setae.body(with(function(l) l.fuzz.guard.abdomen = 0; l.fuzz.guard.head = 0 end)), "guard") == 0, "fuzz.guard sets the standing hairs")
+check(countKind(Setae.body(with(function(l) l.fuzz.pale.density = 0 end)), "pale") == 0, "fuzz.pale.density sets the white hairs on the markings")
+check(countKind(Setae.body(with(function(l) l.fuzz.clear = 0.05 end)), "lock") < (kinds.lock or 0), "fuzz.clear keeps the black hairs further off the white")
+local function meanLift(list: { any }, kind: string): number
+	local sum, n = 0, 0
+	for _, h in list do
+		if h.kind == kind then sum += liftOf(h); n += 1 end
+	end
+	return sum / math.max(1, n)
+end
+check(meanLift(Setae.body(with(function(l) l.fuzz.locks.lift = { 50, 70 } end)), "lock") > meanLift(hairs, "lock") + 30, "fuzz.locks.lift sets how flat the locks lie")
 check(#Setae.palp(with(function(l) l.palp.fluff.hairs = 0 end)) == 0, "palp.fluff.hairs sets the palps' fluff")
 local wide = Anatomy.layout(with(function(l) l.eye.ame.x = 0.14 end))
 local wideFront = {}
@@ -231,8 +349,20 @@ end
 local lowRig, lowParts = rigParts("low")
 local full, low = census(fullParts), census(lowParts)
 print(`look: full {full.total} parts ({full.hair} hairs, {full.shell} shells, {full.other} other), low {low.total} ({low.hair} hairs, {low.shell} shells, {low.other} other)`)
-check(full.total <= 760 and full.other <= 160 and full.hair + full.shell >= 300 and full.hair + full.shell <= 720, `full detail part budget ({full.total})`)
-check(low.total <= 300 and low.hair >= 100 and low.hair <= 260 and low.shell <= 2, `low detail part budget ({low.total})`)
+-- Budgets are the ones the first coat had (705 parts at full detail, 272 at low): the second coat is lighter, not heavier.
+check(full.total <= 705 and full.other <= 160 and full.hair + full.shell >= 300 and full.hair + full.shell <= 720, `full detail part budget ({full.total})`)
+check(low.total <= 272 and low.hair >= 100 and low.hair <= 260 and low.shell <= 2, `low detail part budget ({low.total})`)
+-- Each tier keeps exactly the hairs its table says: one in `every` of each class, none of a class whose `every` is 0.
+local function kept(count: number, every: number): number return if every <= 0 then 0 else math.floor(count / every) end
+local function expectedHairs(every: { [string]: number }): number
+	local n = 0
+	for kind, count in kinds do n += kept(count, every[kind] or 1) end
+	n += kept(#Setae.palp(look), every.palp)
+	for i = 1, 8 do n += kept(#Setae.leg(look, i), every.leg) end
+	return n
+end
+check(full.hair == expectedHairs(look.detail.full.every), `full detail keeps the hairs its table says ({full.hair} of {expectedHairs(look.detail.full.every)})`)
+check(low.hair == expectedHairs(look.detail.low.every), `low detail keeps the hairs its table says ({low.hair} of {expectedHairs(look.detail.low.every)}), no guard hairs`)
 check(low.total < full.total * 0.45 and low.other < full.other, "low detail is under half the parts of full")
 check(full.bad == 0 and low.bad == 0, "every drawn part is anchored, non-colliding, not queryable and has a real size")
 check(fullRig.model:GetAttribute("Detail") == "full" and lowRig.model:GetAttribute("Detail") == "low", "the model says which detail it was built at")

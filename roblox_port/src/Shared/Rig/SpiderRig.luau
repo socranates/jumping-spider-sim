@@ -263,11 +263,12 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 
 	-- Fuzz: flat locks over the head and abdomen, tufts, a cheek ruff and palp fluff (Rig/Setae), moved with the part they grow from.
 	local fuzz = look.fuzz
+	local BLACKEST = if fuzz then color(fuzz.black) else BODY
 	local DARK = if fuzz then color(fuzz.dark) else BODY
 	local GREY = if fuzz then color(fuzz.grey) else BODY
 	local FROST = if fuzz then color(fuzz.frost) else BODY
 	local function seta(tone: string, width: number, thick: number, length: number, transparency: number): Part
-		local h = newPart(model, "Seta", if tone == "white" then WHITE elseif tone == "frost" then FROST elseif tone == "grey" then GREY else DARK, Enum.Material.SmoothPlastic)
+		local h = newPart(model, "Seta", if tone == "white" then WHITE elseif tone == "frost" then FROST elseif tone == "grey" then GREY elseif tone == "black" then BLACKEST else DARK, Enum.Material.SmoothPlastic)
 		h.Size = Vector3.new(width, thick, length)
 		h.CastShadow = false
 		h.Transparency = transparency
@@ -288,9 +289,11 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		end
 		local seen: { [string]: number } = {}
 		local function keep(kind: string): boolean
+			local every = cfg.every[kind] or 1
+			if every <= 0 then return false end -- 0 drops the whole class
 			local n = (seen[kind] or 0) + 1
 			seen[kind] = n
-			return n % (cfg.every[kind] or 1) == 0
+			return n % every == 0
 		end
 		for _, hair in Setae.body(look) do
 			if not keep(hair.kind) then continue end

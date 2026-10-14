@@ -1,4 +1,4 @@
-luau-compile --null (Luau 0.742) on every .luau file under src, tests and tools, evidence 522744ec33d68fa0
+luau-compile --null (Luau 0.742) on every .luau file under src, tests and tools, evidence 80504bccb4e8651f
 ok   src/Client/SpiderCamera.luau
 ok   src/Client/SpiderClient.client.luau
 ok   src/Client/SpiderHud.luau

@@ -79,28 +79,38 @@ local first = {
 	},
 
 	-- ---------------------------------------------------------------- fuzz (ROBLOX-07, retuned for the real camera in ROBLOX-13)
-	-- The camera sits 5 studs away (CameraMath.CAMERA_DISTANCE), 1 stud is about 170 px on a 1080p screen, so a hair has to
-	-- be a couple of hundredths of a stud wide to show at all. Hairs are flat locks lying back along the body; the grey and
-	-- frosted ones give the coat a silvery sheen against the black; white ones cover the white markings.
+	-- The camera sits 5 studs away (CameraMath.CAMERA_DISTANCE), 1 stud is about 170 px on a 1080p screen, so a hair is a few
+	-- pixels at most. The first coat answered that with big stiff hairs, and they stood off the body like a hedgehog's and
+	-- covered the white spots; the second coat (this one) is short, thin and combed flat, and leaves the softness to the shells.
 	fuzz = {
 		enabled = true,
-		-- The pelt: wide flat locks lying back over the head and abdomen like shingles. `abdomen` and `head` are Fibonacci
-		-- sample points before the belly is skipped (the hairs kept are about 60 % of them). `flat`: a lock's thickness as a
-		-- share of its width. `lieBack`: 0 stands straight out, 1.0 leans about 45 degrees toward the rear. `dark` and `grey`
-		-- are the shares of those tones, the rest is frosted; hairs over the white markings are white. `transparency`: a little
-		-- see-through, so the coat looks soft rather than spiky.
-		locks = { abdomen = 150, head = 70, length = { 0.050, 0.085 }, width = 0.040, flat = 0.17, lieBack = 0.9, dark = 0.55, grey = 0.30, transparency = 0.12 },
-		-- Guard hairs: longer, finer hairs that stand off the pelt and make the fuzzy edge you see against the sill.
-		guard = { abdomen = 250, head = 140, length = { 0.060, 0.098 }, width = 0.0135, flat = 1.0, lieBack = 0.45, dark = 0.25, grey = 0.40, transparency = 0.28 },
-		-- The fringe: stiffer, longer hairs that grow only at the sides (`side`: how far round to the side, as a share of the
-		-- radius, a hair has to be) and stand out sideways and back, so the outline is fuzzy from behind and from the front.
-		fringe = { abdomen = 230, head = 100, side = 0.78, length = { 0.070, 0.098 }, width = 0.0155, flat = 1.0, lieBack = 0.3, dark = 0.35, grey = 0.35, transparency = 0.25 },
+		-- The coat is short and sleek, like a real jumping spider's, and it takes its colour from the pattern it grows on:
+		-- black hairs on the black areas, white hairs only inside the white spots and the band, nothing grey or frosted on the
+		-- body (the daughter's white stays crisp, and a hair is never a pale shard). The softness comes from the fur shells.
+		-- `abdomen` and `head` are Fibonacci sample points before the belly is skipped (about 60 % of them become hairs).
+		-- `length` and `lift` are ranges (studs; degrees off the surface: 0 lies flat, 90 stands up); `yaw` scatters the
+		-- combing (degrees either side of straight back); `flat` is the thickness as a share of the width; `black` is the share
+		-- of the blackest tone (the rest is `dark`); `transparency` keeps the coat a little see-through.
+		-- Locks: the pelt, lying nearly flat and combed toward the rear.
+		locks = { abdomen = 340, head = 130, length = { 0.024, 0.040 }, width = 0.018, flat = 0.22, lift = { 3, 13 }, yaw = 18, black = 0.45, transparency = 0.10 },
+		-- Guard hairs: a few short, fine hairs that stand up from the pelt.
+		guard = { abdomen = 50, head = 24, length = { 0.030, 0.046 }, width = 0.0085, flat = 1.0, lift = { 50, 75 }, yaw = 35, black = 0.5, transparency = 0.20 },
+		-- The fringe: short hairs along the sides (`side`: how far round to the side, as a share of the radius, a hair has to
+		-- be), lifted a little, so the outline is ragged by a pixel or two and not by a spike.
+		fringe = { abdomen = 170, head = 60, side = 0.78, length = { 0.026, 0.040 }, width = 0.011, flat = 0.5, lift = { 14, 32 }, yaw = 22, black = 0.5, transparency = 0.20 },
+		-- White hairs inside the white spots and the band: `density` per square stud of marking, lying on it, kept only when the
+		-- whole hair stays `margin` studs inside the edge, so the white keeps its edge.
+		pale = { density = 600, length = { 0.021, 0.028 }, width = 0.013, flat = 0.3, lift = { 3, 10 }, yaw = 14, margin = 0.004, transparency = 0.05 },
+		clear = 0.006, -- black hairs stay this far (studs) from any white marking
+		black = { 0.03, 0.03, 0.03 },
 		dark = { 0.13, 0.13, 0.13 },
-		grey = { 0.50, 0.50, 0.48 },
+		grey = { 0.50, 0.50, 0.48 }, -- grey and frost: the face (tufts, ruff) and the palps' fluff only
 		frost = { 0.76, 0.76, 0.73 },
-		-- Fur shells: see-through layers outside the body so the outline goes soft. Four at full detail, one at low.
-		shellColor = { 0.32, 0.32, 0.31 },
-		shells = { { scale = 1.05, transparency = 0.80 }, { scale = 1.10, transparency = 0.88 }, { scale = 1.16, transparency = 0.94 }, { scale = 1.23, transparency = 0.97 } },
+		-- Fur shells: see-through layers outside the body, strongest nearest it, so the outline goes soft. Four at full detail,
+		-- one at low. A shell tints what is under it as well as what is around it, so they are dark and faint: the white of the
+		-- pattern must stay white.
+		shellColor = { 0.08, 0.08, 0.08 },
+		shells = { { scale = 1.05, transparency = 0.86 }, { scale = 1.10, transparency = 0.92 }, { scale = 1.16, transparency = 0.955 }, { scale = 1.23, transparency = 0.975 } },
 		headShell = { zScale = 0.80, shift = 0.05 }, -- the head's shells sit back from the eye row so the eyes stay clear
 		-- Little tufts that bold jumping spiders have above the eyes, at the upper sides of the head: a fan of dark and
 		-- silvery hairs that sweeps up and out. Not eyebrows: they sit behind the eyes at the sides, not over them.
@@ -113,7 +123,7 @@ local first = {
 		legLength = 0.052,
 		legWidth = 0.0125,
 		legTransparency = 0.2,
-		legDark = 0.4, legGrey = 0.35, -- tone shares on the legs (the rest is frosted)
+		legBlack = 0.4, -- the share of the blackest tone on the legs (the rest is dark; white over the pale bands)
 	},
 
 	-- ---------------------------------------------------------------- idle motion (drawn rig only, ROBLOX-13)
@@ -128,15 +138,16 @@ local first = {
 
 	-- ---------------------------------------------------------------- detail modes
 	-- Full is for PCs. Low is for phones and tablets (touch-only devices, or Workspace attribute Detail = "low"): fewer
-	-- hairs (keep one in `every`), a single fur shell, no foot balls, half the speckles, no outline and no idle motion at all
-	-- (no breathing, head tilt or palp drumming). The pattern, eyes, catchlights and tufts stay.
+	-- hairs (keep one in `every`; 0 drops the whole class, so the low tier has no standing guard hairs), a single fur shell,
+	-- no foot balls, half the speckles, no outline and no idle motion at all (no breathing, head tilt or palp drumming).
+	-- The pattern, eyes, catchlights and tufts stay.
 	detail = {
 		full = {
-			every = { lock = 1, guard = 1, fringe = 1, tuft = 1, ruff = 1, palp = 1, leg = 1 },
+			every = { lock = 1, guard = 1, fringe = 1, pale = 1, tuft = 1, ruff = 1, palp = 1, leg = 1 },
 			shells = 4, speckleEvery = 1, pads = true, sockets = true, idle = true, highlight = true,
 		},
 		low = {
-			every = { lock = 3, guard = 5, fringe = 3, tuft = 2, ruff = 2, palp = 2, leg = 4 },
+			every = { lock = 3, guard = 0, fringe = 3, pale = 2, tuft = 2, ruff = 2, palp = 2, leg = 4 },
 			shells = 1, speckleEvery = 2, pads = false, sockets = false, idle = false, highlight = false,
 		},
 	},

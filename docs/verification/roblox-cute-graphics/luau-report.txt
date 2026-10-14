@@ -1,5 +1,5 @@
-python3 tests/run.py luau (Luau CLI 0.742, Linux), evidence 522744ec33d68fa0
-fuzz: 400 body hairs, 142 leg hairs, 67 white
+python3 tests/run.py luau (Luau CLI 0.742, Linux), evidence 80504bccb4e8651f
+fuzz: 319 body hairs, 142 leg hairs, 29 white
 SUMMARY passed=182 failed=0
   1 east leaf, front: caught true, settled true, reel true, 269 ticks, max turn 0
   2 east leaf, back: caught true, settled true, reel true, 269 ticks, max turn 0
@@ -13,8 +13,8 @@ SUMMARY passed=182 failed=0
   10 west leaf, front, then let go: caught true, settled true, letgo true, 127 ticks, max turn 0
 BOXWORLD passed=15 failed=0
 CLIENT passed=11 failed=0
-look: full 705 parts (556 hairs, 8 shells, 141 other), low 272 (151 hairs, 2 shells, 119 other)
-LOOK passed=54 failed=0
+look: full 624 parts (475 hairs, 8 shells, 141 other), low 266 (145 hairs, 2 shells, 119 other)
+LOOK passed=72 failed=0
 world: invented sun, z flip 1: picks clock 9.75, latitude 40.7, 39 degrees high, 46 degrees off straight-out-of-the-window
 world: invented sun, z flip -1: picks clock 9.75, latitude -40.7, 39 degrees high, 46 degrees off straight-out-of-the-window
 world: decor 76 parts at full detail, 34 at low (view 31 items at full), dust 7 -> 2.8 per second

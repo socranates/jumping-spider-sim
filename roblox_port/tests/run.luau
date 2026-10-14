@@ -336,5 +336,87 @@ do
 	check(near(x1 - x0, 760, 1e-9) and near((x0 + x1) / 2, 960, 1e-9) and bottom == 1064, "keyboard and controller prompts are centred, at most 760 px wide")
 end
 
+
+-- ---------------------------------------------------------------- ROBLOX-09: the catch camera's line framing
+-- Against values exported from the frozen Godot camera rig (tools/export_framing_reference.gd -> tests/framing_reference.json):
+-- BoomMath.smooth_damp, the turn search with a capped 45-degree turn, and tick-by-tick take-overs.
+local LineFraming = require("../src/Shared/Movement/LineFraming")
+local F = require("./framing_reference")
+do
+	local damped = true
+	for _, c in F.smooth_damp do
+		local v, vel = CameraMath.smoothDamp(c["in"][1], c["in"][2], c["in"][3], c["in"][4], c["in"][5])
+		damped = damped and near(v, c.out[1], 1e-12) and near(vel, c.out[2], 1e-12)
+	end
+	check(damped, `the framing turn eases exactly as Godot's BoomMath.smooth_damp ({#F.smooth_damp} cases)`)
+	local decided, capped = true, true
+	for _, c in F.decisions do
+		local good = c.good
+		local turn = LineFraming.wantedTurn(c.held, math.rad(c.cap_deg), function(t)
+			for _, g in good do if math.abs(t - g) < 1e-6 then return true end end
+			return false
+		end)
+		if not near(turn, c.out, 1e-12) then decided = false; print("decision", c.cap_deg, turn, c.out) end
+		if c.cap_deg == 45 and math.abs(turn) > math.rad(45) + 1e-9 then capped = false end
+	end
+	check(decided, `the turn search matches Godot's _wanted_yaw_assist ({#F.decisions} cases: smallest step, + before -, held turn kept, nothing past the cap)`)
+	check(capped and LineFraming.FRAMING_MAX_TURN_DEG == 45 and near(LineFraming.new().maxTurn, math.rad(45), 1e-15), "the turn is capped at 45 degrees")
+	local function angleDiff(a, b) return (b - a + math.pi) % (2 * math.pi) - math.pi end
+	local function rig(yaw0, turns)
+		local r = { yaw = yaw0, framing = LineFraming.new(), onLine = true, aiming = false, good = {}, rows = {} }
+		for _, t in turns do table.insert(r.good, yaw0 + t) end
+		return r
+	end
+	local function tick(r)
+		r.yaw += r.framing:tick(r.onLine, r.aiming, function()
+			return LineFraming.wantedTurn(r.framing.target, r.framing.maxTurn, function(turn)
+				for _, g in r.good do if math.abs(angleDiff(r.yaw + turn, g)) < 1e-6 then return true end end
+				return false
+			end)
+		end, F.dt)
+	end
+	local function row(r) table.insert(r.rows, { r.yaw, r.framing.assist, r.framing.target, if r.framing.off then 1 else 0 }) end
+	local function ticks(r, n) for _ = 1, n do tick(r); row(r) end end
+	local function matches(r, expected)
+		if #r.rows ~= #expected then print("rows", #r.rows, #expected) return false end
+		for i, e in expected do
+			for k = 1, 4 do
+				if not near(r.rows[i][k], e[k], 1e-9) then print("row", i, k, r.rows[i][k], e[k]) return false end
+			end
+		end
+		return true
+	end
+	local d30 = math.rad(30)
+	local r = rig(-0.5235987755982988, { d30 })
+	ticks(r, 40)
+	r.yaw += r.framing:playerTurns(r.onLine); r.yaw -= math.rad(1); row(r)
+	ticks(r, 20)
+	r.onLine = false; ticks(r, 1)
+	check(matches(r, F.sequences.look_takes_over), "a one-degree look takes a held turn over at once, nothing jumps, and the framing stays off while the line is out")
+	r = rig(0.1, { d30 })
+	ticks(r, 3)
+	r.yaw += r.framing:takeOver(); r.aiming = true; row(r)
+	ticks(r, 5)
+	r.aiming = false
+	ticks(r, 10)
+	check(matches(r, F.sequences.aim_takes_over), "aiming takes a turn in progress over (preparation wins)")
+	r = rig(0, { d30 })
+	ticks(r, 30)
+	r.yaw += r.framing:playerTurns(r.onLine); row(r)
+	check(matches(r, F.sequences.recenter_takes_over), "a recenter takes the turn over before it turns (recenter wins)")
+	r = rig(0.7, { math.rad(-45) })
+	ticks(r, 30)
+	r.onLine = false
+	ticks(r, 2)
+	check(matches(r, F.sequences.line_end_keeps_view), "when the line ends the view stays where the framing put it")
+	r = rig(0, { d30 })
+	r.framing.enabled = false
+	ticks(r, 10)
+	check(matches(r, F.sequences.setting_off), "with 'Frame the line after a catch' off nothing turns")
+	local f = LineFraming.new()
+	f.assist, f.target = 0.4, 0.5
+	check(near(f:setEnabled(false), 0.4, 1e-15) and f.assist == 0 and f:setEnabled(true) == 0, "switching the framing off with a turn held hands it to the player")
+end
+
 print(`SUMMARY passed={passed} failed={failed}`)
 if failed > 0 then error("port check failed") end

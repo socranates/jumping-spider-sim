@@ -1,6 +1,6 @@
 --!strict
 -- Pure camera and stick math, ported from the frozen Godot reference (c87ce00):
---   scripts/movement/boom_math.gd    (orbit basis, boom recovery, eased offsets, pitch pick)
+--   scripts/movement/boom_math.gd    (orbit basis, boom recovery, eased offsets, pitch pick, smooth damp)
 --   scripts/movement/surface_input.gd (camera-relative walking on floors, walls and undersides)
 --   scripts/movement/camera_rig.gd   (aim free-look clamp, spider-eye gaze clamp, recenter yaw)
 -- Vector3 only, no Instances, so tests/run.luau checks it against values exported from Godot itself.
@@ -82,6 +82,29 @@ function CameraMath.easeOffset(current: number, target: number, dt: number, inSe
 	local seconds = math.max(if math.abs(target) >= math.abs(current) then inSeconds else outSeconds, 1e-4)
 	local nextValue = current + (target - current) * (1 - math.exp(-math.max(dt, 0) / seconds))
 	return if math.abs(target - nextValue) < SETTLE then target else nextValue
+end
+
+-- BoomMath.smooth_damp: a critically damped approach of current to target (arrives without overshoot, gentle at both
+-- ends); smoothTime is about the time it takes. Returns the next value and velocity; it lands exactly on the target once
+-- within SETTLE and nearly still. Non-finite input returns 0, 0.
+function CameraMath.smoothDamp(current: number, target: number, velocity: number, smoothTime: number, dt: number): (number, number)
+	if not (finite(current) and finite(target) and finite(velocity) and finite(smoothTime) and finite(dt)) then
+		return 0, 0
+	end
+	local omega = 2 / math.max(smoothTime, 1e-4)
+	local x = omega * math.max(dt, 0)
+	local damp = 1 / (1 + x + 0.48 * x * x + 0.235 * x * x * x)
+	local change = current - target
+	local temp = (velocity + omega * change) * dt
+	local nextVelocity = (velocity - omega * temp) * damp
+	local nextValue = target + (change + temp) * damp
+	if (target - current > 0) == (nextValue > target) then
+		return target, 0
+	end
+	if math.abs(target - nextValue) < SETTLE and math.abs(nextVelocity) < 1e-3 then
+		return target, 0
+	end
+	return nextValue, nextVelocity
 end
 
 -- BoomMath.pick_pitch_offset: the first comfortable boom, else the longest.

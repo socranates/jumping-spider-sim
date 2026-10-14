@@ -31,7 +31,7 @@ local TURN_RATE = math.rad(540)
 local AIM_HOLD_S = 0.18
 local AIM_RANGE = 40
 local HOP_DISTANCE = 1.6
-local MAX_DRAGLINES = 12
+local MAX_DRAGLINES = 24 -- two segments per one-bend line
 
 local player = Players.LocalPlayer
 local camera = Workspace.CurrentCamera
@@ -42,6 +42,8 @@ params.FilterType = Enum.RaycastFilterType.Include
 params.FilterDescendantsInstances = { sill }
 
 local rig = SpiderRig.new(Workspace, sill)
+local SilkController = require(Shared.Movement.SilkController)
+local silk = SilkController.new(sill, Surfaces, profile.silk, LOCO.gravity_wu_s2)
 
 type Mode = "attached" | "air"
 local state = {
@@ -57,7 +59,8 @@ local state = {
 	aiming = false,
 	plan = nil :: any,
 	planFrom = Vector3.zero,
-	lineAnchor = nil :: Vector3?,
+	flightTicks = 0,
+	flightLimit = 0,
 }
 
 local function profileOf(hit: RaycastResult): any
@@ -104,14 +107,15 @@ local function respawn()
 	state.vel = Vector3.zero
 	state.aiming = false
 	state.plan = nil
-	state.lineAnchor = nil
+	silk:clear()
 end
 
--- ---------------------------------------------------------------- dragline (drawn only)
+-- ---------------------------------------------------------------- safety-line rendering (mechanics in SilkController)
 local lines = Instance.new("Folder")
 lines.Name = "Draglines"
 lines.Parent = Workspace
 local liveLine: Part? = nil
+local bendLine: Part? = nil
 
 local function strand(a: Vector3, b: Vector3, p: Part)
 	local len = math.max((b - a).Magnitude, 0.01)
@@ -129,6 +133,7 @@ local function newStrand(): Part
 	p.Material = Enum.Material.Neon
 	p.Color = Color3.fromRGB(236, 232, 214)
 	p.Transparency = 0.35
+	p:SetAttribute("Born", time())
 	p.Parent = lines
 	local kids = lines:GetChildren()
 	if #kids > MAX_DRAGLINES then
@@ -211,16 +216,38 @@ local function aim()
 	end
 end
 
-local function launch(velocity: Vector3)
+local function beginStrands()
+	liveLine = newStrand()
+	bendLine = newStrand()
+	bendLine.Transparency = 1
+end
+local function launch(velocity: Vector3, steps: number)
 	local floorHit = Workspace:Raycast(state.pos, -state.up * (HEIGHT + 0.1), params)
-	local fromSurface = if floorHit then profileOf(floorHit) else nil
-	state.lineAnchor = if fromSurface and fromSurface.silk_anchor_allowed then state.pos - state.up * HEIGHT else nil
-	if state.lineAnchor then
-		liveLine = newStrand()
-	end
+	if silk:anchorAt(floorHit, state.pos) then beginStrands() end
+	state.flightTicks, state.flightLimit = 0, steps+4
 	state.vel = velocity
 	state.mode = "air"
 	hidePreview()
+end
+local function beginDrop(push: Vector3): boolean
+	if not silk:startDrop(state.pos, state.up, push) then return false end
+	beginStrands()
+	state.vel = push*0.6
+	state.mode = "air"
+	state.aiming=false; state.spaceDown=false; state.plan=nil
+	hidePreview()
+	return true
+end
+local function requestDrop()
+	if state.mode ~= "attached" or state.aiming or silk.walk then return end
+	local plan, message = silk:planDrop(state.pos,state.up,state.heading)
+	if not plan then silk.message=message; return end
+	if plan.direction.Magnitude<1e-6 then
+		if beginDrop(state.up) then state.pos+=state.up*0.01 end
+	else
+		silk.walk={direction=plan.direction, ticks=math.ceil((plan.distance/LOCO.walk_speed_wu_s+1.5)*60)}
+		silk.message="Walking to the edge — move or cancel to stop"
+	end
 end
 
 local function hop()
@@ -234,7 +261,7 @@ local function hop()
 	local g = if JumpMath.isStanding(state.up) then G else -state.up * LOCO.gravity_wu_s2
 	local result = JumpMath.solve(state.pos, seat, state.up, h.Normal, g, DT, LOCO.flight_time_min_s, LOCO.flight_time_max_s, LOCO.max_launch_speed_wu_s)
 	if result.valid[1] and g == G then
-		launch(result.valid[1].velocity)
+		launch(result.valid[1].velocity, result.valid[1].steps)
 	end
 end
 
@@ -253,7 +280,13 @@ local function wish(): Vector3
 end
 
 local function tickAttached()
-	local dir = if state.aiming then Vector3.zero else wish()
+	local manual = wish()
+	if silk.walk and manual.Magnitude>0 then silk.walk=nil; silk.message="Edge walk cancelled" end
+	local dir = if state.aiming then Vector3.zero elseif silk.walk then silk.walk.direction else manual
+	if silk.walk then
+		silk.walk.ticks-=1
+		if silk.walk.ticks<=0 then silk.walk=nil; silk.message="Edge walk stopped"; return end
+	end
 	state.moving = dir ~= Vector3.zero
 	if not state.moving then
 		-- Re-seat on the support so a vanished or moved surface is noticed.
@@ -283,6 +316,10 @@ local function tickAttached()
 		state.heading = SupportMath.tangentDir(state.heading, n)
 		return
 	end
+	if silk.walk then
+		if beginDrop(dir) then state.pos=nextPos+dir*(HEIGHT+0.02) end
+		return
+	end
 	-- Convex edge: wrap over it onto the face beyond (sill edge, leaf rim, the top of a wall).
 	local around = Workspace:Raycast(nextPos - state.up * (HEIGHT + 0.15), -dir * 1.0, params)
 	if around and attachable(around) then
@@ -294,6 +331,18 @@ local function tickAttached()
 end
 
 local function tickAir()
+	if silk.mode=="locked" then
+		local _,forward=controls:axes()
+		local intent=if controls.held.Drop then math.min(forward,0)-1 else forward
+		local hit
+		state.pos,state.vel,hit=silk:step(state.pos,state.vel,math.clamp(intent,-1,1),controls.held.Release==true)
+		if hit then
+			setSupport(hit); state.vel=Vector3.zero; state.mode="attached"
+			silk:clear(); liveLine=nil; bendLine=nil
+		end
+		return
+	end
+	state.flightTicks+=1
 	local from = state.pos
 	state.vel += G * DT
 	local to = from + state.vel * DT
@@ -310,18 +359,18 @@ local function tickAir()
 			end
 			state.vel = Vector3.zero
 			state.mode = "attached"
-			if liveLine and state.lineAnchor then
-				strand(state.lineAnchor, rig:spinneretPoint(SupportMath.bodyCFrame(state.pos, state.up, state.heading)), liveLine)
-			end
-			liveLine = nil
-			state.lineAnchor = nil
+			liveLine=nil; bendLine=nil
+			silk:clear()
 			return
 		end
+		if silk.mode=="payout" then silk:lock(state.pos,0.25) end
 		-- Not landable here: slide along it.
 		state.vel -= hit.Normal * math.min(0, state.vel:Dot(hit.Normal))
 		to = hit.Position + hit.Normal * HEIGHT
 	end
 	state.pos = to
+	silk:payout(to)
+	if silk.mode=="payout" and state.flightTicks>=state.flightLimit then silk:lock(to,0.25) end
 	-- The drawn body turns upright while falling.
 	state.up = SupportMath.rotateToward(state.up, Vector3.yAxis, math.rad(240) * DT)
 	local lo, hi = Layout.PLAY_BOUNDS_MIN, Layout.PLAY_BOUNDS_MAX
@@ -347,6 +396,7 @@ end
 
 controls = SpiderInput.bind(function(phase: string)
 	if phase == "begin" then
+		silk.walk=nil
 		state.spaceDown = true
 		state.spaceTime = 0
 		return
@@ -355,14 +405,21 @@ controls = SpiderInput.bind(function(phase: string)
 	if phase == "end" and state.mode == "attached" then
 		if state.aiming then
 			local plan = state.plan
-			if plan and (state.pos - state.planFrom).Magnitude < 1e-3 then launch(plan.velocity) end
+			if plan and (state.pos - state.planFrom).Magnitude < 1e-3 then launch(plan.velocity, plan.steps) end
 		else hop() end
 	end
 	state.aiming = false
 	state.plan = nil
 	hidePreview()
-end, respawn, function()
+end, function() silk.walk=nil; respawn() end, function()
 	rig.gaitMode = if rig.gaitMode == "Tetrapod" then "Unilateral" else "Tetrapod"
+end, function(action, phase)
+	if action=="Drop" and phase=="begin" then requestDrop() end
+	if action=="Release" and phase=="begin" then
+		if silk.walk then silk.walk=nil; silk.message="Edge walk cancelled" end
+		state.aiming=false; state.spaceDown=false; state.plan=nil; hidePreview()
+	end
+	if phase=="clear" then silk.release.down=true; silk.release.counts=false; silk.release.held=0; silk.release.progress=0; silk.walk=nil end
 end)
 
 -- ---------------------------------------------------------------- camera
@@ -372,6 +429,12 @@ camera.CameraType = Enum.CameraType.Custom
 camera.CameraSubject = rig.root
 camera.FieldOfView = 60
 
+local hud=Instance.new("ScreenGui")
+hud.Name="SilkHUD"; hud.ResetOnSpawn=false; hud.Parent=player:WaitForChild("PlayerGui")
+local status=Instance.new("TextLabel")
+status.Name="SilkStatus"; status.Size=UDim2.new(1,-32,0,64); status.Position=UDim2.new(0,16,0,36)
+status.BackgroundColor3=Color3.new(0.03,0.03,0.03); status.BackgroundTransparency=0.25
+status.TextColor3=Color3.new(1,1,1); status.TextSize=17; status.TextWrapped=true; status.AutomaticSize=Enum.AutomaticSize.Y; status.Parent=hud
 local accumulator = 0
 RunService.RenderStepped:Connect(function(frameDt: number)
 	accumulator = math.min(accumulator + frameDt, 0.25)
@@ -383,11 +446,39 @@ RunService.RenderStepped:Connect(function(frameDt: number)
 	state.drawnUp = state.drawnUp:Lerp(state.up, 1 - math.exp(-24 * frameDt)).Unit
 	local body = SupportMath.bodyCFrame(state.pos, state.drawnUp, state.heading)
 	rig:update(body, frameDt, state.mode == "attached", state.moving)
-	if liveLine and state.lineAnchor then
-		strand(state.lineAnchor, rig:spinneretPoint(body), liveLine)
+	if liveLine and bendLine and silk.mode~="none" then
+		local tip=rig:spinneretPoint(body)
+		strand(silk.anchor,silk.bend or tip,liveLine)
+		liveLine.Transparency=0.35
+		if silk.bend then strand(silk.bend,tip,bendLine); bendLine.Transparency=0.35 else bendLine.Transparency=1 end
+	elseif liveLine then
+		liveLine:Destroy(); liveLine=nil
+		if bendLine then bendLine:Destroy(); bendLine=nil end
 	end
+	for _,line in lines:GetChildren() do
+		if line~=liveLine and line~=bendLine then
+			local age=time()-(line:GetAttribute("Born") or time())
+			if age>25 then line:Destroy() else line.Transparency=math.max(line.Transparency,0.35+0.65*age/25) end
+		end
+	end
+	local progress=silk.release.progress
+	status.Text=if silk.mode=="locked" then silk.message.." | W / ↑: reel • S / ↓: lower • hold Q / B / Let go"..(if progress>0 then ` ({math.floor(progress*100)}%)` else "")
+		elseif silk.walk then silk.message else (if silk.message~="" then silk.message.." | " else "").."F / X: lower on silk"
+
 	local dof = Lighting:FindFirstChild("MacroDOF")
 	if dof and dof:IsA("DepthOfFieldEffect") then
 		dof.FocusDistance = (camera.CFrame.Position - state.pos).Magnitude
 	end
 end)
+
+-- The test-place-only module exercises this controller in Studio. Absent from the playable build.
+local playback=script.Parent:FindFirstChild("SilkPlayback")
+if RunService:IsStudio() and playback then
+    task.spawn(function()
+        require(playback)({input=controls,drop=requestDrop,
+            place=function(position)
+                controls:clear(); respawn(); state.pos=position; state.up=Vector3.yAxis; state.heading=Vector3.zAxis
+            end,
+            get=function() return {mode=state.mode,line=silk.mode,taut=silk.taut,position=state.pos,walking=silk.walk~=nil} end})
+    end)
+end

@@ -18,7 +18,10 @@
     "StarterPlayer": {
       "StarterPlayerScripts": {
         "Client": {
-          "$path": "src/Client"
+          "$path": "src/Client",
+          "SilkPlayback": {
+            "$path": "tests/client/SilkPlayback.luau"
+          }
         }
       }
     },

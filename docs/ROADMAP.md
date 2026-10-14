@@ -1,6 +1,6 @@
 # Active roadmap — Roblox, 2026-10-14
 
-PLATFORM-01 supersedes the previous distribution plan. New work is Roblox-only; Godot and SPEC are frozen references. Follow [ROBLOX_PORT.md](ROBLOX_PORT.md): first-spider/device foundation, **safety silk next**, perception, flies, LIFE/wasp, then DataStore persistence. Test and accessibility work accompany every chunk. Initial servers are solo; shared play can come later.
+PLATFORM-01 supersedes the previous distribution plan. New work is Roblox-only; Godot and SPEC are frozen references. Follow [ROBLOX_PORT.md](ROBLOX_PORT.md): first-spider/device foundation, core safety silk (implemented), **recovery camera/device acceptance next**, perception, flies, LIFE/wasp, then DataStore persistence. Test and accessibility work accompany every chunk. Initial servers are solo; shared play can come later.
 
 The earlier roadmap below remains design history; it does not authorize further Godot features or new Godot release packaging.
 

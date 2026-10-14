@@ -3,15 +3,18 @@
 local CAS = game:GetService("ContextActionService")
 local UIS = game:GetService("UserInputService")
 local Players = game:GetService("Players")
-local InputState = require(game:GetService("ReplicatedStorage").Shared.Movement.InputState)
+local InputState = require(game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Movement"):WaitForChild("InputState"))
 local SpiderInput = {}
 
-function SpiderInput.bind(jump: (string) -> (), reset: () -> (), gait: () -> ())
+function SpiderInput.bind(jump: (string) -> (), reset: () -> (), gait: () -> (), silkAction: (string,string) -> ())
 	local state = InputState.new()
 	local function act(action: string, phase: Enum.UserInputState)
 		local down = phase == Enum.UserInputState.Begin
 		if action == "Jump" then
 			if down then jump("begin") elseif phase == Enum.UserInputState.End then jump("end") else jump("cancel") end
+		elseif action=="Drop" or action=="Release" then
+			state:set(action,down)
+			silkAction(action,if down then "begin" elseif phase==Enum.UserInputState.End then "end" else "cancel")
 		elseif action == "Reset" then if down then reset() end
 		elseif action == "Gait" then if down then gait() end
 		else state:set(action, down) end
@@ -20,6 +23,7 @@ function SpiderInput.bind(jump: (string) -> (), reset: () -> (), gait: () -> ())
 		Forward = {Enum.KeyCode.W, Enum.KeyCode.DPadUp}, Back = {Enum.KeyCode.S, Enum.KeyCode.DPadDown},
 		Left = {Enum.KeyCode.A, Enum.KeyCode.DPadLeft}, Right = {Enum.KeyCode.D, Enum.KeyCode.DPadRight},
 		Jump = {Enum.KeyCode.Space, Enum.KeyCode.ButtonA}, Creep = {Enum.KeyCode.LeftShift, Enum.KeyCode.ButtonL1},
+		Drop={Enum.KeyCode.F,Enum.KeyCode.ButtonX}, Release={Enum.KeyCode.Q,Enum.KeyCode.ButtonB},
 		Reset = {Enum.KeyCode.R, Enum.KeyCode.ButtonY}, Gait = {Enum.KeyCode.G},
 	}
 	for action, keys in bindings do
@@ -44,6 +48,7 @@ function SpiderInput.bind(jump: (string) -> (), reset: () -> (), gait: () -> ())
 		state:clear()
 		table.clear(active)
 		jump("cancel")
+		silkAction("Release","clear")
 	end
 	local function button(action: string, label: string, position: UDim2, size: number)
 		local b = Instance.new("TextButton")
@@ -72,6 +77,8 @@ function SpiderInput.bind(jump: (string) -> (), reset: () -> (), gait: () -> ())
 	button("Right", "→", UDim2.new(0, 134, 1, -132), 52)
 	button("Jump", "Jump\n(hold)", UDim2.new(1, -92, 1, -102), 72)
 	button("Creep", "Creep", UDim2.new(1, -86, 1, -172), 60)
+	button("Drop", "Silk", UDim2.new(1,-86,1,-242),60)
+	button("Release", "Let go\n(hold)", UDim2.new(1,-156,1,-242),60)
 	UIS.InputEnded:Connect(function(input)
 		local action = active[input]
 		if action then active[input] = nil; act(action, Enum.UserInputState.End) end

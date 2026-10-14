@@ -8,6 +8,9 @@ Open **TheWindowsill.rbxlx** in Roblox Studio and press **Play**. After updating
 | Creep | Hold Shift | Hold L1 | Hold Creep |
 | Hop / aimed jump | Tap / hold Space, release | Tap / hold A, release | Tap / hold Jump, release |
 | Camera | Right-drag, wheel | Roblox camera/right stick | Roblox camera drag/pinch |
+| Lower on silk | F (hold to continue) | X | Silk |
+| Reel / lower while hanging | W / S | Stick or D-pad up/down | Up/down buttons |
+| Deliberately release silk | Hold Q | Hold B | Hold Let go |
 | Reset prototype | R | Y | Not yet exposed |
 | Compare gait | G | — | — |
 
@@ -17,12 +20,12 @@ The first appearance is `src/Shared/Data/Appearances.luau`, separate from specie
 
 ## Build and verify
 
-- Pure checks: `python tests/run.py path/to/luau` (0.742 tested): **43/43** on Windows, including the original 35 golden jump/support checks.
+- Pure checks: `python tests/run.py path/to/luau` (0.742 tested): **115/115** on Windows, including the original 35 golden jump/support checks.
 - Build: `python tools/build.py path/to/rojo` (7.7.1 tested). Rebuilds the playable place and TheWindowsillTests.rbxlx and stamps an evidence ID from source/test/project bytes.
-- Engine checks: open **TheWindowsillTests.rbxlx**, press Play, inspect Output for `PORT_TEST_REPORT`. The report also lives in TestService.PortTestReport. **6/6** on Windows Studio 0.742; this count includes suite completion. Normal place excludes these scripts.
+- Engine checks: open **TheWindowsillTests.rbxlx**, press Play, inspect Output for `PORT_TEST_REPORT`. The report also lives in TestService.PortTestReport. **18/18** on Windows Studio 0.742, including two suite-completion rows, plus **3/3** actual-client scripted checks. Collect matching rows/summary and PORT_CLIENT_REPORT with `python tools/collect_studio_report.py path/to/Studio.log ../docs/verification/roblox-silk`. Normal place excludes these scripts.
 - A missing report or a failed row is not a pass. Preserve JSON and evidence under docs/verification. Pure CLI shims cannot validate engine contacts or rendering.
 - Generate species/surface data with `python tools/json_to_luau.py`. Keep Godot tuning as the source; document any intentional design changes.
 
-Full inventory, test policy, server/filtering/save requirements and proposed order: [ROBLOX_PORT.md](../docs/ROBLOX_PORT.md). Current results: [roblox-first](../docs/verification/roblox-first/RESULTS.md). No Roblox-aware strict type-check result is claimed for this revision.
+Full inventory, test policy, server/filtering/save requirements and proposed order: [ROBLOX_PORT.md](../docs/ROBLOX_PORT.md). Current results: [roblox-silk](../docs/verification/roblox-silk/RESULTS.md). No Roblox-aware strict type-check result is claimed for this revision.
 
-The line is currently **drawn only**. Catch/hang/reel/lower/let-go are the recommended next chunk. Perception, flies, LIFE, wasp, notebook, menus/settings and saves remain to port. Initial publication uses solo servers (maximum players 1); that publishing setting has not been configured here. No experience was published by this build.
+Core catch/hang/reel/lower/let-go and edge-first lowering are implemented. Recovery camera framing and physical-device acceptance are next; see [handoff](../docs/HANDOFF-roblox-silk.md). Perception, flies, LIFE, wasp, notebook, menus/settings and saves remain to port. Initial publication uses solo servers (maximum players 1); that publishing setting has not been configured here. No experience was published by this build.

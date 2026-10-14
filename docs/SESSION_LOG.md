@@ -1154,3 +1154,7 @@ Started main 120abc5, updated laptop, confirmed baseline 640/640. Fixed menu foc
 ## 2026-10-14 — Chet: Roblox becomes active
 
 Merged Perplexity c87ce00 (both parts); froze Godot as reference, kept roblox_port/, recorded PLATFORM-01 and ROBLOX-01 to 03. Committed first-spider reference and appearance table, cuter rounded black/white rig, basic touch/gamepad controls, native Studio runner/build stamping and detailed port inventory. Corrected inherited forbidden runtime lighting assignment. Windows pure checks 43/43, Studio engine 6/6, evidence 5b14ae68fed28794; syntax 17 files. Saved actual Studio preview and reports. Physical controller/tablet and low-end frame-time acceptance remain. Recommended next: safety silk.
+
+## 2026-10-14 — Chet: Roblox core safety silk
+
+Started main e183efc. Added golden-tested tether math, engine silk controller and keyboard/gamepad/touch integration. Fixed edge tie selection and minimum-line leaf recovery through native regressions. Rebuilt both Studio places. Windows 115/115 pure, 18/18 engine (two completion rows), 3/3 client playback, evidence d1a1cff5c06eafe3; 22 Luau files compile. Frozen Godot gameplay/SPEC untouched. See HANDOFF-roblox-silk.md and verification/roblox-silk. Next Claude chunk: recovery camera and control acceptance, then perception. Physical-device/performance checks remain open.

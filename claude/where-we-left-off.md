@@ -1,3 +1,14 @@
+# Current handoff — Chet, 2026-10-14: Roblox safety silk
+
+Read **docs/HANDOFF-roblox-silk.md** and **docs/verification/roblox-silk/RESULTS.md** first. Roblox-only; Godot/SPEC frozen.
+- Core safety silk implemented: catch, hang, reel, lower, edge approach, one bend/snags and deliberate release. Rebuilt playable/test Studio places.
+- Windows **115/115 Luau**, **18/18 Studio**, **3/3 client playback**, evidence **d1a1cff5c06eafe3**. Studio count includes two completion rows.
+- F / X / Silk to lower; W/up reels, S/down lowers while hanging; hold Q / B / Let go to release.
+- **Next Claude: recovery camera and control acceptance**, then perception. Catch framing cap, camera collision, physical-device feel and performance remain unverified. Full details and concrete acceptance in the handoff.
+- Open roblox_port/TheWindowsill.rbxlx in Studio after update.bat; reopen an already-open place.
+
+---
+
 # Current handoff — Chet, 2026-10-14: Roblox only
 
 **Nathan: "Let's only work in roblox going forward."** PLATFORM-01 is decided. Roblox in `roblox_port/` is active; Godot at c87ce00 is a frozen runnable reference/golden-data source. No new Godot features; SPEC.md unchanged. Earlier Godot plans below are historical.

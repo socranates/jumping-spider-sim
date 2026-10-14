@@ -614,6 +614,234 @@ return JumpMath
         </Item>
         <Item class="ModuleScript" referent="13">
           <Properties>
+            <string name="Name">SilkController</string>
+            <string name="Source"><![CDATA[--!strict
+-- Engine adapter for the frozen safety line. One local-space anchor, at most one bend.
+-- Fixed ticks only. The client owns ordinary walking/jumps; this owns locked-line movement.
+local Math = require(script.Parent.TetherMath)
+local Silk = {}
+Silk.__index = Silk
+local HEIGHT, RADIUS = 0.31, 0.30
+local DOWN = Vector3.new(0,-1,0)
+
+function Silk.new(world, surfaces, tuning, gravity: number)
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Include
+	params.FilterDescendantsInstances = {world}
+	return setmetatable({world=world, surfaces=surfaces, params=params, maximum=tuning.max_line_length_wu,
+		speed=tuning.reel_speed_wu_s, gravity=gravity, mode="none", paid=0, rest=0, taut=false,
+		anchor=Vector3.zero, normal=Vector3.yAxis, anchorPart=nil, bend=nil, bendPart=nil,
+		lowering=false, snagged=false, block="", message="", release=Math.newRelease(), walk=nil,
+		previous=Vector3.zero},Silk)
+end
+function Silk.profile(self, hit)
+	return if hit then self.surfaces[hit.Instance:GetAttribute("ProfileId")] else nil
+end
+function Silk.clear(self)
+	self.mode="none"; self.anchorPart=nil; self.bend=nil; self.bendPart=nil
+	self.paid=0; self.rest=0; self.taut=false; self.lowering=false; self.snagged=false; self.block=""
+	self.walk=nil; self.release=Math.newRelease()
+	self.message=""
+end
+function Silk.anchorAt(self, hit, position: Vector3): boolean
+	self:clear()
+	local profile=self:profile(hit)
+	if not profile or not profile.silk_anchor_allowed or not hit.Instance:IsA("BasePart") then
+		self.message="This surface cannot hold silk"; return false
+	end
+	self.anchorPart=hit.Instance
+	self.anchorLocal=hit.Instance.CFrame:PointToObjectSpace(hit.Position)
+	self.normalLocal=hit.Instance.CFrame:VectorToObjectSpace(hit.Normal)
+	self.anchor=hit.Position; self.normal=hit.Normal; self.previous=position
+	self.mode="payout"; self.rest=self.maximum; self.paid=math.min((position-self.anchor).Magnitude,self.maximum)
+	self.message="Silk attached"
+	return true
+end
+function Silk.pivot(self): Vector3 return self.bend or self.anchor end
+function Silk.prefix(self): number return if self.bend then (self.bend-self.anchor).Magnitude else 0 end
+function Silk.path(self, position: Vector3): number return self:prefix()+(position-self:pivot()).Magnitude end
+function Silk.refresh(self): boolean
+	if not self.anchorPart or not self.anchorPart:IsDescendantOf(self.world) then
+		self:clear(); self.message="Silk anchor lost"; return false
+	end
+	self.anchor=self.anchorPart.CFrame:PointToWorldSpace(self.anchorLocal)
+	self.normal=self.anchorPart.CFrame:VectorToWorldSpace(self.normalLocal)
+	if self.bendPart then
+		if self.bendPart:IsDescendantOf(self.world) then self.bend=self.bendPart.CFrame:PointToWorldSpace(self.bendLocal)
+		else self.bend=nil; self.bendPart=nil end
+	end
+	return true
+end
+function Silk.clearRay(self, a: Vector3, b: Vector3): boolean
+	local d=b-a
+	return d.Magnitude<=0.02 or workspace:Raycast(a,d.Unit*(d.Magnitude-0.02),self.params)==nil
+end
+function Silk.geometry(self, position: Vector3)
+	local a=self.anchor+self.normal*0.02
+	if self:clearRay(a,position) then self.bend=nil; self.bendPart=nil; self.snagged=false
+	elseif self.bend then self.snagged=not self:clearRay(self.bend,position)
+	elseif self:clearRay(a,self.previous) then
+		local lo,hi=0,1
+		for _=1,12 do
+			local mid=(lo+hi)*0.5
+			if self:clearRay(a,self.previous:Lerp(position,mid)) then lo=mid else hi=mid end
+		end
+		local hit=workspace:Raycast(a,self.previous:Lerp(position,hi)-a,self.params)
+		self.snagged=true
+		if hit and hit.Instance:IsA("BasePart") then
+			local side=position-hit.Position
+			side-=hit.Normal*side:Dot(hit.Normal)
+			if side.Magnitude>1e-6 then side=side.Unit end
+			for _,k in {1,2,4} do
+				local point=hit.Position+(hit.Normal+side)*0.03*k
+				if self:clearRay(a,point) and self:clearRay(point,position) then
+					self.bend=point; self.bendPart=hit.Instance
+					self.bendLocal=hit.Instance.CFrame:PointToObjectSpace(point)
+					if self.mode=="locked" then self.rest=math.min(math.max(self.rest,self:path(position)),self.maximum) end
+					self.snagged=false; break
+				end
+			end
+		end
+	else self.snagged=true end
+	self.previous=position
+end
+function Silk.lock(self, position: Vector3, extension: number)
+	if self.mode=="none" then return end
+	self.paid,self.rest=Math.lock(self.paid,self:path(position),self.maximum,extension)
+	self.mode="locked"; self.taut=false; self.block=""; self.release=Math.newRelease()
+	self.message="Silk catching"
+end
+function Silk.payout(self, position: Vector3)
+	if self.mode~="payout" or not self:refresh() then return end
+	self:geometry(position)
+	self.paid=math.max(self.paid,self:path(position))
+	if self.paid>=self.maximum then self.paid=self.maximum; self:lock(position,0) end
+end
+function Silk.room(self, position: Vector3): number
+	local hit=workspace:Spherecast(position,RADIUS,DOWN*self.maximum,self.params)
+	return if hit then hit.Distance else 0
+end
+function Silk.planDrop(self, position: Vector3, up: Vector3, heading: Vector3)
+	local hit=workspace:Raycast(position,-up*(HEIGHT+0.12),self.params)
+	local profile=self:profile(hit)
+	if not profile then return nil,"No supporting surface" end
+	if not profile.silk_anchor_allowed then return nil,"This surface cannot hold silk" end
+	if up:Dot(Vector3.yAxis)<0.707 then
+		if self:room(position+up*0.01)>=1 then return {direction=Vector3.zero,distance=0},"" end
+		return nil,"Nothing below to lower into"
+	end
+	local best=nil
+	local limit=6
+	for i=0,15 do
+		local dir=CFrame.fromAxisAngle(up,i*math.pi/8):VectorToWorldSpace(heading)
+		local obstacle=workspace:Spherecast(position,RADIUS,dir*6,self.params)
+		local free=if obstacle then obstacle.Distance else 6
+		for step=1,math.floor(math.min(free,limit)*10) do
+			local distance=step/10
+			local q=position+dir*distance
+			if not workspace:Raycast(q,-up*(HEIGHT+0.12),self.params) then
+				if self:room(q+dir*HEIGHT)>=1 and (not best or distance<limit-1e-6) then best={direction=dir,distance=distance}; limit=distance end
+				break
+			end
+		end
+	end
+	return best,if best then "" else "Nothing below to lower into"
+end
+function Silk.startDrop(self, position: Vector3, up: Vector3, push: Vector3)
+	local hit=workspace:Raycast(position,-up*(HEIGHT+0.12),self.params)
+	if not self:anchorAt(hit,position) then return false end
+	self.lowering=true; self:lock(position,Math.DROP_SLACK)
+	self.message="Lowering on silk"
+	return true
+end
+
+-- Sweep the body, then slide once. Never satisfy a constraint by teleporting through a wall.
+function Silk.move(self, position: Vector3, motion: Vector3, velocity: Vector3, intent: number)
+	local p=position
+	local remaining=motion
+	for _=1,2 do
+		if remaining.Magnitude<1e-7 then break end
+		local hit=workspace:Spherecast(p,RADIUS,remaining,self.params)
+		if not hit then p+=remaining; break end
+		p+=remaining.Unit*math.max(hit.Distance-0.01,0)
+		local profile=self:profile(hit)
+		local allowed=not self.lowering or intent>0 or (hit.Normal.Y>=0.707 and hit.Position.Y<=self.anchor.Y-0.5)
+		if profile and profile.attachable and allowed then return p,Vector3.zero,hit end
+		local rest=remaining-remaining.Unit*math.min(hit.Distance,remaining.Magnitude)
+		remaining=rest-hit.Normal*rest:Dot(hit.Normal)
+		velocity-=hit.Normal*math.min(0,velocity:Dot(hit.Normal))
+	end
+	return p,velocity,nil
+end
+function Silk.step(self, position: Vector3, velocity: Vector3, intent: number, releaseDown: boolean)
+	if self.mode~="locked" or not self:refresh() then return position,velocity,nil end
+	if Math.releaseTick(self.release,true,releaseDown) then
+		self:clear(); self.message="Silk released"; return position,velocity,nil
+	end
+	if intent<=0 and self.block=="blocked" then self.block="" end
+	local oldRest=self.rest
+	if intent<0 or (self.block=="" and not self.snagged) then self.rest=Math.reel(self.rest,self:prefix(),self.maximum,intent,self.speed) end
+	if intent>0 and self.rest>=oldRest-1e-6 and self.block=="" then self.block="shortest" end
+	if intent<0 and self.rest>oldRest then self.block="" end
+	local p=position
+	-- A padded bend can leave the shortest line just below the lip. Acquire a nearby
+	-- real face with the legs (0.6 stud reach), never through an intervening obstacle.
+	if intent>0 and self.block=="shortest" and not self.snagged then
+		for _,direction in {self:pivot()-p,Vector3.yAxis,-self.normal} do
+			if direction.Magnitude>1e-6 then
+				local face=workspace:Raycast(p,direction.Unit*0.6,self.params)
+				local profile=self:profile(face)
+				if face and profile and profile.attachable then
+					local seat=face.Position+face.Normal*HEIGHT
+					local motion=seat-p
+					local obstacle=if motion.Magnitude>1e-7 then workspace:Spherecast(p,RADIUS,motion,self.params) else nil
+					if not obstacle or obstacle.Instance==face.Instance then return seat,Vector3.zero,face end
+				end
+			end
+		end
+	end
+	if self.rest<oldRest then
+		local excess=self:path(p)-self.rest
+		if excess>1e-6 then
+			local hit
+			p,velocity,hit=self:move(p,(self:pivot()-p).Unit*excess,velocity,intent)
+			if hit then return p,velocity,hit end
+			if self:path(p)>self.rest+1e-4 then self.rest=math.min(self:path(p),self.maximum); self.block="blocked" end
+		end
+	end
+	local energy=Math.energy(p,velocity,self.gravity)
+	velocity+=DOWN*self.gravity*Math.DT
+	if self.taut and (p-self:pivot()).Magnitude>1e-6 then
+		local r=(p-self:pivot()).Unit
+		velocity-=(velocity-r*velocity:Dot(r))*(1-math.exp(-Math.DAMPING*Math.DT))
+	end
+	local c=Math.constrain(self:pivot(),math.max(self.rest-self:prefix(),0),p+velocity*Math.DT,velocity)
+	local hit
+	p,velocity,hit=self:move(p,c.position-p,c.velocity,intent)
+	if hit then return p,velocity,hit end
+	local over=self:path(p)-self.rest
+	if over>1e-4 then
+		p,velocity,hit=self:move(p,(self:pivot()-p).Unit*over,velocity,intent)
+		if hit then return p,velocity,hit end
+	end
+	self:geometry(p)
+	if Math.energy(p,velocity,self.gravity)>energy+1e-6 then
+		local ke=0.5*velocity:Dot(velocity)
+		velocity*=if ke>1e-12 then math.sqrt(math.clamp((energy-self.gravity*p.Y)/ke,0,1)) else 0
+	end
+	local path=self:path(p)
+	self.paid=math.min(math.max(self.paid,path),self.rest)
+	self.taut=path>=self.rest-0.003
+	self.message=if self.snagged then "Silk snagged — lower or let go" elseif self.block=="blocked" then "Reel blocked — lower or let go"
+		elseif self.block=="shortest" then "At the shortest line" elseif intent>0 then "Reeling in" elseif intent<0 then "Lowering" else "Hanging on silk"
+	return p,velocity,nil
+end
+return Silk
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="14">
+          <Properties>
             <string name="Name">SupportMath</string>
             <string name="Source"><![CDATA[--!strict
 -- Port of scripts/movement/support_math.gd (spec 6.1, 6.2). Pure geometry for supported locomotion; unit vectors in world space.
@@ -694,12 +922,80 @@ return SupportMath
 ]]></string>
           </Properties>
         </Item>
+        <Item class="ModuleScript" referent="15">
+          <Properties>
+            <string name="Name">TetherMath</string>
+            <string name="Source"><![CDATA[--!strict
+-- Pure safety-line operations from frozen Godot tether.gd / spider_motor.gd.
+-- No renderer, wall clock, Roblox services or collision decisions here.
+local T = {}
+T.BRAKE = 0.25
+T.MIN_REST = 0.4
+T.DROP_SLACK = 0.5
+T.DAMPING = 1.6
+T.DT = 1/60
+
+function T.constrain(pivot: Vector3, length: number, target: Vector3, velocity: Vector3)
+	local d = target-pivot
+	local distance = d.Magnitude
+	local out = {position=target, velocity=velocity, acted=false, radial_before=0, radial_after=0,
+		tangential_change=0, distance_before=distance, distance_after=distance}
+	if distance < 1e-9 then return out end
+	local radial = d/distance
+	local speed = velocity:Dot(radial)
+	out.radial_before, out.radial_after = speed, speed
+	if distance <= length then return out end
+	local v = if speed > 0 then velocity-radial*speed else velocity
+	out.position = pivot+radial*math.max(length,0)
+	out.velocity, out.acted = v, true
+	out.radial_after = v:Dot(radial)
+	out.tangential_change = ((v-radial*v:Dot(radial))-(velocity-radial*speed)).Magnitude
+	out.distance_after = math.max(length,0)
+	return out
+end
+function T.energy(position: Vector3, velocity: Vector3, gravity: number): number
+	return 0.5*velocity:Dot(velocity)+gravity*position.Y
+end
+function T.reelWorkBound(shortening: number, gravity: number, speed: number, length: number): number
+	return math.max(shortening,0)*(gravity+speed*speed/math.max(length,0.05))
+end
+function T.sagDepth(span: number, length: number): number
+	local extra = length-span
+	if extra <= 1e-4 or span < 1e-4 then return 0 end
+	return math.min(math.sqrt(3*span*extra/8),3)
+end
+function T.lock(paid: number, path: number, maximum: number, extension: number): (number,number)
+	local p = math.min(math.max(paid,path),maximum)
+	return p,math.min(p+math.max(extension,0),maximum)
+end
+function T.reel(rest: number, prefix: number, maximum: number, intent: number, speed: number): number
+	return math.clamp(rest-math.clamp(intent,-1,1)*speed*T.DT,math.min(prefix+T.MIN_REST,maximum),maximum)
+end
+
+-- A press that started before the grace period can NEVER become a release later.
+function T.newRelease()
+	return {ticks=0, held=0, down=false, counts=false, progress=0}
+end
+function T.releaseTick(s, onLine: boolean, down: boolean): boolean
+	s.ticks = if onLine then s.ticks+1 else 0
+	if down and not s.down then s.counts = onLine and s.ticks>=24; s.held=0 end
+	if not down or not onLine then s.counts=false; s.held=0 end
+	s.down = down
+	s.held = if s.counts then s.held+1 else 0
+	s.progress = math.min(s.held/36,1)
+	if s.progress>=1 then s.counts=false; s.held=0; s.progress=0; return true end
+	return false
+end
+return T
+]]></string>
+          </Properties>
+        </Item>
       </Item>
-      <Item class="Folder" referent="14">
+      <Item class="Folder" referent="16">
         <Properties>
           <string name="Name">Rig</string>
         </Properties>
-        <Item class="ModuleScript" referent="15">
+        <Item class="ModuleScript" referent="17">
           <Properties>
             <string name="Name">SpiderRig</string>
             <string name="Source"><![CDATA[--!strict
@@ -1117,15 +1413,15 @@ return SpiderRig
       </Item>
     </Item>
   </Item>
-  <Item class="ServerScriptService" referent="16">
+  <Item class="ServerScriptService" referent="18">
     <Properties>
       <string name="Name">ServerScriptService</string>
     </Properties>
-    <Item class="Folder" referent="17">
+    <Item class="Folder" referent="19">
       <Properties>
         <string name="Name">Server</string>
       </Properties>
-      <Item class="Script" referent="18">
+      <Item class="Script" referent="20">
         <Properties>
           <string name="Name">Main</string>
           <token name="RunContext">0</token>
@@ -1267,19 +1563,19 @@ dof.InFocusRadius = 3.5
       </Item>
     </Item>
   </Item>
-  <Item class="StarterPlayer" referent="19">
+  <Item class="StarterPlayer" referent="21">
     <Properties>
       <string name="Name">StarterPlayer</string>
     </Properties>
-    <Item class="StarterPlayerScripts" referent="20">
+    <Item class="StarterPlayerScripts" referent="22">
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="Folder" referent="21">
+      <Item class="Folder" referent="23">
         <Properties>
           <string name="Name">Client</string>
         </Properties>
-        <Item class="LocalScript" referent="22">
+        <Item class="LocalScript" referent="24">
           <Properties>
             <string name="Name">SpiderClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -1315,7 +1611,7 @@ local TURN_RATE = math.rad(540)
 local AIM_HOLD_S = 0.18
 local AIM_RANGE = 40
 local HOP_DISTANCE = 1.6
-local MAX_DRAGLINES = 12
+local MAX_DRAGLINES = 24 -- two segments per one-bend line
 
 local player = Players.LocalPlayer
 local camera = Workspace.CurrentCamera
@@ -1326,6 +1622,8 @@ params.FilterType = Enum.RaycastFilterType.Include
 params.FilterDescendantsInstances = { sill }
 
 local rig = SpiderRig.new(Workspace, sill)
+local SilkController = require(Shared.Movement.SilkController)
+local silk = SilkController.new(sill, Surfaces, profile.silk, LOCO.gravity_wu_s2)
 
 type Mode = "attached" | "air"
 local state = {
@@ -1341,7 +1639,8 @@ local state = {
 	aiming = false,
 	plan = nil :: any,
 	planFrom = Vector3.zero,
-	lineAnchor = nil :: Vector3?,
+	flightTicks = 0,
+	flightLimit = 0,
 }
 
 local function profileOf(hit: RaycastResult): any
@@ -1388,14 +1687,15 @@ local function respawn()
 	state.vel = Vector3.zero
 	state.aiming = false
 	state.plan = nil
-	state.lineAnchor = nil
+	silk:clear()
 end
 
--- ---------------------------------------------------------------- dragline (drawn only)
+-- ---------------------------------------------------------------- safety-line rendering (mechanics in SilkController)
 local lines = Instance.new("Folder")
 lines.Name = "Draglines"
 lines.Parent = Workspace
 local liveLine: Part? = nil
+local bendLine: Part? = nil
 
 local function strand(a: Vector3, b: Vector3, p: Part)
 	local len = math.max((b - a).Magnitude, 0.01)
@@ -1413,6 +1713,7 @@ local function newStrand(): Part
 	p.Material = Enum.Material.Neon
 	p.Color = Color3.fromRGB(236, 232, 214)
 	p.Transparency = 0.35
+	p:SetAttribute("Born", time())
 	p.Parent = lines
 	local kids = lines:GetChildren()
 	if #kids > MAX_DRAGLINES then
@@ -1495,16 +1796,38 @@ local function aim()
 	end
 end
 
-local function launch(velocity: Vector3)
+local function beginStrands()
+	liveLine = newStrand()
+	bendLine = newStrand()
+	bendLine.Transparency = 1
+end
+local function launch(velocity: Vector3, steps: number)
 	local floorHit = Workspace:Raycast(state.pos, -state.up * (HEIGHT + 0.1), params)
-	local fromSurface = if floorHit then profileOf(floorHit) else nil
-	state.lineAnchor = if fromSurface and fromSurface.silk_anchor_allowed then state.pos - state.up * HEIGHT else nil
-	if state.lineAnchor then
-		liveLine = newStrand()
-	end
+	if silk:anchorAt(floorHit, state.pos) then beginStrands() end
+	state.flightTicks, state.flightLimit = 0, steps+4
 	state.vel = velocity
 	state.mode = "air"
 	hidePreview()
+end
+local function beginDrop(push: Vector3): boolean
+	if not silk:startDrop(state.pos, state.up, push) then return false end
+	beginStrands()
+	state.vel = push*0.6
+	state.mode = "air"
+	state.aiming=false; state.spaceDown=false; state.plan=nil
+	hidePreview()
+	return true
+end
+local function requestDrop()
+	if state.mode ~= "attached" or state.aiming or silk.walk then return end
+	local plan, message = silk:planDrop(state.pos,state.up,state.heading)
+	if not plan then silk.message=message; return end
+	if plan.direction.Magnitude<1e-6 then
+		if beginDrop(state.up) then state.pos+=state.up*0.01 end
+	else
+		silk.walk={direction=plan.direction, ticks=math.ceil((plan.distance/LOCO.walk_speed_wu_s+1.5)*60)}
+		silk.message="Walking to the edge — move or cancel to stop"
+	end
 end
 
 local function hop()
@@ -1518,7 +1841,7 @@ local function hop()
 	local g = if JumpMath.isStanding(state.up) then G else -state.up * LOCO.gravity_wu_s2
 	local result = JumpMath.solve(state.pos, seat, state.up, h.Normal, g, DT, LOCO.flight_time_min_s, LOCO.flight_time_max_s, LOCO.max_launch_speed_wu_s)
 	if result.valid[1] and g == G then
-		launch(result.valid[1].velocity)
+		launch(result.valid[1].velocity, result.valid[1].steps)
 	end
 end
 
@@ -1537,7 +1860,13 @@ local function wish(): Vector3
 end
 
 local function tickAttached()
-	local dir = if state.aiming then Vector3.zero else wish()
+	local manual = wish()
+	if silk.walk and manual.Magnitude>0 then silk.walk=nil; silk.message="Edge walk cancelled" end
+	local dir = if state.aiming then Vector3.zero elseif silk.walk then silk.walk.direction else manual
+	if silk.walk then
+		silk.walk.ticks-=1
+		if silk.walk.ticks<=0 then silk.walk=nil; silk.message="Edge walk stopped"; return end
+	end
 	state.moving = dir ~= Vector3.zero
 	if not state.moving then
 		-- Re-seat on the support so a vanished or moved surface is noticed.
@@ -1567,6 +1896,10 @@ local function tickAttached()
 		state.heading = SupportMath.tangentDir(state.heading, n)
 		return
 	end
+	if silk.walk then
+		if beginDrop(dir) then state.pos=nextPos+dir*(HEIGHT+0.02) end
+		return
+	end
 	-- Convex edge: wrap over it onto the face beyond (sill edge, leaf rim, the top of a wall).
 	local around = Workspace:Raycast(nextPos - state.up * (HEIGHT + 0.15), -dir * 1.0, params)
 	if around and attachable(around) then
@@ -1578,6 +1911,18 @@ local function tickAttached()
 end
 
 local function tickAir()
+	if silk.mode=="locked" then
+		local _,forward=controls:axes()
+		local intent=if controls.held.Drop then math.min(forward,0)-1 else forward
+		local hit
+		state.pos,state.vel,hit=silk:step(state.pos,state.vel,math.clamp(intent,-1,1),controls.held.Release==true)
+		if hit then
+			setSupport(hit); state.vel=Vector3.zero; state.mode="attached"
+			silk:clear(); liveLine=nil; bendLine=nil
+		end
+		return
+	end
+	state.flightTicks+=1
 	local from = state.pos
 	state.vel += G * DT
 	local to = from + state.vel * DT
@@ -1594,18 +1939,18 @@ local function tickAir()
 			end
 			state.vel = Vector3.zero
 			state.mode = "attached"
-			if liveLine and state.lineAnchor then
-				strand(state.lineAnchor, rig:spinneretPoint(SupportMath.bodyCFrame(state.pos, state.up, state.heading)), liveLine)
-			end
-			liveLine = nil
-			state.lineAnchor = nil
+			liveLine=nil; bendLine=nil
+			silk:clear()
 			return
 		end
+		if silk.mode=="payout" then silk:lock(state.pos,0.25) end
 		-- Not landable here: slide along it.
 		state.vel -= hit.Normal * math.min(0, state.vel:Dot(hit.Normal))
 		to = hit.Position + hit.Normal * HEIGHT
 	end
 	state.pos = to
+	silk:payout(to)
+	if silk.mode=="payout" and state.flightTicks>=state.flightLimit then silk:lock(to,0.25) end
 	-- The drawn body turns upright while falling.
 	state.up = SupportMath.rotateToward(state.up, Vector3.yAxis, math.rad(240) * DT)
 	local lo, hi = Layout.PLAY_BOUNDS_MIN, Layout.PLAY_BOUNDS_MAX
@@ -1631,6 +1976,7 @@ end
 
 controls = SpiderInput.bind(function(phase: string)
 	if phase == "begin" then
+		silk.walk=nil
 		state.spaceDown = true
 		state.spaceTime = 0
 		return
@@ -1639,14 +1985,21 @@ controls = SpiderInput.bind(function(phase: string)
 	if phase == "end" and state.mode == "attached" then
 		if state.aiming then
 			local plan = state.plan
-			if plan and (state.pos - state.planFrom).Magnitude < 1e-3 then launch(plan.velocity) end
+			if plan and (state.pos - state.planFrom).Magnitude < 1e-3 then launch(plan.velocity, plan.steps) end
 		else hop() end
 	end
 	state.aiming = false
 	state.plan = nil
 	hidePreview()
-end, respawn, function()
+end, function() silk.walk=nil; respawn() end, function()
 	rig.gaitMode = if rig.gaitMode == "Tetrapod" then "Unilateral" else "Tetrapod"
+end, function(action, phase)
+	if action=="Drop" and phase=="begin" then requestDrop() end
+	if action=="Release" and phase=="begin" then
+		if silk.walk then silk.walk=nil; silk.message="Edge walk cancelled" end
+		state.aiming=false; state.spaceDown=false; state.plan=nil; hidePreview()
+	end
+	if phase=="clear" then silk.release.down=true; silk.release.counts=false; silk.release.held=0; silk.release.progress=0; silk.walk=nil end
 end)
 
 -- ---------------------------------------------------------------- camera
@@ -1656,6 +2009,12 @@ camera.CameraType = Enum.CameraType.Custom
 camera.CameraSubject = rig.root
 camera.FieldOfView = 60
 
+local hud=Instance.new("ScreenGui")
+hud.Name="SilkHUD"; hud.ResetOnSpawn=false; hud.Parent=player:WaitForChild("PlayerGui")
+local status=Instance.new("TextLabel")
+status.Name="SilkStatus"; status.Size=UDim2.new(1,-32,0,64); status.Position=UDim2.new(0,16,0,36)
+status.BackgroundColor3=Color3.new(0.03,0.03,0.03); status.BackgroundTransparency=0.25
+status.TextColor3=Color3.new(1,1,1); status.TextSize=17; status.TextWrapped=true; status.AutomaticSize=Enum.AutomaticSize.Y; status.Parent=hud
 local accumulator = 0
 RunService.RenderStepped:Connect(function(frameDt: number)
 	accumulator = math.min(accumulator + frameDt, 0.25)
@@ -1667,18 +2026,46 @@ RunService.RenderStepped:Connect(function(frameDt: number)
 	state.drawnUp = state.drawnUp:Lerp(state.up, 1 - math.exp(-24 * frameDt)).Unit
 	local body = SupportMath.bodyCFrame(state.pos, state.drawnUp, state.heading)
 	rig:update(body, frameDt, state.mode == "attached", state.moving)
-	if liveLine and state.lineAnchor then
-		strand(state.lineAnchor, rig:spinneretPoint(body), liveLine)
+	if liveLine and bendLine and silk.mode~="none" then
+		local tip=rig:spinneretPoint(body)
+		strand(silk.anchor,silk.bend or tip,liveLine)
+		liveLine.Transparency=0.35
+		if silk.bend then strand(silk.bend,tip,bendLine); bendLine.Transparency=0.35 else bendLine.Transparency=1 end
+	elseif liveLine then
+		liveLine:Destroy(); liveLine=nil
+		if bendLine then bendLine:Destroy(); bendLine=nil end
 	end
+	for _,line in lines:GetChildren() do
+		if line~=liveLine and line~=bendLine then
+			local age=time()-(line:GetAttribute("Born") or time())
+			if age>25 then line:Destroy() else line.Transparency=math.max(line.Transparency,0.35+0.65*age/25) end
+		end
+	end
+	local progress=silk.release.progress
+	status.Text=if silk.mode=="locked" then silk.message.." | W / ↑: reel • S / ↓: lower • hold Q / B / Let go"..(if progress>0 then ` ({math.floor(progress*100)}%)` else "")
+		elseif silk.walk then silk.message else (if silk.message~="" then silk.message.." | " else "").."F / X: lower on silk"
+
 	local dof = Lighting:FindFirstChild("MacroDOF")
 	if dof and dof:IsA("DepthOfFieldEffect") then
 		dof.FocusDistance = (camera.CFrame.Position - state.pos).Magnitude
 	end
 end)
+
+-- The test-place-only module exercises this controller in Studio. Absent from the playable build.
+local playback=script.Parent:FindFirstChild("SilkPlayback")
+if RunService:IsStudio() and playback then
+    task.spawn(function()
+        require(playback)({input=controls,drop=requestDrop,
+            place=function(position)
+                controls:clear(); respawn(); state.pos=position; state.up=Vector3.yAxis; state.heading=Vector3.zAxis
+            end,
+            get=function() return {mode=state.mode,line=silk.mode,taut=silk.taut,position=state.pos,walking=silk.walk~=nil} end})
+    end)
+end
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="23">
+        <Item class="ModuleScript" referent="25">
           <Properties>
             <string name="Name">SpiderInput</string>
             <string name="Source"><![CDATA[--!strict
@@ -1686,15 +2073,18 @@ end)
 local CAS = game:GetService("ContextActionService")
 local UIS = game:GetService("UserInputService")
 local Players = game:GetService("Players")
-local InputState = require(game:GetService("ReplicatedStorage").Shared.Movement.InputState)
+local InputState = require(game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Movement"):WaitForChild("InputState"))
 local SpiderInput = {}
 
-function SpiderInput.bind(jump: (string) -> (), reset: () -> (), gait: () -> ())
+function SpiderInput.bind(jump: (string) -> (), reset: () -> (), gait: () -> (), silkAction: (string,string) -> ())
 	local state = InputState.new()
 	local function act(action: string, phase: Enum.UserInputState)
 		local down = phase == Enum.UserInputState.Begin
 		if action == "Jump" then
 			if down then jump("begin") elseif phase == Enum.UserInputState.End then jump("end") else jump("cancel") end
+		elseif action=="Drop" or action=="Release" then
+			state:set(action,down)
+			silkAction(action,if down then "begin" elseif phase==Enum.UserInputState.End then "end" else "cancel")
 		elseif action == "Reset" then if down then reset() end
 		elseif action == "Gait" then if down then gait() end
 		else state:set(action, down) end
@@ -1703,6 +2093,7 @@ function SpiderInput.bind(jump: (string) -> (), reset: () -> (), gait: () -> ())
 		Forward = {Enum.KeyCode.W, Enum.KeyCode.DPadUp}, Back = {Enum.KeyCode.S, Enum.KeyCode.DPadDown},
 		Left = {Enum.KeyCode.A, Enum.KeyCode.DPadLeft}, Right = {Enum.KeyCode.D, Enum.KeyCode.DPadRight},
 		Jump = {Enum.KeyCode.Space, Enum.KeyCode.ButtonA}, Creep = {Enum.KeyCode.LeftShift, Enum.KeyCode.ButtonL1},
+		Drop={Enum.KeyCode.F,Enum.KeyCode.ButtonX}, Release={Enum.KeyCode.Q,Enum.KeyCode.ButtonB},
 		Reset = {Enum.KeyCode.R, Enum.KeyCode.ButtonY}, Gait = {Enum.KeyCode.G},
 	}
 	for action, keys in bindings do
@@ -1727,6 +2118,7 @@ function SpiderInput.bind(jump: (string) -> (), reset: () -> (), gait: () -> ())
 		state:clear()
 		table.clear(active)
 		jump("cancel")
+		silkAction("Release","clear")
 	end
 	local function button(action: string, label: string, position: UDim2, size: number)
 		local b = Instance.new("TextButton")
@@ -1755,6 +2147,8 @@ function SpiderInput.bind(jump: (string) -> (), reset: () -> (), gait: () -> ())
 	button("Right", "→", UDim2.new(0, 134, 1, -132), 52)
 	button("Jump", "Jump\n(hold)", UDim2.new(1, -92, 1, -102), 72)
 	button("Creep", "Creep", UDim2.new(1, -86, 1, -172), 60)
+	button("Drop", "Silk", UDim2.new(1,-86,1,-242),60)
+	button("Release", "Let go\n(hold)", UDim2.new(1,-156,1,-242),60)
 	UIS.InputEnded:Connect(function(input)
 		local action = active[input]
 		if action then active[input] = nil; act(action, Enum.UserInputState.End) end
@@ -1772,7 +2166,7 @@ return SpiderInput
       </Item>
     </Item>
   </Item>
-  <Item class="Workspace" referent="24">
+  <Item class="Workspace" referent="26">
     <Properties>
       <string name="Name">Workspace</string>
       <float name="Gravity">35</float>

@@ -2,7 +2,7 @@
 
 **Nathan's decision, 2026-10-14: "Let's only work in roblox going forward."** New work lives in [`roblox_port/`](roblox_port/README.md). Open **roblox_port/TheWindowsill.rbxlx** in Roblox Studio and press **Play**. After `update.bat`, reopen that file to load the new version.
 
-The first spider uses his daughter's black-and-white reference, with rounder shapes and stout banded front legs. Keyboard/mouse, basic touch controls and gamepad bindings are included. This is an early port: the whole life, flies and safety-line mechanics still need porting. See [the feature inventory and port order](docs/ROBLOX_PORT.md), [current handoff](docs/HANDOFF-roblox-first.md), and [Windows verification](docs/verification/roblox-first/RESULTS.md).
+The first spider uses his daughter's black-and-white reference, with rounder shapes and stout banded front legs. Keyboard/mouse, basic touch controls and gamepad bindings are included. This is an early port: core safety silk now works; the whole life and flies still need porting, and camera/device acceptance remains. See [the feature inventory and port order](docs/ROBLOX_PORT.md), [current handoff](docs/HANDOFF-roblox-silk.md), and [Windows verification](docs/verification/roblox-silk/RESULTS.md).
 
 **Godot is frozen as a runnable reference and source of golden test behavior.** No new Godot features; SPEC.md stays frozen. The accepted design pillars, guardrails, amendments/D-entries and data/*.json tuning carry forward. `play.bat` still opens the historical Godot reference. Roblox is the release direction; the earlier itch.io/Windows/web release plan below is historical.
 

@@ -1,0 +1,99 @@
+{
+  "evidence_id": "d1a1cff5c06eafe3",
+  "engine": "0.742.0.7421053",
+  "tests": 18,
+  "passed": 18,
+  "failed": 0,
+  "results": [
+    {
+      "passed": true,
+      "name": "real engine jump reaches seat",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "raycast planted foot stays in world space",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "appearance stays white when stage changes",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "all rig parts are display only and bounded",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "air and underside poses are finite",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "Studio spec completes",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "floor refuses lowering without room below",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "raised leaf chooses nearest edge",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "anchor policy and moving local-space anchor",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "payout never constrains a valid flight",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "miss catches within paid length and settles",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "deliberate leaf drop hangs then lowers to floor",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "reel after leaf drop grabs the leaf",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "wall drop lowers to floor",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "one bend snags at a second obstruction and clears again",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "anchor deletion releases without invalid coordinates",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "blocked reel cannot pull through nonattachable wall",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "Silk spec completes",
+      "detail": ""
+    }
+  ]
+}

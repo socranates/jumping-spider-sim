@@ -63,5 +63,41 @@ input:stick(0,1); x,y=input:axes(); check(x == 0 and y == 1, "stick full forward
 input:set("Creep", true); input:clear(); x,y=input:axes()
 check(x == 0 and y == 0 and not input.held.Creep, "focus loss clears movement and creep")
 
+
+local Tether = require("../src/Shared/Movement/TetherMath")
+local golden = require("./tether_reference")
+local function vector(a) return Vector3.new(a[1],a[2],a[3]) end
+for i,case in golden.cases do
+    local got=Tether.constrain(Vector3.zero,case.length,vector(case.target),vector(case.velocity))
+    local expected=case.result
+    check((got.position-vector(expected.position)).Magnitude<1e-5,`tether {i} position`)
+    check((got.velocity-vector(expected.velocity)).Magnitude<1e-5,`tether {i} velocity`)
+    check(got.acted==expected.acted,`tether {i} unilateral`)
+    check(near(got.radial_after,expected.radial_after,1e-5),`tether {i} radial`)
+    check(got.velocity.Magnitude<=vector(case.velocity).Magnitude+1e-6,`tether {i} no speed added`)
+end
+check(near(Tether.energy(Vector3.new(0,3,0),Vector3.new(3,4,0),35),golden.energy,1e-6),"Godot energy")
+check(near(Tether.reelWorkBound(0.025,35,4,2),golden.work,1e-6),"Godot reel work")
+check(near(Tether.sagDepth(3,4),golden.sag,1e-6),"Godot sag")
+local paid,rest=Tether.lock(4,3,20,0.25)
+check(paid==4 and rest==4.25,"lock keeps paid line and braking extension")
+paid,rest=Tether.lock(19.9,20.5,20,0.25)
+check(paid==20 and rest==20,"maximum length bounds lock")
+check(near(Tether.reel(4,0,20,1,1.5),3.975,1e-9),"reel is species speed at fixed tick")
+check(Tether.reel(0.4,0,20,1,1.5)==0.4,"shortest line")
+check(Tether.reel(20,0,20,-1,1.5)==20,"lowering capped")
+local release=Tether.newRelease()
+local accidental=false
+for _=1,180 do accidental=accidental or Tether.releaseTick(release,true,true) end
+check(not accidental,"held before catch never releases")
+Tether.releaseTick(release,true,false)
+for _=1,35 do accidental=accidental or Tether.releaseTick(release,true,true) end
+check(not accidental,"short hold does not release")
+check(Tether.releaseTick(release,true,true),"36-tick deliberate hold releases")
+release=Tether.newRelease()
+for _=1,30 do Tether.releaseTick(release,true,false) end
+for _=1,12 do Tether.releaseTick(release,true,true) end
+Tether.releaseTick(release,true,false)
+check(release.progress==0,"tap release resets progress")
 print(`SUMMARY passed={passed} failed={failed}`)
 if failed > 0 then error("port check failed") end

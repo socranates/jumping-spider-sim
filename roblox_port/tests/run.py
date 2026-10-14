@@ -28,6 +28,7 @@ MODULES = [
     ("ControlText", "UI/ControlText.luau"),
     ("HudLayout", "UI/HudLayout.luau"),
     ("Setae", "Rig/Setae.luau"),
+    ("SpiderCamera", "../Client/SpiderCamera.luau"),
 ]
 REFERENCES = ["jump_reference", "tether_reference", "camera_reference", "framing_reference"]
 NAMES = {name for name, _ in MODULES}
@@ -36,8 +37,11 @@ NAMES = {name for name, _ in MODULES}
 def requires(text):
     """Every require of a shared module, in any of the spellings the sources use, becomes the bundled local."""
     text = re.sub(r'require\(script\.Parent(?:\.Parent\.\w+)?\.(\w+)\)', lambda m: f"__mods.{m.group(1)}" if m.group(1) in NAMES else m.group(0), text)
-    text = re.sub(r'require\("\.\./src/Shared/\w+/(\w+)"\)', lambda m: f"__mods.{m.group(1)}", text)
+    text = re.sub(r'require\("\.\./src/(?:Shared/\w+|Client)/(\w+)"\)', lambda m: f"__mods.{m.group(1)}", text)
+    text = re.sub(r'require\(\w+:WaitForChild\("(\w+)"\)\)', lambda m: f"__mods.{m.group(1)}" if m.group(1) in NAMES else m.group(0), text)
+    text = re.sub(r'require\(Shared\.\w+\.(\w+)\)', lambda m: f"__mods.{m.group(1)}" if m.group(1) in NAMES else m.group(0), text)
     text = re.sub(r'require\("\./(\w+)"\)', lambda m: f"__refs.{m.group(1)}" if m.group(1) in REFERENCES else m.group(0), text)
+    text = re.sub(r'require\("\./studio/(\w+)"\)', lambda m: chunk(HERE / "studio" / (m.group(1) + ".luau")), text)
     return text
 
 
@@ -49,9 +53,10 @@ def chunk(path):
 
 
 def bundle(test_file):
-    parts = ["local Vector3, CFrame, Color3, workspace, Instance, Enum, RaycastParams, OverlapParams, BoxWorld",
+    parts = ["local Vector3, CFrame, Color3, workspace, Instance, Enum, RaycastParams, OverlapParams, BoxWorld, Vector2, game",
              "local shim = " + chunk(HERE / "shim.luau"),
              "Vector3, CFrame, Color3, workspace, Instance, Enum, RaycastParams, OverlapParams, BoxWorld = shim.Vector3, shim.CFrame, shim.Color3, shim.workspace, shim.Instance, shim.Enum, shim.RaycastParams, shim.OverlapParams, shim.BoxWorld",
+             "Vector2, game = shim.Vector2, shim.game",
              "local __refs, __mods = {}, {}"]
     for ref in REFERENCES:
         path = HERE / (ref + ".luau")

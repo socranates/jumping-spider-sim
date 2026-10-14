@@ -414,6 +414,8 @@ if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
 			jump = jump,
 			motor = motor,
 			camera = cam,
+			sill = sill,
+			setDevice = function(name: ControlText.Device) device = name end,
 			place = function(position: Vector3)
 				controls:clear()
 				jump:drop(motor)

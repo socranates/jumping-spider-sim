@@ -1,48 +1,31 @@
--- Recovery scenarios against the box world (tests/shim.luau): the real SpiderMotor, SilkController and JumpInput run tick by
--- tick on the windowsill's own boxes (WindowsillLayout.PIECES), with Workspace queries emulated for axis-aligned boxes.
--- A smoke test of the motor's code paths and decisions, deterministic and runnable anywhere. It is not the Roblox engine:
--- tests/studio/RecoverySpec.luau runs the same scenarios against real raycasts and sphere casts in Studio.
-local Motor = require("../src/Shared/Movement/SpiderMotor")
-local JumpInput = require("../src/Shared/Movement/JumpInput")
-local Layout = require("../src/Shared/Habitat/WindowsillLayout")
-local Species = require("../src/Shared/Data/Species")
-local Surfaces = require("../src/Shared/Data/Surfaces")
-
+-- Recovery scenarios against the box world (tests/shim.luau): tests/studio/RecoveryScenarios.luau run tick by tick on the
+-- windowsill's own boxes with Workspace queries emulated for axis-aligned boxes. A deterministic smoke test of the real
+-- motor, silk, jump-input and camera code; not the Roblox engine. Studio runs the same module with real queries.
+local deps = {
+	Motor = require("../src/Shared/Movement/SpiderMotor"),
+	JumpInput = require("../src/Shared/Movement/JumpInput"),
+	Layout = require("../src/Shared/Habitat/WindowsillLayout"),
+	Species = require("../src/Shared/Data/Species"),
+	Surfaces = require("../src/Shared/Data/Surfaces"),
+	SpiderCamera = require("../src/Client/SpiderCamera"),
+	cameraFixtures = { 1, 7 },
+	log = function(line) print("  " .. line) end,
+}
 local passed, failed = 0, 0
-local function check(ok: boolean, what: string)
-	if ok then passed += 1 else failed += 1; print("FAIL boxworld: " .. what) end
+local function check(name: string, fn: () -> ())
+	local ok, err = pcall(fn)
+	if ok then passed += 1 else failed += 1; print("FAIL boxworld: " .. name .. "\n    " .. tostring(err)) end
 end
-
-local pieces = {}
-for _, p in Layout.PIECES do table.insert(pieces, { name = p.id, lo = p.lo, hi = p.hi, profile = p.profile }) end
-local sill = BoxWorld.folder("Windowsill", pieces)
-local function newMotor()
-	return Motor.new({ world = sill, surfaces = Surfaces, profile = Species.phidippus_audax_prototype, spawn = Layout.SPAWN,
-		heading = Layout.SPAWN_HEADING, boundsMin = Layout.PLAY_BOUNDS_MIN, boundsMax = Layout.PLAY_BOUNDS_MAX })
-end
-local function input(t)
-	local i = Motor.idleInput()
-	for k, v in t or {} do i[k] = v end
-	return i
-end
-local function run(m, ticks, inp, stop)
-	for n = 1, ticks do
-		m:tick(input(inp))
-		if stop and stop(m) then return n end
-	end
-	return ticks
-end
-
-do
-	local m = newMotor()
-	run(m, 60)
-	check(m.mode == "attached" and math.abs(m.pos.Y - 0.31) < 1e-6, "the spider stands on the sill at spawn")
-	local start = m.pos
-	run(m, 60, { wish = Vector3.xAxis })
-	check(m.mode == "attached" and m.pos.X > start.X + 1 and math.abs(m.pos.Y - 0.31) < 1e-6, "it walks along the sill")
-	local hop = m:hopPlan()
-	check(hop.kind == "reachable" and hop.steps > 0, `a hop ahead on the open sill is reachable ({hop.kind} {hop.reason})`)
-end
-
+require("./studio/RecoveryScenarios")(check, deps)
+-- Cross-check of the emulation itself: Chet's silk spec, which passed in Windows Studio (docs/verification/roblox-silk),
+-- runs unchanged on the box world.
+check("Chet's Studio silk spec on the box world", function()
+	local rows = {}
+	require("./studio/SilkSpec")(function(name: string, fn: () -> ())
+		local ok, err = pcall(fn)
+		if not ok then table.insert(rows, name .. ": " .. tostring(err)) end
+	end)
+	assert(#rows == 0, table.concat(rows, "\n"))
+end)
 print(`BOXWORLD passed={passed} failed={failed}`)
 if failed > 0 then error("box-world scenarios failed") end

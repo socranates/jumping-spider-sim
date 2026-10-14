@@ -164,7 +164,9 @@ function Silk.step(self: any, position: Vector3, velocity: Vector3, intent: numb
 	if intent<=0 and self.block=="blocked" then self.block="" end
 	local oldRest=self.rest
 	if intent<0 or (self.block=="" and not self.snagged) then self.rest=Math.reel(self.rest,self:prefix(),self.maximum,intent,self.speed) end
-	if intent>0 and self.rest>=oldRest-1e-6 and self.block=="" then self.block="shortest" end
+	-- "Shortest" only when a reel actually ran and could not shorten (Godot sets it inside its not-snagged reel branch);
+	-- a snag while swinging under a leaf must not leave reeling refused once the line is clear again (ROBLOX-10).
+	if intent>0 and not self.snagged and self.rest>=oldRest-1e-6 and self.block=="" then self.block="shortest" end
 	if intent<0 and self.rest>oldRest then self.block="" end
 	local p=position
 	-- A padded bend can leave the shortest line just below the lip. Acquire a nearby

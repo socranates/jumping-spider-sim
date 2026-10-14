@@ -136,6 +136,7 @@ end })
 local Instance = {}
 local Object = {}
 local BASE_PARTS = { Part = true, WedgePart = true, MeshPart = true }
+local HAS_CFRAME = { Part = true, WedgePart = true, MeshPart = true, Camera = true }
 local function children(o) return rawget(o, "_children") end
 Object.__index = function(o, k)
 	if k == "Parent" then return rawget(o, "_parent") end
@@ -163,8 +164,10 @@ Object.__newindex = function(o, k, v)
 end
 function Instance.new(className: string)
 	local o = setmetatable({ ClassName = className, Name = className, _children = {}, _attrs = {} }, Object)
-	if BASE_PARTS[className] then
+	if HAS_CFRAME[className] then
 		rawset(o, "_cframe", CFrame.new())
+	end
+	if BASE_PARTS[className] then
 		rawset(o, "Size", new(4, 1, 2))
 		rawset(o, "CanQuery", true)
 		rawset(o, "CanCollide", true)
@@ -190,6 +193,11 @@ function Object.GetDescendants(o)
 	return out
 end
 function Object.FindFirstChild(o, name) for _, c in children(o) do if c.Name == name then return c end end return nil end
+function Object.FindFirstChildWhichIsA(o, cls, recursive)
+	for _, c in (if recursive then o:GetDescendants() else children(o)) do if c:IsA(cls) then return c end end
+	return nil
+end
+function Object.WaitForChild(o, name) return o:FindFirstChild(name) or o end
 function Object.SetAttribute(o, k, v) rawget(o, "_attrs")[k] = v end
 function Object.GetAttribute(o, k) return rawget(o, "_attrs")[k] end
 function Object.Destroy(o)
@@ -365,6 +373,29 @@ function workspace.GetPartsInPart(_self, part, params)
 	return out
 end
 
+function workspace.GetPartBoundsInRadius(_self, centre, r, params)
+	local out = {}
+	for _, b in boxes(params) do
+		if (closest(centre, b) - centre).Magnitude < r then table.insert(out, b.part) end
+	end
+	return out
+end
+
+-- Vector2 and the services the client modules touch (no input, no menu).
+local Vector2 = {}
+Vector2.__index = Vector2
+function Vector2.new(x, y) return setmetatable({ X = x or 0, Y = y or 0 }, Vector2) end
+Vector2.zero = Vector2.new(0, 0)
+local function signal() return { Connect = function() return { Disconnect = function() end } end } end
+local services = {
+	Workspace = workspace,
+	ReplicatedStorage = Instance.new("Folder"),
+	GuiService = { MenuIsOpen = false, MenuOpened = signal(), MenuClosed = signal() },
+	UserInputService = { InputChanged = signal(), MouseBehavior = nil, MouseIconEnabled = true, TouchEnabled = false, KeyboardEnabled = true,
+		GetMouseDelta = function() return Vector2.zero end },
+}
+local game = { GetService = function(_self, name) return services[name] end }
+
 -- Builds axis-aligned parts from {lo, hi, profile, name} pieces into a folder in the workspace.
 local BoxWorld = {}
 function BoxWorld.folder(name: string, pieces)
@@ -384,4 +415,4 @@ function BoxWorld.folder(name: string, pieces)
 end
 
 return { Vector3 = Vector3, CFrame = CFrame, Color3 = Color3, Enum = Enum, Instance = Instance, RaycastParams = RaycastParams,
-	OverlapParams = OverlapParams, workspace = workspace, BoxWorld = BoxWorld }
+	OverlapParams = OverlapParams, workspace = workspace, BoxWorld = BoxWorld, Vector2 = Vector2, game = game }

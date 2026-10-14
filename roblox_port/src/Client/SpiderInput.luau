@@ -185,6 +185,10 @@ function SpiderInput.bind(h: Handlers)
 		end
 	end
 	api.touchGui = gui
+	-- The test place's playback drives the same path a key, button or finger takes (tests/client/SilkPlayback.luau).
+	function api.simulate(_self: any, action: string, down: boolean, source: any?)
+		act(action, down, source or "playback")
+	end
 	return api
 end
 return SpiderInput

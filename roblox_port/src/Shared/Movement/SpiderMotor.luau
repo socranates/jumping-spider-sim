@@ -105,6 +105,7 @@ function Motor.new(config: Config): any
 		dropped = false,
 		caught = false,
 		safe = { pos = config.spawn + Vector3.new(0, HEIGHT, 0), up = Vector3.yAxis, heading = config.heading },
+		supportPart = nil :: Instance?, -- the part the spider last took hold of
 		events = {} :: { { kind: string, detail: string } },
 	}, Motor)
 	return self
@@ -158,6 +159,7 @@ function Motor._setSupport(self: any, hit: RaycastResult)
 	if self.heading == Vector3.zero then self.heading = SupportMath.anyPerpendicular(hit.Normal) end
 	self.up = hit.Normal
 	self.pos = hit.Position + hit.Normal * HEIGHT
+	self.supportPart = hit.Instance
 end
 
 function Motor._ray(self: any, from: Vector3, motion: Vector3): RaycastResult?

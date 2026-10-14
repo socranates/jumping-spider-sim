@@ -21,6 +21,7 @@ local Workspace = game:GetService("Workspace")
 local SpiderInput = require(script.Parent.SpiderInput)
 local SpiderCamera = require(script.Parent.SpiderCamera)
 local SpiderHud = require(script.Parent.SpiderHud)
+local WorldDetail = require(script.Parent.WorldDetail)
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Movement = Shared:WaitForChild("Movement")
@@ -31,6 +32,7 @@ local StickCarry = require(Movement:WaitForChild("StickCarry"))
 local ControlText = require(Shared:WaitForChild("UI"):WaitForChild("ControlText"))
 local Species = require(Shared:WaitForChild("Data"):WaitForChild("Species"))
 local Surfaces = require(Shared:WaitForChild("Data"):WaitForChild("Surfaces"))
+local Detail = require(Shared:WaitForChild("Data"):WaitForChild("Detail"))
 local Layout = require(Shared:WaitForChild("Habitat"):WaitForChild("WindowsillLayout"))
 local SpiderRig = require(Shared:WaitForChild("Rig"):WaitForChild("SpiderRig"))
 
@@ -62,8 +64,18 @@ local motor: any = SpiderMotor.new({
 })
 local jump: any = JumpInput.new()
 local carry: any = StickCarry.new()
--- Touch-only devices get the lighter fuzz until a real tablet frame-time check (ROBLOX_PORT.md).
-local rig = SpiderRig.new(Workspace, sill, nil, if UIS.TouchEnabled and not UIS.KeyboardEnabled then "low" else "full")
+-- Touch-only devices (phones, tablets) run the low tier until a real tablet frame-time check (ROBLOX_PORT.md): lighter fuzz and
+-- no idle extras on the spider, fewer optional parts in the world. Workspace attribute Detail = "low" or "full" overrides the guess.
+local detail = Detail.choose(UIS.TouchEnabled and not UIS.KeyboardEnabled, Workspace:GetAttribute("Detail"))
+local rig = SpiderRig.new(Workspace, sill, nil, detail)
+task.spawn(function()
+	local roots: { Instance } = { Lighting }
+	local decor = Workspace:WaitForChild("Decor", 10)
+	if decor then table.insert(roots, decor) end
+	local terrain = Workspace:FindFirstChild("Terrain")
+	if terrain then table.insert(roots, terrain) end
+	WorldDetail.apply(detail, roots)
+end)
 local hud = SpiderHud.new(player:WaitForChild("PlayerGui"))
 local device: ControlText.Device = ControlText.initialDevice(UIS.TouchEnabled, UIS.KeyboardEnabled, UIS.GamepadEnabled)
 local drawnUp = Vector3.yAxis

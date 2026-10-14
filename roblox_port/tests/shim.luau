@@ -122,6 +122,24 @@ function Color3.fromHex(s)
 end
 function Color3.Lerp(a, b, t) return Color3.new(a.R + (b.R - a.R) * t, a.G + (b.G - a.G) * t, a.B + (b.B - a.B) * t) end
 
+-- Number and colour sequences (particles, beams, effects): plain tables with the fields the code reads.
+local NumberRange = {}
+function NumberRange.new(a, b) return { Min = a, Max = if b == nil then a else b } end
+local NumberSequenceKeypoint = {}
+function NumberSequenceKeypoint.new(t, v, e) return { Time = t, Value = v, Envelope = e or 0 } end
+local NumberSequence = {}
+function NumberSequence.new(a, b)
+	if type(a) == "table" then return { Keypoints = a } end
+	return { Keypoints = { NumberSequenceKeypoint.new(0, a), NumberSequenceKeypoint.new(1, if b == nil then a else b) } }
+end
+local ColorSequenceKeypoint = {}
+function ColorSequenceKeypoint.new(t, c) return { Time = t, Value = c } end
+local ColorSequence = {}
+function ColorSequence.new(a, b)
+	if getmetatable(a) == Color3 then return { Keypoints = { ColorSequenceKeypoint.new(0, a), ColorSequenceKeypoint.new(1, b or a) } } end
+	return { Keypoints = a }
+end
+
 local Enum = setmetatable({}, { __index = function(enums, typeName)
 	local items = setmetatable({}, { __index = function(list, itemName)
 		local item = { Name = itemName, EnumType = typeName, Value = 0 }
@@ -468,4 +486,5 @@ end
 
 return { Vector3 = Vector3, CFrame = CFrame, Color3 = Color3, Enum = Enum, Instance = Instance, RaycastParams = RaycastParams,
 	OverlapParams = OverlapParams, workspace = workspace, BoxWorld = BoxWorld, Vector2 = Vector2, game = game, UDim = UDim, UDim2 = UDim2,
-	client = client, services = services }
+	client = client, services = services, NumberRange = NumberRange, NumberSequence = NumberSequence,
+	NumberSequenceKeypoint = NumberSequenceKeypoint, ColorSequence = ColorSequence, ColorSequenceKeypoint = ColorSequenceKeypoint }

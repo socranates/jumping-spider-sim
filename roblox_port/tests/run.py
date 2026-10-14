@@ -5,7 +5,8 @@ reference tables and the shared modules into one chunk, where each module is an 
 tests/run.luau (pure logic and goldens), tests/scenarios.luau (recovery scenarios against a box-world emulation of
 raycasts and sphere casts: a smoke test of the real motor, silk and camera code, not the Roblox engine) and
 tests/client_smoke.luau (the client scripts themselves, driven through stub services and simulated keys) and
-tests/look.luau (the daughter's pattern pinned, the look knobs, idle motion and part budgets of the real rig).
+tests/look.luau (the daughter's pattern pinned, the look knobs, idle motion and part budgets of the real rig) and
+tests/world.luau (the graphics table, the sun pick, the scenery, the lighting and the low-detail tier).
 Usage (from roblox_port/):  python3 tests/run.py [path/to/luau [test.luau ...]]   (default: all of them)"""
 import pathlib, re, subprocess, sys, tempfile
 
@@ -18,6 +19,13 @@ MODULES = [
     ("Species", "Data/Species.luau"),
     ("Surfaces", "Data/Surfaces.luau"),
     ("WindowsillLayout", "Habitat/WindowsillLayout.luau"),
+    ("Detail", "Data/Detail.luau"),
+    ("Graphics", "Data/Graphics.luau"),
+    ("Materials", "Habitat/Materials.luau"),
+    ("SunPick", "Habitat/SunPick.luau"),
+    ("Scenery", "Habitat/Scenery.luau"),
+    ("Lit", "Habitat/Lit.luau"),
+    ("WorldDetail", "../Client/WorldDetail.luau"),
     ("JumpMath", "Movement/JumpMath.luau"),
     ("SupportMath", "Movement/SupportMath.luau"),
     ("TetherMath", "Movement/TetherMath.luau"),
@@ -41,7 +49,7 @@ CLIENT_MODULES = [
     ("SpiderInput", "../Client/SpiderInput.luau"),
     ("SpiderHud", "../Client/SpiderHud.luau"),
 ]
-CLIENT_TESTS = {"client_smoke.luau", "look.luau"}
+CLIENT_TESTS = {"client_smoke.luau", "look.luau", "world.luau"}
 REFERENCES = ["jump_reference", "tether_reference", "camera_reference", "framing_reference"]
 NAMES = {name for name, _ in MODULES + CLIENT_MODULES}
 
@@ -69,10 +77,12 @@ def chunk(path):
 
 def bundle(test_file):
     parts = ["local Vector3, CFrame, Color3, workspace, Instance, Enum, RaycastParams, OverlapParams, BoxWorld, Vector2, game, UDim, UDim2, ClientStubs",
+             "local NumberRange, NumberSequence, NumberSequenceKeypoint, ColorSequence, ColorSequenceKeypoint",
              "local time = os.clock",
              "local shim = " + chunk(HERE / "shim.luau"),
              "Vector3, CFrame, Color3, workspace, Instance, Enum, RaycastParams, OverlapParams, BoxWorld = shim.Vector3, shim.CFrame, shim.Color3, shim.workspace, shim.Instance, shim.Enum, shim.RaycastParams, shim.OverlapParams, shim.BoxWorld",
              "Vector2, game, UDim, UDim2, ClientStubs = shim.Vector2, shim.game, shim.UDim, shim.UDim2, shim.client",
+             "NumberRange, NumberSequence, NumberSequenceKeypoint, ColorSequence, ColorSequenceKeypoint = shim.NumberRange, shim.NumberSequence, shim.NumberSequenceKeypoint, shim.ColorSequence, shim.ColorSequenceKeypoint",
              "local __refs, __mods = {}, {}"]
     for ref in REFERENCES:
         path = HERE / (ref + ".luau")
@@ -91,7 +101,7 @@ def bundle(test_file):
 
 luau = sys.argv[1] if len(sys.argv) > 1 else "luau"
 status = 0
-for test_file in sys.argv[2:] or ["run.luau", "scenarios.luau", "client_smoke.luau", "look.luau"]:
+for test_file in sys.argv[2:] or ["run.luau", "scenarios.luau", "client_smoke.luau", "look.luau", "world.luau"]:
     if not (HERE / test_file).exists():
         continue
     with tempfile.NamedTemporaryFile("w", suffix=".luau", encoding="utf-8", delete=False) as f:

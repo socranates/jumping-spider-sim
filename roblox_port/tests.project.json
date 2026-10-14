@@ -39,6 +39,11 @@
       "$properties": {
         "Technology": "Future"
       }
+    },
+    "MaterialService": {
+      "$properties": {
+        "Use2022Materials": true
+      }
     }
   }
 }

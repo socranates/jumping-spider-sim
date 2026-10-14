@@ -1,13 +1,15 @@
-# Current handoff — Claude, 2026-10-14: Roblox controls like Godot, recovery camera
+# Current handoff — Claude, 2026-10-14: Roblox controls like Godot, recovery camera, a cuter fuzzy spider, better graphics
 
-Nathan: "the controls are not as good on roblox, when jumping you can only hop, V doesnt change the view etc. They were perfect on the godot version." Read **docs/HANDOFF-roblox-controls-recovery.md** and **docs/verification/roblox-controls-recovery/RESULTS.md**. Branch **claude/roblox-controls-recovery** (main 432bc53 + Perplexity's 01fe0d1, merged). Roblox only.
+Nathan: "the controls are not as good on roblox, when jumping you can only hop, V doesnt change the view etc. They were perfect on the godot version." Then: the spider "needs to be cuter", "we need fuzzy spider", and the textures and graphics should improve. Read **docs/HANDOFF-roblox-controls-recovery.md** (section "Cuter spider and graphics" for the new work), **docs/verification/roblox-controls-recovery/RESULTS.md** and **docs/verification/roblox-cute-graphics/RESULTS.md**. Branch **claude/roblox-controls-recovery** (main 432bc53 + Perplexity's 01fe0d1, merged). Roblox only.
 - Merged Chet's safety silk with Perplexity's camera, aiming, eye view and fuzz; places regenerated; Perplexity's ROBLOX-04/05 are now **ROBLOX-06/07**.
 - One control scheme like Godot on keyboard, controller and touch together (ROBLOX-08, table in roblox_port/README.md). Q/B cancels an aim or a walk to the edge; only a deliberate hold lets go of the line. Roblox's menu pauses. Prompts name the device in use and wrap in the safe area.
 - Catch camera turns at most 45 degrees to frame the recovery; any look, recenter or aim takes over (ROBLOX-09).
 - New scenarios found and fixed two bugs: a snag left reeling dead (ROBLOX-10); holding W at an edge flipped back and forth (Godot's carry, ROBLOX-11).
-- Linux: pure **182/182**, box world **15/15** (ten misses recovered), client smoke **11/11**, strict analysis clean, evidence **2a5c87b3843fbc0d**. **Not run in Studio or on devices.**
+- **Cuter, fuzzier spider (ROBLOX-13):** the daughter's pattern is unchanged and pinned by tests; bigger rounder head, big glossy eyes with catchlights, fluffy palps, a bold jumper's tufts, a coat sized for the 5-stud camera, and a little idle motion (breathing, head tilt, palp drumming; drawn rig only). Every number is in Appearances. 705 parts at full detail, 272 in low detail.
+- **Graphics (ROBLOX-14):** a material per surface (PBR via Use2022Materials), Future lighting, a sun picked to shine in through the window (SunPick, with a fallback), haze, clouds, gentle bloom, a drawn window with a view, dust, light shafts and small details; all decor non-colliding and invisible to rays. Touch-only devices (or Workspace attribute `Detail`) get a lighter tier (decor 76 to 34 parts). No depth of field unless Workspace attribute `DepthOfField`.
+- Linux: pure **182/182**, box world **15/15** (ten misses recovered), client smoke **11/11**, look **54/54**, world **69/69**, strict analysis clean, 52/52 compile, evidence **adc98ada3f8930a2**. Before/after renders and a contact sheet are in docs/verification/roblox-cute-graphics (Godot-shim renders, **not Roblox**). **Not run in Studio or on devices; none of the new looks has been seen in Roblox.**
 
-**Next:** Chet — Studio suite (39 rows) and client playback (7), controller/touch/tablet and frame-time checks, then merge to main. Nathan — try the list in the handoff. Then perception.
+**Next:** Chet — Studio suite (50 rows) and client playback (7), the graphics checks (Output line `[Windowsill] sun:`, the window view, low detail on a phone), controller/touch/tablet and frame-time checks, then merge to main. Nathan — try the list in the handoff and say how the spider looks. Then perception.
 
 ---
 

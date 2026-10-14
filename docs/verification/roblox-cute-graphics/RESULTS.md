@@ -1,0 +1,62 @@
+# A cuter, fuzzier spider and a prettier windowsill — verification, 2026-10-14 (Claude, Linux)
+
+Nathan: the spider "needs to be cuter" and "we need fuzzy spider", plus better textures and graphics. Branch `claude/roblox-controls-recovery`, on top of fcfd1d9 (the controls and recovery-camera work). Code, tests and both places are at a275d5c; the commit after it changes documents and one preview tool only. Source/test/project evidence **adc98ada3f8930a2** (tools/build.py; it was 2a5c87b3843fbc0d). Luau CLI 0.742, luau-lsp 1.70.1, Rojo 7.7.1, Godot 4.7.2 (only to draw the preview images). **Roblox Studio was not run**: this machine has no Roblox engine. Nothing below says how the spider or the world looks in Roblox; every look, lighting and material claim is unverified until someone opens the place in Studio.
+
+| Check | Result | Evidence and scope |
+|---|---|---|
+| Pure Luau | **PASS 182/182** | luau-report.txt. The count and the file are unchanged (tests/run.luau was not edited): the new rig and world broke no existing check |
+| Box-world scenarios | **PASS 15/15** | luau-report.txt. Unchanged; the ten misses are still recovered |
+| Client smoke | **PASS 11/11** | luau-report.txt. The real client now also chooses a detail tier and runs WorldDetail; unchanged checks still pass |
+| Look checks (new) | **PASS 54/54** | tests/look.luau on the real SpiderRig, Anatomy, Setae and Idle under the shim: the daughter's pattern pinned literally (colours, five spots, band, speckles, cheeks), every knob present in the appearance table, a bigger rounder head, big front eyes with one or two small catchlights each, no part named like a human feature, tufts, fringe and palp fluff, knobs that really change the rig, idle motion bounded and deterministic, part budgets at full and low detail, no idle motion in low detail or with reduced motion, planted feet and the root part untouched by the idle motion |
+| World checks (new) | **PASS 69/69** | tests/world.luau on the real Graphics, Materials, SunPick, Scenery, Lit, Detail and WorldDetail under the shim: every material name is a real Roblox material, the sill's boxes keep geometry, colour, profile and solidity, the physical back wall is invisible but still hit by a ray at z = -12.5, every decor part is anchored, non-colliding, untouchable and invisible to rays, the drawn wall and glass leave no gap, the view is outside the wall and shows inside the glass, details stay low and clear of the spawn and silk spot, shafts follow an invented sun, lighting set-up is idempotent with depth of field opt-in, the low tier removes the optional parts and thins the dust once |
+| Strict type check | **PASS, 0 diagnostics** | typecheck-report.txt: luau-lsp 1.70.1, Roblox definitions and a Rojo sourcemap; all 32 files of src/ are `--!strict` |
+| Compile | **PASS 52/52** | compile-report.txt: every .luau under src, tests and tools |
+| Places | Built | build-report.txt: both places rebuilt twice with identical bytes (SHA-256 recorded) |
+| Studio engine suite | **NOT RUN** | 50 rows expected: Spec 9, SilkSpec 11, RecoveryScenarios 14, PromptSpec 3, GraphicsSpec 8 (new), plus 5 completion rows. The Spec gained two rows (eyes and catchlights; idle motion) and changed one (low-detail parts under 300) |
+| Studio client playback | **NOT RUN** | 7 rows expected, unchanged |
+| How it looks in Roblox | **NOT SEEN** | see "Not verified" |
+| Frame time on a phone or tablet | **NOT MEASURED** | the low tier exists to help; whether it is enough is unknown |
+
+## The spider (ROBLOX-13)
+
+The daughter's design is untouched and pinned by tests/look.luau: black body and legs, the pale band across the front of the abdomen, one large central white spot, two small elongated spots in front, two small ovals behind, fine white speckles, pale side patches on the head, black-and-white banded legs and palps. docs/SPEC.md (the spider is an animal, not a miniature person) still holds: no eyebrows, no mouth, no smile; a test fails if any part is named like a human feature.
+
+- **Proportions.** Head volume is now about 1.07 times the abdomen's (it was 0.77): head radii 0.27 x 0.215 x 0.27 (were 0.245 x 0.18 x 0.255), a rounded muzzle under the eyes, plumper and slightly shorter, more crouched legs with round feet (full detail).
+- **Eyes.** Two big glossy front eyes (0.20 stud across, Glass, reflective), a dark-grey rim so black reads on black, two small white catchlights on each (a larger one high on one side and a smaller one low on the other, the same on both eyes: one light and its reflection), and six smaller eyes.
+- **Fuzz that can be seen from the game camera.** The camera sits 5 studs away and 1 stud is about 170 px on a 1080p screen. The old hairs were 0.022 to 0.042 stud long and 0.0065 wide: about a pixel wide and four to seven pixels long, too fine to show. The coat is now wide flat locks lying back like shingles (0.05 to 0.085 long, 0.04 wide), finer guard hairs standing off the pelt, a fringe of stiffer long hairs at the sides so the outline is soft from behind and from the front, four graded see-through fur shells, bold-jumper tufts (a fan of 10 hairs on each side at the upper sides of the head, behind the eyes, not over them), a pale ruff beside the jaws, fluffy palp clubs and hairs on the legs. Hairs stay under 0.1 stud (an existing test bound) and do not cast shadows.
+- **Measured at the game camera** (tools/preview/fringe.py, output in fringe-report.txt; a Godot-shim render at 1920x1080, FOV 65, 5 studs, legs left out): the coat extends past the bare body outline by an average of **1.73 px (faint threshold) and 1.12 px (strong threshold) for the new rig, against 1.27 and 1.03 px for the old one**. That is a modest gain in softness at the outline, not a dramatic one; the body also fills more of the screen (the bare silhouette is 13 % larger). Whether it reads as fuzzy in Roblox's own lighting is for Nathan's eye. If it does not, the knobs are `fuzz.locks`, `fuzz.guard` and `fuzz.fringe` (length, width, counts), `fuzz.shells` and the tufts, all in `Appearances.fuzz`; the budget checks cap the total at 760 parts.
+- **Idle motion** (drawn rig only, never the planted feet, the root part or anything that feeds movement): once the spider stands still it eases in over a second: the body breathes a little (the abdomen rises at most 0.016 stud and tips 2.4 degrees), the head tilts curiously (inside 7 degrees of roll, 6 of yaw, 3.5 of pitch, on slow overlapping cycles of 5 to 11 seconds) and the palps drum in short bursts (13 degrees, 3.2 Hz). It eases out within a quarter of a second of the spider moving, and it is off in the air, in low detail and with reduced motion.
+
+## Part counts (the drawn spider, from tests/look.luau)
+
+| | Parts | Hairs | Fur shells | Everything else |
+|---|---|---|---|---|
+| Before (old rig, full) | 772 | 639 | 4 | 129 |
+| After, **full detail** | **705** | 556 | 8 (4 per body part) | 141 |
+| After, **low detail** | **272** | 151 | 2 (1 per body part) | 119 |
+
+Low detail (touch-only devices, or the Workspace attribute `Detail` = "low") keeps the pattern, the eyes with their catchlights, the tufts and a thinner coat (one hair in two to five), a single fur shell, and drops the eye rims, foot balls, half the speckles, the outline and all idle motion. The budgets are checked: full at most 760 parts with at most 160 non-hair parts, low at most 300 and under 45 % of full.
+
+## The world (ROBLOX-14)
+
+- **Materials.** Roblox's own, one per surface and looks only (a surface's grip stays its profile in Data/Surfaces): WoodPlanks floor, Wood lip and crevices, Plaster walls, Brick planter, LeafyGrass leaves, Grass stems, Ground soil, Glass. `MaterialService.Use2022Materials` is on in both Rojo projects, so they carry PBR textures. Colours are the old colours.
+- **Lighting.** Future technology (authored in the Rojo projects), a soft warm sun, Atmosphere haze, a Sky, clouds, gentle Bloom and ColorCorrection, faint SunRays. No default depth of field (Workspace attribute `DepthOfField` = true adds it). `SunPick` scans the day (both signs of the latitude, because the sun's direction is not assumed) for a sun behind the window, 18 to 48 degrees high, within 65 degrees of straight out of the window, and records its choice in Lighting's attribute `SunPick` and in Output as `[Windowsill] sun: ...`; it falls back to the old morning light (ClockTime 9.6) if none exists. With an invented sun the pick is clock 9.75, 39 degrees high, 46 degrees off axis. What Roblox's sun does is unknown until Studio.
+- **A window to look out of.** The back wall stays a solid, climbable box but is invisible; a plaster wall is drawn just behind its face with an opening for the glass, wooden trim flush with the face and two mullions. Beyond the glass are hills, seven houses with roofs and two chimneys, a tree on the left and a smaller one on the right, a ground plane and the sky. Everything is placed by where it should appear on the glass from the camera's usual eye, so it holds its place at any depth.
+- **Small details** (full only): 12 paint chips, one crack with a branch, three crumbs, all under 0.25 stud high and away from the spawn and the silk spot so the landing patch, the silk lines and the prompts stay clear. **Dust motes** drift in the window light (7 per second; 2.8 in low). **Light shafts** (three faint stacked ribbons from each pane along the sun, full only).
+- **Gameplay is untouched.** All decor is anchored, non-colliding, untouchable and not queryable, in a folder gameplay never filters in. Decor is 76 parts at full detail and 34 at low (the view is 31 items at full).
+
+## Images (Godot-shim renders, not Roblox)
+
+All pictures in this folder come from tools/preview: the real rig code under the plain Luau CLI with preview stand-ins, drawn by Godot. They show layout, silhouette and proportions only. Roblox's materials, lighting, shadows, anti-aliasing, glass and glossy reflections are not in them, and the fur will look different in the engine.
+
+- **contact_sheet.png**: rows are front three-quarter, top, face close-up and play distance; columns are before (old rig), after (full), after (low detail) and after standing idle for 5 seconds, each with its part count.
+- **game_camera_sheet.png**: the spider as the player sees it at the game camera (1080p, 5 studs), enlarged 2x.
+- `before_*`, `after_*`, `low_*`, `idle_*`: the single renders (front three-quarter, top, face close-up, play distance, side, game camera); `*_counts.txt` the part counts; `before_parts.json` the old rig's parts so the "before" can be redrawn after the old code is gone; `fringe-report.txt` the outline measurement above.
+
+## Not verified
+
+Everything about looks and feel in Roblox Studio and on devices: the spider's face and proportions, whether the fuzz reads at the game camera, the glossy eyes and catchlights, the PBR materials with `Use2022Materials`, the lighting values, the haze, clouds, bloom and sun rays, the dust, the light shafts, whether the window view composes (and that the trees, roofs and hills do not clip or float), the small details. Whether Roblox's sun can stand behind the window at all (the SunPick result is only an invented one here), and the patch of light through the glass. The Studio suite (50 rows) and the client playback (7 rows). The low tier's removal on a real client, and frame time on phones and tablets with either tier. The 8 new engine rows in GraphicsSpec have never run.
+
+## Reproduce
+
+From roblox_port: `python3 tests/run.py path/to/luau` (prints SUMMARY, BOXWORLD, CLIENT, LOOK and WORLD; name test files after the luau path to run only those), `python3 tools/build.py path/to/rojo`. Strict check: `rojo sourcemap default.project.json -o sourcemap.json`, then `luau-lsp analyze --platform roblox --definitions=globalTypes.d.luau --sourcemap sourcemap.json src`. Images: `python3 tools/preview/preview.py path/to/luau path/to/godot out_dir --prefix after_` (also `--detail low`, `--idle 5`, `--parts before_parts.json`), then `python3 tools/preview/contact_sheet.py out_dir`. The outline measurement: `python3 tools/preview/fringe.py path/to/godot parts.json work_dir`.

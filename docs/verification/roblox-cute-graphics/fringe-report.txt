@@ -1,0 +1,18 @@
+tools/preview/fringe.py: the coat's reach past the bare body outline at the game camera (1920x1080, FOV 65, 5 studs), legs left out.
+Godot-shim renders of the parts, not Roblox rendering. Faint threshold 12, stronger 24 (of 255).
+
+BEFORE (the old rig, before_parts.json)
+shells only  threshold 12: bare body 8913 px, with coat 9533 px, fringe 620 px over a 676 px outline -> 0.92 px wide (564 parts, 496 hairs)
+shells only  threshold 24: bare body 8857 px, with coat 9310 px, fringe 453 px over a 676 px outline -> 0.67 px wide (564 parts, 496 hairs)
+hairs only   threshold 12: bare body 8913 px, with coat 9287 px, fringe 374 px over a 676 px outline -> 0.55 px wide (564 parts, 496 hairs)
+hairs only   threshold 24: bare body 8857 px, with coat 9224 px, fringe 367 px over a 676 px outline -> 0.54 px wide (564 parts, 496 hairs)
+all          threshold 12: bare body 8913 px, with coat 9772 px, fringe 859 px over a 676 px outline -> 1.27 px wide (564 parts, 496 hairs)
+all          threshold 24: bare body 8857 px, with coat 9552 px, fringe 695 px over a 676 px outline -> 1.03 px wide (564 parts, 496 hairs)
+
+AFTER (full detail)
+shells only  threshold 12: bare body 10088 px, with coat 10997 px, fringe 909 px over a 739 px outline -> 1.23 px wide (532 parts, 456 hairs)
+shells only  threshold 24: bare body 10037 px, with coat 10595 px, fringe 558 px over a 733 px outline -> 0.76 px wide (532 parts, 456 hairs)
+hairs only   threshold 12: bare body 10088 px, with coat 10987 px, fringe 899 px over a 739 px outline -> 1.22 px wide (532 parts, 456 hairs)
+hairs only   threshold 24: bare body 10037 px, with coat 10716 px, fringe 679 px over a 733 px outline -> 0.93 px wide (532 parts, 456 hairs)
+all          threshold 12: bare body 10088 px, with coat 11368 px, fringe 1280 px over a 739 px outline -> 1.73 px wide (532 parts, 456 hairs)
+all          threshold 24: bare body 10037 px, with coat 10859 px, fringe 822 px over a 733 px outline -> 1.12 px wide (532 parts, 456 hairs)

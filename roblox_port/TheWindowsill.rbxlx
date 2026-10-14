@@ -2227,13 +2227,27 @@ function Silk.move(self: any, position: Vector3, motion: Vector3, velocity: Vect
 		if remaining.Magnitude<1e-7 then break end
 		local hit=workspace:Spherecast(p,RADIUS,remaining,self.params)
 		if not hit then p+=remaining; break end
-		p+=remaining.Unit*math.max(hit.Distance-0.01,0)
+		-- Maintain a skin along the contact normal at grazing angles.
+		p=hit.Position+hit.Normal*(RADIUS+0.01)
 		local profile=self:profile(hit)
 		local allowed=not self.lowering or intent>0 or (hit.Normal.Y>=0.707 and hit.Position.Y<=self.anchor.Y-0.5)
 		if profile and profile.attachable and allowed then return p,Vector3.zero,hit end
 		local rest=remaining-remaining.Unit*math.min(hit.Distance,remaining.Magnitude)
 		remaining=rest-hit.Normal*rest:Dot(hit.Normal)
 		velocity-=hit.Normal*math.min(0,velocity:Dot(hit.Normal))
+	end
+	-- While lowering alongside the launch wall, a nearly tangent native sweep can
+	-- miss a shallow contact. Maintain the wall's skin without grabbing it again.
+	-- Other faces still use the swept landing rules above.
+	if self.lowering and math.abs(self.normal.Y)<0.707 then
+		local face=workspace:Raycast(p,-self.normal*(RADIUS+0.01),self.params)
+		if face and face.Normal:Dot(self.normal)>0.99 then
+			local clearance=(p-face.Position):Dot(face.Normal)
+			if clearance<RADIUS+0.01 then
+				p+=face.Normal*(RADIUS+0.01-clearance)
+				velocity-=face.Normal*math.min(0,velocity:Dot(face.Normal))
+			end
+		end
 	end
 	return p,velocity,nil
 end

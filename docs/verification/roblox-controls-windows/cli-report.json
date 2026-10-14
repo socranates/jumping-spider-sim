@@ -1,0 +1,18 @@
+{
+  "baseline_evidence": "80504bccb4e8651f",
+  "baseline_windows": {
+    "pure": 182,
+    "boxworld": 15,
+    "client": 11,
+    "look": 72,
+    "world": 71,
+    "failed": 0
+  },
+  "final_evidence": "cf31cbabad2e9cad",
+  "final_targeted": {
+    "boxworld": 15,
+    "failed": 0
+  },
+  "compiled_luau_files": 53,
+  "strict_type_analysis": "Claude Linux baseline clean; not rerun locally"
+}

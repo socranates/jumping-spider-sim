@@ -1,0 +1,80 @@
+{
+  "viewport": "821, 473",
+  "route": {
+    "median": 16.652900725603104,
+    "p95": 19.142400473356247,
+    "frames": 1791,
+    "worst": 157.59849548339844
+  },
+  "warmup": {
+    "frames": 0
+  },
+  "tier": "low",
+  "cases": [
+    {
+      "launched": true,
+      "caught": true,
+      "index": 1,
+      "recovered": true
+    },
+    {
+      "launched": true,
+      "caught": true,
+      "index": 2,
+      "recovered": true
+    },
+    {
+      "launched": true,
+      "caught": true,
+      "index": 3,
+      "recovered": true
+    },
+    {
+      "launched": true,
+      "caught": true,
+      "index": 4,
+      "recovered": true
+    },
+    {
+      "launched": true,
+      "caught": true,
+      "index": 5,
+      "recovered": true
+    },
+    {
+      "launched": true,
+      "caught": true,
+      "index": 6,
+      "recovered": true
+    },
+    {
+      "launched": true,
+      "caught": true,
+      "index": 7,
+      "recovered": true
+    },
+    {
+      "launched": true,
+      "caught": true,
+      "index": 8,
+      "recovered": true
+    },
+    {
+      "launched": true,
+      "caught": true,
+      "index": 9,
+      "recovered": true
+    },
+    {
+      "launched": true,
+      "caught": true,
+      "index": 10,
+      "recovered": true
+    }
+  ],
+  "evidence_id": "cf31cbabad2e9cad",
+  "gpu": "AMD Radeon(TM) Graphics",
+  "engine": "0.743.0.7431133",
+  "screenshots_during_measurement": false,
+  "warmup_limitation": "No render callbacks in the first five wall-clock seconds; route may include initial rendering cost. Not a warmed steady-state comparison."
+}

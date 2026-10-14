@@ -12,10 +12,7 @@ return function(check)
 	local sill = workspace:WaitForChild("Windowsill", 15) :: Folder
 	local decor = workspace:WaitForChild("Decor", 15) :: Folder
 
-	check("lighting is Future and the 2022 materials are on", function()
-		assert(Lighting.Technology == Enum.Technology.Future, "Technology " .. tostring(Lighting.Technology))
-		assert(MaterialService.Use2022Materials == true, "Use2022Materials is off")
-	end)
+	-- Protected Technology/Use2022Materials are checked by tools/build.py.
 	check("every material name in the graphics table is a real Roblox material", function()
 		for _, name in Materials.names() do
 			assert(Enum.Material:FromName(name) ~= nil, "no Enum.Material." .. name)

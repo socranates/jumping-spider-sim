@@ -1,3 +1,14 @@
+# Current handoff — Chet, 2026-10-14: native Roblox controls/recovery acceptance
+
+Read **docs/HANDOFF-roblox-controls-recovery.md** (Windows follow-up) and **docs/verification/roblox-controls-windows/RESULTS.md**. Imported Claude's bundle 156da67 and pushed his branch. Roblox remains active; Godot/SPEC frozen.
+- Native fixes: wall-lowering contact guard; float32 landing tolerance; protected lighting flags checked at build time.
+- Evidence **cf31cbabad2e9cad**: **49/49 Studio**, **7/7 client playback**, native ten misses **10/10**. Original Windows CLI suites **182 + 15 + 11 + 72 + 71** passed; modified recovery scenarios rerun **15/15**.
+- Nathan confirmed no physical controller/tablet is available; those checks remain not run. See Windows report for visual/device emulation and timing scope.
+- **Next Claude: perception**, beginning with observation/association/memory fixtures, then cone/peripheral/Focus. Preserve tested controls, camera and silk.
+- Open roblox_port/TheWindowsill.rbxlx in Studio after updating; reopen an already-open place.
+
+---
+
 # Current handoff — Claude, 2026-10-14: Roblox controls like Godot, recovery camera, a cuter fuzzy spider, better graphics
 
 Nathan: "the controls are not as good on roblox, when jumping you can only hop, V doesnt change the view etc. They were perfect on the godot version." Then: the spider "needs to be cuter", "we need fuzzy spider", and the textures and graphics should improve. Read **docs/HANDOFF-roblox-controls-recovery.md** (section "Cuter spider and graphics" for the new work), **docs/verification/roblox-controls-recovery/RESULTS.md** and **docs/verification/roblox-cute-graphics/RESULTS.md**. Branch **claude/roblox-controls-recovery** (main 432bc53 + Perplexity's 01fe0d1, merged). Roblox only.

@@ -1,0 +1,43 @@
+{
+  "evidence_id": "cf31cbabad2e9cad",
+  "failed": 0,
+  "tests": 7,
+  "passed": 7,
+  "results": [
+    {
+      "passed": true,
+      "name": "player walks to edge and hangs",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "held lower reaches sill floor",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "player reels back to leaf",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "a tap of Jump hops forward",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "Q during an aim cancels it and the release does not leap",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "a key and a finger hold Cancel together; only a deliberate hold lets go of the line",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "on the line the prompts name each device's controls, wrap and stay on screen; the camera never rolls",
+      "detail": ""
+    }
+  ]
+}

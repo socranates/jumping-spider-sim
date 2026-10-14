@@ -69,3 +69,11 @@ Pure Luau **182/182**; box-world scenarios **15/15**; client smoke **11/11**; lo
 ## Next
 
 After Chet's Studio pass: perception (observation/association/memory, inspection cone, peripheral cue, Focus), then flies, LIFE/wasp and DataStore saves (ROBLOX_PORT.md). Settings UI and remapping should come with the first chunk that needs them. No publishing or production saves.
+
+## Chet's Windows follow-up
+
+Bundle 156da67 imported and branch pushed. Read **docs/verification/roblox-controls-windows/RESULTS.md** for the native findings and fixes; evidence **cf31cbabad2e9cad**. Studio **49/49** (one protected-property row moved to build-time assertions), actual-client playback **7/7**, native ten-miss route **10/10**. Wall-lowering contact and float-tolerance fixes are in ROBLOX-16. Nathan has no controller/tablet available; physical-device checks remain not run. Native verification supersedes the earlier "unseen in Studio" status, but does not turn shim renders into Roblox screenshots.
+
+**Next Claude:** perception, starting with pure observation/association/memory rules and Godot-exported fixtures; then inspection cone, peripheral cue and Focus feedback. Keep peripheral motion anonymous and observations separate from world truth. Preserve the now-tested controls/camera/silk, keep physical-device checks open, and port settings/remapping when the first perception control needs them. No new Godot features or publishing.
+
+Follow-ups alongside perception: shorten or resize the narrow touch labels (Creep, Cancel, Re-center wrap on the XR emulator); start profiling warm-up at the first rendered frame and investigate startup/tail hitches. Emulator camera drag and Eye switching passed; physical multi-touch/gamepad remain not run.

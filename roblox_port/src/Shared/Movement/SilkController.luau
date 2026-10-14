@@ -17,16 +17,16 @@ function Silk.new(world, surfaces, tuning, gravity: number)
 		lowering=false, snagged=false, block="", message="", release=Math.newRelease(), walk=nil,
 		previous=Vector3.zero},Silk)
 end
-function Silk.profile(self, hit)
+function Silk.profile(self: any, hit)
 	return if hit then self.surfaces[hit.Instance:GetAttribute("ProfileId")] else nil
 end
-function Silk.clear(self)
+function Silk.clear(self: any)
 	self.mode="none"; self.anchorPart=nil; self.bend=nil; self.bendPart=nil
 	self.paid=0; self.rest=0; self.taut=false; self.lowering=false; self.snagged=false; self.block=""
 	self.walk=nil; self.release=Math.newRelease()
 	self.message=""
 end
-function Silk.anchorAt(self, hit, position: Vector3): boolean
+function Silk.anchorAt(self: any, hit, position: Vector3): boolean
 	self:clear()
 	local profile=self:profile(hit)
 	if not profile or not profile.silk_anchor_allowed or not hit.Instance:IsA("BasePart") then
@@ -40,10 +40,10 @@ function Silk.anchorAt(self, hit, position: Vector3): boolean
 	self.message="Silk attached"
 	return true
 end
-function Silk.pivot(self): Vector3 return self.bend or self.anchor end
-function Silk.prefix(self): number return if self.bend then (self.bend-self.anchor).Magnitude else 0 end
-function Silk.path(self, position: Vector3): number return self:prefix()+(position-self:pivot()).Magnitude end
-function Silk.refresh(self): boolean
+function Silk.pivot(self: any): Vector3 return self.bend or self.anchor end
+function Silk.prefix(self: any): number return if self.bend then (self.bend-self.anchor).Magnitude else 0 end
+function Silk.path(self: any, position: Vector3): number return self:prefix()+(position-self:pivot()).Magnitude end
+function Silk.refresh(self: any): boolean
 	if not self.anchorPart or not self.anchorPart:IsDescendantOf(self.world) then
 		self:clear(); self.message="Silk anchor lost"; return false
 	end
@@ -55,11 +55,11 @@ function Silk.refresh(self): boolean
 	end
 	return true
 end
-function Silk.clearRay(self, a: Vector3, b: Vector3): boolean
+function Silk.clearRay(self: any, a: Vector3, b: Vector3): boolean
 	local d=b-a
 	return d.Magnitude<=0.02 or workspace:Raycast(a,d.Unit*(d.Magnitude-0.02),self.params)==nil
 end
-function Silk.geometry(self, position: Vector3)
+function Silk.geometry(self: any, position: Vector3)
 	local a=self.anchor+self.normal*0.02
 	if self:clearRay(a,position) then self.bend=nil; self.bendPart=nil; self.snagged=false
 	elseif self.bend then self.snagged=not self:clearRay(self.bend,position)
@@ -88,23 +88,23 @@ function Silk.geometry(self, position: Vector3)
 	else self.snagged=true end
 	self.previous=position
 end
-function Silk.lock(self, position: Vector3, extension: number)
+function Silk.lock(self: any, position: Vector3, extension: number)
 	if self.mode=="none" then return end
 	self.paid,self.rest=Math.lock(self.paid,self:path(position),self.maximum,extension)
 	self.mode="locked"; self.taut=false; self.block=""; self.release=Math.newRelease()
 	self.message="Silk catching"
 end
-function Silk.payout(self, position: Vector3)
+function Silk.payout(self: any, position: Vector3)
 	if self.mode~="payout" or not self:refresh() then return end
 	self:geometry(position)
 	self.paid=math.max(self.paid,self:path(position))
 	if self.paid>=self.maximum then self.paid=self.maximum; self:lock(position,0) end
 end
-function Silk.room(self, position: Vector3): number
+function Silk.room(self: any, position: Vector3): number
 	local hit=workspace:Spherecast(position,RADIUS,DOWN*self.maximum,self.params)
 	return if hit then hit.Distance else 0
 end
-function Silk.planDrop(self, position: Vector3, up: Vector3, heading: Vector3)
+function Silk.planDrop(self: any, position: Vector3, up: Vector3, heading: Vector3): ({direction: Vector3, distance: number}?, string)
 	local hit=workspace:Raycast(position,-up*(HEIGHT+0.12),self.params)
 	local profile=self:profile(hit)
 	if not profile then return nil,"No supporting surface" end
@@ -113,7 +113,7 @@ function Silk.planDrop(self, position: Vector3, up: Vector3, heading: Vector3)
 		if self:room(position+up*0.01)>=1 then return {direction=Vector3.zero,distance=0},"" end
 		return nil,"Nothing below to lower into"
 	end
-	local best=nil
+	local best: {direction: Vector3, distance: number}? = nil
 	local limit=6
 	for i=0,15 do
 		local dir=CFrame.fromAxisAngle(up,i*math.pi/8):VectorToWorldSpace(heading)
@@ -130,7 +130,7 @@ function Silk.planDrop(self, position: Vector3, up: Vector3, heading: Vector3)
 	end
 	return best,if best then "" else "Nothing below to lower into"
 end
-function Silk.startDrop(self, position: Vector3, up: Vector3, push: Vector3)
+function Silk.startDrop(self: any, position: Vector3, up: Vector3, push: Vector3)
 	local hit=workspace:Raycast(position,-up*(HEIGHT+0.12),self.params)
 	if not self:anchorAt(hit,position) then return false end
 	self.lowering=true; self:lock(position,Math.DROP_SLACK)
@@ -139,7 +139,7 @@ function Silk.startDrop(self, position: Vector3, up: Vector3, push: Vector3)
 end
 
 -- Sweep the body, then slide once. Never satisfy a constraint by teleporting through a wall.
-function Silk.move(self, position: Vector3, motion: Vector3, velocity: Vector3, intent: number)
+function Silk.move(self: any, position: Vector3, motion: Vector3, velocity: Vector3, intent: number)
 	local p=position
 	local remaining=motion
 	for _=1,2 do
@@ -156,7 +156,7 @@ function Silk.move(self, position: Vector3, motion: Vector3, velocity: Vector3, 
 	end
 	return p,velocity,nil
 end
-function Silk.step(self, position: Vector3, velocity: Vector3, intent: number, releaseDown: boolean)
+function Silk.step(self: any, position: Vector3, velocity: Vector3, intent: number, releaseDown: boolean)
 	if self.mode~="locked" or not self:refresh() then return position,velocity,nil end
 	if Math.releaseTick(self.release,true,releaseDown) then
 		self:clear(); self.message="Silk released"; return position,velocity,nil

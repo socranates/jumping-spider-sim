@@ -9,6 +9,17 @@ Read **docs/HANDOFF-roblox-silk.md** and **docs/verification/roblox-silk/RESULTS
 
 ---
 
+# Current handoff — Perplexity Computer, 2026-10-14: Roblox controls, camera and a fuzzy spider
+
+Nathan: the Roblox controls were not as good as Godot's (held jumps only hopped, V did nothing) and the spider should be fuzzy. Read **docs/HANDOFF-roblox-controls.md**, DECISIONS **ROBLOX-06/07** (ROBLOX-04/05 on its branch; renumbered ROBLOX-06/07 when merged with Chet's safety silk), **docs/verification/roblox-controls-fuzz/RESULTS.md**.
+- Cause of "only hop": Roblox's stock camera centred the body, so the centre aim ray met the floor just past the feet. Ported Godot's camera rig, jump controller/planner phases, Focus, spider-eye view (V/Y), recenter (R), cancel (Q/B), slow motion (T/RT). **Reset moved from R to Backspace.**
+- Fuzz: about 640 thin hair parts plus two fur shells, all values in Appearances.fuzz; a third of the hairs on touch-only devices.
+- Linux pure **63/63** (11 new camera goldens exported from Godot), strict type check clean, evidence **db36b09b003a6b8d**. **Not run in Roblox Studio.**
+
+**Next:** Chet — Studio engine suite and a play check of the list in the handoff, plus frame time with the fuzz. Then safety silk.
+
+---
+
 # Current handoff — Chet, 2026-10-14: Roblox only
 
 **Nathan: "Let's only work in roblox going forward."** PLATFORM-01 is decided. Roblox in `roblox_port/` is active; Godot at c87ce00 is a frozen runnable reference/golden-data source. No new Godot features; SPEC.md unchanged. Earlier Godot plans below are historical.

@@ -22,7 +22,8 @@ body = body.replace('_G.CFrame = shim.CFrame', 'CFrame = shim.CFrame')
 body = body.replace('require("../src/Shared/Movement/JumpMath")', chunk(SRC / "Movement" / "JumpMath.luau"))
 body = body.replace('require("../src/Shared/Movement/SupportMath")', chunk(SRC / "Movement" / "SupportMath.luau"))
 body = body.replace('require("./jump_reference")', chunk(HERE / "jump_reference.luau"))
-for name, folder in [("Appearances", "Data"), ("InputState", "Movement"), ("TetherMath", "Movement")]:
+body = body.replace('require("./camera_reference")', chunk(HERE / "camera_reference.luau"))
+for name, folder in [("Appearances", "Data"), ("InputState", "Movement"), ("TetherMath", "Movement"), ("CameraMath", "Movement"), ("Setae", "Rig")]:
     body = body.replace(f'require("../src/Shared/{folder}/{name}")', chunk(SRC / folder / (name + ".luau")))
 body = body.replace('require("./tether_reference")', chunk(HERE / "tether_reference.luau"))
 body = "local Vector3, CFrame\n" + body.replace("\nVector3 = shim", "\nVector3 = shim").replace("_G.", "")

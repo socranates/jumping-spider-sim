@@ -1158,3 +1158,7 @@ Merged Perplexity c87ce00 (both parts); froze Godot as reference, kept roblox_po
 ## 2026-10-14 — Chet: Roblox core safety silk
 
 Started main e183efc. Added golden-tested tether math, engine silk controller and keyboard/gamepad/touch integration. Fixed edge tie selection and minimum-line leaf recovery through native regressions. Rebuilt both Studio places. Windows 115/115 pure, 18/18 engine (two completion rows), 3/3 client playback, evidence d1a1cff5c06eafe3; 22 Luau files compile. Frozen Godot gameplay/SPEC untouched. See HANDOFF-roblox-silk.md and verification/roblox-silk. Next Claude chunk: recovery camera and control acceptance, then perception. Physical-device/performance checks remain open.
+
+## 2026-10-14 — Perplexity Computer: Roblox controls, camera and fuzz
+
+Started main e183efc. Found the "only hop" cause (Roblox's stock camera centred the body, so the aim ray met the floor at the feet). Ported camera_rig.gd (SpiderCamera + pure CameraMath, checked against new Godot-exported goldens), jump controller/planner phases, Focus, spider-eye view, recenter, cancel, slow motion and Godot's bindings (reset now Backspace). Added the fuzzy coat (Setae.luau, Appearances.fuzz, fur shells, low detail on touch-only devices) and a Godot-drawn layout preview tool. Linux pure 63/63, strict type check clean, evidence db36b09b003a6b8d. Not run in Roblox Studio. Next: Chet's Studio suite, play and frame-time check (HANDOFF-roblox-controls.md), then safety silk.

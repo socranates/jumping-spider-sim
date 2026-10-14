@@ -49,7 +49,7 @@ end
 function T.newRelease()
 	return {ticks=0, held=0, down=false, counts=false, progress=0}
 end
-function T.releaseTick(s, onLine: boolean, down: boolean): boolean
+function T.releaseTick(s: any, onLine: boolean, down: boolean): boolean
 	s.ticks = if onLine then s.ticks+1 else 0
 	if down and not s.down then s.counts = onLine and s.ticks>=24; s.held=0 end
 	if not down or not onLine then s.counts=false; s.held=0 end

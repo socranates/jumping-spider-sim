@@ -51,6 +51,28 @@ local first = {
 		{ x = -0.35, z = 0.67, rx = 0.025, rz = 0.035, angle = 0.4 },
 		{ x = 0.35, z = 0.67, rx = 0.025, rz = 0.035, angle = -0.4 },
 	},
+	-- Fuzz: setae (hairs) as thin display parts. Jumping spiders are densely hairy; the hairs lie back toward the abdomen's tip,
+	-- are white where the pattern is white (spots, front band, cheeks), and Phidippus has a tuft above each side of the eyes.
+	-- Counts are budgets, not exact: points on the belly, the eye face and over the eyes get none.
+	fuzz = {
+		enabled = true,
+		abdomenSamples = 520, -- Fibonacci points on the abdomen ellipsoid before the belly is skipped
+		headSamples = 340,
+		length = { 0.022, 0.042 }, -- studs; body radius is about 0.25
+		width = 0.0065,
+		lieBack = 1.7, -- how far a body hair leans toward the rear (0 stands straight out, 1.7 is about 60 degrees)
+		dark = { 0.13, 0.13, 0.13 }, -- a touch lighter than the black body so the fuzz reads in the light
+		grey = { 0.52, 0.52, 0.50 }, -- the soft grey hairs mixed through the coat, a halo against the sill
+		greyShare = 0.3,
+		transparency = 0.25, -- hairs are a little see-through, so the coat looks soft rather than spiky
+		-- Fur shells: see-through layers just outside the body, so the outline goes soft (a classic cheap fur trick).
+		shellColor = { 0.30, 0.30, 0.29 },
+		shells = { { scale = 1.06, transparency = 0.78 }, { scale = 1.13, transparency = 0.9 } },
+		tuftHairs = 8,
+		tuftLength = 0.085,
+		legHairs = { 9, 8, 4 }, -- femur, tibia, tarsus, per leg
+		legLength = 0.04,
+	},
 }
 
 return { default = "first_spider", profiles = { first_spider = first } }
@@ -423,38 +445,313 @@ return table.freeze(Layout)
         </Properties>
         <Item class="ModuleScript" referent="11">
           <Properties>
+            <string name="Name">CameraMath</string>
+            <string name="Source"><![CDATA[--!strict
+-- Pure camera and stick math, ported from the frozen Godot reference (c87ce00):
+--   scripts/movement/boom_math.gd    (orbit basis, boom recovery, eased offsets, pitch pick)
+--   scripts/movement/surface_input.gd (camera-relative walking on floors, walls and undersides)
+--   scripts/movement/camera_rig.gd   (aim free-look clamp, spider-eye gaze clamp, recenter yaw)
+-- Vector3 only, no Instances, so tests/run.luau checks it against values exported from Godot itself.
+-- Conventions match Godot and Roblox alike: right-handed, -Z forward, yaw about world up,
+-- elevation positive puts the camera above the pivot.
+
+local CameraMath = {}
+
+CameraMath.PIVOT_HEIGHT = 0.45
+CameraMath.BOOM_RADIUS = 0.15
+CameraMath.DEFAULT_ELEVATION_DEG = 18.0
+CameraMath.MIN_ELEVATION_DEG = -20.0
+CameraMath.MAX_ELEVATION_DEG = 80.0
+CameraMath.MOUSE_DEG_PER_PIXEL = 0.1
+CameraMath.STICK_DEG_PER_SECOND = 150.0
+CameraMath.RECOVER_SPEED = 6.0
+CameraMath.RECENTER_SECONDS = 0.25
+CameraMath.BODY_HIDE_LENGTH = 0.8
+CameraMath.COMFORT_BOOM = 2.5
+CameraMath.AUTO_PITCH_STEP_DEG = 10.0
+CameraMath.MIN_AUTO_ELEVATION_DEG = -45.0
+CameraMath.AUTO_PITCH_IN_SECONDS = 0.08
+CameraMath.AUTO_PITCH_OUT_SECONDS = 0.35
+CameraMath.AIM_PITCH_MIN_DEG = -20.0
+CameraMath.AIM_PITCH_MAX_DEG = 50.0
+CameraMath.AIM_VIEW_LIMIT_DEG = 85.0
+CameraMath.AIM_RETURN_SECONDS = 0.25
+CameraMath.EYE_FOV_DEG = 80.0
+CameraMath.EYE_AHEAD = 0.53
+CameraMath.EYE_HEIGHT = 0.09
+CameraMath.EYE_PITCH_LIMIT_DEG = 80.0
+CameraMath.EYE_ROLL_DEG_S = 240.0
+CameraMath.PRINCIPAL_SCAN_DEG = 30.0
+CameraMath.EYE_SETTLE_DEG = 4.0
+CameraMath.FOV_DEG = 65.0
+CameraMath.CAMERA_DISTANCE = 5.0
+
+local SETTLE = 2e-4
+local TIE = 1e-3
+local FLOOR_BLEND_START = 0.5
+local FLOOR_BLEND_END = 0.8660254
+
+local function finite(x: number): boolean
+	return x == x and x ~= math.huge and x ~= -math.huge
+end
+
+local function smoothstep(a: number, b: number, x: number): number
+	if a == b then
+		return if x < a then 0 else 1
+	end
+	local t = math.clamp((x - a) / (b - a), 0, 1)
+	return t * t * (3 - 2 * t)
+end
+CameraMath.smoothstep = smoothstep
+
+local function dirOn(v: Vector3, n: Vector3): Vector3
+	local t = v - n * v:Dot(n)
+	local length = t.Magnitude
+	return if length > 1e-6 then t / length else Vector3.new(0, 0, 0)
+end
+
+-- BoomMath.next_length: a shorter allowed length is taken at once; growth is rate limited.
+function CameraMath.nextLength(current: number, allowed: number, desired: number, recoverSpeed: number, dt: number): number
+	if not (finite(current) and finite(allowed) and finite(desired) and finite(recoverSpeed) and finite(dt)) then
+		return 0
+	end
+	local target = math.max(0, math.min(allowed, desired))
+	if target <= current then
+		return target
+	end
+	return math.min(current + math.max(recoverSpeed, 0) * math.max(dt, 0), target)
+end
+
+-- BoomMath.ease_offset: exponential ease, faster away from zero than back toward it.
+function CameraMath.easeOffset(current: number, target: number, dt: number, inSeconds: number, outSeconds: number): number
+	if not (finite(current) and finite(target) and finite(dt) and finite(inSeconds) and finite(outSeconds)) then
+		return 0
+	end
+	local seconds = math.max(if math.abs(target) >= math.abs(current) then inSeconds else outSeconds, 1e-4)
+	local nextValue = current + (target - current) * (1 - math.exp(-math.max(dt, 0) / seconds))
+	return if math.abs(target - nextValue) < SETTLE then target else nextValue
+end
+
+-- BoomMath.pick_pitch_offset: the first comfortable boom, else the longest.
+function CameraMath.pickPitchOffset(offsets: { number }, lengths: { number }, comfort: number): number
+	if #offsets == 0 or #offsets ~= #lengths or not finite(comfort) then
+		return 0
+	end
+	local best = 1
+	for i = 1, #offsets do
+		if lengths[i] >= comfort then
+			return offsets[i]
+		end
+		if lengths[i] > lengths[best] + TIE then
+			best = i
+		end
+	end
+	return offsets[best]
+end
+
+-- BoomMath.back_direction: unit vector from the pivot toward the camera.
+function CameraMath.backDirection(yaw: number, elevation: number): Vector3
+	local ce = math.cos(elevation)
+	return Vector3.new(math.sin(yaw) * ce, math.sin(elevation), math.cos(yaw) * ce)
+end
+
+-- The orbit camera's right and up vectors (SurfaceInput.camera_basis x and y columns).
+function CameraMath.cameraRight(yaw: number, _elevation: number): Vector3
+	return Vector3.new(math.cos(yaw), 0, -math.sin(yaw))
+end
+function CameraMath.cameraUp(yaw: number, elevation: number): Vector3
+	local se = math.sin(elevation)
+	return Vector3.new(-se * math.sin(yaw), math.cos(elevation), -se * math.cos(yaw))
+end
+
+-- SurfaceInput.tangent_axes: camera-relative right and forward on the plane with normal n.
+function CameraMath.tangentAxes(yaw: number, elevation: number, n: Vector3): (Vector3, Vector3)
+	local normal = if n.Magnitude > 1e-5 then n.Unit else Vector3.new(0, 1, 0)
+	local camRight = CameraMath.cameraRight(yaw, elevation)
+	local camUp = CameraMath.cameraUp(yaw, elevation)
+	local flatForward = Vector3.new(-math.sin(yaw), 0, -math.cos(yaw))
+	local pf = dirOn(flatForward, normal)
+	local pu = dirOn(camUp, normal)
+	local w = smoothstep(FLOOR_BLEND_START, FLOOR_BLEND_END, math.abs(normal.Y))
+	local forward = pf * w + pu * (1 - w)
+	if forward:Dot(forward) < 1e-6 then
+		local pr = dirOn(camRight, normal)
+		if pr.Magnitude == 0 then
+			pr = dirOn(Vector3.new(1, 0, 0), normal)
+		end
+		forward = normal:Cross(pr)
+	end
+	forward = dirOn(forward, normal)
+	local right = forward:Cross(normal)
+	right = if right.Magnitude > 1e-9 then right.Unit else right
+	if right:Dot(camRight) < 0 then
+		right = -right
+	end
+	return right, forward
+end
+
+-- SurfaceInput.map_stick: x right, y forward, length kept (at most 1).
+function CameraMath.mapStick(x: number, y: number, yaw: number, elevation: number, n: Vector3): Vector3
+	local length = math.sqrt(x * x + y * y)
+	if not finite(length) or length < 1e-6 then
+		return Vector3.new(0, 0, 0)
+	end
+	if length > 1 then
+		x, y = x / length, y / length
+	end
+	local right, forward = CameraMath.tangentAxes(yaw, elevation, n)
+	return right * x + forward * y
+end
+
+-- Spider-eye walking: forward is the gaze laid on the surface, right is its right on it.
+function CameraMath.mapStickEye(x: number, y: number, gaze: Vector3, bodyForward: Vector3, n: Vector3): Vector3
+	local length = math.sqrt(x * x + y * y)
+	if not finite(length) or length < 1e-6 then
+		return Vector3.new(0, 0, 0)
+	end
+	if length > 1 then
+		x, y = x / length, y / length
+	end
+	local forward = gaze - n * gaze:Dot(n)
+	if forward:Dot(forward) < 1e-6 then
+		forward = bodyForward - n * bodyForward:Dot(n)
+	end
+	if forward:Dot(forward) < 1e-6 then
+		return Vector3.new(0, 0, 0)
+	end
+	forward = forward.Unit
+	local right = forward:Cross(n).Unit
+	return right * x + forward * y
+end
+
+-- camera_rig._clamp_aim_pitch: the aim free-look range, and the whole view short of straight up or down.
+function CameraMath.clampAimPitch(value: number, elevation: number): number
+	local limit = math.rad(CameraMath.AIM_VIEW_LIMIT_DEG)
+	local low = math.max(math.rad(CameraMath.AIM_PITCH_MIN_DEG), elevation - limit)
+	local high = math.min(math.rad(CameraMath.AIM_PITCH_MAX_DEG), elevation + limit)
+	return math.clamp(value, low, math.max(low, high))
+end
+
+-- camera_rig._effective_elevation: the player's pitch plus the auto-pitch, inside the automatic range.
+function CameraMath.effectiveElevation(elevation: number, offset: number): number
+	local low = math.min(elevation, math.rad(CameraMath.MIN_AUTO_ELEVATION_DEG))
+	local high = math.max(elevation, math.rad(CameraMath.MAX_ELEVATION_DEG))
+	return math.clamp(elevation + offset, low, high)
+end
+
+-- The yaw whose flat forward (-sin, 0, -cos) points along v.
+function CameraMath.yawOf(v: Vector3): number
+	return math.atan2(-v.X, -v.Z)
+end
+
+-- SpiderMotor.get_recenter_yaw: behind the heading on floors and undersides, toward the surface on walls.
+function CameraMath.recenterYaw(heading: Vector3, visualUp: Vector3, fallback: number): number
+	local w = visualUp.Y * visualUp.Y
+	local v = Vector3.new(heading.X, 0, heading.Z) * w + Vector3.new(-visualUp.X, 0, -visualUp.Z) * (1 - w)
+	if v.Magnitude < 1e-3 then
+		return fallback
+	end
+	return math.atan2(-v.X, -v.Z)
+end
+
+local function anyPerpendicular(v: Vector3): Vector3
+	local other = if math.abs(v.Y) < 0.9 then Vector3.new(0, 1, 0) else Vector3.new(1, 0, 0)
+	return v:Cross(other).Unit
+end
+
+-- camera_rig._clamp_gaze: unit, and at least EYE_PITCH_LIMIT_DEG from the surface normal either way.
+function CameraMath.clampGaze(g: Vector3, up: Vector3, bodyForward: Vector3): Vector3
+	if not (finite(g.X) and finite(g.Y) and finite(g.Z)) or g:Dot(g) < 1e-10 then
+		g = bodyForward
+	end
+	g = g.Unit
+	local tangent = g - up * g:Dot(up)
+	if tangent:Dot(tangent) < 1e-8 then
+		tangent = bodyForward - up * bodyForward:Dot(up)
+		if tangent:Dot(tangent) < 1e-8 then
+			tangent = anyPerpendicular(up)
+		end
+	end
+	tangent = tangent.Unit
+	local limit = math.rad(CameraMath.EYE_PITCH_LIMIT_DEG)
+	local elev = math.clamp(math.asin(math.clamp(g:Dot(up), -1, 1)), -limit, limit)
+	return (tangent * math.cos(elev) + up * math.sin(elev)).Unit
+end
+
+-- Rodrigues rotation of v about unit axis k by angle a (right-handed).
+function CameraMath.rotate(v: Vector3, k: Vector3, a: number): Vector3
+	local c, s = math.cos(a), math.sin(a)
+	return v * c + k:Cross(v) * s + k * (k:Dot(v) * (1 - c))
+end
+
+-- camera_rig._look_eye (no level-horizon switch): yaw about the view's up (positive looks right),
+-- pitch about the view's right (positive looks down).
+function CameraMath.lookEye(gaze: Vector3, up: Vector3, yawRad: number, pitchRad: number, bodyForward: Vector3): Vector3
+	local g = CameraMath.rotate(gaze, up, -yawRad)
+	local right = g:Cross(up)
+	if right:Dot(right) > 1e-10 then
+		g = CameraMath.rotate(g, right.Unit, -pitchRad)
+	end
+	return CameraMath.clampGaze(g, up, bodyForward)
+end
+
+return CameraMath
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="12">
+          <Properties>
             <string name="Name">InputState</string>
             <string name="Source"><![CDATA[--!strict
--- Pure input state: test without Studio. +Y is forward on the control pad.
+-- Pure input state: test without Studio. +Y is forward on the control pad; look +X is right, +Y is down
+-- (the Godot camera rig's convention: look(dx, dy) with dy > 0 looking down).
 local InputState = {}
 InputState.__index = InputState
+
+local MOVE_DEAD = 0.2
+local LOOK_DEAD = 0.15
+
 function InputState.new()
-	return setmetatable({ held = {} :: {[string]: boolean}, x = 0, y = 0 }, InputState)
+	return setmetatable({ held = {} :: {[string]: boolean}, x = 0, y = 0, lx = 0, ly = 0 }, InputState)
 end
-function InputState.set(self, action: string, down: boolean)
+function InputState.set(self: any, action: string, down: boolean)
 	self.held[action] = down
 end
-function InputState.stick(self, x: number, y: number)
+local function radial(x: number, y: number, dead: number): (number, number)
 	local length = math.sqrt(x*x + y*y)
-	local strength = math.clamp((length - 0.2) / 0.8, 0, 1)
-	self.x = if length > 0 then x / length * strength else 0
-	self.y = if length > 0 then y / length * strength else 0
+	local strength = math.clamp((length - dead) / (1 - dead), 0, 1)
+	if length <= 0 then return 0, 0 end
+	return x / length * strength, y / length * strength
 end
-function InputState.axes(self): (number, number)
+function InputState.stick(self: any, x: number, y: number)
+	self.x, self.y = radial(x, y, MOVE_DEAD)
+end
+-- Right stick: Roblox reports +Y up; store it as look-down positive.
+function InputState.look(self: any, x: number, y: number)
+	local rx, ry = radial(x, y, LOOK_DEAD)
+	self.lx, self.ly = rx, -ry
+end
+function InputState.axes(self: any): (number, number)
 	local x = self.x + (if self.held.Right then 1 else 0) - (if self.held.Left then 1 else 0)
 	local y = self.y + (if self.held.Forward then 1 else 0) - (if self.held.Back then 1 else 0)
 	local length = math.max(1, math.sqrt(x*x + y*y))
 	return x / length, y / length
 end
-function InputState.clear(self)
+-- Look rate in -1..1 per axis: right stick plus arrow keys.
+function InputState.lookAxes(self: any): (number, number)
+	local x = self.lx + (if self.held.LookRight then 1 else 0) - (if self.held.LookLeft then 1 else 0)
+	local y = self.ly + (if self.held.LookDown then 1 else 0) - (if self.held.LookUp then 1 else 0)
+	return math.clamp(x, -1, 1), math.clamp(y, -1, 1)
+end
+function InputState.clear(self: any)
 	table.clear(self.held)
-	self.x, self.y = 0, 0
+	self.x, self.y, self.lx, self.ly = 0, 0, 0, 0
 end
 return InputState
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="12">
+        <Item class="ModuleScript" referent="13">
           <Properties>
             <string name="Name">JumpMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -612,7 +909,7 @@ return JumpMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="13">
+        <Item class="ModuleScript" referent="14">
           <Properties>
             <string name="Name">SilkController</string>
             <string name="Source"><![CDATA[--!strict
@@ -634,16 +931,16 @@ function Silk.new(world, surfaces, tuning, gravity: number)
 		lowering=false, snagged=false, block="", message="", release=Math.newRelease(), walk=nil,
 		previous=Vector3.zero},Silk)
 end
-function Silk.profile(self, hit)
+function Silk.profile(self: any, hit)
 	return if hit then self.surfaces[hit.Instance:GetAttribute("ProfileId")] else nil
 end
-function Silk.clear(self)
+function Silk.clear(self: any)
 	self.mode="none"; self.anchorPart=nil; self.bend=nil; self.bendPart=nil
 	self.paid=0; self.rest=0; self.taut=false; self.lowering=false; self.snagged=false; self.block=""
 	self.walk=nil; self.release=Math.newRelease()
 	self.message=""
 end
-function Silk.anchorAt(self, hit, position: Vector3): boolean
+function Silk.anchorAt(self: any, hit, position: Vector3): boolean
 	self:clear()
 	local profile=self:profile(hit)
 	if not profile or not profile.silk_anchor_allowed or not hit.Instance:IsA("BasePart") then
@@ -657,10 +954,10 @@ function Silk.anchorAt(self, hit, position: Vector3): boolean
 	self.message="Silk attached"
 	return true
 end
-function Silk.pivot(self): Vector3 return self.bend or self.anchor end
-function Silk.prefix(self): number return if self.bend then (self.bend-self.anchor).Magnitude else 0 end
-function Silk.path(self, position: Vector3): number return self:prefix()+(position-self:pivot()).Magnitude end
-function Silk.refresh(self): boolean
+function Silk.pivot(self: any): Vector3 return self.bend or self.anchor end
+function Silk.prefix(self: any): number return if self.bend then (self.bend-self.anchor).Magnitude else 0 end
+function Silk.path(self: any, position: Vector3): number return self:prefix()+(position-self:pivot()).Magnitude end
+function Silk.refresh(self: any): boolean
 	if not self.anchorPart or not self.anchorPart:IsDescendantOf(self.world) then
 		self:clear(); self.message="Silk anchor lost"; return false
 	end
@@ -672,11 +969,11 @@ function Silk.refresh(self): boolean
 	end
 	return true
 end
-function Silk.clearRay(self, a: Vector3, b: Vector3): boolean
+function Silk.clearRay(self: any, a: Vector3, b: Vector3): boolean
 	local d=b-a
 	return d.Magnitude<=0.02 or workspace:Raycast(a,d.Unit*(d.Magnitude-0.02),self.params)==nil
 end
-function Silk.geometry(self, position: Vector3)
+function Silk.geometry(self: any, position: Vector3)
 	local a=self.anchor+self.normal*0.02
 	if self:clearRay(a,position) then self.bend=nil; self.bendPart=nil; self.snagged=false
 	elseif self.bend then self.snagged=not self:clearRay(self.bend,position)
@@ -705,23 +1002,23 @@ function Silk.geometry(self, position: Vector3)
 	else self.snagged=true end
 	self.previous=position
 end
-function Silk.lock(self, position: Vector3, extension: number)
+function Silk.lock(self: any, position: Vector3, extension: number)
 	if self.mode=="none" then return end
 	self.paid,self.rest=Math.lock(self.paid,self:path(position),self.maximum,extension)
 	self.mode="locked"; self.taut=false; self.block=""; self.release=Math.newRelease()
 	self.message="Silk catching"
 end
-function Silk.payout(self, position: Vector3)
+function Silk.payout(self: any, position: Vector3)
 	if self.mode~="payout" or not self:refresh() then return end
 	self:geometry(position)
 	self.paid=math.max(self.paid,self:path(position))
 	if self.paid>=self.maximum then self.paid=self.maximum; self:lock(position,0) end
 end
-function Silk.room(self, position: Vector3): number
+function Silk.room(self: any, position: Vector3): number
 	local hit=workspace:Spherecast(position,RADIUS,DOWN*self.maximum,self.params)
 	return if hit then hit.Distance else 0
 end
-function Silk.planDrop(self, position: Vector3, up: Vector3, heading: Vector3)
+function Silk.planDrop(self: any, position: Vector3, up: Vector3, heading: Vector3): ({direction: Vector3, distance: number}?, string)
 	local hit=workspace:Raycast(position,-up*(HEIGHT+0.12),self.params)
 	local profile=self:profile(hit)
 	if not profile then return nil,"No supporting surface" end
@@ -730,7 +1027,7 @@ function Silk.planDrop(self, position: Vector3, up: Vector3, heading: Vector3)
 		if self:room(position+up*0.01)>=1 then return {direction=Vector3.zero,distance=0},"" end
 		return nil,"Nothing below to lower into"
 	end
-	local best=nil
+	local best: {direction: Vector3, distance: number}? = nil
 	local limit=6
 	for i=0,15 do
 		local dir=CFrame.fromAxisAngle(up,i*math.pi/8):VectorToWorldSpace(heading)
@@ -747,7 +1044,7 @@ function Silk.planDrop(self, position: Vector3, up: Vector3, heading: Vector3)
 	end
 	return best,if best then "" else "Nothing below to lower into"
 end
-function Silk.startDrop(self, position: Vector3, up: Vector3, push: Vector3)
+function Silk.startDrop(self: any, position: Vector3, up: Vector3, push: Vector3)
 	local hit=workspace:Raycast(position,-up*(HEIGHT+0.12),self.params)
 	if not self:anchorAt(hit,position) then return false end
 	self.lowering=true; self:lock(position,Math.DROP_SLACK)
@@ -756,7 +1053,7 @@ function Silk.startDrop(self, position: Vector3, up: Vector3, push: Vector3)
 end
 
 -- Sweep the body, then slide once. Never satisfy a constraint by teleporting through a wall.
-function Silk.move(self, position: Vector3, motion: Vector3, velocity: Vector3, intent: number)
+function Silk.move(self: any, position: Vector3, motion: Vector3, velocity: Vector3, intent: number)
 	local p=position
 	local remaining=motion
 	for _=1,2 do
@@ -773,7 +1070,7 @@ function Silk.move(self, position: Vector3, motion: Vector3, velocity: Vector3, 
 	end
 	return p,velocity,nil
 end
-function Silk.step(self, position: Vector3, velocity: Vector3, intent: number, releaseDown: boolean)
+function Silk.step(self: any, position: Vector3, velocity: Vector3, intent: number, releaseDown: boolean)
 	if self.mode~="locked" or not self:refresh() then return position,velocity,nil end
 	if Math.releaseTick(self.release,true,releaseDown) then
 		self:clear(); self.message="Silk released"; return position,velocity,nil
@@ -840,7 +1137,7 @@ return Silk
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="14">
+        <Item class="ModuleScript" referent="15">
           <Properties>
             <string name="Name">SupportMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -922,7 +1219,7 @@ return SupportMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="15">
+        <Item class="ModuleScript" referent="16">
           <Properties>
             <string name="Name">TetherMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -976,7 +1273,7 @@ end
 function T.newRelease()
 	return {ticks=0, held=0, down=false, counts=false, progress=0}
 end
-function T.releaseTick(s, onLine: boolean, down: boolean): boolean
+function T.releaseTick(s: any, onLine: boolean, down: boolean): boolean
 	s.ticks = if onLine then s.ticks+1 else 0
 	if down and not s.down then s.counts = onLine and s.ticks>=24; s.held=0 end
 	if not down or not onLine then s.counts=false; s.held=0 end
@@ -991,11 +1288,142 @@ return T
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="16">
+      <Item class="Folder" referent="17">
         <Properties>
           <string name="Name">Rig</string>
         </Properties>
-        <Item class="ModuleScript" referent="17">
+        <Item class="ModuleScript" referent="18">
+          <Properties>
+            <string name="Name">Setae</string>
+            <string name="Source"><![CDATA[--!strict
+-- Where the spider's hairs (setae) go: pure layout from the appearance table, Vector3 only, so tests/run.luau checks it.
+-- Body frame as in SpiderRig: +Y up, -Z forward. Deterministic: the same appearance always gives the same fuzz.
+-- SpiderRig turns each entry into one thin anchored part.
+
+local Setae = {}
+
+export type Hair = { at: Vector3, dir: Vector3, length: number, white: boolean, grey: boolean }
+export type LegHair = { segment: number, t: number, theta: number, length: number, white: boolean, grey: boolean }
+
+-- Must match SpiderRig's body layout.
+Setae.HEAD_CENTER = Vector3.new(0, 0.02, -0.20)
+Setae.ABDOMEN_CENTER = Vector3.new(0, 0.04, 0.20)
+local GOLDEN = 2.399963229728653
+local EYES = {
+	Vector3.new(-0.075, 0.09, -0.455), Vector3.new(0.075, 0.09, -0.455),
+	Vector3.new(-0.165, 0.10, -0.40), Vector3.new(0.165, 0.10, -0.40),
+	Vector3.new(-0.13, 0.17, -0.14), Vector3.new(0.13, 0.17, -0.14),
+	Vector3.new(-0.11, 0.185, -0.27), Vector3.new(0.11, 0.185, -0.27),
+}
+
+-- A repeatable 0..1 value per index (no global RNG state).
+local function hash(i: number, salt: number): number
+	local x = math.sin(i * 12.9898 + salt * 78.233) * 43758.5453
+	return x - math.floor(x)
+end
+Setae.hash = hash
+
+local function v3(t: { number }): Vector3
+	return Vector3.new(t[1], t[2], t[3])
+end
+
+-- Leans a hair from its surface normal toward the rear (+Z) along the surface.
+local function lean(normal: Vector3, amount: number, i: number): Vector3
+	local back = Vector3.new(0, 0, 1)
+	local along = back - normal * back:Dot(normal)
+	if along.Magnitude < 1e-4 then along = Vector3.new(0, 1, 0) - normal * normal.Y end
+	if along.Magnitude < 1e-4 then return normal end
+	local side = normal:Cross(along.Unit)
+	local jitter = (hash(i, 3) - 0.5) * 0.7
+	return (normal + along.Unit * amount + side * jitter).Unit
+end
+
+local function whiteOnAbdomen(look: any, x: number, z: number): boolean
+	-- x, z: fractions of the abdomen's X/Z radii, the coordinates the markings use.
+	local ar = look.abdomenRadii
+	for _, s in look.spots do
+		local dx = (x - s.x) * ar[1] / s.rx
+		local dz = (z - s.z) * ar[3] / s.rz
+		if dx * dx + dz * dz < 1.4 then return true end
+	end
+	return z < -0.58 and z > -0.78 and math.abs(x) < 0.72 -- the pale front band
+end
+
+local function ellipsoidHairs(out: { Hair }, look: any, center: Vector3, radii: Vector3, samples: number, salt: number, keep: (Vector3, Vector3) -> boolean, white: (Vector3) -> boolean)
+	local f = look.fuzz
+	for i = 0, samples - 1 do
+		local y = 1 - 2 * (i + 0.5) / samples
+		local r = math.sqrt(math.max(0, 1 - y * y))
+		local a = i * GOLDEN
+		local unit = Vector3.new(math.cos(a) * r, y, math.sin(a) * r)
+		if unit.Y > -0.25 then
+			local at = center + Vector3.new(unit.X * radii.X, unit.Y * radii.Y, unit.Z * radii.Z)
+			local normal = Vector3.new(unit.X / radii.X, unit.Y / radii.Y, unit.Z / radii.Z).Unit
+			if keep(at, unit) then
+				local length = f.length[1] + (f.length[2] - f.length[1]) * hash(i, salt)
+				local dir = lean(normal, f.lieBack, i + salt * 1000)
+				table.insert(out, { at = at - dir * length * 0.25, dir = dir, length = length, white = white(unit), grey = hash(i, salt + 11) < f.greyShare })
+			end
+		end
+	end
+end
+
+function Setae.body(look: any): { Hair }
+	local out: { Hair } = {}
+	local f = look.fuzz
+	if not f or not f.enabled then return out end
+	local ar, hr = v3(look.abdomenRadii), v3(look.headRadii)
+	ellipsoidHairs(out, look, Setae.ABDOMEN_CENTER, ar, f.abdomenSamples, 1, function(_at, unit)
+		return unit.Z > -0.93 -- not where the abdomen meets the pedicel
+	end, function(unit)
+		return whiteOnAbdomen(look, unit.X, unit.Z)
+	end)
+	ellipsoidHairs(out, look, Setae.HEAD_CENTER, hr, f.headSamples, 2, function(at, unit)
+		if unit.Z < -0.55 and unit.Y < 0.75 then return false end -- the eye face stays clear
+		for _, e in EYES do
+			if (at - e).Magnitude < 0.075 then return false end
+		end
+		return true
+	end, function(unit)
+		return math.abs(unit.X) > 0.82 and unit.Z < 0.1 and unit.Y < 0.45 -- pale cheeks
+	end)
+	-- Phidippus eyebrow tufts: long dark hairs above each side of the eye row, leaning forward and out.
+	for _, side in { -1, 1 } do
+		for k = 1, f.tuftHairs do
+			local s = (k - 1) / math.max(1, f.tuftHairs - 1) - 0.5
+			local at = Vector3.new(side * (0.12 + s * 0.03), 0.17, -0.34 + s * 0.04)
+			local dir = Vector3.new(side * (0.35 + 0.15 * s), 1, -0.45 + 0.2 * hash(k, 9)).Unit
+			table.insert(out, { at = at, dir = dir, length = f.tuftLength * (0.85 + 0.3 * hash(k, 7 + side)), white = false, grey = false })
+		end
+	end
+	return out
+end
+
+-- Hairs on one leg: segment 1 femur, 2 tibia, 3 tarsus; t along it (0 base .. 1 tip); theta around it.
+-- White over the leg's pale band (the middle bandFraction of each segment, as SpiderRig draws it), else dark.
+function Setae.leg(look: any, legIndex: number): { LegHair }
+	local out: { LegHair } = {}
+	local f = look.fuzz
+	if not f or not f.enabled then return out end
+	local front = (legIndex - 1) % 4 == 0 -- the first legs carry a denser, longer fringe, as in Phidippus
+	for segment = 1, 3 do
+		local n = if front and segment < 3 then math.floor(f.legHairs[segment] * 1.6) else f.legHairs[segment]
+		for k = 1, n do
+			local i = legIndex * 100 + segment * 10 + k
+			local t = (k - 0.5) / n
+			local theta = k * GOLDEN + legIndex
+			local white = math.abs(t - 0.5) < look.bandFraction * 0.6
+			table.insert(out, { segment = segment, t = t, theta = theta, length = f.legLength * (0.7 + 0.6 * hash(i, 5)) * (if segment == 3 then 0.6 elseif front then 1.4 else 1), white = white, grey = hash(i, 13) < f.greyShare })
+		end
+	end
+	return out
+end
+
+return Setae
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="19">
           <Properties>
             <string name="Name">SpiderRig</string>
             <string name="Source"><![CDATA[--!strict
@@ -1006,6 +1434,7 @@ return T
 
 local Workspace = game:GetService("Workspace")
 local Appearances = require(script.Parent.Parent.Data.Appearances)
+local Setae = require(script.Parent.Setae)
 
 local SpiderRig = {}
 SpiderRig.__index = SpiderRig
@@ -1040,6 +1469,7 @@ type Leg = {
 	knee: Part,
 	ankle: Part,
 	bands: {Part},
+	hairs: { { part: Part, spec: Setae.LegHair } },
 }
 
 type Fixed = { part: Part, offset: CFrame, palp: number? }
@@ -1057,6 +1487,10 @@ export type Rig = typeof(setmetatable(
 		_drum: number,
 		_spots: { Part },
 	_appearance: any,
+		_setae: { Part },
+		_eyeView: boolean,
+		_bodyHidden: boolean,
+		_highlight: Highlight?,
 		_params: RaycastParams,
 		_parts: { BasePart },
 		_cframes: { CFrame },
@@ -1110,7 +1544,8 @@ local function rodCFrame(a: Vector3, b: Vector3): CFrame
 	return CFrame.lookAt((a + b) * 0.5, b) * CFrame.Angles(0, math.pi / 2, 0)
 end
 
-function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: string?): Rig
+-- detail "low" keeps every third hair (phones and tablets until a real-device frame-time check says otherwise).
+function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: string?, detail: string?): Rig
 	local look = Appearances.profiles[appearanceId or Appearances.default]
 	assert(look, "Unknown spider appearance")
 	local function color(rgb): Color3 return Color3.new(rgb[1], rgb[2], rgb[3]) end
@@ -1142,6 +1577,10 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		_drum = 0,
 		_spots = {} :: { Part },
 		_appearance = look,
+		_setae = {} :: { Part },
+		_eyeView = false,
+		_bodyHidden = false,
+		_highlight = nil :: Highlight?,
 		_params = params,
 		_parts = {} :: { BasePart },
 		_cframes = {} :: { CFrame },
@@ -1210,6 +1649,39 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		fixed(ellipsoid(model, "PalpClub", Vector3.new(0.03, 0.03, 0.045), LEG, fabric), tip + Vector3.new(0, -0.005, -0.02) - base, nil, palpIndex)
 		fixed(ellipsoid(model, "PalpTip", Vector3.new(0.022, 0.018, 0.022), JOINT, fabric), tip + Vector3.new(0, 0.006, -0.045) - base, nil, palpIndex)
 	end
+	-- Fuzz: thin hairs over the head and abdomen (Setae.body), moved with the body like every fixed part.
+	local fuzz = look.fuzz
+	local DARK = if fuzz then color(fuzz.dark) else BODY
+	local GREY = if fuzz then color(fuzz.grey) else BODY
+	local function seta(white: boolean, grey: boolean, width: number, length: number): Part
+		local h = newPart(model, "Seta", if white then WHITE elseif grey then GREY else DARK, Enum.Material.SmoothPlastic)
+		h.Size = Vector3.new(width, width, length)
+		h.CastShadow = false
+		h.Transparency = fuzz.transparency
+		table.insert(self._setae, h)
+		return h
+	end
+	if fuzz and fuzz.enabled then
+		local SHELL = color(fuzz.shellColor)
+		local hr, abr = Vector3.new(table.unpack(look.headRadii)), Vector3.new(table.unpack(look.abdomenRadii))
+		for k, shell in fuzz.shells do
+			local a = ellipsoid(model, "FuzzShell", abr * shell.scale, SHELL, Enum.Material.SmoothPlastic)
+			a.Transparency, a.CastShadow = shell.transparency, false
+			fixed(a, Setae.ABDOMEN_CENTER)
+			-- The head's shell sits back from the eye row so the eyes stay clear and glossy.
+			local h = ellipsoid(model, "FuzzShell", Vector3.new(hr.X * shell.scale, hr.Y * shell.scale, hr.Z * 0.82), SHELL, Enum.Material.SmoothPlastic)
+			h.Transparency, h.CastShadow = shell.transparency, false
+			fixed(h, Setae.HEAD_CENTER + Vector3.new(0, 0, 0.05 + 0.01 * k))
+		end
+	end
+	local keepEvery = if detail == "low" then 3 else 1
+	for n, hair in Setae.body(look) do
+		if n % keepEvery ~= 0 then continue end
+		local h = seta(hair.white, hair.grey, fuzz.width, hair.length)
+		local mid = hair.at + hair.dir * (hair.length * 0.5)
+		local upv = if math.abs(hair.dir.Y) < 0.9 then Vector3.yAxis else Vector3.zAxis
+		fixed(h, mid, CFrame.lookAt(Vector3.zero, hair.dir, upv))
+	end
 	for i = 1, 8 do
 		local side = if i <= 4 then -1 else 1
 		local pair = (i - 1) % 4 + 1
@@ -1231,7 +1703,13 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 			knee = ball(model, "Knee" .. i, d[1] * 0.95, JOINT),
 			ankle = ball(model, "Ankle" .. i, d[2] * 0.95, JOINT),
 			bands = {rod(model, "FemurBand" .. i, d[1], WHITE), rod(model, "TibiaBand" .. i, d[2], WHITE), rod(model, "TarsusBand" .. i, d[2] * 0.6, WHITE)},
+			hairs = {},
 		})
+		local leg = self._legs[#self._legs]
+		for n, spec in Setae.leg(look, i) do
+			if n % keepEvery ~= 0 then continue end
+			table.insert(leg.hairs, { part = seta(spec.white, spec.grey, fuzz.width * 0.85, spec.length), spec = spec })
+		end
 	end
 	local hl = Instance.new("Highlight")
 	hl.FillTransparency = 1
@@ -1239,6 +1717,7 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 	hl.OutlineTransparency = 0.82
 	hl.DepthMode = Enum.HighlightDepthMode.Occluded
 	hl.Parent = model
+	self._highlight = hl
 	model.Parent = parent
 	self:setGrowthStage(0)
 	return self
@@ -1379,22 +1858,68 @@ function SpiderRig.update(self: Rig, body: CFrame, dt: number, grounded: boolean
 		local foot = leg.foot
 		local knee = hip:Lerp(foot, 0.48) + up * (if grounded then 0.30 else 0.24)
 		local ankle = knee:Lerp(foot, ANKLE_SHARE) + up * ANKLE_LIFT
-		local function segment(p: Part, band: Part, a: Vector3, b: Vector3)
+		local function segment(index: number, p: Part, band: Part, a: Vector3, b: Vector3)
 			local len = math.max((b - a).Magnitude, 0.01)
 			if math.abs(p.Size.X - len) > 1e-3 then
 				p.Size = Vector3.new(len, p.Size.Y, p.Size.Z)
 			end
-			put(p, rodCFrame(a, b))
+			local rc = rodCFrame(a, b) -- local +X runs from a toward b (toward the foot)
+			put(p, rc)
 			band.Size = Vector3.new(len * self._appearance.bandFraction, p.Size.Y * 1.035, p.Size.Z * 1.035)
-			put(band, rodCFrame(a, b))
+			put(band, rc)
+			-- Leg setae stand out from the segment and lean toward the foot.
+			local r = p.Size.Y * 0.5
+			for _, hair in leg.hairs do
+				local spec = hair.spec
+				if spec.segment == index then
+					local c, s = math.cos(spec.theta), math.sin(spec.theta)
+					local base = Vector3.new((spec.t - 0.5) * len, r * 0.8 * c, r * 0.8 * s)
+					local dir = Vector3.new(1.3, c, s).Unit
+					put(hair.part, rc * CFrame.lookAt(base + dir * (spec.length * 0.5), base + dir * spec.length, Vector3.xAxis))
+				end
+			end
 		end
-		segment(leg.femur, leg.bands[1], hip, knee)
-		segment(leg.tibia, leg.bands[2], knee, ankle)
-		segment(leg.tarsus, leg.bands[3], ankle, foot)
+		segment(1, leg.femur, leg.bands[1], hip, knee)
+		segment(2, leg.tibia, leg.bands[2], knee, ankle)
+		segment(3, leg.tarsus, leg.bands[3], ankle, foot)
 		put(leg.knee, CFrame.new(knee))
 		put(leg.ankle, CFrame.new(ankle))
 	end
 	Workspace:BulkMoveTo(parts, cframes, Enum.BulkMoveMode.FireCFrameChanged)
+end
+
+-- Spider-eye view (Godot SpiderBody.set_eye_view + SurfaceLegs.eye_view): the body, head and palps are hidden and only the
+-- front legs' lower segments stay, reaching into the view. Client-only (LocalTransparencyModifier).
+local function applyVisibility(self: Rig)
+	local function show(p: BasePart, visible: boolean)
+		p.LocalTransparencyModifier = if visible then 0 else 1
+	end
+	local hideBody = self._eyeView or self._bodyHidden
+	if self._highlight then (self._highlight :: Highlight).Enabled = not hideBody end
+	for _, f in self._fixed do
+		show(f.part, not hideBody)
+	end
+	for _, leg in self._legs do
+		local frontReach = self._eyeView and leg.pair == 1
+		local all = not hideBody
+		show(leg.femur, all); show(leg.bands[1], all); show(leg.knee, all)
+		show(leg.tibia, all or frontReach); show(leg.bands[2], all or frontReach)
+		show(leg.tarsus, all or frontReach); show(leg.bands[3], all or frontReach); show(leg.ankle, all or frontReach)
+		for _, hair in leg.hairs do
+			show(hair.part, all or (frontReach and hair.spec.segment >= 2))
+		end
+	end
+end
+
+function SpiderRig.setEyeView(self: Rig, on: boolean)
+	self._eyeView = on
+	applyVisibility(self)
+end
+
+-- The orbit camera hides the spider when its boom is squeezed shorter than BODY_HIDE_LENGTH.
+function SpiderRig.setBodyHidden(self: Rig, hidden: boolean)
+	self._bodyHidden = hidden
+	applyVisibility(self)
 end
 
 -- Where the dragline leaves the body.
@@ -1413,15 +1938,15 @@ return SpiderRig
       </Item>
     </Item>
   </Item>
-  <Item class="ServerScriptService" referent="18">
+  <Item class="ServerScriptService" referent="20">
     <Properties>
       <string name="Name">ServerScriptService</string>
     </Properties>
-    <Item class="Folder" referent="19">
+    <Item class="Folder" referent="21">
       <Properties>
         <string name="Name">Server</string>
       </Properties>
-      <Item class="Script" referent="20">
+      <Item class="Script" referent="22">
         <Properties>
           <string name="Name">Main</string>
           <token name="RunContext">0</token>
@@ -1563,28 +2088,306 @@ dof.InFocusRadius = 3.5
       </Item>
     </Item>
   </Item>
-  <Item class="StarterPlayer" referent="21">
+  <Item class="StarterPlayer" referent="23">
     <Properties>
       <string name="Name">StarterPlayer</string>
     </Properties>
-    <Item class="StarterPlayerScripts" referent="22">
+    <Item class="StarterPlayerScripts" referent="24">
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="Folder" referent="23">
+      <Item class="Folder" referent="25">
         <Properties>
           <string name="Name">Client</string>
         </Properties>
-        <Item class="LocalScript" referent="24">
+        <Item class="ModuleScript" referent="26">
+          <Properties>
+            <string name="Name">SpiderCamera</string>
+            <string name="Source"><![CDATA[--!strict
+-- The spider's camera: a Roblox port of the frozen Godot rig, scripts/movement/camera_rig.gd (c87ce00).
+-- A Scriptable camera, so Roblox's own orbit (which centres on the body and so aimed jumps at the spider's feet)
+-- never runs. Pure math lives in Shared/Movement/CameraMath and is checked against Godot's values.
+--
+-- Orbit view: yaw/pitch only, never rolls. The pivot stands PIVOT_HEIGHT along the spider's drawn up (so on a wall it
+-- stands out from the wall, under an overhang it hangs below). The boom is a sphere cast from the pivot; a hit retracts at
+-- once, recovery is rate limited. A squeezed boom searches steeper, then flatter pitches (auto-pitch). Close in, the body
+-- is hidden so it never fills the screen.
+-- Aiming: the screen-centre ray picks the jump target. Vertical look then tilts the camera about its own position
+-- (aim pitch) instead of orbiting, so the player can aim above the pivot; it eases back after.
+-- Spider-eye view (V / Y): the camera sits just ahead of the principal eyes looking along a gaze the player turns; its up
+-- follows the body's at most EYE_ROLL_DEG_S. Walking is relative to the gaze. Switching back snaps behind the spider.
+-- Mouse: locked to the screen centre while playing (as the Godot game captures it); the Roblox menu frees it.
+
+local GuiService = game:GetService("GuiService")
+local UIS = game:GetService("UserInputService")
+local Workspace = game:GetService("Workspace")
+local CameraMath = require(game:GetService("ReplicatedStorage").Shared.Movement.CameraMath)
+local SupportMath = require(game:GetService("ReplicatedStorage").Shared.Movement.SupportMath)
+
+local SpiderCamera = {}
+SpiderCamera.__index = SpiderCamera
+
+local MIN_DISTANCE, MAX_DISTANCE = 2.0, 12.0
+local TOUCH_DEG_PER_PIXEL = 0.25
+
+export type Target = { pos: Vector3, drawnUp: Vector3, heading: Vector3 }
+
+function SpiderCamera.new(camera: Camera, params: RaycastParams, target: () -> Target, onEye: (boolean) -> ())
+	local self = setmetatable({
+		camera = camera,
+		params = params,
+		target = target,
+		onEye = onEye,
+		yaw = 0,
+		elevation = math.rad(CameraMath.DEFAULT_ELEVATION_DEG),
+		autoPitch = 0, autoPitchPrev = 0, settle = 0,
+		aimPitch = 0,
+		aiming = false,
+		distance = CameraMath.CAMERA_DISTANCE,
+		boom = 0, pivot = 0,
+		pivotDir = Vector3.yAxis,
+		recenterT = -1, recenterYaw0 = 0, recenterElev0 = 0, recenterGaze0 = Vector3.zero,
+		eyeView = false,
+		gaze = -Vector3.zAxis,
+		gazeUp = Vector3.yAxis,
+		bodyHidden = false,
+		hide = nil :: ((boolean) -> ())?,
+	}, SpiderCamera)
+	camera.CameraType = Enum.CameraType.Scriptable
+	camera.FieldOfView = CameraMath.FOV_DEG
+	UIS.InputChanged:Connect(function(input, processed)
+		if input.UserInputType == Enum.UserInputType.MouseWheel and not processed and not self.eyeView then
+			self.distance = math.clamp(self.distance * (if input.Position.Z > 0 then 0.88 else 1 / 0.88), MIN_DISTANCE, MAX_DISTANCE)
+		end
+	end)
+	self:snap()
+	return self
+end
+
+-- Boom length clear of the sill from `from` along `motion`.
+function SpiderCamera._cast(self: any, from: Vector3, motion: Vector3): number
+	local length = motion.Magnitude
+	if length < 1e-6 then return 0 end
+	local hit = Workspace:Spherecast(from, CameraMath.BOOM_RADIUS, motion, self.params)
+	return if hit then math.max(0, hit.Distance - 0.01) else length
+end
+
+function SpiderCamera._boomAt(self: any, from: Vector3, yaw: number, pitch: number): number
+	return self:_cast(from, CameraMath.backDirection(yaw, pitch) * self.distance)
+end
+
+function SpiderCamera._pitchSearch(self: any, from: Vector3): number
+	local comfort = math.min(CameraMath.COMFORT_BOOM, self.distance)
+	local offsets, lengths = { 0 }, { self:_boomAt(from, self.yaw, self.elevation) }
+	local step = math.rad(CameraMath.AUTO_PITCH_STEP_DEG)
+	local roomDown = math.max(math.rad(CameraMath.MAX_ELEVATION_DEG) - self.elevation, 0)
+	local roomUp = math.max(self.elevation - math.rad(CameraMath.MIN_AUTO_ELEVATION_DEG), 0)
+	local offset = 0
+	while lengths[#lengths] < comfort and offset < roomDown - 1e-6 do
+		offset = math.min(offset + step, roomDown)
+		table.insert(offsets, offset)
+		table.insert(lengths, self:_boomAt(from, self.yaw, self.elevation + offset))
+	end
+	offset = 0
+	while lengths[#lengths] < comfort and offset < roomUp - 1e-6 do
+		offset = math.min(offset + step, roomUp)
+		table.insert(offsets, -offset)
+		table.insert(lengths, self:_boomAt(from, self.yaw, self.elevation - offset))
+	end
+	return CameraMath.pickPitchOffset(offsets, lengths, comfort)
+end
+
+function SpiderCamera._bodyForward(self: any): Vector3
+	return self.target().heading
+end
+
+-- Puts the orbit camera behind the spider at once (spawn, reset, leaving the eye view).
+function SpiderCamera.snap(self: any)
+	local t = self.target()
+	self.yaw = CameraMath.recenterYaw(t.heading, t.drawnUp, self.yaw)
+	self.elevation = math.rad(CameraMath.DEFAULT_ELEVATION_DEG)
+	self.recenterT = -1
+	self.pivotDir = t.drawnUp
+	self.pivot = CameraMath.PIVOT_HEIGHT
+	self.settle = 2
+	self.boom = 0
+	self:tick(0)
+end
+
+function SpiderCamera.startRecenter(self: any)
+	if self.aiming then return end
+	self.recenterT = 0
+	if self.eyeView then
+		self.recenterGaze0 = self.gaze
+	else
+		self.recenterYaw0, self.recenterElev0 = self.yaw, self.elevation
+	end
+end
+
+function SpiderCamera.setAiming(self: any, on: boolean)
+	self.aiming = on
+	if on then self.recenterT = -1 end
+end
+
+function SpiderCamera.setEyeView(self: any, on: boolean)
+	if on == self.eyeView then return end
+	self.eyeView = on
+	self.recenterT = -1
+	self.camera.FieldOfView = if on then CameraMath.EYE_FOV_DEG else CameraMath.FOV_DEG
+	if on then
+		local t = self.target()
+		self.aimPitch = 0
+		self.gazeUp = t.drawnUp
+		self.gaze = CameraMath.clampGaze(t.heading, self.gazeUp, t.heading)
+	else
+		self:snap()
+	end
+	self.onEye(on)
+end
+
+function SpiderCamera.toggleEyeView(self: any)
+	self:setEyeView(not self.eyeView)
+end
+
+-- look(dx, dy) in degrees: dx > 0 looks right, dy > 0 looks down (Godot camera_rig.look).
+function SpiderCamera.look(self: any, dx: number, dy: number)
+	if dx == 0 and dy == 0 then return end
+	if self.recenterT >= 0 and math.abs(dx) + math.abs(dy) > 1.5 then self.recenterT = -1 end
+	if self.eyeView then
+		self.gaze = CameraMath.lookEye(self.gaze, self.gazeUp, math.rad(dx), math.rad(dy), self:_bodyForward())
+		return
+	end
+	self.yaw -= math.rad(dx)
+	if self.aiming then
+		self.aimPitch = CameraMath.clampAimPitch(self.aimPitch - math.rad(dy), CameraMath.effectiveElevation(self.elevation, self.autoPitch))
+	else
+		self.elevation = math.clamp(self.elevation + math.rad(dy), math.rad(CameraMath.MIN_ELEVATION_DEG), math.rad(CameraMath.MAX_ELEVATION_DEG))
+	end
+end
+
+function SpiderCamera.touchLook(self: any, delta: Vector2)
+	self:look(delta.X * TOUCH_DEG_PER_PIXEL, delta.Y * TOUCH_DEG_PER_PIXEL)
+end
+
+-- One fixed 60 Hz tick: pivot, auto-pitch and boom (orbit), or the gaze carried with the body (eye view).
+function SpiderCamera.tick(self: any, dt: number)
+	local t = self.target()
+	if self.eyeView then
+		local up = SupportMath.rotateToward(self.gazeUp, t.drawnUp, math.rad(CameraMath.EYE_ROLL_DEG_S) * dt)
+		if SupportMath.angleTo(up, self.gazeUp) > 1e-6 then
+			local axis = self.gazeUp:Cross(up)
+			if axis.Magnitude > 1e-9 then
+				self.gaze = CameraMath.rotate(self.gaze, axis.Unit, SupportMath.angleTo(self.gazeUp, up))
+			end
+		end
+		self.gazeUp = up
+		self.gaze = CameraMath.clampGaze(self.gaze, up, t.heading)
+		return
+	end
+	self.pivotDir = t.drawnUp
+	self.pivot = CameraMath.nextLength(self.pivot, self:_cast(t.pos, self.pivotDir * CameraMath.PIVOT_HEIGHT), CameraMath.PIVOT_HEIGHT, CameraMath.RECOVER_SPEED, dt)
+	local from = t.pos + self.pivotDir * self.pivot
+	local wanted = self:_pitchSearch(from)
+	if self.settle > 0 then
+		self.settle -= 1
+		self.autoPitch = wanted
+	else
+		self.autoPitch = CameraMath.easeOffset(self.autoPitch, wanted, dt, CameraMath.AUTO_PITCH_IN_SECONDS, CameraMath.AUTO_PITCH_OUT_SECONDS)
+	end
+	local elev = CameraMath.effectiveElevation(self.elevation, self.autoPitch)
+	self.boom = CameraMath.nextLength(self.boom, self:_boomAt(from, self.yaw, elev), self.distance, CameraMath.RECOVER_SPEED, if self.settle > 0 then 1 else dt)
+end
+
+local function smooth(k: number): number
+	return k * k * (3 - 2 * k)
+end
+
+-- Every rendered frame: the player's look, recentring and the aim's return, then the camera is placed.
+function SpiderCamera.render(self: any, frameDt: number, lookX: number, lookY: number)
+	local menu = GuiService.MenuIsOpen
+	UIS.MouseBehavior = if menu then Enum.MouseBehavior.Default else Enum.MouseBehavior.LockCenter
+	UIS.MouseIconEnabled = menu
+	if not menu then
+		local m = UIS:GetMouseDelta()
+		self:look(m.X * CameraMath.MOUSE_DEG_PER_PIXEL, m.Y * CameraMath.MOUSE_DEG_PER_PIXEL)
+	end
+	local rate = CameraMath.STICK_DEG_PER_SECOND * frameDt
+	self:look(lookX * rate, lookY * rate)
+	local t = self.target()
+	if self.recenterT >= 0 then
+		self.recenterT += frameDt
+		local k = smooth(math.clamp(self.recenterT / CameraMath.RECENTER_SECONDS, 0, 1))
+		if self.eyeView then
+			self.gaze = CameraMath.clampGaze(self.recenterGaze0:Lerp(t.heading, k), self.gazeUp, t.heading)
+		else
+			local goal = CameraMath.recenterYaw(t.heading, t.drawnUp, self.yaw)
+			local d = (goal - self.recenterYaw0 + math.pi) % (2 * math.pi) - math.pi
+			self.yaw = self.recenterYaw0 + d * k
+			self.elevation = self.recenterElev0 + (math.rad(CameraMath.DEFAULT_ELEVATION_DEG) - self.recenterElev0) * k
+		end
+		if k >= 1 then self.recenterT = -1 end
+	end
+	if self.eyeView then
+		local body = SupportMath.bodyCFrame(t.pos, self.gazeUp, t.heading)
+		local eye = body:PointToWorldSpace(Vector3.new(0, CameraMath.EYE_HEIGHT, -CameraMath.EYE_AHEAD))
+		self.camera.CFrame = CFrame.lookAt(eye, eye + self.gaze, self.gazeUp)
+		self:_hideBody(true)
+		return
+	end
+	if not self.aiming and self.aimPitch ~= 0 then
+		self.aimPitch = CameraMath.easeOffset(self.aimPitch, 0, frameDt, CameraMath.AIM_RETURN_SECONDS, CameraMath.AIM_RETURN_SECONDS)
+	end
+	local elev = CameraMath.effectiveElevation(self.elevation, self.autoPitch)
+	local from = t.pos + self.pivotDir * self.pivot
+	-- A flick between ticks: cast again along the direction about to be used; only shortening is taken.
+	local length = math.min(self.boom, self:_boomAt(from, self.yaw, elev))
+	self.boom = length
+	local orbit = CFrame.new(from) * CFrame.Angles(0, self.yaw, 0) * CFrame.Angles(-elev, 0, 0)
+	self.camera.CFrame = orbit * CFrame.new(0, 0, length) * CFrame.Angles(CameraMath.clampAimPitch(self.aimPitch, elev), 0, 0)
+	self:_hideBody(length < CameraMath.BODY_HIDE_LENGTH)
+end
+
+function SpiderCamera._hideBody(self: any, hidden: boolean)
+	if hidden ~= self.bodyHidden then
+		self.bodyHidden = hidden
+		if self.hide then (self.hide :: (boolean) -> ())(hidden) end
+	end
+end
+
+-- The aim ray: the camera's centre ray.
+function SpiderCamera.aimRay(self: any): (Vector3, Vector3)
+	local cf = self.camera.CFrame
+	return cf.Position, cf.LookVector
+end
+
+-- Walking intent for a stick (x right, y forward) on a surface with normal n.
+function SpiderCamera.mapStick(self: any, x: number, y: number, n: Vector3): Vector3
+	if self.eyeView then
+		return CameraMath.mapStickEye(x, y, self.gaze, self:_bodyForward(), n)
+	end
+	return CameraMath.mapStick(x, y, self.yaw, CameraMath.effectiveElevation(self.elevation, self.autoPitch), n)
+end
+
+return SpiderCamera
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="LocalScript" referent="27">
           <Properties>
             <string name="Name">SpiderClient</string>
             <string name="Source"><![CDATA[--!strict
 -- The playable spider: a client-side, kinematic port of the Godot motor's core (scripts/movement/spider_motor.gd,
--- jump_controller.gd). It walks on any attachable surface (floor, walls, undersides, over edges), aims and flies jumps
--- solved by the shared JumpMath at a fixed 60 Hz tick, trails a dragline, and drives the procedural SpiderRig.
+-- jump_controller.gd, jump_planner.gd, player_controller.gd and tether_controller.gd at the frozen c87ce00). It walks on
+-- any attachable surface (floor, walls, undersides, over edges), plans, aims and flies jumps solved by the shared JumpMath
+-- at a fixed 60 Hz tick, pays out a safety line from every leap off silk-holding ground (SilkController: catch, hang,
+-- reel, lower, edge-first lowering, deliberate let-go), and drives the procedural SpiderRig. The camera is SpiderCamera
+-- (a port of camera_rig.gd).
 --
--- Controls: WASD walk (camera-relative), Shift creep, tap Space hop, hold Space to aim at the screen centre and release
--- to leap, G toggles the gait (alternating tetrapod / one side at a time), R respawns. Right mouse drag orbits, wheel zooms.
+-- Controls (as the Godot game, see SpiderInput): WASD walk relative to the view, mouse looks, Shift creeps.
+-- Tap Space: a short hop. Hold Space (0.15 s): the spider holds still and the reticle aims at any surface; the landing patch
+-- says Reachable / Blocked / Out of reach / Can't land there; release to leap, Q cancels. F lowers on silk; on the line
+-- W reels in, S lowers, hold Q lets go. V spider-eye view, R recenter, right mouse Focus (turn to look where the camera
+-- points), T slow motion, H controls card, Backspace back to the start.
 
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
@@ -1592,11 +2395,12 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 local SpiderInput = require(script.Parent.SpiderInput)
-local controls: any = nil
+local SpiderCamera = require(script.Parent.SpiderCamera)
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local JumpMath = require(Shared:WaitForChild("Movement"):WaitForChild("JumpMath"))
 local SupportMath = require(Shared:WaitForChild("Movement"):WaitForChild("SupportMath"))
+local SilkController = require(Shared:WaitForChild("Movement"):WaitForChild("SilkController"))
 local Species = require(Shared:WaitForChild("Data"):WaitForChild("Species"))
 local Surfaces = require(Shared:WaitForChild("Data"):WaitForChild("Surfaces"))
 local Layout = require(Shared:WaitForChild("Habitat"):WaitForChild("WindowsillLayout"))
@@ -1606,12 +2410,20 @@ local profile = Species.phidippus_audax_prototype
 local LOCO = profile.locomotion
 local DT = 1 / 60
 local G = Vector3.new(0, -LOCO.gravity_wu_s2, 0)
-local HEIGHT = 0.31 -- body centre above the support plane (Godot spawn height)
+local HEIGHT = 0.31 -- body centre above the support plane: radius 0.3 + skin 0.01 (Godot seat distance)
+local SWEEP_RADIUS = 0.303 -- body radius + JumpPlanner.SWEEP_MARGIN
 local TURN_RATE = math.rad(540)
-local AIM_HOLD_S = 0.18
-local AIM_RANGE = 40
-local HOP_DISTANCE = 1.6
+local FOCUS_RATE = math.rad(180) -- Godot FOCUS_TURN_FALLBACK_DEG_S
+local HOLD_TICKS = 9 -- JumpController.HOLD_SECONDS 0.15 at 60 Hz: a shorter press is a hop
+local AIM_RANGE = 60
+local HOP_DISTANCE = 1.5
+local HOP_PROBE_UP, HOP_PROBE_DOWN = 0.5, 1.2
+local MAX_DRIFT = 0.15
+local CONTACT_EXTRA_STEPS = 8
+local FLASH_TICKS = 60
+local SLOW_SPEED = 0.5
 local MAX_DRAGLINES = 24 -- two segments per one-bend line
+local STAND_COS = math.cos(math.rad(JumpMath.STAND_MAX_DEG)) - 1e-6
 
 local player = Players.LocalPlayer
 local camera = Workspace.CurrentCamera
@@ -1620,12 +2432,18 @@ local sill = Workspace:WaitForChild("Windowsill")
 local params = RaycastParams.new()
 params.FilterType = Enum.RaycastFilterType.Include
 params.FilterDescendantsInstances = { sill }
+local overlap = OverlapParams.new()
+overlap.FilterType = Enum.RaycastFilterType.Include
+overlap.FilterDescendantsInstances = { sill }
 
-local rig = SpiderRig.new(Workspace, sill)
-local SilkController = require(Shared.Movement.SilkController)
-local silk = SilkController.new(sill, Surfaces, profile.silk, LOCO.gravity_wu_s2)
+local UIS = game:GetService("UserInputService")
+-- Touch-only devices get the lighter fuzz until a real tablet frame-time check (ROBLOX_PORT.md).
+local rig = SpiderRig.new(Workspace, sill, nil, if UIS.TouchEnabled and not UIS.KeyboardEnabled then "low" else "full")
+local silk: any = SilkController.new(sill, Surfaces, profile.silk, LOCO.gravity_wu_s2)
+local cam: any = nil
 
 type Mode = "attached" | "air"
+type Phase = "idle" | "pressed" | "aiming"
 local state = {
 	mode = "attached" :: Mode,
 	pos = Layout.SPAWN + Vector3.new(0, HEIGHT, 0),
@@ -1634,61 +2452,137 @@ local state = {
 	vel = Vector3.zero,
 	drawnUp = Vector3.yAxis,
 	moving = false,
-	spaceDown = false,
-	spaceTime = 0,
-	aiming = false,
+	phase = "idle" :: Phase,
+	heldTicks = 0,
 	plan = nil :: any,
-	planFrom = Vector3.zero,
+	planKey = "",
+	flash = nil :: any,
+	flashLeft = 0,
 	flightTicks = 0,
 	flightLimit = 0,
+	eyeTurning = false,
+	slow = false,
 }
+local events: { string } = {}
 
-local function profileOf(hit: RaycastResult): any
-	local id = hit.Instance:GetAttribute("ProfileId")
+local function profileOf(inst: Instance?): any
+	if not inst then return nil end
+	local id = inst:GetAttribute("ProfileId")
 	return if typeof(id) == "string" then Surfaces[id] else nil
 end
 
 local function attachable(hit: RaycastResult?): boolean
-	if not hit then
-		return false
-	end
-	local p = profileOf(hit)
+	if not hit then return false end
+	local p = profileOf(hit.Instance)
 	return p ~= nil and p.attachable == true
 end
 
--- The smallest rotation taking unit a onto unit b.
+-- SurfaceProfile.supports: an attachable surface, or any floor flat enough to stand on.
+local function supports(p: any, normal: Vector3): boolean
+	if p ~= nil and p.attachable then return true end
+	return normal.Magnitude > 1e-5 and normal.Unit:Dot(Vector3.yAxis) >= STAND_COS
+end
+
 local function rotationBetween(a: Vector3, b: Vector3): CFrame
 	local angle = SupportMath.angleTo(a, b)
-	if angle < 1e-6 then
-		return CFrame.identity
-	end
+	if angle < 1e-6 then return CFrame.identity end
 	local axis = a:Cross(b)
-	if axis:Dot(axis) < 1e-12 then
-		axis = SupportMath.anyPerpendicular(a)
-	end
+	if axis:Dot(axis) < 1e-12 then axis = SupportMath.anyPerpendicular(a) end
 	return CFrame.fromAxisAngle(axis.Unit, angle)
 end
 
 local function setSupport(hit: RaycastResult)
 	local turn = rotationBetween(state.up, hit.Normal)
 	state.heading = SupportMath.tangentDir(turn * state.heading, hit.Normal)
-	if state.heading == Vector3.zero then
-		state.heading = SupportMath.anyPerpendicular(hit.Normal)
-	end
+	if state.heading == Vector3.zero then state.heading = SupportMath.anyPerpendicular(hit.Normal) end
 	state.up = hit.Normal
 	state.pos = hit.Position + hit.Normal * HEIGHT
 end
 
-local function respawn()
-	state.mode = "attached"
-	state.pos = Layout.SPAWN + Vector3.new(0, HEIGHT, 0)
-	state.up = Vector3.yAxis
-	state.heading = Layout.SPAWN_HEADING
-	state.vel = Vector3.zero
-	state.aiming = false
-	state.plan = nil
-	silk:clear()
+-- ---------------------------------------------------------------- HUD: reticle, aim feedback, status, controls card
+local hud = Instance.new("ScreenGui")
+hud.Name = "SpiderHud"
+hud.ResetOnSpawn = false
+hud.IgnoreGuiInset = true
+hud.Parent = player:WaitForChild("PlayerGui")
+local function label(name: string, pos: UDim2, anchor: Vector2, size: UDim2, textSize: number): TextLabel
+	local l = Instance.new("TextLabel")
+	l.Name = name
+	l.BackgroundColor3 = Color3.new(0, 0, 0)
+	l.BackgroundTransparency = 0.45
+	l.TextColor3 = Color3.new(1, 1, 1)
+	l.Font = Enum.Font.GothamMedium
+	l.TextSize = textSize
+	l.TextWrapped = false -- lines are broken by hand; wrapping with automatic size would collapse the label
+	l.AnchorPoint = anchor
+	l.Position = pos
+	l.Size = size
+	l.AutomaticSize = Enum.AutomaticSize.XY
+	l.Visible = false
+	local pad = Instance.new("UIPadding")
+	pad.PaddingLeft, pad.PaddingRight = UDim.new(0, 10), UDim.new(0, 10)
+	pad.PaddingTop, pad.PaddingBottom = UDim.new(0, 5), UDim.new(0, 5)
+	pad.Parent = l
+	local c = Instance.new("UICorner")
+	c.CornerRadius = UDim.new(0, 8)
+	c.Parent = l
+	l.Parent = hud
+	return l
 end
+local reticle = Instance.new("Frame")
+reticle.Name = "Reticle"
+reticle.AnchorPoint = Vector2.new(0.5, 0.5)
+reticle.Position = UDim2.fromScale(0.5, 0.5)
+reticle.Size = UDim2.fromOffset(6, 6)
+reticle.BackgroundColor3 = Color3.new(1, 1, 1)
+reticle.Visible = false
+local rc = Instance.new("UICorner")
+rc.CornerRadius = UDim.new(1, 0)
+rc.Parent = reticle
+local stroke = Instance.new("UIStroke")
+stroke.Color = Color3.new(0, 0, 0)
+stroke.Thickness = 1.5
+stroke.Parent = reticle
+reticle.Parent = hud
+local ticks: { Frame } = {}
+for i, off in { Vector2.new(-16, 0), Vector2.new(16, 0), Vector2.new(0, -16), Vector2.new(0, 16) } do
+	local t = Instance.new("Frame")
+	t.AnchorPoint = Vector2.new(0.5, 0.5)
+	t.Position = UDim2.new(0.5, off.X, 0.5, off.Y)
+	t.Size = if i <= 2 then UDim2.fromOffset(8, 2) else UDim2.fromOffset(2, 8)
+	t.BackgroundColor3 = Color3.new(1, 1, 1)
+	t.BorderSizePixel = 0
+	t.Visible = false
+	t.Parent = hud
+	ticks[i] = t
+end
+local aimLabel = label("AimFeedback", UDim2.new(0.5, 0, 0.5, 28), Vector2.new(0.5, 0), UDim2.fromOffset(0, 0), 17)
+local statusLabel = label("Status", UDim2.new(0.5, 0, 0, 58), Vector2.new(0.5, 0), UDim2.fromOffset(0, 0), 16)
+local silkLabel = label("SilkStatus", UDim2.new(0.5, 0, 1, -18), Vector2.new(0.5, 1), UDim2.fromOffset(0, 0), 16)
+local help = label("Controls", UDim2.new(0, 14, 1, -14), Vector2.new(0, 1), UDim2.fromOffset(0, 0), 15)
+help.TextXAlignment = Enum.TextXAlignment.Left
+help.Text = table.concat({
+	"WASD walk   Mouse look   Shift creep",
+	"Tap Space hop   Hold Space aim, release to leap   Q cancel",
+	"F lower on silk   On the line: W reel, S lower, hold Q let go",
+	"V spider-eye view   R recenter   Right mouse focus   T slow motion",
+	"Wheel zoom   Backspace back to start   G gait   H hide this",
+	"Controller: sticks, A jump, B cancel, X silk, Y eye view, LB creep, LT focus, RT slow",
+}, "\n")
+help.Visible = true
+local helpUntil = os.clock() + 20
+
+local TITLES = { reachable = "Reachable", obstructed = "Blocked", unreachable = "Out of reach", ineligible = "Can't land there", none = "No surface in view" }
+local REASONS = {
+	ok = "", no_target = "no surface in view", ineligible_surface = "the spider cannot hold on there", too_far = "too far or too high",
+	no_launch = "no way to leave this surface toward there", no_arrival = "it can't land from that angle", no_durations = "out of range",
+	no_room = "no room to land", path_blocked = "something is in the way", graze = "it would only graze the surface",
+	hop_blocked = "something is in the way", no_ground = "nothing to land on ahead",
+}
+local COLORS = {
+	reachable = Color3.new(0.25, 0.92, 0.38), obstructed = Color3.new(1.0, 0.72, 0.1),
+	unreachable = Color3.new(1.0, 0.32, 0.28), ineligible = Color3.new(0.72, 0.45, 1.0), none = Color3.new(0.8, 0.8, 0.8),
+}
 
 -- ---------------------------------------------------------------- safety-line rendering (mechanics in SilkController)
 local lines = Instance.new("Folder")
@@ -1716,168 +2610,356 @@ local function newStrand(): Part
 	p:SetAttribute("Born", time())
 	p.Parent = lines
 	local kids = lines:GetChildren()
-	if #kids > MAX_DRAGLINES then
-		kids[1]:Destroy()
-	end
+	if #kids > MAX_DRAGLINES then kids[1]:Destroy() end
 	return p
 end
 
--- ---------------------------------------------------------------- jump preview
+local function beginStrands()
+	liveLine = newStrand()
+	local bend = newStrand()
+	bend.Transparency = 1
+	bendLine = bend
+end
+
+-- ---------------------------------------------------------------- jump preview: arc and landing patch
 local arc = Instance.new("Folder")
 arc.Name = "JumpArc"
 arc.Parent = Workspace
 local dots: { Part } = {}
+local function display(p: Part)
+	p.Anchored = true
+	p.CanCollide = false
+	p.CanQuery = false
+	p.CanTouch = false
+	p.CastShadow = false
+	p.Material = Enum.Material.Neon
+	p.Transparency = 1
+	p.Parent = arc
+end
 for i = 1, 28 do
 	local d = Instance.new("Part")
 	d.Name = "Dot" .. i
 	d.Shape = Enum.PartType.Ball
 	d.Size = Vector3.one * 0.07
-	d.Anchored = true
-	d.CanCollide = false
-	d.CanQuery = false
-	d.CanTouch = false
-	d.CastShadow = false
-	d.Material = Enum.Material.Neon
-	d.Transparency = 1
-	d.Parent = arc
+	display(d)
 	dots[i] = d
 end
 local patch = Instance.new("Part")
 patch.Name = "LandingPatch"
 patch.Shape = Enum.PartType.Cylinder
-patch.Size = Vector3.new(0.02, 1.0, 1.0)
-patch.Anchored = true
-patch.CanCollide = false
-patch.CanQuery = false
-patch.CanTouch = false
-patch.CastShadow = false
-patch.Material = Enum.Material.Neon
-patch.Transparency = 1
-patch.Parent = arc
+patch.Size = Vector3.new(0.02, 0.9, 0.9)
+display(patch)
+local ring = Instance.new("Part")
+ring.Name = "LandingRing"
+ring.Shape = Enum.PartType.Cylinder
+ring.Size = Vector3.new(0.012, 1.15, 1.15)
+display(ring)
+local cross = Instance.new("Part")
+cross.Name = "BlockedMark"
+cross.Size = Vector3.new(0.5, 0.05, 0.05)
+display(cross)
 
 local function hidePreview()
-	for _, d in dots do
-		d.Transparency = 1
-	end
-	patch.Transparency = 1
+	for _, d in dots do d.Transparency = 1 end
+	patch.Transparency, ring.Transparency, cross.Transparency = 1, 1, 1
 end
 
-local function aim()
-	local vp = camera.ViewportSize
-	local ray = camera:ViewportPointToRay(vp.X * 0.5, vp.Y * 0.5)
-	local hit = Workspace:Raycast(ray.Origin, ray.Direction * AIM_RANGE, params)
-	state.plan = nil
-	if not hit then
-		hidePreview()
-		return
-	end
-	local seat = hit.Position + hit.Normal * HEIGHT
-	local ok = attachable(hit)
-	local result = JumpMath.solve(state.pos, seat, state.up, hit.Normal, G, DT, LOCO.flight_time_min_s, LOCO.flight_time_max_s, LOCO.max_launch_speed_wu_s)
-	local sol = if ok then result.valid[1] else nil
-	local color = if sol then Color3.fromRGB(110, 230, 140) else Color3.fromRGB(235, 90, 70)
-	patch.Color = color
-	patch.Transparency = 0.45
-	patch.CFrame = CFrame.lookAt(hit.Position + hit.Normal * 0.01, hit.Position + hit.Normal) * CFrame.Angles(0, math.pi / 2, 0)
-	if sol then
-		state.plan = sol
-		state.planFrom = state.pos
-		local pts = JumpMath.path(state.pos, sol.velocity, G, DT, sol.steps)
+local function showPlan(plan: any)
+	hidePreview()
+	if not plan or plan.kind == "none" then return end
+	local color = COLORS[plan.kind]
+	local face = CFrame.lookAt(plan.point + plan.normal * 0.012, plan.point + plan.normal * 2) * CFrame.Angles(0, math.pi / 2, 0)
+	patch.Color, ring.Color = color, color
+	patch.CFrame = face
+	ring.CFrame = face * CFrame.new(-0.004, 0, 0)
+	patch.Transparency = if plan.kind == "reachable" then 0.55 else 0.75
+	ring.Transparency = 0.25
+	local path = plan.path
+	if path and #path > 1 then
 		for i, d in dots do
-			local k = math.floor((i - 1) / (#dots - 1) * sol.steps) + 1
-			d.Position = pts[k]
+			local k = math.floor((i - 1) / (#dots - 1) * (#path - 1)) + 1
+			d.Position = path[k]
 			d.Color = color
 			d.Transparency = 0.2
 		end
-	else
-		for _, d in dots do
-			d.Transparency = 1
-		end
+	end
+	if plan.blockedAt then
+		cross.Color = color
+		cross.CFrame = CFrame.lookAt(plan.blockedAt, camera.CFrame.Position) * CFrame.Angles(0, 0, math.rad(45))
+		cross.Transparency = 0.1
 	end
 end
 
-local function beginStrands()
-	liveLine = newStrand()
-	bendLine = newStrand()
-	bendLine.Transparency = 1
+-- ---------------------------------------------------------------- the planner (port of jump_planner.gd)
+local fitBall = Instance.new("Part")
+fitBall.Shape = Enum.PartType.Ball
+fitBall.Size = Vector3.one * (SWEEP_RADIUS * 2)
+fitBall.Anchored = true
+fitBall.CanCollide = false
+fitBall.CanQuery = false
+fitBall.CanTouch = false
+fitBall.Transparency = 1
+fitBall.Name = "RoomProbe"
+fitBall.Parent = arc
+
+local function sweep(a: Vector3, b: Vector3): Vector3?
+	local d = b - a
+	if d.Magnitude < 1e-6 then return nil end
+	local hit = Workspace:Spherecast(a, SWEEP_RADIUS, d, params)
+	return if hit then a + d.Unit * hit.Distance else nil
 end
+
+local function fits(center: Vector3): boolean
+	fitBall.CFrame = CFrame.new(center)
+	return #Workspace:GetPartsInPart(fitBall, overlap) == 0
+end
+
+local function tryCandidate(origin: Vector3, seat: Vector3, c: any): (boolean, string, { Vector3 }, Vector3?)
+	local pts = JumpMath.path(origin, c.velocity, G, DT, c.steps)
+	for k = 2, #pts do
+		local at = sweep(pts[k - 1], pts[k])
+		if at then
+			local cut = table.move(pts, 1, k - 1, 1, {})
+			table.insert(cut, at)
+			return false, "path_blocked", cut, at
+		end
+	end
+	local v = JumpMath.velocityAfter(c.velocity, G, DT, c.steps)
+	local p = pts[#pts]
+	for _ = 1, CONTACT_EXTRA_STEPS do
+		v += G * DT
+		local nextP = p + v * DT
+		local at = sweep(p, nextP)
+		if at then
+			if (at - seat).Magnitude <= MAX_DRIFT then return true, "ok", pts, nil end
+			return false, "graze", pts, at
+		end
+		p = nextP
+	end
+	return false, "graze", pts, seat
+end
+
+-- target: the surface point, its normal and the part it belongs to (nil inst: no surface).
+local function planJump(point: Vector3?, normal: Vector3?, inst: Instance?): any
+	if not point or not normal then return { kind = "none", reason = "no_target" } end
+	local plan: any = { point = point, normal = normal, seat = point + normal * HEIGHT, kind = "unreachable", reason = "" }
+	if not supports(profileOf(inst), normal) then
+		plan.kind, plan.reason = "ineligible", "ineligible_surface"
+		return plan
+	end
+	local solved = JumpMath.solve(state.pos, plan.seat, state.up, normal, G, DT, LOCO.flight_time_min_s, LOCO.flight_time_max_s, LOCO.max_launch_speed_wu_s)
+	if #solved.valid == 0 then
+		plan.reason = solved.reason
+		return plan
+	end
+	if not fits(plan.seat) then
+		plan.kind, plan.reason = "obstructed", "no_room"
+		plan.path = JumpMath.path(state.pos, solved.valid[1].velocity, G, DT, solved.valid[1].steps)
+		plan.blockedAt = plan.seat
+		return plan
+	end
+	local firstPath, firstAt, anyBlocked = nil, nil, false
+	for _, c in solved.valid do
+		local ok, why, path, at = tryCandidate(state.pos, plan.seat, c)
+		if ok then
+			plan.kind, plan.reason, plan.path, plan.velocity, plan.steps = "reachable", "ok", path, c.velocity, c.steps
+			return plan
+		end
+		if not firstPath then firstPath, firstAt = path, at end
+		if why == "path_blocked" then anyBlocked = true end
+	end
+	plan.path, plan.blockedAt = firstPath, firstAt
+	plan.kind, plan.reason = if anyBlocked then "obstructed" else "unreachable", if anyBlocked then "path_blocked" else "graze"
+	return plan
+end
+
+-- The aim: whatever the screen-centre ray meets (no target magnet). Re-planned only when the aim or the spider moves.
+local function aimPlan(): any
+	local origin, dir = cam:aimRay()
+	local hit = Workspace:Raycast(origin, dir * AIM_RANGE, params)
+	local key = if hit
+		then string.format("%.3f,%.3f,%.3f|%.3f,%.3f,%.3f|%.3f,%.3f,%.3f", hit.Position.X, hit.Position.Y, hit.Position.Z, hit.Normal.X, hit.Normal.Y, hit.Normal.Z, state.pos.X, state.pos.Y, state.pos.Z)
+		else "none"
+	if key ~= state.planKey or not state.plan then
+		state.planKey = key
+		state.plan = if hit then planJump(hit.Position, hit.Normal, hit.Instance) else planJump(nil, nil, nil)
+	end
+	return state.plan
+end
+
+-- JumpMotor.plan_hop: the ground HOP_DISTANCE ahead, planned and checked exactly like an aimed jump.
+local function hopPlan(): any
+	local n = state.up
+	local h = SupportMath.tangentDir(state.heading, n)
+	if h == Vector3.zero then h = SupportMath.anyPerpendicular(n) end
+	local ahead = Workspace:Raycast(state.pos, h * (HOP_DISTANCE + HEIGHT), params)
+	if ahead then
+		return { kind = "obstructed", reason = "hop_blocked", point = ahead.Position, normal = ahead.Normal }
+	end
+	local finish = state.pos + h * HOP_DISTANCE
+	local ground = Workspace:Raycast(finish + n * HOP_PROBE_UP, -n * (HOP_PROBE_UP + HOP_PROBE_DOWN), params)
+	if not ground then
+		return { kind = "unreachable", reason = "no_ground", point = finish - n * HEIGHT, normal = n }
+	end
+	return planJump(ground.Position, ground.Normal, ground.Instance)
+end
+
+local function feedback(plan: any)
+	state.flash = plan
+	state.flashLeft = FLASH_TICKS
+end
+
+local function endAim()
+	state.phase = "idle"
+	state.heldTicks = 0
+	state.plan = nil
+	state.planKey = ""
+	cam:setAiming(false)
+	hidePreview()
+end
+
+-- A committed leap anchors a safety line at takeoff where the ground holds silk (SilkController pays it out).
 local function launch(velocity: Vector3, steps: number)
 	local floorHit = Workspace:Raycast(state.pos, -state.up * (HEIGHT + 0.1), params)
 	if silk:anchorAt(floorHit, state.pos) then beginStrands() end
-	state.flightTicks, state.flightLimit = 0, steps+4
+	state.flightTicks, state.flightLimit = 0, steps + 4
 	state.vel = velocity
 	state.mode = "air"
 	hidePreview()
 end
+
 local function beginDrop(push: Vector3): boolean
 	if not silk:startDrop(state.pos, state.up, push) then return false end
 	beginStrands()
-	state.vel = push*0.6
+	state.vel = push * 0.6
 	state.mode = "air"
-	state.aiming=false; state.spaceDown=false; state.plan=nil
-	hidePreview()
+	endAim()
 	return true
 end
+
 local function requestDrop()
-	if state.mode ~= "attached" or state.aiming or silk.walk then return end
-	local plan, message = silk:planDrop(state.pos,state.up,state.heading)
-	if not plan then silk.message=message; return end
-	if plan.direction.Magnitude<1e-6 then
-		if beginDrop(state.up) then state.pos+=state.up*0.01 end
+	if state.mode ~= "attached" or state.phase == "aiming" or silk.walk then return end
+	local plan, message = silk:planDrop(state.pos, state.up, state.heading)
+	if not plan then silk.message = message; return end
+	if plan.direction.Magnitude < 1e-6 then
+		if beginDrop(state.up) then state.pos += state.up * 0.01 end
 	else
-		silk.walk={direction=plan.direction, ticks=math.ceil((plan.distance/LOCO.walk_speed_wu_s+1.5)*60)}
-		silk.message="Walking to the edge — move or cancel to stop"
+		silk.walk = { direction = plan.direction, ticks = math.ceil((plan.distance / LOCO.walk_speed_wu_s + 1.5) * 60) }
+		silk.message = "Walking to the edge — move or cancel to stop"
 	end
 end
 
-local function hop()
-	local seatGuess = state.pos + state.heading * HOP_DISTANCE
-	local hit = Workspace:Raycast(seatGuess + state.up * 0.6, -state.up * 1.5, params)
-	if not attachable(hit) then
-		return
+-- Jump input events are applied at the start of the next tick, so timing is counted in ticks.
+local function applyJumpEvents()
+	for _, e in events do
+		if e == "press" then
+			if state.mode == "attached" then
+				state.phase, state.heldTicks = "pressed", 0
+			end
+		elseif e == "release" then
+			if state.phase == "pressed" and state.mode == "attached" then
+				local plan = hopPlan()
+				if plan.kind == "reachable" then launch(plan.velocity, plan.steps) else feedback(plan) end
+				state.phase = "idle"
+			elseif state.phase == "aiming" then
+				local plan = aimPlan()
+				local attached = (state.mode :: string) == "attached"
+				endAim()
+				if plan.kind == "reachable" and attached then launch(plan.velocity, plan.steps) else feedback(plan) end
+			else
+				state.phase = "idle"
+			end
+		elseif e == "cancel" then
+			if state.phase == "aiming" then
+				endAim()
+				feedback({ kind = "none", reason = "cancelled" })
+			end
+			state.phase = "idle"
+		elseif e == "drop" then
+			endAim()
+		end
 	end
-	local h = hit :: RaycastResult
-	local seat = h.Position + h.Normal * HEIGHT
-	local g = if JumpMath.isStanding(state.up) then G else -state.up * LOCO.gravity_wu_s2
-	local result = JumpMath.solve(state.pos, seat, state.up, h.Normal, g, DT, LOCO.flight_time_min_s, LOCO.flight_time_max_s, LOCO.max_launch_speed_wu_s)
-	if result.valid[1] and g == G then
-		launch(result.valid[1].velocity, result.valid[1].steps)
-	end
+	table.clear(events)
+end
+
+local function respawn()
+	state.mode = "attached"
+	state.pos = Layout.SPAWN + Vector3.new(0, HEIGHT, 0)
+	state.up = Vector3.yAxis
+	state.drawnUp = Vector3.yAxis
+	state.heading = Layout.SPAWN_HEADING
+	state.vel = Vector3.zero
+	silk:clear()
+	liveLine, bendLine = nil, nil
+	endAim()
+	cam:snap()
 end
 
 -- ---------------------------------------------------------------- the fixed tick
+local controls: any = nil
+
 local function wish(): Vector3
 	local r, f = controls:axes()
-	if f == 0 and r == 0 then
-		return Vector3.zero
+	if f == 0 and r == 0 then return Vector3.zero end
+	local d = cam:mapStick(r, f, state.up)
+	return if d.Magnitude > 1e-6 then d.Unit else Vector3.zero
+end
+
+local function turnToward(dir: Vector3, rate: number)
+	local t = SupportMath.tangentDir(dir, state.up)
+	if t ~= Vector3.zero then
+		state.heading = SupportMath.tangentDir(SupportMath.rotateToward(state.heading, t, rate * DT), state.up)
 	end
-	local cf = camera.CFrame
-	local dir = SupportMath.tangentDir(cf.LookVector * f + cf.RightVector * r, state.up)
-	if dir == Vector3.zero then
-		dir = SupportMath.tangentDir(cf.UpVector * f + cf.RightVector * r, state.up)
+end
+
+-- Focus (PlayerController.focus_direction) and the spider-eye turn: standing still, the body turns to look.
+local function lookTurns(stickIdle: boolean)
+	if controls.held.Focus then
+		local origin, dir = cam:aimRay()
+		local hit = Workspace:Raycast(origin, dir * 60, params)
+		local eye = state.pos + state.heading * 0.45
+		local to = if hit then hit.Position - eye else dir
+		turnToward(if to.Magnitude > 0.2 then to else dir, FOCUS_RATE)
+		state.eyeTurning = false
+		return
 	end
-	return dir
+	if not cam.eyeView or not stickIdle then
+		state.eyeTurning = false
+		return
+	end
+	local look = SupportMath.tangentDir(cam.gaze, state.up)
+	if look == Vector3.zero then return end
+	local off = math.deg(SupportMath.angleTo(state.heading, look))
+	if not state.eyeTurning and off > 30 then
+		state.eyeTurning = true
+	elseif state.eyeTurning and off < 4 then
+		state.eyeTurning = false
+	end
+	if state.eyeTurning then turnToward(look, FOCUS_RATE) end
 end
 
 local function tickAttached()
-	local manual = wish()
-	if silk.walk and manual.Magnitude>0 then silk.walk=nil; silk.message="Edge walk cancelled" end
-	local dir = if state.aiming then Vector3.zero elseif silk.walk then silk.walk.direction else manual
+	local preparing = state.phase == "aiming"
+	local manual = if preparing then Vector3.zero else wish()
+	if silk.walk and manual.Magnitude > 0 then silk.walk = nil; silk.message = "Edge walk cancelled" end
+	local dir = if preparing then Vector3.zero elseif silk.walk then silk.walk.direction else manual
 	if silk.walk then
-		silk.walk.ticks-=1
-		if silk.walk.ticks<=0 then silk.walk=nil; silk.message="Edge walk stopped"; return end
+		silk.walk.ticks -= 1
+		if silk.walk.ticks <= 0 then silk.walk = nil; silk.message = "Edge walk stopped"; return end
 	end
 	state.moving = dir ~= Vector3.zero
+	if not preparing and not silk.walk then lookTurns(not state.moving) end
 	if not state.moving then
 		-- Re-seat on the support so a vanished or moved surface is noticed.
 		local below = Workspace:Raycast(state.pos + state.up * 0.1, -state.up * (HEIGHT + 0.35), params)
-		if not attachable(below) then
+		if not attachable(below) and not (below and supports(profileOf(below.Instance), below.Normal)) then
 			state.mode = "air"
 			state.vel = Vector3.zero
+			events = { "drop" }
 		end
 		return
 	end
-	local stalk = controls.held.Creep == true
+	local stalk = controls.held.Creep == true and not silk.walk
 	local speed = if stalk then LOCO.stalk_speed_wu_s else LOCO.walk_speed_wu_s
 	state.heading = SupportMath.tangentDir(SupportMath.rotateToward(state.heading, dir, TURN_RATE * DT), state.up)
 	local step = dir * speed * DT
@@ -1897,7 +2979,8 @@ local function tickAttached()
 		return
 	end
 	if silk.walk then
-		if beginDrop(dir) then state.pos=nextPos+dir*(HEIGHT+0.02) end
+		-- The walk to the edge reached it: let down from here (edge-first lowering, SilkController).
+		if beginDrop(dir) then state.pos = nextPos + dir * (HEIGHT + 0.02) end
 		return
 	end
 	-- Convex edge: wrap over it onto the face beyond (sill edge, leaf rim, the top of a wall).
@@ -1911,18 +2994,22 @@ local function tickAttached()
 end
 
 local function tickAir()
-	if silk.mode=="locked" then
-		local _,forward=controls:axes()
-		local intent=if controls.held.Drop then math.min(forward,0)-1 else forward
+	if silk.mode == "locked" then
+		-- On the line (spec 17's context override): forward reels in, back lowers, F held lowers, a held Q lets go.
+		local _, forward = controls:axes()
+		local intent = if controls.held.Drop then math.min(forward, 0) - 1 else forward
 		local hit
-		state.pos,state.vel,hit=silk:step(state.pos,state.vel,math.clamp(intent,-1,1),controls.held.Release==true)
+		state.pos, state.vel, hit = silk:step(state.pos, state.vel, math.clamp(intent, -1, 1), controls.held.Cancel == true)
 		if hit then
-			setSupport(hit); state.vel=Vector3.zero; state.mode="attached"
-			silk:clear(); liveLine=nil; bendLine=nil
+			setSupport(hit)
+			state.vel = Vector3.zero
+			state.mode = "attached"
+			silk:clear()
+			liveLine, bendLine = nil, nil
 		end
 		return
 	end
-	state.flightTicks+=1
+	state.flightTicks += 1
 	local from = state.pos
 	state.vel += G * DT
 	local to = from + state.vel * DT
@@ -1931,26 +3018,24 @@ local function tickAir()
 	local hit = Workspace:Raycast(from, dir * (travel.Magnitude + HEIGHT), params)
 	if hit then
 		local approach = -state.vel:Dot(hit.Normal)
-		if attachable(hit) and approach >= JumpMath.minApproach(hit.Normal) then
+		if supports(profileOf(hit.Instance), hit.Normal) and approach >= JumpMath.minApproach(hit.Normal) then
 			local heading = SupportMath.tangentDir(state.vel, hit.Normal)
 			setSupport(hit)
-			if heading ~= Vector3.zero then
-				state.heading = heading
-			end
+			if heading ~= Vector3.zero then state.heading = heading end
 			state.vel = Vector3.zero
 			state.mode = "attached"
-			liveLine=nil; bendLine=nil
+			liveLine, bendLine = nil, nil
 			silk:clear()
 			return
 		end
-		if silk.mode=="payout" then silk:lock(state.pos,0.25) end
-		-- Not landable here: slide along it.
+		-- Not landable here: the line locks (a miss), and the body slides along it.
+		if silk.mode == "payout" then silk:lock(state.pos, 0.25) end
 		state.vel -= hit.Normal * math.min(0, state.vel:Dot(hit.Normal))
 		to = hit.Position + hit.Normal * HEIGHT
 	end
 	state.pos = to
 	silk:payout(to)
-	if silk.mode=="payout" and state.flightTicks>=state.flightLimit then silk:lock(to,0.25) end
+	if silk.mode == "payout" and state.flightTicks >= state.flightLimit then silk:lock(to, 0.25) end
 	-- The drawn body turns upright while falling.
 	state.up = SupportMath.rotateToward(state.up, Vector3.yAxis, math.rad(240) * DT)
 	local lo, hi = Layout.PLAY_BOUNDS_MIN, Layout.PLAY_BOUNDS_MAX
@@ -1960,141 +3045,243 @@ local function tickAir()
 end
 
 local function tick()
+	applyJumpEvents()
 	if state.mode == "attached" then
-		if state.spaceDown then
-			state.spaceTime += DT
-			if state.spaceTime >= AIM_HOLD_S then
-				state.aiming = true
-				aim()
+		if state.phase == "pressed" then
+			state.heldTicks += 1
+			if state.heldTicks >= HOLD_TICKS then
+				state.phase = "aiming"
+				state.plan = nil
+				state.planKey = ""
+				cam:setAiming(true)
 			end
 		end
 		tickAttached()
 	else
+		if state.phase ~= "idle" then endAim() end
 		tickAir()
+	end
+	if state.flashLeft > 0 then
+		state.flashLeft -= 1
+		if state.flashLeft == 0 then state.flash = nil end
 	end
 end
 
-controls = SpiderInput.bind(function(phase: string)
-	if phase == "begin" then
-		silk.walk=nil
-		state.spaceDown = true
-		state.spaceTime = 0
-		return
-	end
-	state.spaceDown = false
-	if phase == "end" and state.mode == "attached" then
-		if state.aiming then
-			local plan = state.plan
-			if plan and (state.pos - state.planFrom).Magnitude < 1e-3 then launch(plan.velocity, plan.steps) end
-		else hop() end
-	end
-	state.aiming = false
-	state.plan = nil
-	hidePreview()
-end, function() silk.walk=nil; respawn() end, function()
-	rig.gaitMode = if rig.gaitMode == "Tetrapod" then "Unilateral" else "Tetrapod"
-end, function(action, phase)
-	if action=="Drop" and phase=="begin" then requestDrop() end
-	if action=="Release" and phase=="begin" then
-		if silk.walk then silk.walk=nil; silk.message="Edge walk cancelled" end
-		state.aiming=false; state.spaceDown=false; state.plan=nil; hidePreview()
-	end
-	if phase=="clear" then silk.release.down=true; silk.release.counts=false; silk.release.held=0; silk.release.progress=0; silk.walk=nil end
+-- ---------------------------------------------------------------- camera and input
+cam = SpiderCamera.new(camera, params, function()
+	return { pos = state.pos, drawnUp = state.drawnUp, heading = state.heading }
+end, function(on: boolean)
+	rig:setEyeView(on)
 end)
+cam.hide = function(hidden: boolean)
+	rig:setBodyHidden(hidden)
+end
 
--- ---------------------------------------------------------------- camera
-player.CameraMinZoomDistance = 1.5
-player.CameraMaxZoomDistance = 30
-camera.CameraType = Enum.CameraType.Custom
-camera.CameraSubject = rig.root
-camera.FieldOfView = 60
+controls = SpiderInput.bind({
+	jump = function(phase: string)
+		if phase == "begin" and silk.walk then silk.walk = nil; silk.message = "Edge walk cancelled" end
+		table.insert(events, if phase == "begin" then "press" elseif phase == "end" then "release" else "cancel")
+	end,
+	-- Q / B / touch: the same button cancels an aim, stops a walk to the edge (and is nothing else's then), and, held on
+	-- the line, lets go (SilkController counts only a fresh press after the grace, held 0.6 s).
+	cancel = function(phase: string)
+		if phase ~= "begin" then return end
+		if silk.walk then
+			silk.walk = nil
+			silk.message = "Edge walk cancelled"
+			return
+		end
+		table.insert(events, "cancel")
+	end,
+	drop = function() requestDrop() end,
+	-- Focus loss, a text box, a lost controller: every press and hold is dropped, with no penalty and no message.
+	clear = function()
+		table.clear(events)
+		table.insert(events, "drop")
+		silk.release.down = true
+		silk.release.counts = false
+		silk.release.held = 0
+		silk.release.progress = 0
+		silk.walk = nil
+	end,
+	reset = respawn,
+	gait = function() rig.gaitMode = if rig.gaitMode == "Tetrapod" then "Unilateral" else "Tetrapod" end,
+	eye = function() cam:toggleEyeView() end,
+	recenter = function() cam:startRecenter() end,
+	slow = function() state.slow = not state.slow end,
+	touchLook = function(delta: Vector2) cam:touchLook(delta) end,
+	help = function()
+		help.Visible = not help.Visible
+		helpUntil = math.huge
+	end,
+})
 
-local hud=Instance.new("ScreenGui")
-hud.Name="SilkHUD"; hud.ResetOnSpawn=false; hud.Parent=player:WaitForChild("PlayerGui")
-local status=Instance.new("TextLabel")
-status.Name="SilkStatus"; status.Size=UDim2.new(1,-32,0,64); status.Position=UDim2.new(0,16,0,36)
-status.BackgroundColor3=Color3.new(0.03,0.03,0.03); status.BackgroundTransparency=0.25
-status.TextColor3=Color3.new(1,1,1); status.TextSize=17; status.TextWrapped=true; status.AutomaticSize=Enum.AutomaticSize.Y; status.Parent=hud
+local function updateHud()
+	local aiming = state.phase == "aiming"
+	reticle.Visible = aiming or controls.held.Focus == true or cam.eyeView
+	for _, t in ticks do t.Visible = controls.held.Focus == true end
+	local shown = if aiming then state.plan else state.flash
+	if shown then
+		local title = TITLES[shown.kind] or ""
+		local why = REASONS[shown.reason] or ""
+		if shown.reason == "cancelled" then
+			aimLabel.Text = "Jump cancelled"
+		elseif aiming then
+			local hint = if shown.kind == "reachable" then "release to leap   Q cancels" else "release to cancel"
+			aimLabel.Text = (if why ~= "" and shown.kind ~= "reachable" then title .. ": " .. why else title) .. "\n" .. hint
+		else
+			aimLabel.Text = if why ~= "" then title .. ": " .. why else title
+		end
+		aimLabel.TextColor3 = COLORS[shown.kind] or COLORS.none
+		aimLabel.Visible = true
+	else
+		aimLabel.Visible = false
+	end
+	if aiming then showPlan(state.plan) elseif state.flash and state.flash.point then showPlan(state.flash) else hidePreview() end
+	local status = {}
+	if cam.eyeView then table.insert(status, "SPIDER-EYE VIEW    V / Y: back") end
+	if state.slow then table.insert(status, `SLOW MOTION {math.floor(SLOW_SPEED * 100)}%    T / RT: normal speed`) end
+	statusLabel.Text = table.concat(status, "\n")
+	statusLabel.Visible = #status > 0
+	local progress = silk.release.progress
+	silkLabel.Text = if silk.mode == "locked" then silk.message .. "\nW / ↑: reel   S / ↓: lower   hold Q / B / Let go" .. (if progress > 0 then ` ({math.floor(progress * 100)}%)` else "")
+		elseif silk.walk then silk.message
+		else (if silk.message ~= "" then silk.message .. "\n" else "") .. "F / X / Silk: lower on silk"
+	silkLabel.Visible = state.phase ~= "aiming"
+	if os.clock() > helpUntil and help.Visible then help.Visible = false end
+end
+
 local accumulator = 0
-RunService.RenderStepped:Connect(function(frameDt: number)
-	accumulator = math.min(accumulator + frameDt, 0.25)
+RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, function(frameDt: number)
+	local simDt = frameDt * (if state.slow then SLOW_SPEED else 1)
+	accumulator = math.min(accumulator + simDt, 0.25)
 	while accumulator >= DT do
 		accumulator -= DT
 		tick()
+		cam:tick(DT)
+		if state.phase == "aiming" then aimPlan() end
 	end
 	-- Drawn frame: the up vector eases so walls and edges do not snap.
-	state.drawnUp = state.drawnUp:Lerp(state.up, 1 - math.exp(-24 * frameDt)).Unit
+	state.drawnUp = state.drawnUp:Lerp(state.up, 1 - math.exp(-24 * simDt)).Unit
 	local body = SupportMath.bodyCFrame(state.pos, state.drawnUp, state.heading)
-	rig:update(body, frameDt, state.mode == "attached", state.moving)
-	if liveLine and bendLine and silk.mode~="none" then
-		local tip=rig:spinneretPoint(body)
-		strand(silk.anchor,silk.bend or tip,liveLine)
-		liveLine.Transparency=0.35
-		if silk.bend then strand(silk.bend,tip,bendLine); bendLine.Transparency=0.35 else bendLine.Transparency=1 end
-	elseif liveLine then
-		liveLine:Destroy(); liveLine=nil
-		if bendLine then bendLine:Destroy(); bendLine=nil end
+	rig:update(body, simDt, state.mode == "attached", state.moving)
+	local live, bend = liveLine, bendLine
+	if live and bend and silk.mode ~= "none" then
+		local tip = rig:spinneretPoint(body)
+		strand(silk.anchor, silk.bend or tip, live)
+		live.Transparency = 0.35
+		if silk.bend then strand(silk.bend, tip, bend); bend.Transparency = 0.35 else bend.Transparency = 1 end
+	elseif live then
+		live:Destroy()
+		liveLine = nil
+		if bend then bend:Destroy(); bendLine = nil end
 	end
-	for _,line in lines:GetChildren() do
-		if line~=liveLine and line~=bendLine then
-			local age=time()-(line:GetAttribute("Born") or time())
-			if age>25 then line:Destroy() else line.Transparency=math.max(line.Transparency,0.35+0.65*age/25) end
+	for _, line in lines:GetChildren() do
+		if line ~= liveLine and line ~= bendLine and line:IsA("BasePart") then
+			local born = line:GetAttribute("Born")
+			local age = time() - (if typeof(born) == "number" then born else time())
+			if age > 25 then line:Destroy() else line.Transparency = math.max(line.Transparency, 0.35 + 0.65 * age / 25) end
 		end
 	end
-	local progress=silk.release.progress
-	status.Text=if silk.mode=="locked" then silk.message.." | W / ↑: reel • S / ↓: lower • hold Q / B / Let go"..(if progress>0 then ` ({math.floor(progress*100)}%)` else "")
-		elseif silk.walk then silk.message else (if silk.message~="" then silk.message.." | " else "").."F / X: lower on silk"
-
+	-- Looking runs in real time, so slow motion never makes the camera sluggish.
+	local lx, ly = controls:lookAxes()
+	cam:render(frameDt, lx, ly)
+	updateHud()
 	local dof = Lighting:FindFirstChild("MacroDOF")
 	if dof and dof:IsA("DepthOfFieldEffect") then
-		dof.FocusDistance = (camera.CFrame.Position - state.pos).Magnitude
+		local focus = (camera.CFrame.Position - state.pos).Magnitude
+		if cam.eyeView then
+			local origin, dir = cam:aimRay()
+			local hit = Workspace:Raycast(origin, dir * 40, params)
+			focus = if hit then hit.Distance else 40
+		end
+		dof.FocusDistance = focus
 	end
 end)
 
 -- The test-place-only module exercises this controller in Studio. Absent from the playable build.
-local playback=script.Parent:FindFirstChild("SilkPlayback")
-if RunService:IsStudio() and playback then
-    task.spawn(function()
-        require(playback)({input=controls,drop=requestDrop,
-            place=function(position)
-                controls:clear(); respawn(); state.pos=position; state.up=Vector3.yAxis; state.heading=Vector3.zAxis
-            end,
-            get=function() return {mode=state.mode,line=silk.mode,taut=silk.taut,position=state.pos,walking=silk.walk~=nil} end})
-    end)
+local playback = script.Parent:FindFirstChild("SilkPlayback")
+if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
+	task.spawn(function()
+		local run: any = (require :: any)(playback)
+		run({input = controls, drop = requestDrop,
+			place = function(position: Vector3)
+				controls:clear(); respawn(); state.pos = position; state.up = Vector3.yAxis; state.heading = Vector3.zAxis
+				cam:snap()
+			end,
+			get = function() return {mode = state.mode, line = silk.mode, taut = silk.taut, position = state.pos, walking = silk.walk ~= nil} end})
+	end)
 end
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="25">
+        <Item class="ModuleScript" referent="28">
           <Properties>
             <string name="Name">SpiderInput</string>
             <string name="Source"><![CDATA[--!strict
--- One action path for keyboard, gamepad and held on-screen touch buttons.
+-- One action path for keyboard, mouse, gamepad and held on-screen touch buttons.
+-- Bindings follow the frozen Godot game's scripts/core/input_setup.gd wherever the action exists in the port:
+--   walk WASD / left stick (D-pad too), look mouse / arrow keys / right stick, creep Shift / LB,
+--   jump Space / A (tap hop, hold aim, release leap), cancel Q / B (cancels an aim or a walk to the edge; held on the
+--   line it lets go, ROBLOX-05), focus right mouse / LT, spider-eye view V / Y, recenter R / middle mouse / right-stick
+--   click, slow motion T / RT, lower on silk F / X (Godot: F / D-pad down; the port keeps the D-pad for walking).
+-- Port-only: reset to the start Backspace / View (Select), gait toggle G, controls card H (Godot's H is the field notes).
 local CAS = game:GetService("ContextActionService")
 local UIS = game:GetService("UserInputService")
 local Players = game:GetService("Players")
 local InputState = require(game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Movement"):WaitForChild("InputState"))
 local SpiderInput = {}
 
-function SpiderInput.bind(jump: (string) -> (), reset: () -> (), gait: () -> (), silkAction: (string,string) -> ())
+export type Handlers = {
+	jump: (string) -> (),
+	cancel: (string) -> (),
+	drop: () -> (),
+	clear: () -> (),
+	reset: () -> (),
+	gait: () -> (),
+	eye: () -> (),
+	recenter: () -> (),
+	slow: () -> (),
+	help: () -> (),
+	touchLook: (Vector2) -> (),
+}
+
+local function phaseName(phase: Enum.UserInputState): string
+	return if phase == Enum.UserInputState.Begin then "begin" elseif phase == Enum.UserInputState.End then "end" else "cancel"
+end
+
+function SpiderInput.bind(h: Handlers)
 	local state = InputState.new()
 	local function act(action: string, phase: Enum.UserInputState)
 		local down = phase == Enum.UserInputState.Begin
 		if action == "Jump" then
-			if down then jump("begin") elseif phase == Enum.UserInputState.End then jump("end") else jump("cancel") end
-		elseif action=="Drop" or action=="Release" then
-			state:set(action,down)
-			silkAction(action,if down then "begin" elseif phase==Enum.UserInputState.End then "end" else "cancel")
-		elseif action == "Reset" then if down then reset() end
-		elseif action == "Gait" then if down then gait() end
+			h.jump(phaseName(phase))
+		elseif action == "Cancel" then
+			state:set(action, down)
+			h.cancel(phaseName(phase))
+		elseif action == "Drop" then
+			state:set(action, down)
+			if down then h.drop() end
+		elseif action == "Reset" then if down then h.reset() end
+		elseif action == "Gait" then if down then h.gait() end
+		elseif action == "Eye" then if down then h.eye() end
+		elseif action == "Recenter" then if down then h.recenter() end
+		elseif action == "Slow" then if down then h.slow() end
+		elseif action == "Help" then if down then h.help() end
 		else state:set(action, down) end
 	end
-	local bindings = {
+	local bindings: {[string]: {any}} = {
 		Forward = {Enum.KeyCode.W, Enum.KeyCode.DPadUp}, Back = {Enum.KeyCode.S, Enum.KeyCode.DPadDown},
 		Left = {Enum.KeyCode.A, Enum.KeyCode.DPadLeft}, Right = {Enum.KeyCode.D, Enum.KeyCode.DPadRight},
-		Jump = {Enum.KeyCode.Space, Enum.KeyCode.ButtonA}, Creep = {Enum.KeyCode.LeftShift, Enum.KeyCode.ButtonL1},
-		Drop={Enum.KeyCode.F,Enum.KeyCode.ButtonX}, Release={Enum.KeyCode.Q,Enum.KeyCode.ButtonB},
-		Reset = {Enum.KeyCode.R, Enum.KeyCode.ButtonY}, Gait = {Enum.KeyCode.G},
+		LookLeft = {Enum.KeyCode.Left}, LookRight = {Enum.KeyCode.Right}, LookUp = {Enum.KeyCode.Up}, LookDown = {Enum.KeyCode.Down},
+		Jump = {Enum.KeyCode.Space, Enum.KeyCode.ButtonA}, Cancel = {Enum.KeyCode.Q, Enum.KeyCode.ButtonB},
+		Drop = {Enum.KeyCode.F, Enum.KeyCode.ButtonX},
+		Creep = {Enum.KeyCode.LeftShift, Enum.KeyCode.RightShift, Enum.KeyCode.ButtonL1},
+		Focus = {Enum.UserInputType.MouseButton2, Enum.KeyCode.ButtonL2},
+		Eye = {Enum.KeyCode.V, Enum.KeyCode.ButtonY},
+		Recenter = {Enum.KeyCode.R, Enum.UserInputType.MouseButton3, Enum.KeyCode.ButtonR3},
+		Slow = {Enum.KeyCode.T, Enum.KeyCode.ButtonR2}, Help = {Enum.KeyCode.H},
+		Reset = {Enum.KeyCode.Backspace, Enum.KeyCode.ButtonSelect}, Gait = {Enum.KeyCode.G},
 	}
 	for action, keys in bindings do
 		CAS:BindActionAtPriority("Spider" .. action, function(_, phase)
@@ -2108,6 +3295,12 @@ function SpiderInput.bind(jump: (string) -> (), reset: () -> (), gait: () -> (),
 		else state:stick(input.Position.X, input.Position.Y) end
 		return Enum.ContextActionResult.Sink
 	end, false, 3000, Enum.KeyCode.Thumbstick1)
+	CAS:BindActionAtPriority("SpiderLookStick", function(_, phase, input)
+		if phase == Enum.UserInputState.Cancel or UIS:GetFocusedTextBox() then state:look(0, 0)
+		else state:look(input.Position.X, input.Position.Y) end
+		return Enum.ContextActionResult.Sink
+	end, false, 3000, Enum.KeyCode.Thumbstick2)
+
 	local gui = Instance.new("ScreenGui")
 	gui.Name = "SpiderTouch"
 	gui.ResetOnSpawn = false
@@ -2117,14 +3310,13 @@ function SpiderInput.bind(jump: (string) -> (), reset: () -> (), gait: () -> (),
 	local function clear()
 		state:clear()
 		table.clear(active)
-		jump("cancel")
-		silkAction("Release","clear")
+		h.clear()
 	end
-	local function button(action: string, label: string, position: UDim2, size: number)
+	local function button(action: string, label: string, position: UDim2, size: number, textSize: number?)
 		local b = Instance.new("TextButton")
 		b.Name = action
 		b.Text = label
-		b.TextSize = 18
+		b.TextSize = textSize or 18
 		b.TextColor3 = Color3.new(1, 1, 1)
 		b.BackgroundColor3 = Color3.new(0.06, 0.06, 0.06)
 		b.BackgroundTransparency = 0.15
@@ -2147,11 +3339,16 @@ function SpiderInput.bind(jump: (string) -> (), reset: () -> (), gait: () -> (),
 	button("Right", "→", UDim2.new(0, 134, 1, -132), 52)
 	button("Jump", "Jump\n(hold)", UDim2.new(1, -92, 1, -102), 72)
 	button("Creep", "Creep", UDim2.new(1, -86, 1, -172), 60)
-	button("Drop", "Silk", UDim2.new(1,-86,1,-242),60)
-	button("Release", "Let go\n(hold)", UDim2.new(1,-156,1,-242),60)
+	button("Drop", "Silk", UDim2.new(1, -86, 1, -242), 60)
+	button("Cancel", "Cancel\nLet go", UDim2.new(1, -166, 1, -92), 60, 14)
+	button("Eye", "Eye", UDim2.new(1, -156, 1, -242), 60)
 	UIS.InputEnded:Connect(function(input)
 		local action = active[input]
 		if action then active[input] = nil; act(action, Enum.UserInputState.End) end
+	end)
+	-- Touch look: a drag anywhere that is not on a button turns the view (Roblox marks button touches processed).
+	UIS.TouchMoved:Connect(function(input, processed)
+		if not processed and not active[input] then h.touchLook(Vector2.new(input.Delta.X, input.Delta.Y)) end
 	end)
 	UIS.WindowFocusReleased:Connect(clear)
 	UIS.TextBoxFocused:Connect(clear)
@@ -2166,7 +3363,7 @@ return SpiderInput
       </Item>
     </Item>
   </Item>
-  <Item class="Workspace" referent="26">
+  <Item class="Workspace" referent="29">
     <Properties>
       <string name="Name">Workspace</string>
       <float name="Gravity">35</float>

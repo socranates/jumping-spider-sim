@@ -64,6 +64,78 @@ input:set("Creep", true); input:clear(); x,y=input:axes()
 check(x == 0 and y == 0 and not input.held.Creep, "focus loss clears movement and creep")
 
 
+-- Camera and stick math against values exported from the frozen Godot rig (tools/export_camera_reference.gd).
+local CameraMath = require("../src/Shared/Movement/CameraMath")
+local cam = require("./camera_reference")
+local function vnear(a: Vector3, b, eps: number): boolean
+	return math.abs(a.X - b[1]) <= eps and math.abs(a.Y - b[2]) <= eps and math.abs(a.Z - b[3]) <= eps
+end
+local axesOk, mapOk = true, true
+for _, c in cam.axes do
+	local right, forward = CameraMath.tangentAxes(c.yaw, c.elev, v(c.n))
+	if not (vnear(right, c.right, 1e-5) and vnear(forward, c.forward, 1e-5)) then axesOk = false; print("axes", c.yaw, c.elev, c.n[1], c.n[2], c.n[3]) end
+	for k, st in cam.sticks do
+		if not vnear(CameraMath.mapStick(st[1], st[2], c.yaw, c.elev, v(c.n)), c.mapped[k], 1e-5) then mapOk = false end
+	end
+end
+check(axesOk, `surface axes match Godot SurfaceInput ({#cam.axes} views and normals)`)
+check(mapOk, "stick mapping matches Godot SurfaceInput on floors, walls and undersides")
+local backOk = true
+for _, c in cam.backs do
+	backOk = backOk and vnear(CameraMath.backDirection(c.yaw, c.elev), c.back, 1e-6)
+		and vnear(CameraMath.cameraRight(c.yaw, c.elev), c.x, 1e-6) and vnear(CameraMath.cameraUp(c.yaw, c.elev), c.y, 1e-6)
+end
+check(backOk, "orbit basis matches Godot BoomMath")
+local lenOk = true
+for _, c in cam.next_length do lenOk = lenOk and near(CameraMath.nextLength(c["in"][1], c["in"][2], c["in"][3], c["in"][4], c["in"][5]), c.out, 1e-6) end
+check(lenOk, "boom retracts at once and recovers at the Godot rate")
+local easeOk = true
+for _, c in cam.ease do easeOk = easeOk and near(CameraMath.easeOffset(c["in"][1], c["in"][2], c["in"][3], c["in"][4], c["in"][5]), c.out, 1e-6) end
+check(easeOk, "eased offsets match Godot BoomMath")
+local pickOk = true
+for _, c in cam.pick do pickOk = pickOk and near(CameraMath.pickPitchOffset(c.offsets, c.lengths, 2.5), c.out, 1e-9) end
+check(pickOk, "auto-pitch pick matches Godot BoomMath")
+local clampOk = true
+for _, c in cam.aim_clamp do clampOk = clampOk and near(CameraMath.clampAimPitch(c["in"][1], c["in"][2]), c.out, 1e-6) end
+check(clampOk, "aim free-look clamp matches Godot camera rig")
+local effOk = true
+for _, c in cam.effective do effOk = effOk and near(CameraMath.effectiveElevation(c["in"][1], c["in"][2]), c.out, 1e-6) end
+check(effOk, "effective elevation matches Godot camera rig")
+local gazeOk = true
+for _, c in cam.gaze_clamp do gazeOk = gazeOk and vnear(CameraMath.clampGaze(v(c.g), v(c.up), Vector3.new(0, 0, -1)), c.out, 1e-5) end
+check(gazeOk, "spider-eye gaze clamp matches Godot camera rig")
+local lookOk = true
+for _, c in cam.look_eye do lookOk = lookOk and vnear(CameraMath.lookEye(v(c.g), v(c.up), c.yaw, c.pitch, Vector3.new(0, 0, -1)), c.out, 1e-5) end
+check(lookOk, "spider-eye look turns match Godot camera rig")
+check(near(CameraMath.recenterYaw(Vector3.new(1, 0, 0), Vector3.new(0, 1, 0), 0), -math.pi / 2, 1e-9), "recenter puts the camera behind the heading on a floor")
+check(near(CameraMath.recenterYaw(Vector3.new(0, 1, 0), Vector3.new(0, 0, 1), 0), 0, 1e-9), "recenter faces the wall when climbing")
+
+-- Input: V/Y view toggle and look axes.
+input:clear(); input:look(0.1, 0); local lx, ly = input:lookAxes()
+check(lx == 0 and ly == 0, "look deadzone")
+input:set("LookRight", true); lx, ly = input:lookAxes(); check(lx == 1 and ly == 0, "arrow keys look")
+input:clear(); lx, ly = input:lookAxes(); check(lx == 0 and ly == 0, "focus loss clears look")
+
+-- Fuzz layout (pure): enough hairs to read as fuzzy, bounded for the frame budget, white over the white pattern, eyes clear.
+local Setae = require("../src/Shared/Rig/Setae")
+local hairs = Setae.body(look)
+local whites, overEyes, finiteOk = 0, 0, true
+for _, h in hairs do
+	if h.white then whites += 1 end
+	finiteOk = finiteOk and h.at.X == h.at.X and math.abs(h.dir.Magnitude - 1) < 1e-9 and h.length > 0.02 and h.length < 0.1
+	if (h.at - Vector3.new(-0.075, 0.09, -0.455)).Magnitude < 0.06 or (h.at - Vector3.new(0.075, 0.09, -0.455)).Magnitude < 0.06 then overEyes += 1 end
+end
+local legHairs = 0
+for i = 1, 8 do legHairs += #Setae.leg(look, i) end
+check(#hairs >= 300 and #hairs + legHairs <= 700, `fuzz is dense and bounded ({#hairs} body + {legHairs} leg hairs)`)
+print(`fuzz: {#hairs} body hairs, {legHairs} leg hairs, {whites} white`)
+check(whites >= 15 and whites < #hairs / 2, `white hairs follow the white pattern ({whites})`)
+check(overEyes == 0, "no hairs over the principal eyes")
+check(finiteOk, "every hair is finite, unit-directed and short")
+local again = Setae.body(look)
+check(#again == #hairs and again[17].at == hairs[17].at, "fuzz layout is deterministic")
+
+
 local Tether = require("../src/Shared/Movement/TetherMath")
 local golden = require("./tether_reference")
 local function vector(a) return Vector3.new(a[1],a[2],a[3]) end

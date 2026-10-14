@@ -62,11 +62,22 @@ func _init() -> void:
 	root.add_child(sun)
 	var env := WorldEnvironment.new()
 	var e := Environment.new()
+	# A plain backdrop, but a procedural sky for ambient light and reflections, so glossy parts (the eyes) show a sky in them
+	# the way Roblox's Future lighting does.
+	var sky_mat := ProceduralSkyMaterial.new()
+	sky_mat.sky_top_color = Color(0.45, 0.62, 0.88)
+	sky_mat.sky_horizon_color = Color(0.92, 0.9, 0.84)
+	sky_mat.ground_horizon_color = Color(0.86, 0.8, 0.7)
+	sky_mat.ground_bottom_color = Color(0.7, 0.62, 0.52)
+	var sky := Sky.new()
+	sky.sky_material = sky_mat
+	e.sky = sky
 	e.background_mode = Environment.BG_COLOR
 	e.background_color = Color(0.82, 0.86, 0.9)
-	e.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	e.ambient_light_color = Color(0.75, 0.72, 0.68)
-	e.ambient_light_energy = 0.7
+	e.ambient_light_source = Environment.AMBIENT_SOURCE_SKY
+	e.ambient_light_sky_contribution = 0.8
+	e.ambient_light_energy = 0.9
+	e.reflected_light_source = Environment.REFLECTION_SOURCE_SKY
 	env.environment = e
 	root.add_child(env)
 	var cam := Camera3D.new()

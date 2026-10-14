@@ -1,30 +1,28 @@
 --!strict
--- The drawn spider for Roblox: a port of scripts/presentation/spider_body.gd and surface_legs.gd (VISUAL-01 look).
--- Every part is anchored, non-colliding and non-queryable, and is placed each frame with one Workspace:BulkMoveTo call.
+-- The drawn spider for Roblox: a port of scripts/presentation/spider_body.gd and surface_legs.gd (VISUAL-01 look), made cuter in
+-- ROBLOX-13. Every part is anchored, non-colliding and non-queryable, and is placed each frame with one Workspace:BulkMoveTo call.
 -- Display only: the controller owns the body's CFrame; nothing here feeds back into movement.
--- Body frame: +Y support-up, -Z forward, about 1 stud long (1 Godot WU = 1 cm = 1 stud).
+-- Body frame: +Y support-up, -Z forward, about 1 stud long (1 Godot WU = 1 cm = 1 stud). Every look number is in
+-- Data/Appearances; where things sit comes from Rig/Anatomy, the hairs from Rig/Setae, the idle motion from Rig/Idle.
 
 local Workspace = game:GetService("Workspace")
 local Appearances = require(script.Parent.Parent.Data.Appearances)
+local Anatomy = require(script.Parent.Anatomy)
 local Setae = require(script.Parent.Setae)
+local Idle = require(script.Parent.Idle)
+local v3 = Anatomy.v3
 
 local SpiderRig = {}
 SpiderRig.__index = SpiderRig
 
 export type GaitMode = "Tetrapod" | "Unilateral"
 
-local HIP_Z = { -0.36, -0.24, -0.12, 0.0 }
-local TIP_Z = { -0.82, -0.52, 0.12, 0.62 }
--- Stout front legs, slimmer back legs: { femur, tibia } diameters per pair.
-local LEG_D = { { 0.078, 0.064 }, { 0.065, 0.053 }, { 0.057, 0.045 }, { 0.059, 0.047 } }
 local STEP_ERROR = 0.24
 local SWING_SECONDS = 0.10
 local STEP_HEIGHT = 0.12
 local ANKLE_SHARE = 0.62
-local ANKLE_LIFT = 0.045
-local PALP_DRUM_HZ = 3.2
-local PALP_DRUM_DEG = 11
-
+-- The groups a fixed part follows: the body, the head (tilts about the neck) or the abdomen (breathes).
+local G_BODY, G_HEAD, G_ABDOMEN = 0, 1, 2
 
 type Leg = {
 	side: number,
@@ -40,11 +38,12 @@ type Leg = {
 	tarsus: Part,
 	knee: Part,
 	ankle: Part,
+	pad: Part?,
 	bands: {Part},
 	hairs: { { part: Part, spec: Setae.LegHair } },
 }
 
-type Fixed = { part: Part, offset: CFrame, palp: number? }
+type Fixed = { part: Part, offset: CFrame, group: number, palp: number? }
 
 export type Rig = typeof(setmetatable(
 	{} :: {
@@ -57,8 +56,13 @@ export type Rig = typeof(setmetatable(
 		_group: number,
 		_t: number,
 		_drum: number,
+		_calm: number,
 		_spots: { Part },
-	_appearance: any,
+		_appearance: any,
+		_layout: Anatomy.Layout,
+		_cfg: any,
+		_detail: string,
+		_palpBase: { Vector3 },
 		_setae: { Part },
 		_eyeView: boolean,
 		_bodyHidden: boolean,
@@ -116,10 +120,22 @@ local function rodCFrame(a: Vector3, b: Vector3): CFrame
 	return CFrame.lookAt((a + b) * 0.5, b) * CFrame.Angles(0, math.pi / 2, 0)
 end
 
--- detail "low" keeps every third hair (phones and tablets until a real-device frame-time check says otherwise).
+-- A hair's "up" for lookAt: its surface normal, unless that is (nearly) along the hair.
+local function upFor(dir: Vector3, normal: Vector3): Vector3
+	if math.abs(dir:Dot(normal)) < 0.97 then return normal end
+	return if math.abs(dir.Y) < 0.9 then Vector3.yAxis else Vector3.zAxis
+end
+
+local GROUP_OF: { [string]: number } = { head = G_HEAD, abdomen = G_ABDOMEN }
+
+-- detail "low" is for phones and tablets: fewer hairs, one fur shell, no foot balls, half the speckles, no outline, no
+-- breathing or head tilt (Appearances.detail). Anything else is the full look.
 function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: string?, detail: string?): Rig
 	local look = Appearances.profiles[appearanceId or Appearances.default]
 	assert(look, "Unknown spider appearance")
+	local detailName = if detail == "low" then "low" else "full"
+	local cfg = look.detail[detailName]
+	local A = Anatomy.layout(look)
 	local function color(rgb): Color3 return Color3.new(rgb[1], rgb[2], rgb[3]) end
 	local BODY, LEG = color(look.body), color(look.legs)
 	local JOINT, EYE, FANG = color(look.white), color(look.eyes), color(look.fangs)
@@ -127,6 +143,7 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 	local model = Instance.new("Model")
 	model.Name = "Spider"
 	model:SetAttribute("AppearanceId", look.id)
+	model:SetAttribute("Detail", detailName)
 	local root = newPart(model, "Root", BODY, Enum.Material.SmoothPlastic)
 	root.Size = Vector3.new(1, 0.5, 1)
 	root.Transparency = 1
@@ -147,8 +164,13 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		_group = 0,
 		_t = 0,
 		_drum = 0,
+		_calm = 0,
 		_spots = {} :: { Part },
 		_appearance = look,
+		_layout = A,
+		_cfg = cfg,
+		_detail = detailName,
+		_palpBase = { A.palps[1].base, A.palps[2].base },
 		_setae = {} :: { Part },
 		_eyeView = false,
 		_bodyHidden = false,
@@ -158,107 +180,141 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		_cframes = {} :: { CFrame },
 	}, SpiderRig)
 
-	local function fixed(part: Part, at: Vector3, rot: CFrame?, palp: number?)
-		table.insert(self._fixed, { part = part, offset = CFrame.new(at) * (rot or CFrame.identity), palp = palp })
+	local function fixed(part: Part, at: Vector3, rot: CFrame?, group: number, palp: number?)
+		table.insert(self._fixed, { part = part, offset = CFrame.new(at) * (rot or CFrame.identity), group = group, palp = palp })
 	end
 	local fabric = Enum.Material.SmoothPlastic -- clean high-contrast silhouette
-	fixed(ellipsoid(model, "Cephalothorax", Vector3.new(table.unpack(look.headRadii)), BODY, fabric), Vector3.new(0, 0.02, -0.20))
-	fixed(ellipsoid(model, "EyeFace", Vector3.new(0.205, 0.165, 0.125), BODY, fabric), Vector3.new(0, 0.055, -0.355))
-	fixed(ellipsoid(model, "Pedicel", Vector3.new(0.05, 0.05, 0.06), BODY, fabric), Vector3.new(0, -0.035, -0.06))
-	fixed(ellipsoid(model, "Abdomen", Vector3.new(table.unpack(look.abdomenRadii)), BODY, fabric), Vector3.new(0, 0.04, 0.20))
-	local ar = look.abdomenRadii
+	fixed(ellipsoid(model, "Cephalothorax", A.headRadii, BODY, fabric), A.headCenter, nil, G_HEAD)
+	fixed(ellipsoid(model, "EyeFace", A.faceRadii, BODY, fabric), A.faceCenter, nil, G_HEAD)
+	fixed(ellipsoid(model, "Pedicel", A.pedicelRadii, BODY, fabric), A.pedicelCenter, nil, G_BODY)
+	fixed(ellipsoid(model, "Abdomen", A.abdomenRadii, BODY, fabric), A.abdomenCenter, nil, G_ABDOMEN)
+
+	-- The daughter's pattern: markings are fractions of the abdomen's radii.
+	local ar, ac = A.abdomenRadii, A.abdomenCenter
 	local function marking(name: string, x: number, z: number, rx: number, rz: number, angle: number)
-		local y = ar[2] * math.sqrt(math.max(0, 1 - x*x - z*z))
+		local y = ar.Y * math.sqrt(math.max(0, 1 - x*x - z*z))
 		local spot = ellipsoid(model, name, Vector3.new(rx, 0.012, rz), WHITE, fabric)
-		fixed(spot, Vector3.new(x * ar[1], 0.047 + y, 0.20 + z * ar[3]), CFrame.Angles(0, angle, 0))
+		spot.CastShadow = false
+		fixed(spot, Vector3.new(x * ar.X, ac.Y + 0.007 + y, ac.Z + z * ar.Z), CFrame.Angles(0, angle, 0), G_ABDOMEN)
 		table.insert(self._spots, spot)
 	end
 	-- A curved pale band across the front of the abdomen.
-	for i = -4, 4 do
-		marking("FrontBand", i * 0.16, -0.66, 0.031, 0.018, 0)
+	local band = look.band
+	for i = 0, band.count - 1 do
+		marking("FrontBand", (i - (band.count - 1) / 2) * band.step, band.z, band.rx, band.rz, 0)
 	end
 	for _, spot in look.spots do
 		marking("AbdomenSpot", spot.x, spot.z, spot.rx, spot.rz, spot.angle)
 	end
 	-- Fixed deterministic stippling: no per-frame RNG or extra updates.
+	local sp = look.speckle
 	for i = 1, look.speckleCount do
+		if i % cfg.speckleEvery ~= 0 then continue end
 		local angle = i * 2.399963229728653
-		local radius = 0.40 + (i % 5) * 0.10
-		marking("Speckle", math.cos(angle) * radius, math.sin(angle) * radius, 0.0035, 0.005, angle)
+		local radius = sp.from + (i % 5) * sp.step
+		marking("Speckle", math.cos(angle) * radius, math.sin(angle) * radius, sp.rx, sp.rz, angle)
 	end
-	for _, side in { -1, 1 } do
-		fixed(ellipsoid(model, "PaleCheek", Vector3.new(0.018, 0.066, 0.105), WHITE, fabric), Vector3.new(side * 0.235, 0.055, -0.23))
-		local ame = Vector3.new(side * 0.075, 0.09, -0.455)
-		local eye = ellipsoid(model, "PrincipalEye", Vector3.new(0.080, 0.080, 0.063), EYE, Enum.Material.Glass)
-		eye.Reflectance = 0.35
-		fixed(eye, ame)
-		local glint = ellipsoid(model, "Catchlight", Vector3.new(0.013, 0.013, 0.006), Color3.new(1, 1, 1), Enum.Material.Neon)
-		glint.CastShadow = false
-		fixed(glint, ame + Vector3.new(side * -0.018, 0.03, -0.052))
-		local secondary: { { at: Vector3, r: number } } = {
-			{ at = Vector3.new(side * 0.165, 0.10, -0.40), r = 0.042 }, -- anterior lateral
-			{ at = Vector3.new(side * 0.13, 0.17, -0.14), r = 0.048 }, -- posterior lateral
-			{ at = Vector3.new(side * 0.11, 0.185, -0.27), r = 0.018 }, -- posterior median
-		}
-		for _, e in secondary do
-			local small = ellipsoid(model, "Eye", Vector3.one * e.r, EYE, Enum.Material.Glass)
-			small.Reflectance = 0.3
-			fixed(small, e.at)
+
+	-- Head: pale cheeks, big glossy eyes with their catchlights, jaws.
+	for _, c in A.cheeks do
+		local cheek = ellipsoid(model, "PaleCheek", c.radii, WHITE, fabric)
+		cheek.CastShadow = false
+		fixed(cheek, c.at, nil, G_HEAD)
+	end
+	local SOCKET = color(look.eye.ame.socket.color)
+	for _, e in A.eyes do
+		local eye = ellipsoid(model, e.name, e.radii, EYE, Enum.Material.Glass)
+		eye.Reflectance = e.reflectance
+		eye.CastShadow = false
+		fixed(eye, e.at, nil, G_HEAD)
+		if e.principal and cfg.sockets then
+			local socket = ellipsoid(model, "EyeSocket", e.radii * look.eye.ame.socket.scale, SOCKET, fabric)
+			socket.CastShadow = false
+			fixed(socket, e.at + Vector3.new(0, 0, 0.03), nil, G_HEAD)
 		end
-		local fang = ellipsoid(model, "Chelicera", Vector3.new(0.045, 0.08, 0.04), FANG, Enum.Material.Foil)
-		fang.Reflectance = 0.15
-		fixed(fang, Vector3.new(side * 0.052, -0.075, -0.445), CFrame.Angles(-0.35, 0, side * 0.12))
-		-- Pedipalp: stalk and pale-tipped club, rotating about a pivot at its base.
-		local palpIndex = if side < 0 then 1 else 2
-		local base = Vector3.new(side * 0.10, -0.035, -0.43)
-		local tip = base + Vector3.new(side * 0.03, -0.10, -0.09)
-		local stalk = rod(model, "PalpStalk", 0.042, LEG)
-		stalk.Size = Vector3.new((tip-base).Magnitude, 0.042, 0.042)
-		fixed(stalk, Vector3.zero, CFrame.new(base):Inverse() * rodCFrame(base, tip), palpIndex)
-		local ring = rod(model, "PalpBand", 0.044, WHITE)
-		ring.Size = Vector3.new((tip-base).Magnitude * look.bandFraction, 0.044, 0.044)
-		fixed(ring, Vector3.zero, CFrame.new(base):Inverse() * rodCFrame(base, tip), palpIndex)
-		fixed(ellipsoid(model, "PalpClub", Vector3.new(0.03, 0.03, 0.045), LEG, fabric), tip + Vector3.new(0, -0.005, -0.02) - base, nil, palpIndex)
-		fixed(ellipsoid(model, "PalpTip", Vector3.new(0.022, 0.018, 0.022), JOINT, fabric), tip + Vector3.new(0, 0.006, -0.045) - base, nil, palpIndex)
 	end
-	-- Fuzz: thin hairs over the head and abdomen (Setae.body), moved with the body like every fixed part.
+	local GLINT = color(look.eye.glintColor)
+	for _, g in A.glints do
+		local glint = ellipsoid(model, "Catchlight", g.radii, GLINT, Enum.Material.Neon)
+		glint.CastShadow = false
+		fixed(glint, g.at, nil, G_HEAD)
+	end
+	local cl = look.chelicerae
+	for _, j in A.jaws do
+		local fang = ellipsoid(model, "Chelicera", j.radii, FANG, Enum.Material.Foil)
+		fang.Reflectance = cl.reflectance
+		fixed(fang, j.at, CFrame.Angles(cl.pitch, 0, j.side * cl.splay), G_HEAD)
+	end
+	-- Pedipalps: stalk, pale band, club and pale tip, rotating about a pivot at the base (they drum when the spider stands).
+	local pl = look.palp
+	for index, palp in A.palps do
+		local base, tip = palp.base, palp.tip
+		local len = (tip - base).Magnitude
+		local toBase = CFrame.new(base):Inverse()
+		local stalk = rod(model, "PalpStalk", pl.stalk, LEG)
+		stalk.Size = Vector3.new(len, pl.stalk, pl.stalk)
+		fixed(stalk, Vector3.zero, toBase * rodCFrame(base, tip), G_HEAD, index)
+		local ring = rod(model, "PalpBand", pl.stalk * 1.05, WHITE)
+		ring.Size = Vector3.new(len * look.bandFraction, pl.stalk * 1.05, pl.stalk * 1.05)
+		fixed(ring, Vector3.zero, toBase * rodCFrame(base, tip), G_HEAD, index)
+		fixed(ellipsoid(model, "PalpClub", v3(pl.club), LEG, fabric), tip + Vector3.new(0, -0.005, -0.02) - base, nil, G_HEAD, index)
+		fixed(ellipsoid(model, "PalpTip", v3(pl.tipRadii), JOINT, fabric), tip + Vector3.new(0, 0.004, -0.05) - base, nil, G_HEAD, index)
+	end
+
+	-- Fuzz: flat locks over the head and abdomen, tufts, a cheek ruff and palp fluff (Rig/Setae), moved with the part they grow from.
 	local fuzz = look.fuzz
 	local DARK = if fuzz then color(fuzz.dark) else BODY
 	local GREY = if fuzz then color(fuzz.grey) else BODY
-	local function seta(white: boolean, grey: boolean, width: number, length: number): Part
-		local h = newPart(model, "Seta", if white then WHITE elseif grey then GREY else DARK, Enum.Material.SmoothPlastic)
-		h.Size = Vector3.new(width, width, length)
+	local FROST = if fuzz then color(fuzz.frost) else BODY
+	local function seta(tone: string, width: number, thick: number, length: number, transparency: number): Part
+		local h = newPart(model, "Seta", if tone == "white" then WHITE elseif tone == "frost" then FROST elseif tone == "grey" then GREY else DARK, Enum.Material.SmoothPlastic)
+		h.Size = Vector3.new(width, thick, length)
 		h.CastShadow = false
-		h.Transparency = fuzz.transparency
+		h.Transparency = transparency
 		table.insert(self._setae, h)
 		return h
 	end
 	if fuzz and fuzz.enabled then
 		local SHELL = color(fuzz.shellColor)
-		local hr, abr = Vector3.new(table.unpack(look.headRadii)), Vector3.new(table.unpack(look.abdomenRadii))
+		local hr, hs = A.headRadii, fuzz.headShell
 		for k, shell in fuzz.shells do
-			local a = ellipsoid(model, "FuzzShell", abr * shell.scale, SHELL, Enum.Material.SmoothPlastic)
+			if k > cfg.shells then break end
+			local a = ellipsoid(model, "FuzzShell", A.abdomenRadii * shell.scale, SHELL, fabric)
 			a.Transparency, a.CastShadow = shell.transparency, false
-			fixed(a, Setae.ABDOMEN_CENTER)
-			-- The head's shell sits back from the eye row so the eyes stay clear and glossy.
-			local h = ellipsoid(model, "FuzzShell", Vector3.new(hr.X * shell.scale, hr.Y * shell.scale, hr.Z * 0.82), SHELL, Enum.Material.SmoothPlastic)
+			fixed(a, A.abdomenCenter, nil, G_ABDOMEN)
+			local h = ellipsoid(model, "FuzzShell", Vector3.new(hr.X * shell.scale, hr.Y * shell.scale, hr.Z * hs.zScale), SHELL, fabric)
 			h.Transparency, h.CastShadow = shell.transparency, false
-			fixed(h, Setae.HEAD_CENTER + Vector3.new(0, 0, 0.05 + 0.01 * k))
+			fixed(h, A.headCenter + Vector3.new(0, 0, hs.shift + 0.01 * k), nil, G_HEAD)
+		end
+		local seen: { [string]: number } = {}
+		local function keep(kind: string): boolean
+			local n = (seen[kind] or 0) + 1
+			seen[kind] = n
+			return n % (cfg.every[kind] or 1) == 0
+		end
+		for _, hair in Setae.body(look) do
+			if not keep(hair.kind) then continue end
+			local h = seta(hair.tone, hair.width, hair.thick, hair.length, hair.transparency)
+			local mid = hair.at + hair.dir * (hair.length * 0.5)
+			fixed(h, mid, CFrame.lookAt(Vector3.zero, hair.dir, upFor(hair.dir, hair.normal)), GROUP_OF[hair.group] or G_BODY)
+		end
+		for _, hair in Setae.palp(look) do
+			if not keep("palp") then continue end
+			local index = if hair.side < 0 then 1 else 2
+			local h = seta(hair.tone, hair.width, hair.thick, hair.length, hair.transparency)
+			local mid = hair.at + hair.dir * (hair.length * 0.5)
+			local rest = CFrame.lookAt(mid, mid + hair.dir, upFor(hair.dir, hair.normal))
+			fixed(h, Vector3.zero, CFrame.new(self._palpBase[index]):Inverse() * rest, G_HEAD, index)
 		end
 	end
-	local keepEvery = if detail == "low" then 3 else 1
-	for n, hair in Setae.body(look) do
-		if n % keepEvery ~= 0 then continue end
-		local h = seta(hair.white, hair.grey, fuzz.width, hair.length)
-		local mid = hair.at + hair.dir * (hair.length * 0.5)
-		local upv = if math.abs(hair.dir.Y) < 0.9 then Vector3.yAxis else Vector3.zAxis
-		fixed(h, mid, CFrame.lookAt(Vector3.zero, hair.dir, upv))
-	end
+
+	-- Legs: plump, with rounded joints and (at full detail) round feet.
+	local L = look.limbs
 	for i = 1, 8 do
 		local side = if i <= 4 then -1 else 1
 		local pair = (i - 1) % 4 + 1
-		local raw = LEG_D[pair]
-		local factor = if pair == 1 then look.frontLegScale else 1
+		local raw = L.diameters[pair]
+		local factor = (if pair == 1 then look.frontLegScale else 1) * L.thickness
 		local d = {raw[1] * factor, raw[2] * factor}
 		table.insert(self._legs, {
 			side = side,
@@ -274,22 +330,27 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 			tarsus = rod(model, "Tarsus" .. i, d[2] * 0.6, LEG),
 			knee = ball(model, "Knee" .. i, d[1] * 0.95, JOINT),
 			ankle = ball(model, "Ankle" .. i, d[2] * 0.95, JOINT),
+			pad = if cfg.pads then ball(model, "Foot" .. i, d[2] * 0.6 * L.pad, LEG) else nil,
 			bands = {rod(model, "FemurBand" .. i, d[1], WHITE), rod(model, "TibiaBand" .. i, d[2], WHITE), rod(model, "TarsusBand" .. i, d[2] * 0.6, WHITE)},
 			hairs = {},
 		})
 		local leg = self._legs[#self._legs]
-		for n, spec in Setae.leg(look, i) do
-			if n % keepEvery ~= 0 then continue end
-			table.insert(leg.hairs, { part = seta(spec.white, spec.grey, fuzz.width * 0.85, spec.length), spec = spec })
+		if fuzz and fuzz.enabled then
+			for n, spec in Setae.leg(look, i) do
+				if n % cfg.every.leg ~= 0 then continue end
+				table.insert(leg.hairs, { part = seta(spec.tone, fuzz.legWidth, fuzz.legWidth, spec.length, fuzz.legTransparency), spec = spec })
+			end
 		end
 	end
-	local hl = Instance.new("Highlight")
-	hl.FillTransparency = 1
-	hl.OutlineColor = WHITE
-	hl.OutlineTransparency = 0.82
-	hl.DepthMode = Enum.HighlightDepthMode.Occluded
-	hl.Parent = model
-	self._highlight = hl
+	if cfg.highlight then
+		local hl = Instance.new("Highlight")
+		hl.FillTransparency = 1
+		hl.OutlineColor = WHITE
+		hl.OutlineTransparency = 0.82
+		hl.DepthMode = Enum.HighlightDepthMode.Occluded
+		hl.Parent = model
+		self._highlight = hl
+	end
 	model.Parent = parent
 	self:setGrowthStage(0)
 	return self
@@ -301,6 +362,18 @@ function SpiderRig.setGrowthStage(self: Rig, stage: number)
 	self.model:SetAttribute("GrowthStage", math.clamp(stage, 0, 3))
 end
 
+-- How many parts the drawn spider is made of (the model's direct parts), for budgets and the docs.
+function SpiderRig.count(self: Rig): { total: number, hairs: number, shells: number, body: number }
+	local total, hairs, shells = 0, 0, 0
+	for _, part in self.model:GetChildren() do
+		if part:IsA("BasePart") then
+			total += 1
+			if part.Name == "Seta" then hairs += 1 elseif part.Name == "FuzzShell" then shells += 1 end
+		end
+	end
+	return { total = total, hairs = hairs, shells = shells, body = total - hairs - shells }
+end
+
 local function legGroup(self: Rig, i: number): number
 	if self.gaitMode == "Unilateral" then
 		return if i <= 4 then 0 else 1
@@ -310,14 +383,15 @@ local function legGroup(self: Rig, i: number): number
 	return (j % 4 + j // 4) % 2
 end
 
-local function restLocal(leg: Leg): Vector3
-	return Vector3.new(leg.side * 0.78, -0.30, TIP_Z[leg.pair])
+local function restLocal(self: Rig, leg: Leg): Vector3
+	local s = self._appearance.limbs.stance
+	return Vector3.new(leg.side * s.x * s.reach, s.y, self._appearance.limbs.tipZ[leg.pair] * s.reach)
 end
 
 -- Display-only foothold: retract toward the body at a narrow edge; never invents a platform.
 local function target(self: Rig, body: CFrame, leg: Leg): RaycastResult?
 	local up = body.UpVector
-	local rest = restLocal(leg)
+	local rest = restLocal(self, leg)
 	for _, reach in { 1.0, 0.65, 0.35, 0.12 } do
 		local point = body:PointToWorldSpace(Vector3.new(rest.X * reach, 0, rest.Z * reach))
 		local hit = Workspace:Raycast(point + up * 0.35, -up * 1.0, self._params)
@@ -328,10 +402,11 @@ local function target(self: Rig, body: CFrame, leg: Leg): RaycastResult?
 	return nil
 end
 
--- body: the drawn body's CFrame. grounded: standing on a surface. moving: walking speed > 0 (for palp drumming).
+-- body: the drawn body's CFrame. grounded: standing on a surface. moving: walking speed > 0 (for palp drumming and idle motion).
 function SpiderRig.update(self: Rig, body: CFrame, dt: number, grounded: boolean, moving: boolean)
 	self._t += dt
 	local up = body.UpVector
+	local look, cfg, A = self._appearance, self._cfg, self._layout
 	local parts, cframes = self._parts, self._cframes
 	table.clear(parts)
 	table.clear(cframes)
@@ -341,21 +416,34 @@ function SpiderRig.update(self: Rig, body: CFrame, dt: number, grounded: boolean
 	end
 	put(self.root, body)
 
-	-- Palps drum in bursts while the spider stands still.
-	self._drum = math.clamp(self._drum + (if grounded and not moving and not self.reducedMotion then 3 else -3) * dt, 0, 1)
-	local palpAngle = {}
-	for k = 1, 2 do
-		local burst = math.clamp((math.sin(self._t * 1.3 + 0.7 * k) - 0.55) / 0.3, 0, 1)
-		local beat = math.max(0, math.sin(self._t * 2 * math.pi * PALP_DRUM_HZ + math.pi * k))
-		palpAngle[k] = math.rad(PALP_DRUM_DEG) * self._drum * burst * beat
+	-- Palps drum in bursts while the spider stands still; breathing and a curious head tilt ease in after a moment (full detail).
+	local standing = grounded and not moving and not self.reducedMotion
+	self._drum = math.clamp(self._drum + (if standing then 3 else -3) * dt, 0, 1)
+	local palpAngle = Idle.palps(self._t, self._drum, look.palp)
+	local bodyBase, headBase, abdomenBase = body, body, body
+	if cfg.idle then
+		local idle = look.idle
+		self._calm = math.clamp(self._calm + (if standing then dt / idle.riseSeconds else -dt / idle.fallSeconds), 0, 1)
+		if self._calm > 0 then
+			local c = self._calm * self._calm * (3 - 2 * self._calm)
+			local pose = Idle.pose(self._t, c, idle)
+			bodyBase = body * CFrame.new(0, pose.bodyLift, 0)
+			headBase = bodyBase * CFrame.new(A.neck) * CFrame.Angles(pose.headPitch, pose.headYaw, pose.headRoll) * CFrame.new(-A.neck)
+			abdomenBase = bodyBase * CFrame.new(0, pose.abdomenLift, 0) * CFrame.new(A.pedicelCenter)
+				* CFrame.Angles(-pose.abdomenPitch, 0, 0) * CFrame.new(-A.pedicelCenter)
+		end
 	end
+	local pivots = {
+		CFrame.new(self._palpBase[1]) * CFrame.Angles(palpAngle[1], 0, 0),
+		CFrame.new(self._palpBase[2]) * CFrame.Angles(palpAngle[2], 0, 0),
+	}
 	for _, f in self._fixed do
-		if f.palp then
-			local side = if f.palp == 1 then -1 else 1
-			local pivot = CFrame.new(side * 0.10, -0.035, -0.43) * CFrame.Angles(palpAngle[f.palp], 0, 0)
-			put(f.part, body * pivot * f.offset)
+		local base = if f.group == G_HEAD then headBase elseif f.group == G_ABDOMEN then abdomenBase else bodyBase
+		local palp = f.palp
+		if palp then
+			put(f.part, base * pivots[palp] * f.offset)
 		else
-			put(f.part, body * f.offset)
+			put(f.part, base * f.offset)
 		end
 	end
 
@@ -368,7 +456,7 @@ function SpiderRig.update(self: Rig, body: CFrame, dt: number, grounded: boolean
 		local worst = STEP_ERROR
 		for i, leg in self._legs do
 			if leg.planted then
-				local err = (body:PointToWorldSpace(restLocal(leg)) - leg.planted :: Vector3).Magnitude
+				local err = (body:PointToWorldSpace(restLocal(self, leg)) - leg.planted :: Vector3).Magnitude
 				if err > worst then
 					worst = err
 					self._group = legGroup(self, i)
@@ -376,13 +464,14 @@ function SpiderRig.update(self: Rig, body: CFrame, dt: number, grounded: boolean
 			end
 		end
 	end
+	local L = look.limbs
 	local started = false
 	for i, leg in self._legs do
-		local rest = body:PointToWorldSpace(restLocal(leg))
+		local rest = body:PointToWorldSpace(restLocal(self, leg))
 		if not grounded then
 			leg.planted = nil
 			leg.swing = -1
-			leg.foot = body:PointToWorldSpace(Vector3.new(leg.side * 0.47, -0.12, TIP_Z[leg.pair] * 0.72))
+			leg.foot = body:PointToWorldSpace(Vector3.new(leg.side * 0.47, -0.12, L.tipZ[leg.pair] * 0.72))
 		else
 			if leg.planted == nil then
 				local hit = target(self, body, leg)
@@ -425,11 +514,12 @@ function SpiderRig.update(self: Rig, body: CFrame, dt: number, grounded: boolean
 	if started then
 		self._group = 1 - self._group
 	end
+	local kneeUp = if grounded then L.kneeLift else L.kneeLiftAir
 	for _, leg in self._legs do
-		local hip = body:PointToWorldSpace(Vector3.new(leg.side * 0.16, 0.02, HIP_Z[leg.pair]))
+		local hip = bodyBase:PointToWorldSpace(Vector3.new(leg.side * L.hipX, L.hipY, L.hipZ[leg.pair]))
 		local foot = leg.foot
-		local knee = hip:Lerp(foot, 0.48) + up * (if grounded then 0.30 else 0.24)
-		local ankle = knee:Lerp(foot, ANKLE_SHARE) + up * ANKLE_LIFT
+		local knee = hip:Lerp(foot, 0.48) + up * kneeUp
+		local ankle = knee:Lerp(foot, ANKLE_SHARE) + up * L.ankleLift
 		local function segment(index: number, p: Part, band: Part, a: Vector3, b: Vector3)
 			local len = math.max((b - a).Magnitude, 0.01)
 			if math.abs(p.Size.X - len) > 1e-3 then
@@ -437,7 +527,7 @@ function SpiderRig.update(self: Rig, body: CFrame, dt: number, grounded: boolean
 			end
 			local rc = rodCFrame(a, b) -- local +X runs from a toward b (toward the foot)
 			put(p, rc)
-			band.Size = Vector3.new(len * self._appearance.bandFraction, p.Size.Y * 1.035, p.Size.Z * 1.035)
+			band.Size = Vector3.new(len * look.bandFraction, p.Size.Y * 1.035, p.Size.Z * 1.035)
 			put(band, rc)
 			-- Leg setae stand out from the segment and lean toward the foot.
 			local r = p.Size.Y * 0.5
@@ -456,6 +546,7 @@ function SpiderRig.update(self: Rig, body: CFrame, dt: number, grounded: boolean
 		segment(3, leg.tarsus, leg.bands[3], ankle, foot)
 		put(leg.knee, CFrame.new(knee))
 		put(leg.ankle, CFrame.new(ankle))
+		if leg.pad then put(leg.pad :: Part, CFrame.new(foot)) end
 	end
 	Workspace:BulkMoveTo(parts, cframes, Enum.BulkMoveMode.FireCFrameChanged)
 end
@@ -477,6 +568,7 @@ local function applyVisibility(self: Rig)
 		show(leg.femur, all); show(leg.bands[1], all); show(leg.knee, all)
 		show(leg.tibia, all or frontReach); show(leg.bands[2], all or frontReach)
 		show(leg.tarsus, all or frontReach); show(leg.bands[3], all or frontReach); show(leg.ankle, all or frontReach)
+		if leg.pad then show(leg.pad :: Part, all or frontReach) end
 		for _, hair in leg.hairs do
 			show(hair.part, all or (frontReach and hair.spec.segment >= 2))
 		end
@@ -495,8 +587,8 @@ function SpiderRig.setBodyHidden(self: Rig, hidden: boolean)
 end
 
 -- Where the dragline leaves the body.
-function SpiderRig.spinneretPoint(_self: Rig, body: CFrame): Vector3
-	return body:PointToWorldSpace(Vector3.new(0, 0.06, 0.48))
+function SpiderRig.spinneretPoint(self: Rig, body: CFrame): Vector3
+	return body:PointToWorldSpace(self._layout.spinneret)
 end
 
 function SpiderRig.destroy(self: Rig)

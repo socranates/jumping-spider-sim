@@ -29,7 +29,9 @@ MODULES = [
     ("SpiderMotor", "Movement/SpiderMotor.luau"),
     ("ControlText", "UI/ControlText.luau"),
     ("HudLayout", "UI/HudLayout.luau"),
+    ("Anatomy", "Rig/Anatomy.luau"),
     ("Setae", "Rig/Setae.luau"),
+    ("Idle", "Rig/Idle.luau"),
     ("SpiderCamera", "../Client/SpiderCamera.luau"),
 ]
 # The client scripts, bundled only for tests/client_smoke.luau.

@@ -124,7 +124,7 @@ function Color3.Lerp(a, b, t) return Color3.new(a.R + (b.R - a.R) * t, a.G + (b.
 
 local Enum = setmetatable({}, { __index = function(enums, typeName)
 	local items = setmetatable({}, { __index = function(list, itemName)
-		local item = { Name = itemName, EnumType = typeName }
+		local item = { Name = itemName, EnumType = typeName, Value = 0 }
 		rawset(list, itemName, item)
 		return item
 	end })
@@ -138,7 +138,20 @@ local Object = {}
 local BASE_PARTS = { Part = true, WedgePart = true, MeshPart = true }
 local HAS_CFRAME = { Part = true, WedgePart = true, MeshPart = true, Camera = true }
 local function children(o) return rawget(o, "_children") end
+local function newSignal()
+	local sig = { handlers = {} }
+	function sig.Connect(self, fn) table.insert(self.handlers, fn) return { Disconnect = function() end } end
+	function sig.Fire(self, ...) for _, h in table.clone(self.handlers) do h(...) end end
+	function sig.Wait(_self) return 0 end
+	return sig
+end
+local EVENTS = { InputBegan = true, InputEnded = true, InputChanged = true, Activated = true, MouseButton1Click = true, Changed = true }
 Object.__index = function(o, k)
+	if EVENTS[k] then
+		local sig = newSignal()
+		rawset(o, k, sig)
+		return sig
+	end
 	if k == "Parent" then return rawget(o, "_parent") end
 	if k == "Position" then local c = rawget(o, "_cframe") return c and c.Position end
 	if k == "CFrame" then return rawget(o, "_cframe") end
@@ -153,7 +166,7 @@ Object.__newindex = function(o, k, v)
 		end
 		rawset(o, "_parent", v)
 		if v then table.insert(children(v), o) end
-	elseif k == "Position" then
+	elseif k == "Position" and rawget(o, "_cframe") then -- a part's position; a GUI object's Position is a plain UDim2
 		local c = rawget(o, "_cframe")
 		rawset(o, "_cframe", cf(v, c._x, c._y, c._z))
 	elseif k == "CFrame" then
@@ -164,6 +177,7 @@ Object.__newindex = function(o, k, v)
 end
 function Instance.new(className: string)
 	local o = setmetatable({ ClassName = className, Name = className, _children = {}, _attrs = {} }, Object)
+	if className == "ScreenGui" then rawset(o, "AbsoluteSize", { X = 1280, Y = 720 }) end
 	if HAS_CFRAME[className] then
 		rawset(o, "_cframe", CFrame.new())
 	end
@@ -203,6 +217,12 @@ function Object.GetAttribute(o, k) return rawget(o, "_attrs")[k] end
 function Object.Destroy(o)
 	o.Parent = nil
 	for _, c in table.clone(children(o)) do c:Destroy() end
+end
+function Object.GetPropertyChangedSignal(o, name)
+	local key = "_changed_" .. name
+	local sig = rawget(o, key)
+	if not sig then sig = newSignal(); rawset(o, key, sig) end
+	return sig
 end
 function Object.ClearAllChildren(o) for _, c in table.clone(children(o)) do c:Destroy() end end
 
@@ -381,18 +401,50 @@ function workspace.GetPartBoundsInRadius(_self, centre, r, params)
 	return out
 end
 
--- Vector2 and the services the client modules touch (no input, no menu).
+function workspace.BulkMoveTo(_self, parts, cframes)
+	for i, p in parts do p.CFrame = cframes[i] end
+end
+
+-- Vector2, UDim, UDim2 and the services the client scripts touch. The client smoke test fires their signals.
 local Vector2 = {}
 Vector2.__index = Vector2
 function Vector2.new(x, y) return setmetatable({ X = x or 0, Y = y or 0 }, Vector2) end
 Vector2.zero = Vector2.new(0, 0)
-local function signal() return { Connect = function() return { Disconnect = function() end } end } end
+local UDim, UDim2 = {}, {}
+function UDim.new(scale, offset) return { Scale = scale or 0, Offset = offset or 0 } end
+function UDim2.new(xs, xo, ys, yo) return { X = UDim.new(xs, xo), Y = UDim.new(ys, yo) } end
+function UDim2.fromOffset(x, y) return UDim2.new(0, x, 0, y) end
+function UDim2.fromScale(x, y) return UDim2.new(x, 0, y, 0) end
+local camera = Instance.new("Camera")
+rawset(workspace, "CurrentCamera", camera)
+local localPlayer = Instance.new("Player")
+local playerGui = Instance.new("Folder")
+playerGui.Name = "PlayerGui"
+playerGui.Parent = localPlayer
+-- What the smoke test drives: bound actions, render steps, and the client's test-place driver (its SilkPlayback hook).
+local client = { actions = {}, renderSteps = {}, studio = true, driver = nil :: any }
+client.scriptFolder = Instance.new("Folder")
+local playback = Instance.new("ModuleScript")
+playback.Name = "SilkPlayback"
+rawset(playback, "run", function(driver) client.driver = driver end)
+playback.Parent = client.scriptFolder
+local uis = { MouseBehavior = nil, MouseIconEnabled = true, TouchEnabled = false, KeyboardEnabled = true, GamepadEnabled = false }
+for _, name in { "InputChanged", "InputEnded", "TouchMoved", "WindowFocusReleased", "TextBoxFocused", "GamepadDisconnected", "LastInputTypeChanged" } do
+	uis[name] = newSignal()
+end
+function uis.GetMouseDelta(_self) return Vector2.zero end
+function uis.GetFocusedTextBox(_self) return nil end
+function uis.GetPropertyChangedSignal(_self, _name) return newSignal() end
 local services = {
 	Workspace = workspace,
 	ReplicatedStorage = Instance.new("Folder"),
-	GuiService = { MenuIsOpen = false, MenuOpened = signal(), MenuClosed = signal() },
-	UserInputService = { InputChanged = signal(), MouseBehavior = nil, MouseIconEnabled = true, TouchEnabled = false, KeyboardEnabled = true,
-		GetMouseDelta = function() return Vector2.zero end },
+	Lighting = Instance.new("Folder"),
+	Players = { LocalPlayer = localPlayer },
+	GuiService = { MenuIsOpen = false, MenuOpened = newSignal(), MenuClosed = newSignal(), TouchControlsEnabled = true },
+	UserInputService = uis,
+	ContextActionService = { BindActionAtPriority = function(_self, name, fn) client.actions[name] = fn end },
+	RunService = { IsStudio = function() return client.studio end, Heartbeat = newSignal(),
+		BindToRenderStep = function(_self, name, _priority, fn) client.renderSteps[name] = fn end },
 }
 local game = { GetService = function(_self, name) return services[name] end }
 
@@ -415,4 +467,5 @@ function BoxWorld.folder(name: string, pieces)
 end
 
 return { Vector3 = Vector3, CFrame = CFrame, Color3 = Color3, Enum = Enum, Instance = Instance, RaycastParams = RaycastParams,
-	OverlapParams = OverlapParams, workspace = workspace, BoxWorld = BoxWorld, Vector2 = Vector2, game = game }
+	OverlapParams = OverlapParams, workspace = workspace, BoxWorld = BoxWorld, Vector2 = Vector2, game = game, UDim = UDim, UDim2 = UDim2,
+	client = client, services = services }

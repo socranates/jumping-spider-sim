@@ -62,6 +62,7 @@ end
 for _, flip in { 1, -1 } do
 	local pick = SunPick.choose(astronomical(flip), 9.6, 40.7, Graphics.sun)
 	local why = `flip {flip}: {pick.reason}`
+	print(`world: invented sun, z flip {flip}: picks clock {pick.clock}, latitude {pick.latitude}, {string.format("%.0f", pick.elevationDeg)} degrees high, {string.format("%.0f", pick.azimuthDeg)} degrees off straight-out-of-the-window`)
 	check(pick.ok and pick.direction.Z < -0.3 and pick.direction.Y > 0.3, "a sun behind the window is found (" .. why .. ")")
 	check(math.abs(pick.elevationDeg - Graphics.sun.elevationDeg) <= 10 and pick.azimuthDeg <= Graphics.sun.maxAzimuthDeg, "it is middling high and not along the wall (" .. why .. ")")
 	check((pick.latitude == 40.7) == (flip == 1), "the latitude's sign flips when the sun runs the other way (" .. why .. ")")
@@ -246,7 +247,7 @@ check(decor:FindFirstChild("Details") == nil and decor:FindFirstChild("Shafts") 
 check(near(motes.Rate, rate * Graphics.tiers.low.dustRate, 1e-9), "the dust is thinner")
 WorldDetail.apply("low", roots)
 check(near(motes.Rate, rate * Graphics.tiers.low.dustRate, 1e-9), "applying the low tier twice does not thin the dust again")
-print(`world: decor {fullParts} parts at full detail, {lowParts} at low (view {viewCount} items at full), dust {rate} -> {motes.Rate} per second`)
+print(`world: decor {fullParts} parts at full detail, {lowParts} at low (view {viewCount} items at full), dust {rate} -> {string.format("%.1f", motes.Rate)} per second`)
 
 print(`WORLD passed={passed} failed={failed}`)
 if failed > 0 then error("world checks failed") end

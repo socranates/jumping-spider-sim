@@ -88,15 +88,18 @@ local first = {
 		-- share of its width. `lieBack`: 0 stands straight out, 1.0 leans about 45 degrees toward the rear. `dark` and `grey`
 		-- are the shares of those tones, the rest is frosted; hairs over the white markings are white. `transparency`: a little
 		-- see-through, so the coat looks soft rather than spiky.
-		locks = { abdomen = 190, head = 105, length = { 0.050, 0.085 }, width = 0.040, flat = 0.17, lieBack = 0.9, dark = 0.55, grey = 0.30, transparency = 0.12 },
+		locks = { abdomen = 150, head = 70, length = { 0.050, 0.085 }, width = 0.040, flat = 0.17, lieBack = 0.9, dark = 0.55, grey = 0.30, transparency = 0.12 },
 		-- Guard hairs: longer, finer hairs that stand off the pelt and make the fuzzy edge you see against the sill.
-		guard = { abdomen = 250, head = 140, length = { 0.060, 0.098 }, width = 0.0115, flat = 1.0, lieBack = 0.45, dark = 0.25, grey = 0.40, transparency = 0.28 },
+		guard = { abdomen = 250, head = 140, length = { 0.060, 0.098 }, width = 0.0135, flat = 1.0, lieBack = 0.45, dark = 0.25, grey = 0.40, transparency = 0.28 },
+		-- The fringe: stiffer, longer hairs that grow only at the sides (`side`: how far round to the side, as a share of the
+		-- radius, a hair has to be) and stand out sideways and back, so the outline is fuzzy from behind and from the front.
+		fringe = { abdomen = 230, head = 100, side = 0.78, length = { 0.070, 0.098 }, width = 0.0155, flat = 1.0, lieBack = 0.3, dark = 0.35, grey = 0.35, transparency = 0.25 },
 		dark = { 0.13, 0.13, 0.13 },
 		grey = { 0.50, 0.50, 0.48 },
 		frost = { 0.76, 0.76, 0.73 },
-		-- Fur shells: see-through layers outside the body so the outline goes soft. Three at full detail, one at low.
-		shellColor = { 0.34, 0.34, 0.33 },
-		shells = { { scale = 1.07, transparency = 0.86 }, { scale = 1.14, transparency = 0.93 }, { scale = 1.22, transparency = 0.965 } },
+		-- Fur shells: see-through layers outside the body so the outline goes soft. Four at full detail, one at low.
+		shellColor = { 0.32, 0.32, 0.31 },
+		shells = { { scale = 1.05, transparency = 0.80 }, { scale = 1.10, transparency = 0.88 }, { scale = 1.16, transparency = 0.94 }, { scale = 1.23, transparency = 0.97 } },
 		headShell = { zScale = 0.80, shift = 0.05 }, -- the head's shells sit back from the eye row so the eyes stay clear
 		-- Little tufts that bold jumping spiders have above the eyes, at the upper sides of the head: a fan of dark and
 		-- silvery hairs that sweeps up and out. Not eyebrows: they sit behind the eyes at the sides, not over them.
@@ -128,11 +131,11 @@ local first = {
 	-- (no breathing, head tilt or palp drumming). The pattern, eyes, catchlights and tufts stay.
 	detail = {
 		full = {
-			every = { lock = 1, guard = 1, tuft = 1, ruff = 1, palp = 1, leg = 1 },
-			shells = 3, speckleEvery = 1, pads = true, sockets = true, idle = true, highlight = true,
+			every = { lock = 1, guard = 1, fringe = 1, tuft = 1, ruff = 1, palp = 1, leg = 1 },
+			shells = 4, speckleEvery = 1, pads = true, sockets = true, idle = true, highlight = true,
 		},
 		low = {
-			every = { lock = 3, guard = 5, tuft = 2, ruff = 2, palp = 2, leg = 4 },
+			every = { lock = 3, guard = 5, fringe = 3, tuft = 2, ruff = 2, palp = 2, leg = 4 },
 			shells = 1, speckleEvery = 2, pads = false, sockets = false, idle = false, highlight = false,
 		},
 	},

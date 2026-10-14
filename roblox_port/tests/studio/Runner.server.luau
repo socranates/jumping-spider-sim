@@ -14,6 +14,7 @@ local function check(name: string, fn: () -> ())
 end
 check("Studio spec completes", function() require(script.Parent.Spec)(check) end)
 check("Silk spec completes", function() require(script.Parent.SilkSpec)(check) end)
+check("Graphics spec completes", function() require(script.Parent.GraphicsSpec)(check) end)
 -- Recovery scenarios and the catch camera on real raycasts and sphere casts (the same module the CLI runs on its box world).
 local Shared = game:GetService("ReplicatedStorage"):WaitForChild("Shared")
 local deps = {

@@ -61,12 +61,54 @@ return function(check)
 			rig:setEyeView(false)
 			assert(eye.LocalTransparencyModifier == 0 and rig._legs[2].femur.LocalTransparencyModifier == 0)
 		end)
-		check("low detail keeps about a third of the fuzz", function()
+		check("low detail keeps about a fifth of the fuzz and under 300 parts", function()
 			local low = Rig.new(folder, folder, nil, "low")
-			local n = 0
-			for _, part in low.model:GetChildren() do if part.Name == "Seta" then n += 1 end end
+			local n, total = 0, 0
+			for _, part in low.model:GetChildren() do
+				if part:IsA("BasePart") then total += 1 end
+				if part.Name == "Seta" then n += 1 end
+			end
 			low:destroy()
 			assert(n >= 100 and n <= 260, `low fuzz: {n}`)
+			assert(total <= 300, `low parts: {total}`)
+		end)
+		check("big glossy eyes with catchlights, no sockets or outline in low detail", function()
+			local function named(model: Instance, name: string): number
+				local n = 0
+				for _, part in model:GetChildren() do if part.Name == name then n += 1 end end
+				return n
+			end
+			local low = Rig.new(folder, folder, nil, "low")
+			assert(named(rig.model, "Catchlight") == 4 and named(low.model, "Catchlight") == 4, "catchlights")
+			assert(named(rig.model, "EyeSocket") == 2 and named(low.model, "EyeSocket") == 0, "eye sockets")
+			assert(rig.model:FindFirstChildWhichIsA("Highlight") ~= nil and low.model:FindFirstChildWhichIsA("Highlight") == nil, "outline")
+			local eye = rig.model:FindFirstChild("PrincipalEye") :: BasePart
+			assert(eye.Material == Enum.Material.Glass and eye.Size.X >= 0.18, "the front eyes are big and glossy")
+			low:destroy()
+		end)
+		check("idle motion moves the drawn head and palps only, and not in low detail", function()
+			local body = CFrame.new(100, 0.31, 0)
+			local function pose(r: any): { Vector3 }
+				local out = {}
+				for _, part in r.model:GetChildren() do
+					if part.Name == "PalpClub" or part.Name == "EyeFace" then table.insert(out, part.Position) end
+				end
+				return out
+			end
+			local function run(r: any, seconds: number) for _ = 1, math.floor(seconds * 60) do r:update(body, 1 / 60, true, false) end end
+			local function drift(a: { Vector3 }, b: { Vector3 }): number
+				local most = 0
+				for i, v in a do most = math.max(most, (v - b[i]).Magnitude) end
+				return most
+			end
+			local low = Rig.new(folder, folder, nil, "low")
+			run(rig, 1); run(low, 1)
+			local a, b = pose(rig), pose(low)
+			run(rig, 4); run(low, 4)
+			assert(drift(a, pose(rig)) > 0.004, "full detail stands still")
+			assert(drift(b, pose(low)) < 1e-6, "low detail moves")
+			assert((rig.root.Position - body.Position).Magnitude < 1e-6, "the root moved")
+			low:destroy()
 		end)
 		check("air and underside poses are finite", function()
 			for _, up in {Vector3.yAxis, Vector3.xAxis, -Vector3.yAxis} do

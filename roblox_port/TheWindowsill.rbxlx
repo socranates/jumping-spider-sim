@@ -5,43 +5,52 @@
       <token name="Technology">4</token>
     </Properties>
   </Item>
-  <Item class="Players" referent="1">
+  <Item class="MaterialService" referent="1">
+    <Properties>
+      <string name="Name">MaterialService</string>
+      <bool name="Use2022MaterialsXml">true</bool>
+    </Properties>
+  </Item>
+  <Item class="Players" referent="2">
     <Properties>
       <string name="Name">Players</string>
       <bool name="CharacterAutoLoads">false</bool>
     </Properties>
   </Item>
-  <Item class="ReplicatedStorage" referent="2">
+  <Item class="ReplicatedStorage" referent="3">
     <Properties>
       <string name="Name">ReplicatedStorage</string>
     </Properties>
-    <Item class="Folder" referent="3">
+    <Item class="Folder" referent="4">
       <Properties>
         <string name="Name">Shared</string>
       </Properties>
-      <Item class="Folder" referent="4">
+      <Item class="Folder" referent="5">
         <Properties>
           <string name="Name">Data</string>
         </Properties>
-        <Item class="ModuleScript" referent="5">
+        <Item class="ModuleScript" referent="6">
           <Properties>
             <string name="Name">Appearances</string>
             <string name="Source"><![CDATA[--!strict
 -- Artist-directed appearance, independent of species tuning, growth and physics.
--- Nathan's daughter's pick: docs/art/first-spider-reference.jpg (2026-10-14).
--- Coordinates for markings are fractions of the abdomen's X/Z radii; -Z is front.
+-- Nathan's daughter's pick: docs/art/first-spider-reference.jpg (2026-10-14). ROBLOX-13 made it cuter without changing it:
+-- proportions, eyes, fuzz and a little idle motion. Every number the look needs is in this table.
+-- Body frame: +Y up, -Z forward. Lengths are studs (1 stud = 1 Godot WU = 1 cm). Markings are fractions of the abdomen's X/Z radii.
 local first = {
 	id = "first_spider",
 	name = "First spider",
+
+	-- ---------------------------------------------------------------- the daughter's design: colours and pattern
+	-- tests/look.luau pins every value in this block. Change them only if she does.
 	body = { 0, 0, 0 },
 	legs = { 0, 0, 0 },
 	white = { 0.94, 0.94, 0.92 },
 	eyes = { 0.008, 0.008, 0.008 },
 	fangs = { 0.025, 0.025, 0.025 },
-	headRadii = { 0.245, 0.18, 0.255 },
 	abdomenRadii = { 0.25, 0.205, 0.285 },
 	frontLegScale = 1.28,
-	bandFraction = 0.23,
+	bandFraction = 0.23, -- the pale band on each leg and palp segment
 	speckleCount = 24,
 	-- Large centre, two small elongated anterior spots, two posterior ovals.
 	spots = {
@@ -51,27 +60,118 @@ local first = {
 		{ x = -0.35, z = 0.67, rx = 0.025, rz = 0.035, angle = 0.4 },
 		{ x = 0.35, z = 0.67, rx = 0.025, rz = 0.035, angle = -0.4 },
 	},
-	-- Fuzz: setae (hairs) as thin display parts. Jumping spiders are densely hairy; the hairs lie back toward the abdomen's tip,
-	-- are white where the pattern is white (spots, front band, cheeks), and Phidippus has a tuft above each side of the eyes.
-	-- Counts are budgets, not exact: points on the belly, the eye face and over the eyes get none.
+	-- The pale band across the front of the abdomen: `count` dabs, `step` apart, at z.
+	band = { count = 9, step = 0.16, z = -0.66, rx = 0.031, rz = 0.018 },
+	-- Fine speckles on a spiral: radius `from` + (i % 5) * `step`.
+	speckle = { from = 0.40, step = 0.10, rx = 0.0035, rz = 0.005 },
+
+	-- ---------------------------------------------------------------- cuter proportions (ROBLOX-13)
+	-- A slightly bigger, rounder head than the abdomen (head volume about 1.07 x the abdomen's; it was 0.77).
+	headCenter = { 0, 0.03, -0.21 },
+	headRadii = { 0.27, 0.215, 0.27 },
+	abdomenCenter = { 0, 0.04, 0.20 },
+	pedicel = { center = { 0, -0.035, -0.06 }, radii = { 0.05, 0.05, 0.06 } },
+	face = { center = { 0, 0.05, -0.37 }, radii = { 0.225, 0.18, 0.12 } }, -- the rounded muzzle under the eyes
+	neck = { 0, 0.0, -0.06 }, -- the head tilts about this point
+	-- Pale side patches (the daughter's "cheeks"): placed on the head's side at height y, depth z (body frame).
+	cheek = { y = 0.055, z = -0.235, radii = { 0.02, 0.07, 0.115 }, inset = 0.006 },
+	chelicerae = { x = 0.055, y = -0.085, z = -0.447, radii = { 0.05, 0.072, 0.045 }, pitch = -0.35, splay = 0.12, reflectance = 0.1 },
+	-- Eyes. Never a human face: no brows, no mouth. Big glossy front eyes read as an animal's.
+	eye = {
+		-- Principal (front) eyes: large, glossy, set low in a big forehead. x, y: where on the head they sit; `out`: how far
+		-- they stand out of the head, as a share of their depth. Two catchlights, both toward +X (one light, one reflection).
+		ame = {
+			x = 0.115, y = 0.095, radii = { 0.100, 0.100, 0.082 }, out = 0.30, reflectance = 0.5,
+			socket = { scale = 1.13, color = { 0.11, 0.11, 0.11 } }, -- a dark-grey rim so the black eye reads against the black head
+			glints = { { dx = 0.030, dy = 0.036, r = 0.022 }, { dx = -0.028, dy = -0.034, r = 0.010 } },
+		},
+		ale = { x = 0.235, y = 0.085, r = 0.050, out = 0.15, reflectance = 0.3 }, -- anterior lateral, at the sides of the face
+		ple = { x = 0.150, z = -0.150, r = 0.052, out = 0.10, reflectance = 0.3 }, -- posterior lateral, on the dome
+		pme = { x = 0.115, z = -0.270, r = 0.019, out = 0.10, reflectance = 0.3 }, -- posterior median, a tiny dot
+		glintColor = { 1, 1, 1 },
+	},
+	-- Pedipalps: stout, pale-banded, pale-tipped, with a fluffy club.
+	palp = {
+		x = 0.115, y = -0.045, -- where it leaves the face
+		drop = 0.105, reach = 0.10, spread = 0.035, -- tip: this far down, forward and out from the base
+		stalk = 0.05, club = { 0.042, 0.040, 0.052 }, tipRadii = { 0.030, 0.026, 0.030 },
+		fluff = { hairs = 7, length = 0.055, width = 0.012, flat = 0.7, transparency = 0.15 },
+		drumHz = 3.2, drumDeg = 13,
+	},
+	-- Legs (display only): plump, a little shorter and more crouched than before; round feet.
+	limbs = {
+		hipX = 0.17, hipY = 0.02,
+		hipZ = { -0.36, -0.24, -0.12, 0.0 },
+		tipZ = { -0.82, -0.52, 0.12, 0.62 },
+		-- femur and tibia diameters per pair, stout front legs to slim back legs; `thickness` scales them all.
+		diameters = { { 0.078, 0.064 }, { 0.065, 0.053 }, { 0.057, 0.045 }, { 0.059, 0.047 } },
+		thickness = 1.12,
+		stance = { x = 0.78, y = -0.30, reach = 0.93 }, -- rest foot spot: reach scales x and the pairs' z
+		kneeLift = 0.28, kneeLiftAir = 0.22, ankleLift = 0.045,
+		pad = 1.6, -- foot ball diameter as a multiple of the tarsus' (full detail)
+	},
+
+	-- ---------------------------------------------------------------- fuzz (ROBLOX-07, retuned for the real camera in ROBLOX-13)
+	-- The camera sits 5 studs away (CameraMath.CAMERA_DISTANCE), 1 stud is about 170 px on a 1080p screen, so a hair has to
+	-- be a couple of hundredths of a stud wide to show at all. Hairs are flat locks lying back along the body; the grey and
+	-- frosted ones give the coat a silvery sheen against the black; white ones cover the white markings.
 	fuzz = {
 		enabled = true,
-		abdomenSamples = 520, -- Fibonacci points on the abdomen ellipsoid before the belly is skipped
-		headSamples = 340,
-		length = { 0.022, 0.042 }, -- studs; body radius is about 0.25
-		width = 0.0065,
-		lieBack = 1.7, -- how far a body hair leans toward the rear (0 stands straight out, 1.7 is about 60 degrees)
-		dark = { 0.13, 0.13, 0.13 }, -- a touch lighter than the black body so the fuzz reads in the light
-		grey = { 0.52, 0.52, 0.50 }, -- the soft grey hairs mixed through the coat, a halo against the sill
-		greyShare = 0.3,
-		transparency = 0.25, -- hairs are a little see-through, so the coat looks soft rather than spiky
-		-- Fur shells: see-through layers just outside the body, so the outline goes soft (a classic cheap fur trick).
-		shellColor = { 0.30, 0.30, 0.29 },
-		shells = { { scale = 1.06, transparency = 0.78 }, { scale = 1.13, transparency = 0.9 } },
-		tuftHairs = 8,
-		tuftLength = 0.085,
-		legHairs = { 9, 8, 4 }, -- femur, tibia, tarsus, per leg
-		legLength = 0.04,
+		-- The pelt: wide flat locks lying back over the head and abdomen like shingles. `abdomen` and `head` are Fibonacci
+		-- sample points before the belly is skipped (the hairs kept are about 60 % of them). `flat`: a lock's thickness as a
+		-- share of its width. `lieBack`: 0 stands straight out, 1.0 leans about 45 degrees toward the rear. `dark` and `grey`
+		-- are the shares of those tones, the rest is frosted; hairs over the white markings are white. `transparency`: a little
+		-- see-through, so the coat looks soft rather than spiky.
+		locks = { abdomen = 150, head = 70, length = { 0.050, 0.085 }, width = 0.040, flat = 0.17, lieBack = 0.9, dark = 0.55, grey = 0.30, transparency = 0.12 },
+		-- Guard hairs: longer, finer hairs that stand off the pelt and make the fuzzy edge you see against the sill.
+		guard = { abdomen = 250, head = 140, length = { 0.060, 0.098 }, width = 0.0135, flat = 1.0, lieBack = 0.45, dark = 0.25, grey = 0.40, transparency = 0.28 },
+		-- The fringe: stiffer, longer hairs that grow only at the sides (`side`: how far round to the side, as a share of the
+		-- radius, a hair has to be) and stand out sideways and back, so the outline is fuzzy from behind and from the front.
+		fringe = { abdomen = 230, head = 100, side = 0.78, length = { 0.070, 0.098 }, width = 0.0155, flat = 1.0, lieBack = 0.3, dark = 0.35, grey = 0.35, transparency = 0.25 },
+		dark = { 0.13, 0.13, 0.13 },
+		grey = { 0.50, 0.50, 0.48 },
+		frost = { 0.76, 0.76, 0.73 },
+		-- Fur shells: see-through layers outside the body so the outline goes soft. Four at full detail, one at low.
+		shellColor = { 0.32, 0.32, 0.31 },
+		shells = { { scale = 1.05, transparency = 0.80 }, { scale = 1.10, transparency = 0.88 }, { scale = 1.16, transparency = 0.94 }, { scale = 1.23, transparency = 0.97 } },
+		headShell = { zScale = 0.80, shift = 0.05 }, -- the head's shells sit back from the eye row so the eyes stay clear
+		-- Little tufts that bold jumping spiders have above the eyes, at the upper sides of the head: a fan of dark and
+		-- silvery hairs that sweeps up and out. Not eyebrows: they sit behind the eyes at the sides, not over them.
+		tuftHairs = 10, -- per side
+		tuftLength = 0.078,
+		tuft = { at = { 0.52, 0.80, -0.28 }, lean = { 0.60, 1.0, -0.22 }, fan = 0.46, spread = 0.02, width = 0.0165, flat = 0.8, transparency = 0.1 },
+		-- A soft ruff of pale hair low on each cheek, beside the jaws (not a moustache: it sits at the sides).
+		ruff = { hairs = 5, length = 0.052, width = 0.0135, flat = 0.7, at = { 0.52, -0.36, -0.74 }, lean = { 0.65, -0.55, -0.45 }, whiteShare = 0.6, transparency = 0.15 },
+		legHairs = { 7, 6, 3 }, -- femur, tibia, tarsus, per leg (front legs carry 1.6 x as many on femur and tibia)
+		legLength = 0.052,
+		legWidth = 0.0125,
+		legTransparency = 0.2,
+		legDark = 0.4, legGrey = 0.35, -- tone shares on the legs (the rest is frosted)
+	},
+
+	-- ---------------------------------------------------------------- idle motion (drawn rig only, ROBLOX-13)
+	-- Eased in after the spider has stood still for a moment; off while walking, in the air, in low detail and with reducedMotion
+	-- (the palps' drumming follows the same rule).
+	idle = {
+		riseSeconds = 1.0, fallSeconds = 0.25,
+		breathe = { period = 3.3, bodyLift = 0.006, lift = 0.016, pitchDeg = 2.4 },
+		-- A small, slow, curious head tilt: sums of sines (periods in seconds), always inside these angles.
+		tilt = { rollDeg = 7, yawDeg = 6, pitchDeg = 3.5, periods = { 9.1, 5.3, 11.3, 6.7, 8.3 } },
+	},
+
+	-- ---------------------------------------------------------------- detail modes
+	-- Full is for PCs. Low is for phones and tablets (touch-only devices, or Workspace attribute Detail = "low"): fewer
+	-- hairs (keep one in `every`), a single fur shell, no foot balls, half the speckles, no outline and no idle motion at all
+	-- (no breathing, head tilt or palp drumming). The pattern, eyes, catchlights and tufts stay.
+	detail = {
+		full = {
+			every = { lock = 1, guard = 1, fringe = 1, tuft = 1, ruff = 1, palp = 1, leg = 1 },
+			shells = 4, speckleEvery = 1, pads = true, sockets = true, idle = true, highlight = true,
+		},
+		low = {
+			every = { lock = 3, guard = 5, fringe = 3, tuft = 2, ruff = 2, palp = 2, leg = 4 },
+			shells = 1, speckleEvery = 2, pads = false, sockets = false, idle = false, highlight = false,
+		},
 	},
 }
 
@@ -79,7 +179,197 @@ return { default = "first_spider", profiles = { first_spider = first } }
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="6">
+        <Item class="ModuleScript" referent="7">
+          <Properties>
+            <string name="Name">Detail</string>
+            <string name="Source"><![CDATA[--!strict
+-- Which detail tier a device runs: "full" for computers and consoles, "low" for touch-only phones and tablets. The tier
+-- decides the spider's fuzz and idle motion (Data/Appearances.detail) and which optional parts of the world stay
+-- (Data/Graphics, Client/WorldDetail). A Workspace attribute `Detail` = "low" or "full" overrides the device guess, so a
+-- low-powered laptop or a fast tablet can be tried either way without a code change.
+local Detail = {}
+
+export type Tier = "full" | "low"
+
+function Detail.choose(touchOnly: boolean, override: unknown): Tier
+	if override == "low" then return "low" end
+	if override == "full" then return "full" end
+	return if touchOnly then "low" else "full"
+end
+
+return Detail
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="8">
+          <Properties>
+            <string name="Name">Graphics</string>
+            <string name="Source"><![CDATA[--!strict
+-- How the world looks, apart from the spider (whose look is Data/Appearances). Numbers and names only, so the whole look can
+-- be tuned in one place: Habitat/Scenery builds the parts from it, Habitat/Lit sets up the lighting and the sky, Habitat/SunPick
+-- finds a sun that shines in through the window, and Client/WorldDetail strips what the low tier does without.
+-- Studs: 1 stud = 1 cm. Colours are hex. Materials are Roblox's own (Habitat/Materials), which carry PBR textures once
+-- MaterialService.Use2022Materials is on (both Rojo projects set it). Nothing here has been seen in Roblox Studio (ROBLOX-14).
+
+local Graphics = {}
+
+-- ---------------------------------------------------------------- materials
+-- Looks only: a surface's grip is its profile in Data/Surfaces, never its material.
+Graphics.materials = {
+	-- the physical pieces of the sill (Habitat/WindowsillLayout.PIECES), by id
+	pieces = {
+		sill_floor = "WoodPlanks", front_lip = "Wood",
+		back_frame = "Plaster", left_frame = "Plaster", right_frame = "Plaster",
+		planter = "Brick", planter_rim = "Brick",
+		leaf_west = "LeafyGrass", leaf_middle = "LeafyGrass", leaf_east = "LeafyGrass", leaf_tip = "Cardboard",
+		stem_west = "Grass", stem_middle = "Grass", stem_east = "Grass",
+		crevice_back = "Wood", crevice_roof = "Wood", crevice_north = "Wood", crevice_south = "Wood",
+	} :: { [string]: string },
+	soil = "Ground",
+	wall = "Plaster", trim = "Wood", glass = "Glass",
+	view = "SmoothPlastic", ground = "Grass",
+	chip = "Plaster", crack = "SmoothPlastic", crumb = "Sand",
+	fallback = "SmoothPlastic",
+}
+
+-- ---------------------------------------------------------------- the window
+-- The back wall is a solid, climbable box (WindowsillLayout back_frame), so the window is drawn: the physical wall turns
+-- invisible (still solid, still climbable) and Scenery draws a plaster wall behind its face with an opening for the glass.
+Graphics.window = {
+	hidden = "back_frame", -- the piece that turns invisible
+	slabGap = 0.02, -- the drawn wall sits this far behind the climbable face, so the spider's feet never sink into it
+	left = -27.5, right = 27.5, bottom = 3, top = 13, -- the opening: x from/to, y from/to
+	trimWidth = 0.5, trimDepth = 0.10, -- the frame bars around the opening, flush with the climbable face
+	wallColor = "ded7c3", trimColor = "e2dbc7",
+	glass = { color = "a9c2c1", transparency = 0.8, reflectance = 0.08, thickness = 0.04, setback = 0.05 },
+	mullions = { -10, 10 }, mullionWidth = 0.7, -- bars between the panes
+	-- WindowsillLayout.DECOR entries Scenery draws itself
+	replaces = { window_glass = true, mullion_w = true, mullion_e = true } :: { [string]: boolean },
+}
+
+-- ---------------------------------------------------------------- the view out of the window
+-- Items are placed as seen from a reference eye (the camera's usual spot over the middle of the sill): u, v are where the
+-- item's centre appears on the glass (studs across and up), `depth` how far beyond the glass it really is; Scenery turns
+-- that into world positions and sizes, so every item shows where it should whatever the depth. kind "block": a box w x h
+-- on the glass, `t` deep; "ball": a sphere of diameter w; "roof": a gable (a square turned 45 degrees) w wide with its
+-- eave line at v. `full`: dropped in the low tier.
+Graphics.view = {
+	eye = Vector3.new(0, 2.5, 5),
+	ground = { y = -46, size = 2048, color = "7d8f62" },
+	sky = true,
+	items = {
+		-- far hills
+		{ id = "hill_w", kind = "ball", u = -20, v = -7.0, depth = 320, w = 22, color = "88a08d", full = false },
+		{ id = "hill_m", kind = "ball", u = 3, v = -6.2, depth = 330, w = 24, color = "92a898", full = true },
+		{ id = "hill_e", kind = "ball", u = 24, v = -6.6, depth = 320, w = 22, color = "8aa28f", full = false },
+		-- roofs of the houses across the way
+		{ id = "house_1", kind = "block", u = -24, v = -2.7, depth = 120, w = 6.0, h = 14, t = 5, color = "d8c9a8", full = false },
+		{ id = "roof_1", kind = "roof", u = -24, v = 4.3, depth = 120, w = 6.5, t = 5.4, color = "8d4a3a", full = false },
+		{ id = "house_2", kind = "block", u = -16.5, v = -3.1, depth = 120, w = 5.0, h = 14, t = 5, color = "c9bba0", full = true },
+		{ id = "roof_2", kind = "roof", u = -16.5, v = 3.9, depth = 120, w = 5.5, t = 5.4, color = "5f6a73", full = true },
+		{ id = "house_3", kind = "block", u = -8.5, v = -2.4, depth = 120, w = 6.4, h = 14, t = 5, color = "e0d3b5", full = false },
+		{ id = "roof_3", kind = "roof", u = -8.5, v = 4.6, depth = 120, w = 7.0, t = 5.4, color = "9a5642", full = false },
+		{ id = "house_4", kind = "block", u = 0.5, v = -3.0, depth = 120, w = 5.3, h = 14, t = 5, color = "cdbfa4", full = true },
+		{ id = "roof_4", kind = "roof", u = 0.5, v = 4.0, depth = 120, w = 5.8, t = 5.4, color = "6a5a52", full = true },
+		{ id = "house_5", kind = "block", u = 9, v = -2.2, depth = 120, w = 6.6, h = 14, t = 5, color = "d6c6a6", full = false },
+		{ id = "roof_5", kind = "roof", u = 9, v = 4.8, depth = 120, w = 7.2, t = 5.4, color = "7b4a3d", full = false },
+		{ id = "house_6", kind = "block", u = 17.5, v = -2.9, depth = 120, w = 5.5, h = 14, t = 5, color = "c4b99f", full = true },
+		{ id = "roof_6", kind = "roof", u = 17.5, v = 4.1, depth = 120, w = 6.0, t = 5.4, color = "58626b", full = true },
+		{ id = "house_7", kind = "block", u = 25, v = -2.5, depth = 120, w = 6.2, h = 14, t = 5, color = "dccfb0", full = false },
+		{ id = "roof_7", kind = "roof", u = 25, v = 4.5, depth = 120, w = 6.8, t = 5.4, color = "93513f", full = false },
+		{ id = "chimney_3", kind = "block", u = -7.3, v = 6.7, depth = 119, w = 0.6, h = 2.4, t = 0.8, color = "8c5a48", full = true },
+		{ id = "chimney_5", kind = "block", u = 10.3, v = 6.85, depth = 119, w = 0.6, h = 2.5, t = 0.8, color = "86553f", full = true },
+		-- a tree on the left, a smaller one on the right
+		{ id = "trunk_a", kind = "block", u = -17, v = -3.2, depth = 72, w = 1.3, h = 23.5, t = 1.3, color = "4a3e30", full = false },
+		{ id = "canopy_a1", kind = "ball", u = -17, v = 10.5, depth = 72, w = 11, color = "3f6238", full = false },
+		{ id = "canopy_a2", kind = "ball", u = -23.5, v = 8.5, depth = 72, w = 8.5, color = "496f40", full = false },
+		{ id = "canopy_a3", kind = "ball", u = -10.5, v = 9.0, depth = 72, w = 8, color = "35552f", full = true },
+		{ id = "canopy_a4", kind = "ball", u = -19.5, v = 13.5, depth = 72, w = 7, color = "446a3b", full = true },
+		{ id = "canopy_a5", kind = "ball", u = -13.5, v = 13.2, depth = 72, w = 6.5, color = "3a5c34", full = true },
+		{ id = "canopy_a6", kind = "ball", u = -26, v = 12, depth = 72, w = 6, color = "4d7544", full = true },
+		{ id = "trunk_b", kind = "block", u = 18.5, v = 1.5, depth = 100, w = 0.9, h = 14, t = 0.9, color = "50443a", full = true },
+		{ id = "canopy_b1", kind = "ball", u = 18.5, v = 7.2, depth = 100, w = 6.5, color = "47703e", full = true },
+		{ id = "canopy_b2", kind = "ball", u = 22, v = 6.2, depth = 100, w = 5, color = "3d6336", full = true },
+		{ id = "canopy_b3", kind = "ball", u = 15, v = 6.0, depth = 100, w = 4.5, color = "4f7746", full = true },
+	} :: { { id: string, kind: string, u: number, v: number, depth: number, w: number, h: number?, t: number?, color: string, full: boolean } },
+}
+
+-- ---------------------------------------------------------------- small details on the sill (full tier only)
+-- Flat or tiny, away from the spawn and the silk practice spot, so the landing patch, the silk lines and the prompts stay clear.
+Graphics.details = {
+	-- paint chips: where (x, z), size (w across, d deep), turn in degrees, colour
+	chips = {
+		{ x = -8.6, z = 10.5, w = 0.62, d = 0.40, turn = 20, color = "f1ead8" }, { x = -7.7, z = 10.9, w = 0.34, d = 0.27, turn = -35, color = "e8dfc9" }, { x = -6.6, z = 10.2, w = 0.45, d = 0.30, turn = 70, color = "f1ead8" },
+		{ x = 11.6, z = 9.8, w = 0.55, d = 0.38, turn = -15, color = "f1ead8" }, { x = 12.5, z = 10.3, w = 0.30, d = 0.22, turn = 50, color = "dcd3bc" }, { x = 24.6, z = 7.9, w = 0.50, d = 0.33, turn = 35, color = "f1ead8" },
+		{ x = -3.8, z = 5.4, w = 0.36, d = 0.26, turn = -60, color = "e8dfc9" }, { x = -14.9, z = 8.6, w = 0.58, d = 0.36, turn = 10, color = "f1ead8" }, { x = -15.6, z = 8.1, w = 0.28, d = 0.20, turn = -25, color = "dcd3bc" },
+		{ x = 27.0, z = 11.0, w = 0.70, d = 0.45, turn = 0, color = "f1ead8" }, { x = 20.5, z = 5.0, w = 0.40, d = 0.30, turn = 80, color = "e8dfc9" }, { x = 0.5, z = 8.8, w = 0.32, d = 0.24, turn = -10, color = "f1ead8" },
+	},
+	chipThickness = 0.012,
+	-- cracks in the sill: polylines of x, z points; the first is the main crack, the others branch off it
+	cracks = {
+		{ { -11.0, 9.9 }, { -9.4, 8.9 }, { -8.3, 9.3 }, { -6.5, 7.9 }, { -5.7, 8.2 }, { -3.2, 6.6 } },
+		{ { -6.5, 7.9 }, { -5.9, 6.7 }, { -6.3, 5.9 } },
+	},
+	crackWidth = 0.05, crackColor = "3b2f24", crackHeight = 0.004,
+	-- crumbs: centre (x, y, z), size (sx, sy, sz), turn in degrees, colour
+	crumbs = {
+		{ x = 14.6, y = 0.11, z = 8.6, sx = 0.34, sy = 0.22, sz = 0.27, turn = 25, color = "d6b684" },
+		{ x = 14.95, y = 0.07, z = 8.75, sx = 0.20, sy = 0.14, sz = 0.16, turn = -40, color = "c9a56f" },
+		{ x = 14.3, y = 0.045, z = 8.3, sx = 0.12, sy = 0.09, sz = 0.10, turn = 70, color = "e0c493" },
+	},
+}
+
+-- ---------------------------------------------------------------- lighting
+Graphics.lighting = {
+	brightness = 2.6,
+	ambient = { 70, 66, 58 }, outdoorAmbient = { 150, 146, 132 },
+	colorShiftTop = { 255, 240, 214 }, -- a soft warm sun
+	environmentDiffuse = 1, environmentSpecular = 1,
+	shadowSoftness = 0.2, exposureCompensation = 0.1,
+	clockTime = 9.6, latitude = 40.7, -- used when no through-window sun can be found (SunPick)
+}
+-- SunPick looks for a time of day whose sun stands behind the window and low enough to shine in across the sill.
+Graphics.sun = {
+	elevationDeg = 30, minElevationDeg = 18, maxElevationDeg = 48,
+	azimuthDeg = 30, maxAzimuthDeg = 65, -- angle between straight out of the window (-Z) and the sun's heading
+	clockFrom = 7, clockTo = 17, clockStep = 0.25,
+}
+Graphics.atmosphere = { density = 0.30, offset = 0.25, color = { 199, 215, 232 }, decay = { 232, 196, 150 }, glare = 0.3, haze = 1.0 }
+Graphics.sky = { sunAngularSize = 12, moonAngularSize = 11, starCount = 3000 }
+Graphics.clouds = { cover = 0.45, density = 0.5, color = { 250, 248, 240 } }
+Graphics.bloom = { intensity = 0.3, size = 18, threshold = 1.6 }
+Graphics.grade = { contrast = 0.06, saturation = 0.05, tint = { 255, 248, 236 }, brightness = 0 }
+Graphics.sunRays = { intensity = 0.05, spread = 0.7 }
+-- Depth of field is off unless the Workspace attribute DepthOfField is true (it blurs the sill the player is reading).
+Graphics.depthOfField = { far = 0.55, near = 0.35, focus = 6, radius = 3.5 }
+
+-- ---------------------------------------------------------------- dust motes and light shafts
+Graphics.dust = {
+	at = Vector3.new(0, 6.1, -1), size = Vector3.new(56, 11, 22),
+	rate = 7, lifetime = { 14, 18 }, speed = { 0.04, 0.16 }, particle = { 0.05, 0.11 },
+	transparency = 0.55, lightEmission = 0.55, lightInfluence = 0.35, color = "fff0d2",
+	texture = "rbxasset://textures/particles/smoke_main.dds",
+}
+-- Soft shafts of light from the window along the sun, a few stacked translucent ribbons each (full tier only).
+Graphics.shafts = {
+	x = { -18.75, 0, 18.75 }, -- where along the window each starts (the middle of each pane)
+	startY = 11.5, -- height on the glass where a shaft starts
+	grow = 1.25, -- how much wider a shaft is where it reaches the floor
+	layers = { { 2.4, 0.972 }, { 4.0, 0.982 }, { 6.0, 0.99 } }, -- width, transparency
+	lightEmission = 0.5, color = "fff0d2",
+}
+
+-- ---------------------------------------------------------------- detail tiers
+Graphics.tiers = {
+	full = { dustRate = 1.0 },
+	low = { dustRate = 0.4 }, -- also drops everything built with FullOnly: bloom, sun rays, clouds, shafts, details, the busier view
+}
+
+return Graphics
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="9">
           <Properties>
             <string name="Name">Species</string>
             <string name="Source"><![CDATA[--!strict
@@ -253,7 +543,7 @@ return table.freeze(data)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="7">
+        <Item class="ModuleScript" referent="10">
           <Properties>
             <string name="Name">Surfaces</string>
             <string name="Source"><![CDATA[--!strict
@@ -357,11 +647,533 @@ return table.freeze(data)
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="8">
+      <Item class="Folder" referent="11">
         <Properties>
           <string name="Name">Habitat</string>
         </Properties>
-        <Item class="ModuleScript" referent="9">
+        <Item class="ModuleScript" referent="12">
+          <Properties>
+            <string name="Name">Lit</string>
+            <string name="Source"><![CDATA[--!strict
+-- The lighting, sky and screen effects (Data/Graphics): a soft warm sun picked by SunPick so that it shines in through the
+-- window, Atmosphere haze for the view, a gentle bloom, grade and sun rays, clouds. Depth of field is off unless asked for.
+-- Technology (Future) cannot be set from a script; the Rojo projects author it. Idempotent: effects are reused by name.
+local Graphics = require(script.Parent.Parent.Data.Graphics)
+local SunPick = require(script.Parent.SunPick)
+
+local Lit = {}
+
+export type Options = {
+	sample: ((number, number) -> Vector3)?, -- the sun at (clock, latitude); default: ask the Lighting service
+	depthOfField: boolean?, -- true adds the macro depth-of-field the client keeps focused on the spider
+}
+
+local L = Graphics.lighting
+
+local function rgb(t: { number }): Color3
+	return Color3.fromRGB(t[1], t[2], t[3])
+end
+
+-- The child of `parent` with this name and class, made if missing (a wrong class under that name is replaced).
+local function child(parent: Instance, className: string, name: string): Instance
+	local found = parent:FindFirstChild(name)
+	if found and found.ClassName == className then return found end
+	if found then found:Destroy() end
+	local made = Instance.new(className)
+	made.Name = name
+	made.Parent = parent
+	return made
+end
+
+function Lit.apply(lighting: Lighting, terrain: Instance?, options: Options?): SunPick.Result
+	local opts: Options = options or {}
+	lighting.Brightness = L.brightness
+	lighting.Ambient = rgb(L.ambient)
+	lighting.OutdoorAmbient = rgb(L.outdoorAmbient)
+	lighting.ColorShift_Top = rgb(L.colorShiftTop)
+	lighting.EnvironmentDiffuseScale = L.environmentDiffuse
+	lighting.EnvironmentSpecularScale = L.environmentSpecular
+	lighting.ShadowSoftness = L.shadowSoftness
+	lighting.ExposureCompensation = L.exposureCompensation
+	lighting.GlobalShadows = true
+
+	-- A sun that comes in through the window; if none can be found the old morning light stays.
+	local sample = opts.sample or function(clock: number, latitude: number): Vector3
+		lighting.GeographicLatitude = latitude
+		lighting.ClockTime = clock
+		return lighting:GetSunDirection()
+	end
+	local picked: SunPick.Result? = nil
+	local ok, outcome = pcall(function(): SunPick.Result
+		return SunPick.choose(sample, L.clockTime, L.latitude, Graphics.sun)
+	end)
+	if ok then picked = outcome :: any end
+	local sun: SunPick.Result = picked or {
+		ok = false, clock = L.clockTime, latitude = L.latitude, direction = Vector3.new(0, 1, 0),
+		elevationDeg = 90, azimuthDeg = 0, reason = "the sun could not be sampled",
+	}
+	lighting.ClockTime = sun.clock
+	lighting.GeographicLatitude = sun.latitude
+	lighting:SetAttribute("SunPick", (if sun.ok then "ok: " else "fallback: ") .. sun.reason)
+
+	local A = Graphics.atmosphere
+	local atmosphere = child(lighting, "Atmosphere", "Atmosphere") :: Atmosphere
+	atmosphere.Density = A.density
+	atmosphere.Offset = A.offset
+	atmosphere.Color = rgb(A.color)
+	atmosphere.Decay = rgb(A.decay)
+	atmosphere.Glare = A.glare
+	atmosphere.Haze = A.haze
+
+	local S = Graphics.sky
+	local sky = child(lighting, "Sky", "Sky") :: Sky
+	sky.SunAngularSize = S.sunAngularSize
+	sky.MoonAngularSize = S.moonAngularSize
+	sky.StarCount = S.starCount
+	sky.CelestialBodiesShown = true
+
+	local G = Graphics.grade
+	local grade = child(lighting, "ColorCorrectionEffect", "Grade") :: ColorCorrectionEffect
+	grade.Contrast = G.contrast
+	grade.Saturation = G.saturation
+	grade.Brightness = G.brightness
+	grade.TintColor = rgb(G.tint)
+
+	local B = Graphics.bloom
+	local bloom = child(lighting, "BloomEffect", "Bloom") :: BloomEffect
+	bloom.Intensity = B.intensity
+	bloom.Size = B.size
+	bloom.Threshold = B.threshold
+	bloom:SetAttribute("FullOnly", true)
+
+	local R = Graphics.sunRays
+	local rays = child(lighting, "SunRaysEffect", "SunRays") :: SunRaysEffect
+	rays.Intensity = R.intensity
+	rays.Spread = R.spread
+	rays:SetAttribute("FullOnly", true)
+
+	local stale = lighting:FindFirstChild("MacroDOF")
+	if opts.depthOfField then
+		local D = Graphics.depthOfField
+		local dof = child(lighting, "DepthOfFieldEffect", "MacroDOF") :: DepthOfFieldEffect
+		dof.FarIntensity = D.far
+		dof.NearIntensity = D.near
+		dof.FocusDistance = D.focus
+		dof.InFocusRadius = D.radius
+	elseif stale then
+		stale:Destroy()
+	end
+
+	if terrain then
+		local C = Graphics.clouds
+		local clouds = child(terrain, "Clouds", "Clouds") :: Clouds
+		clouds.Cover = C.cover
+		clouds.Density = C.density
+		clouds.Color = rgb(C.color)
+		clouds:SetAttribute("FullOnly", true)
+	end
+	return sun
+end
+
+return Lit
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="13">
+          <Properties>
+            <string name="Name">Materials</string>
+            <string name="Source"><![CDATA[--!strict
+-- Material names (as Data/Graphics spells them) to Roblox's Enum.Material, so the data stays plain text and a typo is caught by
+-- tests/world.luau instead of showing up as a grey part in Studio. These are Roblox's built-in materials; with
+-- MaterialService.Use2022Materials on (both Rojo projects set it) they carry their own PBR textures.
+local Materials = {}
+
+local MAP: { [string]: Enum.Material } = {
+	Plastic = Enum.Material.Plastic, SmoothPlastic = Enum.Material.SmoothPlastic, Neon = Enum.Material.Neon,
+	Wood = Enum.Material.Wood, WoodPlanks = Enum.Material.WoodPlanks, Plaster = Enum.Material.Plaster,
+	Concrete = Enum.Material.Concrete, Brick = Enum.Material.Brick, Glass = Enum.Material.Glass,
+	Ground = Enum.Material.Ground, Grass = Enum.Material.Grass, LeafyGrass = Enum.Material.LeafyGrass,
+	Fabric = Enum.Material.Fabric, Cardboard = Enum.Material.Cardboard, Sand = Enum.Material.Sand,
+	Slate = Enum.Material.Slate, Pebble = Enum.Material.Pebble, Rock = Enum.Material.Rock, Mud = Enum.Material.Mud,
+	Limestone = Enum.Material.Limestone, Marble = Enum.Material.Marble, Metal = Enum.Material.Metal,
+}
+
+function Materials.known(name: string): boolean
+	return MAP[name] ~= nil
+end
+
+function Materials.get(name: string): Enum.Material
+	return MAP[name] or Enum.Material.SmoothPlastic
+end
+
+function Materials.names(): { string }
+	local out = {}
+	for name in MAP do table.insert(out, name) end
+	table.sort(out)
+	return out
+end
+
+return Materials
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="14">
+          <Properties>
+            <string name="Name">Scenery</string>
+            <string name="Source"><![CDATA[--!strict
+-- Builds the drawn world from Data/Graphics: the sill's physical pieces (looks only), and a "Decor" folder with the window wall,
+-- glass and trim, the view out of the window, the dust, the small details and the light shafts. Gameplay never reads any of
+-- the decor: every decor part is CanQuery = false, CanCollide = false, CanTouch = false, so the spider's rays, the camera's
+-- casts and the jump planner see only the physical pieces. Parts and emitters that only the full tier keeps carry the
+-- attribute FullOnly, which Client/WorldDetail removes on phones and tablets.
+local Graphics = require(script.Parent.Parent.Data.Graphics)
+local Surfaces = require(script.Parent.Parent.Data.Surfaces)
+local Layout = require(script.Parent.WindowsillLayout)
+local Materials = require(script.Parent.Materials)
+
+local Scenery = {}
+
+local W = Graphics.window
+local M = Graphics.materials
+
+local function hex(s: string): Color3
+	return Color3.fromHex(s)
+end
+
+local function folder(parent: Instance, name: string): Folder
+	local f = Instance.new("Folder")
+	f.Name = name
+	f.Parent = parent
+	return f
+end
+
+-- A drawn-only part: anchored, nothing collides with it, no ray sees it.
+local function drawn(parent: Instance, name: string, size: Vector3, cframe: CFrame, color: Color3, material: string): Part
+	local p = Instance.new("Part")
+	p.Name = name
+	p.Anchored = true
+	p.CanCollide = false
+	p.CanQuery = false
+	p.CanTouch = false
+	p.Size = size
+	p.CFrame = cframe
+	p.Color = color
+	p.Material = Materials.get(material)
+	p.TopSurface = Enum.SurfaceType.Smooth
+	p.BottomSurface = Enum.SurfaceType.Smooth
+	p.Parent = parent
+	return p
+end
+
+local function piece(id: string): Layout.Piece
+	for _, p in Layout.PIECES do
+		if p.id == id then return p end
+	end
+	error("no piece " .. id)
+end
+
+-- ---------------------------------------------------------------- the physical sill
+function Scenery.sill(): Folder
+	local sill = Instance.new("Folder")
+	sill.Name = "Windowsill"
+	sill:SetAttribute("ContentRevision", Layout.CONTENT_REVISION)
+	for _, spec in Layout.PIECES do
+		assert(Surfaces[spec.profile], "unknown surface profile " .. spec.profile)
+		local p = Instance.new("Part")
+		p.Name = spec.id
+		p.Anchored = true
+		p.Size = spec.hi - spec.lo
+		p.Position = (spec.lo + spec.hi) * 0.5
+		p.Color = spec.color
+		p.Material = Materials.get(M.pieces[spec.id] or M.fallback)
+		p.TopSurface = Enum.SurfaceType.Smooth
+		p.BottomSurface = Enum.SurfaceType.Smooth
+		p:SetAttribute("SurfaceId", spec.id)
+		p:SetAttribute("ProfileId", spec.profile)
+		if spec.id == W.hidden then
+			-- still solid and climbable; Scenery.window draws the wall in its place, with a see-through opening
+			p.Transparency = 1
+			p.CastShadow = false
+		end
+		p.Parent = sill
+	end
+	return sill
+end
+
+-- ---------------------------------------------------------------- the window wall
+function Scenery.window(parent: Instance): Folder
+	local wall = folder(parent, "Wall")
+	local back = piece(W.hidden)
+	local plane = back.hi.Z -- the climbable face
+	local slabFront = plane - W.slabGap
+	local zMid = (slabFront + back.lo.Z) / 2
+	local depth = slabFront - back.lo.Z
+	local plaster, wood = hex(W.wallColor), hex(W.trimColor)
+	local function slab(name: string, x0: number, x1: number, y0: number, y1: number)
+		drawn(wall, name, Vector3.new(x1 - x0, y1 - y0, depth), CFrame.new((x0 + x1) / 2, (y0 + y1) / 2, zMid), plaster, M.wall)
+	end
+	slab("Apron", back.lo.X, back.hi.X, back.lo.Y, W.bottom)
+	slab("Header", back.lo.X, back.hi.X, W.top, back.hi.Y)
+	slab("StileWest", back.lo.X, W.left, W.bottom, W.top)
+	slab("StileEast", W.right, back.hi.X, W.bottom, W.top)
+	local function bar(name: string, x0: number, x1: number, y0: number, y1: number)
+		drawn(wall, name, Vector3.new(x1 - x0, y1 - y0, W.trimDepth), CFrame.new((x0 + x1) / 2, (y0 + y1) / 2, plane - W.trimDepth / 2), wood, M.trim)
+	end
+	bar("TrimBottom", W.left, W.right, W.bottom, W.bottom + W.trimWidth)
+	bar("TrimTop", W.left, W.right, W.top - W.trimWidth, W.top)
+	bar("TrimWest", W.left, W.left + W.trimWidth, W.bottom, W.top)
+	bar("TrimEast", W.right - W.trimWidth, W.right, W.bottom, W.top)
+	for i, x in W.mullions do
+		bar("Mullion" .. i, x - W.mullionWidth / 2, x + W.mullionWidth / 2, W.bottom, W.top)
+	end
+	local g = W.glass
+	local glass = drawn(wall, "Glass", Vector3.new(W.right - W.left, W.top - W.bottom, g.thickness),
+		CFrame.new(0, (W.bottom + W.top) / 2, plane - g.setback - g.thickness / 2), hex(g.color), M.glass)
+	glass.Transparency = g.transparency
+	glass.Reflectance = g.reflectance
+	glass.CastShadow = false
+	return wall
+end
+
+-- ---------------------------------------------------------------- dust motes in the window light
+function Scenery.dust(parent: Instance): Part
+	local D = Graphics.dust
+	local volume = drawn(parent, "DustVolume", D.size, CFrame.new(D.at), Color3.new(1, 1, 1), "SmoothPlastic")
+	volume.Transparency = 1
+	volume.CastShadow = false
+	local motes = Instance.new("ParticleEmitter")
+	motes.Name = "Motes"
+	motes.Texture = D.texture
+	motes.Rate = D.rate
+	motes.Lifetime = NumberRange.new(D.lifetime[1], D.lifetime[2])
+	motes.Speed = NumberRange.new(D.speed[1], D.speed[2])
+	motes.SpreadAngle = Vector2.new(180, 180)
+	motes.Rotation = NumberRange.new(0, 360)
+	motes.RotSpeed = NumberRange.new(-20, 20)
+	motes.Size = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, D.particle[1]),
+		NumberSequenceKeypoint.new(0.5, D.particle[2]),
+		NumberSequenceKeypoint.new(1, D.particle[1]),
+	})
+	motes.Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 1),
+		NumberSequenceKeypoint.new(0.2, D.transparency),
+		NumberSequenceKeypoint.new(0.8, D.transparency),
+		NumberSequenceKeypoint.new(1, 1),
+	})
+	motes.LightEmission = D.lightEmission
+	motes.LightInfluence = D.lightInfluence
+	motes.Color = ColorSequence.new(hex(D.color))
+	motes.Drag = 0.5
+	motes.Acceleration = Vector3.new(0, 0.01, 0)
+	motes.Shape = Enum.ParticleEmitterShape.Box
+	motes.ShapeInOut = Enum.ParticleEmitterShapeInOut.Outward
+	motes.ShapeStyle = Enum.ParticleEmitterShapeStyle.Volume
+	motes:SetAttribute("Dust", true) -- WorldDetail thins it out in the low tier
+	motes.Parent = volume
+	return volume
+end
+
+-- ---------------------------------------------------------------- the view out of the window
+-- Where an item that should appear at (u, v) on the glass, `depth` beyond it, really goes, and how much bigger it is than
+-- it looks. The reference eye is the camera's usual spot (Graphics.view.eye).
+function Scenery.viewPosition(u: number, v: number, depth: number): (Vector3, number)
+	local eye = Graphics.view.eye
+	local plane = piece(W.hidden).hi.Z
+	local reach = eye.Z - plane
+	local k = (reach + depth) / reach
+	return Vector3.new(eye.X + (u - eye.X) * k, eye.Y + (v - eye.Y) * k, plane - depth), k
+end
+
+function Scenery.view(parent: Instance): Folder
+	local V = Graphics.view
+	local view = folder(parent, "View")
+	local ground = drawn(view, "Ground", Vector3.new(V.ground.size, 2, V.ground.size),
+		CFrame.new(0, V.ground.y - 1, -V.ground.size * 0.5 + 300), hex(V.ground.color), M.ground)
+	ground.CastShadow = false
+	for _, item in V.items do
+		local at, k = Scenery.viewPosition(item.u, item.v, item.depth)
+		local t = (item.t or item.w) * k
+		local part: Part
+		if item.kind == "ball" then
+			part = drawn(view, item.id, Vector3.one * item.w * k, CFrame.new(at), hex(item.color), M.view)
+			part.Shape = Enum.PartType.Ball
+		elseif item.kind == "roof" then
+			local side = item.w * k / math.sqrt(2)
+			part = drawn(view, item.id, Vector3.new(side, side, t), CFrame.new(at) * CFrame.Angles(0, 0, math.rad(45)), hex(item.color), M.view)
+		else
+			part = drawn(view, item.id, Vector3.new(item.w * k, (item.h or item.w) * k, t), CFrame.new(at), hex(item.color), M.view)
+		end
+		part.CastShadow = false
+		if item.full then part:SetAttribute("FullOnly", true) end
+	end
+	return view
+end
+
+-- ---------------------------------------------------------------- paint chips, cracks and a crumb (full tier)
+function Scenery.details(parent: Instance): Folder
+	local D = Graphics.details
+	local details = folder(parent, "Details")
+	details:SetAttribute("FullOnly", true)
+	for i, c in D.chips do
+		local chip = drawn(details, "PaintChip" .. i, Vector3.new(c.w, D.chipThickness, c.d),
+			CFrame.new(c.x, D.chipThickness / 2 + 0.001, c.z) * CFrame.Angles(0, math.rad(c.turn), 0), hex(c.color), M.chip)
+		chip.CastShadow = false
+	end
+	for n, line in D.cracks do
+		for i = 1, #line - 1 do
+			local a, b = line[i], line[i + 1]
+			local dx, dz = b[1] - a[1], b[2] - a[2]
+			local length = math.sqrt(dx * dx + dz * dz)
+			local seg = drawn(details, `Crack{n}_{i}`, Vector3.new(D.crackWidth, D.crackHeight, length + D.crackWidth * 0.6),
+				CFrame.new((a[1] + b[1]) / 2, D.crackHeight / 2 + 0.001, (a[2] + b[2]) / 2) * CFrame.Angles(0, math.atan2(dx, dz), 0), hex(D.crackColor), M.crack)
+			seg.CastShadow = false
+		end
+	end
+	for i, c in D.crumbs do
+		drawn(details, "Crumb" .. i, Vector3.new(c.sx, c.sy, c.sz), CFrame.new(c.x, c.y, c.z) * CFrame.Angles(0, math.rad(c.turn), 0), hex(c.color), M.crumb)
+	end
+	return details
+end
+
+-- ---------------------------------------------------------------- soft shafts of light from the window (full tier)
+-- `sun`: the unit vector toward the sun. Nothing is built if the sun is not behind the window and above the horizon.
+function Scenery.shafts(parent: Instance, sun: Vector3): Folder?
+	local S = Graphics.shafts
+	if sun.Y < 0.15 or sun.Z > -0.05 then return nil end
+	local shafts = folder(parent, "Shafts")
+	shafts:SetAttribute("FullOnly", true)
+	local plane = piece(W.hidden).hi.Z
+	for i, x in S.x do
+		local start = Vector3.new(x, S.startY, plane - 0.05)
+		local stop = start - sun * ((start.Y - 0.05) / sun.Y) -- along the sun's rays down to just above the floor
+		local anchor = drawn(shafts, "ShaftAnchor" .. i, Vector3.one * 0.1, CFrame.new(start), Color3.new(1, 1, 1), "SmoothPlastic")
+		anchor.Transparency = 1
+		anchor.CastShadow = false
+		local a0 = Instance.new("Attachment")
+		a0.Name = "Start"
+		a0.Parent = anchor
+		local a1 = Instance.new("Attachment")
+		a1.Name = "End"
+		a1.Position = anchor.CFrame:PointToObjectSpace(stop)
+		a1.Parent = anchor
+		for j, layer in S.layers do
+			local beam = Instance.new("Beam")
+			beam.Name = `Shaft{i}_{j}`
+			beam.Attachment0 = a0
+			beam.Attachment1 = a1
+			beam.Width0 = layer[1]
+			beam.Width1 = layer[1] * S.grow
+			beam.Transparency = NumberSequence.new(layer[2])
+			beam.Color = ColorSequence.new(hex(S.color))
+			beam.LightEmission = S.lightEmission
+			beam.LightInfluence = 0
+			beam.FaceCamera = true
+			beam.Segments = 1
+			beam.Parent = anchor
+		end
+	end
+	return shafts
+end
+
+-- ---------------------------------------------------------------- everything drawn that is not the sill
+-- `sun`: the unit vector toward the sun (Lit.apply's result), for the shafts; nil builds none.
+function Scenery.decor(sun: Vector3?): Folder
+	local decor = Instance.new("Folder")
+	decor.Name = "Decor"
+	for _, d in Layout.DECOR do
+		if not W.replaces[d.id] then
+			local p = drawn(decor, d.id, d.size, CFrame.new(d.at), d.color, if d.id == "soil" then M.soil else "SmoothPlastic")
+			p.Transparency = d.transparency or 0
+		end
+	end
+	Scenery.window(decor)
+	Scenery.dust(decor)
+	Scenery.view(decor)
+	Scenery.details(decor)
+	if sun then Scenery.shafts(decor, sun) end
+	return decor
+end
+
+return Scenery
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="15">
+          <Properties>
+            <string name="Name">SunPick</string>
+            <string name="Source"><![CDATA[--!strict
+-- Finds a sun that shines in through the window: behind the back wall (-Z), standing between a low and a middling height,
+-- turned a little to one side so the patch of light and the mullions' shadows fall across the sill diagonally.
+-- Which way Roblox's sun travels for a given ClockTime and GeographicLatitude is not something this code assumes: it asks
+-- (`sample`), scans the day for both signs of the latitude, and takes the best match. Pure apart from `sample`, so
+-- tests/world.luau drives it with invented suns.
+
+local SunPick = {}
+
+export type Target = {
+	elevationDeg: number, minElevationDeg: number, maxElevationDeg: number,
+	azimuthDeg: number, maxAzimuthDeg: number,
+	clockFrom: number, clockTo: number, clockStep: number,
+}
+export type Result = {
+	ok: boolean,
+	clock: number, latitude: number,
+	direction: Vector3, -- unit vector from the world toward the sun
+	elevationDeg: number, azimuthDeg: number,
+	reason: string,
+}
+
+-- Height above the horizon and angle from -Z (0 = straight out of the window, 90 = along the wall), in degrees.
+function SunPick.angles(direction: Vector3): (number, number)
+	local d = direction.Unit
+	local elevation = math.deg(math.asin(math.clamp(d.Y, -1, 1)))
+	local azimuth = math.deg(math.atan2(math.abs(d.X), -d.Z))
+	return elevation, azimuth
+end
+
+local function result(ok: boolean, clock: number, latitude: number, direction: Vector3, reason: string): Result
+	local elevation, azimuth = SunPick.angles(direction)
+	return { ok = ok, clock = clock, latitude = latitude, direction = direction.Unit, elevationDeg = elevation, azimuthDeg = azimuth, reason = reason }
+end
+
+-- sample(clock, latitude): the unit vector toward the sun at that time. baseClock and baseLatitude are what to fall back on.
+function SunPick.choose(sample: (number, number) -> Vector3, baseClock: number, baseLatitude: number, target: Target): Result
+	local fallback = sample(baseClock, baseLatitude)
+	-- A sampler that ignores the clock would make every time look the same; do not pretend to have chosen.
+	if (sample(6, baseLatitude) - sample(12, baseLatitude)).Magnitude < 1e-6 then
+		return result(false, baseClock, baseLatitude, fallback, "the sun direction does not change with the clock")
+	end
+	local latitudes = { baseLatitude }
+	if baseLatitude ~= 0 then table.insert(latitudes, -baseLatitude) end
+	local best: Result? = nil
+	local bestCost = math.huge
+	for _, latitude in latitudes do
+		local steps = math.floor((target.clockTo - target.clockFrom) / target.clockStep + 0.5)
+		for i = 0, steps do
+			local clock = target.clockFrom + i * target.clockStep
+			local direction = sample(clock, latitude)
+			if direction.Magnitude > 1e-6 and direction.Z < 0 then
+				local elevation, azimuth = SunPick.angles(direction)
+				if elevation >= target.minElevationDeg and elevation <= target.maxElevationDeg and azimuth <= target.maxAzimuthDeg then
+					local cost = ((elevation - target.elevationDeg) / 10) ^ 2 + ((azimuth - target.azimuthDeg) / 20) ^ 2 + 0.001 * math.abs(clock - 10)
+					if cost < bestCost then
+						bestCost = cost
+						best = result(true, clock, latitude, direction, `clock {clock}, latitude {latitude}`)
+					end
+				end
+			end
+		end
+	end
+	if best then return best end
+	return result(false, baseClock, baseLatitude, fallback, "no time of day puts the sun behind the window")
+end
+
+return SunPick
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="16">
           <Properties>
             <string name="Name">WindowsillLayout</string>
             <string name="Source"><![CDATA[--!strict
@@ -439,11 +1251,11 @@ return table.freeze(Layout)
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="10">
+      <Item class="Folder" referent="17">
         <Properties>
           <string name="Name">Movement</string>
         </Properties>
-        <Item class="ModuleScript" referent="11">
+        <Item class="ModuleScript" referent="18">
           <Properties>
             <string name="Name">CameraMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -722,7 +1534,7 @@ return CameraMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="12">
+        <Item class="ModuleScript" referent="19">
           <Properties>
             <string name="Name">InputState</string>
             <string name="Source"><![CDATA[--!strict
@@ -815,7 +1627,7 @@ return InputState
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="13">
+        <Item class="ModuleScript" referent="20">
           <Properties>
             <string name="Name">JumpInput</string>
             <string name="Source"><![CDATA[--!strict
@@ -986,7 +1798,7 @@ return JumpInput
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="14">
+        <Item class="ModuleScript" referent="21">
           <Properties>
             <string name="Name">JumpMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -1144,7 +1956,7 @@ return JumpMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="15">
+        <Item class="ModuleScript" referent="22">
           <Properties>
             <string name="Name">LineFraming</string>
             <string name="Source"><![CDATA[--!strict
@@ -1243,7 +2055,7 @@ return LineFraming
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="16">
+        <Item class="ModuleScript" referent="23">
           <Properties>
             <string name="Name">SilkController</string>
             <string name="Source"><![CDATA[--!strict
@@ -1473,7 +2285,7 @@ return Silk
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="17">
+        <Item class="ModuleScript" referent="24">
           <Properties>
             <string name="Name">SpiderMotor</string>
             <string name="Source"><![CDATA[--!strict
@@ -2120,7 +2932,7 @@ return Motor
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="18">
+        <Item class="ModuleScript" referent="25">
           <Properties>
             <string name="Name">StickCarry</string>
             <string name="Source"><![CDATA[--!strict
@@ -2180,7 +2992,7 @@ return StickCarry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="19">
+        <Item class="ModuleScript" referent="26">
           <Properties>
             <string name="Name">SupportMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -2262,7 +3074,7 @@ return SupportMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="20">
+        <Item class="ModuleScript" referent="27">
           <Properties>
             <string name="Name">TetherMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -2331,33 +3143,222 @@ return T
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="21">
+      <Item class="Folder" referent="28">
         <Properties>
           <string name="Name">Rig</string>
         </Properties>
-        <Item class="ModuleScript" referent="22">
+        <Item class="ModuleScript" referent="29">
+          <Properties>
+            <string name="Name">Anatomy</string>
+            <string name="Source"><![CDATA[--!strict
+-- Where the parts of the body sit, worked out from the appearance table alone: pure, Vector3 only, so tests/look.luau checks
+-- it. Body frame as in SpiderRig: +Y up, -Z forward. SpiderRig turns the layout into parts; Setae uses it to keep hairs off
+-- the eyes and to grow the palps' fluff. Nothing here is placed by eye: eyes, cheeks and palps are found on the head's surface.
+
+local Anatomy = {}
+
+export type Eye = { name: string, side: number, at: Vector3, radii: Vector3, reflectance: number, principal: boolean }
+export type Glint = { side: number, at: Vector3, radii: Vector3 }
+export type Palp = { side: number, base: Vector3, tip: Vector3 }
+export type Zone = { at: Vector3, radius: number }
+export type Layout = {
+	headCenter: Vector3, headRadii: Vector3,
+	abdomenCenter: Vector3, abdomenRadii: Vector3,
+	faceCenter: Vector3, faceRadii: Vector3,
+	pedicelCenter: Vector3, pedicelRadii: Vector3,
+	neck: Vector3,
+	eyes: { Eye },
+	glints: { Glint },
+	cheeks: { { side: number, at: Vector3, radii: Vector3 } },
+	jaws: { { side: number, at: Vector3, radii: Vector3 } },
+	palps: { Palp },
+	spinneret: Vector3,
+	hairFree: { Zone },
+}
+
+local function v3(t: { number }): Vector3
+	return Vector3.new(t[1], t[2], t[3])
+end
+Anatomy.v3 = v3
+
+-- z of an ellipsoid's front (-Z) surface at lateral offsets x, y from its centre.
+function Anatomy.frontZ(c: Vector3, r: Vector3, x: number, y: number): number
+	local q = 1 - (x / r.X) ^ 2 - (y / r.Y) ^ 2
+	return c.Z - r.Z * math.sqrt(math.max(q, 0))
+end
+
+-- y of an ellipsoid's top surface at offsets x, z from its centre.
+function Anatomy.topY(c: Vector3, r: Vector3, x: number, z: number): number
+	local q = 1 - (x / r.X) ^ 2 - (z / r.Z) ^ 2
+	return c.Y + r.Y * math.sqrt(math.max(q, 0))
+end
+
+-- x of an ellipsoid's +X side surface at offsets y, z from its centre.
+function Anatomy.sideX(c: Vector3, r: Vector3, y: number, z: number): number
+	local q = 1 - (y / r.Y) ^ 2 - (z / r.Z) ^ 2
+	return c.X + r.X * math.sqrt(math.max(q, 0))
+end
+
+-- Outward unit normal of an ellipsoid at a point on its surface.
+function Anatomy.normalAt(c: Vector3, r: Vector3, p: Vector3): Vector3
+	local d = p - c
+	return Vector3.new(d.X / (r.X * r.X), d.Y / (r.Y * r.Y), d.Z / (r.Z * r.Z)).Unit
+end
+
+-- The point of an ellipsoid in direction `dir` (unit-sphere coordinates) and its outward normal.
+function Anatomy.ellipsoidPoint(c: Vector3, r: Vector3, dir: Vector3): (Vector3, Vector3)
+	local u = dir.Unit
+	local p = c + Vector3.new(u.X * r.X, u.Y * r.Y, u.Z * r.Z)
+	return p, Anatomy.normalAt(c, r, p)
+end
+
+function Anatomy.layout(look: any): Layout
+	local hc, hr = v3(look.headCenter), v3(look.headRadii)
+	local ac, ar = v3(look.abdomenCenter), v3(look.abdomenRadii)
+	local e = look.eye
+	local eyes: { Eye } = {}
+	local glints: { Glint } = {}
+	local zones: { Zone } = {}
+	local function addEye(name: string, side: number, anchor: Vector3, r: Vector3, out: number, reflectance: number, principal: boolean): Vector3
+		local n = Anatomy.normalAt(hc, hr, anchor)
+		local at = anchor + n * (out * math.min(r.X, r.Y, r.Z))
+		table.insert(eyes, { name = name, side = side, at = at, radii = r, reflectance = reflectance, principal = principal })
+		table.insert(zones, { at = at, radius = math.max(r.X, r.Y, r.Z) * 1.15 + 0.012 })
+		return at
+	end
+	for _, side in { -1, 1 } do
+		-- Principal eyes on the front of the face, two catchlights each.
+		local a = e.ame
+		local ar3 = v3(a.radii)
+		local ax, ay = side * a.x, a.y
+		local anchor = Vector3.new(hc.X + ax, ay, Anatomy.frontZ(hc, hr, ax, ay - hc.Y))
+		local at = addEye("PrincipalEye", side, anchor, ar3, a.out, a.reflectance, true)
+		for _, g in a.glints do
+			local depth = math.sqrt(math.max(1 - (g.dx / ar3.X) ^ 2 - (g.dy / ar3.Y) ^ 2, 0))
+			local gz = -ar3.Z * depth
+			table.insert(glints, {
+				side = side,
+				at = at + Vector3.new(g.dx, g.dy, gz - g.r * 0.2),
+				radii = Vector3.new(g.r, g.r, g.r * 0.45),
+			})
+		end
+		-- Anterior lateral eyes at the sides of the face.
+		local l = e.ale
+		local lx, ly = side * l.x, l.y
+		addEye("Eye", side, Vector3.new(hc.X + lx, ly, Anatomy.frontZ(hc, hr, lx, ly - hc.Y)), Vector3.one * l.r, l.out, l.reflectance, false)
+		-- Posterior lateral and median eyes on the dome.
+		for _, d in { e.ple, e.pme } do
+			local dx, dz = side * d.x, d.z
+			addEye("Eye", side, Vector3.new(hc.X + dx, Anatomy.topY(hc, hr, dx, dz - hc.Z), dz), Vector3.one * d.r, d.out, d.reflectance, false)
+		end
+	end
+	local cheeks, jaws, palps = {}, {}, {}
+	local ch, cl, pl = look.cheek, look.chelicerae, look.palp
+	for _, side in { -1, 1 } do
+		local cx = Anatomy.sideX(hc, hr, ch.y - hc.Y, ch.z - hc.Z) - ch.inset
+		table.insert(cheeks, { side = side, at = Vector3.new(side * cx, ch.y, ch.z), radii = v3(ch.radii) })
+		local jaw = Vector3.new(side * cl.x, cl.y, cl.z)
+		table.insert(jaws, { side = side, at = jaw, radii = v3(cl.radii) })
+		table.insert(zones, { at = jaw, radius = math.max(cl.radii[1], cl.radii[2], cl.radii[3]) * 1.1 + 0.01 })
+		local px = side * pl.x
+		local base = Vector3.new(px, pl.y, Anatomy.frontZ(hc, hr, px, pl.y - hc.Y))
+		table.insert(palps, { side = side, base = base, tip = base + Vector3.new(side * pl.spread, -pl.drop, -pl.reach) })
+	end
+	return {
+		headCenter = hc, headRadii = hr, abdomenCenter = ac, abdomenRadii = ar,
+		faceCenter = v3(look.face.center), faceRadii = v3(look.face.radii),
+		pedicelCenter = v3(look.pedicel.center), pedicelRadii = v3(look.pedicel.radii),
+		neck = v3(look.neck),
+		eyes = eyes, glints = glints, cheeks = cheeks, jaws = jaws, palps = palps,
+		spinneret = Vector3.new(0, ac.Y + 0.02, ac.Z + ar.Z - 0.005),
+		hairFree = zones,
+	}
+end
+
+return Anatomy
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="30">
+          <Properties>
+            <string name="Name">Idle</string>
+            <string name="Source"><![CDATA[--!strict
+-- Idle motion for the drawn spider (display only, never fed back into movement): a slow breathing bob, a small curious head
+-- tilt and the palps' drumming. Pure functions of time so tests/look.luau can check them. All knobs: Appearances.idle / .palp.
+-- `calm` is 0..1: SpiderRig eases it up after the spider has stood still for a moment and back to 0 as soon as it moves.
+
+local Idle = {}
+
+export type Pose = {
+	bodyLift: number, -- studs: the whole body rises with a breath
+	abdomenLift: number, -- studs: the abdomen rises a little more
+	abdomenPitch: number, -- radians, rear end up
+	headRoll: number, headYaw: number, headPitch: number, -- radians
+}
+
+local TAU = math.pi * 2
+
+function Idle.pose(t: number, calm: number, cfg: any): Pose
+	local b, k = cfg.breathe, cfg.tilt
+	local breath = math.sin(TAU * t / b.period) * (0.85 + 0.15 * math.sin(TAU * t / (b.period * 2.7) + 0.6))
+	local p = k.periods
+	return {
+		bodyLift = b.bodyLift * breath * calm,
+		abdomenLift = b.lift * breath * calm,
+		abdomenPitch = math.rad(b.pitchDeg) * breath * calm,
+		headRoll = math.rad(k.rollDeg) * calm * (0.65 * math.sin(TAU * t / p[1]) + 0.35 * math.sin(TAU * t / p[2] + 1.1)),
+		headYaw = math.rad(k.yawDeg) * calm * (0.7 * math.sin(TAU * t / p[3] + 0.4) + 0.3 * math.sin(TAU * t / p[4] + 2.0)),
+		headPitch = math.rad(k.pitchDeg) * calm * math.sin(TAU * t / p[5] + 0.9),
+	}
+end
+
+-- The largest angle each part of the pose can reach (for tests and for the docs).
+function Idle.limits(cfg: any): Pose
+	local b, k = cfg.breathe, cfg.tilt
+	return {
+		bodyLift = b.bodyLift, abdomenLift = b.lift, abdomenPitch = math.rad(b.pitchDeg),
+		headRoll = math.rad(k.rollDeg), headYaw = math.rad(k.yawDeg), headPitch = math.rad(k.pitchDeg),
+	}
+end
+
+-- Palp drumming in bursts while the spider stands still: the angle (radians, about the palp's base) of palp 1 and palp 2.
+function Idle.palps(t: number, drum: number, palp: any): { number }
+	local out = {}
+	for k = 1, 2 do
+		local burst = math.clamp((math.sin(t * 1.3 + 0.7 * k) - 0.55) / 0.3, 0, 1)
+		local beat = math.max(0, math.sin(t * TAU * palp.drumHz + math.pi * k))
+		out[k] = math.rad(palp.drumDeg) * drum * burst * beat
+	end
+	return out
+end
+
+return Idle
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="31">
           <Properties>
             <string name="Name">Setae</string>
             <string name="Source"><![CDATA[--!strict
--- Where the spider's hairs (setae) go: pure layout from the appearance table, Vector3 only, so tests/run.luau checks it.
--- Body frame as in SpiderRig: +Y up, -Z forward. Deterministic: the same appearance always gives the same fuzz.
--- SpiderRig turns each entry into one thin anchored part.
+-- Where the spider's hairs (setae) go: pure layout from the appearance table, Vector3 only, so tests/run.luau and
+-- tests/look.luau check it. Body frame as in SpiderRig: +Y up, -Z forward. Deterministic: the same appearance always gives
+-- the same fuzz. SpiderRig turns each entry into one thin anchored part.
+--   lock: wide flat locks over the head and abdomen, lying back like shingles (white over the white markings)
+--   guard: longer, finer hairs standing off the pelt: the fuzzy edge     tuft: the plumes at the upper sides of the head
+--   ruff: pale hair low on each cheek
+--   palp: the fluff on the pedipalps (rest pose; SpiderRig moves it with the palp)       leg: see Setae.leg
+
+local Anatomy = require(script.Parent.Anatomy)
 
 local Setae = {}
 
-export type Hair = { at: Vector3, dir: Vector3, length: number, white: boolean, grey: boolean }
-export type LegHair = { segment: number, t: number, theta: number, length: number, white: boolean, grey: boolean }
-
--- Must match SpiderRig's body layout.
-Setae.HEAD_CENTER = Vector3.new(0, 0.02, -0.20)
-Setae.ABDOMEN_CENTER = Vector3.new(0, 0.04, 0.20)
-local GOLDEN = 2.399963229728653
-local EYES = {
-	Vector3.new(-0.075, 0.09, -0.455), Vector3.new(0.075, 0.09, -0.455),
-	Vector3.new(-0.165, 0.10, -0.40), Vector3.new(0.165, 0.10, -0.40),
-	Vector3.new(-0.13, 0.17, -0.14), Vector3.new(0.13, 0.17, -0.14),
-	Vector3.new(-0.11, 0.185, -0.27), Vector3.new(0.11, 0.185, -0.27),
+export type Hair = {
+	at: Vector3, dir: Vector3, normal: Vector3, length: number, width: number, thick: number, transparency: number,
+	kind: string, group: string, side: number, tone: string, white: boolean, grey: boolean, frost: boolean,
 }
+export type LegHair = { segment: number, t: number, theta: number, length: number, tone: string, white: boolean, grey: boolean, frost: boolean }
+
+local GOLDEN = 2.399963229728653
 
 -- A repeatable 0..1 value per index (no global RNG state).
 local function hash(i: number, salt: number): number
@@ -2365,10 +3366,6 @@ local function hash(i: number, salt: number): number
 	return x - math.floor(x)
 end
 Setae.hash = hash
-
-local function v3(t: { number }): Vector3
-	return Vector3.new(t[1], t[2], t[3])
-end
 
 -- Leans a hair from its surface normal toward the rear (+Z) along the surface.
 local function lean(normal: Vector3, amount: number, i: number): Vector3
@@ -2392,8 +3389,23 @@ local function whiteOnAbdomen(look: any, x: number, z: number): boolean
 	return z < -0.58 and z > -0.78 and math.abs(x) < 0.72 -- the pale front band
 end
 
-local function ellipsoidHairs(out: { Hair }, look: any, center: Vector3, radii: Vector3, samples: number, salt: number, keep: (Vector3, Vector3) -> boolean, white: (Vector3) -> boolean)
-	local f = look.fuzz
+-- `dark` and `grey` are the shares of those tones; the rest is frosted. White is only ever over the white markings.
+local function toneOf(dark: number, grey: number, r: number, white: boolean): string
+	if white then return "white" end
+	if r < dark then return "dark" end
+	if r < dark + grey then return "grey" end
+	return "frost"
+end
+
+local function hair(at: Vector3, dir: Vector3, normal: Vector3, length: number, width: number, flat: number, transparency: number, kind: string, group: string, side: number, tone: string): Hair
+	return {
+		at = at, dir = dir, normal = normal, length = length, width = width, thick = width * flat, transparency = transparency,
+		kind = kind, group = group, side = side, tone = tone, white = tone == "white", grey = tone == "grey", frost = tone == "frost",
+	}
+end
+
+-- One class of coat hairs (kind "lock" or "guard") over an ellipsoid; `spec` is the class's table in Appearances.fuzz.
+local function coat(out: { Hair }, kind: string, spec: any, center: Vector3, radii: Vector3, samples: number, salt: number, group: string, keep: (Vector3, Vector3) -> boolean, white: (Vector3) -> boolean)
 	for i = 0, samples - 1 do
 		local y = 1 - 2 * (i + 0.5) / samples
 		local r = math.sqrt(math.max(0, 1 - y * y))
@@ -2403,11 +3415,31 @@ local function ellipsoidHairs(out: { Hair }, look: any, center: Vector3, radii: 
 			local at = center + Vector3.new(unit.X * radii.X, unit.Y * radii.Y, unit.Z * radii.Z)
 			local normal = Vector3.new(unit.X / radii.X, unit.Y / radii.Y, unit.Z / radii.Z).Unit
 			if keep(at, unit) then
-				local length = f.length[1] + (f.length[2] - f.length[1]) * hash(i, salt)
-				local dir = lean(normal, f.lieBack, i + salt * 1000)
-				table.insert(out, { at = at - dir * length * 0.25, dir = dir, length = length, white = white(unit), grey = hash(i, salt + 11) < f.greyShare })
+				local length = spec.length[1] + (spec.length[2] - spec.length[1]) * hash(i, salt)
+				local dir = lean(normal, spec.lieBack, i + salt * 1000)
+				local tone = toneOf(spec.dark, spec.grey, hash(i, salt + 11), white(unit))
+				table.insert(out, hair(at - dir * length * 0.25, dir, normal, length, spec.width, spec.flat, spec.transparency, kind, group, 0, tone))
 			end
 		end
+	end
+end
+
+-- A fan of hairs growing from a point of the head: `spec` = { at (unit-sphere direction, mirrored), lean, fan, spread, ... }.
+local function plume(out: { Hair }, A: Anatomy.Layout, side: number, spec: any, count: number, length: number, kind: string, salt: number, pick: (number) -> string)
+	local p0, n0 = Anatomy.ellipsoidPoint(A.headCenter, A.headRadii, Vector3.new(side * spec.at[1], spec.at[2], spec.at[3]))
+	local axis = Vector3.new(side * spec.lean[1], spec.lean[2], spec.lean[3]).Unit
+	local u = axis:Cross(Vector3.zAxis)
+	if u.Magnitude < 1e-3 then u = axis:Cross(Vector3.xAxis) end
+	u = u.Unit
+	local w = axis:Cross(u).Unit
+	for k = 1, count do
+		local ring = math.sqrt((k - 0.5) / count)
+		local ang = k * GOLDEN + side
+		local off = u * math.cos(ang) + w * math.sin(ang)
+		local dir = (axis + off * (spec.fan * ring)).Unit
+		local at = p0 + off * (spec.spread * ring) - n0 * 0.012
+		local l = length * (0.82 + 0.36 * hash(k, salt + side))
+		table.insert(out, hair(at, dir, n0, l, spec.width, spec.flat, spec.transparency, kind, "head", side, pick(k * 3 + side)))
 	end
 end
 
@@ -2415,35 +3447,84 @@ function Setae.body(look: any): { Hair }
 	local out: { Hair } = {}
 	local f = look.fuzz
 	if not f or not f.enabled then return out end
-	local ar, hr = v3(look.abdomenRadii), v3(look.headRadii)
-	ellipsoidHairs(out, look, Setae.ABDOMEN_CENTER, ar, f.abdomenSamples, 1, function(_at, unit)
-		return unit.Z > -0.93 -- not where the abdomen meets the pedicel
-	end, function(unit)
-		return whiteOnAbdomen(look, unit.X, unit.Z)
-	end)
-	ellipsoidHairs(out, look, Setae.HEAD_CENTER, hr, f.headSamples, 2, function(at, unit)
-		if unit.Z < -0.55 and unit.Y < 0.75 then return false end -- the eye face stays clear
-		for _, e in EYES do
-			if (at - e).Magnitude < 0.075 then return false end
-		end
-		return true
-	end, function(unit)
-		return math.abs(unit.X) > 0.82 and unit.Z < 0.1 and unit.Y < 0.45 -- pale cheeks
-	end)
-	-- Phidippus eyebrow tufts: long dark hairs above each side of the eye row, leaning forward and out.
+	local A = Anatomy.layout(look)
+	local cheek = look.cheek
+	local cy = (cheek.y - A.headCenter.Y) / A.headRadii.Y
+	local cz = (cheek.z - A.headCenter.Z) / A.headRadii.Z
+	local coats: { { kind: string, spec: any } } = { { kind = "lock", spec = f.locks }, { kind = "guard", spec = f.guard } }
+	if f.fringe then table.insert(coats, { kind = "fringe", spec = f.fringe }) end
+	for n, entry in coats do
+		local kind, spec = entry.kind, entry.spec
+		local sideOnly: number = spec.side or 0 -- the fringe grows only at the sides, where it makes the outline
+		coat(out, kind, spec, A.abdomenCenter, A.abdomenRadii, spec.abdomen, n, "abdomen", function(_at, unit)
+			return unit.Z > -0.93 and math.abs(unit.X) >= sideOnly -- not where the abdomen meets the pedicel
+		end, function(unit)
+			return whiteOnAbdomen(look, unit.X, unit.Z)
+		end)
+		coat(out, kind, spec, A.headCenter, A.headRadii, spec.head, n + 2, "head", function(at, unit)
+			if math.abs(unit.X) < sideOnly then return false end
+			if unit.Z < -0.55 and unit.Y < 0.75 then return false end -- the eye face stays clear
+			for _, zone in A.hairFree do
+				if (at - zone.at).Magnitude < zone.radius then return false end
+			end
+			return true
+		end, function(unit)
+			-- the pale cheek patch: white hair over it
+			local dy = (unit.Y - cy) / (cheek.radii[2] / A.headRadii.Y)
+			local dz = (unit.Z - cz) / (cheek.radii[3] / A.headRadii.Z)
+			return math.abs(unit.X) > 0.7 and dy * dy + dz * dz < 1.3
+		end)
+	end
+	-- Tufts: dark and silvery plumes up and out at the upper sides of the head.
 	for _, side in { -1, 1 } do
-		for k = 1, f.tuftHairs do
-			local s = (k - 1) / math.max(1, f.tuftHairs - 1) - 0.5
-			local at = Vector3.new(side * (0.12 + s * 0.03), 0.17, -0.34 + s * 0.04)
-			local dir = Vector3.new(side * (0.35 + 0.15 * s), 1, -0.45 + 0.2 * hash(k, 9)).Unit
-			table.insert(out, { at = at, dir = dir, length = f.tuftLength * (0.85 + 0.3 * hash(k, 7 + side)), white = false, grey = false })
+		plume(out, A, side, f.tuft, f.tuftHairs, f.tuftLength, "tuft", 7, function(i)
+			local r = hash(i, 21)
+			return if r < 0.15 then "frost" elseif r < 0.45 then "grey" else "dark"
+		end)
+	end
+	-- Cheek ruff: pale hair low at the sides of the face, beside the jaws.
+	local rf = f.ruff
+	for _, side in { -1, 1 } do
+		plume(out, A, side, { at = rf.at, lean = rf.lean, fan = 0.55, spread = 0.03, width = rf.width, flat = rf.flat, transparency = rf.transparency }, rf.hairs, rf.length, "ruff", 17, function(i)
+			local r = hash(i, 23)
+			return if r < rf.whiteShare then "white" elseif r < 0.85 then "frost" else "grey"
+		end)
+	end
+	return out
+end
+
+-- Fluff on the pedipalps, in the body frame at rest (SpiderRig moves it with the palp it belongs to; side -1 is palp 1).
+function Setae.palp(look: any): { Hair }
+	local out: { Hair } = {}
+	local f = look.fuzz
+	if not f or not f.enabled then return out end
+	local A = Anatomy.layout(look)
+	local pl = look.palp
+	local spec = pl.fluff
+	for _, p in A.palps do
+		local axis = p.tip - p.base
+		local ax = axis.Unit
+		local u = ax:Cross(Vector3.xAxis)
+		if u.Magnitude < 1e-3 then u = ax:Cross(Vector3.yAxis) end
+		u = u.Unit
+		local w = ax:Cross(u).Unit
+		for k = 1, spec.hairs do
+			local t = 0.3 + 0.7 * (k - 0.5) / spec.hairs
+			local theta = k * GOLDEN + p.side
+			local radial = u * math.cos(theta) + w * math.sin(theta)
+			local r = if t > 0.7 then pl.club[1] else pl.stalk * 0.5
+			local dir = (radial + ax * 0.6).Unit
+			local l = spec.length * (0.8 + 0.4 * hash(k, 31 + p.side))
+			local rr = hash(k, 33 + p.side)
+			local tone = if rr < 0.55 then "white" elseif rr < 0.75 then "frost" else "grey"
+			table.insert(out, hair(p.base + axis * t + radial * (r * 0.8), dir, radial, l, spec.width, spec.flat, spec.transparency, "palp", "palp", p.side, tone))
 		end
 	end
 	return out
 end
 
 -- Hairs on one leg: segment 1 femur, 2 tibia, 3 tarsus; t along it (0 base .. 1 tip); theta around it.
--- White over the leg's pale band (the middle bandFraction of each segment, as SpiderRig draws it), else dark.
+-- White over the leg's pale band (the middle bandFraction of each segment, as SpiderRig draws it), else dark, grey or frosted.
 function Setae.leg(look: any, legIndex: number): { LegHair }
 	local out: { LegHair } = {}
 	local f = look.fuzz
@@ -2456,7 +3537,12 @@ function Setae.leg(look: any, legIndex: number): { LegHair }
 			local t = (k - 0.5) / n
 			local theta = k * GOLDEN + legIndex
 			local white = math.abs(t - 0.5) < look.bandFraction * 0.6
-			table.insert(out, { segment = segment, t = t, theta = theta, length = f.legLength * (0.7 + 0.6 * hash(i, 5)) * (if segment == 3 then 0.6 elseif front then 1.4 else 1), white = white, grey = hash(i, 13) < f.greyShare })
+			local tone = toneOf(f.legDark, f.legGrey, hash(i, 13), white)
+			table.insert(out, {
+				segment = segment, t = t, theta = theta,
+				length = f.legLength * (0.7 + 0.6 * hash(i, 5)) * (if segment == 3 then 0.6 elseif front then 1.4 else 1),
+				tone = tone, white = tone == "white", grey = tone == "grey", frost = tone == "frost",
+			})
 		end
 	end
 	return out
@@ -2466,36 +3552,34 @@ return Setae
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="23">
+        <Item class="ModuleScript" referent="32">
           <Properties>
             <string name="Name">SpiderRig</string>
             <string name="Source"><![CDATA[--!strict
--- The drawn spider for Roblox: a port of scripts/presentation/spider_body.gd and surface_legs.gd (VISUAL-01 look).
--- Every part is anchored, non-colliding and non-queryable, and is placed each frame with one Workspace:BulkMoveTo call.
+-- The drawn spider for Roblox: a port of scripts/presentation/spider_body.gd and surface_legs.gd (VISUAL-01 look), made cuter in
+-- ROBLOX-13. Every part is anchored, non-colliding and non-queryable, and is placed each frame with one Workspace:BulkMoveTo call.
 -- Display only: the controller owns the body's CFrame; nothing here feeds back into movement.
--- Body frame: +Y support-up, -Z forward, about 1 stud long (1 Godot WU = 1 cm = 1 stud).
+-- Body frame: +Y support-up, -Z forward, about 1 stud long (1 Godot WU = 1 cm = 1 stud). Every look number is in
+-- Data/Appearances; where things sit comes from Rig/Anatomy, the hairs from Rig/Setae, the idle motion from Rig/Idle.
 
 local Workspace = game:GetService("Workspace")
 local Appearances = require(script.Parent.Parent.Data.Appearances)
+local Anatomy = require(script.Parent.Anatomy)
 local Setae = require(script.Parent.Setae)
+local Idle = require(script.Parent.Idle)
+local v3 = Anatomy.v3
 
 local SpiderRig = {}
 SpiderRig.__index = SpiderRig
 
 export type GaitMode = "Tetrapod" | "Unilateral"
 
-local HIP_Z = { -0.36, -0.24, -0.12, 0.0 }
-local TIP_Z = { -0.82, -0.52, 0.12, 0.62 }
--- Stout front legs, slimmer back legs: { femur, tibia } diameters per pair.
-local LEG_D = { { 0.078, 0.064 }, { 0.065, 0.053 }, { 0.057, 0.045 }, { 0.059, 0.047 } }
 local STEP_ERROR = 0.24
 local SWING_SECONDS = 0.10
 local STEP_HEIGHT = 0.12
 local ANKLE_SHARE = 0.62
-local ANKLE_LIFT = 0.045
-local PALP_DRUM_HZ = 3.2
-local PALP_DRUM_DEG = 11
-
+-- The groups a fixed part follows: the body, the head (tilts about the neck) or the abdomen (breathes).
+local G_BODY, G_HEAD, G_ABDOMEN = 0, 1, 2
 
 type Leg = {
 	side: number,
@@ -2511,11 +3595,12 @@ type Leg = {
 	tarsus: Part,
 	knee: Part,
 	ankle: Part,
+	pad: Part?,
 	bands: {Part},
 	hairs: { { part: Part, spec: Setae.LegHair } },
 }
 
-type Fixed = { part: Part, offset: CFrame, palp: number? }
+type Fixed = { part: Part, offset: CFrame, group: number, palp: number? }
 
 export type Rig = typeof(setmetatable(
 	{} :: {
@@ -2528,8 +3613,13 @@ export type Rig = typeof(setmetatable(
 		_group: number,
 		_t: number,
 		_drum: number,
+		_calm: number,
 		_spots: { Part },
-	_appearance: any,
+		_appearance: any,
+		_layout: Anatomy.Layout,
+		_cfg: any,
+		_detail: string,
+		_palpBase: { Vector3 },
 		_setae: { Part },
 		_eyeView: boolean,
 		_bodyHidden: boolean,
@@ -2587,10 +3677,22 @@ local function rodCFrame(a: Vector3, b: Vector3): CFrame
 	return CFrame.lookAt((a + b) * 0.5, b) * CFrame.Angles(0, math.pi / 2, 0)
 end
 
--- detail "low" keeps every third hair (phones and tablets until a real-device frame-time check says otherwise).
+-- A hair's "up" for lookAt: its surface normal, unless that is (nearly) along the hair.
+local function upFor(dir: Vector3, normal: Vector3): Vector3
+	if math.abs(dir:Dot(normal)) < 0.97 then return normal end
+	return if math.abs(dir.Y) < 0.9 then Vector3.yAxis else Vector3.zAxis
+end
+
+local GROUP_OF: { [string]: number } = { head = G_HEAD, abdomen = G_ABDOMEN }
+
+-- detail "low" is for phones and tablets: fewer hairs, one fur shell, no foot balls, half the speckles, no outline, no
+-- breathing or head tilt (Appearances.detail). Anything else is the full look.
 function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: string?, detail: string?): Rig
 	local look = Appearances.profiles[appearanceId or Appearances.default]
 	assert(look, "Unknown spider appearance")
+	local detailName = if detail == "low" then "low" else "full"
+	local cfg = look.detail[detailName]
+	local A = Anatomy.layout(look)
 	local function color(rgb): Color3 return Color3.new(rgb[1], rgb[2], rgb[3]) end
 	local BODY, LEG = color(look.body), color(look.legs)
 	local JOINT, EYE, FANG = color(look.white), color(look.eyes), color(look.fangs)
@@ -2598,6 +3700,7 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 	local model = Instance.new("Model")
 	model.Name = "Spider"
 	model:SetAttribute("AppearanceId", look.id)
+	model:SetAttribute("Detail", detailName)
 	local root = newPart(model, "Root", BODY, Enum.Material.SmoothPlastic)
 	root.Size = Vector3.new(1, 0.5, 1)
 	root.Transparency = 1
@@ -2618,8 +3721,13 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		_group = 0,
 		_t = 0,
 		_drum = 0,
+		_calm = 0,
 		_spots = {} :: { Part },
 		_appearance = look,
+		_layout = A,
+		_cfg = cfg,
+		_detail = detailName,
+		_palpBase = { A.palps[1].base, A.palps[2].base },
 		_setae = {} :: { Part },
 		_eyeView = false,
 		_bodyHidden = false,
@@ -2629,107 +3737,141 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		_cframes = {} :: { CFrame },
 	}, SpiderRig)
 
-	local function fixed(part: Part, at: Vector3, rot: CFrame?, palp: number?)
-		table.insert(self._fixed, { part = part, offset = CFrame.new(at) * (rot or CFrame.identity), palp = palp })
+	local function fixed(part: Part, at: Vector3, rot: CFrame?, group: number, palp: number?)
+		table.insert(self._fixed, { part = part, offset = CFrame.new(at) * (rot or CFrame.identity), group = group, palp = palp })
 	end
 	local fabric = Enum.Material.SmoothPlastic -- clean high-contrast silhouette
-	fixed(ellipsoid(model, "Cephalothorax", Vector3.new(table.unpack(look.headRadii)), BODY, fabric), Vector3.new(0, 0.02, -0.20))
-	fixed(ellipsoid(model, "EyeFace", Vector3.new(0.205, 0.165, 0.125), BODY, fabric), Vector3.new(0, 0.055, -0.355))
-	fixed(ellipsoid(model, "Pedicel", Vector3.new(0.05, 0.05, 0.06), BODY, fabric), Vector3.new(0, -0.035, -0.06))
-	fixed(ellipsoid(model, "Abdomen", Vector3.new(table.unpack(look.abdomenRadii)), BODY, fabric), Vector3.new(0, 0.04, 0.20))
-	local ar = look.abdomenRadii
+	fixed(ellipsoid(model, "Cephalothorax", A.headRadii, BODY, fabric), A.headCenter, nil, G_HEAD)
+	fixed(ellipsoid(model, "EyeFace", A.faceRadii, BODY, fabric), A.faceCenter, nil, G_HEAD)
+	fixed(ellipsoid(model, "Pedicel", A.pedicelRadii, BODY, fabric), A.pedicelCenter, nil, G_BODY)
+	fixed(ellipsoid(model, "Abdomen", A.abdomenRadii, BODY, fabric), A.abdomenCenter, nil, G_ABDOMEN)
+
+	-- The daughter's pattern: markings are fractions of the abdomen's radii.
+	local ar, ac = A.abdomenRadii, A.abdomenCenter
 	local function marking(name: string, x: number, z: number, rx: number, rz: number, angle: number)
-		local y = ar[2] * math.sqrt(math.max(0, 1 - x*x - z*z))
+		local y = ar.Y * math.sqrt(math.max(0, 1 - x*x - z*z))
 		local spot = ellipsoid(model, name, Vector3.new(rx, 0.012, rz), WHITE, fabric)
-		fixed(spot, Vector3.new(x * ar[1], 0.047 + y, 0.20 + z * ar[3]), CFrame.Angles(0, angle, 0))
+		spot.CastShadow = false
+		fixed(spot, Vector3.new(x * ar.X, ac.Y + 0.007 + y, ac.Z + z * ar.Z), CFrame.Angles(0, angle, 0), G_ABDOMEN)
 		table.insert(self._spots, spot)
 	end
 	-- A curved pale band across the front of the abdomen.
-	for i = -4, 4 do
-		marking("FrontBand", i * 0.16, -0.66, 0.031, 0.018, 0)
+	local band = look.band
+	for i = 0, band.count - 1 do
+		marking("FrontBand", (i - (band.count - 1) / 2) * band.step, band.z, band.rx, band.rz, 0)
 	end
 	for _, spot in look.spots do
 		marking("AbdomenSpot", spot.x, spot.z, spot.rx, spot.rz, spot.angle)
 	end
 	-- Fixed deterministic stippling: no per-frame RNG or extra updates.
+	local sp = look.speckle
 	for i = 1, look.speckleCount do
+		if i % cfg.speckleEvery ~= 0 then continue end
 		local angle = i * 2.399963229728653
-		local radius = 0.40 + (i % 5) * 0.10
-		marking("Speckle", math.cos(angle) * radius, math.sin(angle) * radius, 0.0035, 0.005, angle)
+		local radius = sp.from + (i % 5) * sp.step
+		marking("Speckle", math.cos(angle) * radius, math.sin(angle) * radius, sp.rx, sp.rz, angle)
 	end
-	for _, side in { -1, 1 } do
-		fixed(ellipsoid(model, "PaleCheek", Vector3.new(0.018, 0.066, 0.105), WHITE, fabric), Vector3.new(side * 0.235, 0.055, -0.23))
-		local ame = Vector3.new(side * 0.075, 0.09, -0.455)
-		local eye = ellipsoid(model, "PrincipalEye", Vector3.new(0.080, 0.080, 0.063), EYE, Enum.Material.Glass)
-		eye.Reflectance = 0.35
-		fixed(eye, ame)
-		local glint = ellipsoid(model, "Catchlight", Vector3.new(0.013, 0.013, 0.006), Color3.new(1, 1, 1), Enum.Material.Neon)
-		glint.CastShadow = false
-		fixed(glint, ame + Vector3.new(side * -0.018, 0.03, -0.052))
-		local secondary: { { at: Vector3, r: number } } = {
-			{ at = Vector3.new(side * 0.165, 0.10, -0.40), r = 0.042 }, -- anterior lateral
-			{ at = Vector3.new(side * 0.13, 0.17, -0.14), r = 0.048 }, -- posterior lateral
-			{ at = Vector3.new(side * 0.11, 0.185, -0.27), r = 0.018 }, -- posterior median
-		}
-		for _, e in secondary do
-			local small = ellipsoid(model, "Eye", Vector3.one * e.r, EYE, Enum.Material.Glass)
-			small.Reflectance = 0.3
-			fixed(small, e.at)
+
+	-- Head: pale cheeks, big glossy eyes with their catchlights, jaws.
+	for _, c in A.cheeks do
+		local cheek = ellipsoid(model, "PaleCheek", c.radii, WHITE, fabric)
+		cheek.CastShadow = false
+		fixed(cheek, c.at, nil, G_HEAD)
+	end
+	local SOCKET = color(look.eye.ame.socket.color)
+	for _, e in A.eyes do
+		local eye = ellipsoid(model, e.name, e.radii, EYE, Enum.Material.Glass)
+		eye.Reflectance = e.reflectance
+		eye.CastShadow = false
+		fixed(eye, e.at, nil, G_HEAD)
+		if e.principal and cfg.sockets then
+			local socket = ellipsoid(model, "EyeSocket", e.radii * look.eye.ame.socket.scale, SOCKET, fabric)
+			socket.CastShadow = false
+			fixed(socket, e.at + Vector3.new(0, 0, 0.03), nil, G_HEAD)
 		end
-		local fang = ellipsoid(model, "Chelicera", Vector3.new(0.045, 0.08, 0.04), FANG, Enum.Material.Foil)
-		fang.Reflectance = 0.15
-		fixed(fang, Vector3.new(side * 0.052, -0.075, -0.445), CFrame.Angles(-0.35, 0, side * 0.12))
-		-- Pedipalp: stalk and pale-tipped club, rotating about a pivot at its base.
-		local palpIndex = if side < 0 then 1 else 2
-		local base = Vector3.new(side * 0.10, -0.035, -0.43)
-		local tip = base + Vector3.new(side * 0.03, -0.10, -0.09)
-		local stalk = rod(model, "PalpStalk", 0.042, LEG)
-		stalk.Size = Vector3.new((tip-base).Magnitude, 0.042, 0.042)
-		fixed(stalk, Vector3.zero, CFrame.new(base):Inverse() * rodCFrame(base, tip), palpIndex)
-		local ring = rod(model, "PalpBand", 0.044, WHITE)
-		ring.Size = Vector3.new((tip-base).Magnitude * look.bandFraction, 0.044, 0.044)
-		fixed(ring, Vector3.zero, CFrame.new(base):Inverse() * rodCFrame(base, tip), palpIndex)
-		fixed(ellipsoid(model, "PalpClub", Vector3.new(0.03, 0.03, 0.045), LEG, fabric), tip + Vector3.new(0, -0.005, -0.02) - base, nil, palpIndex)
-		fixed(ellipsoid(model, "PalpTip", Vector3.new(0.022, 0.018, 0.022), JOINT, fabric), tip + Vector3.new(0, 0.006, -0.045) - base, nil, palpIndex)
 	end
-	-- Fuzz: thin hairs over the head and abdomen (Setae.body), moved with the body like every fixed part.
+	local GLINT = color(look.eye.glintColor)
+	for _, g in A.glints do
+		local glint = ellipsoid(model, "Catchlight", g.radii, GLINT, Enum.Material.Neon)
+		glint.CastShadow = false
+		fixed(glint, g.at, nil, G_HEAD)
+	end
+	local cl = look.chelicerae
+	for _, j in A.jaws do
+		local fang = ellipsoid(model, "Chelicera", j.radii, FANG, Enum.Material.Foil)
+		fang.Reflectance = cl.reflectance
+		fixed(fang, j.at, CFrame.Angles(cl.pitch, 0, j.side * cl.splay), G_HEAD)
+	end
+	-- Pedipalps: stalk, pale band, club and pale tip, rotating about a pivot at the base (they drum when the spider stands).
+	local pl = look.palp
+	for index, palp in A.palps do
+		local base, tip = palp.base, palp.tip
+		local len = (tip - base).Magnitude
+		local toBase = CFrame.new(base):Inverse()
+		local stalk = rod(model, "PalpStalk", pl.stalk, LEG)
+		stalk.Size = Vector3.new(len, pl.stalk, pl.stalk)
+		fixed(stalk, Vector3.zero, toBase * rodCFrame(base, tip), G_HEAD, index)
+		local ring = rod(model, "PalpBand", pl.stalk * 1.05, WHITE)
+		ring.Size = Vector3.new(len * look.bandFraction, pl.stalk * 1.05, pl.stalk * 1.05)
+		fixed(ring, Vector3.zero, toBase * rodCFrame(base, tip), G_HEAD, index)
+		fixed(ellipsoid(model, "PalpClub", v3(pl.club), LEG, fabric), tip + Vector3.new(0, -0.005, -0.02) - base, nil, G_HEAD, index)
+		fixed(ellipsoid(model, "PalpTip", v3(pl.tipRadii), JOINT, fabric), tip + Vector3.new(0, 0.004, -0.05) - base, nil, G_HEAD, index)
+	end
+
+	-- Fuzz: flat locks over the head and abdomen, tufts, a cheek ruff and palp fluff (Rig/Setae), moved with the part they grow from.
 	local fuzz = look.fuzz
 	local DARK = if fuzz then color(fuzz.dark) else BODY
 	local GREY = if fuzz then color(fuzz.grey) else BODY
-	local function seta(white: boolean, grey: boolean, width: number, length: number): Part
-		local h = newPart(model, "Seta", if white then WHITE elseif grey then GREY else DARK, Enum.Material.SmoothPlastic)
-		h.Size = Vector3.new(width, width, length)
+	local FROST = if fuzz then color(fuzz.frost) else BODY
+	local function seta(tone: string, width: number, thick: number, length: number, transparency: number): Part
+		local h = newPart(model, "Seta", if tone == "white" then WHITE elseif tone == "frost" then FROST elseif tone == "grey" then GREY else DARK, Enum.Material.SmoothPlastic)
+		h.Size = Vector3.new(width, thick, length)
 		h.CastShadow = false
-		h.Transparency = fuzz.transparency
+		h.Transparency = transparency
 		table.insert(self._setae, h)
 		return h
 	end
 	if fuzz and fuzz.enabled then
 		local SHELL = color(fuzz.shellColor)
-		local hr, abr = Vector3.new(table.unpack(look.headRadii)), Vector3.new(table.unpack(look.abdomenRadii))
+		local hr, hs = A.headRadii, fuzz.headShell
 		for k, shell in fuzz.shells do
-			local a = ellipsoid(model, "FuzzShell", abr * shell.scale, SHELL, Enum.Material.SmoothPlastic)
+			if k > cfg.shells then break end
+			local a = ellipsoid(model, "FuzzShell", A.abdomenRadii * shell.scale, SHELL, fabric)
 			a.Transparency, a.CastShadow = shell.transparency, false
-			fixed(a, Setae.ABDOMEN_CENTER)
-			-- The head's shell sits back from the eye row so the eyes stay clear and glossy.
-			local h = ellipsoid(model, "FuzzShell", Vector3.new(hr.X * shell.scale, hr.Y * shell.scale, hr.Z * 0.82), SHELL, Enum.Material.SmoothPlastic)
+			fixed(a, A.abdomenCenter, nil, G_ABDOMEN)
+			local h = ellipsoid(model, "FuzzShell", Vector3.new(hr.X * shell.scale, hr.Y * shell.scale, hr.Z * hs.zScale), SHELL, fabric)
 			h.Transparency, h.CastShadow = shell.transparency, false
-			fixed(h, Setae.HEAD_CENTER + Vector3.new(0, 0, 0.05 + 0.01 * k))
+			fixed(h, A.headCenter + Vector3.new(0, 0, hs.shift + 0.01 * k), nil, G_HEAD)
+		end
+		local seen: { [string]: number } = {}
+		local function keep(kind: string): boolean
+			local n = (seen[kind] or 0) + 1
+			seen[kind] = n
+			return n % (cfg.every[kind] or 1) == 0
+		end
+		for _, hair in Setae.body(look) do
+			if not keep(hair.kind) then continue end
+			local h = seta(hair.tone, hair.width, hair.thick, hair.length, hair.transparency)
+			local mid = hair.at + hair.dir * (hair.length * 0.5)
+			fixed(h, mid, CFrame.lookAt(Vector3.zero, hair.dir, upFor(hair.dir, hair.normal)), GROUP_OF[hair.group] or G_BODY)
+		end
+		for _, hair in Setae.palp(look) do
+			if not keep("palp") then continue end
+			local index = if hair.side < 0 then 1 else 2
+			local h = seta(hair.tone, hair.width, hair.thick, hair.length, hair.transparency)
+			local mid = hair.at + hair.dir * (hair.length * 0.5)
+			local rest = CFrame.lookAt(mid, mid + hair.dir, upFor(hair.dir, hair.normal))
+			fixed(h, Vector3.zero, CFrame.new(self._palpBase[index]):Inverse() * rest, G_HEAD, index)
 		end
 	end
-	local keepEvery = if detail == "low" then 3 else 1
-	for n, hair in Setae.body(look) do
-		if n % keepEvery ~= 0 then continue end
-		local h = seta(hair.white, hair.grey, fuzz.width, hair.length)
-		local mid = hair.at + hair.dir * (hair.length * 0.5)
-		local upv = if math.abs(hair.dir.Y) < 0.9 then Vector3.yAxis else Vector3.zAxis
-		fixed(h, mid, CFrame.lookAt(Vector3.zero, hair.dir, upv))
-	end
+
+	-- Legs: plump, with rounded joints and (at full detail) round feet.
+	local L = look.limbs
 	for i = 1, 8 do
 		local side = if i <= 4 then -1 else 1
 		local pair = (i - 1) % 4 + 1
-		local raw = LEG_D[pair]
-		local factor = if pair == 1 then look.frontLegScale else 1
+		local raw = L.diameters[pair]
+		local factor = (if pair == 1 then look.frontLegScale else 1) * L.thickness
 		local d = {raw[1] * factor, raw[2] * factor}
 		table.insert(self._legs, {
 			side = side,
@@ -2745,22 +3887,27 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 			tarsus = rod(model, "Tarsus" .. i, d[2] * 0.6, LEG),
 			knee = ball(model, "Knee" .. i, d[1] * 0.95, JOINT),
 			ankle = ball(model, "Ankle" .. i, d[2] * 0.95, JOINT),
+			pad = if cfg.pads then ball(model, "Foot" .. i, d[2] * 0.6 * L.pad, LEG) else nil,
 			bands = {rod(model, "FemurBand" .. i, d[1], WHITE), rod(model, "TibiaBand" .. i, d[2], WHITE), rod(model, "TarsusBand" .. i, d[2] * 0.6, WHITE)},
 			hairs = {},
 		})
 		local leg = self._legs[#self._legs]
-		for n, spec in Setae.leg(look, i) do
-			if n % keepEvery ~= 0 then continue end
-			table.insert(leg.hairs, { part = seta(spec.white, spec.grey, fuzz.width * 0.85, spec.length), spec = spec })
+		if fuzz and fuzz.enabled then
+			for n, spec in Setae.leg(look, i) do
+				if n % cfg.every.leg ~= 0 then continue end
+				table.insert(leg.hairs, { part = seta(spec.tone, fuzz.legWidth, fuzz.legWidth, spec.length, fuzz.legTransparency), spec = spec })
+			end
 		end
 	end
-	local hl = Instance.new("Highlight")
-	hl.FillTransparency = 1
-	hl.OutlineColor = WHITE
-	hl.OutlineTransparency = 0.82
-	hl.DepthMode = Enum.HighlightDepthMode.Occluded
-	hl.Parent = model
-	self._highlight = hl
+	if cfg.highlight then
+		local hl = Instance.new("Highlight")
+		hl.FillTransparency = 1
+		hl.OutlineColor = WHITE
+		hl.OutlineTransparency = 0.82
+		hl.DepthMode = Enum.HighlightDepthMode.Occluded
+		hl.Parent = model
+		self._highlight = hl
+	end
 	model.Parent = parent
 	self:setGrowthStage(0)
 	return self
@@ -2772,6 +3919,18 @@ function SpiderRig.setGrowthStage(self: Rig, stage: number)
 	self.model:SetAttribute("GrowthStage", math.clamp(stage, 0, 3))
 end
 
+-- How many parts the drawn spider is made of (the model's direct parts), for budgets and the docs.
+function SpiderRig.count(self: Rig): { total: number, hairs: number, shells: number, body: number }
+	local total, hairs, shells = 0, 0, 0
+	for _, part in self.model:GetChildren() do
+		if part:IsA("BasePart") then
+			total += 1
+			if part.Name == "Seta" then hairs += 1 elseif part.Name == "FuzzShell" then shells += 1 end
+		end
+	end
+	return { total = total, hairs = hairs, shells = shells, body = total - hairs - shells }
+end
+
 local function legGroup(self: Rig, i: number): number
 	if self.gaitMode == "Unilateral" then
 		return if i <= 4 then 0 else 1
@@ -2781,14 +3940,15 @@ local function legGroup(self: Rig, i: number): number
 	return (j % 4 + j // 4) % 2
 end
 
-local function restLocal(leg: Leg): Vector3
-	return Vector3.new(leg.side * 0.78, -0.30, TIP_Z[leg.pair])
+local function restLocal(self: Rig, leg: Leg): Vector3
+	local s = self._appearance.limbs.stance
+	return Vector3.new(leg.side * s.x * s.reach, s.y, self._appearance.limbs.tipZ[leg.pair] * s.reach)
 end
 
 -- Display-only foothold: retract toward the body at a narrow edge; never invents a platform.
 local function target(self: Rig, body: CFrame, leg: Leg): RaycastResult?
 	local up = body.UpVector
-	local rest = restLocal(leg)
+	local rest = restLocal(self, leg)
 	for _, reach in { 1.0, 0.65, 0.35, 0.12 } do
 		local point = body:PointToWorldSpace(Vector3.new(rest.X * reach, 0, rest.Z * reach))
 		local hit = Workspace:Raycast(point + up * 0.35, -up * 1.0, self._params)
@@ -2799,10 +3959,11 @@ local function target(self: Rig, body: CFrame, leg: Leg): RaycastResult?
 	return nil
 end
 
--- body: the drawn body's CFrame. grounded: standing on a surface. moving: walking speed > 0 (for palp drumming).
+-- body: the drawn body's CFrame. grounded: standing on a surface. moving: walking speed > 0 (for palp drumming and idle motion).
 function SpiderRig.update(self: Rig, body: CFrame, dt: number, grounded: boolean, moving: boolean)
 	self._t += dt
 	local up = body.UpVector
+	local look, cfg, A = self._appearance, self._cfg, self._layout
 	local parts, cframes = self._parts, self._cframes
 	table.clear(parts)
 	table.clear(cframes)
@@ -2812,21 +3973,35 @@ function SpiderRig.update(self: Rig, body: CFrame, dt: number, grounded: boolean
 	end
 	put(self.root, body)
 
-	-- Palps drum in bursts while the spider stands still.
-	self._drum = math.clamp(self._drum + (if grounded and not moving and not self.reducedMotion then 3 else -3) * dt, 0, 1)
-	local palpAngle = {}
-	for k = 1, 2 do
-		local burst = math.clamp((math.sin(self._t * 1.3 + 0.7 * k) - 0.55) / 0.3, 0, 1)
-		local beat = math.max(0, math.sin(self._t * 2 * math.pi * PALP_DRUM_HZ + math.pi * k))
-		palpAngle[k] = math.rad(PALP_DRUM_DEG) * self._drum * burst * beat
+	-- Palps drum in bursts while the spider stands still; breathing and a curious head tilt ease in after a moment. All of
+	-- it is full detail only (cfg.idle), and reducedMotion turns it off too.
+	local standing = cfg.idle and grounded and not moving and not self.reducedMotion
+	self._drum = math.clamp(self._drum + (if standing then 3 else -3) * dt, 0, 1)
+	local palpAngle = Idle.palps(self._t, self._drum, look.palp)
+	local bodyBase, headBase, abdomenBase = body, body, body
+	if cfg.idle then
+		local idle = look.idle
+		self._calm = math.clamp(self._calm + (if standing then dt / idle.riseSeconds else -dt / idle.fallSeconds), 0, 1)
+		if self._calm > 0 then
+			local c = self._calm * self._calm * (3 - 2 * self._calm)
+			local pose = Idle.pose(self._t, c, idle)
+			bodyBase = body * CFrame.new(0, pose.bodyLift, 0)
+			headBase = bodyBase * CFrame.new(A.neck) * CFrame.Angles(pose.headPitch, pose.headYaw, pose.headRoll) * CFrame.new(-A.neck)
+			abdomenBase = bodyBase * CFrame.new(0, pose.abdomenLift, 0) * CFrame.new(A.pedicelCenter)
+				* CFrame.Angles(-pose.abdomenPitch, 0, 0) * CFrame.new(-A.pedicelCenter)
+		end
 	end
+	local pivots = {
+		CFrame.new(self._palpBase[1]) * CFrame.Angles(palpAngle[1], 0, 0),
+		CFrame.new(self._palpBase[2]) * CFrame.Angles(palpAngle[2], 0, 0),
+	}
 	for _, f in self._fixed do
-		if f.palp then
-			local side = if f.palp == 1 then -1 else 1
-			local pivot = CFrame.new(side * 0.10, -0.035, -0.43) * CFrame.Angles(palpAngle[f.palp], 0, 0)
-			put(f.part, body * pivot * f.offset)
+		local base = if f.group == G_HEAD then headBase elseif f.group == G_ABDOMEN then abdomenBase else bodyBase
+		local palp = f.palp
+		if palp then
+			put(f.part, base * pivots[palp] * f.offset)
 		else
-			put(f.part, body * f.offset)
+			put(f.part, base * f.offset)
 		end
 	end
 
@@ -2839,7 +4014,7 @@ function SpiderRig.update(self: Rig, body: CFrame, dt: number, grounded: boolean
 		local worst = STEP_ERROR
 		for i, leg in self._legs do
 			if leg.planted then
-				local err = (body:PointToWorldSpace(restLocal(leg)) - leg.planted :: Vector3).Magnitude
+				local err = (body:PointToWorldSpace(restLocal(self, leg)) - leg.planted :: Vector3).Magnitude
 				if err > worst then
 					worst = err
 					self._group = legGroup(self, i)
@@ -2847,13 +4022,14 @@ function SpiderRig.update(self: Rig, body: CFrame, dt: number, grounded: boolean
 			end
 		end
 	end
+	local L = look.limbs
 	local started = false
 	for i, leg in self._legs do
-		local rest = body:PointToWorldSpace(restLocal(leg))
+		local rest = body:PointToWorldSpace(restLocal(self, leg))
 		if not grounded then
 			leg.planted = nil
 			leg.swing = -1
-			leg.foot = body:PointToWorldSpace(Vector3.new(leg.side * 0.47, -0.12, TIP_Z[leg.pair] * 0.72))
+			leg.foot = body:PointToWorldSpace(Vector3.new(leg.side * 0.47, -0.12, L.tipZ[leg.pair] * 0.72))
 		else
 			if leg.planted == nil then
 				local hit = target(self, body, leg)
@@ -2896,11 +4072,12 @@ function SpiderRig.update(self: Rig, body: CFrame, dt: number, grounded: boolean
 	if started then
 		self._group = 1 - self._group
 	end
+	local kneeUp = if grounded then L.kneeLift else L.kneeLiftAir
 	for _, leg in self._legs do
-		local hip = body:PointToWorldSpace(Vector3.new(leg.side * 0.16, 0.02, HIP_Z[leg.pair]))
+		local hip = bodyBase:PointToWorldSpace(Vector3.new(leg.side * L.hipX, L.hipY, L.hipZ[leg.pair]))
 		local foot = leg.foot
-		local knee = hip:Lerp(foot, 0.48) + up * (if grounded then 0.30 else 0.24)
-		local ankle = knee:Lerp(foot, ANKLE_SHARE) + up * ANKLE_LIFT
+		local knee = hip:Lerp(foot, 0.48) + up * kneeUp
+		local ankle = knee:Lerp(foot, ANKLE_SHARE) + up * L.ankleLift
 		local function segment(index: number, p: Part, band: Part, a: Vector3, b: Vector3)
 			local len = math.max((b - a).Magnitude, 0.01)
 			if math.abs(p.Size.X - len) > 1e-3 then
@@ -2908,7 +4085,7 @@ function SpiderRig.update(self: Rig, body: CFrame, dt: number, grounded: boolean
 			end
 			local rc = rodCFrame(a, b) -- local +X runs from a toward b (toward the foot)
 			put(p, rc)
-			band.Size = Vector3.new(len * self._appearance.bandFraction, p.Size.Y * 1.035, p.Size.Z * 1.035)
+			band.Size = Vector3.new(len * look.bandFraction, p.Size.Y * 1.035, p.Size.Z * 1.035)
 			put(band, rc)
 			-- Leg setae stand out from the segment and lean toward the foot.
 			local r = p.Size.Y * 0.5
@@ -2927,6 +4104,7 @@ function SpiderRig.update(self: Rig, body: CFrame, dt: number, grounded: boolean
 		segment(3, leg.tarsus, leg.bands[3], ankle, foot)
 		put(leg.knee, CFrame.new(knee))
 		put(leg.ankle, CFrame.new(ankle))
+		if leg.pad then put(leg.pad :: Part, CFrame.new(foot)) end
 	end
 	Workspace:BulkMoveTo(parts, cframes, Enum.BulkMoveMode.FireCFrameChanged)
 end
@@ -2948,6 +4126,7 @@ local function applyVisibility(self: Rig)
 		show(leg.femur, all); show(leg.bands[1], all); show(leg.knee, all)
 		show(leg.tibia, all or frontReach); show(leg.bands[2], all or frontReach)
 		show(leg.tarsus, all or frontReach); show(leg.bands[3], all or frontReach); show(leg.ankle, all or frontReach)
+		if leg.pad then show(leg.pad :: Part, all or frontReach) end
 		for _, hair in leg.hairs do
 			show(hair.part, all or (frontReach and hair.spec.segment >= 2))
 		end
@@ -2966,8 +4145,8 @@ function SpiderRig.setBodyHidden(self: Rig, hidden: boolean)
 end
 
 -- Where the dragline leaves the body.
-function SpiderRig.spinneretPoint(_self: Rig, body: CFrame): Vector3
-	return body:PointToWorldSpace(Vector3.new(0, 0.06, 0.48))
+function SpiderRig.spinneretPoint(self: Rig, body: CFrame): Vector3
+	return body:PointToWorldSpace(self._layout.spinneret)
 end
 
 function SpiderRig.destroy(self: Rig)
@@ -2979,11 +4158,11 @@ return SpiderRig
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="24">
+      <Item class="Folder" referent="33">
         <Properties>
           <string name="Name">UI</string>
         </Properties>
-        <Item class="ModuleScript" referent="25">
+        <Item class="ModuleScript" referent="34">
           <Properties>
             <string name="Name">ControlText</string>
             <string name="Source"><![CDATA[--!strict
@@ -3202,7 +4381,7 @@ return ControlText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="26">
+        <Item class="ModuleScript" referent="35">
           <Properties>
             <string name="Name">HudLayout</string>
             <string name="Source"><![CDATA[--!strict
@@ -3284,169 +4463,62 @@ return HudLayout
       </Item>
     </Item>
   </Item>
-  <Item class="ServerScriptService" referent="27">
+  <Item class="ServerScriptService" referent="36">
     <Properties>
       <string name="Name">ServerScriptService</string>
     </Properties>
-    <Item class="Folder" referent="28">
+    <Item class="Folder" referent="37">
       <Properties>
         <string name="Name">Server</string>
       </Properties>
-      <Item class="Script" referent="29">
+      <Item class="Script" referent="38">
         <Properties>
           <string name="Name">Main</string>
           <token name="RunContext">0</token>
           <string name="Source"><![CDATA[--!strict
--- Builds the windowsill (scripts/habitat/windowsill.gd) and the macro-lens lighting. The spider itself is client-side
--- (StarterPlayerScripts/Client/SpiderClient): one player, one spider, nothing to replicate yet.
+-- Builds the windowsill (scripts/habitat/windowsill.gd), the drawn world around it (Habitat/Scenery, from Data/Graphics) and the
+-- lighting (Habitat/Lit). The spider itself is client-side (StarterPlayerScripts/Client/SpiderClient): one player, one spider,
+-- nothing to replicate yet. Lighting Technology (Future) and MaterialService.Use2022Materials are authored in the Rojo projects;
+-- runtime scripts cannot set them.
 
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 
-local Shared = ReplicatedStorage:WaitForChild("Shared")
-local Layout = require(Shared:WaitForChild("Habitat"):WaitForChild("WindowsillLayout"))
-local Surfaces = require(Shared:WaitForChild("Data"):WaitForChild("Surfaces"))
+local Habitat = ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Habitat")
+local Scenery = require(Habitat:WaitForChild("Scenery"))
+local Lit = require(Habitat:WaitForChild("Lit"))
 
 Players.CharacterAutoLoads = false
 Workspace.Gravity = 35 -- species gravity_wu_s2; used by any unanchored props
 
-local MATERIAL: { [string]: Enum.Material } = {
-	painted_wood_dry = Enum.Material.Wood,
-	bare_wood_rough = Enum.Material.WoodPlanks,
-	brick_rough = Enum.Material.Brick,
-	leaf_dry_prototype = Enum.Material.SmoothPlastic,
-}
+-- Lighting first: the light shafts follow the sun it picks. Depth of field is opt-in (Workspace attribute DepthOfField).
+local sun = Lit.apply(Lighting, Workspace:FindFirstChild("Terrain"), { depthOfField = Workspace:GetAttribute("DepthOfField") == true })
+print("[Windowsill] sun: " .. (if sun.ok then "through the window, " else "fallback, ") .. sun.reason)
 
-local sill = Instance.new("Folder")
-sill.Name = "Windowsill"
-sill:SetAttribute("ContentRevision", Layout.CONTENT_REVISION)
-
-for _, piece in Layout.PIECES do
-	assert(Surfaces[piece.profile], "unknown surface profile " .. piece.profile)
-	local p = Instance.new("Part")
-	p.Name = piece.id
-	p.Anchored = true
-	p.Size = piece.hi - piece.lo
-	p.Position = (piece.lo + piece.hi) * 0.5
-	p.Color = piece.color
-	p.Material = MATERIAL[piece.profile] or Enum.Material.SmoothPlastic
-	p.TopSurface = Enum.SurfaceType.Smooth
-	p.BottomSurface = Enum.SurfaceType.Smooth
-	p:SetAttribute("SurfaceId", piece.id)
-	p:SetAttribute("ProfileId", piece.profile)
-	p.Parent = sill
-end
-
-local decorFolder = Instance.new("Folder")
-decorFolder.Name = "Decor"
-for _, d in Layout.DECOR do
-	local p = Instance.new("Part")
-	p.Name = d.id
-	p.Anchored = true
-	p.CanCollide = false
-	p.CanQuery = false -- drawn only: the spider's rays never see it
-	p.CanTouch = false
-	p.Size = d.size
-	p.Position = d.at
-	p.Color = d.color
-	p.Material = if d.id == "window_glass" then Enum.Material.Glass elseif d.id == "soil" then Enum.Material.Ground else Enum.Material.SmoothPlastic
-	p.Transparency = d.transparency or 0
-	p.CastShadow = d.id ~= "window_glass"
-	p.Parent = decorFolder
-end
-
--- Dust motes drifting in the window light (drawn only).
-local dust = Instance.new("Part")
-dust.Name = "DustVolume"
-dust.Anchored = true
-dust.CanCollide = false
-dust.CanQuery = false
-dust.CanTouch = false
-dust.Transparency = 1
-dust.Size = Vector3.new(56, 11, 22)
-dust.Position = Vector3.new(0, 6.1, -1)
-local motes = Instance.new("ParticleEmitter")
-motes.Texture = "rbxasset://textures/particles/smoke_main.dds"
-motes.Rate = 5
-motes.Lifetime = NumberRange.new(14, 18)
-motes.Speed = NumberRange.new(0.05, 0.2)
-motes.SpreadAngle = Vector2.new(180, 180)
-motes.Size = NumberSequence.new(0.05)
-motes.Transparency = NumberSequence.new({
-	NumberSequenceKeypoint.new(0, 1),
-	NumberSequenceKeypoint.new(0.2, 0.55),
-	NumberSequenceKeypoint.new(0.8, 0.55),
-	NumberSequenceKeypoint.new(1, 1),
-})
-motes.LightEmission = 0.6
-motes.LightInfluence = 0.4
-motes.Color = ColorSequence.new(Color3.fromRGB(255, 238, 205))
-motes.Drag = 0.5
-motes.Acceleration = Vector3.new(0, 0.01, 0)
-motes.Shape = Enum.ParticleEmitterShape.Box
-motes.ShapeInOut = Enum.ParticleEmitterShapeInOut.Outward
-motes.ShapeStyle = Enum.ParticleEmitterShapeStyle.Volume
-motes.Parent = dust
-dust.Parent = decorFolder
-
-decorFolder.Parent = Workspace
+local sill = Scenery.sill()
+local decor = Scenery.decor(if sun.ok then sun.direction else nil)
+decor.Parent = Workspace
 sill.Parent = Workspace
-
--- Macro-lens lighting: morning sun through the window, soft shadows, warm grade, a shallow depth of field
--- (the client keeps the focus on the spider).
--- Technology is authored in the Rojo place; runtime scripts cannot set it.
-Lighting.ClockTime = 9.6
-Lighting.GeographicLatitude = 40.7
-Lighting.Brightness = 2.6
-Lighting.Ambient = Color3.fromRGB(70, 66, 58)
-Lighting.OutdoorAmbient = Color3.fromRGB(150, 146, 132)
-Lighting.EnvironmentDiffuseScale = 1
-Lighting.EnvironmentSpecularScale = 1
-Lighting.ShadowSoftness = 0.12
-Lighting.ExposureCompensation = 0.1
-
-local function effect(className: string, name: string): Instance
-	local e = Lighting:FindFirstChild(name) or Instance.new(className)
-	e.Name = name
-	e.Parent = Lighting
-	return e
-end
-local cc = effect("ColorCorrectionEffect", "Grade") :: ColorCorrectionEffect
-cc.Contrast = 0.06
-cc.Saturation = 0.04
-cc.TintColor = Color3.fromRGB(255, 248, 236)
-local bloom = effect("BloomEffect", "Bloom") :: BloomEffect
-bloom.Intensity = 0.3
-bloom.Size = 18
-bloom.Threshold = 1.6
-local rays = effect("SunRaysEffect", "SunRays") :: SunRaysEffect
-rays.Intensity = 0.06
-rays.Spread = 0.7
-local dof = effect("DepthOfFieldEffect", "MacroDOF") :: DepthOfFieldEffect
-dof.FarIntensity = 0.55
-dof.NearIntensity = 0.35
-dof.FocusDistance = 6
-dof.InFocusRadius = 3.5
 ]]></string>
         </Properties>
       </Item>
     </Item>
   </Item>
-  <Item class="StarterPlayer" referent="30">
+  <Item class="StarterPlayer" referent="39">
     <Properties>
       <string name="Name">StarterPlayer</string>
     </Properties>
-    <Item class="StarterPlayerScripts" referent="31">
+    <Item class="StarterPlayerScripts" referent="40">
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="Folder" referent="32">
+      <Item class="Folder" referent="41">
         <Properties>
           <string name="Name">Client</string>
         </Properties>
-        <Item class="ModuleScript" referent="33">
+        <Item class="ModuleScript" referent="42">
           <Properties>
             <string name="Name">SpiderCamera</string>
             <string name="Source"><![CDATA[--!strict
@@ -3813,7 +4885,7 @@ return SpiderCamera
 ]]></string>
           </Properties>
         </Item>
-        <Item class="LocalScript" referent="34">
+        <Item class="LocalScript" referent="43">
           <Properties>
             <string name="Name">SpiderClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -3839,6 +4911,7 @@ local Workspace = game:GetService("Workspace")
 local SpiderInput = require(script.Parent.SpiderInput)
 local SpiderCamera = require(script.Parent.SpiderCamera)
 local SpiderHud = require(script.Parent.SpiderHud)
+local WorldDetail = require(script.Parent.WorldDetail)
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Movement = Shared:WaitForChild("Movement")
@@ -3849,6 +4922,7 @@ local StickCarry = require(Movement:WaitForChild("StickCarry"))
 local ControlText = require(Shared:WaitForChild("UI"):WaitForChild("ControlText"))
 local Species = require(Shared:WaitForChild("Data"):WaitForChild("Species"))
 local Surfaces = require(Shared:WaitForChild("Data"):WaitForChild("Surfaces"))
+local Detail = require(Shared:WaitForChild("Data"):WaitForChild("Detail"))
 local Layout = require(Shared:WaitForChild("Habitat"):WaitForChild("WindowsillLayout"))
 local SpiderRig = require(Shared:WaitForChild("Rig"):WaitForChild("SpiderRig"))
 
@@ -3880,8 +4954,18 @@ local motor: any = SpiderMotor.new({
 })
 local jump: any = JumpInput.new()
 local carry: any = StickCarry.new()
--- Touch-only devices get the lighter fuzz until a real tablet frame-time check (ROBLOX_PORT.md).
-local rig = SpiderRig.new(Workspace, sill, nil, if UIS.TouchEnabled and not UIS.KeyboardEnabled then "low" else "full")
+-- Touch-only devices (phones, tablets) run the low tier until a real tablet frame-time check (ROBLOX_PORT.md): lighter fuzz and
+-- no idle extras on the spider, fewer optional parts in the world. Workspace attribute Detail = "low" or "full" overrides the guess.
+local detail = Detail.choose(UIS.TouchEnabled and not UIS.KeyboardEnabled, Workspace:GetAttribute("Detail"))
+local rig = SpiderRig.new(Workspace, sill, nil, detail)
+task.spawn(function()
+	local roots: { Instance } = { Lighting }
+	local decor = Workspace:WaitForChild("Decor", 10)
+	if decor then table.insert(roots, decor) end
+	local terrain = Workspace:FindFirstChild("Terrain")
+	if terrain then table.insert(roots, terrain) end
+	WorldDetail.apply(detail, roots)
+end)
 local hud = SpiderHud.new(player:WaitForChild("PlayerGui"))
 local device: ControlText.Device = ControlText.initialDevice(UIS.TouchEnabled, UIS.KeyboardEnabled, UIS.GamepadEnabled)
 local drawnUp = Vector3.yAxis
@@ -4257,7 +5341,7 @@ end
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="35">
+        <Item class="ModuleScript" referent="44">
           <Properties>
             <string name="Name">SpiderHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -4496,7 +5580,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="36">
+        <Item class="ModuleScript" referent="45">
           <Properties>
             <string name="Name">SpiderInput</string>
             <string name="Source"><![CDATA[--!strict
@@ -4696,10 +5780,50 @@ return SpiderInput
 ]]></string>
           </Properties>
         </Item>
+        <Item class="ModuleScript" referent="46">
+          <Properties>
+            <string name="Name">WorldDetail</string>
+            <string name="Source"><![CDATA[--!strict
+-- The low-detail tier of the world, applied on one client: phones and tablets drop what the server built for the full tier
+-- (anything carrying the attribute FullOnly: bloom, sun rays, clouds, light shafts, the small details, the busier part of the
+-- view) and get a thinner dust. Only this client's copy changes; the server and other players keep theirs.
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Graphics = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Data"):WaitForChild("Graphics"))
+
+local WorldDetail = {}
+
+-- detail: "full" or "low". roots: the places the server put optional things in (Decor, Lighting, Terrain). Returns how many
+-- instances it removed.
+function WorldDetail.apply(detail: string, roots: { Instance }): number
+	if detail ~= "low" then return 0 end
+	local scale = Graphics.tiers.low.dustRate
+	local doomed: { Instance } = {}
+	for _, root in roots do
+		if root:GetAttribute("FullOnly") == true then
+			table.insert(doomed, root)
+		else
+			for _, d in root:GetDescendants() do
+				if d:GetAttribute("FullOnly") == true then
+					table.insert(doomed, d)
+				elseif d:IsA("ParticleEmitter") and d:GetAttribute("Dust") == true and d:GetAttribute("Thinned") ~= true then
+					d.Rate = d.Rate * scale
+					d:SetAttribute("Thinned", true)
+				end
+			end
+		end
+	end
+	for _, d in doomed do d:Destroy() end
+	return #doomed
+end
+
+return WorldDetail
+]]></string>
+          </Properties>
+        </Item>
       </Item>
     </Item>
   </Item>
-  <Item class="Workspace" referent="37">
+  <Item class="Workspace" referent="47">
     <Properties>
       <string name="Name">Workspace</string>
       <float name="Gravity">35</float>

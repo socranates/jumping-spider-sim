@@ -146,7 +146,16 @@ for _, h in hairs do
 end
 check(kinds.tuft == 2 * look.fuzz.tuftHairs and tuftsOk, "bold-jumper tufts: a fan on each side, behind and above the eyes, not brows")
 check(nearEye > ame.radii[1], "tufts do not cover the front eyes")
-check((kinds.lock or 0) >= 150 and (kinds.guard or 0) >= 150, `the coat has locks ({kinds.lock}) and guard hairs ({kinds.guard})`)
+check((kinds.lock or 0) >= 100 and (kinds.guard or 0) >= 150 and (kinds.fringe or 0) >= 40,
+	`the coat has locks ({kinds.lock}), guard hairs ({kinds.guard}) and a fringe ({kinds.fringe})`)
+local fringeOk = true
+for _, h in hairs do
+	if h.kind == "fringe" then
+		local out = if h.at.X >= 0 then 1 else -1
+		fringeOk = fringeOk and math.abs(h.at.X) >= 0.15 and h.dir.X * out > 0.3 -- at the sides, standing out sideways
+	end
+end
+check(fringeOk, "the fringe grows at the sides and stands out sideways, so the outline is fuzzy")
 local covered = false
 for _, h in hairs do
 	for _, e in A.eyes do
@@ -222,7 +231,7 @@ end
 local lowRig, lowParts = rigParts("low")
 local full, low = census(fullParts), census(lowParts)
 print(`look: full {full.total} parts ({full.hair} hairs, {full.shell} shells, {full.other} other), low {low.total} ({low.hair} hairs, {low.shell} shells, {low.other} other)`)
-check(full.total <= 720 and full.other <= 160 and full.hair + full.shell >= 300 and full.hair + full.shell <= 720, `full detail part budget ({full.total})`)
+check(full.total <= 760 and full.other <= 160 and full.hair + full.shell >= 300 and full.hair + full.shell <= 720, `full detail part budget ({full.total})`)
 check(low.total <= 300 and low.hair >= 100 and low.hair <= 260 and low.shell <= 2, `low detail part budget ({low.total})`)
 check(low.total < full.total * 0.45 and low.other < full.other, "low detail is under half the parts of full")
 check(full.bad == 0 and low.bad == 0, "every drawn part is anchored, non-colliding, not queryable and has a real size")

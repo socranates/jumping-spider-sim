@@ -60,6 +60,7 @@ else:
     parts_path = out / f"{args.prefix}parts.json"
     parts_path.write_text(json_text)
     print(count_line)
+    (out / f"{args.prefix}counts.txt").write_text(count_line + "\n")
 print("visible parts:", len(json.loads(parts_path.read_text())))
 
 # fov, eye x y z, target x y z (studs; the spider stands on the floor at x = z = 0, body 0.31 up, facing -Z).

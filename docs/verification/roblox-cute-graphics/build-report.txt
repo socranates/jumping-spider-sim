@@ -1,0 +1,9 @@
+python3 tools/build.py rojo (Rojo 7.7.1, Linux), run twice
+Building project 'TheWindowsill'
+Built project to TheWindowsill.rbxlx
+Building project 'TheWindowsillTests'
+Built project to TheWindowsillTests.rbxlx
+evidence_id: 3a8e7c1a4008853c
+5f4b7d16b8ba5e1399c9a121d14dad778f381d7a72f977b17434cef53e568a1c  TheWindowsill.rbxlx
+b870259d53fb0d45b2e5adca41c6a35e05f225f707831e5bc777692e8d03bccd  TheWindowsillTests.rbxlx
+second build: identical bytes

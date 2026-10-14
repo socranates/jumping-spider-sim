@@ -111,14 +111,17 @@ function Setae.body(look: any): { Hair }
 	local cy = (cheek.y - A.headCenter.Y) / A.headRadii.Y
 	local cz = (cheek.z - A.headCenter.Z) / A.headRadii.Z
 	local coats: { { kind: string, spec: any } } = { { kind = "lock", spec = f.locks }, { kind = "guard", spec = f.guard } }
+	if f.fringe then table.insert(coats, { kind = "fringe", spec = f.fringe }) end
 	for n, entry in coats do
 		local kind, spec = entry.kind, entry.spec
+		local sideOnly: number = spec.side or 0 -- the fringe grows only at the sides, where it makes the outline
 		coat(out, kind, spec, A.abdomenCenter, A.abdomenRadii, spec.abdomen, n, "abdomen", function(_at, unit)
-			return unit.Z > -0.93 -- not where the abdomen meets the pedicel
+			return unit.Z > -0.93 and math.abs(unit.X) >= sideOnly -- not where the abdomen meets the pedicel
 		end, function(unit)
 			return whiteOnAbdomen(look, unit.X, unit.Z)
 		end)
 		coat(out, kind, spec, A.headCenter, A.headRadii, spec.head, n + 2, "head", function(at, unit)
+			if math.abs(unit.X) < sideOnly then return false end
 			if unit.Z < -0.55 and unit.Y < 0.75 then return false end -- the eye face stays clear
 			for _, zone in A.hairFree do
 				if (at - zone.at).Magnitude < zone.radius then return false end

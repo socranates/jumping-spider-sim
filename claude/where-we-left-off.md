@@ -5,7 +5,7 @@ Nathan: "the controls are not as good on roblox, when jumping you can only hop, 
 - One control scheme like Godot on keyboard, controller and touch together (ROBLOX-08, table in roblox_port/README.md). Q/B cancels an aim or a walk to the edge; only a deliberate hold lets go of the line. Roblox's menu pauses. Prompts name the device in use and wrap in the safe area.
 - Catch camera turns at most 45 degrees to frame the recovery; any look, recenter or aim takes over (ROBLOX-09).
 - New scenarios found and fixed two bugs: a snag left reeling dead (ROBLOX-10); holding W at an edge flipped back and forth (Godot's carry, ROBLOX-11).
-- Linux: pure **182/182**, box world **15/15** (ten misses recovered), client smoke **11/11**, strict analysis clean, evidence **876253fd47783ce3**. **Not run in Studio or on devices.**
+- Linux: pure **182/182**, box world **15/15** (ten misses recovered), client smoke **11/11**, strict analysis clean, evidence **2a5c87b3843fbc0d**. **Not run in Studio or on devices.**
 
 **Next:** Chet — Studio suite (39 rows) and client playback (7), controller/touch/tablet and frame-time checks, then merge to main. Nathan — try the list in the handoff. Then perception.
 

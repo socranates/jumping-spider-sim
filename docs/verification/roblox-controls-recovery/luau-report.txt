@@ -1,4 +1,4 @@
-python3 tests/run.py luau (Luau CLI 0.742, Linux), evidence 876253fd47783ce3
+python3 tests/run.py luau (Luau CLI 0.742, Linux), evidence 2a5c87b3843fbc0d
 fuzz: 453 body hairs, 186 leg hairs, 77 white
 SUMMARY passed=182 failed=0
   1 east leaf, front: caught true, settled true, reel true, 269 ticks, max turn 0

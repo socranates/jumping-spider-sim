@@ -1,6 +1,6 @@
 # Roblox controls and recovery camera — verification, 2026-10-14 (Claude, Linux)
 
-Branch `claude/roblox-controls-recovery`, based on main 432bc53 with Perplexity's 01fe0d1 merged. Source/test/project evidence **876253fd47783ce3** (tools/build.py). Luau CLI 0.742, luau-lsp 1.70.1, Rojo 7.7.1, Godot 4.7.2 (frozen reference c87ce00, only to export goldens). **Roblox Studio was not run**: this machine has no Roblox engine.
+Branch `claude/roblox-controls-recovery`, based on main 432bc53 with Perplexity's 01fe0d1 merged. Source/test/project evidence **2a5c87b3843fbc0d** (tools/build.py). Luau CLI 0.742, luau-lsp 1.70.1, Rojo 7.7.1, Godot 4.7.2 (frozen reference c87ce00, only to export goldens). **Roblox Studio was not run**: this machine has no Roblox engine.
 
 | Check | Result | Evidence and scope |
 |---|---|---|

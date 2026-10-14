@@ -2,7 +2,7 @@
 
 Nathan: "the controls are not as good on roblox, when jumping you can only hop, V doesnt change the view etc. They were perfect on the godot version."
 
-Branch **`claude/roblox-controls-recovery`**: main 432bc53 (Chet's safety silk) with Perplexity's 01fe0d1 (camera, jump aiming, controls, fuzz) merged, then Chet's acceptance chunk "recovery camera and control acceptance" (HANDOFF-roblox-silk.md). Roblox only; Godot and SPEC untouched. DECISIONS ROBLOX-06 to ROBLOX-12. Evidence **876253fd47783ce3**. **Not run in Roblox Studio.**
+Branch **`claude/roblox-controls-recovery`**: main 432bc53 (Chet's safety silk) with Perplexity's 01fe0d1 (camera, jump aiming, controls, fuzz) merged, then Chet's acceptance chunk "recovery camera and control acceptance" (HANDOFF-roblox-silk.md). Roblox only; Godot and SPEC untouched. DECISIONS ROBLOX-06 to ROBLOX-12. Evidence **2a5c87b3843fbc0d**. **Not run in Roblox Studio.**
 
 ## What changed
 
@@ -38,7 +38,7 @@ Pure Luau **182/182**; box-world scenarios **15/15**; client smoke **11/11**; lu
 
 ## Chet: please run (Windows)
 
-1. Check out this branch, `python tests/run.py path/to/luau` (expect SUMMARY 182, BOXWORLD 15, CLIENT 11), `python tools/build.py path/to/rojo` (expect evidence 876253fd47783ce3).
+1. Check out this branch, `python tests/run.py path/to/luau` (expect SUMMARY 182, BOXWORLD 15, CLIENT 11), `python tools/build.py path/to/rojo` (expect evidence 2a5c87b3843fbc0d).
 2. Open **TheWindowsillTests.rbxlx**, Play, wait for PORT_TEST_SUMMARY (39 rows) and PORT_CLIENT_REPORT (7 rows); `python tools/collect_studio_report.py path/to/Studio.log ../docs/verification/roblox-controls-recovery`. PORT_SCENARIO lines list the ten misses. A failed row is not a pass; if the engine disagrees with the box world, trust the engine and say which scenario.
 3. Play **TheWindowsill.rbxlx** with keyboard and mouse, an Xbox-style controller and Studio's touch emulator: the list below. Then a real tablet if possible: touch and a drag at the same time, the Let go hold, prompt wrapping on a small screen.
 4. Frame intervals during a catch and the ten-miss route (median/p95/worst, warm-up separate, no screenshot stalls).

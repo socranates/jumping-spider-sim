@@ -79,8 +79,8 @@ return function(driver: any)
 			local hint=panel:FindFirstChild("PromptHint") :: TextLabel
 			assert(hint.Visible and string.find(hint.Text,word,1,true),`{device}: "{hint.Text}"`)
 			assert(hint.TextFits,`{device}: the hint does not fit`)
-			local a,b,screen=panel.AbsolutePosition,panel.AbsoluteSize,gui.AbsoluteSize
-			assert(a.X>=0 and a.Y>=0 and a.X+b.X<=screen.X+1 and a.Y+b.Y<=screen.Y+1,`{device}: panel off screen`)
+			local a,b,screen=panel.AbsolutePosition,panel.AbsoluteSize,workspace.CurrentCamera.ViewportSize
+			assert(a.X>=0 and a.Y>=0 and a.X+b.X<=screen.X+1 and a.Y+b.Y<=screen.Y+1,`{device}: panel off screen ({a}, {b} in {screen})`)
 		end
 		driver.setDevice("keyboard")
 		local overlap=OverlapParams.new(); overlap.FilterType=Enum.RaycastFilterType.Include; overlap.FilterDescendantsInstances={driver.sill}

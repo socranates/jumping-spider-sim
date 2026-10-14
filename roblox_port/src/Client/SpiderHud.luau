@@ -200,7 +200,9 @@ function Hud._place(self: any)
 	local key = string.format("%.1f,%.1f,%.1f", x0, x1, bottom)
 	if key == self.lastSpan then return end
 	self.lastSpan = key
-	self.panel.Position = UDim2.fromOffset(x0, bottom)
+	-- Anchored to the safe area's bottom edge (scale 1), so the panel's gap above the bottom holds even if the reported size
+	-- and the children's origin disagree about an inset.
+	self.panel.Position = UDim2.new(0, x0, 1, bottom - size.Y)
 	self.panel.Size = UDim2.fromOffset(math.max(x1 - x0, 0), 0)
 end
 

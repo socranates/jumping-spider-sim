@@ -130,5 +130,22 @@ check("on the line, W reels back and the spider takes hold of the leaf", functio
 	assert(driver.get().mode == "attached" and driver.get().position.Y > 3, `ended at {driver.get().position}`)
 end)
 
+check("holding W at a leaf's edge walks over it and along the underside, never back and forth", function()
+	local driver = ClientStubs.driver
+	driver.place(Vector3.new(0.5, 4.51, -0.5))
+	frames(5)
+	local motor = driver.motor
+	local flips, lastY, under = 0, motor.up.Y, false
+	key("Forward", true)
+	for _ = 1, 120 do
+		frames(1)
+		if motor.up.Y < -0.9 then under = true end
+		if lastY < 0.5 and motor.up.Y > 0.9 and not under then flips += 1 end
+		lastY = motor.up.Y
+	end
+	key("Forward", false)
+	assert(flips == 0 and under, `flips {flips}, underside {under}`)
+end)
+
 print(`CLIENT passed={passed} failed={failed}`)
 if failed > 0 then error("client smoke failed") end

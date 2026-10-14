@@ -8,6 +8,7 @@ local deps = {
 	Species = require("../src/Shared/Data/Species"),
 	Surfaces = require("../src/Shared/Data/Surfaces"),
 	SpiderCamera = require("../src/Client/SpiderCamera"),
+	StickCarry = require("../src/Shared/Movement/StickCarry"),
 	cameraFixtures = { 1, 7 },
 	log = function(line) print("  " .. line) end,
 }

@@ -1584,6 +1584,8 @@ function Motor.new(config: Config): any
 		caught = false,
 		safe = { pos = config.spawn + Vector3.new(0, HEIGHT, 0), up = Vector3.yAxis, heading = config.heading },
 		supportPart = nil :: Instance?, -- the part the spider last took hold of
+		intent = Vector3.zero, -- the walking direction last used, turned with the support at an edge (StickCarry reads it)
+		transitionSerial = 0, -- counts sharp support turns while walking (concave and convex edges)
 		events = {} :: { { kind: string, detail: string } },
 	}, Motor)
 	return self
@@ -1640,6 +1642,15 @@ function Motor._setSupport(self: any, hit: RaycastResult)
 	self.supportPart = hit.Instance
 end
 
+-- A sharp turn of the support while walking (a wall ahead, an edge to wrap): the walking direction turns with it, as the
+-- heading does, and the transition is counted so the controls can carry the stick's direction over the edge.
+function Motor._transition(self: any, hit: RaycastResult)
+	local turn = rotationBetween(self.up, hit.Normal)
+	self.intent = SupportMath.tangentDir(turn * self.intent, hit.Normal)
+	self:_setSupport(hit)
+	self.transitionSerial += 1
+end
+
 function Motor._ray(self: any, from: Vector3, motion: Vector3): RaycastResult?
 	return workspace:Raycast(from, motion, self.params)
 end
@@ -1653,6 +1664,7 @@ function Motor.place(self: any, position: Vector3, up: Vector3?, heading: Vector
 	if self.heading == Vector3.zero then self.heading = SupportMath.anyPerpendicular(self.up) end
 	self.vel = Vector3.zero
 	self.moving = false
+	self.intent = Vector3.zero
 	self.preparing = false
 	self.aimTarget = nil
 	self.plan = nil
@@ -1961,6 +1973,7 @@ function Motor._tickAttached(self: any, input: TickInput)
 		end
 	end
 	self.moving = dir ~= Vector3.zero
+	self.intent = dir
 	if preparing then
 		local target = self.aimTarget
 		if target then self:_turnToward(target - self.pos, PREPARE_TURN_RATE) end
@@ -1987,7 +2000,7 @@ function Motor._tickAttached(self: any, input: TickInput)
 	-- Concave corner: a wall (or a leaf's edge, a stem) ahead becomes the new support.
 	local ahead = self:_ray(self.pos, dir * (HEIGHT + step.Magnitude + 0.02))
 	if ahead and self:attachable(ahead) and SupportMath.angleTo(ahead.Normal, self.up) > math.rad(20) then
-		self:_setSupport(ahead)
+		self:_transition(ahead)
 		return
 	end
 	local nextPos = self.pos + step
@@ -2008,7 +2021,7 @@ function Motor._tickAttached(self: any, input: TickInput)
 	-- Convex edge: wrap over it onto the face beyond (sill edge, leaf rim, the top of a wall).
 	local around = self:_ray(nextPos - self.up * (HEIGHT + 0.15), -dir * 1.0)
 	if around and self:attachable(around) then
-		self:_setSupport(around)
+		self:_transition(around)
 		return
 	end
 	self.mode = "air"
@@ -2109,6 +2122,66 @@ return Motor
         </Item>
         <Item class="ModuleScript" referent="18">
           <Properties>
+            <string name="Name">StickCarry</string>
+            <string name="Source"><![CDATA[--!strict
+-- The carry over an edge: a port of the frozen Godot scripts/movement/player_controller.gd _carry (c87ce00).
+-- On a wall, forward is up; on a floor, away from the camera. So holding the stick forward over a sharp edge would flip
+-- the camera mapping and walk the spider straight back (it would oscillate at the edge). When the support turns sharply
+-- (the motor's transitionSerial changes) while the stick is held, the motor's own direction, which it turned with the
+-- support, is kept instead of the fresh mapping. The carry ends when the stick is released or turned by more than
+-- CARRY_STICK_DEG, or when the fresh mapping agrees with the carried direction again (within CARRY_AGREE_DEG). Pure.
+local StickCarry = {}
+StickCarry.__index = StickCarry
+
+StickCarry.CARRY_STICK_DEG = 30.0
+StickCarry.CARRY_AGREE_DEG = 25.0
+
+function StickCarry.new(): any
+	return setmetatable({ carrying = false, sx = 0, sy = 0, lastSerial = 0 }, StickCarry)
+end
+
+local function angleBetween(a: Vector3, b: Vector3): number
+	return math.atan2(a:Cross(b).Magnitude, a:Dot(b))
+end
+
+-- stick x right, y forward; fresh: the camera mapping on the support now; serial: the motor's transition count;
+-- carried: the motor's own walking direction (turned with the support); inTransition: rounding an edge.
+function StickCarry.step(self: any, sx: number, sy: number, fresh: Vector3, serial: number, carried: Vector3, inTransition: boolean): Vector3
+	local turned = serial ~= self.lastSerial
+	self.lastSerial = serial
+	local length = math.sqrt(sx * sx + sy * sy)
+	if length * length < 1e-8 then
+		self.carrying = false
+		return Vector3.zero
+	end
+	local nx, ny = sx / length, sy / length
+	if turned and not self.carrying then
+		self.carrying = true
+		self.sx, self.sy = nx, ny
+	end
+	if not self.carrying then return fresh end
+	if math.acos(math.clamp(nx * self.sx + ny * self.sy, -1, 1)) > math.rad(StickCarry.CARRY_STICK_DEG) then
+		self.carrying = false
+		return fresh
+	end
+	if carried:Dot(carried) < 1e-8 then
+		self.carrying = false
+		return fresh
+	end
+	local dir = carried.Unit
+	if not inTransition and fresh:Dot(fresh) > 1e-8 and angleBetween(fresh.Unit, dir) < math.rad(StickCarry.CARRY_AGREE_DEG) then
+		self.carrying = false
+		return fresh
+	end
+	return dir * math.min(length, 1)
+end
+
+return StickCarry
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="19">
+          <Properties>
             <string name="Name">SupportMath</string>
             <string name="Source"><![CDATA[--!strict
 -- Port of scripts/movement/support_math.gd (spec 6.1, 6.2). Pure geometry for supported locomotion; unit vectors in world space.
@@ -2189,7 +2262,7 @@ return SupportMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="19">
+        <Item class="ModuleScript" referent="20">
           <Properties>
             <string name="Name">TetherMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -2258,11 +2331,11 @@ return T
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="20">
+      <Item class="Folder" referent="21">
         <Properties>
           <string name="Name">Rig</string>
         </Properties>
-        <Item class="ModuleScript" referent="21">
+        <Item class="ModuleScript" referent="22">
           <Properties>
             <string name="Name">Setae</string>
             <string name="Source"><![CDATA[--!strict
@@ -2393,7 +2466,7 @@ return Setae
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="22">
+        <Item class="ModuleScript" referent="23">
           <Properties>
             <string name="Name">SpiderRig</string>
             <string name="Source"><![CDATA[--!strict
@@ -2906,11 +2979,11 @@ return SpiderRig
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="23">
+      <Item class="Folder" referent="24">
         <Properties>
           <string name="Name">UI</string>
         </Properties>
-        <Item class="ModuleScript" referent="24">
+        <Item class="ModuleScript" referent="25">
           <Properties>
             <string name="Name">ControlText</string>
             <string name="Source"><![CDATA[--!strict
@@ -3129,7 +3202,7 @@ return ControlText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="25">
+        <Item class="ModuleScript" referent="26">
           <Properties>
             <string name="Name">HudLayout</string>
             <string name="Source"><![CDATA[--!strict
@@ -3211,23 +3284,23 @@ return HudLayout
       </Item>
     </Item>
   </Item>
-  <Item class="ServerScriptService" referent="26">
+  <Item class="ServerScriptService" referent="27">
     <Properties>
       <string name="Name">ServerScriptService</string>
     </Properties>
-    <Item class="Folder" referent="27">
+    <Item class="Folder" referent="28">
       <Properties>
         <string name="Name">PortTests</string>
       </Properties>
-      <Item class="ModuleScript" referent="28">
+      <Item class="ModuleScript" referent="29">
         <Properties>
           <string name="Name">BuildInfo</string>
           <string name="Source"><![CDATA[-- Generated by tools/build.py; do not edit.
-return { id = "f3008fb2e2c7a1f7" }
+return { id = "876253fd47783ce3" }
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="29">
+      <Item class="ModuleScript" referent="30">
         <Properties>
           <string name="Name">PromptSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -3277,7 +3350,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="30">
+      <Item class="ModuleScript" referent="31">
         <Properties>
           <string name="Name">RecoveryScenarios</string>
           <string name="Source"><![CDATA[--!strict
@@ -3695,6 +3768,27 @@ return function(check: (string, () -> ()) -> (), deps: any)
 			assert((m.pos - before).Magnitude < 1e-9 and m.heading:Dot(Vector3.zAxis) > 0.99, `preparing: held still and turned to the aim ({m.heading})`)
 		end)
 
+		-- ------------------------------------------------------------------ walking over an edge with the stick held
+		check("holding forward carries the spider over the leaf's edge, along its underside, never back and forth", function()
+			local m = newMotor()
+			local cam = newCamera(m)
+			m:place(Vector3.new(0.5, 4.2 + HEIGHT, -0.5), Vector3.yAxis, Vector3.zAxis)
+			cam:snap()
+			local carry = deps.StickCarry.new()
+			local r = watch(m, cam)
+			local flips, lastUp, underside = 0, m.up, false
+			for _ = 1, 150 do
+				local d = carry:step(0, 1, cam:mapStick(0, 1, m.up), m.transitionSerial, m.intent, false)
+				step(r, input({ wish = if d.Magnitude > 1e-6 then d.Unit else Vector3.zero }))
+				if m.up.Y < -0.9 then underside = true end
+				if lastUp.Y < 0.5 and m.up.Y > 0.9 and not underside then flips += 1 end
+				lastUp = m.up
+			end
+			assert(flips == 0, `turned back onto the top {flips} times`)
+			assert(underside and m.mode == "attached", `never reached the underside (up {m.up})`)
+			assert(#r.problems == 0, table.concat(r.problems, "; "))
+		end)
+
 		-- ------------------------------------------------------------------ ten misses
 		check("ten misses from leaves and the planter are caught and recovered by reeling, lowering or letting go", function()
 			local fixtures: { { any } } = {
@@ -3747,7 +3841,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Script" referent="31">
+      <Item class="Script" referent="32">
         <Properties>
           <string name="Name">Runner</string>
           <token name="RunContext">0</token>
@@ -3770,7 +3864,7 @@ check("Silk spec completes", function() require(script.Parent.SilkSpec)(check) e
 -- Recovery scenarios and the catch camera on real raycasts and sphere casts (the same module the CLI runs on its box world).
 local Shared = game:GetService("ReplicatedStorage"):WaitForChild("Shared")
 local deps = {
-	Motor = require(Shared.Movement.SpiderMotor), JumpInput = require(Shared.Movement.JumpInput),
+	Motor = require(Shared.Movement.SpiderMotor), JumpInput = require(Shared.Movement.JumpInput), StickCarry = require(Shared.Movement.StickCarry),
 	Layout = require(Shared.Habitat.WindowsillLayout), Species = require(Shared.Data.Species), Surfaces = require(Shared.Data.Surfaces),
 	SpiderCamera = require(game:GetService("StarterPlayer"):WaitForChild("StarterPlayerScripts"):WaitForChild("Client"):WaitForChild("SpiderCamera")) :: any,
 	cameraFixtures = "all", transparent = true, yield = function() task.wait() end,
@@ -3793,7 +3887,7 @@ if failed > 0 then warn("PORT_TEST_FAIL") end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="32">
+      <Item class="ModuleScript" referent="33">
         <Properties>
           <string name="Name">SilkSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -3909,7 +4003,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="33">
+      <Item class="ModuleScript" referent="34">
         <Properties>
           <string name="Name">Spec</string>
           <string name="Source"><![CDATA[--!strict
@@ -3999,11 +4093,11 @@ end
         </Properties>
       </Item>
     </Item>
-    <Item class="Folder" referent="34">
+    <Item class="Folder" referent="35">
       <Properties>
         <string name="Name">Server</string>
       </Properties>
-      <Item class="Script" referent="35">
+      <Item class="Script" referent="36">
         <Properties>
           <string name="Name">Main</string>
           <token name="RunContext">0</token>
@@ -4145,19 +4239,19 @@ dof.InFocusRadius = 3.5
       </Item>
     </Item>
   </Item>
-  <Item class="StarterPlayer" referent="36">
+  <Item class="StarterPlayer" referent="37">
     <Properties>
       <string name="Name">StarterPlayer</string>
     </Properties>
-    <Item class="StarterPlayerScripts" referent="37">
+    <Item class="StarterPlayerScripts" referent="38">
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="Folder" referent="38">
+      <Item class="Folder" referent="39">
         <Properties>
           <string name="Name">Client</string>
         </Properties>
-        <Item class="ModuleScript" referent="39">
+        <Item class="ModuleScript" referent="40">
           <Properties>
             <string name="Name">SpiderCamera</string>
             <string name="Source"><![CDATA[--!strict
@@ -4524,7 +4618,7 @@ return SpiderCamera
 ]]></string>
           </Properties>
         </Item>
-        <Item class="LocalScript" referent="40">
+        <Item class="LocalScript" referent="41">
           <Properties>
             <string name="Name">SpiderClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -4556,6 +4650,7 @@ local Movement = Shared:WaitForChild("Movement")
 local SupportMath = require(Movement:WaitForChild("SupportMath"))
 local SpiderMotor = require(Movement:WaitForChild("SpiderMotor"))
 local JumpInput = require(Movement:WaitForChild("JumpInput"))
+local StickCarry = require(Movement:WaitForChild("StickCarry"))
 local ControlText = require(Shared:WaitForChild("UI"):WaitForChild("ControlText"))
 local Species = require(Shared:WaitForChild("Data"):WaitForChild("Species"))
 local Surfaces = require(Shared:WaitForChild("Data"):WaitForChild("Surfaces"))
@@ -4589,6 +4684,7 @@ local motor: any = SpiderMotor.new({
 	boundsMin = Layout.PLAY_BOUNDS_MIN, boundsMax = Layout.PLAY_BOUNDS_MAX, probeParent = arc,
 })
 local jump: any = JumpInput.new()
+local carry: any = StickCarry.new()
 -- Touch-only devices get the lighter fuzz until a real tablet frame-time check (ROBLOX_PORT.md).
 local rig = SpiderRig.new(Workspace, sill, nil, if UIS.TouchEnabled and not UIS.KeyboardEnabled then "low" else "full")
 local hud = SpiderHud.new(player:WaitForChild("PlayerGui"))
@@ -4786,8 +4882,12 @@ local function tickInput(): any
 	local r, f = controls:axes()
 	local wish = Vector3.zero
 	if r ~= 0 or f ~= 0 then
-		local d = cam:mapStick(r, f, motor.up)
+		-- Over a sharp edge the stick keeps carrying the spider the way it was going (Godot's carry), so holding forward
+		-- never walks it straight back when the camera's idea of forward flips from floor to wall.
+		local d = carry:step(r, f, cam:mapStick(r, f, motor.up), motor.transitionSerial, motor.intent, false)
 		if d.Magnitude > 1e-6 then wish = d.Unit end
+	else
+		carry:step(0, 0, Vector3.zero, motor.transitionSerial, motor.intent, false)
 	end
 	local focusPoint: Vector3? = nil
 	if controls.held.Focus then
@@ -4962,7 +5062,7 @@ end
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="41">
+        <Item class="ModuleScript" referent="42">
           <Properties>
             <string name="Name">SpiderHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -5199,7 +5299,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="42">
+        <Item class="ModuleScript" referent="43">
           <Properties>
             <string name="Name">SpiderInput</string>
             <string name="Source"><![CDATA[--!strict
@@ -5399,7 +5499,7 @@ return SpiderInput
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="43">
+        <Item class="ModuleScript" referent="44">
           <Properties>
             <string name="Name">SilkPlayback</string>
             <string name="Source"><![CDATA[--!strict
@@ -5511,7 +5611,7 @@ end
       </Item>
     </Item>
   </Item>
-  <Item class="Workspace" referent="44">
+  <Item class="Workspace" referent="45">
     <Properties>
       <string name="Name">Workspace</string>
       <float name="Gravity">35</float>

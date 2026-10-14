@@ -413,6 +413,27 @@ return function(check: (string, () -> ()) -> (), deps: any)
 			assert((m.pos - before).Magnitude < 1e-9 and m.heading:Dot(Vector3.zAxis) > 0.99, `preparing: held still and turned to the aim ({m.heading})`)
 		end)
 
+		-- ------------------------------------------------------------------ walking over an edge with the stick held
+		check("holding forward carries the spider over the leaf's edge, along its underside, never back and forth", function()
+			local m = newMotor()
+			local cam = newCamera(m)
+			m:place(Vector3.new(0.5, 4.2 + HEIGHT, -0.5), Vector3.yAxis, Vector3.zAxis)
+			cam:snap()
+			local carry = deps.StickCarry.new()
+			local r = watch(m, cam)
+			local flips, lastUp, underside = 0, m.up, false
+			for _ = 1, 150 do
+				local d = carry:step(0, 1, cam:mapStick(0, 1, m.up), m.transitionSerial, m.intent, false)
+				step(r, input({ wish = if d.Magnitude > 1e-6 then d.Unit else Vector3.zero }))
+				if m.up.Y < -0.9 then underside = true end
+				if lastUp.Y < 0.5 and m.up.Y > 0.9 and not underside then flips += 1 end
+				lastUp = m.up
+			end
+			assert(flips == 0, `turned back onto the top {flips} times`)
+			assert(underside and m.mode == "attached", `never reached the underside (up {m.up})`)
+			assert(#r.problems == 0, table.concat(r.problems, "; "))
+		end)
+
 		-- ------------------------------------------------------------------ ten misses
 		check("ten misses from leaves and the planter are caught and recovered by reeling, lowering or letting go", function()
 			local fixtures: { { any } } = {

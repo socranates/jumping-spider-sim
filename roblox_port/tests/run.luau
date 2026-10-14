@@ -418,5 +418,36 @@ do
 	check(near(f:setEnabled(false), 0.4, 1e-15) and f.assist == 0 and f:setEnabled(true) == 0, "switching the framing off with a turn held hands it to the player")
 end
 
+
+-- ---------------------------------------------------------------- ROBLOX-11: the stick's carry over an edge (player_controller._carry)
+local StickCarry = require("../src/Shared/Movement/StickCarry")
+do
+	local up, down, fwd = Vector3.new(0, 1, 0), Vector3.new(0, -1, 0), Vector3.new(0, 0, 1)
+	local c = StickCarry.new()
+	local d = c:step(0, 1, fwd, 0, fwd, false)
+	check(d == fwd and not c.carrying, "without a sharp turn the stick follows the view")
+	d = c:step(0, 1, up, 1, down, false)
+	check(c.carrying and (d - down).Magnitude < 1e-12, "a sharp turn with the stick held keeps the motor's own direction (down the face), not the view's (up)")
+	d = c:step(0.3, 1, up, 1, down, false)
+	check(c.carrying and (d - down).Magnitude < 1e-12, "turning the stick less than 30 degrees keeps carrying")
+	d = c:step(1, 0.3, Vector3.xAxis, 1, down, false)
+	check(not c.carrying and d == Vector3.xAxis, "turning the stick more than 30 degrees hands back to the view")
+	c:step(0, 1, up, 2, down, false)
+	d = c:step(0, 0, up, 2, down, false)
+	check(not c.carrying and d == Vector3.zero, "releasing the stick ends the carry")
+	c:step(0, 1, up, 3, down, false)
+	local nearly = Vector3.new(0, -0.95, 0.31).Unit
+	d = c:step(0, 1, nearly, 3, down, false)
+	check(not c.carrying and d == nearly, "the view agreeing again (within 25 degrees) ends the carry")
+	c:step(0, 1, up, 4, down, false)
+	d = c:step(0, 1, nearly, 4, down, true)
+	check(c.carrying and (d - down).Magnitude < 1e-12, "not while rounding an edge")
+	c = StickCarry.new()
+	d = c:step(0, 0.5, up, 1, down, false)
+	check((d - down * 0.5).Magnitude < 1e-12, "the carried direction keeps the stick's strength")
+	d = c:step(0, 1, up, 2, Vector3.zero, false)
+	check(not c.carrying and d == up, "nothing to carry: the view's mapping")
+end
+
 print(`SUMMARY passed={passed} failed={failed}`)
 if failed > 0 then error("port check failed") end

@@ -17,7 +17,7 @@ check("Silk spec completes", function() require(script.Parent.SilkSpec)(check) e
 -- Recovery scenarios and the catch camera on real raycasts and sphere casts (the same module the CLI runs on its box world).
 local Shared = game:GetService("ReplicatedStorage"):WaitForChild("Shared")
 local deps = {
-	Motor = require(Shared.Movement.SpiderMotor), JumpInput = require(Shared.Movement.JumpInput),
+	Motor = require(Shared.Movement.SpiderMotor), JumpInput = require(Shared.Movement.JumpInput), StickCarry = require(Shared.Movement.StickCarry),
 	Layout = require(Shared.Habitat.WindowsillLayout), Species = require(Shared.Data.Species), Surfaces = require(Shared.Data.Surfaces),
 	SpiderCamera = require(game:GetService("StarterPlayer"):WaitForChild("StarterPlayerScripts"):WaitForChild("Client"):WaitForChild("SpiderCamera")) :: any,
 	cameraFixtures = "all", transparent = true, yield = function() task.wait() end,

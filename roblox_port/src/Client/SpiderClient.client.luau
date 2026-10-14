@@ -27,6 +27,7 @@ local Movement = Shared:WaitForChild("Movement")
 local SupportMath = require(Movement:WaitForChild("SupportMath"))
 local SpiderMotor = require(Movement:WaitForChild("SpiderMotor"))
 local JumpInput = require(Movement:WaitForChild("JumpInput"))
+local StickCarry = require(Movement:WaitForChild("StickCarry"))
 local ControlText = require(Shared:WaitForChild("UI"):WaitForChild("ControlText"))
 local Species = require(Shared:WaitForChild("Data"):WaitForChild("Species"))
 local Surfaces = require(Shared:WaitForChild("Data"):WaitForChild("Surfaces"))
@@ -60,6 +61,7 @@ local motor: any = SpiderMotor.new({
 	boundsMin = Layout.PLAY_BOUNDS_MIN, boundsMax = Layout.PLAY_BOUNDS_MAX, probeParent = arc,
 })
 local jump: any = JumpInput.new()
+local carry: any = StickCarry.new()
 -- Touch-only devices get the lighter fuzz until a real tablet frame-time check (ROBLOX_PORT.md).
 local rig = SpiderRig.new(Workspace, sill, nil, if UIS.TouchEnabled and not UIS.KeyboardEnabled then "low" else "full")
 local hud = SpiderHud.new(player:WaitForChild("PlayerGui"))
@@ -257,8 +259,12 @@ local function tickInput(): any
 	local r, f = controls:axes()
 	local wish = Vector3.zero
 	if r ~= 0 or f ~= 0 then
-		local d = cam:mapStick(r, f, motor.up)
+		-- Over a sharp edge the stick keeps carrying the spider the way it was going (Godot's carry), so holding forward
+		-- never walks it straight back when the camera's idea of forward flips from floor to wall.
+		local d = carry:step(r, f, cam:mapStick(r, f, motor.up), motor.transitionSerial, motor.intent, false)
 		if d.Magnitude > 1e-6 then wish = d.Unit end
+	else
+		carry:step(0, 0, Vector3.zero, motor.transitionSerial, motor.intent, false)
 	end
 	local focusPoint: Vector3? = nil
 	if controls.held.Focus then

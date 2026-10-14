@@ -106,6 +106,8 @@ function Motor.new(config: Config): any
 		caught = false,
 		safe = { pos = config.spawn + Vector3.new(0, HEIGHT, 0), up = Vector3.yAxis, heading = config.heading },
 		supportPart = nil :: Instance?, -- the part the spider last took hold of
+		intent = Vector3.zero, -- the walking direction last used, turned with the support at an edge (StickCarry reads it)
+		transitionSerial = 0, -- counts sharp support turns while walking (concave and convex edges)
 		events = {} :: { { kind: string, detail: string } },
 	}, Motor)
 	return self
@@ -162,6 +164,15 @@ function Motor._setSupport(self: any, hit: RaycastResult)
 	self.supportPart = hit.Instance
 end
 
+-- A sharp turn of the support while walking (a wall ahead, an edge to wrap): the walking direction turns with it, as the
+-- heading does, and the transition is counted so the controls can carry the stick's direction over the edge.
+function Motor._transition(self: any, hit: RaycastResult)
+	local turn = rotationBetween(self.up, hit.Normal)
+	self.intent = SupportMath.tangentDir(turn * self.intent, hit.Normal)
+	self:_setSupport(hit)
+	self.transitionSerial += 1
+end
+
 function Motor._ray(self: any, from: Vector3, motion: Vector3): RaycastResult?
 	return workspace:Raycast(from, motion, self.params)
 end
@@ -175,6 +186,7 @@ function Motor.place(self: any, position: Vector3, up: Vector3?, heading: Vector
 	if self.heading == Vector3.zero then self.heading = SupportMath.anyPerpendicular(self.up) end
 	self.vel = Vector3.zero
 	self.moving = false
+	self.intent = Vector3.zero
 	self.preparing = false
 	self.aimTarget = nil
 	self.plan = nil
@@ -483,6 +495,7 @@ function Motor._tickAttached(self: any, input: TickInput)
 		end
 	end
 	self.moving = dir ~= Vector3.zero
+	self.intent = dir
 	if preparing then
 		local target = self.aimTarget
 		if target then self:_turnToward(target - self.pos, PREPARE_TURN_RATE) end
@@ -509,7 +522,7 @@ function Motor._tickAttached(self: any, input: TickInput)
 	-- Concave corner: a wall (or a leaf's edge, a stem) ahead becomes the new support.
 	local ahead = self:_ray(self.pos, dir * (HEIGHT + step.Magnitude + 0.02))
 	if ahead and self:attachable(ahead) and SupportMath.angleTo(ahead.Normal, self.up) > math.rad(20) then
-		self:_setSupport(ahead)
+		self:_transition(ahead)
 		return
 	end
 	local nextPos = self.pos + step
@@ -530,7 +543,7 @@ function Motor._tickAttached(self: any, input: TickInput)
 	-- Convex edge: wrap over it onto the face beyond (sill edge, leaf rim, the top of a wall).
 	local around = self:_ray(nextPos - self.up * (HEIGHT + 0.15), -dir * 1.0)
 	if around and self:attachable(around) then
-		self:_setSupport(around)
+		self:_transition(around)
 		return
 	end
 	self.mode = "air"

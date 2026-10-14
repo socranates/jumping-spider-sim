@@ -24,6 +24,7 @@ MODULES = [
     ("LineFraming", "Movement/LineFraming.luau"),
     ("InputState", "Movement/InputState.luau"),
     ("JumpInput", "Movement/JumpInput.luau"),
+    ("StickCarry", "Movement/StickCarry.luau"),
     ("SilkController", "Movement/SilkController.luau"),
     ("SpiderMotor", "Movement/SpiderMotor.luau"),
     ("ControlText", "UI/ControlText.luau"),

@@ -86,6 +86,10 @@ for _, spec in Layout.PIECES do
 end
 check(sillOk and #sill:GetChildren() == #Layout.PIECES, "the sill's pieces keep their geometry, colour, profile, solidity and queryability")
 check(listed.back_frame.Transparency == 1 and listed.back_frame.CastShadow == false and listed.sill_floor.Transparency == 0, "only the back wall turns invisible (still solid)")
+-- If the drawn wall could not be built (Main.server.luau catches that), the solid wall must not be left invisible.
+local plain = Scenery.sill(false)
+local plainBack = plain:FindFirstChild("back_frame") :: Part
+check(plainBack.Transparency == 0 and plainBack.CastShadow ~= false and #plain:GetChildren() == #Layout.PIECES, "without the drawn wall the back wall stays visible")
 
 -- ---------------------------------------------------------------- the decor
 local sun = Vector3.new(0.35, 0.5, -0.8).Unit
@@ -98,6 +102,19 @@ for _, d in decor:GetDescendants() do
 	end
 end
 check(bad == 0, "every decor part is anchored, non-colliding, not touchable and invisible to rays")
+
+-- An optional piece that fails is left out with a warning; the wall and the other pieces stay.
+do
+	local warned = {}
+	warn = function(message: string) table.insert(warned, message) end
+	local realDetails = Scenery.details
+	Scenery.details = function() error("boom") end
+	local partial = Scenery.decor(sun)
+	Scenery.details = realDetails
+	check(#warned == 1 and string.find(warned[1], "details", 1, true) ~= nil and partial:FindFirstChild("Wall") ~= nil
+		and partial:FindFirstChild("Shafts") ~= nil and partial:FindFirstChild("View") ~= nil and partial:FindFirstChild("Details") == nil,
+		"an optional piece that fails is left out with a warning, and the rest of the decor is kept")
+end
 check(#parts >= 70 and #parts <= 140, `decor part count is modest ({#parts})`)
 for _, name in { "Wall", "View", "Details", "Shafts", "DustVolume", "soil", "silk_0", "silk_6" } do
 	check(decor:FindFirstChild(name) ~= nil, "decor has " .. name)

@@ -51,7 +51,8 @@ local function piece(id: string): Layout.Piece
 end
 
 -- ---------------------------------------------------------------- the physical sill
-function Scenery.sill(): Folder
+-- `wallDrawn`: false when the drawn window wall could not be built, so the solid back wall stays visible instead of leaving a hole.
+function Scenery.sill(wallDrawn: boolean?): Folder
 	local sill = Instance.new("Folder")
 	sill.Name = "Windowsill"
 	sill:SetAttribute("ContentRevision", Layout.CONTENT_REVISION)
@@ -68,7 +69,7 @@ function Scenery.sill(): Folder
 		p.BottomSurface = Enum.SurfaceType.Smooth
 		p:SetAttribute("SurfaceId", spec.id)
 		p:SetAttribute("ProfileId", spec.profile)
-		if spec.id == W.hidden then
+		if spec.id == W.hidden and wallDrawn ~= false then
 			-- still solid and climbable; Scenery.window draws the wall in its place, with a see-through opening
 			p.Transparency = 1
 			p.CastShadow = false
@@ -256,6 +257,14 @@ end
 
 -- ---------------------------------------------------------------- everything drawn that is not the sill
 -- `sun`: the unit vector toward the sun (Lit.apply's result), for the shafts; nil builds none.
+-- The looks are best effort: a piece that fails (nothing here has run in Roblox Studio yet) is warned about and left out, and
+-- the rest is kept. The wall and the old decor entries are not optional: if they fail, Scenery.decor fails and the server
+-- keeps the plain back wall (Server/Main).
+local function attempt(what: string, build: () -> unknown)
+	local ok, err = pcall(build)
+	if not ok then warn(`[Windowsill] decor: {what} failed: {tostring(err)}`) end
+end
+
 function Scenery.decor(sun: Vector3?): Folder
 	local decor = Instance.new("Folder")
 	decor.Name = "Decor"
@@ -266,10 +275,10 @@ function Scenery.decor(sun: Vector3?): Folder
 		end
 	end
 	Scenery.window(decor)
-	Scenery.dust(decor)
-	Scenery.view(decor)
-	Scenery.details(decor)
-	if sun then Scenery.shafts(decor, sun) end
+	attempt("dust", function() return Scenery.dust(decor) end)
+	attempt("view", function() return Scenery.view(decor) end)
+	attempt("details", function() return Scenery.details(decor) end)
+	if sun then attempt("shafts", function() return Scenery.shafts(decor, sun) end) end
 	return decor
 end
 

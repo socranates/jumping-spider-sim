@@ -1,4 +1,4 @@
-python3 tests/run.py luau (Luau CLI 0.742, Linux), evidence adc98ada3f8930a2
+python3 tests/run.py luau (Luau CLI 0.742, Linux), evidence 522744ec33d68fa0
 fuzz: 400 body hairs, 142 leg hairs, 67 white
 SUMMARY passed=182 failed=0
   1 east leaf, front: caught true, settled true, reel true, 269 ticks, max turn 0
@@ -18,4 +18,4 @@ LOOK passed=54 failed=0
 world: invented sun, z flip 1: picks clock 9.75, latitude 40.7, 39 degrees high, 46 degrees off straight-out-of-the-window
 world: invented sun, z flip -1: picks clock 9.75, latitude -40.7, 39 degrees high, 46 degrees off straight-out-of-the-window
 world: decor 76 parts at full detail, 34 at low (view 31 items at full), dust 7 -> 2.8 per second
-WORLD passed=69 failed=0
+WORLD passed=71 failed=0

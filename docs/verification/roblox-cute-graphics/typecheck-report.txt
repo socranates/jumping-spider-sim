@@ -1,5 +1,5 @@
 luau-lsp 1.70.1 analyze --platform roblox --definitions globalTypes.d.luau --sourcemap (rojo sourcemap default.project.json) src
 files marked --!strict are checked in strict mode (every src file is)
-evidence adc98ada3f8930a2
+evidence 522744ec33d68fa0
 diagnostics: 0
 strict files in src: 32 of 32

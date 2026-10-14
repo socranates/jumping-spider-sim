@@ -4,8 +4,9 @@ The CLI sandboxes globals per module, so this bundles the Vector3/CFrame shim (t
 reference tables and the shared modules into one chunk, where each module is an ordinary local value. Then it runs
 tests/run.luau (pure logic and goldens), tests/scenarios.luau (recovery scenarios against a box-world emulation of
 raycasts and sphere casts: a smoke test of the real motor, silk and camera code, not the Roblox engine) and
-tests/client_smoke.luau (the client scripts themselves, driven through stub services and simulated keys).
-Usage (from roblox_port/):  python3 tests/run.py [path/to/luau]"""
+tests/client_smoke.luau (the client scripts themselves, driven through stub services and simulated keys) and
+tests/look.luau (the daughter's pattern pinned, the look knobs, idle motion and part budgets of the real rig).
+Usage (from roblox_port/):  python3 tests/run.py [path/to/luau [test.luau ...]]   (default: all of them)"""
 import pathlib, re, subprocess, sys, tempfile
 
 HERE = pathlib.Path(__file__).resolve().parent
@@ -34,12 +35,13 @@ MODULES = [
     ("Idle", "Rig/Idle.luau"),
     ("SpiderCamera", "../Client/SpiderCamera.luau"),
 ]
-# The client scripts, bundled only for tests/client_smoke.luau.
+# The client scripts, bundled only for the tests that run the real rig and client (CLIENT_TESTS).
 CLIENT_MODULES = [
     ("SpiderRig", "Rig/SpiderRig.luau"),
     ("SpiderInput", "../Client/SpiderInput.luau"),
     ("SpiderHud", "../Client/SpiderHud.luau"),
 ]
+CLIENT_TESTS = {"client_smoke.luau", "look.luau"}
 REFERENCES = ["jump_reference", "tether_reference", "camera_reference", "framing_reference"]
 NAMES = {name for name, _ in MODULES + CLIENT_MODULES}
 
@@ -76,7 +78,7 @@ def bundle(test_file):
         path = HERE / (ref + ".luau")
         if path.exists():
             parts.append(f"__refs.{ref} = " + chunk(path))
-    for name, rel in MODULES + (CLIENT_MODULES if test_file == "client_smoke.luau" else []):
+    for name, rel in MODULES + (CLIENT_MODULES if test_file in CLIENT_TESTS else []):
         path = SRC / rel
         if path.exists():
             parts.append(f"__mods.{name} = " + chunk(path))
@@ -89,7 +91,7 @@ def bundle(test_file):
 
 luau = sys.argv[1] if len(sys.argv) > 1 else "luau"
 status = 0
-for test_file in ["run.luau", "scenarios.luau", "client_smoke.luau"]:
+for test_file in sys.argv[2:] or ["run.luau", "scenarios.luau", "client_smoke.luau", "look.luau"]:
     if not (HERE / test_file).exists():
         continue
     with tempfile.NamedTemporaryFile("w", suffix=".luau", encoding="utf-8", delete=False) as f:

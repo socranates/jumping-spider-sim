@@ -416,8 +416,9 @@ function SpiderRig.update(self: Rig, body: CFrame, dt: number, grounded: boolean
 	end
 	put(self.root, body)
 
-	-- Palps drum in bursts while the spider stands still; breathing and a curious head tilt ease in after a moment (full detail).
-	local standing = grounded and not moving and not self.reducedMotion
+	-- Palps drum in bursts while the spider stands still; breathing and a curious head tilt ease in after a moment. All of
+	-- it is full detail only (cfg.idle), and reducedMotion turns it off too.
+	local standing = cfg.idle and grounded and not moving and not self.reducedMotion
 	self._drum = math.clamp(self._drum + (if standing then 3 else -3) * dt, 0, 1)
 	local palpAngle = Idle.palps(self._t, self._drum, look.palp)
 	local bodyBase, headBase, abdomenBase = body, body, body

@@ -113,7 +113,8 @@ local first = {
 	},
 
 	-- ---------------------------------------------------------------- idle motion (drawn rig only, ROBLOX-13)
-	-- Eased in after the spider has stood still for a moment; off while walking, in the air, in low detail and with reducedMotion.
+	-- Eased in after the spider has stood still for a moment; off while walking, in the air, in low detail and with reducedMotion
+	-- (the palps' drumming follows the same rule).
 	idle = {
 		riseSeconds = 1.0, fallSeconds = 0.25,
 		breathe = { period = 3.3, bodyLift = 0.006, lift = 0.016, pitchDeg = 2.4 },
@@ -123,8 +124,8 @@ local first = {
 
 	-- ---------------------------------------------------------------- detail modes
 	-- Full is for PCs. Low is for phones and tablets (touch-only devices, or Workspace attribute Detail = "low"): fewer
-	-- hairs (keep one in `every`), a single fur shell, no foot balls, half the speckles, no outline and no breathing or
-	-- head tilt (the palps still drum). The pattern, eyes, catchlights and tufts stay.
+	-- hairs (keep one in `every`), a single fur shell, no foot balls, half the speckles, no outline and no idle motion at all
+	-- (no breathing, head tilt or palp drumming). The pattern, eyes, catchlights and tufts stay.
 	detail = {
 		full = {
 			every = { lock = 1, guard = 1, tuft = 1, ruff = 1, palp = 1, leg = 1 },

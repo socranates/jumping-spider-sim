@@ -1,23 +1,63 @@
 <roblox version="4">
-  <Item class="Players" referent="0">
+  <Item class="Lighting" referent="0">
+    <Properties>
+      <string name="Name">Lighting</string>
+      <token name="Technology">4</token>
+    </Properties>
+  </Item>
+  <Item class="Players" referent="1">
     <Properties>
       <string name="Name">Players</string>
       <bool name="CharacterAutoLoads">false</bool>
     </Properties>
   </Item>
-  <Item class="ReplicatedStorage" referent="1">
+  <Item class="ReplicatedStorage" referent="2">
     <Properties>
       <string name="Name">ReplicatedStorage</string>
     </Properties>
-    <Item class="Folder" referent="2">
+    <Item class="Folder" referent="3">
       <Properties>
         <string name="Name">Shared</string>
       </Properties>
-      <Item class="Folder" referent="3">
+      <Item class="Folder" referent="4">
         <Properties>
           <string name="Name">Data</string>
         </Properties>
-        <Item class="ModuleScript" referent="4">
+        <Item class="ModuleScript" referent="5">
+          <Properties>
+            <string name="Name">Appearances</string>
+            <string name="Source"><![CDATA[--!strict
+-- Artist-directed appearance, independent of species tuning, growth and physics.
+-- Nathan's daughter's pick: docs/art/first-spider-reference.jpg (2026-10-14).
+-- Coordinates for markings are fractions of the abdomen's X/Z radii; -Z is front.
+local first = {
+	id = "first_spider",
+	name = "First spider",
+	body = { 0, 0, 0 },
+	legs = { 0, 0, 0 },
+	white = { 0.94, 0.94, 0.92 },
+	eyes = { 0.008, 0.008, 0.008 },
+	fangs = { 0.025, 0.025, 0.025 },
+	headRadii = { 0.245, 0.18, 0.255 },
+	abdomenRadii = { 0.25, 0.205, 0.285 },
+	frontLegScale = 1.28,
+	bandFraction = 0.23,
+	speckleCount = 24,
+	-- Large centre, two small elongated anterior spots, two posterior ovals.
+	spots = {
+		{ x = 0, z = 0.10, rx = 0.080, rz = 0.074, angle = 0 },
+		{ x = -0.34, z = -0.46, rx = 0.018, rz = 0.034, angle = -0.35 },
+		{ x = 0.34, z = -0.46, rx = 0.018, rz = 0.034, angle = 0.35 },
+		{ x = -0.35, z = 0.67, rx = 0.025, rz = 0.035, angle = 0.4 },
+		{ x = 0.35, z = 0.67, rx = 0.025, rz = 0.035, angle = -0.4 },
+	},
+}
+
+return { default = "first_spider", profiles = { first_spider = first } }
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="6">
           <Properties>
             <string name="Name">Species</string>
             <string name="Source"><![CDATA[--!strict
@@ -191,7 +231,7 @@ return table.freeze(data)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="5">
+        <Item class="ModuleScript" referent="7">
           <Properties>
             <string name="Name">Surfaces</string>
             <string name="Source"><![CDATA[--!strict
@@ -295,11 +335,11 @@ return table.freeze(data)
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="6">
+      <Item class="Folder" referent="8">
         <Properties>
           <string name="Name">Habitat</string>
         </Properties>
-        <Item class="ModuleScript" referent="7">
+        <Item class="ModuleScript" referent="9">
           <Properties>
             <string name="Name">WindowsillLayout</string>
             <string name="Source"><![CDATA[--!strict
@@ -377,11 +417,44 @@ return table.freeze(Layout)
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="8">
+      <Item class="Folder" referent="10">
         <Properties>
           <string name="Name">Movement</string>
         </Properties>
-        <Item class="ModuleScript" referent="9">
+        <Item class="ModuleScript" referent="11">
+          <Properties>
+            <string name="Name">InputState</string>
+            <string name="Source"><![CDATA[--!strict
+-- Pure input state: test without Studio. +Y is forward on the control pad.
+local InputState = {}
+InputState.__index = InputState
+function InputState.new()
+	return setmetatable({ held = {} :: {[string]: boolean}, x = 0, y = 0 }, InputState)
+end
+function InputState.set(self, action: string, down: boolean)
+	self.held[action] = down
+end
+function InputState.stick(self, x: number, y: number)
+	local length = math.sqrt(x*x + y*y)
+	local strength = math.clamp((length - 0.2) / 0.8, 0, 1)
+	self.x = if length > 0 then x / length * strength else 0
+	self.y = if length > 0 then y / length * strength else 0
+end
+function InputState.axes(self): (number, number)
+	local x = self.x + (if self.held.Right then 1 else 0) - (if self.held.Left then 1 else 0)
+	local y = self.y + (if self.held.Forward then 1 else 0) - (if self.held.Back then 1 else 0)
+	local length = math.max(1, math.sqrt(x*x + y*y))
+	return x / length, y / length
+end
+function InputState.clear(self)
+	table.clear(self.held)
+	self.x, self.y = 0, 0
+end
+return InputState
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="12">
           <Properties>
             <string name="Name">JumpMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -539,7 +612,7 @@ return JumpMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="10">
+        <Item class="ModuleScript" referent="13">
           <Properties>
             <string name="Name">SupportMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -622,11 +695,11 @@ return SupportMath
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="11">
+      <Item class="Folder" referent="14">
         <Properties>
           <string name="Name">Rig</string>
         </Properties>
-        <Item class="ModuleScript" referent="12">
+        <Item class="ModuleScript" referent="15">
           <Properties>
             <string name="Name">SpiderRig</string>
             <string name="Source"><![CDATA[--!strict
@@ -636,6 +709,7 @@ return SupportMath
 -- Body frame: +Y support-up, -Z forward, about 1 stud long (1 Godot WU = 1 cm = 1 stud).
 
 local Workspace = game:GetService("Workspace")
+local Appearances = require(script.Parent.Parent.Data.Appearances)
 
 local SpiderRig = {}
 SpiderRig.__index = SpiderRig
@@ -654,13 +728,6 @@ local ANKLE_LIFT = 0.045
 local PALP_DRUM_HZ = 3.2
 local PALP_DRUM_DEG = 11
 
-local BODY = Color3.new(0.14, 0.11, 0.10)
-local LEG = Color3.new(0.19, 0.15, 0.13)
-local JOINT = Color3.new(0.29, 0.25, 0.22)
-local EYE = Color3.new(0.01, 0.01, 0.01)
-local SPOT_ADULT = Color3.new(0.92, 0.9, 0.84)
-local SPOT_JUVENILE = Color3.new(0.93, 0.47, 0.16)
-local FANG = Color3.fromRGB(26, 150, 112)
 
 type Leg = {
 	side: number,
@@ -676,6 +743,7 @@ type Leg = {
 	tarsus: Part,
 	knee: Part,
 	ankle: Part,
+	bands: {Part},
 }
 
 type Fixed = { part: Part, offset: CFrame, palp: number? }
@@ -692,6 +760,7 @@ export type Rig = typeof(setmetatable(
 		_t: number,
 		_drum: number,
 		_spots: { Part },
+	_appearance: any,
 		_params: RaycastParams,
 		_parts: { BasePart },
 		_cframes: { CFrame },
@@ -745,9 +814,16 @@ local function rodCFrame(a: Vector3, b: Vector3): CFrame
 	return CFrame.lookAt((a + b) * 0.5, b) * CFrame.Angles(0, math.pi / 2, 0)
 end
 
-function SpiderRig.new(parent: Instance, worldFolder: Instance): Rig
+function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: string?): Rig
+	local look = Appearances.profiles[appearanceId or Appearances.default]
+	assert(look, "Unknown spider appearance")
+	local function color(rgb): Color3 return Color3.new(rgb[1], rgb[2], rgb[3]) end
+	local BODY, LEG = color(look.body), color(look.legs)
+	local JOINT, EYE, FANG = color(look.white), color(look.eyes), color(look.fangs)
+	local WHITE = color(look.white)
 	local model = Instance.new("Model")
 	model.Name = "Spider"
+	model:SetAttribute("AppearanceId", look.id)
 	local root = newPart(model, "Root", BODY, Enum.Material.SmoothPlastic)
 	root.Size = Vector3.new(1, 0.5, 1)
 	root.Transparency = 1
@@ -769,6 +845,7 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance): Rig
 		_t = 0,
 		_drum = 0,
 		_spots = {} :: { Part },
+		_appearance = look,
 		_params = params,
 		_parts = {} :: { BasePart },
 		_cframes = {} :: { CFrame },
@@ -777,26 +854,35 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance): Rig
 	local function fixed(part: Part, at: Vector3, rot: CFrame?, palp: number?)
 		table.insert(self._fixed, { part = part, offset = CFrame.new(at) * (rot or CFrame.identity), palp = palp })
 	end
-	local fabric = Enum.Material.Fabric -- velvety setae read better than plastic at this scale
-	fixed(ellipsoid(model, "Cephalothorax", Vector3.new(0.22, 0.155, 0.26), BODY, fabric), Vector3.new(0, 0.02, -0.20))
+	local fabric = Enum.Material.SmoothPlastic -- clean high-contrast silhouette
+	fixed(ellipsoid(model, "Cephalothorax", Vector3.new(table.unpack(look.headRadii)), BODY, fabric), Vector3.new(0, 0.02, -0.20))
 	fixed(ellipsoid(model, "EyeFace", Vector3.new(0.205, 0.165, 0.125), BODY, fabric), Vector3.new(0, 0.055, -0.355))
 	fixed(ellipsoid(model, "Pedicel", Vector3.new(0.05, 0.05, 0.06), BODY, fabric), Vector3.new(0, -0.035, -0.06))
-	fixed(ellipsoid(model, "Abdomen", Vector3.new(0.21, 0.19, 0.30), BODY, fabric), Vector3.new(0, 0.04, 0.20))
-	local band = ellipsoid(model, "BasalBand", Vector3.new(0.15, 0.022, 0.03), SPOT_JUVENILE, Enum.Material.SmoothPlastic)
-	fixed(band, Vector3.new(0, 0.115, -0.07), CFrame.Angles(0.9, 0, 0))
-	local tri = ellipsoid(model, "CentralSpot", Vector3.new(0.075, 0.012, 0.07), SPOT_JUVENILE, Enum.Material.SmoothPlastic)
-	fixed(tri, Vector3.new(0, 0.226, 0.14))
-	table.insert(self._spots, band)
-	table.insert(self._spots, tri)
+	fixed(ellipsoid(model, "Abdomen", Vector3.new(table.unpack(look.abdomenRadii)), BODY, fabric), Vector3.new(0, 0.04, 0.20))
+	local ar = look.abdomenRadii
+	local function marking(name: string, x: number, z: number, rx: number, rz: number, angle: number)
+		local y = ar[2] * math.sqrt(math.max(0, 1 - x*x - z*z))
+		local spot = ellipsoid(model, name, Vector3.new(rx, 0.012, rz), WHITE, fabric)
+		fixed(spot, Vector3.new(x * ar[1], 0.047 + y, 0.20 + z * ar[3]), CFrame.Angles(0, angle, 0))
+		table.insert(self._spots, spot)
+	end
+	-- A curved pale band across the front of the abdomen.
+	for i = -4, 4 do
+		marking("FrontBand", i * 0.16, -0.66, 0.031, 0.018, 0)
+	end
+	for _, spot in look.spots do
+		marking("AbdomenSpot", spot.x, spot.z, spot.rx, spot.rz, spot.angle)
+	end
+	-- Fixed deterministic stippling: no per-frame RNG or extra updates.
+	for i = 1, look.speckleCount do
+		local angle = i * 2.399963229728653
+		local radius = 0.40 + (i % 5) * 0.10
+		marking("Speckle", math.cos(angle) * radius, math.sin(angle) * radius, 0.0035, 0.005, angle)
+	end
 	for _, side in { -1, 1 } do
-		local s1 = ellipsoid(model, "Spot", Vector3.new(0.04, 0.012, 0.04), SPOT_JUVENILE, Enum.Material.SmoothPlastic)
-		fixed(s1, Vector3.new(side * 0.075, 0.2, 0.31))
-		local s2 = ellipsoid(model, "Spot", Vector3.new(0.028, 0.012, 0.028), SPOT_JUVENILE, Enum.Material.SmoothPlastic)
-		fixed(s2, Vector3.new(side * 0.07, 0.16, 0.41))
-		table.insert(self._spots, s1)
-		table.insert(self._spots, s2)
+		fixed(ellipsoid(model, "PaleCheek", Vector3.new(0.018, 0.066, 0.105), WHITE, fabric), Vector3.new(side * 0.235, 0.055, -0.23))
 		local ame = Vector3.new(side * 0.075, 0.09, -0.455)
-		local eye = ellipsoid(model, "PrincipalEye", Vector3.new(0.075, 0.075, 0.06), EYE, Enum.Material.Glass)
+		local eye = ellipsoid(model, "PrincipalEye", Vector3.new(0.080, 0.080, 0.063), EYE, Enum.Material.Glass)
 		eye.Reflectance = 0.35
 		fixed(eye, ame)
 		local glint = ellipsoid(model, "Catchlight", Vector3.new(0.013, 0.013, 0.006), Color3.new(1, 1, 1), Enum.Material.Neon)
@@ -819,14 +905,21 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance): Rig
 		local palpIndex = if side < 0 then 1 else 2
 		local base = Vector3.new(side * 0.10, -0.035, -0.43)
 		local tip = base + Vector3.new(side * 0.03, -0.10, -0.09)
-		fixed(rod(model, "PalpStalk", 0.036, LEG), Vector3.zero, CFrame.new(base):Inverse() * rodCFrame(base, tip), palpIndex)
+		local stalk = rod(model, "PalpStalk", 0.042, LEG)
+		stalk.Size = Vector3.new((tip-base).Magnitude, 0.042, 0.042)
+		fixed(stalk, Vector3.zero, CFrame.new(base):Inverse() * rodCFrame(base, tip), palpIndex)
+		local ring = rod(model, "PalpBand", 0.044, WHITE)
+		ring.Size = Vector3.new((tip-base).Magnitude * look.bandFraction, 0.044, 0.044)
+		fixed(ring, Vector3.zero, CFrame.new(base):Inverse() * rodCFrame(base, tip), palpIndex)
 		fixed(ellipsoid(model, "PalpClub", Vector3.new(0.03, 0.03, 0.045), LEG, fabric), tip + Vector3.new(0, -0.005, -0.02) - base, nil, palpIndex)
 		fixed(ellipsoid(model, "PalpTip", Vector3.new(0.022, 0.018, 0.022), JOINT, fabric), tip + Vector3.new(0, 0.006, -0.045) - base, nil, palpIndex)
 	end
 	for i = 1, 8 do
 		local side = if i <= 4 then -1 else 1
 		local pair = (i - 1) % 4 + 1
-		local d = LEG_D[pair]
+		local raw = LEG_D[pair]
+		local factor = if pair == 1 then look.frontLegScale else 1
+		local d = {raw[1] * factor, raw[2] * factor}
 		table.insert(self._legs, {
 			side = side,
 			pair = pair,
@@ -841,11 +934,12 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance): Rig
 			tarsus = rod(model, "Tarsus" .. i, d[2] * 0.6, LEG),
 			knee = ball(model, "Knee" .. i, d[1] * 0.95, JOINT),
 			ankle = ball(model, "Ankle" .. i, d[2] * 0.95, JOINT),
+			bands = {rod(model, "FemurBand" .. i, d[1], WHITE), rod(model, "TibiaBand" .. i, d[2], WHITE), rod(model, "TarsusBand" .. i, d[2] * 0.6, WHITE)},
 		})
 	end
 	local hl = Instance.new("Highlight")
 	hl.FillTransparency = 1
-	hl.OutlineColor = Color3.fromRGB(214, 190, 150)
+	hl.OutlineColor = WHITE
 	hl.OutlineTransparency = 0.82
 	hl.DepthMode = Enum.HighlightDepthMode.Occluded
 	hl.Parent = model
@@ -854,13 +948,10 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance): Rig
 	return self
 end
 
--- Spots are orange in juveniles and turn white with maturity (0 young juvenile .. 3 adult).
+-- The selected appearance stays black and white at every life stage.
+-- Growth is a separate display scale when LIFE is ported; it must not recolor this design.
 function SpiderRig.setGrowthStage(self: Rig, stage: number)
-	local t = math.clamp(stage / 3, 0, 1)
-	local c = SPOT_JUVENILE:Lerp(SPOT_ADULT, t * t * (3 - 2 * t))
-	for _, p in self._spots do
-		p.Color = c
-	end
+	self.model:SetAttribute("GrowthStage", math.clamp(stage, 0, 3))
 end
 
 local function legGroup(self: Rig, i: number): number
@@ -992,16 +1083,18 @@ function SpiderRig.update(self: Rig, body: CFrame, dt: number, grounded: boolean
 		local foot = leg.foot
 		local knee = hip:Lerp(foot, 0.48) + up * (if grounded then 0.30 else 0.24)
 		local ankle = knee:Lerp(foot, ANKLE_SHARE) + up * ANKLE_LIFT
-		local function segment(p: Part, a: Vector3, b: Vector3)
+		local function segment(p: Part, band: Part, a: Vector3, b: Vector3)
 			local len = math.max((b - a).Magnitude, 0.01)
 			if math.abs(p.Size.X - len) > 1e-3 then
 				p.Size = Vector3.new(len, p.Size.Y, p.Size.Z)
 			end
 			put(p, rodCFrame(a, b))
+			band.Size = Vector3.new(len * self._appearance.bandFraction, p.Size.Y * 1.035, p.Size.Z * 1.035)
+			put(band, rodCFrame(a, b))
 		end
-		segment(leg.femur, hip, knee)
-		segment(leg.tibia, knee, ankle)
-		segment(leg.tarsus, ankle, foot)
+		segment(leg.femur, leg.bands[1], hip, knee)
+		segment(leg.tibia, leg.bands[2], knee, ankle)
+		segment(leg.tarsus, leg.bands[3], ankle, foot)
 		put(leg.knee, CFrame.new(knee))
 		put(leg.ankle, CFrame.new(ankle))
 	end
@@ -1024,15 +1117,15 @@ return SpiderRig
       </Item>
     </Item>
   </Item>
-  <Item class="ServerScriptService" referent="13">
+  <Item class="ServerScriptService" referent="16">
     <Properties>
       <string name="Name">ServerScriptService</string>
     </Properties>
-    <Item class="Folder" referent="14">
+    <Item class="Folder" referent="17">
       <Properties>
         <string name="Name">Server</string>
       </Properties>
-      <Item class="Script" referent="15">
+      <Item class="Script" referent="18">
         <Properties>
           <string name="Name">Main</string>
           <token name="RunContext">0</token>
@@ -1136,7 +1229,7 @@ sill.Parent = Workspace
 
 -- Macro-lens lighting: morning sun through the window, soft shadows, warm grade, a shallow depth of field
 -- (the client keeps the focus on the spider).
-Lighting.Technology = Enum.Technology.Future
+-- Technology is authored in the Rojo place; runtime scripts cannot set it.
 Lighting.ClockTime = 9.6
 Lighting.GeographicLatitude = 40.7
 Lighting.Brightness = 2.6
@@ -1174,19 +1267,19 @@ dof.InFocusRadius = 3.5
       </Item>
     </Item>
   </Item>
-  <Item class="StarterPlayer" referent="16">
+  <Item class="StarterPlayer" referent="19">
     <Properties>
       <string name="Name">StarterPlayer</string>
     </Properties>
-    <Item class="StarterPlayerScripts" referent="17">
+    <Item class="StarterPlayerScripts" referent="20">
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="Folder" referent="18">
+      <Item class="Folder" referent="21">
         <Properties>
           <string name="Name">Client</string>
         </Properties>
-        <Item class="LocalScript" referent="19">
+        <Item class="LocalScript" referent="22">
           <Properties>
             <string name="Name">SpiderClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -1201,8 +1294,9 @@ local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
 local Workspace = game:GetService("Workspace")
+local SpiderInput = require(script.Parent.SpiderInput)
+local controls: any = nil
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local JumpMath = require(Shared:WaitForChild("Movement"):WaitForChild("JumpMath"))
@@ -1430,11 +1524,7 @@ end
 
 -- ---------------------------------------------------------------- the fixed tick
 local function wish(): Vector3
-	local f, r = 0, 0
-	if UserInputService:IsKeyDown(Enum.KeyCode.W) then f += 1 end
-	if UserInputService:IsKeyDown(Enum.KeyCode.S) then f -= 1 end
-	if UserInputService:IsKeyDown(Enum.KeyCode.D) then r += 1 end
-	if UserInputService:IsKeyDown(Enum.KeyCode.A) then r -= 1 end
+	local r, f = controls:axes()
 	if f == 0 and r == 0 then
 		return Vector3.zero
 	end
@@ -1458,7 +1548,7 @@ local function tickAttached()
 		end
 		return
 	end
-	local stalk = UserInputService:IsKeyDown(Enum.KeyCode.LeftShift)
+	local stalk = controls.held.Creep == true
 	local speed = if stalk then LOCO.stalk_speed_wu_s else LOCO.walk_speed_wu_s
 	state.heading = SupportMath.tangentDir(SupportMath.rotateToward(state.heading, dir, TURN_RATE * DT), state.up)
 	local step = dir * speed * DT
@@ -1539,41 +1629,24 @@ local function tick()
 	end
 end
 
-UserInputService.InputBegan:Connect(function(input: InputObject, processed: boolean)
-	-- Space can arrive marked processed (the default jump binding); typing in a text box is the case to ignore.
-	if UserInputService:GetFocusedTextBox() or (processed and input.KeyCode ~= Enum.KeyCode.Space) then
-		return
-	end
-	if input.KeyCode == Enum.KeyCode.Space then
+controls = SpiderInput.bind(function(phase: string)
+	if phase == "begin" then
 		state.spaceDown = true
 		state.spaceTime = 0
-	elseif input.KeyCode == Enum.KeyCode.G then
-		rig.gaitMode = if rig.gaitMode == "Tetrapod" then "Unilateral" else "Tetrapod"
-		print("Gait:", rig.gaitMode)
-	elseif input.KeyCode == Enum.KeyCode.R then
-		respawn()
-	end
-end)
-
-UserInputService.InputEnded:Connect(function(input: InputObject)
-	if input.KeyCode ~= Enum.KeyCode.Space then
 		return
 	end
 	state.spaceDown = false
-	if state.mode ~= "attached" then
-		return
-	end
-	if state.aiming then
-		local plan = state.plan
-		if plan and (state.pos - state.planFrom).Magnitude < 1e-3 then
-			launch(plan.velocity)
-		end
-	else
-		hop()
+	if phase == "end" and state.mode == "attached" then
+		if state.aiming then
+			local plan = state.plan
+			if plan and (state.pos - state.planFrom).Magnitude < 1e-3 then launch(plan.velocity) end
+		else hop() end
 	end
 	state.aiming = false
 	state.plan = nil
 	hidePreview()
+end, respawn, function()
+	rig.gaitMode = if rig.gaitMode == "Tetrapod" then "Unilateral" else "Tetrapod"
 end)
 
 -- ---------------------------------------------------------------- camera
@@ -1605,10 +1678,101 @@ end)
 ]]></string>
           </Properties>
         </Item>
+        <Item class="ModuleScript" referent="23">
+          <Properties>
+            <string name="Name">SpiderInput</string>
+            <string name="Source"><![CDATA[--!strict
+-- One action path for keyboard, gamepad and held on-screen touch buttons.
+local CAS = game:GetService("ContextActionService")
+local UIS = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local InputState = require(game:GetService("ReplicatedStorage").Shared.Movement.InputState)
+local SpiderInput = {}
+
+function SpiderInput.bind(jump: (string) -> (), reset: () -> (), gait: () -> ())
+	local state = InputState.new()
+	local function act(action: string, phase: Enum.UserInputState)
+		local down = phase == Enum.UserInputState.Begin
+		if action == "Jump" then
+			if down then jump("begin") elseif phase == Enum.UserInputState.End then jump("end") else jump("cancel") end
+		elseif action == "Reset" then if down then reset() end
+		elseif action == "Gait" then if down then gait() end
+		else state:set(action, down) end
+	end
+	local bindings = {
+		Forward = {Enum.KeyCode.W, Enum.KeyCode.DPadUp}, Back = {Enum.KeyCode.S, Enum.KeyCode.DPadDown},
+		Left = {Enum.KeyCode.A, Enum.KeyCode.DPadLeft}, Right = {Enum.KeyCode.D, Enum.KeyCode.DPadRight},
+		Jump = {Enum.KeyCode.Space, Enum.KeyCode.ButtonA}, Creep = {Enum.KeyCode.LeftShift, Enum.KeyCode.ButtonL1},
+		Reset = {Enum.KeyCode.R, Enum.KeyCode.ButtonY}, Gait = {Enum.KeyCode.G},
+	}
+	for action, keys in bindings do
+		CAS:BindActionAtPriority("Spider" .. action, function(_, phase)
+			if UIS:GetFocusedTextBox() then return Enum.ContextActionResult.Pass end
+			act(action, phase)
+			return Enum.ContextActionResult.Sink
+		end, false, 3000, table.unpack(keys))
+	end
+	CAS:BindActionAtPriority("SpiderStick", function(_, phase, input)
+		if phase == Enum.UserInputState.Cancel or UIS:GetFocusedTextBox() then state:stick(0, 0)
+		else state:stick(input.Position.X, input.Position.Y) end
+		return Enum.ContextActionResult.Sink
+	end, false, 3000, Enum.KeyCode.Thumbstick1)
+	local gui = Instance.new("ScreenGui")
+	gui.Name = "SpiderTouch"
+	gui.ResetOnSpawn = false
+	gui.Enabled = UIS.TouchEnabled
+	gui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
+	local active: {[InputObject]: string} = {}
+	local function clear()
+		state:clear()
+		table.clear(active)
+		jump("cancel")
+	end
+	local function button(action: string, label: string, position: UDim2, size: number)
+		local b = Instance.new("TextButton")
+		b.Name = action
+		b.Text = label
+		b.TextSize = 18
+		b.TextColor3 = Color3.new(1, 1, 1)
+		b.BackgroundColor3 = Color3.new(0.06, 0.06, 0.06)
+		b.BackgroundTransparency = 0.15
+		b.Size = UDim2.fromOffset(size, size)
+		b.Position = position
+		b.Parent = gui
+		local corner = Instance.new("UICorner")
+		corner.CornerRadius = UDim.new(0, 14)
+		corner.Parent = b
+		b.InputBegan:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+				active[input] = action
+				act(action, Enum.UserInputState.Begin)
+			end
+		end)
+	end
+	button("Forward", "↑", UDim2.new(0, 78, 1, -188), 52)
+	button("Left", "←", UDim2.new(0, 22, 1, -132), 52)
+	button("Back", "↓", UDim2.new(0, 78, 1, -76), 52)
+	button("Right", "→", UDim2.new(0, 134, 1, -132), 52)
+	button("Jump", "Jump\n(hold)", UDim2.new(1, -92, 1, -102), 72)
+	button("Creep", "Creep", UDim2.new(1, -86, 1, -172), 60)
+	UIS.InputEnded:Connect(function(input)
+		local action = active[input]
+		if action then active[input] = nil; act(action, Enum.UserInputState.End) end
+	end)
+	UIS.WindowFocusReleased:Connect(clear)
+	UIS.TextBoxFocused:Connect(clear)
+	UIS.GamepadDisconnected:Connect(clear)
+	UIS:GetPropertyChangedSignal("TouchEnabled"):Connect(function() gui.Enabled = UIS.TouchEnabled end)
+	return state
+end
+return SpiderInput
+]]></string>
+          </Properties>
+        </Item>
       </Item>
     </Item>
   </Item>
-  <Item class="Workspace" referent="20">
+  <Item class="Workspace" referent="24">
     <Properties>
       <string name="Name">Workspace</string>
       <float name="Gravity">35</float>

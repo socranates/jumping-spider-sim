@@ -1,0 +1,2 @@
+Luau 0.742 compiler: 17 files compiled; zero syntax failures.
+This is not a Roblox-aware strict type check.

@@ -46,5 +46,22 @@ local r = SupportMath.rotateToward(Vector3.new(1, 0, 0), Vector3.new(0, 0, -1), 
 check(near(SupportMath.angleTo(Vector3.new(1, 0, 0), r), math.rad(30), 1e-9), "rotateToward caps the turn")
 check(SupportMath.filterNormal(up, Vector3.new(0.01, 1, 0).Unit, 2) == up, "filterNormal ignores tiny changes")
 
+local Appearance = require("../src/Shared/Data/Appearances")
+local InputState = require("../src/Shared/Movement/InputState")
+local look = Appearance.profiles[Appearance.default]
+check(look.body[1] == 0 and look.body[2] == 0 and look.body[3] == 0, "first spider is black")
+check(#look.spots == 5 and look.spots[1].rx > look.spots[2].rx * 3, "five spots with large centre")
+check(look.spots[2].z < 0 and look.spots[3].z < 0 and look.spots[4].z > 0 and look.spots[5].z > 0, "two front and two rear spots")
+check(look.frontLegScale > 1 and look.speckleCount <= 24, "stout front legs and bounded speckles")
+local input = InputState.new()
+input:set("Forward", true); input:set("Right", true)
+local x,y = input:axes()
+check(near(x*x+y*y,1,1e-9), "diagonal input normalized")
+input:clear(); input:stick(0.1,0)
+x,y = input:axes(); check(x == 0 and y == 0, "stick deadzone")
+input:stick(0,1); x,y=input:axes(); check(x == 0 and y == 1, "stick full forward")
+input:set("Creep", true); input:clear(); x,y=input:axes()
+check(x == 0 and y == 0 and not input.held.Creep, "focus loss clears movement and creep")
+
 print(`SUMMARY passed={passed} failed={failed}`)
 if failed > 0 then error("port check failed") end

@@ -13,3 +13,8 @@ tests/reports/
 
 # Godot import files for the pictures in docs (made on each machine, never needed)
 docs/**/*.import
+
+# Roblox Studio local edit locks/autosaves
+*.rbxlx.lock
+*.rbxl.lock
+*.rbxlx.autosave

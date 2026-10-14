@@ -1,3 +1,11 @@
+# Active roadmap — Roblox, 2026-10-14
+
+PLATFORM-01 supersedes the previous distribution plan. New work is Roblox-only; Godot and SPEC are frozen references. Follow [ROBLOX_PORT.md](ROBLOX_PORT.md): first-spider/device foundation, **safety silk next**, perception, flies, LIFE/wasp, then DataStore persistence. Test and accessibility work accompany every chunk. Initial servers are solo; shared play can come later.
+
+The earlier roadmap below remains design history; it does not authorize further Godot features or new Godot release packaging.
+
+---
+
 # Jumping Spider Sim: the plan from here
 
 Claude, 2026-10-11, at Nathan's request ("do you want to make a revised plan for moving forward"). It is a proposal: Nathan decides the order, and Nathan, Chet and Claude decide the platform together (PLATFORM-01). Update it when a step is done or the order changes. `docs/SPEC.md` section 26 is still the long-range roadmap; this file is the next few steps.

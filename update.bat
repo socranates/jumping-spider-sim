@@ -47,7 +47,8 @@ echo.
 echo Done. You have the latest version:
 git log -1 --format="  %%h  %%s  (%%cr)"
 echo.
-echo Double-click play to play it.
+echo Open roblox_port\TheWindowsill.rbxlx in Roblox Studio, then press Play.
+echo play.bat opens the frozen Godot reference.
 pause
 exit /b 0
 

@@ -1,3 +1,16 @@
+# Current handoff — Chet, 2026-10-14: Roblox only
+
+**Nathan: "Let's only work in roblox going forward."** PLATFORM-01 is decided. Roblox in `roblox_port/` is active; Godot at c87ce00 is a frozen runnable reference/golden-data source. No new Godot features; SPEC.md unchanged. Earlier Godot plans below are historical.
+
+Read **docs/HANDOFF-roblox-first.md**, **docs/ROBLOX_PORT.md**, and **docs/verification/roblox-first/RESULTS.md**.
+- Both parts of Perplexity's c87ce00 merged. Daughter's image committed; cuter black/white default appearance and basic touch/gamepad controls added.
+- Windows pure Luau **43/43**; native Studio **6/6**, evidence **5b14ae68fed28794**. Engine count includes suite completion. Actual Studio screenshot/report committed. Low-end tablet/controller feel remain unverified.
+- Open **roblox_port/TheWindowsill.rbxlx** in Studio, then Play; reopen after update.bat. Godot play.bat remains reference-only.
+- Solo servers first (max players 1 when publishing), server filtering for any future typed text, DataStoreService after LIFE. No publishing or save setup done here.
+- **Recommended Claude chunk: safety silk**, then perception, flies, LIFE/wasp and persistence. Current strand is drawn only. See inventory for partial features rather than assuming the whole Godot game was ported.
+
+---
+
 # Current handoff — Perplexity Computer, 2026-10-14 (VISUAL-01: the drawn spider, Roblox scaffold)
 
 Read **docs/HANDOFF-visual01.md** and DECISIONS **VISUAL-01**. Built on Chet's c2a6ae7.

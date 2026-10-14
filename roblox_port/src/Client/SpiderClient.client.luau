@@ -10,8 +10,9 @@ local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
 local Workspace = game:GetService("Workspace")
+local SpiderInput = require(script.Parent.SpiderInput)
+local controls: any = nil
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local JumpMath = require(Shared:WaitForChild("Movement"):WaitForChild("JumpMath"))
@@ -239,11 +240,7 @@ end
 
 -- ---------------------------------------------------------------- the fixed tick
 local function wish(): Vector3
-	local f, r = 0, 0
-	if UserInputService:IsKeyDown(Enum.KeyCode.W) then f += 1 end
-	if UserInputService:IsKeyDown(Enum.KeyCode.S) then f -= 1 end
-	if UserInputService:IsKeyDown(Enum.KeyCode.D) then r += 1 end
-	if UserInputService:IsKeyDown(Enum.KeyCode.A) then r -= 1 end
+	local r, f = controls:axes()
 	if f == 0 and r == 0 then
 		return Vector3.zero
 	end
@@ -267,7 +264,7 @@ local function tickAttached()
 		end
 		return
 	end
-	local stalk = UserInputService:IsKeyDown(Enum.KeyCode.LeftShift)
+	local stalk = controls.held.Creep == true
 	local speed = if stalk then LOCO.stalk_speed_wu_s else LOCO.walk_speed_wu_s
 	state.heading = SupportMath.tangentDir(SupportMath.rotateToward(state.heading, dir, TURN_RATE * DT), state.up)
 	local step = dir * speed * DT
@@ -348,41 +345,24 @@ local function tick()
 	end
 end
 
-UserInputService.InputBegan:Connect(function(input: InputObject, processed: boolean)
-	-- Space can arrive marked processed (the default jump binding); typing in a text box is the case to ignore.
-	if UserInputService:GetFocusedTextBox() or (processed and input.KeyCode ~= Enum.KeyCode.Space) then
-		return
-	end
-	if input.KeyCode == Enum.KeyCode.Space then
+controls = SpiderInput.bind(function(phase: string)
+	if phase == "begin" then
 		state.spaceDown = true
 		state.spaceTime = 0
-	elseif input.KeyCode == Enum.KeyCode.G then
-		rig.gaitMode = if rig.gaitMode == "Tetrapod" then "Unilateral" else "Tetrapod"
-		print("Gait:", rig.gaitMode)
-	elseif input.KeyCode == Enum.KeyCode.R then
-		respawn()
-	end
-end)
-
-UserInputService.InputEnded:Connect(function(input: InputObject)
-	if input.KeyCode ~= Enum.KeyCode.Space then
 		return
 	end
 	state.spaceDown = false
-	if state.mode ~= "attached" then
-		return
-	end
-	if state.aiming then
-		local plan = state.plan
-		if plan and (state.pos - state.planFrom).Magnitude < 1e-3 then
-			launch(plan.velocity)
-		end
-	else
-		hop()
+	if phase == "end" and state.mode == "attached" then
+		if state.aiming then
+			local plan = state.plan
+			if plan and (state.pos - state.planFrom).Magnitude < 1e-3 then launch(plan.velocity) end
+		else hop() end
 	end
 	state.aiming = false
 	state.plan = nil
 	hidePreview()
+end, respawn, function()
+	rig.gaitMode = if rig.gaitMode == "Tetrapod" then "Unilateral" else "Tetrapod"
 end)
 
 -- ---------------------------------------------------------------- camera

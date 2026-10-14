@@ -98,7 +98,7 @@ sill.Parent = Workspace
 
 -- Macro-lens lighting: morning sun through the window, soft shadows, warm grade, a shallow depth of field
 -- (the client keeps the focus on the spider).
-Lighting.Technology = Enum.Technology.Future
+-- Technology is authored in the Rojo place; runtime scripts cannot set it.
 Lighting.ClockTime = 9.6
 Lighting.GeographicLatitude = 40.7
 Lighting.Brightness = 2.6

@@ -1150,3 +1150,7 @@ Next Claude: death and continuing. Human listening/child comfort remain open.
 ## 2026-10-13 — Chet: Windows whole-life handback
 
 Started main 120abc5, updated laptop, confirmed baseline 640/640. Fixed menu focus/notebook layering, max-text layout and cross-mode confirmation. Offscreen wasp draw removed the repeated ~110 ms arrival spike; F01 still open. Final Windows 644/644 (2c1c789ef545), related 27/27 at 30/60/144. Corrected test pause cleanup before final pass. Native staged life transitions and release menu/browser checks recorded in verification/life06-windows. Rebuilt both friend ZIPs. Next: round 6 human playtest; HANDOFF-life-windows.md lists limits and follow-ups.
+
+## 2026-10-14 — Chet: Roblox becomes active
+
+Merged Perplexity c87ce00 (both parts); froze Godot as reference, kept roblox_port/, recorded PLATFORM-01 and ROBLOX-01 to 03. Committed first-spider reference and appearance table, cuter rounded black/white rig, basic touch/gamepad controls, native Studio runner/build stamping and detailed port inventory. Corrected inherited forbidden runtime lighting assignment. Windows pure checks 43/43, Studio engine 6/6, evidence 5b14ae68fed28794; syntax 17 files. Saved actual Studio preview and reports. Physical controller/tablet and low-end frame-time acceptance remain. Recommended next: safety silk.

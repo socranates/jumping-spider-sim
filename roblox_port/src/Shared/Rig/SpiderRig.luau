@@ -5,6 +5,7 @@
 -- Body frame: +Y support-up, -Z forward, about 1 stud long (1 Godot WU = 1 cm = 1 stud).
 
 local Workspace = game:GetService("Workspace")
+local Appearances = require(script.Parent.Parent.Data.Appearances)
 
 local SpiderRig = {}
 SpiderRig.__index = SpiderRig
@@ -23,13 +24,6 @@ local ANKLE_LIFT = 0.045
 local PALP_DRUM_HZ = 3.2
 local PALP_DRUM_DEG = 11
 
-local BODY = Color3.new(0.14, 0.11, 0.10)
-local LEG = Color3.new(0.19, 0.15, 0.13)
-local JOINT = Color3.new(0.29, 0.25, 0.22)
-local EYE = Color3.new(0.01, 0.01, 0.01)
-local SPOT_ADULT = Color3.new(0.92, 0.9, 0.84)
-local SPOT_JUVENILE = Color3.new(0.93, 0.47, 0.16)
-local FANG = Color3.fromRGB(26, 150, 112)
 
 type Leg = {
 	side: number,
@@ -45,6 +39,7 @@ type Leg = {
 	tarsus: Part,
 	knee: Part,
 	ankle: Part,
+	bands: {Part},
 }
 
 type Fixed = { part: Part, offset: CFrame, palp: number? }
@@ -61,6 +56,7 @@ export type Rig = typeof(setmetatable(
 		_t: number,
 		_drum: number,
 		_spots: { Part },
+	_appearance: any,
 		_params: RaycastParams,
 		_parts: { BasePart },
 		_cframes: { CFrame },
@@ -114,9 +110,16 @@ local function rodCFrame(a: Vector3, b: Vector3): CFrame
 	return CFrame.lookAt((a + b) * 0.5, b) * CFrame.Angles(0, math.pi / 2, 0)
 end
 
-function SpiderRig.new(parent: Instance, worldFolder: Instance): Rig
+function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: string?): Rig
+	local look = Appearances.profiles[appearanceId or Appearances.default]
+	assert(look, "Unknown spider appearance")
+	local function color(rgb): Color3 return Color3.new(rgb[1], rgb[2], rgb[3]) end
+	local BODY, LEG = color(look.body), color(look.legs)
+	local JOINT, EYE, FANG = color(look.white), color(look.eyes), color(look.fangs)
+	local WHITE = color(look.white)
 	local model = Instance.new("Model")
 	model.Name = "Spider"
+	model:SetAttribute("AppearanceId", look.id)
 	local root = newPart(model, "Root", BODY, Enum.Material.SmoothPlastic)
 	root.Size = Vector3.new(1, 0.5, 1)
 	root.Transparency = 1
@@ -138,6 +141,7 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance): Rig
 		_t = 0,
 		_drum = 0,
 		_spots = {} :: { Part },
+		_appearance = look,
 		_params = params,
 		_parts = {} :: { BasePart },
 		_cframes = {} :: { CFrame },
@@ -146,26 +150,35 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance): Rig
 	local function fixed(part: Part, at: Vector3, rot: CFrame?, palp: number?)
 		table.insert(self._fixed, { part = part, offset = CFrame.new(at) * (rot or CFrame.identity), palp = palp })
 	end
-	local fabric = Enum.Material.Fabric -- velvety setae read better than plastic at this scale
-	fixed(ellipsoid(model, "Cephalothorax", Vector3.new(0.22, 0.155, 0.26), BODY, fabric), Vector3.new(0, 0.02, -0.20))
+	local fabric = Enum.Material.SmoothPlastic -- clean high-contrast silhouette
+	fixed(ellipsoid(model, "Cephalothorax", Vector3.new(table.unpack(look.headRadii)), BODY, fabric), Vector3.new(0, 0.02, -0.20))
 	fixed(ellipsoid(model, "EyeFace", Vector3.new(0.205, 0.165, 0.125), BODY, fabric), Vector3.new(0, 0.055, -0.355))
 	fixed(ellipsoid(model, "Pedicel", Vector3.new(0.05, 0.05, 0.06), BODY, fabric), Vector3.new(0, -0.035, -0.06))
-	fixed(ellipsoid(model, "Abdomen", Vector3.new(0.21, 0.19, 0.30), BODY, fabric), Vector3.new(0, 0.04, 0.20))
-	local band = ellipsoid(model, "BasalBand", Vector3.new(0.15, 0.022, 0.03), SPOT_JUVENILE, Enum.Material.SmoothPlastic)
-	fixed(band, Vector3.new(0, 0.115, -0.07), CFrame.Angles(0.9, 0, 0))
-	local tri = ellipsoid(model, "CentralSpot", Vector3.new(0.075, 0.012, 0.07), SPOT_JUVENILE, Enum.Material.SmoothPlastic)
-	fixed(tri, Vector3.new(0, 0.226, 0.14))
-	table.insert(self._spots, band)
-	table.insert(self._spots, tri)
+	fixed(ellipsoid(model, "Abdomen", Vector3.new(table.unpack(look.abdomenRadii)), BODY, fabric), Vector3.new(0, 0.04, 0.20))
+	local ar = look.abdomenRadii
+	local function marking(name: string, x: number, z: number, rx: number, rz: number, angle: number)
+		local y = ar[2] * math.sqrt(math.max(0, 1 - x*x - z*z))
+		local spot = ellipsoid(model, name, Vector3.new(rx, 0.012, rz), WHITE, fabric)
+		fixed(spot, Vector3.new(x * ar[1], 0.047 + y, 0.20 + z * ar[3]), CFrame.Angles(0, angle, 0))
+		table.insert(self._spots, spot)
+	end
+	-- A curved pale band across the front of the abdomen.
+	for i = -4, 4 do
+		marking("FrontBand", i * 0.16, -0.66, 0.031, 0.018, 0)
+	end
+	for _, spot in look.spots do
+		marking("AbdomenSpot", spot.x, spot.z, spot.rx, spot.rz, spot.angle)
+	end
+	-- Fixed deterministic stippling: no per-frame RNG or extra updates.
+	for i = 1, look.speckleCount do
+		local angle = i * 2.399963229728653
+		local radius = 0.40 + (i % 5) * 0.10
+		marking("Speckle", math.cos(angle) * radius, math.sin(angle) * radius, 0.0035, 0.005, angle)
+	end
 	for _, side in { -1, 1 } do
-		local s1 = ellipsoid(model, "Spot", Vector3.new(0.04, 0.012, 0.04), SPOT_JUVENILE, Enum.Material.SmoothPlastic)
-		fixed(s1, Vector3.new(side * 0.075, 0.2, 0.31))
-		local s2 = ellipsoid(model, "Spot", Vector3.new(0.028, 0.012, 0.028), SPOT_JUVENILE, Enum.Material.SmoothPlastic)
-		fixed(s2, Vector3.new(side * 0.07, 0.16, 0.41))
-		table.insert(self._spots, s1)
-		table.insert(self._spots, s2)
+		fixed(ellipsoid(model, "PaleCheek", Vector3.new(0.018, 0.066, 0.105), WHITE, fabric), Vector3.new(side * 0.235, 0.055, -0.23))
 		local ame = Vector3.new(side * 0.075, 0.09, -0.455)
-		local eye = ellipsoid(model, "PrincipalEye", Vector3.new(0.075, 0.075, 0.06), EYE, Enum.Material.Glass)
+		local eye = ellipsoid(model, "PrincipalEye", Vector3.new(0.080, 0.080, 0.063), EYE, Enum.Material.Glass)
 		eye.Reflectance = 0.35
 		fixed(eye, ame)
 		local glint = ellipsoid(model, "Catchlight", Vector3.new(0.013, 0.013, 0.006), Color3.new(1, 1, 1), Enum.Material.Neon)
@@ -188,14 +201,21 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance): Rig
 		local palpIndex = if side < 0 then 1 else 2
 		local base = Vector3.new(side * 0.10, -0.035, -0.43)
 		local tip = base + Vector3.new(side * 0.03, -0.10, -0.09)
-		fixed(rod(model, "PalpStalk", 0.036, LEG), Vector3.zero, CFrame.new(base):Inverse() * rodCFrame(base, tip), palpIndex)
+		local stalk = rod(model, "PalpStalk", 0.042, LEG)
+		stalk.Size = Vector3.new((tip-base).Magnitude, 0.042, 0.042)
+		fixed(stalk, Vector3.zero, CFrame.new(base):Inverse() * rodCFrame(base, tip), palpIndex)
+		local ring = rod(model, "PalpBand", 0.044, WHITE)
+		ring.Size = Vector3.new((tip-base).Magnitude * look.bandFraction, 0.044, 0.044)
+		fixed(ring, Vector3.zero, CFrame.new(base):Inverse() * rodCFrame(base, tip), palpIndex)
 		fixed(ellipsoid(model, "PalpClub", Vector3.new(0.03, 0.03, 0.045), LEG, fabric), tip + Vector3.new(0, -0.005, -0.02) - base, nil, palpIndex)
 		fixed(ellipsoid(model, "PalpTip", Vector3.new(0.022, 0.018, 0.022), JOINT, fabric), tip + Vector3.new(0, 0.006, -0.045) - base, nil, palpIndex)
 	end
 	for i = 1, 8 do
 		local side = if i <= 4 then -1 else 1
 		local pair = (i - 1) % 4 + 1
-		local d = LEG_D[pair]
+		local raw = LEG_D[pair]
+		local factor = if pair == 1 then look.frontLegScale else 1
+		local d = {raw[1] * factor, raw[2] * factor}
 		table.insert(self._legs, {
 			side = side,
 			pair = pair,
@@ -210,11 +230,12 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance): Rig
 			tarsus = rod(model, "Tarsus" .. i, d[2] * 0.6, LEG),
 			knee = ball(model, "Knee" .. i, d[1] * 0.95, JOINT),
 			ankle = ball(model, "Ankle" .. i, d[2] * 0.95, JOINT),
+			bands = {rod(model, "FemurBand" .. i, d[1], WHITE), rod(model, "TibiaBand" .. i, d[2], WHITE), rod(model, "TarsusBand" .. i, d[2] * 0.6, WHITE)},
 		})
 	end
 	local hl = Instance.new("Highlight")
 	hl.FillTransparency = 1
-	hl.OutlineColor = Color3.fromRGB(214, 190, 150)
+	hl.OutlineColor = WHITE
 	hl.OutlineTransparency = 0.82
 	hl.DepthMode = Enum.HighlightDepthMode.Occluded
 	hl.Parent = model
@@ -223,13 +244,10 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance): Rig
 	return self
 end
 
--- Spots are orange in juveniles and turn white with maturity (0 young juvenile .. 3 adult).
+-- The selected appearance stays black and white at every life stage.
+-- Growth is a separate display scale when LIFE is ported; it must not recolor this design.
 function SpiderRig.setGrowthStage(self: Rig, stage: number)
-	local t = math.clamp(stage / 3, 0, 1)
-	local c = SPOT_JUVENILE:Lerp(SPOT_ADULT, t * t * (3 - 2 * t))
-	for _, p in self._spots do
-		p.Color = c
-	end
+	self.model:SetAttribute("GrowthStage", math.clamp(stage, 0, 3))
 end
 
 local function legGroup(self: Rig, i: number): number
@@ -361,16 +379,18 @@ function SpiderRig.update(self: Rig, body: CFrame, dt: number, grounded: boolean
 		local foot = leg.foot
 		local knee = hip:Lerp(foot, 0.48) + up * (if grounded then 0.30 else 0.24)
 		local ankle = knee:Lerp(foot, ANKLE_SHARE) + up * ANKLE_LIFT
-		local function segment(p: Part, a: Vector3, b: Vector3)
+		local function segment(p: Part, band: Part, a: Vector3, b: Vector3)
 			local len = math.max((b - a).Magnitude, 0.01)
 			if math.abs(p.Size.X - len) > 1e-3 then
 				p.Size = Vector3.new(len, p.Size.Y, p.Size.Z)
 			end
 			put(p, rodCFrame(a, b))
+			band.Size = Vector3.new(len * self._appearance.bandFraction, p.Size.Y * 1.035, p.Size.Z * 1.035)
+			put(band, rodCFrame(a, b))
 		end
-		segment(leg.femur, hip, knee)
-		segment(leg.tibia, knee, ankle)
-		segment(leg.tarsus, ankle, foot)
+		segment(leg.femur, leg.bands[1], hip, knee)
+		segment(leg.tibia, leg.bands[2], knee, ankle)
+		segment(leg.tarsus, leg.bands[3], ankle, foot)
 		put(leg.knee, CFrame.new(knee))
 		put(leg.ankle, CFrame.new(ankle))
 	end

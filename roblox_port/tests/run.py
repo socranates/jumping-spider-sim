@@ -9,21 +9,23 @@ SRC = HERE.parent / "src" / "Shared"
 
 
 def chunk(path):
-    text = path.read_text()
+    text = path.read_text(encoding="utf-8")
     text = re.sub(r"^--!strict\n", "", text)
     text = re.sub(r"^export type", "type", text, flags=re.M)
     return f"(function()\n{text}\nend)()"
 
 
-body = (HERE / "run.luau").read_text()
+body = (HERE / "run.luau").read_text(encoding="utf-8")
 body = body.replace('local shim = require("./shim")', "local shim = " + chunk(HERE / "shim.luau"))
 body = body.replace('_G.Vector3 = shim.Vector3', 'Vector3 = shim.Vector3')
 body = body.replace('_G.CFrame = shim.CFrame', 'CFrame = shim.CFrame')
 body = body.replace('require("../src/Shared/Movement/JumpMath")', chunk(SRC / "Movement" / "JumpMath.luau"))
 body = body.replace('require("../src/Shared/Movement/SupportMath")', chunk(SRC / "Movement" / "SupportMath.luau"))
 body = body.replace('require("./jump_reference")', chunk(HERE / "jump_reference.luau"))
+for name, folder in [("Appearances", "Data"), ("InputState", "Movement")]:
+    body = body.replace(f'require("../src/Shared/{folder}/{name}")', chunk(SRC / folder / (name + ".luau")))
 body = "local Vector3, CFrame\n" + body.replace("\nVector3 = shim", "\nVector3 = shim").replace("_G.", "")
-with tempfile.NamedTemporaryFile("w", suffix=".luau", delete=False) as f:
+with tempfile.NamedTemporaryFile("w", suffix=".luau", encoding="utf-8", delete=False) as f:
     f.write(body)
 luau = sys.argv[1] if len(sys.argv) > 1 else "luau"
 sys.exit(subprocess.call([luau, f.name]))

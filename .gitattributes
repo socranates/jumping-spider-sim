@@ -10,3 +10,6 @@
 *.json -text
 *.gdshader -text
 project.godot -text
+
+# Roblox evidence hashes source bytes too.
+*.luau -text

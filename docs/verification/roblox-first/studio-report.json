@@ -1,0 +1,41 @@
+{
+  "evidence_id": "5b14ae68fed28794",
+  "failed": 0,
+  "engine": "0.742.0.7421053",
+  "tests": 6,
+  "not_run": 0,
+  "suite": "Roblox engine",
+  "passed": 6,
+  "results": [
+    {
+      "passed": true,
+      "name": "real engine jump reaches seat",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "raycast planted foot stays in world space",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "appearance stays white when stage changes",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "all rig parts are display only and bounded",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "air and underside poses are finite",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "Studio spec completes",
+      "detail": ""
+    }
+  ]
+}

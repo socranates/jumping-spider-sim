@@ -79,7 +79,8 @@ local first = {
 	-- Eyes. Never a human face: no brows, no mouth. Big glossy front eyes read as an animal's.
 	eye = {
 		-- Principal (front) eyes: large, glossy, set low in a big forehead. x, y: where on the head they sit; `out`: how far
-		-- they stand out of the head, as a share of their depth. Two catchlights, both toward +X (one light, one reflection).
+		-- they stand out of the head, as a share of their depth. Two catchlights on each, the same on both eyes: a larger one
+		-- high toward +X (the light) and a smaller one low toward -X (its reflection).
 		ame = {
 			x = 0.115, y = 0.095, radii = { 0.100, 0.100, 0.082 }, out = 0.30, reflectance = 0.5,
 			socket = { scale = 1.13, color = { 0.11, 0.11, 0.11 } }, -- a dark-grey rim so the black eye reads against the black head

@@ -11,6 +11,19 @@ const LEG_COLOR := Color(0.19, 0.15, 0.13)
 const EYE_COLOR := Color(0.01, 0.01, 0.01)
 const SPOT_COLOR := Color(0.92, 0.9, 0.84)
 const FANG_COLOR := Color(0.16, 0.58, 0.47)
+## VISUAL-01: Phidippus audax spots are orange in juveniles and turn white as the spider matures (Wikipedia; Univ. Arkansas
+## Arthropod Museum). Drawn by growth stage, 0 young juvenile to 3 adult.
+const SPOT_JUVENILE := Color(0.93, 0.47, 0.16)
+const JOINT_COLOR := Color(0.29, 0.25, 0.22)
+const IRIDESCENT_SHADER := preload("res://scripts/presentation/shaders/iridescent_chelicerae.gdshader")
+## Pedipalps: idle drumming while standing (display only; Reduced motion stills them).
+const PALP_DRUM_HZ := 3.2
+const PALP_DRUM_DEG := 11.0
+var _palps: Node3D
+var _palp_pivots: Array[Node3D] = []
+var _palp_t := 0.0
+var _drum := 0.0
+var _leg_detail: Node3D
 
 var gait_enabled: bool = true
 var legs: Node3D
@@ -48,6 +61,7 @@ func set_growth_stage(stage: int) -> void:
 	var old_lift := 0.30 * (visual_size - 1.0)
 	growth_stage = next
 	visual_size = STAGE_SCALES[next]
+	_apply_spot_colour()
 	scale = Vector3.ONE * visual_size
 	# Scale about the support plane, including on walls and undersides. Do not
 	# discard world-space foot contacts: let the normal gait replace them.
@@ -173,6 +187,7 @@ func _physics_process(_delta: float) -> void:
 	_update_legs(delta)
 	shown_condition = move_toward(shown_condition, condition, CONDITION_FOLLOW_PER_S * delta)
 	_abdomen.scale = abdomen_scale(shown_condition)
+	_drum_palps(delta)
 
 
 func _update_legs(delta: float) -> void:
@@ -263,6 +278,7 @@ func set_softness(s: float) -> void:
 	softness = clampf(s, 0.0, 1.0)
 	_material("body").albedo_color = BODY_COLOR.lerp(PALE, softness * 0.75)
 	_material("leg").albedo_color = LEG_COLOR.lerp(PALE, softness * 0.6)
+	_material("joint").albedo_color = JOINT_COLOR.lerp(PALE, softness * 0.6)
 
 
 func set_condition(energy: float) -> void:
@@ -367,22 +383,38 @@ func _on_line_event(kind: String, _detail: String) -> void:
 
 
 func _build() -> void:
-	_ellipsoid(Vector3(0.0, 0.02, -0.22), Vector3(0.22, 0.17, 0.26), "body")  # cephalothorax
+	# Carapace: a broad, flat-topped thorax and a tall, squared-off front face that carries the eyes (salticid profile).
+	_ellipsoid(Vector3(0.0, 0.02, -0.20), Vector3(0.22, 0.155, 0.26), "body")  # cephalothorax
+	_ellipsoid(Vector3(0.0, 0.055, -0.355), Vector3(0.205, 0.165, 0.125), "body")  # eye face
+	_ellipsoid(Vector3(0.0, -0.035, -0.06), Vector3(0.05, 0.05, 0.06), "body")  # pedicel
 	_abdomen = Node3D.new()
 	_abdomen.name = "Abdomen"
 	add_child(_abdomen)
 	_ellipsoid(Vector3(0.0, 0.04, 0.20), Vector3(0.21, 0.19, 0.30), "body").reparent(_abdomen)   # abdomen
-	_ellipsoid(Vector3(0.0, 0.225, 0.12), Vector3(0.05, 0.012, 0.05), "spot").reparent(_abdomen)
+	var band := _ellipsoid(Vector3(0.0, 0.115, -0.07), Vector3(0.15, 0.022, 0.03), "spot")  # pale basal band
+	band.rotation.x = 0.9
+	band.reparent(_abdomen)
+	_ellipsoid(Vector3(0.0, 0.226, 0.14), Vector3(0.075, 0.012, 0.07), "spot").reparent(_abdomen)   # central triangle
 	for side in [-1.0, 1.0]:
-		_ellipsoid(Vector3(side * 0.07, 0.205, 0.30), Vector3(0.05, 0.012, 0.05), "spot").reparent(_abdomen)
-		_ellipsoid(Vector3(side * 0.075, 0.09, -0.45), Vector3(0.075, 0.075, 0.075), "eye")   # principal
-		_ellipsoid(Vector3(side * 0.17, 0.10, -0.34), Vector3(0.045, 0.045, 0.045), "eye")    # anterior lateral
-		_ellipsoid(Vector3(side * 0.12, 0.15, -0.16), Vector3(0.05, 0.05, 0.05), "eye")       # posterior lateral
-		_ellipsoid(Vector3(side * 0.06, 0.185, -0.20), Vector3(0.022, 0.022, 0.022), "eye")   # posterior median
-		_ellipsoid(Vector3(side * 0.05, -0.05, -0.46), Vector3(0.045, 0.045, 0.045), "fang")
+		_ellipsoid(Vector3(side * 0.075, 0.2, 0.31), Vector3(0.04, 0.012, 0.04), "spot").reparent(_abdomen)
+		_ellipsoid(Vector3(side * 0.07, 0.16, 0.41), Vector3(0.028, 0.012, 0.028), "spot").reparent(_abdomen)
+		var ame := Vector3(side * 0.075, 0.09, -0.455)
+		_ellipsoid(ame, Vector3(0.075, 0.075, 0.06), "eye")   # principal (anterior median)
+		_ellipsoid(ame + Vector3(side * -0.018, 0.03, -0.052), Vector3(0.013, 0.013, 0.006), "glint")  # catchlight
+		_ellipsoid(Vector3(side * 0.165, 0.10, -0.40), Vector3(0.042, 0.042, 0.036), "eye")    # anterior lateral
+		_ellipsoid(Vector3(side * 0.13, 0.17, -0.14), Vector3(0.048, 0.048, 0.048), "eye")      # posterior lateral
+		_ellipsoid(Vector3(side * 0.11, 0.185, -0.27), Vector3(0.018, 0.018, 0.018), "eye")   # posterior median
+		var fang := _ellipsoid(Vector3(side * 0.052, -0.075, -0.445), Vector3(0.045, 0.08, 0.04), "fang")  # chelicera
+		fang.rotation = Vector3(-0.35, 0.0, side * 0.12)
+	_build_palps()
 	legs = SpiderLegs.new()
 	legs.name = "Legs"
 	legs.material = _material("leg")
+	legs.joint_material = _material("joint")
+	_leg_detail = Node3D.new()
+	_leg_detail.name = "LegDetail"
+	add_child(_leg_detail)
+	legs.detail_parent = _leg_detail
 	add_child(legs)
 	_spinnerets = Node3D.new()
 	_spinnerets.name = "Spinnerets"
@@ -396,6 +428,67 @@ func _build() -> void:
 		spinneret.material_override = _material("leg")
 		spinneret.position = Vector3(side * 0.028, 0.02, 0.48)
 		_spinnerets.add_child(spinneret)
+	_apply_spot_colour()
+
+
+## Two short pedipalps beside the chelicerae: a slim stalk and a hairy, pale-tipped club.
+func _build_palps() -> void:
+	_palps = Node3D.new()
+	_palps.name = "Palps"
+	add_child(_palps)
+	for side in [-1.0, 1.0]:
+		var pivot := Node3D.new()
+		pivot.position = Vector3(side * 0.10, -0.035, -0.43)
+		_palps.add_child(pivot)
+		_palp_pivots.append(pivot)
+		var stalk := MeshInstance3D.new()
+		var cyl := CylinderMesh.new()
+		cyl.top_radius = 0.016
+		cyl.bottom_radius = 0.02
+		cyl.height = 1.0
+		cyl.radial_segments = 6
+		cyl.rings = 1
+		stalk.mesh = cyl
+		stalk.material_override = _material("leg")
+		var from := Vector3.ZERO
+		var to := Vector3(side * 0.03, -0.10, -0.09)
+		var b := Basis(Quaternion(Vector3.UP, (to - from).normalized()))
+		b.y *= (to - from).length()
+		stalk.transform = Transform3D(b, (from + to) * 0.5)
+		pivot.add_child(stalk)
+		for part in [[to + Vector3(0, -0.005, -0.02), Vector3(0.03, 0.03, 0.045), "leg"], [to + Vector3(0, 0.006, -0.045), Vector3(0.022, 0.018, 0.022), "joint"]]:
+			var club := MeshInstance3D.new()
+			var sphere := SphereMesh.new()
+			sphere.radius = 1.0
+			sphere.height = 2.0
+			sphere.radial_segments = 10
+			sphere.rings = 5
+			club.mesh = sphere
+			club.material_override = _material(part[2])
+			club.position = part[0]
+			club.scale = part[1]
+			pivot.add_child(club)
+
+
+## Idle drumming: the palps tap alternately while the spider stands still, and rest while it walks or with Reduced motion.
+func _drum_palps(delta: float) -> void:
+	if _palps == null:
+		return
+	var motor := get_parent()
+	var still: bool = twitch_enabled and motor != null and motor.has_method("is_supported") and motor.is_supported() \
+		and motor.velocity.length() < 0.05
+	_drum = move_toward(_drum, 1.0 if still else 0.0, 3.0 * delta)
+	_palp_t = fposmod(_palp_t + delta, 1000.0)
+	for i in _palp_pivots.size():
+		var phase := _palp_t * TAU * PALP_DRUM_HZ + PI * i
+		# Bursts: a few beats, then a pause.
+		var burst := smoothstep(0.55, 0.85, sin(_palp_t * 1.3 + 0.7 * i))
+		_palp_pivots[i].rotation.x = deg_to_rad(PALP_DRUM_DEG) * _drum * burst * maxf(0.0, sin(phase))
+
+
+func _apply_spot_colour() -> void:
+	var t := float(growth_stage) / float(STAGE_SCALES.size() - 1)
+	_material("spot").albedo_color = SPOT_JUVENILE.lerp(SPOT_COLOR, smoothstep(0.0, 1.0, t))
 
 
 ## T10a, spider-eye view: the camera sits at the principal eyes, so the head, abdomen, eyes and fangs are hidden (they would fill or
@@ -404,6 +497,8 @@ func set_eye_view(on: bool) -> void:
 	_eye_view = on
 	legs.eye_view = on
 	_abdomen.visible = not on
+	if _palps != null:
+		_palps.visible = not on
 	for child in get_children():
 		if child is MeshInstance3D:
 			(child as MeshInstance3D).visible = not on
@@ -416,22 +511,59 @@ func _material(kind: String) -> StandardMaterial3D:
 	m.roughness = 0.6
 	match kind:
 		"body":
+			# Velvet setae: rough, with a warm rim so the dark body catches the sill's light at its edges.
 			m.albedo_color = BODY_COLOR
+			m.roughness = 0.78
+			m.rim_enabled = true
+			m.rim = 0.55
+			m.rim_tint = 0.35
 		"leg":
 			m.albedo_color = LEG_COLOR
+			m.roughness = 0.72
+			m.rim_enabled = true
+			m.rim = 0.45
+			m.rim_tint = 0.35
+		"joint":
+			m.albedo_color = JOINT_COLOR
+			m.roughness = 0.85
+			m.rim_enabled = true
+			m.rim = 0.4
+			m.rim_tint = 0.5
 		"eye":
+			# Wet cornea: near-black, mirror-smooth, a clear coat for the sharp highlight.
 			m.albedo_color = EYE_COLOR
-			m.roughness = 0.05
-			m.metallic = 0.4
+			m.roughness = 0.04
+			m.metallic = 0.2
+			m.metallic_specular = 1.0
+			m.clearcoat_enabled = true
+			m.clearcoat = 1.0
+			m.clearcoat_roughness = 0.02
 			m.emission_enabled = true
-			m.emission = Color(0.05, 0.12, 0.16)
+			m.emission = Color(0.02, 0.035, 0.03)
+		"glint":
+			m.albedo_color = Color(0.95, 0.97, 1.0)
+			m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		"spot":
 			m.albedo_color = SPOT_COLOR
+			m.roughness = 0.9
+			m.rim_enabled = true
+			m.rim = 0.3
+			m.rim_tint = 0.6
 		"fang":
 			m.albedo_color = FANG_COLOR
 			m.metallic = 0.3
 			m.roughness = 0.3
 	_mats[kind] = m
+	return m
+
+
+## Chelicerae: the bold jumper's metallic green-to-blue sheen that shifts with the viewing angle.
+func _iridescent() -> ShaderMaterial:
+	if _mats.has("iridescent"):
+		return _mats["iridescent"]
+	var m := ShaderMaterial.new()
+	m.shader = IRIDESCENT_SHADER
+	_mats["iridescent"] = m
 	return m
 
 
@@ -443,7 +575,9 @@ func _ellipsoid(center: Vector3, radii: Vector3, kind: String) -> MeshInstance3D
 	mesh.rings = 10
 	var mi := MeshInstance3D.new()
 	mi.mesh = mesh
-	mi.material_override = _material(kind)
+	mi.material_override = _iridescent() if kind == "fang" else _material(kind)
+	if kind == "glint" or kind == "spot":
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	mi.position = center
 	mi.scale = radii
 	add_child(mi)

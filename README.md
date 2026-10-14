@@ -4,6 +4,14 @@ A third-person prototype about living as a jumping spider. The design is in `doc
 
 Shared development: see [the agent handoff](claude/where-we-left-off.md), [GitHub workflow](docs/SHARED_WORKFLOW.md), and [verification reports](docs/verification/).
 
+## New: a truer-looking spider (2026-10-14)
+
+- Each leg now has three parts, with pale banded knees, and the front legs are stouter, as on a real jumping spider.
+- A squarer face, glossy big eyes that catch the light, shiny green-blue jaws, and two little palps that drum when the spider stands still.
+- The spots are orange while the spider is young and turn white as it grows up, as on a real bold jumper.
+- The sill has fine wood grain, softer light and faint dust drifting in the sun.
+- Nothing about how it moves, jumps or senses has changed. A Roblox version has been started in `roblox_port/`.
+
 ## New: moulting, growing up (2026-10-12)
 
 - Your spider starts as a **young juvenile**. The top line shows its stage.

@@ -5,6 +5,12 @@ extends Node3D
 signal surface_availability_changed(surface_id: String, available: bool)
 
 const Layers = preload("res://scripts/core/physics_layers.gd")
+const SillAtmosphere = preload("res://scripts/presentation/sill_atmosphere.gd")
+## VISUAL-01 (drawn only): fine grain on the wood, mottling on the brick and leaves. A world-space (triplanar) texture tinted by
+## each piece's own colour, so colours, sizes and collision are unchanged.
+const DETAIL_PROFILES := {"painted_wood_dry": "wood", "bare_wood_rough": "wood", "brick_rough": "brick", "leaf_dry_prototype": "leaf"}
+var _detail_textures: Dictionary = {}
+var atmosphere: Node3D
 const RETREAT_ID := "sill_crevice"
 const RETREAT_AREA := AABB(Vector3(-27.8, 0.0, 3.0), Vector3(4.5, 1.5, 6.0))
 const SPAWN := Vector3(-22.0, 0.0, 6.0)
@@ -92,12 +98,19 @@ func _ready() -> void:
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	env.ambient_light_color = Color("dfddce")
 	env.ambient_light_energy = 0.40
+	# VISUAL-01: filmic tone mapping rolls off the bright sill instead of clipping it.
+	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+	env.tonemap_exposure = 1.04
+	env.tonemap_white = 4.0
 	_env = env
 	var background := WorldEnvironment.new()
 	background.environment = env
 	add_child(background)
 	shadow_band = visual_box("passing_shadow", Vector3(10, 0.012, 24), Vector3(-40, 0.025, 0), Color(0.13, 0.17, 0.2, 0.22))
 	shadow_band.visible = false
+	atmosphere = SillAtmosphere.new()
+	atmosphere.name = "Atmosphere"
+	add_child(atmosphere)
 
 func get_spawn_transform() -> Transform3D:
 	return global_transform * Transform3D(Basis(Vector3.UP, deg_to_rad(-90)), SPAWN)
@@ -238,6 +251,8 @@ func _apply_light() -> void:
 		_env.background_color = SKY_NIGHT.lerp(SKY_DAY, daylight)
 	if _window_glow != null:
 		(_window_glow.material_override as StandardMaterial3D).albedo_color = GLOW_NIGHT.lerp(GLOW_DAY, daylight)
+	if atmosphere != null:
+		atmosphere.set_daylight(daylight)
 
 func box(id: String, lo: Vector3, hi: Vector3, profile: String, color: Color) -> void:
 	var body := StaticBody3D.new()
@@ -256,7 +271,49 @@ func box(id: String, lo: Vector3, hi: Vector3, profile: String, color: Color) ->
 	body.position = (lo + hi) * 0.5
 	var mesh := visual_box(id + "_mesh", hi - lo, Vector3.ZERO, color)
 	mesh.reparent(body, false)
+	_add_detail(mesh, profile)
 	pieces[id] = body
+
+func _add_detail(mesh: MeshInstance3D, profile: String) -> void:
+	var kind: String = DETAIL_PROFILES.get(profile, "")
+	if kind == "":
+		return
+	var m := mesh.material_override as StandardMaterial3D
+	m.albedo_texture = _detail_texture(kind)
+	m.uv1_triplanar = true
+	m.uv1_world_triplanar = true
+	match kind:
+		"wood":
+			m.uv1_scale = Vector3(0.05, 0.3, 0.3)   # grain along X
+		"brick":
+			m.uv1_scale = Vector3(0.35, 0.35, 0.35)
+		"leaf":
+			m.uv1_scale = Vector3(0.25, 0.25, 0.25)
+			m.roughness = 0.6
+
+
+func _detail_texture(kind: String) -> Texture2D:
+	if _detail_textures.has(kind):
+		return _detail_textures[kind]
+	var noise := FastNoiseLite.new()
+	noise.seed = {"wood": 7, "brick": 11, "leaf": 13}[kind]
+	noise.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
+	noise.frequency = {"wood": 0.02, "brick": 0.05, "leaf": 0.03}[kind]
+	noise.fractal_octaves = 4
+	var ramp := Gradient.new()
+	var lo: float = {"wood": 0.92, "brick": 0.82, "leaf": 0.88}[kind]
+	ramp.set_color(0, Color(lo, lo, lo))
+	ramp.set_color(1, Color.WHITE)
+	var tex := NoiseTexture2D.new()
+	tex.width = 256
+	tex.height = 256
+	tex.seamless = true
+	tex.noise = noise
+	tex.color_ramp = ramp
+	tex.generate_mipmaps = true
+	_detail_textures[kind] = tex
+	return tex
+
 
 func visual_box(id: String, size: Vector3, at: Vector3, color: Color) -> MeshInstance3D:
 	var mesh := MeshInstance3D.new()

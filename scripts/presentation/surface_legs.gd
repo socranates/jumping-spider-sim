@@ -32,6 +32,9 @@ func clear_contacts() -> void:
 	for segment in _segments:
 		segment.top_level = false
 		segment.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_INHERIT
+	for part in _tarsi + _joints:
+		part.top_level = false
+		part.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_INHERIT
 
 
 func is_planted(i: int) -> bool:
@@ -144,11 +147,15 @@ func _draw_contacts(xf: Transform3D, fraction: float) -> void:
 		# pairs III/IV straighten during push-off. This is not a force model.
 		var bend := 0.30 * (1.0 - 0.85 * _push if pair >= 2 else 1.0)
 		var knee := hip.lerp(foot, 0.48) + xf.basis.y * bend
+		var end := foot
+		if has_detail():
+			end = ankle_point(knee, foot, xf.basis.y)
+			_place_detail(i, knee, end, foot, true, xf.basis.get_scale().x, _detail_shown(pair))
 		for j in 2:
 			var segment := _segments[i * 2 + j]
 			segment.top_level = true
 			segment.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
-			_place_segment(segment, hip if j == 0 else knee, knee if j == 0 else foot)
+			_place_segment(segment, hip if j == 0 else knee, knee if j == 0 else end)
 			# These rods are top-level world transforms, so inherited scale does
 			# not resize their thickness (free legs inherit it normally).
 			var rod_basis := segment.basis
@@ -172,9 +179,18 @@ func pose_seized() -> void:
 		var foot := Vector3(side * 0.10, -0.26, HIP_Z[pair])
 		_feet.append(foot)
 		_place_segment(_segments[i * 2], hip, knee)
-		_place_segment(_segments[i * 2 + 1], knee, foot)
+		if has_detail():
+			var ankle := ankle_point(knee, foot, Vector3.UP)
+			_place_segment(_segments[i * 2 + 1], knee, ankle)
+			_place_detail(i, knee, ankle, foot, false, 1.0, not eye_view)
+		else:
+			_place_segment(_segments[i * 2 + 1], knee, foot)
 		_segments[i * 2].visible = not eye_view
 		_segments[i * 2 + 1].visible = not eye_view
+
+
+func _detail_shown(pair: int) -> bool:
+	return not eye_view or pair == 0
 
 
 func advance_free(dt: float, reduced: bool) -> void:

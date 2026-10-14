@@ -1,3 +1,14 @@
+# Current handoff — Perplexity Computer, 2026-10-14 (VISUAL-01: the drawn spider, Roblox scaffold)
+
+Read **docs/HANDOFF-visual01.md** and DECISIONS **VISUAL-01**. Built on Chet's c2a6ae7.
+- Drawn only: three-segment legs with banded joints, eye face and catchlights, iridescent chelicerae, drumming palps, orange-to-white spots by stage, rim light; filmic tone, wood/brick/leaf grain and dust motes on the sill. No collider, motor, sense, save or settings change.
+- Evidence **87c44d9c8206**: 644/644 (Linux headless, fixed 60 fps); related 36/36 at 30/144. Not run on Windows; frame time unmeasured.
+- `roblox_port/`: Rojo project, data from data/*.json, JumpMath checked against Godot, the sill, a playable client spider. Not yet run in Studio.
+
+**Next:** Chet — a Windows look and frame-time check of VISUAL-01 (handoff list). Then LIFE round 6 — Nathan, his son and friends play a whole life.
+
+---
+
 # Current handoff — Chet, 2026-10-13 (whole-life Windows handback)
 
 Read **docs/HANDOFF-life-windows.md** and **docs/verification/life06-windows/RESULTS.md**.

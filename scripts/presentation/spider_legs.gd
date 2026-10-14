@@ -18,6 +18,18 @@ var _feet: Array[Vector3] = []
 var _segments: Array[MeshInstance3D] = []
 ## Supply before adding to the tree to match the caller's body material.
 var material: StandardMaterial3D
+## VISUAL-01 (drawn only): set before adding to the tree to give each leg a third, thin distal segment (metatarsus and tarsus)
+## and small pale joint bulbs, the bold jumper's banded knees. They live under `detail_parent`, not here, so this node keeps
+## its sixteen rods. With detail the second rod ends at the ankle; the feet are exactly where they were.
+var detail_parent: Node3D
+var joint_material: StandardMaterial3D
+var _tarsi: Array[MeshInstance3D] = []
+var _joints: Array[MeshInstance3D] = []   # two per leg: knee, ankle
+## Stout front legs, slimmer back legs (salticid silhouette): [femur top, femur base, tibia top, tibia base] per pair.
+const LEG_RADII := [[0.034, 0.044, 0.028, 0.036], [0.028, 0.037, 0.023, 0.030],
+	[0.024, 0.033, 0.019, 0.026], [0.025, 0.034, 0.020, 0.027]]
+const ANKLE_SHARE := 0.62      # along knee -> foot
+const ANKLE_LIFT := 0.045      # WU above that line, along support-up
 
 
 func _ready() -> void:
@@ -26,18 +38,83 @@ func _ready() -> void:
 		material.albedo_color = Color("594034")
 		material.roughness = 0.8
 	for i in 16:
+		var r: Array = LEG_RADII[(i / 2) % 4]
 		var mesh := CylinderMesh.new()
-		mesh.top_radius = 0.026 if i % 2 == 0 else 0.020
-		mesh.bottom_radius = 0.035 if i % 2 == 0 else 0.028
+		mesh.top_radius = r[0] if i % 2 == 0 else r[2]
+		mesh.bottom_radius = r[1] if i % 2 == 0 else r[3]
 		mesh.height = 1.0
-		mesh.radial_segments = 6
+		mesh.radial_segments = 8 if detail_parent != null else 6
 		mesh.rings = 1
 		var segment := MeshInstance3D.new()
 		segment.mesh = mesh
 		segment.material_override = material
 		add_child(segment)
 		_segments.append(segment)
+	if detail_parent != null:
+		_build_detail()
 	reset_pose()
+
+
+func _build_detail() -> void:
+	if joint_material == null:
+		joint_material = material
+	for i in 8:
+		var r: Array = LEG_RADII[i % 4]
+		var mesh := CylinderMesh.new()
+		mesh.top_radius = r[2] * 0.42
+		mesh.bottom_radius = r[2] * 0.85
+		mesh.height = 1.0
+		mesh.radial_segments = 6
+		mesh.rings = 1
+		var tarsus := MeshInstance3D.new()
+		tarsus.name = "Tarsus%d" % i
+		tarsus.mesh = mesh
+		tarsus.material_override = material
+		detail_parent.add_child(tarsus)
+		_tarsi.append(tarsus)
+		for j in 2:
+			var bulb := SphereMesh.new()
+			bulb.radius = (r[1] if j == 0 else r[3]) * 0.9
+			bulb.height = bulb.radius * 2.0
+			bulb.radial_segments = 8
+			bulb.rings = 4
+			var joint := MeshInstance3D.new()
+			joint.name = ("Knee%d" if j == 0 else "Ankle%d") % i
+			joint.mesh = bulb
+			joint.material_override = joint_material
+			joint.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			detail_parent.add_child(joint)
+			_joints.append(joint)
+
+
+func has_detail() -> bool:
+	return not _tarsi.is_empty()
+
+
+## Where the drawn tibia ends and the thin tarsus begins: a little above the knee-to-foot line.
+static func ankle_point(knee: Vector3, foot: Vector3, up: Vector3) -> Vector3:
+	return knee.lerp(foot, ANKLE_SHARE) + up * ANKLE_LIFT
+
+
+## Places leg i's detail. `world` puts it in world space with the body's scale `s` (surface contacts); otherwise local.
+func _place_detail(i: int, knee: Vector3, ankle: Vector3, foot: Vector3, world: bool, s: float, shown: bool) -> void:
+	if _tarsi.is_empty():
+		return
+	var parts: Array[MeshInstance3D] = [_tarsi[i], _joints[i * 2], _joints[i * 2 + 1]]
+	for part in parts:
+		part.top_level = world
+		part.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF if world else Node.PHYSICS_INTERPOLATION_MODE_INHERIT
+		part.visible = shown
+	_place_segment(_tarsi[i], ankle, foot)
+	var k := Basis.IDENTITY
+	if world:
+		var b := _tarsi[i].basis
+		b.x *= s
+		b.z *= s
+		_tarsi[i].basis = b
+		k = Basis.IDENTITY.scaled(Vector3.ONE * s)
+	_joints[i * 2].transform = Transform3D(k, knee)
+	_joints[i * 2 + 1].transform = Transform3D(k, ankle)
 
 
 func reset_pose() -> void:
@@ -87,7 +164,17 @@ func advance_pose(delta: float, local_velocity: Vector3, grounded: bool = true,
 			var index := (side_index * 4 + pair) * 2
 			if _segments.size() == 16:
 				_place_segment(_segments[index], hip, knee)
-				_place_segment(_segments[index + 1], knee, foot)
+				if has_detail():
+					var ankle := ankle_point(knee, foot, Vector3.UP)
+					_place_segment(_segments[index + 1], knee, ankle)
+					_place_detail(side_index * 4 + pair, knee, ankle, foot, false, 1.0, _detail_shown(pair))
+				else:
+					_place_segment(_segments[index + 1], knee, foot)
+
+
+## Overridden by the live rig (eye view shows only the front legs' far ends).
+func _detail_shown(_pair: int) -> bool:
+	return true
 
 
 ## A copy for prototype inspection; callers cannot mutate the internal pose.

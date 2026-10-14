@@ -1,0 +1,72 @@
+tools/preview/coat.py: how the abdomen's coat treats the white pattern, the black body and the outline.
+Godot-shim renders of the part list, not Roblox rendering; they compare two coats and do not say how fuzzy either looks.
+Per layer: hairs only, fur shells only, both. White: share of the designed white still as bright as designed (85 % or more) and its mean brightness.
+Shards: pixels the coat made 40/255 or more brighter than the bare body, away from the white. Black: mean lift of the black body.
+Outline: reach past the bare silhouette at a faint (12/255) and a solid (60/255) visibility.
+In the top view the white spots are as white as the background, so the silhouette comes from the bare body alone.
+
+FIRST COAT (before_parts.json, be2fa04)
+704 parts; abdomen coat: 269 hairs, 4 shells
+[top] bare abdomen 44285 px, designed white 6587 px (mean brightness 255/255 against 63 bare)
+    hairs  white:  91% of it as bright as designed (mean  96%); shard pixels  7527 in 55 blobs; black lifted +27.5/255
+           outline faint: reach 8.38 px mean, p95 22.4, farthest 28.6 px, 22 blobs beyond 12 px
+           outline solid: reach 5.35 px mean, p95 21.9, farthest 27.9 px, 29 blobs beyond 12 px
+    shells white:  88% of it as bright as designed (mean  91%); shard pixels     0 in  0 blobs; black lifted +18.8/255
+           outline faint: reach 5.86 px mean, p95 11.5, farthest 17.4 px, 2 blobs beyond 12 px
+           outline solid: reach 0.21 px mean, p95 6.8, farthest 7.8 px, 0 blobs beyond 12 px
+    both   white:  83% of it as bright as designed (mean  89%); shard pixels  7741 in 58 blobs; black lifted +37.9/255
+           outline faint: reach 9.34 px mean, p95 22.0, farthest 28.6 px, 21 blobs beyond 12 px
+           outline solid: reach 5.60 px mean, p95 21.9, farthest 27.9 px, 28 blobs beyond 12 px
+[play_distance] bare abdomen 9857 px, designed white 303 px (mean brightness 254/255 against 65 bare)
+    hairs  white:  85% of it as bright as designed (mean  94%); shard pixels  1458 in 33 blobs; black lifted +22.6/255
+           outline faint: reach 4.02 px mean, p95 11.9, farthest 15.2 px, 9 blobs beyond 12 px
+           outline solid: reach 2.98 px mean, p95 11.5, farthest 15.2 px, 9 blobs beyond 12 px
+    shells white:  92% of it as bright as designed (mean  93%); shard pixels     0 in  0 blobs; black lifted +17.8/255
+           outline faint: reach 2.70 px mean, p95 7.1, farthest 8.5 px, 0 blobs beyond 12 px
+           outline solid: reach 0.22 px mean, p95 2.7, farthest 2.7 px, 0 blobs beyond 12 px
+    both   white:  79% of it as bright as designed (mean  89%); shard pixels  1497 in 35 blobs; black lifted +34.1/255
+           outline faint: reach 4.65 px mean, p95 11.6, farthest 15.2 px, 9 blobs beyond 12 px
+           outline solid: reach 3.08 px mean, p95 11.5, farthest 15.2 px, 9 blobs beyond 12 px
+[game_camera] bare abdomen 7406 px, designed white 269 px (mean brightness 254/255 against 63 bare)
+    hairs  white:  85% of it as bright as designed (mean  94%); shard pixels   996 in 31 blobs; black lifted +21.8/255
+           outline faint: reach 3.18 px mean, p95 10.1, farthest 12.9 px, 10 blobs beyond 6 px
+           outline solid: reach 2.33 px mean, p95 9.6, farthest 12.9 px, 14 blobs beyond 6 px
+    shells white:  94% of it as bright as designed (mean  94%); shard pixels     0 in  0 blobs; black lifted +16.9/255
+           outline faint: reach 2.28 px mean, p95 6.0, farthest 7.1 px, 3 blobs beyond 6 px
+           outline solid: reach 0.23 px mean, p95 2.3, farthest 2.3 px, 0 blobs beyond 6 px
+    both   white:  81% of it as bright as designed (mean  89%); shard pixels  1033 in 33 blobs; black lifted +32.8/255
+           outline faint: reach 3.71 px mean, p95 9.7, farthest 12.9 px, 11 blobs beyond 6 px
+           outline solid: reach 2.43 px mean, p95 9.6, farthest 12.9 px, 14 blobs beyond 6 px
+
+SECOND COAT (the code at 38d15ae, full detail)
+623 parts; abdomen coat: 234 hairs, 4 shells
+[top] bare abdomen 44285 px, designed white 6587 px (mean brightness 255/255 against 63 bare)
+    hairs  white: 100% of it as bright as designed (mean 100%); shard pixels   105 in  6 blobs; black lifted  +0.8/255
+           outline faint: reach 2.55 px mean, p95 9.6, farthest 15.1 px, 4 blobs beyond 12 px
+           outline solid: reach 2.35 px mean, p95 9.6, farthest 15.1 px, 4 blobs beyond 12 px
+    shells white:  86% of it as bright as designed (mean  90%); shard pixels     0 in  0 blobs; black lifted  +0.9/255
+           outline faint: reach 7.26 px mean, p95 15.1, farthest 18.8 px, 5 blobs beyond 12 px
+           outline solid: reach 0.21 px mean, p95 6.8, farthest 7.8 px, 0 blobs beyond 12 px
+    both   white:  87% of it as bright as designed (mean  91%); shard pixels   107 in  6 blobs; black lifted  +1.5/255
+           outline faint: reach 7.29 px mean, p95 15.1, farthest 18.8 px, 5 blobs beyond 12 px
+           outline solid: reach 2.35 px mean, p95 9.6, farthest 15.1 px, 4 blobs beyond 12 px
+[play_distance] bare abdomen 9857 px, designed white 303 px (mean brightness 254/255 against 65 bare)
+    hairs  white:  97% of it as bright as designed (mean  98%); shard pixels    35 in  9 blobs; black lifted  +2.2/255
+           outline faint: reach 0.92 px mean, p95 5.5, farthest 7.8 px, 0 blobs beyond 12 px
+           outline solid: reach 0.88 px mean, p95 5.5, farthest 7.8 px, 0 blobs beyond 12 px
+    shells white:  83% of it as bright as designed (mean  91%); shard pixels     0 in  0 blobs; black lifted  +0.9/255
+           outline faint: reach 2.81 px mean, p95 7.4, farthest 8.5 px, 0 blobs beyond 12 px
+           outline solid: reach 0.03 px mean, p95 1.5, farthest 1.9 px, 0 blobs beyond 12 px
+    both   white:  83% of it as bright as designed (mean  90%); shard pixels    37 in  9 blobs; black lifted  +2.7/255
+           outline faint: reach 2.81 px mean, p95 7.4, farthest 8.5 px, 0 blobs beyond 12 px
+           outline solid: reach 0.89 px mean, p95 5.5, farthest 7.8 px, 0 blobs beyond 12 px
+[game_camera] bare abdomen 7406 px, designed white 269 px (mean brightness 254/255 against 63 bare)
+    hairs  white:  97% of it as bright as designed (mean  98%); shard pixels    22 in  5 blobs; black lifted  +2.0/255
+           outline faint: reach 0.77 px mean, p95 4.6, farthest 6.4 px, 0 blobs beyond 6 px
+           outline solid: reach 0.72 px mean, p95 4.7, farthest 6.4 px, 0 blobs beyond 6 px
+    shells white:  88% of it as bright as designed (mean  92%); shard pixels     0 in  0 blobs; black lifted  +0.9/255
+           outline faint: reach 2.36 px mean, p95 6.1, farthest 7.1 px, 3 blobs beyond 6 px
+           outline solid: reach 0.06 px mean, p95 1.8, farthest 2.3 px, 0 blobs beyond 6 px
+    both   white:  88% of it as bright as designed (mean  91%); shard pixels    25 in  5 blobs; black lifted  +2.5/255
+           outline faint: reach 2.39 px mean, p95 6.1, farthest 7.1 px, 3 blobs beyond 6 px
+           outline solid: reach 0.73 px mean, p95 4.6, farthest 6.4 px, 0 blobs beyond 6 px

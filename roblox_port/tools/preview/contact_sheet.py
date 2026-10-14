@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """Contact sheets from the preview renders in one folder (files named <set>_<view>.png).
-  contact_sheet.png      rows = views (cropped to the spider, the same crop for every column), columns = before | after | after (low detail) | after, idling 5 s
+  contact_sheet.png      rows = views (cropped to the spider, the same crop for every column), columns = before (the first coat) | after (the second
+                         coat) | after (low detail) | after, idling 5 s
   game_camera_sheet.png  the spider cut out of the 1080p game-camera frames (what the player sees), enlarged 2x
 Godot-shim renders: layout and silhouette only, not Roblox rendering.
 Usage: python3 tools/preview/contact_sheet.py folder"""
 import re, sys, pathlib
 from PIL import Image, ImageChops, ImageDraw
 folder = pathlib.Path(sys.argv[1])
-SETS = [("before", "Before (old rig)"), ("after", "After (full detail)"), ("low", "After, low detail"), ("idle", "After, idling 5 s")]
+SETS = [("before", "Before (first coat)"), ("after", "After (second coat)"), ("low", "After, low detail"), ("idle", "After, idling 5 s")]
 VIEWS = [("front_three_quarter", "Front three-quarter"), ("top", "Top"), ("face_closeup", "Face close-up"), ("play_distance", "Play distance")]
 CELL = (480, 300)
 LABEL, TOP = 150, 34

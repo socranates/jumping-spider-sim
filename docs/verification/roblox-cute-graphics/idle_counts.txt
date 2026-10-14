@@ -1,1 +1,1 @@
-parts_total=705 setae=556 shells=8 other=141
+parts_total=624 setae=475 shells=8 other=141

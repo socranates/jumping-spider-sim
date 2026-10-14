@@ -1,3 +1,16 @@
+# Current handoff — Claude, 2026-10-14: Roblox controls like Godot, recovery camera
+
+Nathan: "the controls are not as good on roblox, when jumping you can only hop, V doesnt change the view etc. They were perfect on the godot version." Read **docs/HANDOFF-roblox-controls-recovery.md** and **docs/verification/roblox-controls-recovery/RESULTS.md**. Branch **claude/roblox-controls-recovery** (main 432bc53 + Perplexity's 01fe0d1, merged). Roblox only.
+- Merged Chet's safety silk with Perplexity's camera, aiming, eye view and fuzz; places regenerated; Perplexity's ROBLOX-04/05 are now **ROBLOX-06/07**.
+- One control scheme like Godot on keyboard, controller and touch together (ROBLOX-08, table in roblox_port/README.md). Q/B cancels an aim or a walk to the edge; only a deliberate hold lets go of the line. Roblox's menu pauses. Prompts name the device in use and wrap in the safe area.
+- Catch camera turns at most 45 degrees to frame the recovery; any look, recenter or aim takes over (ROBLOX-09).
+- New scenarios found and fixed two bugs: a snag left reeling dead (ROBLOX-10); holding W at an edge flipped back and forth (Godot's carry, ROBLOX-11).
+- Linux: pure **182/182**, box world **15/15** (ten misses recovered), client smoke **11/11**, strict analysis clean, evidence **876253fd47783ce3**. **Not run in Studio or on devices.**
+
+**Next:** Chet — Studio suite (39 rows) and client playback (7), controller/touch/tablet and frame-time checks, then merge to main. Nathan — try the list in the handoff. Then perception.
+
+---
+
 # Current handoff — Chet, 2026-10-14: Roblox safety silk
 
 Read **docs/HANDOFF-roblox-silk.md** and **docs/verification/roblox-silk/RESULTS.md** first. Roblox-only; Godot/SPEC frozen.

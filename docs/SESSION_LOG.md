@@ -1154,3 +1154,7 @@ Started main 120abc5, updated laptop, confirmed baseline 640/640. Fixed menu foc
 ## 2026-10-14 — Chet: Roblox becomes active
 
 Merged Perplexity c87ce00 (both parts); froze Godot as reference, kept roblox_port/, recorded PLATFORM-01 and ROBLOX-01 to 03. Committed first-spider reference and appearance table, cuter rounded black/white rig, basic touch/gamepad controls, native Studio runner/build stamping and detailed port inventory. Corrected inherited forbidden runtime lighting assignment. Windows pure checks 43/43, Studio engine 6/6, evidence 5b14ae68fed28794; syntax 17 files. Saved actual Studio preview and reports. Physical controller/tablet and low-end frame-time acceptance remain. Recommended next: safety silk.
+
+## 2026-10-14 — Perplexity Computer: Roblox controls, camera and fuzz
+
+Started main e183efc. Found the "only hop" cause (Roblox's stock camera centred the body, so the aim ray met the floor at the feet). Ported camera_rig.gd (SpiderCamera + pure CameraMath, checked against new Godot-exported goldens), jump controller/planner phases, Focus, spider-eye view, recenter, cancel, slow motion and Godot's bindings (reset now Backspace). Added the fuzzy coat (Setae.luau, Appearances.fuzz, fur shells, low detail on touch-only devices) and a Godot-drawn layout preview tool. Linux pure 63/63, strict type check clean, evidence db36b09b003a6b8d. Not run in Roblox Studio. Next: Chet's Studio suite, play and frame-time check (HANDOFF-roblox-controls.md), then safety silk.

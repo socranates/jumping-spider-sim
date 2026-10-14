@@ -6,6 +6,7 @@
 
 local Workspace = game:GetService("Workspace")
 local Appearances = require(script.Parent.Parent.Data.Appearances)
+local Setae = require(script.Parent.Setae)
 
 local SpiderRig = {}
 SpiderRig.__index = SpiderRig
@@ -40,6 +41,7 @@ type Leg = {
 	knee: Part,
 	ankle: Part,
 	bands: {Part},
+	hairs: { { part: Part, spec: Setae.LegHair } },
 }
 
 type Fixed = { part: Part, offset: CFrame, palp: number? }
@@ -57,6 +59,10 @@ export type Rig = typeof(setmetatable(
 		_drum: number,
 		_spots: { Part },
 	_appearance: any,
+		_setae: { Part },
+		_eyeView: boolean,
+		_bodyHidden: boolean,
+		_highlight: Highlight?,
 		_params: RaycastParams,
 		_parts: { BasePart },
 		_cframes: { CFrame },
@@ -110,7 +116,8 @@ local function rodCFrame(a: Vector3, b: Vector3): CFrame
 	return CFrame.lookAt((a + b) * 0.5, b) * CFrame.Angles(0, math.pi / 2, 0)
 end
 
-function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: string?): Rig
+-- detail "low" keeps every third hair (phones and tablets until a real-device frame-time check says otherwise).
+function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: string?, detail: string?): Rig
 	local look = Appearances.profiles[appearanceId or Appearances.default]
 	assert(look, "Unknown spider appearance")
 	local function color(rgb): Color3 return Color3.new(rgb[1], rgb[2], rgb[3]) end
@@ -142,6 +149,10 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		_drum = 0,
 		_spots = {} :: { Part },
 		_appearance = look,
+		_setae = {} :: { Part },
+		_eyeView = false,
+		_bodyHidden = false,
+		_highlight = nil :: Highlight?,
 		_params = params,
 		_parts = {} :: { BasePart },
 		_cframes = {} :: { CFrame },
@@ -210,6 +221,39 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		fixed(ellipsoid(model, "PalpClub", Vector3.new(0.03, 0.03, 0.045), LEG, fabric), tip + Vector3.new(0, -0.005, -0.02) - base, nil, palpIndex)
 		fixed(ellipsoid(model, "PalpTip", Vector3.new(0.022, 0.018, 0.022), JOINT, fabric), tip + Vector3.new(0, 0.006, -0.045) - base, nil, palpIndex)
 	end
+	-- Fuzz: thin hairs over the head and abdomen (Setae.body), moved with the body like every fixed part.
+	local fuzz = look.fuzz
+	local DARK = if fuzz then color(fuzz.dark) else BODY
+	local GREY = if fuzz then color(fuzz.grey) else BODY
+	local function seta(white: boolean, grey: boolean, width: number, length: number): Part
+		local h = newPart(model, "Seta", if white then WHITE elseif grey then GREY else DARK, Enum.Material.SmoothPlastic)
+		h.Size = Vector3.new(width, width, length)
+		h.CastShadow = false
+		h.Transparency = fuzz.transparency
+		table.insert(self._setae, h)
+		return h
+	end
+	if fuzz and fuzz.enabled then
+		local SHELL = color(fuzz.shellColor)
+		local hr, abr = Vector3.new(table.unpack(look.headRadii)), Vector3.new(table.unpack(look.abdomenRadii))
+		for k, shell in fuzz.shells do
+			local a = ellipsoid(model, "FuzzShell", abr * shell.scale, SHELL, Enum.Material.SmoothPlastic)
+			a.Transparency, a.CastShadow = shell.transparency, false
+			fixed(a, Setae.ABDOMEN_CENTER)
+			-- The head's shell sits back from the eye row so the eyes stay clear and glossy.
+			local h = ellipsoid(model, "FuzzShell", Vector3.new(hr.X * shell.scale, hr.Y * shell.scale, hr.Z * 0.82), SHELL, Enum.Material.SmoothPlastic)
+			h.Transparency, h.CastShadow = shell.transparency, false
+			fixed(h, Setae.HEAD_CENTER + Vector3.new(0, 0, 0.05 + 0.01 * k))
+		end
+	end
+	local keepEvery = if detail == "low" then 3 else 1
+	for n, hair in Setae.body(look) do
+		if n % keepEvery ~= 0 then continue end
+		local h = seta(hair.white, hair.grey, fuzz.width, hair.length)
+		local mid = hair.at + hair.dir * (hair.length * 0.5)
+		local upv = if math.abs(hair.dir.Y) < 0.9 then Vector3.yAxis else Vector3.zAxis
+		fixed(h, mid, CFrame.lookAt(Vector3.zero, hair.dir, upv))
+	end
 	for i = 1, 8 do
 		local side = if i <= 4 then -1 else 1
 		local pair = (i - 1) % 4 + 1
@@ -231,7 +275,13 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 			knee = ball(model, "Knee" .. i, d[1] * 0.95, JOINT),
 			ankle = ball(model, "Ankle" .. i, d[2] * 0.95, JOINT),
 			bands = {rod(model, "FemurBand" .. i, d[1], WHITE), rod(model, "TibiaBand" .. i, d[2], WHITE), rod(model, "TarsusBand" .. i, d[2] * 0.6, WHITE)},
+			hairs = {},
 		})
+		local leg = self._legs[#self._legs]
+		for n, spec in Setae.leg(look, i) do
+			if n % keepEvery ~= 0 then continue end
+			table.insert(leg.hairs, { part = seta(spec.white, spec.grey, fuzz.width * 0.85, spec.length), spec = spec })
+		end
 	end
 	local hl = Instance.new("Highlight")
 	hl.FillTransparency = 1
@@ -239,6 +289,7 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 	hl.OutlineTransparency = 0.82
 	hl.DepthMode = Enum.HighlightDepthMode.Occluded
 	hl.Parent = model
+	self._highlight = hl
 	model.Parent = parent
 	self:setGrowthStage(0)
 	return self
@@ -379,22 +430,68 @@ function SpiderRig.update(self: Rig, body: CFrame, dt: number, grounded: boolean
 		local foot = leg.foot
 		local knee = hip:Lerp(foot, 0.48) + up * (if grounded then 0.30 else 0.24)
 		local ankle = knee:Lerp(foot, ANKLE_SHARE) + up * ANKLE_LIFT
-		local function segment(p: Part, band: Part, a: Vector3, b: Vector3)
+		local function segment(index: number, p: Part, band: Part, a: Vector3, b: Vector3)
 			local len = math.max((b - a).Magnitude, 0.01)
 			if math.abs(p.Size.X - len) > 1e-3 then
 				p.Size = Vector3.new(len, p.Size.Y, p.Size.Z)
 			end
-			put(p, rodCFrame(a, b))
+			local rc = rodCFrame(a, b) -- local +X runs from a toward b (toward the foot)
+			put(p, rc)
 			band.Size = Vector3.new(len * self._appearance.bandFraction, p.Size.Y * 1.035, p.Size.Z * 1.035)
-			put(band, rodCFrame(a, b))
+			put(band, rc)
+			-- Leg setae stand out from the segment and lean toward the foot.
+			local r = p.Size.Y * 0.5
+			for _, hair in leg.hairs do
+				local spec = hair.spec
+				if spec.segment == index then
+					local c, s = math.cos(spec.theta), math.sin(spec.theta)
+					local base = Vector3.new((spec.t - 0.5) * len, r * 0.8 * c, r * 0.8 * s)
+					local dir = Vector3.new(1.3, c, s).Unit
+					put(hair.part, rc * CFrame.lookAt(base + dir * (spec.length * 0.5), base + dir * spec.length, Vector3.xAxis))
+				end
+			end
 		end
-		segment(leg.femur, leg.bands[1], hip, knee)
-		segment(leg.tibia, leg.bands[2], knee, ankle)
-		segment(leg.tarsus, leg.bands[3], ankle, foot)
+		segment(1, leg.femur, leg.bands[1], hip, knee)
+		segment(2, leg.tibia, leg.bands[2], knee, ankle)
+		segment(3, leg.tarsus, leg.bands[3], ankle, foot)
 		put(leg.knee, CFrame.new(knee))
 		put(leg.ankle, CFrame.new(ankle))
 	end
 	Workspace:BulkMoveTo(parts, cframes, Enum.BulkMoveMode.FireCFrameChanged)
+end
+
+-- Spider-eye view (Godot SpiderBody.set_eye_view + SurfaceLegs.eye_view): the body, head and palps are hidden and only the
+-- front legs' lower segments stay, reaching into the view. Client-only (LocalTransparencyModifier).
+local function applyVisibility(self: Rig)
+	local function show(p: BasePart, visible: boolean)
+		p.LocalTransparencyModifier = if visible then 0 else 1
+	end
+	local hideBody = self._eyeView or self._bodyHidden
+	if self._highlight then (self._highlight :: Highlight).Enabled = not hideBody end
+	for _, f in self._fixed do
+		show(f.part, not hideBody)
+	end
+	for _, leg in self._legs do
+		local frontReach = self._eyeView and leg.pair == 1
+		local all = not hideBody
+		show(leg.femur, all); show(leg.bands[1], all); show(leg.knee, all)
+		show(leg.tibia, all or frontReach); show(leg.bands[2], all or frontReach)
+		show(leg.tarsus, all or frontReach); show(leg.bands[3], all or frontReach); show(leg.ankle, all or frontReach)
+		for _, hair in leg.hairs do
+			show(hair.part, all or (frontReach and hair.spec.segment >= 2))
+		end
+	end
+end
+
+function SpiderRig.setEyeView(self: Rig, on: boolean)
+	self._eyeView = on
+	applyVisibility(self)
+end
+
+-- The orbit camera hides the spider when its boom is squeezed shorter than BODY_HIDE_LENGTH.
+function SpiderRig.setBodyHidden(self: Rig, hidden: boolean)
+	self._bodyHidden = hidden
+	applyVisibility(self)
 end
 
 -- Where the dragline leaves the body.

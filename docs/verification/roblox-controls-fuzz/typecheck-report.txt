@@ -1,0 +1,2 @@
+luau-lsp 1.70.1 analyze --platform roblox --definitions globalTypes.d.luau (strict files), roblox_port/src, evidence db36b09b003a6b8d
+diagnostics: 0

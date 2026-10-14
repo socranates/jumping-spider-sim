@@ -41,15 +41,32 @@ return function(check)
 			assert(rig.model:GetAttribute("AppearanceId") == "first_spider")
 		end)
 		check("all rig parts are display only and bounded", function()
-			local count = 0
+			local count, fuzz = 0, 0
 			for _, part in rig.model:GetChildren() do
 				if part:IsA("BasePart") then
-					count += 1
+					if part.Name == "Seta" or part.Name == "FuzzShell" then fuzz += 1 else count += 1 end
 					assert(part.Anchored and not part.CanCollide and not part.CanQuery and not part.CanTouch)
 					assert(part.Position.X == part.Position.X)
 				end
 			end
 			assert(count <= 160, `part budget exceeded: {count}`)
+			assert(fuzz >= 300 and fuzz <= 720, `fuzz budget: {fuzz}`)
+		end)
+		check("spider-eye view hides the body and keeps the front legs", function()
+			rig:setEyeView(true)
+			local eye = rig.model:FindFirstChild("PrincipalEye") :: BasePart
+			assert(eye.LocalTransparencyModifier == 1, "head still drawn in the eye view")
+			assert(rig._legs[1].tibia.LocalTransparencyModifier == 0, "front leg hidden")
+			assert(rig._legs[2].femur.LocalTransparencyModifier == 1, "back leg drawn")
+			rig:setEyeView(false)
+			assert(eye.LocalTransparencyModifier == 0 and rig._legs[2].femur.LocalTransparencyModifier == 0)
+		end)
+		check("low detail keeps about a third of the fuzz", function()
+			local low = Rig.new(folder, folder, nil, "low")
+			local n = 0
+			for _, part in low.model:GetChildren() do if part.Name == "Seta" then n += 1 end end
+			low:destroy()
+			assert(n >= 100 and n <= 260, `low fuzz: {n}`)
 		end)
 		check("air and underside poses are finite", function()
 			for _, up in {Vector3.yAxis, Vector3.xAxis, -Vector3.yAxis} do

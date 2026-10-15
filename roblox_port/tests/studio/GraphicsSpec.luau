@@ -9,6 +9,8 @@ return function(check)
 	local Shared = game:GetService("ReplicatedStorage"):WaitForChild("Shared")
 	local Graphics = require(Shared.Data.Graphics)
 	local Materials = require(Shared.Habitat.Materials)
+	local Flora = require(Shared.Data.Flora)
+	local Plants = require(Shared.Habitat.Plants)
 	local sill = workspace:WaitForChild("Windowsill", 15) :: Folder
 	local decor = workspace:WaitForChild("Decor", 15) :: Folder
 
@@ -29,6 +31,25 @@ return function(check)
 		local hit = workspace:Raycast(Vector3.new(0, 8, 0), Vector3.new(0, 0, -30))
 		assert(hit and hit.Instance == back and math.abs(hit.Position.Z + 12.5) < 1e-3, "a ray across the sill must land on the solid back wall")
 	end)
+	check("a piece is invisible only where its drawing exists, and then it stays solid; every drawn leaf's top is its piece's top", function()
+		local pilea = decor:FindFirstChild("Pilea")
+		assert(pilea, "the drawn Pilea is missing")
+		local hidden: { [string]: boolean } = { [Graphics.window.hidden] = true }
+		for _, id in Plants.pieceIds() do hidden[id] = true end
+		for _, part in sill:GetChildren() do
+			local p = part :: BasePart
+			if hidden[p.Name] then
+				assert(p.Transparency == 1 and not p.CastShadow and p.CanCollide and p.CanQuery, p.Name .. " must be invisible but solid")
+			else
+				assert(p.Transparency == 0, p.Name .. " must stay visible")
+			end
+		end
+		for _, plant in Flora.pilea.plants do
+			local leaf = sill:FindFirstChild(plant.leaf) :: BasePart
+			local blade = (pilea:FindFirstChild(plant.leaf) :: Folder):FindFirstChild("BladeA") :: BasePart
+			assert(math.abs((blade.Position.Y + blade.Size.Y / 2) - (leaf.Position.Y + leaf.Size.Y / 2)) < 1e-3, plant.leaf .. ": the drawn top is not the walkable top")
+		end
+	end)
 	check("decor is drawn only: no collisions, no rays, no touches", function()
 		local n = 0
 		for _, d in decor:GetDescendants() do
@@ -37,7 +58,15 @@ return function(check)
 				assert(d.Anchored and not d.CanCollide and not d.CanQuery and not d.CanTouch, d:GetFullName())
 			end
 		end
-		assert(n >= 70 and n <= 140, `decor has {n} parts`)
+		assert(n >= 400 and n < 1500, `decor has {n} parts`)
+	end)
+	check("the flowers' UV layer is invisible Neon until the eye view fades it in", function()
+		local uv = decor:FindFirstChild("UVLayer")
+		assert(uv and #uv:GetChildren() >= 100, "no UV layer")
+		for _, d in uv:GetChildren() do
+			local p = d :: BasePart
+			assert(p.Transparency == 1 and p.Material == Enum.Material.Neon and p:GetAttribute("UVOpacity") == 0.85 and p.Color == Color3.fromHex("b98cff"), p.Name)
+		end
 	end)
 	check("the sun shines in through the window", function()
 		local sun = Lighting:GetSunDirection()
@@ -53,10 +82,15 @@ return function(check)
 		assert(not glass.CastShadow and glass.Transparency >= 0.6 and glass.Material == Enum.Material.Glass)
 		assert(not (sill:FindFirstChild(Graphics.window.hidden) :: BasePart).CastShadow, "the invisible wall must not shade the room")
 	end)
-	check("atmosphere, sky, grade, bloom, sun rays and clouds are in place; no depth of field unless asked", function()
+	check("atmosphere, sky, grade, bloom, sun rays and clouds are in place; the macro depth of field is on unless switched off", function()
 		for _, name in { "Atmosphere", "Sky", "Grade", "Bloom", "SunRays" } do assert(Lighting:FindFirstChild(name), "missing " .. name) end
 		assert(workspace.Terrain:FindFirstChildOfClass("Clouds"), "missing clouds")
-		assert((Lighting:FindFirstChild("MacroDOF") ~= nil) == (workspace:GetAttribute("DepthOfField") == true), "depth of field must be opt-in")
+		local dof = Lighting:FindFirstChild("MacroDOF") :: DepthOfFieldEffect?
+		assert((dof ~= nil) == (workspace:GetAttribute("DepthOfField") ~= false), "depth of field must be on unless the DepthOfField attribute is false")
+		if dof then
+			assert(dof.FarIntensity == Graphics.depthOfField.far and dof.NearIntensity == 0 and dof.InFocusRadius == Graphics.depthOfField.radius, "depth of field blurs only the far")
+			assert(dof:GetAttribute("FullOnly") == true, "depth of field is a full-tier effect")
+		end
 		local bloom = Lighting:FindFirstChild("Bloom") :: BloomEffect
 		assert(bloom.Threshold >= 1.2 and bloom.Intensity <= 0.5, "bloom is not gentle")
 	end)

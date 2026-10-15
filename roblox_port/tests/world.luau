@@ -8,6 +8,9 @@ local Layout = require("../src/Shared/Habitat/WindowsillLayout")
 local Materials = require("../src/Shared/Habitat/Materials")
 local SunPick = require("../src/Shared/Habitat/SunPick")
 local Scenery = require("../src/Shared/Habitat/Scenery")
+local Flora = require("../src/Shared/Data/Flora")
+local Wear = require("../src/Shared/Data/Wear")
+local Plants = require("../src/Shared/Habitat/Plants")
 local Lit = require("../src/Shared/Habitat/Lit")
 local WorldDetail = require("../src/Client/WorldDetail")
 
@@ -33,14 +36,21 @@ check(#unknown == 0, "every material name in the graphics table is one Materials
 local unmapped = {}
 for _, p in Layout.PIECES do if not M.pieces[p.id] then table.insert(unmapped, p.id) end end
 check(#unmapped == 0, "every sill piece has a material (" .. table.concat(unmapped, ", ") .. ")")
-check(M.pieces.sill_floor == "WoodPlanks" and M.pieces.planter == "Brick" and M.wall == "Plaster" and M.glass == "Glass" and M.soil == "Ground"
-	and M.pieces.leaf_west == "LeafyGrass", "wood planks sill, brick planter, plaster wall, glass window, ground soil, leafy leaves")
-check(rgb(Color3.fromHex(W.wallColor)) == rgb(piece("back_frame").color), "the drawn wall keeps the old wall colour")
-local mullion
-for _, d in Layout.DECOR do if d.id == "mullion_w" then mullion = d end end
-check(rgb(Color3.fromHex(W.trimColor)) == rgb(mullion.color) and rgb(Color3.fromHex(W.glass.color)) == rgb(Color3.fromHex("a9c2c1")), "trim and glass keep their old colours")
+check(M.pieces.sill_floor == "SmoothPlastic" and M.pieces.front_lip == "SmoothPlastic" and M.pieces.planter == "Plaster" and M.wall == "Plaster"
+	and M.glass == "Glass" and M.soil == "Ground" and M.pieces.leaf_west == "SmoothPlastic" and M.pieces.leaf_tip == "Plaster" and M.chip == "Wood",
+	"cream enamel sill, plaster planter and walls, glass window, ground soil, glossy leaves, bare wood under the chips")
+local paint = Graphics.paint
+check(paint.sill_floor.color == "e8dfcb" and paint.front_lip.color == "e8dfcb" and paint.sill_floor.reflectance == 0.03 and paint.front_lip.reflectance == 0.03
+	and paint.planter.color == "b8653f" and paint.planter_rim.color == "c97a52" and paint.left_frame.color == "efe8d8" and paint.right_frame.color == "efe8d8",
+	"the sill is cream enamel, the trough terracotta, the side walls plaster")
+check(W.wallColor == "efe8d8" and W.trimColor == "f4efe3" and W.trimReflectance > 0 and W.glass.color == "cfe3e6" and W.glass.transparency == 0.86 and W.glass.reflectance == 0.12,
+	"plaster wall, glossy cream trim, pale blue-green glass")
 check(Graphics.bloom.threshold >= 1.2 and Graphics.bloom.intensity <= 0.5 and Graphics.sunRays.intensity <= 0.1
 	and math.abs(Graphics.grade.contrast) <= 0.15 and math.abs(Graphics.grade.saturation) <= 0.15, "bloom, sun rays and grade are gentle")
+check(Graphics.bloom.intensity == 0.45 and Graphics.bloom.size == 24 and Graphics.bloom.threshold == 1.4 and Graphics.grade.contrast == 0.1 and Graphics.grade.saturation == 0.1
+	and rgb(Color3.fromRGB(Graphics.grade.tint[1], Graphics.grade.tint[2], Graphics.grade.tint[3])) == rgb(Color3.fromRGB(255, 246, 232)), "the morning grade: warm tint, a touch of contrast and colour, soft bloom")
+local DOF = Graphics.depthOfField
+check(DOF.far == 0.3 and DOF.near == 0 and DOF.radius == 18, "the macro depth of field blurs only what is far")
 check(Graphics.lighting.shadowSoftness >= 0.1 and Graphics.lighting.shadowSoftness <= 0.4 and math.abs(Graphics.lighting.exposureCompensation) <= 0.3
 	and Graphics.atmosphere.density <= 0.5 and Graphics.atmosphere.offset >= 0 and Graphics.atmosphere.offset <= 1, "soft shadows, mild exposure and haze")
 check(Graphics.tiers.low.dustRate < Graphics.tiers.full.dustRate and Graphics.tiers.low.dustRate > 0, "the low tier thins the dust rather than removing it")
@@ -80,20 +90,36 @@ local sillOk, listed = true, {}
 for _, spec in Layout.PIECES do
 	local p = sill:FindFirstChild(spec.id)
 	listed[spec.id] = p
+	local painted = Graphics.paint[spec.id]
 	sillOk = sillOk and p ~= nil and (p.Size - (spec.hi - spec.lo)).Magnitude < 1e-9 and (p.Position - (spec.lo + spec.hi) * 0.5).Magnitude < 1e-9
 		and p.Anchored and p.CanQuery ~= false and p.CanCollide ~= false
-		and p:GetAttribute("SurfaceId") == spec.id and p:GetAttribute("ProfileId") == spec.profile and rgb(p.Color) == rgb(spec.color)
+		and p:GetAttribute("SurfaceId") == spec.id and p:GetAttribute("ProfileId") == spec.profile
+		and rgb(p.Color) == rgb(if painted then Color3.fromHex(painted.color) else spec.color) and (p.Reflectance or 0) == (painted and painted.reflectance or 0)
 end
-check(sillOk and #sill:GetChildren() == #Layout.PIECES, "the sill's pieces keep their geometry, colour, profile, solidity and queryability")
-check(listed.back_frame.Transparency == 1 and listed.back_frame.CastShadow == false and listed.sill_floor.Transparency == 0, "only the back wall turns invisible (still solid)")
--- If the drawn wall could not be built (Main.server.luau catches that), the solid wall must not be left invisible.
-local plain = Scenery.sill(false)
+check(sillOk and #sill:GetChildren() == #Layout.PIECES, "the sill's pieces keep their geometry, profile, solidity and queryability, and wear the painted colours")
+-- The back wall and the Pilea's leaves and stems are drawn in their place (still solid and climbable, no shadow); nothing else is hidden.
+local expectHidden: { [string]: boolean } = { [W.hidden] = true }
+for _, id in Plants.pieceIds() do expectHidden[id] = true end
+local hiddenOk, hiddenCount = true, 0
+for _, spec in Layout.PIECES do
+	local p = listed[spec.id]
+	if expectHidden[spec.id] then
+		hiddenCount += 1
+		hiddenOk = hiddenOk and p.Transparency == 1 and p.CastShadow == false and p.CanCollide ~= false and p.CanQuery ~= false
+	else
+		hiddenOk = hiddenOk and p.Transparency == 0 and p.CastShadow ~= false
+	end
+end
+check(hiddenOk and hiddenCount == 8, `only the back wall and the Pilea's pieces turn invisible, and they stay solid ({hiddenCount})`)
+-- If a drawing could not be built (Main.server.luau catches that), what it replaces must not be left invisible.
+local plain = Scenery.sill({})
 local plainBack = plain:FindFirstChild("back_frame") :: Part
-check(plainBack.Transparency == 0 and plainBack.CastShadow ~= false and #plain:GetChildren() == #Layout.PIECES, "without the drawn wall the back wall stays visible")
+local plainLeaf = plain:FindFirstChild("leaf_west") :: Part
+check(plainBack.Transparency == 0 and plainBack.CastShadow ~= false and plainLeaf.Transparency == 0 and #plain:GetChildren() == #Layout.PIECES, "without the drawings the wall and the leaves stay visible")
 
 -- ---------------------------------------------------------------- the decor
 local sun = Vector3.new(0.35, 0.5, -0.8).Unit
-local decor = Scenery.decor(sun)
+local decor, drawnIds = Scenery.decor(sun)
 local parts, bad = {}, 0
 for _, d in decor:GetDescendants() do
 	if d:IsA("BasePart") then
@@ -102,6 +128,10 @@ for _, d in decor:GetDescendants() do
 	end
 end
 check(bad == 0, "every decor part is anchored, non-colliding, not touchable and invisible to rays")
+local sameSet = true
+for id in expectHidden do sameSet = sameSet and drawnIds[id] == true end
+for id in drawnIds do sameSet = sameSet and expectHidden[id] == true end
+check(sameSet, "the decor reports exactly the pieces it drew: the wall and the Pilea's leaves, stems and tip")
 
 -- An optional piece that fails is left out with a warning; the wall and the other pieces stay.
 do
@@ -115,8 +145,29 @@ do
 		and partial:FindFirstChild("Shafts") ~= nil and partial:FindFirstChild("View") ~= nil and partial:FindFirstChild("Details") == nil,
 		"an optional piece that fails is left out with a warning, and the rest of the decor is kept")
 end
-check(#parts >= 70 and #parts <= 140, `decor part count is modest ({#parts})`)
-for _, name in { "Wall", "View", "Details", "Shafts", "DustVolume", "soil", "silk_0", "silk_6" } do
+
+-- If the Pilea fails halfway, what it had built is removed and its pieces stay visible (nothing is hidden for a drawing that is not there).
+do
+	local warned = {}
+	warn = function(message: string) table.insert(warned, message) end
+	local realPilea = Plants.pilea
+	Plants.pilea = function(parent: Instance): Folder
+		local half = Instance.new("Folder")
+		half.Name = "Pilea"
+		half.Parent = parent
+		error("boom")
+	end
+	local partial, partialDrawn = Scenery.decor(sun)
+	Plants.pilea = realPilea
+	local stand = Scenery.sill(partialDrawn)
+	local leaf, stem, wall = stand:FindFirstChild("leaf_west") :: Part, stand:FindFirstChild("stem_east") :: Part, stand:FindFirstChild(W.hidden) :: Part
+	check(#warned == 1 and string.find(warned[1], "pilea", 1, true) ~= nil and partial:FindFirstChild("Pilea") == nil and partialDrawn.leaf_west == nil and partialDrawn.leaf_tip == nil
+		and partialDrawn[W.hidden] == true and leaf.Transparency == 0 and leaf.CastShadow ~= false and stem.Transparency == 0 and wall.Transparency == 1
+		and partial:FindFirstChild("Garden") ~= nil and partial:FindFirstChild("Planter") ~= nil,
+		"if the Pilea fails, its half-built parts are removed, its pieces stay visible, and the rest of the decor is kept")
+end
+check(#parts >= 400 and #parts < 1500, `decor part count stays inside the full-tier budget ({#parts})`)
+for _, name in { "Wall", "View", "Details", "Shafts", "DustVolume", "soil", "silk_0", "silk_6", "Pilea", "Planter", "Garden", "Wear", "Condensation", "Smudges", "Retreat", "UVLayer" } do
 	check(decor:FindFirstChild(name) ~= nil, "decor has " .. name)
 end
 check(decor:FindFirstChild("window_glass") == nil and decor:FindFirstChild("mullion_w") == nil, "the old glass and mullions are replaced by the new wall")
@@ -188,19 +239,273 @@ check(shown >= 14, `the roofs, chimneys and treetops appear inside the glass fro
 check(fullOnly >= 8 and fullOnly < viewCount - 8, `the view keeps a simple core for the low tier ({fullOnly} of {viewCount} are full-only)`)
 
 -- Small details: low and flat, clear of the spawn, the retreat and the silk practice lines.
+local function extent(p: any): Vector3 -- half the size of a part's bounding box along the world axes (a turned part is wider than its Size says)
+	local c, s = p.CFrame, p.Size / 2
+	local x, y, z = c.RightVector, c.UpVector, c.LookVector
+	return Vector3.new(
+		math.abs(x.X) * s.X + math.abs(y.X) * s.Y + math.abs(z.X) * s.Z,
+		math.abs(x.Y) * s.X + math.abs(y.Y) * s.Y + math.abs(z.Y) * s.Z,
+		math.abs(x.Z) * s.X + math.abs(y.Z) * s.Y + math.abs(z.Z) * s.Z)
+end
 local details = decor:FindFirstChild("Details")
 local clear, lowest, count = true, 0, 0
 local SPAWN = Layout.SPAWN
 for _, p in details:GetChildren() do
 	count += 1
-	local c, h = p.Position, p.Size
-	lowest = math.max(lowest, c.Y + h.Y / 2)
+	local c, h = p.Position, extent(p)
+	lowest = math.max(lowest, c.Y + h.Y)
 	local nearSpawn = (Vector3.new(c.X, 0, c.Z) - Vector3.new(SPAWN.X, 0, SPAWN.Z)).Magnitude < 4
 	local inRetreat = c.X > Layout.RETREAT_MIN.X - 1.5 and c.X < Layout.RETREAT_MAX.X + 1.5 and c.Z > Layout.RETREAT_MIN.Z - 1.5 and c.Z < Layout.RETREAT_MAX.Z + 1.5
 	clear = clear and not nearSpawn and not inRetreat and math.abs(c.X) < 30 and c.Z > -12.5 and c.Z < 12.5
 end
 check(clear and count >= 18, `paint chips, cracks and crumbs sit on the sill, clear of the spawn and the silk lines ({count})`)
 check(lowest <= 0.25, "details are low enough not to hide the landing patch")
+
+-- ---------------------------------------------------------------- the look of the sill's things (Data/Flora, Data/Wear)
+local function luminance(c: Color3): number return 0.2126 * c.R + 0.7152 * c.G + 0.0722 * c.B end
+local function same(c: Color3, hex: string): boolean return rgb(c) == rgb(Color3.fromHex(hex)) end
+local function find(root: any, ...: string): any -- a descendant by path; nil if a step is missing
+	local at: any = root
+	for _, name in { ... } do
+		if at == nil then return nil end
+		at = at:FindFirstChild(name)
+	end
+	return at
+end
+local function named(root: any, prefix: string): { any } -- the children whose names start with `prefix`
+	local out = {}
+	for _, c in root:GetChildren() do
+		if string.sub(c.Name, 1, #prefix) == prefix then table.insert(out, c) end
+	end
+	return out
+end
+local Mat = Materials.get
+
+-- The Pilea: pancake leaves whose tops are their pieces' tops and whose footprints fill the pieces (the corners rounded), petioles
+-- inscribed in the stem pieces, pale dots and 7 to 9 veins on each leaf, a darker rim and a lighter underside, a curled dry leaf.
+local pilea = find(decor, "Pilea")
+local topsOk, footOk, rodsOk, veinsOk, dotsOk, coloursOk = true, true, true, true, true, true
+local veinCounts = {}
+local function blade(group: any, lo: Vector3, hi: Vector3): (boolean, boolean)
+	local x0, x1, z0, z1, top, bottom = math.huge, -math.huge, math.huge, -math.huge, -math.huge, math.huge
+	for _, part in named(group, "Blade") do
+		local e = extent(part)
+		x0, x1 = math.min(x0, part.Position.X - e.X), math.max(x1, part.Position.X + e.X)
+		z0, z1 = math.min(z0, part.Position.Z - e.Z), math.max(z1, part.Position.Z + e.Z)
+		top, bottom = math.max(top, part.Position.Y + e.Y), math.min(bottom, part.Position.Y - e.Y)
+	end
+	return near(top, hi.Y, 1e-9) and near(bottom, lo.Y, 1e-9), near(x0, lo.X, 1e-9) and near(x1, hi.X, 1e-9) and near(z0, lo.Z, 1e-9) and near(z1, hi.Z, 1e-9)
+end
+for _, plant in Flora.pilea.plants do
+	local leaf, stem = piece(plant.leaf), piece(plant.stem)
+	local group = find(pilea, plant.leaf)
+	local topOk, footprint = blade(group, leaf.lo, leaf.hi)
+	topsOk, footOk = topsOk and topOk, footOk and footprint
+	local rod = find(group, "Petiole")
+	local cx, cz = (stem.lo.X + stem.hi.X) / 2, (stem.lo.Z + stem.hi.Z) / 2
+	rodsOk = rodsOk and rod ~= nil and rod.Shape == Enum.PartType.Cylinder and near(rod.Size.Y, rod.Size.Z, 1e-9) and near(rod.Size.X, stem.hi.Y - stem.lo.Y, 1e-9)
+		and rod.Size.Y <= math.min(stem.hi.X - stem.lo.X, stem.hi.Z - stem.lo.Z) + 1e-9 and math.abs(rod.CFrame.RightVector.Y) > 0.999
+		and near(rod.Position.X, cx, 1e-9) and near(rod.Position.Z, cz, 1e-9) and near(rod.Position.Y, (stem.lo.Y + stem.hi.Y) / 2, 1e-9)
+		and same(rod.Color, Flora.pilea.petiole)
+	local detail = find(group, "Detail")
+	local veins = named(detail, "Vein")
+	table.insert(veinCounts, #veins)
+	for _, vein in veins do
+		veinsOk = veinsOk and near(vein.Position.Y - vein.Size.Y / 2, leaf.hi.Y, 1e-9) and vein.Size.Y <= 0.01 and vein.Size.X <= 0.06 and luminance(vein.Color) > luminance(Color3.fromHex(Flora.pilea.top))
+	end
+	local dot = find(detail, "Dot")
+	dotsOk = dotsOk and dot ~= nil and near(dot.Position.X, cx, 1e-9) and near(dot.Position.Z, cz, 1e-9) and near(dot.Position.Y - dot.Size.X / 2, leaf.hi.Y, 1e-9)
+	local top, rim, under = find(group, "BladeA"), find(detail, "RimA"), find(detail, "UnderA")
+	coloursOk = coloursOk and same(top.Color, Flora.pilea.top) and top.Material == Mat("SmoothPlastic") and luminance(rim.Color) < luminance(top.Color) and luminance(under.Color) > luminance(top.Color)
+		and rim.Position.Y + extent(rim).Y < leaf.hi.Y and under.Position.Y - extent(under).Y < leaf.lo.Y
+end
+check(topsOk, "each drawn leaf's top is exactly its piece's top (and its underside the piece's underside)")
+check(footOk and Flora.pilea.radius * (math.sqrt(2) - 1) <= 0.7, "each drawn leaf fills its piece's footprint, with corners rounded by less than 0.7")
+check(rodsOk, "each petiole is a Cylinder part inscribed in its stem's box, upright, with Size (length, d, d)")
+check(veinsOk and dotsOk and #veinCounts == 3 and veinCounts[1] >= 7 and veinCounts[1] <= 9 and veinCounts[2] >= 7 and veinCounts[2] <= 9 and veinCounts[3] >= 7 and veinCounts[3] <= 9,
+	`each leaf has a pale dot where the stalk joins and 7 to 9 thin, lighter veins ({table.concat(veinCounts, ", ")})`)
+check(coloursOk, "leaves are glossy green with a darker rim band and a lighter underside")
+do
+	local tip = piece(Flora.pilea.tip)
+	local group = find(pilea, Flora.pilea.tip)
+	local topOk, footprint = blade(group, tip.lo, tip.hi)
+	check(topOk and footprint and same(find(group, "BladeA").Color, "c9a66b") and #named(find(group, "Detail"), "Edge") == 4 and #named(find(group, "Detail"), "Curl") == #Flora.pilea.dry.curls
+		and find(group, "Detail"):GetAttribute("FullOnly") == true, "the dry leaf is a tan plate with darker edges and curled corners, on its piece")
+end
+do -- cracks and crumbled soil at the stem bases (full tier)
+	local base = find(pilea, "leaf_west", "Base")
+	local cracks, crumbs = named(base, "Crack"), named(base, "Crumb")
+	check(base:GetAttribute("FullOnly") == true and #cracks >= 6 and #crumbs >= 5, `cracks and crumbled soil at the stem base ({#cracks} crack strips, {#crumbs} crumbs)`)
+end
+
+-- The trough: terracotta with a darker water-stain band, dark soil, pebbles, moss, tiny seedlings.
+do
+	local planter = find(decor, "Planter")
+	local T = Flora.planter
+	local stainFaces = find(planter, "Stain"):GetChildren()
+	check(#stainFaces == 4 and luminance(Color3.fromHex(T.stain.color)) < luminance(Color3.fromHex(Graphics.paint.planter.color)) and find(planter, "Stain"):GetAttribute("FullOnly") == true,
+		"a darker water-stain band on all four faces of the trough")
+	check(same(find(decor, "soil").Color, "4a3a2c") and find(decor, "soil").Material == Mat("Ground"), "the soil is dark ground")
+	local pebbles = find(planter, "Pebbles"):GetChildren()
+	local pebbleOk = #pebbles == T.pebbles.count
+	for _, pebble in pebbles do
+		pebbleOk = pebbleOk and pebble.Size.X >= 0.3 - 1e-9 and pebble.Size.X <= 0.8 + 1e-9 and pebble.Size.Y < pebble.Size.X and pebble.Position.X > 4 and pebble.Position.X < 16
+			and pebble.Position.Z > -7 and pebble.Position.Z < -1 and pebble:FindFirstChild("Mesh") == nil and pebble:FindFirstChildWhichIsA("SpecialMesh") ~= nil
+	end
+	check(pebbleOk, `pebbles are flattened ellipsoids 0.3 to 0.8 long, on the soil ({#pebbles})`)
+	local mossOk, mossCount = true, 0
+	for _, bit in find(planter, "Moss"):GetChildren() do
+		mossCount += 1
+		mossOk = mossOk and bit.Position.X > 4 and bit.Position.X < 16 and bit.Position.Z > -7 and bit.Position.Z < -1 and bit.Color.G > bit.Color.R
+	end
+	check(mossOk and mossCount >= 15, `moss patches are green and on the soil ({mossCount})`)
+	local seedlings = find(planter, "Seedlings")
+	local tallest = 0
+	for _, bit in seedlings:GetChildren() do tallest = math.max(tallest, bit.Position.Y + extent(bit).Y - T.area.y) end
+	check(#T.seedlings >= 2 and #T.seedlings <= 3 and tallest > 0.3 and tallest < 1, `2 or 3 seedlings, each under a centimetre tall (tallest {string.format("%.2f", tallest)})`)
+end
+
+-- The garden outside the window: a window box whose top hides behind the apron, nine black-eyed Susans turned toward the room, shrubs.
+local garden = find(decor, "Garden")
+local uvLayer = find(decor, "UVLayer")
+local totalPetals = 0
+do
+	local box = find(garden, "WindowBox")
+	local G = Flora.garden
+	check(same(find(box, "Body").Color, "6f8796") and G.box.top <= W.bottom and G.box.z1 < piece(W.hidden).lo.Z and G.box.x0 > W.left - 4 and G.box.x1 < W.right + 4,
+		"the window box is blue-grey, outside the wall, and its top is behind the apron")
+	local heads, petalsOk, headsOk, stemsOk, golden = 0, true, true, true, { f2b705 = true, f6c112 = true, eaa900 = true }
+	for i = 1, #G.flowers do
+		local flower = find(garden, "Flower" .. i)
+		if flower then
+			heads += 1
+			local petals = find(flower, "Petals"):GetChildren()
+			totalPetals += #petals
+			petalsOk = petalsOk and #petals >= 12 and #petals <= 14 and find(flower, "Petals"):GetAttribute("FullOnly") == true
+			for _, petal in petals do
+				local mesh = petal:FindFirstChildWhichIsA("SpecialMesh")
+				petalsOk = petalsOk and mesh ~= nil and mesh.MeshType == Enum.MeshType.Sphere and petal.Shape ~= Enum.PartType.Ball and petal.Size.X > petal.Size.Z and petal.Size.Z > petal.Size.Y * 4
+					and (golden[string.lower(string.format("%02x%02x%02x", math.floor(petal.Color.R * 255 + 0.5), math.floor(petal.Color.G * 255 + 0.5), math.floor(petal.Color.B * 255 + 0.5)))] == true)
+			end
+			local dome = find(flower, "Dome")
+			headsOk = headsOk and same(dome.Color, "3b2414") and dome.Position.Y >= 4.5 and dome.Position.Y <= 8 and dome.CFrame.UpVector.Z > 0.3 -- toward the room
+				and dome.Position.Z < G.box.z1 and dome.Position.X > W.left and dome.Position.X < W.right
+			for _, stem in { find(flower, "StemLow"), find(flower, "StemHigh") } do
+				stemsOk = stemsOk and stem.Shape == Enum.PartType.Cylinder and stem.Color.G > stem.Color.R and stem.Color.G > stem.Color.B and near(stem.Size.Y, stem.Size.Z, 1e-9)
+			end
+			stemsOk = stemsOk and #find(flower, "Leaves"):GetChildren() >= 2
+		end
+	end
+	check(heads == 9 and #G.flowers == 9, "nine black-eyed Susans")
+	check(petalsOk, "each has 12 to 14 golden petals, flattened ellipsoids (SpecialMesh spheres, never non-uniform Ball parts)")
+	check(headsOk and stemsOk, "dark brown domes at heights 4.5 to 8, turned toward the room, on green cylinder stems with leaves")
+	local shrubCores, pink, white = 0, 0, 0
+	for _, bit in find(garden, "Shrubs"):GetChildren() do
+		if string.match(bit.Name, "^Shrub%d+$") then shrubCores += 1 end
+		if string.match(bit.Name, "Bloom") then
+			local c = bit.Color
+			if c.R > 0.85 and c.B > 0.6 and c.G < 0.85 then pink += 1 elseif c.R > 0.85 and c.G > 0.85 and c.B > 0.8 then white += 1 end
+			check(bit.Shape == Enum.PartType.Ball and near(bit.Size.X, bit.Size.Y, 1e-9) and near(bit.Size.X, bit.Size.Z, 1e-9), "blossoms are round balls")
+		end
+	end
+	check(shrubCores == #G.shrubs and pink > 20 and white > 20, `flowering shrubs with pink and white blossoms ({shrubCores} shrubs, {pink} pink, {white} white)`)
+end
+-- The ultraviolet layer: invisible Neon patches (one per petal), faded in by the eye-view helper through the UVOpacity attribute.
+do
+	local uvOk, uvCount = true, 0
+	for _, part in uvLayer:GetChildren() do
+		uvCount += 1
+		uvOk = uvOk and part.Material == Mat("Neon") and same(part.Color, "b98cff") and part.Transparency == 1 and part:GetAttribute("UVOpacity") == 0.85
+			and part:GetAttribute("FullOnly") == true and part.CastShadow == false
+	end
+	check(uvOk and uvCount == totalPetals and uvLayer.Parent == decor, `the UV layer: one invisible Neon patch b98cff per petal, with UVOpacity 0.85 ({uvCount} patches)`)
+end
+
+-- Wear: a bare-wood strip along the lip's front edge, grime in the corners, dust bunnies, condensation, smudges, silk, a coin, leaves.
+local wear = find(decor, "Wear")
+check(wear:GetAttribute("FullOnly") == true, "the wear on the sill is full-tier detail")
+do
+	local lip = piece("front_lip")
+	local runs = named(wear, "LipWear")
+	local lipOk = #runs >= 8
+	for _, run in runs do
+		local e = extent(run)
+		lipOk = lipOk and near(run.Position.Y - e.Y, lip.hi.Y, 1e-9) and run.Position.X - e.X >= lip.lo.X - 1e-9 and run.Position.X + e.X <= lip.hi.X + 1e-9
+			and run.Position.Z - e.Z >= lip.lo.Z and run.Position.Z + e.Z <= lip.hi.Z + 1e-9 and run.Position.Z + e.Z > lip.hi.Z - 0.05
+			and run.Material == Mat("Wood") and run.Color.R > run.Color.G and run.Color.G > run.Color.B
+	end
+	check(lipOk, `a worn strip of bare wood runs along the lip's top front edge, in broken runs ({#runs})`)
+	local grime = find(wear, "Grime"):GetChildren()
+	local back, left, right, grimeOk = 0, 0, 0, true
+	for _, line in grime do
+		grimeOk = grimeOk and same(line.Color, "6e6252") and near(line.Transparency, 0.55, 1e-9) and line.Size.Y <= 0.01 and line.Position.Y - line.Size.Y / 2 > -1e-9 and line.Position.Y < 0.01
+		if line.Position.Z < -12.1 then back += 1 end
+		if line.Position.X < -29.5 then left += 1 end
+		if line.Position.X > 29.5 then right += 1 end
+	end
+	check(grimeOk and back >= 3 and left >= 2 and right >= 2, `grime lines along the back corner and the side frames ({back} back, {left} left, {right} right)`)
+	local bunnies, bunnyOk = named(wear, "DustBunny"), true
+	for _, cluster in bunnies do
+		local fluff = cluster:GetChildren()
+		local cx, cz = 0, 0
+		bunnyOk = bunnyOk and #fluff >= 6 and #fluff <= 10
+		for _, ball in fluff do
+			cx, cz = cx + ball.Position.X / #fluff, cz + ball.Position.Z / #fluff
+			bunnyOk = bunnyOk and ball.Size.X <= 0.4 and ball.Size.Y < ball.Size.X and ball.Transparency >= 0.4 and ball.Transparency <= 0.85 and math.abs(ball.Color.R - ball.Color.B) < 0.1
+				and ball.Color.R > 0.55 and ball:FindFirstChildWhichIsA("SpecialMesh") ~= nil and ball.Position.Y < 0.2
+		end
+		bunnyOk = bunnyOk and math.abs(cx) > 27 and math.abs(cz) > 10 -- in a corner
+	end
+	check(#bunnies >= 2 and #bunnies <= 3 and bunnyOk, `2 or 3 dust bunnies in the corners, each 6 to 10 tiny translucent grey spheres ({#bunnies})`)
+end
+do
+	local W2 = Graphics.window
+	local face = piece(W2.hidden).hi.Z - W2.glass.setback
+	local drops = find(decor, "Condensation")
+	local list, dropOk = drops:GetChildren(), true
+	for _, drop in list do
+		dropOk = dropOk and drop.Material == Mat("Glass") and drop.Size.X >= 0.1 - 1e-9 and drop.Size.X <= 0.4 + 1e-9 and drop.Size.Y >= 0.1 - 1e-9 and drop.Size.Y <= 0.4 + 1e-9
+			and drop.Size.Z <= 0.05 and drop:FindFirstChildWhichIsA("SpecialMesh") ~= nil and drop.Transparency > 0.2
+			and drop.Position.Y > W2.bottom + W2.trimWidth and drop.Position.Y < (W2.bottom + W2.top) / 2 and drop.Position.Z - drop.Size.Z / 2 >= face - 1e-9 and drop.Position.Z < face + 0.05
+		for _, x in W2.mullions do dropOk = dropOk and math.abs(drop.Position.X - x) > W2.mullionWidth / 2 + drop.Size.X / 2 end
+		dropOk = dropOk and drop.Position.X > W2.left + W2.trimWidth and drop.Position.X < W2.right - W2.trimWidth
+	end
+	check(#list >= 20 and #list <= 30 and dropOk and drops:GetAttribute("FullOnly") == true, `20 to 30 condensation droplets (Glass, 0.1 to 0.4, flat) on the lower panes, clear of the bars ({#list})`)
+	local smudges = find(decor, "Smudges"):GetChildren()
+	local smudgeOk = true
+	for _, smudge in smudges do smudgeOk = smudgeOk and smudge.Transparency >= 0.9 and smudge.Size.Z <= 0.02 and smudge.Position.Z < face + 0.05 end
+	check(#smudges == 2 and smudgeOk and find(decor, "Smudges"):GetAttribute("FullOnly") == true, "two faint smudges on the glass")
+end
+do
+	local retreat = find(decor, "Retreat")
+	local shells, threads, silkOk = named(retreat, "Shell"), named(retreat, "Thread"), true
+	for _, shell in shells do
+		silkOk = silkOk and shell.Transparency >= 0.75 and shell.Transparency <= 0.9 and same(shell.Color, "f4f4ee") and shell:FindFirstChildWhichIsA("SpecialMesh") ~= nil
+			and shell.Position.X > Layout.RETREAT_MIN.X - 1 and shell.Position.X < Layout.RETREAT_MAX.X and shell.Position.Z > Layout.RETREAT_MIN.Z and shell.Position.Z < Layout.RETREAT_MAX.Z
+	end
+	for _, thread in threads do silkOk = silkOk and thread.Size.X <= 0.05 and thread.Size.Y <= 0.05 and thread.Transparency >= 0.5 end
+	check(#shells >= 4 and #threads >= 4 and silkOk, `a silk retreat: overlapping translucent shells and threads across the opening ({#shells} shells, {#threads} threads)`)
+	check(same(piece("crevice_back").color, "655640") and luminance(Color3.fromHex(Graphics.paint.crevice_roof.color)) < 0.25 and M.pieces.crevice_roof == "Wood", "the crevice is weathered dark wood")
+end
+do
+	local coin = find(details, "Coin")
+	local C = Wear.coin
+	check(coin ~= nil and coin.Material == Mat("Metal") and same(coin.Color, "b5764f") and coin.Shape == Enum.PartType.Cylinder and near(coin.Size.Y, 1.9, 1e-9) and near(coin.Size.Z, 1.9, 1e-9)
+		and near(coin.Size.X, 0.12, 1e-9) and math.abs(coin.CFrame.RightVector.Y) > 0.999 and near(coin.Position.X, C.x, 1e-9) and near(coin.Position.Z, C.z, 1e-9)
+		and near(coin.Position.Y - coin.Size.X / 2, 0, 1e-9) and #coin:GetChildren() == 0 and math.abs(C.x - 25.5) <= 1 and math.abs(C.z - 9.5) <= 1,
+		"a copper coin 1.9 across and 0.12 thick lies flat near (25.5, 9.5), plain faces")
+	local leaves, leafOk = named(details, "FallenLeaf"), true
+	for _, leaf in leaves do
+		leafOk = leafOk and leaf.Shape == Enum.PartType.Cylinder and leaf.Size.Y >= 1.2 and leaf.Size.Y <= 2.0 and leaf.Size.X <= 0.05 and (same(leaf.Color, "a07a45") or same(leaf.Color, "c49a5b"))
+			and math.abs(leaf.CFrame.RightVector.Y) > 0.999
+	end
+	check(#leaves >= 2 and #leaves <= 3 and leafOk and #named(details, "Crumb") == #Graphics.details.crumbs, `{#leaves} fallen brown Pilea discs 1.2 to 2 across, and the crumbs stay`)
+	local lipOk = true
+	for _, run in named(wear, "LipWear") do lipOk = lipOk and run.Material == Mat("Wood") end
+	local chipsOk = #named(details, "PaintChip") == #Graphics.details.chips
+	for _, chip in named(details, "PaintChip") do chipsOk = chipsOk and chip.Material == Mat("Wood") and chip.Color.R > chip.Color.B end
+	check(lipOk and chipsOk, "where the paint has chipped the bare wood shows")
+end
 
 -- Shafts follow the sun and stay faint; none without a sun behind the window.
 local shafts = decor:FindFirstChild("Shafts")
@@ -238,6 +543,7 @@ local dofLighting = Instance.new("Folder")
 Lit.apply(dofLighting :: any, nil, { sample = astronomical(1), depthOfField = true })
 local dof = dofLighting:FindFirstChild("MacroDOF")
 check(dof ~= nil and dof.FocusDistance == Graphics.depthOfField.focus, "depth of field only when asked for")
+check(dof.FarIntensity == 0.3 and dof.NearIntensity == 0 and dof.InFocusRadius == 18 and dof:GetAttribute("FullOnly") == true, "the macro depth of field: far blur 0.3, no near blur, sharp within 18, full tier only")
 Lit.apply(dofLighting :: any, nil, { sample = astronomical(1) })
 check(dofLighting:FindFirstChild("MacroDOF") == nil, "and gone again when not asked")
 local broken = Instance.new("Folder")
@@ -253,11 +559,24 @@ local function census(root: Instance): number
 end
 local roots: { Instance } = { lighting, decor, terrain }
 local fullParts = census(decor)
+local fullUv = #uvLayer:GetChildren()
 local rate = motes.Rate
 check(WorldDetail.apply("full", roots) == 0 and census(decor) == fullParts and motes.Rate == rate, "the full tier removes nothing")
 local removed = WorldDetail.apply("low", roots)
 local lowParts = census(decor)
 check(removed >= 8 and lowParts < fullParts * 0.6 and lowParts >= 30, `the low tier drops the optional parts (decor {fullParts} -> {lowParts} parts, {removed} things removed)`)
+check(fullParts < 1500 and lowParts < 450, `part budgets: full {fullParts} < 1500, low {lowParts} < 450`)
+-- What replaces a piece's look exists in both tiers; the optional detail goes.
+check(find(decor, "Pilea", "leaf_west", "BladeA") ~= nil and find(decor, "Pilea", "leaf_east", "Petiole") ~= nil and find(decor, "Pilea", "leaf_tip", "BladeA") ~= nil
+	and find(decor, "Pilea", "leaf_west", "Detail") == nil and find(decor, "Pilea", "leaf_west", "Base") == nil and find(decor, "Pilea", "leaf_tip", "Detail") == nil,
+	"the drawn Pilea (blades, petioles, the dry leaf) stays in the low tier; veins, rims, undersides and cracks go")
+check(find(decor, "Wear") == nil and find(decor, "Condensation") == nil and find(decor, "Smudges") == nil and find(decor, "Planter", "Pebbles") == nil and find(decor, "Planter", "Stain") == nil
+	and find(decor, "Garden", "WindowBox") ~= nil and find(decor, "Garden", "Flower1", "Dome") ~= nil and find(decor, "Garden", "Flower1", "Petals") == nil
+	and find(decor, "Garden", "Shrubs", "Shrub1") ~= nil and find(decor, "Retreat") ~= nil, "wear, condensation and the finer planting go; the window box, flower heads, shrubs and the silk stay")
+check(fullUv > 0 and #uvLayer:GetChildren() == 0 and uvLayer.Parent == decor, "the UV patches go with the petals they sit on; the layer's folder stays")
+local dofRoot = Instance.new("Folder")
+Lit.apply(dofRoot :: any, nil, { sample = astronomical(1), depthOfField = true })
+check(dofRoot:FindFirstChild("MacroDOF") ~= nil and WorldDetail.apply("low", { dofRoot }) >= 1 and dofRoot:FindFirstChild("MacroDOF") == nil, "no macro depth of field in the low tier")
 check(lighting:FindFirstChild("Bloom") == nil and lighting:FindFirstChild("SunRays") == nil and terrain:FindFirstChild("Clouds") == nil, "no bloom, sun rays or clouds in the low tier")
 check(lighting:FindFirstChild("Atmosphere") ~= nil and lighting:FindFirstChild("Sky") ~= nil and lighting:FindFirstChild("Grade") ~= nil, "the sky, haze and grade stay")
 check(decor:FindFirstChild("Details") == nil and decor:FindFirstChild("Shafts") == nil and decor:FindFirstChild("Wall") ~= nil and decor:FindFirstChild("View"):FindFirstChild("Ground") ~= nil, "the wall, glass and a simple view stay")

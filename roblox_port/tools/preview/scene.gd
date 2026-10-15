@@ -31,7 +31,7 @@ func make_material(m: String, c: Array, r: float, t: float) -> StandardMaterial3
 	s.roughness = clampf(rough - r * 3.0, 0.03, 1.0)
 	s.metallic_specular = 0.5 + minf(r * 3.0, 0.5)
 	if m == "Metal":
-		s.metallic = 0.85
+		s.metallic = 0.45  # no reflections to pick up here, so keep it from going black
 	if m == "Glass":
 		s.metallic_specular = 1.0
 	if m == "Neon":
@@ -121,10 +121,10 @@ func _init() -> void:
 	var sun := DirectionalLight3D.new()
 	sun.transform = Transform3D(Basis.looking_at(-to_sun, Vector3.UP), Vector3.ZERO)
 	sun.light_color = Color(1.0, 0.93, 0.80)
-	sun.light_energy = float(sun_cfg.get("energy", 1.7))
+	sun.light_energy = float(sun_cfg.get("energy", 1.3))
 	sun.shadow_enabled = true
-	sun.shadow_bias = float(sun_cfg.get("bias", 0.01))
-	sun.shadow_normal_bias = float(sun_cfg.get("nbias", 0.02))
+	sun.shadow_bias = float(sun_cfg.get("bias", 0.06))
+	sun.shadow_normal_bias = float(sun_cfg.get("nbias", 0.4))
 	sun.shadow_blur = float(sun_cfg.get("blur", 0.6))
 	sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS if int(sun_cfg.get("splits", 4)) == 4 else DirectionalLight3D.SHADOW_ORTHOGONAL
 	sun.directional_shadow_max_distance = 140.0
@@ -149,7 +149,7 @@ func _init() -> void:
 	e.background_mode = Environment.BG_SKY
 	e.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR  # warm room light, not the blue of the sky
 	e.ambient_light_color = Color(1.0, 0.90, 0.78)
-	e.ambient_light_energy = float(sun_cfg.get("ambient", 0.7))
+	e.ambient_light_energy = float(sun_cfg.get("ambient", 0.45))
 	e.reflected_light_source = Environment.REFLECTION_SOURCE_SKY
 	e.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	e.tonemap_exposure = 1.0

@@ -10,7 +10,7 @@ field look different (the depth of field is not imitated at all), and Roblox Stu
 Usage (from roblox_port/):
   python3 tools/preview/scene.py path/to/luau path/to/godot out_dir [--prefix after_] [--detail full|low] [--views game,overview,...]
          [--size 1280x720] [--format png|jpg] [--uv] [--set key=value] [--parts parts.json]
-Views: game (5 studs behind and above the spider at the spawn, default elevation, 70 degree vertical field of view), game_mid (the same
+Views: corner, lip, floor, glass (close-ups of the wear), game (5 studs behind and above the spider at the spawn, default elevation, 70 degree vertical field of view), game_mid (the same
 camera, the spider mid-sill), overview, planter, leaves, window (looking out of the glass from the sill), window_uv (the same with the
 UV layer faded in), retreat (the crevice), fly (both flies), fly_a (the standing fly) and fly_b (the one in the air).
 --parts renders an already dumped part list (for example the "before" list kept next to the images) instead of running the code."""
@@ -108,6 +108,11 @@ VIEWS = {
     "window": {"fov": 62, "eye": [0.0, 5.0, 6.0], "at": [0.0, 7.0, -30.0], "near": 0.1, "far": 2500, "groups": []},
     "window_uv": {"fov": 62, "eye": [0.0, 5.0, 6.0], "at": [0.0, 7.0, -30.0], "near": 0.1, "far": 2500, "groups": [], "uv": True},
     "retreat": {"fov": 52, "eye": [-15.5, 3.2, 7.5], "at": [-25.0, 1.0, 5.8], "near": 0.05, "far": 1800, "groups": []},
+    "corner": {"fov": 55, "eye": [-23.0, 5.5, -1.0], "at": [-29.0, 1.2, -11.5], "near": 0.05, "far": 1800, "groups": []},
+    "lip": {"fov": 50, "eye": [6.0, 3.2, 4.0], "at": [6.0, 0.4, 12.2], "near": 0.05, "far": 1800, "groups": []},
+    "floor": {"fov": 52, "eye": [20.5, 5.0, 14.0], "at": [25.0, 0.0, 7.5], "near": 0.05, "far": 1800, "groups": []},
+    "drops": {"fov": 36, "eye": [17.0, 4.9, -6.5], "at": [17.0, 4.9, -12.6], "near": 0.05, "far": 2500, "groups": []},
+    "glass": {"fov": 40, "eye": [-14.0, 5.0, -4.0], "at": [-14.0, 5.4, -12.6], "near": 0.05, "far": 2500, "groups": []},
     "fly": {"fov": 40, "eye": [-14.0, 1.8, 10.5], "at": [-14.0, 1.6, 3.0], "near": 0.05, "far": 1800, "groups": ["flies"], "shadow": 40},
     "fly_a": {"fov": 34, "eye": [-15.0, 0.9, 5.4], "at": [-16.0, 0.2, 4.0], "near": 0.02, "far": 1800, "groups": ["flies"], "shadow": 20},
     "fly_b": {"fov": 34, "eye": [-11.0, 3.4, 3.7], "at": [-12.0, 3.0, 2.0], "near": 0.02, "far": 1800, "groups": ["flies"], "shadow": 20},

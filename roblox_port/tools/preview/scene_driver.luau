@@ -46,7 +46,10 @@ bodies:draw(flies, 0.37)
 
 -- ---------------------------------------------------------------- the dump
 local function f5(x: number): string return string.format("%.5f", x) end
-local function vec(a: any): string return "[" .. f5(a.X) .. "," .. f5(a.Y) .. "," .. f5(a.Z) .. "]" end
+local function vec(a: any): string
+	if a == nil then error("a part has no size or position") end
+	return "[" .. f5(a.X) .. "," .. f5(a.Y) .. "," .. f5(a.Z) .. "]"
+end
 local function pathOf(o: any): string
 	local names = {}
 	local p = o
@@ -58,8 +61,12 @@ local function pathOf(o: any): string
 end
 local function dump(root: any, group: string, rows: { string })
 	for _, p in root:GetDescendants() do
-		if p:IsA("BasePart") and (p.Transparency or 0) < 0.995 or (p:IsA("BasePart") and p:GetAttribute("UVOpacity") ~= nil) then
+		if p:IsA("BasePart") and ((p.Transparency or 0) < 0.995 or p:GetAttribute("UVOpacity") ~= nil) then
 			local c = p.CFrame
+			if c == nil or p.Size == nil then error("part " .. pathOf(p) .. " has no CFrame or Size") end
+			for _, axis in { "Position", "RightVector", "UpVector", "ZVector" } do
+				if (c :: any)[axis] == nil then error("part " .. pathOf(p) .. " CFrame has no " .. axis) end
+			end
 			local mesh = nil
 			for _, ch in p:GetChildren() do
 				if ch.ClassName == "SpecialMesh" then mesh = ch end

@@ -10,21 +10,32 @@ local Graphics = {}
 -- ---------------------------------------------------------------- materials
 -- Looks only: a surface's grip is its profile in Data/Surfaces, never its material.
 Graphics.materials = {
-	-- the physical pieces of the sill (Habitat/WindowsillLayout.PIECES), by id
+	-- the physical pieces of the sill (Habitat/WindowsillLayout.PIECES), by id. SmoothPlastic is clean at any scale: the sill is
+	-- cream enamel, the leaves are glossy; Roblox's textured materials tile in studs, so at 1 stud = 1 cm they are coarse.
 	pieces = {
-		sill_floor = "WoodPlanks", front_lip = "Wood",
+		sill_floor = "SmoothPlastic", front_lip = "SmoothPlastic",
 		back_frame = "Plaster", left_frame = "Plaster", right_frame = "Plaster",
-		planter = "Brick", planter_rim = "Brick",
-		leaf_west = "LeafyGrass", leaf_middle = "LeafyGrass", leaf_east = "LeafyGrass", leaf_tip = "Cardboard",
-		stem_west = "Grass", stem_middle = "Grass", stem_east = "Grass",
+		planter = "Plaster", planter_rim = "Plaster",
+		leaf_west = "SmoothPlastic", leaf_middle = "SmoothPlastic", leaf_east = "SmoothPlastic", leaf_tip = "Plaster",
+		stem_west = "SmoothPlastic", stem_middle = "SmoothPlastic", stem_east = "SmoothPlastic",
 		crevice_back = "Wood", crevice_roof = "Wood", crevice_north = "Wood", crevice_south = "Wood",
 	} :: { [string]: string },
 	soil = "Ground",
-	wall = "Plaster", trim = "Wood", glass = "Glass",
+	wall = "Plaster", trim = "SmoothPlastic", glass = "Glass",
 	view = "SmoothPlastic", ground = "Grass",
-	chip = "Plaster", crack = "SmoothPlastic", crumb = "Sand",
+	chip = "Wood", crack = "SmoothPlastic", crumb = "Sand",
 	fallback = "SmoothPlastic",
 }
+
+-- The colour (and shine) a piece is drawn in when it is not the layout's own colour, which is the frozen Godot habitat's: cream
+-- enamel on the sill, plaster side walls, terracotta, weathered dark wood in the crevice. Looks only. Pieces the drawn Pilea
+-- replaces keep the layout's colours, which show only if the drawing could not be built.
+Graphics.paint = {
+	sill_floor = { color = "e8dfcb", reflectance = 0.03 }, front_lip = { color = "e8dfcb", reflectance = 0.03 },
+	left_frame = { color = "efe8d8" }, right_frame = { color = "efe8d8" },
+	planter = { color = "b8653f" }, planter_rim = { color = "c97a52" },
+	crevice_back = { color = "362b20" }, crevice_roof = { color = "4a3c2e" }, crevice_north = { color = "3f3326" }, crevice_south = { color = "3f3326" },
+} :: { [string]: { color: string, reflectance: number? } }
 
 -- ---------------------------------------------------------------- the window
 -- The back wall is a solid, climbable box (WindowsillLayout back_frame), so the window is drawn: the physical wall turns
@@ -33,9 +44,9 @@ Graphics.window = {
 	hidden = "back_frame", -- the piece that turns invisible
 	slabGap = 0.02, -- the drawn wall sits this far behind the climbable face, so the spider's feet never sink into it
 	left = -27.5, right = 27.5, bottom = 3, top = 13, -- the opening: x from/to, y from/to
-	trimWidth = 0.5, trimDepth = 0.10, -- the frame bars around the opening, flush with the climbable face
-	wallColor = "ded7c3", trimColor = "e2dbc7",
-	glass = { color = "a9c2c1", transparency = 0.8, reflectance = 0.08, thickness = 0.04, setback = 0.05 },
+	trimWidth = 0.5, trimDepth = 0.10, trimReflectance = 0.04, -- the frame bars around the opening, flush with the climbable face; glossy
+	wallColor = "efe8d8", trimColor = "f4efe3",
+	glass = { color = "cfe3e6", transparency = 0.86, reflectance = 0.12, thickness = 0.04, setback = 0.05 },
 	mullions = { -10, 10 }, mullionWidth = 0.7, -- bars between the panes
 	-- WindowsillLayout.DECOR entries Scenery draws itself
 	replaces = { window_glass = true, mullion_w = true, mullion_e = true } :: { [string]: boolean },
@@ -91,12 +102,12 @@ Graphics.view = {
 -- ---------------------------------------------------------------- small details on the sill (full tier only)
 -- Flat or tiny, away from the spawn and the silk practice spot, so the landing patch, the silk lines and the prompts stay clear.
 Graphics.details = {
-	-- paint chips: where (x, z), size (w across, d deep), turn in degrees, colour
+	-- chips in the paint, showing the bare wood: where (x, z), size (w across, d deep), turn in degrees, colour
 	chips = {
-		{ x = -8.6, z = 10.5, w = 0.62, d = 0.40, turn = 20, color = "f1ead8" }, { x = -7.7, z = 10.9, w = 0.34, d = 0.27, turn = -35, color = "e8dfc9" }, { x = -6.6, z = 10.2, w = 0.45, d = 0.30, turn = 70, color = "f1ead8" },
-		{ x = 11.6, z = 9.8, w = 0.55, d = 0.38, turn = -15, color = "f1ead8" }, { x = 12.5, z = 10.3, w = 0.30, d = 0.22, turn = 50, color = "dcd3bc" }, { x = 24.6, z = 7.9, w = 0.50, d = 0.33, turn = 35, color = "f1ead8" },
-		{ x = -3.8, z = 5.4, w = 0.36, d = 0.26, turn = -60, color = "e8dfc9" }, { x = -14.9, z = 8.6, w = 0.58, d = 0.36, turn = 10, color = "f1ead8" }, { x = -15.6, z = 8.1, w = 0.28, d = 0.20, turn = -25, color = "dcd3bc" },
-		{ x = 27.0, z = 11.0, w = 0.70, d = 0.45, turn = 0, color = "f1ead8" }, { x = 20.5, z = 5.0, w = 0.40, d = 0.30, turn = 80, color = "e8dfc9" }, { x = 0.5, z = 8.8, w = 0.32, d = 0.24, turn = -10, color = "f1ead8" },
+		{ x = -8.6, z = 10.5, w = 0.62, d = 0.40, turn = 20, color = "9b7650" }, { x = -7.7, z = 10.9, w = 0.34, d = 0.27, turn = -35, color = "8f6b47" }, { x = -6.6, z = 10.2, w = 0.45, d = 0.30, turn = 70, color = "9b7650" },
+		{ x = 11.6, z = 9.8, w = 0.55, d = 0.38, turn = -15, color = "9b7650" }, { x = 12.5, z = 10.3, w = 0.30, d = 0.22, turn = 50, color = "a58058" }, { x = 24.6, z = 7.9, w = 0.50, d = 0.33, turn = 35, color = "9b7650" },
+		{ x = -3.8, z = 5.4, w = 0.36, d = 0.26, turn = -60, color = "8f6b47" }, { x = -14.9, z = 8.6, w = 0.58, d = 0.36, turn = 10, color = "9b7650" }, { x = -15.6, z = 8.1, w = 0.28, d = 0.20, turn = -25, color = "a58058" },
+		{ x = 27.0, z = 11.0, w = 0.70, d = 0.45, turn = 0, color = "9b7650" }, { x = 20.5, z = 5.0, w = 0.40, d = 0.30, turn = 80, color = "8f6b47" }, { x = 0.5, z = 8.8, w = 0.32, d = 0.24, turn = -10, color = "9b7650" },
 	},
 	chipThickness = 0.012,
 	-- cracks in the sill: polylines of x, z points; the first is the main crack, the others branch off it
@@ -104,7 +115,7 @@ Graphics.details = {
 		{ { -11.0, 9.9 }, { -9.4, 8.9 }, { -8.3, 9.3 }, { -6.5, 7.9 }, { -5.7, 8.2 }, { -3.2, 6.6 } },
 		{ { -6.5, 7.9 }, { -5.9, 6.7 }, { -6.3, 5.9 } },
 	},
-	crackWidth = 0.05, crackColor = "3b2f24", crackHeight = 0.004,
+	crackWidth = 0.05, crackColor = "4d3d2e", crackHeight = 0.004,
 	-- crumbs: centre (x, y, z), size (sx, sy, sz), turn in degrees, colour
 	crumbs = {
 		{ x = 14.6, y = 0.11, z = 8.6, sx = 0.34, sy = 0.22, sz = 0.27, turn = 25, color = "d6b684" },
@@ -131,11 +142,13 @@ Graphics.sun = {
 Graphics.atmosphere = { density = 0.30, offset = 0.25, color = { 199, 215, 232 }, decay = { 232, 196, 150 }, glare = 0.3, haze = 1.0 }
 Graphics.sky = { sunAngularSize = 12, moonAngularSize = 11, starCount = 3000 }
 Graphics.clouds = { cover = 0.45, density = 0.5, color = { 250, 248, 240 } }
-Graphics.bloom = { intensity = 0.3, size = 18, threshold = 1.6 }
-Graphics.grade = { contrast = 0.06, saturation = 0.05, tint = { 255, 248, 236 }, brightness = 0 }
+Graphics.bloom = { intensity = 0.45, size = 24, threshold = 1.4 }
+Graphics.grade = { contrast = 0.1, saturation = 0.1, tint = { 255, 246, 232 }, brightness = 0 }
 Graphics.sunRays = { intensity = 0.05, spread = 0.7 }
--- Depth of field is off unless the Workspace attribute DepthOfField is true (it blurs the sill the player is reading).
-Graphics.depthOfField = { far = 0.55, near = 0.35, focus = 6, radius = 3.5 }
+-- Macro depth of field: on in the full tier unless the Workspace attribute DepthOfField is false. The sill stays sharp (everything
+-- within `radius` of the focus, which the client sets to the camera-to-spider distance) and the garden outside the window melts
+-- into soft bokeh. Nothing near is blurred.
+Graphics.depthOfField = { far = 0.3, near = 0, focus = 6, radius = 18 }
 
 -- ---------------------------------------------------------------- dust motes and light shafts
 Graphics.dust = {

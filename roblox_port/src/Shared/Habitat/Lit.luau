@@ -1,6 +1,8 @@
 --!strict
 -- The lighting, sky and screen effects (Data/Graphics): a soft warm sun picked by SunPick so that it shines in through the
--- window, Atmosphere haze for the view, a gentle bloom, grade and sun rays, clouds. Depth of field is off unless asked for.
+-- window, Atmosphere haze for the view, a gentle bloom, grade and sun rays, clouds, and (full tier) a macro depth of field that
+-- keeps the sill sharp and melts the garden outside the window. Depth of field is only added when asked for (Server/Main asks
+-- for it unless the Workspace attribute DepthOfField is false).
 -- Technology (Future) cannot be set from a script; the Rojo projects author it. Idempotent: effects are reused by name.
 local Graphics = require(script.Parent.Parent.Data.Graphics)
 local SunPick = require(script.Parent.SunPick)
@@ -9,7 +11,7 @@ local Lit = {}
 
 export type Options = {
 	sample: ((number, number) -> Vector3)?, -- the sun at (clock, latitude); default: ask the Lighting service
-	depthOfField: boolean?, -- true adds the macro depth-of-field the client keeps focused on the spider
+	depthOfField: boolean?, -- true adds the macro depth of field (full tier) that the client keeps focused on the spider
 }
 
 local L = Graphics.lighting
@@ -104,6 +106,7 @@ function Lit.apply(lighting: Lighting, terrain: Instance?, options: Options?): S
 		dof.NearIntensity = D.near
 		dof.FocusDistance = D.focus
 		dof.InFocusRadius = D.radius
+		dof:SetAttribute("FullOnly", true) -- phones and tablets go without it (Client/WorldDetail)
 	elseif stale then
 		stale:Destroy()
 	end

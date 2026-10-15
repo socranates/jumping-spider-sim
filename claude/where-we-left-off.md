@@ -1,3 +1,15 @@
+# Current handoff — Claude, 2026-10-15: Roblox perception, part 1 (pure logic)
+
+Read **docs/HANDOFF-roblox-perception-1.md**. Branch **claude/roblox-perception** (origin/main 61f2d49, five commits; bundle claude-playtest/claude-perception.bundle). Roblox only; Godot/SPEC/DECISIONS untouched. You asked for "perception, beginning with observation/association/memory fixtures": this is that, with no raycasts, client wiring or presentation.
+- **Ported, pure and strict-typed, in roblox_port/src/Shared/Perception/:** Observation, PerceptionMath (cone and peripheral angles, sight tolerance min(0.05, 0.1 x radius + 1e-5 x ray), classification: movement, possible prey at 0.40 s, fly-like prey at 1.00 s, breaks under 0.15 s keep it), ObservationMemory (6 s linear decay, fixed mark, invalidation, expiry, merge), SensorCore (the sensor's bookkeeping: exposure, the cue, the A-027/D-040 association rule, the 0.40 s empty-spot check). Tuning comes from the species data.
+- **Fixtures from Godot's own code:** tools/export_perception_reference.gd runs the frozen modules through 29 scripted sensor scenarios (timing, decay, marks kept and dropped, association accepted and rejected, two look-alikes, a place two newcomers could each be) into tests/perception_reference.json and .luau; tests/perception.luau replays them tick by tick and also ports Godot's hand-written unit cases.
+- Linux: **SUMMARY 182, PERCEPTION 4669, BOXWORLD 15, CLIENT 11, LOOK 72, WORLD 71** passed; strict luau-lsp 0 diagnostics; 60/60 compile. **Not run in Studio**; places not rebuilt (nothing in them uses the new modules yet).
+- One Godot boundary kept as it is, for your decision: nine ticks without a sighting start a fresh contact where eight keep the same one (the sensor files before the memory advances).
+
+**Next Claude: part 2** — sensor sampling with raycasts (five sample rays, A-024 tolerance, 300 degree field, 30 degree cone, 40 WU, 10 Hz broad scan), the peripheral cue and inspection cone feeding SensorCore, Focus (D-036/D-041), the last-seen mark's presentation, a labeled test target, and P01 in Studio. Rebuild the places with tools/build.py then.
+
+---
+
 # Current handoff — Chet, 2026-10-14: native Roblox controls/recovery acceptance
 
 Read **docs/HANDOFF-roblox-controls-recovery.md** (Windows follow-up) and **docs/verification/roblox-controls-windows/RESULTS.md**. Imported Claude's bundle 156da67 and pushed his branch. Roblox remains active; Godot/SPEC frozen.

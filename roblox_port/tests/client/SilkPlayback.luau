@@ -4,6 +4,7 @@ local RunService=game:GetService("RunService")
 local HttpService=game:GetService("HttpService")
 return function(driver: any)
 	local rows={}
+ driver.prey.enabled=false
 	local function untilState(predicate,seconds)
 		local deadline=os.clock()+seconds
 		repeat RunService.Heartbeat:Wait(); if predicate(driver.get()) then return true end until os.clock()>=deadline
@@ -130,11 +131,51 @@ return function(driver: any)
 		assert(v and #v.labels>0 and v.labels[1].text=="fly-like prey","drawer has no classification")
 		driver.stage.target.frozen=false
 	end)
-	local passed=0
+ check("live hunt catches at the swept contact, grips and eats without locking movement",function()
+  driver.prey.enabled=true
+  driver.place(Vector3.new(-21,0.31,6));wait(.2)
+  local f=driver.prey.flies[1];f.enabled=false
+  f.position=driver.motor.pos+driver.motor.heading*.9;f.prevPosition=f.position;f.state='PERCHED';f.velocity=Vector3.zero
+  driver.input:simulate("Jump",true);RunService.Heartbeat:Wait();driver.input:simulate("Jump",false)
+  assert(untilState(function()return driver.prey.feeding.struggling end,3),"no capture from real hop")
+  local feed=driver.prey.feeding;local grip=feed.grip
+  driver.input:simulate("Jump",true);wait(.1);driver.input:simulate("Jump",false)
+  assert(feed.grip>grip-.08,"tap did not add grip")
+  game:GetService("Players").LocalPlayer:SetAttribute("AutomaticGrip",true)
+  assert(untilState(function()return not feed.struggling end,15),"automatic grip never subdues")
+  assert(feed.held==f,"automatic grip lost fly")
+  assert(untilState(function()return f.state=='CONSUMED' end,6),"did not finish meal")
+  assert(feed.taken>=.349 and feed.granted<=feed.taken,"nutrition accounting")
+  game:GetService("Players").LocalPlayer:SetAttribute("AutomaticGrip",false)
+ end)
+ check("A029 live sensor cost with three and six moving flies",function()
+  local prey=driver.prey;prey.enabled=true
+  driver.place(Vector3.new(-18,0.31,6));driver.motor.heading=Vector3.xAxis;driver.camera:snap()
+  if driver.stage then driver.stage.target.enabled=false;driver.stage.marker.Transparency=1 end
+  local samples={}
+  for _,count in {3,6} do
+   while #prey.flies<count do
+    local added=false
+    for _,p in prey.graph.perches do if p.valid and p.occupant=='' and p.reserved=='' then prey:spawn(p);added=true;break end end
+    assert(added,"not enough free perches for six-fly measurement")
+   end
+   while #prey.flies>count do local f=table.remove(prey.flies);f.flight:release();if f.perch.occupant==f.id then f.perch.occupant='' end end
+   prey.population.target=count
+   wait(.5);driver.sensor:resetCost();local ticks=driver.sensor.cpuTicks;local rays=driver.sensor.raysTotal;local checks=driver.sensor.checksTotal
+   local frames={};local deadline=os.clock()+8
+   repeat local dt=RunService.Heartbeat:Wait();table.insert(frames,dt*1000) until os.clock()>=deadline
+   table.sort(frames);local n=driver.sensor.cpuTicks-ticks
+   table.insert(samples,{flies=count,ticks=n,candidates_per_tick=(driver.sensor.checksTotal-checks)/math.max(1,n),rays_per_tick=(driver.sensor.raysTotal-rays)/math.max(1,n),
+    sensor_p50_us=driver.sensor:costPercentile(.5),sensor_p95_us=driver.sensor:costPercentile(.95),frame_p50_ms=frames[math.ceil(#frames*.5)],frame_p95_ms=frames[math.ceil(#frames*.95)]})
+   assert(n>120,"too few measured ticks")
+  end
+  print("PORT_PREY_COST "..HttpService:JSONEncode({evidence_id=workspace:GetAttribute("PortEvidence"),samples=samples,source="live client; no screenshots during timing"}))
+ end)
+ local passed=0
 	for _,row in rows do if row.passed then passed+=1 end end
 	print("PORT_CLIENT_REPORT "..HttpService:JSONEncode({evidence_id=workspace:GetAttribute("PortEvidence"),tests=#rows,passed=passed,failed=#rows-passed,results=rows}))
 	print("PORT_CLIENT_SUMMARY "..HttpService:JSONEncode({evidence_id=workspace:GetAttribute("PortEvidence"),tests=#rows,passed=passed,failed=#rows-passed}))
 	driver.input:clear()
 	-- Leave a recoverable hanging pose for visual inspection in the test place.
-	driver.place(Vector3.new(-26,2.31,-3.5)); driver.motor.heading=-Vector3.zAxis; driver.camera:snap()
+	driver.place(Vector3.new(-18,0.31,6)); driver.motor.heading=Vector3.xAxis; driver.camera:snap()
 end

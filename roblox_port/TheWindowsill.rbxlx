@@ -4541,6 +4541,22 @@ function Sensor.workspaceCast(params: RaycastParams): Cast
 	end
 end
 
+-- Capture is bodily evidence: no world identity crosses this API.
+function Sensor.onCapture(self: any,position: Vector3,radius: number): boolean
+ local core=self.core;local matches={}
+ for _,c in self.memory:contacts() do
+  if c.position and c.sizeWu>0 and (c.state==Contact.LIVE or Contact.hasMark(c)) then
+   local age=(core.tick-c.positionTick)/SensorCore.HZ
+   local reach=PerceptionMath.plausibleRadius(c.sizeWu,radius*2,age,core.contactSpeedBound,c.speedWuS)
+   if (c.position-position).Magnitude<=reach and PerceptionMath.sizesCompatible(c.sizeWu,radius*2,core.contactSizeRatio) then table.insert(matches,c.trackId) end
+  end
+ end
+ if #matches~=1 then return false end
+ local id=matches[1];self.memory:resolveCapture(id);core._kept[id]=nil;core._spots[id]=nil
+ for pid,t in core._tracks do if t.trackId==id then core._tracks[pid]=nil end end
+ return true
+end
+
 return Sensor
 ]]></string>
           </Properties>
@@ -5031,9 +5047,715 @@ return Signal
       </Item>
       <Item class="Folder" referent="37">
         <Properties>
-          <string name="Name">Rig</string>
+          <string name="Name">Prey</string>
         </Properties>
         <Item class="ModuleScript" referent="38">
+          <Properties>
+            <string name="Name">Feeding</string>
+            <string name="Source"><![CDATA[--!strict
+-- Frozen feeding_controller.gd / needs_model.gd: struggle after landing, then conserved nutrition grants.
+local R=require(script.Parent.PreyRandom)
+local F={};F.__index=F
+function F.new(): any
+ return setmetatable({held=nil,struggling=false,feeding=false,grip=0,elapsed=0,waiting=0,jerk=0,venom=6,
+  swallow=0,energy=.55,taken=0,granted=0,ledger={},auto=false,tap=false,note='',rng=R.new(513)},F)
+end
+function F.capture(self: any,fly: any)
+ self.held=fly;self.struggling=true;self.feeding=false;self.grip=.4;self.elapsed=0;self.waiting=0
+ self.venom=self.rng:draw({6,8});self.jerk=self.rng:draw({.35,.75});self.note='Caught!'
+end
+function F.press(self: any)
+ if self.struggling then self.tap=true elseif self.swallow<=0 then self.feeding=not self.feeding end
+end
+function F.cancel(self: any) self.feeding=false end
+function F.step(self: any,dt: number,attached: boolean,moving: boolean,escape: (any)->())
+ self.energy=math.max(.2,self.energy-.0006*dt)
+ local f=self.held;if not f then self.tap=false;return end
+ if self.struggling then
+  if not attached and self.waiting<1 then self.waiting+=dt;self.tap=false;return end
+  self.elapsed+=dt
+  local strength=1-.5*math.clamp(self.elapsed/self.venom,0,1)
+  self.grip-=.32*strength*dt
+  self.jerk-=dt
+  if self.jerk<=0 then self.grip-=.12*strength;self.jerk+=self.rng:draw({.35,.75}) end
+  if self.auto then self.grip+=.4*dt end
+  if self.tap then self.grip+=.085 end
+  self.tap=false
+  if self.grip<=0 then self.held=nil;self.struggling=false;self.note='It tore free!';escape(f)
+  elseif self.grip>=1 or self.elapsed>=12 then self.grip=1;self.struggling=false;self.feeding=true;self.swallow=1;self.note='Subdued.' end
+  return
+ end
+ self.swallow=math.max(0,self.swallow-dt)
+ if not attached or moving then self.feeding=false;return end
+ if self.swallow>0 then self.feeding=true end
+ if not self.feeding then return end
+ local take=math.min(f.nutrition,f.profile.body.feed_rate_per_s*dt)
+ local granted=math.min(take,1-self.energy)
+ f.nutrition-=take;self.energy+=granted;self.taken+=take;self.granted+=granted
+ self.ledger[f.captureKey]=(self.ledger[f.captureKey] or 0)+granted
+ if f.nutrition<=1e-9 then f.nutrition=0;f.state='CONSUMED';self.held=nil;self.feeding=false;self.note='Meal finished.' end
+end
+return F
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="39">
+          <Properties>
+            <string name="Name">Fly</string>
+            <string name="Source"><![CDATA[--!strict
+-- Fly's evidence-owned decisions, reactions, flights, glances and surface bursts.
+-- Sources: frozen fly.gd and fly_mind.gd. Geometry and random stream are explicit dependencies.
+local M=require(script.Parent.PreyMath)
+local S=require(script.Parent.FlySenses)
+local F=require(script.Parent.FlyFlight)
+local R=require(script.Parent.PreyRandom)
+local Fly={};Fly.__index=Fly
+function Fly.new(id: string,serial: number,seed: number,perch: any,graph: any,profile: any,now: number): any
+ local f:any=setmetatable({id=id,serial=serial,profile=profile,graph=graph,rng=R.new(seed),senses=S.new(profile.senses),
+  position=graph:rest(perch),prevPosition=graph:rest(perch),normal=perch.normal,heading=Vector3.new(0,0,-1),velocity=Vector3.zero,
+  state='PERCHED',stateSince=now,goal='rest',goalSince=now,perch=perch,fatigue=0,restlessBias=0,
+  nextDecision=now+(serial*.0371)%(1/profile.behavior.decision_hz),nextGlance=now,nextWalk=now+2,nextGroom=now+6,groomUntil=0,
+  walkLeft=0,burstUntil=0,pauseUntil=0,walkSpeed=0,walkDirection=Vector3.zero,pending=nil,blocked={},candidates=0,
+  nutrition=profile.body.nutrition,captureSerial=0,trace={},enabled=true},Fly)
+ f.flight=F.new(f,graph);perch.occupant=id;f:beginStay(now)
+ return f
+end
+function Fly.beginStay(self: any,now: number)
+ local p=self.profile.behavior
+ self.perchedSince=now;self.restlessRate=p.restless_per_s*(1+p.restless_spread*(self.rng:next()*2-1))
+ self.nextGroom=now+self.rng:draw(p.groom_interval_s);self.groomUntil=0
+ self.nextGlance=now+self.rng:draw(p.glance_interval_s);self.glanceSign=if self.rng:next()<.5 then -1 else 1
+ self.nextWalk=now+self.rng:draw(p.walk_interval_s);self.nextFidget=now+self.rng:draw(p.fidget_interval_s)
+ self.homeHeading=self.heading;self.glanceTarget=nil;self.fidgetUntil=0;self.restSpot=self.position;self.walkLeft=0
+end
+function Fly.turn(self: any,target: Vector3,dt: number): boolean
+ local tangent=target-self.normal*target:Dot(self.normal)
+ if tangent.Magnitude<1e-6 then return true end
+ local angle=math.atan2(self.normal:Dot(self.heading:Cross(tangent.Unit)),self.heading:Dot(tangent.Unit))
+ local limit=math.rad(self.profile.flight.turn_rate_deg_s)*dt
+ self.heading=CFrame.fromAxisAngle(self.normal,math.clamp(angle,-limit,limit)):VectorToWorldSpace(self.heading).Unit
+ return math.abs(angle)<=limit+1e-4
+end
+function Fly.surface(self: any,point: Vector3): boolean
+ local hit=self.graph.cast(point+self.normal*.3,point-self.normal*.3)
+ return hit~=nil and hit.Normal:Dot(self.normal)>.98 and math.abs((hit.Position+self.normal*self.profile.body.hover_wu-point):Dot(self.normal))<=.06
+end
+function Fly.alive(self: any): boolean return self.state~='CAPTURED' and self.state~='CONSUMED' end
+function Fly.airborne(self: any): boolean return self.state~='PERCHED' and self.state~='ALERT' and self:alive() end
+function Fly.percept(self: any): any
+ if not self:alive() then return nil end
+ return {id=self.id,position=self.position,radius=self.profile.body.radius_wu,velocity=self.velocity,maxCategory='fly_like_prey'}
+end
+function Fly.relevance(self: any,now: number): number
+ local s=self.senses;if not s.hasLastSeen then return 0 end
+ local p=self.profile
+ return math.clamp(1-(now-s.lastSeenTime-.4)/math.max(p.senses.threat_memory_s-.4,.1),0,1)
+  *math.clamp((p.flight.safe_distance_wu*1.5-(self.position-s.lastSeenPosition).Magnitude)/p.flight.safe_distance_wu,0,1)
+end
+function Fly.ranked(self: any,kind: string,now: number,threat: number,relaxed: boolean?): {any}
+ local p=self.profile;local origin=self.position;local list={}
+ local restless=math.clamp((now-self.perchedSince)*self.restlessRate,0,1)
+ for _,c in self.graph.perches do
+  local d=(origin-c.position).Magnitude
+  local minimum=if kind=='flee' and not relaxed then math.max(p.flight.min_hop_wu,p.flight.flee_speed_wu_s*p.flight.flee_min_s*.5) else p.flight.min_hop_wu
+  local maximum=if kind=='move' then p.behavior.reposition_max_wu else p.flight.max_flight_wu
+  local away=if self.senses.hasLastSeen then (c.position-self.senses.lastSeenPosition).Magnitude else p.flight.safe_distance_wu*.5
+  if c.valid and c.occupant=='' and (c.reserved=='' or c.reserved==self.id) and d>=minimum and d<=maximum and (self.blocked[c.id] or 0)<=now
+   and (kind~='flee' or relaxed or away>=p.flight.perch_avoid_wu) then
+   self.candidates+=1
+   local travel=math.clamp(d/p.flight.max_flight_wu,0,1)
+   local score=if kind=='move' then M.scoreMove(p.utility,restless,math.clamp(c.food-self.perch.food,0,1),math.clamp(c.shelter-self.perch.shelter,0,1),travel,self.fatigue,threat)
+    else M.scoreFlee(p.utility,threat,c.shelter,math.clamp(away/p.flight.safe_distance_wu,0,1),travel)
+   table.insert(list,{perch=c,score=score})
+  end
+ end
+ table.sort(list,function(a,b) return a.score>b.score or (a.score==b.score and a.perch.id<b.perch.id) end)
+ return list
+end
+function Fly.choose(self: any,kind: string,now: number,threat: number,relaxed: boolean?): (any,{Vector3}?)
+ local danger=if kind=='flee' and self.senses.hasLastSeen then self.senses.lastSeenPosition else nil
+ for i,c in self:ranked(kind,now,threat,relaxed) do
+  if i>self.profile.behavior.candidates_validated then break end
+  local path=self.graph:plan(self.position,if self:airborne() then Vector3.zero else self.normal,c.perch,danger)
+  if path then return c.perch,path end
+  self.blocked[c.perch.id]=now+self.profile.behavior.block_retry_s
+ end
+ return nil,nil
+end
+function Fly.launch(self: any,kind: string,now: number): boolean
+ local target,path=self:choose(kind,now,if kind=='flee' then 1 else 0)
+ if not path and kind=='flee' then target,path=self:choose(kind,now,1,true) end
+ if not path and kind=='flee' then
+  local away=if self.senses.hasLastSeen then self.position-self.senses.lastSeenPosition else self.heading
+  local angle=math.atan2(away.X,away.Z)
+  for i=0,7 do
+   local a=angle+i*math.pi/4;local dest=self.position+Vector3.new(math.sin(a),.35,math.cos(a)).Unit*self.profile.flight.open_escape_wu
+   if self.graph:clear(self.position,dest) then path={self.position,dest};break end
+  end
+ end
+ if not path then return false end
+ if kind=='move' and target and not self:airborne() and self.rng:next()<self.profile.behavior.wander_flight_chance then
+  local lifted=self.position+self.normal*self.profile.flight.lift_wu
+  for _=1,4 do
+   local a=self.rng:next()*math.pi*2;local d=self.rng:draw({2.5,6})
+   local w=lifted+Vector3.new(math.cos(a)*d,0,math.sin(a)*d)
+   w=Vector3.new(w.X,math.clamp(lifted.Y+self.rng:draw({.5,3.5}),.8,10),w.Z)
+   if self.graph:clear(self.position,lifted) and self.graph:clear(lifted,w) then
+    local tail=self.graph:plan(w,Vector3.zero,target,nil)
+    if tail then local loop={self.position,lifted};for _,point in tail do table.insert(loop,point) end
+     if M.pathLength(loop)<=self.profile.flight.max_flight_wu*1.6 then path=loop;break end
+    end
+   end
+  end
+ end
+ self.flight:begin(path,target,kind,now);self.goal=kind;self.goalSince=now;self.walkLeft=0
+ table.insert(self.trace,{t=now,goal=kind,target=if target then target.id else 'open'});if #self.trace>80 then table.remove(self.trace,1) end
+ return true
+end
+function Fly.schedule(self: any,now: number,startle: boolean)
+ local p=self.profile.reaction
+ local pair=p.delay_deliberate_s
+ if startle then pair=if self.state=='ALERT' then p.delay_startle_alert_s elseif now<self.groomUntil then p.delay_startle_grooming_s else p.delay_startle_relaxed_s end
+ self.pending=now+self.rng:draw(pair);self.goal='flee'
+end
+function Fly.think(self: any,now: number)
+ local p=self.profile;local s=self.senses;local ev=s.evidence
+ if ev.t==now and ev.startle and not self.pending and (self.state=='PERCHED' or self.state=='ALERT' or self.state=='SEEK_PERCH' or self.state=='REPOSITION') then self:schedule(now,true) end
+ if self.state=='PERCHED' and ((s.awareness>=p.senses.awareness_alert and self:relevance(now)>=.5) or self.pending) then self.state='ALERT';self.stateSince=now;self.walkLeft=0 end
+ if self.pending and now>=self.pending then self.pending=nil;self:launch('flee',now) end
+ if now<self.nextDecision then return end
+ self.nextDecision=now+1/p.behavior.decision_hz
+ local threat=M.threat(s.awareness,p.senses.awareness_calm,p.senses.awareness_flee)*self:relevance(now)
+ if self:airborne() then
+  if self.state=='SEEK_PERCH' and not self.flight.target then self:launch('move',now) end
+  if (self.state=='REPOSITION' or self.state=='SEEK_PERCH') and not self.pending and threat>=p.behavior.interrupt_threat and ev.seen and now-ev.t<=.3 and ev.gain>0 and ev.distance<=p.flight.safe_distance_wu then self:schedule(now,false) end
+  return
+ end
+ local scores={rest=M.scoreRest(p.utility,self.fatigue,self.perch.shelter,self.perch.food,threat)}
+ local move=if self.state=='PERCHED' then self:ranked('move',now,threat) else {}
+ local flee=if threat>.02 then self:ranked('flee',now,threat) else {}
+ if move[1] then scores.move=move[1].score end;if flee[1] then scores.flee=flee[1].score end
+ local chosen=M.pickGoal(scores,self.goal,p.behavior.hysteresis)
+ if chosen~=self.goal and threat<p.behavior.interrupt_threat and now-self.goalSince<p.behavior.min_commit_s then chosen=self.goal end
+ if chosen=='flee' and not self.pending then self:schedule(now,false)
+ elseif chosen=='move' and not self.pending and self.state=='PERCHED' then self:launch('move',now)
+ elseif chosen=='rest' and not self.pending then
+  if self.goal~='rest' then self.goal='rest';self.goalSince=now end
+  if self.state=='ALERT' and (s.awareness<p.senses.awareness_calm or self:relevance(now)<.25) and now-self.stateSince>=p.behavior.alert_min_s then self.state='PERCHED';self.stateSince=now end
+ end
+end
+function Fly.rest(self: any,now: number,dt: number)
+ local p=self.profile.behavior
+ if self.state=='ALERT' then
+  self.groomUntil=0;self.fidgetUntil=0;self.glanceTarget=nil
+  if self.senses.hasLastSeen then local d=self.senses.lastSeenPosition-self.position;local flat=d-self.normal*d:Dot(self.normal);if flat.Magnitude>.001 then self:turn(flat.Unit,dt) end end
+  return
+ end
+ if now<self.fidgetUntil then
+  local t=math.clamp((now-self.fidgetStarted)/(self.fidgetUntil-self.fidgetStarted),0,1)
+  self.position=self.fidgetFrom:Lerp(self.fidgetTo,t*t*(3-2*t));return
+ end
+ if self.glanceTarget then if self:turn(self.glanceTarget,dt) then self.glanceTarget=nil end;return end
+ if now>=self.nextGroom then self.groomUntil=now+self.rng:draw(p.groom_duration_s);self.nextGroom=self.groomUntil+self.rng:draw(p.groom_interval_s) end
+ if now<self.groomUntil then return end
+ if now>=self.nextGlance and self.walkLeft<=0 then
+  self.glanceTarget=CFrame.fromAxisAngle(self.normal,math.rad(self.rng:draw(p.glance_angle_deg))*self.glanceSign):VectorToWorldSpace(self.homeHeading)
+  self.glanceSign=-self.glanceSign;self.nextGlance=now+self.rng:draw(p.glance_interval_s);return
+ end
+ if now>=self.nextWalk and self.walkLeft<=0 then
+  local home=self.graph:rest(self.perch)-self.position
+  local direction=if home.Magnitude>p.wander_radius_wu*.5 then home.Unit else self.heading
+  local angle=if home.Magnitude>p.wander_radius_wu*.5 then 40 else 100
+  self.walkDirection=CFrame.fromAxisAngle(self.normal,math.rad(self.rng:draw({-angle,angle}))):VectorToWorldSpace(direction)
+  local wanted=self.rng:draw(p.walk_distance_wu);self.walkLeft=0
+  for distance=.15,wanted,.15 do
+   local nextPos=self.position+self.walkDirection*distance
+   if not self:surface(nextPos) or (nextPos-self.graph:rest(self.perch)).Magnitude>p.wander_radius_wu or not self.graph:clear(self.position,nextPos) then break end
+   self.walkLeft=distance
+  end
+  if self.walkLeft<.2 then self.walkLeft=0 end
+  self.walkSpeed=self.rng:draw(p.walk_speed_wu_s)
+  self.burstUntil=now+self.rng:draw(p.walk_burst_s);self.pauseUntil=0;self.nextWalk=now+self.rng:draw(p.walk_interval_s)
+ end
+ if self.walkLeft>0 then
+  if math.deg(math.acos(math.clamp(self.heading:Dot(self.walkDirection),-1,1)))>20 then self:turn(self.walkDirection,dt);return end
+  if now<self.pauseUntil then return end
+  if now>=self.burstUntil then self.pauseUntil=now+self.rng:draw(p.walk_pause_s);self.burstUntil=self.pauseUntil+self.rng:draw(p.walk_burst_s);return end
+  local step=math.min(self.walkLeft,self.walkSpeed*dt);local nextPos=self.position+self.walkDirection*step
+  local hit=self.graph.cast(nextPos+self.normal*.3,nextPos-self.normal*.3)
+  if hit and hit.Normal:Dot(self.normal)>.98 and math.abs((hit.Position+self.normal*self.profile.body.hover_wu-nextPos):Dot(self.normal))<=.06
+   and (nextPos-self.graph:rest(self.perch)).Magnitude<=p.wander_radius_wu and self.graph:clear(self.position,nextPos) then
+   self.position=nextPos;self.walkLeft-=step;self.heading=self.heading:Lerp(self.walkDirection,.3).Unit
+   if self.walkLeft<=.001 then self.restSpot=self.position;self.homeHeading=self.heading end
+  else self.walkLeft=0 end
+ elseif now>=self.nextFidget then
+  local dir=CFrame.fromAxisAngle(self.normal,self.rng:next()*math.pi*2):VectorToWorldSpace(self.heading)
+  local distance=self.rng:draw(p.fidget_distance_wu);local duration=self.rng:draw(p.fidget_duration_s)
+  if (self.position+dir*distance-self.restSpot).Magnitude>p.perch_radius_wu and (self.restSpot-self.position).Magnitude>.001 then dir=(self.restSpot-self.position).Unit end
+  local target=self.position+dir*distance
+  self.nextFidget=now+duration+self.rng:draw(p.fidget_interval_s)
+  if self:surface(target) and self.graph:clear(self.position,target) then
+   self.fidgetFrom=self.position;self.fidgetTo=target;self.fidgetStarted=now;self.fidgetUntil=now+duration
+  end
+ end
+end
+function Fly.step(self: any,dt: number,now: number,stimulus: Vector3,radius: number,cast: any)
+ self.prevPosition=self.position
+ if not self:alive() or not self.enabled then return end
+ local p=self.profile
+ if self.senses:shouldCheck(now) then
+  local vigilant=if self.state=='ALERT' then p.senses.vigilance_alert elseif now<self.groomUntil then p.senses.vigilance_grooming else p.senses.vigilance_relaxed
+  self.senses:update(cast,self.position+self.normal*.1,if self:airborne() and self.velocity.Magnitude>.1 then self.velocity.Unit else self.heading,if self:airborne() then Vector3.yAxis else self.normal,stimulus,radius,now,vigilant,if self.state=='ALERT' then p.senses.decay_alert_per_s else p.senses.decay_relaxed_per_s)
+ end
+ self:think(now)
+ if self:airborne() then self.flight:step(now,dt);self.fatigue=math.min(1,self.fatigue+p.behavior.fatigue_up_per_s*dt)
+ else self:rest(now,dt);self.fatigue=math.max(0,self.fatigue-p.behavior.fatigue_down_per_s*dt) end
+ self.velocity=(self.position-self.prevPosition)/dt
+end
+return Fly
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="40">
+          <Properties>
+            <string name="Name">FlyFlight</string>
+            <string name="Source"><![CDATA[--!strict
+-- Frozen FlyFlight: accelerate, sweep every step, brake for landing, reserve the destination.
+local M=require(script.Parent.PreyMath)
+local F={};F.__index=F
+function F.new(fly: any,graph: any): any
+ return setmetatable({fly=fly,graph=graph,path={},length=0,s=0,speed=0,target=nil,mode='',started=0,replans=0,blocked=0,landings=0,sweeps=0},F)
+end
+function F.release(self: any)
+ if self.target and self.target.reserved==self.fly.id then self.target.reserved='' end
+ self.target=nil
+end
+function F.begin(self: any,path: {Vector3},target: any,mode: string,now: number)
+ local f=self.fly;local air=f.state~='PERCHED' and f.state~='ALERT'
+ self:release();self.path=path;self.length=M.pathLength(path);self.s=0;self.speed=if air then f.velocity.Magnitude else 0
+ self.mode=mode;self.target=target;self.started=now;self.replans=0
+ if target then target.reserved=f.id end
+ if f.perch and f.perch.occupant==f.id then f.perch.occupant='' end
+ f.state=if mode=='flee' then (if air then 'FLEE' else 'TAKEOFF') else 'REPOSITION'
+ f.stateSince=now
+end
+function F.step(self: any,now: number,dt: number): boolean
+ local f=self.fly;local p=f.profile.flight
+ if self.length<=1e-6 or #self.path<2 then self.speed=0;f.velocity=Vector3.zero;return false end
+ local fast=f.state=='TAKEOFF' or f.state=='FLEE'
+ local top=if fast then p.flee_speed_wu_s else p.cruise_speed_wu_s
+ local targetSpeed=if self.target then M.targetSpeed(self.length-self.s,top,p.landing_speed_wu_s,p.landing_slow_wu) else top
+ self.speed=M.stepSpeed(self.speed,targetSpeed,if fast then p.takeoff_accel_wu_s2 else p.cruise_accel_wu_s2,dt)
+ local sn=math.min(self.length,self.s+self.speed*dt);local nextPos=M.pointAt(self.path,sn)
+ self.sweeps+=1
+ if not self.graph:clear(f.position,nextPos) then
+  self.blocked+=1;f.velocity=Vector3.zero
+  if self.target and self.replans<3 then
+   self.replans+=1
+   local path=self.graph:plan(f.position,Vector3.zero,self.target,if self.mode=='flee' and f.senses.hasLastSeen then f.senses.lastSeenPosition else nil)
+   if path then self.path=path;self.length=M.pathLength(path);self.s=0;return false end
+  end
+  self:release();self.path={};self.length=0;f.state='SEEK_PERCH';return false
+ end
+ local delta=nextPos-f.position;f.velocity=delta/dt;f.position=nextPos;self.s=sn
+ local flat=Vector3.new(delta.X,0,delta.Z)
+ if flat.Magnitude>.004 then
+  local desired=math.atan2(-flat.X,-flat.Z);local old=math.atan2(-f.heading.X,-f.heading.Z)
+  local diff=math.atan2(math.sin(desired-old),math.cos(desired-old));local angle=old+math.clamp(diff,-math.rad(p.turn_rate_deg_s)*dt,math.rad(p.turn_rate_deg_s)*dt)
+  f.heading=Vector3.new(-math.sin(angle),0,-math.cos(angle))
+ end
+ if f.state=='TAKEOFF' and now-f.stateSince>=p.takeoff_s then f.state='FLEE';f.stateSince=now
+ elseif f.state=='FLEE' and self.target and self.length-self.s<=p.approach_wu+p.landing_slow_wu then f.state='SEEK_PERCH' end
+ if self.s>=self.length-1e-4 then
+  local target=self.target
+  if target and (f.position-self.graph:rest(target)).Magnitude<=.06 then
+   self:release();self.path={};self.length=0;self.speed=0;self.landings+=1
+   f.perch=target;target.occupant=f.id;f.position=self.graph:rest(target);f.normal=target.normal;f.velocity=Vector3.zero
+   f.state='PERCHED';f.stateSince=now;f.goal='rest';f.goalSince=now;f:beginStay(now);return true
+  end
+  self:release();self.path={};self.length=0;f.state='SEEK_PERCH'
+ end
+ return false
+end
+return F
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="41">
+          <Properties>
+            <string name="Name">FlySenses</string>
+            <string name="Source"><![CDATA[--!strict
+-- scripts/prey/fly_senses.gd, A-028. No controls, plans or velocity enter this interface.
+local M=require(script.Parent.PreyMath)
+local PM=require(script.Parent.Parent.Perception.PerceptionMath)
+local S={};S.__index=S
+function S.new(profile: any): any
+ return setmetatable({p=profile,awareness=0,evidence={},hasLastSeen=false,lastSeenPosition=Vector3.zero,lastSeenTime=-1e9,
+  started=false,hasLast=false,lastPoint=Vector3.zero,lastTime=-1e9,lastMask=0,lastCheck=-1e9,nextCheck=0,checks=0,rays=0},S)
+end
+function S.shouldCheck(self: any,now: number): boolean return now+1e-9>=self.nextCheck end
+function S.finish(self: any,ev: any,now: number,dt: number,gain: number,decay: number,seen: boolean): any
+ if not seen then self.hasLast=false end
+ self.started=true
+ self.awareness=M.integrateAwareness(self.awareness,gain,dt,decay*(if seen then 1 else self.p.unseen_decay_mult),self.p.awareness_max)
+ ev.awareness=self.awareness;ev.seen=seen;self.evidence=ev
+ self.nextCheck=if seen and ev.distance<=self.p.near_check_range_wu then now else now+1/math.max(self.p.far_check_hz,.1)
+ return ev
+end
+function S.update(self: any,cast: (Vector3,Vector3)->Vector3?,eye: Vector3,facing: Vector3,up: Vector3,pos: Vector3,radius: number,now: number,vigilance: number,decay: number): any
+ local p=self.p;local dt=if self.started then math.clamp(now-self.lastCheck,0,.25) else 0
+ self.lastCheck=now;self.checks+=1
+ local offset=pos-eye;local dist=offset.Magnitude
+ local ev={t=now,dt=dt,seen=false,distance=dist,reason='',startle=false,appeared=false,bearing=0,loom=0,motion=0,gain=0,visible=0}
+ if dist>p.sight_range_wu or dist<.05 then ev.reason='out of range';return self:finish(ev,now,dt,0,decay,false) end
+ local dir=offset/dist
+ local off=if facing.Magnitude>1e-9 then math.deg(math.acos(math.clamp(facing.Unit:Dot(dir),-1,1))) else 0
+ local face=M.facingWeight(off,p.front_half_deg,p.rear_half_deg,p.rear_gain)
+ local distance=M.distanceWeight(dist,p.full_sensitivity_wu,p.sight_range_wu)
+ local side=dir:Cross(up);if side.Magnitude<.001 then side=dir:Cross(Vector3.xAxis) end
+ side=if side.Magnitude>0 then side.Unit else Vector3.zero
+ local centre=Vector3.zero;local count,mask=0,0
+ for i,point in {pos,pos+side*radius*.8,pos-side*radius*.8} do
+  self.rays+=1;local hit=cast(eye,point);local length=(point-eye).Magnitude
+  if hit==nil or (hit-eye).Magnitude>=length-PM.sightTolerance(radius,length) then
+   centre+=point;count+=1;mask+=2^(i-1)
+  end
+ end
+ if count==0 then ev.reason='no line of sight';return self:finish(ev,now,dt,0,decay,false) end
+ centre/=count;offset=centre-eye;local vd=offset.Magnitude;local angle=M.apparentAngle(radius,vd)
+ ev.visible=count/3;ev.distance=vd
+ if self.started then
+  if self.hasLast and now-self.lastTime<=p.sample_gap_max_s+1e-9 then
+   if mask==self.lastMask then
+    local gap=math.max(now-self.lastTime,1e-9);local old=self.lastPoint-eye
+    ev.bearing=M.bearingRate(old,offset,gap);ev.loom=M.loomRate(M.apparentAngle(radius,old.Magnitude),angle,gap,p.loom_scale_deg_s)
+   end
+  elseif vd<=p.appear_range_wu then ev.appeared=true;ev.bearing=p.appear_motion_deg_s end
+ end
+ ev.motion=math.max(ev.bearing,ev.loom)
+ ev.gain=M.awarenessGain(ev.motion,p.motion_threshold_deg_s,p.motion_scale_deg_s,distance,face,ev.visible,vigilance)
+ ev.startle=ev.motion*math.max(face,p.startle_rear_gain)*ev.visible>=p.startle_motion_deg_s and vd<=p.startle_range_wu
+ self.hasLast=true;self.lastPoint=centre;self.lastTime=now;self.lastMask=mask
+ self.hasLastSeen=true;self.lastSeenPosition=centre;self.lastSeenTime=now
+ return self:finish(ev,now,dt,ev.gain,decay,true)
+end
+return S
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="42">
+          <Properties>
+            <string name="Name">PerchGraph</string>
+            <string name="Source"><![CDATA[--!strict
+-- Geometry adapter for the frozen PerchGraph. Every planned leg and every flight tick is swept.
+local M=require(script.Parent.PreyMath)
+local G={};G.__index=G
+export type Perch={id:string,position:Vector3,normal:Vector3,shelter:number,food:number,start:boolean,valid:boolean,occupant:string,reserved:string}
+function G.new(cast: any,sweep: any,overlap: any,profile: any): any
+ return setmetatable({cast=cast,sweep=sweep,overlap=overlap,p=profile,perches={},plans=0,sweeps=0},G)
+end
+function G.rest(self: any,p: Perch): Vector3 return p.position+p.normal*self.p.body.hover_wu end
+function G.clear(self: any,a: Vector3,b: Vector3): boolean
+ self.sweeps+=1
+ return not self.overlap(a,self.p.flight.clearance_radius_wu) and not self.sweep(a,b,self.p.flight.clearance_radius_wu)
+end
+function G.add(self: any,id: string,position: Vector3,normal: Vector3,shelter: number,food: number,start: boolean): Perch
+ local p: Perch={id=id,position=position,normal=normal,shelter=shelter,food=food,start=start,valid=false,occupant='',reserved=''}
+ local hit=self.cast(position+normal*.5,position-normal*.5)
+ if hit and math.abs((hit.Position-position):Dot(normal))<=.06 and hit.Normal:Dot(normal)>=math.cos(math.rad(12)) then
+  p.position=hit.Position;p.valid=self:clear(self:rest(p),self:rest(p)+normal*self.p.flight.lift_wu)
+ end
+ table.insert(self.perches,p);return p
+end
+function G.plan(self: any,start: Vector3,normal: Vector3,target: Perch,threat: Vector3?): {Vector3}?
+ self.plans+=1;local p=self.p.flight
+ local rest=self:rest(target);if (start-rest).Magnitude>p.max_flight_wu then return nil end
+ local lifted=start+normal*p.lift_wu;local approach=rest+target.normal*p.approach_wu
+ if not self:clear(start,lifted) or not self:clear(approach,rest) then return nil end
+ local routes: {{Vector3}}={{lifted,approach}};local mid=(lifted+approach)*.5
+ for _,h in {2.5,5,8,11} do local y=math.min(mid.Y+h,11)
+  if y>mid.Y+.5 then table.insert(routes,{lifted,Vector3.new(mid.X,y,mid.Z),approach}) end
+ end
+ for _,h in {6,9,11} do local y=math.min(math.max(h,math.max(lifted.Y,approach.Y)+.5),11)
+  if y>math.max(lifted.Y,approach.Y)+.3 then table.insert(routes,{lifted,Vector3.new(lifted.X,y,lifted.Z),Vector3.new(approach.X,y,approach.Z),approach}) end
+ end
+ for _,route in routes do
+  local clear=true
+  for i=2,#route do if not self:clear(route[i-1],route[i]) then clear=false;break end end
+  if clear then
+   local pts={start};for _,v in route do table.insert(pts,v) end;table.insert(pts,rest)
+   if (not threat or M.distanceToPath(pts,threat)>=p.path_threat_clearance_wu) and M.pathLength(pts)<=p.max_flight_wu*1.6 then return pts end
+  end
+ end
+ return nil
+end
+return G
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="43">
+          <Properties>
+            <string name="Name">PreyDirector</string>
+            <string name="Source"><![CDATA[--!strict
+-- Solo client world of perceivable flies. Godot order: sensor, prey, motor, capture/feeding.
+local Fly=require(script.Parent.Fly)
+local Graph=require(script.Parent.PerchGraph)
+local Population=require(script.Parent.PreyPopulation)
+local Feeding=require(script.Parent.Feeding)
+local M=require(script.Parent.PreyMath)
+local D={};D.__index=D
+local POINTS: {{string | number}}={
+ {'sill_first_hunt',-13,0,6},{'rim_hunt',10,4.6,-3},{'leaf_hunt',-1,4.2,-1},{'east_hunt',23,0,7},
+ {'west_leaf',-15,4.2,-1},{'east_leaf',22,5.4,-2},{'under_leaf',-12.8,0,-2},{'front_path',1,0,8},
+ {'east_corner',27,0,-7},{'back_path',-9,0,-9},{'rim_west',5,4.6,-5},{'rim_east',15,4.6,-5},
+}
+function D.new(graph: any,profile: any,seed: number,target: number): any
+ local self:any=setmetatable({graph=graph,p=profile,seed=seed,target=target,flies={},serial=0,now=0,tick=0,
+  population=Population.new(profile.population,seed+117,target),feeding=Feeding.new(),vents={},strikeEnd=-1,previousMode='attached',
+  captures=0,enabled=true,cpu={},candidates=0,entryChecks=0},D)
+ for i,row in POINTS do
+  local id=row[1]::string
+  graph:add(id,Vector3.new(row[2]::number,row[3]::number,row[4]::number),Vector3.yAxis,if id=='under_leaf' then .5 else .2,if string.find(id,'rim') then .5 else .1,i<=6)
+ end
+ -- Keep only perches with a valid outgoing flight.
+ for _,p in graph.perches do
+  if p.valid then
+   local linked=false;local tries=0
+   for _,other in graph.perches do if other~=p and other.valid and (other.position-p.position).Magnitude<=profile.flight.max_flight_wu then
+    tries+=1;if graph:plan(graph:rest(p),p.normal,other,nil) then linked=true;break end
+    if tries>=5 then break end
+   end end
+   p.valid=linked
+  end
+ end
+ for _,p in graph.perches do if #self.flies<target and p.start and p.valid then self:spawn(p) end end
+ for i,x in {-23,23} do
+  -- Authored window vents face into the sill. Entry paths are still swept before a fly exists.
+  table.insert(self.vents,{id='vent_'..i,position=Vector3.new(x,8,-12.5),normal=Vector3.zAxis,shelter=0,food=0,start=false,valid=true,occupant='',reserved=''})
+ end
+ return self
+end
+function D.spawn(self: any,perch: any): any
+ self.serial+=1
+ local f=Fly.new('fly_'..self.serial,self.serial,self.seed+self.serial*997,perch,self.graph,self.p,self.now)
+ table.insert(self.flies,f);return f
+end
+function D.percepts(self: any): {any}
+ local out={};for _,f in self.flies do local p=f:percept();if p then table.insert(out,p) end end;return out
+end
+function D.before(self: any,dt: number,position: Vector3,observer: any,sensor: any,cast: any,camera: any)
+ if not self.enabled then return end
+ local started=os.clock();self.now+=dt;self.tick+=1;self.previousPosition=position
+ local alive=0;for _,f in self.flies do if f:alive() then alive+=1 end end
+ self.population:step(self.now,alive,self.vents,function(v)
+  self.entryChecks+=1
+  local pos=self.graph:rest(v)
+  if (position-pos).Magnitude<self.p.population.vent_min_distance_wu then return false end
+  if M.inView(camera.CFrame,camera.FieldOfView,camera.ViewportSize.X/math.max(1,camera.ViewportSize.Y),pos,self.p.population.vent_view_margin_deg) then return false end
+  return not sensor:couldSense(observer,pos,self.p.body.radius_wu,cast)
+ end,function(v)
+  for _,target in self.graph.perches do
+   if target.valid and target.occupant=='' and target.reserved=='' then
+    local path=self.graph:plan(self.graph:rest(v),v.normal,target,nil)
+    if path and M.pathLength(path)>=self.p.population.entry_min_flight_wu then
+     local f=self:spawn(v);f.flight:begin(path,target,'move',self.now);return true
+    end
+   end
+  end
+  return false
+ end)
+ for _,f in self.flies do f:step(dt,self.now,position,.3,cast) end
+ self.beforeCost=(os.clock()-started)*1e6
+end
+function D.escape(self: any,f: any)
+ f.state='SEEK_PERCH';f.stateSince=self.now;f.senses.awareness=self.p.senses.awareness_max
+ f.senses.hasLastSeen=true;f.senses.lastSeenPosition=self.previousPosition;f.senses.lastSeenTime=self.now
+ f:launch('flee',self.now)
+end
+function D.after(self: any,dt: number,motor: any,sensor: any,cast: any)
+ if not self.enabled then return end
+ local started=os.clock()
+ if motor.mode=='air' and self.previousMode~='air' then
+  for _,event in motor.events do if event.kind=='launched' then self.strikeEnd=self.tick+240;break end end
+ end
+ if self.previousMode=='air' and motor.mode~='air' then self.strikeEnd=math.min(self.strikeEnd,self.tick+3) end
+ self.previousMode=motor.mode
+ if self.tick<=self.strikeEnd and not self.feeding.held then
+  for _,f in self.flies do if f:alive() then
+   local t,d=M.sweepClosest(self.previousPosition,motor.pos,f.prevPosition,f.position)
+   if d<=self.p.body.capture_radius_wu+.3 then
+    local a=self.previousPosition:Lerp(motor.pos,t);local b=f.prevPosition:Lerp(f.position,t)
+    if not cast(a,b) then
+     f.flight:release();if f.perch and f.perch.occupant==f.id then f.perch.occupant='' end
+     f.state='CAPTURED';f.captureSerial+=1;f.captureKey=f.id..':'..f.captureSerial;f.velocity=Vector3.zero
+     sensor:onCapture(b,self.p.body.radius_wu);self.feeding:capture(f);self.captures+=1;break
+    end
+   end
+  end end
+ end
+ self.feeding:step(dt,motor.mode=='attached' and not motor.preparing,motor.moving or motor.vel.Magnitude>.15,function(f) self:escape(f) end)
+ local held=self.feeding.held
+ if held then
+  held.position=motor:eyePosition()+motor.heading*(if self.feeding.struggling then .42 else .2)+motor.up*(if self.feeding.struggling then .04 else -.13)
+  held.normal=motor.up;held.heading=motor.heading;held.prevPosition=held.position
+ end
+ for i=#self.flies,1,-1 do if self.flies[i].state=='CONSUMED' then table.remove(self.flies,i) end end
+ table.insert(self.cpu,(self.beforeCost or 0)+(os.clock()-started)*1e6);if #self.cpu>1200 then table.remove(self.cpu,1) end
+end
+function D.engine(world: Instance,profile: any,seed: number,target: number): any
+ local params=RaycastParams.new();params.FilterType=Enum.RaycastFilterType.Include;params.FilterDescendantsInstances={world}
+ local overlap=OverlapParams.new();overlap.FilterType=Enum.RaycastFilterType.Include;overlap.FilterDescendantsInstances={world}
+ local probe=Instance.new('Part');probe.Name='FlyClearanceProbe';probe.Shape=Enum.PartType.Ball;probe.Anchored=true;probe.CanCollide=false;probe.CanQuery=false;probe.CanTouch=false;probe.Transparency=1;probe.Parent=workspace
+ local graph=Graph.new(function(a: Vector3,b: Vector3) return workspace:Raycast(a,b-a,params) end,
+  function(a: Vector3,b: Vector3,r: number) if (b-a).Magnitude<1e-7 then return false end;return workspace:Spherecast(a,r,b-a,params)~=nil end,
+  function(a: Vector3,r: number) probe.Size=Vector3.one*r*2;probe.Position=a;return #workspace:GetPartsInPart(probe,overlap)>0 end,profile)
+ local self=D.new(graph,profile,seed,target);self.probe=probe;return self
+end
+return D
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="44">
+          <Properties>
+            <string name="Name">PreyMath</string>
+            <string name="Source"><![CDATA[--!strict
+-- Frozen scripts/prey/prey_math.gd: explicit evidence, utility and swept-contact math.
+local M = {}
+local EPS = 1e-6
+function M.sweepClosest(a0: Vector3,a1: Vector3,b0: Vector3,b1: Vector3): (number,number)
+ local d=a0-b0; local dv=a1-b1-d
+ local t=if dv:Dot(dv)>EPS*EPS then math.clamp(-d:Dot(dv)/dv:Dot(dv),0,1) else 0
+ return t,(d+dv*t).Magnitude
+end
+function M.apparentAngle(radius: number,distance: number): number return 2*math.atan(math.max(radius,0)/math.max(distance,EPS)) end
+function M.bearingRate(a: Vector3,b: Vector3,dt: number): number
+ if dt<=EPS or a:Dot(a)<EPS or b:Dot(b)<EPS then return 0 end
+ return math.deg(math.acos(math.clamp(a.Unit:Dot(b.Unit),-1,1)))/dt
+end
+function M.loomRate(old: number,angle: number,dt: number,scale: number): number
+ return if dt<=EPS or angle<=EPS then 0 else scale*math.max(0,((angle-old)/dt)/angle)
+end
+function M.distanceWeight(d: number,full: number,zero: number): number
+ if zero<=full then return if d<=full then 1 else 0 end
+ return math.clamp((zero-d)/(zero-full),0,1)
+end
+function M.facingWeight(angle: number,front: number,rear: number,gain: number): number
+ if angle<=front then return 1 end
+ if angle>=rear or rear<=front then return gain end
+ local t=(angle-front)/(rear-front); return 1+(gain-1)*t*t*(3-2*t)
+end
+function M.awarenessGain(motion: number,threshold: number,scale: number,distance: number,facing: number,visible: number,vigilance: number): number
+ return if motion<=threshold or scale<=EPS then 0 else (motion-threshold)/scale*distance*facing*math.clamp(visible,0,1)*math.max(vigilance,0)
+end
+function M.integrateAwareness(a: number,gain: number,dt: number,decay: number,maximum: number): number
+ return math.clamp(a+(if gain>0 then gain else -decay)*math.max(dt,0),0,maximum)
+end
+function M.threat(a: number,calm: number,flee: number): number
+ if flee<=calm then return if a>=flee then 1 else 0 end
+ return math.clamp((a-calm)/(flee-calm),0,1)
+end
+function M.scoreRest(w: any,fatigue: number,shelter: number,food: number,threat: number): number
+ return w.rest_base+w.rest_fatigue*fatigue+w.rest_shelter*shelter+w.rest_food*food-w.rest_threat*threat
+end
+function M.scoreMove(w: any,restless: number,food: number,shelter: number,travel: number,fatigue: number,threat: number): number
+ return w.move_restless*restless+w.move_food*food+w.move_shelter*shelter-w.move_travel*travel-w.move_fatigue*fatigue-w.move_threat*threat
+end
+function M.scoreFlee(w: any,threat: number,shelter: number,away: number,travel: number): number
+ return threat*(w.flee_threat+w.flee_shelter*shelter+w.flee_away*away-w.flee_travel*travel)
+end
+function M.pickGoal(scores: {[string]:number},current: string,hysteresis: number): string
+ local best,value=current,-math.huge
+ for _,g in {'rest','move','flee'} do
+  if scores[g] then local v=scores[g]+(if g==current then hysteresis else 0); if v>value+1e-9 then best,value=g,v end end
+ end
+ return best
+end
+function M.pathLength(points: {Vector3}): number
+ local total=0; for i=2,#points do total+=(points[i]-points[i-1]).Magnitude end; return total
+end
+function M.pointAt(points: {Vector3},s: number): Vector3
+ if #points==0 then return Vector3.zero end
+ if s<=0 or #points==1 then return points[1] end
+ for i=2,#points do local n=(points[i]-points[i-1]).Magnitude
+  if s<=n then return if n<EPS then points[i-1] else points[i-1]:Lerp(points[i],s/n) end; s-=n
+ end
+ return points[#points]
+end
+function M.distanceToPath(points: {Vector3},p: Vector3): number
+ if #points==0 then return math.huge end
+ local best=(points[1]-p).Magnitude
+ for i=2,#points do local a=points[i-1];local ab=points[i]-a
+  local t=if ab:Dot(ab)<EPS*EPS then 0 else math.clamp((p-a):Dot(ab)/ab:Dot(ab),0,1)
+  best=math.min(best,(a+ab*t-p).Magnitude)
+ end
+ return best
+end
+function M.targetSpeed(remaining: number,top: number,landing: number,slow: number): number
+ return if slow<=EPS or remaining>=slow then top else landing+(top-landing)*math.clamp(remaining/slow,0,1)
+end
+function M.stepSpeed(speed: number,target: number,accel: number,dt: number): number
+ return if speed>=target then target else math.min(speed+accel*dt,target)
+end
+function M.inView(cf: CFrame,fov: number,aspect: number,p: Vector3,margin: number): boolean
+ local v=cf:PointToObjectSpace(p);if v.Z>=-EPS then return false end
+ return math.atan2(math.abs(v.X),-v.Z)<=math.atan(math.tan(math.rad(fov)*.5)*math.max(aspect,.1))+math.rad(margin)
+  and math.atan2(math.abs(v.Y),-v.Z)<=math.rad(fov)*.5+math.rad(margin)
+end
+return M
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="45">
+          <Properties>
+            <string name="Name">PreyPopulation</string>
+            <string name="Source"><![CDATA[--!strict
+-- Frozen prey_population.gd: delayed, twice-unseen vent entries; never teleport a replacement onto a perch.
+local R=require(script.Parent.PreyRandom)
+local P={};P.__index=P
+function P.new(profile: any,seed: number,target: number): any
+ return setmetatable({p=profile,rng=R.new(seed),target=target,owed={},eligible={},rest={},nextCheck=0,entries=0,deferred=0},P)
+end
+function P.step(self: any,now: number,living: number,vents: {any},safe: (any)->boolean,enter: (any)->boolean)
+ local missing=math.max(0,self.target-living)
+ while #self.owed>missing do table.remove(self.owed) end
+ while #self.owed<missing do table.insert(self.owed,now+self.rng:draw(self.p.replenish_delay_s)) end
+ table.sort(self.owed)
+ if #self.owed==0 or now<self.owed[1] or now<self.nextCheck then return end
+ self.nextCheck=now+self.p.replenish_retry_s
+ for _,vent in vents do
+  if now>=(self.rest[vent.id] or 0) and safe(vent) then
+   local old=self.eligible[vent.id]
+   self.eligible[vent.id]=now
+   if old and now-old<=self.p.replenish_retry_s*1.6+1e-6 and enter(vent) then
+    table.remove(self.owed,1);self.rest[vent.id]=now+6;self.eligible[vent.id]=nil;self.entries+=1;return
+   end
+  else self.eligible[vent.id]=nil end
+ end
+ self.deferred+=1
+end
+return P
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="46">
+          <Properties>
+            <string name="Name">PreyRandom</string>
+            <string name="Source"><![CDATA[--!strict
+-- A repeatable port stream (Park-Miller); Godot's random inputs are exported for parity fixtures.
+local R={};R.__index=R
+function R.new(seed: number): any return setmetatable({state=math.max(1,math.floor(seed)%2147483647)},R) end
+function R.next(self: any): number self.state=(self.state*16807)%2147483647;return self.state/2147483647 end
+function R.draw(self: any,pair: {number}): number return pair[1]+(pair[2]-pair[1])*self:next() end
+return R
+]]></string>
+          </Properties>
+        </Item>
+      </Item>
+      <Item class="Folder" referent="47">
+        <Properties>
+          <string name="Name">Rig</string>
+        </Properties>
+        <Item class="ModuleScript" referent="48">
           <Properties>
             <string name="Name">Anatomy</string>
             <string name="Source"><![CDATA[--!strict
@@ -5165,7 +5887,7 @@ return Anatomy
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="39">
+        <Item class="ModuleScript" referent="49">
           <Properties>
             <string name="Name">Idle</string>
             <string name="Source"><![CDATA[--!strict
@@ -5222,7 +5944,7 @@ return Idle
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="40">
+        <Item class="ModuleScript" referent="50">
           <Properties>
             <string name="Name">Setae</string>
             <string name="Source"><![CDATA[--!strict
@@ -5533,7 +6255,7 @@ return Setae
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="41">
+        <Item class="ModuleScript" referent="51">
           <Properties>
             <string name="Name">SpiderRig</string>
             <string name="Source"><![CDATA[--!strict
@@ -6142,11 +6864,11 @@ return SpiderRig
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="42">
+      <Item class="Folder" referent="52">
         <Properties>
           <string name="Name">UI</string>
         </Properties>
-        <Item class="ModuleScript" referent="43">
+        <Item class="ModuleScript" referent="53">
           <Properties>
             <string name="Name">ControlText</string>
             <string name="Source"><![CDATA[--!strict
@@ -6204,17 +6926,17 @@ ControlText.DROP_WALK = "To the edge, to let yourself down"
 -- silk is X on a controller (ROBLOX-05). Touch names are the on-screen buttons.
 local NAMES: { [string]: { [string]: string } } = {
 	keyboard = {
-		jump = "Space", cancel = "Q", letGo = "Q", drop = "F", reel = "W", lower = "S", walk = "WASD", look = "Mouse",
+		feed = "E", jump = "Space", cancel = "Q", letGo = "Q", drop = "F", reel = "W", lower = "S", walk = "WASD", look = "Mouse",
 		creep = "Shift", focus = "Right mouse", eye = "V", recenter = "R", slow = "T", reset = "Backspace", help = "H", zoom = "Wheel",
 	},
 	gamepad = {
-		jump = "A", cancel = "B", letGo = "B", drop = "X", reel = "Stick up", lower = "Stick down", walk = "Left stick",
+		feed = "Left-stick click", jump = "A", cancel = "B", letGo = "B", drop = "X", reel = "Stick up", lower = "Stick down", walk = "Left stick",
 		look = "Right stick", creep = "LB", focus = "LT", eye = "Y", recenter = "Right-stick click", slow = "RT", reset = "View",
 		help = "", zoom = "",
 	},
 	touch = {
-		jump = "Jump", cancel = "Cancel", letGo = "Let go", drop = "Silk", reel = "↑", lower = "↓", walk = "Arrows",
-		look = "Drag", creep = "Creep", focus = "", eye = "Eye", recenter = "Recenter", slow = "", reset = "", help = "", zoom = "",
+		feed = "Eat", jump = "Jump", cancel = "Cancel", letGo = "Let go", drop = "Silk", reel = "↑", lower = "↓", walk = "Arrows",
+		look = "Drag", creep = "Creep", focus = "Focus", eye = "Eye", recenter = "Recenter", slow = "", reset = "", help = "", zoom = "",
 	},
 }
 
@@ -6365,7 +7087,7 @@ return ControlText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="44">
+        <Item class="ModuleScript" referent="54">
           <Properties>
             <string name="Name">HudLayout</string>
             <string name="Source"><![CDATA[--!strict
@@ -6388,6 +7110,7 @@ HudLayout.TOUCH_BUTTONS = {
 	{ action = "Creep", label = "Creep", x = -86, y = -172, size = 60, right = true },
 	{ action = "Drop", label = "Silk", x = -86, y = -242, size = 60, right = true },
 	{ action = "Recenter", label = "Re-\ncenter", x = -160, y = -168, size = 52, right = true, textSize = 14 },
+	{ action = "Feed", label = "Eat", x = 22, y = -242, size = 52, right = false, textSize = 14 },
 	{ action = "Focus", label = "Focus", x = -236, y = -242, size = 60, right = true, textSize = 14 },
 	{ action = "Eye", label = "Eye", x = -156, y = -242, size = 60, right = true },
 } :: { Button }
@@ -6445,7 +7168,7 @@ return HudLayout
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="45">
+        <Item class="ModuleScript" referent="55">
           <Properties>
             <string name="Name">PerceptionText</string>
             <string name="Source"><![CDATA[--!strict
@@ -6461,7 +7184,7 @@ return table.freeze(Text)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="46">
+        <Item class="ModuleScript" referent="56">
           <Properties>
             <string name="Name">PerceptionView</string>
             <string name="Source"><![CDATA[--!strict
@@ -6513,15 +7236,15 @@ return View
       </Item>
     </Item>
   </Item>
-  <Item class="ServerScriptService" referent="47">
+  <Item class="ServerScriptService" referent="57">
     <Properties>
       <string name="Name">ServerScriptService</string>
     </Properties>
-    <Item class="Folder" referent="48">
+    <Item class="Folder" referent="58">
       <Properties>
         <string name="Name">Server</string>
       </Properties>
-      <Item class="Script" referent="49">
+      <Item class="Script" referent="59">
         <Properties>
           <string name="Name">Main</string>
           <token name="RunContext">0</token>
@@ -6566,19 +7289,64 @@ sill.Parent = Workspace
       </Item>
     </Item>
   </Item>
-  <Item class="StarterPlayer" referent="50">
+  <Item class="StarterPlayer" referent="60">
     <Properties>
       <string name="Name">StarterPlayer</string>
     </Properties>
-    <Item class="StarterPlayerScripts" referent="51">
+    <Item class="StarterPlayerScripts" referent="61">
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="Folder" referent="52">
+      <Item class="Folder" referent="62">
         <Properties>
           <string name="Name">Client</string>
         </Properties>
-        <Item class="ModuleScript" referent="53">
+        <Item class="ModuleScript" referent="63">
+          <Properties>
+            <string name="Name">FlyBodies</string>
+            <string name="Source"><![CDATA[--!strict
+-- Drawn fly: compact thorax/abdomen, compound eyes, six legs and two translucent wings. Never queryable.
+local B={};B.__index=B
+function B.new(parent: Instance): any
+ local folder=Instance.new('Folder');folder.Name='Flies';folder.Parent=parent
+ return setmetatable({folder=folder,rigs={}},B)
+end
+local function part(parent: Instance,name: string,size: Vector3,color: Color3,shape: Enum.PartType?): Part
+ local p=Instance.new('Part');p.Name=name;p.Size=size;p.Color=color;p.Shape=shape or Enum.PartType.Ball
+ p.Anchored=true;p.CanCollide=false;p.CanQuery=false;p.CanTouch=false;p.CastShadow=false;p.Material=Enum.Material.SmoothPlastic;p.Parent=parent;return p
+end
+function B.draw(self: any,flies: {any},now: number)
+ local present={};local parts:{BasePart}={};local frames:{CFrame}={}
+ for _,f in flies do
+  present[f.id]=true
+  local r=self.rigs[f.id]
+  if not r then
+   local folder=Instance.new('Folder');folder.Name=f.id;folder.Parent=self.folder;r={folder=folder,parts={}};self.rigs[f.id]=r
+   for i,size in {Vector3.new(.28,.25,.28),Vector3.new(.22,.2,.37),Vector3.new(.24,.22,.18)} do
+    r.parts[i]=part(folder,'Body'..i,size,Color3.fromRGB(34,43,39))
+   end
+   for i=4,5 do r.parts[i]=part(folder,'CompoundEye',Vector3.new(.105,.14,.13),Color3.fromRGB(108,40,26)) end
+   for i=6,7 do r.parts[i]=part(folder,'Wing',Vector3.new(.18,.018,.55),Color3.fromRGB(183,198,195));r.parts[i].Transparency=.42 end
+   for i=8,13 do r.parts[i]=part(folder,'Leg',Vector3.new(.025,.025,.25),Color3.fromRGB(40,35,30),Enum.PartType.Cylinder) end
+  end
+  local cf=CFrame.lookAt(f.position,f.position+f.heading,f.normal)
+  local flying=f:airborne() or f.state=='CAPTURED'
+  local wing=if flying then math.sin(now*92)*.8+.4 else .12
+  local locals={CFrame.new(0,0,0),CFrame.new(0,0,.23),CFrame.new(0,.015,-.18),CFrame.new(-.105,.04,-.22),CFrame.new(.105,.04,-.22),
+   CFrame.new(-.13,.1,.15)*CFrame.Angles(0,-.3,-wing),CFrame.new(.13,.1,.15)*CFrame.Angles(0,.3,wing)}
+  for i=1,6 do local side=if i%2==0 then 1 else -1;local z=math.floor((i-1)/2)*.14-.15
+   table.insert(locals,CFrame.new(side*.17,-.09,z)*CFrame.Angles(0,0,side*.5))
+  end
+  for i,p in r.parts do table.insert(parts,p);table.insert(frames,cf*locals[i]) end
+ end
+ for id,r in self.rigs do if not present[id] then r.folder:Destroy();self.rigs[id]=nil end end
+ if #parts>0 then workspace:BulkMoveTo(parts,frames,Enum.BulkMoveMode.FireCFrameChanged) end
+end
+return B
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="64">
           <Properties>
             <string name="Name">PerceptionHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -6658,7 +7426,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="54">
+        <Item class="ModuleScript" referent="65">
           <Properties>
             <string name="Name">PerceptionStage</string>
             <string name="Source"><![CDATA[--!strict
@@ -6703,7 +7471,7 @@ return Stage
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="55">
+        <Item class="ModuleScript" referent="66">
           <Properties>
             <string name="Name">SpiderCamera</string>
             <string name="Source"><![CDATA[--!strict
@@ -7070,7 +7838,7 @@ return SpiderCamera
 ]]></string>
           </Properties>
         </Item>
-        <Item class="LocalScript" referent="56">
+        <Item class="LocalScript" referent="67">
           <Properties>
             <string name="Name">SpiderClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -7116,6 +7884,8 @@ local ObservationMemory = require(Shared.Perception.ObservationMemory)
 local FocusState = require(Shared.Movement.FocusState)
 local PerceptionStage = require(script.Parent.PerceptionStage)
 local PerceptionHud = require(script.Parent.PerceptionHud)
+local PreyDirector = require(Shared.Prey.PreyDirector)
+local FlyBodies = require(script.Parent.FlyBodies)
 local focusState = FocusState.new()
 local DT = SpiderMotor.DT
 local SLOW_SPEED = 0.5
@@ -7164,7 +7934,10 @@ local sensor = Sensor.new(memory)
 sensor:configureFrom(Species.phidippus_audax_prototype.perception)
 local sightCast = Sensor.workspaceCast(params)
 local perceptionHud = PerceptionHud.new(player:WaitForChild("PlayerGui"))
-local stage = if Workspace:GetAttribute("TestTarget") ~= false then PerceptionStage.new(sill) else nil
+local stage = if Workspace:GetAttribute("TestTarget") == true or (Workspace:GetAttribute("TestTarget") ~= false and script.Parent:FindFirstChild("SilkPlayback")) then PerceptionStage.new(sill) else nil
+local prey = PreyDirector.engine(sill, Species.fly_like_prototype, 914, 4)
+local flyBodies = FlyBodies.new(Workspace)
+local gripPress = false
 local function focusActive(): boolean
 	return focusState:active(false, player:GetAttribute("FocusToggle") == true, motor.mode == "attached")
 end
@@ -7330,7 +8103,10 @@ local controls: any = SpiderInput.bind({
 		if phase == "begin" then focusState:press(player:GetAttribute("FocusToggle") == true, motor.mode == "attached")
 		elseif phase == "cancel" then focusState:clear() end
 	end,
+	feed = function() prey.feeding:press() end,
 	jump = function(phase: string)
+		if phase == "begin" and prey.feeding.struggling then prey.feeding:press(); gripPress=true; return end
+		if gripPress then if phase ~= "begin" then gripPress=false end; return end
 		if phase == "begin" then
 			motor:cancelWalk() -- a jump press takes over from a walk to the edge
 			jump:press()
@@ -7344,6 +8120,7 @@ local controls: any = SpiderInput.bind({
 	-- else's then) and, held on the line, lets go; SilkController counts only a fresh press after the 0.4 s grace, held 0.6 s.
 	cancel = function(phase: string)
 		if phase ~= "begin" then return end
+		prey.feeding:cancel()
 		if motor:cancelWalk() then return end
 		focusState:cancel(jump:isBusy() or #jump.events > 0 or motor:onLine())
 		jump:cancel()
@@ -7436,6 +8213,11 @@ local function updateHud(frameDt: number)
 	else
 		hidePreview()
 	end
+	view.grip = if prey.feeding.struggling then prey.feeding.grip else nil
+	if prey.feeding.struggling then
+		table.insert(view.status, "Caught — tap " .. ControlText.name(device,"jump") .. " to keep your grip")
+	elseif prey.feeding.feeding then table.insert(view.status, "Feeding — move to stop")
+	elseif prey.feeding.held then table.insert(view.status, "Meal paused — " .. ControlText.name(device,"feed") .. " to eat") end
 	if focusState.latched then table.insert(view.status, "FOCUS ON    " .. ControlText.name(device,"focus") .. " again to stop" .. (if not jump:isBusy() and not motor:onLine() and not motor.silk.walk then " / " .. ControlText.name(device,"cancel") else "")) end
 	if cam.eyeView then table.insert(view.status, `SPIDER-EYE VIEW    {ControlText.name(device, "eye")}: back`) end
 	if slow then
@@ -7457,6 +8239,8 @@ local function updateHud(frameDt: number)
 		view.prompt = { hint = ControlText.walkHint(device) }
 	end
 	if os.clock() > helpUntil and helpVisible then helpVisible = false end
+	controls:setTouchVisible("Feed", prey.feeding.held ~= nil)
+	controls:setTouchLabel("Jump", if prey.feeding.struggling then "Grip" else "Jump")
 	controls:setTouchLabel("Cancel", ControlText.touchCancelLabel(onLine))
 	controls:setTouchVisible("Jump", not onLine)
 	controls:setTouchVisible("Creep", not onLine)
@@ -7475,14 +8259,17 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 		motor:setAimRay(origin, dir)
 		while accumulator >= DT do
 			accumulator -= DT
-			local percepts = {}
+			local percepts = prey:percepts()
 			if stage then
 				local p = stage.target:percept()
 				if p then table.insert(percepts,p) end
 			end
 			sensor:step(DT,motor:observer(),percepts,sightCast)
+			prey:before(DT,motor.pos,motor:observer(),sensor,sightCast,camera)
 			jump:step(motor)
 			motor:tick(tickInput())
+			prey.feeding.auto = player:GetAttribute("AutomaticGrip") == true
+			prey:after(DT,motor,sensor,sightCast)
 			if motor.mode ~= "attached" then focusState:clear() end
 			if stage then stage.target:step(DT); stage.marker.Position = stage.target.position end
 			cam:tick(DT)
@@ -7494,6 +8281,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	local body = SupportMath.bodyCFrame(motor.pos, drawnUp, motor.heading)
 	rig:update(body, simFrame, motor.mode == "attached", motor.moving)
 	updateHud(frameDt)
+	flyBodies:draw(prey.flies,prey.now)
 	local silk = motor.silk
 	local live, bend = liveLine, bendLine
 	if live and bend and silk.mode ~= "none" then
@@ -7536,7 +8324,7 @@ if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
 	task.spawn(function()
 		local run: any = (require :: any)(playback)
 		run({
-			sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
+			prey = prey, flyBodies = flyBodies, sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
 			input = controls,
 			drop = function() motor:requestDrop() end,
 			jump = jump,
@@ -7561,7 +8349,7 @@ end
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="57">
+        <Item class="ModuleScript" referent="68">
           <Properties>
             <string name="Name">SpiderHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -7714,7 +8502,10 @@ function Hud.new(playerGui: Instance): any
 	safe.ScreenInsets = Enum.ScreenInsets.CoreUISafeInsets
 	safe.Parent = playerGui
 	local top = column("Top", safe, Vector2.new(0.5, 0), UDim2.new(0.5, 0, 0, 8), Enum.VerticalAlignment.Top)
-	local status = wrapLabel("Status", top, 16, 1)
+	local grip = Instance.new("Frame")
+ grip.Name="GripBar";grip.Size=UDim2.new(.65,0,0,12);grip.LayoutOrder=0;grip.BackgroundColor3=Color3.fromRGB(45,12,12);grip.Visible=false;grip.Parent=top
+ local gripFill=Instance.new("Frame");gripFill.Name="Grip";gripFill.Size=UDim2.fromScale(.4,1);gripFill.BackgroundColor3=Color3.fromRGB(245,35,38);gripFill.BorderSizePixel=0;gripFill.Parent=grip
+ local status = wrapLabel("Status", top, 16, 1)
 	local toast = wrapLabel("Toast", top, 17, 2)
 	local help = wrapLabel("Controls", top, 15, 3)
 	help.TextXAlignment = Enum.TextXAlignment.Left
@@ -7736,7 +8527,7 @@ function Hud.new(playerGui: Instance): any
 	local promptCue = wrapLabel("PromptCue", panel, 16, 3)
 	promptCue.TextColor3 = WARN_COLOR
 	local self = setmetatable({
-		centre = centre, safe = safe, reticle = reticle, ticks = ticks,
+		grip = grip, gripFill = gripFill, centre = centre, safe = safe, reticle = reticle, ticks = ticks,
 		aimTitle = aimTitle, aimHint = aimHint, anchorLabel = anchorLabel,
 		status = status, toastLabel = toast, help = help,
 		panel = panel, promptTitle = promptTitle, promptHint = promptHint, promptCue = promptCue,
@@ -7775,7 +8566,9 @@ end
 -- view: device, aiming, focus, eyeView, aimTitle, aimHint, aimColor, anchorText, anchorOk, status ({string}),
 -- prompt ({title, hint, cue} or nil), helpVisible, helpText.
 function Hud.update(self: any, view: any, dt: number)
-	self.device = view.device
+	self.grip.Visible = view.grip ~= nil
+ if view.grip then self.gripFill.Size = UDim2.fromScale(math.clamp(view.grip,0,1),1) end
+ self.device = view.device
 	self:_place()
 	self.reticle.Visible = view.aiming or view.focus or view.eyeView
 	for _, t in self.ticks do t.Visible = view.focus == true end
@@ -7800,7 +8593,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="58">
+        <Item class="ModuleScript" referent="69">
           <Properties>
             <string name="Name">SpiderInput</string>
             <string name="Source"><![CDATA[--!strict
@@ -7826,6 +8619,7 @@ local HudLayout = require(Shared:WaitForChild("UI"):WaitForChild("HudLayout"))
 local SpiderInput = {}
 
 export type Handlers = {
+	feed: (() -> ())?,
 	focus: ((string) -> ())?,
 	jump: (string) -> (), -- "begin", "end", or "cancel" (the engine took the input away)
 	cancel: (string) -> (),
@@ -7849,6 +8643,7 @@ SpiderInput.BINDINGS = {
 	Left = { Enum.KeyCode.A, Enum.KeyCode.DPadLeft }, Right = { Enum.KeyCode.D, Enum.KeyCode.DPadRight },
 	LookLeft = { Enum.KeyCode.Left }, LookRight = { Enum.KeyCode.Right }, LookUp = { Enum.KeyCode.Up }, LookDown = { Enum.KeyCode.Down },
 	Jump = { Enum.KeyCode.Space, Enum.KeyCode.ButtonA }, Cancel = { Enum.KeyCode.Q, Enum.KeyCode.ButtonB },
+	Feed = { Enum.KeyCode.E, Enum.KeyCode.ButtonL3 },
 	Drop = { Enum.KeyCode.F, Enum.KeyCode.ButtonX },
 	Creep = { Enum.KeyCode.LeftShift, Enum.KeyCode.RightShift, Enum.KeyCode.ButtonL1 },
 	Focus = { Enum.UserInputType.MouseButton2, Enum.KeyCode.ButtonL2 },
@@ -7879,6 +8674,8 @@ function SpiderInput.bind(h: Handlers)
 			h.cancel(if now then "begin" else "end")
 		elseif action == "Focus" then
 			if h.focus then h.focus(if now then "begin" elseif cancelled then "cancel" else "end") end
+		elseif action == "Feed" then
+			if now and h.feed then h.feed() end
 		elseif action == "Drop" then
 			if now then h.drop() end
 		elseif ONE_SHOT[action] then
@@ -8003,7 +8800,7 @@ return SpiderInput
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="59">
+        <Item class="ModuleScript" referent="70">
           <Properties>
             <string name="Name">WorldDetail</string>
             <string name="Source"><![CDATA[--!strict
@@ -8046,7 +8843,7 @@ return WorldDetail
       </Item>
     </Item>
   </Item>
-  <Item class="Workspace" referent="60">
+  <Item class="Workspace" referent="71">
     <Properties>
       <string name="Name">Workspace</string>
       <float name="Gravity">35</float>

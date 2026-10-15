@@ -148,7 +148,10 @@ function Hud.new(playerGui: Instance): any
 	safe.ScreenInsets = Enum.ScreenInsets.CoreUISafeInsets
 	safe.Parent = playerGui
 	local top = column("Top", safe, Vector2.new(0.5, 0), UDim2.new(0.5, 0, 0, 8), Enum.VerticalAlignment.Top)
-	local status = wrapLabel("Status", top, 16, 1)
+	local grip = Instance.new("Frame")
+ grip.Name="GripBar";grip.Size=UDim2.new(.65,0,0,12);grip.LayoutOrder=0;grip.BackgroundColor3=Color3.fromRGB(45,12,12);grip.Visible=false;grip.Parent=top
+ local gripFill=Instance.new("Frame");gripFill.Name="Grip";gripFill.Size=UDim2.fromScale(.4,1);gripFill.BackgroundColor3=Color3.fromRGB(245,35,38);gripFill.BorderSizePixel=0;gripFill.Parent=grip
+ local status = wrapLabel("Status", top, 16, 1)
 	local toast = wrapLabel("Toast", top, 17, 2)
 	local help = wrapLabel("Controls", top, 15, 3)
 	help.TextXAlignment = Enum.TextXAlignment.Left
@@ -170,7 +173,7 @@ function Hud.new(playerGui: Instance): any
 	local promptCue = wrapLabel("PromptCue", panel, 16, 3)
 	promptCue.TextColor3 = WARN_COLOR
 	local self = setmetatable({
-		centre = centre, safe = safe, reticle = reticle, ticks = ticks,
+		grip = grip, gripFill = gripFill, centre = centre, safe = safe, reticle = reticle, ticks = ticks,
 		aimTitle = aimTitle, aimHint = aimHint, anchorLabel = anchorLabel,
 		status = status, toastLabel = toast, help = help,
 		panel = panel, promptTitle = promptTitle, promptHint = promptHint, promptCue = promptCue,
@@ -209,7 +212,9 @@ end
 -- view: device, aiming, focus, eyeView, aimTitle, aimHint, aimColor, anchorText, anchorOk, status ({string}),
 -- prompt ({title, hint, cue} or nil), helpVisible, helpText.
 function Hud.update(self: any, view: any, dt: number)
-	self.device = view.device
+	self.grip.Visible = view.grip ~= nil
+ if view.grip then self.gripFill.Size = UDim2.fromScale(math.clamp(view.grip,0,1),1) end
+ self.device = view.device
 	self:_place()
 	self.reticle.Visible = view.aiming or view.focus or view.eyeView
 	for _, t in self.ticks do t.Visible = view.focus == true end

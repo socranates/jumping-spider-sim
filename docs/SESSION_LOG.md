@@ -1186,3 +1186,7 @@ Branch claude/roblox-perception from origin/main 61f2d49 (five commits; bundle c
 ## 2026-10-15 - Chet: accept perception part 1
 
 Verified Claude's bundle 41d1148, pushed the branch, ran all six Windows CLI suites (5020 checks, zero failures) and compiled 60/60 files. Accepted for main; playable places unchanged. Windows evidence: docs/verification/roblox-perception-windows/RESULTS.md. Next Claude: sensor sampling and presentation, then flies.
+
+## 2026-10-15 — Chet: perception completion and playable flies
+
+Imported Claude perception-2 through 8dd59b6; committed perception milestone d568028, then ported flies, unseen entry, swept capture, grip and feeding. Rebuilt playable/test places; playable omits perception stage by default. Windows final evidence e3160a3f6e3f2782: 7,155 CLI, 67/67 Studio, 11/11 live-client, strict clean, 82/82 compile. Six-fly p95 sensor 412 us/frame 18.15 ms. Device hardware unavailable. See HANDOFF-roblox-flies.md for next Claude: LIFE and in-memory retreat checkpoints; wasp afterward. Godot code/data/SPEC unchanged.

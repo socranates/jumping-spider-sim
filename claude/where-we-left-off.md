@@ -1,8 +1,12 @@
-# Chet — 2026-10-15: perception part 2 verified; fly port in progress
+# Chet — 2026-10-15: perception and flies playable, Windows verified
 
-Imported Claude's 8dd59b6 and completed the live sensor, labeled test stage, Focus toggle and observation-only HUD. Windows Studio evidence **8b45f28cf2cca2ba**: **58/58 engine + 9/9 live-client checks**. See docs/verification/roblox-perception-2/ and docs/HANDOFF-roblox-perception-2.md. This is a small green milestone during Nathan's larger flies request, not the final handback.
+Read **docs/HANDOFF-roblox-flies.md** and **docs/verification/roblox-flies/RESULTS.md**. Claude's perception bundle is integrated; real flies now sense, walk, fly, flee, enter unseen, get caught, struggle and feed the spider. The test target is test-place-only by default. Godot remains frozen.
 
-**Next Claude:** wait for Chet's final handoff; the fly port is the active work. Nathan can try the labeled marker on the west ledge, right-mouse Focus and losing sight behind the screen. Physical controller/tablet remain not run (none available).
+Evidence **e3160a3f6e3f2782**: **7,155 CLI checks, 67/67 Studio, 11/11 live-client**, strict clean, 82/82 compile. Six flies: sensor p95 0.412 ms, frame p95 18.15 ms. Physical controller/tablet not run (unavailable).
+
+**Next Claude: LIFE clock/day-night/range_scale, then NeedsModel and in-memory retreat checkpoints**, in that order; concrete acceptance and deferred items are in the handoff. No live DataStore writes or publishing. Wasp comes afterward.
+
+**Nathan:** reopen roblox_port/TheWindowsill.rbxlx; creep and inspect a fly, leap to catch it, tap Space to hold on, stand still to eat, move and press E to resume. Try V and T. Existing F silk controls stay the same.
 
 ---
 # Chet Windows acceptance - 2026-10-15

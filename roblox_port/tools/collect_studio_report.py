@@ -6,7 +6,7 @@ from pathlib import Path
 import json, sys
 
 text=Path(sys.argv[1]).read_text(encoding='utf-8',errors='replace')
-records={key:[] for key in ['PORT_TEST_ROW','PORT_TEST_SUMMARY','PORT_CLIENT_REPORT','PORT_CLIENT_ROW','PORT_CLIENT_SUMMARY']}
+records={key:[] for key in ['PORT_TEST_ROW','PORT_TEST_SUMMARY','PORT_CLIENT_REPORT','PORT_CLIENT_ROW','PORT_CLIENT_SUMMARY','PORT_PREY_COST']}
 for line in text.splitlines():
     for key,values in records.items():
         marker=key+' '
@@ -30,5 +30,7 @@ else:
 out=Path(sys.argv[2]);out.mkdir(parents=True,exist_ok=True)
 (out/'studio-report.json').write_text(json.dumps(dict(summary,results=list(rows.values())),indent=2)+'\n',encoding='utf-8',newline='\n')
 (out/'client-report.json').write_text(json.dumps(client,indent=2)+'\n',encoding='utf-8',newline='\n')
+costs=[r for r in records['PORT_PREY_COST'] if r.get('evidence_id')==evidence]
+if costs: (out/'prey-cost.json').write_text(json.dumps(costs[-1],indent=2)+'\n',encoding='utf-8',newline='\n')
 print(f"{evidence}: engine {summary['passed']}/{summary['tests']}, client {client['passed']}/{client['tests']}")
 sys.exit(1 if summary['failed'] or client['failed'] else 0)

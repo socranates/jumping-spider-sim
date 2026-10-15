@@ -390,4 +390,20 @@ function Sensor.workspaceCast(params: RaycastParams): Cast
 	end
 end
 
+-- Capture is bodily evidence: no world identity crosses this API.
+function Sensor.onCapture(self: any,position: Vector3,radius: number): boolean
+ local core=self.core;local matches={}
+ for _,c in self.memory:contacts() do
+  if c.position and c.sizeWu>0 and (c.state==Contact.LIVE or Contact.hasMark(c)) then
+   local age=(core.tick-c.positionTick)/SensorCore.HZ
+   local reach=PerceptionMath.plausibleRadius(c.sizeWu,radius*2,age,core.contactSpeedBound,c.speedWuS)
+   if (c.position-position).Magnitude<=reach and PerceptionMath.sizesCompatible(c.sizeWu,radius*2,core.contactSizeRatio) then table.insert(matches,c.trackId) end
+  end
+ end
+ if #matches~=1 then return false end
+ local id=matches[1];self.memory:resolveCapture(id);core._kept[id]=nil;core._spots[id]=nil
+ for pid,t in core._tracks do if t.trackId==id then core._tracks[pid]=nil end end
+ return true
+end
+
 return Sensor

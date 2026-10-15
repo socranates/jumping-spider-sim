@@ -49,6 +49,15 @@ MODULES = [
     ("ObservationMemory", "Perception/ObservationMemory.luau"),
     ("SensorCore", "Perception/SensorCore.luau"),
     ("Sensor", "Perception/Sensor.luau"),
+    ("PreyMath", "Prey/PreyMath.luau"),
+    ("FlySenses", "Prey/FlySenses.luau"),
+    ("PerchGraph", "Prey/PerchGraph.luau"),
+    ("FlyFlight", "Prey/FlyFlight.luau"),
+    ("PreyRandom", "Prey/PreyRandom.luau"),
+    ("Fly", "Prey/Fly.luau"),
+    ("PreyPopulation", "Prey/PreyPopulation.luau"),
+    ("Feeding", "Prey/Feeding.luau"),
+    ("PreyDirector", "Prey/PreyDirector.luau"),
     ("TestTarget", "Habitat/TestTarget.luau"),
     ("FocusState", "Movement/FocusState.luau"),
     ("PerceptionText", "UI/PerceptionText.luau"),
@@ -61,12 +70,13 @@ CLIENT_MODULES = [
     ("SpiderInput", "../Client/SpiderInput.luau"),
     ("SpiderHud", "../Client/SpiderHud.luau"),
     ("PerceptionStage", "../Client/PerceptionStage.luau"),
+    ("FlyBodies", "../Client/FlyBodies.luau"),
     ("PerceptionHud", "../Client/PerceptionHud.luau"),
 ]
 CLIENT_TESTS = {"perception_client.luau", "client_smoke.luau", "look.luau", "world.luau"}
-REFERENCES = ["jump_reference", "tether_reference", "camera_reference", "framing_reference", "perception_reference"]
+REFERENCES = ["jump_reference", "tether_reference", "camera_reference", "framing_reference", "perception_reference", "prey_reference"]
 # A reference only the named tests read (it is large; the other bundles leave it out).
-REFERENCE_ONLY = {"perception_reference": {"perception.luau"}}
+REFERENCE_ONLY = {"prey_reference": {"prey.luau"}, "perception_reference": {"perception.luau"}}
 NAMES = {name for name, _ in MODULES + CLIENT_MODULES}
 
 
@@ -118,7 +128,7 @@ def bundle(test_file):
 luau = sys.argv[1] if len(sys.argv) > 1 else "luau"
 status = 0
 named = sys.argv[2:]
-for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "look.luau", "world.luau"]:
+for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "look.luau", "world.luau"]:
     if not (HERE / test_file).exists():
         if named:  # a misspelt name must not look like a pass
             print(f"no such test file: {test_file} (names are relative to tests/, for example look.luau)", file=sys.stderr)

@@ -707,3 +707,11 @@ Windows Studio exposed a shallow wall-lowering penetration missed by the box emu
 ### ROBLOX-17 — Perception in the live client (Chet, 2026-10-15)
 
 Port P01 F1–F8 using Claude's Sensor/observer, stepped before movement against only Windowsill geometry. Observation memory alone supplies sector cues, classification, fixed fading last-seen rings and lost-sight text. Camera position affects drawing/coverage, never sensing. FocusToggle is an opt-in Player attribute; cancel retains aim/line ownership and leaving a surface clears Focus. Back-to-start clears sensor bookkeeping and observation memory together. A labeled, non-query magenta TEST TARGET and an isolated west stage provide an explicit perception fixture until flies arrive. Native evidence 8b45f28cf2cca2ba: 58 engine and 9 live-client checks passed. No changes to the frozen Godot reference.
+
+### ROBLOX-18 — Evidence-driven flies and unseen arrivals (Chet, 2026-10-15)
+
+Port the frozen prey math, visible-motion senses, utility decisions, validated perches, swept/replanned flight and population entry policy into Shared/Prey. Four flies by default; incoming flies require two unseen vent checks and a planned route. Visibility uses WORLD-only geometry. Keep golden math inputs exported from Godot; the portable Park-Miller RNG deliberately does not promise Godot PCG sequence parity. Fly bodies are anchored/non-query and moved with BulkMoveTo. Native evidence e3160a3f6e3f2782: 67/67 Studio and 11/11 client checks; six-fly sensor p95 412 us. Full behavioral persistence, sound and grooming animation remain future work.
+
+### ROBLOX-19 — Capture evidence, grip and feeding controls (Chet, 2026-10-15)
+
+Capture requires swept unobstructed contact during a committed-jump strike window; ordinary falls cannot catch. Sensor receives only jaws position/radius and resolves exactly one plausible observed contact, never a hidden ID. Port landing delay, grip/escape, automatic-grip help, interruptible feeding and bounded nutrition grants. Space/A/Grip is consumed as grip while struggling; E/L3/Eat grips or resumes feeding. F/X/Silk retains its tested lowering action. AutomaticGrip is a Player attribute pending settings UI. Basic energy remains above 0.2 until LIFE/NeedsModel arrives; no starvation or saves are implied by this milestone.

@@ -21,6 +21,7 @@ local HudLayout = require(Shared:WaitForChild("UI"):WaitForChild("HudLayout"))
 local SpiderInput = {}
 
 export type Handlers = {
+	feed: (() -> ())?,
 	focus: ((string) -> ())?,
 	jump: (string) -> (), -- "begin", "end", or "cancel" (the engine took the input away)
 	cancel: (string) -> (),
@@ -44,6 +45,7 @@ SpiderInput.BINDINGS = {
 	Left = { Enum.KeyCode.A, Enum.KeyCode.DPadLeft }, Right = { Enum.KeyCode.D, Enum.KeyCode.DPadRight },
 	LookLeft = { Enum.KeyCode.Left }, LookRight = { Enum.KeyCode.Right }, LookUp = { Enum.KeyCode.Up }, LookDown = { Enum.KeyCode.Down },
 	Jump = { Enum.KeyCode.Space, Enum.KeyCode.ButtonA }, Cancel = { Enum.KeyCode.Q, Enum.KeyCode.ButtonB },
+	Feed = { Enum.KeyCode.E, Enum.KeyCode.ButtonL3 },
 	Drop = { Enum.KeyCode.F, Enum.KeyCode.ButtonX },
 	Creep = { Enum.KeyCode.LeftShift, Enum.KeyCode.RightShift, Enum.KeyCode.ButtonL1 },
 	Focus = { Enum.UserInputType.MouseButton2, Enum.KeyCode.ButtonL2 },
@@ -74,6 +76,8 @@ function SpiderInput.bind(h: Handlers)
 			h.cancel(if now then "begin" else "end")
 		elseif action == "Focus" then
 			if h.focus then h.focus(if now then "begin" elseif cancelled then "cancel" else "end") end
+		elseif action == "Feed" then
+			if now and h.feed then h.feed() end
 		elseif action == "Drop" then
 			if now then h.drop() end
 		elseif ONE_SHOT[action] then

@@ -41,6 +41,8 @@ local ObservationMemory = require(Shared.Perception.ObservationMemory)
 local FocusState = require(Shared.Movement.FocusState)
 local PerceptionStage = require(script.Parent.PerceptionStage)
 local PerceptionHud = require(script.Parent.PerceptionHud)
+local PreyDirector = require(Shared.Prey.PreyDirector)
+local FlyBodies = require(script.Parent.FlyBodies)
 local focusState = FocusState.new()
 local DT = SpiderMotor.DT
 local SLOW_SPEED = 0.5
@@ -89,7 +91,10 @@ local sensor = Sensor.new(memory)
 sensor:configureFrom(Species.phidippus_audax_prototype.perception)
 local sightCast = Sensor.workspaceCast(params)
 local perceptionHud = PerceptionHud.new(player:WaitForChild("PlayerGui"))
-local stage = if Workspace:GetAttribute("TestTarget") ~= false then PerceptionStage.new(sill) else nil
+local stage = if Workspace:GetAttribute("TestTarget") == true or (Workspace:GetAttribute("TestTarget") ~= false and script.Parent:FindFirstChild("SilkPlayback")) then PerceptionStage.new(sill) else nil
+local prey = PreyDirector.engine(sill, Species.fly_like_prototype, 914, 4)
+local flyBodies = FlyBodies.new(Workspace)
+local gripPress = false
 local function focusActive(): boolean
 	return focusState:active(false, player:GetAttribute("FocusToggle") == true, motor.mode == "attached")
 end
@@ -255,7 +260,10 @@ local controls: any = SpiderInput.bind({
 		if phase == "begin" then focusState:press(player:GetAttribute("FocusToggle") == true, motor.mode == "attached")
 		elseif phase == "cancel" then focusState:clear() end
 	end,
+	feed = function() prey.feeding:press() end,
 	jump = function(phase: string)
+		if phase == "begin" and prey.feeding.struggling then prey.feeding:press(); gripPress=true; return end
+		if gripPress then if phase ~= "begin" then gripPress=false end; return end
 		if phase == "begin" then
 			motor:cancelWalk() -- a jump press takes over from a walk to the edge
 			jump:press()
@@ -269,6 +277,7 @@ local controls: any = SpiderInput.bind({
 	-- else's then) and, held on the line, lets go; SilkController counts only a fresh press after the 0.4 s grace, held 0.6 s.
 	cancel = function(phase: string)
 		if phase ~= "begin" then return end
+		prey.feeding:cancel()
 		if motor:cancelWalk() then return end
 		focusState:cancel(jump:isBusy() or #jump.events > 0 or motor:onLine())
 		jump:cancel()
@@ -361,6 +370,11 @@ local function updateHud(frameDt: number)
 	else
 		hidePreview()
 	end
+	view.grip = if prey.feeding.struggling then prey.feeding.grip else nil
+	if prey.feeding.struggling then
+		table.insert(view.status, "Caught — tap " .. ControlText.name(device,"jump") .. " to keep your grip")
+	elseif prey.feeding.feeding then table.insert(view.status, "Feeding — move to stop")
+	elseif prey.feeding.held then table.insert(view.status, "Meal paused — " .. ControlText.name(device,"feed") .. " to eat") end
 	if focusState.latched then table.insert(view.status, "FOCUS ON    " .. ControlText.name(device,"focus") .. " again to stop" .. (if not jump:isBusy() and not motor:onLine() and not motor.silk.walk then " / " .. ControlText.name(device,"cancel") else "")) end
 	if cam.eyeView then table.insert(view.status, `SPIDER-EYE VIEW    {ControlText.name(device, "eye")}: back`) end
 	if slow then
@@ -382,6 +396,8 @@ local function updateHud(frameDt: number)
 		view.prompt = { hint = ControlText.walkHint(device) }
 	end
 	if os.clock() > helpUntil and helpVisible then helpVisible = false end
+	controls:setTouchVisible("Feed", prey.feeding.held ~= nil)
+	controls:setTouchLabel("Jump", if prey.feeding.struggling then "Grip" else "Jump")
 	controls:setTouchLabel("Cancel", ControlText.touchCancelLabel(onLine))
 	controls:setTouchVisible("Jump", not onLine)
 	controls:setTouchVisible("Creep", not onLine)
@@ -400,14 +416,17 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 		motor:setAimRay(origin, dir)
 		while accumulator >= DT do
 			accumulator -= DT
-			local percepts = {}
+			local percepts = prey:percepts()
 			if stage then
 				local p = stage.target:percept()
 				if p then table.insert(percepts,p) end
 			end
 			sensor:step(DT,motor:observer(),percepts,sightCast)
+			prey:before(DT,motor.pos,motor:observer(),sensor,sightCast,camera)
 			jump:step(motor)
 			motor:tick(tickInput())
+			prey.feeding.auto = player:GetAttribute("AutomaticGrip") == true
+			prey:after(DT,motor,sensor,sightCast)
 			if motor.mode ~= "attached" then focusState:clear() end
 			if stage then stage.target:step(DT); stage.marker.Position = stage.target.position end
 			cam:tick(DT)
@@ -419,6 +438,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	local body = SupportMath.bodyCFrame(motor.pos, drawnUp, motor.heading)
 	rig:update(body, simFrame, motor.mode == "attached", motor.moving)
 	updateHud(frameDt)
+	flyBodies:draw(prey.flies,prey.now)
 	local silk = motor.silk
 	local live, bend = liveLine, bendLine
 	if live and bend and silk.mode ~= "none" then
@@ -461,7 +481,7 @@ if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
 	task.spawn(function()
 		local run: any = (require :: any)(playback)
 		run({
-			sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
+			prey = prey, flyBodies = flyBodies, sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
 			input = controls,
 			drop = function() motor:requestDrop() end,
 			jump = jump,

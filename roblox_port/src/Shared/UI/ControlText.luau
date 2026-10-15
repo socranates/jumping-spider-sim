@@ -53,17 +53,17 @@ ControlText.DROP_WALK = "To the edge, to let yourself down"
 -- silk is X on a controller (ROBLOX-05). Touch names are the on-screen buttons.
 local NAMES: { [string]: { [string]: string } } = {
 	keyboard = {
-		jump = "Space", cancel = "Q", letGo = "Q", drop = "F", reel = "W", lower = "S", walk = "WASD", look = "Mouse",
+		feed = "E", jump = "Space", cancel = "Q", letGo = "Q", drop = "F", reel = "W", lower = "S", walk = "WASD", look = "Mouse",
 		creep = "Shift", focus = "Right mouse", eye = "V", recenter = "R", slow = "T", reset = "Backspace", help = "H", zoom = "Wheel",
 	},
 	gamepad = {
-		jump = "A", cancel = "B", letGo = "B", drop = "X", reel = "Stick up", lower = "Stick down", walk = "Left stick",
+		feed = "Left-stick click", jump = "A", cancel = "B", letGo = "B", drop = "X", reel = "Stick up", lower = "Stick down", walk = "Left stick",
 		look = "Right stick", creep = "LB", focus = "LT", eye = "Y", recenter = "Right-stick click", slow = "RT", reset = "View",
 		help = "", zoom = "",
 	},
 	touch = {
-		jump = "Jump", cancel = "Cancel", letGo = "Let go", drop = "Silk", reel = "↑", lower = "↓", walk = "Arrows",
-		look = "Drag", creep = "Creep", focus = "", eye = "Eye", recenter = "Recenter", slow = "", reset = "", help = "", zoom = "",
+		feed = "Eat", jump = "Jump", cancel = "Cancel", letGo = "Let go", drop = "Silk", reel = "↑", lower = "↓", walk = "Arrows",
+		look = "Drag", creep = "Creep", focus = "Focus", eye = "Eye", recenter = "Recenter", slow = "", reset = "", help = "", zoom = "",
 	},
 }
 

@@ -20,14 +20,14 @@ Every action of the frozen Godot game (`scripts/core/input_setup.gd` and its REA
 | Lower (lower) | S | Stick down | ↓ | Ported, on the line only |
 | Let down on a line (drop_line) | F; hold to keep lowering | X (Godot: D-pad down) | Silk | Ported: on a wall or underside at once; on top of a leaf it walks to the nearest usable edge first |
 | Recenter | R or middle mouse | Right-stick click | Recenter | Ported |
-| Focus | Hold right mouse | Hold LT | — | Ported as the body turning toward where the view points; perception itself is not ported yet |
+| Focus | Hold right mouse | Hold LT | Focus | Ported: gaze, inspection and observation HUD; Player.FocusToggle enables toggle mode |
 | Spider-eye view (eye_view) | V | Y | Eye | Ported: view at the principal eyes, walking relative to the gaze; no retinal/colour rendering yet |
 | Slow motion | T | RT | — | Ported at 50 % for the spider (the whole world when more of it exists) |
 | Pause | Esc | Menu | Roblox menu button | Roblox's own menu (reserved by Roblox): the game drops every press and hold and waits until it closes |
 | Field notes (help) | H | View | — | Deferred (notebook not ported). H shows the port's controls card instead |
-| Interact: eat, rest (interact) | E | X | — | Deferred: no prey or retreat yet. The controller's X is "let down on a line" in the port; settle that when feeding arrives |
+| Eat / resume meal | E | Left-stick click (L3) | Eat | Ported for held prey; movement interrupts feeding. X remains Silk. Rest is not ported yet |
 | Notebook | N | D-pad up | — | Deferred (the port's D-pad walks) |
-| Struggle grip (prepare_jump with prey) | Space | A | — | Deferred: no prey yet |
+| Struggle grip (prepare_jump with prey) | Space or E | A or L3 | Grip or Eat | Ported; these presses grip while struggling instead of jumping |
 | Debug overlay, support view | F3, F4 | — | — | Deferred (developer views) |
 | Settings in the pause panel | Esc | Menu | — | Deferred: sensitivity/invert, FOV, camera distance, stalk/aim/Focus toggles, jump arc, jump reach, hold-to-let-go switch, frame-the-line switch, remapping, assisted-play presets. The port uses Godot's defaults (hold to let go on, framing on, arc shown) |
 | Back to the start (port only) | Backspace | View | — | Port only |
@@ -60,3 +60,7 @@ The first appearance is `src/Shared/Data/Appearances.luau`, separate from specie
 Full inventory, test policy, server/filtering/save requirements and proposed order: [ROBLOX_PORT.md](../docs/ROBLOX_PORT.md). Current results: [roblox-cute-graphics](../docs/verification/roblox-cute-graphics/RESULTS.md) (Linux; the look and graphics, with before/after renders), [roblox-controls-recovery](../docs/verification/roblox-controls-recovery/RESULTS.md) (Linux) and [roblox-silk](../docs/verification/roblox-silk/RESULTS.md) (the last Windows Studio run). Handoff: [HANDOFF-roblox-controls-recovery.md](../docs/HANDOFF-roblox-controls-recovery.md).
 
 Core catch/hang/reel/lower/let-go, edge-first lowering, the capped catch camera and one control scheme are implemented; Studio and physical-device acceptance are next. Perception, flies, LIFE, wasp, notebook, menus/settings and saves remain to port. Initial publication uses solo servers (maximum players 1); that publishing setting has not been configured here. No experience was published by this build.
+
+## Flies and perception (2026-10-15)
+
+Four flies now live on the sill. Stalk, inspect, leap to catch, tap to hold on, then stay still to eat. Player attribute `AutomaticGrip = true` assists the struggle. The labeled perception fixture is only in the test place by default; `Workspace.TestTarget = true` explicitly enables it elsewhere. LIFE, the wasp, notebook and saves remain future port work. See `docs/HANDOFF-roblox-flies.md` for verification and the next chunk.

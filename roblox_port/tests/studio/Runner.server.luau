@@ -26,6 +26,7 @@ local deps = {
 }
 check("Recovery scenarios complete", function() require(script.Parent.RecoveryScenarios)(check, deps) end)
 check("Perception spec completes", function() require(script.Parent.PerceptionSpec)(check) end)
+check("Prey spec completes", function() require(script.Parent.PreySpec)(check) end)
 check("Prompt spec completes", function() require(script.Parent.PromptSpec)(check) end)
 local report = {suite = "Roblox engine", evidence_id = evidence.id, passed = passed, failed = failed,
 	tests = passed + failed, not_run = 0, engine = version(), results = rows}

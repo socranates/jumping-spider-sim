@@ -116,6 +116,9 @@ VIEWS = {
     "glass": {"fov": 40, "eye": [-14.0, 5.0, -4.0], "at": [-14.0, 5.4, -12.6], "near": 0.05, "far": 2500, "groups": []},
     "fly": {"fov": 40, "eye": [-14.0, 1.8, 10.5], "at": [-14.0, 1.6, 3.0], "near": 0.05, "far": 1800, "groups": ["flies"], "shadow": 40},
     "fly_a": {"fov": 34, "eye": [-15.0, 0.9, 5.4], "at": [-16.0, 0.2, 4.0], "near": 0.02, "far": 1800, "groups": ["flies"], "shadow": 20},
+    # the spider-eye view from the spawn (eye = body + 0.09 up + 0.53 ahead; the body is not drawn), side eyes and principal eyes
+    "eye_side": {"fov": 90, "eye": [-21.47, 0.39, 6.0], "at": [-12.0, 0.9, 3.2], "near": 0.02, "far": 2500, "groups": ["flies"], "shadow": 40},
+    "eye_principal": {"fov": 24, "eye": [-21.47, 0.39, 6.0], "at": [-16.0, 0.22, 4.0], "near": 0.02, "far": 2500, "groups": ["flies"], "shadow": 40, "uv": True},
     "fly_b": {"fov": 34, "eye": [-11.0, 3.4, 3.7], "at": [-12.0, 3.0, 2.0], "near": 0.02, "far": 1800, "groups": ["flies"], "shadow": 20},
 }
 

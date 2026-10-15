@@ -26,15 +26,15 @@ local S, P = Eyes.side, Eyes.principal
 -- ---------------------------------------------------------------- the numbers
 check(S.fovDeg == 90 and P.fovDeg == 24, "the side eyes see 90 degrees (vertical), the principal eyes 24")
 check(P.fovDeg >= Eyes.retina.heightDeg and P.fovDeg < 2 * Eyes.retina.heightDeg, "the telephoto view is just wider than a 20 degree retina is tall")
-check(S.saturation == -0.9 and P.saturation == 0.15, "saturation -0.9 with the side eyes, 0.15 with the principal eyes")
-check(S.tint[1] == 198 and S.tint[2] == 232 and S.tint[3] == 196, "the side eyes' tint is (198, 232, 196)")
+check(S.saturation == -0.85 and P.saturation == 0.15, "saturation -0.85 with the side eyes, 0.15 with the principal eyes")
+check(S.tint[1] == 170 and S.tint[2] == 228 and S.tint[3] == 165, "the side eyes' tint is (170, 228, 165)")
 check(P.tint[1] == 115 and P.tint[2] == 255 and P.tint[3] == 236, "the principal eyes' tint cuts the red: (115, 255, 236)")
 check(P.tint[1] < P.tint[2] and P.tint[1] < P.tint[3] and P.tint[3] > 0.8 * P.tint[2], "red is the cut channel, blue stands in for the short-wave one")
-check(S.contrast == 0.08 and P.contrast == 0.16 and S.brightness == 0 and P.brightness == 0.02, "contrast 0.08 / 0.16, brightness 0 / 0.02")
+check(S.contrast == 0.12 and P.contrast == 0.16 and S.brightness == 0.03 and P.brightness == 0.02, "contrast 0.12 / 0.16, brightness 0.03 / 0.02")
 check(S.blur == 2.5 and P.blur == 0, "the side eyes blur 2.5, the principal eyes none")
 check(S.dofFar == 0.35 and S.dofNear == 0.25 and P.dofFar == 0.75 and P.dofNear == 0.6, "depth of field intensities 0.35 / 0.25 and 0.75 / 0.6")
 check(S.dofRadiusMin == 6 and S.dofRadiusPerStud == 0.6 and P.dofRadiusMin == 0.6 and P.dofRadiusPerStud == 0.12, "in-focus radius max(6, 0.6 d) and max(0.6, 0.12 d)")
-check(S.strokeTransparency == 0.82 and P.strokeTransparency == 0.55, "the retina outline: transparency 0.82 and 0.55")
+check(S.strokeTransparency == 0.82 and P.strokeTransparency == 0.68, "the retina outline: transparency 0.82 and 0.68")
 check(S.sweepDeg == 4 and P.sweepDeg == 0.6 and S.torsionDeg == 12 and P.torsionDeg == 3, "scanning: sway 4 and 0.6 degrees, turn 12 and 3")
 check(S.vignette == 0.35 and P.vignette == 0.55 and Eyes.vignette.color[1] == 8 and Eyes.vignette.color[2] == 20 and Eyes.vignette.color[3] == 12, "the vignette: (8, 20, 12) at 0.35 and 0.55")
 local R = Eyes.retina
@@ -118,18 +118,18 @@ check(near(EyeOptics.lookScale(24) * EyeOptics.pixelsPerTan(24, 1000), EyeOptics
 -- ---------------------------------------------------------------- the blend
 local function rgbOf(c: Color3): (number, number, number) return c.R * 255, c.G * 255, c.B * 255 end
 local p0, p1 = EyeOptics.profile(0, 10, false), EyeOptics.profile(1, 10, false)
-check(p0.fovDeg == 90 and p0.saturation == -0.9 and p0.contrast == 0.08 and p0.brightness == 0 and p0.blur == 2.5, "k = 0: the side eyes' look")
+check(p0.fovDeg == 90 and p0.saturation == -0.85 and p0.contrast == 0.12 and p0.brightness == 0.03 and p0.blur == 2.5, "k = 0: the side eyes' look")
 check(p1.fovDeg == 24 and p1.saturation == 0.15 and p1.contrast == 0.16 and p1.brightness == 0.02 and p1.blur == 0, "k = 1: the principal eyes' look")
 local r0, g0, b0 = rgbOf(p0.tint)
 local r1, g1, b1 = rgbOf(p1.tint)
-check(near(r0, 198, 1e-9) and near(g0, 232, 1e-9) and near(b0, 196, 1e-9) and near(r1, 115, 1e-9) and near(g1, 255, 1e-9) and near(b1, 236, 1e-9), "the tint at both ends")
+check(near(r0, 170, 1e-9) and near(g0, 228, 1e-9) and near(b0, 165, 1e-9) and near(r1, 115, 1e-9) and near(g1, 255, 1e-9) and near(b1, 236, 1e-9), "the tint at both ends")
 check(p0.dofFar == 0.35 and p0.dofNear == 0.25 and p1.dofFar == 0.75 and p1.dofNear == 0.6, "the depth of field at both ends")
-check(p0.strokeTransparency == 0.82 and p1.strokeTransparency == 0.55 and p0.vignette == 0.35 and p1.vignette == 0.55, "the outline and the vignette at both ends")
+check(p0.strokeTransparency == 0.82 and p1.strokeTransparency == 0.68 and p0.vignette == 0.35 and p1.vignette == 0.55, "the outline and the vignette at both ends")
 local ph = EyeOptics.profile(0.5, 10, false)
 local rh, gh, bh = rgbOf(ph.tint)
-check(near(ph.saturation, (-0.9 + 0.15) / 2, 1e-12) and near(ph.contrast, 0.12, 1e-12) and near(ph.brightness, 0.01, 1e-12) and near(ph.blur, 1.25, 1e-12), "half way, every number is the average")
-check(near(rh, 156.5, 1e-9) and near(gh, 243.5, 1e-9) and near(bh, 216, 1e-9), "half way, the tint is the average")
-check(near(ph.dofFar, 0.55, 1e-12) and near(ph.dofNear, 0.425, 1e-12) and near(ph.strokeTransparency, 0.685, 1e-12) and near(ph.vignette, 0.45, 1e-12), "half way, the depth of field, outline and vignette too")
+check(near(ph.saturation, (-0.85 + 0.15) / 2, 1e-12) and near(ph.contrast, 0.14, 1e-12) and near(ph.brightness, 0.025, 1e-12) and near(ph.blur, 1.25, 1e-12), "half way, every number is the average")
+check(near(rh, 142.5, 1e-9) and near(gh, 241.5, 1e-9) and near(bh, 200.5, 1e-9), "half way, the tint is the average")
+check(near(ph.dofFar, 0.55, 1e-12) and near(ph.dofNear, 0.425, 1e-12) and near(ph.strokeTransparency, 0.75, 1e-12) and near(ph.vignette, 0.45, 1e-12), "half way, the depth of field, outline and vignette too")
 check(near(ph.fovDeg, mid, 1e-12), "and the field of view is the tangent-space blend")
 check(near(EyeOptics.profile(0, 5, false).dofRadius, 6, 1e-12) and near(EyeOptics.profile(0, 20, false).dofRadius, 12, 1e-12), "side eyes: in focus within max(6, 0.6 x distance)")
 check(near(EyeOptics.profile(1, 2, false).dofRadius, 0.6, 1e-12) and near(EyeOptics.profile(1, 10, false).dofRadius, 1.2, 1e-12) and near(EyeOptics.profile(1, 40, false).dofRadius, 4.8, 1e-12), "principal eyes: within max(0.6, 0.12 x distance)")
@@ -138,7 +138,7 @@ check(EyeOptics.profile(1, -3, false).dofRadius == 0.6, "a negative distance cou
 check(EyeOptics.profile(0.3, 7, false).k == 0.3 and EyeOptics.profile(5, 7, false).k == 1 and EyeOptics.profile(-5, 7, false).k == 0, "k is kept within 0 to 1")
 local pr = EyeOptics.profile(1, 10, true)
 check(pr.fovDeg == 45 and pr.sweepDeg == 0 and pr.torsionDeg == 0, "reduced motion: the zoom stops at 45 and the retinae hold still")
-check(EyeOptics.profile(0, 10, true).fovDeg == 90 and EyeOptics.profile(0, 10, true).saturation == -0.9, "reduced motion leaves the colour and the side eyes' field alone")
+check(EyeOptics.profile(0, 10, true).fovDeg == 90 and EyeOptics.profile(0, 10, true).saturation == -0.85, "reduced motion leaves the colour and the side eyes' field alone")
 
 -- ---------------------------------------------------------------- where the eyes are focused
 check(EyeOptics.focusTarget(nil) == 40 and EyeOptics.focusTarget(12.5) == 12.5 and EyeOptics.focusTarget(100) == 40 and EyeOptics.focusTarget(0) == 0, "focus lands where the ray ends: at most 40, 40 when it hit nothing")
@@ -402,7 +402,7 @@ do
 	local overlay = sc.gui:FindFirstChild("EyeOverlay")
 	check(camera.FieldOfView == 90 and overlay.Enabled == true and sc.eyes.grade.Enabled == true, "in the eye view: 90 degrees, the overlay and the grade on")
 	local g = sc.eyes.grade
-	check(g.Saturation == -0.9 and g.Contrast == 0.08 and g.Brightness == 0 and near(g.TintColor.R * 255, 198, 1e-6) and near(g.TintColor.G * 255, 232, 1e-6) and near(g.TintColor.B * 255, 196, 1e-6), "the side eyes' grade")
+	check(g.Saturation == -0.85 and g.Contrast == 0.12 and g.Brightness == 0.03 and near(g.TintColor.R * 255, 170, 1e-6) and near(g.TintColor.G * 255, 228, 1e-6) and near(g.TintColor.B * 255, 165, 1e-6), "the side eyes' grade")
 	check(sc.eyes.blur.Size == 2.5 and sc.eyes.blur.Enabled == true and near(sc.cam.lookScale, 1, 1e-9), "and blur, with the look scale 1")
 	local r1, r2 = named(overlay, "Retina1")[1], named(overlay, "Retina2")[1]
 	check(r1.Visible and r2.Visible and r1.Size.Y.Offset == r2.Size.Y.Offset and near(r1.Size.Y.Offset, VIEW_H * tan(10), 1e-6) and near(r1.Size.X.Offset, VIEW_H * tan(2.5), 1e-6), "the strips are 5 x 20 degrees on the 90 degree field")
@@ -442,7 +442,7 @@ do
 	check(near(telephoto.Size.Y.Offset, VIEW_H * tan(10) / tan(12), 1e-6) and telephoto.Size.Y.Offset < VIEW_H, "the strips grow to tan(10) / tan(12) of the screen's height")
 	local ts = {}
 	for _, d in telephoto:GetChildren() do if d.ClassName == "UIStroke" then table.insert(ts, d) end end
-	check(ts[1].Transparency == 0.55 and near(top.BackgroundTransparency, 0.45, 1e-12), "the outline and the vignette are stronger")
+	check(ts[1].Transparency == 0.68 and near(top.BackgroundTransparency, 0.45, 1e-12), "the outline and the vignette are stronger")
 	-- release
 	local rising = true
 	previous = 24
@@ -451,7 +451,7 @@ do
 		rising = rising and camera.FieldOfView >= previous
 		previous = camera.FieldOfView
 	end
-	check(rising and camera.FieldOfView == 90 and g.Saturation == -0.9, "release: back to the side eyes in 0.5 s")
+	check(rising and camera.FieldOfView == 90 and g.Saturation == -0.85, "release: back to the side eyes in 0.5 s")
 	-- leave
 	sc.cam.eyeView = false
 	camera.FieldOfView = 65 -- what SpiderCamera does

@@ -39,8 +39,10 @@ Eyes.sources = {
 -- Everything that depends on k is listed here for both ends; EyeOptics.profile blends every number by k (the field of view in
 -- tangent space, so the zoom looks even).
 -- Side eyes (k = 0): a wide view, almost one colour, a little blurred, and loosely focused. The field of view is a choice: a flat
--- screen cannot show about 330 degrees, so it is a wide 90 degrees vertical. Saturation -0.9 and a green tint stand for receptors
--- that are almost all green-sensitive. The blur is far gentler than the measured acuity ratio (about 10 to 40 times lower than the
+-- screen cannot show about 330 degrees, so it is a wide 90 degrees vertical. Saturation -0.85 and a clear green tint stand for
+-- receptors that are almost all green-sensitive: one kind of receptor, so one colour. Roblox does not document whether the tint
+-- is applied before or after the saturation; at -0.85 either order leaves a green picture (tint last: green monochrome; tint
+-- first: reds already darkened, then mostly grey with a green cast). Judge it in Studio and tune here. The blur is far gentler than the measured acuity ratio (about 10 to 40 times lower than the
 -- AM eyes), so the sill stays readable; it never touches the GUI. The loose depth of field (far 0.35, near 0.25, in focus out to at
 -- least 6 studs or 0.6 of the distance looked at) says only that nothing is sharp.
 -- Principal eyes (k = 1): a narrow telephoto view, sharp, in green and ultraviolet, with only the looked-at distance in focus
@@ -48,12 +50,12 @@ Eyes.sources = {
 -- (115 of 255), so reds go dark as for a green-and-UV dichromat; blue is kept as the stand-in for the short-wave (UV) receptor. That
 -- is an illustration, not a spectral response. The depth of field is tight (far 0.75, near 0.6, in focus within 0.12 of the
 -- distance looked at, never less than 0.6 stud).
--- The retina strips' stroke is faint while the side eyes look and stronger once the principal eyes do; `sweepDeg` and `torsionDeg`
+-- The retina strips' stroke is faint while the side eyes look and a little stronger once the principal eyes do; `sweepDeg` and `torsionDeg`
 -- are how far each strip swings side to side and turns about its middle (scanning with the side eyes, small tracking movements
 -- with the principal eyes). The vignette is the telephoto dark edge, as an opacity at the screen's edge.
 Eyes.side = {
 	fovDeg = 90,
-	saturation = -0.9, tint = { 198, 232, 196 }, contrast = 0.08, brightness = 0,
+	saturation = -0.85, tint = { 170, 228, 165 }, contrast = 0.12, brightness = 0.03,
 	blur = 2.5,
 	dofFar = 0.35, dofNear = 0.25, dofRadiusMin = 6, dofRadiusPerStud = 0.6,
 	strokeTransparency = 0.82, fillTransparency = 0.96,
@@ -65,7 +67,7 @@ Eyes.principal = {
 	saturation = 0.15, tint = { 115, 255, 236 }, contrast = 0.16, brightness = 0.02,
 	blur = 0,
 	dofFar = 0.75, dofNear = 0.6, dofRadiusMin = 0.6, dofRadiusPerStud = 0.12,
-	strokeTransparency = 0.55, fillTransparency = 0.90,
+	strokeTransparency = 0.68, fillTransparency = 0.93, -- fainter than first drawn: zoomed in, the strips are large and frame the target
 	sweepDeg = 0.6, torsionDeg = 3,
 	vignette = 0.55,
 }

@@ -48,6 +48,7 @@ MODULES = [
     ("Signal", "Perception/Signal.luau"),
     ("ObservationMemory", "Perception/ObservationMemory.luau"),
     ("SensorCore", "Perception/SensorCore.luau"),
+    ("Sensor", "Perception/Sensor.luau"),
     ("SpiderCamera", "../Client/SpiderCamera.luau"),
 ]
 # The client scripts, bundled only for the tests that run the real rig and client (CLIENT_TESTS).
@@ -111,7 +112,7 @@ def bundle(test_file):
 luau = sys.argv[1] if len(sys.argv) > 1 else "luau"
 status = 0
 named = sys.argv[2:]
-for test_file in named or ["run.luau", "perception.luau", "scenarios.luau", "client_smoke.luau", "look.luau", "world.luau"]:
+for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "scenarios.luau", "client_smoke.luau", "look.luau", "world.luau"]:
     if not (HERE / test_file).exists():
         if named:  # a misspelt name must not look like a pass
             print(f"no such test file: {test_file} (names are relative to tests/, for example look.luau)", file=sys.stderr)

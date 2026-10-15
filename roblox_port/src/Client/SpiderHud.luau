@@ -152,8 +152,11 @@ function Hud.new(playerGui: Instance): any
  grip.Name="GripBar";grip.Size=UDim2.new(.65,0,0,12);grip.LayoutOrder=0;grip.BackgroundColor3=Color3.fromRGB(45,12,12);grip.Visible=false;grip.Parent=top
  local gripFill=Instance.new("Frame");gripFill.Name="Grip";gripFill.Size=UDim2.fromScale(.4,1);gripFill.BackgroundColor3=Color3.fromRGB(245,35,38);gripFill.BorderSizePixel=0;gripFill.Parent=grip
  local status = wrapLabel("Status", top, 16, 1)
-	local toast = wrapLabel("Toast", top, 17, 2)
-	local help = wrapLabel("Controls", top, 15, 3)
+	-- The spider-eye view's explanation, the first time (ROBLOX-20): right under the status lines, in the column, so it never covers
+	-- the aim words or the prompts. Shown from view.caption = { text, alpha }.
+	local caption = wrapLabel("Caption", top, 15, 2)
+	local toast = wrapLabel("Toast", top, 17, 3)
+	local help = wrapLabel("Controls", top, 15, 4)
 	help.TextXAlignment = Enum.TextXAlignment.Left
 	local panel = Instance.new("Frame")
 	panel.Name = "PromptPanel"
@@ -175,7 +178,7 @@ function Hud.new(playerGui: Instance): any
 	local self = setmetatable({
 		grip = grip, gripFill = gripFill, centre = centre, safe = safe, reticle = reticle, ticks = ticks,
 		aimTitle = aimTitle, aimHint = aimHint, anchorLabel = anchorLabel,
-		status = status, toastLabel = toast, help = help,
+		status = status, caption = caption, toastLabel = toast, help = help,
 		panel = panel, promptTitle = promptTitle, promptHint = promptHint, promptCue = promptCue,
 		toastLeft = 0, device = "keyboard", lastSpan = "",
 	}, Hud)
@@ -210,7 +213,7 @@ function Hud._place(self: any)
 end
 
 -- view: device, aiming, focus, eyeView, aimTitle, aimHint, aimColor, anchorText, anchorOk, status ({string}),
--- prompt ({title, hint, cue} or nil), helpVisible, helpText.
+-- caption ({text, alpha} or nil), prompt ({title, hint, cue} or nil), helpVisible, helpText.
 function Hud.update(self: any, view: any, dt: number)
 	self.grip.Visible = view.grip ~= nil
  if view.grip then self.gripFill.Size = UDim2.fromScale(math.clamp(view.grip,0,1),1) end
@@ -224,6 +227,15 @@ function Hud.update(self: any, view: any, dt: number)
 	show(self.anchorLabel, view.anchorText)
 	self.anchorLabel.TextColor3 = if view.anchorOk then OK_COLOR else WARN_COLOR
 	show(self.status, table.concat(view.status or {}, "\n"))
+	local caption = view.caption
+	if caption then
+		if self.caption.Text ~= caption.text then self.caption.Text = caption.text end
+		self.caption.TextTransparency = 1 - caption.alpha
+		self.caption.BackgroundTransparency = 1 - 0.6 * caption.alpha
+		self.caption.Visible = true
+	else
+		self.caption.Visible = false
+	end
 	local prompt = view.prompt
 	show(self.promptTitle, if prompt then prompt.title else nil)
 	show(self.promptHint, if prompt then prompt.hint else nil)

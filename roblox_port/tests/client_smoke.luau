@@ -72,7 +72,7 @@ check("F on the open sill floor says why it cannot let down", function()
 end)
 check("V switches to the spider-eye view and back; the status names the key", function()
 	key("Eye", true); key("Eye", false); frames(5)
-	assert(workspace.CurrentCamera.FieldOfView == 80, "no eye-view field of view")
+	assert(workspace.CurrentCamera.FieldOfView == 90, "no eye-view field of view") -- the side eyes' 90 degrees (SpiderEyes, ROBLOX-20); the camera alone sets 80
 	assert(string.find(find("SpiderPrompts", "Status").Text, "SPIDER-EYE VIEW    V: back", 1, true), find("SpiderPrompts", "Status").Text)
 	key("Eye", true); key("Eye", false); frames(5)
 	assert(workspace.CurrentCamera.FieldOfView == 65 and not find("SpiderPrompts", "Status").Visible, "did not leave the eye view")

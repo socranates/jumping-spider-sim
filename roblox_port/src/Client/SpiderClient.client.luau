@@ -20,6 +20,7 @@ local UIS = game:GetService("UserInputService")
 local Workspace = game:GetService("Workspace")
 local SpiderInput = require(script.Parent.SpiderInput)
 local SpiderCamera = require(script.Parent.SpiderCamera)
+local SpiderEyes = require(script.Parent.SpiderEyes)
 local SpiderHud = require(script.Parent.SpiderHud)
 local WorldDetail = require(script.Parent.WorldDetail)
 
@@ -234,6 +235,8 @@ end
 jump.onAim = function(on: boolean)
 	cam:setAiming(on)
 end
+-- The spider-eye picture (ROBLOX-20): field of view, colour, blur, retina strips, movement rings, UV layer, vignette. Presentation only.
+local eyes: any = SpiderEyes.new({ parent = player:WaitForChild("PlayerGui"), camera = camera, player = player, cam = cam, sensor = sensor, params = params })
 
 -- Everything held is dropped with no penalty and no message: focus loss, the Roblox menu, a text box, a lost controller.
 local function dropAll()
@@ -356,6 +359,7 @@ local function updateHud(frameDt: number)
 	local view: any = {
 		device = device, aiming = aiming, focus = controls.held.Focus == true or focusActive(), eyeView = cam.eyeView,
 		status = {}, helpVisible = helpVisible, helpText = ControlText.helpCard(device),
+		caption = eyes:captionView(device),
 	}
 	if aiming then
 		local plan = jump.plan
@@ -462,16 +466,15 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	-- Looking runs in real time, so slow motion never makes the camera sluggish.
 	local lx, ly = controls:lookAxes()
 	cam:render(frameDt, lx, ly)
-	perceptionHud:draw(memory,camera,sightCast,motor.mode == "attached" and (controls.held.Focus == true or focusActive()),player:GetAttribute("ShowLastSeen") ~= false)
+	-- The Focus that feeds the perception HUD also decides how far the principal eyes are in use (the eye view's picture). The
+	-- picture sets the field of view, so it comes before the HUD projects anything.
+	local focusing = motor.mode == "attached" and (controls.held.Focus == true or focusActive())
+	eyes:update(frameDt, focusing)
+	perceptionHud:draw(memory,camera,sightCast,focusing,player:GetAttribute("ShowLastSeen") ~= false)
+	-- Depth of field: on the spider in third person; in the eye view SpiderEyes owns it and focuses on what is looked at.
 	local dof = Lighting:FindFirstChild("MacroDOF")
-	if dof and dof:IsA("DepthOfFieldEffect") then
-		local focus = (camera.CFrame.Position - motor.pos).Magnitude
-		if cam.eyeView then
-			local origin, dir = cam:aimRay()
-			local hit = Workspace:Raycast(origin, dir * 40, params)
-			focus = if hit then hit.Distance else 40
-		end
-		dof.FocusDistance = focus
+	if not cam.eyeView and dof and dof:IsA("DepthOfFieldEffect") then
+		dof.FocusDistance = (camera.CFrame.Position - motor.pos).Magnitude
 	end
 end)
 

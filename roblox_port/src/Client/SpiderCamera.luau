@@ -15,6 +15,7 @@
 -- (aim pitch) instead of orbiting, so the player can aim above the pivot; it eases back after.
 -- Spider-eye view (V / Y): the camera sits just ahead of the principal eyes looking along a gaze the player turns; its up
 -- follows the body's at most EYE_ROLL_DEG_S. Walking is relative to the gaze. Switching back snaps behind the spider.
+-- The picture (field of view, colour, blur: ROBLOX-20) is Client/SpiderEyes'; it only sets the field of view and lookScale here.
 -- Mouse: locked to the screen centre while playing (as the Godot game captures it); the Roblox menu frees it.
 -- Placement order (Godot chunk 6B): no boom is trusted until the sill can be seen by queries; until then the camera sits
 -- at the pivot with a boom of 0.
@@ -55,6 +56,7 @@ function SpiderCamera.new(camera: Camera, params: RaycastParams, target: () -> T
 		pivotDir = Vector3.yAxis,
 		recenterT = -1, recenterYaw0 = 0, recenterElev0 = 0, recenterGaze0 = Vector3.zero,
 		eyeView = false,
+		lookScale = 1, -- the eye view only: SpiderEyes sets it with the field of view, so a turn of the view moves the picture as fast at any zoom
 		gaze = -Vector3.zAxis,
 		gazeUp = Vector3.yAxis,
 		bodyHidden = false,
@@ -236,7 +238,9 @@ function SpiderCamera.look(self: any, dx: number, dy: number)
 	if dx == 0 and dy == 0 then return end
 	if self.recenterT >= 0 and math.abs(dx) + math.abs(dy) > 1.5 then self.recenterT = -1 end
 	if self.eyeView then
-		self.gaze = CameraMath.lookEye(self.gaze, self.gazeUp, math.rad(dx), math.rad(dy), self:_bodyForward())
+		-- The mouse, the stick and a touch drag all arrive here; lookScale (ROBLOX-20) shrinks them with the field of view.
+		local scale = self.lookScale
+		self.gaze = CameraMath.lookEye(self.gaze, self.gazeUp, math.rad(dx * scale), math.rad(dy * scale), self:_bodyForward())
 		return
 	end
 	self.yaw += self.framing:playerTurns(self.target().onLine == true)

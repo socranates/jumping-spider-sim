@@ -6,7 +6,9 @@ tests/run.luau (pure logic and goldens), tests/scenarios.luau (recovery scenario
 raycasts and sphere casts: a smoke test of the real motor, silk and camera code, not the Roblox engine) and
 tests/client_smoke.luau (the client scripts themselves, driven through stub services and simulated keys) and
 tests/look.luau (the daughter's pattern pinned, the look knobs, idle motion and part budgets of the real rig) and
-tests/world.luau (the graphics table, the sun pick, the scenery, the lighting and the low-detail tier).
+tests/world.luau (the graphics table, the sun pick, the scenery, the lighting and the low-detail tier) and
+tests/perception.luau (the pure perception logic against Godot's own hand-written expectations and against
+tests/perception_reference.json, exported from the frozen Godot modules).
 Usage (from roblox_port/):  python3 tests/run.py [path/to/luau [test.luau ...]]   (default: all of them)"""
 import pathlib, re, subprocess, sys, tempfile
 
@@ -41,6 +43,8 @@ MODULES = [
     ("Anatomy", "Rig/Anatomy.luau"),
     ("Setae", "Rig/Setae.luau"),
     ("Idle", "Rig/Idle.luau"),
+    ("Observation", "Perception/Observation.luau"),
+    ("PerceptionMath", "Perception/PerceptionMath.luau"),
     ("SpiderCamera", "../Client/SpiderCamera.luau"),
 ]
 # The client scripts, bundled only for the tests that run the real rig and client (CLIENT_TESTS).
@@ -50,7 +54,9 @@ CLIENT_MODULES = [
     ("SpiderHud", "../Client/SpiderHud.luau"),
 ]
 CLIENT_TESTS = {"client_smoke.luau", "look.luau", "world.luau"}
-REFERENCES = ["jump_reference", "tether_reference", "camera_reference", "framing_reference"]
+REFERENCES = ["jump_reference", "tether_reference", "camera_reference", "framing_reference", "perception_reference"]
+# A reference only the named tests read (it is large; the other bundles leave it out).
+REFERENCE_ONLY = {"perception_reference": {"perception.luau"}}
 NAMES = {name for name, _ in MODULES + CLIENT_MODULES}
 
 
@@ -86,7 +92,7 @@ def bundle(test_file):
              "local __refs, __mods = {}, {}"]
     for ref in REFERENCES:
         path = HERE / (ref + ".luau")
-        if path.exists():
+        if path.exists() and test_file in REFERENCE_ONLY.get(ref, {test_file}):
             parts.append(f"__refs.{ref} = " + chunk(path))
     for name, rel in MODULES + (CLIENT_MODULES if test_file in CLIENT_TESTS else []):
         path = SRC / rel
@@ -102,7 +108,7 @@ def bundle(test_file):
 luau = sys.argv[1] if len(sys.argv) > 1 else "luau"
 status = 0
 named = sys.argv[2:]
-for test_file in named or ["run.luau", "scenarios.luau", "client_smoke.luau", "look.luau", "world.luau"]:
+for test_file in named or ["run.luau", "perception.luau", "scenarios.luau", "client_smoke.luau", "look.luau", "world.luau"]:
     if not (HERE / test_file).exists():
         if named:  # a misspelt name must not look like a pass
             print(f"no such test file: {test_file} (names are relative to tests/, for example look.luau)", file=sys.stderr)

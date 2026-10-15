@@ -37,8 +37,8 @@ local unmapped = {}
 for _, p in Layout.PIECES do if not M.pieces[p.id] then table.insert(unmapped, p.id) end end
 check(#unmapped == 0, "every sill piece has a material (" .. table.concat(unmapped, ", ") .. ")")
 check(M.pieces.sill_floor == "SmoothPlastic" and M.pieces.front_lip == "SmoothPlastic" and M.pieces.planter == "Plaster" and M.wall == "Plaster"
-	and M.glass == "Glass" and M.soil == "Ground" and M.pieces.leaf_west == "SmoothPlastic" and M.pieces.leaf_tip == "Plaster" and M.chip == "Wood",
-	"cream enamel sill, plaster planter and walls, glass window, ground soil, glossy leaves, bare wood under the chips")
+	and M.glass == "SmoothPlastic" and M.soil == "Ground" and M.pieces.leaf_west == "SmoothPlastic" and M.pieces.leaf_tip == "Plaster" and M.chip == "Wood",
+	"cream enamel sill, plaster planter and walls, non-refracting transparent window for UV visibility, ground soil, glossy leaves, bare wood under the chips")
 local paint = Graphics.paint
 check(paint.sill_floor.color == "e8dfcb" and paint.front_lip.color == "e8dfcb" and paint.sill_floor.reflectance == 0.03 and paint.front_lip.reflectance == 0.03
 	and paint.planter.color == "b8653f" and paint.planter_rim.color == "c97a52" and paint.left_frame.color == "efe8d8" and paint.right_frame.color == "efe8d8",

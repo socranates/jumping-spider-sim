@@ -1,0 +1,15 @@
+# Native inspection notes, 2026-10-15
+
+Imported Claude 771324f on d910d1e. Gameplay code was not changed during acceptance; the drawn window material was corrected after native visual inspection. Rebuilt original evidence 8672e3fc3bd2649f exactly. All 7,801 CLI checks passed on Windows; strict analysis clean, 100/100 Luau files compile.
+
+Original native run: 68/69 engine and 11/11 client. The one failure was exact equality of DepthOfFieldEffect.FarIntensity to 0.3. A Studio client diagnostic read 0.30000001192092896, NearIntensity 0 and InFocusRadius 18. GraphicsSpec now permits 1e-6 rounding for the fractional intensity and radius, retaining the exact zero near blur check. Rebuilt evidence b5a54fd4d5b7bc5d. No visual or gameplay parameter changed.
+
+Screenshots side-eyes.jpg, principal-eyes.jpg and third-person-restored.jpg are actual Windows Studio captures from original 8672e3fc3bd2649f, whose eye/HUD rendering source is unchanged in the final build (the window material changed later). FocusToggle was enabled temporarily through Studio's client command bar to inspect held Focus with a click; it is not a changed default. Side view is green and soft, with visible rings/strips; Focus narrows the view and enlarges the faint strips, with a teal grade. V restores the third-person framing, neutral warm grade and background softness. The worn sill, broad round leaves, planter, flowers, glass details and new flies are visible at play distance. Native GraphicsSpec checks the leaf top alignment and drawn-only flags; precise foot contact at every rounded leaf corner has not been manually walked.
+
+No physical controller/tablet or low-end-device tests; no hardware available. Shader/eye-view performance is not separately timed by the existing A029 playback (it measures third person). No Godot engine suite rerun: frozen Godot source, data and SPEC are unchanged.
+
+## UV rendering correction
+
+A staged camera at (-17.8, 7, -6) looking through the window at Flower2 isolated the effect. The original Glass pane hid the translucent UV patches entirely even with Focus on. Temporarily setting its LocalTransparencyModifier to 1 revealed them; restoring the pane with SmoothPlastic instead of Glass also revealed them, preserving the authored tint, transparency and reflectance. Data/Graphics.materials.glass now uses SmoothPlastic; droplets remain Glass. WORLD and native GraphicsSpec pin this rendering choice. No collision or sensing material changed. Rebuilt evidence **ab5e92132d90a1da**.
+
+flower-side-staged.jpg / flower-focus-staged.jpg show the original problem. flower-focus-fixed-staged.jpg shows the verified material replacement. These are native screenshots with a temporary camera override, not a claim that the spider physically walked to that camera position. UV patches look bright cyan under the principal-eye grade, not the ungraded violet preview; the bullseye pattern is visible. Temporary camera and Player attribute overrides were discarded by stopping the session. The final build retains the original camera and Focus defaults.

@@ -621,7 +621,8 @@ Graphics.materials = {
 		crevice_back = "Wood", crevice_roof = "Wood", crevice_north = "Wood", crevice_south = "Wood",
 	} :: { [string]: string },
 	soil = "Ground",
-	wall = "Plaster", trim = "SmoothPlastic", glass = "Glass",
+	-- Glass hides translucent UV petals behind the pane in native Studio. Preserve tint/reflection without refraction.
+	wall = "Plaster", trim = "SmoothPlastic", glass = "SmoothPlastic",
 	view = "SmoothPlastic", ground = "Grass",
 	chip = "Wood", crack = "SmoothPlastic", crumb = "Sand",
 	fallback = "SmoothPlastic",

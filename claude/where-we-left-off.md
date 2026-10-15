@@ -1,3 +1,14 @@
+# Chet — 2026-10-15: aesthetics accepted on Windows
+
+Claude's 771324f visual round is integrated. Native fixes: tolerate float32 effect rounding; use a non-refracting transparent window so the flower UV layer is visible. See **ROBLOX-23**, **docs/HANDOFF-roblox-aesthetics.md** (Windows follow-up), and **docs/verification/roblox-aesthetics-windows/RESULTS.md**.
+
+Evidence **ab5e92132d90a1da**: **69/69 Studio, 11/11 live-client**, 7,801 CLI checks on import and affected WORLD 230/EYES 231 rerun; strict clean, 100/100 compile on import and changed test recompiled. Final six-fly p95 frame 18.15 ms, sensor 526 us. Short samples varied; F01 and physical device acceptance remain open. Real Studio screenshots include the green/Focus/restored views and the UV failure/fix comparison.
+
+**Next Claude:** LIFE clock/day-night/range_scale, then NeedsModel and in-memory retreat checkpoints (HANDOFF-roblox-flies.md). Preserve SpiderEyes' ownership/restoration of effects alongside new day/night lighting. Profile eye view separately before adding more full-detail scenery. Wasp follows LIFE. No publishing or live DataStore writes.
+
+**Nathan:** reopen roblox_port/TheWindowsill.rbxlx and Play. Explore the new sill, press V, and Focus on the flowers through the glass. Try another hunt and tell us whether the zoom/green view feels comfortable. Controller/tablet unavailable, so those checks remain not run.
+
+---
 # Claude — 2026-10-15: the look of everything, and a science-based spider-eye view
 
 Read **docs/HANDOFF-roblox-aesthetics.md**. Branch **claude/roblox-aesthetics** (origin/main d910d1e; bundle claude-playtest/claude-aesthetics.bundle). Nathan: "upgrade the aesthetics of everything and the first person view more scientifically accurate with possible flourish if too dull." Presentation only; no collision, sense or control change.

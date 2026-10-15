@@ -79,7 +79,7 @@ return function(check)
 		local wall = decor:FindFirstChild("Wall") :: Folder
 		assert((wall:FindFirstChild("Apron") :: BasePart).CastShadow and (wall:FindFirstChild("Mullion1") :: BasePart).CastShadow)
 		local glass = wall:FindFirstChild("Glass") :: BasePart
-		assert(not glass.CastShadow and glass.Transparency >= 0.6 and glass.Material == Enum.Material.Glass)
+		assert(not glass.CastShadow and glass.Transparency >= 0.6 and glass.Material == Enum.Material.SmoothPlastic, "window must not refract away translucent UV petals")
 		assert(not (sill:FindFirstChild(Graphics.window.hidden) :: BasePart).CastShadow, "the invisible wall must not shade the room")
 	end)
 	check("atmosphere, sky, grade, bloom, sun rays and clouds are in place; the macro depth of field is on unless switched off", function()
@@ -88,7 +88,8 @@ return function(check)
 		local dof = Lighting:FindFirstChild("MacroDOF") :: DepthOfFieldEffect?
 		assert((dof ~= nil) == (workspace:GetAttribute("DepthOfField") ~= false), "depth of field must be on unless the DepthOfField attribute is false")
 		if dof then
-			assert(dof.FarIntensity == Graphics.depthOfField.far and dof.NearIntensity == 0 and dof.InFocusRadius == Graphics.depthOfField.radius, "depth of field blurs only the far")
+			-- Roblox stores effect intensities as float32 (0.3 reads back as 0.3000000119).
+			assert(math.abs(dof.FarIntensity - Graphics.depthOfField.far) < 1e-6 and dof.NearIntensity == 0 and math.abs(dof.InFocusRadius - Graphics.depthOfField.radius) < 1e-6, "depth of field blurs only the far")
 			assert(dof:GetAttribute("FullOnly") == true, "depth of field is a full-tier effect")
 		end
 		local bloom = Lighting:FindFirstChild("Bloom") :: BloomEffect

@@ -51,3 +51,13 @@ rebuilt, evidence **8672e3fc3bd2649f**. Not run: Studio, devices, frame time.
 
 Walk around in third person; then press V, look at a fly or a flower, and hold right mouse (Focus): the view zooms into the
 principal eyes, and the flowers outside show their ultraviolet bullseyes.
+
+## Chet Windows follow-up — 2026-10-15
+
+Imported and pushed Claude's complete 771324f branch. Windows CLI 7,801/7,801, strict analysis clean, 100/100 compile. A native effect-precision assertion and an actual UV rendering issue were corrected; see ROBLOX-23 and verification/roblox-aesthetics-windows/RESULTS.md. Final rebuilt evidence **ab5e92132d90a1da**. Godot and gameplay controls remain frozen.
+
+**Next Claude:** resume LIFE clock/day-night/range_scale, then NeedsModel and the in-memory retreat checkpoint adapter from HANDOFF-roblox-flies.md. Make lighting ownership explicit: LIFE may change the world Grade/sun, while SpiderEyes owns EyeGrade and temporarily borrows MacroDOF. Preserve restoration when V exits, Focus ends or ReducedMotion is enabled. Do not route the decorative UV pattern or camera zoom into biological sensing.
+
+Before adding more full-detail scenery, investigate the measured frame-time cost and add a separate eye-view timing scenario; the current six-fly measurement is third person only. Native close-up checks found UV patches cyan after grading rather than violet; consider clarifying the caption without claiming a measured subjective colour. Physical controller/tablet, prolonged motion-comfort feedback and a close manual sweep of every rounded leaf corner remain unverified. No live DataStore writes or publishing. Wasp follows LIFE/checkpoint behavior.
+
+**Nathan:** reopen the updated roblox_port/TheWindowsill.rbxlx, walk around the painted sill, press V, and inspect the flowers through the window with right mouse. Tell us whether the green wide view and narrow Focus zoom feel comfortable. Try catching a fly again; the look changed, the hunt rules did not.

@@ -27,3 +27,11 @@ glass wings with a dark front vein and a faint iridescent film, folded in a shal
 
 Same caveat as above: Godot with the shim's parts, not Roblox. Roblox's Glass material, reflectance and transparency sorting will make the wings, the film and the blur look different; nothing has been seen in Studio.
 Reproduce, from `roblox_port/`: `python3 tools/preview/scene.py path/to/luau path/to/godot out_dir --prefix after_ --views fly,fly_a,fly_b,fly_top,fly_front,fly_side,fly_b_top,fly_b_side,fly_b_front`.
+
+## The spider-eye picture (ROBLOX-20)
+
+`eye_side_render.png` / `eye_principal_render.png` are scene.py's `eye_side` (90 degrees) and `eye_principal` (24 degrees, UV layer
+shown) views from the spider's eye at the spawn; `eye_*_impression.png` lay the real Data/Eyes grade, blur, vignette, retina strips
+and (side eyes) a movement ring on the flying fly over them (`tools/preview/eye_post.py`, numbers from `eye_dump.luau`).
+`eye_side_impression_tint_first.png` shows the other possible order of Roblox's tint and desaturation (grey rather than green).
+Depth of field and bloom are not imitated. Not Roblox rendering.

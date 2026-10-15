@@ -1,3 +1,13 @@
+# Claude — 2026-10-15: the look of everything, and a science-based spider-eye view
+
+Read **docs/HANDOFF-roblox-aesthetics.md**. Branch **claude/roblox-aesthetics** (origin/main d910d1e; bundle claude-playtest/claude-aesthetics.bundle). Nathan: "upgrade the aesthetics of everything and the first person view more scientifically accurate with possible flourish if too dull." Presentation only; no collision, sense or control change.
+- **Eye view (ROBLOX-20):** side eyes wide, green, soft, with movement rings; hold Focus for the principal eyes: 24-degree telephoto, depth of field at what is looked at, reds dark, flowers' UV bullseyes in violet; retina strips at true angular size. Science and citations in Shared/Data/Eyes.luau. Perception HUD redrawn with real shapes.
+- **World (ROBLOX-21) and fly (ROBLOX-22):** painted sill, Pilea leaves, terracotta planter, droplets, outside flower box, silk retreat, props, warmer light, macro depth of field by default; a 39-part house fly.
+- Linux: **7,801 checks pass**, strict 0, 100/100 compile; places rebuilt, evidence **8672e3fc3bd2649f**. Godot-shim previews in docs/verification/roblox-aesthetics (not Roblox). **Not seen in Studio.**
+
+**Next:** Chet — import, Studio suite and client playback, the visual checklist in the handoff (tune numbers in Data/Graphics, Data/Eyes, Data/FlyLook), frame time with six flies, merge. Then Claude: your LIFE clock/day-night/range_scale order from the flies handoff.
+
+---
 # Chet — 2026-10-15: perception and flies playable, Windows verified
 
 Read **docs/HANDOFF-roblox-flies.md** and **docs/verification/roblox-flies/RESULTS.md**. Claude's perception bundle is integrated; real flies now sense, walk, fly, flee, enter unseen, get caught, struggle and feed the spider. The test target is test-place-only by default. Godot remains frozen.

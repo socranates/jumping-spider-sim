@@ -8,6 +8,7 @@ _G.Vector3 = shim.Vector3
 _G.CFrame = shim.CFrame
 local Observation = require("../src/Shared/Perception/Observation")
 local PerceptionMath = require("../src/Shared/Perception/PerceptionMath")
+local ObservationMemory = require("../src/Shared/Perception/ObservationMemory")
 local ref = require("./perception_reference")
 
 local passed, failed = 0, 0
@@ -258,6 +259,278 @@ do
 	end
 	for _, r in m.decayed_confidence do local i = r["in"]; check(sameOut(PerceptionMath.decayedConfidence(i[1], i[2], i[3]), r.out), `decayed_confidence {table.concat(i, ", ")}`) end
 	for _, r in m.staleness do check(sameOut(PerceptionMath.staleness(r["in"][1], r["in"][2]), r.out), `staleness {r["in"][1]}, {r["in"][2]}`) end
+end
+
+
+-- ========================================================================================= ObservationMemory
+-- Godot's tests/unit/test_observation_memory.gd, with its hand-written expectations.
+
+local function newMemory(): (any, { string })
+	local mem = ObservationMemory.new()
+	mem:configure(60.0, 6.0, 0.15, 1.0)
+	local events: { string } = {}
+	mem.contactAcquired:connect(function(c: any) table.insert(events, "acquired:" .. c.trackId) end)
+	mem.contactLost:connect(function(c: any) table.insert(events, "lost:" .. c.trackId) end)
+	mem.contactReacquired:connect(function(c: any) table.insert(events, "reacquired:" .. c.trackId) end)
+	mem.contactEnded:connect(function(c: any, why: string) table.insert(events, `ended:{c.trackId}:{why}`) end)
+	mem.categoryChanged:connect(function(_c: any, a: string, b: string) table.insert(events, `category:{a}>{b}`) end)
+	return mem, events
+end
+local function inspectionAt(tick: number, at: Vector3?, category: string?, track: string?, conf: number?): any
+	local cat = category or Observation.POSSIBLE_PREY
+	return Observation.new({ observerId = "spider", trackId = track or "trk_1", targetId = if cat ~= Observation.MOVEMENT then "test_target" else "",
+		modality = Observation.INSPECTION, hasPosition = true, estimatedPosition = at or Vector3.new(4, 1, -6), direction = FORWARD,
+		confidence = conf or 0.7, observedTick = tick, category = cat, sizeWu = 0.9, apparentSizeDeg = 9.0 })
+end
+local function cueAt(tick: number, track: string?, dir: Vector3?): any
+	return Observation.new({ observerId = "spider", trackId = track or "trk_1", modality = Observation.PERIPHERAL, direction = dir or LEFT, confidence = 0.2, observedTick = tick })
+end
+local function runTo(mem: any, tick: number)
+	for t = mem.nowTick + 1, tick do mem:advance(t) end
+end
+local function count(events: { string }, prefix: string): number
+	local n = 0
+	for _, e in events do if string.sub(e, 1, #prefix) == prefix then n += 1 end end
+	return n
+end
+local function has(events: { string }, e: string): boolean
+	return table.find(events, e) ~= nil
+end
+
+do -- a cue makes a contact with a bearing and nothing else
+	local mem, events = newMemory()
+	local c = mem:ingest(cueAt(10))
+	check(c ~= nil and mem:count() == 1, "a cue: a contact")
+	check(c:isLive() and not c.hasPosition and not c:hasMark(), "live, with no position and no mark")
+	check(c.category == "movement" and c.targetId == "", "movement, nothing resolved")
+	check(c.cueDirection == LEFT, "the bearing is kept")
+	check(table.concat(events, ",") == "acquired:trk_1", "announced once")
+end
+
+do -- an invalid record is refused and changes nothing
+	local mem = newMemory()
+	local bad = inspectionAt(5)
+	bad.confidence = 3.0
+	check(mem:ingest(bad) == nil and mem:ingest(nil) == nil, "refused (and null is refused)")
+	check(mem:count() == 0 and mem.ingested == 0, "no contact, and it was not counted")
+end
+
+do -- a peripheral contact is held for the cue hold and then lost
+	local mem, events = newMemory()
+	mem:ingest(cueAt(0))
+	runTo(mem, 60)
+	check(mem:getContact("trk_1"):isLive(), "still live at one second")
+	runTo(mem, 61)
+	check(not mem:getContact("trk_1"):isLive(), "lost just after")
+	check(table.concat(events, ",") == "acquired:trk_1,lost:trk_1", "one loss, announced once")
+	runTo(mem, 200)
+	check(#events == 2, "and it is not announced again")
+end
+
+do -- an inspection is held for the grace only
+	local mem = newMemory()
+	mem:ingest(inspectionAt(0))
+	runTo(mem, 9)
+	check(mem:getContact("trk_1"):isLive(), "live through the grace (9 ticks)")
+	runTo(mem, 10)
+	check(not mem:getContact("trk_1"):isLive(), "lost on the 10th tick without evidence")
+end
+
+do -- a lost inspected contact leaves a mark that never moves
+	local mem = newMemory()
+	local at = Vector3.new(4, 1, -6)
+	mem:ingest(inspectionAt(0, at))
+	runTo(mem, 10)
+	local c = mem:getContact("trk_1")
+	check(c:hasMark(), "a mark")
+	check(#mem:marks() == 1, "listed")
+	local moved = false
+	for t = 11, 299 do
+		mem:advance(t)
+		local m = mem:getContact("trk_1")
+		if m == nil then break end
+		if m.position ~= at then moved = true end
+	end
+	check(not moved, "the mark never moved over its whole life")
+	check(c.position == at, "it is exactly where it was last observed")
+end
+
+do -- confidence falls in a straight line and the contact expires
+	local mem, events = newMemory()
+	mem:ingest(inspectionAt(0, Vector3.zero, Observation.POSSIBLE_PREY, "trk_1", 0.8))
+	runTo(mem, 10)
+	local c = mem:getContact("trk_1")
+	check(near(c.confidence, 0.8, 1e-9), "at the loss it has what it had")
+	runTo(mem, 10 + 180)
+	check(near(c.confidence, 0.4, 1e-6), "half way through the decay, half")
+	check(near(mem:stalenessOf(c), 0.5, 1e-6), "and half stale")
+	runTo(mem, 10 + 359)
+	check(mem:getContact("trk_1") ~= nil, "still remembered a tick before the end")
+	runTo(mem, 10 + 360)
+	check(mem:getContact("trk_1") == nil, "forgotten after the decay time")
+	check(events[#events] == "ended:trk_1:expired", "announced as expired")
+	check(#mem:marks() == 0, "and no mark is left")
+end
+
+do -- a cue never takes back what an inspection found
+	local mem, events = newMemory()
+	local at = Vector3.new(4, 1, -6)
+	mem:ingest(inspectionAt(0, at, Observation.FLY_LIKE_PREY, "trk_1", 0.9))
+	local c = mem:ingest(cueAt(3, "trk_1", RIGHT))
+	check(c.category == "fly_like_prey" and near(c.confidence, 0.9, 1e-9), "the category and the confidence stay")
+	check(c.position == at and c.modality == Observation.INSPECTION, "and the position and the modality of the record")
+	check(c.cueDirection == RIGHT and c.cueCount == 1, "the bearing is kept apart, and counted")
+	runTo(mem, 30)
+	check(not c:isLive() and c:hasMark(), "the contact is lost on its own clock (the cue did not hold it)")
+	local d = mem:ingest(cueAt(40, "trk_1", LEFT))
+	check(not d:isLive(), "a cue does not bring a lost contact back")
+	check(d.cueDirection == LEFT, "though its bearing is noted")
+	check(d:hasMark() and d.position == at, "the mark is still where it was")
+	check(not has(events, "reacquired:trk_1"), "no reacquisition from a cue")
+end
+
+do -- only an inspection reacquires and it updates the record
+	local mem, events = newMemory()
+	mem:ingest(inspectionAt(0, Vector3.new(4, 1, -6), Observation.POSSIBLE_PREY, "trk_1", 0.6))
+	runTo(mem, 100)
+	local c = mem:getContact("trk_1")
+	check(not c:isLive(), "lost")
+	local now = Vector3.new(9, 1, -6)
+	mem:ingest(inspectionAt(101, now, Observation.FLY_LIKE_PREY, "trk_1", 0.8))
+	check(c:isLive() and not c:hasMark(), "live again, no mark")
+	check(c.position == now and c.positionTick == 101, "at the new position, observed at the new tick")
+	check(c.category == "fly_like_prey" and near(c.confidence, 0.8, 1e-9), "with the new category and confidence")
+	check(c.reacquisitions == 1 and count(events, "reacquired") == 1, "counted once, announced once")
+	check(has(events, "category:possible_prey>fly_like_prey"), "and the category change announced")
+end
+
+do -- a contact that was only ever a cue comes back on a cue
+	local mem = newMemory()
+	mem:ingest(cueAt(0))
+	runTo(mem, 100)
+	check(not mem:getContact("trk_1"):isLive(), "lost")
+	local c = mem:ingest(cueAt(101))
+	check(c:isLive() and c.reacquisitions == 1, "a repeated cue is a reacquisition for a contact that never had a position")
+end
+
+do -- familiarity is one while live, then fades, then is nothing
+	local mem = newMemory()
+	check(near(mem:familiarity("trk_1"), 0.0, 1e-9), "nothing is familiar that was never sensed")
+	mem:ingest(inspectionAt(0))
+	check(near(mem:familiarity("trk_1"), 1.0, 1e-9), "live is fully familiar")
+	runTo(mem, 10 + 180)
+	check(near(mem:familiarity("trk_1"), 0.5, 1e-6), "half way through the decay, half")
+	runTo(mem, 10 + 360)
+	check(near(mem:familiarity("trk_1"), 0.0, 1e-9), "and after it, nothing")
+end
+
+do -- inspecting the empty spot drops the mark, and only a lost contact has one
+	local mem, events = newMemory()
+	mem:ingest(inspectionAt(0))
+	check(not mem:invalidate("trk_1"), "a live contact's spot is not empty: nothing happens")
+	check(mem:count() == 1, "it stays")
+	runTo(mem, 10)
+	check(mem:invalidate("trk_1", "empty"), "a lost one's can be dropped")
+	check(mem:count() == 0 and #mem:marks() == 0, "gone, with no mark")
+	check(events[#events] == "ended:trk_1:empty", "announced as empty")
+	check(not mem:invalidate("trk_1") and not mem:invalidate("trk_9"), "and not twice, nor one that never existed")
+end
+
+do -- time alone never changes a position or a category
+	local mem = newMemory()
+	mem:ingest(inspectionAt(0, Vector3.new(-3, 0.5, 2), Observation.FLY_LIKE_PREY))
+	local before = mem:getContact("trk_1"):toDict()
+	runTo(mem, 10)
+	local after = mem:getContact("trk_1"):toDict()
+	for _, key in { "position", "category", "positionTick", "observedTick", "modality" } do
+		check(after[key] == before[key], `'{key}' is the same after the loss`)
+	end
+	check(before.targetId == "test_target", "while it was seen, the thing had a world link")
+	check(after.targetId == "", "and the link ends with the sight (A-027)")
+	check(after.state ~= before.state, "only the state and the live link changed")
+end
+
+do -- several contacts are kept apart
+	local mem = newMemory()
+	mem:ingest(inspectionAt(0, Vector3.new(1, 0, 0), Observation.POSSIBLE_PREY, "trk_1"))
+	mem:ingest(inspectionAt(5, Vector3.new(2, 0, 0), Observation.MOVEMENT, "trk_2"))
+	check(mem:count() == 2 and mem:contacts()[1].trackId == "trk_1", "two contacts, the older first")
+	runTo(mem, 30)
+	check(#mem:lostContacts() == 2, "both lost")
+	mem:ingest(inspectionAt(31, Vector3.new(2.5, 0, 0), Observation.POSSIBLE_PREY, "trk_2"))
+	check(#mem:liveContacts() == 1 and #mem:marks() == 1 and mem:marks()[1].trackId == "trk_1", "one live, one mark: the first one's")
+end
+
+do -- a contact that expired comes back as a new one
+	local mem, events = newMemory()
+	mem:ingest(inspectionAt(0))
+	runTo(mem, 10 + 360)
+	check(mem:count() == 0, "forgotten")
+	local c = mem:ingest(inspectionAt(400, Vector3.new(1, 0, 1), Observation.MOVEMENT))
+	check(c.reacquisitions == 0, "a track that was forgotten is a new acquisition")
+	check(count(events, "acquired") == 2, "announced as acquired again")
+end
+
+do -- A-027: the hold times are the ones the memory loses contacts by
+	local mem = newMemory()
+	check(mem:holdTicks(Observation.INSPECTION) == 9, "an inspection is held for the exposure grace, 0.15 s")
+	check(mem:holdTicks(Observation.PERIPHERAL) == 60, "a cue for the cue hold, 1.0 s")
+	mem:ingest(inspectionAt(0))
+	runTo(mem, mem:holdTicks(Observation.INSPECTION))
+	check(mem:getContact("trk_1"):isLive(), "live at the last tick the hold allows")
+	runTo(mem, mem:holdTicks(Observation.INSPECTION) + 1)
+	check(not mem:getContact("trk_1"):isLive(), "lost the tick after")
+end
+
+do -- the speed a thing was seen moving at is kept with the place
+	local mem = newMemory()
+	local o = inspectionAt(0)
+	o.speedWuS = 0.8
+	mem:ingest(o)
+	runTo(mem, 20)
+	check(near(mem:getContact("trk_1").speedWuS, 0.8, 1e-9), "a mark remembers how fast the thing was going when it was last seen")
+	local later = inspectionAt(25)
+	later.speedWuS = 0.0
+	mem:ingest(later)
+	check(near(mem:getContact("trk_1").speedWuS, 0.0, 1e-9), "and a new sighting replaces it")
+end
+
+do -- a contact known only from cues can be folded into a lost one
+	local mem, events = newMemory()
+	mem:ingest(inspectionAt(0, Vector3.new(2, 1, -6), Observation.FLY_LIKE_PREY, "trk_1"))
+	runTo(mem, 20)
+	mem:ingest(cueAt(30, "trk_2", RIGHT))
+	mem:ingest(cueAt(40, "trk_2", LEFT))
+	check(mem:count() == 2, "the lost one and the one made of bearings")
+	check(mem:merge("trk_2", "trk_1"), "the bearings turned out to belong to the lost contact")
+	check(mem:count() == 1, "one contact")
+	local c = mem:getContact("trk_1")
+	check(c:hasMark() and c.position == Vector3.new(2, 1, -6), "the mark did not move: a bearing says nothing of where")
+	check(c.cueCount == 2 and c.cueDirection == LEFT, "it has both cues and the latest bearing")
+	check(events[#events] == "ended:trk_2:merged", "the folded contact is announced as merged")
+	mem:ingest(inspectionAt(50, Vector3.new(2.5, 1, -6), Observation.POSSIBLE_PREY, "trk_1"))
+	check(c:isLive() and c.reacquisitions == 1, "and the inspection that follows reacquires it once")
+end
+
+do -- only a contact without a place is folded, and never into itself
+	local mem = newMemory()
+	mem:ingest(inspectionAt(0, Vector3.new(1, 0, 0), Observation.POSSIBLE_PREY, "trk_1"))
+	mem:ingest(inspectionAt(0, Vector3.new(5, 0, 0), Observation.POSSIBLE_PREY, "trk_2"))
+	check(not mem:merge("trk_2", "trk_1"), "an inspected contact has a place of its own and is never folded into another")
+	check(not mem:merge("trk_1", "trk_1"), "nor into itself")
+	check(not mem:merge("trk_9", "trk_1") and not mem:merge("trk_1", "trk_9"), "nor does anything fold into or out of a contact that is not there")
+	check(mem:count() == 2, "nothing changed")
+end
+
+do -- a capture ends the contact (resolveCapture), and the order of announcements is fixed
+	local mem, events = newMemory()
+	mem:ingest(inspectionAt(0, Vector3.new(1, 0, 0), Observation.POSSIBLE_PREY, "trk_1"))
+	mem:ingest(inspectionAt(0, Vector3.new(2, 0, 0), Observation.POSSIBLE_PREY, "trk_2"))
+	mem:ingest(inspectionAt(0, Vector3.new(3, 0, 0), Observation.POSSIBLE_PREY, "trk_3"))
+	check(mem:resolveCapture("trk_2") and not mem:resolveCapture("trk_2") and mem:count() == 2, "a capture ends the contact once")
+	check(events[#events] == "ended:trk_2:captured", "announced as captured")
+	runTo(mem, 10)
+	check(table.concat(events, ","):match("lost:trk_1,lost:trk_3$") ~= nil, "contacts that are lost together are announced oldest first")
 end
 
 -- SECTIONS GO ABOVE THIS LINE

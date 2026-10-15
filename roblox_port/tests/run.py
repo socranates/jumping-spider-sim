@@ -45,6 +45,8 @@ MODULES = [
     ("Idle", "Rig/Idle.luau"),
     ("Observation", "Perception/Observation.luau"),
     ("PerceptionMath", "Perception/PerceptionMath.luau"),
+    ("Signal", "Perception/Signal.luau"),
+    ("ObservationMemory", "Perception/ObservationMemory.luau"),
     ("SpiderCamera", "../Client/SpiderCamera.luau"),
 ]
 # The client scripts, bundled only for the tests that run the real rig and client (CLIENT_TESTS).

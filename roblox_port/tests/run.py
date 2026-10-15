@@ -125,16 +125,21 @@ def bundle(test_file):
     return "\n".join(parts) + "\n"
 
 
-luau = sys.argv[1] if len(sys.argv) > 1 else "luau"
-status = 0
-named = sys.argv[2:]
-for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "look.luau", "world.luau"]:
-    if not (HERE / test_file).exists():
-        if named:  # a misspelt name must not look like a pass
-            print(f"no such test file: {test_file} (names are relative to tests/, for example look.luau)", file=sys.stderr)
-            status = 1
-        continue
-    with tempfile.NamedTemporaryFile("w", suffix=".luau", encoding="utf-8", delete=False) as f:
-        f.write(bundle(test_file))
-    status = subprocess.call([luau, f.name]) or status
-sys.exit(status)
+def main():
+    luau = sys.argv[1] if len(sys.argv) > 1 else "luau"
+    status = 0
+    named = sys.argv[2:]
+    for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "look.luau", "world.luau"]:
+        if not (HERE / test_file).exists():
+            if named:  # a misspelt name must not look like a pass
+                print(f"no such test file: {test_file} (names are relative to tests/, for example look.luau)", file=sys.stderr)
+                status = 1
+            continue
+        with tempfile.NamedTemporaryFile("w", suffix=".luau", encoding="utf-8", delete=False) as f:
+            f.write(bundle(test_file))
+        status = subprocess.call([luau, f.name]) or status
+    sys.exit(status)
+
+
+if __name__ == "__main__":  # tools/preview/scene.py imports this file for its bundler and must not run the tests
+    main()

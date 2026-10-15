@@ -9,6 +9,8 @@ _G.CFrame = shim.CFrame
 local Observation = require("../src/Shared/Perception/Observation")
 local PerceptionMath = require("../src/Shared/Perception/PerceptionMath")
 local ObservationMemory = require("../src/Shared/Perception/ObservationMemory")
+local SensorCore = require("../src/Shared/Perception/SensorCore")
+local Species = require("../src/Shared/Data/Species")
 local ref = require("./perception_reference")
 
 local passed, failed = 0, 0
@@ -531,6 +533,290 @@ do -- a capture ends the contact (resolveCapture), and the order of announcement
 	check(events[#events] == "ended:trk_2:captured", "announced as captured")
 	runTo(mem, 10)
 	check(table.concat(events, ","):match("lost:trk_1,lost:trk_3$") ~= nil, "contacts that are lost together are announced oldest first")
+end
+
+
+-- ================================================================================================ SensorCore
+-- The species numbers: SensorCore takes them from the data (Species.<id>.perception), and Godot's loader of the same file got these.
+local core0 = SensorCore.new(ObservationMemory.new(), "spider")
+core0:configureFrom(Species.phidippus_audax_prototype.perception)
+do
+	local t = ref.tuning
+	check(core0.coneDeg == t.inspect_cone_degrees and core0.peripheralConeDeg == t.peripheral_cone_degrees and core0.sectorDeg == t.peripheral_sector_degrees, "tuning: cone, peripheral field and sector")
+	check(core0.rangeWu == t.sensor_range_wu and core0:reachWu() == t.reach_wu, "tuning: range")
+	check(core0.easyS == t.easy_target_inspection_s and core0.flyS == t.fly_like_inspection_s, "tuning: 0.40 s and 1.00 s")
+	check(core0.easyApparentDeg == t.easy_apparent_size_deg and core0.minApparentDeg == t.min_apparent_size_deg, "tuning: apparent sizes")
+	check(core0.motionMinSpeed == t.motion_min_speed_wu_s and core0.cueCooldownS == t.cue_cooldown_s and core0.broadHz == t.broad_query_hz and core0.closeRangeWu == t.close_check_range_wu, "tuning: motion, cue cooldown, broad scan, close range")
+	check(core0.graceS == t.exposure_grace_s and core0.decayS == t.memory_decay_s, "tuning: grace 0.15 s, decay 6 s")
+	check(core0.contactSpeedBound == t.contact_speed_bound_wu_s and core0.contactSizeRatio == t.contact_size_ratio, "tuning: the association rule's speed bound and size ratio")
+	local m = core0.memory
+	check(m.hz == t.memory_hz and m.decayS == t.memory_decay and m.holdInspectionS == t.memory_hold_inspection_s and near(m.holdPeripheralS, t.memory_hold_peripheral_s, 1e-12), "the memory's timing follows the sensor's")
+	check(m:holdTicks(Observation.INSPECTION) == t.hold_ticks_inspection and m:holdTicks(Observation.PERIPHERAL) == t.hold_ticks_peripheral, "hold ticks 9 and 60")
+end
+
+-- A scripted sensor tick, as Godot's tools/export_perception_reference.gd makes it: the sensing is replaced by the scenario's sightings and
+-- cues; the bookkeeping is SensorCore's. The spots in `blocked` are hidden from the eye by the scripted world.
+local EYE, UP3 = Vector3.zero, Vector3.new(0, 1, 0)
+local DELTA = 1 / 60
+
+local function drive(core: any, step: any, axis: Vector3, allVisible: (Vector3, Vector3, number, Vector3) -> boolean, reverse: boolean)
+	core:beginTick(DELTA)
+	local present: { [string]: boolean } = {}
+	local inspected, sightings = {}, {}
+	for _, id in step.hidden or {} do
+		present[id] = true
+		core:trackOf(id)
+	end
+	for _, c in step.cue or {} do
+		present[c.id] = true
+		local t = core:trackOf(c.id)
+		local at = vec(c.at)
+		if core.tick >= t.nextCueTick then
+			core:cue(t, (at - EYE).Unit, FORWARD, UP3, (at - EYE).Magnitude)
+		end
+	end
+	for _, sp in step.sight or {} do
+		present[sp.id] = true
+		local t = core:trackOf(sp.id)
+		local p = { id = sp.id, position = vec(sp.at), radius = sp.radius, velocity = vec(sp.velocity), maxCategory = sp.max_category }
+		local radius = math.max(p.radius, 0.01)
+		local estimate = if sp.estimate then vec(sp.estimate) else p.position
+		local apparent = PerceptionMath.apparentSizeDeg(2.0 * radius, (p.position - EYE).Magnitude)
+		table.insert(sightings, { t = t, p = p, estimate = estimate, estDir = (estimate - EYE).Unit, apparent = apparent, visibleFraction = sp.visible or 1.0 })
+		table.insert(inspected, { position = estimate, radius = radius })
+	end
+	if reverse then -- the world listing its things the other way round
+		local flipped = {}
+		for i = #sightings, 1, -1 do table.insert(flipped, sightings[i]) end
+		sightings = flipped
+	end
+	core:fileSightings(sightings, DELTA)
+	core:checkSpots(EYE, axis, UP3, DELTA, inspected, allVisible)
+	core:endTick(present)
+end
+
+local function snapshot(core: any, tick: number, eventsSoFar: number): any
+	local live = core.memory:contacts()
+	table.sort(live, function(a, b)
+		return a.firstTick < b.firstTick or (a.firstTick == b.firstTick and a.trackId < b.trackId)
+	end)
+	local contacts = {} -- copies: the scenario goes on changing the real ones
+	for _, c in live do
+		local copy = table.clone(c)
+		copy.hasMarkNow = c:hasMark()
+		table.insert(contacts, copy)
+	end
+	local tracks, spots, kept, marks, derived = {}, {}, {}, {}, {}
+	for _, c in contacts do
+		derived[c.trackId] = { familiarity = core.memory:familiarity(c.trackId), ageS = core.memory:ageS(c), staleness = core.memory:stalenessOf(c) }
+	end
+	for pid, t in core._tracks do tracks[pid] = table.clone(t) end
+	for id, st in core._spots do spots[id] = st.exposure end
+	for id, e in core._kept do kept[id] = e end
+	for _, c in core.memory:marks() do table.insert(marks, c.trackId) end
+	return { tick = tick, eventsSoFar = eventsSoFar, contacts = contacts, derived = derived, tracks = tracks, spots = spots, kept = kept, marks = marks }
+end
+
+local function runScenario(sc: any, reverse: boolean?): ({ any }, { string }, any)
+	local memory = ObservationMemory.new()
+	local core = SensorCore.new(memory, "spider")
+	core:configureFrom(Species.phidippus_audax_prototype.perception)
+	local events: { string } = {}
+	memory.contactAcquired:connect(function(c: any) table.insert(events, `{core.tick} acquired:{c.trackId}`) end)
+	memory.contactLost:connect(function(c: any) table.insert(events, `{core.tick} lost:{c.trackId}`) end)
+	memory.contactReacquired:connect(function(c: any) table.insert(events, `{core.tick} reacquired:{c.trackId}`) end)
+	memory.contactEnded:connect(function(c: any, why: string) table.insert(events, `{core.tick} ended:{c.trackId}:{why}`) end)
+	memory.categoryChanged:connect(function(c: any, a: string, b: string) table.insert(events, `{core.tick} category:{c.trackId}:{a}>{b}`) end)
+	local probes = {}
+	for _, tk in sc.probes do probes[tk] = true end
+	local snaps = {}
+	local tick = 0
+	for _, step in sc.steps do
+		local axis = if step.axis then vec(step.axis) else FORWARD
+		local blocked = {}
+		for _, b in step.blocked or {} do table.insert(blocked, vec(b)) end
+		local function allVisible(_eye: Vector3, center: Vector3, _radius: number, _up: Vector3): boolean
+			for _, b in blocked do
+				if (b - center).Magnitude < 0.01 then return false end
+			end
+			return true
+		end
+		for _ = 1, step.n do
+			tick += 1
+			drive(core, step, axis, allVisible, reverse == true)
+			if probes[tick] then table.insert(snaps, snapshot(core, tick, #events)) end
+		end
+	end
+	return snaps, events, { inspectionsMade = core.inspectionsMade, cuesMade = core.cuesMade }
+end
+
+local function sameKeys(a: any, b: any): boolean
+	for k in a do if b[k] == nil then return false end end
+	for k in b do if a[k] == nil then return false end end
+	return true
+end
+
+-- Compares what the Luau core holds at a probe with what Godot held. Ids, ticks, states, categories and counts are exact; numbers made
+-- from Godot's single-precision vectors agree to ~1e-6.
+local function sameSnapshot(label: string, got: any, want: any)
+	check(got.tick == want.tick and got.eventsSoFar == want.events_so_far, `{label}: tick and announcements so far ({got.eventsSoFar} vs {want.events_so_far})`)
+	check(#got.contacts == #want.contacts, `{label}: {#got.contacts} contacts vs {#want.contacts}`)
+	for i, w in want.contacts do
+		local c = got.contacts[i]
+		if c == nil then continue end
+		local at = `{label} {w.id}`
+		check(c.trackId == w.id and c.state == w.state and c.modality == w.modality and c.category == w.category, `{at}: id, state, modality, category ({c.trackId} {c.state} {c.modality} {c.category} vs {w.id} {w.state} {w.modality} {w.category})`)
+		check(near(c.confidence, w.confidence, 1e-6), `{at}: confidence {c.confidence} vs {w.confidence}`)
+		check(c.targetId == w.target_id, `{at}: world link '{c.targetId}' vs '{w.target_id}'`)
+		check((w.position == nil) == (not c.hasPosition), `{at}: has a position`)
+		if w.position ~= nil then check(vnear(c.position, w.position, F32), `{at}: position {c.position} vs {table.concat(w.position, ", ")}`) end
+		check(c.positionTick == w.position_tick and c.observedTick == w.observed_tick and c.firstTick == w.first_tick and c.lostTick == w.lost_tick, `{at}: ticks`)
+		check(c.reacquisitions == w.reacquisitions and c.cueCount == w.cue_count, `{at}: reacquisitions and cues`)
+		if w.cue_direction ~= nil then check(vnear(c.cueDirection, w.cue_direction, F32) and c.cueTick == w.cue_tick, `{at}: the latest cue`) end
+		check(near(c.sizeWu, w.size_wu, 1e-6) and near(c.speedWuS, w.speed_wu_s, 1e-6), `{at}: size and speed`)
+		check(c.markValid == w.mark_valid and c.hasMarkNow == w.has_mark, `{at}: mark`)
+		local d = got.derived[c.trackId]
+		check(near(d.familiarity, w.familiarity, 1e-6) and near(d.ageS, w.age_s, 1e-9) and near(d.staleness, w.staleness, 1e-6), `{at}: familiarity, age, staleness`)
+	end
+	check(sameKeys(got.tracks, want.tracks), `{label}: the same tracks`)
+	for pid, w in want.tracks do
+		local t = got.tracks[pid]
+		if t == nil then continue end
+		check(t.trackId == w.track_id and near(t.exposure, w.exposure, 1e-9) and t.linkTick == w.link_tick and t.nextCueTick == w.next_cue_tick, `{label} track {pid}: contact {t.trackId} vs {w.track_id}, exposure {t.exposure} vs {w.exposure}`)
+	end
+	check(sameKeys(got.spots, want.spots), `{label}: the same spots being looked at`)
+	for id, w in want.spots do check(got.spots[id] ~= nil and near(got.spots[id], w, 1e-9), `{label} spot {id}`) end
+	check(sameKeys(got.kept, want.kept), `{label}: the same exposure kept`)
+	for id, w in want.kept do check(got.kept[id] ~= nil and near(got.kept[id], w, 1e-9), `{label} kept {id}`) end
+	check(table.concat(got.marks, ",") == table.concat(want.marks, ","), `{label}: marks {table.concat(got.marks, ",")} vs {table.concat(want.marks, ",")}`)
+end
+
+local byName: { [string]: any } = {}
+local lastSnapshots: { [string]: any } = {}
+for _, sc in ref.scenarios do
+	byName[sc.name] = sc
+	local snaps, events, counts = runScenario(sc)
+	check(#snaps == #sc.expected, `{sc.name}: {#snaps} probes vs {#sc.expected}`)
+	for i, want in sc.expected do
+		if snaps[i] then sameSnapshot(`{sc.name} t{want.tick}`, snaps[i], want) end
+	end
+	local same = #events == #sc.events
+	if same then for i, e in sc.events do if events[i] ~= e then same = false end end end
+	check(same, `{sc.name}: announcements\n   got  {table.concat(events, " ; ")}\n   want {table.concat(sc.events, " ; ")}`)
+	check(counts.inspectionsMade == sc.counts.inspections_made and counts.cuesMade == sc.counts.cues_made, `{sc.name}: {counts.inspectionsMade} inspections and {counts.cuesMade} cues vs {sc.counts.inspections_made} and {sc.counts.cues_made}`)
+	lastSnapshots[sc.name] = snaps[#snaps]
+end
+
+-- The headline numbers, said plainly (the golden above pins all of it; these are what a reader looks for).
+local function eventsOf(name: string, reverse: boolean?): { string }
+	local _, events = runScenario(byName[name], reverse)
+	return events
+end
+do
+	local e = eventsOf("timing_easy_target")
+	check(has(e, "1 acquired:trk_1") and has(e, "24 category:trk_1:movement>possible_prey"), "an easy target is movement, then possible prey at 0.40 s of exposure (tick 24)")
+	check(has(e, "60 category:trk_1:possible_prey>fly_like_prey"), "and fly-like prey at 1.00 s (tick 60)")
+	check(has(e, "100 lost:trk_1") and has(e, "460 ended:trk_1:expired"), "sight ends at 90; lost on the 10th tick without evidence; forgotten 6 s after the loss")
+	e = eventsOf("timing_small_target")
+	check(has(e, "51 category:trk_1:movement>possible_prey") and has(e, "126 category:trk_1:possible_prey>fly_like_prey"), "a target half the easy size needs twice as long (0.84 s, 2.09 s)")
+	e = eventsOf("a_short_break_does_not_reset_the_exposure")
+	check(has(e, "65 category:trk_1:possible_prey>fly_like_prey") and not has(e, "40 lost:trk_1"), "a break under 0.15 s does not reset the exposure: fly-like after 60 ticks of sight, 5 of them away")
+	e = eventsOf("the_longest_break_that_keeps_the_contact")
+	check(has(e, "68 category:trk_1:possible_prey>fly_like_prey") and not string.find(table.concat(e, " "), "trk_2"), "8 ticks away (0.133 s) still keeps the contact")
+	e = eventsOf("a_break_one_tick_longer_starts_a_new_contact")
+	check(has(e, "40 acquired:trk_2") and has(e, "40 lost:trk_1"), "one tick more and the first sighting after it is a fresh contact (the old one is lost in the same tick)")
+	e = eventsOf("an_empty_spot_in_plain_view_drops_the_mark")
+	check(has(e, "124 ended:trk_1:empty"), "the empty spot, looked at for 0.40 s (24 ticks) from the tick after the loss, drops the mark")
+	check(count(eventsOf("a_spot_the_world_hides_cannot_be_called_empty"), "124 ended") == 0 and not has(eventsOf("a_spot_out_of_the_cone_is_not_inspected"), "124 ended:trk_1:empty"), "a hidden spot, or one out of the cone, is never called empty")
+	e = eventsOf("seen_again_where_only_it_could_be_is_the_remembered_contact")
+	check(has(e, "151 reacquired:trk_1") and count(e, "151 acquired") == 0, "one lost contact it fits: the sighting rejoins it")
+	e = eventsOf("seen_outside_the_region_is_a_fresh_contact")
+	check(has(e, "151 acquired:trk_2") and count(e, "151 reacquired") == 0, "outside the region it is a fresh contact")
+	e = eventsOf("two_lost_contacts_one_newcomer_late_fits_both_so_is_a_stranger")
+	check(has(e, "281 acquired:trk_3") and count(e, "281 reacquired") == 0, "two lost contacts it could be: neither, a fresh contact")
+	check(count(eventsOf("look_alikes_cross_and_come_out_as_strangers"), "191 acquired") == 2, "look-alikes coming out together are two fresh contacts")
+	e = eventsOf("a_cue_never_joins_a_lost_contact_but_the_inspection_after_it_does")
+	check(has(e, "131 acquired:trk_2") and has(e, "136 ended:trk_2:merged") and has(e, "136 reacquired:trk_1"), "a cue never joins a lost contact; the inspection that follows does, folding the cue's contact in")
+end
+
+-- Digests that leave out the track ids (the order contacts are made in) or keep them.
+local function digest(snap: any, withIds: boolean): string
+	local rows = {}
+	for _, c in snap.contacts do
+		local pos = if c.hasPosition then string.format("%.3f %.3f %.3f", c.position.X, c.position.Y, c.position.Z) else "-"
+		table.insert(rows, string.format("%s%s %s %s %s %d", if withIds then c.trackId .. " " else "", c.state, c.category, if c.targetId ~= "" then "linked" else "-", pos, c.reacquisitions))
+	end
+	table.sort(rows)
+	return table.concat(rows, " | ")
+end
+local function lastOf(name: string, reverse: boolean?): any
+	local snaps = runScenario(byName[name], reverse)
+	return snaps[#snaps]
+end
+
+do -- the order the world lists things in, and the world's ids, decide nothing
+	for _, pair in {
+		{ "look_alikes_cross_and_come_out_as_strangers", "look_alikes_cross_and_come_out_as_strangers_listed_the_other_way_round" },
+		{ "a_place_two_newcomers_could_each_be_is_taken_by_neither", "a_place_two_newcomers_could_each_be_is_taken_by_neither_listed_the_other_way_round" },
+	} do
+		check(digest(lastSnapshots[pair[1]], false) == digest(lastSnapshots[pair[2]], false), `{pair[1]}: the same contacts whichever order Godot listed them in`)
+		check(digest(lastOf(pair[1]), false) == digest(lastOf(pair[1], true), false), `{pair[1]}: the same contacts when the port reverses the listing`)
+	end
+	-- renaming the newcomer (a different world id, or the same one the lost thing had) changes nothing the player could see
+	local function renamedLastStep(name: string, from: string, to: string): any
+		local sc = table.clone(byName[name])
+		sc.steps = table.clone(sc.steps)
+		local last = table.clone(sc.steps[#sc.steps])
+		last.sight = {}
+		for _, sp in byName[name].steps[#sc.steps].sight do
+			local copy = table.clone(sp)
+			if copy.id == from then copy.id = to end
+			table.insert(last.sight, copy)
+		end
+		sc.steps[#sc.steps] = last
+		local snaps = runScenario(sc)
+		return snaps[#snaps]
+	end
+	check(digest(renamedLastStep("seen_again_where_only_it_could_be_is_the_remembered_contact", "z", "a"), true) == digest(lastOf("seen_again_where_only_it_could_be_is_the_remembered_contact"), true), "a lost contact is rejoined by evidence, not by the world id: the same answer under the lost thing's own id")
+	check(digest(renamedLastStep("seen_outside_the_region_is_a_fresh_contact", "a", "z"), true) == digest(lastOf("seen_outside_the_region_is_a_fresh_contact"), true), "and a distant thing with the lost thing's own id is still a stranger")
+end
+
+do -- a thing that was never sensed leaves no trace anywhere
+	local mem = ObservationMemory.new()
+	local core = SensorCore.new(mem, "spider")
+	core:configureFrom(Species.phidippus_audax_prototype.perception)
+	for _ = 1, 30 do
+		core:beginTick(DELTA)
+		core:trackOf("ghost")
+		core:checkSpots(EYE, FORWARD, UP3, DELTA, {}, function() return true end)
+		core:endTick({ ghost = true })
+	end
+	check(mem:count() == 0 and core:trackIdFor("ghost") == "" and next(core._kept) == nil and next(core._spots) == nil, "no contact, no contact id for the thing, no exposure kept, no spot watched")
+	core:beginTick(DELTA)
+	core:endTick({})
+	check(core:getTrack("ghost") == nil, "and a thing that has left the world loses its track at once")
+	check(core.tick == 31 and mem.nowTick == 31, "the sensor and the memory count the same ticks")
+end
+
+do -- the cue gate: at most one cue per cooldown (0.8 s = 48 ticks) for each thing, from the sensor's own bookkeeping
+	local mem = ObservationMemory.new()
+	local core = SensorCore.new(mem, "spider")
+	core:configureFrom(Species.phidippus_audax_prototype.perception)
+	local seen = {}
+	core.cueEmitted:connect(function(obs: any) table.insert(seen, obs) end)
+	local ticks = {}
+	for _ = 1, 100 do
+		core:beginTick(DELTA)
+		local t = core:trackOf("a")
+		if core.tick >= t.nextCueTick then
+			core:cue(t, Vector3.new(0.4, 0.1, -0.9).Unit, FORWARD, UP3, 8.0)
+			table.insert(ticks, core.tick)
+		end
+		core:endTick({ a = true })
+	end
+	check(table.concat(ticks, ",") == "1,49,97" and #seen == 3 and core.cuesMade == 3, "cues on ticks 1, 49 and 97")
+	check(seen[1].modality == Observation.PERIPHERAL and not seen[1].hasPosition and seen[1].category == Observation.MOVEMENT and Observation.isValid(seen[1]), "a cue is a valid peripheral observation with no position and no label")
+	check(mem:count() == 1 and mem:getContact("trk_1"):isLive(), "all three belong to one contact")
 end
 
 -- SECTIONS GO ABOVE THIS LINE

@@ -9,7 +9,8 @@ tests/look.luau (the daughter's pattern pinned, the look knobs, idle motion and 
 tests/world.luau (the graphics table, the sun pick, the scenery, the lighting and the low-detail tier) and
 tests/perception.luau (the pure perception logic against Godot's own hand-written expectations and against
 tests/perception_reference.json, exported from the frozen Godot modules) and
-tests/eyes.luau (the spider-eye picture: its data, the pure optics, the drawer under the shim and the real client's wiring).
+tests/eyes.luau (the spider-eye picture: its data, the pure optics, the drawer under the shim and the real client's wiring) and
+tests/hud.luau (the perception HUD's shapes and its drawer under the shim: circles, dashed rings, chevrons, labels).
 Usage (from roblox_port/):  python3 tests/run.py [path/to/luau [test.luau ...]]   (default: all of them)"""
 import pathlib, re, subprocess, sys, tempfile
 
@@ -65,6 +66,7 @@ MODULES = [
     ("FocusState", "Movement/FocusState.luau"),
     ("PerceptionText", "UI/PerceptionText.luau"),
     ("PerceptionView", "UI/PerceptionView.luau"),
+    ("PerceptionShapes", "UI/PerceptionShapes.luau"),
     ("SpiderCamera", "../Client/SpiderCamera.luau"),
 ]
 # The client scripts, bundled only for the tests that run the real rig and client (CLIENT_TESTS).
@@ -77,7 +79,7 @@ CLIENT_MODULES = [
     ("PerceptionHud", "../Client/PerceptionHud.luau"),
     ("SpiderEyes", "../Client/SpiderEyes.luau"),
 ]
-CLIENT_TESTS = {"perception_client.luau", "client_smoke.luau", "look.luau", "world.luau", "eyes.luau"}
+CLIENT_TESTS = {"perception_client.luau", "client_smoke.luau", "look.luau", "world.luau", "eyes.luau", "hud.luau"}
 REFERENCES = ["jump_reference", "tether_reference", "camera_reference", "framing_reference", "perception_reference", "prey_reference"]
 # A reference only the named tests read (it is large; the other bundles leave it out).
 REFERENCE_ONLY = {"prey_reference": {"prey.luau"}, "perception_reference": {"perception.luau"}}
@@ -107,12 +109,12 @@ def chunk(path):
 
 def bundle(test_file):
     parts = ["local Vector3, CFrame, Color3, workspace, Instance, Enum, RaycastParams, OverlapParams, BoxWorld, Vector2, game, UDim, UDim2, ClientStubs",
-             "local NumberRange, NumberSequence, NumberSequenceKeypoint, ColorSequence, ColorSequenceKeypoint",
+             "local NumberRange, NumberSequence, NumberSequenceKeypoint, ColorSequence, ColorSequenceKeypoint, Font",
              "local time = os.clock",
              "local shim = " + chunk(HERE / "shim.luau"),
              "Vector3, CFrame, Color3, workspace, Instance, Enum, RaycastParams, OverlapParams, BoxWorld = shim.Vector3, shim.CFrame, shim.Color3, shim.workspace, shim.Instance, shim.Enum, shim.RaycastParams, shim.OverlapParams, shim.BoxWorld",
              "Vector2, game, UDim, UDim2, ClientStubs = shim.Vector2, shim.game, shim.UDim, shim.UDim2, shim.client",
-             "NumberRange, NumberSequence, NumberSequenceKeypoint, ColorSequence, ColorSequenceKeypoint = shim.NumberRange, shim.NumberSequence, shim.NumberSequenceKeypoint, shim.ColorSequence, shim.ColorSequenceKeypoint",
+             "NumberRange, NumberSequence, NumberSequenceKeypoint, ColorSequence, ColorSequenceKeypoint, Font = shim.NumberRange, shim.NumberSequence, shim.NumberSequenceKeypoint, shim.ColorSequence, shim.ColorSequenceKeypoint, shim.Font",
              "local __refs, __mods = {}, {}"]
     for ref in REFERENCES:
         path = HERE / (ref + ".luau")
@@ -132,7 +134,7 @@ def bundle(test_file):
 luau = sys.argv[1] if len(sys.argv) > 1 else "luau"
 status = 0
 named = sys.argv[2:]
-for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "look.luau", "world.luau", "eyes.luau"]:
+for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "look.luau", "world.luau", "eyes.luau", "hud.luau"]:
     if not (HERE / test_file).exists():
         if named:  # a misspelt name must not look like a pass
             print(f"no such test file: {test_file} (names are relative to tests/, for example look.luau)", file=sys.stderr)

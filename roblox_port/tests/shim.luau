@@ -196,6 +196,7 @@ end
 function Instance.new(className: string)
 	local o = setmetatable({ ClassName = className, Name = className, _children = {}, _attrs = {} }, Object)
 	if className == "ScreenGui" then rawset(o, "AbsoluteSize", { X = 1280, Y = 720 }) end
+	if className == "TextLabel" or className == "Frame" then rawset(o, "AbsoluteSize", { X = 0, Y = 0 }) end -- nothing is laid out here: the engine's size before its first layout
 	if HAS_CFRAME[className] then
 		rawset(o, "_cframe", CFrame.new())
 	end
@@ -438,6 +439,8 @@ function Vector2.__div(a,b) return Vector2.new(a.X/b,a.Y/b) end
 function Vector2.new(x, y) return setmetatable({ X = x or 0, Y = y or 0 }, Vector2) end
 Vector2.zero = Vector2.new(0, 0)
 local UDim, UDim2 = {}, {}
+local Font = {}
+function Font.new(family, weight, style) return { Family = family, Weight = weight or Enum.FontWeight.Regular, Style = style or Enum.FontStyle.Normal } end
 function UDim.new(scale, offset) return { Scale = scale or 0, Offset = offset or 0 } end
 function UDim2.new(xs, xo, ys, yo) return { X = UDim.new(xs, xo), Y = UDim.new(ys, yo) } end
 function UDim2.fromOffset(x, y) return UDim2.new(0, x, 0, y) end
@@ -504,4 +507,4 @@ end
 return { Vector3 = Vector3, CFrame = CFrame, Color3 = Color3, Enum = Enum, Instance = Instance, RaycastParams = RaycastParams,
 	OverlapParams = OverlapParams, workspace = workspace, BoxWorld = BoxWorld, Vector2 = Vector2, game = game, UDim = UDim, UDim2 = UDim2,
 	client = client, services = services, NumberRange = NumberRange, NumberSequence = NumberSequence,
-	NumberSequenceKeypoint = NumberSequenceKeypoint, ColorSequence = ColorSequence, ColorSequenceKeypoint = ColorSequenceKeypoint }
+	NumberSequenceKeypoint = NumberSequenceKeypoint, ColorSequence = ColorSequence, ColorSequenceKeypoint = ColorSequenceKeypoint, Font = Font }

@@ -1,33 +1,168 @@
 --!strict
--- Thin drawer for the pure memory view. Reuses widgets rather than creating Instances every frame.
+-- Thin drawer for the pure memory view (Shared/UI/PerceptionView). Reuses widgets rather than creating Instances every frame.
+-- ROBLOX-20, the drawer's polish: a circle is a rounded Frame with a UIStroke, the dashed last-seen ring is 12 short rounded bars,
+-- an off-screen cue is a chevron of two bars, the Focus ticks are four bars, and a label is white Builder Sans on a dark pill under
+-- the ring it names (above it only when the screen has no room below, so a world billboard over a marker no longer lies on it). The
+-- geometry is Shared/UI/PerceptionShapes. What is drawn, and its words, opacities and timings, are PerceptionView's: this changes
+-- how it looks, not what it says.
 local Shared = game:GetService("ReplicatedStorage"):WaitForChild("Shared")
 local View = require(Shared.UI.PerceptionView)
+local Shapes = require(Shared.UI.PerceptionShapes)
 local Hud = {}
 Hud.__index = Hud
+
+local WHITE, DARK = Color3.new(1, 1, 1), Color3.new(0, 0, 0)
+local PILL = Color3.fromRGB(10, 14, 12)
+local FONT = Font.new("rbxasset://fonts/families/BuilderSans.json", Enum.FontWeight.SemiBold)
+local TEXT_SIZE = 18
+local THICKNESS = { dash = 2, chevron = 3, tick = 2 }
+
+local function rounded(f: Instance)
+	local c = Instance.new("UICorner")
+	c.CornerRadius = UDim.new(0.5, 0)
+	c.Parent = f
+end
+
+local function outline(f: Instance, color: Color3, thickness: number, mode: Enum.ApplyStrokeMode): UIStroke
+	local s = Instance.new("UIStroke")
+	s.Color, s.Thickness, s.ApplyStrokeMode = color, thickness, mode
+	s.Transparency = 1
+	s.Parent = f
+	return s
+end
+
+local function box(name: string, parent: Instance): Frame
+	local f = Instance.new("Frame")
+	f.Name = name
+	f.AnchorPoint = Vector2.new(0.5, 0.5)
+	f.BorderSizePixel = 0
+	f.Visible = false
+	f.Parent = parent
+	return f
+end
+
+-- A thin rounded bar with a dark edge: a dash of a last-seen ring, an arm of a chevron, a Focus tick.
+local function newBar(parent: Instance): any
+	local f = box("Bar", parent)
+	f.BackgroundColor3 = WHITE
+	rounded(f)
+	return { frame = f, edge = outline(f, DARK, 1, Enum.ApplyStrokeMode.Border) }
+end
+
+-- A circle: a see-through rounded Frame with a 2 px white stroke and, just outside it, a dark one so it reads on light and dark ground.
+local function newCircle(parent: Instance): any
+	local f = box("Circle", parent)
+	f.BackgroundTransparency = 1
+	rounded(f)
+	local line = outline(f, WHITE, 2, Enum.ApplyStrokeMode.Border)
+	local halo = box("Halo", f)
+	halo.Position = UDim2.fromScale(0.5, 0.5)
+	halo.Size = UDim2.new(1, 4, 1, 4)
+	halo.BackgroundTransparency = 1
+	halo.Visible = true
+	rounded(halo)
+	return { frame = f, line = line, halo = outline(halo, DARK, 1.5, Enum.ApplyStrokeMode.Border) }
+end
+
+-- A label: text with a dark edge on a dark pill that grows to fit it.
+local function newLabel(parent: Instance): any
+	local l = Instance.new("TextLabel")
+	l.Name = "Label"
+	l.AnchorPoint = Vector2.new(0.5, 0)
+	l.AutomaticSize = Enum.AutomaticSize.XY
+	l.Size = UDim2.fromOffset(0, 0)
+	l.BackgroundColor3 = PILL
+	l.BorderSizePixel = 0
+	l.FontFace = FONT
+	l.TextSize = TEXT_SIZE
+	l.TextColor3 = WHITE
+	l.TextWrapped = false
+	l.ZIndex = 2
+	l.Visible = false
+	l.Parent = parent
+	rounded(l)
+	local pad = Instance.new("UIPadding")
+	pad.PaddingLeft, pad.PaddingRight = UDim.new(0, 10), UDim.new(0, 10)
+	pad.PaddingTop, pad.PaddingBottom = UDim.new(0, 3), UDim.new(0, 3)
+	pad.Parent = l
+	return { frame = l, edge = outline(l, DARK, 1.5, Enum.ApplyStrokeMode.Contextual) }
+end
+
+local MAKE: { [string]: (Instance) -> any } = { bar = newBar, circle = newCircle, label = newLabel }
+
 function Hud.new(parent: Instance): any
 	local gui = Instance.new("ScreenGui")
 	gui.Name, gui.IgnoreGuiInset, gui.ResetOnSpawn = "PerceptionHud", true, false
 	gui.DisplayOrder = 4
 	gui.Parent = parent
-	return setmetatable({gui=gui, pool={}, used=0}, Hud)
+	return setmetatable({
+		gui = gui,
+		pools = { bar = {}, circle = {}, label = {} }, -- every widget made, by kind
+		used = { bar = 0, circle = 0, label = 0 }, -- how many this frame has taken
+		shown = { bar = 0, circle = 0, label = 0 }, -- how many were showing after the last frame
+	}, Hud)
 end
-function Hud.label(self: any, text: string, at: Vector2, alpha: number, rotation: number?, size: number?)
-	self.used += 1
-	local p = self.pool[self.used]
-	if not p then
-		p = Instance.new("TextLabel")
-		p.BackgroundTransparency, p.AnchorPoint = 1, Vector2.new(0.5,0.5)
-		p.Size = UDim2.fromOffset(240,28)
-		p.TextColor3, p.TextStrokeColor3 = Color3.new(1,1,1), Color3.new(0,0,0)
-		p.Parent = self.gui
-		table.insert(self.pool,p)
+
+function Hud._take(self: any, kind: string): any
+	local n = self.used[kind] + 1
+	self.used[kind] = n
+	local w = self.pools[kind][n]
+	if w == nil then
+		w = MAKE[kind](self.gui)
+		self.pools[kind][n] = w
 	end
-	p.Visible, p.Text, p.Position = true, text, UDim2.fromOffset(at.X,at.Y)
-	p.TextTransparency, p.TextStrokeTransparency = 1-alpha, 1-alpha*0.9
-	p.Rotation, p.TextSize = rotation or 0, size or 18
+	return w
 end
+
+function Hud._bar(self: any, b: Shapes.Bar, thickness: number, alpha: number)
+	local w = self:_take("bar")
+	local f = w.frame
+	f.Position = UDim2.fromOffset(b.x, b.y)
+	f.Size = UDim2.fromOffset(b.length, thickness)
+	f.Rotation = b.rotation
+	f.BackgroundTransparency = 1 - alpha
+	w.edge.Transparency = 1 - alpha * 0.9
+	f.Visible = true
+end
+
+function Hud._circle(self: any, at: Vector2, radius: number, alpha: number)
+	local w = self:_take("circle")
+	local f = w.frame
+	f.Position = UDim2.fromOffset(at.X, at.Y)
+	f.Size = UDim2.fromOffset(radius * 2, radius * 2)
+	w.line.Transparency = 1 - alpha
+	w.halo.Transparency = 1 - alpha * 0.6
+	f.Visible = true
+end
+
+-- `offset` is PerceptionView's gap from the ring's middle to the label. The pill's width is whatever it measured last frame.
+function Hud._label(self: any, text: string, at: Vector2, offset: number, alpha: number, viewport: Vector2)
+	local w = self:_take("label")
+	local l = w.frame
+	local x, y = Shapes.labelAt(at.X, at.Y, offset, l.AbsoluteSize.X, viewport.X, viewport.Y)
+	if l.Text ~= text then
+		l.Text = text
+	end
+	l.Position = UDim2.fromOffset(x, y)
+	l.TextTransparency = 1 - alpha
+	l.BackgroundTransparency = 1 - 0.55 * alpha
+	w.edge.Transparency = 1 - alpha * 0.9
+	l.Visible = true
+end
+
+-- Hides the widgets the last frame used and this one did not.
+function Hud._hideSpare(self: any)
+	for kind, pool in self.pools do
+		for i = self.used[kind] + 1, self.shown[kind] do
+			pool[i].frame.Visible = false
+		end
+		self.shown[kind] = self.used[kind]
+	end
+end
+
 function Hud.draw(self: any, memory: any, camera: Camera, cast: any, focusing: boolean, showMark: boolean?)
-	self.used = 0
+	local used = self.used
+	used.bar, used.circle, used.label = 0, 0, 0
 	local viewport = camera.ViewportSize
 	local adapter = {
 		project = function(at: Vector3, size: number)
@@ -52,23 +187,30 @@ function Hud.draw(self: any, memory: any, camera: Camera, cast: any, focusing: b
 		end,
 	}
 	local view = View.build(memory,adapter,showMark)
-	for _, e in view.edges do self:label("›",e.pos,e.alpha,math.deg(math.atan2(e.dir.Y,e.dir.X)),32) end
+	for _, e in view.edges do
+		for _, b in Shapes.chevron(e.pos.X, e.pos.Y, e.dir.X, e.dir.Y) do
+			self:_bar(b, THICKNESS.chevron, e.alpha)
+		end
+	end
 	for _, r in view.rings do
-		-- Twenty-eight small tangents form a ring; last-seen rings become broken with age.
-		for i=0,27 do
-			if r.kind == "mark" and i%2 == 1 and r.dash < 0.95 then continue end
-			local a = i*math.pi/14
-			self:label("—",r.pos+Vector2.new(math.cos(a),math.sin(a))*r.radius,r.alpha,math.deg(a)+90,8)
+		if r.kind == "mark" then
+			-- Twelve dashes; the gaps grow as the sighting ages (r.dash falls from 1 to 0.3).
+			for _, b in Shapes.dashRing(r.pos.X, r.pos.Y, r.radius, r.dash) do
+				self:_bar(b, THICKNESS.dash, r.alpha)
+			end
+		else
+			self:_circle(r.pos, r.radius, r.alpha)
 		end
 	end
-	for _, l in view.labels do self:label(l.text,l.pos-Vector2.new(0,l.offset+10),l.alpha) end
+	for _, l in view.labels do
+		self:_label(l.text, l.pos, l.offset, l.alpha, viewport)
+	end
 	if focusing then
-		for i=0,3 do
-			local a=i*math.pi/2
-			self:label("—",viewport*0.5+Vector2.new(math.cos(a),math.sin(a))*11,0.8,math.deg(a),12)
+		for _, b in Shapes.focusTicks(viewport.X * 0.5, viewport.Y * 0.5) do
+			self:_bar(b, THICKNESS.tick, 0.8)
 		end
 	end
-	for i=self.used+1,#self.pool do self.pool[i].Visible=false end
+	self:_hideSpare()
 	self.view = view
 end
 return Hud

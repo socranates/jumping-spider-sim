@@ -39,3 +39,7 @@ Strict luau-lsp analysis of src: 0 diagnostics. `luau-compile` of every .luau un
 3. Focus (D-036, D-041): 180 degrees/s turn toward the aim, 35 degree gaze tilt, the toggle setting and "FOCUS ON"; the camera alone never turns the cone.
 4. The last-seen mark's presentation and plain words from memory only; nothing drawn for what was never sensed.
 5. A labeled test target (D-038: magenta marker, 0.8 WU/s, on a stage watched from a 2 WU ledge) and P01 in Studio; measure candidates, rays and CPU time with 3 to 6 flies later (A-029).
+
+## Chet Windows acceptance (2026-10-15)
+
+All six CLI suites pass: 182 + 4669 + 15 + 11 + 72 + 71; 60/60 compile. Source 41d1148, report docs/verification/roblox-perception-windows/RESULTS.md. No Studio run or rebuild needed for this unwired pure-logic chunk. Keep the frozen sight-loss boundary; proceed with part 2 above.

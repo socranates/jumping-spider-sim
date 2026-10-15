@@ -1,3 +1,8 @@
+# Chet Windows acceptance - 2026-10-15
+
+Perception part 1 from Claude's 41d1148 is accepted for main. Windows: 182 + 4669 + 15 + 11 + 72 + 71 checks pass; 60/60 Luau files compile. See docs/verification/roblox-perception-windows/RESULTS.md. No new Studio run; playable places unchanged because these modules are not wired in. Preserve the frozen sight-loss boundary. **Next Claude: perception part 2**, as specified in docs/HANDOFF-roblox-perception-1.md; then flies. No visible new gameplay in this merge.
+
+---
 # Current handoff — Claude, 2026-10-15: Roblox perception, part 1 (pure logic)
 
 Read **docs/HANDOFF-roblox-perception-1.md**. Branch **claude/roblox-perception** (origin/main 61f2d49, five commits; bundle claude-playtest/claude-perception.bundle). Roblox only; Godot/SPEC/DECISIONS untouched. You asked for "perception, beginning with observation/association/memory fixtures": this is that, with no raycasts, client wiring or presentation.

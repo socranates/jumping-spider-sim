@@ -1,39 +1,246 @@
 --!strict
--- Drawn fly: compact thorax/abdomen, compound eyes, six legs and two translucent wings. Never queryable.
-local B={};B.__index=B
-function B.new(parent: Instance): any
- local folder=Instance.new('Folder');folder.Name='Flies';folder.Parent=parent
- return setmetatable({folder=folder,rigs={}},B)
+-- The drawn fly: a house fly (Data/FlyLook has every number) 0.7 cm long, made of ellipsoids and rods: a head with two big red-brown
+-- compound eyes and a pale silver face, a grey thorax with four dark stripes, a grey-brown abdomen with a darker dorsal stripe, a short
+-- dark proboscis, a few bristles, six two-segment legs, and two thin glass wings with a dark leading vein and a faint iridescent film,
+-- folded back in a shallow V at rest. In flight the wings are a soft translucent blur on each side (no strobing flaps) and the legs
+-- trail. Every part is anchored, never collides, is never seen by a ray and casts no shadow (Habitat/Shapes); a soft dark oval on the
+-- surface under a standing fly stands in for its shadow. One Workspace:BulkMoveTo places all the flies' parts each frame.
+-- Display only: the fly's position, heading and normal come from the prey simulation (in the air its back is up); nothing here feeds back.
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local FlyLook = require(Shared:WaitForChild("Data"):WaitForChild("FlyLook"))
+local Shapes = require(Shared:WaitForChild("Habitat"):WaitForChild("Shapes"))
+
+local FlyBodies = {}
+FlyBodies.__index = FlyBodies
+
+-- How a part looks and sits in one pose (at rest or in flight), in the body frame.
+type Pose = { size: Vector3, frame: CFrame, transparency: number }
+type Spec = {
+	name: string,
+	rod: boolean, -- a Cylinder part; otherwise an ellipsoid
+	color: Color3,
+	material: string,
+	reflectance: number,
+	rest: Pose,
+	flight: Pose,
+}
+type Leg = { name: string, hip: { number }, knee: { number }, foot: { number } }
+type Template = {
+	specs: { Spec },
+	restFrames: { CFrame },
+	flightFrames: { CFrame },
+	changing: { number }, -- the parts that differ between the poses: legs, wings, veins, films, the shadow
+	fans: { [number]: boolean }, -- the wing parts, which tremble a little as a blur in flight
+}
+
+local function vec(t: { number }): Vector3
+	return Vector3.new(t[1], t[2], t[3])
 end
-local function part(parent: Instance,name: string,size: Vector3,color: Color3,shape: Enum.PartType?): Part
- local p=Instance.new('Part');p.Name=name;p.Size=size;p.Color=color;p.Shape=shape or Enum.PartType.Ball
- p.Anchored=true;p.CanCollide=false;p.CanQuery=false;p.CanTouch=false;p.CastShadow=false;p.Material=Enum.Material.SmoothPlastic;p.Parent=parent;return p
+
+local function mirrored(p: Vector3, side: number): Vector3
+	return Vector3.new(p.X * side, p.Y, p.Z)
 end
-function B.draw(self: any,flies: {any},now: number)
- local present={};local parts:{BasePart}={};local frames:{CFrame}={}
- for _,f in flies do
-  present[f.id]=true
-  local r=self.rigs[f.id]
-  if not r then
-   local folder=Instance.new('Folder');folder.Name=f.id;folder.Parent=self.folder;r={folder=folder,parts={}};self.rigs[f.id]=r
-   for i,size in {Vector3.new(.28,.25,.28),Vector3.new(.22,.2,.37),Vector3.new(.24,.22,.18)} do
-    r.parts[i]=part(folder,'Body'..i,size,Color3.fromRGB(34,43,39))
-   end
-   for i=4,5 do r.parts[i]=part(folder,'CompoundEye',Vector3.new(.105,.14,.13),Color3.fromRGB(108,40,26)) end
-   for i=6,7 do r.parts[i]=part(folder,'Wing',Vector3.new(.18,.018,.55),Color3.fromRGB(183,198,195));r.parts[i].Transparency=.42 end
-   for i=8,13 do r.parts[i]=part(folder,'Leg',Vector3.new(.025,.025,.25),Color3.fromRGB(40,35,30),Enum.PartType.Cylinder) end
-  end
-  local cf=CFrame.lookAt(f.position,f.position+f.heading,f.normal)
-  local flying=f:airborne() or f.state=='CAPTURED'
-  local wing=if flying then math.sin(now*92)*.8+.4 else .12
-  local locals={CFrame.new(0,0,0),CFrame.new(0,0,.23),CFrame.new(0,.015,-.18),CFrame.new(-.105,.04,-.22),CFrame.new(.105,.04,-.22),
-   CFrame.new(-.13,.1,.15)*CFrame.Angles(0,-.3,-wing),CFrame.new(.13,.1,.15)*CFrame.Angles(0,.3,wing)}
-  for i=1,6 do local side=if i%2==0 then 1 else -1;local z=math.floor((i-1)/2)*.14-.15
-   table.insert(locals,CFrame.new(side*.17,-.09,z)*CFrame.Angles(0,0,side*.5))
-  end
-  for i,p in r.parts do table.insert(parts,p);table.insert(frames,cf*locals[i]) end
- end
- for id,r in self.rigs do if not present[id] then r.folder:Destroy();self.rigs[id]=nil end end
- if #parts>0 then workspace:BulkMoveTo(parts,frames,Enum.BulkMoveMode.FireCFrameChanged) end
+
+-- The size and frame of a rod (a Cylinder part: its axis is X) from a to b, `extraA` and `extraB` longer at the ends.
+local function rodBetween(a: Vector3, b: Vector3, diameter: number, extraA: number, extraB: number): (Vector3, CFrame)
+	local dir = (b - a).Unit
+	local from, to = a - dir * extraA, b + dir * extraB
+	local up = if math.abs(dir.Y) > 0.99 then Vector3.xAxis else Vector3.yAxis
+	return Vector3.new((to - from).Magnitude, diameter, diameter), CFrame.lookAt((from + to) / 2, to, up) * CFrame.Angles(0, math.pi / 2, 0)
 end
-return B
+
+local function build(): Template
+	local C = FlyLook.colors
+	local specs: { Spec } = {}
+	local fans: { [number]: boolean } = {}
+	local function color(name: string): Color3
+		return Color3.fromHex(C[name])
+	end
+	local function same(pose: Pose): Pose
+		return { size = pose.size, frame = pose.frame, transparency = pose.transparency }
+	end
+	local function add(name: string, rod: boolean, tint: Color3, material: string, reflectance: number, rest: Pose, flight: Pose?): number
+		table.insert(specs, { name = name, rod = rod, color = tint, material = material, reflectance = reflectance, rest = rest, flight = flight or same(rest) })
+		return #specs
+	end
+
+	-- head, thorax, abdomen, eyes, face, proboscis
+	local ellipsoids: { [string]: { centre: Vector3, radii: Vector3 } } = {}
+	for _, item in FlyLook.body do
+		local centre, size = vec(item.at), vec(item.size)
+		ellipsoids[item.name] = { centre = centre, radii = size / 2 }
+		local frame = CFrame.new(centre)
+		if item.turn then frame *= CFrame.Angles(math.rad(item.turn[1]), math.rad(item.turn[2]), math.rad(item.turn[3])) end
+		add(item.name, false, color(item.color), "SmoothPlastic", item.reflectance or 0, { size = size, frame = frame, transparency = 0 })
+	end
+	-- the stripes: slices of the ellipsoid they lie on, a little proud of it
+	for _, slice in FlyLook.slices do
+		local body = ellipsoids[slice.on]
+		local share = math.sqrt(1 - (slice.x / body.radii.X) ^ 2)
+		local size = Vector3.new(slice.width, 2 * (body.radii.Y * share + FlyLook.proud), 2 * (body.radii.Z * share + FlyLook.proud))
+		add(slice.name, false, color(slice.color), "SmoothPlastic", 0, { size = size, frame = CFrame.new(body.centre + Vector3.new(slice.x, 0, 0)), transparency = 0 })
+	end
+
+	-- legs: a femur from the hip to the knee and a tibia from the knee to the foot, standing and in flight
+	local L = FlyLook.legs
+	for _, side in { -1, 1 } do
+		local word = if side < 0 then "Left" else "Right"
+		for pair = 1, #L.stand do
+			local stand, fly = L.stand[pair], L.fly[pair]
+			local function segment(label: string, diameter: number, tint: string, a: number, b: number, extraA: number, extraB: number)
+				local function joint(leg: Leg, which: number): Vector3 -- 1 the hip, 2 the knee, 3 the foot
+					return mirrored(vec(if which == 1 then leg.hip elseif which == 2 then leg.knee else leg.foot), side)
+				end
+				local size0, frame0 = rodBetween(joint(stand, a), joint(stand, b), diameter, extraA, extraB)
+				local size1, frame1 = rodBetween(joint(fly, a), joint(fly, b), diameter, extraA, extraB)
+				add(`{word}{stand.name}{label}`, true, color(tint), "SmoothPlastic", 0,
+					{ size = size0, frame = frame0, transparency = 0 }, { size = size1, frame = frame1, transparency = 0 })
+			end
+			segment("Femur", L.femur, "femur", 1, 2, 0, L.overlap)
+			segment("Tibia", L.tibia, "tibia", 2, 3, L.overlap, 0)
+		end
+	end
+
+	-- bristles
+	local B = FlyLook.bristles
+	local n = 0
+	for _, item in B.items do
+		local sides: { number } = if item.mirror then { 1, -1 } else { 1 }
+		for _, side in sides do
+			n += 1
+			local size, frame = rodBetween(mirrored(vec(item.from), side), mirrored(vec(item.to), side), B.diameter, 0, 0)
+			add("Bristle" .. n, true, color("bristle"), "SmoothPlastic", 0, { size = size, frame = frame, transparency = 0 })
+		end
+	end
+
+	-- wings: folded back in a V at rest, a fan of blur each side in flight
+	local W = FlyLook.wing
+	for _, side in { -1, 1 } do
+		local word = if side < 0 then "Left" else "Right"
+		local pitch, yaw = math.rad(W.pitch), math.rad(W.yaw)
+		local along = Vector3.new(side * math.sin(yaw) * math.cos(pitch), math.sin(pitch), math.cos(yaw) * math.cos(pitch)).Unit
+		local root = mirrored(vec(W.root), side)
+		local centre = root + along * (W.length / 2)
+		local up = (Vector3.yAxis - along * along.Y).Unit
+		local wing = CFrame.fromMatrix(centre, up:Cross(along), up) * CFrame.Angles(0, 0, -side * math.rad(W.roll))
+		local restSize = Vector3.new(W.width, W.thick, W.length)
+		-- in flight: a flat fan from the root outward, the outer edge up
+		local yawBack = math.rad(W.fan.yaw)
+		local reachDir = Vector3.new(side * math.cos(yawBack), 0, math.sin(yawBack))
+		local fanRoot = Vector3.new(side * W.root[1], W.root[2] + W.fan.rise, W.root[3] + W.fan.back)
+		local function fanFrame(reach: number): CFrame -- a fan reaching `reach` out from the root
+			return CFrame.new(fanRoot + reachDir * (reach / 2)) * CFrame.Angles(0, -side * yawBack, 0) * CFrame.Angles(0, 0, side * math.rad(W.fan.roll))
+		end
+		local fan, fanSize = fanFrame(W.fan.reach), Vector3.new(W.fan.reach, W.thick, W.fan.span)
+		local filmFan, filmFanSize = fanFrame(W.fan.film.reach), Vector3.new(W.fan.film.reach, W.thick, W.fan.film.span)
+
+		fans[add(`{word}Wing`, false, color("wing"), "Glass", W.reflectance,
+			{ size = restSize, frame = wing, transparency = W.transparency }, { size = fanSize, frame = fan, transparency = W.fan.transparency })] = true
+		local V = W.vein
+		local from, to = wing * Vector3.new(side * V.offset, W.thick, V.from * W.length), wing * Vector3.new(side * V.offset, W.thick, V.to * W.length)
+		local veinSize, veinFrame = rodBetween(from, to, V.diameter, 0, 0)
+		add(`{word}Vein`, true, color("vein"), "SmoothPlastic", 0,
+			{ size = veinSize, frame = veinFrame, transparency = V.transparency }, { size = veinSize, frame = veinFrame, transparency = 1 })
+		local F = W.film
+		fans[add(`{word}Film`, false, color("film"), "SmoothPlastic", 0,
+			{ size = restSize + Vector3.new(F.grow, 0, F.grow), frame = wing * CFrame.new(0, F.rise, 0), transparency = F.transparency },
+			{ size = filmFanSize, frame = filmFan * CFrame.new(0, F.rise, 0), transparency = W.fan.film.transparency })] = true
+	end
+
+	-- the shadow: a dark oval on the surface, only while the fly stands
+	local S = FlyLook.shadow
+	local shadowSize = vec(S.size)
+	local shadowFrame = CFrame.new(0, -FlyLook.hover + S.lift + shadowSize.Y / 2, 0.005)
+	add("Shadow", false, color("shadow"), "SmoothPlastic", 0, { size = shadowSize, frame = shadowFrame, transparency = S.transparency }, { size = shadowSize, frame = shadowFrame, transparency = 1 })
+
+	local restFrames: { CFrame } = {}
+	local flightFrames: { CFrame } = {}
+	local changing: { number } = {}
+	for i, spec in specs do
+		restFrames[i], flightFrames[i] = spec.rest.frame, spec.flight.frame
+		if spec.rest.size ~= spec.flight.size or spec.rest.transparency ~= spec.flight.transparency then table.insert(changing, i) end
+	end
+	return { specs = specs, restFrames = restFrames, flightFrames = flightFrames, changing = changing, fans = fans }
+end
+
+function FlyBodies.new(parent: Instance): any
+	local folder = Instance.new("Folder")
+	folder.Name = "Flies"
+	folder.Parent = parent
+	return setmetatable({ folder = folder, rigs = {}, template = build(), parts = {}, frames = {} }, FlyBodies)
+end
+
+-- One fly's parts, standing.
+function FlyBodies.spawn(self: any, id: string): any
+	local folder = Instance.new("Folder")
+	folder.Name = id
+	folder.Parent = self.folder
+	local parts: { Part } = {}
+	for i, spec in self.template.specs do
+		local pose = spec.rest
+		local part: Part
+		if spec.rod then
+			part = Shapes.block(folder, spec.name, pose.size, pose.frame, spec.color, spec.material)
+			part.Shape = Enum.PartType.Cylinder
+		else
+			part = Shapes.ellipsoid(folder, spec.name, pose.size, pose.frame, spec.color, spec.material)
+		end
+		part.Reflectance = spec.reflectance
+		part.Transparency = pose.transparency
+		parts[i] = part
+	end
+	local rig = { folder = folder, parts = parts, flying = false }
+	self.rigs[id] = rig
+	return rig
+end
+
+-- Switches a fly's parts that differ between the poses (the legs' reach, the wings, their veins and films, the shadow).
+function FlyBodies.pose(self: any, rig: any, flying: boolean)
+	rig.flying = flying
+	for _, i in self.template.changing do
+		local spec = self.template.specs[i]
+		local pose = if flying then spec.flight else spec.rest
+		rig.parts[i].Size = pose.size
+		rig.parts[i].Transparency = pose.transparency
+	end
+end
+
+function FlyBodies.draw(self: any, flies: { any }, now: number)
+	local template: Template = self.template
+	local parts: { BasePart } = self.parts
+	local frames: { CFrame } = self.frames
+	table.clear(parts)
+	table.clear(frames)
+	local present: { [string]: boolean } = {}
+	local shimmer = FlyLook.wing.fan.shimmer
+	for _, fly in flies do
+		present[fly.id] = true
+		local rig = self.rigs[fly.id] or self:spawn(fly.id)
+		local flying = fly:airborne() or fly.state == "CAPTURED"
+		if flying ~= rig.flying then self:pose(rig, flying) end
+		local heading = fly.heading
+		-- the back is up: a fly in the air has no surface (the normal it carries is the one it last stood on, which would roll it sideways after
+		-- a take-off from a wall), so it keeps its back to the sky; a held fly follows the spider's grip
+		local normal = if fly:airborne() then Vector3.yAxis else fly.normal
+		local up = if math.abs(heading.Unit:Dot(normal)) > 0.999 then Vector3.zAxis else normal -- a heading along the normal has no turn to give
+		local body = CFrame.lookAt(fly.position, fly.position + heading, up)
+		local poses = if flying then template.flightFrames else template.restFrames
+		for i, part in rig.parts do
+			local frame = body * poses[i]
+			if flying and template.fans[i] then frame *= CFrame.Angles(math.sin(now * shimmer[1] + i) * shimmer[2], 0, 0) end
+			table.insert(parts, part)
+			table.insert(frames, frame)
+		end
+	end
+	for id, rig in self.rigs do
+		if not present[id] then
+			rig.folder:Destroy()
+			self.rigs[id] = nil
+		end
+	end
+	if #parts > 0 then Workspace:BulkMoveTo(parts, frames, Enum.BulkMoveMode.FireCFrameChanged) end
+end
+
+return FlyBodies

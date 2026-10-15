@@ -1,13 +1,19 @@
 --!strict
 -- Builds the drawn world from Data/Graphics: the sill's physical pieces (looks only), and a "Decor" folder with the window wall,
--- glass and trim, the view out of the window, the dust, the small details and the light shafts. Gameplay never reads any of
--- the decor: every decor part is CanQuery = false, CanCollide = false, CanTouch = false, so the spider's rays, the camera's
--- casts and the jump planner see only the physical pieces. Parts and emitters that only the full tier keeps carry the
--- attribute FullOnly, which Client/WorldDetail removes on phones and tablets.
+-- glass and trim, the view out of the window, the dust, the small details, the light shafts, and (Habitat/Plants, Habitat/Patina,
+-- from Data/Flora and Data/Wear) the Pilea, the planting, the garden outside the window, the wear on the sill and the glass and
+-- the silk retreat. Gameplay never reads any of the decor: every decor part is CanQuery = false, CanCollide = false, CanTouch =
+-- false, so the spider's rays, the camera's casts and the jump planner see only the physical pieces. Parts and emitters that
+-- only the full tier keeps carry the attribute FullOnly, which Client/WorldDetail removes on phones and tablets. A piece whose
+-- look is replaced by a drawing (the back wall, the Pilea's leaves and stems) turns invisible only once that drawing exists.
 local Graphics = require(script.Parent.Parent.Data.Graphics)
+local Flora = require(script.Parent.Parent.Data.Flora)
 local Surfaces = require(script.Parent.Parent.Data.Surfaces)
 local Layout = require(script.Parent.WindowsillLayout)
 local Materials = require(script.Parent.Materials)
+local Patina = require(script.Parent.Patina)
+local Plants = require(script.Parent.Plants)
+local Shapes = require(script.Parent.Shapes)
 
 local Scenery = {}
 
@@ -51,8 +57,18 @@ local function piece(id: string): Layout.Piece
 end
 
 -- ---------------------------------------------------------------- the physical sill
--- `wallDrawn`: false when the drawn window wall could not be built, so the solid back wall stays visible instead of leaving a hole.
-function Scenery.sill(wallDrawn: boolean?): Folder
+-- The set of piece ids that drawn decor stands in for: the back wall and the Pilea (Scenery.decor returns the ones it built).
+local function replaceable(): { [string]: boolean }
+	local all: { [string]: boolean } = { [W.hidden] = true }
+	for _, id in Plants.pieceIds() do all[id] = true end
+	return all
+end
+
+-- `replaced`: the ids of the pieces whose drawn version exists (Scenery.decor's second result); those turn invisible but stay solid
+-- and climbable. A piece whose drawing could not be built stays visible instead of leaving a hole. nil means all the pieces that
+-- the decor can replace (the wall and the Pilea's leaves and stems).
+function Scenery.sill(replaced: { [string]: boolean }?): Folder
+	local hide = replaced or replaceable()
 	local sill = Instance.new("Folder")
 	sill.Name = "Windowsill"
 	sill:SetAttribute("ContentRevision", Layout.CONTENT_REVISION)
@@ -63,14 +79,16 @@ function Scenery.sill(wallDrawn: boolean?): Folder
 		p.Anchored = true
 		p.Size = spec.hi - spec.lo
 		p.Position = (spec.lo + spec.hi) * 0.5
-		p.Color = spec.color
+		local paint = Graphics.paint[spec.id]
+		p.Color = if paint then hex(paint.color) else spec.color
+		if paint and paint.reflectance then p.Reflectance = paint.reflectance end
 		p.Material = Materials.get(M.pieces[spec.id] or M.fallback)
 		p.TopSurface = Enum.SurfaceType.Smooth
 		p.BottomSurface = Enum.SurfaceType.Smooth
 		p:SetAttribute("SurfaceId", spec.id)
 		p:SetAttribute("ProfileId", spec.profile)
-		if spec.id == W.hidden and wallDrawn ~= false then
-			-- still solid and climbable; Scenery.window draws the wall in its place, with a see-through opening
+		if hide[spec.id] then
+			-- still solid and climbable; the decor draws it in its place (the wall with a see-through opening, the leaves and stems)
 			p.Transparency = 1
 			p.CastShadow = false
 		end
@@ -96,7 +114,8 @@ function Scenery.window(parent: Instance): Folder
 	slab("StileWest", back.lo.X, W.left, W.bottom, W.top)
 	slab("StileEast", W.right, back.hi.X, W.bottom, W.top)
 	local function bar(name: string, x0: number, x1: number, y0: number, y1: number)
-		drawn(wall, name, Vector3.new(x1 - x0, y1 - y0, W.trimDepth), CFrame.new((x0 + x1) / 2, (y0 + y1) / 2, plane - W.trimDepth / 2), wood, M.trim)
+		local trim = drawn(wall, name, Vector3.new(x1 - x0, y1 - y0, W.trimDepth), CFrame.new((x0 + x1) / 2, (y0 + y1) / 2, plane - W.trimDepth / 2), wood, M.trim)
+		trim.Reflectance = W.trimReflectance
 	end
 	bar("TrimBottom", W.left, W.right, W.bottom, W.bottom + W.trimWidth)
 	bar("TrimTop", W.left, W.right, W.top - W.trimWidth, W.top)
@@ -189,7 +208,7 @@ function Scenery.view(parent: Instance): Folder
 	return view
 end
 
--- ---------------------------------------------------------------- paint chips, cracks and a crumb (full tier)
+-- ---------------------------------------------------------------- chips in the paint, cracks, a crumb, a coin and fallen leaves (full tier)
 function Scenery.details(parent: Instance): Folder
 	local D = Graphics.details
 	local details = folder(parent, "Details")
@@ -212,6 +231,7 @@ function Scenery.details(parent: Instance): Folder
 	for i, c in D.crumbs do
 		drawn(details, "Crumb" .. i, Vector3.new(c.sx, c.sy, c.sz), CFrame.new(c.x, c.y, c.z) * CFrame.Angles(0, math.rad(c.turn), 0), hex(c.color), M.crumb)
 	end
+	Patina.floor(details) -- a copper coin and some fallen Pilea leaves
 	return details
 end
 
@@ -256,30 +276,50 @@ function Scenery.shafts(parent: Instance, sun: Vector3): Folder?
 end
 
 -- ---------------------------------------------------------------- everything drawn that is not the sill
--- `sun`: the unit vector toward the sun (Lit.apply's result), for the shafts; nil builds none.
--- The looks are best effort: a piece that fails (nothing here has run in Roblox Studio yet) is warned about and left out, and
--- the rest is kept. The wall and the old decor entries are not optional: if they fail, Scenery.decor fails and the server
--- keeps the plain back wall (Server/Main).
-local function attempt(what: string, build: () -> unknown)
+-- `sun`: the unit vector toward the sun (Lit.apply's result), for the shafts; nil builds none. Returns the Decor folder and the
+-- ids of the sill pieces whose look it replaced (Scenery.sill hides exactly those).
+-- The looks are best effort: a piece that fails (nothing here has run in Roblox Studio yet) is warned about, whatever it had
+-- already built is removed, and the rest is kept. The wall and the old decor entries are not optional: if they fail,
+-- Scenery.decor fails and the server keeps the plain back wall (Server/Main).
+local function attempt(decor: Instance, what: string, build: () -> unknown): boolean
+	local before: { [Instance]: boolean } = {}
+	for _, d in decor:GetDescendants() do before[d] = true end
 	local ok, err = pcall(build)
-	if not ok then warn(`[Windowsill] decor: {what} failed: {tostring(err)}`) end
+	if not ok then
+		warn(`[Windowsill] decor: {what} failed: {tostring(err)}`)
+		for _, d in decor:GetDescendants() do
+			if not before[d] then d:Destroy() end
+		end
+	end
+	return ok
 end
 
-function Scenery.decor(sun: Vector3?): Folder
+function Scenery.decor(sun: Vector3?): (Folder, { [string]: boolean })
 	local decor = Instance.new("Folder")
 	decor.Name = "Decor"
+	local replaced: { [string]: boolean } = {}
 	for _, d in Layout.DECOR do
 		if not W.replaces[d.id] then
-			local p = drawn(decor, d.id, d.size, CFrame.new(d.at), d.color, if d.id == "soil" then M.soil else "SmoothPlastic")
+			local p = drawn(decor, d.id, d.size, CFrame.new(d.at), if d.id == "soil" then hex(Flora.planter.soil) else d.color, if d.id == "soil" then M.soil else "SmoothPlastic")
 			p.Transparency = d.transparency or 0
 		end
 	end
 	Scenery.window(decor)
-	attempt("dust", function() return Scenery.dust(decor) end)
-	attempt("view", function() return Scenery.view(decor) end)
-	attempt("details", function() return Scenery.details(decor) end)
-	if sun then attempt("shafts", function() return Scenery.shafts(decor, sun) end) end
-	return decor
+	replaced[W.hidden] = true
+	local uv = Shapes.folder(decor, "UVLayer") -- the ultraviolet pattern of the flowers (the eye-view helper fades it in); always present
+	attempt(decor, "dust", function() return Scenery.dust(decor) end)
+	attempt(decor, "view", function() return Scenery.view(decor) end)
+	attempt(decor, "details", function() return Scenery.details(decor) end)
+	if sun then attempt(decor, "shafts", function() return Scenery.shafts(decor, sun) end) end
+	attempt(decor, "wear", function() return Patina.sill(decor) end)
+	attempt(decor, "glass details", function() return Patina.glass(decor) end)
+	attempt(decor, "retreat", function() return Patina.retreat(decor) end)
+	if attempt(decor, "pilea", function() return Plants.pilea(decor) end) then
+		for _, id in Plants.pieceIds() do replaced[id] = true end
+	end
+	attempt(decor, "planting", function() return Plants.planter(decor) end)
+	attempt(decor, "garden", function() return Plants.garden(decor, uv, Scenery.viewPosition) end)
+	return decor, replaced
 end
 
 return Scenery

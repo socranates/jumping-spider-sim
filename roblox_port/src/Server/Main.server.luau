@@ -18,19 +18,21 @@ Workspace.Gravity = 35 -- species gravity_wu_s2; used by any unanchored props
 
 -- The sill is what the game needs; the looks are best effort. If the lighting or the decor fails (nothing here has run in Roblox
 -- Studio yet), the server says so and carries on with the old look: a visible back wall, the plain morning light.
--- Lighting first: the light shafts follow the sun it picks. Depth of field is opt-in (Workspace attribute DepthOfField).
-local litOk, sun = pcall(Lit.apply, Lighting, Workspace:FindFirstChild("Terrain"), { depthOfField = Workspace:GetAttribute("DepthOfField") == true })
+-- Lighting first: the light shafts follow the sun it picks. The macro depth of field is on (full tier) unless the Workspace
+-- attribute DepthOfField is false.
+local litOk, sun = pcall(Lit.apply, Lighting, Workspace:FindFirstChild("Terrain"), { depthOfField = Workspace:GetAttribute("DepthOfField") ~= false })
 if litOk then
 	print("[Windowsill] sun: " .. (if sun.ok then "through the window, " else "fallback, ") .. sun.reason)
 else
 	warn("[Windowsill] lighting set-up failed: " .. tostring(sun))
 end
 
-local decorOk, decor = pcall(Scenery.decor, if litOk and sun.ok then sun.direction else nil)
+local decorOk, decor, replaced = pcall(Scenery.decor, if litOk and sun.ok then sun.direction else nil)
 if not decorOk then
-	warn("[Windowsill] decor failed, the back wall stays as it was: " .. tostring(decor))
+	warn("[Windowsill] decor failed, the back wall and the Pilea's pieces stay as they were: " .. tostring(decor))
 end
 
-local sill = Scenery.sill(decorOk)
+-- Only the pieces whose drawing exists turn invisible (still solid); if the decor failed nothing is hidden.
+local sill = Scenery.sill(if decorOk then replaced else {})
 if decorOk then decor.Parent = Workspace end
 sill.Parent = Workspace

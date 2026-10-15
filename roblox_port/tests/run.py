@@ -7,6 +7,7 @@ raycasts and sphere casts: a smoke test of the real motor, silk and camera code,
 tests/client_smoke.luau (the client scripts themselves, driven through stub services and simulated keys) and
 tests/look.luau (the daughter's pattern pinned, the look knobs, idle motion and part budgets of the real rig) and
 tests/world.luau (the graphics table, the sun pick, the scenery, the lighting and the low-detail tier) and
+tests/flies.luau (the drawn house fly: parts, proportions, legs, wings, flight pose, placement) and
 tests/perception.luau (the pure perception logic against Godot's own hand-written expectations and against
 tests/perception_reference.json, exported from the frozen Godot modules) and
 tests/eyes.luau (the spider-eye picture: its data, the pure optics, the drawer under the shim and the real client's wiring) and
@@ -26,6 +27,12 @@ MODULES = [
     ("Detail", "Data/Detail.luau"),
     ("Graphics", "Data/Graphics.luau"),
     ("Materials", "Habitat/Materials.luau"),
+    ("Flora", "Data/Flora.luau"),
+    ("Wear", "Data/Wear.luau"),
+    ("FlyLook", "Data/FlyLook.luau"),
+    ("Shapes", "Habitat/Shapes.luau"),
+    ("Plants", "Habitat/Plants.luau"),
+    ("Patina", "Habitat/Patina.luau"),
     ("SunPick", "Habitat/SunPick.luau"),
     ("Scenery", "Habitat/Scenery.luau"),
     ("Lit", "Habitat/Lit.luau"),
@@ -79,7 +86,7 @@ CLIENT_MODULES = [
     ("PerceptionHud", "../Client/PerceptionHud.luau"),
     ("SpiderEyes", "../Client/SpiderEyes.luau"),
 ]
-CLIENT_TESTS = {"perception_client.luau", "client_smoke.luau", "look.luau", "world.luau", "eyes.luau", "hud.luau"}
+CLIENT_TESTS = {"perception_client.luau", "client_smoke.luau", "look.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau"}
 REFERENCES = ["jump_reference", "tether_reference", "camera_reference", "framing_reference", "perception_reference", "prey_reference"]
 # A reference only the named tests read (it is large; the other bundles leave it out).
 REFERENCE_ONLY = {"prey_reference": {"prey.luau"}, "perception_reference": {"perception.luau"}}
@@ -131,16 +138,21 @@ def bundle(test_file):
     return "\n".join(parts) + "\n"
 
 
-luau = sys.argv[1] if len(sys.argv) > 1 else "luau"
-status = 0
-named = sys.argv[2:]
-for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "look.luau", "world.luau", "eyes.luau", "hud.luau"]:
-    if not (HERE / test_file).exists():
-        if named:  # a misspelt name must not look like a pass
-            print(f"no such test file: {test_file} (names are relative to tests/, for example look.luau)", file=sys.stderr)
-            status = 1
-        continue
-    with tempfile.NamedTemporaryFile("w", suffix=".luau", encoding="utf-8", delete=False) as f:
-        f.write(bundle(test_file))
-    status = subprocess.call([luau, f.name]) or status
-sys.exit(status)
+def main():
+    luau = sys.argv[1] if len(sys.argv) > 1 else "luau"
+    status = 0
+    named = sys.argv[2:]
+    for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "look.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau"]:
+        if not (HERE / test_file).exists():
+            if named:  # a misspelt name must not look like a pass
+                print(f"no such test file: {test_file} (names are relative to tests/, for example look.luau)", file=sys.stderr)
+                status = 1
+            continue
+        with tempfile.NamedTemporaryFile("w", suffix=".luau", encoding="utf-8", delete=False) as f:
+            f.write(bundle(test_file))
+        status = subprocess.call([luau, f.name]) or status
+    sys.exit(status)
+
+
+if __name__ == "__main__":  # tools/preview/scene.py imports this file for its bundler and must not run the tests
+    main()

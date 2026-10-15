@@ -112,7 +112,7 @@ def bundle(test_file):
 luau = sys.argv[1] if len(sys.argv) > 1 else "luau"
 status = 0
 named = sys.argv[2:]
-for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "scenarios.luau", "client_smoke.luau", "look.luau", "world.luau"]:
+for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "gaze.luau", "scenarios.luau", "client_smoke.luau", "look.luau", "world.luau"]:
     if not (HERE / test_file).exists():
         if named:  # a misspelt name must not look like a pass
             print(f"no such test file: {test_file} (names are relative to tests/, for example look.luau)", file=sys.stderr)

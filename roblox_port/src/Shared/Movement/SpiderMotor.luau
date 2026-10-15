@@ -8,6 +8,12 @@
 -- No input devices, camera or drawing here: the client passes a TickInput each fixed tick and an aim ray, so Studio specs
 -- (tests/studio/RecoverySpec.luau) run the same motor deterministically, tick by tick, against real geometry. Engine
 -- queries only: Workspace raycasts, sphere casts and one overlap query (the room probe).
+--
+-- The eyes (D-036, spider_motor.gd get_eye_position, get_gaze_direction, get_body_gaze_direction, set_scan_direction, _update_gaze): the
+-- senses read the observer() of the body, never the camera. The eyes sit EYE_FORWARD along the facing and EYE_UP along the body's up; the
+-- gaze is the facing tilted by the gaze pitch, which follows Focus (at the focus rate, up to the species' gaze limit) and settles to the
+-- support plane at half that rate; in the spider-eye view the principal eyes' retinas may point the inspection up to PRINCIPAL_SCAN_DEG
+-- off the body's gaze. The camera alone never moves the cone: only Focus and moving do.
 local JumpMath = require(script.Parent.JumpMath)
 local SupportMath = require(script.Parent.SupportMath)
 local SilkController = require(script.Parent.SilkController)
@@ -30,6 +36,15 @@ local HOP_PROBE_UP, HOP_PROBE_DOWN = 0.5, 1.2
 local MAX_DRIFT = 0.15
 local CONTACT_EXTRA_STEPS = 8
 local EYE_TURN_START_DEG, EYE_TURN_STOP_DEG = 30, 4 -- CameraMath.PRINCIPAL_SCAN_DEG, EYE_SETTLE_DEG
+-- T10a: how far either way of the body's gaze the principal eyes' retinas can point the sharp field (the scan direction).
+Motor.PRINCIPAL_SCAN_DEG = 30
+local PRINCIPAL_SCAN = math.rad(Motor.PRINCIPAL_SCAN_DEG)
+-- Where the eyes are: from the body centre along the facing and along the body's up. Both inside the 0.3 WU body, so a ray from the eye
+-- never starts in the world.
+Motor.EYE_FORWARD = 0.18
+Motor.EYE_UP = 0.08
+local EYE_FORWARD, EYE_UP = Motor.EYE_FORWARD, Motor.EYE_UP
+local GAZE_PITCH_FALLBACK_DEG = 35 -- used when the species profile has no perception section
 local FREE_UP_RATE = math.rad(240) -- the drawn up turns to world up while falling or on the line (Godot VISUAL_TURN)
 
 export type TickInput = {
@@ -39,6 +54,7 @@ export type TickInput = {
 	dropHeld: boolean, -- F / X / Silk held: lowers on the line
 	releaseHeld: boolean, -- Q / B / Let go held: a deliberate let-go after the grace
 	focusPoint: Vector3?, -- Focus held: the body turns toward this point
+	focusDir: Vector3?, -- Focus held: the aim ray's direction, which the gaze tilts toward when the point is within 0.2 WU of the eyes
 	gaze: Vector3?, -- spider-eye view: the body turns to face a gaze beyond 30 degrees
 }
 
@@ -75,6 +91,8 @@ function Motor.new(config: Config): any
 	probe.Transparency = 1
 	probe.Parent = config.probeParent or workspace
 	local loco = config.profile.locomotion
+	local perception = config.profile.perception
+	local gazeLimitDeg = if perception ~= nil and typeof(perception.gaze_pitch_limit_deg) == "number" then perception.gaze_pitch_limit_deg else GAZE_PITCH_FALLBACK_DEG
 	local self = setmetatable({
 		config = config,
 		surfaces = config.surfaces,
@@ -99,6 +117,10 @@ function Motor.new(config: Config): any
 		flightTicks = 0,
 		flightLimit = 0,
 		eyeTurning = false,
+		gazePitch = 0, -- how far the gaze is tilted off the support plane, radians, up positive (Godot _gaze_pitch)
+		gazeLimit = math.rad(gazeLimitDeg),
+		scanDir = nil :: Vector3?, -- T10a: where the spider-eye view points the principal eyes (a unit direction); nil: straight ahead
+		focusOn = false, -- Focus is turning the gaze (held, or the spider-eye view turning the body); Godot is_focusing
 		ticks = 0,
 		lineSerial = 0, -- counts lines started, so the drawing knows a new one began
 		afterMiss = false,
@@ -191,6 +213,7 @@ function Motor.place(self: any, position: Vector3, up: Vector3?, heading: Vector
 	self.aimTarget = nil
 	self.plan = nil
 	self.planKey = ""
+	self.gazePitch = 0
 	self.silk:clear()
 	self.afterMiss, self.dropped, self.caught = false, false, false
 	self.safe = { pos = self.pos, up = self.up, heading = self.heading }
@@ -435,6 +458,95 @@ function Motor.lineLip(self: any): Vector3
 	return self.silk.bend or (self.silk.anchor + self.silk.normal * 0.04)
 end
 
+-- ---------------------------------------------------------------- the eyes (D-036)
+-- Where the eyes are (Godot get_eye_position): on the body, a little ahead and a little up.
+function Motor.eyePosition(self: any): Vector3
+	local frame = SupportMath.bodyCFrame(self.pos, self.up, self.heading)
+	return self.pos + frame.LookVector * EYE_FORWARD + frame.UpVector * EYE_UP
+end
+
+-- The facing tilted by the gaze pitch about the body's right: where the eyes point with the retinas centred (Godot get_body_gaze_direction).
+function Motor.bodyGazeDirection(self: any): Vector3
+	local frame = SupportMath.bodyCFrame(self.pos, self.up, self.heading)
+	return (frame.LookVector * math.cos(self.gazePitch) + frame.UpVector * math.sin(self.gazePitch)).Unit
+end
+
+-- The axis of the inspection cone (Godot get_gaze_direction). The body's own gaze, unless the spider-eye view has pointed the principal
+-- eyes' retinas elsewhere (the scan direction): then that direction, held within PRINCIPAL_SCAN_DEG of the body's gaze.
+function Motor.gazeDirection(self: any): Vector3
+	local axis = self:bodyGazeDirection()
+	local scan: Vector3? = self.scanDir
+	if scan == nil then
+		return axis
+	end
+	if SupportMath.angleTo(axis, scan) <= PRINCIPAL_SCAN then
+		return scan
+	end
+	local turn = axis:Cross(scan)
+	if turn:Dot(turn) < 1e-10 then
+		return axis
+	end
+	return (CFrame.fromAxisAngle(turn.Unit, PRINCIPAL_SCAN) * axis).Unit
+end
+
+-- What the senses read of the body (Sensor.step's observer): the eyes, the axis of the cone, the body's up and its facing. Never the camera.
+function Motor.observer(self: any): { eye: Vector3, gaze: Vector3, up: Vector3, heading: Vector3 }
+	return { eye = self:eyePosition(), gaze = self:gazeDirection(), up = self.up, heading = self.heading }
+end
+
+function Motor.scanDirection(self: any): Vector3?
+	return self.scanDir
+end
+
+-- True while Focus is turning the gaze: held, or the spider-eye view turning the body to face the gaze (Godot is_focusing).
+function Motor.isFocusing(self: any): boolean
+	return self.focusOn
+end
+
+local function moveToward(from: number, to: number, maxStep: number): number
+	if math.abs(to - from) <= maxStep then
+		return to
+	end
+	return from + math.sign(to - from) * maxStep
+end
+
+-- The direction Focus aims the gaze (Godot player_controller.focus_direction): from the eyes to the point the camera's centre ray meets,
+-- or along that ray when the point is within 0.2 WU of them.
+function Motor._focusDirection(self: any, input: TickInput): Vector3?
+	local point = input.focusPoint
+	if point == nil then
+		return nil
+	end
+	local to = point - self:eyePosition()
+	if to.Magnitude > 0.2 then
+		return to.Unit
+	end
+	local ray = input.focusDir
+	return if ray ~= nil and ray.Magnitude > 1e-4 then ray.Unit else nil
+end
+
+-- Godot _update_gaze: the gaze tilts toward the focus direction (within the gaze limit) while Focus is held on a support, and settles back to
+-- the support plane, at half that rate, when it is not. T10a: in the spider-eye view it tilts, at that half rate, toward the scan direction;
+-- while the body turns to face that gaze it has the full rate, as Focus does.
+function Motor._updateGaze(self: any, input: TickInput)
+	local wanted, rate = 0.0, FOCUS_RATE * 0.5
+	local supported = self.mode == "attached"
+	local focus = self:_focusDirection(input)
+	local scan: Vector3? = self.scanDir
+	self.focusOn = focus ~= nil
+	if supported and focus == nil and scan ~= nil and self.eyeTurning and not self.preparing then
+		focus = scan
+		self.focusOn = true
+	end
+	if supported and focus ~= nil then
+		wanted = math.clamp(math.asin(math.clamp(focus:Dot(self.up), -1, 1)), -self.gazeLimit, self.gazeLimit)
+		rate = FOCUS_RATE
+	elseif supported and scan ~= nil then
+		wanted = math.clamp(math.asin(math.clamp(scan:Dot(self.up), -1, 1)), -self.gazeLimit, self.gazeLimit)
+	end
+	self.gazePitch = moveToward(self.gazePitch, wanted, rate * DT)
+end
+
 -- ---------------------------------------------------------------- the fixed tick
 function Motor._turnToward(self: any, dir: Vector3, rate: number)
 	local t = SupportMath.tangentDir(dir, self.up)
@@ -630,12 +742,15 @@ end
 -- One fixed 1/60 s tick of the body.
 function Motor.tick(self: any, input: TickInput)
 	self.ticks += 1
+	local scan = input.gaze
+	self.scanDir = if scan ~= nil and scan.Magnitude > 1e-4 then scan.Unit else nil
 	if self.mode == "attached" then
 		self:_tickAttached(input)
 	else
 		self.preparing = false
 		self:_tickAir(input)
 	end
+	self:_updateGaze(input)
 end
 
 return Motor

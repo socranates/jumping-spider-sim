@@ -11,7 +11,9 @@ return function(driver: any)
 	end
 	local function check(name,fn)
 		local ok,err=pcall(fn)
-		table.insert(rows,{name=name,passed=ok,detail=if ok then "" else tostring(err)})
+		local row={name=name,passed=ok,detail=if ok then "" else tostring(err)}
+		table.insert(rows,row)
+		print("PORT_CLIENT_ROW "..HttpService:JSONEncode({evidence_id=workspace:GetAttribute("PortEvidence"),result=row}))
 	end
 	check("player walks to edge and hangs",function()
 		driver.place(Vector3.new(-1,4.51,0))
@@ -94,10 +96,45 @@ return function(driver: any)
 		until os.clock()>deadline
 		driver.input:simulate("Forward",false)
 	end)
+	check("Focus toggle respects cancel ownership and ends off surface",function()
+		local player=game:GetService("Players").LocalPlayer
+		driver.place(Vector3.new(-22,0.31,6)); wait(0.2)
+		player:SetAttribute("FocusToggle",true)
+		driver.input:simulate("Focus",true); driver.input:simulate("Focus",false); wait(0.1)
+		assert(driver.focusState.latched,"toggle did not latch")
+		driver.input:simulate("Jump",true); wait(0.3)
+		driver.input:simulate("Cancel",true); driver.input:simulate("Cancel",false); wait(0.1)
+		assert(driver.focusState.latched,"aim cancel also cleared Focus")
+		driver.input:simulate("Jump",false); wait(0.1)
+		driver.input:simulate("Cancel",true); driver.input:simulate("Cancel",false); wait(0.1)
+		assert(not driver.focusState.latched,"idle cancel did not clear Focus")
+		driver.input:simulate("Focus",true); driver.input:simulate("Focus",false)
+		driver.input:simulate("Jump",true); RunService.Heartbeat:Wait(); driver.input:simulate("Jump",false)
+		assert(untilState(function(s) return s.mode=="air" end,1))
+		assert(not driver.focusState.latched,"Focus remained latched in air")
+		player:SetAttribute("FocusToggle",false)
+	end)
+	check("live client sensor and drawer classify the labeled stage marker",function()
+		assert(driver.stage,"test stage missing")
+		driver.input:clear(); driver.sensor:reset(); driver.memory:clear()
+		driver.stage.target.frozen=true
+		driver.stage.target.position=Vector3.new(-28,2.8,-10)
+		driver.stage.target.velocity=Vector3.zero
+		driver.place(Vector3.new(-26,2.31,-3.5))
+		local d=driver.stage.target.position-driver.motor.pos
+		driver.motor.heading=Vector3.new(d.X,0,d.Z).Unit
+		driver.camera:snap()
+		assert(untilState(function() local c=driver.memory:getContact(driver.sensor:trackIdFor("test_target")); return c and c.category=="fly_like_prey" end,4),"no classified client contact")
+		wait(0.2)
+		local v=driver.perceptionHud.view
+		assert(v and #v.labels>0 and v.labels[1].text=="fly-like prey","drawer has no classification")
+		driver.stage.target.frozen=false
+	end)
 	local passed=0
 	for _,row in rows do if row.passed then passed+=1 end end
 	print("PORT_CLIENT_REPORT "..HttpService:JSONEncode({evidence_id=workspace:GetAttribute("PortEvidence"),tests=#rows,passed=passed,failed=#rows-passed,results=rows}))
+	print("PORT_CLIENT_SUMMARY "..HttpService:JSONEncode({evidence_id=workspace:GetAttribute("PortEvidence"),tests=#rows,passed=passed,failed=#rows-passed}))
 	driver.input:clear()
 	-- Leave a recoverable hanging pose for visual inspection in the test place.
-	driver.place(Vector3.new(-1,4.51,0)); driver.drop()
+	driver.place(Vector3.new(-26,2.31,-3.5)); driver.motor.heading=-Vector3.zAxis; driver.camera:snap()
 end

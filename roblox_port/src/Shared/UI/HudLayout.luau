@@ -18,6 +18,7 @@ HudLayout.TOUCH_BUTTONS = {
 	{ action = "Creep", label = "Creep", x = -86, y = -172, size = 60, right = true },
 	{ action = "Drop", label = "Silk", x = -86, y = -242, size = 60, right = true },
 	{ action = "Recenter", label = "Re-\ncenter", x = -160, y = -168, size = 52, right = true, textSize = 14 },
+	{ action = "Focus", label = "Focus", x = -236, y = -242, size = 60, right = true, textSize = 14 },
 	{ action = "Eye", label = "Eye", x = -156, y = -242, size = 60, right = true },
 } :: { Button }
 

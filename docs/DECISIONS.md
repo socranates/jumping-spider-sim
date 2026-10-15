@@ -702,3 +702,8 @@ Nathan: the spider "needs to be cuter" and "we need fuzzy spider", and he wants 
 ### ROBLOX-16 — Native recovery acceptance and wall contact (Chet, 2026-10-14)
 
 Windows Studio exposed a shallow wall-lowering penetration missed by the box emulation. Keep a normal skin at sweep contacts and a short launch-wall face guard during wall lowering, without changing jump math or other landing policy. Preserve the existing penetration assertions. A landing endpoint assertion now allows 1e-4 stud for Roblox Vector3 rounding. Protected lighting/material flags are checked in authored build configuration instead of read by game scripts. Evidence cf31cbabad2e9cad: 49/49 native engine checks, 7/7 actual-client playback, ten misses recovered. Physical controller/tablet unavailable by Nathan's confirmation; record those as not run. Details and timing: verification/roblox-controls-windows/RESULTS.md.
+
+
+### ROBLOX-17 — Perception in the live client (Chet, 2026-10-15)
+
+Port P01 F1–F8 using Claude's Sensor/observer, stepped before movement against only Windowsill geometry. Observation memory alone supplies sector cues, classification, fixed fading last-seen rings and lost-sight text. Camera position affects drawing/coverage, never sensing. FocusToggle is an opt-in Player attribute; cancel retains aim/line ownership and leaving a surface clears Focus. Back-to-start clears sensor bookkeeping and observation memory together. A labeled, non-query magenta TEST TARGET and an isolated west stage provide an explicit perception fixture until flies arrive. Native evidence 8b45f28cf2cca2ba: 58 engine and 9 live-client checks passed. No changes to the frozen Godot reference.

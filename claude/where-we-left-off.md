@@ -1,3 +1,10 @@
+# Chet — 2026-10-15: perception part 2 verified; fly port in progress
+
+Imported Claude's 8dd59b6 and completed the live sensor, labeled test stage, Focus toggle and observation-only HUD. Windows Studio evidence **8b45f28cf2cca2ba**: **58/58 engine + 9/9 live-client checks**. See docs/verification/roblox-perception-2/ and docs/HANDOFF-roblox-perception-2.md. This is a small green milestone during Nathan's larger flies request, not the final handback.
+
+**Next Claude:** wait for Chet's final handoff; the fly port is the active work. Nathan can try the labeled marker on the west ledge, right-mouse Focus and losing sight behind the screen. Physical controller/tablet remain not run (none available).
+
+---
 # Chet Windows acceptance - 2026-10-15
 
 Perception part 1 from Claude's 41d1148 is accepted for main. Windows: 182 + 4669 + 15 + 11 + 72 + 71 checks pass; 60/60 Luau files compile. See docs/verification/roblox-perception-windows/RESULTS.md. No new Studio run; playable places unchanged because these modules are not wired in. Preserve the frozen sight-loss boundary. **Next Claude: perception part 2**, as specified in docs/HANDOFF-roblox-perception-1.md; then flies. No visible new gameplay in this merge.

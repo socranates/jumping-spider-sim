@@ -1196,6 +1196,44 @@ return SunPick
         </Item>
         <Item class="ModuleScript" referent="16">
           <Properties>
+            <string name="Name">TestTarget</string>
+            <string name="Source"><![CDATA[--!strict
+-- Godot test_target.gd: a labelled prop, never prey. Path stepping is independent of rendering.
+local Target = {}
+Target.__index = Target
+function Target.new(path: {Vector3}): any
+	assert(#path >= 2)
+	return setmetatable({path=path, position=path[1], velocity=Vector3.zero, index=2, direction=1,
+		pauseLeft=0, speed=0.8, pauseS=1.2, enabled=true, frozen=false, id="test_target", radius=0.45}, Target)
+end
+function Target.step(self: any, dt: number)
+	self.velocity = Vector3.zero
+	if not self.enabled or self.frozen then return end
+	if self.pauseLeft > 0 then self.pauseLeft -= dt; return end
+	local before = self.position
+	local delta = self.path[self.index] - before
+	if delta.Magnitude <= self.speed * dt then
+		self.position = self.path[self.index]
+		local nextIndex = self.index + self.direction
+		if nextIndex < 1 or nextIndex > #self.path then
+			self.direction = -self.direction
+			nextIndex = self.index + self.direction
+			self.pauseLeft = self.pauseS
+		end
+		self.index = nextIndex
+	else self.position += delta.Unit * self.speed * dt end
+	self.velocity = (self.position - before) / dt
+end
+function Target.percept(self: any): any
+	if not self.enabled then return nil end
+	return {id=self.id, position=self.position, radius=self.radius, velocity=self.velocity, maxCategory="fly_like_prey"}
+end
+return Target
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="17">
+          <Properties>
             <string name="Name">WindowsillLayout</string>
             <string name="Source"><![CDATA[--!strict
 -- The windowsill of scripts/habitat/windowsill.gd ("windowsill-v1"), box for box. Coordinates are studs = Godot WU = cm,
@@ -1272,11 +1310,11 @@ return table.freeze(Layout)
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="17">
+      <Item class="Folder" referent="18">
         <Properties>
           <string name="Name">Movement</string>
         </Properties>
-        <Item class="ModuleScript" referent="18">
+        <Item class="ModuleScript" referent="19">
           <Properties>
             <string name="Name">CameraMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -1555,7 +1593,30 @@ return CameraMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="19">
+        <Item class="ModuleScript" referent="20">
+          <Properties>
+            <string name="Name">FocusState</string>
+            <string name="Source"><![CDATA[--!strict
+-- D-041: toggle is optional, grounded only, and Cancel belongs to other actions first.
+local Focus = {}
+Focus.__index = Focus
+function Focus.new(): any return setmetatable({latched=false}, Focus) end
+function Focus.press(self: any, toggle: boolean, grounded: boolean)
+	if toggle and grounded then self.latched = not self.latched end
+end
+function Focus.active(self: any, held: boolean, toggle: boolean, grounded: boolean): boolean
+	if not grounded or not toggle then self.latched = false end
+	return grounded and (if toggle then self.latched else held)
+end
+function Focus.cancel(self: any, busy: boolean)
+	if not busy then self.latched = false end
+end
+function Focus.clear(self: any) self.latched = false end
+return Focus
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="21">
           <Properties>
             <string name="Name">InputState</string>
             <string name="Source"><![CDATA[--!strict
@@ -1648,7 +1709,7 @@ return InputState
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="20">
+        <Item class="ModuleScript" referent="22">
           <Properties>
             <string name="Name">JumpInput</string>
             <string name="Source"><![CDATA[--!strict
@@ -1819,7 +1880,7 @@ return JumpInput
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="21">
+        <Item class="ModuleScript" referent="23">
           <Properties>
             <string name="Name">JumpMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -1977,7 +2038,7 @@ return JumpMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="22">
+        <Item class="ModuleScript" referent="24">
           <Properties>
             <string name="Name">LineFraming</string>
             <string name="Source"><![CDATA[--!strict
@@ -2076,7 +2137,7 @@ return LineFraming
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="23">
+        <Item class="ModuleScript" referent="25">
           <Properties>
             <string name="Name">SilkController</string>
             <string name="Source"><![CDATA[--!strict
@@ -2320,7 +2381,7 @@ return Silk
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="24">
+        <Item class="ModuleScript" referent="26">
           <Properties>
             <string name="Name">SpiderMotor</string>
             <string name="Source"><![CDATA[--!strict
@@ -2333,6 +2394,12 @@ return Silk
 -- No input devices, camera or drawing here: the client passes a TickInput each fixed tick and an aim ray, so Studio specs
 -- (tests/studio/RecoverySpec.luau) run the same motor deterministically, tick by tick, against real geometry. Engine
 -- queries only: Workspace raycasts, sphere casts and one overlap query (the room probe).
+--
+-- The eyes (D-036, spider_motor.gd get_eye_position, get_gaze_direction, get_body_gaze_direction, set_scan_direction, _update_gaze): the
+-- senses read the observer() of the body, never the camera. The eyes sit EYE_FORWARD along the facing and EYE_UP along the body's up; the
+-- gaze is the facing tilted by the gaze pitch, which follows Focus (at the focus rate, up to the species' gaze limit) and settles to the
+-- support plane at half that rate; in the spider-eye view the principal eyes' retinas may point the inspection up to PRINCIPAL_SCAN_DEG
+-- off the body's gaze. The camera alone never moves the cone: only Focus and moving do.
 local JumpMath = require(script.Parent.JumpMath)
 local SupportMath = require(script.Parent.SupportMath)
 local SilkController = require(script.Parent.SilkController)
@@ -2355,6 +2422,15 @@ local HOP_PROBE_UP, HOP_PROBE_DOWN = 0.5, 1.2
 local MAX_DRIFT = 0.15
 local CONTACT_EXTRA_STEPS = 8
 local EYE_TURN_START_DEG, EYE_TURN_STOP_DEG = 30, 4 -- CameraMath.PRINCIPAL_SCAN_DEG, EYE_SETTLE_DEG
+-- T10a: how far either way of the body's gaze the principal eyes' retinas can point the sharp field (the scan direction).
+Motor.PRINCIPAL_SCAN_DEG = 30
+local PRINCIPAL_SCAN = math.rad(Motor.PRINCIPAL_SCAN_DEG)
+-- Where the eyes are: from the body centre along the facing and along the body's up. Both inside the 0.3 WU body, so a ray from the eye
+-- never starts in the world.
+Motor.EYE_FORWARD = 0.18
+Motor.EYE_UP = 0.08
+local EYE_FORWARD, EYE_UP = Motor.EYE_FORWARD, Motor.EYE_UP
+local GAZE_PITCH_FALLBACK_DEG = 35 -- used when the species profile has no perception section
 local FREE_UP_RATE = math.rad(240) -- the drawn up turns to world up while falling or on the line (Godot VISUAL_TURN)
 
 export type TickInput = {
@@ -2364,6 +2440,7 @@ export type TickInput = {
 	dropHeld: boolean, -- F / X / Silk held: lowers on the line
 	releaseHeld: boolean, -- Q / B / Let go held: a deliberate let-go after the grace
 	focusPoint: Vector3?, -- Focus held: the body turns toward this point
+	focusDir: Vector3?, -- Focus held: the aim ray's direction, which the gaze tilts toward when the point is within 0.2 WU of the eyes
 	gaze: Vector3?, -- spider-eye view: the body turns to face a gaze beyond 30 degrees
 }
 
@@ -2400,6 +2477,8 @@ function Motor.new(config: Config): any
 	probe.Transparency = 1
 	probe.Parent = config.probeParent or workspace
 	local loco = config.profile.locomotion
+	local perception = config.profile.perception
+	local gazeLimitDeg = if perception ~= nil and typeof(perception.gaze_pitch_limit_deg) == "number" then perception.gaze_pitch_limit_deg else GAZE_PITCH_FALLBACK_DEG
 	local self = setmetatable({
 		config = config,
 		surfaces = config.surfaces,
@@ -2424,6 +2503,10 @@ function Motor.new(config: Config): any
 		flightTicks = 0,
 		flightLimit = 0,
 		eyeTurning = false,
+		gazePitch = 0, -- how far the gaze is tilted off the support plane, radians, up positive (Godot _gaze_pitch)
+		gazeLimit = math.rad(gazeLimitDeg),
+		scanDir = nil :: Vector3?, -- T10a: where the spider-eye view points the principal eyes (a unit direction); nil: straight ahead
+		focusOn = false, -- Focus is turning the gaze (held, or the spider-eye view turning the body); Godot is_focusing
 		ticks = 0,
 		lineSerial = 0, -- counts lines started, so the drawing knows a new one began
 		afterMiss = false,
@@ -2516,6 +2599,7 @@ function Motor.place(self: any, position: Vector3, up: Vector3?, heading: Vector
 	self.aimTarget = nil
 	self.plan = nil
 	self.planKey = ""
+	self.gazePitch = 0
 	self.silk:clear()
 	self.afterMiss, self.dropped, self.caught = false, false, false
 	self.safe = { pos = self.pos, up = self.up, heading = self.heading }
@@ -2760,6 +2844,95 @@ function Motor.lineLip(self: any): Vector3
 	return self.silk.bend or (self.silk.anchor + self.silk.normal * 0.04)
 end
 
+-- ---------------------------------------------------------------- the eyes (D-036)
+-- Where the eyes are (Godot get_eye_position): on the body, a little ahead and a little up.
+function Motor.eyePosition(self: any): Vector3
+	local frame = SupportMath.bodyCFrame(self.pos, self.up, self.heading)
+	return self.pos + frame.LookVector * EYE_FORWARD + frame.UpVector * EYE_UP
+end
+
+-- The facing tilted by the gaze pitch about the body's right: where the eyes point with the retinas centred (Godot get_body_gaze_direction).
+function Motor.bodyGazeDirection(self: any): Vector3
+	local frame = SupportMath.bodyCFrame(self.pos, self.up, self.heading)
+	return (frame.LookVector * math.cos(self.gazePitch) + frame.UpVector * math.sin(self.gazePitch)).Unit
+end
+
+-- The axis of the inspection cone (Godot get_gaze_direction). The body's own gaze, unless the spider-eye view has pointed the principal
+-- eyes' retinas elsewhere (the scan direction): then that direction, held within PRINCIPAL_SCAN_DEG of the body's gaze.
+function Motor.gazeDirection(self: any): Vector3
+	local axis = self:bodyGazeDirection()
+	local scan: Vector3? = self.scanDir
+	if scan == nil then
+		return axis
+	end
+	if SupportMath.angleTo(axis, scan) <= PRINCIPAL_SCAN then
+		return scan
+	end
+	local turn = axis:Cross(scan)
+	if turn:Dot(turn) < 1e-10 then
+		return axis
+	end
+	return (CFrame.fromAxisAngle(turn.Unit, PRINCIPAL_SCAN) * axis).Unit
+end
+
+-- What the senses read of the body (Sensor.step's observer): the eyes, the axis of the cone, the body's up and its facing. Never the camera.
+function Motor.observer(self: any): { eye: Vector3, gaze: Vector3, up: Vector3, heading: Vector3 }
+	return { eye = self:eyePosition(), gaze = self:gazeDirection(), up = self.up, heading = self.heading }
+end
+
+function Motor.scanDirection(self: any): Vector3?
+	return self.scanDir
+end
+
+-- True while Focus is turning the gaze: held, or the spider-eye view turning the body to face the gaze (Godot is_focusing).
+function Motor.isFocusing(self: any): boolean
+	return self.focusOn
+end
+
+local function moveToward(from: number, to: number, maxStep: number): number
+	if math.abs(to - from) <= maxStep then
+		return to
+	end
+	return from + math.sign(to - from) * maxStep
+end
+
+-- The direction Focus aims the gaze (Godot player_controller.focus_direction): from the eyes to the point the camera's centre ray meets,
+-- or along that ray when the point is within 0.2 WU of them.
+function Motor._focusDirection(self: any, input: TickInput): Vector3?
+	local point = input.focusPoint
+	if point == nil then
+		return nil
+	end
+	local to = point - self:eyePosition()
+	if to.Magnitude > 0.2 then
+		return to.Unit
+	end
+	local ray = input.focusDir
+	return if ray ~= nil and ray.Magnitude > 1e-4 then ray.Unit else nil
+end
+
+-- Godot _update_gaze: the gaze tilts toward the focus direction (within the gaze limit) while Focus is held on a support, and settles back to
+-- the support plane, at half that rate, when it is not. T10a: in the spider-eye view it tilts, at that half rate, toward the scan direction;
+-- while the body turns to face that gaze it has the full rate, as Focus does.
+function Motor._updateGaze(self: any, input: TickInput)
+	local wanted, rate = 0.0, FOCUS_RATE * 0.5
+	local supported = self.mode == "attached"
+	local focus = self:_focusDirection(input)
+	local scan: Vector3? = self.scanDir
+	self.focusOn = focus ~= nil
+	if supported and focus == nil and scan ~= nil and self.eyeTurning and not self.preparing then
+		focus = scan
+		self.focusOn = true
+	end
+	if supported and focus ~= nil then
+		wanted = math.clamp(math.asin(math.clamp(focus:Dot(self.up), -1, 1)), -self.gazeLimit, self.gazeLimit)
+		rate = FOCUS_RATE
+	elseif supported and scan ~= nil then
+		wanted = math.clamp(math.asin(math.clamp(scan:Dot(self.up), -1, 1)), -self.gazeLimit, self.gazeLimit)
+	end
+	self.gazePitch = moveToward(self.gazePitch, wanted, rate * DT)
+end
+
 -- ---------------------------------------------------------------- the fixed tick
 function Motor._turnToward(self: any, dir: Vector3, rate: number)
 	local t = SupportMath.tangentDir(dir, self.up)
@@ -2955,19 +3128,22 @@ end
 -- One fixed 1/60 s tick of the body.
 function Motor.tick(self: any, input: TickInput)
 	self.ticks += 1
+	local scan = input.gaze
+	self.scanDir = if scan ~= nil and scan.Magnitude > 1e-4 then scan.Unit else nil
 	if self.mode == "attached" then
 		self:_tickAttached(input)
 	else
 		self.preparing = false
 		self:_tickAir(input)
 	end
+	self:_updateGaze(input)
 end
 
 return Motor
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="25">
+        <Item class="ModuleScript" referent="27">
           <Properties>
             <string name="Name">StickCarry</string>
             <string name="Source"><![CDATA[--!strict
@@ -3027,7 +3203,7 @@ return StickCarry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="26">
+        <Item class="ModuleScript" referent="28">
           <Properties>
             <string name="Name">SupportMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -3109,7 +3285,7 @@ return SupportMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="27">
+        <Item class="ModuleScript" referent="29">
           <Properties>
             <string name="Name">TetherMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -3178,11 +3354,1686 @@ return T
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="28">
+      <Item class="Folder" referent="30">
+        <Properties>
+          <string name="Name">Perception</string>
+        </Properties>
+        <Item class="ModuleScript" referent="31">
+          <Properties>
+            <string name="Name">Observation</string>
+            <string name="Source"><![CDATA[--!strict
+-- Observation (spec 21.3): one piece of sensed evidence, as the sensor makes it and the memory keeps it. A port of the frozen
+-- Godot scripts/perception/observation.gd (c87ce00), field for field. Observer, target (only when resolved), estimated position,
+-- modality, confidence in [0, 1], the tick it was observed at (an integer action tick) and a category. It is never refreshed from
+-- hidden truth: an observation is only ever made from what the observer could see at `observedTick`, and a later one is a new record.
+--
+-- Two modalities (spec 7):
+--   PERIPHERAL  broad coverage, a coarse direction only, no position and no category beyond "movement". The target is not resolved.
+--   INSPECTION  the forward cone: a position (to within the target's own size), a category that refines with continuous exposure
+--               (movement, possible prey, fly-like prey: A-004), and the target once it is resolved.
+-- Words for the categories belong to the presentation, never here. Pure: no engine services, so the plain Luau CLI runs it.
+--
+-- Naming: Godot's snake_case fields are camelCase here (track_id -> trackId, speed_wu_s -> speedWuS); the values are unchanged.
+local Observation = {}
+Observation.__index = Observation
+
+Observation.PERIPHERAL = "peripheral_motion"
+Observation.INSPECTION = "forward_inspection"
+
+Observation.MOVEMENT = "movement"
+Observation.POSSIBLE_PREY = "possible_prey"
+Observation.FLY_LIKE_PREY = "fly_like_prey"
+-- Refinement order: each is a finer guess than the one before it. No species is ever named (A-004).
+Observation.CATEGORIES = table.freeze({ "movement", "possible_prey", "fly_like_prey" })
+
+export type Observation = {
+	observerId: string,
+	-- The target's persistent id once the observer has resolved it (inspected it long enough), else "".
+	targetId: string,
+	-- Opaque id the sensor gives one thing it keeps sensing, so the memory can follow it. It is not the target's id.
+	trackId: string,
+	-- The estimate; meaningful only when hasPosition. A peripheral observation has none: only `direction`.
+	estimatedPosition: Vector3,
+	hasPosition: boolean,
+	-- Unit direction from the observer to the thing, as sensed: exact enough to aim at for an inspection, quantised to a sector
+	-- for a peripheral cue.
+	direction: Vector3,
+	modality: string,
+	confidence: number,
+	observedTick: number,
+	category: string,
+	-- Estimated size of the thing, WU (an inspection only). The memory uses it to judge whether a place could hide it.
+	sizeWu: number,
+	-- How large it looked, degrees of angle across.
+	apparentSizeDeg: number,
+	-- How fast it was seen moving, WU/s (an inspection only). A lost contact's plausible region grows at least this fast (A-027).
+	speedWuS: number,
+}
+
+local function isFinite(x: number): boolean
+	return x == x and x ~= math.huge and x ~= -math.huge
+end
+
+local function vectorIsFinite(v: Vector3): boolean
+	return isFinite(v.X) and isFinite(v.Y) and isFinite(v.Z)
+end
+
+-- A new record with Godot's defaults (a peripheral movement cue straight ahead with nothing in it); `fields` overrides any of them.
+function Observation.new(fields: { [string]: any }?): Observation
+	local o = {
+		observerId = "",
+		targetId = "",
+		trackId = "",
+		estimatedPosition = Vector3.zero,
+		hasPosition = false,
+		direction = Vector3.new(0, 0, -1), -- Godot's Vector3.FORWARD (both engines look down -Z)
+		modality = Observation.PERIPHERAL,
+		confidence = 0.0,
+		observedTick = 0,
+		category = Observation.MOVEMENT,
+		sizeWu = 0.0,
+		apparentSizeDeg = 0.0,
+		speedWuS = 0.0,
+	}
+	if fields then
+		for k, v in fields do
+			(o :: any)[k] = v
+		end
+	end
+	return setmetatable(o, Observation) :: any
+end
+
+-- The place of a category in the refinement order: 0 movement, 1 possible prey, 2 fly-like prey; -1 for anything else (Godot's Array.find).
+function Observation.rank(c: string): number
+	local i = table.find(Observation.CATEGORIES, c)
+	return if i then i - 1 else -1
+end
+
+-- Problems with the record, empty when it is fine: the invariants of spec 21.3 (no NaN or infinity, confidence in [0, 1], a known
+-- modality and category, a position only for an inspection).
+function Observation.problems(o: Observation): { string }
+	local out: { string } = {}
+	if o.observerId == "" then
+		table.insert(out, "no observer")
+	end
+	if o.trackId == "" then
+		table.insert(out, "no track")
+	end
+	if not (o.modality == Observation.PERIPHERAL or o.modality == Observation.INSPECTION) then
+		table.insert(out, `unknown modality '{o.modality}'`)
+	end
+	if not table.find(Observation.CATEGORIES, o.category) then
+		table.insert(out, `unknown category '{o.category}'`)
+	end
+	if not isFinite(o.confidence) or o.confidence < 0.0 or o.confidence > 1.0 then
+		table.insert(out, `confidence {o.confidence} is not in [0, 1]`)
+	end
+	if o.observedTick < 0 then
+		table.insert(out, "negative tick")
+	end
+	if not vectorIsFinite(o.direction) or math.abs(o.direction.Magnitude - 1.0) > 1e-3 then
+		table.insert(out, "direction is not a unit vector")
+	end
+	if o.hasPosition and not vectorIsFinite(o.estimatedPosition) then
+		table.insert(out, "estimated position is not finite")
+	end
+	if o.modality == Observation.PERIPHERAL and o.hasPosition then
+		table.insert(out, "a peripheral observation carries no position")
+	end
+	if o.modality == Observation.PERIPHERAL and (o.category ~= Observation.MOVEMENT or o.targetId ~= "") then
+		table.insert(out, "a peripheral observation has no category beyond movement and no resolved target")
+	end
+	if o.modality == Observation.INSPECTION and not o.hasPosition then
+		table.insert(out, "an inspection carries a position")
+	end
+	if not isFinite(o.speedWuS) or o.speedWuS < 0.0 then
+		table.insert(out, "speed is not a finite, non-negative number")
+	end
+	return out
+end
+
+function Observation.isValid(o: Observation): boolean
+	return #Observation.problems(o) == 0
+end
+
+-- The spec's fields as a plain table; the position is nil unless the record carries one (a cue's record has no position to read).
+function Observation.toDict(o: Observation): { [string]: any }
+	return {
+		observerId = o.observerId,
+		targetId = o.targetId,
+		trackId = o.trackId,
+		estimatedPosition = if o.hasPosition then o.estimatedPosition else nil,
+		direction = o.direction,
+		modality = o.modality,
+		confidence = o.confidence,
+		observedTick = o.observedTick,
+		category = o.category,
+	}
+end
+
+return Observation
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="32">
+          <Properties>
+            <string name="Name">ObservationMemory</string>
+            <string name="Source"><![CDATA[--!strict
+-- ObservationMemory (spec 7, 21.3): what the observer remembers of what it sensed. A port of the frozen Godot
+-- scripts/perception/observation_memory.gd (c87ce00), method for method. The sensor hands it Observation records; it keeps one Contact
+-- per thing the sensor keeps sensing (a "track"), ages them, and says what is still sensed, what has been lost and what has gone. It
+-- never looks at the world: a contact changes only when an observation arrives, when time passes, or when the sensor reports that the
+-- remembered spot was inspected and is empty.
+--
+-- A contact is LIVE while observations keep coming (a peripheral cue repeats every cue cooldown, an inspection every tick) and LOST once
+-- none has arrived for the hold time of its modality. A lost contact's confidence falls in a straight line from what it was at the loss to
+-- nothing over `decayS` (6 s), and the contact is forgotten at that point. A lost contact that was inspected has a mark (A-002): its last
+-- observed position, which never moves, because the only thing that can move a position is a new inspection.
+--
+-- Which contact an observation belongs to is the sensor's decision, taken from evidence (A-027, D-040): a contact is the spider's
+-- hypothesis that some observations are of one visible thing, not the thing's identity in the world. The memory only keeps what it is
+-- told, and can fold a contact it knew only from cues into the lost contact it turned out to be (merge). The world id of a thing it is
+-- looking at is kept on the contact for as long as sight lasts (targetId) and dropped the moment sight is lost.
+--
+-- What a peripheral cue may and may not do (spec 7: coarse directional evidence, no label): it starts a contact, and it keeps a contact
+-- that is only cues alive. It never gives a position, never changes the category, the confidence or the position of a contact that has
+-- been inspected, and never brings an inspected contact back from lost: that takes another inspection (a reacquisition). What the cue
+-- did say, a bearing, is kept apart (cueTick, cueDirection) for the presentation's edge markers.
+--
+-- Differences from Godot that change no decision: the five signals are Signal objects (memory.contactAcquired:connect(fn)); contacts
+-- are walked oldest first (creation order) wherever Godot walks a dictionary, so announcements come in a fixed order.
+local Observation = require(script.Parent.Observation)
+local PerceptionMath = require(script.Parent.PerceptionMath)
+local Signal = require(script.Parent.Signal)
+
+local PERIPHERAL, INSPECTION = Observation.PERIPHERAL, Observation.INSPECTION
+
+-- =============================================================================================== Contact
+
+local Contact = {}
+Contact.__index = Contact
+Contact.LIVE = "live"
+Contact.LOST = "lost"
+
+export type Contact = {
+	trackId: string,
+	observerId: string,
+	-- The world id of the thing this contact is live-linked to (spec 21.3: target, only when resolved), for validated interaction and
+	-- nothing else. Set while an inspection has resolved the thing, dropped the moment the contact is lost, and never used to decide
+	-- which contact an observation belongs to (A-027).
+	targetId: string,
+	state: string,
+	-- Modality of the latest evidence that updated the record (a cue on an inspected contact does not).
+	modality: string,
+	category: string,
+	-- What the contact is believed to be worth now: the latest evidence's while live, falling after a loss.
+	confidence: number,
+	confidenceAtLoss: number,
+	-- The last observed position: only an inspection gives one, and only another inspection changes it.
+	hasPosition: boolean,
+	position: Vector3,
+	positionTick: number,
+	sizeWu: number,
+	apparentSizeDeg: number,
+	-- How fast it was seen moving at the last inspection, WU/s.
+	speedWuS: number,
+	-- Latest direction from the observer of the evidence that updated the record (coarse for a cue).
+	direction: Vector3,
+	firstTick: number,
+	-- Tick of the latest evidence that updated the record.
+	observedTick: number,
+	-- The latest peripheral cue, apart from the record: its tick, its coarse bearing and how many there have been.
+	cueTick: number,
+	cueDirection: Vector3,
+	cueCount: number,
+	lostTick: number,
+	reacquisitions: number,
+	-- False once the mark was found to be wrong (the spot was inspected and is empty).
+	markValid: boolean,
+	-- Creation order: "oldest first" breaks ties with it.
+	seq: number,
+}
+
+function Contact.new(): Contact
+	return setmetatable({
+		trackId = "",
+		observerId = "",
+		targetId = "",
+		state = Contact.LIVE,
+		modality = PERIPHERAL,
+		category = Observation.MOVEMENT,
+		confidence = 0.0,
+		confidenceAtLoss = 0.0,
+		hasPosition = false,
+		position = Vector3.zero,
+		positionTick = 0,
+		sizeWu = 0.0,
+		apparentSizeDeg = 0.0,
+		speedWuS = 0.0,
+		direction = Vector3.new(0, 0, -1),
+		firstTick = 0,
+		observedTick = 0,
+		cueTick = -1000000,
+		cueDirection = Vector3.zero,
+		cueCount = 0,
+		lostTick = 0,
+		reacquisitions = 0,
+		markValid = true,
+		seq = 0,
+	}, Contact) :: any
+end
+
+function Contact.isLive(c: Contact): boolean
+	return c.state == Contact.LIVE
+end
+
+-- Live and being inspected: the position is where it is being seen now.
+function Contact.isInspectedNow(c: Contact): boolean
+	return c.state == Contact.LIVE and c.modality == INSPECTION
+end
+
+function Contact.hasMark(c: Contact): boolean
+	return c.state == Contact.LOST and c.hasPosition and c.markValid
+end
+
+function Contact.toDict(c: Contact): { [string]: any }
+	return {
+		trackId = c.trackId,
+		targetId = c.targetId,
+		state = c.state,
+		modality = c.modality,
+		category = c.category,
+		confidence = c.confidence,
+		hasPosition = c.hasPosition,
+		position = if c.hasPosition then c.position else nil,
+		observedTick = c.observedTick,
+		positionTick = c.positionTick,
+		lostTick = c.lostTick,
+	}
+end
+
+-- =============================================================================================== Memory
+
+local ObservationMemory = {}
+ObservationMemory.__index = ObservationMemory
+ObservationMemory.Contact = Contact
+
+export type ObservationMemory = {
+	-- Ticks a second lasts (the physics rate), the seconds a lost contact's confidence takes to fall to nothing, and how long a contact
+	-- may go without new evidence before it counts as lost.
+	hz: number,
+	decayS: number,
+	holdInspectionS: number,
+	holdPeripheralS: number,
+	-- The tick the memory was last advanced to.
+	nowTick: number,
+	-- How many observations were ever ingested, by modality; for tests and the debug view.
+	ingested: number,
+	ingestedInspection: number,
+	ingestedPeripheral: number,
+	-- A new contact, or a track picked up again after it had been forgotten.
+	contactAcquired: Signal.Signal,
+	-- (contact, oldCategory, newCategory): the category a contact is believed to be refined (up) or fell back (down).
+	categoryChanged: Signal.Signal,
+	-- Sight of a contact ended: its hold time ran out with no new observation.
+	contactLost: Signal.Signal,
+	-- A lost contact was observed again: the same track, its record updated.
+	contactReacquired: Signal.Signal,
+	-- (contact, reason): a contact left the memory: "expired" (its confidence reached nothing), "empty" (the sensor inspected the
+	-- remembered spot and found nothing there), "merged" (a contact known only from cues turned out to be a lost one) or "captured".
+	contactEnded: Signal.Signal,
+	_contacts: { [string]: Contact },
+	_seq: number,
+}
+
+function ObservationMemory.new(): any
+	return setmetatable({
+		hz = 60.0,
+		decayS = 6.0,
+		holdInspectionS = 0.15,
+		holdPeripheralS = 1.0,
+		nowTick = 0,
+		ingested = 0,
+		ingestedInspection = 0,
+		ingestedPeripheral = 0,
+		contactAcquired = Signal.new(),
+		categoryChanged = Signal.new(),
+		contactLost = Signal.new(),
+		contactReacquired = Signal.new(),
+		contactEnded = Signal.new(),
+		_contacts = {},
+		_seq = 0,
+	}, ObservationMemory)
+end
+
+function ObservationMemory.configure(self: any, hz: number, decayS: number, holdInspectionS: number, holdPeripheralS: number)
+	self.hz = math.max(hz, 1.0)
+	self.decayS = math.max(decayS, 0.01)
+	self.holdInspectionS = math.max(holdInspectionS, 0.0)
+	self.holdPeripheralS = math.max(holdPeripheralS, 0.0)
+end
+
+function ObservationMemory.clear(self: any)
+	self._contacts = {}
+end
+
+function ObservationMemory.getContact(self: any, trackId: string): Contact?
+	return self._contacts[trackId]
+end
+
+function ObservationMemory.count(self: any): number
+	local n = 0
+	for _ in self._contacts do
+		n += 1
+	end
+	return n
+end
+
+-- Every contact, oldest first.
+function ObservationMemory.contacts(self: any): { Contact }
+	local out: { Contact } = {}
+	for _, c in self._contacts do
+		table.insert(out, c)
+	end
+	table.sort(out, function(a: Contact, b: Contact): boolean
+		if a.firstTick ~= b.firstTick then
+			return a.firstTick < b.firstTick
+		end
+		return a.seq < b.seq
+	end)
+	return out
+end
+
+local function filtered(list: { Contact }, keep: (Contact) -> boolean): { Contact }
+	local out: { Contact } = {}
+	for _, c in list do
+		if keep(c) then
+			table.insert(out, c)
+		end
+	end
+	return out
+end
+
+function ObservationMemory.liveContacts(self: any): { Contact }
+	return filtered(self:contacts(), function(c) return c.state == Contact.LIVE end)
+end
+
+function ObservationMemory.lostContacts(self: any): { Contact }
+	return filtered(self:contacts(), function(c) return c.state == Contact.LOST end)
+end
+
+-- Lost contacts that were inspected and whose spot has not been found empty: the last-seen marks.
+function ObservationMemory.marks(self: any): { Contact }
+	return filtered(self:contacts(), function(c) return Contact.hasMark(c) end)
+end
+
+-- Seconds since sight of a lost contact ended; 0 for a live one.
+function ObservationMemory.ageS(self: any, c: Contact): number
+	if c.state == Contact.LIVE then
+		return 0.0
+	end
+	return (self.nowTick - c.lostTick) / self.hz
+end
+
+-- How much of a thing's earlier inspection still counts if it is seen again: 1 for a live contact, falling to 0 as the memory of a lost one
+-- fades, 0 for a track that is gone.
+function ObservationMemory.familiarity(self: any, trackId: string): number
+	local c = self._contacts[trackId]
+	if c == nil then
+		return 0.0
+	end
+	if c.state == Contact.LIVE then
+		return 1.0
+	end
+	return PerceptionMath.decayedConfidence(1.0, self:ageS(c), self.decayS)
+end
+
+-- Seconds since the evidence that last updated the record.
+function ObservationMemory.observedAgeS(self: any, c: Contact): number
+	return (self.nowTick - c.observedTick) / self.hz
+end
+
+-- Seconds since the latest peripheral cue (a very large number if there never was one).
+function ObservationMemory.cueAgeS(self: any, c: Contact): number
+	return (self.nowTick - c.cueTick) / self.hz
+end
+
+-- 0 for a live contact and for one just lost, 1 when its memory is gone (the mark is at its stalest).
+function ObservationMemory.stalenessOf(self: any, c: Contact): number
+	if c.state == Contact.LIVE then
+		return 0.0
+	end
+	return PerceptionMath.staleness(self:ageS(c), self.decayS)
+end
+
+-- Ticks a contact may go without evidence of this modality before it counts as lost. The sensor reads the same number to tell unbroken
+-- sight (the thing is still the same contact) from sight that was lost.
+function ObservationMemory.holdTicks(self: any, modality: string): number
+	return math.round((if modality == INSPECTION then self.holdInspectionS else self.holdPeripheralS) * self.hz)
+end
+
+-- Take in one observation. A record that is not valid (spec 21.3) is refused and returns nil.
+function ObservationMemory.ingest(self: any, obs: Observation.Observation?): Contact?
+	if obs == nil or not Observation.isValid(obs) then
+		return nil
+	end
+	self.ingested += 1
+	local existing: Contact? = self._contacts[obs.trackId]
+	local fresh = existing == nil
+	local wasLost = false
+	local c: Contact
+	if existing == nil then
+		c = Contact.new()
+		c.trackId = obs.trackId
+		c.observerId = obs.observerId
+		c.firstTick = obs.observedTick
+		c.category = obs.category
+		self._seq += 1
+		c.seq = self._seq
+		self._contacts[c.trackId] = c
+	else
+		c = existing
+		wasLost = c.state == Contact.LOST
+	end
+	if obs.modality == PERIPHERAL then
+		self.ingestedPeripheral += 1
+		c.cueTick = obs.observedTick
+		c.cueDirection = obs.direction
+		c.cueCount += 1
+		if not fresh and c.hasPosition then
+			return c -- a bearing says nothing new about something that was inspected (see the header)
+		end
+	end
+	local oldCategory = c.category
+	c.state = Contact.LIVE
+	c.modality = obs.modality
+	c.confidence = obs.confidence
+	c.observedTick = obs.observedTick
+	c.direction = obs.direction
+	if obs.targetId ~= "" then
+		c.targetId = obs.targetId
+	end
+	if obs.modality == INSPECTION then
+		self.ingestedInspection += 1
+		c.hasPosition = true
+		c.position = obs.estimatedPosition
+		c.positionTick = obs.observedTick
+		c.sizeWu = obs.sizeWu
+		c.apparentSizeDeg = obs.apparentSizeDeg
+		c.speedWuS = obs.speedWuS
+		c.markValid = true
+		c.category = obs.category
+	end
+	if fresh then
+		self.contactAcquired:emit(c)
+	elseif wasLost then
+		c.reacquisitions += 1
+		self.contactReacquired:emit(c)
+	end
+	if c.category ~= oldCategory then
+		self.categoryChanged:emit(c, oldCategory, c.category)
+	end
+	return c
+end
+
+-- The ids of the contacts, oldest first (the order Godot's dictionary keeps them in).
+local function orderedIds(self: any): { string }
+	local list: { Contact } = {}
+	for _, c in self._contacts do
+		table.insert(list, c)
+	end
+	table.sort(list, function(a: Contact, b: Contact): boolean
+		return a.seq < b.seq
+	end)
+	local ids: { string } = {}
+	for _, c in list do
+		table.insert(ids, c.trackId)
+	end
+	return ids
+end
+
+-- Moves time on to `tick`: live contacts that have had no evidence for their hold time become lost, lost contacts lose confidence, and
+-- those with none left are forgotten.
+function ObservationMemory.advance(self: any, tick: number)
+	self.nowTick = tick
+	for _, id in orderedIds(self) do
+		local c: Contact? = self._contacts[id]
+		if c == nil then
+			continue
+		end
+		if c.state == Contact.LIVE then
+			if tick - c.observedTick > self:holdTicks(c.modality) then
+				c.state = Contact.LOST
+				c.lostTick = tick
+				c.confidenceAtLoss = c.confidence
+				c.targetId = "" -- sight is over: the link to the world goes with it
+				self.contactLost:emit(c)
+			end
+		end
+		if c.state == Contact.LOST then
+			local age = (tick - c.lostTick) / self.hz
+			c.confidence = PerceptionMath.decayedConfidence(c.confidenceAtLoss, age, self.decayS)
+			if age >= self.decayS - 1e-9 then
+				self._contacts[id] = nil
+				self.contactEnded:emit(c, "expired")
+			end
+		end
+	end
+end
+
+-- The sensor found that a contact it knew only from cues (it has no position) is the lost contact `intoId`, seen again: the bearing of
+-- the latest cue and the count of cues go to that record, and the cue-only contact is dropped (reason "merged"). Returns false when either
+-- is missing or the one to fold has a position of its own (an inspected contact is never folded into another).
+function ObservationMemory.merge(self: any, fromId: string, intoId: string): boolean
+	local a: Contact? = self._contacts[fromId]
+	local b: Contact? = self._contacts[intoId]
+	if a == nil or b == nil or a == b or a.hasPosition then
+		return false
+	end
+	if a.cueTick > b.cueTick then
+		b.cueTick = a.cueTick
+		b.cueDirection = a.cueDirection
+	end
+	b.cueCount += a.cueCount
+	self._contacts[fromId] = nil
+	self.contactEnded:emit(a, "merged")
+	return true
+end
+
+-- The sensor looked at a lost contact's last observed position, clearly and for long enough, and nothing was there: the memory of the
+-- spot is wrong, so it is dropped. Returns false for a contact that is not lost.
+function ObservationMemory.invalidate(self: any, trackId: string, reason: string?): boolean
+	local c: Contact? = self._contacts[trackId]
+	if c == nil or c.state ~= Contact.LOST then
+		return false
+	end
+	c.markValid = false
+	c.confidence = 0.0
+	self._contacts[trackId] = nil
+	self.contactEnded:emit(c, reason or "empty")
+	return true
+end
+
+-- The sensor resolved a capture by a live link or unique spatial bodily evidence.
+function ObservationMemory.resolveCapture(self: any, trackId: string): boolean
+	local c: Contact? = self._contacts[trackId]
+	if c == nil then
+		return false
+	end
+	self._contacts[trackId] = nil
+	self.contactEnded:emit(c, "captured")
+	return true
+end
+
+return ObservationMemory
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="33">
+          <Properties>
+            <string name="Name">PerceptionMath</string>
+            <string name="Source"><![CDATA[--!strict
+-- Pure helpers for the perception layer (spec 7): angles, apparent size, the exposure a classification needs, the evidence's
+-- confidence, the coarse direction a peripheral cue is given, how a remembered contact fades. A port of the frozen Godot
+-- scripts/perception/perception_math.gd (c87ce00), function for function, with the same numbers. Nothing here touches the scene.
+-- Checked against values exported from Godot (tests/perception_reference.json) and against the hand-written expectations of Godot's
+-- own unit tests (tests/unit/test_perception_math.gd), both in tests/perception.luau.
+local Observation = require(script.Parent.Observation)
+
+local PerceptionMath = {}
+
+local EPS = 1e-6
+PerceptionMath.EPS = EPS
+-- A peripheral cue is given a direction in sectors of the observer's own bearing, and in coarse bands of elevation.
+PerceptionMath.PITCH_BAND_DEG = 30.0
+-- Visibility of a sample point (A-024, D-039). A ray the world stops short of its sample point has not seen it: the world is in front of
+-- it. The only allowance is for a sample that lies in the skin of the surface the thing rests on or against and for the float error of a
+-- long cast: SIGHT_SHARE of the thing's own radius plus SIGHT_FLOAT_PER_WU for each WU of ray, and never more than SIGHT_CEILING.
+PerceptionMath.SIGHT_SHARE = 0.1
+PerceptionMath.SIGHT_FLOAT_PER_WU = 1.0e-5
+PerceptionMath.SIGHT_CEILING = 0.05
+
+local function isFinite(x: number): boolean
+	return x == x and x ~= math.huge and x ~= -math.huge
+end
+
+-- Godot's Vector3.normalized(): a vector with no length stays zero.
+local function normalized(v: Vector3): Vector3
+	local m = v.Magnitude
+	if m == 0 then
+		return Vector3.zero
+	end
+	return v / m
+end
+
+-- How far short of its sample point a ray may be stopped by the world and still count as having seen it (A-024). The sample points sit up
+-- to 0.8 of the radius off the centre, so for a thing of radius r the allowance is a tenth of r: a speck's whole body is never inside it,
+-- and a large thing resting on a wall still has the points that lie in the wall's face counted.
+function PerceptionMath.sightTolerance(radius: number, rayLength: number): number
+	return math.min(
+		PerceptionMath.SIGHT_CEILING,
+		PerceptionMath.SIGHT_SHARE * math.max(radius, 0.0) + PerceptionMath.SIGHT_FLOAT_PER_WU * math.max(rayLength, 0.0)
+	)
+end
+
+-- The furthest a lost contact's thing can be from where it was last observed when something is seen `elapsedS` later (A-027, D-040).
+-- Three parts, each an observation or an explicit assumption and none of them the truth about where the thing went: the sizes of the two
+-- sightings (a position is only good to about the size of what it was taken from), and the distance the thing could have covered in the
+-- time at the conservative speed bound, or at the speed it was last seen moving at if that was greater.
+function PerceptionMath.plausibleRadius(oldSizeWu: number, newSizeWu: number, elapsedS: number, speedBound: number, observedSpeed: number): number
+	return 0.5 * (math.max(oldSizeWu, 0.0) + math.max(newSizeWu, 0.0)) + math.max(speedBound, observedSpeed) * math.max(elapsedS, 0.0)
+end
+
+-- Whether two size estimates can belong to one thing: neither is more than `ratio` times the other. A size that is not known (zero) is
+-- compatible with anything.
+function PerceptionMath.sizesCompatible(a: number, b: number, ratio: number): boolean
+	if a <= EPS or b <= EPS then
+		return true
+	end
+	return math.max(a, b) <= math.min(a, b) * math.max(ratio, 1.0) + EPS
+end
+
+-- Whether a lost contact refined to `oldCategory` can be a thing whose appearance can be refined no further than `cap`: what was learned
+-- about the one cannot be finer than the other can ever look.
+function PerceptionMath.categoriesCompatible(oldCategory: string, cap: string): boolean
+	return Observation.rank(oldCategory) <= Observation.rank(cap)
+end
+
+-- Angle between two vectors (Godot's Vector3.angle_to, which needs no unit length), radians.
+function PerceptionMath.angleTo(a: Vector3, b: Vector3): number
+	return math.atan2(a:Cross(b).Magnitude, a:Dot(b))
+end
+
+-- Angle between two directions, radians; 0 when either has no length.
+function PerceptionMath.angleBetween(a: Vector3, b: Vector3): number
+	if a:Dot(a) < EPS * EPS or b:Dot(b) < EPS * EPS then
+		return 0.0
+	end
+	return PerceptionMath.angleTo(normalized(a), normalized(b))
+end
+
+-- True when `to` lies within `halfAngle` (radians) of `axis`.
+function PerceptionMath.inCone(axis: Vector3, to: Vector3, halfAngle: number): boolean
+	return to:Dot(to) > EPS * EPS and PerceptionMath.angleBetween(axis, to) <= halfAngle + 1e-9
+end
+
+-- How large a thing of `sizeWu` across looks from `distance`, degrees of angle.
+function PerceptionMath.apparentSizeDeg(sizeWu: number, distance: number): number
+	if distance <= EPS then
+		return 180.0
+	end
+	return math.deg(2.0 * math.atan(sizeWu * 0.5 / distance))
+end
+
+-- Continuous exposure a refinement needs: `baseS` for an easy target (one that looks at least `easyDeg` across), and proportionally
+-- longer the smaller it looks. Infinite for something with no apparent size.
+function PerceptionMath.requiredExposure(baseS: number, apparentDeg: number, easyDeg: number): number
+	if apparentDeg <= EPS then
+		return math.huge
+	end
+	return baseS * math.max(1.0, easyDeg / apparentDeg)
+end
+
+-- The category continuous exposure supports. Nothing smaller than `minDeg` is refined at all.
+function PerceptionMath.classify(exposureS: number, apparentDeg: number, easyS: number, flyS: number, easyDeg: number, minDeg: number): string
+	if apparentDeg < minDeg then
+		return Observation.MOVEMENT
+	end
+	if exposureS + EPS >= PerceptionMath.requiredExposure(flyS, apparentDeg, easyDeg) then
+		return Observation.FLY_LIKE_PREY
+	end
+	if exposureS + EPS >= PerceptionMath.requiredExposure(easyS, apparentDeg, easyDeg) then
+		return Observation.POSSIBLE_PREY
+	end
+	return Observation.MOVEMENT
+end
+
+-- Confidence of an inspection: it rises with exposure (to the fly-like refinement) and falls with how much of the thing is hidden. From
+-- 0.4 x 0.68 = 0.27 (one of five sample points seen, no exposure yet) to 1.
+function PerceptionMath.inspectionConfidence(exposureS: number, flyNeededS: number, visibleFraction: number): number
+	local progress = 0.0
+	if isFinite(flyNeededS) then
+		progress = math.clamp(exposureS / math.max(flyNeededS, EPS), 0.0, 1.0)
+	end
+	return math.clamp((0.4 + 0.6 * progress) * (0.6 + 0.4 * math.clamp(visibleFraction, 0.0, 1.0)), 0.0, 1.0)
+end
+
+-- Confidence of a peripheral cue: low, and a little higher the nearer it is. In [0.1, 0.3].
+function PerceptionMath.peripheralConfidence(distance: number, rangeWu: number): number
+	return math.clamp(0.1 + 0.2 * (1.0 - distance / math.max(rangeWu, EPS)), 0.1, 0.3)
+end
+
+-- The direction of a peripheral cue, coarse: its bearing about `up` from `forward` rounded to a sector, its elevation to a band of
+-- PITCH_BAND_DEG. Returns a unit vector. This is all a peripheral observation says about where.
+function PerceptionMath.quantizeDirection(dir: Vector3, forward: Vector3, up: Vector3, sectorDeg: number): Vector3
+	local d = normalized(dir)
+	local u = normalized(up)
+	local f = forward - u * forward:Dot(u)
+	if f:Dot(f) < EPS then
+		f = d - u * d:Dot(u)
+	end
+	if f:Dot(f) < EPS then
+		return d -- straight up or down: there is no bearing to round
+	end
+	f = normalized(f)
+	local right = normalized(f:Cross(u))
+	local yaw = math.atan2(d:Dot(right), d:Dot(f))
+	local pitch = math.asin(math.clamp(d:Dot(u), -1.0, 1.0))
+	local sector = math.rad(math.max(sectorDeg, 0.5))
+	local band = math.rad(PerceptionMath.PITCH_BAND_DEG)
+	local yq = math.round(yaw / sector) * sector
+	local pq = math.round(pitch / band) * band
+	return normalized(f * (math.cos(pq) * math.cos(yq)) + right * (math.cos(pq) * math.sin(yq)) + u * math.sin(pq))
+end
+
+-- Confidence of a contact that is no longer sensed: it falls straight to nothing over `decayS`, from the confidence it had when it was lost.
+function PerceptionMath.decayedConfidence(confidenceAtLoss: number, ageS: number, decayS: number): number
+	if decayS <= EPS then
+		return 0.0
+	end
+	return math.clamp(confidenceAtLoss * (1.0 - ageS / decayS), 0.0, 1.0)
+end
+
+-- 0 when a contact has only just been lost, 1 when its memory is gone.
+function PerceptionMath.staleness(ageS: number, decayS: number): number
+	if decayS <= EPS then
+		return 1.0
+	end
+	return math.clamp(ageS / decayS, 0.0, 1.0)
+end
+
+return PerceptionMath
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="34">
+          <Properties>
+            <string name="Name">Sensor</string>
+            <string name="Source"><![CDATA[--!strict
+-- Sensor: the world half of Godot's SensorSystem (scripts/perception/sensor_system.gd, c87ce00). SensorCore keeps what needs no world (which
+-- contact a sighting is filed under, how long a thing has been in view, the cue and its cooldown, the empty-spot check); this is what looks.
+-- Each tick it reads the observer's eye and gaze (never the camera's), takes the percept of every perceivable thing and decides what the
+-- senses could pick up of it:
+--   * a thing inside the broad peripheral field that moves and can be seen through at least one of its sample points gives a PERIPHERAL cue:
+--     a coarse bearing and nothing else, at most once per cue cooldown for each thing;
+--   * a thing inside the narrow inspection cone along the gaze that can be seen, and looks big enough, is INSPECTED: its position is
+--     estimated from the points that could be seen, and the longer it is held in the cone without a break the finer the category.
+-- Line of sight is five rays from the eye to sample points of the thing; a point the world stands in front of does not count. Nothing about a
+-- thing that cannot be seen reaches the memory: a hidden thing makes no observation, and the memory is never refreshed from where it
+-- really is. The sensor also looks at the spots where lost contacts were last seen (SensorCore.checkSpots, through _allVisible below).
+--
+-- Ported method for method from _physics_process (in its order), _sense, _visible_points, _sample_points, _clear, _all_visible, could_sense,
+-- describe_tracks, _record_cost, cost_percentile and reset. Not here: on_capture (the feeding chunk), Focus, and any presentation.
+--
+-- How a caller drives it: once at the START of every fixed tick (Godot's sensor runs at priority -10, before the motor and the things that
+-- move, so it reads the world as the previous tick committed it):
+--
+--   sensor:step(delta, observer, percepts, cast)
+--     observer  {eye, gaze, up, heading}: where the eyes are, the axis of the cone, the body's up and facing (the motor's observer())
+--     percepts  one SensorCore.Percept for every perceivable thing that is there to be sensed (a thing that is not simply is not listed)
+--     cast      (from, to) -> the position of the first WORLD hit on that segment, nil when it is clear. Only world geometry may stop it:
+--               not the observer, not the things sensed (Sensor.workspaceCast makes one from a RaycastParams).
+--
+-- Rates (spec 20): the broad scan of everything runs at broad_query_hz; things already tracked (a live contact), things whose last position
+-- is remembered as a mark, and things within close_check_range_wu of the eye are checked every tick. Tick numbering is Godot's: the tick
+-- counts up first (SensorCore.beginTick), so the first broad scan is tick 1 and the next is due 6 ticks later.
+--
+-- Where the counts live: the sensor's own are fields here (broadScans, rays, checks, cost); the ones SensorCore keeps for the bookkeeping it
+-- does are read from sensor.core (tick, cuesMade, inspectionsMade, spotChecksTotal and the cueEmitted signal).
+local PerceptionMath = require(script.Parent.PerceptionMath)
+local SensorCore = require(script.Parent.SensorCore)
+local ObservationMemory = require(script.Parent.ObservationMemory)
+
+local Contact = ObservationMemory.Contact
+
+local Sensor = {}
+Sensor.__index = Sensor
+
+Sensor.SAMPLE_COUNT = 5
+-- The sample points sit this share of a thing's radius off its centre.
+Sensor.SAMPLE_SPREAD = 0.8
+-- CPU time of the sensor tick in microseconds: a ring of the latest, for percentiles.
+Sensor.COST_RING = 1200
+-- T13a, the lateral eyes' motion sense (the spider-eye picture's shimmer): an entry stays this long after the thing was last seen moving.
+Sensor.MOTION_HOLD_TICKS = 15
+
+-- The observer the sensor reads (Godot: get_eye_position, get_gaze_direction, get_visual_up, get_heading_vector).
+export type Observer = { eye: Vector3, gaze: Vector3, up: Vector3, heading: Vector3 }
+-- The position of the first world hit on the segment from, to; nil when nothing of the world is in the way.
+export type Cast = (Vector3, Vector3) -> Vector3?
+-- What the last check of a thing found, for the developer view (Godot's Track.last_check): the fields appear as the check passes them.
+export type Check = {
+	inRange: boolean,
+	distance: number,
+	offAxisDeg: number?,
+	visiblePoints: number?,
+	inCone: boolean?,
+	apparentDeg: number?,
+}
+-- T13a: a thing the eyes could see moving on its last check: the sensed direction from the eye, the distance, how big it looked, the tick.
+export type Moving = { direction: Vector3, distance: number, apparent: number, tick: number }
+export type TrackRow = {
+	perceptId: string,
+	trackId: string,
+	exposureS: number,
+	inRange: boolean?,
+	distance: number?,
+	offAxisDeg: number?,
+	visiblePoints: number?,
+	inCone: boolean?,
+	apparentDeg: number?,
+}
+
+local EPS = 1e-6
+
+-- Godot's Vector3.normalized(): a vector with no length stays zero.
+local function normalized(v: Vector3): Vector3
+	local m = v.Magnitude
+	if m == 0 then
+		return Vector3.zero
+	end
+	return v / m
+end
+
+function Sensor.new(memory: any, observerId: string?): any
+	return setmetatable({
+		memory = memory,
+		core = SensorCore.new(memory, observerId),
+		enabled = true,
+		-- Statistics, for tests and the developer view.
+		broadScans = 0,
+		raysThisTick = 0,
+		maxRaysInATick = 0,
+		raysTotal = 0,
+		checksThisTick = 0,
+		checksTotal = 0,
+		-- The memory-spot checks' rays (also counted in raysTotal); their number of checks is core.spotChecksTotal.
+		spotRaysTotal = 0,
+		-- CPU time of the ticks that did the work, microseconds: the total, the largest and a ring of the latest for percentiles.
+		cpuUsTotal = 0,
+		cpuTicks = 0,
+		cpuUsMax = 0,
+		-- What the observer's eyes, gaze and up were on the last tick (the developer view draws the cones from them).
+		lastEye = Vector3.zero,
+		lastAxis = Vector3.new(0, 0, -1),
+		lastUp = Vector3.new(0, 1, 0),
+		-- T13a, for the spider-eye picture only: nothing reads it to decide anything and it holds only what the sightline checks found.
+		motionSeen = {} :: { [string]: Moving },
+		_checks = {} :: { [string]: Check },
+		_nextBroadTick = 0,
+		_ring = {} :: { number },
+		_costBase = 0,
+	}, Sensor)
+end
+
+-- Takes the perception section of a species profile (Species.<id>.perception) and sets the memory's timing to match.
+function Sensor.configureFrom(self: any, perception: { [string]: number })
+	self.core:configureFrom(perception)
+end
+
+function Sensor.getTrack(self: any, perceptId: string): SensorCore.Track?
+	return self.core:getTrack(perceptId)
+end
+
+-- The track a percept id is filed under, "" if it was never sensed. Tests and the developer view only.
+function Sensor.trackIdFor(self: any, perceptId: string): string
+	return self.core:trackIdFor(perceptId)
+end
+
+-- What the last check of a thing found (Godot: get_track(id).last_check); nil for a thing that has no track.
+function Sensor.lastCheck(self: any, perceptId: string): Check?
+	return self._checks[perceptId]
+end
+
+-- Forget everything about what is being tracked (the memory is cleared separately). The tick and the statistics go on.
+function Sensor.reset(self: any)
+	self.core:reset()
+	self.motionSeen = {}
+	self._checks = {}
+	self._nextBroadTick = 0
+end
+
+-- ================================================================================================ the tick
+
+-- One physics tick of the senses (Godot _physics_process): see the header for what the caller passes.
+function Sensor.step(self: any, delta: number, observer: Observer, percepts: { SensorCore.Percept }, cast: Cast)
+	self.raysThisTick = 0
+	self.checksThisTick = 0
+	if not self.enabled then
+		return
+	end
+	local t0 = os.clock()
+	local core = self.core
+	local tick: number = core:beginTick(delta) -- the tick counts up and every track's gap since it was last inspected grows
+	local eye, axis, up, forward = observer.eye, observer.gaze, observer.up, observer.heading
+	self.lastEye, self.lastAxis, self.lastUp = eye, axis, up
+	local broadDue = tick >= self._nextBroadTick
+	if broadDue then
+		self._nextBroadTick = tick + math.max(1, math.round(SensorCore.HZ / math.max(core.broadHz, 0.1)))
+		self.broadScans += 1
+	end
+	local inspected: { SensorCore.Inspected } = {}
+	local sightings: { SensorCore.Sighting } = {}
+	local present: { [string]: boolean } = {}
+	for _, p in percepts do
+		present[p.id] = true
+		local t = core:trackOf(p.id)
+		local c: ObservationMemory.Contact? = if t.trackId ~= "" then core.memory:getContact(t.trackId) else nil
+		local watching = c ~= nil and (c.state == Contact.LIVE or Contact.hasMark(c))
+		if broadDue or watching or (p.position - eye).Magnitude <= core.closeRangeWu then
+			self.checksThisTick += 1
+			self.checksTotal += 1
+			self:_sense(t, p, eye, axis, up, forward, cast, delta, inspected, sightings)
+		end
+	end
+	core:fileSightings(sightings, delta)
+	core:checkSpots(eye, axis, up, delta, inspected, function(from: Vector3, center: Vector3, radius: number, u: Vector3): boolean
+		return self:_allVisible(cast, from, center, radius, u)
+	end)
+	core:endTick(present) -- the memory moves on to this tick, then the tracks of things that are no longer there go
+	for id in self._checks do
+		if not present[id] then
+			self._checks[id] = nil
+		end
+	end
+	for id, m in self.motionSeen do
+		if not present[id] or tick - m.tick > Sensor.MOTION_HOLD_TICKS then
+			self.motionSeen[id] = nil
+		end
+	end
+	self.maxRaysInATick = math.max(self.maxRaysInATick, self.raysThisTick)
+	self:_recordCost(math.floor((os.clock() - t0) * 1.0e6 + 0.5))
+end
+
+-- What the eyes make of one thing (Godot _sense): in range, inside the peripheral field, the sample points that could be seen, and then
+-- either an inspection (in the cone and big enough to look at) or, if it moves, a cue.
+function Sensor._sense(self: any, t: SensorCore.Track, p: SensorCore.Percept, eye: Vector3, axis: Vector3, up: Vector3, forward: Vector3, cast: Cast, delta: number, inspected: { SensorCore.Inspected }, sightings: { SensorCore.Sighting })
+	local core = self.core
+	local center = p.position
+	local radius = math.max(p.radius, 0.01)
+	local to = center - eye
+	local dist = to.Magnitude
+	local reach: number = core:reachWu()
+	local check: Check = { inRange = dist <= reach, distance = dist }
+	self._checks[p.id] = check
+	if dist > reach or dist < SensorCore.MIN_DISTANCE then
+		return
+	end
+	local dir = to / dist
+	local offAxis = PerceptionMath.angleTo(axis, dir)
+	check.offAxisDeg = math.deg(offAxis)
+	if offAxis > math.rad(core.peripheralConeDeg) * 0.5 then
+		return
+	end
+	local seen = self:_visiblePoints(cast, eye, center, radius, up)
+	check.visiblePoints = #seen
+	if #seen == 0 then
+		return
+	end
+	local estimate = Vector3.zero
+	for _, s in seen do
+		estimate += s
+	end
+	estimate /= #seen
+	local estDir = normalized(estimate - eye)
+	local apparent = PerceptionMath.apparentSizeDeg(2.0 * radius, dist)
+	local inCone = offAxis <= math.rad(core.coneDeg) * 0.5
+	check.inCone = inCone
+	check.apparentDeg = apparent
+	local visibleFraction = #seen / Sensor.SAMPLE_COUNT
+	local speed = p.velocity.Magnitude
+	if speed >= core.motionMinSpeed then
+		self.motionSeen[p.id] = { direction = estDir, distance = dist, apparent = apparent, tick = core.tick }
+	end
+	if inCone and apparent >= core.minApparentDeg then
+		table.insert(sightings, { t = t, p = p, estimate = estimate, estDir = estDir, apparent = apparent, visibleFraction = visibleFraction })
+		table.insert(inspected, { position = estimate, radius = radius })
+	elseif speed >= core.motionMinSpeed and core.tick >= t.nextCueTick then
+		core:cue(t, estDir, forward, up, dist)
+	end
+end
+
+-- The sample points of a sphere of `radius` at `center` that the eye can see: the centre and four points a little off it, across the line of
+-- sight and along it. An empty list means none could be seen.
+function Sensor._visiblePoints(self: any, cast: Cast, eye: Vector3, center: Vector3, radius: number, up: Vector3): { Vector3 }
+	local out: { Vector3 } = {}
+	for _, s in Sensor.samplePoints(eye, center, radius, up) do
+		if self:_clear(cast, eye, s, radius) then
+			table.insert(out, s)
+		end
+	end
+	return out
+end
+
+-- Godot _sample_points: the centre, then +side, -side, +vert, -vert at SAMPLE_SPREAD of the radius, side across the line of sight and
+-- horizontal to the body (d x up; d x right when the thing is straight above or below) and vert across both.
+function Sensor.samplePoints(eye: Vector3, center: Vector3, radius: number, up: Vector3): { Vector3 }
+	local d = normalized(center - eye)
+	local side = d:Cross(up)
+	if side:Dot(side) < 1e-6 then
+		side = d:Cross(Vector3.new(1, 0, 0))
+	end
+	side = normalized(side)
+	local vert = normalized(side:Cross(d))
+	local r = radius * Sensor.SAMPLE_SPREAD
+	return { center, center + side * r, center - side * r, center + vert * r, center - vert * r }
+end
+
+-- True when the eye can see the sample point `to` of a thing of `radius`: the world stops the ray no further than a small allowance short of
+-- it (PerceptionMath.sightTolerance, A-024). A world hit before the point is occlusion; it is not forgiven because the point is near. Every
+-- ray is counted.
+function Sensor._clear(self: any, cast: Cast, from: Vector3, to: Vector3, radius: number): boolean
+	self.raysThisTick += 1
+	self.raysTotal += 1
+	local hit = cast(from, to)
+	if hit == nil then
+		return true
+	end
+	local length = (to - from).Magnitude
+	return (hit - from).Magnitude >= length - PerceptionMath.sightTolerance(radius, length)
+end
+
+-- A remembered spot is called empty only when every sample point of it is in plain view (the first one the world hides ends the check).
+-- The number of spot checks is counted by SensorCore.checkSpots; the rays they used are counted here and also in raysTotal.
+function Sensor._allVisible(self: any, cast: Cast, eye: Vector3, center: Vector3, radius: number, up: Vector3): boolean
+	local before: number = self.raysTotal
+	local all = true
+	for _, s in Sensor.samplePoints(eye, center, radius, up) do
+		if not self:_clear(cast, eye, s, radius) then
+			all = false
+			break
+		end
+	end
+	self.spotRaysTotal += self.raysTotal - before
+	return all
+end
+
+-- ================================================================================================ questions
+
+-- Whether the eye could sense a thing of `radius` at `center` right now: in range, inside the field of the peripheral eyes and at least one of
+-- its sample points in plain view, which is exactly what a sensed thing has to pass. Changes no state of the senses; the rays are counted.
+-- The prey population asks it before a replacement is let in (it must come in where the spider could not sense it).
+function Sensor.couldSense(self: any, observer: Observer, center: Vector3, radius: number, cast: Cast): boolean
+	local core = self.core
+	local eye = observer.eye
+	local to = center - eye
+	local dist = to.Magnitude
+	if dist > core:reachWu() then
+		return false
+	end
+	if dist < SensorCore.MIN_DISTANCE then
+		return true
+	end
+	if PerceptionMath.angleTo(observer.gaze, to / dist) > math.rad(core.peripheralConeDeg) * 0.5 then
+		return false
+	end
+	return #self:_visiblePoints(cast, eye, center, math.max(radius, 0.01), observer.up) > 0
+end
+
+-- Developer view: what the last check of each thing found (distance, off-axis angle, how many points were seen, whether it was in the cone),
+-- with the exposure so far. Truth-derived numbers, for developers only: nothing in the player's presentation reads this. Sorted by the
+-- world's id.
+function Sensor.describeTracks(self: any): { TrackRow }
+	local core = self.core
+	local out: { TrackRow } = {}
+	for pid, t in core._tracks do
+		local check: Check? = self._checks[pid]
+		local row: TrackRow = {
+			perceptId = pid,
+			trackId = t.trackId,
+			exposureS = if t.gapS <= core.graceS + EPS then t.exposure else 0.0,
+		}
+		if check ~= nil then
+			row.inRange, row.distance, row.offAxisDeg = check.inRange, check.distance, check.offAxisDeg
+			row.visiblePoints, row.inCone, row.apparentDeg = check.visiblePoints, check.inCone, check.apparentDeg
+		end
+		table.insert(out, row)
+	end
+	table.sort(out, function(a: TrackRow, b: TrackRow): boolean
+		return a.perceptId < b.perceptId
+	end)
+	return out
+end
+
+-- ================================================================================================ cost
+
+function Sensor._recordCost(self: any, us: number)
+	self.cpuUsTotal += us
+	self.cpuUsMax = math.max(self.cpuUsMax, us)
+	self._ring[self.cpuTicks % Sensor.COST_RING + 1] = us
+	self.cpuTicks += 1
+end
+
+-- Ticks measured since the window began (the start of the run, or the last resetCost()).
+function Sensor.costTicks(self: any): number
+	return self.cpuTicks - self._costBase
+end
+
+-- Percentile of the latest measured sensor ticks (since the window began), in microseconds.
+function Sensor.costPercentile(self: any, q: number): number
+	local n = math.min(self:costTicks(), Sensor.COST_RING)
+	if n <= 0 then
+		return 0
+	end
+	local xs: { number } = {}
+	for i = 0, n - 1 do
+		table.insert(xs, self._ring[(self.cpuTicks - 1 - i) % Sensor.COST_RING + 1])
+	end
+	table.sort(xs)
+	return xs[math.clamp(math.ceil(q * n), 1, n)]
+end
+
+-- Begins a new measuring window (the totals, the largest and the percentiles start again).
+function Sensor.resetCost(self: any)
+	self.cpuUsTotal = 0
+	self.cpuUsMax = 0
+	self._costBase = self.cpuTicks
+end
+
+-- ================================================================================================ the engine's rays
+
+-- A cast made of the engine's raycast: the position of the first hit on the segment, nil when it is clear. The caller decides what the rays
+-- may meet in `params` (the sill: not the spider, not the things sensed, not anything drawn only).
+function Sensor.workspaceCast(params: RaycastParams): Cast
+	return function(from: Vector3, to: Vector3): Vector3?
+		local hit = workspace:Raycast(from, to - from, params)
+		return if hit ~= nil then hit.Position else nil
+	end
+end
+
+return Sensor
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="35">
+          <Properties>
+            <string name="Name">SensorCore</string>
+            <string name="Source"><![CDATA[--!strict
+-- SensorCore: the half of Godot's SensorSystem (scripts/perception/sensor_system.gd, c87ce00) that needs no world. The sensor turns world
+-- truth into evidence and nothing more; this is what it does with the evidence once the eye has found it: which contact a sighting is filed
+-- under (continuous sight, a lost contact it can only be, or a fresh one), how long a thing has been in view and so how finely it can be
+-- classified, the peripheral cue, and the looking at remembered spots that drops a mark when the place is seen empty. Ported method for
+-- method from _is_linked, _cue_contact, _file_sightings, _placed_and_unbroken, _inspection_contact, _lost_candidates, _inspect, _cue,
+-- _check_spots, _forget_gone and the head and tail of _physics_process. NOT here (the next part of the port): the rays that decide what
+-- was in plain view (_sense, _visible_points, _clear, _sample_points), the eye and gaze, the broad scan and its rates, Focus, the
+-- developer overlay and the motion shimmer. Capture (on_capture) belongs to the feeding chunk. A caller does what _physics_process does:
+--
+--   core:beginTick(delta)                      -- tick += 1, every track's gap grows by delta
+--   core:trackOf(id)                           -- once per percept that exists, sighted or not (creates its track)
+--   core:cue(...)                              -- for each thing that gave a peripheral cue this tick
+--   core:fileSightings(sightings, delta)       -- all of the tick's inspections together (the association rule needs them together)
+--   core:checkSpots(eye, axis, up, delta, inspected, allVisible)
+--   core:endTick(present)                      -- memory:advance(tick), then forget the tracks of things that left the world
+--
+-- Who is who (A-027, D-040). Three things are kept apart. The world's id for a thing is how the sensor finds it again each tick (the key of
+-- _tracks); it is never the spider's idea of who the thing is. A contact (the memory's track id) is the spider's hypothesis that some
+-- observations are of one visible thing. Familiarity is what earlier exposure to a contact taught, kept per contact (_kept) and faded with
+-- the memory of it. A thing's evidence stays under one contact while sight of it is unbroken: the contact is live and the thing itself was
+-- filed under it within the memory's hold time for that kind of evidence. Once sight has been lost the world id decides nothing: a new
+-- inspection is compared with the lost contacts by where each was last observed, how long ago, how big it looked, what it can look like and
+-- how fast it was seen moving, and is taken for a lost contact only when exactly one of them could be it and no other thing sighted in the
+-- same tick could be it either (two look-alikes that come into view together are two fresh contacts, and the order the world lists them in
+-- decides nothing); otherwise it is a fresh contact that starts again at "movement" and inherits no exposure. A bare cue has no place to
+-- compare, so it is always a weak new contact; the inspection that follows it makes the comparison, and a cue-only contact that turns out
+-- to be a lost one is folded into it.
+local Observation = require(script.Parent.Observation)
+local PerceptionMath = require(script.Parent.PerceptionMath)
+local Signal = require(script.Parent.Signal)
+local ObservationMemory = require(script.Parent.ObservationMemory)
+
+local Contact = ObservationMemory.Contact
+local EPS = 1e-6
+
+local SensorCore = {}
+SensorCore.__index = SensorCore
+
+-- One game clock: the senses count in its ticks (SimClock.HZ), never in the engine's rate.
+SensorCore.HZ = 60
+SensorCore.MIN_DISTANCE = 0.05
+
+-- What the sensor keeps for each thing it can sense, under the world's id for it. It is the channel to a visible thing, not an identity.
+export type Track = {
+	perceptId: string,
+	-- The contact this thing's evidence is filed under while sight of it is unbroken. "" until the first observation (only a thing that has
+	-- been sensed has one); it is replaced, not trusted, once sight of the thing has been lost.
+	trackId: string,
+	-- The tick of the last evidence of this thing that was filed under that contact.
+	linkTick: number,
+	-- Continuous exposure in the cone, seconds.
+	exposure: number,
+	-- Seconds since the last inspected tick.
+	gapS: number,
+	nextCueTick: number,
+}
+
+-- What may be sensed: the world's truth about a thing, which only the eye reads (Godot's Perceivable percept).
+export type Percept = {
+	id: string,
+	position: Vector3,
+	radius: number,
+	velocity: Vector3,
+	-- The finest category its appearance can ever be refined to (fly-like prey for something that looks like easy prey up close, movement
+	-- for something that never looks like more). nil is fly-like prey.
+	maxCategory: string?,
+}
+
+-- One thing in the inspection cone this tick, as the eye made it: where it was seen (the mean of the sample points in plain view), the
+-- direction to there, how big it looked and how much of it was in view.
+export type Sighting = {
+	t: Track,
+	p: Percept,
+	estimate: Vector3,
+	estDir: Vector3,
+	apparent: number,
+	visibleFraction: number,
+	match: string?,
+	candidates: { string }?,
+}
+
+-- A thing inspected this tick (position and radius), which the spot checks must not call an empty place.
+export type Inspected = { position: Vector3, radius: number }
+
+function SensorCore.new(memory: any, observerId: string?): any
+	return setmetatable({
+		memory = memory,
+		observerId = observerId or "spider",
+		-- Parameters: the species profile's perception section (configureFrom). The defaults are Godot's.
+		coneDeg = 30.0,
+		peripheralConeDeg = 300.0,
+		sectorDeg = 22.5,
+		rangeWu = 40.0,
+		-- How far the eyes reach now, as a share of rangeWu (1 in daylight; the life clock lowers it at night).
+		rangeScale = 1.0,
+		easyS = 0.4,
+		flyS = 1.0,
+		easyApparentDeg = 3.0,
+		minApparentDeg = 0.6,
+		motionMinSpeed = 0.3,
+		cueCooldownS = 0.8,
+		broadHz = 10.0,
+		closeRangeWu = 4.0,
+		graceS = 0.15,
+		decayS = 6.0,
+		-- The association rule (A-027): the assumed top speed of anything unseen, and the size ratio that still counts as one thing.
+		contactSpeedBound = 2.0,
+		contactSizeRatio = 1.5,
+		-- Statistics, for tests and the developer overlay.
+		tick = 0,
+		inspectionsMade = 0,
+		cuesMade = 0,
+		spotChecksTotal = 0,
+		-- Emitted for every peripheral cue made (after the cooldown), for tests and the developer view.
+		cueEmitted = Signal.new(),
+		_tracks = {} :: { [string]: Track },
+		_serial = 0,
+		_spots = {} :: { [string]: { exposure: number, gap: number } },
+		_kept = {} :: { [string]: number }, -- track id -> continuous exposure the contact had when sight of it last ended
+	}, SensorCore)
+end
+
+-- Takes the perception section of a species profile (spec 21.1: Species.<id>.perception, snake_case as in the data) and sets the memory's
+-- timing to match.
+function SensorCore.configureFrom(self: any, p: { [string]: number })
+	self.coneDeg = p.inspect_cone_degrees
+	self.peripheralConeDeg = p.peripheral_cone_degrees
+	self.sectorDeg = p.peripheral_sector_degrees
+	self.rangeWu = p.sensor_range_wu
+	self.easyS = p.easy_target_inspection_s
+	self.flyS = p.fly_like_inspection_s
+	self.easyApparentDeg = p.easy_apparent_size_deg
+	self.minApparentDeg = p.min_apparent_size_deg
+	self.motionMinSpeed = p.motion_min_speed_wu_s
+	self.cueCooldownS = p.cue_cooldown_s
+	self.broadHz = p.broad_query_hz
+	self.closeRangeWu = p.close_check_range_wu
+	self.graceS = p.exposure_grace_s
+	self.decayS = p.memory_decay_s
+	self.contactSpeedBound = p.contact_speed_bound_wu_s
+	self.contactSizeRatio = p.contact_size_ratio
+	if self.memory ~= nil then
+		self:applyToMemory()
+	end
+end
+
+-- The memory's timing follows the sensor's: a cue repeats every cooldown, so a peripheral contact is held a little longer than that; an
+-- inspection comes every tick, so it is held for the exposure grace.
+function SensorCore.applyToMemory(self: any)
+	self.memory:configure(SensorCore.HZ, self.decayS, self.graceS, self.cueCooldownS + 0.2)
+end
+
+-- The range every check uses.
+function SensorCore.reachWu(self: any): number
+	return self.rangeWu * math.clamp(self.rangeScale, 0.0, 1.0)
+end
+
+function SensorCore.getTrack(self: any, perceptId: string): Track?
+	return self._tracks[perceptId]
+end
+
+-- The track a percept id is filed under, "" if it was never sensed. Tests and the developer overlay only.
+function SensorCore.trackIdFor(self: any, perceptId: string): string
+	local t: Track? = self._tracks[perceptId]
+	return if t == nil then "" else t.trackId
+end
+
+-- Forget everything about what is being tracked (the memory is cleared separately).
+function SensorCore.reset(self: any)
+	self._tracks = {}
+	self._spots = {}
+	self._kept = {}
+end
+
+function SensorCore.trackOf(self: any, perceptId: string): Track
+	local t: Track? = self._tracks[perceptId]
+	if t == nil then
+		t = {
+			perceptId = perceptId,
+			trackId = "",
+			linkTick = -1000000,
+			exposure = 0.0,
+			gapS = 1.0e9,
+			nextCueTick = 0,
+		}
+		self._tracks[perceptId] = t
+	end
+	return t :: Track
+end
+
+-- The head of a physics tick: the clock moves on and every track's gap since it was last inspected grows. Returns the tick.
+function SensorCore.beginTick(self: any, delta: number): number
+	self.tick += 1
+	for _, t in self._tracks do
+		t.gapS += delta
+	end
+	return self.tick
+end
+
+-- The tail of a physics tick: the memory moves on to this tick, then the tracks of things that are no longer there are dropped.
+function SensorCore.endTick(self: any, present: { [string]: boolean })
+	self.memory:advance(self.tick)
+	self:forgetGone(present)
+end
+
+-- Lifecycle (A-029): a thing that is no longer there to be sensed (its node left the world, or it gives no percept) loses its entry; the
+-- contacts it made are not touched, they fade and expire on their own clocks. Exposure kept for a contact that is gone goes too.
+function SensorCore.forgetGone(self: any, present: { [string]: boolean })
+	for pid in self._tracks do
+		if not present[pid] then
+			self._tracks[pid] = nil
+		end
+	end
+	for id in self._kept do
+		if self.memory:getContact(id) == nil then
+			self._kept[id] = nil
+		end
+	end
+end
+
+-- A new contact for a thing, with an opaque id; the thing is filed under it from now on.
+function SensorCore.newContactFor(self: any, t: Track): string
+	self._serial += 1
+	t.trackId = `trk_{self._serial}`
+	return t.trackId
+end
+
+-- True while this thing's evidence is a continuation of the contact it was last filed under (A-027): that contact is live and the thing
+-- itself was filed under it within the memory's hold time for that kind of evidence. Sight that was lost for longer is not unbroken,
+-- whatever the world's id says, and neither is sight of a thing whose contact someone else kept alive.
+function SensorCore.isLinked(self: any, t: Track): boolean
+	if t.trackId == "" then
+		return false
+	end
+	local c: ObservationMemory.Contact? = self.memory:getContact(t.trackId)
+	return c ~= nil and c.state == Contact.LIVE and self.tick - t.linkTick <= self.memory:holdTicks(c.modality)
+end
+
+-- The contact a cue is filed under: the one the thing is unbrokenly filed under, else a new one (a bearing cannot say which remembered
+-- place this is).
+function SensorCore.cueContact(self: any, t: Track): string
+	return if self:isLinked(t) then t.trackId else self:newContactFor(t)
+end
+
+-- The sightings of this tick that are first looks after a loss of sight (or at a thing known only from cues) are compared with the lost
+-- contacts together, not one after the other (A-027): a lost contact is taken by a sighting only when it is that sighting's one candidate
+-- and no other sighting of the tick could be it either. Two look-alikes that come into view at once, both inside the region one lost contact
+-- could have reached, are two fresh contacts, whichever of them the sensor happens to handle first; and the order the world lists its
+-- things in, like the world's ids, decides nothing. Then each sighting is filed.
+function SensorCore.fileSightings(self: any, sightings: { Sighting }, delta: number)
+	if #sightings == 0 then
+		return
+	end
+	local claims: { [string]: number } = {} -- lost contact id -> how many sightings of this tick could be it
+	for _, s in sightings do
+		s.match = ""
+		s.candidates = {}
+		if self:placedAndUnbroken(s.t) then
+			continue
+		end
+		local found = self:lostCandidates(s.estimate, 2.0 * s.p.radius, s.p.maxCategory or Observation.FLY_LIKE_PREY)
+		s.candidates = found
+		for _, id in found do
+			claims[id] = (claims[id] or 0) + 1
+		end
+	end
+	for _, s in sightings do
+		local found = s.candidates :: { string }
+		if #found == 1 and claims[found[1]] == 1 then
+			s.match = found[1]
+		end
+	end
+	for _, s in sightings do
+		self:inspect(s.t, s.p, s.estimate, s.estDir, s.apparent, s.visibleFraction, delta, s.match :: string)
+	end
+end
+
+-- True while the thing's evidence is a continuation of a contact that already has a place: nothing to compare.
+function SensorCore.placedAndUnbroken(self: any, t: Track): boolean
+	return self:isLinked(t) and self.memory:getContact(t.trackId).hasPosition
+end
+
+-- The contact an inspection is filed under (A-027). Unbroken sight of a thing already being inspected: the same contact. Otherwise this is
+-- the first inspection after a loss of sight, or of a thing known only from cues: if the comparison made with the other sightings of the
+-- tick (fileSightings) found exactly one lost contact it could be, it is that one (a contact known only from cues is folded into it); if it
+-- found none, or more than one, it is the contact the cues made or a new one, with nothing carried over.
+function SensorCore.inspectionContact(self: any, t: Track, matched: string): string
+	local linked = self:isLinked(t)
+	if linked and self.memory:getContact(t.trackId).hasPosition then
+		return t.trackId
+	end
+	if matched ~= "" then
+		if linked then
+			self.memory:merge(t.trackId, matched)
+		end
+		t.trackId = matched
+		return matched
+	end
+	return if linked then t.trackId else self:newContactFor(t)
+end
+
+-- The lost contacts a new sighting could be (their track ids; empty when none). A contact could be it when the sighting is inside the region
+-- its thing could have reached since it was last observed (a function of the time and the speed bound, never of where the thing went),
+-- looks about as big, and is not finer in appearance than what was learned. Only a focused sighting is ever asked: a bearing cue says
+-- nothing about which remembered place this is.
+function SensorCore.lostCandidates(self: any, estimate: Vector3, sizeWu: number, cap: string): { string }
+	local found: { string } = {}
+	for _, m in self.memory:marks() do
+		local elapsed = (self.tick - m.positionTick) / SensorCore.HZ
+		local reach = PerceptionMath.plausibleRadius(m.sizeWu, sizeWu, elapsed, self.contactSpeedBound, m.speedWuS)
+		if (estimate - m.position).Magnitude > reach then
+			continue
+		end
+		if not PerceptionMath.sizesCompatible(m.sizeWu, sizeWu, self.contactSizeRatio) then
+			continue
+		end
+		if not PerceptionMath.categoriesCompatible(m.category, cap) then
+			continue
+		end
+		table.insert(found, m.trackId)
+	end
+	return found
+end
+
+-- One inspection of a thing in the cone: its exposure (a new stretch after a break longer than the grace starts from what the contact it
+-- belongs to was taught, as much as the memory of it lasts), the category that exposure supports (never finer than the thing can look),
+-- and the Observation the memory takes in.
+function SensorCore.inspect(self: any, t: Track, p: Percept, estimate: Vector3, estDir: Vector3, apparent: number, visibleFraction: number, delta: number, matched: string)
+	local cap = p.maxCategory or Observation.FLY_LIKE_PREY
+	local id: string = self:inspectionContact(t, matched)
+	if t.gapS > self.graceS + EPS then
+		-- A new stretch of exposure. What an earlier one taught the contact it belongs to still counts, as much as the memory of it does: a
+		-- new contact has been taught nothing.
+		t.exposure = (self._kept[id] or 0.0) * self.memory:familiarity(id)
+	end
+	t.exposure += delta
+	self._kept[id] = t.exposure
+	t.gapS = 0.0
+	local category = PerceptionMath.classify(t.exposure, apparent, self.easyS, self.flyS, self.easyApparentDeg, self.minApparentDeg)
+	if Observation.rank(category) > Observation.rank(cap) then
+		category = cap
+	end
+	local obs = Observation.new()
+	obs.observerId = self.observerId
+	obs.trackId = id
+	obs.targetId = if Observation.rank(category) >= Observation.rank(Observation.POSSIBLE_PREY) then p.id else ""
+	obs.modality = Observation.INSPECTION
+	obs.hasPosition = true
+	obs.estimatedPosition = estimate
+	obs.direction = estDir
+	obs.confidence = PerceptionMath.inspectionConfidence(t.exposure, PerceptionMath.requiredExposure(self.flyS, apparent, self.easyApparentDeg), visibleFraction)
+	obs.observedTick = self.tick
+	obs.category = category
+	obs.sizeWu = 2.0 * p.radius
+	obs.apparentSizeDeg = apparent
+	obs.speedWuS = p.velocity.Magnitude
+	if self.memory:ingest(obs) ~= nil then
+		self.inspectionsMade += 1
+		t.linkTick = self.tick
+	end
+end
+
+-- A peripheral cue: a coarse bearing, low confidence, and nothing else. The caller has already decided that the thing moves, is in the
+-- field and in sight, and that `self.tick >= t.nextCueTick` (at most one cue per cooldown for each thing).
+function SensorCore.cue(self: any, t: Track, estDir: Vector3, forward: Vector3, up: Vector3, dist: number)
+	t.nextCueTick = self.tick + math.round(self.cueCooldownS * SensorCore.HZ)
+	local obs = Observation.new()
+	obs.observerId = self.observerId
+	obs.trackId = self:cueContact(t)
+	obs.modality = Observation.PERIPHERAL
+	obs.hasPosition = false
+	obs.direction = PerceptionMath.quantizeDirection(estDir, forward, up, self.sectorDeg)
+	obs.confidence = PerceptionMath.peripheralConfidence(dist, self:reachWu())
+	obs.observedTick = self.tick
+	obs.category = Observation.MOVEMENT
+	if self.memory:ingest(obs) ~= nil then
+		self.cuesMade += 1
+		t.linkTick = self.tick
+		self.cueEmitted:emit(obs)
+	end
+end
+
+-- The remembered spots of lost contacts: inspecting one that is in plain view and empty drops its mark. A spot is looked at when it is in
+-- the cone, close enough that the thing would look big enough, and entirely in plain view (`allVisible(eye, position, radius, up)`: the
+-- rays, which the world half supplies) with nothing inspected there this tick; it must be looked at for the time an easy target needs
+-- (a break up to the grace does not start it again).
+function SensorCore.checkSpots(self: any, eye: Vector3, axis: Vector3, up: Vector3, delta: number, inspected: { Inspected }, allVisible: (Vector3, Vector3, number, Vector3) -> boolean)
+	local half = math.rad(self.coneDeg) * 0.5
+	local marks: { ObservationMemory.Contact } = self.memory:marks()
+	for id in self._spots do
+		local still = false
+		for _, m in marks do
+			if m.trackId == id then
+				still = true
+			end
+		end
+		if not still then
+			self._spots[id] = nil
+		end
+	end
+	for _, m in marks do
+		local st = self._spots[m.trackId] or { exposure = 0.0, gap = 1.0e9 }
+		st.gap += delta
+		local to = m.position - eye
+		local dist = to.Magnitude
+		local size = math.max(m.sizeWu, 0.2)
+		local apparent = PerceptionMath.apparentSizeDeg(size, dist)
+		local plain = false
+		if dist >= SensorCore.MIN_DISTANCE and dist <= self:reachWu() and PerceptionMath.angleTo(axis, to / dist) <= half and apparent >= self.minApparentDeg then
+			self.spotChecksTotal += 1
+			plain = allVisible(eye, m.position, size * 0.5, up)
+			if plain then
+				for _, q in inspected do
+					if (q.position - m.position).Magnitude < size + q.radius then
+						plain = false -- something is there: not an empty spot
+					end
+				end
+			end
+		end
+		if plain then
+			if st.gap > self.graceS + EPS then
+				st.exposure = 0.0
+			end
+			st.exposure += delta
+			st.gap = 0.0
+			if st.exposure + EPS >= PerceptionMath.requiredExposure(self.easyS, apparent, self.easyApparentDeg) then
+				self.memory:invalidate(m.trackId, "empty")
+				self._spots[m.trackId] = nil
+				continue
+			end
+		end
+		self._spots[m.trackId] = st
+	end
+end
+
+return SensorCore
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="36">
+          <Properties>
+            <string name="Name">Signal</string>
+            <string name="Source"><![CDATA[--!strict
+-- A minimal in-process signal, the stand-in for a Godot `signal`: handlers run synchronously, in the order they were connected, when
+-- the signal is emitted. Pure Luau (no BindableEvent) so the plain CLI can run the perception logic that announces its changes with it.
+local Signal = {}
+Signal.__index = Signal
+
+export type Signal = {
+	connect: (self: Signal, handler: (...any) -> ()) -> () -> (),
+	emit: (self: Signal, ...any) -> (),
+}
+
+function Signal.new(): Signal
+	return setmetatable({ _handlers = {} }, Signal) :: any
+end
+
+-- Returns a function that disconnects this handler.
+function Signal.connect(self: any, handler: (...any) -> ()): () -> ()
+	table.insert(self._handlers, handler)
+	return function()
+		local i = table.find(self._handlers, handler)
+		if i then
+			table.remove(self._handlers, i)
+		end
+	end
+end
+
+function Signal.emit(self: any, ...: any)
+	local handlers: { (...any) -> () } = table.clone(self._handlers)
+	for _, handler in handlers do
+		handler(...)
+	end
+end
+
+return Signal
+]]></string>
+          </Properties>
+        </Item>
+      </Item>
+      <Item class="Folder" referent="37">
         <Properties>
           <string name="Name">Rig</string>
         </Properties>
-        <Item class="ModuleScript" referent="29">
+        <Item class="ModuleScript" referent="38">
           <Properties>
             <string name="Name">Anatomy</string>
             <string name="Source"><![CDATA[--!strict
@@ -3314,7 +5165,7 @@ return Anatomy
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="30">
+        <Item class="ModuleScript" referent="39">
           <Properties>
             <string name="Name">Idle</string>
             <string name="Source"><![CDATA[--!strict
@@ -3371,7 +5222,7 @@ return Idle
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="31">
+        <Item class="ModuleScript" referent="40">
           <Properties>
             <string name="Name">Setae</string>
             <string name="Source"><![CDATA[--!strict
@@ -3682,7 +5533,7 @@ return Setae
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="32">
+        <Item class="ModuleScript" referent="41">
           <Properties>
             <string name="Name">SpiderRig</string>
             <string name="Source"><![CDATA[--!strict
@@ -4291,11 +6142,11 @@ return SpiderRig
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="33">
+      <Item class="Folder" referent="42">
         <Properties>
           <string name="Name">UI</string>
         </Properties>
-        <Item class="ModuleScript" referent="34">
+        <Item class="ModuleScript" referent="43">
           <Properties>
             <string name="Name">ControlText</string>
             <string name="Source"><![CDATA[--!strict
@@ -4514,7 +6365,7 @@ return ControlText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="35">
+        <Item class="ModuleScript" referent="44">
           <Properties>
             <string name="Name">HudLayout</string>
             <string name="Source"><![CDATA[--!strict
@@ -4537,6 +6388,7 @@ HudLayout.TOUCH_BUTTONS = {
 	{ action = "Creep", label = "Creep", x = -86, y = -172, size = 60, right = true },
 	{ action = "Drop", label = "Silk", x = -86, y = -242, size = 60, right = true },
 	{ action = "Recenter", label = "Re-\ncenter", x = -160, y = -168, size = 52, right = true, textSize = 14 },
+	{ action = "Focus", label = "Focus", x = -236, y = -242, size = 60, right = true, textSize = 14 },
 	{ action = "Eye", label = "Eye", x = -156, y = -242, size = 60, right = true },
 } :: { Button }
 
@@ -4593,18 +6445,83 @@ return HudLayout
 ]]></string>
           </Properties>
         </Item>
+        <Item class="ModuleScript" referent="45">
+          <Properties>
+            <string name="Name">PerceptionText</string>
+            <string name="Source"><![CDATA[--!strict
+-- Frozen perception_text.gd: words belong to presentation, never the sensor.
+local Text = {}
+local names = {movement="movement", possible_prey="possible prey", fly_like_prey="fly-like prey"}
+function Text.category(category: string): string
+	return (names :: {[string]: string})[category] or "movement"
+end
+function Text.hasNumber(text: string): boolean return string.find(text, "[%d%%]") ~= nil end
+Text.LOST = "lost sight"
+return table.freeze(Text)
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="46">
+          <Properties>
+            <string name="Name">PerceptionView</string>
+            <string name="Source"><![CDATA[--!strict
+-- Pure build_view from perception_hud.gd. Only memory and a camera adapter enter; never world actors.
+local Text = require(script.Parent.PerceptionText)
+local View = {}
+function View.edgeFade(age: number): number
+	if age < 0 or age >= 1.4 then return 0 end
+	local t = math.clamp(age / 0.12, 0, 1)
+	return t*t*(3-2*t) * (1-age/1.4)^1.5
+end
+function View.build(memory: any, camera: any, showMark: boolean?): any
+	local out: any = {edges={}, rings={}, labels={}}
+	local sectors: {[number]: any} = {}
+	for _, c in memory:contacts() do
+		if c.cueCount > 0 and c.cueDirection.Magnitude > 0.7 and not c:isInspectedNow() then
+			local alpha = 0.6 * View.edgeFade(memory:cueAgeS(c))
+			if alpha > 0 then
+				local e = camera.edge(c.cueDirection)
+				e.alpha, e.trackId = alpha, c.trackId
+				local sector = math.floor(math.atan2(c.cueDirection.X, c.cueDirection.Z) / (math.pi/8) + 0.5)
+				if not sectors[sector] or sectors[sector].alpha < alpha then sectors[sector] = e end
+			end
+		end
+		if not c.hasPosition then continue end
+		local point, visible, radius = camera.project(c.position, c.sizeWu)
+		if not visible then continue end
+		if c:isInspectedNow() then
+			table.insert(out.rings, {pos=point, radius=radius, alpha=0.85, dash=1, kind="live", trackId=c.trackId})
+			table.insert(out.labels, {pos=point, offset=radius+8, text=Text.category(c.category), alpha=1})
+		elseif c:hasMark() then
+			local stale = memory:stalenessOf(c)
+			local covered = camera.covered(c.position, math.max(c.sizeWu, 0.2)*0.5+0.06)
+			if showMark ~= false then
+				table.insert(out.rings, {pos=point, radius=radius, alpha=(0.6-0.48*stale)*(if covered then 0.6 else 1),
+					dash=1-0.7*stale, kind="mark", trackId=c.trackId})
+			end
+			local age = memory:ageS(c)
+			if age < 2.5 then table.insert(out.labels, {pos=point, offset=radius+8, text=Text.LOST, alpha=math.clamp(1-age/2.5,0,1)}) end
+		end
+	end
+	for _, e in sectors do table.insert(out.edges, e) end
+	return out
+end
+return View
+]]></string>
+          </Properties>
+        </Item>
       </Item>
     </Item>
   </Item>
-  <Item class="ServerScriptService" referent="36">
+  <Item class="ServerScriptService" referent="47">
     <Properties>
       <string name="Name">ServerScriptService</string>
     </Properties>
-    <Item class="Folder" referent="37">
+    <Item class="Folder" referent="48">
       <Properties>
         <string name="Name">Server</string>
       </Properties>
-      <Item class="Script" referent="38">
+      <Item class="Script" referent="49">
         <Properties>
           <string name="Name">Main</string>
           <token name="RunContext">0</token>
@@ -4649,19 +6566,144 @@ sill.Parent = Workspace
       </Item>
     </Item>
   </Item>
-  <Item class="StarterPlayer" referent="39">
+  <Item class="StarterPlayer" referent="50">
     <Properties>
       <string name="Name">StarterPlayer</string>
     </Properties>
-    <Item class="StarterPlayerScripts" referent="40">
+    <Item class="StarterPlayerScripts" referent="51">
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="Folder" referent="41">
+      <Item class="Folder" referent="52">
         <Properties>
           <string name="Name">Client</string>
         </Properties>
-        <Item class="ModuleScript" referent="42">
+        <Item class="ModuleScript" referent="53">
+          <Properties>
+            <string name="Name">PerceptionHud</string>
+            <string name="Source"><![CDATA[--!strict
+-- Thin drawer for the pure memory view. Reuses widgets rather than creating Instances every frame.
+local Shared = game:GetService("ReplicatedStorage"):WaitForChild("Shared")
+local View = require(Shared.UI.PerceptionView)
+local Hud = {}
+Hud.__index = Hud
+function Hud.new(parent: Instance): any
+	local gui = Instance.new("ScreenGui")
+	gui.Name, gui.IgnoreGuiInset, gui.ResetOnSpawn = "PerceptionHud", true, false
+	gui.DisplayOrder = 4
+	gui.Parent = parent
+	return setmetatable({gui=gui, pool={}, used=0}, Hud)
+end
+function Hud.label(self: any, text: string, at: Vector2, alpha: number, rotation: number?, size: number?)
+	self.used += 1
+	local p = self.pool[self.used]
+	if not p then
+		p = Instance.new("TextLabel")
+		p.BackgroundTransparency, p.AnchorPoint = 1, Vector2.new(0.5,0.5)
+		p.Size = UDim2.fromOffset(240,28)
+		p.TextColor3, p.TextStrokeColor3 = Color3.new(1,1,1), Color3.new(0,0,0)
+		p.Parent = self.gui
+		table.insert(self.pool,p)
+	end
+	p.Visible, p.Text, p.Position = true, text, UDim2.fromOffset(at.X,at.Y)
+	p.TextTransparency, p.TextStrokeTransparency = 1-alpha, 1-alpha*0.9
+	p.Rotation, p.TextSize = rotation or 0, size or 18
+end
+function Hud.draw(self: any, memory: any, camera: Camera, cast: any, focusing: boolean, showMark: boolean?)
+	self.used = 0
+	local viewport = camera.ViewportSize
+	local adapter = {
+		project = function(at: Vector3, size: number)
+			local p = camera:WorldToViewportPoint(at)
+			local q = camera:WorldToViewportPoint(at+camera.CFrame.RightVector*math.max(size,0.2)*0.5)
+			return Vector2.new(p.X,p.Y), p.Z > 0 and p.X > -40 and p.Y > -40 and p.X < viewport.X+40 and p.Y < viewport.Y+40,
+				math.clamp((Vector2.new(p.X,p.Y)-Vector2.new(q.X,q.Y)).Magnitude,10,36)
+		end,
+		edge = function(dir: Vector3)
+			local d = camera.CFrame:VectorToObjectSpace(dir)
+			local v = Vector2.new(d.X,-d.Y)
+			if v.Magnitude < 0.03 then v = Vector2.new(0,-1) end
+			v = v.Unit
+			local half = viewport*0.5-Vector2.new(34,34)
+			local t = math.min(half.X/math.max(math.abs(v.X),1e-6),half.Y/math.max(math.abs(v.Y),1e-6))
+			return {pos=viewport*0.5+v*t, dir=v}
+		end,
+		covered = function(at: Vector3, slack: number)
+			local eye = camera.CFrame.Position
+			local hit = cast(eye,at)
+			return hit ~= nil and (hit-eye).Magnitude < (at-eye).Magnitude-slack
+		end,
+	}
+	local view = View.build(memory,adapter,showMark)
+	for _, e in view.edges do self:label("›",e.pos,e.alpha,math.deg(math.atan2(e.dir.Y,e.dir.X)),32) end
+	for _, r in view.rings do
+		-- Twenty-eight small tangents form a ring; last-seen rings become broken with age.
+		for i=0,27 do
+			if r.kind == "mark" and i%2 == 1 and r.dash < 0.95 then continue end
+			local a = i*math.pi/14
+			self:label("—",r.pos+Vector2.new(math.cos(a),math.sin(a))*r.radius,r.alpha,math.deg(a)+90,8)
+		end
+	end
+	for _, l in view.labels do self:label(l.text,l.pos-Vector2.new(0,l.offset+10),l.alpha) end
+	if focusing then
+		for i=0,3 do
+			local a=i*math.pi/2
+			self:label("—",viewport*0.5+Vector2.new(math.cos(a),math.sin(a))*11,0.8,math.deg(a),12)
+		end
+	end
+	for i=self.used+1,#self.pool do self.pool[i].Visible=false end
+	self.view = view
+end
+return Hud
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="54">
+          <Properties>
+            <string name="Name">PerceptionStage</string>
+            <string name="Source"><![CDATA[--!strict
+-- Temporary D-038 stage, away from spawn, crevice and recovery routes. Physical screen/ledge belong to WORLD.
+local Shared = game:GetService("ReplicatedStorage"):WaitForChild("Shared")
+local Target = require(Shared.Habitat.TestTarget)
+local Stage = {}
+function Stage.new(sill: Instance): any
+	local folder = Instance.new("Folder")
+	folder.Name = "PerceptionStage"
+	folder.Parent = sill
+	local function part(name: string, at: Vector3, size: Vector3, solid: boolean): Part
+		local p = Instance.new("Part")
+		p.Name, p.Position, p.Size = name, at, size
+		p.Anchored, p.CanCollide, p.CanQuery, p.CanTouch = true, solid, solid, false
+		p.Color = Color3.fromRGB(116, 100, 91)
+		if solid then p:SetAttribute("ProfileId", "bare_wood_rough"); p:SetAttribute("SurfaceId", name) end
+		p.Parent = folder
+		return p
+	end
+	part("watch_ledge", Vector3.new(-25,1,-3.5), Vector3.new(4,2,3), true)
+	part("stage_screen", Vector3.new(-25,1.5,-7), Vector3.new(2,3,0.2), true)
+	local marker = part("TestMarker", Vector3.new(-29,2.8,-10), Vector3.one*0.9, false)
+	marker.Shape = Enum.PartType.Ball
+	marker.Color = Color3.fromRGB(220,31,158)
+	local sign = Instance.new("BillboardGui")
+	sign.Name, sign.Size, sign.StudsOffset = "TargetSign", UDim2.fromOffset(220,55), Vector3.new(0,1,0)
+	sign.AlwaysOnTop = false
+	sign.Parent = marker
+	local label = Instance.new("TextLabel")
+	label.Size = UDim2.fromScale(1,1)
+	label.BackgroundTransparency = 1
+	label.TextColor3 = Color3.new(1,1,1)
+	label.TextStrokeTransparency = 0
+	label.TextSize = 15
+	label.Text = "TEST TARGET\nmoving marker, not a fly"
+	label.Parent = sign
+	local target = Target.new({Vector3.new(-29,2.8,-10), Vector3.new(-21,2.8,-10)})
+	return {target=target, marker=marker, folder=folder}
+end
+return Stage
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="55">
           <Properties>
             <string name="Name">SpiderCamera</string>
             <string name="Source"><![CDATA[--!strict
@@ -5028,7 +7070,7 @@ return SpiderCamera
 ]]></string>
           </Properties>
         </Item>
-        <Item class="LocalScript" referent="43">
+        <Item class="LocalScript" referent="56">
           <Properties>
             <string name="Name">SpiderClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -5069,6 +7111,12 @@ local Detail = require(Shared:WaitForChild("Data"):WaitForChild("Detail"))
 local Layout = require(Shared:WaitForChild("Habitat"):WaitForChild("WindowsillLayout"))
 local SpiderRig = require(Shared:WaitForChild("Rig"):WaitForChild("SpiderRig"))
 
+local Sensor = require(Shared.Perception.Sensor)
+local ObservationMemory = require(Shared.Perception.ObservationMemory)
+local FocusState = require(Shared.Movement.FocusState)
+local PerceptionStage = require(script.Parent.PerceptionStage)
+local PerceptionHud = require(script.Parent.PerceptionHud)
+local focusState = FocusState.new()
 local DT = SpiderMotor.DT
 local SLOW_SPEED = 0.5
 local MAX_DRAGLINES = 24 -- two segments per one-bend line
@@ -5111,7 +7159,16 @@ task.spawn(function()
 end)
 local hud = SpiderHud.new(player:WaitForChild("PlayerGui"))
 local device: ControlText.Device = ControlText.initialDevice(UIS.TouchEnabled, UIS.KeyboardEnabled, UIS.GamepadEnabled)
-local drawnUp = Vector3.yAxis
+local memory = ObservationMemory.new()
+local sensor = Sensor.new(memory)
+sensor:configureFrom(Species.phidippus_audax_prototype.perception)
+local sightCast = Sensor.workspaceCast(params)
+local perceptionHud = PerceptionHud.new(player:WaitForChild("PlayerGui"))
+local stage = if Workspace:GetAttribute("TestTarget") ~= false then PerceptionStage.new(sill) else nil
+local function focusActive(): boolean
+	return focusState:active(false, player:GetAttribute("FocusToggle") == true, motor.mode == "attached")
+end
+local drawnUp = motor.up
 local slow = false
 local helpVisible, helpUntil = true, os.clock() + 20
 local started = os.clock()
@@ -5250,6 +7307,7 @@ end
 
 -- Everything held is dropped with no penalty and no message: focus loss, the Roblox menu, a text box, a lost controller.
 local function dropAll()
+	focusState:clear()
 	jump:drop(motor)
 	local release = motor.silk.release
 	release.down, release.counts, release.held, release.progress = true, false, 0, 0
@@ -5257,6 +7315,9 @@ local function dropAll()
 end
 
 local function backToStart()
+	focusState:clear()
+	sensor:reset()
+	memory:clear()
 	jump:drop(motor)
 	motor:respawn()
 	dropStrands(false)
@@ -5265,6 +7326,10 @@ local function backToStart()
 end
 
 local controls: any = SpiderInput.bind({
+	focus = function(phase: string)
+		if phase == "begin" then focusState:press(player:GetAttribute("FocusToggle") == true, motor.mode == "attached")
+		elseif phase == "cancel" then focusState:clear() end
+	end,
 	jump = function(phase: string)
 		if phase == "begin" then
 			motor:cancelWalk() -- a jump press takes over from a walk to the edge
@@ -5280,6 +7345,7 @@ local controls: any = SpiderInput.bind({
 	cancel = function(phase: string)
 		if phase ~= "begin" then return end
 		if motor:cancelWalk() then return end
+		focusState:cancel(jump:isBusy() or #jump.events > 0 or motor:onLine())
 		jump:cancel()
 	end,
 	drop = function() motor:requestDrop() end,
@@ -5312,7 +7378,7 @@ local function tickInput(): any
 		carry:step(0, 0, Vector3.zero, motor.transitionSerial, motor.intent, false)
 	end
 	local focusPoint: Vector3? = nil
-	if controls.held.Focus then
+	if focusState:active(controls.held.Focus == true, player:GetAttribute("FocusToggle") == true, motor.mode == "attached") then
 		local origin, dir = cam:aimRay()
 		local hit = Workspace:Raycast(origin, dir * SpiderMotor.AIM_RANGE, params)
 		focusPoint = if hit then hit.Position else origin + dir * SpiderMotor.AIM_RANGE
@@ -5354,7 +7420,7 @@ local function updateHud(frameDt: number)
 	handleEvents()
 	local aiming = jump:isAiming()
 	local view: any = {
-		device = device, aiming = aiming, focus = controls.held.Focus == true, eyeView = cam.eyeView,
+		device = device, aiming = aiming, focus = controls.held.Focus == true or focusActive(), eyeView = cam.eyeView,
 		status = {}, helpVisible = helpVisible, helpText = ControlText.helpCard(device),
 	}
 	if aiming then
@@ -5370,6 +7436,7 @@ local function updateHud(frameDt: number)
 	else
 		hidePreview()
 	end
+	if focusState.latched then table.insert(view.status, "FOCUS ON    " .. ControlText.name(device,"focus") .. " again to stop" .. (if not jump:isBusy() and not motor:onLine() and not motor.silk.walk then " / " .. ControlText.name(device,"cancel") else "")) end
 	if cam.eyeView then table.insert(view.status, `SPIDER-EYE VIEW    {ControlText.name(device, "eye")}: back`) end
 	if slow then
 		local key = ControlText.name(device, "slow")
@@ -5408,8 +7475,16 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 		motor:setAimRay(origin, dir)
 		while accumulator >= DT do
 			accumulator -= DT
+			local percepts = {}
+			if stage then
+				local p = stage.target:percept()
+				if p then table.insert(percepts,p) end
+			end
+			sensor:step(DT,motor:observer(),percepts,sightCast)
 			jump:step(motor)
 			motor:tick(tickInput())
+			if motor.mode ~= "attached" then focusState:clear() end
+			if stage then stage.target:step(DT); stage.marker.Position = stage.target.position end
 			cam:tick(DT)
 		end
 	end
@@ -5442,6 +7517,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	-- Looking runs in real time, so slow motion never makes the camera sluggish.
 	local lx, ly = controls:lookAxes()
 	cam:render(frameDt, lx, ly)
+	perceptionHud:draw(memory,camera,sightCast,motor.mode == "attached" and (controls.held.Focus == true or focusActive()),player:GetAttribute("ShowLastSeen") ~= false)
 	local dof = Lighting:FindFirstChild("MacroDOF")
 	if dof and dof:IsA("DepthOfFieldEffect") then
 		local focus = (camera.CFrame.Position - motor.pos).Magnitude
@@ -5460,6 +7536,7 @@ if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
 	task.spawn(function()
 		local run: any = (require :: any)(playback)
 		run({
+			sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
 			input = controls,
 			drop = function() motor:requestDrop() end,
 			jump = jump,
@@ -5484,7 +7561,7 @@ end
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="44">
+        <Item class="ModuleScript" referent="57">
           <Properties>
             <string name="Name">SpiderHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -5723,7 +7800,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="45">
+        <Item class="ModuleScript" referent="58">
           <Properties>
             <string name="Name">SpiderInput</string>
             <string name="Source"><![CDATA[--!strict
@@ -5749,6 +7826,7 @@ local HudLayout = require(Shared:WaitForChild("UI"):WaitForChild("HudLayout"))
 local SpiderInput = {}
 
 export type Handlers = {
+	focus: ((string) -> ())?,
 	jump: (string) -> (), -- "begin", "end", or "cancel" (the engine took the input away)
 	cancel: (string) -> (),
 	drop: () -> (),
@@ -5799,6 +7877,8 @@ function SpiderInput.bind(h: Handlers)
 			h.jump(if now then "begin" elseif cancelled then "cancel" else "end")
 		elseif action == "Cancel" then
 			h.cancel(if now then "begin" else "end")
+		elseif action == "Focus" then
+			if h.focus then h.focus(if now then "begin" elseif cancelled then "cancel" else "end") end
 		elseif action == "Drop" then
 			if now then h.drop() end
 		elseif ONE_SHOT[action] then
@@ -5923,7 +8003,7 @@ return SpiderInput
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="46">
+        <Item class="ModuleScript" referent="59">
           <Properties>
             <string name="Name">WorldDetail</string>
             <string name="Source"><![CDATA[--!strict
@@ -5966,7 +8046,7 @@ return WorldDetail
       </Item>
     </Item>
   </Item>
-  <Item class="Workspace" referent="47">
+  <Item class="Workspace" referent="60">
     <Properties>
       <string name="Name">Workspace</string>
       <float name="Gravity">35</float>

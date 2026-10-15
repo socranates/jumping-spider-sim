@@ -21,6 +21,7 @@ local HudLayout = require(Shared:WaitForChild("UI"):WaitForChild("HudLayout"))
 local SpiderInput = {}
 
 export type Handlers = {
+	focus: ((string) -> ())?,
 	jump: (string) -> (), -- "begin", "end", or "cancel" (the engine took the input away)
 	cancel: (string) -> (),
 	drop: () -> (),
@@ -71,6 +72,8 @@ function SpiderInput.bind(h: Handlers)
 			h.jump(if now then "begin" elseif cancelled then "cancel" else "end")
 		elseif action == "Cancel" then
 			h.cancel(if now then "begin" else "end")
+		elseif action == "Focus" then
+			if h.focus then h.focus(if now then "begin" elseif cancelled then "cancel" else "end") end
 		elseif action == "Drop" then
 			if now then h.drop() end
 		elseif ONE_SHOT[action] then

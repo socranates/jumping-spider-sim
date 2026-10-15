@@ -49,6 +49,10 @@ MODULES = [
     ("ObservationMemory", "Perception/ObservationMemory.luau"),
     ("SensorCore", "Perception/SensorCore.luau"),
     ("Sensor", "Perception/Sensor.luau"),
+    ("TestTarget", "Habitat/TestTarget.luau"),
+    ("FocusState", "Movement/FocusState.luau"),
+    ("PerceptionText", "UI/PerceptionText.luau"),
+    ("PerceptionView", "UI/PerceptionView.luau"),
     ("SpiderCamera", "../Client/SpiderCamera.luau"),
 ]
 # The client scripts, bundled only for the tests that run the real rig and client (CLIENT_TESTS).
@@ -56,8 +60,10 @@ CLIENT_MODULES = [
     ("SpiderRig", "Rig/SpiderRig.luau"),
     ("SpiderInput", "../Client/SpiderInput.luau"),
     ("SpiderHud", "../Client/SpiderHud.luau"),
+    ("PerceptionStage", "../Client/PerceptionStage.luau"),
+    ("PerceptionHud", "../Client/PerceptionHud.luau"),
 ]
-CLIENT_TESTS = {"client_smoke.luau", "look.luau", "world.luau"}
+CLIENT_TESTS = {"perception_client.luau", "client_smoke.luau", "look.luau", "world.luau"}
 REFERENCES = ["jump_reference", "tether_reference", "camera_reference", "framing_reference", "perception_reference"]
 # A reference only the named tests read (it is large; the other bundles leave it out).
 REFERENCE_ONLY = {"perception_reference": {"perception.luau"}}
@@ -112,7 +118,7 @@ def bundle(test_file):
 luau = sys.argv[1] if len(sys.argv) > 1 else "luau"
 status = 0
 named = sys.argv[2:]
-for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "gaze.luau", "scenarios.luau", "client_smoke.luau", "look.luau", "world.luau"]:
+for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "look.luau", "world.luau"]:
     if not (HERE / test_file).exists():
         if named:  # a misspelt name must not look like a pass
             print(f"no such test file: {test_file} (names are relative to tests/, for example look.luau)", file=sys.stderr)

@@ -6,18 +6,27 @@ from pathlib import Path
 import json, sys
 
 text=Path(sys.argv[1]).read_text(encoding='utf-8',errors='replace')
-records={key:[] for key in ['PORT_TEST_ROW','PORT_TEST_SUMMARY','PORT_CLIENT_REPORT']}
+records={key:[] for key in ['PORT_TEST_ROW','PORT_TEST_SUMMARY','PORT_CLIENT_REPORT','PORT_CLIENT_ROW','PORT_CLIENT_SUMMARY']}
 for line in text.splitlines():
     for key,values in records.items():
         marker=key+' '
         if marker in line:
-            values.append(json.loads(line.split(marker,1)[1]))
+            try: values.append(json.loads(line.split(marker,1)[1]))
+            except json.JSONDecodeError: pass # long aggregate log lines can truncate; require complete rows below
 summary=records['PORT_TEST_SUMMARY'][-1]
 evidence=summary['evidence_id']
 rows={r['result']['name']:r['result'] for r in records['PORT_TEST_ROW'] if r['evidence_id']==evidence}
 assert len(rows)==summary['tests'], 'Missing engine result rows'
 assert sum(r['passed'] for r in rows.values())==summary['passed'], 'Inconsistent result counts'
-client=[r for r in records['PORT_CLIENT_REPORT'] if r.get('evidence_id')==evidence][-1]
+summaries=[r for r in records['PORT_CLIENT_SUMMARY'] if r.get('evidence_id')==evidence]
+if summaries:
+    client=summaries[-1]
+    client_rows={r['result']['name']:r['result'] for r in records['PORT_CLIENT_ROW'] if r['evidence_id']==evidence}
+    assert len(client_rows)==client['tests'], 'Missing client result rows'
+    assert sum(r['passed'] for r in client_rows.values())==client['passed'], 'Inconsistent client count'
+    client=dict(client,results=list(client_rows.values()))
+else:
+    client=[r for r in records['PORT_CLIENT_REPORT'] if r.get('evidence_id')==evidence][-1]
 out=Path(sys.argv[2]);out.mkdir(parents=True,exist_ok=True)
 (out/'studio-report.json').write_text(json.dumps(dict(summary,results=list(rows.values())),indent=2)+'\n',encoding='utf-8',newline='\n')
 (out/'client-report.json').write_text(json.dumps(client,indent=2)+'\n',encoding='utf-8',newline='\n')

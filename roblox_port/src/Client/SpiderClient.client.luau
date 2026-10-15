@@ -36,6 +36,12 @@ local Detail = require(Shared:WaitForChild("Data"):WaitForChild("Detail"))
 local Layout = require(Shared:WaitForChild("Habitat"):WaitForChild("WindowsillLayout"))
 local SpiderRig = require(Shared:WaitForChild("Rig"):WaitForChild("SpiderRig"))
 
+local Sensor = require(Shared.Perception.Sensor)
+local ObservationMemory = require(Shared.Perception.ObservationMemory)
+local FocusState = require(Shared.Movement.FocusState)
+local PerceptionStage = require(script.Parent.PerceptionStage)
+local PerceptionHud = require(script.Parent.PerceptionHud)
+local focusState = FocusState.new()
 local DT = SpiderMotor.DT
 local SLOW_SPEED = 0.5
 local MAX_DRAGLINES = 24 -- two segments per one-bend line
@@ -78,7 +84,16 @@ task.spawn(function()
 end)
 local hud = SpiderHud.new(player:WaitForChild("PlayerGui"))
 local device: ControlText.Device = ControlText.initialDevice(UIS.TouchEnabled, UIS.KeyboardEnabled, UIS.GamepadEnabled)
-local drawnUp = Vector3.yAxis
+local memory = ObservationMemory.new()
+local sensor = Sensor.new(memory)
+sensor:configureFrom(Species.phidippus_audax_prototype.perception)
+local sightCast = Sensor.workspaceCast(params)
+local perceptionHud = PerceptionHud.new(player:WaitForChild("PlayerGui"))
+local stage = if Workspace:GetAttribute("TestTarget") ~= false then PerceptionStage.new(sill) else nil
+local function focusActive(): boolean
+	return focusState:active(false, player:GetAttribute("FocusToggle") == true, motor.mode == "attached")
+end
+local drawnUp = motor.up
 local slow = false
 local helpVisible, helpUntil = true, os.clock() + 20
 local started = os.clock()
@@ -217,6 +232,7 @@ end
 
 -- Everything held is dropped with no penalty and no message: focus loss, the Roblox menu, a text box, a lost controller.
 local function dropAll()
+	focusState:clear()
 	jump:drop(motor)
 	local release = motor.silk.release
 	release.down, release.counts, release.held, release.progress = true, false, 0, 0
@@ -224,6 +240,9 @@ local function dropAll()
 end
 
 local function backToStart()
+	focusState:clear()
+	sensor:reset()
+	memory:clear()
 	jump:drop(motor)
 	motor:respawn()
 	dropStrands(false)
@@ -232,6 +251,10 @@ local function backToStart()
 end
 
 local controls: any = SpiderInput.bind({
+	focus = function(phase: string)
+		if phase == "begin" then focusState:press(player:GetAttribute("FocusToggle") == true, motor.mode == "attached")
+		elseif phase == "cancel" then focusState:clear() end
+	end,
 	jump = function(phase: string)
 		if phase == "begin" then
 			motor:cancelWalk() -- a jump press takes over from a walk to the edge
@@ -247,6 +270,7 @@ local controls: any = SpiderInput.bind({
 	cancel = function(phase: string)
 		if phase ~= "begin" then return end
 		if motor:cancelWalk() then return end
+		focusState:cancel(jump:isBusy() or #jump.events > 0 or motor:onLine())
 		jump:cancel()
 	end,
 	drop = function() motor:requestDrop() end,
@@ -279,7 +303,7 @@ local function tickInput(): any
 		carry:step(0, 0, Vector3.zero, motor.transitionSerial, motor.intent, false)
 	end
 	local focusPoint: Vector3? = nil
-	if controls.held.Focus then
+	if focusState:active(controls.held.Focus == true, player:GetAttribute("FocusToggle") == true, motor.mode == "attached") then
 		local origin, dir = cam:aimRay()
 		local hit = Workspace:Raycast(origin, dir * SpiderMotor.AIM_RANGE, params)
 		focusPoint = if hit then hit.Position else origin + dir * SpiderMotor.AIM_RANGE
@@ -321,7 +345,7 @@ local function updateHud(frameDt: number)
 	handleEvents()
 	local aiming = jump:isAiming()
 	local view: any = {
-		device = device, aiming = aiming, focus = controls.held.Focus == true, eyeView = cam.eyeView,
+		device = device, aiming = aiming, focus = controls.held.Focus == true or focusActive(), eyeView = cam.eyeView,
 		status = {}, helpVisible = helpVisible, helpText = ControlText.helpCard(device),
 	}
 	if aiming then
@@ -337,6 +361,7 @@ local function updateHud(frameDt: number)
 	else
 		hidePreview()
 	end
+	if focusState.latched then table.insert(view.status, "FOCUS ON    " .. ControlText.name(device,"focus") .. " again to stop" .. (if not jump:isBusy() and not motor:onLine() and not motor.silk.walk then " / " .. ControlText.name(device,"cancel") else "")) end
 	if cam.eyeView then table.insert(view.status, `SPIDER-EYE VIEW    {ControlText.name(device, "eye")}: back`) end
 	if slow then
 		local key = ControlText.name(device, "slow")
@@ -375,8 +400,16 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 		motor:setAimRay(origin, dir)
 		while accumulator >= DT do
 			accumulator -= DT
+			local percepts = {}
+			if stage then
+				local p = stage.target:percept()
+				if p then table.insert(percepts,p) end
+			end
+			sensor:step(DT,motor:observer(),percepts,sightCast)
 			jump:step(motor)
 			motor:tick(tickInput())
+			if motor.mode ~= "attached" then focusState:clear() end
+			if stage then stage.target:step(DT); stage.marker.Position = stage.target.position end
 			cam:tick(DT)
 		end
 	end
@@ -409,6 +442,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	-- Looking runs in real time, so slow motion never makes the camera sluggish.
 	local lx, ly = controls:lookAxes()
 	cam:render(frameDt, lx, ly)
+	perceptionHud:draw(memory,camera,sightCast,motor.mode == "attached" and (controls.held.Focus == true or focusActive()),player:GetAttribute("ShowLastSeen") ~= false)
 	local dof = Lighting:FindFirstChild("MacroDOF")
 	if dof and dof:IsA("DepthOfFieldEffect") then
 		local focus = (camera.CFrame.Position - motor.pos).Magnitude
@@ -427,6 +461,7 @@ if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
 	task.spawn(function()
 		local run: any = (require :: any)(playback)
 		run({
+			sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
 			input = controls,
 			drop = function() motor:requestDrop() end,
 			jump = jump,

@@ -1,0 +1,299 @@
+{
+  "evidence_id": "8b45f28cf2cca2ba",
+  "engine": "0.743.0.7431133",
+  "tests": 58,
+  "passed": 58,
+  "failed": 0,
+  "results": [
+    {
+      "passed": true,
+      "name": "real engine jump reaches seat",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "raycast planted foot stays in world space",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "appearance stays white when stage changes",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "all rig parts are display only and bounded",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "spider-eye view hides the body and keeps the front legs",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "low detail keeps about a fifth of the fuzz and under 300 parts",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "big glossy eyes with catchlights, no sockets or outline in low detail",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "idle motion moves the drawn head and palps only, and not in low detail",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "air and underside poses are finite",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "Studio spec completes",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "floor refuses lowering without room below",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "raised leaf chooses nearest edge",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "anchor policy and moving local-space anchor",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "payout never constrains a valid flight",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "miss catches within paid length and settles",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "deliberate leaf drop hangs then lowers to floor",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "reel after leaf drop grabs the leaf",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "wall drop lowers to floor",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "one bend snags at a second obstruction and clears again",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "anchor deletion releases without invalid coordinates",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "blocked reel cannot pull through nonattachable wall",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "Silk spec completes",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "every material name in the graphics table is a real Roblox material",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "sill pieces use the table's materials and the back wall is invisible but solid",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "decor is drawn only: no collisions, no rays, no touches",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "the sun shines in through the window",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "the wall casts shadows, the glass does not",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "atmosphere, sky, grade, bloom, sun rays and clouds are in place; no depth of field unless asked",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "dust motes are emitting and the light shafts are faint",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "Graphics spec completes",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "a missed leap off the east leaf is caught by the line, settles, and reeling takes hold of the leaf",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "F on the middle leaf walks to the nearest edge, lets down, and a held F lowers to the sill floor",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "F on the back wall lets down at once and lowering reaches the floor",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "F on the planter rim walks to its front edge, lets down clear of the planter and lowers to the floor",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "after letting down from the leaf, reeling climbs back and takes hold of the leaf",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "a second obstruction snags the line: reeling is refused, lowering and letting go still work",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "a press in the 0.4 s grace never lets go, however long it is held; a fresh 0.6 s hold does",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "Q held from before the leap through the catch never lets go; a fresh hold does",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "focus loss cancels: an aim never leaps afterwards, a let-go hold starts over, a walk to the edge stops",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "catch camera: a squeezed view turns by the smallest working 15-degree step, never past 45, and the player's look wins",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "the landing patch says Reachable, Blocked, Out of reach and Can't land there, as Godot's planner",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "Focus, the eye view and an aim turn the body toward where the view points",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "holding forward carries the spider over the leaf's edge, along its underside, never back and forth",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "ten misses from leaves and the planter are caught and recovered by reeling, lowering or letting go",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "Recovery scenarios complete",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "P01 F1 peripheral cue has bearing but no position or identity",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "P01 F2 camera projection cannot rotate the sensor cone",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "P01 F3 Focus turns at capped rate and inspection refines in time",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "P01 F4 hidden motion never updates observation or HUD position",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "P01 F5 fixed last-seen mark fades and expires",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "P01 F6 association follows evidence even after world id changes",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "P01 F7 only an inspected empty visible spot loses its mark",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "P01 F8 never-sensed actors leave no overlay",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "Perception spec completes",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "every device's prompts wrap inside the narrowest prompt panel in at most four lines",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "the controls card fits a phone's width in landscape for every device",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "touch buttons' words fit their buttons",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "Prompt spec completes",
+      "detail": ""
+    }
+  ]
+}

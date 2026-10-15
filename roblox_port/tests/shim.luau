@@ -425,7 +425,16 @@ end
 
 -- Vector2, UDim, UDim2 and the services the client scripts touch. The client smoke test fires their signals.
 local Vector2 = {}
-Vector2.__index = Vector2
+Vector2.__index = function(v,k)
+	if k == "Magnitude" then return math.sqrt(v.X*v.X+v.Y*v.Y) end
+	if k == "Unit" then local m=math.sqrt(v.X*v.X+v.Y*v.Y); return Vector2.new(v.X/m,v.Y/m) end
+	return Vector2[k]
+end
+function Vector2.__eq(a,b) return a.X==b.X and a.Y==b.Y end
+function Vector2.__add(a,b) return Vector2.new(a.X+b.X,a.Y+b.Y) end
+function Vector2.__sub(a,b) return Vector2.new(a.X-b.X,a.Y-b.Y) end
+function Vector2.__mul(a,b) return Vector2.new(a.X*b,a.Y*b) end
+function Vector2.__div(a,b) return Vector2.new(a.X/b,a.Y/b) end
 function Vector2.new(x, y) return setmetatable({ X = x or 0, Y = y or 0 }, Vector2) end
 Vector2.zero = Vector2.new(0, 0)
 local UDim, UDim2 = {}, {}
@@ -434,6 +443,14 @@ function UDim2.new(xs, xo, ys, yo) return { X = UDim.new(xs, xo), Y = UDim.new(y
 function UDim2.fromOffset(x, y) return UDim2.new(0, x, 0, y) end
 function UDim2.fromScale(x, y) return UDim2.new(x, 0, y, 0) end
 local camera = Instance.new("Camera")
+camera.ViewportSize = Vector2.new(1280,720)
+function camera.WorldToViewportPoint(self, at)
+	local p = self.CFrame:PointToObjectSpace(at)
+	local z = -p.Z
+	local focal = 360/math.tan(math.rad(self.FieldOfView or 70)/2)
+	local safe = if math.abs(z)<1e-6 then 1e-6 else z
+	return new(640+p.X*focal/safe,360-p.Y*focal/safe,z), z>0
+end
 rawset(workspace, "CurrentCamera", camera)
 local localPlayer = Instance.new("Player")
 local playerGui = Instance.new("Folder")

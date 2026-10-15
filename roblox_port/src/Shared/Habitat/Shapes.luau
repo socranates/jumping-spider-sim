@@ -1,5 +1,5 @@
 --!strict
--- Drawn-only parts for the decor builders (Habitat/Scenery, Plants, Patina): every part is anchored, nothing collides with it, no
+-- Drawn-only parts for the decor builders (Habitat/Scenery, Plants, Patina) and the fly (Client/FlyBodies): every part is anchored, nothing collides with it, no
 -- ray sees it and nothing touches it, so the spider's rays, the camera's casts and the jump planner never meet it. Round things are
 -- Cylinder parts (their axis is local X, as in Roblox) or SpecialMesh ellipsoids (Roblox forces a Ball part to be a sphere), as the
 -- spider rig does. A flat leaf is a rounded slab: a cross of two boxes and four discs.
@@ -58,8 +58,9 @@ end
 
 -- A round rod from a to b (a Cylinder part: its axis is X, so Size is length, diameter, diameter).
 function Shapes.rod(parent: Instance, name: string, a: Vector3, b: Vector3, diameter: number, color: Color3, material: string): Part
+	local up = if math.abs((b - a).Unit.Y) > 0.99 then Vector3.xAxis else Vector3.yAxis -- a rod along the up vector has no turn to give
 	local p = Shapes.block(parent, name, Vector3.new((b - a).Magnitude, diameter, diameter),
-		CFrame.lookAt((a + b) * 0.5, b) * CFrame.Angles(0, math.pi / 2, 0), color, material)
+		CFrame.lookAt((a + b) * 0.5, b, up) * CFrame.Angles(0, math.pi / 2, 0), color, material)
 	p.Shape = Enum.PartType.Cylinder
 	return p
 end

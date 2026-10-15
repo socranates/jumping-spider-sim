@@ -12,7 +12,8 @@ Usage (from roblox_port/):
          [--size 1280x720] [--format png|jpg] [--uv] [--set key=value] [--parts parts.json]
 Views: corner, lip, floor, glass (close-ups of the wear), game (5 studs behind and above the spider at the spawn, default elevation, 70 degree vertical field of view), game_mid (the same
 camera, the spider mid-sill), overview, planter, leaves, window (looking out of the glass from the sill), window_uv (the same with the
-UV layer faded in), retreat (the crevice), fly (both flies), fly_a (the standing fly) and fly_b (the one in the air).
+UV layer faded in), retreat (the crevice), fly (both flies), fly_a (the standing fly) and fly_b (the one in the air); close-ups of the
+fly from above, in front and from the side: fly_top, fly_front, fly_side (standing) and fly_b_top, fly_b_side, fly_b_front (in the air).
 --parts renders an already dumped part list (for example the "before" list kept next to the images) instead of running the code."""
 import argparse, importlib.util, json, math, pathlib, subprocess, sys, tempfile
 
@@ -117,6 +118,29 @@ VIEWS = {
     "fly_a": {"fov": 34, "eye": [-15.0, 0.9, 5.4], "at": [-16.0, 0.2, 4.0], "near": 0.02, "far": 1800, "groups": ["flies"], "shadow": 20},
     "fly_b": {"fov": 34, "eye": [-11.0, 3.4, 3.7], "at": [-12.0, 3.0, 2.0], "near": 0.02, "far": 1800, "groups": ["flies"], "shadow": 20},
 }
+
+
+def around(fly, forward, d_back, d_up, d_front=0.0, d_side=0.0, fov=34.0, at_up=0.05):
+    """A close view of a fly: the camera `d_back` behind it, `d_front` ahead of it and `d_side` to its right, `d_up` above, looking at it."""
+    fx, fy, fz = forward
+    n = math.sqrt(fx * fx + fy * fy + fz * fz)
+    fx, fy, fz = fx / n, fy / n, fz / n
+    rx, rz = -fz, fx  # the fly's right when it faces forward, flat
+    m = math.hypot(rx, rz)
+    rx, rz = rx / m, rz / m
+    p = (fly["x"], fly["y"], fly["z"])
+    eye = [p[0] - fx * d_back + fx * d_front + rx * d_side, p[1] + d_up, p[2] - fz * d_back + fz * d_front + rz * d_side]
+    return {"fov": fov, "eye": eye, "at": [p[0], p[1] + at_up, p[2]], "near": 0.02, "far": 1800, "groups": ["flies"], "shadow": 20}
+
+
+VIEWS.update({
+    "fly_top": around(FLIES[0], (1, 0, -0.35), 0.45, 1.45, fov=36),
+    "fly_front": around(FLIES[0], (1, 0, -0.35), 0, 0.30, d_front=1.5, fov=30, at_up=0.0),
+    "fly_side": around(FLIES[0], (1, 0, -0.35), 0, 0.14, d_side=1.6, fov=30, at_up=0.0),
+    "fly_b_top": around(FLIES[1], (1, 0.1, 0.4), 0.2, 1.45, fov=40, at_up=0.0),
+    "fly_b_side": around(FLIES[1], (1, 0.1, 0.4), 0, 0.1, d_side=-1.6, fov=40, at_up=0.0),
+    "fly_b_front": around(FLIES[1], (1, 0.1, 0.4), 0, 0.25, d_front=1.6, fov=40, at_up=0.0),
+})
 names = [n for n in args.views.split(",") if n]
 for n in names:
     if n not in VIEWS:

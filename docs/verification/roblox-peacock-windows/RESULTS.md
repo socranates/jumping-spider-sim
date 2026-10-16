@@ -12,7 +12,7 @@ Imported Claude's five commits through 903bf49 onto main 059811b. The appearance
 
 Initial integration **e54de70c7907c0a8**: **84/84 engine**, **15/15 live client**. Reports in `initial/`. This includes PeacockSpec's rig/pose checks and a full live loop: choose while resting, open fan, unchanged motor position, walk to stop, restore the first spider.
 
-Final build **2c8f574734259bd8** adds the compact landscape fix and one native PromptSpec row. **Final native run pending.** Downloads/Windowsill-Peacock-Test-2c8f5747.rbxlx is the test copy; the older e54de70c file does not test this layout change.
+Final build **2c8f574734259bd8** adds the compact landscape fix and one native PromptSpec row. **85/85 engine and 15/15 live client passed**, collected from Nathan's Studio run (0.743.0.7431133). Final structured reports are in this directory. Downloads/Windowsill-Peacock-Test-2c8f5747.rbxlx is the test copy; the older e54de70c file does not test this layout change.
 
 ## Limits and remaining checks
 

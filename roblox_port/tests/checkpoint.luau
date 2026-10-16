@@ -247,7 +247,7 @@ case("a bad record is refused and changes nothing", function()
 		if expect then check(string.find(table.concat(problems, "; "), expect, 1, true) ~= nil, `{what}: says '{expect}' ({table.concat(problems, "; ")})`) end
 		check(fingerprint(w) == before, `{what}: nothing changed`)
 	end
-	refused(function(r) r.schema_version = 2 end, "a newer schema", "newer version")
+	refused(function(r) r.schema_version = Checkpoint.SCHEMA_VERSION + 1 end, "a newer schema", "newer version")
 	refused(function(r) r.schema_version = 1.5 end, "a broken schema", "whole number")
 	refused(function(r) r.kind = "x" end, "another kind", "not a retreat checkpoint")
 	refused(function(r) r.content_revision = "old-sill" end, "another windowsill", "another windowsill")
@@ -427,5 +427,20 @@ case("ObjectRecord keeps cycles and sharing, and refuses what it does not know",
 	check(Json.canonical(rec) ~= nil, "a record is storable as it is")
 end)
 
+case("mode rules survive recovery and schema 1 defaults to Standard",function()
+ local w=newWorld();tick(w)
+ w.life.mode,w.life.rules,w.needs.gentle="free","gentle",true
+ local r=assert(Checkpoint.capture(w,0))
+ w.life.mode,w.life.rules,w.needs.gentle="main","standard",false
+ check(Checkpoint.restore(r,w),"free record restored")
+ check(w.life.mode=="free" and w.life.rules=="gentle" and w.needs.gentle,"free rules restored")
+ local old=assert(Checkpoint.capture(w,0));old.schema_version=1;old.life_rules=nil
+ check(Checkpoint.restore(old,w),"old schema restored")
+ check(w.life.mode=="main" and not w.needs.gentle,"old defaults Standard")
+ r.life_rules.rules="standard"
+ local before=fingerprint(w)
+ check(not Checkpoint.restore(r,w),"free Standard combination refused")
+ check(fingerprint(w)==before,"invalid rules leave world untouched")
+end)
 print(`CHECKPOINT passed={passed} failed={failed}`)
 if failed > 0 then error("CHECKPOINT failed") end

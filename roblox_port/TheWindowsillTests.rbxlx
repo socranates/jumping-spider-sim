@@ -3223,6 +3223,8 @@ LifeLoop.RESTORE_GRACE_TICKS = 30
 -- Rest restored per second of resting.
 LifeLoop.REST_PER_S = 0.10
 LifeLoop.HUNGRY_AT = 0.25
+LifeLoop.WEAK_AFTER_H = 24
+LifeLoop.STARVE_AFTER_H = 48
 
 -- What the loop needs to know about the spider this tick.
 export type Spider = {
@@ -3239,6 +3241,7 @@ export type Event = { kind: string, day: number? }
 function LifeLoop.new(needs: any, save: (() -> CheckpointResult)?): any
 	local self = setmetatable({
 		clock = LifeClock.new(), needs = needs, save = save,
+		mode = "main", rules = "standard", lifeOver = false,
 		resting = false, restSeconds = 0.0, asleep = false, elapsed = 0.0,
 		checkpointDue = false, checkpointResult = nil :: CheckpointResult?, checkpoints = 0,
 		notice = "", noticeSeconds = 0.0, morningText = "",
@@ -3292,9 +3295,17 @@ function LifeLoop.applyLight(self: any)
 	self.rangeScale = LifeLoop.NIGHT_SIGHT + (1.0 - LifeLoop.NIGHT_SIGHT) * self.daylight
 end
 
+function LifeLoop.tooHungryToSleep(self: any): boolean
+	return not self.needs.gentle and self.needs.starvingStreakH >= LifeLoop.WEAK_AFTER_H
+end
+
+function LifeLoop.starved(self: any): boolean
+	return not self.needs.gentle and self.needs.starvingStreakH >= LifeLoop.STARVE_AFTER_H
+end
+
 function LifeLoop._stepLife(self: any, dt: number)
 	local wasAsleep = self.asleep
-	self.asleep = self.resting and (self.clock.sleeping or self.clock:isSleepTime())
+	self.asleep = self.resting and (self.clock.sleeping or self.clock:isSleepTime()) and not self:tooHungryToSleep()
 	local hours = self.clock:advance(dt, self.asleep)
 	if self.asleep and not self.clock.sleeping then
 		-- The morning came during this tick: awake, still resting in the crack. The new day keeps a checkpoint.
@@ -3329,6 +3340,10 @@ function LifeLoop.step(self: any, dt: number, s: Spider, feedPressed: boolean, c
 		self.needs:restoreRest(dt * LifeLoop.REST_PER_S)
 	end
 	self:_stepLife(dt)
+	if self:starved() and not self.lifeOver then
+		self.lifeOver = true
+		self:_emit("starved")
+	end
 	if self.noticeSeconds > 0.0 then
 		self.noticeSeconds = math.max(0.0, self.noticeSeconds - dt)
 	end
@@ -3408,6 +3423,55 @@ return LifeLoop
           </Properties>
         </Item>
         <Item class="ModuleScript" referent="32">
+          <Properties>
+            <string name="Name">LifeSession</string>
+            <string name="Source"><![CDATA[--!strict
+-- LIFE-19..23: player progress lives outside world checkpoints. Session only until server saves are ported.
+local Session = {}
+Session.__index = Session
+Session.SPOTS = { Vector3.new(12,.31,9), Vector3.new(-8,.31,-10), Vector3.new(24,.31,8), Vector3.new(-2,.31,10) }
+function Session.new(): any
+	return setmetatable({ mode="main", rules="standard", ended=false, summary=nil,
+		deaths=0, lives={}, finishedMain=false, started=false }, Session)
+end
+function Session.begin(self: any, mode: string, easy: boolean): boolean
+	if mode ~= "main" and mode ~= "free" then return false end
+	if mode == "main" and easy and not self.finishedMain then return false end
+	self.mode, self.rules = mode, if mode == "free" or easy then "gentle" else "standard"
+	self.ended, self.summary, self.started = false, nil, true
+	return true
+end
+function Session.finishAdult(self: any, stage: number): boolean
+	if stage ~= 3 or self.mode ~= "main" or self.rules ~= "standard" or self.finishedMain then return false end
+	self.finishedMain = true
+	return true
+end
+function Session.endLife(self: any, cause: string, summary: any): boolean
+	if self.ended or self.rules == "gentle" or (cause ~= "wasp" and cause ~= "starved") then return false end
+	self.ended, self.deaths = true, self.deaths + 1
+	self.summary = table.clone(summary)
+	self.summary.cause, self.summary.mode, self.summary.rules = cause, self.mode, self.rules
+	return true
+end
+function Session.archive(self: any)
+	if self.summary then table.insert(self.lives, table.clone(self.summary)) end
+	while #self.lives > 30 do table.remove(self.lives,1) end
+	self.summary = nil
+end
+function Session.another(self: any): Vector3?
+	if not self.ended then return nil end
+	self:archive()
+	self.ended, self.started = false, true
+	return Session.SPOTS[#self.lives % #Session.SPOTS + 1]
+end
+function Session.title(self: any): string
+	return if self.mode == "free" then "FREE PLAY" elseif self.rules == "gentle" then "THE WINDOWSILL (EASY)" else "THE WINDOWSILL"
+end
+return Session
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="33">
           <Properties>
             <string name="Name">NeedsModel</string>
             <string name="Source"><![CDATA[--!strict
@@ -3700,11 +3764,11 @@ return NeedsModel
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="33">
+      <Item class="Folder" referent="34">
         <Properties>
           <string name="Name">Movement</string>
         </Properties>
-        <Item class="ModuleScript" referent="34">
+        <Item class="ModuleScript" referent="35">
           <Properties>
             <string name="Name">CameraMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -3983,7 +4047,7 @@ return CameraMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="35">
+        <Item class="ModuleScript" referent="36">
           <Properties>
             <string name="Name">FocusState</string>
             <string name="Source"><![CDATA[--!strict
@@ -4006,7 +4070,7 @@ return Focus
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="36">
+        <Item class="ModuleScript" referent="37">
           <Properties>
             <string name="Name">InputState</string>
             <string name="Source"><![CDATA[--!strict
@@ -4099,7 +4163,7 @@ return InputState
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="37">
+        <Item class="ModuleScript" referent="38">
           <Properties>
             <string name="Name">JumpInput</string>
             <string name="Source"><![CDATA[--!strict
@@ -4270,7 +4334,7 @@ return JumpInput
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="38">
+        <Item class="ModuleScript" referent="39">
           <Properties>
             <string name="Name">JumpMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -4428,7 +4492,7 @@ return JumpMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="39">
+        <Item class="ModuleScript" referent="40">
           <Properties>
             <string name="Name">LineFraming</string>
             <string name="Source"><![CDATA[--!strict
@@ -4527,7 +4591,7 @@ return LineFraming
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="40">
+        <Item class="ModuleScript" referent="41">
           <Properties>
             <string name="Name">SilkController</string>
             <string name="Source"><![CDATA[--!strict
@@ -4771,7 +4835,7 @@ return Silk
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="41">
+        <Item class="ModuleScript" referent="42">
           <Properties>
             <string name="Name">SpiderMotor</string>
             <string name="Source"><![CDATA[--!strict
@@ -5558,7 +5622,7 @@ return Motor
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="42">
+        <Item class="ModuleScript" referent="43">
           <Properties>
             <string name="Name">StickCarry</string>
             <string name="Source"><![CDATA[--!strict
@@ -5618,7 +5682,7 @@ return StickCarry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="43">
+        <Item class="ModuleScript" referent="44">
           <Properties>
             <string name="Name">SupportMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -5700,7 +5764,7 @@ return SupportMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="44">
+        <Item class="ModuleScript" referent="45">
           <Properties>
             <string name="Name">TetherMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -5769,11 +5833,11 @@ return T
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="45">
+      <Item class="Folder" referent="46">
         <Properties>
           <string name="Name">Perception</string>
         </Properties>
-        <Item class="ModuleScript" referent="46">
+        <Item class="ModuleScript" referent="47">
           <Properties>
             <string name="Name">Observation</string>
             <string name="Source"><![CDATA[--!strict
@@ -5930,7 +5994,7 @@ return Observation
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="47">
+        <Item class="ModuleScript" referent="48">
           <Properties>
             <string name="Name">ObservationMemory</string>
             <string name="Source"><![CDATA[--!strict
@@ -6384,7 +6448,7 @@ return ObservationMemory
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="48">
+        <Item class="ModuleScript" referent="49">
           <Properties>
             <string name="Name">PerceptionMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -6561,7 +6625,7 @@ return PerceptionMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="49">
+        <Item class="ModuleScript" referent="50">
           <Properties>
             <string name="Name">Sensor</string>
             <string name="Source"><![CDATA[--!strict
@@ -6976,7 +7040,7 @@ return Sensor
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="50">
+        <Item class="ModuleScript" referent="51">
           <Properties>
             <string name="Name">SensorCore</string>
             <string name="Source"><![CDATA[--!strict
@@ -7419,7 +7483,7 @@ return SensorCore
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="51">
+        <Item class="ModuleScript" referent="52">
           <Properties>
             <string name="Name">Signal</string>
             <string name="Source"><![CDATA[--!strict
@@ -7460,11 +7524,11 @@ return Signal
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="52">
+      <Item class="Folder" referent="53">
         <Properties>
           <string name="Name">Persistence</string>
         </Properties>
-        <Item class="ModuleScript" referent="53">
+        <Item class="ModuleScript" referent="54">
           <Properties>
             <string name="Name">Checkpoint</string>
             <string name="Source"><![CDATA[--!strict
@@ -7512,7 +7576,7 @@ local WaspDirector = require(script.Parent.Parent.Predator.WaspDirector)
 
 local Checkpoint = {}
 
-Checkpoint.SCHEMA_VERSION = 1
+Checkpoint.SCHEMA_VERSION = 2
 Checkpoint.KIND = "retreat_checkpoint"
 Checkpoint.GAME = "the-windowsill-roblox"
 -- Changes whenever the windowsill's pieces or perches change in a way an old checkpoint could not be put back into.
@@ -7599,6 +7663,7 @@ function Checkpoint.capture(world: World, createdAt: number?): ({ [string]: any 
 			retreat_id = if Layout.inRetreat(motor.pos) then "sill_crevice" else "", state = "ATTACHED",
 		},
 		world = graph,
+		life_rules = { mode = world.life.mode or "main", rules = world.life.rules or "standard" },
 		wasp = if world.wasp ~= nil then world.wasp:toRecord() else nil,
 	}, nil
 end
@@ -7700,6 +7765,9 @@ function Checkpoint.check(record: any, world: World): ({ string }, ObjectRecord.
 		if p.state ~= "ATTACHED" then bad("the spider is not standing on a surface") end
 		if p.retreat_id ~= "" and p.retreat_id ~= "sill_crevice" then bad("the spider is in an unknown retreat") end
 	end
+	local rules = record.life_rules
+	if record.schema_version >= 2 and rules == nil then bad("missing life rules") end
+	if rules ~= nil and (type(rules) ~= "table" or (rules.mode ~= "main" and rules.mode ~= "free") or (rules.rules ~= "standard" and rules.rules ~= "gentle") or (rules.mode == "free" and rules.rules ~= "gentle")) then bad("invalid life rules") end
 	if record.wasp ~= nil then
 		for _, text in WaspDirector.problems(record.wasp) do bad(text) end
 	end
@@ -7733,6 +7801,10 @@ function Checkpoint.restore(record: any, world: World): (boolean, { string })
 	-- Godot's apply_record: the rest that was going on goes on, the spider takes a moment to take hold, and the screen says
 	-- this is checkpoint recovery. What was owed or announced at that tick is not done again.
 	local life = world.life
+	local rules = record.life_rules or {mode="main",rules="standard"}
+	life.mode, life.rules, life.lifeOver = rules.mode, rules.rules, false
+	world.needs.gentle = rules.rules == "gentle"
+	if world.wasp then world.wasp.gentle = world.needs.gentle end
 	life.asleep = false
 	life.checkpointDue = false
 	life.morningText = ""
@@ -7747,7 +7819,7 @@ return Checkpoint
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="54">
+        <Item class="ModuleScript" referent="55">
           <Properties>
             <string name="Name">CheckpointStore</string>
             <string name="Source"><![CDATA[--!strict
@@ -7919,7 +7991,7 @@ return CheckpointStore
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="55">
+        <Item class="ModuleScript" referent="56">
           <Properties>
             <string name="Name">Json</string>
             <string name="Source"><![CDATA[--!strict
@@ -8044,7 +8116,7 @@ return Json
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="56">
+        <Item class="ModuleScript" referent="57">
           <Properties>
             <string name="Name">ObjectRecord</string>
             <string name="Source"><![CDATA[--!strict
@@ -8380,11 +8452,11 @@ return ObjectRecord
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="57">
+      <Item class="Folder" referent="58">
         <Properties>
           <string name="Name">Predator</string>
         </Properties>
-        <Item class="ModuleScript" referent="58">
+        <Item class="ModuleScript" referent="59">
           <Properties>
             <string name="Name">WaspDirector</string>
             <string name="Source"><![CDATA[--!strict
@@ -9070,11 +9142,11 @@ return WaspDirector
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="59">
+      <Item class="Folder" referent="60">
         <Properties>
           <string name="Name">Prey</string>
         </Properties>
-        <Item class="ModuleScript" referent="60">
+        <Item class="ModuleScript" referent="61">
           <Properties>
             <string name="Name">Feeding</string>
             <string name="Source"><![CDATA[--!strict
@@ -9129,7 +9201,7 @@ return F
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="61">
+        <Item class="ModuleScript" referent="62">
           <Properties>
             <string name="Name">Fly</string>
             <string name="Source"><![CDATA[--!strict
@@ -9346,7 +9418,7 @@ return Fly
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="62">
+        <Item class="ModuleScript" referent="63">
           <Properties>
             <string name="Name">FlyFlight</string>
             <string name="Source"><![CDATA[--!strict
@@ -9411,7 +9483,7 @@ return F
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="63">
+        <Item class="ModuleScript" referent="64">
           <Properties>
             <string name="Name">FlySenses</string>
             <string name="Source"><![CDATA[--!strict
@@ -9473,7 +9545,7 @@ return S
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="64">
+        <Item class="ModuleScript" referent="65">
           <Properties>
             <string name="Name">PerchGraph</string>
             <string name="Source"><![CDATA[--!strict
@@ -9523,7 +9595,7 @@ return G
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="65">
+        <Item class="ModuleScript" referent="66">
           <Properties>
             <string name="Name">PreyDirector</string>
             <string name="Source"><![CDATA[--!strict
@@ -9645,7 +9717,7 @@ return D
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="66">
+        <Item class="ModuleScript" referent="67">
           <Properties>
             <string name="Name">PreyMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -9735,7 +9807,7 @@ return M
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="67">
+        <Item class="ModuleScript" referent="68">
           <Properties>
             <string name="Name">PreyPopulation</string>
             <string name="Source"><![CDATA[--!strict
@@ -9767,7 +9839,7 @@ return P
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="68">
+        <Item class="ModuleScript" referent="69">
           <Properties>
             <string name="Name">PreyRandom</string>
             <string name="Source"><![CDATA[--!strict
@@ -9781,11 +9853,11 @@ return R
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="69">
+      <Item class="Folder" referent="70">
         <Properties>
           <string name="Name">Rig</string>
         </Properties>
-        <Item class="ModuleScript" referent="70">
+        <Item class="ModuleScript" referent="71">
           <Properties>
             <string name="Name">Anatomy</string>
             <string name="Source"><![CDATA[--!strict
@@ -9917,7 +9989,7 @@ return Anatomy
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="71">
+        <Item class="ModuleScript" referent="72">
           <Properties>
             <string name="Name">Idle</string>
             <string name="Source"><![CDATA[--!strict
@@ -9974,7 +10046,7 @@ return Idle
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="72">
+        <Item class="ModuleScript" referent="73">
           <Properties>
             <string name="Name">PeacockDance</string>
             <string name="Source"><![CDATA[--!strict
@@ -10146,7 +10218,7 @@ return PeacockDance
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="73">
+        <Item class="ModuleScript" referent="74">
           <Properties>
             <string name="Name">Setae</string>
             <string name="Source"><![CDATA[--!strict
@@ -10457,7 +10529,7 @@ return Setae
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="74">
+        <Item class="ModuleScript" referent="75">
           <Properties>
             <string name="Name">SpiderChoice</string>
             <string name="Source"><![CDATA[--!strict
@@ -10500,7 +10572,7 @@ return SpiderChoice
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="75">
+        <Item class="ModuleScript" referent="76">
           <Properties>
             <string name="Name">SpiderRig</string>
             <string name="Source"><![CDATA[--!strict
@@ -11265,11 +11337,11 @@ return SpiderRig
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="76">
+      <Item class="Folder" referent="77">
         <Properties>
           <string name="Name">UI</string>
         </Properties>
-        <Item class="ModuleScript" referent="77">
+        <Item class="ModuleScript" referent="78">
           <Properties>
             <string name="Name">ControlText</string>
             <string name="Source"><![CDATA[--!strict
@@ -11492,7 +11564,7 @@ function ControlText.helpCard(device: Device): string
 			`Tap {n("jump")} hop   Hold {n("jump")} aim, release to leap   {n("cancel")} cancel`,
 			`{n("drop")} lower on silk   On the line: stick up reel, down lower, hold {n("letGo")} let go`,
 			`{n("eye")} spider-eye view   {n("recenter")} recenter   {n("focus")} focus   {n("slow")} slow motion`,
-			`In the crack: L3 rest (sleep from evening)   {n("reset")}: last checkpoint`,
+			`In the crack: L3 rest (sleep from evening)   {n("reset")}: life menu / last rest`,
 		}, "\n")
 	elseif device == "touch" then
 		return table.concat({
@@ -11508,7 +11580,7 @@ function ControlText.helpCard(device: Device): string
 		"Tap Space hop   Hold Space aim, release to leap   Q cancel",
 		"F lower on silk   On the line: W reel, S lower, hold Q let go",
 		"V spider-eye view   R recenter   Right mouse focus   T slow motion",
-		"In the crack: E rest (sleep from evening)   Backspace: last checkpoint",
+		"In the crack: E rest (sleep from evening)   Backspace: last checkpoint   M: life menu",
 		"Wheel zoom   G gait   H hide this",
 	}, "\n")
 end
@@ -11517,7 +11589,7 @@ return ControlText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="78">
+        <Item class="ModuleScript" referent="79">
           <Properties>
             <string name="Name">EyeOptics</string>
             <string name="Source"><![CDATA[--!strict
@@ -11850,7 +11922,7 @@ return EyeOptics
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="79">
+        <Item class="ModuleScript" referent="80">
           <Properties>
             <string name="Name">HudLayout</string>
             <string name="Source"><![CDATA[--!strict
@@ -11957,7 +12029,7 @@ return HudLayout
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="80">
+        <Item class="ModuleScript" referent="81">
           <Properties>
             <string name="Name">LifeText</string>
             <string name="Source"><![CDATA[--!strict
@@ -11977,7 +12049,8 @@ end
 
 -- The line under the day (Godot's precedence, among the lines this port has): starving, hungry, night, evening; nil otherwise.
 -- `gentle` rules never say starving (Godot: is_starving() and not gentle).
-function LifeText.line(part: string, energy: number, starving: boolean, gentle: boolean, hungryAt: number): string?
+function LifeText.line(part: string, energy: number, starving: boolean, gentle: boolean, hungryAt: number, weak: boolean?): string?
+	if weak and not gentle then return "Starving: your spider will not last another day. Too hungry to sleep; find food." end
 	if starving and not gentle then
 		return "Starving: your spider's reserve is gone. It must eat soon."
 	end
@@ -12021,7 +12094,7 @@ return LifeText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="81">
+        <Item class="ModuleScript" referent="82">
           <Properties>
             <string name="Name">PeacockText</string>
             <string name="Source"><![CDATA[--!strict
@@ -12084,7 +12157,7 @@ return PeacockText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="82">
+        <Item class="ModuleScript" referent="83">
           <Properties>
             <string name="Name">PerceptionShapes</string>
             <string name="Source"><![CDATA[--!strict
@@ -12177,7 +12250,7 @@ return Shapes
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="83">
+        <Item class="ModuleScript" referent="84">
           <Properties>
             <string name="Name">PerceptionText</string>
             <string name="Source"><![CDATA[--!strict
@@ -12193,7 +12266,7 @@ return table.freeze(Text)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="84">
+        <Item class="ModuleScript" referent="85">
           <Properties>
             <string name="Name">PerceptionView</string>
             <string name="Source"><![CDATA[--!strict
@@ -12242,7 +12315,7 @@ return View
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="85">
+        <Item class="ModuleScript" referent="86">
           <Properties>
             <string name="Name">WaspText</string>
             <string name="Source"><![CDATA[--!strict
@@ -12363,23 +12436,23 @@ return WaspText
       </Item>
     </Item>
   </Item>
-  <Item class="ServerScriptService" referent="86">
+  <Item class="ServerScriptService" referent="87">
     <Properties>
       <string name="Name">ServerScriptService</string>
     </Properties>
-    <Item class="Folder" referent="87">
+    <Item class="Folder" referent="88">
       <Properties>
         <string name="Name">PortTests</string>
       </Properties>
-      <Item class="ModuleScript" referent="88">
+      <Item class="ModuleScript" referent="89">
         <Properties>
           <string name="Name">BuildInfo</string>
           <string name="Source"><![CDATA[-- Generated by tools/build.py; do not edit.
-return { id = "2c8f574734259bd8" }
+return { id = "589d9e7bbe94f6b1" }
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="89">
+      <Item class="ModuleScript" referent="90">
         <Properties>
           <string name="Name">GraphicsSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -12495,7 +12568,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="90">
+      <Item class="ModuleScript" referent="91">
         <Properties>
           <string name="Name">LifeSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -12671,7 +12744,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="91">
+      <Item class="ModuleScript" referent="92">
         <Properties>
           <string name="Name">PeacockSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -12742,7 +12815,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="92">
+      <Item class="ModuleScript" referent="93">
         <Properties>
           <string name="Name">PerceptionSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -12842,7 +12915,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="93">
+      <Item class="ModuleScript" referent="94">
         <Properties>
           <string name="Name">PreySpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -12934,7 +13007,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="94">
+      <Item class="ModuleScript" referent="95">
         <Properties>
           <string name="Name">PromptSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -12996,7 +13069,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="95">
+      <Item class="ModuleScript" referent="96">
         <Properties>
           <string name="Name">RecoveryScenarios</string>
           <string name="Source"><![CDATA[--!strict
@@ -13487,7 +13560,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Script" referent="96">
+      <Item class="Script" referent="97">
         <Properties>
           <string name="Name">Runner</string>
           <token name="RunContext">0</token>
@@ -13539,7 +13612,7 @@ if failed > 0 then warn("PORT_TEST_FAIL") end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="97">
+      <Item class="ModuleScript" referent="98">
         <Properties>
           <string name="Name">SilkSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -13655,7 +13728,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="98">
+      <Item class="ModuleScript" referent="99">
         <Properties>
           <string name="Name">Spec</string>
           <string name="Source"><![CDATA[--!strict
@@ -13786,7 +13859,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="99">
+      <Item class="ModuleScript" referent="100">
         <Properties>
           <string name="Name">WaspSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -13949,11 +14022,11 @@ end
         </Properties>
       </Item>
     </Item>
-    <Item class="Folder" referent="100">
+    <Item class="Folder" referent="101">
       <Properties>
         <string name="Name">Server</string>
       </Properties>
-      <Item class="Script" referent="101">
+      <Item class="Script" referent="102">
         <Properties>
           <string name="Name">Main</string>
           <token name="RunContext">0</token>
@@ -14000,184 +14073,143 @@ sill.Parent = Workspace
       </Item>
     </Item>
   </Item>
-  <Item class="StarterPlayer" referent="102">
+  <Item class="StarterPlayer" referent="103">
     <Properties>
       <string name="Name">StarterPlayer</string>
     </Properties>
-    <Item class="StarterPlayerScripts" referent="103">
+    <Item class="StarterPlayerScripts" referent="104">
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="Folder" referent="104">
+      <Item class="Folder" referent="105">
         <Properties>
           <string name="Name">Client</string>
         </Properties>
-        <Item class="ModuleScript" referent="105">
+        <Item class="ModuleScript" referent="106">
           <Properties>
             <string name="Name">CaughtPanel</string>
             <string name="Source"><![CDATA[--!strict
--- The screen after the wasp has carried the spider off (Godot's scripts/presentation/caught_panel.gd, LIFE rounds 4 and 5; LIFE-01 "death
--- can be real and jarring, not sensationalized"): the world goes quiet and dim for a moment, one plain line says what happened, then a
--- short summary of the life and one way on: back to the last rest (the checkpoint), or the start when there is none. No gore, no score.
--- The game waits while it is up (the client skips its ticks) and it takes the keys and buttons first, so a press of Space, E or A is
--- the choice and never a jump. The words and timing are Shared/UI/WaspText and Data/Wasp. A mouse or a finger presses the button; a
--- controller selects it (GuiService.SelectedObject) so A presses it. Not ported: "Continue as another spider" and the notebook.
+-- Plain end/start screens. Scroll within the safe area; the selected button owns accept,
+-- and modal input never leaks into a jump or a held walking key.
 local CAS = game:GetService("ContextActionService")
 local GuiService = game:GetService("GuiService")
 local UIS = game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local WaspText = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("UI"):WaitForChild("WaspText"))
-
 local CaughtPanel = {}
 CaughtPanel.__index = CaughtPanel
-
-local ACTION = "WaspCaughtChoice"
--- The keys and buttons that choose (Godot: ui_accept, interact, prepare_jump).
-local KEYS: { any } = { Enum.KeyCode.Return, Enum.KeyCode.KeypadEnter, Enum.KeyCode.Space, Enum.KeyCode.E, Enum.KeyCode.ButtonA }
-
-local function label(parent: Instance, name: string, size: number, order: number, color: Color3): TextLabel
-	local l = Instance.new("TextLabel")
-	l.Name = name
-	l.BackgroundTransparency = 1
-	l.TextColor3 = color
-	l.Font = Enum.Font.GothamMedium
-	l.TextSize = size
-	l.TextWrapped = true
-	l.TextStrokeTransparency = 0.4
-	l.Size = UDim2.new(1, 0, 0, 0)
-	l.AutomaticSize = Enum.AutomaticSize.Y
-	l.LayoutOrder = order
-	l.Parent = parent
-	return l
+export type Choice = { id: string, text: string }
+local function label(parent: Instance, name: string, size: number, order: number): TextLabel
+ local l=Instance.new("TextLabel")
+ l.Name=name; l.BackgroundTransparency=1; l.TextColor3=Color3.new(.95,.93,.88)
+ l.Font=Enum.Font.GothamMedium; l.TextSize=size; l.TextWrapped=true
+ l.Size=UDim2.new(1,-24,0,0); l.AutomaticSize=Enum.AutomaticSize.Y; l.LayoutOrder=order; l.Parent=parent
+ return l
 end
-
--- `onChoose` is called once when the player chooses; the client puts the world back and calls `hide`.
-function CaughtPanel.new(playerGui: Instance, onChoose: () -> ()): any
-	local gui = Instance.new("ScreenGui")
-	gui.Name = "SpiderCaught"
-	gui.ResetOnSpawn = false
-	gui.IgnoreGuiInset = true
-	gui.DisplayOrder = 50
-	gui.Enabled = false
-	gui.Parent = playerGui
-	local dim = Instance.new("Frame")
-	dim.Name = "Dim"
-	dim.BackgroundColor3 = Color3.new(0.02, 0.02, 0.03)
-	dim.BackgroundTransparency = 1
-	dim.BorderSizePixel = 0
-	dim.Size = UDim2.fromScale(1, 1)
-	dim.Active = true -- takes the mouse
-	dim.Parent = gui
-	local box = Instance.new("Frame")
-	box.Name = "Box"
-	box.BackgroundTransparency = 1
-	box.AnchorPoint = Vector2.new(0.5, 0.5)
-	box.Position = UDim2.fromScale(0.5, 0.5)
-	box.Size = UDim2.new(0.9, 0, 0, 0)
-	box.AutomaticSize = Enum.AutomaticSize.Y
-	local constraint = Instance.new("UISizeConstraint")
-	constraint.MaxSize = Vector2.new(880, 10000)
-	constraint.Parent = box
-	local list = Instance.new("UIListLayout")
-	list.HorizontalAlignment = Enum.HorizontalAlignment.Center
-	list.SortOrder = Enum.SortOrder.LayoutOrder
-	list.Padding = UDim.new(0, 14)
-	list.Parent = box
-	box.Parent = dim
-	local text = Color3.new(0.95, 0.93, 0.88)
-	local line = label(box, "Line", 28, 1, text)
-	local sub = label(box, "Sub", 18, 2, Color3.new(0.8, 0.79, 0.74))
-	local summary = label(box, "Summary", 18, 3, Color3.new(0.88, 0.86, 0.8))
-	local button = Instance.new("TextButton")
-	button.Name = "Back"
-	button.BackgroundColor3 = Color3.new(0.16, 0.16, 0.18)
-	button.TextColor3 = Color3.new(1, 1, 1)
-	button.Font = Enum.Font.GothamMedium
-	button.TextSize = 20
-	button.AutoButtonColor = true
-	button.Selectable = true
-	button.Size = UDim2.fromOffset(320, 48)
-	button.LayoutOrder = 4
-	local corner = Instance.new("UICorner")
-	corner.CornerRadius = UDim.new(0, 10)
-	corner.Parent = button
-	button.Parent = box
-	local self = setmetatable({
-		gui = gui, dim = dim, line = line, sub = sub, summary = summary, button = button, onChoose = onChoose,
-		showing = false, seconds = 0.0, bound = false, chosen = false,
-	}, CaughtPanel)
-	button.Activated:Connect(function() self:choose() end)
-	return self
+function CaughtPanel.new(playerGui: Instance, onChoose: (string) -> (), name: string?): any
+ local gui=Instance.new("ScreenGui")
+ gui.Name=name or "SpiderCaught"; gui.ResetOnSpawn=false; gui.ScreenInsets=Enum.ScreenInsets.CoreUISafeInsets
+ gui.DisplayOrder=50; gui.Enabled=false; gui.Parent=playerGui
+ local dim=Instance.new("Frame")
+ dim.Name="Dim";dim.Size=UDim2.fromScale(1,1);dim.BackgroundColor3=Color3.new(.02,.02,.03);dim.BackgroundTransparency=1
+ dim.Active=true;dim.Parent=gui
+ local box=Instance.new("ScrollingFrame")
+ box.Name="Box";box.BackgroundTransparency=1;box.BorderSizePixel=0;box.AnchorPoint=Vector2.new(.5,.5)
+ box.Position=UDim2.fromScale(.5,.5);box.Size=UDim2.fromScale(.92,.88)
+ box.CanvasSize=UDim2.new();box.AutomaticCanvasSize=Enum.AutomaticSize.Y;box.ScrollBarThickness=6;box.Parent=dim
+ local constraint=Instance.new("UISizeConstraint");constraint.MaxSize=Vector2.new(880,10000);constraint.Parent=box
+ local list=Instance.new("UIListLayout");list.HorizontalAlignment=Enum.HorizontalAlignment.Center
+ list.SortOrder=Enum.SortOrder.LayoutOrder;list.Padding=UDim.new(0,12);list.Parent=box
+ local self=setmetatable({gui=gui,dim=dim,box=box,line=label(box,"Line",28,1),sub=label(box,"Sub",18,2),
+ summary=label(box,"Summary",18,3),buttons={},choices={},button=nil,onChoose=onChoose,showing=false,
+ seconds=0,bound=false,chosen=false,selected=1,stickDown=false,action="WindowsillChoice"..gui.Name},CaughtPanel)
+ return self
 end
-
-function CaughtPanel.isShowing(self: any): boolean
-	return self.showing
+function CaughtPanel.isShowing(self:any):boolean return self.showing end
+function CaughtPanel.select(self:any, delta:number)
+ if #self.buttons==0 then return end
+ self.selected=(self.selected-1+delta)%#self.buttons+1
+ pcall(function() GuiService.SelectedObject=self.buttons[self.selected] end)
 end
-
--- The catch screen begins: `summary` is WaspText.summary's text, `hasRest` whether there is a rest to go back to.
-function CaughtPanel.show(self: any, summary: string, hasRest: boolean)
-	self.showing, self.seconds, self.chosen = true, 0.0, false
-	self.line.Text, self.sub.Text, self.summary.Text = WaspText.LINE, WaspText.SUB, summary
-	self.button.Text = WaspText.choice(hasRest)
-	self.gui.Enabled = true
-	self:_apply()
-	if not self.bound then
-		self.bound = true
-		-- Above the game's own bindings (3000): Space, E and A choose here and never jump or eat.
-		CAS:BindActionAtPriority(ACTION, function(_, state)
-			if state == Enum.UserInputState.Begin then self:choose() end
-			return Enum.ContextActionResult.Sink
-		end, false, 4000, table.unpack(KEYS))
-	end
-	pcall(function()
-		UIS.MouseBehavior = Enum.MouseBehavior.Default
-		UIS.MouseIconEnabled = true
-	end)
+function CaughtPanel.showChoices(self:any, title:string, subtitle:string, summary:string, choices:{Choice}, immediate:boolean?)
+ for _,b in self.buttons do b:Destroy() end
+ self.buttons={};self.choices=choices;self.selected=1;self.stickDown=false
+ self.showing,self.seconds,self.chosen=true,if immediate then 100 else 0,false
+ self.line.Text,self.sub.Text,self.summary.Text=title,subtitle,summary
+ self.box.CanvasPosition=Vector2.zero
+ for i,c in choices do
+  local b=Instance.new("TextButton");b.Name=c.id;b.Text=c.text;b.BackgroundColor3=Color3.new(.16,.16,.18)
+  b.TextColor3=Color3.new(1,1,1);b.Font=Enum.Font.GothamMedium;b.TextSize=20;b.TextWrapped=true
+  b.Size=UDim2.new(1,-24,0,52);b.AutomaticSize=Enum.AutomaticSize.Y;b.Selectable=true;b.AutoButtonColor=true
+  b.LayoutOrder=i+3;b.Parent=self.box
+  b.Activated:Connect(function() self:choose(c.id) end)
+  table.insert(self.buttons,b)
+ end
+ self.button=self.buttons[1]
+ self.gui.Enabled=true;self:_apply()
+ if not self.bound then
+  self.bound=true
+  CAS:BindActionAtPriority(self.action,function(_,state,input)
+   local k=input and input.KeyCode
+   if k==Enum.KeyCode.Thumbstick1 then
+    local y=if input then input.Position.Y else 0
+    if math.abs(y)<.3 then self.stickDown=false
+    elseif math.abs(y)>.6 and not self.stickDown then self.stickDown=true;self:select(if y>0 then -1 else 1) end
+   elseif state==Enum.UserInputState.Begin then
+    if k==Enum.KeyCode.Up or k==Enum.KeyCode.W or k==Enum.KeyCode.DPadUp then self:select(-1)
+    elseif k==Enum.KeyCode.Down or k==Enum.KeyCode.S or k==Enum.KeyCode.DPadDown then self:select(1)
+    else self:choose() end
+   end
+   return Enum.ContextActionResult.Sink
+  end,false,4000,Enum.KeyCode.Return,Enum.KeyCode.KeypadEnter,Enum.KeyCode.Space,Enum.KeyCode.E,Enum.KeyCode.ButtonA,
+   Enum.KeyCode.Up,Enum.KeyCode.Down,Enum.KeyCode.W,Enum.KeyCode.S,Enum.KeyCode.DPadUp,Enum.KeyCode.DPadDown,Enum.KeyCode.Thumbstick1)
+ end
+ pcall(function() UIS.MouseBehavior=Enum.MouseBehavior.Default;UIS.MouseIconEnabled=true end)
+ if immediate then self:select(0) end
 end
-
-function CaughtPanel.hide(self: any)
-	self.showing = false
-	self.gui.Enabled = false
-	if self.bound then
-		self.bound = false
-		pcall(function() CAS:UnbindAction(ACTION) end)
-	end
-	pcall(function() GuiService.SelectedObject = nil end)
+function CaughtPanel.show(self:any, summary:string, hasRest:boolean)
+ self:showChoices(WaspText.LINE,WaspText.SUB,summary,{{id="Back",text=WaspText.choice(hasRest)}})
 end
-
--- Presses the button, if the choices are up and nothing has been chosen yet (a key, A, a click, a tap, and the tests all come here).
-function CaughtPanel.choose(self: any): boolean
-	if not self.showing or self.chosen or not WaspText.panel(self.seconds).choices then return false end
-	self.chosen = true
-	self.onChoose()
-	return true
+function CaughtPanel.hide(self:any)
+ self.showing=false;self.gui.Enabled=false
+ if self.bound then self.bound=false;CAS:UnbindAction(self.action) end
+ pcall(function() GuiService.SelectedObject=nil end)
 end
-
-function CaughtPanel._apply(self: any)
-	local stage = WaspText.panel(self.seconds)
-	self.dim.BackgroundTransparency = 1 - stage.dim
-	self.line.Visible = stage.line
-	self.sub.Visible = stage.line
-	self.summary.Visible = stage.choices and self.summary.Text ~= ""
-	self.button.Visible = stage.choices
+function CaughtPanel.choose(self:any, id:string?):boolean
+ if not self.showing or self.chosen or not WaspText.panel(self.seconds).choices then return false end
+ local choice=id
+ if not choice then
+  local selected=GuiService.SelectedObject
+  for i,b in self.buttons do if b==selected then self.selected=i end end
+  choice=self.choices[self.selected].id
+ end
+ local valid=false
+ for _,c in self.choices do if c.id==choice then valid=true end end
+ if not valid then return false end
+ self.chosen=true;self.onChoose(choice :: string);return true
 end
-
--- Real seconds, not game seconds: the screen does not wait for itself.
-function CaughtPanel.update(self: any, dt: number)
-	if not self.showing then return end
-	local before = WaspText.panel(self.seconds).choices
-	self.seconds += dt
-	self:_apply()
-	if not before and WaspText.panel(self.seconds).choices then
-		pcall(function() GuiService.SelectedObject = self.button end)
-	end
+function CaughtPanel.setTextScale(self:any, scale:number)
+ scale=math.clamp(scale,1,1.5)
+ self.line.TextSize=28*scale;self.sub.TextSize=18*scale;self.summary.TextSize=18*scale
+ for _,b in self.buttons do b.TextSize=20*scale;b.Size=UDim2.new(1,-24,0,52*scale) end
 end
-
+function CaughtPanel._apply(self:any)
+ local s=WaspText.panel(self.seconds)
+ self.dim.BackgroundTransparency=1-s.dim;self.line.Visible=s.line;self.sub.Visible=s.line
+ self.summary.Visible=s.choices and self.summary.Text~=""
+ for _,b in self.buttons do b.Visible=s.choices end
+end
+function CaughtPanel.update(self:any,dt:number)
+ if not self.showing then return end
+ local before=WaspText.panel(self.seconds).choices
+ self.seconds+=dt;self:_apply()
+ if not before and WaspText.panel(self.seconds).choices then self:select(0) end
+end
 return CaughtPanel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="106">
+        <Item class="ModuleScript" referent="107">
           <Properties>
             <string name="Name">FlyBodies</string>
             <string name="Source"><![CDATA[--!strict
@@ -14429,7 +14461,7 @@ return FlyBodies
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="107">
+        <Item class="ModuleScript" referent="108">
           <Properties>
             <string name="Name">PerceptionHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -14651,7 +14683,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="108">
+        <Item class="ModuleScript" referent="109">
           <Properties>
             <string name="Name">PerceptionStage</string>
             <string name="Source"><![CDATA[--!strict
@@ -14696,7 +14728,7 @@ return Stage
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="109">
+        <Item class="ModuleScript" referent="110">
           <Properties>
             <string name="Name">Soundscape</string>
             <string name="Source"><![CDATA[--!strict
@@ -14798,7 +14830,7 @@ return Soundscape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="110">
+        <Item class="ModuleScript" referent="111">
           <Properties>
             <string name="Name">SpiderCamera</string>
             <string name="Source"><![CDATA[--!strict
@@ -15169,7 +15201,7 @@ return SpiderCamera
 ]]></string>
           </Properties>
         </Item>
-        <Item class="LocalScript" referent="111">
+        <Item class="LocalScript" referent="112">
           <Properties>
             <string name="Name">SpiderClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -15226,6 +15258,8 @@ local FlyBodies = require(script.Parent.FlyBodies)
 local WaspBody = require(script.Parent.WaspBody)
 local NeedsModel = require(Shared.Life.NeedsModel)
 local LifeLoop = require(Shared.Life.LifeLoop)
+local LifeSession = require(Shared.Life.LifeSession)
+local session = LifeSession.new()
 local LifeText = require(Shared.UI.LifeText)
 local DayLight = require(Shared.Habitat.DayLight)
 local LifeClock = require(Shared.Life.LifeClock)
@@ -15249,6 +15283,8 @@ local COLORS = {
 local WARN_EVENTS = { drop_refused = true, snagged = true, lost = true, blocked = true }
 
 local player = Players.LocalPlayer
+-- Solo windowsill: the default player list obscures the life-menu button on small screens.
+pcall(function() game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList,false) end)
 local camera = Workspace.CurrentCamera
 local sill = Workspace:WaitForChild("Windowsill")
 local params = RaycastParams.new()
@@ -15320,13 +15356,18 @@ local wasp: any = WaspDirector.new({
 	},
 })
 local waspSpider: WaspDirector.Spider = { position = Vector3.zero, velocity = Vector3.zero, walkSpeed = Species.phidippus_audax_prototype.locomotion.walk_speed_wu_s, airborne = false, falling = false }
+local menu: any = nil
+local initialRecord: any = nil
+local menuStarted = false
 local panel: any = nil -- the catch screen, made below once returnToCheckpoint exists
 -- S01-C retreat checkpoints (ROBLOX-25): resting in the crack, and each morning, keeps one; Backspace / View returns to it. The
 -- store is DataStore-shaped but in memory only: a checkpoint lasts the session. No live DataStore is written.
 local checkpointWorld: Checkpoint.World = { motor = motor, prey = prey, sensor = sensor, memory = memory, needs = needs, life = life, wasp = wasp }
-local checkpoints = CheckpointStore.new(CheckpointStore.MemoryDataStore.new(), function(r: any): { string }
-	return (Checkpoint.check(r, checkpointWorld))
-end)
+local function newStore(): any
+	return CheckpointStore.new(CheckpointStore.MemoryDataStore.new(), function(r: any): { string } return (Checkpoint.check(r, checkpointWorld)) end)
+end
+local stores = {main=newStore(), free=newStore()}
+local checkpoints = stores.main
 life.save = function(): LifeLoop.CheckpointResult
 	local why = Checkpoint.boundaryProblem(checkpointWorld)
 	if why ~= "" then return { ok = false, message = why } end
@@ -15568,6 +15609,8 @@ local function returnToCheckpoint()
 		hud:toast("The checkpoint could not be used: " .. (problems[1] or "unknown"), true)
 		return
 	end
+	session.mode, session.rules, session.ended = life.mode or "main", life.rules or "standard", false
+	session.summary = nil
 	controls:clear()
 	focusState:clear()
 	dropStrands(false)
@@ -15577,27 +15620,111 @@ local function returnToCheckpoint()
 	feedPending, cancelPending = false, false
 end
 
--- The wasp has carried the spider off: the game waits, the screen is plain, and the one choice puts the world back at the last rest (or
--- the start). The live screen is hidden under it, as in Godot.
+-- Player progress is session-only and outside checkpoints. Modes have independent rest stores.
 local function setHudShown(shown: boolean)
-	hud.safe.Enabled = shown
-	hud.centre.Enabled = shown
+ hud.safe.Enabled=shown;hud.centre.Enabled=shown
+ local touch=player:WaitForChild("PlayerGui"):FindFirstChild("SpiderTouch")
+ if touch and touch:IsA("ScreenGui") then touch.Enabled=shown and UIS.TouchEnabled end
 end
-panel = CaughtPanel.new(player:WaitForChild("PlayerGui"), function()
-	panel:hide()
-	setHudShown(true)
-	wasp:clearVisit()
-	returnToCheckpoint()
+local function applyRules()
+ life.mode,life.rules=session.mode,session.rules
+ needs.gentle=session.rules=="gentle";wasp.gentle=needs.gentle
+end
+local function closeScreens()
+ panel:hide();menu:hide();setHudShown(true);controls:clear();dropAll()
+end
+local function fresh(mode: string, easy: boolean, position: Vector3?): boolean
+ if not initialRecord or (easy and not session.finishedMain) then return false end
+ local ok=Checkpoint.restore(initialRecord,checkpointWorld)
+ if not ok then return false end
+ session:begin(mode,easy);applyRules()
+ sensor:reset();memory:clear()
+ stores[mode]=newStore();checkpoints=stores[mode]
+ life.resting=false;life.notice="";life.noticeSeconds=0;life.restoreGrace=0
+ wasp:load(WaspDirector.defaultRecord());wasp.gentle=needs.gentle
+ if position then motor:place(position,Vector3.yAxis,Layout.SPAWN_HEADING) end
+ closeScreens();dropStrands(false);drawnUp=motor.up;cam:snap();lastLight=nil
+ feedPending,cancelPending=false,false
+ return true
+end
+local function continueAnother()
+ local spot=session:another()
+ if not spot then return end
+ local mode,easy=session.mode,session.rules=="gentle"
+ if fresh(mode,easy,spot) then
+  life:showNotice("Another young spider, somewhere new on the sill. It is not related to the last.")
+  life.noticeSeconds=12
+ end
+end
+local function summaryRecord(cause: string): any
+ return {cause=cause,hours=math.max((life.clock.day-1)*24+life.clock.hour-LifeClock.START_H,0),
+  meals=prey.feeding.mealsFinished,wasp_visits=wasp.visits,wasp_escapes=wasp.escapes,stage=0}
+end
+panel=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
+ if choice=="Another" then continueAnother()
+ elseif choice=="Back" then closeScreens();wasp:clearVisit();returnToCheckpoint() end
 end)
-local function showCaught()
-	local clock = life.clock
-	local hours = (clock.day - LifeClock.START_DAY) * 24 + clock.hour - LifeClock.START_H
-	local summary = WaspText.summary(math.max(hours, 0), prey.feeding.mealsFinished, wasp.visits, wasp.escapes)
-	setHudShown(false)
-	panel:show(summary, checkpoints:loadBest().ok)
+local function endLife(cause: string)
+ local rec=summaryRecord(cause)
+ if not session:endLife(cause,rec) then return end
+ controls:clear();dropAll();setHudShown(false)
+ local choices: {CaughtPanel.Choice}={}
+ if checkpoints:loadBest().ok then table.insert(choices,{id="Back",text="Back to your last rest"}) end
+ table.insert(choices,{id="Another",text="Continue as another spider"})
+ panel:showChoices(if cause=="starved" then "The spider starved." else WaspText.LINE,
+  if cause=="starved" then "It went too long without food." else WaspText.SUB,
+  WaspText.summary(rec.hours,rec.meals,rec.wasp_visits,rec.wasp_escapes),choices)
+ panel:setTextScale(if player:GetAttribute("LargeText")==true then 1.5 else 1)
 end
+local function showCaught() endLife("wasp") end
+local openMenu: () -> ()
+local confirming: string?=nil
+menu=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
+ if choice=="Resume" then closeScreens();return end
+ if choice=="Continue" then checkpoints=stores.main;closeScreens();returnToCheckpoint();return end
+ if choice=="Free" then
+  local saved=stores.free:loadBest()
+  if saved.ok then checkpoints=stores.free;closeScreens();returnToCheckpoint()
+  else fresh("free",false,nil) end
+  return
+ end
+ if choice=="Large" then
+  player:SetAttribute("LargeText",player:GetAttribute("LargeText")~=true);openMenu();return
+ end
+ if choice=="New" or choice=="Easy" then
+  if session.started and confirming~=choice then
+   confirming=choice
+   menu:showChoices("Begin a new life?","This replaces the main life's last rest for this session.","",
+    {{id=choice :: string,text="Begin the new life"},{id="CancelNew",text="Keep this life"}},true)
+   return
+  end
+  confirming=nil;session:archive();fresh("main",choice=="Easy",nil);return
+ end
+ confirming=nil;openMenu()
+end,"SpiderLifeMenu")
+openMenu=function()
+ if panel:isShowing() or not initialRecord then return end
+ controls:clear();dropAll();setHudShown(false)
+ local choices: {CaughtPanel.Choice}={}
+ if session.started then table.insert(choices,{id="Resume",text="Resume this spider"}) end
+ if stores.main:loadBest().ok then table.insert(choices,{id="Continue",text="Continue from last rest"}) end
+ table.insert(choices,{id="New",text="Begin a new life"})
+ if session.finishedMain then table.insert(choices,{id="Easy",text="Begin a new life on Easy"}) end
+ table.insert(choices,{id="Free",text="Free play - gentle rules"})
+ table.insert(choices,{id="Large",text=if player:GetAttribute("LargeText")==true then "Text size: large" else "Text size: normal"})
+ menu:showChoices("The Windowsill","A small life on a windowsill.",
+  "Progress and rest checkpoints last for this play session."..(if session.finishedMain then "" else "\nEasy is not available yet; choose Free play for gentle rules."),choices,true)
+ menu:setTextScale(if player:GetAttribute("LargeText")==true then 1.5 else 1)
+end
+local menuButton=Instance.new("TextButton")
+menuButton.Name="LifeMenu";menuButton.Text="Menu";menuButton.Size=UDim2.fromOffset(72,36)
+menuButton.Position=UDim2.new(1,-84,0,48);menuButton.TextSize=16
+menuButton.BackgroundColor3=Color3.new(.12,.12,.14);menuButton.TextColor3=Color3.new(1,1,1)
+menuButton.Parent=hud.safe;menuButton.Activated:Connect(openMenu)
 
 controls = SpiderInput.bind({
+	blocked = function() return panel:isShowing() or menu:isShowing() end,
+	menu = function() if menu:isShowing() and session.started then closeScreens() else openMenu() end end,
 	focus = function(phase: string)
 		if phase == "begin" then focusState:press(player:GetAttribute("FocusToggle") == true, motor.mode == "attached")
 		elseif phase == "cancel" then focusState:clear() end
@@ -15738,12 +15865,16 @@ local function updateHud(frameDt: number)
 	elseif prey.feeding.feeding then table.insert(view.status, "Feeding — move to stop")
 	elseif prey.feeding.held then table.insert(view.status, "Meal paused — " .. ControlText.name(device,"feed") .. " to eat") end
 	local clock = life.clock
-	view.day = LifeText.day(clock.day, clock:partOfDay())
-	view.dayLine = LifeText.line(clock:partOfDay(), needs.energy, needs:isStarving(), needs.gentle, LifeLoop.HUNGRY_AT)
+	view.day = LifeText.day(clock.day, clock:partOfDay()) .. (if session.mode=="free" then " | FREE PLAY" elseif session.rules=="gentle" then " | EASY" else "")
+	view.dayLine = LifeText.line(clock:partOfDay(), needs.energy, needs:isStarving(), needs.gentle, LifeLoop.HUNGRY_AT, life:tooHungryToSleep())
 	view.notice = if life.noticeSeconds > 0 and life.notice ~= "" then life.notice else nil
 	local canRest = life:canRest(lifeSpider)
-	local restPrompt = LifeText.prompt(life.asleep, life.resting, canRest, clock:isSleepTime(), device, PeacockText.change(device, appearance))
-	local canDance = SpiderChoice.canDance(appearance)
+	local restPrompt = LifeText.prompt(life.asleep, life.resting, canRest, clock:isSleepTime() and not life:tooHungryToSleep(), device, PeacockText.change(device, appearance))
+	if not restPrompt and (motor.pos-Vector3.new(-24,1,6)).Magnitude<7 and not prey.feeding.held then
+  restPrompt={title="Home: the silk-lined crack",hint=if lifeSpider.inRetreat then "Keep still on a surface, then "..ControlText.name(device,"feed")..": rest" else "Walk through the silk-framed opening under the wooden roof, then stop to rest."}
+ end
+ local canDance = SpiderChoice.canDance(appearance)
+	if restPrompt and not lifeSpider.inRetreat and canDance then restPrompt.hint ..= "    " .. PeacockText.displayHint(device,dance.active) end
 	if canDance and dance.active then table.insert(view.status, PeacockText.dancingLine(device)) end
 	if focusState.latched then table.insert(view.status, "FOCUS ON    " .. ControlText.name(device,"focus") .. " again to stop" .. (if not jump:isBusy() and not motor:onLine() and not motor.silk.walk then " / " .. ControlText.name(device,"cancel") else "")) end
 	if cam.eyeView then table.insert(view.status, `SPIDER-EYE VIEW    {ControlText.name(device, "eye")}: back`) end
@@ -15768,7 +15899,7 @@ local function updateHud(frameDt: number)
 		view.prompt = { hint = ControlText.walkHint(device) .. (if canDance then "    " .. PeacockText.displayHint(device, dance.active) else "") }
 	end
 	if os.clock() > helpUntil and helpVisible then helpVisible = false end
-	local restLabel = LifeText.touchLabel(life.asleep, life.resting, canRest, clock:isSleepTime())
+	local restLabel = LifeText.touchLabel(life.asleep, life.resting, canRest, clock:isSleepTime() and not life:tooHungryToSleep())
 	controls:setTouchVisible("Feed", prey.feeding.held ~= nil or restLabel ~= nil)
 	controls:setTouchLabel("Feed", if prey.feeding.held ~= nil then "Eat" else restLabel or "Eat")
 	controls:setTouchLabel("Jump", if prey.feeding.struggling then "Grip" else "Jump")
@@ -15786,7 +15917,7 @@ end
 local accumulator = 0
 RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, function(frameDt: number)
 	if panel:isShowing() then panel:update(frameDt) end
-	if GuiService.MenuIsOpen or panel:isShowing() then
+	if GuiService.MenuIsOpen or panel:isShowing() or menu:isShowing() then
 		accumulator = 0 -- the Roblox menu is Godot's pause (so is the catch screen): the world waits
 	else
 		local simDt = frameDt * (if slow then SLOW_SPEED else 1)
@@ -15844,7 +15975,15 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			life:step(DT, lifeSpider, feedPending, cancelPending)
 			feedPending, cancelPending = false, false
 			sensor.core.rangeScale = life.rangeScale
-			life:drainEvents() -- the screen reads the loop's state and notices; the events are for tests and later rounds
+			for _,event in life:drainEvents() do if event.kind=="starved" then endLife("starved") end end
+            if not initialRecord and Checkpoint.boundaryProblem(checkpointWorld)=="" then
+             initialRecord=Checkpoint.capture(checkpointWorld,0)
+             if initialRecord and not menuStarted then
+              menuStarted=true
+              if not testPlace then openMenu() else session.started=true end
+             end
+            end
+            if panel:isShowing() or menu:isShowing() then accumulator=0;break end
 			if motor.mode ~= "attached" then focusState:clear() end
 			if stage then stage.target:step(DT); stage.marker.Position = stage.target.position end
 			cam:tick(DT)
@@ -15868,7 +16007,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 		dance.reduced = player:GetAttribute("ReducedMotion") == true
 		local r, f = controls:axes()
 		local standing = motor.mode == "attached" and not motor.preparing and not motor.seized and not motor:onLine() and not life.resting
-		local paused = GuiService.MenuIsOpen or panel:isShowing()
+		local paused = GuiService.MenuIsOpen or panel:isShowing() or menu:isShowing()
 		dancePose = dance:step(if paused then 0 else simFrame, standing, motor.moving or r ~= 0 or f ~= 0)
 		rig.dance = if dance:showing() then dancePose else nil
 	else
@@ -15878,7 +16017,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	rig:update(body, simFrame, motor.mode == "attached", motor.moving)
 	updateHud(frameDt)
 	flyBodies:draw(prey.flies,prey.now)
-	local soundPaused = GuiService.MenuIsOpen or panel:isShowing()
+	local soundPaused = GuiService.MenuIsOpen or panel:isShowing() or menu:isShowing()
 	local soundSpeed = if slow then SLOW_SPEED else 1
 	local soundMuted = player:GetAttribute("SoundMuted") == true
 	soundscape:update(frameDt, prey, life.daylight, soundPaused, soundSpeed, soundMuted)
@@ -15906,7 +16045,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	end
 	-- Looking runs in real time, so slow motion never makes the camera sluggish.
 	local lx, ly = controls:lookAxes()
-	cam:render(frameDt, lx, ly)
+	if not panel:isShowing() and not menu:isShowing() then cam:render(frameDt, lx, ly) end
 	-- The Focus that feeds the perception HUD also decides how far the principal eyes are in use (the eye view's picture). The
 	-- picture sets the field of view, so it comes before the HUD projects anything.
 	local focusing = motor.mode == "attached" and (controls.held.Focus == true or focusActive())
@@ -15927,6 +16066,7 @@ if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
 		run({
 			prey = prey, flyBodies = flyBodies, waspBody = waspBody, life = life, wasp = wasp, caughtPanel = panel, needs = needs, checkpoints = checkpoints, returnToCheckpoint = function() returnToCheckpoint() end, lifeSpider = function() return lifeSpider end, sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
 			input = controls,
+			session=session, menu=menu, openMenu=openMenu, endLife=endLife, fresh=fresh, continueAnother=continueAnother, currentStore=function() return checkpoints end,
 			changeSpider = function() changeSpider() end, dance = function() return dance end, appearance = function() return appearance end, rig = function() return rig end,
 			drop = function() motor:requestDrop() end,
 			jump = jump,
@@ -15951,7 +16091,7 @@ end
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="112">
+        <Item class="ModuleScript" referent="113">
           <Properties>
             <string name="Name">SpiderEyes</string>
             <string name="Source"><![CDATA[--!strict
@@ -16409,7 +16549,7 @@ return SpiderEyes
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="113">
+        <Item class="ModuleScript" referent="114">
           <Properties>
             <string name="Name">SpiderHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -16686,7 +16826,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="114">
+        <Item class="ModuleScript" referent="115">
           <Properties>
             <string name="Name">SpiderInput</string>
             <string name="Source"><![CDATA[--!strict
@@ -16714,6 +16854,7 @@ local HudLayout = require(Shared:WaitForChild("UI"):WaitForChild("HudLayout"))
 local SpiderInput = {}
 
 export type Handlers = {
+	blocked: (() -> boolean)?, menu: (() -> ())?,
 	feed: (() -> ())?,
 	choose: (() -> ())?, -- C: change spider (in the crack)
 	display: (() -> ())?, -- X / RB: the peacock spider's courtship dance
@@ -16732,7 +16873,7 @@ export type Handlers = {
 	device: ((string) -> ())?, -- the last input's UserInputType name
 }
 
-local ONE_SHOT = { Reset = "reset", Gait = "gait", Eye = "eye", Recenter = "recenter", Slow = "slow", Help = "help" }
+local ONE_SHOT = { Menu = "menu", Reset = "reset", Gait = "gait", Eye = "eye", Recenter = "recenter", Slow = "slow", Help = "help" }
 
 -- Bindings by action. Exported for tests and the controls table in README.md.
 SpiderInput.BINDINGS = {
@@ -16747,7 +16888,7 @@ SpiderInput.BINDINGS = {
 	Eye = { Enum.KeyCode.V, Enum.KeyCode.ButtonY },
 	Recenter = { Enum.KeyCode.R, Enum.UserInputType.MouseButton3, Enum.KeyCode.ButtonR3 },
 	Slow = { Enum.KeyCode.T, Enum.KeyCode.ButtonR2 }, Help = { Enum.KeyCode.H },
-	Reset = { Enum.KeyCode.Backspace, Enum.KeyCode.ButtonSelect }, Gait = { Enum.KeyCode.G },
+	Reset = { Enum.KeyCode.Backspace }, Menu = { Enum.KeyCode.M, Enum.KeyCode.ButtonSelect }, Gait = { Enum.KeyCode.G },
 	Choose = { Enum.KeyCode.C }, Display = { Enum.KeyCode.X, Enum.KeyCode.ButtonR1 },
 } :: { [string]: { any } }
 
@@ -16764,6 +16905,8 @@ function SpiderInput.bind(h: Handlers)
 	local handlers: { [string]: any } = h :: any
 	-- One source of one action went down (down) or up; "cancel" means the engine took the input away (treated as up).
 	local function act(action: string, down: boolean, source: any, cancelled: boolean?)
+		local blocked: boolean = if h.blocked then h.blocked() else false
+		if down and blocked and action ~= tostring("Menu") then return end
 		local was, now = state:set(action, down, source)
 		if was == now then return end
 		if action == "Jump" then
@@ -16796,7 +16939,7 @@ function SpiderInput.bind(h: Handlers)
 		end, false, 3000, table.unpack(keys))
 	end
 	CAS:BindActionAtPriority("SpiderStick", function(_, phase, input)
-		if phase == Enum.UserInputState.Cancel or UIS:GetFocusedTextBox() then state:stick(0, 0)
+		if phase == Enum.UserInputState.Cancel or UIS:GetFocusedTextBox() or (h.blocked and h.blocked()) then state:stick(0, 0)
 		else state:stick(input.Position.X, input.Position.Y) end
 		return Enum.ContextActionResult.Sink
 	end, false, 3000, Enum.KeyCode.Thumbstick1)
@@ -16914,7 +17057,7 @@ return SpiderInput
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="115">
+        <Item class="ModuleScript" referent="116">
           <Properties>
             <string name="Name">WaspBody</string>
             <string name="Source"><![CDATA[--!strict
@@ -17146,7 +17289,7 @@ return WaspBody
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="116">
+        <Item class="ModuleScript" referent="117">
           <Properties>
             <string name="Name">WorldDetail</string>
             <string name="Source"><![CDATA[--!strict
@@ -17186,7 +17329,7 @@ return WorldDetail
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="117">
+        <Item class="ModuleScript" referent="118">
           <Properties>
             <string name="Name">SilkPlayback</string>
             <string name="Source"><![CDATA[--!strict
@@ -17440,6 +17583,41 @@ return function(driver: any)
   assert(driver.appearance()=="first_spider","first spider was not restored")
   if driver.life.resting then press("Feed") end
  end)
+
+ check("REST entrance: walk under the roof from outside and press rest",function()
+  assert(driver.fresh("main",false,nil))
+  driver.motor:place(Vector3.new(-22,.31,6),Vector3.yAxis,-Vector3.xAxis);driver.camera:snap();wait(.3)
+  driver.input:simulate("Forward",true)
+  local elapsed=0
+  while elapsed<4 and driver.motor.pos.X>-24 do elapsed+=RunService.Heartbeat:Wait() end
+  driver.input:simulate("Forward",false);wait(.3)
+  assert(driver.lifeSpider().inRetreat,"walk did not reach retreat: "..tostring(driver.motor.pos))
+  driver.input:simulate("Feed",true);wait(.1);driver.input:simulate("Feed",false);wait(.2)
+  assert(driver.life.resting and driver.currentStore():loadBest().ok,"rest/checkpoint did not work after walking in")
+ end)
+ check("LIFE end: starvation, last rest, then unrelated new spider",function()
+  driver.needs.starvingStreakH=48;wait(.2)
+  assert(driver.caughtPanel:isShowing() and driver.session.ended,"starvation did not end")
+  local hour=driver.life.clock.hour;wait(5)
+  assert(driver.life.clock.hour==hour,"world not paused")
+  assert(driver.caughtPanel:choose("Back"));wait(.2)
+  assert(not driver.session.ended and driver.needs.starvingStreakH<48,"rest did not revive")
+  driver.endLife("wasp");wait(5)
+  assert(driver.caughtPanel:choose("Another"));wait(.3)
+  assert(not driver.session.ended and driver.life.clock.day==1 and not driver.currentStore():loadBest().ok)
+  assert(string.find(driver.life.notice,"not related",1,true),"no unrelated line")
+ end)
+ check("LIFE menu: large text, controller focus, gentle free play",function()
+  driver.openMenu();driver.menu:setTextScale(1.5);wait(.2)
+  local selected=driver.menu.selected;driver.menu:select(1)
+  assert(driver.menu.selected~=selected,"focus did not move")
+  for _,b in driver.menu.buttons do assert(b.TextFits,"large menu text clipped: "..b.Text) end
+  assert(driver.menu:choose("Free"));wait(.3)
+  assert(driver.needs.gentle and driver.wasp.gentle and driver.session.mode=="free")
+  driver.endLife("wasp");assert(not driver.caughtPanel:isShowing(),"gentle ended")
+  driver.needs:addHours(400,false);wait(.7);assert(driver.needs.energy>=.1-1e-9)
+  assert(driver.fresh("main",false,nil))
+ end)
  local passed=0
 	for _,row in rows do if row.passed then passed+=1 end end
 	print("PORT_CLIENT_REPORT "..HttpService:JSONEncode({evidence_id=workspace:GetAttribute("PortEvidence"),tests=#rows,passed=passed,failed=#rows-passed,results=rows}))
@@ -17454,7 +17632,7 @@ end
       </Item>
     </Item>
   </Item>
-  <Item class="Workspace" referent="118">
+  <Item class="Workspace" referent="119">
     <Properties>
       <string name="Name">Workspace</string>
       <float name="Gravity">35</float>

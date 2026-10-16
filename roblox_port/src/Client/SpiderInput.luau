@@ -23,6 +23,7 @@ local HudLayout = require(Shared:WaitForChild("UI"):WaitForChild("HudLayout"))
 local SpiderInput = {}
 
 export type Handlers = {
+	blocked: (() -> boolean)?, menu: (() -> ())?,
 	feed: (() -> ())?,
 	choose: (() -> ())?, -- C: change spider (in the crack)
 	display: (() -> ())?, -- X / RB: the peacock spider's courtship dance
@@ -41,7 +42,7 @@ export type Handlers = {
 	device: ((string) -> ())?, -- the last input's UserInputType name
 }
 
-local ONE_SHOT = { Reset = "reset", Gait = "gait", Eye = "eye", Recenter = "recenter", Slow = "slow", Help = "help" }
+local ONE_SHOT = { Menu = "menu", Reset = "reset", Gait = "gait", Eye = "eye", Recenter = "recenter", Slow = "slow", Help = "help" }
 
 -- Bindings by action. Exported for tests and the controls table in README.md.
 SpiderInput.BINDINGS = {
@@ -56,7 +57,7 @@ SpiderInput.BINDINGS = {
 	Eye = { Enum.KeyCode.V, Enum.KeyCode.ButtonY },
 	Recenter = { Enum.KeyCode.R, Enum.UserInputType.MouseButton3, Enum.KeyCode.ButtonR3 },
 	Slow = { Enum.KeyCode.T, Enum.KeyCode.ButtonR2 }, Help = { Enum.KeyCode.H },
-	Reset = { Enum.KeyCode.Backspace, Enum.KeyCode.ButtonSelect }, Gait = { Enum.KeyCode.G },
+	Reset = { Enum.KeyCode.Backspace }, Menu = { Enum.KeyCode.M, Enum.KeyCode.ButtonSelect }, Gait = { Enum.KeyCode.G },
 	Choose = { Enum.KeyCode.C }, Display = { Enum.KeyCode.X, Enum.KeyCode.ButtonR1 },
 } :: { [string]: { any } }
 
@@ -73,6 +74,8 @@ function SpiderInput.bind(h: Handlers)
 	local handlers: { [string]: any } = h :: any
 	-- One source of one action went down (down) or up; "cancel" means the engine took the input away (treated as up).
 	local function act(action: string, down: boolean, source: any, cancelled: boolean?)
+		local blocked: boolean = if h.blocked then h.blocked() else false
+		if down and blocked and action ~= tostring("Menu") then return end
 		local was, now = state:set(action, down, source)
 		if was == now then return end
 		if action == "Jump" then
@@ -105,7 +108,7 @@ function SpiderInput.bind(h: Handlers)
 		end, false, 3000, table.unpack(keys))
 	end
 	CAS:BindActionAtPriority("SpiderStick", function(_, phase, input)
-		if phase == Enum.UserInputState.Cancel or UIS:GetFocusedTextBox() then state:stick(0, 0)
+		if phase == Enum.UserInputState.Cancel or UIS:GetFocusedTextBox() or (h.blocked and h.blocked()) then state:stick(0, 0)
 		else state:stick(input.Position.X, input.Position.Y) end
 		return Enum.ContextActionResult.Sink
 	end, false, 3000, Enum.KeyCode.Thumbstick1)

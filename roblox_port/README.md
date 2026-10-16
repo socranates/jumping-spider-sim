@@ -24,13 +24,13 @@ Every action of the frozen Godot game (`scripts/core/input_setup.gd` and its REA
 | Spider-eye view (eye_view) | V | Y | Eye | Ported: view at the principal eyes, walking relative to the gaze. The picture (ROBLOX-20): side eyes (wide, green, soft, movement rings) and, with Focus, the principal eyes (24 degree telephoto, sharp, green and ultraviolet) with two retina strips, a vignette and a first-time caption; Player attribute `ReducedMotion = true` holds the strips still and stops the zoom at 45 degrees; not yet seen in Studio |
 | Slow motion | T | RT | — | Ported at 50 % for the spider (the whole world when more of it exists) |
 | Pause | Esc | Menu | Roblox menu button | Roblox's own menu (reserved by Roblox): the game drops every press and hold and waits until it closes |
-| Field notes (help) | H | View | — | Deferred (notebook not ported). H shows the port's controls card instead |
+| Field notes (help) | H | — | — | Deferred (notebook not ported). H shows the port's controls card instead |
 | Eat / resume meal; rest (interact) | E | Left-stick click (L3) | Eat (Rest, Sleep, Wake or Leave in the crack) | Ported for held prey; movement interrupts feeding. X remains Silk. With nothing in the jaws, in the silk-lined crack, still: rest; from 18:00 to 07:00 sleep until morning; E or Q again, or moving, ends it (ROBLOX-24) |
 | Notebook | N | D-pad up | — | Deferred (the port's D-pad walks) |
 | Struggle grip (prepare_jump with prey) | Space or E | A or L3 | Grip or Eat | Ported; these presses grip while struggling instead of jumping |
 | Debug overlay, support view | F3, F4 | — | — | Deferred (developer views) |
 | Settings in the pause panel | Esc | Menu | — | Deferred: sensitivity/invert, FOV, camera distance, stalk/aim/Focus toggles, jump arc, jump reach, hold-to-let-go switch, frame-the-line switch, remapping, assisted-play presets. The port uses Godot's defaults (hold to let go on, framing on, arc shown) |
-| Return to checkpoint | Backspace | View | — | The last retreat checkpoint (ROBLOX-25), or the start when there is none yet. Godot's is in the Esc menu; the port has no menu, and touch has no button for it yet |
+| Return to checkpoint | Backspace | View/Touchpad opens the life menu | Menu | Current life's last rest; main and Free play keep independent session checkpoints |
 | Zoom (port only) | Wheel | — | — | Port only, 2 to 12 studs |
 | Change spider (port only) | C, in the silk-lined crack while resting | RB (R1 on PlayStation), in the crack | Change (shown only while resting) | ROBLOX-31: becomes the other spider (first spider or the peacock spider, Maratus volans); remembered for the session in Player attribute `Appearance` (Workspace attribute `Appearance` preselects it). The drawn rig is built again; nothing else changes |
 | Courtship dance (port only) | X, as the peacock spider standing still | RB (R1 on PlayStation) outside the crack | Dance (peacock spider only) | ROBLOX-29 to 31: a presentation-only pose of the drawn peacock spider (fan, palps, legs III); any move, a jump, Cancel or X again stops it; Player attribute `ReducedMotion` halves its movement; a felt caption in the rumble-rump |
@@ -78,3 +78,11 @@ The windowsill has a day: it starts at 9:00 on day 1 and about 12 waking hours p
 ## Flies and perception (2026-10-15)
 
 Four flies now live on the sill. Stalk, inspect, leap to catch, tap to hold on, then stay still to eat. Player attribute `AutomaticGrip = true` assists the struggle. The labeled perception fixture is only in the test place by default; `Workspace.TestTarget = true` explicitly enables it elsewhere. The wasp, notebook, growth, death and DataStore saves remain future port work. See `docs/HANDOFF-roblox-flies.md` for verification and the next chunk.
+
+## A life and continuing (ROBLOX-33, 34)
+
+The start menu offers Standard and Free play (gentle hunger; the wasp only touches). **M / View / PlayStation Touchpad / Menu** returns to the life menu. Easy's unlock rule is tested but awaits the growth port; Free play is available now. Progress and checkpoints are **session only**, not saved across Roblox sessions.
+
+Home is the silk-framed opening **under** the wooden roof at the west end, not a decorative paint crack or the roof itself. Walk inside, stop with no prey in the jaws, and press **E / L3 / Rest**. C / R1 / Change while resting awake chooses the peacock; X / R1 / Dance outside starts the dance. It is still free/unlocked for testing.
+
+Standard shows a starvation warning, then a full day of weakness before death. The end offers the last rest (when one exists) or an unrelated spider in a new spot. The appearance stays chosen. Main life and Free play have separate last rests; starting a new main life asks for confirmation. The menu has large text, scrolling and controller focus. Notebook and live DataStore persistence remain later work.

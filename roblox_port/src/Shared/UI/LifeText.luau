@@ -15,7 +15,8 @@ end
 
 -- The line under the day (Godot's precedence, among the lines this port has): starving, hungry, night, evening; nil otherwise.
 -- `gentle` rules never say starving (Godot: is_starving() and not gentle).
-function LifeText.line(part: string, energy: number, starving: boolean, gentle: boolean, hungryAt: number): string?
+function LifeText.line(part: string, energy: number, starving: boolean, gentle: boolean, hungryAt: number, weak: boolean?): string?
+	if weak and not gentle then return "Starving: your spider will not last another day. Too hungry to sleep; find food." end
 	if starving and not gentle then
 		return "Starving: your spider's reserve is gone. It must eat soon."
 	end

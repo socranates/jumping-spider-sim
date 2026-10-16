@@ -43,7 +43,7 @@ local WaspDirector = require(script.Parent.Parent.Predator.WaspDirector)
 
 local Checkpoint = {}
 
-Checkpoint.SCHEMA_VERSION = 1
+Checkpoint.SCHEMA_VERSION = 2
 Checkpoint.KIND = "retreat_checkpoint"
 Checkpoint.GAME = "the-windowsill-roblox"
 -- Changes whenever the windowsill's pieces or perches change in a way an old checkpoint could not be put back into.
@@ -130,6 +130,7 @@ function Checkpoint.capture(world: World, createdAt: number?): ({ [string]: any 
 			retreat_id = if Layout.inRetreat(motor.pos) then "sill_crevice" else "", state = "ATTACHED",
 		},
 		world = graph,
+		life_rules = { mode = world.life.mode or "main", rules = world.life.rules or "standard" },
 		wasp = if world.wasp ~= nil then world.wasp:toRecord() else nil,
 	}, nil
 end
@@ -231,6 +232,9 @@ function Checkpoint.check(record: any, world: World): ({ string }, ObjectRecord.
 		if p.state ~= "ATTACHED" then bad("the spider is not standing on a surface") end
 		if p.retreat_id ~= "" and p.retreat_id ~= "sill_crevice" then bad("the spider is in an unknown retreat") end
 	end
+	local rules = record.life_rules
+	if record.schema_version >= 2 and rules == nil then bad("missing life rules") end
+	if rules ~= nil and (type(rules) ~= "table" or (rules.mode ~= "main" and rules.mode ~= "free") or (rules.rules ~= "standard" and rules.rules ~= "gentle") or (rules.mode == "free" and rules.rules ~= "gentle")) then bad("invalid life rules") end
 	if record.wasp ~= nil then
 		for _, text in WaspDirector.problems(record.wasp) do bad(text) end
 	end
@@ -264,6 +268,10 @@ function Checkpoint.restore(record: any, world: World): (boolean, { string })
 	-- Godot's apply_record: the rest that was going on goes on, the spider takes a moment to take hold, and the screen says
 	-- this is checkpoint recovery. What was owed or announced at that tick is not done again.
 	local life = world.life
+	local rules = record.life_rules or {mode="main",rules="standard"}
+	life.mode, life.rules, life.lifeOver = rules.mode, rules.rules, false
+	world.needs.gentle = rules.rules == "gentle"
+	if world.wasp then world.wasp.gentle = world.needs.gentle end
 	life.asleep = false
 	life.checkpointDue = false
 	life.morningText = ""

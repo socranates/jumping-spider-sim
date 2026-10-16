@@ -1,3 +1,12 @@
+# Chet — 2026-10-16: death/continuing, Free play and rest checked on Windows
+
+Read **docs/HANDOFF-roblox-continuing.md** and **docs/verification/roblox-continuing-windows/RESULTS.md**. ROBLOX-33/34. Final evidence **589d9e7bbe94f6b1**: **85/85 Studio engine, 18/18 live client**, final CLI suite totals **44,819 passed** across the full run and corrected CLIENT 23/23 rerun; strict clean, 127 scripts compile. Actual walk into crack/rest/checkpoint passed. Added near-home guidance without changing the safe box. Normal launch, mouse Begin, M menu, keyboard scrolling and Free play also checked.
+
+Standard starvation/end/recovery/unrelated new spider; separate session-only main/free rests; gentle Free play; launch/menu with keyboard, D-pad/stick and touch/mouse choices, large text; schema 2 mode/rules with schema 1 defaults. Peacock stays free and appearance survives a new life. **No persistent saves/notebook yet; Easy's unlock rule is tested but actual adulthood awaits growth.** Publication status is in RESULTS.md; intended existing place 120119801868085, universe 10771103250. Keep current privacy and Data Sharing off.
+
+**Next chunk: growth and moulting**, including the actual adult event that opens Easy; scope and tests in the handoff. Keep geometry/physics, twitch, senses, sound and peacock display intact. Then notebook and server DataStore persistence, separately. Nathan's physical PlayStation/tablet playtest remains open.
+
+---
 # Chet — 2026-10-16: peacock Windows integration
 
 Read **docs/HANDOFF-roblox-peacock-windows.md** and **docs/verification/roblox-peacock-windows/RESULTS.md**. Claude 903bf49 imported; free peacock appearance/dance retained. Added native dance playback and fixed off-screen prompts on short landscape touch layouts (ROBLOX-32). Full Windows CLI **44,721/44,721** before the layout fix; affected reruns recorded separately. Initial native **84/84 engine + 15/15 client**, evidence **e54de70c7907c0a8**. Final build **2c8f574734259bd8** passed **85/85 Studio engine + 15/15 live client**. Strict src clean; 124 scripts compile. No monetization or live publication performed.

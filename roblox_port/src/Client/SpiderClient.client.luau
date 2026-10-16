@@ -52,6 +52,8 @@ local FlyBodies = require(script.Parent.FlyBodies)
 local WaspBody = require(script.Parent.WaspBody)
 local NeedsModel = require(Shared.Life.NeedsModel)
 local LifeLoop = require(Shared.Life.LifeLoop)
+local LifeSession = require(Shared.Life.LifeSession)
+local session = LifeSession.new()
 local LifeText = require(Shared.UI.LifeText)
 local DayLight = require(Shared.Habitat.DayLight)
 local LifeClock = require(Shared.Life.LifeClock)
@@ -75,6 +77,8 @@ local COLORS = {
 local WARN_EVENTS = { drop_refused = true, snagged = true, lost = true, blocked = true }
 
 local player = Players.LocalPlayer
+-- Solo windowsill: the default player list obscures the life-menu button on small screens.
+pcall(function() game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList,false) end)
 local camera = Workspace.CurrentCamera
 local sill = Workspace:WaitForChild("Windowsill")
 local params = RaycastParams.new()
@@ -146,13 +150,18 @@ local wasp: any = WaspDirector.new({
 	},
 })
 local waspSpider: WaspDirector.Spider = { position = Vector3.zero, velocity = Vector3.zero, walkSpeed = Species.phidippus_audax_prototype.locomotion.walk_speed_wu_s, airborne = false, falling = false }
+local menu: any = nil
+local initialRecord: any = nil
+local menuStarted = false
 local panel: any = nil -- the catch screen, made below once returnToCheckpoint exists
 -- S01-C retreat checkpoints (ROBLOX-25): resting in the crack, and each morning, keeps one; Backspace / View returns to it. The
 -- store is DataStore-shaped but in memory only: a checkpoint lasts the session. No live DataStore is written.
 local checkpointWorld: Checkpoint.World = { motor = motor, prey = prey, sensor = sensor, memory = memory, needs = needs, life = life, wasp = wasp }
-local checkpoints = CheckpointStore.new(CheckpointStore.MemoryDataStore.new(), function(r: any): { string }
-	return (Checkpoint.check(r, checkpointWorld))
-end)
+local function newStore(): any
+	return CheckpointStore.new(CheckpointStore.MemoryDataStore.new(), function(r: any): { string } return (Checkpoint.check(r, checkpointWorld)) end)
+end
+local stores = {main=newStore(), free=newStore()}
+local checkpoints = stores.main
 life.save = function(): LifeLoop.CheckpointResult
 	local why = Checkpoint.boundaryProblem(checkpointWorld)
 	if why ~= "" then return { ok = false, message = why } end
@@ -394,6 +403,8 @@ local function returnToCheckpoint()
 		hud:toast("The checkpoint could not be used: " .. (problems[1] or "unknown"), true)
 		return
 	end
+	session.mode, session.rules, session.ended = life.mode or "main", life.rules or "standard", false
+	session.summary = nil
 	controls:clear()
 	focusState:clear()
 	dropStrands(false)
@@ -403,27 +414,111 @@ local function returnToCheckpoint()
 	feedPending, cancelPending = false, false
 end
 
--- The wasp has carried the spider off: the game waits, the screen is plain, and the one choice puts the world back at the last rest (or
--- the start). The live screen is hidden under it, as in Godot.
+-- Player progress is session-only and outside checkpoints. Modes have independent rest stores.
 local function setHudShown(shown: boolean)
-	hud.safe.Enabled = shown
-	hud.centre.Enabled = shown
+ hud.safe.Enabled=shown;hud.centre.Enabled=shown
+ local touch=player:WaitForChild("PlayerGui"):FindFirstChild("SpiderTouch")
+ if touch and touch:IsA("ScreenGui") then touch.Enabled=shown and UIS.TouchEnabled end
 end
-panel = CaughtPanel.new(player:WaitForChild("PlayerGui"), function()
-	panel:hide()
-	setHudShown(true)
-	wasp:clearVisit()
-	returnToCheckpoint()
+local function applyRules()
+ life.mode,life.rules=session.mode,session.rules
+ needs.gentle=session.rules=="gentle";wasp.gentle=needs.gentle
+end
+local function closeScreens()
+ panel:hide();menu:hide();setHudShown(true);controls:clear();dropAll()
+end
+local function fresh(mode: string, easy: boolean, position: Vector3?): boolean
+ if not initialRecord or (easy and not session.finishedMain) then return false end
+ local ok=Checkpoint.restore(initialRecord,checkpointWorld)
+ if not ok then return false end
+ session:begin(mode,easy);applyRules()
+ sensor:reset();memory:clear()
+ stores[mode]=newStore();checkpoints=stores[mode]
+ life.resting=false;life.notice="";life.noticeSeconds=0;life.restoreGrace=0
+ wasp:load(WaspDirector.defaultRecord());wasp.gentle=needs.gentle
+ if position then motor:place(position,Vector3.yAxis,Layout.SPAWN_HEADING) end
+ closeScreens();dropStrands(false);drawnUp=motor.up;cam:snap();lastLight=nil
+ feedPending,cancelPending=false,false
+ return true
+end
+local function continueAnother()
+ local spot=session:another()
+ if not spot then return end
+ local mode,easy=session.mode,session.rules=="gentle"
+ if fresh(mode,easy,spot) then
+  life:showNotice("Another young spider, somewhere new on the sill. It is not related to the last.")
+  life.noticeSeconds=12
+ end
+end
+local function summaryRecord(cause: string): any
+ return {cause=cause,hours=math.max((life.clock.day-1)*24+life.clock.hour-LifeClock.START_H,0),
+  meals=prey.feeding.mealsFinished,wasp_visits=wasp.visits,wasp_escapes=wasp.escapes,stage=0}
+end
+panel=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
+ if choice=="Another" then continueAnother()
+ elseif choice=="Back" then closeScreens();wasp:clearVisit();returnToCheckpoint() end
 end)
-local function showCaught()
-	local clock = life.clock
-	local hours = (clock.day - LifeClock.START_DAY) * 24 + clock.hour - LifeClock.START_H
-	local summary = WaspText.summary(math.max(hours, 0), prey.feeding.mealsFinished, wasp.visits, wasp.escapes)
-	setHudShown(false)
-	panel:show(summary, checkpoints:loadBest().ok)
+local function endLife(cause: string)
+ local rec=summaryRecord(cause)
+ if not session:endLife(cause,rec) then return end
+ controls:clear();dropAll();setHudShown(false)
+ local choices: {CaughtPanel.Choice}={}
+ if checkpoints:loadBest().ok then table.insert(choices,{id="Back",text="Back to your last rest"}) end
+ table.insert(choices,{id="Another",text="Continue as another spider"})
+ panel:showChoices(if cause=="starved" then "The spider starved." else WaspText.LINE,
+  if cause=="starved" then "It went too long without food." else WaspText.SUB,
+  WaspText.summary(rec.hours,rec.meals,rec.wasp_visits,rec.wasp_escapes),choices)
+ panel:setTextScale(if player:GetAttribute("LargeText")==true then 1.5 else 1)
 end
+local function showCaught() endLife("wasp") end
+local openMenu: () -> ()
+local confirming: string?=nil
+menu=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
+ if choice=="Resume" then closeScreens();return end
+ if choice=="Continue" then checkpoints=stores.main;closeScreens();returnToCheckpoint();return end
+ if choice=="Free" then
+  local saved=stores.free:loadBest()
+  if saved.ok then checkpoints=stores.free;closeScreens();returnToCheckpoint()
+  else fresh("free",false,nil) end
+  return
+ end
+ if choice=="Large" then
+  player:SetAttribute("LargeText",player:GetAttribute("LargeText")~=true);openMenu();return
+ end
+ if choice=="New" or choice=="Easy" then
+  if session.started and confirming~=choice then
+   confirming=choice
+   menu:showChoices("Begin a new life?","This replaces the main life's last rest for this session.","",
+    {{id=choice :: string,text="Begin the new life"},{id="CancelNew",text="Keep this life"}},true)
+   return
+  end
+  confirming=nil;session:archive();fresh("main",choice=="Easy",nil);return
+ end
+ confirming=nil;openMenu()
+end,"SpiderLifeMenu")
+openMenu=function()
+ if panel:isShowing() or not initialRecord then return end
+ controls:clear();dropAll();setHudShown(false)
+ local choices: {CaughtPanel.Choice}={}
+ if session.started then table.insert(choices,{id="Resume",text="Resume this spider"}) end
+ if stores.main:loadBest().ok then table.insert(choices,{id="Continue",text="Continue from last rest"}) end
+ table.insert(choices,{id="New",text="Begin a new life"})
+ if session.finishedMain then table.insert(choices,{id="Easy",text="Begin a new life on Easy"}) end
+ table.insert(choices,{id="Free",text="Free play - gentle rules"})
+ table.insert(choices,{id="Large",text=if player:GetAttribute("LargeText")==true then "Text size: large" else "Text size: normal"})
+ menu:showChoices("The Windowsill","A small life on a windowsill.",
+  "Progress and rest checkpoints last for this play session."..(if session.finishedMain then "" else "\nEasy is not available yet; choose Free play for gentle rules."),choices,true)
+ menu:setTextScale(if player:GetAttribute("LargeText")==true then 1.5 else 1)
+end
+local menuButton=Instance.new("TextButton")
+menuButton.Name="LifeMenu";menuButton.Text="Menu";menuButton.Size=UDim2.fromOffset(72,36)
+menuButton.Position=UDim2.new(1,-84,0,48);menuButton.TextSize=16
+menuButton.BackgroundColor3=Color3.new(.12,.12,.14);menuButton.TextColor3=Color3.new(1,1,1)
+menuButton.Parent=hud.safe;menuButton.Activated:Connect(openMenu)
 
 controls = SpiderInput.bind({
+	blocked = function() return panel:isShowing() or menu:isShowing() end,
+	menu = function() if menu:isShowing() and session.started then closeScreens() else openMenu() end end,
 	focus = function(phase: string)
 		if phase == "begin" then focusState:press(player:GetAttribute("FocusToggle") == true, motor.mode == "attached")
 		elseif phase == "cancel" then focusState:clear() end
@@ -564,12 +659,16 @@ local function updateHud(frameDt: number)
 	elseif prey.feeding.feeding then table.insert(view.status, "Feeding — move to stop")
 	elseif prey.feeding.held then table.insert(view.status, "Meal paused — " .. ControlText.name(device,"feed") .. " to eat") end
 	local clock = life.clock
-	view.day = LifeText.day(clock.day, clock:partOfDay())
-	view.dayLine = LifeText.line(clock:partOfDay(), needs.energy, needs:isStarving(), needs.gentle, LifeLoop.HUNGRY_AT)
+	view.day = LifeText.day(clock.day, clock:partOfDay()) .. (if session.mode=="free" then " | FREE PLAY" elseif session.rules=="gentle" then " | EASY" else "")
+	view.dayLine = LifeText.line(clock:partOfDay(), needs.energy, needs:isStarving(), needs.gentle, LifeLoop.HUNGRY_AT, life:tooHungryToSleep())
 	view.notice = if life.noticeSeconds > 0 and life.notice ~= "" then life.notice else nil
 	local canRest = life:canRest(lifeSpider)
-	local restPrompt = LifeText.prompt(life.asleep, life.resting, canRest, clock:isSleepTime(), device, PeacockText.change(device, appearance))
-	local canDance = SpiderChoice.canDance(appearance)
+	local restPrompt = LifeText.prompt(life.asleep, life.resting, canRest, clock:isSleepTime() and not life:tooHungryToSleep(), device, PeacockText.change(device, appearance))
+	if not restPrompt and (motor.pos-Vector3.new(-24,1,6)).Magnitude<7 and not prey.feeding.held then
+  restPrompt={title="Home: the silk-lined crack",hint=if lifeSpider.inRetreat then "Keep still on a surface, then "..ControlText.name(device,"feed")..": rest" else "Walk through the silk-framed opening under the wooden roof, then stop to rest."}
+ end
+ local canDance = SpiderChoice.canDance(appearance)
+	if restPrompt and not lifeSpider.inRetreat and canDance then restPrompt.hint ..= "    " .. PeacockText.displayHint(device,dance.active) end
 	if canDance and dance.active then table.insert(view.status, PeacockText.dancingLine(device)) end
 	if focusState.latched then table.insert(view.status, "FOCUS ON    " .. ControlText.name(device,"focus") .. " again to stop" .. (if not jump:isBusy() and not motor:onLine() and not motor.silk.walk then " / " .. ControlText.name(device,"cancel") else "")) end
 	if cam.eyeView then table.insert(view.status, `SPIDER-EYE VIEW    {ControlText.name(device, "eye")}: back`) end
@@ -594,7 +693,7 @@ local function updateHud(frameDt: number)
 		view.prompt = { hint = ControlText.walkHint(device) .. (if canDance then "    " .. PeacockText.displayHint(device, dance.active) else "") }
 	end
 	if os.clock() > helpUntil and helpVisible then helpVisible = false end
-	local restLabel = LifeText.touchLabel(life.asleep, life.resting, canRest, clock:isSleepTime())
+	local restLabel = LifeText.touchLabel(life.asleep, life.resting, canRest, clock:isSleepTime() and not life:tooHungryToSleep())
 	controls:setTouchVisible("Feed", prey.feeding.held ~= nil or restLabel ~= nil)
 	controls:setTouchLabel("Feed", if prey.feeding.held ~= nil then "Eat" else restLabel or "Eat")
 	controls:setTouchLabel("Jump", if prey.feeding.struggling then "Grip" else "Jump")
@@ -612,7 +711,7 @@ end
 local accumulator = 0
 RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, function(frameDt: number)
 	if panel:isShowing() then panel:update(frameDt) end
-	if GuiService.MenuIsOpen or panel:isShowing() then
+	if GuiService.MenuIsOpen or panel:isShowing() or menu:isShowing() then
 		accumulator = 0 -- the Roblox menu is Godot's pause (so is the catch screen): the world waits
 	else
 		local simDt = frameDt * (if slow then SLOW_SPEED else 1)
@@ -670,7 +769,15 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			life:step(DT, lifeSpider, feedPending, cancelPending)
 			feedPending, cancelPending = false, false
 			sensor.core.rangeScale = life.rangeScale
-			life:drainEvents() -- the screen reads the loop's state and notices; the events are for tests and later rounds
+			for _,event in life:drainEvents() do if event.kind=="starved" then endLife("starved") end end
+            if not initialRecord and Checkpoint.boundaryProblem(checkpointWorld)=="" then
+             initialRecord=Checkpoint.capture(checkpointWorld,0)
+             if initialRecord and not menuStarted then
+              menuStarted=true
+              if not testPlace then openMenu() else session.started=true end
+             end
+            end
+            if panel:isShowing() or menu:isShowing() then accumulator=0;break end
 			if motor.mode ~= "attached" then focusState:clear() end
 			if stage then stage.target:step(DT); stage.marker.Position = stage.target.position end
 			cam:tick(DT)
@@ -694,7 +801,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 		dance.reduced = player:GetAttribute("ReducedMotion") == true
 		local r, f = controls:axes()
 		local standing = motor.mode == "attached" and not motor.preparing and not motor.seized and not motor:onLine() and not life.resting
-		local paused = GuiService.MenuIsOpen or panel:isShowing()
+		local paused = GuiService.MenuIsOpen or panel:isShowing() or menu:isShowing()
 		dancePose = dance:step(if paused then 0 else simFrame, standing, motor.moving or r ~= 0 or f ~= 0)
 		rig.dance = if dance:showing() then dancePose else nil
 	else
@@ -704,7 +811,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	rig:update(body, simFrame, motor.mode == "attached", motor.moving)
 	updateHud(frameDt)
 	flyBodies:draw(prey.flies,prey.now)
-	local soundPaused = GuiService.MenuIsOpen or panel:isShowing()
+	local soundPaused = GuiService.MenuIsOpen or panel:isShowing() or menu:isShowing()
 	local soundSpeed = if slow then SLOW_SPEED else 1
 	local soundMuted = player:GetAttribute("SoundMuted") == true
 	soundscape:update(frameDt, prey, life.daylight, soundPaused, soundSpeed, soundMuted)
@@ -732,7 +839,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	end
 	-- Looking runs in real time, so slow motion never makes the camera sluggish.
 	local lx, ly = controls:lookAxes()
-	cam:render(frameDt, lx, ly)
+	if not panel:isShowing() and not menu:isShowing() then cam:render(frameDt, lx, ly) end
 	-- The Focus that feeds the perception HUD also decides how far the principal eyes are in use (the eye view's picture). The
 	-- picture sets the field of view, so it comes before the HUD projects anything.
 	local focusing = motor.mode == "attached" and (controls.held.Focus == true or focusActive())
@@ -753,6 +860,7 @@ if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
 		run({
 			prey = prey, flyBodies = flyBodies, waspBody = waspBody, life = life, wasp = wasp, caughtPanel = panel, needs = needs, checkpoints = checkpoints, returnToCheckpoint = function() returnToCheckpoint() end, lifeSpider = function() return lifeSpider end, sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
 			input = controls,
+			session=session, menu=menu, openMenu=openMenu, endLife=endLife, fresh=fresh, continueAnother=continueAnother, currentStore=function() return checkpoints end,
 			changeSpider = function() changeSpider() end, dance = function() return dance end, appearance = function() return appearance end, rig = function() return rig end,
 			drop = function() motor:requestDrop() end,
 			jump = jump,

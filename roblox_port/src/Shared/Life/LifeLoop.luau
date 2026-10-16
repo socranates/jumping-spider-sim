@@ -32,6 +32,8 @@ LifeLoop.RESTORE_GRACE_TICKS = 30
 -- Rest restored per second of resting.
 LifeLoop.REST_PER_S = 0.10
 LifeLoop.HUNGRY_AT = 0.25
+LifeLoop.WEAK_AFTER_H = 24
+LifeLoop.STARVE_AFTER_H = 48
 
 -- What the loop needs to know about the spider this tick.
 export type Spider = {
@@ -48,6 +50,7 @@ export type Event = { kind: string, day: number? }
 function LifeLoop.new(needs: any, save: (() -> CheckpointResult)?): any
 	local self = setmetatable({
 		clock = LifeClock.new(), needs = needs, save = save,
+		mode = "main", rules = "standard", lifeOver = false,
 		resting = false, restSeconds = 0.0, asleep = false, elapsed = 0.0,
 		checkpointDue = false, checkpointResult = nil :: CheckpointResult?, checkpoints = 0,
 		notice = "", noticeSeconds = 0.0, morningText = "",
@@ -101,9 +104,17 @@ function LifeLoop.applyLight(self: any)
 	self.rangeScale = LifeLoop.NIGHT_SIGHT + (1.0 - LifeLoop.NIGHT_SIGHT) * self.daylight
 end
 
+function LifeLoop.tooHungryToSleep(self: any): boolean
+	return not self.needs.gentle and self.needs.starvingStreakH >= LifeLoop.WEAK_AFTER_H
+end
+
+function LifeLoop.starved(self: any): boolean
+	return not self.needs.gentle and self.needs.starvingStreakH >= LifeLoop.STARVE_AFTER_H
+end
+
 function LifeLoop._stepLife(self: any, dt: number)
 	local wasAsleep = self.asleep
-	self.asleep = self.resting and (self.clock.sleeping or self.clock:isSleepTime())
+	self.asleep = self.resting and (self.clock.sleeping or self.clock:isSleepTime()) and not self:tooHungryToSleep()
 	local hours = self.clock:advance(dt, self.asleep)
 	if self.asleep and not self.clock.sleeping then
 		-- The morning came during this tick: awake, still resting in the crack. The new day keeps a checkpoint.
@@ -138,6 +149,10 @@ function LifeLoop.step(self: any, dt: number, s: Spider, feedPressed: boolean, c
 		self.needs:restoreRest(dt * LifeLoop.REST_PER_S)
 	end
 	self:_stepLife(dt)
+	if self:starved() and not self.lifeOver then
+		self.lifeOver = true
+		self:_emit("starved")
+	end
 	if self.noticeSeconds > 0.0 then
 		self.noticeSeconds = math.max(0.0, self.noticeSeconds - dt)
 	end

@@ -218,7 +218,7 @@ function ControlText.helpCard(device: Device): string
 			`Tap {n("jump")} hop   Hold {n("jump")} aim, release to leap   {n("cancel")} cancel`,
 			`{n("drop")} lower on silk   On the line: stick up reel, down lower, hold {n("letGo")} let go`,
 			`{n("eye")} spider-eye view   {n("recenter")} recenter   {n("focus")} focus   {n("slow")} slow motion`,
-			`In the crack: L3 rest (sleep from evening)   {n("reset")}: last checkpoint`,
+			`In the crack: L3 rest (sleep from evening)   {n("reset")}: life menu / last rest`,
 		}, "\n")
 	elseif device == "touch" then
 		return table.concat({
@@ -234,7 +234,7 @@ function ControlText.helpCard(device: Device): string
 		"Tap Space hop   Hold Space aim, release to leap   Q cancel",
 		"F lower on silk   On the line: W reel, S lower, hold Q let go",
 		"V spider-eye view   R recenter   Right mouse focus   T slow motion",
-		"In the crack: E rest (sleep from evening)   Backspace: last checkpoint",
+		"In the crack: E rest (sleep from evening)   Backspace: last checkpoint   M: life menu",
 		"Wheel zoom   G gait   H hide this",
 	}, "\n")
 end

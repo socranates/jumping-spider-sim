@@ -1262,6 +1262,6 @@ Read **docs/HANDOFF-roblox-peacock.md**. Branch **claude/roblox-peacock** (origi
 ---
 # Chet — 2026-10-16: peacock Windows integration
 
-Read **docs/HANDOFF-roblox-peacock-windows.md** and **docs/verification/roblox-peacock-windows/RESULTS.md**. Claude 903bf49 imported; free peacock appearance/dance retained. Added native dance playback and fixed off-screen prompts on short landscape touch layouts (ROBLOX-32). Full Windows CLI **44,721/44,721** before the layout fix; affected reruns recorded separately. Initial native **84/84 engine + 15/15 client**, evidence **e54de70c7907c0a8**. Final build **2c8f574734259bd8** native run pending. Strict src clean; 124 scripts compile. No monetization or live publication performed.
+Read **docs/HANDOFF-roblox-peacock-windows.md** and **docs/verification/roblox-peacock-windows/RESULTS.md**. Claude 903bf49 imported; free peacock appearance/dance retained. Added native dance playback and fixed off-screen prompts on short landscape touch layouts (ROBLOX-32). Full Windows CLI **44,721/44,721** before the layout fix; affected reruns recorded separately. Initial native **84/84 engine + 15/15 client**, evidence **e54de70c7907c0a8**. Final build **2c8f574734259bd8** passed **85/85 Studio engine + 15/15 live client**. Strict src clean; 124 scripts compile. No monetization or live publication performed.
 
 **Next Claude:** death and continuing with mode selection; detailed scope in the new handoff. Keep the peacock unlocked until Nathan asks for sales. Physical PlayStation/tablet and close-up visual checks remain open.

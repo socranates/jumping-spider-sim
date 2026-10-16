@@ -1,8 +1,6 @@
 # Peacock Windows handoff — 2026-10-16
 
-**Integration branch: `codex/roblox-peacock-windows`. Main and the laptop remain at `059811b` until the final native layout check passes.** Claude's source branch `claude/roblox-peacock` is backed up on GitHub.
-
-Claude's peacock work through **903bf49** is integrated locally with Chet's compact landscape touch fix and native dance playback. See ROBLOX-29 through ROBLOX-32 and `docs/verification/roblox-peacock-windows/RESULTS.md`. Final build evidence **2c8f574734259bd8**. The initial native build passed 84/84 engine and 15/15 client; final layout build awaits Studio confirmation. Full Windows CLI 44,721/44,721 before the layout fix, with affected suites rerun afterward.
+Claude's peacock work through **903bf49** is integrated locally with Chet's compact landscape touch fix and native dance playback. See ROBLOX-29 through ROBLOX-32 and `docs/verification/roblox-peacock-windows/RESULTS.md`. Final build evidence **2c8f574734259bd8**. The initial native build passed 84/84 engine and 15/15 client; final layout build passed **85/85 engine and 15/15 client**. Full Windows CLI 44,721/44,721 before the layout fix, with affected suites rerun afterward.
 
 ## Play and publication
 

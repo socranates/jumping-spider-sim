@@ -1244,3 +1244,6 @@ Chet: import, Windows CLI, Studio suite (new Wasp spec) and playback, then docs/
 
 ## 2026-10-16 — Chet: combine Claude a483d65 with original sound
 Merged source conflicts by retaining both paths; regenerated place files. Evidence 52123df9177323c8. Added native wasp sound-loading and visit timing check, with PORT_WASP_COST collection. Strict src clean; 118 Luau source/test files compile. Full Windows CLI in docs/verification/roblox-wasp-windows/cli.txt. Studio check of this build pending Nathan's Play run. See HANDOFF-roblox-wasp-windows.md.
+
+### Windows acceptance completed
+Nathan ran build 52123df9177323c8: 80/80 engine and 14/14 live client, wasp audio loaded. Full Windows CLI 44,610/44,610. Wasp frame median/p95 16.96/20.91 ms. Reports saved. Finish into main and update laptop; publish-ready file in Downloads. Publication and physical console/tablet acceptance remain pending.

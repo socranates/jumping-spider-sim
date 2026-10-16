@@ -1,1 +1,1 @@
-Build 52123df9177323c8. Full Windows CLI: 44,610 passed, zero failed. Strict src clean; 118/118 Luau files compiled. Native Studio/physical device checks pending.
+Build 52123df9177323c8. Windows CLI 44,610/44,610; Studio engine 80/80; live client 14/14. Strict src clean; 118/118 compile. Wasp audio loaded. Wasp frame median 16.96 ms, p95 20.91 ms (467 frames). Physical console/tablet, perceived mix and visual acceptance not run. Publication pending.

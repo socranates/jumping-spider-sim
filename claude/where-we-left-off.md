@@ -1,12 +1,12 @@
-# Chet — 2026-10-16: wasp and sound integration
+# Chet — 2026-10-16: wasp, LIFE, PlayStation prompts and sound accepted on Windows
 
-Active branch **codex/roblox-sound**, merging Claude **a483d65** with the tested sound branch **4510dcf**. Read **docs/HANDOFF-roblox-wasp-windows.md**. Build evidence **52123df9177323c8**. Studio validation of this merged build is pending; do not publish the test place.
+Read **docs/HANDOFF-roblox-wasp-windows.md**. Claude a483d65 is integrated with the original sound work; the combined build is ready for main. Evidence **52123df9177323c8**: **44,610/44,610 Windows CLI**, **80/80 Studio engine**, **14/14 live-client**, strict src clean and **118/118 compile**. Nathan launched the local test; Chet collected matching structured Studio reports. The wasp recording loaded, the crack stayed safe, and the hum stopped after departure. Sample frame median/p95 **16.96/20.91 ms**, not a full F01 pass.
 
-The earlier sound-only build passed **74/74 engine and 13/13 live-client** checks, and Nathan confirmed audible sound. Its publication was requested but not verified. The new build preserves that soundscape, adds Claude's wasp and PlayStation prompts, and connects the original wasp hum to the arrival/search states. The caption stays. The eight-second arrival uses the director's timing. No new gameplay timers or simulation changes.
+The new wasp warning uses its original generated recording, heard immediately during the existing eight-second arrival. The caption stays. On the sill the hum follows the wasp spatially; walking, departure, pause and the catch screen silence it appropriately. Existing room/birds/fly sound remains. See ROBLOX-28. PlayStation names are included; this round has not been physically checked on a console/tablet. No new simulation timers or changes to jump/AI behavior.
 
-Next: Nathan opens Downloads/Windowsill-Wasp-Test-52123df9.rbxlx, presses Play and leaves it running about two minutes. Collect Studio logs (WaspSpec, client sound load check and PORT_WASP_COST), resolve any failure, then finish main and update the laptop. Native Studio control is unavailable in this session. A real PlayStation/controller check, the catch screen's feel and night readability remain manual acceptance work.
+**Publication pending:** Chet cannot control native Studio in this session. Playable file: roblox_port/TheWindowsill.rbxlx, also Downloads/Windowsill-PUBLISH-Wasp-52123df9.rbxlx. Publish to existing place **120119801868085**, universe **10771103250**, not the test place. Previous sound-only publication was requested but never verified. Keep Data Sharing off. Physical warning loudness, night readability and catch-screen feel remain user playtests.
 
-**Recommended next Claude chunk:** LIFE death and continuing, with Easy/Standard/Gentle selection. Use the existing checkpoint return; add a clearly unrelated new spider and retain notebook information only once notebook persistence exists. Preserve the warning caption and sound adapter. Peacock-spider appearance/dance is a separate Gemini design exploration, not a replacement for this next gameplay chunk.
+**Next Claude:** LIFE death and continuing, with Easy/Standard/Gentle selection, then growth/moulting. Preserve audio/captions and the whole-world checkpoint behavior. The notebook is not ported; do not imply persistent notebook retention yet. Gemini's peacock-spider appearance/dance is independent design exploration.
 
 ---
 # Claude — 2026-10-16: the mud dauber wasp

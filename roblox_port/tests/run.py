@@ -13,7 +13,8 @@ tests/perception_reference.json, exported from the frozen Godot modules) and
 tests/eyes.luau (the spider-eye picture: its data, the pure optics, the drawer under the shim and the real client's wiring) and
 tests/hud.luau (the perception HUD's shapes and its drawer under the shim: circles, dashed rings, chevrons, labels) and
 tests/life.luau (the life clock, the needs and the rest-and-sleep loop against tests/life_reference.json, from the frozen Godot code) and
-tests/checkpoint.luau (the retreat checkpoint of a whole world, its refusals, and the DataStore-shaped store).
+tests/checkpoint.luau (the retreat checkpoint of a whole world, its refusals, and the DataStore-shaped store) and
+tests/wasp.luau (the mud dauber wasp's rules against tests/wasp_reference.json, exported from the frozen Godot director, and Godot's hand-written expectations).
 Usage (from roblox_port/):  python3 tests/run.py [path/to/luau [test.luau ...]]   (default: all of them)"""
 import pathlib, re, subprocess, sys, tempfile
 
@@ -32,6 +33,7 @@ MODULES = [
     ("Flora", "Data/Flora.luau"),
     ("Wear", "Data/Wear.luau"),
     ("FlyLook", "Data/FlyLook.luau"),
+    ("WaspLook", "Data/WaspLook.luau"),
     ("Shapes", "Habitat/Shapes.luau"),
     ("Plants", "Habitat/Plants.luau"),
     ("Patina", "Habitat/Patina.luau"),
@@ -72,6 +74,9 @@ MODULES = [
     ("PerchGraph", "Prey/PerchGraph.luau"),
     ("FlyFlight", "Prey/FlyFlight.luau"),
     ("PreyRandom", "Prey/PreyRandom.luau"),
+    ("Wasp", "Data/Wasp.luau"),
+    ("WaspDirector", "Predator/WaspDirector.luau"),
+    ("WaspText", "UI/WaspText.luau"),
     ("Fly", "Prey/Fly.luau"),
     ("PreyPopulation", "Prey/PreyPopulation.luau"),
     ("Feeding", "Prey/Feeding.luau"),
@@ -93,15 +98,17 @@ CLIENT_MODULES = [
     ("SpiderRig", "Rig/SpiderRig.luau"),
     ("SpiderInput", "../Client/SpiderInput.luau"),
     ("SpiderHud", "../Client/SpiderHud.luau"),
+    ("CaughtPanel", "../Client/CaughtPanel.luau"),
     ("PerceptionStage", "../Client/PerceptionStage.luau"),
     ("FlyBodies", "../Client/FlyBodies.luau"),
+    ("WaspBody", "../Client/WaspBody.luau"),
     ("PerceptionHud", "../Client/PerceptionHud.luau"),
     ("SpiderEyes", "../Client/SpiderEyes.luau"),
 ]
-CLIENT_TESTS = {"perception_client.luau", "client_smoke.luau", "look.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau"}
-REFERENCES = ["jump_reference", "tether_reference", "camera_reference", "framing_reference", "perception_reference", "prey_reference", "life_reference"]
+CLIENT_TESTS = {"perception_client.luau", "client_smoke.luau", "look.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "wasp.luau"}
+REFERENCES = ["jump_reference", "tether_reference", "camera_reference", "framing_reference", "perception_reference", "prey_reference", "life_reference", "wasp_reference"]
 # A reference only the named tests read (it is large; the other bundles leave it out).
-REFERENCE_ONLY = {"prey_reference": {"prey.luau"}, "perception_reference": {"perception.luau"}, "life_reference": {"life.luau"}}
+REFERENCE_ONLY = {"prey_reference": {"prey.luau"}, "perception_reference": {"perception.luau"}, "life_reference": {"life.luau"}, "wasp_reference": {"wasp.luau"}}
 NAMES = {name for name, _ in MODULES + CLIENT_MODULES}
 
 
@@ -154,7 +161,7 @@ def main():
     luau = sys.argv[1] if len(sys.argv) > 1 else "luau"
     status = 0
     named = sys.argv[2:]
-    for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "life.luau", "checkpoint.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "look.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau"]:
+    for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "life.luau", "checkpoint.luau", "wasp.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "look.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau"]:
         if not (HERE / test_file).exists():
             if named:  # a misspelt name must not look like a pass
                 print(f"no such test file: {test_file} (names are relative to tests/, for example look.luau)", file=sys.stderr)

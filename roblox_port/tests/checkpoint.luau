@@ -18,6 +18,7 @@ local ObjectRecord = require("../src/Shared/Persistence/ObjectRecord")
 local Checkpoint = require("../src/Shared/Persistence/Checkpoint")
 local CheckpointStore = require("../src/Shared/Persistence/CheckpointStore")
 local Json = require("../src/Shared/Persistence/Json")
+local WaspDirector = require("../src/Shared/Predator/WaspDirector")
 
 local passed, failed = 0, 0
 local current = ""
@@ -355,6 +356,50 @@ case("the DataStore stand-in has a DataStore's rules", function()
 	check(ds:GetAsync("bad") == nil, "nothing refused was stored")
 	check(Json.canonical({ b = 1, a = { 0.1, true, "q\"" } }) == '{"a":[0.10000000000000001,true,"q\\""],"b":1}', "canonical text")
 	check(Json.checksum("abc") ~= Json.checksum("abd") and #Json.checksum("") == 16, "the checksum tells texts apart")
+end)
+
+case("the wasp's record is kept, brought back, and a visit going on ends (ROBLOX-26)", function()
+	local w = newWorld()
+	local none = { ray = function() return false end, clear = function() return true end, inRetreat = function() return false end }
+	w.wasp = WaspDirector.new({ seed = 5, world = none, enabled = false })
+	w.wasp.lastVisitDay, w.wasp.visits, w.wasp.escapes = 4, 3, 2
+	for _ = 1, 60 do tick(w) end
+	local record = assert(Checkpoint.capture(w, 0))
+	check(record.wasp ~= nil and record.wasp.last_visit_day == 4 and record.wasp.visits == 3 and record.wasp.escapes == 2, "the record holds the wasp's record")
+	check(#(Checkpoint.check(record, w)) == 0, "a good record")
+	check(Json.canonical(record) ~= nil, "storable with it")
+	-- A visit goes on, the record moves, then the checkpoint comes back.
+	w.wasp:force(5, "floor_middle")
+	w.wasp.visits, w.wasp.escapes, w.wasp.lastVisitDay = 9, 7, 8
+	check(w.wasp:isVisiting(), "a visit is going on")
+	local ok, problems = Checkpoint.restore(record, w)
+	check(ok, "restored: " .. table.concat(problems, "; "))
+	check(w.wasp.lastVisitDay == 4 and w.wasp.visits == 3 and w.wasp.escapes == 2, "the wasp's record came back")
+	check(not w.wasp:isVisiting() and not w.wasp.wasp.visible and not w.wasp.holding, "and the visit going on is over")
+	-- An older record, made before the wasp, brings the record of a life not yet visited.
+	local older = assert(Checkpoint.capture(w, 0))
+	older.wasp = nil
+	check(#(Checkpoint.check(older, w)) == 0, "a record without the wasp is good")
+	w.wasp.visits = 5
+	check((Checkpoint.restore(older, w)), "and restores")
+	check(w.wasp.visits == 0 and w.wasp.escapes == 0 and w.wasp.lastVisitDay == 0, "to no visits yet")
+	-- A broken wasp record is refused, and the live world is left alone.
+	local bad = assert(Checkpoint.capture(w, 0))
+	bad.wasp = { last_visit_day = 2, visits = 1, escapes = 2 }
+	w.wasp.visits = 6
+	local problems2 = Checkpoint.check(bad, w)
+	check(#problems2 > 0 and string.find(problems2[1], "wasp", 1, true) ~= nil, "refused: " .. tostring(problems2[1]))
+	local restored = Checkpoint.restore(bad, w)
+	check(not restored and w.wasp.visits == 6, "and nothing changed")
+	-- The motor taken by the wasp is put right by a return to the checkpoint.
+	w.motor:seize()
+	check(w.motor.seized and w.motor.mode == "air", "seized")
+	local before = w.motor.pos
+	w.motor:tick(STILL)
+	check(w.motor.pos == before, "a seized motor does not move itself")
+	w.motor:hold(Vector3.new(1, 5, 2))
+	check(w.motor.pos == Vector3.new(1, 5, 2), "the wasp moves the body")
+	check((Checkpoint.restore(record, w)) and not w.motor.seized and w.motor.mode == "attached", "a return puts the spider back on its feet")
 end)
 
 case("ObjectRecord keeps cycles and sharing, and refuses what it does not know", function()

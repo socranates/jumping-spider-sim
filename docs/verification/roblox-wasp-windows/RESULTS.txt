@@ -1,0 +1,1 @@
+Build 52123df9177323c8. Full Windows CLI: 44,610 passed, zero failed. Strict src clean; 118/118 Luau files compiled. Native Studio/physical device checks pending.

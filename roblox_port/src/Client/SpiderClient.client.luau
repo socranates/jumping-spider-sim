@@ -22,6 +22,7 @@ local SpiderInput = require(script.Parent.SpiderInput)
 local SpiderCamera = require(script.Parent.SpiderCamera)
 local SpiderEyes = require(script.Parent.SpiderEyes)
 local SpiderHud = require(script.Parent.SpiderHud)
+local CaughtPanel = require(script.Parent.CaughtPanel)
 local WorldDetail = require(script.Parent.WorldDetail)
 local Soundscape = require(script.Parent.Soundscape)
 
@@ -45,10 +46,14 @@ local PerceptionStage = require(script.Parent.PerceptionStage)
 local PerceptionHud = require(script.Parent.PerceptionHud)
 local PreyDirector = require(Shared.Prey.PreyDirector)
 local FlyBodies = require(script.Parent.FlyBodies)
+local WaspBody = require(script.Parent.WaspBody)
 local NeedsModel = require(Shared.Life.NeedsModel)
 local LifeLoop = require(Shared.Life.LifeLoop)
 local LifeText = require(Shared.UI.LifeText)
 local DayLight = require(Shared.Habitat.DayLight)
+local LifeClock = require(Shared.Life.LifeClock)
+local WaspDirector = require(Shared.Predator.WaspDirector)
+local WaspText = require(Shared.UI.WaspText)
 local Checkpoint = require(Shared.Persistence.Checkpoint)
 local CheckpointStore = require(Shared.Persistence.CheckpointStore)
 local focusState = FocusState.new()
@@ -94,6 +99,12 @@ task.spawn(function()
 end)
 local hud = SpiderHud.new(player:WaitForChild("PlayerGui"))
 local device: ControlText.Device = ControlText.initialDevice(UIS.TouchEnabled, UIS.KeyboardEnabled, UIS.GamepadEnabled)
+-- PlayStation or Xbox button names (ControlText.setPadStyle): Roblox names ButtonA "ButtonCross" on a PlayStation controller.
+local function refreshPadStyle()
+	local ok, text = pcall(function() return UIS:GetStringForKeyCode(Enum.KeyCode.ButtonA) end)
+	ControlText.setPadStyle(ControlText.padStyleFor(if ok then text else nil))
+end
+refreshPadStyle()
 local memory = ObservationMemory.new()
 local sensor = Sensor.new(memory)
 sensor:configureFrom(Species.phidippus_audax_prototype.perception)
@@ -103,14 +114,31 @@ local stage = if Workspace:GetAttribute("TestTarget") == true or (Workspace:GetA
 local prey = PreyDirector.engine(sill, Species.fly_like_prototype, 914, 4)
 local flyBodies = FlyBodies.new(Workspace)
 local soundscape = Soundscape.new(Workspace)
+local waspBody = WaspBody.new(Workspace)
 -- LIFE (ROBLOX-24): the windowsill runs the life clock, so hunger runs by its hours (NeedsModel life mode, Standard rules: the
 -- port has no Easy mode yet). Feeding grants into the same model. The loop keeps the rest, sleep, daylight and the eyes' reach.
 local needs = NeedsModel.new(true, false)
 prey.feeding.needs = needs
 local life = LifeLoop.new(needs, nil)
+-- The mud dauber wasp (ROBLOX-26): a port of Godot's wasp director (Shared/Predator/WaspDirector). It visits by day from the second day,
+-- once the first meal is eaten, and not while the spider rests; it is heard (a caption with its direction) for 8 s before it can look.
+-- It reads the sill through the same casts as the senses. In the test place it never comes by itself (Workspace attribute Wasp = true
+-- allows it); the attribute WaspForce = a place id ("floor_middle") brings it at once, for Studio and playtests. There is no Gentle
+-- mode in Roblox yet, so a catch is always a catch.
+local testPlace = script.Parent:FindFirstChild("SilkPlayback") ~= nil
+local wasp: any = WaspDirector.new({
+	seed = 914, enabled = not testPlace,
+	world = {
+		ray = function(a: Vector3, b: Vector3): boolean return Workspace:Raycast(a, b - a, params) ~= nil end,
+		clear = function(a: Vector3, b: Vector3, radius: number): boolean return Workspace:Spherecast(a, radius, b - a, params) == nil end,
+		inRetreat = function(p: Vector3): boolean return Layout.inRetreat(p) end,
+	},
+})
+local waspSpider: WaspDirector.Spider = { position = Vector3.zero, velocity = Vector3.zero, walkSpeed = Species.phidippus_audax_prototype.locomotion.walk_speed_wu_s, airborne = false, falling = false }
+local panel: any = nil -- the catch screen, made below once returnToCheckpoint exists
 -- S01-C retreat checkpoints (ROBLOX-25): resting in the crack, and each morning, keeps one; Backspace / View returns to it. The
 -- store is DataStore-shaped but in memory only: a checkpoint lasts the session. No live DataStore is written.
-local checkpointWorld: Checkpoint.World = { motor = motor, prey = prey, sensor = sensor, memory = memory, needs = needs, life = life }
+local checkpointWorld: Checkpoint.World = { motor = motor, prey = prey, sensor = sensor, memory = memory, needs = needs, life = life, wasp = wasp }
 local checkpoints = CheckpointStore.new(CheckpointStore.MemoryDataStore.new(), function(r: any): { string }
 	return (Checkpoint.check(r, checkpointWorld))
 end)
@@ -319,6 +347,26 @@ local function returnToCheckpoint()
 	feedPending, cancelPending = false, false
 end
 
+-- The wasp has carried the spider off: the game waits, the screen is plain, and the one choice puts the world back at the last rest (or
+-- the start). The live screen is hidden under it, as in Godot.
+local function setHudShown(shown: boolean)
+	hud.safe.Enabled = shown
+	hud.centre.Enabled = shown
+end
+panel = CaughtPanel.new(player:WaitForChild("PlayerGui"), function()
+	panel:hide()
+	setHudShown(true)
+	wasp:clearVisit()
+	returnToCheckpoint()
+end)
+local function showCaught()
+	local clock = life.clock
+	local hours = (clock.day - LifeClock.START_DAY) * 24 + clock.hour - LifeClock.START_H
+	local summary = WaspText.summary(math.max(hours, 0), prey.feeding.mealsFinished, wasp.visits, wasp.escapes)
+	setHudShown(false)
+	panel:show(summary, checkpoints:loadBest().ok)
+end
+
 controls = SpiderInput.bind({
 	focus = function(phase: string)
 		if phase == "begin" then focusState:press(player:GetAttribute("FocusToggle") == true, motor.mode == "attached")
@@ -352,7 +400,7 @@ controls = SpiderInput.bind({
 	end,
 	drop = function() motor:requestDrop() end,
 	clear = dropAll,
-	reset = function() returnToCheckpoint() end,
+	reset = function() if not panel:isShowing() then returnToCheckpoint() end end, -- the catch screen has its own way back
 	gait = function() rig.gaitMode = if rig.gaitMode == "Tetrapod" then "Unilateral" else "Tetrapod" end,
 	eye = function() cam:toggleEyeView() end,
 	recenter = function() cam:startRecenter() end,
@@ -364,6 +412,7 @@ controls = SpiderInput.bind({
 	end,
 	device = function(name: string)
 		device = ControlText.deviceFor(name, device)
+		if device == "gamepad" then refreshPadStyle() end
 	end,
 })
 
@@ -426,6 +475,11 @@ local function updateHud(frameDt: number)
 		status = {}, helpVisible = helpVisible, helpText = ControlText.helpCard(device),
 		caption = eyes:captionView(device),
 	}
+	if wasp:isVisiting() then
+		local direction = WaspText.directionWord(motor.pos, motor.heading, motor.up, wasp.wasp.position)
+		local heard = WaspText.caption(wasp.phase, wasp.phaseS, direction)
+		if heard then view.caption = heard end
+	end
 	if aiming then
 		local plan = jump.plan
 		local title, hint = ControlText.describe(plan, device)
@@ -439,6 +493,8 @@ local function updateHud(frameDt: number)
 	else
 		hidePreview()
 	end
+	local waspLine = WaspText.line(wasp.phase, wasp.confusedS > 0, wasp.visits, wasp.sparedThisVisit, device)
+	if waspLine then table.insert(view.status, waspLine) end
 	view.grip = if prey.feeding.struggling then prey.feeding.grip else nil
 	if prey.feeding.struggling then
 		table.insert(view.status, "Caught — tap " .. ControlText.name(device,"jump") .. " to keep your grip")
@@ -486,8 +542,9 @@ end
 -- ---------------------------------------------------------------- the frame
 local accumulator = 0
 RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, function(frameDt: number)
-	if GuiService.MenuIsOpen then
-		accumulator = 0 -- the Roblox menu is Godot's pause: the world waits
+	if panel:isShowing() then panel:update(frameDt) end
+	if GuiService.MenuIsOpen or panel:isShowing() then
+		accumulator = 0 -- the Roblox menu is Godot's pause (so is the catch screen): the world waits
 	else
 		local simDt = frameDt * (if slow then SLOW_SPEED else 1)
 		accumulator = math.min(accumulator + simDt, 0.25)
@@ -500,11 +557,38 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 				local p = stage.target:percept()
 				if p then table.insert(percepts,p) end
 			end
+			local waspPercept = wasp:percept() -- movement to the spider's senses, never prey
+			if waspPercept then table.insert(percepts, waspPercept) end
 			sensor:step(DT,motor:observer(),percepts,sightCast)
 			prey:before(DT,motor.pos,motor:observer(),sensor,sightCast,camera)
 			jump:step(motor)
 			local input = tickInput()
 			motor:tick(input)
+			-- The wasp runs after the spider has moved and before feeding (Godot: physics priority 8).
+			wasp.enabled = not testPlace or Workspace:GetAttribute("Wasp") == true
+			local forced = if testPlace then Workspace:GetAttribute("WaspForce") else nil
+			if typeof(forced) == "string" and forced ~= "" then
+				Workspace:SetAttribute("WaspForce", nil)
+				wasp:force(life.clock.day, forced)
+			end
+			local fallingOnLine = motor:onLine() or (motor.mode == "air" and motor.dropped == true)
+			waspSpider.position, waspSpider.velocity = motor.pos, motor.vel
+			waspSpider.falling = fallingOnLine
+			waspSpider.airborne = motor.mode == "air" and not fallingOnLine and not motor.seized
+			wasp:step(DT, waspSpider, {
+				day = life.clock.day, hour = life.clock.hour, resting = life.resting, moulting = false, meals = prey.feeding.mealsFinished,
+			})
+			for _, signal in wasp:drainSignals() do
+				if signal.kind == "caught" then
+					-- Stung: the spider lets go of everything and is carried (Godot SpiderMotor.seize).
+					motor:seize()
+					dropAll()
+					dropStrands(false)
+				elseif signal.kind == "carried_off" then
+					showCaught()
+				end
+			end
+			if wasp.heldAt then motor:hold(wasp.heldAt) end
 			prey.feeding.auto = player:GetAttribute("AutomaticGrip") == true
 			prey:after(DT,motor,sensor,sightCast)
 			-- The life loop runs last in the tick (Godot's habitat loop, priority 12); the reach it sets is the next tick's.
@@ -538,7 +622,12 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	rig:update(body, simFrame, motor.mode == "attached", motor.moving)
 	updateHud(frameDt)
 	flyBodies:draw(prey.flies,prey.now)
-	soundscape:update(frameDt, prey, life.daylight, GuiService.MenuIsOpen, if slow then SLOW_SPEED else 1, player:GetAttribute("SoundMuted") == true)
+	local soundPaused = GuiService.MenuIsOpen or panel:isShowing()
+	local soundSpeed = if slow then SLOW_SPEED else 1
+	local soundMuted = player:GetAttribute("SoundMuted") == true
+	soundscape:update(frameDt, prey, life.daylight, soundPaused, soundSpeed, soundMuted)
+	soundscape:updateWasp(wasp, soundPaused, soundSpeed, soundMuted)
+	waspBody:draw(wasp.wasp, prey.now)
 	local silk = motor.silk
 	local live, bend = liveLine, bendLine
 	if live and bend and silk.mode ~= "none" then
@@ -580,7 +669,7 @@ if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
 	task.spawn(function()
 		local run: any = (require :: any)(playback)
 		run({
-			prey = prey, flyBodies = flyBodies, life = life, needs = needs, checkpoints = checkpoints, returnToCheckpoint = function() returnToCheckpoint() end, lifeSpider = function() return lifeSpider end, sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
+			prey = prey, flyBodies = flyBodies, waspBody = waspBody, life = life, wasp = wasp, caughtPanel = panel, needs = needs, checkpoints = checkpoints, returnToCheckpoint = function() returnToCheckpoint() end, lifeSpider = function() return lifeSpider end, sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
 			input = controls,
 			drop = function() motor:requestDrop() end,
 			jump = jump,

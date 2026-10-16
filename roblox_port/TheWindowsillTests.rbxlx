@@ -1072,6 +1072,188 @@ return table.freeze(data)
         </Item>
         <Item class="ModuleScript" referent="14">
           <Properties>
+            <string name="Name">Wasp</string>
+            <string name="Source"><![CDATA[--!strict
+-- The mud dauber wasp's rules: every number of scripts/predator/wasp_director.gd (LIFE round 4, LIFE-14 to LIFE-17), unchanged, in
+-- Godot's units (1 WU = 1 stud = 1 cm). They are design choices tuned for fairness, not measurements (LIFE-17): sight range, notice
+-- rates, timings and the places it looks. The Godot names are in comments where this file renames them. Predator/WaspDirector reads
+-- them; nothing else decides what the wasp does.
+--
+-- Roblox-only additions are marked "Roblox:". Everything about how it looks is in Data/WaspLook.
+
+local Wasp = {}
+
+export type Point = { id: string, hover: Vector3, land: Vector3? }
+
+-- When it may come: the days and the warm middle of the day (hours of the life clock).
+Wasp.firstDay = 2
+Wasp.visitChance = 0.6
+Wasp.windowFromH = 10.0
+Wasp.windowToH = 15.5
+
+-- A visit (game seconds): heard while it arrives, searching, flying away, carrying the spider off.
+Wasp.arriveS = 8.0
+Wasp.searchS = 45.0
+Wasp.leaveS = 5.0
+Wasp.carryS = 3.5
+
+-- How it flies: between places at cruising height, in over the window frame from outside.
+Wasp.cruiseY = 9.0
+Wasp.entry = Vector3.new(38.0, 19.0, 2.0)
+Wasp.over = Vector3.new(27.0, 15.0, 2.0)
+Wasp.flySpeed = 4.0
+Wasp.radius = 0.55 -- WU kept clear of the world on its paths in the air
+Wasp.hoverS = { 1.5, 2.5 } -- how long it hovers to look
+Wasp.scanDegS = 70.0 -- how fast it turns while it hovers
+Wasp.landChance = 0.5
+Wasp.landS = 0.6
+Wasp.walkS = 2.0
+Wasp.walkSpeed = 0.7
+Wasp.stepEveryS = 0.5
+-- Roblox: the clearance for its steps on a surface. Godot's walk test uses the 0.55 sphere, which the physics engine lets start inside
+-- the floor it stands 0.35 above; Roblox's shape casts are not promised to, so a walking wasp is checked with a sphere that fits.
+Wasp.walkRadius = 0.3
+
+-- What it sees.
+Wasp.sightWu = 7.0
+Wasp.noticeStill = 0.25 -- notice per second for a still spider at point-blank range
+Wasp.noticeMoving = 1.6 -- added per second at walking speed
+Wasp.noticeDecay = 0.2
+Wasp.confuseS = 4.0
+Wasp.afterLossNotice = 0.35
+Wasp.loseUnseenS = 0.8
+Wasp.farFromLossWu = 6.0
+
+-- Inspecting and striking.
+Wasp.standoffWu = 1.2
+Wasp.inspectSpeed = 2.5
+Wasp.inspectS = 1.5
+Wasp.inspectGiveUpS = 6.0 -- it cannot get to arm's length: it gives up on that spider
+Wasp.strikeS = 0.35
+Wasp.catchWu = 0.8
+Wasp.holdBelow = 0.5
+
+-- The wasp as the spider's senses have it (wasp.gd): its eyes ahead of its centre, the size the senses give it. To the spider it is
+-- movement, never prey.
+Wasp.eyeAhead = 1.0
+Wasp.sensedRadius = 0.9
+
+-- The words and timing of the screen (Godot: caught_panel.gd QUIET_S, LINE_S). Roblox: captionTailS is how long the caption of the wasp
+-- leaving stays up and captionFadeS how long it takes to fade.
+Wasp.caughtQuietS = 1.5 -- dim and quiet before the line
+Wasp.caughtLineS = 1.5 -- the line alone before the summary and the choices
+Wasp.caughtDim = 0.82
+Wasp.captionTailS = 3.0
+Wasp.captionFadeS = 1.0
+
+-- Where it looks for spiders: where it hovers to look and, on open surfaces, where it may land. Every hover point is open straight up
+-- to cruising height (tests check them on Godot's boxes; WaspSpec checks them on the real sill).
+local points: { Point } = {
+	{ id = "floor_middle", hover = Vector3.new(0.0, 1.6, 6.0), land = Vector3.new(0.0, 0.35, 6.0) },
+	{ id = "floor_east", hover = Vector3.new(14.0, 1.6, 7.0), land = Vector3.new(14.0, 0.35, 7.0) },
+	{ id = "floor_west", hover = Vector3.new(-13.0, 1.6, 7.0), land = Vector3.new(-13.0, 0.35, 7.0) },
+	{ id = "floor_back", hover = Vector3.new(-7.0, 1.6, -9.0), land = Vector3.new(-7.0, 0.35, -9.0) },
+	{ id = "leaf_west", hover = Vector3.new(-15.0, 5.7, -1.5), land = Vector3.new(-15.0, 4.55, -1.5) },
+	{ id = "leaf_middle", hover = Vector3.new(-1.0, 5.7, -1.5), land = Vector3.new(-1.0, 4.55, -1.5) },
+	{ id = "leaf_east", hover = Vector3.new(21.5, 6.9, -3.0), land = Vector3.new(21.5, 5.75, -3.0) },
+	{ id = "planter", hover = Vector3.new(10.0, 6.1, -4.0), land = Vector3.new(10.0, 4.95, -4.0) },
+	{ id = "back_wall_west", hover = Vector3.new(-12.0, 5.0, -11.2) },
+	{ id = "back_wall_east", hover = Vector3.new(12.0, 7.0, -11.2) },
+	{ id = "right_wall", hover = Vector3.new(28.6, 4.0, 5.0) },
+	{ id = "under_leaf_middle", hover = Vector3.new(-1.0, 2.4, 2.3) },
+	{ id = "under_leaf_west", hover = Vector3.new(-15.0, 2.4, 2.3) },
+	{ id = "planter_front", hover = Vector3.new(10.0, 2.0, 1.5) },
+	{ id = "crack_mouth", hover = Vector3.new(-20.8, 1.6, 6.0) },
+}
+Wasp.points = table.freeze(points)
+
+return Wasp
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="15">
+          <Properties>
+            <string name="Name">WaspLook</string>
+            <string name="Source"><![CDATA[--!strict
+-- How the mud dauber wasp looks: numbers and names only; Client/WaspBody builds the parts and poses them each frame. A black-and-yellow
+-- mud dauber (Sceliphron caementarium) about 2.5 cm long, 1 stud = 1 cm: a black head with big dark eyes and yellow mandibles, a black
+-- thorax with a yellow collar and a yellow scutellum, a very long thin yellow petiole (the thread waist) and a black gaster, six long legs
+-- with black femurs, a yellow band at each knee, and yellow tibias and feet, two smoky dark wings each side, and two curled antennae.
+-- The proportions, joints and walking and hanging poses are Godot's WaspBody (scripts/predator/wasp_body.gd, WASP-01), drawn here from
+-- Roblox parts (the fly's pattern, ROBLOX-22): ellipsoids are Parts with a SpecialMesh sphere, rods are Cylinder parts. Where Godot drew
+-- wings at 23 Hz (which a 60 Hz screen cannot show), the wing here is a soft translucent blur in flight, as the fly's.
+-- Body frame: -Z forward, +Y up, the origin the petiole's base, which is where the wasp's position is. Lengths are studs, colours hex,
+-- angles degrees. Ellipsoid `size` is the full diameters (Godot gave radii).
+
+local WaspLook = {}
+
+WaspLook.colors = {
+	black = "191919", yellow = "d9af26", eye = "302b24", wing = "4a3b2b", vein = "5b4a31", blur = "3a2e22",
+} :: { [string]: string }
+
+-- Reflectance (a glossy black chitin; the eyes a little more).
+WaspLook.gloss = { black = 0.05, yellow = 0.02, eye = 0.08 } :: { [string]: number }
+
+-- The ellipsoids that never move relative to the torso. `color` names WaspLook.colors.
+WaspLook.body = {
+	{ name = "Head", color = "black", at = { 0, 0.04, -1.05 }, size = { 0.46, 0.40, 0.34 } },
+	{ name = "Thorax", color = "black", at = { 0, 0.02, -0.63 }, size = { 0.48, 0.48, 0.70 } },
+	{ name = "Scutellum", color = "yellow", at = { 0, 0.25, -0.52 }, size = { 0.26, 0.09, 0.17 } },
+	{ name = "Collar", color = "yellow", at = { 0, 0.20, -0.85 }, size = { 0.40, 0.08, 0.11 } },
+	{ name = "Gaster", color = "black", at = { 0, 0.025, 0.76 }, size = { 0.49, 0.44, 0.78 } },
+	{ name = "AbdomenTip", color = "black", at = { 0, -0.01, 1.02 }, size = { 0.30, 0.30, 0.46 } },
+	{ name = "AbdomenBase", color = "yellow", at = { 0, 0.04, 0.40 }, size = { 0.24, 0.23, 0.26 } },
+	{ name = "EyeL", color = "eye", at = { -0.185, 0.075, -1.075 }, size = { 0.17, 0.30, 0.23 } },
+	{ name = "EyeR", color = "eye", at = { 0.185, 0.075, -1.075 }, size = { 0.17, 0.30, 0.23 } },
+	{ name = "MandibleL", color = "yellow", at = { -0.055, -0.10, -1.19 }, size = { 0.07, 0.14, 0.13 } },
+	{ name = "MandibleR", color = "yellow", at = { 0.055, -0.10, -1.19 }, size = { 0.07, 0.14, 0.13 } },
+} :: { { name: string, color: string, at: { number }, size: { number } } }
+
+-- The thread waist: a thin yellow rod from the thorax to the gaster, a little narrower toward the gaster.
+WaspLook.petiole = { from = { 0, 0, -0.32 }, to = { 0, 0.04, 0.39 }, diameter = 0.062, color = "yellow" }
+
+-- The antennae: a base on the head, then a scape and a curled flagellum of three segments, in the antenna's own frame (right side; the
+-- left mirrors it). `rest` is its turn about x and y at rest, `flick` how far a searching wasp swings it (Godot: 0.20 and 0.12 rad, 0.32 rad).
+WaspLook.antenna = {
+	base = { 0.075, 0.13, -1.15 },
+	points = { { 0, 0, 0 }, { 0.055, 0.10, -0.17 }, { 0.19, 0.06, -0.53 }, { 0.27, 0.02, -0.71 }, { 0.30, -0.06, -0.80 } },
+	diameters = { 0.04, 0.026, 0.020, 0.016 },
+	colors = { "yellow", "black", "black", "black" },
+	rest = { 0.20, 0.12 }, flick = 0.32, hertz = { 3.0, 0.7 },
+} :: { base: { number }, points: { { number } }, diameters: { number }, colors: { string }, rest: { number }, flick: number, hertz: { number } }
+
+-- A leg: where its hip sits on the torso (right side, front to hind), and the lengths of its parts. The joints come from WaspPose.
+WaspLook.legs = {
+	hips = { { 0.17, -0.12, -0.82 }, { 0.17, -0.12, -0.64 }, { 0.17, -0.12, -0.46 } },
+	femur = 0.062, tibia = 0.046, tarsus = 0.026,
+	band = { length = 0.09, grow = 0.016 }, -- the yellow band at the knee end of the femur
+} :: { hips: { { number } }, femur: number, tibia: number, tarsus: number, band: { length: number, grow: number } }
+
+-- Wings: a fore and a hind wing each side. The membrane is a flat ellipse from the root back and out; in flight it is a soft blur of the
+-- whole stroke. root: where the wing's pivot sits (right side); sizes are the share of the forewing.
+WaspLook.wing = {
+	root = { 0.14, 0.20, -0.68 }, hindStep = 0.17, hindShare = 0.68,
+	length = 1.15, width = 0.44, thick = 0.012, centre = { 0.20, 0, 0.56 }, sweep = 10,
+	-- the angles (Godot): folded at rest on the ground, and the mean of the flap in the air
+	folded = { yaw = 12, roll = 6 }, flight = { yaw = 58, roll = 25, shimmerRoll = 7, shimmerHertz = 5.5 },
+	transparency = 0.45, flightTransparency = 0.62,
+	blur = { widen = 1.55, transparency = 0.86 },
+	vein = { diameter = 0.014, tipX = 0.30, to = 0.96 }, -- the dark edge from the root to near the tip
+	reflectance = 0.04,
+} :: any
+
+-- The torso's gentle bob in the air and while it holds the spider (Godot: 0.025 at 1.3 Hz).
+WaspLook.bob = { height = 0.025, hertz = 1.3 }
+
+-- The walking pose is a stride at 3 Hz; the feet reach the surface 0.35 below the position (the wasp lands 0.35 above it).
+WaspLook.walk = { hertz = 3.0, lift = 0.13, reach = 0.18 }
+
+return WaspLook
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="16">
+          <Properties>
             <string name="Name">Wear</string>
             <string name="Source"><![CDATA[--!strict
 -- What age and use have done to the sill, the glass and the retreat, and the few small things left lying about: numbers and names
@@ -1164,11 +1346,11 @@ return Wear
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="15">
+      <Item class="Folder" referent="17">
         <Properties>
           <string name="Name">Habitat</string>
         </Properties>
-        <Item class="ModuleScript" referent="16">
+        <Item class="ModuleScript" referent="18">
           <Properties>
             <string name="Name">DayLight</string>
             <string name="Source"><![CDATA[--!strict
@@ -1280,7 +1462,7 @@ return DayLight
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="17">
+        <Item class="ModuleScript" referent="19">
           <Properties>
             <string name="Name">Lit</string>
             <string name="Source"><![CDATA[--!strict
@@ -1411,7 +1593,7 @@ return Lit
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="18">
+        <Item class="ModuleScript" referent="20">
           <Properties>
             <string name="Name">Materials</string>
             <string name="Source"><![CDATA[--!strict
@@ -1449,7 +1631,7 @@ return Materials
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="19">
+        <Item class="ModuleScript" referent="21">
           <Properties>
             <string name="Name">Patina</string>
             <string name="Source"><![CDATA[--!strict
@@ -1566,7 +1748,7 @@ return Patina
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="20">
+        <Item class="ModuleScript" referent="22">
           <Properties>
             <string name="Name">Plants</string>
             <string name="Source"><![CDATA[--!strict
@@ -1938,7 +2120,7 @@ return Plants
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="21">
+        <Item class="ModuleScript" referent="23">
           <Properties>
             <string name="Name">Scenery</string>
             <string name="Source"><![CDATA[--!strict
@@ -2269,7 +2451,7 @@ return Scenery
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="22">
+        <Item class="ModuleScript" referent="24">
           <Properties>
             <string name="Name">Shapes</string>
             <string name="Source"><![CDATA[--!strict
@@ -2403,7 +2585,7 @@ return Shapes
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="23">
+        <Item class="ModuleScript" referent="25">
           <Properties>
             <string name="Name">SunPick</string>
             <string name="Source"><![CDATA[--!strict
@@ -2477,7 +2659,7 @@ return SunPick
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="24">
+        <Item class="ModuleScript" referent="26">
           <Properties>
             <string name="Name">TestTarget</string>
             <string name="Source"><![CDATA[--!strict
@@ -2515,7 +2697,7 @@ return Target
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="25">
+        <Item class="ModuleScript" referent="27">
           <Properties>
             <string name="Name">WindowsillLayout</string>
             <string name="Source"><![CDATA[--!strict
@@ -2598,11 +2780,11 @@ return table.freeze(Layout)
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="26">
+      <Item class="Folder" referent="28">
         <Properties>
           <string name="Name">Life</string>
         </Properties>
-        <Item class="ModuleScript" referent="27">
+        <Item class="ModuleScript" referent="29">
           <Properties>
             <string name="Name">LifeClock</string>
             <string name="Source"><![CDATA[--!strict
@@ -2785,7 +2967,7 @@ return LifeClock
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="28">
+        <Item class="ModuleScript" referent="30">
           <Properties>
             <string name="Name">LifeLoop</string>
             <string name="Source"><![CDATA[--!strict
@@ -3006,7 +3188,7 @@ return LifeLoop
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="29">
+        <Item class="ModuleScript" referent="31">
           <Properties>
             <string name="Name">NeedsModel</string>
             <string name="Source"><![CDATA[--!strict
@@ -3299,11 +3481,11 @@ return NeedsModel
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="30">
+      <Item class="Folder" referent="32">
         <Properties>
           <string name="Name">Movement</string>
         </Properties>
-        <Item class="ModuleScript" referent="31">
+        <Item class="ModuleScript" referent="33">
           <Properties>
             <string name="Name">CameraMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -3582,7 +3764,7 @@ return CameraMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="32">
+        <Item class="ModuleScript" referent="34">
           <Properties>
             <string name="Name">FocusState</string>
             <string name="Source"><![CDATA[--!strict
@@ -3605,7 +3787,7 @@ return Focus
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="33">
+        <Item class="ModuleScript" referent="35">
           <Properties>
             <string name="Name">InputState</string>
             <string name="Source"><![CDATA[--!strict
@@ -3698,7 +3880,7 @@ return InputState
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="34">
+        <Item class="ModuleScript" referent="36">
           <Properties>
             <string name="Name">JumpInput</string>
             <string name="Source"><![CDATA[--!strict
@@ -3869,7 +4051,7 @@ return JumpInput
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="35">
+        <Item class="ModuleScript" referent="37">
           <Properties>
             <string name="Name">JumpMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -4027,7 +4209,7 @@ return JumpMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="36">
+        <Item class="ModuleScript" referent="38">
           <Properties>
             <string name="Name">LineFraming</string>
             <string name="Source"><![CDATA[--!strict
@@ -4126,7 +4308,7 @@ return LineFraming
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="37">
+        <Item class="ModuleScript" referent="39">
           <Properties>
             <string name="Name">SilkController</string>
             <string name="Source"><![CDATA[--!strict
@@ -4370,7 +4552,7 @@ return Silk
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="38">
+        <Item class="ModuleScript" referent="40">
           <Properties>
             <string name="Name">SpiderMotor</string>
             <string name="Source"><![CDATA[--!strict
@@ -4478,6 +4660,7 @@ function Motor.new(config: Config): any
 		probe = probe,
 		silk = SilkController.new(config.world, config.surfaces, config.profile.silk, loco.gravity_wu_s2) :: any,
 		mode = "attached",
+		seized = false, -- taken by a predator (Motor.seize): the motor stands still and the wasp moves the body
 		pos = config.spawn + Vector3.new(0, HEIGHT, 0),
 		up = Vector3.yAxis,
 		heading = config.heading,
@@ -4577,6 +4760,7 @@ end
 -- Puts the spider somewhere (a reset, a test fixture). Every line, aim and walk ends.
 function Motor.place(self: any, position: Vector3, up: Vector3?, heading: Vector3?)
 	self.mode = "attached"
+	self.seized = false
 	self.pos = position
 	self.up = up or Vector3.yAxis
 	self.heading = SupportMath.tangentDir(heading or self.config.heading, self.up)
@@ -5114,8 +5298,31 @@ function Motor._tickAir(self: any, input: TickInput)
 	if self:_outOfBounds(to) then self:_backToSafety() end
 end
 
+-- Taken by a predator (Godot SpiderMotor.seize, LIFE round 4; ROBLOX-26): the spider lets go of its surface and its line, takes no more
+-- input, and the motor stops. Whatever took it moves the body from now on with `hold`. Nothing undoes it but `place`: the world that
+-- follows is a checkpoint's or the start.
+function Motor.seize(self: any)
+	self.seized = true
+	self.mode = "air"
+	self.preparing = false
+	self.aimTarget = nil
+	self.plan = nil
+	self.planKey = ""
+	self.vel = Vector3.zero
+	self.moving = false
+	self.intent = Vector3.zero
+	self.silk:clear()
+end
+
+-- Where the predator holds the body (the spider hangs upright under it).
+function Motor.hold(self: any, position: Vector3)
+	self.pos = position
+	self.up = SupportMath.rotateToward(self.up, Vector3.yAxis, FREE_UP_RATE * DT)
+end
+
 -- One fixed 1/60 s tick of the body.
 function Motor.tick(self: any, input: TickInput)
+	if self.seized then return end
 	self.ticks += 1
 	local scan = input.gaze
 	self.scanDir = if scan ~= nil and scan.Magnitude > 1e-4 then scan.Unit else nil
@@ -5132,7 +5339,7 @@ return Motor
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="39">
+        <Item class="ModuleScript" referent="41">
           <Properties>
             <string name="Name">StickCarry</string>
             <string name="Source"><![CDATA[--!strict
@@ -5192,7 +5399,7 @@ return StickCarry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="40">
+        <Item class="ModuleScript" referent="42">
           <Properties>
             <string name="Name">SupportMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -5274,7 +5481,7 @@ return SupportMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="41">
+        <Item class="ModuleScript" referent="43">
           <Properties>
             <string name="Name">TetherMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -5343,11 +5550,11 @@ return T
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="42">
+      <Item class="Folder" referent="44">
         <Properties>
           <string name="Name">Perception</string>
         </Properties>
-        <Item class="ModuleScript" referent="43">
+        <Item class="ModuleScript" referent="45">
           <Properties>
             <string name="Name">Observation</string>
             <string name="Source"><![CDATA[--!strict
@@ -5504,7 +5711,7 @@ return Observation
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="44">
+        <Item class="ModuleScript" referent="46">
           <Properties>
             <string name="Name">ObservationMemory</string>
             <string name="Source"><![CDATA[--!strict
@@ -5958,7 +6165,7 @@ return ObservationMemory
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="45">
+        <Item class="ModuleScript" referent="47">
           <Properties>
             <string name="Name">PerceptionMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -6135,7 +6342,7 @@ return PerceptionMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="46">
+        <Item class="ModuleScript" referent="48">
           <Properties>
             <string name="Name">Sensor</string>
             <string name="Source"><![CDATA[--!strict
@@ -6550,7 +6757,7 @@ return Sensor
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="47">
+        <Item class="ModuleScript" referent="49">
           <Properties>
             <string name="Name">SensorCore</string>
             <string name="Source"><![CDATA[--!strict
@@ -6993,7 +7200,7 @@ return SensorCore
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="48">
+        <Item class="ModuleScript" referent="50">
           <Properties>
             <string name="Name">Signal</string>
             <string name="Source"><![CDATA[--!strict
@@ -7034,11 +7241,11 @@ return Signal
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="49">
+      <Item class="Folder" referent="51">
         <Properties>
           <string name="Name">Persistence</string>
         </Properties>
-        <Item class="ModuleScript" referent="50">
+        <Item class="ModuleScript" referent="52">
           <Properties>
             <string name="Name">Checkpoint</string>
             <string name="Source"><![CDATA[--!strict
@@ -7058,8 +7265,11 @@ return Signal
 -- pose, every reference in the graph, and then the meaning of the rebuilt world (reserves in range and books that add up,
 -- the clock, unique flies, perches held by flies that exist, the meal in the jaws one of them). A record with any problem is
 -- refused with its reasons and the live world is left exactly as it was.
+-- The wasp keeps a small record beside the graph (Godot's checkpoint schema 6): the day of its last visit and this life's visits and
+-- escapes, so a return to a rest meets the same wasp. A visit going on is not kept; restoring ends it. A record without one (the port's
+-- first checkpoints were made before the wasp) gets the record of a life it has not yet visited.
 -- Differences from Godot: the record is the port's own (its flies are the port's, Chet's ROBLOX flies, not Godot's), so
--- Godot checkpoints are not read and schema numbers start again at 1. The passing shadow, growth, the wasp and the notebook
+-- Godot checkpoints are not read and schema numbers start again at 1. The passing shadow, growth and the notebook
 -- are not ported, so they are not recorded.
 
 local ObjectRecord = require(script.Parent.ObjectRecord)
@@ -7079,6 +7289,7 @@ local NeedsModel = require(script.Parent.Parent.Life.NeedsModel)
 local LifeLoop = require(script.Parent.Parent.Life.LifeLoop)
 local LifeClock = require(script.Parent.Parent.Life.LifeClock)
 local Layout = require(script.Parent.Parent.Habitat.WindowsillLayout)
+local WaspDirector = require(script.Parent.Parent.Predator.WaspDirector)
 
 local Checkpoint = {}
 
@@ -7103,6 +7314,7 @@ Checkpoint.CLASSES = {
 -- when a record is made and when it is put back, so a name always means this world's own thing.
 export type World = {
 	motor: any, prey: any, sensor: any, memory: any, needs: any, life: any,
+	wasp: any?, -- the WaspDirector (nil: no wasp in this world)
 	extraRefs: { [string]: any }?, -- anything else the world's state points at that the record should keep by name
 }
 
@@ -7168,6 +7380,7 @@ function Checkpoint.capture(world: World, createdAt: number?): ({ [string]: any 
 			retreat_id = if Layout.inRetreat(motor.pos) then "sill_crevice" else "", state = "ATTACHED",
 		},
 		world = graph,
+		wasp = if world.wasp ~= nil then world.wasp:toRecord() else nil,
 	}, nil
 end
 
@@ -7268,6 +7481,9 @@ function Checkpoint.check(record: any, world: World): ({ string }, ObjectRecord.
 		if p.state ~= "ATTACHED" then bad("the spider is not standing on a surface") end
 		if p.retreat_id ~= "" and p.retreat_id ~= "sill_crevice" then bad("the spider is in an unknown retreat") end
 	end
+	if record.wasp ~= nil then
+		for _, text in WaspDirector.problems(record.wasp) do bad(text) end
+	end
 	if #problems > 0 then return problems, nil end
 	local decoded, why = ObjectRecord.decode(record.world, Checkpoint.CLASSES, Checkpoint.refs(world))
 	if not decoded then
@@ -7294,6 +7510,7 @@ function Checkpoint.restore(record: any, world: World): (boolean, { string })
 	end
 	world.motor:place(pos, n.Unit, h.Unit)
 	world.motor.gazePitch = p.gaze_pitch
+	if world.wasp ~= nil then world.wasp:load(record.wasp or WaspDirector.defaultRecord()) end
 	-- Godot's apply_record: the rest that was going on goes on, the spider takes a moment to take hold, and the screen says
 	-- this is checkpoint recovery. What was owed or announced at that tick is not done again.
 	local life = world.life
@@ -7311,7 +7528,7 @@ return Checkpoint
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="51">
+        <Item class="ModuleScript" referent="53">
           <Properties>
             <string name="Name">CheckpointStore</string>
             <string name="Source"><![CDATA[--!strict
@@ -7483,7 +7700,7 @@ return CheckpointStore
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="52">
+        <Item class="ModuleScript" referent="54">
           <Properties>
             <string name="Name">Json</string>
             <string name="Source"><![CDATA[--!strict
@@ -7608,7 +7825,7 @@ return Json
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="53">
+        <Item class="ModuleScript" referent="55">
           <Properties>
             <string name="Name">ObjectRecord</string>
             <string name="Source"><![CDATA[--!strict
@@ -7944,11 +8161,701 @@ return ObjectRecord
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="54">
+      <Item class="Folder" referent="56">
+        <Properties>
+          <string name="Name">Predator</string>
+        </Properties>
+        <Item class="ModuleScript" referent="57">
+          <Properties>
+            <string name="Name">WaspDirector</string>
+            <string name="Source"><![CDATA[--!strict
+-- WaspDirector: the black-and-yellow mud dauber's visits to the sill, without the engine. A port of the frozen
+-- scripts/predator/wasp_director.gd and its actor scripts/predator/wasp.gd (LIFE round 4; LIFE-03 the first predator; LIFE-01 death can
+-- be real and jarring, not sensationalized; spec 2 no threat spawning behind the player and no unexplained death; spec 8.3 search,
+-- inspect, approach, strike, disengage). Every number is in Data/Wasp.
+--
+-- When. At most one visit a day, in the warm middle of the day, never on the first day, never before the spider has finished its first
+-- meal, and never while it rests or moults in the crack. Whether a day has a visit, and when, follows from the world's seed and the day
+-- alone, so a return to a checkpoint meets the same wasp (the port's own hash: Godot's cannot be reproduced in Luau, so the same seed
+-- does not give the same days as Godot).
+--
+-- Warned. The wasp is heard before it is near: it comes in over the window frame from outside for ARRIVE_S and does not search until it
+-- is on the sill. When it lands the spider feels it. When it has seen the spider it turns toward it and comes to look (INSPECT_S at arm's
+-- length) before it strikes.
+--
+-- Search by sight. It moves between authored places on the sill where a spider might be: it hovers and looks, and on open surfaces it may
+-- land and walk, its antennae flicking. It knows nothing it has not seen. Each tick that it can see the spider (in range, a clear line,
+-- not in the retreat) its notice grows, much faster when the spider moves than when it keeps still, and faster near than far. Out of
+-- sight, notice fades. Full notice: it has found the spider.
+--
+-- Escapes. The silk-lined crack is safe. A jump, a drop on the line, or getting out of sight breaks its approach; then it is confused and
+-- searches somewhere at least FAR_FROM_LOSS_WU away. Its strike is a short lunge at where the spider was: a spider that moves off quickly
+-- is missed. After SEARCH_S of searching it gives up and flies away.
+--
+-- Caught. The wasp stings and the spider goes still; the wasp carries it up and away over the frame (`heldAt` is where the spider hangs).
+-- The host presents that. The spider is paralysed by the sting, not killed (LIFE-03).
+--
+-- What is handed in. The director knows the world only through three functions (`ray`, `clear`, `inRetreat`), the spider only through the
+-- Spider table of this tick and the life clock only through the Block table, so the plain Luau CLI replays it against Godot's goldens
+-- (tests/wasp_reference.json, tools/export_wasp_reference.gd) on an analytic world, and the client gives it the real sill's casts.
+-- Random draws come from `rng` (range, unit, int); the tests hand it a scripted one.
+--
+-- Not ported: Gentle rules (the wasp touches the spider and leaves; Godot's round 5 modes): the flag exists and the rule is here, but
+-- Roblox has no mode choice yet, so it is never set. The sound is the host's (captions only; no audio assets).
+
+local Data = require(script.Parent.Parent.Data.Wasp)
+local PreyRandom = require(script.Parent.Parent.Prey.PreyRandom)
+
+local WaspDirector = {}
+WaspDirector.__index = WaspDirector
+
+WaspDirector.PHASES = table.freeze({ "away", "arriving", "searching", "inspecting", "striking", "carrying", "leaving" })
+
+export type Rng = {
+	range: (Rng, number, number) -> number, -- a number in [lo, hi)
+	unit: (Rng) -> number, -- a number in [0, 1)
+	int: (Rng, number, number) -> number, -- a whole number in [lo, hi]
+}
+-- What the director asks of the world. `ray`: something solid between two points. `clear`: a sphere of that radius goes from a to b
+-- without touching the world. `inRetreat`: inside the silk-lined crack.
+export type World = {
+	ray: (Vector3, Vector3) -> boolean,
+	clear: (Vector3, Vector3, number) -> boolean,
+	inRetreat: (Vector3) -> boolean,
+}
+-- The spider this tick.
+export type Spider = {
+	position: Vector3,
+	velocity: Vector3,
+	walkSpeed: number,
+	airborne: boolean, -- in a jump
+	falling: boolean, -- let down on its line (or fallen)
+}
+-- The life this tick (Godot: the habitat loop and the feeding controller).
+export type Block = { day: number, hour: number, resting: boolean, moulting: boolean, meals: number }
+export type Signal = { kind: string, [string]: any }
+
+local UP = Vector3.new(0, 1, 0)
+local DOWN = Vector3.new(0, -1, 0)
+local FORWARD = Vector3.new(0, 0, -1)
+local TAU = math.pi * 2
+
+local function rotateY(v: Vector3, angle: number): Vector3
+	local c, s = math.cos(angle), math.sin(angle)
+	return Vector3.new(v.X * c + v.Z * s, v.Y, -v.X * s + v.Z * c)
+end
+
+local function pathLength(path: { Vector3 }): number
+	local total = 0.0
+	for i = 2, #path do total += (path[i - 1] - path[i]).Magnitude end
+	return math.max(total, 1e-3)
+end
+
+-- The default random stream for a visit: the port's Park-Miller, mixed from the seed, the day and the visit.
+local function makeStream(seed: number, a: number, b: number): Rng
+	local r = PreyRandom.new((seed * 73856093 + a * 19349663 + b * 83492791 + 12345) % 2147483647)
+	r:next()
+	r:next()
+	return {
+		range = function(_, lo: number, hi: number): number return lo + (hi - lo) * r:next() end,
+		unit = function(): number return r:next() end,
+		int = function(_, lo: number, hi: number): number return lo + math.min(math.floor(r:next() * (hi - lo + 1)), hi - lo) end,
+	} :: any
+end
+
+-- `config.seed`: the world's seed. `config.world`: the three functions. `config.enabled`: false and it never comes by itself (test worlds;
+-- force still brings it). `config.makeRng(day, visit)`: the random stream of a visit (tests).
+function WaspDirector.new(config: { seed: number, world: World, enabled: boolean?, makeRng: ((number, number) -> Rng)? }): any
+	local self = setmetatable({
+		world = config.world, enabled = config.enabled ~= false, seed = config.seed, makeRng = config.makeRng,
+		-- The wasp as the spider's senses have it (wasp.gd).
+		wasp = {
+			position = Vector3.new(0, 0, 0), heading = FORWARD, velocity = Vector3.new(0, 0, 0), normal = UP,
+			mode = "flying", search = 0.0, visible = false, prev = Vector3.new(0, 0, 0),
+		},
+		phase = "away", visitS = 0.0, phaseS = 0.0, searchLeft = 0.0, notice = 0.0, confusedS = 0.0,
+		noticedThisVisit = false, sparedThisVisit = false, gentle = false,
+		lastVisitDay = 0, visits = 0, escapes = 0,
+		events = {} :: { { kind: string, t: number } },
+		signals = {} :: { Signal },
+		-- Where the spider hangs while it is carried (nil otherwise); the host moves the spider there each tick.
+		heldAt = nil :: Vector3?, holding = false,
+		-- The visit in progress.
+		rng = nil :: Rng?, path = {} :: { Vector3 }, pathI = 1, speed = Data.flySpeed, point = 1, recent = {} :: { number },
+		sub = "", subS = 0.0, walkDir = Vector3.new(0, 0, 0), stepS = 0.0, openPos = Vector3.new(0, 0, 0), lastSeen = Vector3.new(0, 0, 0),
+		unseenS = 0.0, holdS = 0.0, lossPos = nil :: Vector3?, strikeFrom = Vector3.new(0, 0, 0), strikeTo = Vector3.new(0, 0, 0),
+		dt = 1 / 60, spider = nil :: Spider?,
+	}, WaspDirector)
+	return self
+end
+
+function WaspDirector.isVisiting(self: any): boolean
+	return self.phase ~= "away"
+end
+
+-- ---------------------------------------------------------------------------------------------------------------- when it comes
+
+-- Whether day `day` has a visit, and at what hour: -1 when it has none. From the seed and the day alone.
+function WaspDirector.plannedHour(self: any, day: number): number
+	if day < Data.firstDay then return -1.0 end
+	local r = makeStream(self.seed, day, 7)
+	if r:unit() >= Data.visitChance then return -1.0 end
+	return r:range(Data.windowFromH, Data.windowToH - 1.0)
+end
+
+-- Why a visit could not begin now ("" when it could), apart from the hour.
+function WaspDirector.blocked(_self: any, block: Block): string
+	if block.day < Data.firstDay then return "the first day" end
+	if block.meals < 1 then return "no meal yet" end
+	if block.resting or block.moulting then return "resting" end
+	return ""
+end
+
+function WaspDirector._maybeBegin(self: any, block: Block)
+	local day = block.day
+	if day == self.lastVisitDay then return end
+	local hour = self:plannedHour(day)
+	if hour < 0.0 or block.hour < hour or block.hour >= Data.windowToH then return end
+	if self:blocked(block) ~= "" then return end
+	self:beginVisit(day)
+end
+
+-- The index of the search place with this id, nil when there is none.
+function WaspDirector.pointIndex(id: string): number?
+	for i, p in Data.points do
+		if p.id == id then return i end
+	end
+	return nil
+end
+
+-- Brings the wasp now (tests, the test place's attribute). `at`: the id of the place it searches first (nil lets the visit choose). False
+-- when it is already here.
+function WaspDirector.force(self: any, day: number, at: string?): boolean
+	if self.phase ~= "away" then return false end
+	self:beginVisit(day, if at then WaspDirector.pointIndex(at) else nil)
+	return true
+end
+
+function WaspDirector.beginVisit(self: any, day: number, first: number?)
+	self.lastVisitDay = day
+	self.visits += 1
+	self.rng = if self.makeRng then self.makeRng(day, self.visits) else makeStream(self.seed, day * 1009 + 13, self.visits)
+	self.events = {}
+	self.visitS = 0.0
+	self.notice = 0.0
+	self.confusedS = 0.0
+	self.noticedThisVisit = false
+	self.sparedThisVisit = false
+	self.searchLeft = Data.searchS
+	self.recent = {}
+	self.lossPos = nil
+	self.holding = false
+	self.heldAt = nil
+	self.point = first or self.rng:int(1, #Data.points)
+	local to: Vector3 = Data.points[self.point].hover
+	self.path = { Data.entry, Data.over, Vector3.new(to.X, Data.cruiseY, to.Z), to }
+	self.pathI = 2
+	self.speed = pathLength(self.path) / Data.arriveS
+	self:_place(Data.entry)
+	self.wasp.mode = "flying"
+	self.wasp.search = 0.0
+	self.wasp.visible = true
+	self:_setPhase("arriving")
+	self:_log("warning")
+	self:_signal({ kind = "visit_started", first = self.visits == 1, point = Data.points[self.point].id })
+end
+
+-- ---------------------------------------------------------------------------------------------------------------- the tick
+
+-- One fixed tick, after the spider has moved. `spider`: this tick's spider; `block`: this tick's life. Nothing is read from the spider
+-- while the wasp is away.
+function WaspDirector.step(self: any, dt: number, spider: Spider, block: Block)
+	self.dt = dt
+	self.spider = spider
+	local phase: string = self.phase
+	if phase == "away" then
+		if self.enabled then self:_maybeBegin(block) end
+		return
+	end
+	self.visitS += dt
+	self.phaseS += dt
+	if phase == "arriving" then
+		if self:_advance(dt) then
+			self.openPos = self.wasp.position
+			self:_setPhase("searching")
+			self:_log("searching")
+			self.sub = "hover"
+			self.subS = self.rng:range(Data.hoverS[1], Data.hoverS[2])
+		end
+	elseif phase == "searching" then
+		self.searchLeft -= dt
+		self:_search(dt)
+		self:_look(dt)
+		if self.notice >= 1.0 then
+			self:_beginInspecting()
+		elseif self.searchLeft <= 0.0 and (self.sub == "hover" or self.sub == "fly") then
+			self:_beginLeaving()
+		end
+	elseif phase == "inspecting" then
+		self:_inspect(dt)
+	elseif phase == "striking" then
+		self:_strike(dt)
+	elseif phase == "carrying" then
+		local done = self:_advance(dt)
+		self:_holdSpider()
+		if done then
+			self:_setPhase("away")
+			self.wasp.visible = false
+			self:_signal({ kind = "carried_off" })
+		end
+	elseif phase == "leaving" then
+		if self:_advance(dt) then
+			self.wasp.visible = false
+			self:_setPhase("away")
+			if self.noticedThisVisit then self.escapes += 1 end
+			self:_log("left")
+			self:_signal({ kind = "left", escaped = self.noticedThisVisit })
+		end
+	end
+end
+
+-- ---------------------------------------------------------------------------------------------------------------- searching
+
+function WaspDirector._search(self: any, dt: number)
+	local wasp = self.wasp
+	local sub: string = self.sub
+	if sub == "fly" then
+		wasp.search = 0.3
+		if self:_advance(dt) then
+			self.openPos = wasp.position
+			self.sub = "hover"
+			self.subS = self.rng:range(Data.hoverS[1], Data.hoverS[2])
+		end
+	elseif sub == "hover" then
+		wasp.mode = "flying"
+		wasp.search = 0.8
+		self:_moveTo(wasp.position, rotateY(wasp.heading, math.rad(Data.scanDegS) * dt), dt)
+		self.subS -= dt
+		if self.subS <= 0.0 then
+			local p = Data.points[self.point]
+			if p.land ~= nil and self.rng:unit() < Data.landChance and self.searchLeft > Data.landS + Data.walkS then
+				self.sub = "land"
+				self.path = { wasp.position, p.land }
+				self.pathI = 2
+				self.speed = (wasp.position - p.land).Magnitude / Data.landS
+			else
+				self:_nextPoint()
+			end
+		end
+	elseif sub == "land" then
+		if self:_advance(dt) then
+			wasp.mode = "walking"
+			wasp.normal = UP
+			self.openPos = wasp.position
+			self:_shake("heavy landing")
+			self:_log("landed")
+			self:_signal({ kind = "landed", at = wasp.position })
+			self.sub = "walk"
+			self.subS = Data.walkS
+			self.stepS = Data.stepEveryS
+			self.walkDir = rotateY(FORWARD, self.rng:range(0.0, TAU))
+		end
+	elseif sub == "walk" then
+		wasp.search = 1.0
+		self:_walk(dt)
+		self.subS -= dt
+		if self.subS <= 0.0 then
+			self.sub = "takeoff"
+			local up = wasp.position + UP * 1.2
+			self.path = { wasp.position, up }
+			self.pathI = 2
+			self.speed = Data.flySpeed * 0.5
+			wasp.mode = "flying"
+		end
+	elseif sub == "takeoff" then
+		if self:_advance(dt) then
+			self.openPos = wasp.position
+			self:_nextPoint()
+		end
+	end
+end
+
+-- A few steps along the surface it stands on, turning back where it would step off.
+function WaspDirector._walk(self: any, dt: number)
+	local wasp = self.wasp
+	local p: Vector3 = wasp.position
+	local nxt = p + self.walkDir * Data.walkSpeed * dt
+	if not self.world.ray(nxt + UP * 0.3, nxt + DOWN * 0.8) or not self:_clear(p, nxt, Data.walkRadius) then
+		self.walkDir = -self.walkDir
+		nxt = p
+	end
+	self:_moveTo(nxt, self.walkDir, dt)
+	self.stepS -= dt
+	if self.stepS <= 0.0 then
+		self.stepS = Data.stepEveryS
+		self:_shake("heavy footsteps")
+	end
+end
+
+function WaspDirector._nextPoint(self: any)
+	table.insert(self.recent, self.point)
+	while #self.recent > 3 do table.remove(self.recent, 1) end
+	local here: Vector3 = self.wasp.position
+	local choices: { number } = {}
+	for i, pt in Data.points do
+		if table.find(self.recent, i) then continue end
+		local hover: Vector3 = pt.hover
+		local loss: Vector3? = self.lossPos
+		if loss ~= nil and (hover - loss).Magnitude < Data.farFromLossWu then continue end
+		table.insert(choices, i)
+	end
+	if #choices == 0 then table.insert(choices, (self.point % #Data.points) + 1) end
+	-- A local search: the nearer half of the places it has not just looked at.
+	table.sort(choices, function(a: number, b: number): boolean
+		return (here - Data.points[a].hover).Magnitude < (here - Data.points[b].hover).Magnitude
+	end)
+	local count = math.max(1, (#choices + 1) // 2)
+	self.point = choices[self.rng:int(1, count)]
+	self:_flyTo(Data.points[self.point].hover, Data.flySpeed)
+	self.sub = "fly"
+end
+
+-- ---------------------------------------------------------------------------------------------------------------- seeing the spider
+
+-- Whether it can see the spider now: in range, nothing in the way, and not in the retreat.
+function WaspDirector.canSeeSpider(self: any): boolean
+	local s: Spider? = self.spider
+	if s == nil or self.holding or not self.wasp.visible then return false end
+	if self.world.inRetreat(s.position) then return false end
+	local eye = self:eyePosition()
+	if (eye - s.position).Magnitude > Data.sightWu then return false end
+	return not self.world.ray(eye, s.position)
+end
+
+function WaspDirector.eyePosition(self: any): Vector3
+	return self.wasp.position + self.wasp.heading * Data.eyeAhead
+end
+
+-- How fast notice grows now (per second) if it can see the spider.
+function WaspDirector.noticeRate(self: any): number
+	local s: Spider = self.spider
+	local d = (self:eyePosition() - s.position).Magnitude
+	local walk = math.max(s.walkSpeed, 0.1)
+	local motion = math.clamp(s.velocity.Magnitude / walk, 0.0, 1.5)
+	if s.airborne then motion = 1.5 end
+	return (Data.noticeStill + Data.noticeMoving * motion) * math.max(1.0 - d / Data.sightWu, 0.0)
+end
+
+function WaspDirector._look(self: any, dt: number)
+	if self.confusedS > 0.0 then
+		self.confusedS -= dt
+		return
+	end
+	if self:canSeeSpider() then
+		self.notice += self:noticeRate() * dt
+		self.lastSeen = (self.spider :: Spider).position
+	else
+		self.notice = math.max(self.notice - Data.noticeDecay * dt, 0.0)
+	end
+end
+
+function WaspDirector._beginInspecting(self: any)
+	self.notice = 1.0
+	self.noticedThisVisit = true
+	self.unseenS = 0.0
+	self.holdS = 0.0
+	if self.wasp.mode == "walking" then self.wasp.mode = "flying" end
+	self:_setPhase("inspecting")
+	self:_log("noticed")
+	self:_signal({ kind = "noticed", at = self.lastSeen })
+end
+
+-- Comes to look: to arm's length from where it last saw the spider, then holds there, antennae busy, for INSPECT_S, then strikes. A
+-- jump, a drop, the retreat, or the spider out of sight for LOSE_UNSEEN_S, and it has lost it.
+function WaspDirector._inspect(self: any, dt: number)
+	local s: Spider = self.spider
+	local wasp = self.wasp
+	wasp.mode = "flying"
+	wasp.search = 1.0
+	if self.world.inRetreat(s.position) then
+		self:_lose("hid")
+		return
+	end
+	if s.airborne then
+		self:_lose("jumped")
+		return
+	end
+	if s.falling then
+		self:_lose("dropped")
+		return
+	end
+	if self:canSeeSpider() then
+		self.unseenS = 0.0
+		self.lastSeen = s.position
+	else
+		self.unseenS += dt
+		if self.unseenS > Data.loseUnseenS then
+			self:_lose("out of sight")
+			return
+		end
+	end
+	if self.phaseS > Data.inspectGiveUpS then
+		self:_lose("out of reach")
+		return
+	end
+	local away: Vector3 = wasp.position - self.lastSeen
+	if away.Magnitude < 1e-3 then away = UP end
+	local standoff = self.lastSeen + away.Unit * Data.standoffWu
+	local to = standoff - wasp.position
+	local step = Data.inspectSpeed * dt
+	local face = self.lastSeen - wasp.position
+	if to.Magnitude > 0.05 then
+		local nxt = wasp.position + (if to.Magnitude > step then to.Unit * step else to)
+		if self:_clear(wasp.position, nxt, Data.radius) then
+			self:_moveTo(nxt, face, dt)
+		else
+			self:_moveTo(wasp.position, face, dt)
+		end
+		self.holdS = math.max(self.holdS - dt, 0.0)
+	else
+		self:_moveTo(wasp.position, face, dt)
+		self.holdS += dt
+		if self.holdS >= Data.inspectS then
+			self.strikeFrom = wasp.position
+			self.strikeTo = s.position
+			self:_setPhase("striking")
+			self:_log("strike")
+		end
+	end
+end
+
+function WaspDirector._strike(self: any, dt: number)
+	local k = math.clamp(self.phaseS / Data.strikeS, 0.0, 1.0)
+	self:_moveTo(self.strikeFrom:Lerp(self.strikeTo, k), self.strikeTo - self.strikeFrom, dt)
+	if k < 1.0 then return end
+	local s: Spider = self.spider
+	if (self.wasp.position - s.position).Magnitude <= Data.catchWu and not self.world.inRetreat(s.position) and not s.airborne then
+		if self.gentle then self:_spare() else self:_catch() end
+	else
+		self:_lose("missed")
+	end
+end
+
+-- Gentle rules (Godot round 5: Easy and free play): the wasp touches the spider with its antennae and gives up on it, and leaves. Roblox
+-- has no such mode yet, so `gentle` is never set outside the tests.
+function WaspDirector._spare(self: any)
+	self.sparedThisVisit = true
+	self:_log("spared")
+	self:_signal({ kind = "lost", why = "spared" })
+	self:_beginLeaving()
+end
+
+function WaspDirector._catch(self: any)
+	local wasp = self.wasp
+	self.holding = true
+	wasp.mode = "holding"
+	wasp.search = 0.0
+	local p: Vector3 = wasp.position
+	self.path = { p, p + UP * 2.5, Data.over }
+	self.pathI = 2
+	self.speed = pathLength(self.path) / Data.carryS
+	self:_setPhase("carrying")
+	self:_log("caught")
+	self:_holdSpider()
+	self:_signal({ kind = "caught" })
+end
+
+function WaspDirector._holdSpider(self: any)
+	if self.holding then self.heldAt = self.wasp.position + DOWN * Data.holdBelow end
+end
+
+function WaspDirector._lose(self: any, why: string)
+	self.lossPos = self.lastSeen
+	self.notice = Data.afterLossNotice
+	self.confusedS = Data.confuseS
+	self:_setPhase("searching")
+	self:_log("lost:" .. why)
+	self:_signal({ kind = "lost", why = why })
+	self:_nextPoint()
+end
+
+function WaspDirector._beginLeaving(self: any)
+	local p: Vector3 = self.wasp.position
+	local path = self:_route(p, Data.over)
+	table.insert(path, Data.entry)
+	self.path = path
+	self.pathI = 2
+	self.speed = pathLength(path) / Data.leaveS
+	self.wasp.mode = "flying"
+	self.wasp.search = 0.0
+	self:_setPhase("leaving")
+	self:_log("leaving")
+end
+
+-- ---------------------------------------------------------------------------------------------------------------- paths and the world
+
+function WaspDirector._flyTo(self: any, to: Vector3, speed: number)
+	self.path = self:_route(self.wasp.position, to)
+	self.pathI = 2
+	self.speed = speed
+end
+
+-- Up to cruising height (from somewhere open above it), across, and down to `to`.
+function WaspDirector._route(self: any, from: Vector3, to: Vector3): { Vector3 }
+	local path: { Vector3 } = { from }
+	local start = from
+	if from.Y < Data.cruiseY and not self:_clear(from, Vector3.new(from.X, Data.cruiseY, from.Z), Data.radius) then
+		table.insert(path, self.openPos)
+		start = self.openPos
+	end
+	if start.Y < Data.cruiseY then table.insert(path, Vector3.new(start.X, Data.cruiseY, start.Z)) end
+	if to.Y < Data.cruiseY then table.insert(path, Vector3.new(to.X, Data.cruiseY, to.Z)) end
+	table.insert(path, to)
+	return path
+end
+
+-- Moves along the path at the current speed; true at its end.
+function WaspDirector._advance(self: any, dt: number): boolean
+	local wasp = self.wasp
+	local p: Vector3 = wasp.position
+	local left = self.speed * dt
+	local path: { Vector3 } = self.path
+	while self.pathI <= #path and left > 0.0 do
+		local target = path[self.pathI]
+		local d = (target - p).Magnitude
+		if d <= left then
+			p = target
+			left -= d
+			self.pathI += 1
+		else
+			p += (target - p) / d * left
+			left = 0.0
+		end
+	end
+	local dir = p - wasp.position
+	self:_moveTo(p, if dir.Magnitude > 1e-5 then dir else wasp.heading, self.dt)
+	return self.pathI > #path
+end
+
+-- True when a sphere of `radius` moves from `a` to `b` without touching the world.
+function WaspDirector._clear(self: any, a: Vector3, b: Vector3, radius: number): boolean
+	if (a - b).Magnitude < 1e-5 then return true end
+	return self.world.clear(a, b, radius)
+end
+
+-- ---------------------------------------------------------------------------------------------------------------- the actor (wasp.gd)
+
+-- Places it and faces it along `dir` (flattened), and works out its velocity from where it was.
+function WaspDirector._moveTo(self: any, p: Vector3, dir: Vector3, dt: number)
+	local wasp = self.wasp
+	wasp.position = p
+	wasp.velocity = if dt > 0.0 then (p - wasp.prev) / dt else Vector3.new(0, 0, 0)
+	wasp.prev = p
+	local flat = Vector3.new(dir.X, 0.0, dir.Z)
+	if flat.Magnitude > 1e-4 then wasp.heading = flat.Unit end
+end
+
+-- Puts it somewhere without a velocity (its first appearance).
+function WaspDirector._place(self: any, p: Vector3)
+	self.wasp.position = p
+	self.wasp.prev = p
+	self.wasp.velocity = Vector3.new(0, 0, 0)
+end
+
+-- What the spider's senses get of it: movement, never prey (its percept is capped at movement, so no aim, capture or inspection ever
+-- treats it as something to catch). Nil while it is away.
+function WaspDirector.percept(self: any): any
+	local w = self.wasp
+	if not w.visible then return nil end
+	return { id = "wasp", position = w.position, radius = Data.sensedRadius, velocity = w.velocity, maxCategory = "movement" }
+end
+
+function WaspDirector._shake(self: any, kind: string)
+	self:_signal({ kind = "shake", shake = kind, at = self.wasp.position + DOWN * 0.35 })
+end
+
+function WaspDirector._setPhase(self: any, p: string)
+	self.phase = p
+	self.phaseS = 0.0
+end
+
+function WaspDirector._log(self: any, kind: string)
+	table.insert(self.events, { kind = kind, t = self.visitS })
+end
+
+function WaspDirector._signal(self: any, s: Signal)
+	table.insert(self.signals, s)
+end
+
+-- The signals since the last call, oldest first: visit_started, shake (a landing or a footstep), landed, noticed, lost, caught,
+-- carried_off, left.
+function WaspDirector.drainSignals(self: any): { Signal }
+	local out = self.signals
+	self.signals = {}
+	return out
+end
+
+-- ---------------------------------------------------------------------------------------------------------------- checkpoints
+
+-- Kept in checkpoints: the day of the last visit, and how many visits and escapes this life has had. A visit going on is not kept,
+-- because the spider rests in the crack where the wasp cannot find it.
+function WaspDirector.toRecord(self: any): { [string]: number }
+	return { last_visit_day = self.lastVisitDay, visits = self.visits, escapes = self.escapes }
+end
+
+-- The record of a life the wasp has not yet visited.
+function WaspDirector.defaultRecord(): { [string]: number }
+	return { last_visit_day = 0, visits = 0, escapes = 0 }
+end
+
+-- Puts a record back and ends any visit going on (the wasp is away and the spider is no longer held).
+function WaspDirector.load(self: any, d: any)
+	self.lastVisitDay = math.floor(tonumber(d.last_visit_day) or 0)
+	self.visits = math.floor(tonumber(d.visits) or 0)
+	self.escapes = math.floor(tonumber(d.escapes) or 0)
+	self:clearVisit()
+end
+
+-- Ends the visit, if any: away, hidden, nothing held. (A return to a rest, a new life.)
+function WaspDirector.clearVisit(self: any)
+	self.phase = "away"
+	self.phaseS = 0.0
+	self.visitS = 0.0
+	self.notice = 0.0
+	self.confusedS = 0.0
+	self.holding = false
+	self.heldAt = nil
+	self.wasp.visible = false
+	self.signals = {}
+	self.events = {}
+end
+
+function WaspDirector.problems(d: any): { string }
+	local out: { string } = {}
+	if type(d) ~= "table" then
+		table.insert(out, "wasp: not a record")
+		return out
+	end
+	for _, key in { "last_visit_day", "visits", "escapes" } do
+		local v = d[key]
+		if type(v) ~= "number" or v ~= v or v < 0 or v ~= math.floor(v) then
+			table.insert(out, `wasp: {key} must be a whole number, not negative`)
+		end
+	end
+	if #out == 0 and d.escapes > d.visits then table.insert(out, "wasp: more escapes than visits") end
+	return out
+end
+
+return WaspDirector
+]]></string>
+          </Properties>
+        </Item>
+      </Item>
+      <Item class="Folder" referent="58">
         <Properties>
           <string name="Name">Prey</string>
         </Properties>
-        <Item class="ModuleScript" referent="55">
+        <Item class="ModuleScript" referent="59">
           <Properties>
             <string name="Name">Feeding</string>
             <string name="Source"><![CDATA[--!strict
@@ -7961,7 +8868,7 @@ local NeedsModel=require(script.Parent.Parent.Life.NeedsModel)
 local F={};F.__index=F
 function F.new(needs: any?): any
  return setmetatable({held=nil,struggling=false,feeding=false,grip=0,elapsed=0,waiting=0,jerk=0,venom=6,
-  swallow=0,needs=needs or NeedsModel.new(),taken=0,granted=0,ledger={},auto=false,tap=false,note='',rng=R.new(513)},F)
+  swallow=0,needs=needs or NeedsModel.new(),taken=0,granted=0,ledger={},mealsFinished=0,auto=false,tap=false,note='',rng=R.new(513)},F)
 end
 function F.capture(self: any,fly: any)
  self.held=fly;self.struggling=true;self.feeding=false;self.grip=.4;self.elapsed=0;self.waiting=0
@@ -7997,13 +8904,13 @@ function F.step(self: any,dt: number,attached: boolean,moving: boolean,escape: (
  local granted=self.needs:grantEnergy(take,f.captureKey)
  self.taken+=take;self.granted+=granted
  self.ledger[f.captureKey]=(self.ledger[f.captureKey] or 0)+granted
- if f.nutrition<=1e-9 then f.nutrition=0;f.state='CONSUMED';self.held=nil;self.feeding=false;self.note='Meal finished.' end
+ if f.nutrition<=1e-9 then f.nutrition=0;f.state='CONSUMED';self.held=nil;self.feeding=false;self.mealsFinished+=1;self.note='Meal finished.' end
 end
 return F
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="56">
+        <Item class="ModuleScript" referent="60">
           <Properties>
             <string name="Name">Fly</string>
             <string name="Source"><![CDATA[--!strict
@@ -8220,7 +9127,7 @@ return Fly
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="57">
+        <Item class="ModuleScript" referent="61">
           <Properties>
             <string name="Name">FlyFlight</string>
             <string name="Source"><![CDATA[--!strict
@@ -8285,7 +9192,7 @@ return F
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="58">
+        <Item class="ModuleScript" referent="62">
           <Properties>
             <string name="Name">FlySenses</string>
             <string name="Source"><![CDATA[--!strict
@@ -8347,7 +9254,7 @@ return S
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="59">
+        <Item class="ModuleScript" referent="63">
           <Properties>
             <string name="Name">PerchGraph</string>
             <string name="Source"><![CDATA[--!strict
@@ -8397,7 +9304,7 @@ return G
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="60">
+        <Item class="ModuleScript" referent="64">
           <Properties>
             <string name="Name">PreyDirector</string>
             <string name="Source"><![CDATA[--!strict
@@ -8519,7 +9426,7 @@ return D
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="61">
+        <Item class="ModuleScript" referent="65">
           <Properties>
             <string name="Name">PreyMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -8609,7 +9516,7 @@ return M
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="62">
+        <Item class="ModuleScript" referent="66">
           <Properties>
             <string name="Name">PreyPopulation</string>
             <string name="Source"><![CDATA[--!strict
@@ -8641,7 +9548,7 @@ return P
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="63">
+        <Item class="ModuleScript" referent="67">
           <Properties>
             <string name="Name">PreyRandom</string>
             <string name="Source"><![CDATA[--!strict
@@ -8655,11 +9562,11 @@ return R
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="64">
+      <Item class="Folder" referent="68">
         <Properties>
           <string name="Name">Rig</string>
         </Properties>
-        <Item class="ModuleScript" referent="65">
+        <Item class="ModuleScript" referent="69">
           <Properties>
             <string name="Name">Anatomy</string>
             <string name="Source"><![CDATA[--!strict
@@ -8791,7 +9698,7 @@ return Anatomy
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="66">
+        <Item class="ModuleScript" referent="70">
           <Properties>
             <string name="Name">Idle</string>
             <string name="Source"><![CDATA[--!strict
@@ -8848,7 +9755,7 @@ return Idle
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="67">
+        <Item class="ModuleScript" referent="71">
           <Properties>
             <string name="Name">Setae</string>
             <string name="Source"><![CDATA[--!strict
@@ -9159,7 +10066,7 @@ return Setae
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="68">
+        <Item class="ModuleScript" referent="72">
           <Properties>
             <string name="Name">SpiderRig</string>
             <string name="Source"><![CDATA[--!strict
@@ -9768,11 +10675,11 @@ return SpiderRig
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="69">
+      <Item class="Folder" referent="73">
         <Properties>
           <string name="Name">UI</string>
         </Properties>
-        <Item class="ModuleScript" referent="70">
+        <Item class="ModuleScript" referent="74">
           <Properties>
             <string name="Name">ControlText</string>
             <string name="Source"><![CDATA[--!strict
@@ -9844,7 +10751,32 @@ local NAMES: { [string]: { [string]: string } } = {
 	},
 }
 
+-- A PlayStation controller has the same buttons under other names (Roblox reports "ButtonCross" for ButtonA there). The client
+-- calls setPadStyle from UserInputService:GetStringForKeyCode(ButtonA) at start and after each controller input; names not listed
+-- here (sticks) are the same on both.
+local PLAYSTATION: { [string]: string } = {
+	feed = "L3", jump = "Cross", cancel = "Circle", letGo = "Circle", drop = "Square", creep = "L1", focus = "L2", eye = "Triangle",
+	recenter = "R3", slow = "R2", reset = "Touchpad",
+}
+local padStyle = "xbox"
+
+-- "xbox" or "playstation", from what Roblox calls ButtonA on this controller.
+function ControlText.padStyleFor(buttonAString: string?): string
+	return if buttonAString == "ButtonCross" then "playstation" else "xbox"
+end
+
+function ControlText.setPadStyle(style: string)
+	padStyle = if style == "playstation" then "playstation" else "xbox"
+end
+
+function ControlText.padStyle(): string
+	return padStyle
+end
+
 function ControlText.name(device: Device, action: string): string
+	if device == "gamepad" and padStyle == "playstation" and PLAYSTATION[action] then
+		return PLAYSTATION[action]
+	end
 	return (NAMES[device] or NAMES.keyboard)[action] or ""
 end
 
@@ -9963,12 +10895,13 @@ end
 -- The controls card (H): the device's own bindings, one action per line pair.
 function ControlText.helpCard(device: Device): string
 	if device == "gamepad" then
+		local function n(action: string): string return ControlText.name("gamepad", action) end
 		return table.concat({
-			"Left stick walk   Right stick look   LB creep",
-			"Tap A hop   Hold A aim, release to leap   B cancel",
-			"X lower on silk   On the line: stick up reel, down lower, hold B let go",
-			"Y spider-eye view   Right-stick click recenter   LT focus   RT slow motion",
-			"In the crack: L3 rest (sleep from evening)   View: last checkpoint",
+			`Left stick walk   Right stick look   {n("creep")} creep`,
+			`Tap {n("jump")} hop   Hold {n("jump")} aim, release to leap   {n("cancel")} cancel`,
+			`{n("drop")} lower on silk   On the line: stick up reel, down lower, hold {n("letGo")} let go`,
+			`{n("eye")} spider-eye view   {n("recenter")} recenter   {n("focus")} focus   {n("slow")} slow motion`,
+			`In the crack: L3 rest (sleep from evening)   {n("reset")}: last checkpoint`,
 		}, "\n")
 	elseif device == "touch" then
 		return table.concat({
@@ -9993,7 +10926,7 @@ return ControlText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="71">
+        <Item class="ModuleScript" referent="75">
           <Properties>
             <string name="Name">EyeOptics</string>
             <string name="Source"><![CDATA[--!strict
@@ -10326,7 +11259,7 @@ return EyeOptics
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="72">
+        <Item class="ModuleScript" referent="76">
           <Properties>
             <string name="Name">HudLayout</string>
             <string name="Source"><![CDATA[--!strict
@@ -10407,7 +11340,7 @@ return HudLayout
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="73">
+        <Item class="ModuleScript" referent="77">
           <Properties>
             <string name="Name">LifeText</string>
             <string name="Source"><![CDATA[--!strict
@@ -10470,7 +11403,7 @@ return LifeText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="74">
+        <Item class="ModuleScript" referent="78">
           <Properties>
             <string name="Name">PerceptionShapes</string>
             <string name="Source"><![CDATA[--!strict
@@ -10563,7 +11496,7 @@ return Shapes
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="75">
+        <Item class="ModuleScript" referent="79">
           <Properties>
             <string name="Name">PerceptionText</string>
             <string name="Source"><![CDATA[--!strict
@@ -10579,7 +11512,7 @@ return table.freeze(Text)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="76">
+        <Item class="ModuleScript" referent="80">
           <Properties>
             <string name="Name">PerceptionView</string>
             <string name="Source"><![CDATA[--!strict
@@ -10628,26 +11561,144 @@ return View
 ]]></string>
           </Properties>
         </Item>
+        <Item class="ModuleScript" referent="81">
+          <Properties>
+            <string name="Name">WaspText</string>
+            <string name="Source"><![CDATA[--!strict
+-- The words of the wasp's visit for the screen (ROBLOX-26): the sound captions, the status line while it visits and the plain screen
+-- after a catch. The texts are Godot's (scripts/habitat/habitat_loop.gd _wasp_line, scripts/audio/soundscape.gd WASP_CAPTIONS,
+-- scripts/presentation/caught_panel.gd); where they differ it is said here. Button names come from ControlText for the device in use.
+-- Pure: checked in tests/wasp.luau.
+--
+-- Differences from Godot: the captions say where the hum is, as the flies' "[buzzing, ahead-left]" does (Godot's wasp captions did
+-- not); the second line after a catch does not point to a notebook, which the port does not have yet; with no rest to go back to the
+-- one choice is "Back to the start" (Godot offered a new spider as another life, which needs the death rules of round 5, not ported).
+local ControlText = require(script.Parent.ControlText)
+local Data = require(script.Parent.Parent.Data.Wasp)
+
+local WaspText = {}
+
+WaspText.LINE = "A mud dauber wasp stung the spider and carried it away."
+WaspText.SUB = "Its sting does not kill: it paralyses."
+WaspText.BACK = "Back to your last rest"
+WaspText.START = "Back to the start"
+
+local NAMES = { "ahead", "ahead-left", "left", "behind-left", "behind", "behind-right", "right", "ahead-right" }
+
+local function roundHalfAway(x: number): number
+	return if x >= 0 then math.floor(x + 0.5) else -math.floor(-x + 0.5)
+end
+
+-- Where `point` is from the spider (Godot VibrationSense.direction_word): the eighth of the compass round its heading, counted
+-- counter-clockwise seen from its up, then "above" or "below" when it is more than 35 degrees off the plane the spider stands on.
+function WaspText.directionWord(spider: Vector3, heading: Vector3, up: Vector3, point: Vector3): string
+	local n = up
+	local to = point - spider
+	local rise = to:Dot(n)
+	local flat = to - n * rise
+	local word = ""
+	if flat:Dot(flat) > 1.0e-6 then
+		local f = flat.Unit
+		local angle = math.deg(math.atan2(n:Dot(heading:Cross(f)), heading:Dot(f)))
+		word = NAMES[(roundHalfAway(angle / 45.0) % 8) + 1]
+	end
+	local elevation = math.deg(math.atan2(rise, math.max(flat.Magnitude, 1.0e-6)))
+	if elevation > 35.0 then
+		word = if word == "" then "above" else "above, " .. word
+	elseif elevation < -35.0 then
+		word = if word == "" then "below" else "below, " .. word
+	end
+	return if word ~= "" then word else "here"
+end
+
+-- The caption of the visit now: { text, alpha }, or nil when there is none. While it arrives (the whole warning), when it has seen the
+-- spider (inspecting, striking), and for a few seconds as it leaves. None begins "[buzzing", which is the flies'.
+function WaspText.caption(phase: string, phaseS: number, direction: string): { text: string, alpha: number }?
+	if phase == "arriving" then
+		return { text = `[a deep, heavy hum outside, {direction}, coming closer]`, alpha = 1.0 }
+	elseif phase == "inspecting" or phase == "striking" then
+		return { text = `[the deep hum turns toward you, {direction}]`, alpha = 1.0 }
+	elseif phase == "leaving" and phaseS < Data.captionTailS then
+		local left = Data.captionTailS - phaseS
+		return { text = `[the deep hum fades away, {direction}]`, alpha = math.clamp(left / Data.captionFadeS, 0.0, 1.0) }
+	end
+	return nil
+end
+
+-- What the status says while the wasp visits (nil when it is away). The first visit says what wasps do and how to get away.
+function WaspText.line(phase: string, confused: boolean, visits: number, spared: boolean, device: ControlText.Device): string?
+	if phase == "arriving" then
+		if visits <= 1 then
+			return `A deep hum outside: a wasp is coming, and wasps hunt spiders. Hide in the crack, keep still, or let yourself down on your line ({ControlText.name(device, "drop")}).`
+		end
+		return "A deep hum outside: a wasp is coming. Hide in the crack, keep still, or drop on your line."
+	elseif phase == "searching" then
+		if confused then return "The wasp has lost you. Get out of sight." end
+		return "A wasp is searching the sill. Keep still, keep out of sight, or get home to the crack."
+	elseif phase == "inspecting" or phase == "striking" then
+		return "The wasp has seen you! Get away: jump, drop on your line, or reach the crack."
+	elseif phase == "carrying" then
+		return "Stung, the spider cannot move. The wasp carries it away."
+	elseif phase == "leaving" then
+		if spared then return "The wasp touched you with its antennae, gave up, and is leaving." end
+		return "The wasp is leaving."
+	end
+	return nil
+end
+
+-- The life in a few plain lines: how long it lived, its meals, the wasp. Never a score. `hours` of life, `meals` finished, and the
+-- wasp's visits and escapes.
+function WaspText.summary(hours: number, meals: number, visits: number, escapes: number): string
+	local lived = "less than a day"
+	if hours >= 24.0 then
+		local days = math.floor(hours / 24.0)
+		lived = `{days} day{if days == 1 then "" else "s"}`
+	end
+	local out = { `It lived {lived}.`, `It ate {meals} meal{if meals == 1 then "" else "s"}.` }
+	if visits > 0 then
+		table.insert(out, `The wasp came {visits} time{if visits == 1 then "" else "s"}; it got away from it {escapes} time{if escapes == 1 then "" else "s"}.`)
+	end
+	return table.concat(out, "\n")
+end
+
+-- The catch screen `seconds` after it began: how dim the world is, and whether the line, then the summary and the choices, show.
+function WaspText.panel(seconds: number): { dim: number, line: boolean, choices: boolean }
+	return {
+		dim = math.clamp(seconds / Data.caughtQuietS, 0.0, 1.0) * Data.caughtDim,
+		line = seconds >= Data.caughtQuietS,
+		choices = seconds >= Data.caughtQuietS + Data.caughtLineS,
+	}
+end
+
+-- The button's words: back to the last rest when there is one, else back to the start.
+function WaspText.choice(hasRest: boolean): string
+	return if hasRest then WaspText.BACK else WaspText.START
+end
+
+return WaspText
+]]></string>
+          </Properties>
+        </Item>
       </Item>
     </Item>
   </Item>
-  <Item class="ServerScriptService" referent="77">
+  <Item class="ServerScriptService" referent="82">
     <Properties>
       <string name="Name">ServerScriptService</string>
     </Properties>
-    <Item class="Folder" referent="78">
+    <Item class="Folder" referent="83">
       <Properties>
         <string name="Name">PortTests</string>
       </Properties>
-      <Item class="ModuleScript" referent="79">
+      <Item class="ModuleScript" referent="84">
         <Properties>
           <string name="Name">BuildInfo</string>
           <string name="Source"><![CDATA[-- Generated by tools/build.py; do not edit.
-return { id = "e97786418fd0fdb3" }
+return { id = "52123df9177323c8" }
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="80">
+      <Item class="ModuleScript" referent="85">
         <Properties>
           <string name="Name">GraphicsSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -10763,7 +11814,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="81">
+      <Item class="ModuleScript" referent="86">
         <Properties>
           <string name="Name">LifeSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -10939,7 +11990,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="82">
+      <Item class="ModuleScript" referent="87">
         <Properties>
           <string name="Name">PerceptionSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -11039,7 +12090,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="83">
+      <Item class="ModuleScript" referent="88">
         <Properties>
           <string name="Name">PreySpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -11131,7 +12182,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="84">
+      <Item class="ModuleScript" referent="89">
         <Properties>
           <string name="Name">PromptSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -11181,7 +12232,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="85">
+      <Item class="ModuleScript" referent="90">
         <Properties>
           <string name="Name">RecoveryScenarios</string>
           <string name="Source"><![CDATA[--!strict
@@ -11672,7 +12723,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Script" referent="86">
+      <Item class="Script" referent="91">
         <Properties>
           <string name="Name">Runner</string>
           <token name="RunContext">0</token>
@@ -11707,6 +12758,7 @@ check("Perception spec completes", function() require(script.Parent.PerceptionSp
 check("Prey spec completes", function() require(script.Parent.PreySpec)(check) end)
 check("Prompt spec completes", function() require(script.Parent.PromptSpec)(check) end)
 check("Life spec completes", function() require(script.Parent.LifeSpec)(check) end)
+check("Wasp spec completes", function() require(script.Parent.WaspSpec)(check) end)
 local report = {suite = "Roblox engine", evidence_id = evidence.id, passed = passed, failed = failed,
 	tests = passed + failed, not_run = 0, engine = version(), results = rows}
 local json = HttpService:JSONEncode(report)
@@ -11722,7 +12774,7 @@ if failed > 0 then warn("PORT_TEST_FAIL") end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="87">
+      <Item class="ModuleScript" referent="92">
         <Properties>
           <string name="Name">SilkSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -11838,7 +12890,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="88">
+      <Item class="ModuleScript" referent="93">
         <Properties>
           <string name="Name">Spec</string>
           <string name="Source"><![CDATA[--!strict
@@ -11969,12 +13021,174 @@ end
 ]]></string>
         </Properties>
       </Item>
+      <Item class="ModuleScript" referent="94">
+        <Properties>
+          <string name="Name">WaspSpec</string>
+          <string name="Source"><![CDATA[--!strict
+-- The mud dauber wasp on the engine (ROBLOX-26). The CLI (tests/wasp.luau) replays Godot's director against its goldens on an analytic
+-- world and checks the places on the sill's boxes; here the same director and the same places run on real raycasts and real sphere
+-- casts against a private copy of the sill, and the drawn wasp is built from real Parts.
+local Shared = game:GetService("ReplicatedStorage"):WaitForChild("Shared")
+local WaspDirector = require(Shared.Predator.WaspDirector)
+local Data = require(Shared.Data.Wasp)
+local Layout = require(Shared.Habitat.WindowsillLayout)
+local Species = require(Shared.Data.Species)
+
+local DT = 1 / 60
+local OPEN = Vector3.new(2, 0.31, 6)
+local CRACK = Vector3.new(-25, 0.31, 6)
+
+return function(check: (string, () -> ()) -> ())
+	local world = Instance.new("Folder")
+	world.Name = "WaspTestWorld"
+	world.Parent = workspace
+	for _, b in Layout.PIECES do
+		local part = Instance.new("Part")
+		part.Anchored = true
+		part.Size = b.hi - b.lo
+		part.CFrame = CFrame.new((b.hi + b.lo) * 0.5)
+		part.Parent = world
+	end
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Include
+	params.FilterDescendantsInstances = { world }
+	local walk = Species.phidippus_audax_prototype.locomotion.walk_speed_wu_s
+	local function clear(a: Vector3, b: Vector3, r: number): boolean
+		return (a - b).Magnitude < 1e-5 or workspace:Spherecast(a, r, b - a, params) == nil
+	end
+	local function inside(p: Vector3): boolean
+		for _, b in Layout.PIECES do
+			if p.X > b.lo.X and p.X < b.hi.X and p.Y > b.lo.Y and p.Y < b.hi.Y and p.Z > b.lo.Z and p.Z < b.hi.Z then return true end
+		end
+		return false
+	end
+	local function newDirector(): any
+		return WaspDirector.new({
+			seed = 914, enabled = true,
+			world = {
+				ray = function(a: Vector3, b: Vector3): boolean return workspace:Raycast(a, b - a, params) ~= nil end,
+				clear = clear,
+				inRetreat = function(p: Vector3): boolean return Layout.inRetreat(p) end,
+			},
+		})
+	end
+	local block = { day = 2, hour = 12.0, resting = false, moulting = false, meals = 1 }
+
+	check("WASP: every place has room to hover, a way in, a way up and ground to land on (real casts)", function()
+		local up = Vector3.new(0, 1, 0)
+		for _, p in Data.points do
+			local hover: Vector3 = p.hover
+			local top = Vector3.new(hover.X, Data.cruiseY, hover.Z)
+			assert(clear(hover + up * 0.01, hover, Data.radius), `{p.id}: no room to hover`)
+			assert(clear(hover, top, Data.radius), `{p.id}: not open straight up`)
+			assert(clear(Data.over, top, Data.radius), `{p.id}: not reached from over the frame`)
+			if p.land then
+				local land: Vector3 = p.land
+				assert(clear(hover, land + up * 0.25, Data.radius), `{p.id}: no clear way down to land`)
+				assert(workspace:Raycast(land, Vector3.new(0, -0.5, 0), params) ~= nil, `{p.id}: no ground under the landing`)
+				assert(clear(land, land + up * 1.2, Data.walkRadius), `{p.id}: no room to take off`)
+			end
+		end
+		assert(clear(Data.entry, Data.over, Data.radius), "the way in over the frame is blocked")
+	end)
+
+	check("WASP: it searches a sill it cannot find the spider on, never inside a piece, and gives up (real casts)", function()
+		local d = newDirector()
+		local spider = { position = CRACK, velocity = Vector3.zero, walkSpeed = walk, airborne = false, falling = false }
+		assert(d:force(2, "crack_mouth"), "the visit does not begin")
+		local seen: { [string]: boolean } = {}
+		local left = false
+		for n = 1, 60 * 90 do
+			spider.velocity = Vector3.new(0, 0, if (n // 30) % 2 == 0 then walk else -walk)
+			spider.position += spider.velocity * DT
+			d:step(DT, spider, block)
+			seen[d.phase] = true
+			assert(not inside(d.wasp.position), `the wasp is inside a piece at tick {n}: {d.wasp.position}`)
+			for _, s in d:drainSignals() do
+				if s.kind == "left" then left = true end
+			end
+			if d.phase == "away" then break end
+		end
+		assert(seen.arriving and seen.searching and seen.leaving, "it arrives, searches and leaves")
+		assert(left and d.phase == "away", "it gives up and goes")
+		assert(d.escapes == 0, "it never saw the spider in the crack")
+	end)
+
+	check("WASP: a spider moving in the open is found and carried off, over the frame (real casts)", function()
+		local d = newDirector()
+		local spider = { position = OPEN, velocity = Vector3.zero, walkSpeed = walk, airborne = false, falling = false }
+		d:force(2, "floor_middle")
+		local caught, carried = false, false
+		for n = 1, 60 * 60 do
+			if d.phase == "searching" or d.phase == "arriving" then
+				spider.velocity = Vector3.new(if (n // 30) % 2 == 0 then walk else -walk, 0, 0)
+			else
+				spider.velocity = Vector3.zero
+			end
+			spider.position += spider.velocity * DT
+			d:step(DT, spider, block)
+			if d.holding and d.heldAt then spider.position = d.heldAt end
+			assert(not inside(d.wasp.position), `the wasp is inside a piece: {d.wasp.position}`)
+			for _, s in d:drainSignals() do
+				if s.kind == "caught" then caught = true elseif s.kind == "carried_off" then carried = true end
+			end
+			if carried then break end
+		end
+		assert(caught and carried, "caught and carried off")
+		assert(spider.position.Y > 10, `up and away: {spider.position}`)
+	end)
+
+	check("WASP: a lunge from a spider that dropped on its line is missed (real casts)", function()
+		local d = newDirector()
+		local spider = { position = OPEN, velocity = Vector3.zero, walkSpeed = walk, airborne = false, falling = false }
+		d:force(2, "floor_middle")
+		local noticed = false
+		for n = 1, 60 * 100 do
+			if d.phase == "searching" then spider.velocity = Vector3.new(if (n // 30) % 2 == 0 then walk else -walk, 0, 0) else spider.velocity = Vector3.zero end
+			spider.position += spider.velocity * DT
+			if noticed then spider.falling = true end
+			d:step(DT, spider, block)
+			assert(not d.holding, "a dropped spider was caught")
+			for _, s in d:drainSignals() do
+				if s.kind == "noticed" then noticed = true end
+			end
+			if d.phase == "away" then break end
+		end
+		assert(noticed and d.phase == "away", "found, then lost")
+	end)
+
+	check("WASP: the drawn wasp builds from real Parts and is not touched by anything", function()
+		local clientFolder = game:GetService("StarterPlayer"):WaitForChild("StarterPlayerScripts"):WaitForChild("Client")
+		local WaspBody = require(clientFolder:WaitForChild("WaspBody") :: ModuleScript) :: any
+		local body = WaspBody.new(world)
+		local d = newDirector()
+		d:force(2, "floor_middle")
+		local spider = { position = OPEN, velocity = Vector3.zero, walkSpeed = walk, airborne = false, falling = false }
+		for _ = 1, 600 do d:step(DT, spider, block) end
+		body:draw(d.wasp, 5.0)
+		local parts = 0
+		for _, o in body.folder:GetDescendants() do
+			if o:IsA("BasePart") then
+				parts += 1
+				local p = o :: BasePart
+				assert(not p.CanCollide and not p.CanQuery and not p.CanTouch and not p.CastShadow and p.Anchored, `{p.Name} is not inert`)
+			end
+		end
+		assert(parts >= 40 and parts <= 80, `{parts} parts`)
+		body:destroy()
+	end)
+
+	world:Destroy()
+end
+]]></string>
+        </Properties>
+      </Item>
     </Item>
-    <Item class="Folder" referent="89">
+    <Item class="Folder" referent="95">
       <Properties>
         <string name="Name">Server</string>
       </Properties>
-      <Item class="Script" referent="90">
+      <Item class="Script" referent="96">
         <Properties>
           <string name="Name">Main</string>
           <token name="RunContext">0</token>
@@ -12021,19 +13235,184 @@ sill.Parent = Workspace
       </Item>
     </Item>
   </Item>
-  <Item class="StarterPlayer" referent="91">
+  <Item class="StarterPlayer" referent="97">
     <Properties>
       <string name="Name">StarterPlayer</string>
     </Properties>
-    <Item class="StarterPlayerScripts" referent="92">
+    <Item class="StarterPlayerScripts" referent="98">
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="Folder" referent="93">
+      <Item class="Folder" referent="99">
         <Properties>
           <string name="Name">Client</string>
         </Properties>
-        <Item class="ModuleScript" referent="94">
+        <Item class="ModuleScript" referent="100">
+          <Properties>
+            <string name="Name">CaughtPanel</string>
+            <string name="Source"><![CDATA[--!strict
+-- The screen after the wasp has carried the spider off (Godot's scripts/presentation/caught_panel.gd, LIFE rounds 4 and 5; LIFE-01 "death
+-- can be real and jarring, not sensationalized"): the world goes quiet and dim for a moment, one plain line says what happened, then a
+-- short summary of the life and one way on: back to the last rest (the checkpoint), or the start when there is none. No gore, no score.
+-- The game waits while it is up (the client skips its ticks) and it takes the keys and buttons first, so a press of Space, E or A is
+-- the choice and never a jump. The words and timing are Shared/UI/WaspText and Data/Wasp. A mouse or a finger presses the button; a
+-- controller selects it (GuiService.SelectedObject) so A presses it. Not ported: "Continue as another spider" and the notebook.
+local CAS = game:GetService("ContextActionService")
+local GuiService = game:GetService("GuiService")
+local UIS = game:GetService("UserInputService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local WaspText = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("UI"):WaitForChild("WaspText"))
+
+local CaughtPanel = {}
+CaughtPanel.__index = CaughtPanel
+
+local ACTION = "WaspCaughtChoice"
+-- The keys and buttons that choose (Godot: ui_accept, interact, prepare_jump).
+local KEYS: { any } = { Enum.KeyCode.Return, Enum.KeyCode.KeypadEnter, Enum.KeyCode.Space, Enum.KeyCode.E, Enum.KeyCode.ButtonA }
+
+local function label(parent: Instance, name: string, size: number, order: number, color: Color3): TextLabel
+	local l = Instance.new("TextLabel")
+	l.Name = name
+	l.BackgroundTransparency = 1
+	l.TextColor3 = color
+	l.Font = Enum.Font.GothamMedium
+	l.TextSize = size
+	l.TextWrapped = true
+	l.TextStrokeTransparency = 0.4
+	l.Size = UDim2.new(1, 0, 0, 0)
+	l.AutomaticSize = Enum.AutomaticSize.Y
+	l.LayoutOrder = order
+	l.Parent = parent
+	return l
+end
+
+-- `onChoose` is called once when the player chooses; the client puts the world back and calls `hide`.
+function CaughtPanel.new(playerGui: Instance, onChoose: () -> ()): any
+	local gui = Instance.new("ScreenGui")
+	gui.Name = "SpiderCaught"
+	gui.ResetOnSpawn = false
+	gui.IgnoreGuiInset = true
+	gui.DisplayOrder = 50
+	gui.Enabled = false
+	gui.Parent = playerGui
+	local dim = Instance.new("Frame")
+	dim.Name = "Dim"
+	dim.BackgroundColor3 = Color3.new(0.02, 0.02, 0.03)
+	dim.BackgroundTransparency = 1
+	dim.BorderSizePixel = 0
+	dim.Size = UDim2.fromScale(1, 1)
+	dim.Active = true -- takes the mouse
+	dim.Parent = gui
+	local box = Instance.new("Frame")
+	box.Name = "Box"
+	box.BackgroundTransparency = 1
+	box.AnchorPoint = Vector2.new(0.5, 0.5)
+	box.Position = UDim2.fromScale(0.5, 0.5)
+	box.Size = UDim2.new(0.9, 0, 0, 0)
+	box.AutomaticSize = Enum.AutomaticSize.Y
+	local constraint = Instance.new("UISizeConstraint")
+	constraint.MaxSize = Vector2.new(880, 10000)
+	constraint.Parent = box
+	local list = Instance.new("UIListLayout")
+	list.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	list.SortOrder = Enum.SortOrder.LayoutOrder
+	list.Padding = UDim.new(0, 14)
+	list.Parent = box
+	box.Parent = dim
+	local text = Color3.new(0.95, 0.93, 0.88)
+	local line = label(box, "Line", 28, 1, text)
+	local sub = label(box, "Sub", 18, 2, Color3.new(0.8, 0.79, 0.74))
+	local summary = label(box, "Summary", 18, 3, Color3.new(0.88, 0.86, 0.8))
+	local button = Instance.new("TextButton")
+	button.Name = "Back"
+	button.BackgroundColor3 = Color3.new(0.16, 0.16, 0.18)
+	button.TextColor3 = Color3.new(1, 1, 1)
+	button.Font = Enum.Font.GothamMedium
+	button.TextSize = 20
+	button.AutoButtonColor = true
+	button.Selectable = true
+	button.Size = UDim2.fromOffset(320, 48)
+	button.LayoutOrder = 4
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, 10)
+	corner.Parent = button
+	button.Parent = box
+	local self = setmetatable({
+		gui = gui, dim = dim, line = line, sub = sub, summary = summary, button = button, onChoose = onChoose,
+		showing = false, seconds = 0.0, bound = false, chosen = false,
+	}, CaughtPanel)
+	button.Activated:Connect(function() self:choose() end)
+	return self
+end
+
+function CaughtPanel.isShowing(self: any): boolean
+	return self.showing
+end
+
+-- The catch screen begins: `summary` is WaspText.summary's text, `hasRest` whether there is a rest to go back to.
+function CaughtPanel.show(self: any, summary: string, hasRest: boolean)
+	self.showing, self.seconds, self.chosen = true, 0.0, false
+	self.line.Text, self.sub.Text, self.summary.Text = WaspText.LINE, WaspText.SUB, summary
+	self.button.Text = WaspText.choice(hasRest)
+	self.gui.Enabled = true
+	self:_apply()
+	if not self.bound then
+		self.bound = true
+		-- Above the game's own bindings (3000): Space, E and A choose here and never jump or eat.
+		CAS:BindActionAtPriority(ACTION, function(_, state)
+			if state == Enum.UserInputState.Begin then self:choose() end
+			return Enum.ContextActionResult.Sink
+		end, false, 4000, table.unpack(KEYS))
+	end
+	pcall(function()
+		UIS.MouseBehavior = Enum.MouseBehavior.Default
+		UIS.MouseIconEnabled = true
+	end)
+end
+
+function CaughtPanel.hide(self: any)
+	self.showing = false
+	self.gui.Enabled = false
+	if self.bound then
+		self.bound = false
+		pcall(function() CAS:UnbindAction(ACTION) end)
+	end
+	pcall(function() GuiService.SelectedObject = nil end)
+end
+
+-- Presses the button, if the choices are up and nothing has been chosen yet (a key, A, a click, a tap, and the tests all come here).
+function CaughtPanel.choose(self: any): boolean
+	if not self.showing or self.chosen or not WaspText.panel(self.seconds).choices then return false end
+	self.chosen = true
+	self.onChoose()
+	return true
+end
+
+function CaughtPanel._apply(self: any)
+	local stage = WaspText.panel(self.seconds)
+	self.dim.BackgroundTransparency = 1 - stage.dim
+	self.line.Visible = stage.line
+	self.sub.Visible = stage.line
+	self.summary.Visible = stage.choices and self.summary.Text ~= ""
+	self.button.Visible = stage.choices
+end
+
+-- Real seconds, not game seconds: the screen does not wait for itself.
+function CaughtPanel.update(self: any, dt: number)
+	if not self.showing then return end
+	local before = WaspText.panel(self.seconds).choices
+	self.seconds += dt
+	self:_apply()
+	if not before and WaspText.panel(self.seconds).choices then
+		pcall(function() GuiService.SelectedObject = self.button end)
+	end
+end
+
+return CaughtPanel
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="101">
           <Properties>
             <string name="Name">FlyBodies</string>
             <string name="Source"><![CDATA[--!strict
@@ -12285,7 +13664,7 @@ return FlyBodies
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="95">
+        <Item class="ModuleScript" referent="102">
           <Properties>
             <string name="Name">PerceptionHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -12507,7 +13886,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="96">
+        <Item class="ModuleScript" referent="103">
           <Properties>
             <string name="Name">PerceptionStage</string>
             <string name="Source"><![CDATA[--!strict
@@ -12552,7 +13931,7 @@ return Stage
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="97">
+        <Item class="ModuleScript" referent="104">
           <Properties>
             <string name="Name">Soundscape</string>
             <string name="Source"><![CDATA[--!strict
@@ -12563,6 +13942,7 @@ Soundscape.__index = Soundscape
 local IDS = {
 	room = "rbxassetid://135813320748786", buzz = "rbxassetid://90354950534870",
 	takeoff = "rbxassetid://135484013341687", birds = "rbxassetid://105858750316891",
+	wasp = "rbxassetid://76049518783466",
 }
 local function voice(parent: Instance, name: string, volume: number, looped: boolean): Sound
 	local s = Instance.new("Sound")
@@ -12579,7 +13959,14 @@ function Soundscape.new(parent: Instance): any
 	local root = Instance.new("Folder")
 	root.Name = "WindowsillAudio"
 	root.Parent = parent
+	local emitter = Instance.new("Part")
+	emitter.Name = "WaspAudio"
+	emitter.Anchored = true; emitter.CanCollide = false; emitter.CanTouch = false; emitter.CanQuery = false
+	emitter.Transparency = 1; emitter.Size = Vector3.new(0.1, 0.1, 0.1); emitter.Parent = root
+	local hum = voice(emitter, "wasp", 0.42, true)
+	hum.RollOffMinDistance = 16; hum.RollOffMaxDistance = 120
 	return setmetatable({ root = root, room = voice(root, "room", 0.16, true),
+		waspEmitter = emitter, waspHum = hum,
 		birds = voice(root, "birds", 0.16, false), slots = {}, elapsed = 0, nextBird = 8 }, Soundscape)
 end
 local function playing(s: Sound, wanted: boolean)
@@ -12624,6 +14011,20 @@ function Soundscape.update(self: any, dt: number, prey: any, daylight: number, p
 		if i > #prey.flies then slot.part:Destroy(); self.slots[i] = nil end
 	end
 end
+-- The warning starts immediately with the director's arrival phase. Its initial global mix
+-- cannot disappear when the third-person camera is far away; the caption supplies direction.
+-- Once it reaches the sill, the same voice follows the wasp in 3D. No second warning timer.
+function Soundscape.updateWasp(self: any, director: any, paused: boolean, speed: number, muted: boolean)
+	local arriving = director.phase == "arriving"
+	local active = director.phase ~= "away" and director.wasp.mode ~= "walking"
+	local hum: Sound = self.waspHum
+	self.waspEmitter.Position = director.wasp.position
+	hum.Parent = if arriving then self.root else self.waspEmitter
+	hum.Volume = if arriving then 0.32 else 0.42
+	hum.PlaybackSpeed = speed
+	if not active then hum:Stop()
+	else playing(hum, not paused and not muted) end
+end
 function Soundscape.destroy(self: any)
 	self.root:Destroy()
 	table.clear(self.slots)
@@ -12632,7 +14033,7 @@ return Soundscape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="98">
+        <Item class="ModuleScript" referent="105">
           <Properties>
             <string name="Name">SpiderCamera</string>
             <string name="Source"><![CDATA[--!strict
@@ -13003,7 +14404,7 @@ return SpiderCamera
 ]]></string>
           </Properties>
         </Item>
-        <Item class="LocalScript" referent="99">
+        <Item class="LocalScript" referent="106">
           <Properties>
             <string name="Name">SpiderClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -13030,6 +14431,7 @@ local SpiderInput = require(script.Parent.SpiderInput)
 local SpiderCamera = require(script.Parent.SpiderCamera)
 local SpiderEyes = require(script.Parent.SpiderEyes)
 local SpiderHud = require(script.Parent.SpiderHud)
+local CaughtPanel = require(script.Parent.CaughtPanel)
 local WorldDetail = require(script.Parent.WorldDetail)
 local Soundscape = require(script.Parent.Soundscape)
 
@@ -13053,10 +14455,14 @@ local PerceptionStage = require(script.Parent.PerceptionStage)
 local PerceptionHud = require(script.Parent.PerceptionHud)
 local PreyDirector = require(Shared.Prey.PreyDirector)
 local FlyBodies = require(script.Parent.FlyBodies)
+local WaspBody = require(script.Parent.WaspBody)
 local NeedsModel = require(Shared.Life.NeedsModel)
 local LifeLoop = require(Shared.Life.LifeLoop)
 local LifeText = require(Shared.UI.LifeText)
 local DayLight = require(Shared.Habitat.DayLight)
+local LifeClock = require(Shared.Life.LifeClock)
+local WaspDirector = require(Shared.Predator.WaspDirector)
+local WaspText = require(Shared.UI.WaspText)
 local Checkpoint = require(Shared.Persistence.Checkpoint)
 local CheckpointStore = require(Shared.Persistence.CheckpointStore)
 local focusState = FocusState.new()
@@ -13102,6 +14508,12 @@ task.spawn(function()
 end)
 local hud = SpiderHud.new(player:WaitForChild("PlayerGui"))
 local device: ControlText.Device = ControlText.initialDevice(UIS.TouchEnabled, UIS.KeyboardEnabled, UIS.GamepadEnabled)
+-- PlayStation or Xbox button names (ControlText.setPadStyle): Roblox names ButtonA "ButtonCross" on a PlayStation controller.
+local function refreshPadStyle()
+	local ok, text = pcall(function() return UIS:GetStringForKeyCode(Enum.KeyCode.ButtonA) end)
+	ControlText.setPadStyle(ControlText.padStyleFor(if ok then text else nil))
+end
+refreshPadStyle()
 local memory = ObservationMemory.new()
 local sensor = Sensor.new(memory)
 sensor:configureFrom(Species.phidippus_audax_prototype.perception)
@@ -13111,14 +14523,31 @@ local stage = if Workspace:GetAttribute("TestTarget") == true or (Workspace:GetA
 local prey = PreyDirector.engine(sill, Species.fly_like_prototype, 914, 4)
 local flyBodies = FlyBodies.new(Workspace)
 local soundscape = Soundscape.new(Workspace)
+local waspBody = WaspBody.new(Workspace)
 -- LIFE (ROBLOX-24): the windowsill runs the life clock, so hunger runs by its hours (NeedsModel life mode, Standard rules: the
 -- port has no Easy mode yet). Feeding grants into the same model. The loop keeps the rest, sleep, daylight and the eyes' reach.
 local needs = NeedsModel.new(true, false)
 prey.feeding.needs = needs
 local life = LifeLoop.new(needs, nil)
+-- The mud dauber wasp (ROBLOX-26): a port of Godot's wasp director (Shared/Predator/WaspDirector). It visits by day from the second day,
+-- once the first meal is eaten, and not while the spider rests; it is heard (a caption with its direction) for 8 s before it can look.
+-- It reads the sill through the same casts as the senses. In the test place it never comes by itself (Workspace attribute Wasp = true
+-- allows it); the attribute WaspForce = a place id ("floor_middle") brings it at once, for Studio and playtests. There is no Gentle
+-- mode in Roblox yet, so a catch is always a catch.
+local testPlace = script.Parent:FindFirstChild("SilkPlayback") ~= nil
+local wasp: any = WaspDirector.new({
+	seed = 914, enabled = not testPlace,
+	world = {
+		ray = function(a: Vector3, b: Vector3): boolean return Workspace:Raycast(a, b - a, params) ~= nil end,
+		clear = function(a: Vector3, b: Vector3, radius: number): boolean return Workspace:Spherecast(a, radius, b - a, params) == nil end,
+		inRetreat = function(p: Vector3): boolean return Layout.inRetreat(p) end,
+	},
+})
+local waspSpider: WaspDirector.Spider = { position = Vector3.zero, velocity = Vector3.zero, walkSpeed = Species.phidippus_audax_prototype.locomotion.walk_speed_wu_s, airborne = false, falling = false }
+local panel: any = nil -- the catch screen, made below once returnToCheckpoint exists
 -- S01-C retreat checkpoints (ROBLOX-25): resting in the crack, and each morning, keeps one; Backspace / View returns to it. The
 -- store is DataStore-shaped but in memory only: a checkpoint lasts the session. No live DataStore is written.
-local checkpointWorld: Checkpoint.World = { motor = motor, prey = prey, sensor = sensor, memory = memory, needs = needs, life = life }
+local checkpointWorld: Checkpoint.World = { motor = motor, prey = prey, sensor = sensor, memory = memory, needs = needs, life = life, wasp = wasp }
 local checkpoints = CheckpointStore.new(CheckpointStore.MemoryDataStore.new(), function(r: any): { string }
 	return (Checkpoint.check(r, checkpointWorld))
 end)
@@ -13327,6 +14756,26 @@ local function returnToCheckpoint()
 	feedPending, cancelPending = false, false
 end
 
+-- The wasp has carried the spider off: the game waits, the screen is plain, and the one choice puts the world back at the last rest (or
+-- the start). The live screen is hidden under it, as in Godot.
+local function setHudShown(shown: boolean)
+	hud.safe.Enabled = shown
+	hud.centre.Enabled = shown
+end
+panel = CaughtPanel.new(player:WaitForChild("PlayerGui"), function()
+	panel:hide()
+	setHudShown(true)
+	wasp:clearVisit()
+	returnToCheckpoint()
+end)
+local function showCaught()
+	local clock = life.clock
+	local hours = (clock.day - LifeClock.START_DAY) * 24 + clock.hour - LifeClock.START_H
+	local summary = WaspText.summary(math.max(hours, 0), prey.feeding.mealsFinished, wasp.visits, wasp.escapes)
+	setHudShown(false)
+	panel:show(summary, checkpoints:loadBest().ok)
+end
+
 controls = SpiderInput.bind({
 	focus = function(phase: string)
 		if phase == "begin" then focusState:press(player:GetAttribute("FocusToggle") == true, motor.mode == "attached")
@@ -13360,7 +14809,7 @@ controls = SpiderInput.bind({
 	end,
 	drop = function() motor:requestDrop() end,
 	clear = dropAll,
-	reset = function() returnToCheckpoint() end,
+	reset = function() if not panel:isShowing() then returnToCheckpoint() end end, -- the catch screen has its own way back
 	gait = function() rig.gaitMode = if rig.gaitMode == "Tetrapod" then "Unilateral" else "Tetrapod" end,
 	eye = function() cam:toggleEyeView() end,
 	recenter = function() cam:startRecenter() end,
@@ -13372,6 +14821,7 @@ controls = SpiderInput.bind({
 	end,
 	device = function(name: string)
 		device = ControlText.deviceFor(name, device)
+		if device == "gamepad" then refreshPadStyle() end
 	end,
 })
 
@@ -13434,6 +14884,11 @@ local function updateHud(frameDt: number)
 		status = {}, helpVisible = helpVisible, helpText = ControlText.helpCard(device),
 		caption = eyes:captionView(device),
 	}
+	if wasp:isVisiting() then
+		local direction = WaspText.directionWord(motor.pos, motor.heading, motor.up, wasp.wasp.position)
+		local heard = WaspText.caption(wasp.phase, wasp.phaseS, direction)
+		if heard then view.caption = heard end
+	end
 	if aiming then
 		local plan = jump.plan
 		local title, hint = ControlText.describe(plan, device)
@@ -13447,6 +14902,8 @@ local function updateHud(frameDt: number)
 	else
 		hidePreview()
 	end
+	local waspLine = WaspText.line(wasp.phase, wasp.confusedS > 0, wasp.visits, wasp.sparedThisVisit, device)
+	if waspLine then table.insert(view.status, waspLine) end
 	view.grip = if prey.feeding.struggling then prey.feeding.grip else nil
 	if prey.feeding.struggling then
 		table.insert(view.status, "Caught — tap " .. ControlText.name(device,"jump") .. " to keep your grip")
@@ -13494,8 +14951,9 @@ end
 -- ---------------------------------------------------------------- the frame
 local accumulator = 0
 RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, function(frameDt: number)
-	if GuiService.MenuIsOpen then
-		accumulator = 0 -- the Roblox menu is Godot's pause: the world waits
+	if panel:isShowing() then panel:update(frameDt) end
+	if GuiService.MenuIsOpen or panel:isShowing() then
+		accumulator = 0 -- the Roblox menu is Godot's pause (so is the catch screen): the world waits
 	else
 		local simDt = frameDt * (if slow then SLOW_SPEED else 1)
 		accumulator = math.min(accumulator + simDt, 0.25)
@@ -13508,11 +14966,38 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 				local p = stage.target:percept()
 				if p then table.insert(percepts,p) end
 			end
+			local waspPercept = wasp:percept() -- movement to the spider's senses, never prey
+			if waspPercept then table.insert(percepts, waspPercept) end
 			sensor:step(DT,motor:observer(),percepts,sightCast)
 			prey:before(DT,motor.pos,motor:observer(),sensor,sightCast,camera)
 			jump:step(motor)
 			local input = tickInput()
 			motor:tick(input)
+			-- The wasp runs after the spider has moved and before feeding (Godot: physics priority 8).
+			wasp.enabled = not testPlace or Workspace:GetAttribute("Wasp") == true
+			local forced = if testPlace then Workspace:GetAttribute("WaspForce") else nil
+			if typeof(forced) == "string" and forced ~= "" then
+				Workspace:SetAttribute("WaspForce", nil)
+				wasp:force(life.clock.day, forced)
+			end
+			local fallingOnLine = motor:onLine() or (motor.mode == "air" and motor.dropped == true)
+			waspSpider.position, waspSpider.velocity = motor.pos, motor.vel
+			waspSpider.falling = fallingOnLine
+			waspSpider.airborne = motor.mode == "air" and not fallingOnLine and not motor.seized
+			wasp:step(DT, waspSpider, {
+				day = life.clock.day, hour = life.clock.hour, resting = life.resting, moulting = false, meals = prey.feeding.mealsFinished,
+			})
+			for _, signal in wasp:drainSignals() do
+				if signal.kind == "caught" then
+					-- Stung: the spider lets go of everything and is carried (Godot SpiderMotor.seize).
+					motor:seize()
+					dropAll()
+					dropStrands(false)
+				elseif signal.kind == "carried_off" then
+					showCaught()
+				end
+			end
+			if wasp.heldAt then motor:hold(wasp.heldAt) end
 			prey.feeding.auto = player:GetAttribute("AutomaticGrip") == true
 			prey:after(DT,motor,sensor,sightCast)
 			-- The life loop runs last in the tick (Godot's habitat loop, priority 12); the reach it sets is the next tick's.
@@ -13546,7 +15031,12 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	rig:update(body, simFrame, motor.mode == "attached", motor.moving)
 	updateHud(frameDt)
 	flyBodies:draw(prey.flies,prey.now)
-	soundscape:update(frameDt, prey, life.daylight, GuiService.MenuIsOpen, if slow then SLOW_SPEED else 1, player:GetAttribute("SoundMuted") == true)
+	local soundPaused = GuiService.MenuIsOpen or panel:isShowing()
+	local soundSpeed = if slow then SLOW_SPEED else 1
+	local soundMuted = player:GetAttribute("SoundMuted") == true
+	soundscape:update(frameDt, prey, life.daylight, soundPaused, soundSpeed, soundMuted)
+	soundscape:updateWasp(wasp, soundPaused, soundSpeed, soundMuted)
+	waspBody:draw(wasp.wasp, prey.now)
 	local silk = motor.silk
 	local live, bend = liveLine, bendLine
 	if live and bend and silk.mode ~= "none" then
@@ -13588,7 +15078,7 @@ if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
 	task.spawn(function()
 		local run: any = (require :: any)(playback)
 		run({
-			prey = prey, flyBodies = flyBodies, life = life, needs = needs, checkpoints = checkpoints, returnToCheckpoint = function() returnToCheckpoint() end, lifeSpider = function() return lifeSpider end, sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
+			prey = prey, flyBodies = flyBodies, waspBody = waspBody, life = life, wasp = wasp, caughtPanel = panel, needs = needs, checkpoints = checkpoints, returnToCheckpoint = function() returnToCheckpoint() end, lifeSpider = function() return lifeSpider end, sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
 			input = controls,
 			drop = function() motor:requestDrop() end,
 			jump = jump,
@@ -13613,7 +15103,7 @@ end
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="100">
+        <Item class="ModuleScript" referent="107">
           <Properties>
             <string name="Name">SpiderEyes</string>
             <string name="Source"><![CDATA[--!strict
@@ -14071,7 +15561,7 @@ return SpiderEyes
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="101">
+        <Item class="ModuleScript" referent="108">
           <Properties>
             <string name="Name">SpiderHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -14348,7 +15838,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="102">
+        <Item class="ModuleScript" referent="109">
           <Properties>
             <string name="Name">SpiderInput</string>
             <string name="Source"><![CDATA[--!strict
@@ -14555,7 +16045,239 @@ return SpiderInput
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="103">
+        <Item class="ModuleScript" referent="110">
+          <Properties>
+            <string name="Name">WaspBody</string>
+            <string name="Source"><![CDATA[--!strict
+-- The drawn mud dauber wasp (Data/WaspLook has every number): about 2.5 cm long, built from ellipsoids and rods as the fly is
+-- (Client/FlyBodies, ROBLOX-22): a black head with big dark eyes and yellow mandibles, a black thorax with a yellow collar and
+-- scutellum, a very long thin yellow petiole and a black gaster, six long legs (black femurs, a yellow band at each knee, yellow
+-- tibias and feet), two smoky dark wings each side and two curled antennae that flick while it searches. Every part is anchored, never
+-- collides, is never seen by a ray and casts no shadow (Habitat/Shapes). One Workspace:BulkMoveTo places all its parts each frame.
+-- Poses: flying (legs trailing, wings a soft translucent blur of the stroke), walking (legs striding at 3 Hz, wings folded back),
+-- holding (flying, with the front legs clutching what hangs under it). Display only: where it is, which way it faces, its mode and how
+-- busily it searches come from the WaspDirector; nothing here feeds back. Godot's WaspBody (wasp_body.gd) is the source of the joints.
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local WaspLook = require(Shared:WaitForChild("Data"):WaitForChild("WaspLook"))
+local Shapes = require(Shared:WaitForChild("Habitat"):WaitForChild("Shapes"))
+
+local WaspBody = {}
+WaspBody.__index = WaspBody
+
+local TAU = math.pi * 2
+local PHASE = 0.37 -- Godot builds the wasp with this phase for its beat
+
+type Spec = { name: string, rod: boolean, color: Color3, reflectance: number }
+
+local function vec(t: { number }): Vector3
+	return Vector3.new(t[1], t[2], t[3])
+end
+
+local function mirrored(t: { number }, side: number): Vector3
+	return Vector3.new(t[1] * side, t[2], t[3])
+end
+
+-- The size and frame of a rod (a Cylinder part: its axis is X) from a to b.
+local function rodBetween(a: Vector3, b: Vector3, diameter: number, grow: number?): (Vector3, CFrame)
+	local d = b - a
+	local length = math.max(d.Magnitude, 1e-4)
+	local dir = d / length
+	local up = if math.abs(dir.Y) > 0.99 then Vector3.xAxis else Vector3.yAxis
+	local g = grow or 0
+	return Vector3.new(length, diameter + g, diameter + g), CFrame.lookAt((a + b) / 2, b, up) * CFrame.Angles(0, math.pi / 2, 0)
+end
+
+-- Euler turns as Godot applies them: about y, then x, then z.
+local function euler(rx: number, ry: number, rz: number): CFrame
+	return CFrame.Angles(0, ry, 0) * CFrame.Angles(rx, 0, 0) * CFrame.Angles(0, 0, rz)
+end
+
+-- The parts, in a fixed order: the static ones, then the antennae, the legs, the wings. `index` finds a part by name.
+local function build(): ({ Spec }, { [string]: number })
+	local C, G = WaspLook.colors, WaspLook.gloss
+	local specs: { Spec } = {}
+	local index: { [string]: number } = {}
+	local function add(name: string, rod: boolean, colorName: string, gloss: number?)
+		table.insert(specs, { name = name, rod = rod, color = Color3.fromHex(C[colorName]), reflectance = gloss or G[colorName] or 0 })
+		index[name] = #specs
+	end
+	for _, item in WaspLook.body do add(item.name, false, item.color) end
+	add("Petiole", true, WaspLook.petiole.color)
+	local A = WaspLook.antenna
+	for _, side in { "L", "R" } do
+		for i = 1, #A.diameters do add(`Antenna{side}{i}`, true, A.colors[i]) end
+	end
+	local L = WaspLook.legs
+	for _, side in { "L", "R" } do
+		for pair = 1, #L.hips do
+			add(`Leg{side}{pair}Femur`, true, "black")
+			add(`Leg{side}{pair}Tibia`, true, "yellow")
+			add(`Leg{side}{pair}Tarsus`, true, "yellow")
+			add(`Leg{side}{pair}Band`, true, "yellow")
+		end
+	end
+	local W = WaspLook.wing
+	for _, side in { "L", "R" } do
+		for k = 1, 2 do
+			add(`Wing{side}{k}`, false, "wing", W.reflectance)
+			add(`Wing{side}{k}Vein`, true, "vein", 0)
+			add(`Wing{side}{k}Blur`, false, "blur", 0)
+		end
+	end
+	return specs, index
+end
+
+function WaspBody.new(parent: Instance): any
+	local folder = Instance.new("Folder")
+	folder.Name = "Wasp"
+	local specs, index = build()
+	local parts: { Part } = {}
+	for i, spec in specs do
+		local part: Part
+		if spec.rod then
+			part = Shapes.block(folder, spec.name, Vector3.one * 0.05, CFrame.new(), spec.color, "SmoothPlastic")
+			part.Shape = Enum.PartType.Cylinder
+		else
+			part = Shapes.ellipsoid(folder, spec.name, Vector3.one * 0.1, CFrame.new(), spec.color, "SmoothPlastic")
+		end
+		part.Reflectance = spec.reflectance
+		parts[i] = part
+	end
+	local self = setmetatable({
+		parent = parent, folder = folder, specs = specs, index = index, parts = parts, shown = false,
+		sizes = {} :: { Vector3 }, frames = {} :: { CFrame }, transparency = {} :: { number }, world = {} :: { CFrame }, moved = {} :: { Part },
+		bob = 0.0,
+	}, WaspBody)
+	self:pose("flying", 0, 0)
+	return self
+end
+
+-- The pose of every part in the torso's frame, for this mode ("flying", "walking" or "holding"), time `beat` (seconds) and how busily
+-- the antennae flick (0 to 1): fills self.sizes, self.frames and self.transparency (indexed as the parts), and self.bob (the torso's rise).
+function WaspBody.pose(self: any, mode: string, beat: number, search: number)
+	local sizes, frames, trans, index = self.sizes, self.frames, self.transparency, self.index
+	local walking, holding = mode == "walking", mode == "holding"
+	local function set(name: string, size: Vector3, frame: CFrame, transparency: number?)
+		local i = index[name]
+		sizes[i], frames[i], trans[i] = size, frame, transparency or 0
+	end
+	-- the body
+	for _, item in WaspLook.body do
+		set(item.name, vec(item.size), CFrame.new(vec(item.at)), 0)
+	end
+	local P = WaspLook.petiole
+	local psize, pframe = rodBetween(vec(P.from), vec(P.to), P.diameter)
+	set("Petiole", psize, pframe, 0)
+	-- the antennae
+	local A = WaspLook.antenna
+	for i, word in { "L", "R" } do
+		local side = if i == 1 then -1 else 1
+		local flick = math.clamp(search, 0, 1) * math.sin(TAU * (A.hertz[1] + A.hertz[2] * (i - 1)) * beat + PHASE) * A.flick
+		local node = CFrame.new(mirrored(A.base, side)) * euler(A.rest[1] + flick, side * A.rest[2] + flick * 0.5, 0)
+		for s = 1, #A.diameters do
+			local size, frame = rodBetween(node * mirrored(A.points[s], side), node * mirrored(A.points[s + 1], side), A.diameters[s])
+			set(`Antenna{word}{s}`, size, frame, 0)
+		end
+	end
+	-- the legs
+	local L, walk = WaspLook.legs, WaspLook.walk
+	for sideIndex, word in { "L", "R" } do
+		local side = if sideIndex == 1 then -1 else 1
+		for pair = 0, #L.hips - 1 do
+			local hip = Vector3.new(side * L.hips[pair + 1][1], L.hips[pair + 1][2], L.hips[pair + 1][3])
+			local knee = Vector3.new(side * (0.35 + 0.05 * pair), -0.25, 0.04 + 0.15 * pair)
+			local ankle = Vector3.new(side * (0.52 + 0.09 * pair), -0.58, 0.10 + 0.23 * pair)
+			local tip = ankle + Vector3.new(side * 0.03, -0.12, 0.12)
+			if walking then
+				-- the actor stands 0.35 above its surface: the feet reach it
+				knee, ankle, tip = Vector3.new(knee.X, -0.08, knee.Z), Vector3.new(ankle.X, -0.20, ankle.Z), Vector3.new(tip.X, -0.23, tip.Z)
+				local cycle = TAU * walk.hertz * beat + PHASE + math.pi * ((pair + (sideIndex - 1)) % 2)
+				local stride = Vector3.new(0, math.max(0, math.sin(cycle)) * walk.lift, math.cos(cycle) * walk.reach)
+				ankle += stride
+				tip += stride
+			elseif holding and pair < 2 then
+				knee, ankle, tip = Vector3.new(side * 0.30, -0.26, -0.05), Vector3.new(side * 0.18, -0.58, -0.07), Vector3.new(side * 0.08, -0.60, -0.16)
+			else
+				ankle += Vector3.new(0, 0, 0.25 + 0.14 * pair)
+				tip = ankle + Vector3.new(0, -0.11, 0.14)
+			end
+			local name = `Leg{word}{pair + 1}`
+			local s1, f1 = rodBetween(hip, hip + knee, L.femur)
+			local s2, f2 = rodBetween(hip + knee, hip + ankle, L.tibia)
+			local s3, f3 = rodBetween(hip + ankle, hip + tip, L.tarsus)
+			local along = knee.Unit
+			local s4, f4 = rodBetween(hip + knee - along * L.band.length, hip + knee, L.femur, L.band.grow)
+			set(name .. "Femur", s1, f1, 0)
+			set(name .. "Tibia", s2, f2, 0)
+			set(name .. "Tarsus", s3, f3, 0)
+			set(name .. "Band", s4, f4, 0)
+		end
+	end
+	-- the wings: folded back on the ground; in the air a soft translucent blur of the stroke, a little unsteady
+	local W = WaspLook.wing
+	for sideIndex, word in { "L", "R" } do
+		local side = if sideIndex == 1 then -1 else 1
+		for k = 1, 2 do
+			local share = if k == 1 then 1.0 else W.hindShare
+			local pivotAt = Vector3.new(side * W.root[1], W.root[2], W.root[3] + (k - 1) * W.hindStep)
+			local yaw, roll = W.folded.yaw, W.folded.roll
+			local transparency = W.transparency
+			if not walking then
+				yaw, roll = W.flight.yaw, W.flight.roll + W.flight.shimmerRoll * math.sin(TAU * W.flight.shimmerHertz * beat + PHASE + k)
+				transparency = W.flightTransparency
+			end
+			local pivot = CFrame.new(pivotAt) * euler(0, math.rad(side * yaw), math.rad(-side * roll))
+			local blade = CFrame.new(side * W.centre[1] * share, 0, W.centre[3] * share) * CFrame.Angles(0, math.rad(side * W.sweep), 0)
+			local size = Vector3.new(W.width * share, W.thick, W.length * share)
+			set(`Wing{word}{k}`, size, pivot * blade, transparency)
+			local vsize, vframe = rodBetween(pivot * Vector3.new(0, W.thick, 0.02), pivot * Vector3.new(side * W.vein.tipX * share, W.thick, W.vein.to * W.length * share), W.vein.diameter)
+			set(`Wing{word}{k}Vein`, vsize, vframe, transparency * 0.4)
+			local widen = if walking then 1.0 else W.blur.widen
+			set(`Wing{word}{k}Blur`, Vector3.new(W.width * share * widen, W.thick * 2, W.length * share), pivot * blade, if walking then 1.0 else W.blur.transparency)
+		end
+	end
+	self.bob = if walking then 0.0 else WaspLook.bob.height * math.sin(TAU * WaspLook.bob.hertz * beat + PHASE)
+end
+
+-- Draws it as the director has it: `wasp` = { position, heading, mode, search, visible }, `now` the time in seconds. Hidden (taken out of
+-- the world) while it is away.
+function WaspBody.draw(self: any, wasp: any, now: number)
+	if not wasp.visible then
+		if self.shown then
+			self.shown = false
+			self.folder.Parent = nil
+		end
+		return
+	end
+	if not self.shown then
+		self.shown = true
+		self.folder.Parent = self.parent
+	end
+	self:pose(wasp.mode, now, wasp.search)
+	local body = CFrame.lookAt(wasp.position, wasp.position + wasp.heading, Vector3.yAxis) * CFrame.new(0, self.bob, 0)
+	local moved, world = self.moved, self.world
+	table.clear(moved)
+	for i, part in self.parts do
+		local size = self.sizes[i]
+		if part.Size ~= size then part.Size = size end
+		if part.Transparency ~= self.transparency[i] then part.Transparency = self.transparency[i] end
+		moved[i] = part
+		world[i] = body * self.frames[i]
+	end
+	Workspace:BulkMoveTo(moved, world, Enum.BulkMoveMode.FireCFrameChanged)
+end
+
+function WaspBody.destroy(self: any)
+	self.folder:Destroy()
+end
+
+return WaspBody
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="111">
           <Properties>
             <string name="Name">WorldDetail</string>
             <string name="Source"><![CDATA[--!strict
@@ -14595,7 +16317,7 @@ return WorldDetail
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="104">
+        <Item class="ModuleScript" referent="112">
           <Properties>
             <string name="Name">SilkPlayback</string>
             <string name="Source"><![CDATA[--!strict
@@ -14801,6 +16523,29 @@ return function(driver: any)
   end
   print("PORT_PREY_COST "..HttpService:JSONEncode({evidence_id=workspace:GetAttribute("PortEvidence"),samples=samples,source="live client; no screenshots during timing"}))
  end)
+ check("WASP: live arrival hum loads, search stays safe in crack, and audio ends with visit",function()
+  driver.input:clear();driver.place(Vector3.new(-25.5,0.31,6));wait(.3)
+  local wasp=driver.wasp;wasp:clearVisit()
+  assert(wasp:force(driver.life.clock.day,"floor_middle"),"could not force visit")
+  RunService.Heartbeat:Wait()
+  local root=workspace:FindFirstChild("WindowsillAudio")
+  local hum=root and root:FindFirstChild("wasp",true)
+  assert(hum and hum:IsA("Sound"),"wasp sound missing")
+  assert(hum.Playing,"arrival hum not playing")
+  local deadline=os.clock()+20
+  repeat RunService.Heartbeat:Wait() until hum.IsLoaded or os.clock()>deadline
+  assert(hum.IsLoaded and hum.TimeLength>0,"wasp recording not loaded: permissions/moderation/network")
+  local frames={};deadline=os.clock()+8
+  repeat local dt=RunService.Heartbeat:Wait();table.insert(frames,dt*1000) until os.clock()>deadline
+  table.sort(frames)
+  assert(not driver.motor.seized,"spider caught inside safe crack")
+  print("PORT_WASP_COST "..HttpService:JSONEncode({evidence_id=workspace:GetAttribute("PortEvidence"),
+   samples=#frames,frame_p50_ms=frames[math.ceil(#frames*.5)],frame_p95_ms=frames[math.ceil(#frames*.95)],
+   phase=wasp.phase,audio_loaded=hum.IsLoaded,source="live wasp visit; no screenshots during timing"}))
+  wasp:clearVisit();RunService.Heartbeat:Wait();RunService.Heartbeat:Wait()
+  assert(not hum.Playing,"hum continued after visit")
+ end)
+ driver.wasp:clearVisit() -- also clean up after an assertion failure
  local passed=0
 	for _,row in rows do if row.passed then passed+=1 end end
 	print("PORT_CLIENT_REPORT "..HttpService:JSONEncode({evidence_id=workspace:GetAttribute("PortEvidence"),tests=#rows,passed=passed,failed=#rows-passed,results=rows}))
@@ -14815,7 +16560,7 @@ end
       </Item>
     </Item>
   </Item>
-  <Item class="Workspace" referent="105">
+  <Item class="Workspace" referent="113">
     <Properties>
       <string name="Name">Workspace</string>
       <float name="Gravity">35</float>

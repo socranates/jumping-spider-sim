@@ -52,7 +52,7 @@
       "sha256": "353fd17a7a5242747ca918636b4e4da0bc921f21436a0804a745cedd1aa99460",
       "bytes": 44144,
       "roblox_asset_id": "76049518783466",
-      "experience_access_saved": false
+      "experience_access_saved": true
     },
     {
       "file": "whoosh.wav",
@@ -62,5 +62,5 @@
       "experience_access_saved": false
     }
   ],
-  "status": "Uploaded 2026-10-16 to socranates; room, buzz, takeoff, birds granted to universe 10771103250. Studio loading and live playback pending."
+  "status": "Uploaded 2026-10-16 to socranates; room, buzz, takeoff, birds and wasp granted to universe 10771103250. Original sound playtest confirmed; wasp sound Studio check pending."
 }

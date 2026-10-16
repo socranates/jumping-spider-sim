@@ -201,6 +201,29 @@ return function(driver: any)
   end
   print("PORT_PREY_COST "..HttpService:JSONEncode({evidence_id=workspace:GetAttribute("PortEvidence"),samples=samples,source="live client; no screenshots during timing"}))
  end)
+ check("WASP: live arrival hum loads, search stays safe in crack, and audio ends with visit",function()
+  driver.input:clear();driver.place(Vector3.new(-25.5,0.31,6));wait(.3)
+  local wasp=driver.wasp;wasp:clearVisit()
+  assert(wasp:force(driver.life.clock.day,"floor_middle"),"could not force visit")
+  RunService.Heartbeat:Wait()
+  local root=workspace:FindFirstChild("WindowsillAudio")
+  local hum=root and root:FindFirstChild("wasp",true)
+  assert(hum and hum:IsA("Sound"),"wasp sound missing")
+  assert(hum.Playing,"arrival hum not playing")
+  local deadline=os.clock()+20
+  repeat RunService.Heartbeat:Wait() until hum.IsLoaded or os.clock()>deadline
+  assert(hum.IsLoaded and hum.TimeLength>0,"wasp recording not loaded: permissions/moderation/network")
+  local frames={};deadline=os.clock()+8
+  repeat local dt=RunService.Heartbeat:Wait();table.insert(frames,dt*1000) until os.clock()>deadline
+  table.sort(frames)
+  assert(not driver.motor.seized,"spider caught inside safe crack")
+  print("PORT_WASP_COST "..HttpService:JSONEncode({evidence_id=workspace:GetAttribute("PortEvidence"),
+   samples=#frames,frame_p50_ms=frames[math.ceil(#frames*.5)],frame_p95_ms=frames[math.ceil(#frames*.95)],
+   phase=wasp.phase,audio_loaded=hum.IsLoaded,source="live wasp visit; no screenshots during timing"}))
+  wasp:clearVisit();RunService.Heartbeat:Wait();RunService.Heartbeat:Wait()
+  assert(not hum.Playing,"hum continued after visit")
+ end)
+ driver.wasp:clearVisit() -- also clean up after an assertion failure
  local passed=0
 	for _,row in rows do if row.passed then passed+=1 end end
 	print("PORT_CLIENT_REPORT "..HttpService:JSONEncode({evidence_id=workspace:GetAttribute("PortEvidence"),tests=#rows,passed=passed,failed=#rows-passed,results=rows}))

@@ -8,7 +8,7 @@ local NeedsModel=require(script.Parent.Parent.Life.NeedsModel)
 local F={};F.__index=F
 function F.new(needs: any?): any
  return setmetatable({held=nil,struggling=false,feeding=false,grip=0,elapsed=0,waiting=0,jerk=0,venom=6,
-  swallow=0,needs=needs or NeedsModel.new(),taken=0,granted=0,ledger={},auto=false,tap=false,note='',rng=R.new(513)},F)
+  swallow=0,needs=needs or NeedsModel.new(),taken=0,granted=0,ledger={},mealsFinished=0,auto=false,tap=false,note='',rng=R.new(513)},F)
 end
 function F.capture(self: any,fly: any)
  self.held=fly;self.struggling=true;self.feeding=false;self.grip=.4;self.elapsed=0;self.waiting=0
@@ -44,6 +44,6 @@ function F.step(self: any,dt: number,attached: boolean,moving: boolean,escape: (
  local granted=self.needs:grantEnergy(take,f.captureKey)
  self.taken+=take;self.granted+=granted
  self.ledger[f.captureKey]=(self.ledger[f.captureKey] or 0)+granted
- if f.nutrition<=1e-9 then f.nutrition=0;f.state='CONSUMED';self.held=nil;self.feeding=false;self.note='Meal finished.' end
+ if f.nutrition<=1e-9 then f.nutrition=0;f.state='CONSUMED';self.held=nil;self.feeding=false;self.mealsFinished+=1;self.note='Meal finished.' end
 end
 return F

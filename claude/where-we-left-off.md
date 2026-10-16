@@ -1,3 +1,38 @@
+# Chet — 2026-10-16: wasp and sound integration
+
+Active branch **codex/roblox-sound**, merging Claude **a483d65** with the tested sound branch **4510dcf**. Read **docs/HANDOFF-roblox-wasp-windows.md**. Build evidence **52123df9177323c8**. Studio validation of this merged build is pending; do not publish the test place.
+
+The earlier sound-only build passed **74/74 engine and 13/13 live-client** checks, and Nathan confirmed audible sound. Its publication was requested but not verified. The new build preserves that soundscape, adds Claude's wasp and PlayStation prompts, and connects the original wasp hum to the arrival/search states. The caption stays. The eight-second arrival uses the director's timing. No new gameplay timers or simulation changes.
+
+Next: Nathan opens Downloads/Windowsill-Wasp-Test-52123df9.rbxlx, presses Play and leaves it running about two minutes. Collect Studio logs (WaspSpec, client sound load check and PORT_WASP_COST), resolve any failure, then finish main and update the laptop. Native Studio control is unavailable in this session. A real PlayStation/controller check, the catch screen's feel and night readability remain manual acceptance work.
+
+**Recommended next Claude chunk:** LIFE death and continuing, with Easy/Standard/Gentle selection. Use the existing checkpoint return; add a clearly unrelated new spider and retain notebook information only once notebook persistence exists. Preserve the warning caption and sound adapter. Peacock-spider appearance/dance is a separate Gemini design exploration, not a replacement for this next gameplay chunk.
+
+---
+# Claude — 2026-10-16: the mud dauber wasp
+
+Read **docs/HANDOFF-roblox-wasp.md**. Branch **claude/roblox-next** (main b5e78c9 + LIFE + PlayStation names + four wasp commits; bundle `claude-playtest/claude-next.bundle`). Ledger **ROBLOX-26**, **ROBLOX-27**. Roblox only; Godot/SPEC frozen. **Not run in Studio, Windows or devices.**
+- **The director ported and checked against Godot's own** (`tools/export_wasp_reference.gd` runs Godot's real director on a stand-in world in eight seeded scenarios; `tests/wasp.luau` replays them: WASP 15,815 checks; Godot's hand-written `test_life04_wasp` expectations too): at most one visit a day (day 2 on, after the first meal, never while resting), 8 s of warning, a search of 45 s over 15 places by sight (moving noticed fast, still slowly, the crack never), 1.5 s look then 0.35 s lunge, a jump / drop / out of sight breaks it off, the catch and the carry.
+- **In the game:** a caption with direction ("[a deep, heavy hum outside, ahead-left, coming closer]"); a caught spider is held and carried off, then a plain screen with Godot's words and "Back to your last rest" (else "Back to the start"). The checkpoint record has a `wasp` field (schema 1). Test place: wasp off; attributes `Wasp` = true allows it, `WaspForce` = place id brings it.
+- **The drawn wasp** (`Data/WaspLook`, `Client/WaspBody`, 56 parts, ~2.5 cm): black, long thin yellow waist, yellow-banded legs, smoky wings (blur in flight), curled antennae; six preview views in `claude-playtest/previews/w1_wasp*.png`.
+- **Differences:** no sound (caption only); no Gentle mode; no continue-as-another or notebook line; the visit days are the port's own hash, not Godot's; walking uses a 0.3 sphere.
+- Linux: WASP 15,815, CHECKPOINT 139, CLIENT 15, all other suites unchanged; strict 0; 121/121 compile. New Studio spec `WaspSpec` (real casts) unrun.
+
+**Next Chet:** import `claude-next.bundle`, push, the checklist in docs/HANDOFF-roblox-wasp.md (Studio suite's Wasp row; force a visit with `WaspForce`; how the wasp reads; the catch screen). **Next Claude:** LIFE round 5 (death and continuing, modes) or growth and moulting.
+
+**Nathan, try:** open TheWindowsill-latest.rbxlx and play. A visit needs day 2 and a first meal: catch and eat a fly, rest in the crack (E) after 18:00 to sleep to "Morning, day 2", then keep playing through midday; on a day with a visit you will see a caption like "[a deep, heavy hum outside, ahead-left, coming closer]" about 8 seconds before the wasp is on the sill (it may not come every day). Move about in the open and it finds you; hide in the crack, jump, or drop on the line to get away. If it catches you, press Return / E / Space (Cross on PlayStation) for "Back to your last rest". To see it at once, Chet can use the test place (`TheWindowsillTests.rbxlx`) with the Workspace attribute `WaspForce` = `floor_middle`.
+
+---
+# Claude — 2026-10-16: LIFE integrated with the new look; PlayStation button names
+
+Branch **claude/roblox-next** (origin/main b5e78c9 + claude/roblox-life merged + one commit; bundle claude-playtest/claude-next.bundle). Chet was unavailable, so nothing here has been run in Studio or on a PlayStation.
+- **LIFE merged** onto main (clean): all suites pass together (LIFE 20,846, CHECKPOINT 123, SUMMARY 184, ...); strict 0; 113/113 compile; places rebuilt, evidence **478963f45d9a8f40**; claude-playtest/TheWindowsill-latest.rbxlx is this build.
+- **PlayStation names:** ControlText.setPadStyle from UserInputService:GetStringForKeyCode(ButtonA) ("ButtonCross" on PlayStation): Cross, Circle, Square, Triangle, L1, L2, R2, R3, Touchpad in prompts and the controls card. Xbox and keyboard unchanged.
+- Nathan has a private published copy to test on his PlayStation (console must be ticked in Playable Devices; same Roblox account; favorite it on the web to find it on the console).
+
+**Next:** Chet — import claude-next.bundle, push, the LIFE Studio checks from docs/HANDOFF-roblox-life.md, a look at the prompts with Studio's PS5 emulation, merge. **Next Claude: the mud dauber wasp** (Nathan's choice): port scripts/predator/wasp_director.gd, wasp.gd, wasp_body.gd with Godot goldens (LIFE-14..18; caught -> back to the last rest checkpoint), a drawn mud dauber, WaspSpec. A first attempt stopped at a usage limit before writing anything.
+
+---
 # Claude — 2026-10-16: LIFE clock, hunger by the hour, rest and sleep, day and night, retreat checkpoints
 
 Read **docs/HANDOFF-roblox-life.md**. Branch **claude/roblox-life** (main b5e78c9, four commits; bundle `claude-playtest/claude-life.bundle`). Ledger **ROBLOX-24**, **ROBLOX-25**. Roblox only; Godot/SPEC frozen.

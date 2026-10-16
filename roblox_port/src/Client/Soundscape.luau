@@ -6,6 +6,7 @@ Soundscape.__index = Soundscape
 local IDS = {
 	room = "rbxassetid://135813320748786", buzz = "rbxassetid://90354950534870",
 	takeoff = "rbxassetid://135484013341687", birds = "rbxassetid://105858750316891",
+	wasp = "rbxassetid://76049518783466",
 }
 local function voice(parent: Instance, name: string, volume: number, looped: boolean): Sound
 	local s = Instance.new("Sound")
@@ -22,7 +23,14 @@ function Soundscape.new(parent: Instance): any
 	local root = Instance.new("Folder")
 	root.Name = "WindowsillAudio"
 	root.Parent = parent
+	local emitter = Instance.new("Part")
+	emitter.Name = "WaspAudio"
+	emitter.Anchored = true; emitter.CanCollide = false; emitter.CanTouch = false; emitter.CanQuery = false
+	emitter.Transparency = 1; emitter.Size = Vector3.new(0.1, 0.1, 0.1); emitter.Parent = root
+	local hum = voice(emitter, "wasp", 0.42, true)
+	hum.RollOffMinDistance = 16; hum.RollOffMaxDistance = 120
 	return setmetatable({ root = root, room = voice(root, "room", 0.16, true),
+		waspEmitter = emitter, waspHum = hum,
 		birds = voice(root, "birds", 0.16, false), slots = {}, elapsed = 0, nextBird = 8 }, Soundscape)
 end
 local function playing(s: Sound, wanted: boolean)
@@ -66,6 +74,20 @@ function Soundscape.update(self: any, dt: number, prey: any, daylight: number, p
 	for i, slot in self.slots do
 		if i > #prey.flies then slot.part:Destroy(); self.slots[i] = nil end
 	end
+end
+-- The warning starts immediately with the director's arrival phase. Its initial global mix
+-- cannot disappear when the third-person camera is far away; the caption supplies direction.
+-- Once it reaches the sill, the same voice follows the wasp in 3D. No second warning timer.
+function Soundscape.updateWasp(self: any, director: any, paused: boolean, speed: number, muted: boolean)
+	local arriving = director.phase == "arriving"
+	local active = director.phase ~= "away" and director.wasp.mode ~= "walking"
+	local hum: Sound = self.waspHum
+	self.waspEmitter.Position = director.wasp.position
+	hum.Parent = if arriving then self.root else self.waspEmitter
+	hum.Volume = if arriving then 0.32 else 0.42
+	hum.PlaybackSpeed = speed
+	if not active then hum:Stop()
+	else playing(hum, not paused and not muted) end
 end
 function Soundscape.destroy(self: any)
 	self.root:Destroy()

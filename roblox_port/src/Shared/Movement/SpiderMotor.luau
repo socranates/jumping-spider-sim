@@ -103,6 +103,7 @@ function Motor.new(config: Config): any
 		probe = probe,
 		silk = SilkController.new(config.world, config.surfaces, config.profile.silk, loco.gravity_wu_s2) :: any,
 		mode = "attached",
+		seized = false, -- taken by a predator (Motor.seize): the motor stands still and the wasp moves the body
 		pos = config.spawn + Vector3.new(0, HEIGHT, 0),
 		up = Vector3.yAxis,
 		heading = config.heading,
@@ -202,6 +203,7 @@ end
 -- Puts the spider somewhere (a reset, a test fixture). Every line, aim and walk ends.
 function Motor.place(self: any, position: Vector3, up: Vector3?, heading: Vector3?)
 	self.mode = "attached"
+	self.seized = false
 	self.pos = position
 	self.up = up or Vector3.yAxis
 	self.heading = SupportMath.tangentDir(heading or self.config.heading, self.up)
@@ -739,8 +741,31 @@ function Motor._tickAir(self: any, input: TickInput)
 	if self:_outOfBounds(to) then self:_backToSafety() end
 end
 
+-- Taken by a predator (Godot SpiderMotor.seize, LIFE round 4; ROBLOX-26): the spider lets go of its surface and its line, takes no more
+-- input, and the motor stops. Whatever took it moves the body from now on with `hold`. Nothing undoes it but `place`: the world that
+-- follows is a checkpoint's or the start.
+function Motor.seize(self: any)
+	self.seized = true
+	self.mode = "air"
+	self.preparing = false
+	self.aimTarget = nil
+	self.plan = nil
+	self.planKey = ""
+	self.vel = Vector3.zero
+	self.moving = false
+	self.intent = Vector3.zero
+	self.silk:clear()
+end
+
+-- Where the predator holds the body (the spider hangs upright under it).
+function Motor.hold(self: any, position: Vector3)
+	self.pos = position
+	self.up = SupportMath.rotateToward(self.up, Vector3.yAxis, FREE_UP_RATE * DT)
+end
+
 -- One fixed 1/60 s tick of the body.
 function Motor.tick(self: any, input: TickInput)
+	if self.seized then return end
 	self.ticks += 1
 	local scan = input.gaze
 	self.scanDir = if scan ~= nil and scan.Magnitude > 1e-4 then scan.Unit else nil

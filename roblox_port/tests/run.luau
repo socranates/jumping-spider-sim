@@ -449,5 +449,12 @@ do
 	check(not c.carrying and d == up, "nothing to carry: the view's mapping")
 end
 
+
+ControlText.setPadStyle(ControlText.padStyleFor("ButtonCross"))
+check(ControlText.padStyle() == "playstation" and ControlText.name("gamepad", "jump") == "Cross" and ControlText.name("gamepad", "focus") == "L2"
+	and ControlText.name("gamepad", "eye") == "Triangle" and ControlText.name("gamepad", "walk") == "Left stick" and ControlText.name("keyboard", "jump") == "Space"
+	and string.find(ControlText.helpCard("gamepad"), "Hold Cross", 1, true) ~= nil, "a PlayStation controller gets its own button names")
+ControlText.setPadStyle(ControlText.padStyleFor("ButtonA"))
+check(ControlText.padStyle() == "xbox" and ControlText.name("gamepad", "jump") == "A" and string.find(ControlText.helpCard("gamepad"), "Hold A", 1, true) ~= nil, "back to Xbox names")
 print(`SUMMARY passed={passed} failed={failed}`)
 if failed > 0 then error("port check failed") end

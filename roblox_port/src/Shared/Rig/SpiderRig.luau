@@ -4,6 +4,8 @@
 -- Display only: the controller owns the body's CFrame; nothing here feeds back into movement.
 -- Body frame: +Y support-up, -Z forward, about 1 stud long (1 Godot WU = 1 cm = 1 stud). Every look number is in
 -- Data/Appearances; where things sit comes from Rig/Anatomy, the hairs from Rig/Setae, the idle motion from Rig/Idle.
+-- The peacock spider (ROBLOX-30) is a second appearance drawn by the same code: a small body (look.scale) standing low (look.bodyDrop),
+-- legs III in their own colours, and a fan of flat discs that the courtship dance (Rig/PeacockDance, set as rig.dance) opens.
 
 local Workspace = game:GetService("Workspace")
 local Appearances = require(script.Parent.Parent.Data.Appearances)
@@ -39,11 +41,16 @@ type Leg = {
 	knee: Part,
 	ankle: Part,
 	pad: Part?,
-	bands: {Part},
+	bands: {Part}, -- empty for a pair drawn without pale bands (the peacock spider's legs III)
 	hairs: { { part: Part, spec: Setae.LegHair } },
 }
 
 type Fixed = { part: Part, offset: CFrame, group: number, palp: number? }
+
+-- The peacock spider's fan: flat ellipsoid discs on the abdomen's back face, stacked fringe first, their size set each frame by how far the fan is open.
+type FanDisc = { part: Part, inset: number, y: number }
+type FanFigure = { part: Part, x: number, z: number, rx: number, rz: number, angle: number }
+type Fan = { front: { FanDisc }, back: { FanDisc }, figure: { FanFigure }, flaps: { { part: Part, side: number } }, cfg: any, parts: { Part } }
 
 export type Rig = typeof(setmetatable(
 	{} :: {
@@ -70,6 +77,10 @@ export type Rig = typeof(setmetatable(
 		_params: RaycastParams,
 		_parts: { BasePart },
 		_cframes: { CFrame },
+		_k: number,
+		_drop: number,
+		_fan: Fan?,
+		dance: any, -- a PeacockDance.Pose, or nil: the peacock spider's display (ignored by an appearance without a fan)
 	},
 	SpiderRig
 ))
@@ -107,6 +118,13 @@ local function rod(model: Model, name: string, d: number, color: Color3): Part
 	return p
 end
 
+local function disc(model: Model, name: string, color: Color3, reflectance: number): Part
+	local p = ellipsoid(model, name, Vector3.new(0.05, 0.002, 0.05), color, Enum.Material.SmoothPlastic)
+	p.CastShadow = false
+	p.Reflectance = reflectance
+	return p
+end
+
 local function ball(model: Model, name: string, d: number, color: Color3): Part
 	local p = newPart(model, name, color, Enum.Material.SmoothPlastic)
 	p.Shape = Enum.PartType.Ball
@@ -138,7 +156,8 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 	local A = Anatomy.layout(look)
 	local function color(rgb): Color3 return Color3.new(rgb[1], rgb[2], rgb[3]) end
 	local BODY, LEG = color(look.body), color(look.legs)
-	local JOINT, EYE, FANG = color(look.white), color(look.eyes), color(look.fangs)
+	local JOINT, EYE, FANG = color(look.joint or look.white), color(look.eyes), color(look.fangs)
+	local ABDOMEN = if look.abdomenColor then color(look.abdomenColor) else BODY
 	local WHITE = color(look.white)
 	local model = Instance.new("Model")
 	model.Name = "Spider"
@@ -178,6 +197,10 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		_params = params,
 		_parts = {} :: { BasePart },
 		_cframes = {} :: { CFrame },
+		_k = look.scale or 1,
+		_drop = look.bodyDrop or 0,
+		_fan = nil :: Fan?,
+		dance = nil :: any,
 	}, SpiderRig)
 
 	local function fixed(part: Part, at: Vector3, rot: CFrame?, group: number, palp: number?)
@@ -187,7 +210,7 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 	fixed(ellipsoid(model, "Cephalothorax", A.headRadii, BODY, fabric), A.headCenter, nil, G_HEAD)
 	fixed(ellipsoid(model, "EyeFace", A.faceRadii, BODY, fabric), A.faceCenter, nil, G_HEAD)
 	fixed(ellipsoid(model, "Pedicel", A.pedicelRadii, BODY, fabric), A.pedicelCenter, nil, G_BODY)
-	fixed(ellipsoid(model, "Abdomen", A.abdomenRadii, BODY, fabric), A.abdomenCenter, nil, G_ABDOMEN)
+	fixed(ellipsoid(model, "Abdomen", A.abdomenRadii, ABDOMEN, fabric), A.abdomenCenter, nil, G_ABDOMEN)
 
 	-- The daughter's pattern: markings are fractions of the abdomen's radii.
 	local ar, ac = A.abdomenRadii, A.abdomenCenter
@@ -221,6 +244,22 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		cheek.CastShadow = false
 		fixed(cheek, c.at, nil, G_HEAD)
 	end
+	-- The peacock spider's red-orange carapace stripes: flat dabs lying on the head's dome, tilted to the slope under them.
+	local stripes = look.stripes
+	if stripes then
+		local STRIPE = color(stripes.color)
+		for n = 1, #stripes do
+			local st = stripes[n]
+			local dx, dz = st.x, st.z - A.headCenter.Z
+			local q = math.sqrt(math.max(1 - (dx / A.headRadii.X) ^ 2 - (dz / A.headRadii.Z) ^ 2, 0.05))
+			local y = A.headCenter.Y + A.headRadii.Y * q
+			local pitch = -math.atan(-A.headRadii.Y * (dz / A.headRadii.Z) / (A.headRadii.Z * q))
+			local roll = math.atan(-A.headRadii.Y * (dx / A.headRadii.X) / (A.headRadii.X * q))
+			local dab = ellipsoid(model, "CarapaceStripe", Vector3.new(st.rx, 0.006, st.rz), STRIPE, fabric)
+			dab.CastShadow = false
+			fixed(dab, Vector3.new(st.x, y + 0.002, st.z), CFrame.Angles(pitch, 0, roll) * CFrame.Angles(0, st.angle, 0), G_HEAD)
+		end
+	end
 	local SOCKET = color(look.eye.ame.socket.color)
 	for _, e in A.eyes do
 		local eye = ellipsoid(model, e.name, e.radii, EYE, Enum.Material.Glass)
@@ -247,18 +286,20 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 	end
 	-- Pedipalps: stalk, pale band, club and pale tip, rotating about a pivot at the base (they drum when the spider stands).
 	local pl = look.palp
+	local pc = look.palpColors
+	local PALP_STALK, PALP_CLUB, PALP_TIP = if pc then color(pc.stalk) else LEG, if pc then color(pc.club) else LEG, if pc then color(pc.tip) else JOINT
 	for index, palp in A.palps do
 		local base, tip = palp.base, palp.tip
 		local len = (tip - base).Magnitude
 		local toBase = CFrame.new(base):Inverse()
-		local stalk = rod(model, "PalpStalk", pl.stalk, LEG)
+		local stalk = rod(model, "PalpStalk", pl.stalk, PALP_STALK)
 		stalk.Size = Vector3.new(len, pl.stalk, pl.stalk)
 		fixed(stalk, Vector3.zero, toBase * rodCFrame(base, tip), G_HEAD, index)
 		local ring = rod(model, "PalpBand", pl.stalk * 1.05, WHITE)
 		ring.Size = Vector3.new(len * look.bandFraction, pl.stalk * 1.05, pl.stalk * 1.05)
 		fixed(ring, Vector3.zero, toBase * rodCFrame(base, tip), G_HEAD, index)
-		fixed(ellipsoid(model, "PalpClub", v3(pl.club), LEG, fabric), tip + Vector3.new(0, -0.005, -0.02) - base, nil, G_HEAD, index)
-		fixed(ellipsoid(model, "PalpTip", v3(pl.tipRadii), JOINT, fabric), tip + Vector3.new(0, 0.004, -0.05) - base, nil, G_HEAD, index)
+		fixed(ellipsoid(model, "PalpClub", v3(pl.club), PALP_CLUB, fabric), tip + Vector3.new(0, -0.005, -0.02) - base, nil, G_HEAD, index)
+		fixed(ellipsoid(model, "PalpTip", v3(pl.tipRadii), PALP_TIP, fabric), tip + Vector3.new(0, 0.004, -0.05) - base, nil, G_HEAD, index)
 	end
 
 	-- Fuzz: flat locks over the head and abdomen, tufts, a cheek ruff and palp fluff (Rig/Setae), moved with the part they grow from.
@@ -319,6 +360,19 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		local raw = L.diameters[pair]
 		local factor = (if pair == 1 then look.frontLegScale else 1) * L.thickness
 		local d = {raw[1] * factor, raw[2] * factor}
+		-- A pair with its own look (the peacock spider's legs III): a colour and a thickness per segment, and no pale bands.
+		local own = if look.pairs then look.pairs[pair] else nil
+		local cFemur, cTibia, cTarsus = LEG, LEG, LEG
+		local tF, tT, tTar = 1, 1, 1
+		local kneeColor, ankleColor = JOINT, JOINT
+		local withBands = true
+		if own then
+			cFemur, cTibia, cTarsus = color(own.colors[1]), color(own.colors[2]), color(own.colors[3])
+			tF, tT, tTar = own.thick[1], own.thick[2], own.thick[3]
+			kneeColor, ankleColor = cFemur, cTibia
+			withBands = own.bands ~= false
+		end
+		if cfg.legBands == false then withBands = false end -- the low tier of the peacock spider draws no pale bands
 		table.insert(self._legs, {
 			side = side,
 			pair = pair,
@@ -328,13 +382,13 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 			to = Vector3.zero,
 			up = Vector3.yAxis,
 			foot = Vector3.zero,
-			femur = rod(model, "Femur" .. i, d[1], LEG),
-			tibia = rod(model, "Tibia" .. i, d[2], LEG),
-			tarsus = rod(model, "Tarsus" .. i, d[2] * 0.6, LEG),
-			knee = ball(model, "Knee" .. i, d[1] * 0.95, JOINT),
-			ankle = ball(model, "Ankle" .. i, d[2] * 0.95, JOINT),
-			pad = if cfg.pads then ball(model, "Foot" .. i, d[2] * 0.6 * L.pad, LEG) else nil,
-			bands = {rod(model, "FemurBand" .. i, d[1], WHITE), rod(model, "TibiaBand" .. i, d[2], WHITE), rod(model, "TarsusBand" .. i, d[2] * 0.6, WHITE)},
+			femur = rod(model, "Femur" .. i, d[1] * tF, cFemur),
+			tibia = rod(model, "Tibia" .. i, d[2] * tT, cTibia),
+			tarsus = rod(model, "Tarsus" .. i, d[2] * 0.6 * tTar, cTarsus),
+			knee = ball(model, "Knee" .. i, d[1] * tF * 0.95, kneeColor),
+			ankle = ball(model, "Ankle" .. i, d[2] * tT * 0.95, ankleColor),
+			pad = if cfg.pads then ball(model, "Foot" .. i, d[2] * 0.6 * tTar * L.pad, cTarsus) else nil,
+			bands = if withBands then {rod(model, "FemurBand" .. i, d[1], WHITE), rod(model, "TibiaBand" .. i, d[2], WHITE), rod(model, "TarsusBand" .. i, d[2] * 0.6, WHITE)} else {},
 			hairs = {},
 		})
 		local leg = self._legs[#self._legs]
@@ -344,6 +398,34 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 				table.insert(leg.hairs, { part = seta(spec.tone, fuzz.legWidth, fuzz.legWidth, spec.length, fuzz.legTransparency), spec = spec })
 			end
 		end
+	end
+	-- The peacock spider's fan (look.fan): the discs of the front face, the figure on them, the repeat on the back and the folded flaps.
+	local fc = look.fan
+	if fc then
+		local fan: Fan = { front = {}, back = {}, figure = {}, flaps = {}, cfg = fc, parts = {} }
+		local function add(list: { FanDisc }, spec: any, y: number)
+			local part = disc(model, spec.name, color(spec.color), if spec.name == "FanField" then fc.sheen else 0)
+			table.insert(list, { part = part, inset = spec.inset, y = y })
+			table.insert(fan.parts, part)
+		end
+		for k = 1, math.min(cfg.fanLayers or #fc.layers, #fc.layers) do
+			add(fan.front, fc.layers[k], (k - 1) * fc.layerStep)
+		end
+		if cfg.fanBack then
+			for j, k in fc.back.layers do add(fan.back, fc.layers[k], fc.back.plane - (j - 1) * fc.layerStep) end
+		end
+		for _, f in fc.figure do
+			local part = disc(model, "FanFigure", color(fc.figureColor), 0)
+			table.insert(fan.figure, { part = part, x = f.x, z = f.z, rx = f.rx, rz = f.rz, angle = f.angle })
+			table.insert(fan.parts, part)
+		end
+		for _, side in { -1, 1 } do
+			local flap = ellipsoid(model, "FanFlap", v3(fc.flaps.radii), color(fc.flaps.color), fabric)
+			flap.CastShadow = false
+			table.insert(fan.flaps, { part = flap, side = side })
+			table.insert(fan.parts, flap)
+		end
+		self._fan = fan
 	end
 	if cfg.highlight then
 		local hl = Instance.new("Highlight")
@@ -388,16 +470,19 @@ end
 
 local function restLocal(self: Rig, leg: Leg): Vector3
 	local s = self._appearance.limbs.stance
-	return Vector3.new(leg.side * s.x * s.reach, s.y, self._appearance.limbs.tipZ[leg.pair] * s.reach)
+	local longer = self._appearance.limbs.pairReach
+	local r = s.reach * (if longer then longer[leg.pair] else 1) -- the peacock spider's legs III are the longest
+	return Vector3.new(leg.side * s.x * r, s.y, self._appearance.limbs.tipZ[leg.pair] * r)
 end
 
 -- Display-only foothold: retract toward the body at a narrow edge; never invents a platform.
 local function target(self: Rig, body: CFrame, leg: Leg): RaycastResult?
 	local up = body.UpVector
 	local rest = restLocal(self, leg)
+	local k = self._k
 	for _, reach in { 1.0, 0.65, 0.35, 0.12 } do
 		local point = body:PointToWorldSpace(Vector3.new(rest.X * reach, 0, rest.Z * reach))
-		local hit = Workspace:Raycast(point + up * 0.35, -up * 1.0, self._params)
+		local hit = Workspace:Raycast(point + up * (0.35 * k), -up * (1.0 * k), self._params)
 		if hit and hit.Normal:Dot(up) > 0.35 then
 			return hit
 		end
@@ -406,10 +491,13 @@ local function target(self: Rig, body: CFrame, leg: Leg): RaycastResult?
 end
 
 -- body: the drawn body's CFrame. grounded: standing on a surface. moving: walking speed > 0 (for palp drumming and idle motion).
-function SpiderRig.update(self: Rig, body: CFrame, dt: number, grounded: boolean, moving: boolean)
+function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boolean, moving: boolean)
 	self._t += dt
+	-- The root part (what the camera and tests read) stays at the collider's frame; the drawn body of a small appearance sits lower.
+	local body = if self._drop ~= 0 then collider * CFrame.new(0, -self._drop, 0) else collider
 	local up = body.UpVector
 	local look, cfg, A = self._appearance, self._cfg, self._layout
+	local k = self._k
 	local parts, cframes = self._parts, self._cframes
 	table.clear(parts)
 	table.clear(cframes)
@@ -417,11 +505,15 @@ function SpiderRig.update(self: Rig, body: CFrame, dt: number, grounded: boolean
 		table.insert(parts, p)
 		table.insert(cframes, cf)
 	end
-	put(self.root, body)
+	put(self.root, collider)
+	-- The courtship display (rig.dance, a PeacockDance pose), for an appearance that has a fan.
+	local display = self.dance
+	local fan = self._fan
+	local dancing = fan ~= nil and display ~= nil and display.presence > 0
 
 	-- Palps drum in bursts while the spider stands still; breathing and a curious head tilt ease in after a moment. All of
 	-- it is full detail only (cfg.idle), and reducedMotion turns it off too.
-	local standing = cfg.idle and grounded and not moving and not self.reducedMotion
+	local standing = cfg.idle and grounded and not moving and not self.reducedMotion and not dancing
 	self._drum = math.clamp(self._drum + (if standing then 3 else -3) * dt, 0, 1)
 	local palpAngle = Idle.palps(self._t, self._drum, look.palp)
 	local bodyBase, headBase, abdomenBase = body, body, body
@@ -437,6 +529,12 @@ function SpiderRig.update(self: Rig, body: CFrame, dt: number, grounded: boolean
 				* CFrame.Angles(-pose.abdomenPitch, 0, 0) * CFrame.new(-A.pedicelCenter)
 		end
 	end
+	if dancing then
+		-- The abdomen pitches up about the pedicel and sways side to side (about the body's long axis), the palps flick in unison.
+		abdomenBase = bodyBase * CFrame.new(A.pedicelCenter) * CFrame.Angles(0, 0, display.abdomenSway + display.shiver)
+			* CFrame.Angles(-display.abdomenPitch, 0, 0) * CFrame.new(-A.pedicelCenter)
+		palpAngle = { palpAngle[1] + display.palp, palpAngle[2] + display.palp }
+	end
 	local pivots = {
 		CFrame.new(self._palpBase[1]) * CFrame.Angles(palpAngle[1], 0, 0),
 		CFrame.new(self._palpBase[2]) * CFrame.Angles(palpAngle[2], 0, 0),
@@ -451,13 +549,17 @@ function SpiderRig.update(self: Rig, body: CFrame, dt: number, grounded: boolean
 		end
 	end
 
+	if fan then
+		self:_drawFan(abdomenBase, if dancing then display.fanOpen else 0, put)
+	end
+
 	-- Legs: planted feet stay put in the world; a leg too far from its rest spot steps, in alternating groups.
 	local swinging = false
 	for _, leg in self._legs do
 		swinging = swinging or leg.swing >= 0
 	end
 	if grounded and not swinging then
-		local worst = STEP_ERROR
+		local worst = STEP_ERROR * k
 		for i, leg in self._legs do
 			if leg.planted then
 				local err = (body:PointToWorldSpace(restLocal(self, leg)) - leg.planted :: Vector3).Magnitude
@@ -475,7 +577,7 @@ function SpiderRig.update(self: Rig, body: CFrame, dt: number, grounded: boolean
 		if not grounded then
 			leg.planted = nil
 			leg.swing = -1
-			leg.foot = body:PointToWorldSpace(Vector3.new(leg.side * 0.47, -0.12, L.tipZ[leg.pair] * 0.72))
+			leg.foot = body:PointToWorldSpace(Vector3.new(leg.side * 0.47 * k, -0.12 * k, L.tipZ[leg.pair] * 0.72))
 		else
 			if leg.planted == nil then
 				local hit = target(self, body, leg)
@@ -486,10 +588,10 @@ function SpiderRig.update(self: Rig, body: CFrame, dt: number, grounded: boolean
 			local anchor = leg.planted
 			if anchor then
 				if leg.swing >= 0 then
-					leg.swing = math.min(1, leg.swing + dt / SWING_SECONDS)
+					leg.swing = math.min(1, leg.swing + dt / (SWING_SECONDS * math.sqrt(k)))
 					local s = leg.swing
 					local smooth = s * s * (3 - 2 * s)
-					leg.foot = leg.from:Lerp(anchor, smooth) + leg.up * math.sin(math.pi * s) * STEP_HEIGHT
+					leg.foot = leg.from:Lerp(anchor, smooth) + leg.up * math.sin(math.pi * s) * (STEP_HEIGHT * k)
 					if leg.swing >= 1 then
 						leg.swing = -1
 						leg.foot = anchor
@@ -497,9 +599,9 @@ function SpiderRig.update(self: Rig, body: CFrame, dt: number, grounded: boolean
 				else
 					leg.foot = anchor
 					local err = (rest - anchor).Magnitude
-					if err > STEP_ERROR and ((not swinging and legGroup(self, i) == self._group) or err > 0.60) then
+					if err > STEP_ERROR * k and ((not swinging and legGroup(self, i) == self._group) or err > 0.60 * k) then
 						local hit = target(self, body, leg)
-						if hit and (anchor - hit.Position).Magnitude > 0.12 then
+						if hit and (anchor - hit.Position).Magnitude > 0.12 * k then
 							leg.from = anchor
 							leg.planted = hit.Position
 							leg.up = hit.Normal
@@ -507,7 +609,7 @@ function SpiderRig.update(self: Rig, body: CFrame, dt: number, grounded: boolean
 							started = true
 						end
 					end
-					if body:PointToObjectSpace(leg.foot).Magnitude > 1.4 then
+					if body:PointToObjectSpace(leg.foot).Magnitude > 1.4 * k then
 						leg.planted = nil
 						leg.foot = rest
 					end
@@ -523,16 +625,29 @@ function SpiderRig.update(self: Rig, body: CFrame, dt: number, grounded: boolean
 		local hip = bodyBase:PointToWorldSpace(Vector3.new(leg.side * L.hipX, L.hipY, L.hipZ[leg.pair]))
 		local foot = leg.foot
 		local knee = hip:Lerp(foot, 0.48) + up * kneeUp
+		local own = if dancing and look.pairs then look.pairs[leg.pair] else nil
+		if own and display.legsRaise > 0 then
+			-- Legs III go up in a V beside the fan and wave: down and forward over the carapace, and back up (the planted foot below is untouched).
+			local raise = display.legsRaise
+			local upAt = Vector3.new(leg.side * own.up.x, own.up.y, own.up.z)
+			local sweptAt = Vector3.new(leg.side * own.swept.x, own.swept.y, own.swept.z)
+			local raised = bodyBase:PointToWorldSpace(upAt:Lerp(sweptAt, display.legsWave))
+			foot = foot:Lerp(raised, raise)
+			local raisedKnee = hip:Lerp(raised, 0.5) + bodyBase.RightVector * (leg.side * own.kneeOut) + up * look.dance.kneeUp
+			knee = knee:Lerp(raisedKnee, raise)
+		end
 		local ankle = knee:Lerp(foot, ANKLE_SHARE) + up * L.ankleLift
-		local function segment(index: number, p: Part, band: Part, a: Vector3, b: Vector3)
+		local function segment(index: number, p: Part, band: Part?, a: Vector3, b: Vector3)
 			local len = math.max((b - a).Magnitude, 0.01)
 			if math.abs(p.Size.X - len) > 1e-3 then
 				p.Size = Vector3.new(len, p.Size.Y, p.Size.Z)
 			end
 			local rc = rodCFrame(a, b) -- local +X runs from a toward b (toward the foot)
 			put(p, rc)
-			band.Size = Vector3.new(len * look.bandFraction, p.Size.Y * 1.035, p.Size.Z * 1.035)
-			put(band, rc)
+			if band then
+				band.Size = Vector3.new(len * look.bandFraction, p.Size.Y * 1.035, p.Size.Z * 1.035)
+				put(band, rc)
+			end
 			-- Leg setae stand out from the segment and lean toward the foot.
 			local r = p.Size.Y * 0.5
 			for _, hair in leg.hairs do
@@ -555,6 +670,42 @@ function SpiderRig.update(self: Rig, body: CFrame, dt: number, grounded: boolean
 	Workspace:BulkMoveTo(parts, cframes, Enum.BulkMoveMode.FireCFrameChanged)
 end
 
+-- Sets the fan's discs for how far it is open (0: folded on the abdomen, 1: a near-round disc) in the abdomen's frame. The discs grow from
+-- Appearances.fan.folded to full size; the figure and the repeat on the back follow; the folded flaps swing out from the flanks and end
+-- under the discs. Flat ellipsoids: only their size and place change.
+function SpiderRig._drawFan(self: Rig, abdomen: CFrame, open: number, put: (BasePart, CFrame) -> ())
+	local fan = self._fan :: Fan
+	local fc, A = fan.cfg, self._layout
+	local sx = fc.folded[1] + (1 - fc.folded[1]) * open
+	local sz = fc.folded[2] + (1 - fc.folded[2]) * open
+	local fold = 1 - open
+	local top = A.abdomenCenter.Y + A.abdomenRadii.Y + fc.plane - fc.foldedSink * fold
+	local z = A.abdomenCenter.Z + fc.zShift * open
+	local thick = fc.thickness + (fc.foldedThickness - fc.thickness) * fold
+	local function place(d: FanDisc, y: number, t: number)
+		local rx, rz = math.max((fc.radii[1] - d.inset) * sx, 0.002), math.max((fc.radii[2] - d.inset) * sz, 0.002)
+		local size = Vector3.new(rx * 2, t, rz * 2)
+		if (d.part.Size - size).Magnitude > 1e-5 then d.part.Size = size end
+		put(d.part, abdomen * CFrame.new(0, y, z))
+	end
+	for _, d in fan.front do place(d, top + d.y, thick) end
+	local mid = A.abdomenCenter.Y - A.abdomenRadii.Y
+	for _, d in fan.back do place(d, mid + d.y, fc.thickness) end
+	local figureY = top + #fan.front * fc.layerStep + (thick - fc.thickness) * 0.5
+	local show = open * open * (3 - 2 * open) -- the black figure shows as the fan opens, and is gone when it is folded
+	for _, f in fan.figure do
+		local size = Vector3.new(math.max(f.rx * fc.radii[1] * sx * 2 * show, 0.002), fc.thickness, math.max(f.rz * fc.radii[2] * sz * 2 * show, 0.002))
+		if (f.part.Size - size).Magnitude > 1e-5 then f.part.Size = size end
+		put(f.part, abdomen * CFrame.new(f.x * fc.radii[1] * sx, figureY, z + f.z * fc.radii[2] * sz) * CFrame.Angles(0, f.angle, 0))
+	end
+	local fl = fc.flaps
+	local angle = math.rad(fl.foldedDeg) * (1 - open)
+	for _, f in fan.flaps do
+		local hinge = Vector3.new(f.side * fl.hingeX, A.abdomenCenter.Y + fl.hingeY, A.abdomenCenter.Z + fc.zShift * open)
+		put(f.part, abdomen * CFrame.new(hinge) * CFrame.Angles(0, 0, f.side * angle) * CFrame.new(f.side * fl.radii[1], 0, 0))
+	end
+end
+
 -- Spider-eye view (Godot SpiderBody.set_eye_view + SurfaceLegs.eye_view): the body, head and palps are hidden and only the
 -- front legs' lower segments stay, reaching into the view. Client-only (LocalTransparencyModifier).
 local function applyVisibility(self: Rig)
@@ -566,12 +717,17 @@ local function applyVisibility(self: Rig)
 	for _, f in self._fixed do
 		show(f.part, not hideBody)
 	end
+	local fan = self._fan
+	if fan then
+		for _, part in fan.parts do show(part, not hideBody) end
+	end
 	for _, leg in self._legs do
 		local frontReach = self._eyeView and leg.pair == 1
 		local all = not hideBody
-		show(leg.femur, all); show(leg.bands[1], all); show(leg.knee, all)
-		show(leg.tibia, all or frontReach); show(leg.bands[2], all or frontReach)
-		show(leg.tarsus, all or frontReach); show(leg.bands[3], all or frontReach); show(leg.ankle, all or frontReach)
+		show(leg.femur, all); show(leg.knee, all)
+		show(leg.tibia, all or frontReach)
+		show(leg.tarsus, all or frontReach); show(leg.ankle, all or frontReach)
+		for n, band in leg.bands do show(band, all or (frontReach and n >= 2)) end
 		if leg.pad then show(leg.pad :: Part, all or frontReach) end
 		for _, hair in leg.hairs do
 			show(hair.part, all or (frontReach and hair.spec.segment >= 2))
@@ -592,7 +748,7 @@ end
 
 -- Where the dragline leaves the body.
 function SpiderRig.spinneretPoint(self: Rig, body: CFrame): Vector3
-	return body:PointToWorldSpace(self._layout.spinneret)
+	return body:PointToWorldSpace(self._layout.spinneret - Vector3.new(0, self._drop, 0))
 end
 
 function SpiderRig.destroy(self: Rig)

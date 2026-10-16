@@ -1,6 +1,10 @@
-local rig = SpiderRig.new({}, {}, nil, DETAIL)
+local rig = SpiderRig.new({}, {}, if APPEARANCE ~= "" then APPEARANCE else nil, DETAIL)
 local body = SupportMath.bodyCFrame(Vector3.new(0, 0.31, 0), Vector3.yAxis, Vector3.new(0, 0, -1))
 for i = 1, 30 do rig:update(body, 1/60, true, false) end
+if DANCE_T >= 0 then
+	rig.dance = PEACOCKDANCE.rawPose(DANCE_T, false)
+	for i = 1, 4 do rig:update(body, 1/60, true, false) end
+end
 for i = 1, math.floor(IDLE_SECONDS * 60) do rig:update(body, 1/60, true, false) end
 if MODE == "eye" then rig:setEyeView(true) end
 local function f(x) return string.format("%.5f", x) end

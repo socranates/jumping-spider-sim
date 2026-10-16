@@ -153,4 +153,143 @@ local first = {
 	},
 }
 
-return { default = "first_spider", profiles = { first_spider = first } }
+-- ================================================================ the peacock spider (ROBLOX-30)
+-- Maratus volans, the male in courtship colours: a second profile beside the daughter's, chosen from the crack (Client/SpiderClient).
+-- Morphology after Otto & Hill 2011 (Peckhamia 96.1): a male about 4 to 5 mm long (DOC); a dark carapace with three red-orange
+-- stripes and a pale margin (DOC); white palp brushes (DOC); legs III longer and darker than the rest, with black brushes and white
+-- tips (DOC); an abdominal fan whose lateral flaps lie folded round the abdomen until the display and then show as a near-round
+-- disc: an iridescent blue-green field with a black central figure, red-orange arches and a white fringe (DOC). The exact
+-- colours, proportions, stripe sizes and the angles below are ART. 1 stud = 1 cm, so the male is 0.45 studs long: the drawn
+-- body is the default spider's face and build at SCALE, with its own colours, a fan and legs III. Collider, senses and physics are
+-- the default spider's: this is a drawn appearance only (ROBLOX-30).
+local SCALE = 0.47 -- body length 0.455 studs against the default spider's 0.97 (ART, from 4.5 mm and 1 stud = 1 cm)
+
+-- A copy of a table with every number in it multiplied by k, except under the keys in `skip` (angles, shares, counts, colours).
+local function scaled(node: any, k: number, skip: { [string]: boolean }): any
+	if type(node) == "number" then return node * k end
+	if type(node) ~= "table" then return node end
+	local out: { [any]: any } = {}
+	for key, value in node do
+		out[key] = if skip[key] then value else scaled(value, k, skip)
+	end
+	return out
+end
+local FACE_SKIP = { out = true, reflectance = true, scale = true, color = true, glintColor = true, pitch = true, splay = true }
+local LIMB_SKIP = { thickness = true, pad = true, reach = true }
+local PALP_SKIP = { hairs = true, drumHz = true, drumDeg = true, flat = true, transparency = true }
+local limbs = scaled(first.limbs, SCALE, LIMB_SKIP)
+limbs.thickness = 1.0
+limbs.stance = { x = limbs.stance.x, y = -0.10, reach = 0.62 } -- ART: low and compact, the legs not much longer than the body
+limbs.pairReach = { 1.0, 1.0, 1.2, 1.0 } -- legs III are the longest (DOC)
+local eye = scaled(first.eye, SCALE, FACE_SKIP)
+eye.ame.socket = { scale = 1.12, color = { 0.50, 0.31, 0.14 } } -- tan and orange ocular setae frame the big eyes (DOC)
+local palp = scaled(first.palp, SCALE, PALP_SKIP)
+palp.club = { 0.021, 0.019, 0.026 } -- the white brushes clothe the palps (DOC; sizes ART)
+palp.tipRadii = { 0.014, 0.012, 0.014 }
+palp.fluff = { hairs = 0, length = 0, width = 0, flat = 1, transparency = 0 }
+
+local volans = {
+	id = "maratus_volans_male",
+	name = "Peacock spider (male)",
+	scale = SCALE, -- SpiderRig scales its own distances (foot search, stepping) by this
+	bodyDrop = 0.21, -- the drawn body sits this far (studs) below the collider's centre, so it stands on the surface (the collider is 0.31 high)
+
+	-- ---------------------------------------------------------------- colours (ART, after the photographs in Otto & Hill 2011)
+	body = { 0.09, 0.05, 0.04 }, -- carapace: dark brown-black
+	legs = { 0.34, 0.22, 0.12 }, -- legs I, II and IV: brown
+	white = { 0.93, 0.90, 0.80 }, -- cream: the pale margin, palp brushes, leg bands, the fan's fringe
+	eyes = { 0.01, 0.01, 0.01 },
+	fangs = { 0.14, 0.08, 0.04 },
+	joint = { 0.20, 0.12, 0.07 }, -- knees and ankles
+	palpColors = { stalk = { 0.20, 0.12, 0.07 }, club = { 0.93, 0.90, 0.80 }, tip = { 0.97, 0.96, 0.90 } },
+	abdomenColor = { 0.05, 0.34, 0.68 }, -- the abdomen is the blue field's colour under the fan's pattern
+	stripes = { -- three red-orange stripes down the carapace behind the eyes (DOC); x, z, half widths in studs, body frame
+		color = { 0.86, 0.26, 0.07 },
+		{ x = 0, z = -0.030, rx = 0.011, rz = 0.050, angle = 0 },
+		{ x = -0.050, z = -0.026, rx = 0.009, rz = 0.040, angle = 0.18 },
+		{ x = 0.050, z = -0.026, rx = 0.009, rz = 0.040, angle = -0.18 },
+	},
+
+	-- ---------------------------------------------------------------- proportions: the default spider's face and build at SCALE
+	headCenter = { 0, 0.014, -0.099 },
+	headRadii = { 0.125, 0.100, 0.125 }, -- the carapace is boxy and high: a little taller than the scaled default
+	abdomenCenter = { 0, 0.019, 0.094 },
+	abdomenRadii = { 0.104, 0.088, 0.125 }, -- an oval, narrower than the default's
+	pedicel = scaled(first.pedicel, SCALE, {}),
+	face = scaled(first.face, SCALE, {}),
+	neck = scaled(first.neck, SCALE, {}),
+	-- The pale margin along the lower edge of the carapace (DOC): the rig draws these as the "cheek" patches.
+	cheek = { y = -0.012, z = -0.075, radii = { 0.010, 0.020, 0.075 }, inset = 0.003 },
+	chelicerae = scaled(first.chelicerae, SCALE, FACE_SKIP),
+	eye = eye,
+	palp = palp,
+	limbs = limbs,
+	frontLegScale = 1.0,
+	bandFraction = 0.12, -- the pale bands on legs I, II and IV
+	speckleCount = 0,
+	spots = {},
+	band = { count = 0, step = 0.1, z = 0, rx = 0.01, rz = 0.01 },
+	speckle = { from = 0.4, step = 0.1, rx = 0.004, rz = 0.005 },
+	-- Legs III (DOC): dark femur, a thick jet-black brush on the tibia, a snow-white tip, no pale bands. `up` and `swept` are
+	-- where the foot goes when they are raised in a V and when a wave sweeps them down and forward (body frame, studs, x mirrored
+	-- for the left leg); `kneeOut` pushes the knee outward. All ART.
+	pairs = {
+		[3] = {
+			colors = { { 0.13, 0.08, 0.05 }, { 0.02, 0.02, 0.025 }, { 0.96, 0.95, 0.90 } },
+			thick = { 1.0, 1.7, 1.9 },
+			bands = false,
+			up = { x = 0.21, y = 0.23, z = -0.015 },
+			swept = { x = 0.10, y = 0.12, z = -0.12 },
+			kneeOut = 0.05,
+		},
+	},
+
+	-- ---------------------------------------------------------------- the fan (DOC: blue-green field, black figure, red-orange arches, white fringe; ART: sizes)
+	-- Flat discs on the abdomen's back (dorsal) face, stacked from the fringe in. `radii` are the open fan's half width and half
+	-- length (a near-round disc, a little wider than long), `folded` the share of that it shows folded; each layer is `inset` studs
+	-- smaller than the one under it. `plane` is the fan's height over the abdomen's top (it floats a hair above the dome), `zShift` moves
+	-- its centre toward the rear so the raised fan stands clear of the head. The figure is three black dabs (two lobes in front, a bar
+	-- behind), given as fractions of the radii. The back (ventral) side repeats the rim and the field so the fan is a fan from behind.
+	fan = {
+		radii = { 0.165, 0.150 }, folded = { 0.42, 0.55 }, plane = 0.004, zShift = 0.018, layerStep = 0.0022, thickness = 0.004,
+		foldedThickness = 0.06, foldedSink = 0.030, -- folded, the discs are thick and sunk into the dome (a lens on the abdomen) and flatten as the fan opens
+		layers = {
+			{ name = "FanFringe", color = { 0.95, 0.94, 0.88 }, inset = 0.0 },
+			{ name = "FanArch", color = { 0.88, 0.25, 0.06 }, inset = 0.024 },
+			{ name = "FanField", color = { 0.05, 0.38, 0.72 }, inset = 0.046 },
+			{ name = "FanArch", color = { 0.88, 0.25, 0.06 }, inset = 0.078 },
+			{ name = "FanField", color = { 0.04, 0.46, 0.66 }, inset = 0.092 },
+		},
+		figureColor = { 0.02, 0.02, 0.03 },
+		-- A black trident on the blue: a long bar and two slanting prongs (fractions of the radii; angle in radians). Never a face.
+		figure = { { x = 0, z = 0.05, rx = 0.07, rz = 0.50, angle = 0 }, { x = -0.30, z = -0.18, rx = 0.07, rz = 0.30, angle = 0.55 }, { x = 0.30, z = -0.18, rx = 0.07, rz = 0.30, angle = -0.55 } },
+		back = { plane = -0.004, layers = { 1, 2, 3 } }, -- the layers (by number) the back repeats, and where (this far under the abdomen's belly)
+		flaps = { color = { 0.88, 0.25, 0.06 }, radii = { 0.030, 0.006, 0.085 }, hingeX = 0.080, hingeY = 0.040, foldedDeg = -80 }, -- the folded flaps on the flanks
+		sheen = 0.12,
+	},
+	-- Legs III in a dance: how the pose's raise and wave move them (ART).
+	dance = { kneeUp = 0.03 },
+
+	-- ---------------------------------------------------------------- no fuzz: at this size the coat would be sub-pixel
+	fuzz = nil,
+
+	idle = {
+		riseSeconds = 1.0, fallSeconds = 0.25,
+		breathe = { period = 3.0, bodyLift = 0.003, lift = 0.008, pitchDeg = 2.4 },
+		tilt = { rollDeg = 7, yawDeg = 6, pitchDeg = 3.5, periods = { 9.1, 5.3, 11.3, 6.7, 8.3 } },
+	},
+
+	-- Full is for PCs; low is for phones and tablets: no foot balls, no eye sockets, no leg bands, no idle motion, no outline, no back to the fan, a plainer fan.
+	detail = {
+		full = {
+			every = { lock = 1, guard = 1, fringe = 1, pale = 1, tuft = 1, ruff = 1, palp = 1, leg = 1 },
+			shells = 0, speckleEvery = 1, pads = true, sockets = true, idle = true, highlight = true, fanBack = true, fanLayers = 5, legBands = true,
+		},
+		low = {
+			every = { lock = 0, guard = 0, fringe = 0, pale = 0, tuft = 0, ruff = 0, palp = 0, leg = 0 },
+			shells = 0, speckleEvery = 1, pads = false, sockets = false, idle = false, highlight = false, fanBack = false, fanLayers = 3, legBands = false,
+		},
+	},
+}
+
+return { default = "first_spider", profiles = { first_spider = first, maratus_volans_male = volans } }

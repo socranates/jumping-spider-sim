@@ -8,6 +8,7 @@ local Idle = require("../src/Shared/Rig/Idle")
 local Setae = require("../src/Shared/Rig/Setae")
 local SupportMath = require("../src/Shared/Movement/SupportMath")
 local SpiderRig = require("../src/Shared/Rig/SpiderRig")
+local PeacockDance = require("../src/Shared/Rig/PeacockDance")
 
 local passed, failed = 0, 0
 local function check(ok: boolean, what: string)
@@ -416,6 +417,114 @@ local w2 = snapshot(walking)
 settle(walking, 2, true, true)
 check(moved(w2, snapshot(walking)) < 0.12, "walking has no idle motion on top (head and palps still)")
 for _, r in { fullRig, lowRig, fullFloor, lowFloor, walking } do r:destroy() end
+
+-- ---------------------------------------------------------------- the peacock spider (ROBLOX-30)
+-- A second appearance drawn by the same rig: small, low, with a fan of flat discs and legs III of its own. The daughter's spider is
+-- checked above and stays the default; nothing below changes it.
+local volans = Appearances.profiles.maratus_volans_male
+check(volans ~= nil and volans.id == "maratus_volans_male" and Appearances.default == "first_spider", "the peacock spider is a second profile and the default is still the first spider")
+local PA = Anatomy.layout(volans)
+local pLength = (PA.abdomenCenter.Z + PA.abdomenRadii.Z) - (PA.faceCenter.Z - PA.faceRadii.Z)
+check(pLength >= 0.40 and pLength <= 0.50, `the peacock spider's body is about 0.45 studs long ({string.format("%.3f", pLength)}; a male is 4 to 5 mm at 1 stud = 1 cm)`)
+check(pLength < 0.55 * ((A.abdomenCenter.Z + A.abdomenRadii.Z) - (A.faceCenter.Z - A.faceRadii.Z)), "it is about half the default spider's length")
+check(volans.fuzz == nil and volans.scale == 0.47 and volans.bodyDrop > 0.15 and volans.bodyDrop < 0.30, "no fuzz at this size; it stands low (the body drops under the collider's centre)")
+local pFront = {}
+for _, e in PA.eyes do if e.principal then table.insert(pFront, e) end end
+check(#pFront == 2 and #PA.eyes == 8 and #PA.palps == 2, "still a jumping spider: two big front eyes, six smaller ones, two palps")
+check(#volans.stripes == 3 and volans.stripes.color[1] > 0.7 and volans.stripes.color[3] < 0.2, "three red-orange carapace stripes")
+check(volans.pairs[3] ~= nil and volans.pairs[3].bands == false and volans.limbs.pairReach[3] > 1, "legs III are longer, darker, unbanded")
+
+local function pRig(detail: string, parent: Instance?)
+	local folder = parent or Instance.new("Folder")
+	return SpiderRig.new(folder, folder, "maratus_volans_male", detail)
+end
+local pFull, pLow = pRig("full"), pRig("low")
+local function names(rig): { [string]: number }
+	local out: { [string]: number } = {}
+	for _, p in rig.model:GetChildren() do
+		if p:IsA("BasePart") then out[p.Name] = (out[p.Name] or 0) + 1 end
+	end
+	return out
+end
+local cf, cl = census(pFull.model:GetChildren()), census(pLow.model:GetChildren())
+print(`look: peacock spider full {cf.total} parts, low {cl.total}`)
+check(cf.total <= 130 and cf.hair == 0 and cf.shell == 0, `peacock full detail part budget ({cf.total})`)
+check(cl.total <= 80 and cl.total < cf.total * 0.75, `peacock low detail part budget ({cl.total})`)
+check(cf.bad == 0 and cl.bad == 0, "every drawn peacock part is anchored, non-colliding, not queryable and has a real size")
+local nf, nl = names(pFull), names(pLow)
+check((nf.FanFringe or 0) == 2 and (nf.FanFigure or 0) == 3 and (nf.FanFlap or 0) == 2 and (nf.FanField or 0) == 3 and (nf.FanArch or 0) == 3, "the full fan: fringe and rim on both faces, two arches and two fields in front, the figure, the flaps")
+check((nl.FanFringe or 0) == 1 and (nl.FanField or 0) == 1 and (nl.FanFigure or 0) == 3, "the low fan is front only and plainer")
+check((nf.CarapaceStripe or 0) == 3 and (nf.PaleCheek or 0) == 2 and (nf.PrincipalEye or 0) == 2 and (nf.Catchlight or 0) == 4, "stripes, the pale margin, the two front eyes with their catchlights")
+local pBad = false
+for name in nf do
+	for _, bad in FORBIDDEN do if bad ~= "Cheek" and string.find(name, bad) then pBad = true end end
+end
+check(not pBad, "no peacock part is named like a human feature")
+
+local pFloor = SpiderRig.new(floor, floor, "maratus_volans_male", "full")
+local dFloor = SpiderRig.new(floor, floor, nil, "full")
+settle(pFloor, 1); settle(dFloor, 1)
+check(pFloor.model:GetAttribute("AppearanceId") == "maratus_volans_male" and dFloor.model:GetAttribute("AppearanceId") == "first_spider", "the model says which spider it is")
+check((pFloor.root.CFrame.Position - body.Position).Magnitude < 1e-9, "the root part stays at the collider's frame")
+local abdomenY, lowest, highest = 0, math.huge, -math.huge
+for _, p in pFloor.model:GetChildren() do
+	if p:IsA("BasePart") and p.Name == "Abdomen" then abdomenY = p.CFrame.Position.Y end
+	if p:IsA("BasePart") and (string.find(p.Name, "Femur") or string.find(p.Name, "Tarsus") or p.Name == "Cephalothorax") then
+		lowest = math.min(lowest, p.CFrame.Position.Y - p.Size.Y / 2)
+	end
+end
+check(abdomenY > 0.05 and abdomenY < 0.17, `the drawn body stands low (abdomen centre {string.format("%.3f", abdomenY)} up with the collider at 0.31)`)
+local feetDown = true
+for _, leg in pFloor._legs do feetDown = feetDown and leg.planted ~= nil and math.abs(leg.planted.Y) < 1e-6 end
+check(feetDown, "all eight feet find the floor")
+local footReach = 0
+for _, leg in pFloor._legs do footReach = math.max(footReach, (leg.planted :: Vector3 - Vector3.new(0, 0, 0)).Magnitude) end
+check(footReach < 0.55, `the legs are not much longer than the body (farthest foot {string.format("%.2f", footReach)} studs from the body)`)
+
+-- The fan, folded and open: the dance pose is the only thing that moves it.
+local function fanParts(rig, name: string)
+	local out = {}
+	for _, p in rig.model:GetChildren() do
+		if p:IsA("BasePart") and p.Name == name then table.insert(out, p) end
+	end
+	return out
+end
+local foldedField = fanParts(pFloor, "FanField")[1]
+local foldedWidth = foldedField.Size.X
+local foldedAbdomen = fanParts(pFloor, "Abdomen")[1].CFrame
+local pose = PeacockDance.rawPose(5.2, false)
+check(pose.fanOpen > 0.99 and pose.legsRaise > 0.99, "(the dance pose at 5.2 s has the fan open and legs III up)")
+pFloor.dance = pose
+settle(pFloor, 0.1)
+local openField = fanParts(pFloor, "FanField")[1]
+check(openField.Size.X > foldedWidth * 1.6, `the fan widens as it opens ({string.format("%.3f", foldedWidth)} to {string.format("%.3f", openField.Size.X)} studs)`)
+local fringe = fanParts(pFloor, "FanFringe")
+local roundness = 0
+for _, f in fringe do roundness = math.max(roundness, f.Size.X / f.Size.Z) end
+check(roundness >= 1.0 and roundness <= 1.3, `the open fan is a near-round disc, a little wider than long (width to length {string.format("%.2f", roundness)})`)
+check(openField.CFrame.UpVector.Z < -0.9, "raised, the fan's face looks forward")
+local abdomenNow = fanParts(pFloor, "Abdomen")[1].CFrame
+check(abdomenNow.Position.Y > foldedAbdomen.Position.Y + 0.05, `the abdomen rises with the fan ({string.format("%.3f", abdomenNow.Position.Y - foldedAbdomen.Position.Y)} studs)`)
+local tarsusIII = fanParts(pFloor, "Tarsus3")[1].CFrame.Position.Y
+check(tarsusIII > 0.2, `legs III go up (the left foot {string.format("%.2f", tarsusIII)} studs up)`)
+check((pFloor.root.CFrame.Position - body.Position).Magnitude < 1e-9, "the dance does not move the root part")
+local planted = true
+for i, leg in pFloor._legs do planted = planted and leg.planted ~= nil and (leg.pair == 3 or (leg.planted - pFloor._legs[i].planted).Magnitude < 1e-9) end
+check(planted, "the other legs stay planted while legs III are up")
+pFloor.dance = nil
+settle(pFloor, 0.1)
+check(fanParts(pFloor, "FanField")[1].Size.X < foldedWidth * 1.05, "with no pose the fan folds again")
+-- The pose says nothing to an appearance without a fan, and slow dance steps never reach the collider.
+dFloor.dance = pose
+local before = snapshot(dFloor)
+settle(dFloor, 0.1)
+check(dFloor._fan == nil and moved(before, snapshot(dFloor)) < 0.05, "the default spider has no fan and ignores a dance pose")
+-- The spider-eye view hides the fan with the body.
+pFloor:setEyeView(true)
+local hidden = true
+for _, f in fanParts(pFloor, "FanFringe") do hidden = hidden and f.LocalTransparencyModifier == 1 end
+check(hidden, "the eye view hides the fan")
+for _, r in { pFull, pLow, pFloor, dFloor } do r:destroy() end
 
 print(`LOOK passed={passed} failed={failed}`)
 if failed > 0 then error("look checks failed") end

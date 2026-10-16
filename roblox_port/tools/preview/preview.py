@@ -6,6 +6,7 @@ anti-aliasing and the engine's own shading differ, and Roblox Studio was not use
 Usage (from roblox_port/):
   python3 tools/preview/preview.py path/to/luau path/to/godot out_dir [--prefix after_] [--detail full|low]
          [--views front_three_quarter,top,face_closeup,play_distance,side,game_camera] [--idle SECONDS] [--parts parts.json]
+         [--appearance maratus_volans_male] [--dance LOOP_SECONDS]   (the peacock spider, posed at that time of its dance loop)
 --parts renders an already-dumped part list (for example the "before" list kept next to the images) instead of running the rig."""
 import argparse, json, pathlib, re, subprocess
 HERE = pathlib.Path(__file__).resolve().parent
@@ -18,6 +19,8 @@ ap.add_argument("--detail", default="full")
 ap.add_argument("--views", default="front_three_quarter,top,face_closeup,play_distance,side,game_camera")
 ap.add_argument("--idle", type=float, default=0.0, help="seconds of standing idle before the pose is dumped")
 ap.add_argument("--parts", default="")
+ap.add_argument("--appearance", default="", help="an id from Data/Appearances (default: the default spider)")
+ap.add_argument("--dance", type=float, default=-1.0, help="pose the peacock spider at this time (s) of its dance loop; -1: no dance")
 ap.add_argument("--size", default="960x600")
 args = ap.parse_args()
 out = pathlib.Path(args.out).resolve()
@@ -40,7 +43,8 @@ def chunk(path):
 
 
 # Shared modules the rig requires, in dependency order. A module that does not exist yet (older commits) is skipped.
-LIBS = [("Appearances", "Data/Appearances.luau"), ("Anatomy", "Rig/Anatomy.luau"), ("Setae", "Rig/Setae.luau"), ("Idle", "Rig/Idle.luau")]
+LIBS = [("Appearances", "Data/Appearances.luau"), ("Anatomy", "Rig/Anatomy.luau"), ("Setae", "Rig/Setae.luau"), ("Idle", "Rig/Idle.luau"),
+        ("Peacock", "Data/Peacock.luau"), ("PeacockDance", "Rig/PeacockDance.luau")]
 libs = [(n, p) for n, p in LIBS if (SRC / p).exists()]
 
 if args.parts:
@@ -53,7 +57,7 @@ else:
     body += "\nSupportMath = " + chunk(SRC / "Movement/SupportMath.luau") + "\nSpiderRig = (function()\n" + rig + "\nend)()\n"
     body += (HERE / "driver.luau").read_text()
     src = out / "bundle.luau"
-    src.write_text(f'MODE = "orbit"\nDETAIL = "{args.detail}"\nIDLE_SECONDS = {args.idle}\n' + body)
+    src.write_text(f'MODE = "orbit"\nDETAIL = "{args.detail}"\nIDLE_SECONDS = {args.idle}\nAPPEARANCE = "{args.appearance}"\nDANCE_T = {args.dance}\n' + body)
     text = subprocess.run([args.luau, str(src)], capture_output=True, text=True, check=True).stdout
     src.unlink()
     count_line, _, json_text = text.partition("\n")
@@ -74,7 +78,17 @@ VIEWS = {
     # (CameraMath.CAMERA_DISTANCE, DEFAULT_ELEVATION_DEG, PIVOT_HEIGHT, FOV_DEG). Full-HD, because this is the scale fuzz must read at.
     "game_camera": (65, 0.0, 2.305, 4.755, 0, 0.76, 0.0),
 }
-VIEW_SIZE = {"game_camera": "1920x1080"}
+# The peacock spider is 0.45 studs long: closer cameras. p_game is the game's own camera (the same 5 studs away).
+VIEWS.update({
+    "p_front": (30, 0.30, 0.30, -0.95, 0, 0.14, 0.02),
+    "p_back": (30, -0.30, 0.42, 0.95, 0, 0.14, 0.0),
+    "p_side": (30, 1.0, 0.24, 0.05, 0, 0.14, 0.0),
+    "p_top": (30, 0.0, 1.05, 0.12, 0, 0.1, 0.0),
+    "p_face": (26, 0.22, 0.20, -0.62, 0, 0.12, -0.22),
+    "p_three": (30, -0.55, 0.38, -0.80, 0, 0.14, 0.0),
+    "p_game": (65, 0.0, 2.305, 4.755, 0, 0.76, 0.0),
+})
+VIEW_SIZE = {"game_camera": "1920x1080", "p_game": "1920x1080"}
 for name in args.views.split(","):
     v = VIEWS[name]
     png = out / f"{args.prefix}{name}.png"

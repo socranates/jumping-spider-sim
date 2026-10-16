@@ -140,6 +140,22 @@ Graphics.sun = {
 	azimuthDeg = 30, maxAzimuthDeg = 65, -- angle between straight out of the window (-Z) and the sun's heading
 	clockFrom = 7, clockTo = 17, clockStep = 0.25,
 }
+-- Day and night (ROBLOX-24, after Godot's LIFE-06). The life clock's daylight (0 night to 1 day) blends the daytime values above
+-- toward these. At full daylight everything is exactly the daytime look. The sun: Roblox puts the sun from ClockTime, so the
+-- day keeps the through-the-window clock SunPick chose, and dusk runs that morning backwards toward `nightClock`, before
+-- sunrise, so the sun sinks on the window's side and the sky goes dark with stars; dawn runs it forwards again. Night is dim
+-- and blue, never black. Every number is a first guess until it is seen in Studio.
+Graphics.dayNight = {
+	nightClock = 4.0, -- ClockTime at full night (the sun well below the horizon)
+	brightness = 0.6, -- Lighting.Brightness at night (the moon's light)
+	ambient = { 38, 42, 58 }, outdoorAmbient = { 58, 68, 98 },
+	exposureCompensation = -0.25,
+	lowSunColorShiftTop = { 255, 196, 150 }, -- the colour of a low sun; white again by daylight warmFrom (Godot: smoothstep 0 to 0.6)
+	warmFrom = 0.6,
+	atmosphereColor = { 70, 82, 112 }, atmosphereDecay = { 92, 84, 110 },
+	motesAtNight = 0.15, -- the dust motes' brightness at night (they catch the sun by day)
+	applyStep = 0.002, -- the light is set again once daylight has changed by this much (and whenever it reaches 0 or 1)
+}
 Graphics.atmosphere = { density = 0.30, offset = 0.25, color = { 199, 215, 232 }, decay = { 232, 196, 150 }, glare = 0.3, haze = 1.0 }
 Graphics.sky = { sunAngularSize = 12, moonAngularSize = 11, starCount = 3000 }
 Graphics.clouds = { cover = 0.45, density = 0.5, color = { 250, 248, 240 } }

@@ -18,7 +18,7 @@ local services = game:GetService("ContextActionService") and ClientStubs
 local frame = ClientStubs.renderSteps.SpiderSim
 local gui = game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui")
 local function frames(n: number) for _ = 1, n do frame(1 / 60) end end
-local KEYS = { Jump = "Space", Cancel = "Q", Drop = "F", Forward = "W", Back = "S", Eye = "V", Recenter = "R", Creep = "LeftShift", Reset = "Backspace" }
+local KEYS = { Feed = "E", Jump = "Space", Cancel = "Q", Drop = "F", Forward = "W", Back = "S", Eye = "V", Recenter = "R", Creep = "LeftShift", Reset = "Backspace" }
 local function key(action: string, down: boolean)
 	local fn = services.actions["Spider" .. action]
 	assert(fn, "no binding for " .. action)
@@ -42,6 +42,11 @@ check("the client loads, binds every action and runs 120 frames", function()
 	frames(120)
 	assert(gui:FindFirstChild("SpiderHud") and gui:FindFirstChild("SpiderPrompts") and gui:FindFirstChild("SpiderTouch"), "HUD missing")
 	assert(math.abs(spider().Y - 0.31) < 0.05, `spawned at {spider()}`)
+end)
+check("with no checkpoint yet, Backspace goes back to the start and says why", function()
+	key("Reset", true); frames(1); key("Reset", false); frames(2)
+	assert(string.find(find("SpiderPrompts", "Toast").Text, "No checkpoint yet", 1, true), find("SpiderPrompts", "Toast").Text)
+	assert(math.abs(spider().Y - 0.31) < 0.05, `not at the start: {spider()}`)
 end)
 check("W walks the spider along the sill", function()
 	local p0 = spider()
@@ -145,6 +150,71 @@ check("holding W at a leaf's edge walks over it and along the underside, never b
 	end
 	key("Forward", false)
 	assert(flips == 0 and under, `flips {flips}, underside {under}`)
+end)
+
+check("in the crack E rests; in the evening the spider sleeps until morning, the light and the eyes' reach follow, moving wakes", function()
+	local driver = ClientStubs.driver
+	local life, needs = driver.life, driver.needs
+	-- The server's Lit.apply is not run here: give Lighting the daytime sun it would have picked.
+	local lighting = game:GetService("Lighting")
+	lighting.ClockTime, lighting.Brightness = 9.75, 2.6
+	lighting:SetAttribute("SunPick", "ok: test")
+	assert(life and needs and driver.prey.feeding.needs == needs, "the client did not hand over one life loop and NeedsModel, shared with feeding")
+	assert(needs.lifeMode, "hunger by the hour on the windowsill")
+	driver.place(Vector3.new(-25.5, 0.31, 6.0))
+	frames(30)
+	assert(driver.lifeSpider().inRetreat, "the spider is not in the crack")
+	life.clock.hour = 12
+	frames(2)
+	assert(string.find(find("SpiderPrompts", "PromptHint").Text, "E: rest", 1, true), "no rest prompt: " .. find("SpiderPrompts", "PromptHint").Text)
+	assert(find("SpiderPrompts", "Day").Text == "Day 1, midday", find("SpiderPrompts", "Day").Text)
+	key("Feed", true); frames(2); key("Feed", false); frames(2)
+	assert(life.resting and not life.asleep, "E did not rest")
+	assert(string.find(find("SpiderPrompts", "PromptTitle").Text, "Resting", 1, true), find("SpiderPrompts", "PromptTitle").Text)
+	assert(find("SpiderPrompts", "Notice").Visible, "no notice for the rest")
+	key("Feed", true); frames(2); key("Feed", false); frames(2)
+	assert(not life.resting, "E again did not end the rest")
+	-- Evening: rest becomes sleep; the night passes quickly and ends in the morning of day 2.
+	life.clock.hour = 19.0
+	frames(2)
+	assert(string.find(find("SpiderPrompts", "PromptHint").Text, "sleep until morning", 1, true), find("SpiderPrompts", "PromptHint").Text)
+	local dayClock = 9.75
+	key("Feed", true); frames(2); key("Feed", false)
+	frames(120)
+	assert(life.asleep and life.clock.day == 1, `not asleep (hour {life.clock.hour})`)
+	assert(math.abs(driver.sensor.core.rangeScale - life.rangeScale) < 1e-12 and life.rangeScale < 1, "the sensor's reach does not follow the hour")
+	assert(lighting.ClockTime < dayClock and lighting.Brightness < 2.6, `the light did not dim at night (clock {lighting.ClockTime}, brightness {lighting.Brightness})`)
+	frames(600)
+	assert(life.clock.day == 2 and not life.asleep and life.resting and math.abs(life.clock.hour - 7) < 0.05, `no morning: day {life.clock.day}, {life.clock.hour}`)
+	assert(string.find(find("SpiderPrompts", "Notice").Text, "Morning, day 2", 1, true), find("SpiderPrompts", "Notice").Text)
+	-- Still resting after the morning: when evening comes again the rest becomes sleep by itself; walking wakes the spider.
+	life.clock.hour = 21
+	frames(30)
+	assert(life.asleep, "not asleep the second night")
+	key("Forward", true); frames(10); key("Forward", false); frames(2)
+	assert(not life.asleep and not life.resting, "walking did not wake the spider")
+	assert(string.find(life.notice, "Awake before morning", 1, true), life.notice)
+end)
+
+check("Backspace returns to the checkpoint kept by a rest, or to the start when there is none", function()
+	local driver = ClientStubs.driver
+	local life, needs, prey = driver.life, driver.needs, driver.prey
+	assert(driver.checkpoints:loadBest().ok, "the rests above kept no checkpoint")
+	-- A new rest at midday keeps a fresh checkpoint.
+	driver.place(Vector3.new(-25.5, 0.31, 6.0))
+	frames(30)
+	life.clock.hour = 12
+	key("Feed", true); frames(2); key("Feed", false); frames(2)
+	assert(life.resting and life.notice == "Checkpoint kept.", "no checkpoint: " .. life.notice)
+	local energy, hour, tick = needs.energy, life.clock.hour, prey.tick
+	-- Walk away for a while: the world moves on.
+	key("Forward", true); frames(90); key("Forward", false); frames(60)
+	assert(not life.resting and prey.tick > tick + 100, "the world did not move on")
+	key("Reset", true); frames(1); key("Reset", false); frames(2)
+	assert(driver.lifeSpider().inRetreat and life.resting, "not back resting in the crack")
+	assert(math.abs(life.clock.hour - hour) < 0.01 and prey.tick < tick + 10, `not the checkpoint's time (hour {life.clock.hour}, tick {prey.tick})`)
+	assert(needs == driver.needs and prey.feeding.needs == needs and math.abs(needs.energy - energy) < 1e-6, "the reserves did not go back")
+	assert(string.find(find("SpiderPrompts", "Notice").Text, "checkpoint recovery", 1, true), find("SpiderPrompts", "Notice").Text)
 end)
 
 

@@ -37,11 +37,11 @@ return function(check: (string,()->())->())
  check('T07 feeding waits for landing, automatic grip works and nutrition cannot be duplicated',function()
   local feed=F.new();local fly={profile=p,nutrition=.35,state='CAPTURED',captureKey='meal1'}
   feed:capture(fly);feed.auto=true
-  feed:step(.5,false,false,function()error('unexpected escape')end);assert(feed.grip==.4 and feed.energy<.55)
+  feed:step(.5,false,false,function()error('unexpected escape')end);assert(feed.grip==.4 and feed.needs.energy<=.55 and feed.needs.grantedTotal==0)
   for _=1,1500 do feed:step(1/60,true,false,function()error('unexpected escape')end) end
-  assert(fly.state=='CONSUMED' and math.abs(feed.taken-.35)<1e-6 and feed.granted<=feed.taken)
+  assert(fly.state=='CONSUMED' and math.abs(feed.taken-.35)<1e-6 and feed.granted<=feed.taken+1e-9) -- the reserve records what it actually rose by (ROBLOX-24)
   local taken=feed.taken;feed:press();for _=1,120 do feed:step(1/60,true,false,function()end) end
-  assert(feed.taken==taken and feed.ledger.meal1<=.35)
+  assert(feed.taken==taken and feed.ledger.meal1<=.35+1e-9)
  end)
  check('T07 no tapping lets a caught fly escape without a meal',function()
   local feed=F.new();local escaped=0;local fly={profile=p,nutrition=.35,state='CAPTURED',captureKey='meal2'}

@@ -155,9 +155,27 @@ function Hud.new(playerGui: Instance): any
 	-- The spider-eye view's explanation, the first time (ROBLOX-20): right under the status lines, in the column, so it never covers
 	-- the aim words or the prompts. Shown from view.caption = { text, alpha }.
 	local caption = wrapLabel("Caption", top, 15, 2)
-	local toast = wrapLabel("Toast", top, 17, 3)
-	local help = wrapLabel("Controls", top, 15, 4)
+	-- The life loop's notices ("Morning, day 2", "Checkpoint kept."), for as long as LifeLoop keeps them (ROBLOX-24).
+	local notice = wrapLabel("Notice", top, 16, 3)
+	local toast = wrapLabel("Toast", top, 17, 4)
+	local help = wrapLabel("Controls", top, 15, 5)
 	help.TextXAlignment = Enum.TextXAlignment.Left
+	-- The day, and one line for the time of day or hunger, small in the top-left corner (ROBLOX-24).
+	local dayBox = Instance.new("Frame")
+	dayBox.Name = "DayBox"
+	dayBox.BackgroundTransparency = 1
+	dayBox.Position = UDim2.fromOffset(12, 8)
+	dayBox.Size = UDim2.fromOffset(300, 0) -- a fixed width, so the wrapped line inside has one to wrap at
+	dayBox.AutomaticSize = Enum.AutomaticSize.Y
+	local dayList = Instance.new("UIListLayout")
+	dayList.HorizontalAlignment = Enum.HorizontalAlignment.Left
+	dayList.SortOrder = Enum.SortOrder.LayoutOrder
+	dayList.Padding = UDim.new(0, 4)
+	dayList.Parent = dayBox
+	dayBox.Parent = safe
+	local day = pill("Day", dayBox, 15, 1)
+	local dayLine = wrapLabel("DayLine", dayBox, 14, 2)
+	dayLine.TextXAlignment = Enum.TextXAlignment.Left
 	local panel = Instance.new("Frame")
 	panel.Name = "PromptPanel"
 	panel.BackgroundTransparency = 1
@@ -178,7 +196,7 @@ function Hud.new(playerGui: Instance): any
 	local self = setmetatable({
 		grip = grip, gripFill = gripFill, centre = centre, safe = safe, reticle = reticle, ticks = ticks,
 		aimTitle = aimTitle, aimHint = aimHint, anchorLabel = anchorLabel,
-		status = status, caption = caption, toastLabel = toast, help = help,
+		status = status, caption = caption, toastLabel = toast, help = help, notice = notice, day = day, dayLine = dayLine,
 		panel = panel, promptTitle = promptTitle, promptHint = promptHint, promptCue = promptCue,
 		toastLeft = 0, device = "keyboard", lastSpan = "",
 	}, Hud)
@@ -213,7 +231,7 @@ function Hud._place(self: any)
 end
 
 -- view: device, aiming, focus, eyeView, aimTitle, aimHint, aimColor, anchorText, anchorOk, status ({string}),
--- caption ({text, alpha} or nil), prompt ({title, hint, cue} or nil), helpVisible, helpText.
+-- caption ({text, alpha} or nil), prompt ({title, hint, cue} or nil), helpVisible, helpText, notice, day and dayLine (strings or nil).
 function Hud.update(self: any, view: any, dt: number)
 	self.grip.Visible = view.grip ~= nil
  if view.grip then self.gripFill.Size = UDim2.fromScale(math.clamp(view.grip,0,1),1) end
@@ -227,6 +245,9 @@ function Hud.update(self: any, view: any, dt: number)
 	show(self.anchorLabel, view.anchorText)
 	self.anchorLabel.TextColor3 = if view.anchorOk then OK_COLOR else WARN_COLOR
 	show(self.status, table.concat(view.status or {}, "\n"))
+	show(self.notice, view.notice)
+	show(self.day, view.day)
+	show(self.dayLine, view.dayLine)
 	local caption = view.caption
 	if caption then
 		if self.caption.Text ~= caption.text then self.caption.Text = caption.text end

@@ -25,12 +25,12 @@ Every action of the frozen Godot game (`scripts/core/input_setup.gd` and its REA
 | Slow motion | T | RT | — | Ported at 50 % for the spider (the whole world when more of it exists) |
 | Pause | Esc | Menu | Roblox menu button | Roblox's own menu (reserved by Roblox): the game drops every press and hold and waits until it closes |
 | Field notes (help) | H | View | — | Deferred (notebook not ported). H shows the port's controls card instead |
-| Eat / resume meal | E | Left-stick click (L3) | Eat | Ported for held prey; movement interrupts feeding. X remains Silk. Rest is not ported yet |
+| Eat / resume meal; rest (interact) | E | Left-stick click (L3) | Eat (Rest, Sleep, Wake or Leave in the crack) | Ported for held prey; movement interrupts feeding. X remains Silk. With nothing in the jaws, in the silk-lined crack, still: rest; from 18:00 to 07:00 sleep until morning; E or Q again, or moving, ends it (ROBLOX-24) |
 | Notebook | N | D-pad up | — | Deferred (the port's D-pad walks) |
 | Struggle grip (prepare_jump with prey) | Space or E | A or L3 | Grip or Eat | Ported; these presses grip while struggling instead of jumping |
 | Debug overlay, support view | F3, F4 | — | — | Deferred (developer views) |
 | Settings in the pause panel | Esc | Menu | — | Deferred: sensitivity/invert, FOV, camera distance, stalk/aim/Focus toggles, jump arc, jump reach, hold-to-let-go switch, frame-the-line switch, remapping, assisted-play presets. The port uses Godot's defaults (hold to let go on, framing on, arc shown) |
-| Back to the start (port only) | Backspace | View | — | Port only |
+| Return to checkpoint | Backspace | View | — | The last retreat checkpoint (ROBLOX-25), or the start when there is none yet. Godot's is in the Esc menu; the port has no menu, and touch has no button for it yet |
 | Zoom (port only) | Wheel | — | — | Port only, 2 to 12 studs |
 | Compare gait (port only) | G | — | — | Port only |
 
@@ -66,6 +66,13 @@ Full inventory, test policy, server/filtering/save requirements and proposed ord
 
 Core catch/hang/reel/lower/let-go, edge-first lowering, the capped catch camera and one control scheme are implemented; Studio and physical-device acceptance are next. Perception, flies, LIFE, wasp, notebook, menus/settings and saves remain to port. Initial publication uses solo servers (maximum players 1); that publishing setting has not been configured here. No experience was published by this build.
 
+## The day, rest and checkpoints (ROBLOX-24, ROBLOX-25; 2026-10-16)
+
+The windowsill has a day: it starts at 9:00 on day 1 and about 12 waking hours pass in 15 minutes of play (the day is in the top-left corner). Hunger runs by the hour (the reserve can run out; nothing follows yet). In the silk-lined crack at the west end, standing still with nothing in the jaws, E rests; in the evening and at night it sleeps until morning, and the night passes in about 8 seconds. The light follows the hour (`Data/Graphics.dayNight`, first guesses until seen in Studio) and the spider's eyes reach a third as far at night. Starting a rest and each morning keep a checkpoint, kept in memory for the session (no DataStore); Backspace returns to it. See `docs/HANDOFF-roblox-life.md`.
+
+- LIFE checks: `python tests/run.py path/to/luau life.luau` prints `LIFE passed=20846 failed=0`: LifeClock, NeedsModel and the rest-and-sleep loop against `tests/life_reference.json` (made by `tools/export_life_reference.gd` from the frozen Godot code: `godot --headless --path . -s roblox_port/tools/export_life_reference.gd -- roblox_port/tests/life_reference.json`, then `python3 tools/reference_to_luau.py tests/life_reference.json`), the day's light, the words and the retreat box.
+- Checkpoint checks: `python tests/run.py path/to/luau checkpoint.luau` prints `CHECKPOINT passed=123 failed=0`: a whole world on the box sill kept, run on, put back and run again exactly; refusals; the store; the DataStore stand-in.
+
 ## Flies and perception (2026-10-15)
 
-Four flies now live on the sill. Stalk, inspect, leap to catch, tap to hold on, then stay still to eat. Player attribute `AutomaticGrip = true` assists the struggle. The labeled perception fixture is only in the test place by default; `Workspace.TestTarget = true` explicitly enables it elsewhere. LIFE, the wasp, notebook and saves remain future port work. See `docs/HANDOFF-roblox-flies.md` for verification and the next chunk.
+Four flies now live on the sill. Stalk, inspect, leap to catch, tap to hold on, then stay still to eat. Player attribute `AutomaticGrip = true` assists the struggle. The labeled perception fixture is only in the test place by default; `Workspace.TestTarget = true` explicitly enables it elsewhere. The wasp, notebook, growth, death and DataStore saves remain future port work. See `docs/HANDOFF-roblox-flies.md` for verification and the next chunk.

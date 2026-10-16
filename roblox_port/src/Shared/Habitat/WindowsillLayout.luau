@@ -31,6 +31,11 @@ Layout.PLAY_BOUNDS_MIN = Vector3.new(-33, -5, -16)
 Layout.PLAY_BOUNDS_MAX = Vector3.new(33, 35, 16)
 Layout.RETREAT_MIN = Vector3.new(-27.8, 0.0, 3.0)
 Layout.RETREAT_MAX = Vector3.new(-23.3, 1.5, 9.0)
+-- Whether a point is inside the silk-lined crack (Godot's windowsill.gd in_retreat: the box, edges included).
+function Layout.inRetreat(p: Vector3): boolean
+	local lo, hi = Layout.RETREAT_MIN, Layout.RETREAT_MAX
+	return p.X >= lo.X and p.X <= hi.X and p.Y >= lo.Y and p.Y <= hi.Y and p.Z >= lo.Z and p.Z <= hi.Z
+end
 
 local function v(x: number, y: number, z: number): Vector3
 	return Vector3.new(x, y, z)

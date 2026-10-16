@@ -1198,3 +1198,25 @@ Branch claude/roblox-aesthetics from origin/main d910d1e (bundle claude-playtest
 ## 2026-10-15 — Chet: native aesthetics acceptance
 
 Imported Claude 771324f; Windows 7,801 CLI checks, strict clean, 100/100 compile. Fixed native effect float32 assertion and the Glass pane hiding UV petals; transparent SmoothPlastic keeps the pane's tint/reflection. Affected WORLD/EYES rerun 230/231 pass. Final evidence ab5e92132d90a1da: 69/69 Studio, 11/11 live-client; six-fly p95 frame 18.15 ms, sensor 526 us. Staged native flower before/after, eye views and restored third person captured. No physical devices; F01 remains open. Next Claude: LIFE and in-memory retreat checkpoints with explicit lighting ownership. See HANDOFF-roblox-aesthetics.md and verification/roblox-aesthetics-windows/.
+
+## Roblox LIFE round 1 and retreat checkpoints (Claude, 2026-10-16)
+
+Branch claude/roblox-life on main b5e78c9. Scope: HANDOFF-roblox-flies.md's next chunk (LIFE clock, day/night and range_scale; NeedsModel; S01-C checkpoints in memory).
+
+### Changed files
+
+Created: `roblox_port/src/Shared/Life/{LifeClock,NeedsModel,LifeLoop}.luau`, `src/Shared/Habitat/DayLight.luau`, `src/Shared/UI/LifeText.luau`, `src/Shared/Persistence/{Json,ObjectRecord,Checkpoint,CheckpointStore}.luau`, `tools/export_life_reference.gd`, `tests/life_reference.{json,luau}`, `tests/life.luau`, `tests/checkpoint.luau`, `tests/studio/LifeSpec.luau`, `docs/HANDOFF-roblox-life.md`, `docs/verification/roblox-life/`.
+Edited: `src/Client/SpiderClient.client.luau` (life loop in the tick, the light, the HUD view, checkpoints, Backspace), `src/Client/SpiderHud.luau` (day pill and line, notice), `src/Shared/Prey/Feeding.luau` (NeedsModel), `src/Shared/Data/Graphics.luau` (`dayNight`), `src/Shared/Habitat/WindowsillLayout.luau` (`inRetreat`), `src/Shared/UI/ControlText.luau` (help card), `tests/run.py`, `tests/client_smoke.luau`, `tests/studio/{PreySpec,Runner.server}.luau`, `tests/client/SilkPlayback.luau`, both places, `docs/DECISIONS.md` (ROBLOX-24, ROBLOX-25), `docs/ROBLOX_PORT.md`, `roblox_port/README.md`.
+
+### Verification
+
+Linux: 28,773 CLI checks pass (LIFE 20,846 and CHECKPOINT 123 new; CLIENT 14), strict 0 diagnostics, 108/108 compile, evidence 68090eafdba72ba0. Studio, Windows and devices: not run.
+
+### Unresolved
+
+The night look's numbers are unseen; HttpService JSON exactness unchecked (LifeSpec); touch has no return-to-checkpoint button; death/growth/wasp not ported.
+
+### Next
+
+Chet: Windows CLI, Studio suite and playback, the night look and frame time, then merge. Then Claude: the wasp director or LIFE round 5.
+

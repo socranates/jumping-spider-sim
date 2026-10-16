@@ -740,6 +740,22 @@ Graphics.sun = {
 	azimuthDeg = 30, maxAzimuthDeg = 65, -- angle between straight out of the window (-Z) and the sun's heading
 	clockFrom = 7, clockTo = 17, clockStep = 0.25,
 }
+-- Day and night (ROBLOX-24, after Godot's LIFE-06). The life clock's daylight (0 night to 1 day) blends the daytime values above
+-- toward these. At full daylight everything is exactly the daytime look. The sun: Roblox puts the sun from ClockTime, so the
+-- day keeps the through-the-window clock SunPick chose, and dusk runs that morning backwards toward `nightClock`, before
+-- sunrise, so the sun sinks on the window's side and the sky goes dark with stars; dawn runs it forwards again. Night is dim
+-- and blue, never black. Every number is a first guess until it is seen in Studio.
+Graphics.dayNight = {
+	nightClock = 4.0, -- ClockTime at full night (the sun well below the horizon)
+	brightness = 0.6, -- Lighting.Brightness at night (the moon's light)
+	ambient = { 38, 42, 58 }, outdoorAmbient = { 58, 68, 98 },
+	exposureCompensation = -0.25,
+	lowSunColorShiftTop = { 255, 196, 150 }, -- the colour of a low sun; white again by daylight warmFrom (Godot: smoothstep 0 to 0.6)
+	warmFrom = 0.6,
+	atmosphereColor = { 70, 82, 112 }, atmosphereDecay = { 92, 84, 110 },
+	motesAtNight = 0.15, -- the dust motes' brightness at night (they catch the sun by day)
+	applyStep = 0.002, -- the light is set again once daylight has changed by this much (and whenever it reaches 0 or 1)
+}
 Graphics.atmosphere = { density = 0.30, offset = 0.25, color = { 199, 215, 232 }, decay = { 232, 196, 150 }, glare = 0.3, haze = 1.0 }
 Graphics.sky = { sunAngularSize = 12, moonAngularSize = 11, starCount = 3000 }
 Graphics.clouds = { cover = 0.45, density = 0.5, color = { 250, 248, 240 } }
@@ -1154,6 +1170,118 @@ return Wear
         </Properties>
         <Item class="ModuleScript" referent="16">
           <Properties>
+            <string name="Name">DayLight</string>
+            <string name="Source"><![CDATA[--!strict
+-- The light of the hour on the sill (ROBLOX-24, after Godot's LIFE-06 set_daylight): the life clock's daylight, 0 (night) to 1
+-- (day), blends the daytime lighting of Data/Graphics toward Graphics.dayNight. Pure apart from `apply`, so tests/life.luau
+-- checks it without an engine.
+--   * Full daylight is exactly the daytime look (Lit.apply's values, and SunPick's through-the-window clock).
+--   * The sun: dusk runs the picked morning backwards toward dayNight.nightClock (before sunrise), so the sun sinks on the
+--     window's side and the sky turns to night; dawn runs it forwards again.
+--   * The room's light, the haze, the sun rays, the light shafts and the dust motes dim with it; a low sun is warmer
+--     (Godot: the sun's colour whitens by daylight 0.6).
+-- The light is only what the screen shows. How far the spider sees comes from the clock (LifeLoop.rangeScale), never from here.
+-- It owns: Lighting's ClockTime, Brightness, Ambient, OutdoorAmbient, ColorShift_Top and ExposureCompensation; the Atmosphere's
+-- Color and Decay; SunRays.Intensity; the Shafts beams' Brightness and Enabled; the Motes' Brightness. Never the eye view's
+-- effects (EyeGrade, EyeBlur, MacroDOF: SpiderEyes) or the world's Grade.
+local Graphics = require(script.Parent.Parent.Data.Graphics)
+
+local DayLight = {}
+
+export type Targets = {
+	daylight: number, clock: number, brightness: number, exposure: number,
+	ambient: { number }, outdoorAmbient: { number }, colorShiftTop: { number },
+	atmosphereColor: { number }, atmosphereDecay: { number },
+	sunRays: number, shafts: number, motes: number,
+}
+
+local function mix(night: number, day: number, t: number): number
+	if t >= 1 then return day end
+	if t <= 0 then return night end
+	return night + (day - night) * t
+end
+
+local function mixRgb(night: { number }, day: { number }, t: number): { number }
+	return { mix(night[1], day[1], t), mix(night[2], day[2], t), mix(night[3], day[3], t) }
+end
+
+local function smoothstep(from: number, to: number, x: number): number
+	local s = math.clamp((x - from) / (to - from), 0, 1)
+	return s * s * (3 - 2 * s)
+end
+
+-- What every light should be at `daylight` (clamped to [0, 1]). `dayClock` is the ClockTime of the day (SunPick's choice).
+function DayLight.targets(daylight: number, dayClock: number): Targets
+	local d = math.clamp(if daylight == daylight then daylight else 1, 0, 1)
+	local L, N, A = Graphics.lighting, Graphics.dayNight, Graphics.atmosphere
+	return {
+		daylight = d,
+		clock = mix(N.nightClock, dayClock, d),
+		brightness = mix(N.brightness, L.brightness, d),
+		exposure = mix(N.exposureCompensation, L.exposureCompensation, d),
+		ambient = mixRgb(N.ambient, L.ambient, d),
+		outdoorAmbient = mixRgb(N.outdoorAmbient, L.outdoorAmbient, d),
+		colorShiftTop = mixRgb(N.lowSunColorShiftTop, L.colorShiftTop, smoothstep(0, N.warmFrom, d)),
+		atmosphereColor = mixRgb(N.atmosphereColor, A.color, d),
+		atmosphereDecay = mixRgb(N.atmosphereDecay, A.decay, d),
+		sunRays = Graphics.sunRays.intensity * d,
+		shafts = d,
+		motes = mix(N.motesAtNight, 1, d),
+	}
+end
+
+-- Whether the light needs setting again: it changed by applyStep, or it reached night or day.
+function DayLight.due(last: number?, daylight: number): boolean
+	if last == nil then return true end
+	if daylight ~= last and (daylight <= 0 or daylight >= 1) then return true end
+	return math.abs(daylight - last) >= Graphics.dayNight.applyStep
+end
+
+local function rgb(t: { number }): Color3
+	return Color3.fromRGB(math.floor(t[1] + 0.5), math.floor(t[2] + 0.5), math.floor(t[3] + 0.5))
+end
+
+-- Sets the lights. `decor` is Workspace.Decor (for the shafts and the motes), when it exists. Anything missing (the low tier
+-- has no sun rays or shafts) is skipped.
+function DayLight.apply(lighting: any, t: Targets, decor: Instance?)
+	lighting.ClockTime = t.clock
+	lighting.Brightness = t.brightness
+	lighting.ExposureCompensation = t.exposure
+	lighting.Ambient = rgb(t.ambient)
+	lighting.OutdoorAmbient = rgb(t.outdoorAmbient)
+	lighting.ColorShift_Top = rgb(t.colorShiftTop)
+	local atmosphere = lighting:FindFirstChild("Atmosphere")
+	if atmosphere and atmosphere:IsA("Atmosphere") then
+		atmosphere.Color = rgb(t.atmosphereColor)
+		atmosphere.Decay = rgb(t.atmosphereDecay)
+	end
+	local rays = lighting:FindFirstChild("SunRays")
+	if rays and rays:IsA("SunRaysEffect") then
+		rays.Intensity = t.sunRays
+	end
+	if decor then
+		local shafts = decor:FindFirstChild("Shafts")
+		if shafts then
+			for _, b in shafts:GetDescendants() do
+				if b:IsA("Beam") then
+					b.Brightness = t.shafts
+					b.Enabled = t.shafts > 0.01
+				end
+			end
+		end
+		local motes = decor:FindFirstChild("Motes", true)
+		if motes and motes:IsA("ParticleEmitter") then
+			motes.Brightness = t.motes
+		end
+	end
+end
+
+return DayLight
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="17">
+          <Properties>
             <string name="Name">Lit</string>
             <string name="Source"><![CDATA[--!strict
 -- The lighting, sky and screen effects (Data/Graphics): a soft warm sun picked by SunPick so that it shines in through the
@@ -1283,7 +1411,7 @@ return Lit
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="17">
+        <Item class="ModuleScript" referent="18">
           <Properties>
             <string name="Name">Materials</string>
             <string name="Source"><![CDATA[--!strict
@@ -1321,7 +1449,7 @@ return Materials
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="18">
+        <Item class="ModuleScript" referent="19">
           <Properties>
             <string name="Name">Patina</string>
             <string name="Source"><![CDATA[--!strict
@@ -1438,7 +1566,7 @@ return Patina
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="19">
+        <Item class="ModuleScript" referent="20">
           <Properties>
             <string name="Name">Plants</string>
             <string name="Source"><![CDATA[--!strict
@@ -1810,7 +1938,7 @@ return Plants
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="20">
+        <Item class="ModuleScript" referent="21">
           <Properties>
             <string name="Name">Scenery</string>
             <string name="Source"><![CDATA[--!strict
@@ -2141,7 +2269,7 @@ return Scenery
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="21">
+        <Item class="ModuleScript" referent="22">
           <Properties>
             <string name="Name">Shapes</string>
             <string name="Source"><![CDATA[--!strict
@@ -2275,7 +2403,7 @@ return Shapes
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="22">
+        <Item class="ModuleScript" referent="23">
           <Properties>
             <string name="Name">SunPick</string>
             <string name="Source"><![CDATA[--!strict
@@ -2349,7 +2477,7 @@ return SunPick
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="23">
+        <Item class="ModuleScript" referent="24">
           <Properties>
             <string name="Name">TestTarget</string>
             <string name="Source"><![CDATA[--!strict
@@ -2387,7 +2515,7 @@ return Target
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="24">
+        <Item class="ModuleScript" referent="25">
           <Properties>
             <string name="Name">WindowsillLayout</string>
             <string name="Source"><![CDATA[--!strict
@@ -2423,6 +2551,11 @@ Layout.PLAY_BOUNDS_MIN = Vector3.new(-33, -5, -16)
 Layout.PLAY_BOUNDS_MAX = Vector3.new(33, 35, 16)
 Layout.RETREAT_MIN = Vector3.new(-27.8, 0.0, 3.0)
 Layout.RETREAT_MAX = Vector3.new(-23.3, 1.5, 9.0)
+-- Whether a point is inside the silk-lined crack (Godot's windowsill.gd in_retreat: the box, edges included).
+function Layout.inRetreat(p: Vector3): boolean
+	local lo, hi = Layout.RETREAT_MIN, Layout.RETREAT_MAX
+	return p.X >= lo.X and p.X <= hi.X and p.Y >= lo.Y and p.Y <= hi.Y and p.Z >= lo.Z and p.Z <= hi.Z
+end
 
 local function v(x: number, y: number, z: number): Vector3
 	return Vector3.new(x, y, z)
@@ -2465,11 +2598,712 @@ return table.freeze(Layout)
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="25">
+      <Item class="Folder" referent="26">
+        <Properties>
+          <string name="Name">Life</string>
+        </Properties>
+        <Item class="ModuleScript" referent="27">
+          <Properties>
+            <string name="Name">LifeClock</string>
+            <string name="Source"><![CDATA[--!strict
+-- The life clock: a port of the frozen scripts/life/life_clock.gd (LIFE-04). The windowsill's time of day and the spider's
+-- age in days. It is one of three separate clocks: the fixed action tick (SpiderMotor.DT) is unchanged by it, so a jump is
+-- never shortened when the day goes faster, and slow motion slows it with everything else because it is only ever advanced
+-- by action time. While the spider is active the day passes slowly (ACTIVE_HOURS_PER_S game hours for each second of action
+-- time); while it sleeps in its retreat at night the hours pass quickly (SLEEP_HOURS_PER_S), never more than one call's
+-- worth at a time, until morning or until the sleep ends. It moves only when it is told to (LifeLoop, each fixed tick), so
+-- the Roblox menu, which stops the ticks, never passes time.
+-- Time is compressed on purpose. A real Phidippus audax lives about a year; one life here is meant to take a few hours to
+-- play (LIFE-03: about 2 to 3 hours over roughly 10 game days).
+-- Checked against Godot's own values in tests/life_reference.json (tools/export_life_reference.gd).
+
+local LifeClock = {}
+LifeClock.__index = LifeClock
+
+-- The day: the spider wakes at WAKE_H, the light goes at DUSK_H and it is fully dark from NIGHT_H until DAWN_H.
+LifeClock.WAKE_H = 7.0
+LifeClock.DAWN_H = 6.0
+LifeClock.DUSK_H = 19.0
+LifeClock.NIGHT_H = 20.5
+-- From this hour a rest in the retreat sleeps until morning (Phidippus goes into its nest before dark).
+LifeClock.EVENING_H = 18.0
+LifeClock.START_DAY = 1
+LifeClock.START_H = 9.0
+-- About 12 waking hours in about 15 minutes of play.
+LifeClock.ACTIVE_HOURS_PER_S = 12.0 / (15.0 * 60.0)
+-- A night of sleep (about 11 hours) in about 8 seconds.
+LifeClock.SLEEP_HOURS_PER_S = 1.4
+
+export type Record = { day: number, hour: number, sleeping: boolean }
+
+local function finite(x: number): boolean
+	return x == x and x ~= math.huge and x ~= -math.huge
+end
+
+-- Godot's fposmod: the remainder with the sign of the divisor.
+local function fposmod(x: number, y: number): number
+	local v = math.fmod(x, y)
+	if (v < 0 and y > 0) or (v > 0 and y < 0) then
+		v += y
+	end
+	return v
+end
+
+-- Godot's smoothstep (0 below `from`, 1 above `to`, the cubic in between).
+local function smoothstep(from: number, to: number, x: number): number
+	if from == to then
+		return if x < from then 0 else 1
+	end
+	local s = math.clamp((x - from) / (to - from), 0, 1)
+	return s * s * (3.0 - 2.0 * s)
+end
+LifeClock.smoothstep = smoothstep
+
+function LifeClock.new(): any
+	return setmetatable({ day = LifeClock.START_DAY, hour = LifeClock.START_H, sleeping = false }, LifeClock)
+end
+
+function LifeClock._addHours(self: any, hours: number)
+	self.hour += hours
+	while self.hour >= 24.0 do
+		self.hour -= 24.0
+		self.day += 1
+	end
+end
+
+-- Lets `seconds` of action time pass. Asleep, the hours run at the sleeping rate, and a sleep that reaches the morning ends
+-- there. Returns the game hours that passed.
+function LifeClock.advance(self: any, seconds: number, asleep: boolean): number
+	if not finite(seconds) or seconds <= 0.0 then
+		return 0.0
+	end
+	local rate = if asleep then LifeClock.SLEEP_HOURS_PER_S else LifeClock.ACTIVE_HOURS_PER_S
+	local hours = seconds * rate
+	if asleep then
+		local toMorning = self:hoursUntil(LifeClock.WAKE_H)
+		if toMorning <= hours then
+			hours = toMorning
+			self.sleeping = false
+		else
+			self.sleeping = true
+		end
+	else
+		self.sleeping = false
+	end
+	self:_addHours(hours)
+	return hours
+end
+
+-- A moult passing: the hours run at the sleeping rate and do not stop at morning. Returns the hours that passed. (Moulting
+-- itself is not ported yet; the clock keeps Godot's whole interface.)
+function LifeClock.advanceMoult(self: any, seconds: number): number
+	if not finite(seconds) or seconds <= 0.0 then
+		return 0.0
+	end
+	self.sleeping = false
+	local hours = seconds * LifeClock.SLEEP_HOURS_PER_S
+	self:_addHours(hours)
+	return hours
+end
+
+-- Hours from now until the clock next shows `target` (0 when it shows it now).
+function LifeClock.hoursUntil(self: any, target: number): number
+	return fposmod(target - self.hour, 24.0)
+end
+
+-- Whether a rest now would be a night's sleep: the evening, the night, or the early morning before waking.
+function LifeClock.isSleepTime(self: any): boolean
+	return self.hour >= LifeClock.EVENING_H or self.hour < LifeClock.WAKE_H
+end
+
+-- How much daylight there is, 0 (night) to 1 (full day), easing through dawn and dusk.
+function LifeClock.daylightAt(hour: number): number
+	local W, D, N, A = LifeClock.WAKE_H, LifeClock.DUSK_H, LifeClock.NIGHT_H, LifeClock.DAWN_H
+	if hour >= W + 1.0 and hour <= D then
+		return 1.0
+	end
+	if hour > D and hour < N then
+		return 1.0 - smoothstep(D, N, hour)
+	end
+	if hour >= A and hour < W + 1.0 then
+		return smoothstep(A, W + 1.0, hour)
+	end
+	return 0.0
+end
+
+function LifeClock.daylight(self: any): number
+	return LifeClock.daylightAt(self.hour)
+end
+
+-- Words for the time of day, for the screen.
+function LifeClock.partOfDay(self: any): string
+	local h = self.hour
+	if h >= 5.0 and h < 10.0 then return "morning" end
+	if h >= 10.0 and h < 14.0 then return "midday" end
+	if h >= 14.0 and h < 18.0 then return "afternoon" end
+	if h >= 18.0 and h < 20.5 then return "evening" end
+	return "night"
+end
+
+function LifeClock.toRecord(self: any): Record
+	return { day = self.day, hour = self.hour, sleeping = self.sleeping }
+end
+
+-- What is wrong with a record, in Godot's words (an empty list for a good one).
+function LifeClock.problems(d: any): { string }
+	local e: { string } = {}
+	if type(d) ~= "table" then
+		table.insert(e, "life: not a record")
+		return e
+	end
+	local dv = d.day
+	if not (type(dv) == "number" and finite(dv) and dv == math.floor(dv)) or dv < 1 then
+		table.insert(e, "life: the day is not a whole number from 1")
+	end
+	local hv = d.hour
+	if type(hv) ~= "number" or not finite(hv) or hv < 0.0 or hv >= 24.0 then
+		table.insert(e, "life: the hour is not in [0, 24)")
+	end
+	if type(d.sleeping) ~= "boolean" then
+		table.insert(e, "life: 'sleeping' is not true or false")
+	end
+	return e
+end
+
+-- Restores a record made by toRecord. False, and nothing changed, for anything that is not one.
+function LifeClock.load(self: any, d: any): boolean
+	if #LifeClock.problems(d) > 0 then
+		return false
+	end
+	self.day = d.day
+	self.hour = d.hour
+	self.sleeping = d.sleeping
+	return true
+end
+
+return LifeClock
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="28">
+          <Properties>
+            <string name="Name">LifeLoop</string>
+            <string name="Source"><![CDATA[--!strict
+-- LifeLoop: the rest, sleep and day of the frozen scripts/habitat/habitat_loop.gd (T08, LIFE-04 to LIFE-06), without the
+-- world. The client gives it, once a fixed tick and after the spider and its meal have moved, what it needs to know about the
+-- spider (in the crack, on a surface, still, holding or eating prey) and the presses of the feed and cancel buttons; it keeps
+-- the life clock and the rest, tells the NeedsModel how many game hours passed, says how much daylight there is and how far
+-- the eyes reach in it, and asks for the retreat checkpoint when a rest begins and when a night's sleep reaches the morning.
+--
+-- * Resting: in the silk-lined crack, on a surface, keeping still, holding no prey, E rests (Godot's interact). E or Q again,
+--   moving, or anything that makes resting impossible ends it.
+-- * Sleeping: a rest in the evening or at night (18:00 to 07:00) sleeps until morning: the hours pass at the sleeping rate,
+--   never more than one tick's worth at a time. Moving wakes the spider ("Awake before morning"). The morning ("Morning, day
+--   N") keeps a new checkpoint. A rest by day passes no extra time.
+-- * Light: daylight 0 to 1 from the hour; the eyes reach NIGHT_SIGHT of their range in the dark (LIFE-06). The reach comes
+--   from the clock, never from the lighting on the screen.
+--
+-- Not ported (later rounds of Godot's loop): growth and moulting (round 3), the wasp (round 4), weakness and starving to death
+-- (round 5: it needs the death and continuing rules), the passing shadow (T08's telegraphed disturbance) and the notebook.
+-- Checked tick by tick against Godot's own loop in tests/life_reference.json (tools/export_life_reference.gd).
+
+local LifeClock = require(script.Parent.LifeClock)
+
+local LifeLoop = {}
+LifeLoop.__index = LifeLoop
+
+-- The sensor's reach at night, as a share of its daytime reach (jumping spiders hunt by sight, in daylight).
+LifeLoop.NIGHT_SIGHT = 0.3
+-- How long a notice stays on the screen.
+LifeLoop.NOTICE_S = 6.0
+-- After a checkpoint is restored the spider takes a moment to take hold of its surface again; the restored rest is not ended
+-- meanwhile.
+LifeLoop.RESTORE_GRACE_TICKS = 30
+-- Rest restored per second of resting.
+LifeLoop.REST_PER_S = 0.10
+LifeLoop.HUNGRY_AT = 0.25
+
+-- What the loop needs to know about the spider this tick.
+export type Spider = {
+	inRetreat: boolean, -- inside the silk-lined crack
+	attached: boolean, -- on a surface (not in the air, not on the line)
+	still: boolean, -- not walking or sliding (Godot: intent under 0.01, speed under 0.15)
+	holding: boolean, -- holds prey (caught, struggling or being eaten)
+	feeding: boolean, -- eating right now
+}
+export type CheckpointResult = { ok: boolean, message: string }
+export type Event = { kind: string, day: number? }
+
+-- `needs` is the NeedsModel whose hours this loop reports; `save` keeps the retreat checkpoint (nil: none is kept).
+function LifeLoop.new(needs: any, save: (() -> CheckpointResult)?): any
+	local self = setmetatable({
+		clock = LifeClock.new(), needs = needs, save = save,
+		resting = false, restSeconds = 0.0, asleep = false, elapsed = 0.0,
+		checkpointDue = false, checkpointResult = nil :: CheckpointResult?, checkpoints = 0,
+		notice = "", noticeSeconds = 0.0, morningText = "",
+		restoreGrace = 0, events = {} :: { Event },
+		daylight = 1.0, rangeScale = 1.0,
+	}, LifeLoop)
+	self:applyLight()
+	return self
+end
+
+function LifeLoop.canRest(_self: any, s: Spider): boolean
+	return s.inRetreat and not s.holding and not s.feeding and s.attached and s.still
+end
+
+function LifeLoop.showNotice(self: any, text: string)
+	self.notice = text
+	self.noticeSeconds = LifeLoop.NOTICE_S
+end
+
+function LifeLoop._emit(self: any, kind: string, day: number?)
+	table.insert(self.events, { kind = kind, day = day })
+end
+
+-- The events since the last call: rest_started, rest_ended, slept, woke (with the day), checkpoint.
+function LifeLoop.drainEvents(self: any): { Event }
+	local e = self.events
+	self.events = {}
+	return e
+end
+
+function LifeLoop.requestRest(self: any, s: Spider): boolean
+	if not self:canRest(s) then
+		return false
+	end
+	self.resting = true
+	self.checkpointDue = true
+	self:_emit("rest_started")
+	return true
+end
+
+function LifeLoop.stopRest(self: any)
+	if self.resting then
+		self.resting = false
+		self:_emit("rest_ended")
+	end
+end
+
+-- The light of the hour, and how far the spider's eyes reach in it.
+function LifeLoop.applyLight(self: any)
+	self.daylight = self.clock:daylight()
+	self.rangeScale = LifeLoop.NIGHT_SIGHT + (1.0 - LifeLoop.NIGHT_SIGHT) * self.daylight
+end
+
+function LifeLoop._stepLife(self: any, dt: number)
+	local wasAsleep = self.asleep
+	self.asleep = self.resting and (self.clock.sleeping or self.clock:isSleepTime())
+	local hours = self.clock:advance(dt, self.asleep)
+	if self.asleep and not self.clock.sleeping then
+		-- The morning came during this tick: awake, still resting in the crack. The new day keeps a checkpoint.
+		self.asleep = false
+		self.checkpointDue = true
+		self.morningText = `Morning, day {self.clock.day}. Rested through the night in the crack.`
+		self:showNotice(self.morningText)
+		self:_emit("woke", self.clock.day)
+	elseif wasAsleep and not self.asleep then
+		self:showNotice(`Awake before morning: it is still {self.clock:partOfDay()}.`)
+	end
+	if self.asleep and not wasAsleep then
+		self:_emit("slept")
+	end
+	self.needs:addHours(hours, self.asleep)
+	self:applyLight()
+end
+
+-- One fixed tick, after the spider and its meal have moved. `feedPressed` and `cancelPressed` are this tick's fresh presses.
+function LifeLoop.step(self: any, dt: number, s: Spider, feedPressed: boolean, cancelPressed: boolean)
+	self.elapsed += dt
+	if self.restoreGrace > 0 then
+		self.restoreGrace = if s.attached then 0 else self.restoreGrace - 1
+	end
+	if self.resting and (cancelPressed or feedPressed or (self.restoreGrace == 0 and not self:canRest(s))) then
+		self:stopRest()
+	elseif feedPressed and not s.holding and not s.feeding then
+		self:requestRest(s)
+	end
+	if self.resting then
+		self.restSeconds += dt
+		self.needs:restoreRest(dt * LifeLoop.REST_PER_S)
+	end
+	self:_stepLife(dt)
+	if self.noticeSeconds > 0.0 then
+		self.noticeSeconds = math.max(0.0, self.noticeSeconds - dt)
+	end
+	if self.checkpointDue then
+		self.checkpointDue = false
+		if self.resting then
+			self:makeCheckpoint()
+		end
+	end
+end
+
+-- The retreat checkpoint, now (the end of a tick).
+function LifeLoop.makeCheckpoint(self: any): CheckpointResult
+	local result: CheckpointResult = if self.save then self.save() else { ok = false, message = "no checkpoint store" }
+	self.checkpointResult = result
+	if result.ok then
+		self.checkpoints += 1
+		self:showNotice(result.message)
+	else
+		self:showNotice("Resting, but the checkpoint was not kept: " .. result.message)
+	end
+	if self.morningText ~= "" then
+		self:showNotice(self.morningText .. "\n" .. self.notice)
+		self.morningText = ""
+	end
+	self:_emit("checkpoint")
+	return result
+end
+
+-- The loop's part of a checkpoint (Godot's habitat record, with the clock beside it as its "life" field).
+function LifeLoop.toRecord(self: any): { [string]: any }
+	return {
+		retreat_id = "sill_crevice", resting = self.resting, rest_seconds = self.restSeconds, elapsed = self.elapsed,
+		life = self.clock:toRecord(),
+	}
+end
+
+function LifeLoop.problems(r: any): { string }
+	local e: { string } = {}
+	if type(r) ~= "table" then
+		table.insert(e, "habitat: not a record")
+		return e
+	end
+	if r.retreat_id ~= "sill_crevice" then table.insert(e, "habitat: not this windowsill's retreat") end
+	if type(r.resting) ~= "boolean" then table.insert(e, "habitat: 'resting' is not true or false") end
+	for _, k in { "rest_seconds", "elapsed" } do
+		local v = r[k]
+		if type(v) ~= "number" or v ~= v or v < 0 or v == math.huge then table.insert(e, `habitat: '{k}' is not a time`) end
+	end
+	for _, p in LifeClock.problems(r.life) do
+		table.insert(e, p)
+	end
+	return e
+end
+
+-- Restores a record made by toRecord (validated first; false and nothing changed if it is not one). The rest that was going on
+-- goes on; no new checkpoint is owed for it.
+function LifeLoop.load(self: any, r: any): boolean
+	if #LifeLoop.problems(r) > 0 then
+		return false
+	end
+	self.clock:load(r.life)
+	self.resting = r.resting
+	self.restSeconds = r.rest_seconds
+	self.elapsed = r.elapsed
+	self.asleep = false
+	self.checkpointDue = false
+	self.morningText = ""
+	self.restoreGrace = LifeLoop.RESTORE_GRACE_TICKS
+	self:applyLight()
+	self:showNotice("Returned to the checkpoint: the sill as it was when you rested in the crack. This is checkpoint recovery, not an exact resume.")
+	return true
+end
+
+return LifeLoop
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="29">
+          <Properties>
+            <string name="Name">NeedsModel</string>
+            <string name="Source"><![CDATA[--!strict
+-- NeedsModel: a port of the frozen scripts/needs/needs_model.gd (spec 11, 19.3, 21.3 NeedState; LIFE-05). The spider's
+-- reserves, and the only place they change. It simulates ENERGY and REST and nothing else (hydration, stress and condition are
+-- named placeholders in the record). The numbers change only through approved calls: time passing (advance, addHours) and food
+-- (grantEnergy). It never reads the world, never decides that anything is eaten, and does not know what a fly is: Feeding asks
+-- it to grant and says which source the energy came from, so its ledger shows that no source ever gave more than it had.
+--
+-- Two modes (explicit, set by whoever builds it; ROBLOX-24):
+--   * sandbox (lifeMode false; Godot's lab and tests that build a model alone): energy drains very slowly with action time and
+--     stops at ENERGY_FLOOR. Nothing happens at the floor.
+--   * life (lifeMode true; the windowsill, where the life clock runs): energy drains with the game hours LifeLoop reports,
+--     faster awake than asleep, and has no floor. It can run out; the hours at zero are counted (starvingHours, and the streak
+--     since the last meal). Nothing follows from them in this port yet: starvation (LIFE round 5) needs the death and
+--     continuing rules, which are not ported.
+--   * gentle (with lifeMode; Godot's Easy and free play) drains at GENTLE_DRAIN of the rate and never falls below GENTLE_FLOOR.
+-- Both drains are integrated at the 2 Hz update (spec 20) over the action time that actually passed, at most MAX_STEP_S a
+-- call, so the same time drains the same energy at any frame rate and a stall cannot drain more than a capped step.
+-- Rest is a second reserve with no consequence yet: it wears down while the spider is active and builds back while it keeps
+-- still, and the retreat restores it.
+-- Checked against Godot's own values in tests/life_reference.json (tools/export_life_reference.gd).
+
+local NeedsModel = {}
+NeedsModel.__index = NeedsModel
+
+NeedsModel.ENERGY_MAX = 1.0
+NeedsModel.ENERGY_START = 0.55
+NeedsModel.ENERGY_DRAIN_PER_S = 0.0006
+NeedsModel.ENERGY_FLOOR = 0.20
+NeedsModel.REST_MAX = 1.0
+NeedsModel.REST_START = 1.0
+NeedsModel.REST_DRAIN_PER_S = 0.0012
+NeedsModel.REST_RECOVER_PER_S = 0.004
+NeedsModel.UPDATE_PERIOD_S = 0.5
+NeedsModel.MAX_STEP_S = 0.25
+NeedsModel.FULL_AT = 0.98
+-- Life mode: a full reserve lasts about three game days without food, and one fly (0.35) feeds the spider for about a day.
+-- A real Phidippus goes much longer without food; the game compresses time on purpose (LIFE-05).
+NeedsModel.LIFE_DRAIN_AWAKE_PER_H = 0.021
+NeedsModel.LIFE_DRAIN_ASLEEP_PER_H = 0.007
+NeedsModel.GENTLE_DRAIN = 0.5
+NeedsModel.GENTLE_FLOOR = 0.1
+NeedsModel.STAGE_ID = "p0_prototype"
+
+local function finite(x: any): boolean
+	return type(x) == "number" and x == x and x ~= math.huge and x ~= -math.huge
+end
+
+local function unit(v: any): boolean
+	return finite(v) and v >= 0.0 and v <= 1.0
+end
+
+local function nonNegative(v: any): boolean
+	return finite(v) and v >= 0.0
+end
+
+local function pair(v: any): boolean
+	return type(v) == "table" and #v == 2 and v[3] == nil and nonNegative(v[1]) and nonNegative(v[2])
+end
+
+export type Record = {
+	energy: number, rest: number, enabled: { string }, update_accumulator: { number }, stage_id: string,
+	elapsed_s: number, granted_total: number, granted_by_source: { [string]: number },
+	life_mode: boolean, starving_hours: number, hour_accumulator: { number }, starving_streak_h: number,
+}
+
+-- `lifeMode` and `gentle` say which rules apply (see above). Both default to false: the sandbox rules.
+function NeedsModel.new(lifeMode: boolean?, gentle: boolean?): any
+	return setmetatable({
+		energy = NeedsModel.ENERGY_START, rest = NeedsModel.REST_START,
+		elapsedS = 0.0, grantedTotal = 0.0, grantedBySource = {} :: { [string]: number }, grantsMade = 0, grantsRefused = 0,
+		lifeMode = lifeMode == true, gentle = gentle == true, starvingHours = 0.0, starvingStreakH = 0.0,
+		_accActive = 0.0, _accStill = 0.0, _accHoursAwake = 0.0, _accHoursAsleep = 0.0,
+		-- Called with (before, after) whenever energy changes (Godot's energy_changed signal). Optional.
+		onEnergyChanged = nil :: ((number, number) -> ())?,
+	}, NeedsModel)
+end
+
+local function changed(self: any, before: number)
+	if self.energy ~= before and self.onEnergyChanged then
+		self.onEnergyChanged(before, self.energy)
+	end
+end
+
+-- Changes the numbers for a fixture. Keys: energy, rest. Values outside [0, 1] or not finite are ignored.
+function NeedsModel.configure(self: any, values: { energy: number?, rest: number? })
+	if values.energy ~= nil and unit(values.energy) then
+		self.energy = values.energy
+	end
+	if values.rest ~= nil and unit(values.rest) then
+		self.rest = values.rest
+	end
+end
+
+function NeedsModel._apply(self: any, period: number, activeShare: number)
+	local before = self.energy
+	if self.lifeMode then
+		local need = self._accHoursAwake * NeedsModel.LIFE_DRAIN_AWAKE_PER_H + self._accHoursAsleep * NeedsModel.LIFE_DRAIN_ASLEEP_PER_H
+		local hours = self._accHoursAwake + self._accHoursAsleep
+		self._accHoursAwake = 0.0
+		self._accHoursAsleep = 0.0
+		if self.gentle then
+			need *= NeedsModel.GENTLE_DRAIN
+		end
+		if need > 0.0 then
+			local floorLeft = if self.gentle then math.max(self.energy - NeedsModel.GENTLE_FLOOR, 0.0) else self.energy
+			local used = math.min(floorLeft, need)
+			self.energy -= used
+			if need > used and not self.gentle then
+				local starved = hours * (need - used) / need
+				self.starvingHours += starved
+				self.starvingStreakH += starved
+			end
+		end
+	elseif self.energy > NeedsModel.ENERGY_FLOOR then
+		self.energy = math.max(NeedsModel.ENERGY_FLOOR, self.energy - NeedsModel.ENERGY_DRAIN_PER_S * period)
+	end
+	self.rest = math.clamp(
+		self.rest + (NeedsModel.REST_RECOVER_PER_S * (1.0 - activeShare) - NeedsModel.REST_DRAIN_PER_S * activeShare) * period,
+		0.0, NeedsModel.REST_MAX)
+	changed(self, before)
+end
+
+-- Lets `dt` seconds of action time pass. `active` is whether the spider spent them moving (walking, leaping, hanging) rather
+-- than keeping still. Non-finite or non-positive time is ignored; a long step counts as at most MAX_STEP_S.
+function NeedsModel.advance(self: any, dt: number, active: boolean)
+	if not finite(dt) or dt <= 0.0 then
+		return
+	end
+	dt = math.min(dt, NeedsModel.MAX_STEP_S)
+	self.elapsedS += dt
+	if active then
+		self._accActive += dt
+	else
+		self._accStill += dt
+	end
+	local total = self._accActive + self._accStill
+	while total >= NeedsModel.UPDATE_PERIOD_S - 1e-9 do
+		self:_apply(NeedsModel.UPDATE_PERIOD_S, self._accActive / total)
+		local keep = math.max(0.0, (total - NeedsModel.UPDATE_PERIOD_S) / total)
+		self._accActive *= keep
+		self._accStill *= keep
+		total -= NeedsModel.UPDATE_PERIOD_S
+	end
+end
+
+-- Life mode: `hours` of game time passed, asleep or awake. They are used up at the next 2 Hz update.
+function NeedsModel.addHours(self: any, hours: number, asleep: boolean)
+	if not self.lifeMode or not finite(hours) or hours <= 0.0 then
+		return
+	end
+	if asleep then
+		self._accHoursAsleep += hours
+	else
+		self._accHoursAwake += hours
+	end
+end
+
+-- Whether the reserve has run out (life mode).
+function NeedsModel.isStarving(self: any): boolean
+	return self.lifeMode and self.energy <= 0.0
+end
+
+-- Energy that could still be added.
+function NeedsModel.room(self: any): number
+	return math.max(0.0, NeedsModel.ENERGY_MAX - self.energy)
+end
+
+-- Adds food energy from `sourceId` (a meal's capture key). Returns what was actually added: nothing for an amount that is not
+-- a positive finite number or a source with no name, and never more than the room left. The caller (Feeding, only while a
+-- held prey is being eaten) decides that the energy is deserved; this only keeps the books.
+function NeedsModel.grantEnergy(self: any, amount: number, sourceId: string): number
+	if sourceId == "" or not finite(amount) or amount <= 0.0 then
+		self.grantsRefused += 1
+		return 0.0
+	end
+	local added = math.min(amount, self:room())
+	if added <= 0.0 then
+		return 0.0
+	end
+	local before = self.energy
+	self.energy = math.min(NeedsModel.ENERGY_MAX, self.energy + added)
+	added = self.energy - before
+	self.grantedTotal += added
+	self.grantedBySource[sourceId] = (self.grantedBySource[sourceId] or 0.0) + added
+	self.grantsMade += 1
+	self.starvingStreakH = 0.0
+	changed(self, before)
+	return added
+end
+
+-- A valid retreat interaction restores rest; it never grants food energy.
+function NeedsModel.restoreRest(self: any, amount: number)
+	if finite(amount) and amount > 0.0 then
+		self.rest = math.min(NeedsModel.REST_MAX, self.rest + amount)
+	end
+end
+
+function NeedsModel.isFull(self: any): boolean
+	return self.energy >= NeedsModel.FULL_AT
+end
+
+-- What one source has given so far.
+function NeedsModel.grantedFrom(self: any, sourceId: string): number
+	return self.grantedBySource[sourceId] or 0.0
+end
+
+-- The NeedState record (spec 21.3), with Godot's field names. Hydration, stress and condition are not simulated and so absent.
+function NeedsModel.toRecord(self: any): Record
+	local by: { [string]: number } = {}
+	for k, v in self.grantedBySource do
+		by[k] = v
+	end
+	return {
+		energy = self.energy, rest = self.rest, enabled = { "energy", "rest" },
+		update_accumulator = { self._accActive, self._accStill }, stage_id = NeedsModel.STAGE_ID,
+		elapsed_s = self.elapsedS, granted_total = self.grantedTotal, granted_by_source = by,
+		life_mode = self.lifeMode, starving_hours = self.starvingHours,
+		hour_accumulator = { self._accHoursAwake, self._accHoursAsleep }, starving_streak_h = self.starvingStreakH,
+	}
+end
+
+-- Restores a record made by toRecord. False, and nothing changed, for anything that is not one: a missing or non-finite number,
+-- a reserve outside [0, 1], an accumulator that is not two non-negative numbers, a grant ledger that does not add up. A record
+-- without the life fields (Godot's older records) loads with them at their defaults. `gentle` is not part of the record.
+function NeedsModel.load(self: any, d: any): boolean
+	if type(d) ~= "table" then
+		return false
+	end
+	for _, key in { "energy", "rest", "elapsed_s", "granted_total" } do
+		if not finite(d[key]) then
+			return false
+		end
+	end
+	if not unit(d.energy) or not unit(d.rest) or d.elapsed_s < 0.0 or d.granted_total < 0.0 then
+		return false
+	end
+	if not pair(d.update_accumulator) then
+		return false
+	end
+	local by = d.granted_by_source
+	if type(by) ~= "table" then
+		return false
+	end
+	local sum = 0.0
+	for k, v in by do
+		if type(k) ~= "string" or not nonNegative(v) then
+			return false
+		end
+		sum += v
+	end
+	if math.abs(sum - d.granted_total) > 1e-6 then
+		return false
+	end
+	local lm = if d.life_mode == nil then false else d.life_mode
+	local sh = if d.starving_hours == nil then 0.0 else d.starving_hours
+	local ha = if d.hour_accumulator == nil then { 0.0, 0.0 } else d.hour_accumulator
+	local streak = if d.starving_streak_h == nil then 0.0 else d.starving_streak_h
+	if not nonNegative(streak) then
+		return false
+	end
+	if type(lm) ~= "boolean" or not nonNegative(sh) then
+		return false
+	end
+	if not pair(ha) then
+		return false
+	end
+	local copy: { [string]: number } = {}
+	for k, v in by do
+		copy[k] = v
+	end
+	self.lifeMode = lm
+	self.starvingHours = sh
+	self.starvingStreakH = streak
+	self._accHoursAwake = ha[1]
+	self._accHoursAsleep = ha[2]
+	self.energy = d.energy
+	self.rest = d.rest
+	self.elapsedS = d.elapsed_s
+	self.grantedTotal = d.granted_total
+	self.grantedBySource = copy
+	self._accActive = d.update_accumulator[1]
+	self._accStill = d.update_accumulator[2]
+	return true
+end
+
+return NeedsModel
+]]></string>
+          </Properties>
+        </Item>
+      </Item>
+      <Item class="Folder" referent="30">
         <Properties>
           <string name="Name">Movement</string>
         </Properties>
-        <Item class="ModuleScript" referent="26">
+        <Item class="ModuleScript" referent="31">
           <Properties>
             <string name="Name">CameraMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -2748,7 +3582,7 @@ return CameraMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="27">
+        <Item class="ModuleScript" referent="32">
           <Properties>
             <string name="Name">FocusState</string>
             <string name="Source"><![CDATA[--!strict
@@ -2771,7 +3605,7 @@ return Focus
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="28">
+        <Item class="ModuleScript" referent="33">
           <Properties>
             <string name="Name">InputState</string>
             <string name="Source"><![CDATA[--!strict
@@ -2864,7 +3698,7 @@ return InputState
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="29">
+        <Item class="ModuleScript" referent="34">
           <Properties>
             <string name="Name">JumpInput</string>
             <string name="Source"><![CDATA[--!strict
@@ -3035,7 +3869,7 @@ return JumpInput
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="30">
+        <Item class="ModuleScript" referent="35">
           <Properties>
             <string name="Name">JumpMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -3193,7 +4027,7 @@ return JumpMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="31">
+        <Item class="ModuleScript" referent="36">
           <Properties>
             <string name="Name">LineFraming</string>
             <string name="Source"><![CDATA[--!strict
@@ -3292,7 +4126,7 @@ return LineFraming
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="32">
+        <Item class="ModuleScript" referent="37">
           <Properties>
             <string name="Name">SilkController</string>
             <string name="Source"><![CDATA[--!strict
@@ -3536,7 +4370,7 @@ return Silk
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="33">
+        <Item class="ModuleScript" referent="38">
           <Properties>
             <string name="Name">SpiderMotor</string>
             <string name="Source"><![CDATA[--!strict
@@ -4298,7 +5132,7 @@ return Motor
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="34">
+        <Item class="ModuleScript" referent="39">
           <Properties>
             <string name="Name">StickCarry</string>
             <string name="Source"><![CDATA[--!strict
@@ -4358,7 +5192,7 @@ return StickCarry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="35">
+        <Item class="ModuleScript" referent="40">
           <Properties>
             <string name="Name">SupportMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -4440,7 +5274,7 @@ return SupportMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="36">
+        <Item class="ModuleScript" referent="41">
           <Properties>
             <string name="Name">TetherMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -4509,11 +5343,11 @@ return T
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="37">
+      <Item class="Folder" referent="42">
         <Properties>
           <string name="Name">Perception</string>
         </Properties>
-        <Item class="ModuleScript" referent="38">
+        <Item class="ModuleScript" referent="43">
           <Properties>
             <string name="Name">Observation</string>
             <string name="Source"><![CDATA[--!strict
@@ -4670,7 +5504,7 @@ return Observation
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="39">
+        <Item class="ModuleScript" referent="44">
           <Properties>
             <string name="Name">ObservationMemory</string>
             <string name="Source"><![CDATA[--!strict
@@ -5124,7 +5958,7 @@ return ObservationMemory
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="40">
+        <Item class="ModuleScript" referent="45">
           <Properties>
             <string name="Name">PerceptionMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -5301,7 +6135,7 @@ return PerceptionMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="41">
+        <Item class="ModuleScript" referent="46">
           <Properties>
             <string name="Name">Sensor</string>
             <string name="Source"><![CDATA[--!strict
@@ -5716,7 +6550,7 @@ return Sensor
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="42">
+        <Item class="ModuleScript" referent="47">
           <Properties>
             <string name="Name">SensorCore</string>
             <string name="Source"><![CDATA[--!strict
@@ -6159,7 +6993,7 @@ return SensorCore
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="43">
+        <Item class="ModuleScript" referent="48">
           <Properties>
             <string name="Name">Signal</string>
             <string name="Source"><![CDATA[--!strict
@@ -6200,31 +7034,945 @@ return Signal
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="44">
+      <Item class="Folder" referent="49">
+        <Properties>
+          <string name="Name">Persistence</string>
+        </Properties>
+        <Item class="ModuleScript" referent="50">
+          <Properties>
+            <string name="Name">Checkpoint</string>
+            <string name="Source"><![CDATA[--!strict
+-- The retreat checkpoint (S01-C; Godot's scripts/persistence/checkpoint.gd, T09; ROBLOX-25). A checkpoint is the whole world
+-- at one tick boundary in one plain record: the spider standing on its surface, its reserves and the books of what fed them,
+-- the life clock and the rest, every fly with its random stream and whatever it was in the middle of, who sits on and who
+-- has reserved each perch, the replacements still owed, the captures made, the meal in the jaws, and what the spider's senses
+-- and memory held. Restoring one puts back all of it together, so an earlier spider is never put into a newer world and a fly
+-- eaten after the checkpoint is not eaten twice: the fly and the energy it gave come back together.
+--
+-- When: only at the end of a tick, from a still spider on a surface that is not mid-meal, mid-struggle or mid-strike
+-- (boundaryProblem). The player makes one by resting in the silk-lined crack (LifeLoop) and when a night's sleep reaches the
+-- morning. Airborne, hanging, aiming and eating are refused: exact arbitrary-state resume (the original S01) stays deferred.
+-- How: the live objects are recorded as one graph (ObjectRecord), so no field can be forgotten; the spider's body is
+-- recorded by its pose (Godot's player record) and put back with SpiderMotor.place.
+-- Validation happens on the record alone, before anything live changes: the format, schema and windowsill, the spider's
+-- pose, every reference in the graph, and then the meaning of the rebuilt world (reserves in range and books that add up,
+-- the clock, unique flies, perches held by flies that exist, the meal in the jaws one of them). A record with any problem is
+-- refused with its reasons and the live world is left exactly as it was.
+-- Differences from Godot: the record is the port's own (its flies are the port's, Chet's ROBLOX flies, not Godot's), so
+-- Godot checkpoints are not read and schema numbers start again at 1. The passing shadow, growth, the wasp and the notebook
+-- are not ported, so they are not recorded.
+
+local ObjectRecord = require(script.Parent.ObjectRecord)
+local Fly = require(script.Parent.Parent.Prey.Fly)
+local FlyFlight = require(script.Parent.Parent.Prey.FlyFlight)
+local FlySenses = require(script.Parent.Parent.Prey.FlySenses)
+local PreyRandom = require(script.Parent.Parent.Prey.PreyRandom)
+local PreyPopulation = require(script.Parent.Parent.Prey.PreyPopulation)
+local PerchGraph = require(script.Parent.Parent.Prey.PerchGraph)
+local Feeding = require(script.Parent.Parent.Prey.Feeding)
+local PreyDirector = require(script.Parent.Parent.Prey.PreyDirector)
+local Sensor = require(script.Parent.Parent.Perception.Sensor)
+local SensorCore = require(script.Parent.Parent.Perception.SensorCore)
+local ObservationMemory = require(script.Parent.Parent.Perception.ObservationMemory)
+local Observation = require(script.Parent.Parent.Perception.Observation)
+local NeedsModel = require(script.Parent.Parent.Life.NeedsModel)
+local LifeLoop = require(script.Parent.Parent.Life.LifeLoop)
+local LifeClock = require(script.Parent.Parent.Life.LifeClock)
+local Layout = require(script.Parent.Parent.Habitat.WindowsillLayout)
+
+local Checkpoint = {}
+
+Checkpoint.SCHEMA_VERSION = 1
+Checkpoint.KIND = "retreat_checkpoint"
+Checkpoint.GAME = "the-windowsill-roblox"
+-- Changes whenever the windowsill's pieces or perches change in a way an old checkpoint could not be put back into.
+Checkpoint.CONTENT_REVISION = "windowsill-roblox-1"
+Checkpoint.STILL_SPEED = 0.15
+Checkpoint.ROOTS = { "prey", "sensor", "memory", "needs", "life" }
+
+-- The classes a world record may hold.
+Checkpoint.CLASSES = {
+	Fly = Fly, FlyFlight = FlyFlight, FlySenses = FlySenses, PreyRandom = PreyRandom, PreyPopulation = PreyPopulation,
+	PerchGraph = PerchGraph, Feeding = Feeding, PreyDirector = PreyDirector,
+	Sensor = Sensor, SensorCore = SensorCore, ObservationMemory = ObservationMemory, Contact = ObservationMemory.Contact,
+	Observation = Observation,
+	NeedsModel = NeedsModel, LifeLoop = LifeLoop, LifeClock = LifeClock,
+}
+
+-- What the world is made of that a record keeps by name instead of copying (see ObjectRecord). The same function names them
+-- when a record is made and when it is put back, so a name always means this world's own thing.
+export type World = {
+	motor: any, prey: any, sensor: any, memory: any, needs: any, life: any,
+	extraRefs: { [string]: any }?, -- anything else the world's state points at that the record should keep by name
+}
+
+function Checkpoint.refs(world: World): { [string]: any }
+	local refs: { [string]: any } = {}
+	local prey = world.prey
+	ObjectRecord.constants("flyProfile", prey.p, refs)
+	local g = prey.graph
+	refs["graph.cast"], refs["graph.sweep"], refs["graph.overlap"] = g.cast, g.sweep, g.overlap
+	if prey.probe ~= nil then refs["prey.probe"] = prey.probe end
+	if world.life.save ~= nil then refs["life.save"] = world.life.save end
+	local m = world.memory
+	for _, k in { "contactAcquired", "categoryChanged", "contactLost", "contactReacquired", "contactEnded" } do
+		if m[k] ~= nil then refs["memory." .. k] = m[k] end
+	end
+	local core = world.sensor.core
+	if core and core.cueEmitted ~= nil then refs["sensor.cueEmitted"] = core.cueEmitted end
+	if world.needs.onEnergyChanged ~= nil then refs["needs.onEnergyChanged"] = world.needs.onEnergyChanged end
+	local extra: { [string]: any } = world.extraRefs or {}
+	for k, v in extra do refs[k] = v end
+	return refs
+end
+
+local function liveRoots(world: World): { [string]: any }
+	return { prey = world.prey, sensor = world.sensor, memory = world.memory, needs = world.needs, life = world.life }
+end
+
+local function v3(v: Vector3): { number }
+	return { v.X, v.Y, v.Z }
+end
+
+local function finite(x: any): boolean
+	return type(x) == "number" and x == x and x ~= math.huge and x ~= -math.huge
+end
+
+local function vec(t: any): Vector3?
+	if type(t) ~= "table" or #t ~= 3 or not finite(t[1]) or not finite(t[2]) or not finite(t[3]) then return nil end
+	return Vector3.new(t[1], t[2], t[3])
+end
+
+-- Why a checkpoint cannot be made of the world now; "" when it can.
+function Checkpoint.boundaryProblem(world: World): string
+	local motor, prey = world.motor, world.prey
+	if motor.mode ~= "attached" or motor.preparing then return "the spider is not standing on a surface" end
+	if motor.vel.Magnitude > Checkpoint.STILL_SPEED then return "the spider is moving" end
+	if prey.feeding.feeding then return "the spider is feeding" end
+	if prey.feeding.struggling then return "the prey in the jaws is still struggling" end
+	if prey.tick <= prey.strikeEnd then return "a strike is still in progress" end
+	return ""
+end
+
+-- The checkpoint record of the world as it is now (call boundaryProblem first). Nil and the reason if something in the world
+-- could not be recorded (a field this file does not know how to keep; the tests make sure there is none).
+function Checkpoint.capture(world: World, createdAt: number?): ({ [string]: any }?, string?)
+	local motor = world.motor
+	local graph, why = ObjectRecord.capture(liveRoots(world), Checkpoint.CLASSES, Checkpoint.refs(world))
+	if not graph then return nil, why end
+	return {
+		schema_version = Checkpoint.SCHEMA_VERSION, kind = Checkpoint.KIND, game = Checkpoint.GAME,
+		content_revision = Checkpoint.CONTENT_REVISION, created_at = createdAt or 0, snapshot_tick = world.prey.tick,
+		player = {
+			position = v3(motor.pos), normal = v3(motor.up), heading = v3(motor.heading), gaze_pitch = motor.gazePitch,
+			retreat_id = if Layout.inRetreat(motor.pos) then "sill_crevice" else "", state = "ATTACHED",
+		},
+		world = graph,
+	}, nil
+end
+
+-- The checks on the rebuilt (fresh, not live) world: what a good world must be.
+local function checkWorld(roots: { [string]: any }, problems: { string })
+	local function bad(t: string) table.insert(problems, t) end
+	for _, name in Checkpoint.ROOTS do
+		if type(roots[name]) ~= "table" then bad(`world: no {name}`) end
+	end
+	if #problems > 0 then return end
+	local prey, needs, life, sensor, memory = roots.prey, roots.needs, roots.life, roots.sensor, roots.memory
+	if getmetatable(prey) ~= PreyDirector then bad("world: the prey is not a prey director") end
+	if getmetatable(needs) ~= NeedsModel then bad("world: the needs are not a needs model") end
+	if getmetatable(life) ~= LifeLoop then bad("world: the life is not a life loop") end
+	if getmetatable(sensor) ~= Sensor then bad("world: the sensor is not a sensor") end
+	if getmetatable(memory) ~= ObservationMemory then bad("world: the memory is not an observation memory") end
+	if #problems > 0 then return end
+	-- The reserves and their books (NeedsModel's own record check).
+	local scratch = NeedsModel.new()
+	local ok, rec = pcall(function() return NeedsModel.toRecord(needs) end)
+	if not ok or not scratch:load(rec) then bad("needs: the reserves or their books are not valid") end
+	-- One needs model: the one feeding grants to is the one the life loop reports hours to.
+	if prey.feeding == nil or prey.feeding.needs ~= needs or life.needs ~= needs then bad("needs: feeding and the life loop do not share the reserves") end
+	-- The clock and the rest.
+	for _, p in LifeClock.problems(if type(life.clock) == "table" then LifeClock.toRecord(life.clock) else nil) do bad(p) end
+	if getmetatable(life.clock) ~= LifeClock then bad("life: the clock is not a life clock") end
+	if type(life.resting) ~= "boolean" then bad("life: 'resting' is not true or false") end
+	-- The flies: unique ids, a known state, finite places, perches held only by flies that exist.
+	if type(prey.flies) ~= "table" then
+		bad("prey: no list of flies")
+		return
+	end
+	local ids: { [string]: any } = {}
+	local states = { PERCHED = true, ALERT = true, TAKEOFF = true, FLEE = true, SEEK_PERCH = true, REPOSITION = true, CAPTURED = true, CONSUMED = true }
+	for i, f in prey.flies do
+		if getmetatable(f) ~= Fly or type(f.id) ~= "string" then
+			bad(`prey: fly {i} is not a fly`)
+			continue
+		end
+		if ids[f.id] then bad(`prey: two flies called {f.id}`) end
+		ids[f.id] = f
+		if not states[f.state] then bad(`prey: {f.id} is in no known state`) end
+		if typeof(f.position) ~= "Vector3" and type(f.position) ~= "table" then bad(`prey: {f.id} has no position`) end
+		if not finite(f.nutrition) or f.nutrition < 0 or f.nutrition > f.profile.body.nutrition + 1e-9 then bad(`prey: {f.id}'s nutrition is out of range`) end
+		if f.flight == nil or f.flight.fly ~= f then bad(`prey: {f.id}'s flight is not its own`) end
+	end
+	if type(prey.graph) == "table" and type(prey.graph.perches) == "table" then
+		for _, p in prey.graph.perches do
+			if p.occupant ~= "" and (ids[p.occupant] == nil or not ids[p.occupant]:alive()) then bad(`prey: perch {p.id} is held by {p.occupant}, which is not a living fly`) end
+			if p.reserved ~= "" and ids[p.reserved] == nil then bad(`prey: perch {p.id} is reserved by {p.reserved}, which is not a fly`) end
+		end
+	else
+		bad("prey: no perches")
+	end
+	-- The meal in the jaws.
+	local held = prey.feeding.held
+	if held ~= nil then
+		if ids[held.id] ~= held or held.state ~= "CAPTURED" then bad("feeding: the prey in the jaws is not a caught fly of this world") end
+	end
+	local sum = 0
+	for _, g in prey.feeding.ledger do
+		if not finite(g) or g < 0 then bad("feeding: a meal's energy is not a number") end
+		sum += if finite(g) then g else 0
+	end
+	if math.abs(sum - prey.feeding.granted) > 1e-6 then bad("feeding: the meals' energy does not add up") end
+	if prey.feeding.granted > needs.grantedTotal + 1e-6 then bad("feeding: more energy was eaten than the reserves were given") end
+end
+
+-- Every problem with `record` (an empty list for a good one), and the rebuilt world when it is good. Nothing live changes.
+function Checkpoint.check(record: any, world: World): ({ string }, ObjectRecord.Decoded?)
+	local problems: { string } = {}
+	local function bad(t: string) table.insert(problems, t) end
+	if type(record) ~= "table" then return { "not a checkpoint" }, nil end
+	local sv = record.schema_version
+	if not finite(sv) or sv ~= math.floor(sv) or sv < 1 then
+		return { "the schema version is not a whole number" }, nil
+	end
+	if sv > Checkpoint.SCHEMA_VERSION then
+		return { `made by a newer version of the game (schema {sv}; this one reads up to {Checkpoint.SCHEMA_VERSION})` }, nil
+	end
+	if record.kind ~= Checkpoint.KIND then bad("not a retreat checkpoint") end
+	if record.game ~= Checkpoint.GAME then bad("not a checkpoint of this game") end
+	if record.content_revision ~= Checkpoint.CONTENT_REVISION then bad(`made for another windowsill ({tostring(record.content_revision)})`) end
+	if not finite(record.snapshot_tick) or record.snapshot_tick < 0 then bad("the tick is not a number") end
+	local p = record.player
+	if type(p) ~= "table" then
+		bad("no spider")
+	else
+		local pos, n, h = vec(p.position), vec(p.normal), vec(p.heading)
+		if not pos then bad("the spider has no position")
+		elseif pos.X < Layout.PLAY_BOUNDS_MIN.X or pos.Y < Layout.PLAY_BOUNDS_MIN.Y or pos.Z < Layout.PLAY_BOUNDS_MIN.Z
+			or pos.X > Layout.PLAY_BOUNDS_MAX.X or pos.Y > Layout.PLAY_BOUNDS_MAX.Y or pos.Z > Layout.PLAY_BOUNDS_MAX.Z then
+			bad("the spider is outside the windowsill")
+		end
+		if not n or math.abs(n.Magnitude - 1) > 1e-3 then bad("the spider's surface normal is not a unit vector") end
+		if not h or math.abs(h.Magnitude - 1) > 1e-3 then bad("the spider's heading is not a unit vector") end
+		if not finite(p.gaze_pitch) or math.abs(p.gaze_pitch) > math.pi / 2 then bad("the spider's gaze is not a number") end
+		if p.state ~= "ATTACHED" then bad("the spider is not standing on a surface") end
+		if p.retreat_id ~= "" and p.retreat_id ~= "sill_crevice" then bad("the spider is in an unknown retreat") end
+	end
+	if #problems > 0 then return problems, nil end
+	local decoded, why = ObjectRecord.decode(record.world, Checkpoint.CLASSES, Checkpoint.refs(world))
+	if not decoded then
+		for _, w in why do bad("world: " .. w) end
+		return problems, nil
+	end
+	local roots = decoded.roots
+	local ok: boolean, err: any = (pcall :: any)(checkWorld, roots, problems)
+	if not ok then bad("world: " .. tostring(err)) end
+	if #problems > 0 then return problems, nil end
+	return problems, decoded
+end
+
+-- Puts the world back as the record has it, or changes nothing. Returns true, or false and the problems.
+-- The caller then lets go of anything the motor or the screen held (aims, lines, the camera); SpiderMotor.place already
+-- ends every line, aim and walk.
+function Checkpoint.restore(record: any, world: World): (boolean, { string })
+	local problems, decoded = Checkpoint.check(record, world)
+	if not decoded then return false, problems end
+	local p = record.player
+	local pos, n, h = vec(p.position) :: Vector3, vec(p.normal) :: Vector3, vec(p.heading) :: Vector3
+	if not ObjectRecord.commit(decoded, liveRoots(world)) then
+		return false, { "the live world is missing a part" }
+	end
+	world.motor:place(pos, n.Unit, h.Unit)
+	world.motor.gazePitch = p.gaze_pitch
+	-- Godot's apply_record: the rest that was going on goes on, the spider takes a moment to take hold, and the screen says
+	-- this is checkpoint recovery. What was owed or announced at that tick is not done again.
+	local life = world.life
+	life.asleep = false
+	life.checkpointDue = false
+	life.morningText = ""
+	life.events = {}
+	life.restoreGrace = LifeLoop.RESTORE_GRACE_TICKS
+	life:applyLight()
+	life:showNotice("Returned to the checkpoint: the sill as it was when you rested in the crack. This is checkpoint recovery, not an exact resume.")
+	return true, {}
+end
+
+return Checkpoint
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="51">
+          <Properties>
+            <string name="Name">CheckpointStore</string>
+            <string name="Source"><![CDATA[--!strict
+-- Where checkpoints live (S02; Godot's scripts/persistence/checkpoint_store.gd; ROBLOX-25), behind a DataStore-shaped
+-- interface. This build uses only MemoryDataStore, an in-memory stand-in with a Roblox DataStore's rules (GetAsync, SetAsync,
+-- RemoveAsync that may raise, values copied in and out, only storable values, a size limit). No live DataStore is written:
+-- the in-memory store lasts as long as the session. A real DataStore can take its place later without changing the rest.
+--
+-- Keys: <key> the current checkpoint; <key>.bak the previous valid one; <key>.tmp a write in progress (never read as a
+-- checkpoint); <key>.aside.N something this build could not read, set aside unchanged (never deleted).
+-- An entry is { format, checksum, checkpoint }; the checksum is taken over the checkpoint's canonical JSON, so an entry that
+-- was cut short or changed is refused even if what is left still looks like a checkpoint.
+-- Saving: the record is checked, written to the temporary key, read back and checked again (checksum and validation). Only
+-- then does the current entry (if it is itself good) become the backup and the new one the current. A current entry that is
+-- damaged, or made by a newer version, never pushes out a good backup: it is set aside unchanged. Loading never writes: the
+-- current entry is tried, then the backup, and each refusal says why. A newer schema is reported and left as it is.
+local Json = require(script.Parent.Json)
+
+local CheckpointStore = {}
+CheckpointStore.__index = CheckpointStore
+CheckpointStore.FORMAT = "the-windowsill checkpoint"
+
+-- ------------------------------------------------------------------------------------------------ the in-memory DataStore
+local MemoryDataStore = {}
+MemoryDataStore.__index = MemoryDataStore
+CheckpointStore.MemoryDataStore = MemoryDataStore
+-- A Roblox DataStore value may be at most 4,194,304 characters once encoded.
+MemoryDataStore.MAX_CHARS = 4194304
+
+function MemoryDataStore.new(): any
+	return setmetatable({ data = {} :: { [string]: any }, writes = 0, failNext = 0, failReads = 0, sizes = {} :: { [string]: number } }, MemoryDataStore)
+end
+
+function MemoryDataStore.GetAsync(self: any, key: string): any
+	if self.failReads > 0 then
+		self.failReads -= 1
+		error("MemoryDataStore: the read failed (a test asked it to)")
+	end
+	return Json.copy(self.data[key])
+end
+
+function MemoryDataStore.SetAsync(self: any, key: string, value: any)
+	if self.failNext > 0 then
+		self.failNext -= 1
+		error("MemoryDataStore: the write failed (a test asked it to)")
+	end
+	local text, why = Json.canonical(value)
+	if not text then error("MemoryDataStore: cannot store this value: " .. tostring(why)) end
+	if #text > MemoryDataStore.MAX_CHARS then error(`MemoryDataStore: the value is {#text} characters, over the limit`) end
+	self.data[key] = Json.copy(value)
+	self.sizes[key] = #text
+	self.writes += 1
+end
+
+function MemoryDataStore.RemoveAsync(self: any, key: string): any
+	local old = self.data[key]
+	self.data[key] = nil
+	self.sizes[key] = nil
+	return old
+end
+
+-- ------------------------------------------------------------------------------------------------ the checkpoint store
+export type Result = { ok: boolean, message: string, errors: { string }, record: any?, source: string? }
+
+-- `store` is DataStore-shaped (GetAsync, SetAsync, RemoveAsync). `validate(record)` returns the record's problems (an empty
+-- list for a good one): the world's own checks (Checkpoint.check).
+function CheckpointStore.new(store: any, validate: (any) -> { string }, key: string?): any
+	return setmetatable({ store = store, validate = validate, key = key or "checkpoint", last = nil :: Result? }, CheckpointStore)
+end
+
+local function result(self: any, ok: boolean, message: string, errors: { string }?, extra: { [string]: any }?): Result
+	local r: any = { ok = ok, message = message, errors = errors or {} }
+	local more: { [string]: any } = extra or {}
+	for k, v in more do r[k] = v end
+	self.last = r
+	return r
+end
+
+-- The entry for a record, or nil and why it cannot be stored.
+function CheckpointStore.entry(record: any): (any?, string?)
+	local text, why = Json.canonical(record)
+	if not text then return nil, why end
+	return { format = CheckpointStore.FORMAT, checksum = Json.checksum(text), checkpoint = record }, nil
+end
+
+-- Reads an entry: the record, or nil and why not. `newer` is true when it was made by a newer version (left as it is).
+function CheckpointStore.read(self: any, entry: any): (any?, { string }, boolean)
+	if entry == nil then return nil, { "there is none" }, false end
+	if type(entry) ~= "table" or entry.format ~= CheckpointStore.FORMAT then return nil, { "not a checkpoint entry" }, false end
+	local text = Json.canonical(entry.checkpoint)
+	if not text or Json.checksum(text) ~= entry.checksum then return nil, { "the checksum does not match: the entry was cut short or changed" }, false end
+	local problems = self.validate(entry.checkpoint)
+	if #problems > 0 then
+		local newer = string.find(problems[1], "newer version", 1, true) ~= nil
+		return nil, problems, newer
+	end
+	return entry.checkpoint, {}, false
+end
+
+local function try(fn: () -> ...any): (boolean, any)
+	return pcall(fn)
+end
+
+-- Sets aside an entry this build could not read: never deleted, never overwritten. Returns the key used, or "".
+function CheckpointStore._setAside(self: any, entry: any): string
+	for i = 1, 50 do
+		local k = `{self.key}.aside.{i}`
+		local ok, existing = try(function() return self.store:GetAsync(k) end)
+		if ok and existing == nil then
+			local wrote = try(function() self.store:SetAsync(k, entry) end)
+			return if wrote then k else ""
+		end
+	end
+	return ""
+end
+
+-- Writes `record` as the current checkpoint, keeping the previous good one as the backup.
+function CheckpointStore.save(self: any, record: any): Result
+	local problems = self.validate(record)
+	if #problems > 0 then return result(self, false, "the checkpoint is not valid", problems) end
+	local entry, why = CheckpointStore.entry(record)
+	if not entry then return result(self, false, "the checkpoint cannot be stored", { why :: string }) end
+	local tmp, main, bak = self.key .. ".tmp", self.key, self.key .. ".bak"
+	local wrote, err = try(function() self.store:SetAsync(tmp, entry) end)
+	if not wrote then return result(self, false, "the checkpoint could not be written", { tostring(err) }) end
+	local readOk, back = try(function() return self.store:GetAsync(tmp) end)
+	local again, againProblems = nil, { "it could not be read back" }
+	if readOk then again, againProblems = self:read(back) end
+	if not again then return result(self, false, "the checkpoint did not read back correctly", againProblems) end
+	local curOk, current = try(function() return self.store:GetAsync(main) end)
+	if not curOk then return result(self, false, "the current checkpoint could not be read", { tostring(current) }) end
+	if current ~= nil then
+		local good, _, _ = self:read(current)
+		if good then
+			local moved, merr = try(function() self.store:SetAsync(bak, current) end)
+			if not moved then return result(self, false, "the previous checkpoint could not be kept as the backup", { tostring(merr) }) end
+		elseif self:_setAside(current) == "" then
+			return result(self, false, "a damaged checkpoint could not be set aside, so it was left in place", {})
+		end
+	end
+	local placed, perr = try(function() self.store:SetAsync(main, entry) end)
+	if not placed then return result(self, false, "the checkpoint could not be put in place", { tostring(perr) }) end
+	try(function() self.store:RemoveAsync(tmp) end)
+	return result(self, true, "Checkpoint kept.", {})
+end
+
+-- The newest good checkpoint: { ok, record, source = "current" | "backup", message, errors }. Never writes.
+function CheckpointStore.loadBest(self: any): Result
+	local errors: { string } = {}
+	for _, which in { { self.key, "current" }, { self.key .. ".bak", "backup" } } do
+		local ok, entry = try(function() return self.store:GetAsync(which[1]) end)
+		if not ok then
+			table.insert(errors, `{which[2]}: it could not be read ({tostring(entry)})`)
+			continue
+		end
+		local record, problems, newer = self:read(entry)
+		if record then
+			return result(self, true, if which[2] == "current" then "the checkpoint" else "the backup checkpoint (the newest could not be used)", errors, { record = record, source = which[2] })
+		end
+		for _, p in problems do table.insert(errors, `{which[2]}: {p}`) end
+		if newer then
+			return result(self, false, "the checkpoint was made by a newer version of the game; it was left as it is", errors)
+		end
+	end
+	return result(self, false, "no checkpoint to return to", errors)
+end
+
+return CheckpointStore
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="52">
+          <Properties>
+            <string name="Name">Json</string>
+            <string name="Source"><![CDATA[--!strict
+-- What a Roblox DataStore can hold, checked without the engine (ROBLOX-25), and the canonical text a checksum is taken over
+-- (Godot's checkpoint_store.gd: sorted keys, full precision). A value is storable when it is a string, a boolean, a finite
+-- number, a list (keys 1..n, no holes) or a table whose keys are all strings, made of storable values, with no table met
+-- twice. Pure; tests/checkpoint.luau checks it.
+
+local Json = {}
+
+local function finite(x: number): boolean
+	return x == x and x ~= math.huge and x ~= -math.huge
+end
+
+local ESC: { [string]: string } = { ['"'] = '\\"', ["\\"] = "\\\\", ["\b"] = "\\b", ["\f"] = "\\f", ["\n"] = "\\n", ["\r"] = "\\r", ["\t"] = "\\t" }
+
+local function quote(s: string): string
+	return '"' .. string.gsub(s, '[%c"\\]', function(c: string): string
+		return ESC[c] or string.format("\\u%04x", string.byte(c))
+	end) .. '"'
+end
+
+-- The kind of table: "list" (keys exactly 1..n; an empty table counts as a list), "object" (all keys strings) or nil.
+local function shape(t: { [any]: any }): string?
+	local n, strings, others = 0, 0, 0
+	for k in t do
+		if type(k) == "string" then
+			strings += 1
+		elseif type(k) == "number" then
+			others += 1
+		else
+			return nil
+		end
+		n += 1
+	end
+	if strings == n then return if n == 0 then "list" else "object" end
+	if others == n then
+		for i = 1, n do
+			if t[i] == nil then return nil end
+		end
+		return "list"
+	end
+	return nil
+end
+
+-- The canonical JSON text of `v`, or nil and why it is not storable.
+function Json.canonical(v: any): (string?, string?)
+	local seen: { [any]: boolean } = {}
+	local problem: string? = nil
+	local function enc(x: any, path: string): string
+		if problem then return "" end
+		local t = type(x)
+		if t == "string" then return quote(x) end
+		if t == "boolean" then return if x then "true" else "false" end
+		if t == "number" then
+			if not finite(x) then
+				problem = `{path}: a number JSON cannot hold`
+				return ""
+			end
+			if x == math.floor(x) and math.abs(x) < 2 ^ 53 then return string.format("%d", x) end
+			return string.format("%.17g", x)
+		end
+		if t ~= "table" then
+			problem = `{path}: a {typeof(x)}`
+			return ""
+		end
+		if getmetatable(x) ~= nil then
+			problem = `{path}: a table with a metatable`
+			return ""
+		end
+		if seen[x] then
+			problem = `{path}: a table met twice`
+			return ""
+		end
+		seen[x] = true
+		local kind = shape(x)
+		if kind == "list" then
+			local parts = table.create(#x)
+			for i, y in ipairs(x) do parts[i] = enc(y, `{path}[{i}]`) end
+			return "[" .. table.concat(parts, ",") .. "]"
+		elseif kind == "object" then
+			local keys: { string } = {}
+			for k in x do table.insert(keys, k) end
+			table.sort(keys)
+			local parts = table.create(#keys)
+			for i, k in keys do parts[i] = quote(k) .. ":" .. enc(x[k], `{path}.{k}`) end
+			return "{" .. table.concat(parts, ",") .. "}"
+		end
+		problem = `{path}: a table with mixed or sparse keys`
+		return ""
+	end
+	local text = enc(v, "value")
+	if problem then return nil, problem end
+	return text, nil
+end
+
+-- A deep copy of a storable value (what a DataStore hands back is never the table that was given to it).
+function Json.copy(v: any): any
+	if type(v) ~= "table" then return v end
+	local out = {}
+	for k, x in v do out[k] = Json.copy(x) end
+	return out
+end
+
+-- FNV-1a over the text, two independent 32-bit lanes, as 16 hex digits: enough to catch a record cut short or changed.
+-- x * 16777619 (the FNV prime, 2^24 + 403) modulo 2^32, exactly: a plain product of two 32-bit numbers can exceed 2^53.
+local function fnvMul(x: number): number
+	return ((x % 256) * 16777216 + x * 403) % 4294967296
+end
+
+function Json.checksum(text: string): string
+	local a, b = 0x811c9dc5, 0x050c5d1f
+	for i = 1, #text do
+		local c = string.byte(text, i)
+		a = fnvMul(bit32.bxor(a, c))
+		b = fnvMul(bit32.bxor(b, (c + i) % 256))
+	end
+	return string.format("%08x%08x", a, b)
+end
+
+return Json
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="53">
+          <Properties>
+            <string name="Name">ObjectRecord</string>
+            <string name="Source"><![CDATA[--!strict
+-- ObjectRecord (ROBLOX-25): the state of a few live objects as one plain record that a DataStore could hold, and back.
+-- The world's state is a graph of Luau tables (flies point at their perches, a flight at its fly and back, the feeding at the
+-- needs it grants to). Writing a record by hand for each module would miss a field sooner or later, and a missed field is a
+-- checkpoint that comes back different. So this walks the graph from named roots and records every table once, keeping who
+-- points at what, cycles included. Nothing is guessed:
+--   * a table with a metatable is recorded only if its metatable is one of the named `classes`; anything else is refused;
+--   * functions, Instances and any other engine value are refused unless they are named `refs` (the running program's own
+--     things: the world's raycast closures, a probe part, a Signal with its listeners, the species data). A ref is kept as its
+--     name and comes back as whatever has that name when the record is restored;
+--   * numbers that JSON cannot hold (infinities, NaN) and Vector3 values are written as small tagged tables.
+-- The record: { format = FORMAT, roots = { name = { ["$o"] = i } }, objects = { { c = class?, e = { { key, value }, ... } } } },
+-- where every key is a string or a finite number, and every value a string, boolean, finite number, or one of
+-- { ["$o"] = i } (the i-th object), { ["$r"] = name }, { ["$v"] = { x, y, z } }, { ["$n"] = "inf" | "-inf" | "nan" }.
+-- Entries are sorted, so the same state always gives the same record.
+-- Restoring is in two steps. `decode` checks the whole record and builds every object fresh, touching nothing live; a record
+-- with any problem is refused there, with the reasons. `commit` then moves the fresh roots' contents into the live root tables
+-- (so everything else that holds a live root keeps holding the right table) and cannot fail part way.
+
+local ObjectRecord = {}
+
+ObjectRecord.FORMAT = "object-record-1"
+-- Refuse graphs larger than this many tables (a runaway reference would otherwise record the whole program).
+ObjectRecord.MAX_OBJECTS = 20000
+
+export type Record = { format: string, roots: { [string]: any }, objects: { any } }
+export type Decoded = { roots: { [string]: any }, objects: { any } }
+
+local V3META: any = if type((Vector3 :: any).zero) == "table" then getmetatable((Vector3 :: any).zero) else nil
+
+local function isVector3(v: any): boolean
+	return typeof(v) == "Vector3" or (V3META ~= nil and type(v) == "table" and getmetatable(v) == V3META)
+end
+
+local function finite(x: number): boolean
+	return x == x and x ~= math.huge and x ~= -math.huge
+end
+
+local function encodeNumber(x: number): any
+	if finite(x) then return x end
+	return { ["$n"] = if x ~= x then "nan" elseif x > 0 then "inf" else "-inf" }
+end
+
+local function keyLess(a: any, b: any): boolean
+	local ka, kb = a[1], b[1]
+	if type(ka) == type(kb) then return ka < kb end
+	return type(ka) == "number" -- numbers before strings
+end
+
+-- Records the graph reachable from `roots`. `classes`: name -> metatable. `refs`: name -> value. Returns the record, or nil
+-- and the reason (with the path to the first thing it could not record).
+function ObjectRecord.capture(roots: { [string]: any }, classes: { [string]: any }, refs: { [string]: any }): (Record?, string?)
+	local classOf: { [any]: string } = {}
+	for name, mt in classes do classOf[mt] = name end
+	local refOf: { [any]: string } = {}
+	for name, v in refs do
+		if refOf[v] == nil then refOf[v] = name end
+	end
+	local index: { [any]: number } = {}
+	local objects: { any } = {}
+	local queue: { any } = {}
+	local paths: { [any]: string } = {}
+	local problem: string? = nil
+
+	local function value(v: any, path: string): any
+		if problem then return nil end
+		local t = type(v)
+		if t == "string" or t == "boolean" then return v end
+		if t == "number" then return encodeNumber(v) end
+		local ref = refOf[v]
+		if ref ~= nil then return { ["$r"] = ref } end
+		if isVector3(v) then
+			return { ["$v"] = { encodeNumber(v.X), encodeNumber(v.Y), encodeNumber(v.Z) } }
+		end
+		if t == "table" then
+			local mt = getmetatable(v)
+			if mt ~= nil and classOf[mt] == nil then
+				problem = `{path}: a table of a class this record does not know`
+				return nil
+			end
+			local i = index[v]
+			if i == nil then
+				if #objects >= ObjectRecord.MAX_OBJECTS then
+					problem = `{path}: more than {ObjectRecord.MAX_OBJECTS} tables`
+					return nil
+				end
+				i = #objects + 1
+				index[v] = i
+				objects[i] = false
+				paths[v] = path
+				table.insert(queue, v)
+			end
+			return { ["$o"] = i }
+		end
+		problem = `{path}: a {typeof(v)} with no name to keep it by`
+		return nil
+	end
+
+	local out: Record = { format = ObjectRecord.FORMAT, roots = {}, objects = objects }
+	local rootNames: { string } = {}
+	for name in roots do table.insert(rootNames, name) end
+	table.sort(rootNames)
+	for _, name in rootNames do
+		local v = roots[name]
+		if type(v) ~= "table" or refOf[v] ~= nil or isVector3(v) then
+			return nil, `root {name} is not an object`
+		end
+		out.roots[name] = value(v, name)
+	end
+	local q = 1
+	while q <= #queue and not problem do
+		local obj = queue[q]
+		q += 1
+		local entries: { any } = {}
+		local path = paths[obj]
+		-- Keys in sorted order, so tables are numbered in the same order whatever the hash order of the live tables.
+		local keys: { any } = {}
+		for k in obj do
+			local kt = type(k)
+			if not ((kt == "string") or (kt == "number" and finite(k))) then
+				problem = `{path}: a key that is not a string or a finite number`
+				break
+			end
+			table.insert(keys, { k })
+		end
+		table.sort(keys, keyLess)
+		for _, key in keys do
+			if problem then break end
+			local k = key[1]
+			local enc = value(obj[k], `{path}.{k}`)
+			if problem then break end
+			table.insert(entries, { k, enc })
+		end
+		local mt = getmetatable(obj)
+		objects[index[obj]] = if mt ~= nil then { c = classOf[mt], e = entries } else { e = entries }
+	end
+	if problem then return nil, problem end
+	return out, nil
+end
+
+local function decodeNumber(x: any): (number?, string?)
+	if type(x) == "number" then
+		if finite(x) then return x, nil end
+		return nil, "a number JSON cannot hold, written bare"
+	end
+	if type(x) == "table" then
+		local n = x["$n"]
+		if n == "inf" then return math.huge, nil end
+		if n == "-inf" then return -math.huge, nil end
+		if n == "nan" then return 0 / 0, nil end
+	end
+	return nil, "not a number"
+end
+
+local function only(t: any, key: string): boolean
+	local count = 0
+	for _ in t do count += 1 end
+	return count == 1 and t[key] ~= nil
+end
+
+-- Checks `record` and builds every object fresh (nothing live is touched). Returns the fresh objects and roots, or nil and
+-- every problem found.
+function ObjectRecord.decode(record: any, classes: { [string]: any }, refs: { [string]: any }): (Decoded?, { string })
+	local problems: { string } = {}
+	local function bad(text: string)
+		if #problems < 20 then table.insert(problems, text) end
+	end
+	if type(record) ~= "table" or record.format ~= ObjectRecord.FORMAT then
+		return nil, { "not an object record of this format" }
+	end
+	local objects, roots = record.objects, record.roots
+	if type(objects) ~= "table" or type(roots) ~= "table" then
+		return nil, { "the record has no objects or roots" }
+	end
+	local n = #objects
+	if n > ObjectRecord.MAX_OBJECTS then
+		return nil, { "too many objects" }
+	end
+	for k in objects do
+		if type(k) ~= "number" or k < 1 or k > n or k ~= math.floor(k) then
+			return nil, { "the objects are not a list" }
+		end
+	end
+	local fresh: { any } = table.create(n)
+	for i = 1, n do fresh[i] = {} end
+
+	local function value(v: any, where: string): any
+		local t = type(v)
+		if t == "string" or t == "boolean" then return v end
+		if t == "number" then
+			if not finite(v) then bad(`{where}: a bare number JSON cannot hold`) end
+			return v
+		end
+		if t ~= "table" then
+			bad(`{where}: a {t}`)
+			return nil
+		end
+		if only(v, "$o") then
+			local i = v["$o"]
+			if type(i) ~= "number" or i < 1 or i > n or i ~= math.floor(i) then
+				bad(`{where}: points at no object`)
+				return nil
+			end
+			return fresh[i]
+		end
+		if only(v, "$r") then
+			local name = v["$r"]
+			if type(name) ~= "string" or refs[name] == nil then
+				bad(`{where}: names '{tostring(name)}', which this world does not have`)
+				return nil
+			end
+			return refs[name]
+		end
+		if only(v, "$v") then
+			local xyz = v["$v"]
+			if type(xyz) ~= "table" or #xyz ~= 3 then
+				bad(`{where}: a vector without three numbers`)
+				return nil
+			end
+			local x, e1 = decodeNumber(xyz[1])
+			local y, e2 = decodeNumber(xyz[2])
+			local z, e3 = decodeNumber(xyz[3])
+			if e1 or e2 or e3 then
+				bad(`{where}: a vector with {e1 or e2 or e3}`)
+				return nil
+			end
+			return Vector3.new(x :: number, y :: number, z :: number)
+		end
+		if only(v, "$n") then
+			local x, e = decodeNumber(v)
+			if e then bad(`{where}: {e}`) end
+			return x
+		end
+		bad(`{where}: a table that is none of the record's kinds`)
+		return nil
+	end
+
+	for i = 1, n do
+		local o = objects[i]
+		local where = `object {i}`
+		if type(o) ~= "table" or type(o.e) ~= "table" then
+			bad(`{where}: not an object`)
+			continue
+		end
+		if o.c ~= nil then
+			if type(o.c) ~= "string" or classes[o.c] == nil then
+				bad(`{where}: of class '{tostring(o.c)}', which this build does not know`)
+				continue
+			end
+		end
+		local target = fresh[i]
+		for j, entry in o.e do
+			if type(entry) ~= "table" or #entry ~= 2 then
+				bad(`{where}, entry {j}: not a key and a value`)
+				continue
+			end
+			local k = entry[1]
+			if not (type(k) == "string" or (type(k) == "number" and finite(k))) then
+				bad(`{where}, entry {j}: a key that is not a string or a finite number`)
+				continue
+			end
+			if target[k] ~= nil then
+				bad(`{where}: the key {k} twice`)
+				continue
+			end
+			target[k] = value(entry[2], `{where}.{k}`)
+		end
+		if o.c ~= nil and classes[o.c] then
+			setmetatable(target, classes[o.c])
+		end
+	end
+	local out: { [string]: any } = {}
+	for name, v in roots do
+		if type(name) ~= "string" then
+			bad("a root without a name")
+			continue
+		end
+		local r = value(v, `root {name}`)
+		if type(r) ~= "table" then
+			bad(`root {name} is not an object`)
+		end
+		out[name] = r
+	end
+	if #problems > 0 then return nil, problems end
+	return { roots = out, objects = fresh }, problems
+end
+
+-- Moves a decoded world into the live one: every live root (by name) ends up with exactly the fresh root's contents and
+-- metatable, and every fresh reference to a fresh root now points at the live root. `live` must name every decoded root.
+-- Plain table work only: it cannot fail part way. Returns false (and changes nothing) if a root is missing from `live`.
+function ObjectRecord.commit(decoded: Decoded, live: { [string]: any }): boolean
+	local swap: { [any]: any } = {}
+	for name, fresh in decoded.roots do
+		local target = live[name]
+		if type(target) ~= "table" then return false end
+		swap[fresh] = target
+	end
+	for _, o in decoded.objects do
+		for k, v in o do
+			local to = swap[v]
+			if to ~= nil then o[k] = to end
+		end
+	end
+	for fresh, target in swap do
+		table.clear(target)
+		for k, v in fresh do target[k] = v end
+		setmetatable(target, getmetatable(fresh))
+	end
+	return true
+end
+
+-- Every plain table reachable from `root` (not through a metatable), named by its path from `name`: the species data a
+-- record should keep by name rather than copy.
+function ObjectRecord.constants(name: string, root: any, into: { [string]: any }?): { [string]: any }
+	local out = into or {}
+	local seen: { [any]: boolean } = {}
+	local function walk(v: any, path: string)
+		if type(v) ~= "table" or seen[v] or isVector3(v) then return end
+		seen[v] = true
+		out[path] = v
+		for k, x in v do
+			if type(k) == "string" or type(k) == "number" then walk(x, `{path}.{k}`) end
+		end
+	end
+	walk(root, name)
+	return out
+end
+
+return ObjectRecord
+]]></string>
+          </Properties>
+        </Item>
+      </Item>
+      <Item class="Folder" referent="54">
         <Properties>
           <string name="Name">Prey</string>
         </Properties>
-        <Item class="ModuleScript" referent="45">
+        <Item class="ModuleScript" referent="55">
           <Properties>
             <string name="Name">Feeding</string>
             <string name="Source"><![CDATA[--!strict
--- Frozen feeding_controller.gd / needs_model.gd: struggle after landing, then conserved nutrition grants.
+-- Frozen feeding_controller.gd: struggle after landing, then conserved nutrition grants. The energy itself belongs to the
+-- NeedsModel (ROBLOX-24): each tick this advances it (active unless still on a surface, as Godot's controller does) and asks it
+-- to grant what the fly gave up, under the meal's capture key. `needs` is the sandbox model unless the owner gives it another
+-- (the client gives it the life one). taken/granted/ledger are this controller's own totals, kept as before.
 local R=require(script.Parent.PreyRandom)
+local NeedsModel=require(script.Parent.Parent.Life.NeedsModel)
 local F={};F.__index=F
-function F.new(): any
+function F.new(needs: any?): any
  return setmetatable({held=nil,struggling=false,feeding=false,grip=0,elapsed=0,waiting=0,jerk=0,venom=6,
-  swallow=0,energy=.55,taken=0,granted=0,ledger={},auto=false,tap=false,note='',rng=R.new(513)},F)
+  swallow=0,needs=needs or NeedsModel.new(),taken=0,granted=0,ledger={},auto=false,tap=false,note='',rng=R.new(513)},F)
 end
 function F.capture(self: any,fly: any)
  self.held=fly;self.struggling=true;self.feeding=false;self.grip=.4;self.elapsed=0;self.waiting=0
  self.venom=self.rng:draw({6,8});self.jerk=self.rng:draw({.35,.75});self.note='Caught!'
 end
 function F.press(self: any)
- if self.struggling then self.tap=true elseif self.swallow<=0 then self.feeding=not self.feeding end
+ if self.struggling then self.tap=true elseif self.held and self.swallow<=0 then self.feeding=not self.feeding end -- nothing to eat: E is the retreat's (LifeLoop)
 end
 function F.cancel(self: any) self.feeding=false end
 function F.step(self: any,dt: number,attached: boolean,moving: boolean,escape: (any)->())
- self.energy=math.max(.2,self.energy-.0006*dt)
+ self.needs:advance(dt,not attached or moving)
  local f=self.held;if not f then self.tap=false;return end
  if self.struggling then
   if not attached and self.waiting<1 then self.waiting+=dt;self.tap=false;return end
@@ -6245,8 +7993,9 @@ function F.step(self: any,dt: number,attached: boolean,moving: boolean,escape: (
  if self.swallow>0 then self.feeding=true end
  if not self.feeding then return end
  local take=math.min(f.nutrition,f.profile.body.feed_rate_per_s*dt)
- local granted=math.min(take,1-self.energy)
- f.nutrition-=take;self.energy+=granted;self.taken+=take;self.granted+=granted
+ f.nutrition-=take
+ local granted=self.needs:grantEnergy(take,f.captureKey)
+ self.taken+=take;self.granted+=granted
  self.ledger[f.captureKey]=(self.ledger[f.captureKey] or 0)+granted
  if f.nutrition<=1e-9 then f.nutrition=0;f.state='CONSUMED';self.held=nil;self.feeding=false;self.note='Meal finished.' end
 end
@@ -6254,7 +8003,7 @@ return F
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="46">
+        <Item class="ModuleScript" referent="56">
           <Properties>
             <string name="Name">Fly</string>
             <string name="Source"><![CDATA[--!strict
@@ -6471,7 +8220,7 @@ return Fly
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="47">
+        <Item class="ModuleScript" referent="57">
           <Properties>
             <string name="Name">FlyFlight</string>
             <string name="Source"><![CDATA[--!strict
@@ -6536,7 +8285,7 @@ return F
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="48">
+        <Item class="ModuleScript" referent="58">
           <Properties>
             <string name="Name">FlySenses</string>
             <string name="Source"><![CDATA[--!strict
@@ -6598,7 +8347,7 @@ return S
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="49">
+        <Item class="ModuleScript" referent="59">
           <Properties>
             <string name="Name">PerchGraph</string>
             <string name="Source"><![CDATA[--!strict
@@ -6648,7 +8397,7 @@ return G
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="50">
+        <Item class="ModuleScript" referent="60">
           <Properties>
             <string name="Name">PreyDirector</string>
             <string name="Source"><![CDATA[--!strict
@@ -6770,7 +8519,7 @@ return D
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="51">
+        <Item class="ModuleScript" referent="61">
           <Properties>
             <string name="Name">PreyMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -6860,7 +8609,7 @@ return M
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="52">
+        <Item class="ModuleScript" referent="62">
           <Properties>
             <string name="Name">PreyPopulation</string>
             <string name="Source"><![CDATA[--!strict
@@ -6892,7 +8641,7 @@ return P
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="53">
+        <Item class="ModuleScript" referent="63">
           <Properties>
             <string name="Name">PreyRandom</string>
             <string name="Source"><![CDATA[--!strict
@@ -6906,11 +8655,11 @@ return R
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="54">
+      <Item class="Folder" referent="64">
         <Properties>
           <string name="Name">Rig</string>
         </Properties>
-        <Item class="ModuleScript" referent="55">
+        <Item class="ModuleScript" referent="65">
           <Properties>
             <string name="Name">Anatomy</string>
             <string name="Source"><![CDATA[--!strict
@@ -7042,7 +8791,7 @@ return Anatomy
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="56">
+        <Item class="ModuleScript" referent="66">
           <Properties>
             <string name="Name">Idle</string>
             <string name="Source"><![CDATA[--!strict
@@ -7099,7 +8848,7 @@ return Idle
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="57">
+        <Item class="ModuleScript" referent="67">
           <Properties>
             <string name="Name">Setae</string>
             <string name="Source"><![CDATA[--!strict
@@ -7410,7 +9159,7 @@ return Setae
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="58">
+        <Item class="ModuleScript" referent="68">
           <Properties>
             <string name="Name">SpiderRig</string>
             <string name="Source"><![CDATA[--!strict
@@ -8019,11 +9768,11 @@ return SpiderRig
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="59">
+      <Item class="Folder" referent="69">
         <Properties>
           <string name="Name">UI</string>
         </Properties>
-        <Item class="ModuleScript" referent="60">
+        <Item class="ModuleScript" referent="70">
           <Properties>
             <string name="Name">ControlText</string>
             <string name="Source"><![CDATA[--!strict
@@ -8219,7 +9968,7 @@ function ControlText.helpCard(device: Device): string
 			"Tap A hop   Hold A aim, release to leap   B cancel",
 			"X lower on silk   On the line: stick up reel, down lower, hold B let go",
 			"Y spider-eye view   Right-stick click recenter   LT focus   RT slow motion",
-			"View back to the start",
+			"In the crack: L3 rest (sleep from evening)   View: last checkpoint",
 		}, "\n")
 	elseif device == "touch" then
 		return table.concat({
@@ -8227,6 +9976,7 @@ function ControlText.helpCard(device: Device): string
 			"Tap Jump hop   Hold Jump aim, release to leap   Cancel",
 			"Silk lowers on silk   On the line: ↑ reel, ↓ lower, hold Let go",
 			"Eye spider-eye view   Recenter",
+			"In the crack: Rest (Sleep from evening)",
 		}, "\n")
 	end
 	return table.concat({
@@ -8234,7 +9984,8 @@ function ControlText.helpCard(device: Device): string
 		"Tap Space hop   Hold Space aim, release to leap   Q cancel",
 		"F lower on silk   On the line: W reel, S lower, hold Q let go",
 		"V spider-eye view   R recenter   Right mouse focus   T slow motion",
-		"Wheel zoom   Backspace back to start   G gait   H hide this",
+		"In the crack: E rest (sleep from evening)   Backspace: last checkpoint",
+		"Wheel zoom   G gait   H hide this",
 	}, "\n")
 end
 
@@ -8242,7 +9993,7 @@ return ControlText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="61">
+        <Item class="ModuleScript" referent="71">
           <Properties>
             <string name="Name">EyeOptics</string>
             <string name="Source"><![CDATA[--!strict
@@ -8575,7 +10326,7 @@ return EyeOptics
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="62">
+        <Item class="ModuleScript" referent="72">
           <Properties>
             <string name="Name">HudLayout</string>
             <string name="Source"><![CDATA[--!strict
@@ -8656,7 +10407,70 @@ return HudLayout
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="63">
+        <Item class="ModuleScript" referent="73">
+          <Properties>
+            <string name="Name">LifeText</string>
+            <string name="Source"><![CDATA[--!strict
+-- The words of the life clock and the retreat for the screen (ROBLOX-24), from Godot's habitat_loop.gd caption(): the day and
+-- the part of it, the one line for the time of day or hunger, and the retreat's prompt. Button names come from ControlText for
+-- the device in use (Godot's interact is the port's feed button, E; cancel is Q). Pure, checked in tests/life.luau.
+local ControlText = require(script.Parent.ControlText)
+
+local LifeText = {}
+
+export type Prompt = { title: string, hint: string }
+
+-- "Day 2, evening".
+function LifeText.day(day: number, part: string): string
+	return `Day {day}, {part}`
+end
+
+-- The line under the day (Godot's precedence, among the lines this port has): starving, hungry, night, evening; nil otherwise.
+-- `gentle` rules never say starving (Godot: is_starving() and not gentle).
+function LifeText.line(part: string, energy: number, starving: boolean, gentle: boolean, hungryAt: number): string?
+	if starving and not gentle then
+		return "Starving: your spider's reserve is gone. It must eat soon."
+	end
+	if energy <= hungryAt then
+		return "Hungry: time to hunt."
+	end
+	if part == "night" then
+		return "It is dark, and your eyes reach only a little way. Home is the silk-lined crack at the west end."
+	end
+	if part == "evening" then
+		return "Evening. Jumping spiders go into their silk retreat before dark."
+	end
+	return nil
+end
+
+-- The retreat's prompt: asleep, resting, or able to rest (sleep in the evening and at night); nil when none of these.
+function LifeText.prompt(asleep: boolean, resting: boolean, canRest: boolean, sleepTime: boolean, device: ControlText.Device): Prompt?
+	local feed, cancel = ControlText.name(device, "feed"), ControlText.name(device, "cancel")
+	if asleep then
+		return { title = "Asleep in the silk-lined crack", hint = `The night passes. Move, {feed} or {cancel} to wake.` }
+	end
+	if resting then
+		return { title = "Resting in the silk-lined crack", hint = `Move, {feed} or {cancel} to leave.` }
+	end
+	if canRest then
+		return { title = "The silk-lined crack", hint = if sleepTime then `{feed}: sleep until morning` else `{feed}: rest` }
+	end
+	return nil
+end
+
+-- What the touch feed button says when it is the retreat's (nil: it is the meal's, or hidden).
+function LifeText.touchLabel(asleep: boolean, resting: boolean, canRest: boolean, sleepTime: boolean): string?
+	if asleep then return "Wake" end
+	if resting then return "Leave" end
+	if canRest then return if sleepTime then "Sleep" else "Rest" end
+	return nil
+end
+
+return LifeText
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="74">
           <Properties>
             <string name="Name">PerceptionShapes</string>
             <string name="Source"><![CDATA[--!strict
@@ -8749,7 +10563,7 @@ return Shapes
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="64">
+        <Item class="ModuleScript" referent="75">
           <Properties>
             <string name="Name">PerceptionText</string>
             <string name="Source"><![CDATA[--!strict
@@ -8765,7 +10579,7 @@ return table.freeze(Text)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="65">
+        <Item class="ModuleScript" referent="76">
           <Properties>
             <string name="Name">PerceptionView</string>
             <string name="Source"><![CDATA[--!strict
@@ -8817,15 +10631,15 @@ return View
       </Item>
     </Item>
   </Item>
-  <Item class="ServerScriptService" referent="66">
+  <Item class="ServerScriptService" referent="77">
     <Properties>
       <string name="Name">ServerScriptService</string>
     </Properties>
-    <Item class="Folder" referent="67">
+    <Item class="Folder" referent="78">
       <Properties>
         <string name="Name">Server</string>
       </Properties>
-      <Item class="Script" referent="68">
+      <Item class="Script" referent="79">
         <Properties>
           <string name="Name">Main</string>
           <token name="RunContext">0</token>
@@ -8872,19 +10686,19 @@ sill.Parent = Workspace
       </Item>
     </Item>
   </Item>
-  <Item class="StarterPlayer" referent="69">
+  <Item class="StarterPlayer" referent="80">
     <Properties>
       <string name="Name">StarterPlayer</string>
     </Properties>
-    <Item class="StarterPlayerScripts" referent="70">
+    <Item class="StarterPlayerScripts" referent="81">
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="Folder" referent="71">
+      <Item class="Folder" referent="82">
         <Properties>
           <string name="Name">Client</string>
         </Properties>
-        <Item class="ModuleScript" referent="72">
+        <Item class="ModuleScript" referent="83">
           <Properties>
             <string name="Name">FlyBodies</string>
             <string name="Source"><![CDATA[--!strict
@@ -9136,7 +10950,7 @@ return FlyBodies
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="73">
+        <Item class="ModuleScript" referent="84">
           <Properties>
             <string name="Name">PerceptionHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -9358,7 +11172,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="74">
+        <Item class="ModuleScript" referent="85">
           <Properties>
             <string name="Name">PerceptionStage</string>
             <string name="Source"><![CDATA[--!strict
@@ -9403,7 +11217,7 @@ return Stage
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="75">
+        <Item class="ModuleScript" referent="86">
           <Properties>
             <string name="Name">SpiderCamera</string>
             <string name="Source"><![CDATA[--!strict
@@ -9774,7 +11588,7 @@ return SpiderCamera
 ]]></string>
           </Properties>
         </Item>
-        <Item class="LocalScript" referent="76">
+        <Item class="LocalScript" referent="87">
           <Properties>
             <string name="Name">SpiderClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -9823,6 +11637,12 @@ local PerceptionStage = require(script.Parent.PerceptionStage)
 local PerceptionHud = require(script.Parent.PerceptionHud)
 local PreyDirector = require(Shared.Prey.PreyDirector)
 local FlyBodies = require(script.Parent.FlyBodies)
+local NeedsModel = require(Shared.Life.NeedsModel)
+local LifeLoop = require(Shared.Life.LifeLoop)
+local LifeText = require(Shared.UI.LifeText)
+local DayLight = require(Shared.Habitat.DayLight)
+local Checkpoint = require(Shared.Persistence.Checkpoint)
+local CheckpointStore = require(Shared.Persistence.CheckpointStore)
 local focusState = FocusState.new()
 local DT = SpiderMotor.DT
 local SLOW_SPEED = 0.5
@@ -9874,6 +11694,33 @@ local perceptionHud = PerceptionHud.new(player:WaitForChild("PlayerGui"))
 local stage = if Workspace:GetAttribute("TestTarget") == true or (Workspace:GetAttribute("TestTarget") ~= false and script.Parent:FindFirstChild("SilkPlayback")) then PerceptionStage.new(sill) else nil
 local prey = PreyDirector.engine(sill, Species.fly_like_prototype, 914, 4)
 local flyBodies = FlyBodies.new(Workspace)
+-- LIFE (ROBLOX-24): the windowsill runs the life clock, so hunger runs by its hours (NeedsModel life mode, Standard rules: the
+-- port has no Easy mode yet). Feeding grants into the same model. The loop keeps the rest, sleep, daylight and the eyes' reach.
+local needs = NeedsModel.new(true, false)
+prey.feeding.needs = needs
+local life = LifeLoop.new(needs, nil)
+-- S01-C retreat checkpoints (ROBLOX-25): resting in the crack, and each morning, keeps one; Backspace / View returns to it. The
+-- store is DataStore-shaped but in memory only: a checkpoint lasts the session. No live DataStore is written.
+local checkpointWorld: Checkpoint.World = { motor = motor, prey = prey, sensor = sensor, memory = memory, needs = needs, life = life }
+local checkpoints = CheckpointStore.new(CheckpointStore.MemoryDataStore.new(), function(r: any): { string }
+	return (Checkpoint.check(r, checkpointWorld))
+end)
+life.save = function(): LifeLoop.CheckpointResult
+	local why = Checkpoint.boundaryProblem(checkpointWorld)
+	if why ~= "" then return { ok = false, message = why } end
+	local record, err = Checkpoint.capture(checkpointWorld, os.time())
+	if not record then
+		warn("[Windowsill] checkpoint: " .. tostring(err))
+		return { ok = false, message = "this moment could not be recorded" }
+	end
+	local r = checkpoints:save(record)
+	if not r.ok then warn("[Windowsill] checkpoint: " .. r.message .. ": " .. table.concat(r.errors, "; ")) end
+	return { ok = r.ok, message = r.message }
+end
+local feedPending, cancelPending = false, false -- this frame's presses, for the next fixed tick (Godot's just_pressed)
+local lifeSpider: LifeLoop.Spider = { inRetreat = false, attached = true, still = true, holding = false, feeding = false }
+local dayClock: number? = nil -- the daytime ClockTime (SunPick's choice, read once from the server's Lighting)
+local lastLight: number? = nil
 local gripPress = false
 local function focusActive(): boolean
 	return focusState:active(false, player:GetAttribute("FocusToggle") == true, motor.mode == "attached")
@@ -10037,12 +11884,41 @@ local function backToStart()
 	cam:snap()
 end
 
-local controls: any = SpiderInput.bind({
+local controls: any -- bound below (SpiderInput.bind)
+
+-- Backspace / View: back to the retreat checkpoint (the whole sill as it was), or to the start when there is none yet.
+local function returnToCheckpoint()
+	local best = checkpoints:loadBest()
+	if not best.ok then
+		backToStart()
+		hud:toast(if best.message == "no checkpoint to return to" then "No checkpoint yet: back to the start. Rest in the silk-lined crack to keep one." else "Back to the start: " .. best.message, true)
+		return
+	end
+	jump:drop(motor)
+	local ok, problems = Checkpoint.restore(best.record, checkpointWorld)
+	if not ok then
+		warn("[Windowsill] checkpoint refused: " .. table.concat(problems, "; "))
+		hud:toast("The checkpoint could not be used: " .. (problems[1] or "unknown"), true)
+		return
+	end
+	controls:clear()
+	focusState:clear()
+	dropStrands(false)
+	drawnUp = motor.up
+	cam:snap()
+	lastLight = nil -- the hour may have changed: set the light again
+	feedPending, cancelPending = false, false
+end
+
+controls = SpiderInput.bind({
 	focus = function(phase: string)
 		if phase == "begin" then focusState:press(player:GetAttribute("FocusToggle") == true, motor.mode == "attached")
 		elseif phase == "cancel" then focusState:clear() end
 	end,
-	feed = function() prey.feeding:press() end,
+	feed = function()
+		prey.feeding:press()
+		feedPending = true -- in the crack, with nothing to eat, the same button rests (Godot's interact)
+	end,
 	jump = function(phase: string)
 		if phase == "begin" and prey.feeding.struggling then prey.feeding:press(); gripPress=true; return end
 		if gripPress then if phase ~= "begin" then gripPress=false end; return end
@@ -10059,6 +11935,7 @@ local controls: any = SpiderInput.bind({
 	-- else's then) and, held on the line, lets go; SilkController counts only a fresh press after the 0.4 s grace, held 0.6 s.
 	cancel = function(phase: string)
 		if phase ~= "begin" then return end
+		cancelPending = true -- also ends a rest
 		prey.feeding:cancel()
 		if motor:cancelWalk() then return end
 		focusState:cancel(jump:isBusy() or #jump.events > 0 or motor:onLine())
@@ -10066,7 +11943,7 @@ local controls: any = SpiderInput.bind({
 	end,
 	drop = function() motor:requestDrop() end,
 	clear = dropAll,
-	reset = backToStart,
+	reset = function() returnToCheckpoint() end,
 	gait = function() rig.gaitMode = if rig.gaitMode == "Tetrapod" then "Unilateral" else "Tetrapod" end,
 	eye = function() cam:toggleEyeView() end,
 	recenter = function() cam:startRecenter() end,
@@ -10158,6 +12035,12 @@ local function updateHud(frameDt: number)
 		table.insert(view.status, "Caught — tap " .. ControlText.name(device,"jump") .. " to keep your grip")
 	elseif prey.feeding.feeding then table.insert(view.status, "Feeding — move to stop")
 	elseif prey.feeding.held then table.insert(view.status, "Meal paused — " .. ControlText.name(device,"feed") .. " to eat") end
+	local clock = life.clock
+	view.day = LifeText.day(clock.day, clock:partOfDay())
+	view.dayLine = LifeText.line(clock:partOfDay(), needs.energy, needs:isStarving(), needs.gentle, LifeLoop.HUNGRY_AT)
+	view.notice = if life.noticeSeconds > 0 and life.notice ~= "" then life.notice else nil
+	local canRest = life:canRest(lifeSpider)
+	local restPrompt = LifeText.prompt(life.asleep, life.resting, canRest, clock:isSleepTime(), device)
 	if focusState.latched then table.insert(view.status, "FOCUS ON    " .. ControlText.name(device,"focus") .. " again to stop" .. (if not jump:isBusy() and not motor:onLine() and not motor.silk.walk then " / " .. ControlText.name(device,"cancel") else "")) end
 	if cam.eyeView then table.insert(view.status, `SPIDER-EYE VIEW    {ControlText.name(device, "eye")}: back`) end
 	if slow then
@@ -10175,11 +12058,15 @@ local function updateHud(frameDt: number)
 		view.prompt = { title = title, hint = hint, cue = cue }
 	elseif silk.walk then
 		view.prompt = { hint = ControlText.edgeWalkHint(device) }
+	elseif restPrompt and not aiming then
+		view.prompt = { title = restPrompt.title, hint = restPrompt.hint }
 	elseif motor.mode == "attached" and not aiming and (helpVisible or os.clock() - started < WALK_HINT_SECONDS) then
 		view.prompt = { hint = ControlText.walkHint(device) }
 	end
 	if os.clock() > helpUntil and helpVisible then helpVisible = false end
-	controls:setTouchVisible("Feed", prey.feeding.held ~= nil)
+	local restLabel = LifeText.touchLabel(life.asleep, life.resting, canRest, clock:isSleepTime())
+	controls:setTouchVisible("Feed", prey.feeding.held ~= nil or restLabel ~= nil)
+	controls:setTouchLabel("Feed", if prey.feeding.held ~= nil then "Eat" else restLabel or "Eat")
 	controls:setTouchLabel("Jump", if prey.feeding.struggling then "Grip" else "Jump")
 	controls:setTouchLabel("Cancel", ControlText.touchCancelLabel(onLine))
 	controls:setTouchVisible("Jump", not onLine)
@@ -10207,13 +12094,33 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			sensor:step(DT,motor:observer(),percepts,sightCast)
 			prey:before(DT,motor.pos,motor:observer(),sensor,sightCast,camera)
 			jump:step(motor)
-			motor:tick(tickInput())
+			local input = tickInput()
+			motor:tick(input)
 			prey.feeding.auto = player:GetAttribute("AutomaticGrip") == true
 			prey:after(DT,motor,sensor,sightCast)
+			-- The life loop runs last in the tick (Godot's habitat loop, priority 12); the reach it sets is the next tick's.
+			local holding = prey.feeding.held ~= nil
+			lifeSpider = {
+				inRetreat = Layout.inRetreat(motor.pos), attached = motor.mode == "attached" and not motor.preparing,
+				still = input.wish.Magnitude < 0.01 and motor.vel.Magnitude < 0.15,
+				holding = holding, feeding = holding and prey.feeding.feeding,
+			}
+			life:step(DT, lifeSpider, feedPending, cancelPending)
+			feedPending, cancelPending = false, false
+			sensor.core.rangeScale = life.rangeScale
+			life:drainEvents() -- the screen reads the loop's state and notices; the events are for tests and later rounds
 			if motor.mode ~= "attached" then focusState:clear() end
 			if stage then stage.target:step(DT); stage.marker.Position = stage.target.position end
 			cam:tick(DT)
 		end
+	end
+	-- The light of the hour (DayLight; the eyes' reach comes from the clock, not from this). The daytime sun is the one the
+	-- server picked, read once it has arrived (or after a few seconds without it).
+	if dayClock == nil and (Lighting:GetAttribute("SunPick") ~= nil or os.clock() - started > 5) then dayClock = Lighting.ClockTime end
+	local dc = dayClock
+	if dc and DayLight.due(lastLight, life.daylight) then
+		DayLight.apply(Lighting, DayLight.targets(life.daylight, dc), Workspace:FindFirstChild("Decor"))
+		lastLight = life.daylight
 	end
 	-- Drawn frame: the up vector eases so walls and edges do not snap.
 	local simFrame = frameDt * (if slow then SLOW_SPEED else 1)
@@ -10263,7 +12170,7 @@ if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
 	task.spawn(function()
 		local run: any = (require :: any)(playback)
 		run({
-			prey = prey, flyBodies = flyBodies, sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
+			prey = prey, flyBodies = flyBodies, life = life, needs = needs, checkpoints = checkpoints, returnToCheckpoint = function() returnToCheckpoint() end, lifeSpider = function() return lifeSpider end, sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
 			input = controls,
 			drop = function() motor:requestDrop() end,
 			jump = jump,
@@ -10288,7 +12195,7 @@ end
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="77">
+        <Item class="ModuleScript" referent="88">
           <Properties>
             <string name="Name">SpiderEyes</string>
             <string name="Source"><![CDATA[--!strict
@@ -10746,7 +12653,7 @@ return SpiderEyes
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="78">
+        <Item class="ModuleScript" referent="89">
           <Properties>
             <string name="Name">SpiderHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -10906,9 +12813,27 @@ function Hud.new(playerGui: Instance): any
 	-- The spider-eye view's explanation, the first time (ROBLOX-20): right under the status lines, in the column, so it never covers
 	-- the aim words or the prompts. Shown from view.caption = { text, alpha }.
 	local caption = wrapLabel("Caption", top, 15, 2)
-	local toast = wrapLabel("Toast", top, 17, 3)
-	local help = wrapLabel("Controls", top, 15, 4)
+	-- The life loop's notices ("Morning, day 2", "Checkpoint kept."), for as long as LifeLoop keeps them (ROBLOX-24).
+	local notice = wrapLabel("Notice", top, 16, 3)
+	local toast = wrapLabel("Toast", top, 17, 4)
+	local help = wrapLabel("Controls", top, 15, 5)
 	help.TextXAlignment = Enum.TextXAlignment.Left
+	-- The day, and one line for the time of day or hunger, small in the top-left corner (ROBLOX-24).
+	local dayBox = Instance.new("Frame")
+	dayBox.Name = "DayBox"
+	dayBox.BackgroundTransparency = 1
+	dayBox.Position = UDim2.fromOffset(12, 8)
+	dayBox.Size = UDim2.fromOffset(300, 0) -- a fixed width, so the wrapped line inside has one to wrap at
+	dayBox.AutomaticSize = Enum.AutomaticSize.Y
+	local dayList = Instance.new("UIListLayout")
+	dayList.HorizontalAlignment = Enum.HorizontalAlignment.Left
+	dayList.SortOrder = Enum.SortOrder.LayoutOrder
+	dayList.Padding = UDim.new(0, 4)
+	dayList.Parent = dayBox
+	dayBox.Parent = safe
+	local day = pill("Day", dayBox, 15, 1)
+	local dayLine = wrapLabel("DayLine", dayBox, 14, 2)
+	dayLine.TextXAlignment = Enum.TextXAlignment.Left
 	local panel = Instance.new("Frame")
 	panel.Name = "PromptPanel"
 	panel.BackgroundTransparency = 1
@@ -10929,7 +12854,7 @@ function Hud.new(playerGui: Instance): any
 	local self = setmetatable({
 		grip = grip, gripFill = gripFill, centre = centre, safe = safe, reticle = reticle, ticks = ticks,
 		aimTitle = aimTitle, aimHint = aimHint, anchorLabel = anchorLabel,
-		status = status, caption = caption, toastLabel = toast, help = help,
+		status = status, caption = caption, toastLabel = toast, help = help, notice = notice, day = day, dayLine = dayLine,
 		panel = panel, promptTitle = promptTitle, promptHint = promptHint, promptCue = promptCue,
 		toastLeft = 0, device = "keyboard", lastSpan = "",
 	}, Hud)
@@ -10964,7 +12889,7 @@ function Hud._place(self: any)
 end
 
 -- view: device, aiming, focus, eyeView, aimTitle, aimHint, aimColor, anchorText, anchorOk, status ({string}),
--- caption ({text, alpha} or nil), prompt ({title, hint, cue} or nil), helpVisible, helpText.
+-- caption ({text, alpha} or nil), prompt ({title, hint, cue} or nil), helpVisible, helpText, notice, day and dayLine (strings or nil).
 function Hud.update(self: any, view: any, dt: number)
 	self.grip.Visible = view.grip ~= nil
  if view.grip then self.gripFill.Size = UDim2.fromScale(math.clamp(view.grip,0,1),1) end
@@ -10978,6 +12903,9 @@ function Hud.update(self: any, view: any, dt: number)
 	show(self.anchorLabel, view.anchorText)
 	self.anchorLabel.TextColor3 = if view.anchorOk then OK_COLOR else WARN_COLOR
 	show(self.status, table.concat(view.status or {}, "\n"))
+	show(self.notice, view.notice)
+	show(self.day, view.day)
+	show(self.dayLine, view.dayLine)
 	local caption = view.caption
 	if caption then
 		if self.caption.Text ~= caption.text then self.caption.Text = caption.text end
@@ -11002,7 +12930,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="79">
+        <Item class="ModuleScript" referent="90">
           <Properties>
             <string name="Name">SpiderInput</string>
             <string name="Source"><![CDATA[--!strict
@@ -11209,7 +13137,7 @@ return SpiderInput
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="80">
+        <Item class="ModuleScript" referent="91">
           <Properties>
             <string name="Name">WorldDetail</string>
             <string name="Source"><![CDATA[--!strict
@@ -11252,7 +13180,7 @@ return WorldDetail
       </Item>
     </Item>
   </Item>
-  <Item class="Workspace" referent="81">
+  <Item class="Workspace" referent="92">
     <Properties>
       <string name="Name">Workspace</string>
       <float name="Gravity">35</float>

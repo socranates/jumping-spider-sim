@@ -1,0 +1,452 @@
+-- LIFE checks: the life clock, the needs and the rest-and-sleep loop of the port against the frozen Godot code.
+-- tests/life_reference.json is made by tools/export_life_reference.gd, which runs Godot's own LifeClock, NeedsModel and habitat
+-- loop (on a stand-in world); this file replays the same calls through Shared/Life and compares every value. Then the cases of
+-- Godot's tests/integration/test_life01_clock_hunger.gd that need no world, ported by hand.
+-- Run with the other suites:  python3 tests/run.py path/to/luau life.luau
+local LifeClock = require("../src/Shared/Life/LifeClock")
+local NeedsModel = require("../src/Shared/Life/NeedsModel")
+local LifeLoop = require("../src/Shared/Life/LifeLoop")
+local DayLight = require("../src/Shared/Habitat/DayLight")
+local LifeText = require("../src/Shared/UI/LifeText")
+local Graphics = require("../src/Shared/Data/Graphics")
+local Layout = require("../src/Shared/Habitat/WindowsillLayout")
+local ref = require("./life_reference")
+
+local passed, failed = 0, 0
+local current = ""
+local function check(ok: boolean, what: string): boolean
+	if ok then passed += 1 else failed += 1; print(`FAIL [{current}] {what}`) end
+	return ok
+end
+local function near(got: number, want: number, eps: number, what: string)
+	check(math.abs(got - want) <= eps, `{what} (got {got}, wanted {want})`)
+end
+local function case(name: string, fn: () -> ())
+	current = name
+	local ok, err = pcall(fn)
+	if not ok then failed += 1; print(`FAIL [{name}] raised: {tostring(err)}`) end
+end
+local function num(x: any): number
+	if x == "nan" then return 0 / 0 end
+	if x == "inf" then return math.huge end
+	if x == "-inf" then return -math.huge end
+	return x
+end
+local EPS = 1e-9
+
+-- ------------------------------------------------------------------------------------------------------------- the clock
+case("clock constants", function()
+	local c = ref.clock.constants
+	near(LifeClock.WAKE_H, c.wake, 0, "wake")
+	near(LifeClock.DAWN_H, c.dawn, 0, "dawn")
+	near(LifeClock.DUSK_H, c.dusk, 0, "dusk")
+	near(LifeClock.NIGHT_H, c.night, 0, "night")
+	near(LifeClock.EVENING_H, c.evening, 0, "evening")
+	near(LifeClock.START_DAY, c.start_day, 0, "start day")
+	near(LifeClock.START_H, c.start_hour, 0, "start hour")
+	near(LifeClock.ACTIVE_HOURS_PER_S, c.active_rate, 1e-15, "active rate")
+	near(LifeClock.SLEEP_HOURS_PER_S, c.sleep_rate, 0, "sleep rate")
+	near(LifeLoop.NIGHT_SIGHT, ref.night_sight, 0, "night sight")
+end)
+
+case("clock over the day", function()
+	for _, g in ref.clock.grid do
+		local c = LifeClock.new()
+		c.hour = g.hour
+		near(c:daylight(), g.daylight, EPS, `daylight at {g.hour}`)
+		check(c:partOfDay() == g.part, `words at {g.hour}: {c:partOfDay()} against {g.part}`)
+		check(c:isSleepTime() == g.sleep_time, `sleep time at {g.hour}`)
+		near(c:hoursUntil(LifeClock.WAKE_H), g.until_wake, EPS, `hours until waking at {g.hour}`)
+		near(c:hoursUntil(LifeClock.DUSK_H), g.until_dusk, EPS, `hours until dusk at {g.hour}`)
+	end
+end)
+
+case("clock sequences", function()
+	for n, seq in ref.clock.sequences do
+		local c = LifeClock.new()
+		c.day, c.hour = seq.day, seq.hour
+		for i, st in seq.steps do
+			local s = num(st.seconds)
+			local h = if st.op == "m" then c:advanceMoult(s) else c:advance(s, st.asleep)
+			local at = `sequence {n} step {i}`
+			near(h, st.hours, EPS, `{at}: hours passed`)
+			check(c.day == st.day, `{at}: day {c.day} against {st.day}`)
+			near(c.hour, st.hour, EPS, `{at}: hour`)
+			check(c.sleeping == st.sleeping, `{at}: sleeping`)
+			near(c:daylight(), st.daylight, EPS, `{at}: daylight`)
+			check(c:partOfDay() == st.part, `{at}: words`)
+			check(c:isSleepTime() == st.sleep_time, `{at}: sleep time`)
+			near(c:hoursUntil(LifeClock.WAKE_H), st.until_wake, EPS, `{at}: until waking`)
+		end
+	end
+end)
+
+case("a night of sleep tick by tick", function()
+	local g = ref.clock.night
+	local c = LifeClock.new()
+	c.hour = 19.0
+	local largest, ticks = 0, 0
+	local last = c.hour + 24 * c.day
+	while ticks < 5000 do
+		c:advance(ref.dt, true)
+		ticks += 1
+		local now = c.hour + 24 * c.day
+		largest = math.max(largest, now - last)
+		last = now
+		if not c.sleeping then break end
+	end
+	check(ticks == g.ticks, `ticks {ticks} against {g.ticks}`)
+	near(largest, g.largest, EPS, "the largest step")
+	check(largest <= LifeClock.SLEEP_HOURS_PER_S * ref.dt + 1e-6, "never more than a tick's worth at a time")
+	check(c.day == g.day and math.abs(c.hour - g.hour) < EPS and c.sleeping == g.sleeping, "wakes when Godot does")
+end)
+
+case("clock records", function()
+	for i, r in ref.clock.records do
+		local c = LifeClock.new()
+		c.day, c.hour = 5, 12.5
+		local got = LifeClock.problems(r.record)
+		check(#got == #r.problems, `record {i}: {#got} problems against {#r.problems}`)
+		for j, p in r.problems do
+			check(got[j] == p, `record {i}: '{tostring(got[j])}' against '{p}'`)
+		end
+		local loaded = if type(r.record) == "table" then c:load(r.record) else false
+		check(loaded == r.loaded, `record {i}: loaded`)
+		check(c.day == r.day and c.hour == r.hour and c.sleeping == r.sleeping, `record {i}: the clock after`)
+	end
+end)
+
+-- ------------------------------------------------------------------------------------------------------------- the needs
+local function needsMatch(n: any, g: any, at: string)
+	near(n.energy, g.energy, EPS, `{at}: energy`)
+	near(n.rest, g.rest, EPS, `{at}: rest`)
+	near(n.elapsedS, g.elapsed, EPS, `{at}: elapsed`)
+	near(n.grantedTotal, g.granted_total, EPS, `{at}: granted`)
+	check(n.grantsMade == g.grants_made and n.grantsRefused == g.grants_refused, `{at}: grants made {n.grantsMade}/{g.grants_made}, refused {n.grantsRefused}/{g.grants_refused}`)
+	near(n.starvingHours, g.starving_hours, EPS, `{at}: starving hours`)
+	near(n.starvingStreakH, g.streak, EPS, `{at}: starving streak`)
+	check(n:isStarving() == g.starving, `{at}: starving`)
+	check(n:isFull() == g.full, `{at}: full`)
+	near(n:room(), g.room, EPS, `{at}: room`)
+	local rec = n:toRecord()
+	near(rec.update_accumulator[1], g.acc[1], EPS, `{at}: active accumulator`)
+	near(rec.update_accumulator[2], g.acc[2], EPS, `{at}: still accumulator`)
+	near(rec.hour_accumulator[1], g.hour_acc[1], EPS, `{at}: waking hours accumulator`)
+	near(rec.hour_accumulator[2], g.hour_acc[2], EPS, `{at}: sleeping hours accumulator`)
+end
+
+case("needs constants", function()
+	local c = ref.needs.constants
+	for k, v in {
+		max = NeedsModel.ENERGY_MAX, start = NeedsModel.ENERGY_START, drain = NeedsModel.ENERGY_DRAIN_PER_S, floor = NeedsModel.ENERGY_FLOOR,
+		rest_start = NeedsModel.REST_START, rest_drain = NeedsModel.REST_DRAIN_PER_S, rest_recover = NeedsModel.REST_RECOVER_PER_S,
+		period = NeedsModel.UPDATE_PERIOD_S, max_step = NeedsModel.MAX_STEP_S, full_at = NeedsModel.FULL_AT,
+		awake_per_h = NeedsModel.LIFE_DRAIN_AWAKE_PER_H, asleep_per_h = NeedsModel.LIFE_DRAIN_ASLEEP_PER_H,
+		gentle_drain = NeedsModel.GENTLE_DRAIN, gentle_floor = NeedsModel.GENTLE_FLOOR,
+	} do
+		near(v, c[k], 0, k)
+	end
+end)
+
+case("needs sequences", function()
+	for n, seq in ref.needs.sequences do
+		local m = NeedsModel.new(seq.life, seq.gentle)
+		for i, st in seq.steps do
+			local v = num(st.value)
+			local ret = 0
+			if st.op == "adv" then m:advance(v, st.flag)
+			elseif st.op == "hrs" then m:addHours(v, st.flag)
+			elseif st.op == "grant" then ret = m:grantEnergy(v, st.flag)
+			elseif st.op == "rest" then m:restoreRest(v)
+			elseif st.op == "cfg" then m:configure({ energy = v, rest = num(st.flag) }) end
+			local at = `sequence {n} step {i} ({st.op})`
+			near(ret, st.returned, EPS, `{at}: returned`)
+			needsMatch(m, st, at)
+		end
+	end
+end)
+
+case("needs at 60 ticks a second", function()
+	local m = NeedsModel.new()
+	local k = 0
+	for i = 0, 599 do
+		m:advance(ref.dt, (i // 45) % 2 == 0)
+		if i % 30 == 29 then
+			k += 1
+			needsMatch(m, ref.needs.ticks[k], `tick {i}`)
+		end
+	end
+	check(k == #ref.needs.ticks, "every sample compared")
+end)
+
+case("needs records", function()
+	for _, r in ref.needs.records do
+		local m = NeedsModel.new()
+		local ok = m:load(r.record)
+		check(ok == r.loaded, `{r.name}: loaded {ok} against {r.loaded}`)
+		needsMatch(m, r.after, r.name)
+		check(m.lifeMode == r.life, `{r.name}: life mode`)
+	end
+	-- And what the port writes, the port reads back exactly.
+	local a = NeedsModel.new(true)
+	a:configure({ energy = 0.4, rest = 0.7 })
+	a:grantEnergy(0.1, "x")
+	a:advance(0.2, true)
+	a:addHours(1.5, false)
+	local b = NeedsModel.new()
+	check(b:load(a:toRecord()), "a written record loads")
+	check(b.energy == a.energy and b.rest == a.rest and b.lifeMode and b:grantedFrom("x") == a:grantedFrom("x"), "with the same numbers")
+	a:advance(0.3, false)
+	b:advance(0.3, false)
+	check(a.energy == b.energy and a.rest == b.rest, "and goes on the same way")
+end)
+
+-- ------------------------------------------------------------------------------------------------------------- the loop
+case("the loop against Godot's habitat loop", function()
+	for _, sc in ref.loops do
+		current = sc.name
+		local needs = NeedsModel.new(true)
+		needs:configure({ energy = sc.energy })
+		local saved = 0
+		local loop = LifeLoop.new(needs, function()
+			saved += 1
+			return { ok = true, message = "Checkpoint kept." }
+		end)
+		loop.clock.day, loop.clock.hour = sc.day, sc.hour
+		for _, g in sc.ticks do
+			local s = { inRetreat = g.inside, attached = not g.airborne, still = not g.moving, holding = g.held, feeding = g.feeding }
+			local active = g.airborne or g.moving
+			needs:advance(ref.dt, active)
+			local before = loop.notice
+			loop:step(ref.dt, s, g.interact, g.cancel)
+			local at = `tick {g.t}`
+			check(loop.clock.day == g.day, `{at}: day {loop.clock.day} against {g.day}`)
+			near(loop.clock.hour, g.hour, EPS, `{at}: hour`)
+			check(loop.clock.sleeping == g.sleeping, `{at}: clock sleeping`)
+			check(loop.asleep == g.asleep, `{at}: asleep {loop.asleep} against {g.asleep}`)
+			check(loop.resting == g.resting, `{at}: resting {loop.resting} against {g.resting}`)
+			near(loop.restSeconds, g.rest_seconds, EPS, `{at}: rest seconds`)
+			near(needs.energy, g.energy, EPS, `{at}: energy`)
+			near(needs.rest, g.rest, EPS, `{at}: rest`)
+			near(loop.rangeScale, g.range, EPS, `{at}: reach of the eyes`)
+			near(loop.daylight, g.light, EPS, `{at}: daylight`)
+			check(saved == g.checkpoints and loop.checkpoints == g.checkpoints, `{at}: checkpoints {saved} against {g.checkpoints}`)
+			-- Godot's record names the notice when it changed (and on the first tick of each phase); otherwise it stayed.
+			if g.notice ~= "" then
+				check(loop.notice == g.notice, `{at}: notice '{loop.notice}' against '{g.notice}'`)
+			else
+				check(loop.notice == before, `{at}: the notice changed to '{loop.notice}' where Godot's did not`)
+			end
+			near(loop.noticeSeconds, g.notice_seconds, EPS, `{at}: notice time`)
+			check(loop:canRest(s) == g.can_rest, `{at}: can rest`)
+		end
+	end
+end)
+
+-- ------------------------------------------------------------------------------------------------------------- by hand
+-- The cases of Godot's test_life01_clock_hunger.gd that need no world.
+case("the day passes with action time", function()
+	local c = LifeClock.new()
+	check(c.day == 1 and c.hour == 9.0, "day 1, 9 in the morning")
+	near(c:advance(60, false), 60 * LifeClock.ACTIVE_HOURS_PER_S, 1e-12, "a minute of play")
+	check(c:advance(-1, false) == 0 and c:advance(0 / 0, false) == 0, "no time from nonsense")
+	c.hour = 23.9
+	c:advance(0.2 / LifeClock.ACTIVE_HOURS_PER_S, false)
+	check(c.day == 2 and c.hour < 0.2, "midnight turns the day")
+	-- 120 ticks: the same game time at any frame rate (the client always steps whole fixed ticks).
+	local l = LifeLoop.new(NeedsModel.new(true))
+	local start = l.clock.hour
+	local away = { inRetreat = false, attached = true, still = true, holding = false, feeding = false }
+	for _ = 1, 120 do l:step(1 / 60, away, false, false) end
+	near(l.clock.hour - start, 120 / 60 * LifeClock.ACTIVE_HOURS_PER_S, 1e-9, "120 ticks")
+end)
+
+case("daylight and the words for the day", function()
+	local c = LifeClock.new()
+	c.hour = 12
+	check(c:daylight() == 1 and c:partOfDay() == "midday", "noon")
+	c.hour = 0.5
+	check(c:daylight() == 0 and c:partOfDay() == "night", "past midnight")
+	c.hour = 19.75
+	check(c:daylight() > 0.05 and c:daylight() < 0.95 and c:partOfDay() == "evening", "dusk")
+	c.hour = 6.5
+	check(c:daylight() > 0 and c:daylight() < 0.5 and c:isSleepTime(), "dawn, still sleep time")
+	c.hour = 10
+	check(not c:isSleepTime(), "10 is not sleep time")
+end)
+
+case("hunger runs by the hour and can run out", function()
+	local function period(n: any)
+		n:advance(NeedsModel.MAX_STEP_S, false)
+		n:advance(NeedsModel.UPDATE_PERIOD_S - NeedsModel.MAX_STEP_S, false)
+	end
+	local n = NeedsModel.new(true)
+	n:configure({ energy = 0.6 })
+	n:addHours(10, false)
+	period(n)
+	near(n.energy, 0.6 - 10 * NeedsModel.LIFE_DRAIN_AWAKE_PER_H, 1e-9, "ten waking hours")
+	local e = n.energy
+	n:addHours(10, true)
+	period(n)
+	near(n.energy, e - 10 * NeedsModel.LIFE_DRAIN_ASLEEP_PER_H, 1e-9, "ten hours asleep use a third as much")
+	n:addHours(100, false)
+	period(n)
+	check(n.energy == 0 and n:isStarving() and n.starvingHours > 50, "the reserve can run out, and the hours are counted")
+	check(n:grantEnergy(0.35, "fly_1") > 0 and not n:isStarving() and n.starvingStreakH == 0, "a meal ends it")
+	local legacy = NeedsModel.new()
+	legacy:addHours(100, false)
+	period(legacy)
+	check(legacy.energy > NeedsModel.ENERGY_START - 0.01, "without life mode the old slow drain is unchanged")
+end)
+
+case("the reach of the eyes follows the hour", function()
+	local l = LifeLoop.new(NeedsModel.new(true))
+	l.clock.hour = 12
+	l:applyLight()
+	near(l.rangeScale, 1, 1e-12, "full range at noon")
+	l.clock.hour = 23
+	l:applyLight()
+	near(l.rangeScale, LifeLoop.NIGHT_SIGHT, 1e-12, "a third at night")
+	l.clock.hour = 19.75
+	l:applyLight()
+	check(l.rangeScale > LifeLoop.NIGHT_SIGHT and l.rangeScale < 1, "between at dusk")
+end)
+
+case("loop records", function()
+	local needs = NeedsModel.new(true)
+	local l = LifeLoop.new(needs, function() return { ok = true, message = "kept" } end)
+	l.clock.day, l.clock.hour = 3, 15.25
+	local home = { inRetreat = true, attached = true, still = true, holding = false, feeding = false }
+	l:step(1 / 60, home, true, false)
+	local r = l:toRecord()
+	check(#LifeLoop.problems(r) == 0, "a written record is good")
+	local m = LifeLoop.new(NeedsModel.new(true))
+	check(m:load(r), "and loads")
+	check(m.clock.day == 3 and math.abs(m.clock.hour - 15.25) < 0.01 and m.resting, "day 3, a quarter past three, still resting")
+	check(m.notice:find("checkpoint recovery") ~= nil, "the screen says it is checkpoint recovery, not an exact resume")
+	-- The restored rest is not ended while the spider takes hold again (Godot's grace).
+	m:step(1 / 60, { inRetreat = true, attached = false, still = true, holding = false, feeding = false }, false, false)
+	check(m.resting, "the rest survives the first ticks after a restore")
+	local bad = table.clone(r)
+	bad.life = { day = 3, hour = 30, sleeping = false }
+	check(#LifeLoop.problems(bad) > 0 and not m:load(bad), "an impossible hour is refused")
+	check(m.clock.day == 3, "and changes nothing")
+	check(#LifeLoop.problems("nope") > 0 and #LifeLoop.problems({}) > 0, "nothing else is a record")
+	local noSave = LifeLoop.new(NeedsModel.new(true))
+	noSave:step(1 / 60, home, true, false)
+	check(noSave.resting and noSave.checkpoints == 0 and noSave.notice:find("not kept") ~= nil, "without a store the rest still begins, and says no checkpoint was kept")
+end)
+
+-- ------------------------------------------------------------------------------------------------------------- light, words
+case("full daylight is exactly the daytime look", function()
+	local t = DayLight.targets(1, 9.75)
+	local L, A = Graphics.lighting, Graphics.atmosphere
+	check(t.clock == 9.75 and t.brightness == L.brightness and t.exposure == L.exposureCompensation, "sun, brightness, exposure")
+	for i = 1, 3 do
+		check(t.ambient[i] == L.ambient[i] and t.outdoorAmbient[i] == L.outdoorAmbient[i] and t.colorShiftTop[i] == L.colorShiftTop[i], `light colours {i}`)
+		check(t.atmosphereColor[i] == A.color[i] and t.atmosphereDecay[i] == A.decay[i], `haze colours {i}`)
+	end
+	check(t.sunRays == Graphics.sunRays.intensity and t.shafts == 1 and t.motes == 1, "rays, shafts, motes")
+	local hour9 = LifeClock.new() -- the game starts at 9 in the morning: full day
+	check(hour9:daylight() == 1, "the start of the game is full day")
+end)
+
+case("night is dim and blue, never black, with the sun below the horizon", function()
+	local N = Graphics.dayNight
+	local t = DayLight.targets(0, 9.75)
+	check(t.clock == N.nightClock and t.brightness == N.brightness and t.exposure == N.exposureCompensation, "night values")
+	check(t.sunRays == 0 and t.shafts == 0 and t.motes == N.motesAtNight, "no rays or shafts, faint motes")
+	check(t.ambient[3] > t.ambient[1] and t.outdoorAmbient[3] > t.outdoorAmbient[1], "blue")
+	check(t.ambient[1] + t.ambient[2] + t.ambient[3] > 60 and t.outdoorAmbient[1] + t.outdoorAmbient[2] + t.outdoorAmbient[3] > 120, "not black")
+	check(N.nightClock < 5.5, "the night clock is before Roblox's sunrise (about 6)")
+	-- Dusk: everything moves one way as daylight falls; the sun sinks before the last light goes.
+	local last = DayLight.targets(1, 9.75)
+	for k = 39, 0, -1 do
+		local d = k / 40
+		local cur = DayLight.targets(d, 9.75)
+		check(cur.clock <= last.clock and cur.brightness <= last.brightness and cur.ambient[1] <= last.ambient[1] and cur.sunRays <= last.sunRays, `dusk at {d}`)
+		last = cur
+	end
+	check(DayLight.targets(0.3, 9.75).clock < 6, "below the horizon by daylight 0.3")
+	check(DayLight.targets(0 / 0, 9.75).daylight == 1 and DayLight.targets(-1, 9.75).daylight == 0 and DayLight.targets(2, 9.75).daylight == 1, "nonsense is clamped")
+	-- A low sun is warmer.
+	check(DayLight.targets(0.2, 9.75).colorShiftTop[3] < Graphics.lighting.colorShiftTop[3], "a low sun is warm")
+end)
+
+case("the light is set again only when it has changed enough", function()
+	check(DayLight.due(nil, 1), "first time")
+	check(not DayLight.due(1, 1) and not DayLight.due(0.5, 0.5 + Graphics.dayNight.applyStep / 2), "not for a small change")
+	check(DayLight.due(0.5, 0.5 + Graphics.dayNight.applyStep), "for a step")
+	check(DayLight.due(0.9995, 1) and DayLight.due(0.0005, 0), "always on reaching day or night")
+end)
+
+case("DayLight.apply sets only what it owns", function()
+	local function node(class: string, name: string): any
+		local n: any = { ClassName = class, Name = name, children = {} }
+		function n.IsA(self: any, c: string) return self.ClassName == c end
+		function n.FindFirstChild(self: any, nm: string, deep: boolean?)
+			for _, c in self.children do
+				if c.Name == nm then return c end
+				if deep then local f = c:FindFirstChild(nm, true); if f then return f end end
+			end
+			return nil
+		end
+		function n.GetDescendants(self: any)
+			local out = {}
+			for _, c in self.children do table.insert(out, c); for _, d in c:GetDescendants() do table.insert(out, d) end end
+			return out
+		end
+		return n
+	end
+	local lighting = node("Lighting", "Lighting")
+	local atm, rays, eyeGrade, dof, grade = node("Atmosphere", "Atmosphere"), node("SunRaysEffect", "SunRays"), node("ColorCorrectionEffect", "EyeGrade"), node("DepthOfFieldEffect", "MacroDOF"), node("ColorCorrectionEffect", "Grade")
+	eyeGrade.Saturation, dof.FocusDistance, grade.Brightness = 0.25, 3, 0
+	lighting.children = { atm, rays, eyeGrade, dof, grade }
+	local decor = node("Folder", "Decor")
+	local shafts, anchor, beam = node("Folder", "Shafts"), node("Part", "ShaftAnchor1"), node("Beam", "Shaft1_1")
+	local dust, motes = node("Part", "Dust"), node("ParticleEmitter", "Motes")
+	anchor.children = { beam }; shafts.children = { anchor }; dust.children = { motes }; decor.children = { shafts, dust }
+	DayLight.apply(lighting, DayLight.targets(0, 9.75), decor)
+	check(lighting.ClockTime == Graphics.dayNight.nightClock and lighting.Brightness == Graphics.dayNight.brightness, "the sun and its strength")
+	check(lighting.Ambient ~= nil and lighting.OutdoorAmbient ~= nil and lighting.ColorShift_Top ~= nil and lighting.ExposureCompensation ~= nil, "the room's light")
+	check(atm.Color ~= nil and atm.Decay ~= nil and rays.Intensity == 0, "haze and rays")
+	check(beam.Enabled == false and beam.Brightness == 0 and motes.Brightness == Graphics.dayNight.motesAtNight, "shafts off, motes faint")
+	check(eyeGrade.Saturation == 0.25 and dof.FocusDistance == 3 and grade.Brightness == 0, "the eye view's effects and the grade untouched")
+	DayLight.apply(lighting, DayLight.targets(1, 9.75), nil)
+	check(lighting.ClockTime == 9.75 and lighting.Brightness == Graphics.lighting.brightness, "back to day")
+	local bare = node("Lighting", "Lighting")
+	DayLight.apply(bare, DayLight.targets(0.5, 9.75), nil) -- the low tier: no rays, no shafts; nothing to fail on
+	check(bare.ClockTime ~= nil, "a lighting without the extras")
+end)
+
+case("the words for the day and the retreat", function()
+	check(LifeText.day(2, "evening") == "Day 2, evening", "the day")
+	check(LifeText.line("midday", 0.5, false, false, 0.25) == nil, "nothing to say at midday")
+	check(LifeText.line("evening", 0.5, false, false, 0.25) == "Evening. Jumping spiders go into their silk retreat before dark.", "evening")
+	check(string.find(LifeText.line("night", 0.5, false, false, 0.25) or "", "dark", 1, true) ~= nil, "night")
+	check(LifeText.line("night", 0.2, false, false, 0.25) == "Hungry: time to hunt.", "hunger before the time of day")
+	check(string.find(LifeText.line("night", 0, true, false, 0.25) or "", "Starving", 1, true) ~= nil, "starving first")
+	check(LifeText.line("midday", 0.05, true, true, 0.25) == "Hungry: time to hunt.", "gentle rules never say starving")
+	local p = LifeText.prompt(false, false, true, false, "keyboard")
+	check(p ~= nil and p.hint == "E: rest", "rest by day")
+	p = LifeText.prompt(false, false, true, true, "gamepad")
+	check(p ~= nil and p.hint == "Left-stick click: sleep until morning", "sleep, on a controller")
+	p = LifeText.prompt(true, true, true, true, "keyboard")
+	check(p ~= nil and p.title == "Asleep in the silk-lined crack" and string.find(p.hint, "E or Q to wake", 1, true) ~= nil, "asleep")
+	p = LifeText.prompt(false, true, true, false, "touch")
+	check(p ~= nil and string.find(p.hint, "Eat or Cancel to leave", 1, true) ~= nil, "resting, on touch")
+	check(LifeText.prompt(false, false, false, true, "keyboard") == nil, "nothing outside the crack")
+	check(LifeText.touchLabel(false, false, true, false) == "Rest" and LifeText.touchLabel(false, false, true, true) == "Sleep", "touch: rest, sleep")
+	check(LifeText.touchLabel(true, true, true, true) == "Wake" and LifeText.touchLabel(false, true, true, false) == "Leave", "touch: wake, leave")
+	check(LifeText.touchLabel(false, false, false, false) == nil, "touch: not the retreat's")
+end)
+
+case("the silk-lined crack", function()
+	check(Layout.inRetreat(Vector3.new(-25.5, 0.31, 6)), "the middle of the crack")
+	check(Layout.inRetreat(Layout.RETREAT_MIN) and Layout.inRetreat(Layout.RETREAT_MAX), "its edges")
+	check(not Layout.inRetreat(Vector3.new(-20, 0.31, 6)) and not Layout.inRetreat(Vector3.new(-25.5, 2, 6)), "not the open sill, not above it")
+	check(not Layout.inRetreat(Layout.SPAWN), "the spawn is not in the crack")
+end)
+
+print(`LIFE passed={passed} failed={failed}`)
+if failed > 0 then error("LIFE failed") end

@@ -30,6 +30,7 @@ check("Prey spec completes", function() require(script.Parent.PreySpec)(check) e
 check("Prompt spec completes", function() require(script.Parent.PromptSpec)(check) end)
 check("Life spec completes", function() require(script.Parent.LifeSpec)(check) end)
 check("Wasp spec completes", function() require(script.Parent.WaspSpec)(check) end)
+check("Peacock spec completes", function() require(script.Parent.PeacockSpec)(check) end)
 local report = {suite = "Roblox engine", evidence_id = evidence.id, passed = passed, failed = failed,
 	tests = passed + failed, not_run = 0, engine = version(), results = rows}
 local json = HttpService:JSONEncode(report)

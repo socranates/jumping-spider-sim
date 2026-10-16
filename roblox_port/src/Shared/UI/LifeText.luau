@@ -31,14 +31,15 @@ function LifeText.line(part: string, energy: number, starving: boolean, gentle: 
 	return nil
 end
 
--- The retreat's prompt: asleep, resting, or able to rest (sleep in the evening and at night); nil when none of these.
-function LifeText.prompt(asleep: boolean, resting: boolean, canRest: boolean, sleepTime: boolean, device: ControlText.Device): Prompt?
+-- The retreat's prompt: asleep, resting, or able to rest (sleep in the evening and at night); nil when none of these. `extra` (the crack's
+-- way to change spider, ROBLOX-31) is added to the resting hint.
+function LifeText.prompt(asleep: boolean, resting: boolean, canRest: boolean, sleepTime: boolean, device: ControlText.Device, extra: string?): Prompt?
 	local feed, cancel = ControlText.name(device, "feed"), ControlText.name(device, "cancel")
 	if asleep then
 		return { title = "Asleep in the silk-lined crack", hint = `The night passes. Move, {feed} or {cancel} to wake.` }
 	end
 	if resting then
-		return { title = "Resting in the silk-lined crack", hint = `Move, {feed} or {cancel} to leave.` }
+		return { title = "Resting in the silk-lined crack", hint = `Move, {feed} or {cancel} to leave.` .. (if extra and extra ~= "" then "    " .. extra else "") }
 	end
 	if canRest then
 		return { title = "The silk-lined crack", hint = if sleepTime then `{feed}: sleep until morning` else `{feed}: rest` }

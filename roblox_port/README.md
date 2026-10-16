@@ -32,6 +32,8 @@ Every action of the frozen Godot game (`scripts/core/input_setup.gd` and its REA
 | Settings in the pause panel | Esc | Menu | — | Deferred: sensitivity/invert, FOV, camera distance, stalk/aim/Focus toggles, jump arc, jump reach, hold-to-let-go switch, frame-the-line switch, remapping, assisted-play presets. The port uses Godot's defaults (hold to let go on, framing on, arc shown) |
 | Return to checkpoint | Backspace | View | — | The last retreat checkpoint (ROBLOX-25), or the start when there is none yet. Godot's is in the Esc menu; the port has no menu, and touch has no button for it yet |
 | Zoom (port only) | Wheel | — | — | Port only, 2 to 12 studs |
+| Change spider (port only) | C, in the silk-lined crack while resting | RB (R1 on PlayStation), in the crack | Change (shown only while resting) | ROBLOX-31: becomes the other spider (first spider or the peacock spider, Maratus volans); remembered for the session in Player attribute `Appearance` (Workspace attribute `Appearance` preselects it). The drawn rig is built again; nothing else changes |
+| Courtship dance (port only) | X, as the peacock spider standing still | RB (R1 on PlayStation) outside the crack | Dance (peacock spider only) | ROBLOX-29 to 31: a presentation-only pose of the drawn peacock spider (fan, palps, legs III); any move, a jump, Cancel or X again stops it; Player attribute `ReducedMotion` halves its movement; a felt caption in the rumble-rump |
 | Compare gait (port only) | G | — | — | Port only |
 
 Input clears on window focus loss, text-box focus, the Roblox menu and controller disconnect. Real tablet/controller feel and accessibility/remapping remain acceptance work.

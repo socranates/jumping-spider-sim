@@ -7,6 +7,8 @@
 --   slow motion T / RT, lower on silk F / X (Godot: F / D-pad down; the port keeps the D-pad for walking, ROBLOX-05).
 --   Esc / Menu open Roblox's own menu: the game drops every press and hold and waits (Godot's pause).
 -- Port-only: reset to the start Backspace / View (Select), gait toggle G, controls card H (Godot's H is the field notes).
+-- The peacock spider (ROBLOX-31): C changes spider in the crack (RB / R1 on a controller, the touch Change button); X, or the same RB / R1
+-- outside the crack, starts and stops the courtship dance (the touch Dance button).
 --
 -- Every button action is held while any source holds it (InputState): a key, a controller button, a finger. Handlers hear
 -- one "begin" when the first source goes down and one "end" when the last comes up, so a touch hold and a key or button
@@ -22,6 +24,8 @@ local SpiderInput = {}
 
 export type Handlers = {
 	feed: (() -> ())?,
+	choose: (() -> ())?, -- C: change spider (in the crack)
+	display: (() -> ())?, -- X / RB: the peacock spider's courtship dance
 	focus: ((string) -> ())?,
 	jump: (string) -> (), -- "begin", "end", or "cancel" (the engine took the input away)
 	cancel: (string) -> (),
@@ -53,6 +57,7 @@ SpiderInput.BINDINGS = {
 	Recenter = { Enum.KeyCode.R, Enum.UserInputType.MouseButton3, Enum.KeyCode.ButtonR3 },
 	Slow = { Enum.KeyCode.T, Enum.KeyCode.ButtonR2 }, Help = { Enum.KeyCode.H },
 	Reset = { Enum.KeyCode.Backspace, Enum.KeyCode.ButtonSelect }, Gait = { Enum.KeyCode.G },
+	Choose = { Enum.KeyCode.C }, Display = { Enum.KeyCode.X, Enum.KeyCode.ButtonR1 },
 } :: { [string]: { any } }
 
 local function sourceOf(input: InputObject?): any
@@ -78,6 +83,10 @@ function SpiderInput.bind(h: Handlers)
 			if h.focus then h.focus(if now then "begin" elseif cancelled then "cancel" else "end") end
 		elseif action == "Feed" then
 			if now and h.feed then h.feed() end
+		elseif action == "Choose" then
+			if now and h.choose then h.choose() end
+		elseif action == "Display" then
+			if now and h.display then h.display() end
 		elseif action == "Drop" then
 			if now then h.drop() end
 		elseif ONE_SHOT[action] then

@@ -18,7 +18,7 @@ local services = game:GetService("ContextActionService") and ClientStubs
 local frame = ClientStubs.renderSteps.SpiderSim
 local gui = game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui")
 local function frames(n: number) for _ = 1, n do frame(1 / 60) end end
-local KEYS = { Feed = "E", Jump = "Space", Cancel = "Q", Drop = "F", Forward = "W", Back = "S", Eye = "V", Recenter = "R", Creep = "LeftShift", Reset = "Backspace" }
+local KEYS = { Feed = "E", Jump = "Space", Cancel = "Q", Drop = "F", Forward = "W", Back = "S", Eye = "V", Recenter = "R", Creep = "LeftShift", Reset = "Backspace", Choose = "C", Display = "X", Slow = "T" }
 local function key(action: string, down: boolean)
 	local fn = services.actions["Spider" .. action]
 	assert(fn, "no binding for " .. action)
@@ -320,6 +320,115 @@ check("the wasp: heard with a direction, found, caught, carried off; the catch s
 	assert(prey.tick >= back + 55, "the game did not go on")
 	-- The checkpoint kept the wasp's record as it was at the rest, before this visit: the same wasp can come again.
 	assert(wasp.visits == 0 and wasp.escapes == 0 and wasp.lastVisitDay == 0, `the record: {wasp.visits} visits, {wasp.escapes} escapes, day {wasp.lastVisitDay}`)
+end)
+
+check("the peacock spider: C in the crack changes spider, X dances, any move, jump or Cancel stops it; the first spider never sees the dance", function()
+	local driver = ClientStubs.driver
+	local life = driver.life
+	local function words(screen: string, name: string): string
+		local d = find(screen, name)
+		return if d and d.Visible then d.Text else ""
+	end
+	driver.place(Layout.SPAWN)
+	frames(60)
+	assert(driver.appearance() == "first_spider" and workspace:FindFirstChild("Spider"):GetAttribute("AppearanceId") == "first_spider", "not the first spider at the start")
+	key("Display", true); frames(2); key("Display", false); frames(30)
+	assert(not driver.dance().active and driver.rig().dance == nil, "the first spider danced")
+	assert(not string.find(words("SpiderPrompts", "PromptHint"), "dance", 1, true) and not string.find(words("SpiderPrompts", "Controls"), "courtship", 1, true), "the dance is mentioned for the first spider")
+	key("Choose", true); frames(2); key("Choose", false); frames(2)
+	assert(words("SpiderPrompts", "Toast") == "You can change spider while resting in the silk-lined crack", words("SpiderPrompts", "Toast"))
+	assert(driver.appearance() == "first_spider", "changed spider outside the crack")
+	-- In the crack, awake and resting: C turns the first spider into the peacock spider.
+	local lighting = game:GetService("Lighting")
+	lighting.ClockTime = 9.75
+	driver.place(Vector3.new(-25.5, 0.31, 6.0))
+	frames(30)
+	life.clock.hour = 12
+	frames(2)
+	key("Feed", true); frames(2); key("Feed", false); frames(2)
+	assert(life.resting and not life.asleep, "E did not rest")
+	assert(string.find(words("SpiderPrompts", "PromptHint"), "C: become the peacock spider", 1, true), words("SpiderPrompts", "PromptHint"))
+	assert(gui:FindFirstChild("SpiderTouch"):FindFirstChild("Choose").Visible == true, "no touch Change button in the crack")
+	local oldModel = workspace:FindFirstChild("Spider")
+	key("Choose", true); frames(2); key("Choose", false); frames(2)
+	assert(driver.appearance() == "maratus_volans_male", "C did not change spider")
+	local model = workspace:FindFirstChild("Spider")
+	assert(model ~= oldModel and model:GetAttribute("AppearanceId") == "maratus_volans_male" and oldModel.Parent == nil, "the rig was not built again")
+	assert(game:GetService("Players").LocalPlayer:GetAttribute("Appearance") == "maratus_volans_male", "the choice is not kept for the session")
+	assert(words("SpiderPrompts", "Toast") == "You are the peacock spider now", words("SpiderPrompts", "Toast"))
+	assert(life.resting, "changing spider ended the rest")
+	key("Feed", true); frames(2); key("Feed", false); frames(2)
+	assert(not life.resting, "E did not end the rest")
+	-- On the open sill: X starts the dance, the status and the hint say so.
+	driver.place(Layout.SPAWN)
+	frames(60)
+	assert(string.find(words("SpiderPrompts", "PromptHint"), "X: courtship dance", 1, true), words("SpiderPrompts", "PromptHint"))
+	assert(gui:FindFirstChild("SpiderTouch"):FindFirstChild("Display").Visible == true and gui:FindFirstChild("SpiderTouch"):FindFirstChild("Choose").Visible == false, "touch buttons: Dance on the sill, Change only in the crack")
+	local p0 = spider()
+	key("Display", true); frames(2); key("Display", false); frames(60)
+	assert(driver.dance().active and driver.rig().dance ~= nil and driver.rig().dance.presence > 0.99, "X did not start the dance")
+	assert(string.find(words("SpiderPrompts", "Status"), "COURTSHIP DANCE    X or move: stop", 1, true), words("SpiderPrompts", "Status"))
+	assert(string.find(words("SpiderPrompts", "PromptHint"), "X: stop dancing", 1, true), words("SpiderPrompts", "PromptHint"))
+	assert(gui:FindFirstChild("SpiderTouch"):FindFirstChild("Display").Text == "Stop", "touch button does not say Stop")
+	assert(string.find(words("SpiderPrompts", "Caption"), "[a fine buzzing through your feet]", 1, true), "no felt caption in the rumble-rump: " .. words("SpiderPrompts", "Caption"))
+	assert((spider() - p0).Magnitude < 0.02, "the dance moved the spider")
+	frames(240)
+	local fan = driver.rig()._fan
+	assert(fan ~= nil and driver.rig().dance.fanOpen > 0.9 and fan.front[1].part.Size.X > 0.25, `the fan is not open at {driver.dance().t} s`)
+	assert(string.find(words("SpiderPrompts", "Controls"), "courtship dance", 1, true) or not find("SpiderPrompts", "Controls").Visible, "the card")
+	-- Walking stops it at once and the pose is gone 0.2 s later.
+	key("Forward", true); frames(1)
+	assert(not driver.dance().active, "walking did not stop the dance")
+	frames(14); key("Forward", false); frames(2)
+	assert(driver.rig().dance == nil and not driver.dance():showing(), "the pose did not fade out")
+	-- A jump (Space) and Cancel (Q) stop it too; X again toggles it off.
+	key("Display", true); frames(2); key("Display", false); frames(30)
+	assert(driver.dance().active, "the dance did not restart")
+	key("Jump", true); frames(1)
+	assert(not driver.dance().active, "Space did not stop the dance")
+	key("Jump", false); frames(60)
+	key("Display", true); frames(2); key("Display", false); frames(30)
+	assert(driver.dance().active, "the dance did not restart after the hop")
+	key("Cancel", true); frames(1); key("Cancel", false)
+	assert(not driver.dance().active, "Q did not stop the dance")
+	frames(30)
+	key("Display", true); frames(2); key("Display", false); frames(30)
+	key("Display", true); frames(2); key("Display", false); frames(2)
+	assert(not driver.dance().active, "X again did not stop the dance")
+	frames(30)
+	-- Slow motion slows the dance as it slows everything; reduced motion is read from the player's attribute.
+	key("Display", true); frames(2); key("Display", false)
+	local t0 = driver.dance().t
+	key("Slow", true); key("Slow", false); frames(120)
+	local advanced = driver.dance().t - t0
+	assert(advanced > 0.9 and advanced < 1.1, `slow motion: the dance advanced {advanced} s in 2 s`)
+	key("Slow", true); key("Slow", false)
+	game:GetService("Players").LocalPlayer:SetAttribute("ReducedMotion", true)
+	frames(2)
+	assert(driver.dance().reduced == true, "ReducedMotion not read")
+	game:GetService("Players").LocalPlayer:SetAttribute("ReducedMotion", nil)
+	key("Display", true); frames(2); key("Display", false); frames(2)
+	-- The eye view and the hidden body survive a change of spider; on a controller RB changes spider in the crack and dances elsewhere.
+	game:GetService("UserInputService").LastInputTypeChanged:Fire(Enum.UserInputType.Gamepad1)
+	frames(2)
+	driver.place(Vector3.new(-25.5, 0.31, 6.0))
+	frames(30)
+	life.clock.hour = 12
+	key("Feed", true); frames(2); key("Feed", false); frames(2)
+	assert(life.resting, "no rest")
+	assert(string.find(words("SpiderPrompts", "PromptHint"), "RB: become the first spider", 1, true), words("SpiderPrompts", "PromptHint"))
+	key("Eye", true); key("Eye", false); frames(3)
+	key("Display", true); frames(2); key("Display", false); frames(2)
+	assert(driver.appearance() == "first_spider" and workspace:FindFirstChild("Spider"):GetAttribute("AppearanceId") == "first_spider", "RB in the crack did not change spider")
+	local anyVisible = false
+	for _, d in workspace:FindFirstChild("Spider"):GetChildren() do
+		if d:IsA("BasePart") and d.Name == "Cephalothorax" and d.LocalTransparencyModifier ~= 1 then anyVisible = true end
+	end
+	assert(not anyVisible, "the new rig did not keep the eye view")
+	key("Eye", true); key("Eye", false); frames(3)
+	key("Feed", true); frames(2); key("Feed", false); frames(2)
+	game:GetService("UserInputService").LastInputTypeChanged:Fire(Enum.UserInputType.Keyboard)
+	frames(2)
 end)
 
 check("wasp hum lasts through arrival, pauses, follows slow motion and silences grounded/away states", function()

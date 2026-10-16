@@ -4,6 +4,12 @@
 -- how Roblox draws the pose (tests/look.luau checks the drawn spider; Studio is the judge of the look).
 local Peacock = require("../src/Shared/Data/Peacock")
 local Dance = require("../src/Shared/Rig/PeacockDance")
+local Choice = require("../src/Shared/Rig/SpiderChoice")
+local Text = require("../src/Shared/UI/PeacockText")
+local ControlText = require("../src/Shared/UI/ControlText")
+local LifeText = require("../src/Shared/UI/LifeText")
+local HudLayout = require("../src/Shared/UI/HudLayout")
+local Appearances = require("../src/Shared/Data/Appearances")
 
 local passed, failed = 0, 0
 local function check(ok: boolean, what: string)
@@ -210,6 +216,37 @@ check(rp.fanOpen > 0.9 and rp.abdomenPitch > math.rad(Peacock.amplitude.raiseDeg
 local sees = false
 for i = 1, 120 do if rd:step(1 / 60, true, false).shiver ~= 0 then sees = true end end
 check(not sees, "the dance object passes the setting on (no tremble)")
+
+-- ---------------------------------------------------------------- choosing the spider, and the words
+check(Choice.start(nil, nil) == "first_spider" and Choice.start("nonsense", 5) == "first_spider", "no choice, or an unknown one, is the first spider")
+check(Choice.start("maratus_volans_male", nil) == "maratus_volans_male" and Choice.start(nil, "maratus_volans_male") == "maratus_volans_male", "the Player or Workspace attribute can preselect the peacock spider")
+check(Choice.start("first_spider", "maratus_volans_male") == "first_spider", "the Player's attribute (kept for the session) wins over the Workspace's")
+check(Choice.next("first_spider") == "maratus_volans_male" and Choice.next("maratus_volans_male") == "first_spider" and Choice.next("junk") == "first_spider", "C cycles between the two")
+check(Choice.canDance("maratus_volans_male") and not Choice.canDance("first_spider") and not Choice.canDance("junk"), "only the peacock spider has a dance")
+local allKnown = true
+for _, id in Choice.ORDER do allKnown = allKnown and Appearances.profiles[id] ~= nil end
+check(allKnown and #Choice.ORDER == 2 and Appearances.default == "first_spider", "both spiders are real appearances and the default is still the first")
+
+check(ControlText.name("keyboard", "choose") == "C" and ControlText.name("keyboard", "display") == "X", "keyboard: C changes spider, X dances")
+check(ControlText.name("gamepad", "choose") == "RB" and ControlText.name("gamepad", "display") == "RB" and ControlText.name("touch", "choose") == "Change" and ControlText.name("touch", "display") == "Dance", "controller RB, touch Change and Dance")
+ControlText.setPadStyle("playstation")
+check(ControlText.name("gamepad", "choose") == "R1" and ControlText.name("gamepad", "display") == "R1", "a PlayStation controller says R1")
+check(Text.change("gamepad", "first_spider") == "R1: become the peacock spider" and Text.displayHint("gamepad", false) == "R1: courtship dance", "PlayStation words in the prompts")
+check(string.find(Text.helpExtra("gamepad", true), "R1 courtship dance", 1, true) ~= nil, "PlayStation words on the controls card")
+ControlText.setPadStyle("xbox")
+check(Text.change("keyboard", "first_spider") == "C: become the peacock spider" and Text.change("keyboard", "maratus_volans_male") == "C: become the first spider", "the crack's hint names the other spider")
+check(Text.change("touch", "first_spider") == "Change: become the peacock spider" and Text.touchChange() == "Change" and Text.touchDisplay(false) == "Dance" and Text.touchDisplay(true) == "Stop", "touch words")
+check(Text.displayHint("keyboard", false) == "X: courtship dance" and Text.displayHint("keyboard", true) == "X: stop dancing" and Text.dancingLine("keyboard") == "COURTSHIP DANCE    X or move: stop", "the dance's prompt and status line")
+check(Text.changed("maratus_volans_male") == "You are the peacock spider now" and Text.changed("first_spider") == "You are the first spider now", "the toast after a change")
+check(string.find(Text.helpExtra("keyboard", false), "courtship", 1, true) == nil and string.find(Text.helpExtra("keyboard", true), "X courtship dance", 1, true) ~= nil
+	and string.find(Text.helpExtra("keyboard", false), "C change spider", 1, true) ~= nil, "the controls card says nothing of the dance for the first spider")
+check(Text.caption(0) == nil and Text.caption(0.01) == nil and (Text.caption(1) :: any).text == "[a fine buzzing through your feet]" and (Text.caption(0.4) :: any).alpha == 0.4, "the felt caption while a rumble-rump is on")
+local prompt = LifeText.prompt(false, true, false, false, "keyboard", Text.change("keyboard", "first_spider")) :: any
+check(prompt.hint == "Move, E or Q to leave.    C: become the peacock spider", "the resting hint carries the choice")
+check((LifeText.prompt(false, true, false, false, "keyboard") :: any).hint == "Move, E or Q to leave." and (LifeText.prompt(true, true, false, true, "keyboard", "C: x") :: any).hint == "The night passes. Move, E or Q to wake.", "no choice before it is offered, none while asleep")
+local buttons = {}
+for _, b in HudLayout.TOUCH_BUTTONS do buttons[b.action] = b end
+check(buttons.Choose ~= nil and buttons.Display ~= nil and not buttons.Choose.right and buttons.Display.right, "touch Change and Dance buttons exist")
 
 print(`PEACOCK passed={passed} failed={failed}`)
 if failed > 0 then error("peacock checks failed") end

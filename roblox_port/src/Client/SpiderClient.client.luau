@@ -10,6 +10,9 @@
 -- Blocked / Out of reach / Can't land there; release to leap, Q cancels. F lets down on silk (to the nearest edge first on
 -- top of a leaf). On the line W reels in, S lowers and holding Q lets go. V spider-eye view, R recenter, right mouse Focus,
 -- T slow motion, H controls card, Backspace back to the start, Esc the Roblox menu (the game waits).
+-- The peacock spider (ROBLOX-31): resting in the crack, C (RB / R1, the touch Change button) turns the spider into the other one (the first
+-- spider or the peacock spider, Maratus volans); as the peacock spider, standing still, X (RB / R1, Dance) starts its courtship dance and any move,
+-- jump or Cancel stops it. The dance is a pose of the drawn rig only; the motor, senses, silk and the rest are the same for both.
 
 local GuiService = game:GetService("GuiService")
 local Lighting = game:GetService("Lighting")
@@ -54,6 +57,9 @@ local DayLight = require(Shared.Habitat.DayLight)
 local LifeClock = require(Shared.Life.LifeClock)
 local WaspDirector = require(Shared.Predator.WaspDirector)
 local WaspText = require(Shared.UI.WaspText)
+local SpiderChoice = require(Shared.Rig.SpiderChoice)
+local PeacockDance = require(Shared.Rig.PeacockDance)
+local PeacockText = require(Shared.UI.PeacockText)
 local Checkpoint = require(Shared.Persistence.Checkpoint)
 local CheckpointStore = require(Shared.Persistence.CheckpointStore)
 local focusState = FocusState.new()
@@ -88,7 +94,12 @@ local carry: any = StickCarry.new()
 -- Touch-only devices (phones, tablets) run the low tier until a real tablet frame-time check (ROBLOX_PORT.md): lighter fuzz and
 -- no idle extras on the spider, fewer optional parts in the world. Workspace attribute Detail = "low" or "full" overrides the guess.
 local detail = Detail.choose(UIS.TouchEnabled and not UIS.KeyboardEnabled, Workspace:GetAttribute("Detail"))
-local rig = SpiderRig.new(Workspace, sill, nil, detail)
+-- Which spider: the Player attribute Appearance (kept for the session), else the Workspace attribute Appearance, else the first spider.
+local appearance = SpiderChoice.start(player:GetAttribute("Appearance"), Workspace:GetAttribute("Appearance"))
+local rig = SpiderRig.new(Workspace, sill, appearance, detail)
+local dance = PeacockDance.new() -- the peacock spider's courtship dance (a pose for the rig; nothing else reads it)
+local dancePose: any = nil
+local bodyHidden = false
 task.spawn(function()
 	local roots: { Instance } = { Lighting }
 	local decor = Workspace:WaitForChild("Decor", 10)
@@ -293,6 +304,7 @@ end, function(on: boolean)
 	rig:setEyeView(on)
 end)
 cam.hide = function(hidden: boolean)
+	bodyHidden = hidden
 	rig:setBodyHidden(hidden)
 end
 jump.onAim = function(on: boolean)
@@ -303,6 +315,7 @@ local eyes: any = SpiderEyes.new({ parent = player:WaitForChild("PlayerGui"), ca
 
 -- Everything held is dropped with no penalty and no message: focus loss, the Roblox menu, a text box, a lost controller.
 local function dropAll()
+	dance:stop()
 	focusState:clear()
 	jump:drop(motor)
 	local release = motor.silk.release
@@ -311,6 +324,7 @@ local function dropAll()
 end
 
 local function backToStart()
+	dance:stop()
 	focusState:clear()
 	sensor:reset()
 	memory:clear()
@@ -323,6 +337,47 @@ end
 
 local controls: any -- bound below (SpiderInput.bind)
 
+-- Choosing the spider (ROBLOX-31): only while resting awake in the silk-lined crack. The drawn rig is built again with the other appearance;
+-- the gait, the eye view and the hidden body carry over; the choice is kept in the Player attribute Appearance for the session.
+local function canChange(): boolean
+	return life.resting and not life.asleep
+end
+local function changeSpider()
+	if not canChange() then
+		hud:toast(PeacockText.NOT_RESTING, false)
+		return
+	end
+	appearance = SpiderChoice.next(appearance)
+	player:SetAttribute("Appearance", appearance)
+	dance:stop()
+	dance = PeacockDance.new()
+	dancePose = nil
+	local old = rig
+	rig = SpiderRig.new(Workspace, sill, appearance, detail)
+	rig.gaitMode = old.gaitMode
+	rig:setEyeView(cam.eyeView)
+	rig:setBodyHidden(bodyHidden)
+	old:destroy()
+	hud:toast(PeacockText.changed(appearance), false)
+end
+-- X / RB / the Dance button: start the courtship dance, or end it. On a controller RB in the crack changes spider instead (one button for
+-- both, as the crack and the open sill never overlap). Not for the first spider: it has no dance.
+local function toggleDance()
+	if life.resting then
+		if device == "gamepad" and not life.asleep then changeSpider() end
+		return
+	end
+	if not SpiderChoice.canDance(appearance) then return end
+	if dance:showing() and dance.active then
+		dance:stop()
+		return
+	end
+	local standing = motor.mode == "attached" and not motor.preparing and not motor.seized and not motor:onLine() and not jump:isBusy() and motor.silk.walk == nil
+	if not dance:start(standing, motor.moving) then
+		hud:toast(PeacockText.STAND, false)
+	end
+end
+
 -- Backspace / View: back to the retreat checkpoint (the whole sill as it was), or to the start when there is none yet.
 local function returnToCheckpoint()
 	local best = checkpoints:loadBest()
@@ -332,6 +387,7 @@ local function returnToCheckpoint()
 		return
 	end
 	jump:drop(motor)
+	dance:stop()
 	local ok, problems = Checkpoint.restore(best.record, checkpointWorld)
 	if not ok then
 		warn("[Windowsill] checkpoint refused: " .. table.concat(problems, "; "))
@@ -372,7 +428,10 @@ controls = SpiderInput.bind({
 		if phase == "begin" then focusState:press(player:GetAttribute("FocusToggle") == true, motor.mode == "attached")
 		elseif phase == "cancel" then focusState:clear() end
 	end,
+	choose = function() changeSpider() end,
+	display = function() toggleDance() end,
 	feed = function()
+		dance:stop()
 		prey.feeding:press()
 		feedPending = true -- in the crack, with nothing to eat, the same button rests (Godot's interact)
 	end,
@@ -380,6 +439,7 @@ controls = SpiderInput.bind({
 		if phase == "begin" and prey.feeding.struggling then prey.feeding:press(); gripPress=true; return end
 		if gripPress then if phase ~= "begin" then gripPress=false end; return end
 		if phase == "begin" then
+			dance:stop() -- a jump (a hop or an aim) ends the dance
 			motor:cancelWalk() -- a jump press takes over from a walk to the edge
 			jump:press()
 		elseif phase == "end" then
@@ -392,13 +452,14 @@ controls = SpiderInput.bind({
 	-- else's then) and, held on the line, lets go; SilkController counts only a fresh press after the 0.4 s grace, held 0.6 s.
 	cancel = function(phase: string)
 		if phase ~= "begin" then return end
+		dance:stop()
 		cancelPending = true -- also ends a rest
 		prey.feeding:cancel()
 		if motor:cancelWalk() then return end
 		focusState:cancel(jump:isBusy() or #jump.events > 0 or motor:onLine())
 		jump:cancel()
 	end,
-	drop = function() motor:requestDrop() end,
+	drop = function() dance:stop(); motor:requestDrop() end,
 	clear = dropAll,
 	reset = function() if not panel:isShowing() then returnToCheckpoint() end end, -- the catch screen has its own way back
 	gait = function() rig.gaitMode = if rig.gaitMode == "Tetrapod" then "Unilateral" else "Tetrapod" end,
@@ -472,9 +533,11 @@ local function updateHud(frameDt: number)
 	local aiming = jump:isAiming()
 	local view: any = {
 		device = device, aiming = aiming, focus = controls.held.Focus == true or focusActive(), eyeView = cam.eyeView,
-		status = {}, helpVisible = helpVisible, helpText = ControlText.helpCard(device),
+		status = {}, helpVisible = helpVisible, helpText = ControlText.helpCard(device) .. PeacockText.helpExtra(device, SpiderChoice.canDance(appearance)),
 		caption = eyes:captionView(device),
 	}
+	local rumble = if dancePose then PeacockText.caption(dancePose.rumble) else nil -- felt through the feet; the wasp's hum below takes precedence
+	if rumble then view.caption = rumble end
 	if wasp:isVisiting() then
 		local direction = WaspText.directionWord(motor.pos, motor.heading, motor.up, wasp.wasp.position)
 		local heard = WaspText.caption(wasp.phase, wasp.phaseS, direction)
@@ -505,7 +568,9 @@ local function updateHud(frameDt: number)
 	view.dayLine = LifeText.line(clock:partOfDay(), needs.energy, needs:isStarving(), needs.gentle, LifeLoop.HUNGRY_AT)
 	view.notice = if life.noticeSeconds > 0 and life.notice ~= "" then life.notice else nil
 	local canRest = life:canRest(lifeSpider)
-	local restPrompt = LifeText.prompt(life.asleep, life.resting, canRest, clock:isSleepTime(), device)
+	local restPrompt = LifeText.prompt(life.asleep, life.resting, canRest, clock:isSleepTime(), device, PeacockText.change(device, appearance))
+	local canDance = SpiderChoice.canDance(appearance)
+	if canDance and dance.active then table.insert(view.status, PeacockText.dancingLine(device)) end
 	if focusState.latched then table.insert(view.status, "FOCUS ON    " .. ControlText.name(device,"focus") .. " again to stop" .. (if not jump:isBusy() and not motor:onLine() and not motor.silk.walk then " / " .. ControlText.name(device,"cancel") else "")) end
 	if cam.eyeView then table.insert(view.status, `SPIDER-EYE VIEW    {ControlText.name(device, "eye")}: back`) end
 	if slow then
@@ -526,7 +591,7 @@ local function updateHud(frameDt: number)
 	elseif restPrompt and not aiming then
 		view.prompt = { title = restPrompt.title, hint = restPrompt.hint }
 	elseif motor.mode == "attached" and not aiming and (helpVisible or os.clock() - started < WALK_HINT_SECONDS) then
-		view.prompt = { hint = ControlText.walkHint(device) }
+		view.prompt = { hint = ControlText.walkHint(device) .. (if canDance then "    " .. PeacockText.displayHint(device, dance.active) else "") }
 	end
 	if os.clock() > helpUntil and helpVisible then helpVisible = false end
 	local restLabel = LifeText.touchLabel(life.asleep, life.resting, canRest, clock:isSleepTime())
@@ -536,6 +601,10 @@ local function updateHud(frameDt: number)
 	controls:setTouchLabel("Cancel", ControlText.touchCancelLabel(onLine))
 	controls:setTouchVisible("Jump", not onLine)
 	controls:setTouchVisible("Creep", not onLine)
+	-- The peacock spider's buttons: Change in the crack, Dance on the open sill (the peacock spider only).
+	controls:setTouchVisible("Choose", canChange())
+	controls:setTouchVisible("Display", canDance and not onLine and not life.resting and motor.mode == "attached")
+	controls:setTouchLabel("Display", PeacockText.touchDisplay(dance.active))
 	hud:update(view, frameDt)
 end
 
@@ -619,6 +688,19 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	local simFrame = frameDt * (if slow then SLOW_SPEED else 1)
 	drawnUp = drawnUp:Lerp(motor.up, 1 - math.exp(-24 * simFrame)).Unit
 	local body = SupportMath.bodyCFrame(motor.pos, drawnUp, motor.heading)
+	-- The peacock spider's dance: a pose for the rig, stepped with the simulation's time (slow motion slows it, a menu or the catch screen
+	-- holds it). Standing still on a surface; any walking intent, jump, line or rest ends it at once.
+	if SpiderChoice.canDance(appearance) then
+		dance.reduced = player:GetAttribute("ReducedMotion") == true
+		local r, f = controls:axes()
+		local standing = motor.mode == "attached" and not motor.preparing and not motor.seized and not motor:onLine() and not life.resting
+		local paused = GuiService.MenuIsOpen or panel:isShowing()
+		dancePose = dance:step(if paused then 0 else simFrame, standing, motor.moving or r ~= 0 or f ~= 0)
+		rig.dance = if dance:showing() then dancePose else nil
+	else
+		dancePose = nil
+		rig.dance = nil
+	end
 	rig:update(body, simFrame, motor.mode == "attached", motor.moving)
 	updateHud(frameDt)
 	flyBodies:draw(prey.flies,prey.now)
@@ -671,6 +753,7 @@ if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
 		run({
 			prey = prey, flyBodies = flyBodies, waspBody = waspBody, life = life, wasp = wasp, caughtPanel = panel, needs = needs, checkpoints = checkpoints, returnToCheckpoint = function() returnToCheckpoint() end, lifeSpider = function() return lifeSpider end, sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
 			input = controls,
+			changeSpider = function() changeSpider() end, dance = function() return dance end, appearance = function() return appearance end, rig = function() return rig end,
 			drop = function() motor:requestDrop() end,
 			jump = jump,
 			motor = motor,

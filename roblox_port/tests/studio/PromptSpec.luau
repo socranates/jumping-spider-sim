@@ -6,6 +6,7 @@ return function(check: (string, () -> ()) -> ())
 	local TextService = game:GetService("TextService")
 	local Shared = game:GetService("ReplicatedStorage"):WaitForChild("Shared")
 	local ControlText = require(Shared.UI.ControlText)
+	local PeacockText = require(Shared.UI.PeacockText)
 	local HudLayout = require(Shared.UI.HudLayout)
 	local FONT = Enum.Font.GothamMedium
 	local devices: { any } = { "keyboard", "gamepad", "touch" }
@@ -27,8 +28,8 @@ return function(check: (string, () -> ()) -> ())
 	end)
 	check("the controls card fits a phone's width in landscape for every device", function()
 		for _, device in devices do
-			local s = size(ControlText.helpCard(device), 15, 568 - 32 - 20)
-			assert(s.Y <= 8 * 15 * 1.35, `{device}: the card needs {s.Y} px`)
+			local s = size(ControlText.helpCard(device) .. PeacockText.helpExtra(device, true), 15, 568 - 32 - 20) -- with the peacock spider's two lines
+			assert(s.Y <= 10 * 15 * 1.35, `{device}: the card needs {s.Y} px`)
 		end
 	end)
 	check("touch buttons' words fit their buttons", function()

@@ -21,6 +21,9 @@ HudLayout.TOUCH_BUTTONS = {
 	{ action = "Feed", label = "Eat", x = 22, y = -242, size = 52, right = false, textSize = 14 },
 	{ action = "Focus", label = "Focus", x = -236, y = -242, size = 60, right = true, textSize = 14 },
 	{ action = "Eye", label = "Eye", x = -156, y = -242, size = 60, right = true },
+	-- The peacock spider (ROBLOX-31): Change (in the crack) beside Eat, Dance (the peacock spider, standing still) above Silk. Both start hidden.
+	{ action = "Choose", label = "Change", x = 82, y = -246, size = 56, right = false, textSize = 13 },
+	{ action = "Display", label = "Dance", x = -86, y = -306, size = 56, right = true, textSize = 14 },
 } :: { Button }
 
 HudLayout.GAP = 12

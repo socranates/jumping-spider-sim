@@ -45,6 +45,7 @@ local PerceptionStage = require(script.Parent.PerceptionStage)
 local PerceptionHud = require(script.Parent.PerceptionHud)
 local PreyDirector = require(Shared.Prey.PreyDirector)
 local FlyBodies = require(script.Parent.FlyBodies)
+local WaspBody = require(script.Parent.WaspBody)
 local NeedsModel = require(Shared.Life.NeedsModel)
 local LifeLoop = require(Shared.Life.LifeLoop)
 local LifeText = require(Shared.UI.LifeText)
@@ -111,6 +112,7 @@ local perceptionHud = PerceptionHud.new(player:WaitForChild("PlayerGui"))
 local stage = if Workspace:GetAttribute("TestTarget") == true or (Workspace:GetAttribute("TestTarget") ~= false and script.Parent:FindFirstChild("SilkPlayback")) then PerceptionStage.new(sill) else nil
 local prey = PreyDirector.engine(sill, Species.fly_like_prototype, 914, 4)
 local flyBodies = FlyBodies.new(Workspace)
+local waspBody = WaspBody.new(Workspace)
 -- LIFE (ROBLOX-24): the windowsill runs the life clock, so hunger runs by its hours (NeedsModel life mode, Standard rules: the
 -- port has no Easy mode yet). Feeding grants into the same model. The loop keeps the rest, sleep, daylight and the eyes' reach.
 local needs = NeedsModel.new(true, false)
@@ -618,6 +620,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	rig:update(body, simFrame, motor.mode == "attached", motor.moving)
 	updateHud(frameDt)
 	flyBodies:draw(prey.flies,prey.now)
+	waspBody:draw(wasp.wasp, prey.now)
 	local silk = motor.silk
 	local live, bend = liveLine, bendLine
 	if live and bend and silk.mode ~= "none" then
@@ -659,7 +662,7 @@ if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
 	task.spawn(function()
 		local run: any = (require :: any)(playback)
 		run({
-			prey = prey, flyBodies = flyBodies, life = life, wasp = wasp, caughtPanel = panel, needs = needs, checkpoints = checkpoints, returnToCheckpoint = function() returnToCheckpoint() end, lifeSpider = function() return lifeSpider end, sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
+			prey = prey, flyBodies = flyBodies, waspBody = waspBody, life = life, wasp = wasp, caughtPanel = panel, needs = needs, checkpoints = checkpoints, returnToCheckpoint = function() returnToCheckpoint() end, lifeSpider = function() return lifeSpider end, sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
 			input = controls,
 			drop = function() motor:requestDrop() end,
 			jump = jump,

@@ -2,12 +2,13 @@
 -- spider (Rig/SpiderRig, at the places scene.py asks for) and the real fly bodies (Client/FlyBodies) under the test shim, then prints
 -- every visible part for scene.gd to draw. The shim is not Roblox: this is a layout and colour preview, never Roblox rendering.
 -- scene.py puts these globals in front of the bundle: DETAIL ("full" or "low"), SUN_ELEVATION_DEG, SUN_AZIMUTH_DEG, SPIDERS (a list
--- of { name, x, z, hx, hz }), FLIES (a list of { id, x, y, z, hx, hy, hz, flying }).
+-- of { name, x, z, hx, hz }), FLIES (a list of { id, x, y, z, hx, hy, hz, flying }), WASPS (a list of { id, x, y, z, hx, hz, mode, search, beat }).
 local Scenery = require("../src/Shared/Habitat/Scenery")
 local WorldDetail = require("../src/Client/WorldDetail")
 local SupportMath = require("../src/Shared/Movement/SupportMath")
 local SpiderRig = require("../src/Shared/Rig/SpiderRig")
 local FlyBodies = require("../src/Client/FlyBodies")
+local WaspBody = require("../src/Client/WaspBody")
 
 -- ---------------------------------------------------------------- the world, as Server/Main builds it
 local el, az = math.rad(SUN_ELEVATION_DEG), math.rad(SUN_AZIMUTH_DEG)
@@ -43,6 +44,16 @@ for _, f in FLIES do
 	})
 end
 bodies:draw(flies, 0.37)
+
+-- ---------------------------------------------------------------- wasps (scene.py's WASPS: id, x, y, z, hx, hz, mode, search, beat)
+local waspHolder = Instance.new("Folder")
+waspHolder.Name = "WaspHolder"
+waspHolder.Parent = workspace
+for _, w in WASPS do
+	local body = WaspBody.new(waspHolder)
+	body.folder.Name = w.id
+	body:draw({ position = Vector3.new(w.x, w.y, w.z), heading = Vector3.new(w.hx, 0, w.hz).Unit, mode = w.mode, search = w.search, visible = true }, w.beat)
+end
 
 -- ---------------------------------------------------------------- the dump
 local function f5(x: number): string return string.format("%.5f", x) end
@@ -98,6 +109,9 @@ end
 local before = #rows
 dump(flyFolder, "flies", rows)
 counts.flies = #rows - before
+before = #rows
+dump(waspHolder, "wasps", rows)
+counts.wasps = #rows - before
 local keys = {}
 for k in counts do table.insert(keys, k) end
 table.sort(keys)

@@ -9,6 +9,8 @@ local Data = require("../src/Shared/Data/Wasp")
 local WaspDirector = require("../src/Shared/Predator/WaspDirector")
 local WaspText = require("../src/Shared/UI/WaspText")
 local Layout = require("../src/Shared/Habitat/WindowsillLayout")
+local WaspLook = require("../src/Shared/Data/WaspLook")
+local WaspBody = require("../src/Client/WaspBody")
 local ref = require("./wasp_reference")
 
 local passed, failed = 0, 0
@@ -629,6 +631,114 @@ case("the lines of the visit and the catch screen", function()
 	check(line.line and not line.choices and math.abs(line.dim - Data.caughtDim) < 1e-12, "then the line alone")
 	check(choices.line and choices.choices, "then the way on")
 	check(math.abs(WaspText.panel(Data.caughtQuietS / 2).dim - Data.caughtDim / 2) < 1e-12, "the dimming is gradual")
+end)
+
+-- ------------------------------------------------------------------------------------------------------- the drawn wasp
+-- A mud dauber about 2.5 cm: black body, very long thin petiole, yellow-banded legs, smoky dark wings, curled antennae; it never
+-- collides, is never seen by a ray and casts no shadow (checked under the shim; the look itself is judged in the preview and in Studio).
+case("the drawn wasp is a mud dauber", function()
+	local holder = Instance.new("Folder")
+	holder.Name = "WaspHolder"
+	holder.Parent = workspace
+	local body = WaspBody.new(holder)
+	local count = #body.parts
+	check(count >= 50 and count <= 70, `{count} parts (a fly has about 60)`)
+	for _, part in body.parts do
+		check(part.Anchored and not part.CanCollide and not part.CanQuery and not part.CanTouch and not part.CastShadow, `{part.Name}: anchored, no collision, no ray, no touch, no shadow`)
+	end
+	local function frameOf(name: string): any return body.frames[body.index[name]] end
+	local function sizeOf(name: string): Vector3 return body.sizes[body.index[name]] end
+	local function colorOf(name: string): Color3 return body.parts[body.index[name]].Color end
+	local function endOf(name: string, sign: number): Vector3 return frameOf(name) * Vector3.new(sign * sizeOf(name).X / 2, 0, 0) end
+	-- its length: the front of the mandibles to the end of the abdomen
+	local lo, hi = math.huge, -math.huge
+	for _, item in WaspLook.body do
+		lo = math.min(lo, item.at[3] - item.size[3] / 2)
+		hi = math.max(hi, item.at[3] + item.size[3] / 2)
+	end
+	check(hi - lo > 2.3 and hi - lo < 2.7, `about 2.5 cm long ({hi - lo})`)
+	-- black body, yellow collar, scutellum, mandibles and petiole
+	for _, name in { "Head", "Thorax", "Gaster", "AbdomenTip" } do
+		local c = colorOf(name)
+		check(c.R < 0.2 and c.G < 0.2 and c.B < 0.2, `{name} is black`)
+	end
+	for _, name in { "Collar", "Scutellum", "MandibleL", "Petiole" } do
+		local c = colorOf(name)
+		check(c.R > 0.7 and c.G > 0.55 and c.B < 0.3, `{name} is yellow`)
+	end
+	-- the very long thin waist: longer than the thorax is wide, a fraction of the gaster's width, joining thorax to gaster
+	body:pose("flying", 0, 0)
+	local petiole = sizeOf("Petiole")
+	check(petiole.X > 0.6 and petiole.Y < 0.08 and petiole.Y < sizeOf("Gaster").X * 0.2, `a long thin petiole ({petiole.X} long, {petiole.Y} thick)`)
+	check(math.abs(endOf("Petiole", -1).Z - WaspLook.petiole.from[3]) < 1e-6 and math.abs(endOf("Petiole", 1).Z - WaspLook.petiole.to[3]) < 1e-6, "from the thorax to the gaster")
+	-- six legs, black femurs, a yellow band at each knee, yellow tibias and feet
+	local bands = 0
+	for _, side in { "L", "R" } do
+		for pair = 1, 3 do
+			local femur, band = colorOf(`Leg{side}{pair}Femur`), colorOf(`Leg{side}{pair}Band`)
+			check(femur.R < 0.2 and band.R > 0.7 and band.B < 0.3 and colorOf(`Leg{side}{pair}Tibia`).R > 0.7 and colorOf(`Leg{side}{pair}Tarsus`).R > 0.7, `leg {side}{pair}: black femur, yellow band, tibia and foot`)
+			bands += 1
+			-- the band sits at the knee end of the femur
+			check((endOf(`Leg{side}{pair}Band`, 1) - endOf(`Leg{side}{pair}Femur`, 1)).Magnitude < 0.02, `leg {side}{pair}: the band is at the knee`)
+		end
+	end
+	check(bands == 6, "six legs")
+	-- smoky, dark, translucent wings, two each side
+	for _, side in { "L", "R" } do
+		for k = 1, 2 do
+			local c, t = colorOf(`Wing{side}{k}`), body.transparency[body.index[`Wing{side}{k}`]]
+			check(c.R < 0.35 and c.G < 0.3 and c.B < 0.25 and t > 0.3 and t < 0.8, `wing {side}{k} is smoky and translucent`)
+		end
+	end
+	-- antennae curl: the last segment turns well away from the first
+	for _, side in { "L", "R" } do
+		local first, last = endOf(`Antenna{side}1`, 1) - endOf(`Antenna{side}1`, -1), endOf(`Antenna{side}4`, 1) - endOf(`Antenna{side}4`, -1)
+		local angle = math.deg(math.acos(math.clamp(first.Unit:Dot(last.Unit), -1, 1)))
+		check(angle > 25 and angle < 150, `antenna {side} curls ({angle} degrees)`)
+	end
+	-- the antennae flick only while it searches
+	body:pose("flying", 0.1, 0)
+	local still = endOf("AntennaR4", 1)
+	body:pose("flying", 0.1, 1)
+	local busy = endOf("AntennaR4", 1)
+	check((still - busy).Magnitude > 0.02, "searching flicks the antennae")
+	-- flying: the wing is a visible blur; on the ground the wings are folded and there is no blur
+	body:pose("flying", 0.3, 0.5)
+	check(body.transparency[body.index["WingR1Blur"]] < 0.95, "the blur shows in flight")
+	local flightYaw = frameOf("WingR1").Position
+	body:pose("walking", 0.3, 0.5)
+	check(body.transparency[body.index["WingR1Blur"]] == 1, "no blur on the ground")
+	check((frameOf("WingR1").Position - flightYaw).Magnitude < WaspLook.wing.length * 0.8, "the wing stays at its root, folded or spread")
+	-- walking: the feet reach the surface 0.35 below the position at the bottom of every stride, and never go lower
+	local lowest = math.huge
+	local reached = 0
+	for step = 0, 59 do
+		body:pose("walking", step / 60, 1)
+		local low = math.huge
+		for _, side in { "L", "R" } do
+			for pair = 1, 3 do low = math.min(low, endOf(`Leg{side}{pair}Tarsus`, 1).Y) end
+		end
+		lowest = math.min(lowest, low)
+		if low < -0.34 then reached += 1 end
+	end
+	check(lowest > -0.37 and lowest < -0.33, `the feet touch the surface ({lowest})`)
+	check(reached > 10, "and it strides")
+	-- holding: the front legs clutch under the body
+	body:pose("holding", 0, 0)
+	local clutch = endOf("LegL1Tarsus", 1)
+	body:pose("flying", 0, 0)
+	check((clutch - endOf("LegL1Tarsus", 1)).Magnitude > 0.3 and clutch.Y < -0.6, "the front legs reach down to hold what hangs under it")
+	-- drawn: placed where the director has it, hidden while it is away
+	local dir = { position = Vector3.new(5, 3, 2), heading = Vector3.new(1, 0, 0), mode = "flying", search = 0.3, visible = true }
+	body:draw(dir, 1.0)
+	check(body.folder.Parent == holder, "shown while it is here")
+	local head = body.parts[body.index["Head"]].Position
+	check((head - Vector3.new(5, 3, 2)).Magnitude > 0.9 and head.X > 5.9 and head.X < 6.3, `the head is ahead of the position along the heading ({head})`)
+	check(math.abs(body.parts[body.index["Gaster"]].Position.X - 5) > 0.5 and body.parts[body.index["Gaster"]].Position.X < 5, "and the gaster behind")
+	dir.visible = false
+	body:draw(dir, 1.1)
+	check(body.folder.Parent == nil, "taken out of the world while it is away")
+	body:destroy()
 end)
 
 print(`WASP passed={passed} failed={failed}`)

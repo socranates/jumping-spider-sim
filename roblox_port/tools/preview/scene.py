@@ -13,7 +13,7 @@ Usage (from roblox_port/):
 Views: corner, lip, floor, glass (close-ups of the wear), game (5 studs behind and above the spider at the spawn, default elevation, 70 degree vertical field of view), game_mid (the same
 camera, the spider mid-sill), overview, planter, leaves, window (looking out of the glass from the sill), window_uv (the same with the
 UV layer faded in), retreat (the crevice), fly (both flies), fly_a (the standing fly) and fly_b (the one in the air); close-ups of the
-fly from above, in front and from the side: fly_top, fly_front, fly_side (standing) and fly_b_top, fly_b_side, fly_b_front (in the air).
+fly from above, in front and from the side: fly_top, fly_front, fly_side (standing) and fly_b_top, fly_b_side, fly_b_front (in the air); wasp, wasp_side, wasp_top, wasp_front (hovering and searching), wasp_walk (on the floor) and wasp_hold (carrying).
 --parts renders an already dumped part list (for example the "before" list kept next to the images) instead of running the code."""
 import argparse, importlib.util, json, math, pathlib, subprocess, sys, tempfile
 
@@ -48,6 +48,13 @@ FLIES = [
 ]
 
 
+WASPS = [
+    {"id": "wasp_a", "x": -14.0, "y": 3.0, "z": 3.0, "hx": 1.0, "hz": 0.3, "mode": "flying", "search": 0.7, "beat": 0.31},   # hovering, searching
+    {"id": "wasp_b", "x": -8.0, "y": 0.35, "z": 6.0, "hx": 1.0, "hz": -0.2, "mode": "walking", "search": 1.0, "beat": 0.2},  # on the sill floor
+    {"id": "wasp_c", "x": -3.0, "y": 8.0, "z": 3.0, "hx": 1.0, "hz": 0.5, "mode": "holding", "search": 0.0, "beat": 0.4},     # carrying
+]
+
+
 def lua(value):
     if isinstance(value, bool):
         return "true" if value else "false"
@@ -67,7 +74,7 @@ def dump_parts(path):
     driver = str(HERE / "scene_driver.luau")
     run.CLIENT_TESTS.add(driver)  # the driver needs the client modules (SpiderRig, FlyBodies) in its bundle
     prefix = (f'DETAIL = {lua(args.detail)}\nSUN_ELEVATION_DEG = {args.elevation}\nSUN_AZIMUTH_DEG = {args.azimuth}\n'
-              f'SPIDERS = {lua(SPIDERS)}\nFLIES = {lua(FLIES)}\n')
+              f'SPIDERS = {lua(SPIDERS)}\nFLIES = {lua(FLIES)}\nWASPS = {lua(WASPS)}\n')
     with tempfile.NamedTemporaryFile("w", suffix=".luau", encoding="utf-8", delete=False, dir=out) as f:
         f.write(prefix + run.bundle(driver))
     try:
@@ -143,6 +150,27 @@ VIEWS.update({
     "fly_b_top": around(FLIES[1], (1, 0.1, 0.4), 0.2, 1.45, fov=40, at_up=0.0),
     "fly_b_side": around(FLIES[1], (1, 0.1, 0.4), 0, 0.1, d_side=-1.6, fov=40, at_up=0.0),
     "fly_b_front": around(FLIES[1], (1, 0.1, 0.4), 0, 0.25, d_front=1.6, fov=40, at_up=0.0),
+})
+
+
+def around_wasp(w, d_back, d_up, d_front=0.0, d_side=0.0, fov=30.0, at_up=0.0, at_ahead=0.0):
+    """A close view of a wasp (its centre is the petiole's base; its length runs 1.2 ahead and 1.2 behind)."""
+    fx, fz = w["hx"], w["hz"]
+    n = math.hypot(fx, fz)
+    fx, fz = fx / n, fz / n
+    rx, rz = -fz, fx
+    p = (w["x"], w["y"], w["z"])
+    eye = [p[0] - fx * d_back + fx * d_front + rx * d_side, p[1] + d_up, p[2] - fz * d_back + fz * d_front + rz * d_side]
+    return {"fov": fov, "eye": eye, "at": [p[0] + fx * at_ahead, p[1] + at_up, p[2] + fz * at_ahead], "near": 0.02, "far": 1800, "groups": ["wasps"], "shadow": 20}
+
+
+VIEWS.update({
+    "wasp": around_wasp(WASPS[0], 0, 1.6, d_front=3.4, d_side=-2.0, fov=34, at_up=0.0),
+    "wasp_side": around_wasp(WASPS[0], 0, 0.15, d_side=-4.2, fov=34),
+    "wasp_top": around_wasp(WASPS[0], 0, 4.4, fov=36),
+    "wasp_front": around_wasp(WASPS[0], 0, 0.2, d_front=4.0, fov=34),
+    "wasp_walk": around_wasp(WASPS[1], 0, 1.0, d_front=2.3, d_side=-2.3, fov=36, at_up=-0.1),
+    "wasp_hold": around_wasp(WASPS[2], 0, 0.8, d_front=3.0, d_side=-2.6, fov=36, at_up=-0.3),
 })
 names = [n for n in args.views.split(",") if n]
 for n in names:

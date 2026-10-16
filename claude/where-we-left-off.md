@@ -1,3 +1,12 @@
+# Claude — 2026-10-16: the peacock spider and its courtship dance
+
+Read **docs/HANDOFF-roblox-peacock.md**. Branch **claude/roblox-peacock** (origin/main 059811b + three commits; `claude-playtest/claude-peacock.bundle`). Ledger **ROBLOX-29** to **ROBLOX-31**. Nathan's design package from another AI (Gemini) was used as source material only and redone: the science re-checked against Girard, Kasumovic and Elias 2011 (PLoS ONE 6(9): e25390), the code not copied.
+
+A second spider, the male peacock spider Maratus volans: a drawn appearance (0.455 studs, fan of flat discs, 113 parts full / 80 low) and a presentation-only courtship dance (a pose for the rig; no change to motor, collider, senses, jump, silk, LIFE or the wasp). Chosen with **C** (RB / R1, touch Change) while resting in the crack; danced with **X** (RB / R1, touch Dance) standing still; a move, a jump, Cancel or the key again stops it. Rates (palp flicker 3.5 Hz, fan dance 3.2 Hz, leg waving 3.2 Hz, fan-flapping 2.5 Hz, rumble-rump 2.44 s at 12.1 bumps/s) are documented; amplitudes, the 14 s loop and the look are artistic and marked. The pre-mount display and the mounting attempt are left out on purpose (a family game). The default spider is untouched.
+
+Linux: PEACOCK 80, LOOK 102, CLIENT 19, all other suites unchanged, strict 0. **Not run in Studio.** Next Chet: import the bundle, the checklist in the handoff (fan look and z-fighting, the touch layout, the Prompt and Peacock Studio specs). Next Claude: LIFE death and continuing, or growth and moulting.
+
+---
 # Chet — 2026-10-16: wasp, LIFE, PlayStation prompts and sound accepted on Windows
 
 Read **docs/HANDOFF-roblox-wasp-windows.md**. Claude a483d65 is integrated with the original sound work; the combined build is ready for main. Evidence **52123df9177323c8**: **44,610/44,610 Windows CLI**, **80/80 Studio engine**, **14/14 live-client**, strict src clean and **118/118 compile**. Nathan launched the local test; Chet collected matching structured Studio reports. The wasp recording loaded, the crack stayed safe, and the hum stopped after departure. Sample frame median/p95 **16.96/20.91 ms**, not a full F01 pass.

@@ -1247,3 +1247,14 @@ Merged source conflicts by retaining both paths; regenerated place files. Eviden
 
 ### Windows acceptance completed
 Nathan ran build 52123df9177323c8: 80/80 engine and 14/14 live client, wasp audio loaded. Full Windows CLI 44,610/44,610. Wasp frame median/p95 16.96/20.91 ms. Reports saved. Finish into main and update laptop; publish-ready file in Downloads. Publication and physical console/tablet acceptance remain pending.
+
+---
+# Claude — 2026-10-16: the peacock spider (Maratus volans) and its courtship dance
+
+Read **docs/HANDOFF-roblox-peacock.md**. Branch **claude/roblox-peacock** (origin/main 059811b + three commits; bundle `claude-playtest/claude-peacock.bundle`). Ledger **ROBLOX-29**, **ROBLOX-30**, **ROBLOX-31**. Roblox only; Godot/SPEC frozen. **Not run in Studio, on Windows or on a device.** Places rebuilt, evidence **154e6bf13cccd87b**.
+- **The dance** (`Data/Peacock`, `Rig/PeacockDance`): rates from Girard, Kasumovic and Elias 2011 (PLoS ONE 6(9): e25390); amplitudes, phase times and the 14 s loop artistic and marked; the pre-mount display and mounting left out. A pure pose, interruptible, slow-motion safe, ReducedMotion aware. PEACOCK 80.
+- **The drawn male** (`Data/Appearances.maratus_volans_male`, SpiderRig): 0.455 studs, standing low, carapace stripes, white palp brushes, legs III dark with white tips, a fan of flat discs folded on the abdomen and opened by the pose. 113 parts full, 80 low. The default spider's table and tests untouched. Previews in `claude-playtest/previews/peacock_*.png`.
+- **In the game:** C / RB / Change in the crack changes spider (rig rebuilt; Player attribute `Appearance`); X / RB / Dance as the peacock spider starts the dance, a move, jump, Cancel or the key again stops it; felt caption for the rumble-rump; words per device (PlayStation R1).
+- Linux: PEACOCK 80, LOOK 102 (was 72), CLIENT 19 (was 18), every other suite unchanged; strict 0; every .luau compiles. New Studio spec `PeacockSpec` unrun.
+
+**Next Chet:** import `claude-peacock.bundle`, push, the checklist in docs/HANDOFF-roblox-peacock.md. **Nathan, try:** open TheWindowsill-latest.rbxlx, rest in the crack (E), press C, walk out, stand still, press X.

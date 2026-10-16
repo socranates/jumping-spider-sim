@@ -15,6 +15,8 @@ Initial native 53c86f528da1894c: 85/85 engine and 18/18 live client, including w
 
 ## Next chunk
 
+Publication follow-up first: c4976fe reached GitHub main and the laptop, but Studio Publish As stalled repeatedly, including in a fresh editor. Cancelled those attempts; latest observed dashboard version 11 predates this submission. Approval review blocked Save to Roblox As as an alternate route; explicit user approval to overwrite only the existing place was requested. Check RESULTS.md for the latest status before attempting publication again.
+
 **Growth and moulting**, porting frozen LIFE round 3 and drawn-growth rules against Godot goldens. Wire the actual adult transition to LifeSession.finishAdult(3) for main/Standard; show the Easy-open notice, and keep session progress outside checkpoints. Record the growth state in whole-world checkpoints; update schema/validation and recover old records deliberately. Preserve drawn scaling with planted feet, abdomen condition, pale soft skin, the twitch, peacock appearance/dance and unchanged movement collider. Test food thresholds, safe crack moult, interrupted/restored moults, soft-skin period, old skins, adulthood/Easy and Free-play exclusions. After growth, notebook and server DataStore persistence are still separate work.
 
 Keep future Game Pass sales deferred until Nathan explicitly asks. Physical PlayStation/tablet acceptance is Nathan's next playtest after publication.

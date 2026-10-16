@@ -1,3 +1,12 @@
+# Chet — 2026-10-16: peacock Windows integration
+
+**Integration branch: `codex/roblox-peacock-windows`. Main and the laptop remain at `059811b` until the final native layout check passes.** Claude's source branch `claude/roblox-peacock` is backed up on GitHub.
+
+Read **docs/HANDOFF-roblox-peacock-windows.md** and **docs/verification/roblox-peacock-windows/RESULTS.md**. Claude 903bf49 imported; free peacock appearance/dance retained. Added native dance playback and fixed off-screen prompts on short landscape touch layouts (ROBLOX-32). Full Windows CLI **44,721/44,721** before the layout fix; affected reruns recorded separately. Initial native **84/84 engine + 15/15 client**, evidence **e54de70c7907c0a8**. Final build **2c8f574734259bd8** native run pending. Strict src clean; 124 scripts compile. No monetization or live publication performed.
+
+**Next Claude:** death and continuing with mode selection; detailed scope in the new handoff. Keep the peacock unlocked until Nathan asks for sales. Physical PlayStation/tablet and close-up visual checks remain open.
+
+---
 # Claude — 2026-10-16: the peacock spider and its courtship dance
 
 Read **docs/HANDOFF-roblox-peacock.md**. Branch **claude/roblox-peacock** (origin/main 059811b + three commits; `claude-playtest/claude-peacock.bundle`). Ledger **ROBLOX-29** to **ROBLOX-31**. Nathan's design package from another AI (Gemini) was used as source material only and redone: the science re-checked against Girard, Kasumovic and Elias 2011 (PLoS ONE 6(9): e25390), the code not copied.

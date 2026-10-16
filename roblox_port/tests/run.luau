@@ -316,13 +316,14 @@ end
 local HudLayout = require("../src/Shared/UI/HudLayout")
 do
 	local sizes = { { 568, 320 }, { 667, 375 }, { 844, 390 }, { 932, 430 }, { 1024, 768 }, { 1180, 820 }, { 1366, 1024 }, { 390, 844 }, { 768, 1024 } }
-	local clear, wide, inside, apart = true, true, true, true
+	local clear, wide, inside, apart, panelInside = true, true, true, true, true
 	for _, sz in sizes do
 		local w, h = sz[1], sz[2]
 		local rects = {}
 		for _, b in HudLayout.TOUCH_BUTTONS do table.insert(rects, HudLayout.buttonRect(b, w, h)) end
 		local x0, x1, bottom = HudLayout.promptSpan(w, h, "touch")
 		local panel = { x0 = x0, y0 = bottom - 120, x1 = x1, y1 = bottom } -- three wrapped lines and a title
+		if panel.y0 < 0 or panel.y1 > h then panelInside = false end
 		for i, r in rects do
 			if HudLayout.overlaps(panel, r) then clear = false; print("overlap", w, h, i) end
 			if r.x0 < 0 or r.y0 < 0 or r.x1 > w or r.y1 > h then inside = false end
@@ -332,6 +333,7 @@ do
 	end
 	check(clear and wide, "touch prompts sit between or above the thumb buttons, at least 260 px wide, at phone and tablet sizes")
 	check(inside and apart, "touch buttons stay inside the safe area and never overlap")
+	check(panelInside, "touch prompt stays vertically inside the safe area, including short landscape phones")
 	local x0, x1, bottom = HudLayout.promptSpan(1920, 1080, "keyboard")
 	check(near(x1 - x0, 760, 1e-9) and near((x0 + x1) / 2, 960, 1e-9) and bottom == 1064, "keyboard and controller prompts are centred, at most 760 px wide")
 end

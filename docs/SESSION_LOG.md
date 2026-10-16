@@ -1258,3 +1258,10 @@ Read **docs/HANDOFF-roblox-peacock.md**. Branch **claude/roblox-peacock** (origi
 - Linux: PEACOCK 80, LOOK 102 (was 72), CLIENT 19 (was 18), every other suite unchanged; strict 0; every .luau compiles. New Studio spec `PeacockSpec` unrun.
 
 **Next Chet:** import `claude-peacock.bundle`, push, the checklist in docs/HANDOFF-roblox-peacock.md. **Nathan, try:** open TheWindowsill-latest.rbxlx, rest in the crack (E), press C, walk out, stand still, press X.
+
+---
+# Chet — 2026-10-16: peacock Windows integration
+
+Read **docs/HANDOFF-roblox-peacock-windows.md** and **docs/verification/roblox-peacock-windows/RESULTS.md**. Claude 903bf49 imported; free peacock appearance/dance retained. Added native dance playback and fixed off-screen prompts on short landscape touch layouts (ROBLOX-32). Full Windows CLI **44,721/44,721** before the layout fix; affected reruns recorded separately. Initial native **84/84 engine + 15/15 client**, evidence **e54de70c7907c0a8**. Final build **2c8f574734259bd8** native run pending. Strict src clean; 124 scripts compile. No monetization or live publication performed.
+
+**Next Claude:** death and continuing with mode selection; detailed scope in the new handoff. Keep the peacock unlocked until Nathan asks for sales. Physical PlayStation/tablet and close-up visual checks remain open.

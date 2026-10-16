@@ -42,4 +42,15 @@ return function(check: (string, () -> ()) -> ())
 			end
 		end
 	end)
+	check("compact landscape touch labels fit and the prompt stays on screen", function()
+		for _, wh in { Vector2.new(568,320), Vector2.new(667,375), Vector2.new(844,390) } do
+			local _, _, bottom = HudLayout.promptSpan(wh.X, wh.Y, "touch")
+			assert(bottom >= 120, "prompt top would be off screen")
+			for _, spec in HudLayout.TOUCH_BUTTONS do
+				local b = HudLayout.layoutButton(spec, wh.X, wh.Y)
+				local text = size(b.label, b.textSize or 18, b.size-6)
+				assert(text.X <= b.size-6+.5 and text.Y <= b.size-6, `compact {b.action} does not fit`)
+			end
+		end
+	end)
 end

@@ -1,0 +1,4 @@
+fuzz: 319 body hairs, 142 leg hairs, 29 white
+SUMMARY passed=185 failed=0
+PEACOCK passed=80 failed=0
+CLIENT passed=19 failed=0

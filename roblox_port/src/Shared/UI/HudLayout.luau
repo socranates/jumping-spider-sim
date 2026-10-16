@@ -30,7 +30,30 @@ HudLayout.GAP = 12
 HudLayout.MIN_PROMPT_WIDTH = 260
 HudLayout.MAX_PROMPT_WIDTH = 760
 
+-- Short landscape safe areas need three rows rather than a tall stack: leave
+-- room for the prompt above them, including when Dance/Change are visible.
+local COMPACT = {
+	Feed={16,-180}, Forward={76,-180}, Choose={136,-180},
+	Left={16,-120}, Right={136,-120}, Back={76,-60},
+	Focus={-188,-180}, Display={-128,-180}, Drop={-68,-180},
+	Eye={-188,-120}, Recenter={-128,-120}, Creep={-68,-120},
+	Cancel={-128,-60}, Jump={-68,-60},
+}
+function HudLayout.layoutButton(b: Button, width: number, height: number): Button
+	if width >= 568 and height > 0 and height < 450 then
+		local slot = COMPACT[b.action]
+		if slot then
+			local copy = table.clone(b)
+			copy.x, copy.y, copy.size = slot[1], slot[2], 52
+			copy.textSize = math.min(b.textSize or 18, 14)
+			return copy
+		end
+	end
+	return b
+end
+
 function HudLayout.buttonRect(b: Button, width: number, height: number): Rect
+	b = HudLayout.layoutButton(b, width, height)
 	local x0 = if b.right then width + b.x else b.x
 	local y0 = height + b.y
 	return { x0 = x0, y0 = y0, x1 = x0 + b.size, y1 = y0 + b.size }

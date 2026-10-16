@@ -159,6 +159,18 @@ function SpiderInput.bind(h: Handlers)
 	for _, b in HudLayout.TOUCH_BUTTONS do
 		button(b.action, b.label, if b.right then UDim2.new(1, b.x, 1, b.y) else UDim2.new(0, b.x, 1, b.y), b.size, b.textSize)
 	end
+	local function layoutTouch()
+		local size = gui.AbsoluteSize
+		for _, spec in HudLayout.TOUCH_BUTTONS do
+			local b = HudLayout.layoutButton(spec, size.X, size.Y)
+			local control = buttons[b.action]
+			control.Position = UDim2.new(if b.right then 1 else 0, b.x, 1, b.y)
+			control.Size = UDim2.fromOffset(b.size, b.size)
+			control.TextSize = b.textSize or 18
+		end
+	end
+	gui:GetPropertyChangedSignal("AbsoluteSize"):Connect(layoutTouch)
+	layoutTouch()
 	UIS.InputEnded:Connect(function(input)
 		local action = active[input]
 		if action then

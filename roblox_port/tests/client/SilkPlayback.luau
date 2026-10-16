@@ -224,6 +224,31 @@ return function(driver: any)
   assert(not hum.Playing,"hum continued after visit")
  end)
  driver.wasp:clearVisit() -- also clean up after an assertion failure
+ check("PEACOCK: change while resting, dance without moving physics, walk to stop, and return to first spider",function()
+  local function press(action)
+   driver.input:simulate(action,true);RunService.Heartbeat:Wait();driver.input:simulate(action,false);wait(.15)
+  end
+  driver.input:clear();driver.place(Vector3.new(-25.5,.31,6));wait(.4)
+  driver.life.clock.hour=12
+  if not driver.life.resting then press("Feed") end
+  assert(driver.life.resting and not driver.life.asleep,"not resting awake")
+  press("Choose")
+  assert(driver.appearance()=="maratus_volans_male","choice did not select peacock")
+  press("Feed")
+  driver.place(Vector3.new(-18,.31,6));wait(.5)
+  local before=driver.motor.pos
+  press("Display");wait(5)
+  assert(driver.dance().active and driver.rig().dance.fanOpen>.9,"dance fan did not open")
+  assert((driver.motor.pos-before).Magnitude<.02,"dance changed physics position")
+  wait(9) -- let Nathan see one full loop
+  driver.input:simulate("Forward",true);wait(.3);driver.input:simulate("Forward",false);wait(.3)
+  assert(not driver.dance().active and driver.rig().dance==nil,"walking did not stop/fade the pose")
+  driver.place(Vector3.new(-25.5,.31,6));wait(.4)
+  if not driver.life.resting then press("Feed") end
+  press("Choose")
+  assert(driver.appearance()=="first_spider","first spider was not restored")
+  if driver.life.resting then press("Feed") end
+ end)
  local passed=0
 	for _,row in rows do if row.passed then passed+=1 end end
 	print("PORT_CLIENT_REPORT "..HttpService:JSONEncode({evidence_id=workspace:GetAttribute("PortEvidence"),tests=#rows,passed=passed,failed=#rows-passed,results=rows}))

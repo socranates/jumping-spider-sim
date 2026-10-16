@@ -15,8 +15,11 @@
 -- pose, every reference in the graph, and then the meaning of the rebuilt world (reserves in range and books that add up,
 -- the clock, unique flies, perches held by flies that exist, the meal in the jaws one of them). A record with any problem is
 -- refused with its reasons and the live world is left exactly as it was.
+-- The wasp keeps a small record beside the graph (Godot's checkpoint schema 6): the day of its last visit and this life's visits and
+-- escapes, so a return to a rest meets the same wasp. A visit going on is not kept; restoring ends it. A record without one (the port's
+-- first checkpoints were made before the wasp) gets the record of a life it has not yet visited.
 -- Differences from Godot: the record is the port's own (its flies are the port's, Chet's ROBLOX flies, not Godot's), so
--- Godot checkpoints are not read and schema numbers start again at 1. The passing shadow, growth, the wasp and the notebook
+-- Godot checkpoints are not read and schema numbers start again at 1. The passing shadow, growth and the notebook
 -- are not ported, so they are not recorded.
 
 local ObjectRecord = require(script.Parent.ObjectRecord)
@@ -36,6 +39,7 @@ local NeedsModel = require(script.Parent.Parent.Life.NeedsModel)
 local LifeLoop = require(script.Parent.Parent.Life.LifeLoop)
 local LifeClock = require(script.Parent.Parent.Life.LifeClock)
 local Layout = require(script.Parent.Parent.Habitat.WindowsillLayout)
+local WaspDirector = require(script.Parent.Parent.Predator.WaspDirector)
 
 local Checkpoint = {}
 
@@ -60,6 +64,7 @@ Checkpoint.CLASSES = {
 -- when a record is made and when it is put back, so a name always means this world's own thing.
 export type World = {
 	motor: any, prey: any, sensor: any, memory: any, needs: any, life: any,
+	wasp: any?, -- the WaspDirector (nil: no wasp in this world)
 	extraRefs: { [string]: any }?, -- anything else the world's state points at that the record should keep by name
 }
 
@@ -125,6 +130,7 @@ function Checkpoint.capture(world: World, createdAt: number?): ({ [string]: any 
 			retreat_id = if Layout.inRetreat(motor.pos) then "sill_crevice" else "", state = "ATTACHED",
 		},
 		world = graph,
+		wasp = if world.wasp ~= nil then world.wasp:toRecord() else nil,
 	}, nil
 end
 
@@ -225,6 +231,9 @@ function Checkpoint.check(record: any, world: World): ({ string }, ObjectRecord.
 		if p.state ~= "ATTACHED" then bad("the spider is not standing on a surface") end
 		if p.retreat_id ~= "" and p.retreat_id ~= "sill_crevice" then bad("the spider is in an unknown retreat") end
 	end
+	if record.wasp ~= nil then
+		for _, text in WaspDirector.problems(record.wasp) do bad(text) end
+	end
 	if #problems > 0 then return problems, nil end
 	local decoded, why = ObjectRecord.decode(record.world, Checkpoint.CLASSES, Checkpoint.refs(world))
 	if not decoded then
@@ -251,6 +260,7 @@ function Checkpoint.restore(record: any, world: World): (boolean, { string })
 	end
 	world.motor:place(pos, n.Unit, h.Unit)
 	world.motor.gazePitch = p.gaze_pitch
+	if world.wasp ~= nil then world.wasp:load(record.wasp or WaspDirector.defaultRecord()) end
 	-- Godot's apply_record: the rest that was going on goes on, the spider takes a moment to take hold, and the screen says
 	-- this is checkpoint recovery. What was owed or announced at that tick is not done again.
 	local life = world.life

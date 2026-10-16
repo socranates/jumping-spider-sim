@@ -480,7 +480,8 @@ local services = {
 	Players = { LocalPlayer = localPlayer },
 	GuiService = { MenuIsOpen = false, MenuOpened = newSignal(), MenuClosed = newSignal(), TouchControlsEnabled = true },
 	UserInputService = uis,
-	ContextActionService = { BindActionAtPriority = function(_self, name, fn) client.actions[name] = fn end },
+	ContextActionService = { BindActionAtPriority = function(_self, name, fn) client.actions[name] = fn end,
+		UnbindAction = function(_self, name) client.actions[name] = nil end },
 	RunService = { IsStudio = function() return client.studio end, Heartbeat = newSignal(),
 		BindToRenderStep = function(_self, name, _priority, fn) client.renderSteps[name] = fn end },
 }

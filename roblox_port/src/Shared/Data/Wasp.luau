@@ -63,6 +63,14 @@ Wasp.holdBelow = 0.5
 Wasp.eyeAhead = 1.0
 Wasp.sensedRadius = 0.9
 
+-- The words and timing of the screen (Godot: caught_panel.gd QUIET_S, LINE_S). Roblox: captionTailS is how long the caption of the wasp
+-- leaving stays up and captionFadeS how long it takes to fade.
+Wasp.caughtQuietS = 1.5 -- dim and quiet before the line
+Wasp.caughtLineS = 1.5 -- the line alone before the summary and the choices
+Wasp.caughtDim = 0.82
+Wasp.captionTailS = 3.0
+Wasp.captionFadeS = 1.0
+
 -- Where it looks for spiders: where it hovers to look and, on open surfaces, where it may land. Every hover point is open straight up
 -- to cruising height (tests check them on Godot's boxes; WaspSpec checks them on the real sill).
 local points: { Point } = {

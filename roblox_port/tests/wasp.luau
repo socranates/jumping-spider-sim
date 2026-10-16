@@ -7,6 +7,8 @@
 -- Run with the other suites:  python3 tests/run.py path/to/luau wasp.luau
 local Data = require("../src/Shared/Data/Wasp")
 local WaspDirector = require("../src/Shared/Predator/WaspDirector")
+local WaspText = require("../src/Shared/UI/WaspText")
+local Layout = require("../src/Shared/Habitat/WindowsillLayout")
 local ref = require("./wasp_reference")
 
 local passed, failed = 0, 0
@@ -542,6 +544,91 @@ case("its landing shakes the surface (LIFE-15)", function()
 		end
 	end
 	check(landed and shook, `on some visit it lands somewhere and the surface shakes: {kinds(d)}`)
+end)
+
+
+-- ------------------------------------------------------------------------------------------------------- the real sill's boxes
+-- Godot's test_what_the_spider_senses_of_it_and_where_it_flies: every place has room to hover, is open straight up to cruising height,
+-- is reached from over the frame, and a landing has a clear way down and ground under it, here on the Roblox sill's own pieces as the
+-- box world of tests/shim.luau has them (axis-aligned boxes; the engine's shapes are checked in tests/studio/WaspSpec).
+case("every place is clear on the sill's pieces", function()
+	local sill = BoxWorld.folder("WaspSill", Layout.PIECES)
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Include
+	params.FilterDescendantsInstances = { sill }
+	local function clear(a: Vector3, b: Vector3, r: number): boolean
+		return (a - b).Magnitude < 1e-5 or workspace:Spherecast(a, r, b - a, params) == nil
+	end
+	local up = Vector3.new(0, 1, 0)
+	for _, p in Data.points do
+		local hover: Vector3 = p.hover
+		local top = Vector3.new(hover.X, Data.cruiseY, hover.Z)
+		check(clear(hover + up * 0.01, hover, Data.radius), `{p.id}: room to hover`)
+		check(clear(hover, top, Data.radius), `{p.id}: open straight up`)
+		check(clear(Data.over, top, Data.radius), `{p.id}: reached from over the frame`)
+		if p.land then
+			local land: Vector3 = p.land
+			check(clear(hover, land + up * 0.25, Data.radius), `{p.id}: a clear way down to land`)
+			check(workspace:Raycast(land, Vector3.new(0, -0.5, 0), params) ~= nil, `{p.id}: ground under the landing`)
+			check(clear(land, land + up * 1.2, Data.walkRadius), `{p.id}: room to take off`)
+		end
+	end
+	check(clear(Data.entry, Data.over, Data.radius), "in over the frame without touching it")
+end)
+
+-- ------------------------------------------------------------------------------------------------------- the words
+case("the captions say where the hum is", function()
+	local at, heading, up = Vector3.new(0, 0, 0), Vector3.new(1, 0, 0), Vector3.new(0, 1, 0)
+	local function word(p: Vector3): string return WaspText.directionWord(at, heading, up, p) end
+	check(word(Vector3.new(5, 0, 0)) == "ahead", "ahead")
+	check(word(Vector3.new(-5, 0, 0)) == "behind", "behind")
+	-- Facing +X with +Y up, the left hand is toward -Z.
+	check(word(Vector3.new(0, 0, -5)) == "left" and word(Vector3.new(0, 0, 5)) == "right", "left and right")
+	check(word(Vector3.new(5, 0, -5)) == "ahead-left" and word(Vector3.new(5, 0, 5)) == "ahead-right", "the front diagonals")
+	check(word(Vector3.new(-5, 0, -5)) == "behind-left" and word(Vector3.new(-5, 0, 5)) == "behind-right", "the back diagonals")
+	check(word(Vector3.new(0, 5, 0)) == "above" and word(Vector3.new(5, 5, 5)) == "above, ahead-right" and word(Vector3.new(0, -5, 0)) == "below", "above and below")
+	check(word(Vector3.new(5, 1, 0)) == "ahead", "a little up is still ahead")
+	check(word(at) == "here", "on top of it")
+	local a = WaspText.caption("arriving", 3, "ahead-left")
+	check(a ~= nil and a.text == "[a deep, heavy hum outside, ahead-left, coming closer]" and a.alpha == 1, "arriving")
+	local i = WaspText.caption("inspecting", 0, "behind")
+	check(i ~= nil and i.text == "[the deep hum turns toward you, behind]", "it has turned toward you")
+	check(WaspText.caption("striking", 0, "behind") ~= nil, "and while it strikes")
+	local l = WaspText.caption("leaving", 0.5, "above")
+	check(l ~= nil and l.text == "[the deep hum fades away, above]" and l.alpha == 1, "leaving")
+	local fading = WaspText.caption("leaving", Data.captionTailS - 0.5 * Data.captionFadeS, "above")
+	check(fading ~= nil and math.abs(fading.alpha - 0.5) < 1e-9, "and fades")
+	check(WaspText.caption("leaving", Data.captionTailS, "above") == nil and WaspText.caption("searching", 1, "ahead") == nil and WaspText.caption("away", 0, "ahead") == nil, "otherwise none")
+	for _, phase in WaspDirector.PHASES do
+		local c = WaspText.caption(phase, 0, "ahead")
+		check(c == nil or string.sub(c.text, 1, 8) ~= "[buzzing", "none begins [buzzing, which is the flies'")
+	end
+end)
+
+case("the lines of the visit and the catch screen", function()
+	local keyboard, pad = "keyboard", "gamepad"
+	local first = WaspText.line("arriving", false, 1, false, keyboard :: any)
+	check(first ~= nil and string.find(first, "wasps hunt spiders", 1, true) ~= nil and string.find(first, "(F)", 1, true) ~= nil, "the first visit says what wasps do and the way down")
+	check(string.find(WaspText.line("arriving", false, 1, false, pad :: any) :: string, "(X)", 1, true) ~= nil, "named for the controller")
+	check(WaspText.line("arriving", false, 2, false, keyboard :: any) == "A deep hum outside: a wasp is coming. Hide in the crack, keep still, or drop on your line.", "later visits are short")
+	check(WaspText.line("searching", true, 1, false, keyboard :: any) == "The wasp has lost you. Get out of sight.", "lost")
+	check(WaspText.line("searching", false, 1, false, keyboard :: any) == "A wasp is searching the sill. Keep still, keep out of sight, or get home to the crack.", "searching")
+	check(WaspText.line("inspecting", false, 1, false, keyboard :: any) == "The wasp has seen you! Get away: jump, drop on your line, or reach the crack.", "seen")
+	check(WaspText.line("striking", false, 1, false, keyboard :: any) == WaspText.line("inspecting", false, 1, false, keyboard :: any), "and striking")
+	check(WaspText.line("carrying", false, 1, false, keyboard :: any) == "Stung, the spider cannot move. The wasp carries it away.", "carried")
+	check(WaspText.line("leaving", false, 1, true, keyboard :: any) == "The wasp touched you with its antennae, gave up, and is leaving.", "spared")
+	check(WaspText.line("leaving", false, 1, false, keyboard :: any) == "The wasp is leaving.", "leaving")
+	check(WaspText.line("away", false, 1, false, keyboard :: any) == nil, "away, nothing")
+	check(WaspText.LINE == "A mud dauber wasp stung the spider and carried it away." and WaspText.BACK == "Back to your last rest", "Godot's caught-panel words")
+	check(WaspText.choice(true) == "Back to your last rest" and WaspText.choice(false) == "Back to the start", "the way on")
+	check(WaspText.summary(5, 0, 0, 0) == "It lived less than a day.\nIt ate 0 meals.", "the life, briefly")
+	check(WaspText.summary(24, 1, 1, 0) == "It lived 1 day.\nIt ate 1 meal.\nThe wasp came 1 time; it got away from it 0 times.", "singulars")
+	check(WaspText.summary(80, 3, 3, 2) == "It lived 3 days.\nIt ate 3 meals.\nThe wasp came 3 times; it got away from it 2 times.", "and plurals")
+	local quiet, line, choices = WaspText.panel(0), WaspText.panel(Data.caughtQuietS), WaspText.panel(Data.caughtQuietS + Data.caughtLineS)
+	check(quiet.dim == 0 and not quiet.line and not quiet.choices, "dim and quiet first")
+	check(line.line and not line.choices and math.abs(line.dim - Data.caughtDim) < 1e-12, "then the line alone")
+	check(choices.line and choices.choices, "then the way on")
+	check(math.abs(WaspText.panel(Data.caughtQuietS / 2).dim - Data.caughtDim / 2) < 1e-12, "the dimming is gradual")
 end)
 
 print(`WASP passed={passed} failed={failed}`)

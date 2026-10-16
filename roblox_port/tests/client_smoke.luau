@@ -218,5 +218,72 @@ check("Backspace returns to the checkpoint kept by a rest, or to the start when 
 end)
 
 
+check("the wasp: heard with a direction, found, caught, carried off; the catch screen offers the way back and the world goes on", function()
+	local driver = ClientStubs.driver
+	local wasp, life, prey = driver.wasp, driver.life, driver.prey
+	assert(wasp and driver.caughtPanel, "the client did not hand over the wasp and the catch screen")
+	assert(not wasp.enabled, "the wasp comes by itself in the test place")
+	driver.place(Vector3.new(2.0, 0.31, 6.0))
+	life.clock.day, life.clock.hour = 3, 12.0
+	prey.feeding.mealsFinished = 1
+	frames(30)
+	assert(not wasp:isVisiting(), "a visit began on its own")
+	workspace:SetAttribute("WaspForce", "floor_middle")
+	frames(30)
+	assert(wasp:isVisiting() and wasp.phase == "arriving", `no visit: {wasp.phase}`)
+	assert(workspace:GetAttribute("WaspForce") == nil, "the force attribute was not taken")
+	local caption = find("SpiderPrompts", "Caption")
+	assert(caption.Visible and string.find(caption.Text, "[a deep, heavy hum outside, ", 1, true) and string.find(caption.Text, "coming closer]", 1, true), "no heard caption: " .. tostring(caption.Text))
+	local status = find("SpiderPrompts", "Status")
+	assert(string.find(status.Text, "a wasp is coming", 1, true), "no warning line: " .. tostring(status.Text))
+	assert(wasp:percept() ~= nil and wasp:percept().maxCategory == "movement", "the wasp is not movement to the senses")
+	-- The 8 s of warning are Godot's numbers and the director suite's business; here they are skipped (the wasp flies at once).
+	wasp.speed = 1e6
+	frames(3)
+	assert(wasp.phase == "searching", `still {wasp.phase}`)
+	local seized = false
+	local panel = driver.caughtPanel
+	-- Finding a spider is the director suite's business (movement noticed fast, stillness slowly); here it has just found this one.
+	wasp.notice, wasp.lastSeen = 1.0, driver.motor.pos
+	frames(2)
+	assert(wasp.phase == "inspecting", `not found: {wasp.phase}`)
+	assert(string.find(find("SpiderPrompts", "Caption").Text, "[the deep hum turns toward you, ", 1, true), "no caption for the look: " .. find("SpiderPrompts", "Caption").Text)
+	assert(string.find(find("SpiderPrompts", "Status").Text, "has seen you", 1, true), find("SpiderPrompts", "Status").Text)
+	for _ = 1, 60 * 12 do
+		frame(1 / 60)
+		if driver.motor.seized then seized = true break end
+	end
+	assert(seized, `the spider was never caught: {wasp.phase}`)
+	assert(string.find(find("SpiderPrompts", "Status").Text, "Stung", 1, true), find("SpiderPrompts", "Status").Text)
+	wasp.speed = 1e6 -- the carry, skipped
+	for _ = 1, 60 do
+		frame(1 / 60)
+		if panel:isShowing() then break end
+	end
+	assert(panel:isShowing() and wasp.phase == "away", "the catch screen did not come after the carry")
+	assert(driver.motor.pos.Y > 8, `not carried up and away: {driver.motor.pos}`)
+	assert(find("SpiderCaught", "Line").Text == "A mud dauber wasp stung the spider and carried it away.", "the plain line")
+	assert(not find("SpiderCaught", "Back").Visible, "the choices were up at once")
+	local tick = prey.tick
+	frames(30)
+	panel:update(5.0) -- the screen's own seconds
+	frames(2)
+	assert(prey.tick == tick, "the game did not wait under the catch screen")
+	assert(find("SpiderCaught", "Back").Visible and find("SpiderCaught", "Back").Text == "Back to your last rest", find("SpiderCaught", "Back").Text)
+	key("Reset", true); frames(1); key("Reset", false)
+	assert(panel:isShowing() and driver.motor.seized, "Backspace got past the catch screen")
+	key("Jump", true); frames(2); key("Jump", false)
+	assert(panel:isShowing() and driver.motor.seized, "Space got past the catch screen")
+	services.actions["WaspCaughtChoice"]("WaspCaughtChoice", Enum.UserInputState.Begin, {})
+	frames(3)
+	assert(not panel:isShowing() and not driver.motor.seized and not wasp:isVisiting() and not wasp.holding, "the way back did not put the world right")
+	assert(find("SpiderPrompts", "Day") ~= nil and find("SpiderHud", "Reticle") ~= nil, "the screen")
+	local back = prey.tick
+	frames(60)
+	assert(prey.tick >= back + 55, "the game did not go on")
+	-- The checkpoint kept the wasp's record as it was at the rest, before this visit: the same wasp can come again.
+	assert(wasp.visits == 0 and wasp.escapes == 0 and wasp.lastVisitDay == 0, `the record: {wasp.visits} visits, {wasp.escapes} escapes, day {wasp.lastVisitDay}`)
+end)
+
 print(`CLIENT passed={passed} failed={failed}`)
 if failed > 0 then error("client smoke failed") end

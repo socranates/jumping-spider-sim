@@ -72,3 +72,11 @@ PlayStation controller: rest in the crack (L3), press **R1** (it says so on the 
 The look in Roblox (SmoothPlastic flat discs, Reflectance 0.12 on the blue field; the real fan is iridescent, which Roblox cannot show); how small 0.45 studs feels
 at the fixed camera distance (the camera's zoom reaches it); whether the "C" key and RB belong on these actions for Chet and Nathan; the pale margin and stripes at
 this size; the touch Dance button's place.
+
+## Nathan's plan: a paid add-on (2026-10-16)
+
+Nathan: the peacock spider will be an add-on "for 99 cents or something later on". Not built yet; keep it unlocked for testing until Nathan says to wire the sale. When he does:
+- Use a Roblox **Game Pass** (a permanent unlock; priced in Robux, Nathan picks the price), not a Developer Product.
+- Check ownership on the server (MarketplaceService:UserOwnsGamePassAsync, cached, with PromptGamePassPurchaseFinished for a purchase in session) and replicate a Player attribute the client reads; the client never decides ownership. Without the pass, the crack's change-spider prompt offers the pass instead.
+- Keep a Studio/test override so the peacock stays testable, and add Studio specs for owned / not owned / purchase finished.
+- The default black-and-white spider and the whole game stay free; the add-on is the peacock spider's look and dance only.

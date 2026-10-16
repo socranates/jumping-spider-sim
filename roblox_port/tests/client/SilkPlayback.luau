@@ -145,8 +145,38 @@ return function(driver: any)
   assert(untilState(function()return not feed.struggling end,15),"automatic grip never subdues")
   assert(feed.held==f,"automatic grip lost fly")
   assert(untilState(function()return f.state=='CONSUMED' end,6),"did not finish meal")
-  assert(feed.taken>=.349 and feed.granted<=feed.taken,"nutrition accounting")
+  assert(feed.taken>=.349 and feed.granted<=feed.taken+1e-9,"nutrition accounting") -- the reserve records what it rose by (ROBLOX-24)
   game:GetService("Players").LocalPlayer:SetAttribute("AutomaticGrip",false)
+ end)
+ check("LIFE: E in the crack rests and keeps a checkpoint; an evening rest sleeps to morning; the light and the eyes follow",function()
+  local life=driver.life
+  driver.input:clear();driver.place(Vector3.new(-25.5,0.31,6));wait(.3)
+  life.clock.hour=12
+  driver.input:simulate("Feed",true);RunService.Heartbeat:Wait();driver.input:simulate("Feed",false);wait(.2)
+  assert(life.resting,"E did not rest in the crack")
+  assert(driver.checkpoints:loadBest().ok,"no checkpoint kept: "..life.notice)
+  driver.input:simulate("Feed",true);RunService.Heartbeat:Wait();driver.input:simulate("Feed",false);wait(.2)
+  assert(not life.resting,"E again did not end the rest")
+  local Lighting=game:GetService("Lighting");local dayClock=Lighting.ClockTime;local dayBrightness=Lighting.Brightness
+  life.clock.hour=19.5
+  driver.input:simulate("Feed",true);RunService.Heartbeat:Wait();driver.input:simulate("Feed",false)
+  local darkest,reach=1e9,1;local day=life.clock.day
+  local deadline=os.clock()+20
+  repeat RunService.Heartbeat:Wait();darkest=math.min(darkest,Lighting.Brightness);reach=math.min(reach,driver.sensor.core.rangeScale)
+  until (life.clock.day==day+1 and not life.asleep) or os.clock()>deadline
+  assert(life.clock.day==day+1 and math.abs(life.clock.hour-7)<.05,`no morning (day {life.clock.day}, {life.clock.hour})`)
+  assert(darkest<dayBrightness*.5 and reach<=.31,`night was not dark or near-sighted (brightness {darkest}, reach {reach})`)
+  print("PORT_LIFE_NIGHT "..HttpService:JSONEncode({evidence_id=workspace:GetAttribute("PortEvidence"),day_clock=dayClock,darkest_brightness=darkest,least_reach=reach}))
+ end)
+ check("LIFE: Backspace returns to the checkpoint; the world goes back with the spider",function()
+  local life=driver.life;assert(driver.checkpoints:loadBest().ok,"no checkpoint") -- the morning's (the last rest's) checkpoint
+  driver.input:simulate("Forward",true);wait(1.5);driver.input:simulate("Forward",false);wait(.3)
+  assert(not life.resting,"still resting after walking")
+  driver.input:simulate("Reset",true);RunService.Heartbeat:Wait();driver.input:simulate("Reset",false);wait(.3)
+  assert(life.resting and driver.lifeSpider().inRetreat,"not back resting in the crack")
+  assert(string.find(life.notice,"checkpoint recovery",1,true),life.notice)
+  driver.input:simulate("Feed",true);RunService.Heartbeat:Wait();driver.input:simulate("Feed",false);wait(.2)
+  life.clock.hour=12
  end)
  check("A029 live sensor cost with three and six moving flies",function()
   local prey=driver.prey;prey.enabled=true

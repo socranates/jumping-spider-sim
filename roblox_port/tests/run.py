@@ -12,7 +12,8 @@ tests/perception.luau (the pure perception logic against Godot's own hand-writte
 tests/perception_reference.json, exported from the frozen Godot modules) and
 tests/eyes.luau (the spider-eye picture: its data, the pure optics, the drawer under the shim and the real client's wiring) and
 tests/hud.luau (the perception HUD's shapes and its drawer under the shim: circles, dashed rings, chevrons, labels) and
-tests/life.luau (the life clock, the needs and the rest-and-sleep loop against tests/life_reference.json, from the frozen Godot code).
+tests/life.luau (the life clock, the needs and the rest-and-sleep loop against tests/life_reference.json, from the frozen Godot code) and
+tests/checkpoint.luau (the retreat checkpoint of a whole world, its refusals, and the DataStore-shaped store).
 Usage (from roblox_port/):  python3 tests/run.py [path/to/luau [test.luau ...]]   (default: all of them)"""
 import pathlib, re, subprocess, sys, tempfile
 
@@ -80,6 +81,10 @@ MODULES = [
     ("PerceptionText", "UI/PerceptionText.luau"),
     ("PerceptionView", "UI/PerceptionView.luau"),
     ("PerceptionShapes", "UI/PerceptionShapes.luau"),
+    ("Json", "Persistence/Json.luau"),
+    ("ObjectRecord", "Persistence/ObjectRecord.luau"),
+    ("Checkpoint", "Persistence/Checkpoint.luau"),
+    ("CheckpointStore", "Persistence/CheckpointStore.luau"),
     ("SpiderCamera", "../Client/SpiderCamera.luau"),
 ]
 # The client scripts, bundled only for the tests that run the real rig and client (CLIENT_TESTS).
@@ -148,7 +153,7 @@ def main():
     luau = sys.argv[1] if len(sys.argv) > 1 else "luau"
     status = 0
     named = sys.argv[2:]
-    for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "life.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "look.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau"]:
+    for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "life.luau", "checkpoint.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "look.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau"]:
         if not (HERE / test_file).exists():
             if named:  # a misspelt name must not look like a pass
                 print(f"no such test file: {test_file} (names are relative to tests/, for example look.luau)", file=sys.stderr)

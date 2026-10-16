@@ -191,7 +191,7 @@ function ControlText.helpCard(device: Device): string
 			"Tap A hop   Hold A aim, release to leap   B cancel",
 			"X lower on silk   On the line: stick up reel, down lower, hold B let go",
 			"Y spider-eye view   Right-stick click recenter   LT focus   RT slow motion",
-			"View back to the start",
+			"In the silk-lined crack: left-stick click rests (sleeps from evening)   View return to the checkpoint",
 		}, "\n")
 	elseif device == "touch" then
 		return table.concat({
@@ -199,6 +199,7 @@ function ControlText.helpCard(device: Device): string
 			"Tap Jump hop   Hold Jump aim, release to leap   Cancel",
 			"Silk lowers on silk   On the line: ↑ reel, ↓ lower, hold Let go",
 			"Eye spider-eye view   Recenter",
+			"In the silk-lined crack: Rest (Sleep from evening)",
 		}, "\n")
 	end
 	return table.concat({
@@ -206,7 +207,8 @@ function ControlText.helpCard(device: Device): string
 		"Tap Space hop   Hold Space aim, release to leap   Q cancel",
 		"F lower on silk   On the line: W reel, S lower, hold Q let go",
 		"V spider-eye view   R recenter   Right mouse focus   T slow motion",
-		"Wheel zoom   Backspace back to start   G gait   H hide this",
+		"In the silk-lined crack: E rests (sleeps from evening)",
+		"Wheel zoom   Backspace return to checkpoint   G gait   H hide this",
 	}, "\n")
 end
 

@@ -48,6 +48,8 @@ local NeedsModel = require(Shared.Life.NeedsModel)
 local LifeLoop = require(Shared.Life.LifeLoop)
 local LifeText = require(Shared.UI.LifeText)
 local DayLight = require(Shared.Habitat.DayLight)
+local Checkpoint = require(Shared.Persistence.Checkpoint)
+local CheckpointStore = require(Shared.Persistence.CheckpointStore)
 local focusState = FocusState.new()
 local DT = SpiderMotor.DT
 local SLOW_SPEED = 0.5
@@ -104,6 +106,24 @@ local flyBodies = FlyBodies.new(Workspace)
 local needs = NeedsModel.new(true, false)
 prey.feeding.needs = needs
 local life = LifeLoop.new(needs, nil)
+-- S01-C retreat checkpoints (ROBLOX-25): resting in the crack, and each morning, keeps one; Backspace / View returns to it. The
+-- store is DataStore-shaped but in memory only: a checkpoint lasts the session. No live DataStore is written.
+local checkpointWorld: Checkpoint.World = { motor = motor, prey = prey, sensor = sensor, memory = memory, needs = needs, life = life }
+local checkpoints = CheckpointStore.new(CheckpointStore.MemoryDataStore.new(), function(r: any): { string }
+	return (Checkpoint.check(r, checkpointWorld))
+end)
+life.save = function(): LifeLoop.CheckpointResult
+	local why = Checkpoint.boundaryProblem(checkpointWorld)
+	if why ~= "" then return { ok = false, message = why } end
+	local record, err = Checkpoint.capture(checkpointWorld, os.time())
+	if not record then
+		warn("[Windowsill] checkpoint: " .. tostring(err))
+		return { ok = false, message = "this moment could not be recorded" }
+	end
+	local r = checkpoints:save(record)
+	if not r.ok then warn("[Windowsill] checkpoint: " .. r.message .. ": " .. table.concat(r.errors, "; ")) end
+	return { ok = r.ok, message = r.message }
+end
 local feedPending, cancelPending = false, false -- this frame's presses, for the next fixed tick (Godot's just_pressed)
 local lifeSpider: LifeLoop.Spider = { inRetreat = false, attached = true, still = true, holding = false, feeding = false }
 local dayClock: number? = nil -- the daytime ClockTime (SunPick's choice, read once from the server's Lighting)
@@ -271,7 +291,33 @@ local function backToStart()
 	cam:snap()
 end
 
-local controls: any = SpiderInput.bind({
+local controls: any -- bound below (SpiderInput.bind)
+
+-- Backspace / View: back to the retreat checkpoint (the whole sill as it was), or to the start when there is none yet.
+local function returnToCheckpoint()
+	local best = checkpoints:loadBest()
+	if not best.ok then
+		backToStart()
+		hud:toast(if best.message == "no checkpoint to return to" then "No checkpoint yet: back to the start. Rest in the silk-lined crack to keep one." else "Back to the start: " .. best.message, true)
+		return
+	end
+	jump:drop(motor)
+	local ok, problems = Checkpoint.restore(best.record, checkpointWorld)
+	if not ok then
+		warn("[Windowsill] checkpoint refused: " .. table.concat(problems, "; "))
+		hud:toast("The checkpoint could not be used: " .. (problems[1] or "unknown"), true)
+		return
+	end
+	controls:clear()
+	focusState:clear()
+	dropStrands(false)
+	drawnUp = motor.up
+	cam:snap()
+	lastLight = nil -- the hour may have changed: set the light again
+	feedPending, cancelPending = false, false
+end
+
+controls = SpiderInput.bind({
 	focus = function(phase: string)
 		if phase == "begin" then focusState:press(player:GetAttribute("FocusToggle") == true, motor.mode == "attached")
 		elseif phase == "cancel" then focusState:clear() end
@@ -304,7 +350,7 @@ local controls: any = SpiderInput.bind({
 	end,
 	drop = function() motor:requestDrop() end,
 	clear = dropAll,
-	reset = backToStart,
+	reset = function() returnToCheckpoint() end,
 	gait = function() rig.gaitMode = if rig.gaitMode == "Tetrapod" then "Unilateral" else "Tetrapod" end,
 	eye = function() cam:toggleEyeView() end,
 	recenter = function() cam:startRecenter() end,
@@ -469,6 +515,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			life:step(DT, lifeSpider, feedPending, cancelPending)
 			feedPending, cancelPending = false, false
 			sensor.core.rangeScale = life.rangeScale
+			life:drainEvents() -- the screen reads the loop's state and notices; the events are for tests and later rounds
 			if motor.mode ~= "attached" then focusState:clear() end
 			if stage then stage.target:step(DT); stage.marker.Position = stage.target.position end
 			cam:tick(DT)
@@ -530,7 +577,7 @@ if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
 	task.spawn(function()
 		local run: any = (require :: any)(playback)
 		run({
-			prey = prey, flyBodies = flyBodies, life = life, needs = needs, lifeSpider = function() return lifeSpider end, sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
+			prey = prey, flyBodies = flyBodies, life = life, needs = needs, checkpoints = checkpoints, returnToCheckpoint = function() returnToCheckpoint() end, lifeSpider = function() return lifeSpider end, sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
 			input = controls,
 			drop = function() motor:requestDrop() end,
 			jump = jump,

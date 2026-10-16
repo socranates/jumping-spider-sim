@@ -43,6 +43,11 @@ check("the client loads, binds every action and runs 120 frames", function()
 	assert(gui:FindFirstChild("SpiderHud") and gui:FindFirstChild("SpiderPrompts") and gui:FindFirstChild("SpiderTouch"), "HUD missing")
 	assert(math.abs(spider().Y - 0.31) < 0.05, `spawned at {spider()}`)
 end)
+check("with no checkpoint yet, Backspace goes back to the start and says why", function()
+	key("Reset", true); frames(1); key("Reset", false); frames(2)
+	assert(string.find(find("SpiderPrompts", "Toast").Text, "No checkpoint yet", 1, true), find("SpiderPrompts", "Toast").Text)
+	assert(math.abs(spider().Y - 0.31) < 0.05, `not at the start: {spider()}`)
+end)
 check("W walks the spider along the sill", function()
 	local p0 = spider()
 	key("Forward", true); frames(60); key("Forward", false); frames(2)
@@ -189,6 +194,27 @@ check("in the crack E rests; in the evening the spider sleeps until morning, the
 	key("Forward", true); frames(10); key("Forward", false); frames(2)
 	assert(not life.asleep and not life.resting, "walking did not wake the spider")
 	assert(string.find(life.notice, "Awake before morning", 1, true), life.notice)
+end)
+
+check("Backspace returns to the checkpoint kept by a rest, or to the start when there is none", function()
+	local driver = ClientStubs.driver
+	local life, needs, prey = driver.life, driver.needs, driver.prey
+	assert(driver.checkpoints:loadBest().ok, "the rests above kept no checkpoint")
+	-- A new rest at midday keeps a fresh checkpoint.
+	driver.place(Vector3.new(-25.5, 0.31, 6.0))
+	frames(30)
+	life.clock.hour = 12
+	key("Feed", true); frames(2); key("Feed", false); frames(2)
+	assert(life.resting and life.notice == "Checkpoint kept.", "no checkpoint: " .. life.notice)
+	local energy, hour, tick = needs.energy, life.clock.hour, prey.tick
+	-- Walk away for a while: the world moves on.
+	key("Forward", true); frames(90); key("Forward", false); frames(60)
+	assert(not life.resting and prey.tick > tick + 100, "the world did not move on")
+	key("Reset", true); frames(1); key("Reset", false); frames(2)
+	assert(driver.lifeSpider().inRetreat and life.resting, "not back resting in the crack")
+	assert(math.abs(life.clock.hour - hour) < 0.01 and prey.tick < tick + 10, `not the checkpoint's time (hour {life.clock.hour}, tick {prey.tick})`)
+	assert(needs == driver.needs and prey.feeding.needs == needs and math.abs(needs.energy - energy) < 1e-6, "the reserves did not go back")
+	assert(string.find(find("SpiderPrompts", "Notice").Text, "checkpoint recovery", 1, true), find("SpiderPrompts", "Notice").Text)
 end)
 
 

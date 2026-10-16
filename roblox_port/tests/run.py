@@ -50,6 +50,8 @@ MODULES = [
     ("SpiderMotor", "Movement/SpiderMotor.luau"),
     ("ControlText", "UI/ControlText.luau"),
     ("HudLayout", "UI/HudLayout.luau"),
+    ("LifeText", "UI/LifeText.luau"),
+    ("DayLight", "Habitat/DayLight.luau"),
     ("Eyes", "Data/Eyes.luau"),
     ("EyeOptics", "UI/EyeOptics.luau"),
     ("Anatomy", "Rig/Anatomy.luau"),

@@ -44,6 +44,10 @@ local PerceptionStage = require(script.Parent.PerceptionStage)
 local PerceptionHud = require(script.Parent.PerceptionHud)
 local PreyDirector = require(Shared.Prey.PreyDirector)
 local FlyBodies = require(script.Parent.FlyBodies)
+local NeedsModel = require(Shared.Life.NeedsModel)
+local LifeLoop = require(Shared.Life.LifeLoop)
+local LifeText = require(Shared.UI.LifeText)
+local DayLight = require(Shared.Habitat.DayLight)
 local focusState = FocusState.new()
 local DT = SpiderMotor.DT
 local SLOW_SPEED = 0.5
@@ -95,6 +99,15 @@ local perceptionHud = PerceptionHud.new(player:WaitForChild("PlayerGui"))
 local stage = if Workspace:GetAttribute("TestTarget") == true or (Workspace:GetAttribute("TestTarget") ~= false and script.Parent:FindFirstChild("SilkPlayback")) then PerceptionStage.new(sill) else nil
 local prey = PreyDirector.engine(sill, Species.fly_like_prototype, 914, 4)
 local flyBodies = FlyBodies.new(Workspace)
+-- LIFE (ROBLOX-24): the windowsill runs the life clock, so hunger runs by its hours (NeedsModel life mode, Standard rules: the
+-- port has no Easy mode yet). Feeding grants into the same model. The loop keeps the rest, sleep, daylight and the eyes' reach.
+local needs = NeedsModel.new(true, false)
+prey.feeding.needs = needs
+local life = LifeLoop.new(needs, nil)
+local feedPending, cancelPending = false, false -- this frame's presses, for the next fixed tick (Godot's just_pressed)
+local lifeSpider: LifeLoop.Spider = { inRetreat = false, attached = true, still = true, holding = false, feeding = false }
+local dayClock: number? = nil -- the daytime ClockTime (SunPick's choice, read once from the server's Lighting)
+local lastLight: number? = nil
 local gripPress = false
 local function focusActive(): boolean
 	return focusState:active(false, player:GetAttribute("FocusToggle") == true, motor.mode == "attached")
@@ -263,7 +276,10 @@ local controls: any = SpiderInput.bind({
 		if phase == "begin" then focusState:press(player:GetAttribute("FocusToggle") == true, motor.mode == "attached")
 		elseif phase == "cancel" then focusState:clear() end
 	end,
-	feed = function() prey.feeding:press() end,
+	feed = function()
+		prey.feeding:press()
+		feedPending = true -- in the crack, with nothing to eat, the same button rests (Godot's interact)
+	end,
 	jump = function(phase: string)
 		if phase == "begin" and prey.feeding.struggling then prey.feeding:press(); gripPress=true; return end
 		if gripPress then if phase ~= "begin" then gripPress=false end; return end
@@ -280,6 +296,7 @@ local controls: any = SpiderInput.bind({
 	-- else's then) and, held on the line, lets go; SilkController counts only a fresh press after the 0.4 s grace, held 0.6 s.
 	cancel = function(phase: string)
 		if phase ~= "begin" then return end
+		cancelPending = true -- also ends a rest
 		prey.feeding:cancel()
 		if motor:cancelWalk() then return end
 		focusState:cancel(jump:isBusy() or #jump.events > 0 or motor:onLine())
@@ -379,6 +396,12 @@ local function updateHud(frameDt: number)
 		table.insert(view.status, "Caught — tap " .. ControlText.name(device,"jump") .. " to keep your grip")
 	elseif prey.feeding.feeding then table.insert(view.status, "Feeding — move to stop")
 	elseif prey.feeding.held then table.insert(view.status, "Meal paused — " .. ControlText.name(device,"feed") .. " to eat") end
+	local clock = life.clock
+	view.day = LifeText.day(clock.day, clock:partOfDay())
+	view.dayLine = LifeText.line(clock:partOfDay(), needs.energy, needs:isStarving(), needs.gentle, LifeLoop.HUNGRY_AT)
+	view.notice = if life.noticeSeconds > 0 and life.notice ~= "" then life.notice else nil
+	local canRest = life:canRest(lifeSpider)
+	local restPrompt = LifeText.prompt(life.asleep, life.resting, canRest, clock:isSleepTime(), device)
 	if focusState.latched then table.insert(view.status, "FOCUS ON    " .. ControlText.name(device,"focus") .. " again to stop" .. (if not jump:isBusy() and not motor:onLine() and not motor.silk.walk then " / " .. ControlText.name(device,"cancel") else "")) end
 	if cam.eyeView then table.insert(view.status, `SPIDER-EYE VIEW    {ControlText.name(device, "eye")}: back`) end
 	if slow then
@@ -396,11 +419,15 @@ local function updateHud(frameDt: number)
 		view.prompt = { title = title, hint = hint, cue = cue }
 	elseif silk.walk then
 		view.prompt = { hint = ControlText.edgeWalkHint(device) }
+	elseif restPrompt and not aiming then
+		view.prompt = { title = restPrompt.title, hint = restPrompt.hint }
 	elseif motor.mode == "attached" and not aiming and (helpVisible or os.clock() - started < WALK_HINT_SECONDS) then
 		view.prompt = { hint = ControlText.walkHint(device) }
 	end
 	if os.clock() > helpUntil and helpVisible then helpVisible = false end
-	controls:setTouchVisible("Feed", prey.feeding.held ~= nil)
+	local restLabel = LifeText.touchLabel(life.asleep, life.resting, canRest, clock:isSleepTime())
+	controls:setTouchVisible("Feed", prey.feeding.held ~= nil or restLabel ~= nil)
+	controls:setTouchLabel("Feed", if prey.feeding.held ~= nil then "Eat" else restLabel or "Eat")
 	controls:setTouchLabel("Jump", if prey.feeding.struggling then "Grip" else "Jump")
 	controls:setTouchLabel("Cancel", ControlText.touchCancelLabel(onLine))
 	controls:setTouchVisible("Jump", not onLine)
@@ -428,13 +455,32 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			sensor:step(DT,motor:observer(),percepts,sightCast)
 			prey:before(DT,motor.pos,motor:observer(),sensor,sightCast,camera)
 			jump:step(motor)
-			motor:tick(tickInput())
+			local input = tickInput()
+			motor:tick(input)
 			prey.feeding.auto = player:GetAttribute("AutomaticGrip") == true
 			prey:after(DT,motor,sensor,sightCast)
+			-- The life loop runs last in the tick (Godot's habitat loop, priority 12); the reach it sets is the next tick's.
+			local holding = prey.feeding.held ~= nil
+			lifeSpider = {
+				inRetreat = Layout.inRetreat(motor.pos), attached = motor.mode == "attached" and not motor.preparing,
+				still = input.wish.Magnitude < 0.01 and motor.vel.Magnitude < 0.15,
+				holding = holding, feeding = holding and prey.feeding.feeding,
+			}
+			life:step(DT, lifeSpider, feedPending, cancelPending)
+			feedPending, cancelPending = false, false
+			sensor.core.rangeScale = life.rangeScale
 			if motor.mode ~= "attached" then focusState:clear() end
 			if stage then stage.target:step(DT); stage.marker.Position = stage.target.position end
 			cam:tick(DT)
 		end
+	end
+	-- The light of the hour (DayLight; the eyes' reach comes from the clock, not from this). The daytime sun is the one the
+	-- server picked, read once it has arrived (or after a few seconds without it).
+	if dayClock == nil and (Lighting:GetAttribute("SunPick") ~= nil or os.clock() - started > 5) then dayClock = Lighting.ClockTime end
+	local dc = dayClock
+	if dc and DayLight.due(lastLight, life.daylight) then
+		DayLight.apply(Lighting, DayLight.targets(life.daylight, dc), Workspace:FindFirstChild("Decor"))
+		lastLight = life.daylight
 	end
 	-- Drawn frame: the up vector eases so walls and edges do not snap.
 	local simFrame = frameDt * (if slow then SLOW_SPEED else 1)
@@ -484,7 +530,7 @@ if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
 	task.spawn(function()
 		local run: any = (require :: any)(playback)
 		run({
-			prey = prey, flyBodies = flyBodies, sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
+			prey = prey, flyBodies = flyBodies, life = life, needs = needs, lifeSpider = function() return lifeSpider end, sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
 			input = controls,
 			drop = function() motor:requestDrop() end,
 			jump = jump,

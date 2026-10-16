@@ -6,6 +6,10 @@
 local LifeClock = require("../src/Shared/Life/LifeClock")
 local NeedsModel = require("../src/Shared/Life/NeedsModel")
 local LifeLoop = require("../src/Shared/Life/LifeLoop")
+local DayLight = require("../src/Shared/Habitat/DayLight")
+local LifeText = require("../src/Shared/UI/LifeText")
+local Graphics = require("../src/Shared/Data/Graphics")
+local Layout = require("../src/Shared/Habitat/WindowsillLayout")
 local ref = require("./life_reference")
 
 local passed, failed = 0, 0
@@ -331,6 +335,117 @@ case("loop records", function()
 	local noSave = LifeLoop.new(NeedsModel.new(true))
 	noSave:step(1 / 60, home, true, false)
 	check(noSave.resting and noSave.checkpoints == 0 and noSave.notice:find("not kept") ~= nil, "without a store the rest still begins, and says no checkpoint was kept")
+end)
+
+-- ------------------------------------------------------------------------------------------------------------- light, words
+case("full daylight is exactly the daytime look", function()
+	local t = DayLight.targets(1, 9.75)
+	local L, A = Graphics.lighting, Graphics.atmosphere
+	check(t.clock == 9.75 and t.brightness == L.brightness and t.exposure == L.exposureCompensation, "sun, brightness, exposure")
+	for i = 1, 3 do
+		check(t.ambient[i] == L.ambient[i] and t.outdoorAmbient[i] == L.outdoorAmbient[i] and t.colorShiftTop[i] == L.colorShiftTop[i], `light colours {i}`)
+		check(t.atmosphereColor[i] == A.color[i] and t.atmosphereDecay[i] == A.decay[i], `haze colours {i}`)
+	end
+	check(t.sunRays == Graphics.sunRays.intensity and t.shafts == 1 and t.motes == 1, "rays, shafts, motes")
+	local hour9 = LifeClock.new() -- the game starts at 9 in the morning: full day
+	check(hour9:daylight() == 1, "the start of the game is full day")
+end)
+
+case("night is dim and blue, never black, with the sun below the horizon", function()
+	local N = Graphics.dayNight
+	local t = DayLight.targets(0, 9.75)
+	check(t.clock == N.nightClock and t.brightness == N.brightness and t.exposure == N.exposureCompensation, "night values")
+	check(t.sunRays == 0 and t.shafts == 0 and t.motes == N.motesAtNight, "no rays or shafts, faint motes")
+	check(t.ambient[3] > t.ambient[1] and t.outdoorAmbient[3] > t.outdoorAmbient[1], "blue")
+	check(t.ambient[1] + t.ambient[2] + t.ambient[3] > 60 and t.outdoorAmbient[1] + t.outdoorAmbient[2] + t.outdoorAmbient[3] > 120, "not black")
+	check(N.nightClock < 5.5, "the night clock is before Roblox's sunrise (about 6)")
+	-- Dusk: everything moves one way as daylight falls; the sun sinks before the last light goes.
+	local last = DayLight.targets(1, 9.75)
+	for k = 39, 0, -1 do
+		local d = k / 40
+		local cur = DayLight.targets(d, 9.75)
+		check(cur.clock <= last.clock and cur.brightness <= last.brightness and cur.ambient[1] <= last.ambient[1] and cur.sunRays <= last.sunRays, `dusk at {d}`)
+		last = cur
+	end
+	check(DayLight.targets(0.3, 9.75).clock < 6, "below the horizon by daylight 0.3")
+	check(DayLight.targets(0 / 0, 9.75).daylight == 1 and DayLight.targets(-1, 9.75).daylight == 0 and DayLight.targets(2, 9.75).daylight == 1, "nonsense is clamped")
+	-- A low sun is warmer.
+	check(DayLight.targets(0.2, 9.75).colorShiftTop[3] < Graphics.lighting.colorShiftTop[3], "a low sun is warm")
+end)
+
+case("the light is set again only when it has changed enough", function()
+	check(DayLight.due(nil, 1), "first time")
+	check(not DayLight.due(1, 1) and not DayLight.due(0.5, 0.5 + Graphics.dayNight.applyStep / 2), "not for a small change")
+	check(DayLight.due(0.5, 0.5 + Graphics.dayNight.applyStep), "for a step")
+	check(DayLight.due(0.9995, 1) and DayLight.due(0.0005, 0), "always on reaching day or night")
+end)
+
+case("DayLight.apply sets only what it owns", function()
+	local function node(class: string, name: string): any
+		local n: any = { ClassName = class, Name = name, children = {} }
+		function n.IsA(self: any, c: string) return self.ClassName == c end
+		function n.FindFirstChild(self: any, nm: string, deep: boolean?)
+			for _, c in self.children do
+				if c.Name == nm then return c end
+				if deep then local f = c:FindFirstChild(nm, true); if f then return f end end
+			end
+			return nil
+		end
+		function n.GetDescendants(self: any)
+			local out = {}
+			for _, c in self.children do table.insert(out, c); for _, d in c:GetDescendants() do table.insert(out, d) end end
+			return out
+		end
+		return n
+	end
+	local lighting = node("Lighting", "Lighting")
+	local atm, rays, eyeGrade, dof, grade = node("Atmosphere", "Atmosphere"), node("SunRaysEffect", "SunRays"), node("ColorCorrectionEffect", "EyeGrade"), node("DepthOfFieldEffect", "MacroDOF"), node("ColorCorrectionEffect", "Grade")
+	eyeGrade.Saturation, dof.FocusDistance, grade.Brightness = 0.25, 3, 0
+	lighting.children = { atm, rays, eyeGrade, dof, grade }
+	local decor = node("Folder", "Decor")
+	local shafts, anchor, beam = node("Folder", "Shafts"), node("Part", "ShaftAnchor1"), node("Beam", "Shaft1_1")
+	local dust, motes = node("Part", "Dust"), node("ParticleEmitter", "Motes")
+	anchor.children = { beam }; shafts.children = { anchor }; dust.children = { motes }; decor.children = { shafts, dust }
+	DayLight.apply(lighting, DayLight.targets(0, 9.75), decor)
+	check(lighting.ClockTime == Graphics.dayNight.nightClock and lighting.Brightness == Graphics.dayNight.brightness, "the sun and its strength")
+	check(lighting.Ambient ~= nil and lighting.OutdoorAmbient ~= nil and lighting.ColorShift_Top ~= nil and lighting.ExposureCompensation ~= nil, "the room's light")
+	check(atm.Color ~= nil and atm.Decay ~= nil and rays.Intensity == 0, "haze and rays")
+	check(beam.Enabled == false and beam.Brightness == 0 and motes.Brightness == Graphics.dayNight.motesAtNight, "shafts off, motes faint")
+	check(eyeGrade.Saturation == 0.25 and dof.FocusDistance == 3 and grade.Brightness == 0, "the eye view's effects and the grade untouched")
+	DayLight.apply(lighting, DayLight.targets(1, 9.75), nil)
+	check(lighting.ClockTime == 9.75 and lighting.Brightness == Graphics.lighting.brightness, "back to day")
+	local bare = node("Lighting", "Lighting")
+	DayLight.apply(bare, DayLight.targets(0.5, 9.75), nil) -- the low tier: no rays, no shafts; nothing to fail on
+	check(bare.ClockTime ~= nil, "a lighting without the extras")
+end)
+
+case("the words for the day and the retreat", function()
+	check(LifeText.day(2, "evening") == "Day 2, evening", "the day")
+	check(LifeText.line("midday", 0.5, false, false, 0.25) == nil, "nothing to say at midday")
+	check(LifeText.line("evening", 0.5, false, false, 0.25) == "Evening. Jumping spiders go into their silk retreat before dark.", "evening")
+	check(string.find(LifeText.line("night", 0.5, false, false, 0.25) or "", "dark", 1, true) ~= nil, "night")
+	check(LifeText.line("night", 0.2, false, false, 0.25) == "Hungry: time to hunt.", "hunger before the time of day")
+	check(string.find(LifeText.line("night", 0, true, false, 0.25) or "", "Starving", 1, true) ~= nil, "starving first")
+	check(LifeText.line("midday", 0.05, true, true, 0.25) == "Hungry: time to hunt.", "gentle rules never say starving")
+	local p = LifeText.prompt(false, false, true, false, "keyboard")
+	check(p ~= nil and p.hint == "E: rest", "rest by day")
+	p = LifeText.prompt(false, false, true, true, "gamepad")
+	check(p ~= nil and p.hint == "Left-stick click: sleep until morning", "sleep, on a controller")
+	p = LifeText.prompt(true, true, true, true, "keyboard")
+	check(p ~= nil and p.title == "Asleep in the silk-lined crack" and string.find(p.hint, "E or Q to wake", 1, true) ~= nil, "asleep")
+	p = LifeText.prompt(false, true, true, false, "touch")
+	check(p ~= nil and string.find(p.hint, "Eat or Cancel to leave", 1, true) ~= nil, "resting, on touch")
+	check(LifeText.prompt(false, false, false, true, "keyboard") == nil, "nothing outside the crack")
+	check(LifeText.touchLabel(false, false, true, false) == "Rest" and LifeText.touchLabel(false, false, true, true) == "Sleep", "touch: rest, sleep")
+	check(LifeText.touchLabel(true, true, true, true) == "Wake" and LifeText.touchLabel(false, true, true, false) == "Leave", "touch: wake, leave")
+	check(LifeText.touchLabel(false, false, false, false) == nil, "touch: not the retreat's")
+end)
+
+case("the silk-lined crack", function()
+	check(Layout.inRetreat(Vector3.new(-25.5, 0.31, 6)), "the middle of the crack")
+	check(Layout.inRetreat(Layout.RETREAT_MIN) and Layout.inRetreat(Layout.RETREAT_MAX), "its edges")
+	check(not Layout.inRetreat(Vector3.new(-20, 0.31, 6)) and not Layout.inRetreat(Vector3.new(-25.5, 2, 6)), "not the open sill, not above it")
+	check(not Layout.inRetreat(Layout.SPAWN), "the spawn is not in the crack")
 end)
 
 print(`LIFE passed={passed} failed={failed}`)

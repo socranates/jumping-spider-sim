@@ -15,7 +15,7 @@ function F.capture(self: any,fly: any)
  self.venom=self.rng:draw({6,8});self.jerk=self.rng:draw({.35,.75});self.note='Caught!'
 end
 function F.press(self: any)
- if self.struggling then self.tap=true elseif self.swallow<=0 then self.feeding=not self.feeding end
+ if self.struggling then self.tap=true elseif self.held and self.swallow<=0 then self.feeding=not self.feeding end -- nothing to eat: E is the retreat's (LifeLoop)
 end
 function F.cancel(self: any) self.feeding=false end
 function F.step(self: any,dt: number,attached: boolean,moving: boolean,escape: (any)->())

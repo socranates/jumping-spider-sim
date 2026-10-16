@@ -1220,3 +1220,24 @@ The night look's numbers are unseen; HttpService JSON exactness unchecked (LifeS
 
 Chet: Windows CLI, Studio suite and playback, the night look and frame time, then merge. Then Claude: the wasp director or LIFE round 5.
 
+
+## Roblox wasp (Claude, 2026-10-16)
+
+Branch claude/roblox-next (main b5e78c9 + LIFE + PlayStation names + this). Scope: the mud dauber wasp of LIFE round 4, ported in four commits (rules against Godot goldens; in the game; the drawn wasp; Studio spec and docs).
+
+### Changed files
+
+Created: `roblox_port/src/Shared/Data/{Wasp,WaspLook}.luau`, `src/Shared/Predator/WaspDirector.luau`, `src/Shared/UI/WaspText.luau`, `src/Client/{WaspBody,CaughtPanel}.luau`, `tools/export_wasp_reference.gd`, `tests/wasp_reference.{json,luau}`, `tests/wasp.luau`, `tests/studio/WaspSpec.luau`, `docs/HANDOFF-roblox-wasp.md`.
+Edited: `src/Client/SpiderClient.client.luau` (the director in the tick, the catch, the caption, the panel, the test-place attributes), `src/Shared/Movement/SpiderMotor.luau` (`seize`, `hold`), `src/Shared/Prey/Feeding.luau` (`mealsFinished`), `src/Shared/Persistence/Checkpoint.luau` (the optional `wasp` field), `tests/{run.py,shim.luau,checkpoint.luau,client_smoke.luau}`, `tests/studio/Runner.server.luau`, `tools/preview/{scene.py,scene_driver.luau}` (six wasp views), `docs/{DECISIONS,ROBLOX_PORT}.md`, the places.
+
+### Verification
+
+Linux: WASP 15,815 new; CHECKPOINT 139 (was 123), CLIENT 15 (was 14); SUMMARY 184, PERCEPTION 4,669, SENSOR 507, PREY 1,549, LIFE 20,846, GAZE 67, PRESENTATION 11, BOXWORLD 15, PERCEPTION_CLIENT 1, LOOK 72, WORLD 230, FLIES 187, EYES 231, HUD 69 unchanged, all failed=0; strict 0 diagnostics; 121/121 compile. Studio, Windows and devices: not run (the new Studio spec compiles and analyses clean).
+
+### Unresolved
+
+The engine's shape casts on the real sill are unchecked until WaspSpec runs; the wasp's look, the caption timing and the catch screen are unseen in Roblox; no sound; no Gentle mode; the visit days are not Godot's.
+
+### Next
+
+Chet: import, Windows CLI, Studio suite (new Wasp spec) and playback, then docs/HANDOFF-roblox-wasp.md's checklist. Then Claude: LIFE round 5 (death and continuing, modes) or growth and moulting.

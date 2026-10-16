@@ -1,3 +1,17 @@
+# Claude — 2026-10-16: the mud dauber wasp
+
+Read **docs/HANDOFF-roblox-wasp.md**. Branch **claude/roblox-next** (main b5e78c9 + LIFE + PlayStation names + four wasp commits; bundle `claude-playtest/claude-next.bundle`). Ledger **ROBLOX-26**, **ROBLOX-27**. Roblox only; Godot/SPEC frozen. **Not run in Studio, Windows or devices.**
+- **The director ported and checked against Godot's own** (`tools/export_wasp_reference.gd` runs Godot's real director on a stand-in world in eight seeded scenarios; `tests/wasp.luau` replays them: WASP 15,815 checks; Godot's hand-written `test_life04_wasp` expectations too): at most one visit a day (day 2 on, after the first meal, never while resting), 8 s of warning, a search of 45 s over 15 places by sight (moving noticed fast, still slowly, the crack never), 1.5 s look then 0.35 s lunge, a jump / drop / out of sight breaks it off, the catch and the carry.
+- **In the game:** a caption with direction ("[a deep, heavy hum outside, ahead-left, coming closer]"); a caught spider is held and carried off, then a plain screen with Godot's words and "Back to your last rest" (else "Back to the start"). The checkpoint record has a `wasp` field (schema 1). Test place: wasp off; attributes `Wasp` = true allows it, `WaspForce` = place id brings it.
+- **The drawn wasp** (`Data/WaspLook`, `Client/WaspBody`, 56 parts, ~2.5 cm): black, long thin yellow waist, yellow-banded legs, smoky wings (blur in flight), curled antennae; six preview views in `claude-playtest/previews/w1_wasp*.png`.
+- **Differences:** no sound (caption only); no Gentle mode; no continue-as-another or notebook line; the visit days are the port's own hash, not Godot's; walking uses a 0.3 sphere.
+- Linux: WASP 15,815, CHECKPOINT 139, CLIENT 15, all other suites unchanged; strict 0; 121/121 compile. New Studio spec `WaspSpec` (real casts) unrun.
+
+**Next Chet:** import `claude-next.bundle`, push, the checklist in docs/HANDOFF-roblox-wasp.md (Studio suite's Wasp row; force a visit with `WaspForce`; how the wasp reads; the catch screen). **Next Claude:** LIFE round 5 (death and continuing, modes) or growth and moulting.
+
+**Nathan, try:** open TheWindowsill-latest.rbxlx and play. A visit needs day 2 and a first meal: catch and eat a fly, rest in the crack (E) after 18:00 to sleep to "Morning, day 2", then keep playing through midday; on a day with a visit you will see a caption like "[a deep, heavy hum outside, ahead-left, coming closer]" about 8 seconds before the wasp is on the sill (it may not come every day). Move about in the open and it finds you; hide in the crack, jump, or drop on the line to get away. If it catches you, press Return / E / Space (Cross on PlayStation) for "Back to your last rest". To see it at once, Chet can use the test place (`TheWindowsillTests.rbxlx`) with the Workspace attribute `WaspForce` = `floor_middle`.
+
+---
 # Claude — 2026-10-16: LIFE integrated with the new look; PlayStation button names
 
 Branch **claude/roblox-next** (origin/main b5e78c9 + claude/roblox-life merged + one commit; bundle claude-playtest/claude-next.bundle). Chet was unavailable, so nothing here has been run in Studio or on a PlayStation.

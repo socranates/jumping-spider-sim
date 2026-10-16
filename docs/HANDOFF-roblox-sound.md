@@ -1,5 +1,9 @@
 # Sound integration in progress — 2026-10-16
 
+## Windows acceptance follow-up
+
+Nathan ran the correct local test build and confirmed sound: "workin great buddy". Studio log `20261016T100215Z_Studio_07ACB_last.log` confirms evidence e97786418fd0fdb3: **74/74 engine, 13/13 client**, zero failures. Structured reports collected in docs/verification/roblox-sound. Nathan requested publication; native Studio control remains unavailable. Prepared `C:/Users/natha/Downloads/Windowsill-PUBLISH-Sound-e9778641.rbxlx` (playable, not test place). Creator Dashboard version-history page explicitly directs publishing through Studio. Publication is still pending; do not claim the live game has sound until verified.
+
 Branch `codex/roblox-sound` includes Claude LIFE `6af95a9` (imported from Nathan's Downloads/claude-life.bundle), based on main `b5e78c9`. Not merged or published yet. Current build evidence `e97786418fd0fdb3`.
 
 Original procedural WAVs exported from frozen Godot sound_bank.gd and uploaded to socranates. `roblox_port/assets/audio/manifest.json` records exact hashes, asset IDs and permission status. Room, buzz, takeoff and birds have saved permission for universe **10771103250**, place **120119801868085**. The other four recordings are reserved, unused and have not been granted experience access. No Creator Store distribution enabled.

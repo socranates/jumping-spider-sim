@@ -67,7 +67,32 @@ local NAMES: { [string]: { [string]: string } } = {
 	},
 }
 
+-- A PlayStation controller has the same buttons under other names (Roblox reports "ButtonCross" for ButtonA there). The client
+-- calls setPadStyle from UserInputService:GetStringForKeyCode(ButtonA) at start and after each controller input; names not listed
+-- here (sticks) are the same on both.
+local PLAYSTATION: { [string]: string } = {
+	feed = "L3", jump = "Cross", cancel = "Circle", letGo = "Circle", drop = "Square", creep = "L1", focus = "L2", eye = "Triangle",
+	recenter = "R3", slow = "R2", reset = "Touchpad",
+}
+local padStyle = "xbox"
+
+-- "xbox" or "playstation", from what Roblox calls ButtonA on this controller.
+function ControlText.padStyleFor(buttonAString: string?): string
+	return if buttonAString == "ButtonCross" then "playstation" else "xbox"
+end
+
+function ControlText.setPadStyle(style: string)
+	padStyle = if style == "playstation" then "playstation" else "xbox"
+end
+
+function ControlText.padStyle(): string
+	return padStyle
+end
+
 function ControlText.name(device: Device, action: string): string
+	if device == "gamepad" and padStyle == "playstation" and PLAYSTATION[action] then
+		return PLAYSTATION[action]
+	end
 	return (NAMES[device] or NAMES.keyboard)[action] or ""
 end
 
@@ -186,12 +211,13 @@ end
 -- The controls card (H): the device's own bindings, one action per line pair.
 function ControlText.helpCard(device: Device): string
 	if device == "gamepad" then
+		local function n(action: string): string return ControlText.name("gamepad", action) end
 		return table.concat({
-			"Left stick walk   Right stick look   LB creep",
-			"Tap A hop   Hold A aim, release to leap   B cancel",
-			"X lower on silk   On the line: stick up reel, down lower, hold B let go",
-			"Y spider-eye view   Right-stick click recenter   LT focus   RT slow motion",
-			"In the crack: L3 rest (sleep from evening)   View: last checkpoint",
+			`Left stick walk   Right stick look   {n("creep")} creep`,
+			`Tap {n("jump")} hop   Hold {n("jump")} aim, release to leap   {n("cancel")} cancel`,
+			`{n("drop")} lower on silk   On the line: stick up reel, down lower, hold {n("letGo")} let go`,
+			`{n("eye")} spider-eye view   {n("recenter")} recenter   {n("focus")} focus   {n("slow")} slow motion`,
+			`In the crack: L3 rest (sleep from evening)   {n("reset")}: last checkpoint`,
 		}, "\n")
 	elseif device == "touch" then
 		return table.concat({

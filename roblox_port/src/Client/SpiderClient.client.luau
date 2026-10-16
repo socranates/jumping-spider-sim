@@ -93,6 +93,12 @@ task.spawn(function()
 end)
 local hud = SpiderHud.new(player:WaitForChild("PlayerGui"))
 local device: ControlText.Device = ControlText.initialDevice(UIS.TouchEnabled, UIS.KeyboardEnabled, UIS.GamepadEnabled)
+-- PlayStation or Xbox button names (ControlText.setPadStyle): Roblox names ButtonA "ButtonCross" on a PlayStation controller.
+local function refreshPadStyle()
+	local ok, text = pcall(function() return UIS:GetStringForKeyCode(Enum.KeyCode.ButtonA) end)
+	ControlText.setPadStyle(ControlText.padStyleFor(if ok then text else nil))
+end
+refreshPadStyle()
 local memory = ObservationMemory.new()
 local sensor = Sensor.new(memory)
 sensor:configureFrom(Species.phidippus_audax_prototype.perception)
@@ -362,6 +368,7 @@ controls = SpiderInput.bind({
 	end,
 	device = function(name: string)
 		device = ControlText.deviceFor(name, device)
+		if device == "gamepad" then refreshPadStyle() end
 	end,
 })
 

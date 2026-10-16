@@ -23,6 +23,7 @@ local SpiderCamera = require(script.Parent.SpiderCamera)
 local SpiderEyes = require(script.Parent.SpiderEyes)
 local SpiderHud = require(script.Parent.SpiderHud)
 local WorldDetail = require(script.Parent.WorldDetail)
+local Soundscape = require(script.Parent.Soundscape)
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Movement = Shared:WaitForChild("Movement")
@@ -101,6 +102,7 @@ local perceptionHud = PerceptionHud.new(player:WaitForChild("PlayerGui"))
 local stage = if Workspace:GetAttribute("TestTarget") == true or (Workspace:GetAttribute("TestTarget") ~= false and script.Parent:FindFirstChild("SilkPlayback")) then PerceptionStage.new(sill) else nil
 local prey = PreyDirector.engine(sill, Species.fly_like_prototype, 914, 4)
 local flyBodies = FlyBodies.new(Workspace)
+local soundscape = Soundscape.new(Workspace)
 -- LIFE (ROBLOX-24): the windowsill runs the life clock, so hunger runs by its hours (NeedsModel life mode, Standard rules: the
 -- port has no Easy mode yet). Feeding grants into the same model. The loop keeps the rest, sleep, daylight and the eyes' reach.
 local needs = NeedsModel.new(true, false)
@@ -536,6 +538,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	rig:update(body, simFrame, motor.mode == "attached", motor.moving)
 	updateHud(frameDt)
 	flyBodies:draw(prey.flies,prey.now)
+	soundscape:update(frameDt, prey, life.daylight, GuiService.MenuIsOpen, if slow then SLOW_SPEED else 1, player:GetAttribute("SoundMuted") == true)
 	local silk = motor.silk
 	local live, bend = liveLine, bendLine
 	if live and bend and silk.mode ~= "none" then

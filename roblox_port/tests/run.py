@@ -89,6 +89,7 @@ MODULES = [
 ]
 # The client scripts, bundled only for the tests that run the real rig and client (CLIENT_TESTS).
 CLIENT_MODULES = [
+    ("Soundscape", "../Client/Soundscape.luau"),
     ("SpiderRig", "Rig/SpiderRig.luau"),
     ("SpiderInput", "../Client/SpiderInput.luau"),
     ("SpiderHud", "../Client/SpiderHud.luau"),

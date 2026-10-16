@@ -1,0 +1,11 @@
+CLIENT passed=16 failed=0
+PERCEPTION_CLIENT passed=1 failed=0
+EYES passed=231 failed=0
+HUD passed=69 failed=0
+look: full 624 parts (475 hairs, 8 shells, 141 other), low 266 (145 hairs, 2 shells, 119 other)
+LOOK passed=72 failed=0
+world: invented sun, z flip 1: picks clock 9.75, latitude 40.7, 39 degrees high, 46 degrees off straight-out-of-the-window
+world: invented sun, z flip -1: picks clock 9.75, latitude -40.7, 39 degrees high, 46 degrees off straight-out-of-the-window
+world: decor 806 parts at full detail, 151 at low (view 31 items at full), dust 7 -> 2.8 per second
+WORLD passed=230 failed=0
+FLIES passed=187 failed=0

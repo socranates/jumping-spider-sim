@@ -218,5 +218,37 @@ check("Backspace returns to the checkpoint kept by a rest, or to the start when 
 end)
 
 
+check("sound pauses with the menu and respects mute", function()
+	local root = workspace:FindFirstChild("WindowsillAudio")
+	assert(root, "soundscape missing from client")
+	local room = root:FindFirstChild("room")
+	local gs = game:GetService("GuiService")
+	gs.MenuIsOpen = false; frames(1); assert(room.Playing)
+	gs.MenuIsOpen = true; frames(1); assert(not room.Playing)
+	gs.MenuIsOpen = false; frames(1); assert(room.Playing)
+	local p = game:GetService("Players").LocalPlayer
+	p:SetAttribute("SoundMuted", true); frames(1); assert(not room.Playing)
+	p:SetAttribute("SoundMuted", false); frames(1); assert(room.Playing)
+end)
+check("sound follows flight, struggle, night, slow motion and replacement flies", function()
+	local Soundscape = require("../src/Client/Soundscape")
+	local s = Soundscape.new(workspace)
+	local f = { position = Vector3.new(3,4,5), flying = true }
+	function f:airborne() return self.flying end
+	local p = { flies = {f}, feeding = {held = nil, struggling = false} }
+	s:update(0.1, p, 1, false, 0.5, false)
+	assert(s.slots[1].buzz.Playing and s.slots[1].buzz.PlaybackSpeed == 0.5)
+	assert(s.slots[1].part.Position == f.position)
+	f.flying = false; s:update(0.1, p, 1, false, 1, false)
+	assert(not s.slots[1].buzz.Playing)
+	p.feeding.held = f; p.feeding.struggling = true
+	s:update(0.1, p, 1, false, 1, false); assert(s.slots[1].buzz.Playing)
+	p.feeding.struggling = false
+	s:update(0.1, p, 1, false, 1, false); assert(not s.slots[1].buzz.Playing)
+	s.nextBird = 0; s:update(0.1, p, 1, false, 1, false); assert(s.birds.Playing)
+	s:update(0.1, p, 0, false, 1, false); assert(not s.birds.Playing)
+	p.flies = {}; s:update(0.1, p, 1, false, 1, false); assert(next(s.slots) == nil)
+	s:destroy(); assert(s.root.Parent == nil)
+end)
 print(`CLIENT passed={passed} failed={failed}`)
 if failed > 0 then error("client smoke failed") end

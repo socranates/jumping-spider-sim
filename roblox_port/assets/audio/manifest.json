@@ -1,0 +1,66 @@
+{
+  "source_commit": "b5e78c947dc3f70549323ec0331e86c61f1be709",
+  "source": "scripts/audio/sound_bank.gd",
+  "sample_rate": 22050,
+  "channels": 1,
+  "bits": 16,
+  "files": [
+    {
+      "file": "birds.wav",
+      "sha256": "698329c42f21643811f579699b24e77a0fa028f5c24b2b7d03c2166e487f8096",
+      "bytes": 52964,
+      "roblox_asset_id": "105858750316891",
+      "experience_access_saved": true
+    },
+    {
+      "file": "buzz.wav",
+      "sha256": "e0d00479f969f363658f96fd4196779f7c9f49076146c49daabeca27dc0547d8",
+      "bytes": 44144,
+      "roblox_asset_id": "90354950534870",
+      "experience_access_saved": true
+    },
+    {
+      "file": "room.wav",
+      "sha256": "f9bb7cb7c484d0e8cce3579de4c509f31274b9340fde760eb9d8766a34ab6379",
+      "bytes": 176444,
+      "roblox_asset_id": "135813320748786",
+      "experience_access_saved": true
+    },
+    {
+      "file": "takeoff.wav",
+      "sha256": "707018ef011a90d339fe08349f8df5acceef9e175a94db7edbe19c6f318696ff",
+      "bytes": 17684,
+      "roblox_asset_id": "135484013341687",
+      "experience_access_saved": true
+    },
+    {
+      "file": "thrum.wav",
+      "sha256": "69539d6f8fbc26b3baf4b6ea5c9400dd8e6f43d53ef7f2ca989dfbe6c620b9c3",
+      "bytes": 22094,
+      "roblox_asset_id": "89155001061590",
+      "experience_access_saved": false
+    },
+    {
+      "file": "thud.wav",
+      "sha256": "34a038d7ad8d2950d454eb350205a894c6fa338b8c1a9697e22fc4d72873bb76",
+      "bytes": 26504,
+      "roblox_asset_id": "114278456910130",
+      "experience_access_saved": false
+    },
+    {
+      "file": "wasp.wav",
+      "sha256": "353fd17a7a5242747ca918636b4e4da0bc921f21436a0804a745cedd1aa99460",
+      "bytes": 44144,
+      "roblox_asset_id": "76049518783466",
+      "experience_access_saved": false
+    },
+    {
+      "file": "whoosh.wav",
+      "sha256": "1b4362e3f43023064239e7f6c135d0331bccfdf2cd45d3826bc2989d23230ab7",
+      "bytes": 110294,
+      "roblox_asset_id": "107171750974740",
+      "experience_access_saved": false
+    }
+  ],
+  "status": "Uploaded 2026-10-16 to socranates; room, buzz, takeoff, birds granted to universe 10771103250. Studio loading and live playback pending."
+}

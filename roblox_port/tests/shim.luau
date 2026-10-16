@@ -232,6 +232,11 @@ function Object.FindFirstChildWhichIsA(o, cls, recursive)
 end
 function Object.WaitForChild(o, name) return o:FindFirstChild(name) or o end
 function Object.SetAttribute(o, k, v) rawget(o, "_attrs")[k] = v end
+-- Sound transport only; the shim cannot verify asset loading or audible output.
+function Object.Play(o) o.Playing = true; o.TimePosition = 0 end
+function Object.Pause(o) o.Playing = false end
+function Object.Resume(o) o.Playing = true end
+function Object.Stop(o) o.Playing = false; o.TimePosition = 0 end
 function Object.GetAttribute(o, k) return rawget(o, "_attrs")[k] end
 function Object.Destroy(o)
 	o.Parent = nil

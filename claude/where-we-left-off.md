@@ -1,3 +1,13 @@
+# Claude — 2026-10-16: LIFE integrated with the new look; PlayStation button names
+
+Branch **claude/roblox-next** (origin/main b5e78c9 + claude/roblox-life merged + one commit; bundle claude-playtest/claude-next.bundle). Chet was unavailable, so nothing here has been run in Studio or on a PlayStation.
+- **LIFE merged** onto main (clean): all suites pass together (LIFE 20,846, CHECKPOINT 123, SUMMARY 184, ...); strict 0; 113/113 compile; places rebuilt, evidence **478963f45d9a8f40**; claude-playtest/TheWindowsill-latest.rbxlx is this build.
+- **PlayStation names:** ControlText.setPadStyle from UserInputService:GetStringForKeyCode(ButtonA) ("ButtonCross" on PlayStation): Cross, Circle, Square, Triangle, L1, L2, R2, R3, Touchpad in prompts and the controls card. Xbox and keyboard unchanged.
+- Nathan has a private published copy to test on his PlayStation (console must be ticked in Playable Devices; same Roblox account; favorite it on the web to find it on the console).
+
+**Next:** Chet — import claude-next.bundle, push, the LIFE Studio checks from docs/HANDOFF-roblox-life.md, a look at the prompts with Studio's PS5 emulation, merge. **Next Claude: the mud dauber wasp** (Nathan's choice): port scripts/predator/wasp_director.gd, wasp.gd, wasp_body.gd with Godot goldens (LIFE-14..18; caught -> back to the last rest checkpoint), a drawn mud dauber, WaspSpec. A first attempt stopped at a usage limit before writing anything.
+
+---
 # Claude — 2026-10-16: LIFE clock, hunger by the hour, rest and sleep, day and night, retreat checkpoints
 
 Read **docs/HANDOFF-roblox-life.md**. Branch **claude/roblox-life** (main b5e78c9, four commits; bundle `claude-playtest/claude-life.bundle`). Ledger **ROBLOX-24**, **ROBLOX-25**. Roblox only; Godot/SPEC frozen.

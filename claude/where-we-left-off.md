@@ -1,3 +1,16 @@
+# Claude — 2026-10-16: LIFE clock, hunger by the hour, rest and sleep, day and night, retreat checkpoints
+
+Read **docs/HANDOFF-roblox-life.md**. Branch **claude/roblox-life** (main b5e78c9, four commits; bundle `claude-playtest/claude-life.bundle`). Ledger **ROBLOX-24**, **ROBLOX-25**. Roblox only; Godot/SPEC frozen.
+- **LIFE round 1 ported** against Godot goldens (`tools/export_life_reference.gd` runs Godot's real habitat loop): the day (9:00 start, ~12 h in 15 min), hunger by the hour (no floor; nothing follows at zero yet), rest in the crack with E, sleep from 18:00 to morning (~8 s a night), "Morning, day N", the eyes' reach 30% at night. NeedsModel now owns energy; Feeding grants into it.
+- **Day and night light** (`Habitat/DayLight`, numbers in `Data/Graphics.dayNight`): full day is exactly the accepted look; dusk runs SunPick's clock back to 4.0, dims the room, haze, rays, shafts and motes. Never touches SpiderEyes' effects. **First guesses, unseen.**
+- **S01-C checkpoints**: a rest and each morning keep one; Backspace / View returns to it (else to the start). Whole world as one object graph (`Persistence/ObjectRecord`), checked fully before anything changes, restored in one pass; DataStore-shaped in-memory store with backup and checksum. **No DataStore writes.**
+- Linux: **28,773 checks pass** (LIFE 20,846 and CHECKPOINT 123 new; CLIENT 14); strict 0; 108/108 compile; places rebuilt, evidence **68090eafdba72ba0**. **Not run in Studio, Windows or devices.**
+
+**Next Chet:** import, Windows CLI, Studio suite (new Life spec) and client playback (two new LIFE rows), then the night look (screenshots at noon, 19:45, 21:00, 06:30), HttpService JSON exactness (LifeSpec), frame time while a night passes; merge. **Next Claude:** the wasp director, or LIFE round 5 (death, continuing) first; growth/moulting also hangs off the clock now.
+
+**Nathan, try:** walk to the silk-lined crack at the west end and keep still: press E to rest. Watch the day in the top-left corner. Rest again after 18:00 (or wait for evening) and the spider sleeps through the night to "Morning, day 2". Go hunting, then press Backspace to return to your last rest. Tell us how the evening and night look.
+
+---
 # Chet — 2026-10-15: aesthetics accepted on Windows
 
 Claude's 771324f visual round is integrated. Native fixes: tolerate float32 effect rounding; use a non-refracting transparent window so the flower UV layer is visible. See **ROBLOX-23**, **docs/HANDOFF-roblox-aesthetics.md** (Windows follow-up), and **docs/verification/roblox-aesthetics-windows/RESULTS.md**.

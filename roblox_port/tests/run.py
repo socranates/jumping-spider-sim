@@ -15,7 +15,8 @@ tests/hud.luau (the perception HUD's shapes and its drawer under the shim: circl
 tests/life.luau (the life clock, the needs and the rest-and-sleep loop against tests/life_reference.json, from the frozen Godot code) and
 tests/checkpoint.luau (the retreat checkpoint of a whole world, its refusals, and the DataStore-shaped store) and
 tests/wasp.luau (the mud dauber wasp's rules against tests/wasp_reference.json, exported from the frozen Godot director, and Godot's hand-written expectations) and
-tests/peacock.luau (the peacock spider's courtship dance: its documented rates, order, interruption and reduced motion).
+tests/peacock.luau (the peacock spider's courtship dance: its documented rates, order, interruption and reduced motion) and
+tests/notebook.luau (the naturalist's notebook: Godot's pages word for word, the model, the watcher, the words and layout, the panel and the client's wiring).
 Usage (from roblox_port/):  python3 tests/run.py [path/to/luau [test.luau ...]]   (default: all of them)"""
 import pathlib, re, subprocess, sys, tempfile
 
@@ -93,6 +94,10 @@ MODULES = [
     ("PerceptionText", "UI/PerceptionText.luau"),
     ("PerceptionView", "UI/PerceptionView.luau"),
     ("PerceptionShapes", "UI/PerceptionShapes.luau"),
+    ("NotebookPages", "Data/NotebookPages.luau"),
+    ("FieldNotebook", "Learning/FieldNotebook.luau"),
+    ("NotebookWatch", "Learning/NotebookWatch.luau"),
+    ("NotebookText", "UI/NotebookText.luau"),
     ("Json", "Persistence/Json.luau"),
     ("ObjectRecord", "Persistence/ObjectRecord.luau"),
     ("Checkpoint", "Persistence/Checkpoint.luau"),
@@ -114,9 +119,9 @@ CLIENT_MODULES = [
     ("SpiderEyes", "../Client/SpiderEyes.luau"),
 ]
 CLIENT_TESTS = {"growth.luau","perception_client.luau", "client_smoke.luau", "look.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "wasp.luau"}
-REFERENCES = ["jump_reference", "tether_reference", "camera_reference", "framing_reference", "perception_reference", "prey_reference", "life_reference", "wasp_reference", "continuing_reference", "growth_reference"]
+REFERENCES = ["jump_reference", "tether_reference", "camera_reference", "framing_reference", "perception_reference", "prey_reference", "life_reference", "wasp_reference", "continuing_reference", "growth_reference", "notebook_reference"]
 # A reference only the named tests read (it is large; the other bundles leave it out).
-REFERENCE_ONLY = {"continuing_reference": {"continuing.luau"},"prey_reference": {"prey.luau"}, "perception_reference": {"perception.luau"}, "life_reference": {"life.luau"}, "wasp_reference": {"wasp.luau"}}
+REFERENCE_ONLY = {"continuing_reference": {"continuing.luau"},"prey_reference": {"prey.luau"}, "perception_reference": {"perception.luau"}, "life_reference": {"life.luau"}, "wasp_reference": {"wasp.luau"}, "notebook_reference": {"notebook.luau"}}
 NAMES = {name for name, _ in MODULES + CLIENT_MODULES}
 
 
@@ -169,7 +174,7 @@ def main():
     luau = sys.argv[1] if len(sys.argv) > 1 else "luau"
     status = 0
     named = sys.argv[2:]
-    for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "life.luau", "checkpoint.luau", "wasp.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "look.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "peacock.luau", "continuing.luau", "growth.luau"]:
+    for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "life.luau", "checkpoint.luau", "wasp.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "look.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "peacock.luau", "continuing.luau", "growth.luau", "notebook.luau"]:
         if not (HERE / test_file).exists():
             if named:  # a misspelt name must not look like a pass
                 print(f"no such test file: {test_file} (names are relative to tests/, for example look.luau)", file=sys.stderr)

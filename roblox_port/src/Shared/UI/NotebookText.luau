@@ -1,0 +1,85 @@
+--!strict
+-- The notebook's words and its layout rules for the screen (ROBLOX-37), from Godot's notebook_panel.gd: the heading, the empty
+-- page, "In this game:" and the sources, the note that a page opened, and how to open and use the book on the device in use. Pure,
+-- so tests/notebook.luau checks them (and the layout at phone, tablet and desktop sizes) without Roblox. Button names come from
+-- ControlText (PlayStation names on a PlayStation controller).
+local ControlText = require(script.Parent.ControlText)
+
+local NotebookText = {}
+
+NotebookText.HEADING = "Naturalist's notebook"
+NotebookText.EMPTY = "Pages appear here as you play."
+NotebookText.GAME = "In this game: "
+NotebookText.CLOSE = "Close"
+NotebookText.PAGES = "Pages"
+NotebookText.MENU_CHOICE = "Notebook"
+NotebookText.BUTTON = "Notebook"
+
+-- Fills {reel}, {letGo}, {drop}, {focus} (any ControlText action name) in a page's "In this game" line with the device's name for it.
+function NotebookText.fill(text: string, device: ControlText.Device): string
+	local out = string.gsub(text, "{(%w+)}", function(action: string): string
+		local name = ControlText.name(device, action)
+		return if name ~= "" then name else "{" .. action .. "}"
+	end)
+	return out
+end
+
+-- The page's "In this game: ..." line, or nil when the page has none (Godot: an empty `game` shows nothing).
+function NotebookText.gameLine(game: string, device: ControlText.Device): string?
+	if game == "" then
+		return nil
+	end
+	return NotebookText.GAME .. NotebookText.fill(game, device)
+end
+
+-- "Source: x" for one source, "Sources:\nx\ny" for several. The links stay in the text as they are.
+function NotebookText.sourcesText(sources: { string }): string
+	return (if #sources == 1 then "Source: " else "Sources:\n") .. table.concat(sources, "\n")
+end
+
+-- How to open the notebook, on the device in use: N on a keyboard; the Notebook button on touch; a controller has no spare button (the
+-- D-pad walks), so it is the life menu (View, or the Touchpad on a PlayStation controller) and then Notebook.
+function NotebookText.openHint(device: ControlText.Device): string
+	if device == "gamepad" then
+		return `{ControlText.name("gamepad", "menu")}, then {NotebookText.MENU_CHOICE},`
+	elseif device == "touch" then
+		return `the {NotebookText.BUTTON} button`
+	end
+	return ControlText.name("keyboard", "notebook")
+end
+
+-- The note when a page opens during play (Godot: "New in your notebook: %s\n(%s to read)").
+function NotebookText.note(title: string, device: ControlText.Device): string
+	return `New in your notebook: {title}\n({NotebookText.openHint(device)} to read)`
+end
+
+-- The line under the page: what the controls do, on the device in use. `stacked`: one pane at a time (small screens).
+function NotebookText.controls(device: ControlText.Device, stacked: boolean): string
+	local back = ControlText.name(device, "cancel")
+	if device == "gamepad" then
+		local a = ControlText.name("gamepad", "jump")
+		return `Stick or D-pad: pages    {a}: open    Right stick: scroll    {back}: {if stacked then "back / close" else "close"}`
+	elseif device == "touch" then
+		return `Tap a page. Drag to scroll.`
+	end
+	return `Up and Down: pages    {if stacked then "Enter: open    Left and Right: next page    " else ""}Wheel or PageUp and PageDown: scroll    N or {back}: close`
+end
+
+-- ---------------------------------------------------------------- layout
+
+-- Text sizes by kind at normal text, and the large-text option's factor (the life menu's switch: the Player attribute LargeText).
+NotebookText.SIZES = { heading = 26, title = 24, body = 19, game = 17, sources = 14, button = 18, controls = 14 }
+NotebookText.LARGE = 1.5
+-- A touch target is at least this tall (before the text scale).
+NotebookText.MIN_TARGET = 44
+
+export type Layout = { sideBySide: boolean, listFraction: number }
+
+-- Side by side (the pages on the left, the page on the right) needs room; a phone held sideways, a portrait phone or large text
+-- show one pane at a time instead. `width` and `height` are the safe area's, `scale` the text scale (1 to LARGE).
+function NotebookText.layout(width: number, height: number, scale: number): Layout
+	local sideBySide = width >= 640 * scale and height >= 340
+	return { sideBySide = sideBySide, listFraction = if sideBySide then 0.34 else 1.0 }
+end
+
+return NotebookText

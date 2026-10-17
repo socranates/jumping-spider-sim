@@ -1,5 +1,7 @@
 # Death/continuing Windows verification — 2026-10-16
 
+**Final publication status: SUCCESS, v12.** Creator Dashboard's **Show published only** filter lists version 12, saved October 16 at 7:05 PM local. Studio logged PublishSuccessful and place 120119801868085 publication at 00:07:23Z (7:07 PM local), taking 1,493 ms. `published-v12.png` is dashboard proof. Earlier unsuccessful attempts below are retained as history.
+
 Final game/test evidence: **589d9e7bbe94f6b1**. Built with Rojo; publishable file SHA-256 `9a25c51a7dd835db1acc12f3d25abbf40e7f0bb27be7558c09da47d1853690fb`.
 
 - **85/85 native engine and 18/18 live client**, Studio 0.743.0.7431133. Matching structured reports here. Initial 53c86f528da1894c reports preserved in initial/.
@@ -16,3 +18,17 @@ Publication: not yet verified. Publish As selected the existing place 1201198018
 Code commit c4976fe was pushed to GitHub main and codex/roblox-life-continuing. The laptop clone was fast-forwarded from e8fd186 to c4976fe; its untracked claude-playtest folder was preserved.
 
 Follow-up, October 16 about 6:20 PM local: Nathan explicitly approved Save to Roblox As to overwrite only the existing place. That route also stalled (Studio logged the correct target, isPublish=0). Saved the older open online session through Download a Copy to Downloads/Windowsill-before-life-publish-20261016.rbxl (216,047 bytes), then closed it. Closed the release session without saving editor-only changes, restarted Studio with no other Studio windows, reopened the hash-verified release and retried Publish As. It again remained at Upload in progress; cancelled it. Dashboard refreshed after the attempt still shows version 11 from 5:42 PM. publish-stalled.jpg records the final attempt. The release remains open locally; no completed upload or new published version was observed. This is now a Studio upload blocker, not an outstanding user-approval request. Do not ask for overwrite approval again. No game source changed in this follow-up.
+
+## Successful recovery, October 16 about 7:07 PM local
+
+Nathan's manual Publish As started at 23:39:15Z and remained stuck after 15 minutes; correct universe/place logged, no completion. Cancelled. Saving/reopening a separate binary copy (259,454 bytes) did not fix Publish As either; cancelled that attempt. The Downloads XML had been reserialized by Studio since the earlier hash: all **85/85 script sources** still matched the repository playable file exactly after line-ending normalization. This comparison was of the local XML, not an assertion about an online download.
+
+Used the supported Rojo live-sync route instead:
+
+1. Installed the plugin bundled with the already-present Rojo **7.7.1** executable (`rojo plugin install`). Opened The Windowsill's existing online place in Studio; no new experience created.
+2. Ran `rojo serve roblox_port/default.project.json --address 127.0.0.1` outside the execution sandbox. The sandboxed server was unreachable by Studio; the host server connected successfully. It serves only on laptop loopback, port 34872.
+3. Reviewed and accepted the plugin's initial synchronization for TheWindowsill, then disconnected and stopped the source server. The project selects only the playable source, not test runners. Downloaded a local binary backup of the synchronized place. A subsequent XML-conversion attempt for full source comparison was unsupported by Rojo (multiple root instances); no full offline comparison of that download is claimed.
+4. Played the synchronized online place: the new life menu appeared, Begin a new life worked, and the spider/world rendered with the new crack guidance (`synced-play.jpg`). This is a smoke check, not a rerun of the automated suite or a physical controller test. Stopped Play.
+5. **Ordinary Publish (Alt+P)** succeeded in 1.493 seconds. Studio log `0.743.0.7431133_20261017T000107Z_Studio_E3630_last.log` reports PublishSuccessful, v12, and the correct place ID. Dashboard independently confirms v12 under **Show published only** (`published-v12.png`). Its 7:05 PM timestamp is the saved version time; publication was 7:07 PM.
+
+The reason Publish As hangs remains undetermined; the successful workaround is verified. No privacy/device settings, Data Sharing settings or credentials changed. No gameplay source changed. Rojo remains installed for future updates, but its server is stopped. Existing online Studio is left open. Nathan's next step is to leave/rejoin on PlayStation for the new version; session-only saves remain the limitation.

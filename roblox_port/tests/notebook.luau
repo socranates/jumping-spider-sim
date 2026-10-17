@@ -453,7 +453,12 @@ do
 			check(m.paperW <= size[1] and m.paperH <= size[2] and m.paperW <= 1040 and m.paperH <= 820, `{size[1]}x{size[2]}: the paper fits the safe area`)
 		end
 	end
-	check(NotebookText.metrics(568, 320, 1).body >= 150, "a phone held sideways keeps 150 px for the page at normal text")
+	check(NotebookText.metrics(568, 320, 1).body >= 140 and NotebookText.metrics(568, 320, 1).hint > 0, "a phone held sideways keeps 140 px for the page at normal text, with the controls line")
+	check(NotebookText.metrics(568, 320, NotebookText.LARGE).hint == 0 and NotebookText.metrics(568, 320, NotebookText.LARGE).body >= 130, "and with large text drops the controls line to keep the page")
+	for _, size in { { 568, 320 }, { 1280, 720 }, { 360, 640 } } do
+		local m = NotebookText.metrics(size[1], size[2], 1)
+		check(m.head + 4 + m.body + 4 + m.hint + m.foot <= m.paperH - 20, `{size[1]}x{size[2]}: heading, pages, controls line and footer fit the paper`)
+	end
 	check(NotebookText.SIZES.body >= 18 and NotebookText.SIZES.sources >= 14 and NotebookText.SIZES.controls >= 14 and NotebookText.MIN_TARGET >= 44, "text is readable and touch targets are 44 px")
 
 	-- the key: N is free and N alone; D-pad up is the port's walking, so a controller has no notebook button of its own

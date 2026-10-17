@@ -320,6 +320,25 @@ return function(driver: any)
   assert(driver.needs.gentle and driver.life.growth.stage==0,"Easy not a new gentle life")
   assert(driver.fresh("main",false,nil))
  end)
+ check("NOTEBOOK: opens in the real client, the world waits, only found pages show, text fits, and it closes",function()
+  local gui=game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+  driver.notebook:notice("jump")
+  local elapsed=driver.life.elapsed
+  driver.openNotebook("game");wait(.3)
+  local sg=gui:FindFirstChild("SpiderNotebook")
+  assert(sg and sg:IsA("ScreenGui") and sg.Enabled,"notebook not shown")
+  assert(driver.notebookPanel:isShowing(),"panel not open")
+  assert(driver.life.elapsed==elapsed,"world ran under the notebook")
+  local found=#driver.notebook:list()
+  assert(found>=1,"no found page")
+  for _,d in sg:GetDescendants() do
+   if d:IsA("TextLabel") and d.Visible and d.Text~="" and d.AbsoluteSize.X>0 then
+    assert(d.TextBounds.X<=d.AbsoluteSize.X+1,"notebook text spills: "..d.Name)
+   end
+  end
+  driver.notebookPanel:close();wait(.2)
+  assert(not sg.Enabled,"notebook did not close")
+ end)
  local passed=0
 	for _,row in rows do if row.passed then passed+=1 end end
 	print("PORT_CLIENT_REPORT "..HttpService:JSONEncode({evidence_id=workspace:GetAttribute("PortEvidence"),tests=#rows,passed=passed,failed=#rows-passed,results=rows}))

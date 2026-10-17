@@ -62,7 +62,7 @@ function NotebookText.controls(device: ControlText.Device, stacked: boolean): st
 	elseif device == "touch" then
 		return `Tap a page. Drag to scroll.`
 	end
-	return `Up and Down: pages    {if stacked then "Enter: open    Left and Right: next page    " else ""}Wheel or PageUp and PageDown: scroll    N or {back}: close`
+	return `Up and Down: pages    {if stacked then "Enter: open    Left and Right: previous and next    " else ""}Wheel, PageUp or PageDown: scroll    N or {back}: close`
 end
 
 -- ---------------------------------------------------------------- layout
@@ -82,15 +82,24 @@ function NotebookText.layout(width: number, height: number, scale: number): Layo
 	return { sideBySide = sideBySide, listFraction = if sideBySide then 0.34 else 1.0 }
 end
 
-export type Metrics = { paperW: number, paperH: number, head: number, foot: number, body: number }
+export type Metrics = { paperW: number, paperH: number, head: number, hint: number, foot: number, body: number }
 
--- Pixel sizes of the panel for a safe area of this size: the paper (97% by 95%, at most 1040 by 820), the heading and footer bands, and
--- the height left for the pages (what scrolls). Pure, so a short screen can be checked: a phone held sideways is 568 by 320.
+-- Pixel sizes of the panel for a safe area of this size: the paper (97% by 95%, at most 1040 by 820), the heading band, the controls
+-- line (two lines of text; 0 when the pages would be left with less than MIN_BODY px without it), the footer's buttons and the height
+-- left for the pages (what scrolls). Pure, so a short screen can be checked: a phone held sideways is 568 by 320.
+NotebookText.MIN_BODY = 120
 function NotebookText.metrics(width: number, height: number, scale: number): Metrics
 	local paperW, paperH = math.min(width * 0.97, 1040), math.min(height * 0.95, 820)
 	local head = math.floor((NotebookText.SIZES.heading + 10) * scale)
-	local foot = math.floor(58 * scale)
-	return { paperW = paperW, paperH = paperH, head = head, foot = foot, body = paperH - 20 - head - foot - 12 }
+	local foot = math.floor((NotebookText.MIN_TARGET + 8) * scale)
+	local hint = math.floor(2.5 * NotebookText.SIZES.controls * scale) + 4
+	local body = paperH - 20 - head - foot - 12
+	if body - hint >= NotebookText.MIN_BODY then
+		body -= hint
+	else
+		hint = 0
+	end
+	return { paperW = paperW, paperH = paperH, head = head, hint = hint, foot = foot, body = body }
 end
 
 return NotebookText

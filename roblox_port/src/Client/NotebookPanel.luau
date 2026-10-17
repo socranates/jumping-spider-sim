@@ -167,8 +167,9 @@ function NotebookPanel.new(playerGui: Instance, book: any, onClose: (string?) ->
 	controls.TextColor3 = FAINT
 	controls.TextWrapped = true
 	controls.TextXAlignment = Enum.TextXAlignment.Left
-	controls.TextYAlignment = Enum.TextYAlignment.Center
-	controls.Parent = footer
+	controls.TextYAlignment = Enum.TextYAlignment.Top
+	controls.TextTruncate = Enum.TextTruncate.AtEnd -- two lines; tests/studio/NotebookSpec.luau checks the words fit them
+	controls.Parent = inner
 	local close = button(footer, "Close", NotebookText.CLOSE)
 	local back = button(footer, "Back", NotebookText.PAGES)
 	back.Visible = false
@@ -192,24 +193,34 @@ end
 
 -- Whether one pane shows at a time (a small screen, or large text).
 function NotebookPanel.stacked(self: any): boolean
+	local w, h = self:_screen()
+	return not NotebookText.layout(w, h, self.scale).sideBySide
+end
+
+-- The safe area's size (before the first layout the engine says 0 by 0: a laptop screen's then, and the size signal lays it out again).
+function NotebookPanel._screen(self: any): (number, number)
 	local size = self.gui.AbsoluteSize
-	return not NotebookText.layout(size.X, size.Y, self.scale).sideBySide
+	return if size.X > 0 then size.X else 1280, if size.Y > 0 then size.Y else 720
 end
 
 -- Sizes, positions and which pane shows, for the screen's size, the text scale and the view.
 function NotebookPanel.layout(self: any)
 	local s: number = self.scale
 	local sizes = NotebookText.SIZES
-	local size = self.gui.AbsoluteSize
-	local lay = NotebookText.layout(size.X, size.Y, s)
-	local m = NotebookText.metrics(size.X, size.Y, s)
-	local head, foot = m.head, m.foot
-	self.heading.Size = UDim2.new(1, 0, 0, head)
+	local w, h = self:_screen()
+	local m = NotebookText.metrics(w, h, s)
+	local lay = NotebookText.layout(w, h, s)
+	self.heading.Size = UDim2.new(1, 0, 0, m.head)
 	self.heading.TextSize = sizes.heading * s
-	self.body.Position = UDim2.fromOffset(0, head + 4)
-	self.body.Size = UDim2.new(1, 0, 1, -(head + foot + 12))
+	self.body.Position = UDim2.fromOffset(0, m.head + 4)
+	self.body.Size = UDim2.new(1, 0, 0, m.body)
+	self.controls.Visible = m.hint > 0
+	self.controls.Position = UDim2.fromOffset(0, m.head + 4 + m.body + 4)
+	self.controls.Size = UDim2.new(1, 0, 0, m.hint)
+	self.controls.TextSize = sizes.controls * s
+	self.controls.Text = NotebookText.controls(self.device, not lay.sideBySide)
 	self.footer.Position = UDim2.fromScale(0, 1)
-	self.footer.Size = UDim2.new(1, 0, 0, foot)
+	self.footer.Size = UDim2.new(1, 0, 0, m.foot)
 	local buttonW = math.floor(112 * s)
 	local backShown = not lay.sideBySide and self.view == "page"
 	self.closeButton.Size = UDim2.new(0, buttonW, 1, -8)
@@ -219,10 +230,6 @@ function NotebookPanel.layout(self: any)
 	self.backButton.Size = UDim2.new(0, buttonW, 1, -8)
 	self.backButton.Position = UDim2.new(1, -(buttonW * 2 + 8), 0, 4)
 	self.backButton.TextSize = sizes.button * s
-	local reserve = buttonW * (if backShown then 2 else 1) + 16
-	self.controls.Size = UDim2.new(1, -reserve, 1, 0)
-	self.controls.TextSize = sizes.controls * s
-	self.controls.Text = NotebookText.controls(self.device, not lay.sideBySide)
 	if lay.sideBySide then
 		self.list.Position, self.list.Size = UDim2.fromOffset(0, 0), UDim2.new(lay.listFraction, -8, 1, 0)
 		self.page.Position, self.page.Size = UDim2.new(lay.listFraction, 8, 0, 0), UDim2.new(1 - lay.listFraction, -8, 1, 0)
@@ -239,7 +246,7 @@ function NotebookPanel.layout(self: any)
 	self.empty.TextSize = sizes.body * s
 	for _, b in self.buttons do
 		b.TextSize = sizes.button * s
-		b.Size = UDim2.new(1, -10, 0, math.floor(NotebookText.MIN_TARGET * s))
+		b.Size = UDim2.new(1, -10, 0, math.floor(NotebookText.MIN_TARGET * s)) -- at least this tall (a touch target); a long title makes it taller
 	end
 end
 
@@ -253,8 +260,10 @@ function NotebookPanel._rebuildList(self: any)
 		b.Selectable = true
 		b.TextXAlignment = Enum.TextXAlignment.Left
 		b.TextWrapped = true
+		b.AutomaticSize = Enum.AutomaticSize.Y
 		local pad = Instance.new("UIPadding")
 		pad.PaddingLeft, pad.PaddingRight = UDim.new(0, 10), UDim.new(0, 6)
+		pad.PaddingTop, pad.PaddingBottom = UDim.new(0, 8), UDim.new(0, 8)
 		pad.Parent = b
 		local id = entry.id
 		b.Activated:Connect(function() self:choose(id) end)

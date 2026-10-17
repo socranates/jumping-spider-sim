@@ -1,3 +1,12 @@
+# Claude - 2026-10-17: the field notebook (branch claude/roblox-notebook)
+
+Read **docs/HANDOFF-roblox-notebook.md**. Decisions ROBLOX-37/38. Godot's 24 pages are in as generated data checked word for word; a pure FieldNotebook; NotebookWatch wired to real events (23 of 24 pages; `felt` has no vibration sense in the port; `buzz` is fly take-off within 10 studs); the book lives outside checkpoints and carries to a new spider; session-only. Panel: N on a keyboard, the life menu or end screen on a controller (View/Touchpad, then Notebook, because the D-pad walks), a button on touch; scrolling, large text, short screens, the world waits while it is open.
+
+**Deviation to decide:** no count of pages left. Godot's spec forbids one; the handoff asked for a "not yet observed" count. Say if wanted.
+
+CLI: NOTEBOOK 793/0 and every other suite failed=0 (total 46,056), strict clean, 145/145 compile. Studio NotebookSpec and the SilkPlayback NOTEBOOK check are written but unrun: Chet's checklist is in the handoff. Next: Chet imports the bundle, runs Studio on Windows and publishes; server-owned DataStore persistence follows separately (FieldNotebook.toRecord/load is its boundary).
+
+---
 # Chet — 2026-10-17: growth, moulting, closer peacock and quieter ambience
 
 **Published version 15** to the existing Windowsill place 120119801868085 / universe 10771103250, independently confirmed in Creator Dashboard. Read **docs/HANDOFF-roblox-growth-polish.md** and **docs/verification/roblox-growth-polish/RESULTS.md**. Decisions ROBLOX-35/36. Build **0ee32d97f26bd2fd**; native acceptance **ece0772bc0acda77**, **91/91 engine + 19/19 live-client**. Only four label-encoding repairs followed native acceptance; synchronized release launch/play smoke passed. Windows CLI **45,263/45,263**, strict clean, final **132/132 compile**.

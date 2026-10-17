@@ -226,7 +226,8 @@ local volans = {
 	id = "maratus_volans_male",
 	name = "Peacock spider (male)",
 	scale = SCALE, -- SpiderRig scales its own distances (foot search, stepping) by this
-	bodyDrop = 0.21, -- the drawn body sits this far (studs) below the collider's centre, so it stands on the surface (the collider is 0.31 high)
+	cameraScale = 0.62, -- closer framing for the small appearance; user zoom still applies
+ bodyDrop = 0.21, -- the drawn body sits this far (studs) below the collider's centre, so it stands on the surface (the collider is 0.31 high)
 
 	-- ---------------------------------------------------------------- colours (ART, after the photographs in Otto & Hill 2011)
 	body = { 0.09, 0.05, 0.04 }, -- carapace: dark brown-black
@@ -286,20 +287,20 @@ local volans = {
 	-- behind), given as fractions of the radii. The back (ventral) side repeats the rim and the field so the fan is a fan from behind.
 	fan = {
 		radii = { 0.165, 0.150 }, folded = { 0.42, 0.55 }, plane = 0.004, zShift = 0.018, layerStep = 0.0022, thickness = 0.004,
-		foldedThickness = 0.06, foldedSink = 0.030, -- folded, the discs are thick and sunk into the dome (a lens on the abdomen) and flatten as the fan opens
+		foldedThickness = 0.042, foldedSink = 0.021, -- folded, the discs are thick and sunk into the dome (a lens on the abdomen) and flatten as the fan opens
 		layers = {
 			{ name = "FanFringe", color = { 0.95, 0.94, 0.88 }, inset = 0.0 },
-			{ name = "FanArch", color = { 0.88, 0.25, 0.06 }, inset = 0.024 },
-			{ name = "FanField", color = { 0.05, 0.38, 0.72 }, inset = 0.046 },
+			{ name = "FanArch", color = { 0.96, 0.30, 0.065 }, inset = 0.015 },
+			{ name = "FanField", color = { 0.025, 0.48, 0.82 }, inset = 0.046 },
 			{ name = "FanArch", color = { 0.88, 0.25, 0.06 }, inset = 0.078 },
-			{ name = "FanField", color = { 0.04, 0.46, 0.66 }, inset = 0.092 },
+			{ name = "FanField", color = { 0.02, 0.65, 0.67 }, inset = 0.092 },
 		},
 		figureColor = { 0.02, 0.02, 0.03 },
 		-- A black trident on the blue: a long bar and two slanting prongs (fractions of the radii; angle in radians). Never a face.
 		figure = { { x = 0, z = 0.05, rx = 0.07, rz = 0.50, angle = 0 }, { x = -0.30, z = -0.18, rx = 0.07, rz = 0.30, angle = 0.55 }, { x = 0.30, z = -0.18, rx = 0.07, rz = 0.30, angle = -0.55 } },
 		back = { plane = -0.004, layers = { 1, 2, 3 } }, -- the layers (by number) the back repeats, and where (this far under the abdomen's belly)
 		flaps = { color = { 0.88, 0.25, 0.06 }, radii = { 0.030, 0.006, 0.085 }, hingeX = 0.080, hingeY = 0.040, foldedDeg = -80 }, -- the folded flaps on the flanks
-		sheen = 0.12,
+		sheen = 0.18,
 	},
 	-- Legs III in a dance: how the pose's raise and wave move them (ART).
 	dance = { kneeUp = 0.03 },
@@ -325,6 +326,14 @@ local volans = {
 		},
 	},
 }
+
+-- ART: six fine teal scale streaks catch light on the open fan. Full detail only; mobile keeps its 80-part budget.
+for _,side in {-1,1} do
+ for _,z in {-0.36,0,0.36} do
+  table.insert(volans.fan.figure,{x=side*0.49,z=z,rx=0.018,rz=0.10,angle=side*z*0.65,
+   color={0.30,0.80,0.86},fullOnly=true})
+ end
+end
 
 return { default = "first_spider", profiles = { first_spider = first, maratus_volans_male = volans } }
 ]]></string>
@@ -3005,6 +3014,91 @@ return table.freeze(Layout)
         </Properties>
         <Item class="ModuleScript" referent="30">
           <Properties>
+            <string name="Name">Growth</string>
+            <string name="Source"><![CDATA[--!strict
+-- Frozen Godot scripts/life/growth.gd, LIFE-10..12. Durations and scales are game tuning, not measured instars.
+local Growth = {}
+Growth.__index = Growth
+Growth.STAGES = { "young juvenile", "juvenile", "subadult", "adult" }
+Growth.SCALES = { 1, 1.15, 1.32, 1.50 }
+Growth.ADULT = 3
+Growth.READY_FOOD = 0.9
+Growth.MOULT_HOURS = 12
+Growth.SOFT_HOURS = 10
+Growth.SOFT_REACH = 0.7
+local function finite(v: any): boolean
+ return type(v)=="number" and v==v and math.abs(v)<math.huge
+end
+function Growth.new(): any
+ return setmetatable({stage=0,fedSinceMoult=0,ready=false,moultingHoursLeft=0,softHoursLeft=0,exuviae={}},Growth)
+end
+function Growth.isAdult(self: any): boolean return self.stage>=Growth.ADULT end
+function Growth.isMoulting(self: any): boolean return self.moultingHoursLeft>0 end
+function Growth.isSoft(self: any): boolean return self.softHoursLeft>0 end
+function Growth.stageName(self: any): string return Growth.STAGES[self.stage+1] end
+function Growth.reachFactor(self: any): number return if self:isSoft() or self:isMoulting() then Growth.SOFT_REACH else 1 end
+function Growth.softness(self: any): number return if self:isMoulting() then 1 else math.clamp(self.softHoursLeft/Growth.SOFT_HOURS,0,1) end
+function Growth.eat(self: any, energy: number): boolean
+ if not finite(energy) or energy<=0 or self:isAdult() or self:isMoulting() then return false end
+ self.fedSinceMoult+=energy
+ local before=self.ready
+ self.ready=self.fedSinceMoult>=Growth.READY_FOOD
+ return self.ready and not before
+end
+function Growth.beginMoult(self: any): boolean
+ if not self.ready or self:isAdult() or self:isMoulting() then return false end
+ self.moultingHoursLeft=Growth.MOULT_HOURS
+ return true
+end
+function Growth.passHours(self: any, hours: number, at: Vector3): string
+ if not finite(hours) or hours<=0 then return "" end
+ if self:isMoulting() then
+  self.moultingHoursLeft=math.max(0,self.moultingHoursLeft-hours)
+  if self.moultingHoursLeft==0 then
+   self.stage=math.min(self.stage+1,Growth.ADULT)
+   self.ready=false;self.fedSinceMoult=0;self.softHoursLeft=Growth.SOFT_HOURS
+   table.insert(self.exuviae,at)
+   return "moulted"
+  end
+ elseif self:isSoft() then
+  self.softHoursLeft=math.max(0,self.softHoursLeft-hours)
+  if self.softHoursLeft==0 then return "hardened" end
+ end
+ return ""
+end
+function Growth.toRecord(self: any): any
+ local skins={}
+ for _,p in self.exuviae do table.insert(skins,{p.X,p.Y,p.Z}) end
+ return {stage=self.stage,fed_since_moult=self.fedSinceMoult,ready=self.ready,
+  moulting_hours_left=self.moultingHoursLeft,soft_hours_left=self.softHoursLeft,exuviae=skins}
+end
+function Growth.problems(r: any): {string}
+ if type(r)~="table" then return {"growth: not a record"} end
+ local e={}
+ if not finite(r.stage) or r.stage%1~=0 or r.stage<0 or r.stage>3 then table.insert(e,"growth: invalid stage") end
+ for _,k in {"fed_since_moult","moulting_hours_left","soft_hours_left"} do
+  if not finite(r[k]) or r[k]<0 then table.insert(e,"growth: invalid "..k) end
+ end
+ if type(r.ready)~="boolean" then table.insert(e,"growth: invalid ready") end
+ if type(r.exuviae)~="table" or #r.exuviae>3 then table.insert(e,"growth: invalid old skins")
+ else for _,p in r.exuviae do
+  if type(p)~="table" or #p~=3 or not finite(p[1]) or not finite(p[2]) or not finite(p[3]) then table.insert(e,"growth: invalid skin position") end
+ end end
+ return e
+end
+function Growth.load(self: any,r: any): boolean
+ if #Growth.problems(r)>0 then return false end
+ self.stage=r.stage;self.fedSinceMoult=r.fed_since_moult;self.ready=r.ready
+ self.moultingHoursLeft=r.moulting_hours_left;self.softHoursLeft=r.soft_hours_left;self.exuviae={}
+ for _,p in r.exuviae do table.insert(self.exuviae,Vector3.new(p[1],p[2],p[3])) end
+ return true
+end
+return Growth
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="31">
+          <Properties>
             <string name="Name">LifeClock</string>
             <string name="Source"><![CDATA[--!strict
 -- The life clock: a port of the frozen scripts/life/life_clock.gd (LIFE-04). The windowsill's time of day and the spider's
@@ -3186,7 +3280,7 @@ return LifeClock
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="31">
+        <Item class="ModuleScript" referent="32">
           <Properties>
             <string name="Name">LifeLoop</string>
             <string name="Source"><![CDATA[--!strict
@@ -3204,11 +3298,11 @@ return LifeClock
 -- * Light: daylight 0 to 1 from the hour; the eyes reach NIGHT_SIGHT of their range in the dark (LIFE-06). The reach comes
 --   from the clock, never from the lighting on the screen.
 --
--- Not ported (later rounds of Godot's loop): growth and moulting (round 3), the wasp (round 4), weakness and starving to death
--- (round 5: it needs the death and continuing rules), the passing shadow (T08's telegraphed disturbance) and the notebook.
+-- Growth, moulting and starvation are ported. The passing shadow and notebook remain separate work.
 -- Checked tick by tick against Godot's own loop in tests/life_reference.json (tools/export_life_reference.gd).
 
 local LifeClock = require(script.Parent.LifeClock)
+local Growth = require(script.Parent.Growth)
 
 local LifeLoop = {}
 LifeLoop.__index = LifeLoop
@@ -3233,6 +3327,7 @@ export type Spider = {
 	still: boolean, -- not walking or sliding (Godot: intent under 0.01, speed under 0.15)
 	holding: boolean, -- holds prey (caught, struggling or being eaten)
 	feeding: boolean, -- eating right now
+ position: Vector3?, -- old skin location; live client always supplies it
 }
 export type CheckpointResult = { ok: boolean, message: string }
 export type Event = { kind: string, day: number? }
@@ -3241,6 +3336,7 @@ export type Event = { kind: string, day: number? }
 function LifeLoop.new(needs: any, save: (() -> CheckpointResult)?): any
 	local self = setmetatable({
 		clock = LifeClock.new(), needs = needs, save = save,
+  growth = Growth.new(), grantedSeen = needs.grantedTotal,
 		mode = "main", rules = "standard", lifeOver = false,
 		resting = false, restSeconds = 0.0, asleep = false, elapsed = 0.0,
 		checkpointDue = false, checkpointResult = nil :: CheckpointResult?, checkpoints = 0,
@@ -3283,7 +3379,7 @@ function LifeLoop.requestRest(self: any, s: Spider): boolean
 end
 
 function LifeLoop.stopRest(self: any)
-	if self.resting then
+	if self.resting and not self.growth:isMoulting() then
 		self.resting = false
 		self:_emit("rest_ended")
 	end
@@ -3303,10 +3399,30 @@ function LifeLoop.starved(self: any): boolean
 	return not self.needs.gentle and self.needs.starvingStreakH >= LifeLoop.STARVE_AFTER_H
 end
 
-function LifeLoop._stepLife(self: any, dt: number)
-	local wasAsleep = self.asleep
-	self.asleep = self.resting and (self.clock.sleeping or self.clock:isSleepTime()) and not self:tooHungryToSleep()
-	local hours = self.clock:advance(dt, self.asleep)
+function LifeLoop._stepLife(self: any, dt: number, at: Vector3)
+ local granted = self.needs.grantedTotal
+ if granted > self.grantedSeen and self.growth:eat(granted-self.grantedSeen) then
+  self:showNotice("Ready to moult. Rest in the silk-lined crack.")
+  self:_emit("moult_ready")
+ end
+ self.grantedSeen = granted
+ if self.resting and self.growth:beginMoult() then
+  self:showNotice("Moulting in the crack. The spider slowly pulls free of its old skin.")
+  self:_emit("moult_started")
+ end
+ local moulting = self.growth:isMoulting()
+ local wasAsleep = self.asleep
+	self.asleep = self.resting and not moulting and (self.clock.sleeping or self.clock:isSleepTime()) and not self:tooHungryToSleep()
+	local hours = if moulting then self.clock:advanceMoult(dt) else self.clock:advance(dt, self.asleep)
+ local what = self.growth:passHours(hours,at)
+ if what == "moulted" then
+  self.checkpointDue=true
+  self.morningText="Moulted: now a "..self.growth:stageName()..". The new skin is soft for a while."
+  self:showNotice(self.morningText)
+  self:_emit("moulted")
+ elseif what == "hardened" then
+  self:showNotice("The new skin has hardened. Full-length jumps again.")
+ end
 	if self.asleep and not self.clock.sleeping then
 		-- The morning came during this tick: awake, still resting in the crack. The new day keeps a checkpoint.
 		self.asleep = false
@@ -3320,7 +3436,7 @@ function LifeLoop._stepLife(self: any, dt: number)
 	if self.asleep and not wasAsleep then
 		self:_emit("slept")
 	end
-	self.needs:addHours(hours, self.asleep)
+	self.needs:addHours(hours, self.asleep or moulting)
 	self:applyLight()
 end
 
@@ -3330,17 +3446,17 @@ function LifeLoop.step(self: any, dt: number, s: Spider, feedPressed: boolean, c
 	if self.restoreGrace > 0 then
 		self.restoreGrace = if s.attached then 0 else self.restoreGrace - 1
 	end
-	if self.resting and (cancelPressed or feedPressed or (self.restoreGrace == 0 and not self:canRest(s))) then
+	if self.resting and not self.growth:isMoulting() and (cancelPressed or feedPressed or (self.restoreGrace == 0 and not self:canRest(s))) then
 		self:stopRest()
-	elseif feedPressed and not s.holding and not s.feeding then
+	elseif feedPressed and not self.growth:isMoulting() and not s.holding and not s.feeding then
 		self:requestRest(s)
 	end
 	if self.resting then
 		self.restSeconds += dt
 		self.needs:restoreRest(dt * LifeLoop.REST_PER_S)
 	end
-	self:_stepLife(dt)
-	if self:starved() and not self.lifeOver then
+	self:_stepLife(dt, s.position or Vector3.zero)
+	if self:starved() and not self.lifeOver and not self.growth:isMoulting() then
 		self.lifeOver = true
 		self:_emit("starved")
 	end
@@ -3377,7 +3493,7 @@ end
 function LifeLoop.toRecord(self: any): { [string]: any }
 	return {
 		retreat_id = "sill_crevice", resting = self.resting, rest_seconds = self.restSeconds, elapsed = self.elapsed,
-		life = self.clock:toRecord(),
+		life = self.clock:toRecord(), growth = self.growth:toRecord(),
 	}
 end
 
@@ -3393,7 +3509,8 @@ function LifeLoop.problems(r: any): { string }
 		local v = r[k]
 		if type(v) ~= "number" or v ~= v or v < 0 or v == math.huge then table.insert(e, `habitat: '{k}' is not a time`) end
 	end
-	for _, p in LifeClock.problems(r.life) do
+	if r.growth ~= nil then for _, p in Growth.problems(r.growth) do table.insert(e,p) end end
+ for _, p in LifeClock.problems(r.life) do
 		table.insert(e, p)
 	end
 	return e
@@ -3406,6 +3523,9 @@ function LifeLoop.load(self: any, r: any): boolean
 		return false
 	end
 	self.clock:load(r.life)
+ self.growth=Growth.new()
+ if r.growth then self.growth:load(r.growth) end
+ self.grantedSeen=self.needs.grantedTotal
 	self.resting = r.resting
 	self.restSeconds = r.rest_seconds
 	self.elapsed = r.elapsed
@@ -3422,7 +3542,7 @@ return LifeLoop
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="32">
+        <Item class="ModuleScript" referent="33">
           <Properties>
             <string name="Name">LifeSession</string>
             <string name="Source"><![CDATA[--!strict
@@ -3471,7 +3591,7 @@ return Session
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="33">
+        <Item class="ModuleScript" referent="34">
           <Properties>
             <string name="Name">NeedsModel</string>
             <string name="Source"><![CDATA[--!strict
@@ -3764,11 +3884,11 @@ return NeedsModel
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="34">
+      <Item class="Folder" referent="35">
         <Properties>
           <string name="Name">Movement</string>
         </Properties>
-        <Item class="ModuleScript" referent="35">
+        <Item class="ModuleScript" referent="36">
           <Properties>
             <string name="Name">CameraMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -4047,7 +4167,7 @@ return CameraMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="36">
+        <Item class="ModuleScript" referent="37">
           <Properties>
             <string name="Name">FocusState</string>
             <string name="Source"><![CDATA[--!strict
@@ -4070,7 +4190,7 @@ return Focus
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="37">
+        <Item class="ModuleScript" referent="38">
           <Properties>
             <string name="Name">InputState</string>
             <string name="Source"><![CDATA[--!strict
@@ -4163,7 +4283,7 @@ return InputState
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="38">
+        <Item class="ModuleScript" referent="39">
           <Properties>
             <string name="Name">JumpInput</string>
             <string name="Source"><![CDATA[--!strict
@@ -4334,7 +4454,7 @@ return JumpInput
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="39">
+        <Item class="ModuleScript" referent="40">
           <Properties>
             <string name="Name">JumpMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -4492,7 +4612,7 @@ return JumpMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="40">
+        <Item class="ModuleScript" referent="41">
           <Properties>
             <string name="Name">LineFraming</string>
             <string name="Source"><![CDATA[--!strict
@@ -4591,7 +4711,7 @@ return LineFraming
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="41">
+        <Item class="ModuleScript" referent="42">
           <Properties>
             <string name="Name">SilkController</string>
             <string name="Source"><![CDATA[--!strict
@@ -4835,7 +4955,7 @@ return Silk
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="42">
+        <Item class="ModuleScript" referent="43">
           <Properties>
             <string name="Name">SpiderMotor</string>
             <string name="Source"><![CDATA[--!strict
@@ -4937,6 +5057,7 @@ function Motor.new(config: Config): any
 		config = config,
 		surfaces = config.surfaces,
 		loco = loco,
+  reachFactor = 1,
 		gravity = Vector3.new(0, -loco.gravity_wu_s2, 0),
 		params = params,
 		overlap = overlap,
@@ -5114,7 +5235,7 @@ function Motor.planJump(self: any, point: Vector3?, normal: Vector3?, inst: Inst
 		plan.kind, plan.reason = "ineligible", "ineligible_surface"
 		return plan
 	end
-	local solved = JumpMath.solve(self.pos, plan.seat, self.up, normal, self.gravity, DT, loco.flight_time_min_s, loco.flight_time_max_s, loco.max_launch_speed_wu_s)
+	local solved = JumpMath.solve(self.pos, plan.seat, self.up, normal, self.gravity, DT, loco.flight_time_min_s, math.max(loco.flight_time_min_s,loco.flight_time_max_s*math.sqrt(self.reachFactor)), loco.max_launch_speed_wu_s*math.sqrt(self.reachFactor))
 	if #solved.valid == 0 then
 		plan.reason = solved.reason
 		return plan
@@ -5146,6 +5267,13 @@ function Motor.setAimRay(self: any, origin: Vector3, direction: Vector3)
 end
 
 -- The aim: whatever the centre ray meets (no target magnet). Re-planned only when the aim or the spider moves.
+-- Frozen JumpPlanner.configure: scale speed and maximum flight time by sqrt(reach), never gravity or the collider.
+function Motor.setReachFactor(self: any, reach: number)
+ if self.reachFactor==reach then return end
+ self.reachFactor=math.clamp(reach,0.1,10)
+ self.planKey="";self.plan=nil
+end
+
 function Motor.aimPlan(self: any): any
 	local hit = self:_ray(self.aimOrigin, self.aimDirection * AIM_RANGE)
 	local key = if hit
@@ -5622,7 +5750,7 @@ return Motor
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="43">
+        <Item class="ModuleScript" referent="44">
           <Properties>
             <string name="Name">StickCarry</string>
             <string name="Source"><![CDATA[--!strict
@@ -5682,7 +5810,7 @@ return StickCarry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="44">
+        <Item class="ModuleScript" referent="45">
           <Properties>
             <string name="Name">SupportMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -5764,7 +5892,7 @@ return SupportMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="45">
+        <Item class="ModuleScript" referent="46">
           <Properties>
             <string name="Name">TetherMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -5833,11 +5961,11 @@ return T
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="46">
+      <Item class="Folder" referent="47">
         <Properties>
           <string name="Name">Perception</string>
         </Properties>
-        <Item class="ModuleScript" referent="47">
+        <Item class="ModuleScript" referent="48">
           <Properties>
             <string name="Name">Observation</string>
             <string name="Source"><![CDATA[--!strict
@@ -5994,7 +6122,7 @@ return Observation
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="48">
+        <Item class="ModuleScript" referent="49">
           <Properties>
             <string name="Name">ObservationMemory</string>
             <string name="Source"><![CDATA[--!strict
@@ -6448,7 +6576,7 @@ return ObservationMemory
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="49">
+        <Item class="ModuleScript" referent="50">
           <Properties>
             <string name="Name">PerceptionMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -6625,7 +6753,7 @@ return PerceptionMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="50">
+        <Item class="ModuleScript" referent="51">
           <Properties>
             <string name="Name">Sensor</string>
             <string name="Source"><![CDATA[--!strict
@@ -7040,7 +7168,7 @@ return Sensor
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="51">
+        <Item class="ModuleScript" referent="52">
           <Properties>
             <string name="Name">SensorCore</string>
             <string name="Source"><![CDATA[--!strict
@@ -7483,7 +7611,7 @@ return SensorCore
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="52">
+        <Item class="ModuleScript" referent="53">
           <Properties>
             <string name="Name">Signal</string>
             <string name="Source"><![CDATA[--!strict
@@ -7524,11 +7652,11 @@ return Signal
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="53">
+      <Item class="Folder" referent="54">
         <Properties>
           <string name="Name">Persistence</string>
         </Properties>
-        <Item class="ModuleScript" referent="54">
+        <Item class="ModuleScript" referent="55">
           <Properties>
             <string name="Name">Checkpoint</string>
             <string name="Source"><![CDATA[--!strict
@@ -7552,8 +7680,8 @@ return Signal
 -- escapes, so a return to a rest meets the same wasp. A visit going on is not kept; restoring ends it. A record without one (the port's
 -- first checkpoints were made before the wasp) gets the record of a life it has not yet visited.
 -- Differences from Godot: the record is the port's own (its flies are the port's, Chet's ROBLOX flies, not Godot's), so
--- Godot checkpoints are not read and schema numbers start again at 1. The passing shadow, growth and the notebook
--- are not ported, so they are not recorded.
+-- Godot checkpoints are not read and schema numbers start again at 1. Schema 3 adds growth and its food ledger cursor.
+-- The passing shadow and notebook are not recorded.
 
 local ObjectRecord = require(script.Parent.ObjectRecord)
 local Fly = require(script.Parent.Parent.Prey.Fly)
@@ -7571,12 +7699,13 @@ local Observation = require(script.Parent.Parent.Perception.Observation)
 local NeedsModel = require(script.Parent.Parent.Life.NeedsModel)
 local LifeLoop = require(script.Parent.Parent.Life.LifeLoop)
 local LifeClock = require(script.Parent.Parent.Life.LifeClock)
+local Growth = require(script.Parent.Parent.Life.Growth)
 local Layout = require(script.Parent.Parent.Habitat.WindowsillLayout)
 local WaspDirector = require(script.Parent.Parent.Predator.WaspDirector)
 
 local Checkpoint = {}
 
-Checkpoint.SCHEMA_VERSION = 2
+Checkpoint.SCHEMA_VERSION = 3
 Checkpoint.KIND = "retreat_checkpoint"
 Checkpoint.GAME = "the-windowsill-roblox"
 -- Changes whenever the windowsill's pieces or perches change in a way an old checkpoint could not be put back into.
@@ -7590,7 +7719,7 @@ Checkpoint.CLASSES = {
 	PerchGraph = PerchGraph, Feeding = Feeding, PreyDirector = PreyDirector,
 	Sensor = Sensor, SensorCore = SensorCore, ObservationMemory = ObservationMemory, Contact = ObservationMemory.Contact,
 	Observation = Observation,
-	NeedsModel = NeedsModel, LifeLoop = LifeLoop, LifeClock = LifeClock,
+	NeedsModel = NeedsModel, LifeLoop = LifeLoop, LifeClock = LifeClock, Growth = Growth,
 }
 
 -- What the world is made of that a record keeps by name instead of copying (see ObjectRecord). The same function names them
@@ -7691,7 +7820,13 @@ local function checkWorld(roots: { [string]: any }, problems: { string })
 	-- The clock and the rest.
 	for _, p in LifeClock.problems(if type(life.clock) == "table" then LifeClock.toRecord(life.clock) else nil) do bad(p) end
 	if getmetatable(life.clock) ~= LifeClock then bad("life: the clock is not a life clock") end
-	if type(life.resting) ~= "boolean" then bad("life: 'resting' is not true or false") end
+	if getmetatable(life.growth) ~= Growth then bad("growth: missing growth state")
+ else
+  for _,p in Growth.problems(life.growth:toRecord()) do bad(p) end
+  if life.growth:isMoulting() and not life.resting then bad("growth: moult outside rest") end
+ end
+ if not finite(life.grantedSeen) or life.grantedSeen<0 or life.grantedSeen>needs.grantedTotal+1e-6 then bad("growth: invalid food ledger cursor") end
+ if type(life.resting) ~= "boolean" then bad("life: 'resting' is not true or false") end
 	-- The flies: unique ids, a known state, finite places, perches held only by flies that exist.
 	if type(prey.flies) ~= "table" then
 		bad("prey: no list of flies")
@@ -7778,6 +7913,11 @@ function Checkpoint.check(record: any, world: World): ({ string }, ObjectRecord.
 		return problems, nil
 	end
 	local roots = decoded.roots
+ -- Schemas 1/2 had no growth. Migrate only old records; never repair a damaged schema 3 record.
+ if sv < 3 and type(roots.life)=="table" and type(roots.needs)=="table" then
+  if roots.life.growth == nil then roots.life.growth=Growth.new() end
+  if roots.life.grantedSeen == nil then roots.life.grantedSeen=roots.needs.grantedTotal end
+ end
 	local ok: boolean, err: any = (pcall :: any)(checkWorld, roots, problems)
 	if not ok then bad("world: " .. tostring(err)) end
 	if #problems > 0 then return problems, nil end
@@ -7819,7 +7959,7 @@ return Checkpoint
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="55">
+        <Item class="ModuleScript" referent="56">
           <Properties>
             <string name="Name">CheckpointStore</string>
             <string name="Source"><![CDATA[--!strict
@@ -7991,7 +8131,7 @@ return CheckpointStore
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="56">
+        <Item class="ModuleScript" referent="57">
           <Properties>
             <string name="Name">Json</string>
             <string name="Source"><![CDATA[--!strict
@@ -8116,7 +8256,7 @@ return Json
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="57">
+        <Item class="ModuleScript" referent="58">
           <Properties>
             <string name="Name">ObjectRecord</string>
             <string name="Source"><![CDATA[--!strict
@@ -8452,11 +8592,11 @@ return ObjectRecord
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="58">
+      <Item class="Folder" referent="59">
         <Properties>
           <string name="Name">Predator</string>
         </Properties>
-        <Item class="ModuleScript" referent="59">
+        <Item class="ModuleScript" referent="60">
           <Properties>
             <string name="Name">WaspDirector</string>
             <string name="Source"><![CDATA[--!strict
@@ -9142,11 +9282,11 @@ return WaspDirector
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="60">
+      <Item class="Folder" referent="61">
         <Properties>
           <string name="Name">Prey</string>
         </Properties>
-        <Item class="ModuleScript" referent="61">
+        <Item class="ModuleScript" referent="62">
           <Properties>
             <string name="Name">Feeding</string>
             <string name="Source"><![CDATA[--!strict
@@ -9201,7 +9341,7 @@ return F
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="62">
+        <Item class="ModuleScript" referent="63">
           <Properties>
             <string name="Name">Fly</string>
             <string name="Source"><![CDATA[--!strict
@@ -9418,7 +9558,7 @@ return Fly
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="63">
+        <Item class="ModuleScript" referent="64">
           <Properties>
             <string name="Name">FlyFlight</string>
             <string name="Source"><![CDATA[--!strict
@@ -9483,7 +9623,7 @@ return F
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="64">
+        <Item class="ModuleScript" referent="65">
           <Properties>
             <string name="Name">FlySenses</string>
             <string name="Source"><![CDATA[--!strict
@@ -9545,7 +9685,7 @@ return S
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="65">
+        <Item class="ModuleScript" referent="66">
           <Properties>
             <string name="Name">PerchGraph</string>
             <string name="Source"><![CDATA[--!strict
@@ -9595,7 +9735,7 @@ return G
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="66">
+        <Item class="ModuleScript" referent="67">
           <Properties>
             <string name="Name">PreyDirector</string>
             <string name="Source"><![CDATA[--!strict
@@ -9717,7 +9857,7 @@ return D
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="67">
+        <Item class="ModuleScript" referent="68">
           <Properties>
             <string name="Name">PreyMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -9807,7 +9947,7 @@ return M
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="68">
+        <Item class="ModuleScript" referent="69">
           <Properties>
             <string name="Name">PreyPopulation</string>
             <string name="Source"><![CDATA[--!strict
@@ -9839,7 +9979,7 @@ return P
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="69">
+        <Item class="ModuleScript" referent="70">
           <Properties>
             <string name="Name">PreyRandom</string>
             <string name="Source"><![CDATA[--!strict
@@ -9853,11 +9993,11 @@ return R
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="70">
+      <Item class="Folder" referent="71">
         <Properties>
           <string name="Name">Rig</string>
         </Properties>
-        <Item class="ModuleScript" referent="71">
+        <Item class="ModuleScript" referent="72">
           <Properties>
             <string name="Name">Anatomy</string>
             <string name="Source"><![CDATA[--!strict
@@ -9989,7 +10129,7 @@ return Anatomy
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="72">
+        <Item class="ModuleScript" referent="73">
           <Properties>
             <string name="Name">Idle</string>
             <string name="Source"><![CDATA[--!strict
@@ -10046,7 +10186,7 @@ return Idle
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="73">
+        <Item class="ModuleScript" referent="74">
           <Properties>
             <string name="Name">PeacockDance</string>
             <string name="Source"><![CDATA[--!strict
@@ -10218,7 +10358,7 @@ return PeacockDance
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="74">
+        <Item class="ModuleScript" referent="75">
           <Properties>
             <string name="Name">Setae</string>
             <string name="Source"><![CDATA[--!strict
@@ -10529,7 +10669,7 @@ return Setae
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="75">
+        <Item class="ModuleScript" referent="76">
           <Properties>
             <string name="Name">SpiderChoice</string>
             <string name="Source"><![CDATA[--!strict
@@ -10572,7 +10712,7 @@ return SpiderChoice
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="76">
+        <Item class="ModuleScript" referent="77">
           <Properties>
             <string name="Name">SpiderRig</string>
             <string name="Source"><![CDATA[--!strict
@@ -10589,6 +10729,7 @@ local Appearances = require(script.Parent.Parent.Data.Appearances)
 local Anatomy = require(script.Parent.Anatomy)
 local Setae = require(script.Parent.Setae)
 local Idle = require(script.Parent.Idle)
+local Growth = require(script.Parent.Parent.Life.Growth)
 local v3 = Anatomy.v3
 
 local SpiderRig = {}
@@ -10655,6 +10796,12 @@ export type Rig = typeof(setmetatable(
 		_parts: { BasePart },
 		_cframes: { CFrame },
 		_k: number,
+  _growth: number,
+  _softness: number,
+  _condition: number,
+  _shownCondition: number,
+  _sizes: {[BasePart]: Vector3},
+  _colors: {[BasePart]: Color3},
 		_drop: number,
 		_fan: Fan?,
 		dance: any, -- a PeacockDance.Pose, or nil: the peacock spider's display (ignored by an appearance without a fan)
@@ -10775,6 +10922,8 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		_parts = {} :: { BasePart },
 		_cframes = {} :: { CFrame },
 		_k = look.scale or 1,
+  _growth = 1, _softness = 0, _condition = 0.55, _shownCondition = 0.55,
+  _sizes = {} :: {[BasePart]: Vector3}, _colors = {} :: {[BasePart]: Color3},
 		_drop = look.bodyDrop or 0,
 		_fan = nil :: Fan?,
 		dance = nil :: any,
@@ -10992,7 +11141,8 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 			for j, k in fc.back.layers do add(fan.back, fc.layers[k], fc.back.plane - (j - 1) * fc.layerStep) end
 		end
 		for _, f in fc.figure do
-			local part = disc(model, "FanFigure", color(fc.figureColor), 0)
+			if f.fullOnly and detailName == "low" then continue end
+			local part = disc(model, if f.color then "FanGlint" else "FanFigure", color(f.color or fc.figureColor), 0)
 			table.insert(fan.figure, { part = part, x = f.x, z = f.z, rx = f.rx, rz = f.rz, angle = f.angle })
 			table.insert(fan.parts, part)
 		end
@@ -11013,15 +11163,36 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		hl.Parent = model
 		self._highlight = hl
 	end
-	model.Parent = parent
+ for _,p in model:GetChildren() do
+  if p:IsA("BasePart") and p~=root then self._sizes[p]=p.Size;self._colors[p]=p.Color end
+ end
+ model.Parent = parent
 	self:setGrowthStage(0)
 	return self
 end
 
--- The selected appearance stays black and white at every life stage.
--- Growth is a separate display scale when LIFE is ported; it must not recolor this design.
+-- Scale about the support plane, not the collider centre. Planted contacts remain world-space points.
 function SpiderRig.setGrowthStage(self: Rig, stage: number)
-	self.model:SetAttribute("GrowthStage", math.clamp(stage, 0, 3))
+ local index=math.clamp(math.floor(stage),0,3)
+ self.model:SetAttribute("GrowthStage",index)
+ local g=Growth.SCALES[index+1]
+ if self._growth==g then return end
+ self._growth=g
+ self._k=(self._appearance.scale or 1)*g
+ self._drop=0.31-(0.31-(self._appearance.bodyDrop or 0))*g
+ for p,size in self._sizes do p.Size=size*g end
+end
+function SpiderRig.setSoftness(self: Rig, value: number)
+ local s=math.clamp(value,0,1)
+ if math.abs(s-self._softness)<0.001 then return end
+ self._softness=s
+ for p,c in self._colors do
+  -- The eyes stay dark and readable; pigment returns as the skin hardens.
+  if p.Material~=Enum.Material.Glass and p.Name~="Catchlight" then p.Color=c:Lerp(Color3.new(0.88,0.82,0.69),s*0.72) end
+ end
+end
+function SpiderRig.setCondition(self: Rig, energy: number)
+ self._condition=math.clamp(energy,0,1)
 end
 
 -- How many parts the drawn spider is made of (the model's direct parts), for budgets and the docs.
@@ -11049,7 +11220,7 @@ local function restLocal(self: Rig, leg: Leg): Vector3
 	local s = self._appearance.limbs.stance
 	local longer = self._appearance.limbs.pairReach
 	local r = s.reach * (if longer then longer[leg.pair] else 1) -- the peacock spider's legs III are the longest
-	return Vector3.new(leg.side * s.x * r, s.y, self._appearance.limbs.tipZ[leg.pair] * r)
+	return Vector3.new(leg.side * s.x * r, s.y, self._appearance.limbs.tipZ[leg.pair] * r) * self._growth
 end
 
 -- Display-only foothold: retract toward the body at a narrow edge; never invents a platform.
@@ -11074,7 +11245,11 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 	local body = if self._drop ~= 0 then collider * CFrame.new(0, -self._drop, 0) else collider
 	local up = body.UpVector
 	local look, cfg, A = self._appearance, self._cfg, self._layout
-	local k = self._k
+	local k, g = self._k, self._growth
+ self._shownCondition += math.clamp(self._condition-self._shownCondition,-0.12*dt,0.12*dt)
+ local conditionValue=self._shownCondition
+ local condition=Vector3.new(0.84+0.30*conditionValue,0.84+0.30*conditionValue,0.93+0.12*conditionValue)
+ local function scaledFrame(cf: CFrame): CFrame return if g==1 then cf else CFrame.new(cf.Position*g)*cf.Rotation end
 	local parts, cframes = self._parts, self._cframes
 	table.clear(parts)
 	table.clear(cframes)
@@ -11100,16 +11275,16 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 		if self._calm > 0 then
 			local c = self._calm * self._calm * (3 - 2 * self._calm)
 			local pose = Idle.pose(self._t, c, idle)
-			bodyBase = body * CFrame.new(0, pose.bodyLift, 0)
-			headBase = bodyBase * CFrame.new(A.neck) * CFrame.Angles(pose.headPitch, pose.headYaw, pose.headRoll) * CFrame.new(-A.neck)
-			abdomenBase = bodyBase * CFrame.new(0, pose.abdomenLift, 0) * CFrame.new(A.pedicelCenter)
-				* CFrame.Angles(-pose.abdomenPitch, 0, 0) * CFrame.new(-A.pedicelCenter)
+			bodyBase = body * CFrame.new(0, pose.bodyLift*g, 0)
+			headBase = bodyBase * CFrame.new(A.neck*g) * CFrame.Angles(pose.headPitch, pose.headYaw, pose.headRoll) * CFrame.new(-A.neck*g)
+			abdomenBase = bodyBase * CFrame.new(0, pose.abdomenLift*g, 0) * CFrame.new(A.pedicelCenter*g)
+				* CFrame.Angles(-pose.abdomenPitch, 0, 0) * CFrame.new(-A.pedicelCenter*g)
 		end
 	end
 	if dancing then
 		-- The abdomen pitches up about the pedicel and sways side to side (about the body's long axis), the palps flick in unison.
-		abdomenBase = bodyBase * CFrame.new(A.pedicelCenter) * CFrame.Angles(0, 0, display.abdomenSway + display.shiver)
-			* CFrame.Angles(-display.abdomenPitch, 0, 0) * CFrame.new(-A.pedicelCenter)
+		abdomenBase = bodyBase * CFrame.new(A.pedicelCenter*g) * CFrame.Angles(0, 0, display.abdomenSway + display.shiver)
+			* CFrame.Angles(-display.abdomenPitch, 0, 0) * CFrame.new(-A.pedicelCenter*g)
 		palpAngle = { palpAngle[1] + display.palp, palpAngle[2] + display.palp }
 	end
 	local pivots = {
@@ -11120,9 +11295,16 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 		local base = if f.group == G_HEAD then headBase elseif f.group == G_ABDOMEN then abdomenBase else bodyBase
 		local palp = f.palp
 		if palp then
-			put(f.part, base * pivots[palp] * f.offset)
+			put(f.part, base * scaledFrame(pivots[palp] * f.offset))
 		else
-			put(f.part, base * f.offset)
+			local offset=f.offset
+    if f.group==G_ABDOMEN then
+     local p=A.abdomenCenter+(offset.Position-A.abdomenCenter)*condition
+     offset=CFrame.new(p)*offset.Rotation
+     local size=self._sizes[f.part]*g*condition
+     if (f.part.Size-size).Magnitude>1e-5 then f.part.Size=size end
+    end
+    put(f.part, base * scaledFrame(offset))
 		end
 	end
 
@@ -11154,7 +11336,7 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 		if not grounded then
 			leg.planted = nil
 			leg.swing = -1
-			leg.foot = body:PointToWorldSpace(Vector3.new(leg.side * 0.47 * k, -0.12 * k, L.tipZ[leg.pair] * 0.72))
+			leg.foot = body:PointToWorldSpace(Vector3.new(leg.side * 0.47 * k, -0.12 * k, L.tipZ[leg.pair] * 0.72 * g))
 		else
 			if leg.planted == nil then
 				local hit = target(self, body, leg)
@@ -11197,9 +11379,9 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 	if started then
 		self._group = 1 - self._group
 	end
-	local kneeUp = if grounded then L.kneeLift else L.kneeLiftAir
+	local kneeUp = (if grounded then L.kneeLift else L.kneeLiftAir)*g
 	for _, leg in self._legs do
-		local hip = bodyBase:PointToWorldSpace(Vector3.new(leg.side * L.hipX, L.hipY, L.hipZ[leg.pair]))
+		local hip = bodyBase:PointToWorldSpace(Vector3.new(leg.side * L.hipX, L.hipY, L.hipZ[leg.pair])*g)
 		local foot = leg.foot
 		local knee = hip:Lerp(foot, 0.48) + up * kneeUp
 		local own = if dancing and look.pairs then look.pairs[leg.pair] else nil
@@ -11208,12 +11390,12 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 			local raise = display.legsRaise
 			local upAt = Vector3.new(leg.side * own.up.x, own.up.y, own.up.z)
 			local sweptAt = Vector3.new(leg.side * own.swept.x, own.swept.y, own.swept.z)
-			local raised = bodyBase:PointToWorldSpace(upAt:Lerp(sweptAt, display.legsWave))
+			local raised = bodyBase:PointToWorldSpace(upAt:Lerp(sweptAt, display.legsWave)*g)
 			foot = foot:Lerp(raised, raise)
-			local raisedKnee = hip:Lerp(raised, 0.5) + bodyBase.RightVector * (leg.side * own.kneeOut) + up * look.dance.kneeUp
+			local raisedKnee = hip:Lerp(raised, 0.5) + bodyBase.RightVector * (leg.side * own.kneeOut*g) + up * look.dance.kneeUp*g
 			knee = knee:Lerp(raisedKnee, raise)
 		end
-		local ankle = knee:Lerp(foot, ANKLE_SHARE) + up * L.ankleLift
+		local ankle = knee:Lerp(foot, ANKLE_SHARE) + up * (L.ankleLift*g)
 		local function segment(index: number, p: Part, band: Part?, a: Vector3, b: Vector3)
 			local len = math.max((b - a).Magnitude, 0.01)
 			if math.abs(p.Size.X - len) > 1e-3 then
@@ -11233,7 +11415,7 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 					local c, s = math.cos(spec.theta), math.sin(spec.theta)
 					local base = Vector3.new((spec.t - 0.5) * len, r * 0.8 * c, r * 0.8 * s)
 					local dir = Vector3.new(1.3, c, s).Unit
-					put(hair.part, rc * CFrame.lookAt(base + dir * (spec.length * 0.5), base + dir * spec.length, Vector3.xAxis))
+					put(hair.part, rc * CFrame.lookAt(base + dir * (spec.length * g * 0.5), base + dir * spec.length*g, Vector3.xAxis))
 				end
 			end
 		end
@@ -11253,6 +11435,17 @@ end
 function SpiderRig._drawFan(self: Rig, abdomen: CFrame, open: number, put: (BasePart, CFrame) -> ())
 	local fan = self._fan :: Fan
 	local fc, A = fan.cfg, self._layout
+ local g=self._growth
+ local c=self._shownCondition
+ local condition=Vector3.new(.84+.30*c,.84+.30*c,.93+.12*c)
+ local output=put
+ local inverse=abdomen:Inverse()
+ put=function(p: BasePart,cf: CFrame)
+  local relative=inverse*cf
+  local at=A.abdomenCenter+(relative.Position-A.abdomenCenter)*condition
+  p.Size=p.Size*condition
+  output(p,abdomen*CFrame.new(at*g)*relative.Rotation)
+ end
 	local sx = fc.folded[1] + (1 - fc.folded[1]) * open
 	local sz = fc.folded[2] + (1 - fc.folded[2]) * open
 	local fold = 1 - open
@@ -11261,7 +11454,7 @@ function SpiderRig._drawFan(self: Rig, abdomen: CFrame, open: number, put: (Base
 	local thick = fc.thickness + (fc.foldedThickness - fc.thickness) * fold
 	local function place(d: FanDisc, y: number, t: number)
 		local rx, rz = math.max((fc.radii[1] - d.inset) * sx, 0.002), math.max((fc.radii[2] - d.inset) * sz, 0.002)
-		local size = Vector3.new(rx * 2, t, rz * 2)
+		local size = Vector3.new(rx * 2, t, rz * 2)*g
 		if (d.part.Size - size).Magnitude > 1e-5 then d.part.Size = size end
 		put(d.part, abdomen * CFrame.new(0, y, z))
 	end
@@ -11271,13 +11464,14 @@ function SpiderRig._drawFan(self: Rig, abdomen: CFrame, open: number, put: (Base
 	local figureY = top + #fan.front * fc.layerStep + (thick - fc.thickness) * 0.5
 	local show = open * open * (3 - 2 * open) -- the black figure shows as the fan opens, and is gone when it is folded
 	for _, f in fan.figure do
-		local size = Vector3.new(math.max(f.rx * fc.radii[1] * sx * 2 * show, 0.002), fc.thickness, math.max(f.rz * fc.radii[2] * sz * 2 * show, 0.002))
+		local size = Vector3.new(math.max(f.rx * fc.radii[1] * sx * 2 * show, 0.002), fc.thickness, math.max(f.rz * fc.radii[2] * sz * 2 * show, 0.002))*g
 		if (f.part.Size - size).Magnitude > 1e-5 then f.part.Size = size end
 		put(f.part, abdomen * CFrame.new(f.x * fc.radii[1] * sx, figureY, z + f.z * fc.radii[2] * sz) * CFrame.Angles(0, f.angle, 0))
 	end
 	local fl = fc.flaps
 	local angle = math.rad(fl.foldedDeg) * (1 - open)
 	for _, f in fan.flaps do
+		f.part.Size=self._sizes[f.part]*g
 		local hinge = Vector3.new(f.side * fl.hingeX, A.abdomenCenter.Y + fl.hingeY, A.abdomenCenter.Z + fc.zShift * open)
 		put(f.part, abdomen * CFrame.new(hinge) * CFrame.Angles(0, 0, f.side * angle) * CFrame.new(f.side * fl.radii[1], 0, 0))
 	end
@@ -11325,7 +11519,7 @@ end
 
 -- Where the dragline leaves the body.
 function SpiderRig.spinneretPoint(self: Rig, body: CFrame): Vector3
-	return body:PointToWorldSpace(self._layout.spinneret - Vector3.new(0, self._drop, 0))
+	return body:PointToWorldSpace(self._layout.spinneret*self._growth - Vector3.new(0, self._drop, 0))
 end
 
 function SpiderRig.destroy(self: Rig)
@@ -11337,11 +11531,11 @@ return SpiderRig
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="77">
+      <Item class="Folder" referent="78">
         <Properties>
           <string name="Name">UI</string>
         </Properties>
-        <Item class="ModuleScript" referent="78">
+        <Item class="ModuleScript" referent="79">
           <Properties>
             <string name="Name">ControlText</string>
             <string name="Source"><![CDATA[--!strict
@@ -11589,7 +11783,7 @@ return ControlText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="79">
+        <Item class="ModuleScript" referent="80">
           <Properties>
             <string name="Name">EyeOptics</string>
             <string name="Source"><![CDATA[--!strict
@@ -11922,7 +12116,7 @@ return EyeOptics
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="80">
+        <Item class="ModuleScript" referent="81">
           <Properties>
             <string name="Name">HudLayout</string>
             <string name="Source"><![CDATA[--!strict
@@ -12029,7 +12223,7 @@ return HudLayout
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="81">
+        <Item class="ModuleScript" referent="82">
           <Properties>
             <string name="Name">LifeText</string>
             <string name="Source"><![CDATA[--!strict
@@ -12094,7 +12288,7 @@ return LifeText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="82">
+        <Item class="ModuleScript" referent="83">
           <Properties>
             <string name="Name">PeacockText</string>
             <string name="Source"><![CDATA[--!strict
@@ -12157,7 +12351,7 @@ return PeacockText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="83">
+        <Item class="ModuleScript" referent="84">
           <Properties>
             <string name="Name">PerceptionShapes</string>
             <string name="Source"><![CDATA[--!strict
@@ -12250,7 +12444,7 @@ return Shapes
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="84">
+        <Item class="ModuleScript" referent="85">
           <Properties>
             <string name="Name">PerceptionText</string>
             <string name="Source"><![CDATA[--!strict
@@ -12266,7 +12460,7 @@ return table.freeze(Text)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="85">
+        <Item class="ModuleScript" referent="86">
           <Properties>
             <string name="Name">PerceptionView</string>
             <string name="Source"><![CDATA[--!strict
@@ -12315,7 +12509,7 @@ return View
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="86">
+        <Item class="ModuleScript" referent="87">
           <Properties>
             <string name="Name">WaspText</string>
             <string name="Source"><![CDATA[--!strict
@@ -12436,23 +12630,23 @@ return WaspText
       </Item>
     </Item>
   </Item>
-  <Item class="ServerScriptService" referent="87">
+  <Item class="ServerScriptService" referent="88">
     <Properties>
       <string name="Name">ServerScriptService</string>
     </Properties>
-    <Item class="Folder" referent="88">
+    <Item class="Folder" referent="89">
       <Properties>
         <string name="Name">PortTests</string>
       </Properties>
-      <Item class="ModuleScript" referent="89">
+      <Item class="ModuleScript" referent="90">
         <Properties>
           <string name="Name">BuildInfo</string>
           <string name="Source"><![CDATA[-- Generated by tools/build.py; do not edit.
-return { id = "589d9e7bbe94f6b1" }
+return { id = "0ee32d97f26bd2fd" }
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="90">
+      <Item class="ModuleScript" referent="91">
         <Properties>
           <string name="Name">GraphicsSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -12568,7 +12762,64 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="91">
+      <Item class="ModuleScript" referent="92">
+        <Properties>
+          <string name="Name">GrowthSpec</string>
+          <string name="Source"><![CDATA[--!strict
+return function(check: (string, () -> ()) -> ())
+ local Shared=game:GetService("ReplicatedStorage"):WaitForChild("Shared")
+ local Rig=require(Shared.Rig.SpiderRig)
+ local Growth=require(Shared.Life.Growth)
+ local Support=require(Shared.Movement.SupportMath)
+ local Dance=require(Shared.Rig.PeacockDance)
+ local folder=Instance.new("Folder");folder.Name="GrowthTestWorld";folder.Parent=workspace
+ local surface=Instance.new("Part");surface.Size=Vector3.new(20,1,20);surface.Anchored=true;surface.Parent=folder
+ for _,normal in {Vector3.yAxis,Vector3.xAxis,-Vector3.yAxis} do
+  check("growth: planted feet and unchanged root on "..tostring(normal),function()
+   local frame=Support.bodyCFrame(Vector3.new(300,0,0),normal,-Vector3.zAxis)
+   surface.CFrame=frame*CFrame.new(0,-.5,0)
+   for _,id in {"first_spider","maratus_volans_male"} do
+    local rig=Rig.new(folder,folder,id,"full");rig.reducedMotion=true
+    local body=frame*CFrame.new(0,.31,0)
+    for _=1,10 do rig:update(body,1/60,true,false) end
+    local size=rig.root.Size
+    for stage=1,3 do
+     local feet={};for i,l in rig._legs do feet[i]=l.foot;assert(l.planted,"foot not on surface") end
+     rig:setGrowthStage(stage);rig:update(body,0,true,false)
+     for i,l in rig._legs do assert((l.foot-feet[i]).Magnitude<1e-4,"growth dragged planted foot") end
+     for _=1,25 do rig:update(body,1/60,true,false) end
+     for _,l in rig._legs do assert(math.abs((l.foot-frame.Position):Dot(normal))<.015,"foot left surface") end
+     assert((rig.root.Position-body.Position).Magnitude<1e-4 and rig.root.Size==size,"root changed")
+    end
+    rig:setSoftness(1);rig:setCondition(.1);rig:update(body,1,true,false)
+    assert(rig.model:FindFirstChild("Cephalothorax").Color.R>.5,"not pale")
+    rig:destroy()
+   end
+  end)
+ end
+ check("growth: adult peacock dance and eye visibility",function()
+  surface.CFrame=CFrame.new(300,-.5,0)
+  local r=Rig.new(folder,folder,"maratus_volans_male","full")
+  r:setGrowthStage(3);r.dance=Dance.rawPose(5.2,false)
+  r:update(CFrame.new(300,.31,0),1/60,true,false)
+  assert(r._fan.front[1].part.Size.X>.4,"fan didn't grow")
+  r:setEyeView(true)
+  for _,p in r._fan.parts do assert(p.LocalTransparencyModifier==1,"fan in eyes") end
+  r:destroy()
+ end)
+ check("growth: interrupted record resumes exactly once",function()
+  local g=Growth.new();assert(g:eat(.9));assert(g:beginMoult());g:passHours(4,Vector3.zero)
+  local r=Growth.new();assert(r:load(g:toRecord()))
+  assert(r:passHours(8,Vector3.zero)=="moulted")
+  assert(r.stage==1 and #r.exuviae==1 and r:softness()==1)
+  assert(r:passHours(10,Vector3.zero)=="hardened" and #r.exuviae==1)
+ end)
+ folder:Destroy()
+end
+]]></string>
+        </Properties>
+      </Item>
+      <Item class="ModuleScript" referent="93">
         <Properties>
           <string name="Name">LifeSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -12744,7 +12995,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="92">
+      <Item class="ModuleScript" referent="94">
         <Properties>
           <string name="Name">PeacockSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -12815,7 +13066,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="93">
+      <Item class="ModuleScript" referent="95">
         <Properties>
           <string name="Name">PerceptionSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -12915,7 +13166,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="94">
+      <Item class="ModuleScript" referent="96">
         <Properties>
           <string name="Name">PreySpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -13007,7 +13258,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="95">
+      <Item class="ModuleScript" referent="97">
         <Properties>
           <string name="Name">PromptSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -13069,7 +13320,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="96">
+      <Item class="ModuleScript" referent="98">
         <Properties>
           <string name="Name">RecoveryScenarios</string>
           <string name="Source"><![CDATA[--!strict
@@ -13560,7 +13811,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Script" referent="97">
+      <Item class="Script" referent="99">
         <Properties>
           <string name="Name">Runner</string>
           <token name="RunContext">0</token>
@@ -13597,6 +13848,7 @@ check("Prompt spec completes", function() require(script.Parent.PromptSpec)(chec
 check("Life spec completes", function() require(script.Parent.LifeSpec)(check) end)
 check("Wasp spec completes", function() require(script.Parent.WaspSpec)(check) end)
 check("Peacock spec completes", function() require(script.Parent.PeacockSpec)(check) end)
+check("Growth spec completes", function() require(script.Parent.GrowthSpec)(check) end)
 local report = {suite = "Roblox engine", evidence_id = evidence.id, passed = passed, failed = failed,
 	tests = passed + failed, not_run = 0, engine = version(), results = rows}
 local json = HttpService:JSONEncode(report)
@@ -13612,7 +13864,7 @@ if failed > 0 then warn("PORT_TEST_FAIL") end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="98">
+      <Item class="ModuleScript" referent="100">
         <Properties>
           <string name="Name">SilkSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -13728,7 +13980,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="99">
+      <Item class="ModuleScript" referent="101">
         <Properties>
           <string name="Name">Spec</string>
           <string name="Source"><![CDATA[--!strict
@@ -13859,7 +14111,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="100">
+      <Item class="ModuleScript" referent="102">
         <Properties>
           <string name="Name">WaspSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -14022,11 +14274,11 @@ end
         </Properties>
       </Item>
     </Item>
-    <Item class="Folder" referent="101">
+    <Item class="Folder" referent="103">
       <Properties>
         <string name="Name">Server</string>
       </Properties>
-      <Item class="Script" referent="102">
+      <Item class="Script" referent="104">
         <Properties>
           <string name="Name">Main</string>
           <token name="RunContext">0</token>
@@ -14073,19 +14325,19 @@ sill.Parent = Workspace
       </Item>
     </Item>
   </Item>
-  <Item class="StarterPlayer" referent="103">
+  <Item class="StarterPlayer" referent="105">
     <Properties>
       <string name="Name">StarterPlayer</string>
     </Properties>
-    <Item class="StarterPlayerScripts" referent="104">
+    <Item class="StarterPlayerScripts" referent="106">
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="Folder" referent="105">
+      <Item class="Folder" referent="107">
         <Properties>
           <string name="Name">Client</string>
         </Properties>
-        <Item class="ModuleScript" referent="106">
+        <Item class="ModuleScript" referent="108">
           <Properties>
             <string name="Name">CaughtPanel</string>
             <string name="Source"><![CDATA[--!strict
@@ -14209,7 +14461,7 @@ return CaughtPanel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="107">
+        <Item class="ModuleScript" referent="109">
           <Properties>
             <string name="Name">FlyBodies</string>
             <string name="Source"><![CDATA[--!strict
@@ -14461,7 +14713,47 @@ return FlyBodies
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="108">
+        <Item class="ModuleScript" referent="110">
+          <Properties>
+            <string name="Name">OldSkins</string>
+            <string name="Source"><![CDATA[--!strict
+-- At most three pale, empty skins in the retreat. Presentation only, never queried by movement or senses.
+local OldSkins={}
+OldSkins.__index=OldSkins
+function OldSkins.new(parent: Instance): any
+ local folder=Instance.new("Folder");folder.Name="OldSkins";folder.Parent=parent
+ return setmetatable({folder=folder,key=""},OldSkins)
+end
+function OldSkins.draw(self: any,positions: {Vector3})
+ local key=""
+ for _,p in positions do key..=string.format("%.5f,%.5f,%.5f;",p.X,p.Y,p.Z) end
+ if key==self.key then return end
+ self.key=key;self.folder:ClearAllChildren()
+ for i,p in positions do
+  local center=p+Vector3.new((i-2)*0.23,-0.25,0.06*(i-1))
+  local function piece(name: string,size: Vector3,cf: CFrame)
+   local part=Instance.new("Part");part.Name=name;part.Size=size;part.CFrame=cf
+   part.Anchored=true;part.CanCollide=false;part.CanQuery=false;part.CanTouch=false;part.CastShadow=false
+   part.Color=Color3.new(.78,.71,.57);part.Material=Enum.Material.SmoothPlastic;part.Transparency=.38
+   part.Parent=self.folder
+   return part
+  end
+  local shell=piece("EmptySkin",Vector3.new(.21,.08,.30),CFrame.new(center))
+  local mesh=Instance.new("SpecialMesh");mesh.MeshType=Enum.MeshType.Sphere;mesh.Parent=shell
+  for j=1,8 do
+   local side=if j<=4 then -1 else 1
+   local z=((j-1)%4-1.5)*.065
+   local a=center+Vector3.new(side*.06,0,z)
+   local b=center+Vector3.new(side*.22,.015,z*1.5)
+   piece("ShedLeg",Vector3.new(.018,.018,(b-a).Magnitude),CFrame.lookAt((a+b)*.5,b))
+  end
+ end
+end
+return OldSkins
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="111">
           <Properties>
             <string name="Name">PerceptionHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -14683,7 +14975,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="109">
+        <Item class="ModuleScript" referent="112">
           <Properties>
             <string name="Name">PerceptionStage</string>
             <string name="Source"><![CDATA[--!strict
@@ -14728,7 +15020,7 @@ return Stage
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="110">
+        <Item class="ModuleScript" referent="113">
           <Properties>
             <string name="Name">Soundscape</string>
             <string name="Source"><![CDATA[--!strict
@@ -14762,7 +15054,7 @@ function Soundscape.new(parent: Instance): any
 	emitter.Transparency = 1; emitter.Size = Vector3.new(0.1, 0.1, 0.1); emitter.Parent = root
 	local hum = voice(emitter, "wasp", 0.42, true)
 	hum.RollOffMinDistance = 16; hum.RollOffMaxDistance = 120
-	return setmetatable({ root = root, room = voice(root, "room", 0.16, true),
+	return setmetatable({ root = root, room = voice(root, "room", 0.09, true),
 		waspEmitter = emitter, waspHum = hum,
 		birds = voice(root, "birds", 0.16, false), slots = {}, elapsed = 0, nextBird = 8 }, Soundscape)
 end
@@ -14830,7 +15122,7 @@ return Soundscape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="111">
+        <Item class="ModuleScript" referent="114">
           <Properties>
             <string name="Name">SpiderCamera</string>
             <string name="Source"><![CDATA[--!strict
@@ -14869,7 +15161,7 @@ SpiderCamera.__index = SpiderCamera
 local MIN_DISTANCE, MAX_DISTANCE = 2.0, 12.0
 local TOUCH_DEG_PER_PIXEL = 0.25
 
-export type Target = { pos: Vector3, drawnUp: Vector3, heading: Vector3, onLine: boolean?, rest: Vector3?, lip: Vector3? }
+export type Target = { pos: Vector3, drawnUp: Vector3, heading: Vector3, onLine: boolean?, rest: Vector3?, lip: Vector3?, cameraScale: number? }
 
 function SpiderCamera.new(camera: Camera, params: RaycastParams, target: () -> Target, onEye: (boolean) -> ())
 	local overlap = OverlapParams.new()
@@ -14887,6 +15179,7 @@ function SpiderCamera.new(camera: Camera, params: RaycastParams, target: () -> T
 		aimPitch = 0,
 		aiming = false,
 		distance = CameraMath.CAMERA_DISTANCE,
+  appearanceScale = 1,
 		boom = 0, pivot = 0,
 		pivotDir = Vector3.yAxis,
 		recenterT = -1, recenterYaw0 = 0, recenterElev0 = 0, recenterGaze0 = Vector3.zero,
@@ -14939,13 +15232,17 @@ function SpiderCamera._cast(self: any, from: Vector3, motion: Vector3): number
 	return if hit then math.max(0, hit.Distance - 0.01) else length
 end
 
+function SpiderCamera.viewDistance(self: any): number
+ return self.distance * self.appearanceScale
+end
+
 function SpiderCamera._boomAt(self: any, from: Vector3, yaw: number, pitch: number): number
-	return self:_cast(from, CameraMath.backDirection(yaw, pitch) * self.distance)
+	return self:_cast(from, CameraMath.backDirection(yaw, pitch) * self:viewDistance())
 end
 
 -- camera_rig._pitch_search: the auto-pitch offset from the pivot `from` at this yaw, and the boom it gives.
 function SpiderCamera._pitchSearch(self: any, from: Vector3, yaw: number): (number, number)
-	local comfort = math.min(CameraMath.COMFORT_BOOM, self.distance)
+	local comfort = math.min(CameraMath.COMFORT_BOOM, self:viewDistance())
 	local offsets, lengths = { 0 }, { self:_boomAt(from, yaw, self.elevation) }
 	local step = math.rad(CameraMath.AUTO_PITCH_STEP_DEG)
 	local roomDown = math.max(math.rad(CameraMath.MAX_ELEVATION_DEG) - self.elevation, 0)
@@ -14979,7 +15276,7 @@ end
 -- the camera sees both the spider where it will hang and the lip.
 function SpiderCamera._goodView(self: any, from: Vector3, yaw: number, spot: Vector3, lip: Vector3): boolean
 	local offset, length = self:_pitchSearch(from, yaw)
-	if length < math.min(CameraMath.COMFORT_BOOM, self.distance) then return false end
+	if length < math.min(CameraMath.COMFORT_BOOM, self:viewDistance()) then return false end
 	local camPos = from + CameraMath.backDirection(yaw, CameraMath.effectiveElevation(self.elevation, offset)) * length
 	return self:_sees(camPos, spot) and self:_sees(camPos, lip)
 end
@@ -14990,7 +15287,7 @@ function SpiderCamera._wantedTurn(self: any, t: Target): number
 	local lip = t.lip or rest
 	local from = rest + self.pivotDir * self.pivot
 	local function q(v: Vector3): string return string.format("%.2f,%.2f,%.2f", v.X, v.Y, v.Z) end
-	local key = q(from) .. "|" .. q(lip) .. "|" .. string.format("%.4f,%.4f,%.2f,%.4f", self.yaw, self.elevation, self.distance, self.framing.target)
+	local key = q(from) .. "|" .. q(lip) .. "|" .. string.format("%.4f,%.4f,%.2f,%.4f", self.yaw, self.elevation, self:viewDistance(), self.framing.target)
 	if key ~= self.wantedKey then
 		self.wantedKey = key
 		self.wantedCache = LineFraming.wantedTurn(self.framing.target, self.framing.maxTurn, function(turn: number): boolean
@@ -15093,6 +15390,8 @@ end
 
 -- One fixed 60 Hz tick: pivot, line framing, auto-pitch and boom (orbit), or the gaze carried with the body (eye view).
 function SpiderCamera.tick(self: any, dt: number)
+ local wantedScale = math.clamp(self.target().cameraScale or 1,0.5,1.5)
+ self.appearanceScale += (wantedScale-self.appearanceScale)*(1-math.exp(-4*dt))
 	local t = self.target()
 	if self.eyeView then
 		local up = SupportMath.rotateToward(self.gazeUp, t.drawnUp, math.rad(CameraMath.EYE_ROLL_DEG_S) * dt)
@@ -15121,7 +15420,7 @@ function SpiderCamera.tick(self: any, dt: number)
 		self.autoPitch = CameraMath.easeOffset(self.autoPitch, wanted, dt, CameraMath.AUTO_PITCH_IN_SECONDS, CameraMath.AUTO_PITCH_OUT_SECONDS)
 	end
 	local elev = CameraMath.effectiveElevation(self.elevation, self.autoPitch)
-	self.boom = CameraMath.nextLength(self.boom, self:_boomAt(from, yaw, elev), self.distance, CameraMath.RECOVER_SPEED, if self.settle > 0 then 1 else dt)
+	self.boom = CameraMath.nextLength(self.boom, self:_boomAt(from, yaw, elev), self:viewDistance(), CameraMath.RECOVER_SPEED, if self.settle > 0 then 1 else dt)
 end
 
 local function smooth(k: number): number
@@ -15201,7 +15500,7 @@ return SpiderCamera
 ]]></string>
           </Properties>
         </Item>
-        <Item class="LocalScript" referent="112">
+        <Item class="LocalScript" referent="115">
           <Properties>
             <string name="Name">SpiderClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -15234,6 +15533,8 @@ local SpiderHud = require(script.Parent.SpiderHud)
 local CaughtPanel = require(script.Parent.CaughtPanel)
 local WorldDetail = require(script.Parent.WorldDetail)
 local Soundscape = require(script.Parent.Soundscape)
+local OldSkins = require(script.Parent.OldSkins)
+local skins = OldSkins.new(Workspace)
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Movement = Shared:WaitForChild("Movement")
@@ -15514,6 +15815,7 @@ local cam: any = SpiderCamera.new(camera, params, function()
 	return {
 		pos = motor.pos, drawnUp = drawnUp, heading = motor.heading,
 		onLine = motor:onLine(), rest = motor:lineRestPoint(), lip = motor:lineLip(),
+  cameraScale = (rig._appearance.cameraScale or 1)*math.sqrt(rig._growth),
 	}
 end, function(on: boolean)
 	rig:setEyeView(on)
@@ -15555,7 +15857,7 @@ local controls: any -- bound below (SpiderInput.bind)
 -- Choosing the spider (ROBLOX-31): only while resting awake in the silk-lined crack. The drawn rig is built again with the other appearance;
 -- the gait, the eye view and the hidden body carry over; the choice is kept in the Player attribute Appearance for the session.
 local function canChange(): boolean
-	return life.resting and not life.asleep
+	return life.resting and not life.asleep and not life.growth:isMoulting()
 end
 local function changeSpider()
 	if not canChange() then
@@ -15610,6 +15912,8 @@ local function returnToCheckpoint()
 		return
 	end
 	session.mode, session.rules, session.ended = life.mode or "main", life.rules or "standard", false
+ motor:setReachFactor(life.growth:reachFactor())
+ session:finishAdult(life.growth.stage)
 	session.summary = nil
 	controls:clear()
 	focusState:clear()
@@ -15637,7 +15941,7 @@ local function fresh(mode: string, easy: boolean, position: Vector3?): boolean
  if not initialRecord or (easy and not session.finishedMain) then return false end
  local ok=Checkpoint.restore(initialRecord,checkpointWorld)
  if not ok then return false end
- session:begin(mode,easy);applyRules()
+ session:begin(mode,easy);applyRules();motor:setReachFactor(life.growth:reachFactor())
  sensor:reset();memory:clear()
  stores[mode]=newStore();checkpoints=stores[mode]
  life.resting=false;life.notice="";life.noticeSeconds=0;life.restoreGrace=0
@@ -15658,7 +15962,7 @@ local function continueAnother()
 end
 local function summaryRecord(cause: string): any
  return {cause=cause,hours=math.max((life.clock.day-1)*24+life.clock.hour-LifeClock.START_H,0),
-  meals=prey.feeding.mealsFinished,wasp_visits=wasp.visits,wasp_escapes=wasp.escapes,stage=0}
+  meals=prey.feeding.mealsFinished,wasp_visits=wasp.visits,wasp_escapes=wasp.escapes,stage=life.growth.stage}
 end
 panel=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
  if choice=="Another" then continueAnother()
@@ -15737,6 +16041,7 @@ controls = SpiderInput.bind({
 		feedPending = true -- in the crack, with nothing to eat, the same button rests (Godot's interact)
 	end,
 	jump = function(phase: string)
+  if life.growth:isMoulting() then return end
 		if phase == "begin" and prey.feeding.struggling then prey.feeding:press(); gripPress=true; return end
 		if gripPress then if phase ~= "begin" then gripPress=false end; return end
 		if phase == "begin" then
@@ -15760,7 +16065,7 @@ controls = SpiderInput.bind({
 		focusState:cancel(jump:isBusy() or #jump.events > 0 or motor:onLine())
 		jump:cancel()
 	end,
-	drop = function() dance:stop(); motor:requestDrop() end,
+	drop = function() if life.growth:isMoulting() then return end; dance:stop(); motor:requestDrop() end,
 	clear = dropAll,
 	reset = function() if not panel:isShowing() then returnToCheckpoint() end end, -- the catch screen has its own way back
 	gait = function() rig.gaitMode = if rig.gaitMode == "Tetrapod" then "Unilateral" else "Tetrapod" end,
@@ -15780,6 +16085,7 @@ controls = SpiderInput.bind({
 
 -- One fixed tick's intent from the controls, for the motor.
 local function tickInput(): any
+ if life.growth:isMoulting() then return SpiderMotor.idleInput() end
 	local r, f = controls:axes()
 	local wish = Vector3.zero
 	if r ~= 0 or f ~= 0 then
@@ -15865,12 +16171,19 @@ local function updateHud(frameDt: number)
 	elseif prey.feeding.feeding then table.insert(view.status, "Feeding — move to stop")
 	elseif prey.feeding.held then table.insert(view.status, "Meal paused — " .. ControlText.name(device,"feed") .. " to eat") end
 	local clock = life.clock
-	view.day = LifeText.day(clock.day, clock:partOfDay()) .. (if session.mode=="free" then " | FREE PLAY" elseif session.rules=="gentle" then " | EASY" else "")
+	view.day = LifeText.day(clock.day, clock:partOfDay()) .. " | " .. life.growth:stageName() .. (if session.mode=="free" then " | FREE PLAY" elseif session.rules=="gentle" then " | EASY" else "")
 	view.dayLine = LifeText.line(clock:partOfDay(), needs.energy, needs:isStarving(), needs.gentle, LifeLoop.HUNGRY_AT, life:tooHungryToSleep())
-	view.notice = if life.noticeSeconds > 0 and life.notice ~= "" then life.notice else nil
+ if life.growth.ready then view.dayLine="Ready to moult: rest in the silk-lined crack."
+ elseif life.growth:isSoft() then view.dayLine="Soft new skin: shorter jumps until it hardens." end
+ view.notice = if life.noticeSeconds > 0 and life.notice ~= "" then life.notice else nil
 	local canRest = life:canRest(lifeSpider)
 	local restPrompt = LifeText.prompt(life.asleep, life.resting, canRest, clock:isSleepTime() and not life:tooHungryToSleep(), device, PeacockText.change(device, appearance))
-	if not restPrompt and (motor.pos-Vector3.new(-24,1,6)).Magnitude<7 and not prey.feeding.held then
+ if life.growth:isMoulting() then
+  restPrompt={title="Moulting in the silk-lined crack",hint="The spider pulls free of its old skin. Wait here while the hours pass."}
+ elseif life.growth.ready and canRest and not life.resting then
+  restPrompt={title="Ready to moult",hint=ControlText.name(device,"feed")..": rest and moult in the crack"}
+ end
+ if not restPrompt and (motor.pos-Vector3.new(-24,1,6)).Magnitude<7 and not prey.feeding.held then
   restPrompt={title="Home: the silk-lined crack",hint=if lifeSpider.inRetreat then "Keep still on a surface, then "..ControlText.name(device,"feed")..": rest" else "Walk through the silk-framed opening under the wooden roof, then stop to rest."}
  end
  local canDance = SpiderChoice.canDance(appearance)
@@ -15900,7 +16213,7 @@ local function updateHud(frameDt: number)
 	end
 	if os.clock() > helpUntil and helpVisible then helpVisible = false end
 	local restLabel = LifeText.touchLabel(life.asleep, life.resting, canRest, clock:isSleepTime() and not life:tooHungryToSleep())
-	controls:setTouchVisible("Feed", prey.feeding.held ~= nil or restLabel ~= nil)
+	controls:setTouchVisible("Feed", (prey.feeding.held ~= nil or restLabel ~= nil) and not life.growth:isMoulting())
 	controls:setTouchLabel("Feed", if prey.feeding.held ~= nil then "Eat" else restLabel or "Eat")
 	controls:setTouchLabel("Jump", if prey.feeding.struggling then "Grip" else "Jump")
 	controls:setTouchLabel("Cancel", ControlText.touchCancelLabel(onLine))
@@ -15935,7 +16248,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			if waspPercept then table.insert(percepts, waspPercept) end
 			sensor:step(DT,motor:observer(),percepts,sightCast)
 			prey:before(DT,motor.pos,motor:observer(),sensor,sightCast,camera)
-			jump:step(motor)
+			if life.growth:isMoulting() then jump:drop(motor);motor:cancelWalk() else jump:step(motor) end
 			local input = tickInput()
 			motor:tick(input)
 			-- The wasp runs after the spider has moved and before feeding (Godot: physics priority 8).
@@ -15950,7 +16263,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			waspSpider.falling = fallingOnLine
 			waspSpider.airborne = motor.mode == "air" and not fallingOnLine and not motor.seized
 			wasp:step(DT, waspSpider, {
-				day = life.clock.day, hour = life.clock.hour, resting = life.resting, moulting = false, meals = prey.feeding.mealsFinished,
+				day = life.clock.day, hour = life.clock.hour, resting = life.resting, moulting = life.growth:isMoulting(), meals = prey.feeding.mealsFinished,
 			})
 			for _, signal in wasp:drainSignals() do
 				if signal.kind == "caught" then
@@ -15970,12 +16283,20 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			lifeSpider = {
 				inRetreat = Layout.inRetreat(motor.pos), attached = motor.mode == "attached" and not motor.preparing,
 				still = input.wish.Magnitude < 0.01 and motor.vel.Magnitude < 0.15,
-				holding = holding, feeding = holding and prey.feeding.feeding,
+				holding = holding, feeding = holding and prey.feeding.feeding, position = motor.pos,
 			}
 			life:step(DT, lifeSpider, feedPending, cancelPending)
 			feedPending, cancelPending = false, false
 			sensor.core.rangeScale = life.rangeScale
-			for _,event in life:drainEvents() do if event.kind=="starved" then endLife("starved") end end
+			motor:setReachFactor(life.growth:reachFactor())
+   for _,event in life:drainEvents() do
+    if event.kind=="starved" then endLife("starved")
+    elseif event.kind=="moult_started" then dropAll()
+    elseif event.kind=="moulted" and session:finishAdult(life.growth.stage) then
+     life:showNotice("Your spider is an adult! Easy is now available in the life menu for this session.")
+     life.noticeSeconds=12
+    end
+   end
             if not initialRecord and Checkpoint.boundaryProblem(checkpointWorld)=="" then
              initialRecord=Checkpoint.capture(checkpointWorld,0)
              if initialRecord and not menuStarted then
@@ -16014,7 +16335,13 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 		dancePose = nil
 		rig.dance = nil
 	end
-	rig:update(body, simFrame, motor.mode == "attached", motor.moving)
+ rig.reducedMotion=player:GetAttribute("ReducedMotion")==true
+ rig:setGrowthStage(life.growth.stage)
+ rig:setSoftness(life.growth:softness())
+ rig:setCondition(needs.energy)
+ local paused=GuiService.MenuIsOpen or panel:isShowing() or menu:isShowing()
+ rig:update(body, if paused then 0 else simFrame, motor.mode == "attached", motor.moving)
+ skins:draw(life.growth.exuviae)
 	updateHud(frameDt)
 	flyBodies:draw(prey.flies,prey.now)
 	local soundPaused = GuiService.MenuIsOpen or panel:isShowing() or menu:isShowing()
@@ -16091,7 +16418,7 @@ end
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="113">
+        <Item class="ModuleScript" referent="116">
           <Properties>
             <string name="Name">SpiderEyes</string>
             <string name="Source"><![CDATA[--!strict
@@ -16549,7 +16876,7 @@ return SpiderEyes
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="114">
+        <Item class="ModuleScript" referent="117">
           <Properties>
             <string name="Name">SpiderHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -16714,20 +17041,20 @@ function Hud.new(playerGui: Instance): any
 	local toast = wrapLabel("Toast", top, 17, 4)
 	local help = wrapLabel("Controls", top, 15, 5)
 	help.TextXAlignment = Enum.TextXAlignment.Left
-	-- The day, and one line for the time of day or hunger, small in the top-left corner (ROBLOX-24).
+	-- Day/stage and notices share one vertical flow, so longer life labels never overlap checkpoint messages.
 	local dayBox = Instance.new("Frame")
 	dayBox.Name = "DayBox"
 	dayBox.BackgroundTransparency = 1
-	dayBox.Position = UDim2.fromOffset(12, 8)
-	dayBox.Size = UDim2.fromOffset(300, 0) -- a fixed width, so the wrapped line inside has one to wrap at
+	dayBox.LayoutOrder = -1
+	dayBox.Size = UDim2.new(1, 0, 0, 0)
 	dayBox.AutomaticSize = Enum.AutomaticSize.Y
 	local dayList = Instance.new("UIListLayout")
 	dayList.HorizontalAlignment = Enum.HorizontalAlignment.Left
 	dayList.SortOrder = Enum.SortOrder.LayoutOrder
 	dayList.Padding = UDim.new(0, 4)
 	dayList.Parent = dayBox
-	dayBox.Parent = safe
-	local day = pill("Day", dayBox, 15, 1)
+	dayBox.Parent = top
+	local day = wrapLabel("Day", dayBox, 15, 1)
 	local dayLine = wrapLabel("DayLine", dayBox, 14, 2)
 	dayLine.TextXAlignment = Enum.TextXAlignment.Left
 	local panel = Instance.new("Frame")
@@ -16826,7 +17153,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="115">
+        <Item class="ModuleScript" referent="118">
           <Properties>
             <string name="Name">SpiderInput</string>
             <string name="Source"><![CDATA[--!strict
@@ -17057,7 +17384,7 @@ return SpiderInput
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="116">
+        <Item class="ModuleScript" referent="119">
           <Properties>
             <string name="Name">WaspBody</string>
             <string name="Source"><![CDATA[--!strict
@@ -17289,7 +17616,7 @@ return WaspBody
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="117">
+        <Item class="ModuleScript" referent="120">
           <Properties>
             <string name="Name">WorldDetail</string>
             <string name="Source"><![CDATA[--!strict
@@ -17329,7 +17656,7 @@ return WorldDetail
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="118">
+        <Item class="ModuleScript" referent="121">
           <Properties>
             <string name="Name">SilkPlayback</string>
             <string name="Source"><![CDATA[--!strict
@@ -17618,13 +17945,55 @@ return function(driver: any)
   driver.needs:addHours(400,false);wait(.7);assert(driver.needs.energy>=.1-1e-9)
   assert(driver.fresh("main",false,nil))
  end)
+ check("GROWTH: three safe moults, old skins, Easy and checkpoint recovery",function()
+  assert(driver.fresh("main",false,nil));driver.place(Vector3.new(-25.5,.31,6));wait(.3)
+  driver.life.clock.hour=12
+  local samples={}
+  local conn=RunService.Heartbeat:Connect(function(dt) table.insert(samples,dt) end)
+  local function press(key)
+   driver.input:simulate(key,true);wait(.08);driver.input:simulate(key,false);wait(.12)
+  end
+  for stage=1,3 do
+   if driver.life.resting then press("Feed") end
+   -- A staged meal credit; the production loop must read the ledger, not a test-only growth hook.
+   driver.needs.energy=0
+   assert(driver.needs:grantEnergy(.9,"growth_test_"..stage)>=.9-1e-9)
+   wait(.1);assert(driver.life.growth.ready,"food did not ready a moult")
+   press("Feed");assert(driver.life.growth:isMoulting(),"moult didn't start")
+   local before=driver.motor.pos
+   driver.input:simulate("Forward",true);press("Jump");press("Drop");wait(.2);driver.input:simulate("Forward",false)
+   assert((driver.motor.pos-before).Magnitude<.02,"moulting spider escaped crack")
+   assert(driver.rig().model:FindFirstChild("Cephalothorax").Color.R>.5,"not pale")
+   local t=0
+   while driver.life.growth.stage<stage and t<12 do t+=RunService.Heartbeat:Wait() end
+   assert(driver.life.growth.stage==stage and #driver.life.growth.exuviae==stage,"moult did not complete once")
+   assert(driver.currentStore():loadBest().ok,"grown checkpoint not kept")
+   assert(driver.rig().model:GetAttribute("GrowthStage")==stage,"rig not grown")
+   driver.returnToCheckpoint();wait(.15)
+   assert(driver.life.growth.stage==stage and driver.life.growth:isSoft(),"checkpoint lost growth or softness")
+  end
+  conn:Disconnect();table.sort(samples)
+  print("PORT_GROWTH_FRAME "..HttpService:JSONEncode({count=#samples,p50=samples[math.max(1,math.floor(#samples*.5))]*1000,p95=samples[math.max(1,math.floor(#samples*.95))]*1000,max=samples[#samples]*1000}))
+  assert(driver.session.finishedMain,"adult did not open Easy")
+  driver.openMenu();assert(driver.menu:choose("Easy"));wait(.2)
+  assert(driver.menu:isShowing() and not driver.needs.gentle,"new-life confirmation skipped")
+  assert(driver.menu:choose("Easy"));wait(.2)
+  assert(driver.needs.gentle and driver.life.growth.stage==0,"Easy not a new gentle life")
+  assert(driver.fresh("main",false,nil))
+ end)
  local passed=0
 	for _,row in rows do if row.passed then passed+=1 end end
 	print("PORT_CLIENT_REPORT "..HttpService:JSONEncode({evidence_id=workspace:GetAttribute("PortEvidence"),tests=#rows,passed=passed,failed=#rows-passed,results=rows}))
 	print("PORT_CLIENT_SUMMARY "..HttpService:JSONEncode({evidence_id=workspace:GetAttribute("PortEvidence"),tests=#rows,passed=passed,failed=#rows-passed}))
 	driver.input:clear()
-	-- Leave a recoverable hanging pose for visual inspection in the test place.
-	driver.place(Vector3.new(-18,0.31,6)); driver.motor.heading=Vector3.xAxis; driver.camera:snap()
+	-- Staged adult peacock portrait for visual inspection, after the reports. Test place only.
+ driver.place(Vector3.new(-25.5,.31,6));driver.life.clock.hour=12;wait(.3)
+ driver.input:simulate("Feed",true);wait(.1);driver.input:simulate("Feed",false);wait(.2)
+ if driver.appearance()~="maratus_volans_male" then driver.changeSpider() end
+ driver.life:stopRest();driver.life.growth.stage=3;driver.life.growth.softHoursLeft=0
+ driver.place(Vector3.new(-18,.31,6));driver.motor.heading=Vector3.xAxis;driver.camera:snap()
+ driver.camera.yaw+=math.pi;driver.camera.elevation=math.rad(22);driver.camera.distance=4
+ wait(.3);driver.input:simulate("Display",true);wait(.1);driver.input:simulate("Display",false)
 end
 ]]></string>
           </Properties>
@@ -17632,7 +18001,7 @@ end
       </Item>
     </Item>
   </Item>
-  <Item class="Workspace" referent="119">
+  <Item class="Workspace" referent="122">
     <Properties>
       <string name="Name">Workspace</string>
       <float name="Gravity">35</float>

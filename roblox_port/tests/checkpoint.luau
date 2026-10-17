@@ -442,5 +442,35 @@ case("mode rules survive recovery and schema 1 defaults to Standard",function()
  check(not Checkpoint.restore(r,w),"free Standard combination refused")
  check(fingerprint(w)==before,"invalid rules leave world untouched")
 end)
+case("growth schema 3 restores a moult, migrates old saves and rejects damage atomically",function()
+ local w=newWorld()
+ for _=1,10 do tick(w) end
+ w.life.growth:eat(.9);rest(w)
+ check(w.life.growth:isMoulting(),"moult starts")
+ local record=assert(Checkpoint.capture(w,0))
+ local left=w.life.growth.moultingHoursLeft
+ w.life.growth:passHours(20,HOME)
+ check(Checkpoint.restore(record,w),"mid-moult restored")
+ check(w.life.growth.stage==0 and math.abs(w.life.growth.moultingHoursLeft-left)<1e-8,"progress rewound together")
+ w.life.growth:passHours(left,HOME)
+ local adult=assert(Checkpoint.capture(w,0))
+ check(#(Checkpoint.check(adult,w))==0,"grown state and skin accepted")
+ local damaged=Json.copy(adult)
+ for _,o in damaged.world.objects do
+  if o.c=="Growth" then for _,e in o.e do if e[1]=="stage" then e[2]=8 end end end
+ end
+ local before=fingerprint(w)
+ check(not Checkpoint.restore(damaged,w) and fingerprint(w)==before,"invalid stage leaves world untouched")
+ -- Simulate records authored before growth: no Growth object and no ledger cursor.
+ for _,schema in {1,2} do
+  local old=newWorld();old.life.growth=nil;old.life.grantedSeen=nil
+  local legacy=assert(Checkpoint.capture(old,0));legacy.schema_version=schema
+  check(Checkpoint.restore(legacy,w),"schema "..schema.." migrated")
+  check(w.life.growth.stage==0 and w.life.grantedSeen==w.needs.grantedTotal,"legacy food not counted again")
+  legacy.schema_version=3
+  check(not Checkpoint.restore(legacy,w),"missing growth in schema 3 refused")
+ end
+end)
+
 print(`CHECKPOINT passed={passed} failed={failed}`)
 if failed > 0 then error("CHECKPOINT failed") end

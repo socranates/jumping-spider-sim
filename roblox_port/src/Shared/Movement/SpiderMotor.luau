@@ -97,6 +97,7 @@ function Motor.new(config: Config): any
 		config = config,
 		surfaces = config.surfaces,
 		loco = loco,
+  reachFactor = 1,
 		gravity = Vector3.new(0, -loco.gravity_wu_s2, 0),
 		params = params,
 		overlap = overlap,
@@ -274,7 +275,7 @@ function Motor.planJump(self: any, point: Vector3?, normal: Vector3?, inst: Inst
 		plan.kind, plan.reason = "ineligible", "ineligible_surface"
 		return plan
 	end
-	local solved = JumpMath.solve(self.pos, plan.seat, self.up, normal, self.gravity, DT, loco.flight_time_min_s, loco.flight_time_max_s, loco.max_launch_speed_wu_s)
+	local solved = JumpMath.solve(self.pos, plan.seat, self.up, normal, self.gravity, DT, loco.flight_time_min_s, math.max(loco.flight_time_min_s,loco.flight_time_max_s*math.sqrt(self.reachFactor)), loco.max_launch_speed_wu_s*math.sqrt(self.reachFactor))
 	if #solved.valid == 0 then
 		plan.reason = solved.reason
 		return plan
@@ -306,6 +307,13 @@ function Motor.setAimRay(self: any, origin: Vector3, direction: Vector3)
 end
 
 -- The aim: whatever the centre ray meets (no target magnet). Re-planned only when the aim or the spider moves.
+-- Frozen JumpPlanner.configure: scale speed and maximum flight time by sqrt(reach), never gravity or the collider.
+function Motor.setReachFactor(self: any, reach: number)
+ if self.reachFactor==reach then return end
+ self.reachFactor=math.clamp(reach,0.1,10)
+ self.planKey="";self.plan=nil
+end
+
 function Motor.aimPlan(self: any): any
 	local hit = self:_ray(self.aimOrigin, self.aimDirection * AIM_RANGE)
 	local key = if hit

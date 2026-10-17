@@ -160,20 +160,20 @@ function Hud.new(playerGui: Instance): any
 	local toast = wrapLabel("Toast", top, 17, 4)
 	local help = wrapLabel("Controls", top, 15, 5)
 	help.TextXAlignment = Enum.TextXAlignment.Left
-	-- The day, and one line for the time of day or hunger, small in the top-left corner (ROBLOX-24).
+	-- Day/stage and notices share one vertical flow, so longer life labels never overlap checkpoint messages.
 	local dayBox = Instance.new("Frame")
 	dayBox.Name = "DayBox"
 	dayBox.BackgroundTransparency = 1
-	dayBox.Position = UDim2.fromOffset(12, 8)
-	dayBox.Size = UDim2.fromOffset(300, 0) -- a fixed width, so the wrapped line inside has one to wrap at
+	dayBox.LayoutOrder = -1
+	dayBox.Size = UDim2.new(1, 0, 0, 0)
 	dayBox.AutomaticSize = Enum.AutomaticSize.Y
 	local dayList = Instance.new("UIListLayout")
 	dayList.HorizontalAlignment = Enum.HorizontalAlignment.Left
 	dayList.SortOrder = Enum.SortOrder.LayoutOrder
 	dayList.Padding = UDim.new(0, 4)
 	dayList.Parent = dayBox
-	dayBox.Parent = safe
-	local day = pill("Day", dayBox, 15, 1)
+	dayBox.Parent = top
+	local day = wrapLabel("Day", dayBox, 15, 1)
 	local dayLine = wrapLabel("DayLine", dayBox, 14, 2)
 	dayLine.TextXAlignment = Enum.TextXAlignment.Left
 	local panel = Instance.new("Frame")

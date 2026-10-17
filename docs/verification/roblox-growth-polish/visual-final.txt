@@ -1,0 +1,4 @@
+GROWTH passed=433 failed=0
+look: full 624 parts (475 hairs, 8 shells, 141 other), low 266 (145 hairs, 2 shells, 119 other)
+look: peacock spider full 119 parts, low 80
+LOOK passed=102 failed=0

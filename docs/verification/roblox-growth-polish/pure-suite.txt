@@ -1,0 +1,37 @@
+fuzz: 319 body hairs, 142 leg hairs, 29 white
+SUMMARY passed=185 failed=0
+PERCEPTION passed=4669 failed=0
+SENSOR passed=507 failed=0
+PREY passed=1549 failed=0
+LIFE passed=20846 failed=0
+checkpoint: 21637 characters, 87 tables
+CHECKPOINT passed=156 failed=0
+WASP passed=15815 failed=0
+GAZE passed=67 failed=0
+PRESENTATION passed=11 failed=0
+  1 east leaf, front: caught true, settled true, reel true, 269 ticks, max turn 0
+  2 east leaf, back: caught true, settled true, reel true, 269 ticks, max turn 0
+  3 middle leaf, front: caught true, settled true, reel true, 206 ticks, max turn 0
+  4 middle leaf, back: caught true, settled true, reel true, 206 ticks, max turn 0
+  5 west leaf, front: caught true, settled true, reel true, 206 ticks, max turn 0
+  6 west leaf, west side: caught true, settled true, reel true, 62 ticks, max turn 0
+  7 planter rim, front: caught true, settled true, reel true, 60 ticks, max turn 0
+  8 middle leaf, front, then lower: caught true, settled true, lower true, 138 ticks, max turn 0
+  9 east leaf, front, then lower: caught true, settled true, lower true, 159 ticks, max turn 0
+  10 west leaf, front, then let go: caught true, settled true, letgo true, 127 ticks, max turn 0
+BOXWORLD passed=15 failed=0
+CLIENT passed=23 failed=0
+PERCEPTION_CLIENT passed=1 failed=0
+look: full 624 parts (475 hairs, 8 shells, 141 other), low 266 (145 hairs, 2 shells, 119 other)
+look: peacock spider full 119 parts, low 80
+LOOK passed=102 failed=0
+world: invented sun, z flip 1: picks clock 9.75, latitude 40.7, 39 degrees high, 46 degrees off straight-out-of-the-window
+world: invented sun, z flip -1: picks clock 9.75, latitude -40.7, 39 degrees high, 46 degrees off straight-out-of-the-window
+world: decor 806 parts at full detail, 151 at low (view 31 items at full), dust 7 -> 2.8 per second
+WORLD passed=230 failed=0
+FLIES passed=187 failed=0
+EYES passed=231 failed=0
+HUD passed=69 failed=0
+PEACOCK passed=80 failed=0
+CONTINUING passed=87 failed=0
+GROWTH passed=433 failed=0

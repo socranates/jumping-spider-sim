@@ -167,7 +167,7 @@ check("in the crack E rests; in the evening the spider sleeps until morning, the
 	life.clock.hour = 12
 	frames(2)
 	assert(string.find(find("SpiderPrompts", "PromptHint").Text, "E: rest", 1, true), "no rest prompt: " .. find("SpiderPrompts", "PromptHint").Text)
-	assert(find("SpiderPrompts", "Day").Text == "Day 1, midday", find("SpiderPrompts", "Day").Text)
+	assert(find("SpiderPrompts", "Day").Text == "Day 1, midday | young juvenile", find("SpiderPrompts", "Day").Text)
 	key("Feed", true); frames(2); key("Feed", false); frames(2)
 	assert(life.resting and not life.asleep, "E did not rest")
 	assert(string.find(find("SpiderPrompts", "PromptTitle").Text, "Resting", 1, true), find("SpiderPrompts", "PromptTitle").Text)

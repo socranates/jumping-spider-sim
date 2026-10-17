@@ -12,6 +12,7 @@ local Appearances = require(script.Parent.Parent.Data.Appearances)
 local Anatomy = require(script.Parent.Anatomy)
 local Setae = require(script.Parent.Setae)
 local Idle = require(script.Parent.Idle)
+local Growth = require(script.Parent.Parent.Life.Growth)
 local v3 = Anatomy.v3
 
 local SpiderRig = {}
@@ -78,6 +79,12 @@ export type Rig = typeof(setmetatable(
 		_parts: { BasePart },
 		_cframes: { CFrame },
 		_k: number,
+  _growth: number,
+  _softness: number,
+  _condition: number,
+  _shownCondition: number,
+  _sizes: {[BasePart]: Vector3},
+  _colors: {[BasePart]: Color3},
 		_drop: number,
 		_fan: Fan?,
 		dance: any, -- a PeacockDance.Pose, or nil: the peacock spider's display (ignored by an appearance without a fan)
@@ -198,6 +205,8 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		_parts = {} :: { BasePart },
 		_cframes = {} :: { CFrame },
 		_k = look.scale or 1,
+  _growth = 1, _softness = 0, _condition = 0.55, _shownCondition = 0.55,
+  _sizes = {} :: {[BasePart]: Vector3}, _colors = {} :: {[BasePart]: Color3},
 		_drop = look.bodyDrop or 0,
 		_fan = nil :: Fan?,
 		dance = nil :: any,
@@ -415,7 +424,8 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 			for j, k in fc.back.layers do add(fan.back, fc.layers[k], fc.back.plane - (j - 1) * fc.layerStep) end
 		end
 		for _, f in fc.figure do
-			local part = disc(model, "FanFigure", color(fc.figureColor), 0)
+			if f.fullOnly and detailName == "low" then continue end
+			local part = disc(model, if f.color then "FanGlint" else "FanFigure", color(f.color or fc.figureColor), 0)
 			table.insert(fan.figure, { part = part, x = f.x, z = f.z, rx = f.rx, rz = f.rz, angle = f.angle })
 			table.insert(fan.parts, part)
 		end
@@ -436,15 +446,36 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		hl.Parent = model
 		self._highlight = hl
 	end
-	model.Parent = parent
+ for _,p in model:GetChildren() do
+  if p:IsA("BasePart") and p~=root then self._sizes[p]=p.Size;self._colors[p]=p.Color end
+ end
+ model.Parent = parent
 	self:setGrowthStage(0)
 	return self
 end
 
--- The selected appearance stays black and white at every life stage.
--- Growth is a separate display scale when LIFE is ported; it must not recolor this design.
+-- Scale about the support plane, not the collider centre. Planted contacts remain world-space points.
 function SpiderRig.setGrowthStage(self: Rig, stage: number)
-	self.model:SetAttribute("GrowthStage", math.clamp(stage, 0, 3))
+ local index=math.clamp(math.floor(stage),0,3)
+ self.model:SetAttribute("GrowthStage",index)
+ local g=Growth.SCALES[index+1]
+ if self._growth==g then return end
+ self._growth=g
+ self._k=(self._appearance.scale or 1)*g
+ self._drop=0.31-(0.31-(self._appearance.bodyDrop or 0))*g
+ for p,size in self._sizes do p.Size=size*g end
+end
+function SpiderRig.setSoftness(self: Rig, value: number)
+ local s=math.clamp(value,0,1)
+ if math.abs(s-self._softness)<0.001 then return end
+ self._softness=s
+ for p,c in self._colors do
+  -- The eyes stay dark and readable; pigment returns as the skin hardens.
+  if p.Material~=Enum.Material.Glass and p.Name~="Catchlight" then p.Color=c:Lerp(Color3.new(0.88,0.82,0.69),s*0.72) end
+ end
+end
+function SpiderRig.setCondition(self: Rig, energy: number)
+ self._condition=math.clamp(energy,0,1)
 end
 
 -- How many parts the drawn spider is made of (the model's direct parts), for budgets and the docs.
@@ -472,7 +503,7 @@ local function restLocal(self: Rig, leg: Leg): Vector3
 	local s = self._appearance.limbs.stance
 	local longer = self._appearance.limbs.pairReach
 	local r = s.reach * (if longer then longer[leg.pair] else 1) -- the peacock spider's legs III are the longest
-	return Vector3.new(leg.side * s.x * r, s.y, self._appearance.limbs.tipZ[leg.pair] * r)
+	return Vector3.new(leg.side * s.x * r, s.y, self._appearance.limbs.tipZ[leg.pair] * r) * self._growth
 end
 
 -- Display-only foothold: retract toward the body at a narrow edge; never invents a platform.
@@ -497,7 +528,11 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 	local body = if self._drop ~= 0 then collider * CFrame.new(0, -self._drop, 0) else collider
 	local up = body.UpVector
 	local look, cfg, A = self._appearance, self._cfg, self._layout
-	local k = self._k
+	local k, g = self._k, self._growth
+ self._shownCondition += math.clamp(self._condition-self._shownCondition,-0.12*dt,0.12*dt)
+ local conditionValue=self._shownCondition
+ local condition=Vector3.new(0.84+0.30*conditionValue,0.84+0.30*conditionValue,0.93+0.12*conditionValue)
+ local function scaledFrame(cf: CFrame): CFrame return if g==1 then cf else CFrame.new(cf.Position*g)*cf.Rotation end
 	local parts, cframes = self._parts, self._cframes
 	table.clear(parts)
 	table.clear(cframes)
@@ -523,16 +558,16 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 		if self._calm > 0 then
 			local c = self._calm * self._calm * (3 - 2 * self._calm)
 			local pose = Idle.pose(self._t, c, idle)
-			bodyBase = body * CFrame.new(0, pose.bodyLift, 0)
-			headBase = bodyBase * CFrame.new(A.neck) * CFrame.Angles(pose.headPitch, pose.headYaw, pose.headRoll) * CFrame.new(-A.neck)
-			abdomenBase = bodyBase * CFrame.new(0, pose.abdomenLift, 0) * CFrame.new(A.pedicelCenter)
-				* CFrame.Angles(-pose.abdomenPitch, 0, 0) * CFrame.new(-A.pedicelCenter)
+			bodyBase = body * CFrame.new(0, pose.bodyLift*g, 0)
+			headBase = bodyBase * CFrame.new(A.neck*g) * CFrame.Angles(pose.headPitch, pose.headYaw, pose.headRoll) * CFrame.new(-A.neck*g)
+			abdomenBase = bodyBase * CFrame.new(0, pose.abdomenLift*g, 0) * CFrame.new(A.pedicelCenter*g)
+				* CFrame.Angles(-pose.abdomenPitch, 0, 0) * CFrame.new(-A.pedicelCenter*g)
 		end
 	end
 	if dancing then
 		-- The abdomen pitches up about the pedicel and sways side to side (about the body's long axis), the palps flick in unison.
-		abdomenBase = bodyBase * CFrame.new(A.pedicelCenter) * CFrame.Angles(0, 0, display.abdomenSway + display.shiver)
-			* CFrame.Angles(-display.abdomenPitch, 0, 0) * CFrame.new(-A.pedicelCenter)
+		abdomenBase = bodyBase * CFrame.new(A.pedicelCenter*g) * CFrame.Angles(0, 0, display.abdomenSway + display.shiver)
+			* CFrame.Angles(-display.abdomenPitch, 0, 0) * CFrame.new(-A.pedicelCenter*g)
 		palpAngle = { palpAngle[1] + display.palp, palpAngle[2] + display.palp }
 	end
 	local pivots = {
@@ -543,9 +578,16 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 		local base = if f.group == G_HEAD then headBase elseif f.group == G_ABDOMEN then abdomenBase else bodyBase
 		local palp = f.palp
 		if palp then
-			put(f.part, base * pivots[palp] * f.offset)
+			put(f.part, base * scaledFrame(pivots[palp] * f.offset))
 		else
-			put(f.part, base * f.offset)
+			local offset=f.offset
+    if f.group==G_ABDOMEN then
+     local p=A.abdomenCenter+(offset.Position-A.abdomenCenter)*condition
+     offset=CFrame.new(p)*offset.Rotation
+     local size=self._sizes[f.part]*g*condition
+     if (f.part.Size-size).Magnitude>1e-5 then f.part.Size=size end
+    end
+    put(f.part, base * scaledFrame(offset))
 		end
 	end
 
@@ -577,7 +619,7 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 		if not grounded then
 			leg.planted = nil
 			leg.swing = -1
-			leg.foot = body:PointToWorldSpace(Vector3.new(leg.side * 0.47 * k, -0.12 * k, L.tipZ[leg.pair] * 0.72))
+			leg.foot = body:PointToWorldSpace(Vector3.new(leg.side * 0.47 * k, -0.12 * k, L.tipZ[leg.pair] * 0.72 * g))
 		else
 			if leg.planted == nil then
 				local hit = target(self, body, leg)
@@ -620,9 +662,9 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 	if started then
 		self._group = 1 - self._group
 	end
-	local kneeUp = if grounded then L.kneeLift else L.kneeLiftAir
+	local kneeUp = (if grounded then L.kneeLift else L.kneeLiftAir)*g
 	for _, leg in self._legs do
-		local hip = bodyBase:PointToWorldSpace(Vector3.new(leg.side * L.hipX, L.hipY, L.hipZ[leg.pair]))
+		local hip = bodyBase:PointToWorldSpace(Vector3.new(leg.side * L.hipX, L.hipY, L.hipZ[leg.pair])*g)
 		local foot = leg.foot
 		local knee = hip:Lerp(foot, 0.48) + up * kneeUp
 		local own = if dancing and look.pairs then look.pairs[leg.pair] else nil
@@ -631,12 +673,12 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 			local raise = display.legsRaise
 			local upAt = Vector3.new(leg.side * own.up.x, own.up.y, own.up.z)
 			local sweptAt = Vector3.new(leg.side * own.swept.x, own.swept.y, own.swept.z)
-			local raised = bodyBase:PointToWorldSpace(upAt:Lerp(sweptAt, display.legsWave))
+			local raised = bodyBase:PointToWorldSpace(upAt:Lerp(sweptAt, display.legsWave)*g)
 			foot = foot:Lerp(raised, raise)
-			local raisedKnee = hip:Lerp(raised, 0.5) + bodyBase.RightVector * (leg.side * own.kneeOut) + up * look.dance.kneeUp
+			local raisedKnee = hip:Lerp(raised, 0.5) + bodyBase.RightVector * (leg.side * own.kneeOut*g) + up * look.dance.kneeUp*g
 			knee = knee:Lerp(raisedKnee, raise)
 		end
-		local ankle = knee:Lerp(foot, ANKLE_SHARE) + up * L.ankleLift
+		local ankle = knee:Lerp(foot, ANKLE_SHARE) + up * (L.ankleLift*g)
 		local function segment(index: number, p: Part, band: Part?, a: Vector3, b: Vector3)
 			local len = math.max((b - a).Magnitude, 0.01)
 			if math.abs(p.Size.X - len) > 1e-3 then
@@ -656,7 +698,7 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 					local c, s = math.cos(spec.theta), math.sin(spec.theta)
 					local base = Vector3.new((spec.t - 0.5) * len, r * 0.8 * c, r * 0.8 * s)
 					local dir = Vector3.new(1.3, c, s).Unit
-					put(hair.part, rc * CFrame.lookAt(base + dir * (spec.length * 0.5), base + dir * spec.length, Vector3.xAxis))
+					put(hair.part, rc * CFrame.lookAt(base + dir * (spec.length * g * 0.5), base + dir * spec.length*g, Vector3.xAxis))
 				end
 			end
 		end
@@ -676,6 +718,17 @@ end
 function SpiderRig._drawFan(self: Rig, abdomen: CFrame, open: number, put: (BasePart, CFrame) -> ())
 	local fan = self._fan :: Fan
 	local fc, A = fan.cfg, self._layout
+ local g=self._growth
+ local c=self._shownCondition
+ local condition=Vector3.new(.84+.30*c,.84+.30*c,.93+.12*c)
+ local output=put
+ local inverse=abdomen:Inverse()
+ put=function(p: BasePart,cf: CFrame)
+  local relative=inverse*cf
+  local at=A.abdomenCenter+(relative.Position-A.abdomenCenter)*condition
+  p.Size=p.Size*condition
+  output(p,abdomen*CFrame.new(at*g)*relative.Rotation)
+ end
 	local sx = fc.folded[1] + (1 - fc.folded[1]) * open
 	local sz = fc.folded[2] + (1 - fc.folded[2]) * open
 	local fold = 1 - open
@@ -684,7 +737,7 @@ function SpiderRig._drawFan(self: Rig, abdomen: CFrame, open: number, put: (Base
 	local thick = fc.thickness + (fc.foldedThickness - fc.thickness) * fold
 	local function place(d: FanDisc, y: number, t: number)
 		local rx, rz = math.max((fc.radii[1] - d.inset) * sx, 0.002), math.max((fc.radii[2] - d.inset) * sz, 0.002)
-		local size = Vector3.new(rx * 2, t, rz * 2)
+		local size = Vector3.new(rx * 2, t, rz * 2)*g
 		if (d.part.Size - size).Magnitude > 1e-5 then d.part.Size = size end
 		put(d.part, abdomen * CFrame.new(0, y, z))
 	end
@@ -694,13 +747,14 @@ function SpiderRig._drawFan(self: Rig, abdomen: CFrame, open: number, put: (Base
 	local figureY = top + #fan.front * fc.layerStep + (thick - fc.thickness) * 0.5
 	local show = open * open * (3 - 2 * open) -- the black figure shows as the fan opens, and is gone when it is folded
 	for _, f in fan.figure do
-		local size = Vector3.new(math.max(f.rx * fc.radii[1] * sx * 2 * show, 0.002), fc.thickness, math.max(f.rz * fc.radii[2] * sz * 2 * show, 0.002))
+		local size = Vector3.new(math.max(f.rx * fc.radii[1] * sx * 2 * show, 0.002), fc.thickness, math.max(f.rz * fc.radii[2] * sz * 2 * show, 0.002))*g
 		if (f.part.Size - size).Magnitude > 1e-5 then f.part.Size = size end
 		put(f.part, abdomen * CFrame.new(f.x * fc.radii[1] * sx, figureY, z + f.z * fc.radii[2] * sz) * CFrame.Angles(0, f.angle, 0))
 	end
 	local fl = fc.flaps
 	local angle = math.rad(fl.foldedDeg) * (1 - open)
 	for _, f in fan.flaps do
+		f.part.Size=self._sizes[f.part]*g
 		local hinge = Vector3.new(f.side * fl.hingeX, A.abdomenCenter.Y + fl.hingeY, A.abdomenCenter.Z + fc.zShift * open)
 		put(f.part, abdomen * CFrame.new(hinge) * CFrame.Angles(0, 0, f.side * angle) * CFrame.new(f.side * fl.radii[1], 0, 0))
 	end
@@ -748,7 +802,7 @@ end
 
 -- Where the dragline leaves the body.
 function SpiderRig.spinneretPoint(self: Rig, body: CFrame): Vector3
-	return body:PointToWorldSpace(self._layout.spinneret - Vector3.new(0, self._drop, 0))
+	return body:PointToWorldSpace(self._layout.spinneret*self._growth - Vector3.new(0, self._drop, 0))
 end
 
 function SpiderRig.destroy(self: Rig)

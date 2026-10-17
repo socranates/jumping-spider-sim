@@ -34,7 +34,7 @@ SpiderCamera.__index = SpiderCamera
 local MIN_DISTANCE, MAX_DISTANCE = 2.0, 12.0
 local TOUCH_DEG_PER_PIXEL = 0.25
 
-export type Target = { pos: Vector3, drawnUp: Vector3, heading: Vector3, onLine: boolean?, rest: Vector3?, lip: Vector3? }
+export type Target = { pos: Vector3, drawnUp: Vector3, heading: Vector3, onLine: boolean?, rest: Vector3?, lip: Vector3?, cameraScale: number? }
 
 function SpiderCamera.new(camera: Camera, params: RaycastParams, target: () -> Target, onEye: (boolean) -> ())
 	local overlap = OverlapParams.new()
@@ -52,6 +52,7 @@ function SpiderCamera.new(camera: Camera, params: RaycastParams, target: () -> T
 		aimPitch = 0,
 		aiming = false,
 		distance = CameraMath.CAMERA_DISTANCE,
+  appearanceScale = 1,
 		boom = 0, pivot = 0,
 		pivotDir = Vector3.yAxis,
 		recenterT = -1, recenterYaw0 = 0, recenterElev0 = 0, recenterGaze0 = Vector3.zero,
@@ -104,13 +105,17 @@ function SpiderCamera._cast(self: any, from: Vector3, motion: Vector3): number
 	return if hit then math.max(0, hit.Distance - 0.01) else length
 end
 
+function SpiderCamera.viewDistance(self: any): number
+ return self.distance * self.appearanceScale
+end
+
 function SpiderCamera._boomAt(self: any, from: Vector3, yaw: number, pitch: number): number
-	return self:_cast(from, CameraMath.backDirection(yaw, pitch) * self.distance)
+	return self:_cast(from, CameraMath.backDirection(yaw, pitch) * self:viewDistance())
 end
 
 -- camera_rig._pitch_search: the auto-pitch offset from the pivot `from` at this yaw, and the boom it gives.
 function SpiderCamera._pitchSearch(self: any, from: Vector3, yaw: number): (number, number)
-	local comfort = math.min(CameraMath.COMFORT_BOOM, self.distance)
+	local comfort = math.min(CameraMath.COMFORT_BOOM, self:viewDistance())
 	local offsets, lengths = { 0 }, { self:_boomAt(from, yaw, self.elevation) }
 	local step = math.rad(CameraMath.AUTO_PITCH_STEP_DEG)
 	local roomDown = math.max(math.rad(CameraMath.MAX_ELEVATION_DEG) - self.elevation, 0)
@@ -144,7 +149,7 @@ end
 -- the camera sees both the spider where it will hang and the lip.
 function SpiderCamera._goodView(self: any, from: Vector3, yaw: number, spot: Vector3, lip: Vector3): boolean
 	local offset, length = self:_pitchSearch(from, yaw)
-	if length < math.min(CameraMath.COMFORT_BOOM, self.distance) then return false end
+	if length < math.min(CameraMath.COMFORT_BOOM, self:viewDistance()) then return false end
 	local camPos = from + CameraMath.backDirection(yaw, CameraMath.effectiveElevation(self.elevation, offset)) * length
 	return self:_sees(camPos, spot) and self:_sees(camPos, lip)
 end
@@ -155,7 +160,7 @@ function SpiderCamera._wantedTurn(self: any, t: Target): number
 	local lip = t.lip or rest
 	local from = rest + self.pivotDir * self.pivot
 	local function q(v: Vector3): string return string.format("%.2f,%.2f,%.2f", v.X, v.Y, v.Z) end
-	local key = q(from) .. "|" .. q(lip) .. "|" .. string.format("%.4f,%.4f,%.2f,%.4f", self.yaw, self.elevation, self.distance, self.framing.target)
+	local key = q(from) .. "|" .. q(lip) .. "|" .. string.format("%.4f,%.4f,%.2f,%.4f", self.yaw, self.elevation, self:viewDistance(), self.framing.target)
 	if key ~= self.wantedKey then
 		self.wantedKey = key
 		self.wantedCache = LineFraming.wantedTurn(self.framing.target, self.framing.maxTurn, function(turn: number): boolean
@@ -258,6 +263,8 @@ end
 
 -- One fixed 60 Hz tick: pivot, line framing, auto-pitch and boom (orbit), or the gaze carried with the body (eye view).
 function SpiderCamera.tick(self: any, dt: number)
+ local wantedScale = math.clamp(self.target().cameraScale or 1,0.5,1.5)
+ self.appearanceScale += (wantedScale-self.appearanceScale)*(1-math.exp(-4*dt))
 	local t = self.target()
 	if self.eyeView then
 		local up = SupportMath.rotateToward(self.gazeUp, t.drawnUp, math.rad(CameraMath.EYE_ROLL_DEG_S) * dt)
@@ -286,7 +293,7 @@ function SpiderCamera.tick(self: any, dt: number)
 		self.autoPitch = CameraMath.easeOffset(self.autoPitch, wanted, dt, CameraMath.AUTO_PITCH_IN_SECONDS, CameraMath.AUTO_PITCH_OUT_SECONDS)
 	end
 	local elev = CameraMath.effectiveElevation(self.elevation, self.autoPitch)
-	self.boom = CameraMath.nextLength(self.boom, self:_boomAt(from, yaw, elev), self.distance, CameraMath.RECOVER_SPEED, if self.settle > 0 then 1 else dt)
+	self.boom = CameraMath.nextLength(self.boom, self:_boomAt(from, yaw, elev), self:viewDistance(), CameraMath.RECOVER_SPEED, if self.settle > 0 then 1 else dt)
 end
 
 local function smooth(k: number): number

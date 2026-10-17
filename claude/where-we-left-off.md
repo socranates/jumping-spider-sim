@@ -1,3 +1,12 @@
+# Chet — 2026-10-17: growth, moulting, closer peacock and quieter ambience
+
+**Published version 15** to the existing Windowsill place 120119801868085 / universe 10771103250, independently confirmed in Creator Dashboard. Read **docs/HANDOFF-roblox-growth-polish.md** and **docs/verification/roblox-growth-polish/RESULTS.md**. Decisions ROBLOX-35/36. Build **0ee32d97f26bd2fd**; native acceptance **ece0772bc0acda77**, **91/91 engine + 19/19 live-client**. Only four label-encoding repairs followed native acceptance; synchronized release launch/play smoke passed. Windows CLI **45,263/45,263**, strict clean, final **132/132 compile**.
+
+Three growth transitions, resting moults, soft skin/shorter jumps, old skins, schema 3 recovery and actual Standard adulthood opening Easy are live. Body and legs grow about their support plane without enlarging the collider. Peacock orbit distance is closer, fan colours/details improved, room ambience reduced about 5 dB. Twitch/dance retained; peacock remains free. Progress remains session-only.
+
+**Next Claude: field notebook**, including event-driven discoveries and retention outside world checkpoints; full scope in the handoff. Server-owned DataStore persistence follows separately. Physical PlayStation/tablet acceptance remains Nathan's playtest. Publishing route: open existing online place, Rojo-sync default project, disconnect/stop server, ordinary Publish. No temporary server remains running. Do not repeat Publish As.
+
+---
 # Chet — 2026-10-16: death/continuing, Free play and rest checked on Windows
 
 Read **docs/HANDOFF-roblox-continuing.md** and **docs/verification/roblox-continuing-windows/RESULTS.md**. ROBLOX-33/34. Final evidence **589d9e7bbe94f6b1**: **85/85 Studio engine, 18/18 live client**, final CLI suite totals **44,819 passed** across the full run and corrected CLIENT 23/23 rerun; strict clean, 127 scripts compile. Actual walk into crack/rest/checkpoint passed. Added near-home guidance without changing the safe box. Normal launch, mouse Begin, M menu, keyboard scrolling and Free play also checked.

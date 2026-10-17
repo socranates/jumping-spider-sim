@@ -13,11 +13,11 @@
 -- * Light: daylight 0 to 1 from the hour; the eyes reach NIGHT_SIGHT of their range in the dark (LIFE-06). The reach comes
 --   from the clock, never from the lighting on the screen.
 --
--- Not ported (later rounds of Godot's loop): growth and moulting (round 3), the wasp (round 4), weakness and starving to death
--- (round 5: it needs the death and continuing rules), the passing shadow (T08's telegraphed disturbance) and the notebook.
+-- Growth, moulting and starvation are ported. The passing shadow and notebook remain separate work.
 -- Checked tick by tick against Godot's own loop in tests/life_reference.json (tools/export_life_reference.gd).
 
 local LifeClock = require(script.Parent.LifeClock)
+local Growth = require(script.Parent.Growth)
 
 local LifeLoop = {}
 LifeLoop.__index = LifeLoop
@@ -42,6 +42,7 @@ export type Spider = {
 	still: boolean, -- not walking or sliding (Godot: intent under 0.01, speed under 0.15)
 	holding: boolean, -- holds prey (caught, struggling or being eaten)
 	feeding: boolean, -- eating right now
+ position: Vector3?, -- old skin location; live client always supplies it
 }
 export type CheckpointResult = { ok: boolean, message: string }
 export type Event = { kind: string, day: number? }
@@ -50,6 +51,7 @@ export type Event = { kind: string, day: number? }
 function LifeLoop.new(needs: any, save: (() -> CheckpointResult)?): any
 	local self = setmetatable({
 		clock = LifeClock.new(), needs = needs, save = save,
+  growth = Growth.new(), grantedSeen = needs.grantedTotal,
 		mode = "main", rules = "standard", lifeOver = false,
 		resting = false, restSeconds = 0.0, asleep = false, elapsed = 0.0,
 		checkpointDue = false, checkpointResult = nil :: CheckpointResult?, checkpoints = 0,
@@ -92,7 +94,7 @@ function LifeLoop.requestRest(self: any, s: Spider): boolean
 end
 
 function LifeLoop.stopRest(self: any)
-	if self.resting then
+	if self.resting and not self.growth:isMoulting() then
 		self.resting = false
 		self:_emit("rest_ended")
 	end
@@ -112,10 +114,30 @@ function LifeLoop.starved(self: any): boolean
 	return not self.needs.gentle and self.needs.starvingStreakH >= LifeLoop.STARVE_AFTER_H
 end
 
-function LifeLoop._stepLife(self: any, dt: number)
-	local wasAsleep = self.asleep
-	self.asleep = self.resting and (self.clock.sleeping or self.clock:isSleepTime()) and not self:tooHungryToSleep()
-	local hours = self.clock:advance(dt, self.asleep)
+function LifeLoop._stepLife(self: any, dt: number, at: Vector3)
+ local granted = self.needs.grantedTotal
+ if granted > self.grantedSeen and self.growth:eat(granted-self.grantedSeen) then
+  self:showNotice("Ready to moult. Rest in the silk-lined crack.")
+  self:_emit("moult_ready")
+ end
+ self.grantedSeen = granted
+ if self.resting and self.growth:beginMoult() then
+  self:showNotice("Moulting in the crack. The spider slowly pulls free of its old skin.")
+  self:_emit("moult_started")
+ end
+ local moulting = self.growth:isMoulting()
+ local wasAsleep = self.asleep
+	self.asleep = self.resting and not moulting and (self.clock.sleeping or self.clock:isSleepTime()) and not self:tooHungryToSleep()
+	local hours = if moulting then self.clock:advanceMoult(dt) else self.clock:advance(dt, self.asleep)
+ local what = self.growth:passHours(hours,at)
+ if what == "moulted" then
+  self.checkpointDue=true
+  self.morningText="Moulted: now a "..self.growth:stageName()..". The new skin is soft for a while."
+  self:showNotice(self.morningText)
+  self:_emit("moulted")
+ elseif what == "hardened" then
+  self:showNotice("The new skin has hardened. Full-length jumps again.")
+ end
 	if self.asleep and not self.clock.sleeping then
 		-- The morning came during this tick: awake, still resting in the crack. The new day keeps a checkpoint.
 		self.asleep = false
@@ -129,7 +151,7 @@ function LifeLoop._stepLife(self: any, dt: number)
 	if self.asleep and not wasAsleep then
 		self:_emit("slept")
 	end
-	self.needs:addHours(hours, self.asleep)
+	self.needs:addHours(hours, self.asleep or moulting)
 	self:applyLight()
 end
 
@@ -139,17 +161,17 @@ function LifeLoop.step(self: any, dt: number, s: Spider, feedPressed: boolean, c
 	if self.restoreGrace > 0 then
 		self.restoreGrace = if s.attached then 0 else self.restoreGrace - 1
 	end
-	if self.resting and (cancelPressed or feedPressed or (self.restoreGrace == 0 and not self:canRest(s))) then
+	if self.resting and not self.growth:isMoulting() and (cancelPressed or feedPressed or (self.restoreGrace == 0 and not self:canRest(s))) then
 		self:stopRest()
-	elseif feedPressed and not s.holding and not s.feeding then
+	elseif feedPressed and not self.growth:isMoulting() and not s.holding and not s.feeding then
 		self:requestRest(s)
 	end
 	if self.resting then
 		self.restSeconds += dt
 		self.needs:restoreRest(dt * LifeLoop.REST_PER_S)
 	end
-	self:_stepLife(dt)
-	if self:starved() and not self.lifeOver then
+	self:_stepLife(dt, s.position or Vector3.zero)
+	if self:starved() and not self.lifeOver and not self.growth:isMoulting() then
 		self.lifeOver = true
 		self:_emit("starved")
 	end
@@ -186,7 +208,7 @@ end
 function LifeLoop.toRecord(self: any): { [string]: any }
 	return {
 		retreat_id = "sill_crevice", resting = self.resting, rest_seconds = self.restSeconds, elapsed = self.elapsed,
-		life = self.clock:toRecord(),
+		life = self.clock:toRecord(), growth = self.growth:toRecord(),
 	}
 end
 
@@ -202,7 +224,8 @@ function LifeLoop.problems(r: any): { string }
 		local v = r[k]
 		if type(v) ~= "number" or v ~= v or v < 0 or v == math.huge then table.insert(e, `habitat: '{k}' is not a time`) end
 	end
-	for _, p in LifeClock.problems(r.life) do
+	if r.growth ~= nil then for _, p in Growth.problems(r.growth) do table.insert(e,p) end end
+ for _, p in LifeClock.problems(r.life) do
 		table.insert(e, p)
 	end
 	return e
@@ -215,6 +238,9 @@ function LifeLoop.load(self: any, r: any): boolean
 		return false
 	end
 	self.clock:load(r.life)
+ self.growth=Growth.new()
+ if r.growth then self.growth:load(r.growth) end
+ self.grantedSeen=self.needs.grantedTotal
 	self.resting = r.resting
 	self.restSeconds = r.rest_seconds
 	self.elapsed = r.elapsed

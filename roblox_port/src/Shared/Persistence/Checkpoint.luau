@@ -19,8 +19,8 @@
 -- escapes, so a return to a rest meets the same wasp. A visit going on is not kept; restoring ends it. A record without one (the port's
 -- first checkpoints were made before the wasp) gets the record of a life it has not yet visited.
 -- Differences from Godot: the record is the port's own (its flies are the port's, Chet's ROBLOX flies, not Godot's), so
--- Godot checkpoints are not read and schema numbers start again at 1. The passing shadow, growth and the notebook
--- are not ported, so they are not recorded.
+-- Godot checkpoints are not read and schema numbers start again at 1. Schema 3 adds growth and its food ledger cursor.
+-- The passing shadow and notebook are not recorded.
 
 local ObjectRecord = require(script.Parent.ObjectRecord)
 local Fly = require(script.Parent.Parent.Prey.Fly)
@@ -38,12 +38,13 @@ local Observation = require(script.Parent.Parent.Perception.Observation)
 local NeedsModel = require(script.Parent.Parent.Life.NeedsModel)
 local LifeLoop = require(script.Parent.Parent.Life.LifeLoop)
 local LifeClock = require(script.Parent.Parent.Life.LifeClock)
+local Growth = require(script.Parent.Parent.Life.Growth)
 local Layout = require(script.Parent.Parent.Habitat.WindowsillLayout)
 local WaspDirector = require(script.Parent.Parent.Predator.WaspDirector)
 
 local Checkpoint = {}
 
-Checkpoint.SCHEMA_VERSION = 2
+Checkpoint.SCHEMA_VERSION = 3
 Checkpoint.KIND = "retreat_checkpoint"
 Checkpoint.GAME = "the-windowsill-roblox"
 -- Changes whenever the windowsill's pieces or perches change in a way an old checkpoint could not be put back into.
@@ -57,7 +58,7 @@ Checkpoint.CLASSES = {
 	PerchGraph = PerchGraph, Feeding = Feeding, PreyDirector = PreyDirector,
 	Sensor = Sensor, SensorCore = SensorCore, ObservationMemory = ObservationMemory, Contact = ObservationMemory.Contact,
 	Observation = Observation,
-	NeedsModel = NeedsModel, LifeLoop = LifeLoop, LifeClock = LifeClock,
+	NeedsModel = NeedsModel, LifeLoop = LifeLoop, LifeClock = LifeClock, Growth = Growth,
 }
 
 -- What the world is made of that a record keeps by name instead of copying (see ObjectRecord). The same function names them
@@ -158,7 +159,13 @@ local function checkWorld(roots: { [string]: any }, problems: { string })
 	-- The clock and the rest.
 	for _, p in LifeClock.problems(if type(life.clock) == "table" then LifeClock.toRecord(life.clock) else nil) do bad(p) end
 	if getmetatable(life.clock) ~= LifeClock then bad("life: the clock is not a life clock") end
-	if type(life.resting) ~= "boolean" then bad("life: 'resting' is not true or false") end
+	if getmetatable(life.growth) ~= Growth then bad("growth: missing growth state")
+ else
+  for _,p in Growth.problems(life.growth:toRecord()) do bad(p) end
+  if life.growth:isMoulting() and not life.resting then bad("growth: moult outside rest") end
+ end
+ if not finite(life.grantedSeen) or life.grantedSeen<0 or life.grantedSeen>needs.grantedTotal+1e-6 then bad("growth: invalid food ledger cursor") end
+ if type(life.resting) ~= "boolean" then bad("life: 'resting' is not true or false") end
 	-- The flies: unique ids, a known state, finite places, perches held only by flies that exist.
 	if type(prey.flies) ~= "table" then
 		bad("prey: no list of flies")
@@ -245,6 +252,11 @@ function Checkpoint.check(record: any, world: World): ({ string }, ObjectRecord.
 		return problems, nil
 	end
 	local roots = decoded.roots
+ -- Schemas 1/2 had no growth. Migrate only old records; never repair a damaged schema 3 record.
+ if sv < 3 and type(roots.life)=="table" and type(roots.needs)=="table" then
+  if roots.life.growth == nil then roots.life.growth=Growth.new() end
+  if roots.life.grantedSeen == nil then roots.life.grantedSeen=roots.needs.grantedTotal end
+ end
 	local ok: boolean, err: any = (pcall :: any)(checkWorld, roots, problems)
 	if not ok then bad("world: " .. tostring(err)) end
 	if #problems > 0 then return problems, nil end

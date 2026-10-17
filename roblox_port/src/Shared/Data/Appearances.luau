@@ -192,7 +192,8 @@ local volans = {
 	id = "maratus_volans_male",
 	name = "Peacock spider (male)",
 	scale = SCALE, -- SpiderRig scales its own distances (foot search, stepping) by this
-	bodyDrop = 0.21, -- the drawn body sits this far (studs) below the collider's centre, so it stands on the surface (the collider is 0.31 high)
+	cameraScale = 0.62, -- closer framing for the small appearance; user zoom still applies
+ bodyDrop = 0.21, -- the drawn body sits this far (studs) below the collider's centre, so it stands on the surface (the collider is 0.31 high)
 
 	-- ---------------------------------------------------------------- colours (ART, after the photographs in Otto & Hill 2011)
 	body = { 0.09, 0.05, 0.04 }, -- carapace: dark brown-black
@@ -252,20 +253,20 @@ local volans = {
 	-- behind), given as fractions of the radii. The back (ventral) side repeats the rim and the field so the fan is a fan from behind.
 	fan = {
 		radii = { 0.165, 0.150 }, folded = { 0.42, 0.55 }, plane = 0.004, zShift = 0.018, layerStep = 0.0022, thickness = 0.004,
-		foldedThickness = 0.06, foldedSink = 0.030, -- folded, the discs are thick and sunk into the dome (a lens on the abdomen) and flatten as the fan opens
+		foldedThickness = 0.042, foldedSink = 0.021, -- folded, the discs are thick and sunk into the dome (a lens on the abdomen) and flatten as the fan opens
 		layers = {
 			{ name = "FanFringe", color = { 0.95, 0.94, 0.88 }, inset = 0.0 },
-			{ name = "FanArch", color = { 0.88, 0.25, 0.06 }, inset = 0.024 },
-			{ name = "FanField", color = { 0.05, 0.38, 0.72 }, inset = 0.046 },
+			{ name = "FanArch", color = { 0.96, 0.30, 0.065 }, inset = 0.015 },
+			{ name = "FanField", color = { 0.025, 0.48, 0.82 }, inset = 0.046 },
 			{ name = "FanArch", color = { 0.88, 0.25, 0.06 }, inset = 0.078 },
-			{ name = "FanField", color = { 0.04, 0.46, 0.66 }, inset = 0.092 },
+			{ name = "FanField", color = { 0.02, 0.65, 0.67 }, inset = 0.092 },
 		},
 		figureColor = { 0.02, 0.02, 0.03 },
 		-- A black trident on the blue: a long bar and two slanting prongs (fractions of the radii; angle in radians). Never a face.
 		figure = { { x = 0, z = 0.05, rx = 0.07, rz = 0.50, angle = 0 }, { x = -0.30, z = -0.18, rx = 0.07, rz = 0.30, angle = 0.55 }, { x = 0.30, z = -0.18, rx = 0.07, rz = 0.30, angle = -0.55 } },
 		back = { plane = -0.004, layers = { 1, 2, 3 } }, -- the layers (by number) the back repeats, and where (this far under the abdomen's belly)
 		flaps = { color = { 0.88, 0.25, 0.06 }, radii = { 0.030, 0.006, 0.085 }, hingeX = 0.080, hingeY = 0.040, foldedDeg = -80 }, -- the folded flaps on the flanks
-		sheen = 0.12,
+		sheen = 0.18,
 	},
 	-- Legs III in a dance: how the pose's raise and wave move them (ART).
 	dance = { kneeUp = 0.03 },
@@ -291,5 +292,13 @@ local volans = {
 		},
 	},
 }
+
+-- ART: six fine teal scale streaks catch light on the open fan. Full detail only; mobile keeps its 80-part budget.
+for _,side in {-1,1} do
+ for _,z in {-0.36,0,0.36} do
+  table.insert(volans.fan.figure,{x=side*0.49,z=z,rx=0.018,rz=0.10,angle=side*z*0.65,
+   color={0.30,0.80,0.86},fullOnly=true})
+ end
+end
 
 return { default = "first_spider", profiles = { first_spider = first, maratus_volans_male = volans } }

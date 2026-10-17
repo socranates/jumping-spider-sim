@@ -284,11 +284,53 @@ return function(driver: any)
   driver.needs:addHours(400,false);wait(.7);assert(driver.needs.energy>=.1-1e-9)
   assert(driver.fresh("main",false,nil))
  end)
+ check("GROWTH: three safe moults, old skins, Easy and checkpoint recovery",function()
+  assert(driver.fresh("main",false,nil));driver.place(Vector3.new(-25.5,.31,6));wait(.3)
+  driver.life.clock.hour=12
+  local samples={}
+  local conn=RunService.Heartbeat:Connect(function(dt) table.insert(samples,dt) end)
+  local function press(key)
+   driver.input:simulate(key,true);wait(.08);driver.input:simulate(key,false);wait(.12)
+  end
+  for stage=1,3 do
+   if driver.life.resting then press("Feed") end
+   -- A staged meal credit; the production loop must read the ledger, not a test-only growth hook.
+   driver.needs.energy=0
+   assert(driver.needs:grantEnergy(.9,"growth_test_"..stage)>=.9-1e-9)
+   wait(.1);assert(driver.life.growth.ready,"food did not ready a moult")
+   press("Feed");assert(driver.life.growth:isMoulting(),"moult didn't start")
+   local before=driver.motor.pos
+   driver.input:simulate("Forward",true);press("Jump");press("Drop");wait(.2);driver.input:simulate("Forward",false)
+   assert((driver.motor.pos-before).Magnitude<.02,"moulting spider escaped crack")
+   assert(driver.rig().model:FindFirstChild("Cephalothorax").Color.R>.5,"not pale")
+   local t=0
+   while driver.life.growth.stage<stage and t<12 do t+=RunService.Heartbeat:Wait() end
+   assert(driver.life.growth.stage==stage and #driver.life.growth.exuviae==stage,"moult did not complete once")
+   assert(driver.currentStore():loadBest().ok,"grown checkpoint not kept")
+   assert(driver.rig().model:GetAttribute("GrowthStage")==stage,"rig not grown")
+   driver.returnToCheckpoint();wait(.15)
+   assert(driver.life.growth.stage==stage and driver.life.growth:isSoft(),"checkpoint lost growth or softness")
+  end
+  conn:Disconnect();table.sort(samples)
+  print("PORT_GROWTH_FRAME "..HttpService:JSONEncode({count=#samples,p50=samples[math.max(1,math.floor(#samples*.5))]*1000,p95=samples[math.max(1,math.floor(#samples*.95))]*1000,max=samples[#samples]*1000}))
+  assert(driver.session.finishedMain,"adult did not open Easy")
+  driver.openMenu();assert(driver.menu:choose("Easy"));wait(.2)
+  assert(driver.menu:isShowing() and not driver.needs.gentle,"new-life confirmation skipped")
+  assert(driver.menu:choose("Easy"));wait(.2)
+  assert(driver.needs.gentle and driver.life.growth.stage==0,"Easy not a new gentle life")
+  assert(driver.fresh("main",false,nil))
+ end)
  local passed=0
 	for _,row in rows do if row.passed then passed+=1 end end
 	print("PORT_CLIENT_REPORT "..HttpService:JSONEncode({evidence_id=workspace:GetAttribute("PortEvidence"),tests=#rows,passed=passed,failed=#rows-passed,results=rows}))
 	print("PORT_CLIENT_SUMMARY "..HttpService:JSONEncode({evidence_id=workspace:GetAttribute("PortEvidence"),tests=#rows,passed=passed,failed=#rows-passed}))
 	driver.input:clear()
-	-- Leave a recoverable hanging pose for visual inspection in the test place.
-	driver.place(Vector3.new(-18,0.31,6)); driver.motor.heading=Vector3.xAxis; driver.camera:snap()
+	-- Staged adult peacock portrait for visual inspection, after the reports. Test place only.
+ driver.place(Vector3.new(-25.5,.31,6));driver.life.clock.hour=12;wait(.3)
+ driver.input:simulate("Feed",true);wait(.1);driver.input:simulate("Feed",false);wait(.2)
+ if driver.appearance()~="maratus_volans_male" then driver.changeSpider() end
+ driver.life:stopRest();driver.life.growth.stage=3;driver.life.growth.softHoursLeft=0
+ driver.place(Vector3.new(-18,.31,6));driver.motor.heading=Vector3.xAxis;driver.camera:snap()
+ driver.camera.yaw+=math.pi;driver.camera.elevation=math.rad(22);driver.camera.distance=4
+ wait(.3);driver.input:simulate("Display",true);wait(.1);driver.input:simulate("Display",false)
 end

@@ -28,6 +28,8 @@ local SpiderHud = require(script.Parent.SpiderHud)
 local CaughtPanel = require(script.Parent.CaughtPanel)
 local WorldDetail = require(script.Parent.WorldDetail)
 local Soundscape = require(script.Parent.Soundscape)
+local OldSkins = require(script.Parent.OldSkins)
+local skins = OldSkins.new(Workspace)
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Movement = Shared:WaitForChild("Movement")
@@ -308,6 +310,7 @@ local cam: any = SpiderCamera.new(camera, params, function()
 	return {
 		pos = motor.pos, drawnUp = drawnUp, heading = motor.heading,
 		onLine = motor:onLine(), rest = motor:lineRestPoint(), lip = motor:lineLip(),
+  cameraScale = (rig._appearance.cameraScale or 1)*math.sqrt(rig._growth),
 	}
 end, function(on: boolean)
 	rig:setEyeView(on)
@@ -349,7 +352,7 @@ local controls: any -- bound below (SpiderInput.bind)
 -- Choosing the spider (ROBLOX-31): only while resting awake in the silk-lined crack. The drawn rig is built again with the other appearance;
 -- the gait, the eye view and the hidden body carry over; the choice is kept in the Player attribute Appearance for the session.
 local function canChange(): boolean
-	return life.resting and not life.asleep
+	return life.resting and not life.asleep and not life.growth:isMoulting()
 end
 local function changeSpider()
 	if not canChange() then
@@ -404,6 +407,8 @@ local function returnToCheckpoint()
 		return
 	end
 	session.mode, session.rules, session.ended = life.mode or "main", life.rules or "standard", false
+ motor:setReachFactor(life.growth:reachFactor())
+ session:finishAdult(life.growth.stage)
 	session.summary = nil
 	controls:clear()
 	focusState:clear()
@@ -431,7 +436,7 @@ local function fresh(mode: string, easy: boolean, position: Vector3?): boolean
  if not initialRecord or (easy and not session.finishedMain) then return false end
  local ok=Checkpoint.restore(initialRecord,checkpointWorld)
  if not ok then return false end
- session:begin(mode,easy);applyRules()
+ session:begin(mode,easy);applyRules();motor:setReachFactor(life.growth:reachFactor())
  sensor:reset();memory:clear()
  stores[mode]=newStore();checkpoints=stores[mode]
  life.resting=false;life.notice="";life.noticeSeconds=0;life.restoreGrace=0
@@ -452,7 +457,7 @@ local function continueAnother()
 end
 local function summaryRecord(cause: string): any
  return {cause=cause,hours=math.max((life.clock.day-1)*24+life.clock.hour-LifeClock.START_H,0),
-  meals=prey.feeding.mealsFinished,wasp_visits=wasp.visits,wasp_escapes=wasp.escapes,stage=0}
+  meals=prey.feeding.mealsFinished,wasp_visits=wasp.visits,wasp_escapes=wasp.escapes,stage=life.growth.stage}
 end
 panel=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
  if choice=="Another" then continueAnother()
@@ -531,6 +536,7 @@ controls = SpiderInput.bind({
 		feedPending = true -- in the crack, with nothing to eat, the same button rests (Godot's interact)
 	end,
 	jump = function(phase: string)
+  if life.growth:isMoulting() then return end
 		if phase == "begin" and prey.feeding.struggling then prey.feeding:press(); gripPress=true; return end
 		if gripPress then if phase ~= "begin" then gripPress=false end; return end
 		if phase == "begin" then
@@ -554,7 +560,7 @@ controls = SpiderInput.bind({
 		focusState:cancel(jump:isBusy() or #jump.events > 0 or motor:onLine())
 		jump:cancel()
 	end,
-	drop = function() dance:stop(); motor:requestDrop() end,
+	drop = function() if life.growth:isMoulting() then return end; dance:stop(); motor:requestDrop() end,
 	clear = dropAll,
 	reset = function() if not panel:isShowing() then returnToCheckpoint() end end, -- the catch screen has its own way back
 	gait = function() rig.gaitMode = if rig.gaitMode == "Tetrapod" then "Unilateral" else "Tetrapod" end,
@@ -574,6 +580,7 @@ controls = SpiderInput.bind({
 
 -- One fixed tick's intent from the controls, for the motor.
 local function tickInput(): any
+ if life.growth:isMoulting() then return SpiderMotor.idleInput() end
 	local r, f = controls:axes()
 	local wish = Vector3.zero
 	if r ~= 0 or f ~= 0 then
@@ -659,12 +666,19 @@ local function updateHud(frameDt: number)
 	elseif prey.feeding.feeding then table.insert(view.status, "Feeding — move to stop")
 	elseif prey.feeding.held then table.insert(view.status, "Meal paused — " .. ControlText.name(device,"feed") .. " to eat") end
 	local clock = life.clock
-	view.day = LifeText.day(clock.day, clock:partOfDay()) .. (if session.mode=="free" then " | FREE PLAY" elseif session.rules=="gentle" then " | EASY" else "")
+	view.day = LifeText.day(clock.day, clock:partOfDay()) .. " | " .. life.growth:stageName() .. (if session.mode=="free" then " | FREE PLAY" elseif session.rules=="gentle" then " | EASY" else "")
 	view.dayLine = LifeText.line(clock:partOfDay(), needs.energy, needs:isStarving(), needs.gentle, LifeLoop.HUNGRY_AT, life:tooHungryToSleep())
-	view.notice = if life.noticeSeconds > 0 and life.notice ~= "" then life.notice else nil
+ if life.growth.ready then view.dayLine="Ready to moult: rest in the silk-lined crack."
+ elseif life.growth:isSoft() then view.dayLine="Soft new skin: shorter jumps until it hardens." end
+ view.notice = if life.noticeSeconds > 0 and life.notice ~= "" then life.notice else nil
 	local canRest = life:canRest(lifeSpider)
 	local restPrompt = LifeText.prompt(life.asleep, life.resting, canRest, clock:isSleepTime() and not life:tooHungryToSleep(), device, PeacockText.change(device, appearance))
-	if not restPrompt and (motor.pos-Vector3.new(-24,1,6)).Magnitude<7 and not prey.feeding.held then
+ if life.growth:isMoulting() then
+  restPrompt={title="Moulting in the silk-lined crack",hint="The spider pulls free of its old skin. Wait here while the hours pass."}
+ elseif life.growth.ready and canRest and not life.resting then
+  restPrompt={title="Ready to moult",hint=ControlText.name(device,"feed")..": rest and moult in the crack"}
+ end
+ if not restPrompt and (motor.pos-Vector3.new(-24,1,6)).Magnitude<7 and not prey.feeding.held then
   restPrompt={title="Home: the silk-lined crack",hint=if lifeSpider.inRetreat then "Keep still on a surface, then "..ControlText.name(device,"feed")..": rest" else "Walk through the silk-framed opening under the wooden roof, then stop to rest."}
  end
  local canDance = SpiderChoice.canDance(appearance)
@@ -694,7 +708,7 @@ local function updateHud(frameDt: number)
 	end
 	if os.clock() > helpUntil and helpVisible then helpVisible = false end
 	local restLabel = LifeText.touchLabel(life.asleep, life.resting, canRest, clock:isSleepTime() and not life:tooHungryToSleep())
-	controls:setTouchVisible("Feed", prey.feeding.held ~= nil or restLabel ~= nil)
+	controls:setTouchVisible("Feed", (prey.feeding.held ~= nil or restLabel ~= nil) and not life.growth:isMoulting())
 	controls:setTouchLabel("Feed", if prey.feeding.held ~= nil then "Eat" else restLabel or "Eat")
 	controls:setTouchLabel("Jump", if prey.feeding.struggling then "Grip" else "Jump")
 	controls:setTouchLabel("Cancel", ControlText.touchCancelLabel(onLine))
@@ -729,7 +743,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			if waspPercept then table.insert(percepts, waspPercept) end
 			sensor:step(DT,motor:observer(),percepts,sightCast)
 			prey:before(DT,motor.pos,motor:observer(),sensor,sightCast,camera)
-			jump:step(motor)
+			if life.growth:isMoulting() then jump:drop(motor);motor:cancelWalk() else jump:step(motor) end
 			local input = tickInput()
 			motor:tick(input)
 			-- The wasp runs after the spider has moved and before feeding (Godot: physics priority 8).
@@ -744,7 +758,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			waspSpider.falling = fallingOnLine
 			waspSpider.airborne = motor.mode == "air" and not fallingOnLine and not motor.seized
 			wasp:step(DT, waspSpider, {
-				day = life.clock.day, hour = life.clock.hour, resting = life.resting, moulting = false, meals = prey.feeding.mealsFinished,
+				day = life.clock.day, hour = life.clock.hour, resting = life.resting, moulting = life.growth:isMoulting(), meals = prey.feeding.mealsFinished,
 			})
 			for _, signal in wasp:drainSignals() do
 				if signal.kind == "caught" then
@@ -764,12 +778,20 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			lifeSpider = {
 				inRetreat = Layout.inRetreat(motor.pos), attached = motor.mode == "attached" and not motor.preparing,
 				still = input.wish.Magnitude < 0.01 and motor.vel.Magnitude < 0.15,
-				holding = holding, feeding = holding and prey.feeding.feeding,
+				holding = holding, feeding = holding and prey.feeding.feeding, position = motor.pos,
 			}
 			life:step(DT, lifeSpider, feedPending, cancelPending)
 			feedPending, cancelPending = false, false
 			sensor.core.rangeScale = life.rangeScale
-			for _,event in life:drainEvents() do if event.kind=="starved" then endLife("starved") end end
+			motor:setReachFactor(life.growth:reachFactor())
+   for _,event in life:drainEvents() do
+    if event.kind=="starved" then endLife("starved")
+    elseif event.kind=="moult_started" then dropAll()
+    elseif event.kind=="moulted" and session:finishAdult(life.growth.stage) then
+     life:showNotice("Your spider is an adult! Easy is now available in the life menu for this session.")
+     life.noticeSeconds=12
+    end
+   end
             if not initialRecord and Checkpoint.boundaryProblem(checkpointWorld)=="" then
              initialRecord=Checkpoint.capture(checkpointWorld,0)
              if initialRecord and not menuStarted then
@@ -808,7 +830,13 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 		dancePose = nil
 		rig.dance = nil
 	end
-	rig:update(body, simFrame, motor.mode == "attached", motor.moving)
+ rig.reducedMotion=player:GetAttribute("ReducedMotion")==true
+ rig:setGrowthStage(life.growth.stage)
+ rig:setSoftness(life.growth:softness())
+ rig:setCondition(needs.energy)
+ local paused=GuiService.MenuIsOpen or panel:isShowing() or menu:isShowing()
+ rig:update(body, if paused then 0 else simFrame, motor.mode == "attached", motor.moving)
+ skins:draw(life.growth.exuviae)
 	updateHud(frameDt)
 	flyBodies:draw(prey.flies,prey.now)
 	local soundPaused = GuiService.MenuIsOpen or panel:isShowing() or menu:isShowing()

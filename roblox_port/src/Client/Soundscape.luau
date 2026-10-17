@@ -29,7 +29,7 @@ function Soundscape.new(parent: Instance): any
 	emitter.Transparency = 1; emitter.Size = Vector3.new(0.1, 0.1, 0.1); emitter.Parent = root
 	local hum = voice(emitter, "wasp", 0.42, true)
 	hum.RollOffMinDistance = 16; hum.RollOffMaxDistance = 120
-	return setmetatable({ root = root, room = voice(root, "room", 0.16, true),
+	return setmetatable({ root = root, room = voice(root, "room", 0.09, true),
 		waspEmitter = emitter, waspHum = hum,
 		birds = voice(root, "birds", 0.16, false), slots = {}, elapsed = 0, nextBird = 8 }, Soundscape)
 end

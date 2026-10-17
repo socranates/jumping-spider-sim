@@ -81,8 +81,16 @@ Four flies now live on the sill. Stalk, inspect, leap to catch, tap to hold on, 
 
 ## A life and continuing (ROBLOX-33, 34)
 
-The start menu offers Standard and Free play (gentle hunger; the wasp only touches). **M / View / PlayStation Touchpad / Menu** returns to the life menu. Easy's unlock rule is tested but awaits the growth port; Free play is available now. Progress and checkpoints are **session only**, not saved across Roblox sessions.
+The start menu offers Standard and Free play (gentle hunger; the wasp only touches). **M / View / PlayStation Touchpad / Menu** returns to the life menu. Growing to adult in a Standard main life opens Easy for this session; Free play is available immediately. Progress and checkpoints are **session only**, not saved across Roblox sessions.
 
 Home is the silk-framed opening **under** the wooden roof at the west end, not a decorative paint crack or the roof itself. Walk inside, stop with no prey in the jaws, and press **E / L3 / Rest**. C / R1 / Change while resting awake chooses the peacock; X / R1 / Dance outside starts the dance. It is still free/unlocked for testing.
 
 Standard shows a starvation warning, then a full day of weakness before death. The end offers the last rest (when one exists) or an unrelated spider in a new spot. The appearance stays chosen. Main life and Free play have separate last rests; starting a new main life asks for confirmation. The menu has large text, scrolling and controller focus. Notebook and live DataStore persistence remain later work.
+
+## Growth and peacock polish (ROBLOX-35/36)
+
+Actual food energy, accumulated until 0.9, readies the next moult (the amount of energy granted matters, not the meal count). Rest in the safe crack to moult. Twelve game hours pass in about nine real seconds; movement waits until the spider finishes. Each of three moults grows the drawn spider, leaves an old skin and gives ten game hours of pale soft skin with shorter jump reach. Stage scales 1/1.15/1.32/1.50 are artistic, with the same collider and world-planted feet. Actual adulthood opens Easy for a Standard main life. Checkpoint schema 3 keeps this state; older records begin at the youngest stage without crediting old meals again. Everything remains session-only.
+
+The peacock gets a closer camera, richer fan colours and six fine scale highlights at full detail (119 parts; mobile stays 80). Room ambience is quieter; the eight-second wasp warning is unchanged. The stage and notices share one HUD column. The cosmetic peacock's adult male colours/dance remain available at every gameplay stage, deliberately: this is an appearance choice, not a biological Maratus life simulation.
+
+Next: a session notebook with sourced pages, then server-owned DataStore persistence in a separate chunk. See docs/HANDOFF-roblox-growth-polish.md.

@@ -202,7 +202,8 @@ function NotebookPanel.layout(self: any)
 	local sizes = NotebookText.SIZES
 	local size = self.gui.AbsoluteSize
 	local lay = NotebookText.layout(size.X, size.Y, s)
-	local head, foot = math.floor((sizes.heading + 10) * s), math.floor(58 * s)
+	local m = NotebookText.metrics(size.X, size.Y, s)
+	local head, foot = m.head, m.foot
 	self.heading.Size = UDim2.new(1, 0, 0, head)
 	self.heading.TextSize = sizes.heading * s
 	self.body.Position = UDim2.fromOffset(0, head + 4)
@@ -279,8 +280,15 @@ function NotebookPanel.showPage(self: any, id: string)
 	for i, b in self.buttons do
 		local on = self.ids[i] == self.shown
 		b.BackgroundColor3 = if on then PAPER_LIT else PAPER_DARK
-		if on and self.device == "gamepad" and self.view == "list" then pcall(function() GuiService.SelectedObject = b end) end
 	end
+	self:_select()
+end
+
+-- A controller shows what it has chosen: the list's selection follows the chosen page while the list is up.
+function NotebookPanel._select(self: any)
+	local at = table.find(self.ids, self.shown)
+	local target: GuiObject? = if self.device == "gamepad" and self.view == "list" and at then self.buttons[at] else nil
+	pcall(function() GuiService.SelectedObject = target end)
 end
 
 -- Opens the notebook at its newest page. `returnTo` comes back to onClose; `device` names the controls; `scale` is the text scale.
@@ -295,6 +303,7 @@ function NotebookPanel.open(self: any, returnTo: string?, device: ControlText.De
 	self:showPage(self.book:newest() or "")
 	if #self.ids > 0 and not self:stacked() then self.view = "list" end
 	self:layout()
+	self:_select()
 	if not self.bound then
 		self.bound = true
 		CAS:BindActionAtPriority(ACTION, function(_, state, input)
@@ -331,11 +340,9 @@ end
 -- Chooses a page: it shows on the right; with one pane it takes the whole panel.
 function NotebookPanel.choose(self: any, id: string)
 	self:showPage(id)
-	if self:stacked() then
-		self.view = "page"
-		pcall(function() GuiService.SelectedObject = nil end)
-	end
+	if self:stacked() then self.view = "page" end
 	self:layout()
+	self:_select()
 end
 
 -- Back from a page to the list when one pane shows; otherwise close.
@@ -356,7 +363,6 @@ function NotebookPanel.step(self: any, delta: number)
 	local at = table.find(self.ids, self.shown) or 1
 	local to = math.clamp(at + delta, 1, n)
 	self:showPage(self.ids[to])
-	if self.device == "gamepad" and self.view == "list" then pcall(function() GuiService.SelectedObject = self.buttons[to] end) end
 end
 
 function NotebookPanel.scrollBy(self: any, pixels: number)

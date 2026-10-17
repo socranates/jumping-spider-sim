@@ -82,4 +82,15 @@ function NotebookText.layout(width: number, height: number, scale: number): Layo
 	return { sideBySide = sideBySide, listFraction = if sideBySide then 0.34 else 1.0 }
 end
 
+export type Metrics = { paperW: number, paperH: number, head: number, foot: number, body: number }
+
+-- Pixel sizes of the panel for a safe area of this size: the paper (97% by 95%, at most 1040 by 820), the heading and footer bands, and
+-- the height left for the pages (what scrolls). Pure, so a short screen can be checked: a phone held sideways is 568 by 320.
+function NotebookText.metrics(width: number, height: number, scale: number): Metrics
+	local paperW, paperH = math.min(width * 0.97, 1040), math.min(height * 0.95, 820)
+	local head = math.floor((NotebookText.SIZES.heading + 10) * scale)
+	local foot = math.floor(58 * scale)
+	return { paperW = paperW, paperH = paperH, head = head, foot = foot, body = paperH - 20 - head - foot - 12 }
+end
+
 return NotebookText

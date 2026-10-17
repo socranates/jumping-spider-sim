@@ -148,6 +148,7 @@ function SpiderEyes.new(o: Options): any
 		dofSaved = nil :: any,
 		uv = { folder = nil :: Instance?, parts = {} :: { any }, wait = 0, scan = true },
 		captionAge = 0,
+		moversShown = 0, -- how many movement rings and edge arcs the last frame drew (the notebook's "shimmer" reads it)
 	}, SpiderEyes)
 end
 
@@ -171,6 +172,7 @@ function SpiderEyes._leave(self: any)
 	self:_restoreDepthOfField()
 	self:_setUv(0)
 	self:_hideMovers(0, 0)
+	self.moversShown = 0
 end
 
 -- Puts the world's depth of field back as the third person had it.
@@ -371,6 +373,7 @@ function SpiderEyes._drawMovers(self: any, strips: { EyeOptics.Strip }, p: EyeOp
 		end
 	end
 	self:_hideMovers(rings, arcs)
+	self.moversShown = rings + arcs
 end
 
 -- ---------------------------------------------------------------- the words

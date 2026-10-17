@@ -176,6 +176,10 @@ function Hud.new(playerGui: Instance): any
 	local day = wrapLabel("Day", dayBox, 15, 1)
 	local dayLine = wrapLabel("DayLine", dayBox, 14, 2)
 	dayLine.TextXAlignment = Enum.TextXAlignment.Left
+	-- The notebook's note that a page opened (ROBLOX-37): under the day, for a few seconds.
+	local note = wrapLabel("NotebookNote", dayBox, 15, 3)
+	note.TextXAlignment = Enum.TextXAlignment.Left
+	note.TextColor3 = Color3.new(0.96, 0.93, 0.82)
 	local panel = Instance.new("Frame")
 	panel.Name = "PromptPanel"
 	panel.BackgroundTransparency = 1
@@ -196,7 +200,7 @@ function Hud.new(playerGui: Instance): any
 	local self = setmetatable({
 		grip = grip, gripFill = gripFill, centre = centre, safe = safe, reticle = reticle, ticks = ticks,
 		aimTitle = aimTitle, aimHint = aimHint, anchorLabel = anchorLabel,
-		status = status, caption = caption, toastLabel = toast, help = help, notice = notice, day = day, dayLine = dayLine,
+		status = status, caption = caption, toastLabel = toast, help = help, notice = notice, day = day, dayLine = dayLine, noteLabel = note, noteLeft = 0,
 		panel = panel, promptTitle = promptTitle, promptHint = promptHint, promptCue = promptCue,
 		toastLeft = 0, device = "keyboard", lastSpan = "",
 	}, Hud)
@@ -209,6 +213,13 @@ function Hud.toast(self: any, text: string, warn: boolean?)
 	self.toastLabel.TextColor3 = if warn then WARN_COLOR else OK_COLOR
 	self.toastLabel.Visible = true
 	self.toastLeft = TOAST_SECONDS
+end
+
+-- The note that a page opened in the notebook, for `seconds`.
+function Hud.setNote(self: any, text: string, seconds: number)
+	self.noteLabel.Text = text
+	self.noteLabel.Visible = text ~= ""
+	self.noteLeft = if text ~= "" then seconds else 0
 end
 
 local function show(label: TextLabel, text: string?)
@@ -262,6 +273,10 @@ function Hud.update(self: any, view: any, dt: number)
 	show(self.promptHint, if prompt then prompt.hint else nil)
 	show(self.promptCue, if prompt then prompt.cue else nil)
 	if view.helpVisible then show(self.help, view.helpText) else show(self.help, nil) end
+	if self.noteLeft > 0 then
+		self.noteLeft -= dt
+		if self.noteLeft <= 0 then self.noteLabel.Visible = false end
+	end
 	if self.toastLeft > 0 then
 		self.toastLeft -= dt
 		if self.toastLeft <= 0 then self.toastLabel.Visible = false end

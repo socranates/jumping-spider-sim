@@ -112,13 +112,14 @@ CLIENT_MODULES = [
     ("SpiderInput", "../Client/SpiderInput.luau"),
     ("SpiderHud", "../Client/SpiderHud.luau"),
     ("CaughtPanel", "../Client/CaughtPanel.luau"),
+    ("NotebookPanel", "../Client/NotebookPanel.luau"),
     ("PerceptionStage", "../Client/PerceptionStage.luau"),
     ("FlyBodies", "../Client/FlyBodies.luau"),
     ("WaspBody", "../Client/WaspBody.luau"),
     ("PerceptionHud", "../Client/PerceptionHud.luau"),
     ("SpiderEyes", "../Client/SpiderEyes.luau"),
 ]
-CLIENT_TESTS = {"growth.luau","perception_client.luau", "client_smoke.luau", "look.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "wasp.luau"}
+CLIENT_TESTS = {"growth.luau","perception_client.luau", "client_smoke.luau", "look.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "wasp.luau", "notebook.luau"}
 REFERENCES = ["jump_reference", "tether_reference", "camera_reference", "framing_reference", "perception_reference", "prey_reference", "life_reference", "wasp_reference", "continuing_reference", "growth_reference", "notebook_reference"]
 # A reference only the named tests read (it is large; the other bundles leave it out).
 REFERENCE_ONLY = {"continuing_reference": {"continuing.luau"},"prey_reference": {"prey.luau"}, "perception_reference": {"perception.luau"}, "life_reference": {"life.luau"}, "wasp_reference": {"wasp.luau"}, "notebook_reference": {"notebook.luau"}}

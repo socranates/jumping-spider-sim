@@ -2,7 +2,10 @@
 -- Intraguild predator, one at a time on the eastern sill: present in every life from the first day it is allowed (Data/RivalRules), and a new one
 -- arrives on the morning after one is eaten (ROBLOX-67). Timings/reward are game tuning, not species measurements.
 -- Plain state lives in LifeLoop's checkpoint graph; no clock, engine instance or hidden player tracking.
+-- ROBLOX-73: the spider's strike catches a rival that has not seen it coming outright, but a rival that has (stalking, winding up, or patrolling
+-- with a notice of Rules.awareNotice) is a contest: caught, sprang clear, or a counter-bite that costs energy. The draw is the rival's own stream.
 local M=require(script.Parent.Parent.Prey.PreyMath)
+local PreyRandom=require(script.Parent.Parent.Prey.PreyRandom)
 local Rules=require(script.Parent.Parent.Data.RivalRules)
 local Layout=require(script.Parent.Parent.Habitat.WindowsillLayout)
 local Rival={}
@@ -13,7 +16,21 @@ local states={dormant=true,patrol=true,stalk=true,windup=true,lunge=true,recover
 function Rival.new(): any
  local at=Rules.arriveAt
  return {state="dormant",position=at,previous=at,heading=-Vector3.xAxis,
-  elapsed=0,notice=0,food=Rival.FOOD,target=at,origin=at,patrol=0,up=Vector3.yAxis,leg=0}
+  elapsed=0,notice=0,food=Rival.FOOD,target=at,origin=at,patrol=0,up=Vector3.yAxis,leg=0,contests=0}
+end
+-- Has it seen the spider coming (so that a strike is a contest and not a sure catch)?
+function Rival.aware(r: any): boolean
+ return r.state=="stalk" or r.state=="windup" or (r.state=="patrol" and r.notice>=Rules.awareNotice)
+end
+-- The outcome of a contest, from a stream of its own so no other draw moves: "captured", "sprang" or "counter". It depends only on the world's seed,
+-- the day and `n` (how many contests this rival has had, kept in its record), so a return to a rest brings back the same outcome for the same strike.
+function Rival.contest(seed: number,day: number,n: number): string
+ local g=PreyRandom.new((seed*73856093+(day*1009+41)*19349663+n*83492791+12345)%2147483647)
+ g:next();g:next()
+ local u=g:next()
+ if u<Rules.contestCaptured then return "captured" end
+ if u<Rules.contestCaptured+Rules.contestSprang then return "sprang" end
+ return "counter"
 end
 -- The next rival, in the same table (the world holds this table): a fresh one that has not yet arrived.
 function Rival.renew(r: any)
@@ -50,6 +67,8 @@ function Rival.valid(r: any): boolean
    or u.X~=u.X or u.Y~=u.Y or u.Z~=u.Z or math.abs(u.Magnitude-1)>.05 then return false end
  end
  if r.leg~=nil and (type(r.leg)~="number" or r.leg~=r.leg or r.leg<0 or r.leg>1e9 or r.leg%1~=0) then return false end
+ if r.contests~=nil and (type(r.contests)~="number" or r.contests~=r.contests or r.contests<0 or r.contests>1e9 or r.contests%1~=0) then return false end
+ if r.spared~=nil and type(r.spared)~="boolean" then return false end
  if r.fate~=nil and r.fate~="eaten" and r.fate~="taken by the wasp" then return false end
  if r.state=="patrol" or r.state=="stalk" or r.state=="windup" or r.state=="lunge" or r.state=="recover" then
   local p,lo,hi=r.position,Layout.PLAY_BOUNDS_MIN,Layout.PLAY_BOUNDS_MAX
@@ -63,7 +82,9 @@ function Rival.valid(r: any): boolean
  return true
 end
 -- blocked(a,b) is the same opaque-world sight query as flies use. Player input is a snapshot of this fixed tick.
--- Returns an event and the amount swallowed; the caller owns food grants and end-of-life presentation.
+-- Returns an event and the amount swallowed; the caller owns food grants and end-of-life presentation. The strike's contest (ROBLOX-73) returns
+-- "captured", "sprang" (it got clear) or "counter" (it bit back) with, for "counter", the energy that costs (0 in the gentle modes) in place of the amount
+-- swallowed. `s.seed` is the world's seed (nil: 0).
 function Rival.step(r: any,dt: number,s: any,blocked: (Vector3,Vector3)->any): (string,number)
  if dt<=0 or dt~=dt then return "",0 end
  dt=math.min(dt,.05);r.previous=r.position
@@ -99,9 +120,21 @@ function Rival.step(r: any,dt: number,s: any,blocked: (Vector3,Vector3)->any): (
  local D=s.drive
  local visible
  if D then visible=D.sees else visible=delta.Magnitude<8 and math.abs(delta.Y)<1.5 and not blocked(r.position,s.position) end
- if s.striking and not s.holding and r.state~="lunge" then
+ if not s.striking then r.spared=nil end
+ if s.striking and not s.holding and r.state~="lunge" and not r.spared then
   local _,d=M.sweepClosest(s.previous,s.position,r.previous,r.position)
-  if d<.65 and not blocked(s.position,r.position) then phase(r,"captured");return "captured",0 end
+  if d<.65 and not blocked(s.position,r.position) then
+   local outcome="captured"
+   if Rival.aware(r) then
+    outcome=Rival.contest(s.seed or 0,s.day or 0,r.contests or 0)
+    r.contests=(r.contests or 0)+1
+   end
+   if outcome=="captured" then phase(r,"captured");return "captured",0 end
+   -- It got away from this strike: it recovers, and the rest of the same strike cannot catch it (the next one, a recovering rival, can).
+   phase(r,"recover");r.spared=true
+   if outcome=="counter" then return "counter",if s.gentle then 0 else Rules.counterCost end
+   return "sprang",0
+  end
  end
  if r.state=="lunge" then
   local k=math.clamp(r.elapsed/.4,0,1)
@@ -129,7 +162,7 @@ function Rival.step(r: any,dt: number,s: any,blocked: (Vector3,Vector3)->any): (
   if r.elapsed>=3 then phase(r,"patrol") end
  else
   r.notice=if visible then math.min(1,r.notice+dt) else math.max(0,r.notice-dt*2)
-  if visible and r.notice>=.6 then
+  if visible and r.notice>=Rules.stalkNotice then
    phase(r,"stalk")
    local flat=if D then delta else Vector3.new(delta.X,0,delta.Z)
    if not D and flat.Magnitude>.01 then r.heading=flat.Unit end

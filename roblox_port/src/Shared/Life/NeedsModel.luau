@@ -189,6 +189,18 @@ function NeedsModel.grantEnergy(self: any, amount: number, sourceId: string): nu
 	return added
 end
 
+-- Energy lost to an injury (ROBLOX-73: the rival's counter-bite). Never more than the spider has, and nothing in the gentle modes. Returns what was
+-- lost. It is not time passing, so it leaves the starving hours to the drain; the reserve is already in the record, so nothing else needs keeping.
+function NeedsModel.injure(self: any, amount: number): number
+	if self.gentle or not finite(amount) or amount <= 0.0 then
+		return 0.0
+	end
+	local before = self.energy
+	self.energy = math.max(0.0, self.energy - amount)
+	changed(self, before)
+	return before - self.energy
+end
+
 -- A valid retreat interaction restores rest; it never grants food energy.
 function NeedsModel.restoreRest(self: any, amount: number)
 	if finite(amount) and amount > 0.0 then

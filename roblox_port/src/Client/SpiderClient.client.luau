@@ -133,8 +133,8 @@ local detail = Detail.choose(UIS.TouchEnabled and not UIS.KeyboardEnabled, Works
 -- Which spider: the Player attribute Appearance (kept for the session), else the Workspace attribute Appearance, else the first spider.
 local appearance = SpiderChoice.start(player:GetAttribute("Appearance"), Workspace:GetAttribute("Appearance"))
 local rig = SpiderRig.new(Workspace, sill, appearance, detail)
--- The rival's legs (ROBLOX-69): its own SpiderMotor over the whole sill, made when it first arrives, and its drawn rig. One table: the client is at Luau's limit of 200 locals.
-local rivalLegs: any = { drive = nil, rig = nil, Drive = require(Shared.Predator.RivalDrive) }
+-- The rival's legs (ROBLOX-69): its own SpiderMotor over the whole sill, made when it first arrives, and its drawn rig; its words (ROBLOX-73). One table: the client is at Luau's limit of 200 locals.
+local rivalLegs: any = { drive = nil, rig = nil, Drive = require(Shared.Predator.RivalDrive), Text = require(Shared.UI.RivalText) }
 local dance = PeacockDance.new() -- the peacock spider's courtship dance (a pose for the rig; nothing else reads it)
 local dancePose: any = nil
 -- The ant-mimicking spider's antennae and drawn walk (a pose for the rig; nothing else reads it): the modules, the state, its latest pose, and where
@@ -1126,6 +1126,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
              wasp=wasp:isVisiting(),gentle=needs.gentle,grounded=motor.mode=="attached",moving=motor.moving,
              airborne=motor.mode=="air",onLine=motor:onLine(),holding=prey.feeding.held~=nil,
              striking=prey.tick<=prey.strikeEnd and not motor.seized,drive=rivalLegs.drive,taken=wasp.holdingRival,
+             seed=914, -- the world's seed, as the prey's and the wasp's: the rival's contest draws from it (ROBLOX-73)
             }
             local rivalEvent,rivalFood=RivalSpider.step(life.rival,DT,rivalState,sightCast)
             if life.rival.state~="dormant" and life.rival.state~="consumed" and rivalLegs.drive==nil then
@@ -1136,13 +1137,16 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
              }),sightCast)
             end
             if rivalLegs.drive then rivalLegs.drive:update(life.rival,DT,rivalState) end
-            if rivalFood>0 then
+            if rivalFood>0 and rivalEvent~="counter" then -- (a counter-bite's number is what it costs, not what was eaten)
              needs:grantEnergy(rivalFood,"rival_spider_meal")
              life.mealFood+=rivalFood*Growth.READY_FOOD/(3*Species.fly_like_prototype.body.nutrition)
             end
             if rivalEvent=="caught" then endLife("rival")
             elseif rivalEvent=="warning" then life:showNotice("The other spider crouches to jump. Dodge, drop or jump away!")
-            elseif rivalEvent=="captured" then life:showNotice("Caught the rival. Stay still to eat; worth two housefly meals.")
+            elseif rivalEvent=="captured" or rivalEvent=="sprang" then life:showNotice(rivalLegs.Text.strike(rivalEvent,needs.gentle) or "")
+            elseif rivalEvent=="counter" then
+             needs:injure(rivalFood) -- the bite costs energy (nothing in the gentle modes)
+             life:showNotice(rivalLegs.Text.counter(needs.gentle))
             elseif rivalEvent=="eaten" then prey.feeding.mealsFinished+=1
             elseif rivalEvent=="touch" then life:showNotice("The rival touched you. You are safe in this mode.") end
 			-- The life loop runs last in the tick (Godot's habitat loop, priority 12); the reach it sets is the next tick's.

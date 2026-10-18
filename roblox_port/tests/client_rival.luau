@@ -90,5 +90,50 @@ check("the wasp takes the rival (ROBLOX-70): it is drawn hanging under the wasp,
 	assert(life.rival.state == "patrol" and life.rival.fate == nil, "a new rival the next morning: " .. tostring(life.rival.state))
 	local _ = rig
 end)
+check("striking a rival that has seen the spider is a contest (ROBLOX-73): each outcome has its notice, a counter-bite costs energy (none in the gentle modes), an unaware rival is still caught outright", function()
+	local driver = ClientStubs.driver
+	local life, needs, prey = driver.life, driver.needs, driver.prey
+	local Rival = require("../src/Shared/Predator/RivalSpider")
+	local RivalText = require("../src/Shared/UI/RivalText")
+	driver.place(Vector3.new(-5, 0.31, -9))
+	frames(5)
+	life.clock.hour = 9
+	assert(life.rival and life.rival.state ~= "dormant" and life.rival.state ~= "consumed", "a rival to strike at")
+	-- One strike at a rival in `state` (with `notice`) whose next draw is `want`. Returns the rival's state, the notice shown, the energy it cost and the draws made.
+	local function strike(state: string, notice: number, want: string?, gentle: boolean): (string, string, number, number)
+		local r = life.rival
+		local n = 0
+		if want ~= nil then
+			while Rival.contest(914, life.clock.day, n) ~= want do n += 1 end
+		end
+		r.state, r.elapsed, r.notice, r.contests, r.spared = state, 0, notice, n, nil
+		r.position = driver.motor.pos + Vector3.new(0.2, 0, 0)
+		r.previous = r.position
+		life.notice, life.noticeSeconds = "", 0
+		needs.energy, needs.gentle = 0.8, gentle
+		prey.strikeEnd = prey.tick + 1
+		local before = needs.energy
+		frames(1)
+		local cost = before - needs.energy
+		needs.gentle = false
+		return r.state, life.notice, cost, r.contests - n
+	end
+	local state, notice, cost, count = strike("stalk", 0, "captured", false)
+	assert(state == "captured" and notice == RivalText.CAPTURED and count == 1, `caught: {state} "{notice}"`)
+	state, notice, cost, count = strike("windup", 0, "sprang", false)
+	assert(state == "recover" and notice == "It sprang clear of your strike." and cost < 0.02 and count == 1, `sprang clear: {state} "{notice}" cost {cost}`)
+	state, notice, cost, count = strike("patrol", 0.5, "counter", false)
+	assert(state == "recover" and notice == "It bit back! Jump away!" and math.abs(cost - 0.25) < 0.02 and count == 1, `counter-bite: {state} "{notice}" cost {cost}`)
+	assert(life.cause == nil, "a counter-bite does not end the life")
+	state, notice, cost = strike("stalk", 0, "counter", true)
+	assert(state == "recover" and notice == RivalText.COUNTER_GENTLE and cost < 0.02, `gentle counter-bite: {state} "{notice}" cost {cost}`)
+	state, notice, cost, count = strike("patrol", 0, nil, false)
+	assert(state == "captured" and notice == RivalText.CAPTURED and count == 0, `an unaware rival is caught outright: {state}, {count} draws`)
+	state, notice, cost, count = strike("recover", 1, nil, false)
+	assert(state == "captured" and count == 0, "and so is one that is recovering")
+	-- Leave it as the other checks expect: a rival of today, patrolling, and the spider's reserves as they were.
+	life.rival.state, life.rival.contests, life.rival.spared, life.rival.food = "patrol", 0, nil, Rival.FOOD
+	needs.energy = 0.8
+end)
 print("CLIENT_RIVAL passed=" .. passed .. " failed=" .. failed)
 if failed > 0 then error("CLIENT_RIVAL failed") end

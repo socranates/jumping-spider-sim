@@ -489,6 +489,7 @@ return function(driver: any)
   driver.life.rival=Rival.new();driver.place(Vector3.new(15,.31,8));wait(.3)
   assert(workspace:FindFirstChild("RivalSpider")~=nil,"rival rig missing")
   driver.life.growth.stage=0;driver.life.growth.fedSinceMoult=0;driver.life.growth.ready=false
+  driver.life.rival.notice=0 -- (it has not seen the spider coming: a strike at one that has is a contest, ROBLOX-73)
   driver.place(driver.life.rival.position);driver.prey.strikeEnd=driver.prey.tick+240
   wait(.2);assert(driver.life.rival.state=="captured","jump contact did not capture rival")
   wait(5.3);assert(driver.life.rival.state=="consumed","rival meal did not finish")

@@ -114,5 +114,141 @@ do -- never in the retreat, never an attack there or while resting, whatever the
  check(seen and worst==0,`the rival stays on the eastern sill ({worst} ticks outside)`)
  check(#events==0,"no attack, warning or touch while the spider is in the retreat")
 end
+-- ---------------------------------------------------------------- striking the rival is a contest, and it presses harder (ROBLOX-73)
+local RivalText=require("../src/Shared/UI/RivalText")
+do -- the numbers, pinned
+ check(Rules.reachWu==3.2 and Rules.rememberSeconds==5.0 and Rules.stalkNotice==.45,"initiative: windup from 3.2 wu, remembers 5 s, stalks from a notice of 0.45")
+ check(Rules.awareNotice==.3 and Rules.contestCaptured==.55 and Rules.contestSprang==.25 and Rules.counterCost==.25,"contest: aware from 0.3, 55% caught, 25% sprang clear, the rest a bite worth 0.25")
+ check(math.abs(Rules.contestCaptured+Rules.contestSprang+.20-1)<1e-12,"55 + 25 + 20 is all of it")
+ check(Rules.reachWu>2.5 and Rules.rememberSeconds>3 and Rules.stalkNotice<.6,"each is more pressing than Godot's 2.5, 3 and 0.6")
+end
+local function strike(r,day,gentle)
+ local s=player();s.day=day or 2;s.seed=914;s.gentle=gentle==true
+ s.position=r.position+Vector3.xAxis*.2;s.previous=s.position;s.striking=true
+ return s
+end
+do -- it stalks sooner: a patrolling rival that sees the spider starts to stalk at a notice of 0.45, not 0.6
+ local r=R.new();local s=player();r.state="patrol";s.position=Vector3.new(20,.31,8);s.previous=s.position
+ local at=0
+ for i=1,60 do R.step(r,1/60,s,clear);if r.state=="stalk" then at=i;break end end
+ check(at>=25 and at<=29 and r.notice>=.45 and r.notice<.5,`it stalks after about {Rules.stalkNotice} s of seeing the spider (tick {at}, notice {r.notice})`)
+end
+do -- who is aware: stalking, winding up, or patrolling with a notice of 0.3; not one that has not noticed, and not one recovering
+ local r=R.new()
+ for _,c in {{"patrol",.29,false},{"patrol",.3,true},{"patrol",0,false},{"stalk",0,true},{"windup",0,true},{"recover",1,false},{"lunge",1,false},{"dormant",1,false}} do
+  r.state=c[1];r.notice=c[2];check(R.aware(r)==c[3],`{c[1]} at notice {c[2]}: aware is {tostring(c[3])}`)
+ end
+end
+do -- a strike at a rival that has not seen it is caught outright, as before, and uses no draw
+ for _,c in {{"patrol",0},{"patrol",.29},{"recover",1}} do
+  local r=R.new();r.state=c[1];r.notice=c[2];r.position=Vector3.new(24,.31,8);r.previous=r.position
+  local e=R.step(r,1/60,strike(r),clear)
+  check(e=="captured" and r.state=="captured" and r.contests==0,`a strike at a rival that is {c[1]} (notice {c[2]}) catches it, with no draw`)
+ end
+end
+do -- a strike at one that has: a contest, over many strikes the rates are 55 / 25 / 20, each rival state is a contest, and the outcomes are what they say
+ local counts={captured=0,sprang=0,counter=0};local N=6000
+ for i=1,N do
+  local r=R.new();r.state=({"stalk","windup","patrol"})[i%3+1];r.notice=if r.state=="patrol" then .5 else 0
+  r.position=Vector3.new(24,.31,8);r.previous=r.position;r.contests=i//7
+  local e,amount=R.step(r,1/60,strike(r,2+i%9),clear)
+  counts[e]=(counts[e] or 0)+1
+  if e=="captured" then check(r.state=="captured" and amount==0 and not r.spared,"caught: held") 
+  elseif e=="sprang" then if not (r.state=="recover" and amount==0 and r.spared==true) then check(false,"sprang clear: recovers, nothing lost") end
+  elseif e=="counter" then if not (r.state=="recover" and amount==.25 and r.spared==true) then check(false,"counter-bite: recovers, costs 0.25") end
+  else check(false,"an unknown event "..tostring(e)) end
+  if r.contests~=i//7+1 then check(false,"the contest is counted once") end
+ end
+ local c,sp,cb=counts.captured/N,counts.sprang/N,counts.counter/N
+ check(math.abs(c-.55)<.03 and math.abs(sp-.25)<.03 and math.abs(cb-.20)<.03,`rates over {N} strikes: {string.format("%.3f %.3f %.3f",c,sp,cb)}`)
+ print(string.format("RIVAL contest rates over %d strikes: caught %.3f, sprang clear %.3f, counter-bite %.3f",N,c,sp,cb))
+end
+do -- the draw is determined by the seed, the day and how many contests it has had: the same strike gives the same outcome, a different one may not
+ local seen={}
+ for n=0,40 do
+  local a,b=R.contest(914,3,n),R.contest(914,3,n)
+  check(a==b,"the same seed, day and count: the same outcome");seen[a]=true
+ end
+ check(seen.captured and seen.sprang and seen.counter,"and over the counts all three come up")
+ local differs=false
+ for n=0,40 do if R.contest(914,3,n)~=R.contest(914,4,n) or R.contest(914,3,n)~=R.contest(915,3,n) then differs=true end end
+ check(differs,"another day or another world is another stream")
+ local function once(r,day) r.state="stalk";r.position=Vector3.new(24,.31,8);r.previous=r.position;return (R.step(r,1/60,strike(r,day),clear)) end
+ local a,b=R.new(),R.new()
+ check(once(a,5)==once(b,5) and a.contests==1,"two rivals with the same record, struck on the same day, do the same")
+ -- a return to a record (a copy of the table as it was) brings the same outcome: no rerolling the draw
+ local rec=R.new();rec.state="stalk";rec.position=Vector3.new(24,.31,8);rec.previous=rec.position;rec.contests=11
+ local back=table.clone(rec)
+ local first=once(rec,6)
+ check(R.valid(rec) and rec.contests==12,"the count moves on with the contest")
+ for _=1,5 do local again=table.clone(back);check(once(again,6)==first,"struck again from the same record, the outcome is the same") end
+ -- a record from before the contest has no count, and means none
+ local old=R.new();old.contests=nil;old.state="stalk";old.position=Vector3.new(24,.31,8);old.previous=old.position
+ check(R.valid(old) and once(old,6)==R.contest(914,6,0) and old.contests==1,"an older record means no contests so far")
+end
+do -- it got away from this strike, but the next strike or a recovering rival is caught outright (recover is still free)
+ local r;local day
+ for d=1,200 do
+  r=R.new();r.state="stalk";r.position=Vector3.new(24,.31,8);r.previous=r.position;day=d
+  if R.contest(914,d,0)=="sprang" then break end
+ end
+ local s=strike(r,day)
+ check(R.step(r,1/60,s,clear)=="sprang","(a strike that springs the rival clear)")
+ for _=1,30 do
+  local e=R.step(r,1/60,s,clear) -- the same strike goes on, with the rival still within reach
+  if e=="captured" then check(false,"the rest of the same strike caught a rival that had just sprung clear") break end
+ end
+ check(r.state=="recover" and r.contests==1,"the rest of the same strike does not catch it, and draws nothing more")
+ s.striking=false;R.step(r,1/60,s,clear)
+ check(r.spared==nil,"when the strike is over it is not spared any more")
+ r.position=s.position+Vector3.xAxis*.2;r.previous=r.position
+ s.striking=true;s.previous=s.position
+ check(R.step(r,1/60,s,clear)=="captured" and r.contests==1,"a new strike catches it while it recovers, with no draw")
+end
+do -- a holding spider, a lunging rival and a blocked line are not strikes
+ for _,c in {"holding","lunge","blocked"} do
+  local r=R.new();r.state="stalk";r.position=Vector3.new(24,.31,8);r.previous=r.position;r.origin=r.position;r.target=r.position
+  local s=strike(r);local block=clear
+  if c=="holding" then s.holding=true elseif c=="lunge" then r.state="lunge" else block=function() return true end end
+  local e=R.step(r,1/60,s,block)
+  check(r.contests==0 and e~="sprang" and e~="counter" and e~="captured",`{c}: no contest`)
+ end
+end
+do -- the gentle modes: the bite costs nothing
+ for d=1,200 do
+  if R.contest(914,d,0)=="counter" then
+   local r=R.new();r.state="stalk";r.position=Vector3.new(24,.31,8);r.previous=r.position
+   local e,cost=R.step(r,1/60,strike(r,d,true),clear)
+   check(e=="counter" and cost==0 and r.state=="recover","gentle: the counter-bite is the same event and costs nothing")
+   local r2=R.new();r2.state="stalk";r2.position=Vector3.new(24,.31,8);r2.previous=r2.position
+   local e2,cost2=R.step(r2,1/60,strike(r2,d,false),clear)
+   check(e2=="counter" and cost2==.25,"and standard rules: 0.25")
+   break
+  end
+ end
+end
+do -- the record: the count and the flag are checked
+ for _,bad in {-1,0/0,math.huge,1.5,"2",true} do local b=R.new();b.contests=bad;check(not R.valid(b),`a contest count of {tostring(bad)} is refused`) end
+ for _,bad in {1,"yes"} do local b=R.new();b.spared=bad;check(not R.valid(b),`a spared of {tostring(bad)} is refused`) end
+ local g=R.new();g.contests=7;g.spared=true;check(R.valid(g),"a count and a flag are good")
+ local n=R.new();R.renew(n);check(n.contests==0 and n.spared==nil,"a new rival has had no contests")
+ local used=R.new();used.contests=9;R.renew(used);check(used.contests==0,"and renewing clears them")
+end
+do -- the cost goes through the needs model: 0.25, never below nothing, nothing in the gentle modes, a bad number nothing
+ local m=Needs.new(true,false);m:configure({energy=.8})
+ check(math.abs(m:injure(.25)-.25)<1e-12 and math.abs(m.energy-.55)<1e-12,"0.25 of the reserve is lost")
+ m:configure({energy=.1});check(math.abs(m:injure(.25)-.1)<1e-12 and m.energy==0,"never below nothing: it loses what there was")
+ check(m:injure(.25)==0 and m:injure(-1)==0 and m:injure(0/0)==0 and m.energy==0,"nothing to lose, or a bad number: nothing")
+ local g=Needs.new(true,true);g:configure({energy=.8})
+ check(g:injure(.25)==0 and g.energy==.8,"gentle: nothing")
+ local heard={};local h=Needs.new(true,false);h:configure({energy=.9});h.onEnergyChanged=function(a,b) table.insert(heard,{a,b}) end
+ h:injure(.25);check(#heard==1 and math.abs(heard[1][1]-.9)<1e-12 and math.abs(heard[1][2]-.65)<1e-12,"the energy-changed signal is told")
+ local before=m.grantedTotal;check(before==0,"(it is no meal: the ledger is untouched)")
+end
+do -- the words
+ check(RivalText.CAPTURED=="Caught the rival. Stay still to eat; worth two housefly meals." and RivalText.SPRANG=="It sprang clear of your strike." and RivalText.COUNTER=="It bit back! Jump away!","the three lines")
+ check(RivalText.counter(false)==RivalText.COUNTER and string.find(RivalText.counter(true),"safe in this mode",1,true)~=nil and RivalText.counter(true)~=RivalText.counter(false),"gentle says you are safe")
+ check(RivalText.strike("captured",false)==RivalText.CAPTURED and RivalText.strike("sprang",true)==RivalText.SPRANG and RivalText.strike("counter",true)==RivalText.COUNTER_GENTLE and RivalText.strike("warning",false)==nil,"each event has its line")
+end
 print(`RIVAL passed={passed} failed={failed}`)
 if failed>0 then error("rival tests failed") end

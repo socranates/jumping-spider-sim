@@ -195,7 +195,7 @@ case("it stalks across a leaf: creeps toward the spider, winds up for a second, 
 	check(r.state == "patrol" and m.mode == "attached" and Rival.valid(r), "after the miss or the catch it is back on its feet and patrols again")
 end)
 
-case("it goes on toward the last place it saw the spider, for three seconds, and then gives up", function()
+case("it goes on toward the last place it saw the spider, for five seconds, and then gives up", function()
 	local leaf: any
 	for _, f in faces do
 		if f.piece == "leaf_east" and f.normal.Y > 0.9 then leaf = f end
@@ -221,11 +221,72 @@ case("it goes on toward the last place it saw the spider, for three seconds, and
 		Drive.update(d, r, DT, s)
 	end
 	check(r.state == "stalk" and (r.position - mark).Magnitude > 0.5, "out of sight for 1.5 s it is still stalking, toward where it saw the spider")
+	for _ = 1, 150 do
+		Rival.step(r, DT, s, function() return true end)
+		Drive.update(d, r, DT, s)
+	end
+	check(Rules.rememberSeconds == 5.0 and r.state == "stalk", "and out of sight for 4 s it still is (it gave up after 3 before ROBLOX-73)")
 	for _ = 1, 60 * 5 do
 		Rival.step(r, DT, s, function() return true end)
 		Drive.update(d, r, DT, s)
 	end
 	check(r.state == "patrol", "after the memory fades it patrols again")
+end)
+
+case("it presses harder (ROBLOX-73): the windup starts at 3.2 wu, and a strike at a rival that has seen the spider is a contest", function()
+	local leaf: any
+	for _, f in faces do
+		if f.piece == "leaf_east" and f.normal.Y > 0.9 then leaf = f end
+	end
+	-- Two spiders of the leaf's own width apart: the windup begins inside 3.2 wu, and not at 3.4.
+	local a, b = leaf.stand[1], leaf.stand[1]
+	local bestGap = math.huge
+	for _, p in leaf.stand do
+		for _, q in leaf.stand do
+			local gap = math.abs((p - q).Magnitude - 3.4)
+			if gap < bestGap then a, b, bestGap = p, q, gap end
+		end
+	end
+	local d, r = newRival(a, Vector3.yAxis, function() return false end)
+	local s = snapshot()
+	s.position, s.drive = b + Vector3.yAxis * Route.SEAT, d
+	s.previous = s.position
+	local from = (s.position - r.position).Magnitude
+	check(from > 3.2 and from < 3.7, `the spider starts just beyond reach ({string.format("%.2f", from)} wu)`)
+	local windupAt: number? = nil
+	for _ = 1, 60 * 6 do
+		Rival.step(r, DT, s, function() return false end)
+		Drive.update(d, r, DT, s)
+		if r.state == "windup" then windupAt = (s.position - r.position).Magnitude break end
+	end
+	check(windupAt ~= nil and windupAt > 2.6 and windupAt <= Rules.reachWu + 0.1, `it winds up from {string.format("%.2f", windupAt or -1)} wu, beyond the old 2.5`)
+	-- The strike on a rival in its windup is a contest through the real drive: every one of the three outcomes happens over some days, each one is valid.
+	local seen: { [string]: number } = {}
+	for day = 1, 60 do
+		local d2, r2 = newRival(a, Vector3.yAxis, function() return false end)
+		r2.state, d2.prevState = "windup", "windup"
+		local s2 = snapshot()
+		s2.day, s2.seed = day, 914
+		s2.position, s2.drive = r2.position + Vector3.xAxis * 0.2, d2
+		s2.previous = s2.position
+		s2.striking = true
+		local event, amount = Rival.step(r2, DT, s2, function() return false end)
+		Drive.update(d2, r2, DT, s2)
+		seen[event] = (seen[event] or 0) + 1
+		check(event == Rival.contest(914, day, 0), `day {day}: the outcome is the draw's ({event})`)
+		if event == "captured" then
+			check(r2.state == "captured", "caught: held")
+		else
+			check(r2.state == "recover" and r2.spared == true and Rival.valid(r2) and (event ~= "counter" or amount == Rules.counterCost), `day {day}: {event}: it recovers, and the cost is right`)
+		end
+	end
+	check((seen.captured or 0) > 20 and (seen.sprang or 0) > 5 and (seen.counter or 0) > 3, `over sixty days: caught {seen.captured}, sprang clear {seen.sprang}, counter-bite {seen.counter}`)
+	-- One that has not noticed is still caught outright, through the drive.
+	local d3, r3 = newRival(a, Vector3.yAxis, function() return false end)
+	local s3 = snapshot()
+	s3.position, s3.drive, s3.striking = r3.position + Vector3.xAxis * 0.2, d3, true
+	s3.previous = s3.position
+	check(Rival.step(r3, DT, s3, function() return false end) == "captured" and r3.contests == 0, "an unaware patrolling rival is still caught outright, with no draw")
 end)
 
 case("a wasp visit pauses it; the retreat shelters the spider; held where it was caught; eaten once", function()

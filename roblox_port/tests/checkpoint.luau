@@ -638,5 +638,43 @@ case("the wasp takes the rival (ROBLOX-70): a rest taken while it hangs under th
   check(not Checkpoint.restore(rec,w),`a rival whose fate is {tostring(bad)} is refused`)
  end
 end)
+case("the rival's contest (ROBLOX-73): its count is kept, a return to a rest gives the same outcome for the same strike (no rerolling), a bad count or flag is refused",function()
+ local Rival=require("../src/Shared/Predator/RivalSpider")
+ local w=newWorld();local r=Rival.new();r.state="stalk";r.position=Vector3.new(24,.31,8);r.previous=r.position;r.contests=4;w.life.rival=r
+ local rec=assert(Checkpoint.capture(w,0))
+ local function strike(day,gentle)
+  return {position=r.position+Vector3.xAxis*.2,previous=r.position+Vector3.xAxis*.2,heading=Vector3.xAxis,day=day,hour=12,meals=3,seed=914,
+   resting=false,safe=false,wasp=false,gentle=gentle==true,grounded=true,moving=false,airborne=false,onLine=false,holding=false,striking=true}
+ end
+ -- find a day on which the fifth contest is not a catch, so there is a rival left to compare
+ local day=1
+ while Rival.contest(914,day,4)=="captured" do day+=1 end
+ local first,cost1=Rival.step(w.life.rival,1/60,strike(day),function() return false end)
+ check((first=="sprang" or first=="counter") and w.life.rival.contests==5 and w.life.rival.state=="recover","the strike is a contest, and the rival recovers")
+ local after=assert(Checkpoint.capture(w,0))
+ check(Checkpoint.restore(after,w) and w.life.rival.contests==5 and w.life.rival.state=="recover","a rest taken after it keeps the count")
+ for _=1,4 do
+  check(Checkpoint.restore(rec,w) and w.life.rival.contests==4 and w.life.rival.state=="stalk","a return to the earlier rest brings back its count")
+  r=w.life.rival
+  local again,cost2=Rival.step(w.life.rival,1/60,strike(day),function() return false end)
+  check(again==first and cost2==cost1 and w.life.rival.contests==5,"and the same strike on the same day gives the same outcome again")
+ end
+ -- the gentle modes: the same outcome, nothing lost
+ Checkpoint.restore(rec,w);r=w.life.rival
+ local g,gcost=Rival.step(w.life.rival,1/60,strike(day,true),function() return false end)
+ check(g==first and gcost==0,"gentle: the same event, no cost")
+ -- bad records
+ for name,set in {["a negative count"]=function(x) x.contests=-1 end,["a fractional count"]=function(x) x.contests=2.5 end,["a count that is not a number"]=function(x) x.contests="3" end,
+   ["a count that is not finite"]=function(x) x.contests=0/0 end,["a spared that is not a boolean"]=function(x) x.spared=1 end} do
+  Checkpoint.restore(rec,w)
+  set(w.life.rival)
+  local bad=assert(Checkpoint.capture(w,0))
+  check(not Checkpoint.restore(bad,w),`a rival with {name} is refused`)
+ end
+ -- a record from before the contest has neither, and restores as one that has had none
+ local old=newWorld();old.life.rival=Rival.new();old.life.rival.state="stalk";old.life.rival.position=Vector3.new(24,.31,8);old.life.rival.contests=nil;old.life.rival.spared=nil
+ local oldRec=assert(Checkpoint.capture(old,0))
+ check(Checkpoint.restore(oldRec,old) and old.life.rival.state=="stalk" and (old.life.rival.contests or 0)==0,"an older record restores")
+end)
 print(`CHECKPOINT passed={passed} failed={failed}`)
 if failed > 0 then error("CHECKPOINT failed") end

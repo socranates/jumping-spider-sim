@@ -18,10 +18,22 @@ RivalRules.thinkSeconds = 0.1
 RivalRules.sightWu = 8.0 -- it perceives the player up to here with a clear line (as before)
 RivalRules.patrolSpeed = 0.8 -- WU per second (it was 0.45 on its small territory)
 RivalRules.stalkSpeed = 1.1
-RivalRules.reachWu = 2.5 -- the windup begins this close, on the same face or one that meets it
-RivalRules.rememberSeconds = 3.0 -- it keeps stalking where it last saw the spider this long after losing sight of it
+RivalRules.reachWu = 3.2 -- the windup begins this close, on the same face or one that meets it (ROBLOX-73: it was 2.5)
+RivalRules.rememberSeconds = 5.0 -- it keeps stalking where it last saw the spider this long after losing sight of it (it was 3)
+-- How long it must see the spider before it stalks it: the notice (0 to 1, rising one a second while it sees the spider) at which a patrolling
+-- rival starts to stalk. It was 0.6 in Godot's rule; the game's rival is quicker to take an interest (ROBLOX-73).
+RivalRules.stalkNotice = 0.45
 RivalRules.legSeconds = 240.0 -- a patrol leg that has not arrived by now is dropped for the next
 RivalRules.stuckSeconds = 4.0 -- no progress for this long: the route is made again
+-- ROBLOX-73: striking a rival that has seen the spider coming is a contest, not a sure catch. A rival is aware when it is stalking or winding up,
+-- or patrolling with a notice of at least awareNotice; a recovering rival or a patrolling one that has not noticed is still caught outright. The
+-- draw is from a stream of its own (RivalSpider.contest, by the world's seed, the day and how many contests this rival has had): the rival is
+-- caught (contestCaptured), springs clear of the strike (contestSprang) or, for the rest, bites back and costs counterCost of the spider's energy
+-- (about two thirds of a day's; nothing in the gentle modes).
+RivalRules.awareNotice = 0.3
+RivalRules.contestCaptured = 0.55
+RivalRules.contestSprang = 0.25 -- (and 0.20 is left for the counter-bite)
+RivalRules.counterCost = 0.25
 -- Nothing the rival does goes in here: the retreat grown by half a stud (the crack itself is also a hard check).
 RivalRules.keepOutMin = Vector3.new(-30.0, -0.5, 2.5)
 RivalRules.keepOutMax = Vector3.new(-22.8, 2.0, 9.5)

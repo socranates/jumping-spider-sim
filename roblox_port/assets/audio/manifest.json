@@ -31,7 +31,7 @@
       "sha256": "c9de73c506cdbd76bc1e6139d56233c3bd242b1a3c19ae8562e60d36d04496f4",
       "bytes": 2822444,
       "roblox_asset_id": "114531800455832",
-      "experience_access_saved": false
+      "experience_access_saved": true
     },
     {
       "file": "takeoff.wav",
@@ -69,5 +69,5 @@
       "experience_access_saved": false
     }
   ],
-  "status": "Uploaded 2026-10-16 to socranates; room, buzz, takeoff, birds and wasp granted to universe 10771103250. Original sound playtest confirmed; wasp sound loaded and transport verified in Studio build 52123df9177323c8. sill_music.wav (ROBLOX-76, the original ambient loop from tools/make_sill_music.py, not from sound_bank.gd) was uploaded 2026-10-18 by socranates through the Creator Dashboard (Claude, with Nathan's go-ahead; no Robux charged): asset 114531800455832, restricted (owner-only) privacy, which covers the owner's own universe; IDS.music carries it. experience_access_saved stays false until the Sound is seen loaded in Studio."
+  "status": "Uploaded 2026-10-16 to socranates; room, buzz, takeoff, birds and wasp granted to universe 10771103250. Original sound playtest confirmed; wasp sound loaded and transport verified in Studio build 52123df9177323c8. sill_music.wav (ROBLOX-76, the original ambient loop from tools/make_sill_music.py, not from sound_bank.gd) was uploaded 2026-10-18 by socranates through the Creator Dashboard (Claude, with Nathan's go-ahead; no Robux charged): asset 114531800455832, restricted (owner-only) privacy, which covers the owner's own universe; IDS.music carries it. Seen loaded in Studio in the playtest place (IsLoaded true, TimeLength 64) with no permission prompt, then published as playtest v28 (2026-10-18)."
 }

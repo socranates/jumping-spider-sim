@@ -9,7 +9,7 @@ Claude completed `claude/roblox-notebook` at 657ce9d from 31e32b9 while Chet ind
 - Claude's validated page model, real-event watcher, responsive found-page list and reader, separate HUD discovery notices, keyboard N, touch Notebook button, controller menu entry, end-screen entry, and layout checks.
 - Chet's peacock dance entry (25 pages total), real Godot-exported 35 transitions, finite-number rejection, integer font sizes, native input ownership fix, measured full-text heights on resize, optional notices, and retention/pause regressions.
 - Nathan's requested optional checklist: **To try** in the notebook; C or Y/Triangle inside the book. Twelve low-pressure invitations get checked by actual discoveries. No hidden biology unlocked by viewing it, and no task to starve or get caught.
-- 24 reachable pages; only the surface-vibration page remains unwired. A nearby fly takeoff now counts as the audible event. Model and checklist survive rest recovery and new lives this session only.
+- 24 reachable pages (now 25 of 26 with the ant-mimic page, ROBLOX-54); only the surface-vibration page remains unwired. A nearby fly takeoff now counts as the audible event. Model and checklist survive rest recovery and new lives this session only.
 - `gen_notebook_pages.py` is the data generator. `notebook_reference.*` is frozen content; `notebook_godot.*` is the executed Godot model's 35 transitions. Never regenerate expected decisions from the Roblox implementation.
 - The adopted reader uses a text/list layout. The earlier Chet sketches are not displayed in this merged reader. No new graphics, physics, purchases, or audience settings.
 

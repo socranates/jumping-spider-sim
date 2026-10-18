@@ -4,6 +4,7 @@
 -- environment), so the pages themselves are checked word for word against a copy of the frozen data/notebook/pages.json
 -- (tests/notebook_reference.json, copied by tools/gen_notebook_pages.py), and nothing is generated from the port under test.
 local NotebookPages = require("../src/Shared/Data/NotebookPages")
+local AntMimic = require("../src/Shared/Data/AntMimic")
 local FieldNotebook = require("../src/Shared/Learning/FieldNotebook")
 local NotebookWatch = require("../src/Shared/Learning/NotebookWatch")
 local NotebookText = require("../src/Shared/UI/NotebookText")
@@ -33,12 +34,12 @@ local ADAPTED = { "bold_jumper", "dragline", "legs_push", "hearing", "green_uv",
 local STABLE = {
 	"bold_jumper", "dragline", "legs_push", "eight_eyes", "moving_retinas", "motion_first", "hunting_by_sight", "venom", "drinking",
 	"felt", "hearing", "retreat", "depth_blur", "green_uv", "home_before_dark", "hungry_at_home", "full_abdomen", "outgrowing_a_skin",
-	"new_skin", "grown_up", "mud_dauber", "what_the_wasp_does", "getting_away", "going_without_food", "peacock_dance",
+	"new_skin", "grown_up", "mud_dauber", "what_the_wasp_does", "getting_away", "going_without_food", "peacock_dance", "walking_like_an_ant",
 }
 do
 	local book = FieldNotebook.new()
 	check(#book.dropped == 0, "no page was left out for a missing field or an unknown trigger")
-	check(#book.pages == #ref.pages + 1 and #ref.pages == 24, `all of Godot's {#ref.pages} pages are here ({#book.pages})`)
+	check(#book.pages == #ref.pages + 2 and #ref.pages == 24, `all of Godot's {#ref.pages} pages are here, then the peacock page and the ant-mimic page ({#book.pages})`)
 	check(#book.pages >= 12, "there is a first set of pages")
 	check(same(ids((function() local l = {} for _, p in book.pages do table.insert(l, { id = p.id, title = p.title }) end return l end)()), STABLE), "the page ids are the stable ones, in Godot's order")
 	local seen: { [string]: boolean } = {}
@@ -68,8 +69,8 @@ do
 	check(urls == refUrls and urls >= 12, `the source links are all kept ({urls} of {refUrls})`)
 	check(same(adapted, ADAPTED), "exactly these pages have a Roblox 'In this game' line: " .. table.concat(adapted, ", "))
 	-- Every trigger a page names is one the notebook has; Godot's list is whole.
-	local triggers = { "start", "jump", "jump_far", "jump_long", "eye_view", "eye_time_20", "eye_time_60", "shimmer", "fly_recognised", "catch", "meal", "felt", "buzz", "rest", "sleep", "hungry", "well_fed", "moult_ready", "moulted", "adult", "wasp", "wasp_escaped", "wasp_caught", "starving", "dance" }
-	check(same(NotebookPages.triggers, triggers), "the trigger list is Godot's")
+	local triggers = { "start", "jump", "jump_far", "jump_long", "eye_view", "eye_time_20", "eye_time_60", "shimmer", "fly_recognised", "catch", "meal", "felt", "buzz", "rest", "sleep", "hungry", "well_fed", "moult_ready", "moulted", "adult", "wasp", "wasp_escaped", "wasp_caught", "starving", "dance", "antennae" }
+	check(same(NotebookPages.triggers, triggers), "the trigger list is Godot's, then the two the Roblox game added (dance, antennae)")
 	for _, p in book.pages do check(table.find(NotebookPages.triggers, p.trigger) ~= nil, `page {p.id} names a trigger the notebook has`) end
 	-- The thresholds are Godot's.
 	check(NotebookPages.hungryAt == 0.25 and NotebookPages.wellFedAt == 0.85 and NotebookPages.jumpFarWu == 5.0 and NotebookPages.jumpLongWu == 8.0, "Godot's thresholds")
@@ -381,12 +382,13 @@ do
 	w:onWasp("visit_started", nil)
 	w:onWasp("left", true)
 	w:onWasp("caught", nil)
+	w:antennae(AntMimic.noticeSeconds)
 	local unopened: { string } = {}
 	for _, p in nb.pages do if not nb:isOpen(p.id) then table.insert(unopened, p.trigger) end end
 	local unwired: { string } = {}
 	for trigger in NotebookWatch.UNWIRED do table.insert(unwired, trigger) end
 	check(same(unopened, { "felt", "dance" }) and same(unwired, { "felt" }), "watcher covers all pages except unwired felt and client-owned dance: left over: " .. table.concat(unopened, ", "))
-	check(#nb.opened == 23, `the long game opened 23 pages ({#nb.opened})`)
+	check(#nb.opened == 24, `the long game opened 24 pages ({#nb.opened})`)
 end
 
 -- ---------------------------------------------------------------- the words and the layout (pure)

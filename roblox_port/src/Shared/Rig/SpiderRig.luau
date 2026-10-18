@@ -14,7 +14,7 @@
 -- rig.threat, ROBLOX-82) rears the prosoma, lifts legs I and the pedipalps, turns the drawn body about and swings the spinnerets.
 -- ROBLOX-84 draws the legs, feet, fangs and palps of the first spider and the two tarantulas as the segments they have (look.legForm,
 -- look.fang, look.palpForm): the same three-link chain and the same targets, each link now one or two rods, a patella at the knee, a break in
--- the tarsus, a pad (and claws or scopula bristles) at the foot. An appearance without those tables is drawn exactly as it was.
+-- the tarsus, a pad (and claws) at the foot. An appearance without those tables is drawn exactly as it was.
 
 local Workspace = game:GetService("Workspace")
 local Appearances = require(script.Parent.Parent.Data.Appearances)
@@ -52,7 +52,7 @@ type Leg = {
 	ankle: Part,
 	pad: Part?,
 	femurTip: Part?, -- the thinner distal rod of a tapered femur or tibia, the thinner distal rod of the tarsus and the ball on its break (look.legForm;
-	tibiaTip: Part?, -- all nil for an appearance without one), and the foot's claws or scopula bristles
+	tibiaTip: Part?, -- all nil for an appearance without one), and the foot's claws
 	tarsusTip: Part?,
 	joint: Part?,
 	toes: {Part},
@@ -262,6 +262,17 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		mound.Reflectance = look.tubercle.reflectance
 		fixed(mound, tubercle.center, nil, G_HEAD)
 	end
+	-- A tarantula's velvet (look.velvet, ROBLOX-85): a fur shell per body mass, a little larger than the carapace and the abdomen it covers, partly
+	-- transparent, in Fabric and in the fur's colour. The head's stops short of the tubercle's eyes by being no taller than the carapace's dome.
+	local velvet = look.velvet
+	if velvet and cfg.velvet then
+		local cover = ellipsoid(model, "FuzzShell", A.headRadii * velvet.head.scale, color(velvet.head.color), Enum.Material.Fabric)
+		cover.Transparency, cover.CastShadow = velvet.head.transparency, false
+		fixed(cover, A.headCenter, nil, G_HEAD)
+		local coat = ellipsoid(model, "FuzzShell", A.abdomenRadii * velvet.abdomen.scale, color(velvet.abdomen.color), Enum.Material.Fabric)
+		coat.Transparency, coat.CastShadow = velvet.abdomen.transparency, false
+		fixed(coat, A.abdomenCenter, nil, G_ABDOMEN)
+	end
 	if look.gloss then
 		for _, f in self._fixed do
 			local name = f.part.Name
@@ -308,9 +319,11 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 			local q = math.sqrt(math.max(1 - x * x - z * z, 0.05))
 			local pitch = math.atan(ar.Y * z / (ar.Z * q))
 			local roll = math.atan(-ar.Y * x / (ar.X * q))
-			local dab = ellipsoid(model, m.name, Vector3.new(m.rx, 0.010, m.rz), color(m.color), fabric)
+			-- (`height`: a ridge, a thin rod-shaped ellipsoid that stands that many studs half-height out of the surface, centred `raise` above it,
+			-- instead of a flat dab, ROBLOX-85; its pointed ends dive into the fur shell, so it follows the dome where a straight cylinder would float)
+			local dab = ellipsoid(model, m.name, Vector3.new(m.rx, m.height or 0.010, m.rz), color(m.color), fabric)
 			dab.CastShadow = false
-			fixed(dab, Vector3.new(x * ar.X, ac.Y + ar.Y * q + 0.002, ac.Z + z * ar.Z), CFrame.Angles(pitch, 0, roll) * CFrame.Angles(0, side * m.angle, 0), G_ABDOMEN)
+			fixed(dab, Vector3.new(x * ar.X, ac.Y + ar.Y * q + (m.raise or 0.002), ac.Z + z * ar.Z), CFrame.Angles(pitch, 0, roll) * CFrame.Angles(0, side * m.angle, 0), G_ABDOMEN)
 			if m.bar then table.insert(self._bars, dab) end
 		end
 	end
@@ -445,6 +458,17 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		end
 	end
 
+	-- The redknee's urticating patch (look.cluster, ROBLOX-85): a tuft of ginger-rust hairs standing out of the patch, combed toward the rear.
+	if look.cluster and cfg.cluster then
+		local tuftLook = look.cluster
+		for _, hair in Setae.cluster(look) do
+			local h = newPart(model, "Seta", color(if hair.tone == "frost" then tuftLook.light else tuftLook.color), fabric)
+			h.Size, h.CastShadow, h.Transparency = Vector3.new(hair.width, hair.thick, hair.length), false, hair.transparency
+			table.insert(self._setae, h)
+			fixed(h, hair.at + hair.dir * (hair.length * 0.5), CFrame.lookAt(Vector3.zero, hair.dir, upFor(hair.dir, hair.normal)), G_ABDOMEN)
+		end
+	end
+
 	-- A leg's pale bands: white on the femur, tibia and tarsus unless the look lists its own (look.legBands: a colour for each segment that has
 	-- one, so the redknee's single band is { tibia = ... } and the greenbottle's none is {}).
 	local function legBands(i: number, d: { number }): { Part }
@@ -498,16 +522,11 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 				local sole = ellipsoid(model, "Foot" .. i, Vector3.new(ft.rx, ft.ry, ft.rz) * DT, cTarsus, fabric)
 				sole.CastShadow = false
 				pad = sole
-				local cw, st = form.claws, form.strands
+				local cw = form.claws
 				for _ = 1, if cw then cfg.claws or 0 else 0 do
 					local claw = rod(model, "Claw", cw.radius * 2, FANG)
 					claw.Size, claw.CastShadow = Vector3.new(cw.length, cw.radius * 2, cw.radius * 2), false
 					table.insert(toes, claw)
-				end
-				for _ = 1, if st then cfg.strands or 0 else 0 do
-					local bristle = rod(model, "FootBristle", st.radius * 2, cTarsus)
-					bristle.Size, bristle.CastShadow = Vector3.new(st.length, st.radius * 2, st.radius * 2), false
-					table.insert(toes, bristle)
 				end
 			end
 		else
@@ -950,8 +969,9 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 				if spec.segment == index then
 					local r = (if tip and spec.t > share then tip.Size.Y else p.Size.Y) * 0.5
 					local c, s = math.cos(spec.theta), math.sin(spec.theta)
-					local base = Vector3.new((spec.t - 0.5) * len, r * 0.8 * c, r * 0.8 * s)
-					local dir = Vector3.new(1.3, c, s).Unit
+					local lie = spec.lift -- (a coat that lies along the leg, ROBLOX-85) or nil: the first coats' hairs stand out and lean toward the foot
+					local base = Vector3.new((spec.t - 0.5) * len, r * (if lie then 1.0 else 0.8) * c, r * (if lie then 1.0 else 0.8) * s)
+					local dir = if lie then Vector3.new(math.cos(lie), math.sin(lie) * c, math.sin(lie) * s) else Vector3.new(1.3, c, s).Unit
 					put(hair.part, rc * CFrame.lookAt(base + dir * (spec.length * g * 0.5), base + dir * spec.length*g, Vector3.xAxis))
 				end
 			end
@@ -974,29 +994,19 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 		if leg.joint then put(leg.joint, CFrame.new(tarsusMid)) end
 		local pad = leg.pad
 		if pad and form then
-			-- The tarsal pad lies on the surface under the foot, flattened, its long side along the way the foot points; the toes (claws, or a
-			-- scopula's bristles) leave its rim. All of it is display: the planted foot is where it was.
+			-- The tarsal pad lies on the surface under the foot, flattened, its long side along the way the foot points; the first spider's claws leave
+			-- its front. All of it is display: the planted foot is where it was.
 			local into = foot - (if leg.joint then tarsusMid else ankle)
 			local flat = into - up * into:Dot(up)
 			local heading = if flat.Magnitude > 1e-4 then flat.Unit else body.LookVector
 			local center = foot + up * (pad.Size.Y * 0.35)
 			put(pad, CFrame.lookAt(center, center + heading, up) * CFrame.Angles(0, math.pi / 2, 0))
 			local right = heading:Cross(up)
-			for n, toe in leg.toes do
-				local first = (n - 1) % 2 == 0
-				local sideways = if first then -1 else 1
-				if toe.Name == "Claw" then
-					-- two claws: from the pad's front, forward and down, splayed apart
-					local from = center + heading * (pad.Size.X * 0.42)
-					local aim = (heading * 0.85 - up * 0.45 + right * (sideways * form.claws.splay)).Unit
-					put(toe, rodCFrame(from, from + aim * (toe.Size.X)))
-				else
-					-- scopula bristles: short rods out of the pad's sides, swept forward and a little down
-					local sway = if (cfg.strands or 0) > 1 then sideways else 0 -- (one bristle points straight ahead)
-					local from = center + right * (sway * pad.Size.Z * 0.40) + heading * (pad.Size.X * (if sway == 0 then 0.38 else 0.1))
-					local aim = (right * sway * 0.9 + heading * (if sway == 0 then 1.0 else 0.5) - up * 0.25).Unit
-					put(toe, rodCFrame(from, from + aim * (toe.Size.X)))
-				end
+			for n, claw in leg.toes do
+				-- two claws: from the pad's front, forward and down, splayed apart
+				local from = center + heading * (pad.Size.X * 0.42)
+				local aim = (heading * 0.85 - up * 0.45 + right * ((if n % 2 == 1 then -1 else 1) * form.claws.splay)).Unit
+				put(claw, rodCFrame(from, from + aim * claw.Size.X))
 			end
 		elseif pad then
 			put(pad, CFrame.new(foot))

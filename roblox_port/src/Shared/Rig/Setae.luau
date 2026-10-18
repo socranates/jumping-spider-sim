@@ -18,7 +18,7 @@ export type Hair = {
 	at: Vector3, dir: Vector3, normal: Vector3, length: number, width: number, thick: number, transparency: number,
 	kind: string, group: string, side: number, tone: string, white: boolean, grey: boolean, frost: boolean,
 }
-export type LegHair = { segment: number, t: number, theta: number, length: number, tone: string, white: boolean, grey: boolean, frost: boolean }
+export type LegHair = { segment: number, t: number, theta: number, length: number, tone: string, white: boolean, grey: boolean, frost: boolean, lift: number? }
 export type Patch = { x: number, z: number, rx: number, rz: number, angle: number }
 
 local GOLDEN = 2.399963229728653
@@ -79,14 +79,20 @@ end
 
 -- The way a hair lies: along the surface toward the rear (+Z), turned `yaw` radians to one side, raised `lift` radians off the
 -- surface (0 lies flat, pi/2 stands up).
-local function comb(normal: Vector3, lift: number, yaw: number): Vector3
+local function comb(normal: Vector3, lift: number, yaw: number, outward: number?): Vector3
 	local back = Vector3.new(0, 0, 1)
 	local along = back - normal * back:Dot(normal)
 	if along.Magnitude < 1e-3 then along = Vector3.new(0, 1, 0) - normal * normal.Y end
 	if along.Magnitude < 1e-3 then return normal end
 	along = along.Unit
 	local side = normal:Cross(along)
-	return ((along * math.cos(yaw) + side * math.sin(yaw)) * math.cos(lift) + normal * math.sin(lift)).Unit
+	local turn = yaw
+	if outward and math.abs(normal.X) > 0.05 then
+		-- fur that flows back and out: turned away from the back's midline, toward the flank on top and down the flank at the side (ROBLOX-85)
+		local away = Vector3.new(normal.Y * (if normal.X >= 0 then 1 else -1), -math.abs(normal.X), 0)
+		turn += (if side:Dot(away) >= 0 then 1 else -1) * outward
+	end
+	return ((along * math.cos(turn) + side * math.sin(turn)) * math.cos(lift) + normal * math.sin(lift)).Unit
 end
 
 -- Where a hair of this class starts: a lying hair sits on the surface (half its thickness above it, so it neither sinks in
@@ -117,10 +123,12 @@ local function coat(out: { Hair }, kind: string, spec: any, center: Vector3, rad
 				local length = between(spec.length, hash(i, salt))
 				local lift = math.rad(between(spec.lift, hash(i, salt + 5)))
 				local yaw = math.rad(spec.yaw) * (2 * hash(i, salt + 3) - 1)
-				local dir = comb(normal, lift, yaw)
+				local dir = comb(normal, lift, yaw, if spec.out then math.rad(spec.out) * (0.5 + 0.5 * hash(i, salt + 9)) else nil)
 				local root = rootOf(surface, normal, lift, spec.width * spec.flat)
 				if allClear(clear, root, dir, length) then
+					-- black or dark, and (`tip`) a few with a paler, greyer cast: the tips of a coat catching the light
 					local tone = if hash(i, salt + 11) < spec.black then "black" else "dark"
+					if spec.tip and hash(i, salt + 17) < spec.tip then tone = "grey" end
 					table.insert(out, hair(root, dir, normal, length, spec.width, spec.flat, spec.transparency, kind, group, 0, tone))
 				end
 			end
@@ -284,20 +292,54 @@ function Setae.leg(look: any, legIndex: number): { LegHair }
 	local f = look.fuzz
 	if not f or not f.enabled then return out end
 	local front = (legIndex - 1) % 4 == 0 -- the first legs carry a denser, longer fringe, as in Phidippus
+	local byPair = if f.legPairs then f.legPairs[(legIndex - 1) % 4 + 1] else nil -- (legPairs: a count per segment for each pair of legs, the front pair's the most)
 	for segment = 1, 3 do
-		local n = if front and segment < 3 then math.floor(f.legHairs[segment] * 1.6) else f.legHairs[segment]
+		local n = if byPair then byPair[segment] elseif front and segment < 3 then math.floor(f.legHairs[segment] * 1.6) else f.legHairs[segment]
 		for k = 1, n do
 			local i = legIndex * 100 + segment * 10 + k
 			local t = (k - 0.5) / n
-			local theta = k * GOLDEN + legIndex
+			if f.legSpan then t = f.legSpan[1] + (f.legSpan[2] - f.legSpan[1]) * t end -- (legSpan: only this stretch of the link carries hairs, clear of the patella and the ankle)
+			-- legEdge: the hairs grow from the sides of the leg, between these two angles (degrees from the top), one side and the other in turn: a fringe
+			local theta = if f.legEdge then (if (k + legIndex) % 2 == 0 then 1 else -1) * math.rad(between(f.legEdge, hash(i, 9))) else k * GOLDEN + legIndex
 			local white = math.abs(t - 0.5) < look.bandFraction * 0.6
 			local tone = if f.legTone then f.legTone elseif white then "white" elseif hash(i, 13) < f.legBlack then "black" else "dark" -- (legTone: every bristle one tone)
+			if f.legTip and tone ~= "white" and hash(i, 17) < f.legTip then tone = "grey" end
 			table.insert(out, {
 				segment = segment, t = t, theta = theta,
 				length = f.legLength * (0.7 + 0.6 * hash(i, 5)) * (if segment == 3 then 0.6 elseif front then 1.4 else 1),
-				tone = tone, white = tone == "white", grey = false, frost = tone == "frost",
+				tone = tone, white = tone == "white", grey = tone == "grey", frost = tone == "frost",
+				lift = if f.legLift then math.rad(between(f.legLift, hash(i, 7))) else nil, -- (legLift: the hair lies at this angle off the leg, toward the foot)
 			})
 		end
+	end
+	return out
+end
+
+-- A tarantula's urticating patch (ROBLOX-85): a denser cluster of short, ginger-rust hairs standing out of the patch on the abdomen's back, combed
+-- toward the rear, in the body frame. `look.cluster` = { mark (the name of the patch in look.marks), hairs, length, lift, yaw, width, flat, color, paler }.
+function Setae.cluster(look: any): { Hair }
+	local out: { Hair } = {}
+	local c = look.cluster
+	if not c then return out end
+	local mark
+	for _, m in look.marks do
+		if m.name == c.mark then mark = m end
+	end
+	if not mark then return out end
+	local ac, ar = Anatomy.v3(look.abdomenCenter), Anatomy.v3(look.abdomenRadii)
+	for k = 1, c.hairs do
+		local ring = math.sqrt((k - 0.5) / c.hairs) * 0.82
+		local ang = k * GOLDEN
+		local dx, dz = mark.rx * ring * math.cos(ang), mark.rz * ring * math.sin(ang)
+		local x, z = mark.x * ar.X + dx, mark.z * ar.Z + dz
+		local surface = Vector3.new(ac.X + x, Anatomy.topY(ac, ar, x, z), ac.Z + z)
+		local normal = Anatomy.normalAt(ac, ar, surface)
+		local lift = math.rad(between(c.lift, hash(k, 61)))
+		local yaw = math.rad(c.yaw) * (2 * hash(k, 63) - 1)
+		local dir = comb(normal, lift, yaw)
+		local length = between(c.length, hash(k, 65))
+		local h = hair(surface - normal * 0.003, dir, normal, length, c.width, c.flat, c.transparency, "cluster", "abdomen", 0, if hash(k, 67) < c.paler then "frost" else "grey")
+		table.insert(out, h)
 	end
 	return out
 end

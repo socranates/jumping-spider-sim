@@ -11,6 +11,7 @@ local first = {
 	-- tests/look.luau pins every value in this block. Change them only if she does.
 	body = { 0, 0, 0 },
 	legs = { 0, 0, 0 },
+	gloss = 0.04, -- ROBLOX-85: a touch of sheen on the carapace and abdomen (Reflectance; SmoothPlastic as before); the eyes are as they were
 	white = { 0.94, 0.94, 0.92 },
 	eyes = { 0.008, 0.008, 0.008 },
 	fangs = { 0.025, 0.025, 0.025 },
@@ -62,7 +63,7 @@ local first = {
 		x = 0.115, y = -0.045, -- where it leaves the face
 		drop = 0.105, reach = 0.10, spread = 0.035, -- tip: this far down, forward and out from the base
 		stalk = 0.05, club = { 0.042, 0.040, 0.052 }, tipRadii = { 0.030, 0.026, 0.030 },
-		fluff = { hairs = 7, length = 0.055, width = 0.012, flat = 0.7, transparency = 0.15 },
+		fluff = { hairs = 5, length = 0.048, width = 0.0085, flat = 0.7, transparency = 0.15 }, -- finer in ROBLOX-85 (was 0.055 long, 0.012 wide)
 		drumHz = 3.2, drumDeg = 13,
 	},
 	-- Legs (display only): plump, a little shorter and more crouched than before; round feet.
@@ -106,46 +107,51 @@ local first = {
 	-- covered the white spots; the second coat (this one) is short, thin and combed flat, and leaves the softness to the shells.
 	fuzz = {
 		enabled = true,
-		-- The coat is short and sleek, like a real jumping spider's, and it takes its colour from the pattern it grows on:
-		-- black hairs on the black areas, white hairs only inside the white spots and the band, nothing grey or frosted on the
-		-- body (the daughter's white stays crisp, and a hair is never a pale shard). The softness comes from the fur shells.
+		-- ROBLOX-85: fur that lies along the body. The third coat (the second, ROBLOX-13's, was short and combed flat but its hairs were wide, flat
+		-- chips, 0.018 across for 0.03 long, and read as scales or splinters) is finer, shorter and denser, and every hair of the coat lies at a low
+		-- angle off the surface (15 to 25 degrees, not 3 to 13 and not standing) pointing backward and a little outward: toward the abdomen's tip on
+		-- the abdomen and the head's dome, down the leg toward the foot on a leg. It takes its colour from the pattern it grows on: black hairs on the black
+		-- areas, white hairs only inside the white spots and the band, and a few (`tip`) with a greyer, paler cast, which is what a dark coat does
+		-- where it catches the light; nothing white is off the white. The softness still comes from the fur shells.
 		-- `abdomen` and `head` are Fibonacci sample points before the belly is skipped (about 60 % of them become hairs).
-		-- `length` and `lift` are ranges (studs; degrees off the surface: 0 lies flat, 90 stands up); `yaw` scatters the
-		-- combing (degrees either side of straight back); `flat` is the thickness as a share of the width; `black` is the share
-		-- of the blackest tone (the rest is `dark`); `transparency` keeps the coat a little see-through.
-		-- Locks: the pelt, lying nearly flat and combed toward the rear.
-		locks = { abdomen = 340, head = 130, length = { 0.024, 0.040 }, width = 0.018, flat = 0.22, lift = { 3, 13 }, yaw = 18, black = 0.45, transparency = 0.10 },
-		-- Guard hairs: a few short, fine hairs that stand up from the pelt.
-		guard = { abdomen = 50, head = 24, length = { 0.030, 0.046 }, width = 0.0085, flat = 1.0, lift = { 50, 75 }, yaw = 35, black = 0.5, transparency = 0.20 },
-		-- The fringe: short hairs along the sides (`side`: how far round to the side, as a share of the radius, a hair has to
-		-- be), lifted a little, so the outline is ragged by a pixel or two and not by a spike.
-		fringe = { abdomen = 170, head = 60, side = 0.78, length = { 0.026, 0.040 }, width = 0.011, flat = 0.5, lift = { 14, 32 }, yaw = 22, black = 0.5, transparency = 0.20 },
-		-- White hairs inside the white spots and the band: `density` per square stud of marking, lying on it, kept only when the
+		-- `length` and `lift` are ranges (studs; degrees off the surface: 0 lies flat, 90 stands up); `yaw` scatters the combing (degrees either
+		-- side of straight back) and `out` turns it away from the midline (degrees, at most, per hair: the abdomen's fur flows back and out);
+		-- `flat` is the thickness as a share of the width; `black` is the share of the blackest tone (the rest is `dark`); `tip` the share of the
+		-- greyer tone; `transparency` keeps the coat a little see-through.
+		-- Locks: the pelt, lying at a low angle and combed toward the rear.
+		locks = { abdomen = 440, head = 250, length = { 0.022, 0.036 }, width = 0.0075, flat = 0.8, lift = { 15, 25 }, yaw = 12, out = 16, black = 0.45, tip = 0.07, transparency = 0.10 },
+		-- Guard hairs: a few short, fine hairs that stand up from the pelt (the only ones that do).
+		guard = { abdomen = 24, head = 12, length = { 0.026, 0.038 }, width = 0.0055, flat = 1.0, lift = { 42, 56 }, yaw = 30, black = 0.5, transparency = 0.20 },
+		-- The fringe: finer hairs along the sides (`side`: how far round to the side, as a share of the radius, a hair has to be), lifted a little more
+		-- and leaning out, so the outline is soft by a pixel or two and not ragged by a chip.
+		fringe = { abdomen = 220, head = 80, side = 0.78, length = { 0.024, 0.034 }, width = 0.0065, flat = 0.8, lift = { 20, 30 }, yaw = 14, out = 24, black = 0.5, tip = 0.07, transparency = 0.20 },
+		-- White hairs inside the white spots and the band: `density` per square stud of marking, lying on it (14 to 22 degrees), kept only when the
 		-- whole hair stays `margin` studs inside the edge, so the white keeps its edge.
-		pale = { density = 600, length = { 0.021, 0.028 }, width = 0.013, flat = 0.3, lift = { 3, 10 }, yaw = 14, margin = 0.004, transparency = 0.05 },
+		pale = { density = 800, length = { 0.021, 0.027 }, width = 0.0085, flat = 0.6, lift = { 14, 22 }, yaw = 12, margin = 0.004, transparency = 0.05 },
 		clear = 0.006, -- black hairs stay this far (studs) from any white marking
 		black = { 0.03, 0.03, 0.03 },
 		dark = { 0.13, 0.13, 0.13 },
-		grey = { 0.50, 0.50, 0.48 }, -- grey and frost: the face (tufts, ruff) and the palps' fluff only
+		grey = { 0.50, 0.50, 0.48 }, -- grey and frost: the pale tips of the coat, the face (tufts, ruff) and the palps' fluff
 		frost = { 0.76, 0.76, 0.73 },
-		-- Fur shells: see-through layers outside the body, strongest nearest it, so the outline goes soft. Four at full detail,
-		-- one at low. A shell tints what is under it as well as what is around it, so they are dark and faint: the white of the
-		-- pattern must stay white.
+		-- Fur shells: see-through layers outside the body, strongest nearest it, so the outline goes soft. Four at full detail, one at low. A shell
+		-- tints what is under it as well as what is around it, so they are dark and faint: the white of the pattern must stay white.
 		shellColor = { 0.08, 0.08, 0.08 },
 		shells = { { scale = 1.05, transparency = 0.86 }, { scale = 1.10, transparency = 0.92 }, { scale = 1.16, transparency = 0.955 }, { scale = 1.23, transparency = 0.975 } },
 		headShell = { zScale = 0.80, shift = 0.05 }, -- the head's shells sit back from the eye row so the eyes stay clear
-		-- Little tufts that bold jumping spiders have above the eyes, at the upper sides of the head: a fan of dark and
-		-- silvery hairs that sweeps up and out. Not eyebrows: they sit behind the eyes at the sides, not over them.
-		tuftHairs = 10, -- per side
-		tuftLength = 0.078,
-		tuft = { at = { 0.52, 0.80, -0.28 }, lean = { 0.60, 1.0, -0.22 }, fan = 0.46, spread = 0.02, width = 0.0165, flat = 0.8, transparency = 0.1 },
+		-- Little tufts that bold jumping spiders have above the eyes, at the upper sides of the head: a fan of dark and silvery hairs that sweeps
+		-- up and out, finer than before. Not eyebrows: they sit behind the eyes at the sides, not over them.
+		tuftHairs = 7, -- per side
+		tuftLength = 0.058,
+		tuft = { at = { 0.52, 0.80, -0.28 }, lean = { 0.60, 1.0, 0.05 }, fan = 0.46, spread = 0.02, width = 0.0075, flat = 0.8, transparency = 0.1 },
 		-- A soft ruff of pale hair low on each cheek, beside the jaws (not a moustache: it sits at the sides).
-		ruff = { hairs = 5, length = 0.052, width = 0.0135, flat = 0.7, at = { 0.52, -0.36, -0.74 }, lean = { 0.65, -0.55, -0.45 }, whiteShare = 0.6, transparency = 0.15 },
-		legHairs = { 7, 6, 3 }, -- femur, tibia, tarsus, per leg (front legs carry 1.6 x as many on femur and tibia)
-		legLength = 0.052,
-		legWidth = 0.0125,
+		ruff = { hairs = 4, length = 0.042, width = 0.0075, flat = 0.7, at = { 0.52, -0.36, -0.74 }, lean = { 0.65, -0.55, -0.30 }, whiteShare = 0.6, transparency = 0.15 },
+		legHairs = { 4, 4, 1 }, -- femur, tibia, tarsus, per leg (front legs carry 1.6 x as many on femur and tibia)
+		legLength = 0.040,
+		legWidth = 0.0075,
 		legTransparency = 0.2,
 		legBlack = 0.4, -- the share of the blackest tone on the legs (the rest is dark; white over the pale bands)
+		legLift = { 15, 26 }, -- a leg's hairs lie at this angle off the leg, pointing down it toward the foot
+		legTip = 0.08, -- the share of the legs' hairs with the greyer cast
 	},
 
 	-- ---------------------------------------------------------------- idle motion (drawn rig only, ROBLOX-13)
@@ -170,7 +176,7 @@ local first = {
 			taper = true, tibiaTaper = true, jointBreak = true, claws = 2, fangSegments = 2,
 		},
 		low = {
-			every = { lock = 3, guard = 0, fringe = 3, pale = 2, tuft = 2, ruff = 2, palp = 2, leg = 4 },
+			every = { lock = 4, guard = 0, fringe = 3, pale = 2, tuft = 2, ruff = 2, palp = 2, leg = 4 },
 			shells = 1, speckleEvery = 2, pads = false, sockets = false, idle = false, highlight = false,
 			taper = true, tibiaTaper = false, jointBreak = false, claws = 0, fangSegments = 1,
 		},
@@ -327,6 +333,52 @@ end
 
 -- A brown rival, distinct from the player; illustrative salticid, no species identification.
 local rival: any=table.clone(first)
+-- The rival keeps the coat the first spider had before ROBLOX-85 (ROBLOX-13's second coat, whose numbers are below), as it was drawn.
+local rivalFuzz: any = {
+	enabled = true,
+	-- The coat is short and sleek, like a real jumping spider's, and it takes its colour from the pattern it grows on:
+	-- black hairs on the black areas, white hairs only inside the white spots and the band, nothing grey or frosted on the
+	-- body (the daughter's white stays crisp, and a hair is never a pale shard). The softness comes from the fur shells.
+	-- `abdomen` and `head` are Fibonacci sample points before the belly is skipped (about 60 % of them become hairs).
+	-- `length` and `lift` are ranges (studs; degrees off the surface: 0 lies flat, 90 stands up); `yaw` scatters the
+	-- combing (degrees either side of straight back); `flat` is the thickness as a share of the width; `black` is the share
+	-- of the blackest tone (the rest is `dark`); `transparency` keeps the coat a little see-through.
+	-- Locks: the pelt, lying nearly flat and combed toward the rear.
+	locks = { abdomen = 340, head = 130, length = { 0.024, 0.040 }, width = 0.018, flat = 0.22, lift = { 3, 13 }, yaw = 18, black = 0.45, transparency = 0.10 },
+	-- Guard hairs: a few short, fine hairs that stand up from the pelt.
+	guard = { abdomen = 50, head = 24, length = { 0.030, 0.046 }, width = 0.0085, flat = 1.0, lift = { 50, 75 }, yaw = 35, black = 0.5, transparency = 0.20 },
+	-- The fringe: short hairs along the sides (`side`: how far round to the side, as a share of the radius, a hair has to
+	-- be), lifted a little, so the outline is ragged by a pixel or two and not by a spike.
+	fringe = { abdomen = 170, head = 60, side = 0.78, length = { 0.026, 0.040 }, width = 0.011, flat = 0.5, lift = { 14, 32 }, yaw = 22, black = 0.5, transparency = 0.20 },
+	-- White hairs inside the white spots and the band: `density` per square stud of marking, lying on it, kept only when the
+	-- whole hair stays `margin` studs inside the edge, so the white keeps its edge.
+	pale = { density = 600, length = { 0.021, 0.028 }, width = 0.013, flat = 0.3, lift = { 3, 10 }, yaw = 14, margin = 0.004, transparency = 0.05 },
+	clear = 0.006, -- black hairs stay this far (studs) from any white marking
+	black = { 0.03, 0.03, 0.03 },
+	dark = { 0.13, 0.13, 0.13 },
+	grey = { 0.50, 0.50, 0.48 }, -- grey and frost: the face (tufts, ruff) and the palps' fluff only
+	frost = { 0.76, 0.76, 0.73 },
+	-- Fur shells: see-through layers outside the body, strongest nearest it, so the outline goes soft. Four at full detail,
+	-- one at low. A shell tints what is under it as well as what is around it, so they are dark and faint: the white of the
+	-- pattern must stay white.
+	shellColor = { 0.08, 0.08, 0.08 },
+	shells = { { scale = 1.05, transparency = 0.86 }, { scale = 1.10, transparency = 0.92 }, { scale = 1.16, transparency = 0.955 }, { scale = 1.23, transparency = 0.975 } },
+	headShell = { zScale = 0.80, shift = 0.05 }, -- the head's shells sit back from the eye row so the eyes stay clear
+	-- Little tufts that bold jumping spiders have above the eyes, at the upper sides of the head: a fan of dark and
+	-- silvery hairs that sweeps up and out. Not eyebrows: they sit behind the eyes at the sides, not over them.
+	tuftHairs = 10, -- per side
+	tuftLength = 0.078,
+	tuft = { at = { 0.52, 0.80, -0.28 }, lean = { 0.60, 1.0, -0.22 }, fan = 0.46, spread = 0.02, width = 0.0165, flat = 0.8, transparency = 0.1 },
+	-- A soft ruff of pale hair low on each cheek, beside the jaws (not a moustache: it sits at the sides).
+	ruff = { hairs = 5, length = 0.052, width = 0.0135, flat = 0.7, at = { 0.52, -0.36, -0.74 }, lean = { 0.65, -0.55, -0.45 }, whiteShare = 0.6, transparency = 0.15 },
+	legHairs = { 7, 6, 3 }, -- femur, tibia, tarsus, per leg (front legs carry 1.6 x as many on femur and tibia)
+	legLength = 0.052,
+	legWidth = 0.0125,
+	legTransparency = 0.2,
+	legBlack = 0.4, -- the share of the blackest tone on the legs (the rest is dark; white over the pale bands)
+}
+rival.fuzz=rivalFuzz;rival.gloss=nil
+rival.palp=table.clone(first.palp);rival.palp.fluff={ hairs = 7, length = 0.055, width = 0.012, flat = 0.7, transparency = 0.15 } -- (ROBLOX-85 made the first spider's palp fluff finer)
 rival.id="rival_spider";rival.body={.22,.14,.08};rival.legs={.27,.18,.10};rival.white={.64,.48,.29}
 -- ROBLOX-84 gave the first spider shaped legs and fangs; the rival (a clone of it) keeps the plain tubes and balls, as it was drawn.
 rival.legForm=nil;rival.fang=nil
@@ -499,14 +551,13 @@ local function tarantula(o: any): any
 		limbs = limbs,
 		-- ROBLOX-84: the legs and palps are drawn as the segments a tarantula has (see `legForm` on the first spider). The femur tapers, the knee is
 		-- a stout patella (the redknee's orange lives on it), the tarsus has a break (a ball on the rod, no second rod: the budget is 150 parts),
-		-- and each foot is a broad, rounder scopula pad of dark velvet with a pair of short bristles at full detail. The palps, which are drawn
-		-- 1.45 times as long, taper the same way.
+		-- and each foot is a broad, rounder scopula pad of dark velvet (ROBLOX-85: its bristles are the legs' own, on the tarsus, and the pad has none
+		-- of its own). The palps, which are drawn 1.45 times as long, taper the same way.
 		legForm = {
 			femur = { split = 0.58, taper = 0.74 },
 			patella = { length = 1.30, width = 1.20 },
 			tarsus = { split = 0.55, joint = 1.20, bend = 0 },
 			foot = { rx = 0.80, ry = 0.58, rz = 0.92 },
-			strands = { length = 0.040, radius = 0.0045 },
 		},
 		palpForm = { split = 0.58, taper = 0.78 },
 		-- Larger fangs than the first spider's, one segment each, under the chelicerae and pointing forward (and a little down).
@@ -517,7 +568,7 @@ local function tarantula(o: any): any
 		-- Bodies in addition to the first spider's four: the rim, and two spinnerets of two segments behind the abdomen (the second segment is full
 		-- detail only). `sweep` names the segment: the silk-mat pose (ROBLOX-82) swings them about the abdomen's rear.
 		extras = {
-			{ name = "CarapaceRim", center = { 0, -0.035, -0.18 }, radii = o.rimRadii, group = "head", color = hex(o.rim) },
+			{ name = "CarapaceRim", center = { 0, -0.035 + o.rimUp, -0.18 }, radii = o.rimRadii, group = "head", color = hex(o.rim) },
 			{ name = "Spinneret", center = { -0.045, 0.02, apex + 0.01 }, radii = { 0.022, 0.020, 0.055 }, group = "abdomen", color = hex(o.spinneret), sweep = 1 },
 			{ name = "Spinneret", center = { 0.045, 0.02, apex + 0.01 }, radii = { 0.022, 0.020, 0.055 }, group = "abdomen", color = hex(o.spinneret), sweep = 1 },
 			{ name = "SpinneretTip", center = { -0.045, 0.01, apex + 0.085 }, radii = { 0.016, 0.015, 0.045 }, group = "abdomen", color = hex(o.spinneret), sweep = 2, fullOnly = true },
@@ -529,18 +580,30 @@ local function tarantula(o: any): any
 		-- the raised feet tremble, how much farther the second spinneret segment swings than the first, and how far inside the abdomen's rear
 		-- tip the spinnerets swing from. All ART.
 		threat = { pair = 1, up = { x = 0.42, y = 0.28, z = -0.60 }, kneeOut = 0.10, kneeUp = 0.12, tremor = 0.015, tipSweep = 1.4, sweepBack = 0.05 },
-		fuzz = o.fuzz,
+		-- ROBLOX-85: a tarantula IS its velvet. A fur shell per body mass: a slightly larger, partly transparent copy of the carapace and of the abdomen
+		-- in the Fabric material, in the colour of the fur (`velvet`; the head's shell stops short of the tubercle's eyes). `cluster` is the redknee's
+		-- urticating patch drawn as a denser tuft of ginger-rust hairs. The bristles are the legs' fringe: short rods standing out from the sides of
+		-- each segment and leaning toward the foot (`lift`: degrees off the leg; `edge`: where round the leg, degrees from the top), `legPairs` of
+		-- them on the femur, tibia and tarsus of each pair of legs, the front pair's the most; full detail only. All ART.
+		velvet = { head = { color = hex(o.velvetHead), scale = 1.07, transparency = o.velvetShade }, abdomen = { color = hex(o.velvetAbdomen), scale = 1.075, transparency = o.velvetShade } },
+		cluster = o.cluster,
+		fuzz = {
+			enabled = true, legsOnly = true, legTone = "frost",
+			black = { 0.03, 0.03, 0.03 }, dark = { 0.13, 0.13, 0.13 }, grey = { 0.5, 0.5, 0.48 }, frost = hex(o.bristle), shellColor = { 0.08, 0.08, 0.08 }, shells = {},
+			legHairs = { 0, 0, 0 }, legPairs = o.legPairs, legLength = 0.080, legWidth = 0.009, legTransparency = 0.1, legBlack = 0,
+			legLift = { 32, 48 }, legEdge = { 50, 115 }, legSpan = { 0.12, 0.74 },
+		},
 		idle = first.idle,
 		detail = {
 			full = {
 				every = { lock = 1, guard = 1, fringe = 1, pale = 1, tuft = 1, ruff = 1, palp = 1, leg = 1 },
 				shells = 0, speckleEvery = 1, pads = true, sockets = false, idle = true, highlight = true,
-				taper = true, jointBreak = true, strands = 1, fangSegments = 1,
+				taper = true, jointBreak = true, fangSegments = 1, velvet = true, cluster = true,
 			},
 			low = {
 				every = { lock = 0, guard = 0, fringe = 0, pale = 0, tuft = 0, ruff = 0, palp = 0, leg = 0 },
 				shells = 0, speckleEvery = 1, pads = false, sockets = false, idle = false, highlight = false,
-				fangSegments = 1,
+				fangSegments = 1, velvet = true, cluster = false,
 			},
 		},
 	}
@@ -554,42 +617,46 @@ local redknee = tarantula({
 	core = 0x1A1614, rim = 0xD67638, tubercle = 0x1A1614, abdomen = 0x161312, spinneret = 0x1E1816, fangs = 0x1C1310,
 	leg = 0x181413, femur = 0x0E0C0B, tibia = 0x181413, tarsus = 0x181413, knee = 0xEE5E22, ankle = 0x181413, palpBand = 0xEE5E22, palpTip = 0x181413,
 	gloss = nil, legGloss = nil, legThickness = 1.12 * 1.35, bandFraction = 0.30,
-	headRadii = { 0.285, 0.140, 0.270 }, rimRadii = { 0.325, 0.105, 0.310 },
+	headRadii = { 0.285, 0.140, 0.270 }, rimRadii = { 0.335, 0.122, 0.318 }, rimUp = 0.018, -- the rim stands up a little round the carapace's edge (ROBLOX-85)
 	abdomenRadii = { 0.290, 0.230, 0.320 },
 	marks = {
-		{ name = "UrticatingPatch", color = hex(0xBA5028), x = 0, z = 0.42, rx = 0.115, rz = 0.100, angle = 0 },
+		{ name = "UrticatingPatch", color = hex(0xBA5028), x = 0, z = 0.42, rx = 0.115, rz = 0.100, angle = 0, height = 0.012, raise = 0.014 }, -- stands out of the velvet shell, not under it
 	} :: { any },
-	fuzz = nil,
+	-- Velvet black-brown shells; the legs' bristles a warm ginger-brown, thinner behind than before; the patch's hairs ginger-rust, a third paler.
+	velvetHead = 0x2A211C, velvetAbdomen = 0x231B18, velvetShade = 0.45, bristle = 0xA8683C,
+	legPairs = { { 3, 2, 1 }, { 2, 2, 0 }, { 1, 1, 0 }, { 1, 1, 0 } },
+	cluster = { mark = "UrticatingPatch", hairs = 8, length = { 0.045, 0.065 }, lift = { 28, 42 }, yaw = 20, width = 0.009, flat = 0.9, transparency = 0.05, color = hex(0xB5532A), light = hex(0xD9803F), paler = 0.35 },
 })
 redknee.legBands = { tibia = hex(0xE08642) }
 
--- Chromatopelma cyaneopubescens, the Greenbottle blue: a metallic blue-green carapace with a lighter turquoise rim and fangs, cobalt legs with
--- brighter azure joint rings and pale golden-tan bristles, and a vivid tiger-orange abdomen with a dark midline and four pairs of diagonal bars.
--- Sleeker than the redknee. The bars fade at the last growth stage (barFade), as a juvenile's pattern does.
+-- Chromatopelma cyaneopubescens, the Greenbottle blue: a teal-green carapace with a sheen and a lighter turquoise rim, deep metallic cobalt legs with
+-- brighter azure joint rings and pale blue-white bristles, and a burnt-orange abdomen with a dark raised midline and four pairs of softened diagonal
+-- bars. Sleeker than the redknee. The bars fade at the last growth stage (barFade), as a juvenile's pattern does. ROBLOX-85 darkened and
+-- desaturated the legs from the first costume's pure cobalt (#204AA8) to #1E3F8F (Reflectance 0.10), greened the carapace, burnt the abdomen and
+-- softened the bars (see ROBLOX-81 for the first palette and ROBLOX-85 for why).
 local greenbottle = tarantula({
-	id = "chromatopelma_cyaneopubescens", name = "Greenbottle blue (Chromatopelma cyaneopubescens)",
-	core = 0x24767C, rim = 0x308E94, tubercle = 0x16285C, abdomen = 0xE46226, spinneret = 0x3A2418, fangs = 0x308E94,
-	leg = 0x204AA8, femur = 0x204AA8, tibia = 0x204AA8, tarsus = 0x204AA8, knee = 0x2E62C4, ankle = 0x2E62C4, palpBand = 0x2E62C4, palpTip = 0x2E62C4,
-	gloss = 0.08, legGloss = 0.06, legThickness = 1.12 * 1.15, bandFraction = 0.24,
-	headRadii = { 0.280, 0.120, 0.270 }, rimRadii = { 0.315, 0.090, 0.310 },
-	abdomenRadii = { 0.245, 0.195, 0.300 },
-	marks = {
-		-- The dark midline: three dabs along the back (the middle one alone at low detail), then four pairs of diagonal bars (x mirrored).
-		{ name = "AbdomenMidline", color = hex(0x2A1C18), x = 0, z = -0.48, rx = 0.017, rz = 0.075, angle = 0, fullOnly = true },
-		{ name = "AbdomenMidline", color = hex(0x2A1C18), x = 0, z = 0.0, rx = 0.017, rz = 0.075, angle = 0 },
-		{ name = "AbdomenMidline", color = hex(0x2A1C18), x = 0, z = 0.48, rx = 0.017, rz = 0.075, angle = 0, fullOnly = true },
-		{ name = "AbdomenBar", color = hex(0x2A1C18), x = 0.50, z = -0.36, rx = 0.017, rz = 0.070, angle = 0.70, bar = true, mirror = true },
-		{ name = "AbdomenBar", color = hex(0x2A1C18), x = 0.54, z = -0.10, rx = 0.017, rz = 0.070, angle = 0.70, bar = true, mirror = true },
-		{ name = "AbdomenBar", color = hex(0x2A1C18), x = 0.52, z = 0.18, rx = 0.017, rz = 0.070, angle = 0.70, bar = true, mirror = true },
-		{ name = "AbdomenBar", color = hex(0x2A1C18), x = 0.44, z = 0.44, rx = 0.017, rz = 0.065, angle = 0.70, bar = true, mirror = true },
-	} :: { any },
-	-- Pale golden-tan bristles on the legs only (full detail): the body wears none. `frost` is the bristle colour and `legTone` says every
-	-- leg hair is that tone; the counts are small to keep the part budget (Setae.leg: femur, tibia, tarsus; the front legs carry 1.6 times as many).
-	fuzz = {
-		enabled = true, legsOnly = true, legTone = "frost",
-		black = { 0.03, 0.03, 0.03 }, dark = { 0.13, 0.13, 0.13 }, grey = { 0.5, 0.5, 0.48 }, frost = hex(0xDAA86C), shellColor = { 0.08, 0.08, 0.08 }, shells = {},
-		legHairs = { 1, 1, 1 }, legLength = 0.07, legWidth = 0.012, legTransparency = 0.1, legBlack = 0,
-	},
+    id = "chromatopelma_cyaneopubescens", name = "Greenbottle blue (Chromatopelma cyaneopubescens)",
+    core = 0x1E8062, rim = 0x2A9A7E, tubercle = 0x16285C, abdomen = 0xC4551C, spinneret = 0x3A2418, fangs = 0x308E94,
+    leg = 0x1E3F8F, femur = 0x1E3F8F, tibia = 0x1E3F8F, tarsus = 0x1E3F8F, knee = 0x2E62C4, ankle = 0x2E62C4, palpBand = 0x2E62C4, palpTip = 0x2E62C4,
+    gloss = 0.14, legGloss = 0.10, legThickness = 1.12 * 1.15, bandFraction = 0.24,
+    headRadii = { 0.280, 0.120, 0.270 }, rimRadii = { 0.322, 0.105, 0.316 }, rimUp = 0.010,
+    abdomenRadii = { 0.245, 0.195, 0.300 },
+    marks = {
+        -- The dark midline: three raised ridges along the back (thin rod-shaped ellipsoids), a little proud of the fur shell (the middle one alone at low detail), then
+        -- four pairs of diagonal bars (x mirrored), a warm brown now and not near-black, so they are softer on the orange.
+        { name = "AbdomenMidline", color = hex(0x2A1C18), x = 0, z = -0.48, rx = 0.0085, rz = 0.080, angle = 0, fullOnly = true, height = 0.010, raise = 0.0065 },
+        { name = "AbdomenMidline", color = hex(0x2A1C18), x = 0, z = 0.0, rx = 0.0085, rz = 0.080, angle = 0, height = 0.010, raise = 0.0065 },
+        { name = "AbdomenMidline", color = hex(0x2A1C18), x = 0, z = 0.48, rx = 0.0085, rz = 0.080, angle = 0, fullOnly = true, height = 0.010, raise = 0.0065 },
+        { name = "AbdomenBar", color = hex(0x5A2A14), x = 0.50, z = -0.36, rx = 0.017, rz = 0.070, angle = 0.70, bar = true, mirror = true },
+        { name = "AbdomenBar", color = hex(0x5A2A14), x = 0.54, z = -0.10, rx = 0.017, rz = 0.070, angle = 0.70, bar = true, mirror = true },
+        { name = "AbdomenBar", color = hex(0x5A2A14), x = 0.52, z = 0.18, rx = 0.017, rz = 0.070, angle = 0.70, bar = true, mirror = true },
+        { name = "AbdomenBar", color = hex(0x5A2A14), x = 0.44, z = 0.44, rx = 0.017, rz = 0.065, angle = 0.70, bar = true, mirror = true },
+    } :: { any },
+    -- Light-teal fuzz on the carapace, burnt-orange fuzz on the abdomen (the shells), and pale blue-white bristles on the legs (not the golden-tan
+    -- of ROBLOX-81: the real animal's long leg hairs read pale blue).
+    velvetHead = 0x35A07F, velvetAbdomen = 0xE0782C, velvetShade = 0.62, bristle = 0xC9DCF2,
+    legPairs = { { 4, 3, 0 }, { 3, 2, 1 }, { 2, 1, 0 }, { 1, 1, 0 } },
+    cluster = nil,
 })
 greenbottle.legBands = {} -- no pale bands on its legs: the joint rings are its markings
 greenbottle.barFade = { 0, 0, 0, 0.6 } -- the bars' transparency at each growth stage: the juvenile pattern softens in the adult

@@ -150,9 +150,10 @@ for _, h in hairs do
 end
 check(kinds.tuft == 2 * look.fuzz.tuftHairs and tuftsOk, "bold-jumper tufts: a fan on each side, behind and above the eyes, not brows")
 check(nearEye > ame.radii[1], "tufts do not cover the front eyes")
--- ---------------------------------------------------------------- the coat (ROBLOX-13, second pass)
--- Short and thin hairs that lie nearly flat and are combed toward the rear; only a few short guard hairs stand up. Every hair has
--- the colour of the pattern it grows from: black on the black areas, white only inside the white spots and the band.
+-- ---------------------------------------------------------------- the coat (ROBLOX-13, second pass; ROBLOX-85, third)
+-- Short, fine hairs that lie along the body at 15 to 25 degrees off the surface, pointing backward and a little outward; only a few short guard hairs
+-- stand up. Every hair has the colour of the pattern it grows from: black on the black areas, white only inside the white spots and the band
+-- (a few with a greyer cast).
 local COAT = { lock = true, guard = true, fringe = true, pale = true }
 local function liftOf(h): number return math.deg(math.asin(math.clamp(h.dir:Dot(h.normal), -1, 1))) end
 local coat, upright, longest, widest, lengthSum = 0, {}, 0, 0, 0
@@ -173,14 +174,15 @@ check(standingAreGuards and #upright == (kinds.guard or 0) and #upright >= 10 an
 local flatOk, combed, locks = true, 0, 0
 for _, h in hairs do
 	local lift = liftOf(h)
-	if h.kind == "lock" or h.kind == "pale" then flatOk = flatOk and lift <= 15 end
-	if h.kind == "fringe" then flatOk = flatOk and lift <= 35 end
+	if h.kind == "lock" then flatOk = flatOk and lift >= 14.9 and lift <= 25.1 end
+	if h.kind == "pale" then flatOk = flatOk and lift >= 13.9 and lift <= 22.1 end
+	if h.kind == "fringe" then flatOk = flatOk and lift >= 19.9 and lift <= 30.1 end
 	if h.kind == "lock" then
 		locks += 1
 		if h.dir.Z > 0.3 then combed += 1 end
 	end
 end
-check(flatOk, "locks and white hairs lie within 15 degrees of the surface, the fringe within 35")
+check(flatOk, "locks lie at 15 to 25 degrees off the surface, the white hairs at 14 to 22 and the fringe at 20 to 30: lying along the body, not flat chips and not spikes")
 check(combed >= locks * 0.9, `locks are combed toward the rear ({combed} of {locks})`)
 
 -- The white as the rig draws it: the AbdomenSpot, FrontBand and PaleCheek parts, read back from the rig (offset in the body frame, size).
@@ -206,6 +208,7 @@ end
 local ac = A.abdomenCenter
 local paleIn, paleCount, blackClear, blackCount, toneOk, whiteOnlyOnWhite = true, 0, true, 0, true, true
 local worstGap = math.huge
+local greyTips = 0
 for _, h in hairs do
 	local points = { h.at, h.at + h.dir * (h.length * 0.5), h.at + h.dir * h.length }
 	if h.kind == "pale" then
@@ -213,7 +216,8 @@ for _, h in hairs do
 		toneOk = toneOk and h.tone == "white"
 		for _, p in points do paleIn = paleIn and (overWhite(p)) < 1 end -- the whole hair stays inside a marking
 	elseif COAT[h.kind] then
-		toneOk = toneOk and (h.tone == "black" or h.tone == "dark") -- nothing grey or frosted in the body coat
+		toneOk = toneOk and (h.tone == "black" or h.tone == "dark" or h.tone == "grey") -- nothing frosted in the body coat; a few have a greyer cast
+		if h.tone == "grey" then greyTips += 1 end
 		if h.group == "abdomen" and h.at.Y >= ac.Y + 0.02 then
 			blackCount += 1
 			for _, p in points do
@@ -227,7 +231,8 @@ end
 blackClear = worstGap >= 0.002
 check(paleCount >= 15 and paleIn, `white coat hairs stay inside the white spots and the band ({paleCount} hairs)`)
 check(blackCount >= 100 and blackClear, `black coat hairs keep off every white marking ({blackCount} hairs, at least {string.format("%.4f", worstGap)} studs clear)`)
-check(toneOk and whiteOnlyOnWhite, "white hairs are only on the white (and the face's ruff), every other coat hair is black or dark")
+check(toneOk and whiteOnlyOnWhite, "white hairs are only on the white (and the face's ruff), every other coat hair is black, dark or (a few) grey")
+check(greyTips >= 8 and greyTips <= coat * 0.12, `a few coat hairs have a paler, greyer cast ({greyTips} of {coat}), nothing frosted or white off the pattern`)
 local offCheek, cheekHairs = true, 0
 for _, h in hairs do
 	if COAT[h.kind] and h.group == "head" then
@@ -729,10 +734,13 @@ check(hexOf(red.body) == "1A1614" and hexOf(red.extras[1].color) == "D67638" and
 check(hexOf(red.abdomenColor) == "161312" and red.marks[1].name == "UrticatingPatch" and hexOf(red.marks[1].color) == "BA5028" and red.marks[1].z > 0.2, "plump velvet-black abdomen #161312 with a ginger-rust patch #BA5028 at the dorsal rear")
 check(hexOf(red.legColors.knee) == "EE5E22" and hexOf(red.legBands.tibia) == "E08642" and hexOf(red.legColors.tarsus) == "181413" and hexOf(red.legColors.femur) == "0E0C0B", "flame-orange patellae #EE5E22, a warm pale-orange tibia band #E08642, dark velvety feet #181413, near-black femurs")
 check(hexOf(red.white) == "EE5E22", "the pedipalps' patellae are the same flame orange")
-check(hexOf(blue.body) == "24767C" and hexOf(blue.extras[1].color) == "308E94" and hexOf(blue.fangs) == "308E94" and blue.gloss == 0.08, "the greenbottle's carapace is metallic blue-green #24767C (Reflectance 0.08) with a lighter turquoise rim and chelicerae #308E94")
-check(hexOf(blue.legColors.femur) == "204AA8" and hexOf(blue.legColors.tarsus) == "204AA8" and hexOf(blue.legColors.knee) == "2E62C4" and hexOf(blue.legColors.ankle) == "2E62C4" and blue.legGloss == 0.06, "cobalt legs #204AA8 (Reflectance 0.06) with brighter azure joint rings #2E62C4")
-check(hexOf(blue.fuzz.frost) == "DAA86C" and blue.fuzz.legsOnly == true and blue.fuzz.legTone == "frost", "pale golden-tan leg bristles #DAA86C")
-check(hexOf(blue.abdomenColor) == "E46226" and #blue.marks == 7 and hexOf(blue.marks[1].color) == "2A1C18", "a vivid tiger-orange abdomen #E46226 with markings in #2A1C18")
+-- The greenbottle's palette is ROBLOX-85's (ROBLOX-81's first palette was a carapace #24767C at Reflectance 0.08, cobalt legs #204AA8 at 0.06, pale golden-tan
+-- bristles #DAA86C and a tiger-orange abdomen #E46226 with bars #2A1C18, which read as pure plastic): teal-green with a sheen, deep metallic cobalt, pale
+-- blue-white bristles, a burnt-orange abdomen and softer brown bars; the azure joint rings (#2E62C4), the turquoise chelicerae (#308E94) and the dark midline (#2A1C18) are as they were.
+check(hexOf(blue.body) == "1E8062" and hexOf(blue.extras[1].color) == "2A9A7E" and hexOf(blue.fangs) == "308E94" and blue.gloss == 0.14, "the greenbottle's carapace is teal-green #1E8062 with a sheen (Reflectance 0.14), a lighter rim #2A9A7E and turquoise chelicerae #308E94")
+check(hexOf(blue.legColors.femur) == "1E3F8F" and hexOf(blue.legColors.tarsus) == "1E3F8F" and hexOf(blue.legColors.knee) == "2E62C4" and hexOf(blue.legColors.ankle) == "2E62C4" and blue.legGloss == 0.10, "deep metallic cobalt legs #1E3F8F (Reflectance 0.10) with brighter azure joint rings #2E62C4")
+check(hexOf(blue.fuzz.frost) == "C9DCF2" and blue.fuzz.legsOnly == true and blue.fuzz.legTone == "frost", "pale blue-white leg bristles #C9DCF2")
+check(hexOf(blue.abdomenColor) == "C4551C" and #blue.marks == 7 and hexOf(blue.marks[1].color) == "2A1C18" and hexOf(blue.marks[4].color) == "5A2A14", "a burnt-orange abdomen #C4551C with a dark midline #2A1C18 and softer brown bars #5A2A14")
 local TA, TB = Anatomy.layout(red), Anatomy.layout(blue)
 -- A tarantula against the first spider: a broader, lower carapace, thick parallel fangs, longer leg-like palps, stockier legs.
 for _, t in { { red, TA }, { blue, TB } } do
@@ -778,8 +786,9 @@ local rc, bc = counts(RED), counts(BLUE)
 print(`look: Mexican redknee full {rc.full.total} parts, low {rc.low.total}; Greenbottle blue full {bc.full.total} parts ({bc.full.hair} bristles), low {bc.low.total}`)
 check(rc.full.total <= 150 and bc.full.total <= 150, `tarantula full detail part budget ({rc.full.total} and {bc.full.total}, at most 150)`)
 check(rc.low.total <= 90 and bc.low.total <= 90 and rc.low.total < rc.full.total and bc.low.total < bc.full.total, `tarantula low detail (phone and mate) part budget ({rc.low.total} and {bc.low.total}, at most 90)`)
-check(rc.full.bad == 0 and rc.low.bad == 0 and bc.full.bad == 0 and bc.low.bad == 0 and rc.full.shell == 0 and bc.full.shell == 0, "every drawn tarantula part is anchored, non-colliding, not queryable and has a real size")
-check(rc.full.hair == 0 and rc.low.hair == 0 and bc.low.hair == 0 and bc.full.hair >= 20 and bc.full.hair <= 40, `the redknee has no bristles; the greenbottle has {bc.full.hair} on its legs at full detail and none at low`)
+check(rc.full.bad == 0 and rc.low.bad == 0 and bc.full.bad == 0 and bc.low.bad == 0, "every drawn tarantula part is anchored, non-colliding, not queryable and has a real size")
+check(rc.full.shell == 2 and rc.low.shell == 2 and bc.full.shell == 2 and bc.low.shell == 2, "a fur shell on the carapace and one on the abdomen, at both tiers (ROBLOX-85)")
+check(rc.low.hair == 0 and bc.low.hair == 0 and rc.full.hair >= 30 and rc.full.hair <= 40 and bc.full.hair >= 30 and bc.full.hair <= 40, `leg bristles (and the redknee's patch tuft) at full detail only: {rc.full.hair} and {bc.full.hair} hairs at full, none at low`)
 for _, c in { rc, bc } do
 	local nf, nl = c.nf, c.nl
 	check((nf.OcularTubercle or 0) == 1 and (nl.OcularTubercle or 0) == 1 and (nf.Eye or 0) == 8 and (nl.Eye or 0) == 8 and (nf.Catchlight or 0) == 2 and (nl.Catchlight or 0) == 2, "one tubercle, eight tiny eyes and two catchlights at both tiers")
@@ -799,8 +808,8 @@ check(not tarBad, "no tarantula part is named like a human feature")
 -- Colours and gloss as drawn.
 local function partColor(rig, name: string): string return hexOf({ rig.model:FindFirstChild(name).Color.R, rig.model:FindFirstChild(name).Color.G, rig.model:FindFirstChild(name).Color.B }) end
 check(partColor(rc.f, "Cephalothorax") == "1A1614" and partColor(rc.f, "CarapaceRim") == "D67638" and partColor(rc.f, "Abdomen") == "161312" and partColor(rc.f, "UrticatingPatch") == "BA5028" and partColor(rc.f, "Knee1") == "EE5E22" and partColor(rc.f, "TibiaBand1") == "E08642" and partColor(rc.f, "Tarsus1") == "181413" and partColor(rc.f, "Femur1") == "0E0C0B", "the redknee is drawn in Perplexity's colours")
-check(partColor(bc.f, "Cephalothorax") == "24767C" and partColor(bc.f, "CarapaceRim") == "308E94" and partColor(bc.f, "Chelicera") == "308E94" and partColor(bc.f, "Abdomen") == "E46226" and partColor(bc.f, "AbdomenBar") == "2A1C18" and partColor(bc.f, "Femur1") == "204AA8" and partColor(bc.f, "Knee1") == "2E62C4" and partColor(bc.f, "Ankle1") == "2E62C4" and partColor(bc.f, "Seta") == "DAA86C", "the greenbottle is drawn in Perplexity's colours, bristles included")
-check(bc.f.model:FindFirstChild("Cephalothorax").Reflectance == 0.08 and bc.f.model:FindFirstChild("Femur1").Reflectance == 0.06 and bc.f.model:FindFirstChild("Tarsus3").Reflectance == 0.06 and (rc.f.model:FindFirstChild("Cephalothorax").Reflectance or 0) == 0, "slight gloss on the greenbottle's carapace (0.08) and legs (0.06); none on the redknee")
+check(partColor(bc.f, "Cephalothorax") == "1E8062" and partColor(bc.f, "CarapaceRim") == "2A9A7E" and partColor(bc.f, "Chelicera") == "308E94" and partColor(bc.f, "Abdomen") == "C4551C" and partColor(bc.f, "AbdomenBar") == "5A2A14" and partColor(bc.f, "AbdomenMidline") == "2A1C18" and partColor(bc.f, "Femur1") == "1E3F8F" and partColor(bc.f, "Knee1") == "2E62C4" and partColor(bc.f, "Ankle1") == "2E62C4" and partColor(bc.f, "Seta") == "C9DCF2", "the greenbottle is drawn in its ROBLOX-85 colours, bristles included")
+check(bc.f.model:FindFirstChild("Cephalothorax").Reflectance == 0.14 and bc.f.model:FindFirstChild("Femur1").Reflectance == 0.10 and bc.f.model:FindFirstChild("Tarsus3").Reflectance == 0.10 and bc.f.model:FindFirstChild("FemurTip3").Reflectance == 0.10 and (rc.f.model:FindFirstChild("Cephalothorax").Reflectance or 0) == 0, "a sheen on the greenbottle's carapace (0.14) and metallic legs (0.10, tips too); none on the redknee")
 -- The bars soften at the last growth stage only; the first spider's rig has none of that.
 local barT = {}
 for stage = 0, 3 do
@@ -945,7 +954,7 @@ tarantulaChecks()
 
 -- ---------------------------------------------------------------- the segments of a leg, the feet and the fangs (ROBLOX-84)
 -- The first spider and the two tarantulas draw each leg link as the segments a spider has: a tapered femur (two rods), a patella for a knee, a
--- tapered tibia (the first spider), a break in the tarsus, a flattened pad and its toes (claws, or a scopula's bristles), and fangs under the
+-- tapered tibia (the first spider), a break in the tarsus, a flattened pad and its claws (the first spider), and fangs under the
 -- chelicerae. The solver, the targets and the gait are untouched: the joints are where they were. The rival (a clone of the first spider's
 -- look, ROBLOX-72) and the peacock and ant spiders are drawn as before.
 local function shapeChecks()
@@ -1013,12 +1022,12 @@ end
 check(fangsOk and FA.fangs[2].dir.Y < -0.7 and FA.fangs[2].side * FA.fangs[2].dir.X < 0, "the first spider's four fang segments hang below the chelicerae, curving in toward the middle")
 check(#TA.fangs == 2 and #TB.fangs == 2 and TA.fangs[1].dir.Z < -0.85 and TA.fangs[1].radii.Z > FA.fangs[1].radii.Z * 1.6, "the tarantulas' fangs are larger, one segment each, and point forward")
 check(#Anatomy.layout(Appearances.profiles.maratus_volans_male).fangs == 0 and #Anatomy.layout(Appearances.profiles.myrmarachne_formicaria_female).fangs == 0, "the peacock spider and the ant mimic have no fangs")
--- The tarantulas: the same, with a scopula's bristles at full detail and a taper in the palps; budgets are above.
+-- The tarantulas: the same, with a taper in the palps; budgets are above.
 for _, id in { RED, BLUE } do
 	local f, l = build(id, "full"), build(id, "low")
 	local a, b = names(f), names(l)
-	check((a.FemurTip1 or 0) == 1 and (a.FemurTip8 or 0) == 1 and (a.TarsalJoint1 or 0) == 1 and (a.TarsalJoint8 or 0) == 1 and (a.FootBristle or 0) == 8 and (a.Fang or 0) == 2 and (a.PalpStalkTip or 0) == 2, `{id}: full detail: a tapered femur, a break in the tarsus, a scopula's bristles on each foot, two fangs and a tapered palp`)
-	check((b.FemurTip1 or 0) == 0 and (b.TarsalJoint1 or 0) == 0 and (b.FootBristle or 0) == 0 and (b.Fang or 0) == 2 and (b.PalpStalkTip or 0) == 2 and (b.Foot1 or 0) == 0, `{id}: low detail: the fangs and the palps' taper, no leg taper, break or scopula`)
+	check((a.FemurTip1 or 0) == 1 and (a.FemurTip8 or 0) == 1 and (a.TarsalJoint1 or 0) == 1 and (a.TarsalJoint8 or 0) == 1 and (a.FootBristle or 0) == 0 and (a.Claw or 0) == 0 and (a.Fang or 0) == 2 and (a.PalpStalkTip or 0) == 2, `{id}: full detail: a tapered femur, a break in the tarsus, two fangs and a tapered palp (the scopula's bristles are the legs' own since ROBLOX-85)`)
+	check((b.FemurTip1 or 0) == 0 and (b.TarsalJoint1 or 0) == 0 and (b.Fang or 0) == 2 and (b.PalpStalkTip or 0) == 2 and (b.Foot1 or 0) == 0, `{id}: low detail: the fangs and the palps' taper, no leg taper, break or scopula`)
 	local wide = pick(f, "Foot1")
 	local legD = pick(f, "Tarsus1").Size.Y
 	check(wide.Size.Z > legD * 1.5 and wide.Size.Y < wide.Size.Z, `{id}: each foot is a pad wider than the tarsus is thick (the scopula)`)
@@ -1039,6 +1048,133 @@ check(shown == 4 and pick(first, "FemurTip1").LocalTransparencyModifier == 1 and
 for _, r in { first, firstLow, rival, scaled } do r:destroy() end
 end
 shapeChecks()
+
+-- ---------------------------------------------------------------- fur, sheen and palette (ROBLOX-85)
+-- The first spider's hairs lie along the body and flow outward, its base has a faint sheen; the tarantulas are velvet: a Fabric fur shell per body mass,
+-- bristles that lean down the leg (more on the front pairs), the redknee's urticating cluster and raised copper rim, the greenbottle's raised midline.
+local function furChecks()
+local RED, BLUE = "brachypelma_hamorii", "chromatopelma_cyaneopubescens"
+local function build(id: string?, detail: string, parent: Instance?): any
+	local folder = parent or Instance.new("Folder")
+	return SpiderRig.new(folder, folder, id, detail)
+end
+local function pick(rig: any, name: string): BasePart return rig.model:FindFirstChild(name) :: BasePart end
+local function lum(c: { number }): number return 0.2126 * c[1] + 0.7152 * c[2] + 0.0722 * c[3] end
+-- The first spider: the flow of the locks and the legs' hairs, and the sheen on the carapace and abdomen.
+local ac = Vector3.new(look.abdomenCenter[1], look.abdomenCenter[2], look.abdomenCenter[3])
+local outward, locks, rear = 0, 0, 0
+for _, h in Setae.body(look) do
+	if h.kind == "lock" and h.group == "abdomen" and math.abs(h.at.X - ac.X) > 0.06 then
+		locks += 1
+		outward += if h.dir.X * (h.at.X - ac.X) > 0 then 1 else 0
+		rear += if h.dir.Z > 0 then 1 else 0
+	end
+end
+check(locks > 20 and outward / locks > 0.7 and rear / locks > 0.9, `the abdomen's locks flow backward and outward ({outward} of {locks} lean out, {rear} lean back)`)
+local legOk, legN = true, 0
+for i = 1, 8 do
+	for _, h in Setae.leg(look, i) do
+		legN += 1
+		legOk = legOk and h.lift ~= nil and math.deg(h.lift :: number) >= 14.99 and math.deg(h.lift :: number) <= 26.01
+	end
+end
+check(legOk and legN > 40, `the first spider's leg hairs lie at 15 to 26 degrees off the leg, pointing down it ({legN} hairs)`)
+local fx, fl = build(nil, "full"), build(nil, "low")
+local fa, fb = pick(fx, "Cephalothorax"), pick(fx, "Abdomen")
+check(fa.Reflectance == 0.04 and fb.Reflectance == 0.04 and fa.Material == Enum.Material.SmoothPlastic and fb.Material == Enum.Material.SmoothPlastic and pick(fl, "Abdomen").Reflectance == 0.04, "the first spider's carapace and abdomen have a faint sheen (Reflectance 0.04, SmoothPlastic), at both tiers")
+local eyesSame = true
+for _, p in fx.model:GetChildren() do
+	if p:IsA("BasePart") and p.Name == "PrincipalEye" then eyesSame = eyesSame and p.Reflectance == look.eye.ame.reflectance end
+end
+check(eyesSame and look.gloss == 0.04, "the eyes keep their own Reflectance")
+local cnt = { full = 0, low = 0 }
+for _, p in fx.model:GetChildren() do if p.Name == "Seta" then cnt.full += 1 end end
+for _, p in fl.model:GetChildren() do if p.Name == "Seta" then cnt.low += 1 end end
+check(cnt.low > 0 and cnt.low < cnt.full * 0.4, `low detail keeps fewer lying hairs ({cnt.low} against {cnt.full})`)
+fx:destroy(); fl:destroy()
+-- The tarantulas' velvet.
+local rd, bl = Appearances.profiles[RED], Appearances.profiles[BLUE]
+for _, id in { RED, BLUE } do
+	local lk = Appearances.profiles[id]
+	local f, l = build(id, "full", floor), build(id, "low", floor)
+	settle(f, 1)
+	local shells = {}
+	for _, p in f.model:GetChildren() do if p.Name == "FuzzShell" then table.insert(shells, p) end end
+	local A = Anatomy.layout(lk)
+	local fine = #shells == 2
+	for _, sh in shells do
+		fine = fine and sh.Material == Enum.Material.Fabric and sh.Transparency >= 0.3 and sh.Transparency <= 0.7 and sh.CastShadow == false
+		local under = if sh.Size.Y > 0.4 then pick(f, "Abdomen") else pick(f, "Cephalothorax")
+		fine = fine and sh.Size.X / under.Size.X > 1.065 and sh.Size.X / under.Size.X < 1.08 and sh.Size.Z / under.Size.Z > 1.065 and sh.Size.Z / under.Size.Z < 1.08
+	end
+	check(fine, `{id}: two Fabric fur shells, partly transparent, 7 percent larger than the carapace and the abdomen they cover`)
+	local headShell = if shells[1].Size.Y < shells[2].Size.Y then shells[1] else shells[2]
+	local buried = 0
+	for _, e in A.eyes do
+		local dx, dz = e.at.X - A.headCenter.X, e.at.Z - A.headCenter.Z
+		if Anatomy.topY(A.headCenter, headShell.Size / 2, dx, dz) > e.at.Y + e.radii.Y * 0.3 then buried += 1 end
+	end
+	check(buried == 0, `{id}: the carapace's shell does not bury the eyes' beads ({buried} of {#A.eyes} covered)`)
+	-- Bristles: more on the front pairs, leaning 32 to 48 degrees off the leg, from the sides of the leg.
+	local byPair, leanOk, edgeOk = {}, true, true
+	for i = 1, 8 do
+		local n = 0
+		for _, h in Setae.leg(lk, i) do
+			n += 1
+			leanOk = leanOk and h.lift ~= nil and math.deg(h.lift :: number) >= 31.99 and math.deg(h.lift :: number) <= 48.01
+			edgeOk = edgeOk and math.abs(math.deg(h.theta)) >= 49.99 and math.abs(math.deg(h.theta)) <= 115.01
+		end
+		byPair[(i - 1) % 4 + 1] = (byPair[(i - 1) % 4 + 1] or 0) + n
+	end
+	check(byPair[1] > byPair[2] and byPair[2] > byPair[3] and byPair[3] >= byPair[4] and byPair[1] >= 3 * byPair[4], `{id}: bristle counts fall from the front pair to the back ({byPair[1]}, {byPair[2]}, {byPair[3]}, {byPair[4]})`)
+	check(leanOk and edgeOk, `{id}: bristles lean 32 to 48 degrees down the leg and grow from its sides (50 to 115 degrees from the top)`)
+	local lowShell = 0
+	for _, p in l.model:GetChildren() do if p.Name == "FuzzShell" then lowShell += 1 end end
+	check(lowShell == 2, `{id}: the shells stay at low detail`)
+	f:destroy(); l:destroy()
+end
+-- The redknee's urticating patch: a denser cluster inside the patch, combed toward the rear, full tier only; the rim stands proud of the carapace.
+local cl = Setae.cluster(rd)
+local patch = rd.marks[1]
+local aR, aC = Anatomy.v3(rd.abdomenRadii), Anatomy.v3(rd.abdomenCenter)
+local inside, backward = 0, 0
+for _, h in cl do
+	local dx, dz = (h.at.X - aC.X - patch.x * aR.X) / patch.rx, (h.at.Z - aC.Z - patch.z * aR.Z) / patch.rz
+	inside += if dx * dx + dz * dz <= 1 then 1 else 0
+	backward += if h.dir.Z > 0 then 1 else 0
+end
+check(#cl == 8 and inside == 8 and backward == 8 and #Setae.cluster(bl) == 0, "the redknee's patch carries 8 hairs, all inside the patch and combed toward the rear; the greenbottle has none")
+local rf, rl = build(RED, "full", floor), build(RED, "low", floor)
+settle(rf, 1); settle(rl, 1)
+local function seta(r: any): number local n = 0 for _, p in r.model:GetChildren() do if p.Name == "Seta" then n += 1 end end return n end
+check(seta(rf) - seta(rl) >= 8 and seta(rl) == 0, "the cluster is drawn at full detail and not at low")
+local rim, car = pick(rf, "CarapaceRim"), pick(rf, "Cephalothorax")
+local dx = car.Size.X / 2 * 0.95
+local rimTop = Anatomy.topY(rim.Position, rim.Size / 2, dx, 0)
+local carTop = Anatomy.topY(car.Position, car.Size / 2, dx, 0)
+check(rimTop - carTop >= 0.010, `the redknee's copper rim stands up round the carapace's edge ({string.format("%.3f", rimTop - carTop)} studs proud)`)
+rf:destroy(); rl:destroy()
+-- The greenbottle: the midline's ridges stand above the fur shell, the bars are softer than the first palette's.
+local bf = build(BLUE, "full", floor)
+settle(bf, 1)
+local shellTop = 0
+for _, p in bf.model:GetChildren() do
+	if p.Name == "FuzzShell" and p.Size.X > 2 * Anatomy.v3(bl.abdomenRadii).X * 0.9 then shellTop = p.Position.Y + p.Size.Y / 2 end
+end
+local ridgeOk, ridges = true, 0
+for _, p in bf.model:GetChildren() do
+	if p.Name == "AbdomenMidline" then
+		ridges += 1
+		local shellAt = Anatomy.topY(Anatomy.v3(bl.abdomenCenter), Anatomy.v3(bl.abdomenRadii) * 1.075, p.Position.X - bl.abdomenCenter[1], p.Position.Z - bl.abdomenCenter[3])
+		ridgeOk = ridgeOk and p.Position.Y + p.Size.Y / 2 > shellAt
+	end
+end
+check(ridges == 3 and ridgeOk and shellTop > 0, "the greenbottle's dark midline stands above its fur shell (three ridges)")
+bf:destroy()
+local abd, bar, ridge = lum(bl.abdomenColor), lum(bl.marks[4].color), lum(bl.marks[1].color)
+check(abd - bar < 0.30 and bar > ridge, `the bars are softer than the first palette's: a burnt-orange ground, brown bars (contrast {string.format("%.2f", abd - bar)}), the midline darker still`)
+end
+furChecks()
 
 print(`LOOK passed={passed} failed={failed}`)
 if failed > 0 then error("look checks failed") end

@@ -57,6 +57,8 @@ type Leg = {
 	joint: Part?,
 	toes: {Part},
 	bands: {Part}, -- empty for a pair drawn without pale bands (the peacock spider's legs III)
+	hangKnee: Vector3?, -- where the hanging pose puts the knee and the ankle this frame (world space), or nil off the line (ROBLOX-86)
+	hangAnkle: Vector3?,
 	hairs: { { part: Part, spec: Setae.LegHair } },
 }
 
@@ -99,6 +101,11 @@ export type Rig = typeof(setmetatable(
   _shownCondition: number,
   hangDirection: Vector3?,
   _hang: number,
+  _lineDir: Vector3, -- the last direction up the line (it stays while the pose blends out)
+  _hangT: number, -- seconds since the drop: the sway's clock
+  _spin: number, _spinVel: number, -- the slow turn about the line (radians, radians a second)
+  _hangCount: number, -- drops so far (the turn alternates its direction)
+  _lastPos: Vector3?, _lineSpeed: number, _climbing: boolean, _climb: number, -- the climb: speed along the line, whether it counts, the head-up blend 0..1
   _spinneret: Vector3?,
   jumpLoad: number,
   jumpPush: number,
@@ -230,6 +237,7 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		_k = look.scale or 1,
   _growth = 1, _softness = 0, _condition = 0.55, _shownCondition = 0.55, jumpLoad = 0, jumpPush = 0, _shownLoad = 0,
   hangDirection=nil :: Vector3?, _hang=0, _spinneret=nil :: Vector3?,
+  _lineDir = Vector3.yAxis, _hangT = 0, _spin = 0, _spinVel = 0, _hangCount = 0, _lastPos = nil :: Vector3?, _lineSpeed = 0, _climbing = false, _climb = 0,
   _sizes = {} :: {[BasePart]: Vector3}, _colors = {} :: {[BasePart]: Color3}, _bars = {} :: { Part },
 		_drop = look.bodyDrop or 0,
 		_fan = nil :: Fan?,
@@ -554,6 +562,8 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 			joint = if form and cfg.jointBreak then ball(model, "TarsalJoint" .. i, DT * form.tarsus.joint, ankleColor) else nil,
 			toes = toes,
 			bands = if not withBands then {} else legBands(i, d),
+			hangKnee = nil :: Vector3?,
+			hangAnkle = nil :: Vector3?,
 			hairs = {},
 		})
 		local leg = self._legs[#self._legs]
@@ -690,6 +700,37 @@ local function target(self: Rig, body: CFrame, leg: Leg): RaycastResult?
 	return nil
 end
 
+-- The hanging pose of one leg (ROBLOX-86): the knee, the ankle and the foot in world space, from the directions in look.hang.legs. Each link keeps
+-- the length it has standing (hip to knee, knee to ankle, ankle to foot, as the walking pose draws them), so legs I and II curl forward and back up
+-- toward the line, III and IV fold back along the body, and nothing reaches for the ground. A fixed scatter per leg keeps the pair from mirroring
+-- exactly; the feet tremble a little (not with Reduced Motion); going up the line the legs' directions along the body turn over (`_climb`), so legs I
+-- reach up the line and legs IV trail.
+function SpiderRig._hangLeg(self: Rig, leg: Leg, body: CFrame): (Vector3, Vector3, Vector3)
+	local look, L, g = self._appearance, self._appearance.limbs, self._growth
+	local hang = look.hang
+	local hip = Vector3.new(leg.side * L.hipX, L.hipY, L.hipZ[leg.pair]) * g
+	local rest = restLocal(self, leg)
+	local knee0 = hip:Lerp(rest, 0.48) + Vector3.yAxis * (L.kneeLift * g)
+	local ankle0 = knee0:Lerp(rest, ANKLE_SHARE) + Vector3.yAxis * (L.ankleLift * g)
+	local lengths = { (knee0 - hip).Magnitude, (ankle0 - knee0).Magnitude, (rest - ankle0).Magnitude }
+	local spec = hang.legs[leg.pair]
+	local names = { "femur", "tibia", "tarsus" }
+	local climb = self._climb
+	local tremble = if self.reducedMotion then 0 else math.sin(self._t * 3.2 + leg.pair * 1.7 + leg.side) * hang.wiggle
+	local joints: { Vector3 } = {}
+	local at = hip
+	for n = 1, 3 do
+		local d = spec[names[n]]
+		local noise = math.sin(leg.pair * 12.9898 + leg.side * 78.233 + n * 37.719)
+		local noise2 = math.sin(leg.pair * 39.346 + leg.side * 11.135 + n * 83.155)
+		local dz = d[3] * (1 - (if leg.pair <= 2 then 2.0 else 1.2) * climb) -- going up, legs I and II reach up the line and III and IV go out to grip it
+		local dir = Vector3.new(leg.side * d[1] + noise * hang.asym, d[2] + noise2 * hang.asym + (if n == 3 then tremble else 0), dz + noise * noise2 * hang.asym).Unit
+		at = at + dir * lengths[n]
+		joints[n] = at
+	end
+	return body:PointToWorldSpace(joints[1]), body:PointToWorldSpace(joints[2]), body:PointToWorldSpace(joints[3])
+end
+
 -- body: the drawn body's CFrame. grounded: standing on a surface. moving: walking speed > 0 (for palp drumming and idle motion).
 function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boolean, moving: boolean)
 	self._t += dt
@@ -714,19 +755,76 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
  self._shownCondition += math.clamp(self._condition-self._shownCondition,-0.12*dt,0.12*dt)
  local conditionValue=self._shownCondition
  local condition=Vector3.new(0.84+0.30*conditionValue,0.84+0.30*conditionValue,0.93+0.12*conditionValue)
- -- Suspension tilts the drawn body about its rear silk outlet, never the motor/camera.
- local hanging=not grounded and self.hangDirection~=nil
- local wanted=if hanging then 1 else 0
- self._hang+=math.clamp(wanted-self._hang,-5*dt,5*dt)
- if grounded then self._hang=0 end
- if self._hang>0 then
-  local direction=body:VectorToObjectSpace(self.hangDirection or Vector3.yAxis)
-  local pitch=-math.clamp(math.atan2(direction.Y,math.max(.05,direction.Z)),0,math.rad(80))*self._hang
-  local roll=math.clamp(-direction.X*.25,-.2,.2)*self._hang
-  local tail=(A.abdomenCenter+(A.spinneret-A.abdomenCenter)*condition)*g
-  body=body*CFrame.new(tail)*CFrame.Angles(pitch,0,roll)*CFrame.new(-tail)
-  up=body.UpVector
- end
+	-- Suspension (ROBLOX-59; hung properly in ROBLOX-86). The drawn body turns about its middle until its long axis, from the face to the spinneret,
+	-- runs along the line (the shortest turn: no angle limit), so the tail lands on the line and the silk leaves the spinneret tip; the root, the camera,
+	-- the collider and the tether never move. Then a small lean, a damped pendulum sway (about the spinneret, started by the drop) and a slow damped turn
+	-- about the line, none of it with Reduced Motion. Going up the line (the collider travelling toward the anchor) the body turns head-up (`_climb`).
+	local hang = look.hang
+	local hanging = not grounded and self.hangDirection ~= nil and hang ~= nil
+	if hanging then
+		local d = (self.hangDirection :: Vector3)
+		if d.Magnitude > 1e-6 then self._lineDir = d.Unit end
+	end
+	local lineUp = self._lineDir
+	local blend = if hang ~= nil then hang.rate * dt else 5 * dt
+	local before = self._hang
+	self._hang += math.clamp((if hanging then 1 else 0) - self._hang, -blend, blend)
+	if grounded then self._hang = 0 end
+	if hang ~= nil then
+		if hanging and dt > 1e-6 and self._lastPos ~= nil then
+			local speed = (collider.Position - (self._lastPos :: Vector3)):Dot(lineUp) / dt
+			self._lineSpeed += (speed - self._lineSpeed) * math.min(1, dt / 0.25)
+			if self._lineSpeed > hang.climb.speed then self._climbing = true elseif self._lineSpeed < hang.climb.speed * 0.4 then self._climbing = false end
+		elseif not hanging then
+			self._lineSpeed, self._climbing = 0, false
+		end
+		self._lastPos = collider.Position
+		local step = if self.reducedMotion then 1 else math.max(dt, 1e-6) / hang.climb.seconds
+		self._climb += math.clamp((if self._climbing and hanging then 1 else 0) - self._climb, -step, step)
+		if not hanging and self._hang <= 0 then self._climb = 0 end
+	end
+	if self._hang > 0 and hang ~= nil then
+		local h = self._hang
+		if before <= 0 then -- the drop: the swing and the turn start now (the turn goes one way, then the other, drop by drop)
+			self._hangT, self._spin = 0, 0
+			self._spinVel = math.rad(hang.spin.degPerS) * (if self._hangCount % 2 == 0 then 1 else -1)
+			self._hangCount += 1
+		end
+		self._hangT += dt
+		local calm = not self.reducedMotion
+		if calm then
+			self._spinVel *= math.exp(-dt / hang.spin.decay)
+			self._spin += self._spinVel * dt
+		end
+		local c = self._climb
+		-- the long axis: the face's centre to the spinneret tip, turned (about the middle) onto the line
+		local nose = Vector3.new(0, A.faceCenter.Y, A.faceCenter.Z) * g
+		local tail = (A.abdomenCenter + (A.spinneret - A.abdomenCenter) * condition) * g
+		local middle = body:PointToWorldSpace((nose + tail) * 0.5)
+		local axis = body:VectorToWorldSpace((tail - nose).Unit)
+		local turn = axis:Cross(lineUp)
+		local offLine = math.acos(math.clamp(axis:Dot(lineUp), -1, 1))
+		local align = CFrame.identity
+		if turn.Magnitude > 1e-5 then align = CFrame.fromAxisAngle(turn.Unit, offLine * h)
+		elseif axis:Dot(lineUp) < 0 then align = CFrame.fromAxisAngle(body.UpVector, math.pi * h) end
+		body = CFrame.new(middle) * align * CFrame.new(-middle) * body
+		if c > 0 then -- head up: end over end about the middle, the body standing off the line toward its back so the silk runs along the belly
+			body = CFrame.new(middle) * CFrame.fromAxisAngle(body.RightVector, math.pi * c * h) * CFrame.new(-middle) * body
+			body = CFrame.new(body.UpVector * (A.headRadii.Y * hang.climb.shift * g * c * h)) * body
+		end
+		local pivot = body:PointToWorldSpace(tail)
+		local side = body.RightVector
+		local forward = lineUp:Cross(side)
+		if forward.Magnitude > 1e-6 then forward = forward.Unit end
+		local rest = (1 - c) * h
+		local swing = if calm then math.exp(-self._hangT / hang.sway.decay) * math.sin(math.pi * 2 * self._hangT / hang.sway.period) else 0
+		local swingAcross = if calm then math.exp(-self._hangT / hang.sway.decay) * math.cos(math.pi * 2 * self._hangT / hang.sway.period) * (1 - math.exp(-self._hangT / 0.3)) else 0
+		local sway = math.rad(hang.sway.deg) * swing
+		local sideways = math.rad(hang.sway.deg) * hang.sway.across * swingAcross
+		local lean = CFrame.fromAxisAngle(side, (math.rad(hang.leanDeg) + sway) * rest) * CFrame.fromAxisAngle(forward, sideways * rest)
+		body = CFrame.new(pivot) * CFrame.fromAxisAngle(lineUp, self._spin * rest) * lean * CFrame.new(-pivot) * body
+		up = body.UpVector
+	end
  local function scaledFrame(cf: CFrame): CFrame return if g==1 then cf else CFrame.new(cf.Position*g)*cf.Rotation end
 	local parts, cframes = self._parts, self._cframes
 	table.clear(parts)
@@ -795,6 +893,10 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 	if threatening then
 		palpAngle = { palpAngle[1] + threatPose.palps, palpAngle[2] + threatPose.palps }
 	end
+ if self._hang > 0 and hang ~= nil then -- hanging: the palps are drawn in toward the jaws
+  local tuck = -math.rad(hang.palpTuckDeg) * self._hang
+  palpAngle = { palpAngle[1] + tuck, palpAngle[2] + tuck }
+ end
  self._spinneret=abdomenBase:PointToWorldSpace((A.abdomenCenter+(A.spinneret-A.abdomenCenter)*condition)*g)
 	local pivots = {
 		CFrame.new(self._palpBase[1]) * CFrame.Angles(palpAngle[1], 0, 0),
@@ -852,10 +954,15 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 			leg.planted = nil
 			leg.swing = -1
    local free=Vector3.new(leg.side*.47*k,-.12*k,L.tipZ[leg.pair]*.72*g)
-   local adjust=if self.reducedMotion then 0 else math.sin(self._t*3.2+leg.pair*1.7+leg.side)*.025*k
-   local suspended=Vector3.new(leg.side*(if leg.pair<=2 then .43 else .31)*k,-.22*k+adjust,L.tipZ[leg.pair]*.52*g)
-   leg.foot=body:PointToWorldSpace(free:Lerp(suspended,self._hang))
+   leg.foot=body:PointToWorldSpace(free)
+   leg.hangKnee, leg.hangAnkle = nil, nil
+   if self._hang>0 then
+    local knee,ankle,foot=self:_hangLeg(leg,body)
+    leg.hangKnee,leg.hangAnkle=knee,ankle
+    leg.foot=leg.foot:Lerp(foot,self._hang)
+   end
 		else
+			leg.hangKnee, leg.hangAnkle = nil, nil
 			if leg.planted == nil then
 				local hit = target(self, body, leg)
 				leg.planted = if hit then hit.Position else nil
@@ -938,7 +1045,10 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 			local raisedKnee = hip:Lerp(raised, 0.5) + prosoma.RightVector * (leg.side * tc.kneeOut * g) + up * (tc.kneeUp * g)
 			knee = knee:Lerp(raisedKnee, threatPose.legs)
 		end
+		local hangKnee, hangAnkle = leg.hangKnee, leg.hangAnkle
+		if hangKnee ~= nil and hangAnkle ~= nil then knee = knee:Lerp(hangKnee, self._hang) end
 		local ankle = knee:Lerp(foot, ANKLE_SHARE) + up * (L.ankleLift*g)
+		if hangKnee ~= nil and hangAnkle ~= nil then ankle = ankle:Lerp(hangAnkle, self._hang) end
 		local form = look.legForm
 		-- One link of the leg: its rod runs from a to b; with a thinner `tip` rod the first runs a to m and the tip m to b (a tapered femur or tibia,
 		-- the break in the tarsus). The pale band (one `bandFraction` of the whole link) and the setae follow the link, not the pieces.

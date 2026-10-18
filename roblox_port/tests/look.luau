@@ -1176,5 +1176,157 @@ check(abd - bar < 0.30 and bar > ridge, `the bars are softer than the first pale
 end
 furChecks()
 
+-- ---------------------------------------------------------------- hanging on the dragline (ROBLOX-86)
+-- The drawn body hangs with its long axis along the line (within 10 degrees, the sway and lean included), head down, no foot below the head or out of the
+-- body's reach, legs I and II up toward the line; a damped 2.5 second swing and a slow damped turn that the drop starts; Reduced Motion is a still pose;
+-- the head turns up on the way up the line; the low tier draws the same parts. Judged by eye in tools/preview (--hang); Studio has not seen it.
+local function hangChecks()
+local function part(r: any, name: string): BasePart return r.model:FindFirstChild(name) :: BasePart end
+local line = Vector3.new(0.10, 1, 0.05).Unit
+local function frameOf(at: Vector3): CFrame return SupportMath.bodyCFrame(at, Vector3.yAxis, Vector3.new(0, 0, -1)) end
+local home = Vector3.new(0, 2, 0)
+local function axisOf(r: any): Vector3 return (r:spinneretPoint(frameOf(home)) - part(r, "EyeFace").Position).Unit end -- the face to the spinneret tip
+local function angleTo(a: Vector3, b: Vector3): number return math.deg(math.acos(math.clamp(a:Dot(b), -1, 1))) end
+local function drop(r: any, seconds: number, reduced: boolean)
+	r.reducedMotion = reduced
+	r.hangDirection = line
+	for _ = 1, math.floor(seconds * 60 + 0.5) do r:update(frameOf(home), 1 / 60, false, false) end
+end
+local ids = { "first_spider", "maratus_volans_male", "myrmarachne_formicaria_female", "rival_spider", "brachypelma_hamorii", "chromatopelma_cyaneopubescens" }
+for _, id in ids do
+	for _, detail in { "full", "low" } do
+		local r = SpiderRig.new(floor, floor, id, detail)
+		local total = r:count().total
+		local worst, lowest = 0, 0
+		local g = r._growth
+		local head = part(r, "EyeFace")
+		for frame = 1, 600 do -- ten seconds of the drop
+			r.hangDirection = line
+			r:update(frameOf(home), 1 / 60, false, false)
+			if frame >= 30 then
+				worst = math.max(worst, angleTo(axisOf(r), line))
+			end
+		end
+		check(worst <= 10, `{id} {detail}: the hung body's long axis stays within 10 degrees of the line ({string.format("%.1f", worst)})`)
+		check(worst >= 2, `{id} {detail}: and it is not a plumb bob ({string.format("%.1f", worst)} degrees at most)`)
+		check(r:count().total == total, `{id} {detail}: hanging adds and removes no part`)
+		-- feet: none below the head, none off the ground's reach, all unplanted; the head is the lowest of the body
+		local spin = r:spinneretPoint(frameOf(home))
+		local depthOfHead = (spin - head.Position):Dot(line) + head.Size.Z * 0.5
+		local bodyLength = (spin - head.Position).Magnitude + head.Size.Z * 0.5
+		local belowHead, wide, planted = 0, 0, 0
+		for _, leg in r._legs do
+			local foot = leg.foot
+			belowHead = math.max(belowHead, (spin - foot):Dot(line) - depthOfHead)
+			local off = (foot - spin) - line * (foot - spin):Dot(line)
+			wide = math.max(wide, off.Magnitude / bodyLength)
+			if leg.planted ~= nil then planted += 1 end
+		end
+		check(belowHead <= 0.01 * bodyLength and planted == 0, `{id} {detail}: no foot reaches below the head, none is planted ({string.format("%.3f", belowHead)} studs below)`)
+		check(wide < 0.62, `{id} {detail}: the feet stay within the body's reach sideways ({string.format("%.2f", wide)} of its length)`)
+		check((r.root.Position - home).Magnitude < 1e-9, `{id} {detail}: the root part (camera and collider) is where the motor left it`)
+		-- head down: the head is under the tail
+		check((part(r, "Abdomen").Position - head.Position):Dot(line) > 0.3 * bodyLength, `{id} {detail}: the head hangs under the abdomen`)
+		-- the tail is on the line: the spinneret is within 4 degrees' worth of it from the body's middle
+		local off = (spin - home) - line * (spin - home):Dot(line)
+		check(off.Magnitude < 0.15 * bodyLength, `{id} {detail}: the silk leaves the spinneret on the line through the body ({string.format("%.3f", off.Magnitude)} studs off)`)
+		r:destroy()
+	end
+end
+-- the sway and the turn, on the first spider
+local function swing(r: any, seconds: number): ({ number }, { number })
+	local fore, turn = {}, {}
+	for frame = 1, math.floor(seconds * 60 + 0.5) do
+		r.hangDirection = line
+		r:update(frameOf(home), 1 / 60, false, false)
+		local side = part(r, "Abdomen").CFrame.RightVector
+		local u = line
+		local f = u:Cross(side).Unit
+		local axis = axisOf(r)
+		fore[frame] = math.deg(math.atan2(axis:Dot(f), axis:Dot(u)))
+		local e1 = u:Cross(Vector3.zAxis).Unit
+		local e2 = u:Cross(e1)
+		turn[frame] = math.deg(math.atan2(side:Dot(e2), side:Dot(e1)))
+	end
+	return fore, turn
+end
+local moving, still = SpiderRig.new(floor, floor, nil, "full"), SpiderRig.new(floor, floor, nil, "full")
+still.reducedMotion = true
+local H = moving._appearance.hang
+local foreM, turnM = swing(moving, 14)
+local foreS, turnS = swing(still, 14)
+check(H.sway.period == 2.5 and H.sway.deg <= 6 and H.sway.deg >= 3 and H.leanDeg <= 4 and H.spin.degPerS <= 10, "the hang's numbers: a 2.5 s swing of a few degrees, a lean under 4, a turn of at most 10 degrees a second")
+local lean = foreS[60]
+check(near(foreS[600], lean, 1e-6) and near(foreS[840], lean, 1e-6) and math.abs(lean) > 1 and math.abs(lean) <= H.leanDeg + 0.5, `Reduced Motion: the hanging pose is still and keeps a small lean ({string.format("%.2f", lean)} degrees)`)
+check(near(turnS[840], turnS[60], 1e-6), "Reduced Motion: no turn about the line")
+local sign = if lean >= 0 then 1 else -1
+local a1 = sign * (foreM[math.floor(0.625 * 60)] - lean) -- the first quarter swing (0.625 s)
+local a2 = sign * (foreM[math.floor(0.625 * 60 + 2.5 * 60)] - lean) -- one period later
+check(a1 > H.sway.deg * math.exp(-0.625 / H.sway.decay) * 0.85 and a1 < H.sway.deg * 1.05, `the swing starts at about its amplitude ({string.format("%.2f", a1)} degrees)`)
+check(near(a2 / a1, math.exp(-2.5 / H.sway.decay), 0.07), `and decays by exp(-t/{H.sway.decay}) a period on ({string.format("%.2f", a2 / a1)})`)
+local late = 0
+for frame = 600, 840 do late = math.max(late, math.abs(foreM[frame] - lean)) end
+check(late < 0.6, `by ten seconds the swing has died away ({string.format("%.2f", late)} degrees)`)
+-- the period: the swing crosses its mean upward once every 2.5 seconds
+local crossings = {}
+for frame = 40, 400 do
+	if foreM[frame - 1] - lean < 0 and foreM[frame] - lean >= 0 then table.insert(crossings, frame / 60) end
+end
+check(#crossings >= 2 and near(crossings[2] - crossings[1], 2.5, 0.12), `the swing's period is 2.5 seconds ({if #crossings >= 2 then string.format("%.2f", crossings[2] - crossings[1]) else "no crossing"})`)
+local fastest, early, later = 0, 0, 0
+for frame = 31, 840 do fastest = math.max(fastest, math.abs(turnM[frame] - turnM[frame - 1]) * 60) end
+early = math.abs(turnM[120] - turnM[60]) / 1.0
+later = math.abs(turnM[840] - turnM[780]) / 1.0
+check(fastest <= 10 and fastest > 2, `the turn about the line is slow and at most 10 degrees a second ({string.format("%.1f", fastest)})`)
+check(later < early * 0.5 and math.abs(turnM[840] - turnM[60]) < 60, `and it dies away ({string.format("%.1f", early)} then {string.format("%.1f", later)} degrees a second)`)
+-- the second drop turns the other way
+moving.hangDirection = nil
+for _ = 1, 30 do moving:update(frameOf(home), 1 / 60, true, false) end
+local _, turnB = swing(moving, 3)
+check((turnB[120] - turnB[60]) * (turnM[120] - turnM[60]) < 0, "a second drop turns the other way")
+moving:destroy(); still:destroy()
+-- legs: I and II curl up toward the line (their feet are above their hips along it), III and IV fold along the body
+local r = SpiderRig.new(floor, floor, nil, "full")
+drop(r, 1.5, true)
+local spin = r:spinneretPoint(frameOf(home))
+local depth: { number } = {}
+for i, leg in r._legs do depth[i] = (spin - leg.foot):Dot(line) end
+local hipsDepth = (spin - part(r, "EyeFace").Position):Dot(line)
+check(depth[1] < hipsDepth and depth[2] < hipsDepth and depth[3] < hipsDepth and depth[4] < hipsDepth and depth[5] < hipsDepth, "the feet are above the head along the line (nothing reaches for the ground)")
+local diff = 0
+for pair = 1, 4 do diff = math.max(diff, math.abs(depth[pair] - depth[pair + 4])) end
+check(diff > 0.01, `the left and right legs are not mirrors ({string.format("%.3f", diff)} studs apart at most)`)
+r:destroy()
+-- going up the line: head up, blended over 0.5 s; back to head down when it stops
+local c = SpiderRig.new(floor, floor, nil, "full")
+local headDown = true
+c.hangDirection = line
+local at = home
+for _ = 1, 60 do c:update(frameOf(at), 1 / 60, false, false) end
+check((part(c, "Abdomen").Position - part(c, "EyeFace").Position):Dot(line) > 0.3 and c._climb == 0, "hanging still: head down")
+local early, upSeen
+for frame = 1, 120 do -- two seconds up the line at 0.9 studs a second
+	at = at + line * (0.9 / 60)
+	c:update(frameOf(at), 1 / 60, false, false)
+	if frame == 24 then early = c._climb end
+end
+local headUp = (part(c, "EyeFace").Position - part(c, "Abdomen").Position):Dot(line)
+check(c._climb > 0.99 and headUp > 0.3, `climbing the line the head turns up (head {string.format("%.2f", headUp)} studs above the abdomen)`)
+check(early ~= nil and early < 0.9, `the head turns over a half second, not at once ({string.format("%.2f", early or -1)} of the way after 0.4 s)`)
+for _ = 1, 120 do c:update(frameOf(at), 1 / 60, false, false) end
+check(c._climb < 0.01 and (part(c, "Abdomen").Position - part(c, "EyeFace").Position):Dot(line) > 0.3, "stopped: head down again")
+c:destroy()
+local d = SpiderRig.new(floor, floor, nil, "full") -- going down the line is not a climb
+d.hangDirection = line
+local lower = home
+for _ = 1, 120 do lower = lower - line * (0.9 / 60); d:update(frameOf(lower), 1 / 60, false, false) end
+check(d._climb == 0, "lowering on the line stays head down")
+d.hangDirection = nil
+d:update(frameOf(lower), 1 / 60, true, false)
+check(d._hang == 0 and d._climb == 0 and not d._climbing, "landing clears the hang at once")
+d:destroy()
+end
+hangChecks()
+
 print(`LOOK passed={passed} failed={failed}`)
 if failed > 0 then error("look checks failed") end

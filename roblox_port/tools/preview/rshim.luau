@@ -29,6 +29,8 @@ C.__mul = function(a, b)
 end
 local cm = {}
 function cm.PointToWorldSpace(c, v) return rot(c, v) + c.p end
+function cm.VectorToWorldSpace(c, v) return rot(c, v) end
+function cm.VectorToObjectSpace(c, v) return vnew(v:Dot(c.x), v:Dot(c.y), v:Dot(c.z)) end
 function cm.PointToObjectSpace(c, v) local d = v - c.p; return vnew(d:Dot(c.x), d:Dot(c.y), d:Dot(c.z)) end
 function cm.Inverse(c)
 	local x, y, z = vnew(c.x.X, c.y.X, c.z.X), vnew(c.x.Y, c.y.Y, c.z.Y), vnew(c.x.Z, c.y.Z, c.z.Z)

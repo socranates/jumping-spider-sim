@@ -164,6 +164,31 @@ local first = {
 		tilt = { rollDeg = 7, yawDeg = 6, pitchDeg = 3.5, periods = { 9.1, 5.3, 11.3, 6.7, 8.3 } },
 	},
 
+	-- ---------------------------------------------------------------- hanging on a dragline (ROBLOX-59, ROBLOX-86; drawn rig only)
+	-- The body hangs with its long axis along the line, head down, tail (the spinneret) up at the line. `rate` is how fast the pose blends in (per
+	-- second); `leanDeg` the static angle the long axis stands off the line; `sway` a damped pendulum about the spinneret (degrees, seconds; `across` is
+	-- the share of it that swings sideways, a quarter turn out of phase) that the drop starts; `spin` a slow damped turn about the line (degrees a second,
+	-- seconds); `climb` the head-up pose on the way up the line (the speed along the line that counts as climbing, studs a second, the blend in seconds,
+	-- and how far the body stands off the line, as a share of the carapace's half height). `legs` are, for each pair, the directions of the femur,
+	-- tibia and tarsus in the body frame (x is mirrored for the left; +Z toward the tail and the line, -Z toward the head): each link keeps the length it
+	-- has standing, so legs I and II curl forward and back up toward the line and legs III and IV fold back along the body. `asym` is a fixed per-leg
+	-- scatter and `wiggle` a small slow tremble of the feet (not with Reduced Motion); `palpTuckDeg` draws the palps in. All ART.
+	hang = {
+		rate = 3.5,
+		leanDeg = 3.0,
+		sway = { deg = 4.5, period = 2.5, decay = 4.0, across = 0.45 },
+		spin = { degPerS = 8.0, decay = 7.0 },
+		climb = { speed = 0.35, seconds = 0.5, shift = 0.8 },
+		palpTuckDeg = 30,
+		asym = 0.10, wiggle = 0.08,
+		legs = {
+			{ femur = { 0.65, -0.20, -0.25 }, tibia = { -0.10, -0.25, 0.90 }, tarsus = { -0.45, -0.30, 0.50 } },
+			{ femur = { 0.65, -0.20, -0.05 }, tibia = { -0.05, -0.25, 0.90 }, tarsus = { -0.50, -0.30, 0.50 } },
+			{ femur = { 0.60, -0.15, 0.55 }, tibia = { 0.00, -0.20, 0.80 }, tarsus = { -0.55, -0.30, -0.35 } },
+			{ femur = { 0.40, -0.15, 0.85 }, tibia = { 0.15, -0.20, 0.35 }, tarsus = { -0.50, -0.30, -0.20 } },
+		},
+	},
+
 	-- ---------------------------------------------------------------- detail modes
 	-- Full is for PCs. Low is for phones and tablets (touch-only devices, or Workspace attribute Detail = "low"): fewer
 	-- hairs (keep one in `every`; 0 drops the whole class, so the low tier has no standing guard hairs), a single fur shell,
@@ -513,6 +538,13 @@ end
 
 -- The parts both share. `o` is what differs between the species (see the two calls below). The first spider is the base so that anything
 -- a tarantula does not say (idle motion, the palp's drum, the body's fuzz knobs) is the first spider's.
+-- A tarantula hangs through the same code as the others (a stretch for the animal: it dangles on silk only when it falls, see ROBLOX-86) but
+-- heavier: a shorter, slower swing and a slower turn.
+local tarantulaHang = table.clone(first.hang)
+tarantulaHang.leanDeg = 3.0
+tarantulaHang.sway = { deg = 3.5, period = 2.5, decay = 3.0, across = 0.45 }
+tarantulaHang.spin = { degPerS = 5.0, decay = 6.0 }
+
 local function tarantula(o: any): any
 	local apex = 0.285 + o.abdomenRadii[3] -- the abdomen's rear tip (its centre is at z = 0.285)
 	local limbs = table.clone(first.limbs)
@@ -594,6 +626,7 @@ local function tarantula(o: any): any
 			legLift = { 32, 48 }, legEdge = { 50, 115 }, legSpan = { 0.12, 0.74 },
 		},
 		idle = first.idle,
+		hang = tarantulaHang,
 		detail = {
 			full = {
 				every = { lock = 1, guard = 1, fringe = 1, pale = 1, tuft = 1, ruff = 1, palp = 1, leg = 1 },
@@ -660,6 +693,11 @@ local greenbottle = tarantula({
 })
 greenbottle.legBands = {} -- no pale bands on its legs: the joint rings are its markings
 greenbottle.barFade = { 0, 0, 0, 0.6 } -- the bars' transparency at each growth stage: the juvenile pattern softens in the adult
+
+-- The peacock spider, the ant-mimicking spider and the rival hang as the first spider does (the rival is a clone of it, as it is; the legs keep
+-- their own lengths, so a small spider hangs as a small one).
+volans.hang = first.hang
+ant.hang = first.hang
 
 return { default = "first_spider", profiles = { first_spider = first, maratus_volans_male = volans, myrmarachne_formicaria_female = ant, rival_spider = rival, brachypelma_hamorii = redknee, chromatopelma_cyaneopubescens = greenbottle } }
 

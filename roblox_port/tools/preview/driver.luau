@@ -26,6 +26,27 @@ if ANT_MODE ~= "" then
 	end
 end
 for i = 1, math.floor(IDLE_SECONDS * 60) do rig:update(body, 1/60, true, false) end
+if HANG_MODE ~= "" then
+	-- The spider on its dragline (ROBLOX-59, ROBLOX-86): the collider is HANG_HEIGHT studs up, the line leaves its spinneret toward a point a little off
+	-- the vertical (lean 4 degrees toward +X, 2 toward +Z), and the rig is drawn suspended (grounded = false) for HANG_SECONDS. "drop": hanging from the
+	-- first frame (the sway starts with it). "climb": the body also rises along the line at 0.6 studs a second (the rig tells the climb from that).
+	local lineUp = Vector3.new(0.07, 1, 0.035).Unit
+	local steps = math.max(1, math.floor(HANG_SECONDS * 60 + 0.5))
+	rig.hangDirection = lineUp
+	for i = 1, steps do
+		local rise = if HANG_MODE == "climb" then ((i - steps) / 60) * 0.6 else 0 -- (it ends at HANG_HEIGHT)
+		local b = SupportMath.bodyCFrame(Vector3.new(0, HANG_HEIGHT, 0) + lineUp * rise, Vector3.yAxis, Vector3.new(0, 0, -1))
+		rig:update(b, 1/60, false, false)
+	end
+	-- the dragline itself, so the pose reads against it: a thin pale strand from the spinneret up the line
+	local top = rig._spinneret
+	local strand = Instance.new("Part")
+	strand.Name = "Silk"; strand.Size = Vector3.new(0.012, 1.6, 0.012); strand.Color = Color3.new(0.93, 0.93, 0.9)
+	strand.Material = "Enum.Material.SmoothPlastic"; strand.Reflectance = 0
+	local mid = top + lineUp * 0.8
+	local side = lineUp:Cross(Vector3.new(0, 0, 1)).Unit
+	strand.CFrame = CFrame.fromMatrix(mid, side, lineUp, side:Cross(lineUp))
+end
 if MODE == "eye" then rig:setEyeView(true) end
 local function f(x) return string.format("%.5f", x) end
 local function v(a) return "[" .. f(a.X) .. "," .. f(a.Y) .. "," .. f(a.Z) .. "]" end

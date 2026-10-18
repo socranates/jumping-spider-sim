@@ -25,6 +25,8 @@ ap.add_argument("--appearance", default="", help="an id from Data/Appearances (d
 ap.add_argument("--dance", type=float, default=-1.0, help="pose the peacock spider at this time (s) of its dance loop; -1: no dance")
 ap.add_argument("--ant", default="", help="the ant-mimicking spider's pose: stand, display or walk")
 ap.add_argument("--ant-seconds", type=float, default=2.0, help="seconds standing before the dump, or seconds walked")
+ap.add_argument("--hang", default="", help="draw the spider suspended on its dragline (ROBLOX-86): drop (hanging from the start) or climb (rising along the line)")
+ap.add_argument("--hang-seconds", type=float, default=1.5, help="seconds hung before the dump (the sway is a damped 2.5 s swing started by the drop)")
 ap.add_argument("--size", default="960x600")
 args = ap.parse_args()
 out = pathlib.Path(args.out).resolve()
@@ -62,7 +64,7 @@ else:
     body += "\nSupportMath = " + chunk(SRC / "Movement/SupportMath.luau") + "\nSpiderRig = (function()\n" + rig + "\nend)()\n"
     body += (HERE / "driver.luau").read_text()
     src = out / "bundle.luau"
-    src.write_text(f'MODE = "orbit"\nDETAIL = "{args.detail}"\nIDLE_SECONDS = {args.idle}\nAPPEARANCE = "{args.appearance}"\nDANCE_T = {args.dance}\nANT_MODE = "{args.ant}"\nANT_SECONDS = {args.ant_seconds}\n' + body)
+    src.write_text(f'MODE = "orbit"\nDETAIL = "{args.detail}"\nIDLE_SECONDS = {args.idle}\nAPPEARANCE = "{args.appearance}"\nDANCE_T = {args.dance}\nANT_MODE = "{args.ant}"\nANT_SECONDS = {args.ant_seconds}\nHANG_MODE = "{args.hang}"\nHANG_SECONDS = {args.hang_seconds}\nHANG_HEIGHT = 2.0\n' + body)
     run = subprocess.run([args.luau, str(src)], capture_output=True, text=True)
     if run.returncode != 0:
         raise SystemExit(f"the rig failed under the preview stand-ins (bundle kept at {src}):\n{run.stderr}")
@@ -106,6 +108,15 @@ VIEWS.update({
     "a_face": (22, 0.22, 0.24, -0.60, 0, 0.19, -0.22),
     "a_game": (65, 0.0, 1.687, 2.853, 0, 0.76, 0.0), # the game camera at the small appearance's cameraScale (0.6): 3 studs, not 5
     "a_close": (40, 0.0, 0.62, 1.0, 0, 0.2, 0.0),
+})
+# The spider hanging on its dragline (--hang): the collider is 2 studs up (driver.luau), the line leaves the spinneret toward +Y. hang_side looks at it
+# from the side (the body's long axis is vertical, the head down), hang_front from in front of the head. The pale strand is the dragline.
+VIEWS.update({
+    "hang_side": (34, 3.0, 2.15, 0.15, 0, 2.0, 0.0),
+    "hang_front": (34, 0.1, 2.1, -3.0, 0, 2.0, 0.0),
+    "hang_three": (34, -2.2, 2.2, -2.2, 0, 2.0, 0.0),
+    "hang_back": (34, -0.1, 2.0, 3.0, 0, 2.0, 0.0),
+    "hang_wide": (50, 3.6, 1.8, 0.2, 0, 1.55, 0.0), # a wider frame, for comparing with the old pose (which hung the body 0.7 studs lower)
 })
 VIEW_SIZE = {"game_camera": "1920x1080", "p_game": "1920x1080", "a_game": "1920x1080"}
 for name in args.views.split(","):

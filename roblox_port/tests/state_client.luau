@@ -277,7 +277,7 @@ case("the real client sends up what the player did, and only that: pages, the ad
 		check(table.find(m.progress.notebook.opened, "bold_jumper") ~= nil and jumpPage ~= nil and table.find(m.progress.notebook.opened, jumpPage) ~= nil, "it carries the old pages and the new one")
 		check(m.progress.finished_main == true, "and the adult life")
 		check(m.progress.appearance == nil, "the spider is not sent: the player did not change it this visit")
-		check(next(m.progress.prefs) == nil, "no toggle is sent: the player did not change one this visit")
+		check(next(m.progress.settings) == nil, "no toggle is sent: the player did not change one this visit")
 		local problems = SaveProgress.sanitize(m.progress)
 		check(#problems == 0, "and the server would accept it")
 	end
@@ -285,7 +285,7 @@ case("the real client sends up what the player did, and only that: pages, the ad
 	lp:SetAttribute("ReducedMotion", true)
 	frames(3)
 	progress = firedOf("progress")
-	check(#progress == 2 and progress[2].progress.prefs.ReducedMotion == true and progress[2].progress.prefs.LargeText == nil, "a toggle the player changed is sent, and only that one")
+	check(#progress == 2 and progress[2].progress.settings.ReducedMotion == true and progress[2].progress.settings.LargeText == nil, "a toggle the player changed is sent, and only that one")
 end)
 
 case("a rest the real client captures goes up as a rest the server would accept, in its mode", function()
@@ -349,6 +349,38 @@ case("the real client uses a later copy of the saved state, but never over what 
 	R.deliver({ kind = "rest", mode = "main", record = storedRest("main") })
 	frames(1)
 	check(before and driver.currentStore():loadBest().ok, "a visit that already has a rest keeps it")
+end)
+
+case("settings (ROBLOX-49): saved numbers and choices are applied as Player attributes; the player's own change this visit wins and is what goes up", function()
+	R.fired = {}
+	local settingsOf = SaveProgress.snapshot({ opened = { "eight_eyes" }, eye_seconds = 1 }, false, nil, { MasterVolume = 0.3, Captions = "large", FieldOfView = 70, InvertY = true })
+	realWait(SaveRules.CLIENT_PROGRESS_GAP + 0.1)
+	lp:SetAttribute("MasterVolume", 0.7) -- the player moved the slider before the late reply
+	frames(3)
+	R.deliver({ kind = "loaded", v = 1, status = "saved", progress = settingsOf, rests = {} })
+	frames(3)
+	check(lp:GetAttribute("MasterVolume") == 0.7, "a slider the player moved is kept")
+	check(lp:GetAttribute("Captions") == "large" and lp:GetAttribute("FieldOfView") == 70 and lp:GetAttribute("InvertY") == true, "the others come from the save, with their own types")
+	local bad = Json.copy(settingsOf)
+	bad.settings = { Captions = "tiny", LookSensitivityMouse = 400, NotASetting = 1 }
+	R.deliver({ kind = "loaded", v = 1, status = "saved", progress = bad, rests = {} })
+	frames(3)
+	check(lp:GetAttribute("Captions") == "large" and lp:GetAttribute("NotASetting") == nil, "an unknown option or id from the server is not applied")
+	check(lp:GetAttribute("LookSensitivityMouse") == 3.0, "a number out of its range is clamped, not trusted")
+	realWait(SaveRules.CLIENT_PROGRESS_GAP + 0.1)
+	lp:SetAttribute("CameraDistance", 6.2)
+	frames(3)
+	local progress = firedOf("progress")
+	local last = progress[#progress]
+	check(last ~= nil and last.progress.settings.MasterVolume == 0.7 and last.progress.settings.CameraDistance == 6.2, "what the player changed goes up, as numbers")
+	check(last ~= nil and #SaveProgress.sanitize(last.progress) == 0, "and the server would accept it")
+	lp:SetAttribute("Captions", "tiny") -- junk written into the attribute by something else is never sent
+	realWait(SaveRules.CLIENT_PROGRESS_GAP + 0.1)
+	lp:SetAttribute("InvertX", true)
+	frames(3)
+	progress = firedOf("progress")
+	last = progress[#progress]
+	check(last ~= nil and last.progress.settings.Captions == nil and last.progress.settings.InvertX == true, "an unclean value is left out of what is sent")
 end)
 
 print(`STATE_CLIENT passed={passed} failed={failed}`)

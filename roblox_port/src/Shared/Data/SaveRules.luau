@@ -26,7 +26,6 @@ SaveRules.MAX_PROGRESS_DEPTH = 8
 SaveRules.MAX_PAGES = 200 -- notebook ids kept (the book has 25 pages; room for the future)
 SaveRules.MAX_ID_CHARS = 48
 SaveRules.MAX_EYE_SECONDS = 1.0e9
-SaveRules.PREF_KEYS = { "FocusToggle", "ReducedMotion", "ShowLastSeen", "AutomaticGrip", "NotebookNotes", "LargeText", "SoundMuted" } :: { string }
 
 -- ---------------------------------------------------------------- timing (seconds)
 SaveRules.PROGRESS_DEBOUNCE = 30 -- at most one progress write in this time (events in between are coalesced)

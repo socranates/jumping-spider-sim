@@ -18,6 +18,7 @@ local SaveStores = require("../src/Shared/Persistence/SaveStores")
 local MemoryBackend = require("../src/Shared/Persistence/MemoryBackend")
 local SaveEnvelope = require("../src/Shared/Persistence/SaveEnvelope")
 local SaveProgress = require("../src/Shared/Persistence/SaveProgress")
+local SettingsModel = require("../src/Shared/UI/SettingsModel")
 local SaveRest = require("../src/Shared/Persistence/SaveRest")
 local SaveScheduler = require("../src/Shared/Persistence/SaveScheduler")
 local SaveSession = require("../src/Shared/Persistence/SaveSession")
@@ -339,11 +340,11 @@ end)
 -- ---------------------------------------------------------------------------------------------- progress
 local function prog(ids: { string }, extra: { [string]: any }?): any
 	local x: any = extra or {}
-	return SaveProgress.snapshot({ opened = ids, eye_seconds = x.eye or 0 }, x.finished == true, x.appearance, x.prefs or {})
+	return SaveProgress.snapshot({ opened = ids, eye_seconds = x.eye or 0 }, x.finished == true, x.appearance, x.settings or {})
 end
 
 case("progress: a good record is kept, anything out of range or of the wrong type is refused, nothing raises", function()
-	local good = prog({ "bold_jumper", "dragline" }, { eye = 12.5, finished = true, appearance = "maratus_volans_male", prefs = { LargeText = true, ShowLastSeen = false } })
+	local good = prog({ "bold_jumper", "dragline" }, { eye = 12.5, finished = true, appearance = "maratus_volans_male", settings = { LargeText = true, ShowLastSeen = false } })
 	local problems, clean = SaveProgress.sanitize(good)
 	check(#problems == 0 and clean ~= nil and canon(clean) == canon(good), "a snapshot is sanitary")
 	local function refused(label: string, mutate: (any) -> ())
@@ -363,8 +364,8 @@ case("progress: a good record is kept, anything out of range or of the wrong typ
 	refused("huge eye seconds", function(c) c.notebook.eye_seconds = 1e12 end)
 	refused("a string for finished_main", function(c) c.finished_main = "yes" end)
 	refused("a table for the appearance", function(c) c.appearance = {} end)
-	refused("a preference that is not a boolean", function(c) c.prefs.LargeText = "yes" end)
-	refused("preferences as a list of numbers", function(c) c.prefs = 5 end)
+	refused("a preference that is not a boolean", function(c) c.settings.LargeText = "yes" end)
+	refused("preferences as a list of numbers", function(c) c.settings = 5 end)
 	refused("no notebook", function(c) c.notebook = nil end)
 	refused("a sparse page list", function(c) c.notebook.opened = { [1] = "a", [3] = "b" } end)
 	for _, v in { 1, "x", true, {}, false } do
@@ -380,9 +381,9 @@ case("progress: a good record is kept, anything out of range or of the wrong typ
 	local _, cl = SaveProgress.sanitize(c)
 	check(cl ~= nil and #cl.notebook.opened == 2, "a repeated page id is dropped quietly")
 	c = Json.copy(good)
-	c.prefs.SomethingNew = true
+	c.settings.SomethingNew = true
 	_, cl = SaveProgress.sanitize(c)
-	check(cl ~= nil and cl.prefs.SomethingNew == nil and cl.prefs.LargeText == true, "a preference this build does not know is dropped, the rest kept")
+	check(cl ~= nil and cl.settings.SomethingNew == nil and cl.settings.LargeText == true, "a preference this build does not know is dropped, the rest kept")
 	c = Json.copy(good)
 	c.notebook.opened = { "bold_jumper", "a_page_from_a_newer_build" }
 	_, cl = SaveProgress.sanitize(c)
@@ -390,16 +391,16 @@ case("progress: a good record is kept, anything out of range or of the wrong typ
 end)
 
 case("progress: merging never loses a page, an adult or the longest eye time; the newer choice wins", function()
-	local a = prog({ "p1", "p2" }, { eye = 100, finished = false, appearance = "first_spider", prefs = { LargeText = true } })
-	local b = prog({ "p2", "p3" }, { eye = 50, finished = true, appearance = "maratus_volans_male", prefs = { SoundMuted = true } })
+	local a = prog({ "p1", "p2" }, { eye = 100, finished = false, appearance = "first_spider", settings = { LargeText = true } })
+	local b = prog({ "p2", "p3" }, { eye = 50, finished = true, appearance = "maratus_volans_male", settings = { SoundMuted = true } })
 	local m = SaveProgress.merge(a, b, 10, 20)
 	check(canon(m.notebook.opened) == canon({ "p1", "p2", "p3" }), "pages: a union, the stored order first")
 	check(m.notebook.eye_seconds == 100 and m.finished_main == true, "eye time the longest, a finished life stays")
-	check(m.appearance == "maratus_volans_male" and m.prefs.LargeText == true and m.prefs.SoundMuted == true, "the newer appearance; preferences key by key")
+	check(m.appearance == "maratus_volans_male" and m.settings.LargeText == true and m.settings.SoundMuted == true, "the newer appearance; preferences key by key")
 	local m2 = SaveProgress.merge(a, b, 30, 20)
 	check(m2.appearance == "first_spider", "the older incoming does not override the appearance")
-	local m3 = SaveProgress.merge(a, prog({}, { prefs = { LargeText = false } }), 10, 20)
-	check(m3.prefs.LargeText == false and m3.appearance == "first_spider", "a newer preference overrides; an absent appearance keeps the stored one")
+	local m3 = SaveProgress.merge(a, prog({}, { settings = { LargeText = false } }), 10, 20)
+	check(m3.settings.LargeText == false and m3.appearance == "first_spider", "a newer preference overrides; an absent appearance keeps the stored one")
 	local d = SaveProgress.default()
 	check(canon(SaveProgress.merge(a, d, 10, 0)) == canon(a), "merging a default changes nothing")
 	check(canon(SaveProgress.merge(d, a, 0, 10)) == canon(a), "merging into a default gives the record")
@@ -565,11 +566,11 @@ case("a new player: the record is made with a lock, progress is saved after the 
 	local o = storedOf(e, "P_1", nil)
 	check(o.status == "ok" and o.lock ~= nil and o.lock.session == "A" and #o.payload.notebook.opened == 0, "a default record with A's lock")
 	check(select(1, a:status()) == "saved", "saved")
-	check(a:setProgress(prog({ "bold_jumper", "dragline" }, { eye = 30, appearance = "maratus_volans_male", prefs = { LargeText = true } })), "progress accepted")
+	check(a:setProgress(prog({ "bold_jumper", "dragline" }, { eye = 30, appearance = "maratus_volans_male", settings = { LargeText = true } })), "progress accepted")
 	check(select(1, a:status()) == "saving", "saving")
 	run(e, a, 2)
 	o = storedOf(e, "P_1", nil)
-	check(#o.payload.notebook.opened == 2 and o.payload.appearance == "maratus_volans_male" and o.payload.prefs.LargeText == true, "written at once (nothing written lately)")
+	check(#o.payload.notebook.opened == 2 and o.payload.appearance == "maratus_volans_male" and o.payload.settings.LargeText == true, "written at once (nothing written lately)")
 	check(select(1, a:status()) == "saved", "saved again")
 	local w0 = e.backend.writes
 	a:setProgress(prog({ "bold_jumper", "dragline", "eight_eyes" }, { eye = 31 }))
@@ -588,7 +589,7 @@ case("a new player: the record is made with a lock, progress is saved after the 
 	local b = newSession(e, 1, "B")
 	check(b:load() == "active", "the rejoin takes the lock at once")
 	check(canon(b.progress.notebook.opened) == canon({ "bold_jumper", "dragline", "eight_eyes", "venom" }) and b.progress.appearance == "maratus_volans_male", "and has the notebook and the choice")
-	check(#b.progress.prefs == 0 and b.progress.prefs.LargeText == true, "and the preferences")
+	check(#b.progress.settings == 0 and b.progress.settings.LargeText == true, "and the preferences")
 end)
 
 case("rests: saved per mode as separate values, handed back on a rejoin, the earlier one kept as the backup", function()
@@ -650,7 +651,7 @@ case("a failed load never overwrites good data: every kind of failure, for ten m
 		local s = newSession(e, 3, "SECOND")
 		local state = s:load()
 		check(state == "session" or state == "loading", `[{label}] the load did not succeed (state {state})`)
-		s:setProgress(prog({ "eight_eyes", "drinking" }, { eye = 5, appearance = "first_spider", prefs = { LargeText = true } }))
+		s:setProgress(prog({ "eight_eyes", "drinking" }, { eye = 5, appearance = "first_spider", settings = { LargeText = true } }))
 		s:setRest("main", realRest(130, "main"))
 		s:setRest("free", realRest(130, "free"))
 		run(e, s, 600)
@@ -666,14 +667,14 @@ case("a transient outage at load is retried: progress kept in memory meanwhile i
 	local e = newEnv()
 	local first = newSession(e, 4, "FIRST")
 	first:load()
-	first:setProgress(prog({ "bold_jumper", "venom" }, { eye = 10, finished = true, appearance = "maratus_volans_male", prefs = { LargeText = true } }))
+	first:setProgress(prog({ "bold_jumper", "venom" }, { eye = 10, finished = true, appearance = "maratus_volans_male", settings = { LargeText = true } }))
 	run(e, first, 3)
 	first:flush()
 	e.backend:fail({ op = "any", times = 4, message = "503: the service is unavailable" })
 	local loaded: { any } = {}
 	local s = newSession(e, 4, "SECOND", { onLoaded = function(snap: any) table.insert(loaded, snap) end })
 	check(s:load() == "session" and s.reason == "load_failed", "the first try fails")
-	s:setProgress(prog({ "eight_eyes" }, { eye = 3, prefs = { SoundMuted = true } }))
+	s:setProgress(prog({ "eight_eyes" }, { eye = 3, settings = { SoundMuted = true } }))
 	local seen = false
 	for _ = 1, 120 do
 		e.t += 1
@@ -685,7 +686,7 @@ case("a transient outage at load is retried: progress kept in memory meanwhile i
 	run(e, s, 40)
 	local o = storedOf(e, "P_4", nil)
 	check(canon(o.payload.notebook.opened) == canon({ "bold_jumper", "venom", "eight_eyes" }) and o.payload.finished_main == true and o.payload.appearance == "maratus_volans_male", "the merged record is stored: the old pages, the new one, the old choice")
-	check(o.payload.prefs.LargeText == true and o.payload.prefs.SoundMuted == true, "preferences from both")
+	check(o.payload.settings.LargeText == true and o.payload.settings.SoundMuted == true, "preferences from both")
 	check(o.backup ~= nil and o.backup.payload.notebook.eye_seconds == 10, "and the version before is its backup")
 	check(select(1, s:status()) == "saved", "saved")
 end)
@@ -741,23 +742,24 @@ end)
 
 case("an older schema migrates forward when saved, and the old version is kept as the backup", function()
 	local e = newEnv()
-	local spec2: SaveEnvelope.Spec = {
-		kind = "progress", current = 2,
-		migrations = { [1] = function(p: any): any p.prefs = p.prefs or {}; p.prefs.LargeText = true; return p end },
+	-- (a later schema than this build's, to show the pattern for the next change)
+	local spec3: SaveEnvelope.Spec = {
+		kind = "progress", current = 3,
+		migrations = { [2] = function(p: any): any p.settings = p.settings or {}; p.settings.LargeText = true; return p end },
 		validate = SaveProgress.SPEC.validate,
 	}
 	local old = SaveProgress.snapshot({ opened = { "p1" }, eye_seconds = 4 }, false, nil, {})
-	e.backend.data["P_8"] = stored(SaveProgress.SPEC, 1, old, 50)
-	local s = newSession(e, 8, "S", { progressSpec = spec2 })
+	e.backend.data["P_8"] = stored(SaveProgress.SPEC, 2, old, 50)
+	local s = newSession(e, 8, "S", { progressSpec = spec3 })
 	check(s:load() == "active", "an older record loads")
-	check(s.progress.prefs.LargeText == true and #s.progress.notebook.opened == 1, "migrated in memory")
-	check(e.backend.data["P_8"].schema == 1, "and the stored value is still schema 1 (loading writes only the lock)")
+	check(s.progress.settings.LargeText == true and #s.progress.notebook.opened == 1, "migrated in memory")
+	check(e.backend.data["P_8"].schema == 2, "and the stored value is still schema 2 (loading writes only the lock)")
 	s:setProgress(prog({ "p1", "p2" }))
 	run(e, s, 3)
-	local o = SaveEnvelope.open(spec2, e.backend.data["P_8"])
-	check(o.status == "ok" and e.backend.data["P_8"].schema == 2 and #o.payload.notebook.opened == 2, "saved at schema 2")
-	check(o.backup ~= nil and o.backup.migratedFrom == 1 and #o.backup.payload.notebook.opened == 1, "the schema-1 version is its backup")
-	-- this build (schema 1 only) now sees schema 2 as newer: it must not touch it
+	local o = SaveEnvelope.open(spec3, e.backend.data["P_8"])
+	check(o.status == "ok" and e.backend.data["P_8"].schema == 3 and #o.payload.notebook.opened == 2, "saved at schema 3")
+	check(o.backup ~= nil and o.backup.migratedFrom == 2 and #o.backup.payload.notebook.opened == 1, "the schema-2 version is its backup")
+	-- this build (schema 2 only) now sees schema 3 as newer: it must not touch it
 	local s1 = newSession(e, 8, "OLDBUILD")
 	s:flush()
 	local before = snapshotAll(e)
@@ -765,6 +767,116 @@ case("an older schema migrates forward when saved, and the old version is kept a
 	run(e, s1, 100)
 	s1:flush()
 	check(snapshotAll(e) == before, "and leaves it as it is")
+end)
+
+case("settings (ROBLOX-49): a schema-1 record's seven toggles become settings, older records load with defaults for the new ones", function()
+	local e = newEnv()
+	-- the record a v19 build wrote: schema 1, `prefs` of booleans
+	local v1 = { notebook = { opened = { "eight_eyes", "venom" }, eye_seconds = 33 }, finished_main = true, appearance = "maratus_volans_male",
+		prefs = { LargeText = true, ShowLastSeen = false, SoundMuted = true, FocusToggle = false, SomethingGone = true } }
+	e.backend.data["P_21"] = stored(SaveProgress.SPEC, 1, v1, 40)
+	local o = SaveEnvelope.open(SaveProgress.SPEC, e.backend.data["P_21"])
+	check(o.status == "migrated" and o.migratedFrom == 1, "it opens as migrated from 1")
+	local pl = o.payload
+	check(pl.prefs == nil and pl.settings.LargeText == true and pl.settings.ShowLastSeen == false and pl.settings.SoundMuted == true and pl.settings.FocusToggle == false, "the toggles are now settings")
+	check(pl.settings.SomethingGone == nil and pl.settings.MasterVolume == nil and pl.settings.Captions == nil, "an unknown toggle is left behind; new settings are simply not there")
+	check(#pl.notebook.opened == 2 and pl.notebook.eye_seconds == 33 and pl.finished_main == true and pl.appearance == "maratus_volans_male", "nothing else changed")
+	check(pl.settings_version == 1, "settings version 1")
+	local s = newSession(e, 21, "S")
+	check(s:load() == "active", "the session loads it")
+	check(s.progress.settings.LargeText == true, "in memory")
+	local m = SettingsModel.get(function(id: string): any return s.progress.settings[id] end, "MasterVolume")
+	check(m == 1.0, "a setting the old record never had reads as its default")
+	check(e.backend.data["P_21"].schema == 1, "loading changes nothing stored but the lock")
+	s:setProgress(prog({ "eight_eyes", "venom", "drinking" }, { eye = 40, finished = true, settings = { MasterVolume = 0.4, Captions = "large" } }))
+	run(e, s, 3)
+	local w = SaveEnvelope.open(SaveProgress.SPEC, e.backend.data["P_21"])
+	check(w.status == "ok" and e.backend.data["P_21"].schema == 2, "the next write is schema 2")
+	check(w.payload.settings.LargeText == true and w.payload.settings.MasterVolume == 0.4 and w.payload.settings.Captions == "large", "old and new settings together")
+	check(w.backup ~= nil and w.backup.migratedFrom == 1 and w.backup.payload.settings.LargeText == true, "the schema-1 record is its backup")
+	-- a damaged old record is not guessed at
+	local e2 = newEnv()
+	local rec = stored(SaveProgress.SPEC, 1, v1, 40)
+	rec.payload.prefs.LargeText = false -- after the checksum was taken
+	e2.backend.data["P_22"] = rec
+	local s2 = newSession(e2, 22, "S")
+	check(s2:load() == "session" and s2.reason == "corrupt", "a record whose checksum no longer matches is corrupt, migrated or not")
+end)
+
+case("settings (ROBLOX-49): progress sanitising checks type, range and id", function()
+	local good = prog({ "bold_jumper" }, { eye = 1, settings = { LargeText = true } })
+	local function with(change: (any) -> ()): ({ string }, any)
+		local c = Json.copy(good)
+		change(c)
+		return SaveProgress.sanitize(c)
+	end
+	local pr, cl = with(function(c) c.settings = { MasterVolume = 0.35, Captions = "off", FieldOfView = 70, InvertY = true } end)
+	check(#pr == 0 and cl.settings.MasterVolume == 0.35 and cl.settings.Captions == "off" and cl.settings.FieldOfView == 70 and cl.settings.InvertY == true, "numbers, choices and toggles are kept")
+	pr, cl = with(function(c) c.settings = { MasterVolume = 7, LookSensitivityMouse = -2, CameraDistance = 100 } end)
+	check(#pr == 0 and cl.settings.MasterVolume == 1 and cl.settings.LookSensitivityMouse == 0.2 and cl.settings.CameraDistance == 7, "out-of-range numbers are clamped to the range")
+	pr = with(function(c) c.settings = { MasterVolume = "loud" } end)
+	check(#pr > 0, "a number setting that is a string is refused")
+	pr = with(function(c) c.settings = { MasterVolume = 0 / 0 } end)
+	check(#pr > 0, "NaN is refused")
+	pr = with(function(c) c.settings = { FieldOfView = math.huge } end)
+	check(#pr > 0, "infinity is refused")
+	pr = with(function(c) c.settings = { InvertY = 1 } end)
+	check(#pr > 0, "a toggle that is a number is refused")
+	pr = with(function(c) c.settings = { Captions = 7 } end)
+	check(#pr > 0, "a choice that is a number is refused")
+	pr, cl = with(function(c) c.settings = { Captions = "tiny", Mystery = 5, [3] = true } end)
+	check(#pr > 0, "a key that is not a name is refused")
+	pr, cl = with(function(c) c.settings = { Captions = "tiny", Mystery = 5, Another = {} } end)
+	check(#pr == 0 and cl.settings.Captions == nil and cl.settings.Mystery == nil and cl.settings.Another == nil, "an unknown id and an unknown option are dropped quietly")
+	pr = with(function(c) c.settings = "all" end)
+	check(#pr > 0, "settings that are not a table are refused")
+	pr = with(function(c) c.settings_version = "one" end)
+	check(#pr > 0, "a settings version that is not a number is refused")
+	pr = with(function(c) c.settings_version = 0 end)
+	check(#pr > 0, "settings version 0 is refused")
+	pr, cl = with(function(c) c.settings = nil end)
+	check(#pr == 0 and next(cl.settings) == nil and cl.settings_version == SettingsModel.VERSION, "no settings at all is fine")
+	pr, cl = with(function(c) c.prefs = { LargeText = true }; c.settings = nil end)
+	check(#pr == 0 and next(cl.settings) == nil, "the old `prefs` field of a stale client is ignored, not trusted")
+	local big: { [string]: any } = {}
+	for i = 1, 400 do big["Setting" .. i] = i end
+	pr, cl = with(function(c) c.settings = big end)
+	check(#pr == 0 and next(cl.settings) == nil, "hundreds of unknown ids are all dropped")
+	-- whatever a client sends, what is kept is clean
+	local seed49 = 49
+	local rnd = { NextInteger = function(_self: any, lo: number, hi: number): number
+		seed49 = (seed49 * 1103515245 + 12345) % 2147483648
+		return lo + seed49 % (hi - lo + 1)
+	end }
+	local junk: { any } = { true, false, 0, 1, -1, 0.5, 1e9, -1e9, "off", "large", "", {}, math.huge, -math.huge, 0 / 0 }
+	for _ = 1, 300 do
+		local c = Json.copy(good)
+		c.settings = {}
+		for _ = 1, 6 do
+			local ids = SettingsModel.ids()
+			c.settings[ids[rnd:NextInteger(1, #ids)]] = junk[rnd:NextInteger(1, #junk)]
+		end
+		local p2, k = SaveProgress.sanitize(c)
+		if #p2 == 0 then
+			for id, v in k.settings do
+				if SettingsModel.clean(id, v) ~= v then check(false, `kept an unclean {id}`) end
+			end
+		end
+	end
+	check(true, "300 random settings objects: nothing unclean is ever kept")
+	-- merging, comparing and sending
+	local a = prog({}, { settings = { MasterVolume = 0.2, InvertY = true } })
+	local b = prog({}, { settings = { MasterVolume = 0.9, Captions = "off" } })
+	local m = SaveProgress.merge(a, b, 10, 20)
+	check(m.settings.MasterVolume == 0.9 and m.settings.InvertY == true and m.settings.Captions == "off", "settings merge key by key, the newer first")
+	m = SaveProgress.merge(a, b, 30, 20)
+	check(m.settings.MasterVolume == 0.2 and m.settings.Captions == "off" and m.settings.InvertY == true, "and the older incoming does not override a newer stored one")
+	check(SaveProgress.same(a, Json.copy(a)) and not SaveProgress.same(a, b), "same() sees settings")
+	local snap = SaveProgress.snapshot({ opened = {}, eye_seconds = 0 }, false, nil, { MasterVolume = 0.5, InvertY = "yes", Mystery = true, Captions = "large", FieldOfView = 400 })
+	check(snap.settings.MasterVolume == 0.5 and snap.settings.InvertY == nil and snap.settings.Mystery == nil and snap.settings.Captions == "large" and snap.settings.FieldOfView == 90, "the snapshot sends only clean settings")
+	check(#(SaveProgress.sanitize(snap)) == 0, "and the snapshot passes its own check")
+	local text = canon(SaveProgress.snapshot({ opened = {}, eye_seconds = 0 }, false, nil, SettingsModel.defaults()))
+	check(#text < 1500 and #text < SaveRules.MAX_PROGRESS_CHARS / 8, `a full set of settings is small ({#text} characters)`)
 end)
 
 case("oversized and malformed things from the client never reach the store", function()
@@ -1052,7 +1164,7 @@ case("random operations, faults and two sessions: stored progress only ever grow
 				local ids: { string } = {}
 				for _, x in s.progress.notebook.opened do table.insert(ids, x) end
 				table.insert(ids, id)
-				s:setProgress(prog(ids, { eye = rnd(100), prefs = { LargeText = rnd(2) == 1 } }))
+				s:setProgress(prog(ids, { eye = rnd(100), settings = { LargeText = rnd(2) == 1 } }))
 			elseif roll <= 28 then
 				s:setRest("main", rests[rnd(#rests)])
 			elseif roll <= 32 then
@@ -1148,7 +1260,7 @@ case("service: a joining player is loaded, answers hello with their state, and n
 	local e = newEnv()
 	local first = newSession(e, 40, "OLD")
 	first:load()
-	first:setProgress(prog({ "bold_jumper", "venom" }, { eye = 9, finished = true, appearance = "maratus_volans_male", prefs = { LargeText = true } }))
+	first:setProgress(prog({ "bold_jumper", "venom" }, { eye = 9, finished = true, appearance = "maratus_volans_male", settings = { LargeText = true } }))
 	local rest = realRest(120, "main")
 	first:setRest("main", rest)
 	run(e, first, 20)

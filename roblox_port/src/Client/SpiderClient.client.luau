@@ -17,7 +17,7 @@
 -- and the world waits. The book is the player's: it lives here, outside the world and its checkpoints, so a return to a rest never erases a
 -- page and a new, unrelated spider opens the same book. NotebookWatch opens pages from the events this loop already has.
 -- Saving (ROBLOX-39): the server owns the DataStore. This script only says hello, applies what the server sends back (the notebook, an Easy
--- unlock, the chosen spider, the toggles, the last rests) and sends its own progress and rests up (Client/SaveClient). With no server reply
+-- unlock, the chosen spider, the settings, the last rests) and sends its own progress and rests up (Client/SaveClient). With no server reply
 -- it is the session-only game it was before, and the menu says saving is off.
 
 local GuiService = game:GetService("GuiService")
@@ -80,6 +80,7 @@ local CheckpointStore = require(Shared.Persistence.CheckpointStore)
 local SaveRules = require(Shared.Data.SaveRules)
 local SaveProgress = require(Shared.Persistence.SaveProgress)
 local SaveText = require(Shared.UI.SaveText)
+local SettingsModel = require(Shared.UI.SettingsModel)
 local SaveClient = require(script.Parent.SaveClient)
 local focusState = FocusState.new()
 local DT = SpiderMotor.DT
@@ -624,12 +625,9 @@ local function refreshMenu()
 	if menuStarted and menu:isShowing() and confirming == nil then openMenu() end
 end
 local function progressSnapshot(): any
-	local prefs: { [string]: boolean? } = {}
-	for key in prefTouched do
-		local v = player:GetAttribute(key)
-		if type(v) == "boolean" then prefs[key] = v end
-	end
-	return SaveProgress.snapshot(book:toRecord(), session.finishedMain, if appearanceTouched then appearance else nil, prefs)
+	local settings: { [string]: any } = {}
+	for key in prefTouched do settings[key] = player:GetAttribute(key) end -- (the snapshot sends only what is clean)
+	return SaveProgress.snapshot(book:toRecord(), session.finishedMain, if appearanceTouched then appearance else nil, settings)
 end
 local function adoptRest(mode: string, record: any)
 	if record == nil or (mode ~= "main" and mode ~= "free") then return end
@@ -652,7 +650,7 @@ local function applySaved(msg: any)
 		book:load({ opened = ids, eye_seconds = math.max(mine.eye_seconds, p.notebook.eye_seconds) })
 		if p.finished_main then session.finishedMain = true end
 		applyingSaved = true
-		for key, v in p.prefs do
+		for key, v in p.settings do
 			if not prefTouched[key] then player:SetAttribute(key, v) end
 		end
 		applyingSaved = false
@@ -684,7 +682,7 @@ saveClient = SaveClient.new({
 	build = progressSnapshot,
 })
 lastSig = `{#book.opened}:{session.finishedMain}`
-for _, key in SaveRules.PREF_KEYS do
+for _, key in SettingsModel.ids() do
 	player:GetAttributeChangedSignal(key):Connect(function()
 		if applyingSaved then return end
 		prefTouched[key] = true

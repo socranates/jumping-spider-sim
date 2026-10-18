@@ -67,6 +67,14 @@ MATING = {
   "Morley, E. L. & Robert, D. (2018). Electric Fields Elicit Ballooning in Spiders. Current Biology 28(14): 2324-2330. https://doi.org/10.1016/j.cub.2018.05.057"]}
 
 
+TARANTULA = {
+ 'id':'tarantula_cousins','trigger':'tarantula','title':'Velvet cousins (Theraphosidae)',
+ 'text':"Tarantulas (family Theraphosidae) are large, heavy, long-lived spiders. They are not jumping spiders: their eyes sit close together on a small mound and are poor, and they feel their way with the hairs on their legs. Their fangs strike downward, side by side. Most New World tarantulas have urticating hairs on the abdomen and cast them at an attacker. A threatened tarantula rears up and lifts its front legs, and all of them spin silk from spinnerets at the rear of the abdomen.",
+ 'game':"The Mexican redknee and the Greenbottle blue are costumes on the first spider's body, nothing more. A real tarantula's body is five or more centimetres long; yours is the first spider's size. You still see, jump, spin your safety line and are hunted exactly as the first spider does, which no real tarantula could do. The rear-up and the turn with the spinnerets sweeping (X) are drawn poses with invented angles and timing, and no silk mat is laid. The colours are stylised, the redknee's rust patch is only a colour (no hairs are cast), and the greenbottle's bars soften at the last growth stage as a game choice.",
+ 'sources':[
+  "Foelix, R. F. (2011). Biology of Spiders, 3rd edition. Oxford University Press.",
+  "Bertani, R. & Guadanucci, J. P. L. (2013). Morphology, evolution and usage of urticating setae by tarantulas (Araneae: Theraphosidae). Zoologia 30(4): 403-418. https://doi.org/10.1590/S1984-46702013000400006"]}
+
 def lua_str(s):
     return '"' + s.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n") + '"'
 
@@ -92,7 +100,7 @@ def main():
     ]
     triggers = ["start", "jump", "jump_far", "jump_long", "eye_view", "eye_time_20", "eye_time_60", "shimmer",
                 "fly_recognised", "catch", "meal", "felt", "buzz", "rest", "sleep", "hungry", "well_fed",
-                "moult_ready", "moulted", "adult", "wasp", "wasp_escaped", "wasp_caught", "starving", "dance", "antennae", "hatched"]
+                "moult_ready", "moulted", "adult", "wasp", "wasp_escaped", "wasp_caught", "starving", "dance", "antennae", "hatched", "tarantula"]
     out += ["\t" + lua_str(t) + "," for t in triggers]
     out += [
         "}",
@@ -112,7 +120,7 @@ def main():
         "",
         "NotebookPages.pages = {",
     ]
-    for p in doc["pages"] + [PEACOCK, ANTMIMIC, MATING]:
+    for p in doc["pages"] + [PEACOCK, ANTMIMIC, MATING, TARANTULA]:
         adapted = p["id"] in ADAPTED
         game = ADAPTED[p["id"]][0] if adapted else p["game"]
         out.append("\t{")
@@ -129,7 +137,7 @@ def main():
         out.append("\t},")
     out += ["} :: { Page }", "", "return NotebookPages", ""]
     OUT.write_text("\n".join(out), encoding="utf-8", newline="\r\n")
-    print("wrote", OUT, len(doc["pages"])+3, "pages;", len(ADAPTED), "with a Roblox 'In this game' line")
+    print("wrote", OUT, len(doc["pages"])+4, "pages;", len(ADAPTED), "with a Roblox 'In this game' line")
 
 
 main()

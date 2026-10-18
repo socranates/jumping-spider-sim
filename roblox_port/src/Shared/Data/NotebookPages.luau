@@ -39,6 +39,7 @@ NotebookPages.triggers = {
 	"dance",
 	"antennae",
 	"hatched",
+	"tarantula",
 }
 
 -- The reserve at or under hungryAt is "hungry"; at or over wellFedAt, "well fed" (LIFE_DESIGN.md round 1).
@@ -350,6 +351,17 @@ NotebookPages.pages = {
 			"Foelix, R. F. (2011). Biology of Spiders, 3rd edition. Oxford University Press.",
 			"Bell, J. R., Bohan, D. A., Shaw, E. M. & Weyman, G. S. (2005). Ballooning dispersal using silk: world fauna, phylogenies, genetics and models. Bulletin of Entomological Research 95(2): 69-114. https://doi.org/10.1079/BER2004350",
 			"Morley, E. L. & Robert, D. (2018). Electric Fields Elicit Ballooning in Spiders. Current Biology 28(14): 2324-2330. https://doi.org/10.1016/j.cub.2018.05.057",
+		},
+	},
+	{
+		id = "tarantula_cousins",
+		trigger = "tarantula",
+		title = "Velvet cousins (Theraphosidae)",
+		text = "Tarantulas (family Theraphosidae) are large, heavy, long-lived spiders. They are not jumping spiders: their eyes sit close together on a small mound and are poor, and they feel their way with the hairs on their legs. Their fangs strike downward, side by side. Most New World tarantulas have urticating hairs on the abdomen and cast them at an attacker. A threatened tarantula rears up and lifts its front legs, and all of them spin silk from spinnerets at the rear of the abdomen.",
+		game = "The Mexican redknee and the Greenbottle blue are costumes on the first spider's body, nothing more. A real tarantula's body is five or more centimetres long; yours is the first spider's size. You still see, jump, spin your safety line and are hunted exactly as the first spider does, which no real tarantula could do. The rear-up and the turn with the spinnerets sweeping (X) are drawn poses with invented angles and timing, and no silk mat is laid. The colours are stylised, the redknee's rust patch is only a colour (no hairs are cast), and the greenbottle's bars soften at the last growth stage as a game choice.",
+		sources = {
+			"Foelix, R. F. (2011). Biology of Spiders, 3rd edition. Oxford University Press.",
+			"Bertani, R. & Guadanucci, J. P. L. (2013). Morphology, evolution and usage of urticating setae by tarantulas (Araneae: Theraphosidae). Zoologia 30(4): 403-418. https://doi.org/10.1590/S1984-46702013000400006",
 		},
 	},
 } :: { Page }

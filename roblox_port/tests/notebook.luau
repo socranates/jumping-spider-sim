@@ -34,12 +34,12 @@ local ADAPTED = { "bold_jumper", "dragline", "legs_push", "hearing", "green_uv",
 local STABLE = {
 	"bold_jumper", "dragline", "legs_push", "eight_eyes", "moving_retinas", "motion_first", "hunting_by_sight", "venom", "drinking",
 	"felt", "hearing", "retreat", "depth_blur", "green_uv", "home_before_dark", "hungry_at_home", "full_abdomen", "outgrowing_a_skin",
-	"new_skin", "grown_up", "mud_dauber", "what_the_wasp_does", "getting_away", "going_without_food", "peacock_dance", "walking_like_an_ant", "eggs_and_wind",
+	"new_skin", "grown_up", "mud_dauber", "what_the_wasp_does", "getting_away", "going_without_food", "peacock_dance", "walking_like_an_ant", "eggs_and_wind", "tarantula_cousins",
 }
 do
 	local book = FieldNotebook.new()
 	check(#book.dropped == 0, "no page was left out for a missing field or an unknown trigger")
-	check(#book.pages == #ref.pages + 3 and #ref.pages == 24, `all of Godot's {#ref.pages} pages are here, then the peacock page, the ant-mimic page and the eggs-and-wind page ({#book.pages})`)
+	check(#book.pages == #ref.pages + 4 and #ref.pages == 24, `all of Godot's {#ref.pages} pages are here, then the peacock page, the ant-mimic page, the eggs-and-wind page and the tarantula page ({#book.pages})`)
 	check(#book.pages >= 12, "there is a first set of pages")
 	check(same(ids((function() local l = {} for _, p in book.pages do table.insert(l, { id = p.id, title = p.title }) end return l end)()), STABLE), "the page ids are the stable ones, in Godot's order")
 	local seen: { [string]: boolean } = {}
@@ -69,8 +69,8 @@ do
 	check(urls == refUrls and urls >= 12, `the source links are all kept ({urls} of {refUrls})`)
 	check(same(adapted, ADAPTED), "exactly these pages have a Roblox 'In this game' line: " .. table.concat(adapted, ", "))
 	-- Every trigger a page names is one the notebook has; Godot's list is whole.
-	local triggers = { "start", "jump", "jump_far", "jump_long", "eye_view", "eye_time_20", "eye_time_60", "shimmer", "fly_recognised", "catch", "meal", "felt", "buzz", "rest", "sleep", "hungry", "well_fed", "moult_ready", "moulted", "adult", "wasp", "wasp_escaped", "wasp_caught", "starving", "dance", "antennae", "hatched" }
-	check(same(NotebookPages.triggers, triggers), "the trigger list is Godot's, then the three the Roblox game added (dance, antennae, hatched)")
+	local triggers = { "start", "jump", "jump_far", "jump_long", "eye_view", "eye_time_20", "eye_time_60", "shimmer", "fly_recognised", "catch", "meal", "felt", "buzz", "rest", "sleep", "hungry", "well_fed", "moult_ready", "moulted", "adult", "wasp", "wasp_escaped", "wasp_caught", "starving", "dance", "antennae", "hatched", "tarantula" }
+	check(same(NotebookPages.triggers, triggers), "the trigger list is Godot's, then the four the Roblox game added (dance, antennae, hatched, tarantula)")
 	for _, p in book.pages do check(table.find(NotebookPages.triggers, p.trigger) ~= nil, `page {p.id} names a trigger the notebook has`) end
 	-- The eggs-and-wind page (ROBLOX-80): its own trigger, honest sources, and the peacock page no longer says there is no mating simulation.
 	do
@@ -84,6 +84,18 @@ do
 		for _, p in book.pages do
 			if p.id == "peacock_dance" then check(string.find(p.game, "no mating simulation", 1, true) == nil and string.find(p.game, "court a mate", 1, true) ~= nil, "the peacock page's game note says the dance courts a mate") end
 		end
+	end
+	-- The tarantula page (ROBLOX-83): its own trigger, two sources in the notebook's style, an honest game note, and no claim about the greenbottle's hairs.
+	do
+		local page: any
+		for _, p in book.pages do if p.id == "tarantula_cousins" then page = p end end
+		check(page ~= nil and page.trigger == "tarantula" and page.title == "Velvet cousins (Theraphosidae)" and page.godotGame == nil, "the tarantula page opens on the tarantula trigger, has its title, and is the game's own (no Godot line)")
+		check(page ~= nil and #page.sources == 2 and string.find(page.sources[1], "Foelix, R. F. (2011). Biology of Spiders, 3rd edition. Oxford University Press.", 1, true) == 1 and string.find(page.sources[2], "Bertani, R. & Guadanucci, J. P. L. (2013)", 1, true) == 1 and string.find(page.sources[2], "Zoologia 30(4): 403-418", 1, true) ~= nil and string.find(page.sources[2], "10.1590/S1984-46702013000400006", 1, true) ~= nil, "its two sources are named in the notebook's style")
+		check(page ~= nil and string.find(page.text, "not jumping spiders", 1, true) ~= nil and string.find(page.text, "urticating", 1, true) ~= nil and string.find(page.text, "rears up", 1, true) ~= nil, "the page says tarantulas are not jumping spiders, and what they do")
+		check(page ~= nil and string.find(page.game, "costumes", 1, true) ~= nil and string.find(page.game, "invented angles", 1, true) ~= nil and string.find(page.game, "no silk mat", 1, true) ~= nil and string.find(page.game, "no hairs are cast", 1, true) ~= nil and string.find(page.game, "five or more centimetres", 1, true) ~= nil, "the game note says where the game departs from the spiders")
+		local fresh = FieldNotebook.new()
+		check(#fresh:notice("tarantula") == 1 and fresh:isOpen("tarantula_cousins") and #fresh:notice("tarantula") == 0, "the trigger opens the page, once")
+		check(not FieldNotebook.new():isOpen("tarantula_cousins"), "the page is not open at the start")
 	end
 	-- The thresholds are Godot's.
 	check(NotebookPages.hungryAt == 0.25 and NotebookPages.wellFedAt == 0.85 and NotebookPages.jumpFarWu == 5.0 and NotebookPages.jumpLongWu == 8.0, "Godot's thresholds")
@@ -400,7 +412,7 @@ do
 	for _, p in nb.pages do if not nb:isOpen(p.id) then table.insert(unopened, p.trigger) end end
 	local unwired: { string } = {}
 	for trigger in NotebookWatch.UNWIRED do table.insert(unwired, trigger) end
-	check(same(unopened, { "felt", "dance", "hatched" }) and same(unwired, { "felt" }), "watcher covers all pages except unwired felt and the client-owned dance and hatching: left over: " .. table.concat(unopened, ", "))
+	check(same(unopened, { "felt", "dance", "hatched", "tarantula" }) and same(unwired, { "felt" }), "watcher covers all pages except unwired felt and the client-owned dance, hatching and tarantula: left over: " .. table.concat(unopened, ", "))
 	check(#nb.opened == 24, `the long game opened 24 pages ({#nb.opened})`)
 end
 

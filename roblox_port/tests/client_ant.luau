@@ -192,6 +192,9 @@ check("the tarantulas: C reaches them, X plays the threat display and silk mat, 
 		assert(driver.appearance() == expected, `C did not reach {expected}`)
 	end
 	assert(words("SpiderPrompts", "Toast") == "You are the Mexican redknee now", words("SpiderPrompts", "Toast"))
+	assert(driver.notebook:isOpen("tarantula_cousins"), "choosing a tarantula did not open the notebook page")
+	local tnote = find("SpiderPrompts", "NotebookNote")
+	assert(tnote ~= nil and tnote.Visible and string.find(tnote.Text, "Velvet cousins", 1, true), "no note says the page opened: " .. tostring(tnote and tnote.Text))
 	assert(string.find(words("SpiderPrompts", "PromptHint"), "C: become the Greenbottle blue", 1, true), words("SpiderPrompts", "PromptHint"))
 	assert(driver.threat() ~= nil and driver.rig().threat == nil and driver.rig().ant == nil and driver.rig().dance == nil, "the redknee starts with a pose given to its rig")
 	key("Feed", true); frames(2); key("Feed", false); frames(2)

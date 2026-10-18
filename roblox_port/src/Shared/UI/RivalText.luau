@@ -4,7 +4,11 @@
 -- Pure: checked in tests/rival.luau and tests/client_rival.luau.
 local RivalText = {}
 
-RivalText.CAPTURED = "Caught the rival. Stay still to eat; worth two housefly meals."
+RivalText.CAPTURED = "Caught the rival! It fights back. Tap to keep your grip."
+-- ROBLOX-77: the rival must be subdued with the tapping grip before it can be eaten, and it can tear free.
+RivalText.SUBDUED = "The rival goes still. Stay still to eat; worth two housefly meals."
+RivalText.TORE = "The rival tore free of your fangs."
+RivalText.TORE_GENTLE = "The rival tore free of your fangs. You are safe in this mode."
 RivalText.SPRANG = "It sprang clear of your strike."
 RivalText.COUNTER = "It bit back! Jump away!"
 RivalText.COUNTER_GENTLE = "It bit back, but you are safe in this mode. Jump away!"
@@ -12,6 +16,17 @@ RivalText.COUNTER_GENTLE = "It bit back, but you are safe in this mode. Jump awa
 -- The line for a counter-bite: the gentle modes cost nothing and say so.
 function RivalText.counter(gentle: boolean): string
 	return if gentle then RivalText.COUNTER_GENTLE else RivalText.COUNTER
+end
+
+-- The status line while the rival fights the grip: the fly's wording (Caught — tap Jump to keep your grip), in the rival's own words. `button` is
+-- the name of the jump button on this device.
+function RivalText.struggle(button: string): string
+	return "Holding the rival — tap " .. button .. " to keep your grip"
+end
+
+-- The notice for the rival tearing free: it never harms the player, and the gentle modes say so.
+function RivalText.tore(gentle: boolean): string
+	return if gentle then RivalText.TORE_GENTLE else RivalText.TORE
 end
 
 -- The notice for a strike's outcome event ("captured", "sprang", "counter"), or nil for any other event.

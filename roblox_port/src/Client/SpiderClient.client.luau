@@ -133,8 +133,9 @@ local detail = Detail.choose(UIS.TouchEnabled and not UIS.KeyboardEnabled, Works
 -- Which spider: the Player attribute Appearance (kept for the session), else the Workspace attribute Appearance, else the first spider.
 local appearance = SpiderChoice.start(player:GetAttribute("Appearance"), Workspace:GetAttribute("Appearance"))
 local rig = SpiderRig.new(Workspace, sill, appearance, detail)
--- The rival's legs (ROBLOX-69): its own SpiderMotor over the whole sill, made when it first arrives, and its drawn rig; its words (ROBLOX-73). One table: the client is at Luau's limit of 200 locals.
-local rivalLegs: any = { drive = nil, rig = nil, Drive = require(Shared.Predator.RivalDrive), Text = require(Shared.UI.RivalText) }
+-- The rival's legs (ROBLOX-69): its own SpiderMotor over the whole sill, made when it first arrives, and its drawn rig; its words (ROBLOX-73); its grip once
+-- caught (ROBLOX-77, `grip` made below with the reserves). One table: the client is at Luau's limit of 200 locals.
+local rivalLegs: any = { drive = nil, rig = nil, Drive = require(Shared.Predator.RivalDrive), Text = require(Shared.UI.RivalText), Grip = require(Shared.Predator.RivalGrip), grip = nil }
 local dance = PeacockDance.new() -- the peacock spider's courtship dance (a pose for the rig; nothing else reads it)
 local dancePose: any = nil
 -- The ant-mimicking spider's antennae and drawn walk (a pose for the rig; nothing else reads it): the modules, the state, its latest pose, and where
@@ -177,7 +178,8 @@ local waspBody = WaspBody.new(Workspace)
 local needs = NeedsModel.new(true, false)
 needs.drainScale=NeedsModel.PLAY_DRAIN
 prey.feeding.needs = needs
-prey.feeding:useGameRules() -- an easier tap on a struggling fly (ROBLOX-72, Data/Catch.game); Godot's numbers stay Feeding's defaults
+prey.feeding:useGameRules() -- an easier tap on a struggling fly (ROBLOX-72, Data/Catch.game), scaled by the prey's size (ROBLOX-77); Godot's numbers stay Feeding's defaults
+rivalLegs.grip = rivalLegs.Grip.new(needs) -- the grip on a caught rival (ROBLOX-77): its own controller, so the fly's is never disturbed
 local life = LifeLoop.new(needs, nil)
 -- The mud dauber wasp (ROBLOX-26): a port of Godot's wasp director (Shared/Predator/WaspDirector). It visits by day from the second day (twice a day in the
 -- game, ROBLOX-75), once the first meal is eaten, and not while the spider rests; it is heard (a caption with its direction) for 8 s before it can look.
@@ -447,7 +449,7 @@ end
 function spiderPick.safe(): boolean
 	return SpiderChoice.safeToChange({
 		mode = motor.mode, seized = motor.seized, preparing = motor.preparing, jumping = jump:isBusy(), onLine = motor:onLine(),
-		moulting = life.growth:isMoulting(), struggling = prey.feeding.struggling,
+		moulting = life.growth:isMoulting(), struggling = prey.feeding.struggling or rivalLegs.Grip.active(rivalLegs.grip),
 	})
 end
 function spiderPick.fromSettings(id: any): string?
@@ -839,7 +841,11 @@ controls = SpiderInput.bind({
 	end,
 	jump = function(phase: string)
   if life.growth:isMoulting() then return end
-		if phase == "begin" and prey.feeding.struggling then prey.feeding:press(); gripPress=true; return end
+		if phase == "begin" and (prey.feeding.struggling or rivalLegs.Grip.active(rivalLegs.grip)) then
+			if prey.feeding.struggling then prey.feeding:press() end
+			if rivalLegs.Grip.active(rivalLegs.grip) then rivalLegs.Grip.tap(rivalLegs.grip) end -- the same button grips a caught rival (ROBLOX-77)
+			gripPress=true; return
+		end
 		if gripPress then if phase ~= "begin" then gripPress=false end; return end
 		if phase == "begin" then
 			ant.stopDisplay() -- a jump (a hop or an aim) ends the dance or the raised antennae
@@ -978,8 +984,9 @@ local function updateHud(frameDt: number)
 	if (wasp.phase == "taking" or wasp.phase == "seizing" or wasp.phase == "bearing")
 		and not WaspText.heardRival((motor.pos - wasp.wasp.position).Magnitude, not sightCast(motor.pos, wasp.wasp.position)) then waspLine = nil end
 	if waspLine then table.insert(view.status, waspLine) end
- if life.rival and life.rival.state=="captured" then table.insert(view.status,"Eating rival — stay still (2 meals)") end
-	view.grip = if prey.feeding.struggling then prey.feeding.grip else nil
+ if life.rival and life.rival.state=="captured" and not RivalSpider.struggling(life.rival) then table.insert(view.status,"Eating rival — stay still (2 meals)") end
+	view.grip = if prey.feeding.struggling then prey.feeding.grip else rivalLegs.Grip.level(rivalLegs.grip)
+	if rivalLegs.Grip.active(rivalLegs.grip) then table.insert(view.status, rivalLegs.Text.struggle(ControlText.name(device,"jump"))) end
 	if prey.feeding.struggling then
 		table.insert(view.status, "Caught — tap " .. ControlText.name(device,"jump") .. " to keep your grip")
 	elseif prey.feeding.feeding then table.insert(view.status, "Feeding — move to stop")
@@ -1034,7 +1041,7 @@ local function updateHud(frameDt: number)
 	local restLabel = LifeText.touchLabel(life.asleep, life.resting, canRest, clock:isSleepTime() and not life:tooHungryToSleep())
 	controls:setTouchVisible("Feed", (prey.feeding.held ~= nil or restLabel ~= nil) and not life.growth:isMoulting())
 	controls:setTouchLabel("Feed", if prey.feeding.held ~= nil then "Eat" else restLabel or "Eat")
-	controls:setTouchLabel("Jump", if prey.feeding.struggling then "Grip" else "Jump")
+	controls:setTouchLabel("Jump", if prey.feeding.struggling or rivalLegs.Grip.active(rivalLegs.grip) then "Grip" else "Jump")
 	controls:setTouchLabel("Cancel", ControlText.touchCancelLabel(onLine))
 	controls:setTouchVisible("Jump", not onLine)
 	controls:setTouchVisible("Creep", not onLine)
@@ -1116,6 +1123,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			if wasp.rivalHeldAt and life.rival.state == "taken" then life.rival.position = wasp.rivalHeldAt end
 			if wasp.heldAt then motor:hold(wasp.heldAt) end
 			prey.feeding.auto = setting("AutomaticGrip") == true
+			if prey.feeding.game ~= true then prey.feeding:useGameRules() end -- (a record restored from before the flag has none: the game's struggle again)
 			local takenBefore = prey.feeding.taken
 			prey:after(DT,motor,sensor,sightCast)
 			-- Three houseflies or six small prey; credit food, not just spare energy capacity.
@@ -1136,6 +1144,12 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
               boundsMin = Layout.PLAY_BOUNDS_MIN, boundsMax = Layout.PLAY_BOUNDS_MAX, probeParent = arc,
              }),sightCast)
             end
+            -- A caught rival fights the tapping grip before it can be eaten (ROBLOX-77); it is subdued, or it tears free and recovers (never a harm).
+            local gripEvent=rivalLegs.Grip.step(rivalLegs.grip,life.rival,DT,{
+             grounded=motor.mode=="attached" and not motor.preparing,gentle=needs.gentle,auto=setting("AutomaticGrip")==true,seed=914,day=life.clock.day,
+            })
+            if gripEvent=="subdued" then life:showNotice(rivalLegs.Text.SUBDUED)
+            elseif gripEvent=="tore" then life:showNotice(rivalLegs.Text.tore(needs.gentle)) end
             if rivalLegs.drive then rivalLegs.drive:update(life.rival,DT,rivalState) end
             if rivalFood>0 and rivalEvent~="counter" then -- (a counter-bite's number is what it costs, not what was eaten)
              needs:grantEnergy(rivalFood,"rival_spider_meal")

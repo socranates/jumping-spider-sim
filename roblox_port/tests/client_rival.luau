@@ -135,5 +135,98 @@ check("striking a rival that has seen the spider is a contest (ROBLOX-73): each 
 	life.rival.state, life.rival.contests, life.rival.spared, life.rival.food = "patrol", 0, nil, Rival.FOOD
 	needs.energy = 0.8
 end)
+check("a caught rival is a hard meal (ROBLOX-77): the Grip button and the grip bar work for it, it can be subdued and then eaten, or tear free to recover; gentle says it is safe", function()
+	local driver = ClientStubs.driver
+	local life, needs, prey = driver.life, driver.needs, driver.prey
+	local Rival = require("../src/Shared/Predator/RivalSpider")
+	local RivalText = require("../src/Shared/UI/RivalText")
+	local Grip = require("../src/Shared/Predator/RivalGrip")
+	local KEY = { Jump = "Space" }
+	local function key(action: string, down: boolean)
+		local fn = services.actions["Spider" .. action]
+		fn("Spider" .. action, if down then Enum.UserInputState.Begin else Enum.UserInputState.End,
+			{ KeyCode = Enum.KeyCode[KEY[action] or action], UserInputType = Enum.UserInputType.Keyboard, Position = Vector3.zero })
+	end
+	local function find(screen: string, name: string): any
+		local g = gui:FindFirstChild(screen)
+		for _, d in g:GetDescendants() do if d.Name == name then return d end end
+		return nil
+	end
+	driver.place(Vector3.new(-5, 0.31, -9))
+	frames(5)
+	life.clock.hour = 9
+	-- A rival of today that has not noticed the spider, caught by one strike (no draw); returns the rival.
+	local function catch(): any
+		local r = life.rival
+		r.state, r.elapsed, r.notice, r.contests, r.spared, r.food, r.subdued, r.day, r.fate = "patrol", 0, 0, 0, nil, Rival.FOOD, nil, nil, nil
+		r.position = driver.motor.pos + Vector3.new(0.2, 0, 0)
+		r.previous = r.position
+		life.notice, life.noticeSeconds = "", 0
+		prey.strikeEnd = prey.tick + 1
+		frames(1)
+		return r
+	end
+	local function status(): string return find("SpiderPrompts", "Status").Text end
+	needs.energy, needs.gentle = 0.2, false
+	local r = catch()
+	local home = driver.motor.pos
+	assert(r.state == "captured" and r.subdued == false and Rival.struggling(r), `caught: {r.state}`)
+	assert(life.notice == RivalText.CAPTURED, `the catch line: "{life.notice}"`)
+	frames(3)
+	assert(Grip.active(driver.rivalLegs.grip), "the grip is on")
+	assert(string.find(status(), "Holding the rival — tap Space to keep your grip", 1, true), `the status line: "{status()}"`)
+	assert(not string.find(status(), "Eating rival", 1, true), "it is not being eaten yet")
+	assert(find("SpiderPrompts", "GripBar").Visible == true, "the grip bar shows for the rival")
+	local gripFill = find("SpiderPrompts", "Grip")
+	assert(gripFill.Size.X.Scale > 0 and gripFill.Size.X.Scale < 1, `the bar shows the grip ({gripFill.Size.X.Scale})`)
+	-- Taps, about 5.5 a second: the jump button is the grip (the spider does not aim or leap), nothing is eaten, and in a few seconds it is subdued.
+	local frameCount = 0
+	while r.subdued == false and frameCount < 60 * 20 do
+		if frameCount % 11 == 0 then key("Jump", true); frames(1); key("Jump", false) else frames(1) end
+		frameCount += 1
+		assert(r.state == "captured", `the rival left the jaws at frame {frameCount}: {r.state}`)
+		assert(r.food == Rival.FOOD, "nothing is eaten while it fights")
+		assert(not driver.jump:isBusy(), "a tap grips; it does not start a jump")
+	end
+	assert(r.subdued == true, "the tapping did not subdue the rival")
+	assert((driver.motor.pos - home).Magnitude < 0.05, "the spider leapt while gripping")
+	frames(1)
+	assert(life.notice == RivalText.SUBDUED, `the subdued line: "{life.notice}"`)
+	assert(find("SpiderPrompts", "GripBar").Visible == false, "the bar is gone once it is subdued")
+	assert(string.find(status(), "Eating rival", 1, true), `the status line: "{status()}"`)
+	-- Eaten, standing still: five seconds, 0.7 of food, the meal counted.
+	local meals, e0 = prey.feeding.mealsFinished, needs.energy
+	frames(60 * 6)
+	assert(r.state == "consumed" and r.fate == "eaten" and prey.feeding.mealsFinished == meals + 1, `eaten: {r.state}`)
+	assert(math.abs(needs.energy - e0 - 0.7) < 0.03, `0.7 of food (energy {e0} to {needs.energy})`)
+	-- The next morning another; with no taps it tears free: recover, nothing lost, nothing harmed, the same rival.
+	life.clock.day += 1
+	life.clock.hour = 8
+	frames(10)
+	assert(life.rival.state == "patrol", `a new rival: {life.rival.state}`)
+	needs.energy = 0.5
+	r = catch()
+	assert(r.state == "captured" and r.subdued == false, "caught again")
+	local waited = 0
+	while r.state == "captured" and waited < 60 * 6 do frames(1); waited += 1 end
+	assert(r.state == "recover" and waited > 60 and waited < 60 * 4, `no taps: it tore free to recover after {waited / 60} s ({r.state})`)
+	assert(r.subdued == nil and r.food == Rival.FOOD and r.day == nil and r.fate == nil, "and it is still a whole rival with its day")
+	assert(life.notice == RivalText.TORE, `the tore-free line: "{life.notice}"`)
+	assert(not Grip.active(driver.rivalLegs.grip) and find("SpiderPrompts", "GripBar").Visible == false, "the grip is gone")
+	assert(life.cause == nil and math.abs(needs.energy - 0.5) < 0.03, "nothing harmed the spider")
+	assert(workspace:FindFirstChild("RivalSpider") ~= nil, "and it is drawn again where it stands")
+	-- Gentle: it is the house fly's struggle, and the line says it is safe.
+	needs.gentle = true
+	r = catch()
+	waited = 0
+	while r.state == "captured" and waited < 60 * 6 do frames(1); waited += 1 end
+	assert(r.state == "recover" and waited < 60 * 2, `gentle, no taps: it tore free after {waited / 60} s ({r.state})`)
+	assert(life.notice == RivalText.TORE_GENTLE, `the gentle tore-free line: "{life.notice}"`)
+	assert(life.cause == nil, "and the spider is safe")
+	needs.gentle = false
+	-- Leave it as the other checks expect.
+	needs.energy = 0.8
+	life.rival.state, life.rival.contests, life.rival.subdued = "patrol", 0, nil
+end)
 print("CLIENT_RIVAL passed=" .. passed .. " failed=" .. failed)
 if failed > 0 then error("CLIENT_RIVAL failed") end

@@ -116,7 +116,9 @@ function Checkpoint.boundaryProblem(world: World): string
 	local motor, prey = world.motor, world.prey
 	if motor.mode ~= "attached" or motor.preparing then return "the spider is not standing on a surface" end
 	if motor.vel.Magnitude > Checkpoint.STILL_SPEED then return "the spider is moving" end
-	if world.life.rival and world.life.rival.state=="captured" then return "the spider is eating its rival" end
+	if world.life.rival and world.life.rival.state=="captured" then
+		return if world.life.rival.subdued == false then "the rival in the jaws is still struggling" else "the spider is eating its rival"
+	end
 	if prey.feeding.feeding then return "the spider is feeding" end
 	if prey.feeding.struggling then return "the prey in the jaws is still struggling" end
 	if prey.tick <= prey.strikeEnd then return "a strike is still in progress" end

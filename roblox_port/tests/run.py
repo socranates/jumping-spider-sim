@@ -106,6 +106,7 @@ MODULES = [
     ("PreyPopulation", "Prey/PreyPopulation.luau"),
     ("Catch", "Data/Catch.luau"),
     ("Feeding", "Prey/Feeding.luau"),
+    ("RivalGrip", "Predator/RivalGrip.luau"),
     ("PreyDirector", "Prey/PreyDirector.luau"),
     ("TestTarget", "Habitat/TestTarget.luau"),
     ("FocusState", "Movement/FocusState.luau"),

@@ -4,6 +4,9 @@
 -- Plain state lives in LifeLoop's checkpoint graph; no clock, engine instance or hidden player tracking.
 -- ROBLOX-73: the spider's strike catches a rival that has not seen it coming outright, but a rival that has (stalking, winding up, or patrolling
 -- with a notice of Rules.awareNotice) is a contest: caught, sprang clear, or a counter-bite that costs energy. The draw is the rival's own stream.
+-- ROBLOX-77: a rival that was caught is held but not yet eaten: it struggles (`subdued` false) until the player has subdued it with the tapping
+-- grip (Predator/RivalGrip runs that; Rival.subdue marks it) or it tears free (Rival.tearFree: back to recover, its day kept). Only a subdued rival
+-- is eaten. A held rival with no `subdued` at all (a record from before) is eaten as it always was.
 local M=require(script.Parent.Parent.Prey.PreyMath)
 local PreyRandom=require(script.Parent.Parent.Prey.PreyRandom)
 local Rules=require(script.Parent.Parent.Data.RivalRules)
@@ -32,11 +35,27 @@ function Rival.contest(seed: number,day: number,n: number): string
  if u<Rules.contestCaptured+Rules.contestSprang then return "sprang" end
  return "counter"
 end
+-- The player has the caught rival subdued: it can now be eaten (stay still).
+function Rival.subdue(r: any): boolean
+ if r==nil or r.state~="captured" then return false end
+ r.subdued=true;return true
+end
+-- The caught rival tore free of the fangs (ROBLOX-77): it is simply gone from them and recovers where it stands, with its day, its food and its
+-- contest count as they were; not a contest and no new rival.
+function Rival.tearFree(r: any): boolean
+ if r==nil or r.state~="captured" then return false end
+ phase(r,"recover");r.notice=0;r.subdued=nil;return true
+end
+-- Held and still fighting the player's grip (a held rival with no `subdued`, as in an older record, is not).
+function Rival.struggling(r: any): boolean
+ return r~=nil and r.state=="captured" and r.subdued==false
+end
 -- The next rival, in the same table (the world holds this table): a fresh one that has not yet arrived.
 function Rival.renew(r: any)
  for k,v in Rival.new() do r[k]=v end
  r.day=nil
  r.fate=nil
+ r.subdued=nil
 end
 -- Where the wasp may take it from (ROBLOX-70): nil unless it is on the sill, awake and free; never in the retreat.
 function Rival.target(r: any): any
@@ -69,6 +88,7 @@ function Rival.valid(r: any): boolean
  if r.leg~=nil and (type(r.leg)~="number" or r.leg~=r.leg or r.leg<0 or r.leg>1e9 or r.leg%1~=0) then return false end
  if r.contests~=nil and (type(r.contests)~="number" or r.contests~=r.contests or r.contests<0 or r.contests>1e9 or r.contests%1~=0) then return false end
  if r.spared~=nil and type(r.spared)~="boolean" then return false end
+ if r.subdued~=nil and type(r.subdued)~="boolean" then return false end
  if r.fate~=nil and r.fate~="eaten" and r.fate~="taken by the wasp" then return false end
  if r.state=="patrol" or r.state=="stalk" or r.state=="windup" or r.state=="lunge" or r.state=="recover" then
   local p,lo,hi=r.position,Layout.PLAY_BOUNDS_MIN,Layout.PLAY_BOUNDS_MAX
@@ -100,6 +120,7 @@ function Rival.step(r: any,dt: number,s: any,blocked: (Vector3,Vector3)->any): (
  end
  if r.state=="captured" then
   r.position=s.position+s.heading*.4;r.heading=s.heading
+  if r.subdued==false then return "struggling",0 end -- fighting the grip: nothing is eaten and no time passes toward it
   if not s.grounded or s.moving then return "paused",0 end
   local food=math.min(r.food,.14*dt);r.food=math.max(0,r.food-food)
   if r.food<=1e-8 then r.food=0;r.day=s.day;r.fate="eaten";phase(r,"consumed");return "eaten",food end
@@ -129,7 +150,7 @@ function Rival.step(r: any,dt: number,s: any,blocked: (Vector3,Vector3)->any): (
     outcome=Rival.contest(s.seed or 0,s.day or 0,r.contests or 0)
     r.contests=(r.contests or 0)+1
    end
-   if outcome=="captured" then phase(r,"captured");return "captured",0 end
+   if outcome=="captured" then phase(r,"captured");r.subdued=false;return "captured",0 end
    -- It got away from this strike: it recovers, and the rest of the same strike cannot catch it (the next one, a recovering rival, can).
    phase(r,"recover");r.spared=true
    if outcome=="counter" then return "counter",if s.gentle then 0 else Rules.counterCost end

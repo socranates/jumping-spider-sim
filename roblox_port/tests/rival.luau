@@ -1,4 +1,5 @@
 local R=require("../src/Shared/Predator/RivalSpider")
+local Species=require("../src/Shared/Data/Species")
 local Needs=require("../src/Shared/Life/NeedsModel")
 local passed,failed=0,0
 local function check(ok,msg) if ok then passed+=1 else failed+=1;print("FAIL rival: "..msg) end end
@@ -7,6 +8,20 @@ local function player()
  hour=12,resting=false,safe=false,wasp=false,gentle=false,grounded=true,moving=false,airborne=false,onLine=false,holding=false,striking=false}
 end
 local clear=function() return false end
+local Grip=require("../src/Shared/Predator/RivalGrip")
+-- Fights a held rival the way the client does each tick (the rival's step, then the grip's) with a tap every 1/rate s from `start` s: the outcome
+-- ("subdued", "tore" or "timeout") and the seconds it took. rate 0 is no taps at all. `g` is the grip, if the caller keeps one.
+local function fight(r,s,rate,limit,start,g)
+ g=g or Grip.new();local t,nextTap=0,start or .2
+ for _=1,math.floor((limit or 40)*60) do
+  t+=1/60
+  R.step(r,1/60,s,clear)
+  if rate>0 and t>=nextTap then Grip.tap(g);nextTap+=1/rate end
+  local e=Grip.step(g,r,1/60,s)
+  if e=="subdued" or e=="tore" then return e,t end
+ end
+ return "timeout",t
+end
 local r=R.new();local s=player()
 s.day=1;R.step(r,1/60,s,clear);check(r.state=="dormant","no rival on first day")
 s.day=2;s.meals=0;R.step(r,1/60,s,clear);check(r.state=="dormant","first meal protected")
@@ -28,7 +43,9 @@ for _=1,120 do local event=R.step(r,1/60,s,clear);if event=="caught" then caught
 check(caught,"unguarded player can be caught")
 r=R.new();r.state="patrol";s.position=r.position;s.previous=s.position;s.striking=true
 local event=R.step(r,1/60,s,clear);check(event=="captured","player jump catches rival")
-s.striking=false;s.moving=true
+check(r.subdued==false,"a caught rival is held but not yet subdued (ROBLOX-77)")
+s.striking=false;check(fight(r,s,5.5)=="subdued" and r.subdued==true,"and the player subdues it with the tapping grip before it is eaten")
+s.moving=true
 local _,food=R.step(r,1/60,s,clear);check(food==0 and r.food==R.FOOD,"walking pauses eating")
 s.moving=false;local total=0
 for _=1,360 do local _,n=R.step(r,1/60,s,clear);total+=n end
@@ -51,6 +68,7 @@ local function eat(r,s)
  r.position=s.position+Vector3.xAxis*.3;r.previous=r.position;r.state="patrol"
  s.striking=true;s.previous=s.position;local e=R.step(r,1/60,s,clear);s.striking=false
  if e~="captured" then return false end
+ if fight(r,s,5.5)~="subdued" then return false end
  for _=1,400 do R.step(r,1/60,s,clear) end
  return r.state=="consumed"
 end
@@ -246,9 +264,180 @@ do -- the cost goes through the needs model: 0.25, never below nothing, nothing 
  local before=m.grantedTotal;check(before==0,"(it is no meal: the ledger is untouched)")
 end
 do -- the words
- check(RivalText.CAPTURED=="Caught the rival. Stay still to eat; worth two housefly meals." and RivalText.SPRANG=="It sprang clear of your strike." and RivalText.COUNTER=="It bit back! Jump away!","the three lines")
+ check(RivalText.CAPTURED=="Caught the rival! It fights back. Tap to keep your grip." and RivalText.SPRANG=="It sprang clear of your strike." and RivalText.COUNTER=="It bit back! Jump away!","the three lines")
  check(RivalText.counter(false)==RivalText.COUNTER and string.find(RivalText.counter(true),"safe in this mode",1,true)~=nil and RivalText.counter(true)~=RivalText.counter(false),"gentle says you are safe")
  check(RivalText.strike("captured",false)==RivalText.CAPTURED and RivalText.strike("sprang",true)==RivalText.SPRANG and RivalText.strike("counter",true)==RivalText.COUNTER_GENTLE and RivalText.strike("warning",false)==nil,"each event has its line")
+end
+-- ---------------------------------------------------------------- a caught rival is a hard meal (ROBLOX-77)
+local Catch=require("../src/Shared/Data/Catch")
+local Feeding=require("../src/Shared/Prey/Feeding")
+-- A rival just caught on `day` by a strike at one that had not noticed (no draw): the rival and the spider's state, ready to fight.
+local function held(day,gentle)
+ local r=R.new();r.state="patrol";r.position=Vector3.new(24,.31,8);r.previous=r.position
+ local s=strike(r,day,gentle);s.seed=914
+ assert(R.step(r,1/60,s,clear)=="captured")
+ s.striking=false;s.previous=s.position
+ return r,s
+end
+do -- the numbers, pinned: its own, not the fly's scaled
+ local k=Catch.rival
+ check(k.startGrip==.6 and k.tapGain==.085 and k.jerkScale==.8 and k.drainScale==.5 and k.tire==.25 and k.cap==math.huge,"the rival's numbers: grip 0.6, a tap 0.085, drain x0.5, jerks 0.8, tires to 0.75, no cap")
+ check(k.tapGain<Catch.game.tapGain,"a tap is worth less than a house fly's (0.12)")
+ local full,gentle=Catch.forRival(false),Catch.forRival(true)
+ check(full.startGrip==.6 and full.cap==math.huge and gentle.cap==math.huge,"neither has a cap: it is never subdued by waiting")
+ check(gentle.tapGain==Catch.game.tapGain and gentle.jerkScale==Catch.game.jerkScale and gentle.startGrip==Catch.game.startGrip and gentle.drainScale==1 and gentle.tire==.5,"gentle is the house fly's struggle")
+ local f=Feeding.new();f:useRivalRules(false);check(f.tapGain==.085 and f.cap==math.huge and f.game==false,"a controller given the rival's rules has them")
+end
+do -- held: a caught rival is not eaten until it is subdued; no time runs toward the meal while it fights
+ local r,s=held(5)
+ check(r.state=="captured" and r.subdued==false and R.struggling(r) and R.valid(r),"caught: held, not subdued, a good record")
+ local g=Grip.new()
+ local events={}
+ for i=1,100 do
+  local e,food=R.step(r,1/60,s,clear);events[e]=true
+  check(food==0 and r.food==R.FOOD,"nothing is eaten while it fights")
+  local ge=Grip.step(g,r,1/60,s);events[ge]=true
+  if ge~="" and ge~="begin" then break end
+ end
+ check(events.struggling and events.begin,"it struggles (the sim says so) and the grip begins once")
+ check(Grip.active(g) or r.state~="captured","(and the grip is active while the rival is held)")
+ r.food=R.FOOD
+end
+do -- subdued: the same tapping, then eaten as before (stay still, 0.7, "eaten", the day kept)
+ local r,s=held(6)
+ local out,t=fight(r,s,5.5,20)
+ check(out=="subdued" and r.state=="captured" and r.subdued==true and not R.struggling(r),`steady 5.5 taps a second subdues it ({t} s)`)
+ check(r.food==R.FOOD,"nothing eaten yet at the moment it is subdued")
+ s.moving=true;local _,f0=R.step(r,1/60,s,clear);check(f0==0,"walking pauses eating, as before")
+ s.moving=false;local total,ticks,last=0,0,""
+ for _=1,600 do local e,n=R.step(r,1/60,s,clear);total+=n;ticks+=1;if e~="feeding" then last=e;break end end
+ check(last=="eaten" and math.abs(total-.7)<1e-8 and r.state=="consumed" and r.fate=="eaten" and r.day==6,`eaten: exactly 0.7 once, fate eaten, day kept`)
+ check(math.abs(ticks/60-5)<.05,`and the five seconds of eating start only after it is subdued ({ticks/60} s)`)
+ check(R.subdue(r)==false and R.tearFree(r)==false and not R.struggling(r),"a consumed rival cannot be subdued or torn free")
+end
+do -- the feel (60 rivals, taps evenly spaced from 0.2 s, standard rules)
+ local function stats(rate,gentle,limit,start,auto)
+  local won,lost,tw,tl,lo,hi,top=0,0,0,0,math.huge,0,0
+  for day=2,61 do
+   local r,s=held(day,gentle);s.auto=auto
+   local out,t=fight(r,s,rate,limit or 40,start)
+   if out=="subdued" then won+=1;tw+=t;lo=math.min(lo,t);hi=math.max(hi,t) elseif out=="tore" then lost+=1;tl+=t;top=math.max(top,t) end
+  end
+  return won,lost,if won>0 then tw/won else 0,if lost>0 then tl/lost else 0,lo,hi,top
+ end
+ local w0,l0,_,t0=stats(0,false)
+ check(w0==0 and l0==60 and t0>=1.7 and t0<=2.4,`no taps: it tears free every time, after {t0} s on average (about 2 s; the house fly 1.1 s)`)
+ local w2,l2=stats(2,false);local w3,l3=stats(3,false)
+ check(w2==0 and l2==60 and w3==0,`2 taps a second tear free every time (won {w2}, lost {l2}) and 3 never subdue it in 40 s (won {w3}, tore free {l3}, the rest still holding on)`)
+ local w4,l4,t4,_,lo4,hi4=stats(4,false)
+ check(w4==60 and l4==0 and lo4>=5.2 and hi4<=9.7 and t4>=6.3 and t4<=8.3,`4 a second wins every time in {lo4} to {hi4} s (mean {t4})`)
+ local w5,l5,t5=stats(5,false);local w6,_,t6=stats(6,false)
+ check(w5==60 and w6==60 and t5<t4 and t6<t5 and t6<3,`5 and 6 a second win sooner ({t5} s, {t6} s)`)
+ local wl,ll=stats(4,false,40,.5)
+ check(wl==60 and ll==0,`a first tap as late as 0.5 s still wins at 4 a second (won {wl})`)
+ -- a lapse costs: a one-second pause at three seconds delays the win by several seconds; a three-second pause loses it
+ local function lapse(len,at)
+  local won,lost,tw=0,0,0
+  for day=2,61 do
+   local r,s=held(day,false);local g=Grip.new();local t,nextTap=0,.2
+   for _=1,40*60 do
+    t+=1/60;R.step(r,1/60,s,clear)
+    if t>=nextTap then if not (t>=at and t<at+len) then Grip.tap(g) end;nextTap+=1/4 end
+    local e=Grip.step(g,r,1/60,s)
+    if e=="subdued" then won+=1;tw+=t;break elseif e=="tore" then lost+=1;break end
+   end
+  end
+  return won,lost,if won>0 then tw/won else 0
+ end
+ local lw,ll1,lt=lapse(1,3);check(lw==60 and lt>t4+2,`a one-second lapse at 3 s costs {lt-t4} s more (won {lw})`)
+ local _,l3s=lapse(3,3);check(l3s==60,`a three-second lapse loses it every time (lost {l3s})`)
+ -- the house fly for comparison, same taps, same limit: the rival needs more
+ local hf=0
+ for day=2,61 do local r,s=held(day,true);if fight(r,s,3,40)=="subdued" then hf+=1 end end
+ check(hf==60,`(the gentle rival is the house fly's struggle: 3 taps a second win it every time, {hf} of 60)`)
+ -- gentle: the house fly's struggle, no cap
+ local gw0,gl0,_,gt0=stats(0,true)
+ check(gw0==0 and gl0==60 and gt0>=1.0 and gt0<=1.45,`gentle, no taps: it tears free after {gt0} s (the fly's)`)
+ local gw4,_,gt4=stats(4,true)
+ check(gw4==60 and gt4<t4,`gentle 4 a second wins sooner than standard ({gt4} s against {t4} s)`)
+ -- automatic grip needs no taps in either
+ local aw,al,at=stats(0,false,40,nil,true);local gaw=stats(0,true,40,nil,true)
+ check(aw==60 and gaw==60,`automatic grip subdues it with no taps (standard {aw}, gentle {gaw}; {at} s)`)
+ print(string.format("RIVAL feel: no taps tears free in %.2f s; 3 a second never wins; 4 a second wins in %.1f to %.1f s (mean %.1f); 5 in %.1f; 6 in %.1f; gentle idle %.2f s, gentle 4 in %.1f s, automatic grip alone %.1f s, a 1 s lapse at 3 s costs %.1f s",t0,lo4,hi4,t4,t5,t6,gt0,gt4,at,lt-t4))
+end
+do -- no cap: waiting never subdues it. A rival held for a minute with an occasional tap that cannot keep up is not subdued by the clock
+ local r,s=held(7);local g=Grip.new();local t,nextTap=0,.2
+ local out="timeout"
+ for _=1,60*90 do
+  t+=1/60;R.step(r,1/60,s,clear)
+  if t>=nextTap then Grip.tap(g);nextTap+=1/3.2 end -- barely enough to hold on without ever climbing
+  local e=Grip.step(g,r,1/60,s);if e=="subdued" or e=="tore" then out=e;break end
+ end
+ check(out~="timeout" or R.struggling(r),"a thin tapper never gets a free subdue")
+ local f=Feeding.new();f:useRivalRules(false);f:capture(r);f.elapsed=1000;f.grip=.3
+ f:struggle(1/60,true,function() end)
+ check(f.struggling==true and f.grip<1,"even after a very long time the clock subdues nothing (a fly's cap is 12 s)")
+ local fly=Feeding.new();fly:capture({profile=Species.fly_like_prototype,nutrition=.35,state="CAPTURED",captureKey="k"});fly.elapsed=13;fly.grip=.3
+ fly:step(1/60,true,false,function() end);check(fly.struggling==false and fly.note=="Subdued.","(the fly still is, at 12 s)")
+end
+do -- tearing free: simply gone from the fangs, to recover; nothing drawn, nothing lost, no early respawn, its day and its meal kept
+ local r,s=held(8);local c=r.contests
+ local out,t=fight(r,s,0,10)
+ check(out=="tore" and r.state=="recover" and r.subdued==nil and not R.struggling(r),`no taps: it tears free to recover after {t} s`)
+ check(r.contests==c and r.food==R.FOOD and r.day==nil and r.fate==nil and r.notice==0 and R.valid(r),"no new draw, still a whole rival with its meal, no day or fate, a good record")
+ -- it is not a free catch or a new rival: it goes on as one rival
+ local arrivals=0
+ s.hour=12
+ for _=1,60*4 do R.step(r,1/60,s,clear) end
+ check(r.state=="patrol" or r.state=="stalk" or r.state=="windup","three seconds on it patrols again")
+ s.day=9;s.hour=7.2;R.step(r,1/60,s,clear)
+ check(r.state~="dormant" and r.food==R.FOOD and r.contests==c,"the next morning it is the same rival (not renewed, not dormant)")
+ -- it can be caught again, and the second fight is its own
+ local r2,s2=held(8);fight(r2,s2,0,10)
+ r2.position=s2.position+Vector3.xAxis*.2;r2.previous=r2.position
+ s2.striking=true;s2.previous=s2.position
+ check(R.step(r2,1/60,s2,clear)=="captured" and R.struggling(r2),"a recovering rival can be caught again (recover is a free catch, ROBLOX-73), and it fights again")
+ -- tearing free never harms the spider: no event of harm, whatever the mode
+ for _,gentle in {false,true} do
+  local g1,g2=held(10,gentle)
+  local harmed=false
+  local grip=Grip.new()
+  for _=1,600 do
+   local e=R.step(g1,1/60,g2,clear);if e=="caught" or e=="touch" or e=="counter" then harmed=true end
+   local ge=Grip.step(grip,g1,1/60,g2);if ge=="tore" then break end
+  end
+  check(not harmed and g1.state=="recover",`tearing free harms nothing (gentle {tostring(gentle)})`)
+ end
+end
+do -- the same encounter fights the same way (a stream of its own from the world's seed, the day and the rival's contest count)
+ local a,sa=held(11);local b,sb=held(11)
+ local o1,t1=fight(a,sa,3.6,30);local o2,t2=fight(b,sb,3.6,30)
+ check(o1==o2 and t1==t2,"the same day and count: the same fight")
+ local diff=false
+ for day=12,30 do local c,sc=held(day);local _,tc=fight(c,sc,3.6,30);if tc~=t1 then diff=true end end
+ check(diff,"another day is another fight")
+end
+do -- records and old records
+ local r=R.new();r.state="captured";check(R.valid(r) and not R.struggling(r),"a held rival with no flag (an older record) is good and is eaten as it always was")
+ r.subdued=false;check(R.valid(r) and R.struggling(r),"a held, struggling rival is a good record")
+ for _,bad in {1,"yes",0} do local b=R.new();b.state="captured";b.subdued=bad;check(not R.valid(b),`a subdued of {tostring(bad)} is refused`) end
+ local used=R.new();used.state="consumed";used.subdued=true;R.renew(used);check(used.subdued==nil and used.state=="dormant","a new rival has no flag")
+ -- an old captured record: eaten without a fight
+ local o=R.new();o.state="captured";local s=player();s.position=Vector3.new(24,.31,8);s.previous=s.position
+ local total=0
+ for _=1,400 do local _,n=R.step(o,1/60,s,clear);total+=n end
+ check(math.abs(total-.7)<1e-8 and o.state=="consumed","an older held rival is eaten with no struggle")
+ -- a restored held-and-fighting record has no grip behind it: whoever finds it begins a fresh one (the grip is scratch, never recorded)
+ local rec=R.new();rec.state="captured";rec.subdued=false;local s2=player();local g=Grip.new()
+ check(Grip.step(g,rec,1/60,s2)=="begin" and Grip.active(g),"a held rival not yet subdued begins a fresh grip")
+ rec.state="patrol";rec.subdued=nil
+ check(Grip.step(g,rec,1/60,s2)=="" and not Grip.active(g),"and the grip lets go if the rival is no longer held")
+end
+do -- the words
+ check(string.find(RivalText.CAPTURED,"fights back",1,true)~=nil and string.find(RivalText.CAPTURED,"Tap",1,true)~=nil,"the catch line tells the player to tap")
+ check(string.find(RivalText.SUBDUED,"Stay still to eat",1,true)~=nil and string.find(RivalText.SUBDUED,"two housefly meals",1,true)~=nil,"the subdued line has the old eating words")
+ check(RivalText.tore(false)==RivalText.TORE and RivalText.tore(true)==RivalText.TORE_GENTLE and string.find(RivalText.TORE_GENTLE,"safe in this mode",1,true)~=nil,"tearing free: gentle says you are safe")
+ check(RivalText.struggle("Space")=="Holding the rival — tap Space to keep your grip","the status line has the fly's words for the rival")
 end
 print(`RIVAL passed={passed} failed={failed}`)
 if failed>0 then error("rival tests failed") end

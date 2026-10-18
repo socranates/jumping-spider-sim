@@ -492,6 +492,10 @@ return function(driver: any)
   driver.life.rival.notice=0 -- (it has not seen the spider coming: a strike at one that has is a contest, ROBLOX-73)
   driver.place(driver.life.rival.position);driver.prey.strikeEnd=driver.prey.tick+240
   wait(.2);assert(driver.life.rival.state=="captured","jump contact did not capture rival")
+  -- ROBLOX-77: a caught rival fights the tapping grip first; about 5.5 taps a second subdue it in a few seconds, then the five seconds of eating start.
+  assert(driver.life.rival.subdued==false,"a caught rival is held but not yet subdued")
+  for _=1,160 do if driver.life.rival.subdued then break end;driver.rivalLegs.Grip.tap(driver.rivalLegs.grip);wait(.18) end
+  assert(driver.life.rival.subdued==true,"tapping did not subdue the rival")
   wait(5.3);assert(driver.life.rival.state=="consumed","rival meal did not finish")
   assert(math.abs(driver.life.growth.fedSinceMoult-.6)<.001,"rival should count as two meals")
   local food=driver.needs.grantedFrom(driver.needs,"rival_spider_meal")

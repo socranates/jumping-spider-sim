@@ -676,5 +676,32 @@ case("the rival's contest (ROBLOX-73): its count is kept, a return to a rest giv
  local oldRec=assert(Checkpoint.capture(old,0))
  check(Checkpoint.restore(oldRec,old) and old.life.rival.state=="stalk" and (old.life.rival.contests or 0)==0,"an older record restores")
 end)
+case("the struggle with a caught rival (ROBLOX-77) is never recorded: no rest is taken while it is held, a return lands at the rest as always, and a held record is valid",function()
+ local Rival=require("../src/Shared/Predator/RivalSpider")
+ local Grip=require("../src/Shared/Predator/RivalGrip")
+ local w=newWorld();local r=Rival.new();r.state="patrol";r.position=Vector3.new(24,.31,8);r.previous=r.position;w.life.rival=r
+ local rest=assert(Checkpoint.capture(w,0))
+ -- caught: held and fighting
+ r.state,r.subdued="captured",false
+ check(Checkpoint.boundaryProblem(w)=="the rival in the jaws is still struggling","no rest while the rival fights the grip: "..Checkpoint.boundaryProblem(w))
+ r.subdued=true
+ check(Checkpoint.boundaryProblem(w)=="the spider is eating its rival","and none while it is eaten (as before): "..Checkpoint.boundaryProblem(w))
+ r.subdued=nil
+ check(Checkpoint.boundaryProblem(w)=="the spider is eating its rival","(a held rival from an older record is eaten)")
+ -- a return to the earlier rest: the rival is as it was at the rest, with no struggle left and a grip that has nothing to hold
+ r=w.life.rival;r.state,r.subdued="captured",false
+ local grip=Grip.new();local s={grounded=true,day=2,seed=914}
+ check(Grip.step(grip,r,1/60,s)=="begin" and Grip.active(grip),"(the fight is on)")
+ check(Checkpoint.restore(rest,w) and w.life.rival.state=="patrol" and w.life.rival.subdued==nil and Rival.valid(w.life.rival),"a return lands at the rest: the rival patrols, nothing struggles")
+ check(Grip.step(grip,w.life.rival,1/60,s)=="" and not Grip.active(grip),"and the old grip lets go of it")
+ -- a record that does hold a fighting rival (made by hand) is valid and restores; whoever finds it begins a fresh grip
+ local held=w.life.rival;held.state,held.subdued="captured",false
+ local rec=assert(Checkpoint.capture(w,0))
+ check(Checkpoint.restore(rec,w) and w.life.rival.state=="captured" and w.life.rival.subdued==false,"a held, fighting rival restores as it was")
+ check(Grip.step(Grip.new(),w.life.rival,1/60,s)=="begin","and a fresh grip begins on it")
+ held=w.life.rival;held.subdued=1
+ local bad=assert(Checkpoint.capture(w,0))
+ check(not Checkpoint.restore(bad,w),"a subdued that is not true or false is refused")
+end)
 print(`CHECKPOINT passed={passed} failed={failed}`)
 if failed > 0 then error("CHECKPOINT failed") end

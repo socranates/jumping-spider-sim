@@ -10,6 +10,7 @@ local Motor = require("../src/Shared/Movement/SpiderMotor")
 local Route = require("../src/Shared/Predator/RivalRoute")
 local Drive = require("../src/Shared/Predator/RivalDrive")
 local Rival = require("../src/Shared/Predator/RivalSpider")
+local Grip = require("../src/Shared/Predator/RivalGrip")
 local Rules = require("../src/Shared/Data/RivalRules")
 
 local passed, failed = 0, 0
@@ -336,6 +337,22 @@ case("a wasp visit pauses it; the retreat shelters the spider; held where it was
 	check(event == "captured", "the spider's jump catches it")
 	s3.striking = false
 	local held = s3.position + s3.heading * 0.4
+	-- ROBLOX-77: it fights the tapping grip first (the drive keeps it in the jaws meanwhile), and only a subdued rival is eaten.
+	local grip, outcome, struggled = Grip.new(), "", 0.0
+	for i = 1, 60 * 30 do
+		local e = Rival.step(r3, DT, s3, function() return false end)
+		if e ~= "struggling" and outcome == "" then outcome = "ate before the fight ended" end
+		if i % 13 == 1 then Grip.tap(grip) end -- about 4.6 taps a second, from the first tick
+		Drive.update(d3, r3, DT, s3)
+		local ge = Grip.step(grip, r3, DT, s3)
+		struggled += DT
+		if ge == "subdued" or ge == "tore" then outcome = ge; break end
+		if (r3.position - held).Magnitude > 0.01 then
+			outcome = "left the jaws"
+			break
+		end
+	end
+	check(outcome == "subdued" and r3.food == Rival.FOOD and (r3.position - held).Magnitude < 0.01, `held in the jaws through a ~4.6-a-second fight of {struggled} s, nothing eaten until subdued ({outcome})`)
 	local food = 0.0
 	for _ = 1, 400 do
 		local _, n = Rival.step(r3, DT, s3, function() return false end)

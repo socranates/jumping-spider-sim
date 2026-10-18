@@ -221,11 +221,11 @@ check(not sees, "the dance object passes the setting on (no tremble)")
 check(Choice.start(nil, nil) == "first_spider" and Choice.start("nonsense", 5) == "first_spider", "no choice, or an unknown one, is the first spider")
 check(Choice.start("maratus_volans_male", nil) == "maratus_volans_male" and Choice.start(nil, "maratus_volans_male") == "maratus_volans_male", "the Player or Workspace attribute can preselect the peacock spider")
 check(Choice.start("first_spider", "maratus_volans_male") == "first_spider", "the Player's attribute (kept for the session) wins over the Workspace's")
-check(Choice.next("first_spider") == "maratus_volans_male" and Choice.next("maratus_volans_male") == "first_spider" and Choice.next("junk") == "first_spider", "C cycles between the two")
+check(Choice.next("first_spider") == "maratus_volans_male" and Choice.next("maratus_volans_male") == "myrmarachne_formicaria_female" and Choice.next("myrmarachne_formicaria_female") == "first_spider" and Choice.next("junk") == "first_spider", "C cycles first spider, peacock spider, ant-mimicking spider, and round again")
 check(Choice.canDance("maratus_volans_male") and not Choice.canDance("first_spider") and not Choice.canDance("junk"), "only the peacock spider has a dance")
 local allKnown = true
 for _, id in Choice.ORDER do allKnown = allKnown and Appearances.profiles[id] ~= nil end
-check(allKnown and #Choice.ORDER == 2 and Appearances.default == "first_spider", "both spiders are real appearances and the default is still the first")
+check(allKnown and #Choice.ORDER == 3 and Appearances.default == "first_spider" and Choice.ORDER[1] == "first_spider", "all three spiders are real appearances and the default is still the first")
 
 check(ControlText.name("keyboard", "choose") == "C" and ControlText.name("keyboard", "display") == "X", "keyboard: C changes spider, X dances")
 check(ControlText.name("gamepad", "choose") == "RB" and ControlText.name("gamepad", "display") == "RB" and ControlText.name("touch", "choose") == "Change" and ControlText.name("touch", "display") == "Dance", "controller RB, touch Change and Dance")
@@ -234,7 +234,7 @@ check(ControlText.name("gamepad", "choose") == "R1" and ControlText.name("gamepa
 check(Text.change("gamepad", "first_spider") == "R1: become the peacock spider" and Text.displayHint("gamepad", false) == "R1: courtship dance", "PlayStation words in the prompts")
 check(string.find(Text.helpExtra("gamepad", true), "R1 courtship dance", 1, true) ~= nil, "PlayStation words on the controls card")
 ControlText.setPadStyle("xbox")
-check(Text.change("keyboard", "first_spider") == "C: become the peacock spider" and Text.change("keyboard", "maratus_volans_male") == "C: become the first spider", "the crack's hint names the other spider")
+check(Text.change("keyboard", "first_spider") == "C: become the peacock spider" and Text.change("keyboard", "maratus_volans_male") == "C: become the ant-mimicking spider" and Text.change("keyboard", "myrmarachne_formicaria_female") == "C: become the first spider", "the crack's hint names the next spider")
 check(Text.change("touch", "first_spider") == "Change: become the peacock spider" and Text.touchChange() == "Change" and Text.touchDisplay(false) == "Dance" and Text.touchDisplay(true) == "Stop", "touch words")
 check(Text.displayHint("keyboard", false) == "X: courtship dance" and Text.displayHint("keyboard", true) == "X: stop dancing" and Text.dancingLine("keyboard") == "COURTSHIP DANCE    X or move: stop", "the dance's prompt and status line")
 check(Text.changed("maratus_volans_male") == "You are the peacock spider now" and Text.changed("first_spider") == "You are the first spider now", "the toast after a change")

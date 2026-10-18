@@ -19,11 +19,13 @@
 --   moult_ready, moulted, adult ... the life loop's events; adult when the moult reaches the adult stage
 --   hungry, well_fed, starving ... the reserve changes to at or under hungryAt, at or over wellFedAt, or to nothing (not on Easy)
 --   wasp, wasp_escaped, wasp_caught ... the director's visit_started, left (it had noticed the spider), caught
+--   antennae ....... the ant-mimicking spider has stood still with its antennae up for AntMimic.noticeSeconds (the client's pose says how long)
 -- Not wired: felt. It answers to Godot's vibration sense (a felt shake through touching surfaces), which the port does not have, so
 -- that page cannot open yet; the notebook never opens a page for something the game does not do.
 -- Checked in tests/notebook.luau.
 
 local Data = require(script.Parent.Parent.Data.NotebookPages)
+local AntMimic = require(script.Parent.Parent.Data.AntMimic)
 
 local NotebookWatch = {}
 NotebookWatch.__index = NotebookWatch
@@ -101,6 +103,14 @@ function NotebookWatch.onWasp(self: any, kind: string, escaped: boolean?)
 		end
 	elseif kind == "caught" then
 		self.book:notice("wasp_caught")
+	end
+end
+
+-- Each rendered frame while the ant-mimicking spider is being played: how long its antennae (legs I) have been fully up. Standing still long
+-- enough for the pose (AntMimic.noticeSeconds) is what opens the walking-like-an-ant page. The client calls this; nothing here reads the pose.
+function NotebookWatch.antennae(self: any, shownSeconds: number)
+	if shownSeconds >= AntMimic.noticeSeconds then
+		self.book:notice("antennae")
 	end
 end
 

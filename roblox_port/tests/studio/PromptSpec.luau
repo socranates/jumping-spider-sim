@@ -7,6 +7,7 @@ return function(check: (string, () -> ()) -> ())
 	local Shared = game:GetService("ReplicatedStorage"):WaitForChild("Shared")
 	local ControlText = require(Shared.UI.ControlText)
 	local PeacockText = require(Shared.UI.PeacockText)
+	local AntMimicText = require(Shared.UI.AntMimicText)
 	local HudLayout = require(Shared.UI.HudLayout)
 	local FONT = Enum.Font.GothamMedium
 	local devices: { any } = { "keyboard", "gamepad", "touch" }
@@ -28,14 +29,17 @@ return function(check: (string, () -> ()) -> ())
 	end)
 	check("the controls card fits a phone's width in landscape for every device", function()
 		for _, device in devices do
-			local s = size(ControlText.helpCard(device) .. PeacockText.helpExtra(device, true), 15, 568 - 32 - 20) -- with the peacock spider's two lines
-			assert(s.Y <= 10 * 15 * 1.35, `{device}: the card needs {s.Y} px`)
+			for _, kind in { "dance", "antennae" } do -- with the peacock spider's two lines, and with the ant mimic's
+				local s = size(ControlText.helpCard(device) .. PeacockText.helpExtra(device, kind), 15, 568 - 32 - 20)
+				assert(s.Y <= 10 * 15 * 1.35, `{device}: the card ({kind}) needs {s.Y} px`)
+			end
 		end
 	end)
 	check("touch buttons' words fit their buttons", function()
 		for _, b in HudLayout.TOUCH_BUTTONS do
 			local labels = { b.label }
 			if b.action == "Cancel" then labels = { ControlText.touchCancelLabel(false), ControlText.touchCancelLabel(true) } end
+			if b.action == "Display" then labels = { b.label, PeacockText.touchDisplay(true), AntMimicText.touchDisplay(false), AntMimicText.touchDisplay(true) } end
 			for _, label in labels do
 				local s = size(label, b.textSize or 18, b.size - 6)
 				assert(s.X <= b.size - 6 + 0.5 and s.Y <= b.size - 6, `{b.action}: "{label}" is {s.X}x{s.Y} in {b.size}`)

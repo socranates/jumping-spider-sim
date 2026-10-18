@@ -5,6 +5,11 @@
 -- checks the drawn spider; Studio is the judge of the look).
 local AntMimic = require("../src/Shared/Data/AntMimic")
 local Pose = require("../src/Shared/Rig/AntMimicPose")
+local Choice = require("../src/Shared/Rig/SpiderChoice")
+local Text = require("../src/Shared/UI/AntMimicText")
+local PeacockText = require("../src/Shared/UI/PeacockText")
+local ControlText = require("../src/Shared/UI/ControlText")
+local Appearances = require("../src/Shared/Data/Appearances")
 
 local passed, failed = 0, 0
 local function check(ok: boolean, what: string)
@@ -250,6 +255,27 @@ local rs = run(rStand, 1.5, 1 / 60, true, false)
 local maxWave = 0
 for _ = 1, 240 do maxWave = math.max(maxWave, rStand:step(1 / 60, true, false, 0).wave) end
 check(rs.antennae > 0.999 and maxWave == 0, "reduced motion stops the waving; the legs still go up")
+
+-- ---------------------------------------------------------------- choosing the spider, and the words
+local ANT = "myrmarachne_formicaria_female"
+check(Choice.start(ANT, nil) == ANT and Choice.start(nil, ANT) == ANT and Choice.start("first_spider", ANT) == "first_spider", "the Player or Workspace attribute can preselect the ant-mimicking spider")
+check(Choice.ORDER[1] == "first_spider" and Choice.ORDER[2] == "maratus_volans_male" and Choice.ORDER[3] == ANT and Choice.next(ANT) == "first_spider", "the crack's key goes first spider, peacock spider, ant mimic, first spider")
+check(Appearances.default == "first_spider" and Appearances.profiles[ANT] ~= nil and Appearances.profiles[ANT].id == ANT, "the default is still the first spider")
+check(Choice.hasAntennae(ANT) and not Choice.hasAntennae("first_spider") and not Choice.hasAntennae("maratus_volans_male") and not Choice.hasAntennae("junk"), "only the ant mimic has antennae")
+check(Choice.displayKind(ANT) == "antennae" and Choice.displayKind("maratus_volans_male") == "dance" and Choice.displayKind("first_spider") == nil and Choice.displayKind("junk") == nil, "the display key: antennae for the ant mimic, the dance for the peacock, nothing for the first spider")
+check(not Choice.canDance(ANT), "the ant mimic has no fan to dance with")
+check(PeacockText.NAMES[ANT] == "the ant-mimicking spider" and PeacockText.changed(ANT) == "You are the ant-mimicking spider now", "its name and the toast")
+check(PeacockText.change("keyboard", "maratus_volans_male") == "C: become the ant-mimicking spider" and PeacockText.change("keyboard", ANT) == "C: become the first spider", "the crack's hint names the next spider")
+check(Text.displayHint("keyboard", false) == "X: wave antennae" and Text.displayHint("keyboard", true) == "X: antennae down" and Text.statusLine("keyboard") == "ANTENNAE UP    X or move: stop", "the display key's words on a keyboard")
+ControlText.setPadStyle("playstation")
+check(Text.displayHint("gamepad", false) == "R1: wave antennae" and string.find(PeacockText.helpExtra("gamepad", "antennae"), "R1 wave antennae", 1, true) ~= nil, "PlayStation words")
+ControlText.setPadStyle("xbox")
+check(Text.displayHint("gamepad", false) == "RB: wave antennae" and Text.displayHint("touch", false) == "Wave: wave antennae" and Text.touchDisplay(false) == "Wave" and Text.touchDisplay(true) == "Stop", "controller and touch words")
+local card = PeacockText.helpExtra("keyboard", "antennae")
+check(string.find(card, "C change spider", 1, true) ~= nil and string.find(card, "wave antennae", 1, true) ~= nil and string.find(card, "courtship", 1, true) == nil, "the controls card has the crack's line and the antennae line, not the dance")
+check(string.find(PeacockText.helpExtra("keyboard", "dance"), "courtship", 1, true) ~= nil and string.find(PeacockText.helpExtra("keyboard", nil), "wave antennae", 1, true) == nil and string.find(PeacockText.helpExtra("keyboard", nil), "courtship", 1, true) == nil, "the peacock's card keeps the dance; the first spider's has neither")
+check(#card <= #PeacockText.helpExtra("keyboard", "dance") + 12 and #Text.helpLine("gamepad") < 90, "the card's new line is no longer than the peacock's")
+check(string.find(Text.STAND, "Stand still", 1, true) == 1, "the refusal says to stand still")
 
 print(`ANTMIMIC passed={passed} failed={failed}`)
 if failed > 0 then error("antmimic checks failed") end

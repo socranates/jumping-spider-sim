@@ -24,6 +24,8 @@ local SaveScheduler = require("../src/Shared/Persistence/SaveScheduler")
 local SaveSession = require("../src/Shared/Persistence/SaveSession")
 local DataStoreBackend = require("../src/Server/DataStoreBackend")
 local SaveService = require("../src/Server/SaveService")
+local Appearances = require("../src/Shared/Data/Appearances")
+local SpiderChoice = require("../src/Shared/Rig/SpiderChoice")
 
 local passed, failed = 0, 0
 local STATE_TRACE = false
@@ -388,6 +390,28 @@ case("progress: a good record is kept, anything out of range or of the wrong typ
 	c.notebook.opened = { "bold_jumper", "a_page_from_a_newer_build" }
 	_, cl = SaveProgress.sanitize(c)
 	check(cl ~= nil and #cl.notebook.opened == 2, "an unknown but well-formed page id is kept")
+end)
+
+case("progress: every spider the game draws is a good appearance, the ant-mimicking spider included (ROBLOX-54)", function()
+	for id in Appearances.profiles do
+		local good = prog({ "bold_jumper" }, { appearance = id })
+		local problems, clean = SaveProgress.sanitize(good)
+		check(#problems == 0 and clean ~= nil and clean.appearance == id, `the appearance {id} is accepted and kept`)
+		check(#id <= SaveRules.MAX_ID_CHARS and string.match(id, "^[%w_]+$") ~= nil, `{id} is a short plain name`)
+		check(SpiderChoice.start(clean and clean.appearance, nil) == id, `{id} is a spider the client puts on`)
+	end
+	local ant = "myrmarachne_formicaria_female"
+	check(Appearances.profiles[ant] ~= nil and table.find(SpiderChoice.ORDER, ant) ~= nil, "the ant-mimicking spider is drawn and in the crack's cycle")
+	check(SaveProgress.merge(prog({}, { appearance = "first_spider" }), prog({}, { appearance = ant }), 10, 20).appearance == ant, "the newer choice of the ant-mimicking spider wins a merge")
+	check(SaveProgress.merge(prog({}, { appearance = ant }), prog({}, { appearance = "maratus_volans_male" }), 30, 20).appearance == ant, "and an older one does not undo it")
+	-- A spider this build does not draw (from a newer build) is kept in the record, and the client falls back to the first spider.
+	local future = prog({ "bold_jumper" }, { appearance = "a_spider_from_a_newer_build" })
+	local _, kept = SaveProgress.sanitize(future)
+	check(kept ~= nil and kept.appearance == "a_spider_from_a_newer_build" and SpiderChoice.start(kept.appearance, nil) == "first_spider", "an unknown spider id is kept, and not put on")
+	local bad = Json.copy(prog({ "bold_jumper" }, { appearance = ant }))
+	bad.appearance = ant .. "/../x"
+	local p1, c1 = SaveProgress.sanitize(bad)
+	check(#p1 > 0 and c1 == nil, "an appearance that is not a plain name is refused")
 end)
 
 case("progress: merging never loses a page, an adult or the longest eye time; the newer choice wins", function()

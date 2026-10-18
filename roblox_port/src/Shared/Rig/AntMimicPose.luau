@@ -30,6 +30,8 @@ local function smooth(x: number): number
 	return c * c * (3 - 2 * c)
 end
 
+AntMimicPose.BODY_LENGTH = AntMimic.bodyLengthStuds -- the drawn body's length (studs) at full growth: a wavelength is ten of them
+
 AntMimicPose.NONE = { antennae = 0, high = 0, wave = 0, yaw = 0, lateral = 0, walking = false, shownSeconds = 0 } :: Pose
 
 export type State = typeof(setmetatable(

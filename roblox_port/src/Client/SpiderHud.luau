@@ -178,6 +178,10 @@ function Hud.new(playerGui: Instance): any
 	local grip = Instance.new("Frame")
  grip.Name="GripBar";grip.Size=UDim2.new(.65,0,0,12);grip.LayoutOrder=0;grip.BackgroundColor3=Color3.fromRGB(45,12,12);grip.Visible=false;grip.Parent=top
  local gripFill=Instance.new("Frame");gripFill.Name="Grip";gripFill.Size=UDim2.fromScale(.4,1);gripFill.BackgroundColor3=Color3.fromRGB(245,35,38);gripFill.BorderSizePixel=0;gripFill.Parent=grip
+ -- The courtship meter (ROBLOX-80): the grip bar's style in a warm colour, under it, shown only while a mate can be courted (view.court, 0 to 1).
+ local court = Instance.new("Frame")
+ court.Name="CourtshipBar";court.Size=UDim2.new(.65,0,0,12);court.LayoutOrder=0;court.BackgroundColor3=Color3.fromRGB(48,22,32);court.Visible=false;court.Parent=top
+ local courtFill=Instance.new("Frame");courtFill.Name="Courtship";courtFill.Size=UDim2.fromScale(0,1);courtFill.BackgroundColor3=Color3.fromRGB(226,128,164);courtFill.BorderSizePixel=0;courtFill.Parent=court
  local status = wrapLabel("Status", top, 16, 1)
 	-- The spider-eye view's explanation, the first time (ROBLOX-20): right under the status lines, in the column, so it never covers
 	-- the aim words or the prompts. Shown from view.caption = { text, alpha }.
@@ -225,7 +229,7 @@ function Hud.new(playerGui: Instance): any
 	local promptCue = wrapLabel("PromptCue", panel, 16, 3)
 	promptCue.TextColor3 = WARN_COLOR
 	local self = setmetatable({
-		food = food, foodFill = foodFill, foodText = foodText, grip = grip, gripFill = gripFill, top = top, centre = centre, safe = safe, reticle = reticle, ticks = ticks,
+		food = food, foodFill = foodFill, foodText = foodText, grip = grip, gripFill = gripFill, court = court, courtFill = courtFill, top = top, centre = centre, safe = safe, reticle = reticle, ticks = ticks,
 		aimTitle = aimTitle, aimHint = aimHint, anchorLabel = anchorLabel,
 		status = status, caption = caption, toastLabel = toast, help = help, notice = notice, day = day, dayLine = dayLine, noteLabel = note, noteLeft = 0,
 		panel = panel, promptTitle = promptTitle, promptHint = promptHint, promptCue = promptCue,
@@ -286,6 +290,8 @@ function Hud.update(self: any, view: any, dt: number)
 	end
 	self.grip.Visible = view.grip ~= nil
  if view.grip then self.gripFill.Size = UDim2.fromScale(math.clamp(view.grip,0,1),1) end
+ self.court.Visible = view.court ~= nil
+ if view.court then self.courtFill.Size = UDim2.fromScale(math.clamp(view.court,0,1),1) end
  self.device = view.device
 	self:_place()
 	self.reticle.Visible = view.aiming or view.focus or view.eyeView

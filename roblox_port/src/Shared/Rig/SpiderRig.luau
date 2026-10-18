@@ -482,7 +482,10 @@ end
 function SpiderRig.setGrowthStage(self: Rig, stage: number)
  local index=math.clamp(math.floor(stage),0,3)
  self.model:SetAttribute("GrowthStage",index)
- local g=Growth.SCALES[index+1]
+ self:setScale(Growth.SCALES[index+1])
+end
+-- Any size, not only a growth stage's (ROBLOX-80: the mate is the played spider's look at the adult scale times its own factor). The same scaling as a stage.
+function SpiderRig.setScale(self: Rig, g: number)
  if self._growth==g then return end
  self._growth=g
  self._k=(self._appearance.scale or 1)*g

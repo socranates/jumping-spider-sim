@@ -136,6 +136,11 @@ local rig = SpiderRig.new(Workspace, sill, appearance, detail)
 -- The rival's legs (ROBLOX-69): its own SpiderMotor over the whole sill, made when it first arrives, and its drawn rig; its words (ROBLOX-73); its grip once
 -- caught (ROBLOX-77, `grip` made below with the reserves). One table: the client is at Luau's limit of 200 locals.
 local rivalLegs: any = { drive = nil, rig = nil, Drive = require(Shared.Predator.RivalDrive), Text = require(Shared.UI.RivalText), Grip = require(Shared.Predator.RivalGrip), grip = nil }
+-- The mating cycle (ROBLOX-80): its modules, the stage that draws it (the mate's rig, the egg sac, the hatching), the mate's legs, and where the ending is
+-- ("" while none, "scene" while the spiderlings play, "card" while the ending card is up). One table: the client is at Luau's limit of 200 locals.
+local mateLegs: any = { Mating = require(Shared.Life.Mating), Mate = require(Shared.Predator.Mate), Drive = require(Shared.Predator.MateDrive), Text = require(Shared.UI.MateText),
+	Rules = require(Shared.Data.MatingRules), drive = nil, phase = "" }
+mateLegs.stage = require(script.Parent.MateStage).new(Workspace, sill, detail)
 local dance = PeacockDance.new() -- the peacock spider's courtship dance (a pose for the rig; nothing else reads it)
 local dancePose: any = nil
 -- The ant-mimicking spider's antennae and drawn walk (a pose for the rig; nothing else reads it): the modules, the state, its latest pose, and where
@@ -218,6 +223,12 @@ end
 local stores = {main=newStore(), free=newStore()}
 local checkpoints = stores.main
 life.save = function(): LifeLoop.CheckpointResult
+	-- The mating cycle (ROBLOX-80): a rest by a full-grown, well-fed spider makes a mate come, and the night's sleep that reached this morning has made the sac, so
+	-- this checkpoint keeps what the player has seen and a return to it never loses a night.
+	mateLegs.Mating.atRest(life, life.clock.day, life.clock.hour)
+	for _, e in life.events do
+		if e.kind == "woke" then mateLegs.Mating.woke(life, e.day) end
+	end
 	local why = Checkpoint.boundaryProblem(checkpointWorld)
 	if why ~= "" then return { ok = false, message = why } end
 	local record, err = Checkpoint.capture(checkpointWorld, os.time())
@@ -509,6 +520,7 @@ local function returnToCheckpoint()
 		return
 	end
 	session.mode, session.rules, session.ended = life.mode or "main", life.rules or "standard", false
+ mateLegs.reset()
  needs:useGameRules()
  motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor())
  session:finishAdult(life.growth.stage)
@@ -541,6 +553,7 @@ local function fresh(mode: string, easy: boolean, position: Vector3?): boolean
  if not initialRecord or (easy and not session.finishedMain) then return false end
  local ok=Checkpoint.restore(initialRecord,checkpointWorld)
  if not ok then return false end
+ mateLegs.reset()
  session:begin(mode,easy);applyRules();motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor())
  sensor:reset();memory:clear()
  stores[mode]=newStore();checkpoints=stores[mode]
@@ -569,6 +582,7 @@ local openNotebook: (string?) -> ()
 local lastEnd: any=nil -- the summary of the life that just ended, while its end screen is up
 panel=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
  if choice=="Notebook" then openNotebook("end")
+ elseif choice=="Carry" then mateLegs.carryOn()
  elseif choice=="Another" then lastEnd=nil;continueAnother()
  elseif choice=="Back" then lastEnd=nil;closeScreens();wasp:clearVisit();returnToCheckpoint() end
 end)
@@ -593,6 +607,65 @@ local function endLife(cause: string)
  presentEnd(false)
 end
 local function showCaught() endLife("wasp") end
+-- ---------------------------------------------------------------- the mating cycle (ROBLOX-80)
+-- Display and the player's side of Life/Mating (which is the cycle itself). The events Mating.tick reports become notices; the hatching plays as a scene in the
+-- crack (about 26 s, the camera and the controls free); the ending card follows it, and Carry on makes the next generation.
+function mateLegs.say(text: string?)
+ if text ~= nil and text ~= "" then life:showNotice(text);life.noticeSeconds=8 end
+end
+function mateLegs.event(e: string,ms: any)
+ local mate=life.mate
+ mateLegs.say(mateLegs.Text.notice(e,{sex=if mate then mate.sex else nil,needsDance=ms.needsDance,device=device,reason=if mate then mate.reason else nil}))
+ if e=="hatched" then mateLegs.begin(true) end
+end
+-- The hatching begins: with its scene (the eggs hatch while the player is there), or, for a record restored into it, at the card at once.
+function mateLegs.begin(scene: boolean)
+ local m=life.mating
+ if m==nil or m.stage~="hatched" then return end
+ book:notice("hatched")
+ if scene then
+  mateLegs.stage:begin(914,mateLegs.Mating.generation(life),m.hatch_day,m.brood)
+  mateLegs.phase="scene"
+ else
+  mateLegs.showCard(true)
+ end
+end
+function mateLegs.showCard(immediate: boolean)
+ local m=life.mating
+ if m==nil then return end
+ local title,sub,body=mateLegs.Text.card(m.brood,m.hatch_day,mateLegs.Mating.generation(life))
+ controls:clear();dropAll();setHudShown(false)
+ panel:showChoices(title,sub,body,{{id="Carry",text=mateLegs.Text.BUTTON}},immediate)
+ panel:setTextScale(if setting("LargeText")==true then 1.5 else 1)
+ mateLegs.phase="card"
+end
+-- A night's sleep reached the morning (LifeLoop's woke): after mating it made the sac (life.save may already have recorded it).
+function mateLegs.woke(day: number)
+ mateLegs.Mating.woke(life,day)
+ local m=life.mating
+ if m~=nil and m.stage=="sac" and m.sac_day==day then mateLegs.say(mateLegs.Text.SAC) end
+end
+-- Everything of the cycle that is only on the screen goes (a new life, a rest returned to).
+function mateLegs.reset()
+ mateLegs.phase=""
+ mateLegs.stage:reset()
+end
+-- Carry on: the next generation is a spiderling again in the crack, the days of the sill go on, the notebook and the look are the player's own.
+function mateLegs.carryOn()
+ local generation,day=mateLegs.Mating.carryOn(life,needs)
+ lastEnd=nil
+ closeScreens()
+ mateLegs.reset()
+ setAppearance(appearance) -- the rig is built again, at the first growth stage
+ motor:place(Vector3.new(-25.5,0.31,6.0),Vector3.yAxis,Layout.SPAWN_HEADING)
+ motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor())
+ sensor:reset();memory:clear()
+ dropStrands(false);drawnUp=motor.up;cam:snap();lastLight=nil
+ feedPending,cancelPending=false,false
+ watch:resync()
+ hud:toast(mateLegs.Text.generationToast(generation,day),false)
+ if saveClient~=nil then saveClient:markDirty() end
+end
 local openMenu: () -> ()
 local openSettings: (string?) -> ()
 local confirming: string?=nil
@@ -984,6 +1057,17 @@ local function updateHud(frameDt: number)
 	if (wasp.phase == "taking" or wasp.phase == "seizing" or wasp.phase == "bearing")
 		and not WaspText.heardRival((motor.pos - wasp.wasp.position).Magnitude, not sightCast(motor.pos, wasp.wasp.position)) then waspLine = nil end
 	if waspLine then table.insert(view.status, waspLine) end
+ do -- the courtship meter, the sac's guard days and the hatching's captions (ROBLOX-80)
+  local mate,m=life.mate,life.mating
+  if mate~=nil and mateLegs.Mate.courtable(mate) then
+   local far=(mate.position-motor.pos).Magnitude
+   if far<=mateLegs.Rules.loseWu or mate.meter>0 then view.court=mate.meter end
+   if far<=14 or mate.meter>0 then table.insert(view.status,mateLegs.Text.courtLine(device,far<=mateLegs.Rules.nearWu,SpiderChoice.canDance(appearance),dance.active,mate.meter)) end
+  end
+  if mate~=nil and mate.state=="pair" and captionScale>0 then view.caption=mateLegs.Text.PAIR_CAPTION end
+  if m~=nil and (m.stage=="sac" or m.stage=="guarding") then table.insert(view.status,mateLegs.Text.guardLine(m.guard_day,mateLegs.Rules.guardDays)) end
+  if mateLegs.phase=="scene" and captionScale>0 then view.caption=mateLegs.Text.sceneCaption(mateLegs.stage.t) or view.caption end
+ end
  if life.rival and life.rival.state=="captured" and not RivalSpider.struggling(life.rival) then table.insert(view.status,"Eating rival — stay still (2 meals)") end
 	view.grip = if prey.feeding.struggling then prey.feeding.grip else rivalLegs.Grip.level(rivalLegs.grip)
 	if rivalLegs.Grip.active(rivalLegs.grip) then table.insert(view.status, rivalLegs.Text.struggle(ControlText.name(device,"jump"))) end
@@ -993,6 +1077,7 @@ local function updateHud(frameDt: number)
 	elseif prey.feeding.held then table.insert(view.status, "Meal paused — " .. ControlText.name(device,"feed") .. " to eat") end
 	local clock = life.clock
 	view.day = LifeText.day(clock.day, clock:partOfDay()) .. " | " .. life.growth:stageName() .. (if session.mode=="free" then " | FREE PLAY" elseif session.rules=="gentle" then " | EASY" else "")
+	view.day ..= mateLegs.Text.dayTag(mateLegs.Mating.generation(life))
 	view.food, view.foodGentle, view.largeText = needs.energy, needs.gentle, setting("LargeText") == true
 	view.growth = LifeText.growth(life.growth, Growth.READY_FOOD, Species.fly_like_prototype.body.nutrition)
 	view.dayLine = LifeText.line(clock:partOfDay(), needs.energy, needs:isStarving(), needs.gentle, LifeLoop.HUNGRY_AT, life:tooHungryToSleep())
@@ -1072,6 +1157,10 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
             life.rival=life.rival or RivalSpider.new()
             local rivalPercept=RivalSpider.percept(life.rival)
             if rivalPercept then table.insert(percepts,rivalPercept) end
+            if life.mate then
+             local matePercept=mateLegs.Mate.percept(life.mate) -- a moving thing on the sill, never prey (ROBLOX-80)
+             if matePercept then table.insert(percepts,matePercept) end
+            end
 			if stage then
 				local p = stage.target:percept()
 				if p then table.insert(percepts,p) end
@@ -1163,6 +1252,23 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
              life:showNotice(rivalLegs.Text.counter(needs.gentle))
             elseif rivalEvent=="eaten" then prey.feeding.mealsFinished+=1
             elseif rivalEvent=="touch" then life:showNotice("The rival touched you. You are safe in this mode.") end
+            -- The mating cycle (ROBLOX-80): the mate and the courtship meter, the sac and the guard days, by the same snapshot of the spider the rival has.
+            do
+             local ms=table.clone(rivalState)
+             ms.drive,ms.sex,ms.needsDance,ms.dancing,ms.blocked=mateLegs.drive,mateLegs.Mating.sexOf(appearance),SpiderChoice.canDance(appearance),dance.active,sightCast
+             for _,e in mateLegs.Mating.tick(life,DT,ms) do mateLegs.event(e,ms) end
+             local mate=life.mate
+             if mate~=nil and mate.state~="away" and mateLegs.drive==nil then
+              mateLegs.drive=mateLegs.Drive.new(SpiderMotor.new({
+               world = sill, surfaces = Surfaces, profile = Species.phidippus_audax_prototype,
+               spawn = mate.position, heading = mate.heading,
+               boundsMin = Layout.PLAY_BOUNDS_MIN, boundsMax = Layout.PLAY_BOUNDS_MAX, probeParent = arc,
+              }),sightCast)
+             end
+             if mateLegs.drive~=nil and mate~=nil then mateLegs.drive:update(mate,DT,ms) end
+             -- A record restored into the hatching (or a brood out while nothing is playing) goes straight to the ending.
+             if life.mating~=nil and life.mating.stage=="hatched" and mateLegs.phase=="" and not panel:isShowing() then mateLegs.begin(false) end
+            end
 			-- The life loop runs last in the tick (Godot's habitat loop, priority 12); the reach it sets is the next tick's.
 			local holding = prey.feeding.held ~= nil or (life.rival~=nil and life.rival.state=="captured")
 			lifeSpider = {
@@ -1176,6 +1282,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor())
    for _,event in life:drainEvents() do
     watch:onLife(event.kind,life.growth.stage)
+    if event.kind=="woke" then mateLegs.woke(event.day) end
     if event.kind=="starved" then endLife("starved")
     elseif event.kind=="moult_started" then dropAll()
     elseif event.kind=="moulted" and session:finishAdult(life.growth.stage) then
@@ -1268,6 +1375,10 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
      rivalLegs.rig.jumpLoad=if rival.state=="windup" then math.clamp(rival.elapsed,0,1) else 0
      rivalLegs.rig:update(SupportMath.bodyCFrame(rival.position,if rival.state=="taken" then Vector3.yAxis else (rival.up or Vector3.yAxis),rival.heading),if paused then 0 else simFrame,rival.state~="lunge" and rival.state~="taken",(rival.position-rival.previous).Magnitude>.001)
     elseif rivalLegs.rig then rivalLegs.rig:destroy();rivalLegs.rig=nil end
+    -- The mate, the egg sac and the hatching (ROBLOX-80). The scene waits when a screen has the game; when it is over the ending card comes.
+    mateLegs.stage:drawMate(life.mate,appearance,if paused then 0 else simFrame,setting("ReducedMotion")==true)
+    mateLegs.stage:drawSac(mateLegs.Mating.hasSac(life.mating))
+    if mateLegs.phase=="scene" and not paused and not mateLegs.stage:step(simFrame,setting("ReducedMotion")==true) then mateLegs.showCard(false) end
 	updateHud(frameDt)
 	flyBodies:draw(prey.flies,prey.now)
 	local soundPaused = GuiService.MenuIsOpen or modal()
@@ -1325,7 +1436,7 @@ if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
 		local run: any = (require :: any)(playback)
 		run({
 			prey = prey, flyBodies = flyBodies, waspBody = waspBody, life = life, wasp = wasp, caughtPanel = panel, needs = needs, checkpoints = checkpoints, returnToCheckpoint = function() returnToCheckpoint() end, lifeSpider = function() return lifeSpider end, sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
-			input = controls, rivalLegs = rivalLegs,
+			input = controls, rivalLegs = rivalLegs, mateLegs = mateLegs,
 			notebook = book, notebookWatch = watch, notebookPanel = nbPanel, openNotebook = openNotebook, settingsPanel = settingsPanel, openSettings = openSettings, setting = setting, cam = cam, soundscape = soundscape, eyes = eyes,
 			session=session, menu=menu, openMenu=openMenu, endLife=endLife, fresh=fresh, continueAnother=continueAnother, currentStore=function() return checkpoints end,
 			changeSpider = function() changeSpider() end, dance = function() return dance end, ant = function() return ant.state end, antPose = function() return ant.pose end, appearance = function() return appearance end, rig = function() return rig end,

@@ -38,6 +38,7 @@ NotebookPages.triggers = {
 	"starving",
 	"dance",
 	"antennae",
+	"hatched",
 }
 
 -- The reserve at or under hungryAt is "hungry"; at or over wellFedAt, "well fed" (LIFE_DESIGN.md round 1).
@@ -323,7 +324,7 @@ NotebookPages.pages = {
 		trigger = "dance",
 		title = "A fan and a dance",
 		text = "A male peacock spider, Maratus volans, unfolds colourful flaps on its abdomen and waves its third pair of legs during courtship. The display also sends vibrations through the surface beneath it. It is a message to a female, not just a dance people can see.",
-		game = "Our repeating dance is inspired by recorded displays. Its size, colour, timing and movement are stylised. There is no mating simulation, and the cosmetic dance is available at every gameplay growth stage.",
+		game = "Our repeating dance is inspired by recorded displays. Its size, colour, timing and movement are stylised. Here the dance is also how you court a mate: it is available at every growth stage, but only a full-grown, well-fed spider is visited by one.",
 		sources = {
 			"Girard, M. B., Kasumovic, M. M. & Elias, D. O. (2011). Multi-Modal Courtship in the Peacock Spider, Maratus volans. PLoS ONE 6(9): e25390. https://doi.org/10.1371/journal.pone.0025390",
 		},
@@ -336,6 +337,19 @@ NotebookPages.pages = {
 		game = "The ant mimic is a look only: where you go, how fast and what the wasp does are the first spider's. Its front legs rise when you keep still, and a stop shorter than about 83 milliseconds is not drawn as a pause. The waving, the sway of the body as it walks, the colours and the size are stylised: the real mimic's wobbling path is not walked. The female is drawn.",
 		sources = {
 			"Shamble, P. S., Hoy, R. R., Cohen, I. & Beatus, T. (2017). Walking like an ant: a quantitative and experimental approach to understanding locomotor mimicry in the jumping spider Myrmarachne formicaria. Proceedings of the Royal Society B 284: 20170308. https://doi.org/10.1098/rspb.2017.0308",
+		},
+	},
+	{
+		id = "eggs_and_wind",
+		trigger = "hatched",
+		title = "Eggs, silk and wind",
+		text = "Jumping spiders court by sight: a male shows a display and the female decides. She lays her eggs in a silken nest. A Phidippus johnsoni mother stays with it until the young hatch and leave: in the laboratory the eggs hatched about three weeks after laying, and the spiderlings left about three weeks after that. Many young spiders then travel by ballooning: they climb high, let out a thread of silk and are carried off by the air. The electric field in the air can trigger the take-off.",
+		game = "A game day is about fifteen minutes, so weeks become days: a mate on the sill, a courtship you hold for eight seconds, one night to the sac and two guard days. The real mother makes and guards the sac; here the sac is drawn the same whichever spider you play, and no claim is made that a male guards eggs. A real brood is far larger than the eight to twelve shown: a Phidippus johnsoni female laid about 200 eggs in all. The first spider's sex is the game's choice (a female), and the peacock spider's mate is drawn with the male's colours although the real female is plain brown. Nothing can harm the sac, and you carry on as one of the spiderlings, which a real one could not choose.",
+		sources = {
+			"Jackson, R. R. (1978). The life history of Phidippus johnsoni (Araneae, Salticidae). Journal of Arachnology 6: 1-29.",
+			"Foelix, R. F. (2011). Biology of Spiders, 3rd edition. Oxford University Press.",
+			"Bell, J. R., Bohan, D. A., Shaw, E. M. & Weyman, G. S. (2005). Ballooning dispersal using silk: world fauna, phylogenies, genetics and models. Bulletin of Entomological Research 95(2): 69-114. https://doi.org/10.1079/BER2004350",
+			"Morley, E. L. & Robert, D. (2018). Electric Fields Elicit Ballooning in Spiders. Current Biology 28(14): 2324-2330. https://doi.org/10.1016/j.cub.2018.05.057",
 		},
 	},
 } :: { Page }

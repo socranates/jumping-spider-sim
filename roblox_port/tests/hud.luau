@@ -371,5 +371,30 @@ do
 	end
 end
 
+-- the courtship meter (ROBLOX-80): the grip bar's style, in its own colour, shown only while the view carries a courtship level
+do
+	local parent = Instance.new("Folder")
+	local hud = SpiderHud.new(parent)
+	local function bar(v: number?): (any, any)
+		hud:update({ device = "keyboard", court = v }, 0.016)
+		return named(parent, "CourtshipBar")[1], named(parent, "Courtship")[1]
+	end
+	local b, f = bar(nil)
+	check(b ~= nil and f ~= nil and not b.Visible, "the courtship bar exists and is hidden while there is nothing to court")
+	b, f = bar(0)
+	check(b.Visible and f.Size.X.Scale == 0, "empty: shown, nothing in it")
+	b, f = bar(0.4)
+	check(b.Visible and f.Size.X.Scale == 0.4, "the fill is the meter")
+	b, f = bar(1.7)
+	check(f.Size.X.Scale == 1, "clamped to 1")
+	b, f = bar(-1)
+	check(f.Size.X.Scale == 0, "and to 0")
+	local grip = named(parent, "GripBar")[1]
+	check(b.Size.X.Scale == grip.Size.X.Scale and b.Size.Y.Offset == grip.Size.Y.Offset and b.LayoutOrder == grip.LayoutOrder, "the grip bar's width, height and place in the column")
+	check(f.BackgroundColor3 ~= named(parent, "Grip")[1].BackgroundColor3, "in a colour of its own, not the grip's red")
+	b = bar(nil)
+	check(not b.Visible and not grip.Visible, "gone again, and the grip bar is not the one that shows")
+end
+
 print(`HUD passed={passed} failed={failed}`)
 if failed > 0 then error("hud checks failed") end

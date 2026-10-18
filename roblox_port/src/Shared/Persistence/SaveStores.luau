@@ -19,7 +19,7 @@ end
 -- like). Classes:
 --   "throttle"  the request was over a budget or queued out: wait and try again, slower
 --   "config"    saving cannot work here at all (Studio API access off, an unpublished place, DataStores disabled): do not keep hammering
---   "value"     this value can never be stored (too large, not storable): retrying the same value cannot work
+--   "value"     this key or value can never be stored (a bad key, too large, not storable): retrying the same thing cannot work
 --   "transient" anything else (a timeout, the service down, an unknown error): try again later
 -- The mapping of messages to classes is from Roblox's documented error codes (101-106 key and value, 301-306 throttles, 4xx and 5xx
 -- service); it has not been checked against a live DataStore, and an unknown message is treated as transient on purpose.
@@ -28,7 +28,7 @@ function SaveStores.classify(message: any): string
 	local code = tonumber(string.match(m, "^%s*(%d%d%d)%s*:"))
 	if code ~= nil then
 		if code >= 301 and code <= 306 then return "throttle" end
-		if code == 103 or code == 104 or code == 105 then return "value" end
+		if code == 101 or code == 102 or code == 103 or code == 104 or code == 105 then return "value" end
 		if code == 403 or code == 401 or code == 402 then return "config" end
 	end
 	if string.find(m, "studio access", 1, true) or string.find(m, "studioaccesstoapis", 1, true) or string.find(m, "not allowed", 1, true)

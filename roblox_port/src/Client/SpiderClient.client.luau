@@ -552,6 +552,10 @@ menu=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
  end
  confirming=nil;openMenu()
 end,"SpiderLifeMenu")
+-- The start menu's body: the saving line, then the Easy note. Also rewritten in place when the saving status changes under an open menu.
+local function menuBody(): string
+ return SaveText.menuLine(saveClient:status())..(if session.finishedMain then "" else "\nEasy is not available yet; choose Free play for gentle rules.")
+end
 openMenu=function()
  if panel:isShowing() or not initialRecord then return end
  controls:clear();dropAll();setHudShown(false)
@@ -565,7 +569,7 @@ openMenu=function()
  table.insert(choices,{id="Notes",text=if player:GetAttribute("NotebookNotes")==false then "Discovery notes: off" else "Discovery notes: on"})
  table.insert(choices,{id="Large",text=if player:GetAttribute("LargeText")==true then "Text size: large" else "Text size: normal"})
  menu:showChoices("The Windowsill","A small life on a windowsill.",
-  SaveText.menuLine(saveClient:status())..(if session.finishedMain then "" else "\nEasy is not available yet; choose Free play for gentle rules."),choices,true)
+  menuBody(),choices,true)
  menu:setTextScale(if player:GetAttribute("LargeText")==true then 1.5 else 1)
 end
 local menuButton=Instance.new("TextButton")
@@ -708,7 +712,7 @@ local function updateSaves()
 		local text = SaveText.toast(savedStatus, savedReason, status, reason)
 		savedStatus, savedReason = status, reason
 		if text ~= "" then hud:toast(text, status == "session") end
-		refreshMenu()
+		if menuStarted and menu:isShowing() and confirming == nil then menu.summary.Text = menuBody() end
 	end
 end
 

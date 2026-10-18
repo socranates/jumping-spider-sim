@@ -12,6 +12,12 @@ local function check(name: string, fn: () -> ())
 	if ok then passed += 1 else failed += 1 end
 	table.insert(rows, {name = name, passed = ok, detail = if ok then "" else tostring(detail)})
 end
+-- A spec may report that part of itself could not run here (for instance DataStore checks without API access): never counted as passed.
+local notRun = {}
+local function skip(name: string, why: string)
+	table.insert(notRun, {name = name, why = why})
+	print("PORT_TEST_SKIPPED " .. HttpService:JSONEncode({evidence_id = evidence.id, name = name, why = why}))
+end
 check("Studio spec completes", function() require(script.Parent.Spec)(check) end)
 check("Silk spec completes", function() require(script.Parent.SilkSpec)(check) end)
 check("Graphics spec completes", function() require(script.Parent.GraphicsSpec)(check) end)
@@ -33,8 +39,9 @@ check("Wasp spec completes", function() require(script.Parent.WaspSpec)(check) e
 check("Peacock spec completes", function() require(script.Parent.PeacockSpec)(check) end)
 check("Growth spec completes", function() require(script.Parent.GrowthSpec)(check) end)
 check("Notebook spec completes", function() require(script.Parent.NotebookSpec)(check) end)
+check("State spec completes", function() require(script.Parent.StateSpec)(check, skip) end)
 local report = {suite = "Roblox engine", evidence_id = evidence.id, passed = passed, failed = failed,
-	tests = passed + failed, not_run = 0, engine = version(), results = rows}
+	tests = passed + failed, not_run = #notRun, skipped = notRun, engine = version(), results = rows}
 local json = HttpService:JSONEncode(report)
 local output = Instance.new("StringValue")
 output.Name = "PortTestReport"
@@ -43,5 +50,5 @@ output.Parent = game:GetService("TestService")
 print("PORT_TEST_REPORT " .. json)
 -- Studio truncates long individual log messages. Keep each result independently recoverable.
 for _, row in rows do print("PORT_TEST_ROW " .. HttpService:JSONEncode({evidence_id=evidence.id,result=row})) end
-print("PORT_TEST_SUMMARY " .. HttpService:JSONEncode({evidence_id=evidence.id,passed=passed,failed=failed,tests=passed+failed,engine=version()}))
+print("PORT_TEST_SUMMARY " .. HttpService:JSONEncode({evidence_id=evidence.id,passed=passed,failed=failed,tests=passed+failed,not_run=#notRun,engine=version()}))
 if failed > 0 then warn("PORT_TEST_FAIL") end

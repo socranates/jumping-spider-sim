@@ -44,6 +44,9 @@ local toClient = Instance.new("RemoteEvent")
 toClient.Name = "ToClient"
 toClient.Parent = folder
 
+-- The test place files each run's players under a name of their own, so an automated run never meets what an earlier run saved and never
+-- leaves a lock for the next. Studio runs of the playable project use the real UserId, so leaving and rejoining there is the real test.
+local runTag = tostring(os.time())
 local service = SaveService.new({
 	backend = backend,
 	now = os.time,
@@ -51,6 +54,7 @@ local service = SaveService.new({
 	spawn = function(fn: (...any) -> ...any, ...: any) task.spawn(fn, ...) end,
 	send = function(player: SaveService.Player, msg: { [string]: any }) toClient:FireClient(player :: any, msg) end,
 	jobId = game.JobId,
+	keyOf = if isTestPlace then function(player: SaveService.Player): string | number return `t{runTag}_{player.UserId}` end else nil,
 	log = function(text: string) warn("[Windowsill] saves: " .. text) end,
 })
 

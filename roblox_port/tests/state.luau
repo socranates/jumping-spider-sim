@@ -141,6 +141,7 @@ case("error classes: throttles, configuration, values that can never be stored, 
 	}
 	for _, row in table1 do check(SaveStores.classify(row[1]) == row[2], `"{row[1]}" is {row[2]} (got {SaveStores.classify(row[1])})`) end
 	check(SaveStores.classify(nil) == "transient", "nil is transient")
+	check(SaveStores.classify("102: KeyNameLimit") == "value" and SaveStores.classify("101: KeyNameEmpty") == "value", "a bad key can never be stored")
 end)
 
 -- ---------------------------------------------------------------------------------------------- the rest check
@@ -1344,6 +1345,29 @@ case("service: the real DataStore backend, against a fake DataStore, behaves as 
 	s:flush()
 	check(SaveEnvelope.open(SaveProgress.SPEC, ds.data["P_60"]).payload.notebook.opened[1] == "p1" and ds.data["P_60"].lock == nil, "progress stored through the DataStore interface, lock released")
 	check(SaveEnvelope.open(SaveRest.SPECS.main, ds.data["R_60_main"]).status == "ok", "and the rest")
+end)
+
+case("the Studio fixture still matches the checkpoint format (regenerate tests/studio/StateFixture.luau if this fails)", function()
+	local Fixture = require("./studio/StateFixture")
+	for _, key in { "main", "free" } do
+		local text = Fixture[key]
+		check(string.find(text, `"schema_version":{Checkpoint.SCHEMA_VERSION},`, 1, true) ~= nil, `{key}: the checkpoint schema is {Checkpoint.SCHEMA_VERSION}`)
+		check(string.find(text, `"content_revision":"{Checkpoint.CONTENT_REVISION}"`, 1, true) ~= nil, `{key}: the content revision is {Checkpoint.CONTENT_REVISION}`)
+		check(string.find(text, '"life_rules":{"mode":"' .. key .. '"', 1, true) ~= nil, `{key}: the rules are {key}'s`)
+	end
+end)
+
+case("service: the key a player is filed under can be chosen (the test place files each run apart)", function()
+	local e = newEnv()
+	local srv = newServer(e)
+	srv.service.cfg.keyOf = function(p: any): string return "tRUN_" .. p.UserId end
+	local p = player(70)
+	srv.service:addPlayer(p)
+	srv.service:onMessage(p, { kind = "hello", v = 1 })
+	srv.service:onMessage(p, { kind = "progress", progress = prog({ "x" }) })
+	tickServer(e, srv, 5)
+	check(e.backend.data["P_tRUN_70"] ~= nil and e.backend.data["P_70"] == nil, "filed under the chosen name")
+	srv.service:removePlayer(p)
 end)
 
 print(`STATE passed={passed} failed={failed}`)

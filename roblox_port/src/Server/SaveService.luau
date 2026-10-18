@@ -21,6 +21,7 @@ export type Player = { UserId: number, Name: string }
 export type Config = {
 	backend: any, now: () -> number, sleep: (number) -> (), spawn: ((...any) -> ...any, ...any) -> (),
 	send: (Player, { [string]: any }) -> (), jobId: string?, log: ((string) -> ())?,
+	keyOf: ((Player) -> string | number)?, -- the name a player's records are filed under (default: their UserId); the test place files each run under a fresh one
 }
 
 function SaveService.new(cfg: Config): any
@@ -64,7 +65,7 @@ function SaveService.addPlayer(self: any, player: Player)
 	local sessionId = `{self.cfg.jobId or "local"}:{math.floor(now)}:{self.counter}`
 	local entry: any = { player = player, hello = false, loaded = false, leaving = false, progressBucket = bucket(SaveRules.PROGRESS_BURST, SaveRules.PROGRESS_PER_SECOND, now), restBucket = bucket(SaveRules.REST_BURST, SaveRules.REST_PER_SECOND, now), helloBucket = bucket(3, 0.2, now) }
 	entry.session = SaveSession.new({
-		backend = self.cfg.backend, userId = player.UserId, sessionId = sessionId, now = self.cfg.now, sleep = self.cfg.sleep,
+		backend = self.cfg.backend, userId = if self.cfg.keyOf then self.cfg.keyOf(player) else player.UserId, sessionId = sessionId, now = self.cfg.now, sleep = self.cfg.sleep,
 		log = function(text: string) log(self, text) end,
 		onChange = function(status: string, reason: string?)
 			if entry.loaded and entry.hello and not entry.leaving then sendTo(self, player, { kind = "status", status = status, reason = reason }) end

@@ -31,7 +31,7 @@ local SaveSession = {}
 SaveSession.__index = SaveSession
 
 export type Config = {
-	backend: any, userId: number, sessionId: string, now: () -> number,
+	backend: any, userId: number | string, sessionId: string, now: () -> number,
 	sleep: ((number) -> ())?, log: ((string) -> ())?, progressSpec: SaveEnvelope.Spec?, -- (a test may hand in a later schema)
 	onChange: ((string, string?) -> ())?, onLoaded: ((any) -> ())?, onRest: ((string, any) -> ())?,
 }

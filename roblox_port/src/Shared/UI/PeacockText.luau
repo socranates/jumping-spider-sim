@@ -13,6 +13,21 @@ local PeacockText = {}
 PeacockText.NAMES = { first_spider = "the first spider", maratus_volans_male = "the peacock spider", myrmarachne_formicaria_female = "the ant-mimicking spider" } :: { [string]: string }
 PeacockText.STAND = "Stand still on a surface to dance"
 PeacockText.NOT_RESTING = "You can change spider while resting in the silk-lined crack"
+-- The Settings row's refusal (ROBLOX-71): the spider stays as it was. Said as a toast and on the panel's own line.
+PeacockText.NOT_NOW = "Your spider will not change now. Stand safely on a surface first"
+
+-- A spider's name for a row or a button: the name, with its first letter capital.
+function PeacockText.title(id: string): string
+	local name = PeacockText.NAMES[id] or id
+	return string.upper(string.sub(name, 1, 1)) .. string.sub(name, 2)
+end
+
+-- The controls card's pointer to the Settings row (ROBLOX-71): where to open it on the device in use.
+function PeacockText.settingsLine(device: ControlText.Device): string
+	if device == "gamepad" then return `Spider: change it in Settings ({ControlText.name("gamepad", "menu")}, then Settings)` end
+	if device == "touch" then return "Spider: change it in Menu, then Settings" end
+	return `Spider: change it in Settings ({ControlText.name(device, "settings")}) when standing safe`
+end
 
 -- The crack's extra hint while resting: how to become the other spider.
 function PeacockText.change(device: ControlText.Device, current: string): string
@@ -39,12 +54,12 @@ end
 function PeacockText.touchChange(): string return "Change" end
 function PeacockText.touchDisplay(dancing: boolean): string return if dancing then "Stop" else "Dance" end
 
--- Lines added to the controls card (H): the crack's choice for every spider, then the display key's line for the spider that has one:
+-- Lines added to the controls card (H): the crack's choice for every spider, the pointer to the Settings row (ROBLOX-71), then the display key's line for the spider that has one:
 -- `display` is "dance" (the peacock spider), "antennae" (the ant-mimicking spider), nil (the first spider). true means "dance" and false nil.
 function PeacockText.helpExtra(device: ControlText.Device, display: (string | boolean)?): string
 	local choose = ControlText.name(device, "choose")
 	local kind: string? = if display == true then "dance" elseif type(display) == "string" then display else nil
-	local lines = { `In the crack: {choose} change spider (first, peacock, ant mimic)` }
+	local lines = { `In the crack: {choose} change spider (first, peacock, ant mimic)`, PeacockText.settingsLine(device) }
 	if kind == "dance" then
 		table.insert(lines, `Standing still: {ControlText.name(device, "display")} courtship dance. Any move, jump or Cancel stops it`)
 	elseif kind == "antennae" then

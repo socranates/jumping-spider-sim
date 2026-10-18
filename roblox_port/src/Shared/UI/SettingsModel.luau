@@ -9,6 +9,8 @@
 --   * a number outside the range ...................... clamped to it (a range may be tightened later; the value stays usable)
 --   * a choice that is not an option .................. dropped quietly (an option may be removed later)
 local SettingsSpec = require(script.Parent.Parent.Data.SettingsSpec)
+local SpiderChoice = require(script.Parent.Parent.Rig.SpiderChoice)
+local PeacockText = require(script.Parent.PeacockText)
 
 local SettingsModel = {}
 
@@ -20,6 +22,21 @@ for _, s in SettingsSpec.LIST do
 	BY_ID[s.id] = s
 	table.insert(ORDER, s.id)
 end
+
+-- The live rows (ROBLOX-71) are not settings in the saved sense: they are found by spec() and listed in sections(), but ids(), defaults(), clean()
+-- and get() know nothing of them, so nothing about them is ever saved, read from a save or put back by Reset. Each steps and speaks through
+-- the part that owns it.
+local LIVE_BY_ID: { [string]: SettingsSpec.Setting } = {}
+for _, s in SettingsSpec.LIVE do LIVE_BY_ID[s.id] = s end
+local LIVE_STEP: { [string]: (any, number, any) -> string } = {
+	-- `owned` (nil now) is where the Game Pass answer goes when the add-ons are sold: SpiderChoice.locked skips what is not owned.
+	Spider = function(current: any, dir: number, owned: any): string
+		return SpiderChoice.step(SpiderChoice.start(current, nil), dir, owned)
+	end,
+}
+local LIVE_TEXT: { [string]: (any) -> string } = {
+	Spider = function(value: any): string return PeacockText.title(SpiderChoice.start(value, nil)) end,
+}
 
 SettingsModel.VERSION = SettingsSpec.VERSION
 
@@ -36,17 +53,25 @@ function SettingsModel.ids(): { string }
 end
 
 function SettingsModel.spec(id: string): SettingsSpec.Setting?
-	return BY_ID[id]
+	return BY_ID[id] or LIVE_BY_ID[id]
+end
+
+-- Is this a live row (a choice the game drives, not a saved setting)?
+function SettingsModel.live(id: any): boolean
+	return type(id) == "string" and LIVE_BY_ID[id] ~= nil
 end
 
 function SettingsModel.known(id: any): boolean
 	return type(id) == "string" and BY_ID[id] ~= nil
 end
 
--- The settings of one section, in the table's order.
+-- The rows of one section, in the table's order: the settings, then the live rows.
 function SettingsModel.items(sectionId: string): { SettingsSpec.Setting }
 	local out: { SettingsSpec.Setting } = {}
 	for _, s in SettingsSpec.LIST do
+		if s.section == sectionId then table.insert(out, s) end
+	end
+	for _, s in SettingsSpec.LIVE do
 		if s.section == sectionId then table.insert(out, s) end
 	end
 	return out
@@ -148,9 +173,11 @@ local function snap(s: SettingsSpec.Setting, x: number): number
 	return math.clamp(math.floor((lo + k * step) * scale + 0.5) / scale, lo, s.max :: number)
 end
 
--- The value one step in `dir` (+1 or -1) from `current`: a toggle flips, a slider moves a step (and stays on its grid), a choice moves to the
+-- The value one step in `dir` (+1 or -1) from `current`: a live row steps as its owner says (the Spider row, skipping any spider that is locked); a toggle flips, a slider moves a step (and stays on its grid), a choice moves to the
 -- next option and wraps. A current value that is not clean counts as the default.
-function SettingsModel.step(id: string, current: any, dir: number): Value
+function SettingsModel.step(id: string, current: any, dir: number, owned: { [string]: boolean }?): Value
+	local stepLive = LIVE_STEP[id]
+	if stepLive ~= nil then return stepLive(current, dir, owned) end
 	local s = BY_ID[id]
 	if s == nil then error(`unknown setting {id}`) end
 	local v = SettingsModel.clean(id, current)
@@ -202,6 +229,8 @@ end
 
 -- The value in words: "On", "80%", "1.00x", "65 degrees", "5.0 studs", or the option's label.
 function SettingsModel.valueText(id: string, value: any): string
+	local sayLive = LIVE_TEXT[id]
+	if sayLive ~= nil then return sayLive(value) end
 	local s = BY_ID[id]
 	if s == nil then return "" end
 	local v = SettingsModel.clean(id, value)
@@ -226,7 +255,7 @@ end
 
 -- "Label: value" for a single line (a toggle shows On or Off).
 function SettingsModel.line(id: string, value: any): string
-	local s = BY_ID[id]
+	local s = SettingsModel.spec(id)
 	if s == nil then return "" end
 	return `{s.label}: {SettingsModel.valueText(id, value)}`
 end

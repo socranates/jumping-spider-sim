@@ -28,6 +28,7 @@ SettingsSpec.SECTIONS = {
 	{ id = "camera", title = "Camera" },
 	{ id = "comfort", title = "Comfort and accessibility" },
 	{ id = "help", title = "Help and hints" },
+	{ id = "spider", title = "Your spider" },
 } :: { { id: string, title: string } }
 
 -- Units name how a slider's number is shown (SettingsModel.valueText): percent of 1, a plain multiplier, degrees, studs.
@@ -63,6 +64,15 @@ SettingsSpec.LIST = {
 	{ id = "ControlHints", section = "help", label = "Show control hints", kind = "toggle", default = true,
 		note = "The controls card and the walking reminder. Prompts that say what a button does right now stay." },
 	{ id = "NotebookNotes", section = "help", label = "Say when a new notebook page opens", kind = "toggle", default = true },
+} :: { Setting }
+
+-- Rows that show and drive something the game already keeps elsewhere, so they are not saved settings (ROBLOX-71): no Player attribute of the
+-- id, nothing in the save's settings, nothing in Reset to defaults. The spider is kept in the save as `appearance` (Player attribute
+-- `Appearance`), and the client drives it through the panel's Io. `default` is only what an unknown reading says. The options and the words of
+-- a live row come from the part that owns it (the Spider row's from Rig/SpiderChoice and UI/PeacockText, through SettingsModel), not from here.
+SettingsSpec.LIVE = {
+	{ id = "Spider", section = "spider", label = "Spider", kind = "choice", default = "first_spider",
+		note = "Change it anywhere you stand safely. Not while jumping, on silk, moulting or holding prey." },
 } :: { Setting }
 
 -- How big the caption text is for each Captions option, as a multiple of the HUD's caption size (0: no captions of sounds at all).

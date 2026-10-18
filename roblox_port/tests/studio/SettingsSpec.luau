@@ -122,8 +122,14 @@ return function(check: (string, () -> ()) -> ())
 		local values: { [string]: any } = {}
 		local closed: { string } = {}
 		local io = {
-			get = function(id: string): any return SettingsModel.get(function(k: string): any return values[k] end, id) end,
-			set = function(id: string, v: any) values[id] = v end,
+			get = function(id: string): any
+				if SettingsModel.live(id) then return "first_spider" end -- (the Spider row reads the client's live appearance, not a setting)
+				return SettingsModel.get(function(k: string): any return values[k] end, id)
+			end,
+			set = function(id: string, v: any): string?
+				if not SettingsModel.live(id) then values[id] = v end
+				return nil
+			end,
 			reset = function() for _, id in SettingsModel.ids() do values[id] = SettingsModel.default(id) end end,
 			status = function(): string? return "saved" end,
 		}
@@ -138,7 +144,7 @@ return function(check: (string, () -> ()) -> ())
 		for _, w in panel.widgets do
 			if w.kind == "header" then headers += 1 elseif w.kind == "setting" then rows += 1 end
 		end
-		assert(headers == 4 and rows == 22, `{headers} headers, {rows} rows`)
+		assert(headers == 5 and rows == 22 + #SettingsSpec.LIVE, `{headers} headers, {rows} rows`)
 		assert(panel.list.ScrollingDirection == Enum.ScrollingDirection.Y and panel.list.AutomaticCanvasSize ~= Enum.AutomaticSize.X, "the list scrolls up and down")
 		assert(panel.hint.TextTruncate == Enum.TextTruncate.AtEnd, "the controls line truncates")
 		local target = SettingsText.MIN_TARGET

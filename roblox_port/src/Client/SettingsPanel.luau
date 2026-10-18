@@ -9,6 +9,8 @@
 -- jump sections, the right stick scrolls, B (Circle) goes back. Mouse and touch: tap a row to switch it, - and + or drag a bar, scroll the list.
 -- Large text (the LargeText setting) takes effect at once, here too; short screens lose the controls line before the list loses room.
 -- Words and sizes are Shared/UI/SettingsText and Data/SettingsSpec; movement through the rows is Shared/UI/SettingsNav.
+-- One row is not a saved setting (ROBLOX-71): Spider, a live row. It reads and drives the spider the game already keeps in the save; io.set may
+-- refuse it and answer a line, which the panel shows in place of the saving line, and the row then shows the spider it still is.
 local TextService = game:GetService("TextService")
 local CAS = game:GetService("ContextActionService")
 local GuiService = game:GetService("GuiService")
@@ -27,7 +29,7 @@ SettingsPanel.__index = SettingsPanel
 
 export type Io = {
 	get: (string) -> SettingsModel.Value, -- the setting's clean value (or its default)
-	set: (string, SettingsModel.Value) -> (), -- the player's change: the client keeps it and everything reads it live
+	set: (string, SettingsModel.Value) -> string?, -- the player's change: the client keeps it and everything reads it live; a live row may answer a line to show
 	reset: () -> (), -- every setting back to its default
 	status: () -> string?, -- "saved" | "saving" | "session" | nil (not known yet)
 }
@@ -297,12 +299,21 @@ function SettingsPanel.refreshRow(self: any, id: string)
 	local value = self.io.get(id)
 	local spec: SettingsSpec.Setting = w.spec
 	w.value.Text = SettingsModel.valueText(id, value)
+	self:_fitValue(w)
 	if spec.kind == "toggle" then
 		w.value.BackgroundColor3 = if value == true then BUTTON_PICK else BUTTON
 	elseif spec.kind == "slider" then
 		w.fill.Size = UDim2.fromScale(SettingsModel.fraction(id, value), 1)
 		w.minus.TextTransparency = if SettingsModel.fraction(id, value) <= 0 then 0.6 else 0
 		w.plus.TextTransparency = if SettingsModel.fraction(id, value) >= 1 then 0.6 else 0
+	end
+end
+
+-- A choice's word, at the largest size that fits its button (the Spider row's longest name wraps to two lines; the others fit at full size).
+function SettingsPanel._fitValue(self: any, w: any)
+	local fit = w.fit
+	if fit ~= nil and w.spec.kind == "choice" then
+		w.value.TextSize = SettingsText.buttonTextSize(w.value.Text, fit.w, fit.h, fit.size)
 	end
 end
 
@@ -328,13 +339,15 @@ local function largeNow(self: any): boolean
 	return self.io.get("LargeText") == true
 end
 
--- The player's change to one setting: kept, shown, and (large text) the panel itself grows or shrinks at once.
+-- The player's change to one setting: kept, shown, and (large text) the panel itself grows or shrinks at once. A live row's answer is shown as the status line.
 function SettingsPanel._apply(self: any, id: string, value: SettingsModel.Value)
-	self.io.set(id, value)
-	self.message = ""
+	local said = self.io.set(id, value)
+	local before = self.message
+	self.message = if said ~= nil then said else ""
 	self.confirming = false
 	self:refreshRow(id)
 	self:_statusLine()
+	if self.message ~= before then self:layout() end -- (the line may need more or less room)
 	if id == "LargeText" then
 		self.scale = SettingsText.scale(largeNow(self))
 		self:layout()
@@ -444,6 +457,8 @@ function SettingsPanel.layout(self: any)
 				wd.prev.Position, wd.prev.Size, wd.prev.TextSize = UDim2.fromOffset(cx, cy), UDim2.fromOffset(target, target), btext
 				wd.next.Position, wd.next.Size, wd.next.TextSize = UDim2.fromOffset(cx + cw - target, cy), UDim2.fromOffset(target, target), btext
 				wd.value.Position, wd.value.Size, wd.value.TextSize = UDim2.fromOffset(cx + target + gap, cy), UDim2.fromOffset(cw - 2 * target - 2 * gap, target), vtext
+				wd.fit = { w = cw - 2 * target - 2 * gap, h = target, size = vtext }
+				self:_fitValue(wd)
 			else
 				local vw = math.floor(SettingsText.VALUE_WIDTH * s)
 				wd.minus.Position, wd.minus.Size, wd.minus.TextSize = UDim2.fromOffset(cx, cy), UDim2.fromOffset(target, target), btext

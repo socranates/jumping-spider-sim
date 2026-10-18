@@ -6,6 +6,9 @@ local Nav = require("../src/Shared/UI/SettingsNav")
 local Text = require("../src/Shared/UI/SettingsText")
 local ControlText = require("../src/Shared/UI/ControlText")
 local CameraMath = require("../src/Shared/Movement/CameraMath")
+local SpiderChoice = require("../src/Shared/Rig/SpiderChoice")
+local PeacockText = require("../src/Shared/UI/PeacockText")
+local SaveProgress = require("../src/Shared/Persistence/SaveProgress")
 local SettingsPanel = require("../src/Client/SettingsPanel")
 local stubs = ClientStubs
 
@@ -21,9 +24,9 @@ for _, sec in Spec.SECTIONS do
 	check(not sectionIds[sec.id] and sec.title ~= "", `section {sec.id} is unique and has a title`)
 	sectionIds[sec.id] = true
 end
-check(#Spec.SECTIONS == 4 and Spec.SECTIONS[1].id == "sound" and Spec.SECTIONS[2].id == "camera" and Spec.SECTIONS[3].id == "comfort" and Spec.SECTIONS[4].id == "help",
-	"four sections in order: Sound, Camera, Comfort and accessibility, Help and hints")
-check(Spec.SECTIONS[3].title == "Comfort and accessibility" and Spec.SECTIONS[4].title == "Help and hints", "the section titles")
+check(#Spec.SECTIONS == 5 and Spec.SECTIONS[1].id == "sound" and Spec.SECTIONS[2].id == "camera" and Spec.SECTIONS[3].id == "comfort" and Spec.SECTIONS[4].id == "help" and Spec.SECTIONS[5].id == "spider",
+	"five sections in order: Sound, Camera, Comfort and accessibility, Help and hints, Your spider")
+check(Spec.SECTIONS[3].title == "Comfort and accessibility" and Spec.SECTIONS[4].title == "Help and hints" and Spec.SECTIONS[5].title == "Your spider", "the section titles")
 
 local seen: { [string]: boolean } = {}
 local perSection: { [string]: number } = {}
@@ -173,7 +176,7 @@ for _, sec in Model.sections() do
 	nSections += 1
 	nItems += #sec.items
 end
-check(nSections == 4 and nItems == #Spec.LIST, "sections() holds every setting once")
+check(nSections == 5 and nItems == #Spec.LIST + #Spec.LIVE, "sections() holds every setting and every live row once")
 
 -- ---------------------------------------------------------------- words
 check(Model.valueText("InvertY", true) == "On" and Model.valueText("InvertY", false) == "Off", "On and Off")
@@ -204,11 +207,45 @@ out = Model.migrate({ A = 1 }, 1)
 check(out.A == 1, "this build has no steps to run yet")
 
 
+-- ---------------------------------------------------------------- the Spider row: a live row, not a saved setting (ROBLOX-71)
+do
+	check(#Spec.LIVE == 1 and Spec.LIVE[1].id == "Spider" and Spec.LIVE[1].section == "spider" and Spec.LIVE[1].kind == "choice", "one live row: Spider, a choice, in Your spider")
+	local live = Spec.LIVE[1]
+	check(live.label == "Spider" and #live.label <= 56 and live.note ~= nil and #(live.note :: string) <= 110, "a label and a note that fit a line")
+	check(sectionIds[live.section] == true and Spec.LIST[1].id ~= "Spider", "in a known section")
+	for _, s in Spec.LIST do check(s.id ~= "Spider", "no saved setting is called Spider") end
+	check(Model.live("Spider") and not Model.live("MasterVolume") and not Model.live(nil) and not Model.live("Nope"), "live() knows the row and only the row")
+	check(Model.spec("Spider") == live and Model.spec("MasterVolume") ~= nil, "spec() finds both kinds")
+	-- not saved, not read from a save, not reset, not an attribute
+	check(not Model.known("Spider") and table.find(Model.ids(), "Spider") == nil and Model.defaults().Spider == nil and Model.default("Spider") == nil, "ids(), defaults() and known() leave it out")
+	local v2, p2 = Model.clean("Spider", "maratus_volans_male")
+	check(v2 == nil and p2 == nil, "clean() drops it quietly, as it does an id from a newer build")
+	local problems2, cleaned2 = Model.cleanAll({ Spider = "maratus_volans_male", InvertY = true })
+	check(#problems2 == 0 and cleaned2.Spider == nil and cleaned2.InvertY == true, "a saved settings table that holds it keeps nothing of it")
+	check(not pcall(Model.get, holder({ Spider = "x" }), "Spider"), "and it cannot be read as a saved setting")
+	local payload = SaveProgress.snapshot({ opened = {}, eye_seconds = 0 }, false, "maratus_volans_male", { Spider = "myrmarachne_formicaria_female", InvertY = true })
+	check(payload.settings.Spider == nil and payload.settings.InvertY == true and payload.appearance == "maratus_volans_male", "the save keeps the spider as `appearance`, never as a setting")
+	-- stepping and words follow SpiderChoice and PeacockText
+	check(Model.step("Spider", "first_spider", 1) == "maratus_volans_male" and Model.step("Spider", "maratus_volans_male", 1) == "myrmarachne_formicaria_female" and Model.step("Spider", "myrmarachne_formicaria_female", 1) == "first_spider", "it cycles first spider, peacock, ant mimic and round")
+	check(Model.step("Spider", "first_spider", -1) == "myrmarachne_formicaria_female" and Model.step("Spider", "maratus_volans_male", -1) == "first_spider", "and back the other way")
+	check(Model.step("Spider", "rival_spider", 1) == "maratus_volans_male" and Model.step("Spider", 7, 1) == "maratus_volans_male", "something that is not a spider counts as the first")
+	for _, id in SpiderChoice.ORDER do
+		check(Model.valueText("Spider", id) == PeacockText.title(id) and string.lower(string.sub(Model.valueText("Spider", id), 1, 1)) .. string.sub(Model.valueText("Spider", id), 2) == PeacockText.NAMES[id], `{id}: the row says its name from PeacockText.NAMES`)
+	end
+	check(Model.valueText("Spider", "maratus_volans_male") == "The peacock spider" and Model.valueText("Spider", nil) == "The first spider" and Model.line("Spider", "myrmarachne_formicaria_female") == "Spider: The ant-mimicking spider", "the words")
+	-- a locked spider is skipped (nothing is locked today: the ownership hook is SpiderChoice.locked)
+	local real = SpiderChoice.locked
+	SpiderChoice.locked = function(id: string): boolean return id == "maratus_volans_male" end
+	check(Model.step("Spider", "first_spider", 1) == "myrmarachne_formicaria_female" and Model.step("Spider", "myrmarachne_formicaria_female", -1) == "first_spider", "a locked spider is skipped, both ways")
+	SpiderChoice.locked = real
+	check(Model.step("Spider", "first_spider", 1) == "maratus_volans_male", "and everything is free again")
+end
+
 -- ---------------------------------------------------------------- moving about without a mouse (SettingsNav)
 do
 	local nav = Nav.new()
 	local rows = nav.rows
-	check(#rows == #Spec.LIST + 4 + 2, "a header per section, every setting, then Reset and Back")
+	check(#rows == #Spec.LIST + #Spec.LIVE + 5 + 2, "a header per section, every setting and live row, then Reset and Back")
 	check(rows[1].kind == "header" and rows[1].title == "Sound" and rows[#rows - 1].kind == "reset" and rows[#rows].kind == "back", "in order, ending with Reset and Back")
 	check(nav:current().kind == "setting" and nav:current().id == "SoundMuted", "it starts on the first setting, not on a header")
 	nav:move(1)
@@ -219,7 +256,10 @@ do
 	nav:move(-1)
 	check(nav:current().kind == "reset", "and then Reset")
 	nav:move(-1)
-	check(nav:current().id == "NotebookNotes", "and then the last setting")
+	check(nav:current().id == "Spider", "and then the last row, the Spider")
+	nav:move(-1)
+	check(nav:current().id == "NotebookNotes", "and then the last saved setting")
+	nav:move(1)
 	nav:move(1)
 	nav:move(1)
 	nav:move(1)
@@ -237,8 +277,11 @@ do
 	nav:section(-1)
 	check(nav:current().id == "SoundMuted", "and then to the one before")
 	nav:section(-1)
-	check(nav:current().section == "help", "and wraps to the last section's start")
-	check(nav:current().id == "ControlHints", "which is Help and hints")
+	check(nav:current().section == "spider", "and wraps to the last section's start")
+	check(nav:current().id == "Spider", "which is Your spider")
+	nav:section(-1)
+	check(nav:current().id == "ControlHints", "and Help and hints is the one before")
+	nav:section(1)
 	nav:section(1)
 	check(nav:current().id == "SoundMuted", "forward from the last section wraps to the first")
 	nav:select(#rows)
@@ -246,8 +289,8 @@ do
 	check(nav:current().id == "SoundMuted", "from Back, PageDown goes to the first section")
 	nav:select(#rows)
 	nav:section(-1)
-	check(nav:current().id == "ControlHints", "and PageUp to the last")
-	check(not nav:select(1) and nav:current().id == "ControlHints", "a header cannot be chosen")
+	check(nav:current().id == "Spider", "and PageUp to the last")
+	check(not nav:select(1) and nav:current().id == "Spider", "a header cannot be chosen")
 	check(nav:selectId("FieldOfView") and nav:current().id == "FieldOfView" and not nav:selectId("Nope"), "a setting can be chosen by id")
 end
 
@@ -307,15 +350,28 @@ end
 -- ---------------------------------------------------------------- the panel on its own (SettingsPanel)
 local GuiService = game:GetService("GuiService")
 local function build(width: number, height: number, startValues: { [string]: any }?): (any, any)
-	local state: any = { values = {}, log = {}, resets = 0, status = "saved" }
+	local state: any = { values = {}, log = {}, resets = 0, status = "saved", refuse = false }
 	for k, v in startValues or {} do state.values[k] = v end
 	local io = {
-		get = function(id: string): any return Model.get(function(k: string): any return state.values[k] end, id) end,
-		set = function(id: string, v: any) state.values[id] = v; table.insert(state.log, id) end,
+		get = function(id: string): any
+			if Model.live(id) then return state.spider end -- (the client: `appearance`, not a setting)
+			return Model.get(function(k: string): any return state.values[k] end, id)
+		end,
+		set = function(id: string, v: any): string?
+			table.insert(state.log, id)
+			if Model.live(id) then
+				if state.refuse then return PeacockText.NOT_NOW end
+				state.spider = v
+				return PeacockText.changed(v)
+			end
+			state.values[id] = v
+			return nil
+		end,
 		reset = function() state.resets += 1; for _, id in Model.ids() do state.values[id] = Model.default(id) end end,
 		status = function(): string? return state.status end,
 	}
 	state.closed = {}
+	state.spider = "first_spider"
 	local panel = SettingsPanel.new(Instance.new("Folder"), io, function(to: string?) table.insert(state.closed, if to then to else "nil") end)
 	panel.gui.AbsoluteSize = { X = width, Y = height }
 	local m = Text.metrics(width, height, 1)
@@ -347,7 +403,7 @@ do
 	for _, w in panel.widgets do
 		if w.kind == "header" then headers += 1 elseif w.kind == "setting" then rows += 1 end
 	end
-	check(headers == 4 and rows == #Spec.LIST, "four sections and every setting have a place")
+	check(headers == 5 and rows == #Spec.LIST + #Spec.LIVE, "five sections and every setting and live row have a place")
 	check(panel.widgets[1].frame.Text == "Sound" and panel.widgets[1].frame.Name == "Header_sound", "the first section is Sound")
 	check(panel.status.Text == Spec.WORDS.savedLine, "it says the settings are kept with the saved game")
 	check(widgetOf(panel, "MasterVolume").value.Text == "100%" and widgetOf(panel, "SoundMuted").value.Text == "Off" and widgetOf(panel, "Captions").value.Text == "Normal", "values from the defaults")
@@ -540,6 +596,59 @@ do
 end
 
 do
+	-- the Spider row (ROBLOX-71): reads and drives the live spider, may be refused, is not reset
+	local panel, st = build(1280, 720)
+	panel:open("game", "keyboard", 1)
+	local w = widgetOf(panel, "Spider")
+	check(w ~= nil and w.label.Text == "Spider" and w.value.Text == "The first spider" and w.note.Visible and w.note.Text == Spec.LIVE[1].note, "the row: its label, the spider it shows, its note")
+	check(panel.widgets[#panel.widgets - 1].kind == "header" and panel.widgets[#panel.widgets - 1].frame.Text == "Your spider" and panel.widgets[#panel.widgets] == w, "it sits last, under Your spider")
+	panel.nav:selectId("Spider")
+	key("Right")
+	check(st.spider == "maratus_volans_male" and w.value.Text == "The peacock spider" and panel.status.Text == "You are the peacock spider now", "Right: the next spider, shown and said")
+	key("Right", Enum.UserInputState.End)
+	key("Return")
+	check(st.spider == "myrmarachne_formicaria_female" and w.value.Text == "The ant-mimicking spider", "Enter steps it on")
+	key("Left")
+	key("Left", Enum.UserInputState.End)
+	check(st.spider == "maratus_volans_male", "Left steps back")
+	w.next.Activated:Fire()
+	w.next.Activated:Fire()
+	check(st.spider == "first_spider" and w.value.Text == "The first spider", "the arrows on a tap, round the three and back")
+	w.value.Activated:Fire()
+	check(st.spider == "maratus_volans_male", "a tap on the word steps it on")
+	check(st.values.Spider == nil, "it is never held as a setting")
+	-- refused: the row snaps back to the spider it still is, and the panel says why
+	st.refuse = true
+	key("Return")
+	check(st.spider == "maratus_volans_male" and w.value.Text == "The peacock spider" and panel.status.Text == PeacockText.NOT_NOW, "refused: the row shows the spider it still is, and the line says it will not change now")
+	st.refuse = false
+	-- the line is the panel's own, and the next change of anything clears it
+	panel.nav:selectId("SoundMuted")
+	key("Return")
+	check(panel.status.Text == Spec.WORDS.savedLine, "changing a saved setting brings the saving line back")
+	-- Reset leaves the spider alone
+	panel.nav:select(#panel.nav.rows - 1)
+	key("Return")
+	key("Return")
+	check(st.resets == 1 and st.spider == "maratus_volans_male" and w.value.Text == "The peacock spider", "Reset to defaults does not touch the spider")
+	-- every name fits its button at a readable size, on a phone and with large text
+	for _, scr in { { 1280, 720 }, { 360, 640 }, { 568, 320 } } do
+		for _, large in { false, true } do
+			local p2, st2 = build(scr[1], scr[2], { LargeText = large })
+			p2:open("game", "touch", if large then 1.5 else 1)
+			local w2 = widgetOf(p2, "Spider")
+			for _, id in SpiderChoice.ORDER do
+				st2.spider = id
+				p2:refreshRow("Spider")
+				check(w2.value.TextSize >= 11 and w2.value.Text == PeacockText.title(id), `{scr[1]}x{scr[2]}{if large then " large" else ""}: "{w2.value.Text}" is {w2.value.TextSize} pt in its button`)
+			end
+			p2:close()
+		end
+	end
+	panel:close()
+end
+
+do
 	-- saved settings arriving while it is open; the saving line; large text inside the panel
 	local panel, st = build(1280, 720, { MasterVolume = 0.4, Captions = "large", LargeText = false })
 	st.status = "session"
@@ -620,7 +729,7 @@ do
 					if rowH < target then bad += 1; print(`  row short: {name} {w.id}`) end
 				end
 			end
-			check(rowsChecked == #Spec.LIST and bad == 0, `{name}: every control sits inside its row, apart from the others, and is a touch target`)
+			check(rowsChecked == #Spec.LIST + #Spec.LIVE and bad == 0, `{name}: every control sits inside its row, apart from the others, and is a touch target`)
 			local foot = panel.resetButton.Size.Y.Offset
 			check(m.foot + foot >= target and panel.backButton.Size.X.Offset >= 100 * 1 and panel.resetButton.Position.X.Offset + panel.resetButton.Size.X.Offset <= panel.backButton.Position.X.Offset + m.paperW, `{name}: Reset and Back are touch targets`)
 			check(panel.hint.Visible == (m.hint > 0), `{name}: the controls line shows only when there is room`)
@@ -944,6 +1053,53 @@ do
 	press("WindowsillSettings", "Return")
 	check(lp:GetAttribute("SoundMuted") == false and lp:GetAttribute("MasterVolume") == 1.0, "Reset puts every setting back (and writes them, so the save follows)")
 	sp:close()
+
+	-- the Spider row (ROBLOX-71): the real client changes the spider anywhere it stands safely, keeps it as Appearance (the save), never as a setting
+	do
+		local function spiderRow(): any
+			for _, x in sp.widgets do if x.kind == "setting" and x.id == "Spider" then return x end end
+			return nil
+		end
+		driver.openSettings("game")
+		sp:refresh()
+		local row = spiderRow()
+		check(row ~= nil and row.value.Text == "The first spider" and driver.appearance() == "first_spider", "the row shows the spider being played")
+		sp.nav:selectId("Spider")
+		press("WindowsillSettings", "Return")
+		check(driver.appearance() == "maratus_volans_male" and lp:GetAttribute("Appearance") == "maratus_volans_male", "Enter on the row changes the spider, here on the open sill and not in the crack")
+		check(lp:GetAttribute("Spider") == nil and row.value.Text == "The peacock spider" and sp.status.Text == "You are the peacock spider now", "kept as Appearance, never as a setting; the row and the line say so")
+		check(workspace:FindFirstChild("Spider"):GetAttribute("AppearanceId") == "maratus_volans_male", "and the drawn spider is the peacock")
+		-- each unsafe moment: it will not change, says so, and the row snaps back
+		local motor, jump, feeding = driver.motor, driver.jump, driver.prey.feeding
+		local unsafe: { { string | (boolean) -> () } } = {
+			{ "seized", function(on: boolean) motor.seized = on end },
+			{ "preparing a jump", function(on: boolean) motor.preparing = on end },
+			{ "struggling with prey", function(on: boolean) feeding.struggling = on end },
+			{ "in the air", function(on: boolean) motor.mode = if on then "airborne" else "attached" end },
+		}
+		for _, u in unsafe do
+			local name, set = u[1] :: string, u[2] :: (boolean) -> ()
+			set(true)
+			press("WindowsillSettings", "Return")
+			check(driver.appearance() == "maratus_volans_male" and lp:GetAttribute("Appearance") == "maratus_volans_male", `{name}: the spider stays as it was`)
+			check(row.value.Text == "The peacock spider" and sp.status.Text == PeacockText.NOT_NOW, `{name}: the row snaps back and the panel says it will not change now`)
+			set(false)
+		end
+		check(not jump:isBusy() and motor.mode == "attached", "(the spider is standing again)")
+		-- a locked spider is skipped by the row, as by the crack's key
+		local real = SpiderChoice.locked
+		SpiderChoice.locked = function(id: string): boolean return id == "myrmarachne_formicaria_female" end
+		press("WindowsillSettings", "Return")
+		check(driver.appearance() == "first_spider", "with the ant mimic locked the row goes from the peacock to the first spider")
+		SpiderChoice.locked = real
+		press("WindowsillSettings", "Return")
+		press("WindowsillSettings", "Return")
+		check(driver.appearance() == "myrmarachne_formicaria_female", "and unlocked it reaches the ant mimic")
+		press("WindowsillSettings", "Return")
+		check(driver.appearance() == "first_spider" and lp:GetAttribute("Appearance") == "first_spider", "and round to the first spider")
+		sp:close()
+		frames(3)
+	end
 end
 
 print(`SETTINGS passed={passed} failed={failed}`)

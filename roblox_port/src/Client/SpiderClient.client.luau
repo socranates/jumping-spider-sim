@@ -412,7 +412,9 @@ local camSettings: any = {} -- the camera's settings, filled each frame (see the
 local function canChange(): boolean
 	return life.resting and not life.asleep and not life.growth:isMoulting()
 end
-local appearanceTouched = false -- the player chose a spider this visit (only then is the choice sent to be saved)
+-- The spider pick (ROBLOX-71): whether the player chose a spider this visit (only then is the choice sent to be saved), and the one way a choice is
+-- made, shared by the crack's key and the Settings row. One table: the client is at Luau's limit of 200 locals.
+local spiderPick: any = { touched = false }
 local function setAppearance(id: string)
 	appearance = id
 	player:SetAttribute("Appearance", appearance)
@@ -427,15 +429,35 @@ local function setAppearance(id: string)
 	rig:setBodyHidden(bodyHidden)
 	old:destroy()
 end
+function spiderPick.switch(id: string)
+	setAppearance(id)
+	spiderPick.touched = true
+	if saveClient ~= nil then saveClient:markDirty() end
+	hud:toast(PeacockText.changed(appearance), false)
+end
 local function changeSpider()
 	if not canChange() then
 		hud:toast(PeacockText.NOT_RESTING, false)
 		return
 	end
-	setAppearance(SpiderChoice.next(appearance))
-	appearanceTouched = true
-	if saveClient ~= nil then saveClient:markDirty() end
-	hud:toast(PeacockText.changed(appearance), false)
+	spiderPick.switch(SpiderChoice.next(appearance))
+end
+-- The Settings row's side: standing safely (SpiderChoice.safeToChange) anywhere, not only in the crack. Answers the line the panel shows.
+function spiderPick.safe(): boolean
+	return SpiderChoice.safeToChange({
+		mode = motor.mode, seized = motor.seized, preparing = motor.preparing, jumping = jump:isBusy(), onLine = motor:onLine(),
+		moulting = life.growth:isMoulting(), struggling = prey.feeding.struggling,
+	})
+end
+function spiderPick.fromSettings(id: any): string?
+	if SpiderChoice.start(id, nil) ~= id or id == appearance then return nil end
+	if SpiderChoice.locked(id :: string) then return nil end
+	if not spiderPick.safe() then
+		hud:toast(PeacockText.NOT_NOW, false)
+		return PeacockText.NOT_NOW
+	end
+	spiderPick.switch(id :: string)
+	return PeacockText.changed(appearance)
 end
 -- X / RB / the Dance (Wave) button: the peacock spider starts its courtship dance or ends it; the ant mimic raises its antennae higher or lets them
 -- go. On a controller RB in the crack changes spider instead (one button for both, as the crack and the open sill never overlap). The first
@@ -665,10 +687,18 @@ placeTopButtons()
 
 -- The settings (ROBLOX-49). Opened from the life menu or with O; closing it goes back to wherever it was opened from. The world waits while
 -- it is open (modal()). The values live as Player attributes named by SettingsSpec ids (the panel asks setting(), tells player:SetAttribute),
--- so the saving that already watches them (below) keeps them and every consumer in this script reads them live.
+-- so the saving that already watches them (below) keeps them and every consumer in this script reads them live. The one exception is the Spider
+-- row (ROBLOX-71, SettingsModel.live): it reads `appearance` and asks spiderPick, so the spider is kept in the save as before, not as a setting.
 settingsPanel=SettingsPanel.new(player:WaitForChild("PlayerGui"),{
- get=function(id: string): any return setting(id) end,
- set=function(id: string,value: any) player:SetAttribute(id,value) end,
+ get=function(id: string): any
+  if SettingsModel.live(id) then return appearance end
+  return setting(id)
+ end,
+ set=function(id: string,value: any): string?
+  if SettingsModel.live(id) then return spiderPick.fromSettings(value) end
+  player:SetAttribute(id,value)
+  return nil
+ end,
  reset=function() for _,id in SettingsModel.ids() do player:SetAttribute(id,SettingsModel.default(id)) end end,
  status=function(): string? local status=saveClient:status();return status end,
 },function(to: string?)
@@ -701,7 +731,7 @@ end
 local function progressSnapshot(): any
 	local settings: { [string]: any } = {}
 	for key in prefTouched do settings[key] = player:GetAttribute(key) end -- (the snapshot sends only what is clean)
-	return SaveProgress.snapshot(book:toRecord(), session.finishedMain, if appearanceTouched then appearance else nil, settings)
+	return SaveProgress.snapshot(book:toRecord(), session.finishedMain, if spiderPick.touched then appearance else nil, settings)
 end
 local function adoptRest(mode: string, record: any)
 	if record == nil or (mode ~= "main" and mode ~= "free") then return end
@@ -728,7 +758,7 @@ local function applySaved(msg: any)
 			if not prefTouched[key] then player:SetAttribute(key, v) end
 		end
 		applyingSaved = false
-		if p.appearance ~= nil and not appearanceTouched and p.appearance ~= appearance and SpiderChoice.start(p.appearance, nil) == p.appearance then
+		if p.appearance ~= nil and not spiderPick.touched and p.appearance ~= appearance and SpiderChoice.start(p.appearance, nil) == p.appearance then
 			setAppearance(p.appearance)
 		end
 	end

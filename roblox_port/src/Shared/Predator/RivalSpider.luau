@@ -4,6 +4,7 @@
 -- Plain state lives in LifeLoop's checkpoint graph; no clock, engine instance or hidden player tracking.
 local M=require(script.Parent.Parent.Prey.PreyMath)
 local Rules=require(script.Parent.Parent.Data.RivalRules)
+local Layout=require(script.Parent.Parent.Habitat.WindowsillLayout)
 local Rival={}
 Rival.FOOD=.7 -- two housefly-equivalent meals
 local states={dormant=true,patrol=true,stalk=true,windup=true,lunge=true,recover=true,captured=true,consumed=true}
@@ -11,7 +12,7 @@ local states={dormant=true,patrol=true,stalk=true,windup=true,lunge=true,recover
 function Rival.new(): any
  local at=Rules.arriveAt
  return {state="dormant",position=at,previous=at,heading=-Vector3.xAxis,
-  elapsed=0,notice=0,food=Rival.FOOD,target=at,origin=at,patrol=0}
+  elapsed=0,notice=0,food=Rival.FOOD,target=at,origin=at,patrol=0,up=Vector3.yAxis,leg=0}
 end
 -- The next rival, in the same table (the world holds this table): a fresh one that has not yet arrived.
 function Rival.renew(r: any)
@@ -25,6 +26,18 @@ function Rival.valid(r: any): boolean
   local n=r[k];if type(n)~="number" or n~=n or n<0 or n==math.huge then return false end
  end
  if r.food>Rival.FOOD+1e-8 then return false end
+ -- ROBLOX-69: where it stands. `up` (the face under it) and `leg` (patrol places visited) are missing in older records: they mean the floor and
+ -- none. It is on the sill, never in the crack.
+ if r.up~=nil then
+  local u=r.up
+  if (typeof(u)~="Vector3" and type(u)~="table") or type(u.X)~="number" or type(u.Y)~="number" or type(u.Z)~="number"
+   or u.X~=u.X or u.Y~=u.Y or u.Z~=u.Z or math.abs(u.Magnitude-1)>.05 then return false end
+ end
+ if r.leg~=nil and (type(r.leg)~="number" or r.leg~=r.leg or r.leg<0 or r.leg>1e9 or r.leg%1~=0) then return false end
+ do
+  local p,lo,hi=r.position,Layout.PLAY_BOUNDS_MIN,Layout.PLAY_BOUNDS_MAX
+  if p.X<lo.X or p.Y<lo.Y or p.Z<lo.Z or p.X>hi.X or p.Y>hi.Y or p.Z>hi.Z or Layout.inRetreat(Vector3.new(p.X,p.Y,p.Z)) then return false end
+ end
  if r.day~=nil and (type(r.day)~="number" or r.day~=r.day or r.day<0 or r.day==math.huge) then return false end
  for _,k in {"position","previous","heading","target","origin"} do
   local v=r[k];if typeof(v)~="Vector3" and type(v)~="table" then return false end
@@ -54,43 +67,54 @@ function Rival.step(r: any,dt: number,s: any,blocked: (Vector3,Vector3)->any): (
   if s.day<Rules.firstDay or s.meals<Rules.firstMeals or (s.hour or Rules.arriveHour)<Rules.arriveHour
    or (s.position-r.position).Magnitude<Rules.arriveDistance or s.resting or s.wasp then return "",0 end
   phase(r,"patrol")
+  if s.drive then r.leg=(s.day or 0)*5 end -- a different first place to patrol to each day
  end
  -- Never stack two attackers or pursue into the retreat. No hidden-target chase.
  if s.safe or s.resting or s.wasp then phase(r,"recover");r.notice=0;return "",0 end
  r.elapsed+=dt
  local delta=s.position-r.position
- local visible=delta.Magnitude<8 and math.abs(delta.Y)<1.5 and not blocked(r.position,s.position)
+ -- Driven by a RivalDrive (its own motor over the whole sill): what it sees is decided ten times a second, at any height; otherwise
+ -- (the CLI's floor-only checks, Godot's rule) every tick and on the floor's level.
+ local D=s.drive
+ local visible
+ if D then visible=D.sees else visible=delta.Magnitude<8 and math.abs(delta.Y)<1.5 and not blocked(r.position,s.position) end
  if s.striking and not s.holding and r.state~="lunge" then
   local _,d=M.sweepClosest(s.previous,s.position,r.previous,r.position)
   if d<.65 and not blocked(s.position,r.position) then phase(r,"captured");return "captured",0 end
  end
  if r.state=="lunge" then
   local k=math.clamp(r.elapsed/.4,0,1)
-  local next=r.origin:Lerp(r.target,k)+Vector3.yAxis*(.35*4*k*(1-k))
+  local next=r.origin:Lerp(r.target,k)+(if D then r.up or Vector3.yAxis else Vector3.yAxis)*(.35*4*k*(1-k))
   if blocked(r.position,next) then phase(r,"recover");return "missed",0 end
   r.position=next
   local _,d=M.sweepClosest(s.previous,s.position,r.previous,r.position)
   if d<.6 and not blocked(r.position,s.position) then
    phase(r,"recover");return if s.gentle then "touch" else "caught",0
   end
-  if k>=1 then r.position=Vector3.new(r.position.X,.31,r.position.Z);phase(r,"recover") end
+  if k>=1 then if not D then r.position=Vector3.new(r.position.X,.31,r.position.Z) end;phase(r,"recover") end
  elseif r.state=="windup" then
   if not visible or s.airborne or s.onLine then phase(r,"recover");return "missed",0 end
   if r.elapsed>=1 then
-   r.origin=r.position;r.target=Vector3.new(math.clamp(s.position.X,18,28),.31,math.clamp(s.position.Z,3,10.8))
+   r.origin=r.position
+   if D then
+    -- At the spider's own place, wherever that is; never at the crack.
+    if Layout.inRetreat(s.position) then phase(r,"recover");return "missed",0 end
+    r.target=s.position
+   else r.target=Vector3.new(math.clamp(s.position.X,18,28),.31,math.clamp(s.position.Z,3,10.8)) end
    phase(r,"lunge")
   end
  elseif r.state=="recover" then
-  r.position=Vector3.new(r.position.X,.31,r.position.Z)
+  if not D then r.position=Vector3.new(r.position.X,.31,r.position.Z) end
   if r.elapsed>=3 then phase(r,"patrol") end
  else
   r.notice=if visible then math.min(1,r.notice+dt) else math.max(0,r.notice-dt*2)
   if visible and r.notice>=.6 then
    phase(r,"stalk")
-   local flat=Vector3.new(delta.X,0,delta.Z)
-   if flat.Magnitude>.01 then r.heading=flat.Unit end
-   if flat.Magnitude<2.5 then phase(r,"windup");return "warning",0 end
-  elseif not visible then r.state="patrol" end
+   local flat=if D then delta else Vector3.new(delta.X,0,delta.Z)
+   if not D and flat.Magnitude>.01 then r.heading=flat.Unit end
+   if flat.Magnitude<(if D then Rules.reachWu else 2.5) and (not D or D.reach) then phase(r,"windup");return "warning",0 end
+  elseif not visible and not (D and r.state=="stalk" and D.remember) then r.state="patrol" end
+  if D then return "",0 end -- its legs are the drive's
   local next=r.position
   if r.state=="stalk" then next+=r.heading*dt*1.1
   elseif r.state=="patrol" then

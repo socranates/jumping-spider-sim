@@ -133,7 +133,8 @@ local detail = Detail.choose(UIS.TouchEnabled and not UIS.KeyboardEnabled, Works
 -- Which spider: the Player attribute Appearance (kept for the session), else the Workspace attribute Appearance, else the first spider.
 local appearance = SpiderChoice.start(player:GetAttribute("Appearance"), Workspace:GetAttribute("Appearance"))
 local rig = SpiderRig.new(Workspace, sill, appearance, detail)
-local rivalRig: any = nil
+-- The rival's legs (ROBLOX-69): its own SpiderMotor over the whole sill, made when it first arrives, and its drawn rig. One table: the client is at Luau's limit of 200 locals.
+local rivalLegs: any = { drive = nil, rig = nil, Drive = require(Shared.Predator.RivalDrive) }
 local dance = PeacockDance.new() -- the peacock spider's courtship dance (a pose for the rig; nothing else reads it)
 local dancePose: any = nil
 -- The ant-mimicking spider's antennae and drawn walk (a pose for the rig; nothing else reads it): the modules, the state, its latest pose, and where
@@ -1074,13 +1075,22 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			prey:after(DT,motor,sensor,sightCast)
 			-- Three houseflies or six small prey; credit food, not just spare energy capacity.
 			life.mealFood = (life.mealFood or 0) + (prey.feeding.taken-takenBefore) * Growth.READY_FOOD / (3 * Species.fly_like_prototype.body.nutrition)
-            local rivalEvent,rivalFood=RivalSpider.step(life.rival,DT,{
-             position=motor.pos,previous=prey.previousPosition or motor.pos,heading=motor.heading,
+            local rivalState={
+             position=motor.pos,previous=prey.previousPosition or motor.pos,heading=motor.heading,up=motor.up,
              day=life.clock.day,hour=life.clock.hour,meals=prey.feeding.mealsFinished,resting=life.resting,safe=Layout.inRetreat(motor.pos),
              wasp=wasp:isVisiting(),gentle=needs.gentle,grounded=motor.mode=="attached",moving=motor.moving,
              airborne=motor.mode=="air",onLine=motor:onLine(),holding=prey.feeding.held~=nil,
-             striking=prey.tick<=prey.strikeEnd and not motor.seized,
-            },sightCast)
+             striking=prey.tick<=prey.strikeEnd and not motor.seized,drive=rivalLegs.drive,
+            }
+            local rivalEvent,rivalFood=RivalSpider.step(life.rival,DT,rivalState,sightCast)
+            if life.rival.state~="dormant" and life.rival.state~="consumed" and rivalLegs.drive==nil then
+             rivalLegs.drive=rivalLegs.Drive.new(SpiderMotor.new({
+              world = sill, surfaces = Surfaces, profile = Species.phidippus_audax_prototype,
+              spawn = life.rival.position, heading = life.rival.heading,
+              boundsMin = Layout.PLAY_BOUNDS_MIN, boundsMax = Layout.PLAY_BOUNDS_MAX, probeParent = arc,
+             }),sightCast)
+            end
+            if rivalLegs.drive then rivalLegs.drive:update(life.rival,DT,rivalState) end
             if rivalFood>0 then
              needs:grantEnergy(rivalFood,"rival_spider_meal")
              life.mealFood+=rivalFood*Growth.READY_FOOD/(3*Species.fly_like_prototype.body.nutrition)
@@ -1188,11 +1198,11 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
  if not paused then watch:frame(simFrame,cam.eyeView,eyes.moversShown) end
     local rival=life.rival
     if rival and rival.state~="dormant" and rival.state~="consumed" then
-     if not rivalRig then rivalRig=SpiderRig.new(Workspace,sill,"rival_spider","low");rivalRig.model.Name="RivalSpider" end
-     rivalRig.reducedMotion=setting("ReducedMotion")==true
-     rivalRig.jumpLoad=if rival.state=="windup" then math.clamp(rival.elapsed,0,1) else 0
-     rivalRig:update(SupportMath.bodyCFrame(rival.position,Vector3.yAxis,rival.heading),if paused then 0 else simFrame,rival.state~="lunge",(rival.position-rival.previous).Magnitude>.001)
-    elseif rivalRig then rivalRig:destroy();rivalRig=nil end
+     if not rivalLegs.rig then rivalLegs.rig=SpiderRig.new(Workspace,sill,"rival_spider","low");rivalLegs.rig.model.Name="RivalSpider" end
+     rivalLegs.rig.reducedMotion=setting("ReducedMotion")==true
+     rivalLegs.rig.jumpLoad=if rival.state=="windup" then math.clamp(rival.elapsed,0,1) else 0
+     rivalLegs.rig:update(SupportMath.bodyCFrame(rival.position,rival.up or Vector3.yAxis,rival.heading),if paused then 0 else simFrame,rival.state~="lunge",(rival.position-rival.previous).Magnitude>.001)
+    elseif rivalLegs.rig then rivalLegs.rig:destroy();rivalLegs.rig=nil end
 	updateHud(frameDt)
 	flyBodies:draw(prey.flies,prey.now)
 	local soundPaused = GuiService.MenuIsOpen or modal()
@@ -1250,7 +1260,7 @@ if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
 		local run: any = (require :: any)(playback)
 		run({
 			prey = prey, flyBodies = flyBodies, waspBody = waspBody, life = life, wasp = wasp, caughtPanel = panel, needs = needs, checkpoints = checkpoints, returnToCheckpoint = function() returnToCheckpoint() end, lifeSpider = function() return lifeSpider end, sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
-			input = controls,
+			input = controls, rivalLegs = rivalLegs,
 			notebook = book, notebookWatch = watch, notebookPanel = nbPanel, openNotebook = openNotebook, settingsPanel = settingsPanel, openSettings = openSettings, setting = setting, cam = cam, soundscape = soundscape, eyes = eyes,
 			session=session, menu=menu, openMenu=openMenu, endLife=endLife, fresh=fresh, continueAnother=continueAnother, currentStore=function() return checkpoints end,
 			changeSpider = function() changeSpider() end, dance = function() return dance end, ant = function() return ant.state end, antPose = function() return ant.pose end, appearance = function() return appearance end, rig = function() return rig end,

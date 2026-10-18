@@ -13,4 +13,20 @@ RivalRules.arriveDistance = 8.0
 -- Where it arrives, at the east end of the sill (WU).
 RivalRules.arriveAt = Vector3.new(25, 0.31, 8)
 
+-- ROBLOX-69: the rival roams the whole sill with its own motor. How often it decides (the motor itself steps every tick), how far and how it moves.
+RivalRules.thinkSeconds = 0.1
+RivalRules.sightWu = 8.0 -- it perceives the player up to here with a clear line (as before)
+RivalRules.patrolSpeed = 0.8 -- WU per second (it was 0.45 on its small territory)
+RivalRules.stalkSpeed = 1.1
+RivalRules.reachWu = 2.5 -- the windup begins this close, on the same face or one that meets it
+RivalRules.rememberSeconds = 3.0 -- it keeps stalking where it last saw the spider this long after losing sight of it
+RivalRules.legSeconds = 240.0 -- a patrol leg that has not arrived by now is dropped for the next
+RivalRules.stuckSeconds = 4.0 -- no progress for this long: the route is made again
+-- Nothing the rival does goes in here: the retreat grown by half a stud (the crack itself is also a hard check).
+RivalRules.keepOutMin = Vector3.new(-30.0, -0.5, 2.5)
+RivalRules.keepOutMax = Vector3.new(-22.8, 2.0, 9.5)
+-- The sill the rival may walk (the frames' outer faces and the underside of the floor are outside it).
+RivalRules.sillMin = Vector3.new(-31.05, -0.05, -13.55)
+RivalRules.sillMax = Vector3.new(31.05, 40.0, 12.55)
+
 return RivalRules

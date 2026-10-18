@@ -534,5 +534,83 @@ case("the daily rival: the day it was eaten round-trips, a new one still comes t
  local oldRec=assert(Checkpoint.capture(old,0))
  check(oldRec.world~=nil and Checkpoint.restore(oldRec,old) and old.life.rival.day==nil,"an older record of an eaten rival still restores")
 end)
+case("the roaming rival (ROBLOX-69): a checkpoint taken mid-climb brings it back on the same wall, a rest elsewhere in its walk is not kept, bad places are refused", function()
+ local Rival=require("../src/Shared/Predator/RivalSpider")
+ local Drive=require("../src/Shared/Predator/RivalDrive")
+ local Route=require("../src/Shared/Predator/RivalRoute")
+ local w=newWorld()
+ local m=Motor.new({world=sill,surfaces=Surfaces,profile=Species.phidippus_audax_prototype,spawn=Vector3.new(25,.31,8),heading=Vector3.new(-1,0,0),
+  boundsMin=Layout.PLAY_BOUNDS_MIN,boundsMax=Layout.PLAY_BOUNDS_MAX,probeParent=sill})
+ local d=Drive.new(m,function() return true end)
+ local r=Rival.new();r.state="patrol";w.life.rival=r
+ m:place(Vector3.new(25,.31,8),Vector3.yAxis,Vector3.new(-1,0,0));r.position,r.previous,r.origin,r.heading=m.pos,m.pos,m.pos,m.heading;d.prevState="patrol"
+ -- Its next place is a stem (the leg picks it).
+ local want
+ for leg=0,300 do
+  r.leg=leg
+  local pick=d:_pickWaypoint(r)
+  if pick and string.sub(Route.faces()[pick.face].piece,1,5)=="stem_" and pick.pos.X>0 then want=leg break end
+ end
+ check(want~=nil,"a patrol place on a stem is found")
+ r.leg=want or 0
+ local snap={position=Vector3.new(-25,.31,6),previous=Vector3.new(-25,.31,6),up=Vector3.yAxis,grounded=true,heading=Vector3.xAxis,day=3,hour=12,meals=2,
+  resting=false,safe=false,wasp=false,gentle=false,moving=false,airborne=false,onLine=false,holding=false,striking=false,drive=d}
+ local function run(ticks:number)
+  for _=1,ticks do Rival.step(r,DT,snap,function() return true end);d:update(r,DT,snap) end
+ end
+ local climbing=false
+ for _=1,60*150 do
+  run(1)
+  if r.up.Y<.5 then climbing=true break end
+ end
+ check(climbing,"it is on a wall or a stem")
+ run(40)
+ local rec=assert(Checkpoint.capture(w,0))
+ local at,up,leg,heading=r.position,r.up,r.leg,r.heading
+ run(60*20)
+ local later=r.position
+ check((later-at).Magnitude>1,"it walked on after the checkpoint")
+ check(Checkpoint.restore(rec,w),"the checkpoint restores")
+ check(w.life.rival.state=="patrol" and (w.life.rival.position-at).Magnitude<1e-9 and (w.life.rival.up-up).Magnitude<1e-9 and w.life.rival.leg==leg,"the rival is back where it was, on the same face, on the same leg")
+ -- The legs follow the state, then carry on to the same place.
+ r=w.life.rival
+ snap.drive=d
+ local before=d.stats.resets
+ run(1)
+ check(d.stats.resets>before and (m.pos-at).Magnitude<.2 and (m.up-up).Magnitude<1e-6,"its motor stands where the record says")
+ run(60*120)
+ check(r.leg>leg and Rival.valid(r),"it carries on to the place it was going to, and the next leg begins")
+ -- A fresh drive on the same record (a new session) does the same.
+ check(Checkpoint.restore(rec,w),"restored again")
+ r=w.life.rival
+ local m2=Motor.new({world=sill,surfaces=Surfaces,profile=Species.phidippus_audax_prototype,spawn=Vector3.new(25,.31,8),heading=Vector3.new(-1,0,0),
+  boundsMin=Layout.PLAY_BOUNDS_MIN,boundsMax=Layout.PLAY_BOUNDS_MAX,probeParent=sill})
+ local d2=Drive.new(m2,function() return true end)
+ d2.prevState="patrol"
+ snap.drive=d2
+ for _=1,10 do Rival.step(r,DT,snap,function() return true end);d2:update(r,DT,snap) end
+ check((m2.pos-at).Magnitude<.2 and (m2.up-up).Magnitude<1e-6,"a new session's legs stand there too")
+ -- Refusals: in the crack, outside the sill, a bad face, a bad leg.
+ local good=assert(Checkpoint.capture(w,0))
+ for name,mut in {
+  crack=function(x) x.position=Vector3.new(-26,.31,6) end,
+  outside=function(x) x.position=Vector3.new(200,.31,6) end,
+  up=function(x) x.up=Vector3.new(0,0,0) end,
+  leg=function(x) x.leg=-3 end,
+  legfrac=function(x) x.leg=1.5 end,
+ } do
+  local x=w.life.rival
+  local keep={x.position,x.up,x.leg}
+  mut(x)
+  local bad=assert(Checkpoint.capture(w,0))
+  check(not Checkpoint.restore(bad,w),`a rival {name} is refused`)
+  x.position,x.up,x.leg=keep[1],keep[2],keep[3]
+ end
+ check(Checkpoint.restore(good,w),"and the good record still restores")
+ -- A record from before the roaming rival (no up, no leg) restores and means the floor.
+ local old=newWorld();old.life.rival=Rival.new();old.life.rival.state="patrol";old.life.rival.up=nil;old.life.rival.leg=nil
+ local oldRec=assert(Checkpoint.capture(old,0))
+ check(Checkpoint.restore(oldRec,old) and old.life.rival.state=="patrol","an older record of a patrolling rival restores")
+end)
 print(`CHECKPOINT passed={passed} failed={failed}`)
 if failed > 0 then error("CHECKPOINT failed") end

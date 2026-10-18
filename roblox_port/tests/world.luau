@@ -11,6 +11,9 @@ local Scenery = require("../src/Shared/Habitat/Scenery")
 local Flora = require("../src/Shared/Data/Flora")
 local Wear = require("../src/Shared/Data/Wear")
 local Plants = require("../src/Shared/Habitat/Plants")
+local Shapes = require("../src/Shared/Habitat/Shapes")
+local Dressing = require("../src/Shared/Habitat/Dressing")
+local DayLight = require("../src/Shared/Habitat/DayLight")
 local Lit = require("../src/Shared/Habitat/Lit")
 local WorldDetail = require("../src/Client/WorldDetail")
 
@@ -603,14 +606,285 @@ check(blade.Position.Y<home.Y-1 and not tip.CanQuery and tip.Transparency==1,"dr
 b:apply(nil)
 check((blade.Position-home).Magnitude<1e-6 and tip.CanQuery and tip.Transparency==1,"drawn tip returns without showing collision box")
 local grass=decor:FindFirstChild("GrassTufts")
-check(grass~=nil and #grass:GetChildren()==14,"sparse grass patches survive low detail")
+check(grass~=nil and #grass:GetChildren()==34,"Chet's 14 grass patches and the 20 added tufts survive low detail")
 local safe=true;local count=0
 for _,p in grass:GetDescendants() do if p:IsA("BasePart") then count+=1;safe=safe and not p.CanQuery and not p.CanCollide and not p.CanTouch end end
-check(safe and count==42,"low grass is bounded and cannot block any gameplay query")
+check(safe and count==82,`low grass is bounded (14 x 3 + 20 x 2 = 82 blades, {count}) and cannot block any gameplay query`)
 local coverParams=RaycastParams.new();coverParams.FilterType=Enum.RaycastFilterType.Include;coverParams.FilterDescendantsInstances={sill}
 for _,id in {"cover_bark_west","cover_bark_east","cover_leaf_front","cover_rim"} do
  local p=sill:FindFirstChild(id)
  check(p~=nil and p.CanQuery~=false and p.CanCollide~=false and p.Transparency<1,"stalking cover stays visible and solid: "..id)
 end
+
+-- ---------------------------------------------------------------- ROBLOX-74: more grass and detail, and the morning dew
+-- Pure visual density. The nav graph of the rival and the player's walkable surfaces come from Layout.PIECES alone, so what is pinned here is that
+-- those boxes are byte for byte the ones they were, and that none of the new parts can be walked on, hit by a ray or touched.
+do
+	local sum = 0
+	for i, p in Layout.PIECES do
+		sum += i * (p.lo.X + 2 * p.lo.Y + 3 * p.lo.Z + 5 * p.hi.X + 7 * p.hi.Y + 11 * p.hi.Z)
+	end
+	check(#Layout.PIECES == 28 and near(sum, 25445.9, 1e-6) and Layout.CONTENT_REVISION == "windowsill-v1" and #Layout.DECOR == 11, `Layout.PIECES is the 28 boxes it was (checksum {sum})`)
+
+	local sunFull = Vector3.new(0.35, 0.5, -0.8).Unit
+	local fresh = Scenery.decor(sunFull)
+	local again = Scenery.decor(sunFull)
+	local function newParts(root: any): { any } -- everything ROBLOX-74 added: the four folders and the added tufts' blades
+		local out = {}
+		for _, name in { "Moss", "Litter", "Windfall", "Dew" } do
+			for _, d in find(root, name):GetDescendants() do if d:IsA("BasePart") then table.insert(out, d) end end
+		end
+		for _, t in find(root, "GrassTufts"):GetChildren() do
+			if tonumber(string.sub(t.Name, 5)) > #Flora.grass.patches then
+				for _, d in t:GetDescendants() do if d:IsA("BasePart") then table.insert(out, d) end end
+			end
+		end
+		return out
+	end
+	local function census(root: any): number
+		local n = 0
+		for _, d in root:GetDescendants() do if d:IsA("BasePart") then n += 1 end end
+		return n
+	end
+	local added = newParts(fresh)
+	local solid = 0
+	for _, p in added do
+		if p.CanCollide ~= false or p.CanQuery ~= false or p.CanTouch ~= false or not p.Anchored then solid += 1 end
+	end
+	check(#added > 0 and solid == 0, `none of the {#added} new parts can collide, be queried or be touched`)
+
+	-- Part budgets: the full tier adds at most about 250 parts, the low tier fewer than half of them.
+	local fullAdded = #added
+	local fullTotal = census(fresh)
+	local grassFull = 0
+	for _, t in find(fresh, "GrassTufts"):GetChildren() do
+		if tonumber(string.sub(t.Name, 5)) > #Flora.grass.patches then for _, d in t:GetDescendants() do if d:IsA("BasePart") then grassFull += 1 end end end
+	end
+	local counts = { Moss = census(find(fresh, "Moss")), Litter = census(find(fresh, "Litter")), Windfall = census(find(fresh, "Windfall")), Dew = census(find(fresh, "Dew")) }
+	check(fullAdded == grassFull + counts.Moss + counts.Litter + counts.Windfall + counts.Dew and fullAdded <= 250 and fullAdded >= 150,
+		`the full tier adds {fullAdded} parts (grass {grassFull}, moss {counts.Moss}, pebbles and bark {counts.Litter}, fallen leaves {counts.Windfall}, dew {counts.Dew}), at most 250`)
+	check(grassFull == 80 and counts.Moss == 28 and counts.Litter == 22 and counts.Windfall == 6 and counts.Dew == 56,
+		"the counts per kind: 80 blades in 20 tufts, 28 moss mounds, 14 pebbles and 8 bark chips, 6 leaf parts, 56 drops")
+
+	local fullGrass = 0
+	for _, d in find(fresh, "GrassTufts"):GetDescendants() do if d:IsA("BasePart") then fullGrass += 1 end end
+	check(fullGrass == 150 and #find(fresh, "GrassTufts"):GetChildren() == 34, "the grass is 150 blades in 34 tufts at full detail (it was 70 in 14)")
+
+	WorldDetail.apply("low", { fresh })
+	local lowAdded = #newParts(fresh)
+	local lowTotal = census(fresh)
+	check(lowAdded < fullAdded * 0.55 and lowAdded >= 60 and lowTotal < 450,
+		`the low tier keeps {lowAdded} of the {fullAdded} added parts (decor {lowTotal} parts, under 450)`)
+	local lowCounts = { Moss = census(find(fresh, "Moss")), Litter = census(find(fresh, "Litter")), Windfall = census(find(fresh, "Windfall")), Dew = census(find(fresh, "Dew")) }
+	check(lowCounts.Moss == 12 and lowCounts.Litter == 10 and lowCounts.Windfall == 4 and lowCounts.Dew == 19, `low: 12 moss, 6 pebbles and 4 bark chips, 4 leaf parts, 19 drops ({lowCounts.Moss}, {lowCounts.Litter}, {lowCounts.Windfall}, {lowCounts.Dew})`)
+
+	-- Rays and navigation: a grid of rays through the whole sill hits exactly the same physical piece at exactly the same point with the new decor
+	-- in the world as with no decor at all.
+	do
+		local function shoot(withDecor: boolean): { string }
+			workspace:ClearAllChildren()
+			Scenery.sill().Parent = workspace
+			if withDecor then Scenery.decor(sunFull).Parent = workspace end
+			local out = {}
+			for x = -29, 29, 1.5 do
+				for z = -11.5, 11.5, 1.5 do
+					local hit = workspace:Raycast(Vector3.new(x, 20, z), Vector3.new(0, -25, 0), RaycastParams.new())
+					table.insert(out, if hit then `{hit.Instance.Name}@{string.format("%.5f,%.5f,%.5f", hit.Position.X, hit.Position.Y, hit.Position.Z)}` else "none")
+				end
+			end
+			return out
+		end
+		local bare, dressed = shoot(false), shoot(true)
+		local same = #bare == #dressed
+		for i = 1, #bare do
+			same = same and bare[i] == dressed[i]
+		end
+		check(same and #bare > 500, `{#bare} rays down through the sill hit the same piece at the same point with and without the decor`)
+		workspace:ClearAllChildren()
+	end
+
+	-- Seeded placement: the same sill every time, a different one for another seed, and a pinned fingerprint.
+	local function fingerprint(root: any): number
+		local total = 0
+		for _, p in newParts(root) do total += p.Position.X + 2 * p.Position.Y + 3 * p.Position.Z end
+		return total
+	end
+	local full2 = Scenery.decor(sunFull)
+	local a, b = fingerprint(full2), fingerprint(again)
+	check(a == b and near(a, -129.1926, 1e-3), `every build places the same sill (fingerprint {string.format("%.4f", a)})`)
+	local firstPebble = find(full2, "Litter", "Pebbles", "Pebble1")
+	local seed = Flora.worldSeed
+	Flora.worldSeed = seed + 1
+	local other = Scenery.decor(sunFull)
+	Flora.worldSeed = seed
+	local movedPebble = find(other, "Litter", "Pebbles", "Pebble1")
+	check(firstPebble ~= nil and movedPebble ~= nil and (firstPebble.Position - movedPebble.Position).Magnitude > 0.01 and fingerprint(other) ~= a, "another world seed scatters it differently")
+	local back = Scenery.decor(sunFull)
+	check(fingerprint(back) == a, "and the seed restored gives the sill back")
+end
+
+-- The grass: Chet's tufts are as they were; the added ones vary in height and hue and stand clear of the pieces, the spawn and the retreat.
+do
+	local blades = Plants.grassBlades()
+	local old, new = {}, {}
+	for _, b in blades do table.insert(if b.tuft <= #Flora.grass.patches then old else new, b) end
+	local heights, hues, dry = {}, {}, 0
+	for _, b in new do
+		table.insert(heights, b.size.Y)
+		hues[string.format("%.2f,%.2f,%.2f", b.color.R, b.color.G, b.color.B)] = true
+		if b.color.R > b.color.G * 0.95 then dry += 1 end
+	end
+	table.sort(heights)
+	local hueCount = 0
+	for _ in hues do hueCount += 1 end
+	check(#old == 70 and #new == 80 and heights[1] >= Flora.grass.more.height[1] - 1e-9 and heights[#heights] <= Flora.grass.more.height[2] + 1e-9 and heights[#heights] > 2 * heights[1],
+		`the added tufts' blades are {string.format("%.2f", heights[1])} to {string.format("%.2f", heights[#heights])} tall, more than twofold`)
+	check(hueCount >= 40 and dry >= 3, `the added blades have {hueCount} different colours, {dry} of them dry`)
+	local first = blades[1]
+	check(near(first.size.Y, 0.25 + (7 + 3) % 9 * 0.035, 1e-12) and near(first.size.X, 0.065, 1e-12) and near(old[#old].foot.X, 18, 1e-12), "Chet's blades are built as they were")
+	local clearOk, tufts = true, {}
+	for _, b in new do
+		clearOk = clearOk and Shapes.clearAt(b.foot.X, b.foot.Y, b.foot.Z, 0.3) and near(b.tip.Y - b.foot.Y, b.size.Y * math.cos(math.acos(b.direction.Y)), 1e-9)
+		tufts[b.tuft] = b.foot
+	end
+	local nTufts = 0
+	for _ in tufts do nTufts += 1 end
+	check(clearOk and nTufts == 20, `all 20 added tufts stand clear of every piece, the spawn and the retreat ({nTufts})`)
+end
+
+-- Moss, pebbles and bark, the fallen leaves: where they lie.
+do
+	local d = Scenery.decor(Vector3.new(0.35, 0.5, -0.8).Unit)
+	local mossOk, mossN, lowest = true, 0, math.huge
+	for _, bit in find(d, "Moss"):GetDescendants() do
+		if bit:IsA("BasePart") then
+			mossN += 1
+			local c = bit.Position
+			local onTrough = c.Z > 0 and c.Z < 0.4 and c.X > 3.4 and c.X < 16.6 and c.Y > 0
+			local onWall = c.Z > -12.5 and c.Z < -12.1 and c.Y > 0
+			mossOk = mossOk and (onTrough or onWall) and bit.Color.G > bit.Color.R and bit.Size.Y < bit.Size.X and c.Y - extent(bit).Y > -0.01
+		end
+	end
+	check(mossOk and mossN == 28, `moss lies on the shaded faces only: the trough's room side and the back wall's foot, green and above the floor ({mossN} mounds)`)
+	local litterOk, litterTop, pebbles, chips = true, 0, 0, 0
+	for _, bit in find(d, "Litter"):GetDescendants() do
+		if bit:IsA("BasePart") then
+			local c = bit.Position
+			if string.sub(bit.Name, 1, 6) == "Pebble" then pebbles += 1 elseif string.sub(bit.Name, 1, 4) == "Chip" then chips += 1 end
+			litterOk = litterOk and Shapes.clearAt(c.X, 0.02, c.Z, 0.3) and c.Y - extent(bit).Y > -0.05 and c.Y > 0 -- a pebble sits a fifth into the floor
+			litterTop = math.max(litterTop, c.Y + extent(bit).Y)
+		end
+	end
+	check(litterOk and pebbles == 14 and chips == 8 and litterTop <= 0.35, `14 pebbles and 8 bark chips lie on the floor clear of pieces, spawn and retreat, none over 3.5 mm high ({string.format("%.2f", litterTop)})`)
+	local leafOk = true
+	for i, leaf in Flora.windfall.items do
+		local blade = find(d, "Windfall", "Leaf" .. i, "Blade")
+		local e = extent(blade)
+		leafOk = leafOk and Shapes.clearAt(leaf.x, 0.02, leaf.z, 1.2) and near(blade.Position.Y - e.Y, 0, 0.012) and find(d, "Windfall", "Leaf" .. i, "Stalk") ~= nil
+			and find(d, "Windfall", "Leaf" .. i, "Detail"):GetAttribute("FullOnly") == true
+	end
+	check(#Flora.windfall.items == 2 and leafOk, "two fallen leaves lie on the floor, a lower edge touching it, each with a stalk and a full-tier midrib")
+end
+
+-- The dew follows the clock: it gathers through the night, is there at 06:00, burns off between 07:30 and 09:30 and is gone by 10:00.
+do
+	local decorDew = Scenery.decor(Vector3.new(0.35, 0.5, -0.8).Unit)
+	local dew = find(decorDew, "Dew")
+	local drops = {}
+	for _, p in dew:GetDescendants() do if p:IsA("BasePart") then table.insert(drops, p) end end
+	local function visible(): number
+		local n = 0
+		for _, p in drops do if p.Transparency < 1 then n += 1 end end
+		return n
+	end
+	local function allAt(t: (number) -> boolean): boolean
+		for _, p in drops do if not t(p.Transparency) then return false end end
+		return true
+	end
+	check(#drops == 56 and visible() == 0, "the dew is built unseen: 56 drops, all transparent until the clock says")
+	check(DayLight.dewAt(6.0) == 1 and DayLight.dewAt(7.5) == 1 and DayLight.dewAt(10.0) == 0 and DayLight.dewAt(9.5) == 0 and DayLight.dewAt(14.0) == 0 and DayLight.dewAt(20.0) == 0
+		and DayLight.dewAt(5.0) == 1 and DayLight.dewAt(0 / 0) == 0, "the dew is full from 05:00 to 07:30, gone from 09:30 to 20:00")
+	local rising, burning, last = true, true, -1
+	for h = 20, 29, 0.25 do
+		local level = DayLight.dewAt(h % 24)
+		rising = rising and level >= last
+		last = level
+	end
+	last = 2
+	for h = 7.5, 9.5, 0.05 do
+		local level = DayLight.dewAt(h)
+		burning = burning and level <= last
+		last = level
+	end
+	check(rising and burning and DayLight.dewAt(0.0) > 0.2 and DayLight.dewAt(0.0) < 0.9 and DayLight.dewAt(8.5) > 0.2 and DayLight.dewAt(8.5) < 0.8,
+		"it gathers steadily through the night from 20:00 and fades steadily from 07:30 to 09:30")
+	check(DayLight.applyDew(decorDew, 6.0) and visible() == 56 and allAt(function(t) return t >= 0.28 - 1e-9 and t <= 0.45 + 1e-9 end),
+		"at 06:00 all 56 drops show, translucent (0.28 to 0.45)")
+	check(not DayLight.applyDew(decorDew, 6.0) and not DayLight.applyDew(decorDew, 6.05) and not DayLight.applyDew(nil, 6.0) and not DayLight.applyDew(Instance.new("Folder"), 6.0),
+		"nothing is set again for the same dew, or when there is no dew")
+	check(not DayLight.applyDew(decorDew, 7.5) and visible() == 56, "at 07:30 they are all still there (the level has not moved)")
+	DayLight.applyDew(decorDew, 8.5)
+	local mid = visible()
+	check(mid > 0 and mid < 56, `at 08:30 some have gone, some remain ({mid} of 56)`)
+	DayLight.applyDew(decorDew, 9.4)
+	local late = visible()
+	check(late < mid, `fewer at 09:24 still ({late})`)
+	check(DayLight.applyDew(decorDew, 10.0) and visible() == 0 and allAt(function(t) return t == 1 end), "by 10:00 every drop is fully transparent")
+	DayLight.applyDew(decorDew, 20.0)
+	check(visible() == 0, "at 20:00 there is none yet")
+	DayLight.applyDew(decorDew, 21.0)
+	check(visible() < 10, `at 21:00 the first few are forming ({visible()})`)
+	DayLight.applyDew(decorDew, 2.0)
+	local night = visible()
+	check(night > 0, `at 02:00 the dew has gathered ({night} drops)`)
+	local before = visible()
+	check(DayLight.applyDew(decorDew, 2.0) == false and visible() == before, "the same hour sets nothing again")
+
+	-- Where the drops stand: on a grass tip, around a Pilea leaf's rim or on a fallen leaf.
+	local blades = Plants.grassBlades()
+	local onTips, onLeaves, onFallen = 0, 0, 0
+	local standOk = true
+	for _, p in find(dew, "Grass"):GetChildren() do
+		local nearest = math.huge
+		for _, b in blades do nearest = math.min(nearest, (b.tip - p.Position).Magnitude) end
+		standOk = standOk and nearest < 0.2
+		onTips += 1
+	end
+	for i, plant in Flora.pilea.plants do
+		local leaf = piece(plant.leaf)
+		for k = 1, Flora.dew.pilea.perLeaf do
+			local p = find(dew, "Leaves", `Drop{i}_{k}`)
+			if p then
+				onLeaves += 1
+				standOk = standOk and p.Position.X > leaf.lo.X and p.Position.X < leaf.hi.X and p.Position.Z > leaf.lo.Z and p.Position.Z < leaf.hi.Z
+					and near(p.Position.Y, leaf.hi.Y, 0.1) and p.Material == Mat("Glass")
+			end
+		end
+	end
+	for _ in find(dew, "Windfall"):GetChildren() do onFallen += 1 end
+	check(standOk and onTips == 25 and onLeaves == 25 and onFallen == 6, `drops: {onTips} on grass tips, {onLeaves} on the Pilea's leaves, {onFallen} on the fallen leaves`)
+
+	-- On a phone: the grass and leaf drops that stand on something the low tier keeps stay, the rest go; those that stay still follow the clock.
+	WorldDetail.apply("low", { decorDew })
+	local keptDrops = {}
+	for _, p in find(decorDew, "Dew"):GetDescendants() do if p:IsA("BasePart") then table.insert(keptDrops, p) end end
+	local lowBlades = {}
+	for _, d in find(decorDew, "GrassTufts"):GetDescendants() do if d:IsA("BasePart") then table.insert(lowBlades, d) end end
+	local supported = true
+	for _, p in find(decorDew, "Dew", "Grass"):GetChildren() do
+		local nearest = math.huge
+		for _, blade in lowBlades do nearest = math.min(nearest, (blade.CFrame * Vector3.new(0, blade.Size.Y / 2, 0) - p.Position).Magnitude) end
+		supported = supported and nearest < 0.2
+	end
+	check(#keptDrops == 19 and supported and find(decorDew, "Dew", "Windfall") == nil, `on a phone {#keptDrops} drops stay, each on a blade or leaf that stays, and none on the fallen leaves`)
+	DayLight.applyDew(decorDew, 6.0)
+	local shown = 0
+	for _, p in keptDrops do if p.Transparency < 1 then shown += 1 end end
+	DayLight.applyDew(decorDew, 10.0)
+	local hidden = 0
+	for _, p in keptDrops do if p.Transparency == 1 then hidden += 1 end end
+	check(shown == 19 and hidden == 19, "and they come with 06:00 and go by 10:00")
+end
+
 print(`WORLD passed={passed} failed={failed}`)
 if failed > 0 then error("world checks failed") end

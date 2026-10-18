@@ -198,6 +198,36 @@ check("in the crack E rests; in the evening the spider sleeps until morning, the
 	assert(string.find(life.notice, "Awake before morning", 1, true), life.notice)
 end)
 
+check("the morning dew follows the life clock: there at 06:00, fading from 07:30, gone by 10:00 (ROBLOX-74)", function()
+	local life = ClientStubs.driver.life
+	local decor = Instance.new("Folder")
+	decor.Name = "Decor"
+	local dew = Instance.new("Folder")
+	dew.Name = "Dew"
+	dew.Parent = decor
+	local drops = {}
+	for i, lag in { 0.0, 0.3, 0.5 } do
+		local d = Instance.new("Part")
+		d.Name = "Drop" .. i
+		d:SetAttribute("Lag", lag)
+		d:SetAttribute("Base", 0.3)
+		d.Transparency = 1
+		d.Parent = dew
+		table.insert(drops, d)
+	end
+	decor.Parent = workspace
+	life.clock.hour = 6.0
+	frames(2)
+	for _, d in drops do assert(d.Transparency < 1 and math.abs(d.Transparency - 0.3) < 1e-9, `no dew at 06:00 ({d.Transparency})`) end
+	life.clock.hour = 8.6
+	frames(2)
+	assert(drops[1].Transparency < 1 and drops[3].Transparency == 1, `the last drop should be gone first at 08:36 ({drops[1].Transparency}, {drops[3].Transparency})`)
+	life.clock.hour = 10.0
+	frames(2)
+	for _, d in drops do assert(d.Transparency == 1, `dew at 10:00 ({d.Transparency})`) end
+	decor:Destroy()
+end)
+
 check("Backspace returns to the checkpoint kept by a rest, or to the start when there is none", function()
 	local driver = ClientStubs.driver
 	local life, needs, prey = driver.life, driver.needs, driver.prey

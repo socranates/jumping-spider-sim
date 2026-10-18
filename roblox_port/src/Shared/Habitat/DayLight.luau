@@ -9,9 +9,10 @@
 --     (Godot: the sun's colour whitens by daylight 0.6).
 -- The light is only what the screen shows. How far the spider sees comes from the clock (LifeLoop.rangeScale), never from here.
 -- It owns: Lighting's ClockTime, Brightness, Ambient, OutdoorAmbient, ColorShift_Top and ExposureCompensation; the Atmosphere's
--- Color and Decay; SunRays.Intensity; the Shafts beams' Brightness and Enabled; the Motes' Brightness. Never the eye view's
--- effects (EyeGrade, EyeBlur, MacroDOF: SpiderEyes) or the world's Grade.
+-- Color and Decay; SunRays.Intensity; the Shafts beams' Brightness and Enabled; the Motes' Brightness; and (ROBLOX-74, applyDew) the
+-- Transparency of the morning dew's drops. Never the eye view's effects (EyeGrade, EyeBlur, MacroDOF: SpiderEyes) or the world's Grade.
 local Graphics = require(script.Parent.Parent.Data.Graphics)
+local Flora = require(script.Parent.Parent.Data.Flora)
 
 local DayLight = {}
 
@@ -101,6 +102,41 @@ function DayLight.apply(lighting: any, t: Targets, decor: Instance?)
 			motes.Brightness = t.motes
 		end
 	end
+end
+
+-- ---------------------------------------------------------------- the morning dew (ROBLOX-74)
+-- How much dew there is at an hour of the day (0 to 1): it gathers through the night from Flora.dew.formFrom (20:00) to fullBy (05:00),
+-- holds until burnFrom (07:30) and is gone by goneBy (09:30), smoothly. It follows the hour, not the daylight, which is already full by 08:00.
+function DayLight.dewAt(hour: number): number
+	if hour ~= hour or hour == math.huge or hour == -math.huge then return 0 end
+	local D = Flora.dew
+	local h = hour % 24
+	if h >= D.goneBy and h < D.formFrom then return 0 end
+	if h >= D.burnFrom and h < D.goneBy then return 1 - smoothstep(D.burnFrom, D.goneBy, h) end
+	return smoothstep(D.formFrom, D.fullBy + 24, if h >= D.formFrom then h else h + 24)
+end
+
+-- Sets the dew for `hour` on Workspace.Decor's folder "Dew" (Habitat/Dressing): each drop is shown from its Lag (the share of the dew at
+-- which it appears) to full at a dew of 1, with the transparency Base it carries. Nothing is touched unless the dew changed by Flora.dew.step
+-- (or reached 0 or 1); the last level is kept in the folder's attribute Level, so no one else holds state. Returns whether it set the drops.
+function DayLight.applyDew(decor: Instance?, hour: number): boolean
+	local dew = if decor then decor:FindFirstChild("Dew") else nil
+	if not dew then return false end
+	local level = DayLight.dewAt(hour)
+	local last = dew:GetAttribute("Level")
+	if type(last) == "number" then
+		if last == level then return false end
+		if level > 0 and level < 1 and math.abs(level - last) < Flora.dew.step then return false end
+	end
+	dew:SetAttribute("Level", level)
+	for _, drop in dew:GetDescendants() do
+		local lag, base = drop:GetAttribute("Lag"), drop:GetAttribute("Base")
+		if drop:IsA("BasePart") and type(lag) == "number" and type(base) == "number" then
+			local seen = math.clamp((level - lag) / (1 - lag), 0, 1)
+			drop.Transparency = 1 - seen * (1 - base)
+		end
+	end
+	return true
 end
 
 return DayLight

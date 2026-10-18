@@ -1194,6 +1194,8 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 		DayLight.apply(Lighting, DayLight.targets(life.daylight, dc), Workspace:FindFirstChild("Decor"))
 		lastLight = life.daylight
 	end
+	-- The morning dew follows the hour, not the daylight (ROBLOX-74): it is drawn from the clock and keeps its last level on its own folder.
+	DayLight.applyDew(Workspace:FindFirstChild("Decor"), life.clock.hour)
 	-- Drawn frame: the up vector eases so walls and edges do not snap.
 	local simFrame = frameDt * (if slow then SLOW_SPEED else 1)
 	drawnUp = drawnUp:Lerp(motor.up, 1 - math.exp(-24 * simFrame)).Unit

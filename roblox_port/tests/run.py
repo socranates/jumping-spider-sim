@@ -46,6 +46,7 @@ MODULES = [
     ("WaspLook", "Data/WaspLook.luau"),
     ("Shapes", "Habitat/Shapes.luau"),
     ("Plants", "Habitat/Plants.luau"),
+    ("Dressing", "Habitat/Dressing.luau"),
     ("Patina", "Habitat/Patina.luau"),
     ("SunPick", "Habitat/SunPick.luau"),
     ("Scenery", "Habitat/Scenery.luau"),

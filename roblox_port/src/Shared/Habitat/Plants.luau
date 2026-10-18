@@ -363,20 +363,109 @@ function Plants.garden(parent: Instance, uv: Instance, place: (number, number, n
 	return garden
 end
 
-function Plants.grass(parent: Instance): Folder
- local group=folder(parent,"GrassTufts")
- for i,xyz in Flora.grass.patches do
-  local tuft=folder(group,"Tuft"..i)
-  local origin=Vector3.new(xyz[1],xyz[2],xyz[3])
-  for j=1,5 do
-   local optional=if j>3 then folder(tuft,"Fine"..j,true) else tuft
-   local turn=i*2.399+j*1.257
-   local height=.25+((i*7+j*3)%9)*.035
-   local lean=Vector3.new(math.cos(turn)*.14,0,math.sin(turn)*.14)
-   local frame=CFrame.new(origin+Vector3.new(0,height*.5,0)+lean*.5)*CFrame.Angles(0,turn,.22)
-   Shapes.ellipsoid(optional,"GrassBlade",Vector3.new(.065,height,.025),frame,hex(Flora.grass.colors[1+(i+j)%3]),"SmoothPlastic").CastShadow=false
-  end
- end
- return group
+-- ---------------------------------------------------------------- the grass
+-- One blade of grass. `foot` is where it stands, `tip` its upper end, `direction` the way it points, `size` the ellipsoid's diameters.
+export type Blade = { tuft: number, index: number, fine: boolean, size: Vector3, frame: CFrame, foot: Vector3, tip: Vector3, direction: Vector3, color: Color3 }
+
+local GR = Flora.grass
+
+local function shaded(c: Color3, shade: number): Color3
+	return Color3.new(math.min(c.R * shade, 1), math.min(c.G * shade, 1), math.min(c.B * shade, 1))
 end
+
+-- A free place for a tuft in a region (Shapes.clearAt, and `apart` from every foot in `taken` on the same surface), or nil after forty tries.
+local function tuftSpot(rand: () -> number, region: { x0: number, x1: number, z0: number, z1: number, y: number }, taken: { Vector3 }, apart: number): Vector3?
+	for _ = 1, 40 do
+		local x, z = between(rand, region.x0, region.x1), between(rand, region.z0, region.z1)
+		if Shapes.clearAt(x, region.y, z, 0.35) then
+			local clear = true
+			for _, other in taken do
+				if math.abs(other.Y - region.y) < 1 and (other.X - x) ^ 2 + (other.Z - z) ^ 2 < apart * apart then
+					clear = false
+					break
+				end
+			end
+			if clear then return Vector3.new(x, region.y, z) end
+		end
+	end
+	return nil
+end
+
+-- Every blade of grass on the sill, tuft by tuft: Chet's 14 patches first (five blades each, built exactly as before) and then the tufts of
+-- ROBLOX-74, placed from the world's seed in Flora.grass.more.regions. Pure: the same blades every time, so the dew can stand on their tips.
+function Plants.grassBlades(): { Blade }
+	local out: { Blade } = {}
+	local feet: { Vector3 } = {}
+	for i, xyz in GR.patches do
+		local origin = Vector3.new(xyz[1], xyz[2], xyz[3])
+		table.insert(feet, origin)
+		for j = 1, 5 do
+			local turn = i * 2.399 + j * 1.257
+			local height = 0.25 + ((i * 7 + j * 3) % 9) * 0.035
+			local lean = Vector3.new(math.cos(turn) * 0.14, 0, math.sin(turn) * 0.14)
+			local frame = CFrame.new(origin + Vector3.new(0, height * 0.5, 0) + lean * 0.5) * CFrame.Angles(0, turn, 0.22)
+			table.insert(out, {
+				tuft = i, index = j, fine = j > 3, size = Vector3.new(0.065, height, 0.025), frame = frame, foot = origin,
+				tip = frame:PointToWorldSpace(Vector3.new(0, height * 0.5, 0)), direction = frame.UpVector, color = hex(GR.colors[1 + (i + j) % 3]),
+			})
+		end
+	end
+	local M = GR.more
+	local rand = Shapes.rng(Flora.worldSeed * 100 + M.salt)
+	local tuft = #GR.patches
+	for _, region in M.regions do
+		for _ = 1, region.n do
+			local origin = tuftSpot(rand, region, feet, M.apart)
+			if origin then
+				tuft += 1
+				table.insert(feet, origin)
+				local growth = between(rand, 0.15, 1)
+				local offset = rand() * TAU
+				for j = 1, M.blades do
+					local height = M.height[1] + (M.height[2] - M.height[1]) * math.min(growth * between(rand, 0.5, 1), 1)
+					local width = between(rand, M.width[1], M.width[2])
+					local turn = offset + (j - 1) * TAU / M.blades + (rand() - 0.5) * 0.9
+					local tilt = between(rand, M.tilt[1], M.tilt[2])
+					local frame = CFrame.new(origin) * CFrame.Angles(0, turn, tilt) * CFrame.new(0, height * 0.5, 0)
+					local shade = between(rand, M.shade[1], M.shade[2])
+					local a = 1 + math.floor(rand() * #GR.colors)
+					local b = 1 + math.floor(rand() * #GR.colors)
+					local color = shaded(hex(GR.colors[a]):Lerp(hex(GR.colors[b]), rand()), shade)
+					if rand() < M.dryShare then color = shaded(hex(M.dry), shade) end
+					table.insert(out, {
+						tuft = tuft, index = j, fine = j > M.blades - M.fine, size = Vector3.new(width, height, width * 0.4), frame = frame, foot = origin,
+						tip = frame:PointToWorldSpace(Vector3.new(0, height * 0.5, 0)), direction = frame.UpVector, color = color,
+					})
+				end
+			end
+		end
+	end
+	return out
+end
+
+-- Builds the grass: a folder "GrassTufts" with one folder per tuft; its fine blades sit in their own full-tier folders.
+function Plants.grass(parent: Instance): Folder
+	local group = folder(parent, "GrassTufts")
+	local tufts: { [number]: Folder } = {}
+	for _, blade in Plants.grassBlades() do
+		local tuft = tufts[blade.tuft]
+		if not tuft then
+			tuft = folder(group, "Tuft" .. blade.tuft)
+			tufts[blade.tuft] = tuft
+		end
+		local into: Instance = if blade.fine then folder(tuft, "Fine" .. blade.index, true) else tuft
+		Shapes.ellipsoid(into, "GrassBlade", blade.size, blade.frame, blade.color, "SmoothPlastic").CastShadow = false
+	end
+	return group
+end
+
+-- A point on the top of the drawn leaf of the piece `id` (its blade is the piece's footprint with rounded corners): in the direction `angle`
+-- (radians, in plan) from the leaf's middle, `inset` in from the edge. Used by the dew.
+function Plants.leafEdge(id: string, angle: number, inset: number): Vector3
+	local leaf = piece(id)
+	local cx, cz = (leaf.lo.X + leaf.hi.X) / 2, (leaf.lo.Z + leaf.hi.Z) / 2
+	local far = reach(cx, cz, angle, leaf.lo, leaf.hi, P.radius, inset)
+	return Vector3.new(cx + math.cos(angle) * far, leaf.hi.Y, cz + math.sin(angle) * far)
+end
+
 return Plants

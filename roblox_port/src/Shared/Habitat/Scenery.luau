@@ -2,7 +2,8 @@
 -- Builds the drawn world from Data/Graphics: the sill's physical pieces (looks only), and a "Decor" folder with the window wall,
 -- glass and trim, the view out of the window, the dust, the small details, the light shafts, and (Habitat/Plants, Habitat/Patina,
 -- from Data/Flora and Data/Wear) the Pilea, the planting, the garden outside the window, the wear on the sill and the glass and
--- the silk retreat. Gameplay never reads any of the decor: every decor part is CanQuery = false, CanCollide = false, CanTouch =
+-- the silk retreat, and (Habitat/Dressing, ROBLOX-74) the shaded moss, the floor's pebbles and bark, the fallen leaves and the morning dew.
+-- Gameplay never reads any of the decor: every decor part is CanQuery = false, CanCollide = false, CanTouch =
 -- false, so the spider's rays, the camera's casts and the jump planner see only the physical pieces. Parts and emitters that
 -- only the full tier keeps carry the attribute FullOnly, which Client/WorldDetail removes on phones and tablets. A piece whose
 -- look is replaced by a drawing (the back wall, the Pilea's leaves and stems) turns invisible only once that drawing exists.
@@ -11,6 +12,7 @@ local Flora = require(script.Parent.Parent.Data.Flora)
 local Surfaces = require(script.Parent.Parent.Data.Surfaces)
 local Layout = require(script.Parent.WindowsillLayout)
 local Materials = require(script.Parent.Materials)
+local Dressing = require(script.Parent.Dressing)
 local Patina = require(script.Parent.Patina)
 local Plants = require(script.Parent.Plants)
 local Shapes = require(script.Parent.Shapes)
@@ -319,6 +321,10 @@ function Scenery.decor(sun: Vector3?): (Folder, { [string]: boolean })
 	end
 	attempt(decor, "grass", function() return Plants.grass(decor) end)
 	attempt(decor, "planting", function() return Plants.planter(decor) end)
+	attempt(decor, "moss", function() return Dressing.moss(decor) end) -- ROBLOX-74: moss, pebbles and bark, two fallen leaves and the dew
+	attempt(decor, "litter", function() return Dressing.litter(decor) end)
+	attempt(decor, "windfall", function() return Dressing.windfall(decor) end)
+	attempt(decor, "dew", function() return Dressing.dew(decor) end)
 	attempt(decor, "garden", function() return Plants.garden(decor, uv, Scenery.viewPosition) end)
 	return decor, replaced
 end

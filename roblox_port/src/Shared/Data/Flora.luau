@@ -39,14 +39,81 @@ Flora.pilea = {
 	},
 }
 
+-- ROBLOX-74: the world's seed (the number the prey, the wasp and the rival draw from, Client/SpiderClient) also scatters the added greenery,
+-- each part of it with a salt of its own, so every player sees the same sill and the tests can pin it.
+Flora.worldSeed = 914
+
 -- ---------------------------------------------------------------- the trough's planting
 -- The soil patch (WindowsillLayout.DECOR "soil") is 12 x 6 at (10, 4.61, -4), on the rim slab's top.
+-- Grass: Chet's 14 patches (x, y, z of each tuft's foot; five blades each, the last two fine) and the tufts added in ROBLOX-74. The added ones
+-- are placed from the world's seed in the regions below (y is the surface they stand on; Shapes.clearAt keeps them off pieces, the spawn and the
+-- retreat, and `apart` off each other and the old patches). Each has `blades` blades, the last `fine` of them full-tier only. A tuft grows
+-- between short and lush (`height`), each blade leans (`tilt`, radians), a blade's colour is a mix of two of `colors` times a shade, and some
+-- blades are dry. Lengths are studs (1 stud = 1 cm), so the tallest blade is 1.6 cm.
 Flora.grass = {
- colors={"668544","7a9853","91aa65"},
- patches={{5.2,4.62,-5.8},{7.0,4.62,-6.0},{11.6,4.62,-5.9},{14.9,4.62,-3.5},
- {5.3,4.62,-2.1},{11.4,4.62,-1.8},{-17,0.02,-9.5},{-14,0.02,8.8},
- {-8,0.02,-9.8},{-3,0.02,9.0},{3,0.02,9.5},{19,0.02,8.9},{24,0.02,-9.1},{18,0.02,-8.8}},
+	colors = { "668544", "7a9853", "91aa65" },
+	patches = {
+		{ 5.2, 4.62, -5.8 }, { 7.0, 4.62, -6.0 }, { 11.6, 4.62, -5.9 }, { 14.9, 4.62, -3.5 },
+		{ 5.3, 4.62, -2.1 }, { 11.4, 4.62, -1.8 }, { -17, 0.02, -9.5 }, { -14, 0.02, 8.8 },
+		{ -8, 0.02, -9.8 }, { -3, 0.02, 9.0 }, { 3, 0.02, 9.5 }, { 19, 0.02, 8.9 }, { 24, 0.02, -9.1 }, { 18, 0.02, -8.8 },
+	},
+	more = {
+		salt = 1, blades = 4, fine = 2, apart = 0.8,
+		height = { 0.35, 1.6 }, width = { 0.06, 0.1 }, tilt = { 0.08, 0.5 }, shade = { 0.84, 1.14 }, dry = "a8a468", dryShare = 0.12,
+		regions = {
+			{ name = "soil", x0 = 4.6, x1 = 15.4, z0 = -6.5, z1 = -1.6, y = 4.62, n = 5 }, -- the trough's soil
+			{ name = "back", x0 = -28.0, x1 = 28.0, z0 = -11.9, z1 = -10.3, y = 0.02, n = 6 }, -- along the back wall
+			{ name = "front", x0 = -28.0, x1 = 28.0, z0 = 10.4, z1 = 11.7, y = 0.02, n = 4 }, -- along the front lip
+			{ name = "east", x0 = 24.0, x1 = 29.4, z0 = -9.0, z1 = 9.0, y = 0.02, n = 3 }, -- by the right frame
+			{ name = "west", x0 = -29.4, x1 = -26.0, z0 = -11.0, z1 = 0.5, y = 0.02, n = 2 }, -- by the left frame, north of the retreat
+		},
+	},
 }
+
+-- Moss on the shaded side (ROBLOX-74): the sun comes in through the window behind the sill, so the trough's room-side face and the foot of the
+-- back wall's room-side face stay in shade. Each patch is a scatter of flattened mounds on a face: its centre point, the face's outward normal,
+-- a radius, how many mounds and how many of them are core (the rest are full-tier). The mounds lie on the face, `mound` as thick as they are wide.
+Flora.moss = {
+	salt = 2, size = { 0.3, 0.75 }, mound = 0.33, colors = { "4f7b34", "5f8a3a", "6b9b47", "476f30" }, material = "Plaster",
+	patches = {
+		{ x = 5.9, y = 0.9, z = 0.0, normal = { 0, 0, 1 }, r = 0.9, n = 7, core = 3 }, -- the trough's room-side face
+		{ x = 12.8, y = 0.7, z = 0.0, normal = { 0, 0, 1 }, r = 0.8, n = 7, core = 3 },
+		{ x = -5.5, y = 0.8, z = -12.5, normal = { 0, 0, 1 }, r = 0.7, n = 7, core = 3 }, -- the back wall's foot
+		{ x = 21.0, y = 0.9, z = -12.5, normal = { 0, 0, 1 }, r = 0.8, n = 7, core = 3 },
+	},
+}
+
+-- Pebbles and bark chips scattered on the sill floor (ROBLOX-74), clear of the pieces, the spawn and the retreat (Shapes.clearAt) and of each other
+-- by `apart`. A pebble is a flattened ellipsoid, a bark chip a thin, slightly tilted slab. `core` of each kind stay in the low tier.
+Flora.litter = {
+	salt = 3, apart = 0.8,
+	area = { x0 = -29.0, x1 = 29.0, z0 = -11.6, z1 = 11.2 },
+	pebbles = { count = 14, core = 6, length = { 0.3, 0.85 }, flat = 0.34, colors = { "b9b6ae", "a9aaa6", "c8c4b9", "9c9a94", "d2cfc6" }, material = "Plaster" },
+	bark = { count = 8, core = 4, length = { 0.5, 1.3 }, width = { 0.25, 0.55 }, thick = { 0.05, 0.1 }, tilt = 0.18, colors = { "6b4f36", "7d5d41", "5a432e", "86694b" }, material = "Wood" },
+}
+
+-- Two leaves blown in from the garden (ROBLOX-74), lying on the floor: a pointed oval blade with a lighter midrib and a stub of stalk. x, z where
+-- the middle lies, length and width, turn about the vertical and how far one edge is lifted (degrees). The midrib is full-tier.
+Flora.windfall = {
+	items = {
+		{ x = 8.4, z = 7.2, length = 2.7, width = 1.15, turn = 35, curl = 9, color = "b4903f", rib = "d1b366" }, -- dry gold
+		{ x = -4.4, z = -9.0, length = 2.2, width = 0.95, turn = -62, curl = 12, color = "7f8f3f", rib = "a8b56a" }, -- olive, fallen last
+	},
+	thick = 0.04, stalk = 0.6, stalkColor = "7d5c30", material = "Fabric",
+}
+
+-- Morning dew (ROBLOX-74): small translucent Glass droplets on the tips of grass blades, on the rims of the Pilea's leaves and on the fallen
+-- leaves. They are drawn from the world's seed (salt) and follow the clock of the day (Habitat/DayLight.dewAt): they gather through the night
+-- from `formFrom` (20:00) to `fullBy` (05:00), stay until `burnFrom` (07:30) and are gone by `goneBy` (09:30). Each drop has a `lag`, the share
+-- of the dew at which it appears and is gone (0 to `lag`), so they come and go one by one and not all at once.
+Flora.dew = {
+	salt = 4, formFrom = 20.0, fullBy = 5.0, burnFrom = 7.5, goneBy = 9.5, step = 0.01,
+	size = { 0.07, 0.15 }, flat = 0.8, color = "eef7f5", transparency = { 0.28, 0.45 }, reflectance = 0.25, material = "Glass", lag = 0.55,
+	grass = { chance = 0.8, keepEvery = 2 }, -- the tallest blade of a tuft; every second tuft's drop stays in the low tier
+	pilea = { perLeaf = 5, keep = 2, inset = 0.4 }, -- around the rim of each of the five green leaves; `keep` of them stay in the low tier
+	windfall = { perLeaf = 3, inset = 0.25 }, -- full tier only
+}
+
 Flora.planter = {
 	soil = "4a3a2c", -- the soil's colour (the layout's own 665644 is the old look)
 	area = { x0 = 4.3, x1 = 15.7, z0 = -6.7, z1 = -1.3, y = 4.615 }, -- where things may lie on the soil

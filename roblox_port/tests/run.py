@@ -98,10 +98,18 @@ MODULES = [
     ("FieldNotebook", "Learning/FieldNotebook.luau"),
     ("NotebookWatch", "Learning/NotebookWatch.luau"),
     ("NotebookText", "UI/NotebookText.luau"),
+    ("SaveRules", "Data/SaveRules.luau"),
     ("Json", "Persistence/Json.luau"),
     ("ObjectRecord", "Persistence/ObjectRecord.luau"),
     ("Checkpoint", "Persistence/Checkpoint.luau"),
     ("CheckpointStore", "Persistence/CheckpointStore.luau"),
+    ("SaveStores", "Persistence/SaveStores.luau"),
+    ("MemoryBackend", "Persistence/MemoryBackend.luau"),
+    ("SaveEnvelope", "Persistence/SaveEnvelope.luau"),
+    ("SaveProgress", "Persistence/SaveProgress.luau"),
+    ("SaveRest", "Persistence/SaveRest.luau"),
+    ("SaveScheduler", "Persistence/SaveScheduler.luau"),
+    ("SaveSession", "Persistence/SaveSession.luau"),
     ("SpiderCamera", "../Client/SpiderCamera.luau"),
 ]
 # The client scripts, bundled only for the tests that run the real rig and client (CLIENT_TESTS).
@@ -175,7 +183,7 @@ def main():
     luau = sys.argv[1] if len(sys.argv) > 1 else "luau"
     status = 0
     named = sys.argv[2:]
-    for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "life.luau", "checkpoint.luau", "wasp.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "look.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "peacock.luau", "continuing.luau", "growth.luau", "notebook.luau"]:
+    for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "life.luau", "checkpoint.luau", "wasp.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "look.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "peacock.luau", "continuing.luau", "growth.luau", "notebook.luau", "state.luau"]:
         if not (HERE / test_file).exists():
             if named:  # a misspelt name must not look like a pass
                 print(f"no such test file: {test_file} (names are relative to tests/, for example look.luau)", file=sys.stderr)

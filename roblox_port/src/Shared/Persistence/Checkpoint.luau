@@ -44,6 +44,8 @@ local Layout = require(script.Parent.Parent.Habitat.WindowsillLayout)
 local WaspDirector = require(script.Parent.Parent.Predator.WaspDirector)
 
 local RivalSpider = require(script.Parent.Parent.Predator.RivalSpider)
+local Mate = require(script.Parent.Parent.Predator.Mate)
+local Mating = require(script.Parent.Parent.Life.Mating)
 local Breakaway = require(script.Parent.Parent.Habitat.Breakaway)
 local Checkpoint = {}
 
@@ -119,6 +121,8 @@ function Checkpoint.boundaryProblem(world: World): string
 	if world.life.rival and world.life.rival.state=="captured" then
 		return if world.life.rival.subdued == false then "the rival in the jaws is still struggling" else "the spider is eating its rival"
 	end
+	-- ROBLOX-79: the brood is out and the ending is the player's to take; a rest here would keep a family that has already hatched.
+	if world.life.mating and world.life.mating.stage == "hatched" then return "the brood is hatching" end
 	if prey.feeding.feeding then return "the spider is feeding" end
 	if prey.feeding.struggling then return "the prey in the jaws is still struggling" end
 	if prey.tick <= prey.strikeEnd then return "a strike is still in progress" end
@@ -175,6 +179,10 @@ local function checkWorld(roots: { [string]: any }, problems: { string })
  end
  if not finite(life.grantedSeen) or life.grantedSeen<0 or life.grantedSeen>needs.grantedTotal+1e-6 then bad("growth: invalid food ledger cursor") end
  if not RivalSpider.valid(life.rival) then bad("life: invalid rival state") end
+ -- ROBLOX-79: the mate, the mating cycle and the generation. All three are missing in a record from before (a life with no mate, stage none, generation 0).
+ if not Mate.valid(life.mate) then bad("life: invalid mate state") end
+ for _, text in Mating.problemsWith(life.mating, life.mate) do bad(text) end
+ if life.generation ~= nil and not (finite(life.generation) and life.generation >= 0 and life.generation <= 1e6 and life.generation % 1 == 0) then bad("life: invalid generation") end
  if type(life.resting) ~= "boolean" then bad("life: 'resting' is not true or false") end
 	-- The flies: unique ids, a known state, finite places, perches held only by flies that exist.
 	if type(prey.flies) ~= "table" then

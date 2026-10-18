@@ -221,11 +221,13 @@ check(not sees, "the dance object passes the setting on (no tremble)")
 check(Choice.start(nil, nil) == "first_spider" and Choice.start("nonsense", 5) == "first_spider", "no choice, or an unknown one, is the first spider")
 check(Choice.start("maratus_volans_male", nil) == "maratus_volans_male" and Choice.start(nil, "maratus_volans_male") == "maratus_volans_male", "the Player or Workspace attribute can preselect the peacock spider")
 check(Choice.start("first_spider", "maratus_volans_male") == "first_spider", "the Player's attribute (kept for the session) wins over the Workspace's")
-check(Choice.next("first_spider") == "maratus_volans_male" and Choice.next("maratus_volans_male") == "myrmarachne_formicaria_female" and Choice.next("myrmarachne_formicaria_female") == "first_spider" and Choice.next("junk") == "first_spider", "C cycles first spider, peacock spider, ant-mimicking spider, and round again")
+check(Choice.next("first_spider") == "maratus_volans_male" and Choice.next("maratus_volans_male") == "myrmarachne_formicaria_female" and Choice.next("myrmarachne_formicaria_female") == "brachypelma_hamorii"
+	and Choice.next("brachypelma_hamorii") == "chromatopelma_cyaneopubescens" and Choice.next("chromatopelma_cyaneopubescens") == "first_spider" and Choice.next("junk") == "first_spider", "C cycles first spider, peacock spider, ant-mimicking spider, Mexican redknee, Greenbottle blue, and round again")
 check(Choice.canDance("maratus_volans_male") and not Choice.canDance("first_spider") and not Choice.canDance("junk"), "only the peacock spider has a dance")
 local allKnown = true
 for _, id in Choice.ORDER do allKnown = allKnown and Appearances.profiles[id] ~= nil end
-check(allKnown and #Choice.ORDER == 3 and Appearances.default == "first_spider" and Choice.ORDER[1] == "first_spider", "all three spiders are real appearances and the default is still the first")
+check(allKnown and #Choice.ORDER == 5 and Appearances.default == "first_spider" and Choice.ORDER[1] == "first_spider" and Choice.ORDER[4] == "brachypelma_hamorii" and Choice.ORDER[5] == "chromatopelma_cyaneopubescens", "all five spiders are real appearances (the tarantulas last) and the default is still the first")
+check(Choice.packOf("brachypelma_hamorii") == "tarantula_pack" and Choice.packOf("chromatopelma_cyaneopubescens") == "tarantula_pack" and Choice.packOf("first_spider") == nil and Choice.packOf("maratus_volans_male") == nil and Choice.packOf("junk") == nil, "the two tarantulas are in the tarantula pack; the others are in none")
 
 -- Which spiders are the player's to choose (ROBLOX-71): all of them while the add-ons are free (ROBLOX-66), with one hook for ownership later.
 do
@@ -233,13 +235,13 @@ do
 		check(Choice.locked(id) == false and Choice.locked(id, {}) == false and Choice.locked(id, { [id] = false }) == false, `{id}: nothing is locked while the add-ons are free`)
 	end
 	check(Choice.locked("junk") == false, "(and an unknown id is not locked either; known() is what refuses it)")
-	check(Choice.step("first_spider", 1) == "maratus_volans_male" and Choice.step("first_spider", -1) == "myrmarachne_formicaria_female" and Choice.step("maratus_volans_male", -1) == "first_spider" and Choice.step("junk", -1) == "first_spider", "step() goes either way round, and from nothing it goes to the first spider")
+	check(Choice.step("first_spider", 1) == "maratus_volans_male" and Choice.step("first_spider", -1) == "chromatopelma_cyaneopubescens" and Choice.step("maratus_volans_male", -1) == "first_spider" and Choice.step("brachypelma_hamorii", -1) == "myrmarachne_formicaria_female" and Choice.step("junk", -1) == "first_spider", "step() goes either way round, and from nothing it goes to the first spider")
 	check(Choice.next("first_spider", {}) == "maratus_volans_male", "next() is step(+1)")
 	-- a locked spider is skipped by the crack's key (next) and by the Settings row (step), in both directions
 	local real = Choice.locked
 	Choice.locked = function(id: string, owned: { [string]: boolean }?): boolean return id == "maratus_volans_male" and not (owned ~= nil and owned[id] == true) end
-	check(Choice.next("first_spider") == "myrmarachne_formicaria_female" and Choice.next("myrmarachne_formicaria_female") == "first_spider", "the peacock locked: the crack cycle goes first, ant mimic, first")
-	check(Choice.step("myrmarachne_formicaria_female", -1) == "first_spider" and Choice.step("first_spider", -1) == "myrmarachne_formicaria_female", "and the Settings row skips it going back too")
+	check(Choice.next("first_spider") == "myrmarachne_formicaria_female" and Choice.next("chromatopelma_cyaneopubescens") == "first_spider", "the peacock locked: the crack cycle goes first, ant mimic, the tarantulas, first")
+	check(Choice.step("myrmarachne_formicaria_female", -1) == "first_spider" and Choice.step("first_spider", -1) == "chromatopelma_cyaneopubescens", "and the Settings row skips it going back too")
 	check(Choice.next("first_spider", { maratus_volans_male = true }) == "maratus_volans_male", "an owned spider (the table passed down) is open again")
 	Choice.locked = function(id: string): boolean return id ~= "first_spider" end
 	check(Choice.next("first_spider") == "first_spider" and Choice.step("first_spider", -1) == "first_spider", "with everything else locked it stays as it is")
@@ -268,14 +270,15 @@ check(ControlText.name("gamepad", "choose") == "R1" and ControlText.name("gamepa
 check(Text.change("gamepad", "first_spider") == "R1: become the peacock spider" and Text.displayHint("gamepad", false) == "R1: courtship dance", "PlayStation words in the prompts")
 check(string.find(Text.helpExtra("gamepad", true), "R1 courtship dance", 1, true) ~= nil, "PlayStation words on the controls card")
 ControlText.setPadStyle("xbox")
-check(Text.change("keyboard", "first_spider") == "C: become the peacock spider" and Text.change("keyboard", "maratus_volans_male") == "C: become the ant-mimicking spider" and Text.change("keyboard", "myrmarachne_formicaria_female") == "C: become the first spider", "the crack's hint names the next spider")
+check(Text.change("keyboard", "first_spider") == "C: become the peacock spider" and Text.change("keyboard", "maratus_volans_male") == "C: become the ant-mimicking spider" and Text.change("keyboard", "myrmarachne_formicaria_female") == "C: become the Mexican redknee"
+	and Text.change("keyboard", "brachypelma_hamorii") == "C: become the Greenbottle blue" and Text.change("keyboard", "chromatopelma_cyaneopubescens") == "C: become the first spider", "the crack's hint names the next spider")
 check(Text.change("touch", "first_spider") == "Change: become the peacock spider" and Text.touchChange() == "Change" and Text.touchDisplay(false) == "Dance" and Text.touchDisplay(true) == "Stop", "touch words")
 check(Text.displayHint("keyboard", false) == "X: courtship dance" and Text.displayHint("keyboard", true) == "X: stop dancing" and Text.dancingLine("keyboard") == "COURTSHIP DANCE    X or move: stop", "the dance's prompt and status line")
 check(Text.changed("maratus_volans_male") == "You are the peacock spider now" and Text.changed("first_spider") == "You are the first spider now", "the toast after a change")
 check(string.find(Text.helpExtra("keyboard", false), "courtship", 1, true) == nil and string.find(Text.helpExtra("keyboard", true), "X courtship dance", 1, true) ~= nil
 	and string.find(Text.helpExtra("keyboard", false), "C change spider", 1, true) ~= nil, "the controls card says nothing of the dance for the first spider")
 -- The Settings row's words and the card's pointer to it (ROBLOX-71)
-check(Text.title("first_spider") == "The first spider" and Text.title("maratus_volans_male") == "The peacock spider" and Text.title("myrmarachne_formicaria_female") == "The ant-mimicking spider" and Text.title("junk") == "Junk", "a spider's name for a row starts with a capital")
+check(Text.title("first_spider") == "The first spider" and Text.title("maratus_volans_male") == "The peacock spider" and Text.title("myrmarachne_formicaria_female") == "The ant-mimicking spider" and Text.title("brachypelma_hamorii") == "The Mexican redknee" and Text.title("chromatopelma_cyaneopubescens") == "The Greenbottle blue" and Text.title("junk") == "Junk", "a spider's name for a row starts with a capital")
 check(Text.NOT_NOW == "Your spider will not change now. Stand safely on a surface first" and Text.NOT_NOW ~= Text.NOT_RESTING, "the refusal says it will not change now")
 check(Text.settingsLine("keyboard") == "Spider: change it in Settings (O) when standing safe" and Text.settingsLine("touch") == "Spider: change it in Menu, then Settings", "the card's pointer on a keyboard and on touch")
 check(Text.settingsLine("gamepad") == "Spider: change it in Settings (View, then Settings)", "and on an Xbox controller")

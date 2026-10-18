@@ -254,13 +254,15 @@ do
 	local payload = SaveProgress.snapshot({ opened = {}, eye_seconds = 0 }, false, "maratus_volans_male", { Spider = "myrmarachne_formicaria_female", InvertY = true })
 	check(payload.settings.Spider == nil and payload.settings.InvertY == true and payload.appearance == "maratus_volans_male", "the save keeps the spider as `appearance`, never as a setting")
 	-- stepping and words follow SpiderChoice and PeacockText
-	check(Model.step("Spider", "first_spider", 1) == "maratus_volans_male" and Model.step("Spider", "maratus_volans_male", 1) == "myrmarachne_formicaria_female" and Model.step("Spider", "myrmarachne_formicaria_female", 1) == "first_spider", "it cycles first spider, peacock, ant mimic and round")
-	check(Model.step("Spider", "first_spider", -1) == "myrmarachne_formicaria_female" and Model.step("Spider", "maratus_volans_male", -1) == "first_spider", "and back the other way")
+	check(Model.step("Spider", "first_spider", 1) == "maratus_volans_male" and Model.step("Spider", "maratus_volans_male", 1) == "myrmarachne_formicaria_female" and Model.step("Spider", "myrmarachne_formicaria_female", 1) == "brachypelma_hamorii"
+		and Model.step("Spider", "brachypelma_hamorii", 1) == "chromatopelma_cyaneopubescens" and Model.step("Spider", "chromatopelma_cyaneopubescens", 1) == "first_spider", "it cycles first spider, peacock, ant mimic, redknee, greenbottle and round")
+	check(Model.step("Spider", "first_spider", -1) == "chromatopelma_cyaneopubescens" and Model.step("Spider", "maratus_volans_male", -1) == "first_spider" and Model.step("Spider", "brachypelma_hamorii", -1) == "myrmarachne_formicaria_female", "and back the other way")
 	check(Model.step("Spider", "rival_spider", 1) == "maratus_volans_male" and Model.step("Spider", 7, 1) == "maratus_volans_male", "something that is not a spider counts as the first")
 	for _, id in SpiderChoice.ORDER do
 		check(Model.valueText("Spider", id) == PeacockText.title(id) and string.lower(string.sub(Model.valueText("Spider", id), 1, 1)) .. string.sub(Model.valueText("Spider", id), 2) == PeacockText.NAMES[id], `{id}: the row says its name from PeacockText.NAMES`)
 	end
-	check(Model.valueText("Spider", "maratus_volans_male") == "The peacock spider" and Model.valueText("Spider", nil) == "The first spider" and Model.line("Spider", "myrmarachne_formicaria_female") == "Spider: The ant-mimicking spider", "the words")
+	check(Model.valueText("Spider", "maratus_volans_male") == "The peacock spider" and Model.valueText("Spider", nil) == "The first spider" and Model.line("Spider", "myrmarachne_formicaria_female") == "Spider: The ant-mimicking spider"
+		and Model.valueText("Spider", "brachypelma_hamorii") == "The Mexican redknee" and Model.line("Spider", "chromatopelma_cyaneopubescens") == "Spider: The Greenbottle blue", "the words")
 	-- a locked spider is skipped (nothing is locked today: the ownership hook is SpiderChoice.locked)
 	local real = SpiderChoice.locked
 	SpiderChoice.locked = function(id: string): boolean return id == "maratus_volans_male" end
@@ -639,9 +641,8 @@ do
 	key("Left")
 	key("Left", Enum.UserInputState.End)
 	check(st.spider == "maratus_volans_male", "Left steps back")
-	w.next.Activated:Fire()
-	w.next.Activated:Fire()
-	check(st.spider == "first_spider" and w.value.Text == "The first spider", "the arrows on a tap, round the three and back")
+	for _ = 1, 4 do w.next.Activated:Fire() end
+	check(st.spider == "first_spider" and w.value.Text == "The first spider", "the arrows on a tap, round the five and back")
 	w.value.Activated:Fire()
 	check(st.spider == "maratus_volans_male", "a tap on the word steps it on")
 	check(st.values.Spider == nil, "it is never held as a setting")
@@ -1202,11 +1203,14 @@ do
 		local real = SpiderChoice.locked
 		SpiderChoice.locked = function(id: string): boolean return id == "myrmarachne_formicaria_female" end
 		press("WindowsillSettings", "Return")
-		check(driver.appearance() == "first_spider", "with the ant mimic locked the row goes from the peacock to the first spider")
+		check(driver.appearance() == "brachypelma_hamorii", "with the ant mimic locked the row goes from the peacock past it to the Mexican redknee")
 		SpiderChoice.locked = real
-		press("WindowsillSettings", "Return")
-		press("WindowsillSettings", "Return")
+		for _ = 1, 4 do press("WindowsillSettings", "Return") end -- Greenbottle blue, first spider, peacock, ant mimic
 		check(driver.appearance() == "myrmarachne_formicaria_female", "and unlocked it reaches the ant mimic")
+		press("WindowsillSettings", "Return")
+		check(driver.appearance() == "brachypelma_hamorii" and workspace:FindFirstChild("Spider"):GetAttribute("AppearanceId") == "brachypelma_hamorii" and lp:GetAttribute("Appearance") == "brachypelma_hamorii", "the next is a tarantula, drawn and kept as `Appearance`")
+		press("WindowsillSettings", "Return")
+		check(driver.appearance() == "chromatopelma_cyaneopubescens" and workspace:FindFirstChild("Spider"):GetAttribute("AppearanceId") == "chromatopelma_cyaneopubescens", "and the other tarantula")
 		press("WindowsillSettings", "Return")
 		check(driver.appearance() == "first_spider" and lp:GetAttribute("Appearance") == "first_spider", "and round to the first spider")
 		sp:close()

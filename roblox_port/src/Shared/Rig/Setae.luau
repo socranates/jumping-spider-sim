@@ -187,7 +187,7 @@ end
 function Setae.body(look: any): { Hair }
 	local out: { Hair } = {}
 	local f = look.fuzz
-	if not f or not f.enabled then return out end
+	if not f or not f.enabled or f.legsOnly then return out end -- (legsOnly: bristles on the legs and nowhere else, the Greenbottle blue)
 	local A = Anatomy.layout(look)
 	local cheek = look.cheek
 	local cy = (cheek.y - A.headCenter.Y) / A.headRadii.Y
@@ -251,7 +251,7 @@ end
 function Setae.palp(look: any): { Hair }
 	local out: { Hair } = {}
 	local f = look.fuzz
-	if not f or not f.enabled then return out end
+	if not f or not f.enabled or f.legsOnly then return out end
 	local A = Anatomy.layout(look)
 	local pl = look.palp
 	local spec = pl.fluff
@@ -291,11 +291,11 @@ function Setae.leg(look: any, legIndex: number): { LegHair }
 			local t = (k - 0.5) / n
 			local theta = k * GOLDEN + legIndex
 			local white = math.abs(t - 0.5) < look.bandFraction * 0.6
-			local tone = if white then "white" elseif hash(i, 13) < f.legBlack then "black" else "dark"
+			local tone = if f.legTone then f.legTone elseif white then "white" elseif hash(i, 13) < f.legBlack then "black" else "dark" -- (legTone: every bristle one tone)
 			table.insert(out, {
 				segment = segment, t = t, theta = theta,
 				length = f.legLength * (0.7 + 0.6 * hash(i, 5)) * (if segment == 3 then 0.6 elseif front then 1.4 else 1),
-				tone = tone, white = tone == "white", grey = false, frost = false,
+				tone = tone, white = tone == "white", grey = false, frost = tone == "frost",
 			})
 		end
 	end

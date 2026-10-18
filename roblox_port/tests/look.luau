@@ -713,5 +713,152 @@ for _, r in { pFull, pLow, pFloor, dFloor, aFull, aLow, aFloor } do r:destroy() 
 end
 antMimicChecks()
 
+-- ---------------------------------------------------------------- the tarantula pack (ROBLOX-81)
+-- Two more appearances drawn by the same rig: the Mexican redknee and the Greenbottle blue. A costume on the first spider's body: its size, its
+-- stance and its eight legs; what makes them tarantulas is the carapace, the tubercle's eight tiny eyes, the fangs, the palps, the abdomen and
+-- the leg colours. Nothing below changes the three spiders checked above.
+local function tarantulaChecks() -- a function of its own: this file is close to Luau's limit of 200 locals
+local RED, BLUE = "brachypelma_hamorii", "chromatopelma_cyaneopubescens"
+local red, blue = Appearances.profiles[RED], Appearances.profiles[BLUE]
+check(red ~= nil and blue ~= nil and red.id == RED and blue.id == BLUE and Appearances.default == "first_spider", "the two tarantulas are profiles and the default is still the first spider")
+check(red.pack == "tarantula_pack" and blue.pack == "tarantula_pack" and look.pack == nil and volans.pack == nil and Appearances.profiles.myrmarachne_formicaria_female.pack == nil, "both belong to the tarantula pack; the first three spiders belong to none")
+local function hexOf(c: { number }): string return string.format("%02X%02X%02X", math.floor(c[1] * 255 + 0.5), math.floor(c[2] * 255 + 0.5), math.floor(c[3] * 255 + 0.5)) end
+-- Perplexity's colours, exactly (design adapted by Nathan; the shapes are ART).
+check(hexOf(red.body) == "1A1614" and hexOf(red.extras[1].color) == "D67638" and red.extras[1].name == "CarapaceRim", "the redknee's carapace: a dark centre #1A1614 with a copper-orange rim #D67638")
+check(hexOf(red.abdomenColor) == "161312" and red.marks[1].name == "UrticatingPatch" and hexOf(red.marks[1].color) == "BA5028" and red.marks[1].z > 0.2, "plump velvet-black abdomen #161312 with a ginger-rust patch #BA5028 at the dorsal rear")
+check(hexOf(red.legColors.knee) == "EE5E22" and hexOf(red.legBands.tibia) == "E08642" and hexOf(red.legColors.tarsus) == "181413" and hexOf(red.legColors.femur) == "0E0C0B", "flame-orange patellae #EE5E22, a warm pale-orange tibia band #E08642, dark velvety feet #181413, near-black femurs")
+check(hexOf(red.white) == "EE5E22", "the pedipalps' patellae are the same flame orange")
+check(hexOf(blue.body) == "24767C" and hexOf(blue.extras[1].color) == "308E94" and hexOf(blue.fangs) == "308E94" and blue.gloss == 0.08, "the greenbottle's carapace is metallic blue-green #24767C (Reflectance 0.08) with a lighter turquoise rim and chelicerae #308E94")
+check(hexOf(blue.legColors.femur) == "204AA8" and hexOf(blue.legColors.tarsus) == "204AA8" and hexOf(blue.legColors.knee) == "2E62C4" and hexOf(blue.legColors.ankle) == "2E62C4" and blue.legGloss == 0.06, "cobalt legs #204AA8 (Reflectance 0.06) with brighter azure joint rings #2E62C4")
+check(hexOf(blue.fuzz.frost) == "DAA86C" and blue.fuzz.legsOnly == true and blue.fuzz.legTone == "frost", "pale golden-tan leg bristles #DAA86C")
+check(hexOf(blue.abdomenColor) == "E46226" and #blue.marks == 7 and hexOf(blue.marks[1].color) == "2A1C18", "a vivid tiger-orange abdomen #E46226 with markings in #2A1C18")
+local TA, TB = Anatomy.layout(red), Anatomy.layout(blue)
+-- A tarantula against the first spider: a broader, lower carapace, thick parallel fangs, longer leg-like palps, stockier legs.
+for _, t in { { red, TA }, { blue, TB } } do
+	local lk, ly = t[1], t[2]
+	check(ly.headRadii.X > A.headRadii.X and ly.headRadii.Y < A.headRadii.Y * 0.7 and ly.headRadii.X / ly.headRadii.Y > 1.5 * (A.headRadii.X / A.headRadii.Y), `{lk.id}: a broad, low carapace`)
+	check(lk.fuzz == nil or lk.fuzz.legsOnly == true, `{lk.id}: no coat of fuzz on the body`)
+	check(lk.cheek == nil and lk.fan == nil and lk.stripes == nil and lk.antennae == nil and lk.scale == nil, `{lk.id}: no cheeks, fan, stripes or antennae, and the first spider's size`)
+end
+local function len3(pl: any): number return Vector3.new(pl.drop, pl.reach, pl.spread).Magnitude end
+local cheli = look.chelicerae.radii
+check(near(red.chelicerae.radii[2] / cheli[2], 1.3, 0.05) and near(red.chelicerae.radii[1] / cheli[1], 1.3, 0.05) and red.chelicerae.splay == 0 and red.chelicerae.pitch > 0, "thick (about 1.3 times) parallel chelicerae that point forward and down")
+check(near(len3(red.palp) / len3(look.palp), 1.45, 0.05) and near(len3(blue.palp) / len3(look.palp), 1.45, 0.05), "pedipalps about 1.45 times the first spider's in length")
+local function femur(lk: any, pair: number): number return lk.limbs.diameters[pair][1] * lk.limbs.thickness * (if pair == 1 then lk.frontLegScale else 1) end
+check(near(femur(red, 2) / femur(look, 2), 1.35, 0.02) and femur(blue, 2) > femur(look, 2) * 1.1 and femur(blue, 2) < femur(red, 2), "the redknee's legs are about 1.35 times the first spider's thickness, the greenbottle's a little less")
+check(red.limbs.tipZ[1] > look.limbs.tipZ[1] and red.bodyDrop > 0 and red.bodyDrop < 0.15 and TA.abdomenRadii.Y * 2 > TB.abdomenRadii.Y * 2 * 1.1, "the legs are no longer than the first spider's, it stands low, and the redknee's abdomen is the plumper")
+-- The ocular tubercle: a small mound that stands out of the carapace, eight eyes on it, none of the salticid's big front pair.
+for _, t in { { red, TA }, { blue, TB } } do
+	local lk, ly = t[1], t[2]
+	local tub = ly.tubercle :: any
+	check(tub ~= nil and tub.radii.X < ly.headRadii.X * 0.4 and tub.center.Y + tub.radii.Y > ly.headCenter.Y + ly.headRadii.Y, `{lk.id}: a small tubercle that stands up out of the carapace`)
+	local principal, onMound, inCluster = 0, 0, 0
+	for _, e in ly.eyes do
+		if e.principal then principal += 1 end
+		local k = ellipsoidRadius(tub.center, tub.radii, e.at)
+		if k > 0.95 and k < 1.55 then onMound += 1 end
+		if (e.at - tub.center).Magnitude < 0.12 and e.radii.X < 0.03 then inCluster += 1 end
+	end
+	check(#ly.eyes == 8 and principal == 0 and onMound == 8 and inCluster == 8, `{lk.id}: eight tiny eyes clustered on the mound, no big front pair ({onMound} on the mound)`)
+	check(#ly.glints == 2 and ly.glints[1].side ~= ly.glints[2].side, `{lk.id}: two catchlights, one a side`)
+end
+check(TA.tubercle.center.Y == TA.tubercle.center.Y and ellipsoidRadius(TA.headCenter, TA.headRadii, TA.eyes[1].at) > 1.0, "the eyes are above the carapace")
+-- The parts, at both tiers: budgets (128 at full detail, 80 at low), one tubercle, eight eyes, two catchlights, the spinnerets, the markings.
+local function rigOf(id: string, detail: string, parent: Instance?)
+	local folder = parent or Instance.new("Folder")
+	return SpiderRig.new(folder, folder, id, detail)
+end
+local function counts(id: string)
+	local f, l = rigOf(id, "full"), rigOf(id, "low")
+	local out = { full = census(f.model:GetChildren()), low = census(l.model:GetChildren()), nf = names(f), nl = names(l), f = f, l = l }
+	return out
+end
+local rc, bc = counts(RED), counts(BLUE)
+print(`look: Mexican redknee full {rc.full.total} parts, low {rc.low.total}; Greenbottle blue full {bc.full.total} parts ({bc.full.hair} bristles), low {bc.low.total}`)
+check(rc.full.total <= 128 and bc.full.total <= 128, `tarantula full detail part budget ({rc.full.total} and {bc.full.total}, at most 128)`)
+check(rc.low.total <= 80 and bc.low.total <= 80 and rc.low.total < rc.full.total and bc.low.total < bc.full.total, `tarantula low detail (phone and mate) part budget ({rc.low.total} and {bc.low.total}, at most 80)`)
+check(rc.full.bad == 0 and rc.low.bad == 0 and bc.full.bad == 0 and bc.low.bad == 0 and rc.full.shell == 0 and bc.full.shell == 0, "every drawn tarantula part is anchored, non-colliding, not queryable and has a real size")
+check(rc.full.hair == 0 and rc.low.hair == 0 and bc.low.hair == 0 and bc.full.hair >= 24 and bc.full.hair <= 40, `the redknee has no bristles; the greenbottle has {bc.full.hair} on its legs at full detail and none at low`)
+for _, c in { rc, bc } do
+	local nf, nl = c.nf, c.nl
+	check((nf.OcularTubercle or 0) == 1 and (nl.OcularTubercle or 0) == 1 and (nf.Eye or 0) == 8 and (nl.Eye or 0) == 8 and (nf.Catchlight or 0) == 2 and (nl.Catchlight or 0) == 2, "one tubercle, eight tiny eyes and two catchlights at both tiers")
+	check((nf.PrincipalEye or 0) == 0 and (nf.EyeSocket or 0) == 0 and (nf.PaleCheek or 0) == 0 and (nf.FanField or 0) == 0 and (nf.CarapaceRim or 0) == 1 and (nl.CarapaceRim or 0) == 1, "no big front eyes, sockets, cheeks or fan; the carapace has its rim")
+	check((nf.Spinneret or 0) == 2 and (nf.SpinneretTip or 0) == 2 and (nl.Spinneret or 0) == 2 and (nl.SpinneretTip or 0) == 0, "two spinnerets of two segments at full detail, of one at low")
+	check((nf.Chelicera or 0) == 2 and (nf.PalpStalk or 0) == 2 and (nf.PalpBand or 0) == 2 and (nf.Femur1 or 0) == 1 and (nf.Femur8 or 0) == 1 and (nf.Foot1 or 0) == 1 and (nl.Foot1 or 0) == 0, "two fangs, two palps, eight legs; foot balls at full detail only")
+end
+check((rc.nf.UrticatingPatch or 0) == 1 and (rc.nl.UrticatingPatch or 0) == 1 and (rc.nf.TibiaBand1 or 0) == 1 and (rc.nf.TibiaBand8 or 0) == 1 and (rc.nf.FemurBand1 or 0) == 0 and (rc.nf.TarsusBand1 or 0) == 0 and (rc.nl.TibiaBand8 or 0) == 1, "the redknee: the rust patch and one band on each tibia, on both tiers")
+check((bc.nf.AbdomenBar or 0) == 8 and (bc.nl.AbdomenBar or 0) == 8 and (bc.nf.AbdomenMidline or 0) == 3 and (bc.nl.AbdomenMidline or 0) == 1 and (bc.nf.TibiaBand1 or 0) == 0, "the greenbottle: four pairs of bars on both tiers, the dark midline whole at full detail and a dab at low, no leg bands")
+local tarBad = false
+for _, c in { rc, bc } do
+	for name in c.nf do
+		for _, bad in FORBIDDEN do if string.find(name, bad) then tarBad = true end end
+	end
+end
+check(not tarBad, "no tarantula part is named like a human feature")
+-- Colours and gloss as drawn.
+local function partColor(rig, name: string): string return hexOf({ rig.model:FindFirstChild(name).Color.R, rig.model:FindFirstChild(name).Color.G, rig.model:FindFirstChild(name).Color.B }) end
+check(partColor(rc.f, "Cephalothorax") == "1A1614" and partColor(rc.f, "CarapaceRim") == "D67638" and partColor(rc.f, "Abdomen") == "161312" and partColor(rc.f, "UrticatingPatch") == "BA5028" and partColor(rc.f, "Knee1") == "EE5E22" and partColor(rc.f, "TibiaBand1") == "E08642" and partColor(rc.f, "Tarsus1") == "181413" and partColor(rc.f, "Femur1") == "0E0C0B", "the redknee is drawn in Perplexity's colours")
+check(partColor(bc.f, "Cephalothorax") == "24767C" and partColor(bc.f, "CarapaceRim") == "308E94" and partColor(bc.f, "Chelicera") == "308E94" and partColor(bc.f, "Abdomen") == "E46226" and partColor(bc.f, "AbdomenBar") == "2A1C18" and partColor(bc.f, "Femur1") == "204AA8" and partColor(bc.f, "Knee1") == "2E62C4" and partColor(bc.f, "Ankle1") == "2E62C4" and partColor(bc.f, "Seta") == "DAA86C", "the greenbottle is drawn in Perplexity's colours, bristles included")
+check(bc.f.model:FindFirstChild("Cephalothorax").Reflectance == 0.08 and bc.f.model:FindFirstChild("Femur1").Reflectance == 0.06 and bc.f.model:FindFirstChild("Tarsus3").Reflectance == 0.06 and (rc.f.model:FindFirstChild("Cephalothorax").Reflectance or 0) == 0, "slight gloss on the greenbottle's carapace (0.08) and legs (0.06); none on the redknee")
+-- The bars soften at the last growth stage only; the first spider's rig has none of that.
+local barT = {}
+for stage = 0, 3 do
+	bc.f:setGrowthStage(stage)
+	barT[stage] = bc.f.model:FindFirstChild("AbdomenBar").Transparency
+end
+check(barT[0] == 0 and barT[1] == 0 and barT[2] == 0 and barT[3] > 0.4 and barT[3] <= 0.7, `the greenbottle's bars soften at the last stage ({barT[3]} transparent) and are full before it`)
+bc.f:setGrowthStage(3)
+local barMid = bc.f.model:FindFirstChild("AbdomenMidline")
+check(barMid.Transparency == 0, "(the dark midline stays)")
+rc.f:setGrowthStage(3)
+check(rc.f.model:FindFirstChild("UrticatingPatch").Transparency == 0, "the redknee's patch does not fade")
+-- Growth and the mate's scale: the same scaling as the first spider's, any size.
+local ratio = {}
+for _, id in { "first_spider", RED, BLUE } do
+	local r = rigOf(id, "low")
+	r:setGrowthStage(0)
+	local before = r.model:FindFirstChild("Cephalothorax").Size
+	r:setGrowthStage(3)
+	local adult = r.model:FindFirstChild("Cephalothorax").Size
+	r:setScale(1.7)
+	ratio[id] = { adult.X / before.X, r.model:FindFirstChild("Cephalothorax").Size.X / before.X }
+	r:destroy()
+end
+for _, id in { RED, BLUE } do
+	check(near(ratio[id][1], 1.5, 1e-9) and near(ratio[id][2], 1.7, 1e-9) and near(ratio[id][1], ratio.first_spider[1], 1e-9), `{id}: the adult stage scales the body 1.5 times, setScale to any size`)
+end
+-- Standing on the floor: eight feet down, the belly clear, the root at the collider, the eye view hiding the tubercle and the rim.
+for _, id in { RED, BLUE } do
+	local rig = rigOf(id, "full", floor)
+	settle(rig, 1)
+	local down = true
+	for _, leg in rig._legs do down = down and leg.planted ~= nil and math.abs((leg.planted :: Vector3).Y) < 1e-6 end
+	check(down, `{id}: all eight feet find the floor`)
+	local belly = math.huge
+	for _, p in rig.model:GetChildren() do
+		if p:IsA("BasePart") and (p.Name == "Abdomen" or p.Name == "Cephalothorax" or p.Name == "CarapaceRim") then belly = math.min(belly, p.CFrame.Position.Y - p.Size.Y / 2) end
+	end
+	check(belly > 0.0 and belly < 0.12, `{id}: the body stands low and clear of the floor ({string.format("%.3f", belly)} studs under the belly)`)
+	check(rig.model:GetAttribute("AppearanceId") == id and (rig.root.CFrame.Position - body.Position).Magnitude < 1e-9, `{id}: the model says which spider it is; the root stays at the collider's frame`)
+	local reach = 0
+	for _, leg in rig._legs do reach = math.max(reach, (leg.planted :: Vector3 - Vector3.new(0, 0, 0)).Magnitude) end
+	local firstReach = 0
+	for _, leg in fullFloor._legs do firstReach = math.max(firstReach, (leg.planted :: Vector3 - Vector3.new(0, 0, 0)).Magnitude) end
+	check(reach <= firstReach * 1.02, `{id}: the legs reach no further than the first spider's (farthest foot {string.format("%.2f", reach)} studs against {string.format("%.2f", firstReach)})`)
+	rig:setEyeView(true)
+	local hidden = true
+	for _, p in rig.model:GetChildren() do
+		if p:IsA("BasePart") and (p.Name == "OcularTubercle" or p.Name == "CarapaceRim" or p.Name == "Spinneret" or p.Name == "AbdomenBar" or p.Name == "UrticatingPatch") then hidden = hidden and p.LocalTransparencyModifier == 1 end
+	end
+	check(hidden, `{id}: the eye view hides the tubercle, the rim and the markings with the body`)
+	rig:destroy()
+end
+for _, c in { rc, bc } do
+	c.f:destroy()
+	c.l:destroy()
+end
+end
+tarantulaChecks()
+
 print(`LOOK passed={passed} failed={failed}`)
 if failed > 0 then error("look checks failed") end

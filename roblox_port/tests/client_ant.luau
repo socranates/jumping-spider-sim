@@ -77,7 +77,7 @@ check("the ant-mimicking spider: C cycles to it, legs I rise when it stands and 
 	key("Feed", true); frames(2); key("Feed", false); frames(30)
 	assert(life.resting and not life.asleep, "E did not rest")
 	assert(driver.antPose().antennae == 0 and legUp() < 0, "the antennae are up while resting in the crack")
-	assert(string.find(words("SpiderPrompts", "PromptHint"), "C: become the first spider", 1, true), words("SpiderPrompts", "PromptHint"))
+	assert(string.find(words("SpiderPrompts", "PromptHint"), "C: become the Mexican redknee", 1, true), words("SpiderPrompts", "PromptHint"))
 	key("Feed", true); frames(2); key("Feed", false); frames(2)
 	assert(not life.resting, "E did not end the rest")
 	-- On the open sill: standing still raises legs I (no key), the words and the buttons say so for this spider only.
@@ -158,8 +158,10 @@ check("the ant-mimicking spider: C cycles to it, legs I rise when it stands and 
 	driver.place(Vector3.new(-25.5, 0.31, 6.0)); frames(30)
 	life.clock.hour = 12
 	key("Feed", true); frames(2); key("Feed", false); frames(2)
-	key("Choose", true); frames(2); key("Choose", false); frames(2)
-	assert(driver.appearance() == "first_spider" and workspace:FindFirstChild("Spider"):GetAttribute("AppearanceId") == "first_spider", "C did not cycle back to the first spider")
+	for _, expected in { "brachypelma_hamorii", "chromatopelma_cyaneopubescens", "first_spider" } do -- the ant mimic is followed by the two tarantulas, then the first spider
+		key("Choose", true); frames(2); key("Choose", false); frames(2)
+		assert(driver.appearance() == expected and workspace:FindFirstChild("Spider"):GetAttribute("AppearanceId") == expected, `C did not cycle on to {expected}`)
+	end
 	assert(driver.antPose() == nil and driver.rig().ant == nil, "the first spider has an ant pose")
 	key("Feed", true); frames(2); key("Feed", false); frames(2)
 	driver.place(Layout.SPAWN); frames(60)

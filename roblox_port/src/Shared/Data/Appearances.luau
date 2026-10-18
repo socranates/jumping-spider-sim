@@ -414,5 +414,134 @@ local ant = {
 	},
 }
 
-return { default = "first_spider", profiles = { first_spider = first, maratus_volans_male = volans, myrmarachne_formicaria_female = ant, rival_spider = rival } }
+-- ================================================================ the tarantula pack (ROBLOX-81)
+-- Two tarantula costumes on the jumping spider's own body and senses: the Mexican redknee (Brachypelma hamorii) and the Greenbottle blue
+-- (Chromatopelma cyaneopubescens). Perplexity's design (Nathan, 2026-10-18), adapted to the rig: the colours are hers; the shapes are the
+-- first spider's size and build (a real tarantula is five or six centimetres of body, five times the first spider, and would not fit the
+-- crack or the collider, which a costume must not change), so this is a drawn appearance at the first spider's scale and nothing more:
+-- the collider, the motor, the jump, the senses, the silk, the wasp and the rival are the first spider's (SpiderChoice, ROBLOX-81).
+-- Both belong to `pack = "tarantula_pack"` and are free, like the peacock spider and the ant mimic (ROBLOX-66): SpiderChoice.locked is the
+-- one place a sale would go. What makes a tarantula in the rig: a broad low carapace (a dark core with a lighter rim, "CarapaceRim"), an
+-- ocular tubercle with eight tiny clustered eyes instead of the salticid's big front pair (`tubercle`, Anatomy), thick parallel chelicerae,
+-- leg-like pedipalps, a plump abdomen with its own markings (`marks`), two two-segment spinnerets (extras), stocky legs coloured segment by
+-- segment (`legColors`, `legBands`). Colours are Perplexity's hex values; every size and angle is ART.
+local function hex(h: number): { number }
+	return { math.floor(h / 65536) / 255, math.floor(h / 256) % 256 / 255, h % 256 / 255 }
+end
+
+-- The parts both share. `o` is what differs between the species (see the two calls below). The first spider is the base so that anything
+-- a tarantula does not say (idle motion, the palp's drum, the body's fuzz knobs) is the first spider's.
+local function tarantula(o: any): any
+	local apex = 0.285 + o.abdomenRadii[3] -- the abdomen's rear tip (its centre is at z = 0.285)
+	local limbs = table.clone(first.limbs)
+	limbs.hipX, limbs.hipZ, limbs.tipZ = 0.20, { -0.30, -0.20, -0.10, -0.01 }, { -0.76, -0.50, 0.10, 0.58 }
+	limbs.thickness = o.legThickness
+	limbs.stance = { x = 0.80, y = -0.22, reach = 0.92 } -- the body sits 0.09 under the collider's centre, so the rest foot spot is this far under it
+	limbs.kneeLift, limbs.kneeLiftAir, limbs.ankleLift, limbs.pad = 0.22, 0.18, 0.04, 1.5
+	local p = {
+		id = o.id, name = o.name, pack = "tarantula_pack", gloss = o.gloss, legGloss = o.legGloss, outline = hex(0xE8E4DA),
+		bodyDrop = 0.09, -- the drawn body sits this far (studs) under the collider's centre: low to the floor
+		body = hex(o.core), legs = hex(o.leg), white = hex(o.palpBand), eyes = { 0.006, 0.006, 0.006 }, fangs = hex(o.fangs), joint = hex(o.leg),
+		abdomenColor = hex(o.abdomen),
+		palpColors = { stalk = hex(o.leg), club = hex(o.leg), tip = hex(o.palpTip) },
+		legColors = { femur = hex(o.femur), tibia = hex(o.tibia), tarsus = hex(o.tarsus), knee = hex(o.knee), ankle = hex(o.ankle) },
+		-- A broad low carapace: the dark core (Cephalothorax) with a wider, flatter rim under it (CarapaceRim, an extra) that shows round its edge.
+		headCenter = { 0, 0, -0.18 }, headRadii = o.headRadii,
+		abdomenCenter = { 0, 0.035, 0.285 }, abdomenRadii = o.abdomenRadii,
+		pedicel = { center = { 0, -0.02, 0.04 }, radii = { 0.07, 0.06, 0.07 } },
+		face = { center = { 0, -0.02, -0.36 }, radii = { 0.20, 0.09, 0.12 } },
+		neck = { 0, 0, -0.04 },
+		-- The ocular tubercle: a small mound on the carapace with eight tiny glossy eyes clustered on it. `eyes` are x (to the right), z (from
+		-- the mound's centre) and the bead's radius, for the right side; the left is the mirror. The first of each side carries a catchlight.
+		tubercle = {
+			center = { 0, 0.125, -0.29 }, radii = { 0.085, 0.060, 0.075 }, color = hex(o.tubercle), reflectance = 0.12,
+			eyes = { { x = 0.020, z = -0.040, r = 0.021 }, { x = 0.050, z = -0.022, r = 0.018 }, { x = 0.022, z = -0.008, r = 0.015 }, { x = 0.052, z = 0.016, r = 0.017 } },
+			glint = { dx = 0.006, dy = 0.007, r = 0.0075 }, eyeReflectance = 0.5,
+		},
+		-- Thick, parallel, forward-and-down fangs (about 1.3 times the first spider's), set wide, not splayed.
+		chelicerae = { x = 0.075, y = -0.10, z = -0.49, radii = { 0.065, 0.094, 0.058 }, pitch = 0.30, splay = 0, reflectance = 0.1 },
+		eye = { glintColor = { 1, 1, 1 } },
+		-- Leg-like pedipalps: about 1.45 times the first spider's palp in length, thick, with a patella band (the palp band is the `white`).
+		palp = {
+			x = 0.12, y = -0.03, drop = 0.147, reach = 0.152, spread = 0.049, stalk = 0.062, club = { 0.050, 0.048, 0.060 }, tipRadii = { 0.035, 0.030, 0.035 },
+			fluff = { hairs = 0, length = 0, width = 0, flat = 1, transparency = 0 }, drumHz = 3.2, drumDeg = 13,
+		},
+		limbs = limbs,
+		frontLegScale = 1.1,
+		bandFraction = o.bandFraction,
+		speckleCount = 0, spots = {}, band = { count = 0, step = 0.1, z = 0, rx = 0.01, rz = 0.01 }, speckle = { from = 0.4, step = 0.1, rx = 0.004, rz = 0.005 },
+		-- Bodies in addition to the first spider's four: the rim, and two spinnerets of two segments behind the abdomen (the second segment is full
+		-- detail only). `sweep` names the segment: the silk-mat pose (ROBLOX-82) swings them about the abdomen's rear.
+		extras = {
+			{ name = "CarapaceRim", center = { 0, -0.035, -0.18 }, radii = o.rimRadii, group = "head", color = hex(o.rim) },
+			{ name = "Spinneret", center = { -0.045, 0.02, apex + 0.01 }, radii = { 0.022, 0.020, 0.055 }, group = "abdomen", color = hex(o.spinneret), sweep = 1 },
+			{ name = "Spinneret", center = { 0.045, 0.02, apex + 0.01 }, radii = { 0.022, 0.020, 0.055 }, group = "abdomen", color = hex(o.spinneret), sweep = 1 },
+			{ name = "SpinneretTip", center = { -0.045, 0.01, apex + 0.085 }, radii = { 0.016, 0.015, 0.045 }, group = "abdomen", color = hex(o.spinneret), sweep = 2, fullOnly = true },
+			{ name = "SpinneretTip", center = { 0.045, 0.01, apex + 0.085 }, radii = { 0.016, 0.015, 0.045 }, group = "abdomen", color = hex(o.spinneret), sweep = 2, fullOnly = true },
+		},
+		marks = o.marks,
+		fuzz = o.fuzz,
+		idle = first.idle,
+		detail = {
+			full = {
+				every = { lock = 1, guard = 1, fringe = 1, pale = 1, tuft = 1, ruff = 1, palp = 1, leg = 1 },
+				shells = 0, speckleEvery = 1, pads = true, sockets = false, idle = true, highlight = true,
+			},
+			low = {
+				every = { lock = 0, guard = 0, fringe = 0, pale = 0, tuft = 0, ruff = 0, palp = 0, leg = 0 },
+				shells = 0, speckleEvery = 1, pads = false, sockets = false, idle = false, highlight = false,
+			},
+		},
+	}
+	return p
+end
+
+-- Brachypelma hamorii, the Mexican redknee: velvet black-brown with copper-orange on the carapace's rim, flame-orange patellae (the "knees"), a
+-- warm pale-orange band on each tibia, dark feet, and a ginger-rust patch of urticating hair at the abdomen's dorsal rear. Stocky.
+local redknee = tarantula({
+	id = "brachypelma_hamorii", name = "Mexican redknee (Brachypelma hamorii)",
+	core = 0x1A1614, rim = 0xD67638, tubercle = 0x1A1614, abdomen = 0x161312, spinneret = 0x1E1816, fangs = 0x1C1310,
+	leg = 0x181413, femur = 0x0E0C0B, tibia = 0x181413, tarsus = 0x181413, knee = 0xEE5E22, ankle = 0x181413, palpBand = 0xEE5E22, palpTip = 0x181413,
+	gloss = nil, legGloss = nil, legThickness = 1.12 * 1.35, bandFraction = 0.30,
+	headRadii = { 0.285, 0.140, 0.270 }, rimRadii = { 0.325, 0.105, 0.310 },
+	abdomenRadii = { 0.290, 0.230, 0.320 },
+	marks = {
+		{ name = "UrticatingPatch", color = hex(0xBA5028), x = 0, z = 0.42, rx = 0.115, rz = 0.100, angle = 0 },
+	} :: { any },
+	fuzz = nil,
+})
+redknee.legBands = { tibia = hex(0xE08642) }
+
+-- Chromatopelma cyaneopubescens, the Greenbottle blue: a metallic blue-green carapace with a lighter turquoise rim and fangs, cobalt legs with
+-- brighter azure joint rings and pale golden-tan bristles, and a vivid tiger-orange abdomen with a dark midline and four pairs of diagonal bars.
+-- Sleeker than the redknee. The bars fade at the last growth stage (barFade), as a juvenile's pattern does.
+local greenbottle = tarantula({
+	id = "chromatopelma_cyaneopubescens", name = "Greenbottle blue (Chromatopelma cyaneopubescens)",
+	core = 0x24767C, rim = 0x308E94, tubercle = 0x16285C, abdomen = 0xE46226, spinneret = 0x3A2418, fangs = 0x308E94,
+	leg = 0x204AA8, femur = 0x204AA8, tibia = 0x204AA8, tarsus = 0x204AA8, knee = 0x2E62C4, ankle = 0x2E62C4, palpBand = 0x2E62C4, palpTip = 0x2E62C4,
+	gloss = 0.08, legGloss = 0.06, legThickness = 1.12 * 1.15, bandFraction = 0.24,
+	headRadii = { 0.280, 0.120, 0.270 }, rimRadii = { 0.315, 0.090, 0.310 },
+	abdomenRadii = { 0.245, 0.195, 0.300 },
+	marks = {
+		-- The dark midline: three dabs along the back (the middle one alone at low detail), then four pairs of diagonal bars (x mirrored).
+		{ name = "AbdomenMidline", color = hex(0x2A1C18), x = 0, z = -0.48, rx = 0.017, rz = 0.075, angle = 0, fullOnly = true },
+		{ name = "AbdomenMidline", color = hex(0x2A1C18), x = 0, z = 0.0, rx = 0.017, rz = 0.075, angle = 0 },
+		{ name = "AbdomenMidline", color = hex(0x2A1C18), x = 0, z = 0.48, rx = 0.017, rz = 0.075, angle = 0, fullOnly = true },
+		{ name = "AbdomenBar", color = hex(0x2A1C18), x = 0.50, z = -0.36, rx = 0.017, rz = 0.070, angle = 0.70, bar = true, mirror = true },
+		{ name = "AbdomenBar", color = hex(0x2A1C18), x = 0.54, z = -0.10, rx = 0.017, rz = 0.070, angle = 0.70, bar = true, mirror = true },
+		{ name = "AbdomenBar", color = hex(0x2A1C18), x = 0.52, z = 0.18, rx = 0.017, rz = 0.070, angle = 0.70, bar = true, mirror = true },
+		{ name = "AbdomenBar", color = hex(0x2A1C18), x = 0.44, z = 0.44, rx = 0.017, rz = 0.065, angle = 0.70, bar = true, mirror = true },
+	} :: { any },
+	-- Pale golden-tan bristles on the legs only (full detail): the body wears none. `frost` is the bristle colour and `legTone` says every
+	-- leg hair is that tone; the counts are small to keep the part budget (Setae.leg: femur, tibia, tarsus; the front legs carry 1.6 times as many).
+	fuzz = {
+		enabled = true, legsOnly = true, legTone = "frost",
+		black = { 0.03, 0.03, 0.03 }, dark = { 0.13, 0.13, 0.13 }, grey = { 0.5, 0.5, 0.48 }, frost = hex(0xDAA86C), shellColor = { 0.08, 0.08, 0.08 }, shells = {},
+		legHairs = { 2, 1, 1 }, legLength = 0.07, legWidth = 0.012, legTransparency = 0.1, legBlack = 0,
+	},
+})
+greenbottle.legBands = {} -- no pale bands on its legs: the joint rings are its markings
+greenbottle.barFade = { 0, 0, 0, 0.6 } -- the bars' transparency at each growth stage: the juvenile pattern softens in the adult
+
+return { default = "first_spider", profiles = { first_spider = first, maratus_volans_male = volans, myrmarachne_formicaria_female = ant, rival_spider = rival, brachypelma_hamorii = redknee, chromatopelma_cyaneopubescens = greenbottle } }
 

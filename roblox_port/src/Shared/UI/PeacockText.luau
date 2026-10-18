@@ -10,7 +10,10 @@ local AntMimicText = require(script.Parent.AntMimicText)
 
 local PeacockText = {}
 
-PeacockText.NAMES = { first_spider = "the first spider", maratus_volans_male = "the peacock spider", myrmarachne_formicaria_female = "the ant-mimicking spider" } :: { [string]: string }
+PeacockText.NAMES = {
+	first_spider = "the first spider", maratus_volans_male = "the peacock spider", myrmarachne_formicaria_female = "the ant-mimicking spider",
+	brachypelma_hamorii = "the Mexican redknee", chromatopelma_cyaneopubescens = "the Greenbottle blue",
+} :: { [string]: string }
 PeacockText.STAND = "Stand still on a surface to dance"
 PeacockText.NOT_RESTING = "You can change spider while resting in the silk-lined crack"
 -- The Settings row's refusal (ROBLOX-71): the spider stays as it was. Said as a toast and on the panel's own line.
@@ -59,7 +62,7 @@ function PeacockText.touchDisplay(dancing: boolean): string return if dancing th
 function PeacockText.helpExtra(device: ControlText.Device, display: (string | boolean)?): string
 	local choose = ControlText.name(device, "choose")
 	local kind: string? = if display == true then "dance" elseif type(display) == "string" then display else nil
-	local lines = { `In the crack: {choose} change spider (first, peacock, ant mimic)`, PeacockText.settingsLine(device) }
+	local lines = { `In the crack: {choose} change spider (five spiders)`, PeacockText.settingsLine(device) }
 	if kind == "dance" then
 		table.insert(lines, `Standing still: {ControlText.name(device, "display")} courtship dance. Any move, jump or Cancel stops it`)
 	elseif kind == "antennae" then

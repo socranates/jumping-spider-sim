@@ -22,6 +22,7 @@ export type Layout = {
 	palps: { Palp },
 	spinneret: Vector3,
 	hairFree: { Zone },
+	tubercle: { center: Vector3, radii: Vector3 }?, -- a tarantula's ocular tubercle, which carries its eyes
 }
 
 local function v3(t: { number }): Vector3
@@ -74,7 +75,29 @@ function Anatomy.layout(look: any): Layout
 		table.insert(zones, { at = at, radius = math.max(r.X, r.Y, r.Z) * 1.15 + 0.012 })
 		return at
 	end
-	for _, side in { -1, 1 } do
+	local tub = look.tubercle
+	if tub then
+		-- A tarantula (ROBLOX-81): no big front pair; eight tiny eyes clustered on a small mound, their beads standing a little out of it, and one
+		-- catchlight on the first bead of each side. Placed on the mound's surface like the others are on the head's.
+		local tc, tr = v3(tub.center), v3(tub.radii)
+		for _, side in { -1, 1 } do
+			for n, spec in tub.eyes do
+				local dx, dz = side * spec.x, spec.z
+				local q = math.sqrt(math.max(1 - (dx / tr.X) ^ 2 - (dz / tr.Z) ^ 2, 0.05))
+				local anchor = Vector3.new(tc.X + dx, tc.Y + tr.Y * q, tc.Z + dz)
+				local at = anchor + Anatomy.normalAt(tc, tr, anchor) * (0.3 * spec.r)
+				local r3 = Vector3.one * spec.r
+				table.insert(eyes, { name = "Eye", side = side, at = at, radii = r3, reflectance = tub.eyeReflectance, principal = false })
+				table.insert(zones, { at = at, radius = spec.r * 1.15 + 0.012 })
+				if n == 1 then
+					local g = tub.glint
+					table.insert(glints, { side = side, at = at + Vector3.new(side * g.dx, g.dy, -spec.r * 0.75), radii = Vector3.new(g.r, g.r, g.r * 0.45) })
+				end
+			end
+		end
+	end
+	local frontSides: { number } = if tub then {} else { -1, 1 } -- (a tarantula's eyes are on its tubercle, above)
+	for _, side in frontSides do
 		-- Principal eyes on the front of the face, two catchlights each.
 		local a = e.ame
 		local ar3 = v3(a.radii)
@@ -122,6 +145,7 @@ function Anatomy.layout(look: any): Layout
 		eyes = eyes, glints = glints, cheeks = cheeks, jaws = jaws, palps = palps,
 		spinneret = Vector3.new(0, ac.Y + 0.02, ac.Z + ar.Z - 0.005),
 		hairFree = zones,
+		tubercle = if tub then { center = v3(tub.center), radii = v3(tub.radii) } else nil,
 	}
 end
 

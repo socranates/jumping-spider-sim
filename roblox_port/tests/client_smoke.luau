@@ -457,9 +457,12 @@ check("the peacock spider: C in the crack changes spider, X dances, any move, ju
 		if d:IsA("BasePart") and d.Name == "Cephalothorax" and d.LocalTransparencyModifier ~= 1 then anyVisible = true end
 	end
 	assert(not anyVisible, "the new rig did not keep the eye view")
-	assert(string.find(words("SpiderPrompts", "PromptHint"), "RB: become the first spider", 1, true), words("SpiderPrompts", "PromptHint"))
-	key("Display", true); frames(2); key("Display", false); frames(2)
-	assert(driver.appearance() == "first_spider" and workspace:FindFirstChild("Spider"):GetAttribute("AppearanceId") == "first_spider", "RB in the crack did not come round to the first spider")
+	-- ...and on through the two tarantulas (ROBLOX-81), then round to the first spider.
+	for _, step in { { "RB: become the Mexican redknee", "brachypelma_hamorii" }, { "RB: become the Greenbottle blue", "chromatopelma_cyaneopubescens" }, { "RB: become the first spider", "first_spider" } } do
+		assert(string.find(words("SpiderPrompts", "PromptHint"), step[1], 1, true), words("SpiderPrompts", "PromptHint"))
+		key("Display", true); frames(2); key("Display", false); frames(2)
+		assert(driver.appearance() == step[2] and workspace:FindFirstChild("Spider"):GetAttribute("AppearanceId") == step[2], `RB in the crack did not come on to {step[2]}`)
+	end
 	key("Eye", true); key("Eye", false); frames(3)
 	key("Feed", true); frames(2); key("Feed", false); frames(2)
 	game:GetService("UserInputService").LastInputTypeChanged:Fire(Enum.UserInputType.Keyboard)

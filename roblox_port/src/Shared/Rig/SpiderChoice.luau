@@ -1,5 +1,6 @@
 --!strict
--- Which spider the player is (ROBLOX-31, ROBLOX-64): the first spider, the peacock spider or the ant-mimicking spider. Pure, so tests/peacock.luau checks it.
+-- Which spider the player is (ROBLOX-31, ROBLOX-64, ROBLOX-81): the first spider, the peacock spider, the ant-mimicking spider or one of the two
+-- tarantulas of the tarantula pack. Pure, so tests/peacock.luau checks it.
 -- The choice is remembered for the session in the Player attribute `Appearance`; the Workspace attribute `Appearance` can preselect
 -- it for Studio and playtests. Anything that is not a known appearance is the default (the first spider).
 local Appearances = require(script.Parent.Parent.Data.Appearances)
@@ -7,7 +8,7 @@ local Appearances = require(script.Parent.Parent.Data.Appearances)
 local SpiderChoice = {}
 
 -- The spiders to choose between, in the order the crack's key cycles through them.
-SpiderChoice.ORDER = { "first_spider", "maratus_volans_male", "myrmarachne_formicaria_female" } :: { string }
+SpiderChoice.ORDER = { "first_spider", "maratus_volans_male", "myrmarachne_formicaria_female", "brachypelma_hamorii", "chromatopelma_cyaneopubescens" } :: { string }
 
 -- Only a spider in ORDER can be the player: the brown rival's look (Data/Appearances.rival_spider) is drawn for the other spider and is never
 -- offered by the cycle or accepted from an attribute or a save.
@@ -29,10 +30,18 @@ end
 -- Is this spider not the player's to be yet (ROBLOX-71)? Nothing is locked while the add-ons are free for testing (ROBLOX-66), so this is
 -- always false. It is the one place to wire ownership when Nathan says the sales start: ROBLOX-48's Game Pass pattern (the server checks
 -- ownership, a replicated Player attribute holds the answer, a Studio override) fills `owned` ({ [appearance id] = true }), and this
--- returns true for a pass-only spider (the peacock, the ant mimic) that is not in it. The first spider is never locked. Both ways of
--- choosing, the crack's key and the Settings row, skip a locked spider through next() and step() below.
+-- returns true for a pass-only spider (the peacock, the ant mimic, and the pair in the tarantula pack, `packOf` below) that is not in it. The
+-- first spider is never locked. Both ways of choosing, the crack's key and the Settings row, skip a locked spider through next() and step()
+-- below. Nathan's default for the tarantula pack (ROBLOX-81) is both tarantulas in one pass of about US$0.99, so the pack, and not the
+-- spider, is the thing `owned` would say (an owned pack opens both); selling each on its own is his open call. Nothing is sold now.
 function SpiderChoice.locked(id: string, owned: { [string]: boolean }?): boolean
 	return false
+end
+
+-- The pack a spider belongs to (Appearances `pack`), or nil for the first spider, the peacock and the ant mimic, which are not in one.
+function SpiderChoice.packOf(id: string): string?
+	local look = Appearances.profiles[id]
+	return if look ~= nil then (look :: any).pack else nil
 end
 
 -- The appearance `dir` (+1 or -1) places from this one in ORDER, wrapping and skipping any that is locked. When nothing else is open it is

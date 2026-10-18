@@ -8,6 +8,9 @@
 -- legs III in their own colours, and a fan of flat discs that the courtship dance (Rig/PeacockDance, set as rig.dance) opens.
 -- The ant-mimicking spider (ROBLOX-64) is a third: extra body segments (look.extras), glossy cuticle (look.gloss), and a pose (Rig/AntMimicPose,
 -- set as rig.ant) that raises legs I as antennae when it stands and turns the drawn body a little as it walks.
+-- The two tarantulas (ROBLOX-81) are two more: a broad low carapace with a rim (look.extras), an ocular tubercle with eight tiny eyes
+-- (Anatomy's tubercle), markings on the abdomen (look.marks), legs coloured segment by segment (look.legColors, look.legBands) and, for the
+-- Greenbottle blue, leg bristles only (fuzz.legsOnly) and bars that soften at the last growth stage (look.barFade).
 
 local Workspace = game:GetService("Workspace")
 local Appearances = require(script.Parent.Parent.Data.Appearances)
@@ -48,7 +51,7 @@ type Leg = {
 	hairs: { { part: Part, spec: Setae.LegHair } },
 }
 
-type Fixed = { part: Part, offset: CFrame, group: number, palp: number? }
+type Fixed = { part: Part, offset: CFrame, group: number, palp: number?, sweep: number? }
 
 -- The peacock spider's fan: flat ellipsoid discs on the abdomen's back face, stacked fringe first, their size set each frame by how far the fan is open.
 type FanDisc = { part: Part, inset: number, y: number }
@@ -93,6 +96,7 @@ export type Rig = typeof(setmetatable(
   _shownLoad: number,
   _sizes: {[BasePart]: Vector3},
   _colors: {[BasePart]: Color3},
+  _bars: { Part }, -- the Greenbottle blue's diagonal bars, which soften at the last growth stage
 		_drop: number,
 		_fan: Fan?,
 		dance: any, -- a PeacockDance.Pose, or nil: the peacock spider's display (ignored by an appearance without a fan)
@@ -216,15 +220,17 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		_k = look.scale or 1,
   _growth = 1, _softness = 0, _condition = 0.55, _shownCondition = 0.55, jumpLoad = 0, jumpPush = 0, _shownLoad = 0,
   hangDirection=nil :: Vector3?, _hang=0, _spinneret=nil :: Vector3?,
-  _sizes = {} :: {[BasePart]: Vector3}, _colors = {} :: {[BasePart]: Color3},
+  _sizes = {} :: {[BasePart]: Vector3}, _colors = {} :: {[BasePart]: Color3}, _bars = {} :: { Part },
 		_drop = look.bodyDrop or 0,
 		_fan = nil :: Fan?,
 		dance = nil :: any,
 		ant = nil :: any,
 	}, SpiderRig)
 
-	local function fixed(part: Part, at: Vector3, rot: CFrame?, group: number, palp: number?)
-		table.insert(self._fixed, { part = part, offset = CFrame.new(at) * (rot or CFrame.identity), group = group, palp = palp })
+	local function fixed(part: Part, at: Vector3, rot: CFrame?, group: number, palp: number?): Fixed
+		local entry: Fixed = { part = part, offset = CFrame.new(at) * (rot or CFrame.identity), group = group, palp = palp, sweep = nil }
+		table.insert(self._fixed, entry)
+		return entry
 	end
 	local fabric = Enum.Material.SmoothPlastic -- clean high-contrast silhouette
 	fixed(ellipsoid(model, "Cephalothorax", A.headRadii, BODY, fabric), A.headCenter, nil, G_HEAD)
@@ -232,13 +238,23 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 	fixed(ellipsoid(model, "Pedicel", A.pedicelRadii, BODY, fabric), A.pedicelCenter, nil, G_BODY)
 	fixed(ellipsoid(model, "Abdomen", A.abdomenRadii, ABDOMEN, fabric), A.abdomenCenter, nil, G_ABDOMEN)
 	-- More segments (the ant-mimicking spider's thorax and the node on its waist), and a glossy cuticle where the look asks for one.
+	-- (`fullOnly` extras are left out at low detail; `sweep` marks a spinneret segment that the silk-mat pose swings.)
 	for _, ex in look.extras or {} do
+		if ex.fullOnly and detailName == "low" then continue end
 		local seg = ellipsoid(model, ex.name, v3(ex.radii), if ex.color then color(ex.color) else BODY, fabric)
-		fixed(seg, v3(ex.center), nil, GROUP_OF[ex.group] or G_BODY)
+		fixed(seg, v3(ex.center), nil, GROUP_OF[ex.group] or G_BODY).sweep = ex.sweep
+	end
+	-- A tarantula's ocular tubercle, the mound that carries its eyes (the eyes themselves are below).
+	local tubercle = A.tubercle
+	if tubercle then
+		local mound = ellipsoid(model, "OcularTubercle", tubercle.radii, color(look.tubercle.color), fabric)
+		mound.Reflectance = look.tubercle.reflectance
+		fixed(mound, tubercle.center, nil, G_HEAD)
 	end
 	if look.gloss then
 		for _, f in self._fixed do
-			if f.part.Name == "Cephalothorax" or f.part.Name == "EyeFace" or f.part.Name == "Pedicel" or f.part.Name == "Abdomen" or f.part.Name == "Thorax" or f.part.Name == "PetioleNode" then
+			local name = f.part.Name
+			if name == "Cephalothorax" or name == "EyeFace" or name == "Pedicel" or name == "Abdomen" or name == "Thorax" or name == "PetioleNode" or name == "CarapaceRim" then
 				f.part.Reflectance = look.gloss
 			end
 		end
@@ -270,6 +286,24 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		marking("Speckle", math.cos(angle) * radius, math.sin(angle) * radius, sp.rx, sp.rz, angle)
 	end
 
+	-- A tarantula's markings on the abdomen (look.marks): flat dabs in their own colours lying on the back, each tilted to the slope under it.
+	-- x and z are fractions of the abdomen's radii, rx and rz the dab's half sizes in studs. `mirror` also draws the other side, `fullOnly`
+	-- leaves it out at low detail, `bar` lists it among the bars that soften with growth (look.barFade).
+	for _, m in look.marks or {} do
+		if m.fullOnly and detailName == "low" then continue end
+		local sides: { number } = if m.mirror then { 1, -1 } else { 1 }
+		for _, side in sides do
+			local x, z = side * m.x, m.z
+			local q = math.sqrt(math.max(1 - x * x - z * z, 0.05))
+			local pitch = math.atan(ar.Y * z / (ar.Z * q))
+			local roll = math.atan(-ar.Y * x / (ar.X * q))
+			local dab = ellipsoid(model, m.name, Vector3.new(m.rx, 0.010, m.rz), color(m.color), fabric)
+			dab.CastShadow = false
+			fixed(dab, Vector3.new(x * ar.X, ac.Y + ar.Y * q + 0.002, ac.Z + z * ar.Z), CFrame.Angles(pitch, 0, roll) * CFrame.Angles(0, side * m.angle, 0), G_ABDOMEN)
+			if m.bar then table.insert(self._bars, dab) end
+		end
+	end
+
 	-- Head: pale cheeks, big glossy eyes with their catchlights, jaws.
 	for _, c in A.cheeks do
 		local cheek = ellipsoid(model, "PaleCheek", c.radii, WHITE, fabric)
@@ -292,7 +326,7 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 			fixed(dab, Vector3.new(st.x, y + 0.002, st.z), CFrame.Angles(pitch, 0, roll) * CFrame.Angles(0, st.angle, 0), G_HEAD)
 		end
 	end
-	local SOCKET = color(look.eye.ame.socket.color)
+	local SOCKET = if look.eye.ame then color(look.eye.ame.socket.color) else EYE -- (a tarantula has no big front eyes to frame)
 	for _, e in A.eyes do
 		local eye = ellipsoid(model, e.name, e.radii, EYE, Enum.Material.Glass)
 		eye.Reflectance = e.reflectance
@@ -385,6 +419,19 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		end
 	end
 
+	-- A leg's pale bands: white on the femur, tibia and tarsus unless the look lists its own (look.legBands: a colour for each segment that has
+	-- one, so the redknee's single band is { tibia = ... } and the greenbottle's none is {}).
+	local function legBands(i: number, d: { number }): { Part }
+		local lb = look.legBands
+		if lb == nil then
+			return {rod(model, "FemurBand" .. i, d[1], WHITE), rod(model, "TibiaBand" .. i, d[2], WHITE), rod(model, "TarsusBand" .. i, d[2] * 0.6, WHITE)}
+		end
+		local out: { Part } = {}
+		if lb.femur then out[1] = rod(model, "FemurBand" .. i, d[1], color(lb.femur)) end
+		if lb.tibia then out[2] = rod(model, "TibiaBand" .. i, d[2], color(lb.tibia)) end
+		if lb.tarsus then out[3] = rod(model, "TarsusBand" .. i, d[2] * 0.6, color(lb.tarsus)) end
+		return out
+	end
 	-- Legs: plump, with rounded joints and (at full detail) round feet.
 	local L = look.limbs
 	for i = 1, 8 do
@@ -398,6 +445,10 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		local cFemur, cTibia, cTarsus = LEG, LEG, LEG
 		local tF, tT, tTar = 1, 1, 1
 		local kneeColor, ankleColor = JOINT, JOINT
+		local lc = look.legColors -- a tarantula's legs are coloured segment by segment: the patella is the knee, the metatarsus and tarsus the foot
+		if lc then
+			cFemur, cTibia, cTarsus, kneeColor, ankleColor = color(lc.femur), color(lc.tibia), color(lc.tarsus), color(lc.knee), color(lc.ankle)
+		end
 		local withBands = true
 		if own then
 			cFemur, cTibia, cTarsus = color(own.colors[1]), color(own.colors[2]), color(own.colors[3])
@@ -421,15 +472,20 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 			knee = ball(model, "Knee" .. i, d[1] * tF * 0.95, kneeColor),
 			ankle = ball(model, "Ankle" .. i, d[2] * tT * 0.95, ankleColor),
 			pad = if cfg.pads then ball(model, "Foot" .. i, d[2] * 0.6 * tTar * L.pad, cTarsus) else nil,
-			bands = if withBands then {rod(model, "FemurBand" .. i, d[1], WHITE), rod(model, "TibiaBand" .. i, d[2], WHITE), rod(model, "TarsusBand" .. i, d[2] * 0.6, WHITE)} else {},
+			bands = if not withBands then {} else legBands(i, d),
 			hairs = {},
 		})
 		local leg = self._legs[#self._legs]
 		if fuzz and fuzz.enabled then
 			for n, spec in Setae.leg(look, i) do
-				if n % cfg.every.leg ~= 0 then continue end
+				if cfg.every.leg <= 0 or n % cfg.every.leg ~= 0 then continue end
 				table.insert(leg.hairs, { part = seta(spec.tone, fuzz.legWidth, fuzz.legWidth, spec.length, fuzz.legTransparency), spec = spec })
 			end
+		end
+	end
+	if look.legGloss then -- the Greenbottle blue's legs are a little glossy
+		for _, leg in self._legs do
+			leg.femur.Reflectance, leg.tibia.Reflectance, leg.tarsus.Reflectance = look.legGloss, look.legGloss, look.legGloss
 		end
 	end
 	-- The peacock spider's fan (look.fan): the discs of the front face, the figure on them, the repeat on the back and the folded flaps.
@@ -464,7 +520,7 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 	if cfg.highlight then
 		local hl = Instance.new("Highlight")
 		hl.FillTransparency = 1
-		hl.OutlineColor = WHITE
+		hl.OutlineColor = if look.outline then color(look.outline) else WHITE
 		hl.OutlineTransparency = 0.82
 		hl.DepthMode = Enum.HighlightDepthMode.Occluded
 		hl.Parent = model
@@ -482,6 +538,8 @@ end
 function SpiderRig.setGrowthStage(self: Rig, stage: number)
  local index=math.clamp(math.floor(stage),0,3)
  self.model:SetAttribute("GrowthStage",index)
+ local fade=self._appearance.barFade -- the Greenbottle blue's juvenile bars soften at the last stage
+ if fade then for _,bar in self._bars do bar.Transparency=fade[index+1] end end
  self:setScale(Growth.SCALES[index+1])
 end
 -- Any size, not only a growth stage's (ROBLOX-80: the mate is the played spider's look at the adult scale times its own factor). The same scaling as a stage.

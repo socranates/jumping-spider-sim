@@ -263,13 +263,13 @@ check(rs.antennae > 0.999 and maxWave == 0, "reduced motion stops the waving; th
 -- ---------------------------------------------------------------- choosing the spider, and the words
 local ANT = "myrmarachne_formicaria_female"
 check(Choice.start(ANT, nil) == ANT and Choice.start(nil, ANT) == ANT and Choice.start("first_spider", ANT) == "first_spider", "the Player or Workspace attribute can preselect the ant-mimicking spider")
-check(Choice.ORDER[1] == "first_spider" and Choice.ORDER[2] == "maratus_volans_male" and Choice.ORDER[3] == ANT and Choice.next(ANT) == "first_spider", "the crack's key goes first spider, peacock spider, ant mimic, first spider")
+check(Choice.ORDER[1] == "first_spider" and Choice.ORDER[2] == "maratus_volans_male" and Choice.ORDER[3] == ANT and Choice.next(ANT) == "brachypelma_hamorii" and Choice.next("chromatopelma_cyaneopubescens") == "first_spider", "the crack's key goes first spider, peacock spider, ant mimic, the two tarantulas, first spider")
 do -- the brown rival's look is never a choice: not in the cycle, not from a Player or Workspace attribute, not from a save
 	local walked, seen = {}, {}
 	local id = "first_spider"
-	for _ = 1, 6 do seen[id] = true; id = Choice.next(id) end
+	for _ = 1, 7 do seen[id] = true; id = Choice.next(id) end
 	for name in seen do table.insert(walked, name) end
-	check(#walked == 3 and not seen["rival_spider"] and Appearances.profiles["rival_spider"] ~= nil, "the change-spider cycle (first spider, peacock, ant mimic) never offers the rival's look, which is still a real profile")
+	check(#walked == 5 and not seen["rival_spider"] and Appearances.profiles["rival_spider"] ~= nil, "the change-spider cycle (first spider, peacock, ant mimic, redknee, greenbottle) never offers the rival's look, which is still a real profile")
 	check(Choice.start("rival_spider", nil) == "first_spider" and Choice.start(nil, "rival_spider") == "first_spider" and Choice.next("rival_spider") == "first_spider", "the rival's look cannot be preselected as the player")
 end
 check(Appearances.default == "first_spider" and Appearances.profiles[ANT] ~= nil and Appearances.profiles[ANT].id == ANT, "the default is still the first spider")
@@ -277,7 +277,7 @@ check(Choice.hasAntennae(ANT) and not Choice.hasAntennae("first_spider") and not
 check(Choice.displayKind(ANT) == "antennae" and Choice.displayKind("maratus_volans_male") == "dance" and Choice.displayKind("first_spider") == nil and Choice.displayKind("junk") == nil, "the display key: antennae for the ant mimic, the dance for the peacock, nothing for the first spider")
 check(not Choice.canDance(ANT), "the ant mimic has no fan to dance with")
 check(PeacockText.NAMES[ANT] == "the ant-mimicking spider" and PeacockText.changed(ANT) == "You are the ant-mimicking spider now", "its name and the toast")
-check(PeacockText.change("keyboard", "maratus_volans_male") == "C: become the ant-mimicking spider" and PeacockText.change("keyboard", ANT) == "C: become the first spider", "the crack's hint names the next spider")
+check(PeacockText.change("keyboard", "maratus_volans_male") == "C: become the ant-mimicking spider" and PeacockText.change("keyboard", ANT) == "C: become the Mexican redknee", "the crack's hint names the next spider")
 check(Text.displayHint("keyboard", false) == "X: wave antennae" and Text.displayHint("keyboard", true) == "X: antennae down" and Text.statusLine("keyboard") == "ANTENNAE UP    X or move: stop", "the display key's words on a keyboard")
 ControlText.setPadStyle("playstation")
 check(Text.displayHint("gamepad", false) == "R1: wave antennae" and string.find(PeacockText.helpExtra("gamepad", "antennae"), "R1 wave antennae", 1, true) ~= nil, "PlayStation words")

@@ -1,5 +1,7 @@
 # Latest: persistent saves published v19 — Chet, 2026-10-17
 
+**Price reminder from Nathan:** the peacock appearance and dance are intended as a one-time add-on targeting **US$0.99**, with the Robux/Game Pass price to be checked when sales are implemented (ROBLOX-48). Free for testing is temporary; the first spider and full game stay free. No purchases activated by this reminder.
+
 Claude's save bundle 871b816 is integrated with review fixes and a native-discovered shutdown race repair. Build **881f5ba653b169fe**. Accepted CLI **46,652**, strict clean, **160/160** compile. Real isolated DataStore run: **106/106 engine, zero skipped; 23/23 live client** at evidence 461991282cc6007c before the final shutdown repair. The final repair passed its coroutine regression and an actual immediate normal Studio restart with the discovered notebook page retained and no stale lock.
 
 **Published v19** to existing Windowsill place 120119801868085, independently confirmed in Creator Dashboard. No audience/privacy changes. Nathan enabled API access himself only in Windowsill Save Tests (place 109879630247781); production Studio API settings remain untouched. See `docs/verification/roblox-state-windows/RESULTS.md`, `docs/HANDOFF-roblox-state.md`, ROBLOX-47 and `docs/PUBLIC_RELEASE.md`.

@@ -866,6 +866,10 @@ The client says hello (6 tries, 2.5 s apart), then waits up to 4 s for the first
 
 No server copy of the simulation, so a stored rest is validated for shape and consistency, not replayed. One level of backup. No in-place repair of corrupt or newer records. No ProfileService-style dependency. No ordered stores, leaderboards or cross-player data. Notebook notes remain per-session word choices, not free text. The real DataStore backend is thin and tested only in Studio (`tests/studio/StateSpec.luau`, which marks the DataStore checks "not run" when API access is off). The checks that the stored number round trip is lossless and the error-message patterns used by `SaveStores.classify` are assumptions until Chet runs them in Studio.
 
+### ROBLOX-48 - Peacock price intention reaffirmed (Nathan, 2026-10-17)
+
+Nathan reaffirmed: "the peacock spider will be 99 cents remember, however that works". Intended sale: a one-time cosmetic add-on for the peacock appearance and dance, targeting approximately US$0.99 through a Roblox Game Pass. Verify current Roblox pricing and select the Robux price when implementing sales; do not promise an exact dollar equivalent across purchase methods or regions. The daughter's first spider and the full game remain free. Peacock stays unlocked during testing until Nathan requests sales activation. This reminder records the intended price; it does not activate purchases.
+
 ### ROBLOX-47 - Save review and real-store acceptance (Chet, 2026-10-17)
 
 Preserve pages earned during yielding writes; renew locks ahead of failed-read retries; retain ownership until rest writes finish. Never write a rest without first reading it successfully. This supersedes ROBLOX-41's sentence permitting replacement of corrupt rests: corrupt, invalid and newer values remain untouched, including damage found on retry or write. Unavailable service and permanent write rejection must report session-only, never Saved. Shutdown awaits PlayerRemoving flushes already in flight as well as entries still in the service.

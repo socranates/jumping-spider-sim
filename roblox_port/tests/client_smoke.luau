@@ -161,6 +161,8 @@ check("in the crack E rests; in the evening the spider sleeps until morning, the
 	lighting:SetAttribute("SunPick", "ok: test")
 	assert(life and needs and driver.prey.feeding.needs == needs, "the client did not hand over one life loop and NeedsModel, shared with feeding")
 	assert(needs.lifeMode, "hunger by the hour on the windowsill")
+	local feeding = driver.prey.feeding
+	assert(feeding.startGrip == 0.5 and feeding.tapGain == 0.12 and feeding.jerkScale == 0.8, "the client did not give feeding the game's easier tap (Data/Catch.game, ROBLOX-72)")
 	driver.place(Vector3.new(-25.5, 0.31, 6.0))
 	frames(30)
 	assert(driver.lifeSpider().inRetreat, "the spider is not in the crack")

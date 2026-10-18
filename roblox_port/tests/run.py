@@ -102,6 +102,7 @@ MODULES = [
     ("PeacockText", "UI/PeacockText.luau"),
     ("Fly", "Prey/Fly.luau"),
     ("PreyPopulation", "Prey/PreyPopulation.luau"),
+    ("Catch", "Data/Catch.luau"),
     ("Feeding", "Prey/Feeding.luau"),
     ("PreyDirector", "Prey/PreyDirector.luau"),
     ("TestTarget", "Habitat/TestTarget.luau"),

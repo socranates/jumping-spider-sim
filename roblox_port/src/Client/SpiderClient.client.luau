@@ -16,6 +16,9 @@
 -- The naturalist's notebook (ROBLOX-37): N, the Notebook button beside Menu, or "Notebook" in the life menu and on the end screen opens it
 -- and the world waits. The book is the player's: it lives here, outside the world and its checkpoints, so a return to a rest never erases a
 -- page and a new, unrelated spider opens the same book. NotebookWatch opens pages from the events this loop already has.
+-- Saving (ROBLOX-39): the server owns the DataStore. This script only says hello, applies what the server sends back (the notebook, an Easy
+-- unlock, the chosen spider, the toggles, the last rests) and sends its own progress and rests up (Client/SaveClient). With no server reply
+-- it is the session-only game it was before, and the menu says saving is off.
 
 local GuiService = game:GetService("GuiService")
 local Lighting = game:GetService("Lighting")
@@ -74,6 +77,10 @@ local NotebookText = require(Shared.UI.NotebookText)
 local NotebookPanel = require(script.Parent.NotebookPanel)
 local Checkpoint = require(Shared.Persistence.Checkpoint)
 local CheckpointStore = require(Shared.Persistence.CheckpointStore)
+local SaveRules = require(Shared.Data.SaveRules)
+local SaveProgress = require(Shared.Persistence.SaveProgress)
+local SaveText = require(Shared.UI.SaveText)
+local SaveClient = require(script.Parent.SaveClient)
 local focusState = FocusState.new()
 local DT = SpiderMotor.DT
 local SLOW_SPEED = 0.5
@@ -169,9 +176,12 @@ local initialRecord: any = nil
 local menuStarted = false
 local panel: any = nil -- the catch screen, made below once returnToCheckpoint exists
 local nbPanel: any = nil -- the notebook, made below with the menus
--- Whether a modal screen has the game: the world waits and the controls belong to it.
+local saveClient: any = nil -- persistent saves (ROBLOX-39), made below with the menus
+-- Whether a modal screen has the game: the world waits and the controls belong to it. At the very start the world also waits (a second or
+-- so at most) for the server to say what is saved, so the start menu shows the right choices; not in the test place unless the Workspace attribute SaveWait is true.
 local function modal(): boolean
 	return panel:isShowing() or menu:isShowing() or nbPanel:isShowing()
+		or (not menuStarted and (not testPlace or Workspace:GetAttribute("SaveWait") == true) and saveClient ~= nil and saveClient:waiting() == true)
 end
 -- S01-C retreat checkpoints (ROBLOX-25): resting in the crack, and each morning, keeps one; Backspace / View returns to it. The
 -- store is DataStore-shaped but in memory only: a checkpoint lasts the session. No live DataStore is written.
@@ -191,6 +201,7 @@ life.save = function(): LifeLoop.CheckpointResult
 	end
 	local r = checkpoints:save(record)
 	if not r.ok then warn("[Windowsill] checkpoint: " .. r.message .. ": " .. table.concat(r.errors, "; ")) end
+	if r.ok and saveClient ~= nil then saveClient:sendRest(if checkpoints == stores.free then "free" else "main", record) end
 	return { ok = r.ok, message = r.message }
 end
 local feedPending, cancelPending = false, false -- this frame's presses, for the next fixed tick (Godot's just_pressed)
@@ -371,12 +382,9 @@ local controls: any -- bound below (SpiderInput.bind)
 local function canChange(): boolean
 	return life.resting and not life.asleep and not life.growth:isMoulting()
 end
-local function changeSpider()
-	if not canChange() then
-		hud:toast(PeacockText.NOT_RESTING, false)
-		return
-	end
-	appearance = SpiderChoice.next(appearance)
+local appearanceTouched = false -- the player chose a spider this visit (only then is the choice sent to be saved)
+local function setAppearance(id: string)
+	appearance = id
 	player:SetAttribute("Appearance", appearance)
 	dance:stop()
 	dance = PeacockDance.new()
@@ -387,6 +395,15 @@ local function changeSpider()
 	rig:setEyeView(cam.eyeView)
 	rig:setBodyHidden(bodyHidden)
 	old:destroy()
+end
+local function changeSpider()
+	if not canChange() then
+		hud:toast(PeacockText.NOT_RESTING, false)
+		return
+	end
+	setAppearance(SpiderChoice.next(appearance))
+	appearanceTouched = true
+	if saveClient ~= nil then saveClient:markDirty() end
 	hud:toast(PeacockText.changed(appearance), false)
 end
 -- X / RB / the Dance button: start the courtship dance, or end it. On a controller RB in the crack changes spider instead (one button for
@@ -527,7 +544,7 @@ menu=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
  if choice=="New" or choice=="Easy" then
   if session.started and confirming~=choice then
    confirming=choice
-   menu:showChoices("Begin a new life?","This replaces the main life's last rest for this session.","",
+   menu:showChoices("Begin a new life?","This replaces the main life's last rest as soon as the new spider rests.","",
     {{id=choice :: string,text="Begin the new life"},{id="CancelNew",text="Keep this life"}},true)
    return
   end
@@ -548,7 +565,7 @@ openMenu=function()
  table.insert(choices,{id="Notes",text=if player:GetAttribute("NotebookNotes")==false then "Discovery notes: off" else "Discovery notes: on"})
  table.insert(choices,{id="Large",text=if player:GetAttribute("LargeText")==true then "Text size: large" else "Text size: normal"})
  menu:showChoices("The Windowsill","A small life on a windowsill.",
-  "Progress and rest checkpoints last for this play session."..(if session.finishedMain then "" else "\nEasy is not available yet; choose Free play for gentle rules."),choices,true)
+  SaveText.menuLine(saveClient:status())..(if session.finishedMain then "" else "\nEasy is not available yet; choose Free play for gentle rules."),choices,true)
  menu:setTextScale(if player:GetAttribute("LargeText")==true then 1.5 else 1)
 end
 local menuButton=Instance.new("TextButton")
@@ -586,6 +603,114 @@ notebookButton.Name="NotebookButton";notebookButton.Text=NotebookText.BUTTON;not
 notebookButton.Position=UDim2.new(1,-180,0,48);notebookButton.TextSize=14
 notebookButton.BackgroundColor3=Color3.new(.12,.12,.14);notebookButton.TextColor3=Color3.new(1,1,1)
 notebookButton.Parent=hud.safe;notebookButton.Activated:Connect(function() openNotebook("game") end)
+
+-- ---------------------------------------------------------------- persistent saves (ROBLOX-39)
+-- What this visit changed is sent up (the notebook and an adult life always; the spider and the toggles only if the player changed them, so
+-- a late reply can never be overwritten by defaults). What the server sends down is applied once, before the start menu, and again if a
+-- retry succeeds later: the notebook and the adult life are only ever added to, the rest of the choices only if the player has not already
+-- made their own this visit.
+local prefTouched: { [string]: boolean } = {}
+local applyingSaved = false
+local savedStatus: string? = nil
+local savedReason: string? = nil
+local lastSig = ""
+local lastEye = 0.0
+local lastEyeCheck = os.clock()
+local function refreshMenu()
+	if menuStarted and menu:isShowing() and confirming == nil then openMenu() end
+end
+local function progressSnapshot(): any
+	local prefs: { [string]: boolean? } = {}
+	for key in prefTouched do
+		local v = player:GetAttribute(key)
+		if type(v) == "boolean" then prefs[key] = v end
+	end
+	return SaveProgress.snapshot(book:toRecord(), session.finishedMain, if appearanceTouched then appearance else nil, prefs)
+end
+local function adoptRest(mode: string, record: any)
+	if record == nil or (mode ~= "main" and mode ~= "free") then return end
+	if session.started or stores[mode]:loadBest().ok then return end -- this visit has begun, or already has a rest of its own
+	local r = stores[mode]:save(record)
+	if not r.ok then warn("[Windowsill] saved " .. mode .. " rest not used: " .. r.message .. ": " .. table.concat(r.errors, "; ")) end
+end
+local function applySaved(msg: any)
+	if type(msg) ~= "table" then return end
+	local _, p = SaveProgress.sanitize(msg.progress)
+	if p then
+		local mine = book:toRecord()
+		local ids: { string } = {}
+		local seen: { [string]: boolean } = {}
+		for _, list in { mine.opened, p.notebook.opened } do
+			for _, id in list do
+				if not seen[id] then seen[id] = true; table.insert(ids, id) end
+			end
+		end
+		book:load({ opened = ids, eye_seconds = math.max(mine.eye_seconds, p.notebook.eye_seconds) })
+		if p.finished_main then session.finishedMain = true end
+		applyingSaved = true
+		for key, v in p.prefs do
+			if not prefTouched[key] then player:SetAttribute(key, v) end
+		end
+		applyingSaved = false
+		if p.appearance ~= nil and not appearanceTouched and p.appearance ~= appearance and SpiderChoice.start(p.appearance, nil) == p.appearance then
+			setAppearance(p.appearance)
+		end
+	end
+	if type(msg.rests) == "table" then
+		adoptRest("main", msg.rests.main)
+		adoptRest("free", msg.rests.free)
+	end
+	lastSig = `{#book.opened}:{session.finishedMain}`
+	lastEye = book.eyeSeconds
+	if nbPanel:isShowing() then nbPanel:refresh() end
+	refreshMenu()
+end
+saveClient = SaveClient.new({
+	rules = SaveRules, now = os.clock,
+	findRemotes = function(): any
+		local folder = ReplicatedStorage:FindFirstChild(SaveRules.REMOTES_NAME)
+		if folder == nil then return nil end
+		local toServer, toClient = folder:FindFirstChild("ToServer"), folder:FindFirstChild("ToClient")
+		if toServer == nil or toClient == nil then return nil end
+		return { server = toServer, client = toClient }
+	end,
+	onLoaded = applySaved,
+	onRest = function(mode: string, record: any) adoptRest(mode, record) end,
+	onStatus = function(_status: string, _reason: string?) end, -- (the status is read each frame below)
+	build = progressSnapshot,
+})
+lastSig = `{#book.opened}:{session.finishedMain}`
+for _, key in SaveRules.PREF_KEYS do
+	player:GetAttributeChangedSignal(key):Connect(function()
+		if applyingSaved then return end
+		prefTouched[key] = true
+		saveClient:markDirty()
+	end)
+end
+-- Each frame: the connection, what changed, and the status (a toast when it changes, a fresh menu line).
+local function updateSaves()
+	saveClient:update()
+	local sig = `{#book.opened}:{session.finishedMain}`
+	if sig ~= lastSig then
+		lastSig = sig
+		saveClient:markDirty()
+	end
+	local t = os.clock()
+	if t - lastEyeCheck >= SaveRules.CLIENT_EYE_GAP then
+		lastEyeCheck = t
+		if book.eyeSeconds ~= lastEye then
+			lastEye = book.eyeSeconds
+			saveClient:markDirty()
+		end
+	end
+	local status, reason = saveClient:status()
+	if status ~= nil and (status ~= savedStatus or reason ~= savedReason) then
+		local text = SaveText.toast(savedStatus, savedReason, status, reason)
+		savedStatus, savedReason = status, reason
+		if text ~= "" then hud:toast(text, status == "session") end
+		refreshMenu()
+	end
+end
 
 controls = SpiderInput.bind({
 	blocked = modal,
@@ -795,6 +920,7 @@ end
 -- ---------------------------------------------------------------- the frame
 local accumulator = 0
 RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, function(frameDt: number)
+	updateSaves()
 	if panel:isShowing() then panel:update(frameDt) end
 	if nbPanel:isShowing() then nbPanel:update(frameDt) end
 	if GuiService.MenuIsOpen or modal() then

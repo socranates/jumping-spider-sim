@@ -51,7 +51,7 @@ SaveRules.CLIENT_HELLO_GAP = 2.5 -- the client says hello again this often until
 SaveRules.CLIENT_HELLO_TRIES = 6
 SaveRules.CLIENT_PROGRESS_GAP = 2 -- the client sends at most one progress message in this time
 SaveRules.CLIENT_EYE_GAP = 30 -- and re-sends the eye-view seconds this often when they changed
-SaveRules.CLIENT_WAIT_REMOTES = 2.5 -- the start menu waits this long for the server's remotes to appear
+SaveRules.CLIENT_WAIT_REMOTES = 1.5 -- the start menu waits this long for the server's remotes to appear
 SaveRules.CLIENT_WAIT_REPLY = 4 -- and this long for the first reply after saying hello
 
 -- ---------------------------------------------------------------- words for statuses

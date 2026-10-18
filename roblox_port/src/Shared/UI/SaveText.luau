@@ -1,0 +1,58 @@
+--!strict
+-- The words about saving (ROBLOX-39): what the menu and a short toast say. Plain and honest: saved, saving, or off for this visit and why.
+-- The reasons are SaveRules.REASONS. Pure; checked in tests/state_client.luau.
+local SaveText = {}
+
+SaveText.SAVED = "Your notebook and last rests are saved."
+SaveText.SAVING = "Saving..."
+SaveText.TROUBLE = "Having trouble saving. Your progress is kept for now and the game keeps trying."
+SaveText.OFF = "Saving is off for this visit: your notebook and rests will last only until you leave."
+SaveText.LOOKING = "Finding your saved game..."
+SaveText.BACK = "Saving is back on."
+
+SaveText.WHY = {
+	offline = "The game could not reach its saving service.",
+	no_api = "Saving is not available here.",
+	load_failed = "Your saved game could not be read just now. It has not been changed, and the game keeps trying.",
+	other_session = "Your game is open somewhere else, and this copy cannot save over it.",
+	corrupt = "Your saved game could not be read, so it was left exactly as it is.",
+	newer = "Your saved game was made by a newer version of this game, so it was left exactly as it is.",
+} :: { [string]: string }
+
+local function because(reason: string?): string?
+	if reason == nil then return nil end
+	return SaveText.WHY[reason]
+end
+
+-- The line for the menu: one or two sentences.
+function SaveText.menuLine(status: string?, reason: string?): string
+	if status == "session" then
+		local why = because(reason)
+		return SaveText.OFF .. (if why then "\n" .. why else "")
+	elseif status == "saving" then
+		return if reason == "write_failed" then SaveText.TROUBLE else SaveText.SAVING
+	elseif status == "saved" then
+		return SaveText.SAVED
+	end
+	return SaveText.LOOKING
+end
+
+-- A short toast when the status changes, or "" when nothing needs saying (a plain saving/saved flicker is not announced).
+function SaveText.toast(oldStatus: string?, oldReason: string?, status: string?, reason: string?): string
+	local was: string = oldStatus or ""
+	local now: string = status or ""
+	local toSession = now == "session" and was ~= "session"
+	local fromSession = was == "session" and (now == "saved" or now == "saving")
+	local newTrouble = now == "saving" and reason == "write_failed" and was ~= "" and not (was == "saving" and oldReason == "write_failed")
+	if toSession then
+		local why = because(reason)
+		return SaveText.OFF .. (if why then " " .. why else "")
+	elseif fromSession then
+		return SaveText.BACK
+	elseif newTrouble then
+		return SaveText.TROUBLE
+	end
+	return ""
+end
+
+return SaveText

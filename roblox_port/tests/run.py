@@ -98,6 +98,7 @@ MODULES = [
     ("FieldNotebook", "Learning/FieldNotebook.luau"),
     ("NotebookWatch", "Learning/NotebookWatch.luau"),
     ("NotebookText", "UI/NotebookText.luau"),
+    ("SaveText", "UI/SaveText.luau"),
     ("SaveRules", "Data/SaveRules.luau"),
     ("Json", "Persistence/Json.luau"),
     ("ObjectRecord", "Persistence/ObjectRecord.luau"),
@@ -128,8 +129,9 @@ CLIENT_MODULES = [
     ("WaspBody", "../Client/WaspBody.luau"),
     ("PerceptionHud", "../Client/PerceptionHud.luau"),
     ("SpiderEyes", "../Client/SpiderEyes.luau"),
+    ("SaveClient", "../Client/SaveClient.luau"),
 ]
-CLIENT_TESTS = {"growth.luau","perception_client.luau", "client_smoke.luau", "look.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "wasp.luau", "notebook.luau"}
+CLIENT_TESTS = {"state_client.luau","state_offline.luau","growth.luau","perception_client.luau", "client_smoke.luau", "look.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "wasp.luau", "notebook.luau"}
 REFERENCES = ["jump_reference", "tether_reference", "camera_reference", "framing_reference", "perception_reference", "prey_reference", "life_reference", "wasp_reference", "continuing_reference", "growth_reference", "notebook_reference", "notebook_godot"]
 # A reference only the named tests read (it is large; the other bundles leave it out).
 REFERENCE_ONLY = {"continuing_reference": {"continuing.luau"},"prey_reference": {"prey.luau"}, "perception_reference": {"perception.luau"}, "life_reference": {"life.luau"}, "wasp_reference": {"wasp.luau"}, "notebook_reference": {"notebook.luau"}, "notebook_godot": {"notebook.luau"}}
@@ -185,7 +187,7 @@ def main():
     luau = sys.argv[1] if len(sys.argv) > 1 else "luau"
     status = 0
     named = sys.argv[2:]
-    for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "life.luau", "checkpoint.luau", "wasp.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "look.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "peacock.luau", "continuing.luau", "growth.luau", "notebook.luau", "state.luau"]:
+    for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "life.luau", "checkpoint.luau", "wasp.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "look.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "peacock.luau", "continuing.luau", "growth.luau", "notebook.luau", "state.luau", "state_client.luau", "state_offline.luau"]:
         if not (HERE / test_file).exists():
             if named:  # a misspelt name must not look like a pass
                 print(f"no such test file: {test_file} (names are relative to tests/, for example look.luau)", file=sys.stderr)

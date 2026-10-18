@@ -233,7 +233,21 @@ function Object.FindFirstChildWhichIsA(o, cls, recursive)
 	return nil
 end
 function Object.WaitForChild(o, name) return o:FindFirstChild(name) or o end
-function Object.SetAttribute(o, k, v) rawget(o, "_attrs")[k] = v end
+function Object.SetAttribute(o, k, v)
+	local attrs = rawget(o, "_attrs")
+	local old = attrs[k]
+	attrs[k] = v
+	if old ~= v then
+		local sig = rawget(o, "_attr_" .. k)
+		if sig then sig:Fire() end
+	end
+end
+function Object.GetAttributeChangedSignal(o, name)
+	local key = "_attr_" .. name
+	local sig = rawget(o, key)
+	if not sig then sig = newSignal(); rawset(o, key, sig) end
+	return sig
+end
 -- Sound transport only; the shim cannot verify asset loading or audible output.
 function Object.Play(o) o.Playing = true; o.TimePosition = 0 end
 function Object.Pause(o) o.Playing = false end

@@ -6,6 +6,8 @@
 -- Data/Appearances; where things sit comes from Rig/Anatomy, the hairs from Rig/Setae, the idle motion from Rig/Idle.
 -- The peacock spider (ROBLOX-30) is a second appearance drawn by the same code: a small body (look.scale) standing low (look.bodyDrop),
 -- legs III in their own colours, and a fan of flat discs that the courtship dance (Rig/PeacockDance, set as rig.dance) opens.
+-- The ant-mimicking spider (ROBLOX-54) is a third: extra body segments (look.extras), glossy cuticle (look.gloss), and a pose (Rig/AntMimicPose,
+-- set as rig.ant) that raises legs I as antennae when it stands and turns the drawn body a little as it walks.
 
 local Workspace = game:GetService("Workspace")
 local Appearances = require(script.Parent.Parent.Data.Appearances)
@@ -88,6 +90,7 @@ export type Rig = typeof(setmetatable(
 		_drop: number,
 		_fan: Fan?,
 		dance: any, -- a PeacockDance.Pose, or nil: the peacock spider's display (ignored by an appearance without a fan)
+		ant: any, -- an AntMimicPose.Pose, or nil: the ant-mimicking spider's antennae and walk (ignored by an appearance without look.antennae)
 	},
 	SpiderRig
 ))
@@ -210,6 +213,7 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		_drop = look.bodyDrop or 0,
 		_fan = nil :: Fan?,
 		dance = nil :: any,
+		ant = nil :: any,
 	}, SpiderRig)
 
 	local function fixed(part: Part, at: Vector3, rot: CFrame?, group: number, palp: number?)
@@ -220,6 +224,18 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 	fixed(ellipsoid(model, "EyeFace", A.faceRadii, BODY, fabric), A.faceCenter, nil, G_HEAD)
 	fixed(ellipsoid(model, "Pedicel", A.pedicelRadii, BODY, fabric), A.pedicelCenter, nil, G_BODY)
 	fixed(ellipsoid(model, "Abdomen", A.abdomenRadii, ABDOMEN, fabric), A.abdomenCenter, nil, G_ABDOMEN)
+	-- More segments (the ant-mimicking spider's thorax and the node on its waist), and a glossy cuticle where the look asks for one.
+	for _, ex in look.extras or {} do
+		local seg = ellipsoid(model, ex.name, v3(ex.radii), if ex.color then color(ex.color) else BODY, fabric)
+		fixed(seg, v3(ex.center), nil, GROUP_OF[ex.group] or G_BODY)
+	end
+	if look.gloss then
+		for _, f in self._fixed do
+			if f.part.Name == "Cephalothorax" or f.part.Name == "EyeFace" or f.part.Name == "Pedicel" or f.part.Name == "Abdomen" or f.part.Name == "Thorax" or f.part.Name == "PetioleNode" then
+				f.part.Reflectance = look.gloss
+			end
+		end
+	end
 
 	-- The daughter's pattern: markings are fractions of the abdomen's radii.
 	local ar, ac = A.abdomenRadii, A.abdomenCenter
@@ -307,8 +323,9 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		local ring = rod(model, "PalpBand", pl.stalk * 1.05, WHITE)
 		ring.Size = Vector3.new(len * look.bandFraction, pl.stalk * 1.05, pl.stalk * 1.05)
 		fixed(ring, Vector3.zero, toBase * rodCFrame(base, tip), G_HEAD, index)
-		fixed(ellipsoid(model, "PalpClub", v3(pl.club), PALP_CLUB, fabric), tip + Vector3.new(0, -0.005, -0.02) - base, nil, G_HEAD, index)
-		fixed(ellipsoid(model, "PalpTip", v3(pl.tipRadii), PALP_TIP, fabric), tip + Vector3.new(0, 0.004, -0.05) - base, nil, G_HEAD, index)
+		local os = pl.offsetScale or 1 -- the club and tip sit a little past the stalk's end; a very small spider scales that down
+		fixed(ellipsoid(model, "PalpClub", v3(pl.club), PALP_CLUB, fabric), tip + Vector3.new(0, -0.005, -0.02) * os - base, nil, G_HEAD, index)
+		fixed(ellipsoid(model, "PalpTip", v3(pl.tipRadii), PALP_TIP, fabric), tip + Vector3.new(0, 0.004, -0.05) * os - base, nil, G_HEAD, index)
 	end
 
 	-- Fuzz: flat locks over the head and abdomen, tufts, a cheek ruff and palp fluff (Rig/Setae), moved with the part they grow from.
@@ -526,6 +543,12 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 	self._t += dt
 	-- The root part (what the camera and tests read) stays at the collider's frame; the drawn body of a small appearance sits lower.
 	local body = if self._drop ~= 0 then collider * CFrame.new(0, -self._drop, 0) else collider
+	-- The ant-mimicking spider's drawn walk: the body yaws and sways a little along a sine of the distance walked (the collider and the path
+	-- are untouched; the root part stays at the collider's frame).
+	local antPose = if self._appearance.antennae ~= nil then self.ant else nil
+	if antPose ~= nil and (antPose.yaw ~= 0 or antPose.lateral ~= 0) then
+		body = body * CFrame.new(antPose.lateral * self._growth, 0, 0) * CFrame.Angles(0, antPose.yaw, 0)
+	end
 	local up = body.UpVector
 	local look, cfg, A = self._appearance, self._cfg, self._layout
 	local k, g = self._k, self._growth
@@ -677,6 +700,18 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 			foot = foot:Lerp(raised, raise)
 			local raisedKnee = hip:Lerp(raised, 0.5) + bodyBase.RightVector * (leg.side * own.kneeOut*g) + up * look.dance.kneeUp*g
 			knee = knee:Lerp(raisedKnee, raise)
+		end
+		-- The antennal illusion: legs I go up above the head, both in phase (one wave value), and the planted foot below is untouched.
+		local antCfg = look.antennae
+		if antPose ~= nil and antCfg ~= nil and leg.pair == antCfg.pair and antPose.antennae > 0 then
+			local highShift = Vector3.new(0, antCfg.high.y - antCfg.up.y, antCfg.high.z - antCfg.up.z) * antPose.high
+			local upAt = Vector3.new(leg.side * antCfg.up.x, antCfg.up.y, antCfg.up.z)
+				+ Vector3.new(leg.side * (antCfg.high.x - antCfg.up.x) * antPose.high, 0, 0) + highShift
+			local sweptAt = Vector3.new(leg.side * antCfg.swept.x, antCfg.swept.y, antCfg.swept.z) + highShift
+			local raised = bodyBase:PointToWorldSpace(upAt:Lerp(sweptAt, antPose.wave) * g)
+			foot = foot:Lerp(raised, antPose.antennae)
+			local raisedKnee = hip:Lerp(raised, 0.5) + bodyBase.RightVector * (leg.side * antCfg.kneeOut * g) + up * (antCfg.kneeUp * g)
+			knee = knee:Lerp(raisedKnee, antPose.antennae)
 		end
 		local ankle = knee:Lerp(foot, ANKLE_SHARE) + up * (L.ankleLift*g)
 		local function segment(index: number, p: Part, band: Part?, a: Vector3, b: Vector3)

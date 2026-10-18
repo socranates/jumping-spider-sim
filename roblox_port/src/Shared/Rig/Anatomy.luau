@@ -103,8 +103,10 @@ function Anatomy.layout(look: any): Layout
 	local cheeks, jaws, palps = {}, {}, {}
 	local ch, cl, pl = look.cheek, look.chelicerae, look.palp
 	for _, side in { -1, 1 } do
-		local cx = Anatomy.sideX(hc, hr, ch.y - hc.Y, ch.z - hc.Z) - ch.inset
-		table.insert(cheeks, { side = side, at = Vector3.new(side * cx, ch.y, ch.z), radii = v3(ch.radii) })
+		if ch then -- an appearance without pale cheeks (the ant-mimicking spider) has none
+			local cx = Anatomy.sideX(hc, hr, ch.y - hc.Y, ch.z - hc.Z) - ch.inset
+			table.insert(cheeks, { side = side, at = Vector3.new(side * cx, ch.y, ch.z), radii = v3(ch.radii) })
+		end
 		local jaw = Vector3.new(side * cl.x, cl.y, cl.z)
 		table.insert(jaws, { side = side, at = jaw, radii = v3(cl.radii) })
 		table.insert(zones, { at = jaw, radius = math.max(cl.radii[1], cl.radii[2], cl.radii[3]) * 1.1 + 0.01 })

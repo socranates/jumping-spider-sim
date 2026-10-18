@@ -5,6 +5,26 @@ if DANCE_T >= 0 then
 	rig.dance = PEACOCKDANCE.rawPose(DANCE_T, false)
 	for i = 1, 4 do rig:update(body, 1/60, true, false) end
 end
+if ANT_MODE ~= "" then
+	-- The ant-mimicking spider: standing with legs I up (or the display pose), or walking toward the origin at 6 studs a second.
+	local pose = ANTMIMICPOSE.new()
+	local dt = 1 / 60
+	if ANT_MODE == "walk" then
+		local steps = math.floor(ANT_SECONDS * 60 + 0.5)
+		for i = 1, steps do
+			local z = (steps - i) * 6 * dt
+			local b = SupportMath.bodyCFrame(Vector3.new(0, 0.31, z), Vector3.yAxis, Vector3.new(0, 0, -1))
+			rig.ant = pose:step(dt, true, true, 6 * dt)
+			rig:update(b, dt, true, true)
+		end
+	else
+		if ANT_MODE == "display" then pose:start(true, false) end
+		for i = 1, math.floor(ANT_SECONDS * 60 + 0.5) do
+			rig.ant = pose:step(dt, true, false, 0)
+			rig:update(body, dt, true, false)
+		end
+	end
+end
 for i = 1, math.floor(IDLE_SECONDS * 60) do rig:update(body, 1/60, true, false) end
 if MODE == "eye" then rig:setEyeView(true) end
 local function f(x) return string.format("%.5f", x) end

@@ -84,3 +84,7 @@ Built on `claude/roblox-settings` from main 3b8a919. Decisions ROBLOX-49..52. Ha
 ## Chet — 2026-10-18: settings accepted, v20 published
 
 Settings and touch update passed 47,547 CLI checks, 111 engine and 24 live-client checks, strict analysis and 167-script compile. Normal real-cloud restart retained volume and large text. Phone emulator checked both orientations; short landscape with large text is cramped but scrollable. Physical-device checks remain pending. See `verification/roblox-settings-windows/RESULTS.md` and `HANDOFF-roblox-settings.md`.
+
+## Claude - 2026-10-18 (evening): the sill round, published v24-v26 unverified
+
+Built on `claude/roblox-sill` (contains roblox-daily). Decisions ROBLOX-71..83. Handoff `docs/HANDOFF-roblox-sill.md`. The spider picker, catch and rival feel tuning, the dressed sill, the wasp twice a day, ambient music (asset upload pending, Chet), the meal-scaled struggle, the hunger bar, the complete mating cycle ending in a new generation, and the tarantula pack. Evidence d865b73033b37e93; all CLI suites green, strict clean, 132/132 compile. Published v24/v25/v26 to the playtest from Nathan's PC by Rojo sync with command-bar spot checks; no Studio or device acceptance yet - that pass is Chet's next.

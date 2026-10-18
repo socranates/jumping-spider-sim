@@ -1259,7 +1259,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	local soundPaused = GuiService.MenuIsOpen or modal()
 	local soundSpeed = if slow then SLOW_SPEED else 1
 	local soundMuted = setting("SoundMuted") == true
-	soundscape:setVolumes(setting("MasterVolume"), setting("AmbienceVolume"), setting("CreatureVolume"))
+	soundscape:setVolumes(setting("MasterVolume"), setting("AmbienceVolume"), setting("CreatureVolume"), setting("MusicVolume"))
 	soundscape:update(frameDt, prey, life.daylight, soundPaused, soundSpeed, soundMuted)
 	soundscape:updateWasp(wasp, soundPaused, soundSpeed, soundMuted)
 	waspBody:draw(wasp.wasp, prey.now)

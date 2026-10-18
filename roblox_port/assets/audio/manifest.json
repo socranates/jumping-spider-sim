@@ -27,6 +27,13 @@
       "experience_access_saved": true
     },
     {
+      "file": "sill_music.wav",
+      "sha256": "c9de73c506cdbd76bc1e6139d56233c3bd242b1a3c19ae8562e60d36d04496f4",
+      "bytes": 2822444,
+      "roblox_asset_id": null,
+      "experience_access_saved": false
+    },
+    {
       "file": "takeoff.wav",
       "sha256": "707018ef011a90d339fe08349f8df5acceef9e175a94db7edbe19c6f318696ff",
       "bytes": 17684,
@@ -62,5 +69,5 @@
       "experience_access_saved": false
     }
   ],
-  "status": "Uploaded 2026-10-16 to socranates; room, buzz, takeoff, birds and wasp granted to universe 10771103250. Original sound playtest confirmed; wasp sound loaded and transport verified in Studio build 52123df9177323c8."
+  "status": "Uploaded 2026-10-16 to socranates; room, buzz, takeoff, birds and wasp granted to universe 10771103250. Original sound playtest confirmed; wasp sound loaded and transport verified in Studio build 52123df9177323c8. sill_music.wav (ROBLOX-76, the original ambient loop from tools/make_sill_music.py, not from sound_bank.gd) is not uploaded yet: Chet uploads it, grants it to universe 10771103250, and pastes the asset id into IDS.music in src/Client/Soundscape.luau (and the roblox_asset_id and experience_access_saved here); until then the game plays no music and is otherwise unchanged."
 }

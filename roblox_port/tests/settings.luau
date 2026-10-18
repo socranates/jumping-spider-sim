@@ -63,8 +63,8 @@ for _, s in Spec.LIST do
 	local clean, problem = Model.clean(s.id, s.default)
 	check(clean == s.default and problem == nil, `{s.id}: the default is clean`)
 end
-check(#Spec.LIST == 22, `22 settings in the table (found {#Spec.LIST})`)
-check(perSection.sound == 5 and perSection.camera == 8 and perSection.comfort == 7 and perSection.help == 2, "5 sound, 8 camera, 7 comfort, 2 help")
+check(#Spec.LIST == 23, `23 settings in the table (found {#Spec.LIST})`)
+check(perSection.sound == 6 and perSection.camera == 8 and perSection.comfort == 7 and perSection.help == 2, "6 sound, 8 camera, 7 comfort, 2 help")
 check(Spec.VERSION == 1 and Model.VERSION == 1, "version 1")
 
 -- The seven that were already Player attributes (ROBLOX-39's PREF_KEYS) keep their names and what "unset" meant.
@@ -89,6 +89,34 @@ check(Model.default("Captions") == "normal", "captions: on (Godot's true is the 
 check(Model.default("AutomaticGrip") == false and Model.default("FocusToggle") == false and Model.default("ReducedMotion") == false, "struggle_auto, focus_toggle, reduced_motion: off")
 -- The Roblox mix was tuned and accepted at full volume (ROBLOX-28), so the three volumes start at 100 per cent rather than Godot's 0.8, 0.6, 0.9.
 check(Model.default("MasterVolume") == 1.0 and Model.default("AmbienceVolume") == 1.0 and Model.default("CreatureVolume") == 1.0, "volumes start at the accepted mix")
+-- ROBLOX-76: the ambient music's slider is the fourth volume, made exactly like the three: 0 to 1 in steps of 0.05, 100 per cent, in Sound.
+do
+	local music = Model.spec("MusicVolume") :: Spec.Setting
+	check(music ~= nil and music.section == "sound" and music.kind == "slider" and music.default == 1.0 and music.min == 0.0 and music.max == 1.0 and music.step == 0.05 and music.unit == "percent" and music.label == "Ambient music",
+		"MusicVolume: a slider 0 to 1 in steps of 0.05, 100 per cent, in Sound, labelled Ambient music")
+	local master = Model.spec("MasterVolume") :: Spec.Setting
+	check(music.unit == master.unit and music.step == master.step and music.min == master.min and music.max == master.max and music.default == master.default and music.note == master.note, "and made as the other volumes are")
+	local order = Model.ids()
+	check(order[2] == "MasterVolume" and order[3] == "AmbienceVolume" and order[4] == "CreatureVolume" and order[5] == "MusicVolume" and order[6] == "Captions", "it comes after the other three volumes, before the captions")
+	check(Model.known("MusicVolume") and Model.defaults().MusicVolume == 1.0 and Model.isDefault("MusicVolume", 1.0) and not Model.isDefault("MusicVolume", 0.5), "known, in the defaults")
+	local v3, p3 = Model.clean("MusicVolume", 0.35)
+	check(v3 == 0.35 and p3 == nil, "0.35 is clean")
+	v3, p3 = Model.clean("MusicVolume", 5)
+	check(v3 == 1 and p3 == nil, "above the range it is clamped")
+	v3, p3 = Model.clean("MusicVolume", -1)
+	check(v3 == 0 and p3 == nil, "and below")
+	v3, p3 = Model.clean("MusicVolume", "quiet")
+	check(v3 == nil and p3 ~= nil, "a string is a problem")
+	check(Model.step("MusicVolume", 1.0, -1) == 0.95 and Model.step("MusicVolume", 0.0, -1) == 0.0 and Model.valueText("MusicVolume", 0.35) == "35%" and Model.line("MusicVolume", 0.5) == "Ambient music: 50%", "it steps by a twentieth and says percent")
+	check(Model.get(function() return nil end, "MusicVolume") == 1.0 and Model.get(function() return 0.2 end, "MusicVolume") == 0.2, "unset it reads full, set it reads as set")
+	-- Saved with the other settings, and a save from before it gets the default.
+	local payload = SaveProgress.snapshot({ opened = {}, eye_seconds = 0 }, false, "first_spider", { MusicVolume = 0.35, MasterVolume = 0.5 })
+	check(payload.settings.MusicVolume == 0.35 and payload.settings.MasterVolume == 0.5, "a changed music volume goes into the save with the others")
+	local problems4, cleaned4 = Model.cleanAll({ MasterVolume = 0.5, MusicVolume = 0.35 })
+	check(#problems4 == 0 and cleaned4.MusicVolume == 0.35, "and comes back clean")
+	local problems5, cleaned5 = Model.cleanAll({ MasterVolume = 0.5 })
+	check(#problems5 == 0 and cleaned5.MusicVolume == nil and Model.get(function(id: string): any return cleaned5[id] end, "MusicVolume") == 1.0, "a save from before it has none and reads the default")
+end
 
 -- ---------------------------------------------------------------- looking up and cleaning
 local function holder(t: { [string]: any }): (string) -> any return function(id: string): any return t[id] end end
@@ -797,6 +825,82 @@ do
 	check(s.room.Volume == 0, "and ambience at nothing silences the room alone")
 end
 
+-- ---------------------------------------------------------------- the ambient music voice (ROBLOX-76)
+do
+	local Soundscape = require("../src/Client/Soundscape")
+	local prey = { flies = {}, feeding = { held = nil, struggling = false } }
+	local away = { phase = "away", wasp = { mode = "flying", position = Vector3.new(0, 20, 0) } }
+	local visiting = { phase = "searching", wasp = { mode = "flying", position = Vector3.new(0, 5, 0) } }
+	-- No asset id yet: no voice at all, and nothing else changes.
+	check(Soundscape.IDS.music == "", "the music's asset id is empty until Chet pastes it in")
+	local silent = Soundscape.new(Instance.new("Folder"))
+	silent:setVolumes(1, 1, 1, 0.5)
+	silent:update(0.1, prey, 1, false, 1, false)
+	silent:updateWasp(visiting, false, 1, false)
+	silent:update(0.1, prey, 1, false, 1, false)
+	check(silent.music == nil and silent.root:FindFirstChild("music") == nil and near(silent.musicVolume, 0.5, 1e-9) and near(silent.room.Volume, 0.09, 1e-9), "with an empty id there is no music voice, and the room is as it was")
+	-- With an id the voice exists: looped, in the mix at 0.10, scenery under the room tone's presence.
+	Soundscape.IDS.music = "rbxassetid://1"
+	local s = Soundscape.new(Instance.new("Folder"))
+	local music: any = s.music
+	check(music ~= nil and music.Name == "music" and music.Looped == true and music.SoundId == "rbxassetid://1" and music.Parent == s.root, "with an id there is one looped voice called music")
+	s:update(0.1, prey, 1, false, 1, false)
+	check(near(music.Volume, 0.10, 1e-9) and music.Playing, "at full volume it is 0.10 in the mix, playing")
+	check(0.10 > 0.09 * 0.9 and 0.10 < 0.16 and music.Volume > s.room.Volume, "a little above the room tone's 0.09 and under the birds' 0.16")
+	s:setVolumes(0.5, 0.2, 0.2, 0.5)
+	s:update(0.1, prey, 1, false, 1, false)
+	check(near(music.Volume, 0.10 * 0.25, 1e-9), "master times the music volume (not the room's or the creatures')")
+	s:setVolumes(1, 1, 1)
+	s:update(0.1, prey, 1, false, 1, false)
+	check(near(music.Volume, 0.10, 1e-9), "a caller that leaves the fourth volume out gets full music")
+	s:setVolumes(1, 1, 1, 0)
+	s:update(0.1, prey, 1, false, 1, false)
+	check(music.Volume == 0, "music at nothing is silent")
+	s:setVolumes(2, 2, 2, 9)
+	check(s.musicVolume == 1 and s.master == 1, "out of range is held to 0..1")
+	s:setVolumes(1, 1, 1, 1)
+	-- It pauses with the menu and the mute, and does not follow slow motion.
+	s:update(0.1, prey, 1, true, 1, false)
+	check(not music.Playing, "it pauses with the menu")
+	s:update(0.1, prey, 1, false, 1, true)
+	check(not music.Playing, "it stops with the mute")
+	s:update(0.1, prey, 1, false, 0.5, false)
+	check(music.Playing and (music.PlaybackSpeed == nil or music.PlaybackSpeed == 1) and s.room.PlaybackSpeed == 0.5, "and in slow motion the music plays at its own pace while the room slows")
+	-- Ducking: to 40 per cent over a second while the wasp is on the sill, back over a second after.
+	local function run(seconds: number, director: any)
+		for _ = 1, math.floor(seconds * 60 + 0.5) do
+			s:updateWasp(director, false, 1, false)
+			s:update(1 / 60, prey, 1, false, 1, false)
+		end
+	end
+	s:setVolumes(1, 1, 1, 1)
+	run(2, away)
+	check(near(music.Volume, 0.10, 1e-9) and s.duck == 1, "with the wasp away the music is not ducked")
+	run(0.5, visiting)
+	check(near(music.Volume, 0.10 * 0.7, 2e-3) and s.duck < 1 and s.duck > 0.4, `half a second in it is part way down (${string.format("%.3f", music.Volume)})`)
+	run(0.55, visiting)
+	check(near(music.Volume, 0.10 * 0.4, 1e-9), "by a second it is at 40 per cent")
+	run(3, visiting)
+	check(near(music.Volume, 0.04, 1e-9), "and stays there while the wasp is here")
+	local arriving = { phase = "arriving", wasp = { mode = "flying", position = Vector3.new(38, 19, 2) } }
+	local walking = { phase = "searching", wasp = { mode = "walking", position = Vector3.new(0, 0.3, 4) } }
+	run(0.2, walking)
+	check(near(music.Volume, 0.04, 1e-9), "(on the ground as well)")
+	run(0.5, away)
+	check(near(music.Volume, 0.10 * 0.7, 2e-3) and s.duck > 0.4 and s.duck < 1, "after it goes the music comes back over a second")
+	run(0.6, away)
+	check(near(music.Volume, 0.10, 1e-9), "all the way")
+	run(0.1, arriving)
+	check(s.duck < 1, "it begins to duck as the warning begins, while the wasp is still outside")
+	-- The ducking times the volume setting.
+	s:setVolumes(0.5, 1, 1, 0.5)
+	run(2, visiting)
+	check(near(music.Volume, 0.10 * 0.25 * 0.4, 1e-9), "and ducking multiplies the player's volumes")
+	Soundscape.IDS.music = ""
+	local again = Soundscape.new(Instance.new("Folder"))
+	check(again.music == nil, "an empty id again: no voice")
+end
+
 -- ---------------------------------------------------------------- the real client: every setting does what it says
 local Layout = require("../src/Shared/Habitat/WindowsillLayout")
 local SaveRules = require("../src/Shared/Data/SaveRules")
@@ -868,6 +972,14 @@ do
 	setAll({ MasterVolume = 1, AmbienceVolume = 1, CreatureVolume = 1 })
 	frames(2)
 	check(near(driver.soundscape.room.Volume, 0.09, 1e-9), "back to full")
+	check(driver.soundscape.music == nil, "the client makes no music voice while the asset id is empty (the game is silent but healthy)")
+	setAll({ MusicVolume = 0.3 })
+	frames(2)
+	check(near(driver.soundscape.musicVolume, 0.3, 1e-9) and near(driver.soundscape.room.Volume, 0.09, 1e-9), "the music volume reaches the sound, and the room does not move")
+	setAll({ MusicVolume = "loud" })
+	frames(2)
+	check(driver.setting("MusicVolume") == 1 and driver.soundscape.musicVolume == 1, "a wrong-typed music volume reads as the default")
+	lp:SetAttribute("MusicVolume", nil)
 	-- junk in an attribute never reaches the sound
 	lp:SetAttribute("MasterVolume", "loud")
 	frames(2)

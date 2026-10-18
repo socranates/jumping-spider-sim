@@ -26,7 +26,7 @@ return function(check: (string, () -> ()) -> ())
 	end
 
 	check("settings: the table, its defaults and a full set of changes survive the engine's JSON and the saved envelope unchanged", function()
-		assert(#SettingsSpec.LIST == 22, `{#SettingsSpec.LIST} settings`)
+		assert(#SettingsSpec.LIST == 23, `{#SettingsSpec.LIST} settings`)
 		local changed: { [string]: any } = {}
 		for _, s in SettingsSpec.LIST do
 			local v: any = s.default
@@ -144,7 +144,7 @@ return function(check: (string, () -> ()) -> ())
 		for _, w in panel.widgets do
 			if w.kind == "header" then headers += 1 elseif w.kind == "setting" then rows += 1 end
 		end
-		assert(headers == 5 and rows == 22 + #SettingsSpec.LIVE, `{headers} headers, {rows} rows`)
+		assert(headers == 5 and rows == 23 + #SettingsSpec.LIVE, `{headers} headers, {rows} rows`)
 		assert(panel.list.ScrollingDirection == Enum.ScrollingDirection.Y and panel.list.AutomaticCanvasSize ~= Enum.AutomaticSize.X, "the list scrolls up and down")
 		assert(panel.hint.TextTruncate == Enum.TextTruncate.AtEnd, "the controls line truncates")
 		local target = SettingsText.MIN_TARGET

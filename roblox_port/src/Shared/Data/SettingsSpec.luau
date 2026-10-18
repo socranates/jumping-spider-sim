@@ -38,6 +38,7 @@ SettingsSpec.LIST = {
 	{ id = "MasterVolume", section = "sound", label = "Volume", kind = "slider", default = 1.0, min = 0.0, max = 1.0, step = 0.05, unit = "percent" },
 	{ id = "AmbienceVolume", section = "sound", label = "Room sounds and birds", kind = "slider", default = 1.0, min = 0.0, max = 1.0, step = 0.05, unit = "percent" },
 	{ id = "CreatureVolume", section = "sound", label = "Flies and the wasp", kind = "slider", default = 1.0, min = 0.0, max = 1.0, step = 0.05, unit = "percent" },
+	{ id = "MusicVolume", section = "sound", label = "Ambient music", kind = "slider", default = 1.0, min = 0.0, max = 1.0, step = 0.05, unit = "percent" },
 	{ id = "Captions", section = "sound", label = "Captions for sounds and vibrations", kind = "choice", default = "normal",
 		options = { { id = "off", label = "Off" }, { id = "normal", label = "Normal" }, { id = "large", label = "Large" } },
 		note = "A line for the wasp's hum and the buzz felt through the feet, with its direction." },

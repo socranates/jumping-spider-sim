@@ -43,7 +43,7 @@ function SettingsText.controls(device: ControlText.Device): string
 	elseif device == "touch" then
 		return "Tap a setting to switch it. Use - and + or drag a bar."
 	end
-	return `Up and Down: choose    Left and Right: change    Enter: switch    PageUp and PageDown: sections    {ControlText.name("keyboard", "settings")} or {ControlText.name("keyboard", "cancel")}: back`
+	return `Up/Down: choose    Left/Right: change    Enter: switch    PageUp/PageDown: sections    {ControlText.name("keyboard", "settings")} or {ControlText.name("keyboard", "cancel")}: back`
 end
 
 -- How to open the settings, on the device in use.
@@ -58,13 +58,14 @@ end
 
 export type Metrics = { paperW: number, paperH: number, head: number, hint: number, foot: number, body: number, bodyW: number }
 
--- Pixel sizes for a safe area of this size: the paper (97% by 95%, at most MAX_PANEL), the heading band, the controls line (two lines; 0 when
+-- Pixel sizes for a safe area of this size: the paper (97% by 95%, at most MAX_PANEL), the heading band, the controls line (two lines, three on a narrow phone; 0 when
 -- the list would be left with less than MIN_BODY px), the footer's buttons and the height left for the list.
 function SettingsText.metrics(width: number, height: number, scale: number): Metrics
 	local paperW, paperH = math.min(width * 0.97, SettingsText.MAX_PANEL.w), math.min(height * 0.95, SettingsText.MAX_PANEL.h)
 	local head = math.floor((SettingsText.SIZES.heading + 10) * scale)
 	local foot = math.floor((SettingsText.MIN_TARGET + 8) * scale)
-	local hint = math.floor(2.4 * SettingsText.SIZES.controls * scale) + 4
+	local lines = if paperW < 500 then (if scale > 1 then 4 else 3) else 2 -- (a narrow phone wraps the line to a third row, or a fourth in large text)
+	local hint = math.ceil(lines * SettingsText.SIZES.controls * scale * 1.25) + 4
 	local body = paperH - 20 - head - foot - 12
 	if body - hint >= SettingsText.MIN_BODY then body -= hint else hint = 0 end
 	return { paperW = paperW, paperH = paperH, head = head, hint = hint, foot = foot, body = body, bodyW = paperW - 28 - SettingsText.SCROLLBAR }
@@ -100,6 +101,18 @@ function SettingsText.rowHeight(layout: RowLayout, labelH: number, noteH: number
 		return math.ceil(pad + math.max(text, if layout.valueTop then target * 0.6 else 0) + SettingsText.GAP * scale + target + pad)
 	end
 	return math.ceil(math.max(target + pad, text + 2 * pad))
+end
+
+-- The largest text size (at most `wanted`, at least 10) at which `word` fits a button `width` px wide and `height` tall: the word wraps, so
+-- the lines it needs (an estimate a little wider than Gotham's real letters) must fit the height.
+function SettingsText.buttonTextSize(word: string, width: number, height: number, wanted: number): number
+	local size = wanted
+	while size > 10 do
+		local lines = math.ceil(#word * size * 0.58 / math.max(1, width - 10))
+		if lines * size * 1.2 <= height then return size end
+		size -= 1
+	end
+	return 10
 end
 
 return SettingsText

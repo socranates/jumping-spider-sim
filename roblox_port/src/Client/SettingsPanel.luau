@@ -379,6 +379,10 @@ function SettingsPanel._paint(self: any)
 	self.resetButton.BackgroundColor3 = if at == rows - 1 then BUTTON_PICK else BUTTON
 	self.backButton.BackgroundColor3 = if at == rows then BUTTON_PICK else BUTTON
 	self.resetButton.Text = if self.confirming then SettingsSpec.WORDS.resetSure else SettingsSpec.WORDS.reset
+	local fit = self.footFit
+	if fit then
+		self.resetButton.TextSize = SettingsText.buttonTextSize(self.resetButton.Text, fit.w, fit.h, fit.size)
+	end
 end
 
 -- Sizes and positions for the screen's size and the text scale. A row's height comes from its measured label and note.
@@ -403,7 +407,8 @@ function SettingsPanel.layout(self: any)
 	self.footer.Size = UDim2.new(1, 0, 0, m.foot)
 	local bw = math.floor(math.min(260 * s, (m.paperW - 28 - 16) / 2))
 	local btext = math.round(sizes.button * s)
-	self.resetButton.Position, self.resetButton.Size, self.resetButton.TextSize = UDim2.fromOffset(0, 4), UDim2.new(0, bw, 1, -8), math.min(btext, math.max(10, math.floor(bw / 8)))
+	self.footFit = { w = bw, h = m.foot - 8, size = btext }
+	self.resetButton.Position, self.resetButton.Size = UDim2.fromOffset(0, 4), UDim2.new(0, bw, 1, -8)
 	self.backButton.Position, self.backButton.Size, self.backButton.TextSize = UDim2.new(1, -bw, 0, 4), UDim2.new(0, bw, 1, -8), btext
 	local statusH = measure(self.status.Text ~= "" and self.status.Text or " ", math.round(sizes.note * s), m.bodyW)
 	self.status.TextSize = math.round(sizes.note * s)

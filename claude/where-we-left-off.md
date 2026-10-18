@@ -1,3 +1,11 @@
+# Latest: settings and device polish built, 2026-10-18 (not yet run in Studio or on a device)
+
+Claude's `claude/roblox-settings` (from v19 main 3b8a919): 22 saved settings (sound volumes and captions, look speeds per device, invert X/Y, camera distance and field of view, the line-framing switch, reduced motion, large text, focus toggle, automatic grip, last-seen mark, spider-eye level horizon and grey, control hints, notebook notes), each read live by its real consumer; a modal settings panel (O, or Menu then Settings) for keyboard, controller and touch; PlayerProgress schema 2 with a migration from the seven old toggles; Menu and Notebook are 48 px touch targets laid out with the status lines, Focus and Change no longer overlap the thumb cluster on narrow phones. Decisions ROBLOX-49..52. CLI total **47,545** accepted checks, failed=0 (SETTINGS 923 new; NOTEBOOK 889 -> 813 because its button-place loop became SUMMARY's 13-size matrix, 185 -> 189); strict types 0; compile 172/172; places rebuilt. Nothing published.
+
+Next for Chet: integrate the bundle, run the Studio Runner (new "Settings spec completes": real text measurements are the check most likely to need a fix), then the checklist in `docs/HANDOFF-roblox-settings.md`. Then Nathan: a complete life on PlayStation (Touchpad, Settings; Cross, L1/R1, Circle) and on a lower-end tablet/phone (thumb reach, large text, narrow portrait). Then presentation/science review and account/audience readiness (PUBLIC_RELEASE.md). Keep the daughter's spider and game free, the peacock free for testing (ROBLOX-48), twitch and SimClock. Godot stays frozen.
+
+---
+
 # Latest: persistent saves published v19 — Chet, 2026-10-17
 
 **Price reminder from Nathan:** the peacock appearance and dance are intended as a one-time add-on targeting **US$0.99**, with the Robux/Game Pass price to be checked when sales are implemented (ROBLOX-48). Free for testing is temporary; the first spider and full game stay free. No purchases activated by this reminder.

@@ -1323,3 +1323,12 @@ Next: Chet runs the checklist in the handoff, then Nathan checks leave-and-rejoi
 ## 2026-10-17 — Chet: persistent saves accepted and published
 
 Integrated Claude 871b816; repaired yielding-write progress loss, lock/read/write safety, honest failure status and shutdown racing an already departing player. 46,652 accepted CLI checks, strict clean, 160 compiled; isolated real DataStore 106 engine + 23 client, zero skipped, followed by normal immediate restart verification for the shutdown fix. Published v19 to the existing playtest; see verification/roblox-state-windows/RESULTS.md. Next settings/device polish; physical PlayStation rejoin remains Nathan's check.
+
+## Claude - 2026-10-18: settings and device polish, not yet seen on a device
+
+Built on `claude/roblox-settings` (cce2a5d, e913508, 99f1de0, 61c8cf0 and the docs/Studio-spec commit) from main 3b8a919 (v19). Decisions ROBLOX-49..52. Handoff: `docs/HANDOFF-roblox-settings.md`. 22 settings in four sections, saved (progress schema 2, migration from the seven old toggles, cleaned on the server by id, type and range), each read live by its consumer: volumes, look speeds, inversion, field of view, camera distance, the line-framing switch, the spider-eye level horizon and grey, caption size, control hints and the older toggles. A modal settings panel (O, or Menu then Settings) for keyboard, controller and touch with Reset on two presses. Menu and Notebook are 48 px touch targets laid out with the status lines; Focus and Change no longer meet the thumb cluster on narrow phones; every touch button is at least 48 px and 4 px from the next at 13 screen sizes.
+
+Verification: SETTINGS 923 (new), STATE 432, STATE_CLIENT 102, STATE_OFFLINE 8, SUMMARY 189, NOTEBOOK 813 (its button-place loop moved to SUMMARY's matrix), every other suite unchanged; CLI total 47,545 accepted checks, failed=0; strict types 0 diagnostics; compile 172/172. Not run: the new Studio spec (real text measurements), any device, any publish.
+
+Next: Chet runs the Studio checklist; Nathan checks a complete life on PlayStation and a lower-end tablet (handoff list); then presentation/science review and account/audience readiness.
+

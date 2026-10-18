@@ -71,7 +71,7 @@ SettingsSpec.CAPTION_SCALE = { off = 0, normal = 1, large = 1.5 } :: { [string]:
 SettingsSpec.WORDS = {
 	title = "Settings",
 	reset = "Reset to defaults",
-	resetSure = "Reset every setting? Press again",
+	resetSure = "Press again to reset",
 	resetDone = "Settings are back to their defaults.",
 	close = "Back",
 	menuChoice = "Settings",

@@ -254,7 +254,7 @@ end
 -- ---------------------------------------------------------------- the words and the layout rules (SettingsText)
 do
 	ControlText.setPadStyle("xbox")
-	check(Text.controls("keyboard") == "Up and Down: choose    Left and Right: change    Enter: switch    PageUp and PageDown: sections    O or Q: back", "the keyboard line")
+	check(Text.controls("keyboard") == "Up/Down: choose    Left/Right: change    Enter: switch    PageUp/PageDown: sections    O or Q: back", "the keyboard line")
 	check(Text.controls("gamepad") == "Stick or D-pad: choose and change    A: switch    LB and RB: sections    B: back", "the Xbox line")
 	ControlText.setPadStyle("playstation")
 	check(Text.controls("gamepad") == "Stick or D-pad: choose and change    Cross: switch    L1 and R1: sections    Circle: back", "the PlayStation line says Cross, L1, R1 and Circle")
@@ -263,6 +263,7 @@ do
 	check(Text.openHint("gamepad") == "View, then Settings", "View on an Xbox controller")
 	check(Text.controls("touch") == "Tap a setting to switch it. Use - and + or drag a bar.", "the touch line")
 	check(ControlText.name("keyboard", "settings") == "O" and ControlText.name("gamepad", "settings") == "" and string.find(ControlText.helpCard("keyboard"), "O: settings", 1, true) ~= nil, "O opens it, and the controls card says so")
+	check(Text.buttonTextSize("Back", 200, 44, 18) == 18 and Text.buttonTextSize(string.rep("word ", 30), 100, 44, 18) == 10, "a button's text shrinks to fit its height, to 10 at the least")
 	check(Text.scale(false) == 1 and Text.scale(true) == 1.5, "large text is 1.5 times")
 	-- the screens in use: desktop, a tablet either way up, phones either way up, the smallest landscape, and a short laptop window
 	local screens = { { 1920, 1080 }, { 1280, 720 }, { 1024, 768 }, { 768, 1024 }, { 844, 390 }, { 667, 375 }, { 568, 320 }, { 390, 844 }, { 360, 640 }, { 1100, 500 } }
@@ -274,6 +275,13 @@ do
 			check(m.body >= Text.MIN_BODY or m.paperH < 330, `{name}: the list has room ({m.body})`)
 			check(m.hint == 0 or m.body >= Text.MIN_BODY, `{name}: the controls line only when the list keeps its room`)
 			check(m.foot - 8 >= math.floor(Text.MIN_TARGET * s), `{name}: the footer's buttons are touch targets`)
+			do
+				local bw = math.floor(math.min(260 * s, (m.paperW - 28 - 16) / 2))
+				for _, word in { Spec.WORDS.reset, Spec.WORDS.resetSure, Spec.WORDS.close } do
+					local fit = Text.buttonTextSize(word, bw, m.foot - 8, Text.SIZES.button * s)
+					check(fit >= 12 and fit <= Text.SIZES.button * s, `{name}: "{word}" gets a readable size ({fit}) in its button`)
+				end
+			end
 			for _, kind in { "toggle", "choice", "slider" } do
 				local rl = Text.rowLayout(m.bodyW, kind, s)
 				local pad = Text.PAD * s
@@ -401,7 +409,7 @@ do
 	key("Up")
 	check(chosen(panel) == "reset", "then Reset")
 	key("Return")
-	check(st.resets == 0 and panel.resetButton.Text == "Reset every setting? Press again", "the first press asks")
+	check(st.resets == 0 and panel.resetButton.Text == "Press again to reset", "the first press asks")
 	key("Down")
 	check(panel.resetButton.Text == "Reset to defaults" and st.resets == 0, "moving away cancels the question")
 	key("Up")

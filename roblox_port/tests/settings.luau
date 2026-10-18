@@ -862,6 +862,57 @@ do
 	frames(3)
 	check(hintLabel.Visible and string.find(hintLabel.Text, walk, 1, true) ~= nil, "and returns when they are on again")
 
+	-- the real buttons at other screen sizes: touch targets, apart from each other and from the status lines
+	do
+		local safe = gui:FindFirstChild("SpiderPrompts")
+		local touchGui = gui:FindFirstChild("SpiderTouch")
+		local HudLayout = require("../src/Shared/UI/HudLayout")
+		local function rectOf(b: any, w: number, h: number): any
+			local p, sz = b.Position, b.Size
+			local x0, y0 = p.X.Scale * w + p.X.Offset, p.Y.Scale * h + p.Y.Offset
+			return { x0 = x0, y0 = y0, x1 = x0 + sz.X.Offset, y1 = y0 + sz.Y.Offset }
+		end
+		local problems, seen = 0, 0
+		for _, sz in { { 360, 640 }, { 390, 844 }, { 568, 320 }, { 667, 375 }, { 844, 390 }, { 768, 1024 }, { 1024, 768 }, { 1280, 720 } } do
+			local w, h = sz[1], sz[2]
+			rawset(safe, "AbsoluteSize", { X = w, Y = h })
+			rawset(touchGui, "AbsoluteSize", { X = w, Y = h })
+			safe:GetPropertyChangedSignal("AbsoluteSize"):Fire()
+			touchGui:GetPropertyChangedSignal("AbsoluteSize"):Fire()
+			frames(2)
+			local menuR, noteR = rectOf(find("SpiderPrompts", "LifeMenu"), w, h), rectOf(find("SpiderPrompts", "NotebookButton"), w, h)
+			local topCol = find("SpiderPrompts", "Top")
+			local colX0 = topCol.Position.X.Offset - topCol.Size.X.Offset / 2
+			local colX1 = topCol.Position.X.Offset + topCol.Size.X.Offset / 2
+			local colY = topCol.Position.Y.Offset
+			local col = { x0 = colX0, y0 = colY, x1 = colX1, y1 = colY + 40 }
+			local mine = { menuR, noteR }
+			for _, r in mine do
+				if r.x1 - r.x0 < 48 or r.y1 - r.y0 < 48 then problems += 1; print(`  {w}x{h}: a top button is small`) end
+				if r.x0 < 0 or r.x1 > w or r.y0 < 0 or r.y1 > h then problems += 1; print(`  {w}x{h}: a top button is off screen`) end
+				if HudLayout.overlaps(r, col) then problems += 1; print(`  {w}x{h}: a top button covers the status lines`) end
+			end
+			if HudLayout.overlaps(menuR, noteR) then problems += 1; print(`  {w}x{h}: Menu and Notebook meet`) end
+			for _, b in touchGui:GetChildren() do
+				if b:IsA("TextButton") then
+					seen += 1
+					local r = rectOf(b, w, h)
+					if r.x1 - r.x0 < 48 or r.y1 - r.y0 < 48 then problems += 1; print(`  {w}x{h}: touch button {b.Name} is small`) end
+					for _, m in mine do
+						if HudLayout.overlaps(r, m) then problems += 1; print(`  {w}x{h}: touch button {b.Name} meets a top button`) end
+					end
+				end
+			end
+		end
+		check(seen == 8 * #HudLayout.TOUCH_BUTTONS, `(all {#HudLayout.TOUCH_BUTTONS} touch buttons were looked at, {seen})`)
+		check(problems == 0, "the real Menu, Notebook and touch buttons are touch targets and never meet, at phone, tablet and desktop sizes")
+		rawset(safe, "AbsoluteSize", { X = 1280, Y = 720 })
+		rawset(touchGui, "AbsoluteSize", { X = 1280, Y = 720 })
+		safe:GetPropertyChangedSignal("AbsoluteSize"):Fire()
+		touchGui:GetPropertyChangedSignal("AbsoluteSize"):Fire()
+		frames(2)
+	end
+
 	-- discovery notes
 	check(driver.setting("NotebookNotes") == true, "notes are on by default")
 

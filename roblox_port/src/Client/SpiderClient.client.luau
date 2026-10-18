@@ -75,6 +75,7 @@ local FieldNotebook = require(Shared.Learning.FieldNotebook)
 local NotebookWatch = require(Shared.Learning.NotebookWatch)
 local NotebookText = require(Shared.UI.NotebookText)
 local NotebookPanel = require(script.Parent.NotebookPanel)
+local HudLayout = require(Shared.UI.HudLayout)
 local SettingsPanel = require(script.Parent.SettingsPanel)
 local SettingsSpec = require(Shared.Data.SettingsSpec)
 local Checkpoint = require(Shared.Persistence.Checkpoint)
@@ -586,8 +587,7 @@ openMenu=function()
  menu:setTextScale(if setting("LargeText")==true then 1.5 else 1)
 end
 local menuButton=Instance.new("TextButton")
-menuButton.Name="LifeMenu";menuButton.Text="Menu";menuButton.Size=UDim2.fromOffset(72,36)
-menuButton.Position=UDim2.new(1,-84,0,48);menuButton.TextSize=16
+menuButton.Name="LifeMenu";menuButton.Text="Menu";menuButton.TextSize=18
 menuButton.BackgroundColor3=Color3.new(.12,.12,.14);menuButton.TextColor3=Color3.new(1,1,1)
 menuButton.Parent=hud.safe;menuButton.Activated:Connect(openMenu)
 
@@ -616,10 +616,20 @@ book.pageOpened:connect(function(id: string)
  if page and setting("NotebookNotes") then hud:setNote(NotebookText.note(page.title,device),NotebookPages.noteSeconds) end
 end)
 local notebookButton=Instance.new("TextButton")
-notebookButton.Name="NotebookButton";notebookButton.Text=NotebookText.BUTTON;notebookButton.Size=UDim2.fromOffset(88,36)
-notebookButton.Position=UDim2.new(1,-180,0,48);notebookButton.TextSize=14
+notebookButton.Name="NotebookButton";notebookButton.Text=NotebookText.BUTTON;notebookButton.TextSize=16
 notebookButton.BackgroundColor3=Color3.new(.12,.12,.14);notebookButton.TextColor3=Color3.new(1,1,1)
 notebookButton.Parent=hud.safe;notebookButton.Activated:Connect(function() openNotebook("game") end)
+-- Both buttons are touch targets (48 px tall) and clear of the status lines at every screen size (HudLayout.topLayout, tested).
+local function placeTopButton(button: TextButton,r: HudLayout.Rect)
+ button.Position=UDim2.fromOffset(r.x0,r.y0);button.Size=UDim2.fromOffset(r.x1-r.x0,r.y1-r.y0)
+end
+local function placeTopButtons()
+ local size=hud.safe.AbsoluteSize
+ local t=HudLayout.topLayout(size.X,size.Y)
+ placeTopButton(menuButton,t.menu);placeTopButton(notebookButton,t.notebook)
+end
+hud.safe:GetPropertyChangedSignal("AbsoluteSize"):Connect(placeTopButtons)
+placeTopButtons()
 
 -- The settings (ROBLOX-49). Opened from the life menu or with O; closing it goes back to wherever it was opened from. The world waits while
 -- it is open (modal()). The values live as Player attributes named by SettingsSpec ids (the panel asks setting(), tells player:SetAttribute),

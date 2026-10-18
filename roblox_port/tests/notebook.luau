@@ -757,20 +757,16 @@ if loaded and d then
 	-- the Notebook button beside Menu: for touch, a mouse and a controller's pointer; clear of Menu and of the touch controls
 	local noteButton, menuButton = find("SpiderPrompts", "NotebookButton"), find("SpiderPrompts", "LifeMenu")
 	check(noteButton ~= nil and menuButton ~= nil and noteButton.Text == "Notebook", "there is a Notebook button beside the Menu button")
-	local function rect(b: any, w: number): any
-		local pos, size = b.Position, b.Size
-		local x0 = (if pos.X.Scale == 1 then w else 0) + pos.X.Offset
-		return { x0 = x0, y0 = pos.Y.Offset, x1 = x0 + size.X.Offset, y1 = pos.Y.Offset + size.Y.Offset }
+	-- (where the two buttons go at every screen size, and that they are touch targets clear of everything else, is checked in tests/run.luau
+	-- with HudLayout.topLayout; here, that the real buttons sit where it says for this screen)
+	local t = HudLayout.topLayout(1280, 720)
+	local function rect(b: any): any
+		return { x0 = b.Position.X.Offset, y0 = b.Position.Y.Offset, x1 = b.Position.X.Offset + b.Size.X.Offset, y1 = b.Position.Y.Offset + b.Size.Y.Offset }
 	end
-	for _, size in { { 568, 320 }, { 360, 640 }, { 844, 390 }, { 1024, 768 }, { 1280, 720 } } do
-		local w, h = size[1], size[2]
-		local n, m = rect(noteButton, w), rect(menuButton, w)
-		check(n.x0 >= 0 and n.x1 <= w and n.y1 <= h and not HudLayout.overlaps(n, m), `{w}x{h}: the Notebook button is on screen and clear of Menu`)
-		for _, b in HudLayout.TOUCH_BUTTONS do
-			check(not HudLayout.overlaps(n, HudLayout.buttonRect(b, w, h)), `{w}x{h}: the Notebook button is clear of the {b.action} button`)
-		end
-		check(n.y1 - n.y0 >= 36 and n.x1 - n.x0 >= 80, "and big enough to tap")
-	end
+	local n, m = rect(noteButton), rect(menuButton)
+	check(n.x0 == t.notebook.x0 and n.y0 == t.notebook.y0 and n.x1 == t.notebook.x1 and n.y1 == t.notebook.y1, "the Notebook button is where the layout puts it")
+	check(m.x0 == t.menu.x0 and m.y0 == t.menu.y0 and m.x1 == t.menu.x1 and m.y1 == t.menu.y1 and not HudLayout.overlaps(n, m), "and Menu, clear of it")
+	check(n.y1 - n.y0 >= 48 and n.x1 - n.x0 >= 80 and m.y1 - m.y0 >= 48 and m.x1 - m.x0 >= 48, "both big enough to tap")
 	noteButton.Activated:Fire()
 	check(panel:isShowing(), "the button opens the notebook")
 	nbKey("N")

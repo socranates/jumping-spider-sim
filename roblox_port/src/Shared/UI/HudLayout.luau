@@ -22,7 +22,7 @@ HudLayout.TOUCH_BUTTONS = {
 	{ action = "Focus", label = "Focus", x = -236, y = -242, size = 60, right = true, textSize = 14 },
 	{ action = "Eye", label = "Eye", x = -156, y = -242, size = 60, right = true },
 	-- The peacock spider (ROBLOX-31): Change (in the crack) beside Eat, Dance (the peacock spider, standing still) above Silk. Both start hidden.
-	{ action = "Choose", label = "Change", x = 82, y = -246, size = 56, right = false, textSize = 13 },
+	{ action = "Choose", label = "Change", x = 82, y = -252, size = 56, right = false, textSize = 13 },
 	{ action = "Display", label = "Dance", x = -86, y = -306, size = 56, right = true, textSize = 14 },
 } :: { Button }
 
@@ -40,6 +40,12 @@ local COMPACT = {
 	Cancel={-128,-60}, Jump={-68,-60},
 }
 function HudLayout.layoutButton(b: Button, width: number, height: number): Button
+	-- A narrow phone (under 400 px) has no room for Focus beside the left thumb's cluster: it goes one row up.
+	if b.action == "Focus" and width < 400 and not (width >= 568 and height > 0 and height < 450) then
+		local copy = table.clone(b)
+		copy.y = -320
+		return copy
+	end
 	if width >= 568 and height > 0 and height < 450 then
 		local slot = COMPACT[b.action]
 		if slot then
@@ -82,6 +88,9 @@ function HudLayout.promptSpan(width: number, height: number, device: string): (n
 			x0, x1, bottom = leftEdge + gap, rightEdge - gap, height - gap
 		else
 			x0, x1, bottom = gap, width - gap, top - gap
+			-- (above the clusters on a short screen the panel reaches the top: keep it out of the Menu and Notebook stack)
+			local strip = HudLayout.topLayout(width, height)
+			if strip.stacked then x1 = math.min(x1, strip.notebook.x0 - gap) end
 		end
 	else
 		x0, x1, bottom = 24, width - 24, height - 16
@@ -92,6 +101,27 @@ function HudLayout.promptSpan(width: number, height: number, device: string): (n
 		x1 -= extra / 2
 	end
 	return x0, x1, bottom
+end
+
+-- The Menu and Notebook buttons (ROBLOX-50) and the HUD's top column of status lines (day, notices, toasts, captions), laid out together so none
+-- covers another and every button is a touch target (at least MIN_TARGET px each way). Where the screen is wide enough the two buttons stack at
+-- the top right and the column gives up that strip on both sides (it stays centred); on a narrow phone they sit side by side in a row at the
+-- top and the column starts under them. Rects are offsets from the safe area's top-left corner.
+HudLayout.MIN_TARGET = 48
+HudLayout.TOP = { menuW = 80, notebookW = 104, h = 48, margin = 12, gap = 8, columnY = 8, columnInset = 16, minColumn = 300 }
+export type Top = { menu: Rect, notebook: Rect, columnX0: number, columnX1: number, columnY: number, stacked: boolean }
+function HudLayout.topLayout(width: number, height: number): Top
+	local t = HudLayout.TOP
+	local x1 = width - t.margin
+	local side = t.margin + t.notebookW + t.gap -- the strip the buttons take on each side of a centred column
+	if width - 2 * side >= t.minColumn then
+		local menu = { x0 = x1 - t.menuW, y0 = t.columnY, x1 = x1, y1 = t.columnY + t.h }
+		local notebook = { x0 = x1 - t.notebookW, y0 = menu.y1 + t.gap, x1 = x1, y1 = menu.y1 + t.gap + t.h }
+		return { menu = menu, notebook = notebook, columnX0 = side, columnX1 = width - side, columnY = t.columnY, stacked = true }
+	end
+	local menu = { x0 = x1 - t.menuW, y0 = t.columnY, x1 = x1, y1 = t.columnY + t.h }
+	local notebook = { x0 = menu.x0 - t.gap - t.notebookW, y0 = t.columnY, x1 = menu.x0 - t.gap, y1 = t.columnY + t.h }
+	return { menu = menu, notebook = notebook, columnX0 = t.columnInset, columnX1 = width - t.columnInset, columnY = menu.y1 + t.gap, stacked = false }
 end
 
 function HudLayout.overlaps(a: Rect, b: Rect): boolean

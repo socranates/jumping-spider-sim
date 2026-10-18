@@ -338,6 +338,59 @@ do
 	check(near(x1 - x0, 760, 1e-9) and near((x0 + x1) / 2, 960, 1e-9) and bottom == 1064, "keyboard and controller prompts are centred, at most 760 px wide")
 end
 
+-- ROBLOX-50: touch targets and the top strip. Every touch button is at least 48 px each way and a few pixels from the next; the Menu and
+-- Notebook buttons are touch targets too, on screen, clear of each other, of the touch buttons, of the prompt panel and of the status column.
+do
+	local sizes = { { 360, 640 }, { 390, 844 }, { 568, 320 }, { 667, 375 }, { 844, 390 }, { 932, 430 }, { 768, 1024 }, { 1024, 768 }, { 1180, 820 }, { 1280, 720 }, { 1366, 1024 }, { 1920, 1080 }, { 1100, 500 } }
+	local small, close, bad, gaps = {}, {}, {}, {}
+	for _, sz in sizes do
+		local w, h = sz[1], sz[2]
+		local name = `{w}x{h}`
+		local rects = {}
+		for _, b in HudLayout.TOUCH_BUTTONS do
+			local laid = HudLayout.layoutButton(b, w, h)
+			if laid.size < HudLayout.MIN_TARGET then table.insert(small, `{name} {b.action} {laid.size}`) end
+			rects[b.action] = HudLayout.buttonRect(b, w, h)
+		end
+		for a, ra in rects do
+			for b2, rb in rects do
+				if a < b2 then
+					local gx = math.max(rb.x0 - ra.x1, ra.x0 - rb.x1)
+					local gy = math.max(rb.y0 - ra.y1, ra.y0 - rb.y1)
+					if math.max(gx, gy) < 4 then table.insert(close, `{name} {a}/{b2} {math.max(gx, gy)}`) end
+				end
+			end
+		end
+		local t = HudLayout.topLayout(w, h)
+		local x0, x1, bottom = HudLayout.promptSpan(w, h, "touch")
+		local short = h < 450 -- a landscape phone has about four lines in all for the status lines and the prompt
+		local panel = { x0 = x0, y0 = bottom - (if short then 66 else 120), x1 = x1, y1 = bottom }
+		local column = { x0 = t.columnX0, y0 = t.columnY, x1 = t.columnX1, y1 = t.columnY + (if short then 50 else 110) } -- a day line, a notice and a toast (two lines on a short screen)
+		for label, r in { Menu = t.menu, Notebook = t.notebook } do
+			if r.x1 - r.x0 < HudLayout.MIN_TARGET or r.y1 - r.y0 < HudLayout.MIN_TARGET then table.insert(bad, `{name} {label} too small`) end
+			if r.x0 < 0 or r.y0 < 0 or r.x1 > w or r.y1 > h then table.insert(bad, `{name} {label} off screen`) end
+			if HudLayout.overlaps(r, column) then table.insert(bad, `{name} {label} covers the status column`) end
+			if HudLayout.overlaps(r, panel) then table.insert(bad, `{name} {label} covers the prompts`) end
+			for action, rb in rects do
+				local gx = math.max(rb.x0 - r.x1, r.x0 - rb.x1)
+				local gy = math.max(rb.y0 - r.y1, r.y0 - rb.y1)
+				if math.max(gx, gy) < 4 then table.insert(bad, `{name} {label} is within 4 px of {action}`) end
+			end
+		end
+		if HudLayout.overlaps(t.menu, t.notebook) then table.insert(bad, `{name} Menu and Notebook overlap`) end
+		if HudLayout.overlaps(column, panel) then table.insert(bad, `{name} the status column meets the prompts`) end
+		if t.columnX1 - t.columnX0 < 260 then table.insert(bad, `{name} the status column is only {t.columnX1 - t.columnX0} wide`) end
+		if math.abs((t.columnX0 + t.columnX1) / 2 - w / 2) > 1e-6 then table.insert(bad, `{name} the status column is not centred`) end
+	end
+	for _, m in small do print("  small touch button: " .. m) end
+	for _, m in close do print("  touch buttons too close: " .. m) end
+	for _, m in bad do print("  top strip: " .. m) end
+	check(#small == 0, "every touch button is at least 48 px each way, at every screen size")
+	check(#close == 0, "and at least 4 px from the next one")
+	check(#bad == 0, "Menu and Notebook are touch targets, on screen, and clear of each other, the touch buttons, the prompts and the status lines")
+	check(HudLayout.topLayout(390, 844).stacked == false and HudLayout.topLayout(1280, 720).stacked == true, "a narrow phone has the buttons in a row, a wide screen in a stack")
+end
+
 
 -- ---------------------------------------------------------------- ROBLOX-09: the catch camera's line framing
 -- Against values exported from the frozen Godot camera rig (tools/export_framing_reference.gd -> tests/framing_reference.json):

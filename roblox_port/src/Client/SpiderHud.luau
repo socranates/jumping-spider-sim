@@ -199,7 +199,7 @@ function Hud.new(playerGui: Instance): any
 	local promptCue = wrapLabel("PromptCue", panel, 16, 3)
 	promptCue.TextColor3 = WARN_COLOR
 	local self = setmetatable({
-		grip = grip, gripFill = gripFill, centre = centre, safe = safe, reticle = reticle, ticks = ticks,
+		grip = grip, gripFill = gripFill, top = top, centre = centre, safe = safe, reticle = reticle, ticks = ticks,
 		aimTitle = aimTitle, aimHint = aimHint, anchorLabel = anchorLabel,
 		status = status, caption = caption, toastLabel = toast, help = help, notice = notice, day = day, dayLine = dayLine, noteLabel = note, noteLeft = 0,
 		panel = panel, promptTitle = promptTitle, promptHint = promptHint, promptCue = promptCue,
@@ -233,9 +233,14 @@ end
 function Hud._place(self: any)
 	local size = self.safe.AbsoluteSize
 	local x0, x1, bottom = HudLayout.promptSpan(size.X, size.Y, self.device)
-	local key = string.format("%.1f,%.1f,%.1f", x0, x1, bottom)
+	-- The status column makes way for the Menu and Notebook buttons (HudLayout.topLayout).
+	local t = HudLayout.topLayout(size.X, size.Y)
+	local key = string.format("%.1f,%.1f,%.1f,%.1f,%.1f,%.1f", x0, x1, bottom, t.columnX0, t.columnX1, t.columnY)
 	if key == self.lastSpan then return end
 	self.lastSpan = key
+	self.top.AnchorPoint = Vector2.new(0.5, 0)
+	self.top.Position = UDim2.new(0, (t.columnX0 + t.columnX1) / 2, 0, t.columnY)
+	self.top.Size = UDim2.new(0, t.columnX1 - t.columnX0, 0, 0)
 	-- Anchored to the safe area's bottom edge (scale 1), so the panel's gap above the bottom holds even if the reported size
 	-- and the children's origin disagree about an inset.
 	self.panel.Position = UDim2.new(0, x0, 1, bottom - size.Y)

@@ -1044,7 +1044,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			motor:tick(input)
 			-- The wasp runs after the spider has moved and before feeding (Godot: physics priority 8).
 			wasp.enabled = not testPlace or Workspace:GetAttribute("Wasp") == true
-            wasp.searchScale=1.6;wasp.noticeScale=1.2;wasp.inspectScale=.8
+            wasp:useGameRules()
 			local forced = if testPlace then Workspace:GetAttribute("WaspForce") else nil
 			if typeof(forced) == "string" and forced ~= "" then
 				Workspace:SetAttribute("WaspForce", nil)
@@ -1076,7 +1076,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			life.mealFood = (life.mealFood or 0) + (prey.feeding.taken-takenBefore) * Growth.READY_FOOD / (3 * Species.fly_like_prototype.body.nutrition)
             local rivalEvent,rivalFood=RivalSpider.step(life.rival,DT,{
              position=motor.pos,previous=prey.previousPosition or motor.pos,heading=motor.heading,
-             day=life.clock.day,meals=prey.feeding.mealsFinished,resting=life.resting,safe=Layout.inRetreat(motor.pos),
+             day=life.clock.day,hour=life.clock.hour,meals=prey.feeding.mealsFinished,resting=life.resting,safe=Layout.inRetreat(motor.pos),
              wasp=wasp:isVisiting(),gentle=needs.gentle,grounded=motor.mode=="attached",moving=motor.moving,
              airborne=motor.mode=="air",onLine=motor:onLine(),holding=prey.feeding.held~=nil,
              striking=prey.tick<=prey.strikeEnd and not motor.seized,

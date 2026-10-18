@@ -27,3 +27,5 @@ The wasp now uses live multipliers (search 1.6, notice 1.2, inspection 0.8); def
 
 
 Rival scope: one floor-territory encounter per life, not a general NPC surface-walker. It does not climb walls, spin silk, hunt the fly population, or use species-specific cognition. Its patrol/lunge stays within the eastern sill and is blocked by solid cover. The player's existing jump provides the capture action; eating pauses while moving. Future animation can tuck the captured rival's legs and improve patrol avoidance without changing the food/save ledger. Do not advertise it as a complete second spider simulation.
+
+Update (ROBLOX-67/68, docs/HANDOFF-roblox-daily.md): the rival is no longer optional. A new rival arrives each morning after one is eaten, and the wasp visits every day from day 2. The scope limits above (one encounter on the eastern sill, no climbing or silk) still hold; "one encounter per life" now reads "one rival at a time".

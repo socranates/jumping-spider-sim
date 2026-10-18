@@ -4,7 +4,7 @@
 -- be real and jarring, not sensationalized; spec 2 no threat spawning behind the player and no unexplained death; spec 8.3 search,
 -- inspect, approach, strike, disengage). Every number is in Data/Wasp.
 --
--- When. At most one visit a day, in the warm middle of the day, never on the first day, never before the spider has finished its first
+-- When. At most one visit a day (every day from the second in the game, some days in the Godot replay; useGameRules), in the warm middle of the day, never on the first day, never before the spider has finished its first
 -- meal, and never while it rests or moults in the crack. Whether a day has a visit, and when, follows from the world's seed and the day
 -- alone, so a return to a checkpoint meets the same wasp (the port's own hash: Godot's cannot be reproduced in Luau, so the same seed
 -- does not give the same days as Godot).
@@ -119,6 +119,13 @@ function WaspDirector.new(config: { seed: number, world: World, enabled: boolean
 	return self
 end
 
+-- The game's rules (Data/Wasp.game): a visit every day from the second, and the longer search of ROBLOX-62. A director that is never given
+-- them replays Godot (some days only, the original rates), which is what the goldens check.
+function WaspDirector.useGameRules(self: any)
+	local g = Data.game
+	self.visitChance, self.searchScale, self.noticeScale, self.inspectScale = g.visitChance, g.searchScale, g.noticeScale, g.inspectScale
+end
+
 function WaspDirector.isVisiting(self: any): boolean
 	return self.phase ~= "away"
 end
@@ -129,7 +136,7 @@ end
 function WaspDirector.plannedHour(self: any, day: number): number
 	if day < Data.firstDay then return -1.0 end
 	local r = makeStream(self.seed, day, 7)
-	if r:unit() >= Data.visitChance then return -1.0 end
+	if r:unit() >= (self.visitChance or Data.visitChance) then return -1.0 end
 	return r:range(Data.windowFromH, Data.windowToH - 1.0)
 end
 

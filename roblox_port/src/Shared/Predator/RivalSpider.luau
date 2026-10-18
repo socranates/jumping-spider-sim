@@ -1,13 +1,22 @@
 --!strict
--- Optional intraguild predator. Timings/reward are game tuning, not species measurements.
+-- Intraguild predator, one at a time on the eastern sill: present in every life from the first day it is allowed (Data/RivalRules), and a new one
+-- arrives on the morning after one is eaten (ROBLOX-67). Timings/reward are game tuning, not species measurements.
 -- Plain state lives in LifeLoop's checkpoint graph; no clock, engine instance or hidden player tracking.
 local M=require(script.Parent.Parent.Prey.PreyMath)
+local Rules=require(script.Parent.Parent.Data.RivalRules)
 local Rival={}
 Rival.FOOD=.7 -- two housefly-equivalent meals
 local states={dormant=true,patrol=true,stalk=true,windup=true,lunge=true,recover=true,captured=true,consumed=true}
+-- "dormant" is "has not arrived yet". `day` (nil in a record from before the daily rival) is the day it was eaten, so the next one comes after it.
 function Rival.new(): any
- return {state="dormant",position=Vector3.new(25,.31,8),previous=Vector3.new(25,.31,8),heading=-Vector3.xAxis,
-  elapsed=0,notice=0,food=Rival.FOOD,target=Vector3.new(25,.31,8),origin=Vector3.new(25,.31,8),patrol=0}
+ local at=Rules.arriveAt
+ return {state="dormant",position=at,previous=at,heading=-Vector3.xAxis,
+  elapsed=0,notice=0,food=Rival.FOOD,target=at,origin=at,patrol=0}
+end
+-- The next rival, in the same table (the world holds this table): a fresh one that has not yet arrived.
+function Rival.renew(r: any)
+ for k,v in Rival.new() do r[k]=v end
+ r.day=nil
 end
 function Rival.valid(r: any): boolean
  if r==nil then return true end
@@ -16,6 +25,7 @@ function Rival.valid(r: any): boolean
   local n=r[k];if type(n)~="number" or n~=n or n<0 or n==math.huge then return false end
  end
  if r.food>Rival.FOOD+1e-8 then return false end
+ if r.day~=nil and (type(r.day)~="number" or r.day~=r.day or r.day<0 or r.day==math.huge) then return false end
  for _,k in {"position","previous","heading","target","origin"} do
   local v=r[k];if typeof(v)~="Vector3" and type(v)~="table" then return false end
   if type(v.X)~="number" or type(v.Y)~="number" or type(v.Z)~="number" or type(v.Magnitude)~="number" or v.X~=v.X or v.Y~=v.Y or v.Z~=v.Z or v.Magnitude>1000 then return false end
@@ -28,16 +38,21 @@ local function phase(r: any,s: string) r.state=s;r.elapsed=0 end
 function Rival.step(r: any,dt: number,s: any,blocked: (Vector3,Vector3)->any): (string,number)
  if dt<=0 or dt~=dt then return "",0 end
  dt=math.min(dt,.05);r.previous=r.position
- if r.state=="consumed" then return "",0 end
+ if r.state=="consumed" then
+  -- An old record has no day: the day it is first seen eaten is the day it was eaten. A new rival comes on a later morning.
+  if r.day==nil then r.day=s.day end
+  if s.day>r.day and (s.hour or Rules.arriveHour)>=Rules.arriveHour then Rival.renew(r) else return "",0 end
+ end
  if r.state=="captured" then
   r.position=s.position+s.heading*.4;r.heading=s.heading
   if not s.grounded or s.moving then return "paused",0 end
   local food=math.min(r.food,.14*dt);r.food=math.max(0,r.food-food)
-  if r.food<=1e-8 then r.food=0;phase(r,"consumed");return "eaten",food end
+  if r.food<=1e-8 then r.food=0;r.day=s.day;phase(r,"consumed");return "eaten",food end
   return "feeding",food
  end
  if r.state=="dormant" then
-  if s.day<2 or s.meals<1 or (s.position-r.position).Magnitude<8 or s.resting or s.wasp then return "",0 end
+  if s.day<Rules.firstDay or s.meals<Rules.firstMeals or (s.hour or Rules.arriveHour)<Rules.arriveHour
+   or (s.position-r.position).Magnitude<Rules.arriveDistance or s.resting or s.wasp then return "",0 end
   phase(r,"patrol")
  end
  -- Never stack two attackers or pursue into the retreat. No hidden-target chase.

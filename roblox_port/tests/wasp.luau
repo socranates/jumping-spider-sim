@@ -751,4 +751,63 @@ case("live pressure tuning extends search without shortening warning",function()
  local faster=w:noticeRate();w.noticeScale=1
  near(faster/w:noticeRate(),1.2,1e-8,"twenty percent quicker recognition")
 end)
+case("the game's wasp comes every day from the second, once, by day, never in a rest (ROBLOX-67); the Godot replay keeps its some-days rule", function()
+	check(Data.visitChance == 0.6 and Data.firstDay == 2 and Data.game.visitChance == 1.0, "Godot's numbers stay; the game's chance is its own setting")
+	local godot = newDirector()
+	local skipped = 0
+	for day = 2, 41 do if godot:plannedHour(day) < 0 then skipped += 1 end end
+	check(skipped > 0, `an unconfigured director still skips days like Godot ({skipped} of 40)`)
+	local d = newDirector()
+	d:useGameRules()
+	check(d.searchScale == 1.6 and d.noticeScale == 1.2 and d.inspectScale == 0.8, "Chet's live multipliers are still applied")
+	check(d:plannedHour(1) == -1.0, "never on the first day")
+	local hours, distinct = {}, 0
+	for day = 2, 41 do
+		local h = d:plannedHour(day)
+		check(h >= Data.windowFromH and h < Data.windowToH - 1.0 + 1e-9, `day {day}: a visit, in the warm window ({h} h)`)
+		check(d:plannedHour(day) == h, `day {day}: the same world, the same hour`)
+		if not hours[string.format("%.2f", h)] then hours[string.format("%.2f", h)] = true; distinct += 1 end
+	end
+	check(distinct >= 30, `the hour varies from day to day ({distinct} different hours in 40 days)`)
+	-- A simulated week, hour by hour: one visit on each of days 2..10, none on day 1.
+	local s = spiderAt(CRACK)
+	local function week(resting: (number, number) -> boolean, meals: number, gentle: boolean?): { [number]: number }
+		local w = newDirector()
+		w:useGameRules()
+		w.gentle = gentle == true
+		local started: { [number]: number } = {}
+		for day = 1, 10 do
+			local hour = 0.0
+			while hour < 24.0 do
+				w:step(DT, s, { day = day, hour = hour, resting = resting(day, hour), moulting = false, meals = meals })
+				if w:isVisiting() then
+					started[day] = (started[day] or 0) + 1
+					check(not resting(day, hour), `day {day}: not begun during a rest`)
+					check(hour >= Data.windowFromH and hour < Data.windowToH, `day {day}: begun by day ({hour} h)`)
+					check(hour >= w:plannedHour(day) and (resting(day, w:plannedHour(day)) or hour < w:plannedHour(day) + 0.06), `day {day}: begun at its planned hour {w:plannedHour(day)} (or when the rest ended), not at {hour}`)
+					w:clearVisit()
+				end
+				hour += 0.05
+			end
+		end
+		return started
+	end
+	local started = week(function() return false end, 1)
+	check(started[1] == nil, "day 1: no visit")
+	for day = 2, 10 do check(started[day] == 1, `day {day}: exactly one visit ({tostring(started[day])})`) end
+	local gentle = week(function() return false end, 1, true)
+	for day = 2, 10 do check(gentle[day] == 1, `day {day}: Easy and Free get the visit too`) end
+	local none = week(function() return false end, 0)
+	local any = false
+	for day = 1, 10 do any = any or none[day] ~= nil end
+	check(not any, "no visit in a life that has not finished a meal")
+	-- A rest through the planned hour: the visit waits for the spider to come out, still inside the window, and never begins in the rest.
+	local late = week(function(day: number, hour: number): boolean return hour < 12.0 end, 1)
+	for day = 2, 10 do check(late[day] == 1, `day {day}: a rest in the morning only delays the visit`) end
+	local through = week(function(_: number, hour: number): boolean return hour >= 9.0 and hour < 16.0 end, 1)
+	local nv = false
+	for day = 1, 10 do nv = nv or through[day] ~= nil end
+	check(not nv, "a rest through the whole window means no visit that day")
+end)
+
 print(`WASP passed={passed} failed={failed}`)

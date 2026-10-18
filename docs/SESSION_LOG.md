@@ -1362,3 +1362,8 @@ Food/moult HUD, controller jump aim, +0.05 capture radius, fruit-fly prototype, 
 ## 2026-10-18 — Chet: dragline, cover and predator update
 
 Added the suspended pose, authored leaf-tip failure and saved cooldown, sparse grass and real ambush cover. Nathan revised hunger to slightly faster energy drain with clear weighted meal counts. Added stronger/longer live wasp tuning and an optional edible brown rival, with warning, cover/escape rules and normal life recovery. Hard mode is designed but not enabled. Build 2ed6a64d5e6d9d58 passed 111 native engine plus 29 live-client checks. Final CLI 48,279/48,279; 170 scripts compile; strict types clean. Published v23 to the existing private playtest, verified in Creator Dashboard. Details are in docs/verification/roblox-dragline/RESULTS.md. Next chunk: safe separate-slot Hard mode, following Nathan's balance feedback.
+
+
+## 2026-10-18 — Claude: the ant mimic merged, a wasp and a rival every day
+
+Merged `claude/roblox-antmimic` into the dragline round (conflicts in the changelog files, Appearances, look/run tests, build info and the places; the ant mimic's decisions renumbered ROBLOX-64..66; the rival's look is never a spider choice). Then, for Nathan's "always present": the wasp visits every day from day 2 (`Data/Wasp.game`, Godot numbers and goldens untouched, ROBLOX-67) and the brown rival arrives anew every morning after one is eaten (`Data/RivalRules`, ROBLOX-68, checkpoint-validated `day`, old records load). Handoff: `docs/HANDOFF-roblox-daily.md` (also the food-balance note for Nathan). Not run in Studio or on a device.

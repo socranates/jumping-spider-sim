@@ -1,3 +1,9 @@
+# Latest: a wasp and a rival every day, 2026-10-18 (not yet seen in Studio or on a device) - Claude
+
+Branch **claude/roblox-daily** (main ce64498 + the ant mimic merged + this), decisions ROBLOX-64..66 (ant mimic, renumbered) and ROBLOX-67..68, handoff `docs/HANDOFF-roblox-daily.md`. Nathan: the rival and the wasp should always be present, read as every day, guaranteed. The wasp visits every day from day 2 at a seeded hour in 10:00 to 15:30 (never day 1, never before the first meal, never in a rest; Godot numbers and goldens untouched); the brown rival arrives from day 2 after the first meal and a new one comes each morning (07:00) after one is eaten, in the same territory and with the same rules. The ant mimic is in this branch too, so Chet needs only this bundle. Food balance, not retuned: a rival is two days of food every day; see the handoff.
+
+---
+
 # Chet — 2026-10-18: dragline, cover and predator playtest
 
 Latest handoff: `docs/HANDOFF-roblox-dragline.md`; accepted evidence: `docs/verification/roblox-dragline/RESULTS.md`. Build `2ed6a64d5e6d9d58`. Published **v23** to the existing private playtest. CLI **48,279/48,279**; types clean; **170/170** compile. This handoff and the generated places belong to the same code commit.

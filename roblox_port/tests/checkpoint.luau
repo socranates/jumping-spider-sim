@@ -510,5 +510,29 @@ case("rival state is kept and malformed rival is refused",function()
  local bad=assert(Checkpoint.capture(w,0))
  check(not Checkpoint.restore(bad,w),"invalid rival food refused")
 end)
+case("the daily rival: the day it was eaten round-trips, a new one still comes the next morning, a bad day is refused (ROBLOX-67)",function()
+ local Rival=require("../src/Shared/Predator/RivalSpider")
+ local w=newWorld();w.life.rival=Rival.new();w.life.rival.state="consumed";w.life.rival.food=0;w.life.rival.day=4
+ local rec=assert(Checkpoint.capture(w,0))
+ w.life.rival=nil
+ check(Checkpoint.restore(rec,w) and w.life.rival.state=="consumed" and w.life.rival.day==4,"the day it was eaten is kept")
+ local s={position=Vector3.new(-25,.31,6),previous=Vector3.new(-25,.31,6),heading=Vector3.xAxis,day=4,hour=20,meals=3,
+  resting=false,safe=false,wasp=false,gentle=false,grounded=true,moving=false,airborne=false,onLine=false,holding=false,striking=false}
+ Rival.step(w.life.rival,1/60,s,function() return false end)
+ check(w.life.rival.state=="consumed","the same evening nothing new comes")
+ s.day=5;s.hour=7
+ Rival.step(w.life.rival,1/60,s,function() return false end)
+ check(w.life.rival.state=="patrol" and w.life.rival.day==nil and w.life.rival.food==Rival.FOOD,"the next morning a fresh rival is on the sill")
+ check(Checkpoint.restore(rec,w) and w.life.rival.state=="consumed","a return to the rest brings back the state of that rest")
+ for _,bad in {-1,0/0,math.huge,"4",true} do
+  w.life.rival.day=bad
+  local badRec=assert(Checkpoint.capture(w,0))
+  check(not Checkpoint.restore(badRec,w),`a rival eaten on day {tostring(bad)} is refused`)
+ end
+ -- A record from before the daily rival has no day at all: it restores, and a new rival comes the morning after it is first seen.
+ local old=newWorld();old.life.rival=Rival.new();old.life.rival.state="consumed";old.life.rival.food=0
+ local oldRec=assert(Checkpoint.capture(old,0))
+ check(oldRec.world~=nil and Checkpoint.restore(oldRec,old) and old.life.rival.day==nil,"an older record of an eaten rival still restores")
+end)
 print(`CHECKPOINT passed={passed} failed={failed}`)
 if failed > 0 then error("CHECKPOINT failed") end

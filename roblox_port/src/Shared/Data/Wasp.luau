@@ -16,6 +16,14 @@ Wasp.visitChance = 0.6
 Wasp.windowFromH = 10.0
 Wasp.windowToH = 15.5
 
+-- The game's own rules, which the Godot replay above does not use (the goldens keep the values above; WaspDirector:useGameRules() applies these):
+-- a visit on every day from firstDay (guaranteed, ROBLOX-67) at an hour the seed picks inside the same warm window, and Chet's longer, slightly
+-- sharper visits (ROBLOX-62). The first-day, first-meal and rest protections do not change.
+Wasp.game = {
+	visitChance = 1.0, -- 1 = every day from firstDay (Godot: visitChance above, some days only)
+	searchScale = 1.6, noticeScale = 1.2, inspectScale = 0.8,
+}
+
 -- A visit (game seconds): heard while it arrives, searching, flying away, carrying the spider off.
 Wasp.arriveS = 8.0
 Wasp.searchS = 45.0

@@ -80,6 +80,7 @@ MODULES = [
     ("LifeLoop", "Life/LifeLoop.luau"),
     ("LifeSession", "Life/LifeSession.luau"),
     ("PreyMath", "Prey/PreyMath.luau"),
+    ("RivalRules", "Data/RivalRules.luau"),
     ("RivalSpider", "Predator/RivalSpider.luau"),
     ("FlySenses", "Prey/FlySenses.luau"),
     ("PerchGraph", "Prey/PerchGraph.luau"),

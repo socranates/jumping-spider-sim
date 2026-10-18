@@ -7,6 +7,7 @@ local ControlText = require(script.Parent.ControlText)
 local Peacock = require(script.Parent.Parent.Data.Peacock)
 local SpiderChoice = require(script.Parent.Parent.Rig.SpiderChoice)
 local AntMimicText = require(script.Parent.AntMimicText)
+local TarantulaText = require(script.Parent.TarantulaText)
 
 local PeacockText = {}
 
@@ -58,7 +59,7 @@ function PeacockText.touchChange(): string return "Change" end
 function PeacockText.touchDisplay(dancing: boolean): string return if dancing then "Stop" else "Dance" end
 
 -- Lines added to the controls card (H): the crack's choice for every spider, the pointer to the Settings row (ROBLOX-71), then the display key's line for the spider that has one:
--- `display` is "dance" (the peacock spider), "antennae" (the ant-mimicking spider), nil (the first spider). true means "dance" and false nil.
+-- `display` is "dance" (the peacock spider), "antennae" (the ant-mimicking spider), "threat" (the tarantulas), nil (the first spider). true means "dance" and false nil.
 function PeacockText.helpExtra(device: ControlText.Device, display: (string | boolean)?): string
 	local choose = ControlText.name(device, "choose")
 	local kind: string? = if display == true then "dance" elseif type(display) == "string" then display else nil
@@ -67,6 +68,8 @@ function PeacockText.helpExtra(device: ControlText.Device, display: (string | bo
 		table.insert(lines, `Standing still: {ControlText.name(device, "display")} courtship dance. Any move, jump or Cancel stops it`)
 	elseif kind == "antennae" then
 		table.insert(lines, AntMimicText.helpLine(device))
+	elseif kind == "threat" then
+		table.insert(lines, TarantulaText.helpLine(device))
 	end
 	return "\n" .. table.concat(lines, "\n")
 end

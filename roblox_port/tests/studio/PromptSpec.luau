@@ -29,7 +29,7 @@ return function(check: (string, () -> ()) -> ())
 	end)
 	check("the controls card fits a phone's width in landscape for every device", function()
 		for _, device in devices do
-			for _, kind in { "dance", "antennae" } do -- with the peacock spider's two lines, and with the ant mimic's
+			for _, kind in { "dance", "antennae", "threat" } do -- with the peacock spider's two lines, with the ant mimic's and with the tarantulas'
 				local s = size(ControlText.helpCard(device) .. PeacockText.helpExtra(device, kind), 15, 568 - 32 - 20)
 				assert(s.Y <= 10 * 15 * 1.35, `{device}: the card ({kind}) needs {s.Y} px`)
 			end

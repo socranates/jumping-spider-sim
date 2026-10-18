@@ -480,6 +480,11 @@ local function tarantula(o: any): any
 			{ name = "SpinneretTip", center = { 0.045, 0.01, apex + 0.085 }, radii = { 0.016, 0.015, 0.045 }, group = "abdomen", color = hex(o.spinneret), sweep = 2, fullOnly = true },
 		},
 		marks = o.marks,
+		-- The threat display and silk mat (Rig/TarantulaPose says how far and how fast; Data/Tarantula has the numbers): where legs I go when
+		-- they are raised (body frame of the reared prosoma, studs, x mirrored for the left leg), how far the knee goes out and up, how much
+		-- the raised feet tremble, how much farther the second spinneret segment swings than the first, and how far inside the abdomen's rear
+		-- tip the spinnerets swing from. All ART.
+		threat = { pair = 1, up = { x = 0.42, y = 0.28, z = -0.60 }, kneeOut = 0.10, kneeUp = 0.12, tremor = 0.015, tipSweep = 1.4, sweepBack = 0.05 },
 		fuzz = o.fuzz,
 		idle = first.idle,
 		detail = {

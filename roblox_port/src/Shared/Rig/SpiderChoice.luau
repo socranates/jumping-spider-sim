@@ -85,11 +85,18 @@ function SpiderChoice.hasAntennae(id: string): boolean
 	return look ~= nil and (look :: any).antennae ~= nil
 end
 
+-- Does this appearance have a threat display and silk mat (the tarantulas', ROBLOX-82) on the display key?
+function SpiderChoice.hasThreat(id: string): boolean
+	local look = Appearances.profiles[id]
+	return look ~= nil and (look :: any).threat ~= nil
+end
+
 -- What the display key (X / RB / the touch button) does for this appearance: "dance" (the peacock's courtship dance), "antennae" (the
--- ant mimic's antennae pose) or nil (the first spider has none).
+-- ant mimic's antennae pose), "threat" (the tarantulas' rear-up and silk mat) or nil (the first spider has none).
 function SpiderChoice.displayKind(id: string): string?
 	if SpiderChoice.canDance(id) then return "dance" end
 	if SpiderChoice.hasAntennae(id) then return "antennae" end
+	if SpiderChoice.hasThreat(id) then return "threat" end
 	return nil
 end
 

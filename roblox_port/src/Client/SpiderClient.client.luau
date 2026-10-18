@@ -15,6 +15,8 @@
 -- jump or Cancel stops it. The dance is a pose of the drawn rig only; the motor, senses, silk and the rest are the same for both.
 -- The ant-mimicking spider (ROBLOX-64) is the third in the crack's cycle: standing still, legs I rise as antennae and wave by themselves, X (RB / R1,
 -- Wave) makes them higher and faster; walking, its drawn body yaws and sways along the distance walked. Again drawn only: the motor never knows.
+-- The two tarantulas (ROBLOX-81, ROBLOX-82) are the last two in the cycle: costumes on the first spider's body; standing still, X (RB / R1, Rear up) plays
+-- a 6 second loop (the threat posture, then a turn about with the spinnerets sweeping like laying a silk mat) until it, a move, a jump or Cancel ends it.
 -- The naturalist's notebook (ROBLOX-37): N, the Notebook button beside Menu, or "Notebook" in the life menu and on the end screen opens it
 -- and the world waits. The book is the player's: it lives here, outside the world and its checkpoints, so a return to a rest never erases a
 -- page and a new, unrelated spider opens the same book. NotebookWatch opens pages from the events this loop already has.
@@ -147,6 +149,9 @@ local dancePose: any = nil
 -- the spider was last frame (the distance walked drives the drawn wobble). One table: the client is at Luau's limit of 200 locals.
 local ant: any = { Pose = require(Shared.Rig.AntMimicPose), Text = require(Shared.UI.AntMimicText), state = nil, pose = nil, last = nil }
 ant.state = ant.Pose.new()
+-- The tarantulas' threat display and silk mat (ROBLOX-82), kept in the same table for the same reason: the modules, the state and its latest pose.
+ant.Threat, ant.ThreatText = require(Shared.Rig.TarantulaPose), require(Shared.UI.TarantulaText)
+ant.threat, ant.threatPose = ant.Threat.new(), nil
 local bodyHidden = false
 task.spawn(function()
 	local roots: { Instance } = { Lighting }
@@ -390,10 +395,11 @@ end
 -- The spider-eye picture (ROBLOX-20): field of view, colour, blur, retina strips, movement rings, UV layer, vignette. Presentation only.
 local eyes: any = SpiderEyes.new({ parent = player:WaitForChild("PlayerGui"), camera = camera, player = player, cam = cam, sensor = sensor, params = params })
 
--- The display key's pose (the peacock's dance, the ant mimic's raised antennae) ends at once: a step, a jump, a rest, a drop, a menu.
+-- The display key's pose (the peacock's dance, the ant mimic's raised antennae, the tarantulas' threat display) ends at once: a step, a jump, a rest, a drop, a menu.
 function ant.stopDisplay()
 	dance:stop()
 	ant.state:stop()
+	ant.threat:stop()
 end
 
 -- Everything held is dropped with no penalty and no message: focus loss, the Roblox menu, a text box, a lost controller.
@@ -436,6 +442,7 @@ local function setAppearance(id: string)
 	dance = PeacockDance.new()
 	dancePose = nil
 	ant.state, ant.pose, ant.last = ant.Pose.new(), nil, nil
+	ant.threat, ant.threatPose = ant.Threat.new(), nil
 	local old = rig
 	rig = SpiderRig.new(Workspace, sill, appearance, detail)
 	rig.gaitMode = old.gaitMode
@@ -446,6 +453,7 @@ end
 function spiderPick.switch(id: string)
 	setAppearance(id)
 	spiderPick.touched = true
+	if SpiderChoice.hasThreat(appearance) then book:notice("tarantula") end -- choosing a tarantula opens its notebook page (ROBLOX-83)
 	if saveClient ~= nil then saveClient:markDirty() end
 	hud:toast(PeacockText.changed(appearance), false)
 end
@@ -489,6 +497,16 @@ local function toggleDance()
 			ant.state:stop()
 		elseif not ant.state:start(standing, motor.moving) then
 			hud:toast(ant.Text.STAND, false)
+		end
+		return
+	end
+	if kind == "threat" then -- the tarantulas: the rear-up and the silk mat, a loop until the key again, a move, a jump or Cancel
+		if ant.threat:displaying() then
+			ant.threat:stop()
+		elseif not ant.threat:start(standing, motor.moving) then
+			hud:toast(ant.ThreatText.STAND, false)
+		else
+			book:notice("tarantula")
 		end
 		return
 	end
@@ -1096,10 +1114,10 @@ local function updateHud(frameDt: number)
   restPrompt={title="Home: the silk-lined crack",hint=if lifeSpider.inRetreat then "Keep still on a surface, then "..ControlText.name(device,"feed")..": rest" else "Walk through the silk-framed opening under the wooden roof, then stop to rest."}
  end
  local displayKind = SpiderChoice.displayKind(appearance)
-	local displayOn = if displayKind == "antennae" then ant.state:displaying() else dance.active
-	local displayHint = if displayKind == "antennae" then ant.Text.displayHint(device, displayOn) elseif displayKind == "dance" then PeacockText.displayHint(device, displayOn) else ""
+	local displayOn = if displayKind == "antennae" then ant.state:displaying() elseif displayKind == "threat" then ant.threat:displaying() else dance.active
+	local displayHint = if displayKind == "antennae" then ant.Text.displayHint(device, displayOn) elseif displayKind == "threat" then ant.ThreatText.displayHint(device, displayOn) elseif displayKind == "dance" then PeacockText.displayHint(device, displayOn) else ""
 	if restPrompt and not lifeSpider.inRetreat and displayKind ~= nil then restPrompt.hint ..= "    " .. displayHint end
-	if displayKind ~= nil and displayOn then table.insert(view.status, if displayKind == "antennae" then ant.Text.statusLine(device) else PeacockText.dancingLine(device)) end
+	if displayKind ~= nil and displayOn then table.insert(view.status, if displayKind == "antennae" then ant.Text.statusLine(device) elseif displayKind == "threat" then ant.ThreatText.statusLine(device) else PeacockText.dancingLine(device)) end
 	if focusState.latched then table.insert(view.status, "FOCUS ON    " .. ControlText.name(device,"focus") .. " again to stop" .. (if not jump:isBusy() and not motor:onLine() and not motor.silk.walk then " / " .. ControlText.name(device,"cancel") else "")) end
 	if cam.eyeView then table.insert(view.status, `SPIDER-EYE VIEW    {ControlText.name(device, "eye")}: back`) end
 	if slow then
@@ -1133,7 +1151,7 @@ local function updateHud(frameDt: number)
 	-- The peacock spider's buttons: Change in the crack, Dance on the open sill (the peacock spider only).
 	controls:setTouchVisible("Choose", canChange())
 	controls:setTouchVisible("Display", displayKind ~= nil and not onLine and not life.resting and motor.mode == "attached")
-	controls:setTouchLabel("Display", if displayKind == "antennae" then ant.Text.touchDisplay(displayOn) else PeacockText.touchDisplay(displayOn))
+	controls:setTouchLabel("Display", if displayKind == "antennae" then ant.Text.touchDisplay(displayOn) elseif displayKind == "threat" then ant.ThreatText.touchDisplay(displayOn) else PeacockText.touchDisplay(displayOn))
 	hud:update(view, frameDt)
 end
 
@@ -1356,6 +1374,22 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 		end
 		ant.last = here
 	end
+	-- The tarantulas' threat display and silk mat (ROBLOX-82): a loop of the drawn pose, stepped with the simulation's time (slow motion slows it, a
+	-- menu or the catch screen holds it), on the same standing test as the dance; any walking intent, aim, jump, line or rest ends it at once.
+	do
+		if SpiderChoice.hasThreat(appearance) then
+			ant.threat.reduced = setting("ReducedMotion") == true
+			local r, f = controls:axes()
+			if jump:isAiming() then r, f = 0, 0 end
+			local standing = motor.mode == "attached" and not motor.preparing and not motor.seized and not motor:onLine() and not life.resting
+			local paused = GuiService.MenuIsOpen or modal()
+			ant.threatPose = ant.threat:step(if paused then 0 else simFrame, standing, motor.moving or r ~= 0 or f ~= 0)
+			rig.threat = if ant.threat:showing() then ant.threatPose else nil
+		else
+			ant.threatPose = nil
+			rig.threat = nil
+		end
+	end
  rig.reducedMotion=setting("ReducedMotion")==true
  rig:setGrowthStage(life.growth.stage)
  rig:setSoftness(life.growth:softness())
@@ -1439,7 +1473,7 @@ if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
 			input = controls, rivalLegs = rivalLegs, mateLegs = mateLegs,
 			notebook = book, notebookWatch = watch, notebookPanel = nbPanel, openNotebook = openNotebook, settingsPanel = settingsPanel, openSettings = openSettings, setting = setting, cam = cam, soundscape = soundscape, eyes = eyes,
 			session=session, menu=menu, openMenu=openMenu, endLife=endLife, fresh=fresh, continueAnother=continueAnother, currentStore=function() return checkpoints end,
-			changeSpider = function() changeSpider() end, dance = function() return dance end, ant = function() return ant.state end, antPose = function() return ant.pose end, appearance = function() return appearance end, rig = function() return rig end,
+			changeSpider = function() changeSpider() end, dance = function() return dance end, ant = function() return ant.state end, antPose = function() return ant.pose end, threat = function() return ant.threat end, threatPose = function() return ant.threatPose end, appearance = function() return appearance end, rig = function() return rig end,
 			drop = function() motor:requestDrop() end,
 			jump = jump,
 			motor = motor,

@@ -853,6 +853,88 @@ for _, id in { RED, BLUE } do
 	check(hidden, `{id}: the eye view hides the tubercle, the rim and the markings with the body`)
 	rig:destroy()
 end
+-- The threat display and silk mat (ROBLOX-82): the pose rears the drawn prosoma, lifts legs I and the palps, turns the drawn body about and swings
+-- the spinnerets. Display only: the root, the planted feet and the other spiders do not change. reducedMotion is on for the comparisons so the idle
+-- twitch does not move the baseline.
+local TarantulaPose = require("../src/Shared/Rig/TarantulaPose")
+local TarantulaData = require("../src/Shared/Data/Tarantula")
+local function part(rig: any, name: string): BasePart return rig.model:FindFirstChild(name) :: BasePart end
+local function pair(rig: any, name: string): { BasePart } return fanParts(rig, name) end
+for _, id in { RED, BLUE } do
+	local rig = rigOf(id, "full", floor)
+	rig.reducedMotion = true
+	settle(rig, 0.5)
+	local planted = {}
+	for i, leg in rig._legs do planted[i] = leg.planted end
+	local head0, tub0, tars0 = part(rig, "Cephalothorax").CFrame.Position, part(rig, "OcularTubercle").CFrame.Position, part(rig, "Tarsus1").CFrame.Position
+	local palp0 = pair(rig, "PalpStalk")[1].CFrame.Position
+	local rear0 = part(rig, "Tarsus4").CFrame.Position
+	local abdomen0 = part(rig, "Abdomen").CFrame
+	local root0 = rig.root.CFrame
+	-- The rear-up, held: the head and tubercle go up and back, legs I and the palps go up above the head, the legs behind stay put.
+	local hold = TarantulaPose.rawPose(1.5, false)
+	check(hold.phase == "threat" and near(hold.rear, math.rad(TarantulaData.rearDeg), 1e-9) and hold.legs == 1, "(the pose at 1.5 s is the held threat)")
+	rig.threat = hold
+	settle(rig, 0.1)
+	local head1, tub1, tars1 = part(rig, "Cephalothorax").CFrame.Position, part(rig, "OcularTubercle").CFrame.Position, part(rig, "Tarsus1").CFrame.Position
+	check(head1.Y > head0.Y + 0.05 and tub1.Y > tub0.Y + 0.05, `{id}: the prosoma rears (head {string.format("%.3f", head1.Y - head0.Y)} and tubercle {string.format("%.3f", tub1.Y - tub0.Y)} studs up)`)
+	check(tars1.Y > tars0.Y + 0.15 and tars1.Y > tub1.Y, `{id}: legs I lift above the tubercle ({string.format("%.3f", tars1.Y)} against {string.format("%.3f", tub1.Y)})`)
+	local lt, rt = part(rig, "Tarsus1").CFrame.Position, part(rig, "Tarsus5").CFrame.Position
+	check(near(lt.Y, rt.Y, 1e-4) and near(lt.X, -rt.X, 1e-4), `{id}: both raised legs are mirror images`)
+	check(pair(rig, "PalpStalk")[1].CFrame.Position.Y > palp0.Y + 0.02, `{id}: the palps lift`)
+	check(math.abs(part(rig, "Tarsus4").CFrame.Position.Y - rear0.Y) < 0.03 and (part(rig, "Tarsus4").CFrame.Position - rear0).Magnitude < 0.05, `{id}: the legs behind hardly change ({string.format("%.4f", (part(rig, "Tarsus4").CFrame.Position - rear0).Magnitude)} studs)`)
+	local plantedOk = true
+	for i, leg in rig._legs do plantedOk = plantedOk and leg.planted ~= nil and (leg.planted :: Vector3 - planted[i]).Magnitude < 1e-9 end
+	check(plantedOk and (rig.root.CFrame.Position - root0.Position).Magnitude < 1e-9, `{id}: every foot keeps its planted spot and the root does not move`)
+	check(part(rig, "Abdomen").CFrame.Position.Y < head1.Y and (part(rig, "Abdomen").CFrame.Position - abdomen0.Position).Magnitude < 0.02, `{id}: the abdomen stays on the floor behind the reared prosoma`)
+	-- The tremble moves the raised feet a little and nothing else.
+	rig.threat = { phase = "threat", presence = 1, rear = hold.rear, legs = 1, palps = hold.palps, yaw = 0, sweep = 0, tremor = 0 }
+	settle(rig, 0.1)
+	local still = part(rig, "Tarsus1").CFrame.Position.Y
+	rig.threat = { phase = "threat", presence = 1, rear = hold.rear, legs = 1, palps = hold.palps, yaw = 0, sweep = 0, tremor = 1 }
+	settle(rig, 0.1)
+	local shaken = part(rig, "Tarsus1").CFrame.Position.Y - still
+	check(shaken > 0.003 and shaken < 0.05, `{id}: the tremble moves a raised foot only a little ({string.format("%.4f", shaken)} studs)`)
+	-- With no pose (presence 0) the motor has the head and legs again.
+	rig.threat = TarantulaPose.NONE
+	settle(rig, 0.1)
+	check(near(part(rig, "Cephalothorax").CFrame.Position.Y, head0.Y, 1e-6) and near(part(rig, "Tarsus1").CFrame.Position.Y, tars0.Y, 1e-6), `{id}: no pose, no rear: the head and legs I are back where the motor has them`)
+	rig.threat = nil
+	-- The turn about: the drawn body pivots about its up axis to 180 degrees; the root and the feet do not turn.
+	local mat = TarantulaPose.rawPose(3.2 + 1.2 + 0.1, false)
+	check(mat.phase == "mat" and near(mat.yaw, math.rad(180), 1e-9), "(the pose in the mat phase has turned the body 180 degrees)")
+	rig.threat = { phase = "mat", presence = 1, rear = 0, legs = 0, palps = 0, yaw = mat.yaw, sweep = 0, tremor = 0 }
+	settle(rig, 0.1)
+	local turned = math.acos(math.clamp(part(rig, "Abdomen").CFrame.LookVector:Dot(abdomen0.LookVector), -1, 1))
+	check(near(turned, math.pi, 0.01), `{id}: the drawn body turns {string.format("%.1f", math.deg(turned))} degrees about its up axis`)
+	check(part(rig, "Abdomen").CFrame.Position.Z < abdomen0.Position.Z - 0.1, `{id}: the abdomen has swung round to the front`)
+	check(rig.root.CFrame.LookVector.Z == root0.LookVector.Z and (rig.root.CFrame.Position - root0.Position).Magnitude < 1e-9, `{id}: the root (the collider's frame) does not turn`)
+	-- The spinnerets sweep side to side; the second segment farther; a sweep of nothing is straight back.
+	rig.threat = nil
+	settle(rig, 0.1)
+	local s0, t0 = pair(rig, "Spinneret")[1].CFrame.Position, pair(rig, "SpinneretTip")[1].CFrame.Position
+	local right = { phase = "turn", presence = 1, rear = 0, legs = 0, palps = 0, yaw = 0, sweep = math.rad(TarantulaData.sweepDeg), tremor = 0 }
+	rig.threat = right
+	settle(rig, 0.1)
+	local s1, t1 = pair(rig, "Spinneret")[1].CFrame.Position, pair(rig, "SpinneretTip")[1].CFrame.Position
+	rig.threat = { phase = "turn", presence = 1, rear = 0, legs = 0, palps = 0, yaw = 0, sweep = -right.sweep, tremor = 0 }
+	settle(rig, 0.1)
+	local s2 = pair(rig, "Spinneret")[1].CFrame.Position
+	check(math.abs(s1.X - s0.X) > 0.005 and math.abs(s2.X - s0.X) > 0.005 and (s1.X - s0.X) * (s2.X - s0.X) < 0, `{id}: the spinnerets swing to one side and the other ({string.format("%.3f", s1.X - s0.X)} and {string.format("%.3f", s2.X - s0.X)} studs)`)
+	check(math.abs(t1.X - t0.X) > math.abs(s1.X - s0.X), `{id}: the tip segment swings farther than the base`)
+	check(near(s1.Y, s0.Y, 1e-6) and near(part(rig, "Tarsus1").CFrame.Position.Y, tars0.Y, 1e-6), `{id}: the sweep moves nothing else`)
+	rig.threat = nil
+	rig:destroy()
+end
+-- Another appearance ignores the pose entirely; so do the rigs that have no threat configuration.
+local ignorer = rigOf("first_spider", "full", floor)
+ignorer.reducedMotion = true
+settle(ignorer, 0.3)
+local ignoreBefore = snapshot(ignorer)
+ignorer.threat = TarantulaPose.rawPose(1.5, false)
+settle(ignorer, 0.1)
+check(moved(ignoreBefore, snapshot(ignorer)) < 0.05, "the first spider ignores a threat pose")
+ignorer:destroy()
 for _, c in { rc, bc } do
 	c.f:destroy()
 	c.l:destroy()

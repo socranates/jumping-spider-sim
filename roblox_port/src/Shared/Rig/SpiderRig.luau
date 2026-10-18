@@ -10,7 +10,8 @@
 -- set as rig.ant) that raises legs I as antennae when it stands and turns the drawn body a little as it walks.
 -- The two tarantulas (ROBLOX-81) are two more: a broad low carapace with a rim (look.extras), an ocular tubercle with eight tiny eyes
 -- (Anatomy's tubercle), markings on the abdomen (look.marks), legs coloured segment by segment (look.legColors, look.legBands) and, for the
--- Greenbottle blue, leg bristles only (fuzz.legsOnly) and bars that soften at the last growth stage (look.barFade).
+-- Greenbottle blue, leg bristles only (fuzz.legsOnly) and bars that soften at the last growth stage (look.barFade). A pose (Rig/TarantulaPose, set as
+-- rig.threat, ROBLOX-82) rears the prosoma, lifts legs I and the pedipalps, turns the drawn body about and swings the spinnerets.
 
 local Workspace = game:GetService("Workspace")
 local Appearances = require(script.Parent.Parent.Data.Appearances)
@@ -101,6 +102,7 @@ export type Rig = typeof(setmetatable(
 		_fan: Fan?,
 		dance: any, -- a PeacockDance.Pose, or nil: the peacock spider's display (ignored by an appearance without a fan)
 		ant: any, -- an AntMimicPose.Pose, or nil: the ant-mimicking spider's antennae and walk (ignored by an appearance without look.antennae)
+		threat: any, -- a TarantulaPose.Pose, or nil: a tarantula's threat display and silk mat (ignored by an appearance without look.threat)
 	},
 	SpiderRig
 ))
@@ -225,6 +227,7 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		_fan = nil :: Fan?,
 		dance = nil :: any,
 		ant = nil :: any,
+		threat = nil :: any,
 	}, SpiderRig)
 
 	local function fixed(part: Part, at: Vector3, rot: CFrame?, group: number, palp: number?): Fixed
@@ -617,6 +620,13 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 	if antPose ~= nil and (antPose.yaw ~= 0 or antPose.lateral ~= 0) then
 		body = body * CFrame.new(antPose.lateral * self._growth, 0, 0) * CFrame.Angles(0, antPose.yaw, 0)
 	end
+	-- A tarantula's threat display and silk mat (ROBLOX-82): the drawn body pivots about its up axis (the root and the collider do not); what else
+	-- the pose does (rears the prosoma, raises legs I and the palps, swings the spinnerets) is further down.
+	local threatPose = if self._appearance.threat ~= nil then self.threat else nil
+	local threatening = threatPose ~= nil and threatPose.presence > 0
+	if threatening and threatPose.yaw ~= 0 then
+		body = body * CFrame.Angles(0, threatPose.yaw, 0)
+	end
 	local up = body.UpVector
 	local look, cfg, A = self._appearance, self._cfg, self._layout
 	local k, g = self._k, self._growth
@@ -649,6 +659,7 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 	local display = self.dance
 	local fan = self._fan
 	local dancing = fan ~= nil and display ~= nil and display.presence > 0
+	local posed = dancing or threatening -- a display pose is on: no idle motion, twitch or jump brace on top of it
 
 	-- Palps drum in bursts while the spider stands still; breathing and a curious head tilt ease in after a moment. All of
 	-- it is full detail only (cfg.idle), and reducedMotion turns it off too.
@@ -657,7 +668,7 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
  local desiredLoad = if loading and not self.reducedMotion then math.clamp(self.jumpLoad,0,1) else 0
  self._shownLoad += math.clamp(desiredLoad-self._shownLoad,-12*dt,6*dt)
  local load = if self.reducedMotion then 0 else self._shownLoad
- local standing = cfg.idle and grounded and not moving and not self.reducedMotion and not dancing and not loading
+ local standing = cfg.idle and grounded and not moving and not self.reducedMotion and not posed and not loading
 	self._drum = math.clamp(self._drum + (if standing then 3 else -3) * dt, 0, 1)
 	local palpAngle = Idle.palps(self._t, self._drum, look.palp)
 	local bodyBase, headBase, abdomenBase = body, body, body
@@ -674,7 +685,7 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 		end
 	end
 	-- Display-only snaps also run on low-detail devices. Camera/root, foot anchors and motor stay unchanged.
-	if grounded and not self.reducedMotion and not dancing and not loading then
+	if grounded and not self.reducedMotion and not posed and not loading then
 		local yaw, lift = Idle.snap(self._t, moving)
 		local accent = body * CFrame.new(0, lift * g, 0) * CFrame.Angles(0, yaw, 0) * body:Inverse()
 		bodyBase, headBase, abdomenBase = accent * bodyBase, accent * headBase, accent * abdomenBase
@@ -682,7 +693,7 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
  -- A visible preparation and extension, not a pressure gauge or an inflated body. Hydraulic
  -- extension and muscle action both matter; their jump contribution varies among species
  -- (Nabawy et al. 2018, doi:10.1038/s41598-018-25227-9). Timings are display tuning.
- if not dancing and (load > 0 or push > 0) then
+ if not posed and (load > 0 or push > 0) then
   local brace = body * CFrame.new(0,(-0.065*load+0.025*push)*k,0)
    * CFrame.Angles(-0.07*load+0.05*push,0,0) * body:Inverse()
   bodyBase,headBase,abdomenBase=brace*bodyBase,brace*headBase,brace*abdomenBase
@@ -692,6 +703,16 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 		abdomenBase = bodyBase * CFrame.new(A.pedicelCenter*g) * CFrame.Angles(0, 0, display.abdomenSway + display.shiver)
 			* CFrame.Angles(-display.abdomenPitch, 0, 0) * CFrame.new(-A.pedicelCenter*g)
 		palpAngle = { palpAngle[1] + display.palp, palpAngle[2] + display.palp }
+	end
+	-- The threat display: the prosoma (the head with the palps, and every leg's hip) pitches up about the waist; the palps lift at their bases.
+	local prosoma = bodyBase
+	if threatening and threatPose.rear ~= 0 then
+		local waist = A.pedicelCenter * g
+		prosoma = bodyBase * CFrame.new(waist) * CFrame.Angles(threatPose.rear, 0, 0) * CFrame.new(-waist)
+		headBase = prosoma * (bodyBase:Inverse() * headBase) -- (keeps any head tilt the idle motion still has)
+	end
+	if threatening then
+		palpAngle = { palpAngle[1] + threatPose.palps, palpAngle[2] + threatPose.palps }
 	end
  self._spinneret=abdomenBase:PointToWorldSpace((A.abdomenCenter+(A.spinneret-A.abdomenCenter)*condition)*g)
 	local pivots = {
@@ -705,6 +726,12 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 			put(f.part, base * scaledFrame(pivots[palp] * f.offset))
 		else
 			local offset=f.offset
+			if threatening and f.sweep ~= nil and threatPose.sweep ~= 0 then
+				-- A spinneret segment swings side to side about a point just inside the abdomen's rear tip (the second segment farther).
+				local tc = look.threat
+				local at = A.spinneret - Vector3.new(0, 0, tc.sweepBack)
+				offset = CFrame.new(at) * CFrame.Angles(0, threatPose.sweep * (if f.sweep > 1 then tc.tipSweep else 1), 0) * CFrame.new(-at) * offset
+			end
     if f.group==G_ABDOMEN then
      local p=A.abdomenCenter+(offset.Position-A.abdomenCenter)*condition
      offset=CFrame.new(p)*offset.Rotation
@@ -791,7 +818,7 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 	end
 	local kneeUp = (if grounded then L.kneeLift else L.kneeLiftAir)*g
 	for _, leg in self._legs do
-		local hip = bodyBase:PointToWorldSpace(Vector3.new(leg.side * L.hipX, L.hipY, L.hipZ[leg.pair])*g)
+		local hip = prosoma:PointToWorldSpace(Vector3.new(leg.side * L.hipX, L.hipY, L.hipZ[leg.pair])*g)
 		local foot = leg.foot
   local rear = leg.pair >= 3
   if not grounded and rear and push > 0 then
@@ -820,6 +847,15 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 			foot = foot:Lerp(raised, antPose.antennae)
 			local raisedKnee = hip:Lerp(raised, 0.5) + bodyBase.RightVector * (leg.side * antCfg.kneeOut * g) + up * (antCfg.kneeUp * g)
 			knee = knee:Lerp(raisedKnee, antPose.antennae)
+		end
+		-- The threat posture: legs I go up and out in front of the reared prosoma, trembling a little; the planted foot below is untouched.
+		local tc = look.threat
+		if threatening and tc ~= nil and leg.pair == tc.pair and threatPose.legs > 0 then
+			local upAt = Vector3.new(leg.side * tc.up.x, tc.up.y + threatPose.tremor * tc.tremor, tc.up.z)
+			local raised = prosoma:PointToWorldSpace(upAt * g)
+			foot = foot:Lerp(raised, threatPose.legs)
+			local raisedKnee = hip:Lerp(raised, 0.5) + prosoma.RightVector * (leg.side * tc.kneeOut * g) + up * (tc.kneeUp * g)
+			knee = knee:Lerp(raisedKnee, threatPose.legs)
 		end
 		local ankle = knee:Lerp(foot, ANKLE_SHARE) + up * (L.ankleLift*g)
 		local function segment(index: number, p: Part, band: Part?, a: Vector3, b: Vector3)

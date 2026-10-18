@@ -21,6 +21,7 @@ tests/checkpoint.luau (the retreat checkpoint of a whole world, its refusals, an
 tests/wasp.luau (the mud dauber wasp's rules against tests/wasp_reference.json, exported from the frozen Godot director, and Godot's hand-written expectations) and
 tests/peacock.luau (the peacock spider's courtship dance: its documented rates, order, interruption and reduced motion) and
 tests/antmimic.luau (the ant-mimicking spider's antennae and drawn walk: its documented numbers, the short stops, interruption and reduced motion) and
+tests/tarantula.luau (the tarantulas' threat display and silk mat: its loop, order, angles and rates, interruption, slow motion and reduced motion, and the words) and
 tests/notebook.luau (the naturalist's notebook: Godot's pages word for word, the model, the watcher, the words and layout, the panel and the client's wiring) and
 tests/mating.luau (the mating cycle: the eligibility gate, the mate's arrival and legs, the courtship meter, the mating, the sac night, the guard days, the hatching, the next generation and their checkpoint records) and
 tests/state.luau (persistent saves: envelope, progress and rest records, session lock, scheduler, server service) and
@@ -102,12 +103,15 @@ MODULES = [
     ("PeacockDance", "Rig/PeacockDance.luau"),
     ("AntMimic", "Data/AntMimic.luau"),
     ("AntMimicPose", "Rig/AntMimicPose.luau"),
+    ("Tarantula", "Data/Tarantula.luau"),
+    ("TarantulaPose", "Rig/TarantulaPose.luau"),
     ("SpiderChoice", "Rig/SpiderChoice.luau"),
     ("WaspDirector", "Predator/WaspDirector.luau"),
     ("WaspText", "UI/WaspText.luau"),
     ("RivalText", "UI/RivalText.luau"),
     ("MateText", "UI/MateText.luau"),
     ("AntMimicText", "UI/AntMimicText.luau"),
+    ("TarantulaText", "UI/TarantulaText.luau"),
     ("PeacockText", "UI/PeacockText.luau"),
     ("Fly", "Prey/Fly.luau"),
     ("PreyPopulation", "Prey/PreyPopulation.luau"),
@@ -219,7 +223,7 @@ def main():
     luau = sys.argv[1] if len(sys.argv) > 1 else "luau"
     status = 0
     named = sys.argv[2:]
-    for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "life.luau", "checkpoint.luau", "wasp.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "client_ant.luau", "client_rival.luau", "client_mating.luau", "look.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "peacock.luau", "antmimic.luau", "continuing.luau", "growth.luau", "notebook.luau", "state.luau", "state_client.luau", "state_offline.luau", "settings.luau", "rival.luau", "rivalnav.luau", "mating.luau"]:
+    for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "life.luau", "checkpoint.luau", "wasp.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "client_ant.luau", "client_rival.luau", "client_mating.luau", "look.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "peacock.luau", "antmimic.luau", "tarantula.luau", "continuing.luau", "growth.luau", "notebook.luau", "state.luau", "state_client.luau", "state_offline.luau", "settings.luau", "rival.luau", "rivalnav.luau", "mating.luau"]:
         if not (HERE / test_file).exists():
             if named:  # a misspelt name must not look like a pass
                 print(f"no such test file: {test_file} (names are relative to tests/, for example look.luau)", file=sys.stderr)

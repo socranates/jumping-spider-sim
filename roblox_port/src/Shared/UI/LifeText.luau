@@ -56,4 +56,13 @@ function LifeText.touchLabel(asleep: boolean, resting: boolean, canRest: boolean
 	return nil
 end
 
+-- A food-equivalent estimate, not a kill counter: small prey and partially eaten meals count.
+function LifeText.growth(g: any, required: number, meal: number): string
+ if g:isAdult() then return "Adult: keep your food reserves up." end
+ if g:isMoulting() then return "Moulting: stay in the crack." end
+ if g.ready then return "Ready to moult: rest in the crack." end
+ local fraction = math.clamp(g.fedSinceMoult / required, 0, 1)
+ local remaining = math.max(1, math.ceil((required - g.fedSinceMoult) / meal - 1e-9))
+ return `Next moult: {math.floor(fraction * 100)}% · about {remaining} housefly {if remaining == 1 then "meal" else "meals"} left`
+end
 return LifeText

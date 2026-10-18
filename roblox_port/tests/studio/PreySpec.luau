@@ -80,7 +80,10 @@ return function(check: (string,()->())->())
   d:after(1/60,motor,sensor,function()return nil end);assert(not d.feeding.held and captures==0)
   d.previousMode='attached';motor.events={{kind='launched'}}
   d:after(1/60,motor,sensor,function(a,b)return (a+b)*.5 end);assert(not d.feeding.held and captures==0)
-  d:after(1/60,motor,sensor,function()return nil end);assert(d.feeding.held==f and captures==1)
+  motor.pos=Vector3.new(.76,10,0);d.previousPosition=motor.pos
+  d:after(1/60,motor,sensor,function()return nil end);assert(not d.feeding.held,"outside the modest new reach must miss")
+  motor.pos=Vector3.new(.74,10,0);d.previousPosition=motor.pos
+  d:after(1/60,motor,sensor,function()return nil end);assert(d.feeding.held==f and captures==1,"near miss inside new reach should catch")
  end)
  d.probe:Destroy();world:Destroy()
 end

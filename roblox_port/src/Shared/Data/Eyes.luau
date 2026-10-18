@@ -24,6 +24,12 @@
 -- (docs/VISION_RESEARCH.md, EYE-14, still applies to prey, glass and leaves). The sensor's own peripheral cone (Species,
 -- peripheral_cone_degrees 300) is narrower than the anatomical 330 degrees: the shimmer shows what the sensor found.
 
+-- Player-feedback revision: simultaneous central colour and muted surround. The four neutral
+-- edge gradients are a contrast/colour wash, NOT a true regional desaturation shader or blur.
+-- Roblox BlurEffect is global, so it is disabled to keep the centre clear. The centre is a
+-- readable approximation of combined principal-eye sampling, not a human fovea or measured
+-- angular boundary. Focus still narrows the view; retina strips and motion cues remain.
+-- The historical optical-model descriptions below refer to the earlier whole-screen blend.
 local Eyes = {}
 
 Eyes.sources = {
@@ -55,12 +61,12 @@ Eyes.sources = {
 -- with the principal eyes). The vignette is the telephoto dark edge, as an opacity at the screen's edge.
 Eyes.side = {
 	fovDeg = 90,
-	saturation = -0.85, tint = { 170, 228, 165 }, contrast = 0.12, brightness = 0.03,
-	blur = 2.5,
+	saturation = 0.15, tint = { 115, 255, 236 }, contrast = 0.12, brightness = 0.03,
+	blur = 0,
 	dofFar = 0.35, dofNear = 0.25, dofRadiusMin = 6, dofRadiusPerStud = 0.6,
 	strokeTransparency = 0.82, fillTransparency = 0.96,
 	sweepDeg = 4, torsionDeg = 12,
-	vignette = 0.35,
+	vignette = 0.65,
 }
 Eyes.principal = {
 	fovDeg = 24,
@@ -69,7 +75,7 @@ Eyes.principal = {
 	dofFar = 0.75, dofNear = 0.6, dofRadiusMin = 0.6, dofRadiusPerStud = 0.12,
 	strokeTransparency = 0.68, fillTransparency = 0.93, -- fainter than first drawn: zoomed in, the strips are large and frame the target
 	sweepDeg = 0.6, torsionDeg = 3,
-	vignette = 0.55,
+	vignette = 0.75,
 }
 
 -- How fast k moves: it runs 0 to 1 in engageSeconds while Focus is held (or toggled on) and back in releaseSeconds. A choice; the
@@ -124,9 +130,9 @@ Eyes.shimmer = {
 -- Eyes.principal. `ramp` is the gradient's transparency from the edge inward; the bands are fractions of the screen's height
 -- (top and bottom) and width (left and right).
 Eyes.vignette = {
-	color = { 8, 20, 12 },
+	color = { 48, 52, 48 },
 	ramp = { { 0, 0 }, { 0.25, 0.35 }, { 0.55, 0.75 }, { 1, 1 } },
-	topBottom = 0.22, leftRight = 0.16,
+	topBottom = 0.38, leftRight = 0.36,
 }
 
 -- ---------------------------------------------------------------- the words, the first time
@@ -134,7 +140,7 @@ Eyes.vignette = {
 -- %s is "Hold" or "Press" (a toggled Focus) and then the Focus key or button of the device in use (ControlText).
 Eyes.caption = {
 	seconds = 6, fadeInSeconds = 0.4, fadeOutSeconds = 1.5,
-	side = "Spider-eye view: the side eyes see wide, mostly in green, and catch movement.",
+	side = "Spider-eye impression: a clear colour centre, muted edges that still catch movement.",
 	principal = "%s %s for the principal eyes: narrow, sharp, telephoto, in green and ultraviolet (shown as violet).",
 	hold = "Hold", toggle = "Press",
 }

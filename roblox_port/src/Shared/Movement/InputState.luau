@@ -73,9 +73,9 @@ function InputState.axes(self: InputState): (number, number)
 	return x / length, y / length
 end
 -- Look rate in -1..1 per axis: right stick plus arrow keys.
-function InputState.lookAxes(self: InputState): (number, number)
-	local x = self.lx + (if self.held.LookRight then 1 else 0) - (if self.held.LookLeft then 1 else 0)
-	local y = self.ly + (if self.held.LookDown then 1 else 0) - (if self.held.LookUp then 1 else 0)
+function InputState.lookAxes(self: InputState, aiming: boolean?): (number, number)
+	local x = self.lx + (if aiming then self.x else 0) + (if self.held.LookRight then 1 else 0) - (if self.held.LookLeft then 1 else 0)
+	local y = self.ly - (if aiming then self.y else 0) + (if self.held.LookDown then 1 else 0) - (if self.held.LookUp then 1 else 0)
 	return math.clamp(x, -1, 1), math.clamp(y, -1, 1)
 end
 -- Focus loss, the Roblox menu, a text box, a lost controller: nothing stays held.

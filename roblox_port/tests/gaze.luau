@@ -334,5 +334,26 @@ case("camera: the camera going round never moves the cone", function()
 	camera:Destroy()
 end)
 
+case("soft skin reduces real walking and stalking; hardening restores both", function()
+ local Growth=require("../src/Shared/Life/Growth")
+ local g=Growth.new();g.softHoursLeft=Growth.SOFT_HOURS
+ local restored=Growth.new();assert(restored:load(g:toRecord()))
+ for _,creep in {false,true} do
+  local normal,soft=newMotor(),newMotor()
+  normal:place(Vector3.new(0,.31,10),Vector3.yAxis,Vector3.xAxis)
+  soft:place(normal.pos,Vector3.yAxis,Vector3.xAxis)
+  soft:setSpeedFactor(restored:speedFactor());soft:setReachFactor(restored:reachFactor())
+  local start=normal.pos
+  ticks(normal,30,{wish=Vector3.xAxis,creep=creep});ticks(soft,30,{wish=Vector3.xAxis,creep=creep})
+  check((normal.pos-start).Magnitude>.1,"normal spider actually moves")
+  near((soft.pos-start).Magnitude/(normal.pos-start).Magnitude,.65,1e-6,"soft walk/stalk distance reduced after restore")
+  local before=soft.pos
+  soft:setSpeedFactor(1);ticks(soft,30,{wish=Vector3.xAxis,creep=creep})
+  near((soft.pos-before).Magnitude,(normal.pos-start).Magnitude,1e-6,"normal pace restored")
+  normal:destroy();soft:destroy()
+ end
+ restored:passHours(Growth.SOFT_HOURS,Vector3.zero)
+ check(restored:speedFactor()==1 and restored:reachFactor()==1,"hardening restores speed and jump capacity")
+end)
 print(`GAZE passed={passed} failed={failed}`)
 if failed > 0 then error("gaze checks failed") end

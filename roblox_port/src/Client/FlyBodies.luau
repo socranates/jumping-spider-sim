@@ -199,11 +199,13 @@ end
 -- Switches a fly's parts that differ between the poses (the legs' reach, the wings, their veins and films, the shadow).
 function FlyBodies.pose(self: any, rig: any, flying: boolean)
 	rig.flying = flying
-	for _, i in self.template.changing do
-		local spec = self.template.specs[i]
+	for i, spec in self.template.specs do
 		local pose = if flying then spec.flight else spec.rest
-		rig.parts[i].Size = pose.size
-		rig.parts[i].Transparency = pose.transparency
+		rig.parts[i].Size = pose.size * (rig.scale or 1)
+		rig.parts[i].Transparency = if rig.scale == 0.6 and string.find(spec.name, "Stripe") then 1 else pose.transparency
+		local name = spec.name
+		rig.parts[i].Color = if rig.scale == 0.6 and (name == "Head" or name == "Thorax" or name == "Abdomen" or name == "Face") then Color3.fromRGB(178, 132, 65)
+			elseif rig.scale == 0.6 and (name == "EyeL" or name == "EyeR") then Color3.fromRGB(176, 39, 24) else spec.color
 	end
 end
 
@@ -219,16 +221,19 @@ function FlyBodies.draw(self: any, flies: { any }, now: number)
 		present[fly.id] = true
 		local rig = self.rigs[fly.id] or self:spawn(fly.id)
 		local flying = fly:airborne() or fly.state == "CAPTURED"
-		if flying ~= rig.flying then self:pose(rig, flying) end
+		local scale = if fly.profile then fly.profile.body.visual_scale or 1 else 1
+		if flying ~= rig.flying or rig.scale ~= scale then rig.scale = scale; self:pose(rig, flying) end
 		local heading = fly.heading
 		-- the back is up: a fly in the air has no surface (the normal it carries is the one it last stood on, which would roll it sideways after
 		-- a take-off from a wall), so it keeps its back to the sky; a held fly follows the spider's grip
 		local normal = if fly:airborne() then Vector3.yAxis else fly.normal
 		local up = if math.abs(heading.Unit:Dot(normal)) > 0.999 then Vector3.zAxis else normal -- a heading along the normal has no turn to give
-		local body = CFrame.lookAt(fly.position, fly.position + heading, up)
+		local position = fly.position - normal * (if flying then 0 else FlyLook.hover * (1 - scale))
+		local body = CFrame.lookAt(position, position + heading, up)
 		local poses = if flying then template.flightFrames else template.restFrames
 		for i, part in rig.parts do
-			local frame = body * poses[i]
+			local localFrame = poses[i]
+			local frame = body * (CFrame.new(localFrame.Position * scale) * localFrame.Rotation)
 			if flying and template.fans[i] then frame *= CFrame.Angles(math.sin(now * shimmer[1] + i) * shimmer[2], 0, 0) end
 			table.insert(parts, part)
 			table.insert(frames, frame)

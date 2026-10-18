@@ -299,6 +299,14 @@ for _, e in wide.eyes do if e.principal then table.insert(wideFront, e) end end
 check(wideFront[2].at.X > front[2].at.X + 0.02, "eye.ame.x spreads the front eyes")
 check(Anatomy.layout(with(function(l) l.headRadii = { 0.30, 0.24, 0.30 } end)).headRadii.X == 0.30, "headRadii sets the head")
 
+-- Snap accents have quiet intervals, deterministic bounded peaks, and no camera/root motion.
+local peakSnap, quiet = 0, 0
+for i=0,600 do
+ local yaw,lift=Idle.snap(i/60,false)
+ check(math.abs(yaw)<=math.rad(5)+1e-9 and lift>=0 and lift<=.022+1e-9,"snap stays bounded")
+ peakSnap=math.max(peakSnap,math.abs(yaw));if yaw==0 and lift==0 then quiet+=1 end
+end
+check(peakSnap>math.rad(4) and quiet>300,"snaps are distinct bursts with still pauses")
 -- ---------------------------------------------------------------- idle motion
 local cfg = look.idle
 local lim = Idle.limits(cfg)
@@ -397,7 +405,7 @@ local a1, b1 = snapshot(fullFloor), snapshot(lowFloor)
 settle(fullFloor, 4); settle(lowFloor, 4)
 local a2, b2 = snapshot(fullFloor), snapshot(lowFloor)
 check(moved(a1, a2) > 0.004, `full detail: the standing spider breathes, tilts its head and drums its palps ({string.format("%.4f", moved(a1, a2))} studs)`)
-check(moved(b1, b2) < 1e-9, "low detail: no idle motion at all")
+check(moved(b1, b2) < 0.12, "low detail: bounded snap accents without elaborate idle detail")
 check(moved(a1, a2) < 0.12, "idle motion stays small")
 local feetStill = true
 for i, leg in fullFloor._legs do feetStill = feetStill and feet[i] ~= nil and leg.planted ~= nil and (leg.planted - feet[i]).Magnitude < 1e-9 end
@@ -517,13 +525,29 @@ check(fanParts(pFloor, "FanField")[1].Size.X < foldedWidth * 1.05, "with no pose
 -- The pose says nothing to an appearance without a fan, and slow dance steps never reach the collider.
 dFloor.dance = pose
 local before = snapshot(dFloor)
-settle(dFloor, 0.1)
+dFloor:update(body, 0, true, false)
 check(dFloor._fan == nil and moved(before, snapshot(dFloor)) < 0.05, "the default spider has no fan and ignores a dance pose")
 -- The spider-eye view hides the fan with the body.
 pFloor:setEyeView(true)
 local hidden = true
 for _, f in fanParts(pFloor, "FanFringe") do hidden = hidden and f.LocalTransparencyModifier == 1 end
 check(hidden, "the eye view hides the fan")
+dFloor.dance=nil
+dFloor.reducedMotion=false
+dFloor.jumpLoad=1
+local anchors={};for i,leg in dFloor._legs do anchors[i]=leg.foot end
+settle(dFloor,.25)
+check(dFloor._shownLoad>.99,"held jump builds the drawn preparation")
+local feetStill=true;for i,leg in dFloor._legs do feetStill=feetStill and (leg.foot-anchors[i]).Magnitude<1e-8 end
+check(feetStill and (dFloor.root.Position-body.Position).Magnitude<1e-9,"preparation keeps planted feet and physics root unchanged")
+dFloor.reducedMotion=true
+dFloor:update(body,.2,true,false)
+check(dFloor._shownLoad==0,"reduced motion clears preparation")
+dFloor.jumpLoad=0;dFloor.jumpPush=1;dFloor.reducedMotion=false
+dFloor:update(body,0,false,false)
+local extended=dFloor._legs[3].tarsus.Position
+dFloor.jumpPush=0;dFloor:update(body,0,false,false)
+check((dFloor._legs[3].tarsus.Position-extended).Magnitude>.03,"rear legs visibly extend at takeoff")
 for _, r in { pFull, pLow, pFloor, dFloor } do r:destroy() end
 
 print(`LOOK passed={passed} failed={failed}`)

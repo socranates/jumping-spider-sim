@@ -1,3 +1,13 @@
+# Latest: player feedback published v22 — Chet, 2026-10-18
+
+Published to the existing Windowsill place 120119801868085; no audience/security/monetization changes. Added food bar and meal-equivalent moult progress, left-stick jump aim, slightly easier fly captures, a small fruit-fly-inspired prey profile, two plants/new leaves and an upper ledge, more twitch, visible jump bracing/rear-leg push, and a coloured clear eye-view centre with muted edges. Soft skin now slows walking/stalking to 65%; existing 0.7 jump reach remains until hardening and survives rest restore.
+
+Final build **c2dcf7301abf3792**, accepted CLI **48,218**, strict clean, **167/167** compile. Studio **111/111 engine + 27/27 client** passed at b7161446d2fd178f before the final soft-skin change. That last change has targeted CLI and normal startup coverage, not a fresh full Studio pass. See docs/verification/roblox-player-feedback/RESULTS.md and docs/HANDOFF-roblox-player-feedback.md. Historical failing logs are documented, not claimed as passes.
+
+Next: Nathan tries v22 in a fresh PlayStation session, especially left-stick aim, post-moult pace, food text and eye-view comfort. Claude: native soft-skin/save-restore acceptance; compact short-phone HUD; then release presentation and notebook science/source review. Eye edges are a contrast wash, not true selective greyscale. Fruit fly is a reused fly-brain prototype. Keep species-specific science caveats, twitch, SimClock, free first spider/full game and free testing peacock (future ~US$0.99 cosmetic pass). Physical devices/F01 and a complete life remain unaccepted. Godot and SPEC stay frozen.
+
+---
+
 # Latest: settings accepted and published v20 — Chet, 2026-10-18
 
 Claude's settings bundle 9c63783 is integrated. Build **d89045d8f2212cda**: **47,547 CLI checks**, **111/111 Studio engine checks (zero skipped)** and **24/24 live-client checks** pass; strict analysis clean, **167/167** scripts compile. Native tests include real TextService measurements and isolated real DataStore operations. Chet also changed normal-game volume to 75% and enabled large text, stopped and restarted Play, and saw both choices restored from the cloud.

@@ -9,6 +9,7 @@ Growth.READY_FOOD = 0.9
 Growth.MOULT_HOURS = 12
 Growth.SOFT_HOURS = 10
 Growth.SOFT_REACH = 0.7
+Growth.SOFT_SPEED = 0.65 -- Gameplay tuning for the vulnerable soft-cuticle period.
 local function finite(v: any): boolean
  return type(v)=="number" and v==v and math.abs(v)<math.huge
 end
@@ -20,6 +21,7 @@ function Growth.isMoulting(self: any): boolean return self.moultingHoursLeft>0 e
 function Growth.isSoft(self: any): boolean return self.softHoursLeft>0 end
 function Growth.stageName(self: any): string return Growth.STAGES[self.stage+1] end
 function Growth.reachFactor(self: any): number return if self:isSoft() or self:isMoulting() then Growth.SOFT_REACH else 1 end
+function Growth.speedFactor(self: any): number return if self:isSoft() or self:isMoulting() then Growth.SOFT_SPEED else 1 end
 function Growth.softness(self: any): number return if self:isMoulting() then 1 else math.clamp(self.softHoursLeft/Growth.SOFT_HOURS,0,1) end
 function Growth.eat(self: any, energy: number): boolean
  if not finite(energy) or energy<=0 or self:isAdult() or self:isMoulting() then return false end

@@ -390,6 +390,12 @@ return Detail
 -- (docs/VISION_RESEARCH.md, EYE-14, still applies to prey, glass and leaves). The sensor's own peripheral cone (Species,
 -- peripheral_cone_degrees 300) is narrower than the anatomical 330 degrees: the shimmer shows what the sensor found.
 
+-- Player-feedback revision: simultaneous central colour and muted surround. The four neutral
+-- edge gradients are a contrast/colour wash, NOT a true regional desaturation shader or blur.
+-- Roblox BlurEffect is global, so it is disabled to keep the centre clear. The centre is a
+-- readable approximation of combined principal-eye sampling, not a human fovea or measured
+-- angular boundary. Focus still narrows the view; retina strips and motion cues remain.
+-- The historical optical-model descriptions below refer to the earlier whole-screen blend.
 local Eyes = {}
 
 Eyes.sources = {
@@ -421,12 +427,12 @@ Eyes.sources = {
 -- with the principal eyes). The vignette is the telephoto dark edge, as an opacity at the screen's edge.
 Eyes.side = {
 	fovDeg = 90,
-	saturation = -0.85, tint = { 170, 228, 165 }, contrast = 0.12, brightness = 0.03,
-	blur = 2.5,
+	saturation = 0.15, tint = { 115, 255, 236 }, contrast = 0.12, brightness = 0.03,
+	blur = 0,
 	dofFar = 0.35, dofNear = 0.25, dofRadiusMin = 6, dofRadiusPerStud = 0.6,
 	strokeTransparency = 0.82, fillTransparency = 0.96,
 	sweepDeg = 4, torsionDeg = 12,
-	vignette = 0.35,
+	vignette = 0.65,
 }
 Eyes.principal = {
 	fovDeg = 24,
@@ -435,7 +441,7 @@ Eyes.principal = {
 	dofFar = 0.75, dofNear = 0.6, dofRadiusMin = 0.6, dofRadiusPerStud = 0.12,
 	strokeTransparency = 0.68, fillTransparency = 0.93, -- fainter than first drawn: zoomed in, the strips are large and frame the target
 	sweepDeg = 0.6, torsionDeg = 3,
-	vignette = 0.55,
+	vignette = 0.75,
 }
 
 -- How fast k moves: it runs 0 to 1 in engageSeconds while Focus is held (or toggled on) and back in releaseSeconds. A choice; the
@@ -490,9 +496,9 @@ Eyes.shimmer = {
 -- Eyes.principal. `ramp` is the gradient's transparency from the edge inward; the bands are fractions of the screen's height
 -- (top and bottom) and width (left and right).
 Eyes.vignette = {
-	color = { 8, 20, 12 },
+	color = { 48, 52, 48 },
 	ramp = { { 0, 0 }, { 0.25, 0.35 }, { 0.55, 0.75 }, { 1, 1 } },
-	topBottom = 0.22, leftRight = 0.16,
+	topBottom = 0.38, leftRight = 0.36,
 }
 
 -- ---------------------------------------------------------------- the words, the first time
@@ -500,7 +506,7 @@ Eyes.vignette = {
 -- %s is "Hold" or "Press" (a toggled Focus) and then the Focus key or button of the device in use (ControlText).
 Eyes.caption = {
 	seconds = 6, fadeInSeconds = 0.4, fadeOutSeconds = 1.5,
-	side = "Spider-eye view: the side eyes see wide, mostly in green, and catch movement.",
+	side = "Spider-eye impression: a clear colour centre, muted edges that still catch movement.",
 	principal = "%s %s for the principal eyes: narrow, sharp, telephoto, in green and ultraviolet (shown as violet).",
 	hold = "Hold", toggle = "Press",
 }
@@ -537,6 +543,8 @@ local Flora = {}
 -- footprint with its top at the piece's top, and each stem piece as a round petiole inscribed in its box.
 Flora.pilea = {
 	plants = {
+		{ leaf = "leaf_garden", stem = "stem_garden" },
+		{ leaf = "leaf_high", stem = "stem_high" },
 		{ leaf = "leaf_west", stem = "stem_west" },
 		{ leaf = "leaf_middle", stem = "stem_middle" },
 		{ leaf = "leaf_east", stem = "stem_east" },
@@ -761,6 +769,8 @@ Graphics.materials = {
 	-- the physical pieces of the sill (Habitat/WindowsillLayout.PIECES), by id. SmoothPlastic is clean at any scale: the sill is
 	-- cream enamel, the leaves are glossy; Roblox's textured materials tile in studs, so at 1 stud = 1 cm they are coarse.
 	pieces = {
+		upper_ledge = "Wood", garden_step = "Plaster",
+		leaf_garden = "SmoothPlastic", stem_garden = "SmoothPlastic", leaf_high = "SmoothPlastic", stem_high = "SmoothPlastic",
 		sill_floor = "SmoothPlastic", front_lip = "SmoothPlastic",
 		back_frame = "Plaster", left_frame = "Plaster", right_frame = "Plaster",
 		planter = "Plaster", planter_rim = "Plaster",
@@ -1529,7 +1539,7 @@ local data = {
 			radius_wu = 0.3,
 			length_wu = 0.7,
 			hover_wu = 0.16,
-			capture_radius_wu = 0.4,
+			capture_radius_wu = 0.45, -- Nathan playtest: total contact allowance 0.70 -> 0.75 WU (+7%); senses unchanged
 			nutrition = 0.35,
 			capture_assist_scale = 1.6,
 			feed_rate_per_s = 0.1,
@@ -1684,6 +1694,19 @@ local data = {
 	},
 }
 
+-- A second, fruit-fly-inspired prey profile. Reuses the flight/senses model; these are game values,
+-- not a claim that Drosophila has the house fly's measured behaviour.
+local function copy(value: any): any
+ if type(value) ~= "table" then return value end
+ local out = {}; for k,v in value do out[k] = copy(v) end; return out
+end
+local fruit = copy(data.fly_like_prototype)
+fruit.body.nutrition = 0.18
+fruit.body.visual_scale = 0.60
+fruit.body.radius_wu = 0.18
+fruit.body.capture_radius_wu = 0.42
+fruit.body.prey_kind = "fruit_fly"
+data.fruit_fly_prototype = fruit
 return table.freeze(data)
 ]]></string>
           </Properties>
@@ -3464,7 +3487,14 @@ local function v(x: number, y: number, z: number): Vector3
 	return Vector3.new(x, y, z)
 end
 
+-- Additive upper garden: old support boxes/IDs and retreat remain unchanged for existing rests.
 Layout.PIECES = {
+	{ id = "upper_ledge", lo = v(-20, 13.8, -12.5), hi = v(18, 14.4, -8), profile = "bare_wood_rough", color = hex("a78861") },
+	{ id = "garden_step", lo = v(-12, 0, 5), hi = v(-6, 1.2, 10), profile = "brick_rough", color = hex("b5744c") },
+	{ id = "leaf_garden", lo = v(-11.5, 7.4, 3), hi = v(-6, 7.8, 9), profile = "leaf_dry_prototype", color = hex("66884a") },
+	{ id = "stem_garden", lo = v(-10, 1.2, 5.5), hi = v(-9, 7.4, 6.5), profile = "leaf_dry_prototype", color = hex("536b43") },
+	{ id = "leaf_high", lo = v(-14, 10.8, -9), hi = v(-7, 11.2, -3), profile = "leaf_dry_prototype", color = hex("78985c") },
+	{ id = "stem_high", lo = v(-11, 0, -6.5), hi = v(-10, 10.8, -5.5), profile = "leaf_dry_prototype", color = hex("536b43") },
 	{ id = "sill_floor", lo = v(-30, -1, -12.5), hi = v(30, 0, 12.5), profile = "painted_wood_dry", color = hex("b6a082") },
 	{ id = "back_frame", lo = v(-31, 0, -13.5), hi = v(31, 14, -12.5), profile = "bare_wood_rough", color = hex("ded7c3") },
 	{ id = "left_frame", lo = v(-31, 0, -12.5), hi = v(-30, 14, 12.5), profile = "bare_wood_rough", color = hex("ded7c3") },
@@ -3871,6 +3901,7 @@ Growth.READY_FOOD = 0.9
 Growth.MOULT_HOURS = 12
 Growth.SOFT_HOURS = 10
 Growth.SOFT_REACH = 0.7
+Growth.SOFT_SPEED = 0.65 -- Gameplay tuning for the vulnerable soft-cuticle period.
 local function finite(v: any): boolean
  return type(v)=="number" and v==v and math.abs(v)<math.huge
 end
@@ -3882,6 +3913,7 @@ function Growth.isMoulting(self: any): boolean return self.moultingHoursLeft>0 e
 function Growth.isSoft(self: any): boolean return self.softHoursLeft>0 end
 function Growth.stageName(self: any): string return Growth.STAGES[self.stage+1] end
 function Growth.reachFactor(self: any): number return if self:isSoft() or self:isMoulting() then Growth.SOFT_REACH else 1 end
+function Growth.speedFactor(self: any): number return if self:isSoft() or self:isMoulting() then Growth.SOFT_SPEED else 1 end
 function Growth.softness(self: any): number return if self:isMoulting() then 1 else math.clamp(self.softHoursLeft/Growth.SOFT_HOURS,0,1) end
 function Growth.eat(self: any, energy: number): boolean
  if not finite(energy) or energy<=0 or self:isAdult() or self:isMoulting() then return false end
@@ -5132,9 +5164,9 @@ function InputState.axes(self: InputState): (number, number)
 	return x / length, y / length
 end
 -- Look rate in -1..1 per axis: right stick plus arrow keys.
-function InputState.lookAxes(self: InputState): (number, number)
-	local x = self.lx + (if self.held.LookRight then 1 else 0) - (if self.held.LookLeft then 1 else 0)
-	local y = self.ly + (if self.held.LookDown then 1 else 0) - (if self.held.LookUp then 1 else 0)
+function InputState.lookAxes(self: InputState, aiming: boolean?): (number, number)
+	local x = self.lx + (if aiming then self.x else 0) + (if self.held.LookRight then 1 else 0) - (if self.held.LookLeft then 1 else 0)
+	local y = self.ly - (if aiming then self.y else 0) + (if self.held.LookDown then 1 else 0) - (if self.held.LookUp then 1 else 0)
 	return math.clamp(x, -1, 1), math.clamp(y, -1, 1)
 end
 -- Focus loss, the Roblox menu, a text box, a lost controller: nothing stays held.
@@ -5922,6 +5954,7 @@ function Motor.new(config: Config): any
 		surfaces = config.surfaces,
 		loco = loco,
   reachFactor = 1,
+  speedFactor = 1,
 		gravity = Vector3.new(0, -loco.gravity_wu_s2, 0),
 		params = params,
 		overlap = overlap,
@@ -6138,6 +6171,10 @@ function Motor.setReachFactor(self: any, reach: number)
  self.planKey="";self.plan=nil
 end
 
+function Motor.setSpeedFactor(self: any, speed: number)
+ self.speedFactor=math.clamp(speed,0.1,1)
+end
+
 function Motor.aimPlan(self: any): any
 	local hit = self:_ray(self.aimOrigin, self.aimDirection * AIM_RANGE)
 	local key = if hit
@@ -6260,7 +6297,7 @@ function Motor.requestDrop(self: any): boolean
 	if plan.direction.Magnitude < 1e-6 then
 		if self:_beginDrop(self.up) then self.pos += self.up * 0.01 end
 	else
-		self.silk.walk = { direction = plan.direction, ticks = math.ceil((plan.distance / self.loco.walk_speed_wu_s + 1.5) * 60) }
+		self.silk.walk = { direction = plan.direction, ticks = math.ceil((plan.distance / (self.loco.walk_speed_wu_s*self.speedFactor) + 1.5) * 60) }
 		self.silk.message = "Walking to the edge — move or cancel to stop"
 		self:_event("drop_walk")
 	end
@@ -6462,7 +6499,7 @@ function Motor._tickAttached(self: any, input: TickInput)
 		return
 	end
 	local stalk = input.creep and not silk.walk
-	local speed = if stalk then self.loco.stalk_speed_wu_s else self.loco.walk_speed_wu_s
+	local speed = (if stalk then self.loco.stalk_speed_wu_s else self.loco.walk_speed_wu_s)*self.speedFactor
 	self.heading = SupportMath.tangentDir(SupportMath.rotateToward(self.heading, dir, TURN_RATE * DT), self.up)
 	local step = dir * speed * DT
 	-- Concave corner: a wall (or a leaf's edge, a stem) ahead becomes the new support.
@@ -8547,6 +8584,7 @@ return Signal
 -- Godot checkpoints are not read and schema numbers start again at 1. Schema 3 adds growth and its food ledger cursor.
 -- The passing shadow and notebook are not recorded.
 
+local Species = require(script.Parent.Parent.Data.Species)
 local ObjectRecord = require(script.Parent.ObjectRecord)
 local Fly = require(script.Parent.Parent.Prey.Fly)
 local FlyFlight = require(script.Parent.Parent.Prey.FlyFlight)
@@ -8598,6 +8636,7 @@ function Checkpoint.refs(world: World): { [string]: any }
 	local refs: { [string]: any } = {}
 	local prey = world.prey
 	ObjectRecord.constants("flyProfile", prey.p, refs)
+	ObjectRecord.constants("fruitFlyProfile", Species.fruit_fly_prototype, refs)
 	local g = prey.graph
 	refs["graph.cast"], refs["graph.sweep"], refs["graph.overlap"] = g.cast, g.sweep, g.overlap
 	if prey.probe ~= nil then refs["prey.probe"] = prey.probe end
@@ -11851,6 +11890,7 @@ return G
             <string name="Source"><![CDATA[--!strict
 -- Solo client world of perceivable flies. Godot order: sensor, prey, motor, capture/feeding.
 local Fly=require(script.Parent.Fly)
+local Species=require(script.Parent.Parent.Data.Species)
 local Graph=require(script.Parent.PerchGraph)
 local Population=require(script.Parent.PreyPopulation)
 local Feeding=require(script.Parent.Feeding)
@@ -11861,8 +11901,8 @@ local POINTS: {{string | number}}={
  {'west_leaf',-15,4.2,-1},{'east_leaf',22,5.4,-2},{'under_leaf',-12.8,0,-2},{'front_path',1,0,8},
  {'east_corner',27,0,-7},{'back_path',-9,0,-9},{'rim_west',5,4.6,-5},{'rim_east',15,4.6,-5},
 }
-function D.new(graph: any,profile: any,seed: number,target: number): any
- local self:any=setmetatable({graph=graph,p=profile,seed=seed,target=target,flies={},serial=0,now=0,tick=0,
+function D.new(graph: any,profile: any,seed: number,target: number,mixed: boolean?): any
+ local self:any=setmetatable({graph=graph,p=profile,mixed=mixed==true,seed=seed,target=target,flies={},serial=0,now=0,tick=0,
   population=Population.new(profile.population,seed+117,target),feeding=Feeding.new(),vents={},strikeEnd=-1,previousMode='attached',
   captures=0,enabled=true,cpu={},candidates=0,entryChecks=0},D)
  for i,row in POINTS do
@@ -11889,7 +11929,8 @@ function D.new(graph: any,profile: any,seed: number,target: number): any
 end
 function D.spawn(self: any,perch: any): any
  self.serial+=1
- local f=Fly.new('fly_'..self.serial,self.serial,self.seed+self.serial*997,perch,self.graph,self.p,self.now)
+ local profile = if self.mixed~=false and self.serial%3==0 then Species.fruit_fly_prototype else self.p
+ local f=Fly.new('fly_'..self.serial,self.serial,self.seed+self.serial*997,perch,self.graph,profile,self.now)
  table.insert(self.flies,f);return f
 end
 function D.percepts(self: any): {any}
@@ -11920,7 +11961,7 @@ function D.before(self: any,dt: number,position: Vector3,observer: any,sensor: a
  self.beforeCost=(os.clock()-started)*1e6
 end
 function D.escape(self: any,f: any)
- f.state='SEEK_PERCH';f.stateSince=self.now;f.senses.awareness=self.p.senses.awareness_max
+ f.state='SEEK_PERCH';f.stateSince=self.now;f.senses.awareness=f.profile.senses.awareness_max
  f.senses.hasLastSeen=true;f.senses.lastSeenPosition=self.previousPosition;f.senses.lastSeenTime=self.now
  f:launch('flee',self.now)
 end
@@ -11935,12 +11976,12 @@ function D.after(self: any,dt: number,motor: any,sensor: any,cast: any)
  if self.tick<=self.strikeEnd and not self.feeding.held then
   for _,f in self.flies do if f:alive() then
    local t,d=M.sweepClosest(self.previousPosition,motor.pos,f.prevPosition,f.position)
-   if d<=self.p.body.capture_radius_wu+.3 then
+   if d<=f.profile.body.capture_radius_wu+.3 then
     local a=self.previousPosition:Lerp(motor.pos,t);local b=f.prevPosition:Lerp(f.position,t)
     if not cast(a,b) then
      f.flight:release();if f.perch and f.perch.occupant==f.id then f.perch.occupant='' end
      f.state='CAPTURED';f.captureSerial+=1;f.captureKey=f.id..':'..f.captureSerial;f.velocity=Vector3.zero
-     sensor:onCapture(b,self.p.body.radius_wu);self.feeding:capture(f);self.captures+=1;break
+     sensor:onCapture(b,f.profile.body.radius_wu);self.feeding:capture(f);self.captures+=1;break
     end
    end
   end end
@@ -11954,14 +11995,14 @@ function D.after(self: any,dt: number,motor: any,sensor: any,cast: any)
  for i=#self.flies,1,-1 do if self.flies[i].state=='CONSUMED' then table.remove(self.flies,i) end end
  table.insert(self.cpu,(self.beforeCost or 0)+(os.clock()-started)*1e6);if #self.cpu>1200 then table.remove(self.cpu,1) end
 end
-function D.engine(world: Instance,profile: any,seed: number,target: number): any
+function D.engine(world: Instance,profile: any,seed: number,target: number,mixed: boolean?): any
  local params=RaycastParams.new();params.FilterType=Enum.RaycastFilterType.Include;params.FilterDescendantsInstances={world}
  local overlap=OverlapParams.new();overlap.FilterType=Enum.RaycastFilterType.Include;overlap.FilterDescendantsInstances={world}
  local probe=Instance.new('Part');probe.Name='FlyClearanceProbe';probe.Shape=Enum.PartType.Ball;probe.Anchored=true;probe.CanCollide=false;probe.CanQuery=false;probe.CanTouch=false;probe.Transparency=1;probe.Parent=workspace
  local graph=Graph.new(function(a: Vector3,b: Vector3) return workspace:Raycast(a,b-a,params) end,
   function(a: Vector3,b: Vector3,r: number) if (b-a).Magnitude<1e-7 then return false end;return workspace:Spherecast(a,r,b-a,params)~=nil end,
   function(a: Vector3,r: number) probe.Size=Vector3.one*r*2;probe.Position=a;return #workspace:GetPartsInPart(probe,overlap)>0 end,profile)
- local self=D.new(graph,profile,seed,target);self.probe=probe;return self
+ local self=D.new(graph,profile,seed,target,mixed);self.probe=probe;return self
 end
 return D
 ]]></string>
@@ -12290,6 +12331,19 @@ function Idle.palps(t: number, drum: number, palp: any): { number }
 		out[k] = math.rad(palp.drumDeg) * drum * burst * beat
 	end
 	return out
+end
+
+-- Authored salticid-like stop/snap/settle accents, not a measured biological frequency.
+-- Short asymmetric pulses separated by stillness, instead of continuous vibration.
+function Idle.snap(t: number, moving: boolean): (number, number)
+	local function pulse(period: number, offset: number): number
+		local phase = (t + offset) % period
+		if phase >= 0.19 then return 0 end
+		if phase < 0.035 then return phase / 0.035 end
+		return (1 - (phase - 0.035) / 0.155) ^ 2
+	end
+	local a, b = pulse(1.37, 0.31), pulse(2.11, 0.83)
+	return math.rad(if moving then 3 else 5) * (a - b), 0.022 * a
 end
 
 return Idle
@@ -12910,6 +12964,9 @@ export type Rig = typeof(setmetatable(
   _softness: number,
   _condition: number,
   _shownCondition: number,
+  jumpLoad: number,
+  jumpPush: number,
+  _shownLoad: number,
   _sizes: {[BasePart]: Vector3},
   _colors: {[BasePart]: Color3},
 		_drop: number,
@@ -13032,7 +13089,7 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		_parts = {} :: { BasePart },
 		_cframes = {} :: { CFrame },
 		_k = look.scale or 1,
-  _growth = 1, _softness = 0, _condition = 0.55, _shownCondition = 0.55,
+  _growth = 1, _softness = 0, _condition = 0.55, _shownCondition = 0.55, jumpLoad = 0, jumpPush = 0, _shownLoad = 0,
   _sizes = {} :: {[BasePart]: Vector3}, _colors = {} :: {[BasePart]: Color3},
 		_drop = look.bodyDrop or 0,
 		_fan = nil :: Fan?,
@@ -13375,7 +13432,12 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 
 	-- Palps drum in bursts while the spider stands still; breathing and a curious head tilt ease in after a moment. All of
 	-- it is full detail only (cfg.idle), and reducedMotion turns it off too.
-	local standing = cfg.idle and grounded and not moving and not self.reducedMotion and not dancing
+	local loading = grounded and self.jumpLoad > 0
+ local push = if self.reducedMotion then 0 else math.clamp(self.jumpPush,0,1)
+ local desiredLoad = if loading and not self.reducedMotion then math.clamp(self.jumpLoad,0,1) else 0
+ self._shownLoad += math.clamp(desiredLoad-self._shownLoad,-12*dt,6*dt)
+ local load = if self.reducedMotion then 0 else self._shownLoad
+ local standing = cfg.idle and grounded and not moving and not self.reducedMotion and not dancing and not loading
 	self._drum = math.clamp(self._drum + (if standing then 3 else -3) * dt, 0, 1)
 	local palpAngle = Idle.palps(self._t, self._drum, look.palp)
 	local bodyBase, headBase, abdomenBase = body, body, body
@@ -13391,6 +13453,20 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 				* CFrame.Angles(-pose.abdomenPitch, 0, 0) * CFrame.new(-A.pedicelCenter*g)
 		end
 	end
+	-- Display-only snaps also run on low-detail devices. Camera/root, foot anchors and motor stay unchanged.
+	if grounded and not self.reducedMotion and not dancing and not loading then
+		local yaw, lift = Idle.snap(self._t, moving)
+		local accent = body * CFrame.new(0, lift * g, 0) * CFrame.Angles(0, yaw, 0) * body:Inverse()
+		bodyBase, headBase, abdomenBase = accent * bodyBase, accent * headBase, accent * abdomenBase
+	end
+ -- A visible preparation and extension, not a pressure gauge or an inflated body. Hydraulic
+ -- extension and muscle action both matter; their jump contribution varies among species
+ -- (Nabawy et al. 2018, doi:10.1038/s41598-018-25227-9). Timings are display tuning.
+ if not dancing and (load > 0 or push > 0) then
+  local brace = body * CFrame.new(0,(-0.065*load+0.025*push)*k,0)
+   * CFrame.Angles(-0.07*load+0.05*push,0,0) * body:Inverse()
+  bodyBase,headBase,abdomenBase=brace*bodyBase,brace*headBase,brace*abdomenBase
+ end
 	if dancing then
 		-- The abdomen pitches up about the pedicel and sways side to side (about the body's long axis), the palps flick in unison.
 		abdomenBase = bodyBase * CFrame.new(A.pedicelCenter*g) * CFrame.Angles(0, 0, display.abdomenSway + display.shiver)
@@ -13493,7 +13569,11 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 	for _, leg in self._legs do
 		local hip = bodyBase:PointToWorldSpace(Vector3.new(leg.side * L.hipX, L.hipY, L.hipZ[leg.pair])*g)
 		local foot = leg.foot
-		local knee = hip:Lerp(foot, 0.48) + up * kneeUp
+  local rear = leg.pair >= 3
+  if not grounded and rear and push > 0 then
+   foot += body:VectorToWorldSpace(Vector3.new(leg.side*.05,-.25,.18)*k*push)
+  end
+		local knee = hip:Lerp(foot, 0.48) + up * (if rear then kneeUp*(1-.7*push)+.035*k*load else kneeUp)
 		local own = if dancing and look.pairs then look.pairs[leg.pair] else nil
 		if own and display.legsRaise > 0 then
 			-- Legs III go up in a V beside the fan and wave: down and forward over the carapace, and back up (the planted foot below is untouched).
@@ -13769,7 +13849,7 @@ end
 
 -- The two lines at the reticle while aiming (JumpFeedback.describe, hold mode) and Godot's cancel hint beside the second.
 function ControlText.describe(plan: any, device: Device): (string, string)
-	local cancel = ControlText.name(device, "cancel") .. ": cancel the jump"
+	local cancel = (if device == "gamepad" then "Left stick: aim    " else "") .. ControlText.name(device, "cancel") .. ": cancel the jump"
 	if plan == nil then
 		return ControlText.TITLES.none, "release to cancel    " .. cancel
 	end
@@ -14424,6 +14504,15 @@ function LifeText.touchLabel(asleep: boolean, resting: boolean, canRest: boolean
 	return nil
 end
 
+-- A food-equivalent estimate, not a kill counter: small prey and partially eaten meals count.
+function LifeText.growth(g: any, required: number, meal: number): string
+ if g:isAdult() then return "Adult: keep your food reserves up." end
+ if g:isMoulting() then return "Moulting: stay in the crack." end
+ if g.ready then return "Ready to moult: rest in the crack." end
+ local fraction = math.clamp(g.fedSinceMoult / required, 0, 1)
+ local remaining = math.max(1, math.ceil((required - g.fedSinceMoult) / meal - 1e-9))
+ return `Next moult: {math.floor(fraction * 100)}% · about {remaining} housefly {if remaining == 1 then "meal" else "meals"} left`
+end
 return LifeText
 ]]></string>
           </Properties>
@@ -15459,7 +15548,7 @@ return WaspText
         <Properties>
           <string name="Name">BuildInfo</string>
           <string name="Source"><![CDATA[-- Generated by tools/build.py; do not edit.
-return { id = "d89045d8f2212cda" }
+return { id = "c2dcf7301abf3792" }
 ]]></string>
         </Properties>
       </Item>
@@ -16229,7 +16318,10 @@ return function(check: (string,()->())->())
   d:after(1/60,motor,sensor,function()return nil end);assert(not d.feeding.held and captures==0)
   d.previousMode='attached';motor.events={{kind='launched'}}
   d:after(1/60,motor,sensor,function(a,b)return (a+b)*.5 end);assert(not d.feeding.held and captures==0)
-  d:after(1/60,motor,sensor,function()return nil end);assert(d.feeding.held==f and captures==1)
+  motor.pos=Vector3.new(.76,10,0);d.previousPosition=motor.pos
+  d:after(1/60,motor,sensor,function()return nil end);assert(not d.feeding.held,"outside the modest new reach must miss")
+  motor.pos=Vector3.new(.74,10,0);d.previousPosition=motor.pos
+  d:after(1/60,motor,sensor,function()return nil end);assert(d.feeding.held==f and captures==1,"near miss inside new reach should catch")
  end)
  d.probe:Destroy();world:Destroy()
 end
@@ -18348,11 +18440,13 @@ end
 -- Switches a fly's parts that differ between the poses (the legs' reach, the wings, their veins and films, the shadow).
 function FlyBodies.pose(self: any, rig: any, flying: boolean)
 	rig.flying = flying
-	for _, i in self.template.changing do
-		local spec = self.template.specs[i]
+	for i, spec in self.template.specs do
 		local pose = if flying then spec.flight else spec.rest
-		rig.parts[i].Size = pose.size
-		rig.parts[i].Transparency = pose.transparency
+		rig.parts[i].Size = pose.size * (rig.scale or 1)
+		rig.parts[i].Transparency = if rig.scale == 0.6 and string.find(spec.name, "Stripe") then 1 else pose.transparency
+		local name = spec.name
+		rig.parts[i].Color = if rig.scale == 0.6 and (name == "Head" or name == "Thorax" or name == "Abdomen" or name == "Face") then Color3.fromRGB(178, 132, 65)
+			elseif rig.scale == 0.6 and (name == "EyeL" or name == "EyeR") then Color3.fromRGB(176, 39, 24) else spec.color
 	end
 end
 
@@ -18368,16 +18462,19 @@ function FlyBodies.draw(self: any, flies: { any }, now: number)
 		present[fly.id] = true
 		local rig = self.rigs[fly.id] or self:spawn(fly.id)
 		local flying = fly:airborne() or fly.state == "CAPTURED"
-		if flying ~= rig.flying then self:pose(rig, flying) end
+		local scale = if fly.profile then fly.profile.body.visual_scale or 1 else 1
+		if flying ~= rig.flying or rig.scale ~= scale then rig.scale = scale; self:pose(rig, flying) end
 		local heading = fly.heading
 		-- the back is up: a fly in the air has no surface (the normal it carries is the one it last stood on, which would roll it sideways after
 		-- a take-off from a wall), so it keeps its back to the sky; a held fly follows the spider's grip
 		local normal = if fly:airborne() then Vector3.yAxis else fly.normal
 		local up = if math.abs(heading.Unit:Dot(normal)) > 0.999 then Vector3.zAxis else normal -- a heading along the normal has no turn to give
-		local body = CFrame.lookAt(fly.position, fly.position + heading, up)
+		local position = fly.position - normal * (if flying then 0 else FlyLook.hover * (1 - scale))
+		local body = CFrame.lookAt(position, position + heading, up)
 		local poses = if flying then template.flightFrames else template.restFrames
 		for i, part in rig.parts do
-			local frame = body * poses[i]
+			local localFrame = poses[i]
+			local frame = body * (CFrame.new(localFrame.Position * scale) * localFrame.Rotation)
 			if flying and template.fans[i] then frame *= CFrame.Angles(math.sin(now * shimmer[1] + i) * shimmer[2], 0, 0) end
 			table.insert(parts, part)
 			table.insert(frames, frame)
@@ -20641,6 +20738,7 @@ local FlyBodies = require(script.Parent.FlyBodies)
 local WaspBody = require(script.Parent.WaspBody)
 local NeedsModel = require(Shared.Life.NeedsModel)
 local LifeLoop = require(Shared.Life.LifeLoop)
+local Growth = require(Shared.Life.Growth)
 local LifeSession = require(Shared.Life.LifeSession)
 local session = LifeSession.new()
 local LifeText = require(Shared.UI.LifeText)
@@ -20737,7 +20835,7 @@ sensor:configureFrom(Species.phidippus_audax_prototype.perception)
 local sightCast = Sensor.workspaceCast(params)
 local perceptionHud = PerceptionHud.new(player:WaitForChild("PlayerGui"))
 local stage = if Workspace:GetAttribute("TestTarget") == true or (Workspace:GetAttribute("TestTarget") ~= false and script.Parent:FindFirstChild("SilkPlayback")) then PerceptionStage.new(sill) else nil
-local prey = PreyDirector.engine(sill, Species.fly_like_prototype, 914, 4)
+local prey = PreyDirector.engine(sill, Species.fly_like_prototype, 914, 4, true)
 local flyBodies = FlyBodies.new(Workspace)
 local soundscape = Soundscape.new(Workspace)
 local waspBody = WaspBody.new(Workspace)
@@ -21035,7 +21133,7 @@ local function returnToCheckpoint()
 		return
 	end
 	session.mode, session.rules, session.ended = life.mode or "main", life.rules or "standard", false
- motor:setReachFactor(life.growth:reachFactor())
+ motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor())
  session:finishAdult(life.growth.stage)
 	session.summary = nil
 	controls:clear()
@@ -21065,7 +21163,7 @@ local function fresh(mode: string, easy: boolean, position: Vector3?): boolean
  if not initialRecord or (easy and not session.finishedMain) then return false end
  local ok=Checkpoint.restore(initialRecord,checkpointWorld)
  if not ok then return false end
- session:begin(mode,easy);applyRules();motor:setReachFactor(life.growth:reachFactor())
+ session:begin(mode,easy);applyRules();motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor())
  sensor:reset();memory:clear()
  stores[mode]=newStore();checkpoints=stores[mode]
  life.resting=false;life.notice="";life.noticeSeconds=0;life.restoreGrace=0
@@ -21404,6 +21502,7 @@ controls = SpiderInput.bind({
 local function tickInput(): any
  if life.growth:isMoulting() then return SpiderMotor.idleInput() end
 	local r, f = controls:axes()
+	if jump:isAiming() then r, f = 0, 0 end -- left stick aims, never walks during the held jump
 	local wish = Vector3.zero
 	if r ~= 0 or f ~= 0 then
 		-- Over a sharp edge the stick keeps carrying the spider the way it was going (Godot's carry), so holding forward
@@ -21497,9 +21596,12 @@ local function updateHud(frameDt: number)
 	elseif prey.feeding.held then table.insert(view.status, "Meal paused — " .. ControlText.name(device,"feed") .. " to eat") end
 	local clock = life.clock
 	view.day = LifeText.day(clock.day, clock:partOfDay()) .. " | " .. life.growth:stageName() .. (if session.mode=="free" then " | FREE PLAY" elseif session.rules=="gentle" then " | EASY" else "")
+	view.food, view.foodGentle, view.largeText = needs.energy, needs.gentle, setting("LargeText") == true
+	view.growth = LifeText.growth(life.growth, Growth.READY_FOOD, Species.fly_like_prototype.body.nutrition)
 	view.dayLine = LifeText.line(clock:partOfDay(), needs.energy, needs:isStarving(), needs.gentle, LifeLoop.HUNGRY_AT, life:tooHungryToSleep())
- if life.growth.ready then view.dayLine="Ready to moult: rest in the silk-lined crack."
- elseif life.growth:isSoft() then view.dayLine="Soft new skin: shorter jumps until it hardens." end
+ if life.growth.ready then view.dayLine=nil
+ elseif life.growth:isSoft() then view.dayLine="Soft new skin: slower steps and shorter jumps until it hardens." end
+ view.dayLine = view.growth .. (if view.dayLine then "\n" .. view.dayLine else "")
  view.notice = if life.noticeSeconds > 0 and life.notice ~= "" then life.notice else nil
 	local canRest = life:canRest(lifeSpider)
 	local restPrompt = LifeText.prompt(life.asleep, life.resting, canRest, clock:isSleepTime() and not life:tooHungryToSleep(), device, PeacockText.change(device, appearance))
@@ -21617,7 +21719,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			life:step(DT, lifeSpider, feedPending, cancelPending)
 			feedPending, cancelPending = false, false
 			sensor.core.rangeScale = life.rangeScale
-			motor:setReachFactor(life.growth:reachFactor())
+			motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor())
    for _,event in life:drainEvents() do
     watch:onLife(event.kind,life.growth.stage)
     if event.kind=="starved" then endLife("starved")
@@ -21661,6 +21763,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	if SpiderChoice.canDance(appearance) then
 		dance.reduced = setting("ReducedMotion") == true
 		local r, f = controls:axes()
+	if jump:isAiming() then r, f = 0, 0 end -- left stick aims, never walks during the held jump
 		local standing = motor.mode == "attached" and not motor.preparing and not motor.seized and not motor:onLine() and not life.resting
 		local paused = GuiService.MenuIsOpen or modal()
 		dancePose = dance:step(if paused then 0 else simFrame, standing, motor.moving or r ~= 0 or f ~= 0)
@@ -21673,6 +21776,9 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
  rig:setGrowthStage(life.growth.stage)
  rig:setSoftness(life.growth:softness())
  rig:setCondition(needs.energy)
+ rig.jumpLoad=if motor.mode=="attached" and not motor.seized and jump:isBusy() then math.clamp(jump.heldTicks/JumpInput.HOLD_TICKS,0,1) else 0
+ local recentJump=jump.last
+ rig.jumpPush=if not motor.seized and motor.mode=="air" and recentJump and recentJump.kind=="launched" then math.clamp(1-(jump.tick-recentJump.tick)/8,0,1) else 0
  local paused=GuiService.MenuIsOpen or modal()
  rig:update(body, if paused then 0 else simFrame, motor.mode == "attached", motor.moving)
  skins:draw(life.growth.exuviae)
@@ -21713,7 +21819,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	camSettings.levelHorizon = setting("EyeLevelHorizon")
 	cam:configure(camSettings)
 	-- Looking runs in real time, so slow motion never makes the camera sluggish.
-	local lx, ly = controls:lookAxes()
+	local lx, ly = controls:lookAxes(jump:isAiming())
 	if not modal() then cam:render(frameDt, lx, ly) end
 	-- The Focus that feeds the perception HUD also decides how far the principal eyes are in use (the eye view's picture). The
 	-- picture sets the field of view, so it comes before the HUD projects anything.
@@ -22381,6 +22487,31 @@ function Hud.new(playerGui: Instance): any
 	safe.ScreenInsets = Enum.ScreenInsets.CoreUISafeInsets
 	safe.Parent = playerGui
 	local top = column("Top", safe, Vector2.new(0.5, 0), UDim2.new(0.5, 0, 0, 8), Enum.VerticalAlignment.Top)
+	-- Food reserves, not a damage/health system. Always present during play, even with hints off.
+	local food = Instance.new("Frame")
+	food.Name = "FoodBar"
+	food.Size = UDim2.new(1, 0, 0, 36)
+	food.LayoutOrder = -2
+	food.BackgroundColor3 = Color3.fromRGB(24, 27, 24)
+	food.BorderSizePixel = 0
+	food.Visible = false
+	food.Parent = top
+	corner(food, 6)
+	local foodFill = Instance.new("Frame")
+	foodFill.Name = "FoodFill"
+	foodFill.Size = UDim2.fromScale(0, 1)
+	foodFill.BorderSizePixel = 0
+	foodFill.BackgroundColor3 = Color3.fromRGB(53, 103, 61)
+	foodFill.Parent = food
+	corner(foodFill, 6)
+	local foodText = Instance.new("TextLabel")
+	foodText.Name = "FoodText"
+	foodText.BackgroundTransparency = 1
+	foodText.Size = UDim2.fromScale(1, 1)
+	foodText.TextColor3 = Color3.new(1, 1, 1)
+	foodText.Font = Enum.Font.GothamBold
+	foodText.TextSize = 16
+	foodText.Parent = food
 	local grip = Instance.new("Frame")
  grip.Name="GripBar";grip.Size=UDim2.new(.65,0,0,12);grip.LayoutOrder=0;grip.BackgroundColor3=Color3.fromRGB(45,12,12);grip.Visible=false;grip.Parent=top
  local gripFill=Instance.new("Frame");gripFill.Name="Grip";gripFill.Size=UDim2.fromScale(.4,1);gripFill.BackgroundColor3=Color3.fromRGB(245,35,38);gripFill.BorderSizePixel=0;gripFill.Parent=grip
@@ -22431,7 +22562,7 @@ function Hud.new(playerGui: Instance): any
 	local promptCue = wrapLabel("PromptCue", panel, 16, 3)
 	promptCue.TextColor3 = WARN_COLOR
 	local self = setmetatable({
-		grip = grip, gripFill = gripFill, top = top, centre = centre, safe = safe, reticle = reticle, ticks = ticks,
+		food = food, foodFill = foodFill, foodText = foodText, grip = grip, gripFill = gripFill, top = top, centre = centre, safe = safe, reticle = reticle, ticks = ticks,
 		aimTitle = aimTitle, aimHint = aimHint, anchorLabel = anchorLabel,
 		status = status, caption = caption, toastLabel = toast, help = help, notice = notice, day = day, dayLine = dayLine, noteLabel = note, noteLeft = 0,
 		panel = panel, promptTitle = promptTitle, promptHint = promptHint, promptCue = promptCue,
@@ -22482,6 +22613,14 @@ end
 -- view: device, aiming, focus, eyeView, aimTitle, aimHint, aimColor, anchorText, anchorOk, status ({string}),
 -- caption ({text, alpha} or nil), prompt ({title, hint, cue} or nil), helpVisible, helpText, notice, day and dayLine (strings or nil).
 function Hud.update(self: any, view: any, dt: number)
+	self.food.Visible = type(view.food) == "number"
+	if self.food.Visible then
+		local food = math.clamp(view.food, 0, 1)
+		self.foodFill.Size = UDim2.fromScale(food, 1)
+		self.foodFill.BackgroundColor3 = if food <= 0.25 then Color3.fromRGB(136, 66, 24) else Color3.fromRGB(53, 103, 61)
+		self.foodText.Text = string.format("Food %d%%", math.floor(food * 100 + 0.5)) .. (if view.foodGentle then " · gentle" elseif food <= 0 then " · starving" elseif food <= 0.25 then " · hungry" else "")
+		self.foodText.TextSize = if view.largeText then 24 else 16
+	end
 	self.grip.Visible = view.grip ~= nil
  if view.grip then self.gripFill.Size = UDim2.fromScale(math.clamp(view.grip,0,1),1) end
  self.device = view.device
@@ -23472,6 +23611,47 @@ return function(driver: any)
   assert(driver.menu:isShowing() and not p:isShowing(),"Circle/B did not return to menu")
   assert(driver.menu:choose("Resume"));wait(.1)
   player:SetAttribute("SoundMuted",muted);player:SetAttribute("MasterVolume",volume)
+ end)
+ check("PLAYTEST: food meter and left-stick charged-jump aim",function()
+  local player=game:GetService("Players").LocalPlayer
+  driver.place(Vector3.new(-18,.31,6));driver.input:clear()
+  local old=driver.needs.energy;local gentle=driver.needs.gentle;driver.needs.gentle=false;driver.needs.energy=.2;wait(.1)
+  local gui=player.PlayerGui:FindFirstChild("SpiderPrompts")
+  local bar=gui and gui:FindFirstChild("FoodBar",true)
+  assert(bar and bar.Visible,"food meter missing")
+  local label=bar:FindFirstChild("FoodText") :: TextLabel
+  assert(string.find(label.Text,"Food") and string.find(label.Text,"hungry"),"food words missing")
+  driver.needs.energy=old;driver.needs.gentle=gentle
+  driver.input:simulate("Jump",true);wait(.25)
+  assert(driver.jump:isAiming(),"held jump did not aim")
+  assert(driver.rig().jumpLoad>0 and driver.rig()._shownLoad>0,"jump preparation was not drawn")
+  local pos,yaw=driver.motor.pos,driver.camera.yaw
+  driver.input:stick(1,0);wait(.25)
+  assert(math.abs(driver.camera.yaw-yaw)>.01,"left stick did not aim camera")
+  assert((driver.motor.pos-pos).Magnitude<.01,"aim stick walked the spider")
+  driver.input:stick(0,0);driver.input:simulate("Cancel",true);driver.input:simulate("Cancel",false)
+  driver.input:simulate("Jump",false);wait(.1)
+ end)
+ check("PLAYTEST: added leaves and upper ledge support the real motor",function()
+  for _,point in {Vector3.new(-8,8.11,5),Vector3.new(-8,11.51,-5),Vector3.new(0,14.71,-10)} do
+   driver.place(point);wait(.2)
+   assert(driver.motor.mode=="attached" and math.abs(driver.motor.pos.Y-point.Y)<.08,"new perch failed to support spider")
+  end
+ end)
+ check("PLAYTEST: clear centre and muted peripheral eye view cleans up",function()
+  local player=game:GetService("Players").LocalPlayer
+  driver.place(Vector3.new(-18,.31,6))
+  player:SetAttribute("EyeGrey",false);player:SetAttribute("ReducedMotion",false)
+  if not driver.cam.eyeView then driver.input:simulate("Eye",true);driver.input:simulate("Eye",false) end
+  wait(.6)
+  assert(driver.eyes.grade.Saturation>0 and not driver.eyes.blur.Enabled,"centre is grey or globally blurred")
+  local edge=driver.eyes.gui:FindFirstChild("VignetteLeft") :: Frame
+  assert(edge.Visible and edge.Size.X.Scale<.5 and edge.BackgroundTransparency<.5,"muted surround missing or covering centre")
+  player:SetAttribute("EyeGrey",true);wait(.1)
+  assert(driver.eyes.grade.Saturation==-1,"greyscale comfort setting failed")
+  player:SetAttribute("EyeGrey",false)
+  driver.input:simulate("Eye",true);driver.input:simulate("Eye",false);wait(.1)
+  assert(not driver.eyes.gui.Enabled and not driver.eyes.grade.Enabled,"eye effects leaked into third person")
  end)
  local passed=0
 	for _,row in rows do if row.passed then passed+=1 end end

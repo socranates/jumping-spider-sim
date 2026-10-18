@@ -83,6 +83,9 @@ export type Rig = typeof(setmetatable(
   _softness: number,
   _condition: number,
   _shownCondition: number,
+  jumpLoad: number,
+  jumpPush: number,
+  _shownLoad: number,
   _sizes: {[BasePart]: Vector3},
   _colors: {[BasePart]: Color3},
 		_drop: number,
@@ -205,7 +208,7 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		_parts = {} :: { BasePart },
 		_cframes = {} :: { CFrame },
 		_k = look.scale or 1,
-  _growth = 1, _softness = 0, _condition = 0.55, _shownCondition = 0.55,
+  _growth = 1, _softness = 0, _condition = 0.55, _shownCondition = 0.55, jumpLoad = 0, jumpPush = 0, _shownLoad = 0,
   _sizes = {} :: {[BasePart]: Vector3}, _colors = {} :: {[BasePart]: Color3},
 		_drop = look.bodyDrop or 0,
 		_fan = nil :: Fan?,
@@ -548,7 +551,12 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 
 	-- Palps drum in bursts while the spider stands still; breathing and a curious head tilt ease in after a moment. All of
 	-- it is full detail only (cfg.idle), and reducedMotion turns it off too.
-	local standing = cfg.idle and grounded and not moving and not self.reducedMotion and not dancing
+	local loading = grounded and self.jumpLoad > 0
+ local push = if self.reducedMotion then 0 else math.clamp(self.jumpPush,0,1)
+ local desiredLoad = if loading and not self.reducedMotion then math.clamp(self.jumpLoad,0,1) else 0
+ self._shownLoad += math.clamp(desiredLoad-self._shownLoad,-12*dt,6*dt)
+ local load = if self.reducedMotion then 0 else self._shownLoad
+ local standing = cfg.idle and grounded and not moving and not self.reducedMotion and not dancing and not loading
 	self._drum = math.clamp(self._drum + (if standing then 3 else -3) * dt, 0, 1)
 	local palpAngle = Idle.palps(self._t, self._drum, look.palp)
 	local bodyBase, headBase, abdomenBase = body, body, body
@@ -564,6 +572,20 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 				* CFrame.Angles(-pose.abdomenPitch, 0, 0) * CFrame.new(-A.pedicelCenter*g)
 		end
 	end
+	-- Display-only snaps also run on low-detail devices. Camera/root, foot anchors and motor stay unchanged.
+	if grounded and not self.reducedMotion and not dancing and not loading then
+		local yaw, lift = Idle.snap(self._t, moving)
+		local accent = body * CFrame.new(0, lift * g, 0) * CFrame.Angles(0, yaw, 0) * body:Inverse()
+		bodyBase, headBase, abdomenBase = accent * bodyBase, accent * headBase, accent * abdomenBase
+	end
+ -- A visible preparation and extension, not a pressure gauge or an inflated body. Hydraulic
+ -- extension and muscle action both matter; their jump contribution varies among species
+ -- (Nabawy et al. 2018, doi:10.1038/s41598-018-25227-9). Timings are display tuning.
+ if not dancing and (load > 0 or push > 0) then
+  local brace = body * CFrame.new(0,(-0.065*load+0.025*push)*k,0)
+   * CFrame.Angles(-0.07*load+0.05*push,0,0) * body:Inverse()
+  bodyBase,headBase,abdomenBase=brace*bodyBase,brace*headBase,brace*abdomenBase
+ end
 	if dancing then
 		-- The abdomen pitches up about the pedicel and sways side to side (about the body's long axis), the palps flick in unison.
 		abdomenBase = bodyBase * CFrame.new(A.pedicelCenter*g) * CFrame.Angles(0, 0, display.abdomenSway + display.shiver)
@@ -666,7 +688,11 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 	for _, leg in self._legs do
 		local hip = bodyBase:PointToWorldSpace(Vector3.new(leg.side * L.hipX, L.hipY, L.hipZ[leg.pair])*g)
 		local foot = leg.foot
-		local knee = hip:Lerp(foot, 0.48) + up * kneeUp
+  local rear = leg.pair >= 3
+  if not grounded and rear and push > 0 then
+   foot += body:VectorToWorldSpace(Vector3.new(leg.side*.05,-.25,.18)*k*push)
+  end
+		local knee = hip:Lerp(foot, 0.48) + up * (if rear then kneeUp*(1-.7*push)+.035*k*load else kneeUp)
 		local own = if dancing and look.pairs then look.pairs[leg.pair] else nil
 		if own and display.legsRaise > 0 then
 			-- Legs III go up in a V beside the fan and wave: down and forward over the carapace, and back up (the planted foot below is untouched).

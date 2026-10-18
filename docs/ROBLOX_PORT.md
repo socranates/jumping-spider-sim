@@ -1,3 +1,7 @@
+# Player-feedback update — 2026-10-18
+
+See HANDOFF-roblox-player-feedback.md and verification/roblox-player-feedback/RESULTS.md for acceptance. The Roblox habitat now has two additional leaves and an upper ledge; the prey population includes a smaller fruit-fly-inspired type. Food/growth progress is visible, held-jump aim accepts the left stick, and capture tolerance is slightly wider. Drawn twitch/jump preparation and the eye view changed; Godot remains frozen. Earlier inventory rows below describe historical stages and are not current acceptance evidence.
+
 # Roblox port inventory — updated 2026-10-17
 
 Roblox is the active project, in `roblox_port/`. Godot at c87ce00 is the frozen runnable reference, including both parts of Perplexity's branch. SPEC.md stays frozen. PLATFORM-01 records Nathan's decision. This is a full port, not a completed Roblox version of the whole life.

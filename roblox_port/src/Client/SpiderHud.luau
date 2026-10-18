@@ -149,6 +149,31 @@ function Hud.new(playerGui: Instance): any
 	safe.ScreenInsets = Enum.ScreenInsets.CoreUISafeInsets
 	safe.Parent = playerGui
 	local top = column("Top", safe, Vector2.new(0.5, 0), UDim2.new(0.5, 0, 0, 8), Enum.VerticalAlignment.Top)
+	-- Food reserves, not a damage/health system. Always present during play, even with hints off.
+	local food = Instance.new("Frame")
+	food.Name = "FoodBar"
+	food.Size = UDim2.new(1, 0, 0, 36)
+	food.LayoutOrder = -2
+	food.BackgroundColor3 = Color3.fromRGB(24, 27, 24)
+	food.BorderSizePixel = 0
+	food.Visible = false
+	food.Parent = top
+	corner(food, 6)
+	local foodFill = Instance.new("Frame")
+	foodFill.Name = "FoodFill"
+	foodFill.Size = UDim2.fromScale(0, 1)
+	foodFill.BorderSizePixel = 0
+	foodFill.BackgroundColor3 = Color3.fromRGB(53, 103, 61)
+	foodFill.Parent = food
+	corner(foodFill, 6)
+	local foodText = Instance.new("TextLabel")
+	foodText.Name = "FoodText"
+	foodText.BackgroundTransparency = 1
+	foodText.Size = UDim2.fromScale(1, 1)
+	foodText.TextColor3 = Color3.new(1, 1, 1)
+	foodText.Font = Enum.Font.GothamBold
+	foodText.TextSize = 16
+	foodText.Parent = food
 	local grip = Instance.new("Frame")
  grip.Name="GripBar";grip.Size=UDim2.new(.65,0,0,12);grip.LayoutOrder=0;grip.BackgroundColor3=Color3.fromRGB(45,12,12);grip.Visible=false;grip.Parent=top
  local gripFill=Instance.new("Frame");gripFill.Name="Grip";gripFill.Size=UDim2.fromScale(.4,1);gripFill.BackgroundColor3=Color3.fromRGB(245,35,38);gripFill.BorderSizePixel=0;gripFill.Parent=grip
@@ -199,7 +224,7 @@ function Hud.new(playerGui: Instance): any
 	local promptCue = wrapLabel("PromptCue", panel, 16, 3)
 	promptCue.TextColor3 = WARN_COLOR
 	local self = setmetatable({
-		grip = grip, gripFill = gripFill, top = top, centre = centre, safe = safe, reticle = reticle, ticks = ticks,
+		food = food, foodFill = foodFill, foodText = foodText, grip = grip, gripFill = gripFill, top = top, centre = centre, safe = safe, reticle = reticle, ticks = ticks,
 		aimTitle = aimTitle, aimHint = aimHint, anchorLabel = anchorLabel,
 		status = status, caption = caption, toastLabel = toast, help = help, notice = notice, day = day, dayLine = dayLine, noteLabel = note, noteLeft = 0,
 		panel = panel, promptTitle = promptTitle, promptHint = promptHint, promptCue = promptCue,
@@ -250,6 +275,14 @@ end
 -- view: device, aiming, focus, eyeView, aimTitle, aimHint, aimColor, anchorText, anchorOk, status ({string}),
 -- caption ({text, alpha} or nil), prompt ({title, hint, cue} or nil), helpVisible, helpText, notice, day and dayLine (strings or nil).
 function Hud.update(self: any, view: any, dt: number)
+	self.food.Visible = type(view.food) == "number"
+	if self.food.Visible then
+		local food = math.clamp(view.food, 0, 1)
+		self.foodFill.Size = UDim2.fromScale(food, 1)
+		self.foodFill.BackgroundColor3 = if food <= 0.25 then Color3.fromRGB(136, 66, 24) else Color3.fromRGB(53, 103, 61)
+		self.foodText.Text = string.format("Food %d%%", math.floor(food * 100 + 0.5)) .. (if view.foodGentle then " · gentle" elseif food <= 0 then " · starving" elseif food <= 0.25 then " · hungry" else "")
+		self.foodText.TextSize = if view.largeText then 24 else 16
+	end
 	self.grip.Visible = view.grip ~= nil
  if view.grip then self.gripFill.Size = UDim2.fromScale(math.clamp(view.grip,0,1),1) end
  self.device = view.device

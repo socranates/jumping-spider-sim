@@ -41,7 +41,14 @@ local function v(x: number, y: number, z: number): Vector3
 	return Vector3.new(x, y, z)
 end
 
+-- Additive upper garden: old support boxes/IDs and retreat remain unchanged for existing rests.
 Layout.PIECES = {
+	{ id = "upper_ledge", lo = v(-20, 13.8, -12.5), hi = v(18, 14.4, -8), profile = "bare_wood_rough", color = hex("a78861") },
+	{ id = "garden_step", lo = v(-12, 0, 5), hi = v(-6, 1.2, 10), profile = "brick_rough", color = hex("b5744c") },
+	{ id = "leaf_garden", lo = v(-11.5, 7.4, 3), hi = v(-6, 7.8, 9), profile = "leaf_dry_prototype", color = hex("66884a") },
+	{ id = "stem_garden", lo = v(-10, 1.2, 5.5), hi = v(-9, 7.4, 6.5), profile = "leaf_dry_prototype", color = hex("536b43") },
+	{ id = "leaf_high", lo = v(-14, 10.8, -9), hi = v(-7, 11.2, -3), profile = "leaf_dry_prototype", color = hex("78985c") },
+	{ id = "stem_high", lo = v(-11, 0, -6.5), hi = v(-10, 10.8, -5.5), profile = "leaf_dry_prototype", color = hex("536b43") },
 	{ id = "sill_floor", lo = v(-30, -1, -12.5), hi = v(30, 0, 12.5), profile = "painted_wood_dry", color = hex("b6a082") },
 	{ id = "back_frame", lo = v(-31, 0, -13.5), hi = v(31, 14, -12.5), profile = "bare_wood_rough", color = hex("ded7c3") },
 	{ id = "left_frame", lo = v(-31, 0, -12.5), hi = v(-30, 14, 12.5), profile = "bare_wood_rough", color = hex("ded7c3") },

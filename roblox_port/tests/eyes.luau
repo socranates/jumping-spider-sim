@@ -26,17 +26,17 @@ local S, P = Eyes.side, Eyes.principal
 -- ---------------------------------------------------------------- the numbers
 check(S.fovDeg == 90 and P.fovDeg == 24, "the side eyes see 90 degrees (vertical), the principal eyes 24")
 check(P.fovDeg >= Eyes.retina.heightDeg and P.fovDeg < 2 * Eyes.retina.heightDeg, "the telephoto view is just wider than a 20 degree retina is tall")
-check(S.saturation == -0.85 and P.saturation == 0.15, "saturation -0.85 with the side eyes, 0.15 with the principal eyes")
-check(S.tint[1] == 170 and S.tint[2] == 228 and S.tint[3] == 165, "the side eyes' tint is (170, 228, 165)")
+check(S.saturation == 0.15 and P.saturation == 0.15, "central colour remains during both wide and Focus views")
+check(S.tint[1] == 115 and S.tint[2] == 255 and S.tint[3] == 236, "the wide view retains the principal-eye colour impression")
 check(P.tint[1] == 115 and P.tint[2] == 255 and P.tint[3] == 236, "the principal eyes' tint cuts the red: (115, 255, 236)")
 check(P.tint[1] < P.tint[2] and P.tint[1] < P.tint[3] and P.tint[3] > 0.8 * P.tint[2], "red is the cut channel, blue stands in for the short-wave one")
 check(S.contrast == 0.12 and P.contrast == 0.16 and S.brightness == 0.03 and P.brightness == 0.02, "contrast 0.12 / 0.16, brightness 0.03 / 0.02")
-check(S.blur == 2.5 and P.blur == 0, "the side eyes blur 2.5, the principal eyes none")
+check(S.blur == 0 and P.blur == 0, "neither view blurs the clear centre")
 check(S.dofFar == 0.35 and S.dofNear == 0.25 and P.dofFar == 0.75 and P.dofNear == 0.6, "depth of field intensities 0.35 / 0.25 and 0.75 / 0.6")
 check(S.dofRadiusMin == 6 and S.dofRadiusPerStud == 0.6 and P.dofRadiusMin == 0.6 and P.dofRadiusPerStud == 0.12, "in-focus radius max(6, 0.6 d) and max(0.6, 0.12 d)")
 check(S.strokeTransparency == 0.82 and P.strokeTransparency == 0.68, "the retina outline: transparency 0.82 and 0.68")
 check(S.sweepDeg == 4 and P.sweepDeg == 0.6 and S.torsionDeg == 12 and P.torsionDeg == 3, "scanning: sway 4 and 0.6 degrees, turn 12 and 3")
-check(S.vignette == 0.35 and P.vignette == 0.55 and Eyes.vignette.color[1] == 8 and Eyes.vignette.color[2] == 20 and Eyes.vignette.color[3] == 12, "the vignette: (8, 20, 12) at 0.35 and 0.55")
+check(S.vignette == 0.65 and P.vignette == 0.75 and Eyes.vignette.color[1] == 48 and Eyes.vignette.color[2] == 52 and Eyes.vignette.color[3] == 48, "neutral surround at 0.65 and 0.75")
 local R = Eyes.retina
 check(R.widthDeg == 5 and R.heightDeg == 20 and R.offsetDeg == 3 and R.tiltDeg == 10, "each retina is 5 x 20 degrees, 3 degrees either side of the middle, tilted 10")
 check(R.sweepSeconds == 1.7 and R.lagSeconds == 0.3 and R.torsionSeconds == 2.6, "sway period 1.7 s, the second strip 0.3 s behind, turn period 2.6 s")
@@ -50,7 +50,7 @@ check(H.hz <= 3, "the pulse is at or under the 3 Hz flash guideline")
 check(Eyes.overlay.displayOrder < 0 and Eyes.overlay.name == "EyeOverlay", "the overlay sits under SpiderHud (order 0) and the perception HUD (order 4)")
 check(Eyes.effects.grade == "EyeGrade" and Eyes.effects.blur == "EyeBlur" and Eyes.effects.dof == "MacroDOF", "the effect names")
 check(Eyes.uv.folder[1] == "Decor" and Eyes.uv.folder[2] == "UVLayer" and Eyes.uv.opacityAttribute == "UVOpacity" and Eyes.uv.lookupSeconds == 1, "the UV layer is Decor.UVLayer, UVOpacity, looked up at most once a second")
-check(Eyes.caption.seconds == 6 and string.find(Eyes.caption.side, "Spider-eye view: the side eyes see wide, mostly in green, and catch movement.", 1, true) ~= nil, "the caption's first line and 6 seconds")
+check(Eyes.caption.seconds == 6 and string.find(Eyes.caption.side, "Spider-eye impression: a clear colour centre, muted edges that still catch movement.", 1, true) ~= nil, "the caption's first line and 6 seconds")
 local ranges = true
 for _, v in { S, P } do
 	ranges = ranges and v.fovDeg >= 1 and v.fovDeg <= 120 and math.abs(v.saturation) <= 1 and math.abs(v.contrast) <= 1 and math.abs(v.brightness) <= 1
@@ -66,7 +66,7 @@ for _, name in { "land1969", "shepeleva2022", "nagata2012", "devoe1975", "glensz
 	cited = cited and type(text) == "string" and string.find(text, "%d%d%d%d") ~= nil
 end
 check(cited, "the sources the notes cite are listed, each with a year")
-check(S.sweepDeg > P.sweepDeg and S.torsionDeg > P.torsionDeg and S.blur > P.blur and S.fovDeg > P.fovDeg and S.vignette < P.vignette, "the side eyes scan and blur more, the principal eyes zoom and darken the edges more")
+check(S.sweepDeg > P.sweepDeg and S.torsionDeg > P.torsionDeg and S.blur == P.blur and S.fovDeg > P.fovDeg and S.vignette < P.vignette, "the side eyes scan more, the principal eyes zoom and darken the edges more")
 
 -- ---------------------------------------------------------------- how much the principal eyes are in use
 local function runPhase(wanted: boolean, seconds: number, hz: number, from: number): number
@@ -118,18 +118,18 @@ check(near(EyeOptics.lookScale(24) * EyeOptics.pixelsPerTan(24, 1000), EyeOptics
 -- ---------------------------------------------------------------- the blend
 local function rgbOf(c: Color3): (number, number, number) return c.R * 255, c.G * 255, c.B * 255 end
 local p0, p1 = EyeOptics.profile(0, 10, false), EyeOptics.profile(1, 10, false)
-check(p0.fovDeg == 90 and p0.saturation == -0.85 and p0.contrast == 0.12 and p0.brightness == 0.03 and p0.blur == 2.5, "k = 0: the side eyes' look")
+check(p0.fovDeg == 90 and p0.saturation == 0.15 and p0.contrast == 0.12 and p0.brightness == 0.03 and p0.blur == 0, "k = 0: the side eyes' look")
 check(p1.fovDeg == 24 and p1.saturation == 0.15 and p1.contrast == 0.16 and p1.brightness == 0.02 and p1.blur == 0, "k = 1: the principal eyes' look")
 local r0, g0, b0 = rgbOf(p0.tint)
 local r1, g1, b1 = rgbOf(p1.tint)
-check(near(r0, 170, 1e-9) and near(g0, 228, 1e-9) and near(b0, 165, 1e-9) and near(r1, 115, 1e-9) and near(g1, 255, 1e-9) and near(b1, 236, 1e-9), "the tint at both ends")
+check(near(r0, 115, 1e-9) and near(g0, 255, 1e-9) and near(b0, 236, 1e-9) and near(r1, 115, 1e-9) and near(g1, 255, 1e-9) and near(b1, 236, 1e-9), "the tint at both ends")
 check(p0.dofFar == 0.35 and p0.dofNear == 0.25 and p1.dofFar == 0.75 and p1.dofNear == 0.6, "the depth of field at both ends")
-check(p0.strokeTransparency == 0.82 and p1.strokeTransparency == 0.68 and p0.vignette == 0.35 and p1.vignette == 0.55, "the outline and the vignette at both ends")
+check(p0.strokeTransparency == 0.82 and p1.strokeTransparency == 0.68 and p0.vignette == 0.65 and p1.vignette == 0.75, "the outline and the vignette at both ends")
 local ph = EyeOptics.profile(0.5, 10, false)
 local rh, gh, bh = rgbOf(ph.tint)
-check(near(ph.saturation, (-0.85 + 0.15) / 2, 1e-12) and near(ph.contrast, 0.14, 1e-12) and near(ph.brightness, 0.025, 1e-12) and near(ph.blur, 1.25, 1e-12), "half way, every number is the average")
-check(near(rh, 142.5, 1e-9) and near(gh, 241.5, 1e-9) and near(bh, 200.5, 1e-9), "half way, the tint is the average")
-check(near(ph.dofFar, 0.55, 1e-12) and near(ph.dofNear, 0.425, 1e-12) and near(ph.strokeTransparency, 0.75, 1e-12) and near(ph.vignette, 0.45, 1e-12), "half way, the depth of field, outline and vignette too")
+check(near(ph.saturation, 0.15, 1e-12) and near(ph.contrast, 0.14, 1e-12) and near(ph.brightness, 0.025, 1e-12) and near(ph.blur, 0, 1e-12), "half way, every number is the average")
+check(near(rh, 115, 1e-9) and near(gh, 255, 1e-9) and near(bh, 236, 1e-9), "half way, the tint is the average")
+check(near(ph.dofFar, 0.55, 1e-12) and near(ph.dofNear, 0.425, 1e-12) and near(ph.strokeTransparency, 0.75, 1e-12) and near(ph.vignette, 0.7, 1e-12), "half way, the depth of field, outline and vignette too")
 check(near(ph.fovDeg, mid, 1e-12), "and the field of view is the tangent-space blend")
 check(near(EyeOptics.profile(0, 5, false).dofRadius, 6, 1e-12) and near(EyeOptics.profile(0, 20, false).dofRadius, 12, 1e-12), "side eyes: in focus within max(6, 0.6 x distance)")
 check(near(EyeOptics.profile(1, 2, false).dofRadius, 0.6, 1e-12) and near(EyeOptics.profile(1, 10, false).dofRadius, 1.2, 1e-12) and near(EyeOptics.profile(1, 40, false).dofRadius, 4.8, 1e-12), "principal eyes: within max(0.6, 0.12 x distance)")
@@ -138,7 +138,7 @@ check(EyeOptics.profile(1, -3, false).dofRadius == 0.6, "a negative distance cou
 check(EyeOptics.profile(0.3, 7, false).k == 0.3 and EyeOptics.profile(5, 7, false).k == 1 and EyeOptics.profile(-5, 7, false).k == 0, "k is kept within 0 to 1")
 local pr = EyeOptics.profile(1, 10, true)
 check(pr.fovDeg == 45 and pr.sweepDeg == 0 and pr.torsionDeg == 0, "reduced motion: the zoom stops at 45 and the retinae hold still")
-check(EyeOptics.profile(0, 10, true).fovDeg == 90 and EyeOptics.profile(0, 10, true).saturation == -0.85, "reduced motion leaves the colour and the side eyes' field alone")
+check(EyeOptics.profile(0, 10, true).fovDeg == 90 and EyeOptics.profile(0, 10, true).saturation == 0.15, "reduced motion leaves the colour and the side eyes' field alone")
 
 -- ---------------------------------------------------------------- where the eyes are focused
 check(EyeOptics.focusTarget(nil) == 40 and EyeOptics.focusTarget(12.5) == 12.5 and EyeOptics.focusTarget(100) == 40 and EyeOptics.focusTarget(0) == 0, "focus lands where the ray ends: at most 40, 40 when it hit nothing")
@@ -320,7 +320,7 @@ check(near(top[3].x, 640, 1e-9) and near(top[3].y, 20, 1e-9) and (near(top[3].ro
 check(EyeOptics.captionAlpha(-1) == 0 and EyeOptics.captionAlpha(0) == 0 and EyeOptics.captionAlpha(6) == 0 and EyeOptics.captionAlpha(7) == 0, "the caption is not there before it fades in or after 6 s")
 check(EyeOptics.captionAlpha(0.4) == 1 and EyeOptics.captionAlpha(3) == 1 and EyeOptics.captionAlpha(4.5) == 1, "it holds at full opacity")
 check(EyeOptics.captionAlpha(0.2) > 0 and EyeOptics.captionAlpha(0.2) < 1 and EyeOptics.captionAlpha(5.2) > 0 and EyeOptics.captionAlpha(5.2) < 1 and EyeOptics.captionAlpha(5.9) < EyeOptics.captionAlpha(5.2), "it fades in at the start and out toward 6 s")
-check(EyeOptics.captionText("Right mouse", false) == "Spider-eye view: the side eyes see wide, mostly in green, and catch movement.\nHold Right mouse for the principal eyes: narrow, sharp, telephoto, in green and ultraviolet (shown as violet).", "the caption, with the Focus key")
+check(EyeOptics.captionText("Right mouse", false) == "Spider-eye impression: a clear colour centre, muted edges that still catch movement.\nHold Right mouse for the principal eyes: narrow, sharp, telephoto, in green and ultraviolet (shown as violet).", "the caption, with the Focus key")
 check(string.find(EyeOptics.captionText("LT", true), "Press LT for the principal eyes", 1, true) ~= nil and string.find(EyeOptics.captionText("", false), "Hold Focus for", 1, true) ~= nil, "a toggled Focus is pressed, not held; no key name falls back to Focus")
 check(EyeOptics.uvTransparency(0, 0.8) == 1 and near(EyeOptics.uvTransparency(1, 0.8), 0.2, 1e-12) and near(EyeOptics.uvTransparency(0.5, 0.8), 0.6, 1e-12) and EyeOptics.uvTransparency(1, 0) == 1, "UV parts: 1 - k x UVOpacity")
 check(EyeOptics.uvTransparency(2, 3) == 0 and EyeOptics.uvTransparency(-1, 1) == 1, "kept in 0 to 1")
@@ -402,8 +402,8 @@ do
 	local overlay = sc.gui:FindFirstChild("EyeOverlay")
 	check(camera.FieldOfView == 90 and overlay.Enabled == true and sc.eyes.grade.Enabled == true, "in the eye view: 90 degrees, the overlay and the grade on")
 	local g = sc.eyes.grade
-	check(g.Saturation == -0.85 and g.Contrast == 0.12 and g.Brightness == 0.03 and near(g.TintColor.R * 255, 170, 1e-6) and near(g.TintColor.G * 255, 228, 1e-6) and near(g.TintColor.B * 255, 165, 1e-6), "the side eyes' grade")
-	check(sc.eyes.blur.Size == 2.5 and sc.eyes.blur.Enabled == true and near(sc.cam.lookScale, 1, 1e-9), "and blur, with the look scale 1")
+	check(g.Saturation == 0.15 and g.Contrast == 0.12 and g.Brightness == 0.03 and near(g.TintColor.R * 255, 115, 1e-6) and near(g.TintColor.G * 255, 255, 1e-6) and near(g.TintColor.B * 255, 236, 1e-6), "the side eyes' grade")
+	check(sc.eyes.blur.Size == 0 and sc.eyes.blur.Enabled == false and near(sc.cam.lookScale, 1, 1e-9), "and blur, with the look scale 1")
 	local r1, r2 = named(overlay, "Retina1")[1], named(overlay, "Retina2")[1]
 	check(r1.Visible and r2.Visible and r1.Size.Y.Offset == r2.Size.Y.Offset and near(r1.Size.Y.Offset, VIEW_H * tan(10), 1e-6) and near(r1.Size.X.Offset, VIEW_H * tan(2.5), 1e-6), "the strips are 5 x 20 degrees on the 90 degree field")
 	local rot1, rot2, samples = 0, 0, 156 -- one whole turn of 2.6 s at 60 Hz
@@ -424,7 +424,7 @@ do
 	end
 	check(gradient ~= nil and corner ~= nil and corner.CornerRadius.Scale == 0.5, "a faint gradient fill and fully rounded ends")
 	local top = named(overlay, "VignetteTop")[1]
-	check(near(top.BackgroundTransparency, 0.65, 1e-12) and top.Size.Y.Scale == Eyes.vignette.topBottom, "the vignette at 0.35 opacity")
+	check(near(top.BackgroundTransparency, 0.35, 1e-12) and top.Size.Y.Scale == Eyes.vignette.topBottom, "the muted surround at 0.65 opacity")
 	-- Focus in
 	local fovs, falling = {}, true
 	local previous = 90
@@ -442,7 +442,7 @@ do
 	check(near(telephoto.Size.Y.Offset, VIEW_H * tan(10) / tan(12), 1e-6) and telephoto.Size.Y.Offset < VIEW_H, "the strips grow to tan(10) / tan(12) of the screen's height")
 	local ts = {}
 	for _, d in telephoto:GetChildren() do if d.ClassName == "UIStroke" then table.insert(ts, d) end end
-	check(ts[1].Transparency == 0.68 and near(top.BackgroundTransparency, 0.45, 1e-12), "the outline and the vignette are stronger")
+	check(ts[1].Transparency == 0.68 and near(top.BackgroundTransparency, 0.25, 1e-12), "the outline and the vignette are stronger")
 	-- release
 	local rising = true
 	previous = 24
@@ -451,7 +451,7 @@ do
 		rising = rising and camera.FieldOfView >= previous
 		previous = camera.FieldOfView
 	end
-	check(rising and camera.FieldOfView == 90 and g.Saturation == -0.85, "release: back to the side eyes in 0.5 s")
+	check(rising and camera.FieldOfView == 90 and g.Saturation == 0.15, "release: back to the side eyes in 0.5 s")
 	-- leave
 	sc.cam.eyeView = false
 	camera.FieldOfView = 65 -- what SpiderCamera does
@@ -674,7 +674,7 @@ do
 	sc.cam.eyeView = true
 	sc.run(1, 60, false)
 	local c = sc.eyes:captionView("keyboard")
-	check(c ~= nil and c.alpha == 1 and string.find(c.text, "Spider-eye view: the side eyes see wide, mostly in green, and catch movement.", 1, true) ~= nil and string.find(c.text, "Hold Right mouse for the principal eyes", 1, true) ~= nil, "the first time: both lines, the key of the device")
+	check(c ~= nil and c.alpha == 1 and string.find(c.text, "Spider-eye impression: a clear colour centre, muted edges that still catch movement.", 1, true) ~= nil and string.find(c.text, "Hold Right mouse for the principal eyes", 1, true) ~= nil, "the first time: both lines, the key of the device")
 	check(string.find(sc.eyes:captionView("gamepad").text, "Hold LT for", 1, true) ~= nil and string.find(sc.eyes:captionView("touch").text, "Hold Focus for", 1, true) ~= nil, "and the controller's and the screen's own words")
 	sc.player:SetAttribute("FocusToggle", true)
 	check(string.find(sc.eyes:captionView("keyboard").text, "Press Right mouse for", 1, true) ~= nil, "a toggled Focus is pressed")
@@ -787,7 +787,7 @@ do
 	check(overlay.Enabled == true and cam.FieldOfView == 90, "V: the overlay is on and the field is 90 degrees")
 	local caption = find("SpiderPrompts", "Caption")
 	local status = find("SpiderPrompts", "Status")
-	check(caption.Visible and string.find(caption.Text, "Spider-eye view: the side eyes see wide", 1, true) ~= nil and string.find(caption.Text, "Hold Right mouse for the principal eyes", 1, true) ~= nil, "the caption shows in the top column")
+	check(caption.Visible and string.find(caption.Text, "Spider-eye impression: a clear colour centre", 1, true) ~= nil and string.find(caption.Text, "Hold Right mouse for the principal eyes", 1, true) ~= nil, "the caption shows in the top column")
 	check(caption.LayoutOrder > status.LayoutOrder and caption.LayoutOrder < find("SpiderPrompts", "Toast").LayoutOrder and caption.Parent == status.Parent, "right under the status lines, before the toast and the controls card")
 	check(dof.FarIntensity == 0.35 and dof.NearIntensity == 0.25, "the eye view owns the depth of field")
 	local seenByEyes = dof.FocusDistance

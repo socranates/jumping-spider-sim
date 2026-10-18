@@ -119,7 +119,7 @@ end
 
 -- The two lines at the reticle while aiming (JumpFeedback.describe, hold mode) and Godot's cancel hint beside the second.
 function ControlText.describe(plan: any, device: Device): (string, string)
-	local cancel = ControlText.name(device, "cancel") .. ": cancel the jump"
+	local cancel = (if device == "gamepad" then "Left stick: aim    " else "") .. ControlText.name(device, "cancel") .. ": cancel the jump"
 	if plan == nil then
 		return ControlText.TITLES.none, "release to cancel    " .. cancel
 	end

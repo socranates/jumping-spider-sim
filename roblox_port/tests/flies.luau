@@ -384,5 +384,23 @@ do
 	check(total <= 200, `four flies are {total} parts`)
 end
 
+do
+ local Species=require("../src/Shared/Data/Species")
+ local bodies=FlyBodies.new(workspace)
+ local small=fly("fruit","PERCHED",Vector3.new(0,HOVER,0),Vector3.xAxis,Vector3.yAxis)
+ small.profile=Species.fruit_fly_prototype
+ bodies:draw({small},0)
+ local rig=bodies.rigs.fruit
+ check(rig.scale==.6,"fruit fly has its own smaller scale")
+ for i,p in rig.parts do
+  check((p.Size-bodies.template.specs[i].rest.size*.6).Magnitude<1e-6,"fruit parts scaled")
+ end
+ local first=rig.parts[1]
+ check(colour(first,"b28441"),"fruit thorax is warm tan")
+ small.profile=Species.fly_like_prototype
+ bodies:draw({small},0)
+ check(rig.scale==1 and (first.Size-bodies.template.specs[1].rest.size).Magnitude<1e-6,"restored identity returns original size")
+ bodies:draw({},0)
+end
 print(`FLIES passed={passed} failed={failed}`)
 if failed > 0 then error("fly checks failed") end

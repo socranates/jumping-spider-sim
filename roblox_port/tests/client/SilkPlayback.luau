@@ -432,6 +432,47 @@ return function(driver: any)
   assert(driver.menu:choose("Resume"));wait(.1)
   player:SetAttribute("SoundMuted",muted);player:SetAttribute("MasterVolume",volume)
  end)
+ check("PLAYTEST: food meter and left-stick charged-jump aim",function()
+  local player=game:GetService("Players").LocalPlayer
+  driver.place(Vector3.new(-18,.31,6));driver.input:clear()
+  local old=driver.needs.energy;local gentle=driver.needs.gentle;driver.needs.gentle=false;driver.needs.energy=.2;wait(.1)
+  local gui=player.PlayerGui:FindFirstChild("SpiderPrompts")
+  local bar=gui and gui:FindFirstChild("FoodBar",true)
+  assert(bar and bar.Visible,"food meter missing")
+  local label=bar:FindFirstChild("FoodText") :: TextLabel
+  assert(string.find(label.Text,"Food") and string.find(label.Text,"hungry"),"food words missing")
+  driver.needs.energy=old;driver.needs.gentle=gentle
+  driver.input:simulate("Jump",true);wait(.25)
+  assert(driver.jump:isAiming(),"held jump did not aim")
+  assert(driver.rig().jumpLoad>0 and driver.rig()._shownLoad>0,"jump preparation was not drawn")
+  local pos,yaw=driver.motor.pos,driver.camera.yaw
+  driver.input:stick(1,0);wait(.25)
+  assert(math.abs(driver.camera.yaw-yaw)>.01,"left stick did not aim camera")
+  assert((driver.motor.pos-pos).Magnitude<.01,"aim stick walked the spider")
+  driver.input:stick(0,0);driver.input:simulate("Cancel",true);driver.input:simulate("Cancel",false)
+  driver.input:simulate("Jump",false);wait(.1)
+ end)
+ check("PLAYTEST: added leaves and upper ledge support the real motor",function()
+  for _,point in {Vector3.new(-8,8.11,5),Vector3.new(-8,11.51,-5),Vector3.new(0,14.71,-10)} do
+   driver.place(point);wait(.2)
+   assert(driver.motor.mode=="attached" and math.abs(driver.motor.pos.Y-point.Y)<.08,"new perch failed to support spider")
+  end
+ end)
+ check("PLAYTEST: clear centre and muted peripheral eye view cleans up",function()
+  local player=game:GetService("Players").LocalPlayer
+  driver.place(Vector3.new(-18,.31,6))
+  player:SetAttribute("EyeGrey",false);player:SetAttribute("ReducedMotion",false)
+  if not driver.cam.eyeView then driver.input:simulate("Eye",true);driver.input:simulate("Eye",false) end
+  wait(.6)
+  assert(driver.eyes.grade.Saturation>0 and not driver.eyes.blur.Enabled,"centre is grey or globally blurred")
+  local edge=driver.eyes.gui:FindFirstChild("VignetteLeft") :: Frame
+  assert(edge.Visible and edge.Size.X.Scale<.5 and edge.BackgroundTransparency<.5,"muted surround missing or covering centre")
+  player:SetAttribute("EyeGrey",true);wait(.1)
+  assert(driver.eyes.grade.Saturation==-1,"greyscale comfort setting failed")
+  player:SetAttribute("EyeGrey",false)
+  driver.input:simulate("Eye",true);driver.input:simulate("Eye",false);wait(.1)
+  assert(not driver.eyes.gui.Enabled and not driver.eyes.grade.Enabled,"eye effects leaked into third person")
+ end)
  local passed=0
 	for _,row in rows do if row.passed then passed+=1 end end
 	print("PORT_CLIENT_REPORT "..HttpService:JSONEncode({evidence_id=workspace:GetAttribute("PortEvidence"),tests=#rows,passed=passed,failed=#rows-passed,results=rows}))

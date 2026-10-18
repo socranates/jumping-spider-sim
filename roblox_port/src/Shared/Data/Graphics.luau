@@ -13,6 +13,8 @@ Graphics.materials = {
 	-- the physical pieces of the sill (Habitat/WindowsillLayout.PIECES), by id. SmoothPlastic is clean at any scale: the sill is
 	-- cream enamel, the leaves are glossy; Roblox's textured materials tile in studs, so at 1 stud = 1 cm they are coarse.
 	pieces = {
+		upper_ledge = "Wood", garden_step = "Plaster",
+		leaf_garden = "SmoothPlastic", stem_garden = "SmoothPlastic", leaf_high = "SmoothPlastic", stem_high = "SmoothPlastic",
 		sill_floor = "SmoothPlastic", front_lip = "SmoothPlastic",
 		back_frame = "Plaster", left_frame = "Plaster", right_frame = "Plaster",
 		planter = "Plaster", planter_rim = "Plaster",

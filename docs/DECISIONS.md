@@ -907,3 +907,24 @@ Unsupported future settings_version values make the visit read-only, preserving 
 Studio's server runner checks construction and layout without trying to bind client-only controls. The live-client playback opens the actual settings panel, checks its bound priority, paused world, value changes and menu return. The tap-jump playback queues press/release in the same tick: waiting a Heartbeat under startup load could make the supposed tap longer than the aim threshold. Production jump timing is unchanged. Exact Windows evidence, native counts, manual checks and publication status are in verification/roblox-settings-windows/RESULTS.md.
 
 Physical PlayStation and tablet acceptance remain Nathan's checks after the private playtest update. Public release still requires those checks, release presentation/science review and Nathan's account/audience decisions. The intended peacock price remains approximately US$0.99 as a one-time cosmetic pass; it stays free during testing.
+
+
+### ROBLOX-54 — Food visibility, meal progress and controller aim (2026-10-18)
+
+Nathan's PlayStation feedback: show food reserves, let the left stick aim a held jump, and ease catches only slightly. The food bar is always shown during play. Growth displays actual fed progress and an approximate count of remaining housefly-sized meals, preserving READY_FOOD=0.9 and partial-meal/save semantics. The aim stick stops moving the body while the existing jump plan is selected; release/cancel are unchanged. Housefly swept contact radius including the spider goes from 0.70 to 0.75. Regression tests retain obstruction and non-strike-fall refusals.
+
+### ROBLOX-55 — Additive habitat and smaller fruit-fly-inspired prey (2026-10-18)
+
+Nathan asked for more places to explore and a second prey type. Add two leaves/stems, a terracotta step and an upper wooden ledge without moving old supports or the retreat. Every third new mixed-population spawn is a small tan/red-eyed fruit fly, drawn at 60% housefly size, food 0.18 instead of 0.35. Reuse the fly model of senses/flight/feeding and its conservative clearance graph; no species-specific behavioural accuracy is claimed. Keep independent constant references for both profiles in checkpoints. Existing rests retain their flies and acquire mixed replacements over time. Keep the four-fly target and low-detail tier.
+
+### ROBLOX-56 — Clear central eye view and muted surround (2026-10-18)
+
+Nathan revised the regional-blur request to a colour centre and black-and-white-like periphery. Retain central colour and disable whole-screen blur; wider neutral edge gradients mute peripheral contrast/colour. This is expressly a grey wash, not per-pixel desaturation, regional blur, a spectral simulation, or a measured retinal field. It avoids extra scene rendering on consoles/tablets. Focus, retina scans, sensed motion cues, Reduced Motion and whole-view EyeGrey remain. Scientific/engine references and limitations are in HANDOFF-roblox-player-feedback.md.
+
+### ROBLOX-57 — Twitch and visible jump preparation (2026-10-18)
+
+Short irregular-looking body snaps run on both detail tiers, without moving the motor/camera/foot anchors. Nathan also asked to show hydraulic pressure building before a jump. A drawn brace/crouch while holding jump and brief extension of pairs III/IV after launch illustrate preparation; actual pressure is not measured or exposed, and the body does not inflate. Existing fixed-tick jump events drive it, with no solver, jump-power or input-delay change. Reduced Motion suppresses these poses; courtship retains its own pose. Nabawy et al. 2018 reports muscular capacity sufficient for P. regius jumps, so do not claim hydraulic pressure is their sole power source. See the handoff's primary research links.
+
+### ROBLOX-58 — Soft-skin movement after moulting (Nathan, 2026-10-18)
+
+Walking and stalking run at 65% speed while the existing soft-cuticle timer is active; the existing 0.7 jump-reach factor remains. Both restore at hardening and derive from the saved growth state. Scale the automatic walk-to-edge timeout too so lowering on silk still works. HUD explains slower steps and shorter jumps. Values are game tuning, not measured biology. No change to gravity, airborne velocity, silk reeling or the underlying species profile.

@@ -97,3 +97,10 @@ The peacock gets a closer camera, richer fan colours and six fine scale highligh
 The session notebook with sourced pages is in (ROBLOX-37/38). Next: server-owned DataStore persistence in a separate chunk. See docs/HANDOFF-roblox-growth-polish.md.
 
 The notebook includes an optional **To try** checklist (C or Y/Triangle inside the reader). It marks observed activities and never requires completion. Notes and rest saves are still session-only. See `../docs/PUBLIC_RELEASE.md`.
+
+
+## Player feedback update (2026-10-18)
+
+Hold Jump and use the **left stick** to aim; the right stick still works. Release to leap, Circle/B to cancel. The food bar shows reserves; the growth line estimates housefly-sized meals until the next moult. Small tan/red-eyed fruit flies give smaller meals. Explore the additional Pilea leaves and upper wooden ledge. In spider-eye view the centre stays coloured with a softly greyed surround; this is an illustration, not an exact simulation. Hold a jump to see the brace/crouch and rear-leg extension; slow motion makes it easier to observe. Reduced Motion keeps the extra poses calm.
+
+Full scope, science caveats and test evidence: `docs/HANDOFF-roblox-player-feedback.md` in the repository root.

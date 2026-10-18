@@ -11,6 +11,8 @@ local Flora = {}
 -- footprint with its top at the piece's top, and each stem piece as a round petiole inscribed in its box.
 Flora.pilea = {
 	plants = {
+		{ leaf = "leaf_garden", stem = "stem_garden" },
+		{ leaf = "leaf_high", stem = "stem_high" },
 		{ leaf = "leaf_west", stem = "stem_west" },
 		{ leaf = "leaf_middle", stem = "stem_middle" },
 		{ leaf = "leaf_east", stem = "stem_east" },

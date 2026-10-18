@@ -115,6 +115,11 @@ input:clear(); input:look(0.1, 0); local lx, ly = input:lookAxes()
 check(lx == 0 and ly == 0, "look deadzone")
 input:set("LookRight", true); lx, ly = input:lookAxes(); check(lx == 1 and ly == 0, "arrow keys look")
 input:clear(); lx, ly = input:lookAxes(); check(lx == 0 and ly == 0, "focus loss clears look")
+input:stick(1, 0); lx, ly = input:lookAxes(false); check(lx == 0 and ly == 0, "left stick does not turn normal camera")
+lx, ly = input:lookAxes(true); check(lx == 1 and ly == 0, "left stick aims a held jump")
+input:stick(0, 1); lx, ly = input:lookAxes(true); check(lx == 0 and ly == -1, "left-stick up aims up")
+input:look(0, -1); lx, ly = input:lookAxes(true); check(ly == 0, "both sticks combine without doubling the rate")
+input:clear(); lx, ly = input:lookAxes(true); check(lx == 0 and ly == 0, "focus loss clears jump aim too")
 
 -- Fuzz layout (pure): enough hairs to read as fuzzy, bounded for the frame budget, white over the white pattern, eyes clear.
 local Setae = require("../src/Shared/Rig/Setae")
@@ -282,7 +287,7 @@ do
 		and touch == "↑: reel in    ↓: lower    hold Let go: let go", "the line's prompts name each device's own controls")
 	local title, hint = ControlText.describe({ kind = "reachable", reason = "ok" }, "keyboard")
 	local _, padHint = ControlText.describe({ kind = "reachable", reason = "ok" }, "gamepad")
-	check(title == "Reachable" and hint == "release to leap    Q: cancel the jump" and padHint == "release to leap    B: cancel the jump",
+	check(title == "Reachable" and hint == "release to leap    Q: cancel the jump" and padHint == "release to leap    Left stick: aim    B: cancel the jump",
 		"Q / B cancels an aim (the same button lets go of the line only when held)")
 	local t1 = ControlText.describe({ kind = "obstructed", reason = "no_room" }, "keyboard")
 	local t2, h2 = ControlText.describe({ kind = "unreachable", reason = "too_far" }, "touch")

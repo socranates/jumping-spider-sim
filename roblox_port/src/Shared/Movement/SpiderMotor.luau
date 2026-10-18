@@ -98,6 +98,7 @@ function Motor.new(config: Config): any
 		surfaces = config.surfaces,
 		loco = loco,
   reachFactor = 1,
+  speedFactor = 1,
 		gravity = Vector3.new(0, -loco.gravity_wu_s2, 0),
 		params = params,
 		overlap = overlap,
@@ -314,6 +315,10 @@ function Motor.setReachFactor(self: any, reach: number)
  self.planKey="";self.plan=nil
 end
 
+function Motor.setSpeedFactor(self: any, speed: number)
+ self.speedFactor=math.clamp(speed,0.1,1)
+end
+
 function Motor.aimPlan(self: any): any
 	local hit = self:_ray(self.aimOrigin, self.aimDirection * AIM_RANGE)
 	local key = if hit
@@ -436,7 +441,7 @@ function Motor.requestDrop(self: any): boolean
 	if plan.direction.Magnitude < 1e-6 then
 		if self:_beginDrop(self.up) then self.pos += self.up * 0.01 end
 	else
-		self.silk.walk = { direction = plan.direction, ticks = math.ceil((plan.distance / self.loco.walk_speed_wu_s + 1.5) * 60) }
+		self.silk.walk = { direction = plan.direction, ticks = math.ceil((plan.distance / (self.loco.walk_speed_wu_s*self.speedFactor) + 1.5) * 60) }
 		self.silk.message = "Walking to the edge — move or cancel to stop"
 		self:_event("drop_walk")
 	end
@@ -638,7 +643,7 @@ function Motor._tickAttached(self: any, input: TickInput)
 		return
 	end
 	local stalk = input.creep and not silk.walk
-	local speed = if stalk then self.loco.stalk_speed_wu_s else self.loco.walk_speed_wu_s
+	local speed = (if stalk then self.loco.stalk_speed_wu_s else self.loco.walk_speed_wu_s)*self.speedFactor
 	self.heading = SupportMath.tangentDir(SupportMath.rotateToward(self.heading, dir, TURN_RATE * DT), self.up)
 	local step = dir * speed * DT
 	-- Concave corner: a wall (or a leaf's edge, a stem) ahead becomes the new support.

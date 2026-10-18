@@ -60,6 +60,7 @@ local FlyBodies = require(script.Parent.FlyBodies)
 local WaspBody = require(script.Parent.WaspBody)
 local NeedsModel = require(Shared.Life.NeedsModel)
 local LifeLoop = require(Shared.Life.LifeLoop)
+local Growth = require(Shared.Life.Growth)
 local LifeSession = require(Shared.Life.LifeSession)
 local session = LifeSession.new()
 local LifeText = require(Shared.UI.LifeText)
@@ -156,7 +157,7 @@ sensor:configureFrom(Species.phidippus_audax_prototype.perception)
 local sightCast = Sensor.workspaceCast(params)
 local perceptionHud = PerceptionHud.new(player:WaitForChild("PlayerGui"))
 local stage = if Workspace:GetAttribute("TestTarget") == true or (Workspace:GetAttribute("TestTarget") ~= false and script.Parent:FindFirstChild("SilkPlayback")) then PerceptionStage.new(sill) else nil
-local prey = PreyDirector.engine(sill, Species.fly_like_prototype, 914, 4)
+local prey = PreyDirector.engine(sill, Species.fly_like_prototype, 914, 4, true)
 local flyBodies = FlyBodies.new(Workspace)
 local soundscape = Soundscape.new(Workspace)
 local waspBody = WaspBody.new(Workspace)
@@ -454,7 +455,7 @@ local function returnToCheckpoint()
 		return
 	end
 	session.mode, session.rules, session.ended = life.mode or "main", life.rules or "standard", false
- motor:setReachFactor(life.growth:reachFactor())
+ motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor())
  session:finishAdult(life.growth.stage)
 	session.summary = nil
 	controls:clear()
@@ -484,7 +485,7 @@ local function fresh(mode: string, easy: boolean, position: Vector3?): boolean
  if not initialRecord or (easy and not session.finishedMain) then return false end
  local ok=Checkpoint.restore(initialRecord,checkpointWorld)
  if not ok then return false end
- session:begin(mode,easy);applyRules();motor:setReachFactor(life.growth:reachFactor())
+ session:begin(mode,easy);applyRules();motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor())
  sensor:reset();memory:clear()
  stores[mode]=newStore();checkpoints=stores[mode]
  life.resting=false;life.notice="";life.noticeSeconds=0;life.restoreGrace=0
@@ -823,6 +824,7 @@ controls = SpiderInput.bind({
 local function tickInput(): any
  if life.growth:isMoulting() then return SpiderMotor.idleInput() end
 	local r, f = controls:axes()
+	if jump:isAiming() then r, f = 0, 0 end -- left stick aims, never walks during the held jump
 	local wish = Vector3.zero
 	if r ~= 0 or f ~= 0 then
 		-- Over a sharp edge the stick keeps carrying the spider the way it was going (Godot's carry), so holding forward
@@ -916,9 +918,12 @@ local function updateHud(frameDt: number)
 	elseif prey.feeding.held then table.insert(view.status, "Meal paused — " .. ControlText.name(device,"feed") .. " to eat") end
 	local clock = life.clock
 	view.day = LifeText.day(clock.day, clock:partOfDay()) .. " | " .. life.growth:stageName() .. (if session.mode=="free" then " | FREE PLAY" elseif session.rules=="gentle" then " | EASY" else "")
+	view.food, view.foodGentle, view.largeText = needs.energy, needs.gentle, setting("LargeText") == true
+	view.growth = LifeText.growth(life.growth, Growth.READY_FOOD, Species.fly_like_prototype.body.nutrition)
 	view.dayLine = LifeText.line(clock:partOfDay(), needs.energy, needs:isStarving(), needs.gentle, LifeLoop.HUNGRY_AT, life:tooHungryToSleep())
- if life.growth.ready then view.dayLine="Ready to moult: rest in the silk-lined crack."
- elseif life.growth:isSoft() then view.dayLine="Soft new skin: shorter jumps until it hardens." end
+ if life.growth.ready then view.dayLine=nil
+ elseif life.growth:isSoft() then view.dayLine="Soft new skin: slower steps and shorter jumps until it hardens." end
+ view.dayLine = view.growth .. (if view.dayLine then "\n" .. view.dayLine else "")
  view.notice = if life.noticeSeconds > 0 and life.notice ~= "" then life.notice else nil
 	local canRest = life:canRest(lifeSpider)
 	local restPrompt = LifeText.prompt(life.asleep, life.resting, canRest, clock:isSleepTime() and not life:tooHungryToSleep(), device, PeacockText.change(device, appearance))
@@ -1036,7 +1041,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			life:step(DT, lifeSpider, feedPending, cancelPending)
 			feedPending, cancelPending = false, false
 			sensor.core.rangeScale = life.rangeScale
-			motor:setReachFactor(life.growth:reachFactor())
+			motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor())
    for _,event in life:drainEvents() do
     watch:onLife(event.kind,life.growth.stage)
     if event.kind=="starved" then endLife("starved")
@@ -1080,6 +1085,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	if SpiderChoice.canDance(appearance) then
 		dance.reduced = setting("ReducedMotion") == true
 		local r, f = controls:axes()
+	if jump:isAiming() then r, f = 0, 0 end -- left stick aims, never walks during the held jump
 		local standing = motor.mode == "attached" and not motor.preparing and not motor.seized and not motor:onLine() and not life.resting
 		local paused = GuiService.MenuIsOpen or modal()
 		dancePose = dance:step(if paused then 0 else simFrame, standing, motor.moving or r ~= 0 or f ~= 0)
@@ -1092,6 +1098,9 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
  rig:setGrowthStage(life.growth.stage)
  rig:setSoftness(life.growth:softness())
  rig:setCondition(needs.energy)
+ rig.jumpLoad=if motor.mode=="attached" and not motor.seized and jump:isBusy() then math.clamp(jump.heldTicks/JumpInput.HOLD_TICKS,0,1) else 0
+ local recentJump=jump.last
+ rig.jumpPush=if not motor.seized and motor.mode=="air" and recentJump and recentJump.kind=="launched" then math.clamp(1-(jump.tick-recentJump.tick)/8,0,1) else 0
  local paused=GuiService.MenuIsOpen or modal()
  rig:update(body, if paused then 0 else simFrame, motor.mode == "attached", motor.moving)
  skins:draw(life.growth.exuviae)
@@ -1132,7 +1141,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	camSettings.levelHorizon = setting("EyeLevelHorizon")
 	cam:configure(camSettings)
 	-- Looking runs in real time, so slow motion never makes the camera sluggish.
-	local lx, ly = controls:lookAxes()
+	local lx, ly = controls:lookAxes(jump:isAiming())
 	if not modal() then cam:render(frameDt, lx, ly) end
 	-- The Focus that feeds the perception HUD also decides how far the principal eyes are in use (the eye view's picture). The
 	-- picture sets the field of view, so it comes before the HUD projects anything.

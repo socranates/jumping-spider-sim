@@ -1,6 +1,7 @@
 --!strict
 -- Solo client world of perceivable flies. Godot order: sensor, prey, motor, capture/feeding.
 local Fly=require(script.Parent.Fly)
+local Species=require(script.Parent.Parent.Data.Species)
 local Graph=require(script.Parent.PerchGraph)
 local Population=require(script.Parent.PreyPopulation)
 local Feeding=require(script.Parent.Feeding)
@@ -11,8 +12,8 @@ local POINTS: {{string | number}}={
  {'west_leaf',-15,4.2,-1},{'east_leaf',22,5.4,-2},{'under_leaf',-12.8,0,-2},{'front_path',1,0,8},
  {'east_corner',27,0,-7},{'back_path',-9,0,-9},{'rim_west',5,4.6,-5},{'rim_east',15,4.6,-5},
 }
-function D.new(graph: any,profile: any,seed: number,target: number): any
- local self:any=setmetatable({graph=graph,p=profile,seed=seed,target=target,flies={},serial=0,now=0,tick=0,
+function D.new(graph: any,profile: any,seed: number,target: number,mixed: boolean?): any
+ local self:any=setmetatable({graph=graph,p=profile,mixed=mixed==true,seed=seed,target=target,flies={},serial=0,now=0,tick=0,
   population=Population.new(profile.population,seed+117,target),feeding=Feeding.new(),vents={},strikeEnd=-1,previousMode='attached',
   captures=0,enabled=true,cpu={},candidates=0,entryChecks=0},D)
  for i,row in POINTS do
@@ -39,7 +40,8 @@ function D.new(graph: any,profile: any,seed: number,target: number): any
 end
 function D.spawn(self: any,perch: any): any
  self.serial+=1
- local f=Fly.new('fly_'..self.serial,self.serial,self.seed+self.serial*997,perch,self.graph,self.p,self.now)
+ local profile = if self.mixed~=false and self.serial%3==0 then Species.fruit_fly_prototype else self.p
+ local f=Fly.new('fly_'..self.serial,self.serial,self.seed+self.serial*997,perch,self.graph,profile,self.now)
  table.insert(self.flies,f);return f
 end
 function D.percepts(self: any): {any}
@@ -70,7 +72,7 @@ function D.before(self: any,dt: number,position: Vector3,observer: any,sensor: a
  self.beforeCost=(os.clock()-started)*1e6
 end
 function D.escape(self: any,f: any)
- f.state='SEEK_PERCH';f.stateSince=self.now;f.senses.awareness=self.p.senses.awareness_max
+ f.state='SEEK_PERCH';f.stateSince=self.now;f.senses.awareness=f.profile.senses.awareness_max
  f.senses.hasLastSeen=true;f.senses.lastSeenPosition=self.previousPosition;f.senses.lastSeenTime=self.now
  f:launch('flee',self.now)
 end
@@ -85,12 +87,12 @@ function D.after(self: any,dt: number,motor: any,sensor: any,cast: any)
  if self.tick<=self.strikeEnd and not self.feeding.held then
   for _,f in self.flies do if f:alive() then
    local t,d=M.sweepClosest(self.previousPosition,motor.pos,f.prevPosition,f.position)
-   if d<=self.p.body.capture_radius_wu+.3 then
+   if d<=f.profile.body.capture_radius_wu+.3 then
     local a=self.previousPosition:Lerp(motor.pos,t);local b=f.prevPosition:Lerp(f.position,t)
     if not cast(a,b) then
      f.flight:release();if f.perch and f.perch.occupant==f.id then f.perch.occupant='' end
      f.state='CAPTURED';f.captureSerial+=1;f.captureKey=f.id..':'..f.captureSerial;f.velocity=Vector3.zero
-     sensor:onCapture(b,self.p.body.radius_wu);self.feeding:capture(f);self.captures+=1;break
+     sensor:onCapture(b,f.profile.body.radius_wu);self.feeding:capture(f);self.captures+=1;break
     end
    end
   end end
@@ -104,13 +106,13 @@ function D.after(self: any,dt: number,motor: any,sensor: any,cast: any)
  for i=#self.flies,1,-1 do if self.flies[i].state=='CONSUMED' then table.remove(self.flies,i) end end
  table.insert(self.cpu,(self.beforeCost or 0)+(os.clock()-started)*1e6);if #self.cpu>1200 then table.remove(self.cpu,1) end
 end
-function D.engine(world: Instance,profile: any,seed: number,target: number): any
+function D.engine(world: Instance,profile: any,seed: number,target: number,mixed: boolean?): any
  local params=RaycastParams.new();params.FilterType=Enum.RaycastFilterType.Include;params.FilterDescendantsInstances={world}
  local overlap=OverlapParams.new();overlap.FilterType=Enum.RaycastFilterType.Include;overlap.FilterDescendantsInstances={world}
  local probe=Instance.new('Part');probe.Name='FlyClearanceProbe';probe.Shape=Enum.PartType.Ball;probe.Anchored=true;probe.CanCollide=false;probe.CanQuery=false;probe.CanTouch=false;probe.Transparency=1;probe.Parent=workspace
  local graph=Graph.new(function(a: Vector3,b: Vector3) return workspace:Raycast(a,b-a,params) end,
   function(a: Vector3,b: Vector3,r: number) if (b-a).Magnitude<1e-7 then return false end;return workspace:Spherecast(a,r,b-a,params)~=nil end,
   function(a: Vector3,r: number) probe.Size=Vector3.one*r*2;probe.Position=a;return #workspace:GetPartsInPart(probe,overlap)>0 end,profile)
- local self=D.new(graph,profile,seed,target);self.probe=probe;return self
+ local self=D.new(graph,profile,seed,target,mixed);self.probe=probe;return self
 end
 return D

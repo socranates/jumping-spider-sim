@@ -22,6 +22,7 @@
 -- Godot checkpoints are not read and schema numbers start again at 1. Schema 3 adds growth and its food ledger cursor.
 -- The passing shadow and notebook are not recorded.
 
+local Species = require(script.Parent.Parent.Data.Species)
 local ObjectRecord = require(script.Parent.ObjectRecord)
 local Fly = require(script.Parent.Parent.Prey.Fly)
 local FlyFlight = require(script.Parent.Parent.Prey.FlyFlight)
@@ -73,6 +74,7 @@ function Checkpoint.refs(world: World): { [string]: any }
 	local refs: { [string]: any } = {}
 	local prey = world.prey
 	ObjectRecord.constants("flyProfile", prey.p, refs)
+	ObjectRecord.constants("fruitFlyProfile", Species.fruit_fly_prototype, refs)
 	local g = prey.graph
 	refs["graph.cast"], refs["graph.sweep"], refs["graph.overlap"] = g.cast, g.sweep, g.overlap
 	if prey.probe ~= nil then refs["prey.probe"] = prey.probe end

@@ -3,6 +3,16 @@
 -- play (no Continue, no Easy), and says plainly that saving is off and why. Run with the other suites:  python3 tests/run.py path/to/luau state_offline.luau
 local Layout = require("../src/Shared/Habitat/WindowsillLayout")
 local SaveText = require("../src/Shared/UI/SaveText")
+local SaveClient = require("../src/Client/SaveClient")
+-- Render work in the shim is CPU-dependent. Control only the save transport's wall
+-- clock so thirty expensive frames cannot accidentally expire its real-time deadline.
+local transportNow = 0
+local originalNew = SaveClient.new
+SaveClient.new = function(cfg: any): any
+	local testConfig = table.clone(cfg)
+	testConfig.now = function() return transportNow end
+	return originalNew(testConfig)
+end
 local passed, failed = 0, 0
 local function check(ok: boolean, what: string)
 	if ok then passed += 1 else failed += 1; print("FAIL [offline] " .. what) end
@@ -29,8 +39,7 @@ end
 check(loaded, "the client loads with no remotes")
 for _ = 1, 30 do frame(1 / 60) end
 check(not menuShowing(), "the menu waits a moment for a server (the world holds)")
-local t0 = os.clock()
-while os.clock() - t0 < 1.7 do end
+transportNow = 1.7
 for _ = 1, 30 do frame(1 / 60) end
 check(menuShowing(), "then the start menu opens")
 local summary = find("SpiderLifeMenu", "Summary")

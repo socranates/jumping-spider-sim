@@ -472,5 +472,21 @@ case("growth schema 3 restores a moult, migrates old saves and rejects damage at
  end
 end)
 
+case("mixed prey keeps the fruit profile across a rest",function()
+ local w=newWorld()
+ w.prey.mixed=true
+ local perch=w.prey.flies[3].perch
+ w.prey.serial=5
+ local f=w.prey:spawn(perch)
+ check(f.profile==Species.fruit_fly_prototype and f.nutrition==.18,"third spawn is the smaller meal")
+ -- Use the existing fly's slot, preserving the graph's one-occupant rule.
+ local old=w.prey.flies[3];old.perch=nil
+ table.remove(w.prey.flies,3)
+ local record=assert(Checkpoint.capture(w,0))
+ check(Checkpoint.restore(record,w),"mixed checkpoint restores")
+ local found=false
+ for _,prey in w.prey.flies do if prey.id==f.id then found=prey.profile==Species.fruit_fly_prototype and prey.nutrition==.18 end end
+ check(found,"restored fruit fly keeps its identity and food")
+end)
 print(`CHECKPOINT passed={passed} failed={failed}`)
 if failed > 0 then error("CHECKPOINT failed") end

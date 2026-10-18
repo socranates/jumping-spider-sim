@@ -1,0 +1,131 @@
+{
+  "passed": 48218,
+  "failed": 0,
+  "suites": {
+    "SUMMARY": {
+      "passed": 194,
+      "failed": 0,
+      "source": "cli-final.txt"
+    },
+    "PERCEPTION": {
+      "passed": 4669,
+      "failed": 0,
+      "source": "cli-final.txt"
+    },
+    "SENSOR": {
+      "passed": 507,
+      "failed": 0,
+      "source": "cli-final.txt"
+    },
+    "PREY": {
+      "passed": 1549,
+      "failed": 0,
+      "source": "cli-final.txt"
+    },
+    "LIFE": {
+      "passed": 20846,
+      "failed": 0,
+      "source": "cli-final.txt"
+    },
+    "CHECKPOINT": {
+      "passed": 159,
+      "failed": 0,
+      "source": "cli-final.txt"
+    },
+    "WASP": {
+      "passed": 15815,
+      "failed": 0,
+      "source": "cli-final.txt"
+    },
+    "GAZE": {
+      "passed": 74,
+      "failed": 0,
+      "source": "soft-skin.txt"
+    },
+    "PRESENTATION": {
+      "passed": 11,
+      "failed": 0,
+      "source": "cli-final.txt"
+    },
+    "BOXWORLD": {
+      "passed": 15,
+      "failed": 0,
+      "source": "cli-final.txt"
+    },
+    "CLIENT": {
+      "passed": 23,
+      "failed": 0,
+      "source": "cli-final.txt"
+    },
+    "PERCEPTION_CLIENT": {
+      "passed": 1,
+      "failed": 0,
+      "source": "cli-final.txt"
+    },
+    "LOOK": {
+      "passed": 708,
+      "failed": 0,
+      "source": "incremental look.luau after jump-pose change; session 58321"
+    },
+    "WORLD": {
+      "passed": 233,
+      "failed": 0,
+      "source": "cli-final.txt"
+    },
+    "FLIES": {
+      "passed": 229,
+      "failed": 0,
+      "source": "cli-final.txt"
+    },
+    "EYES": {
+      "passed": 231,
+      "failed": 0,
+      "source": "cli-final.txt"
+    },
+    "HUD": {
+      "passed": 69,
+      "failed": 0,
+      "source": "cli-final.txt"
+    },
+    "PEACOCK": {
+      "passed": 80,
+      "failed": 0,
+      "source": "cli-final.txt"
+    },
+    "CONTINUING": {
+      "passed": 87,
+      "failed": 0,
+      "source": "cli-final.txt"
+    },
+    "GROWTH": {
+      "passed": 438,
+      "failed": 0,
+      "source": "cli-final.txt"
+    },
+    "NOTEBOOK": {
+      "passed": 813,
+      "failed": 0,
+      "source": "cli-final.txt"
+    },
+    "STATE": {
+      "passed": 434,
+      "failed": 0,
+      "source": "cli-final.txt"
+    },
+    "STATE_CLIENT": {
+      "passed": 102,
+      "failed": 0,
+      "source": "cli-final.txt"
+    },
+    "STATE_OFFLINE": {
+      "passed": 8,
+      "failed": 0,
+      "source": "offline-fixed.txt; controlled test clock"
+    },
+    "SETTINGS": {
+      "passed": 923,
+      "failed": 0,
+      "source": "cli-final.txt"
+    }
+  }
+}

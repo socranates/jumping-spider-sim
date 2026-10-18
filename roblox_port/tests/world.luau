@@ -27,6 +27,13 @@ local function piece(id: string)
 	error("no piece " .. id)
 end
 
+-- The expansion is additive and climbable, with a continuous old-wall route to the upper shelf.
+check(piece("upper_ledge").lo.Y < piece("back_frame").hi.Y and piece("upper_ledge").lo.Z == piece("back_frame").hi.Z,
+ "upper garden shelf touches the climbable back wall")
+check(piece("stem_garden").lo.Y == piece("garden_step").hi.Y and piece("stem_garden").hi.Y == piece("leaf_garden").lo.Y,
+ "new terracotta step and plant form a continuous climbing route")
+check(piece("stem_high").lo.Y == 0 and piece("stem_high").hi.Y == piece("leaf_high").lo.Y,
+ "high leaf has a climbable route from the sill")
 -- ---------------------------------------------------------------- the graphics table
 local unknown = {}
 local function mat(name: string) if not Materials.known(name) then table.insert(unknown, name) end end
@@ -110,7 +117,7 @@ for _, spec in Layout.PIECES do
 		hiddenOk = hiddenOk and p.Transparency == 0 and p.CastShadow ~= false
 	end
 end
-check(hiddenOk and hiddenCount == 8, `only the back wall and the Pilea's pieces turn invisible, and they stay solid ({hiddenCount})`)
+check(hiddenOk and hiddenCount == 12, `only the back wall and the Pilea's pieces turn invisible, and they stay solid ({hiddenCount})`)
 -- If a drawing could not be built (Main.server.luau catches that), what it replaces must not be left invisible.
 local plain = Scenery.sill({})
 local plainBack = plain:FindFirstChild("back_frame") :: Part
@@ -322,7 +329,7 @@ end
 check(topsOk, "each drawn leaf's top is exactly its piece's top (and its underside the piece's underside)")
 check(footOk and Flora.pilea.radius * (math.sqrt(2) - 1) <= 0.7, "each drawn leaf fills its piece's footprint, with corners rounded by less than 0.7")
 check(rodsOk, "each petiole is a Cylinder part inscribed in its stem's box, upright, with Size (length, d, d)")
-check(veinsOk and dotsOk and #veinCounts == 3 and veinCounts[1] >= 7 and veinCounts[1] <= 9 and veinCounts[2] >= 7 and veinCounts[2] <= 9 and veinCounts[3] >= 7 and veinCounts[3] <= 9,
+check(veinsOk and dotsOk and #veinCounts == #Flora.pilea.plants and veinCounts[1] >= 7 and veinCounts[1] <= 9 and veinCounts[2] >= 7 and veinCounts[2] <= 9 and veinCounts[3] >= 7 and veinCounts[3] <= 9,
 	`each leaf has a pale dot where the stalk joins and 7 to 9 thin, lighter veins ({table.concat(veinCounts, ", ")})`)
 check(coloursOk, "leaves are glossy green with a darker rim band and a lighter underside")
 do

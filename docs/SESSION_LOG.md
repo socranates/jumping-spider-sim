@@ -1344,3 +1344,7 @@ Next chunk: release presentation (icon, thumbnail and accurate description of mo
 
 ---
 
+
+## 2026-10-18 — Chet: player feedback, v22
+
+Food/moult HUD, controller jump aim, +0.05 capture radius, fruit-fly prototype, additive habitat surfaces/plants, twitch and jump-load pose, revised eye presentation, and soft-skin slowdown. Published v21 then v22 after Nathan's final soft-skin request. Accepted CLI 48,218; final types clean and compile 167/167. Native 111+27 checks predate the final soft-skin update; exact evidence and limitations in docs/verification/roblox-player-feedback/RESULTS.md. Next handoff is docs/HANDOFF-roblox-player-feedback.md.

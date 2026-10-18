@@ -10,7 +10,7 @@ local data = {
 			radius_wu = 0.3,
 			length_wu = 0.7,
 			hover_wu = 0.16,
-			capture_radius_wu = 0.4,
+			capture_radius_wu = 0.45, -- Nathan playtest: total contact allowance 0.70 -> 0.75 WU (+7%); senses unchanged
 			nutrition = 0.35,
 			capture_assist_scale = 1.6,
 			feed_rate_per_s = 0.1,
@@ -165,4 +165,17 @@ local data = {
 	},
 }
 
+-- A second, fruit-fly-inspired prey profile. Reuses the flight/senses model; these are game values,
+-- not a claim that Drosophila has the house fly's measured behaviour.
+local function copy(value: any): any
+ if type(value) ~= "table" then return value end
+ local out = {}; for k,v in value do out[k] = copy(v) end; return out
+end
+local fruit = copy(data.fly_like_prototype)
+fruit.body.nutrition = 0.18
+fruit.body.visual_scale = 0.60
+fruit.body.radius_wu = 0.18
+fruit.body.capture_radius_wu = 0.42
+fruit.body.prey_kind = "fruit_fly"
+data.fruit_fly_prototype = fruit
 return table.freeze(data)

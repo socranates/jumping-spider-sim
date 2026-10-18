@@ -48,4 +48,17 @@ function Idle.palps(t: number, drum: number, palp: any): { number }
 	return out
 end
 
+-- Authored salticid-like stop/snap/settle accents, not a measured biological frequency.
+-- Short asymmetric pulses separated by stillness, instead of continuous vibration.
+function Idle.snap(t: number, moving: boolean): (number, number)
+	local function pulse(period: number, offset: number): number
+		local phase = (t + offset) % period
+		if phase >= 0.19 then return 0 end
+		if phase < 0.035 then return phase / 0.035 end
+		return (1 - (phase - 0.035) / 0.155) ^ 2
+	end
+	local a, b = pulse(1.37, 0.31), pulse(2.11, 0.83)
+	return math.rad(if moving then 3 else 5) * (a - b), 0.022 * a
+end
+
 return Idle

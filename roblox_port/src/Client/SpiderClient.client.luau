@@ -75,6 +75,8 @@ local FieldNotebook = require(Shared.Learning.FieldNotebook)
 local NotebookWatch = require(Shared.Learning.NotebookWatch)
 local NotebookText = require(Shared.UI.NotebookText)
 local NotebookPanel = require(script.Parent.NotebookPanel)
+local SettingsPanel = require(script.Parent.SettingsPanel)
+local SettingsSpec = require(Shared.Data.SettingsSpec)
 local Checkpoint = require(Shared.Persistence.Checkpoint)
 local CheckpointStore = require(Shared.Persistence.CheckpointStore)
 local SaveRules = require(Shared.Data.SaveRules)
@@ -95,6 +97,11 @@ local COLORS = {
 local WARN_EVENTS = { drop_refused = true, snagged = true, lost = true, blocked = true }
 
 local player = Players.LocalPlayer
+-- A setting's value now (ROBLOX-49): the Player attribute of its name if it holds a clean value, else the default. Every consumer below reads
+-- its setting here each frame, so a change in the settings panel (or a saved one arriving) takes effect at once.
+local function setting(id: string): any
+	return SettingsModel.get(function(key: string): any return player:GetAttribute(key) end, id)
+end
 -- Solo windowsill: the default player list obscures the life-menu button on small screens.
 pcall(function() game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList,false) end)
 local camera = Workspace.CurrentCamera
@@ -177,11 +184,12 @@ local initialRecord: any = nil
 local menuStarted = false
 local panel: any = nil -- the catch screen, made below once returnToCheckpoint exists
 local nbPanel: any = nil -- the notebook, made below with the menus
+local settingsPanel: any = nil -- the settings (ROBLOX-49), made below with the menus
 local saveClient: any = nil -- persistent saves (ROBLOX-39), made below with the menus
 -- Whether a modal screen has the game: the world waits and the controls belong to it. At the very start the world also waits (a second or
 -- so at most) for the server to say what is saved, so the start menu shows the right choices; not in the test place unless the Workspace attribute SaveWait is true.
 local function modal(): boolean
-	return panel:isShowing() or menu:isShowing() or nbPanel:isShowing()
+	return panel:isShowing() or menu:isShowing() or nbPanel:isShowing() or settingsPanel:isShowing()
 		or (not menuStarted and (not testPlace or Workspace:GetAttribute("SaveWait") == true) and saveClient ~= nil and saveClient:waiting() == true)
 end
 -- S01-C retreat checkpoints (ROBLOX-25): resting in the crack, and each morning, keeps one; Backspace / View returns to it. The
@@ -211,7 +219,7 @@ local dayClock: number? = nil -- the daytime ClockTime (SunPick's choice, read o
 local lastLight: number? = nil
 local gripPress = false
 local function focusActive(): boolean
-	return focusState:active(false, player:GetAttribute("FocusToggle") == true, motor.mode == "attached")
+	return focusState:active(false, setting("FocusToggle") == true, motor.mode == "attached")
 end
 local drawnUp = motor.up
 local slow = false
@@ -377,6 +385,7 @@ local function backToStart()
 end
 
 local controls: any -- bound below (SpiderInput.bind)
+local camSettings: any = {} -- the camera's settings, filled each frame (see the render step)
 
 -- Choosing the spider (ROBLOX-31): only while resting awake in the silk-lined crack. The drawn rig is built again with the other appearance;
 -- the gait, the eye view and the hidden body carry over; the choice is kept in the Player attribute Appearance for the session.
@@ -516,7 +525,7 @@ local function presentEnd(immediate: boolean)
  panel:showChoices(if cause=="starved" then "The spider starved." else WaspText.LINE,
   if cause=="starved" then "It went too long without food." else WaspText.SUB,
   WaspText.summary(rec.hours,rec.meals,rec.wasp_visits,rec.wasp_escapes),choices,immediate)
- panel:setTextScale(if player:GetAttribute("LargeText")==true then 1.5 else 1)
+ panel:setTextScale(if setting("LargeText")==true then 1.5 else 1)
 end
 local function endLife(cause: string)
  local rec=summaryRecord(cause)
@@ -527,10 +536,12 @@ local function endLife(cause: string)
 end
 local function showCaught() endLife("wasp") end
 local openMenu: () -> ()
+local openSettings: (string?) -> ()
 local confirming: string?=nil
 menu=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
  if choice=="Notebook" then openNotebook("menu");return end
- if choice=="Notes" then player:SetAttribute("NotebookNotes",player:GetAttribute("NotebookNotes")==false);openMenu();return end
+ if choice=="Notes" then player:SetAttribute("NotebookNotes",not setting("NotebookNotes"));openMenu();return end
+ if choice=="Settings" then openSettings("menu");return end
  if choice=="Resume" then closeScreens();return end
  if choice=="Continue" then checkpoints=stores.main;closeScreens();returnToCheckpoint();return end
  if choice=="Free" then
@@ -540,7 +551,7 @@ menu=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
   return
  end
  if choice=="Large" then
-  player:SetAttribute("LargeText",player:GetAttribute("LargeText")~=true);openMenu();return
+  player:SetAttribute("LargeText",not setting("LargeText"));openMenu();return
  end
  if choice=="New" or choice=="Easy" then
   if session.started and confirming~=choice then
@@ -567,11 +578,12 @@ openMenu=function()
  if session.finishedMain then table.insert(choices,{id="Easy",text="Begin a new life on Easy"}) end
  table.insert(choices,{id="Free",text="Free play - gentle rules"})
  table.insert(choices,{id="Notebook",text=NotebookText.MENU_CHOICE})
- table.insert(choices,{id="Notes",text=if player:GetAttribute("NotebookNotes")==false then "Discovery notes: off" else "Discovery notes: on"})
- table.insert(choices,{id="Large",text=if player:GetAttribute("LargeText")==true then "Text size: large" else "Text size: normal"})
+ table.insert(choices,{id="Notes",text=if setting("NotebookNotes") then "Discovery notes: on" else "Discovery notes: off"})
+ table.insert(choices,{id="Settings",text=SettingsSpec.WORDS.menuChoice})
+ table.insert(choices,{id="Large",text=if setting("LargeText")==true then "Text size: large" else "Text size: normal"})
  menu:showChoices("The Windowsill","A small life on a windowsill.",
   menuBody(),choices,true)
- menu:setTextScale(if player:GetAttribute("LargeText")==true then 1.5 else 1)
+ menu:setTextScale(if setting("LargeText")==true then 1.5 else 1)
 end
 local menuButton=Instance.new("TextButton")
 menuButton.Name="LifeMenu";menuButton.Text="Menu";menuButton.Size=UDim2.fromOffset(72,36)
@@ -582,7 +594,7 @@ menuButton.Parent=hud.safe;menuButton.Activated:Connect(openMenu)
 -- The naturalist's notebook (ROBLOX-37). Opened from the game (N, the button beside Menu), the life menu or the end screen; closing it
 -- goes back to wherever it was opened from. The world waits while it is open (modal()).
 local function noteScale(): number
- return if player:GetAttribute("LargeText")==true then NotebookText.LARGE else 1
+ return if setting("LargeText")==true then NotebookText.LARGE else 1
 end
 nbPanel=NotebookPanel.new(player:WaitForChild("PlayerGui"),book,function(to: string?)
  if to=="menu" then openMenu()
@@ -601,13 +613,33 @@ end
 book.pageOpened:connect(function(id: string)
  local page=book:view(id)
  if nbPanel:isShowing() then nbPanel:refresh() end
- if page and player:GetAttribute("NotebookNotes")~=false then hud:setNote(NotebookText.note(page.title,device),NotebookPages.noteSeconds) end
+ if page and setting("NotebookNotes") then hud:setNote(NotebookText.note(page.title,device),NotebookPages.noteSeconds) end
 end)
 local notebookButton=Instance.new("TextButton")
 notebookButton.Name="NotebookButton";notebookButton.Text=NotebookText.BUTTON;notebookButton.Size=UDim2.fromOffset(88,36)
 notebookButton.Position=UDim2.new(1,-180,0,48);notebookButton.TextSize=14
 notebookButton.BackgroundColor3=Color3.new(.12,.12,.14);notebookButton.TextColor3=Color3.new(1,1,1)
 notebookButton.Parent=hud.safe;notebookButton.Activated:Connect(function() openNotebook("game") end)
+
+-- The settings (ROBLOX-49). Opened from the life menu or with O; closing it goes back to wherever it was opened from. The world waits while
+-- it is open (modal()). The values live as Player attributes named by SettingsSpec ids (the panel asks setting(), tells player:SetAttribute),
+-- so the saving that already watches them (below) keeps them and every consumer in this script reads them live.
+settingsPanel=SettingsPanel.new(player:WaitForChild("PlayerGui"),{
+ get=function(id: string): any return setting(id) end,
+ set=function(id: string,value: any) player:SetAttribute(id,value) end,
+ reset=function() for _,id in SettingsModel.ids() do player:SetAttribute(id,SettingsModel.default(id)) end end,
+ status=function(): string? local status=saveClient:status();return status end,
+},function(to: string?)
+ if to=="menu" then openMenu() else setHudShown(true) end
+end)
+openSettings=function(to: string?)
+ if settingsPanel:isShowing() then return end
+ if to=="menu" then menu:hide()
+ elseif modal() then return
+ else controls:clear();dropAll();setHudShown(false) end
+ hud:setNote("",0)
+ settingsPanel:open(to,device,noteScale())
+end
 
 -- ---------------------------------------------------------------- persistent saves (ROBLOX-39)
 -- What this visit changed is sent up (the notebook and an adult life always; the spider and the toggles only if the player changed them, so
@@ -665,6 +697,8 @@ local function applySaved(msg: any)
 	lastSig = `{#book.opened}:{session.finishedMain}`
 	lastEye = book.eyeSeconds
 	if nbPanel:isShowing() then nbPanel:refresh() end
+	if settingsPanel:isShowing() then settingsPanel:refresh() end
+	if not setting("ControlHints") and helpUntil ~= math.huge then helpVisible = false end
 	refreshMenu()
 end
 saveClient = SaveClient.new({
@@ -716,10 +750,11 @@ end
 
 controls = SpiderInput.bind({
 	blocked = modal,
-	menu = function() if nbPanel:isShowing() then nbPanel:close() elseif menu:isShowing() and session.started then closeScreens() else openMenu() end end,
+	menu = function() if settingsPanel:isShowing() then settingsPanel:close() elseif nbPanel:isShowing() then nbPanel:close() elseif menu:isShowing() and session.started then closeScreens() else openMenu() end end,
 	notebook = function() openNotebook("game") end,
+	settings = function() openSettings("game") end,
 	focus = function(phase: string)
-		if phase == "begin" then focusState:press(player:GetAttribute("FocusToggle") == true, motor.mode == "attached")
+		if phase == "begin" then focusState:press(setting("FocusToggle") == true, motor.mode == "attached")
 		elseif phase == "cancel" then focusState:clear() end
 	end,
 	choose = function() changeSpider() end,
@@ -763,13 +798,14 @@ controls = SpiderInput.bind({
 	slow = function() slow = not slow end,
 	touchLook = function(delta: Vector2) cam:touchLook(delta) end,
 	help = function()
-		helpVisible = not helpVisible
+		helpVisible = not (helpVisible and (setting("ControlHints") or helpUntil == math.huge))
 		helpUntil = math.huge
 	end,
 	device = function(name: string)
 		device = ControlText.deviceFor(name, device)
 		if device == "gamepad" then refreshPadStyle() end
 		nbPanel:setDevice(device)
+		settingsPanel:setDevice(device)
 	end,
 })
 
@@ -787,7 +823,7 @@ local function tickInput(): any
 		carry:step(0, 0, Vector3.zero, motor.transitionSerial, motor.intent, false)
 	end
 	local focusPoint: Vector3? = nil
-	if focusState:active(controls.held.Focus == true, player:GetAttribute("FocusToggle") == true, motor.mode == "attached") then
+	if focusState:active(controls.held.Focus == true, setting("FocusToggle") == true, motor.mode == "attached") then
 		local origin, dir = cam:aimRay()
 		local hit = Workspace:Raycast(origin, dir * SpiderMotor.AIM_RANGE, params)
 		focusPoint = if hit then hit.Position else origin + dir * SpiderMotor.AIM_RANGE
@@ -836,9 +872,14 @@ local function updateHud(frameDt: number)
 		status = {}, helpVisible = helpVisible, helpText = ControlText.helpCard(device) .. PeacockText.helpExtra(device, SpiderChoice.canDance(appearance)),
 		caption = eyes:captionView(device),
 	}
-	local rumble = if dancePose then PeacockText.caption(dancePose.rumble) else nil -- felt through the feet; the wasp's hum below takes precedence
+	-- Captions for sounds and vibrations (ROBLOX-49): off, normal or large. The eye view's own explanation above is not a sound caption.
+	local captionScale = SettingsSpec.CAPTION_SCALE[setting("Captions")] or 1
+	view.captionScale = if captionScale > 0 then captionScale else 1
+	local hints = setting("ControlHints")
+	view.helpVisible = helpVisible and (hints or helpUntil == math.huge) -- (H asks for the card even when the hints are off)
+	local rumble = if dancePose and captionScale > 0 then PeacockText.caption(dancePose.rumble) else nil -- felt through the feet; the wasp's hum below takes precedence
 	if rumble then view.caption = rumble end
-	if wasp:isVisiting() then
+	if wasp:isVisiting() and captionScale > 0 then
 		local direction = WaspText.directionWord(motor.pos, motor.heading, motor.up, wasp.wasp.position)
 		local heard = WaspText.caption(wasp.phase, wasp.phaseS, direction)
 		if heard then view.caption = heard end
@@ -901,7 +942,7 @@ local function updateHud(frameDt: number)
 		view.prompt = { hint = ControlText.edgeWalkHint(device) }
 	elseif restPrompt and not aiming then
 		view.prompt = { title = restPrompt.title, hint = restPrompt.hint }
-	elseif motor.mode == "attached" and not aiming and (helpVisible or os.clock() - started < WALK_HINT_SECONDS) then
+	elseif hints and motor.mode == "attached" and not aiming and (helpVisible or os.clock() - started < WALK_HINT_SECONDS) then
 		view.prompt = { hint = ControlText.walkHint(device) .. (if canDance then "    " .. PeacockText.displayHint(device, dance.active) else "") }
 	end
 	if os.clock() > helpUntil and helpVisible then helpVisible = false end
@@ -925,6 +966,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	updateSaves()
 	if panel:isShowing() then panel:update(frameDt) end
 	if nbPanel:isShowing() then nbPanel:update(frameDt) end
+	if settingsPanel:isShowing() then settingsPanel:update(frameDt) end
 	if GuiService.MenuIsOpen or modal() then
 		accumulator = 0 -- the Roblox menu is Godot's pause (so is the catch screen): the world waits
 	else
@@ -972,7 +1014,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 				end
 			end
 			if wasp.heldAt then motor:hold(wasp.heldAt) end
-			prey.feeding.auto = player:GetAttribute("AutomaticGrip") == true
+			prey.feeding.auto = setting("AutomaticGrip") == true
 			prey:after(DT,motor,sensor,sightCast)
 			-- The life loop runs last in the tick (Godot's habitat loop, priority 12); the reach it sets is the next tick's.
 			local holding = prey.feeding.held ~= nil
@@ -1026,7 +1068,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	-- The peacock spider's dance: a pose for the rig, stepped with the simulation's time (slow motion slows it, a menu or the catch screen
 	-- holds it). Standing still on a surface; any walking intent, jump, line or rest ends it at once.
 	if SpiderChoice.canDance(appearance) then
-		dance.reduced = player:GetAttribute("ReducedMotion") == true
+		dance.reduced = setting("ReducedMotion") == true
 		local r, f = controls:axes()
 		local standing = motor.mode == "attached" and not motor.preparing and not motor.seized and not motor:onLine() and not life.resting
 		local paused = GuiService.MenuIsOpen or modal()
@@ -1036,7 +1078,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 		dancePose = nil
 		rig.dance = nil
 	end
- rig.reducedMotion=player:GetAttribute("ReducedMotion")==true
+ rig.reducedMotion=setting("ReducedMotion")==true
  rig:setGrowthStage(life.growth.stage)
  rig:setSoftness(life.growth:softness())
  rig:setCondition(needs.energy)
@@ -1048,7 +1090,8 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	flyBodies:draw(prey.flies,prey.now)
 	local soundPaused = GuiService.MenuIsOpen or modal()
 	local soundSpeed = if slow then SLOW_SPEED else 1
-	local soundMuted = player:GetAttribute("SoundMuted") == true
+	local soundMuted = setting("SoundMuted") == true
+	soundscape:setVolumes(setting("MasterVolume"), setting("AmbienceVolume"), setting("CreatureVolume"))
 	soundscape:update(frameDt, prey, life.daylight, soundPaused, soundSpeed, soundMuted)
 	soundscape:updateWasp(wasp, soundPaused, soundSpeed, soundMuted)
 	waspBody:draw(wasp.wasp, prey.now)
@@ -1072,6 +1115,12 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			if age > 25 then line:Destroy() else line.Transparency = math.max(line.Transparency, 0.35 + 0.65 * age / 25) end
 		end
 	end
+	-- The camera's settings (ROBLOX-49), read each frame so a change in the panel shows at once.
+	camSettings.mouse, camSettings.stick, camSettings.touch = setting("LookSensitivityMouse"), setting("LookSensitivityStick"), setting("LookSensitivityTouch")
+	camSettings.invertX, camSettings.invertY = setting("InvertX"), setting("InvertY")
+	camSettings.fov, camSettings.distance, camSettings.framing = setting("FieldOfView"), setting("CameraDistance"), setting("FrameLine")
+	camSettings.levelHorizon = setting("EyeLevelHorizon")
+	cam:configure(camSettings)
 	-- Looking runs in real time, so slow motion never makes the camera sluggish.
 	local lx, ly = controls:lookAxes()
 	if not modal() then cam:render(frameDt, lx, ly) end
@@ -1079,7 +1128,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	-- picture sets the field of view, so it comes before the HUD projects anything.
 	local focusing = motor.mode == "attached" and (controls.held.Focus == true or focusActive())
 	eyes:update(frameDt, focusing)
-	perceptionHud:draw(memory,camera,sightCast,focusing,player:GetAttribute("ShowLastSeen") ~= false)
+	perceptionHud:draw(memory,camera,sightCast,focusing,setting("ShowLastSeen") == true)
 	-- Depth of field: on the spider in third person; in the eye view SpiderEyes owns it and focuses on what is looked at.
 	local dof = Lighting:FindFirstChild("MacroDOF")
 	if not cam.eyeView and dof and dof:IsA("DepthOfFieldEffect") then
@@ -1095,7 +1144,7 @@ if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
 		run({
 			prey = prey, flyBodies = flyBodies, waspBody = waspBody, life = life, wasp = wasp, caughtPanel = panel, needs = needs, checkpoints = checkpoints, returnToCheckpoint = function() returnToCheckpoint() end, lifeSpider = function() return lifeSpider end, sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
 			input = controls,
-			notebook = book, notebookWatch = watch, notebookPanel = nbPanel, openNotebook = openNotebook,
+			notebook = book, notebookWatch = watch, notebookPanel = nbPanel, openNotebook = openNotebook, settingsPanel = settingsPanel, openSettings = openSettings, setting = setting, cam = cam, soundscape = soundscape, eyes = eyes,
 			session=session, menu=menu, openMenu=openMenu, endLife=endLife, fresh=fresh, continueAnother=continueAnother, currentStore=function() return checkpoints end,
 			changeSpider = function() changeSpider() end, dance = function() return dance end, appearance = function() return appearance end, rig = function() return rig end,
 			drop = function() motor:requestDrop() end,

@@ -65,9 +65,13 @@ SettingsSpec.LIST = {
 	{ id = "NotebookNotes", section = "help", label = "Say when a new notebook page opens", kind = "toggle", default = true },
 } :: { Setting }
 
+-- How big the caption text is for each Captions option, as a multiple of the HUD's caption size (0: no captions of sounds at all).
+SettingsSpec.CAPTION_SCALE = { off = 0, normal = 1, large = 1.5 } :: { [string]: number }
+
 SettingsSpec.WORDS = {
 	title = "Settings",
 	reset = "Reset to defaults",
+	resetSure = "Reset every setting? Press again",
 	resetDone = "Settings are back to their defaults.",
 	close = "Back",
 	menuChoice = "Settings",

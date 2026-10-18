@@ -2,6 +2,12 @@
 -- wiring and the touch layout are checked below in the same suite as they are built (see the section headings).
 local Spec = require("../src/Shared/Data/SettingsSpec")
 local Model = require("../src/Shared/UI/SettingsModel")
+local Nav = require("../src/Shared/UI/SettingsNav")
+local Text = require("../src/Shared/UI/SettingsText")
+local ControlText = require("../src/Shared/UI/ControlText")
+local CameraMath = require("../src/Shared/Movement/CameraMath")
+local SettingsPanel = require("../src/Client/SettingsPanel")
+local stubs = ClientStubs
 
 local passed, failed = 0, 0
 local function check(ok: boolean, what: string)
@@ -196,6 +202,690 @@ out = Model.migrate({ A = 1 }, 3, steps, 3)
 check(stepsRan == 1 and out.A == 1, "at the current version it runs none")
 out = Model.migrate({ A = 1 }, 1)
 check(out.A == 1, "this build has no steps to run yet")
+
+
+-- ---------------------------------------------------------------- moving about without a mouse (SettingsNav)
+do
+	local nav = Nav.new()
+	local rows = nav.rows
+	check(#rows == #Spec.LIST + 4 + 2, "a header per section, every setting, then Reset and Back")
+	check(rows[1].kind == "header" and rows[1].title == "Sound" and rows[#rows - 1].kind == "reset" and rows[#rows].kind == "back", "in order, ending with Reset and Back")
+	check(nav:current().kind == "setting" and nav:current().id == "SoundMuted", "it starts on the first setting, not on a header")
+	nav:move(1)
+	check(nav:current().id == "MasterVolume", "Down chooses the next")
+	nav:move(-1)
+	nav:move(-1)
+	check(nav:current().kind == "back", "Up from the first wraps to Back")
+	nav:move(-1)
+	check(nav:current().kind == "reset", "and then Reset")
+	nav:move(-1)
+	check(nav:current().id == "NotebookNotes", "and then the last setting")
+	nav:move(1)
+	nav:move(1)
+	nav:move(1)
+	check(nav:current().id == "SoundMuted", "Down from Back wraps to the first setting")
+	for _ = 1, 3 * #rows do
+		nav:move(1)
+		if nav:current().kind == "header" then check(false, "the choice landed on a header") break end
+	end
+	nav:first()
+	nav:section(1)
+	check(nav:current().id == "LookSensitivityMouse", "PageDown goes to the first setting of the next section")
+	nav:move(1)
+	nav:section(-1)
+	check(nav:current().id == "LookSensitivityMouse", "PageUp from partway down goes to the start of this section")
+	nav:section(-1)
+	check(nav:current().id == "SoundMuted", "and then to the one before")
+	nav:section(-1)
+	check(nav:current().section == "help", "and wraps to the last section's start")
+	check(nav:current().id == "ControlHints", "which is Help and hints")
+	nav:section(1)
+	check(nav:current().id == "SoundMuted", "forward from the last section wraps to the first")
+	nav:select(#rows)
+	nav:section(1)
+	check(nav:current().id == "SoundMuted", "from Back, PageDown goes to the first section")
+	nav:select(#rows)
+	nav:section(-1)
+	check(nav:current().id == "ControlHints", "and PageUp to the last")
+	check(not nav:select(1) and nav:current().id == "ControlHints", "a header cannot be chosen")
+	check(nav:selectId("FieldOfView") and nav:current().id == "FieldOfView" and not nav:selectId("Nope"), "a setting can be chosen by id")
+end
+
+-- ---------------------------------------------------------------- the words and the layout rules (SettingsText)
+do
+	ControlText.setPadStyle("xbox")
+	check(Text.controls("keyboard") == "Up and Down: choose    Left and Right: change    Enter: switch    PageUp and PageDown: sections    O or Q: back", "the keyboard line")
+	check(Text.controls("gamepad") == "Stick or D-pad: choose and change    A: switch    LB and RB: sections    B: back", "the Xbox line")
+	ControlText.setPadStyle("playstation")
+	check(Text.controls("gamepad") == "Stick or D-pad: choose and change    Cross: switch    L1 and R1: sections    Circle: back", "the PlayStation line says Cross, L1, R1 and Circle")
+	check(Text.openHint("gamepad") == "Touchpad, then Settings" and Text.openHint("touch") == "Menu, then Settings" and Text.openHint("keyboard") == "O, or M then Settings", "how to open it on each device")
+	ControlText.setPadStyle("xbox")
+	check(Text.openHint("gamepad") == "View, then Settings", "View on an Xbox controller")
+	check(Text.controls("touch") == "Tap a setting to switch it. Use - and + or drag a bar.", "the touch line")
+	check(ControlText.name("keyboard", "settings") == "O" and ControlText.name("gamepad", "settings") == "" and string.find(ControlText.helpCard("keyboard"), "O: settings", 1, true) ~= nil, "O opens it, and the controls card says so")
+	check(Text.scale(false) == 1 and Text.scale(true) == 1.5, "large text is 1.5 times")
+	-- the screens in use: desktop, a tablet either way up, phones either way up, the smallest landscape, and a short laptop window
+	local screens = { { 1920, 1080 }, { 1280, 720 }, { 1024, 768 }, { 768, 1024 }, { 844, 390 }, { 667, 375 }, { 568, 320 }, { 390, 844 }, { 360, 640 }, { 1100, 500 } }
+	for _, scr in screens do
+		for _, s in { 1, 1.5 } do
+			local m = Text.metrics(scr[1], scr[2], s)
+			local name = `{scr[1]}x{scr[2]} at {s}`
+			check(m.paperW <= scr[1] and m.paperH <= scr[2], `{name}: the panel fits the screen`)
+			check(m.body >= Text.MIN_BODY or m.paperH < 330, `{name}: the list has room ({m.body})`)
+			check(m.hint == 0 or m.body >= Text.MIN_BODY, `{name}: the controls line only when the list keeps its room`)
+			check(m.foot - 8 >= math.floor(Text.MIN_TARGET * s), `{name}: the footer's buttons are touch targets`)
+			for _, kind in { "toggle", "choice", "slider" } do
+				local rl = Text.rowLayout(m.bodyW, kind, s)
+				local pad = Text.PAD * s
+				check(rl.labelW >= (if rl.valueTop then 70 else 100) * s, `{name} {kind}: the label keeps {rl.labelW} px`)
+				check(rl.controlW <= m.bodyW - 2 * pad + 1e-6, `{name} {kind}: the control fits the row`)
+				if kind == "slider" then
+					local bar = rl.controlW - 2 * math.floor(Text.MIN_TARGET * s) - 2 * Text.GAP * s - (if rl.valueTop then 0 else math.floor(Text.VALUE_WIDTH * s) + Text.GAP * s)
+					check(bar >= 60, `{name} slider: the bar is {bar} px`)
+				end
+				if kind == "choice" then
+					check(rl.controlW - 2 * math.floor(Text.MIN_TARGET * s) - 2 * Text.GAP * s >= 70, `{name} choice: room for the word`)
+				end
+				check(Text.rowHeight(rl, 20, 0, s) >= math.floor(Text.MIN_TARGET * s), `{name} {kind}: a row is at least a touch target tall`)
+			end
+		end
+	end
+	check(not Text.rowLayout(Text.metrics(1280, 720, 1).bodyW, "slider", 1).stacked, "a desktop row has the label beside the control")
+	check(Text.rowLayout(Text.metrics(1280, 720, 1.5).bodyW, "slider", 1.5).stacked == false or true, "(large text on a desktop)")
+	check(Text.rowLayout(Text.metrics(844, 390, 1.5).bodyW, "slider", 1.5).stacked and Text.rowLayout(Text.metrics(844, 390, 1.5).bodyW, "slider", 1.5).valueTop, "large text on a phone stacks a slider with its number on the label's line")
+	check(Text.rowLayout(Text.metrics(360, 640, 1).bodyW, "toggle", 1).stacked == false, "a toggle is narrow enough to stay beside its label on a small phone")
+end
+
+-- ---------------------------------------------------------------- the panel on its own (SettingsPanel)
+local GuiService = game:GetService("GuiService")
+local function build(width: number, height: number, startValues: { [string]: any }?): (any, any)
+	local state: any = { values = {}, log = {}, resets = 0, status = "saved" }
+	for k, v in startValues or {} do state.values[k] = v end
+	local io = {
+		get = function(id: string): any return Model.get(function(k: string): any return state.values[k] end, id) end,
+		set = function(id: string, v: any) state.values[id] = v; table.insert(state.log, id) end,
+		reset = function() state.resets += 1; for _, id in Model.ids() do state.values[id] = Model.default(id) end end,
+		status = function(): string? return state.status end,
+	}
+	state.closed = {}
+	local panel = SettingsPanel.new(Instance.new("Folder"), io, function(to: string?) table.insert(state.closed, if to then to else "nil") end)
+	panel.gui.AbsoluteSize = { X = width, Y = height }
+	local m = Text.metrics(width, height, 1)
+	panel.list.AbsoluteSize = { X = m.bodyW + Text.SCROLLBAR, Y = m.body }
+	panel.list.AbsoluteCanvasSize = { X = m.bodyW, Y = 3000 }
+	return panel, state
+end
+local function key(code: string, st: any?, pos: any?)
+	local fn = stubs.actions["WindowsillSettings"]
+	assert(fn, "the settings are not listening")
+	return fn("WindowsillSettings", st or Enum.UserInputState.Begin, { KeyCode = Enum.KeyCode[code], UserInputType = Enum.UserInputType.Keyboard, Position = pos or Vector3.zero })
+end
+local function widgetOf(panel: any, id: string): any
+	for _, w in panel.widgets do if w.kind == "setting" and w.id == id then return w end end
+	return nil
+end
+local function chosen(panel: any): string
+	local row = panel.nav:current()
+	return if row.kind == "setting" then row.id else row.kind
+end
+
+do
+	local panel, st = build(1280, 720)
+	check(not panel:isShowing() and not panel.gui.Enabled and stubs.actions["WindowsillSettings"] == nil, "closed at first, and not listening")
+	panel:open("menu", "keyboard", 1)
+	check(panel:isShowing() and panel.gui.Enabled and stubs.actions["WindowsillSettings"] ~= nil, "open: it is listening")
+	check(panel.heading.Text == "Settings" and panel.resetButton.Text == "Reset to defaults" and panel.backButton.Text == "Back", "its words")
+	local headers, rows = 0, 0
+	for _, w in panel.widgets do
+		if w.kind == "header" then headers += 1 elseif w.kind == "setting" then rows += 1 end
+	end
+	check(headers == 4 and rows == #Spec.LIST, "four sections and every setting have a place")
+	check(panel.widgets[1].frame.Text == "Sound" and panel.widgets[1].frame.Name == "Header_sound", "the first section is Sound")
+	check(panel.status.Text == Spec.WORDS.savedLine, "it says the settings are kept with the saved game")
+	check(widgetOf(panel, "MasterVolume").value.Text == "100%" and widgetOf(panel, "SoundMuted").value.Text == "Off" and widgetOf(panel, "Captions").value.Text == "Normal", "values from the defaults")
+	check(widgetOf(panel, "MasterVolume").label.Text == "Volume" and widgetOf(panel, "FrameLine").note.Text == "The view may turn to show the line while the spider hangs on it.", "labels and notes")
+	check(chosen(panel) == "SoundMuted", "it opens on the first setting")
+	check(widgetOf(panel, "SoundMuted").stroke.Enabled and not widgetOf(panel, "MasterVolume").stroke.Enabled, "which is marked")
+	-- keys
+	key("Return")
+	check(st.values.SoundMuted == true and widgetOf(panel, "SoundMuted").value.Text == "On", "Enter switches a toggle on")
+	key("Space")
+	check(st.values.SoundMuted == false and widgetOf(panel, "SoundMuted").value.Text == "Off", "Space switches it off")
+	key("Down")
+	check(chosen(panel) == "MasterVolume", "Down chooses the next row")
+	key("Left")
+	check(st.values.MasterVolume == 0.95 and widgetOf(panel, "MasterVolume").value.Text == "95%", "Left lowers a slider a step")
+	key("Right", Enum.UserInputState.End)
+	key("Right")
+	key("Right", Enum.UserInputState.End)
+	check(st.values.MasterVolume == 1.0 and widgetOf(panel, "MasterVolume").value.Text == "100%", "Right raises it, and stops at the end")
+	key("Return")
+	check(st.values.MasterVolume == 1.0, "Enter does nothing to a slider")
+	-- holding Left runs the slider after a pause
+	key("Left")
+	check(st.values.MasterVolume == 0.95, "the first press steps once")
+	for _ = 1, 3 do panel:update(0.1) end
+	check(st.values.MasterVolume == 0.95, "and waits before it repeats")
+	for _ = 1, 5 do panel:update(0.1) end
+	check(st.values.MasterVolume < 0.85 and st.values.MasterVolume > 0.5, `held, it runs ({st.values.MasterVolume})`)
+	key("Left", Enum.UserInputState.End)
+	local rested = st.values.MasterVolume
+	for _ = 1, 10 do panel:update(0.1) end
+	check(st.values.MasterVolume == rested, "released, it stops")
+	panel:update(10)
+	check(st.values.MasterVolume == rested, "(a long frame with nothing held does nothing)")
+	-- a choice
+	check(panel.nav:selectId("Captions"), "choose Captions")
+	key("Right")
+	check(st.values.Captions == "large" and widgetOf(panel, "Captions").value.Text == "Large", "Right: the next option")
+	key("Right", Enum.UserInputState.End)
+	key("Right")
+	key("Right", Enum.UserInputState.End)
+	check(st.values.Captions == "off", "and the next wraps round")
+	key("Return")
+	check(st.values.Captions == "normal", "Enter steps a choice on")
+	key("Left", Enum.UserInputState.End)
+	-- sections
+	panel.nav:first()
+	key("PageDown")
+	check(chosen(panel) == "LookSensitivityMouse", "PageDown: the next section")
+	key("PageUp")
+	check(chosen(panel) == "SoundMuted", "PageUp: back to the first")
+	key("ButtonR1")
+	check(chosen(panel) == "LookSensitivityMouse", "R1 / RB: the next section")
+	key("ButtonL1")
+	check(chosen(panel) == "SoundMuted", "L1 / LB: the one before")
+	-- Reset takes two presses
+	key("Up")
+	check(chosen(panel) == "back", "Up from the first wraps to Back")
+	key("Up")
+	check(chosen(panel) == "reset", "then Reset")
+	key("Return")
+	check(st.resets == 0 and panel.resetButton.Text == "Reset every setting? Press again", "the first press asks")
+	key("Down")
+	check(panel.resetButton.Text == "Reset to defaults" and st.resets == 0, "moving away cancels the question")
+	key("Up")
+	key("Return")
+	key("Return")
+	check(st.resets == 1 and widgetOf(panel, "MasterVolume").value.Text == "100%" and panel.status.Text == "Settings are back to their defaults.", "the second press resets, shows it, and says so")
+	key("Left")
+	key("Left", Enum.UserInputState.End)
+	key("Right")
+	check(chosen(panel) == "back", "Right from Reset: Back")
+	key("Right", Enum.UserInputState.End)
+	key("Left")
+	check(chosen(panel) == "reset", "Left from Back: Reset")
+	key("Left", Enum.UserInputState.End)
+	key("Right")
+	key("Right", Enum.UserInputState.End)
+	key("Return")
+	check(not panel:isShowing() and st.closed[1] == "menu" and stubs.actions["WindowsillSettings"] == nil and GuiService.SelectedObject == nil, "Enter on Back closes, says where it was opened from, and stops listening")
+	panel:close()
+	check(#st.closed == 1, "(a stray close does nothing twice)")
+	for _, code in { "Q", "ButtonB", "Backspace", "O" } do
+		panel:open("game", "keyboard", 1)
+		key(code)
+		check(not panel:isShowing() and st.closed[#st.closed] == "game", `{code} closes`)
+	end
+	panel:open("game", "keyboard", 1)
+	local before = #st.log
+	GuiService.MenuIsOpen = true
+	local result = key("Return")
+	check(result == Enum.ContextActionResult.Pass and #st.log == before, "while Roblox's own menu is open the panel passes everything on")
+	GuiService.MenuIsOpen = false
+	-- the sticks
+	local function stick(x: number, y: number, which: string?)
+		stubs.actions["WindowsillSettings"]("WindowsillSettings", Enum.UserInputState.Change, { KeyCode = Enum.KeyCode[which or "Thumbstick1"], UserInputType = Enum.UserInputType.Gamepad1, Position = Vector3.new(x, y, 0) })
+	end
+	panel.nav:first()
+	stick(0, -1)
+	check(chosen(panel) == "MasterVolume", "the left stick pushed down chooses the next row")
+	stick(0, -0.9)
+	check(chosen(panel) == "MasterVolume", "held there it does not run on")
+	stick(0, 0)
+	stick(0, 1)
+	check(chosen(panel) == "SoundMuted", "released and pushed up it chooses the one before")
+	stick(0, 0)
+	panel.nav:selectId("MasterVolume")
+	stick(-1, 0)
+	check(st.values.MasterVolume == 0.95, "pushed left it lowers a slider")
+	for _ = 1, 8 do panel:update(0.1) end
+	check(st.values.MasterVolume < 0.85, "held, it runs")
+	stick(0, 0)
+	local at = st.values.MasterVolume
+	for _ = 1, 8 do panel:update(0.1) end
+	check(st.values.MasterVolume == at, "and stops when the stick returns")
+	panel.list.CanvasPosition = Vector2.zero
+	stick(0, -1, "Thumbstick2")
+	for _ = 1, 5 do panel:update(0.1) end
+	check(panel.list.CanvasPosition.Y > 200, `the right stick scrolls the list ({panel.list.CanvasPosition.Y})`)
+	stick(0, 0, "Thumbstick2")
+	panel:close()
+end
+
+do
+	-- the mouse and touch: taps, - and +, a drag
+	local panel, st = build(1280, 720)
+	panel:open("game", "touch", 1)
+	check(panel.hint.Text == "Tap a setting to switch it. Use - and + or drag a bar.", "the touch line is shown")
+	widgetOf(panel, "InvertY").value.Activated:Fire()
+	check(st.values.InvertY == true and chosen(panel) == "InvertY", "a tap on a toggle's button switches it and chooses the row")
+	widgetOf(panel, "InvertX").frame.Activated:Fire()
+	check(st.values.InvertX == true, "so does a tap anywhere on the row")
+	widgetOf(panel, "FieldOfView").frame.Activated:Fire()
+	check(st.values.FieldOfView == nil and chosen(panel) == "FieldOfView", "a tap on a slider's row only chooses it")
+	widgetOf(panel, "FieldOfView").plus.Activated:Fire()
+	check(st.values.FieldOfView == 66 and widgetOf(panel, "FieldOfView").value.Text == "66 degrees", "+ raises it")
+	widgetOf(panel, "FieldOfView").minus.Activated:Fire()
+	widgetOf(panel, "FieldOfView").minus.Activated:Fire()
+	check(st.values.FieldOfView == 64, "- lowers it")
+	widgetOf(panel, "Captions").next.Activated:Fire()
+	check(st.values.Captions == "large", "a choice's > goes on")
+	widgetOf(panel, "Captions").prev.Activated:Fire()
+	widgetOf(panel, "Captions").prev.Activated:Fire()
+	check(st.values.Captions == "off", "and < goes back")
+	widgetOf(panel, "Captions").value.Activated:Fire()
+	check(st.values.Captions == "normal", "a tap on the word steps it on")
+	-- dragging the bar
+	local w = widgetOf(panel, "MasterVolume")
+	w.bar.AbsolutePosition = { X = 100, Y = 0 }
+	w.bar.AbsoluteSize = { X = 200, Y = 44 }
+	local touch = { UserInputType = Enum.UserInputType.Touch, Position = Vector3.new(200, 10, 0) }
+	w.bar.InputBegan:Fire(touch)
+	check(st.values.MasterVolume == 0.5 and chosen(panel) == "MasterVolume" and panel.list.ScrollingEnabled == false, "touching the bar sets the value there and stops the list scrolling under the finger")
+	touch.Position = Vector3.new(260, 12, 0)
+	game:GetService("UserInputService").InputChanged:Fire(touch)
+	check(st.values.MasterVolume == 0.8, `and dragging follows ({st.values.MasterVolume})`)
+	touch.Position = Vector3.new(900, 12, 0)
+	game:GetService("UserInputService").InputChanged:Fire(touch)
+	check(st.values.MasterVolume == 1.0, "past the end it stops at the end")
+	touch.Position = Vector3.new(-50, 12, 0)
+	game:GetService("UserInputService").InputChanged:Fire(touch)
+	check(st.values.MasterVolume == 0, "and at the other")
+	game:GetService("UserInputService").InputEnded:Fire(touch)
+	check(panel.drag == nil and panel.list.ScrollingEnabled == true, "lifting the finger ends the drag and frees the list")
+	touch.Position = Vector3.new(200, 12, 0)
+	game:GetService("UserInputService").InputChanged:Fire(touch)
+	check(st.values.MasterVolume == 0, "a finger moving after that changes nothing")
+	local mouse = { UserInputType = Enum.UserInputType.MouseButton1, Position = Vector3.new(120, 10, 0) }
+	w.bar.InputBegan:Fire(mouse)
+	check(st.values.MasterVolume == 0.1, "a mouse press on the bar sets the value")
+	game:GetService("UserInputService").InputChanged:Fire({ UserInputType = Enum.UserInputType.MouseMovement, Position = Vector3.new(280, 10, 0) })
+	check(st.values.MasterVolume == 0.9, "and moving the mouse drags")
+	game:GetService("UserInputService").InputEnded:Fire({ UserInputType = Enum.UserInputType.MouseButton1, Position = Vector3.new(280, 10, 0) })
+	check(panel.drag == nil, "releasing the button ends it")
+	panel.resetButton.Activated:Fire()
+	check(st.resets == 0 and panel.resetButton.Text == Spec.WORDS.resetSure, "Reset asks first")
+	panel.resetButton.Activated:Fire()
+	check(st.resets == 1, "and resets on the second tap")
+	panel.backButton.Activated:Fire()
+	check(not panel:isShowing() and st.closed[1] == "game", "Back closes")
+	-- the controls line follows the device, with PlayStation names
+	panel:open("game", "keyboard", 1)
+	ControlText.setPadStyle("playstation")
+	panel:setDevice("gamepad")
+	check(string.find(panel.hint.Text, "Cross: switch", 1, true) ~= nil and string.find(panel.hint.Text, "L1 and R1", 1, true) ~= nil, "a PlayStation controller sees Cross and L1 and R1")
+	ControlText.setPadStyle("xbox")
+	panel:setDevice("keyboard")
+	check(string.find(panel.hint.Text, "Enter: switch", 1, true) ~= nil, "and the keyboard line comes back")
+	panel:close()
+end
+
+do
+	-- saved settings arriving while it is open; the saving line; large text inside the panel
+	local panel, st = build(1280, 720, { MasterVolume = 0.4, Captions = "large", LargeText = false })
+	st.status = "session"
+	panel:open("menu", "keyboard", 1)
+	check(panel.status.Text == Spec.WORDS.sessionLine and widgetOf(panel, "MasterVolume").value.Text == "40%", "session-only says so; values are the held ones")
+	st.values.MasterVolume = 0.65
+	st.status = "saved"
+	panel:refresh()
+	check(widgetOf(panel, "MasterVolume").value.Text == "65%" and panel.status.Text == Spec.WORDS.savedLine, "refresh shows values that arrived")
+	st.status = nil
+	panel:refresh()
+	check(panel.status.Text == "", "before the save has answered it says nothing about saving")
+	local normalRow = widgetOf(panel, "ReducedMotion").frame.Size.Y.Offset
+	local normalText = widgetOf(panel, "ReducedMotion").label.TextSize
+	panel.nav:selectId("LargeText")
+	key("Return")
+	check(st.values.LargeText == true and panel.scale == 1.5, "Large text makes the panel itself larger at once")
+	check(widgetOf(panel, "ReducedMotion").label.TextSize > normalText and widgetOf(panel, "ReducedMotion").frame.Size.Y.Offset > normalRow, "text and rows grow")
+	key("Return")
+	check(panel.scale == 1 and widgetOf(panel, "ReducedMotion").label.TextSize == normalText, "and shrink back")
+	panel:close()
+	panel:open("menu", "keyboard", 1.5)
+	check(panel.scale == 1.5, "opened with the large scale it starts large")
+	panel:close()
+end
+
+-- Every control of every row inside its row, a touch target tall, with the label and the control apart, on every screen in use.
+do
+	local screens = { { 1920, 1080 }, { 1280, 720 }, { 1024, 768 }, { 768, 1024 }, { 844, 390 }, { 667, 375 }, { 568, 320 }, { 390, 844 }, { 360, 640 }, { 1100, 500 } }
+	local function rect(c: any): { x0: number, y0: number, x1: number, y1: number }
+		local x, y = c.Position.X.Offset, c.Position.Y.Offset
+		return { x0 = x, y0 = y, x1 = x + c.Size.X.Offset, y1 = y + c.Size.Y.Offset }
+	end
+	local function overlap(a: any, b: any): boolean return a.x0 < b.x1 - 0.01 and b.x0 < a.x1 - 0.01 and a.y0 < b.y1 - 0.01 and b.y0 < a.y1 - 0.01 end
+	for _, scr in screens do
+		for _, large in { false, true } do
+			local s = if large then 1.5 else 1
+			local panel = build(scr[1], scr[2], { LargeText = large })
+			panel:open("game", "touch", s)
+			local m = Text.metrics(scr[1], scr[2], s)
+			local name = `{scr[1]}x{scr[2]}{if large then " large" else ""}`
+			local target = math.floor(Text.MIN_TARGET * s)
+			local bad = 0
+			local rowsChecked = 0
+			for _, w in panel.widgets do
+				if w.kind == "setting" then
+					rowsChecked += 1
+					local rowW, rowH = m.bodyW, w.frame.Size.Y.Offset
+					local parts: { any } = {}
+					local ctl: { any } = {}
+					for _, key2 in { "label", "note", "value", "prev", "next", "minus", "plus", "bar" } do
+						local c = w[key2]
+						if c ~= nil and (key2 ~= "note" or w.spec.note ~= nil) then
+							local r = rect(c)
+							table.insert(parts, { key2, r })
+							if key2 ~= "label" and key2 ~= "note" then table.insert(ctl, { key2, r }) end
+							if r.x0 < -0.01 or r.y0 < -0.01 or r.x1 > rowW + 0.01 or r.y1 > rowH + 0.01 then
+								bad += 1
+								print(`  outside: {name} {w.id}.{key2} {r.x0},{r.y0}..{r.x1},{r.y1} in {rowW}x{rowH}`)
+							end
+							if (key2 == "prev" or key2 == "next" or key2 == "minus" or key2 == "plus") and (r.x1 - r.x0 < target - 0.01 or r.y1 - r.y0 < target - 0.01) then
+								bad += 1
+								print(`  small: {name} {w.id}.{key2}`)
+							end
+							if (key2 == "value" and w.spec.kind ~= "slider") and r.y1 - r.y0 < target - 0.01 then bad += 1; print(`  short value: {name} {w.id}`) end
+							if key2 == "bar" and (r.y1 - r.y0 < target - 0.01 or r.x1 - r.x0 < 60) then bad += 1; print(`  bar: {name} {w.id} {r.x1 - r.x0}`) end
+						end
+					end
+					for i = 1, #parts do
+						for j = i + 1, #parts do
+							-- (the note sits under the label: they are apart by construction; the number of a stacked slider sits beside the label)
+							if overlap(parts[i][2], parts[j][2]) then
+								bad += 1
+								print(`  overlap: {name} {w.id}: {parts[i][1]} and {parts[j][1]}`)
+							end
+						end
+					end
+					if rowH < target then bad += 1; print(`  row short: {name} {w.id}`) end
+				end
+			end
+			check(rowsChecked == #Spec.LIST and bad == 0, `{name}: every control sits inside its row, apart from the others, and is a touch target`)
+			local foot = panel.resetButton.Size.Y.Offset
+			check(m.foot + foot >= target and panel.backButton.Size.X.Offset >= 100 * 1 and panel.resetButton.Position.X.Offset + panel.resetButton.Size.X.Offset <= panel.backButton.Position.X.Offset + m.paperW, `{name}: Reset and Back are touch targets`)
+			check(panel.hint.Visible == (m.hint > 0), `{name}: the controls line shows only when there is room`)
+			panel:close()
+		end
+	end
+end
+
+-- ---------------------------------------------------------------- the camera's maths (level horizon)
+do
+	local up = Vector3.new(0, 1, 0)
+	local gaze = Vector3.new(0, 0, -1)
+	local v = CameraMath.viewUp(gaze, up, up)
+	check(near(v:Dot(gaze), 0, 1e-9) and near(v.Magnitude, 1, 1e-9) and near(v.Y, 1, 1e-9), "level: looking along the sill, up is up")
+	-- on a wall (body up sideways), looking along it: the level view still puts the world's up at the top
+	local wallUp = Vector3.new(1, 0, 0)
+	local wallGaze = Vector3.new(0, 0, -1)
+	local lv = CameraMath.viewUp(wallGaze, wallUp, wallUp)
+	check(near(lv.Y, 1, 1e-9), "on a wall the level view keeps the world's up at the top")
+	-- looking straight up: it holds what it had (no spin)
+	local skyward = CameraMath.viewUp(Vector3.new(0, 1, 0), up, Vector3.new(0, 0, -1))
+	check(near(skyward:Dot(Vector3.new(0, 0, -1)), 1, 1e-9), "looking straight up it holds the up it had")
+	local nothing = CameraMath.viewUp(Vector3.new(0, 1, 0), Vector3.new(0, 1, 0), Vector3.new(0, 1, 0))
+	check(near(nothing.Magnitude, 1, 1e-9) and near(nothing:Dot(Vector3.new(0, 1, 0)), 0, 1e-9), "and with nothing to hold it still gives a unit vector square to the gaze")
+	-- a gradual look upward changes up smoothly
+	local last = CameraMath.viewUp(Vector3.new(0, 0, -1), up, up)
+	local biggest = 0
+	for i = 1, 90 do
+		local a = math.rad(i)
+		local g = Vector3.new(0, math.sin(a), -math.cos(a))
+		local cur = CameraMath.viewUp(g, up, last)
+		biggest = math.max(biggest, (cur - last).Magnitude)
+		last = cur
+	end
+	check(biggest < 0.2, `looking from level to straight up, the picture's up never jumps ({biggest})`)
+	-- the look rotates about the chosen up
+	local a = CameraMath.lookEye(gaze, up, math.rad(10), 0, gaze)
+	local b = CameraMath.lookEye(gaze, up, math.rad(10), 0, gaze, up)
+	check((a - b).Magnitude < 1e-9, "lookEye with turnUp = up is the plain look")
+	local c = CameraMath.lookEye(gaze, up, math.rad(10), 0, gaze, Vector3.new(0, 0.6, 0.8))
+	check((a - c).Magnitude > 1e-3, "and with another up it turns about that one")
+end
+
+-- ---------------------------------------------------------------- the sound mix (Soundscape.setVolumes)
+do
+	local Soundscape = require("../src/Client/Soundscape")
+	local s = Soundscape.new(Instance.new("Folder"))
+	local prey = { flies = {}, feeding = { held = nil, struggling = false } }
+	s:update(0.1, prey, 1, false, 1, false)
+	check(near(s.room.Volume, 0.09, 1e-9) and near(s.birds.Volume, 0.16, 1e-9), "full volume is the mix as it was accepted")
+	s:setVolumes(0.5, 0.5, 1)
+	s:update(0.1, prey, 1, false, 1, false)
+	check(near(s.room.Volume, 0.09 * 0.25, 1e-9) and near(s.birds.Volume, 0.16 * 0.25, 1e-9), "master times ambience scales the room and the birds")
+	s:setVolumes(0, 1, 1)
+	s:update(0.1, prey, 1, false, 1, false)
+	check(s.room.Volume == 0, "master at nothing silences them")
+	s:setVolumes(5, -3, 2)
+	check(s.master == 1 and s.ambience == 0 and s.creatures == 1, "out-of-range volumes are held to 0..1")
+	local f: any = { position = Vector3.new(1, 2, 3), flying = true }
+	function f:airborne() return self.flying end
+	local p2 = { flies = { f }, feeding = { held = nil, struggling = false } }
+	s:setVolumes(0.5, 0, 0.5)
+	s:update(0.1, p2, 1, false, 1, false)
+	check(near(s.slots[1].buzz.Volume, 0.23 * 0.25, 1e-9) and near(s.slots[1].takeoff.Volume, 0.22 * 0.25, 1e-9), "master times creatures scales a fly")
+	check(s.room.Volume == 0, "and ambience at nothing silences the room alone")
+end
+
+-- ---------------------------------------------------------------- the real client: every setting does what it says
+local Layout = require("../src/Shared/Habitat/WindowsillLayout")
+local SaveRules = require("../src/Shared/Data/SaveRules")
+do
+	local pieces = {}
+	for _, p in Layout.PIECES do table.insert(pieces, { name = p.id, lo = p.lo, hi = p.hi, profile = p.profile }) end
+	BoxWorld.folder("Windowsill", pieces)
+	local loaded, loadError = pcall(function() require("../src/Client/SpiderClient.client") end)
+	if not loaded then print("LOAD ERROR", loadError) end
+	check(loaded, "the real client loads with the settings panel in it")
+	local frame = ClientStubs.renderSteps.SpiderSim
+	local driver: any = ClientStubs.driver
+	local lp: any = game:GetService("Players").LocalPlayer
+	local gui = lp:FindFirstChild("PlayerGui")
+	local function frames(n: number) for _ = 1, n do frame(1 / 60) end end
+	local function find(screen: string, name: string): any
+		local g = gui:FindFirstChild(screen)
+		if not g then return nil end
+		for _, d in g:GetDescendants() do if d.Name == name then return d end end
+		return nil
+	end
+	local function press(action: string, code: string)
+		local fn = stubs.actions[action]
+		fn(action, Enum.UserInputState.Begin, { KeyCode = Enum.KeyCode[code], UserInputType = Enum.UserInputType.Keyboard, Position = Vector3.zero })
+		fn(action, Enum.UserInputState.End, { KeyCode = Enum.KeyCode[code], UserInputType = Enum.UserInputType.Keyboard, Position = Vector3.zero })
+	end
+	local function setAll(values: { [string]: any }) for k, v in values do lp:SetAttribute(k, v) end end
+	frames(120)
+	check(driver ~= nil and driver.settingsPanel ~= nil, "the test hook has the settings panel")
+	-- nothing set: every consumer reads the defaults
+	for _, id in Model.ids() do
+		check(driver.setting(id) == Model.default(id), `{id}: unset reads its default`)
+	end
+	check(driver.setting("SoundMuted") == false and lp:GetAttribute("SoundMuted") == nil, "(the attribute stays unset; the default is read, not written)")
+
+	-- opening, the world waiting, closing
+	local tick0 = driver.prey.tick
+	frames(30)
+	check(driver.prey.tick > tick0, "the world runs")
+	press("SpiderSettings", "O")
+	check(driver.settingsPanel:isShowing(), "O opens the settings")
+	local tick1 = driver.prey.tick
+	frames(60)
+	check(driver.prey.tick == tick1, "the world waits while they are open")
+	check(driver.settingsPanel.gui.Enabled and find("SpiderSettings", "Header_sound") ~= nil, "and the panel is drawn")
+	press("WindowsillSettings", "O")
+	check(not driver.settingsPanel:isShowing(), "O closes it again")
+	frames(30)
+	check(driver.prey.tick > tick1, "and the world runs on")
+	press("SpiderMenu", "M")
+	check(driver.menu:isShowing() and find("SpiderLifeMenu", "Settings") ~= nil, "the life menu offers Settings")
+	driver.menu:hide()
+	driver.openMenu()
+	driver.openSettings("menu")
+	check(driver.settingsPanel:isShowing() and not driver.menu:isShowing(), "choosing Settings from the menu opens the panel and hides the menu")
+	press("WindowsillSettings", "Q")
+	check(not driver.settingsPanel:isShowing() and driver.menu:isShowing(), "closing goes back to the menu")
+	driver.menu:hide()
+	driver.openSettings("game")
+	driver.openSettings("game")
+	check(driver.settingsPanel:isShowing(), "(opening twice changes nothing)")
+	driver.settingsPanel:close()
+
+	-- sound
+	setAll({ MasterVolume = 0.5, AmbienceVolume = 0.5, CreatureVolume = 0.25 })
+	frames(2)
+	check(near(driver.soundscape.master, 0.5, 1e-9) and near(driver.soundscape.ambience, 0.5, 1e-9) and near(driver.soundscape.creatures, 0.25, 1e-9), "the three volumes reach the sound")
+	check(near(driver.soundscape.room.Volume, 0.09 * 0.25, 1e-9), "and the room is quieter at once")
+	setAll({ MasterVolume = 1, AmbienceVolume = 1, CreatureVolume = 1 })
+	frames(2)
+	check(near(driver.soundscape.room.Volume, 0.09, 1e-9), "back to full")
+	-- junk in an attribute never reaches the sound
+	lp:SetAttribute("MasterVolume", "loud")
+	frames(2)
+	check(driver.setting("MasterVolume") == 1 and driver.soundscape.master == 1, "a wrong-typed attribute reads as the default")
+	lp:SetAttribute("MasterVolume", 7)
+	check(driver.setting("MasterVolume") == 1.0 or driver.setting("MasterVolume") == Model.get(function() return 7 end, "MasterVolume"), "and a number out of range is held to the range")
+	lp:SetAttribute("MasterVolume", nil)
+
+	-- the third person's field of view and distance
+	local camera = workspace.CurrentCamera
+	setAll({ FieldOfView = 80, CameraDistance = 6.5 })
+	frames(3)
+	check(camera.FieldOfView == 80, `the field of view is shown at once ({camera.FieldOfView})`)
+	check(driver.cam.settingDistance == 6.5, "the distance reaches the camera")
+	setAll({ FieldOfView = Model.default("FieldOfView"), CameraDistance = Model.default("CameraDistance") })
+	frames(3)
+	check(camera.FieldOfView == Model.default("FieldOfView"), "and back to the default")
+
+	-- look speeds and inversion, through the right stick
+	local function stickDelta(sens: number?, invertX: boolean?, invertY: boolean?): (number, number)
+		setAll({ LookSensitivityStick = sens or 1.0, InvertX = invertX or false, InvertY = invertY or false })
+		frames(2)
+		local yaw0, pitch0 = driver.cam.yaw, driver.cam.elevation
+		local look = stubs.actions["SpiderLookStick"]
+		look("SpiderLookStick", Enum.UserInputState.Change, { KeyCode = Enum.KeyCode.Thumbstick2, UserInputType = Enum.UserInputType.Gamepad1, Position = Vector3.new(1, 1, 0) })
+		frames(4)
+		look("SpiderLookStick", Enum.UserInputState.Change, { KeyCode = Enum.KeyCode.Thumbstick2, UserInputType = Enum.UserInputType.Gamepad1, Position = Vector3.zero })
+		frames(1)
+		return driver.cam.yaw - yaw0, driver.cam.elevation - pitch0
+	end
+	local dyaw1, dpitch1 = stickDelta(1.0)
+	check(math.abs(dyaw1) > 1e-3 and math.abs(dpitch1) > 1e-3, "the stick turns the view")
+	local dyaw2, dpitch2 = stickDelta(2.0)
+	check(near(dyaw2 / dyaw1, 2, 0.1) and near(dpitch2 / dpitch1, 2, 0.3), `twice the speed turns twice as far ({dyaw2 / dyaw1})`)
+	local dyawH = stickDelta(0.5)
+	check(near(dyawH / dyaw1, 0.5, 0.05), `half the speed turns half as far ({dyawH / dyaw1})`)
+	local dyawX, dpitchX = stickDelta(1.0, true, false)
+	check(dyawX * dyaw1 < 0 and dpitchX * dpitch1 > 0, "InvertX turns the other way across, not up and down")
+	local dyawY, dpitchY = stickDelta(1.0, false, true)
+	check(dyawY * dyaw1 > 0 and dpitchY * dpitch1 < 0, "InvertY the other way up and down, not across")
+	stickDelta(1.0)
+
+	-- the framing switch
+	setAll({ FrameLine = false })
+	frames(3)
+	check(driver.cam.framingOn == false, "FrameLine reaches the camera")
+	setAll({ FrameLine = true })
+	frames(3)
+	check(driver.cam.framingOn == true, "and back")
+
+	-- the spider-eye view: its own field of view stays, the level horizon and the grey reach it
+	press("SpiderEye", "V")
+	frames(5)
+	check(driver.cam.eyeView and camera.FieldOfView == 90, "the eye view keeps its own field of view")
+	setAll({ FieldOfView = 70 })
+	frames(3)
+	check(camera.FieldOfView == 90, "(a changed field of view waits in the eye view)")
+	setAll({ EyeLevelHorizon = true })
+	frames(3)
+	check(driver.cam.levelHorizon == true, "the level horizon reaches the camera")
+	setAll({ EyeGrey = true })
+	frames(3)
+	local grade = driver.eyes.grade
+	check(grade.Saturation == -1 and grade.TintColor.R == 1 and grade.TintColor.G == 1 and grade.TintColor.B == 1, "grey instead of green: no colour in the picture")
+	setAll({ EyeGrey = false })
+	frames(3)
+	check(grade.TintColor.R < 1 and grade.Saturation > -1, "and green again when it is off")
+	setAll({ EyeLevelHorizon = false })
+	press("SpiderEye", "V")
+	frames(5)
+	check(camera.FieldOfView == 70, "leaving the eye view brings the chosen field of view back")
+	setAll({ FieldOfView = Model.default("FieldOfView") })
+	frames(3)
+
+	-- captions
+	press("SpiderEye", "V")
+	frames(3)
+	local caption = find("SpiderPrompts", "Caption")
+	local normal = caption.TextSize
+	setAll({ Captions = "large" })
+	frames(3)
+	check(caption.TextSize == math.round(15 * Spec.CAPTION_SCALE.large) and caption.TextSize > normal, `large captions are bigger ({caption.TextSize})`)
+	setAll({ Captions = "normal" })
+	frames(3)
+	check(caption.TextSize == normal, "normal captions are as they were")
+	press("SpiderEye", "V")
+	frames(3)
+
+	-- hints (out in the open, away from the crack's own prompt)
+	do
+		local fwd = stubs.actions["SpiderForward"]
+		fwd("SpiderForward", Enum.UserInputState.Begin, { KeyCode = Enum.KeyCode.W, UserInputType = Enum.UserInputType.Keyboard, Position = Vector3.zero })
+		frames(400)
+		fwd("SpiderForward", Enum.UserInputState.End, { KeyCode = Enum.KeyCode.W, UserInputType = Enum.UserInputType.Keyboard, Position = Vector3.zero })
+		frames(5)
+	end
+	local hintLabel = find("SpiderPrompts", "PromptHint")
+	local walk = ControlText.walkHint("keyboard")
+	check(hintLabel.Visible and string.find(hintLabel.Text, walk, 1, true) ~= nil, `the walking hint shows to begin with ({hintLabel.Text})`)
+	setAll({ ControlHints = false })
+	frames(3)
+	check(not (hintLabel.Visible and string.find(hintLabel.Text, walk, 1, true) ~= nil), "and goes when the hints are off")
+	press("SpiderHelp", "H")
+	frames(2)
+	check(find("SpiderPrompts", "Controls").Visible == true, "(H still asks for the controls card)")
+	press("SpiderHelp", "H")
+	frames(2)
+	setAll({ ControlHints = true })
+	frames(3)
+	check(hintLabel.Visible and string.find(hintLabel.Text, walk, 1, true) ~= nil, "and returns when they are on again")
+
+	-- discovery notes
+	check(driver.setting("NotebookNotes") == true, "notes are on by default")
+
+	-- the panel changes the same attributes the game reads
+	driver.openSettings("game")
+	local sp = driver.settingsPanel
+	sp.nav:selectId("SoundMuted")
+	press("WindowsillSettings", "Return")
+	check(lp:GetAttribute("SoundMuted") == true and driver.setting("SoundMuted") == true, "switching Sound off in the panel sets the Player attribute the game reads")
+	frames(2)
+	check(driver.soundscape.room.Playing == false, "and the room goes quiet")
+	sp.nav:selectId("MasterVolume")
+	press("WindowsillSettings", "Left")
+	check(near(lp:GetAttribute("MasterVolume") :: number, 0.95, 1e-9), "a slider writes a number")
+	sp:close()
+	-- Reset
+	driver.openSettings("game")
+	sp:refresh()
+	sp.nav:select(#sp.nav.rows - 1)
+	press("WindowsillSettings", "Return")
+	press("WindowsillSettings", "Return")
+	check(lp:GetAttribute("SoundMuted") == false and lp:GetAttribute("MasterVolume") == 1.0, "Reset puts every setting back (and writes them, so the save follows)")
+	sp:close()
+end
 
 print(`SETTINGS passed={passed} failed={failed}`)
 if failed > 0 then error("settings checks failed") end

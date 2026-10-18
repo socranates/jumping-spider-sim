@@ -1,6 +1,8 @@
 --!strict
 -- Original procedural recordings from the frozen Godot sound_bank.gd. Presentation only:
--- never feeds perception, AI or simulation time. Roblox's master volume controls every voice.
+-- never feeds perception, AI or simulation time. Roblox's master volume controls every voice. The player's three volumes (ROBLOX-49:
+-- MasterVolume, AmbienceVolume for the room and the birds, CreatureVolume for the flies and the wasp) multiply the mix below, which was
+-- tuned and accepted at full volume; setVolumes is called each frame and takes effect at once.
 local Soundscape = {}
 Soundscape.__index = Soundscape
 local IDS = {
@@ -8,6 +10,8 @@ local IDS = {
 	takeoff = "rbxassetid://135484013341687", birds = "rbxassetid://105858750316891",
 	wasp = "rbxassetid://76049518783466",
 }
+-- The mix as authored (each voice's own loudness before the player's volumes).
+local MIX = { room = 0.09, birds = 0.16, buzz = 0.23, takeoff = 0.22, hum = 0.42, humArriving = 0.32 }
 local function voice(parent: Instance, name: string, volume: number, looped: boolean): Sound
 	local s = Instance.new("Sound")
 	s.Name = name
@@ -27,11 +31,15 @@ function Soundscape.new(parent: Instance): any
 	emitter.Name = "WaspAudio"
 	emitter.Anchored = true; emitter.CanCollide = false; emitter.CanTouch = false; emitter.CanQuery = false
 	emitter.Transparency = 1; emitter.Size = Vector3.new(0.1, 0.1, 0.1); emitter.Parent = root
-	local hum = voice(emitter, "wasp", 0.42, true)
+	local hum = voice(emitter, "wasp", MIX.hum, true)
 	hum.RollOffMinDistance = 16; hum.RollOffMaxDistance = 120
-	return setmetatable({ root = root, room = voice(root, "room", 0.09, true),
-		waspEmitter = emitter, waspHum = hum,
-		birds = voice(root, "birds", 0.16, false), slots = {}, elapsed = 0, nextBird = 8 }, Soundscape)
+	return setmetatable({ root = root, room = voice(root, "room", MIX.room, true),
+		waspEmitter = emitter, waspHum = hum, master = 1, ambience = 1, creatures = 1,
+		birds = voice(root, "birds", MIX.birds, false), slots = {}, elapsed = 0, nextBird = 8 }, Soundscape)
+end
+-- The player's volumes, each 0 to 1.
+function Soundscape.setVolumes(self: any, master: number, ambience: number, creatures: number)
+	self.master, self.ambience, self.creatures = math.clamp(master, 0, 1), math.clamp(ambience, 0, 1), math.clamp(creatures, 0, 1)
 end
 local function playing(s: Sound, wanted: boolean)
 	if wanted then
@@ -40,6 +48,9 @@ local function playing(s: Sound, wanted: boolean)
 end
 function Soundscape.update(self: any, dt: number, prey: any, daylight: number, paused: boolean, speed: number, muted: boolean)
 	local audible = not paused and not muted
+	local room, creature = self.master * self.ambience, self.master * self.creatures
+	self.room.Volume = MIX.room * room
+	self.birds.Volume = MIX.birds * room
 	playing(self.room, audible)
 	self.room.PlaybackSpeed = speed
 	self.birds.PlaybackSpeed = speed
@@ -60,9 +71,10 @@ function Soundscape.update(self: any, dt: number, prey: any, daylight: number, p
 			p.Name = "FlyAudio"
 			p.Anchored = true; p.CanCollide = false; p.CanTouch = false; p.CanQuery = false
 			p.Transparency = 1; p.Size = Vector3.new(0.1, 0.1, 0.1); p.Parent = self.root
-			slot = { part = p, buzz = voice(p, "buzz", 0.23, true), takeoff = voice(p, "takeoff", 0.22, false), flying = false }
+			slot = { part = p, buzz = voice(p, "buzz", MIX.buzz, true), takeoff = voice(p, "takeoff", MIX.takeoff, false), flying = false }
 			self.slots[i] = slot
 		end
+		slot.buzz.Volume, slot.takeoff.Volume = MIX.buzz * creature, MIX.takeoff * creature
 		slot.part.Position = fly.position
 		local flying = fly:airborne() or (prey.feeding.held == fly and prey.feeding.struggling)
 		slot.buzz.PlaybackSpeed = speed; slot.takeoff.PlaybackSpeed = speed
@@ -84,7 +96,7 @@ function Soundscape.updateWasp(self: any, director: any, paused: boolean, speed:
 	local hum: Sound = self.waspHum
 	self.waspEmitter.Position = director.wasp.position
 	hum.Parent = if arriving then self.root else self.waspEmitter
-	hum.Volume = if arriving then 0.32 else 0.42
+	hum.Volume = (if arriving then MIX.humArriving else MIX.hum) * self.master * self.creatures
 	hum.PlaybackSpeed = speed
 	if not active then hum:Stop()
 	else playing(hum, not paused and not muted) end

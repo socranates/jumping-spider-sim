@@ -66,6 +66,10 @@ function SpiderCamera.new(camera: Camera, params: RaycastParams, target: () -> T
 		wantedKey = "", wantedCache = 0,
 		worldReady = false,
 		mouse = true, -- false in tests: no mouse lock or mouse look (the Studio specs run on the server)
+		-- The player's settings (ROBLOX-49; SpiderCamera.configure, called every frame): look speeds, inversion, the third person's field of
+		-- view and distance, the framing switch and the spider-eye view's level horizon.
+		mouseSens = 1, stickSens = 1, touchSens = 1, invertX = false, invertY = false,
+		fov = CameraMath.FOV_DEG, settingDistance = CameraMath.CAMERA_DISTANCE, framingOn = true, levelHorizon = false, levelUp = Vector3.yAxis,
 	}, SpiderCamera)
 	camera.CameraType = Enum.CameraType.Scriptable
 	camera.FieldOfView = CameraMath.FOV_DEG
@@ -76,6 +80,39 @@ function SpiderCamera.new(camera: Camera, params: RaycastParams, target: () -> T
 	end)
 	self:snap()
 	return self
+end
+
+export type Settings = {
+	mouse: number?, stick: number?, touch: number?, invertX: boolean?, invertY: boolean?,
+	fov: number?, distance: number?, framing: boolean?, levelHorizon: boolean?,
+}
+-- Takes the player's settings (every field optional; call it each frame with what they are now). A changed distance starts the camera at it
+-- (the wheel then zooms from there until the setting changes again); a changed field of view is shown at once, except in the eye view,
+-- which keeps its own; the framing switch is passed on to the line framing when it changes.
+function SpiderCamera.configure(self: any, c: Settings)
+	if c.mouse ~= nil then self.mouseSens = c.mouse end
+	if c.stick ~= nil then self.stickSens = c.stick end
+	if c.touch ~= nil then self.touchSens = c.touch end
+	if c.invertX ~= nil then self.invertX = c.invertX end
+	if c.invertY ~= nil then self.invertY = c.invertY end
+	if c.fov ~= nil and c.fov ~= self.fov then
+		self.fov = c.fov
+		if not self.eyeView then self.camera.FieldOfView = c.fov end
+	end
+	if c.distance ~= nil and c.distance ~= self.settingDistance then
+		self.settingDistance = c.distance
+		self.distance = math.clamp(c.distance, MIN_DISTANCE, MAX_DISTANCE)
+	end
+	if c.framing ~= nil and c.framing ~= self.framingOn then
+		self.framingOn = c.framing
+		self:setFraming(c.framing)
+	end
+	if c.levelHorizon ~= nil then self.levelHorizon = c.levelHorizon end
+end
+
+-- A look from the mouse, stick or touch in degrees, scaled by that device's speed and turned round by the inversion switches.
+function SpiderCamera.lookScaled(self: any, dx: number, dy: number, speed: number)
+	self:look(dx * speed * (if self.invertX then -1 else 1), dy * speed * (if self.invertY then -1 else 1))
 end
 
 -- The view's yaw: the player's own plus the line framing's turn. Walking steers by it, so the stick means what is on screen.
@@ -220,7 +257,7 @@ function SpiderCamera.setEyeView(self: any, on: boolean)
 	if on == self.eyeView then return end
 	self.eyeView = on
 	self.recenterT = -1
-	self.camera.FieldOfView = if on then CameraMath.EYE_FOV_DEG else CameraMath.FOV_DEG
+	self.camera.FieldOfView = if on then CameraMath.EYE_FOV_DEG else self.fov
 	if on then
 		local t = self.target()
 		self.yaw += self.framing:takeOver()
@@ -245,7 +282,8 @@ function SpiderCamera.look(self: any, dx: number, dy: number)
 	if self.eyeView then
 		-- The mouse, the stick and a touch drag all arrive here; lookScale (ROBLOX-20) shrinks them with the field of view.
 		local scale = self.lookScale
-		self.gaze = CameraMath.lookEye(self.gaze, self.gazeUp, math.rad(dx * scale), math.rad(dy * scale), self:_bodyForward())
+		local turnUp: Vector3? = if self.levelHorizon then self.levelUp else nil
+		self.gaze = CameraMath.lookEye(self.gaze, self.gazeUp, math.rad(dx * scale), math.rad(dy * scale), self:_bodyForward(), turnUp)
 		return
 	end
 	self.yaw += self.framing:playerTurns(self.target().onLine == true)
@@ -258,7 +296,7 @@ function SpiderCamera.look(self: any, dx: number, dy: number)
 end
 
 function SpiderCamera.touchLook(self: any, delta: Vector2)
-	self:look(delta.X * TOUCH_DEG_PER_PIXEL, delta.Y * TOUCH_DEG_PER_PIXEL)
+	self:lookScaled(delta.X * TOUCH_DEG_PER_PIXEL, delta.Y * TOUCH_DEG_PER_PIXEL, self.touchSens)
 end
 
 -- One fixed 60 Hz tick: pivot, line framing, auto-pitch and boom (orbit), or the gaze carried with the body (eye view).
@@ -308,11 +346,11 @@ function SpiderCamera.render(self: any, frameDt: number, lookX: number, lookY: n
 		UIS.MouseIconEnabled = menu
 		if not menu then
 			local m = UIS:GetMouseDelta()
-			self:look(m.X * CameraMath.MOUSE_DEG_PER_PIXEL, m.Y * CameraMath.MOUSE_DEG_PER_PIXEL)
+			self:lookScaled(m.X * CameraMath.MOUSE_DEG_PER_PIXEL, m.Y * CameraMath.MOUSE_DEG_PER_PIXEL, self.mouseSens)
 		end
 	end
 	local rate = CameraMath.STICK_DEG_PER_SECOND * frameDt
-	self:look(lookX * rate, lookY * rate)
+	self:lookScaled(lookX * rate, lookY * rate, self.stickSens)
 	local t = self.target()
 	if self.recenterT >= 0 then
 		self.recenterT += frameDt
@@ -330,7 +368,12 @@ function SpiderCamera.render(self: any, frameDt: number, lookX: number, lookY: n
 	if self.eyeView then
 		local body = SupportMath.bodyCFrame(t.pos, self.gazeUp, t.heading)
 		local eye = body:PointToWorldSpace(Vector3.new(0, CameraMath.EYE_HEIGHT, -CameraMath.EYE_AHEAD))
-		self.camera.CFrame = CFrame.lookAt(eye, eye + self.gaze, self.gazeUp)
+		local viewUp = self.gazeUp
+		if self.levelHorizon then
+			viewUp = CameraMath.viewUp(self.gaze, self.gazeUp, self.levelUp)
+		end
+		self.levelUp = viewUp
+		self.camera.CFrame = CFrame.lookAt(eye, eye + self.gaze, viewUp)
 		self:_hideBody(true)
 		return
 	end

@@ -11,6 +11,7 @@
 -- outside the crack, starts and stops the courtship dance (the touch Dance button).
 -- The naturalist's notebook (ROBLOX-37): N opens it. Godot's D-pad up is the port's walking, so a controller reaches it through the life
 -- menu (View / Touchpad, then Notebook); touch has the Notebook button beside Menu (SpiderClient).
+-- The settings (ROBLOX-49): O opens them; a controller and touch reach them through the life menu (then Settings).
 --
 -- Every button action is held while any source holds it (InputState): a key, a controller button, a finger. Handlers hear
 -- one "begin" when the first source goes down and one "end" when the last comes up, so a touch hold and a key or button
@@ -29,6 +30,7 @@ export type Handlers = {
 	feed: (() -> ())?,
 	choose: (() -> ())?, -- C: change spider (in the crack)
 	notebook: (() -> ())?, -- N: the naturalist's notebook
+	settings: (() -> ())?, -- O: the settings (ROBLOX-49)
 	display: (() -> ())?, -- X / RB: the peacock spider's courtship dance
 	focus: ((string) -> ())?,
 	jump: (string) -> (), -- "begin", "end", or "cancel" (the engine took the input away)
@@ -45,7 +47,7 @@ export type Handlers = {
 	device: ((string) -> ())?, -- the last input's UserInputType name
 }
 
-local ONE_SHOT = { Menu = "menu", Notebook = "notebook", Reset = "reset", Gait = "gait", Eye = "eye", Recenter = "recenter", Slow = "slow", Help = "help" }
+local ONE_SHOT = { Menu = "menu", Notebook = "notebook", Settings = "settings", Reset = "reset", Gait = "gait", Eye = "eye", Recenter = "recenter", Slow = "slow", Help = "help" }
 
 -- Bindings by action. Exported for tests and the controls table in README.md.
 SpiderInput.BINDINGS = {
@@ -61,7 +63,7 @@ SpiderInput.BINDINGS = {
 	Recenter = { Enum.KeyCode.R, Enum.UserInputType.MouseButton3, Enum.KeyCode.ButtonR3 },
 	Slow = { Enum.KeyCode.T, Enum.KeyCode.ButtonR2 }, Help = { Enum.KeyCode.H },
 	Reset = { Enum.KeyCode.Backspace }, Menu = { Enum.KeyCode.M, Enum.KeyCode.ButtonSelect }, Gait = { Enum.KeyCode.G },
-	Choose = { Enum.KeyCode.C }, Notebook = { Enum.KeyCode.N }, Display = { Enum.KeyCode.X, Enum.KeyCode.ButtonR1 },
+	Choose = { Enum.KeyCode.C }, Notebook = { Enum.KeyCode.N }, Settings = { Enum.KeyCode.O }, Display = { Enum.KeyCode.X, Enum.KeyCode.ButtonR1 },
 } :: { [string]: { any } }
 
 local function sourceOf(input: InputObject?): any

@@ -12,7 +12,7 @@
 -- borrowed), the overlay (a ScreenGui under the HUD), and the transparency of the UV layer's parts. Outside the eye view it draws
 -- nothing and has put everything back; the camera's field of view then belongs to SpiderCamera again.
 -- Presentation only: it reads the sensor's motionSeen (never a fly), the camera and the player's attributes (ReducedMotion,
--- FocusToggle) and moves nothing in the game: the senses, the motor, the jump planner, the aim ray and where the camera stands
+-- FocusToggle, EyeGrey) and moves nothing in the game: the senses, the motor, the jump planner, the aim ray and where the camera stands
 -- are as they were.
 local Lighting = game:GetService("Lighting")
 local Workspace = game:GetService("Workspace")
@@ -21,6 +21,7 @@ local Eyes = require(Shared.Data.Eyes)
 local EyeOptics = require(Shared.UI.EyeOptics)
 local ControlText = require(Shared.UI.ControlText)
 local Sensor = require(Shared.Perception.Sensor)
+local SettingsModel = require(Shared.UI.SettingsModel)
 
 local SpiderEyes = {}
 SpiderEyes.__index = SpiderEyes
@@ -427,6 +428,10 @@ function SpiderEyes.update(self: any, dt: number, focusing: boolean)
 	self.cam.lookScale = EyeOptics.lookScale(p.fovDeg)
 	local grade = self.grade
 	grade.Saturation, grade.TintColor, grade.Contrast, grade.Brightness = p.saturation, p.tint, p.contrast, p.brightness
+	-- The comfort switch "grey instead of green" (T13a, ROBLOX-49): the same picture and brightness without the tint or any colour.
+	if SettingsModel.get(function(id: string): any return self.player:GetAttribute(id) end, "EyeGrey") == true then
+		grade.Saturation, grade.TintColor = -1, Color3.new(1, 1, 1)
+	end
 	self.blur.Size = p.blur
 	self.blur.Enabled = p.blur > 0.05
 	self:_depthOfField(p)

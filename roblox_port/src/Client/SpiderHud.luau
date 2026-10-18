@@ -11,6 +11,7 @@ local Hud = {}
 Hud.__index = Hud
 
 local TOAST_SECONDS = 2.6
+local CAPTION_TEXT = 15 -- the sound captions' text size at normal; view.captionScale (the Captions setting) multiplies it
 local OK_COLOR = Color3.new(0.92, 0.94, 0.98)
 local WARN_COLOR = Color3.new(1.0, 0.72, 0.1)
 
@@ -154,7 +155,7 @@ function Hud.new(playerGui: Instance): any
  local status = wrapLabel("Status", top, 16, 1)
 	-- The spider-eye view's explanation, the first time (ROBLOX-20): right under the status lines, in the column, so it never covers
 	-- the aim words or the prompts. Shown from view.caption = { text, alpha }.
-	local caption = wrapLabel("Caption", top, 15, 2)
+	local caption = wrapLabel("Caption", top, CAPTION_TEXT, 2)
 	-- The life loop's notices ("Morning, day 2", "Checkpoint kept."), for as long as LifeLoop keeps them (ROBLOX-24).
 	local notice = wrapLabel("Notice", top, 16, 3)
 	local toast = wrapLabel("Toast", top, 17, 4)
@@ -261,6 +262,8 @@ function Hud.update(self: any, view: any, dt: number)
 	show(self.dayLine, view.dayLine)
 	local caption = view.caption
 	if caption then
+		local size = math.round(CAPTION_TEXT * (view.captionScale or 1))
+		if self.caption.TextSize ~= size then self.caption.TextSize = size end
 		if self.caption.Text ~= caption.text then self.caption.Text = caption.text end
 		self.caption.TextTransparency = 1 - caption.alpha
 		self.caption.BackgroundTransparency = 1 - 0.6 * caption.alpha

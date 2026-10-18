@@ -259,15 +259,34 @@ function CameraMath.rotate(v: Vector3, k: Vector3, a: number): Vector3
 	return v * c + k:Cross(v) * s + k * (k:Dot(v) * (1 - c))
 end
 
--- camera_rig._look_eye (no level-horizon switch): yaw about the view's up (positive looks right),
--- pitch about the view's right (positive looks down).
-function CameraMath.lookEye(gaze: Vector3, up: Vector3, yawRad: number, pitchRad: number, bodyForward: Vector3): Vector3
-	local g = CameraMath.rotate(gaze, up, -yawRad)
-	local right = g:Cross(up)
+-- camera_rig._look_eye: yaw about the view's up (positive looks right), pitch about the view's right (positive looks down). Normally
+-- that up is the body's (`up`); with the level-horizon comfort switch (ROBLOX-49) the camera's own up (`turnUp`, from viewUp) is used
+-- instead, so the mouse and stick move the picture the way they look on screen. The gaze stays clamped against the body's up either way.
+function CameraMath.lookEye(gaze: Vector3, up: Vector3, yawRad: number, pitchRad: number, bodyForward: Vector3, turnUp: Vector3?): Vector3
+	local turn = turnUp or up
+	local g = CameraMath.rotate(gaze, turn, -yawRad)
+	local right = g:Cross(turn)
 	if right:Dot(right) > 1e-10 then
 		g = CameraMath.rotate(g, right.Unit, -pitchRad)
 	end
 	return CameraMath.clampGaze(g, up, bodyForward)
+end
+
+-- camera_rig.view_up, the level-horizon comfort switch (T13a, ROBLOX-49): the spider-eye picture's up for the gaze `gaze` is the world's up
+-- laid square to the gaze, so the picture never rolls on a wall or an underside. Looking nearly straight up or down, where the world's up
+-- says little about roll, it holds `held` (the up it last had; falling back to the body's up, then any perpendicular). Returns a unit vector
+-- square to `gaze`. Without the switch the caller uses the body's up and keeps it as `held`.
+local LEVEL_FROM, LEVEL_TO = 0.1, 0.35 -- how much of the world's up shows in the gaze's square (length) before it takes over, and fully does
+function CameraMath.viewUp(gaze: Vector3, bodyUp: Vector3, held: Vector3): Vector3
+	local g = gaze
+	local world = Vector3.new(0, 1, 0) - g * g:Dot(Vector3.new(0, 1, 0))
+	local keep = held - g * g:Dot(held)
+	if keep:Dot(keep) < 1e-6 then keep = bodyUp - g * g:Dot(bodyUp) end
+	if keep:Dot(keep) < 1e-6 then keep = anyPerpendicular(g) end
+	local w = smoothstep(LEVEL_FROM, LEVEL_TO, world.Magnitude)
+	local v = (if w > 0 then world.Unit * w else Vector3.zero) + keep.Unit * (1 - w)
+	if v:Dot(v) < 1e-6 then v = keep end
+	return v.Unit
 end
 
 return CameraMath

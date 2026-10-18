@@ -55,7 +55,7 @@ local NAMES: { [string]: { [string]: string } } = {
 	keyboard = {
 		feed = "E", jump = "Space", cancel = "Q", letGo = "Q", drop = "F", reel = "W", lower = "S", walk = "WASD", look = "Mouse",
 		creep = "Shift", focus = "Right mouse", eye = "V", recenter = "R", slow = "T", reset = "Backspace", help = "H", zoom = "Wheel",
-		choose = "C", display = "X", menu = "M", notebook = "N",
+		choose = "C", display = "X", menu = "M", notebook = "N", settings = "O",
 	},
 	gamepad = {
 		feed = "Left-stick click", jump = "A", cancel = "B", letGo = "B", drop = "X", reel = "Stick up", lower = "Stick down", walk = "Left stick",
@@ -234,7 +234,7 @@ function ControlText.helpCard(device: Device): string
 		"Tap Space hop   Hold Space aim, release to leap   Q cancel",
 		"F lower on silk   On the line: W reel, S lower, hold Q let go",
 		"V spider-eye view   R recenter   Right mouse focus   T slow motion",
-		"In the crack: E rest (sleep from evening)   Backspace: last checkpoint   M: life menu",
+		"In the crack: E rest (sleep from evening)   Backspace: last checkpoint   M: life menu   N: notebook   O: settings",
 		"Wheel zoom   G gait   H hide this",
 	}, "\n")
 end

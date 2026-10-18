@@ -30,6 +30,11 @@ local function knobChecks()
 	check(red.groom == nil and blue.groom == nil and red.attention == nil, "a tarantula never grooms and does not turn to what is watched")
 	check(red.stretch ~= nil and red.stretch.seconds == 3.0 and red.stretch.gap[1] >= 8 and red.alarm ~= nil, "a tarantula stretches a leg over 3 seconds now and then, and keeps the alarm")
 	check(Appearances.profiles.maratus_volans_male.idle.groom == nil and Appearances.profiles.maratus_volans_male.idle.breathe.scale == nil, "the peacock spider and the ant mimic neither groom nor pulse")
+	local pm = Appearances.profiles.maratus_volans_male.idle
+	check(pm.meet ~= nil and pm.settle ~= nil and near(pm.meet.reach.z / I.meet.reach.z, 0.47, 0.01) and near(pm.settle.lower / I.settle.lower, 0.47, 0.03) and Appearances.profiles.myrmarachne_formicaria_female.idle.meet == nil, "the peacock spider's reach and sink are the first spider's at its size; the ant mimic has none")
+	check(I.meet.seconds == 4 and I.meet.riseSeconds == 0.8 and I.meet.fallSeconds == 0.8 and I.meet.palpLiftDeg == 12 and I.meet.palpYawDeg == 8, "meet: four seconds, in and out over 0.8 s, the palps up 12 degrees and in 8")
+	check(I.settle.seconds == 4 and I.settle.lower == 0.035 and I.settle.breath == 1.6, "settle: four seconds by default, sinking 0.035 studs, the breath 1.6 times as deep")
+	check(Appearances.profiles[RED].idle.meet ~= nil and Appearances.profiles[BLUE].idle.settle ~= nil, "the tarantulas inherit them")
 end
 knobChecks()
 
@@ -347,7 +352,7 @@ local function breathChecks()
 	end
 	-- the peacock spider does not pulse
 	local pc = build("maratus_volans_male", "full")
-	check(breath(pc, 5, false) < 1e-9 and pc._living == nil, "the peacock spider's fan does not pulse")
+	check(breath(pc, 5, false) < 1e-9 and pc._living ~= nil and pc._living.cfg.groom == nil and pc._living.cfg.alarm == nil, "the peacock spider's fan does not pulse (it has living motion only for the mating scene's two cues)")
 	pc:destroy()
 end
 breathChecks()
@@ -510,6 +515,116 @@ local function tarantulaRig()
 end
 tarantulaRig()
 
+-- ROBLOX-89: the mating scene's cues: meet (legs I reach, the palps come up and in), settle (the body sinks, the breath deepens), release
+local function sceneChecks()
+	local l = Living.new(I, 11)
+	local pose = drive(l, 0.2, true, nil, nil)
+	check(pose.legs[1].w == 0 and pose.legs[5].w == 0 and pose.settle == 0 and pose.breath == 1, "before a cue: no reach, no sink, the breath as it was")
+	Living.cue(l, "meet")
+	pose = drive(l, 0.4, true, nil, nil)
+	check(pose.legs[1].w > 0.1 and pose.legs[1].w < 0.9 and pose.legs[1].w == pose.legs[5].w, `half way in at 0.4 s ({pose.legs[1].w}): legs I of both sides`)
+	pose = drive(l, 1.0, true, nil, nil)
+	check(pose.legs[1].w == 1 and pose.legs[1].z == I.meet.reach.z and pose.legs[1].y == I.meet.reach.y and pose.legs[1].rel == false, "held at the reach in 1.4 s")
+	check(pose.legs[2].w == 0 and pose.legs[3].w == 0 and pose.legs[4].w == 0, "legs II to IV are not touched")
+	check(near(pose.palpYaw[1], -math.rad(8), 1e-9) and near(pose.palpYaw[2], math.rad(8), 1e-9) and near(pose.palpPitch[1], -math.rad(12), 1e-9), "the palps up 12 degrees and in 8 toward the midline")
+	pose = drive(l, 1.6, true, nil, nil) -- 3.0 s in
+	check(pose.legs[1].w == 1, "still held at 3.0 s")
+	pose = drive(l, 0.6, true, nil, nil) -- 3.6 s: fading out (the cue is 4 s with its ease out in it)
+	check(pose.legs[1].w < 1 and pose.legs[1].w > 0, `easing out at the end of its four seconds ({pose.legs[1].w})`)
+	pose = drive(l, 0.5, true, nil, nil) -- 4.1 s
+	check(pose.legs[1].w == 0 and l.meetT == nil and pose.palpYaw[1] == 0, "and gone when the four seconds are up")
+	-- a cue of another length
+	Living.cue(l, "meet", 2.0)
+	pose = drive(l, 1.0, true, nil, nil)
+	check(pose.legs[1].w == 1, "a two-second cue is up at one second")
+	pose = drive(l, 1.2, true, nil, nil)
+	check(l.meetT == nil and pose.legs[1].w == 0, "and over by 2.2 s")
+	drive(l, 1.0, true, nil, nil)
+	-- settle
+	Living.cue(l, "settle", 8.0)
+	pose = drive(l, 1.0, true, nil, nil)
+	check(near(pose.settle, 1, 1e-9) and near(pose.breath, I.settle.breath, 1e-9), `settled: sunk and breathing 1.6 times as deep ({pose.settle}, {pose.breath})`)
+	pose = drive(l, 5.0, true, nil, nil)
+	check(near(pose.settle, 1, 1e-9), "held through eight seconds")
+	-- release lets go at once, eased (no pop)
+	Living.cue(l, "meet")
+	drive(l, 1.0, true, nil, nil)
+	Living.cue(l, "release")
+	check(l.meetT == nil and l.settleT == nil, "release clears both cues")
+	pose = drive(l, 0.2, true, nil, nil)
+	check(pose.legs[1].w > 0 and pose.legs[1].w < 1 and pose.settle > 0 and pose.settle < 1, "and they ease out rather than pop")
+	pose = drive(l, 1.0, true, nil, nil)
+	check(pose.legs[1].w == 0 and pose.settle == 0 and pose.breath == 1, "gone within a second")
+	-- they give way: a bout, the groom, is cut short by the scene
+	local g2 = Living.new(I, 3)
+	Living.cue(g2, "settle", 30)
+	local began = false
+	for _ = 1, 60 * 40 do
+		Living.step(g2, DT, true, false, nil, nil, true)
+		if g2.bout ~= nil and g2.settleW >= 1 then began = true end
+	end
+	check(not began, "grooming does not begin while the scene has them settled")
+	-- Reduced Motion: a held pose, at once, all or nothing
+	local r = Living.new(I, 5)
+	Living.cue(r, "meet", 2.0)
+	local rp = Living.step(r, DT, true, true, nil, nil, true)
+	check(r.meetW == 1 and rp.legs[1].w == 1, "Reduced Motion: the reach is held in at once")
+	Living.cue(r, "settle", 2.0)
+	rp = Living.step(r, DT, true, true, nil, nil, true)
+	check(r.settleW == 1 and rp.settle == 1 and near(rp.breath, I.settle.breath, 1e-9), "and so is the settle")
+	for _ = 1, 130 do rp = Living.step(r, DT, true, true, nil, nil, true) end
+	check(r.meetW == 0 and rp.legs[1].w == 0 and rp.settle == 0, "and let go at once when the cue is over")
+	check(rp.yaw == 0 and rp.freeze == 0 and rp.bout == nil, "(nothing else moves)")
+	-- a look without the cue ignores it
+	local t = Living.new(Appearances.profiles[RED].idle, 9)
+	Living.cue(t, "meet")
+	check(t.meetT ~= nil, "a tarantula has it")
+	local a = Living.new({ breathe = { period = 4 }, alarm = Appearances.profiles[RED].idle.alarm }, 9)
+	Living.cue(a, "meet"); Living.cue(a, "settle")
+	local ap = drive(a, 1.0, true, nil, nil)
+	check(a.meetT == nil and a.settleT == nil and ap.legs[1].w == 0 and ap.settle == 0, "a look with neither ignores the cues")
+	-- the rig: the reach is drawn, the sink is drawn, the breath is deeper, and the root and the feet are where they were
+	local rig = build(nil, "full")
+	stand(rig, 3)
+	local feetBefore = {}
+	for i, leg in rig._legs do feetBefore[i] = leg.planted :: Vector3 end
+	local count = rig:count().total
+	local bodyY = part(rig, "Cephalothorax").Position.Y
+	local reachBefore = (rig._legs[1].pad :: Part).Position
+	rig:cue("meet")
+	stand(rig, 2)
+	local reachNow = (rig._legs[1].pad :: Part).Position
+	check((reachNow - reachBefore).Magnitude > 0.1, `the reach is drawn: the front foot moved {string.format("%.2f", (reachNow - reachBefore).Magnitude)} studs`)
+	check(rig._legs[1].planted == feetBefore[1] and rig._legs[3].planted == feetBefore[3], "(the planted feet are where they were)")
+	rig:cue("settle", 6)
+	stand(rig, 2)
+	local sunk = bodyY - part(rig, "Cephalothorax").Position.Y
+	check(sunk > 0.025 and sunk < 0.05, `the body has sunk {string.format("%.3f", sunk)} studs (0.035)`)
+	check(rig:count().total == count and rig.root.Position == body.Position, "the part count and the root are untouched")
+	-- the abdomen's breath is deeper while settled
+	local settledAmp = breath(rig, 6, false)
+	rig:cue("release")
+	stand(rig, 1.5)
+	local calmAmp = breath(rig, 6, false)
+	check(settledAmp > calmAmp * 1.3 and settledAmp < calmAmp * 1.9, `the breath is {string.format("%.2f", settledAmp / calmAmp)} times as deep while settled (1.6)`)
+	-- the mate's rig (a low tier made living) takes them too, with the same parts
+	local lowLiving = SpiderRig.new(floor, floor, nil, "low", true)
+	local lowPlain = SpiderRig.new(floor, floor, nil, "low")
+	check(lowLiving._living ~= nil and lowPlain._living == nil and lowLiving:count().total == lowPlain:count().total, "a low-tier rig made living has the same parts and takes the cues")
+	lowLiving:cue("meet")
+	stand(lowLiving, 2)
+	check(lowLiving._living.meetW == 1, "and reaches")
+	lowLiving:destroy(); lowPlain:destroy()
+	rig:destroy()
+	-- the peacock spider settles and reaches too, at its size
+	local pc = build("maratus_volans_male", "full")
+	pc:cue("meet"); pc:cue("settle", 5)
+	stand(pc, 2)
+	check(pc._living.meetW == 1 and pc._living.settleW == 1, "the peacock spider reaches and settles")
+	pc:destroy()
+end
+sceneChecks()
+
 -- the mate's and the rival's rigs, and the other looks, stay as they were
 local function otherRigs()
 	local rival = build("rival_spider", "low")
@@ -528,7 +643,7 @@ local function otherRigs()
 	check(other._living ~= nil and other._living.rng ~= build(nil, "full")._living.rng, "each rig draws from a stream of its own")
 	local ant = build("myrmarachne_formicaria_female", "full")
 	local pc = build("maratus_volans_male", "full")
-	check(ant._living == nil and pc._living == nil, "the ant mimic and the peacock spider have none")
+	check(ant._living == nil and pc._living ~= nil, "the ant mimic has none; the peacock spider has the mating scene's cues only")
 	ant:cue("alarm"); pc:cue("groom")
 	local antCount, pcCount = ant:count().total, pc:count().total
 	stand(ant, 2); stand(pc, 2)

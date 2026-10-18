@@ -48,7 +48,24 @@ check("the words: a notice for every beat, the button names of the device in use
 	assert(MateText.guardLine(1, 2) == "Guarding the eggs: day 1 of 2. Rest in the crack to pass the nights.", MateText.guardLine(1, 2))
 	-- The scene's captions.
 	assert(MateText.sceneCaption(2) ~= nil and MateText.sceneCaption(12) ~= nil and MateText.sceneCaption(25) == nil and MateText.sceneCaption(-1) == nil, "captions through the scene")
-	assert(MateText.PAIR_CAPTION.text ~= "" and MateText.PAIR_CAPTION.alpha == 1, "the one caption of the pause together")
+	-- The mating scene's captions (ROBLOX-89): by the beat, device-neutral, the mirror for the male player; nothing before it or after it.
+	local function cap(t: number, sex: string): string? local c = MateText.matingCaption(t, sex); return if c then c.text else nil end
+	assert(cap(-0.1, "female") == nil and cap(15, "female") == nil and cap(40, "male") == nil, "no caption outside the scene")
+	assert(cap(0, "female") == "She turns to face him." and cap(2.99, "female") == "She turns to face him.", "0 to 3 s: she turns to face him")
+	assert(cap(0, "male") == "She turns to face you.", "(you, for the male player)")
+	assert(cap(3, "female") == "They touch, very lightly, with their front legs and palps." and cap(6.99, "male") == cap(3, "female"), "3 to 7 s: they touch")
+	assert(cap(7, "female") == "They settle together, still." and cap(10.99, "male") == "They settle together, still.", "7 to 11 s: they settle together, still")
+	assert(cap(11, "female") == "He goes. The sill is yours again." and cap(14.99, "female") == "He goes. The sill is yours again.", "11 to 15 s: he goes")
+	assert(cap(11, "male") == "She stays. You go on." and cap(14.99, "male") == "She stays. You go on.", "(she stays, you go on, for the male player)")
+	for _, t in { 0, 4, 8, 12 } do
+		for _, sex in { "male", "female" } do
+			local c = MateText.matingCaption(t, sex) :: any
+			assert(c.alpha == 1 and not string.find(c.text, "press", 1, true) and not string.find(string.lower(c.text), "button"), "device-neutral: " .. c.text)
+			for _, bad in { "mate", "mating", "sex", "breed", "egg" } do assert(not string.find(string.lower(c.text), bad, 1, true), "child-safe: " .. c.text) end
+		end
+	end
+	assert(MateText.entry(4, "male") == "Day 4: A male came to the sill. The two spiders stayed together a while, and then he went.", MateText.entry(4, "male"))
+	assert(MateText.entry(9, "female") == "Day 9: A female was on the sill. The two spiders stayed together a while, and then you went on.", MateText.entry(9, "female"))
 	-- The card, the toast, the tag.
 	local title, sub, body = MateText.card(9, 6, 0)
 	assert(title == "The sill continues", title)
@@ -175,7 +192,7 @@ local gui = game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui")
 local function frames(n: number) for _ = 1, n do frame(1 / 60) end end
 -- The long waits (nights, the courting, the scene) go in frames of 0.1 s (six fixed ticks each, the rate a slow machine gives): the same simulation, a third of the time.
 local function wait(seconds: number) for _ = 1, math.ceil(seconds * 10) do frame(0.1) end end
-local KEYS = { Feed = "E", Forward = "W", Display = "X" }
+local KEYS = { Feed = "E", Forward = "W", Display = "X", Jump = "Space", Cancel = "Q", Drop = "F", Eye = "V", Choose = "C" }
 local function key(action: string, down: boolean)
 	local fn = services.actions["Spider" .. action]
 	assert(fn, "no binding for " .. action)
@@ -301,22 +318,25 @@ check("courting: close, facing, still, the meter fills in the hud for eight seco
 	assert(n / 10 > 7 and n / 10 < 13, `about eight seconds of courting ({n / 10})`)
 	assert(life.notice == MateText.COURTED, `the notice: "{life.notice}"`)
 	frames(2)
-	assert(find("SpiderPrompts", "Caption").Text == MateText.PAIR_CAPTION.text, `the one caption: "{find("SpiderPrompts", "Caption").Text}"`)
+	assert(find("SpiderPrompts", "Caption").Text == MateText.SCENE_TURN_FEMALE, `the scene's first caption: "{find("SpiderPrompts", "Caption").Text}"`)
 	local m = 0
-	while life.mating.stage == "courted" and m < 10 * 8 do wait(0.1); m += 1; life.clock.hour = 9.0 end
-	assert(life.mating.stage == "mated" and mate.state == "leaving" and m / 10 > 4 and m / 10 < 6.5, `together about five seconds ({m / 10}): {life.mating.stage}`)
-	assert(life.notice == MateText.MATED, `the notice: "{life.notice}"`)
+	while life.mating.stage == "courted" and m < 10 * 16 do wait(0.1); m += 1; life.clock.hour = 9.0 end
+	assert(life.mating.stage == "mated" and mate.state == "leaving" and m / 10 > 10 and m / 10 < 12, `together about eleven seconds ({m / 10}): {life.mating.stage}`)
+	assert(life.notice ~= MateText.MATED and mate.scene == true, `the parting is told when the scene is over, not before: "{life.notice}"`)
 	-- It walks off the sill and does not come again.
 	local from = mate.position
 	local k = 0
 	local farthest = 0.0
+	local toldAt = nil
 	while mate.state == "leaving" and k < 10 * 20 do
 		wait(0.1)
 		k += 1
 		life.clock.hour = 9.0
 		farthest = math.max(farthest, (mate.position - from).Magnitude)
 		assert(not Layout.inRetreat(mate.position), "the mate went into the retreat")
+		if toldAt == nil and mate.scene == false then toldAt = k / 10; assert(life.notice == MateText.MATED, `the notice at the scene's end: "{life.notice}"`) end
 	end
+	assert(toldAt ~= nil and toldAt > 2.5 and toldAt < 4.6, `the scene's last beat is the walk off: about four seconds ({toldAt})`)
 	assert(mate.state == "leaving" and farthest > 3, `the mate is walking off the sill ({farthest} studs in {k / 10} s)`)
 	mate.elapsed = Rules.leaveSeconds -- (the rest of the walk is not waited for: Predator/Mate is tested on its own, tests/mating.luau)
 	frames(2)
@@ -484,6 +504,306 @@ check("a record restored into the hatching goes straight to the ending card, and
 	assert(life.generation == 2 and life.growth.stage == 0 and life.mating.stage == "none", "the next generation after that")
 	assert(find("SpiderPrompts", "Toast").Text == "Generation 3 — hatched on day 9", find("SpiderPrompts", "Toast").Text)
 	assert(string.find(find("SpiderPrompts", "Day").Text, "Generation 3", 1, true) ~= nil, "and the day line")
+end)
+
+-- ---------------------------------------------------------------- the mating scene (ROBLOX-89)
+-- The scene itself through the real client: the camera's two-shot and its quarter-orbit, the locked controls and the skip, the cues to both rigs, the music's swell, the
+-- captions, the held parting notice, the notebook's line, the refused rest, the wasp, the female mate's mirror and Reduced Motion. Not evidence of how it looks or sounds.
+local Mate = require("../src/Shared/Predator/Mate")
+local MatingScene = require("../src/Shared/Life/MatingScene")
+local player: any = game:GetService("Players").LocalPlayer
+
+-- A fresh courtship set up on the open floor and played to the moment the pair are together. `sex`: the mate's; `dance`: the player owes a dance (the peacock spider).
+local function court(d: any, sex: string, dance: boolean): any
+	local life = d.life
+	life.growth.stage = 3
+	life.clock.day += 1
+	d.place(OPEN)
+	frames(5)
+	life.clock.hour = 9.0
+	local mate = Mate.new()
+	mate.sex, mate.scale = sex, 1
+	local function bring()
+		mate.state, mate.elapsed, mate.meter, mate.lost = "attend", 0, 0, 0
+		mate.position = d.motor.pos + Vector3.new(0, 0, 1.5)
+		mate.previous = mate.position
+		mate.heading, mate.up = -Vector3.zAxis, Vector3.yAxis
+	end
+	bring()
+	life.mate = mate
+	d.mateLegs.drive = nil
+	life.mating = Mating.normalize({ stage = "none", ready_day = 1, mates = 1, visits = 1, visit_day = life.clock.day })
+	local n = 0
+	while mate.scene ~= true and n < 10 * 20 do
+		if dance and not d.dance().active then key("Display", true); frames(1); key("Display", false) end
+		wait(0.1)
+		n += 1
+		life.clock.hour = 9.0
+		if mate.scene ~= true and mate.state ~= "attend" and mate.state ~= "approach" and mate.state ~= "pair" then bring() end
+	end
+	assert(mate.scene == true and mate.state == "pair" and life.mating.stage == "courted", `courted: {mate.state} {life.mating.stage} after {n / 10} s (resting {tostring(life.resting)}, asleep {tostring(life.asleep)}, meter {mate.meter})`)
+	return mate
+end
+
+-- Plays on (in tenths of a second) until the scene's own clock reaches `t`.
+local function untilScene(d: any, t: number)
+	local k = 0
+	while d.mateLegs.couple.active and d.mateLegs.couple.t < t and k < 10 * 20 do wait(0.1); k += 1; d.life.clock.hour = 9.0 end
+end
+local function caption(): string local c = find("SpiderPrompts", "Caption"); return if c.Visible then c.Text else "" end
+local function flatAngle(a: Vector3, b: Vector3): number
+	local fa, fb = Vector3.new(a.X, 0, a.Z).Unit, Vector3.new(b.X, 0, b.Z).Unit
+	return math.deg(math.acos(math.clamp(fa:Dot(fb), -1, 1)))
+end
+
+local runMusic: any = nil
+check("the scene: the camera eases into a two-shot and orbits a quarter, the controls are locked, a skip after four seconds parts them and everything goes back", function()
+	local d = ClientStubs.driver
+	local life, legs, cam, snd = d.life, d.mateLegs, d.cam, d.soundscape
+	runMusic = snd.music
+	assert(not legs.couple.active and cam.shot == nil and not cam:shotActive() and snd.swell == 1, "before: nothing of the scene")
+	local entriesBefore = #d.notebook:entriesFor("eggs_and_wind")
+	local mate = court(d, "male", false)
+	local day = life.clock.day
+	assert(legs.couple.active and legs.couple.mateSex == "male" and legs.couple.plan ~= nil and legs.couple.plan.day == day, "the scene began at the courted event")
+	assert(legs.couple.plan.playerSex == "female" and legs.couple.plan.mateSex == "male", "the first spider is the game's female")
+	local t0 = legs.couple.t
+	assert(t0 >= 0 and t0 < 1, `scene seconds from the simulation ({t0})`)
+	assert(life.notice == MateText.COURTED, `the courted notice: "{life.notice}"`)
+	assert(not cam.eyeView, "the eye view is off")
+	-- The camera: easing in over 0.8 s from where it was.
+	assert(cam.shot ~= nil and cam:shotActive() and cam.shotT < 0.5, `easing in (shotT {cam.shotT})`)
+	local before = cam.camera.CFrame.Position
+	local k0 = cam.shotT
+	frames(24) -- 0.4 s
+	assert(cam.shotT - k0 > 0.45 and cam.shotT - k0 < 0.55 and cam.shotT < 1, `it eases in over 0.8 s: half of it in 0.4 s ({k0} then {cam.shotT})`)
+	frames(30) -- 0.9 s in all
+	assert(cam.shotT == 1, `held after 0.8 s ({cam.shotT})`)
+	local mid = (d.motor.pos + mate.position) * 0.5
+	local cf = cam.camera.CFrame
+	local toMid = (mid - cf.Position)
+	assert(toMid.Unit:Dot(cf.LookVector) > 0.93, `looking at the pair ({toMid.Unit:Dot(cf.LookVector)})`)
+	assert(cf.Position.Y > mid.Y + 1.0 and toMid.Magnitude > 3.5 and toMid.Magnitude < 14, `from slightly above, at a distance of {toMid.Magnitude}`)
+	assert((cf.Position - before).Magnitude > 0.5, "and it moved")
+	assert(caption() == "She turns to face him.", `the first caption: "{caption()}"`)
+	-- The controls are the scene's: walking, feeding, dropping, the eye view, the dance and a jump are nothing.
+	local p0 = d.motor.pos
+	key("Forward", true); frames(40); key("Forward", false)
+	key("Feed", true); frames(2); key("Feed", false)
+	key("Drop", true); frames(2); key("Drop", false)
+	key("Eye", true); frames(2); key("Eye", false)
+	key("Display", true); frames(2); key("Display", false)
+	key("Jump", true); frames(3); key("Jump", false); frames(2)
+	key("Cancel", true); frames(3); key("Cancel", false); frames(2)
+	assert((d.motor.pos - p0).Magnitude < 0.05 and not life.resting and not cam.eyeView and d.motor.mode == "attached", "the spider did not move, rest, drop or look through its eyes")
+	assert(mate.state == "pair" and legs.couple.active and legs.couple.t < 4, `a skip before four seconds is nothing (scene {legs.couple.t})`)
+	-- Cues: the touch at three seconds, on both rigs.
+	untilScene(d, 3.4)
+	local mine, theirs = d.rig()._living, legs.stage.rig._living
+	assert(mine ~= nil and theirs ~= nil, "both rigs have living motion (the mate's for the same parts as the player's)")
+	assert(mine.meetT ~= nil and theirs.meetT ~= nil and mine.meetLen == 4 and theirs.meetLen == 4, "the meet cue reached both rigs, four seconds long")
+	assert(caption() == MateText.SCENE_TOUCH, `the second caption: "{caption()}"`)
+	untilScene(d, 4.6)
+	assert(mine.meetW > 0.5 and theirs.meetW > 0.5, `the reach is under way ({mine.meetW}, {theirs.meetW})`)
+	-- The orbit, and the music.
+	local first = cam.camera.CFrame.Position - mid
+	assert(snd.swell > 1.59 and snd.swell < 1.61, `the music has swelled to 1.6 ({snd.swell})`)
+	if runMusic ~= nil then assert(math.abs(runMusic.Volume - 0.18 * 1.6) < 0.01, `and the music voice is at 1.6 of its level ({runMusic.Volume})`) end
+	untilScene(d, 7.3)
+	assert(mine.settleT ~= nil and theirs.settleT ~= nil and mine.settleLen == 8 and theirs.settleLen == 4, "the settle cue: the male's four seconds, the female's eight")
+	assert(caption() == MateText.SCENE_SETTLE, `the third caption: "{caption()}"`)
+	untilScene(d, 9.0)
+	assert(mine.pose.breath > 1.2 and theirs.pose.breath > 1.2 and mine.pose.settle > 0.3, `the abdomens are breathing deeper ({mine.pose.breath}, {theirs.pose.breath})`)
+	local later = cam.camera.CFrame.Position - ((d.motor.pos + mate.position) * 0.5)
+	local turned = flatAngle(first, later)
+	assert(turned > 25 and turned < 80, `the camera has gone round the pair by {turned} degrees between 4.6 s and 9 s`)
+	assert(d.mateLegs.stage.rig ~= nil and legs.couple.focus ~= nil, "the pair look at each other")
+	-- A rest cannot land inside it.
+	local why = life.save()
+	assert(not why.ok and string.find(why.message, "together", 1, true) ~= nil, `a rest is refused: {why.message}`)
+	-- A skip after four seconds.
+	assert(legs.couple.t > 4, "(past four seconds)")
+	local entries = #d.notebook:entriesFor("eggs_and_wind")
+	key("Jump", true); frames(2); key("Jump", false)
+	assert(mate.state == "leaving" and mate.reason == "mated" and life.mating.stage == "mated" and mate.scene == false, "the pair part at once: the mate walks off")
+	assert(not legs.couple.active and cam.shot == nil, "the scene is over")
+	assert(life.notice == MateText.MATED, `the parting is told: "{life.notice}"`)
+	assert(mine.meetT == nil and mine.settleT == nil and theirs.meetT == nil and theirs.settleT == nil, "both rigs let go of their poses")
+	local list = d.notebook:entriesFor("eggs_and_wind")
+	assert(#list == entries + 1 and list[#list].day == day and list[#list].text == MateText.entry(day, "male"), `the notebook has its line ({#list} entries)`)
+	-- Everything goes back: the camera over 0.8 s, the music over 1 s; the controls are free.
+	frames(24)
+	assert(cam.shotT > 0.4 and cam.shotT < 0.6 and cam:shotActive(), `the camera eases out ({cam.shotT})`)
+	frames(30)
+	assert(cam.shotT == 0 and not cam:shotActive(), "and is the player's again")
+	wait(1.2)
+	assert(snd.swell == 1, `the music is back ({snd.swell})`)
+	local p1 = d.motor.pos
+	key("Forward", true); frames(40); key("Forward", false)
+	assert((d.motor.pos - p1).Magnitude > 0.3, "the controls are free")
+	assert(caption() ~= MateText.SCENE_GOES, "(no scene caption left)")
+	-- The departure still happens.
+	local from = mate.position
+	local farthest = 0.0
+	for _ = 1, 30 do wait(0.1); life.clock.hour = 9.0; farthest = math.max(farthest, (mate.position - from).Magnitude) end
+	assert(mate.state == "leaving" and farthest > 2, `the mate walks off the sill ({farthest} studs)`)
+	mate.elapsed = Rules.leaveSeconds
+	frames(3)
+	assert(mate.state == "away" and entriesBefore + 1 == #d.notebook:entriesFor("eggs_and_wind"), "and is gone; one line in the notebook")
+end)
+
+check("the scene played to its end: the notice is held, the walk off is the last beat, the camera and music go back; Reduced Motion is a static two-shot", function()
+	local d = ClientStubs.driver
+	local life, legs, cam, snd = d.life, d.mateLegs, d.cam, d.soundscape
+	player:SetAttribute("ReducedMotion", true)
+	frames(3)
+	local mate = court(d, "male", false)
+	local day = life.clock.day
+	untilScene(d, 2.0)
+	local cf2 = cam.camera.CFrame.Position
+	assert(cam.shotT == 1, "in the shot")
+	untilScene(d, 3.4)
+	local mine, theirs = d.rig()._living, legs.stage.rig._living
+	frames(3)
+	assert(mine.meetW == 1 and theirs.meetW == 1, `Reduced Motion: the reach is a held pose, at once ({mine.meetW}, {theirs.meetW})`)
+	untilScene(d, 7.3)
+	frames(3)
+	assert(mine.settleW == 1 and theirs.settleW == 1, "and so is the settle")
+	untilScene(d, 10.5)
+	local cf10 = cam.camera.CFrame.Position
+	assert((cf10 - cf2).Magnitude < 0.05, `Reduced Motion: no orbit, the two-shot is static (moved {(cf10 - cf2).Magnitude})`)
+	-- the walk off
+	untilScene(d, 11.5)
+	assert(mate.state == "leaving" and mate.scene == true and legs.couple.active, "the pause is over and the mate is walking: the last beat")
+	assert(caption() == MateText.SCENE_GOES, `the last caption: "{caption()}"`)
+	assert(life.notice ~= MateText.MATED, "the parting is not told over the scene")
+	local why = life.save()
+	assert(not why.ok and string.find(why.message, "together", 1, true), "a rest is refused in the walk off too")
+	local k = 0
+	while legs.couple.active and k < 10 * 8 do wait(0.1); k += 1; life.clock.hour = 9.0 end
+	assert(not legs.couple.active and mate.scene == false and mate.state == "leaving", `the scene ends with the walk off ({k / 10} s later)`)
+	assert(life.notice == MateText.MATED, `and the parting is told: "{life.notice}"`)
+	assert(caption() == "", "the caption goes")
+	wait(1.0)
+	assert(not cam:shotActive() and cam.shotT == 0, "the camera is back")
+	wait(0.5)
+	assert(snd.swell == 1, "and the music")
+	local lines = d.notebook:entriesFor("eggs_and_wind")
+	assert(#lines >= 2 and lines[#lines].day == day and lines[#lines - 1].day ~= day, `a second line in the notebook, another day ({#lines} lines, last day {lines[#lines] and lines[#lines].day} of {day})`)
+	mate.elapsed = Rules.leaveSeconds
+	frames(3)
+	player:SetAttribute("ReducedMotion", nil)
+	frames(3)
+end)
+
+check("the scene and a wasp: the controls are the player's the moment it comes, the duck wins over the swell", function()
+	local d = ClientStubs.driver
+	local life, legs, cam, snd = d.life, d.mateLegs, d.cam, d.soundscape
+	local mate = court(d, "male", false)
+	untilScene(d, 1.5)
+	wait(1.2)
+	assert(snd.swell > 1.5, "swelling")
+	d.wasp.enabled = true
+	assert(d.wasp:force(life.clock.day, "floor_middle"), "the wasp could not be brought")
+	frames(3)
+	assert(not legs.couple.active and mate.scene == false and mate.state == "leaving" and life.mating.stage == "mated", "a wasp's visit ends the scene at once, whatever the scene's clock")
+	assert(d.wasp:isVisiting(), "(it is visiting)")
+	local p0 = d.motor.pos
+	key("Forward", true); frames(30); key("Forward", false)
+	assert((d.motor.pos - p0).Magnitude > 0.2 or d.life.lifeOver, "the player can move again")
+	wait(1.2)
+	assert(snd.swell == 1 and snd.duck < 0.99, `the music is ducked and not swelled (swell {snd.swell}, duck {snd.duck})`)
+	d.wasp:clearVisit()
+	wait(1.2)
+	mate.elapsed = Rules.leaveSeconds
+	frames(3)
+end)
+
+check("the mirror: a male player's female mate turns to face him, stays and turns away; the captions, the cues, the pause and the entry follow", function()
+	local d = ClientStubs.driver
+	local life, legs, cam, snd = d.life, d.mateLegs, d.cam, d.soundscape
+	-- become the peacock spider: in the crack, resting, C
+	life.growth.stage = 3
+	d.needs.energy = 0.8
+	d.place(CRACK)
+	frames(30)
+	life.clock.hour = 12.0
+	frames(2)
+	if not life.resting then key("Feed", true); frames(2); key("Feed", false); frames(2) end
+	assert(life.resting and not life.asleep, "resting")
+	key("Choose", true); frames(2); key("Choose", false); frames(2)
+	assert(d.appearance() == "maratus_volans_male", "the peacock spider")
+	key("Forward", true); frames(30); key("Forward", false); frames(2)
+	assert(not life.resting, "out of the crack")
+	local mate = court(d, "female", true)
+	local day = life.clock.day
+	assert(legs.couple.active and legs.couple.plan.playerSex == "male" and legs.couple.plan.mateSex == "female" and mate.sex == "female", "the peacock spider is the male: its mate is a female")
+	assert(not d.dance().active, "the dance ends when the scene begins")
+	frames(3)
+	assert(caption() == MateText.SCENE_TURN_MALE and caption() == "She turns to face you.", `the first caption: "{caption()}"`)
+	assert(Mate.pairLength(mate) == 15, "the pause is the whole scene")
+	untilScene(d, 3.5)
+	local mine, theirs = d.rig()._living, legs.stage.rig._living
+	assert(mine ~= nil and theirs ~= nil and mine.meetT ~= nil and theirs.meetT ~= nil, "the cue reaches the peacock spider and the female")
+	untilScene(d, 7.3)
+	assert(mine.settleLen == 4 and theirs.settleLen == 8, "the player is the male now: its settle is the four seconds, hers eight")
+	untilScene(d, 11.4)
+	assert(caption() == MateText.SCENE_STAYS and caption() == "She stays. You go on.", `the last caption: "{caption()}"`)
+	assert(mate.state == "pair" and legs.couple.turn ~= nil and legs.couple.turn ~= 0, "she is turning away")
+	untilScene(d, 13.0)
+	assert(math.abs(legs.couple.turn :: number - 0) > math.rad(109) and math.abs(legs.couple.turn :: number) < math.rad(111), `she has turned away by 110 degrees ({math.deg(legs.couple.turn)})`)
+	assert(mate.state == "pair", "she stays where she is")
+	local k = 0
+	while legs.couple.active and k < 10 * 6 do wait(0.1); k += 1; life.clock.hour = 9.0 end
+	assert(not legs.couple.active and mate.state == "leaving" and mate.scene == false, "at fifteen seconds the scene and the pause end together")
+	assert(life.notice == MateText.MATED, "the parting is told")
+	local list = d.notebook:entriesFor("eggs_and_wind")
+	assert(list[#list].text == MateText.entry(day, "female") and string.find(list[#list].text, "you went on", 1, true), `the line: "{list[#list].text}"`)
+	frames(40)
+	assert(legs.couple.turn == nil or math.abs(legs.couple.turn) < 0.01, "the drawn turn lets go")
+	-- Skipping by the cancel button, at about five seconds, with a second mate.
+	mate.elapsed = Rules.leaveSeconds
+	frames(3)
+	local second = court(d, "female", true)
+	untilScene(d, 2.0)
+	key("Cancel", true); frames(2); key("Cancel", false); frames(2)
+	assert(legs.couple.active and second.state == "pair", "cancel before four seconds is nothing")
+	untilScene(d, 4.3)
+	key("Cancel", true); frames(2); key("Cancel", false); frames(2)
+	assert(not legs.couple.active and second.state == "leaving" and second.reason == "mated", "cancel after four seconds skips")
+	assert(cam.shot == nil and not life.resting, "(and it does not rest)")
+	second.elapsed = Rules.leaveSeconds
+	frames(3)
+end)
+
+check("a record returned to during the scene's world, a reset and a new life leave nothing of the scene behind", function()
+	local d = ClientStubs.driver
+	local life, legs, cam, snd = d.life, d.mateLegs, d.cam, d.soundscape
+	local mate = court(d, "female", true)
+	untilScene(d, 2.0)
+	assert(legs.couple.active and snd.swell > 1, "mid-scene")
+	d.returnToCheckpoint()
+	frames(3)
+	assert(not legs.couple.active and cam.shot == nil and legs.couple.turn == nil and legs.couple.focus == nil, "a return to the last rest ends the scene's presentation")
+	wait(1.2)
+	assert(snd.swell == 1 and not cam:shotActive(), "the camera and the music are back")
+	assert(life.mate == nil or life.mate.scene ~= true, "and the mate is the record's")
+	-- with no rest to return to the spider is put back at the start: the pair part first, and the scene does not play on round it
+	local third = court(d, "female", true) -- (the player is still the peacock spider of the test before: a male, whose mate is a female and who owes the dance)
+	untilScene(d, 1.5)
+	assert(legs.couple.active, "mid-scene again")
+	local store = d.currentStore()
+	local loadBest = store.loadBest
+	store.loadBest = function() return { ok = false, message = "no checkpoint to return to" } end
+	d.returnToCheckpoint()
+	store.loadBest = loadBest
+	frames(3)
+	assert(not legs.couple.active and cam.shot == nil and third.state == "leaving" and third.scene == false and life.mating.stage == "mated", "back to the start: the pair part, the scene is over")
+	wait(1.2)
+	assert(snd.swell == 1 and not cam:shotActive(), "and the camera and the music are back")
+	third.elapsed = Rules.leaveSeconds
+	frames(3)
+	local _ = mate
 end)
 
 check("the notebook page is sourced and honest: the real citations, the game's departures, no 'no mating simulation' left", function()

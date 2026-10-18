@@ -141,7 +141,10 @@ local rivalLegs: any = { drive = nil, rig = nil, Drive = require(Shared.Predator
 -- The mating cycle (ROBLOX-80): its modules, the stage that draws it (the mate's rig, the egg sac, the hatching), the mate's legs, and where the ending is
 -- ("" while none, "scene" while the spiderlings play, "card" while the ending card is up). One table: the client is at Luau's limit of 200 locals.
 local mateLegs: any = { Mating = require(Shared.Life.Mating), Mate = require(Shared.Predator.Mate), Drive = require(Shared.Predator.MateDrive), Text = require(Shared.UI.MateText),
-	Rules = require(Shared.Data.MatingRules), drive = nil, phase = "" }
+	Rules = require(Shared.Data.MatingRules), drive = nil, phase = "",
+	-- The mating scene (ROBLOX-89): its pure plan module and its state here (the plan, the scene's seconds as the simulation counts them, the last frame's, the notice held
+	-- until it is over, whether it was skipped and whose it was).
+	Scene = require(Shared.Life.MatingScene), couple = { active = false, plan = nil, t = -1, prev = -1, notice = nil, skipped = false, mateSex = "" } }
 mateLegs.stage = require(script.Parent.MateStage).new(Workspace, sill, detail)
 local dance = PeacockDance.new() -- the peacock spider's courtship dance (a pose for the rig; nothing else reads it)
 local dancePose: any = nil
@@ -526,6 +529,7 @@ end
 local function returnToCheckpoint()
 	local best = checkpoints:loadBest()
 	if not best.ok then
+		mateLegs.skip(true) -- (a scene is not left playing round a spider put back at the start: the pair part, ROBLOX-89)
 		backToStart()
 		hud:toast(if best.message == "no checkpoint to return to" then "No checkpoint yet: back to the start. Rest in the silk-lined crack to keep one." else "Back to the start: " .. best.message, true)
 		return
@@ -623,6 +627,7 @@ end
 local function endLife(cause: string)
  local rec=summaryRecord(cause)
  if not session:endLife(cause,rec) then return end
+ mateLegs.coupleEnd(false)
  controls:clear();dropAll();setHudShown(false)
  lastEnd=rec
  presentEnd(false)
@@ -636,8 +641,77 @@ function mateLegs.say(text: string?)
 end
 function mateLegs.event(e: string,ms: any)
  local mate=life.mate
- mateLegs.say(mateLegs.Text.notice(e,{sex=if mate then mate.sex else nil,needsDance=ms.needsDance,device=device,reason=if mate then mate.reason else nil}))
+ if e=="courted" then mateLegs.coupleBegin() end
+ local text=mateLegs.Text.notice(e,{sex=if mate then mate.sex else nil,needsDance=ms.needsDance,device=device,reason=if mate then mate.reason else nil})
+ -- A male mate's walk off the sill is still the scene's last beat: its parting is told when the scene is over (a notice over the two-shot would be read for the captions).
+ if e=="mated" and mateLegs.couple.active and mate~=nil and mate.scene==true then mateLegs.couple.notice=text else mateLegs.say(text) end
  if e=="hatched" then mateLegs.begin(true) end
+end
+-- The mating scene (ROBLOX-89). Its clock is the simulation's own (Predator/Mate.sceneTime: the pair's pause, then the male's walk off), so a wasp visit holds it as it holds the
+-- mate, a menu holds it with everything and a rest cannot land inside it (Checkpoint.boundaryProblem). Here it is only drawn: the controls are the scene's (locked but for the
+-- skip, tickInput and the handlers), the camera is the two-shot, both rigs take the cues, the captions, the music swells; Life/Mating owns the parting.
+function mateLegs.coupleBegin()
+ local c,mate=mateLegs.couple,life.mate
+ if c.active or mate==nil or mate.scene~=true then return end
+ c.active,c.t,c.prev,c.notice,c.skipped,c.mateSex,c.turn,c.focus=true,-1,-1,nil,false,mate.sex,nil,nil
+ c.plan=mateLegs.Scene.plan(914,if life.mating then life.mating.mates else 0,life.clock.day,mateLegs.Mating.sexOf(appearance))
+ dropAll();cam:setEyeView(false);feedPending,cancelPending=false,false
+ soundscape:setSwell(true)
+end
+-- The scene is over: the camera and the music go back, the rigs let go of their poses, the parting is told and (when it was seen to its end) the notebook gets its line.
+-- `saw` is false when the world was reset under it (a rest returned to, a new life, the end of this one).
+function mateLegs.coupleEnd(saw: boolean)
+ local c=mateLegs.couple
+ if not c.active then return end
+ c.active=false
+ cam:setShot(nil);soundscape:setSwell(false)
+ rig.focusPoint=nil;rig:cue("release")
+ if mateLegs.stage.rig~=nil then mateLegs.stage.rig:cue("release") end
+ if not saw then c.notice,c.focus,c.turn=nil,nil,nil;return end
+ mateLegs.say(c.notice);c.notice=nil
+ if c.plan~=nil then book:addEntry("eggs_and_wind",c.plan.day,mateLegs.Text.entry(c.plan.day,c.mateSex)) end
+end
+-- A jump or cancel during the scene: a skip, allowed after Scene.SKIP_AFTER seconds of it (`force`: a wasp visit, which cannot wait). The pair part at once and the mate
+-- walks off in play; the sac, the guard and the hatching are the same.
+function mateLegs.skip(force: boolean)
+ local c,mate=mateLegs.couple,life.mate
+ if not c.active or mate==nil then return end
+ local t=mateLegs.Mate.sceneTime(mate)
+ if force~=true and (t==nil or not mateLegs.Scene.canSkip(t)) then return end
+ local events=mateLegs.Mating.skip(life,force)
+ if mate.scene==true then return end
+ c.skipped=true
+ for _,e in events do mateLegs.event(e,{}) end
+ mateLegs.coupleEnd(true)
+end
+-- Each frame (before the rigs are drawn): the scene's seconds from the simulation, the cues that fell due, the camera's two-shot, who looks at whom and the female mate's turn away.
+function mateLegs.coupleFrame(reduced: boolean,frameDt: number)
+ local c,mate=mateLegs.couple,life.mate
+ local t=if mate~=nil then mateLegs.Mate.sceneTime(mate) else nil
+ if t==nil then
+  mateLegs.coupleEnd(true)
+  if c.turn~=nil then -- (a female mate turned away walks off: the drawn turn lets go over half a second rather than snapping)
+   local step=math.rad(mateLegs.Scene.TURN_AWAY_DEG)/0.5*frameDt
+   c.turn=if math.abs(c.turn)<=step then nil else c.turn-step*(if c.turn>0 then 1 else -1)
+  end
+  return
+ end
+ if not c.active then
+  if session.ended then return end
+  mateLegs.coupleBegin()
+ end
+ local plan=c.plan
+ if plan==nil then return end
+ c.prev,c.t=c.t,t
+ local mine,mateRig=mateLegs.Mating.sexOf(appearance),mateLegs.stage.rig
+ for _,q in mateLegs.Scene.cues(c.prev,t) do
+  rig:cue(q.name,q.seconds[mine])
+  if mateRig~=nil then mateRig:cue(q.name,q.seconds[mate.sex]) end
+ end
+ cam:setShot(mateLegs.Scene.shot(plan,t,reduced,motor.pos,mate.position,motor.up))
+ rig.focusPoint=mate.position
+ c.focus=if mate.state=="pair" then motor.pos else nil
+ c.turn=mateLegs.Scene.turnAway(plan,t,reduced)*math.rad(mateLegs.Scene.TURN_AWAY_DEG)*plan.turnSign
 end
 -- The hatching begins: with its scene (the eggs hatch while the player is there), or, for a record restored into it, at the card at once.
 function mateLegs.begin(scene: boolean)
@@ -668,6 +742,8 @@ function mateLegs.woke(day: number)
 end
 -- Everything of the cycle that is only on the screen goes (a new life, a rest returned to).
 function mateLegs.reset()
+ mateLegs.coupleEnd(false)
+ mateLegs.couple.focus,mateLegs.couple.turn=nil,nil
  mateLegs.phase=""
  mateLegs.stage:reset()
 end
@@ -926,15 +1002,20 @@ controls = SpiderInput.bind({
 		if phase == "begin" then focusState:press(setting("FocusToggle") == true, motor.mode == "attached")
 		elseif phase == "cancel" then focusState:clear() end
 	end,
-	choose = function() changeSpider() end,
-	display = function() toggleDance() end,
+	choose = function() if not mateLegs.couple.active then changeSpider() end end,
+	display = function() if not mateLegs.couple.active then toggleDance() end end,
 	feed = function()
+		if mateLegs.couple.active then return end
 		ant.stopDisplay()
 		prey.feeding:press()
 		feedPending = true -- in the crack, with nothing to eat, the same button rests (Godot's interact)
 	end,
 	jump = function(phase: string)
   if life.growth:isMoulting() then return end
+  if mateLegs.couple.active then -- the mating scene (ROBLOX-89): the buttons are its skip, and what is left of a press is swallowed like a grip's
+   if phase == "begin" then mateLegs.skip(false);gripPress=true elseif gripPress then gripPress=false end
+   return
+  end
 		if phase == "begin" and (prey.feeding.struggling or rivalLegs.Grip.active(rivalLegs.grip)) then
 			if prey.feeding.struggling then prey.feeding:press() end
 			if rivalLegs.Grip.active(rivalLegs.grip) then rivalLegs.Grip.tap(rivalLegs.grip) end -- the same button grips a caught rival (ROBLOX-77)
@@ -955,6 +1036,7 @@ controls = SpiderInput.bind({
 	-- else's then) and, held on the line, lets go; SilkController counts only a fresh press after the 0.4 s grace, held 0.6 s.
 	cancel = function(phase: string)
 		if phase ~= "begin" then return end
+		if mateLegs.couple.active then mateLegs.skip(false);return end
 		ant.stopDisplay()
 		cancelPending = true -- also ends a rest
 		prey.feeding:cancel()
@@ -962,11 +1044,11 @@ controls = SpiderInput.bind({
 		focusState:cancel(jump:isBusy() or #jump.events > 0 or motor:onLine())
 		jump:cancel()
 	end,
-	drop = function() if life.growth:isMoulting() then return end; ant.stopDisplay(); motor:requestDrop() end,
+	drop = function() if life.growth:isMoulting() or mateLegs.couple.active then return end; ant.stopDisplay(); motor:requestDrop() end,
 	clear = dropAll,
 	reset = function() if not panel:isShowing() then returnToCheckpoint() end end, -- the catch screen has its own way back
 	gait = function() rig.gaitMode = if rig.gaitMode == "Tetrapod" then "Unilateral" else "Tetrapod" end,
-	eye = function() cam:toggleEyeView() end,
+	eye = function() if not mateLegs.couple.active then cam:toggleEyeView() end end,
 	recenter = function() cam:startRecenter() end,
 	slow = function() slow = not slow end,
 	touchLook = function(delta: Vector2) cam:touchLook(delta) end,
@@ -984,7 +1066,7 @@ controls = SpiderInput.bind({
 
 -- One fixed tick's intent from the controls, for the motor.
 local function tickInput(): any
- if life.growth:isMoulting() then return SpiderMotor.idleInput() end
+ if life.growth:isMoulting() or mateLegs.couple.active then return SpiderMotor.idleInput() end
 	local r, f = controls:axes()
 	if jump:isAiming() then r, f = 0, 0 end -- left stick aims, never walks during the held jump
 	local wish = Vector3.zero
@@ -1086,7 +1168,9 @@ local function updateHud(frameDt: number)
    if far<=mateLegs.Rules.loseWu or mate.meter>0 then view.court=mate.meter end
    if far<=14 or mate.meter>0 then table.insert(view.status,mateLegs.Text.courtLine(device,far<=mateLegs.Rules.nearWu,SpiderChoice.canDance(appearance),dance.active,mate.meter)) end
   end
-  if mate~=nil and mate.state=="pair" and captionScale>0 then view.caption=mateLegs.Text.PAIR_CAPTION end
+  if mateLegs.couple.active and captionScale>0 and not wasp:isVisiting() then -- the mating scene's captions (ROBLOX-89)
+   view.caption=mateLegs.Text.matingCaption(mateLegs.couple.t,mateLegs.Mating.sexOf(appearance)) or view.caption
+  end
   if m~=nil and (m.stage=="sac" or m.stage=="guarding") then table.insert(view.status,mateLegs.Text.guardLine(m.guard_day,mateLegs.Rules.guardDays)) end
   if mateLegs.phase=="scene" and captionScale>0 then view.caption=mateLegs.Text.sceneCaption(mateLegs.stage.t) or view.caption end
  end
@@ -1234,7 +1318,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			end
 			if wasp.rivalHeldAt and life.rival.state == "taken" then life.rival.position = wasp.rivalHeldAt end
 			if wasp.heldAt then motor:hold(wasp.heldAt) end
-			prey.feeding.auto = setting("AutomaticGrip") == true
+			prey.feeding.auto = setting("AutomaticGrip") == true or mateLegs.couple.active -- (a meal in the legs is held for a player whose hands are the scene's: ROBLOX-89)
 			if life.growth.gameRules ~= true then life.growth:useGameRules() end -- (a family that carries on has a new growth)
 			if prey.feeding.game ~= true then prey.feeding:useGameRules() end -- (a record restored from before the flag has none: the game's struggle again)
 			local takenBefore = prey.feeding.taken
@@ -1259,7 +1343,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
             end
             -- A caught rival fights the tapping grip before it can be eaten (ROBLOX-77); it is subdued, or it tears free and recovers (never a harm).
             local gripEvent=rivalLegs.Grip.step(rivalLegs.grip,life.rival,DT,{
-             grounded=motor.mode=="attached" and not motor.preparing,gentle=needs.gentle,auto=setting("AutomaticGrip")==true,seed=914,day=life.clock.day,
+             grounded=motor.mode=="attached" and not motor.preparing,gentle=needs.gentle,auto=setting("AutomaticGrip")==true or mateLegs.couple.active,seed=914,day=life.clock.day,
             })
             if gripEvent=="subdued" then life:showNotice(rivalLegs.Text.SUBDUED)
             elseif gripEvent=="tore" then life:showNotice(rivalLegs.Text.tore(needs.gentle)) end
@@ -1280,6 +1364,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
             do
              local ms=table.clone(rivalState)
              ms.drive,ms.sex,ms.needsDance,ms.dancing,ms.blocked=mateLegs.drive,mateLegs.Mating.sexOf(appearance),SpiderChoice.canDance(appearance),dance.active,sightCast
+             if mateLegs.couple.active and wasp:isVisiting() then mateLegs.skip(true) end -- (the controls are the player's again the moment the wasp comes)
              for _,e in mateLegs.Mating.tick(life,DT,ms) do mateLegs.event(e,ms) end
              local mate=life.mate
              if mate~=nil and mate.state~="away" and mateLegs.drive==nil then
@@ -1397,6 +1482,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 		end
 	end
  rig.reducedMotion=setting("ReducedMotion")==true
+ mateLegs.coupleFrame(rig.reducedMotion,frameDt) -- (the mating scene's camera, cues and looks; before the rigs are drawn)
  rig:noteMeals(prey.feeding.mealsFinished) -- a meal ended: a longer cleaning once it stands still (ROBLOX-87)
  rig:setGrowthStage(life.growth.stage)
  rig:setSoftness(life.growth:softness())
@@ -1417,7 +1503,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
      rivalLegs.rig:update(SupportMath.bodyCFrame(rival.position,if rival.state=="taken" then Vector3.yAxis else (rival.up or Vector3.yAxis),rival.heading),if paused then 0 else simFrame,rival.state~="lunge" and rival.state~="taken",(rival.position-rival.previous).Magnitude>.001)
     elseif rivalLegs.rig then rivalLegs.rig:destroy();rivalLegs.rig=nil end
     -- The mate, the egg sac and the hatching (ROBLOX-80). The scene waits when a screen has the game; when it is over the ending card comes.
-    mateLegs.stage:drawMate(life.mate,appearance,if paused then 0 else simFrame,setting("ReducedMotion")==true)
+    mateLegs.stage:drawMate(life.mate,appearance,if paused then 0 else simFrame,setting("ReducedMotion")==true,mateLegs.couple.focus,mateLegs.couple.turn)
     mateLegs.stage:drawSac(mateLegs.Mating.hasSac(life.mating))
     if mateLegs.phase=="scene" and not paused and not mateLegs.stage:step(simFrame,setting("ReducedMotion")==true) then mateLegs.showCard(false) end
 	updateHud(frameDt)

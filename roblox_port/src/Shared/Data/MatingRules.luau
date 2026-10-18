@@ -31,8 +31,14 @@ MatingRules.loseSeconds = 3.0
 MatingRules.faceDeg = 40.0
 MatingRules.strikeWu = 0.65
 MatingRules.jumpAtWu = 2.0
--- The pause together, in which the one caption of the mating is shown; then the mate walks off the sill and is not seen again.
-MatingRules.pairSeconds = 5.0
+-- The pause together (ROBLOX-89: it was five seconds and one caption). The mating is a scene of `sceneSeconds` in four beats (Life/MatingScene: she turns, they touch,
+-- they settle, one goes). A male mate is together with the spider for `pairSeconds` (the first three beats) and then walks off the sill during the last beat; a female
+-- mate (the peacock spider is the male) stays through the whole scene (`stayPairSeconds`), turns away and settles in the last beat, and walks off after it. The scene may
+-- be skipped after `skipAfter` seconds, or at once when a wasp comes (nothing keeps the player in the open); then the mate walks off as it always did.
+MatingRules.sceneSeconds = 15.0
+MatingRules.pairSeconds = 11.0
+MatingRules.stayPairSeconds = 15.0
+MatingRules.skipAfter = 4.0
 -- A mate that leaves (driven off, at dusk, after mating) walks to the edge of the sill, the back corner of the east end of the floor (the waypoint
 -- there); it is gone within exitRadius of it, or after leaveSeconds, whichever is first.
 MatingRules.leaveSeconds = 120.0

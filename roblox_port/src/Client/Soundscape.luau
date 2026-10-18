@@ -20,6 +20,11 @@ local MIX = { room = 0.09, birds = 0.16, buzz = 0.23, takeoff = 0.22, hum = 0.42
 -- While the wasp is on the sill the music is this share of itself, reached (and left) over about DUCK_S seconds.
 local DUCK = 0.4
 local DUCK_S = 1.0
+-- The mating scene (ROBLOX-89) swells the music to this share of itself over SWELL_S seconds (and back after); the wasp's duck still wins: while it is on the
+-- sill the swell is not asked for and the music is at its ducked level.
+local SWELL = 1.6
+local SWELL_S = 1.0
+Soundscape.SWELL, Soundscape.SWELL_S = SWELL, SWELL_S -- (the tests read them)
 local function voice(parent: Instance, name: string, volume: number, looped: boolean): Sound
 	local s = Instance.new("Sound")
 	s.Name = name
@@ -42,9 +47,14 @@ function Soundscape.new(parent: Instance): any
 	local hum = voice(emitter, "wasp", MIX.hum, true)
 	hum.RollOffMinDistance = 16; hum.RollOffMaxDistance = 120
 	return setmetatable({ root = root, room = voice(root, "room", MIX.room, true),
-		music = if IDS.music ~= "" then voice(root, "music", MIX.music, true) else nil, musicVolume = 1, duck = 1, duckTarget = 1,
+		music = if IDS.music ~= "" then voice(root, "music", MIX.music, true) else nil, musicVolume = 1, duck = 1, duckTarget = 1, swell = 1, swellWanted = false,
 		waspEmitter = emitter, waspHum = hum, master = 1, ambience = 1, creatures = 1,
 		birds = voice(root, "birds", MIX.birds, false), slots = {}, elapsed = 0, nextBird = 8 }, Soundscape)
+end
+-- The mating scene is playing (true) or over (false): the music swells to SWELL of itself over SWELL_S seconds, and comes back. Only music, nothing new: the birds and
+-- the room go on as they were. While the wasp ducks the music the swell is ignored (the duck wins).
+function Soundscape.setSwell(self: any, on: boolean)
+	self.swellWanted = on
 end
 -- The player's volumes, each 0 to 1 (`music`, the fourth, is 1 when left out).
 function Soundscape.setVolumes(self: any, master: number, ambience: number, creatures: number, music: number?)
@@ -67,9 +77,11 @@ function Soundscape.update(self: any, dt: number, prey: any, daylight: number, p
 	-- The music: its own volume times the master, ducked toward DUCK while the wasp is here (updateWasp sets the target); it pauses with the
 	-- menu and the mute like the rest, and does not follow slow motion.
 	self.duck += math.clamp(self.duckTarget - self.duck, -(1 - DUCK) / DUCK_S * dt, (1 - DUCK) / DUCK_S * dt)
+	local swellTarget = if self.swellWanted and self.duckTarget >= 1 then SWELL else 1
+	self.swell += math.clamp(swellTarget - self.swell, -(SWELL - 1) / SWELL_S * dt, (SWELL - 1) / SWELL_S * dt)
 	local music: Sound? = self.music
 	if music then
-		music.Volume = MIX.music * self.master * self.musicVolume * self.duck
+		music.Volume = MIX.music * self.master * self.musicVolume * self.duck * self.swell
 		playing(music, audible)
 	end
 	if not audible or daylight < 0.3 then self.birds:Stop() end

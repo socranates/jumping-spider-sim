@@ -121,6 +121,8 @@ function Checkpoint.boundaryProblem(world: World): string
 	if world.life.rival and world.life.rival.state=="captured" then
 		return if world.life.rival.subdued == false then "the rival in the jaws is still struggling" else "the spider is eating its rival"
 	end
+	-- ROBLOX-89: the mating scene is playing (the pause together, and a male mate's walk off the sill that ends it): no rest is kept inside it.
+	if world.life.mate and world.life.mate.scene == true then return "the two spiders are together" end
 	-- ROBLOX-79: the brood is out and the ending is the player's to take; a rest here would keep a family that has already hatched.
 	if world.life.mating and world.life.mating.stage == "hatched" then return "the brood is hatching" end
 	if prey.feeding.feeding then return "the spider is feeding" end

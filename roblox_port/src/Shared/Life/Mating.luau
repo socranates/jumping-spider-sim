@@ -8,7 +8,7 @@
 -- The cycle, in stages:
 --   none ....... nothing going on. A rest in the crack by a full-grown spider with energy of at least 0.6 sets `ready_day`, the morning of the next 07:00:
 --                from then a mate comes on mornings (Predator/Mate) until the player has courted it.
---   courted .... the courtship meter is full and the pair are together for the pause (Mate state "pair").
+--   courted .... the courtship meter is full and the pair are together for the pause (Mate state "pair"): the mating scene (ROBLOX-89, Life/MatingScene).
 --   mated ...... the pause is over and the mate is walking off. The next sleep in the crack that reaches the morning makes the egg sac.
 --   sac ........ the morning the sac is there: guard day 1.
 --   guarding ... guard day 2. (Guarding is surviving: nothing in v1 can harm the sac, the wasp and the rival never enter the crack.)
@@ -171,6 +171,18 @@ function Mating.tick(life: any, dt: number, s: any): { string }
 	return events
 end
 
+-- The player skips the mating scene (ROBLOX-89; the client allows it after Rules.skipAfter seconds of it, `force` for a wasp visit): a pause cut short is the
+-- mating at once, the same event Mating.tick reports when the pause ends by itself. Returns the events: {"mated"} or {}.
+function Mating.skip(life: any, force: boolean?): { string }
+	local mate = life.mate
+	if mate == nil then return {} end
+	if Mate.skip(mate, force) ~= "mated" then return {} end
+	local m = Mating.normalize(life.mating or Mating.new())
+	life.mating = m
+	m.stage = "mated"
+	return { "mated" }
+end
+
 -- The next generation (after the hatching scene and the ending card). The spider is a spiderling again: the first growth stage and a fresh energy, rested;
 -- the days of the sill go on; the mating state and the mate are new, so the cycle can happen again. Notebook, appearance and the world are not touched.
 -- Returns the new generation number and the day it hatched.
@@ -223,6 +235,7 @@ function Mating.problemsWith(m: any, mate: any): { string }
 	end
 	if stage == "courted" and mate.state ~= "pair" then table.insert(e, "mating: courted, but the pair are not together") end
 	if mate.state == "pair" and stage ~= "courted" then table.insert(e, "mating: together, but not courted") end
+	if mate.scene == true and stage ~= "courted" and stage ~= "mated" then table.insert(e, "mating: a mating scene, but no mating") end
 	return e
 end
 

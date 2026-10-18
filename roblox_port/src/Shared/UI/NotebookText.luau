@@ -33,6 +33,15 @@ function NotebookText.gameLine(game: string, device: ControlText.Device): string
 	return NotebookText.GAME .. NotebookText.fill(game, device)
 end
 
+-- ROBLOX-89: the lines the game has added to a page ("Day 4: ..."), under the page's "In this game" line, or nil when there are none.
+NotebookText.SEEN = "Things you saw:"
+function NotebookText.seenText(entries: { { day: number, text: string } }): string?
+	if #entries == 0 then return nil end
+	local lines = { NotebookText.SEEN }
+	for _, e in entries do table.insert(lines, e.text) end
+	return table.concat(lines, "\n")
+end
+
 -- "Source: x" for one source, "Sources:\nx\ny" for several. The links stay in the text as they are.
 function NotebookText.sourcesText(sources: { string }): string
 	return (if #sources == 1 then "Source: " else "Sources:\n") .. table.concat(sources, "\n")

@@ -7,6 +7,7 @@ local Rules = require("../src/Shared/Data/MatingRules")
 local RivalRules = require("../src/Shared/Data/RivalRules")
 local Mate = require("../src/Shared/Predator/Mate")
 local Mating = require("../src/Shared/Life/Mating")
+local Scene = require("../src/Shared/Life/MatingScene")
 local Rival = require("../src/Shared/Predator/RivalSpider")
 local NeedsModel = require("../src/Shared/Life/NeedsModel")
 local LifeLoop = require("../src/Shared/Life/LifeLoop")
@@ -417,8 +418,8 @@ case("a whole cycle, day by day: rest, mate, court, mate, sac night, two guard d
 	check(life.mating.stage == "courted" and mate.state == "pair", "full after 8 s: courted, together")
 	local courted = last(w, "courted")
 	near(courted.hour - arrived.hour, 8.0 * LifeClock.ACTIVE_HOURS_PER_S + 0.5 * LifeClock.ACTIVE_HOURS_PER_S, 0.05, "a little over eight seconds of play after the first")
-	run(w, 4.3)
-	check(life.mating.stage == "courted", "the pause together is five seconds")
+	run(w, 10.3)
+	check(life.mating.stage == "courted", "the pause together is eleven seconds with a male mate (ROBLOX-89: it was five)")
 	run(w, 0.4)
 	check(life.mating.stage == "mated" and mate.state == "leaving" and mate.reason == "mated", "mated; the mate leaves")
 	check(count(w, "mated") == 1, "once")
@@ -666,7 +667,7 @@ case("the legs: it walks the sill, comes up to a spider it sees, stands facing i
 	mover.player.heading = Vector3.new(flat.X, 0, flat.Z) * -1
 	for _ = 1, 60 * 12 do walkTick(mover) end
 	check(mover.life.mating.stage == "courted" or mover.life.mating.stage == "mated", `courted by standing still ({mover.life.mating.stage}, meter {string.format("%.2f", mm.meter)})`)
-	for _ = 1, 60 * 8 do walkTick(mover) end
+	for _ = 1, 60 * 12 do walkTick(mover) end
 	check(mover.life.mating.stage == "mated" and mm.state == "leaving", "mated and leaving")
 	-- It walks to the exit and is gone.
 	local took = nil
@@ -998,6 +999,246 @@ case("records: validation, old records, bad records", function()
 	mbad(function(x) x.position = Vector3.new(500, 0, 0) end, "a position outside the sill")
 	mbad(function(x) x.position = CRACK end, "a mate in the crack")
 	mbad(function(x) x.up = Vector3.new(0, 3, 0) end, "an up that is not a unit")
+end)
+
+-- ----------------------------------------------------------------------------------------------------------- the mating scene (ROBLOX-89)
+-- Life/MatingScene (the pure plan) and the simulation's side of the scene (Predator/Mate's scene flag, sceneTime and skip, Life/Mating.skip, the checkpoint's refusal).
+-- The drawing (camera, cues, captions, locked controls, music) is checked in tests/client_mating.luau.
+local function sameVec(a: Vector3, b: Vector3): boolean return (a - b).Magnitude < 1e-9 end
+
+case("the scene's plan: beats, locks, skip, cues", function()
+	check(Scene.SECONDS == 15 and Scene.SKIP_AFTER == 4 and Scene.EASE_SECONDS == 0.8 and Scene.ORBIT_DEG == 90, "fifteen seconds, a skip after four, an ease of 0.8 s, a quarter-orbit")
+	check(Rules.sceneSeconds == 15 and Rules.pairSeconds == 11 and Rules.stayPairSeconds == 15 and Rules.skipAfter == 4, "the rules say the same: 11 s of pause with a male mate and 15 s with a female, whose walk-off is the rest")
+	local want = { { -1, "" }, { 0, "turn" }, { 2.99, "turn" }, { 3, "touch" }, { 6.99, "touch" }, { 7, "settle" }, { 10.99, "settle" }, { 11, "depart" }, { 14.99, "depart" }, { 15, "over" }, { 40, "over" } }
+	for _, x in want do check(Scene.beat(x[1] :: number) == x[2], `beat at {x[1]} s is '{x[2]}' (got '{Scene.beat(x[1] :: number)}')`) end
+	check(not Scene.locked(-1) and Scene.locked(0) and Scene.locked(14.99) and not Scene.locked(15), "the controls are the scene's from 0 to 15 s")
+	check(not Scene.canSkip(0) and not Scene.canSkip(3.99) and Scene.canSkip(4) and Scene.canSkip(14.99) and not Scene.canSkip(15), "a skip from 4 s until the end")
+	local c = Scene.cues(2.9, 3.0)
+	check(#c == 1 and c[1].name == "meet" and c[1].seconds.male == 4 and c[1].seconds.female == 4 and c[1].at == 3, "the touch cue falls due at 3 s, four seconds long, for both")
+	c = Scene.cues(6.9, 7.0)
+	check(#c == 1 and c[1].name == "settle" and c[1].seconds.male == 4 and c[1].seconds.female == 8, "the settle cue at 7 s: the male's four seconds (it rises and goes), the female's eight (she stays)")
+	check(#Scene.cues(3.0, 7.0) == 1 and Scene.cues(3.0, 7.0)[1].name == "settle", "a cue falls due once: (from, to]")
+	c = Scene.cues(-1, 15)
+	check(#c == 2 and c[1].name == "meet" and c[2].name == "settle", "a scene entered late gives the cues already passed, in order")
+	check(#Scene.cues(7.0, 14.0) == 0 and #Scene.cues(-1, 2.99) == 0, "none between")
+end)
+
+case("the scene's plan: seeded, varied, a slow quarter-orbit, static under Reduced Motion", function()
+	local a, b = Scene.plan(914, 2, 5, "female"), Scene.plan(914, 2, 5, "female")
+	local same = true
+	for k, v in a :: any do if (b :: any)[k] ~= v then same = false end end
+	check(same, "the same mate on the same day is the same scene")
+	check(a.playerSex == "female" and a.mateSex == "male" and Scene.plan(914, 2, 5, "male").mateSex == "female", "the mate is the opposite sex")
+	local dirs, sides, turns, jit, elevs, dists = {}, {}, {}, {}, {}, {}
+	local inRange = true
+	for n = 1, 60 do
+		local p = Scene.plan(914, 1 + n % 3, n, "female")
+		dirs[p.dir], sides[p.side], turns[p.turnSign] = true, true, true
+		jit[math.floor(p.jitterDeg)], elevs[math.floor(p.elevationDeg)] = true, true
+		dists[math.floor(p.distanceK * 100)] = true
+		if math.abs(p.jitterDeg) > 8 or p.elevationDeg < 28 or p.elevationDeg > 36 or p.distanceK < 0.95 or p.distanceK > 1.05 then inRange = false end
+	end
+	check(inRange, "the draws stay in their ranges: a sweep within 8 degrees of the side view, 28 to 36 degrees up, a distance within 5%")
+	check(dirs[1] and dirs[-1] and sides[1] and sides[-1] and turns[1] and turns[-1], "both ways round, both sides, both turns come up")
+	local function size(t: any): number local n = 0; for _ in t do n += 1 end; return n end
+	check(size(jit) >= 6 and size(elevs) >= 5 and size(dists) >= 6, "and the numbers vary scene to scene")
+	check(Scene.plan(915, 2, 5, "female").jitterDeg ~= a.jitterDeg or Scene.plan(915, 2, 5, "female").dir ~= a.dir, "another world, another scene")
+	-- the orbit
+	local plan = a
+	local centre = math.rad(plan.jitterDeg)
+	near(Scene.orbit(plan, 0, false), centre - plan.dir * math.rad(45), 1e-9, "the sweep starts a quarter of a quarter before its centre")
+	near(Scene.orbit(plan, 7.5, false), centre, 1e-9, "and is at its centre half way")
+	near(Scene.orbit(plan, 15, false), centre + plan.dir * math.rad(45), 1e-9, "and ends the same distance after: ninety degrees in all")
+	near(math.abs(Scene.orbit(plan, 15, false) - Scene.orbit(plan, 0, false)), math.rad(90), 1e-9, "a quarter-orbit")
+	local mono = true
+	local prev = Scene.orbit(plan, 0, false)
+	for k = 1, 150 do
+		local o = Scene.orbit(plan, k * 0.1, false)
+		if (o - prev) * plan.dir < -1e-12 then mono = false end
+		prev = o
+	end
+	check(mono, "it only ever goes one way")
+	check(math.abs(Scene.orbit(plan, 0.5, false) - Scene.orbit(plan, 0, false)) < math.abs(Scene.orbit(plan, 8, false) - Scene.orbit(plan, 7.5, false)), "slow at the ends, quickest in the middle")
+	local still = true
+	for k = 0, 150 do if Scene.orbit(plan, k * 0.1, true) ~= centre then still = false end end
+	check(still, "Reduced Motion: no orbit at all, the centre held")
+	-- the turn away
+	local male, female = Scene.plan(914, 1, 5, "female"), Scene.plan(914, 1, 5, "male")
+	check(Scene.turnAway(male, 12.5, false) == 0 and Scene.turnAway(male, 14, true) == 0, "a male mate never turns away")
+	check(Scene.turnAway(female, 10.9, false) == 0 and Scene.turnAway(female, 11, false) == 0, "a female mate has not turned before 11 s")
+	near(Scene.turnAway(female, 11.75, false), 0.5, 1e-9, "she is half turned at 11.75 s")
+	check(Scene.turnAway(female, 12.5, false) == 1 and Scene.turnAway(female, 15, false) == 1, "and has turned by 12.5 s")
+	check(Scene.turnAway(female, 11.0, true) == 1 and Scene.turnAway(female, 10.99, true) == 0, "Reduced Motion: at once at 11 s")
+	check(Scene.TURN_AWAY_DEG == 110 and Scene.TURN_AWAY_AT == 11 and Scene.TURN_AWAY_SECONDS == 1.5, "110 degrees at 11 s over 1.5 s")
+	local pose = Scene.pose(female, 5, false)
+	check(pose.beat == "touch" and pose.locked and pose.t == 5 and not pose.over and pose.canSkip, "a pose has the beat, the lock and the skip")
+	check(Scene.pose(female, 15, false).over and not Scene.pose(female, 15, false).locked, "over at 15 s")
+end)
+
+case("the scene's two-shot: from slightly above, side on, wide enough for the pair", function()
+	local plan = Scene.plan(914, 1, 4, "female")
+	local a, b, up = Vector3.new(10, 0.31, 8), Vector3.new(12.5, 0.31, 8), Vector3.yAxis
+	local s0 = Scene.shot(plan, 0, false, a, b, up)
+	check(sameVec(s0.focus, Vector3.new(11.25, 0.31 + Scene.LIFT, 8)), "it looks at the middle of the pair, a little up from the floor")
+	near(s0.dir.Magnitude, 1, 1e-9, "the direction from it to the camera is a unit")
+	near(s0.dir:Dot(up), math.sin(math.rad(plan.elevationDeg)), 1e-9, "slightly above: the plan's elevation")
+	check(s0.dir:Dot(up) > 0.45 and s0.dir:Dot(up) < 0.6, "between 28 and 36 degrees")
+	check(s0.distance >= Scene.MIN_DISTANCE * 0.95 - 1e-9, `no nearer than {Scene.MIN_DISTANCE} (x the plan's 5%): {s0.distance}`)
+	local wide = Scene.shot(plan, 0, false, a, a + Vector3.xAxis * 9, up)
+	check(wide.distance > s0.distance + 5, "a wider pair, a further camera")
+	-- side on: at the sweep's centre the camera is across the pair, never behind one
+	local mid = Scene.shot(plan, 7.5, false, a, b, up)
+	local flatDir = Vector3.new(mid.dir.X, 0, mid.dir.Z).Unit
+	check(math.abs(flatDir:Dot(Vector3.xAxis)) <= math.sin(math.rad(8)) + 1e-6, `at the middle of the sweep the camera is across the pair ({flatDir:Dot(Vector3.xAxis)})`)
+	local turned = Scene.shot(plan, 15, false, a, b, up)
+	check(not sameVec(turned.dir, s0.dir) and math.abs(turned.dir:Dot(s0.dir)) < 1, "and over the scene it goes round")
+	local r0, r1 = Scene.shot(plan, 0, true, a, b, up), Scene.shot(plan, 15, true, a, b, up)
+	check(sameVec(r0.dir, r1.dir) and r0.distance == r1.distance and sameVec(r0.focus, r1.focus), "Reduced Motion: the same shot all through (static)")
+	-- on a wall and with the pair on top of each other
+	local wall = Scene.shot(plan, 3, false, Vector3.new(-30, 4, 5), Vector3.new(-30, 4, 7), Vector3.xAxis)
+	near(wall.dir:Dot(Vector3.xAxis), math.sin(math.rad(plan.elevationDeg)), 1e-9, "on a wall 'above' is out from the wall")
+	local together = Scene.shot(plan, 3, false, a, a, up)
+	check(together.dir.Magnitude > 0.99 and together.distance >= 3.9, "two on one spot: still a shot")
+	near(s0.up:Dot(up), 1, 1e-9, "and it keeps the floor's up")
+end)
+
+-- A world that has courted: the player stands near the mate, the meter fills, the pair are together. `sex` is the player's.
+local function together(sex: string?): any
+	local w = withMate(sex)
+	standNear(w, w.life.mate, 2.5)
+	run(w, 8.6)
+	assert(w.life.mate.state == "pair", "together")
+	return w
+end
+
+case("the scene in the simulation: its clock, the pause, the walk off, who stays", function()
+	local w = together("female")
+	local mate = w.life.mate
+	check(mate.scene == true and mate.sex == "male" and Mate.pairLength(mate) == 11, "a male mate: the scene begins with the pair, the pause is 11 s")
+	check(Mate.sceneTime(mate) ~= nil and (Mate.sceneTime(mate) :: number) < 1, `scene time starts at the pair ({Mate.sceneTime(mate)})`)
+	near(Mate.sceneTime(mate) :: number, mate.elapsed, 1e-9, "and is the pair's own elapsed time while together")
+	run(w, 5)
+	near(Mate.sceneTime(mate) :: number, mate.elapsed, 1e-9, "(still)")
+	local t5 = Mate.sceneTime(mate) :: number
+	-- a wasp visit holds the scene as it holds the mate
+	w.wasp = true
+	run(w, 4)
+	near(Mate.sceneTime(mate) :: number, t5, 1e-9, "a wasp visit holds the scene's clock")
+	check(mate.state == "pair" and mate.meter == 1, "and the pair")
+	w.wasp = false
+	run(w, 5.0)
+	check(mate.state == "pair", "just short of eleven seconds of scene")
+	run(w, 1.0)
+	check(mate.state == "leaving" and mate.reason == "mated" and w.life.mating.stage == "mated", "at 11 s of scene the pause ends: mated, the male leaves")
+	check(mate.scene == true and Mate.sceneTime(mate) :: number >= 11 and (Mate.sceneTime(mate) :: number) < 12, `and the walk off is the scene's last beat ({Mate.sceneTime(mate)})`)
+	check(Mate.valid(mate) and #Mating.problemsWith(w.life.mating, mate) == 0, "a good record there")
+	run(w, 3.0)
+	check(mate.scene == true, "still the scene at 14 s")
+	run(w, 1.2)
+	check(mate.scene == false and Mate.sceneTime(mate) == nil, "the scene is over at 15 s")
+	check(mate.state == "leaving" or mate.state == "away", "(he is still walking, or gone)")
+	-- the female mate (a male player): she stays, the pause is the whole scene
+	local m = together("male")
+	local fe = m.life.mate
+	check(fe.sex == "female" and fe.scene == true and Mate.pairLength(fe) == 15, "a female mate: the pause is the whole fifteen seconds")
+	run(m, 13.5)
+	check(fe.state == "pair" and fe.scene == true, "together at about 14 s")
+	run(m, 1.2)
+	check(fe.state == "leaving" and fe.reason == "mated" and fe.scene == false and Mate.sceneTime(fe) == nil and m.life.mating.stage == "mated", "at 15 s the scene and the pause end together")
+	-- the cycle after it is the same chain
+	setClock(w, 3, 18.5)
+	w.life.mate.position = Rules.exitAt
+	run(w, 0.2)
+	sleepThrough(w)
+	check(w.life.mating.stage == "sac" and w.life.mating.sac_day == 4, "the sac is made by the night's sleep as before")
+end)
+
+case("skipping the scene: after four seconds, to the parting; a wasp may force it", function()
+	local w = together("female")
+	local mate = w.life.mate
+	run(w, 3.0)
+	check(#Mating.skip(w.life) == 0 and mate.state == "pair" and mate.scene == true and w.life.mating.stage == "courted", "a skip before 4 s is nothing")
+	run(w, 1.2)
+	check((Mate.sceneTime(mate) :: number) >= 4, `(scene time {Mate.sceneTime(mate)})`)
+	local ev = Mating.skip(w.life)
+	check(#ev == 1 and ev[1] == "mated" and w.life.mating.stage == "mated", "after 4 s it is the mating, at once")
+	check(mate.state == "leaving" and mate.reason == "mated" and mate.scene == false and Mate.sceneTime(mate) == nil, "the mate walks off and the scene is over (the departure still happens)")
+	check(#Mating.skip(w.life) == 0, "a second skip is nothing")
+	mate.position = Rules.exitAt
+	run(w, 0.2)
+	check(mate.state == "away", "and he is gone off the sill")
+	-- the same for the walk off at the end of the male's scene
+	local u = together("female")
+	run(u, 11.5)
+	check(u.life.mate.state == "leaving" and u.life.mate.scene == true, "(in the last beat)")
+	check(#Mating.skip(u.life) == 0 and u.life.mate.scene == false and u.life.mate.state == "leaving", "a skip there ends the scene and lets him walk on")
+	-- a female mate
+	local f = together("male")
+	run(f, 6)
+	check(#Mating.skip(f.life) == 1 and f.life.mate.state == "leaving" and f.life.mating.stage == "mated", "the same for a female mate")
+	-- forced, for a wasp visit
+	local x = together("female")
+	run(x, 1.0)
+	check(#Mating.skip(x.life) == 0 and #Mating.skip(x.life, false) == 0, "not before 4 s, asked nicely")
+	check(#Mating.skip(x.life, true) == 1 and x.life.mate.state == "leaving" and x.life.mating.stage == "mated", "but a wasp's visit forces it at any time")
+	-- nothing to skip
+	local n = withMate()
+	check(#Mating.skip(n.life, true) == 0 and #Mating.skip({}, true) == 0 and Mate.skip(nil) == "", "no scene, nothing to skip")
+end)
+
+case("the scene's record: validity and old records", function()
+	local function mk(state: string, scene: any, reason: string?): any
+		local m = Mate.new()
+		m.state, m.position, m.previous, m.scene, m.reason = state, Vector3.new(12, 0.31, 6), Vector3.new(12, 0.31, 6), scene, reason or ""
+		return m
+	end
+	check(Mate.valid(mk("pair", true)) and Mate.valid(mk("leaving", true, "mated")) and Mate.valid(mk("pair", false)) and Mate.valid(mk("wander", false)), "a scene in the pair, or in the walk off after the mating: good")
+	check(not Mate.valid(mk("wander", true)) and not Mate.valid(mk("leaving", true, "driven")) and not Mate.valid(mk("attend", true)), "a scene in any other state is refused")
+	check(not Mate.valid(mk("pair", "yes")) and not Mate.valid(mk("pair", 1)), "and a scene that is not a yes or a no")
+	local old = mk("pair", nil)
+	check(Mate.valid(old) and Mate.sceneTime(old) == nil, "a record from before the scene has none: good, and no scene")
+	check(Mate.new().scene == false and Mate.sceneTime(Mate.new()) == nil, "a new mate has none")
+	local m = Mating.new()
+	m.stage = "none"
+	check(#Mating.problemsWith(m, mk("pair", true)) > 0, "a scene with the cycle not courted or mated is refused")
+	m.stage = "courted"
+	check(#Mating.problemsWith(m, mk("pair", true)) == 0, "courted: good")
+	m.stage = "mated"
+	check(#Mating.problemsWith(m, mk("leaving", true, "mated")) == 0, "mated and walking off: good")
+end)
+
+case("a rest cannot land inside the scene; the record has no scene to restore into", function()
+	local w = fullWorld()
+	w.life.mating = Mating.new()
+	w.life.mating.stage, w.life.mating.mates, w.life.mating.visits, w.life.mating.visit_day = "courted", 1, 1, 3
+	local mate = Mate.new()
+	mate.state, mate.position, mate.previous, mate.sex, mate.scene, mate.meter = "pair", Vector3.new(12, 0.31, 6), Vector3.new(12, 0.31, 6), "male", true, 1
+	w.life.mate = mate
+	check(Checkpoint.boundaryProblem(w) == "the two spiders are together", `a rest is refused while it plays ({Checkpoint.boundaryProblem(w)})`)
+	fullTick(w, true)
+	check(w.life.resting and #w.kept == 0 and w.life.checkpointResult ~= nil and not w.life.checkpointResult.ok and #w.kept == 0, "a rest there keeps nothing and says so")
+	mate.state, mate.reason, mate.elapsed = "leaving", "mated", 0
+	w.life.mating.stage = "mated"
+	check(Checkpoint.boundaryProblem(w) == "the two spiders are together", "and in the male's walk off, which is the scene's last beat")
+	mate.scene = false
+	check(Checkpoint.boundaryProblem(w) == "", "when the scene is over a rest keeps its checkpoint again")
+	-- a record without the field (all the records there have ever been) restores, with no scene
+	mate.state, mate.reason = "pair", ""
+	w.life.mating.stage = "courted"
+	local rec = assert(Checkpoint.capture(w, 0))
+	for _, o in rec.world.objects do
+		local keep = {}
+		for _, entry in o.e do if entry[1] ~= "scene" then table.insert(keep, entry) end end
+		o.e = keep
+	end
+	local v = fullWorld()
+	local ok, problems = Checkpoint.restore(rec, v)
+	check(ok, "restored: " .. table.concat(problems, "; "))
+	check(v.life.mate.state == "pair" and v.life.mate.scene == nil and Mate.sceneTime(v.life.mate) == nil, "the pair are together with no scene (an older record: the pause is what it was)")
+	check(Checkpoint.boundaryProblem(v) == "", "and a rest is not refused for it")
+	-- and the pause still ends on its own
+	for _ = 1, 60 * 13 do fullTick(v) end
+	check(v.life.mate.state ~= "pair", "which ends by its own clock")
 end)
 
 print(`MATING passed={passed} failed={failed}`)

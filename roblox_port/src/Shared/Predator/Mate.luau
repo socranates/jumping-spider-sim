@@ -5,6 +5,10 @@
 -- from a snapshot of the player (no clock, no engine, no hidden tracking), arrival rules like the rival's (Data/MatingRules), and legs that are the
 -- rival's own (Predator/MateDrive, which gives RivalDrive a record in the rival's vocabulary). It keeps out of the retreat for the same reason.
 --
+-- ROBLOX-89: the pair's pause is the mating scene (Life/MatingScene, drawn by the client). `scene` is true from the moment the meter fills until the scene is over:
+-- the whole pause, and for a male mate the walk off the sill that is its last beat. Nothing else reads it but the checkpoint (no rest is kept inside the scene) and
+-- the client (the camera, the locked controls, the captions: `Mate.sceneTime` is the scene's clock, which a wasp visit holds like every other timer of the mate).
+--
 -- States: away (not on the sill: not arrived yet, driven off, gone for the day or for good), wander (walking the sill, in no hurry), approach (it has
 -- seen the spider and walks up to it), attend (it stands facing the spider, close), pair (the pause together once the courtship meter is full), leaving
 -- (walking to the edge: driven off, the evening, or after mating). The courtship meter lives here (m.meter, 0 to 1) and is the player's to fill.
@@ -34,8 +38,21 @@ function Mate.new(): any
 	local at = Rules.arriveAt
 	return {
 		state = "away", position = at, previous = at, up = Vector3.yAxis, heading = -Vector3.xAxis,
-		leg = 0, elapsed = 0, meter = 0, lost = 0, sex = "male", scale = 1, reason = "",
+		leg = 0, elapsed = 0, meter = 0, lost = 0, sex = "male", scale = 1, reason = "", scene = false,
 	}
+end
+
+-- How long the pair are together before the mate leaves: a male mate for the first three beats of the scene, a female mate through all four.
+function Mate.pairLength(m: any): number
+	return if m.sex == "female" then Rules.stayPairSeconds else Rules.pairSeconds
+end
+
+-- The scene's clock in seconds (0 to Rules.sceneSeconds) while the mating scene plays, or nil when it does not.
+function Mate.sceneTime(m: any): number?
+	if m == nil or m.scene ~= true then return nil end
+	if m.state == "pair" then return m.elapsed end
+	if m.state == "leaving" then return Mate.pairLength(m) + m.elapsed end
+	return nil
 end
 
 function Mate.opposite(sex: string): string
@@ -67,11 +84,30 @@ function Mate.courtable(m: any): boolean
 end
 
 local function leave(m: any, reason: string)
-	m.state, m.elapsed, m.meter, m.reason, m.lost = "leaving", 0, 0, reason, 0
+	m.state, m.elapsed, m.meter, m.reason, m.lost, m.scene = "leaving", 0, 0, reason, 0, false
 end
 
 local function gone(m: any)
-	m.state, m.elapsed, m.meter, m.lost = "away", 0, 0, 0
+	m.state, m.elapsed, m.meter, m.lost, m.scene = "away", 0, 0, 0, false
+end
+
+-- The pause is over (its time, or a rest during it): it leaves, mated. A male mate's walk off the sill is still the scene's last beat.
+local function parted(m: any)
+	leave(m, "mated")
+	m.scene = m.sex ~= "female" and Rules.sceneSeconds > Rules.pairSeconds
+end
+
+-- The player skips the scene (a jump or cancel after Rules.skipAfter seconds of it; `force` for a wasp visit, which cannot wait): the pair part at once and the mate
+-- walks off. Returns "mated" for a pause cut short, and "" when there is nothing to part (a male mate already walking just ends the scene's last beat).
+function Mate.skip(m: any, force: boolean?): string
+	if m == nil or m.scene ~= true then return "" end
+	if m.state == "pair" then
+		if force ~= true and m.elapsed < Rules.skipAfter - 1e-9 then return "" end
+		leave(m, "mated")
+		return "mated"
+	end
+	if m.state == "leaving" and (force == true or Mate.sceneTime(m) :: number >= Rules.skipAfter - 1e-9) then m.scene = false end
+	return ""
 end
 
 -- Whether the player is facing it: the mate within Rules.faceDeg of where the player looks, in the plane the player stands on.
@@ -112,7 +148,7 @@ function Mate.step(m: any, dt: number, s: any): string
 	-- The player rests: it is gone without being seen to go. (A pair that is together finishes first: the mating is not cut short.)
 	if s.resting then
 		if st == "pair" then
-			leave(m, "mated")
+			parted(m)
 			return "mated"
 		end
 		gone(m)
@@ -125,6 +161,7 @@ function Mate.step(m: any, dt: number, s: any): string
 	local delta = s.position - m.position
 	local dist = delta.Magnitude
 	if st == "leaving" then
+		if m.scene == true and Mate.pairLength(m) + m.elapsed >= Rules.sceneSeconds then m.scene = false end -- (the scene's last beat is over)
 		local out = (m.position - Rules.exitAt)
 		if m.elapsed >= Rules.leaveSeconds or Vector3.new(out.X, 0, out.Z).Magnitude <= Rules.exitRadius then
 			gone(m)
@@ -133,8 +170,8 @@ function Mate.step(m: any, dt: number, s: any): string
 		return ""
 	end
 	if st == "pair" then
-		if m.elapsed >= Rules.pairSeconds then
-			leave(m, "mated")
+		if m.elapsed >= Mate.pairLength(m) then
+			parted(m)
 			return "mated"
 		end
 		return ""
@@ -188,7 +225,7 @@ function Mate.step(m: any, dt: number, s: any): string
 		m.meter = math.max(0, m.meter - dt * Rules.decayPerSecond)
 	end
 	if m.meter >= 1 - 1e-9 then
-		m.meter, m.state, m.elapsed = 1, "pair", 0
+		m.meter, m.state, m.elapsed, m.scene = 1, "pair", 0, true
 		return "courted"
 	end
 	return event
@@ -213,11 +250,14 @@ function Mate.valid(m: any): boolean
 	if m.sex ~= nil and m.sex ~= "male" and m.sex ~= "female" then return false end
 	if m.scale ~= nil and (not finite(m.scale) or m.scale < 0.5 or m.scale > 2) then return false end
 	if m.reason ~= nil and (type(m.reason) ~= "string" or not REASONS[m.reason]) then return false end
+	if m.scene ~= nil and type(m.scene) ~= "boolean" then return false end
+	local atRest = m.state == "away" -- (the scene is the pause, or the walk off after it: never away)
+	if m.scene == true and (atRest or not (m.state == "pair" or (m.state == "leaving" and m.reason == "mated"))) then return false end -- (the scene is the pause, or the walk off after it)
 	for _, k in { "position", "previous", "heading", "up" } do
 		if m[k] ~= nil and not vec3(m[k]) then return false end
 	end
 	if m.up ~= nil and math.abs(m.up.Magnitude - 1) > 0.05 then return false end
-	if m.state ~= "away" then
+	if not atRest then
 		local p, lo, hi = m.position, Layout.PLAY_BOUNDS_MIN, Layout.PLAY_BOUNDS_MAX
 		if p == nil or p.X < lo.X or p.Y < lo.Y or p.Z < lo.Z or p.X > hi.X or p.Y > hi.Y or p.Z > hi.Z or Layout.inRetreat(Vector3.new(p.X, p.Y, p.Z)) then return false end
 	end

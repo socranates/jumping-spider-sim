@@ -184,6 +184,11 @@ local first = {
 		attention = { maxDeg = 20, easeSeconds = 0.4, glance = 0.02, glanceSpanDeg = 28 },
 		-- Alarm: legs I go to `raise` (body frame, studs) and the idle motion freezes for `seconds`, in `riseSeconds` and out over `fallSeconds`.
 		alarm = { seconds = 1.2, riseSeconds = 0.15, fallSeconds = 0.35, raise = { x = 0.20, y = 0.30, z = -0.52, kneeOut = 0.10, kneeUp = 0.22 } },
+		-- The mating scene's two cues (ROBLOX-89; both spiders, ART). Meet: legs I go to `reach` (the body frame, studs: out in front of the head and a little off the floor, the
+		-- knee out and up) and the palps lift `palpLiftDeg` and turn `palpYawDeg` toward the midline, in `riseSeconds`, held, and out over `fallSeconds`, for the cue's `seconds`. Settle:
+		-- the body sinks `lower` studs and the breath is `breath` times as deep, the same way. Grooming and the accents give way to both (the breath goes on).
+		meet = { seconds = 4.0, riseSeconds = 0.8, fallSeconds = 0.8, reach = { x = 0.14, y = -0.02, z = -0.74, kneeOut = 0.08, kneeUp = 0.16 }, palpLiftDeg = 12, palpYawDeg = 8 },
+		settle = { seconds = 4.0, riseSeconds = 0.8, fallSeconds = 0.8, lower = 0.035, breath = 1.6 },
 	},
 
 	-- ---------------------------------------------------------------- hanging on a dragline (ROBLOX-59, ROBLOX-86; drawn rig only)
@@ -355,6 +360,9 @@ local volans = {
 		riseSeconds = 1.0, fallSeconds = 0.25,
 		breathe = { period = 3.0, bodyLift = 0.003, lift = 0.008, pitchDeg = 2.4 },
 		tilt = { rollDeg = 7, yawDeg = 6, pitchDeg = 3.5, periods = { 9.1, 5.3, 11.3, 6.7, 8.3 } },
+		-- The mating scene's cues (ROBLOX-89): the first spider's, at this spider's size (0.47): no grooming, no alarm, but the reach and the settle.
+		meet = { seconds = 4.0, riseSeconds = 0.8, fallSeconds = 0.8, reach = { x = 0.066, y = -0.01, z = -0.35, kneeOut = 0.04, kneeUp = 0.075 }, palpLiftDeg = 12, palpYawDeg = 8 },
+		settle = { seconds = 4.0, riseSeconds = 0.8, fallSeconds = 0.8, lower = 0.016, breath = 1.6 },
 	},
 
 	-- Full is for PCs; low is for phones and tablets: no foot balls, no eye sockets, no leg bands, no idle motion, no outline, no back to the fan, a plainer fan.

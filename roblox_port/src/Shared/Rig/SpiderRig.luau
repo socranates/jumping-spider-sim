@@ -190,12 +190,17 @@ end
 local GROUP_OF: { [string]: number } = { head = G_HEAD, abdomen = G_ABDOMEN }
 
 -- detail "low" is for phones and tablets: fewer hairs, one fur shell, no foot balls, half the speckles, no outline, no
--- breathing or head tilt (Appearances.detail). Anything else is the full look.
-function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: string?, detail: string?): Rig
+-- breathing or head tilt (Appearances.detail). Anything else is the full look. `living` (ROBLOX-89: the mate, which has to breathe and take the mating scene's cues
+-- at the low tier) turns the living motion on at a tier that has none, for the same parts.
+function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: string?, detail: string?, living: boolean?): Rig
 	local look = Appearances.profiles[appearanceId or Appearances.default]
 	assert(look, "Unknown spider appearance")
 	local detailName = if detail == "low" then "low" else "full"
 	local cfg = look.detail[detailName]
+	if living == true and not cfg.idle then
+		cfg = table.clone(cfg)
+		cfg.idle = true
+	end
 	local A = Anatomy.layout(look)
 	local function color(rgb): Color3 return Color3.new(rgb[1], rgb[2], rgb[3]) end
 	local BODY, LEG = color(look.body), color(look.legs)
@@ -255,7 +260,7 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 
 	made += 1
 	local idleLook = look.idle
-	if cfg.idle and (idleLook.groom or idleLook.attention or idleLook.alarm or idleLook.stretch) then
+	if cfg.idle and (idleLook.groom or idleLook.attention or idleLook.alarm or idleLook.stretch or idleLook.meet or idleLook.settle) then
 		self._living = Living.new(idleLook, Living.hash(look.id) + 7919 * made)
 	end
 	local function fixed(part: Part, at: Vector3, rot: CFrame?, group: number, palp: number?): Fixed
@@ -671,9 +676,11 @@ end
 
 -- A cue from the host for the living motion (ROBLOX-87): "groom" (a meal has just ended: a longer cleaning once it stands still) or "alarm" (the wasp's
 -- warning or the rival's windup: legs I up and the idle motion frozen for a moment). Anything else, or a rig below the full tier, ignores it.
-function SpiderRig.cue(self: Rig, name: string)
+-- ROBLOX-89: "meet" (reach out to the other spider) and "settle" (sink and breathe deeper) for the mating scene, each for `seconds` (default the look's own), and
+-- "release" to let both go; a rig without the living motion (the ant mimic, the low tier unless made `living`) ignores them.
+function SpiderRig.cue(self: Rig, name: string, seconds: number?)
 	local living = self._living
-	if living ~= nil then Living.cue(living, name) end
+	if living ~= nil then Living.cue(living, name, seconds) end
 end
 
 -- The host's count of meals finished so far: a rise cues the "groom". (The first count only sets the baseline: a spider loaded from a save does not clean itself.)
@@ -895,7 +902,8 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 	local breathing = 0
 	if cfg.idle and not self.reducedMotion then breathing = if standing then 1 else (look.idle.breathe.movingShare or 0) end
 	self._breath += math.clamp(breathing - self._breath, -dt / 0.6, dt / 0.6)
-	local breathScale = if cfg.idle then Idle.abdomenScale(self._t, self._breath * (1 - 0.8 * freeze), look.idle) else 1
+	local gain = if lp ~= nil then lp.breath else 1 -- (the mating scene's settle: a deeper breath, ROBLOX-89)
+	local breathScale = if cfg.idle then Idle.abdomenScale(self._t, self._breath * (1 - 0.8 * freeze) * gain, look.idle) else 1
 	self._drum = math.clamp(self._drum + (if standing then 3 else -3) * dt, 0, 1)
 	local palpAngle = Idle.palps(self._t, self._drum * (1 - freeze), look.palp)
 	local bodyBase, headBase, abdomenBase = body, body, body
@@ -905,10 +913,10 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 		if self._calm > 0 then
 			local c = self._calm * self._calm * (3 - 2 * self._calm) * (1 - freeze)
 			local pose = Idle.pose(self._t, c, idle)
-			bodyBase = body * CFrame.new(0, pose.bodyLift*g, 0)
+			bodyBase = body * CFrame.new(0, pose.bodyLift*g*gain, 0)
 			headBase = bodyBase * CFrame.new(A.neck*g) * CFrame.Angles(pose.headPitch, pose.headYaw, pose.headRoll) * CFrame.new(-A.neck*g)
-			abdomenBase = bodyBase * CFrame.new(0, pose.abdomenLift*g, 0) * CFrame.new(A.pedicelCenter*g)
-				* CFrame.Angles(-pose.abdomenPitch, 0, 0) * CFrame.new(-A.pedicelCenter*g)
+			abdomenBase = bodyBase * CFrame.new(0, pose.abdomenLift*g*gain, 0) * CFrame.new(A.pedicelCenter*g)
+				* CFrame.Angles(-pose.abdomenPitch*gain, 0, 0) * CFrame.new(-A.pedicelCenter*g)
 		end
 	end
 	-- Display-only snaps also run on low-detail devices. Camera/root, foot anchors and motor stay unchanged.
@@ -922,6 +930,11 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 	if lp ~= nil and lp.yaw ~= 0 then
 		local turn = body * CFrame.Angles(0, lp.yaw, 0) * body:Inverse()
 		bodyBase, headBase, abdomenBase = turn * bodyBase, turn * headBase, turn * abdomenBase
+	end
+	-- The mating scene's settle (ROBLOX-89): the whole drawn body sinks a little toward the surface (the planted feet stay where they are).
+	if lp ~= nil and lp.settle > 0 and look.idle.settle ~= nil then
+		local sink = body * CFrame.new(0, -look.idle.settle.lower * g * lp.settle, 0) * body:Inverse()
+		bodyBase, headBase, abdomenBase = sink * bodyBase, sink * headBase, sink * abdomenBase
 	end
  -- A visible preparation and extension, not a pressure gauge or an inflated body. Hydraulic
  -- extension and muscle action both matter; their jump contribution varies among species

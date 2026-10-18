@@ -16,6 +16,10 @@
 -- Spider-eye view (V / Y): the camera sits just ahead of the principal eyes looking along a gaze the player turns; its up
 -- follows the body's at most EYE_ROLL_DEG_S. Walking is relative to the gaze. Switching back snaps behind the spider.
 -- The picture (field of view, colour, blur: ROBLOX-20) is Client/SpiderEyes'; it only sets the field of view and lookScale here.
+-- The mating scene's two-shot (ROBLOX-89): `setShot` hands the camera the pair's framing (Life/MatingScene.shot: a point, a direction from it and a distance) each frame
+-- of the scene; the view then eases into it over SHOT_EASE_SECONDS from wherever the orbit camera was, the player's own look is ignored while it holds, and when the
+-- shot ends (setShot(nil)) it eases back out over the same time to the orbit camera, which has not moved. The boom is cast against the sill like the orbit's, so the
+-- view is never inside geometry, and the body is never hidden by it.
 -- Mouse: locked to the screen centre while playing (as the Godot game captures it); the Roblox menu frees it.
 -- Placement order (Godot chunk 6B): no boom is trusted until the sill can be seen by queries; until then the camera sits
 -- at the pivot with a boom of 0.
@@ -33,6 +37,10 @@ SpiderCamera.__index = SpiderCamera
 
 local MIN_DISTANCE, MAX_DISTANCE = 2.0, 12.0
 local TOUCH_DEG_PER_PIXEL = 0.25
+
+export type Shot = { focus: Vector3, dir: Vector3, distance: number, up: Vector3 }
+local SHOT_EASE_SECONDS = 0.8
+SpiderCamera.SHOT_EASE_SECONDS = SHOT_EASE_SECONDS
 
 export type Target = { pos: Vector3, drawnUp: Vector3, heading: Vector3, onLine: boolean?, rest: Vector3?, lip: Vector3?, cameraScale: number? }
 
@@ -57,6 +65,7 @@ function SpiderCamera.new(camera: Camera, params: RaycastParams, target: () -> T
 		pivotDir = Vector3.yAxis,
 		recenterT = -1, recenterYaw0 = 0, recenterElev0 = 0, recenterGaze0 = Vector3.zero,
 		eyeView = false,
+		shot = nil :: Shot?, lastShot = nil :: Shot?, shotT = 0, -- the mating two-shot (ROBLOX-89): the shot now, the last one (to ease out of) and the ease, 0 to 1
 		lookScale = 1, -- the eye view only: SpiderEyes sets it with the field of view, so a turn of the view moves the picture as fast at any zoom
 		gaze = -Vector3.zAxis,
 		gazeUp = Vector3.yAxis,
@@ -278,6 +287,7 @@ end
 -- framing's turn over at once; on the line the framing then stays off until the line ends.
 function SpiderCamera.look(self: any, dx: number, dy: number)
 	if dx == 0 and dy == 0 then return end
+	if self.shot ~= nil then return end -- (the mating scene's two-shot is not the player's to turn)
 	if self.recenterT >= 0 and math.abs(dx) + math.abs(dy) > 1.5 then self.recenterT = -1 end
 	if self.eyeView then
 		-- The mouse, the stick and a touch drag all arrive here; lookScale (ROBLOX-20) shrinks them with the field of view.
@@ -389,6 +399,41 @@ function SpiderCamera.render(self: any, frameDt: number, lookX: number, lookY: n
 	local orbit = CFrame.new(from) * CFrame.Angles(0, yaw, 0) * CFrame.Angles(-elev, 0, 0)
 	self.camera.CFrame = orbit * CFrame.new(0, 0, length) * CFrame.Angles(CameraMath.clampAimPitch(self.aimPitch, elev), 0, 0)
 	self:_hideBody(length < CameraMath.BODY_HIDE_LENGTH)
+	self:_applyShot(frameDt)
+end
+
+-- The mating scene's two-shot (ROBLOX-89): `shot` is the framing for this frame, or nil when the scene is not playing.
+function SpiderCamera.setShot(self: any, shot: Shot?)
+	self.shot = shot
+	if shot ~= nil then self.lastShot = shot end
+end
+
+-- Whether the two-shot has any hold on the view now (easing in, held or easing out).
+function SpiderCamera.shotActive(self: any): boolean
+	return self.shot ~= nil or self.shotT > 0
+end
+
+-- After the orbit camera is placed: ease toward (or away from) the two-shot and put the camera between them by the ease.
+function SpiderCamera._applyShot(self: any, frameDt: number)
+	local step = frameDt / SHOT_EASE_SECONDS
+	local want = if self.shot ~= nil then 1 else 0
+	self.shotT = math.clamp(self.shotT + math.clamp(want - self.shotT, -step, step), 0, 1)
+	local s: Shot? = self.shot or self.lastShot
+	if self.shotT <= 0 or s == nil then
+		if self.shot == nil then self.lastShot = nil end
+		return
+	end
+	local boom = math.max(self:_cast(s.focus, s.dir * s.distance), 0.9)
+	local there = s.focus + s.dir * math.min(boom, s.distance)
+	local k = smooth(self.shotT)
+	local here: CFrame = self.camera.CFrame
+	local pos = here.Position:Lerp(there, k)
+	local look = here.LookVector:Lerp((s.focus - there).Unit, k)
+	if look.Magnitude < 1e-4 then look = (s.focus - there).Unit end
+	local up = here.UpVector:Lerp(s.up, k)
+	if up.Magnitude < 1e-4 then up = s.up end
+	self.camera.CFrame = CFrame.lookAt(pos, pos + look.Unit, up.Unit)
+	self:_hideBody(false)
 end
 
 function SpiderCamera._hideBody(self: any, hidden: boolean)

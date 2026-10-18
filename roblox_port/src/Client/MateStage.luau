@@ -163,8 +163,10 @@ end
 
 -- ---- the mate
 
--- Draws the mate where `mate` (the record) stands, or takes its rig away when it is not on the sill. `appearance`: the played spider's look.
-function MateStage.drawMate(self: any, mate: any, appearance: string, dt: number, reduced: boolean)
+-- Draws the mate where `mate` (the record) stands, or takes its rig away when it is not on the sill. `appearance`: the played spider's look. `focus` (ROBLOX-89): the point
+-- the mate looks at (the player's spider during the mating scene; its drawn body turns a little toward it), and `turn` (radians, 0 for none): how far the drawn body is
+-- turned about its up axis from where the simulation faces it (a female mate turning away in the scene's last beat; the simulation's heading is untouched).
+function MateStage.drawMate(self: any, mate: any, appearance: string, dt: number, reduced: boolean, focus: Vector3?, turn: number?)
 	if mate == nil or mate.state == "away" then
 		if self.rig ~= nil then
 			self.rig:destroy()
@@ -174,7 +176,7 @@ function MateStage.drawMate(self: any, mate: any, appearance: string, dt: number
 	end
 	if self.rig == nil or self.rigFor ~= appearance then
 		if self.rig ~= nil then self.rig:destroy() end
-		self.rig = SpiderRig.new(self.parent, self.world, appearance, "low")
+		self.rig = SpiderRig.new(self.parent, self.world, appearance, "low", true) -- (living: it breathes and takes the mating scene's cues, for the same parts)
 		self.rig.model.Name = "MateSpider"
 		self.rigFor = appearance
 	end
@@ -183,7 +185,11 @@ function MateStage.drawMate(self: any, mate: any, appearance: string, dt: number
 	rig:setGrowthStage(Growth.ADULT)
 	rig:setScale(Growth.SCALES[Growth.ADULT + 1] * (mate.scale or 1))
 	local moving = (mate.position - (mate.previous or mate.position)).Magnitude > 0.001
-	rig:update(SupportMath.bodyCFrame(mate.position, mate.up or Vector3.yAxis, mate.heading), dt, true, moving)
+	local up = mate.up or Vector3.yAxis
+	local heading = mate.heading
+	if turn ~= nil and turn ~= 0 then heading = CFrame.fromAxisAngle(up, turn):VectorToWorldSpace(heading) end
+	rig.focusPoint = focus
+	rig:update(SupportMath.bodyCFrame(mate.position, up, heading), dt, true, moving)
 end
 
 -- ---- the egg sac

@@ -292,6 +292,8 @@ function NotebookPanel.showPage(self: any, id: string)
 	self.empty.Visible = p == nil
 	self.title.Visible, self.text.Visible, self.sources.Visible = p ~= nil, p ~= nil, p ~= nil
 	local gameLine = if p then NotebookText.gameLine(p.game, self.device) else nil
+	local seen = if p then NotebookText.seenText(self.book:entriesFor(id)) else nil -- (lines the game added to the page, ROBLOX-89)
+	if seen ~= nil then gameLine = if gameLine ~= nil then gameLine .. "\n\n" .. seen else seen end
 	self.game.Visible = gameLine ~= nil
 	if p then
 		self.title.Text, self.text.Text = p.title, p.text

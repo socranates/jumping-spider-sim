@@ -69,8 +69,33 @@ function MateText.guardLine(day: number, days: number): string
 	return `Guarding the eggs: day {day} of {days}. Rest in the crack to pass the nights.`
 end
 
--- The one caption of the pause together: a quiet sound, read as words (Settings: Captions).
-MateText.PAIR_CAPTION = { text = "[a faint tremble in the silk]", alpha = 1 }
+-- The captions of the mating scene (ROBLOX-89; Settings: Captions), by the scene's seconds. Device-neutral (nothing here names a button). `playerSex` is the played spider's:
+-- the first spider is the game's female ("She turns to face him."), the peacock spider the male ("She turns to face you."). The last beat is the mirror when the player is
+-- the male: the female turns away and stays, and the player goes on. The game is for children and about nature: they touch, they settle, one goes.
+MateText.SCENE_TURN_FEMALE = "She turns to face him."
+MateText.SCENE_TURN_MALE = "She turns to face you."
+MateText.SCENE_TOUCH = "They touch, very lightly, with their front legs and palps."
+MateText.SCENE_SETTLE = "They settle together, still."
+MateText.SCENE_GOES = "He goes. The sill is yours again."
+MateText.SCENE_STAYS = "She stays. You go on."
+function MateText.matingCaption(seconds: number, playerSex: string): { text: string, alpha: number }?
+	if seconds < 0 then return nil end
+	local text: string
+	if seconds < 3 then text = if playerSex == "male" then MateText.SCENE_TURN_MALE else MateText.SCENE_TURN_FEMALE
+	elseif seconds < 7 then text = MateText.SCENE_TOUCH
+	elseif seconds < 11 then text = MateText.SCENE_SETTLE
+	elseif seconds < 15 then text = if playerSex == "male" then MateText.SCENE_STAYS else MateText.SCENE_GOES
+	else return nil end
+	return { text = text, alpha = 1 }
+end
+
+-- The notebook's dated line for the page "Eggs, silk and wind" (a thing the player saw; ROBLOX-89): the day, and who came.
+function MateText.entry(day: number, mateSex: string): string
+	if mateSex == "female" then
+		return `Day {day}: A female was on the sill. The two spiders stayed together a while, and then you went on.`
+	end
+	return `Day {day}: A male came to the sill. The two spiders stayed together a while, and then he went.`
+end
 -- The captions of the hatching scene, by the seconds since it began.
 function MateText.sceneCaption(seconds: number): { text: string, alpha: number }?
 	if seconds < 0 then return nil end

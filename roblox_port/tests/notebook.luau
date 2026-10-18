@@ -989,5 +989,43 @@ do
  check(panel:isShowing() and result==Enum.ContextActionResult.Pass,"Roblox menu keeps input ownership")
  GuiService.MenuIsOpen=false;panel:close()
 end
+-- ---------------------------------------------------------------- ROBLOX-89: the lines the game adds to a page ("things you saw")
+do
+	local book = FieldNotebook.new()
+	check(not book:addEntry("no_such_page", 3, "Day 3: x") and #book:entriesFor("no_such_page") == 0, "a line for a page the book does not have is nothing")
+	check(not book:addEntry("eggs_and_wind", 3, "   ") and not book:addEntry("eggs_and_wind", -1, "Day -1: x") and not book:addEntry("eggs_and_wind", 0 / 0, "Day nan: x"), "an empty line, a day before the first and a day that is not a number are nothing")
+	check(book:addEntry("eggs_and_wind", 3, "Day 3: A male came to the sill."), "a line for a page the book has is kept, found or not")
+	check(#book:entriesFor("eggs_and_wind") == 0, "but shows nothing until the page is found")
+	check(not book:isOpen("eggs_and_wind"), "(and does not find it)")
+	book:notice("hatched")
+	check(book:isOpen("eggs_and_wind") and #book:entriesFor("eggs_and_wind") == 1 and book:entriesFor("eggs_and_wind")[1].day == 3 and book:entriesFor("eggs_and_wind")[1].text == "Day 3: A male came to the sill.", "once the page is found the line is there")
+	check(not book:addEntry("eggs_and_wind", 3, "Day 3: A male came to the sill."), "the same line twice is once")
+	check(book:addEntry("eggs_and_wind", 3, "Day 3: A second visitor."), "another line the same day is another")
+	for day = 4, 12 do book:addEntry("eggs_and_wind", day, `Day {day}: seen.`) end
+	local list = book:entriesFor("eggs_and_wind")
+	check(#list == FieldNotebook.MAX_ENTRIES and FieldNotebook.MAX_ENTRIES == 6 and list[1].day == 7 and list[#list].day == 12, "at most six to a page, the oldest dropped")
+	list[1].text = "changed"
+	check(book:entriesFor("eggs_and_wind")[1].text ~= "changed", "what is handed out is a copy")
+	local rec = book:toRecord()
+	local again = FieldNotebook.new()
+	again:load(rec)
+	check(#again:entriesFor("eggs_and_wind") == 0 and (rec :: any).entries == nil and (rec :: any).entry == nil, "the lines are the session's: the record does not carry them, and a loaded book has none")
+	check(NotebookText.seenText({}) == nil, "no lines, no words")
+	check(NotebookText.seenText({ { day = 3, text = "Day 3: A." }, { day = 4, text = "Day 4: B." } }) == "Things you saw:\nDay 3: A.\nDay 4: B.", "the words: a heading and the lines")
+	-- on the page
+	local panel, pbook = buildPanel({ "hatched" }, 1280, 720)
+	panel:open("game", "keyboard", 1)
+	check(panel.shown == "eggs_and_wind" and not string.find(panel.game.Text, "Things you saw", 1, true), "a page with no lines shows only the game's note")
+	panel:close()
+	pbook:addEntry("eggs_and_wind", 5, "Day 5: A male came to the sill. The two spiders stayed together a while, and then he went.")
+	panel:open("game", "keyboard", 1)
+	check(panel.game.Visible and string.find(panel.game.Text, "In this game:", 1, true) == 1 and string.find(panel.game.Text, "Things you saw:\nDay 5: A male came to the sill.", 1, true) ~= nil, "the page shows them under the note about the game")
+	check(string.find(panel.game.Text, "In this game:", 1, true) < string.find(panel.game.Text, "Things you saw", 1, true), "after it")
+	panel:close()
+	-- the page's own words are untouched (the reference file pins them)
+	local page
+	for _, pg in NotebookPages.pages do if pg.id == "eggs_and_wind" then page = pg end end
+	check(page ~= nil and not string.find(page.game, "Things you saw", 1, true), "the data holds no lines of its own")
+end
 print(`NOTEBOOK passed={passed} failed={failed}`)
 if failed > 0 then error("notebook failed") end

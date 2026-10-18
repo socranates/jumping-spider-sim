@@ -23,6 +23,8 @@ export type Pose = {
 	palpYaw: { number }, palpPitch: { number }, -- the palps' extra turn (toward the jaws) and pitch, radians, palp 1 (left) and palp 2 (right)
 	legs: { LegPose }, -- by leg: 1..4 the left legs I to IV, 5..8 the right
 	freeze: number, -- 0..1: an alarm: the idle motion stands still
+	settle: number, -- 0..1: the mating scene's settle (ROBLOX-89): the body sinks and the breath deepens
+	breath: number, -- the breath's gain: 1, and `settle.breath` at full settle
 	bout: string?, -- the bout now ("palp", "leg", "meal", "stretch"), or nil
 	act: string?, -- the act of the bout now (tests)
 }
@@ -33,6 +35,7 @@ export type State = {
 	t: number, standS: number, wait: number, weight: number,
 	yaw: number, glanceX: number, glanceY: number,
 	bout: Bout?, pendingMeal: number?, alarmT: number?,
+	meetT: number?, meetLen: number, meetW: number, settleT: number?, settleLen: number, settleW: number, -- the scene's cues (ROBLOX-89): their clock, length and eased weight
 	rng: number,
 	pose: Pose,
 	log: { { t: number, kind: string } }, -- the bouts begun (tests; kept to the last 64)
@@ -63,7 +66,8 @@ function Living.new(cfg: any, seed: number): State
 	local self: State = {
 		cfg = cfg, t = 0, standS = 0, wait = 0, weight = 0, yaw = 0, glanceX = 0, glanceY = 0,
 		bout = nil, pendingMeal = nil, alarmT = nil, rng = seed % 4294967296,
-		pose = { yaw = 0, glanceX = 0, glanceY = 0, palpYaw = { 0, 0 }, palpPitch = { 0, 0 }, legs = legs, freeze = 0, bout = nil, act = nil },
+		meetT = nil, meetLen = 0, meetW = 0, settleT = nil, settleLen = 0, settleW = 0,
+		pose = { yaw = 0, glanceX = 0, glanceY = 0, palpYaw = { 0, 0 }, palpPitch = { 0, 0 }, legs = legs, freeze = 0, settle = 0, breath = 1, bout = nil, act = nil },
 		log = {},
 	}
 	unit(self) -- (the first draws of a small seed are close together)
@@ -73,13 +77,44 @@ function Living.new(cfg: any, seed: number): State
 	return self
 end
 
--- The cue from the host: "groom" (a meal has ended: a longer cleaning, once it stands still) or "alarm" (a warning: raise legs I and freeze).
-function Living.cue(self: State, name: string)
+-- The cue from the host: "groom" (a meal has ended: a longer cleaning, once it stands still) or "alarm" (a warning: raise legs I and freeze); and, for the mating scene
+-- (ROBLOX-89), "meet" (reach out to the other spider) and "settle" (sink and breathe deeper), each for `seconds` (default the look's own) with its ease in and out,
+-- and "release", which lets both go at once.
+function Living.cue(self: State, name: string, seconds: number?)
 	if name == "groom" and self.cfg.groom then
 		self.pendingMeal = 30
 	elseif name == "alarm" and self.cfg.alarm then
 		self.alarmT = 0
+	elseif name == "meet" and self.cfg.meet then
+		self.meetT, self.meetLen = 0, seconds or self.cfg.meet.seconds
+	elseif name == "settle" and self.cfg.settle then
+		self.settleT, self.settleLen = 0, seconds or self.cfg.settle.seconds
+	elseif name == "release" then
+		self.meetT, self.settleT = nil, nil
 	end
+end
+
+-- The scene's cues for one step: their clocks, and their eased weights (a slew-limited share, so a release or a late cue never pops). Under Reduced Motion the
+-- weight is a held pose: all or nothing.
+local function stepScene(self: State, dt: number, reduced: boolean)
+	local cfg = self.cfg
+	local meet, settle = cfg.meet, cfg.settle
+	if self.meetT ~= nil then
+		self.meetT += dt
+		if self.meetT >= self.meetLen then self.meetT = nil end
+	end
+	if self.settleT ~= nil then
+		self.settleT += dt
+		if self.settleT >= self.settleLen then self.settleT = nil end
+	end
+	local function ease(w: number, on: boolean, spec: any): number
+		if spec == nil then return 0 end
+		if reduced then return if on then 1 else 0 end
+		return math.clamp(w + (if on then dt / spec.riseSeconds else -dt / spec.fallSeconds), 0, 1)
+	end
+	-- (a cue's seconds are its whole length, the ease out included: it is let go `fallSeconds` before its end)
+	self.meetW = ease(self.meetW, self.meetT ~= nil and meet ~= nil and self.meetT < self.meetLen - meet.fallSeconds, meet)
+	self.settleW = ease(self.settleW, self.settleT ~= nil and settle ~= nil and self.settleT < self.settleLen - settle.fallSeconds, settle)
 end
 
 local function acts(self: State, kind: string): ({ Act }, number)
@@ -110,6 +145,7 @@ end
 
 local function clearPose(pose: Pose)
 	pose.yaw, pose.glanceX, pose.glanceY, pose.freeze, pose.bout, pose.act = 0, 0, 0, 0, nil, nil
+	pose.settle, pose.breath = 0, 1
 	pose.palpYaw[1], pose.palpYaw[2], pose.palpPitch[1], pose.palpPitch[2] = 0, 0, 0, 0
 	for _, leg in pose.legs do leg.w = 0 end
 end
@@ -120,17 +156,44 @@ local function setLeg(pose: Pose, index: number, w: number, spec: any, rel: bool
 	leg.kneeOut, leg.kneeUp = spec.kneeOut or 0, spec.kneeUp or 0
 end
 
+-- The pose of the scene's cues now (their weights are in the state): legs I reach, the palps come up and in, the body sinks and the breath deepens.
+function Living._sceneLegs(self: State, pose: Pose, legsFree: boolean)
+	local cfg = self.cfg
+	local meet, settle = cfg.meet, cfg.settle
+	local m = smooth(self.meetW)
+	if meet ~= nil and m > 0 then
+		if legsFree then
+			setLeg(pose, 1, m, meet.reach, false)
+			setLeg(pose, 5, m, meet.reach, false)
+		end
+		for k = 1, 2 do
+			local inward = if k == 1 then -1 else 1
+			pose.palpYaw[k] = inward * math.rad(meet.palpYawDeg) * m
+			pose.palpPitch[k] = -math.rad(meet.palpLiftDeg) * m
+		end
+	end
+	local s = smooth(self.settleW)
+	if settle ~= nil and s > 0 then
+		pose.settle = s
+		pose.breath = 1 + (settle.breath - 1) * s
+	end
+end
+
 -- One step. standing: still on a surface with nothing else drawn on the body; reduced: Reduced Motion; focusYaw and focusPitch (radians) are where the
 -- watched point is from the drawn body's heading (nil when nothing is watched); alarmLegs: the legs may be drawn raised (nothing else has them).
 function Living.step(self: State, dt: number, standing: boolean, reduced: boolean, focusYaw: number?, focusPitch: number?, alarmLegs: boolean): Pose
 	local cfg, pose = self.cfg, self.pose
 	clearPose(pose)
-	if reduced then -- no motion at all: whatever was under way is gone
+	stepScene(self, dt, reduced)
+	if reduced then -- no motion at all: whatever was under way is gone (the scene's reach and settle are held as poses, not moved)
 		self.bout, self.weight, self.alarmT, self.yaw, self.glanceX, self.glanceY, self.pendingMeal, self.standS = nil, 0, nil, 0, 0, 0, nil, 0
+		Living._sceneLegs(self, pose, alarmLegs)
 		return pose
 	end
 	self.t += dt
 	self.standS = if standing then self.standS + dt else 0
+
+	Living._sceneLegs(self, pose, alarmLegs)
 
 	-- attention: the body's turn toward the watched point (only while it stands), the eyes' glance toward it (always)
 	local att = cfg.attention
@@ -163,6 +226,9 @@ function Living.step(self: State, dt: number, standing: boolean, reduced: boolea
 		end
 	end
 
+	-- the scene's reach and settle (ROBLOX-89): grooming and the accents give way, the breath goes on (an alarm still wins the legs)
+	if self.meetW > 0 or self.settleW > 0 then alarming = true end
+
 	-- bouts
 	local groom = cfg.groom
 	local bout = self.bout
@@ -183,7 +249,7 @@ function Living.step(self: State, dt: number, standing: boolean, reduced: boolea
 			end
 		end
 	end
-	if self.bout == nil and standing and not alarming then
+	if self.bout == nil and standing and not alarming and (groom or cfg.stretch) then
 		local pending = self.pendingMeal
 		if pending ~= nil then
 			self.pendingMeal = if pending - dt <= 0 then nil else pending - dt

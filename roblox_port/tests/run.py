@@ -97,6 +97,7 @@ MODULES = [
     ("Mate", "Predator/Mate.luau"),
     ("MateDrive", "Predator/MateDrive.luau"),
     ("Mating", "Life/Mating.luau"),
+    ("MatingScene", "Life/MatingScene.luau"),
     ("FlySenses", "Prey/FlySenses.luau"),
     ("PerchGraph", "Prey/PerchGraph.luau"),
     ("FlyFlight", "Prey/FlyFlight.luau"),

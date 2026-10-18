@@ -232,6 +232,12 @@ end
 -- ---------------------------------------------------------------- what the client gives and what is known
 function SaveSession.setProgress(self: any, payload: any): boolean
 	if self.closed then return false end
+	local big = SaveRest.bounded(payload, SaveRules.MAX_PROGRESS_NODES, SaveRules.MAX_PROGRESS_DEPTH)
+	if big then
+		self.counters.rejected += 1
+		log(self, "progress refused: " .. big)
+		return false
+	end
 	local problems, clean = SaveProgress.sanitize(payload)
 	if clean == nil then
 		self.counters.rejected += 1

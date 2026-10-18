@@ -21,6 +21,8 @@ local SaveProgress = require("../src/Shared/Persistence/SaveProgress")
 local SaveRest = require("../src/Shared/Persistence/SaveRest")
 local SaveScheduler = require("../src/Shared/Persistence/SaveScheduler")
 local SaveSession = require("../src/Shared/Persistence/SaveSession")
+local DataStoreBackend = require("../src/Server/DataStoreBackend")
+local SaveService = require("../src/Server/SaveService")
 
 local passed, failed = 0, 0
 local STATE_TRACE = false
@@ -1092,4 +1094,256 @@ case("random operations, faults and two sessions: stored progress only ever grow
 	end
 	check(bad == 0, `{bad} invariant breaks in 8 runs of 300 steps`)
 end)
+
+-- ---------------------------------------------------------------------------------------------- the server service, with scripted clients
+local function newServer(e: any, opts: { [string]: any }?): any
+	local srv: any = { sent = {} :: { [any]: { any } }, queue = {} :: { () -> () }, deferSpawn = false, logs = e.logs }
+	local o: any = opts or {}
+	srv.service = SaveService.new({
+		backend = o.backend or e.backend, now = e.now, sleep = e.sleep, jobId = o.jobId or "JOB",
+		spawn = function(fn: any, ...: any)
+			if srv.deferSpawn then
+				local args = { ... }
+				table.insert(srv.queue, function() fn(table.unpack(args)) end)
+			else
+				fn(...)
+			end
+		end,
+		send = function(player: any, msg: any)
+			srv.sent[player] = srv.sent[player] or {}
+			table.insert(srv.sent[player], Json.copy(msg))
+		end,
+		log = function(text: string) table.insert(e.logs, text) end,
+	})
+	function srv.drain()
+		while #srv.queue > 0 do
+			local f = table.remove(srv.queue, 1)
+			f()
+		end
+	end
+	function srv.last(player: any, kind: string): any
+		local list = srv.sent[player] or {}
+		for i = #list, 1, -1 do if list[i].kind == kind then return list[i] end end
+		return nil
+	end
+	function srv.count(player: any, kind: string): number
+		local n = 0
+		for _, m in srv.sent[player] or {} do if m.kind == kind then n += 1 end end
+		return n
+	end
+	return srv
+end
+local function tickServer(e: any, srv: any, seconds: number)
+	for _ = 1, seconds do
+		e.t += 1
+		srv.service:step()
+	end
+end
+local function player(uid: number): any
+	return { UserId = uid, Name = "P" .. uid }
+end
+
+case("service: a joining player is loaded, answers hello with their state, and nothing is sent before they speak", function()
+	local e = newEnv()
+	local first = newSession(e, 40, "OLD")
+	first:load()
+	first:setProgress(prog({ "bold_jumper", "venom" }, { eye = 9, finished = true, appearance = "maratus_volans_male", prefs = { LargeText = true } }))
+	local rest = realRest(120, "main")
+	first:setRest("main", rest)
+	run(e, first, 20)
+	first:flush()
+	local srv = newServer(e)
+	local p = player(40)
+	srv.service:addPlayer(p)
+	check(srv.sent[p] == nil, "no hello yet: nothing sent")
+	srv.service:onMessage(p, { kind = "hello", v = 1 })
+	local m = srv.last(p, "loaded")
+	check(m ~= nil and m.status == "saved" and m.reason == nil, "loaded, saved")
+	check(m ~= nil and canon(m.progress.notebook.opened) == canon({ "bold_jumper", "venom" }) and m.progress.finished_main == true and m.progress.appearance == "maratus_volans_male", "with the notebook, the adult and the choice")
+	check(m ~= nil and canon(m.rests.main) == canon(rest) and m.rests.free == nil, "and the main rest, no free one")
+	check(srv.service:statusOf(p) == "saved", "statusOf")
+	srv.service:onMessage(p, { kind = "hello", v = 1 })
+	check(srv.count(p, "loaded") == 2, "a repeated hello is answered again (within its small allowance)")
+end)
+
+case("service: hello before the load finishes is answered when it does; a store that is down answers session-only, and the late load follows", function()
+	local e = newEnv()
+	local seed = newSession(e, 41, "OLD")
+	seed:load()
+	seed:setProgress(prog({ "p1" }, { eye = 3 }))
+	run(e, seed, 3)
+	seed:flush()
+	local srv = newServer(e)
+	srv.deferSpawn = true
+	local p = player(41)
+	srv.service:addPlayer(p)
+	srv.service:onMessage(p, { kind = "hello", v = 1 })
+	check(srv.sent[p] == nil, "the load has not run: nothing yet")
+	e.backend:fail({ op = "any", times = 3, message = "503: the service is unavailable" })
+	srv.drain()
+	local m = srv.last(p, "loaded")
+	check(m ~= nil and m.status == "session" and m.reason == "load_failed", "answered once the load failed: session-only, load_failed")
+	srv.deferSpawn = false
+	srv.service:onMessage(p, { kind = "progress", progress = prog({ "p1", "p2" }, { eye = 4 }) })
+	tickServer(e, srv, 80)
+	local late = srv.last(p, "loaded")
+	check(srv.count(p, "loaded") >= 2 and late.status ~= "session", "the retry succeeded and the client was sent the state again")
+	check(canon(late.progress.notebook.opened) == canon({ "p1", "p2" }), "merged with what this visit found")
+	tickServer(e, srv, 40)
+	check(canon(storedOf(e, "P_41", nil).payload.notebook.opened) == canon({ "p1", "p2" }), "and it is stored")
+end)
+
+case("service: progress and rest messages are stored (debounced), status changes are sent, leaving flushes and releases", function()
+	local e = newEnv()
+	local srv = newServer(e)
+	local p = player(42)
+	srv.service:addPlayer(p)
+	srv.service:onMessage(p, { kind = "hello", v = 1 })
+	srv.service:onMessage(p, { kind = "progress", progress = prog({ "bold_jumper" }, { appearance = "maratus_volans_male" }) })
+	local rest = realRest(120, "main")
+	srv.service:onMessage(p, { kind = "rest", mode = "main", record = rest })
+	check(srv.service:statusOf(p) == "saving", "saving")
+	tickServer(e, srv, 25)
+	check(srv.service:statusOf(p) == "saved", "saved")
+	check(storedOf(e, "P_42", nil).payload.appearance == "maratus_volans_male" and canon(storedOf(e, "R_42_main", SaveRest.SPECS.main).payload) == canon(rest), "both stored")
+	check(srv.count(p, "status") >= 2 and srv.last(p, "status").status == "saved", "the client was told: saving, then saved")
+	srv.service:onMessage(p, { kind = "progress", progress = prog({ "bold_jumper", "dragline" }) })
+	srv.service:removePlayer(p)
+	local o = storedOf(e, "P_42", nil)
+	check(#o.payload.notebook.opened == 2 and o.lock == nil, "leaving wrote the last event and released the lock")
+	srv.service:onMessage(p, { kind = "progress", progress = prog({ "x" }) })
+	check(#storedOf(e, "P_42", nil).payload.notebook.opened == 2, "messages after leaving are ignored")
+	-- a new server picks it up at once
+	local srv2 = newServer(e, { jobId = "JOB2" })
+	local p2 = player(42)
+	srv2.service:addPlayer(p2)
+	srv2.service:onMessage(p2, { kind = "hello", v = 1 })
+	check(srv2.last(p2, "loaded").status == "saved" and #srv2.last(p2, "loaded").progress.notebook.opened == 2, "the next server has it, no waiting for the lock")
+end)
+
+case("service: nothing a client sends can raise, be stored unchecked, or exceed its allowance", function()
+	local e = newEnv()
+	local srv = newServer(e)
+	local p = player(43)
+	srv.service:addPlayer(p)
+	srv.service:onMessage(p, { kind = "hello", v = 1 })
+	local before = canon(e.backend.data["P_43"].payload)
+	local cyc: any = {}
+	cyc.me = cyc
+	local rest = realRest(120, "main")
+	local forgedRest = Json.copy(rest)
+	forgedRest.player.position = { 5000, 0, 0 }
+	local junk: { any } = {
+		"hello", 42, true, nil, {}, { kind = 5 }, { kind = "teleport" }, { kind = "progress" }, { kind = "progress", progress = "all of it" },
+		{ kind = "progress", progress = cyc }, { kind = "progress", progress = { notebook = { opened = { "../../etc" }, eye_seconds = 1 }, finished_main = false } },
+		{ kind = "progress", progress = { notebook = { opened = {}, eye_seconds = math.huge }, finished_main = false } },
+		{ kind = "progress", progress = { notebook = { opened = {}, eye_seconds = 0 }, finished_main = "yes" } },
+		{ kind = "progress", progress = { notebook = { opened = string.rep("x", 5000), eye_seconds = 0 }, finished_main = false } },
+		{ kind = "rest" }, { kind = "rest", mode = "main" }, { kind = "rest", mode = 5, record = rest }, { kind = "rest", mode = "daily", record = rest },
+		{ kind = "rest", mode = "free", record = rest }, { kind = "rest", mode = "main", record = forgedRest }, { kind = "rest", mode = "main", record = cyc },
+		{ kind = "rest", mode = "main", record = function() end }, { kind = "rest", mode = "main", record = { player = {} } },
+	}
+	local raised = 0
+	for i = 1, 24 do
+		e.t += 5 -- inside the allowance
+		local ok = pcall(srv.service.onMessage, srv.service, p, junk[i])
+		if not ok then raised += 1 end
+	end
+	check(raised == 0, "no message raised")
+	tickServer(e, srv, 60)
+	check(canon(e.backend.data["P_43"].payload) == before, "no progress changed")
+	check(e.backend.data["R_43_main"] == nil and e.backend.data["R_43_free"] == nil, "no rest was stored")
+	check(srv.service.stats.dropped >= 18, `the refusals are counted ({srv.service.stats.dropped})`)
+	-- the allowance: a flood is cut to the burst
+	local srv2 = newServer(e)
+	local p2 = player(44)
+	srv2.service:addPlayer(p2)
+	srv2.service:onMessage(p2, { kind = "hello", v = 1 })
+	for i = 1, 200 do srv2.service:onMessage(p2, { kind = "progress", progress = prog({ "page" .. i }) }) end
+	check(srv2.service.stats.limited >= 200 - SaveRules.PROGRESS_BURST - 1, `a flood of 200 is cut ({srv2.service.stats.limited} limited)`)
+	local entry = srv2.service.entries[p2]
+	check(#entry.session.progress.notebook.opened <= SaveRules.PROGRESS_BURST + 1, "only the burst got through")
+	for i = 1, 10 do srv2.service:onMessage(p2, { kind = "rest", mode = "main", record = rest }) end
+	check(srv2.service.stats.limited >= 200 - SaveRules.PROGRESS_BURST - 1 + 10 - SaveRules.REST_BURST - 1, "and a flood of rests")
+	-- before addPlayer and after removePlayer
+	local stranger = player(45)
+	srv2.service:onMessage(stranger, { kind = "progress", progress = prog({ "x" }) })
+	check(e.backend.data["P_45"] == nil, "a player with no session cannot store anything")
+end)
+
+case("service: the player leaves while the load is still in flight: the thread that loads lets go of the lock", function()
+	local e = newEnv()
+	local srv = newServer(e)
+	srv.deferSpawn = true
+	local p = player(46)
+	srv.service:addPlayer(p)
+	srv.service:removePlayer(p)
+	srv.drain()
+	local d = e.backend.data["P_46"]
+	check(d == nil or d.lock == nil, "no lock left behind")
+	local again = newSession(e, 46, "AGAIN")
+	check(again:load() == "active", "and a rejoin is not kept waiting")
+end)
+
+case("service: shutdown writes everyone's waiting changes at once, inside the deadline, even through a few failures", function()
+	local e = newEnv()
+	local srv = newServer(e)
+	local ps = { player(50), player(51), player(52) }
+	for _, p in ps do
+		srv.service:addPlayer(p)
+		srv.service:onMessage(p, { kind = "hello", v = 1 })
+		srv.service:onMessage(p, { kind = "progress", progress = prog({ "mine" .. p.UserId }, { eye = p.UserId }) })
+	end
+	srv.service:onMessage(ps[1], { kind = "rest", mode = "main", record = realRest(120, "main") })
+	e.backend:fail({ op = "update", times = 3, message = "504: timed out" })
+	local t0 = e.t
+	srv.service:shutdown()
+	for _, p in ps do
+		local o = storedOf(e, "P_" .. p.UserId, nil)
+		check(o.status == "ok" and o.payload.notebook.opened[1] == "mine" .. p.UserId and o.lock == nil, `{p.UserId}: written and released`)
+	end
+	check(storedOf(e, "R_50_main", SaveRest.SPECS.main).status == "ok", "and the rest")
+	check(e.t - t0 <= SaveRules.FLUSH_DEADLINE, `inside the deadline ({e.t - t0} s)`)
+end)
+
+case("service: the real DataStore backend, against a fake DataStore, behaves as the in-memory one: update, cancel, errors, and a whole visit", function()
+	local ds: any = { data = {} :: { [string]: any }, err = nil :: string?, calls = 0 }
+	function ds.GetAsync(self: any, key: string): any
+		self.calls += 1
+		if self.err then error(self.err) end
+		return Json.copy(self.data[key])
+	end
+	function ds.UpdateAsync(self: any, key: string, fn: (any) -> any): (any, any)
+		self.calls += 1
+		if self.err then error(self.err) end
+		local new = fn(Json.copy(self.data[key]))
+		if new == nil then return nil, nil end
+		self.data[key] = Json.copy(new)
+		return Json.copy(new), {}
+	end
+	local b = DataStoreBackend.new(ds)
+	local ok, v = b:read("k")
+	check(ok and v == nil, "a missing key reads as nil")
+	local ok2, v2 = b:update("k", function(old: any): any return { n = (old and old.n or 0) + 1 } end)
+	check(ok2 and v2.n == 1 and ds.data.k.n == 1, "update writes")
+	local ok3, v3 = b:update("k", function(_old: any): any return nil end)
+	check(ok3 and v3 == nil and ds.data.k.n == 1, "returning nil cancels")
+	ds.err = "304: UpdateAsync over limit"
+	local ok4, _, err4 = b:update("k", function(_old: any): any return { n = 9 } end)
+	check(not ok4 and string.find(err4 :: string, "304", 1, true) ~= nil and ds.data.k.n == 1, "an error is reported, not raised, and nothing changed")
+	local ok5, _, err5 = b:read("k")
+	check(not ok5 and err5 ~= nil, "a read error too")
+	ds.err = nil
+	local e = newEnv()
+	e.backend = b
+	local s = SaveSession.new({ backend = b, userId = 60, sessionId = "S", now = e.now, sleep = e.sleep })
+	check(s:load() == "active", "a session loads through it")
+	s:setProgress(prog({ "p1" }))
+	s:setRest("main", realRest(120, "main"))
+	for _ = 1, 30 do e.t += 1; s:step() end
+	s:flush()
+	check(SaveEnvelope.open(SaveProgress.SPEC, ds.data["P_60"]).payload.notebook.opened[1] == "p1" and ds.data["P_60"].lock == nil, "progress stored through the DataStore interface, lock released")
+	check(SaveEnvelope.open(SaveRest.SPECS.main, ds.data["R_60_main"]).status == "ok", "and the rest")
+end)
+
 print(`STATE passed={passed} failed={failed}`)

@@ -110,6 +110,8 @@ MODULES = [
     ("SaveRest", "Persistence/SaveRest.luau"),
     ("SaveScheduler", "Persistence/SaveScheduler.luau"),
     ("SaveSession", "Persistence/SaveSession.luau"),
+    ("DataStoreBackend", "../Server/DataStoreBackend.luau"),
+    ("SaveService", "../Server/SaveService.luau"),
     ("SpiderCamera", "../Client/SpiderCamera.luau"),
 ]
 # The client scripts, bundled only for the tests that run the real rig and client (CLIENT_TESTS).
@@ -137,7 +139,7 @@ NAMES = {name for name, _ in MODULES + CLIENT_MODULES}
 def requires(text):
     """Every require of a shared module, in any of the spellings the sources use, becomes the bundled local."""
     text = re.sub(r'require\(script\.Parent(?:\.Parent\.\w+)?\.(\w+)\)', lambda m: f"__mods.{m.group(1)}" if m.group(1) in NAMES else m.group(0), text)
-    text = re.sub(r'require\("\.\./src/(?:Shared/\w+|Client)/(\w+)"\)', lambda m: f"__mods.{m.group(1)}", text)
+    text = re.sub(r'require\("\.\./src/(?:Shared/\w+|Client|Server)/(\w+)"\)', lambda m: f"__mods.{m.group(1)}", text)
     text = re.sub(r'require\((?:[^()\n]|\([^()\n]*\))*:WaitForChild\("(\w+)"\)\)', lambda m: f"__mods.{m.group(1)}" if m.group(1) in NAMES else m.group(0), text)
     text = re.sub(r'require\("\.\./src/Client/SpiderClient\.client"\)', lambda m: "(function()\nlocal script = { Parent = ClientStubs.scriptFolder }\nlocal require = function(module) return module.run end\nlocal task = { spawn = function(f, ...) f(...) end }\n" + requires(strict((HERE.parent / "src/Client/SpiderClient.client.luau").read_text(encoding="utf-8"))) + "\nend)()", text)
     text = re.sub(r'require\(Shared\.\w+\.(\w+)\)', lambda m: f"__mods.{m.group(1)}" if m.group(1) in NAMES else m.group(0), text)

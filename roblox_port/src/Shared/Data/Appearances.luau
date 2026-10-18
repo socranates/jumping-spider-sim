@@ -159,9 +159,31 @@ local first = {
 	-- (the palps' drumming follows the same rule).
 	idle = {
 		riseSeconds = 1.0, fallSeconds = 0.25,
-		breathe = { period = 3.3, bodyLift = 0.006, lift = 0.016, pitchDeg = 2.4 },
+		-- A breath (ROBLOX-87: 0.4 Hz, was 0.3): the body's lift and the abdomen's pitch as before, and the abdomen's scale `scale` (2.5%) with it, hairs and shell
+		-- moving with it; `movingShare` of it while the spider walks, hangs or is posed.
+		breathe = { period = 2.5, bodyLift = 0.006, lift = 0.016, pitchDeg = 2.4, scale = 0.025, movingShare = 0.35 },
 		-- A small, slow, curious head tilt: sums of sines (periods in seconds), always inside these angles.
 		tilt = { rollDeg = 7, yawDeg = 6, pitchDeg = 3.5, periods = { 9.1, 5.3, 11.3, 6.7, 8.3 } },
+		-- Living motion (ROBLOX-87, Rig/Living; every number ART). Grooming: after `after` seconds of standing, a bout `firstWait` seconds later and then every `gap` seconds
+		-- after the last one ended (a seeded stream), either a palp drawn through the jaws (`strokes` of them over `palpSeconds`, the palp turning `palpYawDeg` toward
+		-- the midline and `palpPitchDeg` down) or a leg I pulled forward to where `legs[1]` says (the body frame, studs; kneeOut and kneeUp bend the knee) and wiped
+		-- `sweep` studs to and fro through the palps (which close `legPalpYawDeg`) for `legSeconds`; after a meal (the "groom" cue), `mealDelay` seconds into a stand, both
+		-- palps (`mealPalpSeconds`) then legs I and II, each leg `legSeconds`. A bout fades over `fade` of its act and gives way in `abortSeconds` when the spider moves.
+		groom = {
+			after = 4.0, firstWait = { 0.3, 3.0 }, gap = { 8, 20 }, mealDelay = 1.5, strokes = 3,
+			palpSeconds = 2.0, legSeconds = 2.5, mealPalpSeconds = 2.2, palpYawDeg = 30, palpPitchDeg = 20, legPalpYawDeg = 24, fade = 0.18, abortSeconds = 0.25,
+			legs = {
+				{ x = 0.12, y = -0.16, z = -0.64, sweep = 0.06, kneeOut = 0.22, kneeUp = 0.20 },
+				{ x = 0.15, y = -0.18, z = -0.56, sweep = 0.06, kneeOut = 0.22, kneeUp = 0.20 },
+				{ x = 0.15, y = -0.18, z = -0.56, sweep = 0.06, kneeOut = 0.22, kneeUp = 0.20 },
+				{ x = 0.15, y = -0.18, z = -0.56, sweep = 0.06, kneeOut = 0.22, kneeUp = 0.20 },
+			},
+		},
+		-- Attention: the drawn body turns toward the focus point (at most `maxDeg`, eased over `easeSeconds`); the principal eyes shift `glance` studs toward it,
+		-- all of it across `glanceSpanDeg` of the angle that is left.
+		attention = { maxDeg = 20, easeSeconds = 0.4, glance = 0.02, glanceSpanDeg = 28 },
+		-- Alarm: legs I go to `raise` (body frame, studs) and the idle motion freezes for `seconds`, in `riseSeconds` and out over `fallSeconds`.
+		alarm = { seconds = 1.2, riseSeconds = 0.15, fallSeconds = 0.35, raise = { x = 0.20, y = 0.30, z = -0.52, kneeOut = 0.10, kneeUp = 0.22 } },
 	},
 
 	-- ---------------------------------------------------------------- hanging on a dragline (ROBLOX-59, ROBLOX-86; drawn rig only)
@@ -545,6 +567,15 @@ tarantulaHang.leanDeg = 3.0
 tarantulaHang.sway = { deg = 3.5, period = 2.5, decay = 3.0, across = 0.45 }
 tarantulaHang.spin = { degPerS = 5.0, decay = 6.0 }
 
+-- A tarantula's idle is calm and heavy (ROBLOX-87): a slower breath (0.25 Hz, 2%), no grooming and no turning toward what the player watches, but every
+-- `gap` seconds (after `after` seconds of standing, the first `firstWait` into it) one leg reaches out `out` studs and `lift` up and `along` along the body and
+-- settles again over `seconds`. It keeps the first spider's alarm.
+local tarantulaIdle: any = table.clone(first.idle)
+tarantulaIdle.breathe = { period = 4.0, bodyLift = 0.004, lift = 0.010, pitchDeg = 1.6, scale = 0.02, movingShare = 0.35 }
+tarantulaIdle.groom = nil
+tarantulaIdle.attention = nil
+tarantulaIdle.stretch = { after = 4.0, firstWait = { 2, 6 }, gap = { 10, 24 }, seconds = 3.0, out = 0.16, lift = 0.05, along = 0.16, kneeUp = 0.07 }
+
 local function tarantula(o: any): any
 	local apex = 0.285 + o.abdomenRadii[3] -- the abdomen's rear tip (its centre is at z = 0.285)
 	local limbs = table.clone(first.limbs)
@@ -625,7 +656,7 @@ local function tarantula(o: any): any
 			legHairs = { 0, 0, 0 }, legPairs = o.legPairs, legLength = 0.080, legWidth = 0.009, legTransparency = 0.1, legBlack = 0,
 			legLift = { 32, 48 }, legEdge = { 50, 115 }, legSpan = { 0.12, 0.74 },
 		},
-		idle = first.idle,
+		idle = tarantulaIdle,
 		hang = tarantulaHang,
 		detail = {
 			full = {

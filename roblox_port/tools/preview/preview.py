@@ -6,6 +6,7 @@ anti-aliasing and the engine's own shading differ, and Roblox Studio was not use
 Usage (from roblox_port/):
   python3 tools/preview/preview.py path/to/luau path/to/godot out_dir [--prefix after_] [--detail full|low]
          [--views front_three_quarter,top,face_closeup,play_distance,side,game_camera] [--idle SECONDS] [--parts parts.json]
+         [--cue groom|alarm] [--focus X,Y,Z]   (the living motion: cue it, or have the spider watch a point, then --idle seconds)
          [--appearance maratus_volans_male] [--dance LOOP_SECONDS]   (the peacock spider, posed at that time of its dance loop)
          [--appearance myrmarachne_formicaria_female] [--ant stand|display|walk] [--ant-seconds S]   (the ant-mimicking spider: standing with
          legs I up S seconds after it stopped, the display pose, or mid-walk at 6 studs a second for S seconds, ending at the origin)
@@ -27,6 +28,8 @@ ap.add_argument("--ant", default="", help="the ant-mimicking spider's pose: stan
 ap.add_argument("--ant-seconds", type=float, default=2.0, help="seconds standing before the dump, or seconds walked")
 ap.add_argument("--hang", default="", help="draw the spider suspended on its dragline (ROBLOX-86): drop (hanging from the start) or climb (rising along the line)")
 ap.add_argument("--hang-seconds", type=float, default=1.5, help="seconds hung before the dump (the sway is a damped 2.5 s swing started by the drop)")
+ap.add_argument("--cue", default="", help="a cue to the living motion at the start of --idle (ROBLOX-87): groom (a meal ended) or alarm; the spider has stood 0.5 s by then")
+ap.add_argument("--focus", default="", help="the watched point X,Y,Z (world, studs; the spider stands at the origin facing -Z), for the attention yaw and the eyes' glance")
 ap.add_argument("--size", default="960x600")
 args = ap.parse_args()
 out = pathlib.Path(args.out).resolve()
@@ -49,7 +52,7 @@ def chunk(path):
 
 
 # Shared modules the rig requires, in dependency order. A module that does not exist yet (older commits) is skipped.
-LIBS = [("Appearances", "Data/Appearances.luau"), ("Growth", "Life/Growth.luau"), ("Anatomy", "Rig/Anatomy.luau"), ("Setae", "Rig/Setae.luau"), ("Idle", "Rig/Idle.luau"),
+LIBS = [("Appearances", "Data/Appearances.luau"), ("Growth", "Life/Growth.luau"), ("Anatomy", "Rig/Anatomy.luau"), ("Setae", "Rig/Setae.luau"), ("Idle", "Rig/Idle.luau"), ("Living", "Rig/Living.luau"),
         ("Peacock", "Data/Peacock.luau"), ("PeacockDance", "Rig/PeacockDance.luau"),
         ("AntMimic", "Data/AntMimic.luau"), ("AntMimicPose", "Rig/AntMimicPose.luau")]
 libs = [(n, p) for n, p in LIBS if (SRC / p).exists()]
@@ -64,7 +67,7 @@ else:
     body += "\nSupportMath = " + chunk(SRC / "Movement/SupportMath.luau") + "\nSpiderRig = (function()\n" + rig + "\nend)()\n"
     body += (HERE / "driver.luau").read_text()
     src = out / "bundle.luau"
-    src.write_text(f'MODE = "orbit"\nDETAIL = "{args.detail}"\nIDLE_SECONDS = {args.idle}\nAPPEARANCE = "{args.appearance}"\nDANCE_T = {args.dance}\nANT_MODE = "{args.ant}"\nANT_SECONDS = {args.ant_seconds}\nHANG_MODE = "{args.hang}"\nHANG_SECONDS = {args.hang_seconds}\nHANG_HEIGHT = 2.0\n' + body)
+    src.write_text(f'MODE = "orbit"\nDETAIL = "{args.detail}"\nIDLE_SECONDS = {args.idle}\nAPPEARANCE = "{args.appearance}"\nDANCE_T = {args.dance}\nANT_MODE = "{args.ant}"\nANT_SECONDS = {args.ant_seconds}\nHANG_MODE = "{args.hang}"\nHANG_SECONDS = {args.hang_seconds}\nHANG_HEIGHT = 2.0\nCUE = "{args.cue}"\nFOCUS = "{args.focus}"\n' + body)
     run = subprocess.run([args.luau, str(src)], capture_output=True, text=True)
     if run.returncode != 0:
         raise SystemExit(f"the rig failed under the preview stand-ins (bundle kept at {src}):\n{run.stderr}")

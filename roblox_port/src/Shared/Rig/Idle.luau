@@ -14,9 +14,21 @@ export type Pose = {
 
 local TAU = math.pi * 2
 
+-- One breath, -1 to 1: a sine of the period with a slow wobble in its depth. The body's lift, the abdomen's pitch and its scale (ROBLOX-87) all follow it.
+function Idle.breath(t: number, period: number): number
+	return math.sin(TAU * t / period) * (0.85 + 0.15 * math.sin(TAU * t / (period * 2.7) + 0.6))
+end
+
+-- The abdomen's scale (ROBLOX-87): 1 plus `breathe.scale` of a breath, as much as `amount` (0..1: standing is 1, moving `breathe.movingShare`, Reduced Motion 0).
+-- Appearances without `breathe.scale` (the peacock spider's fan, the ant mimic) do not pulse.
+function Idle.abdomenScale(t: number, amount: number, cfg: any): number
+	local b = cfg.breathe
+	return 1 + (b.scale or 0) * Idle.breath(t, b.period) * amount
+end
+
 function Idle.pose(t: number, calm: number, cfg: any): Pose
 	local b, k = cfg.breathe, cfg.tilt
-	local breath = math.sin(TAU * t / b.period) * (0.85 + 0.15 * math.sin(TAU * t / (b.period * 2.7) + 0.6))
+	local breath = Idle.breath(t, b.period)
 	local p = k.periods
 	return {
 		bodyLift = b.bodyLift * breath * calm,

@@ -25,6 +25,11 @@ if ANT_MODE ~= "" then
 		end
 	end
 end
+if CUE ~= "" then rig:cue(CUE) end
+if FOCUS ~= "" then
+	local x, y, z = string.match(FOCUS, "^(%-?[%d%.]+),(%-?[%d%.]+),(%-?[%d%.]+)$")
+	rig.focusPoint = Vector3.new(tonumber(x), tonumber(y), tonumber(z))
+end
 for i = 1, math.floor(IDLE_SECONDS * 60) do rig:update(body, 1/60, true, false) end
 if HANG_MODE ~= "" then
 	-- The spider on its dragline (ROBLOX-59, ROBLOX-86): the collider is HANG_HEIGHT studs up, the line leaves its spinneret toward a point a little off

@@ -21,6 +21,7 @@ local Appearances = require(script.Parent.Parent.Data.Appearances)
 local Anatomy = require(script.Parent.Anatomy)
 local Setae = require(script.Parent.Setae)
 local Idle = require(script.Parent.Idle)
+local Living = require(script.Parent.Living)
 local Growth = require(script.Parent.Parent.Life.Growth)
 local v3 = Anatomy.v3
 
@@ -32,6 +33,7 @@ export type GaitMode = "Tetrapod" | "Unilateral"
 local STEP_ERROR = 0.24
 local SWING_SECONDS = 0.10
 local STEP_HEIGHT = 0.12
+local made = 0 -- rigs made so far: each one's living motion draws from its own seeded stream
 local ANKLE_SHARE = 0.62
 -- The groups a fixed part follows: the body, the head (tilts about the neck) or the abdomen (breathes).
 local G_BODY, G_HEAD, G_ABDOMEN = 0, 1, 2
@@ -62,7 +64,7 @@ type Leg = {
 	hairs: { { part: Part, spec: Setae.LegHair } },
 }
 
-type Fixed = { part: Part, offset: CFrame, group: number, palp: number?, sweep: number? }
+type Fixed = { part: Part, offset: CFrame, group: number, palp: number?, sweep: number?, glance: boolean?, big: boolean? } -- (glance: a principal eye or its catchlight, which shifts toward what is watched; big: an abdomen mass that is resized as it breathes)
 
 -- The peacock spider's fan: flat ellipsoid discs on the abdomen's back face, stacked fringe first, their size set each frame by how far the fan is open.
 type FanDisc = { part: Part, inset: number, y: number }
@@ -101,6 +103,10 @@ export type Rig = typeof(setmetatable(
   _shownCondition: number,
   hangDirection: Vector3?,
   _hang: number,
+  focusPoint: Vector3?, -- the point the player watches (world space), or nil: the drawn body turns toward it a little and the eyes glance at it (ROBLOX-87)
+  _living: Living.State?, -- the living motion (attention, grooming, alarm, a tarantula's stretch), or nil below the full tier
+  _breath: number, -- how much the abdomen breathes now, 0..1
+  _mealsSeen: number?,
   _lineDir: Vector3, -- the last direction up the line (it stays while the pose blends out)
   _hangT: number, -- seconds since the drop: the sway's clock
   _spin: number, _spinVel: number, -- the slow turn about the line (radians, radians a second)
@@ -237,6 +243,7 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		_k = look.scale or 1,
   _growth = 1, _softness = 0, _condition = 0.55, _shownCondition = 0.55, jumpLoad = 0, jumpPush = 0, _shownLoad = 0,
   hangDirection=nil :: Vector3?, _hang=0, _spinneret=nil :: Vector3?,
+  focusPoint = nil :: Vector3?, _living = nil :: Living.State?, _breath = 0, _mealsSeen = nil :: number?,
   _lineDir = Vector3.yAxis, _hangT = 0, _spin = 0, _spinVel = 0, _hangCount = 0, _lastPos = nil :: Vector3?, _lineSpeed = 0, _climbing = false, _climb = 0,
   _sizes = {} :: {[BasePart]: Vector3}, _colors = {} :: {[BasePart]: Color3}, _bars = {} :: { Part },
 		_drop = look.bodyDrop or 0,
@@ -246,8 +253,13 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		threat = nil :: any,
 	}, SpiderRig)
 
+	made += 1
+	local idleLook = look.idle
+	if cfg.idle and (idleLook.groom or idleLook.attention or idleLook.alarm or idleLook.stretch) then
+		self._living = Living.new(idleLook, Living.hash(look.id) + 7919 * made)
+	end
 	local function fixed(part: Part, at: Vector3, rot: CFrame?, group: number, palp: number?): Fixed
-		local entry: Fixed = { part = part, offset = CFrame.new(at) * (rot or CFrame.identity), group = group, palp = palp, sweep = nil }
+		local entry: Fixed = { part = part, offset = CFrame.new(at) * (rot or CFrame.identity), group = group, palp = palp, sweep = nil, glance = nil, big = nil }
 		table.insert(self._fixed, entry)
 		return entry
 	end
@@ -255,7 +267,7 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 	fixed(ellipsoid(model, "Cephalothorax", A.headRadii, BODY, fabric), A.headCenter, nil, G_HEAD)
 	fixed(ellipsoid(model, "EyeFace", A.faceRadii, BODY, fabric), A.faceCenter, nil, G_HEAD)
 	fixed(ellipsoid(model, "Pedicel", A.pedicelRadii, BODY, fabric), A.pedicelCenter, nil, G_BODY)
-	fixed(ellipsoid(model, "Abdomen", A.abdomenRadii, ABDOMEN, fabric), A.abdomenCenter, nil, G_ABDOMEN)
+	fixed(ellipsoid(model, "Abdomen", A.abdomenRadii, ABDOMEN, fabric), A.abdomenCenter, nil, G_ABDOMEN).big = true
 	-- More segments (the ant-mimicking spider's thorax and the node on its waist), and a glossy cuticle where the look asks for one.
 	-- (`fullOnly` extras are left out at low detail; `sweep` marks a spinneret segment that the silk-mat pose swings.)
 	for _, ex in look.extras or {} do
@@ -279,7 +291,7 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		fixed(cover, A.headCenter, nil, G_HEAD)
 		local coat = ellipsoid(model, "FuzzShell", A.abdomenRadii * velvet.abdomen.scale, color(velvet.abdomen.color), Enum.Material.Fabric)
 		coat.Transparency, coat.CastShadow = velvet.abdomen.transparency, false
-		fixed(coat, A.abdomenCenter, nil, G_ABDOMEN)
+		fixed(coat, A.abdomenCenter, nil, G_ABDOMEN).big = true
 	end
 	if look.gloss then
 		for _, f in self._fixed do
@@ -363,18 +375,18 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		local eye = ellipsoid(model, e.name, e.radii, EYE, Enum.Material.Glass)
 		eye.Reflectance = e.reflectance
 		eye.CastShadow = false
-		fixed(eye, e.at, nil, G_HEAD)
+		fixed(eye, e.at, nil, G_HEAD).glance = e.principal
 		if e.principal and cfg.sockets then
 			local socket = ellipsoid(model, "EyeSocket", e.radii * look.eye.ame.socket.scale, SOCKET, fabric)
 			socket.CastShadow = false
-			fixed(socket, e.at + Vector3.new(0, 0, 0.03), nil, G_HEAD)
+			fixed(socket, e.at + Vector3.new(0, 0, 0.03), nil, G_HEAD).glance = true
 		end
 	end
 	local GLINT = color(look.eye.glintColor)
 	for _, g in A.glints do
 		local glint = ellipsoid(model, "Catchlight", g.radii, GLINT, Enum.Material.Neon)
 		glint.CastShadow = false
-		fixed(glint, g.at, nil, G_HEAD)
+		fixed(glint, g.at, nil, G_HEAD).glance = tubercle == nil -- (the catchlights of the big front eyes; a tarantula's are on its tubercle's beads)
 	end
 	local cl = look.chelicerae
 	for _, j in A.jaws do
@@ -437,7 +449,7 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 			if k > cfg.shells then break end
 			local a = ellipsoid(model, "FuzzShell", A.abdomenRadii * shell.scale, SHELL, fabric)
 			a.Transparency, a.CastShadow = shell.transparency, false
-			fixed(a, A.abdomenCenter, nil, G_ABDOMEN)
+			fixed(a, A.abdomenCenter, nil, G_ABDOMEN).big = true
 			local h = ellipsoid(model, "FuzzShell", Vector3.new(hr.X * shell.scale, hr.Y * shell.scale, hr.Z * hs.zScale), SHELL, fabric)
 			h.Transparency, h.CastShadow = shell.transparency, false
 			fixed(h, A.headCenter + Vector3.new(0, 0, hs.shift + 0.01 * k), nil, G_HEAD)
@@ -657,6 +669,20 @@ function SpiderRig.setCondition(self: Rig, energy: number)
  self._condition=math.clamp(energy,0,1)
 end
 
+-- A cue from the host for the living motion (ROBLOX-87): "groom" (a meal has just ended: a longer cleaning once it stands still) or "alarm" (the wasp's
+-- warning or the rival's windup: legs I up and the idle motion frozen for a moment). Anything else, or a rig below the full tier, ignores it.
+function SpiderRig.cue(self: Rig, name: string)
+	local living = self._living
+	if living ~= nil then Living.cue(living, name) end
+end
+
+-- The host's count of meals finished so far: a rise cues the "groom". (The first count only sets the baseline: a spider loaded from a save does not clean itself.)
+function SpiderRig.noteMeals(self: Rig, count: number)
+	local seen = self._mealsSeen
+	self._mealsSeen = count
+	if seen ~= nil and count > seen then self:cue("groom") end
+end
+
 -- How many parts the drawn spider is made of (the model's direct parts), for budgets and the docs.
 function SpiderRig.count(self: Rig): { total: number, hairs: number, shells: number, body: number }
 	local total, hairs, shells = 0, 0, 0
@@ -848,14 +874,36 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
  self._shownLoad += math.clamp(desiredLoad-self._shownLoad,-12*dt,6*dt)
  local load = if self.reducedMotion then 0 else self._shownLoad
  local standing = cfg.idle and grounded and not moving and not self.reducedMotion and not posed and not loading
+	-- Living motion (ROBLOX-87), full detail only: the watched point as an angle from the drawn body's heading, then the pose of attention, grooming, alarm and
+	-- a tarantula's stretch. It only ever turns and bends drawn parts: the planted feet, the root, the motor and the camera do not know it.
+	local lp: Living.Pose? = nil
+	local living = self._living
+	if living ~= nil then
+		local focusYaw: number?, focusPitch: number? = nil, nil
+		local watched = self.focusPoint
+		if watched ~= nil and grounded and not posed and self._hang <= 0 then
+			local d = body:PointToObjectSpace(watched)
+			local flat = math.sqrt(d.X * d.X + d.Z * d.Z)
+			if flat > 0.25 * k then
+				focusYaw, focusPitch = math.atan2(-d.X, -d.Z), math.atan2(d.Y - A.faceCenter.Y * g, flat)
+			end
+		end
+		lp = Living.step(living, dt, standing == true, self.reducedMotion, focusYaw, focusPitch, grounded and not posed and self._hang <= 0)
+	end
+	local freeze = if lp ~= nil then lp.freeze else 0
+	-- The abdomen breathes: all of it at a stand, `movingShare` of it otherwise (and none with Reduced Motion or below the full tier).
+	local breathing = 0
+	if cfg.idle and not self.reducedMotion then breathing = if standing then 1 else (look.idle.breathe.movingShare or 0) end
+	self._breath += math.clamp(breathing - self._breath, -dt / 0.6, dt / 0.6)
+	local breathScale = if cfg.idle then Idle.abdomenScale(self._t, self._breath * (1 - 0.8 * freeze), look.idle) else 1
 	self._drum = math.clamp(self._drum + (if standing then 3 else -3) * dt, 0, 1)
-	local palpAngle = Idle.palps(self._t, self._drum, look.palp)
+	local palpAngle = Idle.palps(self._t, self._drum * (1 - freeze), look.palp)
 	local bodyBase, headBase, abdomenBase = body, body, body
 	if cfg.idle then
 		local idle = look.idle
 		self._calm = math.clamp(self._calm + (if standing then dt / idle.riseSeconds else -dt / idle.fallSeconds), 0, 1)
 		if self._calm > 0 then
-			local c = self._calm * self._calm * (3 - 2 * self._calm)
+			local c = self._calm * self._calm * (3 - 2 * self._calm) * (1 - freeze)
 			local pose = Idle.pose(self._t, c, idle)
 			bodyBase = body * CFrame.new(0, pose.bodyLift*g, 0)
 			headBase = bodyBase * CFrame.new(A.neck*g) * CFrame.Angles(pose.headPitch, pose.headYaw, pose.headRoll) * CFrame.new(-A.neck*g)
@@ -866,8 +914,14 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 	-- Display-only snaps also run on low-detail devices. Camera/root, foot anchors and motor stay unchanged.
 	if grounded and not self.reducedMotion and not posed and not loading then
 		local yaw, lift = Idle.snap(self._t, moving)
+		yaw, lift = yaw * (1 - freeze), lift * (1 - freeze)
 		local accent = body * CFrame.new(0, lift * g, 0) * CFrame.Angles(0, yaw, 0) * body:Inverse()
 		bodyBase, headBase, abdomenBase = accent * bodyBase, accent * headBase, accent * abdomenBase
+	end
+	-- Attention: the whole drawn body turns toward what is watched (the hips go with it; the planted feet stay where they are).
+	if lp ~= nil and lp.yaw ~= 0 then
+		local turn = body * CFrame.Angles(0, lp.yaw, 0) * body:Inverse()
+		bodyBase, headBase, abdomenBase = turn * bodyBase, turn * headBase, turn * abdomenBase
 	end
  -- A visible preparation and extension, not a pressure gauge or an inflated body. Hydraulic
  -- extension and muscle action both matter; their jump contribution varies among species
@@ -898,9 +952,20 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
   palpAngle = { palpAngle[1] + tuck, palpAngle[2] + tuck }
  end
  self._spinneret=abdomenBase:PointToWorldSpace((A.abdomenCenter+(A.spinneret-A.abdomenCenter)*condition)*g)
+	-- Grooming: a palp is drawn in toward the jaws (turned toward the midline and tipped down) about its base.
+	local palpYaw1, palpYaw2 = 0, 0
+	if lp ~= nil then
+		palpAngle = { palpAngle[1] - lp.palpPitch[1], palpAngle[2] - lp.palpPitch[2] }
+		palpYaw1, palpYaw2 = lp.palpYaw[1], lp.palpYaw[2]
+	end
+	local glanceAt = Vector3.zero -- the principal eyes' shift in the head's frame, studs, toward what is watched
+	if lp ~= nil and look.idle.attention ~= nil then
+		local reach = look.idle.attention.glance
+		glanceAt = Vector3.new(lp.glanceX * reach, lp.glanceY * reach * 0.6, 0)
+	end
 	local pivots = {
-		CFrame.new(self._palpBase[1]) * CFrame.Angles(palpAngle[1], 0, 0),
-		CFrame.new(self._palpBase[2]) * CFrame.Angles(palpAngle[2], 0, 0),
+		CFrame.new(self._palpBase[1]) * CFrame.Angles(palpAngle[1], palpYaw1, 0),
+		CFrame.new(self._palpBase[2]) * CFrame.Angles(palpAngle[2], palpYaw2, 0),
 	}
 	for _, f in self._fixed do
 		local base = if f.group == G_HEAD then headBase elseif f.group == G_ABDOMEN then abdomenBase else bodyBase
@@ -909,6 +974,7 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 			put(f.part, base * scaledFrame(pivots[palp] * f.offset))
 		else
 			local offset=f.offset
+			if f.glance == true and glanceAt ~= Vector3.zero then offset = CFrame.new(glanceAt) * offset end
 			if threatening and f.sweep ~= nil and threatPose.sweep ~= 0 then
 				-- A spinneret segment swings side to side about a point just inside the abdomen's rear tip (the second segment farther).
 				local tc = look.threat
@@ -916,9 +982,9 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 				offset = CFrame.new(at) * CFrame.Angles(0, threatPose.sweep * (if f.sweep > 1 then tc.tipSweep else 1), 0) * CFrame.new(-at) * offset
 			end
     if f.group==G_ABDOMEN then
-     local p=A.abdomenCenter+(offset.Position-A.abdomenCenter)*condition
+     local p=A.abdomenCenter+(offset.Position-A.abdomenCenter)*condition*breathScale -- (the whole abdomen, its hairs and its shells, breathes; only the big masses are resized)
      offset=CFrame.new(p)*offset.Rotation
-     local size=self._sizes[f.part]*g*condition
+     local size=self._sizes[f.part]*g*condition*(if f.big == true then breathScale else 1)
      if (f.part.Size-size).Magnitude>1e-5 then f.part.Size=size end
     end
     put(f.part, base * scaledFrame(offset))
@@ -1005,7 +1071,7 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 		self._group = 1 - self._group
 	end
 	local kneeUp = (if grounded then L.kneeLift else L.kneeLiftAir)*g
-	for _, leg in self._legs do
+	for index, leg in self._legs do
 		local hip = prosoma:PointToWorldSpace(Vector3.new(leg.side * L.hipX, L.hipY, L.hipZ[leg.pair])*g)
 		local foot = leg.foot
   local rear = leg.pair >= 3
@@ -1013,6 +1079,15 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
    foot += body:VectorToWorldSpace(Vector3.new(leg.side*.05,-.25,.18)*k*push)
   end
 		local knee = hip:Lerp(foot, 0.48) + up * (if rear then kneeUp*(1-.7*push)+.035*k*load else kneeUp)
+		-- A leg of the living motion (ROBLOX-87): pulled forward to be groomed, raised in an alarm, or reaching out in a tarantula's stretch. The planted foot below is untouched.
+		local alive = if lp ~= nil then lp.legs[index] else nil
+		if alive ~= nil and alive.w > 0 then
+			local spot = Vector3.new(leg.side * alive.x, alive.y, alive.z) * g
+			local reached = if alive.rel then foot + bodyBase:VectorToWorldSpace(spot) else bodyBase:PointToWorldSpace(spot)
+			foot = foot:Lerp(reached, alive.w)
+			local bent = hip:Lerp(reached, 0.5) + bodyBase.RightVector * (leg.side * alive.kneeOut * g) + up * (alive.kneeUp * g)
+			knee = knee:Lerp(bent, alive.w)
+		end
 		local own = if dancing and look.pairs then look.pairs[leg.pair] else nil
 		if own and display.legsRaise > 0 then
 			-- Legs III go up in a V beside the fan and wave: down and forward over the carapace, and back up (the planted foot below is untouched).

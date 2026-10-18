@@ -999,6 +999,7 @@ local function tickInput(): any
 		local hit = Workspace:Raycast(origin, dir * SpiderMotor.AIM_RANGE, params)
 		focusPoint = if hit then hit.Position else origin + dir * SpiderMotor.AIM_RANGE
 	end
+	rig.focusPoint = focusPoint -- (the drawn body turns a little toward it and the eyes glance at it: ROBLOX-87, display only)
 	return {
 		wish = wish, creep = controls.held.Creep == true, reel = f,
 		dropHeld = controls.held.Drop == true, releaseHeld = controls.held.Cancel == true,
@@ -1211,6 +1212,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			})
 			for _, signal in wasp:drainSignals() do
 				watch:onWasp(signal.kind, signal.escaped)
+				if signal.kind == "visit_started" then rig:cue("alarm") end -- the warning begins: legs I up and still for a moment (ROBLOX-87)
 				if signal.kind == "caught" then
 					-- Stung: the spider lets go of everything and is carried (Godot SpiderMotor.seize).
 					motor:seize()
@@ -1263,7 +1265,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
              life.mealFood+=rivalFood*Growth.READY_FOOD/(3*Species.fly_like_prototype.body.nutrition)
             end
             if rivalEvent=="caught" then endLife("rival")
-            elseif rivalEvent=="warning" then life:showNotice("The other spider crouches to jump. Dodge, drop or jump away!")
+            elseif rivalEvent=="warning" then rig:cue("alarm");life:showNotice("The other spider crouches to jump. Dodge, drop or jump away!")
             elseif rivalEvent=="captured" or rivalEvent=="sprang" then life:showNotice(rivalLegs.Text.strike(rivalEvent,needs.gentle) or "")
             elseif rivalEvent=="counter" then
              needs:injure(rivalFood) -- the bite costs energy (nothing in the gentle modes)
@@ -1391,6 +1393,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 		end
 	end
  rig.reducedMotion=setting("ReducedMotion")==true
+ rig:noteMeals(prey.feeding.mealsFinished) -- a meal ended: a longer cleaning once it stands still (ROBLOX-87)
  rig:setGrowthStage(life.growth.stage)
  rig:setSoftness(life.growth:softness())
  rig:setCondition(needs.energy)

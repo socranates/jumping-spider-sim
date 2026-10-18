@@ -296,6 +296,10 @@ check("the wasp: heard with a direction, found, caught, carried off; the catch s
 	frames(30)
 	assert(wasp:isVisiting() and wasp.phase == "arriving", `no visit: {wasp.phase}`)
 	assert(workspace:GetAttribute("WaspForce") == nil, "the force attribute was not taken")
+	-- The living motion's cues (ROBLOX-87): the warning raises legs I and freezes the spider for a moment, and the meal counted above is the cue to clean.
+	local living = driver.rig()._living
+	assert(living ~= nil and living.alarmT ~= nil and living.alarmT > 0, "the wasp's warning did not cue the alarm")
+	assert(living.pendingMeal ~= nil or #living.log > 0, "a meal finished did not cue the cleaning")
 	local audioRoot = workspace:FindFirstChild("WindowsillAudio")
 	local hum = audioRoot:FindFirstChild("wasp")
 	assert(hum and hum.Playing and hum.SoundId == "rbxassetid://76049518783466", "arrival warning has no sound")

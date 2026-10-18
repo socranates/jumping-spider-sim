@@ -43,6 +43,8 @@ local Growth = require(script.Parent.Parent.Life.Growth)
 local Layout = require(script.Parent.Parent.Habitat.WindowsillLayout)
 local WaspDirector = require(script.Parent.Parent.Predator.WaspDirector)
 
+local RivalSpider = require(script.Parent.Parent.Predator.RivalSpider)
+local Breakaway = require(script.Parent.Parent.Habitat.Breakaway)
 local Checkpoint = {}
 
 Checkpoint.SCHEMA_VERSION = 3
@@ -66,6 +68,7 @@ Checkpoint.CLASSES = {
 -- when a record is made and when it is put back, so a name always means this world's own thing.
 export type World = {
 	motor: any, prey: any, sensor: any, memory: any, needs: any, life: any,
+	breakaway: any?,
 	wasp: any?, -- the WaspDirector (nil: no wasp in this world)
 	extraRefs: { [string]: any }?, -- anything else the world's state points at that the record should keep by name
 }
@@ -113,6 +116,7 @@ function Checkpoint.boundaryProblem(world: World): string
 	local motor, prey = world.motor, world.prey
 	if motor.mode ~= "attached" or motor.preparing then return "the spider is not standing on a surface" end
 	if motor.vel.Magnitude > Checkpoint.STILL_SPEED then return "the spider is moving" end
+	if world.life.rival and world.life.rival.state=="captured" then return "the spider is eating its rival" end
 	if prey.feeding.feeding then return "the spider is feeding" end
 	if prey.feeding.struggling then return "the prey in the jaws is still struggling" end
 	if prey.tick <= prey.strikeEnd then return "a strike is still in progress" end
@@ -134,6 +138,7 @@ function Checkpoint.capture(world: World, createdAt: number?): ({ [string]: any 
 		},
 		world = graph,
 		life_rules = { mode = world.life.mode or "main", rules = world.life.rules or "standard" },
+		breakaway = if world.breakaway then world.breakaway:record() else nil,
 		wasp = if world.wasp ~= nil then world.wasp:toRecord() else nil,
 	}, nil
 end
@@ -167,6 +172,7 @@ local function checkWorld(roots: { [string]: any }, problems: { string })
   if life.growth:isMoulting() and not life.resting then bad("growth: moult outside rest") end
  end
  if not finite(life.grantedSeen) or life.grantedSeen<0 or life.grantedSeen>needs.grantedTotal+1e-6 then bad("growth: invalid food ledger cursor") end
+ if not RivalSpider.valid(life.rival) then bad("life: invalid rival state") end
  if type(life.resting) ~= "boolean" then bad("life: 'resting' is not true or false") end
 	-- The flies: unique ids, a known state, finite places, perches held only by flies that exist.
 	if type(prey.flies) ~= "table" then
@@ -184,7 +190,7 @@ local function checkWorld(roots: { [string]: any }, problems: { string })
 		ids[f.id] = f
 		if not states[f.state] then bad(`prey: {f.id} is in no known state`) end
 		if typeof(f.position) ~= "Vector3" and type(f.position) ~= "table" then bad(`prey: {f.id} has no position`) end
-		if not finite(f.nutrition) or f.nutrition < 0 or f.nutrition > f.profile.body.nutrition + 1e-9 then bad(`prey: {f.id}'s nutrition is out of range`) end
+		if not finite(f.nutrition) or f.nutrition < 0 or f.nutrition > (if f.profile==Species.fruit_fly_prototype then .18 else f.profile.body.nutrition) + 1e-9 then bad(`prey: {f.id}'s nutrition is out of range`) end
 		if f.flight == nil or f.flight.fly ~= f then bad(`prey: {f.id}'s flight is not its own`) end
 	end
 	if type(prey.graph) == "table" and type(prey.graph.perches) == "table" then
@@ -241,6 +247,7 @@ function Checkpoint.check(record: any, world: World): ({ string }, ObjectRecord.
 		if p.state ~= "ATTACHED" then bad("the spider is not standing on a surface") end
 		if p.retreat_id ~= "" and p.retreat_id ~= "sill_crevice" then bad("the spider is in an unknown retreat") end
 	end
+	if not Breakaway.valid(record.breakaway) then bad("invalid falling leaf state") end
 	local rules = record.life_rules
 	if record.schema_version >= 2 and rules == nil then bad("missing life rules") end
 	if rules ~= nil and (type(rules) ~= "table" or (rules.mode ~= "main" and rules.mode ~= "free") or (rules.rules ~= "standard" and rules.rules ~= "gentle") or (rules.mode == "free" and rules.rules ~= "gentle")) then bad("invalid life rules") end
@@ -278,6 +285,7 @@ function Checkpoint.restore(record: any, world: World): (boolean, { string })
 	end
 	world.motor:place(pos, n.Unit, h.Unit)
 	world.motor.gazePitch = p.gaze_pitch
+	if world.breakaway then world.breakaway:apply(record.breakaway) end
 	if world.wasp ~= nil then world.wasp:load(record.wasp or WaspDirector.defaultRecord()) end
 	-- Godot's apply_record: the rest that was going on goes on, the spider takes a moment to take hold, and the screen says
 	-- this is checkpoint recovery. What was owed or announced at that tick is not done again.

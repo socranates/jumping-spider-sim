@@ -864,7 +864,8 @@ if loaded and d then
 	d.life.clock.hour = 12
 	check(not book:isOpen("outgrowing_a_skin") and not book:isOpen("new_skin") and not book:isOpen("grown_up"), "no moult pages yet")
 	d.needs.energy = 0.05
-	d.needs:grantEnergy(0.9, "test_meal") -- a meal's worth of food, booked as a real grant
+	d.needs:grantEnergy(0.9, "test_meal")
+ d.life.mealFood=.9 -- fixture credits three consumed meals, independent of reserve capacity
 	frames(3)
 	check(d.life.growth.ready and book:isOpen("outgrowing_a_skin"), "being ready to moult opens its page")
 	tap("Feed"); frames(3)

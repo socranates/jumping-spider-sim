@@ -1,0 +1,5 @@
+world: invented sun, z flip 1: picks clock 9.75, latitude 40.7, 39 degrees high, 46 degrees off straight-out-of-the-window
+world: invented sun, z flip -1: picks clock 9.75, latitude -40.7, 39 degrees high, 46 degrees off straight-out-of-the-window
+world: decor 964 parts at full detail, 207 at low (view 31 items at full), dust 7 -> 2.8 per second
+WORLD passed=237 failed=0
+LIFE passed=20850 failed=0

@@ -32,6 +32,7 @@ MODULES = [
     ("Species", "Data/Species.luau"),
     ("Surfaces", "Data/Surfaces.luau"),
     ("WindowsillLayout", "Habitat/WindowsillLayout.luau"),
+    ("Breakaway", "Habitat/Breakaway.luau"),
     ("Detail", "Data/Detail.luau"),
     ("Graphics", "Data/Graphics.luau"),
     ("Materials", "Habitat/Materials.luau"),
@@ -77,6 +78,7 @@ MODULES = [
     ("LifeLoop", "Life/LifeLoop.luau"),
     ("LifeSession", "Life/LifeSession.luau"),
     ("PreyMath", "Prey/PreyMath.luau"),
+    ("RivalSpider", "Predator/RivalSpider.luau"),
     ("FlySenses", "Prey/FlySenses.luau"),
     ("PerchGraph", "Prey/PerchGraph.luau"),
     ("FlyFlight", "Prey/FlyFlight.luau"),
@@ -195,7 +197,7 @@ def main():
     luau = sys.argv[1] if len(sys.argv) > 1 else "luau"
     status = 0
     named = sys.argv[2:]
-    for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "life.luau", "checkpoint.luau", "wasp.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "look.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "peacock.luau", "continuing.luau", "growth.luau", "notebook.luau", "state.luau", "state_client.luau", "state_offline.luau", "settings.luau"]:
+    for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "life.luau", "checkpoint.luau", "wasp.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "look.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "peacock.luau", "continuing.luau", "growth.luau", "notebook.luau", "state.luau", "state_client.luau", "state_offline.luau", "settings.luau", "rival.luau"]:
         if not (HERE / test_file).exists():
             if named:  # a misspelt name must not look like a pass
                 print(f"no such test file: {test_file} (names are relative to tests/, for example look.luau)", file=sys.stderr)

@@ -172,7 +172,7 @@ local function copy(value: any): any
  local out = {}; for k,v in value do out[k] = copy(v) end; return out
 end
 local fruit = copy(data.fly_like_prototype)
-fruit.body.nutrition = 0.18
+fruit.body.nutrition = 0.175 -- Exactly half a housefly meal.
 fruit.body.visual_scale = 0.60
 fruit.body.radius_wu = 0.18
 fruit.body.capture_radius_wu = 0.42

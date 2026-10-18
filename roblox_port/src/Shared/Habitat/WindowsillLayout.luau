@@ -43,6 +43,11 @@ end
 
 -- Additive upper garden: old support boxes/IDs and retreat remain unchanged for existing rests.
 Layout.PIECES = {
+ -- Solid stalking cover: queryable, climbable, and identical on every detail tier.
+ { id = "cover_bark_west", lo = v(-14.4, 0, 3.4), hi = v(-11.6, 1.3, 4.0), profile = "bare_wood_rough", color = hex("756047") },
+ { id = "cover_bark_east", lo = v(19.5, 0, 5.8), hi = v(20.2, 1.4, 8.2), profile = "bare_wood_rough", color = hex("79624b") },
+ { id = "cover_leaf_front", lo = v(-0.5, 0, 10.0), hi = v(2.5, 1.1, 10.5), profile = "leaf_dry_prototype", color = hex("657b48") },
+ { id = "cover_rim", lo = v(7.0, 4.6, -4.3), hi = v(7.6, 5.7, -2.0), profile = "bare_wood_rough", color = hex("786148") },
 	{ id = "upper_ledge", lo = v(-20, 13.8, -12.5), hi = v(18, 14.4, -8), profile = "bare_wood_rough", color = hex("a78861") },
 	{ id = "garden_step", lo = v(-12, 0, 5), hi = v(-6, 1.2, 10), profile = "brick_rough", color = hex("b5744c") },
 	{ id = "leaf_garden", lo = v(-11.5, 7.4, 3), hi = v(-6, 7.8, 9), profile = "leaf_dry_prototype", color = hex("66884a") },

@@ -63,6 +63,7 @@ local LifeLoop = require(Shared.Life.LifeLoop)
 local Growth = require(Shared.Life.Growth)
 local LifeSession = require(Shared.Life.LifeSession)
 local session = LifeSession.new()
+local RivalSpider = require(Shared.Predator.RivalSpider)
 local LifeText = require(Shared.UI.LifeText)
 local DayLight = require(Shared.Habitat.DayLight)
 local LifeClock = require(Shared.Life.LifeClock)
@@ -108,6 +109,8 @@ end
 pcall(function() game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList,false) end)
 local camera = Workspace.CurrentCamera
 local sill = Workspace:WaitForChild("Windowsill")
+local Breakaway = require(Shared.Habitat.Breakaway)
+local breakaway = Breakaway.new(sill,Workspace:FindFirstChild("Decor"))
 local params = RaycastParams.new()
 params.FilterType = Enum.RaycastFilterType.Include
 params.FilterDescendantsInstances = { sill }
@@ -128,6 +131,7 @@ local detail = Detail.choose(UIS.TouchEnabled and not UIS.KeyboardEnabled, Works
 -- Which spider: the Player attribute Appearance (kept for the session), else the Workspace attribute Appearance, else the first spider.
 local appearance = SpiderChoice.start(player:GetAttribute("Appearance"), Workspace:GetAttribute("Appearance"))
 local rig = SpiderRig.new(Workspace, sill, appearance, detail)
+local rivalRig: any = nil
 local dance = PeacockDance.new() -- the peacock spider's courtship dance (a pose for the rig; nothing else reads it)
 local dancePose: any = nil
 local bodyHidden = false
@@ -164,6 +168,7 @@ local waspBody = WaspBody.new(Workspace)
 -- LIFE (ROBLOX-24): the windowsill runs the life clock, so hunger runs by its hours (NeedsModel life mode, Standard rules: the
 -- port has no Easy mode yet). Feeding grants into the same model. The loop keeps the rest, sleep, daylight and the eyes' reach.
 local needs = NeedsModel.new(true, false)
+needs.drainScale=NeedsModel.PLAY_DRAIN
 prey.feeding.needs = needs
 local life = LifeLoop.new(needs, nil)
 -- The mud dauber wasp (ROBLOX-26): a port of Godot's wasp director (Shared/Predator/WaspDirector). It visits by day from the second day,
@@ -196,7 +201,7 @@ local function modal(): boolean
 end
 -- S01-C retreat checkpoints (ROBLOX-25): resting in the crack, and each morning, keeps one; Backspace / View returns to it. The
 -- store is DataStore-shaped but in memory only: a checkpoint lasts the session. No live DataStore is written.
-local checkpointWorld: Checkpoint.World = { motor = motor, prey = prey, sensor = sensor, memory = memory, needs = needs, life = life, wasp = wasp }
+local checkpointWorld: Checkpoint.World = { motor = motor, prey = prey, sensor = sensor, memory = memory, needs = needs, life = life, wasp = wasp, breakaway = breakaway }
 local function newStore(): any
 	return CheckpointStore.new(CheckpointStore.MemoryDataStore.new(), function(r: any): { string } return (Checkpoint.check(r, checkpointWorld)) end)
 end
@@ -455,6 +460,7 @@ local function returnToCheckpoint()
 		return
 	end
 	session.mode, session.rules, session.ended = life.mode or "main", life.rules or "standard", false
+ needs.drainScale=NeedsModel.PLAY_DRAIN
  motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor())
  session:finishAdult(life.growth.stage)
 	session.summary = nil
@@ -476,6 +482,7 @@ local function setHudShown(shown: boolean)
 end
 local function applyRules()
  life.mode,life.rules=session.mode,session.rules
+ needs.drainScale=NeedsModel.PLAY_DRAIN
  needs.gentle=session.rules=="gentle";wasp.gentle=needs.gentle
 end
 local function closeScreens()
@@ -524,8 +531,8 @@ local function presentEnd(immediate: boolean)
  if checkpoints:loadBest().ok then table.insert(choices,{id="Back",text="Back to your last rest"}) end
  table.insert(choices,{id="Another",text="Continue as another spider"})
  table.insert(choices,{id="Notebook",text=NotebookText.MENU_CHOICE})
- panel:showChoices(if cause=="starved" then "The spider starved." else WaspText.LINE,
-  if cause=="starved" then "It went too long without food." else WaspText.SUB,
+ panel:showChoices(if cause=="starved" then "The spider starved." elseif cause=="rival" then "The other spider caught you." else WaspText.LINE,
+  if cause=="starved" then "It went too long without food." elseif cause=="rival" then "A hunter can become prey. You can return to your last rest." else WaspText.SUB,
   WaspText.summary(rec.hours,rec.meals,rec.wasp_visits,rec.wasp_escapes),choices,immediate)
  panel:setTextScale(if setting("LargeText")==true then 1.5 else 1)
 end
@@ -911,6 +918,7 @@ local function updateHud(frameDt: number)
 	end
 	local waspLine = WaspText.line(wasp.phase, wasp.confusedS > 0, wasp.visits, wasp.sparedThisVisit, device)
 	if waspLine then table.insert(view.status, waspLine) end
+ if life.rival and life.rival.state=="captured" then table.insert(view.status,"Eating rival — stay still (2 meals)") end
 	view.grip = if prey.feeding.struggling then prey.feeding.grip else nil
 	if prey.feeding.struggling then
 		table.insert(view.status, "Caught — tap " .. ControlText.name(device,"jump") .. " to keep your grip")
@@ -992,6 +1000,9 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 		while accumulator >= DT do
 			accumulator -= DT
 			local percepts = prey:percepts()
+            life.rival=life.rival or RivalSpider.new()
+            local rivalPercept=RivalSpider.percept(life.rival)
+            if rivalPercept then table.insert(percepts,rivalPercept) end
 			if stage then
 				local p = stage.target:percept()
 				if p then table.insert(percepts,p) end
@@ -1001,10 +1012,14 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			sensor:step(DT,motor:observer(),percepts,sightCast)
 			prey:before(DT,motor.pos,motor:observer(),sensor,sightCast,camera)
 			if life.growth:isMoulting() then jump:drop(motor);motor:cancelWalk() else jump:step(motor) end
+			if breakaway:step(DT,if jump.last and jump.last.tick==jump.tick then jump.last else nil,motor.pos,setting("ReducedMotion")==true) then
+    motor.planKey="";hud:toast("The dry leaf tip gave way. Your dragline catches the miss.",false)
+   end
 			local input = tickInput()
 			motor:tick(input)
 			-- The wasp runs after the spider has moved and before feeding (Godot: physics priority 8).
 			wasp.enabled = not testPlace or Workspace:GetAttribute("Wasp") == true
+            wasp.searchScale=1.6;wasp.noticeScale=1.2;wasp.inspectScale=.8
 			local forced = if testPlace then Workspace:GetAttribute("WaspForce") else nil
 			if typeof(forced) == "string" and forced ~= "" then
 				Workspace:SetAttribute("WaspForce", nil)
@@ -1030,13 +1045,32 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			end
 			if wasp.heldAt then motor:hold(wasp.heldAt) end
 			prey.feeding.auto = setting("AutomaticGrip") == true
+			local takenBefore = prey.feeding.taken
 			prey:after(DT,motor,sensor,sightCast)
+			-- Three houseflies or six small prey; credit food, not just spare energy capacity.
+			life.mealFood = (life.mealFood or 0) + (prey.feeding.taken-takenBefore) * Growth.READY_FOOD / (3 * Species.fly_like_prototype.body.nutrition)
+            local rivalEvent,rivalFood=RivalSpider.step(life.rival,DT,{
+             position=motor.pos,previous=prey.previousPosition or motor.pos,heading=motor.heading,
+             day=life.clock.day,meals=prey.feeding.mealsFinished,resting=life.resting,safe=Layout.inRetreat(motor.pos),
+             wasp=wasp:isVisiting(),gentle=needs.gentle,grounded=motor.mode=="attached",moving=motor.moving,
+             airborne=motor.mode=="air",onLine=motor:onLine(),holding=prey.feeding.held~=nil,
+             striking=prey.tick<=prey.strikeEnd and not motor.seized,
+            },sightCast)
+            if rivalFood>0 then
+             needs:grantEnergy(rivalFood,"rival_spider_meal")
+             life.mealFood+=rivalFood*Growth.READY_FOOD/(3*Species.fly_like_prototype.body.nutrition)
+            end
+            if rivalEvent=="caught" then endLife("rival")
+            elseif rivalEvent=="warning" then life:showNotice("The other spider crouches to jump. Dodge, drop or jump away!")
+            elseif rivalEvent=="captured" then life:showNotice("Caught the rival. Stay still to eat; worth two housefly meals.")
+            elseif rivalEvent=="eaten" then prey.feeding.mealsFinished+=1
+            elseif rivalEvent=="touch" then life:showNotice("The rival touched you. You are safe in this mode.") end
 			-- The life loop runs last in the tick (Godot's habitat loop, priority 12); the reach it sets is the next tick's.
-			local holding = prey.feeding.held ~= nil
+			local holding = prey.feeding.held ~= nil or (life.rival~=nil and life.rival.state=="captured")
 			lifeSpider = {
 				inRetreat = Layout.inRetreat(motor.pos), attached = motor.mode == "attached" and not motor.preparing,
 				still = input.wish.Magnitude < 0.01 and motor.vel.Magnitude < 0.15,
-				holding = holding, feeding = holding and prey.feeding.feeding, position = motor.pos,
+				holding = holding, feeding = holding and (prey.feeding.feeding or (life.rival~=nil and life.rival.state=="captured")), position = motor.pos,
 			}
 			life:step(DT, lifeSpider, feedPending, cancelPending)
 			feedPending, cancelPending = false, false
@@ -1098,6 +1132,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
  rig:setGrowthStage(life.growth.stage)
  rig:setSoftness(life.growth:softness())
  rig:setCondition(needs.energy)
+ rig.hangDirection=if motor:onLine() and motor.silk.taut and not motor.seized then motor.silk:pivot()-motor.pos else nil
  rig.jumpLoad=if motor.mode=="attached" and not motor.seized and jump:isBusy() then math.clamp(jump.heldTicks/JumpInput.HOLD_TICKS,0,1) else 0
  local recentJump=jump.last
  rig.jumpPush=if not motor.seized and motor.mode=="air" and recentJump and recentJump.kind=="launched" then math.clamp(1-(jump.tick-recentJump.tick)/8,0,1) else 0
@@ -1105,6 +1140,13 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
  rig:update(body, if paused then 0 else simFrame, motor.mode == "attached", motor.moving)
  skins:draw(life.growth.exuviae)
  if not paused then watch:frame(simFrame,cam.eyeView,eyes.moversShown) end
+    local rival=life.rival
+    if rival and rival.state~="dormant" and rival.state~="consumed" then
+     if not rivalRig then rivalRig=SpiderRig.new(Workspace,sill,"rival_spider","low");rivalRig.model.Name="RivalSpider" end
+     rivalRig.reducedMotion=setting("ReducedMotion")==true
+     rivalRig.jumpLoad=if rival.state=="windup" then math.clamp(rival.elapsed,0,1) else 0
+     rivalRig:update(SupportMath.bodyCFrame(rival.position,Vector3.yAxis,rival.heading),if paused then 0 else simFrame,rival.state~="lunge",(rival.position-rival.previous).Magnitude>.001)
+    elseif rivalRig then rivalRig:destroy();rivalRig=nil end
 	updateHud(frameDt)
 	flyBodies:draw(prey.flies,prey.now)
 	local soundPaused = GuiService.MenuIsOpen or modal()

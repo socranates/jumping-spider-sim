@@ -301,4 +301,7 @@ for _,side in {-1,1} do
  end
 end
 
-return { default = "first_spider", profiles = { first_spider = first, maratus_volans_male = volans } }
+-- A brown rival, distinct from the player; illustrative salticid, no species identification.
+local rival=table.clone(first)
+rival.id="rival_spider";rival.body={.22,.14,.08};rival.legs={.27,.18,.10};rival.white={.64,.48,.29}
+return { default = "first_spider", profiles = { first_spider = first, maratus_volans_male = volans, rival_spider=rival } }

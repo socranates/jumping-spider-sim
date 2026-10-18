@@ -41,6 +41,12 @@ Flora.pilea = {
 
 -- ---------------------------------------------------------------- the trough's planting
 -- The soil patch (WindowsillLayout.DECOR "soil") is 12 x 6 at (10, 4.61, -4), on the rim slab's top.
+Flora.grass = {
+ colors={"668544","7a9853","91aa65"},
+ patches={{5.2,4.62,-5.8},{7.0,4.62,-6.0},{11.6,4.62,-5.9},{14.9,4.62,-3.5},
+ {5.3,4.62,-2.1},{11.4,4.62,-1.8},{-17,0.02,-9.5},{-14,0.02,8.8},
+ {-8,0.02,-9.8},{-3,0.02,9.0},{3,0.02,9.5},{19,0.02,8.9},{24,0.02,-9.1},{18,0.02,-8.8}},
+}
 Flora.planter = {
 	soil = "4a3a2c", -- the soil's colour (the layout's own 665644 is the old look)
 	area = { x0 = 4.3, x1 = 15.7, z0 = -6.7, z1 = -1.3, y = 4.615 }, -- where things may lie on the soil

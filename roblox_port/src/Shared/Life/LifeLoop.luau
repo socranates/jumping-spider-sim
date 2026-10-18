@@ -116,7 +116,10 @@ end
 
 function LifeLoop._stepLife(self: any, dt: number, at: Vector3)
  local granted = self.needs.grantedTotal
- if granted > self.grantedSeen and self.growth:eat(granted-self.grantedSeen) then
+ -- Live play counts food swallowed, including when the energy reserve is full.
+ local food = if self.mealFood ~= nil then self.mealFood else granted-self.grantedSeen
+ self.mealFood = nil
+ if food > 0 and self.growth:eat(food) then
   self:showNotice("Ready to moult. Rest in the silk-lined crack.")
   self:_emit("moult_ready")
  end

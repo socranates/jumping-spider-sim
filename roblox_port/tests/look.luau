@@ -548,6 +548,19 @@ dFloor:update(body,0,false,false)
 local extended=dFloor._legs[3].tarsus.Position
 dFloor.jumpPush=0;dFloor:update(body,0,false,false)
 check((dFloor._legs[3].tarsus.Position-extended).Magnitude>.03,"rear legs visibly extend at takeoff")
+for _,r in {pFull,pLow,dFloor} do
+ r.dance=nil;r.jumpLoad=0;r.jumpPush=0;r.hangDirection=Vector3.yAxis;r.reducedMotion=true
+ for _=1,30 do r:update(body,1/60,false,false) end
+ local head=r.model:FindFirstChild("Cephalothorax")
+ check(r:spinneretPoint(body).Y>head.Position.Y+.2*r._k,"hanging head sits beneath spinneret")
+ check((r.root.Position-body.Position).Magnitude<1e-9,"hanging leaves camera/physics root alone")
+ local feet={};for i,leg in r._legs do feet[i]=leg.foot end
+ r:update(body,1,false,false)
+ local calm=true;for i,leg in r._legs do calm=calm and (leg.foot-feet[i]).Magnitude<1e-8 and leg.planted==nil end
+ check(calm,"reduced-motion hanging legs are still and unplanted")
+ r.hangDirection=nil;r:update(body,1/60,true,false)
+ check(r._hang==0,"landing restores surface frame immediately")
+end
 for _, r in { pFull, pLow, pFloor, dFloor } do r:destroy() end
 
 print(`LOOK passed={passed} failed={failed}`)

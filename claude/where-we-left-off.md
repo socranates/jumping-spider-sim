@@ -1,3 +1,15 @@
+# Chet — 2026-10-18: dragline, cover and predator playtest
+
+Latest handoff: `docs/HANDOFF-roblox-dragline.md`; accepted evidence: `docs/verification/roblox-dragline/RESULTS.md`. Build `2ed6a64d5e6d9d58`. Published **v23** to the existing private playtest. CLI **48,279/48,279**; types clean; **170/170** compile. This handoff and the generated places belong to the same code commit.
+
+Nathan's new requests are implemented: head-down line suspension and a falling end leaf, sparse grass, four solid stalking covers, clearer three-housefly/six-small-prey moult counts, 10% faster energy drain, longer/more dangerous wasp visits and an optional edible rival spider. The rival is a brown salticid prototype at the far eastern sill after day one and the first meal. It telegraphs a lunge; jump/drop/cover can defeat its approach. Catching it gives two meals; getting caught uses the normal recovery choices. Both predators respect the crack and gentle play. See ROBLOX-59 through ROBLOX-63.
+
+Native Windows: 111/111 engine and 29/29 client checks. Real DataStore round-trip skipped in the unpublished local test place; prior cloud acceptance is separate. Physical PlayStation/tablet checks remain Nathan's. The game and daughter's spider stay free; peacock stays free for testing (future cosmetic target about US$0.99). No public access, security or monetization changes.
+
+**Suggested next Claude chunk:** implement the hunger-only Hard profile and separate save slot from `docs/HARD_MODE_DESIGN.md`, including migration and isolated cloud-save acceptance. First respond to Nathan's balance feedback on the longer wasp/rival. Keep the safe crack, warnings and accessibility. Do not raise difficulty further without playtest evidence. Public release still needs complete-life/device playtesting, science review and store presentation. Godot/SPEC stay frozen; preserve twitch and fixed simulation ticks.
+
+---
+
 # Latest: player feedback published v22 — Chet, 2026-10-18
 
 Published to the existing Windowsill place 120119801868085; no audience/security/monetization changes. Added food bar and meal-equivalent moult progress, left-stick jump aim, slightly easier fly captures, a small fruit-fly-inspired prey profile, two plants/new leaves and an upper ledge, more twitch, visible jump bracing/rear-leg push, and a coloured clear eye-view centre with muted edges. Soft skin now slows walking/stalking to 65%; existing 0.7 jump reach remains until hardening and survives rest restore.

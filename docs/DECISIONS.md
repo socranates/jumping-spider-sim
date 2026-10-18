@@ -928,3 +928,28 @@ Short irregular-looking body snaps run on both detail tiers, without moving the 
 ### ROBLOX-58 — Soft-skin movement after moulting (Nathan, 2026-10-18)
 
 Walking and stalking run at 65% speed while the existing soft-cuticle timer is active; the existing 0.7 jump-reach factor remains. Both restore at hardening and derive from the saved growth state. Scale the automatic walk-to-edge timeout too so lowering on silk still works. HUD explains slower steps and shorter jumps. Values are game tuning, not measured biology. No change to gravity, airborne velocity, silk reeling or the underlying species profile.
+
+
+### ROBLOX-59 — Dragline pose and the falling leaf tip (2026-10-18)
+
+Nathan asked for a more convincing suspension and Godot's falling end platform. Draw the body head-down from its actual spinneret and narrow the hanging legs; retain the motor, camera and tether physics. A committed jump toward leaf_tip drops the surface and its art, allowing the existing line to catch the miss. Restore after eight simulated seconds only when clear; validate and persist the optional cooldown. Reduced Motion gives a static hanging pose and hides the falling animation. Research scope and evidence: HANDOFF-roblox-dragline.md.
+
+### ROBLOX-60 — Grass and functional stalking cover (2026-10-18)
+
+Fourteen sparse decorative grass patches cost 70 parts full / 42 low and never obstruct physics or sight. Four additional solid bark/leaf obstacles near hunting perches do block sight and support climbing in both detail tiers. Preserve retreat geometry and open jumping routes. Query tests distinguish real cover from decorative foliage. No higher prey population or per-blade physics.
+
+### ROBLOX-61 — Clear meal counts and slightly faster hunger (2026-10-18)
+
+Nathan superseded the proposed slower hunger: keep the normal meal goal, drain energy a bit faster, and count smaller prey proportionally. Live drain is 1.1 times the original LIFE rate; gentle mode retains its existing modifier. Display a count out of three housefly-equivalent meals, in half-meal increments. New small prey supplies exactly half a housefly (0.175 versus 0.35). Live growth credits food swallowed, not only energy that fits in the reserve, normalized to the existing 0.9 growth threshold. Partial progress and old saves remain; legacy fruit prey with 0.18 nutrition is still accepted. Godot golden fixtures retain original default rates.
+
+### ROBLOX-62 — Longer wasp visits and an optional rival (2026-10-18)
+
+Nathan requested greater danger. Live wasp search lasts 72 rather than 45 seconds, notice accrues 20% faster, and close inspection is 1.2 rather than 1.5 seconds. Preserve the eight-second arrival warning, daily limit, first-day/first-meal protection, safe crack and gentle-mode touches. Original defaults remain for reference replay tests.
+
+A brown rival jumping spider patrols the far eastern sill after day one and the first meal, appearing only away from the player. It sees through the same world query as prey; cover breaks sight. A one-second visible windup precedes a committed lunge; jumping or dropping during preparation breaks it. It does not attack during a wasp visit or pursue into the crack. A player's strike can catch it before its lunge; staying still eats it for two housefly-equivalent meals. It can end a standard life, with the existing return-to-rest/another-spider options; gentle play only touches. Its consumed state is saved so rest recovery cannot create another meal in the same saved world. No gore, payment, or requirement to hunt it.
+
+This is an illustrative salticid encounter, not a new species simulation. Field evidence for spider prey in P. audax: Okuyama (2007), https://www.jstage.jst.go.jp/article/aez/42/4/42_4_663/_article . Exact timings, reward and geographical encounter are game design.
+
+### ROBLOX-63 — Hard mode remains a design (2026-10-18)
+
+HARD_MODE_DESIGN.md proposes an explicit optional life with separate saves and 50% greater food demand than revised Normal. It is not enabled in this build. Preserve accessibility, safe retreat, warning and reliable movement. Implement and test save migration before exposing its menu choice.

@@ -741,4 +741,14 @@ case("the drawn wasp is a mud dauber", function()
 	body:destroy()
 end)
 
+case("live pressure tuning extends search without shortening warning",function()
+ local w=WaspDirector.new({seed=914,world={ray=function() return false end,clear=function() return true end,inRetreat=function() return false end}})
+ w.searchScale=1.6;w.noticeScale=1.2;w.inspectScale=.8
+ w:force(2,"floor_middle")
+ near(w.searchLeft,72,1e-8,"search lasts 72 seconds")
+ near(Data.arriveS,8,0,"eight second warning preserved")
+ w.spider={position=w:eyePosition()+Vector3.xAxis,velocity=Vector3.zero,walkSpeed=1,airborne=false,falling=false}
+ local faster=w:noticeRate();w.noticeScale=1
+ near(faster/w:noticeRate(),1.2,1e-8,"twenty percent quicker recognition")
+end)
 print(`WASP passed={passed} failed={failed}`)

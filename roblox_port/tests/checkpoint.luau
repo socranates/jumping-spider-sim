@@ -478,15 +478,37 @@ case("mixed prey keeps the fruit profile across a rest",function()
  local perch=w.prey.flies[3].perch
  w.prey.serial=5
  local f=w.prey:spawn(perch)
- check(f.profile==Species.fruit_fly_prototype and f.nutrition==.18,"third spawn is the smaller meal")
+ check(f.profile==Species.fruit_fly_prototype and f.nutrition==.175,"third spawn is the smaller meal")
  -- Use the existing fly's slot, preserving the graph's one-occupant rule.
  local old=w.prey.flies[3];old.perch=nil
  table.remove(w.prey.flies,3)
  local record=assert(Checkpoint.capture(w,0))
  check(Checkpoint.restore(record,w),"mixed checkpoint restores")
  local found=false
- for _,prey in w.prey.flies do if prey.id==f.id then found=prey.profile==Species.fruit_fly_prototype and prey.nutrition==.18 end end
+ for _,prey in w.prey.flies do if prey.id==f.id then found=prey.profile==Species.fruit_fly_prototype and prey.nutrition==.175 end end
  check(found,"restored fruit fly keeps its identity and food")
+end)
+case("fallen tip timer survives rest and invalid data is atomic",function()
+ local Breakaway=require("../src/Shared/Habitat/Breakaway")
+ local w=newWorld();w.breakaway=Breakaway.new(sill)
+ w.breakaway:apply({left=4})
+ local record=assert(Checkpoint.capture(w,0))
+ w.breakaway:apply(nil)
+ check(Checkpoint.restore(record,w) and w.breakaway.left==4,"fallen leaf restored")
+ record.breakaway.left=-1
+ check(not Checkpoint.restore(record,w) and w.breakaway.left==4,"bad timer refused without mutation")
+ record.breakaway=nil
+ check(Checkpoint.restore(record,w) and w.breakaway.left==0,"older checkpoint has intact tip")
+end)
+case("rival state is kept and malformed rival is refused",function()
+ local Rival=require("../src/Shared/Predator/RivalSpider")
+ local w=newWorld();w.life.rival=Rival.new();w.life.rival.state="consumed";w.life.rival.food=0
+ local rec=assert(Checkpoint.capture(w,0))
+ w.life.rival=nil
+ check(Checkpoint.restore(rec,w) and w.life.rival.state=="consumed","eaten rival cannot respawn on rest")
+ w.life.rival.food=-1
+ local bad=assert(Checkpoint.capture(w,0))
+ check(not Checkpoint.restore(bad,w),"invalid rival food refused")
 end)
 print(`CHECKPOINT passed={passed} failed={failed}`)
 if failed > 0 then error("CHECKPOINT failed") end

@@ -8,6 +8,8 @@
 -- Studio runs this with the engine's raycasts and sphere casts (tests/studio/Runner.server.luau). The plain Luau CLI runs the
 -- same code against the box-world emulation in tests/shim.luau (tests/scenarios.luau): a smoke test, not engine evidence.
 -- A miss is made the way a player makes one (Godot M03): a jump is planned and committed to a perch that then drops away.
+local Shared=game:GetService("ReplicatedStorage"):WaitForChild("Shared")
+local Breakaway=require(Shared.Habitat.Breakaway)
 return function(check: (string, () -> ()) -> (), deps: any)
 	local Motor, JumpInput, Layout, Species, Surfaces, SpiderCamera = deps.Motor, deps.JumpInput, deps.Layout, deps.Species, deps.Surfaces, deps.SpiderCamera
 	local DT = Motor.DT
@@ -36,6 +38,17 @@ return function(check: (string, () -> ()) -> (), deps: any)
 	end
 
 	local sill = windowsill("RecoverySill")
+ check("stalking cover blocks sight with clear views above it",function()
+  for _,id in {"cover_bark_west","cover_bark_east","cover_leaf_front","cover_rim"} do
+   local p=sill:FindFirstChild(id) :: BasePart
+   local rp=RaycastParams.new();rp.FilterType=Enum.RaycastFilterType.Include;rp.FilterDescendantsInstances={p}
+   local across=if p.Size.X<p.Size.Z then Vector3.xAxis else Vector3.zAxis
+   local start=p.Position-across*3
+   assert(workspace:Raycast(start,across*6,rp)~=nil,id.." must block sight")
+   assert(workspace:Raycast(start+Vector3.yAxis*(p.Size.Y+1),across*6,rp)==nil,id.." must leave an open view above")
+  end
+ end)
+
 	local overlap = OverlapParams.new()
 	overlap.FilterType = Enum.RaycastFilterType.Include
 	overlap.FilterDescendantsInstances = { sill }
@@ -480,6 +493,33 @@ return function(check: (string, () -> ()) -> (), deps: any)
 			assert(recovered == #fixtures, `{recovered}/{#fixtures} recovered:\n` .. table.concat(results, "\n"))
 		end)
 	end)
+ check("authored leaf tip falls after launch, catches on silk and resets safely",function()
+  local world=windowsill("BreakawaySill")
+  local m=newMotor(world);local leaf=world:FindFirstChild("leaf_tip")
+  local b=Breakaway.new(world)
+  m:place(Vector3.new(23,5.71,-3),Vector3.yAxis,Vector3.xAxis)
+  local plan=m:planJump(Vector3.new(27,5.35,-3),Vector3.yAxis,leaf)
+  assert(plan.kind=="reachable","dry leaf must be a valid landing before commitment: "..plan.kind)
+  assert(not b:step(DT,nil,m.pos,false) and leaf.CanQuery,"aim never collapses the leaf")
+  assert(m:beginPrepare() and m:commit(plan),"jump commits and anchors first")
+  local outcome={kind="launched",plan=plan}
+  assert(b:step(DT,outcome,m.pos,false) and not leaf.CanQuery,"committed target falls")
+  local caught=false
+  for _=1,400 do
+   m:tick(input());b:step(DT,outcome,m.pos,false)
+   caught=caught or (m:onLine() and m.silk.taut)
+  end
+  assert(caught,"the authored miss is caught by its dragline")
+  for _=1,600 do b:step(DT,outcome,Vector3.new(27,5.35,-3),false) end
+  assert(not leaf.CanQuery,"never reset inside the spider")
+  for _=1,60 do b:step(DT,outcome,Vector3.zero,false) end
+  assert(leaf.CanQuery and (leaf.CFrame.Position-b.home.Position).Magnitude<1e-6,"leaf returns once clear")
+  assert(not b:step(DT,outcome,Vector3.zero,false),"an old launch never triggers twice")
+  b:apply({left=3});assert(not leaf.CanQuery and leaf.Transparency==1,"restore keeps a fallen tip down")
+  b:apply(nil);assert(leaf.CanQuery,"legacy/new life resets tip")
+  assert(not Breakaway.valid({left=0/0}) and not Breakaway.valid({left=9}),"reject damaged timers")
+  m:destroy()
+ end)
 	for _, folder in folders do folder:Destroy() end
 	if not ok then error(err) end
 end

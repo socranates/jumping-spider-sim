@@ -448,5 +448,28 @@ case("the silk-lined crack", function()
 	check(not Layout.inRetreat(Layout.SPAWN), "the spawn is not in the crack")
 end)
 
+case("play tuning uses 10 percent faster energy drain awake, asleep and gentle",function()
+ for _,gentle in {false,true} do
+  for _,asleep in {false,true} do
+   local old=NeedsModel.new(true,gentle);local tuned=NeedsModel.new(true,gentle)
+   tuned.drainScale=NeedsModel.PLAY_DRAIN
+   old:addHours(10,asleep);tuned:addHours(10,asleep)
+   for _=1,2 do old:advance(.25,false);tuned:advance(.25,false) end
+   check(math.abs((.55-tuned.energy)/(.55-old.energy)-1.1)<1e-8,"ten percent increase")
+  end
+ end
+end)
+case("meal credit is consumed food, even with full energy",function()
+ for _,portion in {.3,.15} do
+  local needs=NeedsModel.new(true);needs.energy=1
+  local l=LifeLoop.new(needs)
+  local n=math.floor(.9/portion+.5)
+  for i=1,n do
+   l.mealFood=portion;l:_stepLife(1/60,Vector3.zero)
+   check(l.growth.ready==(i==n),"exact three houseflies or six small prey")
+  end
+  check(needs.grantedTotal==0,"growth does not invent energy grants")
+ end
+end)
 print(`LIFE passed={passed} failed={failed}`)
 if failed > 0 then error("LIFE failed") end

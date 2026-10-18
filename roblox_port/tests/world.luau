@@ -592,5 +592,25 @@ WorldDetail.apply("low", roots)
 check(near(motes.Rate, rate * Graphics.tiers.low.dustRate, 1e-9), "applying the low tier twice does not thin the dust again")
 print(`world: decor {fullParts} parts at full detail, {lowParts} at low (view {viewCount} items at full), dust {rate} -> {string.format("%.1f", motes.Rate)} per second`)
 
+local Breakaway=require("../src/Shared/Habitat/Breakaway")
+local b=Breakaway.new(sill,decor)
+local blade=find(decor,"Pilea","leaf_tip","BladeA")
+local home=blade.Position
+local tip=sill:FindFirstChild("leaf_tip")
+local hit={kind="launched",plan={point=Vector3.new(27,5.35,-3)}}
+b:step(1/60,hit,Vector3.zero,false);b:step(.35,hit,Vector3.zero,false)
+check(blade.Position.Y<home.Y-1 and not tip.CanQuery and tip.Transparency==1,"drawn tip falls; hidden collider stays hidden and unavailable")
+b:apply(nil)
+check((blade.Position-home).Magnitude<1e-6 and tip.CanQuery and tip.Transparency==1,"drawn tip returns without showing collision box")
+local grass=decor:FindFirstChild("GrassTufts")
+check(grass~=nil and #grass:GetChildren()==14,"sparse grass patches survive low detail")
+local safe=true;local count=0
+for _,p in grass:GetDescendants() do if p:IsA("BasePart") then count+=1;safe=safe and not p.CanQuery and not p.CanCollide and not p.CanTouch end end
+check(safe and count==42,"low grass is bounded and cannot block any gameplay query")
+local coverParams=RaycastParams.new();coverParams.FilterType=Enum.RaycastFilterType.Include;coverParams.FilterDescendantsInstances={sill}
+for _,id in {"cover_bark_west","cover_bark_east","cover_leaf_front","cover_rim"} do
+ local p=sill:FindFirstChild(id)
+ check(p~=nil and p.CanQuery~=false and p.CanCollide~=false and p.Transparency<1,"stalking cover stays visible and solid: "..id)
+end
 print(`WORLD passed={passed} failed={failed}`)
 if failed > 0 then error("world checks failed") end

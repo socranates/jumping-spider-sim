@@ -317,6 +317,7 @@ function Scenery.decor(sun: Vector3?): (Folder, { [string]: boolean })
 	if attempt(decor, "pilea", function() return Plants.pilea(decor) end) then
 		for _, id in Plants.pieceIds() do replaced[id] = true end
 	end
+	attempt(decor, "grass", function() return Plants.grass(decor) end)
 	attempt(decor, "planting", function() return Plants.planter(decor) end)
 	attempt(decor, "garden", function() return Plants.garden(decor, uv, Scenery.viewPosition) end)
 	return decor, replaced

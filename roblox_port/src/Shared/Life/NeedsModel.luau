@@ -37,6 +37,7 @@ NeedsModel.FULL_AT = 0.98
 -- A real Phidippus goes much longer without food; the game compresses time on purpose (LIFE-05).
 NeedsModel.LIFE_DRAIN_AWAKE_PER_H = 0.021
 NeedsModel.LIFE_DRAIN_ASLEEP_PER_H = 0.007
+NeedsModel.PLAY_DRAIN = 1.1 -- Nathan: slightly faster energy drain; reference fixtures retain factor 1.
 NeedsModel.GENTLE_DRAIN = 0.5
 NeedsModel.GENTLE_FLOOR = 0.1
 NeedsModel.STAGE_ID = "p0_prototype"
@@ -94,7 +95,7 @@ end
 function NeedsModel._apply(self: any, period: number, activeShare: number)
 	local before = self.energy
 	if self.lifeMode then
-		local need = self._accHoursAwake * NeedsModel.LIFE_DRAIN_AWAKE_PER_H + self._accHoursAsleep * NeedsModel.LIFE_DRAIN_ASLEEP_PER_H
+		local need = (self._accHoursAwake * NeedsModel.LIFE_DRAIN_AWAKE_PER_H + self._accHoursAsleep * NeedsModel.LIFE_DRAIN_ASLEEP_PER_H) * (self.drainScale or 1)
 		local hours = self._accHoursAwake + self._accHoursAsleep
 		self._accHoursAwake = 0.0
 		self._accHoursAsleep = 0.0

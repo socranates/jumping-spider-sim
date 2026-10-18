@@ -363,4 +363,20 @@ function Plants.garden(parent: Instance, uv: Instance, place: (number, number, n
 	return garden
 end
 
+function Plants.grass(parent: Instance): Folder
+ local group=folder(parent,"GrassTufts")
+ for i,xyz in Flora.grass.patches do
+  local tuft=folder(group,"Tuft"..i)
+  local origin=Vector3.new(xyz[1],xyz[2],xyz[3])
+  for j=1,5 do
+   local optional=if j>3 then folder(tuft,"Fine"..j,true) else tuft
+   local turn=i*2.399+j*1.257
+   local height=.25+((i*7+j*3)%9)*.035
+   local lean=Vector3.new(math.cos(turn)*.14,0,math.sin(turn)*.14)
+   local frame=CFrame.new(origin+Vector3.new(0,height*.5,0)+lean*.5)*CFrame.Angles(0,turn,.22)
+   Shapes.ellipsoid(optional,"GrassBlade",Vector3.new(.065,height,.025),frame,hex(Flora.grass.colors[1+(i+j)%3]),"SmoothPlastic").CastShadow=false
+  end
+ end
+ return group
+end
 return Plants

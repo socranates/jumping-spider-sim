@@ -1,0 +1,6 @@
+FAIL rival: old saves and valid state
+RIVAL passed=14 failed=1
+checkpoint: 21702 characters, 87 tables
+FAIL [rival state is kept and malformed rival is refused] eaten rival cannot respawn on rest
+FAIL [rival state is kept and malformed rival is refused] raised: C:/Users/natha/AppData/Local/Packages/sandbox.{77fda560-9064-4429-864c-8b6fb78696d0}/AC/Temp/tmpfoufget9.luau:17440: attempt to index nil with 'food'
+CHECKPOINT passed=162 failed=2

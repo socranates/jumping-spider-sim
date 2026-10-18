@@ -176,7 +176,7 @@ function WaspDirector.beginVisit(self: any, day: number, first: number?)
 	self.confusedS = 0.0
 	self.noticedThisVisit = false
 	self.sparedThisVisit = false
-	self.searchLeft = Data.searchS
+	self.searchLeft = Data.searchS * (self.searchScale or 1)
 	self.recent = {}
 	self.lossPos = nil
 	self.holding = false
@@ -373,7 +373,7 @@ function WaspDirector.noticeRate(self: any): number
 	local walk = math.max(s.walkSpeed, 0.1)
 	local motion = math.clamp(s.velocity.Magnitude / walk, 0.0, 1.5)
 	if s.airborne then motion = 1.5 end
-	return (Data.noticeStill + Data.noticeMoving * motion) * math.max(1.0 - d / Data.sightWu, 0.0)
+	return (self.noticeScale or 1) * (Data.noticeStill + Data.noticeMoving * motion) * math.max(1.0 - d / Data.sightWu, 0.0)
 end
 
 function WaspDirector._look(self: any, dt: number)
@@ -450,7 +450,7 @@ function WaspDirector._inspect(self: any, dt: number)
 	else
 		self:_moveTo(wasp.position, face, dt)
 		self.holdS += dt
-		if self.holdS >= Data.inspectS then
+		if self.holdS >= Data.inspectS * (self.inspectScale or 1) then
 			self.strikeFrom = wasp.position
 			self.strikeTo = s.position
 			self:_setPhase("striking")

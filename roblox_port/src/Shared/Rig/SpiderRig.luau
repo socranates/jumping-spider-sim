@@ -83,6 +83,9 @@ export type Rig = typeof(setmetatable(
   _softness: number,
   _condition: number,
   _shownCondition: number,
+  hangDirection: Vector3?,
+  _hang: number,
+  _spinneret: Vector3?,
   jumpLoad: number,
   jumpPush: number,
   _shownLoad: number,
@@ -209,6 +212,7 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		_cframes = {} :: { CFrame },
 		_k = look.scale or 1,
   _growth = 1, _softness = 0, _condition = 0.55, _shownCondition = 0.55, jumpLoad = 0, jumpPush = 0, _shownLoad = 0,
+  hangDirection=nil :: Vector3?, _hang=0, _spinneret=nil :: Vector3?,
   _sizes = {} :: {[BasePart]: Vector3}, _colors = {} :: {[BasePart]: Color3},
 		_drop = look.bodyDrop or 0,
 		_fan = nil :: Fan?,
@@ -535,6 +539,19 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
  self._shownCondition += math.clamp(self._condition-self._shownCondition,-0.12*dt,0.12*dt)
  local conditionValue=self._shownCondition
  local condition=Vector3.new(0.84+0.30*conditionValue,0.84+0.30*conditionValue,0.93+0.12*conditionValue)
+ -- Suspension tilts the drawn body about its rear silk outlet, never the motor/camera.
+ local hanging=not grounded and self.hangDirection~=nil
+ local wanted=if hanging then 1 else 0
+ self._hang+=math.clamp(wanted-self._hang,-5*dt,5*dt)
+ if grounded then self._hang=0 end
+ if self._hang>0 then
+  local direction=body:VectorToObjectSpace(self.hangDirection or Vector3.yAxis)
+  local pitch=-math.clamp(math.atan2(direction.Y,math.max(.05,direction.Z)),0,math.rad(80))*self._hang
+  local roll=math.clamp(-direction.X*.25,-.2,.2)*self._hang
+  local tail=(A.abdomenCenter+(A.spinneret-A.abdomenCenter)*condition)*g
+  body=body*CFrame.new(tail)*CFrame.Angles(pitch,0,roll)*CFrame.new(-tail)
+  up=body.UpVector
+ end
  local function scaledFrame(cf: CFrame): CFrame return if g==1 then cf else CFrame.new(cf.Position*g)*cf.Rotation end
 	local parts, cframes = self._parts, self._cframes
 	table.clear(parts)
@@ -592,6 +609,7 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 			* CFrame.Angles(-display.abdomenPitch, 0, 0) * CFrame.new(-A.pedicelCenter*g)
 		palpAngle = { palpAngle[1] + display.palp, palpAngle[2] + display.palp }
 	end
+ self._spinneret=abdomenBase:PointToWorldSpace((A.abdomenCenter+(A.spinneret-A.abdomenCenter)*condition)*g)
 	local pivots = {
 		CFrame.new(self._palpBase[1]) * CFrame.Angles(palpAngle[1], 0, 0),
 		CFrame.new(self._palpBase[2]) * CFrame.Angles(palpAngle[2], 0, 0),
@@ -641,7 +659,10 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 		if not grounded then
 			leg.planted = nil
 			leg.swing = -1
-			leg.foot = body:PointToWorldSpace(Vector3.new(leg.side * 0.47 * k, -0.12 * k, L.tipZ[leg.pair] * 0.72 * g))
+   local free=Vector3.new(leg.side*.47*k,-.12*k,L.tipZ[leg.pair]*.72*g)
+   local adjust=if self.reducedMotion then 0 else math.sin(self._t*3.2+leg.pair*1.7+leg.side)*.025*k
+   local suspended=Vector3.new(leg.side*(if leg.pair<=2 then .43 else .31)*k,-.22*k+adjust,L.tipZ[leg.pair]*.52*g)
+   leg.foot=body:PointToWorldSpace(free:Lerp(suspended,self._hang))
 		else
 			if leg.planted == nil then
 				local hit = target(self, body, leg)
@@ -828,7 +849,7 @@ end
 
 -- Where the dragline leaves the body.
 function SpiderRig.spinneretPoint(self: Rig, body: CFrame): Vector3
-	return body:PointToWorldSpace(self._layout.spinneret*self._growth - Vector3.new(0, self._drop, 0))
+	return self._spinneret or body:PointToWorldSpace(self._layout.spinneret*self._growth - Vector3.new(0, self._drop, 0))
 end
 
 function SpiderRig.destroy(self: Rig)

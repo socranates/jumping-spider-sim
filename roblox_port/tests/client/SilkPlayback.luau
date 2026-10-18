@@ -22,6 +22,14 @@ return function(driver: any)
 		assert(driver.get().walking,"did not start edge walk")
 		assert(untilState(function(s) return s.line=="locked" and s.taut and s.position.Y<3.9 end,12),"no hanging state")
 	end)
+ check("suspended pose follows rear silk outlet without moving physics",function()
+  local deadline=os.clock()+.4;repeat RunService.Heartbeat:Wait() until os.clock()>deadline
+  local rig=driver.rig()
+  assert(rig._hang>.9,"hanging pose not wired")
+  local head=rig.model:FindFirstChild("Cephalothorax")
+  assert(rig:spinneretPoint(rig.root.CFrame).Y>head.Position.Y+.1,"head is not below rear silk outlet")
+  assert((rig.root.Position-driver.motor.pos).Magnitude<.001,"drawn hanging moved motor")
+ end)
 	check("held lower reaches sill floor",function()
 		driver.input:set("Drop",true)
 		assert(untilState(function(s) return s.mode=="attached" and s.position.Y<0.4 end,15),"did not land on sill")
@@ -303,6 +311,7 @@ return function(driver: any)
    -- A staged meal credit; the production loop must read the ledger, not a test-only growth hook.
    driver.needs.energy=0
    assert(driver.needs:grantEnergy(.9,"growth_test_"..stage)>=.9-1e-9)
+   driver.life.mealFood=.9 -- three consumed meals, separate from the energy grant
    wait(.1);assert(driver.life.growth.ready,"food did not ready a moult")
    press("Feed");assert(driver.life.growth:isMoulting(),"moult didn't start")
    local before=driver.motor.pos
@@ -472,6 +481,21 @@ return function(driver: any)
   player:SetAttribute("EyeGrey",false)
   driver.input:simulate("Eye",true);driver.input:simulate("Eye",false);wait(.1)
   assert(not driver.eyes.gui.Enabled and not driver.eyes.grade.Enabled,"eye effects leaked into third person")
+ end)
+ check("RIVAL: live rig, capture, two-meal reward and no repeated reward",function()
+  local Rival=require(game:GetService("ReplicatedStorage").Shared.Predator.RivalSpider)
+  driver.fresh("main",false,nil);driver.wasp:clearVisit()
+  driver.life.clock.day=2;driver.life.clock.hour=12;driver.prey.feeding.mealsFinished=1
+  driver.life.rival=Rival.new();driver.place(Vector3.new(15,.31,8));wait(.3)
+  assert(workspace:FindFirstChild("RivalSpider")~=nil,"rival rig missing")
+  driver.life.growth.stage=0;driver.life.growth.fedSinceMoult=0;driver.life.growth.ready=false
+  driver.place(driver.life.rival.position);driver.prey.strikeEnd=driver.prey.tick+240
+  wait(.2);assert(driver.life.rival.state=="captured","jump contact did not capture rival")
+  wait(5.3);assert(driver.life.rival.state=="consumed","rival meal did not finish")
+  assert(math.abs(driver.life.growth.fedSinceMoult-.6)<.001,"rival should count as two meals")
+  local food=driver.needs.grantedFrom(driver.needs,"rival_spider_meal")
+  wait(.2);assert(driver.needs:grantedFrom("rival_spider_meal")==food,"meal paid twice")
+  driver.fresh("main",false,nil)
  end)
  local passed=0
 	for _,row in rows do if row.passed then passed+=1 end end

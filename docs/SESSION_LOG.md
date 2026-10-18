@@ -1348,3 +1348,8 @@ Next chunk: release presentation (icon, thumbnail and accurate description of mo
 ## 2026-10-18 — Chet: player feedback, v22
 
 Food/moult HUD, controller jump aim, +0.05 capture radius, fruit-fly prototype, additive habitat surfaces/plants, twitch and jump-load pose, revised eye presentation, and soft-skin slowdown. Published v21 then v22 after Nathan's final soft-skin request. Accepted CLI 48,218; final types clean and compile 167/167. Native 111+27 checks predate the final soft-skin update; exact evidence and limitations in docs/verification/roblox-player-feedback/RESULTS.md. Next handoff is docs/HANDOFF-roblox-player-feedback.md.
+
+
+## 2026-10-18 — Chet: dragline, cover and predator update
+
+Added the suspended pose, authored leaf-tip failure and saved cooldown, sparse grass and real ambush cover. Nathan revised hunger to slightly faster energy drain with clear weighted meal counts. Added stronger/longer live wasp tuning and an optional edible brown rival, with warning, cover/escape rules and normal life recovery. Hard mode is designed but not enabled. Build 2ed6a64d5e6d9d58 passed 111 native engine plus 29 live-client checks. Final CLI 48,279/48,279; 170 scripts compile; strict types clean. Published v23 to the existing private playtest, verified in Creator Dashboard. Details are in docs/verification/roblox-dragline/RESULTS.md. Next chunk: safe separate-slot Hard mode, following Nathan's balance feedback.

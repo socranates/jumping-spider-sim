@@ -832,28 +832,30 @@ do
 	local prey = { flies = {}, feeding = { held = nil, struggling = false } }
 	local away = { phase = "away", wasp = { mode = "flying", position = Vector3.new(0, 20, 0) } }
 	local visiting = { phase = "searching", wasp = { mode = "flying", position = Vector3.new(0, 5, 0) } }
-	-- No asset id yet: no voice at all, and nothing else changes.
-	check(Soundscape.IDS.music == "", "the music's asset id is empty until Chet pastes it in")
+	-- The real id is in (114531800455832, uploaded 2026-10-18); an empty id would mean no voice at all, and nothing else changes.
+	check(Soundscape.IDS.music == "rbxassetid://114531800455832", "the music's asset id is the uploaded loop")
+	local realId = Soundscape.IDS.music
+	Soundscape.IDS.music = ""
 	local silent = Soundscape.new(Instance.new("Folder"))
 	silent:setVolumes(1, 1, 1, 0.5)
 	silent:update(0.1, prey, 1, false, 1, false)
 	silent:updateWasp(visiting, false, 1, false)
 	silent:update(0.1, prey, 1, false, 1, false)
 	check(silent.music == nil and silent.root:FindFirstChild("music") == nil and near(silent.musicVolume, 0.5, 1e-9) and near(silent.room.Volume, 0.09, 1e-9), "with an empty id there is no music voice, and the room is as it was")
-	-- With an id the voice exists: looped, in the mix at 0.10, scenery under the room tone's presence.
+	-- With an id the voice exists: looped, in the mix at 0.18, scenery kept under the buzz and the hum.
 	Soundscape.IDS.music = "rbxassetid://1"
 	local s = Soundscape.new(Instance.new("Folder"))
 	local music: any = s.music
 	check(music ~= nil and music.Name == "music" and music.Looped == true and music.SoundId == "rbxassetid://1" and music.Parent == s.root, "with an id there is one looped voice called music")
 	s:update(0.1, prey, 1, false, 1, false)
-	check(near(music.Volume, 0.10, 1e-9) and music.Playing, "at full volume it is 0.10 in the mix, playing")
-	check(0.10 > 0.09 * 0.9 and 0.10 < 0.16 and music.Volume > s.room.Volume, "a little above the room tone's 0.09 and under the birds' 0.16")
+	check(near(music.Volume, 0.18, 1e-9) and music.Playing, "at full volume it is 0.18 in the mix, playing")
+	check(0.18 > 0.16 and 0.18 < 0.23 and music.Volume > s.room.Volume, "above the room tone and the birds, under the buzz's 0.23 and the hum")
 	s:setVolumes(0.5, 0.2, 0.2, 0.5)
 	s:update(0.1, prey, 1, false, 1, false)
-	check(near(music.Volume, 0.10 * 0.25, 1e-9), "master times the music volume (not the room's or the creatures')")
+	check(near(music.Volume, 0.18 * 0.25, 1e-9), "master times the music volume (not the room's or the creatures')")
 	s:setVolumes(1, 1, 1)
 	s:update(0.1, prey, 1, false, 1, false)
-	check(near(music.Volume, 0.10, 1e-9), "a caller that leaves the fourth volume out gets full music")
+	check(near(music.Volume, 0.18, 1e-9), "a caller that leaves the fourth volume out gets full music")
 	s:setVolumes(1, 1, 1, 0)
 	s:update(0.1, prey, 1, false, 1, false)
 	check(music.Volume == 0, "music at nothing is silent")
@@ -876,30 +878,31 @@ do
 	end
 	s:setVolumes(1, 1, 1, 1)
 	run(2, away)
-	check(near(music.Volume, 0.10, 1e-9) and s.duck == 1, "with the wasp away the music is not ducked")
+	check(near(music.Volume, 0.18, 1e-9) and s.duck == 1, "with the wasp away the music is not ducked")
 	run(0.5, visiting)
-	check(near(music.Volume, 0.10 * 0.7, 2e-3) and s.duck < 1 and s.duck > 0.4, `half a second in it is part way down (${string.format("%.3f", music.Volume)})`)
+	check(near(music.Volume, 0.18 * 0.7, 2e-3) and s.duck < 1 and s.duck > 0.4, `half a second in it is part way down (${string.format("%.3f", music.Volume)})`)
 	run(0.55, visiting)
-	check(near(music.Volume, 0.10 * 0.4, 1e-9), "by a second it is at 40 per cent")
+	check(near(music.Volume, 0.18 * 0.4, 1e-9), "by a second it is at 40 per cent")
 	run(3, visiting)
-	check(near(music.Volume, 0.04, 1e-9), "and stays there while the wasp is here")
+	check(near(music.Volume, 0.18 * 0.4, 1e-9), "and stays there while the wasp is here")
 	local arriving = { phase = "arriving", wasp = { mode = "flying", position = Vector3.new(38, 19, 2) } }
 	local walking = { phase = "searching", wasp = { mode = "walking", position = Vector3.new(0, 0.3, 4) } }
 	run(0.2, walking)
-	check(near(music.Volume, 0.04, 1e-9), "(on the ground as well)")
+	check(near(music.Volume, 0.18 * 0.4, 1e-9), "(on the ground as well)")
 	run(0.5, away)
-	check(near(music.Volume, 0.10 * 0.7, 2e-3) and s.duck > 0.4 and s.duck < 1, "after it goes the music comes back over a second")
+	check(near(music.Volume, 0.18 * 0.7, 2e-3) and s.duck > 0.4 and s.duck < 1, "after it goes the music comes back over a second")
 	run(0.6, away)
-	check(near(music.Volume, 0.10, 1e-9), "all the way")
+	check(near(music.Volume, 0.18, 1e-9), "all the way")
 	run(0.1, arriving)
 	check(s.duck < 1, "it begins to duck as the warning begins, while the wasp is still outside")
 	-- The ducking times the volume setting.
 	s:setVolumes(0.5, 1, 1, 0.5)
 	run(2, visiting)
-	check(near(music.Volume, 0.10 * 0.25 * 0.4, 1e-9), "and ducking multiplies the player's volumes")
+	check(near(music.Volume, 0.18 * 0.25 * 0.4, 1e-9), "and ducking multiplies the player's volumes")
 	Soundscape.IDS.music = ""
 	local again = Soundscape.new(Instance.new("Folder"))
 	check(again.music == nil, "an empty id again: no voice")
+	Soundscape.IDS.music = realId
 end
 
 -- ---------------------------------------------------------------- the real client: every setting does what it says
@@ -973,10 +976,12 @@ do
 	setAll({ MasterVolume = 1, AmbienceVolume = 1, CreatureVolume = 1 })
 	frames(2)
 	check(near(driver.soundscape.room.Volume, 0.09, 1e-9), "back to full")
-	check(driver.soundscape.music == nil, "the client makes no music voice while the asset id is empty (the game is silent but healthy)")
+	local clientMusic: any = driver.soundscape.music
+	check(clientMusic ~= nil and clientMusic.SoundId == "rbxassetid://114531800455832" and clientMusic.Looped, "the client makes the looped music voice from the uploaded id")
 	setAll({ MusicVolume = 0.3 })
 	frames(2)
 	check(near(driver.soundscape.musicVolume, 0.3, 1e-9) and near(driver.soundscape.room.Volume, 0.09, 1e-9), "the music volume reaches the sound, and the room does not move")
+	check(near(clientMusic.Volume, 0.18 * 0.3, 1e-9), "and the voice follows it")
 	setAll({ MusicVolume = "loud" })
 	frames(2)
 	check(driver.setting("MusicVolume") == 1 and driver.soundscape.musicVolume == 1, "a wrong-typed music volume reads as the default")

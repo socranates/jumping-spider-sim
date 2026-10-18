@@ -12,11 +12,11 @@ local IDS = {
 	room = "rbxassetid://135813320748786", buzz = "rbxassetid://90354950534870",
 	takeoff = "rbxassetid://135484013341687", birds = "rbxassetid://105858750316891",
 	wasp = "rbxassetid://76049518783466",
-	music = "", -- assets/audio/sill_music.wav, once Chet has uploaded it and granted it to the universe (assets/audio/manifest.json); "" = no music, no voice
+	music = "rbxassetid://114531800455832", -- assets/audio/sill_music.wav, uploaded 2026-10-18 by socranates (assets/audio/manifest.json); "" would mean no music, no voice
 }
 Soundscape.IDS = IDS -- (tests/settings.luau gives the music an id to see its voice)
 -- The mix as authored (each voice's own loudness before the player's volumes).
-local MIX = { room = 0.09, birds = 0.16, buzz = 0.23, takeoff = 0.22, hum = 0.42, humArriving = 0.32, music = 0.10 }
+local MIX = { room = 0.09, birds = 0.16, buzz = 0.23, takeoff = 0.22, hum = 0.42, humArriving = 0.32, music = 0.18 }
 -- While the wasp is on the sill the music is this share of itself, reached (and left) over about DUCK_S seconds.
 local DUCK = 0.4
 local DUCK_S = 1.0

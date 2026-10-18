@@ -1,104 +1,495 @@
 --!strict
-local CAS=game:GetService("ContextActionService")
-local GuiService=game:GetService("GuiService")
-local UIS=game:GetService("UserInputService")
-local Art=require(script.Parent.NotebookArt)
-local Panel={}
-Panel.__index=Panel
-local function text(parent:Instance,name:string,size:number,order:number):TextLabel
-	local l=Instance.new("TextLabel");l.Name=name;l.BackgroundTransparency=1
-	l.TextColor3=Color3.fromRGB(44,57,54);l.Font=Enum.Font.GothamMedium;l.TextSize=size
-	l.TextWrapped=true;l.TextXAlignment=Enum.TextXAlignment.Left;l.TextYAlignment=Enum.TextYAlignment.Top
-	l.Size=UDim2.new(1,-32,0,0);l.AutomaticSize=Enum.AutomaticSize.Y;l.LayoutOrder=order;l.Parent=parent
+-- The naturalist's notebook on screen (ROBLOX-37), from Godot's notebook_panel.gd: the pages found so far on the left, in the order they
+-- were found, and the page on the right: a few true sentences, "In this game:" where the game simplifies, and the sources with their
+-- links as text. No count of pages left to find (spec 4). On a small or narrow screen, or with large text, one pane shows at a time:
+-- the pages, then the page, with a Pages button to go back (Shared/UI/NotebookText.layout). It is modal like the life menu: while it is
+-- open the world waits (the client's render step stops the fixed ticks), and it owns the input (a Context Action at a priority above the
+-- game's bindings) so nothing it uses reaches the spider. Keyboard: Up and Down choose a page, Left and Right go to the previous or next
+-- page, Enter opens (one pane), PageUp and PageDown scroll, N or Q closes. Controller: stick or D-pad choose, A opens, LB and RB go to the
+-- previous or next page, the right stick scrolls, B goes back or closes. Mouse and touch: tap a page, drag or use the wheel to scroll.
+-- The client opens it (N, the Notebook button, or from the life menu or the end screen) and is told when it closes.
+local TextService=game:GetService("TextService")
+local CAS = game:GetService("ContextActionService")
+local GuiService = game:GetService("GuiService")
+local UIS = game:GetService("UserInputService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UI = ReplicatedStorage:WaitForChild("Shared"):WaitForChild("UI")
+local ControlText = require(UI:WaitForChild("ControlText"))
+local NotebookText = require(UI:WaitForChild("NotebookText"))
+
+local NotebookPanel = {}
+NotebookPanel.__index = NotebookPanel
+
+local PAPER = Color3.new(0.93, 0.90, 0.82)
+local PAPER_DARK = Color3.new(0.84, 0.79, 0.68)
+local PAPER_LIT = Color3.new(0.99, 0.95, 0.80)
+local BORDER = Color3.new(0.45, 0.38, 0.28)
+local INK = Color3.new(0.20, 0.16, 0.10)
+local BODY = Color3.new(0.15, 0.13, 0.10)
+local GREEN = Color3.new(0.18, 0.32, 0.22)
+local FAINT = Color3.new(0.35, 0.30, 0.24)
+local PRIORITY = 4000 -- above the game's bindings (3000) and level with the life menu's
+local SCROLL_PX_S = 520 -- right stick: pixels a second at full tilt
+local STEP_PX = 120 -- a key press that scrolls
+local ACTION = "WindowsillNotebook"
+local KEYS = {
+	Enum.KeyCode.C, Enum.KeyCode.ButtonY, Enum.KeyCode.N, Enum.KeyCode.Q, Enum.KeyCode.ButtonB, Enum.KeyCode.Backspace,
+	Enum.KeyCode.Return, Enum.KeyCode.KeypadEnter, Enum.KeyCode.Space, Enum.KeyCode.E, Enum.KeyCode.ButtonA,
+	Enum.KeyCode.Up, Enum.KeyCode.Down, Enum.KeyCode.W, Enum.KeyCode.S, Enum.KeyCode.DPadUp, Enum.KeyCode.DPadDown,
+	Enum.KeyCode.Left, Enum.KeyCode.Right, Enum.KeyCode.A, Enum.KeyCode.D, Enum.KeyCode.DPadLeft, Enum.KeyCode.DPadRight,
+	Enum.KeyCode.ButtonL1, Enum.KeyCode.ButtonR1, Enum.KeyCode.PageUp, Enum.KeyCode.PageDown,
+	Enum.KeyCode.Thumbstick1, Enum.KeyCode.Thumbstick2,
+}
+
+local function label(parent: Instance, name: string, order: number): TextLabel
+	local l = Instance.new("TextLabel")
+	l.Name = name
+	l.Text = ""
+	l.BackgroundTransparency = 1
+	l.Font = Enum.Font.Gotham
+	l.TextWrapped = true
+	l.TextXAlignment = Enum.TextXAlignment.Left
+	l.TextYAlignment = Enum.TextYAlignment.Top
+	l.Size = UDim2.new(1, -14, 0, 0)
+	l.AutomaticSize = Enum.AutomaticSize.None
+	l.LayoutOrder = order
+	l.Parent = parent
 	return l
 end
-function Panel.new(parent:Instance,book:any,onClose:()->()):any
-	local gui=Instance.new("ScreenGui");gui.Name="FieldNotebook";gui.ResetOnSpawn=false
-	gui.ScreenInsets=Enum.ScreenInsets.CoreUISafeInsets;gui.DisplayOrder=70;gui.Enabled=false;gui.Parent=parent
-	local paper=Instance.new("Frame");paper.Name="Paper";paper.BackgroundColor3=Color3.fromRGB(239,234,213)
-	paper.AnchorPoint=Vector2.new(.5,.5);paper.Position=UDim2.fromScale(.5,.5);paper.Size=UDim2.fromScale(.94,.96);paper.Active=true;paper.Parent=gui
-	local limit=Instance.new("UISizeConstraint");limit.MaxSize=Vector2.new(920,10000);limit.Parent=paper
-	local heading=text(paper,"Heading",22,0);heading.Text="FIELD NOTEBOOK";heading.Position=UDim2.fromOffset(16,8)
-	local body=Instance.new("ScrollingFrame");body.Name="Reading";body.Position=UDim2.fromOffset(0,42)
-	body.Size=UDim2.new(1,0,1,-150);body.CanvasSize=UDim2.new();body.AutomaticCanvasSize=Enum.AutomaticSize.Y
-	body.BackgroundTransparency=1;body.BorderSizePixel=0;body.ScrollBarThickness=8;body.ScrollingDirection=Enum.ScrollingDirection.Y;body.Parent=paper
-	local layout=Instance.new("UIListLayout");layout.SortOrder=Enum.SortOrder.LayoutOrder
-	layout.HorizontalAlignment=Enum.HorizontalAlignment.Center;layout.Padding=UDim.new(0,14);layout.Parent=body
-	local art=Instance.new("Frame");art.Name="Illustration";art.Size=UDim2.new(1,-32,0,96);art.BackgroundTransparency=1;art.LayoutOrder=1;art.Parent=body
-	local self:any=setmetatable({gui=gui,paper=paper,body=body,art=art,book=book,onClose=onClose,showing=false,index=1,
-		title=text(body,"Title",26,2),fact=text(body,"Fact",21,3),gameText=text(body,"InThisGame",19,4),sources=text(body,"Sources",16,5),
-		hint=text(paper,"Hint",14,0),buttons={},scrollAxis=0,shown=""},Panel)
-	self.hint.Position=UDim2.new(0,16,1,-103);self.hint.Size=UDim2.new(1,-32,0,46);self.hint.AutomaticSize=Enum.AutomaticSize.None
-	local specs: {{name:string,run:()->()}} = {{name="Previous",run=function() self:turn(-1) end},{name="Next",run=function() self:turn(1) end},{name="Back",run=function() self:close() end}}
-	for i,spec in specs do
-		local b=Instance.new("TextButton");b.Name=spec.name;b.Text=spec.name;b.Font=Enum.Font.GothamMedium;b.TextSize=19
-		b.BackgroundColor3=Color3.fromRGB(44,57,54);b.TextColor3=Color3.new(1,1,1);b.TextWrapped=true;b.Selectable=false
-		b.Position=UDim2.new((i-1)/3,6,1,-52);b.Size=UDim2.new(1/3,-12,0,46);b.Parent=paper
-		b.Activated:Connect(spec.run);self.buttons[i]=b
-	end
-	body:GetPropertyChangedSignal("AbsoluteWindowSize"):Connect(function() self:fitReading() end)
+
+local function scroller(parent: Instance, name: string, padding: number): ScrollingFrame
+	local f = Instance.new("ScrollingFrame")
+	f.Name = name
+	f.BackgroundTransparency = 1
+	f.BorderSizePixel = 0
+	f.ScrollBarThickness = 6
+	f.CanvasSize = UDim2.new()
+	f.CanvasPosition=Vector2.zero
+	f.AutomaticCanvasSize = Enum.AutomaticSize.Y
+	f.ScrollingDirection = Enum.ScrollingDirection.Y
+	local list = Instance.new("UIListLayout")
+	list.SortOrder = Enum.SortOrder.LayoutOrder
+	list.Padding = UDim.new(0, padding)
+	list.Parent = f
+	f.Parent = parent
+	return f
+end
+
+local function button(parent: Instance, name: string, text: string): TextButton
+	local b = Instance.new("TextButton")
+	b.Name = name
+	b.Text = text
+	b.Font = Enum.Font.GothamMedium
+	b.TextColor3 = INK
+	b.BackgroundColor3 = PAPER_DARK
+	b.AutoButtonColor = true
+	b.Selectable = false
+	b.Parent = parent
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, 6)
+	corner.Parent = b
+	return b
+end
+
+-- `book` is the FieldNotebook; `onClose(returnTo)` is called when the panel closes, with what open() was given.
+function NotebookPanel.new(playerGui: Instance, book: any, onClose: (string?) -> ()): any
+	local gui = Instance.new("ScreenGui")
+	gui.Name = "SpiderNotebook"
+	gui.ResetOnSpawn = false
+	gui.ScreenInsets = Enum.ScreenInsets.CoreUISafeInsets
+	gui.DisplayOrder = 55
+	gui.Enabled = false
+	gui.Parent = playerGui
+	local dim = Instance.new("Frame")
+	dim.Name = "Dim"
+	dim.Size = UDim2.fromScale(1, 1)
+	dim.BackgroundColor3 = Color3.new(0.02, 0.02, 0.03)
+	dim.BackgroundTransparency = 0.35
+	dim.BorderSizePixel = 0
+	dim.Active = true
+	dim.Parent = gui
+	local paper = Instance.new("Frame")
+	paper.Name = "Paper"
+	paper.AnchorPoint = Vector2.new(0.5, 0.5)
+	paper.Position = UDim2.fromScale(0.5, 0.5)
+	paper.Size = UDim2.fromScale(0.97, 0.95)
+	paper.BackgroundColor3 = PAPER
+	paper.BorderSizePixel = 0
+	paper.Parent = dim
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, 8)
+	corner.Parent = paper
+	local stroke = Instance.new("UIStroke")
+	stroke.Color = BORDER
+	stroke.Thickness = 2
+	stroke.Parent = paper
+	local limit = Instance.new("UISizeConstraint")
+	limit.MaxSize = Vector2.new(1040, 820)
+	limit.Parent = paper
+	local inner = Instance.new("Frame")
+	inner.Name = "Inner"
+	inner.BackgroundTransparency = 1
+	inner.Position = UDim2.fromOffset(14, 10)
+	inner.Size = UDim2.new(1, -28, 1, -20)
+	inner.Parent = paper
+	local heading = Instance.new("TextLabel")
+	heading.Name = "Heading"
+	heading.BackgroundTransparency = 1
+	heading.Font = Enum.Font.GothamBold
+	heading.TextColor3 = INK
+	heading.TextXAlignment = Enum.TextXAlignment.Left
+	heading.Text = NotebookText.HEADING
+	heading.Parent = inner
+	local body = Instance.new("Frame")
+	body.Name = "Body"
+	body.BackgroundTransparency = 1
+	body.Parent = inner
+	local list = scroller(body, "Pages", 6)
+	local page = scroller(body, "Page", 12)
+	local title = label(page, "Title", 1)
+	title.Font = Enum.Font.GothamBold
+	title.TextColor3 = INK
+	local text = label(page, "Text", 2)
+	text.TextColor3 = BODY
+	local game = label(page, "InThisGame", 3)
+	game.TextColor3 = GREEN
+	local sources = label(page, "Sources", 4)
+	sources.TextColor3 = FAINT
+	local empty = label(page, "Empty", 5)
+	empty.TextColor3 = FAINT
+	empty.Text = NotebookText.EMPTY
+	local footer = Instance.new("Frame")
+	footer.Name = "Footer"
+	footer.BackgroundTransparency = 1
+	footer.AnchorPoint = Vector2.new(0, 1)
+	footer.Parent = inner
+	local controls = Instance.new("TextLabel")
+	controls.Name = "Controls"
+	controls.BackgroundTransparency = 1
+	controls.Font = Enum.Font.Gotham
+	controls.TextColor3 = FAINT
+	controls.TextWrapped = true
+	controls.TextXAlignment = Enum.TextXAlignment.Left
+	controls.TextYAlignment = Enum.TextYAlignment.Top
+	controls.TextTruncate = Enum.TextTruncate.AtEnd -- two lines; tests/studio/NotebookSpec.luau checks the words fit them
+	controls.Parent = inner
+	local close = button(footer, "Close", NotebookText.CLOSE)
+	local back = button(footer, "Back", NotebookText.PAGES)
+	local tries = button(footer,"Try","To try")
+	back.Visible = false
+	local self = setmetatable({
+		gui = gui, paper = paper, heading = heading, body = body, list = list, page = page, title = title, text = text, game = game,
+		sources = sources, empty = empty, footer = footer, controls = controls, closeButton = close, backButton = back, tryButton = tries,
+		book = book, onClose = onClose,
+		showing = false, bound = false, returnTo = nil :: string?, device = "keyboard" :: ControlText.Device, scale = 1.0,
+		view = "list", shown = "", buttons = {} :: { TextButton }, ids = {} :: { string },
+		stickDown = false, scrollAxis = 0.0,
+	}, NotebookPanel)
+	tries.Activated:Connect(function() self:showChecklist() end)
+	close.Activated:Connect(function() self:close() end)
+	back.Activated:Connect(function() self:back() end)
+	gui:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() self:layout() end)
+	page:GetPropertyChangedSignal("AbsoluteSize"):Connect(function() self:fitText() end)
 	return self
 end
-function Panel.fitReading(self:any)
-	-- A short landscape screen needs its first lines of text more than the sketch.
-	self.art.Visible=self.body.AbsoluteWindowSize.Y>=180
+
+function NotebookPanel.isShowing(self: any): boolean
+	return self.showing
 end
-function Panel.isShowing(self:any):boolean return self.showing end
-function Panel.render(self:any)
-	local id=self.book.opened[self.index]
-	local p=if id then self.book:page(id) else nil
-	self.shown=id or ""
-	self.title.Text=if p then p.title else "A notebook for your discoveries"
-	self.fact.Text=if p then p.text else "Explore the sill. As things happen, you can read about their real biology here."
-	self.gameText.Text=if p and p.game~="" then "In this game\n"..p.game else ""
-	self.sources.Text=if p then "Sources\n"..table.concat(p.sources,"\n\n") else ""
-	self.body.CanvasPosition=Vector2.zero
-	Art.draw(self.art,id or "")
+
+-- Whether one pane shows at a time (a small screen, or large text).
+function NotebookPanel.stacked(self: any): boolean
+	local w, h = self:_screen()
+	return not NotebookText.layout(w, h, self.scale).sideBySide
 end
-function Panel.turn(self:any,delta:number)
-	if #self.book.opened==0 then return end
-	self.index=(self.index-1+delta)%#self.book.opened+1;self:render()
+
+-- The safe area's size (before the first layout the engine says 0 by 0: a laptop screen's then, and the size signal lays it out again).
+function NotebookPanel._screen(self: any): (number, number)
+	local size = self.gui.AbsoluteSize
+	return if size.X > 0 then size.X else 1280, if size.Y > 0 then size.Y else 720
 end
-function Panel.scroll(self:any,delta:number)
-	local maximum=math.max(0,self.body.AbsoluteCanvasSize.Y-self.body.AbsoluteWindowSize.Y)
-	self.body.CanvasPosition=Vector2.new(0,math.clamp(self.body.CanvasPosition.Y+delta,0,maximum))
+
+-- Sizes, positions and which pane shows, for the screen's size, the text scale and the view.
+function NotebookPanel.layout(self: any)
+	local s: number = self.scale
+	local sizes = NotebookText.SIZES
+	local w, h = self:_screen()
+	local m = NotebookText.metrics(w, h, s)
+	local lay = NotebookText.layout(w, h, s)
+	self.heading.Size = UDim2.new(1, 0, 0, m.head)
+	self.heading.TextSize = math.round(sizes.heading * s)
+	self.body.Position = UDim2.fromOffset(0, m.head + 4)
+	self.body.Size = UDim2.new(1, 0, 0, m.body)
+	self.controls.Visible = m.hint > 0
+	self.controls.Position = UDim2.fromOffset(0, m.head + 4 + m.body + 4)
+	self.controls.Size = UDim2.new(1, 0, 0, m.hint)
+	self.controls.TextSize = math.round(sizes.controls * s)
+	self.controls.Text = NotebookText.controls(self.device, not lay.sideBySide)
+	self.footer.Position = UDim2.fromScale(0, 1)
+	self.footer.Size = UDim2.new(1, 0, 0, m.foot)
+	local buttonW = math.floor(math.min(112 * s,(m.paperW-28-16)/3))
+	local buttonText = math.min(math.round(sizes.button*s),math.floor(buttonW/3.7))
+	self.tryButton.Size=UDim2.new(0,buttonW,1,-8)
+	self.tryButton.Position=UDim2.fromOffset(0,4)
+	self.tryButton.TextSize=if self.device=="gamepad" then math.min(buttonText,math.floor(buttonW/6.5)) else buttonText
+	self.tryButton.Text=if self.device=="gamepad" then (if ControlText.padStyle()=="playstation" then "Triangle" else "Y")..": To try" else "To try"
+	local backShown = not lay.sideBySide and self.view == "page"
+	self.closeButton.Size = UDim2.new(0, buttonW, 1, -8)
+	self.closeButton.Position = UDim2.new(1, -buttonW, 0, 4)
+	self.closeButton.TextSize = buttonText
+	self.backButton.Visible = backShown
+	self.backButton.Size = UDim2.new(0, buttonW, 1, -8)
+	self.backButton.Position = UDim2.new(1, -(buttonW * 2 + 8), 0, 4)
+	self.backButton.TextSize = buttonText
+	if lay.sideBySide then
+		self.list.Position, self.list.Size = UDim2.fromOffset(0, 0), UDim2.new(lay.listFraction, -8, 1, 0)
+		self.page.Position, self.page.Size = UDim2.new(lay.listFraction, 8, 0, 0), UDim2.new(1 - lay.listFraction, -8, 1, 0)
+		self.list.Visible, self.page.Visible = true, true
+	else
+		self.list.Position, self.list.Size = UDim2.fromOffset(0, 0), UDim2.fromScale(1, 1)
+		self.page.Position, self.page.Size = UDim2.fromOffset(0, 0), UDim2.fromScale(1, 1)
+		self.list.Visible, self.page.Visible = self.view == "list", self.view == "page"
+	end
+	self.title.TextSize = math.round(sizes.title * s)
+	self.text.TextSize = math.round(sizes.body * s)
+	self.game.TextSize = math.round(sizes.game * s)
+	self.sources.TextSize = math.round(sizes.sources * s)
+	self.empty.TextSize = math.round(sizes.body * s)
+	for _, b in self.buttons do
+		b.TextSize = math.round(sizes.button * s)
+		b.Size = UDim2.new(1, -10, 0, math.floor(NotebookText.MIN_TARGET * s)) -- at least this tall (a touch target); a long title makes it taller
+	end
+	self:fitText()
 end
-function Panel.show(self:any,large:boolean,device:string,padStyle:string?)
-	self.showing=true;self.gui.Enabled=true;self.index=math.max(1,#self.book.opened);self.scrollAxis=0
-	local scale=if large then 1.5 else 1
-	self.title.TextSize=math.round(26*scale);self.fact.TextSize=math.round(21*scale);self.gameText.TextSize=math.round(19*scale);self.sources.TextSize=math.round(16*scale)
-	self.hint.Text=if device=="gamepad" then (if padStyle=="playstation" then "L1 / R1: page   D-pad / right stick: scroll   Circle: back" else "LB / RB: page   D-pad / right stick: scroll   B: back")
-		elseif device=="touch" then "Swipe to read. Only your discoveries are shown. Kept for this session."
-		else "Left / right: page   Up / down: scroll   N or Q: back. Session only."
-	self:render()
-	self:fitReading()
-	UIS.MouseBehavior=Enum.MouseBehavior.Default;UIS.MouseIconEnabled=true
-	-- This reader owns directional input. A selected GuiObject makes Roblox consume
-	-- arrows/D-pad for button navigation before our reading action receives them.
-	GuiService.SelectedObject=nil
-	CAS:BindActionAtPriority("WindowsillNotebook",function(_,state,input)
-		if GuiService.MenuIsOpen then self.scrollAxis=0;return Enum.ContextActionResult.Pass end
-		local k=input.KeyCode
-		if k==Enum.KeyCode.Thumbstick2 or k==Enum.KeyCode.Thumbstick1 then
-			self.scrollAxis=if state==Enum.UserInputState.Cancel then 0 else input.Position.Y
-		elseif state==Enum.UserInputState.Begin then
-			if k==Enum.KeyCode.Left or k==Enum.KeyCode.DPadLeft or k==Enum.KeyCode.ButtonL1 then self:turn(-1)
-			elseif k==Enum.KeyCode.Right or k==Enum.KeyCode.DPadRight or k==Enum.KeyCode.ButtonR1 then self:turn(1)
-			elseif k==Enum.KeyCode.Up or k==Enum.KeyCode.DPadUp then self:scroll(-120)
-			elseif k==Enum.KeyCode.Down or k==Enum.KeyCode.DPadDown then self:scroll(120)
-			else self:close() end
+
+-- The list of found pages, in the order they were found.
+function NotebookPanel._rebuildList(self: any)
+	for _, b in self.buttons do b:Destroy() end
+	self.buttons, self.ids = {}, {}
+	for i, entry in self.book:list() do
+		local b = button(self.list, "Page_" .. entry.id, entry.title)
+		b.LayoutOrder = i
+		b.Selectable = false
+		b.TextXAlignment = Enum.TextXAlignment.Left
+		b.TextWrapped = true
+		b.AutomaticSize = Enum.AutomaticSize.Y
+		local pad = Instance.new("UIPadding")
+		pad.PaddingLeft, pad.PaddingRight = UDim.new(0, 10), UDim.new(0, 6)
+		pad.PaddingTop, pad.PaddingBottom = UDim.new(0, 8), UDim.new(0, 8)
+		pad.Parent = b
+		local id = entry.id
+		b.Activated:Connect(function() self:choose(id) end)
+		table.insert(self.buttons, b)
+		table.insert(self.ids, id)
+	end
+end
+
+-- Shows one found page on the right (nothing about a page that is not found: view() gives nil for it).
+function NotebookPanel.showPage(self: any, id: string)
+	if id=="_checklist" then self:showChecklist();return end
+	local p = if id ~= "" then self.book:view(id) else nil
+	self.shown = if p then id else ""
+	self.empty.Visible = p == nil
+	self.title.Visible, self.text.Visible, self.sources.Visible = p ~= nil, p ~= nil, p ~= nil
+	local gameLine = if p then NotebookText.gameLine(p.game, self.device) else nil
+	self.game.Visible = gameLine ~= nil
+	if p then
+		self.title.Text, self.text.Text = p.title, p.text
+		self.game.Text = gameLine or ""
+		self.sources.Text = NotebookText.sourcesText(p.sources)
+	end
+	self:fitText()
+	self.page.CanvasPosition = Vector2.zero
+	for i, b in self.buttons do
+		local on = self.ids[i] == self.shown
+		b.BackgroundColor3 = if on then PAPER_LIT else PAPER_DARK
+	end
+	self:_select()
+end
+
+-- A controller shows what it has chosen: the list's selection follows the chosen page while the list is up.
+function NotebookPanel._select(self: any)
+	local at = table.find(self.ids, self.shown)
+	local target: GuiObject? = nil -- native selection consumes D-pad before the reading action
+	if at and self.list.Visible then
+		local b = self.buttons[at]
+		local y = b.AbsolutePosition.Y - self.list.AbsolutePosition.Y + self.list.CanvasPosition.Y
+		local top = self.list.CanvasPosition.Y
+		if y < top then top = y elseif y + b.AbsoluteSize.Y > top + self.list.AbsoluteSize.Y then top = y + b.AbsoluteSize.Y - self.list.AbsoluteSize.Y end
+		self.list.CanvasPosition = Vector2.new(0,math.max(0,top))
+	end
+	pcall(function() GuiService.SelectedObject = target end)
+end
+
+-- Opens the notebook at its newest page. `returnTo` comes back to onClose; `device` names the controls; `scale` is the text scale.
+function NotebookPanel.open(self: any, returnTo: string?, device: ControlText.Device, scale: number)
+	self.returnTo, self.device, self.scale = returnTo, device, math.clamp(scale, 1, NotebookText.LARGE)
+	self.showing = true
+	self.stickDown, self.scrollAxis = false, 0
+	self.gui.Enabled = true
+	self:_rebuildList()
+	self.view = "page"
+	self:layout()
+	self:showPage(self.book:newest() or "")
+	if #self.ids > 0 and not self:stacked() then self.view = "list" end
+	self:layout()
+	self:_select()
+	if not self.bound then
+		self.bound = true
+		CAS:BindActionAtPriority(ACTION, function(_, state, input)
+			if GuiService.MenuIsOpen then self.scrollAxis=0;return Enum.ContextActionResult.Pass end
+			self:_input(state, input)
+			return Enum.ContextActionResult.Sink
+		end, false, PRIORITY, table.unpack(KEYS))
+	end
+	pcall(function() UIS.MouseBehavior = Enum.MouseBehavior.Default; UIS.MouseIconEnabled = true end)
+end
+
+-- A page opened while the book is open (the list grows; the page on show stays).
+function NotebookPanel.refresh(self: any)
+	if not self.showing then return end
+	local keep = self.shown
+	self:_rebuildList()
+	self:layout()
+	self:showPage(keep)
+end
+
+function NotebookPanel.close(self: any)
+	if not self.showing then return end
+	self.showing = false
+	self.gui.Enabled = false
+	if self.bound then
+		self.bound = false
+		CAS:UnbindAction(ACTION)
+	end
+	pcall(function() GuiService.SelectedObject = nil end)
+	local to = self.returnTo
+	self.returnTo = nil
+	self.onClose(to)
+end
+
+-- Chooses a page: it shows on the right; with one pane it takes the whole panel.
+function NotebookPanel.choose(self: any, id: string)
+	self:showPage(id)
+	if self:stacked() then self.view = "page" end
+	self:layout()
+	self:_select()
+end
+
+-- Back from a page to the list when one pane shows; otherwise close.
+function NotebookPanel.back(self: any)
+	if self:stacked() and self.view == "page" then
+		self.view = "list"
+		self:layout()
+		self:showPage(self.shown)
+	else
+		self:close()
+	end
+end
+
+-- Moves the chosen page by `delta` in the list (wraps neither way).
+function NotebookPanel.step(self: any, delta: number)
+	local n = #self.ids
+	if n == 0 then return end
+	local at = table.find(self.ids, self.shown) or 1
+	local to = math.clamp(at + delta, 1, n)
+	self:showPage(self.ids[to])
+end
+
+function NotebookPanel.scrollBy(self: any, pixels: number)
+	local p: ScrollingFrame = self.page
+	local max = math.max(p.AbsoluteCanvasSize.Y - p.AbsoluteSize.Y, 0)
+	p.CanvasPosition = Vector2.new(0, math.clamp(p.CanvasPosition.Y + pixels, 0, math.max(max, 0)))
+end
+
+-- One input the Context Action got.
+function NotebookPanel._input(self: any, state: Enum.UserInputState, input: InputObject?)
+	local k = if input then input.KeyCode else nil
+	if k == Enum.KeyCode.Thumbstick2 then
+		local y = if input and state ~= Enum.UserInputState.Cancel then input.Position.Y else 0
+		self.scrollAxis = if math.abs(y) < 0.25 then 0 else -y -- stick up scrolls up the page
+		return
+	end
+	if k == Enum.KeyCode.Thumbstick1 then
+		local y = if input and state ~= Enum.UserInputState.Cancel then input.Position.Y else 0
+		if math.abs(y) < 0.3 then
+			self.stickDown = false
+		elseif math.abs(y) > 0.6 and not self.stickDown then
+			self.stickDown = true
+			self:_vertical(if y > 0 then -1 else 1)
 		end
-		return Enum.ContextActionResult.Sink
-	end,false,5000,Enum.KeyCode.N,Enum.KeyCode.Q,Enum.KeyCode.M,Enum.KeyCode.ButtonB,Enum.KeyCode.ButtonSelect,
-		Enum.KeyCode.Left,Enum.KeyCode.Right,Enum.KeyCode.Up,Enum.KeyCode.Down,Enum.KeyCode.DPadLeft,Enum.KeyCode.DPadRight,
-		Enum.KeyCode.DPadUp,Enum.KeyCode.DPadDown,Enum.KeyCode.ButtonL1,Enum.KeyCode.ButtonR1,Enum.KeyCode.Thumbstick1,Enum.KeyCode.Thumbstick2)
+		return
+	end
+	if state ~= Enum.UserInputState.Begin then return end
+	if k==Enum.KeyCode.C or k==Enum.KeyCode.ButtonY then
+		self:showChecklist()
+	elseif k == Enum.KeyCode.N then
+		self:close()
+	elseif k == Enum.KeyCode.Q or k == Enum.KeyCode.ButtonB or k == Enum.KeyCode.Backspace then
+		self:back()
+	elseif k == Enum.KeyCode.Up or k == Enum.KeyCode.W or k == Enum.KeyCode.DPadUp then
+		self:_vertical(-1)
+	elseif k == Enum.KeyCode.Down or k == Enum.KeyCode.S or k == Enum.KeyCode.DPadDown then
+		self:_vertical(1)
+	elseif k == Enum.KeyCode.Left or k == Enum.KeyCode.A or k == Enum.KeyCode.DPadLeft or k == Enum.KeyCode.ButtonL1 then
+		self:step(-1)
+	elseif k == Enum.KeyCode.Right or k == Enum.KeyCode.D or k == Enum.KeyCode.DPadRight or k == Enum.KeyCode.ButtonR1 then
+		self:step(1)
+	elseif k == Enum.KeyCode.PageUp then
+		self:scrollBy(-self.page.AbsoluteSize.Y * 0.8)
+	elseif k == Enum.KeyCode.PageDown then
+		self:scrollBy(self.page.AbsoluteSize.Y * 0.8)
+	else -- Return, Space, E, A: open the chosen page (one pane), or nothing to do (two panes)
+		if self:stacked() and self.view == "list" and self.shown ~= "" then self:choose(self.shown) end
+	end
 end
-function Panel.update(self:any,dt:number)
-	if self.showing and not GuiService.MenuIsOpen and math.abs(self.scrollAxis)>.2 then self:scroll(-self.scrollAxis*480*math.min(dt,.1)) end
+
+-- Up and Down: choose a page in the list, or scroll the page when it has the whole panel.
+function NotebookPanel._vertical(self: any, dir: number)
+	if self.shown=="_checklist" or (self:stacked() and self.view == "page") then
+		self:scrollBy(dir * STEP_PX)
+	else
+		self:step(dir)
+	end
 end
-function Panel.hide(self:any)
-	self.showing=false;self.gui.Enabled=false;self.scrollAxis=0
-	CAS:UnbindAction("WindowsillNotebook");GuiService.SelectedObject=nil
+
+-- Each rendered frame while open: the right stick scrolls the page.
+function NotebookPanel.update(self: any, dt: number)
+	if self.showing and not GuiService.MenuIsOpen and self.scrollAxis ~= 0 then
+		self:scrollBy(self.scrollAxis * SCROLL_PX_S * math.min(dt, 0.1))
+	end
 end
-function Panel.close(self:any) self:hide();self.onClose() end
-return Panel
+
+-- The controls change with the device in use (a controller picked up while the book is open).
+function NotebookPanel.setDevice(self: any, device: ControlText.Device)
+	if device == self.device then return end
+	self.device = device
+	if self.showing then
+		self:layout()
+		self:showPage(self.shown)
+	end
+end
+
+-- Explicit full-text heights avoid AutomaticSize clipping long labels to the viewport on resize.
+function NotebookPanel.fitText(self:any)
+ local width=self.page.AbsoluteSize.X
+ if width<=0 then
+  local w,h=self:_screen();local lay=NotebookText.layout(w,h,self.scale)
+  width=(NotebookText.metrics(w,h,self.scale).paperW-28)*(if lay.sideBySide then 1-lay.listFraction else 1)-(if lay.sideBySide then 8 else 0)
+ end
+ for _,l in {self.title,self.text,self.game,self.sources,self.empty} do
+  local measured=TextService:GetTextSize(l.Text,l.TextSize,l.Font,Vector2.new(math.max(1,width-14),100000))
+  l.Size=UDim2.new(1,-14,0,math.ceil(measured.Y)+4)
+ end
+end
+function NotebookPanel.showChecklist(self:any)
+ self.shown="_checklist";self.view="page"
+ self.empty.Visible=false;self.title.Visible=true;self.text.Visible=true;self.game.Visible=true;self.sources.Visible=false
+ self.title.Text="Things to try"
+ self.text.Text=NotebookText.checklist(self.book)
+ self.game.Text="Choose whatever interests you. Checked things happened during this play session; nothing here is required. The page list contains what you have discovered."
+ self.page.CanvasPosition=Vector2.zero
+ self:layout();self:_select()
+ for _,b in self.buttons do b.BackgroundColor3=PAPER_DARK end
+end
+return NotebookPanel

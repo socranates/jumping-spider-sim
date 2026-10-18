@@ -1,0 +1,7 @@
+{
+  "native_test_evidence": "f47e5d0b3aebd3ae",
+  "normal_build_sha256": "2923c6d274564a7906b6011ac52a0ff4ff777be0606d672884d23321f9fb65c7",
+  "normal_build_unchanged": true,
+  "change": "Only notebook.luau expectation updated to match short-screen hiding of long hints; runtime bytes unchanged.",
+  "historical_only": "f47e5d0b3aebd3ae -> aa2b800588fbcbfb, superseded by a58f99f547d6ad8b for full text height correction"
+}

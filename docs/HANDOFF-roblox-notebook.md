@@ -1,20 +1,25 @@
-# Field notebook — Chet, 2026-10-17
+# Notebook integration and public-release preparation — 2026-10-17
 
-Nathan approved the next chunk after the peacock polish. Roblox remains active; Godot and SPEC remain frozen. Check `verification/roblox-notebook/RESULTS.md` for the final accepted evidence and published version.
+Claude completed `claude/roblox-notebook` at 657ce9d from 31e32b9 while Chet independently built the notebook at 77ca385. Both are reconciled into this round. Consult `verification/roblox-notebook/merged/RESULTS.md` for final checks and publication. The earlier results describe the superseded reader, not the combined build.
 
-## This round
+**Published v18**, confirmed in Studio and Creator Dashboard. Evidence **3525b7b58f9afc70**: engine **98/98**, live client **23/23**, CLI **46,152**, strict clean and **142/142** compile. Physical PlayStation/tablet acceptance is pending Nathan's playtest.
 
-- `Shared/Learning/FieldNotebook` ports discovery order, deduplication, long-jump and eye-time thresholds from Godot. `tools/export_notebook_reference.gd` executes the actual frozen notebook for 35 golden transitions. Player notes are outside world checkpoints and survive rest recovery, mode switches and unrelated new lives in this session.
-- `NotebookWatch` observes life/wasp events and changes in actual capture, food-taken and energy counters. Rebase on checkpoint/new-life restoration prevents imported history from pretending to be a new event. Fly recognition uses the perception signal; jump pages use committed JumpInput feedback, never an aim preview. Eye time counts fixed simulation ticks only while playing. The peacock page requires a successful dance start.
-- N or Menu > Field notebook opens a cream-paper, scrollable reading view with small vector spider sketches. Only discovered pages appear, in discovery order; it opens at the newest. No hidden-page count, checklist, reward or effect on the spider's senses. Close returns to whichever pause owner opened it. Large text, touch swiping, controller shoulders/left-right pages, D-pad/right-stick scrolling and B/Circle back are supported. The D-pad still walks outside the notebook.
-- Facts, game simplifications and complete source citations are separate. `tools/notebook_pages.py` imports the frozen facts/citations and adapts obsolete game/control descriptions; it adds a sourced peacock courtship entry. Sources are readable citation text, with URLs retained where supplied, not an external browser-launch UI. No typed text or filtering surface was added.
-- 25 authored pages, **23 currently reachable**. The inherited `felt` and `buzz` triggers stay dormant until a real surface-vibration/observed-buzz event exists in the Roblox port. Do not unlock those from a wasp footstep at any distance or simply from a Sound object's existence. Other pages are driven by actual play. Discovery notices can be disabled from the life menu.
+## What ships
 
-Notes, unlocks and checkpoints are still **session-only**. No DataStore or monetization was introduced. The peacock stays free, the closer camera/quieter ambience and twitch/dance stay.
+- Claude's validated page model, real-event watcher, responsive found-page list and reader, separate HUD discovery notices, keyboard N, touch Notebook button, controller menu entry, end-screen entry, and layout checks.
+- Chet's peacock dance entry (25 pages total), real Godot-exported 35 transitions, finite-number rejection, integer font sizes, native input ownership fix, measured full-text heights on resize, optional notices, and retention/pause regressions.
+- Nathan's requested optional checklist: **To try** in the notebook; C or Y/Triangle inside the book. Twelve low-pressure invitations get checked by actual discoveries. No hidden biology unlocked by viewing it, and no task to starve or get caught.
+- 24 reachable pages; only the surface-vibration page remains unwired. A nearby fly takeoff now counts as the audible event. Model and checklist survive rest recovery and new lives this session only.
+- `gen_notebook_pages.py` is the data generator. `notebook_reference.*` is frozen content; `notebook_godot.*` is the executed Godot model's 35 transitions. Never regenerate expected decisions from the Roblox implementation.
+- The adopted reader uses a text/list layout. The earlier Chet sketches are not displayed in this merged reader. No new graphics, physics, purchases, or audience settings.
 
-## Next chunk: persistent player and world records
+## What Nathan should test on PlayStation
 
-Start with the ownership design and pure tests, then an isolated Studio/Roblox test environment before any production writes.
+Rejoin to get the published version. Touchpad opens the life menu; choose Notebook. Triangle opens To try. D-pad/left stick navigates the page list; Cross opens on compact layouts; right stick scrolls, L1/R1 changes pages, Circle returns/closes. Confirm that movement is paused while reading and that closing a book opened from the end screen returns there. Try a meal, rest, moult and peacock dance, and check the corresponding invitations.
+
+## Next chunk for Claude or Chet: persistence first
+
+Start from updated main. Read `PUBLIC_RELEASE.md`. The current world simulation runs on the client. Do not expose an arbitrary client checkpoint upload and call it authoritative. Plan a trust boundary before a server save implementation.
 
 1. Version a player record containing notebook IDs/eye time, cosmetic choice, accessibility preferences and main-life completion; keep it separate from the last-rest world record and the Free-play rest. Define bounded fields, migrations, unknown-ID handling and newer-schema preservation. Do not add typed spider names yet.
 2. Establish a server-owned source of truth before saving world state. The current simulation and discovery watcher are client-side. A RemoteEvent accepting an arbitrary client checkpoint is not an authority boundary. Plan a server copy of the necessary life/action state, or explicitly defer durable world recovery until that copy exists. Do not claim secure persistence from shape validation alone.

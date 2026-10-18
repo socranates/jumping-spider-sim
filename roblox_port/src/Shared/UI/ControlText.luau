@@ -55,16 +55,16 @@ local NAMES: { [string]: { [string]: string } } = {
 	keyboard = {
 		feed = "E", jump = "Space", cancel = "Q", letGo = "Q", drop = "F", reel = "W", lower = "S", walk = "WASD", look = "Mouse",
 		creep = "Shift", focus = "Right mouse", eye = "V", recenter = "R", slow = "T", reset = "Backspace", help = "H", zoom = "Wheel",
-		choose = "C", display = "X",
+		choose = "C", display = "X", menu = "M", notebook = "N",
 	},
 	gamepad = {
 		feed = "Left-stick click", jump = "A", cancel = "B", letGo = "B", drop = "X", reel = "Stick up", lower = "Stick down", walk = "Left stick",
 		look = "Right stick", creep = "LB", focus = "LT", eye = "Y", recenter = "Right-stick click", slow = "RT", reset = "View",
-		help = "", zoom = "", choose = "RB", display = "RB",
+		help = "", zoom = "", choose = "RB", display = "RB", menu = "View", notebook = "View",
 	},
 	touch = {
 		feed = "Eat", jump = "Jump", cancel = "Cancel", letGo = "Let go", drop = "Silk", reel = "↑", lower = "↓", walk = "Arrows",
-		look = "Drag", creep = "Creep", focus = "Focus", eye = "Eye", recenter = "Recenter", slow = "", reset = "", help = "", zoom = "", choose = "Change", display = "Dance",
+		look = "Drag", creep = "Creep", focus = "Focus", eye = "Eye", recenter = "Recenter", slow = "", reset = "", help = "", zoom = "", choose = "Change", display = "Dance", menu = "Menu", notebook = "Notebook",
 	},
 }
 
@@ -73,7 +73,7 @@ local NAMES: { [string]: { [string]: string } } = {
 -- here (sticks) are the same on both.
 local PLAYSTATION: { [string]: string } = {
 	feed = "L3", jump = "Cross", cancel = "Circle", letGo = "Circle", drop = "Square", creep = "L1", focus = "L2", eye = "Triangle",
-	recenter = "R3", slow = "R2", reset = "Touchpad", choose = "R1", display = "R1",
+	recenter = "R3", slow = "R2", reset = "Touchpad", choose = "R1", display = "R1", menu = "Touchpad", notebook = "Touchpad",
 }
 local padStyle = "xbox"
 

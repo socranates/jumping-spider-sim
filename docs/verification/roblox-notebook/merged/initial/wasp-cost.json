@@ -1,0 +1,9 @@
+{
+  "evidence_id": "b14d040bc22d17ef",
+  "frame_p50_ms": 22.05779403448105,
+  "source": "live wasp visit; no screenshots during timing",
+  "phase": "searching",
+  "samples": 360,
+  "audio_loaded": true,
+  "frame_p95_ms": 29.05089408159256
+}

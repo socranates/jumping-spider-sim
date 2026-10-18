@@ -209,7 +209,11 @@ return function(driver: any)
   local root=workspace:FindFirstChild("WindowsillAudio")
   local hum=root and root:FindFirstChild("wasp",true)
   assert(hum and hum:IsA("Sound"),"wasp sound missing")
-  assert(hum.Playing,"arrival hum not playing")
+  -- The sound is updated by BindToRenderStep; one Heartbeat can run before it.
+  -- Give that real callback a bounded chance, still well inside the 8-second warning.
+  local onset=os.clock()+1
+  while not hum.Playing and os.clock()<onset do RunService.Heartbeat:Wait() end
+  assert(hum.Playing,"arrival hum not playing within one second")
   local deadline=os.clock()+20
   repeat RunService.Heartbeat:Wait() until hum.IsLoaded or os.clock()>deadline
   assert(hum.IsLoaded and hum.TimeLength>0,"wasp recording not loaded: permissions/moderation/network")
@@ -320,6 +324,25 @@ return function(driver: any)
   assert(driver.needs.gentle and driver.life.growth.stage==0,"Easy not a new gentle life")
   assert(driver.fresh("main",false,nil))
  end)
+ check("NOTEBOOK: opens in the real client, the world waits, only found pages show, text fits, and it closes",function()
+  local gui=game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+  driver.notebook:notice("jump")
+  local elapsed=driver.life.elapsed
+  driver.openNotebook("game");wait(.3)
+  local sg=gui:FindFirstChild("SpiderNotebook")
+  assert(sg and sg:IsA("ScreenGui") and sg.Enabled,"notebook not shown")
+  assert(driver.notebookPanel:isShowing(),"panel not open")
+  assert(driver.life.elapsed==elapsed,"world ran under the notebook")
+  local found=#driver.notebook:list()
+  assert(found>=1,"no found page")
+  for _,d in sg:GetDescendants() do
+   if d:IsA("TextLabel") and d.Visible and d.Text~="" and d.AbsoluteSize.X>0 then
+    assert(d.TextBounds.X<=d.AbsoluteSize.X+1,"notebook text spills: "..d.Name)
+   end
+  end
+  driver.notebookPanel:close();wait(.2)
+  assert(not sg.Enabled,"notebook did not close")
+ end)
  check("NOTEBOOK: earned discoveries survive recovery and new lives",function()
   local b=driver.notebook
   assert(b:isOpen("dragline") and b:isOpen("retreat") and b:isOpen("peacock_dance"),"play didn't open jump/rest/dance pages")
@@ -335,18 +358,18 @@ return function(driver: any)
   local pg=game:GetService("Players").LocalPlayer
   pg:SetAttribute("LargeText",true)
   driver.openMenu();assert(driver.menu:choose("Notebook"));wait(.3)
-  local p=driver.bookPanel
+  local p=driver.notebookPanel
   assert(p:isShowing() and not driver.menu:isShowing(),"menu/notebook pause ownership")
   local hour=driver.life.clock.hour;local point=driver.motor.pos
   driver.input:simulate("Jump",true);driver.input:simulate("Forward",true);wait(.3)
   driver.input:simulate("Jump",false);driver.input:simulate("Forward",false)
   assert(driver.life.clock.hour==hour and (driver.motor.pos-point).Magnitude<1e-5,"reading didn't pause world")
-  assert(p.fact.TextSize==32 and p.sources.Text~="","missing large sourced text")
+  assert(p.text.TextSize==29 and p.sources.Text~="","missing large sourced text")
   assert(game:GetService("GuiService").SelectedObject==nil,"GUI navigation steals reading directions")
-  assert(p.body.AbsoluteWindowSize.Y>60,"no readable area")
-  p:scroll(100000);wait(.1)
-  assert(p.body.CanvasPosition.Y>0,"long page can't scroll to sources")
-  p:turn(-1);wait(.1);assert(p.body.CanvasPosition.Y==0,"new page kept old scroll")
+  assert(p.page.AbsoluteWindowSize.Y>60,"no readable area")
+  p:scrollBy(100000);wait(.1)
+  assert(p.page.CanvasPosition.Y>0,"long page can't scroll to sources")
+  p:step(-1);wait(.1);assert(p.page.CanvasPosition.Y==0,"new page kept old scroll")
   for _,button in p.buttons do assert(button.TextFits,"notebook button clipped") end
   p:close();wait(.1)
   assert(driver.menu:isShowing() and driver.life.clock.hour==hour,"didn't return to paused life menu")
@@ -354,6 +377,32 @@ return function(driver: any)
   pg:SetAttribute("LargeText",false)
   driver.openNotebook();wait(.1);p:close();wait(.15)
   assert(not driver.menu:isShowing() and driver.life.clock.hour>hour,"direct notebook didn't resume")
+ end)
+ check("NOTEBOOK: optional checklist, end-screen return and compact footer",function()
+  local player=game:GetService("Players").LocalPlayer
+  player:SetAttribute("LargeText",true)
+  driver.openNotebook("game");wait(.2)
+  local p=driver.notebookPanel
+  p:showChecklist();wait(.2)
+  assert(p.shown=="_checklist" and string.find(p.text.Text,"[x] Change",1,true),"earned dance missing from checklist")
+  assert(not p.sources.Visible and not p.empty.Visible,"checklist pretending to be a sourced fact")
+  assert(string.find(p.text.Text,"dance outside",1,true),"last invitation absent")
+  local full=game:GetService("TextService"):GetTextSize(p.text.Text,p.text.TextSize,p.text.Font,Vector2.new(p.text.AbsoluteSize.X,100000))
+  assert(p.text.AbsoluteSize.Y>=full.Y,"checklist label clips later invitations")
+  assert(p.text.TextFits,"complete checklist does not fit its scrolling label")
+  for _,b in {p.tryButton,p.closeButton,p.backButton} do
+   if b.Visible then
+    assert(b.TextFits,"footer text clips: "..b.Text)
+    assert(b.AbsolutePosition.X>=p.paper.AbsolutePosition.X and b.AbsolutePosition.X+b.AbsoluteSize.X<=p.paper.AbsolutePosition.X+p.paper.AbsoluteSize.X+1,"footer outside paper")
+   end
+  end
+  p:close();wait(.1);driver.endLife("wasp");wait(5)
+  assert(driver.caughtPanel:choose("Notebook"));wait(.2)
+  assert(p:isShowing() and not driver.caughtPanel:isShowing(),"end screen did not open book")
+  p:close();wait(.2)
+  assert(driver.caughtPanel:isShowing() and driver.session.ended,"book did not return to end screen")
+  assert(driver.caughtPanel:choose("Another"));wait(.2)
+  player:SetAttribute("LargeText",false)
  end)
  local passed=0
 	for _,row in rows do if row.passed then passed+=1 end end

@@ -1,0 +1,2 @@
+NOTEBOOK client: after the first 120 frames the book holds: bold_jumper,hunting_by_sight
+NOTEBOOK passed=889 failed=0

@@ -1,6 +1,6 @@
 # Roblox field notebook — Windows, 2026-10-17
 
-Source/test build evidence: **2e7a7b9fda966ec0**. Publication and final native results are recorded below when verified.
+Source/test build evidence: **2e7a7b9fda966ec0**. This earlier reader was not published. It is superseded by [the Claude/Chet integration results](merged/RESULTS.md).
 
 ## Logic and build checks
 

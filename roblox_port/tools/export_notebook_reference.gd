@@ -13,7 +13,7 @@ func _init() -> void:
 			"jump": book.notice_jump(a.value)
 			"eye": book.add_eye_time(a.value)
 		rows.append({"action":a,"opened":book.opened.duplicate(),"eye_seconds":book.eye_seconds})
-	var f := FileAccess.open("res://roblox_port/tests/notebook_reference.json",FileAccess.WRITE)
+	var f := FileAccess.open("res://roblox_port/tests/notebook_godot.json",FileAccess.WRITE)
 	f.store_string(JSON.stringify(rows,"  ")+"\n")
 	print("NOTEBOOK_REFERENCE: ",rows.size()," transitions")
 	book.free()

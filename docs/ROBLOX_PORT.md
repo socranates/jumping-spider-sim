@@ -60,6 +60,10 @@ Current Windows evidence: [roblox-controls-windows/RESULTS.md](verification/robl
 
 Official implementation references: [ContextActionService](https://create.roblox.com/docs/reference/engine/classes/ContextActionService), [text filtering](https://create.roblox.com/docs/reference/engine/classes/TextService/FilterStringAsync), [filtered results](https://create.roblox.com/docs/reference/engine/classes/TextFilterResult), [Data stores](https://create.roblox.com/docs/cloud-services/data-stores), [optional run-in-roblox automation](https://github.com/rojo-rbx/run-in-roblox).
 
+## Notebook integration acceptance, 2026-10-17
+
+Claude and Chet notebooks are reconciled: responsive discovered-page list, optional To try checklist, sourced peacock page, native input fixes and end-screen return. 24 of 25 authored pages are reachable; only felt surface vibration is unwired. See `verification/roblox-notebook/merged/RESULTS.md`. `PUBLIC_RELEASE.md` supersedes stale historical acceptance statements when assessing readiness. Persistence remains session-only.
+
 ## Windows aesthetics acceptance, 2026-10-15
 
 The ROBLOX-20–22 visual round has now run in Studio. Final evidence ab5e92132d90a1da: 69/69 engine and 11/11 client checks. ROBLOX-23 replaces the refracting window material so the UV flower pattern is visible. See verification/roblox-aesthetics-windows/RESULTS.md for visual evidence, timing and remaining checks; earlier “not seen in Studio” statements describe pre-acceptance history. LIFE/checkpoint work remains next.

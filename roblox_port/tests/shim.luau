@@ -195,8 +195,9 @@ Object.__newindex = function(o, k, v)
 end
 function Instance.new(className: string)
 	local o = setmetatable({ ClassName = className, Name = className, _children = {}, _attrs = {} }, Object)
+	rawset(o, "AbsolutePosition", {X=0,Y=0})
 	if className == "ScreenGui" then rawset(o, "AbsoluteSize", { X = 1280, Y = 720 }) end
-	if className == "TextLabel" or className == "Frame" then rawset(o, "AbsoluteSize", { X = 0, Y = 0 }) end -- nothing is laid out here: the engine's size before its first layout
+	if className == "TextLabel" or className == "Frame" or className == "TextButton" or className == "ScrollingFrame" then rawset(o, "AbsoluteSize", { X = 0, Y = 0 }) end -- nothing is laid out here: the engine's size before its first layout
 	if className == "ScrollingFrame" then rawset(o, "AbsoluteWindowSize", { X = 0, Y = 0 }); rawset(o, "AbsoluteCanvasSize", { X = 0, Y = 0 }) end
 	if HAS_CFRAME[className] then
 		rawset(o, "_cframe", CFrame.new())
@@ -480,6 +481,12 @@ function uis.GetMouseDelta(_self) return Vector2.zero end
 function uis.GetFocusedTextBox(_self) return nil end
 function uis.GetPropertyChangedSignal(_self, _name) return newSignal() end
 local services = {
+ -- Approximation only for structural CLI tests; real text metrics are tested in Studio.
+ TextService={GetTextSize=function(_self,text,size,_font,bounds)
+  local lines=0
+  for line in (text.."\n"):gmatch("([^\n]*)\n") do lines+=math.max(1,math.ceil(#line*size*.6/math.max(1,bounds.X))) end
+  return Vector2.new(bounds.X,lines*size*1.2)
+ end},
 	Workspace = workspace,
 	ReplicatedStorage = Instance.new("Folder"),
 	Lighting = Instance.new("Folder"),

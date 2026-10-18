@@ -1,0 +1,26 @@
+{
+  "evidence_id": "f47e5d0b3aebd3ae",
+  "samples": [
+    {
+      "frame_p95_ms": 18.210941925644875,
+      "sensor_p50_us": 23,
+      "flies": 3,
+      "frame_p50_ms": 16.925472766160965,
+      "rays_per_tick": 1.6632016632016633,
+      "ticks": 481,
+      "sensor_p95_us": 474,
+      "candidates_per_tick": 0.498960498960499
+    },
+    {
+      "frame_p95_ms": 24.063143879175186,
+      "sensor_p50_us": 339,
+      "flies": 6,
+      "frame_p50_ms": 17.099246382713318,
+      "rays_per_tick": 7.5,
+      "ticks": 480,
+      "sensor_p95_us": 771,
+      "candidates_per_tick": 1.8333333333333333
+    }
+  ],
+  "source": "live client; no screenshots during timing"
+}

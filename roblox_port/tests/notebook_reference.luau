@@ -1,247 +1,173 @@
 -- GENERATED from tests/notebook_reference.json by tools/reference_to_luau.py. Regenerate both together.
-return { {
-		action = {
-			kind = "notice",
-			value = "start",
-		},
-		eye_seconds = 0.0,
-		opened = { "bold_jumper" },
-	}, {
-		action = {
-			kind = "notice",
-			value = "jump",
-		},
-		eye_seconds = 0.0,
-		opened = { "bold_jumper", "dragline" },
-	}, {
-		action = {
-			kind = "notice",
-			value = "jump",
-		},
-		eye_seconds = 0.0,
-		opened = { "bold_jumper", "dragline" },
-	}, {
-		action = {
-			kind = "jump",
-			value = 4.99,
-		},
-		eye_seconds = 0.0,
-		opened = { "bold_jumper", "dragline" },
-	}, {
-		action = {
-			kind = "jump",
-			value = 5.0,
-		},
-		eye_seconds = 0.0,
-		opened = { "bold_jumper", "dragline", "legs_push" },
-	}, {
-		action = {
-			kind = "jump",
-			value = 8.0,
-		},
-		eye_seconds = 0.0,
-		opened = { "bold_jumper", "dragline", "legs_push", "depth_blur" },
-	}, {
-		action = {
-			kind = "eye",
-			value = 19.0,
-		},
-		eye_seconds = 19.0,
-		opened = { "bold_jumper", "dragline", "legs_push", "depth_blur" },
-	}, {
-		action = {
-			kind = "eye",
-			value = -2.0,
-		},
-		eye_seconds = 19.0,
-		opened = { "bold_jumper", "dragline", "legs_push", "depth_blur" },
-	}, {
-		action = {
-			kind = "eye",
-			value = 2.0,
-		},
-		eye_seconds = 21.0,
-		opened = { "bold_jumper", "dragline", "legs_push", "depth_blur", "moving_retinas" },
-	}, {
-		action = {
-			kind = "eye",
-			value = 40.0,
-		},
-		eye_seconds = 61.0,
-		opened = { "bold_jumper", "dragline", "legs_push", "depth_blur", "moving_retinas", "green_uv" },
-	}, {
-		action = {
-			kind = "notice",
-			value = "unknown",
-		},
-		eye_seconds = 61.0,
-		opened = { "bold_jumper", "dragline", "legs_push", "depth_blur", "moving_retinas", "green_uv" },
-	}, {
-		action = {
-			kind = "notice",
-			value = "start",
-		},
-		eye_seconds = 61.0,
-		opened = { "bold_jumper", "dragline", "legs_push", "depth_blur", "moving_retinas", "green_uv" },
-	}, {
-		action = {
-			kind = "notice",
-			value = "jump",
-		},
-		eye_seconds = 61.0,
-		opened = { "bold_jumper", "dragline", "legs_push", "depth_blur", "moving_retinas", "green_uv" },
-	}, {
-		action = {
-			kind = "notice",
-			value = "jump_far",
-		},
-		eye_seconds = 61.0,
-		opened = { "bold_jumper", "dragline", "legs_push", "depth_blur", "moving_retinas", "green_uv" },
-	}, {
-		action = {
-			kind = "notice",
-			value = "jump_long",
-		},
-		eye_seconds = 61.0,
-		opened = { "bold_jumper", "dragline", "legs_push", "depth_blur", "moving_retinas", "green_uv" },
-	}, {
-		action = {
-			kind = "notice",
-			value = "eye_view",
-		},
-		eye_seconds = 61.0,
-		opened = { "bold_jumper", "dragline", "legs_push", "depth_blur", "moving_retinas", "green_uv", "eight_eyes" },
-	}, {
-		action = {
-			kind = "notice",
-			value = "eye_time_20",
-		},
-		eye_seconds = 61.0,
-		opened = { "bold_jumper", "dragline", "legs_push", "depth_blur", "moving_retinas", "green_uv", "eight_eyes" },
-	}, {
-		action = {
-			kind = "notice",
-			value = "eye_time_60",
-		},
-		eye_seconds = 61.0,
-		opened = { "bold_jumper", "dragline", "legs_push", "depth_blur", "moving_retinas", "green_uv", "eight_eyes" },
-	}, {
-		action = {
-			kind = "notice",
-			value = "shimmer",
-		},
-		eye_seconds = 61.0,
-		opened = { "bold_jumper", "dragline", "legs_push", "depth_blur", "moving_retinas", "green_uv", "eight_eyes", "motion_first" },
-	}, {
-		action = {
-			kind = "notice",
-			value = "fly_recognised",
-		},
-		eye_seconds = 61.0,
-		opened = { "bold_jumper", "dragline", "legs_push", "depth_blur", "moving_retinas", "green_uv", "eight_eyes", "motion_first", "hunting_by_sight" },
-	}, {
-		action = {
-			kind = "notice",
-			value = "catch",
-		},
-		eye_seconds = 61.0,
-		opened = { "bold_jumper", "dragline", "legs_push", "depth_blur", "moving_retinas", "green_uv", "eight_eyes", "motion_first", "hunting_by_sight", "venom" },
-	}, {
-		action = {
-			kind = "notice",
-			value = "meal",
-		},
-		eye_seconds = 61.0,
-		opened = { "bold_jumper", "dragline", "legs_push", "depth_blur", "moving_retinas", "green_uv", "eight_eyes", "motion_first", "hunting_by_sight", "venom", "drinking" },
-	}, {
-		action = {
-			kind = "notice",
-			value = "felt",
-		},
-		eye_seconds = 61.0,
-		opened = { "bold_jumper", "dragline", "legs_push", "depth_blur", "moving_retinas", "green_uv", "eight_eyes", "motion_first", "hunting_by_sight", "venom", "drinking", "felt" },
-	}, {
-		action = {
-			kind = "notice",
-			value = "buzz",
-		},
-		eye_seconds = 61.0,
-		opened = { "bold_jumper", "dragline", "legs_push", "depth_blur", "moving_retinas", "green_uv", "eight_eyes", "motion_first", "hunting_by_sight", "venom", "drinking", "felt", "hearing" },
-	}, {
-		action = {
-			kind = "notice",
-			value = "rest",
-		},
-		eye_seconds = 61.0,
-		opened = { "bold_jumper", "dragline", "legs_push", "depth_blur", "moving_retinas", "green_uv", "eight_eyes", "motion_first", "hunting_by_sight", "venom", "drinking", "felt", "hearing", "retreat" },
-	}, {
-		action = {
-			kind = "notice",
-			value = "sleep",
-		},
-		eye_seconds = 61.0,
-		opened = { "bold_jumper", "dragline", "legs_push", "depth_blur", "moving_retinas", "green_uv", "eight_eyes", "motion_first", "hunting_by_sight", "venom", "drinking", "felt", "hearing", "retreat", "home_before_dark" },
-	}, {
-		action = {
-			kind = "notice",
-			value = "hungry",
-		},
-		eye_seconds = 61.0,
-		opened = { "bold_jumper", "dragline", "legs_push", "depth_blur", "moving_retinas", "green_uv", "eight_eyes", "motion_first", "hunting_by_sight", "venom", "drinking", "felt", "hearing", "retreat", "home_before_dark", "hungry_at_home" },
-	}, {
-		action = {
-			kind = "notice",
-			value = "well_fed",
-		},
-		eye_seconds = 61.0,
-		opened = { "bold_jumper", "dragline", "legs_push", "depth_blur", "moving_retinas", "green_uv", "eight_eyes", "motion_first", "hunting_by_sight", "venom", "drinking", "felt", "hearing", "retreat", "home_before_dark", "hungry_at_home", "full_abdomen" },
-	}, {
-		action = {
-			kind = "notice",
-			value = "moult_ready",
-		},
-		eye_seconds = 61.0,
-		opened = { "bold_jumper", "dragline", "legs_push", "depth_blur", "moving_retinas", "green_uv", "eight_eyes", "motion_first", "hunting_by_sight", "venom", "drinking", "felt", "hearing", "retreat", "home_before_dark", "hungry_at_home", "full_abdomen", "outgrowing_a_skin" },
-	}, {
-		action = {
-			kind = "notice",
-			value = "moulted",
-		},
-		eye_seconds = 61.0,
-		opened = { "bold_jumper", "dragline", "legs_push", "depth_blur", "moving_retinas", "green_uv", "eight_eyes", "motion_first", "hunting_by_sight", "venom", "drinking", "felt", "hearing", "retreat", "home_before_dark", "hungry_at_home", "full_abdomen", "outgrowing_a_skin", "new_skin" },
-	}, {
-		action = {
-			kind = "notice",
-			value = "adult",
-		},
-		eye_seconds = 61.0,
-		opened = { "bold_jumper", "dragline", "legs_push", "depth_blur", "moving_retinas", "green_uv", "eight_eyes", "motion_first", "hunting_by_sight", "venom", "drinking", "felt", "hearing", "retreat", "home_before_dark", "hungry_at_home", "full_abdomen", "outgrowing_a_skin", "new_skin", "grown_up" },
-	}, {
-		action = {
-			kind = "notice",
-			value = "wasp",
-		},
-		eye_seconds = 61.0,
-		opened = { "bold_jumper", "dragline", "legs_push", "depth_blur", "moving_retinas", "green_uv", "eight_eyes", "motion_first", "hunting_by_sight", "venom", "drinking", "felt", "hearing", "retreat", "home_before_dark", "hungry_at_home", "full_abdomen", "outgrowing_a_skin", "new_skin", "grown_up", "mud_dauber" },
-	}, {
-		action = {
-			kind = "notice",
-			value = "wasp_escaped",
-		},
-		eye_seconds = 61.0,
-		opened = { "bold_jumper", "dragline", "legs_push", "depth_blur", "moving_retinas", "green_uv", "eight_eyes", "motion_first", "hunting_by_sight", "venom", "drinking", "felt", "hearing", "retreat", "home_before_dark", "hungry_at_home", "full_abdomen", "outgrowing_a_skin", "new_skin", "grown_up", "mud_dauber", "getting_away" },
-	}, {
-		action = {
-			kind = "notice",
-			value = "wasp_caught",
-		},
-		eye_seconds = 61.0,
-		opened = { "bold_jumper", "dragline", "legs_push", "depth_blur", "moving_retinas", "green_uv", "eight_eyes", "motion_first", "hunting_by_sight", "venom", "drinking", "felt", "hearing", "retreat", "home_before_dark", "hungry_at_home", "full_abdomen", "outgrowing_a_skin", "new_skin", "grown_up", "mud_dauber", "getting_away", "what_the_wasp_does" },
-	}, {
-		action = {
-			kind = "notice",
-			value = "starving",
-		},
-		eye_seconds = 61.0,
-		opened = { "bold_jumper", "dragline", "legs_push", "depth_blur", "moving_retinas", "green_uv", "eight_eyes", "motion_first", "hunting_by_sight", "venom", "drinking", "felt", "hearing", "retreat", "home_before_dark", "hungry_at_home", "full_abdomen", "outgrowing_a_skin", "new_skin", "grown_up", "mud_dauber", "getting_away", "what_the_wasp_does", "going_without_food" },
-	} }
+return {
+	note = "The naturalist's notebook (LEARN-01). Each page opens the first time its trigger happens in play. Text is short and true; 'game' says plainly where the game simplifies; 'sources' name where each claim comes from (see docs/NOTEBOOK_SOURCES.md for what was read in full). Order here is the order pages are listed in.",
+	pages = { {
+			id = "bold_jumper",
+			trigger = "start",
+			title = "The bold jumping spider",
+			text = "You are a bold jumping spider, Phidippus audax. It lives across much of North America, often on walls, fences and windowsills. Adults are about 6 to 15 millimetres long, and females are usually bigger than males. Look for its shining green-blue fangs and the pale spots on its black abdomen.",
+			game = "This windowsill is built at true scale: one game unit is one centimetre, about the length of the spider.",
+			sources = { "Edwards, G. B. (2004). Revision of the jumping spiders of the genus Phidippus (Araneae: Salticidae). Occasional Papers of the Florida State Collection of Arthropods 11." },
+		}, {
+			id = "dragline",
+			trigger = "jump",
+			title = "A line before every leap",
+			text = "Before it jumps, a jumping spider usually fixes a silk line to the surface behind it. In the air the line helps keep its body steady, and if it misses, it can hang from the line and climb back. Spiders of the species Hasarius adansoni landed more steadily when they had their line.",
+			game = "The spider here dips its abdomen to fix the line, and a missed jump leaves it hanging. Reel in with W / stick up; let go with Q / B. F / D-pad down lets it down on its line from anywhere; hold it to keep lowering.",
+			sources = { "Chen, Y.-K., Liao, C.-P., Tsai, F.-Y. & Chi, K.-J. (2013). More than a safety line: jump-stabilizing silk of salticids. Journal of the Royal Society Interface 10: 20130572. https://pmc.ncbi.nlm.nih.gov/articles/PMC3758018/" },
+		}, {
+			id = "legs_push",
+			trigger = "jump_far",
+			title = "Legs that push",
+			text = "Jumping spiders have no giant jumping legs like a grasshopper. High-speed films of Phidippus regius show the third and fourth pairs of legs straightening at take-off. Spiders can stretch some leg joints by raising their blood pressure, but that study found the leg muscles could supply the power for a jump.",
+			game = "Watch the back legs straighten as the spider leaves the surface.",
+			sources = { "Nabawy, M. R. A., Sivalingam, G., Garwood, R. J., Crowther, W. J. & Sellers, W. I. (2018). Energy and time optimal trajectories in exploratory jumps of the spider Phidippus regius. Scientific Reports 8: 7142. https://doi.org/10.1038/s41598-018-25227-9" },
+		}, {
+			id = "eight_eyes",
+			trigger = "eye_view",
+			title = "Eight eyes, different jobs",
+			text = "Jumping spiders have eight eyes. The two big front eyes see sharp detail, but only in a narrow field. The eyes beside them watch for movement, and the others look out to the sides and behind, so the spider can notice something almost anywhere and turn to look at it.",
+			game = "The spider-eye view is an impression made from this research, not a recording of what a spider sees.",
+			sources = { "Land, M. F. (1969). Movements of the retinae of jumping spiders (Salticidae: Dendryphantinae) in response to visual stimuli. Journal of Experimental Biology 51: 471-493. https://doi.org/10.1242/jeb.51.2.471", "Zurek, D. B., Taylor, A. J., Evans, C. S. & Nelson, X. J. (2010). The role of the anterior lateral eyes in the vision-based behaviour of jumping spiders. Journal of Experimental Biology 213: 2372-2378. https://doi.org/10.1242/jeb.042382" },
+		}, {
+			id = "moving_retinas",
+			trigger = "eye_time_20",
+			title = "Eyes that look without turning",
+			text = "The big front eyes cannot turn: their lenses are fixed in the head. Instead, the retina at the back of each eye moves. It sweeps from side to side and slowly twists, so the spider can scan what it is looking at without moving its body.",
+			game = "The two sharp strips that sweep and twist in the eye view show this.",
+			sources = { "Land, M. F. (1969). Movements of the retinae of jumping spiders (Salticidae: Dendryphantinae) in response to visual stimuli. Journal of Experimental Biology 51: 471-493. https://doi.org/10.1242/jeb.51.2.471" },
+		}, {
+			id = "motion_first",
+			trigger = "shimmer",
+			title = "Movement first, shape later",
+			text = "The eyes beside the big front pair are motion detectors. When everything but these eyes was covered, jumping spiders of the Australian species Servaea vestita still turned toward moving dots and even stalked flies. These eyes can notice a movement smaller than the gap between their own light-sensing cells.",
+			game = "The shimmering ring in the eye view shows something the side eyes saw moving before the front eyes can tell what it is.",
+			sources = { "Zurek, D. B., Taylor, A. J., Evans, C. S. & Nelson, X. J. (2010). The role of the anterior lateral eyes in the vision-based behaviour of jumping spiders. Journal of Experimental Biology 213: 2372-2378. https://doi.org/10.1242/jeb.042382", "Zurek, D. B. & Nelson, X. J. (2012). Hyperacute motion detection by the lateral eyes of jumping spiders. Vision Research 66: 26-30." },
+		}, {
+			id = "hunting_by_sight",
+			trigger = "fly_recognised",
+			title = "A hunter that uses its eyes",
+			text = "Jumping spiders catch their food without a web. A hunt usually goes like this: turn to face a movement, look at it with the big front eyes, creep closer, crouch, and leap.",
+			game = "Here the spider becomes surer of what something is the longer it looks at it.",
+			sources = { "Jackson, R. R. & Pollard, S. D. (1996). Predatory behavior of jumping spiders. Annual Review of Entomology 41: 287-308." },
+		}, {
+			id = "venom",
+			trigger = "catch",
+			title = "The bite",
+			text = "A jumping spider grips its catch with its front legs and fangs and bites. The venom soon stops the prey from struggling.",
+			game = "In this game the fly weakens over several seconds as the venom works.",
+			sources = { "Foelix, R. F. (2011). Biology of Spiders, 3rd edition. Oxford University Press." },
+		}, {
+			id = "drinking",
+			trigger = "meal",
+			title = "A meal you drink",
+			text = "Spiders cannot swallow solid food. They digest their meal partly outside the body: they pour digestive juices onto the prey and suck up the liquid food.",
+			game = "",
+			sources = { "Foelix, R. F. (2011). Biology of Spiders, 3rd edition. Oxford University Press." },
+		}, {
+			id = "felt",
+			trigger = "felt",
+			title = "Feeling through the feet",
+			text = "Spiders feel vibrations through tiny slits in the hard skin of their legs, called slit sensilla. A group of them near the end of each leg picks up very small shakes of the surface the spider stands on.",
+			game = "The ripple on the screen and the low thrum stand in for this. A vibration reaches the spider only through touching surfaces, never across a gap.",
+			sources = { "Barth, F. G. (2002). A Spider's World: Senses and Behavior. Springer." },
+		}, {
+			id = "hearing",
+			trigger = "buzz",
+			title = "Hearing without ears",
+			text = "Jumping spiders have no ears, yet the bold jumping spider responds to low sounds. In experiments these spiders froze at a low hum, and cells in their brains answered to sounds of 80 to 380 vibrations a second, even from more than 3 metres away. Fine hairs on the legs, moved by the air, probably do the hearing.",
+			game = "The fly's buzz you hear here is about 200 vibrations a second, inside that range.",
+			sources = { "Shamble, P. S., Menda, G., Golden, J. R., et al. (2016). Airborne acoustic perception by a jumping spider. Current Biology 26: 2913-2920. https://doi.org/10.1016/j.cub.2016.08.041" },
+		}, {
+			id = "retreat",
+			trigger = "rest",
+			title = "A silk retreat",
+			text = "Jumping spiders do not build webs to catch food, but they do spin retreats: small tents of silk in a crack or under a leaf, where they rest at night, moult and shelter from bad weather.",
+			game = "In this game the crack in the sill is the retreat. The spider does not spin one yet.",
+			sources = { "Foelix, R. F. (2011). Biology of Spiders, 3rd edition. Oxford University Press." },
+		}, {
+			id = "depth_blur",
+			trigger = "jump_long",
+			title = "Judging distance by blur",
+			text = "How does a jumping spider know how far to jump? One answer is blur. The big front eyes have retinas in layers, and one layer always gets a slightly blurred picture; how blurred depends on how far away things are. In green light the spiders of the species Hasarius adansoni jumped accurately. In red light they jumped short, as this idea predicts.",
+			game = "In this game a jump lands where the marker shows, whatever the light.",
+			sources = { "Nagata, T., Koyanagi, M., Tsukamoto, H., et al. (2012). Depth perception from image defocus in a jumping spider. Science 335: 469-471. https://doi.org/10.1126/science.1211667" },
+		}, {
+			id = "green_uv",
+			trigger = "eye_time_60",
+			title = "Green and ultraviolet",
+			text = "In the big front eyes of the related Phidippus regius, light-sensing cells respond best to green and to ultraviolet, a colour people cannot see; no cells most sensitive to red were found. Some other jumping spiders, such as Habronattus, see red with the help of a red filter inside the eye.",
+			game = "A screen cannot show ultraviolet, and ordinary colours carry no ultraviolet information, so the eye view says 'UV not simulated'.",
+			sources = { "DeVoe, R. D. (1975). Ultraviolet and green receptors in principal eyes of jumping spiders. Journal of General Physiology 66: 193-207. https://doi.org/10.1085/jgp.66.2.193", "Zurek, D. B., Cronin, T. W., Taylor, L. A., Byrne, K., Sullivan, M. L. G. & Morehouse, N. I. (2015). Spectral filtering enables trichromatic vision in colorful jumping spiders. Current Biology 25: R403-R404." },
+		}, {
+			id = "home_before_dark",
+			trigger = "sleep",
+			title = "Home before dark",
+			text = "Jumping spiders hunt in daylight. Spiders of the related species Phidippus johnsoni go into their silk nests before dark and stay inside through the night, and in bad weather.",
+			game = "Rest in the crack in the evening to sleep until morning. The game compresses time: a day here passes in about a quarter of an hour of play, and a real bold jumping spider lives about a year.",
+			sources = { "Jackson, R. R. (1979). Nests of Phidippus johnsoni (Araneae, Salticidae): characteristics, pattern of occupation, and function. Journal of Arachnology 7: 47-58." },
+		}, {
+			id = "hungry_at_home",
+			trigger = "hungry",
+			title = "Hungry, yet at home",
+			text = "In one field study, most bold jumping spiders stayed in their silk nests during the day, and the ones inside were hungrier than the ones out hunting. The author suggests the spiders switch between resting and active spells, with hunger deciding when to switch.",
+			game = "Here hunger shows in the spider's thinner abdomen and its energy. A reserve that runs out does not yet end a life; that comes in a later version.",
+			sources = { "Okuyama, T. (2011). Biphasic activity of a jumping spider. Naturwissenschaften 98: 15-22. https://doi.org/10.1007/s00114-010-0734-3" },
+		}, {
+			id = "full_abdomen",
+			trigger = "well_fed",
+			title = "A full abdomen",
+			text = "A spider's abdomen stretches as it feeds and shrinks as it goes without. Biologists judge how well fed a spider is by the size of its abdomen compared with the rest of its body.",
+			game = "Watch the spider's abdomen grow after a meal and slowly shrink over the days.",
+			sources = { "Jakob, E. M., Marshall, S. D. & Uetz, G. W. (1996). Estimating fitness: a comparison of body condition indices. Oikos 77: 61-67.", "Foelix, R. F. (2011). Biology of Spiders, 3rd edition. Oxford University Press." },
+		}, {
+			id = "outgrowing_a_skin",
+			trigger = "moult_ready",
+			title = "Outgrowing a skin",
+			text = "A spider's hard outer skin cannot stretch, so to grow it must shed it. This is called moulting. Spiders of the related species Phidippus johnsoni stay in their silk nest for about six days before a moult and two days after it.",
+			game = "Rest in the crack when your spider is ready. Real spiders usually stop eating before a moult; here the spider can still eat, and the days are compressed.",
+			sources = { "Foelix, R. F. (2011). Biology of Spiders, 3rd edition. Oxford University Press.", "Jackson, R. R. (1979). Nests of Phidippus johnsoni (Araneae, Salticidae): characteristics, pattern of occupation, and function. Journal of Arachnology 7: 47-58." },
+		}, {
+			id = "new_skin",
+			trigger = "moulted",
+			title = "A new skin",
+			text = "In a moult the spider pulls itself out of its old skin and leaves an empty husk behind. The new skin is pale and soft at first and hardens over the following hours. Until it does, the spider is more easily hurt.",
+			game = "Your spider is paler and its jumps shorter while the new skin hardens. How long that takes for a jumping spider has not been measured; the game's timing is a guess. Look for the old skin in the crack.",
+			sources = { "Foelix, R. F. (2011). Biology of Spiders, 3rd edition. Oxford University Press." },
+		}, {
+			id = "grown_up",
+			trigger = "adult",
+			title = "Grown up",
+			text = "Jumping spiders moult several times before they are adults. In the field, males of the related Phidippus johnsoni became adult after about six to eight moults and females after about seven to nine. Bold jumping spiders spend the winter as juveniles and become adults in spring.",
+			game = "Your spider is an adult: you have finished the main life. The game shows only its last three moults.",
+			sources = { "Jackson, R. R. (1978). The life history of Phidippus johnsoni (Araneae, Salticidae). Journal of Arachnology 6: 1-29.", "Taylor, B. B. & Peck, W. B. (1975). A comparison of northern and southern forms of Phidippus audax. Journal of Arachnology 2: 89-99." },
+		}, {
+			id = "mud_dauber",
+			trigger = "wasp",
+			title = "A hunter of spiders",
+			text = "The black-and-yellow mud dauber, Sceliphron caementarium, is a wasp about 2 to 3 centimetres long. It builds nests of mud in sheltered places on buildings, such as under eaves, and it is active by day in spring and summer. It hunts spiders, jumping spiders among them. It finds a spider by sight, then touches it with its antennae before it stings.",
+			game = "You hear the wasp before it reaches the sill, see its shadow, and feel it land. The silk-lined crack is safe. Keeping still makes you hard to notice, and a jump or a drop on your line breaks its approach.",
+			sources = { "Powell, E. C. & Taylor, L. A. Black and yellow mud dauber, Sceliphron caementarium (Drury, 1773). Featured Creatures EENY-654 / IN1478, University of Florida IFAS Extension. https://ask.ifas.ufl.edu/publication/IN1478", "Grissell, E. E. (1973). Sceliphron caementarium (Drury), a mud daubing wasp. Entomology Circular 136, Florida Department of Agriculture and Consumer Services, Division of Plant Industry.", "Uma, D., Durkee, C., Herzner, G. & Weiss, M. (2013). Double deception: ant-mimicking spiders elude both visually- and chemically-oriented predators. PLoS ONE 8(11): e79660." },
+		}, {
+			id = "what_the_wasp_does",
+			trigger = "wasp_caught",
+			title = "What the wasp does",
+			text = "The wasp's sting does not kill a spider: it paralyses it. The wasp carries the spider to a cell in its mud nest and fills the cell with paralysed spiders, up to twenty or more. It lays an egg on one of them and seals the cell with mud. When the larva hatches, it feeds on the spiders, which have stayed fresh because they are still alive.",
+			game = "Being caught ends this spider's life. You go back to your last rest.",
+			sources = { "Powell, E. C. & Taylor, L. A. Black and yellow mud dauber, Sceliphron caementarium (Drury, 1773). Featured Creatures EENY-654 / IN1478, University of Florida IFAS Extension. https://ask.ifas.ufl.edu/publication/IN1478", "Grissell, E. E. (1973). Sceliphron caementarium (Drury), a mud daubing wasp. Entomology Circular 136, Florida Department of Agriculture and Consumer Services, Division of Plant Industry.", "Long, R. F. (2018). Why mud daubers are on spider patrol. UC ANR Green Blog, University of California Agriculture and Natural Resources." },
+		}, {
+			id = "getting_away",
+			trigger = "wasp_escaped",
+			title = "Getting away",
+			text = "Jumping spiders watch what moves around them. When something looms toward a bold jumping spider, it backs away, and experiments showed that its side eyes, the anterior lateral eyes, are what tell it to. Not being seen matters most: the mud dauber finds its prey by sight.",
+			game = "The wasp lost you, or gave up. Here a jump, a drop on your line or getting out of sight breaks its approach, and the crack is always safe. Dropping on a line to escape is the game's choice: it is not known to be what jumping spiders do.",
+			sources = { "Spano, L., Long, S. M. & Jakob, E. M. (2012). Secondary eyes mediate the response to looming objects in jumping spiders (Phidippus audax, Salticidae). Biology Letters 8(6): 949-951.", "Uma, D., Durkee, C., Herzner, G. & Weiss, M. (2013). Double deception: ant-mimicking spiders elude both visually- and chemically-oriented predators. PLoS ONE 8(11): e79660." },
+		}, {
+			id = "going_without_food",
+			trigger = "starving",
+			title = "Going without food",
+			text = "Spiders can go a long time without food. Adult females of the related Phidippus johnsoni were kept for 25 to 31 days without eating. As a spider uses up its reserves its abdomen shrinks: how plump the abdomen is, against the size of the body, is how scientists judge a spider's condition.",
+			game = "Time is compressed here. A full reserve lasts about three days; a spider that then goes two more days without food dies, after warnings on the screen. On Easy and in free play it cannot starve.",
+			sources = { "Jackson, R. R. (1978). The life history of Phidippus johnsoni (Araneae, Salticidae). Journal of Arachnology 6: 1-29.", "Jakob, E. M., Marshall, S. D. & Uetz, G. W. (1996). Estimating fitness: a comparison of body condition indices. Oikos 77: 61-67." },
+		} },
+}

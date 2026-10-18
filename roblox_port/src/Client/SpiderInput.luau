@@ -9,6 +9,8 @@
 -- Port-only: reset to the start Backspace / View (Select), gait toggle G, controls card H (Godot's H is the field notes).
 -- The peacock spider (ROBLOX-31): C changes spider in the crack (RB / R1 on a controller, the touch Change button); X, or the same RB / R1
 -- outside the crack, starts and stops the courtship dance (the touch Dance button).
+-- The naturalist's notebook (ROBLOX-37): N opens it. Godot's D-pad up is the port's walking, so a controller reaches it through the life
+-- menu (View / Touchpad, then Notebook); touch has the Notebook button beside Menu (SpiderClient).
 --
 -- Every button action is held while any source holds it (InputState): a key, a controller button, a finger. Handlers hear
 -- one "begin" when the first source goes down and one "end" when the last comes up, so a touch hold and a key or button
@@ -23,9 +25,10 @@ local HudLayout = require(Shared:WaitForChild("UI"):WaitForChild("HudLayout"))
 local SpiderInput = {}
 
 export type Handlers = {
-	notebook: (() -> ())?, blocked: (() -> boolean)?, menu: (() -> ())?,
+	blocked: (() -> boolean)?, menu: (() -> ())?,
 	feed: (() -> ())?,
 	choose: (() -> ())?, -- C: change spider (in the crack)
+	notebook: (() -> ())?, -- N: the naturalist's notebook
 	display: (() -> ())?, -- X / RB: the peacock spider's courtship dance
 	focus: ((string) -> ())?,
 	jump: (string) -> (), -- "begin", "end", or "cancel" (the engine took the input away)
@@ -42,7 +45,7 @@ export type Handlers = {
 	device: ((string) -> ())?, -- the last input's UserInputType name
 }
 
-local ONE_SHOT = { Notebook = "notebook", Menu = "menu", Reset = "reset", Gait = "gait", Eye = "eye", Recenter = "recenter", Slow = "slow", Help = "help" }
+local ONE_SHOT = { Menu = "menu", Notebook = "notebook", Reset = "reset", Gait = "gait", Eye = "eye", Recenter = "recenter", Slow = "slow", Help = "help" }
 
 -- Bindings by action. Exported for tests and the controls table in README.md.
 SpiderInput.BINDINGS = {
@@ -57,8 +60,8 @@ SpiderInput.BINDINGS = {
 	Eye = { Enum.KeyCode.V, Enum.KeyCode.ButtonY },
 	Recenter = { Enum.KeyCode.R, Enum.UserInputType.MouseButton3, Enum.KeyCode.ButtonR3 },
 	Slow = { Enum.KeyCode.T, Enum.KeyCode.ButtonR2 }, Help = { Enum.KeyCode.H },
-	Notebook = { Enum.KeyCode.N }, Reset = { Enum.KeyCode.Backspace }, Menu = { Enum.KeyCode.M, Enum.KeyCode.ButtonSelect }, Gait = { Enum.KeyCode.G },
-	Choose = { Enum.KeyCode.C }, Display = { Enum.KeyCode.X, Enum.KeyCode.ButtonR1 },
+	Reset = { Enum.KeyCode.Backspace }, Menu = { Enum.KeyCode.M, Enum.KeyCode.ButtonSelect }, Gait = { Enum.KeyCode.G },
+	Choose = { Enum.KeyCode.C }, Notebook = { Enum.KeyCode.N }, Display = { Enum.KeyCode.X, Enum.KeyCode.ButtonR1 },
 } :: { [string]: { any } }
 
 local function sourceOf(input: InputObject?): any
@@ -93,7 +96,8 @@ function SpiderInput.bind(h: Handlers)
 		elseif action == "Drop" then
 			if now then h.drop() end
 		elseif ONE_SHOT[action] then
-			if now and handlers[ONE_SHOT[action]] then handlers[ONE_SHOT[action]]() end
+			local fn = if now then handlers[ONE_SHOT[action]] else nil
+			if fn then fn() end
 		end
 	end
 	for action, keys in SpiderInput.BINDINGS do

@@ -179,8 +179,8 @@ needs.drainScale=NeedsModel.PLAY_DRAIN
 prey.feeding.needs = needs
 prey.feeding:useGameRules() -- an easier tap on a struggling fly (ROBLOX-72, Data/Catch.game); Godot's numbers stay Feeding's defaults
 local life = LifeLoop.new(needs, nil)
--- The mud dauber wasp (ROBLOX-26): a port of Godot's wasp director (Shared/Predator/WaspDirector). It visits by day from the second day,
--- once the first meal is eaten, and not while the spider rests; it is heard (a caption with its direction) for 8 s before it can look.
+-- The mud dauber wasp (ROBLOX-26): a port of Godot's wasp director (Shared/Predator/WaspDirector). It visits by day from the second day (twice a day in the
+-- game, ROBLOX-75), once the first meal is eaten, and not while the spider rests; it is heard (a caption with its direction) for 8 s before it can look.
 -- It reads the sill through the same casts as the senses. In the test place it never comes by itself (Workspace attribute Wasp = true
 -- allows it); the attribute WaspForce = a place id ("floor_middle") brings it at once, for Studio and playtests. There is no Gentle
 -- mode in Roblox yet, so a catch is always a catch.

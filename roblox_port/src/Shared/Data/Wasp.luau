@@ -17,10 +17,18 @@ Wasp.windowFromH = 10.0
 Wasp.windowToH = 15.5
 
 -- The game's own rules, which the Godot replay above does not use (the goldens keep the values above; WaspDirector:useGameRules() applies these):
--- a visit on every day from firstDay (guaranteed, ROBLOX-67) at an hour the seed picks inside the same warm window, and Chet's longer, slightly
+-- a visit on every day from firstDay (guaranteed, ROBLOX-67), two a day in two windows of the day (ROBLOX-75), and Chet's longer, slightly
 -- sharper visits (ROBLOX-62). The first-day, first-meal and rest protections do not change.
 Wasp.game = {
-	visitChance = 1.0, -- 1 = every day from firstDay (Godot: visitChance above, some days only)
+	visitChance = 1.0, -- 1 = every visit of every day from firstDay (Godot: visitChance above, some days only); a visit of the day is drawn against it each
+	-- ROBLOX-75 (Nathan: "the wasp needs to be around more, maybe a couple times through the day"): two visits a day, one in each of these windows
+	-- (from, to; hours of the life clock; Godot has the one window windowFromH to windowToH above). The hour of each is drawn from the world's seed,
+	-- the day and the visit's place in the day, in the window's first part (up to an hour before its end, so a rest can still delay it inside the
+	-- window), and the afternoon's is at least minGapH after the morning's. Every visit is a full one (the warning, the search, its own takesRival
+	-- draw below) and has its own protections: a rest or moult at its hour only delays it to the window's end, and a rest through the whole window
+	-- skips that visit and no other.
+	windows = { { 9.5, 12.0 }, { 13.5, 16.5 } },
+	minGapH = 2.0,
 	searchScale = 1.6, noticeScale = 1.2, inspectScale = 0.8,
 	-- ROBLOX-70 (Nathan: "The wasp should kill the rival male like 10 percent of the time"): the chance, per visit, that a visit is for the rival
 	-- male instead of the spider, when there is a free rival on the sill that is not in the retreat. Drawn from a stream of its own (the visit's

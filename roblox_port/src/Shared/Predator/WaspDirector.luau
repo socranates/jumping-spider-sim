@@ -39,7 +39,8 @@ local PreyRandom = require(script.Parent.Parent.Prey.PreyRandom)
 local WaspDirector = {}
 WaspDirector.__index = WaspDirector
 
-WaspDirector.PHASES = table.freeze({ "away", "arriving", "searching", "inspecting", "striking", "carrying", "leaving" })
+-- ("taking", "seizing" and "bearing" are the game's wasp going for the rival male, ROBLOX-70: flying to it and hanging over it, the strike, carrying it off.)
+WaspDirector.PHASES = table.freeze({ "away", "arriving", "searching", "inspecting", "striking", "carrying", "leaving", "taking", "seizing", "bearing" })
 
 export type Rng = {
 	range: (Rng, number, number) -> number, -- a number in [lo, hi)
@@ -62,7 +63,8 @@ export type Spider = {
 	falling: boolean, -- let down on its line (or fallen)
 }
 -- The life this tick (Godot: the habitat loop and the feeding controller).
-export type Block = { day: number, hour: number, resting: boolean, moulting: boolean, meals: number }
+-- `rival`: the free rival male the wasp may take, if one is on the sill (RivalSpider.target): where it is and which way is up from it.
+export type Block = { day: number, hour: number, resting: boolean, moulting: boolean, meals: number, rival: { position: Vector3, up: Vector3, present: boolean }? }
 export type Signal = { kind: string, [string]: any }
 
 local UP = Vector3.new(0, 1, 0)
@@ -110,6 +112,8 @@ function WaspDirector.new(config: { seed: number, world: World, enabled: boolean
 		signals = {} :: { Signal },
 		-- Where the spider hangs while it is carried (nil otherwise); the host moves the spider there each tick.
 		heldAt = nil :: Vector3?, holding = false,
+		-- The rival male (ROBLOX-70): whether this visit is for it, whether it hangs under the wasp, and where.
+		takeRival = false, holdingRival = false, rivalHeldAt = nil :: Vector3?, rivalNow = nil :: any, takeSub = "fly", takeOpen = Vector3.new(0, 0, 0),
 		-- The visit in progress.
 		rng = nil :: Rng?, path = {} :: { Vector3 }, pathI = 1, speed = Data.flySpeed, point = 1, recent = {} :: { number },
 		sub = "", subS = 0.0, walkDir = Vector3.new(0, 0, 0), stepS = 0.0, openPos = Vector3.new(0, 0, 0), lastSeen = Vector3.new(0, 0, 0),
@@ -124,6 +128,7 @@ end
 function WaspDirector.useGameRules(self: any)
 	local g = Data.game
 	self.visitChance, self.searchScale, self.noticeScale, self.inspectScale = g.visitChance, g.searchScale, g.noticeScale, g.inspectScale
+	self.rivalChance = g.takesRival
 end
 
 function WaspDirector.isVisiting(self: any): boolean
@@ -188,6 +193,9 @@ function WaspDirector.beginVisit(self: any, day: number, first: number?)
 	self.lossPos = nil
 	self.holding = false
 	self.heldAt = nil
+	self.holdingRival, self.rivalHeldAt = false, nil
+	-- Whether this visit is for the rival male (the game's wasp only): a draw from a stream of its own, so the other draws are as before.
+	self.takeRival = self.rivalChance ~= nil and makeStream(self.seed, day * 1009 + 29, self.visits):unit() < self.rivalChance
 	self.point = first or self.rng:int(1, #Data.points)
 	local to: Vector3 = Data.points[self.point].hover
 	self.path = { Data.entry, Data.over, Vector3.new(to.X, Data.cruiseY, to.Z), to }
@@ -209,6 +217,7 @@ end
 function WaspDirector.step(self: any, dt: number, spider: Spider, block: Block)
 	self.dt = dt
 	self.spider = spider
+	self.rivalNow = block.rival
 	local phase: string = self.phase
 	if phase == "away" then
 		if self.enabled then self:_maybeBegin(block) end
@@ -219,6 +228,7 @@ function WaspDirector.step(self: any, dt: number, spider: Spider, block: Block)
 	if phase == "arriving" then
 		if self:_advance(dt) then
 			self.openPos = self.wasp.position
+			if self.takeRival and self:_beginTaking() then return end
 			self:_setPhase("searching")
 			self:_log("searching")
 			self.sub = "hover"
@@ -244,6 +254,19 @@ function WaspDirector.step(self: any, dt: number, spider: Spider, block: Block)
 			self:_setPhase("away")
 			self.wasp.visible = false
 			self:_signal({ kind = "carried_off" })
+		end
+	elseif phase == "taking" then
+		self:_take(dt)
+	elseif phase == "seizing" then
+		self:_seize(dt)
+	elseif phase == "bearing" then
+		local done = self:_advance(dt)
+		self:_holdRival()
+		if done then
+			self:_setPhase("away")
+			self.wasp.visible = false
+			self.holdingRival, self.rivalHeldAt, self.takeRival = false, nil, false
+			self:_signal({ kind = "rival_carried_off" })
 		end
 	elseif phase == "leaving" then
 		if self:_advance(dt) then
@@ -529,6 +552,100 @@ function WaspDirector._beginLeaving(self: any)
 	self:_log("leaving")
 end
 
+-- ---------------------------------------------------------------------------------------------------------------- the rival male (ROBLOX-70)
+
+-- Sets off for the rival, if there is a free one on the sill out of the retreat and a way to hang over it: true, and the visit is for the rival
+-- (it does not look for the spider, and the spider is spared that day). False: the visit goes on as any other.
+function WaspDirector._beginTaking(self: any): boolean
+	local r = self.rivalNow
+	if r == nil or not r.present or self.world.inRetreat(r.position) then return false end
+	local D = Data.rival
+	local top: Vector3 = r.position + r.up * D.aboveWu
+	local low: Vector3 = r.position + r.up * 0.5
+	for _, off in D.offsets do
+		local c = top + Vector3.new(off[1], 0, off[2])
+		local sky = Vector3.new(c.X, math.max(Data.cruiseY, c.Y), c.Z)
+		if not self.world.inRetreat(c) and self:_clear(sky, c, Data.radius) and self:_clear(c, low, D.clearRadius) then
+			self.path = self:_route(self.wasp.position, c)
+			self.pathI = 2
+			self.speed = D.flySpeed
+			self.takeSub = "fly"
+			self.takeOpen = c
+			self.wasp.mode = "flying"
+			self.wasp.search = 0.0
+			self:_setPhase("taking")
+			self:_log("taking")
+			return true
+		end
+	end
+	return false
+end
+
+-- The rival is gone (the spider caught it, say) before the wasp has it: the visit goes on as a search.
+function WaspDirector._abortTaking(self: any)
+	self.takeRival = false
+	self.openPos = self.takeOpen
+	self.wasp.mode = "flying"
+	self:_setPhase("searching")
+	self:_log("rival gone")
+	self:_nextPoint()
+end
+
+function WaspDirector._take(self: any, dt: number)
+	local r = self.rivalNow
+	if r == nil or not r.present then
+		self:_abortTaking()
+		return
+	end
+	if self.takeSub == "fly" then
+		if self:_advance(dt) then
+			self.takeSub = "hover"
+			self.subS = Data.rival.hoverS
+		end
+		return
+	end
+	local wasp = self.wasp
+	self:_moveTo(wasp.position, r.position - wasp.position, dt)
+	self.subS -= dt
+	if self.subS <= 0.0 then
+		self.strikeFrom = wasp.position
+		self.strikeTo = r.position + r.up * 0.2
+		self:_setPhase("seizing")
+		self:_log("seize")
+	end
+end
+
+function WaspDirector._seize(self: any, dt: number)
+	local r = self.rivalNow
+	if r == nil or not r.present then
+		self:_abortTaking()
+		return
+	end
+	local k = math.clamp(self.phaseS / Data.rival.strikeS, 0.0, 1.0)
+	self:_moveTo(self.strikeFrom:Lerp(self.strikeTo, k), self.strikeTo - self.strikeFrom, dt)
+	if k < 1.0 then return end
+	local wasp = self.wasp
+	if (wasp.position - r.position).Magnitude > Data.rival.catchWu then
+		self:_abortTaking()
+		return
+	end
+	self.holdingRival = true
+	wasp.mode = "holding"
+	wasp.search = 0.0
+	local p: Vector3 = wasp.position
+	self.path = { p, p + UP * 2.5, Data.over }
+	self.pathI = 2
+	self.speed = pathLength(self.path) / Data.carryS
+	self:_setPhase("bearing")
+	self:_log("seized")
+	self:_holdRival()
+	self:_signal({ kind = "rival_seized", at = p })
+end
+
+function WaspDirector._holdRival(self: any)
+	if self.holdingRival then self.rivalHeldAt = self.wasp.position + DOWN * Data.holdBelow end
+end
+
 -- ---------------------------------------------------------------------------------------------------------------- paths and the world
 
 function WaspDirector._flyTo(self: any, to: Vector3, speed: number)
@@ -662,6 +779,7 @@ function WaspDirector.clearVisit(self: any)
 	self.confusedS = 0.0
 	self.holding = false
 	self.heldAt = nil
+	self.holdingRival, self.rivalHeldAt, self.takeRival = false, nil, false
 	self.wasp.visible = false
 	self.signals = {}
 	self.events = {}

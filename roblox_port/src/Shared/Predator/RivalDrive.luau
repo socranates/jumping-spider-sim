@@ -255,7 +255,7 @@ function Drive.update(self: any, r: any, dt: number, s: any)
 		motor:place(r.position, r.up, r.heading)
 		return
 	end
-	if state == "lunge" then return end
+	if state == "lunge" or state == "taken" then return end
 	if prev == "lunge" then
 		self:_reseat(r)
 	elseif (motor.pos - r.position).Magnitude > 0.05 or (r.up :: Vector3):Dot(motor.up) < 0.99 then

@@ -925,6 +925,9 @@ local function updateHud(frameDt: number)
 	if wasp:isVisiting() and captionScale > 0 then
 		local direction = WaspText.directionWord(motor.pos, motor.heading, motor.up, wasp.wasp.position)
 		local heard = WaspText.caption(wasp.phase, wasp.phaseS, direction)
+		-- The wasp going for the rival male is told only to a spider that could hear or see it (ROBLOX-70).
+		local forRival = wasp.phase == "taking" or wasp.phase == "seizing" or wasp.phase == "bearing"
+		if forRival and not WaspText.heardRival((motor.pos - wasp.wasp.position).Magnitude, not sightCast(motor.pos, wasp.wasp.position)) then heard = nil end
 		if heard then view.caption = heard end
 	end
 	if aiming then
@@ -941,6 +944,8 @@ local function updateHud(frameDt: number)
 		hidePreview()
 	end
 	local waspLine = WaspText.line(wasp.phase, wasp.confusedS > 0, wasp.visits, wasp.sparedThisVisit, device)
+	if (wasp.phase == "taking" or wasp.phase == "seizing" or wasp.phase == "bearing")
+		and not WaspText.heardRival((motor.pos - wasp.wasp.position).Magnitude, not sightCast(motor.pos, wasp.wasp.position)) then waspLine = nil end
 	if waspLine then table.insert(view.status, waspLine) end
  if life.rival and life.rival.state=="captured" then table.insert(view.status,"Eating rival — stay still (2 meals)") end
 	view.grip = if prey.feeding.struggling then prey.feeding.grip else nil
@@ -1057,6 +1062,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			waspSpider.airborne = motor.mode == "air" and not fallingOnLine and not motor.seized
 			wasp:step(DT, waspSpider, {
 				day = life.clock.day, hour = life.clock.hour, resting = life.resting, moulting = life.growth:isMoulting(), meals = prey.feeding.mealsFinished,
+				rival = RivalSpider.target(life.rival),
 			})
 			for _, signal in wasp:drainSignals() do
 				watch:onWasp(signal.kind, signal.escaped)
@@ -1067,8 +1073,16 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 					dropStrands(false)
 				elseif signal.kind == "carried_off" then
 					showCaught()
+				elseif signal.kind == "rival_seized" then
+					-- The wasp has the rival male (ROBLOX-70): it hangs under the wasp; the spider is not hunted today.
+					if RivalSpider.seize(life.rival) and WaspText.heardRival((motor.pos - signal.at).Magnitude, not sightCast(motor.pos, signal.at)) then
+						life:showNotice(WaspText.RIVAL_TAKEN)
+					end
+				elseif signal.kind == "rival_carried_off" then
+					RivalSpider.carried(life.rival, life.clock.day)
 				end
 			end
+			if wasp.rivalHeldAt and life.rival.state == "taken" then life.rival.position = wasp.rivalHeldAt end
 			if wasp.heldAt then motor:hold(wasp.heldAt) end
 			prey.feeding.auto = setting("AutomaticGrip") == true
 			local takenBefore = prey.feeding.taken
@@ -1080,7 +1094,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
              day=life.clock.day,hour=life.clock.hour,meals=prey.feeding.mealsFinished,resting=life.resting,safe=Layout.inRetreat(motor.pos),
              wasp=wasp:isVisiting(),gentle=needs.gentle,grounded=motor.mode=="attached",moving=motor.moving,
              airborne=motor.mode=="air",onLine=motor:onLine(),holding=prey.feeding.held~=nil,
-             striking=prey.tick<=prey.strikeEnd and not motor.seized,drive=rivalLegs.drive,
+             striking=prey.tick<=prey.strikeEnd and not motor.seized,drive=rivalLegs.drive,taken=wasp.holdingRival,
             }
             local rivalEvent,rivalFood=RivalSpider.step(life.rival,DT,rivalState,sightCast)
             if life.rival.state~="dormant" and life.rival.state~="consumed" and rivalLegs.drive==nil then
@@ -1201,7 +1215,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
      if not rivalLegs.rig then rivalLegs.rig=SpiderRig.new(Workspace,sill,"rival_spider","low");rivalLegs.rig.model.Name="RivalSpider" end
      rivalLegs.rig.reducedMotion=setting("ReducedMotion")==true
      rivalLegs.rig.jumpLoad=if rival.state=="windup" then math.clamp(rival.elapsed,0,1) else 0
-     rivalLegs.rig:update(SupportMath.bodyCFrame(rival.position,rival.up or Vector3.yAxis,rival.heading),if paused then 0 else simFrame,rival.state~="lunge",(rival.position-rival.previous).Magnitude>.001)
+     rivalLegs.rig:update(SupportMath.bodyCFrame(rival.position,if rival.state=="taken" then Vector3.yAxis else (rival.up or Vector3.yAxis),rival.heading),if paused then 0 else simFrame,rival.state~="lunge" and rival.state~="taken",(rival.position-rival.previous).Magnitude>.001)
     elseif rivalLegs.rig then rivalLegs.rig:destroy();rivalLegs.rig=nil end
 	updateHud(frameDt)
 	flyBodies:draw(prey.flies,prey.now)

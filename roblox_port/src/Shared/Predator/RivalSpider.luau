@@ -6,8 +6,9 @@ local M=require(script.Parent.Parent.Prey.PreyMath)
 local Rules=require(script.Parent.Parent.Data.RivalRules)
 local Layout=require(script.Parent.Parent.Habitat.WindowsillLayout)
 local Rival={}
+local function phase(r: any,s: string) r.state=s;r.elapsed=0 end
 Rival.FOOD=.7 -- two housefly-equivalent meals
-local states={dormant=true,patrol=true,stalk=true,windup=true,lunge=true,recover=true,captured=true,consumed=true}
+local states={dormant=true,patrol=true,stalk=true,windup=true,lunge=true,recover=true,captured=true,consumed=true,taken=true}
 -- "dormant" is "has not arrived yet". `day` (nil in a record from before the daily rival) is the day it was eaten, so the next one comes after it.
 function Rival.new(): any
  local at=Rules.arriveAt
@@ -18,6 +19,21 @@ end
 function Rival.renew(r: any)
  for k,v in Rival.new() do r[k]=v end
  r.day=nil
+ r.fate=nil
+end
+-- Where the wasp may take it from (ROBLOX-70): nil unless it is on the sill, awake and free; never in the retreat.
+function Rival.target(r: any): any
+ if r==nil or not (r.state=="patrol" or r.state=="stalk" or r.state=="windup" or r.state=="recover") or Layout.inRetreat(r.position) then return nil end
+ return {position=r.position,up=r.up or Vector3.yAxis,present=true}
+end
+-- The wasp has it: it hangs under the wasp and nothing else touches it.
+function Rival.seize(r: any): boolean
+ if r==nil or Rival.target(r)==nil then return false end
+ phase(r,"taken");return true
+end
+-- The wasp has carried it off the sill: gone for today (food for no one), and a new one comes on a later morning like after an eaten one.
+function Rival.carried(r: any,day: number)
+ r.state="consumed";r.elapsed=0;r.food=0;r.day=day;r.fate="taken by the wasp"
 end
 function Rival.valid(r: any): boolean
  if r==nil then return true end
@@ -34,7 +50,8 @@ function Rival.valid(r: any): boolean
    or u.X~=u.X or u.Y~=u.Y or u.Z~=u.Z or math.abs(u.Magnitude-1)>.05 then return false end
  end
  if r.leg~=nil and (type(r.leg)~="number" or r.leg~=r.leg or r.leg<0 or r.leg>1e9 or r.leg%1~=0) then return false end
- do
+ if r.fate~=nil and r.fate~="eaten" and r.fate~="taken by the wasp" then return false end
+ if r.state=="patrol" or r.state=="stalk" or r.state=="windup" or r.state=="lunge" or r.state=="recover" then
   local p,lo,hi=r.position,Layout.PLAY_BOUNDS_MIN,Layout.PLAY_BOUNDS_MAX
   if p.X<lo.X or p.Y<lo.Y or p.Z<lo.Z or p.X>hi.X or p.Y>hi.Y or p.Z>hi.Z or Layout.inRetreat(Vector3.new(p.X,p.Y,p.Z)) then return false end
  end
@@ -45,12 +62,16 @@ function Rival.valid(r: any): boolean
  end
  return true
 end
-local function phase(r: any,s: string) r.state=s;r.elapsed=0 end
 -- blocked(a,b) is the same opaque-world sight query as flies use. Player input is a snapshot of this fixed tick.
 -- Returns an event and the amount swallowed; the caller owns food grants and end-of-life presentation.
 function Rival.step(r: any,dt: number,s: any,blocked: (Vector3,Vector3)->any): (string,number)
  if dt<=0 or dt~=dt then return "",0 end
  dt=math.min(dt,.05);r.previous=r.position
+ if r.state=="taken" then
+  -- In the wasp's grip. If the wasp no longer holds it (a record returned to), it is gone: carried off.
+  if s.taken then return "",0 end
+  Rival.carried(r,s.day or 0);return "taken",0
+ end
  if r.state=="consumed" then
   -- An old record has no day: the day it is first seen eaten is the day it was eaten. A new rival comes on a later morning.
   if r.day==nil then r.day=s.day end
@@ -60,7 +81,7 @@ function Rival.step(r: any,dt: number,s: any,blocked: (Vector3,Vector3)->any): (
   r.position=s.position+s.heading*.4;r.heading=s.heading
   if not s.grounded or s.moving then return "paused",0 end
   local food=math.min(r.food,.14*dt);r.food=math.max(0,r.food-food)
-  if r.food<=1e-8 then r.food=0;r.day=s.day;phase(r,"consumed");return "eaten",food end
+  if r.food<=1e-8 then r.food=0;r.day=s.day;r.fate="eaten";phase(r,"consumed");return "eaten",food end
   return "feeding",food
  end
  if r.state=="dormant" then
@@ -128,7 +149,7 @@ function Rival.step(r: any,dt: number,s: any,blocked: (Vector3,Vector3)->any): (
  return "",0
 end
 function Rival.percept(r: any): any
- if r.state=="dormant" or r.state=="captured" or r.state=="consumed" then return nil end
+ if r.state=="dormant" or r.state=="captured" or r.state=="consumed" or r.state=="taken" then return nil end
  return {id="rival_spider",position=r.position,radius=.45,velocity=(r.position-r.previous)*60,maxCategory="movement"}
 end
 return Rival

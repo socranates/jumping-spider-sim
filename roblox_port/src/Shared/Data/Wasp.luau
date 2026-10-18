@@ -22,6 +22,24 @@ Wasp.windowToH = 15.5
 Wasp.game = {
 	visitChance = 1.0, -- 1 = every day from firstDay (Godot: visitChance above, some days only)
 	searchScale = 1.6, noticeScale = 1.2, inspectScale = 0.8,
+	-- ROBLOX-70 (Nathan: "The wasp should kill the rival male like 10 percent of the time"): the chance, per visit, that a visit is for the rival
+	-- male instead of the spider, when there is a free rival on the sill that is not in the retreat. Drawn from a stream of its own (the visit's
+	-- seed), so the places and times of the other draws do not change. 0 turns it off.
+	takesRival = 0.10,
+}
+
+-- How it takes the rival (the game only; Godot's wasp has no rival): it flies to a place just above it and a little aside (the first of these
+-- offsets from which the way down is clear), hangs there, strikes and carries it up and away like a spider.
+Wasp.rival = {
+	aboveWu = 1.3, -- above the rival's surface, where it hovers
+	offsets = { { 0.0, 0.0 }, { 1.5, 0.0 }, { -1.5, 0.0 }, { 0.0, 1.5 }, { 0.0, -1.5 }, { 3.0, 0.0 }, { -3.0, 0.0 }, { 0.0, 3.0 }, { 0.0, -3.0 }, { 2.2, 2.2 }, { -2.2, 2.2 }, { 2.2, -2.2 }, { -2.2, -2.2 } },
+	flySpeed = 5.0, -- it goes straight for it (searching is 4)
+	hoverS = 0.8, -- it hangs over it before it strikes
+	strikeS = 0.35,
+	catchWu = 0.8,
+	clearRadius = 0.3, -- the way down to the rival is checked with this sphere
+	earshotWu = 18.0, -- the player is told what happened (a caption, a notice) when the wasp is this near
+	sightWu = 24.0, -- ... or in clear sight of it, this far
 }
 
 -- A visit (game seconds): heard while it arrives, searching, flying away, carrying the spider off.

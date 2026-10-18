@@ -612,5 +612,31 @@ case("the roaming rival (ROBLOX-69): a checkpoint taken mid-climb brings it back
  local oldRec=assert(Checkpoint.capture(old,0))
  check(Checkpoint.restore(oldRec,old) and old.life.rival.state=="patrol","an older record of a patrolling rival restores")
 end)
+case("the wasp takes the rival (ROBLOX-70): a rest taken while it hangs under the wasp, one after it is gone, why it is gone, and the next morning", function()
+ local Rival=require("../src/Shared/Predator/RivalSpider")
+ local w=newWorld();local r=Rival.new();r.state="patrol";r.position=Vector3.new(12,.31,3);w.life.rival=r
+ check(Rival.seize(r),"the wasp seizes the rival")
+ r.position=Vector3.new(27,16,2)
+ local held=assert(Checkpoint.capture(w,0))
+ -- A rest taken then restores (the wasp's visit is not kept, so the rival is carried off at once).
+ w.life.rival=nil
+ check(Checkpoint.restore(held,w) and w.life.rival.state=="taken","a record taken under the wasp restores")
+ local s={position=Vector3.new(-25,.31,6),previous=Vector3.new(-25,.31,6),heading=Vector3.xAxis,day=3,hour=13,meals=2,
+  resting=true,safe=true,wasp=false,gentle=false,grounded=true,moving=false,airborne=false,onLine=false,holding=false,striking=false,taken=false}
+ local ev=Rival.step(w.life.rival,DT,s,function() return false end)
+ check(ev=="taken" and w.life.rival.state=="consumed" and w.life.rival.day==3 and w.life.rival.fate=="taken by the wasp","with no wasp holding it, it is gone for today, and why")
+ local gone=assert(Checkpoint.capture(w,0))
+ w.life.rival=nil
+ check(Checkpoint.restore(gone,w) and w.life.rival.state=="consumed" and w.life.rival.fate=="taken by the wasp" and w.life.rival.day==3,"that record restores with its reason and its day")
+ s.day,s.hour,s.resting,s.safe=4,7.5,false,false
+ Rival.step(w.life.rival,DT,s,function() return false end)
+ check(w.life.rival.state=="patrol" and w.life.rival.fate==nil and w.life.rival.food==Rival.FOOD,"the next morning a new rival")
+ check(Checkpoint.restore(gone,w) and w.life.rival.state=="consumed","a return to that rest brings back the day's state: no second rival today")
+ for _,bad in {3,true,"elf"} do
+  w.life.rival.fate=bad
+  local rec=assert(Checkpoint.capture(w,0))
+  check(not Checkpoint.restore(rec,w),`a rival whose fate is {tostring(bad)} is refused`)
+ end
+end)
 print(`CHECKPOINT passed={passed} failed={failed}`)
 if failed > 0 then error("CHECKPOINT failed") end

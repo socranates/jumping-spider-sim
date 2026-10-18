@@ -301,10 +301,13 @@ case("an older record (no up, no leg) is accepted; a bad one is refused; a recor
 	bad.up = Vector3.new(0, 3, 0)
 	check(not Rival.valid(bad), "an up that is not a direction is refused")
 	bad.up = Vector3.yAxis
+	bad.state = "patrol"
 	bad.position = Vector3.new(-26, 0.31, 6)
 	check(not Rival.valid(bad), "a rival in the retreat is refused")
 	bad.position = Vector3.new(0, 90, 0)
 	check(not Rival.valid(bad), "a rival outside the sill is refused")
+	bad.state = "captured"
+	check(Rival.valid(bad), "(a rival the spider holds goes where the spider goes, even to the crack: not checked)")
 	-- Restored elsewhere: the legs follow the state.
 	local d2, r2, m2 = newRival(FLOOR, Vector3.yAxis)
 	Drive.update(d2, r2, DT, snapshot())

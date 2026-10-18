@@ -40,6 +40,7 @@ C.__index = function(c, k)
 	if k == "UpVector" then return c.y end
 	if k == "LookVector" then return -c.z end
 	if k == "RightVector" then return c.x end
+	if k == "Rotation" then return cnew(vnew(0, 0, 0), c.x, c.y, c.z) end
 	return cm[k]
 end
 local I = cnew(vnew(0, 0, 0), vnew(1, 0, 0), vnew(0, 1, 0), vnew(0, 0, 1))
@@ -71,10 +72,17 @@ Inst.__index = function(t, k)
 	if k == "SetAttribute" then return function(self, a, v) rawset(self, "attr_" .. a, v) end end
 	if k == "GetAttribute" then return function(self, a) return rawget(self, "attr_" .. a) end end
 	if k == "Destroy" then return function() end end
+	if k == "GetChildren" then return function(self) return rawget(self, "_kids") or {} end end -- the rig sizes and colours its parts for growth
+	if k == "IsA" then return function(self, cls) return rawget(self, "ClassName") == cls or (cls == "BasePart" and rawget(self, "ClassName") == "Part") end end
 	return nil
 end
 Inst.__newindex = function(t, k, v)
 	if k == "Parent" and v ~= nil and rawget(t, "ClassName") == "SpecialMesh" then rawset(v, "Mesh", t) end
+	if k == "Parent" and v ~= nil then
+		local kids = rawget(v, "_kids")
+		if kids == nil then kids = {}; rawset(v, "_kids", kids) end
+		table.insert(kids, t)
+	end
 	rawset(t, k, v)
 end
 Instance = { new = function(cls)

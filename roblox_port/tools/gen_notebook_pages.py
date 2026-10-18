@@ -49,6 +49,12 @@ PEACOCK = {
  'game':'Our repeating dance is inspired by recorded displays. Its size, colour, timing and movement are stylised. There is no mating simulation, and the cosmetic dance is available at every gameplay growth stage.',
  'sources':['Girard, M. B., Kasumovic, M. M. & Elias, D. O. (2011). Multi-Modal Courtship in the Peacock Spider, Maratus volans. PLoS ONE 6(9): e25390. https://doi.org/10.1371/journal.pone.0025390']}
 
+ANTMIMIC = {
+ 'id':'walking_like_an_ant','trigger':'antennae','title':'Walking like an ant',
+ 'text':"Myrmarachne formicaria is a jumping spider that mimics an ant. It walks on all eight legs, and when it stands still it raises its front legs above its head and moves them together, like an ant's antennae. It makes only short stops, about 83 milliseconds on average, so it seems to move almost constantly, as ants do. In tests with Phidippus audax as the predator, ordinary spider targets were attacked 4.5 times as often as ants and 3 times as often as mimics; ants and mimics did not differ.",
+ 'game':"The ant mimic is a look only: where you go, how fast and what the wasp does are the first spider's. Its front legs rise when you keep still, and a stop shorter than about 83 milliseconds is not drawn as a pause. The waving, the sway of the body as it walks, the colours and the size are stylised: the real mimic's wobbling path is not walked. The female is drawn.",
+ 'sources':["Shamble, P. S., Hoy, R. R., Cohen, I. & Beatus, T. (2017). Walking like an ant: a quantitative and experimental approach to understanding locomotor mimicry in the jumping spider Myrmarachne formicaria. Proceedings of the Royal Society B 284: 20170308. https://doi.org/10.1098/rspb.2017.0308"]}
+
 def lua_str(s):
     return '"' + s.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n") + '"'
 
@@ -74,7 +80,7 @@ def main():
     ]
     triggers = ["start", "jump", "jump_far", "jump_long", "eye_view", "eye_time_20", "eye_time_60", "shimmer",
                 "fly_recognised", "catch", "meal", "felt", "buzz", "rest", "sleep", "hungry", "well_fed",
-                "moult_ready", "moulted", "adult", "wasp", "wasp_escaped", "wasp_caught", "starving", "dance"]
+                "moult_ready", "moulted", "adult", "wasp", "wasp_escaped", "wasp_caught", "starving", "dance", "antennae"]
     out += ["\t" + lua_str(t) + "," for t in triggers]
     out += [
         "}",
@@ -94,7 +100,7 @@ def main():
         "",
         "NotebookPages.pages = {",
     ]
-    for p in doc["pages"] + [PEACOCK]:
+    for p in doc["pages"] + [PEACOCK, ANTMIMIC]:
         adapted = p["id"] in ADAPTED
         game = ADAPTED[p["id"]][0] if adapted else p["game"]
         out.append("\t{")
@@ -111,7 +117,7 @@ def main():
         out.append("\t},")
     out += ["} :: { Page }", "", "return NotebookPages", ""]
     OUT.write_text("\n".join(out), encoding="utf-8", newline="\r\n")
-    print("wrote", OUT, len(doc["pages"])+1, "pages;", len(ADAPTED), "with a Roblox 'In this game' line")
+    print("wrote", OUT, len(doc["pages"])+2, "pages;", len(ADAPTED), "with a Roblox 'In this game' line")
 
 
 main()

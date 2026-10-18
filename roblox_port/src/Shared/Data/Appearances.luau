@@ -304,4 +304,115 @@ end
 -- A brown rival, distinct from the player; illustrative salticid, no species identification.
 local rival=table.clone(first)
 rival.id="rival_spider";rival.body={.22,.14,.08};rival.legs={.27,.18,.10};rival.white={.64,.48,.29}
-return { default = "first_spider", profiles = { first_spider = first, maratus_volans_male = volans, rival_spider=rival } }
+
+-- ================================================================ the ant-mimicking spider (ROBLOX-64)
+-- Myrmarachne formicaria, the female: a third profile beside the daughter's and the peacock's, chosen from the crack (Client/SpiderClient).
+-- A jumping spider that looks like an ant (Shamble, Hoy, Cohen & Beatus 2017, Proc. R. Soc. B 284: 20170308; see Data/AntMimic): a slender,
+-- glossy dark brown-black body (DOC), the cephalothorax pinched into a "head" and a "thorax" (DOC), the abdomen joined by a narrow waist
+-- like an ant's petiole, with an oval "gaster" behind it (DOC), and long thin legs (DOC). It keeps a jumping spider's eight eyes with the big
+-- pair in front: take away the ant's body and it is a salticid. The playbacks' body length was 5 mm (DOC), so the drawn spider is 0.5 studs
+-- (1 stud = 1 cm). The exact colours, proportions, thicknesses and angles are ART. The male (huge forward chelicerae) is a possible later variant.
+-- Collider, senses and physics are the first spider's: this is a drawn appearance, an antennae pose and a drawn wobble, nothing more.
+local ant = {
+	id = "myrmarachne_formicaria_female",
+	name = "Ant-mimicking spider (female)",
+	scale = 0.5, -- SpiderRig scales its own distances (foot search, stepping) by this
+	cameraScale = 0.6, -- closer framing for the small appearance; user zoom still applies
+	bodyDrop = 0.19, -- the drawn body sits this far (studs) below the collider's centre (0.31 over the surface): long legs, the body well off the floor
+
+	-- ---------------------------------------------------------------- colours (ART)
+	body = { 0.050, 0.030, 0.022 }, -- the head: glossy dark brown-black
+	legs = { 0.20, 0.115, 0.055 }, -- amber-brown legs
+	white = { 0.50, 0.36, 0.18 }, -- palp bands: a dull amber (no white on this spider)
+	eyes = { 0.008, 0.008, 0.008 },
+	fangs = { 0.12, 0.060, 0.030 },
+	joint = { 0.11, 0.065, 0.035 },
+	palpColors = { stalk = { 0.18, 0.10, 0.05 }, club = { 0.30, 0.18, 0.08 }, tip = { 0.42, 0.28, 0.12 } },
+	abdomenColor = { 0.068, 0.040, 0.027 }, -- the gaster: a shade warmer than the head, so the three segments read apart
+	gloss = 0.16, -- glossy cuticle (Reflectance on the body segments)
+
+	-- ---------------------------------------------------------------- proportions: head, thorax, waist, gaster (body frame: -Z forward)
+	headCenter = { 0, 0, -0.165 },
+	headRadii = { 0.072, 0.062, 0.080 },
+	abdomenCenter = { 0, 0.004, 0.145 },
+	abdomenRadii = { 0.058, 0.052, 0.105 },
+	pedicel = { center = { 0, 0.0, 0.041 }, radii = { 0.021, 0.021, 0.024 } },
+	face = { center = { 0, -0.012, -0.205 }, radii = { 0.050, 0.040, 0.040 } },
+	neck = { 0, 0, -0.095 }, -- the head tilts about this point
+	-- More body segments the first spiders do not have: the thorax behind the head (the pinch between them is the "neck" of an ant's silhouette)
+	-- and the node on the waist (the petiole). group: "body", "head" or "abdomen" (what they move with).
+	extras = {
+		{ name = "Thorax", center = { 0, 0.004, -0.040 }, radii = { 0.056, 0.052, 0.074 }, group = "body", color = { 0.125, 0.070, 0.038 } },
+		{ name = "PetioleNode", center = { 0, 0.020, 0.046 }, radii = { 0.016, 0.019, 0.015 }, group = "body", color = { 0.085, 0.048, 0.028 } },
+	},
+	chelicerae = { x = 0.016, y = -0.040, z = -0.234, radii = { 0.013, 0.019, 0.013 }, pitch = -0.35, splay = 0.12, reflectance = 0.1 }, -- the female's are small
+	-- Eyes, as a jumping spider's: the big principal pair in front (a second look shows a spider), two smaller pairs at the sides and on the dome.
+	eye = {
+		ame = {
+			x = 0.032, y = 0.012, radii = { 0.029, 0.029, 0.025 }, out = 0.30, reflectance = 0.5,
+			socket = { scale = 1.12, color = { 0.20, 0.115, 0.05 } },
+			glints = { { dx = 0.009, dy = 0.011, r = 0.0075 }, { dx = -0.009, dy = -0.011, r = 0.0033 } },
+		},
+		ale = { x = 0.055, y = 0.020, r = 0.014, out = 0.15, reflectance = 0.3 },
+		ple = { x = 0.050, z = -0.130, r = 0.016, out = 0.10, reflectance = 0.3 },
+		pme = { x = 0.036, z = -0.190, r = 0.006, out = 0.10, reflectance = 0.3 },
+		glintColor = { 1, 1, 1 },
+	},
+	palp = {
+		x = 0.030, y = -0.030,
+		drop = 0.022, reach = 0.004, spread = 0.008, offsetScale = 0.25, -- the club and tip sit closer to the stalk at this size
+		stalk = 0.011, club = { 0.013, 0.012, 0.016 }, tipRadii = { 0.0085, 0.0075, 0.0085 },
+		fluff = { hairs = 0, length = 0, width = 0, flat = 1, transparency = 0 },
+		drumHz = 3.2, drumDeg = 13,
+	},
+	-- Legs (display only): long and thin, standing the body well off the floor, spread like an ant's.
+	limbs = {
+		hipX = 0.040, hipY = -0.010,
+		hipZ = { -0.115, -0.070, -0.025, 0.020 },
+		tipZ = { -0.27, -0.13, 0.09, 0.27 },
+		diameters = { { 0.020, 0.014 }, { 0.019, 0.013 }, { 0.019, 0.013 }, { 0.020, 0.014 } },
+		thickness = 1.0,
+		stance = { x = 0.24, y = -0.12, reach = 1.0 }, -- the rest foot spot (the drop of 0.19 puts it on the surface)
+		kneeLift = 0.15, kneeLiftAir = 0.10, ankleLift = 0.02,
+		pad = 1.6,
+		pairReach = { 1.0, 1.0, 1.0, 1.1 },
+	},
+	frontLegScale = 1.0,
+	bandFraction = 0.12, -- the amber band on each palp
+	speckleCount = 0,
+	spots = {},
+	band = { count = 0, step = 0.1, z = 0, rx = 0.01, rz = 0.01 },
+	speckle = { from = 0.4, step = 0.1, rx = 0.004, rz = 0.005 },
+	-- The antennal illusion (DOC: when stationary, legs I are raised above head height and move in phase like ant antennae): where the foot goes
+	-- (body frame, studs, x mirrored for the left leg) when they are up, when they are up and high (the display key) and at the end of a wave
+	-- sweep (down and forward). `kneeOut` pushes the knee outward and `kneeUp` lifts it. All ART; Rig/AntMimicPose says how far and how fast.
+	antennae = {
+		pair = 1,
+		up = { x = 0.075, y = 0.175, z = -0.285 },
+		high = { x = 0.085, y = 0.225, z = -0.300 },
+		swept = { x = 0.095, y = 0.130, z = -0.335 },
+		kneeOut = 0.030, kneeUp = 0.020,
+	},
+
+	-- ---------------------------------------------------------------- no fuzz (sub-pixel at this size), no fan, no idle motion: when still it waves its legs I
+	fuzz = nil,
+	idle = {
+		riseSeconds = 1.0, fallSeconds = 0.25,
+		breathe = { period = 3.0, bodyLift = 0, lift = 0, pitchDeg = 0 },
+		tilt = { rollDeg = 0, yawDeg = 0, pitchDeg = 0, periods = { 9.1, 5.3, 11.3, 6.7, 8.3 } },
+	},
+	-- Full is for PCs; low is for phones and tablets: no foot balls, no eye sockets, no outline. No leg bands, no hairs at either tier.
+	detail = {
+		full = {
+			every = { lock = 0, guard = 0, fringe = 0, pale = 0, tuft = 0, ruff = 0, palp = 0, leg = 0 },
+			shells = 0, speckleEvery = 1, pads = true, sockets = true, idle = false, highlight = true, legBands = false,
+		},
+		low = {
+			every = { lock = 0, guard = 0, fringe = 0, pale = 0, tuft = 0, ruff = 0, palp = 0, leg = 0 },
+			shells = 0, speckleEvery = 1, pads = false, sockets = false, idle = false, highlight = false, legBands = false,
+		},
+	},
+}
+
+return { default = "first_spider", profiles = { first_spider = first, maratus_volans_male = volans, myrmarachne_formicaria_female = ant, rival_spider = rival } }
+

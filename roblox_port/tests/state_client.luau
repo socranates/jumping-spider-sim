@@ -336,6 +336,12 @@ case("the real client uses a later copy of the saved state, but never over what 
 	check(driver.notebook:isOpen("eight_eyes") and driver.notebook:isOpen("bold_jumper") and jumpPage ~= nil and driver.notebook:isOpen(jumpPage), "pages only ever add")
 	check(driver.session.finishedMain == true, "an adult life stays")
 	check(driver.appearance() == "first_spider", "the spider the save names is used when the player has not chosen one")
+	R.deliver({ kind = "loaded", v = 1, status = "saved", progress = SaveProgress.snapshot({ opened = { "eight_eyes" }, eye_seconds = 1 }, false, "myrmarachne_formicaria_female", {}), rests = {} })
+	frames(3)
+	check(driver.appearance() == "myrmarachne_formicaria_female" and lp:GetAttribute("Appearance") == "myrmarachne_formicaria_female" and workspace:FindFirstChild("Spider"):GetAttribute("AppearanceId") == "myrmarachne_formicaria_female", "a save that names the ant-mimicking spider puts it on")
+	R.deliver({ kind = "loaded", v = 1, status = "saved", progress = SaveProgress.snapshot({ opened = { "eight_eyes" }, eye_seconds = 1 }, false, "first_spider", {}), rests = {} })
+	frames(3)
+	check(driver.appearance() == "first_spider", "and a later save that names the first spider puts that back")
 	-- junk from the server changes nothing
 	local pages = #driver.notebook.opened
 	for _, junk in { "x", { kind = "loaded", progress = "nope", rests = 5 }, { kind = "loaded", progress = { notebook = { opened = { "../x" } } } }, { kind = "rest", mode = "main", record = { not_a_rest = true } } } do

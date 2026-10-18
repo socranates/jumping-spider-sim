@@ -119,6 +119,7 @@ NotebookText.TRY = {
  {id="new_skin",text="Eat, then rest when ready to moult."},
  {id="grown_up",text="Grow through three moults."},
  {id="peacock_dance",text="Change to the peacock while resting, then dance outside."},
+ {id="walking_like_an_ant",text="Change to the ant mimic while resting, then stand still."},
 }
 function NotebookText.checklist(book:any):string
  local lines={}

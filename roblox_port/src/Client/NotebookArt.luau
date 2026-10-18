@@ -16,6 +16,11 @@ function Art.draw(parent: Instance,id:string)
 		shape(centre,105,58,78,55,0,Color3.fromRGB(16,125,146),true)
 		shape(centre,105,58,58,38,0,Color3.fromRGB(231,125,54),true)
 	end
+	if id=="walking_like_an_ant" then
+		-- Raised front legs, like antennae, and a narrow waist.
+		for side=-1,1,2 do shape(centre,105+side*17,14,3,30,side*24,ink,true) end
+		shape(centre,105,48,10,10,0,ink,true)
+	end
 	shape(centre,105,62,34,43,0,ink,true);shape(centre,105,35,30,26,0,ink,true)
 	for side=-1,1,2 do
 		for i=1,4 do

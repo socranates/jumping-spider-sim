@@ -9,6 +9,7 @@ local Setae = require("../src/Shared/Rig/Setae")
 local SupportMath = require("../src/Shared/Movement/SupportMath")
 local SpiderRig = require("../src/Shared/Rig/SpiderRig")
 local PeacockDance = require("../src/Shared/Rig/PeacockDance")
+local AntMimicPose = require("../src/Shared/Rig/AntMimicPose")
 
 local passed, failed = 0, 0
 local function check(ok: boolean, what: string)
@@ -561,7 +562,156 @@ for _,r in {pFull,pLow,dFloor} do
  r.hangDirection=nil;r:update(body,1/60,true,false)
  check(r._hang==0,"landing restores surface frame immediately")
 end
-for _, r in { pFull, pLow, pFloor, dFloor } do r:destroy() end
+
+
+-- ---------------------------------------------------------------- the ant-mimicking spider (ROBLOX-64)
+-- A third appearance drawn by the same rig: an ant's three segments and waist, long thin legs, a jumping spider's eyes. Legs I go up as
+-- antennae and the body turns a little as it walks, both only from the pose. The first spider and the peacock spider are checked above and
+-- below and nothing here changes them.
+local function antMimicChecks() -- a function of its own: this file is close to Luau's limit of 200 locals
+local ant = Appearances.profiles.myrmarachne_formicaria_female
+check(ant ~= nil and ant.id == "myrmarachne_formicaria_female" and Appearances.default == "first_spider" and Appearances.profiles.maratus_volans_male ~= nil, "the ant-mimicking spider is a third profile and the default is still the first spider")
+local NA = Anatomy.layout(ant)
+local aLength = (NA.abdomenCenter.Z + NA.abdomenRadii.Z) - (NA.faceCenter.Z - NA.faceRadii.Z)
+check(aLength >= 0.46 and aLength <= 0.54, `the ant-mimicking spider's body is about 0.5 studs long ({string.format("%.3f", aLength)}; the playbacks' body length was 5 mm at 1 stud = 1 cm)`)
+check(ant.fuzz == nil and ant.fan == nil and ant.scale == 0.5 and ant.bodyDrop > 0.15 and ant.bodyDrop < 0.25 and ant.antennae ~= nil and ant.antennae.pair == 1, "no fuzz, no fan, stands on long legs; legs I are its antennae")
+local aFront = {}
+for _, e in NA.eyes do if e.principal then table.insert(aFront, e) end end
+check(#aFront == 2 and #NA.eyes == 8 and #NA.palps == 2 and #NA.cheeks == 0, "still a jumping spider: two big front eyes, six smaller ones, two palps")
+-- An ant's silhouette: a head wider than the thorax, a waist narrower than any of the three, an oval gaster behind it, in a row.
+local thorax, node
+for _, ex in ant.extras do
+	if ex.name == "Thorax" then thorax = ex elseif ex.name == "PetioleNode" then node = ex end
+end
+check(thorax ~= nil and node ~= nil, "a thorax and a node on the waist are drawn")
+local waistX = ant.pedicel.radii[1]
+check(NA.headRadii.X > thorax.radii[1] and waistX < thorax.radii[1] * 0.5 and waistX < NA.abdomenRadii.X * 0.5, "the head is wider than the thorax and the waist is a narrow petiole (under half either side)")
+check(NA.headCenter.Z < thorax.center[3] and thorax.center[3] < ant.pedicel.center[2 + 1] and ant.pedicel.center[3] < NA.abdomenCenter.Z, "head, thorax, waist and gaster in a row, front to back")
+local pinchHead = ellipsoidRadius(NA.headCenter, NA.headRadii, Vector3.new(0, 0, (NA.headCenter.Z + NA.headRadii.Z + (thorax.center[3] - thorax.radii[3])) / 2))
+check(pinchHead < 1.0 and NA.abdomenRadii.Z * 2 > NA.headRadii.Z * 2 * 1.2, "the head and the thorax overlap only at a pinch, and the gaster is the longest segment")
+check(ant.legs[1] < 0.3 and ant.gloss ~= nil and ant.gloss > 0 and ant.gloss <= 0.3, "dark, glossy cuticle (the body is nearly black)")
+check(ant.limbs.diameters[1][1] <= 0.025 and ant.limbs.stance.reach >= 1.0, "long, thin legs")
+
+local function aRig(detail: string, parent: Instance?)
+	local folder = parent or Instance.new("Folder")
+	return SpiderRig.new(folder, folder, "myrmarachne_formicaria_female", detail)
+end
+local aFull, aLow = aRig("full"), aRig("low")
+local ac, al = census(aFull.model:GetChildren()), census(aLow.model:GetChildren())
+print(`look: ant-mimicking spider full {ac.total} parts, low {al.total}`)
+check(ac.total <= 100 and ac.hair == 0 and ac.shell == 0, `ant mimic full detail part budget ({ac.total})`)
+check(al.total <= 70 and al.total < ac.total * 0.9, `ant mimic low detail part budget ({al.total})`)
+check(ac.bad == 0 and al.bad == 0, "every drawn ant mimic part is anchored, non-colliding, not queryable and has a real size")
+local an, anl = names(aFull), names(aLow)
+check((an.Thorax or 0) == 1 and (an.PetioleNode or 0) == 1 and (an.Pedicel or 0) == 1 and (an.Abdomen or 0) == 1 and (an.Cephalothorax or 0) == 1, "the full set of segments: head, thorax, node, waist, gaster")
+check((an.PrincipalEye or 0) == 2 and (an.Catchlight or 0) == 4 and (an.PaleCheek or 0) == 0 and (an.CarapaceStripe or 0) == 0 and (an.FanField or 0) == 0, "the big front eyes with their catchlights; no cheeks, stripes or fan")
+check((an.Femur1 or 0) == 1 and (an.Femur8 or 0) == 1 and (an.FemurBand1 or 0) == 0 and (anl.Foot1 or 0) == 0 and (an.Foot1 or 0) == 1, "eight legs; no bands; foot balls only at full detail")
+local aBad = false
+for name in an do
+	for _, bad in FORBIDDEN do if bad ~= "Cheek" and string.find(name, bad) then aBad = true end end
+end
+check(not aBad, "no ant mimic part is named like a human feature")
+local glossy = true
+for _, p in aFull.model:GetChildren() do
+	if p:IsA("BasePart") and (p.Name == "Abdomen" or p.Name == "Thorax" or p.Name == "Cephalothorax") then glossy = glossy and p.Reflectance == ant.gloss end
+end
+check(glossy, "the body segments are glossy")
+
+local aFloor = SpiderRig.new(floor, floor, "myrmarachne_formicaria_female", "full")
+settle(aFloor, 1)
+check(aFloor.model:GetAttribute("AppearanceId") == "myrmarachne_formicaria_female" and (aFloor.root.CFrame.Position - body.Position).Magnitude < 1e-9, "the model says which spider it is; the root stays at the collider's frame")
+local feetDown = true
+for _, leg in aFloor._legs do feetDown = feetDown and leg.planted ~= nil and math.abs(leg.planted.Y) < 1e-6 end
+check(feetDown, "all eight feet find the floor")
+local aReach = 0
+for _, leg in aFloor._legs do aReach = math.max(aReach, (leg.planted :: Vector3).Magnitude) end
+check(aReach < 0.62, `the legs reach about a body length from the body (farthest foot {string.format("%.2f", aReach)} studs)`)
+local lowestBody, headTop = math.huge, 0
+for _, p in aFloor.model:GetChildren() do
+	if p:IsA("BasePart") and (p.Name == "Abdomen" or p.Name == "Cephalothorax" or p.Name == "Thorax") then lowestBody = math.min(lowestBody, p.CFrame.Position.Y - p.Size.Y / 2) end
+	if p:IsA("BasePart") and p.Name == "Cephalothorax" then headTop = p.CFrame.Position.Y + p.Size.Y / 2 end
+end
+check(lowestBody > 0.04 and lowestBody < 0.12, `the body stands clear of the floor on its legs ({string.format("%.3f", lowestBody)} studs under the belly)`)
+
+-- The antennae: legs I go up above the head, both the same (in phase), and nothing else changes; no pose, no antennae.
+local function legPart(rig, name: string): BasePart return fanParts(rig, name)[1] end
+local plantedBefore = {}
+for i, leg in aFloor._legs do plantedBefore[i] = leg.planted end
+local tarsusBefore = legPart(aFloor, "Tarsus1").CFrame.Position
+local stand = AntMimicPose.new()
+local pose
+for _ = 1, 90 do pose = stand:step(1 / 60, true, false, 0) end
+check(pose.antennae > 0.999, "(the pose has the antennae up)")
+aFloor.reducedMotion = true -- the twitch (ROBLOX-57) yaws the whole body for a moment; mirror and phase are compared with it off
+aFloor.ant = pose
+settle(aFloor, 0.1)
+local l1, r1 = legPart(aFloor, "Tarsus1").CFrame.Position, legPart(aFloor, "Tarsus5").CFrame.Position
+check(l1.Y > headTop + 0.05 and r1.Y > headTop + 0.05 and l1.Y > tarsusBefore.Y + 0.15, `legs I go up above head height (feet {string.format("%.3f", l1.Y)} and {string.format("%.3f", r1.Y)} up, the head's top {string.format("%.3f", headTop)})`)
+check(near(l1.Y, r1.Y, 1e-6) and near(l1.Z, r1.Z, 1e-6) and near(l1.X, -r1.X, 1e-6), "both legs I are mirror images: they move in phase")
+check(l1.Z < -0.2, "the antennae point forward")
+local others = true
+for i, leg in aFloor._legs do
+	if leg.pair ~= 1 then others = others and leg.planted ~= nil and (leg.planted :: Vector3 - plantedBefore[i]).Magnitude < 1e-9 end
+end
+check(others, "the other six legs stay planted while legs I are up")
+local feetAfter = true
+for _, leg in aFloor._legs do feetAfter = feetAfter and leg.planted ~= nil and (leg.pair ~= 1 or math.abs(leg.planted.Y) < 1e-6) end
+check(feetAfter and (aFloor.root.CFrame.Position - body.Position).Magnitude < 1e-9, "legs I keep their planted feet below the raised pose; the root does not move")
+-- Waving moves both together; the display key lifts them higher.
+local upY, upZ = l1.Y, l1.Z
+local waved = AntMimicPose.new()
+local wp
+local lowest, highest = math.huge, -math.huge
+for _ = 1, 240 do
+	wp = waved:step(1 / 60, true, false, 0)
+	aFloor.ant = wp
+	aFloor:update(body, 1 / 60, true, false)
+	local a1, a2 = legPart(aFloor, "Tarsus1").CFrame.Position, legPart(aFloor, "Tarsus5").CFrame.Position
+	if wp.antennae > 0.999 then
+		lowest, highest = math.min(lowest, a1.Y), math.max(highest, a1.Y)
+		if not (near(a1.Y, a2.Y, 1e-6) and near(a1.Z, a2.Z, 1e-6)) then feetAfter = false end
+	end
+end
+check(feetAfter and highest - lowest > 0.02, `waving moves the antennae together ({string.format("%.3f", highest - lowest)} studs of travel)`)
+local shown = AntMimicPose.new()
+shown:start(true, false)
+for _ = 1, 40 do aFloor.ant = shown:step(1 / 60, true, false, 0); aFloor:update(body, 1 / 60, true, false) end
+check(legPart(aFloor, "Tarsus1").CFrame.Position.Y > highest - 0.02, "the display pose lifts legs I at least as high as the calm wave reaches")
+aFloor.ant = nil
+aFloor.reducedMotion = false
+settle(aFloor, 0.2)
+check(legPart(aFloor, "Tarsus1").CFrame.Position.Y < tarsusBefore.Y + 0.02, "with no pose legs I are legs again")
+-- The drawn walk: the body turns about its up axis, the root and the planted feet do not.
+local walkPose = { antennae = 0, high = 0, wave = 0, yaw = math.rad(10), lateral = 0.03, walking = true, shownSeconds = 0 }
+local abdomenBefore = fanParts(aFloor, "Abdomen")[1].CFrame
+local rootBefore = aFloor.root.CFrame
+aFloor.ant = walkPose
+aFloor:update(body, 1 / 60, true, true)
+local abdomenAfter = fanParts(aFloor, "Abdomen")[1].CFrame
+local turned = math.acos(math.clamp(abdomenAfter.LookVector:Dot(abdomenBefore.LookVector), -1, 1))
+check(near(turned, math.rad(10), 0.01), `the drawn body turns {string.format("%.1f", math.deg(turned))} degrees with the yaw`)
+aFloor.ant = { antennae = 0, high = 0, wave = 0, yaw = 0, lateral = 0.03, walking = true, shownSeconds = 0 }
+aFloor:update(body, 1 / 60, true, true)
+check(near(fanParts(aFloor, "Abdomen")[1].CFrame.Position.X - abdomenBefore.Position.X, 0.03, 1e-6), "and sways to the side by the lateral")
+check((aFloor.root.CFrame.Position - rootBefore.Position).Magnitude < 1e-9 and aFloor.root.CFrame.LookVector.X == rootBefore.LookVector.X, "the root part (the collider's frame) does not turn or sway")
+aFloor.ant = nil
+-- The other appearances ignore the pose.
+dFloor.ant = pose
+local beforeD = snapshot(dFloor)
+settle(dFloor, 0.1)
+pFloor.ant = pose
+local beforeP = snapshot(pFloor)
+settle(pFloor, 0.1)
+check(moved(beforeD, snapshot(dFloor)) < 0.05 and moved(beforeP, snapshot(pFloor)) < 0.05, "the first spider and the peacock spider ignore an ant pose")
+aFloor:setEyeView(true)
+local aHidden = true
+for _, p in aFloor.model:GetChildren() do
+	if p:IsA("BasePart") and p.Name == "Thorax" then aHidden = aHidden and p.LocalTransparencyModifier == 1 end
+end
+check(aHidden, "the eye view hides the thorax with the body")
+for _, r in { pFull, pLow, pFloor, dFloor, aFull, aLow, aFloor } do r:destroy() end
+end
+antMimicChecks()
 
 print(`LOOK passed={passed} failed={failed}`)
 if failed > 0 then error("look checks failed") end

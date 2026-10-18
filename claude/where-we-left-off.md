@@ -20,6 +20,14 @@ Next: Nathan tries v22 in a fresh PlayStation session, especially left-stick aim
 
 ---
 
+# Latest: the ant-mimicking spider built, 2026-10-18 (not yet seen in Studio or on a device) - Claude
+
+Branch **claude/roblox-antmimic** (from main e4a2b5a, published v20), decisions ROBLOX-64..66, handoff `docs/HANDOFF-roblox-antmimic.md`. The third spider is the female ant-mimicking jumping spider Myrmarachne formicaria (Shamble, Hoy, Cohen and Beatus 2017, doi:10.1098/rspb.2017.0308): 0.5 studs, waist, dark glossy cuticle. In the crack C / RB / R1 / Change cycles first spider, peacock, ant mimic. Standing still raises legs I as antennae; X / RB / Wave raises them higher and waves them faster; walking draws a small yaw and sway on the body, but the path is the first spider's exactly (`tests/client_ant.luau`). Cosmetic only: same motor, collider, speed, jump, senses and wasp. A notebook page, "Walking like an ant", opens after the antennae have been up for a second (26 authored pages, 25 reachable; only felt vibration unwired). Saved appearance accepts the new id (tested). 47,700-odd CLI checks, all failed=0; strict 0 diagnostics; 178/178 compile. Chet's Studio checklist is in the handoff (new `AntMimicSpec`). The ant mimic stays free like the peacock; the planned ~US$0.99 Game Pass for both is not wired and waits for Nathan.
+
+Open: how the 0.5 stud body reads at the camera distance; whether the drawn wobble (12 degrees, 0.04 studs) is right; the display key is artistic (the paper reports none). The default spider and the peacock are untouched.
+
+---
+
 # Latest: settings accepted and published v20 — Chet, 2026-10-18
 
 Claude's settings bundle 9c63783 is integrated. Build **d89045d8f2212cda**: **47,547 CLI checks**, **111/111 Studio engine checks (zero skipped)** and **24/24 live-client checks** pass; strict analysis clean, **167/167** scripts compile. Native tests include real TextService measurements and isolated real DataStore operations. Chet also changed normal-game volume to 75% and enabled large text, stopped and restarted Play, and saw both choices restored from the cloud.

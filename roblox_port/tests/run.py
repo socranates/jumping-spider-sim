@@ -5,6 +5,7 @@ reference tables and the shared modules into one chunk, where each module is an 
 tests/run.luau (pure logic and goldens), tests/scenarios.luau (recovery scenarios against a box-world emulation of
 raycasts and sphere casts: a smoke test of the real motor, silk and camera code, not the Roblox engine) and
 tests/client_smoke.luau (the client scripts themselves, driven through stub services and simulated keys) and
+tests/client_ant.luau (the ant-mimicking spider through the same client: C, the antennae, the drawn walk, X, slow motion, reduced motion) and
 tests/look.luau (the daughter's pattern pinned, the look knobs, idle motion and part budgets of the real rig) and
 tests/world.luau (the graphics table, the sun pick, the scenery, the lighting and the low-detail tier) and
 tests/flies.luau (the drawn house fly: parts, proportions, legs, wings, flight pose, placement) and
@@ -16,6 +17,7 @@ tests/life.luau (the life clock, the needs and the rest-and-sleep loop against t
 tests/checkpoint.luau (the retreat checkpoint of a whole world, its refusals, and the DataStore-shaped store) and
 tests/wasp.luau (the mud dauber wasp's rules against tests/wasp_reference.json, exported from the frozen Godot director, and Godot's hand-written expectations) and
 tests/peacock.luau (the peacock spider's courtship dance: its documented rates, order, interruption and reduced motion) and
+tests/antmimic.luau (the ant-mimicking spider's antennae and drawn walk: its documented numbers, the short stops, interruption and reduced motion) and
 tests/notebook.luau (the naturalist's notebook: Godot's pages word for word, the model, the watcher, the words and layout, the panel and the client's wiring) and
 tests/state.luau (persistent saves: envelope, progress and rest records, session lock, scheduler, server service) and
 tests/state_client.luau (the client's saving wiring against the real service) and tests/state_offline.luau (no server at all) and
@@ -86,9 +88,12 @@ MODULES = [
     ("Wasp", "Data/Wasp.luau"),
     ("Peacock", "Data/Peacock.luau"),
     ("PeacockDance", "Rig/PeacockDance.luau"),
+    ("AntMimic", "Data/AntMimic.luau"),
+    ("AntMimicPose", "Rig/AntMimicPose.luau"),
     ("SpiderChoice", "Rig/SpiderChoice.luau"),
     ("WaspDirector", "Predator/WaspDirector.luau"),
     ("WaspText", "UI/WaspText.luau"),
+    ("AntMimicText", "UI/AntMimicText.luau"),
     ("PeacockText", "UI/PeacockText.luau"),
     ("Fly", "Prey/Fly.luau"),
     ("PreyPopulation", "Prey/PreyPopulation.luau"),
@@ -141,7 +146,7 @@ CLIENT_MODULES = [
     ("SpiderEyes", "../Client/SpiderEyes.luau"),
     ("SaveClient", "../Client/SaveClient.luau"),
 ]
-CLIENT_TESTS = {"state_client.luau","state_offline.luau","growth.luau","perception_client.luau", "client_smoke.luau", "look.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "wasp.luau", "notebook.luau", "settings.luau"}
+CLIENT_TESTS = {"state_client.luau","state_offline.luau","growth.luau","perception_client.luau", "client_smoke.luau", "client_ant.luau", "look.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "wasp.luau", "notebook.luau", "settings.luau"}
 REFERENCES = ["jump_reference", "tether_reference", "camera_reference", "framing_reference", "perception_reference", "prey_reference", "life_reference", "wasp_reference", "continuing_reference", "growth_reference", "notebook_reference", "notebook_godot"]
 # A reference only the named tests read (it is large; the other bundles leave it out).
 REFERENCE_ONLY = {"continuing_reference": {"continuing.luau"},"prey_reference": {"prey.luau"}, "perception_reference": {"perception.luau"}, "life_reference": {"life.luau"}, "wasp_reference": {"wasp.luau"}, "notebook_reference": {"notebook.luau"}, "notebook_godot": {"notebook.luau"}}
@@ -197,7 +202,7 @@ def main():
     luau = sys.argv[1] if len(sys.argv) > 1 else "luau"
     status = 0
     named = sys.argv[2:]
-    for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "life.luau", "checkpoint.luau", "wasp.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "look.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "peacock.luau", "continuing.luau", "growth.luau", "notebook.luau", "state.luau", "state_client.luau", "state_offline.luau", "settings.luau", "rival.luau"]:
+    for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "life.luau", "checkpoint.luau", "wasp.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "client_ant.luau", "look.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "peacock.luau", "antmimic.luau", "continuing.luau", "growth.luau", "notebook.luau", "state.luau", "state_client.luau", "state_offline.luau", "settings.luau", "rival.luau"]:
         if not (HERE / test_file).exists():
             if named:  # a misspelt name must not look like a pass
                 print(f"no such test file: {test_file} (names are relative to tests/, for example look.luau)", file=sys.stderr)

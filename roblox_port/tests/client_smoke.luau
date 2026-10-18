@@ -416,15 +416,18 @@ check("the peacock spider: C in the crack changes spider, X dances, any move, ju
 	life.clock.hour = 12
 	key("Feed", true); frames(2); key("Feed", false); frames(2)
 	assert(life.resting, "no rest")
-	assert(string.find(words("SpiderPrompts", "PromptHint"), "RB: become the first spider", 1, true), words("SpiderPrompts", "PromptHint"))
+	assert(string.find(words("SpiderPrompts", "PromptHint"), "RB: become the ant-mimicking spider", 1, true), words("SpiderPrompts", "PromptHint"))
 	key("Eye", true); key("Eye", false); frames(3)
 	key("Display", true); frames(2); key("Display", false); frames(2)
-	assert(driver.appearance() == "first_spider" and workspace:FindFirstChild("Spider"):GetAttribute("AppearanceId") == "first_spider", "RB in the crack did not change spider")
+	assert(driver.appearance() == "myrmarachne_formicaria_female" and workspace:FindFirstChild("Spider"):GetAttribute("AppearanceId") == "myrmarachne_formicaria_female", "RB in the crack did not change to the ant-mimicking spider")
 	local anyVisible = false
 	for _, d in workspace:FindFirstChild("Spider"):GetChildren() do
 		if d:IsA("BasePart") and d.Name == "Cephalothorax" and d.LocalTransparencyModifier ~= 1 then anyVisible = true end
 	end
 	assert(not anyVisible, "the new rig did not keep the eye view")
+	assert(string.find(words("SpiderPrompts", "PromptHint"), "RB: become the first spider", 1, true), words("SpiderPrompts", "PromptHint"))
+	key("Display", true); frames(2); key("Display", false); frames(2)
+	assert(driver.appearance() == "first_spider" and workspace:FindFirstChild("Spider"):GetAttribute("AppearanceId") == "first_spider", "RB in the crack did not come round to the first spider")
 	key("Eye", true); key("Eye", false); frames(3)
 	key("Feed", true); frames(2); key("Feed", false); frames(2)
 	game:GetService("UserInputService").LastInputTypeChanged:Fire(Enum.UserInputType.Keyboard)

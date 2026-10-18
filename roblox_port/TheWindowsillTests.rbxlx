@@ -31,6 +31,73 @@
         </Properties>
         <Item class="ModuleScript" referent="6">
           <Properties>
+            <string name="Name">AntMimic</string>
+            <string name="Source"><![CDATA[--!strict
+-- The ant-mimicking jumping spider's walk and antennae (ROBLOX-64): every number the pose needs, each marked DOC (reported in the
+-- paper) or ART (artistic: not reported, chosen to read well on a small screen). The pose is presentation only: it bends the drawn
+-- legs and turns the drawn body a little; it never changes the motor, the collider, the path, the speed, the jump, the senses or the
+-- wasp. The real animal's path is a sine-like trail (wavelength about ten body lengths); the game's spider goes where the player
+-- sends it, so the zigzag is drawn on the body and not walked.
+--
+-- Source: Shamble, P. S., Hoy, R. R., Cohen, I. & Beatus, T. (2017). Walking like an ant: a quantitative and experimental approach to
+-- understanding locomotor mimicry in the jumping spider Myrmarachne formicaria. Proceedings of the Royal Society B 284: 20170308.
+-- doi:10.1098/rspb.2017.0308. What it reports, and the game uses:
+--   * the mimic walks on all eight legs; when stationary the forelegs (legs I) are raised above head height and move in phase, like
+--     ant antennae (the "antennal illusion"); when moving they work as legs;
+--   * the mimic makes only short stops, 83.3 +- 82.6 ms on average, so to an observer it seems to move almost constantly, like an ant
+--     (a non-mimic jumping spider such as Salticus scenicus is stationary about 55 % of the time; ants about 5 to 10 %);
+--   * its path is sine-like, wavelength about ten body lengths (range 5 to 10), amplitude about five body lengths, statistically like
+--     a trail-following ant;
+--   * in playbacks to Phidippus audax (the genus of the game's first spider) as the predator, non-mimic spider targets were attacked
+--     4.5 times as often as ants and 3 times as often as mimics; ants and mimics did not differ (protective Batesian mimicry);
+--   * the playback target's body length was 5 mm.
+-- The drawn animal is the female (the male's chelicerae are enormous and point forward: a possible later variant).
+
+local AntMimic = {}
+
+AntMimic.id = "myrmarachne_formicaria_female"
+AntMimic.citation = "Shamble, Hoy, Cohen & Beatus 2017, Proc. R. Soc. B 284: 20170308 (doi:10.1098/rspb.2017.0308)"
+
+-- ---------------------------------------------------------------- reported: DOC
+AntMimic.bodyLengthMm = 5 -- the playbacks' body length (DOC); 1 stud = 1 cm, so the drawn spider is 0.5 studs long
+AntMimic.bodyLengthStuds = 0.5
+AntMimic.walkingLegs = 8 -- DOC: all eight legs walk
+AntMimic.stops = { meanMs = 83.3, sdMs = 82.6 } -- DOC: the mimic's stops are this short
+AntMimic.stationaryShare = { nonMimicSpider = 0.55, antLow = 0.05, antHigh = 0.10 } -- DOC: share of the time stationary (S. scenicus about 55 %, ants 5 to 10 %)
+AntMimic.path = { wavelengthBodyLengths = { min = 5, max = 10, used = 10 }, amplitudeBodyLengths = 5 } -- DOC: the real path; the game draws only the wavelength
+AntMimic.playback = { predator = "Phidippus audax", nonMimicVsAnt = 4.5, nonMimicVsMimic = 3.0 } -- DOC: times attacked more than ants, and than mimics
+
+-- ---------------------------------------------------------------- artistic: ART (the paper reports none of these)
+-- Antennae: legs I raised above head height and waving in phase. The paper gives no wave rate; both rates stay at or below 3 Hz
+-- (a slow, calm flutter, and nothing that flashes).
+AntMimic.antennae = {
+	delaySeconds = 0.25, -- how long the spider must keep still before the legs go up (no twitching on a key tap)
+	riseSeconds = 0.25, -- the legs go up over this long
+	fallSeconds = 0.12, -- and come down this fast when it moves (legs I are legs again)
+	waveHz = 1.6, -- waving rate, resting
+	waveAmount = 0.55, -- how much of the foot's path from "up" to "swept" a wave covers, resting (0..1)
+	highWaveHz = 3.0, -- the display key: waving faster
+	highWaveAmount = 1.0, -- and wider
+	highRaise = 1.0, -- and the legs lift to their highest
+}
+-- The drawn walk: the body's yaw and sideways sway follow the distance walked (so slow motion and frame rate change nothing but speed).
+-- The wavelength is DOC (ten body lengths); the drawn sizes are ART and small, because the real path cannot change.
+AntMimic.walk = {
+	yawDeg = 12, -- ART: the drawn body turns this far either side of its heading
+	lateralStuds = 0.04, -- ART: and sways this far to either side (0.08 body lengths)
+	easeInSeconds = 0.15, easeOutSeconds = 0.25, -- ART: the wobble arrives and leaves over these
+	stopHoldSeconds = AntMimic.stops.meanMs / 1000, -- DOC value, used as the drawn rule: a stop shorter than 83.3 ms is not drawn as a pause
+	teleportStuds = 2.0, -- ART: a step longer than this in one frame is a respawn or a return, not a walk
+}
+AntMimic.reducedMotion = 0.5 -- ReducedMotion halves the yaw and the sway and stops the waving (the legs stay up)
+AntMimic.noticeSeconds = 1.0 -- ART: with the antennae fully up this long, the notebook opens its page
+
+return AntMimic
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="7">
+          <Properties>
             <string name="Name">Appearances</string>
             <string name="Source"><![CDATA[--!strict
 -- Artist-directed appearance, independent of species tuning, growth and physics.
@@ -338,11 +405,122 @@ end
 -- A brown rival, distinct from the player; illustrative salticid, no species identification.
 local rival=table.clone(first)
 rival.id="rival_spider";rival.body={.22,.14,.08};rival.legs={.27,.18,.10};rival.white={.64,.48,.29}
-return { default = "first_spider", profiles = { first_spider = first, maratus_volans_male = volans, rival_spider=rival } }
+
+-- ================================================================ the ant-mimicking spider (ROBLOX-64)
+-- Myrmarachne formicaria, the female: a third profile beside the daughter's and the peacock's, chosen from the crack (Client/SpiderClient).
+-- A jumping spider that looks like an ant (Shamble, Hoy, Cohen & Beatus 2017, Proc. R. Soc. B 284: 20170308; see Data/AntMimic): a slender,
+-- glossy dark brown-black body (DOC), the cephalothorax pinched into a "head" and a "thorax" (DOC), the abdomen joined by a narrow waist
+-- like an ant's petiole, with an oval "gaster" behind it (DOC), and long thin legs (DOC). It keeps a jumping spider's eight eyes with the big
+-- pair in front: take away the ant's body and it is a salticid. The playbacks' body length was 5 mm (DOC), so the drawn spider is 0.5 studs
+-- (1 stud = 1 cm). The exact colours, proportions, thicknesses and angles are ART. The male (huge forward chelicerae) is a possible later variant.
+-- Collider, senses and physics are the first spider's: this is a drawn appearance, an antennae pose and a drawn wobble, nothing more.
+local ant = {
+	id = "myrmarachne_formicaria_female",
+	name = "Ant-mimicking spider (female)",
+	scale = 0.5, -- SpiderRig scales its own distances (foot search, stepping) by this
+	cameraScale = 0.6, -- closer framing for the small appearance; user zoom still applies
+	bodyDrop = 0.19, -- the drawn body sits this far (studs) below the collider's centre (0.31 over the surface): long legs, the body well off the floor
+
+	-- ---------------------------------------------------------------- colours (ART)
+	body = { 0.050, 0.030, 0.022 }, -- the head: glossy dark brown-black
+	legs = { 0.20, 0.115, 0.055 }, -- amber-brown legs
+	white = { 0.50, 0.36, 0.18 }, -- palp bands: a dull amber (no white on this spider)
+	eyes = { 0.008, 0.008, 0.008 },
+	fangs = { 0.12, 0.060, 0.030 },
+	joint = { 0.11, 0.065, 0.035 },
+	palpColors = { stalk = { 0.18, 0.10, 0.05 }, club = { 0.30, 0.18, 0.08 }, tip = { 0.42, 0.28, 0.12 } },
+	abdomenColor = { 0.068, 0.040, 0.027 }, -- the gaster: a shade warmer than the head, so the three segments read apart
+	gloss = 0.16, -- glossy cuticle (Reflectance on the body segments)
+
+	-- ---------------------------------------------------------------- proportions: head, thorax, waist, gaster (body frame: -Z forward)
+	headCenter = { 0, 0, -0.165 },
+	headRadii = { 0.072, 0.062, 0.080 },
+	abdomenCenter = { 0, 0.004, 0.145 },
+	abdomenRadii = { 0.058, 0.052, 0.105 },
+	pedicel = { center = { 0, 0.0, 0.041 }, radii = { 0.021, 0.021, 0.024 } },
+	face = { center = { 0, -0.012, -0.205 }, radii = { 0.050, 0.040, 0.040 } },
+	neck = { 0, 0, -0.095 }, -- the head tilts about this point
+	-- More body segments the first spiders do not have: the thorax behind the head (the pinch between them is the "neck" of an ant's silhouette)
+	-- and the node on the waist (the petiole). group: "body", "head" or "abdomen" (what they move with).
+	extras = {
+		{ name = "Thorax", center = { 0, 0.004, -0.040 }, radii = { 0.056, 0.052, 0.074 }, group = "body", color = { 0.125, 0.070, 0.038 } },
+		{ name = "PetioleNode", center = { 0, 0.020, 0.046 }, radii = { 0.016, 0.019, 0.015 }, group = "body", color = { 0.085, 0.048, 0.028 } },
+	},
+	chelicerae = { x = 0.016, y = -0.040, z = -0.234, radii = { 0.013, 0.019, 0.013 }, pitch = -0.35, splay = 0.12, reflectance = 0.1 }, -- the female's are small
+	-- Eyes, as a jumping spider's: the big principal pair in front (a second look shows a spider), two smaller pairs at the sides and on the dome.
+	eye = {
+		ame = {
+			x = 0.032, y = 0.012, radii = { 0.029, 0.029, 0.025 }, out = 0.30, reflectance = 0.5,
+			socket = { scale = 1.12, color = { 0.20, 0.115, 0.05 } },
+			glints = { { dx = 0.009, dy = 0.011, r = 0.0075 }, { dx = -0.009, dy = -0.011, r = 0.0033 } },
+		},
+		ale = { x = 0.055, y = 0.020, r = 0.014, out = 0.15, reflectance = 0.3 },
+		ple = { x = 0.050, z = -0.130, r = 0.016, out = 0.10, reflectance = 0.3 },
+		pme = { x = 0.036, z = -0.190, r = 0.006, out = 0.10, reflectance = 0.3 },
+		glintColor = { 1, 1, 1 },
+	},
+	palp = {
+		x = 0.030, y = -0.030,
+		drop = 0.022, reach = 0.004, spread = 0.008, offsetScale = 0.25, -- the club and tip sit closer to the stalk at this size
+		stalk = 0.011, club = { 0.013, 0.012, 0.016 }, tipRadii = { 0.0085, 0.0075, 0.0085 },
+		fluff = { hairs = 0, length = 0, width = 0, flat = 1, transparency = 0 },
+		drumHz = 3.2, drumDeg = 13,
+	},
+	-- Legs (display only): long and thin, standing the body well off the floor, spread like an ant's.
+	limbs = {
+		hipX = 0.040, hipY = -0.010,
+		hipZ = { -0.115, -0.070, -0.025, 0.020 },
+		tipZ = { -0.27, -0.13, 0.09, 0.27 },
+		diameters = { { 0.020, 0.014 }, { 0.019, 0.013 }, { 0.019, 0.013 }, { 0.020, 0.014 } },
+		thickness = 1.0,
+		stance = { x = 0.24, y = -0.12, reach = 1.0 }, -- the rest foot spot (the drop of 0.19 puts it on the surface)
+		kneeLift = 0.15, kneeLiftAir = 0.10, ankleLift = 0.02,
+		pad = 1.6,
+		pairReach = { 1.0, 1.0, 1.0, 1.1 },
+	},
+	frontLegScale = 1.0,
+	bandFraction = 0.12, -- the amber band on each palp
+	speckleCount = 0,
+	spots = {},
+	band = { count = 0, step = 0.1, z = 0, rx = 0.01, rz = 0.01 },
+	speckle = { from = 0.4, step = 0.1, rx = 0.004, rz = 0.005 },
+	-- The antennal illusion (DOC: when stationary, legs I are raised above head height and move in phase like ant antennae): where the foot goes
+	-- (body frame, studs, x mirrored for the left leg) when they are up, when they are up and high (the display key) and at the end of a wave
+	-- sweep (down and forward). `kneeOut` pushes the knee outward and `kneeUp` lifts it. All ART; Rig/AntMimicPose says how far and how fast.
+	antennae = {
+		pair = 1,
+		up = { x = 0.075, y = 0.175, z = -0.285 },
+		high = { x = 0.085, y = 0.225, z = -0.300 },
+		swept = { x = 0.095, y = 0.130, z = -0.335 },
+		kneeOut = 0.030, kneeUp = 0.020,
+	},
+
+	-- ---------------------------------------------------------------- no fuzz (sub-pixel at this size), no fan, no idle motion: when still it waves its legs I
+	fuzz = nil,
+	idle = {
+		riseSeconds = 1.0, fallSeconds = 0.25,
+		breathe = { period = 3.0, bodyLift = 0, lift = 0, pitchDeg = 0 },
+		tilt = { rollDeg = 0, yawDeg = 0, pitchDeg = 0, periods = { 9.1, 5.3, 11.3, 6.7, 8.3 } },
+	},
+	-- Full is for PCs; low is for phones and tablets: no foot balls, no eye sockets, no outline. No leg bands, no hairs at either tier.
+	detail = {
+		full = {
+			every = { lock = 0, guard = 0, fringe = 0, pale = 0, tuft = 0, ruff = 0, palp = 0, leg = 0 },
+			shells = 0, speckleEvery = 1, pads = true, sockets = true, idle = false, highlight = true, legBands = false,
+		},
+		low = {
+			every = { lock = 0, guard = 0, fringe = 0, pale = 0, tuft = 0, ruff = 0, palp = 0, leg = 0 },
+			shells = 0, speckleEvery = 1, pads = false, sockets = false, idle = false, highlight = false, legBands = false,
+		},
+	},
+}
+
+return { default = "first_spider", profiles = { first_spider = first, maratus_volans_male = volans, myrmarachne_formicaria_female = ant, rival_spider = rival } }
+
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="7">
+        <Item class="ModuleScript" referent="8">
           <Properties>
             <string name="Name">Detail</string>
             <string name="Source"><![CDATA[--!strict
@@ -364,7 +542,7 @@ return Detail
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="8">
+        <Item class="ModuleScript" referent="9">
           <Properties>
             <string name="Name">Eyes</string>
             <string name="Source"><![CDATA[--!strict
@@ -530,7 +708,7 @@ return Eyes
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="9">
+        <Item class="ModuleScript" referent="10">
           <Properties>
             <string name="Name">Flora</string>
             <string name="Source"><![CDATA[--!strict
@@ -664,7 +842,7 @@ return Flora
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="10">
+        <Item class="ModuleScript" referent="11">
           <Properties>
             <string name="Name">FlyLook</string>
             <string name="Source"><![CDATA[--!strict
@@ -760,7 +938,7 @@ return FlyLook
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="11">
+        <Item class="ModuleScript" referent="12">
           <Properties>
             <string name="Name">Graphics</string>
             <string name="Source"><![CDATA[--!strict
@@ -961,7 +1139,7 @@ return Graphics
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="12">
+        <Item class="ModuleScript" referent="13">
           <Properties>
             <string name="Name">NotebookPages</string>
             <string name="Source"><![CDATA[--!strict
@@ -1003,6 +1181,7 @@ NotebookPages.triggers = {
 	"wasp_caught",
 	"starving",
 	"dance",
+	"antennae",
 }
 
 -- The reserve at or under hungryAt is "hungry"; at or over wellFedAt, "well fed" (LIFE_DESIGN.md round 1).
@@ -1292,13 +1471,23 @@ NotebookPages.pages = {
 			"Girard, M. B., Kasumovic, M. M. & Elias, D. O. (2011). Multi-Modal Courtship in the Peacock Spider, Maratus volans. PLoS ONE 6(9): e25390. https://doi.org/10.1371/journal.pone.0025390",
 		},
 	},
+	{
+		id = "walking_like_an_ant",
+		trigger = "antennae",
+		title = "Walking like an ant",
+		text = "Myrmarachne formicaria is a jumping spider that mimics an ant. It walks on all eight legs, and when it stands still it raises its front legs above its head and moves them together, like an ant's antennae. It makes only short stops, about 83 milliseconds on average, so it seems to move almost constantly, as ants do. In tests with Phidippus audax as the predator, ordinary spider targets were attacked 4.5 times as often as ants and 3 times as often as mimics; ants and mimics did not differ.",
+		game = "The ant mimic is a look only: where you go, how fast and what the wasp does are the first spider's. Its front legs rise when you keep still, and a stop shorter than about 83 milliseconds is not drawn as a pause. The waving, the sway of the body as it walks, the colours and the size are stylised: the real mimic's wobbling path is not walked. The female is drawn.",
+		sources = {
+			"Shamble, P. S., Hoy, R. R., Cohen, I. & Beatus, T. (2017). Walking like an ant: a quantitative and experimental approach to understanding locomotor mimicry in the jumping spider Myrmarachne formicaria. Proceedings of the Royal Society B 284: 20170308. https://doi.org/10.1098/rspb.2017.0308",
+		},
+	},
 } :: { Page }
 
 return NotebookPages
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="13">
+        <Item class="ModuleScript" referent="14">
           <Properties>
             <string name="Name">Peacock</string>
             <string name="Source"><![CDATA[--!strict
@@ -1378,7 +1567,7 @@ return Peacock
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="14">
+        <Item class="ModuleScript" referent="15">
           <Properties>
             <string name="Name">SaveRules</string>
             <string name="Source"><![CDATA[--!strict
@@ -1444,7 +1633,7 @@ return SaveRules
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="15">
+        <Item class="ModuleScript" referent="16">
           <Properties>
             <string name="Name">SettingsSpec</string>
             <string name="Source"><![CDATA[--!strict
@@ -1534,7 +1723,7 @@ return SettingsSpec
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="16">
+        <Item class="ModuleScript" referent="17">
           <Properties>
             <string name="Name">Species</string>
             <string name="Source"><![CDATA[--!strict
@@ -1721,7 +1910,7 @@ return table.freeze(data)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="17">
+        <Item class="ModuleScript" referent="18">
           <Properties>
             <string name="Name">Surfaces</string>
             <string name="Source"><![CDATA[--!strict
@@ -1824,7 +2013,7 @@ return table.freeze(data)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="18">
+        <Item class="ModuleScript" referent="19">
           <Properties>
             <string name="Name">Wasp</string>
             <string name="Source"><![CDATA[--!strict
@@ -1925,7 +2114,7 @@ return Wasp
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="19">
+        <Item class="ModuleScript" referent="20">
           <Properties>
             <string name="Name">WaspLook</string>
             <string name="Source"><![CDATA[--!strict
@@ -2006,7 +2195,7 @@ return WaspLook
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="20">
+        <Item class="ModuleScript" referent="21">
           <Properties>
             <string name="Name">Wear</string>
             <string name="Source"><![CDATA[--!strict
@@ -2100,11 +2289,11 @@ return Wear
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="21">
+      <Item class="Folder" referent="22">
         <Properties>
           <string name="Name">Habitat</string>
         </Properties>
-        <Item class="ModuleScript" referent="22">
+        <Item class="ModuleScript" referent="23">
           <Properties>
             <string name="Name">Breakaway</string>
             <string name="Source"><![CDATA[--!strict
@@ -2181,7 +2370,7 @@ return Breakaway
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="23">
+        <Item class="ModuleScript" referent="24">
           <Properties>
             <string name="Name">DayLight</string>
             <string name="Source"><![CDATA[--!strict
@@ -2293,7 +2482,7 @@ return DayLight
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="24">
+        <Item class="ModuleScript" referent="25">
           <Properties>
             <string name="Name">Lit</string>
             <string name="Source"><![CDATA[--!strict
@@ -2424,7 +2613,7 @@ return Lit
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="25">
+        <Item class="ModuleScript" referent="26">
           <Properties>
             <string name="Name">Materials</string>
             <string name="Source"><![CDATA[--!strict
@@ -2462,7 +2651,7 @@ return Materials
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="26">
+        <Item class="ModuleScript" referent="27">
           <Properties>
             <string name="Name">Patina</string>
             <string name="Source"><![CDATA[--!strict
@@ -2579,7 +2768,7 @@ return Patina
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="27">
+        <Item class="ModuleScript" referent="28">
           <Properties>
             <string name="Name">Plants</string>
             <string name="Source"><![CDATA[--!strict
@@ -2967,7 +3156,7 @@ return Plants
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="28">
+        <Item class="ModuleScript" referent="29">
           <Properties>
             <string name="Name">Scenery</string>
             <string name="Source"><![CDATA[--!strict
@@ -3299,7 +3488,7 @@ return Scenery
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="29">
+        <Item class="ModuleScript" referent="30">
           <Properties>
             <string name="Name">Shapes</string>
             <string name="Source"><![CDATA[--!strict
@@ -3433,7 +3622,7 @@ return Shapes
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="30">
+        <Item class="ModuleScript" referent="31">
           <Properties>
             <string name="Name">SunPick</string>
             <string name="Source"><![CDATA[--!strict
@@ -3507,7 +3696,7 @@ return SunPick
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="31">
+        <Item class="ModuleScript" referent="32">
           <Properties>
             <string name="Name">TestTarget</string>
             <string name="Source"><![CDATA[--!strict
@@ -3545,7 +3734,7 @@ return Target
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="32">
+        <Item class="ModuleScript" referent="33">
           <Properties>
             <string name="Name">WindowsillLayout</string>
             <string name="Source"><![CDATA[--!strict
@@ -3640,11 +3829,11 @@ return table.freeze(Layout)
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="33">
+      <Item class="Folder" referent="34">
         <Properties>
           <string name="Name">Learning</string>
         </Properties>
-        <Item class="ModuleScript" referent="34">
+        <Item class="ModuleScript" referent="35">
           <Properties>
             <string name="Name">FieldNotebook</string>
             <string name="Source"><![CDATA[--!strict
@@ -3814,7 +4003,7 @@ return FieldNotebook
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="35">
+        <Item class="ModuleScript" referent="36">
           <Properties>
             <string name="Name">NotebookWatch</string>
             <string name="Source"><![CDATA[--!strict
@@ -3838,11 +4027,13 @@ return FieldNotebook
 --   moult_ready, moulted, adult ... the life loop's events; adult when the moult reaches the adult stage
 --   hungry, well_fed, starving ... the reserve changes to at or under hungryAt, at or over wellFedAt, or to nothing (not on Easy)
 --   wasp, wasp_escaped, wasp_caught ... the director's visit_started, left (it had noticed the spider), caught
+--   antennae ....... the ant-mimicking spider has stood still with its antennae up for AntMimic.noticeSeconds (the client's pose says how long)
 -- Not wired: felt. It answers to Godot's vibration sense (a felt shake through touching surfaces), which the port does not have, so
 -- that page cannot open yet; the notebook never opens a page for something the game does not do.
 -- Checked in tests/notebook.luau.
 
 local Data = require(script.Parent.Parent.Data.NotebookPages)
+local AntMimic = require(script.Parent.Parent.Data.AntMimic)
 
 local NotebookWatch = {}
 NotebookWatch.__index = NotebookWatch
@@ -3923,6 +4114,14 @@ function NotebookWatch.onWasp(self: any, kind: string, escaped: boolean?)
 	end
 end
 
+-- Each rendered frame while the ant-mimicking spider is being played: how long its antennae (legs I) have been fully up. Standing still long
+-- enough for the pose (AntMimic.noticeSeconds) is what opens the walking-like-an-ant page. The client calls this; nothing here reads the pose.
+function NotebookWatch.antennae(self: any, shownSeconds: number)
+	if shownSeconds >= AntMimic.noticeSeconds then
+		self.book:notice("antennae")
+	end
+end
+
 -- Each rendered frame: `seconds` of play (0 while the game waits), whether the eye view is on and how many movement marks it draws.
 function NotebookWatch.frame(self: any, seconds: number, eyeView: boolean, movers: number)
 	if not eyeView then
@@ -3992,11 +4191,11 @@ return NotebookWatch
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="36">
+      <Item class="Folder" referent="37">
         <Properties>
           <string name="Name">Life</string>
         </Properties>
-        <Item class="ModuleScript" referent="37">
+        <Item class="ModuleScript" referent="38">
           <Properties>
             <string name="Name">Growth</string>
             <string name="Source"><![CDATA[--!strict
@@ -4083,7 +4282,7 @@ return Growth
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="38">
+        <Item class="ModuleScript" referent="39">
           <Properties>
             <string name="Name">LifeClock</string>
             <string name="Source"><![CDATA[--!strict
@@ -4266,7 +4465,7 @@ return LifeClock
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="39">
+        <Item class="ModuleScript" referent="40">
           <Properties>
             <string name="Name">LifeLoop</string>
             <string name="Source"><![CDATA[--!strict
@@ -4531,7 +4730,7 @@ return LifeLoop
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="40">
+        <Item class="ModuleScript" referent="41">
           <Properties>
             <string name="Name">LifeSession</string>
             <string name="Source"><![CDATA[--!strict
@@ -4580,7 +4779,7 @@ return Session
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="41">
+        <Item class="ModuleScript" referent="42">
           <Properties>
             <string name="Name">NeedsModel</string>
             <string name="Source"><![CDATA[--!strict
@@ -4874,11 +5073,11 @@ return NeedsModel
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="42">
+      <Item class="Folder" referent="43">
         <Properties>
           <string name="Name">Movement</string>
         </Properties>
-        <Item class="ModuleScript" referent="43">
+        <Item class="ModuleScript" referent="44">
           <Properties>
             <string name="Name">CameraMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -5176,7 +5375,7 @@ return CameraMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="44">
+        <Item class="ModuleScript" referent="45">
           <Properties>
             <string name="Name">FocusState</string>
             <string name="Source"><![CDATA[--!strict
@@ -5199,7 +5398,7 @@ return Focus
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="45">
+        <Item class="ModuleScript" referent="46">
           <Properties>
             <string name="Name">InputState</string>
             <string name="Source"><![CDATA[--!strict
@@ -5292,7 +5491,7 @@ return InputState
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="46">
+        <Item class="ModuleScript" referent="47">
           <Properties>
             <string name="Name">JumpInput</string>
             <string name="Source"><![CDATA[--!strict
@@ -5463,7 +5662,7 @@ return JumpInput
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="47">
+        <Item class="ModuleScript" referent="48">
           <Properties>
             <string name="Name">JumpMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -5621,7 +5820,7 @@ return JumpMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="48">
+        <Item class="ModuleScript" referent="49">
           <Properties>
             <string name="Name">LineFraming</string>
             <string name="Source"><![CDATA[--!strict
@@ -5720,7 +5919,7 @@ return LineFraming
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="49">
+        <Item class="ModuleScript" referent="50">
           <Properties>
             <string name="Name">SilkController</string>
             <string name="Source"><![CDATA[--!strict
@@ -5964,7 +6163,7 @@ return Silk
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="50">
+        <Item class="ModuleScript" referent="51">
           <Properties>
             <string name="Name">SpiderMotor</string>
             <string name="Source"><![CDATA[--!strict
@@ -6764,7 +6963,7 @@ return Motor
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="51">
+        <Item class="ModuleScript" referent="52">
           <Properties>
             <string name="Name">StickCarry</string>
             <string name="Source"><![CDATA[--!strict
@@ -6824,7 +7023,7 @@ return StickCarry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="52">
+        <Item class="ModuleScript" referent="53">
           <Properties>
             <string name="Name">SupportMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -6906,7 +7105,7 @@ return SupportMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="53">
+        <Item class="ModuleScript" referent="54">
           <Properties>
             <string name="Name">TetherMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -6975,11 +7174,11 @@ return T
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="54">
+      <Item class="Folder" referent="55">
         <Properties>
           <string name="Name">Perception</string>
         </Properties>
-        <Item class="ModuleScript" referent="55">
+        <Item class="ModuleScript" referent="56">
           <Properties>
             <string name="Name">Observation</string>
             <string name="Source"><![CDATA[--!strict
@@ -7136,7 +7335,7 @@ return Observation
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="56">
+        <Item class="ModuleScript" referent="57">
           <Properties>
             <string name="Name">ObservationMemory</string>
             <string name="Source"><![CDATA[--!strict
@@ -7590,7 +7789,7 @@ return ObservationMemory
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="57">
+        <Item class="ModuleScript" referent="58">
           <Properties>
             <string name="Name">PerceptionMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -7767,7 +7966,7 @@ return PerceptionMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="58">
+        <Item class="ModuleScript" referent="59">
           <Properties>
             <string name="Name">Sensor</string>
             <string name="Source"><![CDATA[--!strict
@@ -8182,7 +8381,7 @@ return Sensor
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="59">
+        <Item class="ModuleScript" referent="60">
           <Properties>
             <string name="Name">SensorCore</string>
             <string name="Source"><![CDATA[--!strict
@@ -8625,7 +8824,7 @@ return SensorCore
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="60">
+        <Item class="ModuleScript" referent="61">
           <Properties>
             <string name="Name">Signal</string>
             <string name="Source"><![CDATA[--!strict
@@ -8666,11 +8865,11 @@ return Signal
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="61">
+      <Item class="Folder" referent="62">
         <Properties>
           <string name="Name">Persistence</string>
         </Properties>
-        <Item class="ModuleScript" referent="62">
+        <Item class="ModuleScript" referent="63">
           <Properties>
             <string name="Name">Checkpoint</string>
             <string name="Source"><![CDATA[--!strict
@@ -8983,7 +9182,7 @@ return Checkpoint
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="63">
+        <Item class="ModuleScript" referent="64">
           <Properties>
             <string name="Name">CheckpointStore</string>
             <string name="Source"><![CDATA[--!strict
@@ -9155,7 +9354,7 @@ return CheckpointStore
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="64">
+        <Item class="ModuleScript" referent="65">
           <Properties>
             <string name="Name">Json</string>
             <string name="Source"><![CDATA[--!strict
@@ -9280,7 +9479,7 @@ return Json
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="65">
+        <Item class="ModuleScript" referent="66">
           <Properties>
             <string name="Name">MemoryBackend</string>
             <string name="Source"><![CDATA[--!strict
@@ -9387,7 +9586,7 @@ return MemoryBackend
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="66">
+        <Item class="ModuleScript" referent="67">
           <Properties>
             <string name="Name">ObjectRecord</string>
             <string name="Source"><![CDATA[--!strict
@@ -9722,7 +9921,7 @@ return ObjectRecord
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="67">
+        <Item class="ModuleScript" referent="68">
           <Properties>
             <string name="Name">SaveEnvelope</string>
             <string name="Source"><![CDATA[--!strict
@@ -9881,7 +10080,7 @@ return SaveEnvelope
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="68">
+        <Item class="ModuleScript" referent="69">
           <Properties>
             <string name="Name">SaveProgress</string>
             <string name="Source"><![CDATA[--!strict
@@ -10049,7 +10248,7 @@ return SaveProgress
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="69">
+        <Item class="ModuleScript" referent="70">
           <Properties>
             <string name="Name">SaveRest</string>
             <string name="Source"><![CDATA[--!strict
@@ -10151,7 +10350,7 @@ return SaveRest
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="70">
+        <Item class="ModuleScript" referent="71">
           <Properties>
             <string name="Name">SaveScheduler</string>
             <string name="Source"><![CDATA[--!strict
@@ -10277,7 +10476,7 @@ return SaveScheduler
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="71">
+        <Item class="ModuleScript" referent="72">
           <Properties>
             <string name="Name">SaveSession</string>
             <string name="Source"><![CDATA[--!strict
@@ -10808,7 +11007,7 @@ return SaveSession
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="72">
+        <Item class="ModuleScript" referent="73">
           <Properties>
             <string name="Name">SaveStores</string>
             <string name="Source"><![CDATA[--!strict
@@ -10862,11 +11061,11 @@ return SaveStores
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="73">
+      <Item class="Folder" referent="74">
         <Properties>
           <string name="Name">Predator</string>
         </Properties>
-        <Item class="ModuleScript" referent="74">
+        <Item class="ModuleScript" referent="75">
           <Properties>
             <string name="Name">RivalSpider</string>
             <string name="Source"><![CDATA[--!strict
@@ -10967,7 +11166,7 @@ return Rival
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="75">
+        <Item class="ModuleScript" referent="76">
           <Properties>
             <string name="Name">WaspDirector</string>
             <string name="Source"><![CDATA[--!strict
@@ -11653,11 +11852,11 @@ return WaspDirector
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="76">
+      <Item class="Folder" referent="77">
         <Properties>
           <string name="Name">Prey</string>
         </Properties>
-        <Item class="ModuleScript" referent="77">
+        <Item class="ModuleScript" referent="78">
           <Properties>
             <string name="Name">Feeding</string>
             <string name="Source"><![CDATA[--!strict
@@ -11712,7 +11911,7 @@ return F
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="78">
+        <Item class="ModuleScript" referent="79">
           <Properties>
             <string name="Name">Fly</string>
             <string name="Source"><![CDATA[--!strict
@@ -11929,7 +12128,7 @@ return Fly
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="79">
+        <Item class="ModuleScript" referent="80">
           <Properties>
             <string name="Name">FlyFlight</string>
             <string name="Source"><![CDATA[--!strict
@@ -11994,7 +12193,7 @@ return F
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="80">
+        <Item class="ModuleScript" referent="81">
           <Properties>
             <string name="Name">FlySenses</string>
             <string name="Source"><![CDATA[--!strict
@@ -12056,7 +12255,7 @@ return S
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="81">
+        <Item class="ModuleScript" referent="82">
           <Properties>
             <string name="Name">PerchGraph</string>
             <string name="Source"><![CDATA[--!strict
@@ -12106,7 +12305,7 @@ return G
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="82">
+        <Item class="ModuleScript" referent="83">
           <Properties>
             <string name="Name">PreyDirector</string>
             <string name="Source"><![CDATA[--!strict
@@ -12230,7 +12429,7 @@ return D
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="83">
+        <Item class="ModuleScript" referent="84">
           <Properties>
             <string name="Name">PreyMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -12320,7 +12519,7 @@ return M
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="84">
+        <Item class="ModuleScript" referent="85">
           <Properties>
             <string name="Name">PreyPopulation</string>
             <string name="Source"><![CDATA[--!strict
@@ -12352,7 +12551,7 @@ return P
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="85">
+        <Item class="ModuleScript" referent="86">
           <Properties>
             <string name="Name">PreyRandom</string>
             <string name="Source"><![CDATA[--!strict
@@ -12366,11 +12565,11 @@ return R
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="86">
+      <Item class="Folder" referent="87">
         <Properties>
           <string name="Name">Rig</string>
         </Properties>
-        <Item class="ModuleScript" referent="87">
+        <Item class="ModuleScript" referent="88">
           <Properties>
             <string name="Name">Anatomy</string>
             <string name="Source"><![CDATA[--!strict
@@ -12478,8 +12677,10 @@ function Anatomy.layout(look: any): Layout
 	local cheeks, jaws, palps = {}, {}, {}
 	local ch, cl, pl = look.cheek, look.chelicerae, look.palp
 	for _, side in { -1, 1 } do
-		local cx = Anatomy.sideX(hc, hr, ch.y - hc.Y, ch.z - hc.Z) - ch.inset
-		table.insert(cheeks, { side = side, at = Vector3.new(side * cx, ch.y, ch.z), radii = v3(ch.radii) })
+		if ch then -- an appearance without pale cheeks (the ant-mimicking spider) has none
+			local cx = Anatomy.sideX(hc, hr, ch.y - hc.Y, ch.z - hc.Z) - ch.inset
+			table.insert(cheeks, { side = side, at = Vector3.new(side * cx, ch.y, ch.z), radii = v3(ch.radii) })
+		end
 		local jaw = Vector3.new(side * cl.x, cl.y, cl.z)
 		table.insert(jaws, { side = side, at = jaw, radii = v3(cl.radii) })
 		table.insert(zones, { at = jaw, radius = math.max(cl.radii[1], cl.radii[2], cl.radii[3]) * 1.1 + 0.01 })
@@ -12502,7 +12703,127 @@ return Anatomy
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="88">
+        <Item class="ModuleScript" referent="89">
+          <Properties>
+            <string name="Name">AntMimicPose</string>
+            <string name="Source"><![CDATA[--!strict
+-- The ant-mimicking spider's antennae and walk as a pose (ROBLOX-64): pure and Vector3-free, display only. SpiderRig reads the pose, turns
+-- the drawn body and raises legs I; nothing here moves the collider, the path, the speed, the senses, the jump or the silk. All
+-- numbers are in Data/AntMimic (documented ones from Shamble et al. 2017, the rest marked artistic).
+--
+-- Standing still, legs I go up (above head height) and wave in phase like ant antennae; walking, all eight legs walk and the drawn body
+-- yaws and sways along a sine of the distance walked, wavelength ten body lengths. A stop shorter than the mimic's mean stop (83.3 ms)
+-- is not drawn as a pause. step(dt, standing, moving, distance) adds the dt it is handed, so slow motion slows the waving as it slows
+-- everything else; the wobble depends on distance only.
+
+local AntMimic = require(script.Parent.Parent.Data.AntMimic)
+
+local AntMimicPose = {}
+AntMimicPose.__index = AntMimicPose
+
+export type Pose = {
+	antennae: number, -- 0..1: legs I raised (0 they are legs)
+	high: number, -- 0..1: the display pose (higher and wider)
+	wave: number, -- 0..1: legs I swept from "up" toward "swept"; both legs share the one value (they move in phase)
+	yaw: number, -- radians: the drawn body's turn about its up axis
+	lateral: number, -- studs: the drawn body's sway to its right
+	walking: boolean, -- drawn as walking (a stop shorter than the hold does not end it)
+	shownSeconds: number, -- seconds the antennae have been fully up
+}
+
+local TAU = math.pi * 2
+
+local function smooth(x: number): number
+	local c = math.clamp(x, 0, 1)
+	return c * c * (3 - 2 * c)
+end
+
+AntMimicPose.BODY_LENGTH = AntMimic.bodyLengthStuds -- the drawn body's length (studs) at full growth: a wavelength is ten of them
+
+AntMimicPose.NONE = { antennae = 0, high = 0, wave = 0, yaw = 0, lateral = 0, walking = false, shownSeconds = 0 } :: Pose
+
+export type State = typeof(setmetatable(
+	{} :: {
+		walked: number, still: number, walking: boolean, antennae: number, high: number, walkLevel: number, phase: number, shown: number,
+		emphasis: boolean, reduced: boolean, bodyLength: number,
+	},
+	AntMimicPose
+))
+
+function AntMimicPose.new(): State
+	return setmetatable({
+		walked = 0, still = 0, walking = false, antennae = 0, high = 0, walkLevel = 0, phase = 0, shown = 0,
+		emphasis = false, reduced = false, bodyLength = AntMimic.bodyLengthStuds,
+	}, AntMimicPose)
+end
+
+-- The display key: legs I high and waving faster. Refused (false) unless the spider is standing still on a surface.
+function AntMimicPose.start(self: State, standing: boolean, moving: boolean): boolean
+	if self.emphasis or not standing or moving then return false end
+	self.emphasis = true
+	return true
+end
+
+function AntMimicPose.stop(self: State)
+	self.emphasis = false
+end
+
+-- The display pose is on.
+function AntMimicPose.displaying(self: State): boolean
+	return self.emphasis
+end
+
+-- The pose after one step of dt seconds (the simulation's). standing: on a surface and not in a jump, on the line or resting; moving: walking
+-- (or asked to); distance: studs the spider actually moved this step.
+function AntMimicPose.step(self: State, dt: number, standing: boolean, moving: boolean, distance: number): Pose
+	local a, w = AntMimic.antennae, AntMimic.walk
+	if standing and not moving then self.still += dt else self.still = 0 end
+	if not standing or moving then self.emphasis = false end
+	-- Walking carries over a stop shorter than the mimic's mean stop; a spider that was not walking is not.
+	local walking = standing and (moving or (self.walking and self.still < w.stopHoldSeconds))
+	self.walking = walking
+	if standing and moving and distance > 0 and distance <= w.teleportStuds then
+		self.walked += distance
+	end
+	-- The antennae: up after a short stillness (at once for the display key), down quickly when it moves.
+	local up = standing and not walking and (self.emphasis or self.still >= a.delaySeconds)
+	if up then
+		self.antennae = math.min(1, self.antennae + dt / a.riseSeconds)
+	else
+		self.antennae = math.max(0, self.antennae - dt / a.fallSeconds)
+	end
+	self.high = math.clamp(self.high + (if self.emphasis then dt else -dt) / a.riseSeconds, 0, 1)
+	-- The drawn wobble eases in and out.
+	if walking then
+		self.walkLevel = math.min(1, self.walkLevel + dt / w.easeInSeconds)
+	else
+		self.walkLevel = math.max(0, self.walkLevel - dt / w.easeOutSeconds)
+	end
+	local shownA, shownHigh, shownWalk = smooth(self.antennae), smooth(self.high), smooth(self.walkLevel)
+	local hz = a.waveHz + (a.highWaveHz - a.waveHz) * shownHigh
+	self.phase = (self.phase + TAU * hz * dt) % TAU
+	if self.antennae >= 0.999 then self.shown += dt else self.shown = 0 end
+	local amp = if self.reduced then AntMimic.reducedMotion else 1
+	local amount = a.waveAmount + (a.highWaveAmount - a.waveAmount) * shownHigh
+	local wavelength = AntMimic.path.wavelengthBodyLengths.used * self.bodyLength
+	local turn = TAU * self.walked / wavelength
+	return {
+		antennae = shownA,
+		high = shownHigh,
+		wave = if self.reduced then 0 else shownA * amount * (0.5 + 0.5 * math.sin(self.phase)),
+		-- The path is x = A sin(s), so the heading follows its slope, cos(s): the body turns most where the sway crosses the middle.
+		yaw = shownWalk * math.rad(w.yawDeg) * amp * math.cos(turn),
+		lateral = shownWalk * w.lateralStuds * amp * math.sin(turn),
+		walking = walking,
+		shownSeconds = self.shown,
+	}
+end
+
+return AntMimicPose
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="90">
           <Properties>
             <string name="Name">Idle</string>
             <string name="Source"><![CDATA[--!strict
@@ -12572,7 +12893,7 @@ return Idle
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="89">
+        <Item class="ModuleScript" referent="91">
           <Properties>
             <string name="Name">PeacockDance</string>
             <string name="Source"><![CDATA[--!strict
@@ -12744,7 +13065,7 @@ return PeacockDance
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="90">
+        <Item class="ModuleScript" referent="92">
           <Properties>
             <string name="Name">Setae</string>
             <string name="Source"><![CDATA[--!strict
@@ -13055,11 +13376,11 @@ return Setae
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="91">
+        <Item class="ModuleScript" referent="93">
           <Properties>
             <string name="Name">SpiderChoice</string>
             <string name="Source"><![CDATA[--!strict
--- Which spider the player is (ROBLOX-31): the daughter's first spider or the peacock spider. Pure, so tests/peacock.luau checks it.
+-- Which spider the player is (ROBLOX-31, ROBLOX-64): the first spider, the peacock spider or the ant-mimicking spider. Pure, so tests/peacock.luau checks it.
 -- The choice is remembered for the session in the Player attribute `Appearance`; the Workspace attribute `Appearance` can preselect
 -- it for Studio and playtests. Anything that is not a known appearance is the default (the first spider).
 local Appearances = require(script.Parent.Parent.Data.Appearances)
@@ -13067,10 +13388,16 @@ local Appearances = require(script.Parent.Parent.Data.Appearances)
 local SpiderChoice = {}
 
 -- The spiders to choose between, in the order the crack's key cycles through them.
-SpiderChoice.ORDER = { "first_spider", "maratus_volans_male" } :: { string }
+SpiderChoice.ORDER = { "first_spider", "maratus_volans_male", "myrmarachne_formicaria_female" } :: { string }
 
+-- Only a spider in ORDER can be the player: the brown rival's look (Data/Appearances.rival_spider) is drawn for the other spider and is never
+-- offered by the cycle or accepted from an attribute or a save.
 local function known(id: any): boolean
-	return type(id) == "string" and Appearances.profiles[id] ~= nil
+	if type(id) ~= "string" or Appearances.profiles[id] == nil then return false end
+	for _, name in SpiderChoice.ORDER do
+		if name == id then return true end
+	end
+	return false
 end
 
 -- The appearance to start with: the Player attribute if it names one, else the Workspace attribute, else the default.
@@ -13094,11 +13421,25 @@ function SpiderChoice.canDance(id: string): boolean
 	return look ~= nil and (look :: any).fan ~= nil
 end
 
+-- Does this appearance have antennae to show (legs I raised when it stands still) and so an antennae pose on the display key?
+function SpiderChoice.hasAntennae(id: string): boolean
+	local look = Appearances.profiles[id]
+	return look ~= nil and (look :: any).antennae ~= nil
+end
+
+-- What the display key (X / RB / the touch button) does for this appearance: "dance" (the peacock's courtship dance), "antennae" (the
+-- ant mimic's antennae pose) or nil (the first spider has none).
+function SpiderChoice.displayKind(id: string): string?
+	if SpiderChoice.canDance(id) then return "dance" end
+	if SpiderChoice.hasAntennae(id) then return "antennae" end
+	return nil
+end
+
 return SpiderChoice
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="92">
+        <Item class="ModuleScript" referent="94">
           <Properties>
             <string name="Name">SpiderRig</string>
             <string name="Source"><![CDATA[--!strict
@@ -13109,6 +13450,8 @@ return SpiderChoice
 -- Data/Appearances; where things sit comes from Rig/Anatomy, the hairs from Rig/Setae, the idle motion from Rig/Idle.
 -- The peacock spider (ROBLOX-30) is a second appearance drawn by the same code: a small body (look.scale) standing low (look.bodyDrop),
 -- legs III in their own colours, and a fan of flat discs that the courtship dance (Rig/PeacockDance, set as rig.dance) opens.
+-- The ant-mimicking spider (ROBLOX-64) is a third: extra body segments (look.extras), glossy cuticle (look.gloss), and a pose (Rig/AntMimicPose,
+-- set as rig.ant) that raises legs I as antennae when it stands and turns the drawn body a little as it walks.
 
 local Workspace = game:GetService("Workspace")
 local Appearances = require(script.Parent.Parent.Data.Appearances)
@@ -13197,6 +13540,7 @@ export type Rig = typeof(setmetatable(
 		_drop: number,
 		_fan: Fan?,
 		dance: any, -- a PeacockDance.Pose, or nil: the peacock spider's display (ignored by an appearance without a fan)
+		ant: any, -- an AntMimicPose.Pose, or nil: the ant-mimicking spider's antennae and walk (ignored by an appearance without look.antennae)
 	},
 	SpiderRig
 ))
@@ -13320,6 +13664,7 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		_drop = look.bodyDrop or 0,
 		_fan = nil :: Fan?,
 		dance = nil :: any,
+		ant = nil :: any,
 	}, SpiderRig)
 
 	local function fixed(part: Part, at: Vector3, rot: CFrame?, group: number, palp: number?)
@@ -13330,6 +13675,18 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 	fixed(ellipsoid(model, "EyeFace", A.faceRadii, BODY, fabric), A.faceCenter, nil, G_HEAD)
 	fixed(ellipsoid(model, "Pedicel", A.pedicelRadii, BODY, fabric), A.pedicelCenter, nil, G_BODY)
 	fixed(ellipsoid(model, "Abdomen", A.abdomenRadii, ABDOMEN, fabric), A.abdomenCenter, nil, G_ABDOMEN)
+	-- More segments (the ant-mimicking spider's thorax and the node on its waist), and a glossy cuticle where the look asks for one.
+	for _, ex in look.extras or {} do
+		local seg = ellipsoid(model, ex.name, v3(ex.radii), if ex.color then color(ex.color) else BODY, fabric)
+		fixed(seg, v3(ex.center), nil, GROUP_OF[ex.group] or G_BODY)
+	end
+	if look.gloss then
+		for _, f in self._fixed do
+			if f.part.Name == "Cephalothorax" or f.part.Name == "EyeFace" or f.part.Name == "Pedicel" or f.part.Name == "Abdomen" or f.part.Name == "Thorax" or f.part.Name == "PetioleNode" then
+				f.part.Reflectance = look.gloss
+			end
+		end
+	end
 
 	-- The daughter's pattern: markings are fractions of the abdomen's radii.
 	local ar, ac = A.abdomenRadii, A.abdomenCenter
@@ -13417,8 +13774,9 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		local ring = rod(model, "PalpBand", pl.stalk * 1.05, WHITE)
 		ring.Size = Vector3.new(len * look.bandFraction, pl.stalk * 1.05, pl.stalk * 1.05)
 		fixed(ring, Vector3.zero, toBase * rodCFrame(base, tip), G_HEAD, index)
-		fixed(ellipsoid(model, "PalpClub", v3(pl.club), PALP_CLUB, fabric), tip + Vector3.new(0, -0.005, -0.02) - base, nil, G_HEAD, index)
-		fixed(ellipsoid(model, "PalpTip", v3(pl.tipRadii), PALP_TIP, fabric), tip + Vector3.new(0, 0.004, -0.05) - base, nil, G_HEAD, index)
+		local os = pl.offsetScale or 1 -- the club and tip sit a little past the stalk's end; a very small spider scales that down
+		fixed(ellipsoid(model, "PalpClub", v3(pl.club), PALP_CLUB, fabric), tip + Vector3.new(0, -0.005, -0.02) * os - base, nil, G_HEAD, index)
+		fixed(ellipsoid(model, "PalpTip", v3(pl.tipRadii), PALP_TIP, fabric), tip + Vector3.new(0, 0.004, -0.05) * os - base, nil, G_HEAD, index)
 	end
 
 	-- Fuzz: flat locks over the head and abdomen, tufts, a cheek ruff and palp fluff (Rig/Setae), moved with the part they grow from.
@@ -13636,6 +13994,12 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 	self._t += dt
 	-- The root part (what the camera and tests read) stays at the collider's frame; the drawn body of a small appearance sits lower.
 	local body = if self._drop ~= 0 then collider * CFrame.new(0, -self._drop, 0) else collider
+	-- The ant-mimicking spider's drawn walk: the body yaws and sways a little along a sine of the distance walked (the collider and the path
+	-- are untouched; the root part stays at the collider's frame).
+	local antPose = if self._appearance.antennae ~= nil then self.ant else nil
+	if antPose ~= nil and (antPose.yaw ~= 0 or antPose.lateral ~= 0) then
+		body = body * CFrame.new(antPose.lateral * self._growth, 0, 0) * CFrame.Angles(0, antPose.yaw, 0)
+	end
 	local up = body.UpVector
 	local look, cfg, A = self._appearance, self._cfg, self._layout
 	local k, g = self._k, self._growth
@@ -13828,6 +14192,18 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 			local raisedKnee = hip:Lerp(raised, 0.5) + bodyBase.RightVector * (leg.side * own.kneeOut*g) + up * look.dance.kneeUp*g
 			knee = knee:Lerp(raisedKnee, raise)
 		end
+		-- The antennal illusion: legs I go up above the head, both in phase (one wave value), and the planted foot below is untouched.
+		local antCfg = look.antennae
+		if antPose ~= nil and antCfg ~= nil and leg.pair == antCfg.pair and antPose.antennae > 0 then
+			local highShift = Vector3.new(0, antCfg.high.y - antCfg.up.y, antCfg.high.z - antCfg.up.z) * antPose.high
+			local upAt = Vector3.new(leg.side * antCfg.up.x, antCfg.up.y, antCfg.up.z)
+				+ Vector3.new(leg.side * (antCfg.high.x - antCfg.up.x) * antPose.high, 0, 0) + highShift
+			local sweptAt = Vector3.new(leg.side * antCfg.swept.x, antCfg.swept.y, antCfg.swept.z) + highShift
+			local raised = bodyBase:PointToWorldSpace(upAt:Lerp(sweptAt, antPose.wave) * g)
+			foot = foot:Lerp(raised, antPose.antennae)
+			local raisedKnee = hip:Lerp(raised, 0.5) + bodyBase.RightVector * (leg.side * antCfg.kneeOut * g) + up * (antCfg.kneeUp * g)
+			knee = knee:Lerp(raisedKnee, antPose.antennae)
+		end
 		local ankle = knee:Lerp(foot, ANKLE_SHARE) + up * (L.ankleLift*g)
 		local function segment(index: number, p: Part, band: Part?, a: Vector3, b: Vector3)
 			local len = math.max((b - a).Magnitude, 0.01)
@@ -13964,11 +14340,52 @@ return SpiderRig
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="93">
+      <Item class="Folder" referent="95">
         <Properties>
           <string name="Name">UI</string>
         </Properties>
-        <Item class="ModuleScript" referent="94">
+        <Item class="ModuleScript" referent="96">
+          <Properties>
+            <string name="Name">AntMimicText</string>
+            <string name="Source"><![CDATA[--!strict
+-- The words of the ant-mimicking spider's display key for the screen (ROBLOX-64): the prompt, the status line, the touch button and the
+-- controls card's line. The walking hint, the status line and the card carry them only for that spider. Button names come from
+-- ControlText for the device in use, except on touch, where the button says "Wave" (ControlText's "Dance" is the peacock's). Pure:
+-- checked in tests/antmimic.luau.
+local ControlText = require(script.Parent.ControlText)
+
+local AntMimicText = {}
+
+AntMimicText.STAND = "Stand still on a surface to wave your antennae"
+
+local function key(device: ControlText.Device): string
+	return if device == "touch" then "Wave" else ControlText.name(device, "display")
+end
+
+-- The walking hint's extra words.
+function AntMimicText.displayHint(device: ControlText.Device, showing: boolean): string
+	if showing then return `{key(device)}: antennae down` end
+	return `{key(device)}: wave antennae`
+end
+
+-- The status line while the display pose is on.
+function AntMimicText.statusLine(device: ControlText.Device): string
+	return `ANTENNAE UP    {key(device)} or move: stop`
+end
+
+-- The touch button's words.
+function AntMimicText.touchDisplay(showing: boolean): string return if showing then "Stop" else "Wave" end
+
+-- The controls card's line (legs I rise by themselves when the spider keeps still; the key makes them higher and faster).
+function AntMimicText.helpLine(device: ControlText.Device): string
+	return `Standing still: {key(device)} wave antennae higher. Any move, jump or Cancel stops it`
+end
+
+return AntMimicText
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="97">
           <Properties>
             <string name="Name">ControlText</string>
             <string name="Source"><![CDATA[--!strict
@@ -14216,7 +14633,7 @@ return ControlText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="95">
+        <Item class="ModuleScript" referent="98">
           <Properties>
             <string name="Name">EyeOptics</string>
             <string name="Source"><![CDATA[--!strict
@@ -14549,7 +14966,7 @@ return EyeOptics
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="96">
+        <Item class="ModuleScript" referent="99">
           <Properties>
             <string name="Name">HudLayout</string>
             <string name="Source"><![CDATA[--!strict
@@ -14686,7 +15103,7 @@ return HudLayout
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="97">
+        <Item class="ModuleScript" referent="100">
           <Properties>
             <string name="Name">LifeText</string>
             <string name="Source"><![CDATA[--!strict
@@ -14760,7 +15177,7 @@ return LifeText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="98">
+        <Item class="ModuleScript" referent="101">
           <Properties>
             <string name="Name">NotebookText</string>
             <string name="Source"><![CDATA[--!strict
@@ -14884,6 +15301,7 @@ NotebookText.TRY = {
  {id="new_skin",text="Eat, then rest when ready to moult."},
  {id="grown_up",text="Grow through three moults."},
  {id="peacock_dance",text="Change to the peacock while resting, then dance outside."},
+ {id="walking_like_an_ant",text="Change to the ant mimic while resting, then stand still."},
 }
 function NotebookText.checklist(book:any):string
  local lines={}
@@ -14897,7 +15315,7 @@ return NotebookText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="99">
+        <Item class="ModuleScript" referent="102">
           <Properties>
             <string name="Name">PeacockText</string>
             <string name="Source"><![CDATA[--!strict
@@ -14908,10 +15326,11 @@ return NotebookText
 local ControlText = require(script.Parent.ControlText)
 local Peacock = require(script.Parent.Parent.Data.Peacock)
 local SpiderChoice = require(script.Parent.Parent.Rig.SpiderChoice)
+local AntMimicText = require(script.Parent.AntMimicText)
 
 local PeacockText = {}
 
-PeacockText.NAMES = { first_spider = "the first spider", maratus_volans_male = "the peacock spider" } :: { [string]: string }
+PeacockText.NAMES = { first_spider = "the first spider", maratus_volans_male = "the peacock spider", myrmarachne_formicaria_female = "the ant-mimicking spider" } :: { [string]: string }
 PeacockText.STAND = "Stand still on a surface to dance"
 PeacockText.NOT_RESTING = "You can change spider while resting in the silk-lined crack"
 
@@ -14940,12 +15359,16 @@ end
 function PeacockText.touchChange(): string return "Change" end
 function PeacockText.touchDisplay(dancing: boolean): string return if dancing then "Stop" else "Dance" end
 
--- Lines added to the controls card (H): the crack's choice for both spiders, the dance for the peacock spider only.
-function PeacockText.helpExtra(device: ControlText.Device, peacock: boolean): string
-	local choose, display = ControlText.name(device, "choose"), ControlText.name(device, "display")
-	local lines = { `In the crack: {choose} change spider (first spider, peacock spider)` }
-	if peacock then
-		table.insert(lines, `Standing still: {display} courtship dance. Any move, jump or Cancel stops it`)
+-- Lines added to the controls card (H): the crack's choice for every spider, then the display key's line for the spider that has one:
+-- `display` is "dance" (the peacock spider), "antennae" (the ant-mimicking spider), nil (the first spider). true means "dance" and false nil.
+function PeacockText.helpExtra(device: ControlText.Device, display: (string | boolean)?): string
+	local choose = ControlText.name(device, "choose")
+	local kind: string? = if display == true then "dance" elseif type(display) == "string" then display else nil
+	local lines = { `In the crack: {choose} change spider (first, peacock, ant mimic)` }
+	if kind == "dance" then
+		table.insert(lines, `Standing still: {ControlText.name(device, "display")} courtship dance. Any move, jump or Cancel stops it`)
+	elseif kind == "antennae" then
+		table.insert(lines, AntMimicText.helpLine(device))
 	end
 	return "\n" .. table.concat(lines, "\n")
 end
@@ -14960,7 +15383,7 @@ return PeacockText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="100">
+        <Item class="ModuleScript" referent="103">
           <Properties>
             <string name="Name">PerceptionShapes</string>
             <string name="Source"><![CDATA[--!strict
@@ -15053,7 +15476,7 @@ return Shapes
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="101">
+        <Item class="ModuleScript" referent="104">
           <Properties>
             <string name="Name">PerceptionText</string>
             <string name="Source"><![CDATA[--!strict
@@ -15069,7 +15492,7 @@ return table.freeze(Text)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="102">
+        <Item class="ModuleScript" referent="105">
           <Properties>
             <string name="Name">PerceptionView</string>
             <string name="Source"><![CDATA[--!strict
@@ -15118,7 +15541,7 @@ return View
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="103">
+        <Item class="ModuleScript" referent="106">
           <Properties>
             <string name="Name">SaveText</string>
             <string name="Source"><![CDATA[--!strict
@@ -15183,7 +15606,7 @@ return SaveText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="104">
+        <Item class="ModuleScript" referent="107">
           <Properties>
             <string name="Name">SettingsModel</string>
             <string name="Source"><![CDATA[--!strict
@@ -15423,7 +15846,7 @@ return SettingsModel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="105">
+        <Item class="ModuleScript" referent="108">
           <Properties>
             <string name="Name">SettingsNav</string>
             <string name="Source"><![CDATA[--!strict
@@ -15534,7 +15957,7 @@ return SettingsNav
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="106">
+        <Item class="ModuleScript" referent="109">
           <Properties>
             <string name="Name">SettingsText</string>
             <string name="Source"><![CDATA[--!strict
@@ -15658,7 +16081,7 @@ return SettingsText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="107">
+        <Item class="ModuleScript" referent="110">
           <Properties>
             <string name="Name">WaspText</string>
             <string name="Source"><![CDATA[--!strict
@@ -15779,23 +16202,120 @@ return WaspText
       </Item>
     </Item>
   </Item>
-  <Item class="ServerScriptService" referent="108">
+  <Item class="ServerScriptService" referent="111">
     <Properties>
       <string name="Name">ServerScriptService</string>
     </Properties>
-    <Item class="Folder" referent="109">
+    <Item class="Folder" referent="112">
       <Properties>
         <string name="Name">PortTests</string>
       </Properties>
-      <Item class="ModuleScript" referent="110">
+      <Item class="ModuleScript" referent="113">
         <Properties>
-          <string name="Name">BuildInfo</string>
-          <string name="Source"><![CDATA[-- Generated by tools/build.py; do not edit.
-return { id = "2ed6a64d5e6d9d58" }
+          <string name="Name">AntMimicSpec</string>
+          <string name="Source"><![CDATA[--!strict
+-- The ant-mimicking spider on real Roblox parts (ROBLOX-64): the drawn female builds inside its budget, every part is display only,
+-- legs I rise as antennae and fall again, the drawn walk wobbles only the picture (the root does not move), and all eight feet
+-- find the floor. Cosmetic only: nothing here touches a collider or a sense.
+return function(check: (string, () -> ()) -> ())
+	local Shared = game:GetService("ReplicatedStorage"):WaitForChild("Shared")
+	local Rig = require(Shared.Rig.SpiderRig)
+	local AntMimicPose = require(Shared.Rig.AntMimicPose)
+	local folder = Instance.new("Folder")
+	folder.Name = "AntMimicTestWorld"
+	folder.Parent = workspace
+	local floor = Instance.new("Part")
+	floor.Anchored = true
+	floor.Size = Vector3.new(20, 1, 20)
+	floor.Position = Vector3.new(300, -0.5, 0)
+	floor.Parent = folder
+	local body = CFrame.new(300, 0.2, 0)
+	local ID = "myrmarachne_formicaria_female"
+	local function parts(rig: any, name: string): { BasePart }
+		local out = {}
+		for _, p in rig.model:GetChildren() do
+			if p:IsA("BasePart") and p.Name == name then table.insert(out, p) end
+		end
+		return out
+	end
+	local function maxY(list: { BasePart }): number
+		local best = -math.huge
+		for _, p in list do best = math.max(best, p.Position.Y) end
+		return best
+	end
+	local function settle(rig: any, frames: number)
+		for _ = 1, frames do rig:update(body, 1 / 60, true, false) end
+	end
+	check("the ant-mimicking spider builds in the engine inside its part budget, display only", function()
+		for _, detail in { "full", "low" } do
+			local rig = Rig.new(folder, folder, ID, detail)
+			local count = 0
+			for _, part in rig.model:GetChildren() do
+				if part:IsA("BasePart") then
+					count += 1
+					assert(part.Anchored and not part.CanCollide and not part.CanQuery and not part.CanTouch, `{part.Name} is not display only`)
+				end
+			end
+			assert(count <= (if detail == "full" then 100 else 70), `{detail}: {count} parts`)
+			assert(rig.model:GetAttribute("AppearanceId") == ID)
+			rig:destroy()
+		end
+	end)
+	check("legs I go up as antennae and come down again; the root never moves", function()
+		local rig = Rig.new(folder, folder, ID, "full")
+		settle(rig, 60)
+		local down = maxY(parts(rig, "Tarsus1"))
+		local pose = table.clone(AntMimicPose.NONE)
+		pose.antennae = 1
+		rig.ant = pose
+		settle(rig, 10)
+		local up = maxY(parts(rig, "Tarsus1"))
+		assert(up > down + 0.05, `legs I did not rise ({down} to {up})`)
+		assert((rig.root.Position - body.Position).Magnitude < 1e-6, "the root moved")
+		assert(maxY(parts(rig, "Tarsus3")) < up, "legs III rose with the antennae")
+		rig.ant = nil
+		settle(rig, 10)
+		assert(maxY(parts(rig, "Tarsus1")) < down + 0.02, "legs I did not come down")
+		rig:destroy()
+	end)
+	check("the drawn walk turns the picture a little and nothing else", function()
+		local rig = Rig.new(folder, folder, ID, "full")
+		settle(rig, 60)
+		local before = parts(rig, "Abdomen")[1].CFrame.LookVector
+		local pose = table.clone(AntMimicPose.NONE)
+		pose.yaw = math.rad(10)
+		pose.lateral = 0.03
+		pose.walking = true
+		rig.ant = pose
+		settle(rig, 5)
+		local after = parts(rig, "Abdomen")[1].CFrame.LookVector
+		assert(before:Dot(after) < 0.999, "the drawn body did not turn")
+		assert((rig.root.Position - body.Position).Magnitude < 1e-6, "the root moved")
+		rig:destroy()
+	end)
+	check("a small body stands low and all eight feet find the floor", function()
+		local rig = Rig.new(folder, folder, ID, "full")
+		settle(rig, 60)
+		for _, leg in rig._legs do
+			assert(leg.planted ~= nil and math.abs(leg.planted.Y) < 0.01, "a foot is not on the floor")
+		end
+		assert(parts(rig, "Abdomen")[1].Position.Y < 0.3, "the body is not low")
+		rig:destroy()
+	end)
+	folder:Destroy()
+end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="111">
+      <Item class="ModuleScript" referent="114">
+        <Properties>
+          <string name="Name">BuildInfo</string>
+          <string name="Source"><![CDATA[-- Generated by tools/build.py; do not edit.
+return { id = "b6e6b2707077d237" }
+]]></string>
+        </Properties>
+      </Item>
+      <Item class="ModuleScript" referent="115">
         <Properties>
           <string name="Name">GraphicsSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -15911,7 +16431,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="112">
+      <Item class="ModuleScript" referent="116">
         <Properties>
           <string name="Name">GrowthSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -15968,7 +16488,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="113">
+      <Item class="ModuleScript" referent="117">
         <Properties>
           <string name="Name">LifeSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -16144,7 +16664,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="114">
+      <Item class="ModuleScript" referent="118">
         <Properties>
           <string name="Name">NotebookSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -16305,7 +16825,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="115">
+      <Item class="ModuleScript" referent="119">
         <Properties>
           <string name="Name">PeacockSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -16376,7 +16896,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="116">
+      <Item class="ModuleScript" referent="120">
         <Properties>
           <string name="Name">PerceptionSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -16476,7 +16996,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="117">
+      <Item class="ModuleScript" referent="121">
         <Properties>
           <string name="Name">PreySpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -16571,7 +17091,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="118">
+      <Item class="ModuleScript" referent="122">
         <Properties>
           <string name="Name">PromptSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -16583,6 +17103,7 @@ return function(check: (string, () -> ()) -> ())
 	local Shared = game:GetService("ReplicatedStorage"):WaitForChild("Shared")
 	local ControlText = require(Shared.UI.ControlText)
 	local PeacockText = require(Shared.UI.PeacockText)
+	local AntMimicText = require(Shared.UI.AntMimicText)
 	local HudLayout = require(Shared.UI.HudLayout)
 	local FONT = Enum.Font.GothamMedium
 	local devices: { any } = { "keyboard", "gamepad", "touch" }
@@ -16604,14 +17125,17 @@ return function(check: (string, () -> ()) -> ())
 	end)
 	check("the controls card fits a phone's width in landscape for every device", function()
 		for _, device in devices do
-			local s = size(ControlText.helpCard(device) .. PeacockText.helpExtra(device, true), 15, 568 - 32 - 20) -- with the peacock spider's two lines
-			assert(s.Y <= 10 * 15 * 1.35, `{device}: the card needs {s.Y} px`)
+			for _, kind in { "dance", "antennae" } do -- with the peacock spider's two lines, and with the ant mimic's
+				local s = size(ControlText.helpCard(device) .. PeacockText.helpExtra(device, kind), 15, 568 - 32 - 20)
+				assert(s.Y <= 10 * 15 * 1.35, `{device}: the card ({kind}) needs {s.Y} px`)
+			end
 		end
 	end)
 	check("touch buttons' words fit their buttons", function()
 		for _, b in HudLayout.TOUCH_BUTTONS do
 			local labels = { b.label }
 			if b.action == "Cancel" then labels = { ControlText.touchCancelLabel(false), ControlText.touchCancelLabel(true) } end
+			if b.action == "Display" then labels = { b.label, PeacockText.touchDisplay(true), AntMimicText.touchDisplay(false), AntMimicText.touchDisplay(true) } end
 			for _, label in labels do
 				local s = size(label, b.textSize or 18, b.size - 6)
 				assert(s.X <= b.size - 6 + 0.5 and s.Y <= b.size - 6, `{b.action}: "{label}" is {s.X}x{s.Y} in {b.size}`)
@@ -16633,7 +17157,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="119">
+      <Item class="ModuleScript" referent="123">
         <Properties>
           <string name="Name">RecoveryScenarios</string>
           <string name="Source"><![CDATA[--!strict
@@ -17164,7 +17688,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Script" referent="120">
+      <Item class="Script" referent="124">
         <Properties>
           <string name="Name">Runner</string>
           <token name="RunContext">0</token>
@@ -17207,6 +17731,7 @@ check("Prompt spec completes", function() require(script.Parent.PromptSpec)(chec
 check("Life spec completes", function() require(script.Parent.LifeSpec)(check) end)
 check("Wasp spec completes", function() require(script.Parent.WaspSpec)(check) end)
 check("Peacock spec completes", function() require(script.Parent.PeacockSpec)(check) end)
+check("Ant mimic spec completes", function() require(script.Parent.AntMimicSpec)(check) end)
 check("Growth spec completes", function() require(script.Parent.GrowthSpec)(check) end)
 check("Notebook spec completes", function() require(script.Parent.NotebookSpec)(check) end)
 check("State spec completes", function() require(script.Parent.StateSpec)(check, skip) end)
@@ -17226,7 +17751,7 @@ if failed > 0 then warn("PORT_TEST_FAIL") end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="121">
+      <Item class="ModuleScript" referent="125">
         <Properties>
           <string name="Name">SettingsSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -17393,7 +17918,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="122">
+      <Item class="ModuleScript" referent="126">
         <Properties>
           <string name="Name">SilkSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -17509,7 +18034,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="123">
+      <Item class="ModuleScript" referent="127">
         <Properties>
           <string name="Name">Spec</string>
           <string name="Source"><![CDATA[--!strict
@@ -17640,7 +18165,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="124">
+      <Item class="ModuleScript" referent="128">
         <Properties>
           <string name="Name">StateFixture</string>
           <string name="Source"><![CDATA[--!strict
@@ -17654,7 +18179,7 @@ return {
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="125">
+      <Item class="ModuleScript" referent="129">
         <Properties>
           <string name="Name">StateSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -17844,7 +18369,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="126">
+      <Item class="ModuleScript" referent="130">
         <Properties>
           <string name="Name">WaspSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -18007,11 +18532,11 @@ end
         </Properties>
       </Item>
     </Item>
-    <Item class="Folder" referent="127">
+    <Item class="Folder" referent="131">
       <Properties>
         <string name="Name">Server</string>
       </Properties>
-      <Item class="ModuleScript" referent="128">
+      <Item class="ModuleScript" referent="132">
         <Properties>
           <string name="Name">DataStoreBackend</string>
           <string name="Source"><![CDATA[--!strict
@@ -18046,7 +18571,7 @@ return DataStoreBackend
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Script" referent="129">
+      <Item class="Script" referent="133">
         <Properties>
           <string name="Name">Main</string>
           <token name="RunContext">0</token>
@@ -18091,7 +18616,7 @@ sill.Parent = Workspace
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Script" referent="130">
+      <Item class="Script" referent="134">
         <Properties>
           <string name="Name">Persistence</string>
           <token name="RunContext">0</token>
@@ -18185,7 +18710,7 @@ end)
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="131">
+      <Item class="ModuleScript" referent="135">
         <Properties>
           <string name="Name">SaveService</string>
           <string name="Source"><![CDATA[--!strict
@@ -18383,19 +18908,19 @@ return SaveService
       </Item>
     </Item>
   </Item>
-  <Item class="StarterPlayer" referent="132">
+  <Item class="StarterPlayer" referent="136">
     <Properties>
       <string name="Name">StarterPlayer</string>
     </Properties>
-    <Item class="StarterPlayerScripts" referent="133">
+    <Item class="StarterPlayerScripts" referent="137">
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="Folder" referent="134">
+      <Item class="Folder" referent="138">
         <Properties>
           <string name="Name">Client</string>
         </Properties>
-        <Item class="ModuleScript" referent="135">
+        <Item class="ModuleScript" referent="139">
           <Properties>
             <string name="Name">CaughtPanel</string>
             <string name="Source"><![CDATA[--!strict
@@ -18519,7 +19044,7 @@ return CaughtPanel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="136">
+        <Item class="ModuleScript" referent="140">
           <Properties>
             <string name="Name">FlyBodies</string>
             <string name="Source"><![CDATA[--!strict
@@ -18776,7 +19301,7 @@ return FlyBodies
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="137">
+        <Item class="ModuleScript" referent="141">
           <Properties>
             <string name="Name">NotebookArt</string>
             <string name="Source"><![CDATA[--!strict
@@ -18797,6 +19322,11 @@ function Art.draw(parent: Instance,id:string)
 		shape(centre,105,58,78,55,0,Color3.fromRGB(16,125,146),true)
 		shape(centre,105,58,58,38,0,Color3.fromRGB(231,125,54),true)
 	end
+	if id=="walking_like_an_ant" then
+		-- Raised front legs, like antennae, and a narrow waist.
+		for side=-1,1,2 do shape(centre,105+side*17,14,3,30,side*24,ink,true) end
+		shape(centre,105,48,10,10,0,ink,true)
+	end
 	shape(centre,105,62,34,43,0,ink,true);shape(centre,105,35,30,26,0,ink,true)
 	for side=-1,1,2 do
 		for i=1,4 do
@@ -18809,7 +19339,7 @@ return Art
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="138">
+        <Item class="ModuleScript" referent="142">
           <Properties>
             <string name="Name">NotebookPanel</string>
             <string name="Source"><![CDATA[--!strict
@@ -19310,7 +19840,7 @@ return NotebookPanel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="139">
+        <Item class="ModuleScript" referent="143">
           <Properties>
             <string name="Name">OldSkins</string>
             <string name="Source"><![CDATA[--!strict
@@ -19350,7 +19880,7 @@ return OldSkins
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="140">
+        <Item class="ModuleScript" referent="144">
           <Properties>
             <string name="Name">PerceptionHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -19572,7 +20102,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="141">
+        <Item class="ModuleScript" referent="145">
           <Properties>
             <string name="Name">PerceptionStage</string>
             <string name="Source"><![CDATA[--!strict
@@ -19617,7 +20147,7 @@ return Stage
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="142">
+        <Item class="ModuleScript" referent="146">
           <Properties>
             <string name="Name">SaveClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -19742,7 +20272,7 @@ return SaveClient
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="143">
+        <Item class="ModuleScript" referent="147">
           <Properties>
             <string name="Name">SettingsPanel</string>
             <string name="Source"><![CDATA[--!strict
@@ -20421,7 +20951,7 @@ return SettingsPanel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="144">
+        <Item class="ModuleScript" referent="148">
           <Properties>
             <string name="Name">Soundscape</string>
             <string name="Source"><![CDATA[--!strict
@@ -20535,7 +21065,7 @@ return Soundscape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="145">
+        <Item class="ModuleScript" referent="149">
           <Properties>
             <string name="Name">SpiderCamera</string>
             <string name="Source"><![CDATA[--!strict
@@ -20956,7 +21486,7 @@ return SpiderCamera
 ]]></string>
           </Properties>
         </Item>
-        <Item class="LocalScript" referent="146">
+        <Item class="LocalScript" referent="150">
           <Properties>
             <string name="Name">SpiderClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -20974,6 +21504,8 @@ return SpiderCamera
 -- The peacock spider (ROBLOX-31): resting in the crack, C (RB / R1, the touch Change button) turns the spider into the other one (the first
 -- spider or the peacock spider, Maratus volans); as the peacock spider, standing still, X (RB / R1, Dance) starts its courtship dance and any move,
 -- jump or Cancel stops it. The dance is a pose of the drawn rig only; the motor, senses, silk and the rest are the same for both.
+-- The ant-mimicking spider (ROBLOX-64) is the third in the crack's cycle: standing still, legs I rise as antennae and wave by themselves, X (RB / R1,
+-- Wave) makes them higher and faster; walking, its drawn body yaws and sways along the distance walked. Again drawn only: the motor never knows.
 -- The naturalist's notebook (ROBLOX-37): N, the Notebook button beside Menu, or "Notebook" in the life menu and on the end screen opens it
 -- and the world waits. The book is the player's: it lives here, outside the world and its checkpoints, so a return to a rest never erases a
 -- page and a new, unrelated spider opens the same book. NotebookWatch opens pages from the events this loop already has.
@@ -21095,6 +21627,10 @@ local rig = SpiderRig.new(Workspace, sill, appearance, detail)
 local rivalRig: any = nil
 local dance = PeacockDance.new() -- the peacock spider's courtship dance (a pose for the rig; nothing else reads it)
 local dancePose: any = nil
+-- The ant-mimicking spider's antennae and drawn walk (a pose for the rig; nothing else reads it): the modules, the state, its latest pose, and where
+-- the spider was last frame (the distance walked drives the drawn wobble). One table: the client is at Luau's limit of 200 locals.
+local ant: any = { Pose = require(Shared.Rig.AntMimicPose), Text = require(Shared.UI.AntMimicText), state = nil, pose = nil, last = nil }
+ant.state = ant.Pose.new()
 local bodyHidden = false
 task.spawn(function()
 	local roots: { Instance } = { Lighting }
@@ -21330,9 +21866,15 @@ end
 -- The spider-eye picture (ROBLOX-20): field of view, colour, blur, retina strips, movement rings, UV layer, vignette. Presentation only.
 local eyes: any = SpiderEyes.new({ parent = player:WaitForChild("PlayerGui"), camera = camera, player = player, cam = cam, sensor = sensor, params = params })
 
+-- The display key's pose (the peacock's dance, the ant mimic's raised antennae) ends at once: a step, a jump, a rest, a drop, a menu.
+function ant.stopDisplay()
+	dance:stop()
+	ant.state:stop()
+end
+
 -- Everything held is dropped with no penalty and no message: focus loss, the Roblox menu, a text box, a lost controller.
 local function dropAll()
-	dance:stop()
+	ant.stopDisplay()
 	focusState:clear()
 	jump:drop(motor)
 	local release = motor.silk.release
@@ -21341,7 +21883,7 @@ local function dropAll()
 end
 
 local function backToStart()
-	dance:stop()
+	ant.stopDisplay()
 	focusState:clear()
 	sensor:reset()
 	memory:clear()
@@ -21367,6 +21909,7 @@ local function setAppearance(id: string)
 	dance:stop()
 	dance = PeacockDance.new()
 	dancePose = nil
+	ant.state, ant.pose, ant.last = ant.Pose.new(), nil, nil
 	local old = rig
 	rig = SpiderRig.new(Workspace, sill, appearance, detail)
 	rig.gaitMode = old.gaitMode
@@ -21384,19 +21927,29 @@ local function changeSpider()
 	if saveClient ~= nil then saveClient:markDirty() end
 	hud:toast(PeacockText.changed(appearance), false)
 end
--- X / RB / the Dance button: start the courtship dance, or end it. On a controller RB in the crack changes spider instead (one button for
--- both, as the crack and the open sill never overlap). Not for the first spider: it has no dance.
+-- X / RB / the Dance (Wave) button: the peacock spider starts its courtship dance or ends it; the ant mimic raises its antennae higher or lets them
+-- go. On a controller RB in the crack changes spider instead (one button for both, as the crack and the open sill never overlap). The first
+-- spider has no display.
 local function toggleDance()
 	if life.resting then
 		if device == "gamepad" and not life.asleep then changeSpider() end
 		return
 	end
-	if not SpiderChoice.canDance(appearance) then return end
+	local kind = SpiderChoice.displayKind(appearance)
+	if kind == nil then return end
+	local standing = motor.mode == "attached" and not motor.preparing and not motor.seized and not motor:onLine() and not jump:isBusy() and motor.silk.walk == nil
+	if kind == "antennae" then
+		if ant.state:displaying() then
+			ant.state:stop()
+		elseif not ant.state:start(standing, motor.moving) then
+			hud:toast(ant.Text.STAND, false)
+		end
+		return
+	end
 	if dance:showing() and dance.active then
 		dance:stop()
 		return
 	end
-	local standing = motor.mode == "attached" and not motor.preparing and not motor.seized and not motor:onLine() and not jump:isBusy() and motor.silk.walk == nil
 	if not dance:start(standing, motor.moving) then
 		hud:toast(PeacockText.STAND, false)
 	else
@@ -21413,7 +21966,7 @@ local function returnToCheckpoint()
 		return
 	end
 	jump:drop(motor)
-	dance:stop()
+	ant.stopDisplay()
 	local ok, problems = Checkpoint.restore(best.record, checkpointWorld)
 	if not ok then
 		warn("[Windowsill] checkpoint refused: " .. table.concat(problems, "; "))
@@ -21739,7 +22292,7 @@ controls = SpiderInput.bind({
 	choose = function() changeSpider() end,
 	display = function() toggleDance() end,
 	feed = function()
-		dance:stop()
+		ant.stopDisplay()
 		prey.feeding:press()
 		feedPending = true -- in the crack, with nothing to eat, the same button rests (Godot's interact)
 	end,
@@ -21748,7 +22301,7 @@ controls = SpiderInput.bind({
 		if phase == "begin" and prey.feeding.struggling then prey.feeding:press(); gripPress=true; return end
 		if gripPress then if phase ~= "begin" then gripPress=false end; return end
 		if phase == "begin" then
-			dance:stop() -- a jump (a hop or an aim) ends the dance
+			ant.stopDisplay() -- a jump (a hop or an aim) ends the dance or the raised antennae
 			motor:cancelWalk() -- a jump press takes over from a walk to the edge
 			jump:press()
 		elseif phase == "end" then
@@ -21761,14 +22314,14 @@ controls = SpiderInput.bind({
 	-- else's then) and, held on the line, lets go; SilkController counts only a fresh press after the 0.4 s grace, held 0.6 s.
 	cancel = function(phase: string)
 		if phase ~= "begin" then return end
-		dance:stop()
+		ant.stopDisplay()
 		cancelPending = true -- also ends a rest
 		prey.feeding:cancel()
 		if motor:cancelWalk() then return end
 		focusState:cancel(jump:isBusy() or #jump.events > 0 or motor:onLine())
 		jump:cancel()
 	end,
-	drop = function() if life.growth:isMoulting() then return end; dance:stop(); motor:requestDrop() end,
+	drop = function() if life.growth:isMoulting() then return end; ant.stopDisplay(); motor:requestDrop() end,
 	clear = dropAll,
 	reset = function() if not panel:isShowing() then returnToCheckpoint() end end, -- the catch screen has its own way back
 	gait = function() rig.gaitMode = if rig.gaitMode == "Tetrapod" then "Unilateral" else "Tetrapod" end,
@@ -21849,7 +22402,7 @@ local function updateHud(frameDt: number)
 	local aiming = jump:isAiming()
 	local view: any = {
 		device = device, aiming = aiming, focus = controls.held.Focus == true or focusActive(), eyeView = cam.eyeView,
-		status = {}, helpVisible = helpVisible, helpText = ControlText.helpCard(device) .. PeacockText.helpExtra(device, SpiderChoice.canDance(appearance)),
+		status = {}, helpVisible = helpVisible, helpText = ControlText.helpCard(device) .. PeacockText.helpExtra(device, SpiderChoice.displayKind(appearance)),
 		caption = eyes:captionView(device),
 	}
 	-- Captions for sounds and vibrations (ROBLOX-49): off, normal or large. The eye view's own explanation above is not a sound caption.
@@ -21904,9 +22457,11 @@ local function updateHud(frameDt: number)
  if not restPrompt and (motor.pos-Vector3.new(-24,1,6)).Magnitude<7 and not prey.feeding.held then
   restPrompt={title="Home: the silk-lined crack",hint=if lifeSpider.inRetreat then "Keep still on a surface, then "..ControlText.name(device,"feed")..": rest" else "Walk through the silk-framed opening under the wooden roof, then stop to rest."}
  end
- local canDance = SpiderChoice.canDance(appearance)
-	if restPrompt and not lifeSpider.inRetreat and canDance then restPrompt.hint ..= "    " .. PeacockText.displayHint(device,dance.active) end
-	if canDance and dance.active then table.insert(view.status, PeacockText.dancingLine(device)) end
+ local displayKind = SpiderChoice.displayKind(appearance)
+	local displayOn = if displayKind == "antennae" then ant.state:displaying() else dance.active
+	local displayHint = if displayKind == "antennae" then ant.Text.displayHint(device, displayOn) elseif displayKind == "dance" then PeacockText.displayHint(device, displayOn) else ""
+	if restPrompt and not lifeSpider.inRetreat and displayKind ~= nil then restPrompt.hint ..= "    " .. displayHint end
+	if displayKind ~= nil and displayOn then table.insert(view.status, if displayKind == "antennae" then ant.Text.statusLine(device) else PeacockText.dancingLine(device)) end
 	if focusState.latched then table.insert(view.status, "FOCUS ON    " .. ControlText.name(device,"focus") .. " again to stop" .. (if not jump:isBusy() and not motor:onLine() and not motor.silk.walk then " / " .. ControlText.name(device,"cancel") else "")) end
 	if cam.eyeView then table.insert(view.status, `SPIDER-EYE VIEW    {ControlText.name(device, "eye")}: back`) end
 	if slow then
@@ -21927,7 +22482,7 @@ local function updateHud(frameDt: number)
 	elseif restPrompt and not aiming then
 		view.prompt = { title = restPrompt.title, hint = restPrompt.hint }
 	elseif hints and motor.mode == "attached" and not aiming and (helpVisible or os.clock() - started < WALK_HINT_SECONDS) then
-		view.prompt = { hint = ControlText.walkHint(device) .. (if canDance then "    " .. PeacockText.displayHint(device, dance.active) else "") }
+		view.prompt = { hint = ControlText.walkHint(device) .. (if displayKind ~= nil then "    " .. displayHint else "") }
 	end
 	if os.clock() > helpUntil and helpVisible then helpVisible = false end
 	local restLabel = LifeText.touchLabel(life.asleep, life.resting, canRest, clock:isSleepTime() and not life:tooHungryToSleep())
@@ -21939,8 +22494,8 @@ local function updateHud(frameDt: number)
 	controls:setTouchVisible("Creep", not onLine)
 	-- The peacock spider's buttons: Change in the crack, Dance on the open sill (the peacock spider only).
 	controls:setTouchVisible("Choose", canChange())
-	controls:setTouchVisible("Display", canDance and not onLine and not life.resting and motor.mode == "attached")
-	controls:setTouchLabel("Display", PeacockText.touchDisplay(dance.active))
+	controls:setTouchVisible("Display", displayKind ~= nil and not onLine and not life.resting and motor.mode == "attached")
+	controls:setTouchLabel("Display", if displayKind == "antennae" then ant.Text.touchDisplay(displayOn) else PeacockText.touchDisplay(displayOn))
 	hud:update(view, frameDt)
 end
 
@@ -22089,6 +22644,27 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 		dancePose = nil
 		rig.dance = nil
 	end
+	-- The ant-mimicking spider: legs I rise as antennae when it keeps still and its drawn body yaws and sways along the distance it walks. The
+	-- same time and the same standing test as the dance; the distance is the spider's real movement since the last frame (a respawn is not a walk).
+	do
+		local here = motor.pos
+		if SpiderChoice.hasAntennae(appearance) then
+			ant.state.reduced = setting("ReducedMotion") == true
+			ant.state.bodyLength = ant.Pose.BODY_LENGTH * rig._growth
+			local r, f = controls:axes()
+			local standing = motor.mode == "attached" and not motor.preparing and not motor.seized and not motor:onLine() and not life.resting
+			local paused = GuiService.MenuIsOpen or modal()
+			local last = ant.last
+			local moved = if last ~= nil and not paused then (here - last).Magnitude else 0
+			ant.pose = ant.state:step(if paused then 0 else simFrame, standing, motor.moving or r ~= 0 or f ~= 0, moved)
+			rig.ant = ant.pose
+			if not paused then watch:antennae(ant.pose.shownSeconds) end
+		else
+			ant.pose = nil
+			rig.ant = nil
+		end
+		ant.last = here
+	end
  rig.reducedMotion=setting("ReducedMotion")==true
  rig:setGrowthStage(life.growth.stage)
  rig:setSoftness(life.growth:softness())
@@ -22168,7 +22744,7 @@ if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
 			input = controls,
 			notebook = book, notebookWatch = watch, notebookPanel = nbPanel, openNotebook = openNotebook, settingsPanel = settingsPanel, openSettings = openSettings, setting = setting, cam = cam, soundscape = soundscape, eyes = eyes,
 			session=session, menu=menu, openMenu=openMenu, endLife=endLife, fresh=fresh, continueAnother=continueAnother, currentStore=function() return checkpoints end,
-			changeSpider = function() changeSpider() end, dance = function() return dance end, appearance = function() return appearance end, rig = function() return rig end,
+			changeSpider = function() changeSpider() end, dance = function() return dance end, ant = function() return ant.state end, antPose = function() return ant.pose end, appearance = function() return appearance end, rig = function() return rig end,
 			drop = function() motor:requestDrop() end,
 			jump = jump,
 			motor = motor,
@@ -22192,7 +22768,7 @@ end
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="147">
+        <Item class="ModuleScript" referent="151">
           <Properties>
             <string name="Name">SpiderEyes</string>
             <string name="Source"><![CDATA[--!strict
@@ -22658,7 +23234,7 @@ return SpiderEyes
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="148">
+        <Item class="ModuleScript" referent="152">
           <Properties>
             <string name="Name">SpiderHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -22991,7 +23567,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="149">
+        <Item class="ModuleScript" referent="153">
           <Properties>
             <string name="Name">SpiderInput</string>
             <string name="Source"><![CDATA[--!strict
@@ -23228,7 +23804,7 @@ return SpiderInput
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="150">
+        <Item class="ModuleScript" referent="154">
           <Properties>
             <string name="Name">WaspBody</string>
             <string name="Source"><![CDATA[--!strict
@@ -23460,7 +24036,7 @@ return WaspBody
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="151">
+        <Item class="ModuleScript" referent="155">
           <Properties>
             <string name="Name">WorldDetail</string>
             <string name="Source"><![CDATA[--!strict
@@ -23500,7 +24076,7 @@ return WorldDetail
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="152">
+        <Item class="ModuleScript" referent="156">
           <Properties>
             <string name="Name">SilkPlayback</string>
             <string name="Source"><![CDATA[--!strict
@@ -24022,7 +24598,7 @@ end
       </Item>
     </Item>
   </Item>
-  <Item class="Workspace" referent="153">
+  <Item class="Workspace" referent="157">
     <Properties>
       <string name="Name">Workspace</string>
       <float name="Gravity">35</float>

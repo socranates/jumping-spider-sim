@@ -16,6 +16,7 @@ tests/life.luau (the life clock, the needs and the rest-and-sleep loop against t
 tests/checkpoint.luau (the retreat checkpoint of a whole world, its refusals, and the DataStore-shaped store) and
 tests/wasp.luau (the mud dauber wasp's rules against tests/wasp_reference.json, exported from the frozen Godot director, and Godot's hand-written expectations) and
 tests/peacock.luau (the peacock spider's courtship dance: its documented rates, order, interruption and reduced motion) and
+tests/antmimic.luau (the ant-mimicking spider's antennae and drawn walk: its documented numbers, the short stops, interruption and reduced motion) and
 tests/notebook.luau (the naturalist's notebook: Godot's pages word for word, the model, the watcher, the words and layout, the panel and the client's wiring) and
 tests/state.luau (persistent saves: envelope, progress and rest records, session lock, scheduler, server service) and
 tests/state_client.luau (the client's saving wiring against the real service) and tests/state_offline.luau (no server at all) and
@@ -84,6 +85,8 @@ MODULES = [
     ("Wasp", "Data/Wasp.luau"),
     ("Peacock", "Data/Peacock.luau"),
     ("PeacockDance", "Rig/PeacockDance.luau"),
+    ("AntMimic", "Data/AntMimic.luau"),
+    ("AntMimicPose", "Rig/AntMimicPose.luau"),
     ("SpiderChoice", "Rig/SpiderChoice.luau"),
     ("WaspDirector", "Predator/WaspDirector.luau"),
     ("WaspText", "UI/WaspText.luau"),
@@ -195,7 +198,7 @@ def main():
     luau = sys.argv[1] if len(sys.argv) > 1 else "luau"
     status = 0
     named = sys.argv[2:]
-    for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "life.luau", "checkpoint.luau", "wasp.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "look.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "peacock.luau", "continuing.luau", "growth.luau", "notebook.luau", "state.luau", "state_client.luau", "state_offline.luau", "settings.luau"]:
+    for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "life.luau", "checkpoint.luau", "wasp.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "look.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "peacock.luau", "antmimic.luau", "continuing.luau", "growth.luau", "notebook.luau", "state.luau", "state_client.luau", "state_offline.luau", "settings.luau"]:
         if not (HERE / test_file).exists():
             if named:  # a misspelt name must not look like a pass
                 print(f"no such test file: {test_file} (names are relative to tests/, for example look.luau)", file=sys.stderr)

@@ -1,0 +1,8 @@
+state: a rest is 21584 characters early and 64490 at most after 3 samples of a long life (cap 262144, Roblox 4194304)
+slow [measured sizes: a real rest, early and after a long life, against the cap and Roblox's limit] 27.4 s
+slow [a failed load never overwrites good data: every kind of failure, for ten minutes and a leave, leaves every stored byte as it was] 7.4 s
+FAIL [oversized and malformed things from the client never reach the store] the session carries on
+slow [random operations, faults and two sessions: stored progress only ever grows, every stored value is a good save, and nothing raises] 16.9 s
+STATE passed=394 failed=1
+STATE_CLIENT passed=95 failed=0
+STATE_OFFLINE passed=8 failed=0

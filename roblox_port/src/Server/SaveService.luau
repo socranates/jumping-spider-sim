@@ -25,7 +25,7 @@ export type Config = {
 }
 
 function SaveService.new(cfg: Config): any
-	return setmetatable({ cfg = cfg, entries = {} :: { [any]: any }, counter = 0, stats = { dropped = 0, limited = 0, handled = 0 }, closing = false }, SaveService)
+	return setmetatable({ cfg = cfg, entries = {} :: { [any]: any }, counter = 0, departing = 0, stats = { dropped = 0, limited = 0, handled = 0 }, closing = false }, SaveService)
 end
 
 local function log(self: any, text: string)
@@ -86,7 +86,9 @@ function SaveService.addPlayer(self: any, player: Player)
 		end
 		entry.loaded = true
 		if entry.leaving then
-			entry.session:flush() -- the player left while the load was in flight: let go of the lock it took
+			local flushed, flushError = pcall(function() entry.session:flush() end)
+			self.departing -= 1
+			if not flushed then log(self, "flush raised: " .. tostring(flushError)) end
 			return
 		end
 		if entry.hello then sendTo(self, player, loadedMessage(entry.session)) end
@@ -137,8 +139,10 @@ function SaveService.removePlayer(self: any, player: Player)
 	if entry == nil then return end
 	self.entries[player] = nil
 	entry.leaving = true
+	self.departing += 1 -- BindToClose must also await a PlayerRemoving write already in flight.
 	if not entry.loaded then return end -- the loading thread finishes the job (see addPlayer)
 	local ok, err = pcall(function() entry.session:flush() end)
+	self.departing -= 1
 	if not ok then log(self, "flush raised: " .. tostring(err)) end
 end
 
@@ -171,7 +175,7 @@ function SaveService.shutdown(self: any)
 		end
 		self.entries[player] = nil
 	end
-	while pending > 0 and self.cfg.now() < deadline do
+	while (pending > 0 or self.departing > 0) and self.cfg.now() < deadline do
 		self.cfg.sleep(0.25)
 	end
 end

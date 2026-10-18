@@ -1,0 +1,537 @@
+{
+  "evidence_id": "9f8c40cff99e5e90",
+  "engine": "0.743.0.7431133",
+  "not_run": 1,
+  "tests": 104,
+  "passed": 104,
+  "failed": 0,
+  "skipped": [
+    {
+      "evidence_id": "9f8c40cff99e5e90",
+      "name": "state: DataStore round trip through DataStoreBackend, the lock, real error messages",
+      "why": "no DataStore access: You must publish this place to the web to access DataStore."
+    }
+  ],
+  "results": [
+    {
+      "passed": true,
+      "name": "real engine jump reaches seat",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "raycast planted foot stays in world space",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "appearance stays white when stage changes",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "all rig parts are display only and bounded",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "spider-eye view hides the body and keeps the front legs",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "low detail keeps about a fifth of the fuzz and under 300 parts",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "big glossy eyes with catchlights, no sockets or outline in low detail",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "idle motion moves the drawn head and palps only, and not in low detail",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "air and underside poses are finite",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "Studio spec completes",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "floor refuses lowering without room below",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "raised leaf chooses nearest edge",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "anchor policy and moving local-space anchor",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "payout never constrains a valid flight",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "miss catches within paid length and settles",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "deliberate leaf drop hangs then lowers to floor",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "reel after leaf drop grabs the leaf",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "wall drop lowers to floor",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "one bend snags at a second obstruction and clears again",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "anchor deletion releases without invalid coordinates",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "blocked reel cannot pull through nonattachable wall",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "Silk spec completes",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "every material name in the graphics table is a real Roblox material",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "sill pieces use the table's materials and the back wall is invisible but solid",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "a piece is invisible only where its drawing exists, and then it stays solid; every drawn leaf's top is its piece's top",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "decor is drawn only: no collisions, no rays, no touches",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "the flowers' UV layer is invisible Neon until the eye view fades it in",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "the sun shines in through the window",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "the wall casts shadows, the glass does not",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "atmosphere, sky, grade, bloom, sun rays and clouds are in place; the macro depth of field is on unless switched off",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "dust motes are emitting and the light shafts are faint",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "Graphics spec completes",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "a missed leap off the east leaf is caught by the line, settles, and reeling takes hold of the leaf",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "F on the middle leaf walks to the nearest edge, lets down, and a held F lowers to the sill floor",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "F on the back wall lets down at once and lowering reaches the floor",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "F on the planter rim walks to its front edge, lets down clear of the planter and lowers to the floor",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "after letting down from the leaf, reeling climbs back and takes hold of the leaf",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "a second obstruction snags the line: reeling is refused, lowering and letting go still work",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "a press in the 0.4 s grace never lets go, however long it is held; a fresh 0.6 s hold does",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "Q held from before the leap through the catch never lets go; a fresh hold does",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "focus loss cancels: an aim never leaps afterwards, a let-go hold starts over, a walk to the edge stops",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "catch camera: a squeezed view turns by the smallest working 15-degree step, never past 45, and the player's look wins",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "the landing patch says Reachable, Blocked, Out of reach and Can't land there, as Godot's planner",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "Focus, the eye view and an aim turn the body toward where the view points",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "holding forward carries the spider over the leaf's edge, along its underside, never back and forth",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "ten misses from leaves and the planter are caught and recovered by reeling, lowering or letting go",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "Recovery scenarios complete",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "P01 F1 peripheral cue has bearing but no position or identity",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "P01 F2 camera projection cannot rotate the sensor cone",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "P01 F3 Focus turns at capped rate and inspection refines in time",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "P01 F4 hidden motion never updates observation or HUD position",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "P01 F5 fixed last-seen mark fades and expires",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "P01 F6 association follows evidence even after world id changes",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "P01 F7 only an inspected empty visible spot loses its mark",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "P01 F8 never-sensed actors leave no overlay",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "Perception spec completes",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "T07 valid starts and swept flight reaches a reserved perch without teleporting",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "T07 population waits, checks twice, rejects visible entrances and respects capacity",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "T07 feeding waits for landing, automatic grip works and nutrition cannot be duplicated",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "T07 no tapping lets a caught fly escape without a meal",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "T07 movement interrupts feeding on the same tick",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "T07 jaws resolve one position-size contact; ambiguous capture resolves neither",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "T07 a changed obstacle stops the flight before penetration",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "T07 capture cannot cross a wall or start from an ordinary fall",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "Prey spec completes",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "every device's prompts wrap inside the narrowest prompt panel in at most four lines",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "the controls card fits a phone's width in landscape for every device",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "touch buttons' words fit their buttons",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "compact landscape touch labels fit and the prompt stays on screen",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "Prompt spec completes",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "LIFE: the clock, the needs and the loop run in the engine as in the CLI",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "LIFE: the day's light is the accepted look; night is set on the real Lighting and taken back",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "S01-C: a retreat checkpoint goes through HttpService's JSON and back, and the world repeats exactly",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "S02: the store keeps the last good checkpoint and refuses a bad one without touching the world",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "Life spec completes",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "WASP: every place has room to hover, a way in, a way up and ground to land on (real casts)",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "WASP: it searches a sill it cannot find the spider on, never inside a piece, and gives up (real casts)",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "WASP: a spider moving in the open is found and carried off, over the frame (real casts)",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "WASP: a lunge from a spider that dropped on its line is missed (real casts)",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "WASP: the drawn wasp builds from real Parts and is not touched by anything",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "Wasp spec completes",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "the peacock spider builds in the engine inside its part budget, display only",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "the dance pose opens the fan and raises legs III; no pose folds it",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "a small body stands low and all eight feet find the floor",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "Peacock spec completes",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "growth: planted feet and unchanged root on 0, 1, 0",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "growth: planted feet and unchanged root on 1, 0, 0",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "growth: planted feet and unchanged root on -0, -1, -0",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "growth: adult peacock dance and eye visibility",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "growth: interrupted record resumes exactly once",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "Growth spec completes",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "notebook: the book in the engine is Godot's 25 pages, found once each, with no unfound page readable",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "notebook: every page fits every screen the panel supports, one pane or two, normal and large text",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "notebook: page titles fit the list in at most three lines, and the heading and buttons fit their bands",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "notebook: the controls line fits its two lines, where it is shown, for every device",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "notebook: the note that a page opened wraps inside the narrowest label, and the Notebook button's word fits its button",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "notebook: the panel is built with real property names, shows each found page and nothing else",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "Notebook spec completes",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "state: real checkpoints, decoded by the engine's JSON, pass the server's rest check; the other mode refuses them",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "state: the server's rest check refuses the usual damage in the engine too",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "state: envelopes survive the engine's JSON round trip: checksum, backup and lock",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "state: a whole visit on the in-memory backend in the engine: load, save, leave, rejoin, and a competing session",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "state: the server script started with the test store and made its remotes",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "State spec completes",
+      "detail": ""
+    }
+  ]
+}

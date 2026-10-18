@@ -1,0 +1,18 @@
+state: a rest is 21581 characters early and 64206 at most after 3 samples of a long life (cap 262144, Roblox 4194304)
+slow [measured sizes: a real rest, early and after a long life, against the cap and Roblox's limit] 19.7 s
+slow [a failed load never overwrites good data: every kind of failure, for ten minutes and a leave, leaves every stored byte as it was] 5.2 s
+slow [random operations, faults and two sessions: stored progress only ever grows, every stored value is a good save, and nothing raises] 15.9 s
+FAIL [a page earned while UpdateAsync yields survives its reply] in-memory progress retains the new page
+FAIL [a page earned while UpdateAsync yields survives its reply] the next write stores it
+FAIL [leaving holds the lock until both rest writes have finished] rejoining cannot read an unfinished departing visit
+FAIL [leaving holds the lock until both rest writes have finished] lock is released after the rest completes
+FAIL [a failed rest load never permits a leave-time overwrite] unread stored rest remains byte-for-byte intact
+FAIL [damaged rests stay intact, including damage discovered on a retry or write] load: damaged record preserved
+FAIL [damaged rests stay intact, including damage discovered on a retry or write] load: player is told saving is off
+FAIL [damaged rests stay intact, including damage discovered on a retry or write] retry: damaged record preserved
+FAIL [damaged rests stay intact, including damage discovered on a retry or write] retry: player is told saving is off
+FAIL [damaged rests stay intact, including damage discovered on a retry or write] write: damaged record preserved
+FAIL [damaged rests stay intact, including damage discovered on a retry or write] write: player is told saving is off
+FAIL [failed rest reads do not starve a live session's heartbeat] repeated read failures retain the live lock
+FAIL [flush deadline never overlaps an existing write] no concurrent second write is started after the wait expires
+STATE passed=380 failed=13

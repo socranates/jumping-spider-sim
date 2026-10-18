@@ -1,3 +1,9 @@
+# Windows acceptance update — Chet, 2026-10-17
+
+Read `verification/roblox-state-windows/RESULTS.md` for reviewed fixes, exact test evidence and publication status. The older unverified statements below describe Claude's incoming bundle. Real DataStore checks now pass. Actual recursive compile count is 160, not 165.
+
+Next chunk: settings and device polish. Expose sound volumes, reduced motion, camera and readable-text options in a controller/touch-friendly settings menu; persist only the supported preference keys. Check narrow landscape touch layout, focus return, and play a complete life on PlayStation and a lower-end tablet. Preserve the free first spider and free-for-testing peacock, twitch and existing controls. Public release also needs presentation/science review and Nathan's account/audience prerequisites; see PUBLIC_RELEASE.md.
+
 # Persistent saves (DataStore) - 2026-10-17
 
 Branch `claude/roblox-state` from main 2e36716. Decisions ROBLOX-39 to ROBLOX-46 in `DECISIONS.md`. Nothing here is published; the places were rebuilt and nothing has been run against a real DataStore yet (see Chet's checklist).

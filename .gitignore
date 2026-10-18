@@ -18,3 +18,5 @@ docs/**/*.import
 *.rbxlx.lock
 *.rbxl.lock
 *.rbxlx.autosave
+__pycache__/
+*.pyc

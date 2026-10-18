@@ -224,7 +224,9 @@ return function(driver: any)
   print("PORT_WASP_COST "..HttpService:JSONEncode({evidence_id=workspace:GetAttribute("PortEvidence"),
    samples=#frames,frame_p50_ms=frames[math.ceil(#frames*.5)],frame_p95_ms=frames[math.ceil(#frames*.95)],
    phase=wasp.phase,audio_loaded=hum.IsLoaded,source="live wasp visit; no screenshots during timing"}))
-  wasp:clearVisit();RunService.Heartbeat:Wait();RunService.Heartbeat:Wait()
+  wasp:clearVisit()
+  local stopped=os.clock()+1
+  while hum.Playing and os.clock()<stopped do RunService.Heartbeat:Wait() end
   assert(not hum.Playing,"hum continued after visit")
  end)
  driver.wasp:clearVisit() -- also clean up after an assertion failure

@@ -1,0 +1,3 @@
+[INFO] Loading definitions file: @roblox - ../../roblox_tools/globalTypes.d.luau
+[WARN] client does not allow didChangeWatchedFiles registration - automatic updating on sourcemap changes disabled
+src/Shared/Persistence/SaveSession.luau(457,10): DuplicateCondition: Condition has already been checked on line 436

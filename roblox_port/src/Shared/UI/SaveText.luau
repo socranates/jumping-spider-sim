@@ -17,6 +17,7 @@ SaveText.WHY = {
 	other_session = "Your game is open somewhere else, and this copy cannot save over it.",
 	corrupt = "Your saved game could not be read, so it was left exactly as it is.",
 	newer = "Your saved game was made by a newer version of this game, so it was left exactly as it is.",
+	write_failed = "This visit could not be saved. Your earlier saved game is still kept.",
 } :: { [string]: string }
 
 local function because(reason: string?): string?

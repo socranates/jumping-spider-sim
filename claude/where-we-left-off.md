@@ -1,4 +1,14 @@
-# Latest: persistent saves built, 2026-10-17 (not yet run against a live DataStore)
+# Latest: persistent saves published v19 — Chet, 2026-10-17
+
+Claude's save bundle 871b816 is integrated with review fixes and a native-discovered shutdown race repair. Build **881f5ba653b169fe**. Accepted CLI **46,652**, strict clean, **160/160** compile. Real isolated DataStore run: **106/106 engine, zero skipped; 23/23 live client** at evidence 461991282cc6007c before the final shutdown repair. The final repair passed its coroutine regression and an actual immediate normal Studio restart with the discovered notebook page retained and no stale lock.
+
+**Published v19** to existing Windowsill place 120119801868085, independently confirmed in Creator Dashboard. No audience/privacy changes. Nathan enabled API access himself only in Windowsill Save Tests (place 109879630247781); production Studio API settings remain untouched. See `docs/verification/roblox-state-windows/RESULTS.md`, `docs/HANDOFF-roblox-state.md`, ROBLOX-47 and `docs/PUBLIC_RELEASE.md`.
+
+Next: settings/accessibility and device polish, then presentation/science review and account/audience readiness. Nathan: on PlayStation discover a notebook page, rest, leave and rejoin; verify the page and Back to your last rest. Physical console/tablet acceptance and a manual normal rest/rejoin are not claimed. The automated real-store test did restore both mode slots. Keep daughter's spider/game free, peacock free for testing, twitch and SimClock. Godot stays frozen.
+
+---
+
+# Incoming bundle: persistent saves built, 2026-10-17 (not yet run against a live DataStore)
 
 Branch `claude/roblox-state` (9e8b814 plus docs): the notebook, checklist, Easy unlock, appearance, preferences and the last rest of each mode now save between visits. The server alone touches DataStore (`Windowsill_v1` live, `WindowsillTest_v1` in Studio and the test place); it checks everything the client sends for corruption safety, not anti-cheat. If saving cannot be trusted (load failure, bad checksum, newer version, game open elsewhere) the game runs session-only, says so in plain words, and never writes over what is stored. STATE 380, STATE_CLIENT 95, STATE_OFFLINE 8; whole CLI 46,635, all failed=0; types 0, compile 165/165. Measured rests: about 21.6 KB early, about 64 KB plateau; cap 262,144 chars; progress about 1 KB.
 

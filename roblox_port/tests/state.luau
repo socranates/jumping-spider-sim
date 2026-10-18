@@ -794,7 +794,7 @@ case("oversized and malformed things from the client never reach the store", fun
 	e2.backend:fail({ op = "update", key = "R_10_main", times = 1, message = "105: ValueTooLarge" })
 	run(e2, s2, 60)
 	check(not s2.sched:isDirty("rest_main") and s2.restPending.main == nil, "a value that can never be stored is abandoned, not retried")
-	check(select(1, s2:status()) == "saved", "the session carries on")
+	check(select(1, s2:status()) == "session" and s2.reason == "write_failed", "play carries on but the rejected save is never called Saved")
 end)
 
 case("throttling and outages while saving: the change stays dirty, retries back off 4, 8, 16 s, and it lands when the store returns", function()
@@ -1368,6 +1368,135 @@ case("service: the key a player is filed under can be chosen (the test place fil
 	tickServer(e, srv, 5)
 	check(e.backend.data["P_tRUN_70"] ~= nil and e.backend.data["P_70"] == nil, "filed under the chosen name")
 	srv.service:removePlayer(p)
+end)
+
+
+case("a page earned while UpdateAsync yields survives its reply", function()
+	local e = newEnv()
+	local a = newSession(e, 81, "A")
+	a:load()
+	a:setProgress(prog({ "first" }))
+	local update = e.backend.update
+	local once = false
+	e.backend.update = function(self: any, key: string, transform: any): (boolean, any, string?)
+		local ok, value, err = update(self, key, transform)
+		if key == "P_81" and not once then
+			once = true
+			e.t += 1
+			a:setProgress(prog({ "first", "during_write" }))
+		end
+		return ok, value, err
+	end
+	run(e, a, 40)
+	check(table.find(a.progress.notebook.opened, "during_write") ~= nil, "in-memory progress retains the new page")
+	check(table.find(storedOf(e, "P_81", nil).payload.notebook.opened, "during_write") ~= nil, "the next write stores it")
+end)
+
+case("leaving holds the lock until both rest writes have finished", function()
+	local e = newEnv()
+	local a = newSession(e, 82, "A")
+	a:load()
+	a:setRest("main", realRest(120, "main"))
+	local update = e.backend.update
+	local observed = false
+	e.backend.update = function(self: any, key: string, transform: any): (boolean, any, string?)
+		if key == "R_82_main" then
+			observed = true
+			local b = newSession(e, 82, "B")
+			check(b:load() == "session" and b.reason == "other_session", "rejoining cannot read an unfinished departing visit")
+		end
+		return update(self, key, transform)
+	end
+	a:flush()
+	check(observed and storedOf(e, "P_82", nil).lock == nil, "lock is released after the rest completes")
+end)
+
+case("a failed rest load never permits a leave-time overwrite", function()
+	local e = newEnv()
+	local original = SaveEnvelope.make(SaveRest.SPECS.main, realRest(400, "main"), e.t, nil, { session = "OLD" })
+	e.backend:poke("R_83_main", original)
+	e.backend:fail({ op = "read", key = "R_83_main", times = 100, message = "503: down" })
+	local a = newSession(e, 83, "A")
+	a:load()
+	a:setRest("main", realRest(120, "main"))
+	a:flush()
+	check(canon(e.backend.data.R_83_main) == canon(original), "unread stored rest remains byte-for-byte intact")
+end)
+
+case("damaged rests stay intact, including damage discovered on a retry or write", function()
+	for _, when in { "load", "retry", "write" } do
+		local e = newEnv()
+		local a = newSession(e, 84, "A")
+		local damaged = SaveEnvelope.make(SaveRest.SPECS.main, realRest(120, "main"), e.t, nil, { session = "OLD" })
+		damaged.checksum = "damaged"
+		if when ~= "write" then e.backend:poke("R_84_main", damaged) end
+		if when == "retry" then e.backend:fail({ op = "read", key = "R_84_main", times = 1, message = "503: down" }) end
+		a:load()
+		if when == "write" then e.backend:poke("R_84_main", damaged) end
+		a:setRest("main", realRest(200, "main"))
+		run(e, a, 20)
+		a:flush()
+		check(canon(e.backend.data.R_84_main) == canon(damaged), when .. ": damaged record preserved")
+		check(a.reason == "corrupt", when .. ": player is told saving is off")
+	end
+end)
+
+case("failed rest reads do not starve a live session's heartbeat", function()
+	local e = newEnv()
+	local a = newSession(e, 85, "A")
+	e.backend:fail({ op = "read", key = "R_85_main", times = 1000, message = "503: down" })
+	a:load()
+	run(e, a, SaveRules.LOCK_STALE + 40)
+	local b = newSession(e, 85, "B")
+	check(b:load() == "session" and b.reason == "other_session", "repeated read failures retain the live lock")
+end)
+
+case("flush deadline never overlaps an existing write", function()
+	local e = newEnv()
+	local a = newSession(e, 86, "A")
+	a:load()
+	a:setProgress(prog({ "pending" }))
+	a.busy = true
+	local before = e.backend.writes
+	a:flush(e.t + 1)
+	check(e.backend.writes == before, "no concurrent second write is started after the wait expires")
+end)
+
+case("a permanent write rejection never reports Saved", function()
+	for _, key in { "P_87", "R_87_main" } do
+		local e = newEnv()
+		local a = newSession(e, 87, "A")
+		a:load()
+		a:setProgress(prog({ "unsaved" }))
+		a:setRest("main", realRest(120, "main"))
+		e.backend:fail({ op = "update", key = key, times = 1, message = "105: value too large" })
+		run(e, a, 5)
+		local st, why = a:status()
+		check(st == "session" and why == "write_failed", key .. ": explicitly session-only")
+	end
+end)
+
+case("shutdown waits for a PlayerRemoving flush already in flight", function()
+	local e = newEnv()
+	local srv = newServer(e)
+	local p = player(88)
+	srv.service:addPlayer(p)
+	local entry = srv.service.entries[p]
+	local flushed = false
+	entry.session.flush = function()
+		coroutine.yield()
+		flushed = true
+	end
+	local leaving = coroutine.create(function() srv.service:removePlayer(p) end)
+	check(coroutine.resume(leaving) and not flushed, "departing flush is suspended after removal")
+	local waited = false
+	srv.service.cfg.sleep = function(seconds: number)
+		waited = true
+		e.t += seconds
+		assert(coroutine.resume(leaving))
+	end
+	srv.service:shutdown()
+	check(waited and flushed and srv.service.departing == 0, "shutdown awaits and completes the departing write")
 end)
 
 print(`STATE passed={passed} failed={failed}`)

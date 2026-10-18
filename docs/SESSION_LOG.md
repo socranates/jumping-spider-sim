@@ -1319,3 +1319,7 @@ Changed: `src/Shared/Data/SaveRules.luau`, `src/Shared/Persistence/*`, `src/Shar
 Verification: STATE 380, STATE_CLIENT 95, STATE_OFFLINE 8, every older suite unchanged, CLI total 46,635 accepted checks, failed=0 everywhere; strict types 0 diagnostics; compile 165/165. Not run: the Studio spec (needs Chet and Studio API access), any real DataStore call, any publish. Unverified assumptions: lossless number round trip through DataStore JSON, the error-message patterns in `SaveStores.classify`, transform CPU in Roblox's Luau.
 
 Next: Chet runs the checklist in the handoff, then Nathan checks leave-and-rejoin on the published place.
+
+## 2026-10-17 — Chet: persistent saves accepted and published
+
+Integrated Claude 871b816; repaired yielding-write progress loss, lock/read/write safety, honest failure status and shutdown racing an already departing player. 46,652 accepted CLI checks, strict clean, 160 compiled; isolated real DataStore 106 engine + 23 client, zero skipped, followed by normal immediate restart verification for the shutdown fix. Published v19 to the existing playtest; see verification/roblox-state-windows/RESULTS.md. Next settings/device polish; physical PlayStation rejoin remains Nathan's check.

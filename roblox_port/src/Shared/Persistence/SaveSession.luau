@@ -75,7 +75,7 @@ end
 function SaveSession.status(self: any): (string, string?)
 	if self.state == "session" then return SaveRules.STATUS.session, self.reason end
 	if self.state == "loading" then return SaveRules.STATUS.saving, nil end
-	if self.busy or self.sched:anyDirty() then
+	if self.busy or self.sched:anyDirty() or not self.restLoaded.main or not self.restLoaded.free then
 		local trouble = false
 		for _, name in { "progress", "rest_main", "rest_free" } do
 			if self.sched.items[name].dirty and self.sched.items[name].failures >= 3 then trouble = true end
@@ -169,13 +169,12 @@ local function readRests(self: any)
 				elseif op.status == "missing" then
 					self.restBase[mode] = 0
 				else
-					-- unreadable or made by a newer build: the backup, if it is good, is what the player returns to; the damaged value is replaced
-					-- by the next rest (a newer build's value is never written over: see writeRest)
+					-- A readable backup is offered in memory only. Preserve the original unreadable record for recovery.
 					self.restBase[mode] = op.updatedAt or 0
 					local b = op.backup
 					if b and (b.status == "ok" or b.status == "migrated") then self.rests[mode] = b.payload end
 					log(self, `the {mode} rest is {op.status}: {op.reasons[1] or ""}`)
-					if op.status == "newer" then self.restNewer = true end
+					self:demote(if op.status == "newer" then "newer" else "corrupt", false)
 				end
 				-- a rest we hold unsent that is newer than the one stored stays pending; an older one is dropped
 				local pending = self.restPendingTime[mode]
@@ -199,10 +198,6 @@ function SaveSession.load(self: any): string
 		self.sched:beat(self.now())
 		self.restLoaded = {} -- read again: another session may have written a rest while this one could not
 		readRests(self)
-		if self.restNewer then
-			self:demote("newer", false)
-			self.restNewer = false
-		end
 	elseif verdict == "locked" then
 		if info and info.payload then self.progress = SaveProgress.merge(info.payload, self.progress, info.updatedAt or 0, self.progressTime) end
 		self.state = "session"
@@ -301,6 +296,7 @@ local function writeProgress(self: any, release: boolean): boolean
 		if class == "value" then
 			log(self, "the progress record cannot be stored: " .. tostring(err))
 			self.sched:abandon("progress")
+			self:demote("write_failed", false)
 			return false
 		end
 		local wait = self.sched:failed("progress", now, class)
@@ -308,7 +304,8 @@ local function writeProgress(self: any, release: boolean): boolean
 		return false
 	end
 	if outcome == "ok" then
-		self.progress = merged
+		-- UpdateAsync yields after its callback. Keep progress that arrived while the request was in flight.
+		self.progress = SaveProgress.merge(merged, self.progress, newTime, self.progressTime)
 		self.storedTime = newTime
 		self.sched:succeeded("progress", now, version)
 		self.sched:beat(now)
@@ -327,6 +324,8 @@ local function writeProgress(self: any, release: boolean): boolean
 end
 
 local function writeRest(self: any, mode: string): boolean
+	-- Never overwrite a record whose load failed, including during shutdown.
+	if not self.restLoaded[mode] or self.restBase[mode] == nil then return false end
 	local name = "rest_" .. mode
 	local record = self.restPending[mode]
 	if record == nil then
@@ -343,6 +342,7 @@ local function writeRest(self: any, mode: string): boolean
 		outcome = ""
 		local op = SaveEnvelope.open(spec, old, false)
 		if op.status == "newer" then outcome = "newer"; return nil end
+		if op.status == "corrupt" or op.status == "invalid" then outcome = "corrupt"; return nil end
 		local base = self.restBase[mode]
 		if (op.status == "ok" or op.status == "migrated") and base ~= nil and (op.updatedAt or 0) > base and op.session ~= self.id then
 			outcome = "superseded"
@@ -364,6 +364,7 @@ local function writeRest(self: any, mode: string): boolean
 			log(self, `the {mode} rest cannot be stored: {tostring(err)}`)
 			self.restPending[mode], self.restPendingTime[mode] = nil, nil
 			self.sched:abandon(name)
+			self:demote("write_failed", false)
 			return false
 		end
 		local wait = self.sched:failed(name, now, class)
@@ -382,6 +383,8 @@ local function writeRest(self: any, mode: string): boolean
 		self:demote("other_session", true)
 	elseif outcome == "newer" then
 		self:demote("newer", false)
+	elseif outcome == "corrupt" then
+		self:demote("corrupt", false)
 	end
 	return false
 end
@@ -431,7 +434,12 @@ local function stepInner(self: any): boolean
 			did = false
 		end
 	elseif self.state == "active" then
-		if not self.restLoaded.main or not self.restLoaded.free then
+		-- A failed rest read must not starve lock renewal for a live player.
+		if self.sched:due("progress", now) then
+			writeProgress(self, false) -- also renews the lock
+		elseif self.sched:heartbeatDue(now) then
+			heartbeat(self)
+		elseif not self.restLoaded.main or not self.restLoaded.free then
 			if now >= self.restRetryAt and self.sched:budgetOk(now) then
 				local before = { main = self.rests.main, free = self.rests.free }
 				readRests(self)
@@ -444,14 +452,10 @@ local function stepInner(self: any): boolean
 			else
 				did = false
 			end
-		elseif self.sched:due("progress", now) then
-			writeProgress(self, false)
 		elseif self.sched:due("rest_main", now) then
 			writeRest(self, "main")
 		elseif self.sched:due("rest_free", now) then
 			writeRest(self, "free")
-		elseif self.sched:heartbeatDue(now) then
-			heartbeat(self)
 		else
 			did = false
 		end
@@ -480,38 +484,41 @@ function SaveSession.snapshot(self: any): any
 	return { status = status, reason = reason, progress = self.progress, rests = { main = self.rests.main, free = self.rests.free } }
 end
 
--- Leaving or shutting down: write whatever is waiting (progress first, then the rests), release the lock, retrying a few times with the
--- backoff, never beyond `deadline` (an absolute time). Yields. After this the session is closed.
+-- Leaving/shutdown keeps ownership until the pending records finish; a new visit must not load half a flush.
 function SaveSession.flush(self: any, deadline: number?)
+	if self.closed or self.flushing then return end
+	self.flushing = true
 	local sleep = self.cfg.sleep
 	local limit = deadline or (self.now() + SaveRules.FLUSH_DEADLINE)
-	-- let a write already in flight finish
-	local waited = 0
-	while self.busy and self.now() < limit and sleep do
-		sleep(0.25)
-		waited += 1
-		if waited > 200 then break end
+	while self.busy and self.now() < limit and sleep do sleep(0.25) end
+	if self.busy or self.now() >= limit then
+		self.closed, self.flushing = true, false
+		return -- never overlap an in-flight request; its lock will expire if it cannot finish
 	end
-	if self.state == "active" and not self.closed then
+	if self.state == "active" then
 		self.busy = true
 		local attempt = 0
-		local progressDone, restsDone = false, { main = false, free = false }
-		while attempt < SaveRules.FLUSH_ATTEMPTS and self.state == "active" do
+		while attempt < SaveRules.FLUSH_ATTEMPTS and self.state == "active" and self.now() < limit do
 			attempt += 1
-			if not progressDone then progressDone = writeProgress(self, true) end
-			if self.state ~= "active" then break end
-			for _, mode in SaveRules.MODES do
-				if not restsDone[mode] then
-					restsDone[mode] = (self.restPending[mode] == nil) or writeRest(self, mode)
+			-- Also checks ownership before touching a rest, even when progress itself is unchanged.
+			local progressDone = writeProgress(self, false)
+			local restsDone = true
+			if progressDone and self.state == "active" then
+				for _, mode in SaveRules.MODES do
+					if self.restPending[mode] ~= nil then
+						if self.now() >= limit or self.state ~= "active" or not writeRest(self, mode) then restsDone = false end
+					end
+				end
+				if restsDone and self.state == "active" and self.now() < limit then
+					if writeProgress(self, true) then break end -- release only after every rest has completed
 				end
 			end
-			if progressDone and restsDone.main and restsDone.free then break end
 			if self.now() >= limit or sleep == nil then break end
-			sleep(SaveRules.FLUSH_BACKOFF * 2 ^ (attempt - 1))
+			sleep(math.min(SaveRules.FLUSH_BACKOFF * 2 ^ (attempt - 1), math.max(0, limit - self.now())))
 		end
 		self.busy = false
 	end
-	self.closed = true
+	self.closed, self.flushing = true, false
 	self:notify()
 end
 

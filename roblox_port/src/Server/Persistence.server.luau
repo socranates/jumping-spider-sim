@@ -15,7 +15,6 @@ local Workspace = game:GetService("Workspace")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local SaveRules = require(Shared.Data.SaveRules)
 local SaveStores = require(Shared.Persistence.SaveStores)
-local MemoryBackend = require(Shared.Persistence.MemoryBackend)
 local SaveService = require(script.Parent.SaveService)
 local DataStoreBackend = require(script.Parent.DataStoreBackend)
 
@@ -23,14 +22,17 @@ local isStudio = RunService:IsStudio()
 local isTestPlace = ServerScriptService:FindFirstChild("PortTests") ~= nil
 local storeName = SaveStores.name(isStudio, isTestPlace, Workspace:GetAttribute("SaveStore"))
 
--- The real DataStore when the service can be asked for one; otherwise the in-memory backend (a session that lasts as long as the server).
+-- The real DataStore when the service can be asked for one; otherwise an unavailable backend: session-only, never a misleading Saved status.
 local backend: any
 local okStore, store = pcall(function(): any return game:GetService("DataStoreService"):GetDataStore(storeName) end)
 if okStore and store ~= nil then
 	backend = DataStoreBackend.new(store)
 else
 	warn("[Windowsill] saves: no DataStore service (" .. tostring(store) .. "); saving stays in memory for this server")
-	backend = MemoryBackend.new()
+	backend = {
+		read = function(_self: any, _key: string): (boolean, any, string?) return false, nil, "403: DataStore service unavailable" end,
+		update = function(_self: any, _key: string, _transform: any): (boolean, any, string?) return false, nil, "403: DataStore service unavailable" end,
+	}
 end
 print("[Windowsill] saves: store " .. storeName .. (if okStore then "" else " (memory)"))
 Workspace:SetAttribute("SaveStoreName", storeName)

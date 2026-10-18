@@ -6,7 +6,7 @@ from pathlib import Path
 import json, sys
 
 text=Path(sys.argv[1]).read_text(encoding='utf-8',errors='replace')
-records={key:[] for key in ['PORT_TEST_ROW','PORT_TEST_SUMMARY','PORT_CLIENT_REPORT','PORT_CLIENT_ROW','PORT_CLIENT_SUMMARY','PORT_PREY_COST','PORT_WASP_COST']}
+records={key:[] for key in ['PORT_TEST_ROW','PORT_TEST_SUMMARY','PORT_TEST_SKIPPED','PORT_CLIENT_REPORT','PORT_CLIENT_ROW','PORT_CLIENT_SUMMARY','PORT_PREY_COST','PORT_WASP_COST']}
 for line in text.splitlines():
     for key,values in records.items():
         marker=key+' '
@@ -15,6 +15,9 @@ for line in text.splitlines():
             except json.JSONDecodeError: pass # long aggregate log lines can truncate; require complete rows below
 summary=records['PORT_TEST_SUMMARY'][-1]
 evidence=summary['evidence_id']
+skipped={r['name']:r for r in records['PORT_TEST_SKIPPED'] if r['evidence_id']==evidence}
+assert len(skipped)==summary.get('not_run',0), 'Missing skipped result rows'
+summary['skipped']=list(skipped.values())
 rows={r['result']['name']:r['result'] for r in records['PORT_TEST_ROW'] if r['evidence_id']==evidence}
 assert len(rows)==summary['tests'], 'Missing engine result rows'
 assert sum(r['passed'] for r in rows.values())==summary['passed'], 'Inconsistent result counts'

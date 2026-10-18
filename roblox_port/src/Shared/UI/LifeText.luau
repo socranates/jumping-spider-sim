@@ -68,7 +68,9 @@ function LifeText.growth(g: any, required: number, meal: number): string
  if g:isAdult() then return "Adult: keep your hunger bar full." end
  if g:isMoulting() then return "Moulting: stay in the crack." end
  if g.ready then return "Ready to moult: rest in the crack." end
- local goal = math.ceil(required / meal)
+ -- (ROBLOX-88: the goal is the growth's own, 3 by Godot's rule and 5 in the game; `required` and `meal` serve a growth that cannot say.)
+ local goal = if g.mealGoal ~= nil then g:mealGoal() else math.ceil(required / meal)
+ required = if g.readyAt ~= nil then g:readyAt() else required
  local count = math.min(goal, math.floor(g.fedSinceMoult / required * goal * 2 + 1e-8) / 2)
  return `Next moult: {count} of {goal} meals · 2 small prey = 1 housefly`
 end

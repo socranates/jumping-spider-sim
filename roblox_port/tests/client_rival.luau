@@ -123,7 +123,7 @@ check("striking a rival that has seen the spider is a contest (ROBLOX-73): each 
 	state, notice, cost, count = strike("windup", 0, "sprang", false)
 	assert(state == "recover" and notice == "It sprang clear of your strike." and cost < 0.02 and count == 1, `sprang clear: {state} "{notice}" cost {cost}`)
 	state, notice, cost, count = strike("patrol", 0.5, "counter", false)
-	assert(state == "recover" and notice == "It bit back! Jump away!" and math.abs(cost - 0.25) < 0.02 and count == 1, `counter-bite: {state} "{notice}" cost {cost}`)
+	assert(state == "recover" and notice == "It bit back! Jump away!" and math.abs(cost - 0.30) < 0.02 and count == 1, `counter-bite: {state} "{notice}" cost {cost}`)
 	assert(life.cause == nil, "a counter-bite does not end the life")
 	state, notice, cost = strike("stalk", 0, "counter", true)
 	assert(state == "recover" and notice == RivalText.COUNTER_GENTLE and cost < 0.02, `gentle counter-bite: {state} "{notice}" cost {cost}`)

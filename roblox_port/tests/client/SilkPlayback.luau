@@ -311,7 +311,7 @@ return function(driver: any)
    -- A staged meal credit; the production loop must read the ledger, not a test-only growth hook.
    driver.needs.energy=0
    assert(driver.needs:grantEnergy(.9,"growth_test_"..stage)>=.9-1e-9)
-   driver.life.mealFood=.9 -- three consumed meals, separate from the energy grant
+   driver.life.mealFood=1.5 -- five consumed meals (ROBLOX-88; it was three, 0.9), separate from the energy grant
    wait(.1);assert(driver.life.growth.ready,"food did not ready a moult")
    press("Feed");assert(driver.life.growth:isMoulting(),"moult didn't start")
    local before=driver.motor.pos

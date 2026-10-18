@@ -136,8 +136,8 @@ end
 local RivalText=require("../src/Shared/UI/RivalText")
 do -- the numbers, pinned
  check(Rules.reachWu==3.2 and Rules.rememberSeconds==5.0 and Rules.stalkNotice==.45,"initiative: windup from 3.2 wu, remembers 5 s, stalks from a notice of 0.45")
- check(Rules.awareNotice==.3 and Rules.contestCaptured==.55 and Rules.contestSprang==.25 and Rules.counterCost==.25,"contest: aware from 0.3, 55% caught, 25% sprang clear, the rest a bite worth 0.25")
- check(math.abs(Rules.contestCaptured+Rules.contestSprang+.20-1)<1e-12,"55 + 25 + 20 is all of it")
+ check(Rules.awareNotice==.3 and Rules.contestCaptured==.40 and Rules.contestSprang==.32 and Rules.counterCost==.30,"contest (ROBLOX-88): aware from 0.3, 40% caught, 32% sprang clear, the rest a bite worth 0.30 (it was 55/25/20 and 0.25)")
+ check(math.abs(Rules.contestCaptured+Rules.contestSprang+.28-1)<1e-12,"40 + 32 + 28 is all of it")
  check(Rules.reachWu>2.5 and Rules.rememberSeconds>3 and Rules.stalkNotice<.6,"each is more pressing than Godot's 2.5, 3 and 0.6")
 end
 local function strike(r,day,gentle)
@@ -164,7 +164,7 @@ do -- a strike at a rival that has not seen it is caught outright, as before, an
   check(e=="captured" and r.state=="captured" and r.contests==0,`a strike at a rival that is {c[1]} (notice {c[2]}) catches it, with no draw`)
  end
 end
-do -- a strike at one that has: a contest, over many strikes the rates are 55 / 25 / 20, each rival state is a contest, and the outcomes are what they say
+do -- a strike at one that has: a contest, over many strikes the rates are 40 / 32 / 28, each rival state is a contest, and the outcomes are what they say
  local counts={captured=0,sprang=0,counter=0};local N=6000
  for i=1,N do
   local r=R.new();r.state=({"stalk","windup","patrol"})[i%3+1];r.notice=if r.state=="patrol" then .5 else 0
@@ -173,12 +173,12 @@ do -- a strike at one that has: a contest, over many strikes the rates are 55 / 
   counts[e]=(counts[e] or 0)+1
   if e=="captured" then check(r.state=="captured" and amount==0 and not r.spared,"caught: held") 
   elseif e=="sprang" then if not (r.state=="recover" and amount==0 and r.spared==true) then check(false,"sprang clear: recovers, nothing lost") end
-  elseif e=="counter" then if not (r.state=="recover" and amount==.25 and r.spared==true) then check(false,"counter-bite: recovers, costs 0.25") end
+  elseif e=="counter" then if not (r.state=="recover" and amount==.30 and r.spared==true) then check(false,"counter-bite: recovers, costs 0.30") end
   else check(false,"an unknown event "..tostring(e)) end
   if r.contests~=i//7+1 then check(false,"the contest is counted once") end
  end
  local c,sp,cb=counts.captured/N,counts.sprang/N,counts.counter/N
- check(math.abs(c-.55)<.03 and math.abs(sp-.25)<.03 and math.abs(cb-.20)<.03,`rates over {N} strikes: {string.format("%.3f %.3f %.3f",c,sp,cb)}`)
+ check(math.abs(c-.40)<.03 and math.abs(sp-.32)<.03 and math.abs(cb-.28)<.03,`rates over {N} strikes: {string.format("%.3f %.3f %.3f",c,sp,cb)}`)
  print(string.format("RIVAL contest rates over %d strikes: caught %.3f, sprang clear %.3f, counter-bite %.3f",N,c,sp,cb))
 end
 do -- the draw is determined by the seed, the day and how many contests it has had: the same strike gives the same outcome, a different one may not
@@ -240,7 +240,7 @@ do -- the gentle modes: the bite costs nothing
    check(e=="counter" and cost==0 and r.state=="recover","gentle: the counter-bite is the same event and costs nothing")
    local r2=R.new();r2.state="stalk";r2.position=Vector3.new(24,.31,8);r2.previous=r2.position
    local e2,cost2=R.step(r2,1/60,strike(r2,d,false),clear)
-   check(e2=="counter" and cost2==.25,"and standard rules: 0.25")
+   check(e2=="counter" and cost2==.30,"and standard rules: 0.30")
    break
   end
  end
@@ -281,7 +281,7 @@ local function held(day,gentle)
 end
 do -- the numbers, pinned: its own, not the fly's scaled
  local k=Catch.rival
- check(k.startGrip==.6 and k.tapGain==.085 and k.jerkScale==.8 and k.drainScale==.5 and k.tire==.25 and k.cap==math.huge,"the rival's numbers: grip 0.6, a tap 0.085, drain x0.5, jerks 0.8, tires to 0.75, no cap")
+ check(k.startGrip==.6 and k.tapGain==.085 and k.jerkScale==.8 and k.drainScale==.7 and k.tire==.1 and k.cap==math.huge,"the rival's numbers (ROBLOX-88): grip 0.6, a tap 0.085, drain x0.7, jerks 0.8, tires to 0.9, no cap")
  check(k.tapGain<Catch.game.tapGain,"a tap is worth less than a house fly's (0.12)")
  local full,gentle=Catch.forRival(false),Catch.forRival(true)
  check(full.startGrip==.6 and full.cap==math.huge and gentle.cap==math.huge,"neither has a cap: it is never subdued by waiting")
@@ -315,7 +315,7 @@ do -- subdued: the same tapping, then eaten as before (stay still, 0.7, "eaten",
  check(math.abs(ticks/60-5)<.05,`and the five seconds of eating start only after it is subdued ({ticks/60} s)`)
  check(R.subdue(r)==false and R.tearFree(r)==false and not R.struggling(r),"a consumed rival cannot be subdued or torn free")
 end
-do -- the feel (60 rivals, taps evenly spaced from 0.2 s, standard rules)
+do -- the feel (60 rivals, taps evenly spaced from 0.2 s, standard rules). ROBLOX-88: harder than ROBLOX-77's (5 a second where 4 was enough)
  local function stats(rate,gentle,limit,start,auto)
   local won,lost,tw,tl,lo,hi,top=0,0,0,0,math.huge,0,0
   for day=2,61 do
@@ -326,15 +326,17 @@ do -- the feel (60 rivals, taps evenly spaced from 0.2 s, standard rules)
   return won,lost,if won>0 then tw/won else 0,if lost>0 then tl/lost else 0,lo,hi,top
  end
  local w0,l0,_,t0=stats(0,false)
- check(w0==0 and l0==60 and t0>=1.7 and t0<=2.4,`no taps: it tears free every time, after {t0} s on average (about 2 s; the house fly 1.1 s)`)
- local w2,l2=stats(2,false);local w3,l3=stats(3,false)
- check(w2==0 and l2==60 and w3==0,`2 taps a second tear free every time (won {w2}, lost {l2}) and 3 never subdue it in 40 s (won {w3}, tore free {l3}, the rest still holding on)`)
- local w4,l4,t4,_,lo4,hi4=stats(4,false)
- check(w4==60 and l4==0 and lo4>=5.2 and hi4<=9.7 and t4>=6.3 and t4<=8.3,`4 a second wins every time in {lo4} to {hi4} s (mean {t4})`)
- local w5,l5,t5=stats(5,false);local w6,_,t6=stats(6,false)
- check(w5==60 and w6==60 and t5<t4 and t6<t5 and t6<3,`5 and 6 a second win sooner ({t5} s, {t6} s)`)
- local wl,ll=stats(4,false,40,.5)
- check(wl==60 and ll==0,`a first tap as late as 0.5 s still wins at 4 a second (won {wl})`)
+ check(w0==0 and l0==60 and t0>=1.5 and t0<=1.8,`no taps: it tears free every time, after {t0} s on average (about 1.6 s; the house fly 1.1 s)`)
+ local w2,l2=stats(2,false);local w3,l3=stats(3,false);local w35,l35=stats(3.5,false);local w4,l4,_,t4l=stats(4,false)
+ check(w2==0 and l2==60 and w3==0 and l3==60,`2 and 3 taps a second tear free every time (won {w2} and {w3}, lost {l2} and {l3})`)
+ check(w35==0 and l35==60,`3.5 taps a second never subdues it in 40 s: it tears free every time (won {w35}, lost {l35})`)
+ check(w4==0 and l4>=55,`and 4 a second, which won it in 7 s before, now loses it (won {w4}, lost {l4} of 60 in 40 s, after {t4l} s)`)
+ local w5,l5,t5,_,lo5,hi5=stats(5,false)
+ check(w5==60 and l5==0 and lo5>=5 and hi5<=10.5 and t5>=7 and t5<=9,`5 a second wins every time in {lo5} to {hi5} s (mean {t5})`)
+ local w55,_,t55=stats(5.5,false);local w6,_,t6=stats(6,false)
+ check(w55==60 and w6==60 and t55<t5 and t6<t55 and t6<4,`5.5 and 6 a second win sooner ({t55} s, {t6} s)`)
+ local wl,ll=stats(5,false,40,.5)
+ check(wl==60 and ll==0,`a first tap as late as 0.5 s still wins at 5 a second (won {wl})`)
  -- a lapse costs: a one-second pause at three seconds delays the win by several seconds; a three-second pause loses it
  local function lapse(len,at)
   local won,lost,tw=0,0,0
@@ -342,14 +344,14 @@ do -- the feel (60 rivals, taps evenly spaced from 0.2 s, standard rules)
    local r,s=held(day,false);local g=Grip.new();local t,nextTap=0,.2
    for _=1,40*60 do
     t+=1/60;R.step(r,1/60,s,clear)
-    if t>=nextTap then if not (t>=at and t<at+len) then Grip.tap(g) end;nextTap+=1/4 end
+    if t>=nextTap then if not (t>=at and t<at+len) then Grip.tap(g) end;nextTap+=1/5 end
     local e=Grip.step(g,r,1/60,s)
     if e=="subdued" then won+=1;tw+=t;break elseif e=="tore" then lost+=1;break end
    end
   end
   return won,lost,if won>0 then tw/won else 0
  end
- local lw,ll1,lt=lapse(1,3);check(lw==60 and lt>t4+2,`a one-second lapse at 3 s costs {lt-t4} s more (won {lw})`)
+ local lw,ll1,lt=lapse(1,3);check(lw+ll1==60 and lw>0 and lt>t5+1,`a one-second lapse at 3 s at 5 a second costs {lt-t5} s more (won {lw}, lost {ll1})`)
  local _,l3s=lapse(3,3);check(l3s==60,`a three-second lapse loses it every time (lost {l3s})`)
  -- the house fly for comparison, same taps, same limit: the rival needs more
  local hf=0
@@ -358,19 +360,19 @@ do -- the feel (60 rivals, taps evenly spaced from 0.2 s, standard rules)
  -- gentle: the house fly's struggle, no cap
  local gw0,gl0,_,gt0=stats(0,true)
  check(gw0==0 and gl0==60 and gt0>=1.0 and gt0<=1.45,`gentle, no taps: it tears free after {gt0} s (the fly's)`)
- local gw4,_,gt4=stats(4,true)
- check(gw4==60 and gt4<t4,`gentle 4 a second wins sooner than standard ({gt4} s against {t4} s)`)
+ local gw4,_,gt4=stats(4,true);local gw5,_,gt5=stats(5,true)
+ check(gw4==60 and gw5==60 and gt4>=5 and gt4<=6 and gt5<t5,`gentle 4 a second wins in {gt4} s (the house fly's, as before ROBLOX-88) and 5 a second wins sooner than standard ({gt5} s against {t5} s)`)
  -- automatic grip needs no taps in either
  local aw,al,at=stats(0,false,40,nil,true);local gaw=stats(0,true,40,nil,true)
  check(aw==60 and gaw==60,`automatic grip subdues it with no taps (standard {aw}, gentle {gaw}; {at} s)`)
- print(string.format("RIVAL feel: no taps tears free in %.2f s; 3 a second never wins; 4 a second wins in %.1f to %.1f s (mean %.1f); 5 in %.1f; 6 in %.1f; gentle idle %.2f s, gentle 4 in %.1f s, automatic grip alone %.1f s, a 1 s lapse at 3 s costs %.1f s",t0,lo4,hi4,t4,t5,t6,gt0,gt4,at,lt-t4))
+ print(string.format("RIVAL feel: no taps tears free in %.2f s; 2, 3, 3.5 a second tear free; 4 a second tears free (%d of 60 in 40 s); 5 a second wins in %.1f to %.1f s (mean %.1f); 5.5 in %.1f; 6 in %.1f; gentle idle %.2f s, gentle 4 in %.1f s, automatic grip alone %.1f s, a 1 s lapse at 3 s costs %.1f s",t0,l4,lo5,hi5,t5,t55,t6,gt0,gt4,at,lt-t5))
 end
 do -- no cap: waiting never subdues it. A rival held for a minute with an occasional tap that cannot keep up is not subdued by the clock
  local r,s=held(7);local g=Grip.new();local t,nextTap=0,.2
  local out="timeout"
  for _=1,60*90 do
   t+=1/60;R.step(r,1/60,s,clear)
-  if t>=nextTap then Grip.tap(g);nextTap+=1/3.2 end -- barely enough to hold on without ever climbing
+  if t>=nextTap then Grip.tap(g);nextTap+=1/3.2 end -- not enough to hold on any more (ROBLOX-88: it was enough to hover)
   local e=Grip.step(g,r,1/60,s);if e=="subdued" or e=="tore" then out=e;break end
  end
  check(out~="timeout" or R.struggling(r),"a thin tapper never gets a free subdue")

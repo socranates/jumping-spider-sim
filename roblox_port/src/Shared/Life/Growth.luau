@@ -6,6 +6,11 @@ Growth.STAGES = { "young juvenile", "juvenile", "subadult", "adult" }
 Growth.SCALES = { 1, 1.15, 1.32, 1.50 }
 Growth.ADULT = 3
 Growth.READY_FOOD = 0.9
+-- What one housefly counts for in `fedSinceMoult`: a third of Godot's 0.9 (ROBLOX-61; a small prey is half of it). The client credits food in these units.
+Growth.FLY_FOOD = 0.3
+-- The game's own rules (ROBLOX-88), opt-in like NeedsModel.game and Data/Catch.game: the housefly-equivalents a moult asks for. Godot's is 3 (READY_FOOD,
+-- pinned by tests/growth_reference.json); a Growth never given these replays it. Growth:useGameRules() applies them.
+Growth.game = { moultFlies = 5 }
 Growth.MOULT_HOURS = 12
 Growth.SOFT_HOURS = 10
 Growth.SOFT_REACH = 0.7
@@ -16,6 +21,14 @@ end
 function Growth.new(): any
  return setmetatable({stage=0,fedSinceMoult=0,ready=false,moultingHoursLeft=0,softHoursLeft=0,exuviae={}},Growth)
 end
+-- The game's moult: `moultFlies` housefly-equivalents instead of three. Sets the instance's own threshold; food already eaten is kept (a spider that has
+-- eaten two flies has eaten two flies), and a spider already ready to moult stays ready.
+function Growth.useGameRules(self: any)
+ self.readyFood=Growth.game.moultFlies*Growth.FLY_FOOD;self.gameRules=true
+end
+-- The food a moult asks for, in the units of `fedSinceMoult`, and in housefly-equivalents (3 by Godot's rule, 5 in the game).
+function Growth.readyAt(self: any): number return self.readyFood or Growth.READY_FOOD end
+function Growth.mealGoal(self: any): number return math.floor(self:readyAt()/Growth.FLY_FOOD+.5) end
 function Growth.isAdult(self: any): boolean return self.stage>=Growth.ADULT end
 function Growth.isMoulting(self: any): boolean return self.moultingHoursLeft>0 end
 function Growth.isSoft(self: any): boolean return self.softHoursLeft>0 end
@@ -27,7 +40,7 @@ function Growth.eat(self: any, energy: number): boolean
  if not finite(energy) or energy<=0 or self:isAdult() or self:isMoulting() then return false end
  self.fedSinceMoult+=energy
  local before=self.ready
- self.ready=self.fedSinceMoult>=Growth.READY_FOOD-1e-9
+ self.ready=self.fedSinceMoult>=self:readyAt()-1e-9
  return self.ready and not before
 end
 function Growth.beginMoult(self: any): boolean

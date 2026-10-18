@@ -121,5 +121,45 @@ restored:eat(.45)
 check(string.find(LifeText.growth(restored,.9,.35),"Ready",1,true)~=nil,"ready gives the rest instruction")
 restored.stage=3
 check(string.find(LifeText.growth(restored,.9,.35),"Adult",1,true)~=nil,"adults have no further meal goal")
+-- ROBLOX-88: the game asks for five housefly-equivalents to a moult (ten small prey), Godot's three stay Growth's defaults.
+do
+ check(Growth.READY_FOOD==.9 and Growth.game.moultFlies==5 and Growth.FLY_FOOD==.3,"the numbers: Godot's 0.9 for three flies, the game's five, a fly is 0.3")
+ local godot,game=Growth.new(),Growth.new();game:useGameRules()
+ check(godot.readyFood==nil and godot.gameRules==nil and godot:mealGoal()==3 and math.abs(godot:readyAt()-.9)<1e-12,"a growth never given the game's rules is Godot's (three flies, 0.9)")
+ check(game.gameRules==true and game:mealGoal()==5 and math.abs(game:readyAt()-1.5)<1e-12,"the game's is five flies, 1.5")
+ for i=1,3 do godot:eat(.3) end
+ check(godot.ready==true,"Godot's: three flies are ready")
+ local ready=false
+ for i=1,4 do ready=game:eat(.3) end
+ check(game.ready==false and ready==false,"the game's: four flies are not ready")
+ check(game:eat(.3)==true and game.ready==true,"the fifth is, and says so once")
+ check(game:eat(.3)==false,"(and only once)")
+ -- small prey count half: ten of them, not nine
+ local small=Growth.new();small:useGameRules()
+ for i=1,9 do small:eat(.15) end
+ check(small.ready==false,"nine small prey are 4.5 flies: not ready")
+ check(small:eat(.15)==true and small.ready==true,"the tenth small prey is")
+ -- the words
+ local words=Growth.new();words:useGameRules()
+ check(string.find(LifeText.growth(words,Growth.READY_FOOD,.35),"0 of 5 meals",1,true)~=nil,"a fresh moult says 0 of 5 meals")
+ words:eat(.3);words:eat(.15)
+ check(string.find(LifeText.growth(words,Growth.READY_FOOD,.35),"1.5 of 5 meals",1,true)~=nil,"a fly and a small prey are 1.5 of 5")
+ check(string.find(LifeText.growth(words,Growth.READY_FOOD,.35),"2 small prey = 1 housefly",1,true)~=nil,"and the small prey rule is still said")
+ words:eat(.3);words:eat(.3);words:eat(.3)
+ check(string.find(LifeText.growth(words,Growth.READY_FOOD,.35),"4.5 of 5 meals",1,true)~=nil,"4.5 of 5 before the last half")
+ words:eat(.15);check(string.find(LifeText.growth(words,Growth.READY_FOOD,.35),"Ready",1,true)~=nil,"ready at five")
+ -- food already eaten is kept when the game's rules arrive: two flies from an old record are 2 of 5, ready stays ready
+ local old=Growth.new();old:eat(.6)
+ local rec=old:toRecord();local back=Growth.new();back:load(rec);back:useGameRules()
+ check(string.find(LifeText.growth(back,Growth.READY_FOOD,.35),"2 of 5 meals",1,true)~=nil,"a record with two flies eaten reads 2 of 5")
+ local was=Growth.new();was:eat(.9);local wrec=was:toRecord();local again=Growth.new();again:load(wrec);again:useGameRules()
+ check(again.ready==true and string.find(LifeText.growth(again,Growth.READY_FOOD,.35),"Ready",1,true)~=nil,"a spider already ready stays ready")
+ -- the records and goldens are untouched: the threshold is a rule, not data
+ check(next(Growth.problems(game:toRecord()))==nil and game:toRecord().readyFood==nil,"the record is the same shape")
+ -- the life loop credits the same food: five flies, as the client does (0.3 per fly), grow the spider the same way
+ local needs=Needs.new(true);needs.energy=1
+ local l=LifeLoop.new(needs);l.growth:useGameRules()
+ for i=1,5 do l.mealFood=.3;l:_stepLife(1/60,Vector3.zero);check(l.growth.ready==(i==5),`the life loop: ready only at the fifth fly (fly {i})`) end
+end
 print(`GROWTH passed={passed} failed={failed}`)
 if failed>0 then error("growth checks failed") end

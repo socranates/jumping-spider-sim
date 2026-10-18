@@ -313,7 +313,7 @@ NotebookPages.pages = {
 		trigger = "starving",
 		title = "Going without food",
 		text = "Spiders can go a long time without food. Adult females of the related Phidippus johnsoni were kept for 25 to 31 days without eating. As a spider uses up its reserves its abdomen shrinks: how plump the abdomen is, against the size of the body, is how scientists judge a spider's condition.",
-		game = "Time is compressed here. The hunger bar, full when your spider is fed, empties in about two days; a spider that then goes two more days without food dies, after warnings on the screen. On Easy and in free play it cannot starve.",
+		game = "Time is compressed here. The hunger bar, full when your spider is fed, empties in a little over a day and a half; a spider that then goes two more days without food dies, after warnings on the screen. On Easy and in free play it cannot starve.",
 		godotGame = "Time is compressed here. A full reserve lasts about three days; a spider that then goes two more days without food dies, after warnings on the screen. On Easy and in free play it cannot starve.",
 		sources = {
 			"Jackson, R. R. (1978). The life history of Phidippus johnsoni (Araneae, Salticidae). Journal of Arachnology 6: 1-29.",

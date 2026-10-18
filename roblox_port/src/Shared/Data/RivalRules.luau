@@ -29,11 +29,12 @@ RivalRules.stuckSeconds = 4.0 -- no progress for this long: the route is made ag
 -- or patrolling with a notice of at least awareNotice; a recovering rival or a patrolling one that has not noticed is still caught outright. The
 -- draw is from a stream of its own (RivalSpider.contest, by the world's seed, the day and how many contests this rival has had): the rival is
 -- caught (contestCaptured), springs clear of the strike (contestSprang) or, for the rest, bites back and costs counterCost of the spider's energy
--- (about two thirds of a day's; nothing in the gentle modes).
+-- (about half of a day's; nothing in the gentle modes). ROBLOX-88: harder to take down: 40 caught, 32 sprang clear, 28 bit back (it was 55/25/20), and a
+-- bite costs 0.30 (it was 0.25; a day costs about 0.61 at the game's hunger drain).
 RivalRules.awareNotice = 0.3
-RivalRules.contestCaptured = 0.55
-RivalRules.contestSprang = 0.25 -- (and 0.20 is left for the counter-bite)
-RivalRules.counterCost = 0.25
+RivalRules.contestCaptured = 0.40
+RivalRules.contestSprang = 0.32 -- (and 0.28 is left for the counter-bite)
+RivalRules.counterCost = 0.30
 -- Nothing the rival does goes in here: the retreat grown by half a stud (the crack itself is also a hard check).
 RivalRules.keepOutMin = Vector3.new(-30.0, -0.5, 2.5)
 RivalRules.keepOutMax = Vector3.new(-22.8, 2.0, 9.5)

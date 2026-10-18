@@ -40,8 +40,9 @@ NeedsModel.LIFE_DRAIN_ASLEEP_PER_H = 0.007
 -- The game's own rules (ROBLOX-78), opt-in like Data/Wasp.game and Data/Catch.game: `drain` multiplies the life-mode drain (awake, asleep and gentle
 -- alike) of a model that was given them by useGameRules. A model that never is replays Godot (factor 1) and the reference fixtures hold.
 -- The factor is worked out from the constants above: a day is about 11 waking hours and 13 asleep, 11 x 0.021 + 13 x 0.007 = 0.322 energy at factor 1,
--- so 1.55 costs 0.499, about half the reserve (it was 1.1, 0.354, Chet's ten percent more, ROBLOX-61).
-NeedsModel.game = { drain = 1.55 }
+-- so 1.55 cost 0.499, about half the reserve (it was 1.1, 0.354, Chet's ten percent more, ROBLOX-61). ROBLOX-88: 1.9 costs 0.612 a day (11 x 0.021 x 1.9 =
+-- 0.439 awake, 13 x 0.007 x 1.9 = 0.173 asleep): a full reserve lasts 1.63 days, and a housefly (0.35) is 0.57 of a day.
+NeedsModel.game = { drain = 1.9 }
 NeedsModel.PLAY_DRAIN = NeedsModel.game.drain -- (the name the client and tests have used since ROBLOX-61)
 NeedsModel.GENTLE_DRAIN = 0.5
 NeedsModel.GENTLE_FLOOR = 0.1

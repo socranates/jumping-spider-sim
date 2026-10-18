@@ -51,12 +51,14 @@ end
 -- drain half the fly's that eases only a little (the rival tires to 0.75 of its strength, not 0.5) and no cap, so it is never subdued by waiting.
 -- It takes about 3.3 taps a second to hold it (the house fly: 2.5, and it is subdued at 12 s whatever); 4 a second wins in 5.7 to 8.4 s
 -- (the fly: 4.6 s); with no taps it tears free in about 2 s (the fly: 1.15 s); a pause of 3 s loses it.
+-- ROBLOX-88 ("the rival male should still be harder to take down"): the drain 0.5 to 0.7 and the tiring 0.25 to 0.10 make it harder: about 5 taps
+-- a second win in 7 to 10 s (mean 7.6), 3.5 or fewer tear free, 4 a second almost always does and no taps tears free in 1.65 s. The rest is as it was.
 Catch.rival = {
 	startGrip = 0.6,
 	tapGain = 0.085,
 	jerkScale = 0.8,
-	drainScale = 0.5,
-	tire = 0.25,
+	drainScale = 0.7, -- ROBLOX-88: it was 0.5
+	tire = 0.1, -- (it was 0.25: the rival hardly weakens, so a thin tapper never catches up)
 	cap = math.huge,
 }
 

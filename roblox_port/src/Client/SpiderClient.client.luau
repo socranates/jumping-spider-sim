@@ -191,6 +191,7 @@ prey.feeding.needs = needs
 prey.feeding:useGameRules() -- an easier tap on a struggling fly (ROBLOX-72, Data/Catch.game), scaled by the prey's size (ROBLOX-77); Godot's numbers stay Feeding's defaults
 rivalLegs.grip = rivalLegs.Grip.new(needs) -- the grip on a caught rival (ROBLOX-77): its own controller, so the fly's is never disturbed
 local life = LifeLoop.new(needs, nil)
+life.growth:useGameRules() -- five housefly-equivalents to a moult, not Godot's three (ROBLOX-88, Growth.game)
 -- The mud dauber wasp (ROBLOX-26): a port of Godot's wasp director (Shared/Predator/WaspDirector). It visits by day from the second day (twice a day in the
 -- game, ROBLOX-75), once the first meal is eaten, and not while the spider rests; it is heard (a caption with its direction) for 8 s before it can look.
 -- It reads the sill through the same casts as the senses. In the test place it never comes by itself (Workspace attribute Wasp = true
@@ -540,6 +541,7 @@ local function returnToCheckpoint()
 	session.mode, session.rules, session.ended = life.mode or "main", life.rules or "standard", false
  mateLegs.reset()
  needs:useGameRules()
+ life.growth:useGameRules() -- (a record from before has Godot's threshold)
  motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor())
  session:finishAdult(life.growth.stage)
 	session.summary = nil
@@ -562,6 +564,7 @@ end
 local function applyRules()
  life.mode,life.rules=session.mode,session.rules
  needs:useGameRules()
+ life.growth:useGameRules()
  needs.gentle=session.rules=="gentle";wasp.gentle=needs.gentle
 end
 local function closeScreens()
@@ -1232,10 +1235,11 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			if wasp.rivalHeldAt and life.rival.state == "taken" then life.rival.position = wasp.rivalHeldAt end
 			if wasp.heldAt then motor:hold(wasp.heldAt) end
 			prey.feeding.auto = setting("AutomaticGrip") == true
+			if life.growth.gameRules ~= true then life.growth:useGameRules() end -- (a family that carries on has a new growth)
 			if prey.feeding.game ~= true then prey.feeding:useGameRules() end -- (a record restored from before the flag has none: the game's struggle again)
 			local takenBefore = prey.feeding.taken
 			prey:after(DT,motor,sensor,sightCast)
-			-- Three houseflies or six small prey; credit food, not just spare energy capacity.
+			-- Five houseflies or ten small prey (ROBLOX-88; Godot's three and six are Growth's defaults); credit food, not just spare energy capacity.
 			life.mealFood = (life.mealFood or 0) + (prey.feeding.taken-takenBefore) * Growth.READY_FOOD / (3 * Species.fly_like_prototype.body.nutrition)
             local rivalState={
              position=motor.pos,previous=prey.previousPosition or motor.pos,heading=motor.heading,up=motor.up,

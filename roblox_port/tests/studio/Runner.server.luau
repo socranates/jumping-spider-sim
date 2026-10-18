@@ -37,6 +37,7 @@ check("Prompt spec completes", function() require(script.Parent.PromptSpec)(chec
 check("Life spec completes", function() require(script.Parent.LifeSpec)(check) end)
 check("Wasp spec completes", function() require(script.Parent.WaspSpec)(check) end)
 check("Peacock spec completes", function() require(script.Parent.PeacockSpec)(check) end)
+check("Ant mimic spec completes", function() require(script.Parent.AntMimicSpec)(check) end)
 check("Growth spec completes", function() require(script.Parent.GrowthSpec)(check) end)
 check("Notebook spec completes", function() require(script.Parent.NotebookSpec)(check) end)
 check("State spec completes", function() require(script.Parent.StateSpec)(check, skip) end)

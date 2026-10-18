@@ -1334,6 +1334,15 @@ Next: Chet runs the Studio checklist; Nathan checks a complete life on PlayStati
 
 
 
+## Claude - 2026-10-18: the ant-mimicking spider, not yet seen in Studio or on a device
+
+Built on `claude/roblox-antmimic` (a52fcd9, 35d7203, 244ff2a, 8c68cec, 9546ccf and the Studio-spec/docs commit) from main e4a2b5a (v20). Decisions ROBLOX-54..56. Handoff: `docs/HANDOFF-roblox-antmimic.md`. A third, cosmetic-only spider: the female ant-mimicking jumping spider Myrmarachne formicaria (Shamble, Hoy, Cohen and Beatus 2017, doi:10.1098/rspb.2017.0308), drawn 0.5 studs long with a waist and glossy dark cuticle. C / RB / Change cycles first spider, peacock, ant mimic; standing still raises legs I as antennae; the Display key raises and waves them more; walking draws a small yaw and sway on the body (wavelength ten body lengths) while the path, speed, collider and senses stay exactly the first spider's (tested). New notebook page "Walking like an ant" (26 authored, 25 reachable). Saved appearance, validation and the new id are tested. Free for testing; planned ~US$0.99 Game Pass beside the peacock, not wired.
+
+Verification: ANTMIMIC 86 and CLIENT_ANT 2 (new), LOOK 138, NOTEBOOK 828, STATE 448, STATE_CLIENT 104, SUMMARY 189, SETTINGS 923, PEACOCK 80, WASP 15,815, LIFE 20,846, PERCEPTION 4,669, PREY 1,549, SENSOR 507, GROWTH 433, WORLD 230, EYES 231, FLIES 187, CHECKPOINT 156, CONTINUING 87, HUD 69, GAZE 67, PRESENTATION 11, BOXWORLD 15, STATE_OFFLINE 8, PERCEPTION_CLIENT 1, CLIENT 12 + 12 (two halves; the whole file exceeds the VM's three-minute call limit even on the untouched baseline), all failed=0; strict types 0 diagnostics; compile 178/178. Not run: the new Studio AntMimicSpec, any device, any publish. Unverified: how it reads in Roblox's renderer (previews are Godot layout renders of the real rig).
+
+Next: Chet runs the Studio checklist in the handoff; Nathan and the kids watch it walk and stand still and say whether it reads as an ant.
+
+
 # Latest: settings accepted and published v20 — Chet, 2026-10-18
 
 Claude's settings bundle 9c63783 is integrated. Build **d89045d8f2212cda**: **47,547 CLI checks**, **111/111 Studio engine checks (zero skipped)** and **24/24 live-client checks** pass; strict analysis clean, **167/167** scripts compile. Native tests include real TextService measurements and isolated real DataStore operations. Chet also changed normal-game volume to 75% and enabled large text, stopped and restarted Play, and saw both choices restored from the cloud.

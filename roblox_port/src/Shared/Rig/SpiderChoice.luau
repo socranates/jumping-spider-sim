@@ -23,21 +23,7 @@ end
 -- The appearance after this one.
 function SpiderChoice.next(id: string): string
 	for i, name in SpiderChoice.ORDER do
-		if name == id then -- Does this appearance have antennae to show (legs I raised when it stands still) and so an antennae pose on the display key?
-function SpiderChoice.hasAntennae(id: string): boolean
-	local look = Appearances.profiles[id]
-	return look ~= nil and (look :: any).antennae ~= nil
-end
-
--- What the display key (X / RB / the touch button) does for this appearance: "dance" (the peacock's courtship dance), "antennae" (the
--- ant mimic's antennae pose) or nil (the first spider has none).
-function SpiderChoice.displayKind(id: string): string?
-	if SpiderChoice.canDance(id) then return "dance" end
-	if SpiderChoice.hasAntennae(id) then return "antennae" end
-	return nil
-end
-
-return SpiderChoice.ORDER[i % #SpiderChoice.ORDER + 1] end
+		if name == id then return SpiderChoice.ORDER[i % #SpiderChoice.ORDER + 1] end
 	end
 	return Appearances.default
 end

@@ -80,7 +80,7 @@ check("V switches to the spider-eye view and back; the status names the key", fu
 	assert(workspace.CurrentCamera.FieldOfView == 90, "no eye-view field of view") -- the side eyes' 90 degrees (SpiderEyes, ROBLOX-20); the camera alone sets 80
 	assert(string.find(find("SpiderPrompts", "Status").Text, "SPIDER-EYE VIEW    V: back", 1, true), find("SpiderPrompts", "Status").Text)
 	key("Eye", true); key("Eye", false); frames(5)
-	assert(workspace.CurrentCamera.FieldOfView == 65 and not find("SpiderPrompts", "Status").Visible, "did not leave the eye view")
+	assert(workspace.CurrentCamera.FieldOfView == 65 and not string.find(find("SpiderPrompts", "Status").Text, "SPIDER-EYE VIEW", 1, true), "did not leave the eye view") -- a notebook discovery can still occupy the shared status line
 end)
 check("the Roblox menu drops held keys and the spider waits", function()
 	local p0 = spider()

@@ -23,7 +23,7 @@ local HudLayout = require(Shared:WaitForChild("UI"):WaitForChild("HudLayout"))
 local SpiderInput = {}
 
 export type Handlers = {
-	blocked: (() -> boolean)?, menu: (() -> ())?,
+	notebook: (() -> ())?, blocked: (() -> boolean)?, menu: (() -> ())?,
 	feed: (() -> ())?,
 	choose: (() -> ())?, -- C: change spider (in the crack)
 	display: (() -> ())?, -- X / RB: the peacock spider's courtship dance
@@ -42,7 +42,7 @@ export type Handlers = {
 	device: ((string) -> ())?, -- the last input's UserInputType name
 }
 
-local ONE_SHOT = { Menu = "menu", Reset = "reset", Gait = "gait", Eye = "eye", Recenter = "recenter", Slow = "slow", Help = "help" }
+local ONE_SHOT = { Notebook = "notebook", Menu = "menu", Reset = "reset", Gait = "gait", Eye = "eye", Recenter = "recenter", Slow = "slow", Help = "help" }
 
 -- Bindings by action. Exported for tests and the controls table in README.md.
 SpiderInput.BINDINGS = {
@@ -57,7 +57,7 @@ SpiderInput.BINDINGS = {
 	Eye = { Enum.KeyCode.V, Enum.KeyCode.ButtonY },
 	Recenter = { Enum.KeyCode.R, Enum.UserInputType.MouseButton3, Enum.KeyCode.ButtonR3 },
 	Slow = { Enum.KeyCode.T, Enum.KeyCode.ButtonR2 }, Help = { Enum.KeyCode.H },
-	Reset = { Enum.KeyCode.Backspace }, Menu = { Enum.KeyCode.M, Enum.KeyCode.ButtonSelect }, Gait = { Enum.KeyCode.G },
+	Notebook = { Enum.KeyCode.N }, Reset = { Enum.KeyCode.Backspace }, Menu = { Enum.KeyCode.M, Enum.KeyCode.ButtonSelect }, Gait = { Enum.KeyCode.G },
 	Choose = { Enum.KeyCode.C }, Display = { Enum.KeyCode.X, Enum.KeyCode.ButtonR1 },
 } :: { [string]: { any } }
 
@@ -93,7 +93,7 @@ function SpiderInput.bind(h: Handlers)
 		elseif action == "Drop" then
 			if now then h.drop() end
 		elseif ONE_SHOT[action] then
-			if now then handlers[ONE_SHOT[action]]() end
+			if now and handlers[ONE_SHOT[action]] then handlers[ONE_SHOT[action]]() end
 		end
 	end
 	for action, keys in SpiderInput.BINDINGS do

@@ -24,9 +24,9 @@ Every action of the frozen Godot game (`scripts/core/input_setup.gd` and its REA
 | Spider-eye view (eye_view) | V | Y | Eye | Ported: view at the principal eyes, walking relative to the gaze. The picture (ROBLOX-20): side eyes (wide, green, soft, movement rings) and, with Focus, the principal eyes (24 degree telephoto, sharp, green and ultraviolet) with two retina strips, a vignette and a first-time caption; Player attribute `ReducedMotion = true` holds the strips still and stops the zoom at 45 degrees; not yet seen in Studio |
 | Slow motion | T | RT | — | Ported at 50 % for the spider (the whole world when more of it exists) |
 | Pause | Esc | Menu | Roblox menu button | Roblox's own menu (reserved by Roblox): the game drops every press and hold and waits until it closes |
-| Field notes (help) | H | — | — | Deferred (notebook not ported). H shows the port's controls card instead |
+| Field notes (help) | H | — | — | H shows controls. Discovery notices can be switched off in the life menu; notebook pages remain available |
 | Eat / resume meal; rest (interact) | E | Left-stick click (L3) | Eat (Rest, Sleep, Wake or Leave in the crack) | Ported for held prey; movement interrupts feeding. X remains Silk. With nothing in the jaws, in the silk-lined crack, still: rest; from 18:00 to 07:00 sleep until morning; E or Q again, or moving, ends it (ROBLOX-24) |
-| Notebook | N | D-pad up | — | Deferred (the port's D-pad walks) |
+| Notebook | N, or M → Field notebook | View/Touchpad → Field notebook | Menu → Field notebook | Reading pauses the world. Left/right or LB/RB (L1/R1): page; up/down or D-pad/stick: scroll; touch: swipe. N/Q or B/Circle or Back: return. Only discovered pages are shown; notes survive new lives in this session |
 | Struggle grip (prepare_jump with prey) | Space or E | A or L3 | Grip or Eat | Ported; these presses grip while struggling instead of jumping |
 | Debug overlay, support view | F3, F4 | — | — | Deferred (developer views) |
 | Settings in the pause panel | Esc | Menu | — | Deferred: sensitivity/invert, FOV, camera distance, stalk/aim/Focus toggles, jump arc, jump reach, hold-to-let-go switch, frame-the-line switch, remapping, assisted-play presets. The port uses Godot's defaults (hold to let go on, framing on, arc shown) |

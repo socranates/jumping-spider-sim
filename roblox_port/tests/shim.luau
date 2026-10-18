@@ -197,6 +197,7 @@ function Instance.new(className: string)
 	local o = setmetatable({ ClassName = className, Name = className, _children = {}, _attrs = {} }, Object)
 	if className == "ScreenGui" then rawset(o, "AbsoluteSize", { X = 1280, Y = 720 }) end
 	if className == "TextLabel" or className == "Frame" then rawset(o, "AbsoluteSize", { X = 0, Y = 0 }) end -- nothing is laid out here: the engine's size before its first layout
+	if className == "ScrollingFrame" then rawset(o, "AbsoluteWindowSize", { X = 0, Y = 0 }); rawset(o, "AbsoluteCanvasSize", { X = 0, Y = 0 }) end
 	if HAS_CFRAME[className] then
 		rawset(o, "_cframe", CFrame.new())
 	end

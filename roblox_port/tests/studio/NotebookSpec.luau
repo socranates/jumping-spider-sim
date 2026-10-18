@@ -1,0 +1,18 @@
+--!strict
+return function(check: (string,()->())->())
+ local Shared=game:GetService("ReplicatedStorage"):WaitForChild("Shared")
+ local Book=require(Shared.Learning.FieldNotebook)
+ check("notebook: sources, discovery order and no hidden pages",function()
+  local b=Book.new();assert(b:page("mud_dauber")==nil)
+  b:notice("start");b:noticeJump(9);b:notice("jump")
+  assert(#b.opened==4 and b.opened[2]=="dragline")
+  assert(#b:page("dragline").sources>0 and b:page("dragline").game~="")
+ end)
+ check("notebook: player record is detached from world and tolerates old IDs",function()
+  local b=Book.new();b:notice("dance");b:addEyeTime(61)
+  local record=b:toRecord();table.insert(record.opened,"obsolete")
+  local restored=Book.new();restored:load(record)
+  assert(#restored.opened==#b.opened and restored.eyeSeconds==61)
+  assert(restored:isOpen("peacock_dance") and restored:isOpen("green_uv"))
+ end)
+end

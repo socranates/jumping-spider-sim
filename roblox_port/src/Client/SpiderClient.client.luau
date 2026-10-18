@@ -26,6 +26,7 @@ local SpiderCamera = require(script.Parent.SpiderCamera)
 local SpiderEyes = require(script.Parent.SpiderEyes)
 local SpiderHud = require(script.Parent.SpiderHud)
 local CaughtPanel = require(script.Parent.CaughtPanel)
+local NotebookPanel = require(script.Parent.NotebookPanel)
 local WorldDetail = require(script.Parent.WorldDetail)
 local Soundscape = require(script.Parent.Soundscape)
 local OldSkins = require(script.Parent.OldSkins)
@@ -56,6 +57,15 @@ local NeedsModel = require(Shared.Life.NeedsModel)
 local LifeLoop = require(Shared.Life.LifeLoop)
 local LifeSession = require(Shared.Life.LifeSession)
 local session = LifeSession.new()
+local FieldNotebook = require(Shared.Learning.FieldNotebook)
+local NotebookWatch = require(Shared.Learning.NotebookWatch)
+local notebook = FieldNotebook.new()
+local notebookWatch = NotebookWatch.new(notebook)
+local bookPanel: any = nil
+local noteSeconds, noteTitle = 0, ""
+notebook.pageOpened:connect(function(id: string)
+ noteTitle=notebook:page(id).title;noteSeconds=6
+end)
 local LifeText = require(Shared.UI.LifeText)
 local DayLight = require(Shared.Habitat.DayLight)
 local LifeClock = require(Shared.Life.LifeClock)
@@ -137,6 +147,10 @@ local waspBody = WaspBody.new(Workspace)
 local needs = NeedsModel.new(true, false)
 prey.feeding.needs = needs
 local life = LifeLoop.new(needs, nil)
+notebookWatch:rebase(prey,needs)
+memory.categoryChanged:connect(function(_,_,category)
+ if category=="fly_like_prey" then notebook:notice("fly_recognised") end
+end)
 -- The mud dauber wasp (ROBLOX-26): a port of Godot's wasp director (Shared/Predator/WaspDirector). It visits by day from the second day,
 -- once the first meal is eaten, and not while the spider rests; it is heard (a caption with its direction) for 8 s before it can look.
 -- It reads the sill through the same casts as the senses. In the test place it never comes by itself (Workspace attribute Wasp = true
@@ -387,7 +401,7 @@ local function toggleDance()
 	local standing = motor.mode == "attached" and not motor.preparing and not motor.seized and not motor:onLine() and not jump:isBusy() and motor.silk.walk == nil
 	if not dance:start(standing, motor.moving) then
 		hud:toast(PeacockText.STAND, false)
-	end
+	else notebook:notice("dance") end
 end
 
 -- Backspace / View: back to the retreat checkpoint (the whole sill as it was), or to the start when there is none yet.
@@ -406,6 +420,7 @@ local function returnToCheckpoint()
 		hud:toast("The checkpoint could not be used: " .. (problems[1] or "unknown"), true)
 		return
 	end
+	notebookWatch:rebase(prey,needs)
 	session.mode, session.rules, session.ended = life.mode or "main", life.rules or "standard", false
  motor:setReachFactor(life.growth:reachFactor())
  session:finishAdult(life.growth.stage)
@@ -430,13 +445,13 @@ local function applyRules()
  needs.gentle=session.rules=="gentle";wasp.gentle=needs.gentle
 end
 local function closeScreens()
- panel:hide();menu:hide();setHudShown(true);controls:clear();dropAll()
+ panel:hide();menu:hide();if bookPanel then bookPanel:hide() end;setHudShown(true);controls:clear();dropAll()
 end
 local function fresh(mode: string, easy: boolean, position: Vector3?): boolean
  if not initialRecord or (easy and not session.finishedMain) then return false end
  local ok=Checkpoint.restore(initialRecord,checkpointWorld)
  if not ok then return false end
- session:begin(mode,easy);applyRules();motor:setReachFactor(life.growth:reachFactor())
+ session:begin(mode,easy);notebook:notice("start");notebookWatch:rebase(prey,needs);applyRules();motor:setReachFactor(life.growth:reachFactor())
  sensor:reset();memory:clear()
  stores[mode]=newStore();checkpoints=stores[mode]
  life.resting=false;life.notice="";life.noticeSeconds=0;life.restoreGrace=0
@@ -477,8 +492,21 @@ local function endLife(cause: string)
 end
 local function showCaught() endLife("wasp") end
 local openMenu: () -> ()
+local bookFromMenu=false
+local function openNotebook()
+ if panel:isShowing() or not initialRecord or bookPanel:isShowing() then return end
+ bookFromMenu=menu:isShowing()
+ menu:hide();controls:clear();dropAll();setHudShown(false);noteSeconds=0
+ bookPanel:show(player:GetAttribute("LargeText")==true,device,ControlText.padStyle())
+end
+bookPanel=NotebookPanel.new(player:WaitForChild("PlayerGui"),notebook,function()
+ controls:clear();dropAll()
+ if bookFromMenu then openMenu() else setHudShown(true) end
+end)
 local confirming: string?=nil
 menu=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
+ if choice=="Notebook" then openNotebook();return end
+ if choice=="Notes" then player:SetAttribute("NotebookNotes",player:GetAttribute("NotebookNotes")==false);noteSeconds=0;openMenu();return end
  if choice=="Resume" then closeScreens();return end
  if choice=="Continue" then checkpoints=stores.main;closeScreens();returnToCheckpoint();return end
  if choice=="Free" then
@@ -510,6 +538,8 @@ openMenu=function()
  table.insert(choices,{id="New",text="Begin a new life"})
  if session.finishedMain then table.insert(choices,{id="Easy",text="Begin a new life on Easy"}) end
  table.insert(choices,{id="Free",text="Free play - gentle rules"})
+ table.insert(choices,{id="Notebook",text="Field notebook"})
+ table.insert(choices,{id="Notes",text=if player:GetAttribute("NotebookNotes")==false then "Discovery notes: off" else "Discovery notes: on"})
  table.insert(choices,{id="Large",text=if player:GetAttribute("LargeText")==true then "Text size: large" else "Text size: normal"})
  menu:showChoices("The Windowsill","A small life on a windowsill.",
   "Progress and rest checkpoints last for this play session."..(if session.finishedMain then "" else "\nEasy is not available yet; choose Free play for gentle rules."),choices,true)
@@ -522,8 +552,9 @@ menuButton.BackgroundColor3=Color3.new(.12,.12,.14);menuButton.TextColor3=Color3
 menuButton.Parent=hud.safe;menuButton.Activated:Connect(openMenu)
 
 controls = SpiderInput.bind({
-	blocked = function() return panel:isShowing() or menu:isShowing() end,
-	menu = function() if menu:isShowing() and session.started then closeScreens() else openMenu() end end,
+	blocked = function() return panel:isShowing() or menu:isShowing() or bookPanel:isShowing() end,
+ notebook = openNotebook,
+	menu = function() if bookPanel:isShowing() then bookPanel:close();return end; if menu:isShowing() and session.started then closeScreens() else openMenu() end end,
 	focus = function(phase: string)
 		if phase == "begin" then focusState:press(player:GetAttribute("FocusToggle") == true, motor.mode == "attached")
 		elseif phase == "cancel" then focusState:clear() end
@@ -608,7 +639,7 @@ end
 local function handleEvents()
 	for _, e in motor:drainEvents() do
 		local kind = if e.kind == "landed" then "completed" else e.kind
-		if kind == "locked" then afterMiss = true elseif kind == "dropped" then dropped = true end
+		if kind == "locked" then notebook:notice("jump");afterMiss = true elseif kind == "dropped" then dropped = true end
 		if kind == "anchored" or kind == "dropped" then beginStrands() end
 		if kind == "completed" then dropStrands(true) end
 		if kind == "released" or kind == "lost" or kind == "out_of_bounds" then dropStrands(false) end
@@ -626,6 +657,7 @@ local function handleEvents()
 	local last = jump.last
 	if last and last ~= lastFeedback then
 		lastFeedback = last
+		if last.kind=="launched" and last.plan then notebook:noticeJump((last.plan.point-last.plan.origin).Magnitude) end
 		hud:toast(ControlText.toast(last.kind, last.plan), last.kind ~= "cancelled")
 	end
 end
@@ -718,14 +750,19 @@ local function updateHud(frameDt: number)
 	controls:setTouchVisible("Choose", canChange())
 	controls:setTouchVisible("Display", canDance and not onLine and not life.resting and motor.mode == "attached")
 	controls:setTouchLabel("Display", PeacockText.touchDisplay(dance.active))
-	hud:update(view, frameDt)
+	if noteSeconds>0 and player:GetAttribute("NotebookNotes")~=false and session.started then
+  table.insert(view.status,"Notebook: "..noteTitle.." — "..(if device=="keyboard" then "N to read" else "Menu > Field notebook"))
+ end
+ hud:update(view, frameDt)
 end
 
 -- ---------------------------------------------------------------- the frame
 local accumulator = 0
 RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, function(frameDt: number)
 	if panel:isShowing() then panel:update(frameDt) end
-	if GuiService.MenuIsOpen or panel:isShowing() or menu:isShowing() then
+ bookPanel:update(frameDt)
+ if not bookPanel:isShowing() and not menu:isShowing() and not panel:isShowing() then noteSeconds=math.max(0,noteSeconds-frameDt) end
+	if GuiService.MenuIsOpen or panel:isShowing() or menu:isShowing() or bookPanel:isShowing() then
 		accumulator = 0 -- the Roblox menu is Godot's pause (so is the catch screen): the world waits
 	else
 		local simDt = frameDt * (if slow then SLOW_SPEED else 1)
@@ -761,6 +798,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 				day = life.clock.day, hour = life.clock.hour, resting = life.resting, moulting = life.growth:isMoulting(), meals = prey.feeding.mealsFinished,
 			})
 			for _, signal in wasp:drainSignals() do
+    notebookWatch:wasp(signal)
 				if signal.kind == "caught" then
 					-- Stung: the spider lets go of everything and is carried (Godot SpiderMotor.seize).
 					motor:seize()
@@ -785,6 +823,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			sensor.core.rangeScale = life.rangeScale
 			motor:setReachFactor(life.growth:reachFactor())
    for _,event in life:drainEvents() do
+    notebookWatch:life(event.kind,life.growth.stage)
     if event.kind=="starved" then endLife("starved")
     elseif event.kind=="moult_started" then dropAll()
     elseif event.kind=="moulted" and session:finishAdult(life.growth.stage) then
@@ -792,14 +831,17 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
      life.noticeSeconds=12
     end
    end
+            local hasMotion=false
+            for _,m in sensor.motionSeen do if sensor.core.tick-m.tick<=Sensor.MOTION_HOLD_TICKS then hasMotion=true;break end end
+            notebookWatch:tick(DT,prey,needs,cam.eyeView,hasMotion)
             if not initialRecord and Checkpoint.boundaryProblem(checkpointWorld)=="" then
              initialRecord=Checkpoint.capture(checkpointWorld,0)
              if initialRecord and not menuStarted then
               menuStarted=true
-              if not testPlace then openMenu() else session.started=true end
+              if not testPlace then openMenu() else session.started=true;notebook:notice("start") end
              end
             end
-            if panel:isShowing() or menu:isShowing() then accumulator=0;break end
+            if panel:isShowing() or menu:isShowing() or bookPanel:isShowing() then accumulator=0;break end
 			if motor.mode ~= "attached" then focusState:clear() end
 			if stage then stage.target:step(DT); stage.marker.Position = stage.target.position end
 			cam:tick(DT)
@@ -823,7 +865,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 		dance.reduced = player:GetAttribute("ReducedMotion") == true
 		local r, f = controls:axes()
 		local standing = motor.mode == "attached" and not motor.preparing and not motor.seized and not motor:onLine() and not life.resting
-		local paused = GuiService.MenuIsOpen or panel:isShowing() or menu:isShowing()
+		local paused = GuiService.MenuIsOpen or panel:isShowing() or menu:isShowing() or bookPanel:isShowing()
 		dancePose = dance:step(if paused then 0 else simFrame, standing, motor.moving or r ~= 0 or f ~= 0)
 		rig.dance = if dance:showing() then dancePose else nil
 	else
@@ -834,12 +876,12 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
  rig:setGrowthStage(life.growth.stage)
  rig:setSoftness(life.growth:softness())
  rig:setCondition(needs.energy)
- local paused=GuiService.MenuIsOpen or panel:isShowing() or menu:isShowing()
+ local paused=GuiService.MenuIsOpen or panel:isShowing() or menu:isShowing() or bookPanel:isShowing()
  rig:update(body, if paused then 0 else simFrame, motor.mode == "attached", motor.moving)
  skins:draw(life.growth.exuviae)
 	updateHud(frameDt)
 	flyBodies:draw(prey.flies,prey.now)
-	local soundPaused = GuiService.MenuIsOpen or panel:isShowing() or menu:isShowing()
+	local soundPaused = GuiService.MenuIsOpen or panel:isShowing() or menu:isShowing() or bookPanel:isShowing()
 	local soundSpeed = if slow then SLOW_SPEED else 1
 	local soundMuted = player:GetAttribute("SoundMuted") == true
 	soundscape:update(frameDt, prey, life.daylight, soundPaused, soundSpeed, soundMuted)
@@ -867,11 +909,11 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	end
 	-- Looking runs in real time, so slow motion never makes the camera sluggish.
 	local lx, ly = controls:lookAxes()
-	if not panel:isShowing() and not menu:isShowing() then cam:render(frameDt, lx, ly) end
+	if not panel:isShowing() and not menu:isShowing() and not bookPanel:isShowing() then cam:render(frameDt, lx, ly) end
 	-- The Focus that feeds the perception HUD also decides how far the principal eyes are in use (the eye view's picture). The
 	-- picture sets the field of view, so it comes before the HUD projects anything.
 	local focusing = motor.mode == "attached" and (controls.held.Focus == true or focusActive())
-	eyes:update(frameDt, focusing)
+	eyes:update(if soundPaused then 0 else frameDt, focusing)
 	perceptionHud:draw(memory,camera,sightCast,focusing,player:GetAttribute("ShowLastSeen") ~= false)
 	-- Depth of field: on the spider in third person; in the eye view SpiderEyes owns it and focuses on what is looked at.
 	local dof = Lighting:FindFirstChild("MacroDOF")
@@ -888,7 +930,8 @@ if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
 		run({
 			prey = prey, flyBodies = flyBodies, waspBody = waspBody, life = life, wasp = wasp, caughtPanel = panel, needs = needs, checkpoints = checkpoints, returnToCheckpoint = function() returnToCheckpoint() end, lifeSpider = function() return lifeSpider end, sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
 			input = controls,
-			session=session, menu=menu, openMenu=openMenu, endLife=endLife, fresh=fresh, continueAnother=continueAnother, currentStore=function() return checkpoints end,
+			notebook=notebook, notebookWatch=notebookWatch, bookPanel=bookPanel, openNotebook=openNotebook,
+            session=session, menu=menu, openMenu=openMenu, endLife=endLife, fresh=fresh, continueAnother=continueAnother, currentStore=function() return checkpoints end,
 			changeSpider = function() changeSpider() end, dance = function() return dance end, appearance = function() return appearance end, rig = function() return rig end,
 			drop = function() motor:requestDrop() end,
 			jump = jump,

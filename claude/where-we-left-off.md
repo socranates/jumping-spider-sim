@@ -1,3 +1,12 @@
+# Chet — 2026-10-17: field notebook
+
+Read **docs/HANDOFF-roblox-notebook.md** and **docs/verification/roblox-notebook/RESULTS.md** for the exact final evidence and publication. Nathan approved the notebook after the growth/peacock polish. **N** or **Menu → Field notebook** opens discovered biology notes, authored sketches, game simplifications and full citations. Reading pauses the world; large text and directional/shoulder/stick reading controls are supported. Short phone layouts prioritize text over the sketch.
+
+There are **25 pages, 23 currently reachable**, including the peacock dance. Discoveries come from actual events; felt/buzz entries wait for real sensory signals. Notes survive last-rest recovery and new lives in the same session. Discovery notices can be disabled. Godot discovery behavior is compared with 35 exported transitions; the notebook suite has 222 checks. No changes to movement, silk, twitch, free peacock access or privacy.
+
+**Next chunk: persistent saves**, separately. Begin with server ownership and an isolated test store, not a RemoteEvent accepting arbitrary client checkpoints. Keep player notes/cosmetic/preferences/unlocks separate from main/Free world records; protect existing saves on load failure, schema mismatch, reconnect and concurrent sessions. The detailed scope is in the handoff. Current notes/checkpoints/unlocks are still session-only. Physical PlayStation/tablet acceptance remains Nathan's check.
+
+---
 # Chet — 2026-10-17: growth, moulting, closer peacock and quieter ambience
 
 **Published version 15** to the existing Windowsill place 120119801868085 / universe 10771103250, independently confirmed in Creator Dashboard. Read **docs/HANDOFF-roblox-growth-polish.md** and **docs/verification/roblox-growth-polish/RESULTS.md**. Decisions ROBLOX-35/36. Build **0ee32d97f26bd2fd**; native acceptance **ece0772bc0acda77**, **91/91 engine + 19/19 live-client**. Only four label-encoding repairs followed native acceptance; synchronized release launch/play smoke passed. Windows CLI **45,263/45,263**, strict clean, final **132/132 compile**.

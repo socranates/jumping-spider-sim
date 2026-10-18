@@ -16,7 +16,9 @@ tests/life.luau (the life clock, the needs and the rest-and-sleep loop against t
 tests/checkpoint.luau (the retreat checkpoint of a whole world, its refusals, and the DataStore-shaped store) and
 tests/wasp.luau (the mud dauber wasp's rules against tests/wasp_reference.json, exported from the frozen Godot director, and Godot's hand-written expectations) and
 tests/peacock.luau (the peacock spider's courtship dance: its documented rates, order, interruption and reduced motion) and
-tests/notebook.luau (the naturalist's notebook: Godot's pages word for word, the model, the watcher, the words and layout, the panel and the client's wiring).
+tests/notebook.luau (the naturalist's notebook: Godot's pages word for word, the model, the watcher, the words and layout, the panel and the client's wiring) and
+tests/state.luau (persistent saves: envelope, progress and rest records, session lock, scheduler, server service) and
+tests/state_client.luau (the client's saving wiring against the real service) and tests/state_offline.luau (no server at all).
 Usage (from roblox_port/):  python3 tests/run.py [path/to/luau [test.luau ...]]   (default: all of them)"""
 import pathlib, re, subprocess, sys, tempfile
 

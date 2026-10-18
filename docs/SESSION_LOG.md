@@ -1308,3 +1308,14 @@ Nathan asked to bring in Claude's completed chunk, preferred a checklist and aut
 Final source/test evidence 3525b7b58f9afc70: 98/98 native engine, 23/23 live-client replay on Windows in phone emulation; 46,152 accepted CLI checks across 21 suites, strict source clean, 142/142 scripts compile. Normal online-place smoke passed. Published version 18 to existing place 120119801868085 at 8:23 PM CDT; Studio success and Dashboard published-only view agree (saved-version timestamp 8:19 PM). Reports/screenshots: docs/verification/roblox-notebook/merged/. No account/access/privacy/monetization changes. Hardware PlayStation/tablet tests remain Nathan's next check.
 
 Read-only Creator Dashboard audit recorded unfinished public-audience prerequisites in docs/PUBLIC_RELEASE.md. Next development chunk is durable player progress and rest saves with an explicit server trust boundary, followed by settings/accessibility and phone control polish. Detailed handoff: docs/HANDOFF-roblox-notebook.md. Notes, unlocks and checkpoints still last for this play session only; peacock stays free.
+
+
+## Claude - 2026-10-17: persistent saves (DataStore), not yet run live
+
+Built on `claude/roblox-state` (656db41, 4b67dd7, 778dac0, 9e8b814 and the docs commit) from main 2e36716. Two server-owned records (player progress; last rest per mode), versioned checksummed envelope with one backup, forward migration table, UpdateAsync monotonic merge, session lock with heartbeat (stale after 120 s), debounced and retried writes, flush on leave and shutdown, validated remotes with rate limits, client menu that waits for the server and says plainly when saving is off. Decisions ROBLOX-39..46. Handoff: `docs/HANDOFF-roblox-state.md`.
+
+Changed: `src/Shared/Data/SaveRules.luau`, `src/Shared/Persistence/*`, `src/Shared/UI/SaveText.luau`, `src/Server/{DataStoreBackend,SaveService}.luau`, `src/Server/Persistence.server.luau`, `src/Client/SaveClient.luau`, `src/Client/SpiderClient.client.luau`, `tests/{state,state_client,state_offline}.luau`, `tests/run.py`, `tests/shim.luau`, `tests/studio/{StateSpec,StateFixture,Runner.server}.luau`, rebuilt `TheWindowsill.rbxlx` and `TheWindowsillTests.rbxlx`.
+
+Verification: STATE 380, STATE_CLIENT 95, STATE_OFFLINE 8, every older suite unchanged, CLI total 46,635 accepted checks, failed=0 everywhere; strict types 0 diagnostics; compile 165/165. Not run: the Studio spec (needs Chet and Studio API access), any real DataStore call, any publish. Unverified assumptions: lossless number round trip through DataStore JSON, the error-message patterns in `SaveStores.classify`, transform CPU in Roblox's Luau.
+
+Next: Chet runs the checklist in the handoff, then Nathan checks leave-and-rejoin on the published place.

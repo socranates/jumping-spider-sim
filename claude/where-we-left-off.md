@@ -1,3 +1,9 @@
+# Latest: persistent saves built, 2026-10-17 (not yet run against a live DataStore)
+
+Branch `claude/roblox-state` (9e8b814 plus docs): the notebook, checklist, Easy unlock, appearance, preferences and the last rest of each mode now save between visits. The server alone touches DataStore (`Windowsill_v1` live, `WindowsillTest_v1` in Studio and the test place); it checks everything the client sends for corruption safety, not anti-cheat. If saving cannot be trusted (load failure, bad checksum, newer version, game open elsewhere) the game runs session-only, says so in plain words, and never writes over what is stored. STATE 380, STATE_CLIENT 95, STATE_OFFLINE 8; whole CLI 46,635, all failed=0; types 0, compile 165/165. Measured rests: about 21.6 KB early, about 64 KB plateau; cap 262,144 chars; progress about 1 KB.
+
+Waiting on Chet: the Studio checklist in `docs/HANDOFF-roblox-state.md` (enable Studio API access in a saved test place, confirm SaveStoreName, run the Runner's StateSpec, check the lossless-number round trip and the real error messages). Then Nathan: leave, rejoin, notebook still there. Decisions ROBLOX-39..46. Nothing published.
+
 # Latest: merged notebook and optional checklist, 2026-10-17
 
 Claude's 657ce9d notebook and Chet's 77ca385 reader are reconciled. Nathan preferred a checklist: Notebook > **To try** offers twelve optional invitations marked from actual observations. The peacock dance has a sourced page. 25 authored pages, 24 reachable; only vibration is unwired. Session-only notes survive new lives and rest recovery.

@@ -359,9 +359,10 @@ end
 local lowRig, lowParts = rigParts("low")
 local full, low = census(fullParts), census(lowParts)
 print(`look: full {full.total} parts ({full.hair} hairs, {full.shell} shells, {full.other} other), low {low.total} ({low.hair} hairs, {low.shell} shells, {low.other} other)`)
--- Budgets are the ones the first coat had (705 parts at full detail, 272 at low): the second coat is lighter, not heavier.
-check(full.total <= 705 and full.other <= 160 and full.hair + full.shell >= 300 and full.hair + full.shell <= 720, `full detail part budget ({full.total})`)
-check(low.total <= 272 and low.hair >= 100 and low.hair <= 260 and low.shell <= 2, `low detail part budget ({low.total})`)
+-- Budgets: the first coat had 705 parts at full detail and 272 at low. ROBLOX-84 gives the legs, feet and fangs their segments (53 parts more at full
+-- detail, 10 at low) and sets the ceiling at 700 and 290; `other` (everything that is not a hair or a shell) was 141 and is 193.
+check(full.total <= 700 and full.other <= 200 and full.hair + full.shell >= 300 and full.hair + full.shell <= 720, `full detail part budget ({full.total})`)
+check(low.total <= 290 and low.hair >= 100 and low.hair <= 260 and low.shell <= 2, `low detail part budget ({low.total})`)
 -- Each tier keeps exactly the hairs its table says: one in `every` of each class, none of a class whose `every` is 0.
 local function kept(count: number, every: number): number return if every <= 0 then 0 else math.floor(count / every) end
 local function expectedHairs(every: { [string]: number }): number
@@ -763,7 +764,7 @@ for _, t in { { red, TA }, { blue, TB } } do
 	check(#ly.glints == 2 and ly.glints[1].side ~= ly.glints[2].side, `{lk.id}: two catchlights, one a side`)
 end
 check(TA.tubercle.center.Y == TA.tubercle.center.Y and ellipsoidRadius(TA.headCenter, TA.headRadii, TA.eyes[1].at) > 1.0, "the eyes are above the carapace")
--- The parts, at both tiers: budgets (128 at full detail, 80 at low), one tubercle, eight eyes, two catchlights, the spinnerets, the markings.
+-- The parts, at both tiers: budgets (150 at full detail, 90 at low since ROBLOX-84; 128 and 80 before), one tubercle, eight eyes, two catchlights, the spinnerets, the markings.
 local function rigOf(id: string, detail: string, parent: Instance?)
 	local folder = parent or Instance.new("Folder")
 	return SpiderRig.new(folder, folder, id, detail)
@@ -775,10 +776,10 @@ local function counts(id: string)
 end
 local rc, bc = counts(RED), counts(BLUE)
 print(`look: Mexican redknee full {rc.full.total} parts, low {rc.low.total}; Greenbottle blue full {bc.full.total} parts ({bc.full.hair} bristles), low {bc.low.total}`)
-check(rc.full.total <= 128 and bc.full.total <= 128, `tarantula full detail part budget ({rc.full.total} and {bc.full.total}, at most 128)`)
-check(rc.low.total <= 80 and bc.low.total <= 80 and rc.low.total < rc.full.total and bc.low.total < bc.full.total, `tarantula low detail (phone and mate) part budget ({rc.low.total} and {bc.low.total}, at most 80)`)
+check(rc.full.total <= 150 and bc.full.total <= 150, `tarantula full detail part budget ({rc.full.total} and {bc.full.total}, at most 150)`)
+check(rc.low.total <= 90 and bc.low.total <= 90 and rc.low.total < rc.full.total and bc.low.total < bc.full.total, `tarantula low detail (phone and mate) part budget ({rc.low.total} and {bc.low.total}, at most 90)`)
 check(rc.full.bad == 0 and rc.low.bad == 0 and bc.full.bad == 0 and bc.low.bad == 0 and rc.full.shell == 0 and bc.full.shell == 0, "every drawn tarantula part is anchored, non-colliding, not queryable and has a real size")
-check(rc.full.hair == 0 and rc.low.hair == 0 and bc.low.hair == 0 and bc.full.hair >= 24 and bc.full.hair <= 40, `the redknee has no bristles; the greenbottle has {bc.full.hair} on its legs at full detail and none at low`)
+check(rc.full.hair == 0 and rc.low.hair == 0 and bc.low.hair == 0 and bc.full.hair >= 20 and bc.full.hair <= 40, `the redknee has no bristles; the greenbottle has {bc.full.hair} on its legs at full detail and none at low`)
 for _, c in { rc, bc } do
 	local nf, nl = c.nf, c.nl
 	check((nf.OcularTubercle or 0) == 1 and (nl.OcularTubercle or 0) == 1 and (nf.Eye or 0) == 8 and (nl.Eye or 0) == 8 and (nf.Catchlight or 0) == 2 and (nl.Catchlight or 0) == 2, "one tubercle, eight tiny eyes and two catchlights at both tiers")
@@ -941,6 +942,103 @@ for _, c in { rc, bc } do
 end
 end
 tarantulaChecks()
+
+-- ---------------------------------------------------------------- the segments of a leg, the feet and the fangs (ROBLOX-84)
+-- The first spider and the two tarantulas draw each leg link as the segments a spider has: a tapered femur (two rods), a patella for a knee, a
+-- tapered tibia (the first spider), a break in the tarsus, a flattened pad and its toes (claws, or a scopula's bristles), and fangs under the
+-- chelicerae. The solver, the targets and the gait are untouched: the joints are where they were. The rival (a clone of the first spider's
+-- look, ROBLOX-72) and the peacock and ant spiders are drawn as before.
+local function shapeChecks()
+local RED, BLUE = "brachypelma_hamorii", "chromatopelma_cyaneopubescens"
+local function build(id: string?, detail: string, parent: Instance?): any
+	local folder = parent or Instance.new("Folder")
+	return SpiderRig.new(folder, folder, id, detail)
+end
+local function endOf(p: BasePart, sign: number): Vector3 return p.CFrame * Vector3.new(sign * p.Size.X / 2, 0, 0) end -- a rod's end (-1 start, 1 end)
+local function pick(rig: any, name: string): BasePart return rig.model:FindFirstChild(name) :: BasePart end
+local first, firstLow = build(nil, "full", floor), build(nil, "low", floor)
+local rival = build("rival_spider", "full", floor)
+for _, r in { first, firstLow, rival } do settle(r, 1) end
+local nf, nl, nr = names(first), names(firstLow), names(rival)
+check((nf.FemurTip1 or 0) == 1 and (nf.FemurTip8 or 0) == 1 and (nf.TibiaTip1 or 0) == 1 and (nf.TarsusTip8 or 0) == 1 and (nf.TarsalJoint1 or 0) == 1 and (nf.TarsalJoint8 or 0) == 1, "the first spider's legs: a tapered femur and tibia and a break in the tarsus, on all eight")
+check((nf.Claw or 0) == 16 and (nf.Fang or 0) == 4 and (nf.Foot1 or 0) == 1 and (nf.Foot8 or 0) == 1, "two claws on every foot (16), and two fangs of two segments (4)")
+check((nl.FemurTip1 or 0) == 1 and (nl.TibiaTip1 or 0) == 0 and (nl.TarsalJoint1 or 0) == 0 and (nl.TarsusTip1 or 0) == 0 and (nl.Claw or 0) == 0 and (nl.Foot1 or 0) == 0 and (nl.Fang or 0) == 2, "at low detail: the femur still tapers and the fangs are one segment; no tibia taper, tarsus break, pad or claws")
+check(next(nr) ~= nil and (nr.FemurTip1 or 0) == 0 and (nr.TarsalJoint1 or 0) == 0 and (nr.Claw or 0) == 0 and (nr.Fang or 0) == 0, "the rival, a clone of the first spider's look, keeps the plain legs and no fangs")
+check(Appearances.profiles.rival_spider.legForm == nil and Appearances.profiles.rival_spider.fang == nil and Appearances.profiles.maratus_volans_male.legForm == nil and Appearances.profiles.myrmarachne_formicaria_female.legForm == nil, "the rival, the peacock spider and the ant mimic have no legForm and no fang")
+-- The shaped legs share the plain legs' joints exactly: the same feet, the same knees and ankles (the solver was not touched).
+local same3 = true
+for i, leg in first._legs do
+	local o = rival._legs[i]
+	same3 = same3 and leg.planted ~= nil and o.planted ~= nil and (leg.planted - o.planted).Magnitude < 1e-9
+	same3 = same3 and (pick(first, "Knee" .. i).CFrame.Position - pick(rival, "Knee" .. i).CFrame.Position).Magnitude < 1e-9
+	same3 = same3 and (pick(first, "Ankle" .. i).CFrame.Position - pick(rival, "Ankle" .. i).CFrame.Position).Magnitude < 1e-9
+end
+check(same3, "the feet, knees and ankles of the shaped legs are exactly where the plain legs have them")
+-- Each link is a chain of rods that meet end to end: femur, its thinner tip, the patella at the knee; tibia and its tip; the tarsus, the break, the tip, the foot.
+local joined, taper, bigKnee = true, true, true
+for i, leg in first._legs do
+	local fe, ft, ti, tt, ta, tp, jt, ko = pick(first, "Femur" .. i), pick(first, "FemurTip" .. i), pick(first, "Tibia" .. i), pick(first, "TibiaTip" .. i), pick(first, "Tarsus" .. i), pick(first, "TarsusTip" .. i), pick(first, "TarsalJoint" .. i), pick(first, "Knee" .. i)
+	local gaps = { (endOf(fe, 1) - endOf(ft, -1)).Magnitude, (endOf(ft, 1) - ko.CFrame.Position).Magnitude, (endOf(ti, 1) - endOf(tt, -1)).Magnitude, (endOf(ta, 1) - jt.CFrame.Position).Magnitude,
+		(endOf(ta, 1) - endOf(tp, -1)).Magnitude, (endOf(tp, 1) - leg.foot).Magnitude, (endOf(ta, -1) - pick(first, "Ankle" .. i).CFrame.Position).Magnitude }
+	for n, gap in gaps do
+		joined = joined and gap < 1.5e-3 -- (the rig keeps a rod's length until it differs by a millimetre)
+	end
+	taper = taper and ft.Size.Y < fe.Size.Y * 0.8 and tt.Size.Y < ti.Size.Y * 0.9 and tp.Size.Y < ta.Size.Y * 0.85 and ft.Size.X < fe.Size.X
+	bigKnee = bigKnee and ko.Size.X > fe.Size.Y * 1.2 and ko.Size.Y > fe.Size.Y * 1.05
+end
+check(joined, "the rods meet end to end (to a millimetre): the femur and its tip run into the patella at the knee, the tarsus into its break and on to the foot")
+check(taper, "the femur and tibia taper (the tip rods are thinner) and so does the tarsus past its break")
+check(bigKnee, "the patella is longer than the femur is thick and a little stouter than it")
+local straight = pick(first, "Ankle1").CFrame.Position:Lerp(first._legs[1].foot, 0.55)
+check(near(pick(first, "TarsalJoint1").CFrame.Position.Y - straight.Y, 0.012, 1e-6) and near(pick(first, "TarsalJoint1").CFrame.Position.X, straight.X, 1e-6), "the tarsus' break, 55% of the way to the foot, is lifted 0.012 studs: a bend, not a straight rod")
+-- The foot: a flattened pad lying on the floor, claws leaving its front, none of it under the floor.
+local flat, lowest, claws = true, math.huge, 0
+for i = 1, 8 do
+	local pad = pick(first, "Foot" .. i)
+	flat = flat and pad.Size.Y < pad.Size.X * 0.7 and pad.Size.Y < pad.Size.Z * 0.8
+	lowest = math.min(lowest, pad.CFrame.Position.Y - pad.Size.Y / 2)
+end
+for _, p in first.model:GetChildren() do
+	if p:IsA("BasePart") and p.Name == "Claw" then claws += 1; lowest = math.min(lowest, endOf(p, 1).Y, endOf(p, -1).Y) end
+end
+check(flat and claws == 16 and lowest > -0.012, `the pads are flattened and the claws and pads do not sink into the floor (lowest {string.format("%.4f", lowest)} studs)`)
+-- Fangs: under the chelicerae, tucked and curved at the first spider, and bigger and pointing forward at the tarantulas.
+local FA = Anatomy.layout(look)
+local TA, TB = Anatomy.layout(Appearances.profiles[RED]), Anatomy.layout(Appearances.profiles[BLUE])
+local fangsOk = #FA.fangs == 4
+for _, f in FA.fangs do
+	local jaw = if f.side < 0 then FA.jaws[1] else FA.jaws[2]
+	fangsOk = fangsOk and f.at.Y < jaw.at.Y - jaw.radii.Y * 0.5 and f.side * f.at.X > 0 and f.at.Z < jaw.at.Z + jaw.radii.Z
+end
+check(fangsOk and FA.fangs[2].dir.Y < -0.7 and FA.fangs[2].side * FA.fangs[2].dir.X < 0, "the first spider's four fang segments hang below the chelicerae, curving in toward the middle")
+check(#TA.fangs == 2 and #TB.fangs == 2 and TA.fangs[1].dir.Z < -0.85 and TA.fangs[1].radii.Z > FA.fangs[1].radii.Z * 1.6, "the tarantulas' fangs are larger, one segment each, and point forward")
+check(#Anatomy.layout(Appearances.profiles.maratus_volans_male).fangs == 0 and #Anatomy.layout(Appearances.profiles.myrmarachne_formicaria_female).fangs == 0, "the peacock spider and the ant mimic have no fangs")
+-- The tarantulas: the same, with a scopula's bristles at full detail and a taper in the palps; budgets are above.
+for _, id in { RED, BLUE } do
+	local f, l = build(id, "full"), build(id, "low")
+	local a, b = names(f), names(l)
+	check((a.FemurTip1 or 0) == 1 and (a.FemurTip8 or 0) == 1 and (a.TarsalJoint1 or 0) == 1 and (a.TarsalJoint8 or 0) == 1 and (a.FootBristle or 0) == 8 and (a.Fang or 0) == 2 and (a.PalpStalkTip or 0) == 2, `{id}: full detail: a tapered femur, a break in the tarsus, a scopula's bristles on each foot, two fangs and a tapered palp`)
+	check((b.FemurTip1 or 0) == 0 and (b.TarsalJoint1 or 0) == 0 and (b.FootBristle or 0) == 0 and (b.Fang or 0) == 2 and (b.PalpStalkTip or 0) == 2 and (b.Foot1 or 0) == 0, `{id}: low detail: the fangs and the palps' taper, no leg taper, break or scopula`)
+	local wide = pick(f, "Foot1")
+	local legD = pick(f, "Tarsus1").Size.Y
+	check(wide.Size.Z > legD * 1.5 and wide.Size.Y < wide.Size.Z, `{id}: each foot is a pad wider than the tarsus is thick (the scopula)`)
+	f:destroy(); l:destroy()
+end
+-- Any size: the rods, the pad and the toes scale with setScale as the rest does; the eye view keeps only legs I's lower segments.
+local scaled = build(nil, "full", floor)
+local c0 = pick(scaled, "Claw").Size.X
+local fd0, pd0 = pick(scaled, "FemurTip1").Size.Y, pick(scaled, "Foot1").Size.Z
+scaled:setScale(1.7)
+check(near(pick(scaled, "Claw").Size.X / c0, 1.7, 1e-9) and near(pick(scaled, "FemurTip1").Size.Y / fd0, 1.7, 1e-9) and near(pick(scaled, "Foot1").Size.Z / pd0, 1.7, 1e-9), "setScale scales the tips, the pad and the claws like the rest of the spider")
+first:setEyeView(true)
+local shown = 0
+for _, p in first.model:GetChildren() do
+	if p:IsA("BasePart") and p.Name == "Claw" and p.LocalTransparencyModifier == 0 then shown += 1 end
+end
+check(shown == 4 and pick(first, "FemurTip1").LocalTransparencyModifier == 1 and pick(first, "TibiaTip1").LocalTransparencyModifier == 0 and pick(first, "TarsalJoint1").LocalTransparencyModifier == 0 and pick(first, "TarsalJoint2").LocalTransparencyModifier == 1 and pick(first, "Fang").LocalTransparencyModifier == 1, "the eye view keeps legs I's lower segments, joint and claws, and hides the femurs, the other legs and the fangs")
+for _, r in { first, firstLow, rival, scaled } do r:destroy() end
+end
+shapeChecks()
 
 print(`LOOK passed={passed} failed={failed}`)
 if failed > 0 then error("look checks failed") end

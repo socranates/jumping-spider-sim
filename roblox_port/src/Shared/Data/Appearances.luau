@@ -77,6 +77,28 @@ local first = {
 		kneeLift = 0.28, kneeLiftAir = 0.22, ankleLift = 0.045,
 		pad = 1.6, -- foot ball diameter as a multiple of the tarsus' (full detail)
 	},
+	-- ---------------------------------------------------------------- the shape of a leg and a fang (ROBLOX-84)
+	-- The three links of a leg (femur, tibia, tarsus: the solver, the targets and the gait are untouched) are drawn as the segments a spider
+	-- really has, each a part, so a leg is no longer a tube with ball joints. All numbers are ART. Shares are of the link's length (`split`:
+	-- where the thick rod ends and the thinner one starts) and of the rod's diameter (`taper`, `tip`, `joint`, `patella`). `bend` is how far
+	-- (studs) the break in the tarsus is lifted, so the foot reads as two segments. The knee is the patella: a short stout ellipsoid, its
+	-- long axis along the bend. `foot` is the tarsal pad: radii as multiples of the tarsus' diameter, a flattened ellipsoid lying on the
+	-- surface under the foot; `claws` are two tiny dark rods splayed from its front (`splay` is the share of sideways in the direction).
+	-- Which of these a tier draws is in `detail` (taper, tibiaTaper, jointBreak, claws, strands, fangSegments).
+	legForm = {
+		femur = { split = 0.62, taper = 0.74 },
+		tibia = { split = 0.62, taper = 0.86 },
+		patella = { length = 1.30, width = 1.10 },
+		tarsus = { split = 0.55, tip = 0.78, joint = 1.15, bend = 0.012 },
+		foot = { rx = 0.85, ry = 0.50, rz = 0.72 },
+		claws = { count = 2, length = 0.036, radius = 0.0045, splay = 0.40 },
+	},
+	-- Two small curved fangs under the chelicerae, tucked: each is a chain of ellipsoids from the lower front of its chelicera (Anatomy.layout);
+	-- `dir` is the segment's direction (x is mirrored; -Z forward, -Y down). Foil, a little glossy, so a highlight finds them.
+	fang = {
+		x = 0.052, y = -0.140, z = -0.466, reflectance = 0.25, color = { 0.11, 0.05, 0.035 }, -- dark mahogany, so it reads against the black jaw
+		segments = { { dir = { -0.10, -0.75, -0.65 }, length = 0.040, radius = 0.011 }, { dir = { -0.55, -0.80, -0.10 }, length = 0.032, radius = 0.008 } },
+	},
 
 	-- ---------------------------------------------------------------- fuzz (ROBLOX-07, retuned for the real camera in ROBLOX-13)
 	-- The camera sits 5 studs away (CameraMath.CAMERA_DISTANCE), 1 stud is about 170 px on a 1080p screen, so a hair is a few
@@ -145,10 +167,12 @@ local first = {
 		full = {
 			every = { lock = 1, guard = 1, fringe = 1, pale = 1, tuft = 1, ruff = 1, palp = 1, leg = 1 },
 			shells = 4, speckleEvery = 1, pads = true, sockets = true, idle = true, highlight = true,
+			taper = true, tibiaTaper = true, jointBreak = true, claws = 2, fangSegments = 2,
 		},
 		low = {
 			every = { lock = 3, guard = 0, fringe = 3, pale = 2, tuft = 2, ruff = 2, palp = 2, leg = 4 },
 			shells = 1, speckleEvery = 2, pads = false, sockets = false, idle = false, highlight = false,
+			taper = true, tibiaTaper = false, jointBreak = false, claws = 0, fangSegments = 1,
 		},
 	},
 }
@@ -302,8 +326,14 @@ for _,side in {-1,1} do
 end
 
 -- A brown rival, distinct from the player; illustrative salticid, no species identification.
-local rival=table.clone(first)
+local rival: any=table.clone(first)
 rival.id="rival_spider";rival.body={.22,.14,.08};rival.legs={.27,.18,.10};rival.white={.64,.48,.29}
+-- ROBLOX-84 gave the first spider shaped legs and fangs; the rival (a clone of it) keeps the plain tubes and balls, as it was drawn.
+rival.legForm=nil;rival.fang=nil
+rival.detail={
+ full={every={lock=1,guard=1,fringe=1,pale=1,tuft=1,ruff=1,palp=1,leg=1},shells=4,speckleEvery=1,pads=true,sockets=true,idle=true,highlight=true},
+ low={every={lock=3,guard=0,fringe=3,pale=2,tuft=2,ruff=2,palp=2,leg=4},shells=1,speckleEvery=2,pads=false,sockets=false,idle=false,highlight=false},
+}
 
 -- ================================================================ the ant-mimicking spider (ROBLOX-64)
 -- Myrmarachne formicaria, the female: a third profile beside the daughter's and the peacock's, chosen from the crack (Client/SpiderClient).
@@ -467,6 +497,20 @@ local function tarantula(o: any): any
 			fluff = { hairs = 0, length = 0, width = 0, flat = 1, transparency = 0 }, drumHz = 3.2, drumDeg = 13,
 		},
 		limbs = limbs,
+		-- ROBLOX-84: the legs and palps are drawn as the segments a tarantula has (see `legForm` on the first spider). The femur tapers, the knee is
+		-- a stout patella (the redknee's orange lives on it), the tarsus has a break (a ball on the rod, no second rod: the budget is 150 parts),
+		-- and each foot is a broad, rounder scopula pad of dark velvet with a pair of short bristles at full detail. The palps, which are drawn
+		-- 1.45 times as long, taper the same way.
+		legForm = {
+			femur = { split = 0.58, taper = 0.74 },
+			patella = { length = 1.30, width = 1.20 },
+			tarsus = { split = 0.55, joint = 1.20, bend = 0 },
+			foot = { rx = 0.80, ry = 0.58, rz = 0.92 },
+			strands = { length = 0.040, radius = 0.0045 },
+		},
+		palpForm = { split = 0.58, taper = 0.78 },
+		-- Larger fangs than the first spider's, one segment each, under the chelicerae and pointing forward (and a little down).
+		fang = { x = 0.075, y = -0.175, z = -0.525, reflectance = 0.2, color = hex(0x2B1A12), segments = { { dir = { -0.04, -0.34, -0.94 }, length = 0.105, radius = 0.019 } } },
 		frontLegScale = 1.1,
 		bandFraction = o.bandFraction,
 		speckleCount = 0, spots = {}, band = { count = 0, step = 0.1, z = 0, rx = 0.01, rz = 0.01 }, speckle = { from = 0.4, step = 0.1, rx = 0.004, rz = 0.005 },
@@ -491,10 +535,12 @@ local function tarantula(o: any): any
 			full = {
 				every = { lock = 1, guard = 1, fringe = 1, pale = 1, tuft = 1, ruff = 1, palp = 1, leg = 1 },
 				shells = 0, speckleEvery = 1, pads = true, sockets = false, idle = true, highlight = true,
+				taper = true, jointBreak = true, strands = 1, fangSegments = 1,
 			},
 			low = {
 				every = { lock = 0, guard = 0, fringe = 0, pale = 0, tuft = 0, ruff = 0, palp = 0, leg = 0 },
 				shells = 0, speckleEvery = 1, pads = false, sockets = false, idle = false, highlight = false,
+				fangSegments = 1,
 			},
 		},
 	}
@@ -542,7 +588,7 @@ local greenbottle = tarantula({
 	fuzz = {
 		enabled = true, legsOnly = true, legTone = "frost",
 		black = { 0.03, 0.03, 0.03 }, dark = { 0.13, 0.13, 0.13 }, grey = { 0.5, 0.5, 0.48 }, frost = hex(0xDAA86C), shellColor = { 0.08, 0.08, 0.08 }, shells = {},
-		legHairs = { 2, 1, 1 }, legLength = 0.07, legWidth = 0.012, legTransparency = 0.1, legBlack = 0,
+		legHairs = { 1, 1, 1 }, legLength = 0.07, legWidth = 0.012, legTransparency = 0.1, legBlack = 0,
 	},
 })
 greenbottle.legBands = {} -- no pale bands on its legs: the joint rings are its markings

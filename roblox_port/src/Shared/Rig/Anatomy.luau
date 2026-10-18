@@ -9,6 +9,8 @@ export type Eye = { name: string, side: number, at: Vector3, radii: Vector3, ref
 export type Glint = { side: number, at: Vector3, radii: Vector3 }
 export type Palp = { side: number, base: Vector3, tip: Vector3 }
 export type Zone = { at: Vector3, radius: number }
+-- One segment of a fang, an ellipsoid whose long axis (local Z) runs along `dir`; `index` counts from the chelicera (1) out to the tip.
+export type Fang = { side: number, index: number, at: Vector3, dir: Vector3, radii: Vector3 }
 export type Layout = {
 	headCenter: Vector3, headRadii: Vector3,
 	abdomenCenter: Vector3, abdomenRadii: Vector3,
@@ -20,6 +22,7 @@ export type Layout = {
 	cheeks: { { side: number, at: Vector3, radii: Vector3 } },
 	jaws: { { side: number, at: Vector3, radii: Vector3 } },
 	palps: { Palp },
+	fangs: { Fang }, -- empty for an appearance without a `fang` table (ROBLOX-84)
 	spinneret: Vector3,
 	hairFree: { Zone },
 	tubercle: { center: Vector3, radii: Vector3 }?, -- a tarantula's ocular tubercle, which carries its eyes
@@ -137,12 +140,27 @@ function Anatomy.layout(look: any): Layout
 		local base = Vector3.new(px, pl.y, Anatomy.frontZ(hc, hr, px, pl.y - hc.Y))
 		table.insert(palps, { side = side, base = base, tip = base + Vector3.new(side * pl.spread, -pl.drop, -pl.reach) })
 	end
+	-- Fangs (ROBLOX-84): each hangs from the lower front of its chelicera as a short chain of ellipsoids, every segment `length` studs long and
+	-- turned to its own direction (x is mirrored for the left one; -Z forward, -Y down), so a chain of two curves in and a single one points
+	-- straight out. Where the base is, how long and how thick are in the appearance's `fang` table.
+	local fangs: { Fang } = {}
+	local fg = look.fang
+	if fg then
+		for _, side in { -1, 1 } do
+			local p = Vector3.new(side * fg.x, fg.y, fg.z)
+			for index, seg in fg.segments do
+				local dir = Vector3.new(side * seg.dir[1], seg.dir[2], seg.dir[3]).Unit
+				table.insert(fangs, { side = side, index = index, at = p + dir * (seg.length * 0.5), dir = dir, radii = Vector3.new(seg.radius, seg.radius, seg.length * 0.5 + seg.radius * 0.35) })
+				p += dir * seg.length
+			end
+		end
+	end
 	return {
 		headCenter = hc, headRadii = hr, abdomenCenter = ac, abdomenRadii = ar,
 		faceCenter = v3(look.face.center), faceRadii = v3(look.face.radii),
 		pedicelCenter = v3(look.pedicel.center), pedicelRadii = v3(look.pedicel.radii),
 		neck = v3(look.neck),
-		eyes = eyes, glints = glints, cheeks = cheeks, jaws = jaws, palps = palps,
+		eyes = eyes, glints = glints, cheeks = cheeks, jaws = jaws, palps = palps, fangs = fangs,
 		spinneret = Vector3.new(0, ac.Y + 0.02, ac.Z + ar.Z - 0.005),
 		hairFree = zones,
 		tubercle = if tub then { center = v3(tub.center), radii = v3(tub.radii) } else nil,

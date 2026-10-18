@@ -12,6 +12,9 @@
 -- (Anatomy's tubercle), markings on the abdomen (look.marks), legs coloured segment by segment (look.legColors, look.legBands) and, for the
 -- Greenbottle blue, leg bristles only (fuzz.legsOnly) and bars that soften at the last growth stage (look.barFade). A pose (Rig/TarantulaPose, set as
 -- rig.threat, ROBLOX-82) rears the prosoma, lifts legs I and the pedipalps, turns the drawn body about and swings the spinnerets.
+-- ROBLOX-84 draws the legs, feet, fangs and palps of the first spider and the two tarantulas as the segments they have (look.legForm,
+-- look.fang, look.palpForm): the same three-link chain and the same targets, each link now one or two rods, a patella at the knee, a break in
+-- the tarsus, a pad (and claws or scopula bristles) at the foot. An appearance without those tables is drawn exactly as it was.
 
 local Workspace = game:GetService("Workspace")
 local Appearances = require(script.Parent.Parent.Data.Appearances)
@@ -48,6 +51,11 @@ type Leg = {
 	knee: Part,
 	ankle: Part,
 	pad: Part?,
+	femurTip: Part?, -- the thinner distal rod of a tapered femur or tibia, the thinner distal rod of the tarsus and the ball on its break (look.legForm;
+	tibiaTip: Part?, -- all nil for an appearance without one), and the foot's claws or scopula bristles
+	tarsusTip: Part?,
+	joint: Part?,
+	toes: {Part},
 	bands: {Part}, -- empty for a pair drawn without pale bands (the peacock spider's legs III)
 	hairs: { { part: Part, spec: Setae.LegHair } },
 }
@@ -353,6 +361,14 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		fang.Reflectance = cl.reflectance
 		fixed(fang, j.at, CFrame.Angles(cl.pitch, 0, j.side * cl.splay), G_HEAD)
 	end
+	-- Fangs (look.fang): chains of dark, glossy ellipsoids hanging from the chelicerae's lower front, each segment turned along its own direction.
+	for _, f in A.fangs do
+		if f.index > (cfg.fangSegments or 0) then continue end
+		local tooth = ellipsoid(model, "Fang", f.radii, if look.fang.color then color(look.fang.color) else FANG, Enum.Material.Foil)
+		tooth.Reflectance = look.fang.reflectance
+		tooth.CastShadow = false
+		fixed(tooth, f.at, CFrame.lookAt(Vector3.zero, f.dir), G_HEAD)
+	end
 	-- Pedipalps: stalk, pale band, club and pale tip, rotating about a pivot at the base (they drum when the spider stands).
 	local pl = look.palp
 	local pc = look.palpColors
@@ -362,8 +378,15 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		local len = (tip - base).Magnitude
 		local toBase = CFrame.new(base):Inverse()
 		local stalk = rod(model, "PalpStalk", pl.stalk, PALP_STALK)
-		stalk.Size = Vector3.new(len, pl.stalk, pl.stalk)
-		fixed(stalk, Vector3.zero, toBase * rodCFrame(base, tip), G_HEAD, index)
+		local pf = look.palpForm -- a leg-like palp tapers like a femur: a thick rod, then a thinner one out to the club
+		local reach = if pf then len * pf.split else len
+		stalk.Size = Vector3.new(reach, pl.stalk, pl.stalk)
+		fixed(stalk, Vector3.zero, toBase * rodCFrame(base, base:Lerp(tip, reach / len)), G_HEAD, index)
+		if pf then
+			local thin = rod(model, "PalpStalkTip", pl.stalk * pf.taper, PALP_STALK)
+			thin.Size = Vector3.new(len - reach, pl.stalk * pf.taper, pl.stalk * pf.taper)
+			fixed(thin, Vector3.zero, toBase * rodCFrame(base:Lerp(tip, reach / len), tip), G_HEAD, index)
+		end
 		local ring = rod(model, "PalpBand", pl.stalk * 1.05, WHITE)
 		ring.Size = Vector3.new(len * look.bandFraction, pl.stalk * 1.05, pl.stalk * 1.05)
 		fixed(ring, Vector3.zero, toBase * rodCFrame(base, tip), G_HEAD, index)
@@ -460,6 +483,37 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 			withBands = own.bands ~= false
 		end
 		if cfg.legBands == false then withBands = false end -- the low tier of the peacock spider draws no pale bands
+		-- The shape of the leg (look.legForm, ROBLOX-84): a tapered femur and tibia, a patella for a knee, a break in the tarsus, a pad and its toes.
+		local form = look.legForm
+		local D1, D2, DT = d[1] * tF, d[2] * tT, d[2] * 0.6 * tTar -- the femur's, tibia's and tarsus' diameters
+		local knee: Part
+		local pad: Part? = nil
+		local toes: {Part} = {}
+		if form then
+			local pt = form.patella
+			knee = ellipsoid(model, "Knee" .. i, Vector3.new(D1 * pt.length, D1 * pt.width, D1 * pt.width) * 0.5, kneeColor, fabric)
+			knee.CastShadow = false
+			if cfg.pads then
+				local ft = form.foot
+				local sole = ellipsoid(model, "Foot" .. i, Vector3.new(ft.rx, ft.ry, ft.rz) * DT, cTarsus, fabric)
+				sole.CastShadow = false
+				pad = sole
+				local cw, st = form.claws, form.strands
+				for _ = 1, if cw then cfg.claws or 0 else 0 do
+					local claw = rod(model, "Claw", cw.radius * 2, FANG)
+					claw.Size, claw.CastShadow = Vector3.new(cw.length, cw.radius * 2, cw.radius * 2), false
+					table.insert(toes, claw)
+				end
+				for _ = 1, if st then cfg.strands or 0 else 0 do
+					local bristle = rod(model, "FootBristle", st.radius * 2, cTarsus)
+					bristle.Size, bristle.CastShadow = Vector3.new(st.length, st.radius * 2, st.radius * 2), false
+					table.insert(toes, bristle)
+				end
+			end
+		else
+			knee = ball(model, "Knee" .. i, D1 * 0.95, kneeColor)
+			pad = if cfg.pads then ball(model, "Foot" .. i, DT * L.pad, cTarsus) else nil
+		end
 		table.insert(self._legs, {
 			side = side,
 			pair = pair,
@@ -472,9 +526,14 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 			femur = rod(model, "Femur" .. i, d[1] * tF, cFemur),
 			tibia = rod(model, "Tibia" .. i, d[2] * tT, cTibia),
 			tarsus = rod(model, "Tarsus" .. i, d[2] * 0.6 * tTar, cTarsus),
-			knee = ball(model, "Knee" .. i, d[1] * tF * 0.95, kneeColor),
+			knee = knee,
 			ankle = ball(model, "Ankle" .. i, d[2] * tT * 0.95, ankleColor),
-			pad = if cfg.pads then ball(model, "Foot" .. i, d[2] * 0.6 * tTar * L.pad, cTarsus) else nil,
+			pad = pad,
+			femurTip = if form and cfg.taper then rod(model, "FemurTip" .. i, D1 * form.femur.taper, cFemur) else nil,
+			tibiaTip = if form and form.tibia and cfg.tibiaTaper then rod(model, "TibiaTip" .. i, D2 * form.tibia.taper, cTibia) else nil,
+			tarsusTip = if form and form.tarsus.tip and cfg.jointBreak then rod(model, "TarsusTip" .. i, DT * form.tarsus.tip, cTarsus) else nil,
+			joint = if form and cfg.jointBreak then ball(model, "TarsalJoint" .. i, DT * form.tarsus.joint, ankleColor) else nil,
+			toes = toes,
 			bands = if not withBands then {} else legBands(i, d),
 			hairs = {},
 		})
@@ -489,6 +548,9 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 	if look.legGloss then -- the Greenbottle blue's legs are a little glossy
 		for _, leg in self._legs do
 			leg.femur.Reflectance, leg.tibia.Reflectance, leg.tarsus.Reflectance = look.legGloss, look.legGloss, look.legGloss
+			if leg.femurTip then leg.femurTip.Reflectance = look.legGloss end
+			if leg.tibiaTip then leg.tibiaTip.Reflectance = look.legGloss end
+			if leg.tarsusTip then leg.tarsusTip.Reflectance = look.legGloss end
 		end
 	end
 	-- The peacock spider's fan (look.fan): the discs of the front face, the figure on them, the repeat on the back and the folded flaps.
@@ -858,22 +920,35 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 			knee = knee:Lerp(raisedKnee, threatPose.legs)
 		end
 		local ankle = knee:Lerp(foot, ANKLE_SHARE) + up * (L.ankleLift*g)
-		local function segment(index: number, p: Part, band: Part?, a: Vector3, b: Vector3)
+		local form = look.legForm
+		-- One link of the leg: its rod runs from a to b; with a thinner `tip` rod the first runs a to m and the tip m to b (a tapered femur or tibia,
+		-- the break in the tarsus). The pale band (one `bandFraction` of the whole link) and the setae follow the link, not the pieces.
+		local function segment(index: number, p: Part, tip: Part?, band: Part?, a: Vector3, m: Vector3, b: Vector3)
 			local len = math.max((b - a).Magnitude, 0.01)
-			if math.abs(p.Size.X - len) > 1e-3 then
-				p.Size = Vector3.new(len, p.Size.Y, p.Size.Z)
+			local ends = if tip then m else b
+			local plen = math.max((ends - a).Magnitude, 0.01)
+			if math.abs(p.Size.X - plen) > 1e-3 then
+				p.Size = Vector3.new(plen, p.Size.Y, p.Size.Z)
 			end
 			local rc = rodCFrame(a, b) -- local +X runs from a toward b (toward the foot)
-			put(p, rc)
+			put(p, if tip then rodCFrame(a, m) else rc)
+			local share = plen / len
+			if tip then
+				local tlen = math.max((b - m).Magnitude, 0.01)
+				if math.abs(tip.Size.X - tlen) > 1e-3 then
+					tip.Size = Vector3.new(tlen, tip.Size.Y, tip.Size.Z)
+				end
+				put(tip, rodCFrame(m, b))
+			end
 			if band then
 				band.Size = Vector3.new(len * look.bandFraction, p.Size.Y * 1.035, p.Size.Z * 1.035)
 				put(band, rc)
 			end
 			-- Leg setae stand out from the segment and lean toward the foot.
-			local r = p.Size.Y * 0.5
 			for _, hair in leg.hairs do
 				local spec = hair.spec
 				if spec.segment == index then
+					local r = (if tip and spec.t > share then tip.Size.Y else p.Size.Y) * 0.5
 					local c, s = math.cos(spec.theta), math.sin(spec.theta)
 					local base = Vector3.new((spec.t - 0.5) * len, r * 0.8 * c, r * 0.8 * s)
 					local dir = Vector3.new(1.3, c, s).Unit
@@ -881,12 +956,51 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 				end
 			end
 		end
-		segment(1, leg.femur, leg.bands[1], hip, knee)
-		segment(2, leg.tibia, leg.bands[2], knee, ankle)
-		segment(3, leg.tarsus, leg.bands[3], ankle, foot)
-		put(leg.knee, CFrame.new(knee))
+		local femurMid = if form and leg.femurTip then hip:Lerp(knee, form.femur.split) else knee
+		local tibiaMid = if form and form.tibia and leg.tibiaTip then knee:Lerp(ankle, form.tibia.split) else ankle
+		local tarsusMid = if form and leg.joint then ankle:Lerp(foot, form.tarsus.split) + up * (if leg.tarsusTip then form.tarsus.bend * g else 0) else foot
+		segment(1, leg.femur, leg.femurTip, leg.bands[1], hip, femurMid, knee)
+		segment(2, leg.tibia, leg.tibiaTip, leg.bands[2], knee, tibiaMid, ankle)
+		segment(3, leg.tarsus, leg.tarsusTip, leg.bands[3], ankle, tarsusMid, foot)
+		if form then
+			-- The knee is a patella: a short stout ellipsoid lying along the bend of the leg there.
+			local bend = (knee - hip).Unit + (ankle - knee).Unit
+			local along = if bend.Magnitude > 1e-3 then bend.Unit else (knee - hip).Unit
+			put(leg.knee, rodCFrame(knee - along, knee + along))
+		else
+			put(leg.knee, CFrame.new(knee))
+		end
 		put(leg.ankle, CFrame.new(ankle))
-		if leg.pad then put(leg.pad :: Part, CFrame.new(foot)) end
+		if leg.joint then put(leg.joint, CFrame.new(tarsusMid)) end
+		local pad = leg.pad
+		if pad and form then
+			-- The tarsal pad lies on the surface under the foot, flattened, its long side along the way the foot points; the toes (claws, or a
+			-- scopula's bristles) leave its rim. All of it is display: the planted foot is where it was.
+			local into = foot - (if leg.joint then tarsusMid else ankle)
+			local flat = into - up * into:Dot(up)
+			local heading = if flat.Magnitude > 1e-4 then flat.Unit else body.LookVector
+			local center = foot + up * (pad.Size.Y * 0.35)
+			put(pad, CFrame.lookAt(center, center + heading, up) * CFrame.Angles(0, math.pi / 2, 0))
+			local right = heading:Cross(up)
+			for n, toe in leg.toes do
+				local first = (n - 1) % 2 == 0
+				local sideways = if first then -1 else 1
+				if toe.Name == "Claw" then
+					-- two claws: from the pad's front, forward and down, splayed apart
+					local from = center + heading * (pad.Size.X * 0.42)
+					local aim = (heading * 0.85 - up * 0.45 + right * (sideways * form.claws.splay)).Unit
+					put(toe, rodCFrame(from, from + aim * (toe.Size.X)))
+				else
+					-- scopula bristles: short rods out of the pad's sides, swept forward and a little down
+					local sway = if (cfg.strands or 0) > 1 then sideways else 0 -- (one bristle points straight ahead)
+					local from = center + right * (sway * pad.Size.Z * 0.40) + heading * (pad.Size.X * (if sway == 0 then 0.38 else 0.1))
+					local aim = (right * sway * 0.9 + heading * (if sway == 0 then 1.0 else 0.5) - up * 0.25).Unit
+					put(toe, rodCFrame(from, from + aim * (toe.Size.X)))
+				end
+			end
+		elseif pad then
+			put(pad, CFrame.new(foot))
+		end
 	end
 	Workspace:BulkMoveTo(parts, cframes, Enum.BulkMoveMode.FireCFrameChanged)
 end
@@ -958,8 +1072,13 @@ local function applyVisibility(self: Rig)
 		local frontReach = self._eyeView and leg.pair == 1
 		local all = not hideBody
 		show(leg.femur, all); show(leg.knee, all)
+		if leg.femurTip then show(leg.femurTip, all) end
 		show(leg.tibia, all or frontReach)
+		if leg.tibiaTip then show(leg.tibiaTip, all or frontReach) end
 		show(leg.tarsus, all or frontReach); show(leg.ankle, all or frontReach)
+		if leg.tarsusTip then show(leg.tarsusTip, all or frontReach) end
+		if leg.joint then show(leg.joint, all or frontReach) end
+		for _, toe in leg.toes do show(toe, all or frontReach) end
 		for n, band in leg.bands do show(band, all or (frontReach and n >= 2)) end
 		if leg.pad then show(leg.pad :: Part, all or frontReach) end
 		for _, hair in leg.hairs do

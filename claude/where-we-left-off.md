@@ -1,3 +1,13 @@
+# Latest: settings accepted and published v20 — Chet, 2026-10-18
+
+Claude's settings bundle 9c63783 is integrated. Build **d89045d8f2212cda**: **47,547 CLI checks**, **111/111 Studio engine checks (zero skipped)** and **24/24 live-client checks** pass; strict analysis clean, **167/167** scripts compile. Native tests include real TextService measurements and isolated real DataStore operations. Chet also changed normal-game volume to 75% and enabled large text, stopped and restarted Play, and saw both choices restored from the cloud.
+
+Published **v20** to the existing Windowsill place **120119801868085**, confirmed in Creator Dashboard's published-only history. No audience/security/monetization changes. Evidence: `docs/verification/roblox-settings-windows/RESULTS.md`; decision ROBLOX-53. Daughter's spider/game remain free; peacock remains free for testing, with Nathan's future ~US$0.99 cosmetic-pass target preserved.
+
+Next chunk: release presentation (icon, thumbnail and accurate description of modes/saves) plus notebook science/source review. Start with Nathan's PlayStation/tablet feedback and repair usability issues first. Narrow-phone large-text landscape is usable by scrolling but cramped: a slider's label and buttons may not be visible together. Consider a more compact short-screen layout. Do not claim physical-device or F01 acceptance from emulator results. Nathan still needs a complete life and settings leave/rejoin on PlayStation and tablet, and must handle account identity/security/content/fee screens himself before a public release. Godot stays frozen; keep twitch and SimClock.
+
+---
+
 # Latest: settings and device polish built, 2026-10-18 (not yet run in Studio or on a device)
 
 Claude's `claude/roblox-settings` (from v19 main 3b8a919): 22 saved settings (sound volumes and captions, look speeds per device, invert X/Y, camera distance and field of view, the line-framing switch, reduced motion, large text, focus toggle, automatic grip, last-seen mark, spider-eye level horizon and grey, control hints, notebook notes), each read live by its real consumer; a modal settings panel (O, or Menu then Settings) for keyboard, controller and touch; PlayerProgress schema 2 with a migration from the seven old toggles; Menu and Notebook are 48 px touch targets laid out with the status lines, Focus and Change no longer overlap the thumb cluster on narrow phones. Decisions ROBLOX-49..52. CLI total **47,545** accepted checks, failed=0 (SETTINGS 923 new; NOTEBOOK 889 -> 813 because its button-place loop became SUMMARY's 13-size matrix, 185 -> 189); strict types 0; compile 172/172; places rebuilt. Nothing published.

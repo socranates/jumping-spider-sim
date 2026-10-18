@@ -899,3 +899,11 @@ PlayerProgress schema 2 stores `settings` (a map of setting id to value) and `se
 ### ROBLOX-52 - What settings deliberately do not do (Claude, 2026-10-18)
 
 No key or button remapping (the scheme is one for all three devices and the help card must stay true). No per-device settings, so the same look speeds apply to a phone and a laptop the player owns (touch has its own look speed, which is the only difference). No difficulty or rules settings (Standard and Free play are chosen at the menu). No graphics-quality setting: the lower-detail tier for touch-only devices is automatic and unchanged. No screen-reader or text-to-speech work. Colour choices beyond the grey eye-view switch are not offered. The PlayStation names (Cross, Circle, L1, R1, Touchpad) come from the same ControlText table as the rest of the game. Cannot be verified here: that the panel reads well on a real PlayStation or a lower-end tablet, and that thumb reach feels right (Studio tests measure text and geometry only).
+
+### ROBLOX-53 - Settings Windows review and acceptance (Chet, 2026-10-18)
+
+Unsupported future settings_version values make the visit read-only, preserving stored bytes. Normal schema-1 prefs still migrate to schema 2. This closes a review finding where validation accepted a future version but returned the current version and dropped unknown values before the next write.
+
+Studio's server runner checks construction and layout without trying to bind client-only controls. The live-client playback opens the actual settings panel, checks its bound priority, paused world, value changes and menu return. The tap-jump playback queues press/release in the same tick: waiting a Heartbeat under startup load could make the supposed tap longer than the aim threshold. Production jump timing is unchanged. Exact Windows evidence, native counts, manual checks and publication status are in verification/roblox-settings-windows/RESULTS.md.
+
+Physical PlayStation and tablet acceptance remain Nathan's checks after the private playtest update. Public release still requires those checks, release presentation/science review and Nathan's account/audience decisions. The intended peacock price remains approximately US$0.99 as a one-time cosmetic pass; it stays free during testing.

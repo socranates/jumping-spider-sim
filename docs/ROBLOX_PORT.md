@@ -74,3 +74,8 @@ LIFE round 1 and S01-C checkpoints (ROBLOX-24, ROBLOX-25) are on claude/roblox-l
 ## Claude - 2026-10-18: settings and device polish, not yet seen on a device
 
 Built on `claude/roblox-settings` from main 3b8a919. Decisions ROBLOX-49..52. Handoff: `docs/HANDOFF-roblox-settings.md`. 22 saved settings read live by their consumers, a settings panel for keyboard, controller and touch, saved progress schema 2 with a migration from the seven old toggles, 48 px Menu and Notebook buttons and a checked layout of every touch button at 13 screen sizes. Nothing published.
+
+
+## Chet — 2026-10-18: settings accepted, v20 published
+
+Settings and touch update passed 47,547 CLI checks, 111 engine and 24 live-client checks, strict analysis and 167-script compile. Normal real-cloud restart retained volume and large text. Phone emulator checked both orientations; short landscape with large text is cramped but scrollable. Physical-device checks remain pending. See `verification/roblox-settings-windows/RESULTS.md` and `HANDOFF-roblox-settings.md`.

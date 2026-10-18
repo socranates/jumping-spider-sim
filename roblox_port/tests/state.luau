@@ -1611,4 +1611,20 @@ case("shutdown waits for a PlayerRemoving flush already in flight", function()
 	check(waited and flushed and srv.service.departing == 0, "shutdown awaits and completes the departing write")
 end)
 
+case("future settings versions never get silently downgraded", function()
+	local e = newEnv()
+	local future = SaveProgress.default()
+	future.settings_version = SettingsModel.VERSION + 1
+	future.settings.FutureChoice = "keep_me"
+	local raw = SaveEnvelope.make(SaveProgress.SPEC, future, e.t, nil, nil)
+	e.backend:poke("P_89", raw)
+	local before = canon(raw)
+	local a = newSession(e, 89, "A")
+	check(a:load() == "session", "unsupported settings make this visit read-only")
+	a:setProgress(prog({ "new_page" }))
+	run(e, a, 40)
+	a:flush()
+	check(canon(e.backend.data.P_89) == before, "future settings and their version remain byte-for-byte intact")
+end)
+
 print(`STATE passed={passed} failed={failed}`)

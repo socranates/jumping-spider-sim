@@ -1,11 +1,11 @@
-# Public-release readiness — 2026-10-17
+# Public-release readiness — 2026-10-18
 
 The Windowsill is a playable private test experience, not yet a durable public release. This round updates the existing place (universe 10771103250, place 120119801868085), without changing who can play.
 
 ## Recommended order
 
 1. **Persistent player progress and rest saves.** Implemented and reviewed (ROBLOX-39..47): real isolated DataStore checks passed, with notebook and separate rest records. Windows verification and publication status are in verification/roblox-state-windows/RESULTS.md. Physical PlayStation leave/rejoin remains a release check. A failed load must never overwrite good progress with defaults. Keep player discoveries separate from world rewind and main/Free-play saves.
-2. **Settings and device polish.** Built (ROBLOX-49..52, `HANDOFF-roblox-settings.md`) but not yet seen in Studio or on a device: a settings panel, 22 saved settings, 48 px touch buttons. Still needed: Chet's Studio run and Nathan's PlayStation and tablet checks. The original ask: give players usable sound/reduced-motion/camera/accessibility options, fix cramped touch gameplay controls, and verify a complete life with physical PlayStation and a lower-end tablet. Studio checks are not physical-device acceptance or a controlled F01 performance pass.
+2. **Settings and device polish.** Accepted in Windows Studio and published privately as v20 (ROBLOX-49..53, `HANDOFF-roblox-settings.md`): a settings panel, 22 saved settings, 48 px touch buttons. Studio checks and a normal settings cloud restart passed. Still needed: Nathan’s PlayStation and tablet checks; short landscape with large text deserves usability feedback. The original ask: give players usable sound/reduced-motion/camera/accessibility options, fix cramped touch gameplay controls, and verify a complete life with physical PlayStation and a lower-end tablet. Studio checks are not physical-device acceptance or a controlled F01 performance pass.
 3. **Release presentation and science review.** Choose a proper icon/thumbnail/description and explain Standard versus Free play and saving. Review inherited notebook claims and asset/source provenance; existing citations do not mean every paper was read in full. Keep the daughter's spider and whole game free. Peacock remains free for testing until Nathan changes that decision.
 4. **Nathan completes Roblox account/audience prerequisites, then chooses release scope.** These are separate from whether the game builds or publishes.
 

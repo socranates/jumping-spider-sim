@@ -1332,3 +1332,15 @@ Verification: SETTINGS 923 (new), STATE 432, STATE_CLIENT 102, STATE_OFFLINE 8, 
 
 Next: Chet runs the Studio checklist; Nathan checks a complete life on PlayStation and a lower-end tablet (handoff list); then presentation/science review and account/audience readiness.
 
+
+
+# Latest: settings accepted and published v20 — Chet, 2026-10-18
+
+Claude's settings bundle 9c63783 is integrated. Build **d89045d8f2212cda**: **47,547 CLI checks**, **111/111 Studio engine checks (zero skipped)** and **24/24 live-client checks** pass; strict analysis clean, **167/167** scripts compile. Native tests include real TextService measurements and isolated real DataStore operations. Chet also changed normal-game volume to 75% and enabled large text, stopped and restarted Play, and saw both choices restored from the cloud.
+
+Published **v20** to the existing Windowsill place **120119801868085**, confirmed in Creator Dashboard's published-only history. No audience/security/monetization changes. Evidence: `docs/verification/roblox-settings-windows/RESULTS.md`; decision ROBLOX-53. Daughter's spider/game remain free; peacock remains free for testing, with Nathan's future ~US$0.99 cosmetic-pass target preserved.
+
+Next chunk: release presentation (icon, thumbnail and accurate description of modes/saves) plus notebook science/source review. Start with Nathan's PlayStation/tablet feedback and repair usability issues first. Narrow-phone large-text landscape is usable by scrolling but cramped: a slider's label and buttons may not be visible together. Consider a more compact short-screen layout. Do not claim physical-device or F01 acceptance from emulator results. Nathan still needs a complete life and settings leave/rejoin on PlayStation and tablet, and must handle account identity/security/content/fee screens himself before a public release. Godot stays frozen; keep twitch and SimClock.
+
+---
+

@@ -1,0 +1,128 @@
+{
+  "evidence_id": "d89045d8f2212cda",
+  "tests": 24,
+  "passed": 24,
+  "failed": 0,
+  "results": [
+    {
+      "passed": true,
+      "name": "player walks to edge and hangs",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "held lower reaches sill floor",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "player reels back to leaf",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "a tap of Jump hops forward",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "Q during an aim cancels it and the release does not leap",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "a key and a finger hold Cancel together; only a deliberate hold lets go of the line",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "on the line the prompts name each device's controls, wrap and stay on screen; the camera never rolls",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "Focus toggle respects cancel ownership and ends off surface",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "live client sensor and drawer classify the labeled stage marker",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "live hunt catches at the swept contact, grips and eats without locking movement",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "LIFE: E in the crack rests and keeps a checkpoint; an evening rest sleeps to morning; the light and the eyes follow",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "LIFE: Backspace returns to the checkpoint; the world goes back with the spider",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "A029 live sensor cost with three and six moving flies",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "WASP: live arrival hum loads, search stays safe in crack, and audio ends with visit",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "PEACOCK: change while resting, dance without moving physics, walk to stop, and return to first spider",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "REST entrance: walk under the roof from outside and press rest",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "LIFE end: starvation, last rest, then unrelated new spider",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "LIFE menu: large text, controller focus, gentle free play",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "GROWTH: three safe moults, old skins, Easy and checkpoint recovery",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "NOTEBOOK: opens in the real client, the world waits, only found pages show, text fits, and it closes",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "NOTEBOOK: earned discoveries survive recovery and new lives",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "NOTEBOOK: modal reading, controller scrolling, large text and return to menu",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "NOTEBOOK: optional checklist, end-screen return and compact footer",
+      "detail": ""
+    },
+    {
+      "passed": true,
+      "name": "SETTINGS: real client opens, binds controls, pauses, changes values and returns to menu",
+      "detail": ""
+    }
+  ]
+}

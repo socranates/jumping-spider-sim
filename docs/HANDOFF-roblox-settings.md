@@ -1,3 +1,13 @@
+# Chet acceptance: settings accepted and published v20 — Chet, 2026-10-18
+
+Claude's settings bundle 9c63783 is integrated. Build **d89045d8f2212cda**: **47,547 CLI checks**, **111/111 Studio engine checks (zero skipped)** and **24/24 live-client checks** pass; strict analysis clean, **167/167** scripts compile. Native tests include real TextService measurements and isolated real DataStore operations. Chet also changed normal-game volume to 75% and enabled large text, stopped and restarted Play, and saw both choices restored from the cloud.
+
+Published **v20** to the existing Windowsill place **120119801868085**, confirmed in Creator Dashboard's published-only history. No audience/security/monetization changes. Evidence: `docs/verification/roblox-settings-windows/RESULTS.md`; decision ROBLOX-53. Daughter's spider/game remain free; peacock remains free for testing, with Nathan's future ~US$0.99 cosmetic-pass target preserved.
+
+Next chunk: release presentation (icon, thumbnail and accurate description of modes/saves) plus notebook science/source review. Start with Nathan's PlayStation/tablet feedback and repair usability issues first. Narrow-phone large-text landscape is usable by scrolling but cramped: a slider's label and buttons may not be visible together. Consider a more compact short-screen layout. Do not claim physical-device or F01 acceptance from emulator results. Nathan still needs a complete life and settings leave/rejoin on PlayStation and tablet, and must handle account identity/security/content/fee screens himself before a public release. Godot stays frozen; keep twitch and SimClock.
+
+---
+
 # Settings and device polish - 2026-10-18
 
 Branch `claude/roblox-settings` from main 3b8a919 (v19 published). Decisions ROBLOX-49 to ROBLOX-52 in `DECISIONS.md`. Nothing here is published. Nothing has been seen in Studio or on a device: the CLI checks the rules, the layout geometry and the real client scripts on the shim; Studio measures real text. Physical PlayStation and tablet acceptance are still Nathan's.
@@ -76,7 +86,7 @@ What SETTINGS covers: the table (unique ids, ranges on a step grid, defaults ins
 - Changing the field of view during the spider-eye view takes effect when you leave it.
 - Settings are one set per player (not per device).
 - The panel keeps no history: Reset puts every setting back to its default, and cannot be undone.
-- A saved settings version newer than this build knows is carried as stored and only the values this build understands are used.
+- Windows review: a saved settings version newer than this build knows makes the visit read-only. Preserve the whole stored record rather than dropping unknown choices and writing a downgraded version.
 
 ## Commits
 

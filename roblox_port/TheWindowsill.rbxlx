@@ -9798,6 +9798,8 @@ function SaveProgress.sanitize(raw: any): ({ string }, Payload?)
 		local sv = raw.settings_version
 		if not finite(sv) or sv < 1 or sv ~= math.floor(sv) then bad("the settings version is not a whole number") else version = sv end
 	end
+	-- An older build must not silently drop future choices and write a downgraded record.
+	if version > SettingsModel.VERSION then bad("settings were written by a newer build") end
 	if raw.settings ~= nil then
 		if type(raw.settings) ~= "table" then
 			bad("settings are not a table")

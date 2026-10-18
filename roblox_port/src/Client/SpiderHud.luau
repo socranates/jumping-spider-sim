@@ -6,6 +6,7 @@
 -- keeps clear of the touch buttons (Shared/UI/HudLayout).
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local HudLayout = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("UI"):WaitForChild("HudLayout"))
+local LifeText = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("UI"):WaitForChild("LifeText"))
 
 local Hud = {}
 Hud.__index = Hud
@@ -149,9 +150,9 @@ function Hud.new(playerGui: Instance): any
 	safe.ScreenInsets = Enum.ScreenInsets.CoreUISafeInsets
 	safe.Parent = playerGui
 	local top = column("Top", safe, Vector2.new(0.5, 0), UDim2.new(0.5, 0, 0, 8), Enum.VerticalAlignment.Top)
-	-- Food reserves, not a damage/health system. Always present during play, even with hints off.
+	-- The hunger bar (ROBLOX-78; the energy reserve, full when fed), not a damage/health system. Always present during play, even with hints off.
 	local food = Instance.new("Frame")
-	food.Name = "FoodBar"
+	food.Name = "HungerBar"
 	food.Size = UDim2.new(1, 0, 0, 36)
 	food.LayoutOrder = -2
 	food.BackgroundColor3 = Color3.fromRGB(24, 27, 24)
@@ -160,14 +161,14 @@ function Hud.new(playerGui: Instance): any
 	food.Parent = top
 	corner(food, 6)
 	local foodFill = Instance.new("Frame")
-	foodFill.Name = "FoodFill"
+	foodFill.Name = "HungerFill"
 	foodFill.Size = UDim2.fromScale(0, 1)
 	foodFill.BorderSizePixel = 0
 	foodFill.BackgroundColor3 = Color3.fromRGB(53, 103, 61)
 	foodFill.Parent = food
 	corner(foodFill, 6)
 	local foodText = Instance.new("TextLabel")
-	foodText.Name = "FoodText"
+	foodText.Name = "HungerText"
 	foodText.BackgroundTransparency = 1
 	foodText.Size = UDim2.fromScale(1, 1)
 	foodText.TextColor3 = Color3.new(1, 1, 1)
@@ -280,7 +281,7 @@ function Hud.update(self: any, view: any, dt: number)
 		local food = math.clamp(view.food, 0, 1)
 		self.foodFill.Size = UDim2.fromScale(food, 1)
 		self.foodFill.BackgroundColor3 = if food <= 0.25 then Color3.fromRGB(136, 66, 24) else Color3.fromRGB(53, 103, 61)
-		self.foodText.Text = string.format("Food %d%%", math.floor(food * 100 + 0.5)) .. (if view.foodGentle then " · gentle" elseif food <= 0 then " · starving" elseif food <= 0.25 then " · hungry" else "")
+		self.foodText.Text = LifeText.hunger(food, view.foodGentle == true)
 		self.foodText.TextSize = if view.largeText then 24 else 16
 	end
 	self.grip.Visible = view.grip ~= nil

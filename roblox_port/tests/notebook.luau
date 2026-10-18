@@ -30,7 +30,7 @@ end
 
 -- ---------------------------------------------------------------- the pages are Godot's, word for word
 -- Godot: test_every_page_is_complete_short_and_sourced
-local ADAPTED = { "bold_jumper", "dragline", "legs_push", "hearing", "green_uv", "home_before_dark", "hungry_at_home", "new_skin", "grown_up", "mud_dauber", "what_the_wasp_does" }
+local ADAPTED = { "bold_jumper", "dragline", "legs_push", "hearing", "green_uv", "home_before_dark", "hungry_at_home", "new_skin", "grown_up", "mud_dauber", "what_the_wasp_does", "going_without_food" }
 local STABLE = {
 	"bold_jumper", "dragline", "legs_push", "eight_eyes", "moving_retinas", "motion_first", "hunting_by_sight", "venom", "drinking",
 	"felt", "hearing", "retreat", "depth_blur", "green_uv", "home_before_dark", "hungry_at_home", "full_abdomen", "outgrowing_a_skin",

@@ -33,11 +33,16 @@ NeedsModel.REST_RECOVER_PER_S = 0.004
 NeedsModel.UPDATE_PERIOD_S = 0.5
 NeedsModel.MAX_STEP_S = 0.25
 NeedsModel.FULL_AT = 0.98
--- Life mode: a full reserve lasts about three game days without food, and one fly (0.35) feeds the spider for about a day.
+-- Life mode, at Godot's factor 1: a full reserve lasts about three game days without food, and one fly (0.35) feeds the spider for about a day.
 -- A real Phidippus goes much longer without food; the game compresses time on purpose (LIFE-05).
 NeedsModel.LIFE_DRAIN_AWAKE_PER_H = 0.021
 NeedsModel.LIFE_DRAIN_ASLEEP_PER_H = 0.007
-NeedsModel.PLAY_DRAIN = 1.1 -- Nathan: slightly faster energy drain; reference fixtures retain factor 1.
+-- The game's own rules (ROBLOX-78), opt-in like Data/Wasp.game and Data/Catch.game: `drain` multiplies the life-mode drain (awake, asleep and gentle
+-- alike) of a model that was given them by useGameRules. A model that never is replays Godot (factor 1) and the reference fixtures hold.
+-- The factor is worked out from the constants above: a day is about 11 waking hours and 13 asleep, 11 x 0.021 + 13 x 0.007 = 0.322 energy at factor 1,
+-- so 1.55 costs 0.499, about half the reserve (it was 1.1, 0.354, Chet's ten percent more, ROBLOX-61).
+NeedsModel.game = { drain = 1.55 }
+NeedsModel.PLAY_DRAIN = NeedsModel.game.drain -- (the name the client and tests have used since ROBLOX-61)
 NeedsModel.GENTLE_DRAIN = 0.5
 NeedsModel.GENTLE_FLOOR = 0.1
 NeedsModel.STAGE_ID = "p0_prototype"
@@ -65,6 +70,10 @@ export type Record = {
 }
 
 -- `lifeMode` and `gentle` say which rules apply (see above). Both default to false: the sandbox rules.
+function NeedsModel.useGameRules(self: any)
+	self.drainScale = NeedsModel.game.drain
+end
+
 function NeedsModel.new(lifeMode: boolean?, gentle: boolean?): any
 	return setmetatable({
 		energy = NeedsModel.ENERGY_START, rest = NeedsModel.REST_START,

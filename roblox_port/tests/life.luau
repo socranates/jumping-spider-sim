@@ -6,6 +6,7 @@
 local LifeClock = require("../src/Shared/Life/LifeClock")
 local NeedsModel = require("../src/Shared/Life/NeedsModel")
 local LifeLoop = require("../src/Shared/Life/LifeLoop")
+local Growth = require("../src/Shared/Life/Growth")
 local DayLight = require("../src/Shared/Habitat/DayLight")
 local LifeText = require("../src/Shared/UI/LifeText")
 local Graphics = require("../src/Shared/Data/Graphics")
@@ -448,16 +449,44 @@ case("the silk-lined crack", function()
 	check(not Layout.inRetreat(Layout.SPAWN), "the spawn is not in the crack")
 end)
 
-case("play tuning uses 10 percent faster energy drain awake, asleep and gentle",function()
+case("the game's hunger factor (ROBLOX-78): 1.55, a day costs about half the reserve, in every mode, and Godot's defaults are untouched",function()
+ check(NeedsModel.game.drain==1.55 and NeedsModel.PLAY_DRAIN==1.55,"the factor is 1.55")
+ -- Worked from the constants: 11 waking hours at 0.021 and 13 asleep at 0.007 cost 0.322 at factor 1.
+ local base=11*NeedsModel.LIFE_DRAIN_AWAKE_PER_H+13*NeedsModel.LIFE_DRAIN_ASLEEP_PER_H
+ check(math.abs(base-0.322)<1e-12,"a day at factor 1 costs 0.322")
+ check(math.abs(base*NeedsModel.game.drain-0.5)<0.002,"a day at the game's factor costs 0.5 ("..string.format("%.4f",base*NeedsModel.game.drain)..")")
+ check(math.abs(base*1.1-0.354)<0.001,"it was 0.354 at 1.1")
+ local g=NeedsModel.new(true,false);local d=NeedsModel.new(true,false)
+ check(d.drainScale==nil and g.drainScale==nil,"a model starts with Godot's rules")
+ g:useGameRules()
+ check(g.drainScale==NeedsModel.game.drain and d.drainScale==nil,"useGameRules gives only that model the game's factor")
  for _,gentle in {false,true} do
   for _,asleep in {false,true} do
    local old=NeedsModel.new(true,gentle);local tuned=NeedsModel.new(true,gentle)
-   tuned.drainScale=NeedsModel.PLAY_DRAIN
+   tuned:useGameRules()
    old:addHours(10,asleep);tuned:addHours(10,asleep)
    for _=1,2 do old:advance(.25,false);tuned:advance(.25,false) end
-   check(math.abs((.55-tuned.energy)/(.55-old.energy)-1.1)<1e-8,"ten percent increase")
+   check(math.abs((.55-tuned.energy)/(.55-old.energy)-1.55)<1e-8,"1.55 times the drain, awake or asleep, standard or gentle")
   end
  end
+ -- A whole simulated day: 11 hours awake, 13 asleep, from a full reserve.
+ local n=NeedsModel.new(true,false);n:useGameRules();n.energy=1
+ for _=1,11 do n:addHours(1,false);for _=1,2 do n:advance(.25,false) end end
+ for _=1,13 do n:addHours(1,true);for _=1,2 do n:advance(.25,false) end end
+ check(math.abs((1-n.energy)-0.5)<0.002,"a played day takes about 0.5 ("..string.format("%.4f",1-n.energy)..")")
+ -- The comfortable pace is two meals a day: a housefly gives 0.35, a fruit fly 0.175, and a daily rival 0.7 is no longer a whole day's food twice over.
+ check(2*0.35>=0.5 and 0.35<0.5 and 0.7>0.5 and 0.7<2*0.5,"two house flies cover a day; one does not; the rival is about a day and a half")
+end)
+case("the hunger bar's words (ROBLOX-78): full when fed, 'Hunger', hungry and starving, gentle",function()
+ check(LifeText.hunger(1,false)=="Hunger 100%" and LifeText.hunger(0.55,false)=="Hunger 55%","fed: Hunger and the percent")
+ check(LifeText.hunger(0.25,false)=="Hunger 25% · hungry" and LifeText.hunger(0.26,false)=="Hunger 26%","hungry at a quarter")
+ check(LifeText.hunger(0,false)=="Hunger 0% · starving" and LifeText.hunger(0,true)=="Hunger 0% · gentle","starving; gentle never says it")
+ check(LifeText.hunger(1.5,false)=="Hunger 100%" and LifeText.hunger(-1,false)=="Hunger 0% · starving","clamped")
+ for _,v in {1,0.5,0.2,0} do
+  local t=LifeText.hunger(v,false);check(not string.find(string.lower(t),"food") and not string.find(string.lower(t),"energy"),"no 'food' or 'energy' on the bar")
+ end
+ local g:any=Growth.new();g.stage=Growth.ADULT
+ check(not string.find(string.lower(LifeText.growth(g,0.9,0.35)),"food reserves"),"the adult line says hunger")
 end)
 case("meal credit is consumed food, even with full energy",function()
  for _,portion in {.3,.15} do

@@ -176,7 +176,7 @@ local waspBody = WaspBody.new(Workspace)
 -- LIFE (ROBLOX-24): the windowsill runs the life clock, so hunger runs by its hours (NeedsModel life mode, Standard rules: the
 -- port has no Easy mode yet). Feeding grants into the same model. The loop keeps the rest, sleep, daylight and the eyes' reach.
 local needs = NeedsModel.new(true, false)
-needs.drainScale=NeedsModel.PLAY_DRAIN
+needs:useGameRules()
 prey.feeding.needs = needs
 prey.feeding:useGameRules() -- an easier tap on a struggling fly (ROBLOX-72, Data/Catch.game), scaled by the prey's size (ROBLOX-77); Godot's numbers stay Feeding's defaults
 rivalLegs.grip = rivalLegs.Grip.new(needs) -- the grip on a caught rival (ROBLOX-77): its own controller, so the fly's is never disturbed
@@ -509,7 +509,7 @@ local function returnToCheckpoint()
 		return
 	end
 	session.mode, session.rules, session.ended = life.mode or "main", life.rules or "standard", false
- needs.drainScale=NeedsModel.PLAY_DRAIN
+ needs:useGameRules()
  motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor())
  session:finishAdult(life.growth.stage)
 	session.summary = nil
@@ -531,7 +531,7 @@ local function setHudShown(shown: boolean)
 end
 local function applyRules()
  life.mode,life.rules=session.mode,session.rules
- needs.drainScale=NeedsModel.PLAY_DRAIN
+ needs:useGameRules()
  needs.gentle=session.rules=="gentle";wasp.gentle=needs.gentle
 end
 local function closeScreens()

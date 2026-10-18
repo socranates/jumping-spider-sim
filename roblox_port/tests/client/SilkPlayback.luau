@@ -446,10 +446,10 @@ return function(driver: any)
   driver.place(Vector3.new(-18,.31,6));driver.input:clear()
   local old=driver.needs.energy;local gentle=driver.needs.gentle;driver.needs.gentle=false;driver.needs.energy=.2;wait(.1)
   local gui=player.PlayerGui:FindFirstChild("SpiderPrompts")
-  local bar=gui and gui:FindFirstChild("FoodBar",true)
-  assert(bar and bar.Visible,"food meter missing")
-  local label=bar:FindFirstChild("FoodText") :: TextLabel
-  assert(string.find(label.Text,"Food") and string.find(label.Text,"hungry"),"food words missing")
+  local bar=gui and gui:FindFirstChild("HungerBar",true)
+  assert(bar and bar.Visible,"hunger meter missing")
+  local label=bar:FindFirstChild("HungerText") :: TextLabel
+  assert(string.find(label.Text,"Hunger") and string.find(label.Text,"hungry"),"hunger words missing")
   driver.needs.energy=old;driver.needs.gentle=gentle
   driver.input:simulate("Jump",true);wait(.25)
   assert(driver.jump:isAiming(),"held jump did not aim")

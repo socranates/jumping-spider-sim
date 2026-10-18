@@ -32,6 +32,13 @@ function LifeText.line(part: string, energy: number, starving: boolean, gentle: 
 	return nil
 end
 
+-- The HUD bar's label (ROBLOX-78), the Minecraft way: the bar is the spider's hunger, FULL when it is fed and emptying as it grows hungry, and
+-- eating fills it. `fed` is the reserve, 0 to 1; the word after it is the same one the line under the day uses.
+function LifeText.hunger(fed: number, gentle: boolean): string
+	local v = math.clamp(fed, 0, 1)
+	return string.format("Hunger %d%%", math.floor(v * 100 + 0.5)) .. (if gentle then " · gentle" elseif v <= 0 then " · starving" elseif v <= 0.25 then " · hungry" else "")
+end
+
 -- The retreat's prompt: asleep, resting, or able to rest (sleep in the evening and at night); nil when none of these. `extra` (the crack's
 -- way to change spider, ROBLOX-31) is added to the resting hint.
 function LifeText.prompt(asleep: boolean, resting: boolean, canRest: boolean, sleepTime: boolean, device: ControlText.Device, extra: string?): Prompt?
@@ -58,7 +65,7 @@ end
 
 -- Housefly-equivalent meals: a small prey counts as half. Partial feeding is retained.
 function LifeText.growth(g: any, required: number, meal: number): string
- if g:isAdult() then return "Adult: keep your food reserves up." end
+ if g:isAdult() then return "Adult: keep your hunger bar full." end
  if g:isMoulting() then return "Moulting: stay in the crack." end
  if g.ready then return "Ready to moult: rest in the crack." end
  local goal = math.ceil(required / meal)

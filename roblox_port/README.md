@@ -102,6 +102,6 @@ The notebook includes an optional **To try** checklist (C or Y/Triangle inside t
 
 ## Player feedback update (2026-10-18)
 
-Hold Jump and use the **left stick** to aim; the right stick still works. Release to leap, Circle/B to cancel. The food bar shows reserves; the growth line estimates housefly-sized meals until the next moult. Small tan/red-eyed fruit flies give smaller meals. Explore the additional Pilea leaves and upper wooden ledge. In spider-eye view the centre stays coloured with a softly greyed surround; this is an illustration, not an exact simulation. Hold a jump to see the brace/crouch and rear-leg extension; slow motion makes it easier to observe. Reduced Motion keeps the extra poses calm.
+Hold Jump and use the **left stick** to aim; the right stick still works. Release to leap, Circle/B to cancel. The hunger bar (full when your spider is fed, emptying as it grows hungry) shows its reserves; the growth line estimates housefly-sized meals until the next moult. Small tan/red-eyed fruit flies give smaller meals. Explore the additional Pilea leaves and upper wooden ledge. In spider-eye view the centre stays coloured with a softly greyed surround; this is an illustration, not an exact simulation. Hold a jump to see the brace/crouch and rear-leg extension; slow motion makes it easier to observe. Reduced Motion keeps the extra poses calm.
 
 Full scope, science caveats and test evidence: `docs/HANDOFF-roblox-player-feedback.md` in the repository root.

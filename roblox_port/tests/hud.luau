@@ -7,6 +7,7 @@
 local Shapes = require("../src/Shared/UI/PerceptionShapes")
 local View = require("../src/Shared/UI/PerceptionView")
 local PerceptionHud = require("../src/Client/PerceptionHud")
+local SpiderHud = require("../src/Client/SpiderHud")
 
 local passed, failed = 0, 0
 local function check(ok: boolean, what: string)
@@ -340,6 +341,34 @@ do
 	check(#direct.rings == 1 and direct.rings[1].alpha == 0.85 and direct.labels[1].text == "fly-like prey" and direct.labels[1].offset == 20, "the pure view is as it was: alpha 0.85, the label's words, the gap radius + 8")
 	draw(hud, { contact({ position = Vector3.new(0, 5, -10), inspected = true }) })
 	check(hud.view.labels[1].text == shown(parent, "Label")[1].Text and hud.view.rings[1].alpha == 0.85, "and the drawer follows it")
+end
+
+-- the hunger bar (ROBLOX-78): the old food bar, renamed; full when fed, emptying as the spider grows hungry
+do
+	local parent = Instance.new("Folder")
+	local hud = SpiderHud.new(parent)
+	local function bar(v: number?, gentle: boolean?, large: boolean?): (any, any, any)
+		hud:update({ device = "keyboard", food = v, foodGentle = gentle, largeText = large }, 0.016)
+		return named(parent, "HungerBar")[1], named(parent, "HungerFill")[1], named(parent, "HungerText")[1]
+	end
+	local b, f, t = bar(1)
+	check(b ~= nil and f ~= nil and t ~= nil and #named(parent, "FoodBar") == 0 and #named(parent, "FoodText") == 0, "the bar is the Hunger bar; no FoodBar is left")
+	check(b.Visible and f.Size.X.Scale == 1 and t.Text == "Hunger 100%", "a fed spider: a full bar that says Hunger 100%")
+	b, f, t = bar(0.55)
+	check(f.Size.X.Scale == 0.55 and t.Text == "Hunger 55%", "the fill is the reserve")
+	b, f, t = bar(0.2)
+	check(t.Text == "Hunger 20% · hungry" and f.BackgroundColor3.R > f.BackgroundColor3.G, "hungry at a quarter, and the fill turns amber-brown")
+	b, f, t = bar(0)
+	check(f.Size.X.Scale == 0 and t.Text == "Hunger 0% · starving", "empty is starving")
+	b, f, t = bar(0, true)
+	check(t.Text == "Hunger 0% · gentle", "gentle play never says starving")
+	b, f, t = bar(0.5, false, true)
+	check(t.TextSize == 24, "large text")
+	b = bar(nil)
+	check(not b.Visible, "no reserve in the view: the bar is hidden")
+	for _, d in parent:GetDescendants() do
+		if d.ClassName == "TextLabel" and type(d.Text) == "string" and d.Text ~= "" then check(not string.find(string.lower(d.Text), "food"), "no word 'food' on the screen: " .. d.Text) end
+	end
 end
 
 print(`HUD passed={passed} failed={failed}`)

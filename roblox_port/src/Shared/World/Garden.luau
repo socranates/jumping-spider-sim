@@ -13,6 +13,10 @@
 -- same garden forever, and a drawn thing that the low tier drops (`full`) never moves what the low tier keeps. The physical pieces are the walkable world: the
 -- motor walks their faces, RivalRoute builds the region's graph from them. A drawn record is one part (Habitat/Scenery.look builds them); the region's budget
 -- (Region.budget) is a ceiling the placer keeps to at both tiers, and tests/world.luau holds the counts.
+-- ROBLOX-96 (W3, garden life): the bed's life is placed here too, from the same seed: `prey(region)` is the bed's perch and vent list for a Prey/PreyDirector
+-- (on the soil, the mounds' and stones' tops, under the dock's leaves for the gnats; on the plants' leaves and the dock's stem for the aphids, which only walk),
+-- and `bugs(region)` the woodlice's starting places and the spots they hide in (under the big stone, at the other stones' feet, under the litter). The wall's look
+-- gains the descent's dressing: lichen on the brick, a weathered course and cobweb strands in the corner under the outer sill.
 local Flora = require(script.Parent.Parent.Data.Flora)
 local WorldMap = require(script.Parent.WorldMap)
 
@@ -93,6 +97,16 @@ Garden.BED = {
 	twigs = { count = 9, length = { 2, 6 }, width = 0.18, colors = { "5a4632", "6b5640", "4a3a2a" } },
 	pebbles = { count = 24, size = { 0.25, 0.8 }, colors = { "a9a59c", "938f87", "bdb8ad", "7f7b74" } },
 	mottle = { count = 12, size = { 3, 8 }, colors = { "3f3126", "54412f", "463729" } },
+	-- ROBLOX-96: the bed's life. Perches: shelter and food as the sill's (0..1); `soil` perches are seeded free spots on the soil; the gnats' vents are two more
+	-- (they come up out of the soil); the aphids' vents sit at the plants (an aphid appears on a free plant perch within `reach`). `target`: how many prey the bed holds.
+	prey = {
+		target = 6, soil = 8, vents = 2, ventNear = { 4, 9 }, -- (a gnat's vent lies 4 to 9 studs from some soil perch, so an entry flight of at least 4 exists)
+		shelter = { soil = 0.2, mound = 0.15, stone = 0.1, under = 0.6, leaf = 0.3, stem = 0.35 },
+		food = { soil = 0.1, mound = 0.1, stone = 0.05, under = 0.5, leaf = 0.5, stem = 0.5 }, -- (the plants are where the food is, as the sill's rim is: the gradient the fly model moves on)
+		reach = { dock = 8, dandelion = 6 },
+	},
+	-- the woodlice: how many, and the litter they hide under (the first few of the litter kept at the low tier, so a hiding place is always drawn)
+	woodlice = { count = 4, litterSpots = 3 },
 }
 
 -- ---------------------------------------------------------------- the pieces
@@ -399,6 +413,34 @@ local function wallDecor(region: WorldMap.Region, budget: { full: number, low: n
 		add({ id = "Algae" .. i, size = v(w, between(erand, 1.5, 5), 0.006), at = v(W.west + (i - 0.5) * (W.east - W.west) / 10 + between(erand, -2, 2), W.foot + between(erand, 1, 3), face - 0.002),
 			color = hex("4f6a36"), material = "Grass", transparency = 0.4, full = true, group = "Weather" })
 	end
+	-- ROBLOX-96, the descent's dressing. Cobweb strands in the corner under the outer sill (both tiers for the two long ones: they are what the spider passes on
+	-- its way down), lichen patches on the brick and one weathered course whose bricks have lost their faces (full tier).
+	local drand = rng(region.seed, 19)
+	local corner = if drand() < 0.5 then slab.lo.X else slab.hi.X
+	local inward = if corner < 0 then 1 else -1
+	local strands = {
+		{ a = v(corner + inward * 0.2, W.under - 0.05, face - 0.35), b = v(corner + inward * between(drand, 2.4, 3.6), W.under - between(drand, 2.6, 3.8), face - 0.03), full = false },
+		{ a = v(corner + inward * 0.1, W.under - 0.6, face - 0.03), b = v(corner + inward * between(drand, 1.6, 2.6), W.under - 0.05, face - between(drand, 0.5, 0.9)), full = false },
+		{ a = v(corner + inward * between(drand, 0.8, 1.4), W.under - 0.05, face - 0.25), b = v(corner + inward * between(drand, 1.8, 2.4), W.under - between(drand, 1.2, 1.8), face - 0.04), full = true },
+	}
+	for i, s in strands do
+		local d = s.b - s.a
+		local yaw = math.deg(math.atan2(-d.Z, d.X))
+		local tilt = math.deg(math.asin(math.clamp(d.Y / d.Magnitude, -1, 1)))
+		add({ id = "Cobweb" .. i, size = v(d.Magnitude, 0.012, 0.012), at = (s.a + s.b) * 0.5, turn = v(0, yaw, tilt), shape = "Cylinder", color = hex("e8e4d8"), material = "Glass",
+			transparency = 0.45, full = s.full, group = "Weather" })
+	end
+	for i = 1, 8 do
+		local w = between(drand, 0.6, 1.8)
+		add({ id = "Lichen" .. i, size = v(w, w * between(drand, 0.55, 0.9), 0.008), at = v(between(drand, W.west + 4, W.east - 4), between(drand, -72, -16), face - 0.003),
+			turn = v(0, 0, drand() * 360), shape = "Ellipsoid", color = hex(pick({ "b9b78f", "c7c4a2", "9fa97d", "d0cdb2" }, drand)), material = "Plaster", full = true, group = "Weather" })
+	end
+	local weathered = W.under - K.joint / 2 - course * (6 + math.floor(drand() * 5)) -- the top of one course between the sixth and the tenth below the slab
+	for i = 1, 6 do
+		local w = between(drand, 3, 9)
+		add({ id = "Erode" .. i, size = v(w, K.height * between(drand, 0.5, 0.9), 0.01), at = v(between(drand, W.west + 3, W.east - 3), weathered - K.height / 2, face - 0.004),
+			color = hex(pick({ "6e3a2a", "7b4433", "8a5540" }, drand)), material = "Concrete", transparency = 0.15, full = true, group = "Weather" })
+	end
 	return list
 end
 
@@ -532,10 +574,11 @@ end
 -- ---------------------------------------------------------------- the questions Region asks
 -- The budgets: the most drawn parts a region of the kind may carry at each tier. They are what the generators place now (tests/world.luau builds the looks and
 -- holds each tier to them exactly, so a look that grows says so here); the placers stop at them (`sheet`), keeping what they place first. All three together
--- are 551 parts at full and 216 at low, beside the sill's 1,178 and 314.
+-- are 568 parts at full and 218 at low, beside the sill's 1,178 and 314 (ROBLOX-96: the wall's 93/73 became 110/75 with the descent's dressing: three cobweb
+-- strands, eight lichen patches and six eroded faces; nothing moved).
 Garden.BUDGETS = {
 	outer_sill = { full = 94, low = 36 },
-	house_wall = { full = 93, low = 73 },
+	house_wall = { full = 110, low = 75 },
 	bed = { full = 364, low = 107 },
 } :: { [string]: { full: number, low: number } }
 
@@ -603,6 +646,163 @@ function Garden.drawnBySill(region: WorldMap.Region): { string }
 	if region.kind == "outer_sill" then
 		for _, half in Flora.garden.box.boxes do table.insert(out, half.id) end
 	end
+	return out
+end
+
+-- ---------------------------------------------------------------- the bed's life (ROBLOX-96)
+export type Perch = { id: string, position: Vector3, normal: Vector3, shelter: number, food: number, start: boolean, walker: boolean?, kind: string }
+export type Vent = { id: string, position: Vector3, normal: Vector3, walker: boolean?, reach: number? }
+export type PreySpec = { perches: { Perch }, vents: { Vent }, target: number, seed: number, prefix: string }
+export type HideSpot = { pos: Vector3, kind: string }
+export type BugSpec = { woodlice: { { pos: Vector3, heading: Vector3 } }, hides: { HideSpot }, seed: number }
+
+local preyCache: { [string]: PreySpec } = {}
+local bugsCache: { [string]: BugSpec } = {}
+
+-- The standing boxes of the bed (everything on the soil but the soil), and a seeded free spot on the soil clear of them by `margin` (nil after forty tries).
+local function standingOf(region: WorldMap.Region): { Box }
+	local B = Garden.BED
+	local standing: { Box } = {}
+	for _, p in Garden.pieces(region) do
+		if p.lo.Y <= B.top + 0.01 and p.id ~= "bed_a_soil" then table.insert(standing, { min = p.lo, max = p.hi }) end
+	end
+	return standing
+end
+local function freeSpot(rand: () -> number, standing: { Box }, taken: { Vector3 }, margin: number, apart: number): Vector3?
+	local B = Garden.BED
+	for _ = 1, 40 do
+		local x, z = between(rand, B.x0 + 2, B.x1 - 2), between(rand, B.z0 + 2, B.z1 - B.landing - 1)
+		local ok = true
+		for _, b in standing do
+			if x > b.min.X - margin and x < b.max.X + margin and z > b.min.Z - margin and z < b.max.Z + margin then ok = false; break end
+		end
+		if ok then
+			for _, t in taken do
+				if (Vector3.new(x, 0, z) - Vector3.new(t.X, 0, t.Z)).Magnitude < apart then ok = false; break end
+			end
+		end
+		if ok then
+			local p = v(x, B.top, z)
+			table.insert(taken, p)
+			return p
+		end
+	end
+	return nil
+end
+
+-- The bed's perches and vents for its prey director, from the region's own boxes and seed: the gnats' on the soil (seeded free spots), on every mound's and
+-- stone's top and under the dock's leaves; the aphids' (walker perches) on the dock's leaves and stem and the dandelion's leaves; the gnats' vents two more spots
+-- on the soil, the aphids' at the plants. Perches sit exactly on a box's face (the director's graph casts for the face and keeps only what it finds).
+function Garden.prey(region: WorldMap.Region): PreySpec?
+	if region.kind ~= "bed" then return nil end
+	local key = region.id .. "/" .. tostring(region.seed)
+	local cached = preyCache[key]
+	if cached ~= nil then return cached end
+	local B, P = Garden.BED, Garden.BED.prey
+	local pieces = Garden.pieces(region)
+	local byId: { [string]: Piece } = {}
+	for _, p in pieces do byId[p.id] = p end
+	local perches: { Perch } = {}
+	local vents: { Vent } = {}
+	local function perch(id: string, pos: Vector3, normal: Vector3, kind: string, start: boolean, walker: boolean?)
+		table.insert(perches, { id = id, position = pos, normal = normal, shelter = P.shelter[kind], food = P.food[kind], start = start, walker = walker, kind = kind })
+	end
+	local standing = standingOf(region)
+	local taken: { Vector3 } = {}
+	local rand = rng(region.seed, 61)
+	-- the soil: seeded free spots about three studs apart at least, the first two the gnats' starts
+	local soilSpots: { Vector3 } = {}
+	for i = 1, P.soil do
+		local spot = freeSpot(rand, standing, taken, 0.8, 3)
+		if spot then perch(`{region.id}_soil_{i}`, spot, Vector3.yAxis, "soil", i <= 2); table.insert(soilSpots, spot) end
+	end
+	-- the mounds' and the stones' tops
+	for _, p in pieces do
+		if string.find(p.id, "_mound_", 1, true) ~= nil then
+			perch(p.id .. "_top", v((p.lo.X + p.hi.X) / 2, p.hi.Y, (p.lo.Z + p.hi.Z) / 2), Vector3.yAxis, "mound", false)
+		elseif p.id == "bed_a_stone_top" or string.find(p.id, "_stone_%a$") ~= nil then
+			perch(p.id .. "_top", v((p.lo.X + p.hi.X) / 2, p.hi.Y, (p.lo.Z + p.hi.Z) / 2), Vector3.yAxis, "stone", false)
+		end
+	end
+	-- the dock: under each leaf for the gnats (the first a start), on each leaf and on the stem's side for the aphids (the first leaf and the stem starts)
+	local stem = byId[region.id .. "_dock_stem"]
+	if stem ~= nil then
+		for i = 1, 3 do
+			local leaf = byId[`{region.id}_dock_leaf_{i}`]
+			if leaf ~= nil then
+				local cx, cz = (leaf.lo.X + leaf.hi.X) / 2, (leaf.lo.Z + leaf.hi.Z) / 2
+				perch(leaf.id .. "_under", v(cx, leaf.lo.Y, cz), -Vector3.yAxis, "under", i == 1)
+				perch(leaf.id .. "_top", v(cx, leaf.hi.Y, cz), Vector3.yAxis, "leaf", i == 1, true)
+			end
+		end
+		perch(stem.id .. "_side", v(stem.hi.X, B.top + 3.5, (stem.lo.Z + stem.hi.Z) / 2), Vector3.xAxis, "stem", true, true)
+		table.insert(vents, { id = region.id .. "_vent_dock", position = v(stem.hi.X + 1.2, B.top, (stem.lo.Z + stem.hi.Z) / 2), normal = Vector3.yAxis, walker = true, reach = P.reach.dock })
+	end
+	-- the dandelion's rosette: walker perches, the first a start
+	local stalk = byId[region.id .. "_dandelion_stalk"]
+	if stalk ~= nil then
+		for i = 1, 4 do
+			local leaf = byId[`{region.id}_dandelion_leaf_{i}`]
+			if leaf ~= nil then perch(leaf.id .. "_top", v((leaf.lo.X + leaf.hi.X) / 2, leaf.hi.Y, (leaf.lo.Z + leaf.hi.Z) / 2), Vector3.yAxis, "leaf", i == 1, true) end
+		end
+		table.insert(vents, { id = region.id .. "_vent_dandelion", position = v(stalk.hi.X + 0.3, B.top + 0.25, stalk.hi.Z + 0.3), normal = Vector3.yAxis, walker = true, reach = P.reach.dandelion })
+	end
+	-- the gnats' vents: two more spots on the soil within an entry flight of a soil perch, listed first and third so neither kind of entry always comes first
+	for i = 1, P.vents do
+		local spot: Vector3? = nil
+		for _ = 1, 12 do
+			local try = freeSpot(rand, standing, taken, 0.8, 2)
+			if try == nil then break end
+			for _, sp in soilSpots do
+				local d = (sp - try).Magnitude
+				if d >= P.ventNear[1] and d <= P.ventNear[2] then spot = try; break end
+			end
+			if spot ~= nil then break end
+		end
+		if spot then table.insert(vents, math.min(1 + (i - 1) * 2, #vents + 1), { id = `{region.id}_vent_soil_{i}`, position = spot, normal = Vector3.yAxis }) end
+	end
+	local out: PreySpec = { perches = perches, vents = vents, target = P.target, seed = region.seed, prefix = region.id .. "_fly_" }
+	preyCache[key] = out
+	return out
+end
+
+-- The bed's woodlice: their starting places on the soil (seeded free spots) and the spots they hide in: the mouth and the back of the gap under the big stone, the
+-- foot of each other stone, and a few of the fallen leaves the low tier keeps.
+function Garden.bugs(region: WorldMap.Region): BugSpec?
+	if region.kind ~= "bed" then return nil end
+	local key = region.id .. "/" .. tostring(region.seed)
+	local cached = bugsCache[key]
+	if cached ~= nil then return cached end
+	local B, L = Garden.BED, Garden.BED.woodlice
+	local hides: { HideSpot } = {}
+	for _, t in region.retreats do
+		local cx = (t.min.X + t.max.X) / 2
+		table.insert(hides, { pos = v(cx, B.top, t.max.Z + 0.6), kind = "stone" })
+		table.insert(hides, { pos = v(cx, B.top, t.min.Z - 0.6), kind = "stone" })
+	end
+	for _, p in Garden.pieces(region) do
+		if string.find(p.id, "_stone_%a$") ~= nil then table.insert(hides, { pos = v((p.lo.X + p.hi.X) / 2, B.top, p.lo.Z - 0.4), kind = "stone" }) end
+	end
+	local litter = 0
+	for _, d in Garden.decor(region) do
+		if litter < L.litterSpots and string.sub(d.id, 1, 6) == "Litter" and not d.full then
+			litter += 1
+			table.insert(hides, { pos = v(d.at.X, B.top, d.at.Z), kind = "litter" })
+		end
+	end
+	local standing = standingOf(region)
+	local taken: { Vector3 } = {}
+	local rand = rng(region.seed, 67)
+	local lice: { { pos: Vector3, heading: Vector3 } } = {}
+	for _ = 1, L.count do
+		local spot = freeSpot(rand, standing, taken, 1.0, 5)
+		if spot then
+			local a = rand() * TAU
+			table.insert(lice, { pos = spot, heading = v(math.cos(a), 0, math.sin(a)) })
+		end
+	end
+	local out: BugSpec = { woodlice = lice, hides = hides, seed = region.seed }
+	bugsCache[key] = out
 	return out
 end
 

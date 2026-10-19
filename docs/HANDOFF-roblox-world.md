@@ -138,4 +138,60 @@ What is in it:
   rather they were bushes to the ground (they would hide more of the garden).
 - The wall above the outer sill is drawn but not climbable this round; the outer sill's ends and the wall's shoulders are the edges of the world.
 
-*(W3 — garden life, W4 — nature's rules and W5 — no hand holding will be appended here as they land.)*
+## W3 — garden life (ROBLOX-96)
+
+Claude → Chet, 2026-10-19, same branch and bundle. The bed under the window has its first life: fungus gnats and aphids as prey (the gnats fly short flights, the aphids
+only walk the dock's and the dandelion's leaves and stems), four woodlice that walk the soil and go under the big stone, the other stones' feet or the litter when the spider
+comes within four studs (not prey: nothing can catch them, and the senses see them as movement only), the gap under the stone as a home in the words ("Home: under the
+stone", "Resting under the stone", "Last rest kept, under the stone."), the wall dressed for the descent (lichen, one weathered course, cobweb strands in the corner under
+the outer sill), the game's line long enough for the 90 cm let-down (`SilkController.game.maxLine` = 100 studs; Godot's 20 untouched as the default), a notebook page
+("Life on the ground", opened by the first step onto the bed), and rests that keep the bed's prey and woodlice where they were. `docs/DECISIONS.md` ROBLOX-96 has the numbers
+and the reasons. CLI at the closing commit: strict clean, 146/146 modules compile, all 38 suites green (the README has the counts; the new suite is `garden_life`). **Nothing
+of it has run in Studio.** The sill plays as it did: its flies, their seeds and every sill golden are pinned unchanged.
+
+What is in it:
+
+- **Prey per region** (`Shared/Prey/PreyWorld`, kept as `M.World.prey` in the client): the sill's director is the one the client always had; the bed's is made from
+  `Shared/World/Garden.prey(bed_a)` (28 perches on the soil, the mounds' and stones' tops, under and on the dock's leaves, the stem and the dandelion's rosette; four vents)
+  with the bed's own seed, the first time the bed has arrived whole (`WorldClient:regionReady`) with the spider in it or near its foot on the wall, and it keeps its own
+  random streams and its own clock ever after: leave and it waits, come back and it goes on. Six prey in the bed: three gnats, three aphids; the population replaces what is
+  eaten (gnats fly in from the soil, aphids appear on a free plant perch out of sight). One jaws: every director eats with the sill's `Feeding`.
+- **Woodlice** (`Shared/Prey/Woodlouse`, drawn by `Client/BugBodies`, 24 parts each, four in the bed): seeded on free soil, slow walkers that steer round the mounds, the
+  stones and the plants, hide within four studs of the spider and come out 8 to 15 s after it is six studs away.
+- **The wall's look** is 110 parts at full and 75 at low (93/73 before): three cobweb strands (two at both tiers), eight lichen patches and six eroded faces on one course.
+  Nothing moved, so `WorldMap.REVISION` stays `world-2` and every v32 rest comes back where it was.
+- **Saves**: the record gains an optional `garden` root (`{ bed_a = { prey, bugs } }`) beside the sill's `prey`, which is byte for byte what it was; a v32 record (no garden)
+  restores unchanged and leaves the bed's live prey as it is. `SCHEMA_VERSION` and `CONTENT_REVISION` unchanged.
+
+## Your Studio checklist (W3)
+
+1. **Walk out and down** (the W2 route): out through the opening, over the stone, down the brick (walking) to the bed. Output should carry no `[Windowsill] world:` warning
+   on the way; if "bed_a ... has not arrived whole" appears, the bed's prey will not exist until it does (that is the gate working; tell us how long it took).
+2. **See a gnat and an aphid in the bed.** Gnats (dark, about 3 mm, one pair of wings) sit on the soil, the mounds and under the dock's leaves and flit short flights; aphids
+   (green, pear-shaped, under 3 mm) sit on the dock's and the dandelion's leaves and the dock's stem and only shuffle. Watch for a minute: a gnat should fly at least once;
+   no aphid should ever fly or leave its leaf. `print(#workspace.Flies:GetChildren())` in the bed should be 6 (their names begin `bed_a_fly_`).
+3. **Catch each and read the meal line.** A gnat is easier than a fruit fly (fewer taps), an aphid easiest. While one is in the jaws the growth line should read
+   "3 gnats = 1 housefly" or "6 aphids = 1 housefly" and count in tenths ("0.3 of 5 meals"); with nothing held, the old "2 small prey = 1 housefly" in halves.
+4. **A woodlouse hides and returns.** `workspace.Bugs` holds four; walk up to one: within about four studs it makes for the big stone's gap, a stone's foot or a fallen leaf and
+   goes under (it is drawn a stud and a half under the soil); wait six studs away and it comes back out within about fifteen seconds. A jump or a strike through one catches
+   nothing, and the perception HUD may show it as movement, never as prey.
+5. **Rest under the stone and read the home line.** Near the stone the line says "Home: under the stone" and how to get in; under it "Under the stone" / E: rest; resting
+   "Resting under the stone"; the notice "Last rest kept, under the stone." On the sill every word is as it was.
+6. **The descent on the line.** From the outer sill's front edge, F: the spider walks to the edge, drops, and with F held lets down at 0.75 studs a second past the cobwebbed
+   corner and the lichened brick, about two minutes to the soil; it lands on the soil, the line is released, the day line runs at the bed's pace. Watch the camera against
+   the wall on the way. If the hang stops short (20 studs down), the game's line length did not take: tell us.
+7. **The page appears** on the first step onto the bed: "Life on the ground" in the notebook, once.
+8. **Leave and rejoin.** Rest under the stone, note where a gnat and a woodlouse are, leave the game, rejoin and return to the rest: the bed's prey and woodlice should be where
+   they were (not rerolled), the sill's flies as before.
+9. **Output stays clean**: no `[Windowsill] world:` or `[Windowsill] decor:` warnings through all of it; no `[Windowsill] checkpoint refused` on the return.
+10. **Parts and frame time** at both tiers, on the PC and when you can on the PlayStation or a phone: the bed adds at most 6 prey (22 or 15 parts each) and 4 woodlice (24 each),
+    about 200 parts, and the wall's look 17 more at full; the sill's flies are not drawn while the spider is in the bed.
+
+## Open for Nathan (W3)
+
+- The bed's prey count (six: three gnats, three aphids) and the woodlice (four): more, fewer?
+- The game's line length (100 studs) for the let-down: long enough for the wall and nothing else; say if the hang should stop part way and make the spider walk the rest.
+- Whether the woodlice should show to the senses at all (they are movement now, as the wasp and the rival are) or be invisible to the perception HUD.
+- The aphids only shuffle on one leaf (no walk from leaf to leaf); say if they should wander the plant.
+
+*(W4 — nature's rules and W5 — no hand holding will be appended here as they land.)*

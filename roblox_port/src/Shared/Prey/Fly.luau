@@ -1,6 +1,8 @@
 --!strict
 -- Fly's evidence-owned decisions, reactions, flights, glances and surface bursts.
 -- Sources: frozen fly.gd and fly_mind.gd. Geometry and random stream are explicit dependencies.
+-- ROBLOX-96: a profile whose body says `walker` (the aphid, Data/Species) never launches: `launch` refuses every flight, so FlyFlight is never used for it, and
+-- startled it freezes on its perch instead of turning to face the threat. Godot's profiles have no such field, so nothing of theirs is touched.
 local M=require(script.Parent.PreyMath)
 local S=require(script.Parent.FlySenses)
 local F=require(script.Parent.FlyFlight)
@@ -79,6 +81,7 @@ function Fly.choose(self: any,kind: string,now: number,threat: number,relaxed: b
  return nil,nil
 end
 function Fly.launch(self: any,kind: string,now: number): boolean
+ if self.profile.body.walker then return false end -- (ROBLOX-96: a walker never flies)
  local target,path=self:choose(kind,now,if kind=='flee' then 1 else 0)
  if not path and kind=='flee' then target,path=self:choose(kind,now,1,true) end
  if not path and kind=='flee' then
@@ -144,6 +147,7 @@ function Fly.rest(self: any,now: number,dt: number)
  local p=self.profile.behavior
  if self.state=='ALERT' then
   self.groomUntil=0;self.fidgetUntil=0;self.glanceTarget=nil
+  if self.profile.body.walker then return end -- (ROBLOX-96: a walker freezes)
   if self.senses.hasLastSeen then local d=self.senses.lastSeenPosition-self.position;local flat=d-self.normal*d:Dot(self.normal);if flat.Magnitude>.001 then self:turn(flat.Unit,dt) end end
   return
  end

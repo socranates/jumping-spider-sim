@@ -10,7 +10,10 @@ local DOWN = Vector3.new(0,-1,0)
 -- reel speed (Species silk.reel_speed_wu_s, 1.5 studs a second either way). Nathan: "make the hang just go slower by default". Lowering (the stick back, or
 -- the drop key held) runs at `lowerScale` of it; reeling in keeps Godot's speed, so the climb back is as brisk as it was and the rig's head-up climb
 -- (look.hang.climb.speed) still trips. A controller never given the rule (Silk:useGameRules) replays Godot: the tether goldens and the box-world scenarios.
-Silk.game = { lowerScale = 0.5 }
+-- ROBLOX-96: and how long a line may be. Godot's 20 studs (silk.max_line_length_wu) was never reached on the sill; the garden's first set piece is the let-down from
+-- the outer sill's front edge to the bed, 90 studs of brick, so the game's line is `maxLine` studs (a game value: jumping spiders do descend on draglines far
+-- farther than their body length, but no measured length is claimed here). Everything else about the line (the slack, the hang, the release) is Godot's.
+Silk.game = { lowerScale = 0.5, maxLine = 100 }
 
 function Silk.new(world, surfaces, tuning, gravity: number)
 	local params = RaycastParams.new()
@@ -25,6 +28,7 @@ end
 -- Opt in to the game's lowering (Silk.game): the let-down at lowerScale of the reel speed. Reeling in is untouched.
 function Silk.useGameRules(self: any)
 	self.lowerSpeed = self.speed * Silk.game.lowerScale
+	self.maximum = Silk.game.maxLine
 end
 function Silk.profile(self: any, hit)
 	return if hit then self.surfaces[hit.Instance:GetAttribute("ProfileId")] else nil

@@ -132,6 +132,7 @@ local motor: any = SpiderMotor.new({
 	world = M.World.root, surfaces = Surfaces, profile = Species.phidippus_audax_prototype,
 	spawn = M.World.spawnPos, heading = M.World.spawnHeading,
 	boundsMin = M.World.boundsMin, boundsMax = M.World.boundsMax, probeParent = arc,
+	inBounds = function(p: Vector3): boolean return M.World:inBounds(p) end, -- (ROBLOX-95: out of the world only where no region holds the spider)
 })
 local jump: any = JumpInput.new()
 local carry: any = StickCarry.new()
@@ -166,6 +167,8 @@ task.spawn(function()
 	local roots: { Instance } = { Lighting }
 	local decor = Workspace:WaitForChild("Decor", 10)
 	if decor then table.insert(roots, decor) end
+	local looks = M.World.looks or Workspace:WaitForChild("WorldDecor", 10) -- (ROBLOX-95: the looks of the regions outside the window)
+	if looks then table.insert(roots, looks) end
 	local terrain = Workspace:FindFirstChild("Terrain")
 	if terrain then table.insert(roots, terrain) end
 	WorldDetail.apply(detail, roots)
@@ -1569,7 +1572,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
              rivalLegs.drive=rivalLegs.Drive.new(SpiderMotor.new({
               world = M.World.root, surfaces = Surfaces, profile = Species.phidippus_audax_prototype,
               spawn = life.rival.position, heading = life.rival.heading,
-              boundsMin = M.World.boundsMin, boundsMax = M.World.boundsMax, probeParent = arc,
+              boundsMin = M.World.homeMin, boundsMax = M.World.homeMax, probeParent = arc, -- (ROBLOX-95: bound to the sill, its bounds)
              }),sightCast,M.World.home)
             end
             -- A caught rival fights the tapping grip before it can be eaten (ROBLOX-77); it is subdued, or it tears free and recovers (never a harm).
@@ -1605,7 +1608,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
               mateLegs.drive=mateLegs.Drive.new(SpiderMotor.new({
                world = M.World.root, surfaces = Surfaces, profile = Species.phidippus_audax_prototype,
                spawn = mate.position, heading = mate.heading,
-               boundsMin = M.World.boundsMin, boundsMax = M.World.boundsMax, probeParent = arc,
+               boundsMin = M.World.homeMin, boundsMax = M.World.homeMax, probeParent = arc, -- (ROBLOX-95: bound to the sill, its bounds)
               }),sightCast,M.World.home)
              end
              if mateLegs.drive~=nil and mate~=nil then mateLegs.drive:update(mate,DT,ms) end

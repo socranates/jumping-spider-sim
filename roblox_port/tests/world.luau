@@ -31,7 +31,7 @@ local function piece(id: string)
 end
 
 -- The expansion is additive and climbable, with a continuous old-wall route to the upper shelf.
-check(piece("upper_ledge").lo.Y < piece("back_frame").hi.Y and piece("upper_ledge").lo.Z == piece("back_frame").hi.Z,
+check(piece("upper_ledge").lo.Y < piece("back_frame_west").hi.Y and piece("upper_ledge").lo.Z == piece("back_frame_west").hi.Z,
  "upper garden shelf touches the climbable back wall")
 check(piece("stem_garden").lo.Y == piece("garden_step").hi.Y and piece("stem_garden").hi.Y == piece("leaf_garden").lo.Y,
  "new terracotta step and plant form a continuous climbing route")
@@ -108,7 +108,8 @@ for _, spec in Layout.PIECES do
 end
 check(sillOk and #sill:GetChildren() == #Layout.PIECES, "the sill's pieces keep their geometry, profile, solidity and queryability, and wear the painted colours")
 -- The back wall and the Pilea's leaves and stems are drawn in their place (still solid and climbable, no shadow); nothing else is hidden.
-local expectHidden: { [string]: boolean } = { [W.hidden] = true }
+local expectHidden: { [string]: boolean } = {}
+for _, id in W.hidden do expectHidden[id] = true end
 for _, id in Plants.pieceIds() do expectHidden[id] = true end
 local hiddenOk, hiddenCount = true, 0
 for _, spec in Layout.PIECES do
@@ -120,10 +121,10 @@ for _, spec in Layout.PIECES do
 		hiddenOk = hiddenOk and p.Transparency == 0 and p.CastShadow ~= false
 	end
 end
-check(hiddenOk and hiddenCount == 12, `only the back wall and the Pilea's pieces turn invisible, and they stay solid ({hiddenCount})`)
+check(hiddenOk and hiddenCount == 15, `only the back wall (four pieces round the raised sash, ROBLOX-95) and the Pilea's pieces turn invisible, and they stay solid ({hiddenCount})`)
 -- If a drawing could not be built (Main.server.luau catches that), what it replaces must not be left invisible.
 local plain = Scenery.sill({})
-local plainBack = plain:FindFirstChild("back_frame") :: Part
+local plainBack = plain:FindFirstChild("back_frame_west") :: Part
 local plainLeaf = plain:FindFirstChild("leaf_west") :: Part
 check(plainBack.Transparency == 0 and plainBack.CastShadow ~= false and plainLeaf.Transparency == 0 and #plain:GetChildren() == #Layout.PIECES, "without the drawings the wall and the leaves stay visible")
 
@@ -139,9 +140,11 @@ for _, d in decor:GetDescendants() do
 end
 check(bad == 0, "every decor part is anchored, non-colliding, not touchable and invisible to rays")
 local sameSet = true
-for id in expectHidden do sameSet = sameSet and drawnIds[id] == true end
-for id in drawnIds do sameSet = sameSet and expectHidden[id] == true end
-check(sameSet, "the decor reports exactly the pieces it drew: the wall and the Pilea's leaves, stems and tip")
+local expectDrawn = table.clone(expectHidden)
+for _, id in Plants.windowBoxIds() do expectDrawn[id] = true end -- (ROBLOX-95: the window box's halves are the outer sill's pieces, drawn here)
+for id in expectDrawn do sameSet = sameSet and drawnIds[id] == true end
+for id in drawnIds do sameSet = sameSet and expectDrawn[id] == true end
+check(sameSet, "the decor reports exactly the pieces it drew: the wall, the Pilea's leaves, stems and tip, and the window box's two halves on the outer sill")
 
 -- An optional piece that fails is left out with a warning; the wall and the other pieces stay.
 do
@@ -170,9 +173,9 @@ do
 	local partial, partialDrawn = Scenery.decor(sun)
 	Plants.pilea = realPilea
 	local stand = Scenery.sill(partialDrawn)
-	local leaf, stem, wall = stand:FindFirstChild("leaf_west") :: Part, stand:FindFirstChild("stem_east") :: Part, stand:FindFirstChild(W.hidden) :: Part
+	local leaf, stem, wall = stand:FindFirstChild("leaf_west") :: Part, stand:FindFirstChild("stem_east") :: Part, stand:FindFirstChild(W.hidden[1]) :: Part
 	check(#warned == 1 and string.find(warned[1], "pilea", 1, true) ~= nil and partial:FindFirstChild("Pilea") == nil and partialDrawn.leaf_west == nil and partialDrawn.leaf_tip == nil
-		and partialDrawn[W.hidden] == true and leaf.Transparency == 0 and leaf.CastShadow ~= false and stem.Transparency == 0 and wall.Transparency == 1
+		and partialDrawn[W.hidden[1]] == true and leaf.Transparency == 0 and leaf.CastShadow ~= false and stem.Transparency == 0 and wall.Transparency == 1
 		and partial:FindFirstChild("Garden") ~= nil and partial:FindFirstChild("Planter") ~= nil,
 		"if the Pilea fails, its half-built parts are removed, its pieces stay visible, and the rest of the decor is kept")
 end
@@ -186,47 +189,68 @@ workspace:ClearAllChildren()
 sill.Parent = workspace
 decor.Parent = workspace
 local ray = workspace:Raycast(Vector3.new(0, 8, 0), Vector3.new(0, 0, -30), RaycastParams.new())
-check(ray ~= nil and ray.Instance.Name == "back_frame" and near(ray.Position.Z, -12.5, 1e-6), "a ray across the sill lands on the solid back wall, through the glass")
+check(ray ~= nil and ray.Instance.Name == "back_frame_head" and near(ray.Position.Z, -12.5, 1e-6), "a ray across the sill lands on the solid back wall, through the glass")
+-- ROBLOX-95: the raised sash: a ray low across the sill goes out through the opening (only the sill is in the workspace here), and the rail stops one at its foot
+check(workspace:Raycast(Vector3.new(0, 3, 0), Vector3.new(0, 0, -30), RaycastParams.new()) == nil, "a ray at y 3 goes out through the opening")
+local railRay = workspace:Raycast(Vector3.new(0, 0.35, 0), Vector3.new(0, 0, -30), RaycastParams.new())
+check(railRay ~= nil and railRay.Instance.Name == "back_frame_rail" and near(railRay.Position.Z, -12.5, 1e-6), "and one at y 0.35 meets the sill rail, 0.7 tall")
 local onlyDecor = RaycastParams.new()
 onlyDecor.FilterType = Enum.RaycastFilterType.Include
 onlyDecor.FilterDescendantsInstances = { decor }
 check(workspace:Raycast(Vector3.new(0, 8, 0), Vector3.new(0, 0, -30), onlyDecor) == nil and workspace:Raycast(Vector3.new(5, 5, -30), Vector3.new(0, -9, 0), onlyDecor) == nil, "no ray ever hits a decor part")
 
 -- The drawn wall covers the solid wall's face except the opening, and stays behind the climbable face.
-local plane = piece("back_frame").hi.Z
+local backLo, backHi = Scenery.wallBox()
+local plane = backHi.Z
 local wall = decor:FindFirstChild("Wall")
 local wallParts = wall:GetChildren()
 local maxFront = -math.huge
 for _, p in wallParts do maxFront = math.max(maxFront, p.Position.Z + p.Size.Z / 2) end
 check(near(maxFront, plane, 1e-9), "the trim is flush with the climbable face and nothing of the wall stands in front of it")
-local gaps, samples = 0, 0
-local back = piece("back_frame")
+local gaps, samples, open, openSamples = 0, 0, 0, 0
+local O = W.opening
 for xi = 0, 60 do
 	for yi = 0, 28 do
-		local x = back.lo.X + (back.hi.X - back.lo.X) * (xi + 0.5) / 61
-		local y = back.lo.Y + (back.hi.Y - back.lo.Y) * (yi + 0.5) / 29
+		local x = backLo.X + (backHi.X - backLo.X) * (xi + 0.5) / 61
+		local y = backLo.Y + (backHi.Y - backLo.Y) * (yi + 0.5) / 29
 		local covered = false
 		for _, p in wallParts do
 			local h = p.Size / 2
 			local c = p.Position
 			if math.abs(x - c.X) <= h.X and math.abs(y - c.Y) <= h.Y then covered = true break end
 		end
-		samples += 1
-		if not covered then gaps += 1 end
+		-- ROBLOX-95: the raised sash leaves the opening open: from the sill rail's top to the sash's bottom rail, between the jambs, nothing is drawn
+		if x > O.left and x < O.right and y > O.bottom and y < O.top then
+			openSamples += 1
+			if not covered then open += 1 end
+		else
+			samples += 1
+			if not covered then gaps += 1 end
+		end
 	end
 end
-check(gaps == 0, `the drawn wall and glass cover the whole back wall ({gaps} of {samples} points bare)`)
+check(gaps == 0, `the drawn wall and glass cover the whole back wall but the opening ({gaps} of {samples} points bare)`)
+check(openSamples > 20 and open == openSamples, `and the opening is open: no glass, no wall ({open} of {openSamples} points clear)`)
 local glass = wall:FindFirstChild("Glass")
-check(glass.Transparency >= 0.6 and glass.Position.Z + glass.Size.Z / 2 < plane - 0.02 and near(glass.Size.X, W.right - W.left, 1e-9)
-	and near(glass.Size.Y, W.top - W.bottom, 1e-9), "the glass fills the opening, a little behind the climbable face, mostly clear")
+local paneWest, paneEast = wall:FindFirstChild("GlassWest"), wall:FindFirstChild("GlassEast")
+check(glass.Transparency >= 0.6 and glass.Position.Z + glass.Size.Z / 2 < plane - 0.02 and near(glass.Position.Y - glass.Size.Y / 2, O.top + W.sashRail, 1e-9)
+	and near(glass.Position.Y + glass.Size.Y / 2, W.top, 1e-9) and near(glass.Size.X, O.right - O.left + 2 * W.jambWidth, 1e-9),
+	"the raised sash's pane fills the middle above its bottom rail, a little behind the climbable face, mostly clear")
+check(paneWest ~= nil and paneEast ~= nil and near(paneWest.Size.Y, W.top - W.bottom, 1e-9) and near(paneWest.Position.X - paneWest.Size.X / 2, W.left, 1e-9)
+	and near(paneEast.Position.X + paneEast.Size.X / 2, W.right, 1e-9) and paneWest.Transparency == glass.Transparency, "the side panes are as they were, either side of the opening")
+local rail, sash = wall:FindFirstChild("SillRail"), wall:FindFirstChild("SashRail")
+check(rail ~= nil and near(rail.Position.Y + rail.Size.Y / 2, O.bottom - W.slabGap, 1e-9) and sash ~= nil and near(sash.Position.Y - sash.Size.Y / 2, O.top + W.slabGap, 1e-9)
+	and near(sash.Position.Y + sash.Size.Y / 2, O.top + W.sashRail, 1e-9) and sash.Size.X >= O.right - O.left and sash.Position.Z + sash.Size.Z / 2 < plane,
+	"the sill rail is drawn under the opening and the raised sash's bottom rail across its top, set back in the frame")
+check(wall:FindFirstChild("JambWest") ~= nil and wall:FindFirstChild("JambEast") ~= nil and wall:FindFirstChild("Apron") == nil and wall:FindFirstChild("ApronWest") ~= nil, "jambs line the cut through the wall, and the apron is cut")
 local opening = 0
 for _, p in wallParts do
 	local inset = W.trimWidth + 0.01 -- the trim bars frame the opening's edge
-	if p.Name ~= "Glass" and p.Position.X > W.left + inset and p.Position.X < W.right - inset and p.Position.Y > W.bottom + inset and p.Position.Y < W.top - inset then
-		if not string.find(p.Name, "Mullion") then opening += 1 end
+	if string.sub(p.Name, 1, 5) ~= "Glass" and p.Position.X > W.left + inset and p.Position.X < W.right - inset and p.Position.Y > W.bottom + inset and p.Position.Y < W.top - inset then
+		if not string.find(p.Name, "Mullion") and not string.find(p.Name, "Jamb") and p.Name ~= "SashRail" then opening += 1 end
 	end
 end
-check(opening == 0, "nothing but mullions crosses the opening")
+check(opening == 0, "nothing but mullions, the jambs and the sash's rail crosses the window")
 
 -- The view: beyond the wall, placed so that it shows through the glass from the reference eye.
 local view = decor:FindFirstChild("View")
@@ -236,7 +260,7 @@ for _, p in view:GetChildren() do
 	if p.Name ~= "Ground" then nearest = math.min(nearest, -(p.Position.Z + p.Size.Z / 2)) end -- the ground runs on under the sill, far below
 	if p:GetAttribute("FullOnly") then fullOnly += 1 end
 end
-check(nearest > -piece("back_frame").lo.Z, `the whole view is outside, beyond the wall (nearest {string.format("%.1f", nearest)})`)
+check(nearest > -backLo.Z, `the whole view is outside, beyond the wall (nearest {string.format("%.1f", nearest)})`)
 for _, item in Graphics.view.items do
 	local at, k = Scenery.viewPosition(item.u, item.v, item.depth)
 	local eye = Graphics.view.eye
@@ -382,8 +406,13 @@ local totalPetals = 0
 do
 	local box = find(garden, "WindowBox")
 	local G = Flora.garden
-	check(same(find(box, "Body").Color, "6f8796") and G.box.top <= W.bottom and G.box.z1 < piece(W.hidden).lo.Z and G.box.x0 > W.left - 4 and G.box.x1 < W.right + 4,
+	check(same(find(box, "West", "Body").Color, "6f8796") and same(find(box, "East", "Body").Color, "6f8796") and G.box.top <= W.bottom and G.box.z1 < backLo.Z
+		and G.box.boxes[1].x0 > W.left - 4 and G.box.boxes[2].x1 < W.right + 4,
 		"the window box is blue-grey, outside the wall, and its top is behind the apron")
+	-- ROBLOX-95: in two halves standing on the outer sill (y 0), the stone in front of the raised sash clear between them
+	local westBody, eastBody = find(box, "West", "Body"), find(box, "East", "Body")
+	check(G.box.bottom == 0 and near(westBody.Position.Y - westBody.Size.Y / 2, 0, 1e-9) and westBody.Position.X + westBody.Size.X / 2 <= W.opening.left - 1
+		and eastBody.Position.X - eastBody.Size.X / 2 >= W.opening.right + 1, "in two halves on the stone outer sill, either side of the opening")
 	local heads, petalsOk, headsOk, stemsOk, golden = 0, true, true, true, { f2b705 = true, f6c112 = true, eaa900 = true }
 	for i = 1, #G.flowers do
 		local flower = find(garden, "Flower" .. i)
@@ -470,13 +499,17 @@ do
 end
 do
 	local W2 = Graphics.window
-	local face = piece(W2.hidden).hi.Z - W2.glass.setback
+	local face = piece(W2.hidden[1]).hi.Z - W2.glass.setback
+	local O2 = W2.opening
 	local drops = find(decor, "Condensation")
 	local list, dropOk = drops:GetChildren(), true
 	for _, drop in list do
 		dropOk = dropOk and drop.Material == Mat("Glass") and drop.Size.X >= 0.1 - 1e-9 and drop.Size.X <= 0.4 + 1e-9 and drop.Size.Y >= 0.1 - 1e-9 and drop.Size.Y <= 0.4 + 1e-9
 			and drop.Size.Z <= 0.05 and drop:FindFirstChildWhichIsA("SpecialMesh") ~= nil and drop.Transparency > 0.2
-			and drop.Position.Y > W2.bottom + W2.trimWidth and drop.Position.Y < (W2.bottom + W2.top) / 2 and drop.Position.Z - drop.Size.Z / 2 >= face - 1e-9 and drop.Position.Z < face + 0.05
+			and drop.Position.Y > W2.bottom + W2.trimWidth and drop.Position.Z - drop.Size.Z / 2 >= face - 1e-9 and drop.Position.Z < face + 0.05
+		-- (ROBLOX-95: on a lower pane, or over the opening on the raised sash's pane above its rail: never in the air of the opening)
+		local overOpening = math.abs(drop.Position.X) < O2.right + W2.jambWidth + drop.Size.X / 2
+		dropOk = dropOk and (if overOpening then drop.Position.Y - drop.Size.Y / 2 > O2.top + W2.sashRail and drop.Position.Y < W2.top - W2.trimWidth else drop.Position.Y < (W2.bottom + W2.top) / 2)
 		for _, x in W2.mullions do dropOk = dropOk and math.abs(drop.Position.X - x) > W2.mullionWidth / 2 + drop.Size.X / 2 end
 		dropOk = dropOk and drop.Position.X > W2.left + W2.trimWidth and drop.Position.X < W2.right - W2.trimWidth
 	end
@@ -624,7 +657,8 @@ do
 	for i, p in Layout.PIECES do
 		sum += i * (p.lo.X + 2 * p.lo.Y + 3 * p.lo.Z + 5 * p.hi.X + 7 * p.hi.Y + 11 * p.hi.Z)
 	end
-	check(#Layout.PIECES == 28 and near(sum, 25445.9, 1e-6) and Layout.CONTENT_REVISION == "windowsill-v1" and #Layout.DECOR == 11, `Layout.PIECES is the 28 boxes it was (checksum {sum})`)
+	-- (ROBLOX-95: 28 boxes and 25445.9 until the back frame was opened round the raised sash, one box become four; nothing else in the layout moved)
+	check(#Layout.PIECES == 31 and near(sum, 25125.25, 1e-6) and Layout.CONTENT_REVISION == "windowsill-v1" and #Layout.DECOR == 11, `Layout.PIECES is the 31 boxes it is (checksum {sum})`)
 
 	local sunFull = Vector3.new(0.35, 0.5, -0.8).Unit
 	local fresh = Scenery.decor(sunFull)
@@ -919,16 +953,16 @@ do
 	local holder = Instance.new("Folder")
 	local world = WorldBuild.world(holder)
 	check(Region.WORLD_FOLDER == "World" and world.Name == "World" and world.Parent == holder and #holder:GetChildren() == 1, "the physical world is one folder named World")
-	check(#WorldMap.regions() == 1 and #world:GetChildren() == #WorldMap.regions() and world:GetChildren()[1].Name == "Windowsill", "with a folder for every region; the sill's is still called Windowsill")
+	check(#WorldMap.regions() == 4 and #world:GetChildren() == #WorldMap.regions() and world:GetChildren()[1].Name == "Windowsill", "with a folder for every region; the sill's is still called Windowsill")
 	local inWorld = world:FindFirstChild("Windowsill") :: Folder
 	check(#inWorld:GetChildren() == #Layout.PIECES and dumpFolder(inWorld) == dumpFolder(Scenery.sill()),
 		"the sill's folder inside World is exactly the one Scenery.sill makes: every part's name, size, place, solidity, looks and attributes")
 	local drawn = WorldBuild.world(Instance.new("Folder"), WorldMap.SEED, drawnIds):FindFirstChild("Windowsill") :: Folder
 	check(dumpFolder(drawn) == dumpFolder(Scenery.sill(drawnIds)), "the same with the decor's own list of the pieces it drew")
 	local undrawn = WorldBuild.world(Instance.new("Folder"), WorldMap.SEED, {}):FindFirstChild("Windowsill") :: Folder
-	check(dumpFolder(undrawn) == dumpFolder(Scenery.sill({})) and (undrawn:FindFirstChild("back_frame") :: Part).Transparency == 0, "and with none (the decor failed): nothing is hidden")
+	check(dumpFolder(undrawn) == dumpFolder(Scenery.sill({})) and (undrawn:FindFirstChild("back_frame_west") :: Part).Transparency == 0, "and with none (the decor failed): nothing is hidden")
 	check(dumpFolder(WorldBuild.world(Instance.new("Folder"), 1234):FindFirstChild("Windowsill") :: Folder) == dumpFolder(Scenery.sill()), "another world seed builds the same hand-placed sill")
-	check(not pcall(WorldBuild.region, { id = "bed_a", kind = "bed" } :: any, Instance.new("Folder")), "a region of a kind with no generator is refused, not built empty")
+	check(not pcall(WorldBuild.region, { id = "pond_1", kind = "pond", seed = 1, retreats = {} } :: any, Instance.new("Folder")), "a region of a kind with no generator is refused, not built empty")
 	-- The part-making any later kind of region will be built with: its own boxes, named for them, solid, hidden when a drawing stands in for one.
 	local invented: { Layout.Piece } = {
 		{ id = "mound_1", lo = Vector3.new(40, 0, 0), hi = Vector3.new(44, 1, 3), profile = Layout.PIECES[1].profile, color = Color3.fromRGB(90, 70, 50) },
@@ -985,6 +1019,125 @@ do
 	local down = workspace:Raycast(at + Vector3.new(0, 5, 0), Vector3.new(0, -10, 0), RaycastParams.new())
 	check(down ~= nil and down.Instance ~= carolsFocus and down.Instance:IsDescendantOf(workspace:FindFirstChild("World") :: Instance), "a ray down through the focus meets the sill, not the focus")
 	check(not carolsFocus:IsDescendantOf(workspace:FindFirstChild("World") :: Instance), "and the focus is not part of World")
+end
+
+-- ---------------------------------------------------------------- beyond the glass (ROBLOX-95): the regions outside the window, their looks and budgets, the focus report
+do
+	local WorldMap = require("../src/Shared/World/WorldMap")
+	local Region = require("../src/Shared/World/Region")
+	local WorldBuild = require("../src/Shared/World/WorldBuild")
+	local WorldFocus = require("../src/Server/WorldFocus")
+	local WorldDetail = require("../src/Client/WorldDetail")
+	local function partsOf(root: Instance): { any }
+		local out = {}
+		for _, d in root:GetDescendants() do if d:IsA("BasePart") then table.insert(out, d) end end
+		return out
+	end
+	-- the looks: a persistent Model per region outside the window, in WorldDecor beside World, each tier holding its budget exactly
+	local holder = Instance.new("Folder")
+	local looks, looksDrawn = WorldBuild.looks(holder, WorldMap.SEED)
+	check(looks.Name == Region.LOOKS_FOLDER and looks.Parent == holder and #looks:GetChildren() == 3, "the looks of the three regions outside, in WorldDecor")
+	local full: { [string]: number } = {}
+	local safe = true
+	for _, model in looks:GetChildren() do
+		local m = model :: any
+		check(m.ClassName == "Model" and m.ModelStreamingMode == Enum.ModelStreamingMode.Persistent, `{m.Name}: a persistent model, as the sill's Decor is`)
+		local list = partsOf(m)
+		full[m.Name] = #list
+		for _, part in list do
+			if part.CanCollide ~= false or part.CanQuery ~= false or part.CanTouch ~= false or not part.Anchored then safe = false end
+		end
+	end
+	check(safe, "no part of any look can be walked on, hit by a ray or touched")
+	WorldDetail.apply("low", { looks })
+	local summary = {}
+	for _, model in looks:GetChildren() do
+		local region = WorldMap.region(model.Name) :: WorldMap.Region
+		local low = #partsOf(model)
+		table.insert(summary, `{model.Name} {full[model.Name]}/{low}`)
+		check(full[model.Name] == Region.budget(region.kind, "full") and low == Region.budget(region.kind, "low"),
+			`{model.Name}: {full[model.Name]} parts at full and {low} at low, its budgets exactly ({tostring(Region.budget(region.kind, "full"))}, {tostring(Region.budget(region.kind, "low"))})`)
+	end
+	print("world: the looks outside the window (full/low): " .. table.concat(summary, ", "))
+	-- what each look stands in for: the wall's boxes (the bricks), the bed's leaves and stems; the slab, the soil, the stones and the mounds are their own look
+	check(looksDrawn.house_wall and looksDrawn.house_wall_west and looksDrawn.house_wall_east and looksDrawn.bed_a_dock_stem and looksDrawn.bed_a_dandelion_leaf_1
+		and not looksDrawn.outer_sill_slab and not looksDrawn.bed_a_soil and not looksDrawn.bed_a_stone_top and not looksDrawn.bed_a_mound_1, "the looks report the pieces they draw")
+	-- the physical regions: their pieces as parts, the drawn ones invisible and solid, the others in their own materials
+	local hide = table.clone(drawnIds)
+	for id in looksDrawn do hide[id] = true end
+	local world = WorldBuild.world(Instance.new("Folder"), WorldMap.SEED, hide)
+	local ok, count = true, 0
+	for _, region in WorldMap.regions() do
+		local folder = world:FindFirstChild(Region.folderName(region)) :: Instance
+		check(folder ~= nil and #folder:GetChildren() == #Region.pieces(region), `{region.id}: its folder in World holds its {#Region.pieces(region)} boxes`)
+		if region.kind ~= "sill" and folder then
+			for _, spec in Region.pieces(region) do
+				local part = folder:FindFirstChild(spec.id) :: any
+				count += 1
+				local hidden = hide[spec.id] == true
+				ok = ok and part ~= nil and part.Anchored and part.CanQuery ~= false and part.CanCollide ~= false and (part.Size - (spec.hi - spec.lo)).Magnitude < 1e-9
+					and part:GetAttribute("ProfileId") == spec.profile and (part.Transparency == 1) == hidden
+			end
+		end
+	end
+	check(ok and count == 27, `the {count} boxes outside are solid, queryable parts; the ones a look draws are invisible`)
+	local outerFolder = world:FindFirstChild("outer_sill") :: Instance
+	local slab = outerFolder:FindFirstChild("outer_sill_slab") :: any
+	local box = outerFolder:FindFirstChild("window_box_west") :: any
+	check(slab.Transparency == 0 and slab.Material == Mat("Concrete") and box.Transparency == 1, "the stone slab is its own look; the window box's halves are drawn by the sill's garden")
+	local soil = (world:FindFirstChild("bed_a") :: Instance):FindFirstChild("bed_a_soil") :: any
+	local stone = (world:FindFirstChild("bed_a") :: Instance):FindFirstChild("bed_a_stone_top") :: any
+	check(soil.Material == Mat("Ground") and stone.Material == Mat("Slate") and soil.Transparency == 0, "the soil is ground and the stones slate")
+	-- with no list (WorldBuild.world's default) every piece a drawing can stand in for is hidden, as the sill's always were
+	local default = WorldBuild.world(Instance.new("Folder"))
+	check(((default:FindFirstChild("house_wall") :: Instance):FindFirstChild("house_wall") :: any).Transparency == 1
+		and ((default:FindFirstChild("outer_sill") :: Instance):FindFirstChild("window_box_east") :: any).Transparency == 1
+		and ((default:FindFirstChild("outer_sill") :: Instance):FindFirstChild("outer_sill_slab") :: any).Transparency == 0, "and by default the pieces any drawing stands in for")
+	-- a look that fails is warned about and left out, and its pieces stay visible
+	do
+		local warned = {}
+		warn = function(message: string) table.insert(warned, message) end
+		local real = Scenery.look
+		Scenery.look = function(parent: Instance, list: { any }): number
+			if parent.Name == "house_wall" then error("boom") end
+			return real(parent, list)
+		end
+		local partial, partialDrawn = WorldBuild.looks(Instance.new("Folder"))
+		Scenery.look = real
+		check(#warned == 1 and string.find(warned[1], "house_wall", 1, true) ~= nil and partial:FindFirstChild("house_wall") == nil and partial:FindFirstChild("bed_a") ~= nil
+			and partialDrawn.house_wall == nil and partialDrawn.bed_a_dock_stem == true, "a look that fails is left out with a warning; its bricks are not hidden and the others are kept")
+	end
+
+	-- the focus report: the server moves a player's focus part to what its client reports, if it is a point inside the world and not too soon after the last
+	local foci = Instance.new("Folder")
+	local dana: any = Instance.new("Player")
+	dana.UserId = 7004
+	local home = (WorldMap.region(WorldMap.HOME) :: WorldMap.Region).spawn.pos + Vector3.new(0, 0.31, 0)
+	local part = WorldFocus.park(dana, foci, home)
+	local bedPoint = Vector3.new(11, -89.69, -43.5)
+	check(WorldFocus.valid(bedPoint) and WorldFocus.valid(home) and not WorldFocus.valid(Vector3.new(0 / 0, 0, 0)) and not WorldFocus.valid(Vector3.new(math.huge, 0, 0))
+		and not WorldFocus.valid(Vector3.new(0, 0, -500)) and not WorldFocus.valid(Vector3.new(0, 300, 0)) and not WorldFocus.valid({ X = 1, Y = 1, Z = 1 })
+		and not WorldFocus.valid("here") and not WorldFocus.valid(nil) and not WorldFocus.valid(42), "a report is a finite Vector3 inside the world's bounds, or nothing")
+	check(WorldFocus.report(dana, foci, bedPoint, 100.0) and (part.Position - bedPoint).Magnitude < 1e-9, "a good report moves the focus there")
+	check(not WorldFocus.report(dana, foci, Vector3.new(0, 0.31, -18), 100.05) and (part.Position - bedPoint).Magnitude < 1e-9, "one sooner than a tenth of a second after it is ignored")
+	check(WorldFocus.report(dana, foci, Vector3.new(0, 0.31, -18), 100.1) and (part.Position - Vector3.new(0, 0.31, -18)).Magnitude < 1e-9, "and the next one in time is taken")
+	check(not WorldFocus.report(dana, foci, Vector3.new(0, -500, 0), 101) and not WorldFocus.report(dana, foci, Vector3.new(0 / 0, 0, 0), 102) and (part.Position - Vector3.new(0, 0.31, -18)).Magnitude < 1e-9,
+		"a report outside the world, or not a number, leaves the focus where it was")
+	local accepted = 0
+	for k = 1, 100 do
+		if WorldFocus.report(dana, foci, Vector3.new(0, 0.31, -18 - (k % 5)), 200 + k * 0.01) then accepted += 1 end
+	end
+	check(accepted >= 9 and accepted <= 12, `a client reporting a hundred times a second is heard about ten times a second ({accepted} in one second)`)
+	local storage = Instance.new("Folder")
+	local remote = WorldFocus.listen(storage, foci)
+	check(remote.ClassName == "RemoteEvent" and remote.Name == "WorldFocus" and remote.Parent == storage and WorldFocus.listen(storage, foci) == remote, "the server makes the WorldFocus remote once, in ReplicatedStorage")
+	local erin: any = Instance.new("Player") -- (a player who has not reported yet: the remote's reports run on the server's own clock)
+	erin.UserId = 7005
+	local erinsFocus = WorldFocus.park(erin, foci, home)
+	remote.OnServerEvent:Fire(erin, { X = 0, Y = 0, Z = 0 })
+	check((erinsFocus.Position - home).Magnitude < 1e-9, "a table sent as a point is ignored")
+	remote.OnServerEvent:Fire(erin, Vector3.new(-5, -40, -24.31))
+	check((erinsFocus.Position - Vector3.new(-5, -40, -24.31)).Magnitude < 1e-9 and math.abs(part.Position.Y - 0.31) < 1e-9, "and a client's report on it moves that player's focus, and no one else's")
 end
 
 print(`WORLD passed={passed} failed={failed}`)

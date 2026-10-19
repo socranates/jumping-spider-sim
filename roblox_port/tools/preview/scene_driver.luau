@@ -4,6 +4,8 @@
 -- scene.py puts these globals in front of the bundle: DETAIL ("full" or "low"), SUN_ELEVATION_DEG, SUN_AZIMUTH_DEG, SPIDERS (a list
 -- of { name, x, z, hx, hz }), FLIES (a list of { id, x, y, z, hx, hy, hz, flying }), WASPS (a list of { id, x, y, z, hx, hz, mode, search, beat }).
 local Scenery = require("../src/Shared/Habitat/Scenery")
+local WorldMap = require("../src/Shared/World/WorldMap")
+local WorldBuild = require("../src/Shared/World/WorldBuild")
 local WorldDetail = require("../src/Client/WorldDetail")
 local SupportMath = require("../src/Shared/Movement/SupportMath")
 local SpiderRig = require("../src/Shared/Rig/SpiderRig")
@@ -19,13 +21,28 @@ local sill = Scenery.sill(drawn)
 decor.Parent = workspace
 sill.Parent = workspace
 if DETAIL == "low" then WorldDetail.apply("low", { decor }) end
+-- ROBLOX-95 (scene.py --world): the regions outside the window too, their boxes and their looks, as Server/Main builds them
+local outside = Instance.new("Folder")
+outside.Name = "Outside"
+if WORLD then
+	local looks, looksDrawn = WorldBuild.looks(workspace, WorldMap.SEED)
+	if DETAIL == "low" then WorldDetail.apply("low", { looks }) end
+	local hide: { [string]: boolean } = {}
+	for id in drawn do hide[id] = true end
+	for id in looksDrawn do hide[id] = true end
+	for _, region in WorldMap.regions() do
+		if region.kind ~= "sill" then WorldBuild.region(region, outside, hide) end
+	end
+	outside.Parent = workspace
+	looks.Parent = outside
+end
 
 -- ---------------------------------------------------------------- the spider, standing at each asked-for place
 local rigs = {}
 for _, s in SPIDERS do
-	local rig = SpiderRig.new(workspace, sill, nil, DETAIL)
-	local up = Vector3.yAxis
-	local body = SupportMath.bodyCFrame(Vector3.new(s.x, 0.31, s.z), up, Vector3.new(s.hx, 0, s.hz))
+	local rig = SpiderRig.new(workspace, if s.y ~= nil then outside else sill, nil, DETAIL) -- (the spiders outside stand on the outside's boxes)
+	local up = if s.up then Vector3.new(s.up[1], s.up[2], s.up[3]) else Vector3.yAxis
+	local body = SupportMath.bodyCFrame(Vector3.new(s.x, s.y or 0.31, s.z), up, Vector3.new(s.hx, s.hy or 0, s.hz))
 	for _ = 1, 40 do rig:update(body, 1 / 60, true, false) end
 	rigs[s.name] = rig
 end
@@ -100,6 +117,7 @@ end
 local rows: { string } = {}
 dump(sill, "world", rows)
 dump(decor, "world", rows)
+dump(outside, "world", rows)
 local counts = { world = #rows }
 for name, rig in rigs do
 	local before = #rows

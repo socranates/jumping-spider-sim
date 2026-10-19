@@ -5,6 +5,7 @@
 -- untouchable); optional detail is marked FullOnly, which Client/WorldDetail removes on phones and tablets. A drawn leaf's top is
 -- its piece's top and a drawn stem stands inside its piece's box, so what the spider walks on is what the player sees.
 local Flora = require(script.Parent.Parent.Data.Flora)
+local Graphics = require(script.Parent.Parent.Data.Graphics)
 local Layout = require(script.Parent.WindowsillLayout)
 local Shapes = require(script.Parent.Shapes)
 
@@ -252,23 +253,38 @@ end
 -- ---------------------------------------------------------------- the garden outside the window
 local G = Flora.garden
 
+-- The ids of the outer sill's pieces the window box draws instead (World/Garden's window_box_west and window_box_east): Scenery hides exactly these, and
+-- only once the garden is drawn (ROBLOX-95).
+function Plants.windowBoxIds(): { string }
+	local ids = {}
+	for _, half in G.box.boxes do table.insert(ids, half.id) end
+	return ids
+end
+
+-- ROBLOX-95: two halves either side of the raised sash, standing on the stone outer sill; each half is drawn as the one box was.
 local function windowBox(parent: Instance)
 	local B = G.box
 	local box = folder(parent, "WindowBox")
-	local w, d = B.x1 - B.x0, B.z1 - B.z0
-	local cx, cz = (B.x0 + B.x1) / 2, (B.z0 + B.z1) / 2
+	local d = B.z1 - B.z0
+	local cz = (B.z0 + B.z1) / 2
 	local rimBottom = B.soilTop - 0.1
-	Shapes.block(box, "Body", Vector3.new(w, rimBottom - B.bottom, d), CFrame.new(cx, (rimBottom + B.bottom) / 2, cz), hex(B.color), "Wood")
-	Shapes.block(box, "Soil", Vector3.new(w - 2 * B.rimWidth, 0.4, d - 2 * B.rimWidth), CFrame.new(cx, B.soilTop - 0.2, cz), hex(B.soil), "Ground")
 	local rim = hex(B.rim)
 	local rimHeight = B.top - rimBottom
 	local ry = (B.top + rimBottom) / 2
-	Shapes.block(box, "RimFar", Vector3.new(w, rimHeight, B.rimWidth), CFrame.new(cx, ry, B.z0 + B.rimWidth / 2), rim, "Wood")
-	Shapes.block(box, "RimNear", Vector3.new(w, rimHeight, B.rimWidth), CFrame.new(cx, ry, B.z1 - B.rimWidth / 2), rim, "Wood")
-	Shapes.block(box, "RimWest", Vector3.new(B.rimWidth, rimHeight, d - 2 * B.rimWidth), CFrame.new(B.x0 + B.rimWidth / 2, ry, cz), rim, "Wood")
-	Shapes.block(box, "RimEast", Vector3.new(B.rimWidth, rimHeight, d - 2 * B.rimWidth), CFrame.new(B.x1 - B.rimWidth / 2, ry, cz), rim, "Wood")
-	for i, peel in B.peel do
-		Shapes.block(box, "Peel" .. i, Vector3.new(peel[3], 0.01, peel[4]), CFrame.new(peel[1], B.top + 0.006, peel[2]), hex(B.paint), "SmoothPlastic")
+	for _, span in B.boxes do
+		local half = folder(box, if span.x1 <= 0 then "West" else "East")
+		local w, cx = span.x1 - span.x0, (span.x0 + span.x1) / 2
+		Shapes.block(half, "Body", Vector3.new(w, rimBottom - B.bottom, d), CFrame.new(cx, (rimBottom + B.bottom) / 2, cz), hex(B.color), "Wood")
+		Shapes.block(half, "Soil", Vector3.new(w - 2 * B.rimWidth, 0.4, d - 2 * B.rimWidth), CFrame.new(cx, B.soilTop - 0.2, cz), hex(B.soil), "Ground")
+		Shapes.block(half, "RimFar", Vector3.new(w, rimHeight, B.rimWidth), CFrame.new(cx, ry, B.z0 + B.rimWidth / 2), rim, "Wood")
+		Shapes.block(half, "RimNear", Vector3.new(w, rimHeight, B.rimWidth), CFrame.new(cx, ry, B.z1 - B.rimWidth / 2), rim, "Wood")
+		Shapes.block(half, "RimWest", Vector3.new(B.rimWidth, rimHeight, d - 2 * B.rimWidth), CFrame.new(span.x0 + B.rimWidth / 2, ry, cz), rim, "Wood")
+		Shapes.block(half, "RimEast", Vector3.new(B.rimWidth, rimHeight, d - 2 * B.rimWidth), CFrame.new(span.x1 - B.rimWidth / 2, ry, cz), rim, "Wood")
+		for i, peel in B.peel do
+			if peel[1] > span.x0 and peel[1] < span.x1 then
+				Shapes.block(half, "Peel" .. i, Vector3.new(peel[3], 0.01, peel[4]), CFrame.new(peel[1], B.top + 0.006, peel[2]), hex(B.paint), "SmoothPlastic")
+			end
+		end
 	end
 end
 
@@ -339,10 +355,14 @@ local function shrubs(parent: Instance, place: (number, number, number) -> (Vect
 		p.Shape = Enum.PartType.Ball
 		if optional then Shapes.fullOnly(p) end
 	end
+	local ground = Graphics.view.ground.y
 	for i, spec in G.shrubs do
 		local at, k = place(spec.u, spec.v, spec.depth)
 		local diameter = spec.w * k
 		ball(`Shrub{i}`, at, diameter, hex(pick(S.foliage, rand)), false)
+		-- ROBLOX-95: a woody stem from the lawn up into the ball, so the shrub stands in the garden the spider can now walk to (no draw: the blooms below
+		-- are where they were)
+		Shapes.rod(group, `Shrub{i}Stem`, Vector3.new(at.X, ground, at.Z), at, diameter * S.body.width, hex(S.body.color), "Wood")
 		local colors = if spec.bloom == "pink" then S.pink else S.white
 		for j = 1, S.blooms do
 			local dir = Vector3.new(rand() * 2 - 1, rand() * 1.2 - 0.3, 0.35 + rand() * 0.8).Unit

@@ -144,20 +144,24 @@ Flora.planter = {
 -- flowering shrubs further out. None of it can be reached. The view out is placed as seen from the camera's usual spot
 -- (Graphics.view.eye); the box and the flowers stand where they really are.
 Flora.garden = {
+	-- ROBLOX-95: the window box stands on the stone outer sill (World/Garden's outer_sill: its top is y 0), in two halves either side of the raised sash,
+	-- so the stone in front of the opening is clear: `boxes` are the halves' x spans, each as solid as it looks (World/Garden's window_box_west and
+	-- window_box_east, hidden once this drawing exists). It was one box, x -24.5 to 24.5, sunk to y -3.2 when there was nothing outside the glass.
 	box = {
-		x0 = -24.5, x1 = 24.5, z0 = -21.8, z1 = -13.62, top = 2.8, bottom = -3.2,
+		boxes = { { x0 = -24.5, x1 = -9.5, id = "window_box_west" }, { x0 = 9.5, x1 = 24.5, id = "window_box_east" } },
+		z0 = -21.8, z1 = -13.62, top = 2.8, bottom = 0,
 		color = "6f8796", rim = "7f98a5", paint = "c4d0d2", soil = "392c21", soilTop = 2.55, rimWidth = 0.9,
 		-- patches where the paint has lifted: x, z (on the rim and the far board), width, depth
-		peel = { { -17.0, -21.6, 3.2, 0.6 }, { -2.5, -21.6, 2.4, 0.5 }, { 11.0, -21.6, 4.0, 0.6 }, { 20.5, -13.9, 3.0, 0.5 } },
+		peel = { { -17.0, -21.6, 3.2, 0.6 }, { -12.6, -21.6, 2.4, 0.5 }, { 11.0, -21.6, 4.0, 0.6 }, { 20.5, -13.9, 3.0, 0.5 } },
 	},
 	-- Rudbeckia: head centre height y (above the sill), where it stands in the box (x, z), how much the head nods and turns toward the room (degrees), size
 	flowers = {
 		{ x = -23.2, z = -17.0, y = 5.5, nod = -8, turn = 14, size = 0.9 },
 		{ x = -17.8, z = -15.8, y = 7.0, nod = -12, turn = -10, size = 1.0 },
 		{ x = -12.4, z = -18.6, y = 6.0, nod = -4, turn = 22, size = 1.05 },
-		{ x = -5.6, z = -16.3, y = 4.9, nod = -14, turn = -18, size = 0.95 },
-		{ x = 0.8, z = -19.0, y = 7.7, nod = -9, turn = 6, size = 1.1 },
-		{ x = 6.2, z = -15.9, y = 5.8, nod = -6, turn = -24, size = 1.0 },
+		{ x = -20.4, z = -19.7, y = 4.9, nod = -14, turn = -18, size = 0.95 }, -- (ROBLOX-95: these three stood in the middle, x -5.6, 0.8 and 6.2, where the stone is now clear)
+		{ x = -15.0, z = -15.3, y = 7.7, nod = -9, turn = 6, size = 1.1 },
+		{ x = 15.4, z = -20.0, y = 5.8, nod = -6, turn = -24, size = 1.0 },
 		{ x = 12.6, z = -17.8, y = 7.2, nod = -13, turn = 16, size = 0.9 },
 		{ x = 18.2, z = -16.3, y = 5.1, nod = -10, turn = -8, size = 1.05 },
 		{ x = 23.0, z = -18.4, y = 6.6, nod = -5, turn = -20, size = 0.95 },
@@ -173,13 +177,15 @@ Flora.garden = {
 		uv = { color = "b98cff", opacity = 0.85, rise = 0.03, thick = 0.02 },
 		seed = 100,
 	},
-	-- flowering shrubs further out: where they appear on the glass (u across, v up), how far beyond it, how wide they look there
+	-- flowering shrubs further out: where they appear on the glass (u across, v up), how far beyond it, how wide they look there. ROBLOX-95: the garden
+	-- under the window is walkable now (bed_a, x -25..25, z -24..-74, its soil at y -90), so no shrub hangs over it: the three that did (depths 36, 52
+	-- and 32) stand further out (80, 80 and 82), where they look the same through the glass, and every shrub stands on a woody stem down to the lawn (`body`).
 	shrubs = {
 		{ u = -24, v = 3.6, depth = 30, w = 6, bloom = "pink" },
 		{ u = -17, v = 3.9, depth = 44, w = 8, bloom = "white" },
-		{ u = -9.5, v = 3.5, depth = 36, w = 6.5, bloom = "pink" },
-		{ u = -2.5, v = 4.1, depth = 52, w = 8.5, bloom = "white" },
-		{ u = 4.5, v = 3.6, depth = 32, w = 6, bloom = "pink" },
+		{ u = -9.5, v = 3.5, depth = 80, w = 6.5, bloom = "pink" },
+		{ u = -2.5, v = 4.1, depth = 80, w = 6.5, bloom = "white" }, -- (and a little narrower, 6.5 for 8.5, so it fits between the bed and the houses)
+		{ u = 4.5, v = 3.6, depth = 82, w = 6, bloom = "pink" },
 		{ u = 11.5, v = 4.0, depth = 46, w = 8, bloom = "white" },
 		{ u = 18, v = 3.5, depth = 34, w = 6.5, bloom = "pink" },
 		{ u = 25, v = 3.8, depth = 48, w = 8, bloom = "white" },
@@ -189,6 +195,9 @@ Flora.garden = {
 		pink = { "f4c7d3", "ee9fb9", "f9dbe3", "e98fae" }, white = { "f8f4ec", "efe9de", "fbfaf5", "e6e0d2" },
 		blooms = 14, bloomSize = { 0.13, 0.22 }, -- as a share of the shrub's width
 		seed = 40,
+		-- ROBLOX-95: the shrub's stem, a woody trunk from the lawn (Graphics.view.ground.y) up into its ball, `width` of the ball's diameter thick: the shrubs
+		-- are standards, a crown on a stem, as a garden grows them (both tiers: a ball floating over the lawn is what the garden would show otherwise)
+		body = { width = 0.07, color = "5a4632" },
 	},
 }
 

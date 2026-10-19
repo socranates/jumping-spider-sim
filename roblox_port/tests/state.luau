@@ -198,7 +198,17 @@ case("the rest check refuses what is not a whole, sensible rest, and never raise
 	refused("a seed that is not a number", "main", mutated(function(c) c.world_map.seed = 0 / 0 end))
 	refused("changes to the world this game does not know", "main", mutated(function(c) c.world_map.diffs = { { id = "stone_1", moved = { 1, 2, 3 } } } end))
 	refused("a world record that is not a table", "main", mutated(function(c) c.world_map = "sill" end))
-	check(#SaveRest.check("main", mutated(function(c) c.world_map = nil end)) == 0, "a rest from before the world record is accepted, as the sill's")
+	check(#SaveRest.check("main", mutated(function(c) c.world_map = nil end)) == 0, "a rest from before the world record is accepted, as the sill's (of world-1: put back at the spawn when used, ROBLOX-95)")
+	-- ROBLOX-95: the regions outside the window. A rest under the bed's stone is a rest like the crack's; one that says the bed but lies outside it, or names the
+	-- sill's crack, is not.
+	local function inBed(c: any)
+		c.player.position = { 11, -89.69, -50 }
+		c.world_map.region, c.world_map.retreat, c.player.retreat_id = "bed_a", "bed_a_stone", "bed_a_stone"
+	end
+	check(#SaveRest.check("main", mutated(inBed)) == 0, "a rest under the bed's stone is accepted: " .. table.concat(SaveRest.check("main", mutated(inBed)), "; "))
+	refused("a bed rest outside the bed", "main", mutated(function(c) inBed(c); c.player.position = { 11, -89.69, -200 } end))
+	refused("a bed rest in the sill's crack", "main", mutated(function(c) inBed(c); c.world_map.retreat = "sill_crevice"; c.player.retreat_id = "sill_crevice" end))
+	refused("a rest in the bed's stone that says the sill", "main", mutated(function(c) inBed(c); c.world_map.region = "sill" end))
 	check(#SaveRest.check("main", mutated(function(c) c.world_map.revision = "world-0"; c.world_map.seed = 7 end)) == 0, "a rest from another revision or seed of the world is accepted: it is put back at the spawn when used")
 	refused("a non-unit normal", "main", mutated(function(c) c.player.normal = { 0, 5, 0 } end))
 	refused("NaN in the pose", "main", mutated(function(c) c.player.position = { 0 / 0, 1, 1 } end))

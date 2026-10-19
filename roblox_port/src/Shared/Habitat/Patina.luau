@@ -53,16 +53,23 @@ end
 -- Condensation on the lower panes (tiny flattened Glass spheres) and two faint smudges, on the room side of the glass.
 function Patina.glass(parent: Instance): (Folder, Folder)
 	local W = Graphics.window
-	local face = Shapes.piece(W.hidden).hi.Z - W.glass.setback -- the glass's room-side face
+	local face = Shapes.piece(W.hidden[1]).hi.Z - W.glass.setback -- the glass's room-side face
 	local D = Wear.drops
 	local drops = folder(parent, "Condensation", true)
 	local rand = Shapes.rng(D.seed)
+	-- ROBLOX-95: the middle lower sash is raised (Graphics.window.opening); a drop that would sit over the gap sits on the raised sash's pane instead, as high
+	-- above its bottom rail as it would have been above the sill (the same draws, so every other drop is where it was).
+	local O = W.opening
+	local lift = O.top + W.sashRail + 0.25 - D.y[1]
 	for i = 1, D.count do
 		local pane = D.panes[1 + math.floor(rand() * #D.panes)]
 		local d = D.size[1] + (D.size[2] - D.size[1]) * rand() ^ 2.2
 		local run = 1.15 + (d - D.size[1]) / (D.size[2] - D.size[1]) * 0.9 -- bigger drops are longer: they have started to run
+		local x = between(rand, pane[1], pane[2])
+		local y = D.y[1] + (D.y[2] - D.y[1]) * rand() ^ 1.8
+		if x > O.left - W.jambWidth - d and x < O.right + W.jambWidth + d then y += lift end
 		local drop = Shapes.ellipsoid(drops, "Drop" .. i, Vector3.new(d, math.min(d * run, D.size[2]), 2 * D.flat),
-			CFrame.new(between(rand, pane[1], pane[2]), D.y[1] + (D.y[2] - D.y[1]) * rand() ^ 1.8, face + D.flat), hex(D.color), "Glass")
+			CFrame.new(x, y, face + D.flat), hex(D.color), "Glass")
 		drop.Transparency = D.transparency
 		drop.Reflectance = D.reflectance
 	end

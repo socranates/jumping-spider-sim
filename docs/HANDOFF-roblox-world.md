@@ -80,4 +80,61 @@ let-down and the music; the whole point of W1 is that nothing a player can see h
   should be true with `TimePosition` advancing. If a `did not load` line appears, the asset is the problem (moderation, the grant to universe
   10771103250), not the code.
 
-*(W2 — beyond the glass, W3 — garden life, W4 — nature's rules and W5 — no hand holding will be appended here as they land.)*
+## W2 — beyond the glass (ROBLOX-95)
+
+Claude → Chet, 2026-10-19, same branch and bundle. The window opens: the middle lower sash is raised 6 cm and the spider can walk out through the gap
+(x -8..8, y 0.7..6 in the back frame) onto the stone outer sill, over its front edge, down 90 cm of brick and onto the bed under the window, and back.
+Nothing lives out there yet (W3); the rival and the mate stay on the sill. `docs/DECISIONS.md` ROBLOX-95 has the numbers and the reasons. CLI at the
+closing commit: strict clean, 143/143 modules compile (the client at -O0, -O1 and -O2), all 37 suites green (see the README for the counts). **Nothing of
+it has run in Studio.** The places in the repository are not rebuilt by this round.
+
+What is in it:
+
+- **The sill's back frame** is four boxes round the opening (`back_frame_west`, `_east`, `_head`, `_rail`); the drawn window shows the raised sash (a
+  sash rail across the top of the gap, jambs, the sill rail, no glass in the gap, the side panes and the raised pane as before). The window box outside
+  is two halves standing on the stone, either side of the gap; the view's lawn is at the garden's level (y -90.4) and the shrubs stand on stems.
+- **Three regions** in `Shared/World/WorldMap` (with the sill, four, in priority order): `outer_sill` (the slab, top y 0, x -30..30, z -24..-13.5),
+  `house_wall` (face at z -24, y 0 down to the lawn, x -40..40, drawn as brick courses), `bed_a` (soil top y -90, x -25..25, z -24..-74: mounds,
+  three stones, a dock and a dandelion, litter, grass). Their seeded generators are `Shared/World/Garden`; their looks are persistent models in
+  `Workspace.WorldDecor` (about 550 parts at full, 216 at low); their boxes are folders in `Workspace.World` beside `Windowsill`.
+- **The bed's stone** has a gap under it that is a retreat (`bed_a_stone`), the first garden home: a rest there is kept and returned to like the crack's.
+- **The day runs at 0.33** in the bed (the sill's pace on the outer sill and the wall).
+- **Streaming follows the spider**: the server makes `ReplicatedStorage.WorldFocus` (a RemoteEvent) at startup; the client fires it with the spider's
+  place every 8 studs or 2 seconds; the server moves the player's `ReplicationFocus_<UserId>` part there (finite points inside the world, about ten a
+  second at most). The client warns once per region in Output if the spider is in a region whose boxes have not all arrived.
+- **Saves**: the world's revision is `world-2`. A rest kept by v30 or v31 comes back **at the sill's spawn** with "the world has changed since you rested"
+  (intended: the back frame moved). Rests made by this build come back where they were kept.
+
+## Your Studio checklist (W2)
+
+1. **Walk out through the opening.** From the spawn, walk to the middle of the back wall (x 0) at floor level: the spider climbs the 0.7 cm rail, crosses
+   it and steps down onto the stone. It should not snag at the rail or at the jambs; the rival should never follow it into the gap.
+2. **The view through it**, from the sill's usual camera and from floor level in front of the gap: the stone outer sill and the garden beyond, the
+   window box's halves either side, no glass in the gap, the raised sash's rail across its top, the upper panes as before, nothing drawn inside a
+   backdrop. From the outer sill looking back: the window in its brick and plaster, the sill inside through the gap.
+3. **Descend the wall on the line.** From the outer sill's front edge, let down on the dragline (the hang of ROBLOX-86 at the slower 0.75 studs a second
+   of ROBLOX-99: about two minutes for the 90 cm; that is intended). Watch the camera's framing against the brick and the boom near the wall. Also walk
+   down the brick face and back up it.
+4. **The bed.** Walk the soil, the mounds, the stones, up the dock's stem and out under and over its leaves, the dandelion's leaves; the day line should
+   run noticeably slower (0.33). A jump or a fall from the wall lands on the soil (no harm); a fall beside the garden puts the spider back on its last
+   support.
+5. **Rest under the stone.** Walk into the gap under the big stone (x 7..15, z -53..-47) and rest: it should be accepted as a rest. Walk away, use
+   "Back to last rest": the spider is back under the stone.
+6. **Come back up and home.** Climb the brick, cross the stone, step over the rail, rest in the crack; the day's pace is the sill's again.
+7. **An old save** (a rest from v31 or v30) under the revision gate: it should come back at the sill's spawn with the "world has changed" notice,
+   everything else as it was.
+8. **The remote and the focus**, in the server view while walking out and down: `game.ReplicatedStorage.WorldFocus` exists, and
+   `print(workspace.ReplicationFoci:GetChildren()[1].Position)` follows the spider (within about 8 studs).
+9. **Output stays clean**: no `[Windowsill] world:` warnings (a region that has not arrived whole, a box that never streamed in) and no
+   `[Windowsill] decor:` warnings (a look that failed) while going out, down and back.
+10. **Frame time and parts** at both tiers, on the PC and when you can on the PlayStation or a phone: the looks outside add about 550 parts at full and 216
+   at low, all persistent.
+
+## Open for Nathan (W2)
+
+- The garden's pace is 0.33 for now, as you said; W4 tunes it with the movement cost.
+- The shrubs in the view now stand on stems (standards) because as floating balls they hung over the garden you can now walk into; say if you would
+  rather they were bushes to the ground (they would hide more of the garden).
+- The wall above the outer sill is drawn but not climbable this round; the outer sill's ends and the wall's shoulders are the edges of the world.
+
+*(W3 — garden life, W4 — nature's rules and W5 — no hand holding will be appended here as they land.)*

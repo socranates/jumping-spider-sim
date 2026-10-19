@@ -26,15 +26,21 @@ return function(check)
 			assert(want, "no material for " .. part.Name)
 			assert((part :: BasePart).Material == Enum.Material:FromName(want), `{part.Name}: {tostring((part :: BasePart).Material)}`)
 		end
-		local back = sill:FindFirstChild(Graphics.window.hidden) :: BasePart
-		assert(back.Transparency == 1 and back.CanCollide and back.CanQuery, "the back wall must stay solid and climbable")
+		for _, id in Graphics.window.hidden do
+			local back = sill:FindFirstChild(id) :: BasePart
+			assert(back.Transparency == 1 and back.CanCollide and back.CanQuery, id .. ": the back wall must stay solid and climbable")
+		end
 		local hit = workspace:Raycast(Vector3.new(0, 8, 0), Vector3.new(0, 0, -30))
-		assert(hit and hit.Instance == back and math.abs(hit.Position.Z + 12.5) < 1e-3, "a ray across the sill must land on the solid back wall")
+		assert(hit and hit.Instance == sill:FindFirstChild("back_frame_head") and math.abs(hit.Position.Z + 12.5) < 1e-3, "a ray across the sill must land on the solid back wall")
+		-- ROBLOX-95: the raised sash: a ray low across the middle of the sill goes out through the opening and meets the outer sill's world, not the back wall
+		local low = workspace:Raycast(Vector3.new(0, 3, 0), Vector3.new(0, 0, -30))
+		assert(low == nil or not low.Instance:IsDescendantOf(sill), "the opening in the back frame must be open")
 	end)
 	check("a piece is invisible only where its drawing exists, and then it stays solid; every drawn leaf's top is its piece's top", function()
 		local pilea = decor:FindFirstChild("Pilea")
 		assert(pilea, "the drawn Pilea is missing")
-		local hidden: { [string]: boolean } = { [Graphics.window.hidden] = true }
+		local hidden: { [string]: boolean } = {}
+		for _, id in Graphics.window.hidden do hidden[id] = true end
 		for _, id in Plants.pieceIds() do hidden[id] = true end
 		for _, part in sill:GetChildren() do
 			local p = part :: BasePart
@@ -73,14 +79,14 @@ return function(check)
 		local status = tostring(Lighting:GetAttribute("SunPick"))
 		assert(string.sub(status, 1, 3) == "ok:", "SunPick: " .. status)
 		assert(sun.Z < -0.2 and sun.Y > 0.25, "sun direction " .. tostring(sun))
-		assert(Graphics.window.hidden == "back_frame" and decor:FindFirstChild("Shafts") ~= nil, "no light shafts built")
+		assert(Graphics.window.hidden[1] == "back_frame_west" and decor:FindFirstChild("Shafts") ~= nil, "no light shafts built")
 	end)
 	check("the wall casts shadows, the glass does not", function()
 		local wall = decor:FindFirstChild("Wall") :: Folder
-		assert((wall:FindFirstChild("Apron") :: BasePart).CastShadow and (wall:FindFirstChild("Mullion1") :: BasePart).CastShadow)
+		assert((wall:FindFirstChild("ApronWest") :: BasePart).CastShadow and (wall:FindFirstChild("Mullion1") :: BasePart).CastShadow)
 		local glass = wall:FindFirstChild("Glass") :: BasePart
 		assert(not glass.CastShadow and glass.Transparency >= 0.6 and glass.Material == Enum.Material.SmoothPlastic, "window must not refract away translucent UV petals")
-		assert(not (sill:FindFirstChild(Graphics.window.hidden) :: BasePart).CastShadow, "the invisible wall must not shade the room")
+		assert(not (sill:FindFirstChild(Graphics.window.hidden[1]) :: BasePart).CastShadow, "the invisible wall must not shade the room")
 	end)
 	check("atmosphere, sky, grade, bloom, sun rays and clouds are in place; the macro depth of field is on unless switched off", function()
 		for _, name in { "Atmosphere", "Sky", "Grade", "Bloom", "SunRays" } do assert(Lighting:FindFirstChild(name), "missing " .. name) end

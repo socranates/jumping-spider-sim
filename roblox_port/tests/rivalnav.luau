@@ -12,6 +12,8 @@ local Drive = require("../src/Shared/Predator/RivalDrive")
 local Rival = require("../src/Shared/Predator/RivalSpider")
 local Grip = require("../src/Shared/Predator/RivalGrip")
 local Rules = require("../src/Shared/Data/RivalRules")
+local WorldMap = require("../src/Shared/World/WorldMap")
+local Region = require("../src/Shared/World/Region")
 
 local passed, failed = 0, 0
 local current = ""
@@ -90,10 +92,16 @@ case("a graph of the sill: faces, seams, a few hundred places to patrol to, none
 		pieces[faces[w.face].piece] = true
 		check(not Layout.inRetreat(w.pos + w.up * Route.SEAT) and not Route.inKeepOut(w.pos), "no place to patrol to is in or beside the crack")
 	end
-	for _, piece in { "sill_floor", "leaf_west", "leaf_east", "planter", "planter_rim", "back_frame", "left_frame", "right_frame", "stem_west", "garden_step" } do
+	for _, piece in { "sill_floor", "leaf_west", "leaf_east", "planter", "planter_rim", "back_frame_west", "back_frame_east", "back_frame_head", "left_frame", "right_frame", "stem_west", "garden_step" } do
 		check(pieces[piece] == true, `{piece} has a place to patrol to`)
 	end
 	check(not pieces.crevice_south and not pieces.leaf_tip, "the crack and the dry leaf tip have none")
+	-- ROBLOX-95: the open sash is the sill's second keep-out: no place to patrol to is in it (the rail and the cut through the wall are not the rival's)
+	local inSash = 0
+	for _, w in d.waypoints do
+		if Route.inKeepOut(w.pos) or Route.inKeepOut(w.pos + w.up * Route.SEAT) then inSash += 1 end
+	end
+	check(inSash == 0 and not pieces.back_frame_rail, `no place to patrol to is in the open sash or on its rail ({inSash})`)
 	check(Route.faceAt(Vector3.new(25, 0.31, 8), Vector3.yAxis) ~= nil and Route.faceAt(Vector3.new(0, 20, 0), Vector3.yAxis) == nil, "a body on the floor is on a face, one in the air is on none")
 	check(Route.inKeepOut(Vector3.new(-26, 0.31, 6)) and not Route.inKeepOut(Vector3.new(0, 0.31, 0)), "the keep-out box holds the crack and its margin")
 end)
@@ -105,7 +113,7 @@ case("it walks to a place on the floor, a leaf, the planter's rim and the wall",
 		{ "the floor", waypointOn(d, "sill_floor", function(w: any): boolean return w.pos.X < 0 and w.pos.Z < -2 end) },
 		{ "a leaf top", waypointOn(d, "leaf_west", function(w: any): boolean return w.up.Y > 0.9 end) },
 		{ "the planter's rim", waypointOn(d, "planter_rim", function(w: any): boolean return w.up.Y > 0.9 end) },
-		{ "the back wall", waypointOn(d, "back_frame", function(w: any): boolean return w.up.Z > 0.9 end) },
+		{ "the back wall", waypointOn(d, "back_frame_west", function(w: any): boolean return w.up.Z > 0.9 end) },
 		{ "a stem", waypointOn(d, "stem_east") },
 	}
 	for _, t in targets do
@@ -401,7 +409,7 @@ case("what it costs: rays per tick, decisions and plans", function()
 	rays = 0
 	local ticks = 0
 	-- A minute and a half of patrol over a floor, a wall and a leaf.
-	local legs = { waypointOn(d, "leaf_west", function(w: any): boolean return w.up.Y > 0.9 end), waypointOn(d, "back_frame", function(w: any): boolean return w.up.Z > 0.9 end),
+	local legs = { waypointOn(d, "leaf_west", function(w: any): boolean return w.up.Y > 0.9 end), waypointOn(d, "back_frame_west", function(w: any): boolean return w.up.Z > 0.9 end),
 		waypointOn(d, "sill_floor", function(w: any): boolean return w.pos.X < 0 and w.pos.Z < -2 end) }
 	for _, w in legs do
 		d:_setGoal(w, "patrol")
@@ -422,6 +430,131 @@ case("what it costs: rays per tick, decisions and plans", function()
 	r.state = "recover"
 	for _ = 1, 600 do Drive.update(d, r, DT, s) end
 	check(rays / 600 < 1.5, `a standing rival costs almost nothing ({string.format("%.2f", rays / 600)} rays/tick)`)
+end)
+
+-- ---------------------------------------------------------------- ROBLOX-95: a graph per region, seams between them
+case("a graph per region: the sill's is the module's, every region has its own from its own pieces", function()
+	local sillGraph = Route.graph()
+	check(Route.graph("sill") == sillGraph and Route.faces() == sillGraph:allFaces(), "the module's functions are the sill's graph's")
+	check(#Route.waypoints() == #sillGraph:waypoints() and Route.faceAt(Vector3.new(25, 0.31, 8), Vector3.yAxis) == sillGraph:faceAt(Vector3.new(25, 0.31, 8), Vector3.yAxis), "and answer the same")
+	local counts = {}
+	for _, region in WorldMap.regions() do
+		local g = Route.graph(region.id)
+		local pieces = Region.pieces(region)
+		check(#g:allFaces() == #pieces * 6, `{region.id}: every face of its {#pieces} boxes is a node, and only its own`)
+		check(#pieces <= 60, `{region.id}: {#pieces} boxes, inside the design's 60 for a graph Dijkstra runs over`)
+		local ids: { [string]: boolean } = {}
+		for _, piece in pieces do ids[piece.id] = true end
+		local strangers = 0
+		for _, f in g:allFaces() do if not ids[f.piece] then strangers += 1 end end
+		check(strangers == 0, `{region.id}: no face of another region's box`)
+		counts[region.id] = #g:waypoints()
+	end
+	print(`RIVALNAV places to patrol to: sill {counts.sill}, outer_sill {counts.outer_sill}, house_wall {counts.house_wall}, bed_a {counts.bed_a}`)
+	check(counts.bed_a >= 30 and counts.outer_sill >= 5 and counts.house_wall >= 5, "every region outside has places to stand")
+	local bed = Route.graph("bed_a")
+	local stone = (WorldMap.retreat("bed_a_stone") :: WorldMap.Retreat)
+	local inStone = 0
+	for _, w in bed:waypoints() do
+		if bed:inKeepOut(w.pos) or (w.pos.X >= stone.min.X and w.pos.X <= stone.max.X and w.pos.Z >= stone.min.Z and w.pos.Z <= stone.max.Z and w.pos.Y <= stone.max.Y) then inStone += 1 end
+	end
+	check(inStone == 0, "the bed's places keep out of the gap under its stone")
+	check(not pcall(Route.graph, "garden"), "a region that is not on the map has no graph")
+end)
+
+case("the bed's graph plans: from the soil up a stem and out onto a leaf, to the stone's top, and round the stone", function()
+	local bed = Route.graph("bed_a")
+	local up = Vector3.yAxis
+	local soilAt = Vector3.new(-20, -90, -30)
+	local soil = bed:faceAt(soilAt + up * Route.SEAT, up) :: number
+	check(soil ~= nil and bed:allFaces()[soil].piece == "bed_a_soil", "a body on the soil is on the soil's top")
+	local function topOf(id: string): (number?, Vector3)
+		for _, region in WorldMap.regions() do
+			for _, piece in Region.pieces(region) do
+				if piece.id == id then
+					local at = Vector3.new((piece.lo.X + piece.hi.X) / 2, piece.hi.Y, (piece.lo.Z + piece.hi.Z) / 2)
+					return bed:faceAt(at + up * Route.SEAT, up), at
+				end
+			end
+		end
+		return nil, Vector3.zero
+	end
+	for _, id in { "bed_a_dock_leaf_1", "bed_a_dock_leaf_3", "bed_a_stone_top", "bed_a_dandelion_leaf_2", "bed_a_mound_1" } do
+		local face, at = topOf(id)
+		local hops = if face ~= nil then bed:plan(soil, soilAt, face, at) else nil
+		check(hops ~= nil and #hops >= 1, `a way from the soil to the top of {id} ({if hops then #hops else "none"} hops)`)
+	end
+end)
+
+case("seams: every seam the map declares joins the two regions' graphs along its line, both ways", function()
+	for _, region in WorldMap.regions() do
+		local g = Route.graph(region.id)
+		for _, n in region.neighbors do
+			local edges, off, samples = 0, 0, 0
+			for _, s in g:allSeams() do
+				if s.edge.region == n.id then
+					edges += 1
+					for _, p in s.edge.samples do
+						samples += 1
+						local ab = n.b - n.a
+						local t0 = (p - n.a):Dot(ab) / ab:Dot(ab)
+						if t0 < -1e-6 or t0 > 1 + 1e-6 or (n.a + ab * t0 - p).Magnitude > 0.06 then off += 1 end
+					end
+					local other = Route.graph(n.id)
+					local back = false
+					for _, e in other:seamsOf(s.edge.to) do
+						if e.region == region.id and e.to == s.face then back = true end
+					end
+					check(back, `{region.id} to {n.id}: the edge from face {s.face} has one back`)
+				end
+			end
+			check(edges >= 1 and samples >= 3, `{region.id} meets {n.id} along its seam ({edges} edges, {samples} places to cross)`)
+			check(off == 0, `{region.id} to {n.id}: every place to cross is on the seam's line ({off} off it)`)
+		end
+	end
+	-- what the seams are: the rail's outer face onto the stone (a corner), the stone's front face into the brick (flat), the wall's foot onto the soil (a corner)
+	local function kinds(from: string, to: string): (boolean, boolean)
+		local flat, corner = false, false
+		for _, s in Route.graph(from):allSeams() do
+			if s.edge.region == to then
+				if s.edge.flat then flat = true else corner = true end
+			end
+		end
+		return flat, corner
+	end
+	local f1, c1 = kinds("sill", "outer_sill")
+	local f2, c2 = kinds("outer_sill", "house_wall")
+	local f3, c3 = kinds("house_wall", "bed_a")
+	check(c1 and not f1, "sill to outer sill: across the corner where the rail's outer face meets the stone")
+	check(f2 and not c2, "outer sill to wall: flat, where the stone's front face goes on down as brick")
+	check(c3 and not f3, "wall to bed: across the corner of the wall's foot and the soil")
+	-- the sill's planner never crosses a seam: a plan stays on the sill's faces
+	local sillGraph = Route.graph()
+	local hops = sillGraph:plan(Route.faceAt(Vector3.new(0, 0.31, -10), Vector3.yAxis) :: number, Vector3.new(0, 0, -10),
+		Route.faceAt(Vector3.new(25, 0.31, 8), Vector3.yAxis) :: number, Vector3.new(25, 0, 8))
+	check(hops ~= nil, "a plan across the sill in front of the opening")
+	local strays = 0
+	for _, h in hops or {} do
+		if h.face > #sillGraph:allFaces() or Route.inKeepOut(h.seam) then strays += 1 end
+	end
+	check(strays == 0, "and every hop of it is on the sill, outside the sash")
+end)
+
+case("the rival walks along the back wall's foot past the open sash and never goes into it", function()
+	local d, r = newRival(Vector3.new(-14, 0, -11.8), Vector3.yAxis)
+	local s = snapshot()
+	local goal = { pos = Vector3.new(14, 0, -11.8), up = Vector3.yAxis, face = Route.faceAt(Vector3.new(14, 0.31, -11.8), Vector3.yAxis) :: number }
+	d:_setGoal(goal, "patrol")
+	local inSash, behind, arrived = 0, 0, false
+	local before = d.stats.arrivals
+	for _ = 1, 60 * 90 do
+		Drive.update(d, r, DT, s)
+		if Route.inKeepOut(d.motor.pos) then inSash += 1 end
+		if d.motor.pos.Z < -12.5 then behind += 1 end
+		if d.stats.arrivals > before then arrived = true; break end
+	end
+	check(arrived, "it gets past the opening")
+	check(inSash == 0 and behind == 0, `never in the sash ({inSash} ticks) nor through the frame ({behind})`)
 end)
 
 print(`RIVALNAV passed={passed} failed={failed}`)

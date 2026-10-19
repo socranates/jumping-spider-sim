@@ -111,7 +111,7 @@ check("the server's World folder is found: its Windowsill is the sill, World is 
 end)
 
 check("the same rays hit the same boxes at the same places whether the sill stands in the workspace or inside the World folder", function()
-	local function rays(root: Instance): { string }
+	local function rays(root: Instance): { { text: string, name: string, dist: number } }
 		local params = RaycastParams.new()
 		params.FilterType = Enum.RaycastFilterType.Include
 		params.FilterDescendantsInstances = { root }
@@ -125,7 +125,8 @@ check("the same rays hit the same boxes at the same places whether the sill stan
 			local origin = Vector3.new(-33 + 66 * rnd(), -2 + 30 * rnd(), -16 + 32 * rnd())
 			local direction = Vector3.new(rnd() - 0.5, rnd() - 0.5, rnd() - 0.5).Unit * 40
 			local hit = workspace:Raycast(origin, direction, params)
-			table.insert(out, if hit then string.format("%s %.6f %.6f %.6f n(%d,%d,%d)", hit.Instance.Name, hit.Position.X, hit.Position.Y, hit.Position.Z, hit.Normal.X, hit.Normal.Y, hit.Normal.Z) else "-")
+			table.insert(out, if hit then { text = string.format("%s %.6f %.6f %.6f n(%d,%d,%d)", hit.Instance.Name, hit.Position.X, hit.Position.Y, hit.Position.Z, hit.Normal.X, hit.Normal.Y, hit.Normal.Z),
+				name = hit.Instance.Name, dist = (hit.Position - origin).Magnitude } else { text = "-", name = "", dist = math.huge })
 		end
 		return out
 	end
@@ -133,12 +134,22 @@ check("the same rays hit the same boxes at the same places whether the sill stan
 	local a = rays(flatWorld())
 	workspace:ClearAllChildren()
 	local b = rays(serverWorld())
-	local hits = 0
+	local sillIds: { [string]: boolean } = {}
+	for _, p in Layout.PIECES do sillIds[p.id] = true end
+	local hits, outside = 0, 0
 	for i = 1, #a do
-		assert(a[i] == b[i], `ray {i}: {a[i]} in the workspace, {b[i]} in the World folder`)
-		if a[i] ~= "-" then hits += 1 end
+		-- (ROBLOX-95: World holds the regions outside the window too. A ray that leaves the sill may meet one of their boxes first, where the sill alone has nothing
+		-- nearer; every ray that ends on a box of the sill ends exactly where it always did.)
+		if b[i].name ~= "" and not sillIds[b[i].name] then
+			outside += 1
+			assert(a[i].dist > b[i].dist, `ray {i}: {a[i].text} in the workspace, {b[i].text} in the World folder`)
+		else
+			assert(a[i].text == b[i].text, `ray {i}: {a[i].text} in the workspace, {b[i].text} in the World folder`)
+		end
+		if a[i].text ~= "-" then hits += 1 end
 	end
 	assert(hits >= 100, `the rays hit something often enough to mean something ({hits} of {#a})`)
+	assert(outside > 0 and outside < 80, `some rays from the sill reach the world outside, most do not ({outside})`)
 	workspace:ClearAllChildren()
 end)
 
@@ -232,6 +243,97 @@ check("a refused write of the focus is warned about once and the game goes on", 
 	workspace:ClearAllChildren()
 end)
 
+-- ---------------------------------------------------------------- ROBLOX-95: the regions outside, whole or not, the focus report, the world's bounds
+check("a region is ready when its folder holds every one of its boxes; a place with only the sill has only the sill", function()
+	workspace:ClearAllChildren()
+	local world = serverWorld()
+	local c = WorldClient.new(workspace, player())
+	for _, r in WorldMap.regions() do
+		assert(c:regionReady(r.id), `{r.id} is whole as the server builds it`)
+	end
+	assert(not c:regionReady("garden") and not c:regionReady(""), "a region that is not on the map is never ready")
+	local bed = world:FindFirstChild("bed_a") :: Instance
+	local stone = bed:FindFirstChild("bed_a_stone_top") :: Instance
+	stone.Parent = nil
+	assert(not c:regionReady("bed_a") and c:regionReady("house_wall"), "one box of the bed missing: the bed is not ready, the wall still is")
+	stone.Parent = bed
+	assert(c:regionReady("bed_a"), "and it is again when the box arrives")
+	local folder = world:FindFirstChild("outer_sill") :: Instance
+	folder.Parent = nil
+	assert(not c:regionReady("outer_sill"), "a region whose folder has not arrived is not ready")
+	workspace:ClearAllChildren()
+	flatWorld()
+	local flat = WorldClient.new(workspace, player())
+	assert(flat:regionReady("sill") and not flat:regionReady("bed_a"), "in a sill-only place the sill is ready and nothing else")
+	workspace:ClearAllChildren()
+end)
+
+check("a spider in a region that has not arrived whole is warned about once for that region, in Output, and the game goes on", function()
+	workspace:ClearAllChildren()
+	local world = serverWorld()
+	local c = WorldClient.new(workspace, player())
+	local bed = world:FindFirstChild("bed_a") :: Instance
+	local mound = bed:FindFirstChild("bed_a_mound_3") :: Instance
+	mound.Parent = nil
+	local inBed, onSill, onWall = Vector3.new(0, -89.69, -50), Vector3.new(-22, 0.31, 6), Vector3.new(0, -40, -24.31)
+	local seen = warnings(function()
+		c:update(onSill, nil, 10)
+		c:update(inBed, nil, 11)
+		c:update(inBed, nil, 12)
+		c:update(onWall, nil, 13)
+		c:update(inBed, nil, 14)
+	end)
+	assert(#seen == 1 and string.find(seen[1], "bed_a", 1, true) ~= nil and string.find(seen[1], "not arrived whole", 1, true) ~= nil, `warned {#seen} times: {seen[1]}`)
+	assert(c.region.id == "bed_a" and c.whole.sill and c.whole.house_wall and not c.whole.bed_a, "the regions found whole are remembered; the bed is not one of them")
+	mound.Parent = bed
+	local after = warnings(function() c:update(inBed, nil, 15) end)
+	assert(#after == 0 and c.whole.bed_a, "when the box arrives the bed is whole, and nothing more is said")
+	-- and without warn at all (the plain CLI), nothing breaks
+	mound.Parent = nil
+	local fresh = WorldClient.new(workspace, player())
+	fresh:update(inBed, nil, 1)
+	assert(fresh.warned.bed_a, "the CLI has no warn, and the client goes on")
+	workspace:ClearAllChildren()
+end)
+
+check("the focus is reported when the spider has moved more than 8 studs from the last report or 2 seconds have passed, and not otherwise", function()
+	workspace:ClearAllChildren()
+	serverWorld()
+	local storage = game:GetService("ReplicatedStorage")
+	local had = storage:FindFirstChild("WorldFocus")
+	if had then had.Parent = nil end
+	local c = WorldClient.new(workspace, player())
+	assert(not c:report(Vector3.new(0, 0.31, 0), 0) and c.reports == 0, "without the server's remote nothing is sent")
+	local remote = Instance.new("RemoteEvent")
+	remote.Name = "WorldFocus"
+	remote.Parent = storage
+	local function sent(): number return #(rawget(remote, "fired") or {}) end
+	local p0 = Vector3.new(0, 0.31, 0)
+	assert(c:report(p0, 1.0) and sent() == 1 and rawget(remote, "fired")[1][1] == p0, "the first report goes at once, with the spider's place")
+	assert(not c:report(p0 + Vector3.new(7.9, 0, 0), 1.5) and sent() == 1, "7.9 studs on, half a second later: nothing")
+	assert(c:report(p0 + Vector3.new(8.1, 0, 0), 1.6) and sent() == 2, "8.1 studs on: reported")
+	assert(not c:report(p0 + Vector3.new(8.1, 0, 0), 3.5) and c:report(p0 + Vector3.new(8.1, 0, 0), 3.6) and sent() == 3, "standing still: again after 2 seconds")
+	assert(not c:report(p0 + Vector3.new(8.1, -0.5, 0), 3.7) and sent() == 3, "and not before")
+	-- update reports too, on os.clock unless given a clock
+	c:update(Vector3.new(0, -40, -24.31), nil, 3.8)
+	assert(sent() == 4 and c.reported == Vector3.new(0, -40, -24.31), "update sends the report when it is due")
+	remote.Parent = nil
+	if had then had.Parent = storage end
+	workspace:ClearAllChildren()
+end)
+
+check("the world's bounds: out of it is in no region, so a fall from the sill's room side ends where it always did and one from the outer sill goes on to the bed", function()
+	workspace:ClearAllChildren()
+	serverWorld()
+	local c = WorldClient.new(workspace, player())
+	assert(c:inBounds(Vector3.new(0, -4.9, 12.4)) and not c:inBounds(Vector3.new(0, -5.1, 12.4)), "in front of the sill (the room's side), y -5 is the floor of the world, as it was")
+	assert(c:inBounds(Vector3.new(0, -50, -27)) and c:inBounds(Vector3.new(0, -89.69, -40)) and not c:inBounds(Vector3.new(0, -93.5, -40)), "out over the stone it goes on down past the wall to the bed")
+	assert(not c:inBounds(Vector3.new(60, -50, -40)) and c.homeMin == sill.bounds[1] and c.homeMax == sill.bounds[2], "beside the garden, nothing; the rival's and the mate's bounds are the sill's")
+	local lo, hi = WorldMap.bounds()
+	assert(c.boundsMin == lo and c.boundsMax == hi and lo.Y == -93, "the motor's box is the union, down to just under the bed's soil")
+	workspace:ClearAllChildren()
+end)
+
 -- ---------------------------------------------------------------- instance streaming: the sim begins on a whole sill
 -- The late boxes come when the client asks for them (WaitForChild), as streaming brings them; `never` leaves them out for good.
 local function streamed(never: boolean): ({ { name: string, timeout: number } }, { string }, any, { string })
@@ -320,6 +422,10 @@ local decorModel = Instance.new("Model")
 decorModel.Name = "Decor"
 decorModel.Parent = workspace
 local serverFolder = WorldBuild.world(workspace, WorldMap.SEED)
+-- (ROBLOX-95: the remote the server makes for the focus reports, Server/WorldFocus.listen; the shim's RemoteEvent keeps what is fired on it)
+local focusRemote = Instance.new("RemoteEvent")
+focusRemote.Name = "WorldFocus"
+focusRemote.Parent = game:GetService("ReplicatedStorage")
 local loaded, loadError = pcall(function() require("../src/Client/SpiderClient.client") end)
 if not loaded then print("LOAD ERROR", loadError) end
 local frame = ClientStubs.renderSteps.SpiderSim
@@ -356,6 +462,10 @@ check("the sim's world is the server's: its sill is Windowsill inside World, and
 	assert(#driver.motor.overlap.FilterDescendantsInstances == 1 and driver.motor.overlap.FilterDescendantsInstances[1] == world.root, "and its overlap queries")
 	local lo, hi = WorldMap.bounds()
 	assert(driver.motor.config.boundsMin == lo and driver.motor.config.boundsMax == hi, "its fall-off box is the map's")
+	local inside = driver.motor.config.inBounds
+	assert(inside ~= nil, "the motor has no inBounds")
+	assert(inside(Vector3.new(0, -50, -27)) and not inside(Vector3.new(0, -6, 10)),
+		"and out of it is where no region holds the spider (ROBLOX-95)")
 	assert(driver.motor.config.spawn == sill.spawn.pos and driver.motor.config.heading == sill.spawn.heading, "it begins where the sill's life begins")
 	assert(#driver.prey.flies >= 1, "the flies found their perches among the boxes of World")
 end)
@@ -450,6 +560,75 @@ check("a rest from another revision of the world is put back at the sill's spawn
 	assert(localPlayer.ReplicationFocus == drawnRoot(), "the focus follows the spider to where it stands")
 end)
 
+-- ---------------------------------------------------------------- ROBLOX-95: out through the raised sash and down to the bed, through the real client
+check("the real client walks out through the raised sash onto the outer sill, over its edge and down the brick to the bed: the region and the dial follow, the focus is reported", function()
+	local driver = ClientStubs.driver
+	local motor = driver.motor
+	local fired = function(): { any } return rawget(focusRemote, "fired") or {} end
+	local before = #fired()
+	driver.place(Vector3.new(0, 0.31, -9))
+	motor:place(Vector3.new(0, 0.31, -9), Vector3.yAxis, Vector3.new(0, 0, -1))
+	driver.camera:snap()
+	frames(5)
+	local seen: { string } = {}
+	local scales: { [string]: number } = {}
+	local function note()
+		local id = driver.world.region.id
+		if seen[#seen] ~= id then table.insert(seen, id) end
+		scales[id] = LifeClock.game.clockScale
+	end
+	key("Forward", true)
+	for _ = 1, 60 * 90 do
+		frames(1)
+		note()
+		if driver.world.region.id == "bed_a" and motor.mode == "attached" and motor.up.Y > 0.9 then break end
+	end
+	key("Forward", false)
+	frames(2)
+	print(`world_client: walked through {table.concat(seen, " > ")}, now at {motor.pos}, mode {motor.mode}`)
+	assert(seen[1] == "sill" and table.find(seen, "outer_sill") ~= nil and table.find(seen, "house_wall") ~= nil and seen[#seen] == "bed_a", `the regions in order: {table.concat(seen, " > ")}`)
+	assert((table.find(seen, "outer_sill") :: number) < (table.find(seen, "house_wall") :: number), "out over the stone before down the wall")
+	assert(math.abs(motor.pos.Y - (-90 + 0.31)) < 0.1 and motor.up.Y > 0.9, `standing on the bed's soil ({motor.pos})`)
+	assert(scales.sill == 1.0 and scales.outer_sill == 1.0 and scales.house_wall == 1.0 and scales.bed_a == 0.33 and LifeClock.game.clockScale == 0.33, "the dial: the sill's pace to the foot of the wall, a third of it in the bed")
+	local reports = fired()
+	assert(#reports - before >= 10, `the focus was reported on the way ({#reports - before} reports for about 100 studs)`)
+	local last = reports[#reports][1]
+	assert(typeof(last) == "Vector3" or type(last) == "table", "a report is a point")
+	assert((last - motor.pos).Magnitude <= 8 + 1e-6, `the last report is within 8 studs of the spider ({(last - motor.pos).Magnitude})`)
+	local gaps = 0
+	for i = before + 2, #reports do
+		if (reports[i][1] - reports[i - 1][1]).Magnitude > 8.5 then gaps += 1 end
+	end
+	assert(gaps == 0, "no stretch of more than 8 studs went unreported")
+	assert(driver.world:regionReady("bed_a") and driver.world:regionReady("house_wall") and driver.world:regionReady("outer_sill"), "every region it passed through was whole")
+end)
+
+check("a rest under the bed's stone keeps the world it was in (bed_a, bed_a_stone) and a return to it comes back under the stone", function()
+	local driver = ClientStubs.driver
+	local life = driver.life
+	driver.place(Vector3.new(11, -89.69, -50))
+	frames(30)
+	assert(driver.world.region.id == "bed_a" and driver.world:inRetreat(driver.motor.pos) == "bed_a_stone", "under the stone")
+	life.clock.hour = 12
+	key("Feed", true); frames(2); key("Feed", false); frames(2)
+	assert(life.resting, "no rest under the stone: " .. tostring(life.notice))
+	local best = driver.currentStore():loadBest()
+	assert(best.ok and best.record.world_map.region == "bed_a" and best.record.world_map.retreat == "bed_a_stone" and best.record.player.retreat_id == "bed_a_stone"
+		and best.record.world_map.revision == "world-2", "the rest carries the bed and its stone")
+	-- walk out from under it, and come back
+	driver.motor:place(Vector3.new(11, -89.69, -50), Vector3.yAxis, Vector3.new(0, 0, 1))
+	driver.camera:snap()
+	key("Forward", true); frames(120); key("Forward", false); frames(30)
+	assert(driver.world:inRetreat(driver.motor.pos) == nil, "walked out from under the stone")
+	key("Reset", true); frames(1); key("Reset", false); frames(2)
+	assert(driver.lifeSpider().inRetreat and life.resting and driver.world:inRetreat(driver.motor.pos) == "bed_a_stone", "back resting under the stone")
+	assert(driver.world.region.id == "bed_a" and LifeClock.game.clockScale == 0.33 and string.find(life.notice, "the world has changed", 1, true) == nil, "in the bed, at its pace, with no word of a changed world")
+	-- home again, for the checks that follow
+	driver.place(Vector3.new(-5, 0.31, -9))
+	frames(5)
+	assert(driver.world.region.id == "sill" and LifeClock.game.clockScale == 1.0, "back on the sill")
+end)
+
 check("the roaming rival's legs belong to the sill region and keep out of its crack, on the folders the server builds", function()
 	local driver = ClientStubs.driver
 	local life = driver.life
@@ -462,6 +641,7 @@ check("the roaming rival's legs belong to the sill region and keep out of its cr
 	assert(life.rival and life.rival.state == "patrol", "the rival did not arrive: " .. tostring(life.rival and life.rival.state))
 	local drive = driver.rivalLegs.drive
 	assert(drive ~= nil and drive.region == "sill", "the rival's legs are made for the sill")
+	assert(drive.motor.config.boundsMin == sill.bounds[1] and drive.motor.config.boundsMax == sill.bounds[2] and drive.motor.config.inBounds == nil, "and keep to the sill's bounds (ROBLOX-95)")
 	local filter = drive.motor.params.FilterDescendantsInstances
 	assert(#filter == 1 and filter[1] == driver.world.root, "and walk on the World folder's boxes")
 	local at, moved, crack = life.rival.position, 0.0, 0

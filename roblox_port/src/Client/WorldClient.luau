@@ -6,15 +6,22 @@
 --                            (the test box worlds, the old places) still works: both are that folder.
 --   which region we are in .. from the spider's place each frame, kept when it is momentarily in none (`region`); the pace of its day (`clockScale`, set on LifeClock's dial each
 --                            frame); and `isActive`, which says whether a creature that belongs to a region is in the region the spider is in. The creatures are regional
---                            (Predator/RivalSpider, Mate and RivalDrive take their region, the sill's unless given); nothing is sent to sleep yet because there is nowhere else to go.
+--                            (Predator/RivalSpider, Mate and RivalDrive take their region, the sill's unless given); nothing is sent to sleep yet: the rival and the mate go on on the
+--                            sill while the spider is outside (ROBLOX-95), and the regions outside have no creatures of their own until W3.
 --   what to stream .......... with instance streaming on, the server sends what is near the player's replication focus. The server parks each player's (Server/WorldFocus): that
 --                            is the focus streaming follows. This also points the player's own ReplicationFocus at the drawn spider's root, when it is made and again after a respawn
 --                            or a return to a rest: a client's write of that property is not expected to reach the server (the docs say to set it there), so it is belt and braces,
 --                            not the mechanism; a write that raises is warned about once and the game goes on. None of this has run in Studio yet.
 -- The sim must never raycast beyond what is streamed in: StreamingMinRadius (96 studs around the focus) is always there, so a region and its neighbours must fit inside it, and a
--- creature is only simulated in the region the spider is in or beside. The sill, the only region now, is inside it from every spot on it.
+-- creature is only simulated in the region the spider is in or beside.
 -- With streaming, the sill's boxes and the drawn sill (the persistent Decor model) arrive after the folders do: `new` waits for every box of the sill and for the Decor, so the
 -- sim begins on a whole sill. Without streaming (the test places, the box worlds) everything is there at once and nothing is waited for.
+-- ROBLOX-95 (W2): the window is open and three regions lie outside it (the outer sill, the brick wall, the bed 90 studs below), the bed farther from the sill's spawn than the
+-- radius. So the focus follows the spider: `update` reports the spider's place to the server through the WorldFocus remote (Server/WorldFocus) whenever it has moved more than
+-- REPORT_MOVE studs from the last report or REPORT_EVERY seconds have passed, and the server moves the player's focus part there. And the client knows whether a region it is
+-- in has arrived whole (`regionReady`: its folder holds every piece of Region.pieces); a spider in a region that is not whole is warned about once per region in Output, since
+-- a missing box is a fall. The looks of the regions outside (WorldDecor, persistent models like the Decor) are waited for as the Decor is. The player's motor is out of the
+-- world only where no region holds it (`inBounds`); the rival's and the mate's are bound to the sill and keep its bounds (`homeMin`, `homeMax`).
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local WorldMap = require(Shared:WaitForChild("World"):WaitForChild("WorldMap"))
@@ -24,9 +31,20 @@ local LifeClock = require(Shared:WaitForChild("Life"):WaitForChild("LifeClock"))
 local WorldClient = {}
 WorldClient.__index = WorldClient
 
+-- A line in Output (the engine's warn; the CLI tests that drive the client have none unless they collect them).
+local function tell(message: string)
+	local say: any = warn
+	if say ~= nil then say(message) end
+end
+
 -- How long, in seconds, the sill may take to arrive under streaming before the sim begins without a missing piece (and says so), and the decor may.
 WorldClient.PIECES_WAIT = 30
 WorldClient.DECOR_WAIT = 10
+-- The focus report (ROBLOX-95): sent when the spider is more than this many studs from where it last reported, or this many seconds after the last report.
+WorldClient.REPORT_MOVE = 8
+WorldClient.REPORT_EVERY = 2
+-- The name of the remote the server makes for the reports (Server/WorldFocus.REMOTE).
+WorldClient.REMOTE = "WorldFocus"
 
 -- `ws`: the workspace; `player`: the local player; `map`: the world map (WorldMap, unless a test hands in another with the same functions).
 function WorldClient.new(ws: Instance, player: Instance, map: any?): any
@@ -43,6 +61,7 @@ function WorldClient.new(ws: Instance, player: Instance, map: any?): any
 		sill = root:WaitForChild(name)
 	end
 	local decor = ws:FindFirstChild("Decor")
+	local looks = ws:FindFirstChild(Region.LOOKS_FOLDER)
 	if (ws :: any).StreamingEnabled == true then
 		local deadline = os.clock() + WorldClient.PIECES_WAIT
 		for _, piece in Region.pieces(home) do
@@ -51,13 +70,59 @@ function WorldClient.new(ws: Instance, player: Instance, map: any?): any
 			end
 		end
 		if decor == nil then decor = ws:WaitForChild("Decor", WorldClient.DECOR_WAIT) end
+		if looks == nil then looks = ws:WaitForChild(Region.LOOKS_FOLDER, WorldClient.DECOR_WAIT) end
 	end
 	return setmetatable({
-		map = m, player = player, root = root, sill = sill, decor = decor,
+		map = m, player = player, root = root, sill = sill, decor = decor, looks = looks,
 		home = home.id, region = home,
 		boundsMin = lo, boundsMax = hi, spawnPos = home.spawn.pos, spawnHeading = home.spawn.heading,
+		homeMin = home.bounds[1], homeMax = home.bounds[2],
 		focused = nil :: Instance?, focusWarned = false,
+		-- the focus report: the remote (found when first needed), where and when the last report was, how many were sent
+		remote = nil :: Instance?, reported = nil :: Vector3?, reportedAt = -math.huge, reports = 0,
+		-- the readiness guard: regions found whole, and regions already warned about
+		whole = {} :: { [string]: boolean }, warned = {} :: { [string]: boolean },
 	}, WorldClient)
+end
+
+-- Whether the point is inside some region's bounds: the player's motor is out of the world only where no region holds it (SpiderMotor's `inBounds`), so a fall from the
+-- sill's room side ends where it always did and a fall from the outer sill goes on down to the bed.
+function WorldClient.inBounds(self: any, pos: Vector3): boolean
+	return self.map.at(pos) ~= nil
+end
+
+-- The folder of a region's physical boxes, or nil while it has not arrived (a place with only the sill straight in the workspace has only the sill's).
+function WorldClient.folderOf(self: any, region: WorldMap.Region): Instance?
+	if region.id == self.home then return self.sill end
+	if self.root == self.sill then return nil end
+	return self.root:FindFirstChild(Region.folderName(region))
+end
+
+-- Whether every box of the region is here: its folder holds every piece of Region.pieces(region). With instance streaming the folders arrive at once and their parts as the
+-- server sends them, so a region can be here in part; the sim must not raycast into it until it is whole. False for a region that is not on the map.
+function WorldClient.regionReady(self: any, id: string): boolean
+	local region = self.map.region(id)
+	if region == nil then return false end
+	local folder = self:folderOf(region)
+	if folder == nil then return false end
+	for _, piece in Region.pieces(region) do
+		if folder:FindFirstChild(piece.id) == nil then return false end
+	end
+	return true
+end
+
+-- Sends the server where the spider is (the WorldFocus remote), when it has moved more than REPORT_MOVE studs from the last report or REPORT_EVERY seconds have passed. True
+-- when it sent one. Without the remote (a place whose server has not made it, the box worlds) nothing is sent.
+function WorldClient.report(self: any, pos: Vector3, now: number): boolean
+	local last = self.reported
+	if last ~= nil and (pos - last).Magnitude <= WorldClient.REPORT_MOVE and now - self.reportedAt < WorldClient.REPORT_EVERY then return false end
+	if self.remote == nil then self.remote = ReplicatedStorage:FindFirstChild(WorldClient.REMOTE) end
+	local remote = self.remote
+	if remote == nil or not remote:IsA("RemoteEvent") then return false end
+	(remote :: RemoteEvent):FireServer(pos)
+	self.reported, self.reportedAt = pos, now
+	self.reports += 1
+	return true
 end
 
 -- The id of the retreat the point is in, in any region, or nil.
@@ -91,11 +156,22 @@ function WorldClient.refocus(self: any)
 	self.focused = nil
 end
 
--- Each frame, before the sim's ticks: the region the spider is in, the pace of its day, and the focus on the drawn spider's root (`root`) when it is not set on it yet.
-function WorldClient.update(self: any, pos: Vector3, root: Instance?)
+-- Each frame, before the sim's ticks: the region the spider is in, the pace of its day, the focus on the drawn spider's root (`root`) when it is not set on it yet, the
+-- report of where it is to the server (`now`: os.clock() unless a test gives a clock), and whether the region it is in has arrived whole (warned about once if not).
+function WorldClient.update(self: any, pos: Vector3, root: Instance?, now: number?)
 	self.region = self.map.at(pos) or self.region
 	LifeClock.game.clockScale = self.region.clockScale
 	if root ~= nil and root ~= self.focused then self:focus(root) end
+	self:report(pos, now or os.clock())
+	local id = self.region.id
+	if not self.whole[id] then
+		if self:regionReady(id) then
+			self.whole[id] = true
+		elseif not self.warned[id] then
+			self.warned[id] = true
+			tell(`[Windowsill] world: the spider is in {id}, which has not arrived whole; it may fall through where a box should be`)
+		end
+	end
 end
 
 return WorldClient

@@ -55,7 +55,12 @@ Layout.PIECES = {
 	{ id = "leaf_high", lo = v(-14, 10.8, -9), hi = v(-7, 11.2, -3), profile = "leaf_dry_prototype", color = hex("78985c") },
 	{ id = "stem_high", lo = v(-11, 0, -6.5), hi = v(-10, 10.8, -5.5), profile = "leaf_dry_prototype", color = hex("536b43") },
 	{ id = "sill_floor", lo = v(-30, -1, -12.5), hi = v(30, 0, 12.5), profile = "painted_wood_dry", color = hex("b6a082") },
-	{ id = "back_frame", lo = v(-31, 0, -13.5), hi = v(31, 14, -12.5), profile = "bare_wood_rough", color = hex("ded7c3") },
+	-- ROBLOX-95: the back frame with the lower sash raised 6 cm, an opening x -8..8, y 0.7..6 through it (the way out onto the outer sill): the wall
+	-- west and east of it, the frame above it, and the 0.7 cm sill rail below it. Same profile and colour as the one back_frame box they replace.
+	{ id = "back_frame_west", lo = v(-31, 0, -13.5), hi = v(-8, 14, -12.5), profile = "bare_wood_rough", color = hex("ded7c3") },
+	{ id = "back_frame_east", lo = v(8, 0, -13.5), hi = v(31, 14, -12.5), profile = "bare_wood_rough", color = hex("ded7c3") },
+	{ id = "back_frame_head", lo = v(-8, 6, -13.5), hi = v(8, 14, -12.5), profile = "bare_wood_rough", color = hex("ded7c3") },
+	{ id = "back_frame_rail", lo = v(-8, 0, -13.5), hi = v(8, 0.7, -12.5), profile = "bare_wood_rough", color = hex("ded7c3") },
 	{ id = "left_frame", lo = v(-31, 0, -12.5), hi = v(-30, 14, 12.5), profile = "bare_wood_rough", color = hex("ded7c3") },
 	{ id = "right_frame", lo = v(30, 0, -12.5), hi = v(31, 14, 12.5), profile = "bare_wood_rough", color = hex("ded7c3") },
 	{ id = "front_lip", lo = v(-30, 0, 12.0), hi = v(30, 0.7, 12.5), profile = "bare_wood_rough", color = hex("8b7256") },

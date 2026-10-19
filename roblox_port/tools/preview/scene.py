@@ -31,6 +31,7 @@ ap.add_argument("--size", default="1280x720")
 ap.add_argument("--format", default="png")
 ap.add_argument("--uv", action="store_true", help="also show the UV layer (as the eye-view helper does) in every view")
 ap.add_argument("--parts", default="")
+ap.add_argument("--world", action="store_true", help="also build the regions outside the window (ROBLOX-95: the outer sill, the wall, the bed) for the outside views")
 ap.add_argument("--elevation", type=float, default=30.0, help="sun elevation, degrees")
 ap.add_argument("--set", action="append", default=[], help="lighting knob for scene.gd, key=value (energy, ambient, bias, nbias, blur)")
 ap.add_argument("--azimuth", type=float, default=30.0, help="degrees off straight out of the window (-Z); positive turns toward +X")
@@ -41,6 +42,10 @@ out.mkdir(parents=True, exist_ok=True)
 SPIDERS = [
     {"name": "spawn", "x": -22.0, "z": 6.0, "hx": 1, "hz": 0},   # Layout.SPAWN, Layout.SPAWN_HEADING
     {"name": "mid", "x": -9.0, "z": 5.5, "hx": 1, "hz": 0},
+    # ROBLOX-95 (--world): one on the outer sill just out of the opening, one on the wall's face part way down, one in front of the bed's stone
+    {"name": "out", "x": 0.0, "y": 0.31, "z": -18.0, "hx": 0, "hz": -1},
+    {"name": "wall", "x": 2.0, "y": -40.0, "z": -24.31, "hx": 0, "hy": -1, "hz": 0, "up": [0, 0, -1]},
+    {"name": "bed", "x": 11.0, "y": -89.69, "z": -43.5, "hx": 0, "hz": -1},
 ]
 FLIES = [
     {"id": "fly_a", "x": -16.0, "y": 0.16, "z": 4.0, "hx": 1, "hy": 0, "hz": -0.35, "flying": False},  # on the sill floor, hover 0.16
@@ -73,8 +78,9 @@ def dump_parts(path):
     spec.loader.exec_module(run)
     driver = str(HERE / "scene_driver.luau")
     run.CLIENT_TESTS.add(driver)  # the driver needs the client modules (SpiderRig, FlyBodies) in its bundle
+    spiders = SPIDERS if args.world else SPIDERS[:2]
     prefix = (f'DETAIL = {lua(args.detail)}\nSUN_ELEVATION_DEG = {args.elevation}\nSUN_AZIMUTH_DEG = {args.azimuth}\n'
-              f'SPIDERS = {lua(SPIDERS)}\nFLIES = {lua(FLIES)}\nWASPS = {lua(WASPS)}\n')
+              f'SPIDERS = {lua(spiders)}\nFLIES = {lua(FLIES)}\nWASPS = {lua(WASPS)}\nWORLD = {lua(args.world)}\n')
     with tempfile.NamedTemporaryFile("w", suffix=".luau", encoding="utf-8", delete=False, dir=out) as f:
         f.write(prefix + run.bundle(driver))
     try:
@@ -127,6 +133,14 @@ VIEWS = {
     "eye_side": {"fov": 90, "eye": [-21.47, 0.39, 6.0], "at": [-12.0, 0.9, 3.2], "near": 0.02, "far": 2500, "groups": ["flies"], "shadow": 40},
     "eye_principal": {"fov": 24, "eye": [-21.47, 0.39, 6.0], "at": [-16.0, 0.22, 4.0], "near": 0.02, "far": 2500, "groups": ["flies"], "shadow": 40, "uv": True},
     "fly_b": {"fov": 34, "eye": [-11.0, 3.4, 3.7], "at": [-12.0, 3.0, 2.0], "near": 0.02, "far": 1800, "groups": ["flies"], "shadow": 20},
+    # ROBLOX-95, with --world: the raised sash from the sill, the window from the outer sill, the wall from the air in front of it, the bed, the stone, the whole
+    "sash": {"fov": 60, "eye": [0.0, 1.6, -5.0], "at": [0.0, 0.6, -20.0], "near": 0.05, "far": 2500, "groups": []},
+    "outside": {"fov": 62, "eye": [7.0, 5.0, -23.0], "at": [0.0, 2.5, -13.0], "near": 0.05, "far": 2500, "groups": ["out"]},
+    "wall": {"fov": 60, "eye": [28.0, -25.0, -75.0], "at": [0.0, -45.0, -24.0], "near": 0.1, "far": 2500, "groups": ["wall"], "shadow": 160},
+    "bed": {"fov": 58, "eye": [0.0, -60.0, -100.0], "at": [0.0, -89.0, -47.0], "near": 0.1, "far": 2500, "groups": ["bed"], "shadow": 120},
+    "stone": {"fov": 50, "eye": [11.0, -85.5, -39.0], "at": [11.0, -89.0, -50.0], "near": 0.05, "far": 2500, "groups": ["bed"], "shadow": 40},
+    "world": {"fov": 60, "eye": [75.0, -15.0, -100.0], "at": [0.0, -55.0, -30.0], "near": 1.0, "far": 4000, "groups": [], "shadow": 220},
+    "descent": {"fov": 60, "eye": [6.0, -36.0, -31.0], "at": [2.0, -40.0, -24.31], "near": 0.05, "far": 2500, "groups": ["wall"], "shadow": 40},
 }
 
 

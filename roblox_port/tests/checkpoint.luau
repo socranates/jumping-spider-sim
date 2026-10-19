@@ -773,24 +773,60 @@ case("a rest records where in the world it was kept, and a record from before me
 	local text = assert(Json.canonical(record))
 	check(string.find(text, '"world_map":{"diffs":[],"region":"sill","retreat":"sill_crevice","revision":"' .. WorldMap.REVISION .. '","seed":914}', 1, true) ~= nil, "(its stored text: " .. string.sub(text, (string.find(text, '"world_map"', 1, true) or 1), (string.find(text, '"world_map"', 1, true) or 1) + 110) .. ")")
 	check(#(Checkpoint.check(Json.copy(record), w)) == 0, "and a copy of it is a good record")
-	-- A record from before there was a world has no such block, and means the sill of the default world with no changes: it is as good as it was.
+	-- A record from before there was a world has no such block, and means the sill of the default world with no changes, kept under the first revision of the world
+	-- (ROBLOX-95: world-1, before the back frame opened): a good record, from a world that has moved since, so it is put back at the sill's spawn with the notice.
 	local old = Json.copy(record)
 	old.world_map = nil
-	check(#(Checkpoint.check(old, w)) == 0 and not Checkpoint.worldMoved(old), "a record without one is good, and from this world")
+	check(#(Checkpoint.check(old, w)) == 0 and Checkpoint.worldMoved(old) and WorldMap.FIRST_REVISION == "world-1" and WorldMap.REVISION ~= WorldMap.FIRST_REVISION,
+		"a record without one is good, and from the world as it was before the sash was raised")
 	local fp = fingerprint(w)
 	check(Checkpoint.restore(old, w), "and restores")
-	check((w.motor.pos - HOME).Magnitude < 1e-6 and Layout.inRetreat(w.motor.pos) and fingerprint(w) ~= fp, "where it was kept: at home in the crack")
+	local spawn = Layout.SPAWN + Vector3.new(0, 0.31, 0)
+	check((w.motor.pos - spawn).Magnitude < 1e-6 and not Layout.inRetreat(w.motor.pos) and fingerprint(w) ~= fp, "at the sill's spawn, not where it was kept (the geometry has moved since)")
+	check(string.find(w.life.notice, "the world has changed since you rested", 1, true) ~= nil, "with the notice that says so")
 	local oldAway = Json.copy(away)
 	oldAway.world_map = nil
-	check(Checkpoint.restore(oldAway, w) and (w.motor.pos - Vector3.new(8, 0.31, 4)).Magnitude < 1e-6, "an old record away from the crack restores to where it was")
-	-- The old bounds check holds for an old record: a spider outside the sill is refused, and says so as it always has.
+	check(Checkpoint.restore(oldAway, w) and (w.motor.pos - spawn).Magnitude < 1e-6, "an old record away from the crack is put back at the spawn too")
+	-- An old record's place is not tested (it is not used), so one outside the sill is no longer refused for it; a retreat that is not on the map still is.
 	local far = Json.copy(old)
 	far.player.position = { 900, 1, 1 }
-	local problems = Checkpoint.check(far, w)
-	check(#problems > 0 and string.find(table.concat(problems, "; "), "outside the windowsill", 1, true) ~= nil, "an old record outside the sill is refused as before")
+	check(#(Checkpoint.check(far, w)) == 0 and Checkpoint.restore(far, w) and (w.motor.pos - spawn).Magnitude < 1e-6, "an old record's place is not trusted: one from outside the sill comes back at the spawn")
 	local ghost = Json.copy(old)
 	ghost.player.retreat_id = "stone"
-	check(string.find(table.concat(Checkpoint.check(ghost, w), "; "), "unknown retreat", 1, true) ~= nil, "and an old record in a retreat that is not on the map")
+	check(string.find(table.concat(Checkpoint.check(ghost, w), "; "), "unknown retreat", 1, true) ~= nil, "and an old record in a retreat that is not on the map is refused")
+	-- The current revision's record from the sill is as trusted as ever: it comes back where it was kept.
+	check(Checkpoint.restore(record, w) and (w.motor.pos - HOME).Magnitude < 1e-6 and Layout.inRetreat(w.motor.pos), "a rest kept under world-2 comes back in the crack")
+end)
+
+case("a rest under the bed's stone (ROBLOX-95): it records the bed and its stone, is checked against the bed, and comes back there", function()
+	local w = newWorld()
+	for _ = 1, 60 do tick(w) end
+	local under = Vector3.new(11, -89.69, -50)
+	w.motor:place(under, Vector3.yAxis, Vector3.new(0, 0, 1))
+	local record = assert(Checkpoint.capture(w, 0))
+	check(record.world_map.region == "bed_a" and record.world_map.retreat == "bed_a_stone" and record.player.retreat_id == "bed_a_stone" and record.world_map.revision == "world-2",
+		"a rest under the stone records bed_a, bed_a_stone and world-2")
+	check(#(Checkpoint.check(record, w)) == 0 and #(Checkpoint.check(Json.copy(record), w)) == 0, "a good record, and a stored copy of it")
+	w.motor:place(Layout.SPAWN + Vector3.new(0, 0.31, 0), Vector3.yAxis, Vector3.xAxis)
+	check(Checkpoint.restore(record, w) and (w.motor.pos - under).Magnitude < 1e-6 and WorldMap.inRetreat(w.motor.pos) == "bed_a_stone", "and it comes back under the stone")
+	check(string.find(w.life.notice, "the world has changed", 1, true) == nil, "with the usual notice")
+	-- the bed's own checks: its bounds, its retreats
+	local function problemsOf(change: (any) -> ()): string
+		local r = Json.copy(record)
+		change(r)
+		return table.concat(Checkpoint.check(r, w), "; ")
+	end
+	check(string.find(problemsOf(function(r) r.player.position = { 11, -89.69, -100 } end), "outside bed_a", 1, true) ~= nil, "a spot outside the bed's bounds is refused, by the bed's name")
+	check(string.find(problemsOf(function(r) r.player.position = { -22, 0.31, 6 } end), "outside bed_a", 1, true) ~= nil, "and so is the sill's spawn, for a record that says the bed")
+	check(string.find(problemsOf(function(r) r.world_map.retreat = "sill_crevice"; r.player.retreat_id = "sill_crevice" end), "unknown retreat", 1, true) ~= nil, "the crack is not a retreat of the bed")
+	check(problemsOf(function(r) r.world_map.region = "house_wall"; r.world_map.retreat = ""; r.player.retreat_id = ""; r.player.position = { 0, -40, -24.31 }; r.player.normal = { 0, 0, -1 } end) == "",
+		"a record on the wall's face is a good record (no retreat there)")
+	-- a rest in the bed from another revision is put back at the bed's own spawn
+	local moved = Json.copy(record)
+	moved.world_map.revision = "world-1"
+	local bed = WorldMap.region("bed_a") :: WorldMap.Region
+	check(Checkpoint.restore(moved, w) and (w.motor.pos - (bed.spawn.pos + Vector3.new(0, 0.31, 0))).Magnitude < 1e-6 and string.find(w.life.notice, "the world has changed", 1, true) ~= nil,
+		"a bed rest from another revision comes back at the bed's spawn, with the notice")
 end)
 
 case("a region that is not on the map, a spot outside its bounds and a bad world record are refused and change nothing (ROBLOX-94)", function()

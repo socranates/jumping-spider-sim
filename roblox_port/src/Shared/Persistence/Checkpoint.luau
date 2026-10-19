@@ -29,6 +29,9 @@
 -- rest before the world) means the sill of the default world with no changes. A region that is not on the map, or a position outside that region's bounds, is refused like
 -- any bad record. A rest made in another revision of the world, or from another seed, is put back at its region's spawn: the position was kept for geometry that may have
 -- moved, so it is not trusted (the rest of the record is: the life, the reserves, the clock).
+-- ROBLOX-95: the world is at revision world-2 (the sill's back frame opened, the garden added) and a record without `world_map` is read as world-1's, the sill
+-- of before: every rest kept before this round is put back at its region's spawn with the notice. A rest in the garden (the gap under the bed's stone) records
+-- region bed_a and retreat bed_a_stone and is put back there. SCHEMA_VERSION and CONTENT_REVISION do not change (a new content revision would refuse old records).
 
 local Species = require(script.Parent.Parent.Data.Species)
 local ObjectRecord = require(script.Parent.ObjectRecord)
@@ -121,14 +124,16 @@ local function vec(t: any): Vector3?
 	return Vector3.new(t[1], t[2], t[3])
 end
 
--- The world record of a checkpoint with the defaults of a record from before there was a world: the default world's seed and revision, the sill, the retreat the
--- player block names, no changes. Returns it and what is wrong with a record that has one (an empty list for a good one or an old one).
+-- The world record of a checkpoint with the defaults of a record from before there was a world: the default world's seed, the first revision of the world
+-- (WorldMap.FIRST_REVISION, ROBLOX-95: such a rest was kept on the sill before its back frame opened, so it is put back at the spawn like any rest from
+-- world-1), the sill, the retreat the player block names, no changes. Returns it and what is wrong with a record that has one (an empty list for a good one or
+-- an old one).
 export type MapRecord = { seed: number, revision: string, region: string, retreat: string, diffs: { any } }
 local function mapRecord(record: any): (MapRecord, { string })
 	local problems: { string } = {}
 	local p = record.player
 	local out: MapRecord = {
-		seed = WorldMap.SEED, revision = WorldMap.REVISION, region = WorldMap.HOME, diffs = {},
+		seed = WorldMap.SEED, revision = WorldMap.FIRST_REVISION, region = WorldMap.HOME, diffs = {},
 		retreat = if type(p) == "table" and type(p.retreat_id) == "string" then p.retreat_id else "",
 	}
 	local m = record.world_map
@@ -317,7 +322,7 @@ function Checkpoint.check(record: any, world: World): ({ string }, ObjectRecord.
 	for _, text in mapProblemList do bad(text) end
 	local region = WorldMap.region(map.region)
 	if #mapProblemList == 0 and region == nil then bad("the spider is in a region this world does not have") end
-	local moved = map.revision ~= WorldMap.REVISION or map.seed ~= WorldMap.SEED
+	local moved = Checkpoint.worldMoved(record)
 	if region ~= nil and #mapProblemList == 0 and map.retreat ~= "" and not hasRetreat(region, map.retreat) then bad("the spider is in an unknown retreat") end
 	local p = record.player
 	if type(p) ~= "table" then

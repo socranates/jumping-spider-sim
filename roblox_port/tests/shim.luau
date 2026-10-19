@@ -165,7 +165,7 @@ local function newSignal()
 	function sig.Wait(_self) return 0 end
 	return sig
 end
-local EVENTS = { InputBegan = true, InputEnded = true, InputChanged = true, Activated = true, MouseButton1Click = true, Changed = true }
+local EVENTS = { InputBegan = true, InputEnded = true, InputChanged = true, Activated = true, MouseButton1Click = true, Changed = true, OnServerEvent = true }
 Object.__index = function(o, k)
 	if k == "Size" then
 		local s = rawget(o, "_size")
@@ -263,6 +263,12 @@ function Object.Pause(o) o.Playing = false end
 function Object.Resume(o) o.Playing = true; rawset(o, "plays", (rawget(o, "plays") or 0) + 1) end -- (`plays` counts the asks to play, ROBLOX-100)
 function Object.Stop(o) o.Playing = false; o.TimePosition = 0 end
 function Object.GetAttribute(o, k) return rawget(o, "_attrs")[k] end
+-- A RemoteEvent fired by a client: the arguments are kept, in order, in `fired` (ROBLOX-95: the focus report); nothing reaches a server here.
+function Object.FireServer(o, ...)
+	local list = rawget(o, "fired")
+	if list == nil then list = {}; rawset(o, "fired", list) end
+	table.insert(list, { ... })
+end
 function Object.Destroy(o)
 	o.Parent = nil
 	for _, c in table.clone(children(o)) do c:Destroy() end

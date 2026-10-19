@@ -63,7 +63,7 @@ return function(check: (string, () -> ()) -> ())
 			{ "sill_floor", function(w: any): boolean return w.pos.X < 0 and w.pos.Z < -2 end },
 			{ "leaf_west", function(w: any): boolean return w.up.Y > 0.9 end },
 			{ "planter_rim", function(w: any): boolean return w.up.Y > 0.9 end },
-			{ "back_frame", function(w: any): boolean return w.up.Z > 0.9 end },
+			{ "back_frame_west", function(w: any): boolean return w.up.Z > 0.9 end },
 		}
 		for _, t in targets do
 			local goal: any = nil

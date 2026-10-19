@@ -67,6 +67,9 @@ export type Config = {
 	boundsMin: Vector3,
 	boundsMax: Vector3,
 	probeParent: Instance?,
+	-- ROBLOX-95: where the play area is, when it is not one box (the world's regions: the client's WorldClient.inBounds). Out of bounds is then outside the box or
+	-- where this says no; without it, the box alone, as Godot has it.
+	inBounds: ((Vector3) -> boolean)?,
 }
 
 function Motor.idleInput(): TickInput
@@ -603,7 +606,9 @@ end
 
 function Motor._outOfBounds(self: any, p: Vector3): boolean
 	local lo, hi = self.config.boundsMin, self.config.boundsMax
-	return p.X < lo.X or p.Y < lo.Y or p.Z < lo.Z or p.X > hi.X or p.Y > hi.Y or p.Z > hi.Z
+	if p.X < lo.X or p.Y < lo.Y or p.Z < lo.Z or p.X > hi.X or p.Y > hi.Y or p.Z > hi.Z then return true end
+	local inside = self.config.inBounds
+	return inside ~= nil and not inside(p)
 end
 
 -- Leaving the play area puts the spider back at its last supported spot (Godot _reset_out_of_bounds).

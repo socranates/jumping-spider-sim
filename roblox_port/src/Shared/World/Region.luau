@@ -2,41 +2,66 @@
 -- What a region is made of (ROBLOX-94, docs/OPEN_WORLD_DESIGN.md): the generators. Each is pure and deterministic from the region (its kind and its
 -- seed), so the same region gives the same boxes forever, on the server and on any client; nothing here touches the engine.
 --   pieces ... the physical boxes: what the motor walks on, the rival's route is built from, and the prey perch on (Habitat/WindowsillLayout.Piece).
---   decor .... the drawn-only boxes that stand beside them (Habitat/WindowsillLayout.Decor). The sill's drawn world (Habitat/Scenery.decor) is its own
---              generator and still reads these; a region of any other kind will put its looks here.
---   keepOut .. the boxes the rival's route keeps out of: the retreats and a margin around them.
+--   decor .... the drawn-only boxes that stand beside them. The sill's are the layout's DECOR (its drawn world is Habitat/Scenery.decor, which still reads the layout);
+--              every other kind's are its whole drawn look, one record a part (World/Garden.Drawn, built by Habitat/Scenery.look).
+--   keepOut .. the boxes the region's creatures keep out of: the retreats and a margin around them, and the sill's open sash (ROBLOX-95: the rival and the mate
+--              are bound to the sill, so the way out is not theirs).
 --   budget ... how many drawn parts a region of a kind may carry at each detail tier.
--- The sill is the one kind so far, and its generator returns the layout's lists as they are: the sill is hand-placed and byte-identical to what it was
--- before there was a world (tests/worldmap.luau pins that). Every later kind is a seeded placer (soil mounds, litter leaves, grass tufts, stones, stems
--- and a flower head) that respects its budget; asking for a kind with no generator is a mistake, not an empty region.
+-- The sill is hand-placed and its generator returns the layout's lists as they are (tests/worldmap.luau pins that). ROBLOX-95 adds the three kinds under the
+-- window, seeded placers in World/Garden: outer_sill, house_wall and bed. Asking for a kind with no generator is a mistake, not an empty region.
 local Layout = require(script.Parent.Parent.Habitat.WindowsillLayout)
 local Rules = require(script.Parent.Parent.Data.RivalRules)
 local WorldMap = require(script.Parent.WorldMap)
+local Garden = require(script.Parent.Garden)
 
 local Region = {}
 
 export type Box = { min: Vector3, max: Vector3 }
+export type Drawn = Garden.Drawn
 
 -- The name of the folder every region's folder of physical boxes is built under, in the workspace (WorldBuild; the client's rays include it).
 Region.WORLD_FOLDER = "World"
+-- The folder beside it that holds the drawn look of every region but the sill (WorldBuild.looks; the sill's is the Decor model, as it always was).
+Region.LOOKS_FOLDER = "WorldDecor"
+
+-- ROBLOX-95: the open sash, as the sill's creatures keep out of it: the gap between the back frame's pieces (WindowsillLayout back_frame_*), grown by 0.3 across
+-- and up, through the frame's depth and 0.05 into the room (so the floor in front of it is not in it).
+Region.SASH_MIN = Vector3.new(-8.3, -0.05, -13.55)
+Region.SASH_MAX = Vector3.new(8.3, 6.3, -12.45)
 
 -- The physical boxes of the region.
 function Region.pieces(region: WorldMap.Region): { Layout.Piece }
 	if region.kind == "sill" then return Layout.PIECES end
-	error("no generator for the region kind " .. region.kind)
+	return Garden.pieces(region) :: any
 end
 
 -- The drawn-only boxes of the region.
-function Region.decor(region: WorldMap.Region): { Layout.Decor }
-	if region.kind == "sill" then return Layout.DECOR end
-	error("no generator for the region kind " .. region.kind)
+function Region.decor(region: WorldMap.Region): { Drawn }
+	if region.kind == "sill" then return Layout.DECOR :: any end
+	return Garden.decor(region)
 end
 
--- The boxes the rival's route keeps out of (RivalRoute: nothing the rival does goes in): the sill's are the crack grown by a margin, authored with the
--- rival's other rules (Data/RivalRules). One box per retreat, in the retreats' order.
+-- The ids of the region's pieces that its drawn look stands in for (they turn invisible, still solid, once the look exists). The sill's are decided by its Decor
+-- (Habitat/Scenery.decor's second result), so none here.
+function Region.drawnPieces(region: WorldMap.Region): { string }
+	if region.kind == "sill" then return {} end
+	return Garden.drawnPieces(region)
+end
+
+-- Every piece of the region that some drawing may stand in for: its own look's (drawnPieces) and, on the outer sill, the window box's halves, which the sill's
+-- Decor draws (Habitat/Plants.garden). WorldBuild hides these when it is not told which drawings exist.
+function Region.replaceable(region: WorldMap.Region): { string }
+	if region.kind == "sill" then return {} end
+	local out = table.clone(Garden.drawnPieces(region))
+	for _, id in Garden.drawnBySill(region) do table.insert(out, id) end
+	return out
+end
+
+-- The boxes the region's creatures keep out of (RivalRoute: nothing the rival does goes in): for the sill, the crack grown by a margin, authored with the rival's
+-- other rules (Data/RivalRules), then the open sash; for the others, each retreat grown by half a stud. The retreats' boxes come first, in the retreats' order.
 function Region.keepOut(region: WorldMap.Region): { Box }
-	if region.kind == "sill" then return { { min = Rules.keepOutMin, max = Rules.keepOutMax } } end
-	error("no generator for the region kind " .. region.kind)
+	if region.kind == "sill" then return { { min = Rules.keepOutMin, max = Rules.keepOutMax }, { min = Region.SASH_MIN, max = Region.SASH_MAX } } end
+	return Garden.keepOut(region)
 end
 
 -- The folder a region's physical boxes are built into (WorldBuild), by which the client finds it: the sill is "Windowsill", as it was before there was a
@@ -46,11 +71,12 @@ function Region.folderName(region: WorldMap.Region): string
 end
 
 -- The most drawn parts (the decor, as tests/world.luau counts them) a region of this kind may carry at a detail tier ("full" or "low", Data/Detail), or nil
--- for a kind with no budget yet. A stub: the sill's are what its decor builds now, with the sun through the window (the most it ever builds), and
--- tests/world.luau holds it to them exactly, so a sill that grows says so here; every later kind brings its own numbers with its generator.
+-- for a kind with no budget. The sill's are what its decor builds now, with the sun through the window (the most it ever builds), and tests/world.luau holds
+-- it to them exactly, so a sill that grows says so here; the garden's kinds are ceilings their placers keep to (World/Garden.BUDGETS).
 local BUDGETS: { [string]: { full: number, low: number } } = {
-	sill = { full = 1156, low = 292 },
+	sill = { full = 1178, low = 314 }, -- (ROBLOX-95: 1156 and 292 before the raised sash, the window box's halves and the shrubs' bodies: 22 more at each tier)
 }
+for kind, b in Garden.BUDGETS do BUDGETS[kind] = b end
 
 function Region.budget(kind: string, tier: string): number?
 	local b = BUDGETS[kind]

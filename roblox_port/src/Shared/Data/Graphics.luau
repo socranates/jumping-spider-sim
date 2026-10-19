@@ -17,7 +17,7 @@ Graphics.materials = {
 		upper_ledge = "Wood", garden_step = "Plaster",
 		leaf_garden = "SmoothPlastic", stem_garden = "SmoothPlastic", leaf_high = "SmoothPlastic", stem_high = "SmoothPlastic",
 		sill_floor = "SmoothPlastic", front_lip = "SmoothPlastic",
-		back_frame = "Plaster", left_frame = "Plaster", right_frame = "Plaster",
+		back_frame_west = "Plaster", back_frame_east = "Plaster", back_frame_head = "Plaster", back_frame_rail = "Plaster", left_frame = "Plaster", right_frame = "Plaster",
 		planter = "Plaster", planter_rim = "Plaster",
 		leaf_west = "SmoothPlastic", leaf_middle = "SmoothPlastic", leaf_east = "SmoothPlastic", leaf_tip = "Plaster",
 		stem_west = "SmoothPlastic", stem_middle = "SmoothPlastic", stem_east = "SmoothPlastic",
@@ -42,16 +42,23 @@ Graphics.paint = {
 } :: { [string]: { color: string, reflectance: number? } }
 
 -- ---------------------------------------------------------------- the window
--- The back wall is a solid, climbable box (WindowsillLayout back_frame), so the window is drawn: the physical wall turns
+-- The back wall is solid, climbable boxes (WindowsillLayout back_frame_*), so the window is drawn: the physical wall turns
 -- invisible (still solid, still climbable) and Scenery draws a plaster wall behind its face with an opening for the glass.
 Graphics.window = {
-	hidden = "back_frame", -- the piece that turns invisible
+	-- the pieces that turn invisible: the back frame, in four since the lower sash was raised (ROBLOX-95: WindowsillLayout's back_frame_*)
+	hidden = { "back_frame_west", "back_frame_east", "back_frame_head", "back_frame_rail" } :: { string },
 	slabGap = 0.02, -- the drawn wall sits this far behind the climbable face, so the spider's feet never sink into it
 	left = -27.5, right = 27.5, bottom = 3, top = 13, -- the opening: x from/to, y from/to
 	trimWidth = 0.5, trimDepth = 0.10, trimReflectance = 0.04, -- the frame bars around the opening, flush with the climbable face; glossy
 	wallColor = "efe8d8", trimColor = "f4efe3",
 	glass = { color = "cfe3e6", transparency = 0.86, reflectance = 0.12, thickness = 0.04, setback = 0.05 },
 	mullions = { -10, 10 }, mullionWidth = 0.7, -- bars between the panes
+	-- ROBLOX-95: the middle lower sash is raised 6 cm. `opening` is the gap it leaves (the layout's own: back_frame_rail's top to back_frame_head's
+	-- underside, between back_frame_west and back_frame_east), open air from the sill rail up to the sash; the glass over it is gone. The raised sash's
+	-- bottom rail is drawn across the top of the opening (`sashRail` tall, `sashDepth` deep, set back `sashSetback` from the face), the jambs either side
+	-- (`jambWidth`) line the cut through the wall, and the sill rail is trim.
+	opening = { left = -8, right = 8, bottom = 0.7, top = 6 },
+	sashRail = 0.8, sashDepth = 0.45, sashSetback = 0.12, jambWidth = 0.5,
 	-- WindowsillLayout.DECOR entries Scenery draws itself
 	replaces = { window_glass = true, mullion_w = true, mullion_e = true } :: { [string]: boolean },
 }
@@ -64,7 +71,9 @@ Graphics.window = {
 -- eave line at v. `full`: dropped in the low tier.
 Graphics.view = {
 	eye = Vector3.new(0, 2.5, 5),
-	ground = { y = -46, size = 2048, color = "7d8f62" },
+	-- ROBLOX-95: the lawn is at the garden's level now, 0.4 below the soil of the bed under the window (World/WorldMap bed_a, y -90), where the house wall
+	-- meets it; it was at -46 when nothing could be walked outside the glass. Everything below stands on it (the trunks and a house were lengthened to reach it).
+	ground = { y = -90.4, size = 2048, color = "7d8f62" },
 	sky = true,
 	items = {
 		-- far hills
@@ -80,7 +89,7 @@ Graphics.view = {
 		{ id = "roof_3", kind = "roof", u = -8.5, v = 4.6, depth = 120, w = 7.0, t = 5.4, color = "9a5642", full = false },
 		{ id = "house_4", kind = "block", u = 0.5, v = -3.0, depth = 120, w = 5.3, h = 14, t = 5, color = "cdbfa4", full = true },
 		{ id = "roof_4", kind = "roof", u = 0.5, v = 4.0, depth = 120, w = 5.8, t = 5.4, color = "6a5a52", full = true },
-		{ id = "house_5", kind = "block", u = 9, v = -2.2, depth = 120, w = 6.6, h = 14, t = 5, color = "d6c6a6", full = false },
+		{ id = "house_5", kind = "block", u = 9, v = -2.35, depth = 120, w = 6.6, h = 14.3, t = 5, color = "d6c6a6", full = false },
 		{ id = "roof_5", kind = "roof", u = 9, v = 4.8, depth = 120, w = 7.2, t = 5.4, color = "7b4a3d", full = false },
 		{ id = "house_6", kind = "block", u = 17.5, v = -2.9, depth = 120, w = 5.5, h = 14, t = 5, color = "c4b99f", full = true },
 		{ id = "roof_6", kind = "roof", u = 17.5, v = 4.1, depth = 120, w = 6.0, t = 5.4, color = "58626b", full = true },
@@ -89,14 +98,14 @@ Graphics.view = {
 		{ id = "chimney_3", kind = "block", u = -7.3, v = 6.7, depth = 119, w = 0.6, h = 2.4, t = 0.8, color = "8c5a48", full = true },
 		{ id = "chimney_5", kind = "block", u = 10.3, v = 6.85, depth = 119, w = 0.6, h = 2.5, t = 0.8, color = "86553f", full = true },
 		-- a tree on the left, a smaller one on the right
-		{ id = "trunk_a", kind = "block", u = -17, v = -3.2, depth = 72, w = 1.3, h = 23.5, t = 1.3, color = "4a3e30", full = false },
+		{ id = "trunk_a", kind = "block", u = -17, v = -3.56, depth = 72, w = 1.3, h = 24.22, t = 1.3, color = "4a3e30", full = false },
 		{ id = "canopy_a1", kind = "ball", u = -17, v = 10.5, depth = 72, w = 11, color = "3f6238", full = false },
 		{ id = "canopy_a2", kind = "ball", u = -23.5, v = 8.5, depth = 72, w = 8.5, color = "496f40", full = false },
 		{ id = "canopy_a3", kind = "ball", u = -10.5, v = 9.0, depth = 72, w = 8, color = "35552f", full = true },
 		{ id = "canopy_a4", kind = "ball", u = -19.5, v = 13.5, depth = 72, w = 7, color = "446a3b", full = true },
 		{ id = "canopy_a5", kind = "ball", u = -13.5, v = 13.2, depth = 72, w = 6.5, color = "3a5c34", full = true },
 		{ id = "canopy_a6", kind = "ball", u = -26, v = 12, depth = 72, w = 6, color = "4d7544", full = true },
-		{ id = "trunk_b", kind = "block", u = 18.5, v = 1.5, depth = 100, w = 0.9, h = 14, t = 0.9, color = "50443a", full = true },
+		{ id = "trunk_b", kind = "block", u = 18.5, v = -1.42, depth = 100, w = 0.9, h = 19.84, t = 0.9, color = "50443a", full = true },
 		{ id = "canopy_b1", kind = "ball", u = 18.5, v = 7.2, depth = 100, w = 6.5, color = "47703e", full = true },
 		{ id = "canopy_b2", kind = "ball", u = 22, v = 6.2, depth = 100, w = 5, color = "3d6336", full = true },
 		{ id = "canopy_b3", kind = "ball", u = 15, v = 6.0, depth = 100, w = 4.5, color = "4f7746", full = true },

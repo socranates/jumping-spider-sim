@@ -262,6 +262,81 @@ case("the day passes with action time", function()
 	near(l.clock.hour - start, 120 / 60 * LifeClock.ACTIVE_HOURS_PER_S, 1e-9, "120 ticks")
 end)
 
+-- ROBLOX-94: a region's day can run slower than the sill's (LifeClock.game.clockScale, set from the region the spider is in). It multiplies every advance of game
+-- hours and nothing else: Godot's rates are untouched, the goldens above ran at 1.0, and the hours it makes are what hunger, growth and the rest read.
+case("the clock scale slows the day and nothing else", function()
+	local function withScale(scale: any, fn: () -> ())
+		local was = LifeClock.game.clockScale
+		LifeClock.game.clockScale = scale
+		local ok, err = pcall(fn)
+		LifeClock.game.clockScale = was
+		if not ok then error(err, 0) end
+	end
+	check(LifeClock.game.clockScale == 1.0, "the dial rests at 1.0")
+	-- At 1.0 the hours are Godot's, to the last bit: seconds times the rate, nothing more.
+	local c = LifeClock.new()
+	check(c:advance(60, false) == 60 * LifeClock.ACTIVE_HOURS_PER_S, "a minute awake at 1.0 is exactly 60 times the rate")
+	check(c:advance(0.1, false) == 0.1 * LifeClock.ACTIVE_HOURS_PER_S and c:advanceMoult(0.1) == 0.1 * LifeClock.SLEEP_HOURS_PER_S, "and a tenth of a second, awake and moulting")
+	c.hour = 22
+	check(c:advance(1, true) == LifeClock.SLEEP_HOURS_PER_S and c.sleeping, "a second of sleep is the sleeping rate")
+	-- At 0.25 every one is a quarter (a power of two, so exactly).
+	withScale(0.25, function()
+		local q = LifeClock.new()
+		check(q:advance(60, false) == 60 * LifeClock.ACTIVE_HOURS_PER_S / 4, "a minute awake is a quarter of the hours")
+		q.hour = 22
+		check(q:advance(1, true) == LifeClock.SLEEP_HOURS_PER_S / 4 and q.sleeping, "a second of sleep is a quarter of the hours")
+		check(q:advanceMoult(2) == 2 * LifeClock.SLEEP_HOURS_PER_S / 4, "a second of moulting too")
+		check(q:advance(0, false) == 0 and q:advance(0 / 0, true) == 0 and q:advance(-3, false) == 0, "no time from nonsense, as before")
+		-- A night's sleep reaches the morning four times later in play, with the same hours to get there.
+		local night = LifeClock.new()
+		night.hour = 22
+		local hours, seconds = 0.0, 0
+		while night.sleeping or seconds == 0 do
+			hours += night:advance(1 / 60, true)
+			seconds += 1
+			if seconds > 100000 then break end
+		end
+		local base = LifeClock.new()
+		base.hour = 22
+		LifeClock.game.clockScale = 1.0
+		local hours1, seconds1 = 0.0, 0
+		while base.sleeping or seconds1 == 0 do
+			hours1 += base:advance(1 / 60, true)
+			seconds1 += 1
+			if seconds1 > 100000 then break end
+		end
+		check(math.abs(hours - hours1) < 1e-9 and math.abs(night.hour - LifeClock.WAKE_H) < 1e-9 and math.abs(base.hour - LifeClock.WAKE_H) < 1e-9, `both nights end at the same morning ({night.hour}, {base.hour}) after the same ten hours`)
+		check(seconds >= seconds1 * 4 - 4 and seconds <= seconds1 * 4 + 4, `and the garden's takes about four times as many ticks ({seconds} against {seconds1})`)
+	end)
+	-- Anything that is not a positive number runs at the sill's pace: the dial can never stop the clock or poison it.
+	for _, bad in { 0, -1, 0 / 0, math.huge, -math.huge, "slow", true } do
+		withScale(bad, function()
+			local b = LifeClock.new()
+			check(b:advance(60, false) == 60 * LifeClock.ACTIVE_HOURS_PER_S and b.hour == b.hour, `a dial of {tostring(bad)} runs at 1.0`)
+		end)
+	end
+	-- The game: the loop's hours, and so hunger and the day, follow the dial. 120 ticks in the garden are a quarter of the sill's hours.
+	local function play(scale: number, ticks: number): (number, number)
+		local out = { 0.0, 0.0 }
+		withScale(scale, function()
+			local needs = NeedsModel.new(true)
+			local l = LifeLoop.new(needs)
+			local start, energy = l.clock.hour, needs.energy
+			local away = { inRetreat = false, attached = true, still = true, holding = false, feeding = false }
+			for _ = 1, ticks do l:step(1 / 60, away, false, false) end
+			needs:advance(NeedsModel.MAX_STEP_S, false) -- (the reserve takes the hours given to it at its next update, as the client's prey director makes it)
+			needs:advance(NeedsModel.UPDATE_PERIOD_S - NeedsModel.MAX_STEP_S, false)
+			out = { l.clock.hour - start, energy - needs.energy }
+		end)
+		return out[1], out[2]
+	end
+	local sillHours, sillHunger = play(1.0, 3600)
+	local gardenHours, gardenHunger = play(0.25, 3600)
+	near(gardenHours, sillHours / 4, 1e-9, "a minute of play in the garden is a quarter of the sill's hours")
+	check(sillHunger > 0 and math.abs(gardenHunger / sillHunger - 0.25) < 0.02, `and hunger follows the hours ({gardenHunger} against {sillHunger})`)
+	check(LifeClock.game.clockScale == 1.0, "and the dial is put back")
+end)
+
 case("daylight and the words for the day", function()
 	local c = LifeClock.new()
 	c.hour = 12

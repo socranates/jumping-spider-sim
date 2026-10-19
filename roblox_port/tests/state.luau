@@ -191,6 +191,15 @@ case("the rest check refuses what is not a whole, sensible rest, and never raise
 	refused("another windowsill", "main", mutated(function(c) c.content_revision = "windowsill-roblox-0" end))
 	refused("a missing world", "main", mutated(function(c) c.world = nil end))
 	refused("a spider outside the sill", "main", mutated(function(c) c.player.position = { 9999, 0, 0 } end))
+	-- The record of the world the rest was made in (ROBLOX-94): a rest of a place this world does not have, or of changes this game does not know, is refused; one from before the record, or from another
+	-- revision of the world, is not (it is put back at the region's spawn when it is used).
+	refused("a region the world does not have", "main", mutated(function(c) c.world_map.region = "moon" end))
+	refused("a retreat of another region", "main", mutated(function(c) c.world_map.retreat = "garden_hollow" end))
+	refused("a seed that is not a number", "main", mutated(function(c) c.world_map.seed = 0 / 0 end))
+	refused("changes to the world this game does not know", "main", mutated(function(c) c.world_map.diffs = { { id = "stone_1", moved = { 1, 2, 3 } } } end))
+	refused("a world record that is not a table", "main", mutated(function(c) c.world_map = "sill" end))
+	check(#SaveRest.check("main", mutated(function(c) c.world_map = nil end)) == 0, "a rest from before the world record is accepted, as the sill's")
+	check(#SaveRest.check("main", mutated(function(c) c.world_map.revision = "world-0"; c.world_map.seed = 7 end)) == 0, "a rest from another revision or seed of the world is accepted: it is put back at the spawn when used")
 	refused("a non-unit normal", "main", mutated(function(c) c.player.normal = { 0, 5, 0 } end))
 	refused("NaN in the pose", "main", mutated(function(c) c.player.position = { 0 / 0, 1, 1 } end))
 	refused("an infinity", "main", mutated(function(c) c.player.gaze_pitch = math.huge end))

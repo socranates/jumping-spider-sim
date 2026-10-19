@@ -28,7 +28,9 @@ tests/mating.luau (the mating cycle: the eligibility gate, the mate's arrival an
 tests/state.luau (persistent saves: envelope, progress and rest records, session lock, scheduler, server service) and
 tests/state_client.luau (the client's saving wiring against the real service) and tests/state_offline.luau (no server at all) and
 tests/settings.luau (the settings table and model, their saving, the panel, the live wiring and the touch layout) and
-tests/inspect.luau (Inspect mode: its numbers, the camera's ease, orbit and restore, the Settings row, the hold, the lock and the reasons it ends, through the real client).
+tests/inspect.luau (Inspect mode: its numbers, the camera's ease, orbit and restore, the Settings row, the hold, the lock and the reasons it ends, through the real client) and
+tests/worldmap.luau (the world map: the sill as region 0, the questions about a point, a region's seed, the sill's generator and its budgets) and
+tests/world_client.luau (the client's world: where its boxes are, the region the spider is in, the pace of its day, the streaming focus, and the real client on the server's World folder).
 Usage (from roblox_port/):  python3 tests/run.py [path/to/luau [test.luau ...]]   (default: all of them)"""
 import pathlib, re, subprocess, sys, tempfile
 
@@ -41,6 +43,9 @@ MODULES = [
     ("Species", "Data/Species.luau"),
     ("Surfaces", "Data/Surfaces.luau"),
     ("WindowsillLayout", "Habitat/WindowsillLayout.luau"),
+    ("RivalRules", "Data/RivalRules.luau"),
+    ("WorldMap", "World/WorldMap.luau"),
+    ("Region", "World/Region.luau"),
     ("Breakaway", "Habitat/Breakaway.luau"),
     ("Detail", "Data/Detail.luau"),
     ("Graphics", "Data/Graphics.luau"),
@@ -55,6 +60,7 @@ MODULES = [
     ("Patina", "Habitat/Patina.luau"),
     ("SunPick", "Habitat/SunPick.luau"),
     ("Scenery", "Habitat/Scenery.luau"),
+    ("WorldBuild", "World/WorldBuild.luau"),
     ("Lit", "Habitat/Lit.luau"),
     ("WorldDetail", "../Client/WorldDetail.luau"),
     ("JumpMath", "Movement/JumpMath.luau"),
@@ -92,7 +98,6 @@ MODULES = [
     ("LifeSession", "Life/LifeSession.luau"),
     ("PreyMath", "Prey/PreyMath.luau"),
     ("PreyRandom", "Prey/PreyRandom.luau"),
-    ("RivalRules", "Data/RivalRules.luau"),
     ("MatingRules", "Data/MatingRules.luau"),
     ("RivalRoute", "Predator/RivalRoute.luau"),
     ("RivalSpider", "Predator/RivalSpider.luau"),
@@ -154,6 +159,7 @@ MODULES = [
     ("SaveSession", "Persistence/SaveSession.luau"),
     ("DataStoreBackend", "../Server/DataStoreBackend.luau"),
     ("SaveService", "../Server/SaveService.luau"),
+    ("WorldFocus", "../Server/WorldFocus.luau"),
     ("SpiderCamera", "../Client/SpiderCamera.luau"),
 ]
 # The client scripts, bundled only for the tests that run the real rig and client (CLIENT_TESTS).
@@ -173,8 +179,9 @@ CLIENT_MODULES = [
     ("PerceptionHud", "../Client/PerceptionHud.luau"),
     ("SpiderEyes", "../Client/SpiderEyes.luau"),
     ("SaveClient", "../Client/SaveClient.luau"),
+    ("WorldClient", "../Client/WorldClient.luau"),
 ]
-CLIENT_TESTS = {"state_client.luau","state_offline.luau","growth.luau","perception_client.luau", "client_smoke.luau", "client_ant.luau", "client_rival.luau", "client_mating.luau", "look.luau", "idle.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "wasp.luau", "notebook.luau", "settings.luau", "inspect.luau"}
+CLIENT_TESTS = {"world_client.luau","state_client.luau","state_offline.luau","growth.luau","perception_client.luau", "client_smoke.luau", "client_ant.luau", "client_rival.luau", "client_mating.luau", "look.luau", "idle.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "wasp.luau", "notebook.luau", "settings.luau", "inspect.luau"}
 REFERENCES = ["jump_reference", "tether_reference", "camera_reference", "framing_reference", "perception_reference", "prey_reference", "life_reference", "wasp_reference", "continuing_reference", "growth_reference", "notebook_reference", "notebook_godot"]
 # A reference only the named tests read (it is large; the other bundles leave it out).
 REFERENCE_ONLY = {"continuing_reference": {"continuing.luau"},"prey_reference": {"prey.luau"}, "perception_reference": {"perception.luau"}, "life_reference": {"life.luau"}, "wasp_reference": {"wasp.luau"}, "notebook_reference": {"notebook.luau"}, "notebook_godot": {"notebook.luau"}}
@@ -230,7 +237,7 @@ def main():
     luau = sys.argv[1] if len(sys.argv) > 1 else "luau"
     status = 0
     named = sys.argv[2:]
-    for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "life.luau", "checkpoint.luau", "wasp.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "client_ant.luau", "client_rival.luau", "client_mating.luau", "look.luau", "idle.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "peacock.luau", "antmimic.luau", "tarantula.luau", "continuing.luau", "growth.luau", "notebook.luau", "state.luau", "state_client.luau", "state_offline.luau", "settings.luau", "rival.luau", "rivalnav.luau", "mating.luau", "inspect.luau"]:
+    for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "life.luau", "checkpoint.luau", "wasp.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "client_ant.luau", "client_rival.luau", "client_mating.luau", "look.luau", "idle.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "peacock.luau", "antmimic.luau", "tarantula.luau", "continuing.luau", "growth.luau", "notebook.luau", "state.luau", "state_client.luau", "state_offline.luau", "settings.luau", "rival.luau", "rivalnav.luau", "mating.luau", "inspect.luau", "worldmap.luau", "world_client.luau"]:
         if not (HERE / test_file).exists():
             if named:  # a misspelt name must not look like a pass
                 print(f"no such test file: {test_file} (names are relative to tests/, for example look.luau)", file=sys.stderr)

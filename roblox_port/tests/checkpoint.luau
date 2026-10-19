@@ -19,6 +19,7 @@ local Checkpoint = require("../src/Shared/Persistence/Checkpoint")
 local CheckpointStore = require("../src/Shared/Persistence/CheckpointStore")
 local Json = require("../src/Shared/Persistence/Json")
 local WaspDirector = require("../src/Shared/Predator/WaspDirector")
+local WorldMap = require("../src/Shared/World/WorldMap")
 
 local passed, failed = 0, 0
 local current = ""
@@ -750,6 +751,140 @@ case("a capture holds neither the prey director's cpu window nor the sensor's co
 	check(#(Checkpoint.check(oldRecord, w)) == 0, "a record made before (with the windows in it) is good")
 	check(Checkpoint.restore(oldRecord, w) and #w.prey.cpu == 0 and #w.sensor._ring == 0, "and restores with them empty")
 	check(w.sensor:costPercentile(0.9) == 0, "without a reading")
+end)
+
+-- ---------------------------------------------------------------------------------------------- where in the world (ROBLOX-94)
+case("a rest records where in the world it was kept, and a record from before means the sill (ROBLOX-94)", function()
+	local w = newWorld()
+	for _ = 1, 120 do tick(w) end
+	rest(w)
+	local record = w.store:loadBest().record
+	local map = record.world_map
+	check(map ~= nil and map.seed == 914 and map.revision == WorldMap.REVISION and map.region == "sill" and map.retreat == "sill_crevice" and type(map.diffs) == "table" and #map.diffs == 0,
+		"a rest at home records the seed, the revision, the sill, the crevice and no changes")
+	check(record.player.retreat_id == "sill_crevice", "and the player block still names the crevice")
+	check(record.world ~= nil and record.world.roots ~= nil, "(the recorded world is still the object graph)")
+	check(not Checkpoint.worldMoved(record), "this is the world it was kept in")
+	-- Away from the crack the retreat is empty and the region is the same.
+	w.motor:place(Vector3.new(8, 0.31, 4), Vector3.yAxis, Vector3.new(1, 0, 0))
+	local away = assert(Checkpoint.capture(w, 0))
+	check(away.world_map.region == "sill" and away.world_map.retreat == "" and away.player.retreat_id == "" and #(Checkpoint.check(away, w)) == 0, "away from the crack: still the sill, no retreat, a good record")
+	-- It is storable as it is, the empty list of changes included, and a copy of what a store hands back is as good.
+	local text = assert(Json.canonical(record))
+	check(string.find(text, '"world_map":{"diffs":[],"region":"sill","retreat":"sill_crevice","revision":"' .. WorldMap.REVISION .. '","seed":914}', 1, true) ~= nil, "(its stored text: " .. string.sub(text, (string.find(text, '"world_map"', 1, true) or 1), (string.find(text, '"world_map"', 1, true) or 1) + 110) .. ")")
+	check(#(Checkpoint.check(Json.copy(record), w)) == 0, "and a copy of it is a good record")
+	-- A record from before there was a world has no such block, and means the sill of the default world with no changes: it is as good as it was.
+	local old = Json.copy(record)
+	old.world_map = nil
+	check(#(Checkpoint.check(old, w)) == 0 and not Checkpoint.worldMoved(old), "a record without one is good, and from this world")
+	local fp = fingerprint(w)
+	check(Checkpoint.restore(old, w), "and restores")
+	check((w.motor.pos - HOME).Magnitude < 1e-6 and Layout.inRetreat(w.motor.pos) and fingerprint(w) ~= fp, "where it was kept: at home in the crack")
+	local oldAway = Json.copy(away)
+	oldAway.world_map = nil
+	check(Checkpoint.restore(oldAway, w) and (w.motor.pos - Vector3.new(8, 0.31, 4)).Magnitude < 1e-6, "an old record away from the crack restores to where it was")
+	-- The old bounds check holds for an old record: a spider outside the sill is refused, and says so as it always has.
+	local far = Json.copy(old)
+	far.player.position = { 900, 1, 1 }
+	local problems = Checkpoint.check(far, w)
+	check(#problems > 0 and string.find(table.concat(problems, "; "), "outside the windowsill", 1, true) ~= nil, "an old record outside the sill is refused as before")
+	local ghost = Json.copy(old)
+	ghost.player.retreat_id = "stone"
+	check(string.find(table.concat(Checkpoint.check(ghost, w), "; "), "unknown retreat", 1, true) ~= nil, "and an old record in a retreat that is not on the map")
+end)
+
+case("a region that is not on the map, a spot outside its bounds and a bad world record are refused and change nothing (ROBLOX-94)", function()
+	local w = newWorld()
+	for _ = 1, 40 do tick(w) end
+	local good = assert(Checkpoint.capture(w, 0))
+	for _ = 1, 30 do tick(w) end
+	local function refused(change: (any) -> (), what: string, expect: string)
+		local r = Json.copy(good)
+		change(r)
+		local before = fingerprint(w)
+		local ok, problems = Checkpoint.restore(r, w)
+		check(not ok and #problems > 0, `{what}: refused`)
+		check(string.find(table.concat(problems, "; "), expect, 1, true) ~= nil, `{what}: says '{expect}' ({table.concat(problems, "; ")})`)
+		check(fingerprint(w) == before, `{what}: nothing changed`)
+	end
+	refused(function(r) r.world_map.region = "garden" end, "a region that is not on the map", "region this world does not have")
+	refused(function(r) r.world_map.region = "" end, "an empty region", "region this world does not have")
+	refused(function(r) r.world_map.region = 7 end, "a region that is not a name", "region is not a name")
+	refused(function(r) r.world_map.region = "garden"; r.world_map.revision = "world-0" end, "a region that is not on the map, from another revision too", "region this world does not have")
+	refused(function(r) r.player.position = { 40, 1, 1 } end, "a spot outside the sill's bounds", "outside the windowsill")
+	refused(function(r) r.player.position = { -22, 40, 1 } end, "a spot above them", "outside the windowsill")
+	refused(function(r) r.world_map.retreat = "stone" end, "a retreat that is not in the region", "unknown retreat")
+	refused(function(r) r.world_map.retreat = 4 end, "a retreat that is not a name", "retreat is not a name")
+	refused(function(r) r.player.retreat_id = "stone" end, "a player in a retreat that is not on the map", "unknown retreat")
+	-- The two retreats of a record are one answer written twice: a record that says both is not one a capture made.
+	check(good.player.retreat_id == "sill_crevice" and good.world_map.retreat == "sill_crevice", "(the good record rests in the crack, in both places)")
+	refused(function(r) r.world_map.retreat = "" end, "a world record outside the crack while the spider is in it", "retreat disagree")
+	refused(function(r) r.player.retreat_id = "" end, "a spider outside the crack while the world record is in it", "retreat disagree")
+	for _, seed in { "914", -1, 1.5, 0 / 0, 2 ^ 40, true } do
+		refused(function(r) r.world_map.seed = seed end, `a seed of {tostring(seed)}`, "seed")
+	end
+	for _, rev in { 5, "", string.rep("x", 65), true } do
+		refused(function(r) r.world_map.revision = rev end, `a revision of {tostring(rev)}`, "revision")
+	end
+	for _, diffs in { { 1 }, { kind = "stone" }, { { kind = "stone", region = "sill", id = "a", data = {} } }, "none", 3 } do
+		refused(function(r) r.world_map.diffs = diffs end, `changes of {tostring(diffs)}`, "changes")
+	end
+	refused(function(r) r.world_map = 5 end, "a world record that is not a record", "place in the world")
+	refused(function(r) r.world_map = "sill" end, "a world record that is a name", "place in the world")
+	check(Checkpoint.restore(good, w), "the good record still restores")
+end)
+
+case("a rest from another revision of the world, or another seed, is put back at its region's spawn (ROBLOX-94)", function()
+	local w = newWorld()
+	for _ = 1, 40 do tick(w) end
+	w.motor:place(Vector3.new(8, 0.31, 4), Vector3.yAxis, Vector3.new(0, 0, -1))
+	w.needs:configure({ energy = 0.5 })
+	rest(w)
+	local record = assert(Checkpoint.capture(w, 0))
+	local energy, flies = w.needs.energy, #w.prey.flies
+	check(not Checkpoint.worldMoved(record), "(this world's own rest)")
+	local spawn = (WorldMap.region("sill") :: WorldMap.Region).spawn
+	local want = spawn.pos + Vector3.new(0, Motor.HEIGHT, 0)
+	-- The same record from another revision.
+	for _, change in { function(r: any) r.world_map.revision = "world-0" end, function(r: any) r.world_map.seed = 915 end } do
+		local moved = Json.copy(record)
+		change(moved)
+		check(Checkpoint.worldMoved(moved), "a different revision (or seed) is another world")
+		check(#(Checkpoint.check(moved, w)) == 0, "and a good record: the check does not ask where the spider was kept")
+		for _ = 1, 90 do tick(w) end -- the world moves on; the restore must bring back the record's life, but not its spot
+		w.needs:configure({ energy = 0.9 })
+		local ok, problems = Checkpoint.restore(moved, w)
+		check(ok, "restored: " .. table.concat(problems, "; "))
+		check((w.motor.pos - want).Magnitude < 1e-9 and w.motor.mode == "attached" and (w.motor.up - Vector3.yAxis).Magnitude < 1e-9, `the spider is at the sill's spawn ({w.motor.pos}), not where it rested`)
+		check((w.motor.heading - spawn.heading).Magnitude < 1e-9, "facing the spawn's way")
+		check(math.abs(w.needs.energy - energy) < 1e-9 and #w.prey.flies == flies, "while the life itself is the record's: the reserves and the flies")
+		check(string.find(w.life.notice, "world has changed", 1, true) ~= nil, `and the notice says so ({w.life.notice})`)
+		for _ = 1, 3 do tick(w) end
+		check(not w.life.resting, "the rest does not go on outside the crack")
+		-- An unmoved record puts the spider back where it rested, as ever.
+		check(Checkpoint.restore(record, w) and (w.motor.pos - Vector3.new(8, 0.31, 4)).Magnitude < 1e-6, "while this world's own rest returns to its spot")
+	end
+	-- The position of such a rest is not trusted, so it is not tested: a spot far outside the sill is no reason to lose the life.
+	local far = Json.copy(record)
+	far.world_map.revision = "world-0"
+	far.player.position = { 900, 1, 1 }
+	check(#(Checkpoint.check(far, w)) == 0 and Checkpoint.restore(far, w) and (w.motor.pos - want).Magnitude < 1e-9, "a spot outside the old bounds is put right, not refused")
+	local near = Json.copy(far)
+	near.world_map.revision = WorldMap.REVISION
+	check(#(Checkpoint.check(near, w)) > 0, "(from this world, the same record is refused)")
+	-- But a spot that is not a spot at all, or a region that is not on the map, still is.
+	local nan = Json.copy(far)
+	nan.player.position = { 0, 0 / 0, 0 }
+	check(#(Checkpoint.check(nan, w)) > 0, "a position that is not numbers is refused whatever the revision")
+	local lost = Json.copy(far)
+	lost.world_map.region = "garden"
+	check(#(Checkpoint.check(lost, w)) > 0, "and so is a region that is not on the map")
+	-- What it relies on: the motor stands the spider on the support point of any region's spawn, facing the heading given, and on its own config's when none is.
+	w.motor:respawn(Vector3.new(-10, 0, 5), Vector3.new(0, 0, -1))
+	check((w.motor.pos - Vector3.new(-10, Motor.HEIGHT, 5)).Magnitude < 1e-9 and (w.motor.heading - Vector3.new(0, 0, -1)).Magnitude < 1e-9 and w.motor.mode == "attached",
+		"Motor.respawn stands the spider on the support point it is given, facing the heading it is given")
+	w.motor:respawn()
+	check((w.motor.pos - want).Magnitude < 1e-9 and (w.motor.heading - spawn.heading).Magnitude < 1e-9, "and on the config's own when it is given none")
 end)
 
 -- ROBLOX-92: the reasons a rest is refused are engineering words (they are in the tests above); the player is told them in the game's own (LifeText.restRefusal, MateText).

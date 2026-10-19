@@ -18,7 +18,7 @@
 local Rules = require(script.Parent.Parent.Data.MatingRules)
 local PreyMath = require(script.Parent.Parent.Prey.PreyMath)
 local PreyRandom = require(script.Parent.Parent.Prey.PreyRandom)
-local Layout = require(script.Parent.Parent.Habitat.WindowsillLayout)
+local WorldMap = require(script.Parent.Parent.World.WorldMap)
 
 local Mate = {}
 
@@ -249,8 +249,9 @@ function Mate.percept(m: any): any
 	return { id = "mate_spider", position = m.position, radius = 0.4, velocity = (m.position - m.previous) * 60, maxCategory = "movement" }
 end
 
--- Whether a record is good (nil is: a life that has had no mate). It is on the sill, never in the crack, when it is on the sill.
-function Mate.valid(m: any): boolean
+-- Whether a record is good (nil is: a life that has had no mate). It is on the sill, never in the crack, when it is on the sill. ROBLOX-94: `region` is the region it
+-- belongs to (the sill's unless given): where it may stand is that region's bounds, outside that region's retreats.
+function Mate.valid(m: any, region: string?): boolean
 	if m == nil then return true end
 	if type(m) ~= "table" or not STATES[m.state] then return false end
 	for _, k in { "elapsed", "lost" } do
@@ -270,8 +271,8 @@ function Mate.valid(m: any): boolean
 	end
 	if m.up ~= nil and math.abs(m.up.Magnitude - 1) > 0.05 then return false end
 	if not atRest then
-		local p, lo, hi = m.position, Layout.PLAY_BOUNDS_MIN, Layout.PLAY_BOUNDS_MAX
-		if p == nil or p.X < lo.X or p.Y < lo.Y or p.Z < lo.Z or p.X > hi.X or p.Y > hi.Y or p.Z > hi.Z or Layout.inRetreat(Vector3.new(p.X, p.Y, p.Z)) then return false end
+		local p, id = m.position, region or WorldMap.HOME
+		if p == nil or not WorldMap.inBounds(p, id) or WorldMap.inRetreat(Vector3.new(p.X, p.Y, p.Z), id) ~= nil then return false end
 	end
 	return true
 end

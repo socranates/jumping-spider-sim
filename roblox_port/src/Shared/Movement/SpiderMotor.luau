@@ -223,8 +223,10 @@ function Motor.place(self: any, position: Vector3, up: Vector3?, heading: Vector
 	self.safe = { pos = self.pos, up = self.up, heading = self.heading }
 end
 
-function Motor.respawn(self: any)
-	self:place(self.config.spawn + Vector3.new(0, HEIGHT, 0), Vector3.yAxis, self.config.heading)
+-- Back to the start, standing on the support point `spawn` facing `heading` (the config's own when none is given; ROBLOX-94: a rest from another revision of the world
+-- is put back at its region's spawn, Checkpoint.restore).
+function Motor.respawn(self: any, spawn: Vector3?, heading: Vector3?)
+	self:place((spawn or self.config.spawn) + Vector3.new(0, HEIGHT, 0), Vector3.yAxis, heading or self.config.heading)
 end
 
 -- ---------------------------------------------------------------- the planner (port of jump_planner.gd)

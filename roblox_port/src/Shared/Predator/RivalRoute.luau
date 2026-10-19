@@ -1,5 +1,5 @@
 --!strict
--- Where the rival spider can walk, and the ways between (ROBLOX-69). A graph of the windowsill's box faces made from Layout.PIECES alone:
+-- Where the rival spider can walk, and the ways between (ROBLOX-69). A graph of the windowsill's box faces made from the sill region's pieces alone (Region.pieces, ROBLOX-94):
 -- every face of every box is a node; two faces that meet along a line (a box's own edge, convex, or a wall rising from a floor, concave) are
 -- joined by that seam. The rival's own SpiderMotor walks any seam the way the player's does (a wall ahead becomes the support, an edge is wrapped), so a
 -- route is only a list of seams to cross and where to head to cross them. Pure and Vector3-light: the CLI checks it on the boxes, and the
@@ -8,10 +8,16 @@
 -- Faces are looked up by their box, the axis and the side. A face is "stand-able" at the sample points where a body of the motor's radius fits
 -- without touching another box. The crack (the crevice boxes) is forbidden: no route enters it, and the keep-out box around the retreat turns
 -- every straight walk aside.
-local Layout = require(script.Parent.Parent.Habitat.WindowsillLayout)
 local Rules = require(script.Parent.Parent.Data.RivalRules)
+local WorldMap = require(script.Parent.Parent.World.WorldMap)
+local Region = require(script.Parent.Parent.World.Region)
 
 local Route = {}
+
+-- ROBLOX-94: the graph is the sill's, region 0 of the world: its boxes and the keep-out around its crack come from the region's generator (Region.pieces, Region.keepOut). It
+-- becomes region-scoped, with seams to the neighbours, in the navigation round; until then there is one region and one crack.
+local SILL = WorldMap.region(WorldMap.HOME) :: WorldMap.Region
+local KEEP = Region.keepOut(SILL)[1]
 
 local AXIS = { "X", "Y", "Z" }
 local SEAT = 0.31 -- the motor's body centre above its support (SpiderMotor.HEIGHT)
@@ -83,7 +89,7 @@ end
 
 -- The keep-out box: the retreat, grown by a margin. Nothing the rival does goes in.
 function Route.inKeepOut(p: Vector3): boolean
-	local lo, hi = Rules.keepOutMin, Rules.keepOutMax
+	local lo, hi = KEEP.min, KEEP.max
 	return p.X >= lo.X and p.X <= hi.X and p.Y >= lo.Y and p.Y <= hi.Y and p.Z >= lo.Z and p.Z <= hi.Z
 end
 
@@ -94,7 +100,7 @@ end
 local function build()
 	if built then return end
 	built = true
-	for _, piece in Layout.PIECES do
+	for _, piece in Region.pieces(SILL) do
 		table.insert(boxes, { id = piece.id, lo = { piece.lo.X, piece.lo.Y, piece.lo.Z }, hi = { piece.hi.X, piece.hi.Y, piece.hi.Z } })
 	end
 	-- Faces: six to a box.
@@ -187,7 +193,7 @@ local function build()
 		end
 	end
 	-- The keep-out box is an obstacle like any box (the walk tests and the corners to round count it) but has no faces: nothing walks on it.
-	local ko, ki = Rules.keepOutMin, Rules.keepOutMax
+	local ko, ki = KEEP.min, KEEP.max
 	table.insert(boxes, { id = "keepout", lo = { ko.X, ko.Y, ko.Z }, hi = { ki.X, ki.Y, ki.Z } })
 end
 
@@ -429,7 +435,7 @@ end
 
 -- Where to head so a straight walk does not cross the keep-out box: the goal itself, or a corner of the box to round first.
 function Route.aroundKeepOut(from: Vector3, goal: Vector3): Vector3
-	local lo, hi = Rules.keepOutMin, Rules.keepOutMax
+	local lo, hi = KEEP.min, KEEP.max
 	-- The segment against the box, on the plane of the floor (the box is only a little taller than the spider).
 	local function crosses(a: Vector3, b: Vector3): boolean
 		local tmin, tmax = 0, 1

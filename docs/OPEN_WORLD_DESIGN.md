@@ -152,7 +152,8 @@ holding. As design:
 ## This round's plan (W1–W5)
 
 1. **W1 — the world core** (ROBLOX-94): the sill as region 0, WorldMap/Region/WorldBuild/WorldClient, server build,
-   streaming, the world record in the save, `clockScale`. The game plays identically.
+   streaming, the world record in the save, `clockScale`. The game plays identically. *(Done 2026-10-19: ROBLOX-94 in
+   `docs/DECISIONS.md`, Chet's checklist in `docs/HANDOFF-roblox-world.md`; CLI only, not run in Studio.)*
 2. **W2 — beyond the glass** (ROBLOX-95): the raised sash, the outer sill, the brick descent, bed_a, per-region nav.
 3. **W3 — garden life** (ROBLOX-96): prey in the bed (gnats and aphids join the flies), woodlice as the first ambient
    bug, the stone retreat, the descent set piece, the page, saves across regions.

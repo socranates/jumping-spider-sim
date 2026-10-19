@@ -24,6 +24,11 @@
 -- ROBLOX-91: nor are the two profiling windows of the live world: the prey director's `cpu` (the last 1200 ticks' microseconds) and the sensor's cost ring. They are
 -- clock readings, different on every run, and were about 2400 floats, twice the rest of the record; capture leaves them out and a restore (of an old record too)
 -- leaves them empty.
+-- ROBLOX-94: where in the world the rest was kept is `world_map` = { seed, revision, region, retreat, diffs } (not `world`: that is the recorded object graph). The world is
+-- never saved, only the seed and the revision it was made from and what changed in it (`diffs`, empty until something in the world can change). A record without one (every
+-- rest before the world) means the sill of the default world with no changes. A region that is not on the map, or a position outside that region's bounds, is refused like
+-- any bad record. A rest made in another revision of the world, or from another seed, is put back at its region's spawn: the position was kept for geometry that may have
+-- moved, so it is not trusted (the rest of the record is: the life, the reserves, the clock).
 
 local Species = require(script.Parent.Parent.Data.Species)
 local ObjectRecord = require(script.Parent.ObjectRecord)
@@ -43,7 +48,7 @@ local NeedsModel = require(script.Parent.Parent.Life.NeedsModel)
 local LifeLoop = require(script.Parent.Parent.Life.LifeLoop)
 local LifeClock = require(script.Parent.Parent.Life.LifeClock)
 local Growth = require(script.Parent.Parent.Life.Growth)
-local Layout = require(script.Parent.Parent.Habitat.WindowsillLayout)
+local WorldMap = require(script.Parent.Parent.World.WorldMap)
 local WaspDirector = require(script.Parent.Parent.Predator.WaspDirector)
 
 local RivalSpider = require(script.Parent.Parent.Predator.RivalSpider)
@@ -116,6 +121,52 @@ local function vec(t: any): Vector3?
 	return Vector3.new(t[1], t[2], t[3])
 end
 
+-- The world record of a checkpoint with the defaults of a record from before there was a world: the default world's seed and revision, the sill, the retreat the
+-- player block names, no changes. Returns it and what is wrong with a record that has one (an empty list for a good one or an old one).
+export type MapRecord = { seed: number, revision: string, region: string, retreat: string, diffs: { any } }
+local function mapRecord(record: any): (MapRecord, { string })
+	local problems: { string } = {}
+	local p = record.player
+	local out: MapRecord = {
+		seed = WorldMap.SEED, revision = WorldMap.REVISION, region = WorldMap.HOME, diffs = {},
+		retreat = if type(p) == "table" and type(p.retreat_id) == "string" then p.retreat_id else "",
+	}
+	local m = record.world_map
+	if m == nil then return out, problems end
+	local function bad(t: string) table.insert(problems, t) end
+	if type(m) ~= "table" then
+		bad("world: the place in the world is not a record")
+		return out, problems
+	end
+	if not finite(m.seed) or m.seed < 0 or m.seed > 4294967295 or m.seed % 1 ~= 0 then bad("world: the world's seed is not a whole number") else out.seed = m.seed end
+	if type(m.revision) ~= "string" or #m.revision < 1 or #m.revision > 64 then bad("world: the world's revision is not a name") else out.revision = m.revision end
+	if type(m.region) ~= "string" then
+		bad("world: the region is not a name")
+	else
+		out.region = m.region
+	end
+	if type(m.retreat) ~= "string" then bad("world: the retreat is not a name") else out.retreat = m.retreat end
+	if type(m.diffs) ~= "table" or getmetatable(m.diffs) ~= nil then
+		bad("world: the changes to the world are not a list")
+	elseif next(m.diffs) ~= nil then
+		bad("world: the world has changes this game does not know (nothing in it can change yet)") -- later entries are { kind, region, id, data }, each kind with its own check
+	end
+	return out, problems
+end
+
+-- Whether a rest was kept in another world than this game's (another revision of it, or another seed): its position is not to be trusted.
+function Checkpoint.worldMoved(record: any): boolean
+	local map = mapRecord(record)
+	return map.revision ~= WorldMap.REVISION or map.seed ~= WorldMap.SEED
+end
+
+local function hasRetreat(region: WorldMap.Region, id: string): boolean
+	for _, t in region.retreats do
+		if t.id == id then return true end
+	end
+	return false
+end
+
 -- Why a checkpoint cannot be made of the world now; "" when it can.
 function Checkpoint.boundaryProblem(world: World): string
 	local motor, prey = world.motor, world.prey
@@ -147,13 +198,16 @@ function Checkpoint.capture(world: World, createdAt: number?): ({ [string]: any 
 	if cpu ~= nil then prey.cpu = cpu end
 	if ring ~= nil then sensor._ring = ring end
 	if not graph then return nil, why end
+	local region = WorldMap.at(motor.pos) or WorldMap.region(WorldMap.HOME) :: WorldMap.Region
+	local retreat = WorldMap.inRetreat(motor.pos) or ""
 	return {
 		schema_version = Checkpoint.SCHEMA_VERSION, kind = Checkpoint.KIND, game = Checkpoint.GAME,
 		content_revision = Checkpoint.CONTENT_REVISION, created_at = createdAt or 0, snapshot_tick = world.prey.tick,
 		player = {
 			position = v3(motor.pos), normal = v3(motor.up), heading = v3(motor.heading), gaze_pitch = motor.gazePitch,
-			retreat_id = if Layout.inRetreat(motor.pos) then "sill_crevice" else "", state = "ATTACHED",
+			retreat_id = retreat, state = "ATTACHED",
 		},
+		world_map = { seed = WorldMap.SEED, revision = WorldMap.REVISION, region = region.id, retreat = retreat, diffs = {} },
 		world = graph,
 		life_rules = { mode = world.life.mode or "main", rules = world.life.rules or "standard" },
 		breakaway = if world.breakaway then world.breakaway:record() else nil,
@@ -258,21 +312,29 @@ function Checkpoint.check(record: any, world: World): ({ string }, ObjectRecord.
 	if record.game ~= Checkpoint.GAME then bad("not a checkpoint of this game") end
 	if record.content_revision ~= Checkpoint.CONTENT_REVISION then bad(`made for another windowsill ({tostring(record.content_revision)})`) end
 	if not finite(record.snapshot_tick) or record.snapshot_tick < 0 then bad("the tick is not a number") end
+	-- ROBLOX-94: which region the rest was kept in, and whether this is the world it was kept in.
+	local map, mapProblemList = mapRecord(record)
+	for _, text in mapProblemList do bad(text) end
+	local region = WorldMap.region(map.region)
+	if #mapProblemList == 0 and region == nil then bad("the spider is in a region this world does not have") end
+	local moved = map.revision ~= WorldMap.REVISION or map.seed ~= WorldMap.SEED
+	if region ~= nil and #mapProblemList == 0 and map.retreat ~= "" and not hasRetreat(region, map.retreat) then bad("the spider is in an unknown retreat") end
 	local p = record.player
 	if type(p) ~= "table" then
 		bad("no spider")
 	else
 		local pos, n, h = vec(p.position), vec(p.normal), vec(p.heading)
 		if not pos then bad("the spider has no position")
-		elseif pos.X < Layout.PLAY_BOUNDS_MIN.X or pos.Y < Layout.PLAY_BOUNDS_MIN.Y or pos.Z < Layout.PLAY_BOUNDS_MIN.Z
-			or pos.X > Layout.PLAY_BOUNDS_MAX.X or pos.Y > Layout.PLAY_BOUNDS_MAX.Y or pos.Z > Layout.PLAY_BOUNDS_MAX.Z then
-			bad("the spider is outside the windowsill")
+		elseif region ~= nil and not moved and not WorldMap.inBounds(pos, region.id) then
+			bad(if region.id == WorldMap.HOME then "the spider is outside the windowsill" else `the spider is outside {region.id}`) -- (a rest from another world is put back at the spawn: its position is not tested)
 		end
 		if not n or math.abs(n.Magnitude - 1) > 1e-3 then bad("the spider's surface normal is not a unit vector") end
 		if not h or math.abs(h.Magnitude - 1) > 1e-3 then bad("the spider's heading is not a unit vector") end
 		if not finite(p.gaze_pitch) or math.abs(p.gaze_pitch) > math.pi / 2 then bad("the spider's gaze is not a number") end
 		if p.state ~= "ATTACHED" then bad("the spider is not standing on a surface") end
-		if p.retreat_id ~= "" and p.retreat_id ~= "sill_crevice" then bad("the spider is in an unknown retreat") end
+		if p.retreat_id ~= "" and (type(p.retreat_id) ~= "string" or (region ~= nil and not hasRetreat(region, p.retreat_id)) or (region == nil and WorldMap.retreat(p.retreat_id) == nil)) then bad("the spider is in an unknown retreat") end
+		-- The player block's retreat and the world record's are one answer written twice (capture writes both from the same lookup); a record where they differ was not made by a capture.
+		if type(record.world_map) == "table" and #mapProblemList == 0 and p.retreat_id ~= map.retreat then bad("the spider's retreat and the world record's retreat disagree") end
 	end
 	if not Breakaway.valid(record.breakaway) then bad("invalid falling leaf state") end
 	local rules = record.life_rules
@@ -313,8 +375,16 @@ function Checkpoint.restore(record: any, world: World): (boolean, { string })
 	-- The profiling windows are not in the record (an older one holds them): empty, and the sensor's window begins now.
 	world.prey.cpu = {}
 	world.sensor._ring = {}
-	world.motor:place(pos, n.Unit, h.Unit)
-	world.motor.gazePitch = p.gaze_pitch
+	-- ROBLOX-94: a rest from another world than this game's is put back at its region's spawn; its position was kept for geometry that may have moved.
+	local moved = Checkpoint.worldMoved(record)
+	if moved then
+		local home = WorldMap.region(WorldMap.HOME) :: WorldMap.Region
+		local at = (WorldMap.region(mapRecord(record).region) or home).spawn
+		world.motor:respawn(at.pos, at.heading)
+	else
+		world.motor:place(pos, n.Unit, h.Unit)
+		world.motor.gazePitch = p.gaze_pitch
+	end
 	if world.breakaway then world.breakaway:apply(record.breakaway) end
 	if world.wasp ~= nil then world.wasp:load(record.wasp or WaspDirector.defaultRecord()) end
 	-- Godot's apply_record: the rest that was going on goes on, the spider takes a moment to take hold, and the screen says
@@ -330,7 +400,8 @@ function Checkpoint.restore(record: any, world: World): (boolean, { string })
 	life.events = {}
 	life.restoreGrace = LifeLoop.RESTORE_GRACE_TICKS
 	life:applyLight()
-	life:showNotice("Returned to your last rest: the sill as it was when you rested in the crack. This is a return to the rest, not an exact resume.")
+	life:showNotice(if moved then "Returned to your last rest, but the world has changed since you rested, so you stand where a life begins in it. Everything else is as you left it."
+		else "Returned to your last rest: the sill as it was when you rested in the crack. This is a return to the rest, not an exact resume.")
 	return true, {}
 end
 

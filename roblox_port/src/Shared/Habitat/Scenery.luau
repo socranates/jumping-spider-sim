@@ -1,5 +1,5 @@
 --!strict
--- Builds the drawn world from Data/Graphics: the sill's physical pieces (looks only), and a "Decor" folder with the window wall,
+-- Builds the drawn world from Data/Graphics: the sill's physical pieces (looks only), and a "Decor" model (a persistent one, ROBLOX-94) with the window wall,
 -- glass and trim, the view out of the window, the dust, the small details, the light shafts, and (Habitat/Plants, Habitat/Patina,
 -- from Data/Flora and Data/Wear) the Pilea, the planting, the garden outside the window, the wear on the sill and the glass and
 -- the silk retreat, and (Habitat/Dressing, ROBLOX-74) the shaded moss, the floor's pebbles and bark, the fallen leaves and the morning dew.
@@ -66,15 +66,10 @@ local function replaceable(): { [string]: boolean }
 	return all
 end
 
--- `replaced`: the ids of the pieces whose drawn version exists (Scenery.decor's second result); those turn invisible but stay solid
--- and climbable. A piece whose drawing could not be built stays visible instead of leaving a hole. nil means all the pieces that
--- the decor can replace (the wall and the Pilea's leaves and stems).
-function Scenery.sill(replaced: { [string]: boolean }?): Folder
-	local hide = replaced or replaceable()
-	local sill = Instance.new("Folder")
-	sill.Name = "Windowsill"
-	sill:SetAttribute("ContentRevision", Layout.CONTENT_REVISION)
-	for _, spec in Layout.PIECES do
+-- The physical parts of some pieces, one anchored Part for each, into `parent` (ROBLOX-94: the part-making the sill always had, for any region's pieces; World/WorldBuild builds
+-- each region with it). `hide`: the ids of the pieces whose look is replaced by a drawing; those turn invisible but stay solid and climbable.
+function Scenery.parts(parent: Instance, pieces: { Layout.Piece }, hide: { [string]: boolean })
+	for _, spec in pieces do
 		assert(Surfaces[spec.profile], "unknown surface profile " .. spec.profile)
 		local p = Instance.new("Part")
 		p.Name = spec.id
@@ -94,8 +89,19 @@ function Scenery.sill(replaced: { [string]: boolean }?): Folder
 			p.Transparency = 1
 			p.CastShadow = false
 		end
-		p.Parent = sill
+		p.Parent = parent
 	end
+end
+
+-- `replaced`: the ids of the pieces whose drawn version exists (Scenery.decor's second result); those turn invisible but stay solid
+-- and climbable. A piece whose drawing could not be built stays visible instead of leaving a hole. nil means all the pieces that
+-- the decor can replace (the wall and the Pilea's leaves and stems). `pieces`: the sill's boxes (the layout's own unless World/WorldBuild hands in its region's, which are the same).
+function Scenery.sill(replaced: { [string]: boolean }?, pieces: { Layout.Piece }?): Folder
+	local hide = replaced or replaceable()
+	local sill = Instance.new("Folder")
+	sill.Name = "Windowsill"
+	sill:SetAttribute("ContentRevision", Layout.CONTENT_REVISION)
+	Scenery.parts(sill, pieces or Layout.PIECES, hide)
 	return sill
 end
 
@@ -296,9 +302,13 @@ local function attempt(decor: Instance, what: string, build: () -> unknown): boo
 	return ok
 end
 
-function Scenery.decor(sun: Vector3?): (Folder, { [string]: boolean })
-	local decor = Instance.new("Folder")
+function Scenery.decor(sun: Vector3?): (Model, { [string]: boolean })
+	-- ROBLOX-94: a Model, and a persistent one, so that with instance streaming on (Workspace.StreamingEnabled) the whole drawn sill, and the far view out of the window above
+	-- all, reaches every client at once and never streams out; a Folder would be streamed part by part around the replication focus, and the view is hundreds of studs away.
+	-- (Without streaming it is exactly the container the Folder was.) The client's one-time reads of it (Breakaway, WorldDetail, DayLight) depend on it being whole.
+	local decor = Instance.new("Model")
 	decor.Name = "Decor"
+	decor.ModelStreamingMode = Enum.ModelStreamingMode.Persistent
 	local replaced: { [string]: boolean } = {}
 	for _, d in Layout.DECOR do
 		if not W.replaces[d.id] then

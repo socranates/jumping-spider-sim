@@ -12,7 +12,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Rules = require(Shared:WaitForChild("Data"):WaitForChild("MatingRules"))
-local Layout = require(Shared:WaitForChild("Habitat"):WaitForChild("WindowsillLayout"))
+local WorldMap = require(Shared:WaitForChild("World"):WaitForChild("WorldMap"))
 local SupportMath = require(Shared:WaitForChild("Movement"):WaitForChild("SupportMath"))
 local PreyRandom = require(Shared:WaitForChild("Prey"):WaitForChild("PreyRandom"))
 local SpiderRig = require(Shared:WaitForChild("Rig"):WaitForChild("SpiderRig"))
@@ -33,10 +33,11 @@ MateStage.BODY = 0.14 -- the abdomen's diameter in studs (one stud is a centimet
 -- Where a spiderling's two balls sit, in BODY, along its heading from its middle, and the head's diameter: the head overlaps the abdomen (centres 0.77 apart, the radii
 -- 0.5 and 0.35 add to 0.85, so they are 0.08 into each other); at 0.55 and 0.6 across there was a gap of 0.1 BODY (0.014 studs) between them, a head floating in front.
 MateStage.BODY_AT, MateStage.HEAD_AT, MateStage.HEAD = -0.35, 0.42, 0.7
--- The crack's floor, where the spiderlings walk: inside the retreat's box, clear of its walls.
+-- The crack's floor, where the spiderlings walk: inside the retreat's box (the map's: ROBLOX-94), clear of its walls.
 local FLOOR_Y = 0.05
-local LO = Vector3.new(Layout.RETREAT_MIN.X + 0.4, FLOOR_Y, Layout.RETREAT_MIN.Z + 0.4)
-local HI = Vector3.new(Layout.RETREAT_MAX.X - 0.4, FLOOR_Y, Layout.RETREAT_MAX.Z - 0.4)
+local CRACK = WorldMap.retreat("sill_crevice") :: WorldMap.Retreat
+local LO = Vector3.new(CRACK.min.X + 0.4, FLOOR_Y, CRACK.min.Z + 0.4)
+local HI = Vector3.new(CRACK.max.X - 0.4, FLOOR_Y, CRACK.max.Z - 0.4)
 
 local SILK = Color3.fromRGB(236, 232, 214)
 

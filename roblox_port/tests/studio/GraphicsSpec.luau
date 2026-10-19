@@ -11,8 +11,8 @@ return function(check)
 	local Materials = require(Shared.Habitat.Materials)
 	local Flora = require(Shared.Data.Flora)
 	local Plants = require(Shared.Habitat.Plants)
-	local sill = workspace:WaitForChild("Windowsill", 15) :: Folder
-	local decor = workspace:WaitForChild("Decor", 15) :: Folder
+	local sill = (workspace:WaitForChild("World", 15) :: Folder):WaitForChild("Windowsill", 15) :: Folder -- (ROBLOX-94: the sill is region 0, inside the World folder)
+	local decor = workspace:WaitForChild("Decor", 15) :: Model -- (a persistent model since ROBLOX-94)
 
 	-- Protected Technology/Use2022Materials are checked by tools/build.py.
 	check("every material name in the graphics table is a real Roblox material", function()

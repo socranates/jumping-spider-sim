@@ -13,7 +13,7 @@
 local M=require(script.Parent.Parent.Prey.PreyMath)
 local PreyRandom=require(script.Parent.Parent.Prey.PreyRandom)
 local Rules=require(script.Parent.Parent.Data.RivalRules)
-local Layout=require(script.Parent.Parent.Habitat.WindowsillLayout)
+local WorldMap=require(script.Parent.Parent.World.WorldMap)
 local Rival={}
 local function phase(r: any,s: string) if r.state~=s then r.shaken=nil end;r.state=s;r.elapsed=0 end
 Rival.FOOD=.7 -- two housefly-equivalent meals
@@ -70,9 +70,10 @@ function Rival.renew(r: any)
  r.subdued=nil
  r.shaken=nil
 end
--- Where the wasp may take it from (ROBLOX-70): nil unless it is on the sill, awake and free; never in the retreat.
-function Rival.target(r: any): any
- if r==nil or not (r.state=="patrol" or r.state=="stalk" or r.state=="windup" or r.state=="recover") or Layout.inRetreat(r.position) then return nil end
+-- Where the wasp may take it from (ROBLOX-70): nil unless it is on the sill, awake and free; never in the retreat. ROBLOX-94: `region` (the sill's unless given) is the
+-- region it belongs to, whose retreats it keeps out of.
+function Rival.target(r: any,region: string?): any
+ if r==nil or not (r.state=="patrol" or r.state=="stalk" or r.state=="windup" or r.state=="recover") or WorldMap.inRetreat(r.position,region or WorldMap.HOME)~=nil then return nil end
  return {position=r.position,up=r.up or Vector3.yAxis,present=true}
 end
 -- The wasp has it: it hangs under the wasp and nothing else touches it.
@@ -85,7 +86,8 @@ end
 function Rival.carried(r: any,day: number,hour: number?)
  r.state="consumed";r.elapsed=0;r.food=0;r.day=day;r.hour=hour;r.fate="taken by the wasp";r.shaken=nil
 end
-function Rival.valid(r: any): boolean
+-- ROBLOX-94: `region` is the region the rival belongs to (the sill's unless given): where it may stand is that region's bounds, outside that region's retreats.
+function Rival.valid(r: any,region: string?): boolean
  if r==nil then return true end
  if type(r)~="table" or not states[r.state] then return false end
  for _,k in {"elapsed","notice","food","patrol"} do
@@ -108,8 +110,8 @@ function Rival.valid(r: any): boolean
  if r.hour~=nil and (type(r.hour)~="number" or r.hour~=r.hour or r.hour<0 or r.hour>=24) then return false end
  if r.fate~=nil and r.fate~="eaten" and r.fate~="taken by the wasp" then return false end
  if r.state=="patrol" or r.state=="stalk" or r.state=="windup" or r.state=="lunge" or r.state=="recover" then
-  local p,lo,hi=r.position,Layout.PLAY_BOUNDS_MIN,Layout.PLAY_BOUNDS_MAX
-  if p.X<lo.X or p.Y<lo.Y or p.Z<lo.Z or p.X>hi.X or p.Y>hi.Y or p.Z>hi.Z or Layout.inRetreat(Vector3.new(p.X,p.Y,p.Z)) then return false end
+  local p,id=r.position,region or WorldMap.HOME
+  if not WorldMap.inBounds(p,id) or WorldMap.inRetreat(Vector3.new(p.X,p.Y,p.Z),id)~=nil then return false end
  end
  if r.day~=nil and (type(r.day)~="number" or r.day~=r.day or r.day<0 or r.day==math.huge) then return false end
  for _,k in {"position","previous","heading","target","origin"} do
@@ -194,7 +196,7 @@ function Rival.step(r: any,dt: number,s: any,blocked: (Vector3,Vector3)->any): (
    r.origin=r.position
    if D then
     -- At the spider's own place, wherever that is; never at the crack.
-    if Layout.inRetreat(s.position) then phase(r,"recover");return "missed",0 end
+    if WorldMap.inRetreat(s.position)~=nil then phase(r,"recover");return "missed",0 end
     r.target=s.position
    else r.target=Vector3.new(math.clamp(s.position.X,18,28),.31,math.clamp(s.position.Z,3,10.8)) end
    phase(r,"lunge")

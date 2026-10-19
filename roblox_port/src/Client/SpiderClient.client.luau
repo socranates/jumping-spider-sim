@@ -51,7 +51,6 @@ local ControlText = require(Shared:WaitForChild("UI"):WaitForChild("ControlText"
 local Species = require(Shared:WaitForChild("Data"):WaitForChild("Species"))
 local Surfaces = require(Shared:WaitForChild("Data"):WaitForChild("Surfaces"))
 local Detail = require(Shared:WaitForChild("Data"):WaitForChild("Detail"))
-local Layout = require(Shared:WaitForChild("Habitat"):WaitForChild("WindowsillLayout"))
 local SpiderRig = require(Shared:WaitForChild("Rig"):WaitForChild("SpiderRig"))
 
 local Sensor = require(Shared.Perception.Sensor)
@@ -94,6 +93,9 @@ local M = {
 	LifeClock = require(Shared.Life.LifeClock),
 	HudLayout = require(Shared.UI.HudLayout),
 	Heard = require(Shared.UI.Heard),
+	-- The world (ROBLOX-94, Client/WorldClient): where the boxes are, which region the spider is in and how fast its day runs, the streaming focus. One instance, here for the same reason: the
+	-- client is at Luau's limit of 200 locals.
+	World = require(script.Parent.WorldClient).new(Workspace, Players.LocalPlayer),
 }
 local focusState = FocusState.new()
 local DT = SpiderMotor.DT
@@ -116,20 +118,20 @@ end
 -- Solo windowsill: the default player list obscures the life-menu button on small screens.
 pcall(function() game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList,false) end)
 local camera = Workspace.CurrentCamera
-local sill = Workspace:WaitForChild("Windowsill")
+local sill = M.World.sill -- region 0's folder (ROBLOX-94): its own pieces, the leaf tip; every ray includes M.World.root, the folder of all the regions' boxes
 local Breakaway = require(Shared.Habitat.Breakaway)
-local breakaway = Breakaway.new(sill,Workspace:FindFirstChild("Decor"))
+local breakaway = Breakaway.new(sill,M.World.decor)
 local params = RaycastParams.new()
 params.FilterType = Enum.RaycastFilterType.Include
-params.FilterDescendantsInstances = { sill }
+params.FilterDescendantsInstances = { M.World.root }
 
 local arc = Instance.new("Folder")
 arc.Name = "JumpArc"
 arc.Parent = Workspace
 local motor: any = SpiderMotor.new({
-	world = sill, surfaces = Surfaces, profile = Species.phidippus_audax_prototype,
-	spawn = Layout.SPAWN, heading = Layout.SPAWN_HEADING,
-	boundsMin = Layout.PLAY_BOUNDS_MIN, boundsMax = Layout.PLAY_BOUNDS_MAX, probeParent = arc,
+	world = M.World.root, surfaces = Surfaces, profile = Species.phidippus_audax_prototype,
+	spawn = M.World.spawnPos, heading = M.World.spawnHeading,
+	boundsMin = M.World.boundsMin, boundsMax = M.World.boundsMax, probeParent = arc,
 })
 local jump: any = JumpInput.new()
 local carry: any = StickCarry.new()
@@ -138,7 +140,7 @@ local carry: any = StickCarry.new()
 local detail = Detail.choose(UIS.TouchEnabled and not UIS.KeyboardEnabled, Workspace:GetAttribute("Detail"))
 -- Which spider: the Player attribute Appearance (kept for the session), else the Workspace attribute Appearance, else the first spider.
 local appearance = SpiderChoice.start(player:GetAttribute("Appearance"), Workspace:GetAttribute("Appearance"))
-local rig = SpiderRig.new(Workspace, sill, appearance, detail)
+local rig = SpiderRig.new(Workspace, M.World.root, appearance, detail)
 -- The rival's legs (ROBLOX-69): its own SpiderMotor over the whole sill, made when it first arrives, and its drawn rig; its words (ROBLOX-73); its grip once
 -- caught (ROBLOX-77, `grip` made below with the reserves). One table: the client is at Luau's limit of 200 locals.
 local rivalLegs: any = { drive = nil, rig = nil, Drive = require(Shared.Predator.RivalDrive), Text = require(Shared.UI.RivalText), Grip = require(Shared.Predator.RivalGrip), grip = nil }
@@ -149,7 +151,7 @@ local mateLegs: any = { Mating = require(Shared.Life.Mating), Mate = require(Sha
 	-- The mating scene (ROBLOX-89): its pure plan module and its state here (the plan, the scene's seconds as the simulation counts them, the last frame's, the notice held
 	-- until it is over, whether it was skipped and whose it was).
 	Scene = require(Shared.Life.MatingScene), couple = { active = false, plan = nil, t = -1, prev = -1, notice = nil, skipped = false, mateSex = "" } }
-mateLegs.stage = require(script.Parent.MateStage).new(Workspace, sill, detail)
+mateLegs.stage = require(script.Parent.MateStage).new(Workspace, M.World.root, detail)
 local dance = PeacockDance.new() -- the peacock spider's courtship dance (a pose for the rig; nothing else reads it)
 local dancePose: any = nil
 -- The ant-mimicking spider's antennae and drawn walk (a pose for the rig; nothing else reads it): the modules, the state, its latest pose, and where
@@ -186,7 +188,7 @@ sensor:configureFrom(Species.phidippus_audax_prototype.perception)
 local sightCast = Sensor.workspaceCast(params)
 local perceptionHud = PerceptionHud.new(player:WaitForChild("PlayerGui"))
 local stage = if Workspace:GetAttribute("TestTarget") == true or (Workspace:GetAttribute("TestTarget") ~= false and script.Parent:FindFirstChild("SilkPlayback")) then PerceptionStage.new(sill) else nil
-local prey = PreyDirector.engine(sill, Species.fly_like_prototype, 914, 4, true)
+local prey = PreyDirector.engine(M.World.root, Species.fly_like_prototype, 914, 4, true)
 local flyBodies = FlyBodies.new(Workspace)
 local soundscape = Soundscape.new(Workspace)
 local waspBody = WaspBody.new(Workspace)
@@ -210,7 +212,7 @@ local wasp: any = WaspDirector.new({
 	world = {
 		ray = function(a: Vector3, b: Vector3): boolean return Workspace:Raycast(a, b - a, params) ~= nil end,
 		clear = function(a: Vector3, b: Vector3, radius: number): boolean return Workspace:Spherecast(a, radius, b - a, params) == nil end,
-		inRetreat = function(p: Vector3): boolean return Layout.inRetreat(p) end,
+		inRetreat = function(p: Vector3): boolean return M.World:inRetreat(p) ~= nil end,
 	},
 })
 local waspSpider: WaspDirector.Spider = { position = Vector3.zero, velocity = Vector3.zero, walkSpeed = Species.phidippus_audax_prototype.locomotion.walk_speed_wu_s, airborne = false, falling = false }
@@ -444,6 +446,7 @@ local function backToStart()
 	motor:respawn()
 	dropStrands(false)
 	drawnUp = motor.up
+	M.World:refocus() -- (the streaming focus is set on the drawn spider again)
 	cam:snap()
 end
 
@@ -467,7 +470,7 @@ local function setAppearance(id: string)
 	ant.state, ant.pose, ant.last = ant.Pose.new(), nil, nil
 	ant.threat, ant.threatPose = ant.Threat.new(), nil
 	local old = rig
-	rig = SpiderRig.new(Workspace, sill, appearance, detail)
+	rig = SpiderRig.new(Workspace, M.World.root, appearance, detail)
 	rig.gaitMode = old.gaitMode
 	rig:setEyeView(cam.eyeView)
 	rig:setBodyHidden(bodyHidden)
@@ -695,6 +698,7 @@ local function returnToCheckpoint()
 	focusState:clear()
 	dropStrands(false)
 	drawnUp = motor.up
+	M.World:refocus()
 	cam:snap()
 	lastLight = nil -- the hour may have changed: set the light again
 	feedPending, cancelPending = false, false
@@ -729,8 +733,8 @@ local function fresh(mode: string, easy: boolean, position: Vector3?): boolean
  stores[slot]=newStore();checkpoints=stores[slot]
  life.resting=false;life.notice="";life.noticeSeconds=0;life.restoreGrace=0
  wasp:load(WaspDirector.defaultRecord());wasp.gentle=needs.gentle
- if position then motor:place(position,Vector3.yAxis,Layout.SPAWN_HEADING) end
- closeScreens();dropStrands(false);drawnUp=motor.up;cam:snap();lastLight=nil
+ if position then motor:place(position,Vector3.yAxis,M.World.spawnHeading) end
+ closeScreens();dropStrands(false);drawnUp=motor.up;M.World:refocus();cam:snap();lastLight=nil
  feedPending,cancelPending=false,false
  watch:resync()
  return true
@@ -919,10 +923,10 @@ function mateLegs.carryOn()
  closeScreens()
  mateLegs.reset()
  setAppearance(appearance) -- the rig is built again, at the first growth stage
- motor:place(Vector3.new(-25.5,0.31,6.0),Vector3.yAxis,Layout.SPAWN_HEADING)
+ motor:place(Vector3.new(-25.5,0.31,6.0),Vector3.yAxis,M.World.spawnHeading)
  motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor())
  sensor:reset();memory:clear()
- dropStrands(false);drawnUp=motor.up;cam:snap();lastLight=nil
+ dropStrands(false);drawnUp=motor.up;M.World:refocus();cam:snap();lastLight=nil
  feedPending,cancelPending=false,false
  watch:resync()
  hud:toast(mateLegs.Text.generationToast(generation,day),false)
@@ -1468,6 +1472,7 @@ local accumulator = 0
 RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, function(frameDt: number)
 	saveState.frame()
 	spiderPick.update(frameDt) -- (the choose hold's clock and the close look's reasons to end)
+	M.World:update(motor.pos, rig.root) -- (ROBLOX-94: the region the spider is in, the pace of its day, the streaming focus on the drawn spider)
 	if panel:isShowing() then panel:update(frameDt) end
 	if nbPanel:isShowing() then nbPanel:update(frameDt) end
 	if settingsPanel:isShowing() then settingsPanel:update(frameDt) end
@@ -1550,7 +1555,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			life.mealFood = (life.mealFood or 0) + Growth.rivalCredit(prey.feeding.taken-takenBefore)
             local rivalState={
              position=motor.pos,previous=prey.previousPosition or motor.pos,heading=motor.heading,up=motor.up,
-             day=life.clock.day,hour=life.clock.hour,meals=genMeals,born=born,resting=life.resting,safe=Layout.inRetreat(motor.pos),
+             day=life.clock.day,hour=life.clock.hour,meals=genMeals,born=born,resting=life.resting,safe=M.World:inRetreat(motor.pos)~=nil,
              -- the rival keeps away from a courting pair and from the mating scene (ROBLOX-91): it recovers, like for the wasp
              scene=mateLegs.Mate.sceneActive(life.mate),courting=mateLegs.Mate.courting(life.mate,motor.pos),
              wasp=wasp:isVisiting(),gentle=needs.gentle,grounded=motor.mode=="attached",moving=motor.moving,
@@ -1561,10 +1566,10 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
             local rivalEvent,rivalFood=RivalSpider.step(life.rival,DT,rivalState,sightCast)
             if life.rival.state~="dormant" and life.rival.state~="consumed" and rivalLegs.drive==nil then
              rivalLegs.drive=rivalLegs.Drive.new(SpiderMotor.new({
-              world = sill, surfaces = Surfaces, profile = Species.phidippus_audax_prototype,
+              world = M.World.root, surfaces = Surfaces, profile = Species.phidippus_audax_prototype,
               spawn = life.rival.position, heading = life.rival.heading,
-              boundsMin = Layout.PLAY_BOUNDS_MIN, boundsMax = Layout.PLAY_BOUNDS_MAX, probeParent = arc,
-             }),sightCast)
+              boundsMin = M.World.boundsMin, boundsMax = M.World.boundsMax, probeParent = arc,
+             }),sightCast,M.World.home)
             end
             -- A caught rival fights the tapping grip before it can be eaten (ROBLOX-77); it is subdued, or it tears free and recovers (never a harm).
             local gripEvent=rivalLegs.Grip.step(rivalLegs.grip,life.rival,DT,{
@@ -1597,10 +1602,10 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
              local mate=life.mate
              if mate~=nil and mate.state~="away" and mateLegs.drive==nil then
               mateLegs.drive=mateLegs.Drive.new(SpiderMotor.new({
-               world = sill, surfaces = Surfaces, profile = Species.phidippus_audax_prototype,
+               world = M.World.root, surfaces = Surfaces, profile = Species.phidippus_audax_prototype,
                spawn = mate.position, heading = mate.heading,
-               boundsMin = Layout.PLAY_BOUNDS_MIN, boundsMax = Layout.PLAY_BOUNDS_MAX, probeParent = arc,
-              }),sightCast)
+               boundsMin = M.World.boundsMin, boundsMax = M.World.boundsMax, probeParent = arc,
+              }),sightCast,M.World.home)
              end
              if mateLegs.drive~=nil and mate~=nil then mateLegs.drive:update(mate,DT,ms) end
              -- A record restored into the hatching (or a brood out while nothing is playing) goes straight to the ending.
@@ -1609,7 +1614,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			-- The life loop runs last in the tick (Godot's habitat loop, priority 12); the reach it sets is the next tick's.
 			local holding = prey.feeding.held ~= nil or (life.rival~=nil and life.rival.state=="captured")
 			lifeSpider = {
-				inRetreat = Layout.inRetreat(motor.pos), attached = motor.mode == "attached" and not motor.preparing,
+				inRetreat = M.World:inRetreat(motor.pos) ~= nil, attached = motor.mode == "attached" and not motor.preparing,
 				still = input.wish.Magnitude < 0.01 and motor.vel.Magnitude < 0.15,
 				holding = holding, feeding = holding and (prey.feeding.feeding or (life.rival~=nil and life.rival.state=="captured")), position = motor.pos,
 			}
@@ -1725,7 +1730,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
  if not paused then watch:frame(simFrame,cam.eyeView,eyes.moversShown) end
     local rival=life.rival
     if rival and rival.state~="dormant" and rival.state~="consumed" then
-     if not rivalLegs.rig then rivalLegs.rig=SpiderRig.new(Workspace,sill,"rival_spider","low");rivalLegs.rig.model.Name="RivalSpider" end
+     if not rivalLegs.rig then rivalLegs.rig=SpiderRig.new(Workspace,M.World.root,"rival_spider","low");rivalLegs.rig.model.Name="RivalSpider" end
      rivalLegs.rig.reducedMotion=setting("ReducedMotion")==true
      rivalLegs.rig.jumpLoad=if rival.state=="windup" then math.clamp(rival.elapsed,0,1) else 0
      -- (ROBLOX-93: drawn ten times a second when it is more than SpiderRig's FAR_STUDS from the camera, except in a windup, a lunge or when carried; the sim steps it every tick)
@@ -1809,6 +1814,7 @@ if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
 			motor = motor,
 			camera = cam,
 			sill = sill,
+			world = M.World,
 			setDevice = function(name: ControlText.Device) device = name end,
 			place = function(position: Vector3)
 				controls:clear()

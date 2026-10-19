@@ -18,9 +18,10 @@ local MAP: { [string]: string } = {
 	away = "dormant", wander = "patrol", approach = "stalk", attend = "windup", pair = "windup", leaving = "patrol",
 }
 
--- `motor`: a SpiderMotor made for the mate; `blocked(a, b)`: something opaque between the points (the sight query).
-function MateDrive.new(motor: any, blocked: (Vector3, Vector3) -> any): any
-	local drive = RivalDrive.new(motor, blocked)
+-- `motor`: a SpiderMotor made for the mate; `blocked(a, b)`: something opaque between the points (the sight query). ROBLOX-94: `region` (the sill's unless given) is the
+-- region it walks in (RivalDrive.new).
+function MateDrive.new(motor: any, blocked: (Vector3, Vector3) -> any, region: string?): any
+	local drive = RivalDrive.new(motor, blocked, region)
 	local exit: any = nil
 	local best = math.huge
 	for _, w in drive.waypoints do

@@ -7,7 +7,7 @@
 -- not know the engine: the motor and a sight query are handed in, so the CLI runs it on the box world and Studio on the real sill.
 local Route = require(script.Parent.RivalRoute)
 local Rules = require(script.Parent.Parent.Data.RivalRules)
-local Layout = require(script.Parent.Parent.Habitat.WindowsillLayout)
+local WorldMap = require(script.Parent.Parent.World.WorldMap)
 local SupportMath = require(script.Parent.Parent.Movement.SupportMath)
 local Motor = require(script.Parent.Parent.Movement.SpiderMotor)
 
@@ -22,13 +22,14 @@ local function gcd(a: number, b: number): number
 	return a
 end
 
--- `motor`: a SpiderMotor made for the rival (its own world query and probe). `blocked(a, b)`: something opaque between the points.
-function Drive.new(motor: any, blocked: (Vector3, Vector3) -> any): any
+-- `motor`: a SpiderMotor made for the rival (its own world query and probe). `blocked(a, b)`: something opaque between the points. ROBLOX-94: `region` (the sill's unless
+-- given) is the region it walks in, whose retreats it never enters.
+function Drive.new(motor: any, blocked: (Vector3, Vector3) -> any, region: string?): any
 	local waypoints = Route.waypoints()
 	local stride = 7
 	while gcd(stride, math.max(#waypoints, 1)) ~= 1 do stride += 1 end
 	return setmetatable({
-		motor = motor, blocked = blocked, waypoints = waypoints, stride = stride,
+		motor = motor, blocked = blocked, region = region or WorldMap.HOME, waypoints = waypoints, stride = stride,
 		ticks = 0, think = 0.0, face = nil :: number?, route = nil :: { any }?, hop = 1,
 		goal = nil :: any, goalKey = "", prevState = "dormant",
 		lastUp = Vector3.yAxis, sees = false, reach = false, remember = false, seen = nil :: Vector3?, seenUp = Vector3.yAxis, lost = 0.0,
@@ -224,7 +225,7 @@ function Drive._reseat(self: any, r: any)
 	local motor = self.motor
 	local up = r.up or Vector3.yAxis
 	local hit = workspace:Raycast(r.position + up * 0.3, -up * 1.2, motor.params)
-	if hit ~= nil and motor:attachable(hit) and not Layout.inRetreat(hit.Position + hit.Normal * SEAT) then
+	if hit ~= nil and motor:attachable(hit) and WorldMap.inRetreat(hit.Position + hit.Normal * SEAT, self.region) == nil then
 		motor:place(hit.Position + hit.Normal * SEAT, hit.Normal, r.heading)
 	else
 		local at = r.origin
@@ -286,7 +287,7 @@ function Drive.update(self: any, r: any, dt: number, s: any)
 		self:_hops()
 	end
 	-- The crack is never entered: whatever happened, back to the last place outside it.
-	if Layout.inRetreat(motor.pos) then
+	if WorldMap.inRetreat(motor.pos, self.region) ~= nil then
 		local safe = self.safe
 		motor:place(safe.pos, safe.up, safe.heading)
 		self.route, self.goal = nil, nil

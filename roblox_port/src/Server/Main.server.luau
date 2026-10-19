@@ -1,8 +1,8 @@
 --!strict
--- Builds the windowsill (scripts/habitat/windowsill.gd), the drawn world around it (Habitat/Scenery, from Data/Graphics) and the
--- lighting (Habitat/Lit). The spider itself is client-side (StarterPlayerScripts/Client/SpiderClient): one player, one spider,
--- nothing to replicate yet. Lighting Technology (Future) and MaterialService.Use2022Materials are authored in the Rojo projects;
--- runtime scripts cannot set them.
+-- Builds the world: the windowsill (scripts/habitat/windowsill.gd) as region 0 of the map (World/WorldBuild, ROBLOX-94: every region's physical boxes under one `World`
+-- folder), the drawn world around it (Habitat/Scenery, from Data/Graphics) and the lighting (Habitat/Lit). The spider itself is client-side
+-- (StarterPlayerScripts/Client/SpiderClient): one player, one spider, nothing to replicate yet but where the server streams the world to (Server/WorldFocus).
+-- Lighting Technology (Future), MaterialService.Use2022Materials and the Workspace's streaming settings are authored in the Rojo projects; runtime scripts cannot set them.
 
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
@@ -12,6 +12,10 @@ local Workspace = game:GetService("Workspace")
 local Habitat = ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Habitat")
 local Scenery = require(Habitat:WaitForChild("Scenery"))
 local Lit = require(Habitat:WaitForChild("Lit"))
+local World = ReplicatedStorage:WaitForChild("Shared"):WaitForChild("World")
+local WorldMap = require(World:WaitForChild("WorldMap"))
+local WorldBuild = require(World:WaitForChild("WorldBuild"))
+local WorldFocus = require(script.Parent.WorldFocus)
 
 Players.CharacterAutoLoads = false
 Workspace.Gravity = 35 -- species gravity_wu_s2; used by any unanchored props
@@ -32,7 +36,15 @@ if not decorOk then
 	warn("[Windowsill] decor failed, the back wall and the Pilea's pieces stay as they were: " .. tostring(decor))
 end
 
--- Only the pieces whose drawing exists turn invisible (still solid); if the decor failed nothing is hidden.
-local sill = Scenery.sill(if decorOk then replaced else {})
+-- Only the pieces whose drawing exists turn invisible (still solid); if the decor failed nothing is hidden. The sill is region 0 of the world: its "Windowsill" folder, exactly
+-- as it was, now inside the `World` folder with every other region's.
 if decorOk then decor.Parent = Workspace end
-sill.Parent = Workspace
+WorldBuild.world(Workspace, WorldMap.SEED, if decorOk then replaced else {})
+
+-- With instance streaming on (Workspace.StreamingEnabled, authored in default.project.json) the server sends a client what is near its replication focus, and a player here
+-- has no character to be the focus: each gets a small invisible part, parked at the home region's spawn (Server/WorldFocus).
+local foci = Instance.new("Folder")
+foci.Name = "ReplicationFoci"
+foci.Parent = Workspace
+local home = WorldMap.region(WorldMap.HOME) :: WorldMap.Region
+WorldFocus.watch(Players, foci, home.spawn.pos + Vector3.new(0, 0.31, 0))

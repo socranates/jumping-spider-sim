@@ -886,5 +886,106 @@ do
 	check(shown == 19 and hidden == 19, "and they come with 06:00 and go by 10:00")
 end
 
+-- ---------------------------------------------------------------- the sill as region 0 of a world (ROBLOX-94)
+-- The same sill is built into a World folder that has a folder for every region; the drawn sill is a persistent model; the server keeps each player's replication focus on a part
+-- of its own. None of this can say how instance streaming behaves in the engine: that is a Studio question (docs/DECISIONS.md, ROBLOX-94).
+do
+	local WorldMap = require("../src/Shared/World/WorldMap")
+	local Region = require("../src/Shared/World/Region")
+	local WorldBuild = require("../src/Shared/World/WorldBuild")
+	local WorldFocus = require("../src/Server/WorldFocus")
+
+	-- The most the sill's drawing may build, as the region records it, is exactly what the decor builds at each tier (a sill that grows must say so in Region).
+	check(Region.budget("sill", "full") == fullParts and Region.budget("sill", "low") == lowParts,
+		`the sill's recorded budgets are what its decor builds: {fullParts} drawn parts at full detail ({tostring(Region.budget("sill", "full"))}), {lowParts} at low ({tostring(Region.budget("sill", "low"))})`)
+	-- The drawn sill streams as one piece: a persistent model, so the far view out of the window and the one-time reads of the client never meet a half-streamed sill.
+	check(decor.ClassName == "Model" and decor.Name == "Decor" and decor.ModelStreamingMode == Enum.ModelStreamingMode.Persistent, "the drawn sill is a model named Decor that streaming never takes away (Persistent)")
+
+	-- Everything a part is, one line each, so that two sills can be compared whole.
+	local function fmt(v: Vector3): string return string.format("%.9f,%.9f,%.9f", v.X, v.Y, v.Z) end
+	local function dumpFolder(folder: Instance): string
+		local lines = { `{folder.ClassName} {folder.Name} revision={tostring(folder:GetAttribute("ContentRevision"))} children={#folder:GetChildren()}` }
+		for _, child in folder:GetChildren() do
+			local part = child :: any
+			table.insert(lines, table.concat({
+				part.ClassName, part.Name, fmt(part.Size), fmt(part.Position), tostring(part.Anchored), tostring(part.CanCollide), tostring(part.CanQuery), tostring(part.CanTouch),
+				tostring(part.Transparency), tostring(part.CastShadow), if part.Material then part.Material.Name else "nil", if part.Color then rgb(part.Color) else "nil",
+				tostring(part.Reflectance), tostring(part:GetAttribute("SurfaceId")), tostring(part:GetAttribute("ProfileId")),
+			}, "|"))
+		end
+		return table.concat(lines, "\n")
+	end
+
+	local holder = Instance.new("Folder")
+	local world = WorldBuild.world(holder)
+	check(Region.WORLD_FOLDER == "World" and world.Name == "World" and world.Parent == holder and #holder:GetChildren() == 1, "the physical world is one folder named World")
+	check(#WorldMap.regions() == 1 and #world:GetChildren() == #WorldMap.regions() and world:GetChildren()[1].Name == "Windowsill", "with a folder for every region; the sill's is still called Windowsill")
+	local inWorld = world:FindFirstChild("Windowsill") :: Folder
+	check(#inWorld:GetChildren() == #Layout.PIECES and dumpFolder(inWorld) == dumpFolder(Scenery.sill()),
+		"the sill's folder inside World is exactly the one Scenery.sill makes: every part's name, size, place, solidity, looks and attributes")
+	local drawn = WorldBuild.world(Instance.new("Folder"), WorldMap.SEED, drawnIds):FindFirstChild("Windowsill") :: Folder
+	check(dumpFolder(drawn) == dumpFolder(Scenery.sill(drawnIds)), "the same with the decor's own list of the pieces it drew")
+	local undrawn = WorldBuild.world(Instance.new("Folder"), WorldMap.SEED, {}):FindFirstChild("Windowsill") :: Folder
+	check(dumpFolder(undrawn) == dumpFolder(Scenery.sill({})) and (undrawn:FindFirstChild("back_frame") :: Part).Transparency == 0, "and with none (the decor failed): nothing is hidden")
+	check(dumpFolder(WorldBuild.world(Instance.new("Folder"), 1234):FindFirstChild("Windowsill") :: Folder) == dumpFolder(Scenery.sill()), "another world seed builds the same hand-placed sill")
+	check(not pcall(WorldBuild.region, { id = "bed_a", kind = "bed" } :: any, Instance.new("Folder")), "a region of a kind with no generator is refused, not built empty")
+	-- The part-making any later kind of region will be built with: its own boxes, named for them, solid, hidden when a drawing stands in for one.
+	local invented: { Layout.Piece } = {
+		{ id = "mound_1", lo = Vector3.new(40, 0, 0), hi = Vector3.new(44, 1, 3), profile = Layout.PIECES[1].profile, color = Color3.fromRGB(90, 70, 50) },
+		{ id = "stone_1", lo = Vector3.new(50, 0, 1), hi = Vector3.new(52, 2, 3), profile = Layout.PIECES[1].profile, color = Color3.fromRGB(120, 120, 120) },
+	}
+	local bed = Instance.new("Folder")
+	Scenery.parts(bed, invented, { stone_1 = true })
+	local mound, stone = bed:FindFirstChild("mound_1") :: Part, bed:FindFirstChild("stone_1") :: Part
+	check(#bed:GetChildren() == 2 and mound.Anchored and mound.CanQuery ~= false and mound.CanCollide ~= false and near((mound.Size - Vector3.new(4, 1, 3)).Magnitude, 0, 1e-9)
+		and near((mound.Position - Vector3.new(42, 0.5, 1.5)).Magnitude, 0, 1e-9) and mound:GetAttribute("SurfaceId") == "mound_1" and mound:GetAttribute("ProfileId") == Layout.PIECES[1].profile
+		and rgb(mound.Color) == rgb(Color3.fromRGB(90, 70, 50)) and mound.Transparency == 0 and stone.Transparency == 1 and stone.CastShadow == false and stone.CanQuery ~= false,
+		"a region's boxes are anchored, solid, queryable parts at the box's size and place, named and tagged for their ids; the one a drawing stands in for is invisible but solid")
+
+	-- Where the server streams to: each player gets a small invisible anchored part for a replication focus, parked at the sill's spawn.
+	local foci = Instance.new("Folder")
+	local alice: any = Instance.new("Player")
+	alice.UserId = 7001
+	local at = (WorldMap.region(WorldMap.HOME) :: WorldMap.Region).spawn.pos + Vector3.new(0, 0.31, 0)
+	local focus = WorldFocus.park(alice, foci, at)
+	check(focus.Name == "ReplicationFocus_7001" and focus.Parent == foci and alice.ReplicationFocus == focus and focus.Anchored and focus.Transparency == 1
+		and focus.CanCollide == false and focus.CanQuery == false and focus.CanTouch == false and focus.CastShadow == false and (focus.Position - at).Magnitude < 1e-9 and focus.Size.X <= 0.5,
+		"a player's focus is a small invisible anchored part that nothing collides with, touches or casts a ray at, parked at the spawn, and the player's ReplicationFocus")
+	check(WorldFocus.park(alice, foci, Vector3.new(5, 5, 5)) == focus and #foci:GetChildren() == 1 and (focus.Position - at).Magnitude < 1e-9, "a player who has one keeps it, where it is")
+	local bob: any = Instance.new("Player")
+	bob.UserId = 7002
+	check(WorldFocus.move(alice, foci, Vector3.new(3, 4, 5)) and (focus.Position - Vector3.new(3, 4, 5)).Magnitude < 1e-9 and not WorldFocus.move(bob, foci, Vector3.new(1, 1, 1)), "it can be moved, and a player without one cannot")
+	WorldFocus.release(alice, foci)
+	WorldFocus.release(bob, foci)
+	check(#foci:GetChildren() == 0, "and is taken away when the player leaves (and leaving without one is no matter)")
+	local function signal(): any
+		local s = { handlers = {} :: { (any) -> () } }
+		function s.Connect(self: any, fn: (any) -> ()) table.insert(self.handlers, fn); return { Disconnect = function() end } end
+		function s.Fire(self: any, value: any) for _, h in self.handlers do h(value) end end
+		return s
+	end
+	local roster: { any } = { alice }
+	local players = { GetPlayers = function(_self: any): { any } return roster end, PlayerAdded = signal(), PlayerRemoving = signal() }
+	local watched = Instance.new("Folder")
+	WorldFocus.watch(players :: any, watched, at)
+	check(#watched:GetChildren() == 1 and watched:FindFirstChild("ReplicationFocus_7001") ~= nil and alice.ReplicationFocus == watched:FindFirstChild("ReplicationFocus_7001"), "watching: the players already in the game have one")
+	players.PlayerAdded:Fire(bob)
+	check(#watched:GetChildren() == 2 and bob.ReplicationFocus == watched:FindFirstChild("ReplicationFocus_7002"), "and every one who joins")
+	players.PlayerRemoving:Fire(alice)
+	check(#watched:GetChildren() == 1 and watched:FindFirstChild("ReplicationFocus_7001") == nil and watched:FindFirstChild("ReplicationFocus_7002") ~= nil, "and the part goes when its player does")
+	-- It is no obstacle to the client: not under World, not queryable, so no ray of the sim (which includes World only) and not a ray at the whole workspace meets it.
+	workspace:ClearAllChildren()
+	WorldBuild.world(workspace)
+	local fociInWorkspace = Instance.new("Folder")
+	fociInWorkspace.Name = "ReplicationFoci"
+	fociInWorkspace.Parent = workspace
+	local carol: any = Instance.new("Player")
+	carol.UserId = 7003
+	local carolsFocus = WorldFocus.park(carol, fociInWorkspace, at)
+	local down = workspace:Raycast(at + Vector3.new(0, 5, 0), Vector3.new(0, -10, 0), RaycastParams.new())
+	check(down ~= nil and down.Instance ~= carolsFocus and down.Instance:IsDescendantOf(workspace:FindFirstChild("World") :: Instance), "a ray down through the focus meets the sill, not the focus")
+	check(not carolsFocus:IsDescendantOf(workspace:FindFirstChild("World") :: Instance), "and the focus is not part of World")
+end
+
 print(`WORLD passed={passed} failed={failed}`)
 if failed > 0 then error("world checks failed") end

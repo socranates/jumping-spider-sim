@@ -21,6 +21,8 @@
 --   wasp, wasp_escaped, wasp_caught ... the director's visit_started, left (it had noticed the spider), caught
 --   antennae ....... the ant-mimicking spider has stood still with its antennae up for AntMimic.noticeSeconds (the client's pose says how long)
 --   garden_bed ..... (ROBLOX-96, the Roblox game's own) the spider's first step onto a bed of the garden: the view's `region` is a region of kind "bed"
+--   look_springtail, look_leafhopper, look_moth, look_crane_fly ... (ROBLOX-101) the first close look at a prey of that kind: one of the view's flies of the kind
+--                    (Species body.prey_kind, NotebookPages.looks) within lookWu of the spider, perched or flying; distance only, not the sensor's say
 -- Not wired: felt. It answers to Godot's vibration sense (a felt shake through touching surfaces), which the port does not have, so
 -- that page cannot open yet; the notebook never opens a page for something the game does not do.
 -- Checked in tests/notebook.luau.
@@ -172,9 +174,12 @@ function NotebookWatch.step(self: any, v: View)
 	if v.region == "bed" then
 		book:notice("garden_bed")
 	end
-	-- A fly taking off near enough to hear.
+	-- A fly taking off near enough to hear; (ROBLOX-101) a close look at one of the bestiary's.
 	local seen: { [string]: boolean } = {}
 	for _, f in v.flies do
+		local kind = if f.profile ~= nil and f.profile.body ~= nil then f.profile.body.prey_kind else nil
+		local look = if kind ~= nil then Data.looks[kind] else nil
+		if look ~= nil and (f.position - v.spider).Magnitude <= Data.lookWu then book:notice(look) end
 		local up: boolean = f:airborne()
 		seen[f.id] = up
 		if up and not self.flying[f.id] and (f.position - v.spider).Magnitude <= Data.hearWu then

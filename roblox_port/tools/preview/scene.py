@@ -14,6 +14,8 @@ Views: corner, lip, floor, glass (close-ups of the wear), game (5 studs behind a
 camera, the spider mid-sill), overview, planter, leaves, window (looking out of the glass from the sill), window_uv (the same with the
 UV layer faded in), retreat (the crevice), fly (both flies), fly_a (the standing fly) and fly_b (the one in the air); close-ups of the
 fly from above, in front and from the side: fly_top, fly_front, fly_side (standing) and fly_b_top, fly_b_side, fly_b_front (in the air); wasp, wasp_side, wasp_top, wasp_front (hovering and searching), wasp_walk (on the floor) and wasp_hold (carrying).
+With --world (ROBLOX-101): bestiary_stone, bestiary_wall (the bestiary's prey in place) and spec_springtail, spec_springtail_air, spec_leafhopper, spec_moth,
+spec_moth_air, spec_crane_fly, spec_crane_fly_shed, spec_crane_fly_air (each kind close on a specimen tray at x 200, at the --detail tier).
 --parts renders an already dumped part list (for example the "before" list kept next to the images) instead of running the code."""
 import argparse, importlib.util, json, math, pathlib, subprocess, sys, tempfile
 
@@ -142,6 +144,18 @@ VIEWS = {
     # ROBLOX-96: the bed's life close up (the dock with its aphids and a gnat under a leaf, the soil with its woodlice), and the corner under the outer sill with its cobweb
     "bed_life": {"fov": 46, "eye": [-4.0, -84.5, -31.0], "at": [-12.0, -87.5, -42.0], "near": 0.05, "far": 2500, "groups": ["bed", "flies"], "shadow": 40},
     "corner_web": {"fov": 36, "eye": [22.0, -1.5, -31.0], "at": [28.6, -4.2, -24.2], "near": 0.05, "far": 2500, "groups": [], "shadow": 40},
+    # ROBLOX-101 (--world): the bestiary in place (the springtails round the big stone, a leafhopper on the dock, the wall's moths and crane fly, the outer sill's)
+    # and on the specimen tray at x 200 (each kind close, standing and in the air, and the crane fly with a leg gone)
+    "bestiary_stone": {"fov": 44, "eye": [17.0, -84.0, -37.0], "at": [11.0, -89.6, -48.0], "near": 0.05, "far": 2500, "groups": ["bed", "flies"], "shadow": 40},
+    "bestiary_wall": {"fov": 60, "eye": [0.0, -40.0, -60.0], "at": [0.0, -45.0, -24.0], "near": 0.1, "far": 2500, "groups": ["flies"], "shadow": 120},
+    "spec_springtail": {"fov": 14, "eye": [200.35, 0.45, 0.45], "at": [200.0, 0.06, 0.0], "near": 0.01, "far": 600, "groups": ["flies"], "shadow": 4},
+    "spec_springtail_air": {"fov": 14, "eye": [200.45, 1.3, -4.4], "at": [200.0, 1.06, -5.0], "near": 0.01, "far": 600, "groups": ["flies"], "shadow": 4},
+    "spec_leafhopper": {"fov": 18, "eye": [203.8, 0.75, 0.9], "at": [203.0, 0.1, 0.0], "near": 0.01, "far": 600, "groups": ["flies"], "shadow": 4},
+    "spec_moth": {"fov": 26, "eye": [208.9, 1.9, 1.6], "at": [208.0, 0.1, 0.0], "near": 0.02, "far": 600, "groups": ["flies"], "shadow": 6},
+    "spec_moth_air": {"fov": 30, "eye": [209.5, 2.6, -3.0], "at": [208.0, 1.16, -5.0], "near": 0.02, "far": 600, "groups": ["flies"], "shadow": 6},
+    "spec_crane_fly": {"fov": 40, "eye": [220.0, 4.0, 5.0], "at": [216.0, 0.2, -0.3], "near": 0.02, "far": 600, "groups": ["flies"], "shadow": 12},
+    "spec_crane_fly_shed": {"fov": 40, "eye": [228.0, 4.0, 5.0], "at": [224.0, 0.2, -0.3], "near": 0.02, "far": 600, "groups": ["flies"], "shadow": 12},
+    "spec_crane_fly_air": {"fov": 40, "eye": [221.0, 3.5, 0.0], "at": [216.0, 2.0, -5.0], "near": 0.02, "far": 600, "groups": ["flies"], "shadow": 12},
     "world": {"fov": 60, "eye": [75.0, -15.0, -100.0], "at": [0.0, -55.0, -30.0], "near": 1.0, "far": 4000, "groups": [], "shadow": 220},
     "descent": {"fov": 60, "eye": [6.0, -36.0, -31.0], "at": [2.0, -40.0, -24.31], "near": 0.05, "far": 2500, "groups": ["wall"], "shadow": 40},
 }

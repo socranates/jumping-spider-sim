@@ -99,6 +99,8 @@ local M = {
 	-- ROBLOX-96 (W3): the world's prey per region (Prey/PreyWorld, kept as M.World.prey) and the drawn woodlice (Client/BugBodies, M.World.bugs); here for the same reason.
 	PreyWorld = require(Shared.Prey.PreyWorld),
 	BugBodies = require(script.Parent.BugBodies),
+	-- ROBLOX-101 (W3b part A): the words for a prey that gets out of the jaws by its own trick (a moth's scales, a crane fly's leg); here for the same reason.
+	PreyText = require(Shared.UI.PreyText),
 }
 local focusState = FocusState.new()
 local DT = SpiderMotor.DT
@@ -195,7 +197,7 @@ local sightCast = Sensor.workspaceCast(params)
 local perceptionHud = PerceptionHud.new(player:WaitForChild("PlayerGui"))
 local stage = if Workspace:GetAttribute("TestTarget") == true or (Workspace:GetAttribute("TestTarget") ~= false and script.Parent:FindFirstChild("SilkPlayback")) then PerceptionStage.new(sill) else nil
 local prey = PreyDirector.engine(M.World.root, Species.fly_like_prototype, 914, 4, true)
-local flyBodies = FlyBodies.new(Workspace)
+local flyBodies = FlyBodies.new(Workspace, detail) -- (ROBLOX-101: the bestiary's bodies draw fewer parts at the low tier)
 local soundscape = Soundscape.new(Workspace)
 local waspBody = WaspBody.new(Workspace)
 -- LIFE (ROBLOX-24): the windowsill runs the life clock, so hunger runs by its hours (NeedsModel life mode, Standard rules to begin with; Easy and Free play
@@ -210,6 +212,7 @@ prey.feeding:useGameRules() -- an easier tap on a struggling fly (ROBLOX-72, Dat
 M.World.garden = {}
 M.World.prey = M.PreyWorld.new(prey, M.World, M.World.garden, M.World.root, { probe = prey.probe, cast = prey.graph.cast, sweep = prey.graph.sweep, overlap = prey.graph.overlap })
 M.World.bugs = M.BugBodies.new(Workspace)
+M.World.prey.tier = detail -- (ROBLOX-101: how many of the bestiary's prey a region holds)
 rivalLegs.grip = rivalLegs.Grip.new(needs) -- the grip on a caught rival (ROBLOX-77): its own controller, so the fly's is never disturbed
 local life = LifeLoop.new(needs, nil)
 life.growth:useGameRules(needs.gentle) -- five housefly-equivalents to a moult in the standard rules, not Godot's three; three in the gentle modes (ROBLOX-88/91, Growth.game)
@@ -1512,7 +1515,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			local waspPercept = wasp:percept() -- movement to the spider's senses, never prey
 			if waspPercept then table.insert(percepts, waspPercept) end
 			sensor:step(DT,motor:observer(),percepts,sightCast)
-			M.World.prey:before(DT,motor.pos,motor:observer(),sensor,sightCast,camera)
+			M.World.prey:before(DT,motor.pos,motor:observer(),sensor,sightCast,camera,life.clock.hour) -- (ROBLOX-101: the moths and crane flies fly from dusk)
 			if life.growth:isMoulting() then jump:drop(motor);motor:cancelWalk() else jump:step(motor) end
 			if breakaway:step(DT,if jump.last and jump.last.tick==jump.tick then jump.last else nil,motor.pos,setting("ReducedMotion")==true) then
     motor.planKey="";hud:toast("The dry leaf tip gave way. Your dragline catches the miss.",false)
@@ -1563,6 +1566,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			if prey.feeding.game ~= true then prey.feeding:useGameRules() end -- (a record restored from before the flag has none: the game's struggle again)
 			local takenBefore = prey.feeding.taken
 			M.World.prey:after(DT,motor,sensor,sightCast)
+			if M.World.prey.event ~= nil then hud:setNote(M.PreyText.note(M.World.prey.event) or "",M.PreyText.SECONDS);M.World.prey.event=nil end -- (ROBLOX-101: a slip, a shed leg)
 			-- Five houseflies or ten small prey (ROBLOX-88; Godot's three and six are Growth's defaults); credit food, not just spare energy capacity.
 			life.mealFood = (life.mealFood or 0) + Growth.rivalCredit(prey.feeding.taken-takenBefore)
             local rivalState={

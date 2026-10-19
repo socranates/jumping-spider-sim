@@ -8,6 +8,9 @@
 -- Display only: the fly's position, heading and normal come from the prey simulation (in the air its back is up); nothing here feeds back.
 -- ROBLOX-96: the bed's prey are drawn from FlyLook.small by `buildSmall`, a template per prey kind (Species body.prey_kind: the fungus gnat, the aphid), each
 -- under the fly's part budget; a fly whose kind has no sheet (the house fly, the fruit fly) is the house fly's template at its visual_scale, as before.
+-- ROBLOX-101: the bestiary's four (the springtail, the leafhopper, the moth, the crane fly) from the same sheets with the detail tier (`new`'s `detail`: a sheet's
+-- `full` items are drawn only at "full", its `low` items only at "low"), wings in pairs of several kinds (`wings`), and the crane fly's shed leg (a fly with
+-- `legsLost` is drawn from the template without the sheet's `shed` parts). A template is built per kind, tier and shed leg, when first asked for.
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
@@ -169,8 +172,16 @@ end
 
 -- ROBLOX-96: a smaller prey from one of FlyLook.small's sheets: its ellipsoids, its rods (mirrored where the sheet says, with a flight pose where it differs),
 -- one pair of plain wings when it has any (folded at rest, a fan in flight, as the fly's without the vein and the film), and the shadow.
-local function buildSmall(L: any): Template
+local function buildSmall(L: any, tier: string?, shed: boolean?): Template
 	local specs: { Spec } = {}
+	-- (ROBLOX-101) whether an item of the sheet is drawn at this tier, and not a part of the shed leg
+	local low = tier == "low"
+	local function shown(item: any, name: string): boolean
+		if item.full and low then return false end
+		if item.low and not low then return false end
+		if shed and L.shed ~= nil and string.sub(name, 1, #L.shed) == L.shed then return false end
+		return true
+	end
 	local fans: { [number]: boolean } = {}
 	local function color(name: string): Color3
 		return Color3.fromHex(L.colors[name])
@@ -183,6 +194,7 @@ local function buildSmall(L: any): Template
 		return #specs
 	end
 	for _, item in L.body do
+		if not shown(item, item.name) then continue end
 		local centre, size = vec(item.at), vec(item.size)
 		local frame = CFrame.new(centre)
 		if item.turn then frame *= CFrame.Angles(math.rad(item.turn[1]), math.rad(item.turn[2]), math.rad(item.turn[3])) end
@@ -192,6 +204,7 @@ local function buildSmall(L: any): Template
 		local sides: { number } = if item.mirror then { -1, 1 } else { 1 }
 		for _, side in sides do
 			local word = if not item.mirror then "" elseif side < 0 then "Left" else "Right"
+			if not shown(item, word .. item.name) then continue end
 			local size0, frame0 = rodBetween(mirrored(vec(item.from), side), mirrored(vec(item.to), side), item.d, 0, 0)
 			local flight: Pose? = nil
 			if item.fly then
@@ -201,29 +214,36 @@ local function buildSmall(L: any): Template
 			add(word .. item.name, true, color(item.color), "SmoothPlastic", 0, { size = size0, frame = frame0, transparency = 0 }, flight)
 		end
 	end
-	local W = L.wing
-	if W ~= nil then
+	local pairs_: { any } = L.wings or (if L.wing ~= nil then { L.wing } else {})
+	for _, W in pairs_ do
+		local label = W.name or "Wing"
 		for _, side in { -1, 1 } do
 			local word = if side < 0 then "Left" else "Right"
+			if not shown(W, word .. label) then continue end
 			local pitch, yaw = math.rad(W.pitch), math.rad(W.yaw)
 			local along = Vector3.new(side * math.sin(yaw) * math.cos(pitch), math.sin(pitch), math.cos(yaw) * math.cos(pitch)).Unit
 			local root = mirrored(vec(W.root), side)
 			local centre = root + along * (W.length / 2)
 			local up = (Vector3.yAxis - along * along.Y).Unit
 			local wing = CFrame.fromMatrix(centre, up:Cross(along), up) * CFrame.Angles(0, 0, -side * math.rad(W.roll))
-			local yawBack = math.rad(W.fan.yaw)
+			local F = W.fan or { reach = W.length, span = W.width, roll = 0, yaw = W.yaw, back = 0, rise = 0, transparency = 1 }
+			local yawBack = math.rad(F.yaw)
 			local reachDir = Vector3.new(side * math.cos(yawBack), 0, math.sin(yawBack))
-			local fanRoot = Vector3.new(side * W.root[1], W.root[2] + W.fan.rise, W.root[3] + W.fan.back)
-			local fan = CFrame.new(fanRoot + reachDir * (W.fan.reach / 2)) * CFrame.Angles(0, -side * yawBack, 0) * CFrame.Angles(0, 0, side * math.rad(W.fan.roll))
-			fans[add(`{word}Wing`, false, color("wing"), "Glass", W.reflectance,
-				{ size = Vector3.new(W.width, W.thick, W.length), frame = wing, transparency = W.transparency },
-				{ size = Vector3.new(W.fan.reach, W.thick, W.fan.span), frame = fan, transparency = W.fan.transparency })] = true
+			local fanRoot = Vector3.new(side * W.root[1], W.root[2] + F.rise, W.root[3] + F.back)
+			local fan = CFrame.new(fanRoot + reachDir * (F.reach / 2)) * CFrame.Angles(0, -side * yawBack, 0) * CFrame.Angles(0, 0, side * math.rad(F.roll))
+			local restPose = { size = Vector3.new(W.width, W.thick, W.length), frame = wing, transparency = W.transparency }
+			local index = add(`{word}{label}`, false, color(W.color or "wing"), W.material or "Glass", W.reflectance,
+				restPose,
+				if W.hide then { size = restPose.size, frame = wing, transparency = 1 } else { size = Vector3.new(F.reach, W.thick, F.span), frame = fan, transparency = F.transparency })
+			if not W.hide then fans[index] = true end
 		end
 	end
 	local S = L.shadow
-	local shadowSize = vec(S.size)
-	local shadowFrame = CFrame.new(0, -FlyLook.hover + S.lift + shadowSize.Y / 2, 0.005)
-	add("Shadow", false, color("shadow"), "SmoothPlastic", 0, { size = shadowSize, frame = shadowFrame, transparency = S.transparency }, { size = shadowSize, frame = shadowFrame, transparency = 1 })
+	if shown(S, "Shadow") then
+		local shadowSize = vec(S.size)
+		local shadowFrame = CFrame.new(0, -FlyLook.hover + S.lift + shadowSize.Y / 2, 0.005)
+		add("Shadow", false, color("shadow"), "SmoothPlastic", 0, { size = shadowSize, frame = shadowFrame, transparency = S.transparency }, { size = shadowSize, frame = shadowFrame, transparency = 1 })
+	end
 	local restFrames: { CFrame } = {}
 	local flightFrames: { CFrame } = {}
 	local changing: { number } = {}
@@ -234,20 +254,25 @@ local function buildSmall(L: any): Template
 	return { specs = specs, restFrames = restFrames, flightFrames = flightFrames, changing = changing, fans = fans }
 end
 
-function FlyBodies.new(parent: Instance): any
+-- `detail` (ROBLOX-101): the client's detail tier, "full" (the default) or "low", for the sheets that draw fewer parts at low.
+function FlyBodies.new(parent: Instance, detail: string?): any
 	local folder = Instance.new("Folder")
 	folder.Name = "Flies"
 	folder.Parent = parent
-	return setmetatable({ folder = folder, rigs = {}, template = build(), templates = {} :: { [string]: Template }, parts = {}, frames = {} }, FlyBodies)
+	return setmetatable({ folder = folder, rigs = {}, template = build(), templates = {} :: { [string]: Template }, parts = {}, frames = {}, detail = detail or "full" }, FlyBodies)
 end
 
--- The template a prey kind is drawn from (Species body.prey_kind): one of FlyLook.small's, built when first asked for, or the house fly's.
+-- The template a prey kind is drawn from (Species body.prey_kind): one of FlyLook.small's, built when first asked for, or the house fly's. `kind` may end in
+-- "+shed" (ROBLOX-101: the crane fly that left a leg).
 function FlyBodies.templateFor(self: any, kind: string?): Template
-	if kind == nil or FlyLook.small[kind] == nil then return self.template end
-	local t = self.templates[kind]
+	if kind == nil then return self.template end
+	local base = string.gsub(kind, "%+shed$", "")
+	if FlyLook.small[base] == nil then return self.template end
+	local key = kind .. "|" .. self.detail
+	local t = self.templates[key]
 	if t == nil then
-		t = buildSmall(FlyLook.small[kind])
-		self.templates[kind] = t
+		t = buildSmall(FlyLook.small[base], self.detail, base ~= kind)
+		self.templates[key] = t
 	end
 	return t
 end
@@ -301,6 +326,7 @@ function FlyBodies.draw(self: any, flies: { any }, now: number)
 	for _, fly in flies do
 		present[fly.id] = true
 		local kind: string? = if fly.profile and FlyLook.small[fly.profile.body.prey_kind or ""] ~= nil then fly.profile.body.prey_kind else nil
+		if kind ~= nil and fly.legsLost ~= nil and fly.legsLost > 0 then kind = kind .. "+shed" end -- (ROBLOX-101)
 		local rig = self.rigs[fly.id]
 		if rig ~= nil and rig.kind ~= kind then
 			rig.folder:Destroy()

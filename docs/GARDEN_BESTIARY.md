@@ -4,7 +4,9 @@ Nathan, 2026-10-19: "More more more bugs and types of bugs and information on th
 life: the fungus gnat, the aphid and the woodlouse, which set the pattern: a prey profile derived from the fly's golden, or an ambient
 bug with its own small module; a body under the fly's part budget; a generated notebook page with named sources). Each entry says what
 the bug is in the game, its size at the game's scale (1 stud = 1 cm; the first spider is about 1 cm, the peacock about 0.5), where it
-lives, what it does, and what its page can honestly say with a source the builder must open. **Nothing here is built.** The honesty
+lives, what it does, and what its page can honestly say with a source the builder must open. **Built so far** (marked *built* in the tables):
+the springtail, the leafhopper, the small moth and the crane fly, part A of W3b (ROBLOX-101, 2026-10-19: `docs/DECISIONS.md` has the numbers,
+`docs/NOTEBOOK_SOURCES.md` the pages' sources). The rest is not built. The honesty
 rule stands: a sentence without a source is left out, and the page says "In this game" where the game simplifies.
 
 The jumping spider's own rules decide the roles: it hunts by sight what moves and is smaller than itself, it avoids ants and armoured or
@@ -18,12 +20,12 @@ cites pages).
 | --- | --- | --- | --- | --- |
 | Housefly, fruit fly | 0.7 / 0.3 | sill and garden | as today | existing pages |
 | Fungus gnat, aphid | 0.3 / 0.2 | bed (W3) | W3 | W3's page |
-| **Springtail** | 0.1–0.2 | soil, litter, under the stone | tiny, in numbers; flicks away with its spring (the furcula) when touched or approached, a jump many times its length | the furcula; the fastest escape for its size; soil life feeds on fungi and litter; a mouthful, not a meal (a sixth or less) |
-| **Leafhopper** | 0.4 | the dandelion and dock, grass | sits along a stem, walks sideways, jumps far and fast when the shadow comes; a hard catch, a good meal (about half) | sap feeder; the jump; why it sits in line with the stem |
+| **Springtail** (*built*, ROBLOX-101) | 0.1–0.2 | soil, litter, under the stone | tiny, in numbers; flicks away with its spring (the furcula) when touched or approached, a jump many times its length | the furcula; the fastest escape for its size; soil life feeds on fungi and litter; a mouthful, not a meal (a sixth or less) |
+| **Leafhopper** (*built*, ROBLOX-101) | 0.4 | the dandelion and dock, grass | sits along a stem, walks sideways, jumps far and fast when the shadow comes; a hard catch, a good meal (about half) | sap feeder; the jump; why it sits in line with the stem |
 | **Thrips** | 0.1 | flower, leaf undersides | barely moves, in groups; a mouthful | the smallest prey a jumping spider takes; the fringe wings |
-| **Small moth** | 0.8 (wings 1.5) | dusk and night, the wall by the window light | rests on the wall and the sash by day, flutters at dusk; scales come off in the catch (a second grab) | why moths come to the window; the scales as an escape (sourced) |
+| **Small moth** (*built*, ROBLOX-101) | 0.8 (wings 1.5) | dusk and night, the wall by the window light | rests on the wall and the sash by day, flutters at dusk; scales come off in the catch (a second grab) | why moths come to the window; the scales as an escape (sourced) |
 | **Midge / mosquito** | 0.3 | dusk over the bed, the water in the saucer if there is one | hovers in a cloud, lands briefly; easy to spot, easy to miss | the swarm; which bite (only the females, only mosquitoes) |
-| **Crane fly** | 2 (legs 4) | wall and glass at dusk | bigger than the spider but harmless and weak: a long wobbling flier that sheds legs; a feast if caught, the legs come off in the fight | not a giant mosquito; it does not bite; the legs that come off (autotomy) |
+| **Crane fly** (*built*, ROBLOX-101) | 2 (legs 4) | wall and glass at dusk | bigger than the spider but harmless and weak: a long wobbling flier that sheds legs; a feast if caught, the legs come off in the fight | not a giant mosquito; it does not bite; the legs that come off (autotomy) |
 | **Hoverfly** | 1 | flowers | hovers and darts; looks like a bee and is not; a meal the spider must learn to try (the bee look makes it hesitate) | mimicry; the hover; the larvae eat aphids |
 | **Lacewing** | 1.2 | the plants at night | slow, green, lace wings; the larva (the aphid lion) on the leaves eats aphids and bites | the adult and the larva; the smell when handled (some species) |
 | **Caterpillar / inchworm** | 1–2 | leaves | slow, loops along the stem; a meal and a struggle; some are hairy and left alone | which are safe to eat and which are not (hairs, warning colours), sourced per family or left general |
@@ -75,8 +77,8 @@ cites pages).
 
 ## For Nathan
 
-- Which first? A suggested W3b: springtail, leafhopper, small moth, crane fly (prey); ladybird, millipede, snail, harvestman (ambient);
-  centipede at the stone (the first new threat, with W4's rules). The rest in later rounds.
+- Which first? A suggested W3b: springtail, leafhopper, small moth, crane fly (prey; part A, built in ROBLOX-101); ladybird, millipede, snail,
+  harvestman (ambient; part B, next); centipede at the stone (the first new threat, with W4's rules). The rest in later rounds.
 - The water: a saucer under a pot or a puddle after rain would bring the midges, the mosquitoes and the earthworms; it needs the
   weather, which is W4's.
 - Every page needs a real source the builder opens; where none is found the bug is drawn and left unexplained rather than explained

@@ -653,6 +653,158 @@ case("an old record (sill-only prey, no garden) restores unchanged and leaves th
 	check(w.garden.bed_a.prey == liveDirector and #liveDirector.flies == 6, "the live garden is still untouched after the refusals")
 end)
 
+-- ---------------------------------------------------------------- ROBLOX-101: the bestiary's directors per region (the garden root's `kinds`)
+local PreyWorld = require("../src/Shared/Prey/PreyWorld")
+-- The garden world with the bestiary added the way Prey/PreyWorld makes it: the bed's springtails and leafhoppers beside W3's director, the wall's and the outer
+-- sill's moths and crane flies, every director sharing the jaws and the casts.
+local function bestiaryWorld(): any
+	local w, bedPrey, bugs = gardenWorld()
+	local casts = { probe = w.prey.probe, cast = w.prey.graph.cast, sweep = w.prey.graph.sweep, overlap = w.prey.graph.overlap }
+	local folder = w.prey.probe.Parent -- (unused: the casts carry the world)
+	local _ = folder
+	local all = {}
+	for _, id in { "bed_a", "house_wall", "outer_sill" } do
+		local region = WorldMap2.region(id) :: any
+		w.garden[id] = w.garden[id] or {}
+		w.garden[id].kinds = {}
+		for _, spec in Garden.bestiary(region) :: { any } do
+			local d = PreyDirector.engine(WorldBuild.world(workspace, WorldMap2.SEED), (Species :: any)[spec.profile], spec.seed, spec.target, false, spec, casts)
+			d.feeding = w.prey.feeding
+			w.garden[id].kinds[spec.kind] = d
+			table.insert(all, d)
+		end
+	end
+	return w, bedPrey, bugs, all
+end
+local function kindsOf(w: any): { any }
+	local out = {}
+	for _, id in { "bed_a", "house_wall", "outer_sill" } do
+		for _, spec in Garden.bestiary(WorldMap2.region(id) :: any) :: { any } do table.insert(out, w.garden[id].kinds[spec.kind]) end
+	end
+	return out
+end
+local function bestiaryTick(w: any, at: Vector3)
+	gardenTick(w, w.garden.bed_a.prey, w.garden.bed_a.bugs, at)
+	local obs = { eye = at, gaze = Vector3.new(0, 0, -1), up = Vector3.yAxis, heading = Vector3.new(0, 0, -1) }
+	for _, d in kindsOf(w) do d:before(DT, at, obs, w.sensor, cast, camera); d:afterShared(w.motor, w.sensor, cast) end
+end
+local function bestiaryText(w: any): string
+	local saved = {}
+	for i, d in kindsOf(w) do saved[i] = { d.cpu, d.beforeCost }; d.cpu, d.beforeCost = {}, 0 end
+	local text = gardenText(w)
+	for i, d in kindsOf(w) do d.cpu, d.beforeCost = saved[i][1], saved[i][2] end
+	return text
+end
+case("ROBLOX-101: the bestiary's prey of each region is kept with the rest and put back where it was, its tricks used or not, and runs on identically", function()
+	local w = bestiaryWorld()
+	local ds = kindsOf(w)
+	check(#ds == 6 and #ds[1].flies == 4 and #ds[2].flies == 2 and #ds[3].flies == 2 and #ds[4].flies == 1 and #ds[5].flies == 1 and #ds[6].flies == 1, "springtails 4, leafhoppers 2, the wall's moths 2 and crane fly 1, the outer sill's moth and crane fly")
+	for _ = 1, 300 do bestiaryTick(w, Vector3.new(-20, -89.69, -30)) end
+	-- a moth that has used its slip, a crane fly that has left a leg, a springtail in the middle of a hop, the wall's moths flying from dusk
+	local m, c = w.garden.house_wall.kinds.moth.flies[1], w.garden.outer_sill.kinds.crane_fly.flies[1]
+	m.slipDrawn = true
+	c.legsLost, c.shedDrawn = 1, true
+	local PreyKinds = require("../src/Shared/Prey/PreyKinds")
+	PreyKinds.light(w.garden.house_wall.kinds.moth, true)
+	local st = w.garden.bed_a.kinds.springtail.flies[1]
+	st.senses.hasLastSeen, st.senses.lastSeenPosition = true, st.position + Vector3.new(1, 0, 0)
+	check(PreyKinds.hop(st, w.garden.bed_a.kinds.springtail.now) and st.state == "HOP", "a springtail mid-hop")
+	check(Checkpoint.boundaryProblem(w) == "", "a rest can be kept")
+	local record = assert(Checkpoint.capture(w, 0))
+	check(#SaveRest.check("main", record) == 0, "the server's rest check accepts it: " .. table.concat(SaveRest.check("main", record), "; "))
+	local before = bestiaryText(w)
+	for _ = 1, 300 do bestiaryTick(w, Vector3.new(-5, -89.69, -40)) end
+	check(bestiaryText(w) ~= before, "the world moved on")
+	local ok, problems = Checkpoint.restore(record, w)
+	check(ok, "restored: " .. table.concat(problems, "; "))
+	local back = kindsOf(w)
+	check(#back == 6 and back[1] ~= ds[1] and getmetatable(back[1]) == PreyDirector, "each region's kinds rebuilt from the record")
+	for _, d in back do check(d.feeding == w.prey.feeding and d.graph.cast == w.prey.graph.cast, "one jaws, one set of casts") end
+	local m2, c2, st2 = w.garden.house_wall.kinds.moth.flies[1], w.garden.outer_sill.kinds.crane_fly.flies[1], w.garden.bed_a.kinds.springtail.flies[1]
+	check(m2.slipDrawn == true and m2.profile == Species.moth_dusk_prototype and w.garden.house_wall.kinds.moth.p == Species.moth_dusk_prototype, "the moth's slip is still spent, and it is dusk for the wall's moths, the profile kept by name")
+	check(c2.legsLost == 1 and c2.shedDrawn == true and c2.profile == Species.crane_fly_prototype, "the crane fly is still a leg short")
+	check(st2.state == "HOP" and st2.hop ~= nil and (st2.hop.target == nil or table.find(w.garden.bed_a.kinds.springtail.graph.perches, st2.hop.target) ~= nil), "the springtail is still in the air, its landing one of its own perches")
+	do
+		local after = bestiaryText(w)
+		if after ~= before then
+			local i = 1
+			while i <= #before and string.byte(before, i) == string.byte(after, i) do i += 1 end
+			print("bestiary restore, first difference:\n  " .. string.sub(before, math.max(1, i - 200), i + 100) .. "\n  " .. string.sub(after, math.max(1, i - 200), i + 100))
+		end
+		check(after == before, "the whole world, every region's prey included, is the record's again")
+	end
+	local w2 = bestiaryWorld()
+	check(Checkpoint.restore(record, w2), "the same record into a fresh world")
+	for _ = 1, 300 do bestiaryTick(w, Vector3.new(-5, -89.69, -40)); bestiaryTick(w2, Vector3.new(-5, -89.69, -40)) end
+	check(bestiaryText(w) == bestiaryText(w2), "two worlds restored from it run on identically")
+	-- refusals: a kind the region does not have, a kind with jaws of its own, a moth with a crane fly's meal
+	local function objectOf(r: any, ref: any): any return r.world.objects[ref["$o"]] end
+	local function entry(o: any, key: string): any
+		for _, e in o.e do if e[1] == key then return e end end
+		return nil
+	end
+	local function refused(label: string, edit: (any) -> (), part: string)
+		local r = Json.copy(record)
+		edit(r)
+		local ok3, problems3 = Checkpoint.restore(r, w)
+		local text = table.concat(problems3, "; ")
+		check(not ok3 and string.find(text, part, 1, true) ~= nil, `{label} is refused ({if ok3 then "ACCEPTED" else text})`)
+		check(#SaveRest.check("main", r) > 0, "and the server refuses it too")
+	end
+	local function kindsRecord(r: any, id: string): any
+		local g = objectOf(r, r.world.roots.garden)
+		return objectOf(r, entry(objectOf(r, entry(g, id)[2]), "kinds")[2])
+	end
+	refused("a springtail on the wall", function(r) entry(kindsRecord(r, "house_wall"), "moth")[1] = "springtail" end, "has no prey of the kind springtail")
+	refused("a wall moth with jaws of its own", function(r)
+		local d = objectOf(r, entry(kindsRecord(r, "house_wall"), "moth")[2])
+		local feeding = objectOf(r, entry(d, "feeding")[2])
+		local copy = { c = feeding.c, e = {} }
+		for _, e in feeding.e do table.insert(copy.e, { e[1], e[2] }) end
+		table.insert(r.world.objects, copy)
+		entry(d, "feeding")[2] = { ["$o"] = #r.world.objects }
+	end, "does not eat with the sill's jaws")
+	refused("a moth with more meal than a moth", function(r)
+		local d = objectOf(r, entry(kindsRecord(r, "outer_sill"), "moth")[2])
+		local f = objectOf(r, objectOf(r, entry(d, "flies")[2]).e[1][2])
+		entry(f, "nutrition")[2] = 0.7
+	end, "nutrition is out of range")
+end)
+
+case("ROBLOX-101: a W3 record (the bed's gnats, aphids and woodlice alone) restores unchanged; the bestiary's prey it lacks is made afresh from its seeds, never rerolled", function()
+	local w = bestiaryWorld()
+	for _ = 1, 120 do bestiaryTick(w, Vector3.new(-20, -89.69, -30)) end
+	local record = assert(Checkpoint.capture(w, 0))
+	-- the record as W3 made it: its garden holds only the bed's director and woodlice
+	local old = Json.copy(record)
+	local function objectOf(r: any, ref: any): any return r.world.objects[ref["$o"]] end
+	local g = objectOf(old, old.world.roots.garden)
+	local keep = {}
+	for _, e in g.e do if e[1] == "bed_a" then table.insert(keep, e) end end
+	g.e = keep
+	local bedEntry = objectOf(old, keep[1][2])
+	local entries = {}
+	for _, e in bedEntry.e do if e[1] ~= "kinds" then table.insert(entries, e) end end
+	bedEntry.e = entries
+	local w3Prey = w.garden.bed_a.prey
+	local ok, problems = Checkpoint.restore(old, w)
+	check(ok, "a W3-shaped record restores: " .. table.concat(problems, "; "))
+	check(#SaveRest.check("main", old) == 0, "and the server accepts it")
+	check(w.garden.bed_a.prey ~= nil and w.garden.bed_a.prey ~= w3Prey and #w.garden.bed_a.prey.flies == 6 and w.garden.bed_a.kinds == nil and w.garden.house_wall == nil, "the bed's W3 prey is the record's; no kinds and no wall in the garden yet")
+	-- the world's prey makes the missing kinds as a first arrival would: the same flies as a fresh director from the same seed
+	local world = { home = "sill", map = WorldMap2, region = WorldMap2.region("bed_a"), regionReady = function() return true end }
+	local folder = WorldBuild.world(workspace, WorldMap2.SEED)
+	local pw = PreyWorld.new(w.prey, world, w.garden, folder, { probe = w.prey.probe, cast = w.prey.graph.cast, sweep = w.prey.graph.sweep, overlap = w.prey.graph.overlap })
+	local made = pw:kinds("bed_a")
+	local spec = (Garden.bestiary(WorldMap2.region("bed_a") :: any) :: { any })[1]
+	local fresh = PreyDirector.engine(folder, Species.springtail_prototype, spec.seed, spec.target, false, spec)
+	local same = #made == 2 and #made[1].flies == #fresh.flies
+	for i, f in made[1].flies do
+		if fresh.flies[i] == nil or fresh.flies[i].id ~= f.id or fresh.flies[i].rng.state ~= f.rng.state or (fresh.flies[i].position - f.position).Magnitude > 1e-9 then same = false end
+	end
+	check(same and w.garden.bed_a.kinds.springtail == made[1] and w.garden.bed_a.prey.feeding == w.prey.feeding and made[1].feeding == w.prey.feeding, "the springtails and leafhoppers are made from their seeds, as on a first arrival, eating with the jaws")
+end)
+
 case("fallen tip timer survives rest and invalid data is atomic",function()
  local Breakaway=require("../src/Shared/Habitat/Breakaway")
  local w=newWorld();w.breakaway=Breakaway.new(sill)

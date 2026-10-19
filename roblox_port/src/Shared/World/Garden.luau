@@ -17,6 +17,10 @@
 -- (on the soil, the mounds' and stones' tops, under the dock's leaves for the gnats; on the plants' leaves and the dock's stem for the aphids, which only walk),
 -- and `bugs(region)` the woodlice's starting places and the spots they hide in (under the big stone, at the other stones' feet, under the litter). The wall's look
 -- gains the descent's dressing: lichen on the brick, a weathered course and cobweb strands in the corner under the outer sill.
+-- ROBLOX-101 (W3b part A, the garden's bestiary): `bestiary(region)` is the list of the region's other prey, one spec per kind, each for a director of its own
+-- (Prey/PreyWorld): springtails on the soil round the stones and the litter and leafhoppers on the dock's and the dandelion's stems and leaves in the bed; small
+-- moths and crane flies on the house wall and on the outer sill (the slab by the window, the window box's fronts, the slab's front edge). From the same seed
+-- by streams of their own, so W3's perches, vents and prey are what they were.
 local Flora = require(script.Parent.Parent.Data.Flora)
 local WorldMap = require(script.Parent.WorldMap)
 
@@ -650,8 +654,9 @@ function Garden.drawnBySill(region: WorldMap.Region): { string }
 end
 
 -- ---------------------------------------------------------------- the bed's life (ROBLOX-96)
-export type Perch = { id: string, position: Vector3, normal: Vector3, shelter: number, food: number, start: boolean, walker: boolean?, kind: string }
-export type Vent = { id: string, position: Vector3, normal: Vector3, walker: boolean?, reach: number? }
+export type Perch = { id: string, position: Vector3, normal: Vector3, shelter: number, food: number, start: boolean, walker: boolean?, kind: string,
+	hop: boolean?, behind: string?, round: Vector3? } -- (ROBLOX-101: a hopper's perch; the leafhopper's far side and the point it passes going round)
+export type Vent = { id: string, position: Vector3, normal: Vector3, walker: boolean?, reach: number?, appear: boolean? }
 export type PreySpec = { perches: { Perch }, vents: { Vent }, target: number, seed: number, prefix: string }
 export type HideSpot = { pos: Vector3, kind: string }
 export type BugSpec = { woodlice: { { pos: Vector3, heading: Vector3 } }, hides: { HideSpot }, seed: number }
@@ -803,6 +808,211 @@ function Garden.bugs(region: WorldMap.Region): BugSpec?
 	end
 	local out: BugSpec = { woodlice = lice, hides = hides, seed = region.seed }
 	bugsCache[key] = out
+	return out
+end
+
+-- ---------------------------------------------------------------- the bestiary's prey (ROBLOX-101)
+-- How many of each kind a region holds at the full tier and the low one (the phone is the limit: the bed's prey stays at 12 at full with W3's six, 9 at low), the
+-- streams' salts, and the perches' shelter and food (game values: the plants are the leafhoppers' food, the stones the springtails' cover, the wall a place to
+-- sit still). `dusk`: the hours of the life clock from which (dusk) and until which (dawn) the moths and the crane flies fly (World/LifeClock: dusk at 19, the
+-- evening from 18, dawn at 6).
+Garden.BESTIARY = {
+	bed = {
+		{ kind = "springtail", full = 4, low = 2, salt = 71, perches = 12, near = { 0.7, 2.2 }, apart = 1.0, reach = 6, shelter = 0.5, food = 0.4 },
+		{ kind = "leafhopper", full = 2, low = 1, salt = 73, reach = 14, shelter = 0.4, food = 0.6 },
+	} :: { any },
+	house_wall = {
+		{ kind = "moth", full = 2, low = 1, salt = 79, perches = 8, x = { -30, 30 }, y = { -45, -6 }, apart = 5, reach = 30, shelter = 0.2, food = 0.1 },
+		{ kind = "crane_fly", full = 1, low = 1, salt = 83, perches = 6, x = { -20, 20 }, y = { -86, -40 }, apart = 6, reach = 45, shelter = 0.2, food = 0.1 },
+	} :: { any },
+	outer_sill = {
+		{ kind = "moth", full = 1, low = 1, salt = 89, reach = 40, shelter = 0.3, food = 0.1 },
+		{ kind = "crane_fly", full = 1, low = 0, salt = 97, reach = 40, shelter = 0.3, food = 0.1 },
+	} :: { any },
+	dusk = { from = 18.0, to = 6.0 },
+} :: any
+
+export type KindSpec = PreySpec & { kind: string, profile: string, low: number, dusk: { from: number, to: number }? }
+local bestiaryCache: { [string]: { KindSpec } } = {}
+
+-- The springtails' spots: free soil within `near` of each hide spot the woodlice use (the big stone's mouth and back, the other stones' feet, the litter), clear
+-- of every standing box and of the retreat, `apart` from each other.
+local function springtailPerches(region: WorldMap.Region, row: any, rand: () -> number): { Perch }
+	local B = Garden.BED
+	local standing = standingOf(region)
+	for _, t in region.retreats do table.insert(standing, { min = t.min - v(0.5, 0, 0.5), max = t.max + v(0.5, 0, 0.5) }) end
+	local hides = (Garden.bugs(region) :: BugSpec).hides
+	local out: { Perch } = {}
+	local taken: { Vector3 } = {}
+	local i = 0
+	for _ = 1, 3 do
+		for _, h in hides do
+			if #out >= row.perches then break end
+			for _ = 1, 12 do
+				local a, d = rand() * TAU, between(rand, row.near[1], row.near[2])
+				local x, z = h.pos.X + math.cos(a) * d, h.pos.Z + math.sin(a) * d
+				local ok = x > B.x0 + 1 and x < B.x1 - 1 and z > B.z0 + 1 and z < B.z1 - 1
+				if ok then
+					for _, b in standing do
+						if x > b.min.X - 0.3 and x < b.max.X + 0.3 and z > b.min.Z - 0.3 and z < b.max.Z + 0.3 then ok = false; break end
+					end
+				end
+				if ok then
+					for _, t in taken do
+						if (Vector3.new(x, 0, z) - Vector3.new(t.X, 0, t.Z)).Magnitude < row.apart then ok = false; break end
+					end
+				end
+				if ok then
+					i += 1
+					local p = v(x, B.top, z)
+					table.insert(taken, p)
+					table.insert(out, { id = `{region.id}_springtail_{i}`, position = p, normal = Vector3.yAxis, shelter = row.shelter, food = row.food, start = i <= row.full, kind = "soil", hop = true })
+					break
+				end
+			end
+		end
+		if #out >= row.perches then break end
+	end
+	return out
+end
+
+-- The leafhoppers' perches, in pairs either side of a stem, a stalk or a leaf (each the other's `behind`, with the point to pass going round): the dock's stem low
+-- (east and west) and high (north and south), the dandelion's stalk (east and west), and each dock leaf's top and underside two thirds of the way to its tip.
+local function leafhopperPerches(region: WorldMap.Region, row: any): { Perch }
+	local B = Garden.BED
+	local byId: { [string]: Piece } = {}
+	for _, p in Garden.pieces(region) do byId[p.id] = p end
+	local out: { Perch } = {}
+	local n = 0
+	local function pair(a: Vector3, na: Vector3, b: Vector3, nb: Vector3, round: Vector3, kind: string, start: boolean)
+		n += 1
+		local ia, ib = `{region.id}_leafhopper_{n}a`, `{region.id}_leafhopper_{n}b`
+		table.insert(out, { id = ia, position = a, normal = na, shelter = row.shelter, food = row.food, start = start, kind = kind, hop = true, behind = ib, round = round })
+		table.insert(out, { id = ib, position = b, normal = nb, shelter = row.shelter, food = row.food, start = false, kind = kind, hop = true, behind = ia, round = round })
+	end
+	local stem = byId[region.id .. "_dock_stem"]
+	if stem ~= nil then
+		local mx, mz = (stem.lo.X + stem.hi.X) / 2, (stem.lo.Z + stem.hi.Z) / 2
+		local y1, y2 = B.top + 1.5, B.top + 9
+		pair(v(stem.hi.X, y1, mz), Vector3.xAxis, v(stem.lo.X, y1, mz), -Vector3.xAxis, v(mx, y1, stem.hi.Z + 0.35), "stem", true)
+		pair(v(mx, y2, stem.hi.Z), Vector3.zAxis, v(mx, y2, stem.lo.Z), -Vector3.zAxis, v(stem.hi.X + 0.35, y2, mz), "stem", false)
+	end
+	local stalk = byId[region.id .. "_dandelion_stalk"]
+	if stalk ~= nil then
+		local mx, mz = (stalk.lo.X + stalk.hi.X) / 2, (stalk.lo.Z + stalk.hi.Z) / 2
+		local y = B.top + 5
+		pair(v(stalk.hi.X, y, mz), Vector3.xAxis, v(stalk.lo.X, y, mz), -Vector3.xAxis, v(mx, y, stalk.hi.Z + 0.3), "stem", false)
+	end
+	for i, leaf in B.dock.leaves do
+		local box = byId[`{region.id}_dock_leaf_{i}`]
+		if box ~= nil then
+			local cx, cz = (box.lo.X + box.hi.X) / 2, (box.lo.Z + box.hi.Z) / 2
+			local my = (box.lo.Y + box.hi.Y) / 2
+			local x, z, rx, rz = cx, cz, cx, cz
+			if leaf.dir == "x+" then x = box.lo.X + (box.hi.X - box.lo.X) * 2 / 3; rx = box.hi.X + 0.35
+			elseif leaf.dir == "x-" then x = box.hi.X - (box.hi.X - box.lo.X) * 2 / 3; rx = box.lo.X - 0.35
+			elseif leaf.dir == "z+" then z = box.lo.Z + (box.hi.Z - box.lo.Z) * 2 / 3; rz = box.hi.Z + 0.35
+			else z = box.hi.Z - (box.hi.Z - box.lo.Z) * 2 / 3; rz = box.lo.Z - 0.35 end
+			if leaf.dir == "x+" or leaf.dir == "x-" then rz = z else rx = x end
+			pair(v(x, box.hi.Y, z), Vector3.yAxis, v(x, box.lo.Y, z), -Vector3.yAxis, v(rx, my, rz), "leaf", i == 2)
+		end
+	end
+	return out
+end
+
+-- Seeded spots on the house wall's face (z -24, facing the garden), `apart` from each other, inside `x` and between the heights `y`.
+local function wallPerches(region: WorldMap.Region, row: any, rand: () -> number): { Perch }
+	local W = Garden.WALL
+	local out: { Perch } = {}
+	local taken: { Vector3 } = {}
+	for i = 1, row.perches do
+		for _ = 1, 40 do
+			local p = v(between(rand, row.x[1], row.x[2]), between(rand, row.y[1], row.y[2]), W.face)
+			local ok = true
+			for _, t in taken do if (t - p).Magnitude < row.apart then ok = false; break end end
+			if ok then
+				table.insert(taken, p)
+				table.insert(out, { id = `{region.id}_{row.kind}_{i}`, position = p, normal = -Vector3.zAxis, shelter = row.shelter, food = row.food, start = i <= row.full, kind = "wall" })
+				break
+			end
+		end
+	end
+	return out
+end
+
+-- The outer sill's: the moths by the window (the slab's ends against the frame, the window box's fronts, the slab's front edge either side of the way down), the
+-- crane flies out at the slab's front corners and on the box's fronts beside them.
+local function outerPerches(region: WorldMap.Region, row: any): { Perch }
+	local O, Bx = Garden.OUTER, Flora.garden.box
+	local top, front = O.slab.hi.Y, O.slab.lo.Z
+	local boxFront, boxMid = Bx.z0, (Bx.top + Bx.bottom) / 2
+	local spots: { { Vector3 | string } }
+	if row.kind == "moth" then
+		spots = {
+			{ v(-27.5, top, -15.0), "slab" }, { v(27.5, top, -15.0), "slab" },
+			{ v(-17.0, boxMid, boxFront), "box" }, { v(17.0, boxMid, boxFront), "box" },
+			{ v(-4.0, -1.5, front), "edge" }, { v(4.0, -1.5, front), "edge" },
+		}
+	else
+		spots = {
+			{ v(-27.0, top, -22.0), "slab" }, { v(-20.0, boxMid, boxFront), "box" },
+			{ v(27.0, top, -22.0), "slab" }, { v(20.0, boxMid, boxFront), "box" },
+		}
+	end
+	local out: { Perch } = {}
+	for i, s in spots do
+		local pos, kind = s[1] :: Vector3, s[2] :: string
+		table.insert(out, { id = `{region.id}_{row.kind}_{i}`, position = pos, normal = if kind == "slab" then Vector3.yAxis else -Vector3.zAxis, shelter = row.shelter,
+			food = row.food, start = i <= math.max(row.full, 1), kind = kind })
+	end
+	return out
+end
+
+-- The region's bestiary prey: one spec per kind, in the order the directors run (nil for none). Each spec is a Prey/PreyDirector spec with its kind, the profile
+-- it is made with (Data/Species, by name), the targets at the full and the low tier, its own seed (the region's mixed with the kind's salt) and its flies' prefix
+-- (`bed_a_springtail_`...), and for the moths and the crane flies the hours they fly. Every vent is an `appear` vent: the prey comes on a free perch in reach,
+-- out of sight.
+function Garden.bestiary(region: WorldMap.Region): { KindSpec }?
+	local rows = (Garden.BESTIARY :: any)[region.kind]
+	if rows == nil then return nil end
+	local key = region.id .. "/" .. tostring(region.seed)
+	local cached = bestiaryCache[key]
+	if cached ~= nil then return cached end
+	local out: { KindSpec } = {}
+	for _, row in rows do
+		local rand = rng(region.seed, row.salt)
+		local perches: { Perch }
+		local vents: { Vent } = {}
+		if row.kind == "springtail" then
+			perches = springtailPerches(region, row, rand)
+			local hides = (Garden.bugs(region) :: BugSpec).hides
+			for i = 1, math.min(2, #hides) do
+				table.insert(vents, { id = `{region.id}_vent_springtail_{i}`, position = hides[i * 2 - 1].pos, normal = Vector3.yAxis, appear = true, reach = row.reach })
+			end
+		elseif row.kind == "leafhopper" then
+			perches = leafhopperPerches(region, row)
+			for _, p in Garden.pieces(region) do
+				if p.id == region.id .. "_dock_stem" or p.id == region.id .. "_dandelion_stalk" then
+					table.insert(vents, { id = `{p.id}_vent_leafhopper`, position = v((p.lo.X + p.hi.X) / 2, Garden.BED.top, p.lo.Z - 0.6), normal = Vector3.yAxis, appear = true, reach = row.reach })
+				end
+			end
+		elseif region.kind == "house_wall" then
+			perches = wallPerches(region, row, rand)
+			local y = (row.y[1] + row.y[2]) / 2
+			for i, x in { -20, 20 } do
+				table.insert(vents, { id = `{region.id}_vent_{row.kind}_{i}`, position = v(x, y, Garden.WALL.face - 2), normal = -Vector3.zAxis, appear = true, reach = row.reach })
+			end
+		else
+			perches = outerPerches(region, row)
+			table.insert(vents, { id = `{region.id}_vent_{row.kind}`, position = v(0, 1, -20), normal = Vector3.yAxis, appear = true, reach = row.reach })
+		end
+		local seed = (region.seed + row.salt * 104729) % MOD
+		table.insert(out, {
+			kind = row.kind, profile = row.kind .. "_prototype", perches = perches, vents = vents, target = row.full, low = row.low, seed = seed,
+			prefix = `{region.id}_{row.kind}_fly_`, dusk = if row.kind == "moth" or row.kind == "crane_fly" then Garden.BESTIARY.dusk else nil,
+		})
+	end
+	bestiaryCache[key] = out
 	return out
 end
 

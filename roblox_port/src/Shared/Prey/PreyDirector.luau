@@ -6,6 +6,11 @@
 -- vent marked `walker` is where an aphid appears, on a free walker perch within the vent's reach, out of the spider's sight (the population's own check), with
 -- no flight. Several directors share one Feeding (the jaws): Prey/PreyWorld runs the home director's `after` with the feeding step and every other active
 -- director's `afterShared`, which strikes and tidies but never advances the reserves; a fly that tears free is sent back to the director it belongs to.
+-- ROBLOX-101 (W3b part A): a director per bestiary kind (World/Garden.bestiary: the springtails and leafhoppers of the bed, the moths and crane flies of the wall
+-- and the outer sill), each with its kind's profile. A perch marked `hop` is one a hopper uses (it needs no flight to be valid); `behind` and `round` are the
+-- leafhopper's far-side perch and the point it passes going round (Prey/PreyKinds.sidestep). A vent marked `appear` is where a prey of the director's own kind
+-- appears on any free perch within the vent's reach, out of the spider's sight, with no flight (the walker vents' rule without the aphid). A hopper torn free
+-- hops off if it can; a flightless one that cannot is put back as a walker is.
 local Fly=require(script.Parent.Fly)
 local Species=require(script.Parent.Parent.Data.Species)
 local Graph=require(script.Parent.PerchGraph)
@@ -30,6 +35,8 @@ function D.new(graph: any,profile: any,seed: number,target: number,mixed: boolea
   for _,row in spec.perches do
    local p=graph:add(row.id,row.position,row.normal,row.shelter,row.food,row.start==true)
    if row.walker then p.walker=true end
+   if row.hop then p.hop=true end -- (ROBLOX-101)
+   if row.behind then p.behind=row.behind;p.round=row.round end
   end
  else
   for i,row in POINTS do
@@ -39,7 +46,7 @@ function D.new(graph: any,profile: any,seed: number,target: number,mixed: boolea
  end
  -- Keep only perches with a valid outgoing flight (a walker's perch needs none: nothing flies from it).
  for _,p in graph.perches do
-  if p.valid and not p.walker then
+  if p.valid and not p.walker and not p.hop then
    local linked=false;local tries=0
    for _,other in graph.perches do if other~=p and other.valid and (other.position-p.position).Magnitude<=profile.flight.max_flight_wu then
     tries+=1;if graph:plan(graph:rest(p),p.normal,other,nil) then linked=true;break end
@@ -51,7 +58,7 @@ function D.new(graph: any,profile: any,seed: number,target: number,mixed: boolea
  for _,p in graph.perches do if #self.flies<target and p.start and p.valid then self:spawn(p) end end
  if spec then
   for _,v in spec.vents do
-   table.insert(self.vents,{id=v.id,position=v.position,normal=v.normal,shelter=0,food=0,start=false,valid=true,occupant='',reserved='',walker=v.walker==true,reach=v.reach or 4})
+   table.insert(self.vents,{id=v.id,position=v.position,normal=v.normal,shelter=0,food=0,start=false,valid=true,occupant='',reserved='',walker=v.walker==true,reach=v.reach or 4,appear=if v.appear then true else nil})
   end
  else
   for i,x in {-23,23} do
@@ -94,6 +101,15 @@ function D.before(self: any,dt: number,position: Vector3,observer: any,sensor: a
    end
    return false
   end
+  if v.appear then
+   -- (ROBLOX-101) a prey of the director's kind appears on any free perch within the vent's reach: no flight, out of sight
+   for _,target in self.graph.perches do
+    if target.valid and target.occupant=='' and target.reserved=='' and (target.position-v.position).Magnitude<=v.reach then
+     self:spawn(target);return true
+    end
+   end
+   return false
+  end
   for _,target in self.graph.perches do
    if target.valid and target.occupant=='' and target.reserved=='' then
     local path=self.graph:plan(self.graph:rest(v),v.normal,target,nil)
@@ -108,7 +124,13 @@ function D.before(self: any,dt: number,position: Vector3,observer: any,sensor: a
  self.beforeCost=(os.clock()-started)*1e6
 end
 function D.escape(self: any,f: any)
- if f.profile.body.walker then
+ if f.profile.body.flightless then
+  -- (ROBLOX-101) a flightless hopper torn free flicks away if it can, and otherwise is put back as a walker is (below)
+  f.state='ALERT';f.stateSince=self.now;f.senses.awareness=f.profile.senses.awareness_max
+  f.senses.hasLastSeen=true;f.senses.lastSeenPosition=self.previousPosition;f.senses.lastSeenTime=self.now
+  if f:launch('flee',self.now) then return end
+ end
+ if f.profile.body.walker or f.profile.body.flightless then
   -- (ROBLOX-96) a walker that tears free is back on its perch if the perch is still free; if not, it is gone (the population owes another)
   local perch=f.perch
   if perch and perch.occupant=='' then
@@ -131,12 +153,13 @@ function D.strike(self: any,motor: any,sensor: any,cast: any)
  if self.previousMode=='air' and motor.mode~='air' then self.strikeEnd=math.min(self.strikeEnd,self.tick+3) end
  self.previousMode=motor.mode
  if self.tick<=self.strikeEnd and not self.feeding.held then
-  for _,f in self.flies do if f:alive() then
+  for _,f in self.flies do if f:alive() and not (f.freeUntil and f.freeUntil>self.now) then -- (ROBLOX-101: freeUntil, a prey that just slipped the jaws)
    local t,d=M.sweepClosest(self.previousPosition,motor.pos,f.prevPosition,f.position)
    if d<=f.profile.body.capture_radius_wu+.3 then
     local a=self.previousPosition:Lerp(motor.pos,t);local b=f.prevPosition:Lerp(f.position,t)
     if not cast(a,b) then
      f.flight:release();if f.perch and f.perch.occupant==f.id then f.perch.occupant='' end
+     if f.hop then if f.hop.target and f.hop.target.reserved==f.id then f.hop.target.reserved='' end;f.hop=nil end;f.side=nil -- (ROBLOX-101: caught mid-hop or mid-sidestep)
      f.state='CAPTURED';f.captureSerial+=1;f.captureKey=f.id..':'..f.captureSerial;f.velocity=Vector3.zero
      sensor:onCapture(b,f.profile.body.radius_wu);self.feeding:capture(f);self.captures+=1;break
     end

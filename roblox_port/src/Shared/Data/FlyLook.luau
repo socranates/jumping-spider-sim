@@ -135,4 +135,122 @@ FlyLook.small = {
 	},
 } :: { [string]: any }
 
+-- ROBLOX-101 (W3b part A): the bestiary's four, drawn at their true sizes (visual_scale 1: the springtail 0.15 long, the leafhopper 0.4, the moth 0.8 with wings
+-- about 1.5 across, the crane fly about 1.9 with legs near 4), on the same plan with three more words: an item marked `full` is drawn only at the full detail
+-- tier, one marked `low` only at the low tier (the crane fly's legs there are one rod each, hip to foot); `wings` is a list of pairs (each mirrored; `hide`: drawn
+-- at rest only, as the moth's dark bands; `material`, `color` per pair); `shed` names the leg a crane fly leaves behind (the parts whose names begin with it are
+-- not drawn once it has). Colours from the field guides' descriptions the pages cite (docs/NOTEBOOK_SOURCES.md): a grey-blue soil springtail, a green
+-- leafhopper, a mottled grey-brown moth, a grey-brown crane fly with smoky wings.
+FlyLook.small.springtail = {
+	colors = { body = "5b6170", abdomen = "666c7a", head = "555a68", eye = "1c1d22", leg = "8a8f99", antenna = "4d525e", furcula = "9a9fa8", shadow = "2a241c" },
+	body = {
+		{ name = "Thorax", color = "body", at = { 0, -0.11, -0.02 }, size = { 0.04, 0.035, 0.06 } },
+		{ name = "Abdomen", color = "abdomen", at = { 0, -0.112, 0.04 }, size = { 0.045, 0.04, 0.08 } },
+		{ name = "Head", color = "head", at = { 0, -0.11, -0.065 }, size = { 0.035, 0.03, 0.032 } },
+		{ name = "EyeL", color = "eye", at = { -0.014, -0.1, -0.07 }, size = { 0.012, 0.012, 0.012 }, full = true },
+		{ name = "EyeR", color = "eye", at = { 0.014, -0.1, -0.07 }, size = { 0.012, 0.012, 0.012 }, full = true },
+	} :: { any },
+	rods = {
+		{ name = "Antenna", color = "antenna", d = 0.006, from = { 0.008, -0.1, -0.078 }, to = { 0.03, -0.085, -0.13 }, mirror = true },
+		{ name = "FrontLeg", color = "leg", d = 0.006, from = { 0.015, -0.12, -0.035 }, to = { 0.035, -0.16, -0.05 }, mirror = true },
+		{ name = "MiddleLeg", color = "leg", d = 0.006, from = { 0.018, -0.12, -0.01 }, to = { 0.04, -0.16, -0.005 }, mirror = true },
+		{ name = "HindLeg", color = "leg", d = 0.006, from = { 0.018, -0.12, 0.015 }, to = { 0.04, -0.16, 0.03 }, mirror = true },
+		-- the furcula, the spring: folded forward under the abdomen at rest, swung down and back in the leap
+		{ name = "Furcula", color = "furcula", d = 0.008, from = { 0, -0.13, 0.075 }, to = { 0, -0.135, 0.02 }, fly = { { 0, -0.13, 0.075 }, { 0, -0.17, 0.13 } }, full = true },
+	} :: { any },
+	shadow = { size = { 0.05, 0.004, 0.14 }, lift = 0.003, transparency = 0.8, full = true },
+}
+FlyLook.small.leafhopper = {
+	colors = { head = "7cb342", eye = "6b5a3a", pronotum = "6fae3c", scutellum = "8bc34a", abdomen = "9ccc65", wing = "6aa636", leg = "8fbf5a", spine = "d6e8b0", antenna = "5e8f30", shadow = "2a241c" },
+	body = {
+		{ name = "Head", color = "head", at = { 0, -0.065, -0.16 }, size = { 0.11, 0.05, 0.06 } },
+		{ name = "EyeL", color = "eye", at = { -0.05, -0.055, -0.155 }, size = { 0.03, 0.035, 0.035 }, full = true },
+		{ name = "EyeR", color = "eye", at = { 0.05, -0.055, -0.155 }, size = { 0.03, 0.035, 0.035 }, full = true },
+		{ name = "Pronotum", color = "pronotum", at = { 0, -0.05, -0.11 }, size = { 0.11, 0.05, 0.07 } },
+		{ name = "Scutellum", color = "scutellum", at = { 0, -0.045, -0.065 }, size = { 0.06, 0.03, 0.05 }, full = true },
+		{ name = "Abdomen", color = "abdomen", at = { 0, -0.075, 0.02 }, size = { 0.08, 0.055, 0.2 } },
+	} :: { any },
+	rods = {
+		{ name = "FrontFemur", color = "leg", d = 0.016, from = { 0.03, -0.09, -0.1 }, to = { 0.07, -0.08, -0.13 }, fly = { { 0.03, -0.09, -0.1 }, { 0.04, -0.12, -0.13 } }, mirror = true },
+		{ name = "FrontTibia", color = "leg", d = 0.012, from = { 0.07, -0.08, -0.13 }, to = { 0.08, -0.16, -0.15 }, fly = { { 0.04, -0.12, -0.13 }, { 0.04, -0.15, -0.1 } }, mirror = true, full = true },
+		{ name = "MiddleFemur", color = "leg", d = 0.016, from = { 0.035, -0.09, -0.06 }, to = { 0.08, -0.08, -0.05 }, fly = { { 0.035, -0.09, -0.06 }, { 0.05, -0.12, -0.05 } }, mirror = true },
+		{ name = "MiddleTibia", color = "leg", d = 0.012, from = { 0.08, -0.08, -0.05 }, to = { 0.1, -0.16, -0.04 }, fly = { { 0.05, -0.12, -0.05 }, { 0.05, -0.15, -0.01 } }, mirror = true, full = true },
+		{ name = "HindFemur", color = "leg", d = 0.016, from = { 0.035, -0.09, -0.02 }, to = { 0.1, -0.07, 0.02 }, fly = { { 0.035, -0.09, -0.02 }, { 0.06, -0.11, 0.04 } }, mirror = true },
+		{ name = "HindTibia", color = "leg", d = 0.012, from = { 0.1, -0.07, 0.02 }, to = { 0.11, -0.16, 0.14 }, fly = { { 0.06, -0.11, 0.04 }, { 0.05, -0.12, 0.2 } }, mirror = true },
+		-- the rows of spines along the hind tibiae, a pale line beside each
+		{ name = "Spines", color = "spine", d = 0.008, from = { 0.112, -0.075, 0.03 }, to = { 0.122, -0.15, 0.13 }, fly = { { 0.064, -0.105, 0.05 }, { 0.056, -0.115, 0.19 } }, mirror = true, full = true },
+		{ name = "Antenna", color = "antenna", d = 0.005, from = { 0.025, -0.06, -0.19 }, to = { 0.04, -0.05, -0.22 }, mirror = true, full = true },
+	} :: { any },
+	-- the forewings held over the back like a roof, opaque green; a blur of a fan in flight
+	wings = {
+		{ name = "Wing", color = "wing", material = "SmoothPlastic", root = { 0.02, -0.03, -0.08 }, length = 0.3, width = 0.09, thick = 0.012, yaw = 4, pitch = -6, roll = 35,
+			transparency = 0, reflectance = 0.05, fan = { reach = 0.24, span = 0.2, roll = 8, yaw = 20, back = 0.02, rise = 0.01, transparency = 0.7 } },
+	} :: { any },
+	shadow = { size = { 0.14, 0.004, 0.36 }, lift = 0.003, transparency = 0.8, full = true },
+}
+FlyLook.small.moth = {
+	colors = { head = "7a6e5c", eye = "2a2018", thorax = "7a6e5c", abdomen = "8a7f6c", forewing = "8c8170", hindwing = "a39a88", band = "4f4639", antenna = "5e5446", leg = "6b604f", shadow = "2a241c" },
+	body = {
+		{ name = "Head", color = "head", at = { 0, -0.04, -0.36 }, size = { 0.12, 0.11, 0.1 } },
+		{ name = "EyeL", color = "eye", at = { -0.05, -0.035, -0.37 }, size = { 0.06, 0.07, 0.06 }, full = true },
+		{ name = "EyeR", color = "eye", at = { 0.05, -0.035, -0.37 }, size = { 0.06, 0.07, 0.06 }, full = true },
+		{ name = "Thorax", color = "thorax", at = { 0, -0.03, -0.22 }, size = { 0.18, 0.15, 0.22 } },
+		{ name = "Abdomen", color = "abdomen", at = { 0, -0.05, 0.1 }, size = { 0.13, 0.11, 0.5 } },
+	} :: { any },
+	rods = {
+		{ name = "Antenna", color = "antenna", d = 0.012, from = { 0.03, 0.0, -0.4 }, to = { 0.22, 0.0, -0.55 }, mirror = true },
+		{ name = "FrontLeg", color = "leg", d = 0.02, from = { 0.05, -0.08, -0.27 }, to = { 0.13, -0.16, -0.34 }, fly = { { 0.05, -0.08, -0.27 }, { 0.07, -0.16, -0.3 } }, mirror = true, full = true },
+		{ name = "MiddleLeg", color = "leg", d = 0.02, from = { 0.06, -0.08, -0.2 }, to = { 0.16, -0.16, -0.18 }, fly = { { 0.06, -0.08, -0.2 }, { 0.08, -0.17, -0.15 } }, mirror = true, full = true },
+		{ name = "HindLeg", color = "leg", d = 0.02, from = { 0.05, -0.08, -0.13 }, to = { 0.15, -0.16, -0.03 }, fly = { { 0.05, -0.08, -0.13 }, { 0.07, -0.17, -0.02 } }, mirror = true, full = true },
+	} :: { any },
+	-- at rest the four wings lie flat and spread (the forewings out to the sides, the hindwings behind and under them, a dark band across each forewing); in
+	-- flight each is a blurred fan
+	wings = {
+		{ name = "Forewing", color = "forewing", material = "SmoothPlastic", root = { 0.06, 0.0, -0.24 }, length = 0.74, width = 0.42, thick = 0.01, yaw = 70, pitch = -3, roll = 0,
+			transparency = 0, reflectance = 0, fan = { reach = 0.7, span = 0.5, roll = 10, yaw = 70, back = 0.0, rise = 0.02, transparency = 0.55 } },
+		{ name = "Hindwing", color = "hindwing", material = "SmoothPlastic", root = { 0.05, -0.008, -0.12 }, length = 0.55, width = 0.4, thick = 0.01, yaw = 40, pitch = -3, roll = 0,
+			transparency = 0, reflectance = 0, fan = { reach = 0.55, span = 0.42, roll = 10, yaw = 35, back = 0.05, rise = 0.01, transparency = 0.6 } },
+		{ name = "Band", color = "band", material = "SmoothPlastic", root = { 0.341, 0.004, -0.138 }, length = 0.2, width = 0.4, thick = 0.006, yaw = 70, pitch = -3, roll = 0,
+			transparency = 0, reflectance = 0, hide = true, full = true },
+	} :: { any },
+	shadow = { size = { 1.3, 0.004, 0.6 }, lift = 0.003, transparency = 0.82, full = true },
+}
+-- (the crane fly's legs: hip, knee, ankle and foot of the right front, middle and hind leg, standing splayed and dangling in flight)
+local craneLegs = {
+	{ name = "Front", stand = { { 0.1, 0.08, -0.5 }, { 0.55, 0.75, -1.1 }, { 0.95, 0.25, -1.9 }, { 1.3, -0.16, -3.5 } }, fly = { { 0.1, 0.08, -0.5 }, { 0.35, -0.3, -0.4 }, { 0.5, -1.25, -0.1 }, { 0.6, -2.4, 0.3 } } },
+	{ name = "Middle", stand = { { 0.12, 0.06, -0.38 }, { 0.95, 0.75, -0.45 }, { 1.85, 0.25, -0.4 }, { 3.0, -0.16, -0.3 } }, fly = { { 0.12, 0.06, -0.38 }, { 0.4, -0.3, -0.25 }, { 0.55, -1.25, 0.1 }, { 0.65, -2.4, 0.5 } } },
+	{ name = "Hind", stand = { { 0.1, 0.06, -0.25 }, { 0.75, 0.75, 0.4 }, { 1.35, 0.25, 1.4 }, { 1.9, -0.16, 2.7 } }, fly = { { 0.1, 0.06, -0.25 }, { 0.35, -0.3, -0.05 }, { 0.5, -1.25, 0.35 }, { 0.6, -2.4, 0.8 } } },
+}
+local craneRods: { any } = {
+	{ name = "Antenna", color = "antenna", d = 0.015, from = { 0.03, 0.17, -0.68 }, to = { 0.1, 0.22, -0.95 }, mirror = true, full = true },
+	{ name = "Haltere", color = "haltere", d = 0.03, from = { 0.08, 0.25, -0.22 }, to = { 0.18, 0.28, -0.1 }, mirror = true, full = true },
+}
+for _, leg in craneLegs do
+	local st, fl = leg.stand, leg.fly
+	table.insert(craneRods, { name = leg.name .. "Femur", color = "leg", d = 0.03, from = st[1], to = st[2], fly = { fl[1], fl[2] }, mirror = true, full = true })
+	table.insert(craneRods, { name = leg.name .. "Tibia", color = "leg", d = 0.022, from = st[2], to = st[3], fly = { fl[2], fl[3] }, mirror = true, full = true })
+	table.insert(craneRods, { name = leg.name .. "Tarsus", color = "tarsus", d = 0.016, from = st[3], to = st[4], fly = { fl[3], fl[4] }, mirror = true, full = true })
+	table.insert(craneRods, { name = leg.name .. "Leg", color = "leg", d = 0.026, from = st[1], to = st[4], fly = { fl[1], fl[4] }, mirror = true, low = true })
+end
+FlyLook.small.crane_fly = {
+	colors = { head = "6f6350", rostrum = "5f5444", eye = "2b2b2b", thorax = "7c705c", abdomen = "8a7a5a", wing = "c8c3b4", haltere = "b5a98e", antenna = "5a4e3e",
+		leg = "5a4e3e", tarsus = "4a4033", shadow = "2a241c" },
+	body = {
+		{ name = "Head", color = "head", at = { 0, 0.15, -0.62 }, size = { 0.14, 0.14, 0.14 } },
+		{ name = "Rostrum", color = "rostrum", at = { 0, 0.12, -0.73 }, size = { 0.07, 0.07, 0.14 }, full = true },
+		{ name = "EyeL", color = "eye", at = { -0.06, 0.16, -0.62 }, size = { 0.07, 0.09, 0.09 }, full = true },
+		{ name = "EyeR", color = "eye", at = { 0.06, 0.16, -0.62 }, size = { 0.07, 0.09, 0.09 }, full = true },
+		{ name = "Thorax", color = "thorax", at = { 0, 0.18, -0.38 }, size = { 0.3, 0.32, 0.42 } },
+		{ name = "Abdomen", color = "abdomen", at = { 0, 0.13, 0.42 }, size = { 0.17, 0.17, 1.25 } },
+	} :: { any },
+	rods = craneRods,
+	-- one pair of long narrow smoky wings, held out in a V at rest
+	wings = {
+		{ name = "Wing", color = "wing", material = "Glass", root = { 0.1, 0.3, -0.4 }, length = 1.25, width = 0.22, thick = 0.008, yaw = 40, pitch = 2, roll = 0,
+			transparency = 0.45, reflectance = 0.06, fan = { reach = 1.0, span = 0.5, roll = 8, yaw = 10, back = 0.02, rise = 0.01, transparency = 0.8 } },
+	} :: { any },
+	shadow = { size = { 0.4, 0.004, 1.8 }, lift = 0.003, transparency = 0.82, full = true },
+	shed = "RightHind", -- the leg left in the jaws (ROBLOX-101): the right hind leg's parts, at either tier
+}
+
 return FlyLook

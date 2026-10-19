@@ -44,6 +44,10 @@ NotebookPages.triggers = {
 	"hatched",
 	"tarantula",
 	"garden_bed",
+	"look_springtail",
+	"look_leafhopper",
+	"look_moth",
+	"look_crane_fly",
 }
 
 -- The reserve at or under hungryAt is "hungry"; at or over wellFedAt, "well fed" (LIFE_DESIGN.md round 1).
@@ -58,6 +62,9 @@ NotebookPages.eyeMarks = { 20, 60 }
 NotebookPages.hearWu = 10.0
 -- How long the note that a page opened stays on the screen (Godot notebook_panel.gd NOTE_S).
 NotebookPages.noteSeconds = 6.0
+-- ROBLOX-101: a prey of the bestiary within this many studs of the spider is a close look, which opens its kind's page (`looks`: prey kind -> trigger).
+NotebookPages.lookWu = 4.0
+NotebookPages.looks = { springtail = "look_springtail", leafhopper = "look_leafhopper", moth = "look_moth", crane_fly = "look_crane_fly" } :: { [string]: string }
 
 NotebookPages.pages = {
 	{
@@ -376,14 +383,65 @@ NotebookPages.pages = {
 		id = "ground_life",
 		trigger = "garden_bed",
 		title = "Life on the ground",
-		text = "Fungus gnats are small dark flies whose larvae live in damp soil and eat fungi and rotting matter; the adults fly weakly. Aphids are soft, pear-shaped insects that feed in groups, sucking sap from leaves and stems. A jumping spider hunts small insects of many kinds; the related Phidippus johnsoni takes aphids. Woodlice are crustaceans, not insects, with seven pairs of legs: they keep to damp places under stones and litter, and glands in their armour give off a secretion that puts spiders off.",
+		text = "Fungus gnats are small dark flies whose larvae live in damp soil and eat fungi and rotting matter; the adults fly weakly. Aphids are soft, pear-shaped insects that live in colonies and suck sap from leaves and stems. A jumping spider hunts small insects of many kinds; the related Phidippus johnsoni takes aphids. Woodlice are crustaceans, not insects, with seven pairs of legs: they keep to damp places under stones and litter, and glands on the sides of the body give off a sticky secretion that puts spiders off.",
 		game = "The gnats and the aphids in the bed are the house fly's model made smaller and slower, with no measured numbers behind them: a gnat is a third of a housefly meal here and an aphid a sixth, and the aphids only walk. The woodlice walk the soil, go under cover when you come near and cannot be caught, which is the game's way of saying the spider leaves them alone.",
 		sources = {
-			"Cranshaw, W. S. & Cloyd, R. A. (2009). Fungus Gnats as Houseplant and Indoor Pests. Colorado State University Extension, Fact Sheet 5.584.",
+			"Cranshaw, W. S. & Cloyd, R. A. (2003, reviewed 2025). Fungus Gnats as Houseplant and Indoor Pests. Colorado State University Extension, Fact Sheet 5.584.",
 			"Warren, P. & Schalau, J. (2014). Aphids. University of Arizona Cooperative Extension, AZ1635.",
 			"Jackson, R. R. (1977). Prey of the jumping spider Phidippus johnsoni (Araneae: Salticidae). Journal of Arachnology 5: 145-149.",
 			"Hopkin, S. P. (1991). A key to the woodlice of Britain and Ireland. Field Studies Council (AIDGAP), Shrewsbury.",
+			"Katz, O., DeVries, Z. & Larson, J. (2023). Sowbugs and Pillbugs. University of Kentucky Entomology, ENTFACT-439.",
 			"Fischer, A., Gries, R., Roman-Torres, C. A., Devireddy, A. & Gries, G. (2025). Glandular quinoline-derivates protect crustacean woodlice from spider predation. Journal of the Royal Society Interface 22: 20250260. https://doi.org/10.1098/rsif.2025.0260",
+		},
+	},
+	{
+		id = "springtails",
+		trigger = "look_springtail",
+		title = "Springtails and the spring",
+		text = "Springtails (Collembola) have six legs like insects, but biologists count them a lineage of their own. Most are about a millimetre long, white, grey or blue-grey. Many carry a forked spring, the furcula, clasped under the abdomen; released, it strikes the ground and flips the animal into the air, up to about 10 cm. They live in damp soil and litter and eat fungi and decaying plants, and small or young spiders are among the many small predators that eat them.",
+		game = "Here a springtail is an eighth of a housefly meal and easy to hold once caught: the hard part is getting close. Its flick is a hop of 1.5 to 4 studs, set off when you come near or move fast beside it. The numbers are the game's, not measurements.",
+		sources = {
+			"Koehler, P. G., Aparicio, M. L. & Pfiester, M. (1994, revised 2022). Springtails. University of Florida IFAS Extension, ENY-228.",
+			"Missouri Department of Conservation (undated, read 2026). Springtails. Missouri Field Guide, mdc.mo.gov.",
+			"Blevins, H., Larson, J. & DeVries, Z. (2023). Springtails. University of Kentucky Entomology, ENTFACT-420.",
+		},
+	},
+	{
+		id = "leafhoppers",
+		trigger = "look_leafhopper",
+		title = "Leafhoppers: the sidestep and the jump",
+		text = "Leafhoppers (Cicadellidae) are small wedge-shaped bugs, a few millimetres long and often green, with the wings held like a tent over the back. They suck sap from leaves. Young and adults walk with a sideways sidestep; disturbed, the young often walk round to the other side of the stem or leaf, while adults jump and fly readily. The jump comes from the strong hind legs, which carry rows of spines: long-legged leafhoppers push off in 3 to 5 thousandths of a second.",
+		game = "Here a leafhopper is half a housefly meal but struggles as hard as a whole one. Watched from its side it slips round its stem or leaf (the game's adults do it too); come at it fast and it jumps 3 to 10 studs, and sometimes flies on. The numbers are the game's.",
+		sources = {
+			"University of Illinois Extension (undated, read 2026). Leafhopper. Illinois Extension insect pages, extension.illinois.edu.",
+			"University of Nebraska-Lincoln Extension (undated, read 2026). Leafhoppers. Backyard Farmer, byf.unl.edu.",
+			"Utah State University Extension (undated, read 2026). Leafhoppers. Utah Pests IPM Ornamental Pest Guide.",
+			"Burrows, M. & Sutton, G. P. (2008). The effect of leg length on jumping performance of short- and long-legged leafhopper insects. Journal of Experimental Biology 211: 1317-1325.",
+		},
+	},
+	{
+		id = "small_moths",
+		trigger = "look_moth",
+		title = "Moths at the window",
+		text = "Moths are Lepidoptera, the scale-winged insects: tiny scales cover their wings like shingles. Most fly at night, and many are drawn to lights. A flying insect does not steer straight at a lamp: it keeps its back toward the light, as it would to the sky, and near a lamp that can keep it circling. The scales help it escape: they stick to a spider's sticky silk but come away from the wing. Spiders are among the many animals that eat moths, and Phidippus johnsoni has been found with one.",
+		game = "Here a moth is a housefly meal. It rests on the wall and the outer sill by day, drawn with its wings spread flat (many moths fold them like a tent), and flutters from dusk. Your first grab at one may slip, leaving scales; a jumping spider's catch is not a web, so that slip is the game's borrowing.",
+		sources = {
+			"Missouri Department of Conservation (undated, read 2026). Moths. Missouri Field Guide, mdc.mo.gov.",
+			"Fabian, S. T., Sondhi, Y., Allen, P. E., Theobald, J. C. & Lin, H.-T. (2024). Why flying insects gather at artificial light. Nature Communications 15. https://doi.org/10.1038/s41467-024-44785-3",
+			"Alicea-Serrano, A. M., Onyak, A., Dhinojwala, A. & Blackledge, T. A. (2021). Robust performance of spider viscid silk on hairy and smooth insect substrates. Integrative and Comparative Biology 61(4): 1432-1439, citing Eisner, T., Alsop, R. & Ettershank, G. (1964), Adhesiveness of spider silk, Science 146: 1058-1061.",
+			"Jackson, R. R. (1977). Prey of the jumping spider Phidippus johnsoni (Araneae: Salticidae). Journal of Arachnology 5: 145-149.",
+		},
+	},
+	{
+		id = "crane_flies",
+		trigger = "look_crane_fly",
+		title = "Crane flies: legs to spare",
+		text = "Crane flies (Tipulidae) are large, slender flies on long, fragile legs. They look like giant mosquitoes, but they are not mosquitoes and do not bite, and the short-lived adults feed little or not at all. A special seam in the legs lets them break off easily, to escape predators. Like most flies they come to lights at night. A Phidippus johnsoni was found with one in the field; its prey is usually a quarter to three quarters its own size, sometimes as large or a little larger.",
+		game = "Here a crane fly is two housefly meals and a harder struggle than a house fly; it can leave a leg in your fangs and get away, once, and is drawn with a leg fewer after. It is bigger than your spider: real jumping spiders take prey that large only sometimes. It flies slowly from dusk.",
+		sources = {
+			"University of Maine Cooperative Extension (undated, read 2026). Crane Flies. Home and Garden IPM.",
+			"Layton, B. (2019). Crane Fly. Bug's Eye View 5(5), Mississippi State University Extension.",
+			"Jackson, R. R. (1977). Prey of the jumping spider Phidippus johnsoni (Araneae: Salticidae). Journal of Arachnology 5: 145-149.",
 		},
 	},
 } :: { Page }

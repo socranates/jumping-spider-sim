@@ -36,6 +36,11 @@
 -- the regions outside are an optional `garden` root, { [regionId] = { prey = a PreyDirector?, bugs = a Woodlice? } } (Prey/PreyWorld's table), recorded when the
 -- world has one and checked like the sill's: every fly in a known state with a meal inside its own profile's, every held perch held by a living fly, the woodlice
 -- inside their region. A record without one leaves the live garden as it is (nothing rerolls); one with a region the map lacks is refused.
+-- ROBLOX-101: a region's entry may hold `kinds`, the bestiary's directors by kind ({ [kind] = director }), checked as W3's director is; the wall and the outer
+-- sill may now be named (they have bestiary prey). The new profiles are kept by name (springtailProfile ... craneFlyDuskProfile) and a hopper in the air is in
+-- the state HOP. A W3 record (its bed with gnats, aphids and woodlice alone) restores unchanged; the bestiary's directors it lacks are made afresh from their
+-- seeds when their region is next whole (Prey/PreyWorld.kinds), so nothing is rerolled that the record had. SCHEMA_VERSION, CONTENT_REVISION and the
+-- world's revision stay as they were (W3's precedent: an optional part an old record lacks needs none of them).
 
 local Species = require(script.Parent.Parent.Data.Species)
 local ObjectRecord = require(script.Parent.ObjectRecord)
@@ -100,6 +105,12 @@ function Checkpoint.refs(world: World): { [string]: any }
 	ObjectRecord.constants("fruitFlyProfile", Species.fruit_fly_prototype, refs)
 	ObjectRecord.constants("gnatProfile", Species.fungus_gnat_prototype, refs) -- (ROBLOX-96: the bed's prey)
 	ObjectRecord.constants("aphidProfile", Species.aphid_prototype, refs)
+	-- (ROBLOX-101: the bestiary's prey, by day and from dusk)
+	for _, pair in { { "springtailProfile", Species.springtail_prototype }, { "leafhopperProfile", Species.leafhopper_prototype }, { "mothProfile", Species.moth_prototype },
+		{ "mothDuskProfile", Species.moth_dusk_prototype }, { "craneFlyProfile", Species.crane_fly_prototype }, { "craneFlyDuskProfile", Species.crane_fly_dusk_prototype } } :: { { any } } do
+		local name: string, profile: any = pair[1], pair[2]
+		ObjectRecord.constants(name, profile, refs)
+	end
 	local g = prey.graph
 	refs["graph.cast"], refs["graph.sweep"], refs["graph.overlap"] = g.cast, g.sweep, g.overlap
 	if prey.probe ~= nil then refs["prey.probe"] = prey.probe end
@@ -213,6 +224,9 @@ function Checkpoint.capture(world: World, createdAt: number?): ({ [string]: any 
 	local gardenCpu: { [any]: any } = {}
 	for _, entry in (world.garden or {}) :: { [string]: any } do
 		if type(entry) == "table" and entry.prey ~= nil and entry.prey.cpu ~= nil then gardenCpu[entry.prey] = entry.prey.cpu; entry.prey.cpu = {} end
+		if type(entry) == "table" and type(entry.kinds) == "table" then
+			for _, d in entry.kinds do if type(d) == "table" and d.cpu ~= nil then gardenCpu[d] = d.cpu; d.cpu = {} end end
+		end
 	end
 	local graph, why = ObjectRecord.capture(liveRoots(world), Checkpoint.CLASSES, Checkpoint.refs(world))
 	if cpu ~= nil then prey.cpu = cpu end
@@ -279,7 +293,7 @@ local function checkWorld(roots: { [string]: any }, problems: { string })
 	-- The flies: unique ids, a known state, finite places, a meal no bigger than the profile's (ROBLOX-96: each profile's own; the fruit fly's was special-cased
 	-- before), perches held only by flies that exist. The same checks for each region's director outside (the `garden` root); `ids` is every fly of the world.
 	local every: { [any]: boolean } = {} -- every fly of the world, by identity
-	local states = { PERCHED = true, ALERT = true, TAKEOFF = true, FLEE = true, SEEK_PERCH = true, REPOSITION = true, CAPTURED = true, CONSUMED = true }
+	local states = { PERCHED = true, ALERT = true, TAKEOFF = true, FLEE = true, SEEK_PERCH = true, REPOSITION = true, CAPTURED = true, CONSUMED = true, HOP = true }
 	local function checkFlies(director: any, label: string): boolean
 		if type(director.flies) ~= "table" then
 			bad(`{label}: no list of flies`)
@@ -319,13 +333,31 @@ local function checkWorld(roots: { [string]: any }, problems: { string })
 		else
 			for id, entry in garden do
 				local region = if type(id) == "string" then WorldMap.region(id) else nil
-				if region == nil or Garden.prey(region) == nil then bad(`garden: {tostring(id)} is not a region with prey`); continue end
+				local kinds = if region ~= nil then Garden.bestiary(region) else nil
+				if region == nil or (Garden.prey(region) == nil and kinds == nil) then bad(`garden: {tostring(id)} is not a region with prey`); continue end
 				if type(entry) ~= "table" or getmetatable(entry) ~= nil then bad(`garden: {id} is not a record`); continue end
 				if entry.prey ~= nil then
 					if getmetatable(entry.prey) ~= PreyDirector then bad(`garden: {id}'s prey is not a prey director`)
 					else
 						if entry.prey.feeding ~= prey.feeding then bad(`garden: {id}'s prey does not eat with the sill's jaws`) end
 						checkFlies(entry.prey, `garden {id}`)
+					end
+				end
+				if entry.prey ~= nil and Garden.prey(region) == nil then bad(`garden: {id} has no prey of the bed's kind`) end
+				-- ROBLOX-101: the bestiary's directors, one per kind the region has
+				if entry.kinds ~= nil then
+					if type(entry.kinds) ~= "table" or getmetatable(entry.kinds) ~= nil then bad(`garden: {id}'s kinds are not a record`)
+					else
+						local known: { [string]: boolean } = {}
+						for _, k in (kinds or {}) :: { any } do known[k.kind] = true end
+						for kind, d in entry.kinds do
+							if type(kind) ~= "string" or not known[kind] then bad(`garden: {id} has no prey of the kind {tostring(kind)}`)
+							elseif getmetatable(d) ~= PreyDirector then bad(`garden: {id}'s {kind} is not a prey director`)
+							else
+								if d.feeding ~= prey.feeding then bad(`garden: {id}'s {kind} does not eat with the sill's jaws`) end
+								checkFlies(d, `garden {id} {kind}`)
+							end
+						end
 					end
 				end
 				if entry.bugs ~= nil then
@@ -430,6 +462,7 @@ function Checkpoint.restore(record: any, world: World): (boolean, { string })
 	world.sensor._ring = {}
 	for _, entry in (world.garden or {}) :: { [string]: any } do
 		if type(entry) == "table" and entry.prey ~= nil then entry.prey.cpu = {} end
+		if type(entry) == "table" and type(entry.kinds) == "table" then for _, d in entry.kinds do d.cpu = {} end end
 	end
 	-- ROBLOX-94: a rest from another world than this game's is put back at its region's spawn; its position was kept for geometry that may have moved.
 	local moved = Checkpoint.worldMoved(record)

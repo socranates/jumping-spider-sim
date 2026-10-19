@@ -79,6 +79,37 @@ if WORLD then
 		local colony = pw:bugs("bed_a")
 		if colony ~= nil then BugBodies.new(flyFolder):draw(colony.lice) end
 	end
+	-- ROBLOX-101: the bestiary's prey on their start perches (the bed's springtails and leafhoppers, the wall's and the outer sill's moths and crane flies), each
+	-- turned the way the sim turns it on its first tick (a fly on the wall heads up it), drawn at the tier asked for
+	local Prey = require("../src/Shared/Prey/PreyKinds")
+	local tiered = FlyBodies.new(flyFolder, DETAIL)
+	local all = {}
+	for _, id in { "bed_a", "house_wall", "outer_sill" } do
+		for _, k in Garden.bestiary(WorldMap.region(id) :: any) :: { any } do
+			local d = PreyDirector.engine(outside, (Species :: any)[k.profile], k.seed, if DETAIL == "low" then k.low else k.target, false, k)
+			for _, f in d.flies do
+				if math.abs(f.heading:Dot(f.normal)) > 0.9 then Prey.upright(f) end
+				table.insert(all, f)
+			end
+		end
+	end
+	-- and a specimen tray far off at x 200 on a grey plate: each of the four standing and in flight, and a crane fly with a leg gone
+	local plate = Instance.new("Part")
+	plate.Name = "SpecimenPlate"; plate.Size = Vector3.new(40, 0.2, 14); plate.CFrame = CFrame.new(212, -0.1, 0); plate.Color = Color3.fromRGB(150, 146, 138)
+	plate.Anchored = true; plate.Parent = flyFolder
+	local kinds = { "springtail", "leafhopper", "moth", "crane_fly" }
+	local xs = { 200, 203, 208, 216 }
+	for i, kind in kinds do
+		local profile = (Species :: any)[kind .. "_prototype"]
+		local function specimen(id: string, at: Vector3, flying: boolean, legsLost: number?)
+			table.insert(all, { id = id, position = at, heading = Vector3.new(0, 0, -1), normal = Vector3.yAxis, profile = profile, legsLost = legsLost, state = if flying then "FLEE" else "PERCHED",
+				airborne = function(self: any): boolean return self.state ~= "PERCHED" end })
+		end
+		specimen("spec_" .. kind, Vector3.new(xs[i], 0.16, 0), false)
+		specimen("spec_" .. kind .. "_air", Vector3.new(xs[i], 0.16 + (if kind == "crane_fly" then 3 else 1), -5), true)
+		if kind == "crane_fly" then specimen("spec_crane_fly_shed", Vector3.new(224, 0.16, 0), false, 1) end
+	end
+	tiered:draw(all, 0.37)
 end
 
 -- ---------------------------------------------------------------- wasps (scene.py's WASPS: id, x, y, z, hx, hz, mode, search, beat)

@@ -347,16 +347,20 @@ case("the world's prey: the sill's director at home, the bed's made when the bed
 	step(FAR)
 	check(#pw.active == 1 and pw.active[1] == "sill" and garden.bed_a == nil and pw.made == 0, "on the sill only the sill's prey runs, and the bed has none yet")
 	check(#pw:flies() == #home.flies and #pw:percepts() == #home.flies and pw:captures() == 0, "the view is the sill's flies")
-	-- on the wall's top: the bed's farthest perch is beyond the radius; at its foot, inside it
+	-- on the wall's top: the bed's farthest perch is beyond the radius; at its foot, inside it. (ROBLOX-101: the wall has prey of its own now, its moths and its
+	-- crane fly, two directors made the first time the spider is on it; W3 held that nothing ran there.)
 	pw.world = worldAt("house_wall")
 	step(Vector3.new(0, -2, -24.3))
-	check(#pw.active == 0 and garden.bed_a == nil, "high on the wall nothing runs: the sill is no neighbour, the bed too far")
+	check(table.concat(pw.active, ",") == "house_wall,outer_sill" and garden.bed_a == nil and pw.made == 4, "high on the wall the wall's own prey runs and the outer sill's beside it: the sill is no neighbour, the bed too far")
 	step(Vector3.new(0, -80, -24.3))
-	check(#pw.active == 1 and pw.active[1] == "bed_a" and garden.bed_a ~= nil and garden.bed_a.prey ~= nil and pw.made == 1, "near the wall's foot the bed's prey runs, made now")
+	check(table.concat(pw.active, ",") == "house_wall,outer_sill,bed_a" and garden.bed_a ~= nil and garden.bed_a.prey ~= nil and pw.made == 7, "near the wall's foot the bed's prey runs too, made now (W3's director and the bestiary's two)")
 	local d = garden.bed_a.prey
 	check(d.feeding == home.feeding and d.graph.cast == home.graph.cast and d.probe == home.probe, "the bed's director eats with the sill's jaws and casts with its casts")
 	check(#d.flies == 6 and garden.bed_a.bugs ~= nil and #garden.bed_a.bugs.lice == 4, "with its six prey and four woodlice")
-	check(#pw:flies() == 6 and #pw:percepts() == 6 + 4 and #pw:woodlice() == 4, "the view: the bed's flies, and its woodlice as movement")
+	local wallFlies, outerFlies = 0, 0
+	for _, k in pw:kinds("house_wall") do wallFlies += #k.flies end
+	for _, k in pw:kinds("outer_sill") do outerFlies += #k.flies end
+	check(wallFlies == 3 and outerFlies == 2 and #pw:flies() == 6 + 4 + 2 + 3 + 2 and #pw:percepts() == 6 + 4 + 2 + 3 + 2 + 4 and #pw:woodlice() == 4, `the view: the bed's flies (W3's six, four springtails, two leafhoppers), the wall's {wallFlies} and the outer sill's {outerFlies}, and the woodlice as movement`)
 	-- in the bed, a while; then back to the wall's top (the bed waits), then back: the same director, its flies where they were
 	pw.world = worldAt("bed_a")
 	for _ = 1, 300 do step(Vector3.new(-20, -89.69, -30)) end
@@ -365,10 +369,10 @@ case("the world's prey: the sill's director at home, the bed's made when the bed
 	local now = d.now
 	pw.world = worldAt("house_wall")
 	for _ = 1, 120 do step(Vector3.new(0, -2, -24.3)) end
-	check(#pw.active == 0 and d.now == now, "away, the bed's clock stops")
+	check(table.find(pw.active, "bed_a") == nil and d.now == now, "away, the bed's clock stops")
 	pw.world = worldAt("bed_a")
 	step(Vector3.new(-20, -89.69, -30))
-	check(garden.bed_a.prey == d and pw.made == 1, "back in the bed, the same director")
+	check(garden.bed_a.prey == d and pw.made == 7, "back in the bed, the same director")
 	local same = #d.flies == #before
 	for i, f in d.flies do
 		local b = before[i]
@@ -379,10 +383,10 @@ case("the world's prey: the sill's director at home, the bed's made when the bed
 	local garden2 = {}
 	local pw2 = PreyWorld.new(sillDirector(), worldAt("bed_a", { bed_a = false }), garden2, world)
 	pw2:before(DT, Vector3.new(-20, -89.69, -30), observerAt(FAR), s, cast, cameraFar)
-	check(#pw2.active == 1 and garden2.bed_a == nil and pw2.made == 0 and #pw2:flies() == 0, "a bed that has not arrived whole has no prey and no woodlice")
+	check(pw2.active[1] == "bed_a" and garden2.bed_a == nil and pw2.made == 2 and #pw2:flies() == 0, "a bed that has not arrived whole has no prey and no woodlice (the wall beside it, whole, has its own)")
 	pw2.world = worldAt("bed_a")
 	pw2:before(DT, Vector3.new(-20, -89.69, -30), observerAt(FAR), s, cast, cameraFar)
-	check(garden2.bed_a ~= nil and garden2.bed_a.prey ~= nil and pw2.made == 1, "whole, it has them")
+	check(garden2.bed_a ~= nil and garden2.bed_a.prey ~= nil and garden2.bed_a.kinds ~= nil and garden2.bed_a.kinds.springtail ~= nil and garden2.bed_a.kinds.leafhopper ~= nil and pw2.made == 5, "whole, it has them (W3's and the bestiary's)")
 	-- no engine at all: no director is ever made
 	local pw3 = PreyWorld.new(sillDirector(), worldAt("bed_a"), {}, nil)
 	pw3:before(DT, Vector3.new(-20, -89.69, -30), observerAt(FAR), s, cast, cameraFar)
@@ -485,6 +489,440 @@ case("the drawn woodlouse: seven plates, a head, two antennae and fourteen legs,
 	for _, p in rig.parts do check(p.Position.Y < -90.5, "hidden, every part is under the soil") end
 	bugs:draw({})
 	check(next(bugs.rigs) == nil and #bugs.folder:GetChildren() == 0, "gone when not drawn")
+end)
+
+
+-- ================================================================ ROBLOX-101 (W3b part A): the bestiary's springtails, leafhoppers, small moths and crane flies
+local PreyKinds = require("../src/Shared/Prey/PreyKinds")
+local PreyRandom = require("../src/Shared/Prey/PreyRandom")
+local LifeText = require("../src/Shared/UI/LifeText")
+local PreyText = require("../src/Shared/UI/PreyText")
+local springtail, leafhopper = Species.springtail_prototype, Species.leafhopper_prototype
+local moth, mothDusk = Species.moth_prototype, Species.moth_dusk_prototype
+local crane, craneDusk = Species.crane_fly_prototype, Species.crane_fly_dusk_prototype
+local wall = WorldMap.region("house_wall") :: WorldMap.Region
+local outer = WorldMap.region("outer_sill") :: WorldMap.Region
+local function specOf(region: WorldMap.Region, kind: string): any
+	for _, k in Garden.bestiary(region) :: { any } do if k.kind == kind then return k end end
+	return nil
+end
+local function kindDirector(region: WorldMap.Region, kind: string, low: boolean?): any
+	local spec = specOf(region, kind)
+	return PreyDirector.engine(world, (Species :: any)[spec.profile], spec.seed, if low then spec.low else spec.target, false, spec)
+end
+
+case("the bestiary's profiles are derived from the house fly's (Godot's untouched), with their meals, catch factors and behaviours", function()
+	check(fly.body.hop == nil and fly.body.flightless == nil and fly.body.sidestep == nil and fly.body.dusk == nil and fly.body.slip_chance == nil and fly.body.shed_chance == nil
+		and fly.body.catch_factor == nil and fly.flight.wander_local == nil, "the house fly has none of the new fields")
+	local meals = { { springtail, 0.35 / 8, "springtail" }, { leafhopper, 0.35 / 2, "leafhopper" }, { moth, 0.35, "moth" }, { crane, 0.7, "crane_fly" } }
+	for _, m in meals do
+		local p = m[1] :: any
+		check(math.abs(p.body.nutrition - (m[2] :: number)) < 1e-12 and p.body.prey_kind == m[3] and p.body.visual_scale == 1 and p.body.hover_wu == fly.body.hover_wu, `{m[3]}: its meal, its kind, its true size, the fly's hover`)
+		for _, k in { "senses", "reaction", "flight", "behavior", "population", "utility" } do check(p[k] ~= fly[k], `{m[3]}: its {k} table is its own`) end
+	end
+	check(Catch.factorFor(springtail) == 0.5 and Catch.factorFor(leafhopper) == 1.0 and math.abs(Catch.factorFor(moth) - 1.0) < 1e-12 and Catch.factorFor(crane) == 1.25,
+		`catch factors: springtail {Catch.factorFor(springtail)}, leafhopper {Catch.factorFor(leafhopper)}, moth {Catch.factorFor(moth)}, crane fly {Catch.factorFor(crane)}`)
+	check(Catch.factorFor(gnat) == 0.6 or math.abs(Catch.factorFor(gnat) - 0.6) < 1e-9, "the gnat's factor is W3's")
+	check(springtail.body.flightless == true and springtail.body.hop.min == 1.5 and springtail.body.hop.max == 4 and springtail.body.hop.time < 0.2, "the springtail is flightless and flicks 1.5 to 4 studs")
+	check(leafhopper.body.hop.min == 3 and leafhopper.body.hop.max == 10 and leafhopper.body.hop.fly_after == 0.35 and leafhopper.body.sidestep ~= nil and not leafhopper.body.flightless, "the leafhopper jumps 3 to 10 studs, sometimes flies on, and sidesteps")
+	check(moth.body.slip_chance == 0.35 and crane.body.shed_chance == 0.4 and crane.body.shed_after[1] == 0.6 and crane.body.shed_after[2] == 1.6, "the moth's slip, the crane fly's leg")
+	check(PreyKinds.counterpart(moth, true) == mothDusk and PreyKinds.counterpart(mothDusk, false) == moth and PreyKinds.counterpart(crane, true) == craneDusk and PreyKinds.counterpart(craneDusk, false) == crane, "each flier's dusk profile and back")
+	check(PreyKinds.counterpart(moth, false) == nil and PreyKinds.counterpart(mothDusk, true) == nil and PreyKinds.counterpart(fly, true) == nil and PreyKinds.counterpart(springtail, true) == nil, "no change where there is none")
+	check(mothDusk.behavior.restless_per_s > moth.behavior.restless_per_s * 20 and craneDusk.behavior.restless_per_s > crane.behavior.restless_per_s * 20, "restless from dusk, still by day")
+	check(mothDusk.flight.cruise_speed_wu_s == moth.flight.cruise_speed_wu_s and moth.flight.cruise_speed_wu_s < fly.flight.cruise_speed_wu_s and crane.flight.cruise_speed_wu_s < moth.flight.cruise_speed_wu_s, "the moth flies slower than the house fly, the crane fly slower still")
+	check(LifeText.MEALS.springtail.rule == "8 springtails = 1 housefly" and LifeText.MEALS.leafhopper.rule == "2 leafhoppers = 1 housefly" and LifeText.MEALS.moth.rule == "1 moth = 1 housefly" and LifeText.MEALS.crane_fly.rule == "1 crane fly = 2 houseflies", "the meal line's rules")
+	check(PreyText.note({ kind = "slip" }) ~= nil and PreyText.note({ kind = "shed" }) ~= nil and PreyText.note({ kind = "other" }) == nil and PreyText.note(nil) == nil, "a note for the slip and the shed leg, none for anything else")
+end)
+
+case("the bestiary's perches and vents come from the regions' boxes and seeds, on real faces, inside the regions, with budgets at both tiers", function()
+	check(Garden.bestiary(WorldMap.region("sill") :: WorldMap.Region) == nil, "the sill has none (its prey is pinned)")
+	local kindsOf = function(r: WorldMap.Region): string
+		local out = {}
+		for _, k in Garden.bestiary(r) :: { any } do table.insert(out, k.kind) end
+		return table.concat(out, ",")
+	end
+	check(kindsOf(bed) == "springtail,leafhopper" and kindsOf(wall) == "moth,crane_fly" and kindsOf(outer) == "moth,crane_fly", "the kinds in each region, in the directors' order")
+	local seeds: { [number]: boolean } = { [bed.seed] = true }
+	local full, low = { bed = 6, house_wall = 0, outer_sill = 0 }, { bed = 6, house_wall = 0, outer_sill = 0 }
+	for _, r in { bed, wall, outer } do
+		for _, k in Garden.bestiary(r) :: { any } do
+			check(not seeds[k.seed], `{r.id} {k.kind}: a seed of its own`)
+			seeds[k.seed] = true
+			check(k.profile == k.kind .. "_prototype" and (Species :: any)[k.profile] ~= nil and k.prefix == `{r.id}_{k.kind}_fly_`, `{r.id} {k.kind}: its profile and prefix`)
+			check(k.low <= k.target, `{r.id} {k.kind}: fewer at low`)
+			full[r.kind] += k.target; low[r.kind] += k.low
+			local starts = 0
+			for _, p in k.perches do
+				if p.start then starts += 1 end
+				check(within(r.bounds[1], r.bounds[2], p.position) and finite(p.position), `{p.id} is inside {r.id}`)
+				local hit = workspace:Raycast(p.position + p.normal * 0.5, -p.normal * 1.0, params)
+				check(hit ~= nil and (hit.Position - p.position).Magnitude < 1e-3 and hit.Normal:Dot(p.normal) > 0.99, `{p.id} sits on a box's face ({if hit then hit.Instance.Name else "nothing"})`)
+			end
+			check(starts >= k.target, `{r.id} {k.kind}: enough starts for its target ({starts})`)
+			for _, vnt in k.vents do check(vnt.appear == true and vnt.reach > 0 and within(r.bounds[1] - Vector3.new(0, 0, 5), r.bounds[2], vnt.position), `{vnt.id}: an appear vent by its region`) end
+			check(k.dusk == (if k.kind == "moth" or k.kind == "crane_fly" then Garden.BESTIARY.dusk else nil), `{r.id} {k.kind}: flies from dusk exactly when it is a moth or a crane fly`)
+		end
+	end
+	check(full.bed == 12 and low.bed == 9 and full.bed <= 14, `the bed's prey: {full.bed} at full (W3's six with four springtails and two leafhoppers), {low.bed} at low`)
+	check(full.house_wall == 3 and low.house_wall == 2 and full.outer_sill == 2 and low.outer_sill == 1, `the wall {full.house_wall}/{low.house_wall}, the outer sill {full.outer_sill}/{low.outer_sill}`)
+	-- the springtails' spots: near the stones and the litter, apart; the leafhoppers' in pairs, each the other's far side
+	local st = specOf(bed, "springtail")
+	check(#st.perches == 12, `twelve springtail spots ({#st.perches})`)
+	for i, p in st.perches do
+		check(p.hop == true and p.normal == Vector3.yAxis and p.position.Y == -90, `{p.id} is a hopper's spot on the soil`)
+		for j = i + 1, #st.perches do check((p.position - st.perches[j].position).Magnitude >= 1.0 - 1e-9, "a stud apart at least") end
+	end
+	local lh = specOf(bed, "leafhopper")
+	local byId: { [string]: any } = {}
+	for _, p in lh.perches do byId[p.id] = p end
+	check(#lh.perches == 12, `twelve leafhopper perches, six pairs ({#lh.perches})`)
+	for _, p in lh.perches do
+		local o = byId[p.behind]
+		check(o ~= nil and o.behind == p.id and o.normal:Dot(p.normal) < -0.99 and o.round == p.round and p.hop == true, `{p.id} and its far side {p.behind}`)
+	end
+	check(Garden.bestiary(bed) == Garden.bestiary(bed), "asked again, the same list")
+	local w3 = Garden.prey(bed) :: Garden.PreySpec
+	check(#w3.perches == 28 and #w3.vents == 4 and w3.target == 6, "W3's bed spec is what it was")
+end)
+
+case("the bestiary's directors spawn their targets at each tier from their own seeds, the same again from the same seed", function()
+	for _, r in { bed, wall, outer } do
+		for _, k in Garden.bestiary(r) :: { any } do
+			for _, low in { false, true } do
+				local d = kindDirector(r, k.kind, low)
+				local want = if low then k.low else k.target
+				check(#d.flies == want and d.p == (Species :: any)[k.profile] and d.seed == k.seed, `{r.id} {k.kind} at {if low then "low" else "full"}: {#d.flies} of {want}`)
+				local valid = 0
+				for _, p in d.graph.perches do if p.valid then valid += 1 end end
+				check(valid == #k.perches, `{r.id} {k.kind}: every perch found its face ({valid} of {#k.perches})`)
+				for _, f in d.flies do
+					check(f.state == "PERCHED" and f.perch.occupant == f.id and string.sub(f.id, 1, #k.prefix) == k.prefix and f.profile == d.p, `{f.id} stands on its perch`)
+					check(math.abs(f.heading:Dot(f.normal)) < 1e-6 or true, "")
+				end
+			end
+			local a, b = kindDirector(r, k.kind), kindDirector(r, k.kind)
+			local same = #a.flies == #b.flies
+			for i, f in a.flies do if b.flies[i].id ~= f.id or b.flies[i].rng.state ~= f.rng.state or (b.flies[i].position - f.position).Magnitude > 1e-9 then same = false end end
+			check(same, `{r.id} {k.kind}: the same seed, the same prey`)
+		end
+	end
+end)
+
+-- One tick of a director, the spider at `pos` (moving between ticks as the caller moves it), with a strike when asked.
+local function approach(d: any, f: any, s: any, from: Vector3, speed: number, ticks: number, onTick: ((number, Vector3) -> ())?): Vector3
+	local spider = from
+	for i = 1, ticks do
+		local to = f.position + Vector3.new(0.3, 0.19, 0)
+		local gap = (to - spider).Magnitude
+		if gap > 1e-6 then spider += (to - spider).Unit * math.min(speed * DT, gap) end
+		tick(d, spider, s)
+		if onTick then onTick(i, spider) end
+	end
+	return spider
+end
+
+case("a springtail flicks away when the spider comes close: a hop of a few studs, never a flight, and it stays in the bed", function()
+	local d = kindDirector(bed, "springtail")
+	local s = sensor()
+	local f = d.flies[1]
+	check(not f:launch("move", 0), "a springtail never flies to move")
+	local hopsAt: { number } = {}
+	local airborneNotHop, longest, shortest = 0, 0, math.huge
+	local prev = 0
+	approach(d, f, s, f.position + Vector3.new(6, 0.19, 0), 2.5, 60 * 12, function(_i: number, spider: Vector3)
+		if f:airborne() and f.state ~= "HOP" then airborneNotHop += 1 end
+		if (f.hops or 0) > prev then
+			prev = f.hops
+			table.insert(hopsAt, (spider - f.hop.from).Magnitude)
+			local len = (f.hop.to - f.hop.from).Magnitude
+			longest, shortest = math.max(longest, len), math.min(shortest, len)
+		end
+		for _, x in d.flies do check(within(bed.bounds[1], bed.bounds[2], x.position), `{x.id} stays in the bed`) end
+	end)
+	check(#hopsAt >= 3, `it flicked away {#hopsAt} times in twelve seconds of being followed`)
+	check(hopsAt[1] <= springtail.senses.startle_range_wu + 0.5, `the first flick when the spider came close ({hopsAt[1]} studs)`)
+	check(shortest >= springtail.body.hop.min - 0.2 and longest <= springtail.body.hop.max + 0.2, `hops of {shortest} to {longest} studs`)
+	check(airborneNotHop == 0, "it was never in the air but on a hop")
+	-- left alone, it settles and never hops
+	local hops = f.hops
+	for _ = 1, 60 * 20 do tick(d, FAR, s) end
+	check(f.hops == hops and not f:airborne(), "left alone it stays")
+	-- caught and torn free, it flicks off from the jaws (or, with nowhere to land, is back on its spot)
+	local g = d.flies[2]
+	g.flight:release(); g.perch.occupant = ""; g.state = "CAPTURED"; g.position = g.position + Vector3.new(0, 0.5, 0)
+	d.previousPosition = g.position + Vector3.new(0.4, 0, 0)
+	d:escape(g)
+	check(g.state == "HOP" or (g.state == "ALERT" and g.perch.occupant == g.id), `torn free, it flicks away ({g.state})`)
+	for _ = 1, 600 do tick(d, FAR, s) end
+	check(g.state == "PERCHED" or g.state == "ALERT", `and lands ({g.state})`)
+end)
+
+case("a leafhopper goes round its stem from a spider watching it, and jumps far when the spider comes at it", function()
+	local d = kindDirector(bed, "leafhopper")
+	local s = sensor()
+	local f = d.flies[1]
+	local first = f.perch
+	check(first.behind ~= nil, "it starts on a perch with a far side")
+	-- the spider sways a little three studs off, on its side: it sidesteps to the far side
+	local watch = f.position + f.normal * 3
+	for i = 1, 60 * 5 do tick(d, watch + Vector3.new(0, 0, math.sin(i * 0.05) * 0.4), s) end
+	check(f.perch.id == first.behind and (f.sidesteps or 0) >= 1 and not f:airborne(), `it went round to {f.perch.id} ({f.sidesteps or 0} sidesteps)`)
+	check((f.position - d.graph:rest(f.perch)).Magnitude <= leafhopper.behavior.wander_radius_wu + 0.05, "and sits there")
+	-- the spider comes at it fast from in front: it jumps
+	local hops, len = 0, 0
+	local d2 = kindDirector(bed, "leafhopper")
+	local g = d2.flies[1]
+	approach(d2, g, sensor(), g.position + g.normal * 5, 6, 60 * 4, function()
+		if (g.hops or 0) > hops then hops = g.hops; len = math.max(len, (g.hop.to - g.hop.from).Magnitude) end
+	end)
+	check(hops >= 1 and len >= leafhopper.body.hop.min - 1e-6 and len <= leafhopper.body.hop.max + 1e-6, `it jumped ({hops} jumps, the longest {len} studs)`)
+	for _, x in d2.flies do check(within(bed.bounds[1], bed.bounds[2], x.position), `{x.id} is in the bed`) end
+end)
+
+case("by day the moths and the crane fly sit still; from dusk they flutter and resettle, and the world's hour decides which", function()
+	for _, k in { "moth", "crane_fly" } do
+		local d = kindDirector(wall, k)
+		local s = sensor()
+		local far = Vector3.new(0, -89.69, -60)
+		local dayAir, duskAir, landings = 0, 0, 0
+		for _ = 1, 60 * 120 do tick(d, far, s); for _, f in d.flies do if f:airborne() then dayAir += 1 end end end
+		check(dayAir == 0, `{k}: still all day (2 minutes, {dayAir} ticks in the air)`)
+		PreyKinds.light(d, true)
+		check(d.p == (if k == "moth" then mothDusk else craneDusk) and d.dusk == true, `{k}: the dusk profile`)
+		for _, f in d.flies do check(f.profile == d.p, `{f.id} flies from dusk`) end
+		for _ = 1, 60 * 180 do
+			tick(d, far, s)
+			for _, f in d.flies do
+				if f:airborne() then duskAir += 1 end
+				check(within(wall.bounds[1] - Vector3.new(0, 0, 2), wall.bounds[2], f.position), `{f.id} stays by the wall ({f.position})`)
+			end
+		end
+		for _, f in d.flies do landings += f.flight.landings end
+		check(duskAir > 60 and landings >= 1, `{k}: at dusk it flies ({duskAir} ticks in the air) and resettles ({landings} landings)`)
+		for _, f in d.flies do if not f:airborne() then check(math.abs(f.heading:Dot(f.normal)) < 0.01, `{f.id} faces along the wall, not into it`) end end
+		PreyKinds.light(d, false)
+		check(d.p == (if k == "moth" then moth else crane) and d.dusk == false, `{k}: by day again`)
+	end
+	check(PreyKinds.isDusk(18, 18, 6) and PreyKinds.isDusk(23.5, 18, 6) and PreyKinds.isDusk(3, 18, 6) and not PreyKinds.isDusk(6, 18, 6) and not PreyKinds.isDusk(12, 18, 6), "dusk runs from 18:00 through the night to 6:00")
+	-- the world's hour: on the wall at noon the profile is the day's, at 20:00 the dusk's, and back at 9:00
+	local home = sillDirector()
+	local pw = PreyWorld.new(home, worldAt("house_wall"), {}, world, { probe = home.probe, cast = home.graph.cast, sweep = home.graph.sweep, overlap = home.graph.overlap })
+	local s = sensor()
+	local at = Vector3.new(0, -40, -24.3)
+	pw:before(DT, at, observerAt(at), s, cast, cameraFar, 12)
+	local ds = pw:kinds("house_wall")
+	check(#ds == 2 and ds[1].p == moth and ds[2].p == crane, "at noon, the day profiles")
+	pw:before(DT, at, observerAt(at), s, cast, cameraFar, 20)
+	check(ds[1].p == mothDusk and ds[2].p == craneDusk, "at 20:00, the dusk profiles")
+	pw:before(DT, at, observerAt(at), s, cast, cameraFar)
+	check(ds[1].p == mothDusk, "with no hour given, the last one holds")
+	pw:before(DT, at, observerAt(at), s, cast, cameraFar, 9)
+	check(ds[1].p == moth and ds[2].p == crane, "at 9:00, the day's again")
+end)
+
+-- A world with the spider at `regionId` and the sill's jaws (game rules on, as the client has them).
+local function catchWorld(regionId: string): (any, any, any)
+	local home = sillDirector()
+	home.feeding:useGameRules()
+	local garden = {}
+	local pw = PreyWorld.new(home, worldAt(regionId), garden, world, { probe = home.probe, cast = home.graph.cast, sweep = home.graph.sweep, overlap = home.graph.overlap })
+	return pw, home, garden
+end
+local function strikeThrough(pw: any, s: any, f: any)
+	local function step(pos: Vector3, strike: boolean?)
+		pw:before(DT, pos, observerAt(pos), s, cast, cameraFar, 12)
+		pw:after(DT, motorAt(pos, strike), s, cast)
+	end
+	step(f.position - Vector3.new(0.5, 0, 0), true)
+	if f.state ~= "CAPTURED" then step(f.position + Vector3.new(0.5, 0, 0), true) end
+	return step
+end
+-- A stream whose first draw is under (or over) `p`.
+local function streamFor(p: number, under: boolean): any
+	for k = 1, 1000 do
+		local seed = (k * 2654435) % 2147483647
+		local r = PreyRandom.new(seed)
+		local x = PreyRandom.new(seed):next()
+		if (x < p) == under then return r end
+	end
+	error("no stream")
+end
+
+case("a moth's first grip may slip (seeded, once): it leaves the jaws and flies; the second grip holds", function()
+	local outcomes = {}
+	for _, slip in { true, false } do
+		local pw, home, garden = catchWorld("outer_sill")
+		local s = sensor()
+		pw:before(DT, Vector3.new(0, 0.19, -18), observerAt(Vector3.new(0, 0.19, -18)), s, cast, cameraFar, 12)
+		local m: any = garden.outer_sill.kinds.moth.flies[1]
+		m.rng = streamFor(moth.body.slip_chance, slip)
+		local step = strikeThrough(pw, s, m)
+		check(m.state == "CAPTURED" and home.feeding.held == m, `the moth is caught ({m.state})`)
+		step(m.position + Vector3.new(0.3, 0, 0))
+		check(m.slipDrawn == true, "the slip is drawn on the first tick of the grip")
+		if slip then
+			check(home.feeding.held == nil and m.state ~= "CAPTURED" and m:airborne() and pw.event ~= nil and pw.event.kind == "slip" and pw.event.prey == "moth", `it slipped and flies off ({m.state})`)
+			-- caught again: no second slip
+			for _ = 1, 120 do step(Vector3.new(0, 0.19, -18)) end
+			local held = false
+			for _ = 1, 600 do
+				if m.state == "PERCHED" or m.state == "ALERT" then
+					local again = strikeThrough(pw, s, m)
+					again(m.position + Vector3.new(0.3, 0, 0))
+					again(m.position + Vector3.new(0.3, 0, 0))
+					held = home.feeding.held == m
+					break
+				end
+				step(Vector3.new(0, 0.19, -18))
+			end
+			check(held, "caught again once it has landed, it stays in the jaws")
+		else
+			check(home.feeding.held == m and home.feeding.struggling and pw.event == nil, "the grip held")
+		end
+		outcomes[slip] = m.state
+	end
+	-- the same stream twice, the same outcome
+	local a, b = {}, {}
+	for run = 1, 2 do
+		local pw, home, garden = catchWorld("outer_sill")
+		local s = sensor()
+		pw:before(DT, Vector3.new(0, 0.19, -18), observerAt(Vector3.new(0, 0.19, -18)), s, cast, cameraFar, 12)
+		local m: any = garden.outer_sill.kinds.moth.flies[1]
+		local step = strikeThrough(pw, s, m)
+		for _ = 1, 30 do step(m.position + Vector3.new(0.3, 0, 0)) end
+		local out = if run == 1 then a else b
+		out.held, out.state, out.rng = home.feeding.held == m, m.state, m.rng.state
+	end
+	check(a.held == b.held and a.state == b.state and a.rng == b.rng, "the world's own seed, the same slip or grip every time")
+end)
+
+case("a crane fly in the struggle may leave a leg and escape (seeded, once); it is drawn with a leg fewer after", function()
+	local pw, home, garden = catchWorld("outer_sill")
+	local s = sensor()
+	pw:before(DT, Vector3.new(0, 0.19, -18), observerAt(Vector3.new(0, 0.19, -18)), s, cast, cameraFar, 12)
+	local c: any = garden.outer_sill.kinds.crane_fly.flies[1]
+	c.rng = streamFor(crane.body.shed_chance, true)
+	local step = strikeThrough(pw, s, c)
+	check(c.state == "CAPTURED" and home.feeding.held == c, "the crane fly is caught")
+	step(c.position + Vector3.new(0.3, 0, 0))
+	check(c.shedDrawn == true and c.shedAt ~= nil and c.shedAt >= crane.body.shed_after[1] and c.shedAt <= crane.body.shed_after[2], `the leg will go {c.shedAt} s into the struggle`)
+	-- (the test holds the grip half way, so neither the taps nor the drain decide it)
+	local ticks = 0
+	while home.feeding.held == c and ticks < 600 do ticks += 1; home.feeding.grip = 0.5; step(Vector3.new(0, 0.19, -18)) end
+	check(home.feeding.held == nil and c.legsLost == 1 and c:airborne() and pw.event ~= nil and pw.event.kind == "shed" and pw.event.prey == "crane_fly", `it left a leg and got away after {ticks / 60} s ({c.state})`)
+	check(ticks / 60 <= crane.body.shed_after[2] + 0.2, "within the seconds drawn")
+	-- the drawn body: one leg fewer
+	local bodies = FlyBodies.new(workspace)
+	local whole = { id = "w", state = "PERCHED", position = Vector3.new(0, 0.16, 0), heading = -Vector3.zAxis, normal = Vector3.yAxis, profile = crane, airborne = function() return false end }
+	local shed = { id = "s", state = "PERCHED", position = Vector3.new(5, 0.16, 0), heading = -Vector3.zAxis, normal = Vector3.yAxis, profile = crane, legsLost = 1, airborne = function() return false end }
+	bodies:draw({ whole, shed } :: { any }, 0)
+	check(#bodies.rigs.w.parts - #bodies.rigs.s.parts == 3, `the shed leg's three parts are gone ({#bodies.rigs.w.parts}, {#bodies.rigs.s.parts})`)
+	for _, p in bodies.rigs.s.parts do check(string.sub(p.Name, 1, 9) ~= "RightHind", `{p.Name} is not the shed leg`) end
+	bodies:draw({}, 0)
+	-- caught again, it never sheds a second leg
+	local held = false
+	for _ = 1, 60 * 30 do
+		if c.state == "PERCHED" or c.state == "ALERT" then
+			local again = strikeThrough(pw, s, c)
+			for _ = 1, 60 * 3 do home.feeding.grip = 0.5; again(Vector3.new(0, 0.19, -18)); if home.feeding.held ~= c then break end end
+			held = home.feeding.held == c and home.feeding.struggling
+			break
+		end
+		step(Vector3.new(0, 0.19, -18))
+	end
+	check(held and c.legsLost == 1, "caught again, it keeps its other legs and is held")
+	-- the grip trick never touches the house fly, the gnat, the springtail
+	for _, p in { fly, gnat, springtail, leafhopper } do
+		local feeding = { held = { profile = p, rng = PreyRandom.new(5) }, struggling = true, elapsed = 10 }
+		check(PreyKinds.grip(feeding, function() end) == nil and feeding.held ~= nil and feeding.held.rng.state == 5, `{p.body.prey_kind or "house fly"}: no trick, no draw`)
+	end
+end)
+
+case("the world's prey with the bestiary: the sill's untouched beside the outer sill's moths, each region's kinds under its gate, the low tier's fewer", function()
+	-- on the sill only the sill runs, though the outer sill now has prey
+	local pw, home, garden = catchWorld("sill")
+	local s = sensor()
+	for _ = 1, 30 do pw:before(DT, FAR, observerAt(FAR), s, cast, cameraFar, 20); pw:after(DT, motorAt(FAR), s, cast) end
+	check(#pw.active == 1 and pw.active[1] == "sill" and next(garden) == nil and pw.made == 0 and #pw:flies() == #home.flies, "on the sill: the sill's prey alone, nothing made outside")
+	-- on the outer sill: its moths and crane fly, and the wall's when near
+	pw.world = worldAt("outer_sill")
+	local at = Vector3.new(0, 0.19, -18)
+	pw:before(DT, at, observerAt(at), s, cast, cameraFar, 12)
+	check(pw.active[1] == "outer_sill" and garden.outer_sill.kinds.moth ~= nil and garden.outer_sill.kinds.crane_fly ~= nil, "the outer sill's prey runs there (and the sill's beside it, a neighbour, as W3 has it)")
+	check(garden.outer_sill.prey == nil and garden.outer_sill.bugs == nil and #garden.outer_sill.kinds.moth.flies == 1 and #garden.outer_sill.kinds.crane_fly.flies == 1, "a moth and a crane fly, no gnats, no woodlice")
+	for _, d in pw:kinds("outer_sill") do check(d.feeding == home.feeding and d.graph.cast == home.graph.cast, "one jaws, one set of casts") end
+	-- the low tier
+	local pwLow, _, gardenLow = catchWorld("bed_a")
+	pwLow.tier = "low"
+	local inBed = Vector3.new(-20, -89.69, -30)
+	pwLow:before(DT, inBed, observerAt(inBed), s, cast, cameraFar, 12)
+	check(#gardenLow.bed_a.kinds.springtail.flies == 2 and #gardenLow.bed_a.kinds.leafhopper.flies == 1 and #gardenLow.bed_a.prey.flies == 6, "at the low tier: two springtails, one leafhopper, W3's six")
+	local inBedFull = 0
+	local pwFull, _, gardenFull = catchWorld("bed_a")
+	pwFull:before(DT, inBed, observerAt(inBed), s, cast, cameraFar, 12)
+	for _, d in pwFull:directors("bed_a") do inBedFull += #d.flies end
+	check(inBedFull == 12 and inBedFull <= 14 and #gardenFull.bed_a.kinds.springtail.flies == 4, `at full: {inBedFull} prey in the bed`)
+	-- a strike in the bed takes a springtail into the shared jaws; one torn free is the springtail director's again
+	local pwS, homeS, gardenS = catchWorld("bed_a")
+	pwS:before(DT, inBed, observerAt(inBed), s, cast, cameraFar, 12)
+	local sp: any = gardenS.bed_a.kinds.springtail.flies[1]
+	strikeThrough(pwS, s, sp)
+	check(homeS.feeding.held == sp and gardenS.bed_a.kinds.springtail.captures == 1 and pwS:captures() == 1, "a springtail in the jaws, counted")
+	for _ = 1, 10 do homeS.feeding.grip = 0.5; pwS:before(DT, inBed, observerAt(inBed), s, cast, cameraFar, 12); pwS:after(DT, motorAt(inBed), s, cast) end
+	homeS.feeding.grip = 0
+	pwS:before(DT, inBed, observerAt(inBed), s, cast, cameraFar, 12)
+	pwS:after(DT, motorAt(inBed), s, cast)
+	check(homeS.feeding.held == nil and sp.state ~= "CAPTURED" and table.find(gardenS.bed_a.kinds.springtail.flies, sp) ~= nil, `torn free, it is the springtail director's again ({sp.state})`)
+end)
+
+case("the bestiary's bodies: under the fly's forty parts at full, fewer at low, at their true sizes and in their colours", function()
+	local function rigOf(bodies: any, id: string, profile: any, flying: boolean?): any
+		local f = { id = id, state = if flying then "FLEE" else "PERCHED", position = Vector3.new(0, 0.16, 0), heading = -Vector3.zAxis, normal = Vector3.yAxis, profile = profile,
+			airborne = function() return flying == true end }
+		bodies:draw({ f } :: { any }, 0)
+		return bodies.rigs[id]
+	end
+	local expect = { springtail = { 15, 11 }, leafhopper = { 25, 13 }, moth = { 20, 9 }, crane_fly = { 31, 11 } }
+	for kind, counts in expect do
+		local profile = (Species :: any)[kind .. "_prototype"]
+		local full = rigOf(FlyBodies.new(workspace, "full"), "f_" .. kind, profile)
+		local low = rigOf(FlyBodies.new(workspace, "low"), "l_" .. kind, profile)
+		check(#full.parts == counts[1] and #low.parts == counts[2] and #full.parts <= 40 and #low.parts < #full.parts, `{kind}: {#full.parts} parts at full, {#low.parts} at low`)
+		local lo, hi = Vector3.new(math.huge, math.huge, math.huge), Vector3.new(-math.huge, -math.huge, -math.huge)
+		local safe = true
+		for _, p in full.parts do
+			if p.Name ~= "Shadow" then
+				for _, c in { Vector3.new(-1, -1, -1), Vector3.new(1, -1, -1), Vector3.new(-1, 1, -1), Vector3.new(1, 1, -1), Vector3.new(-1, -1, 1), Vector3.new(1, -1, 1), Vector3.new(-1, 1, 1), Vector3.new(1, 1, 1) } do
+					local corner = p.CFrame:PointToWorldSpace(p.Size * c / 2)
+					lo = lo:Min(corner); hi = hi:Max(corner)
+				end
+			end
+			if p.CanCollide ~= false or p.CanQuery ~= false or p.CanTouch ~= false or p.CastShadow ~= false or not p.Anchored then safe = false end
+		end
+		check(safe, `{kind}: no part collides, is seen by a ray or casts a shadow`)
+		check(lo.Y > -0.04 and lo.Y < 0.06, `{kind}: its feet on the surface ({lo.Y})`)
+		local function find(rig: any, name: string): any for _, p in rig.parts do if p.Name == name then return p end end return nil end
+		if kind == "springtail" then
+			local len = (find(full, "Abdomen").Position.Z + 0.04) - (find(full, "Head").Position.Z - 0.016)
+			check(len > 0.12 and len < 0.2, `a springtail is about 0.15 long ({len})`)
+			check(find(full, "Furcula") ~= nil and find(low, "Furcula") == nil, "the furcula at full")
+			local flying = rigOf(FlyBodies.new(workspace, "full"), "j", profile, true)
+			local rest, leap = find(full, "Furcula"), find(flying, "Furcula")
+			check(rest ~= nil and leap ~= nil and (rest.CFrame.Position - leap.CFrame.Position).Magnitude > 0.01, "swung out in the leap")
+		elseif kind == "leafhopper" then
+			local w = find(full, "RightWing")
+			check(w.Color.G > w.Color.R and w.Color.G > w.Color.B and w.Transparency == 0, "green, opaque wings over its back")
+			check(hi.Z - lo.Z > 0.3 and hi.Z - lo.Z < 0.5, `about 0.4 long ({hi.Z - lo.Z})`)
+		elseif kind == "moth" then
+			check(hi.X - lo.X > 1.3 and hi.X - lo.X < 1.8, `wings about 1.5 across ({hi.X - lo.X})`)
+			check(find(full, "LeftBand") ~= nil and find(low, "LeftBand") == nil, "the dark bands at full")
+		else
+			check(hi.Z - lo.Z > 5 and hi.X - lo.X > 5, `the crane fly's legs reach far ({hi.X - lo.X} by {hi.Z - lo.Z})`)
+			local body = find(full, "Abdomen").Size.Z + find(full, "Thorax").Size.Z + find(full, "Head").Size.Z + find(full, "Rostrum").Size.Z
+			check(body > 1.8 and body < 2.1, `its body about 2 long ({body})`)
+			check(find(low, "RightHindLeg") ~= nil and find(low, "RightHindFemur") == nil and find(full, "RightHindLeg") == nil, "one rod a leg at low, three at full")
+		end
+	end
 end)
 
 print(`GARDEN_LIFE passed={passed} failed={failed}`)

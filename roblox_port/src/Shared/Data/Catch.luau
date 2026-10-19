@@ -26,7 +26,12 @@ Catch.size = {
 }
 
 -- How hard catching `profile` is against the house fly: 1.0 for the house fly, 0.7 for the fruit fly.
+-- ROBLOX-101: a profile whose body names its own `catch_factor` is that hard, whatever its meal (the leafhopper: half a meal that kicks like a house fly).
 function Catch.factorFor(profile: any): number
+	if profile.body.catch_factor ~= nil then
+		local z = Catch.size
+		return math.clamp(profile.body.catch_factor, z.min, z.max)
+	end
 	local base = Species.fly_like_prototype.body.nutrition
 	local ratio = profile.body.nutrition / base
 	local z = Catch.size

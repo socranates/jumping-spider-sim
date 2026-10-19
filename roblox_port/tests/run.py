@@ -31,7 +31,8 @@ tests/settings.luau (the settings table and model, their saving, the panel, the 
 tests/inspect.luau (Inspect mode: its numbers, the camera's ease, orbit and restore, the Settings row, the hold, the lock and the reasons it ends, through the real client) and
 tests/worldmap.luau (the world map: the sill as region 0, the questions about a point, a region's seed, the sill's generator and its budgets) and
 tests/world_client.luau (the client's world: where its boxes are, the region the spider is in, the pace of its day, the streaming focus, and the real client on the server's World folder) and
-tests/garden_life.luau (ROBLOX-96: the bed's prey director on its boxes, the gnat and the aphid, the woodlice, the world's prey per region, and the drawn gnat, aphid and woodlouse).
+tests/garden_life.luau (ROBLOX-96: the bed's prey director on its boxes, the gnat and the aphid, the woodlice, the world's prey per region, and the drawn gnat, aphid and woodlouse;
+ROBLOX-101: the bestiary's springtails, leafhoppers, moths and crane flies, their perches per region, hops, sidesteps, dusk, the moth's slip, the crane fly's leg, and their bodies at both tiers).
 Usage (from roblox_port/):  python3 tests/run.py [path/to/luau [test.luau ...]]   (default: all of them)"""
 import pathlib, re, subprocess, sys, tempfile
 
@@ -127,6 +128,8 @@ MODULES = [
     ("TarantulaText", "UI/TarantulaText.luau"),
     ("PeacockText", "UI/PeacockText.luau"),
     ("InspectText", "UI/InspectText.luau"),
+    ("PreyText", "UI/PreyText.luau"),
+    ("PreyKinds", "Prey/PreyKinds.luau"),
     ("Fly", "Prey/Fly.luau"),
     ("PreyPopulation", "Prey/PreyPopulation.luau"),
     ("Catch", "Data/Catch.luau"),

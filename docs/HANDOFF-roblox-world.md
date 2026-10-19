@@ -194,4 +194,63 @@ What is in it:
 - Whether the woodlice should show to the senses at all (they are movement now, as the wasp and the rival are) or be invisible to the perception HUD.
 - The aphids only shuffle on one leaf (no walk from leaf to leaf); say if they should wander the plant.
 
+## W3b part A — the garden's bestiary: springtails, leafhoppers, small moths, crane flies (ROBLOX-101)
+
+Claude → Chet, 2026-10-19, same branch. Four more prey from `docs/GARDEN_BESTIARY.md`, on W3's pattern: **springtails** on the soil round the big stone and the litter
+(1.5 mm, four of them; they flick away with a hop of 1.5 to 4 studs when the spider comes close or moves fast beside them), **leafhoppers** on the dock's stem and leaves and
+the dandelion's stalk (4 mm, green, two; watched from their side they slip round to the far side of the stem or leaf; come at them fast and they jump 3 to 10 studs, sometimes
+flying on), **small moths** on the brick wall and the outer sill by the window (8 mm, wings 15 mm, grey-brown, resting flat; still by day, fluttering from 18:00 through the
+night; the first grab at one may slip, once) and **crane flies** on the wall and the outer sill (2 cm with legs near 4 cm, bigger than the spider; still by day, a slow
+wobbling flier from 18:00; two housefly meals and a harder struggle than a house fly; it may leave a leg in the fangs and get away, once, and is drawn a leg short after). Each kind is
+its own director per region (`World/Garden.bestiary`, `Prey/PreyWorld`'s `kinds`), behaviours in the new `Shared/Prey/PreyKinds`, bodies in `Data/FlyLook.small` at full and
+low tier, four notebook pages opened by the first close look (within 4 studs), and the rest's record keeps them per region. `docs/DECISIONS.md` ROBLOX-101 has the numbers and
+the reasons. **Nothing of it has run in Studio.** The sill plays as it did: no prey outside it runs while the spider is on it.
+
+What is in it:
+
+- **The bed** holds 12 prey at full (W3's three gnats and three aphids, four springtails, two leafhoppers) and 9 at low; **the wall** two moths and a crane fly (one and one at
+  low); **the outer sill** a moth and a crane fly (a moth alone at low). Replacements appear on a free perch of their kind in reach, out of sight.
+- **The tier** (`PreyWorld.tier`) is the client's detail tier, read when a region's directors are made. Bodies: springtail 15 / 11 parts, leafhopper 25 / 13, moth 20 / 9,
+  crane fly 31 / 11 (28 / 10 a leg short), all under the fly's 40.
+- **The hour** reaches the prey through `PreyWorld.before`'s last argument (the client passes `life.clock.hour`).
+- **New words**: the meal line's "8 springtails = 1 housefly", "2 leafhoppers = 1 housefly", "1 moth = 1 housefly", "1 crane fly = 2 houseflies"; the notes "The moth slipped
+  free, leaving scales in your fangs." and "The crane fly left a leg in your fangs and got away." (`UI/PreyText`, four seconds).
+- **Saves**: a region's entry in the record's `garden` root may hold `kinds`; a v33 rest (W3's bed alone) restores unchanged and the new kinds are made from their seeds when
+  their region is next whole. `SCHEMA_VERSION`, `CONTENT_REVISION` and `WorldMap.REVISION` unchanged.
+- **The ground-life page** was checked against the sources that could be opened this time: two sentences narrowed ("live in colonies", "glands on the sides of the body"), one
+  date fixed, a sixth source added (`docs/NOTEBOOK_SOURCES.md`).
+
+## Your Studio checklist (W3b part A)
+
+1. **Springtails at the stone.** In the bed, walk slowly toward the big stone's gap: `workspace.Flies` should hold four `bed_a_springtail_fly_` rigs (two at low detail)
+   on the soil near the stones and the litter. Can you see one at all from the game camera? Come within two or three studs: it should flick away a few studs in a low arc
+   (a sixth of a second), never fly; follow it and it flicks again. Strike one: it is easy to hold ("8 springtails = 1 housefly").
+2. **A leafhopper on the dock.** Find the green leafhopper on the dock's stem or a leaf (two of them, `bed_a_leafhopper_fly_`). Stand three studs off on its side and sway a
+   little: it should slip round to the other side of the stem or leaf in half a second. Rush it: it should jump far (3 to 10 studs) in a fast arc and sometimes fly on.
+   Caught, it should take a house fly's tapping ("2 leafhoppers = 1 housefly").
+3. **Moths and the crane fly by day.** On the wall on the way down and on the outer sill near the window: two moths and a crane fly on the brick, a moth and a crane fly on
+   the outer sill (the slab's ends, the window box's fronts, the slab's front edge). By day they should not move unless you come close; the moths head up the wall, wings
+   flat; the crane fly's legs splay about four studs across.
+4. **At dusk.** Stay out past 18:00: the moths and the crane fly should flutter between perches, the crane fly slow and
+   wobbling, and settle again; back to day profiles at 6:00.
+5. **The moth's slip.** Catch a moth several times across lives: about a third of first grabs should end at once with the note "The moth slipped free, leaving scales in your
+   fangs." and the moth flying off; once caught again, it stays in the jaws.
+6. **The crane fly's leg.** Catch a crane fly and keep tapping: about four times in ten it should get away 0.6 to 1.6 s into the struggle with "The crane fly left a leg in your
+   fangs and got away."; the drawn crane fly should then have five legs (the right hind gone) for the rest of its life. A whole one is two housefly meals.
+7. **The pages.** Come within four studs of each kind: "Springtails and the spring", "Leafhoppers: the sidestep and the jump", "Moths at the window", "Crane flies: legs to
+   spare" open once each. "Life on the ground" reads "live in colonies" and "glands on the sides of the body".
+8. **The sill is the sill.** On the sill nothing outside runs: `print(#workspace.Flies:GetChildren())` there is the sill's four flies, as in v33; the sill's flies behave as
+   they always did.
+9. **Rest and rejoin.** Rest under the stone, note where a springtail and a leafhopper are; leave, rejoin, return to the rest: the bed's prey (all six kinds) where they
+   were. A rest made in v33 should restore with no `[Windowsill] checkpoint refused`, the new kinds appearing fresh.
+10. **Parts and frame time** in the bed at both tiers on the PC and, when you can, a phone: the bed's living prey is about 221 parts at full (W3's was 111) plus the woodlice's
+   96; the wall's prey 71 and the outer sill's 51 at full.
+
+## Open for Nathan (W3b part A)
+
+- Can a springtail be seen and hunted at all at 1.5 mm, or should it be drawn larger than life (the moth and the crane fly are true size; the gnats are too)?
+- The numbers are first guesses: four springtails and two leafhoppers in the bed, the moth's 35% slip, the crane fly's 40% shed leg, dusk from 18:00 to 6:00.
+- The crane fly does not rest on the glass: the glass belongs to the sill's region, whose prey is pinned. Say if it should, and the sill's pin can be renegotiated for it.
+- Part B (the ladybird, millipede, snail and harvestman as ambient bugs) is next on the bestiary's list.
+
 *(W4 — nature's rules and W5 — no hand holding will be appended here as they land.)*

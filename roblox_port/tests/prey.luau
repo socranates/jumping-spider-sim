@@ -227,4 +227,35 @@ do
  assert(d.startGrip==.4 and d.tapGain==.085 and d.drainScale==1,'Godot controller, aphid: still Godot');passed+=1
  print(string.format('PREY feel (ROBLOX-96): gnat idle %.2f s, aphid idle %.2f s',gIdle,aIdle))
 end
+-- ---------------------------------------------------------------- the bestiary's prey (ROBLOX-101): the springtail, the leafhopper, the moth, the crane fly
+do
+ local spring,hopper,moth,crane=Species.springtail_prototype,Species.leafhopper_prototype,Species.moth_prototype,Species.crane_fly_prototype
+ near(Catch.factorFor(spring),.5);near(Catch.factorFor(hopper),1);near(Catch.factorFor(moth),1);near(Catch.factorFor(crane),1.25)
+ local g=F.new();g:useGameRules()
+ g:capture({profile=crane,nutrition=crane.body.nutrition,state='CAPTURED',captureKey='c'})
+ near(g.tapGain,.12/1.25);near(g.drainScale,1.25)
+ g:capture({profile=hopper,nutrition=hopper.body.nutrition,state='CAPTURED',captureKey='h'})
+ near(g.tapGain,.12);near(g.drainScale,1)
+ local function stats(profile: any,rate: number)
+  local won,lost,tl=0,0,0
+  for seed=1,60 do
+   local r=struggle(true,rate,seed*7+1,0,nil,nil,profile)
+   if r.escaped then lost+=1;tl+=r.seconds elseif r.subdued then won+=1 end
+  end
+  return won,lost,if lost>0 then tl/lost else 0
+ end
+ -- a springtail held is held (two a second wins every time); a leafhopper struggles exactly as a house fly does; a crane fly is harder than either
+ local sw=stats(spring,2)
+ assert(sw==60,'two a second holds a springtail every time: '..sw);passed+=1
+ local hw4,_,hIdle=stats(hopper,4);local fw4,_,fIdle=stats(Species.fly_like_prototype,4)
+ local _,_,hIdle0=stats(hopper,0);local _,_,fIdle0=stats(Species.fly_like_prototype,0)
+ assert(hw4==fw4 and math.abs(hIdle0-fIdle0)<1e-9,'the leafhopper fights as the house fly does ('..hw4..' and '..fw4..' won at four a second)');passed+=1
+ local cw4=stats(crane,4);local cw6=stats(crane,6)
+ local _,_,cIdle=stats(crane,0)
+ assert(cw4<=fw4 and cIdle<fIdle0 and cw6>cw4,'the crane fly is harder: '..cw4..' won at four a second (house fly '..fw4..'), '..cw6..' at six; untouched it tears free in '..string.format('%.2f',cIdle)..' s');passed+=1
+ -- a controller never given the game's rules is still Godot's, whatever is caught
+ local d=F.new();d:capture({profile=crane,nutrition=crane.body.nutrition,state='CAPTURED',captureKey='k'})
+ assert(d.startGrip==.4 and d.tapGain==.085 and d.drainScale==1,'Godot controller, crane fly: still Godot');passed+=1
+ print(string.format('PREY feel (ROBLOX-101): crane fly idle %.2f s, won %d/60 at 4 taps/s and %d/60 at 6; house fly %d/60 at 4',cIdle,cw4,cw6,fw4))
+end
 print('PREY passed='..passed..' failed=0')

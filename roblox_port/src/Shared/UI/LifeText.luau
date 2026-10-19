@@ -128,6 +128,11 @@ LifeText.MEALS = {
 	fruit_fly = { rule = "2 small prey = 1 housefly", step = 2 },
 	fungus_gnat = { rule = "3 gnats = 1 housefly", step = 10 },
 	aphid = { rule = "6 aphids = 1 housefly", step = 10 },
+	-- ROBLOX-101: the bestiary's
+	springtail = { rule = "8 springtails = 1 housefly", step = 10 },
+	leafhopper = { rule = "2 leafhoppers = 1 housefly", step = 2 },
+	moth = { rule = "1 moth = 1 housefly", step = 2 },
+	crane_fly = { rule = "1 crane fly = 2 houseflies", step = 2 },
 } :: { [string]: { rule: string, step: number } }
 local DEFAULT_MEAL = { rule = "2 small prey = 1 housefly", step = 2 }
 

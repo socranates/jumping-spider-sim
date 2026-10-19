@@ -10,6 +10,7 @@ local WorldBuild = require("../src/Shared/World/WorldBuild")
 local WorldClient = require("../src/Client/WorldClient")
 local LifeClock = require("../src/Shared/Life/LifeClock")
 local Json = require("../src/Shared/Persistence/Json")
+local Species = require("../src/Shared/Data/Species")
 
 local passed, failed = 0, 0
 local function check(name: string, fn: () -> ())
@@ -680,18 +681,23 @@ check("prey runs only in the spider's region: on the sill the sill's flies alone
 		driver.place(Vector3.new(-20, -89.69, -30))
 		frames(10)
 	end)
-	assert(driver.world.region.id == "bed_a" and garden.bed_a == nil and #pw:flies() == 0, "a bed that is not whole has no prey, however long the spider stands in it")
+	local bedFlies = 0
+	for _, f in pw:flies() do if string.find(f.id, "bed_a_", 1, true) == 1 then bedFlies += 1 end end
+	assert(driver.world.region.id == "bed_a" and garden.bed_a == nil and bedFlies == 0, "a bed that is not whole has no prey, however long the spider stands in it (ROBLOX-101: the whole wall beside it may run its own)")
 	assert(#seen == 1 and string.find(seen[1], "bed_a", 1, true) ~= nil and string.find(seen[1], "not arrived whole", 1, true) ~= nil, "and the once-per-region warning says so: " .. table.concat(seen, " | "))
 	taken.Parent = bedFolder
 	seen = warnings(function() frames(10) end)
 	assert(#seen == 0, "whole again: no more warnings")
 	assert(garden.bed_a ~= nil and garden.bed_a.prey ~= nil and garden.bed_a.bugs ~= nil, "the bed's prey and woodlice are made once it is whole")
-	assert(#pw.active == 1 and pw.active[1] == "bed_a", "in the bed only the bed's prey runs")
+	assert(pw.active[1] == "bed_a" and table.find(pw.active, "sill") == nil, `in the bed the bed's prey runs (and, ROBLOX-101, the wall's beside it when its perches are near), never the sill's ({table.concat(pw.active, ",")})`)
 	local d = garden.bed_a.prey
 	assert(#d.flies == 6 and d.feeding == driver.prey.feeding, "six prey, eating with the sill's jaws")
 	local gnats, aphids = 0, 0
 	for _, f in flyFolder:GetChildren() do
-		if string.find(f.Name, "bed_a_fly_", 1, true) then
+		if string.sub(f.Name, 1, 4) ~= "fly_" and string.find(f.Name, "bed_a_fly_", 1, true) == nil then
+			-- (ROBLOX-101: the bestiary's, the bed's springtails and leafhoppers and, when near, the wall's moths and crane fly)
+			assert(string.find(f.Name, "bed_a_", 1, true) == 1 or string.find(f.Name, "house_wall_", 1, true) == 1, "a drawn prey of the garden: " .. f.Name)
+		elseif string.find(f.Name, "bed_a_fly_", 1, true) then
 			local kind = (workspace:FindFirstChild("Flies") :: Instance) ~= nil and f:FindFirstChild("Cornicle") == nil and f:FindFirstChild("RightWing") ~= nil
 			if f:FindFirstChild("RightCornicle") then aphids += 1 elseif f:FindFirstChild("RightWing") then gnats += 1 end
 		else
@@ -716,8 +722,10 @@ check("crossing a seam rerolls nothing: the bed's prey waits while the spider is
 	local made, now = pw.made, d.now
 	driver.place(Vector3.new(36, 0.31, -18.75)) -- (the top of the wall's east shoulder, the wall's own spawn: the sill no neighbour, the bed's farthest perch beyond 96)
 	frames(60)
-	assert(driver.world.region.id == "house_wall" and #pw.active == 0 and d.now == now, `high on the wall nothing runs and the bed's clock has stopped ({driver.world.region.id}: {table.concat(pw.active, ",")})`)
-	assert(#(workspace:FindFirstChild("Flies") :: Instance):GetChildren() == 0 and #(workspace:FindFirstChild("Bugs") :: Instance):GetChildren() == 0, "nothing drawn there")
+	assert(driver.world.region.id == "house_wall" and table.find(pw.active, "bed_a") == nil and d.now == now, `high on the wall the bed's prey does not run and its clock has stopped ({driver.world.region.id}: {table.concat(pw.active, ",")})`)
+	local drawnBed = 0
+	for _, f in (workspace:FindFirstChild("Flies") :: Instance):GetChildren() do if string.find(f.Name, "bed_a_", 1, true) == 1 then drawnBed += 1 end end
+	assert(drawnBed == 0 and #(workspace:FindFirstChild("Bugs") :: Instance):GetChildren() == 0, "nothing of the bed drawn there (ROBLOX-101: the wall's own moths and crane fly may be)")
 	driver.place(Vector3.new(-20, -89.69, -30))
 	frames(1)
 	assert(garden.bed_a.prey == d and pw.made == made, "the same director, not another")
@@ -770,7 +778,7 @@ check("the descent: from the slab's front edge the spider lets itself down the w
 	local reports = fired()
 	local last = reports[#reports][1]
 	assert((last - motor.pos).Magnitude <= 8 + 1e-6, `the focus report followed ({(last - motor.pos).Magnitude} studs behind)`)
-	assert(driver.world.garden.bed_a ~= nil and #driver.world.prey.active == 1 and driver.world.prey.active[1] == "bed_a", "and the bed's prey runs")
+	assert(driver.world.garden.bed_a ~= nil and driver.world.prey.active[1] == "bed_a", "and the bed's prey runs")
 end)
 
 check("the stone is a home in the words: near it the line says so, under it the prompt and a kept rest say under the stone; the crack's words are as they were", function()
@@ -838,6 +846,43 @@ check("a return to a rest under the stone puts the bed's prey back where it was"
 	for i, l in garden.bed_a.bugs.lice do assert((lice[i] - l.position).Magnitude < 1e-9, "the woodlice are where they were") end
 	driver.place(Vector3.new(-5, 0.31, -9))
 	frames(5)
+end)
+
+-- ---------------------------------------------------------------- ROBLOX-101 (W3b part A): the bestiary through the real client
+check("the bestiary through the real client: the bed's springtails and leafhoppers made and drawn at the client's tier, the wall's moths flying from dusk by the life clock's hour, the sill's prey alone on the sill", function()
+	local driver = ClientStubs.driver
+	local pw, garden, life = driver.world.prey, driver.world.garden, driver.life
+	assert(pw.tier == "full" or pw.tier == "low", `the client gave the world's prey its tier ({pw.tier})`)
+	driver.place(Vector3.new(-20, -89.69, -30))
+	life.clock.hour = 12
+	frames(10)
+	local kinds = garden.bed_a.kinds
+	assert(kinds ~= nil and kinds.springtail ~= nil and kinds.leafhopper ~= nil, "the bed's springtails and leafhoppers are made")
+	local want = if pw.tier == "low" then { 2, 1 } else { 4, 2 }
+	assert(#kinds.springtail.flies == want[1] and #kinds.leafhopper.flies == want[2], `{#kinds.springtail.flies} springtails and {#kinds.leafhopper.flies} leafhoppers at the {pw.tier} tier`)
+	assert(kinds.springtail.feeding == driver.prey.feeding and kinds.leafhopper.feeding == driver.prey.feeding, "eating with the sill's jaws")
+	local springtails, leafhoppers = 0, 0
+	for _, f in (workspace:FindFirstChild("Flies") :: Instance):GetChildren() do
+		if string.find(f.Name, "bed_a_springtail_fly_", 1, true) == 1 then springtails += 1; assert(f:FindFirstChild("Thorax") ~= nil, "a springtail's body") end
+		if string.find(f.Name, "bed_a_leafhopper_fly_", 1, true) == 1 then leafhoppers += 1; assert(f:FindFirstChild("Pronotum") ~= nil, "a leafhopper's body") end
+	end
+	assert(springtails == want[1] and leafhoppers == want[2], `drawn: {springtails} springtails, {leafhoppers} leafhoppers`)
+	-- on the wall at noon its moths keep the day's profile; at 20:00 the dusk's
+	driver.place(Vector3.new(36, 0.31, -18.75))
+	life.clock.hour = 12
+	frames(5)
+	local wall = garden.house_wall
+	assert(wall ~= nil and wall.kinds ~= nil and wall.kinds.moth ~= nil and wall.kinds.moth.p == Species.moth_prototype, "the wall's moths, by day")
+	life.clock.hour = 20
+	frames(5)
+	assert(wall.kinds.moth.p == Species.moth_dusk_prototype and wall.kinds.crane_fly.p == Species.crane_fly_dusk_prototype, "from dusk, the dusk's (the client hands the prey the life clock's hour)")
+	life.clock.hour = 12
+	frames(2)
+	-- home: the sill's prey alone
+	driver.place(Vector3.new(-5, 0.31, -9))
+	frames(5)
+	assert(#pw.active == 1 and pw.active[1] == "sill", "on the sill the sill's prey alone, though the outer sill has its own")
+	for _, f in (workspace:FindFirstChild("Flies") :: Instance):GetChildren() do assert(string.sub(f.Name, 1, 4) == "fly_", "only the sill's flies drawn on the sill: " .. f.Name) end
 end)
 
 print("WORLD_CLIENT passed=" .. passed .. " failed=" .. failed)

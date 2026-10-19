@@ -49,7 +49,7 @@ return function(check)
 					assert(part.Position.X == part.Position.X)
 				end
 			end
-			assert(count <= 160, `part budget exceeded: {count}`)
+			assert(count <= 200, `part budget exceeded: {count}`) -- the same ceiling as tests/look.luau's `other` (the first spider has had 193 since ROBLOX-84; this said 160)
 			assert(fuzz >= 300 and fuzz <= 720, `fuzz budget: {fuzz}`)
 		end)
 		check("spider-eye view hides the body and keeps the front legs", function()

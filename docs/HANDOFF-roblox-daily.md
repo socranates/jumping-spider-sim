@@ -1,5 +1,13 @@
 # The daily wasp and the daily rival — Claude, 2026-10-18
 
+> **Superseded numbers (2026-10-19).** This handoff is history and is not rewritten. Where it differs from the code, the code and ROBLOX-75, -88 and -91 win:
+> the wasp comes **twice** a day, in 09:30 to 12:00 and 13:30 to 16:30 (ROBLOX-75), not once in 10:00 to 15:30;
+> a strike at an aware rival is a **contest** (40 / 32 / 28 in standard play, 55 / 25 / 20 in Easy and Free play; ROBLOX-73, -88, -91) and a caught rival a **grip fight** (ROBLOX-77, -88), not a sure catch followed by five seconds of eating;
+> a day costs **0.612** energy (drain 1.9), not 0.35 to 0.38, so the rival's 0.7 is about 1.14 days of food and 40% of a moult (**five** flies, not three), not two thirds of one, and it cannot carry a life;
+> the change-spider cycle offers **five** spiders, and the rival's drawn spider is 622 / 262 parts (full / low) after ROBLOX-93;
+> tests: `rivalnav` 293 and `client_rival` 8 (not 167 and 3), and the client has been brought back under the 200-local limit (181 top-level locals after ROBLOX-92).
+> The current suite totals are in `roblox_port/README.md`.
+
 Nathan: "I would also like the new rival male and the wasp to always be present." Decided with the lead as: every day, guaranteed. Decisions ROBLOX-67 (wasp), ROBLOX-68 (rival), and for Nathan's two later requests ROBLOX-69 (the rival stalks the whole sill) and ROBLOX-70 (the wasp takes the rival about one visit in ten). This branch (`claude/roblox-daily`) also contains the ant-mimicking spider (merge commit; its decisions are now ROBLOX-64..66) and Chet's dragline round. Nothing here has run in Studio or on a device.
 
 ## What changed

@@ -129,10 +129,10 @@ NotebookText.TRY = {
  {id="home_before_dark",text="Sleep in the crack through a night."},
  {id="new_skin",text="Eat, then rest when ready to moult."},
  {id="grown_up",text="Grow through three moults."},
- {id="peacock_dance",text="Change to the peacock while resting, then dance outside."},
- {id="walking_like_an_ant",text="Change to the ant mimic while resting, then stand still."},
+ {id="peacock_dance",text="Change to the peacock (in Settings, or while resting), then dance outside."},
+ {id="walking_like_an_ant",text="Change to the ant mimic (in Settings, or while resting), then stand still."},
  {id="eggs_and_wind",text="Raise a family: court a mate, guard the sac, watch the hatching."},
- {id="tarantula_cousins",text="Change to a tarantula while resting, then rear up outside."},
+ {id="tarantula_cousins",text="Change to a tarantula (in Settings, or while resting), then rear up outside."},
 }
 function NotebookText.checklist(book:any):string
  local lines={}

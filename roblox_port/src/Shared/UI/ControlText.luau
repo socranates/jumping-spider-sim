@@ -64,7 +64,7 @@ local NAMES: { [string]: { [string]: string } } = {
 	},
 	touch = {
 		feed = "Eat", jump = "Jump", cancel = "Cancel", letGo = "Let go", drop = "Silk", reel = "↑", lower = "↓", walk = "Arrows",
-		look = "Drag", creep = "Creep", focus = "Focus", eye = "Eye", recenter = "Recenter", slow = "", reset = "", help = "", zoom = "", choose = "Change", display = "Dance", menu = "Menu", notebook = "Notebook",
+		look = "Drag", creep = "Creep", focus = "Focus", eye = "Eye", recenter = "Recentre", slow = "", reset = "", help = "", zoom = "", choose = "Change", display = "Dance", menu = "Menu", notebook = "Notebook",
 	},
 }
 
@@ -220,15 +220,15 @@ function ControlText.helpCard(device: Device): string
 			`Tap {n("jump")} hop   Hold {n("jump")} aim, release to leap`,
 			`{n("drop")} lower on silk   {n("cancel")} cancel   {n("eye")} eye view`,
 			`On the line: up reel, down lower, hold {n("letGo")} let go`,
-			`{n("recenter")} recenter   {n("focus")} focus   {n("slow")} slow motion`,
+			`{n("recenter")} recentre   {n("focus")} focus   {n("slow")} slow motion`,
 			`In the crack: {n("feed")} rest (sleep from evening)`,
 			`{n("menu")}: menu, then last rest, notebook, settings`,
 		}, "\n")
 	elseif device == "touch" then
 		return table.concat({
-			"Arrows walk   Drag to look   Creep (hold)   Recenter   Focus",
+			"Arrows walk   Drag to look   Creep (hold)   Recentre   Focus",
 			"Tap Jump hop   Hold Jump aim, release to leap   Cancel",
-			"Silk lowers on silk   On the line: ↑ reel, ↓ lower, hold Let go",
+			"Silk: lower on a line   On a line: ↑ reel, ↓ lower, hold Let go",
 			"Eye spider-eye view   In the crack: Rest (Sleep from evening)",
 			"Menu: last rest, notebook, settings, this card",
 		}, "\n")
@@ -237,7 +237,7 @@ function ControlText.helpCard(device: Device): string
 		"WASD walk   Mouse look   Shift creep   Wheel zoom   G gait",
 		"Tap Space hop   Hold Space aim, release to leap   Q cancel",
 		"F lower on silk   On the line: W reel, S lower, hold Q let go",
-		"V eye view   R recenter   Right mouse focus   T slow motion",
+		"V eye view   R recentre   Right mouse focus   T slow motion",
 		"In the crack: E rest (sleep from evening)   H: hide this",
 		"Backspace: last rest   M: menu   N: notebook   O: settings",
 	}, "\n")

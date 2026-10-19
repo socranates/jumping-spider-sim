@@ -4,8 +4,8 @@
 -- MasterVolume, AmbienceVolume for the room and the birds, CreatureVolume for the flies and the wasp) multiply the mix below, which was
 -- tuned and accepted at full volume; setVolumes is called each frame and takes effect at once.
 -- The ambient music (ROBLOX-76) is the same kind of thing: scenery, a 64 s loop of its own, never read by perception, the AI or the simulation,
--- and it has no part in the world (no position, no slow motion). Its fourth volume is MusicVolume. It makes no sound until its asset id is
--- pasted into IDS.music (the voice is not even made while the id is empty), and it ducks while the wasp is on the sill.
+-- and it has no part in the world (no position, no slow motion). Its fourth volume is MusicVolume. Its asset (assets/audio/sill_music.wav) is uploaded and its id is in
+-- IDS.music, so it plays; were the id ever empty the voice would not even be made. It ducks while the wasp is on the sill and swells during the mating scene.
 local Soundscape = {}
 Soundscape.__index = Soundscape
 local IDS = {

@@ -346,5 +346,13 @@ end
 check(string.find(Text.card("touch", nil), "Change change", 1, true) == nil and string.find(Text.crackLine("touch"), "tap Change", 1, true) ~= nil, "touch: the button's label is not doubled in its own sentence")
 check(Text.crackLine("keyboard") == "In the crack: C change spider (hold C: look closely)" and Text.crackLine("gamepad") == "In the crack: RB change spider (hold RB: look closely)", "the crack's line, the close look folded in, by device")
 
+-- The words are British, like the rest of the game (colour, moult, grey): "recentre" on every card and on the touch button; and the touch card's silk line says what the button does (audit, 2026-10-19).
+for _, device in { "keyboard", "gamepad", "touch" } do
+	local lower = string.lower(Text.card(device :: any, "dance"))
+	check(string.find(lower, "recentre", 1, true) ~= nil and string.find(lower, "recenter", 1, true) == nil, `{device}: the card says recentre`)
+end
+check(ControlText.name("touch", "recenter") == "Recentre" and buttons.Recenter ~= nil and buttons.Recenter.label == "Re-\ncentre", "the touch button says Recentre (the action's id stays Recenter)")
+check(string.find(ControlText.helpCard("touch"), "Silk: lower on a line", 1, true) ~= nil and string.find(ControlText.helpCard("touch"), "Silk lowers", 1, true) == nil, "the touch card's silk line says what the button does")
+
 print(`PEACOCK passed={passed} failed={failed}`)
 if failed > 0 then error("peacock checks failed") end

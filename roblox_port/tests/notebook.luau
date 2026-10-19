@@ -32,6 +32,8 @@ end
 -- ---------------------------------------------------------------- the pages are Godot's, word for word
 -- Godot: test_every_page_is_complete_short_and_sourced
 local ADAPTED = { "bold_jumper", "dragline", "legs_push", "hearing", "green_uv", "home_before_dark", "hungry_at_home", "new_skin", "grown_up", "mud_dauber", "what_the_wasp_does", "going_without_food" }
+-- The audit of 2026-10-19 corrected one sentence of each of these four texts (the generator's TEXT_FIXES; docs/NOTEBOOK_SOURCES.md says why). Godot's whole text stays as godotText.
+local REVISED = { "grown_up", "mud_dauber", "getting_away", "going_without_food" }
 local STABLE = {
 	"bold_jumper", "dragline", "legs_push", "eight_eyes", "moving_retinas", "motion_first", "hunting_by_sight", "venom", "drinking",
 	"felt", "hearing", "retreat", "depth_blur", "green_uv", "home_before_dark", "hungry_at_home", "full_abdomen", "outgrowing_a_skin",
@@ -45,6 +47,7 @@ do
 	check(same(ids((function() local l = {} for _, p in book.pages do table.insert(l, { id = p.id, title = p.title }) end return l end)()), STABLE), "the page ids are the stable ones, in Godot's order")
 	local seen: { [string]: boolean } = {}
 	local adapted: { string } = {}
+	local revised: { string } = {}
 	local urls, refUrls = 0, 0
 	for i, p in book.pages do
 		local g: any = ref.pages[i] or p
@@ -52,7 +55,14 @@ do
 		check(not seen[p.id], `page ids are unique ({p.id})`)
 		seen[p.id] = true
 		check(#p.text <= 520, `page {p.id} is short enough to read in a moment ({#p.text} characters)`)
-		check(p.id == g.id and p.trigger == g.trigger and p.title == g.title and p.text == (string.gsub(g.text,"You are a bold jumping spider,","The first spider is inspired by the bold jumping spider,")), `page {p.id}: id, trigger, title and text are Godot's, word for word`)
+		local godotText: string = (string.gsub(g.text, "You are a bold jumping spider,", "The first spider is inspired by the bold jumping spider,"))
+		check(p.id == g.id and p.trigger == g.trigger and p.title == g.title, `page {p.id}: id, trigger and title are Godot's, word for word`)
+		if p.text ~= godotText then
+			table.insert(revised, p.id)
+			check(p.godotText == godotText and p.text ~= "", `page {p.id}: Godot's own text is kept as godotText where the game's corrects it`)
+		else
+			check(p.godotText == nil, `page {p.id}: the text is Godot's, word for word, and there is no godotText`)
+		end
 		check(same(p.sources, g.sources), `page {p.id}: the sources are Godot's, word for word`)
 		for _, s in p.sources do
 			check(#s > 20 and string.find(s, "(", 1, true) ~= nil, `page {p.id} names a full source: {s}`)
@@ -69,6 +79,7 @@ do
 	end
 	check(urls == refUrls and urls >= 12, `the source links are all kept ({urls} of {refUrls})`)
 	check(same(adapted, ADAPTED), "exactly these pages have a Roblox 'In this game' line: " .. table.concat(adapted, ", "))
+	check(same(revised, REVISED), "exactly these pages have a corrected text: " .. table.concat(revised, ", "))
 	-- Every trigger a page names is one the notebook has; Godot's list is whole.
 	local triggers = { "start", "jump", "jump_far", "jump_long", "eye_view", "eye_time_20", "eye_time_60", "shimmer", "fly_recognised", "catch", "meal", "felt", "buzz", "rest", "sleep", "hungry", "well_fed", "moult_ready", "moulted", "adult", "wasp", "wasp_escaped", "wasp_caught", "starving", "dance", "antennae", "hatched", "tarantula" }
 	check(same(NotebookPages.triggers, triggers), "the trigger list is Godot's, then the four the Roblox game added (dance, antennae, hatched, tarantula)")
@@ -79,7 +90,7 @@ do
 		for _, p in book.pages do if p.id == "eggs_and_wind" then page = p end end
 		check(page ~= nil and page.trigger == "hatched" and page.godotGame == nil, "the eggs-and-wind page opens when the eggs hatch, and is the game's own (no Godot line)")
 		check(page ~= nil and #page.sources == 4 and string.find(page.sources[1], "Journal of Arachnology 6: 1-29", 1, true) ~= nil and string.find(page.sources[3], "10.1079/BER2004350", 1, true) ~= nil and string.find(page.sources[4], "Current Biology 28(14)", 1, true) ~= nil, "its four sources are named in the notebook's style")
-		check(page ~= nil and string.find(page.game, "male", 1, true) ~= nil and string.find(page.game, "fifteen minutes", 1, true) ~= nil and string.find(page.game, "plain brown", 1, true) ~= nil, "the game note says where the game departs from the spiders")
+		check(page ~= nil and string.find(page.game, "male", 1, true) ~= nil and string.find(page.game, "fifteen minutes", 1, true) ~= nil and string.find(page.game, "mottled grey-brown", 1, true) ~= nil and string.find(page.game, "plain brown", 1, true) == nil, "the game note says where the game departs from the spiders")
 		local fresh = FieldNotebook.new()
 		check(#fresh:notice("hatched") == 1 and fresh:isOpen("eggs_and_wind") and #fresh:notice("hatched") == 0, "the trigger opens the page, once")
 		for _, p in book.pages do
@@ -93,10 +104,32 @@ do
 		check(page ~= nil and page.trigger == "tarantula" and page.title == "Velvet cousins (Theraphosidae)" and page.godotGame == nil, "the tarantula page opens on the tarantula trigger, has its title, and is the game's own (no Godot line)")
 		check(page ~= nil and #page.sources == 2 and string.find(page.sources[1], "Foelix, R. F. (2011). Biology of Spiders, 3rd edition. Oxford University Press.", 1, true) == 1 and string.find(page.sources[2], "Bertani, R. & Guadanucci, J. P. L. (2013)", 1, true) == 1 and string.find(page.sources[2], "Zoologia 30(4): 403-418", 1, true) ~= nil and string.find(page.sources[2], "10.1590/S1984-46702013000400006", 1, true) ~= nil, "its two sources are named in the notebook's style")
 		check(page ~= nil and string.find(page.text, "not jumping spiders", 1, true) ~= nil and string.find(page.text, "urticating", 1, true) ~= nil and string.find(page.text, "rears up", 1, true) ~= nil, "the page says tarantulas are not jumping spiders, and what they do")
-		check(page ~= nil and string.find(page.game, "costumes", 1, true) ~= nil and string.find(page.game, "invented angles", 1, true) ~= nil and string.find(page.game, "no silk mat", 1, true) ~= nil and string.find(page.game, "no hairs are cast", 1, true) ~= nil and string.find(page.game, "five or more centimetres", 1, true) ~= nil, "the game note says where the game departs from the spiders")
+		check(page ~= nil and string.find(page.game, "costumes", 1, true) ~= nil and string.find(page.game, "invented angles", 1, true) ~= nil and string.find(page.game, "no silk mat", 1, true) ~= nil and string.find(page.game, "no hairs are cast", 1, true) ~= nil and string.find(page.game, "small cluster of hairs", 1, true) ~= nil and string.find(page.game, "only a colour", 1, true) == nil and string.find(page.game, "five or more centimetres", 1, true) ~= nil, "the game note says where the game departs from the spiders (the redknee's patch is drawn as hairs, none are cast)")
 		local fresh = FieldNotebook.new()
 		check(#fresh:notice("tarantula") == 1 and fresh:isOpen("tarantula_cousins") and #fresh:notice("tarantula") == 0, "the trigger opens the page, once")
 		check(not FieldNotebook.new():isOpen("tarantula_cousins"), "the page is not open at the start")
+	end
+	-- The audit of 2026-10-19 (docs/NOTEBOOK_SOURCES.md): what each corrected page now says, and the claim it no longer makes.
+	do
+		local by: { [string]: any } = {}
+		for _, p in book.pages do by[p.id] = p end
+		local function has(s: string, part: string): boolean return string.find(s, part, 1, true) ~= nil end
+		check(has(by.grown_up.text, "In the lab, males of the related Phidippus johnsoni matured after 5 to 7 moults and females after 6 to 8.") and not has(by.grown_up.text, "In the field") and not has(by.grown_up.text, "six to eight"), "Grown up gives Jackson's counts as laboratory counts")
+		check(has(by.going_without_food.text, "In the lab, jumping spiders have survived weeks without food, longer when cold and still.") and not has(by.going_without_food.text, "25 to 31") and not has(by.going_without_food.text, "kept for"), "Going without food claims no figure the cited paper does not give")
+		check(has(by.mud_dauber.text, "It searches by sight, then checks a spider with its antennae before it stings.") and not has(by.mud_dauber.text, "finds a spider by sight"), "A hunter of spiders: sight searches, the antennae check")
+		check(has(by.getting_away.text, "The mud dauber searches by sight and then checks with its antennae, so a spider that stays out of sight is safer.") and not has(by.getting_away.text, "finds its prey by sight") and not has(by.getting_away.text, "matters most"), "Getting away: staying out of sight is safer, not all that matters")
+		check(has(by.legs_push.game, "In this game the spider braces and crouches before a jump, then pushes off with its back legs.") and not has(by.legs_push.game, "does not yet") and by.legs_push.godotGame == "Watch the back legs straighten as the spider leaves the surface.", "Legs that push: the game does show the back legs pushing off")
+		check(has(by.bold_jumper.game, "four growth stages (three moults)") and not has(by.bold_jumper.game, "three growth stages") and has(by.bold_jumper.game, "The peacock spider, the ant mimic and the two tarantulas are costumes on the same body"), "The first page names every costume and the four stages")
+		check(has(by.walking_like_an_ant.text, "about a tenth of a second") and not has(by.walking_like_an_ant.text, "83") and has(by.walking_like_an_ant.game, "83 milliseconds"), "Walking like an ant: the page says a tenth of a second (the paper's abstract), the game note keeps its own 83 ms rule")
+		check(has(by.eggs_and_wind.text, "court mostly by sight, and often by vibration too") and not has(by.eggs_and_wind.text, "court by sight") and #by.eggs_and_wind.text <= 520, "Eggs, silk and wind: courtship is mostly by sight and often by vibration")
+		local tries = 0
+		for _, entry in NotebookText.TRY do
+			if string.sub(entry.text, 1, 9) == "Change to" then
+				tries += 1
+				check(has(entry.text, "(in Settings, or while resting)"), `To try "{entry.id}" names both ways of changing spider`)
+			end
+		end
+		check(tries == 3, "the three spiders' invitations (peacock, ant mimic, tarantula) all say so")
 	end
 	-- The thresholds are Godot's.
 	check(NotebookPages.hungryAt == 0.25 and NotebookPages.wellFedAt == 0.85 and NotebookPages.jumpFarWu == 5.0 and NotebookPages.jumpLongWu == 8.0, "Godot's thresholds")

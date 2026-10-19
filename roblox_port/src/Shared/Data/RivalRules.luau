@@ -1,5 +1,5 @@
 --!strict
--- When the brown rival spider arrives (ROBLOX-67). Game tuning, not measurements. Predator/RivalSpider reads these; nothing else decides it.
+-- When the brown rival spider arrives (ROBLOX-68). Game tuning, not measurements. Predator/RivalSpider reads these; nothing else decides it.
 -- One rival at a time on the eastern sill: it arrives, and when it is eaten a new one arrives on a later morning.
 local RivalRules = {}
 

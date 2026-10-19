@@ -220,7 +220,8 @@ local first = {
 	-- ---------------------------------------------------------------- detail modes
 	-- Full is for PCs. Low is for phones and tablets (touch-only devices, or Workspace attribute Detail = "low"): fewer
 	-- hairs (keep one in `every`; 0 drops the whole class, so the low tier has no standing guard hairs), a single fur shell,
-	-- no foot balls, half the speckles, no outline and no idle motion at all (no breathing, head tilt or palp drumming).
+	-- no foot balls, half the speckles, no outline and no idle motion of its own (no breathing, head tilt or palp drumming), except that a rig built `living`
+	-- (the mate in the mating scene) has a minimal idle (ROBLOX-89: its breath and the scene's cues).
 	-- The pattern, eyes, catchlights and tufts stay.
 	detail = {
 		full = {
@@ -366,7 +367,7 @@ local volans = {
 		settle = { seconds = 4.0, riseSeconds = 0.8, fallSeconds = 0.8, lower = 0.016, breath = 1.6 },
 	},
 
-	-- Full is for PCs; low is for phones and tablets: no foot balls, no eye sockets, no leg bands, no idle motion, no outline, no back to the fan, a plainer fan.
+	-- Full is for PCs; low is for phones and tablets: no foot balls, no eye sockets, no leg bands, no idle motion (but a rig built `living`, the mate, has a minimal idle: ROBLOX-89), no outline, no back to the fan, a plainer fan.
 	detail = {
 		full = {
 			every = { lock = 1, guard = 1, fringe = 1, pale = 1, tuft = 1, ruff = 1, palp = 1, leg = 1 },

@@ -295,12 +295,13 @@ do
 	check(page ~= nil and page.trigger == "antennae" and page.title == "Walking like an ant" and table.find(NotebookPages.triggers, "antennae") ~= nil, "the page is there, on its own trigger")
 	check(page ~= nil and #page.text <= 520 and #page.game > 0 and page.game ~= page.text and page.godotGame == nil, "short, with the game's line apart from the biology")
 	local text: string = page and page.text or ""
-	for _, must in { "Myrmarachne formicaria", "all eight legs", "above its head", "antennae", "83 milliseconds", "Phidippus audax", "4.5 times", "3 times", "ants and mimics did not differ" } do
+	for _, must in { "Myrmarachne formicaria", "all eight legs", "above its head", "antennae", "about a tenth of a second", "Phidippus audax", "4.5 times", "3 times", "ants and mimics did not differ" } do
 		check(string.find(text, must, 1, true) ~= nil, `the biology says "{must}"`)
 	end
 	for _, never in { "North America", "lives", "found in", "native", "range", "tropic" } do
 		check(string.find(text, never, 1, true) == nil and string.find(page and page.game or "", never, 1, true) == nil, `the page says nothing about where it lives ("{never}")`)
 	end
+	check(string.find(text, "83", 1, true) == nil and string.find(page and page.game or "", "83 milliseconds", 1, true) ~= nil, "the biology rounds the paper's stops to a tenth of a second (its abstract's figure); the game's line keeps its own rule, the measured mean of 83 ms")
 	check(string.find(page and page.game or "", "stylised", 1, true) ~= nil and string.find(page and page.game or "", "look only", 1, true) ~= nil and string.find(page and page.game or "", "female", 1, true) ~= nil, "the game's line says what is stylised and that it changes nothing else")
 	local src: string = page and page.sources[1] or ""
 	check(page ~= nil and #page.sources == 1 and string.find(src, "Shamble, P. S., Hoy, R. R., Cohen, I. & Beatus, T. (2017). Walking like an ant: a quantitative and experimental approach to understanding locomotor mimicry in the jumping spider Myrmarachne formicaria. Proceedings of the Royal Society B 284: 20170308.", 1, true) == 1 and string.find(src, "https://doi.org/10.1098/rspb.2017.0308", 1, true) ~= nil, "the source is the paper, cited in full")
@@ -308,7 +309,7 @@ do
 	local book = FieldNotebook.new()
 	check(#book.dropped == 0 and book:has("walking_like_an_ant") and not book:isOpen("walking_like_an_ant") and book:view("walking_like_an_ant") == nil, "it is in the notebook and stays shut until found")
 	local try = NotebookText.checklist(book)
-	check(string.find(try, "[ ] Change to the ant mimic while resting, then stand still.", 1, true) ~= nil, "the optional checklist invites it")
+	check(string.find(try, "[ ] Change to the ant mimic (in Settings, or while resting), then stand still.", 1, true) ~= nil, "the optional checklist invites it, by either way of changing spider")
 end
 
 -- ---------------------------------------------------------------- the notebook page and its watcher

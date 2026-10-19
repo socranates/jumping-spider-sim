@@ -1,5 +1,14 @@
 # Handoff: the sill round (ROBLOX-71..83) — spider picker, feel tuning, a living sill, the mating cycle, the tarantula pack
 
+> **Superseded numbers (2026-10-19).** This handoff is history and is not rewritten. Where it differs from the code, the code and ROBLOX-88, -91 and -93 win:
+> contest of an aware rival **40 / 32 / 28** in standard play with a counter-bite of 0.30 (not 55 / 25 / 20, which are now Easy and Free play's, with a free counter-bite);
+> hunger drain **1.9**, a day of 0.612 energy (not 1.1 or 1.55; Easy and Free play 1.1 with the half rate, 0.177 a day); **five** flies to a moult (Easy and Free: three);
+> the rival's grip drain 0.7 and tire 0.10, about 4.5 taps a second to win (not "~4 taps/s wins in 6–9 s");
+> part counts: first spider **693** full / **265** low (not 624 / 266), redknee 146 / 84 and greenbottle 148 / 84 (not 88 / 124 and 78), peacock 119 / 80, decor 1156 / 292;
+> settings: **23 saved plus two live rows** (Spider and Inspect);
+> music: the WAV was uploaded and wired on 2026-10-18 (asset 114531800455832, mix 0.18), so the ROBLOX-76 "needs you" and checklist item 7 are **done**;
+> notebook: 28 pages, 27 reachable. The current suite totals are in `roblox_port/README.md`.
+
 Claude → Chet, 2026-10-18. Branch **claude/roblox-sill** (on top of `claude/roblox-daily` d2fc73d, which is still
 unmerged — this branch contains it, so importing this one bundle gives you everything since main ce64498).
 Bundle: `claude-playtest/claude-sill.bundle`. Import:

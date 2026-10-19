@@ -9,9 +9,12 @@ calls for it.
 ROBLOX-69 gave the rival its own `SpiderMotor` over the whole sill: the same surface-walker the player uses, driven
 by `RivalDrive` (an AI brain that feeds the motor ordinary inputs: a wish direction, a focus point). A second human
 is, mechanically, a replacement for `RivalDrive`: their sticks produce the same inputs the brain does. The drawing
-path for a second spider already exists (the rival's rig; the mate reuses it too). What the game does NOT have is
+path for a second spider already exists (the rival's rig; the mate reuses it too). The mate shares more than the
+rig: `MateDrive` (ROBLOX-79) wraps `RivalDrive` and gives it a record in the rival's vocabulary, with a motor of its
+own, so any change to `RivalDrive`'s contract (a human taking it over, a handback) has to keep the mate's use of it
+working; `tests/rivalnav.luau` and `tests/mating.luau` pin both. What the game does NOT have is
 any server-side simulation: the whole sim (life clock, prey, wasp, rival) runs on the one player's client, and the
-server only holds saves (ROBLOX-4x, the DataStore service). Two humans means crossing that line for the first time,
+server only holds saves (ROBLOX-39..47, the DataStore service). Two humans means crossing that line for the first time,
 and doing it narrowly is the whole trick.
 
 ## Proposed shape (v1: play with someone you invited)
@@ -33,7 +36,12 @@ and doing it narrowly is the whole trick.
 - **Contested moments go through the server** (a thin RemoteEvent referee, the first server gameplay code):
   - the rival's lunge touching the resident (today: client-side `sweepClosest` within 0.6) — both clients report,
     the server stamps the outcome with the shared seed so neither side can cheat the draw;
-  - the resident's strike-contest (ROBLOX-73's 55/25/20 draw) — the server draws it;
+  - the resident's strike-contest (ROBLOX-73's draw: 40/32/28 caught / sprang clear / counter-bite in standard play since ROBLOX-88,
+    55/25/20 in the gentle modes) — the server draws it;
+  - the **grip fight** after a caught rival (ROBLOX-77, tuned in ROBLOX-88): today the rival's side of it is a number
+    (`Data/Catch.rival`, `Predator/RivalGrip`) and the resident taps against it. With a human rival the fight has two sides, and v1 has to say
+    which it is: keep the AI's numbers and let the human only watch the fight, or let the rival's taps count against the resident's. The
+    first is the smaller change and the one to build first; the second is a design call for Nathan;
   - the wasp taking the rival (ROBLOX-70): a human rival gets what the AI never had — a 1.5 s dodge window
     (jump or drop breaks the take). The 10% draw stands; fairness is the window, not the odds.
 - **The retreat rule holds absolutely**: the rival player cannot enter the crack (the motor refuses the keep-out
@@ -64,7 +72,9 @@ and doing it narrowly is the whole trick.
    through the rival's eyes). Playable test: two Studio clients.
 2. Human input on the rival motor + fallback handback to `RivalDrive`.
 3. The referee'd contests (lunge, strike-contest, wasp dodge window) + scorecard.
-4. Cards, words (`RivalText`), gentle modes, Studio spec, FRIEND_PLAYTEST.md update.
+4. Cards, words (`RivalText`), gentle modes, Studio spec, and a friend-playtest page for Roblox. `docs/FRIEND_PLAYTEST.md` is a Godot-era
+   document (it describes the Godot build's playtest), so this is writing a new one, not updating it; the current Roblox playtest is
+   described in `docs/HANDOFF-roblox-*.md`.
 
 Estimate: two to three of our usual rounds, with Studio two-client testing in every one of them (this cannot be
 verified by the CLI suites alone; the referee logic can and must be).

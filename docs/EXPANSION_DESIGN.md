@@ -38,15 +38,15 @@ with an honest game-note. Nathan's list, placed:
 | --- | --- | --- |
 | **Isopods (woodlice)** | Armored walkers in the litter; too tough to bite, roll up when struck (the pill bugs); harmless company | Crustaceans on land; gills that need damp; the roll (conglobation) |
 | **Crickets** | The big risky meal: hind-leg kick knocks the spider back, hearing makes stalking hard, worth three flies | Ears on their front legs; the chirp (wing stridulation, males); escape jump |
-| **Earthworms** | After rain, on the path; NOT prey (far too big for a salticid) — watch the blackbird take one | Soil engineers; skin breathing (why rain brings them up); segments |
+| **Earthworms** | After rain, on the path; NOT prey (far too big for a salticid) — watch the blackbird take one | Soil engineers; they breathe through their skin and come up when the soil floods (the full reason is debated); segments |
 | **Ants** | A trail the ant mimic can walk beside (its page finally pays off in play); a swarm is a place you leave | Trail pheromones; why mimicry works; formic acid |
 | **Aphids + ladybirds** | Aphid colonies on stems; ladybird as a walking tank the spider cannot hurt | Honeydew; farming by ants; warning colors |
 | **Bees & butterflies** | Flower traffic, watch-only; a bee near the retreat is a wasp-grade alarm | Pollination; why a salticid leaves them alone |
 | **Snail** | A moving landscape feature; its trail is a surface with its own grip | The foot, the trail, the shell's spiral |
 | **Birds (robin, wren)** | The garden's wasp, scaled up: a shadow, an alarm, cover-or-die; takes the worm, the cricket, sometimes the rival | The real top of this food chain; shadow response in spiders |
 
-Prey difficulty continues ROBLOX-77's rule: the struggle scales with the meal. Crickets sit above the rival;
-aphids below the fruit fly. Every predator keeps the wasp's grammar: a warning you can learn, an escape that
+Prey difficulty continues ROBLOX-77's rule: the struggle scales with the meal. Crickets would sit between the house fly
+and the rival in difficulty; aphids below the fruit fly. Every predator keeps the wasp's grammar: a warning you can learn, an escape that
 always exists, gentle modes that stay gentle.
 
 ## New playable spiders (the pass shelf grows)

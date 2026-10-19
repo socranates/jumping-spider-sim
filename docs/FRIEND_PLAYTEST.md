@@ -1,3 +1,5 @@
+> **Godot-era document (2026-10-13); the Roblox playtest is described in docs/HANDOFF-roblox-*.md.**
+
 # Friend playtest instructions
 
 THE WINDOWSILL — Whole-life friend playtest, 2026-10-13

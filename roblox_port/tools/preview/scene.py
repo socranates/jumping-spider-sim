@@ -31,7 +31,7 @@ ap.add_argument("--size", default="1280x720")
 ap.add_argument("--format", default="png")
 ap.add_argument("--uv", action="store_true", help="also show the UV layer (as the eye-view helper does) in every view")
 ap.add_argument("--parts", default="")
-ap.add_argument("--world", action="store_true", help="also build the regions outside the window (ROBLOX-95: the outer sill, the wall, the bed) for the outside views")
+ap.add_argument("--world", action="store_true", help="also build the regions outside the window (ROBLOX-95: the outer sill, the wall, the bed) for the outside views, with the bed's prey and woodlice (ROBLOX-96)")
 ap.add_argument("--elevation", type=float, default=30.0, help="sun elevation, degrees")
 ap.add_argument("--set", action="append", default=[], help="lighting knob for scene.gd, key=value (energy, ambient, bias, nbias, blur)")
 ap.add_argument("--azimuth", type=float, default=30.0, help="degrees off straight out of the window (-Z); positive turns toward +X")
@@ -137,8 +137,11 @@ VIEWS = {
     "sash": {"fov": 60, "eye": [0.0, 1.6, -5.0], "at": [0.0, 0.6, -20.0], "near": 0.05, "far": 2500, "groups": []},
     "outside": {"fov": 62, "eye": [7.0, 5.0, -23.0], "at": [0.0, 2.5, -13.0], "near": 0.05, "far": 2500, "groups": ["out"]},
     "wall": {"fov": 60, "eye": [28.0, -25.0, -75.0], "at": [0.0, -45.0, -24.0], "near": 0.1, "far": 2500, "groups": ["wall"], "shadow": 160},
-    "bed": {"fov": 58, "eye": [0.0, -60.0, -100.0], "at": [0.0, -89.0, -47.0], "near": 0.1, "far": 2500, "groups": ["bed"], "shadow": 120},
-    "stone": {"fov": 50, "eye": [11.0, -85.5, -39.0], "at": [11.0, -89.0, -50.0], "near": 0.05, "far": 2500, "groups": ["bed"], "shadow": 40},
+    "bed": {"fov": 58, "eye": [0.0, -60.0, -100.0], "at": [0.0, -89.0, -47.0], "near": 0.1, "far": 2500, "groups": ["bed", "flies"], "shadow": 120},
+    "stone": {"fov": 50, "eye": [11.0, -85.5, -39.0], "at": [11.0, -89.0, -50.0], "near": 0.05, "far": 2500, "groups": ["bed", "flies"], "shadow": 40},
+    # ROBLOX-96: the bed's life close up (the dock with its aphids and a gnat under a leaf, the soil with its woodlice), and the corner under the outer sill with its cobweb
+    "bed_life": {"fov": 46, "eye": [-4.0, -84.5, -31.0], "at": [-12.0, -87.5, -42.0], "near": 0.05, "far": 2500, "groups": ["bed", "flies"], "shadow": 40},
+    "corner_web": {"fov": 36, "eye": [22.0, -1.5, -31.0], "at": [28.6, -4.2, -24.2], "near": 0.05, "far": 2500, "groups": [], "shadow": 40},
     "world": {"fov": 60, "eye": [75.0, -15.0, -100.0], "at": [0.0, -55.0, -30.0], "near": 1.0, "far": 4000, "groups": [], "shadow": 220},
     "descent": {"fov": 60, "eye": [6.0, -36.0, -31.0], "at": [2.0, -40.0, -24.31], "near": 0.05, "far": 2500, "groups": ["wall"], "shadow": 40},
 }

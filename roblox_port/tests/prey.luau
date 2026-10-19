@@ -199,4 +199,32 @@ do
  assert(pausedFruit==60 and pausedFly==0,'a three-second pause: fruit held '..pausedFruit..', house fly held '..pausedFly);passed+=1
  print(string.format('PREY feel: fruit fly idle %.2f s, 2 taps/s won %d/60, 4 taps/s %.2f s; house fly idle %.2f s, 4 taps/s %.2f s',fruitIdle,fw,ft4,flyIdle,ht4))
 end
+-- ---------------------------------------------------------------- the bed's prey (ROBLOX-96): the gnat and the aphid through the same struggle
+do
+ local gnat,aphid=Species.fungus_gnat_prototype,Species.aphid_prototype
+ near(Catch.factorFor(gnat),.6);near(Catch.factorFor(aphid),.5)
+ assert(Catch.factorFor(aphid)<Catch.factorFor(gnat) and Catch.factorFor(gnat)<Catch.factorFor(Species.fruit_fly_prototype),'the aphid is the easiest, then the gnat, then the fruit fly');passed+=1
+ local g=F.new();g:useGameRules()
+ g:capture({profile=gnat,nutrition=gnat.body.nutrition,state='CAPTURED',captureKey='g'})
+ near(g.tapGain,.12/.6);near(g.drainScale,.6)
+ g:capture({profile=aphid,nutrition=aphid.body.nutrition,state='CAPTURED',captureKey='a'})
+ near(g.tapGain,.12/.5);near(g.drainScale,.5)
+ -- the feel: a steady two a second holds a gnat and an aphid every time (it loses a house fly every time); untouched, each lasts longer in the jaws than the fruit fly
+ local function stats(profile: any,rate: number)
+  local won,lost,tl=0,0,0
+  for seed=1,60 do
+   local r=struggle(true,rate,seed*7+1,0,nil,nil,profile)
+   if r.escaped then lost+=1;tl+=r.seconds elseif r.subdued then won+=1 end
+  end
+  return won,lost,if lost>0 then tl/lost else 0
+ end
+ local gw=stats(gnat,2);local aw=stats(aphid,2)
+ assert(gw==60 and aw==60,'two a second: gnat won '..gw..', aphid won '..aw);passed+=1
+ local _,_,gIdle=stats(gnat,0);local _,_,aIdle=stats(aphid,0);local _,_,fIdle=stats(Species.fruit_fly_prototype,0)
+ assert(gIdle>fIdle and aIdle>gIdle and aIdle<3.0,'untouched: gnat '..gIdle..' s, aphid '..aIdle..' s, fruit fly '..fIdle);passed+=1
+ -- a controller never given the game's rules is still Godot's, whatever is caught
+ local d=F.new();d:capture({profile=aphid,nutrition=aphid.body.nutrition,state='CAPTURED',captureKey='k'})
+ assert(d.startGrip==.4 and d.tapGain==.085 and d.drainScale==1,'Godot controller, aphid: still Godot');passed+=1
+ print(string.format('PREY feel (ROBLOX-96): gnat idle %.2f s, aphid idle %.2f s',gIdle,aIdle))
+end
 print('PREY passed='..passed..' failed=0')

@@ -430,7 +430,7 @@ local loaded, loadError = pcall(function() require("../src/Client/SpiderClient.c
 if not loaded then print("LOAD ERROR", loadError) end
 local frame = ClientStubs.renderSteps.SpiderSim
 local function frames(n: number) for _ = 1, n do frame(1 / 60) end end
-local KEYS = { Feed = "E", Forward = "W", Reset = "Backspace" }
+local KEYS = { Feed = "E", Forward = "W", Reset = "Backspace", Drop = "F" }
 local function key(action: string, down: boolean)
 	local fn = ClientStubs.actions["Spider" .. action]
 	assert(fn, "no binding for " .. action)
@@ -653,6 +653,191 @@ check("the roaming rival's legs belong to the sill region and keep out of its cr
 	end
 	assert(moved > 2, `the rival did not walk ({moved})`)
 	assert(crack == 0, "the rival entered the retreat")
+end)
+
+-- ---------------------------------------------------------------- ROBLOX-96 (W3): the garden's life through the real client
+check("prey runs only in the spider's region: on the sill the sill's flies alone; in the bed, once it is whole, the bed's gnats, aphids and woodlice, drawn", function()
+	local driver = ClientStubs.driver
+	local pw = driver.world.prey
+	local garden = driver.world.garden
+	assert(pw ~= nil and garden ~= nil and driver.world.bugs ~= nil, "the client made the world's prey and the drawn bugs")
+	driver.place(Vector3.new(-5, 0.31, -9))
+	frames(5)
+	assert(#pw.active == 1 and pw.active[1] == "sill", `on the sill only the sill's prey runs ({table.concat(pw.active, ",")})`)
+	assert(#pw:flies() == #driver.prey.flies and #pw:flies() >= 1, "the drawn flies are the sill's")
+	-- (the walk of ROBLOX-95's check above already took the spider into the bed and made its director: taken away here, as if it had never been made, for the gate)
+	garden.bed_a = nil
+	pw.made = 0
+	local flyFolder = workspace:FindFirstChild("Flies") :: Instance
+	for _, f in flyFolder:GetChildren() do assert(string.sub(f.Name, 1, 4) == "fly_", "a drawn fly of the sill: " .. f.Name) end
+	-- the bed, not whole: a box taken away before the spider arrives
+	local bedFolder = (driver.world.root :: Instance):FindFirstChild("bed_a") :: Instance
+	local taken = bedFolder:FindFirstChild("bed_a_mound_1") :: Instance
+	taken.Parent = nil
+	driver.world.whole.bed_a = nil
+	driver.world.warned.bed_a = nil
+	local seen = warnings(function()
+		driver.place(Vector3.new(-20, -89.69, -30))
+		frames(10)
+	end)
+	assert(driver.world.region.id == "bed_a" and garden.bed_a == nil and #pw:flies() == 0, "a bed that is not whole has no prey, however long the spider stands in it")
+	assert(#seen == 1 and string.find(seen[1], "bed_a", 1, true) ~= nil and string.find(seen[1], "not arrived whole", 1, true) ~= nil, "and the once-per-region warning says so: " .. table.concat(seen, " | "))
+	taken.Parent = bedFolder
+	seen = warnings(function() frames(10) end)
+	assert(#seen == 0, "whole again: no more warnings")
+	assert(garden.bed_a ~= nil and garden.bed_a.prey ~= nil and garden.bed_a.bugs ~= nil, "the bed's prey and woodlice are made once it is whole")
+	assert(#pw.active == 1 and pw.active[1] == "bed_a", "in the bed only the bed's prey runs")
+	local d = garden.bed_a.prey
+	assert(#d.flies == 6 and d.feeding == driver.prey.feeding, "six prey, eating with the sill's jaws")
+	local gnats, aphids = 0, 0
+	for _, f in flyFolder:GetChildren() do
+		if string.find(f.Name, "bed_a_fly_", 1, true) then
+			local kind = (workspace:FindFirstChild("Flies") :: Instance) ~= nil and f:FindFirstChild("Cornicle") == nil and f:FindFirstChild("RightWing") ~= nil
+			if f:FindFirstChild("RightCornicle") then aphids += 1 elseif f:FindFirstChild("RightWing") then gnats += 1 end
+		else
+			error("a sill fly drawn in the bed: " .. f.Name)
+		end
+	end
+	assert(gnats == 3 and aphids == 3, `drawn: {gnats} gnats and {aphids} aphids`)
+	local bugs = workspace:FindFirstChild("Bugs") :: Instance
+	assert(bugs ~= nil and #bugs:GetChildren() == 4, "four woodlice drawn")
+	for _, w in bugs:GetChildren() do assert(#w:GetChildren() == 24, "a woodlouse is 24 parts") end
+	assert(driver.world:regionReady("bed_a"), "the bed is whole")
+end)
+
+check("crossing a seam rerolls nothing: the bed's prey waits while the spider is on the wall and takes up where it was", function()
+	local driver = ClientStubs.driver
+	local pw, garden = driver.world.prey, driver.world.garden
+	driver.place(Vector3.new(-20, -89.69, -30))
+	frames(120)
+	local d = garden.bed_a.prey
+	local before = {}
+	for i, f in d.flies do before[i] = { id = f.id, pos = f.position, rng = f.rng.state } end
+	local made, now = pw.made, d.now
+	driver.place(Vector3.new(36, 0.31, -18.75)) -- (the top of the wall's east shoulder, the wall's own spawn: the sill no neighbour, the bed's farthest perch beyond 96)
+	frames(60)
+	assert(driver.world.region.id == "house_wall" and #pw.active == 0 and d.now == now, `high on the wall nothing runs and the bed's clock has stopped ({driver.world.region.id}: {table.concat(pw.active, ",")})`)
+	assert(#(workspace:FindFirstChild("Flies") :: Instance):GetChildren() == 0 and #(workspace:FindFirstChild("Bugs") :: Instance):GetChildren() == 0, "nothing drawn there")
+	driver.place(Vector3.new(-20, -89.69, -30))
+	frames(1)
+	assert(garden.bed_a.prey == d and pw.made == made, "the same director, not another")
+	for i, f in d.flies do
+		local b = before[i]
+		assert(b ~= nil and b.id == f.id and (b.pos - f.prevPosition).Magnitude < 1e-9, `{f.id} took up where it was`)
+	end
+	driver.place(Vector3.new(-5, 0.31, -9))
+	frames(5)
+	assert(#pw.active == 1 and pw.active[1] == "sill" and garden.bed_a.prey == d, "home: the sill's prey runs again and the bed's director is kept")
+end)
+
+check("the descent: from the slab's front edge the spider lets itself down the wall on its line at 0.75 studs a second, lands on the soil, releases the line, and is in bed_a with its focus reported", function()
+	local driver = ClientStubs.driver
+	local motor = driver.motor
+	local fired = function(): { any } return rawget(focusRemote, "fired") or {} end
+	assert(motor.silk.maximum == 100 and motor.silk.lowerSpeed == 0.75, `the game's line: 100 studs at most, let down at 0.75 ({motor.silk.maximum}, {motor.silk.lowerSpeed})`)
+	driver.place(Vector3.new(2, 0.31, -23.2))
+	motor:place(Vector3.new(2, 0.31, -23.2), Vector3.yAxis, Vector3.new(0, 0, -1))
+	driver.camera:snap()
+	frames(5)
+	assert(driver.world.region.id == "outer_sill", "on the outer sill, at its front edge")
+	local seen = warnings(function()
+		key("Drop", true)
+		local dropped, lowest, landedAt = false, 0.31, nil
+		local lowerRate = 0
+		for i = 1, 60 * 150 do
+			frames(1)
+			if motor:onLine() then dropped = true end
+			lowest = math.min(lowest, motor.pos.Y)
+			if dropped and i % 600 == 0 and motor:onLine() and motor.pos.Y > -80 then
+				local y0 = motor.pos.Y
+				frames(60)
+				lowerRate = y0 - motor.pos.Y
+			end
+			if dropped and motor.mode == "attached" and driver.world.region.id == "bed_a" then landedAt = i; break end
+		end
+		key("Drop", false)
+		frames(2)
+		assert(dropped, "the spider never let itself down")
+		assert(landedAt ~= nil, `the spider did not land on the bed within 150 s (at {motor.pos}, mode {motor.mode}, line {motor.silk.mode}, lowest {lowest})`)
+		print(`world_client: the descent took {landedAt / 60} s; lowering measured at {lowerRate} studs a second`)
+		assert(lowerRate > 0.6 and lowerRate < 0.9, `let down at about 0.75 studs a second ({lowerRate})`)
+		assert(landedAt / 60 > 100 and landedAt / 60 < 150, `about two minutes for the 90 studs ({landedAt / 60} s)`)
+	end)
+	assert(#seen == 0, "no world warning on the way down: " .. table.concat(seen, " | "))
+	assert(motor.mode == "attached" and motor.up.Y > 0.9 and math.abs(motor.pos.Y - (-90 + 0.31)) < 0.1, `standing on the soil ({motor.pos}, up {motor.up})`)
+	assert(motor.silk.mode == "none" and not motor:onLine(), "the line is released")
+	assert(driver.world.region.id == "bed_a" and LifeClock.game.clockScale == 0.33, "in the bed, at its pace")
+	local reports = fired()
+	local last = reports[#reports][1]
+	assert((last - motor.pos).Magnitude <= 8 + 1e-6, `the focus report followed ({(last - motor.pos).Magnitude} studs behind)`)
+	assert(driver.world.garden.bed_a ~= nil and #driver.world.prey.active == 1 and driver.world.prey.active[1] == "bed_a", "and the bed's prey runs")
+end)
+
+check("the stone is a home in the words: near it the line says so, under it the prompt and a kept rest say under the stone; the crack's words are as they were", function()
+	local driver = ClientStubs.driver
+	local life = driver.life
+	local hud = driver.hud
+	driver.place(Vector3.new(11, -89.69, -44))
+	frames(5)
+	assert(driver.world:homeRetreat(driver.motor.pos) == "bed_a_stone" and driver.world.lastRetreat == "bed_a_stone", "in the bed the home is the stone")
+	assert(hud.promptTitle.Text == "Home: under the stone" and string.find(hud.promptHint.Text, "gap under the big stone", 1, true) ~= nil, `near the stone: "{hud.promptTitle.Text}" / "{hud.promptHint.Text}"`)
+	driver.place(Vector3.new(11, -89.69, -50))
+	frames(5)
+	assert(hud.promptTitle.Text == "Under the stone", `under it, able to rest: "{hud.promptTitle.Text}"`)
+	life.clock.hour = 12
+	key("Feed", true); frames(2); key("Feed", false); frames(2)
+	assert(life.resting and life.notice == "Last rest kept, under the stone.", `the kept rest says where: "{life.notice}"`)
+	assert(hud.promptTitle.Text == "Resting under the stone", `resting: "{hud.promptTitle.Text}"`)
+	local best = driver.currentStore():loadBest()
+	assert(best.ok and best.record.world.roots.garden ~= nil, "the rest records the garden's prey")
+	-- home: the crack's words, word for word
+	driver.place(Vector3.new(-20, 0.31, 6))
+	frames(5)
+	assert(driver.world:homeRetreat(driver.motor.pos) == "sill_crevice", "on the sill the home is the crack")
+	assert(hud.promptTitle.Text == "Home: the silk-lined crack" and hud.promptHint.Text == "Walk through the silk-framed opening under the wooden roof, then stop to rest.", `near the crack: "{hud.promptTitle.Text}" / "{hud.promptHint.Text}"`)
+	driver.place(Vector3.new(-25.5, 0.31, 6))
+	frames(5)
+	assert(hud.promptTitle.Text == "The silk-lined crack", `in the crack: "{hud.promptTitle.Text}"`)
+	key("Feed", true); frames(2); key("Feed", false); frames(2)
+	assert(life.resting and life.notice == "Last rest kept." and hud.promptTitle.Text == "Resting in the silk-lined crack", `the crack's rest: "{life.notice}" / "{hud.promptTitle.Text}"`)
+end)
+
+check("a return to a rest under the stone puts the bed's prey back where it was", function()
+	local driver = ClientStubs.driver
+	local life = driver.life
+	local garden = driver.world.garden
+	driver.place(Vector3.new(-5, 0.31, -9)) -- (out of the crack first: the rest the check above left going ends)
+	frames(5)
+	assert(not life.resting, "the crack's rest has ended")
+	driver.place(Vector3.new(11, -89.69, -50))
+	frames(30)
+	life.clock.hour = 12
+	key("Feed", true); frames(2); key("Feed", false); frames(2)
+	assert(life.resting, "resting under the stone: " .. tostring(life.notice))
+	local d = garden.bed_a.prey
+	local kept = {}
+	for i, f in d.flies do kept[i] = { id = f.id, pos = f.position, nutrition = f.nutrition, profile = f.profile } end
+	local lice = {}
+	for i, l in garden.bed_a.bugs.lice do lice[i] = l.position end
+	-- the garden goes on without the spider for a while, then the rest is returned to
+	driver.motor:place(Vector3.new(11, -89.69, -50), Vector3.yAxis, Vector3.new(0, 0, 1))
+	driver.camera:snap()
+	key("Forward", true); frames(300); key("Forward", false); frames(300)
+	local moved = false
+	for i, f in d.flies do if kept[i] == nil or kept[i].id ~= f.id or (kept[i].pos - f.position).Magnitude > 0.01 then moved = true end end
+	assert(moved, "the prey moved on meanwhile")
+	key("Reset", true); frames(1); key("Reset", false); frames(2)
+	assert(life.resting and driver.world:inRetreat(driver.motor.pos) == "bed_a_stone", "back under the stone")
+	local d2 = garden.bed_a.prey
+	assert(d2 ~= nil and #d2.flies == #kept, "the bed's prey is back")
+	for i, f in d2.flies do
+		local k = kept[i]
+		assert(k.id == f.id and (k.pos - f.position).Magnitude < 1e-9 and k.nutrition == f.nutrition and k.profile == f.profile, `{f.id} is where it was, as it was`)
+	end
+	assert(d2.feeding == driver.prey.feeding, "and still eats with the sill's jaws")
+	for i, l in garden.bed_a.bugs.lice do assert((lice[i] - l.position).Magnitude < 1e-9, "the woodlice are where they were") end
+	driver.place(Vector3.new(-5, 0.31, -9))
+	frames(5)
 end)
 
 print("WORLD_CLIENT passed=" .. passed .. " failed=" .. failed)

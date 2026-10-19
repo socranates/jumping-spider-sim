@@ -6,6 +6,8 @@
 -- trail. Every part is anchored, never collides, is never seen by a ray and casts no shadow (Habitat/Shapes); a soft dark oval on the
 -- surface under a standing fly stands in for its shadow. One Workspace:BulkMoveTo places all the flies' parts each frame.
 -- Display only: the fly's position, heading and normal come from the prey simulation (in the air its back is up); nothing here feeds back.
+-- ROBLOX-96: the bed's prey are drawn from FlyLook.small by `buildSmall`, a template per prey kind (Species body.prey_kind: the fungus gnat, the aphid), each
+-- under the fly's part budget; a fly whose kind has no sheet (the house fly, the fruit fly) is the house fly's template at its visual_scale, as before.
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
@@ -165,20 +167,99 @@ local function build(): Template
 	return { specs = specs, restFrames = restFrames, flightFrames = flightFrames, changing = changing, fans = fans }
 end
 
+-- ROBLOX-96: a smaller prey from one of FlyLook.small's sheets: its ellipsoids, its rods (mirrored where the sheet says, with a flight pose where it differs),
+-- one pair of plain wings when it has any (folded at rest, a fan in flight, as the fly's without the vein and the film), and the shadow.
+local function buildSmall(L: any): Template
+	local specs: { Spec } = {}
+	local fans: { [number]: boolean } = {}
+	local function color(name: string): Color3
+		return Color3.fromHex(L.colors[name])
+	end
+	local function same(pose: Pose): Pose
+		return { size = pose.size, frame = pose.frame, transparency = pose.transparency }
+	end
+	local function add(name: string, rod: boolean, tint: Color3, material: string, reflectance: number, rest: Pose, flight: Pose?): number
+		table.insert(specs, { name = name, rod = rod, color = tint, material = material, reflectance = reflectance, rest = rest, flight = flight or same(rest) })
+		return #specs
+	end
+	for _, item in L.body do
+		local centre, size = vec(item.at), vec(item.size)
+		local frame = CFrame.new(centre)
+		if item.turn then frame *= CFrame.Angles(math.rad(item.turn[1]), math.rad(item.turn[2]), math.rad(item.turn[3])) end
+		add(item.name, false, color(item.color), "SmoothPlastic", item.reflectance or 0, { size = size, frame = frame, transparency = 0 })
+	end
+	for _, item in L.rods do
+		local sides: { number } = if item.mirror then { -1, 1 } else { 1 }
+		for _, side in sides do
+			local word = if not item.mirror then "" elseif side < 0 then "Left" else "Right"
+			local size0, frame0 = rodBetween(mirrored(vec(item.from), side), mirrored(vec(item.to), side), item.d, 0, 0)
+			local flight: Pose? = nil
+			if item.fly then
+				local size1, frame1 = rodBetween(mirrored(vec(item.fly[1]), side), mirrored(vec(item.fly[2]), side), item.d, 0, 0)
+				flight = { size = size1, frame = frame1, transparency = 0 }
+			end
+			add(word .. item.name, true, color(item.color), "SmoothPlastic", 0, { size = size0, frame = frame0, transparency = 0 }, flight)
+		end
+	end
+	local W = L.wing
+	if W ~= nil then
+		for _, side in { -1, 1 } do
+			local word = if side < 0 then "Left" else "Right"
+			local pitch, yaw = math.rad(W.pitch), math.rad(W.yaw)
+			local along = Vector3.new(side * math.sin(yaw) * math.cos(pitch), math.sin(pitch), math.cos(yaw) * math.cos(pitch)).Unit
+			local root = mirrored(vec(W.root), side)
+			local centre = root + along * (W.length / 2)
+			local up = (Vector3.yAxis - along * along.Y).Unit
+			local wing = CFrame.fromMatrix(centre, up:Cross(along), up) * CFrame.Angles(0, 0, -side * math.rad(W.roll))
+			local yawBack = math.rad(W.fan.yaw)
+			local reachDir = Vector3.new(side * math.cos(yawBack), 0, math.sin(yawBack))
+			local fanRoot = Vector3.new(side * W.root[1], W.root[2] + W.fan.rise, W.root[3] + W.fan.back)
+			local fan = CFrame.new(fanRoot + reachDir * (W.fan.reach / 2)) * CFrame.Angles(0, -side * yawBack, 0) * CFrame.Angles(0, 0, side * math.rad(W.fan.roll))
+			fans[add(`{word}Wing`, false, color("wing"), "Glass", W.reflectance,
+				{ size = Vector3.new(W.width, W.thick, W.length), frame = wing, transparency = W.transparency },
+				{ size = Vector3.new(W.fan.reach, W.thick, W.fan.span), frame = fan, transparency = W.fan.transparency })] = true
+		end
+	end
+	local S = L.shadow
+	local shadowSize = vec(S.size)
+	local shadowFrame = CFrame.new(0, -FlyLook.hover + S.lift + shadowSize.Y / 2, 0.005)
+	add("Shadow", false, color("shadow"), "SmoothPlastic", 0, { size = shadowSize, frame = shadowFrame, transparency = S.transparency }, { size = shadowSize, frame = shadowFrame, transparency = 1 })
+	local restFrames: { CFrame } = {}
+	local flightFrames: { CFrame } = {}
+	local changing: { number } = {}
+	for i, spec in specs do
+		restFrames[i], flightFrames[i] = spec.rest.frame, spec.flight.frame
+		if spec.rest.size ~= spec.flight.size or spec.rest.transparency ~= spec.flight.transparency then table.insert(changing, i) end
+	end
+	return { specs = specs, restFrames = restFrames, flightFrames = flightFrames, changing = changing, fans = fans }
+end
+
 function FlyBodies.new(parent: Instance): any
 	local folder = Instance.new("Folder")
 	folder.Name = "Flies"
 	folder.Parent = parent
-	return setmetatable({ folder = folder, rigs = {}, template = build(), parts = {}, frames = {} }, FlyBodies)
+	return setmetatable({ folder = folder, rigs = {}, template = build(), templates = {} :: { [string]: Template }, parts = {}, frames = {} }, FlyBodies)
 end
 
--- One fly's parts, standing.
-function FlyBodies.spawn(self: any, id: string): any
+-- The template a prey kind is drawn from (Species body.prey_kind): one of FlyLook.small's, built when first asked for, or the house fly's.
+function FlyBodies.templateFor(self: any, kind: string?): Template
+	if kind == nil or FlyLook.small[kind] == nil then return self.template end
+	local t = self.templates[kind]
+	if t == nil then
+		t = buildSmall(FlyLook.small[kind])
+		self.templates[kind] = t
+	end
+	return t
+end
+
+-- One fly's parts, standing. `kind`: its prey kind (nil: the house fly's template).
+function FlyBodies.spawn(self: any, id: string, kind: string?): any
 	local folder = Instance.new("Folder")
 	folder.Name = id
 	folder.Parent = self.folder
+	local template = self:templateFor(kind)
 	local parts: { Part } = {}
-	for i, spec in self.template.specs do
+	for i, spec in template.specs do
 		local pose = spec.rest
 		local part: Part
 		if spec.rod then
@@ -191,7 +272,7 @@ function FlyBodies.spawn(self: any, id: string): any
 		part.Transparency = pose.transparency
 		parts[i] = part
 	end
-	local rig = { folder = folder, parts = parts, flying = false }
+	local rig = { folder = folder, parts = parts, flying = false, kind = kind, template = template }
 	self.rigs[id] = rig
 	return rig
 end
@@ -199,7 +280,8 @@ end
 -- Switches a fly's parts that differ between the poses (the legs' reach, the wings, their veins and films, the shadow).
 function FlyBodies.pose(self: any, rig: any, flying: boolean)
 	rig.flying = flying
-	for i, spec in self.template.specs do
+	local template: Template = rig.template or self.template
+	for i, spec in template.specs do
 		local pose = if flying then spec.flight else spec.rest
 		rig.parts[i].Size = pose.size * (rig.scale or 1)
 		rig.parts[i].Transparency = if rig.scale == 0.6 and string.find(spec.name, "Stripe") then 1 else pose.transparency
@@ -210,7 +292,6 @@ function FlyBodies.pose(self: any, rig: any, flying: boolean)
 end
 
 function FlyBodies.draw(self: any, flies: { any }, now: number)
-	local template: Template = self.template
 	local parts: { BasePart } = self.parts
 	local frames: { CFrame } = self.frames
 	table.clear(parts)
@@ -219,7 +300,14 @@ function FlyBodies.draw(self: any, flies: { any }, now: number)
 	local shimmer = FlyLook.wing.fan.shimmer
 	for _, fly in flies do
 		present[fly.id] = true
-		local rig = self.rigs[fly.id] or self:spawn(fly.id)
+		local kind: string? = if fly.profile and FlyLook.small[fly.profile.body.prey_kind or ""] ~= nil then fly.profile.body.prey_kind else nil
+		local rig = self.rigs[fly.id]
+		if rig ~= nil and rig.kind ~= kind then
+			rig.folder:Destroy()
+			rig = nil
+		end
+		rig = rig or self:spawn(fly.id, kind)
+		local template: Template = rig.template or self.template
 		local flying = fly:airborne() or fly.state == "CAPTURED"
 		local scale = if fly.profile then fly.profile.body.visual_scale or 1 else 1
 		if flying ~= rig.flying or rig.scale ~= scale then rig.scale = scale; self:pose(rig, flying) end

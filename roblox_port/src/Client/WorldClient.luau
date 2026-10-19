@@ -22,6 +22,9 @@
 -- in has arrived whole (`regionReady`: its folder holds every piece of Region.pieces); a spider in a region that is not whole is warned about once per region in Output, since
 -- a missing box is a fall. The looks of the regions outside (WorldDecor, persistent models like the Decor) are waited for as the Decor is. The player's motor is out of the
 -- world only where no region holds it (`inBounds`); the rival's and the mate's are bound to the sill and keep its bounds (`homeMin`, `homeMax`).
+-- ROBLOX-96 (W3): the garden has life. `prey` is the world's prey (Prey/PreyWorld: a director per region, run where the spider is and gated by `regionReady`) and
+-- `bugs` the drawn woodlice (Client/BugBodies); both are made by the client once it has its sill director, and kept here so the client gains no local. `homeRetreat`
+-- is the retreat the words call home: the one the spider is in, else the first of the region it is in, else the last one it was in (the crack to begin with).
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local WorldMap = require(Shared:WaitForChild("World"):WaitForChild("WorldMap"))
@@ -82,7 +85,29 @@ function WorldClient.new(ws: Instance, player: Instance, map: any?): any
 		remote = nil :: Instance?, reported = nil :: Vector3?, reportedAt = -math.huge, reports = 0,
 		-- the readiness guard: regions found whole, and regions already warned about
 		whole = {} :: { [string]: boolean }, warned = {} :: { [string]: boolean },
+		-- ROBLOX-96: the world's prey and the drawn bugs (set by the client), and the last retreat the spider was in or beside
+		prey = nil :: any, bugs = nil :: any, lastRetreat = if #home.retreats > 0 then home.retreats[1].id else nil,
 	}, WorldClient)
+end
+
+-- The retreat the words call home at this place (ROBLOX-96): the retreat the spider is in; else the first retreat of the region it is in; else the last one it was in
+-- or beside. Remembers what it answers.
+function WorldClient.homeRetreat(self: any, pos: Vector3): string?
+	local inside = self.map.inRetreat(pos)
+	if inside ~= nil then self.lastRetreat = inside; return inside end
+	local region = self:regionAt(pos)
+	if #region.retreats > 0 then self.lastRetreat = region.retreats[1].id; return region.retreats[1].id end
+	return self.lastRetreat
+end
+
+-- Whether the spider is within `near` studs of the retreat's door (WorldMap's `door`, the point the line near home has always been measured from; its box's centre
+-- for a retreat without one), for the line near home.
+function WorldClient.nearRetreat(self: any, pos: Vector3, retreat: string?, near: number): boolean
+	if retreat == nil or self.map.retreat == nil then return false end
+	local t = self.map.retreat(retreat)
+	if t == nil then return false end
+	local door: Vector3 = t.door or (t.min + t.max) * 0.5
+	return (pos - door).Magnitude < near
 end
 
 -- Whether the point is inside some region's bounds: the player's motor is out of the world only where no region holds it (SpiderMotor's `inBounds`), so a fall from the

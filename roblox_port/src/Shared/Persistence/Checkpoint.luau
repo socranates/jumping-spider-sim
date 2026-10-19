@@ -32,6 +32,10 @@
 -- ROBLOX-95: the world is at revision world-2 (the sill's back frame opened, the garden added) and a record without `world_map` is read as world-1's, the sill
 -- of before: every rest kept before this round is put back at its region's spawn with the notice. A rest in the garden (the gap under the bed's stone) records
 -- region bed_a and retreat bed_a_stone and is put back there. SCHEMA_VERSION and CONTENT_REVISION do not change (a new content revision would refuse old records).
+-- ROBLOX-96: the prey is per region. The `prey` root is still the sill's director, byte for byte what it was (an old record, sill-only prey, restores unchanged);
+-- the regions outside are an optional `garden` root, { [regionId] = { prey = a PreyDirector?, bugs = a Woodlice? } } (Prey/PreyWorld's table), recorded when the
+-- world has one and checked like the sill's: every fly in a known state with a meal inside its own profile's, every held perch held by a living fly, the woodlice
+-- inside their region. A record without one leaves the live garden as it is (nothing rerolls); one with a region the map lacks is refused.
 
 local Species = require(script.Parent.Parent.Data.Species)
 local ObjectRecord = require(script.Parent.ObjectRecord)
@@ -53,6 +57,8 @@ local LifeClock = require(script.Parent.Parent.Life.LifeClock)
 local Growth = require(script.Parent.Parent.Life.Growth)
 local WorldMap = require(script.Parent.Parent.World.WorldMap)
 local WaspDirector = require(script.Parent.Parent.Predator.WaspDirector)
+local Woodlice = require(script.Parent.Parent.Prey.Woodlouse)
+local Garden = require(script.Parent.Parent.World.Garden)
 
 local RivalSpider = require(script.Parent.Parent.Predator.RivalSpider)
 local Mate = require(script.Parent.Parent.Predator.Mate)
@@ -71,7 +77,7 @@ Checkpoint.ROOTS = { "prey", "sensor", "memory", "needs", "life" }
 -- The classes a world record may hold.
 Checkpoint.CLASSES = {
 	Fly = Fly, FlyFlight = FlyFlight, FlySenses = FlySenses, PreyRandom = PreyRandom, PreyPopulation = PreyPopulation,
-	PerchGraph = PerchGraph, Feeding = Feeding, PreyDirector = PreyDirector,
+	PerchGraph = PerchGraph, Feeding = Feeding, PreyDirector = PreyDirector, Woodlice = Woodlice,
 	Sensor = Sensor, SensorCore = SensorCore, ObservationMemory = ObservationMemory, Contact = ObservationMemory.Contact,
 	Observation = Observation,
 	NeedsModel = NeedsModel, LifeLoop = LifeLoop, LifeClock = LifeClock, Growth = Growth,
@@ -83,6 +89,7 @@ export type World = {
 	motor: any, prey: any, sensor: any, memory: any, needs: any, life: any,
 	breakaway: any?,
 	wasp: any?, -- the WaspDirector (nil: no wasp in this world)
+	garden: { [string]: any }?, -- ROBLOX-96: the regions' prey and bugs outside the sill (Prey/PreyWorld's table; nil: a world of the sill alone)
 	extraRefs: { [string]: any }?, -- anything else the world's state points at that the record should keep by name
 }
 
@@ -91,6 +98,8 @@ function Checkpoint.refs(world: World): { [string]: any }
 	local prey = world.prey
 	ObjectRecord.constants("flyProfile", prey.p, refs)
 	ObjectRecord.constants("fruitFlyProfile", Species.fruit_fly_prototype, refs)
+	ObjectRecord.constants("gnatProfile", Species.fungus_gnat_prototype, refs) -- (ROBLOX-96: the bed's prey)
+	ObjectRecord.constants("aphidProfile", Species.aphid_prototype, refs)
 	local g = prey.graph
 	refs["graph.cast"], refs["graph.sweep"], refs["graph.overlap"] = g.cast, g.sweep, g.overlap
 	if prey.probe ~= nil then refs["prey.probe"] = prey.probe end
@@ -108,7 +117,9 @@ function Checkpoint.refs(world: World): { [string]: any }
 end
 
 local function liveRoots(world: World): { [string]: any }
-	return { prey = world.prey, sensor = world.sensor, memory = world.memory, needs = world.needs, life = world.life }
+	local roots: { [string]: any } = { prey = world.prey, sensor = world.sensor, memory = world.memory, needs = world.needs, life = world.life }
+	if world.garden ~= nil then roots.garden = world.garden end
+	return roots
 end
 
 local function v3(v: Vector3): { number }
@@ -199,9 +210,14 @@ function Checkpoint.capture(world: World, createdAt: number?): ({ [string]: any 
 	local cpu, ring = prey.cpu, sensor._ring
 	if cpu ~= nil then prey.cpu = {} end
 	if ring ~= nil then sensor._ring = {} end
+	local gardenCpu: { [any]: any } = {}
+	for _, entry in (world.garden or {}) :: { [string]: any } do
+		if type(entry) == "table" and entry.prey ~= nil and entry.prey.cpu ~= nil then gardenCpu[entry.prey] = entry.prey.cpu; entry.prey.cpu = {} end
+	end
 	local graph, why = ObjectRecord.capture(liveRoots(world), Checkpoint.CLASSES, Checkpoint.refs(world))
 	if cpu ~= nil then prey.cpu = cpu end
 	if ring ~= nil then sensor._ring = ring end
+	for d, window in gardenCpu do d.cpu = window end
 	if not graph then return nil, why end
 	local region = WorldMap.at(motor.pos) or WorldMap.region(WorldMap.HOME) :: WorldMap.Region
 	local retreat = WorldMap.inRetreat(motor.pos) or ""
@@ -260,37 +276,69 @@ local function checkWorld(roots: { [string]: any }, problems: { string })
   if v ~= nil and not (finite(v) and v >= 0 and v <= 1e9 and v % 1 == 0) then bad("life: invalid " .. k) end
  end
  if type(life.resting) ~= "boolean" then bad("life: 'resting' is not true or false") end
-	-- The flies: unique ids, a known state, finite places, perches held only by flies that exist.
-	if type(prey.flies) ~= "table" then
-		bad("prey: no list of flies")
-		return
-	end
-	local ids: { [string]: any } = {}
+	-- The flies: unique ids, a known state, finite places, a meal no bigger than the profile's (ROBLOX-96: each profile's own; the fruit fly's was special-cased
+	-- before), perches held only by flies that exist. The same checks for each region's director outside (the `garden` root); `ids` is every fly of the world.
+	local every: { [any]: boolean } = {} -- every fly of the world, by identity
 	local states = { PERCHED = true, ALERT = true, TAKEOFF = true, FLEE = true, SEEK_PERCH = true, REPOSITION = true, CAPTURED = true, CONSUMED = true }
-	for i, f in prey.flies do
-		if getmetatable(f) ~= Fly or type(f.id) ~= "string" then
-			bad(`prey: fly {i} is not a fly`)
-			continue
+	local function checkFlies(director: any, label: string): boolean
+		if type(director.flies) ~= "table" then
+			bad(`{label}: no list of flies`)
+			return false
 		end
-		if ids[f.id] then bad(`prey: two flies called {f.id}`) end
-		ids[f.id] = f
-		if not states[f.state] then bad(`prey: {f.id} is in no known state`) end
-		if typeof(f.position) ~= "Vector3" and type(f.position) ~= "table" then bad(`prey: {f.id} has no position`) end
-		if not finite(f.nutrition) or f.nutrition < 0 or f.nutrition > (if f.profile==Species.fruit_fly_prototype then .18 else f.profile.body.nutrition) + 1e-9 then bad(`prey: {f.id}'s nutrition is out of range`) end
-		if f.flight == nil or f.flight.fly ~= f then bad(`prey: {f.id}'s flight is not its own`) end
+		local ids: { [string]: any } = {}
+		for i, f in director.flies do
+			if getmetatable(f) ~= Fly or type(f.id) ~= "string" then
+				bad(`{label}: fly {i} is not a fly`)
+				continue
+			end
+			if ids[f.id] then bad(`{label}: two flies called {f.id}`) end
+			ids[f.id] = f
+			every[f] = true
+			if not states[f.state] then bad(`{label}: {f.id} is in no known state`) end
+			if typeof(f.position) ~= "Vector3" and type(f.position) ~= "table" then bad(`{label}: {f.id} has no position`) end
+			if type(f.profile) ~= "table" or type(f.profile.body) ~= "table" or not finite(f.profile.body.nutrition) then bad(`{label}: {f.id} has no profile`)
+			elseif not finite(f.nutrition) or f.nutrition < 0 or f.nutrition > f.profile.body.nutrition + 1e-9 then bad(`{label}: {f.id}'s nutrition is out of range`) end
+			if f.flight == nil or f.flight.fly ~= f then bad(`{label}: {f.id}'s flight is not its own`) end
+		end
+		if type(director.graph) == "table" and type(director.graph.perches) == "table" then
+			for _, p in director.graph.perches do
+				if p.occupant ~= "" and (ids[p.occupant] == nil or not ids[p.occupant]:alive()) then bad(`{label}: perch {p.id} is held by {p.occupant}, which is not a living fly`) end
+				if p.reserved ~= "" and ids[p.reserved] == nil then bad(`{label}: perch {p.id} is reserved by {p.reserved}, which is not a fly`) end
+			end
+		else
+			bad(`{label}: no perches`)
+		end
+		return true
 	end
-	if type(prey.graph) == "table" and type(prey.graph.perches) == "table" then
-		for _, p in prey.graph.perches do
-			if p.occupant ~= "" and (ids[p.occupant] == nil or not ids[p.occupant]:alive()) then bad(`prey: perch {p.id} is held by {p.occupant}, which is not a living fly`) end
-			if p.reserved ~= "" and ids[p.reserved] == nil then bad(`prey: perch {p.id} is reserved by {p.reserved}, which is not a fly`) end
+	if not checkFlies(prey, "prey") then return end
+	-- ROBLOX-96: the regions outside. Each a region of the map with prey of its own, its director a director sharing the jaws, its woodlice inside the region.
+	local garden = roots.garden
+	if garden ~= nil then
+		if type(garden) ~= "table" or getmetatable(garden) ~= nil then
+			bad("garden: not a record of regions")
+		else
+			for id, entry in garden do
+				local region = if type(id) == "string" then WorldMap.region(id) else nil
+				if region == nil or Garden.prey(region) == nil then bad(`garden: {tostring(id)} is not a region with prey`); continue end
+				if type(entry) ~= "table" or getmetatable(entry) ~= nil then bad(`garden: {id} is not a record`); continue end
+				if entry.prey ~= nil then
+					if getmetatable(entry.prey) ~= PreyDirector then bad(`garden: {id}'s prey is not a prey director`)
+					else
+						if entry.prey.feeding ~= prey.feeding then bad(`garden: {id}'s prey does not eat with the sill's jaws`) end
+						checkFlies(entry.prey, `garden {id}`)
+					end
+				end
+				if entry.bugs ~= nil then
+					if getmetatable(entry.bugs) ~= Woodlice then bad(`garden: {id}'s bugs are not woodlice`)
+					else for _, text in entry.bugs:problems(region.bounds[1], region.bounds[2]) do bad(`garden: {id}: {text}`) end end
+				end
+			end
 		end
-	else
-		bad("prey: no perches")
 	end
 	-- The meal in the jaws.
 	local held = prey.feeding.held
 	if held ~= nil then
-		if ids[held.id] ~= held or held.state ~= "CAPTURED" then bad("feeding: the prey in the jaws is not a caught fly of this world") end
+		if not every[held] or held.state ~= "CAPTURED" then bad("feeding: the prey in the jaws is not a caught fly of this world") end
 	end
 	local sum = 0
 	for _, g in prey.feeding.ledger do
@@ -380,6 +428,9 @@ function Checkpoint.restore(record: any, world: World): (boolean, { string })
 	-- The profiling windows are not in the record (an older one holds them): empty, and the sensor's window begins now.
 	world.prey.cpu = {}
 	world.sensor._ring = {}
+	for _, entry in (world.garden or {}) :: { [string]: any } do
+		if type(entry) == "table" and entry.prey ~= nil then entry.prey.cpu = {} end
+	end
 	-- ROBLOX-94: a rest from another world than this game's is put back at its region's spawn; its position was kept for geometry that may have moved.
 	local moved = Checkpoint.worldMoved(record)
 	if moved then

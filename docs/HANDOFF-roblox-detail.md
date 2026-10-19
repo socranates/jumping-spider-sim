@@ -1,7 +1,7 @@
 # Handoff: the detail round (ROBLOX-84..90) and its audit (ROBLOX-91..93) — the spiders up close, the hang, living motion, pacing, the mating scene, Inspect
 
 Claude → Chet, 2026-10-18 (evening). Still branch **claude/roblox-sill** (one bundle, `claude-playtest/claude-sill.bundle`,
-carries the daily round, the sill round ROBLOX-71..83 and this round). Build evidence `e2986a4a8c0a2de1`. CLI at the
+carries the daily round, the sill round ROBLOX-71..83 and this round). Build evidence `a83e0b69a7a331ce`. CLI at the
 closing commit: strict clean, 136/136 compile, every suite green (new/changed: look 1009, idle 5719, inspect 36,
 mating 643, client_mating 17, settings 1151, growth 460, rival 2724). **Nothing in this round has run in Studio** — the
 rig work was judged in the off-Roblox previewer (`tools/preview/preview.py`, now with `--hang`, `--cue`, `--focus`),

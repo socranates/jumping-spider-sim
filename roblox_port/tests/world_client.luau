@@ -720,7 +720,7 @@ check("crossing a seam rerolls nothing: the bed's prey waits while the spider is
 	local before = {}
 	for i, f in d.flies do before[i] = { id = f.id, pos = f.position, rng = f.rng.state } end
 	local made, now = pw.made, d.now
-	driver.place(Vector3.new(36, 0.31, -18.75)) -- (the top of the wall's east shoulder, the wall's own spawn: the sill no neighbour, the bed's farthest perch beyond 96)
+	driver.place(Vector3.new(36, -1.69, -24.31), Vector3.new(0, 0, -1)) -- (on the face of the wall's east shoulder, by the wall's own spawn: the sill no neighbour, the bed's farthest perch beyond 96; ROBLOX-103: the shoulder's top is under the window's east jamb now)
 	frames(60)
 	assert(driver.world.region.id == "house_wall" and table.find(pw.active, "bed_a") == nil and d.now == now, `high on the wall the bed's prey does not run and its clock has stopped ({driver.world.region.id}: {table.concat(pw.active, ",")})`)
 	local drawnBed = 0
@@ -868,7 +868,7 @@ check("the bestiary through the real client: the bed's springtails and leafhoppe
 	end
 	assert(springtails == want[1] and leafhoppers == want[2], `drawn: {springtails} springtails, {leafhoppers} leafhoppers`)
 	-- on the wall at noon its moths keep the day's profile; at 20:00 the dusk's
-	driver.place(Vector3.new(36, 0.31, -18.75))
+	driver.place(Vector3.new(36, -1.69, -24.31), Vector3.new(0, 0, -1))
 	life.clock.hour = 12
 	frames(5)
 	local wall = garden.house_wall

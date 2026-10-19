@@ -21,6 +21,13 @@
 --   house_wall .. the brick wall below, face at z -24 from y 0 to the lawn, x -40..40; the air 6 studs out from its face is the wall's down to y -89.
 --   bed_a ....... the soil under the window, top y -90, x -25..25, z -24..-74, and the air over it; it meets the wall along the wall's foot (z -24, y -90,
 --                 x -25..25). Its stone is the first garden home. Its day runs at a third of the sill's pace (Nathan's 0.33; W4 tunes it).
+-- ROBLOX-103 (W3c, docs/WORLD_MAP_PLAN.md region 4): the house is a single story, so the wall above the window ends at the eaves.
+--   wall_upper .. the brick above the window up to the eaves (face z -24, y 14..110, x -40..40), standing on the window's two jambs (x 31..40 either side, y 0..14,
+--                 on the wall's shoulders), the eaves' soffit, the fascia board and the gutter hung on it (its floor y 109, 1.09 m above the sill: a high perch), and
+--                 the first course of roof tiles over the gutter. It meets the wall where the jambs' faces go on up from the shoulders' (z -24, y 0, x 31..40 on the
+--                 east; the west is the same and the map lists one line per pair, as it always has). Added somewhere new, so WorldMap.REVISION stays: nothing moved
+--                 but the house_wall's spawn, which stood on the east shoulder's top where the east jamb now stands (a spawn is only where a rest from another
+--                 revision goes back to, and nothing can rest on the wall). No retreat and no prey yet.
 local Layout = require(script.Parent.Parent.Habitat.WindowsillLayout)
 
 local WorldMap = {}
@@ -86,6 +93,7 @@ end
 local SEAM_SASH = { a = v(-8, 0, -13.5), b = v(8, 0, -13.5) } -- the rail's outer face meets the stone
 local SEAM_STONE = { a = v(-30, -3, -24), b = v(30, -3, -24) } -- the stone's front face goes on down as brick
 local SEAM_FOOT = { a = v(-25, -90, -24), b = v(25, -90, -24) } -- the wall's foot meets the soil
+local SEAM_JAMB = { a = v(31, 0, -24), b = v(40, 0, -24) } -- (ROBLOX-103) the east shoulder's face goes on up as the east jamb's
 local function seam(id: string, line: { a: Vector3, b: Vector3 }): Neighbor
 	return table.freeze({ id = id, a = line.a, b = line.b })
 end
@@ -115,9 +123,10 @@ local function author(worldSeed: number): { Region }
 			id = "house_wall", kind = "house_wall", origin = v(0, -45, -24),
 			bounds = { v(-42, -89, -30), v(42, 35, -13.5) },
 			seed = WorldMap.seed(worldSeed, "house_wall"),
-			neighbors = { seam("outer_sill", SEAM_STONE), seam("bed_a", SEAM_FOOT) },
+			neighbors = { seam("outer_sill", SEAM_STONE), seam("bed_a", SEAM_FOOT), seam("wall_upper", SEAM_JAMB) },
 			retreats = {},
-			spawn = { pos = v(35, 0, -18.75), heading = v(-1, 0, 0) }, -- the top of the wall's east shoulder, beside the outer sill
+			-- on the face of the east shoulder, heading up (ROBLOX-103: it was the shoulder's top, x 35, y 0, z -18.75, where the window's east jamb stands now)
+			spawn = { pos = v(35, -1.5, -24), heading = v(0, 1, 0) },
 			clockScale = 1.0,
 		}),
 		freeze({
@@ -129,6 +138,15 @@ local function author(worldSeed: number): { Region }
 			retreats = { { id = "bed_a_stone", min = v(8.6, -90, -52.6), max = v(13.4, -88.6, -47.4), door = v(11, -89.5, -46.5) } }, -- (the door: in front of the gap's mouth)
 			spawn = { pos = v(11, -90, -43.5), heading = v(0, 0, -1) }, -- in front of the stone, facing its way in
 			clockScale = 0.33,
+		}),
+		freeze({
+			id = "wall_upper", kind = "wall_upper", origin = v(0, 60, -24),
+			bounds = { v(-42, 0, -70), v(42, 130, -13.5) },
+			seed = WorldMap.seed(worldSeed, "wall_upper"),
+			neighbors = { seam("house_wall", SEAM_JAMB) },
+			retreats = {},
+			spawn = { pos = v(0, 109, -61), heading = v(1, 0, 0) }, -- on the gutter's floor, along it
+			clockScale = 1.0,
 		}),
 	}
 end

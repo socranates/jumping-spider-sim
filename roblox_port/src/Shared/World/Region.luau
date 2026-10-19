@@ -8,7 +8,8 @@
 --              are bound to the sill, so the way out is not theirs).
 --   budget ... how many drawn parts a region of a kind may carry at each detail tier.
 -- The sill is hand-placed and its generator returns the layout's lists as they are (tests/worldmap.luau pins that). ROBLOX-95 adds the three kinds under the
--- window, seeded placers in World/Garden: outer_sill, house_wall and bed. Asking for a kind with no generator is a mistake, not an empty region.
+-- window, seeded placers in World/Garden: outer_sill, house_wall and bed; ROBLOX-103 a fourth above it, wall_upper. Asking for a kind with no generator is a
+-- mistake, not an empty region.
 local Layout = require(script.Parent.Parent.Habitat.WindowsillLayout)
 local Rules = require(script.Parent.Parent.Data.RivalRules)
 local WorldMap = require(script.Parent.WorldMap)
@@ -74,7 +75,9 @@ end
 -- for a kind with no budget. The sill's are what its decor builds now, with the sun through the window (the most it ever builds), and tests/world.luau holds
 -- it to them exactly, so a sill that grows says so here; the garden's kinds are ceilings their placers keep to (World/Garden.BUDGETS).
 local BUDGETS: { [string]: { full: number, low: number } } = {
-	sill = { full = 1178, low = 314 }, -- (ROBLOX-95: 1156 and 292 before the raised sash, the window box's halves and the shrubs' bodies: 22 more at each tier)
+	-- (ROBLOX-95: 1156 and 292 before the raised sash, the window box's halves and the shrubs' bodies: 22 more at each tier. ROBLOX-103: 1178 and 314 before the bushes
+	-- to the ground, 62 more at full and 40 at low; the bungalows for the tall houses, 4 more at full and 2 fewer at low; the fences, 9 and 3)
+	sill = { full = 1253, low = 355 },
 }
 for kind, b in Garden.BUDGETS do BUDGETS[kind] = b end
 

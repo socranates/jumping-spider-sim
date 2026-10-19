@@ -109,7 +109,34 @@ if WORLD then
 		specimen("spec_" .. kind .. "_air", Vector3.new(xs[i], 0.16 + (if kind == "crane_fly" then 3 else 1), -5), true)
 		if kind == "crane_fly" then specimen("spec_crane_fly_shed", Vector3.new(224, 0.16, 0), false, 1) end
 	end
-	tiered:draw(all, 0.37)
+	-- ROBLOX-103: a second row at z 4 of the bed's own and the sill's (a gnat and an aphid at their scales, a house fly), and a woodlouse; then every standing
+	-- specimen walks a quarter of its stride toward -Z over ten frames (sixtieths of a second) and every flier beats on, so the tray shows the bodies mid-stride and
+	-- mid-wingbeat (the --world views spec_*). The walkers' strides are their sheets' own (Data/FlyLook motion).
+	local FlyLook = require("../src/Shared/Data/FlyLook")
+	for i, kind in { "fungus_gnat", "aphid", "fly_like" } do
+		local profile = (Species :: any)[kind .. "_prototype"]
+		table.insert(all, { id = "spec_" .. kind, position = Vector3.new(200 + (i - 1) * 3, 0.16, 4), heading = Vector3.new(0, 0, -1), normal = Vector3.yAxis, profile = profile, state = "PERCHED",
+			airborne = function(self: any): boolean return self.state ~= "PERCHED" end })
+	end
+	local louse = { id = "spec_woodlouse", position = Vector3.new(210, 0.12, 4), heading = Vector3.new(0, 0, -1), state = "walk" }
+	local lice = BugBodies.new(flyFolder)
+	local t = 0.37
+	tiered:draw(all, t)
+	lice:draw({ louse }, t)
+	for _ = 1, 10 do
+		t += 1 / 60
+		for _, f in all do
+			if string.sub(f.id, 1, 5) == "spec_" and f.state == "PERCHED" then
+				local body = f.profile.body
+				local sheet = FlyLook.small[body.prey_kind or ""]
+				local motion = if sheet and sheet.motion then sheet.motion else FlyLook.motion
+				f.position += Vector3.new(0, 0, -motion.gait.stride * (body.visual_scale or 1) / 4 / 10)
+			end
+		end
+		louse.position += Vector3.new(0, 0, -BugBodies.look.motion.gait.stride / 4 / 10)
+		tiered:draw(all, t)
+		lice:draw({ louse }, t)
+	end
 end
 
 -- ---------------------------------------------------------------- wasps (scene.py's WASPS: id, x, y, z, hx, hz, mode, search, beat)

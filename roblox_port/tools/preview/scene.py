@@ -157,6 +157,19 @@ VIEWS = {
     "spec_crane_fly_shed": {"fov": 40, "eye": [228.0, 4.0, 5.0], "at": [224.0, 0.2, -0.3], "near": 0.02, "far": 600, "groups": ["flies"], "shadow": 12},
     "spec_crane_fly_air": {"fov": 40, "eye": [221.0, 3.5, 0.0], "at": [216.0, 2.0, -5.0], "near": 0.02, "far": 600, "groups": ["flies"], "shadow": 12},
     "world": {"fov": 60, "eye": [75.0, -15.0, -100.0], "at": [0.0, -55.0, -30.0], "near": 1.0, "far": 4000, "groups": [], "shadow": 220},
+    # ROBLOX-103 (--world): the wall above the window, its eaves and gutter; the house from the lawn; the garden from the eaves; the bushes from the outer sill;
+    # details of the outer sill, the wall's foot and the bed; and the tray's second row walking (the gnat, the aphid, the house fly, the woodlouse) mid-stride
+    "gutter": {"fov": 55, "eye": [22.0, 124.0, -88.0], "at": [0.0, 110.0, -58.0], "near": 0.1, "far": 5000, "groups": [], "shadow": 120},
+    "eaves": {"fov": 62, "eye": [35.0, -70.0, -150.0], "at": [0.0, 55.0, -24.0], "near": 1.0, "far": 6000, "groups": [], "shadow": 300},
+    "house": {"fov": 62, "eye": [160.0, -45.0, -430.0], "at": [0.0, 20.0, -24.0], "near": 1.0, "far": 6000, "groups": [], "shadow": 600},
+    "garden": {"fov": 72, "eye": [0.0, 175.0, -95.0], "at": [0.0, -60.0, -700.0], "near": 1.0, "far": 6000, "groups": [], "shadow": 900},
+    "bushes": {"fov": 64, "eye": [0.0, 4.0, -20.0], "at": [-80.0, -45.0, -160.0], "near": 0.1, "far": 6000, "groups": [], "shadow": 300},
+    "outer_detail": {"fov": 50, "eye": [-15.0, 4.0, -31.0], "at": [-15.0, 0.0, -22.0], "near": 0.05, "far": 2500, "groups": [], "shadow": 40},
+    "wall_foot": {"fov": 55, "eye": [12.0, -74.0, -46.0], "at": [4.0, -84.0, -24.0], "near": 0.05, "far": 2500, "groups": [], "shadow": 60},
+    "spec_gnat_walk": {"fov": 16, "eye": [200.55, 0.45, 4.35], "at": [200.0, 0.1, 3.95], "near": 0.01, "far": 600, "groups": ["flies"], "shadow": 4},
+    "spec_aphid_walk": {"fov": 16, "eye": [203.5, 0.4, 4.3], "at": [203.0, 0.1, 3.97], "near": 0.01, "far": 600, "groups": ["flies"], "shadow": 4},
+    "spec_fly_walk": {"fov": 22, "eye": [206.9, 0.75, 4.6], "at": [206.0, 0.12, 3.9], "near": 0.01, "far": 600, "groups": ["flies"], "shadow": 4},
+    "spec_woodlouse": {"fov": 28, "eye": [211.4, 1.2, 4.6], "at": [210.0, 0.1, 3.9], "near": 0.01, "far": 600, "groups": ["flies"], "shadow": 6},
     "descent": {"fov": 60, "eye": [6.0, -36.0, -31.0], "at": [2.0, -40.0, -24.31], "near": 0.05, "far": 2500, "groups": ["wall"], "shadow": 40},
 }
 

@@ -269,7 +269,61 @@ for _, item in Graphics.view.items do
 		if item.u > W.left and item.u < W.right and item.v > W.bottom and item.v < W.top then shown += 1 end
 	end
 end
-check(shown >= 14, `the roofs, chimneys and treetops appear inside the glass from the reference eye ({shown})`)
+-- (ROBLOX-103: the bungalows across the way are built in the garden's own studs; their roofs and chimneys are counted where they project onto the glass)
+local acrossShown = 0
+for _, p in view:GetChildren() do
+	if string.match(p.Name, "^bungalow_%d+_roof$") or string.match(p.Name, "^bungalow_%d+_chimney$") then
+		local eye = Graphics.view.eye
+		local s = (eye.Z - plane) / (eye.Z - p.Position.Z)
+		local u, v = eye.X + (p.Position.X - eye.X) * s, eye.Y + (p.Position.Y - eye.Y) * s
+		if u > W.left and u < W.right and v > W.bottom and v < W.top then acrossShown += 1 end
+	end
+end
+check(shown + acrossShown >= 14, `the roofs, chimneys and treetops appear inside the glass from the reference eye ({shown} items and {acrossShown} of the bungalows' roofs and chimneys)`)
+-- ROBLOX-103: the houses across the way are bungalows beyond the back fence: one storey (walls under 3 m), one row of windows, a pitched roof whose ridge is the
+-- highest thing on each house but its chimney; the garden's fences
+do
+	local A = Graphics.view.across
+	local ground = Graphics.view.ground.y
+	local bungalows, oneStorey, oneRow, pitched = 0, 0, 0, 0
+	for _, h in A.houses do
+		local wall = view:FindFirstChild(h.id .. "_wall") :: any
+		local roof = view:FindFirstChild(h.id .. "_roof") :: any
+		if wall and roof then
+			bungalows += 1
+			local wallTop = wall.Position.Y + wall.Size.Y / 2
+			if wall.Size.Y < 300 and math.abs(wall.Position.Y - wall.Size.Y / 2 - ground) < 1e-6 and wall.Size.X > wall.Size.Y * 1.5 then oneStorey += 1 end
+			local ys: { [number]: boolean } = {}
+			local rows = 0
+			for _, part in view:GetChildren() do
+				if string.find(part.Name, h.id .. "_window", 1, true) == 1 then
+					local key = math.floor(part.Position.Y * 10 + 0.5)
+					if not ys[key] then ys[key] = true; rows += 1 end
+					if part.Position.Y + part.Size.Y / 2 > wallTop then rows += 10 end
+				end
+			end
+			if rows == 1 then oneRow += 1 end
+			local tilt = math.deg(math.acos(math.clamp(math.abs(roof.CFrame.UpVector.Y), 0, 1)))
+			if tilt > 20 and tilt < 45 and roof.Position.Z < wall.Position.Z + wall.Size.Z / 2 + A.overhang then pitched += 1 end
+		end
+	end
+	check(bungalows == #A.houses and bungalows >= 3, `{bungalows} bungalows across the way`)
+	check(oneStorey == bungalows and oneRow == bungalows and pitched == bungalows, `each one storey, under 3 m, wider than it is tall ({oneStorey}), with one row of windows ({oneRow}) under a pitched roof ({pitched})`)
+	local F = Graphics.view.fence
+	local back = view:FindFirstChild("fence_back") :: any
+	check(back ~= nil and math.abs(back.Position.Z - F.back) < 1e-6 and view:FindFirstChild("fence_side1") ~= nil and view:FindFirstChild("fence_side2") ~= nil
+		and (view:FindFirstChild(A.houses[1].id .. "_wall") :: any).Position.Z < F.back, "the garden's back and side fences, the bungalows beyond the back one")
+	-- the trees are trees in the neighbours' gardens: round trunks standing on the lawn beyond the side fences, crowns metres up
+	local trees = 0
+	for _, item in Graphics.view.items do
+		if item.kind == "trunk" then
+			local trunk = view:FindFirstChild(item.id) :: any
+			local foot = trunk.Position.Y - trunk.Size.X / 2
+			if trunk.Shape == Enum.PartType.Cylinder and math.abs(foot - ground) < 1 and math.abs(trunk.Position.X) > F.x1 and trunk.Size.X > 300 then trees += 1 end
+		end
+	end
+	check(trees == 2, `two trees on round trunks, standing on the lawn beyond the side fences, 3 m and more tall ({trees})`)
+end
 check(fullOnly >= 8 and fullOnly < viewCount - 8, `the view keeps a simple core for the low tier ({fullOnly} of {viewCount} are full-only)`)
 
 -- Small details: low and flat, clear of the spawn, the retreat and the silk practice lines.
@@ -448,6 +502,50 @@ do
 		end
 	end
 	check(shrubCores == #G.shrubs and pink > 20 and white > 20, `flowering shrubs with pink and white blossoms ({shrubCores} shrubs, {pink} pink, {white} white)`)
+	-- ROBLOX-103: bushes to the ground (Nathan: "shrubs should be bushes"): each a crown of leaf clusters on stems from the lawn, as tall as its spec, touching the
+	-- lawn, clear of every walkable region, the house's wall and the view's tree trunks
+	local WorldMap = require("../src/Shared/World/WorldMap")
+	local ground = Graphics.view.ground.y
+	local toGround, tall, clear, framed = 0, 0, 0, 0
+	local trunks = {}
+	for _, item in Graphics.view.items do
+		if string.sub(item.id, 1, 5) == "trunk" then
+			local at, k = Scenery.viewPosition(item.u, item.v, item.depth)
+			table.insert(trunks, { x = at.X, z = at.Z, r = item.w * k / 2 })
+		end
+	end
+	for i, spec in G.shrubs do
+		local lowest, highest, stems, clusters = math.huge, -math.huge, 0, 0
+		local x0, x1, z0, z1 = math.huge, -math.huge, math.huge, -math.huge
+		for _, bit in find(garden, "Shrubs"):GetChildren() do
+			local name = bit.Name
+			if name == `Shrub{i}` or string.find(name, `Shrub{i}Leaf`, 1, true) == 1 or string.find(name, `Shrub{i}Stem`, 1, true) == 1 or string.find(name, `Shrub{i}Bloom`, 1, true) == 1 then
+				if not string.match(string.sub(name, #`Shrub{i}` + 1, #`Shrub{i}` + 1), "%d") then
+					local half = if bit.Shape == Enum.PartType.Cylinder then Vector3.new(bit.Size.X / 2, bit.Size.X / 2, bit.Size.X / 2) else bit.Size / 2
+					lowest = math.min(lowest, bit.Position.Y - half.Y)
+					highest = math.max(highest, bit.Position.Y + half.Y)
+					x0, x1 = math.min(x0, bit.Position.X - half.X), math.max(x1, bit.Position.X + half.X)
+					z0, z1 = math.min(z0, bit.Position.Z - half.Z), math.max(z1, bit.Position.Z + half.Z)
+					if string.find(name, "Stem", 1, true) then stems += 1 end
+					if string.find(name, "Leaf", 1, true) then clusters += 1 end
+				end
+			end
+		end
+		if lowest <= ground + 0.5 then toGround += 1 end
+		if highest - ground >= spec.h * 0.9 and highest - ground <= spec.h * 1.15 then tall += 1 end
+		if stems >= 2 and clusters >= 3 then framed += 1 end
+		local ok = z1 < -24 -- in front of the house's wall
+		for _, r in WorldMap.regions() do
+			local lo, hi = r.bounds[1], r.bounds[2]
+			if r.kind ~= "sill" and x0 < hi.X and x1 > lo.X and z0 < hi.Z and z1 > lo.Z and lowest < hi.Y and highest > lo.Y then ok = false end
+		end
+		for _, t in trunks do
+			if math.sqrt((t.x - spec.x) ^ 2 + (t.z - spec.z) ^ 2) < spec.w / 2 + t.r then ok = false end
+		end
+		if ok then clear += 1 end
+	end
+	check(toGround == #G.shrubs and tall == #G.shrubs and framed == #G.shrubs, `every bush reaches the lawn ({toGround}), stands as tall as it is meant to ({tall}), on a frame of stems under a crown of clusters ({framed})`)
+	check(clear == #G.shrubs, `every bush stands clear of the walkable regions, the house's wall and the trees' trunks ({clear} of {#G.shrubs})`)
 end
 -- The ultraviolet layer: invisible Neon patches (one per petal), faded in by the eye-view helper through the UVOpacity attribute.
 do
@@ -953,7 +1051,7 @@ do
 	local holder = Instance.new("Folder")
 	local world = WorldBuild.world(holder)
 	check(Region.WORLD_FOLDER == "World" and world.Name == "World" and world.Parent == holder and #holder:GetChildren() == 1, "the physical world is one folder named World")
-	check(#WorldMap.regions() == 4 and #world:GetChildren() == #WorldMap.regions() and world:GetChildren()[1].Name == "Windowsill", "with a folder for every region; the sill's is still called Windowsill")
+	check(#WorldMap.regions() == 5 and #world:GetChildren() == #WorldMap.regions() and world:GetChildren()[1].Name == "Windowsill", "with a folder for every region; the sill's is still called Windowsill")
 	local inWorld = world:FindFirstChild("Windowsill") :: Folder
 	check(#inWorld:GetChildren() == #Layout.PIECES and dumpFolder(inWorld) == dumpFolder(Scenery.sill()),
 		"the sill's folder inside World is exactly the one Scenery.sill makes: every part's name, size, place, solidity, looks and attributes")
@@ -1036,7 +1134,7 @@ do
 	-- the looks: a persistent Model per region outside the window, in WorldDecor beside World, each tier holding its budget exactly
 	local holder = Instance.new("Folder")
 	local looks, looksDrawn = WorldBuild.looks(holder, WorldMap.SEED)
-	check(looks.Name == Region.LOOKS_FOLDER and looks.Parent == holder and #looks:GetChildren() == 3, "the looks of the three regions outside, in WorldDecor")
+	check(looks.Name == Region.LOOKS_FOLDER and looks.Parent == holder and #looks:GetChildren() == 4, "the looks of the four regions outside, in WorldDecor")
 	local full: { [string]: number } = {}
 	local safe = true
 	for _, model in looks:GetChildren() do
@@ -1059,6 +1157,43 @@ do
 			`{model.Name}: {full[model.Name]} parts at full and {low} at low, its budgets exactly ({tostring(Region.budget(region.kind, "full"))}, {tostring(Region.budget(region.kind, "low"))})`)
 	end
 	print("world: the looks outside the window (full/low): " .. table.concat(summary, ", "))
+	-- ROBLOX-103: no hole and no seam. Under every region's footprint lies the view's lawn, at or below the lowest walkable top of the region (so nothing is seen
+	-- through the world's floor from anywhere in it); the house's back wall goes on either side of the walkable wall from the lawn to the eaves with no slit
+	-- between them; the roof covers the whole house; the wall above the window starts where the wall's drawing stops
+	do
+		local Garden = require("../src/Shared/World/Garden")
+		local viewFolder = Instance.new("Folder")
+		Scenery.view(viewFolder)
+		local groundPart = viewFolder:FindFirstChild("View"):FindFirstChild("Ground") :: any
+		local gLo, gHi = groundPart.Position - groundPart.Size / 2, groundPart.Position + groundPart.Size / 2
+		local covered, under = 0, 0
+		for _, r in WorldMap.regions() do
+			local lo, hi = r.bounds[1], r.bounds[2]
+			if lo.X >= gLo.X and hi.X <= gHi.X and lo.Z >= gLo.Z and hi.Z <= gHi.Z then covered += 1 end
+			local lowestTop = math.huge
+			for _, piece in Region.pieces(r) do lowestTop = math.min(lowestTop, piece.hi.Y) end
+			if gHi.Y <= lowestTop + 1e-6 then under += 1 end
+		end
+		check(covered == #WorldMap.regions() and under == #WorldMap.regions(), `the lawn lies under every region's whole footprint ({covered}), no higher than its lowest floor ({under})`)
+		local soil = Garden.BED
+		check(gHi.Y < soil.top and gHi.Y > soil.bottom, "the bed's soil stands in the lawn, its top a little above it: no gap at its edge")
+		local upper = looks:FindFirstChild("wall_upper") :: Instance
+		local function part(name: string): any
+			for _, d in upper:GetDescendants() do if d.Name == name and d:IsA("BasePart") then return d end end
+			return nil
+		end
+		local west, east, slope = part("HouseWest"), part("HouseEast"), part("RoofSlope")
+		local U = Garden.UPPER
+		check(west ~= nil and east ~= nil and math.abs(west.Position.X + west.Size.X / 2 - U.west) < 1e-6 and math.abs(east.Position.X - east.Size.X / 2 - U.east) < 1e-6
+			and math.abs(west.Position.Y - west.Size.Y / 2 - Graphics.view.ground.y) < 1e-6 and math.abs(east.Position.Y + east.Size.Y / 2 - U.top) < 1e-6,
+			"the house's back wall goes on either side from the lawn to the eaves, meeting the walkable wall with no slit")
+		check(slope ~= nil and slope.Size.X >= 2 * U.house.x and slope.Position.Y - U.eaves.top > 50, "the roof's slope covers the whole house, rising from the eaves")
+		local mortar = part("Mortar")
+		check(mortar ~= nil and math.abs(mortar.Position.Y - mortar.Size.Y / 2 - Garden.WALL.above) < 1e-6, "the wall above the window takes up the brick where the wall's drawing stops (y 30)")
+		local inLook, quiet = 0, 0
+		for _, d in upper:GetDescendants() do if d:IsA("BasePart") then inLook += 1; if d.CastShadow == false then quiet += 1 end end end
+		check(inLook > 0 and quiet == inLook, "and nothing of it casts a shadow, so the light through the window is the light it was")
+	end
 	-- what each look stands in for: the wall's boxes (the bricks), the bed's leaves and stems; the slab, the soil, the stones and the mounds are their own look
 	check(looksDrawn.house_wall and looksDrawn.house_wall_west and looksDrawn.house_wall_east and looksDrawn.bed_a_dock_stem and looksDrawn.bed_a_dandelion_leaf_1
 		and not looksDrawn.outer_sill_slab and not looksDrawn.bed_a_soil and not looksDrawn.bed_a_stone_top and not looksDrawn.bed_a_mound_1, "the looks report the pieces they draw")
@@ -1080,7 +1215,7 @@ do
 			end
 		end
 	end
-	check(ok and count == 27, `the {count} boxes outside are solid, queryable parts; the ones a look draws are invisible`)
+	check(ok and count == 37, `the {count} boxes outside are solid, queryable parts; the ones a look draws are invisible`)
 	local outerFolder = world:FindFirstChild("outer_sill") :: Instance
 	local slab = outerFolder:FindFirstChild("outer_sill_slab") :: any
 	local box = outerFolder:FindFirstChild("window_box_west") :: any

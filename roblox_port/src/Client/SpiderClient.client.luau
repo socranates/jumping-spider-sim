@@ -1758,8 +1758,9 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
     mateLegs.stage:drawSac(mateLegs.Mating.hasSac(life.mating))
     if mateLegs.phase=="scene" and not paused and not mateLegs.stage:step(simFrame,setting("ReducedMotion")==true) then mateLegs.showCard(false) end
 	updateHud(frameDt)
-	flyBodies:draw(M.World.prey:flies(),M.World.prey.clock)
-	M.World.bugs:draw(M.World.prey:woodlice())
+	-- (ROBLOX-103: the bodies step, sway and beat by the prey's clock; far ones ten times a second; Reduced Motion stills all but the steps)
+	flyBodies:draw(M.World.prey:flies(),M.World.prey.clock,camera.CFrame.Position,setting("ReducedMotion")==true)
+	M.World.bugs:draw(M.World.prey:woodlice(),M.World.prey.clock,camera.CFrame.Position,setting("ReducedMotion")==true)
 	local soundPaused = GuiService.MenuIsOpen or modal()
 	local soundSpeed = if slow then SLOW_SPEED else 1
 	local soundMuted = setting("SoundMuted") == true
@@ -1833,10 +1834,10 @@ if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
 			sill = sill,
 			world = M.World,
 			setDevice = function(name: ControlText.Device) device = name end,
-			place = function(position: Vector3)
+			place = function(position: Vector3, up: Vector3?) -- (ROBLOX-103: `up` for a place on a wall's face; the floor's by default)
 				controls:clear()
 				jump:drop(motor)
-				motor:place(position, Vector3.yAxis, Vector3.zAxis)
+				motor:place(position, up or Vector3.yAxis, if up ~= nil and math.abs(up.Z) > 0.9 then Vector3.yAxis else Vector3.zAxis)
 				dropStrands(false)
 				drawnUp = motor.up
 				cam:snap()

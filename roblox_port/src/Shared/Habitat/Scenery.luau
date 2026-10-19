@@ -280,13 +280,76 @@ function Scenery.view(parent: Instance): Folder
 		elseif item.kind == "roof" then
 			local side = item.w * k / math.sqrt(2)
 			part = drawn(view, item.id, Vector3.new(side, side, t), CFrame.new(at) * CFrame.Angles(0, 0, math.rad(45)), hex(item.color), M.view)
+		elseif item.kind == "trunk" then -- (ROBLOX-103: a round upright rod)
+			part = drawn(view, item.id, Vector3.new((item.h or item.w) * k, item.w * k, item.w * k), CFrame.new(at) * CFrame.Angles(0, 0, math.rad(90)), hex(item.color), "Wood")
+			part.Shape = Enum.PartType.Cylinder
+		elseif item.kind == "hill" then -- (ROBLOX-103)
+			part = drawn(view, item.id, Vector3.new(item.w * k, (item.h or item.w) * k, t), CFrame.new(at), hex(item.color), M.view)
+			local mesh = Instance.new("SpecialMesh")
+			mesh.MeshType = Enum.MeshType.Sphere
+			mesh.Parent = part
 		else
 			part = drawn(view, item.id, Vector3.new(item.w * k, (item.h or item.w) * k, t), CFrame.new(at), hex(item.color), M.view)
 		end
 		part.CastShadow = false
 		if item.full then part:SetAttribute("FullOnly", true) end
 	end
+	Scenery.across(view)
 	return view
+end
+
+-- ROBLOX-103: the bungalows across the way and the garden's fences (Graphics.view.across, Graphics.view.fence), in the garden's own studs, into the view's folder:
+-- for each house its rendered wall, the front slope of its roof up to the ridge (both tiers), a ridge cap, a row of windows, a door and a chimney (full tier);
+-- the back fence and the two side fences (both tiers) and the back fence's posts (full tier). Nothing casts a shadow (the view never has), so the light is the light.
+function Scenery.across(view: Instance)
+	local A, F = Graphics.view.across, Graphics.view.fence
+	local ground = Graphics.view.ground.y
+	local function part(name: string, size: Vector3, cframe: CFrame, color: string, material: string, full: boolean): Part
+		local p = drawn(view, name, size, cframe, hex(color), material)
+		p.CastShadow = false
+		if full then p:SetAttribute("FullOnly", true) end
+		return p
+	end
+	local pitch = math.rad(A.pitch)
+	local run = A.depth / 2 + A.overhang -- from the eave out front to the ridge over the middle, flat
+	local slope = run / math.cos(pitch)
+	local eaveY = ground + A.wall -- (the eave stands `overhang` out from the front wall, toward the garden, +z)
+	for _, h in A.houses do
+		local backZ = A.front - A.depth
+		part(h.id .. "_wall", Vector3.new(h.w, A.wall, A.depth), CFrame.new(h.x, ground + A.wall / 2, (A.front + backZ) / 2), h.wall, A.wallMaterial, false)
+		-- the roof's front slope: from the eave (over the overhang, in front of the wall) up and back to the ridge over the middle
+		local mid = Vector3.new(h.x, eaveY + run * math.tan(pitch) / 2, A.front + A.overhang - run / 2)
+		part(h.id .. "_roof", Vector3.new(h.w + 2 * A.overhang, 6, slope), CFrame.new(mid) * CFrame.Angles(pitch, 0, 0), h.roof, A.roofMaterial, false)
+		local ridgeY = eaveY + run * math.tan(pitch)
+		local ridgeZ = A.front + A.overhang - run
+		part(h.id .. "_ridge", Vector3.new(h.w + 2 * A.overhang, A.ridgeCap, A.ridgeCap * 1.6), CFrame.new(h.x, ridgeY + 2, ridgeZ), h.roof, A.roofMaterial, true)
+		-- one row of windows (and a door), evenly along the front, a hair proud of the wall
+		local W, D = A.window, A.door
+		local slots = h.windows + (if h.door then 1 else 0)
+		for k = 1, slots do
+			local x = h.x - h.w / 2 + h.w * (k - 0.5) / slots
+			if h.door and k == math.ceil(slots / 2) then
+				part(`{h.id}_door`, Vector3.new(D.w, D.h, 3), CFrame.new(x, ground + D.h / 2, A.front + 1.4), D.color, A.wallMaterial, true)
+			else
+				part(`{h.id}_window{k}`, Vector3.new(W.w, W.h, 3), CFrame.new(x, ground + W.sill + W.h / 2, A.front + 1.4), W.color, "SmoothPlastic", true).Reflectance = 0.08
+			end
+		end
+		if h.chimney ~= nil then
+			local C = A.chimney
+			local cx = h.x + h.chimney * h.w
+			part(h.id .. "_chimney", Vector3.new(C.w, C.h + 60, C.t), CFrame.new(cx, ridgeY + C.h / 2 - 30, ridgeZ + 40), C.color, "Brick", true)
+		end
+	end
+	-- the fences: the back one across the garden's end, the sides from the house to it
+	local depthOf = F.near - F.back
+	part("fence_back", Vector3.new(F.x1 - F.x0, F.height, F.thick), CFrame.new((F.x0 + F.x1) / 2, ground + F.height / 2, F.back), F.color, F.material, false)
+	for i, x in { F.x0, F.x1 } do
+		part("fence_side" .. i, Vector3.new(F.thick, F.height, depthOf), CFrame.new(x, ground + F.height / 2, (F.near + F.back) / 2), F.color, F.material, false)
+	end
+	for k = 1, F.posts do
+		local x = F.x0 + (F.x1 - F.x0) * (k - 0.5) / F.posts
+		part("fence_post" .. k, Vector3.new(F.post, F.height + 6, F.post), CFrame.new(x, ground + (F.height + 6) / 2, F.back + F.thick / 2 + F.post / 2), F.postColor, "Wood", true)
+	end
 end
 
 -- ---------------------------------------------------------------- chips in the paint, cracks, a crumb, a coin and fallen leaves (full tier)

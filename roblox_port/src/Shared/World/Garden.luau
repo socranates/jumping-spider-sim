@@ -21,6 +21,12 @@
 -- (Prey/PreyWorld): springtails on the soil round the stones and the litter and leafhoppers on the dock's and the dandelion's stems and leaves in the bed; small
 -- moths and crane flies on the house wall and on the outer sill (the slab by the window, the window box's fronts, the slab's front edge). From the same seed
 -- by streams of their own, so W3's perches, vents and prey are what they were.
+-- ROBLOX-103 (W3c, the look): a fourth kind, `wall_upper` (docs/WORLD_MAP_PLAN.md region 4: the house is a single story): the brick above the window up to the
+-- eaves on the window's two jambs, the eaves' soffit, the fascia, the gutter hung on it (a walkable high perch) and the eave course of the roof; its look carries
+-- the rest of the house as a backdrop (the back wall on either side to 5 m out, the roof over it all, the eaves and gutter along it, a downpipe, a window and the
+-- back door), all drawn only until wall_west and wall_east are built. And more on the three built looks: drip stains and moss in the wall's joints, petals and
+-- seeds on the outer sill, veins on the bed's leaves, seed heads on its grass and more kinds of litter, each from a stream of its own after what was placed
+-- before, so nothing placed before moves.
 local Flora = require(script.Parent.Parent.Data.Flora)
 local WorldMap = require(script.Parent.WorldMap)
 
@@ -83,6 +89,21 @@ Garden.WALL = {
 	brickMaterial = "Concrete", mortarMaterial = "Plaster",
 }
 
+-- ---------------------------------------------------------------- the wall above the window (ROBLOX-103)
+-- Studs, the sill's frame. The brick goes on from the house_wall's drawing (which stops at y 30) to the eaves at `top`; the eaves box (the soffit underneath) runs
+-- out to the fascia; the gutter hangs on the fascia, its floor at `gutter.floor`; the eave course of tiles over it. `house`: the rest of the house drawn round it.
+Garden.UPPER = {
+	face = -24, back = -13.5, west = -40, east = 40, jamb = 31, head = 14, top = 110, -- the jambs stand x 31..40 either side of the window, on the shoulders (y 0)
+	eaves = { out = -54, top = 120, edge = 42 }, -- the soffit's box: from the wall out to z -54, y 110..120, x -42..42
+	fascia = { out = -55.5, bottom = 106 },
+	gutter = { floor = 108, thick = 1, lip = 115, out = -66, wall = 1, cap = 1, span = 40 }, -- floor y 108..109; the lip's inner face at z -66
+	roof = { eave = -62, thick = 1.5, pitch = 35, ridge = 376, x = 500, color = "7b4a3d", tiles = { "8d4a3a", "7b4a3d", "934f3e", "6f4236" }, material = "Slate" },
+	paint = "ece7dc", gutterColor = "3a3c3e", gutterMaterial = "Metal", houseMortar = "a8927e", -- (the long walls' mortar lines, toned toward the brick so they read as courses, not siding)
+	-- (the kitchen's window is the sill's, 62 wide and 14 tall with its sill at y 0: the house's other window is drawn the same; the back door stands on a step)
+	house = { x = 500, foot = -90.4, door = { x = 230, w = 85, h = 180, step = 14, color = "3f5b4a" }, window = { x = -260, w = 62, h = 14, sill = 0 }, pipe = { x = -50, d = 7 } },
+	debris = { "6e4d2e", "8a6239", "5b4129", "a07445" },
+}
+
 -- ---------------------------------------------------------------- the bed
 Garden.BED = {
 	x0 = -25, x1 = 25, z0 = -74, z1 = -24, top = -90, bottom = -92,
@@ -101,6 +122,15 @@ Garden.BED = {
 	twigs = { count = 9, length = { 2, 6 }, width = 0.18, colors = { "5a4632", "6b5640", "4a3a2a" } },
 	pebbles = { count = 24, size = { 0.25, 0.8 }, colors = { "a9a59c", "938f87", "bdb8ad", "7f7b74" } },
 	mottle = { count = 12, size = { 3, 8 }, colors = { "3f3126", "54412f", "463729" } },
+	-- ROBLOX-103: seed heads on the tufts (a stalk `over` the tuft's height, a head `length` long), grass clumps creeping in at the edges, and more kinds of litter
+	seedHeads = { over = { 1.15, 1.45 }, length = 0.7, stalk = "9aa86a", colors = { "c8b47a", "b6a067", "d4c494", "a89060" } },
+	clumps = { count = 6, blades = 5, height = { 1.8, 3.4 } },
+	moreLitter = { count = 14, kinds = {
+		{ size = { 1.4, 2.6 }, shape = 0.6, colors = { "d9c9a0", "cdbb8e" }, transparency = 0.35 }, -- skeleton leaves, gone to lace
+		{ size = { 1.0, 2.2 }, shape = 0.55, colors = { "3d2c1e", "4a3524", "35271b" } }, -- dark, rotting
+		{ size = { 0.6, 1.0 }, shape = 0.9, colors = { "c9a23d", "b58a2c", "a7792a" } }, -- small and round, yellow
+		{ size = { 0.4, 0.7 }, shape = 0.45, colors = { "6b5232", "7d6240" } }, -- husks
+	} :: { any } },
 	-- ROBLOX-96: the bed's life. Perches: shelter and food as the sill's (0..1); `soil` perches are seeded free spots on the soil; the gnats' vents are two more
 	-- (they come up out of the soil); the aphids' vents sit at the plants (an aphid appears on a free plant perch within `reach`). `target`: how many prey the bed holds.
 	prey = {
@@ -133,6 +163,28 @@ local function wallPieces(): { Piece }
 		{ id = "house_wall", lo = v(W.west, W.foot, W.face), hi = v(W.east, W.under, W.back), profile = "brick_rough", color = brick, material = W.brickMaterial },
 		{ id = "house_wall_west", lo = v(W.west, W.under, W.face), hi = v(Garden.OUTER.slab.lo.X, W.top, W.back), profile = "brick_rough", color = brick, material = W.brickMaterial },
 		{ id = "house_wall_east", lo = v(Garden.OUTER.slab.hi.X, W.under, W.face), hi = v(W.east, W.top, W.back), profile = "brick_rough", color = brick, material = W.brickMaterial },
+	}
+end
+
+-- (ROBLOX-103) The wall above the window: the two jambs on the shoulders, the brick up to the eaves, the eaves' box, the fascia, the gutter (floor, lip, two end
+-- caps) and the eave course of the roof over the eaves.
+local function upperPieces(): { Piece }
+	local U = Garden.UPPER
+	local G, E, F, R = U.gutter, U.eaves, U.fascia, U.roof
+	local brick = hex(Garden.WALL.bricks[1])
+	local paint = hex(U.paint)
+	local metal = hex(U.gutterColor)
+	return {
+		{ id = "wall_upper_west", lo = v(U.west, 0, U.face), hi = v(-U.jamb, U.head, U.back), profile = "brick_rough", color = brick, material = Garden.WALL.brickMaterial },
+		{ id = "wall_upper_east", lo = v(U.jamb, 0, U.face), hi = v(U.east, U.head, U.back), profile = "brick_rough", color = brick, material = Garden.WALL.brickMaterial },
+		{ id = "wall_upper_brick", lo = v(U.west, U.head, U.face), hi = v(U.east, U.top, U.back), profile = "brick_rough", color = brick, material = Garden.WALL.brickMaterial },
+		{ id = "wall_upper_soffit", lo = v(-E.edge, U.top, E.out), hi = v(E.edge, E.top, U.back), profile = "painted_wood_dry", color = paint, material = "Wood" },
+		{ id = "wall_upper_fascia", lo = v(-E.edge, F.bottom, F.out), hi = v(E.edge, E.top, E.out), profile = "painted_wood_dry", color = paint, material = "Wood" },
+		{ id = "wall_upper_gutter", lo = v(-G.span, G.floor, G.out), hi = v(G.span, G.floor + G.thick, F.out), profile = "painted_wood_dry", color = metal, material = U.gutterMaterial },
+		{ id = "wall_upper_gutter_lip", lo = v(-G.span, G.floor, G.out - G.wall), hi = v(G.span, G.lip, G.out), profile = "painted_wood_dry", color = metal, material = U.gutterMaterial },
+		{ id = "wall_upper_gutter_west", lo = v(-G.span - G.cap, G.floor, G.out - G.wall), hi = v(-G.span, G.lip, F.out), profile = "painted_wood_dry", color = metal, material = U.gutterMaterial },
+		{ id = "wall_upper_gutter_east", lo = v(G.span, G.floor, G.out - G.wall), hi = v(G.span + G.cap, G.lip, F.out), profile = "painted_wood_dry", color = metal, material = U.gutterMaterial },
+		{ id = "wall_upper_roof", lo = v(-E.edge, E.top, R.eave), hi = v(E.edge, E.top + R.thick, U.back), profile = "brick_rough", color = hex(R.color), material = R.material },
 	}
 end
 
@@ -289,6 +341,18 @@ local function leafOver(add: (Drawn) -> boolean, name: string, lo: Vector3, hi: 
 	local c = (lo + hi) * 0.5
 	local length = (if along == "x" then hi.X - lo.X else hi.Z - lo.Z) * 0.82
 	add({ id = name .. "Rib", size = if along == "x" then v(length, 0.008, 0.07) else v(0.07, 0.008, length), at = v(c.X, hi.Y + 0.004, c.Z), color = hex(L.rib), material = L.material, full = true, group = group })
+	-- ROBLOX-103: side veins off the midrib, the Pilea's standard (full tier): four, alternating sides, angled toward the tip
+	local half = (if along == "x" then hi.Z - lo.Z else hi.X - lo.X) * 0.5
+	for i, f in { 0.28, 0.44, 0.6, 0.74 } do
+		local side = if i % 2 == 0 then 1 else -1
+		local t = (f - 0.5) * length / 0.82
+		local veinLength = half * 0.85 / math.sin(math.rad(48))
+		local out = half * 0.85 * 0.5
+		local fwd = out / math.tan(math.rad(48))
+		local at = if along == "x" then v(c.X + t + fwd, hi.Y + 0.004, c.Z + side * out) else v(c.X + side * out, hi.Y + 0.004, c.Z + t + fwd)
+		local yaw = if along == "x" then -side * 48 else 90 + side * 48
+		add({ id = `{name}Vein{i}`, size = v(veinLength, 0.008, 0.045), at = at, turn = v(0, yaw, 0), color = hex(L.rib), material = L.material, full = true, group = group })
+	end
 end
 
 local function outerDecor(region: WorldMap.Region, budget: { full: number, low: number }): { Drawn }
@@ -329,6 +393,32 @@ local function outerDecor(region: WorldMap.Region, budget: { full: number, low: 
 		local s = between(grand, 0.07, 0.24)
 		add({ id = "Grit" .. i, size = v(s, s * 0.6, s * between(grand, 0.6, 1.0)), at = v(between(grand, slab.lo.X + 0.5, slab.hi.X - 0.5), top + s * 0.25, between(grand, front + 0.4, slab.hi.Z - 0.4)),
 			turn = v(between(grand, -20, 20), grand() * 360, 0), color = hex(pick(O.grit, grand)), material = "Pebble", full = true, group = "Grit" })
+	end
+	-- ROBLOX-103: what the window box lets fall on the stone (petals of its black-eyed Susans, browning at the edges, their seeds, a dry leaf; three petals at
+	-- both tiers) and hairline cracks in the paint (full tier); a stream of its own, after everything placed before
+	local frand = rng(region.seed, 107)
+	local boxes = Flora.garden.box
+	for i = 1, 10 do
+		local half = boxes.boxes[1 + (i % 2)]
+		local x = between(frand, half.x0 - 1.5, half.x1 + 1.5)
+		local z = between(frand, front + 0.6, boxes.z0 - 0.4)
+		local brown = frand() < 0.3
+		add({ id = "Petal" .. i, size = v(between(frand, 0.9, 1.3), 0.03, between(frand, 0.35, 0.5)), at = v(x, top + 0.02, z), turn = v(between(frand, 0, 8), frand() * 360, 0),
+			shape = "Ellipsoid", color = hex(if brown then "b5852a" else pick(Flora.garden.rudbeckia.petalColors, frand)), material = "SmoothPlastic", full = i > 3, group = "Fallen" })
+	end
+	for i = 1, 6 do
+		add({ id = "Seed" .. i, size = v(0.16, 0.08, 0.32), at = v(between(frand, -24, 24), top + 0.04, between(frand, front + 0.6, boxes.z0 - 0.3)), turn = v(0, frand() * 360, 0),
+			shape = "Ellipsoid", color = hex("2e231a"), material = "SmoothPlastic", full = true, group = "Fallen" })
+	end
+	for i = 1, 2 do
+		local s = between(frand, 2.2, 3.2)
+		add({ id = "DryLeaf" .. i, size = v(s, 0.04, s * 0.5), at = v(between(frand, slab.lo.X + 3, slab.hi.X - 3), top + 0.12, between(frand, front + 1.5, slab.hi.Z - 1.5)),
+			turn = v(between(frand, 6, 16), frand() * 360, 0), shape = "Ellipsoid", color = hex(pick({ "a07445", "8a6239", "b88c52" }, frand)), material = "Fabric", full = true, group = "Fallen" })
+	end
+	for i = 1, 4 do
+		local l = between(frand, 2, 6)
+		add({ id = "Hairline" .. i, size = v(l, 0.006, 0.04), at = v(between(frand, slab.lo.X + 4, slab.hi.X - 4), top + 0.003, between(frand, front + 1, slab.hi.Z - 1)), turn = v(0, frand() * 360, 0),
+			color = hex("6f6a60"), material = "Concrete", transparency = 0.3, full = true, group = "Weather" })
 	end
 	return list
 end
@@ -445,6 +535,169 @@ local function wallDecor(region: WorldMap.Region, budget: { full: number, low: n
 		add({ id = "Erode" .. i, size = v(w, K.height * between(drand, 0.5, 0.9), 0.01), at = v(between(drand, W.west + 3, W.east - 3), weathered - K.height / 2, face - 0.004),
 			color = hex(pick({ "6e3a2a", "7b4433", "8a5540" }, drand)), material = "Concrete", transparency = 0.15, full = true, group = "Weather" })
 	end
+	-- ROBLOX-103 (full tier, a stream of its own after the rest): rain off the outer sill's front edge leaves darker streaks down the brick under it; the mortar has
+	-- weathered darker and deeper in places along the joints; moss grows in the joints near the foot, where the soil splashes
+	local xrand = rng(region.seed, 109)
+	for i = 1, 6 do
+		local w, l = between(xrand, 1.5, 4), between(xrand, 8, 22)
+		add({ id = "Drip" .. i, size = v(w, l, 0.006), at = v(between(xrand, slab.lo.X + 3, slab.hi.X - 3), W.under - l / 2 - 0.3, face - 0.0045), color = hex("5e3a2c"), material = "Concrete",
+			transparency = 0.6, full = true, group = "Weather" })
+	end
+	for i = 1, 8 do
+		local row = W.under - K.joint / 2 - course * math.floor(between(xrand, 1, 11))
+		add({ id = "Joint" .. i, size = v(between(xrand, 6, 18), K.joint * 0.9, 0.01), at = v(between(xrand, W.west + 8, W.east - 8), row + K.joint / 2, mortarFace - 0.006),
+			color = hex(pick({ "8f877a", "a39b8d", "7a7366" }, xrand)), material = W.mortarMaterial, full = true, group = "Mortar" })
+	end
+	for i = 1, 10 do
+		local row = W.under - course * (10 + math.floor(xrand() * 2)) -- the middle of a joint near the foot (the courses' joints are at y -3 - 7.5k)
+		local s = between(xrand, 0.5, 1.2)
+		add({ id = "JointMoss" .. i, size = v(s * 1.6, s * 0.7, s * 0.6), at = v(between(xrand, W.west + 3, W.east - 3), row, face - 0.1), shape = "Ellipsoid",
+			color = hex(pick(Garden.OUTER.moss, xrand)), material = "Grass", full = true, group = "Weather" })
+	end
+	return list
+end
+
+-- (ROBLOX-103) The wall above the window and the house round it. Both tiers: the brick courses from y 30 (where the house_wall's look stops) to the eaves over a
+-- recessed mortar bed and the room's plaster behind, the soffit, the fascia, the gutter and the eave course of tiles over the pieces they stand in for, the roof's
+-- slope from the eaves over the whole house to the ridge, the house's back wall on either side out to 5 m (x 40..500) with its eaves and gutter, and the downpipe.
+-- Full tier: the tile joints, the gutter's rolled lip, mortar lines along the long walls, a window and the back door, the downpipe's brackets, leaves, moss and a
+-- puddle in the gutter, dirt streaks under it where it overflows, lichen, and an old cobweb in the eaves' corner. Nothing here casts a shadow (no look does), so the
+-- light through the window is the light it was.
+local function upperDecor(region: WorldMap.Region, budget: { full: number, low: number }): { Drawn }
+	local U, W = Garden.UPPER, Garden.WALL
+	local K, G, E, F, R, H = W.brick, U.gutter, U.eaves, U.fascia, U.roof, U.house
+	local list, add = sheet(budget)
+	local face = U.face + K.gap
+	local mortarFace = U.face + K.recess
+	local skin = 1.0
+	local gap = 0.02 -- a drawn board sits this far inside the walkable box it stands in for
+	local function box(id: string, lo: Vector3, hi: Vector3, color: string, material: string, group: string, full: boolean?, transparency: number?)
+		add({ id = id, size = hi - lo, at = (lo + hi) * 0.5, color = hex(color), material = material, group = group, full = full, transparency = transparency })
+	end
+	local function inside(id: string, lo: Vector3, hi: Vector3, color: string, material: string, group: string)
+		box(id, lo + v(gap, gap, gap), hi - v(gap, gap, gap), color, material, group)
+	end
+	-- the mortar bed and the room's plaster behind, from y 30 to the eaves
+	box("Mortar", v(U.west, W.above, mortarFace), v(U.east, U.top, U.back - skin), W.mortar, W.mortarMaterial, "Mortar")
+	box("Skin", v(U.west, W.above, U.back - skin), v(U.east, U.top, U.back), W.plaster, "Plaster", "Mortar")
+	-- the courses, on from the house_wall's (its courses above the outer sill start at y 0.5, one every brick and joint)
+	local brand = rng(region.seed, 13)
+	local pitch, course = K.length + K.joint, K.height + K.joint
+	local n, c = 0, 0
+	local y = W.top + K.joint / 2
+	while y + K.height <= W.above do y += course; c += 1 end
+	while y + K.height <= U.top - K.joint / 2 do
+		local offset = ((c + 1) % 2) * pitch / 2
+		local x = U.west - offset
+		while x < U.east do
+			local a, b = math.max(x + K.joint / 2, U.west), math.min(x + pitch - K.joint / 2, U.east)
+			if b - a >= 2.0 then
+				n += 1
+				local burnt, pale = brand() < 0.08, brand() < 0.06
+				local color = if burnt then hex(W.burnt) elseif pale then hex(W.pale) else hex(pick(W.bricks, brand))
+				local sink = brand() * 0.05
+				add({ id = "Brick" .. n, size = v(b - a, K.height, K.depth), at = v((a + b) / 2, y + K.height / 2, face + sink + K.depth / 2), color = color, material = W.brickMaterial, group = "Bricks" })
+			end
+			x += pitch
+		end
+		y += course
+		c += 1
+	end
+	-- the eaves: the soffit, the fascia, the gutter, the eave course of tiles (over the pieces they stand in for)
+	inside("Soffit", v(-E.edge, U.top, E.out), v(E.edge, E.top, U.back), U.paint, "Wood", "Eaves")
+	inside("Fascia", v(-E.edge, F.bottom, F.out), v(E.edge, E.top, E.out), U.paint, "Wood", "Eaves")
+	inside("GutterFloor", v(-G.span, G.floor, G.out), v(G.span, G.floor + G.thick, F.out), U.gutterColor, U.gutterMaterial, "Gutter")
+	inside("GutterLip", v(-G.span, G.floor, G.out - G.wall), v(G.span, G.lip, G.out), U.gutterColor, U.gutterMaterial, "Gutter")
+	inside("GutterWest", v(-G.span - G.cap, G.floor, G.out - G.wall), v(-G.span, G.lip, F.out), U.gutterColor, U.gutterMaterial, "Gutter")
+	inside("GutterEast", v(G.span, G.floor, G.out - G.wall), v(G.span + G.cap, G.lip, F.out), U.gutterColor, U.gutterMaterial, "Gutter")
+	inside("EaveCourse", v(-E.edge, E.top, R.eave), v(E.edge, E.top + R.thick, U.back), R.color, R.material, "Roof")
+	-- the roof's slope from the eave over the whole house to the ridge
+	local p = math.rad(R.pitch)
+	local run = R.ridge - R.eave
+	local length = run / math.cos(p)
+	local eaveTop = E.top + R.thick
+	add({ id = "RoofSlope", size = v(2 * R.x, 3, length), at = v(0, eaveTop + run * math.tan(p) / 2 + 1.5 / math.cos(p) - 0.2, R.eave + run / 2), turn = v(-R.pitch, 0, 0),
+		color = hex(R.color), material = R.material, group = "Roof" })
+	-- the house's back wall either side, with its eaves and gutter, and the downpipe
+	for _, side in { -1, 1 } do
+		local x0, x1 = if side < 0 then -H.x else U.east, if side < 0 then U.west else H.x
+		local e0, e1 = if side < 0 then -H.x else E.edge, if side < 0 then -E.edge else H.x
+		local name = if side < 0 then "West" else "East"
+		box("House" .. name, v(x0, H.foot, U.face + K.gap), v(x1, U.top, U.back), W.bricks[1], W.brickMaterial, "House")
+		box("Eaves" .. name, v(e0, U.top, E.out), v(e1, E.top, U.back), U.paint, "Wood", "House")
+		box("Fascia" .. name, v(e0, F.bottom, F.out), v(e1, E.top, E.out), U.paint, "Wood", "House")
+		box("Gutter" .. name, v(if side < 0 then e0 else G.span + G.cap, G.floor, G.out - G.wall), v(if side < 0 then -G.span - G.cap else e1, G.lip, F.out), U.gutterColor, U.gutterMaterial, "House")
+	end
+	local P = H.pipe
+	add({ id = "Downpipe", size = v(G.floor - H.foot, P.d, P.d), at = v(P.x, (G.floor + H.foot) / 2, U.face - P.d / 2 - 1.2), turn = v(0, 0, 90), shape = "Cylinder",
+		color = hex(U.gutterColor), material = U.gutterMaterial, group = "House" })
+	-- full tier: the tile joints, the gutter's rolled lip, the window and the back door, the downpipe's brackets and shoe
+	local trand = rng(region.seed, 101)
+	for k = 1, 7 do
+		local x = -E.edge + (k - 0.5) * 2 * E.edge / 7 + between(trand, -2, 2)
+		add({ id = "TileJoint" .. k, size = v(0.35, R.thick + 0.1, 0.4), at = v(x, E.top + R.thick / 2, R.eave - 0.1), color = hex("4a2a22"), material = R.material, full = true, group = "Roof" })
+	end
+	add({ id = "GutterBead", size = v(2 * G.span, 1.4, 1.4), at = v(0, G.lip, G.out - G.wall / 2), shape = "Cylinder", color = hex(U.gutterColor), material = U.gutterMaterial, full = true, group = "Gutter" })
+	local D, Wn = H.door, H.window
+	local stepTop = H.foot + D.step
+	add({ id = "BackStep", size = v(D.w + 30, D.step, 30), at = v(D.x, H.foot + D.step / 2, U.face - 15), color = hex("a29d92"), material = "Concrete", full = true, group = "House" })
+	add({ id = "BackDoorFrame", size = v(D.w + 8, D.h + 4, 1.2), at = v(D.x, stepTop + (D.h + 4) / 2, U.face - 0.4), color = hex(U.paint), material = "Wood", full = true, group = "House" })
+	add({ id = "BackDoor", size = v(D.w, D.h, 1.6), at = v(D.x, stepTop + D.h / 2, U.face - 0.7), color = hex(D.color), material = "WoodPlanks", full = true, group = "House" })
+	-- another window like the kitchen's (the sill's: from y 0 to 14, its glass 3 to 13), along the west wall
+	add({ id = "WindowFrame", size = v(Wn.w + 2, Wn.h + 2, 1.2), at = v(Wn.x, Wn.sill + (Wn.h + 2) / 2, U.face - 0.4), color = hex(U.paint), material = "Wood", full = true, group = "House" })
+	add({ id = "WindowGlass", size = v(Wn.w - 2, Wn.h - 2, 1.4), at = v(Wn.x, Wn.sill + 1 + Wn.h / 2, U.face - 0.6), color = hex("5d7480"), material = "Glass", transparency = 0.2, full = true, group = "House" })
+	add({ id = "WindowSill", size = v(Wn.w + 6, 3, 10.5), at = v(Wn.x, Wn.sill - 1.5, U.face + 5.25 - 10.5), color = hex("ddd5c3"), material = "Concrete", full = true, group = "House" })
+	for k, yy in { H.foot + 12, G.floor - 14 } do
+		add({ id = "PipeBracket" .. k, size = v(P.d + 2, 1.5, P.d + 2), at = v(P.x, yy, U.face - P.d / 2 - 1.2), color = hex(U.gutterColor), material = U.gutterMaterial, full = true, group = "House" })
+	end
+	add({ id = "PipeShoe", size = v(P.d * 1.6, P.d * 0.8, P.d * 1.8), at = v(P.x, H.foot + P.d * 0.4, U.face - P.d / 2 - 2.4), color = hex(U.gutterColor), material = U.gutterMaterial, full = true, group = "House" })
+	-- full tier: what collects in a gutter, the dirt it leaves on the brick, lichen, an old cobweb in the eaves' corner
+	local grand = rng(region.seed, 103)
+	for k = 1, 8 do
+		local s = between(grand, 1.2, 3.2)
+		add({ id = "GutterLeaf" .. k, size = v(s, 0.08, s * between(grand, 0.45, 0.7)), at = v(between(grand, -G.span + 2, G.span - 2), G.floor + G.thick + 0.05, between(grand, G.out + 1.5, F.out - 1.5)),
+			turn = v(between(grand, 0, 12), grand() * 360, 0), shape = "Ellipsoid", color = hex(pick(U.debris, grand)), material = "Fabric", full = true, group = "Gutter" })
+	end
+	for k = 1, 3 do
+		local s = between(grand, 1.5, 3.0)
+		add({ id = "GutterMoss" .. k, size = v(s, s * 0.45, s), at = v(between(grand, -G.span + 3, G.span - 3), G.floor + G.thick + s * 0.15, between(grand, G.out + 2, F.out - 2)),
+			shape = "Ellipsoid", color = hex(pick(Garden.OUTER.moss, grand)), material = "Grass", full = true, group = "Gutter" })
+	end
+	add({ id = "GutterPuddle", size = v(between(grand, 8, 14), 0.06, 7), at = v(between(grand, -20, 20), G.floor + G.thick + 0.03, (G.out + F.out) / 2), shape = "Ellipsoid",
+		color = hex("6d7a80"), material = "Glass", transparency = 0.45, full = true, group = "Gutter" })
+	for k = 1, 5 do
+		local w = between(grand, 3, 8)
+		local l = between(grand, 10, 30)
+		add({ id = "Streak" .. k, size = v(w, l, 0.006), at = v(between(grand, U.west + 4, U.east - 4), U.top - l / 2 - 0.5, face - 0.003), color = hex("4e4a3c"), material = "Concrete",
+			transparency = 0.55, full = true, group = "Weather" })
+	end
+	for k = 1, 4 do
+		local w = between(grand, 0.8, 2.0)
+		add({ id = "Lichen" .. k, size = v(w, w * between(grand, 0.55, 0.9), 0.008), at = v(between(grand, U.west + 4, U.east - 4), between(grand, 40, 100), face - 0.003), turn = v(0, 0, grand() * 360),
+			shape = "Ellipsoid", color = hex(pick({ "b9b78f", "c7c4a2", "9fa97d", "d0cdb2" }, grand)), material = "Plaster", full = true, group = "Weather" })
+	end
+	local corner = if grand() < 0.5 then -E.edge + 0.2 else E.edge - 0.2
+	local inward = if corner < 0 then 1 else -1
+	for k = 1, 3 do
+		local a = v(corner, U.top - 0.05, U.face - between(grand, 1, 8))
+		local b = v(corner + inward * between(grand, 3, 9), U.top - between(grand, 2, 6), U.face - 0.05)
+		local d = b - a
+		add({ id = "Cobweb" .. k, size = v(d.Magnitude, 0.012, 0.012), at = (a + b) * 0.5, turn = v(0, math.deg(math.atan2(-d.Z, d.X)), math.deg(math.asin(math.clamp(d.Y / d.Magnitude, -1, 1)))),
+			shape = "Cylinder", color = hex("e8e4d8"), material = "Glass", transparency = 0.45, full = true, group = "Weather" })
+	end
+	-- full tier: mortar lines along the long walls either side, one a course, so they read as brick from the garden
+	for i, side in { -1, 1 } do
+		local x0, x1 = if side < 0 then -H.x else U.east, if side < 0 then U.west else H.x
+		local yy = W.under - K.joint / 2
+		while yy > H.foot do yy -= course end
+		yy += course
+		local k = 0
+		while yy < U.top do
+			k += 1
+			add({ id = `Course{i}_{k}`, size = v(x1 - x0, K.joint * 0.6, 0.02), at = v((x0 + x1) / 2, yy, U.face + K.gap - 0.012), color = hex(U.houseMortar), material = W.mortarMaterial, full = true, group = "House" })
+			yy += course
+		end
+	end
 	return list
 end
 
@@ -526,6 +779,7 @@ local function bedDecor(region: WorldMap.Region, budget: { full: number, low: nu
 	-- the grass: tufts along the bed's edges and by the stones, each blade a long thin leaf leaning out from the tuft's foot
 	local grand = rng(region.seed, 47)
 	local G = B.grass
+	local tufts: { { x: number, z: number, height: number } } = {} -- (ROBLOX-103: where each tuft stands, for its seed heads below)
 	for i = 1, G.tufts do
 		local x, z
 		if i % 2 == 0 then
@@ -536,6 +790,7 @@ local function bedDecor(region: WorldMap.Region, budget: { full: number, low: nu
 			x, z = onSoil(grand, 0.5)
 		end
 		local height = between(grand, G.height[1], G.height[2])
+		table.insert(tufts, { x = x, z = z, height = height })
 		for j = 1, G.blades do
 			local a = grand() * TAU
 			local lean = between(grand, 12, 34)
@@ -572,18 +827,73 @@ local function bedDecor(region: WorldMap.Region, budget: { full: number, low: nu
 		add({ id = "Pebble" .. i, size = v(s, s * 0.55, s * between(trand, 0.6, 0.9)), at = v(x, top + s * 0.18, z), turn = v(between(trand, -15, 15), trand() * 360, 0), shape = "Ellipsoid",
 			color = hex(pick(P.colors, trand)), material = "Pebble", full = true, group = "Litter" })
 	end
+	-- ROBLOX-103 (W3c), each from a stream of its own after everything placed before, so nothing above moves (the woodlice's litter included):
+	-- seed heads on every other tuft (a stalk from the tuft's foot past its blades and a head of seeds on it, full tier);
+	local hrand = rng(region.seed, 111)
+	local SH = B.seedHeads
+	for i, t in tufts do
+		if i % 2 == 0 then
+			local a = hrand() * TAU
+			local lean = between(hrand, 6, 18)
+			local l = t.height * between(hrand, SH.over[1], SH.over[2])
+			local tipOut = math.sin(math.rad(lean)) * l
+			local foot = v(t.x, top, t.z)
+			local tip = foot + v(math.cos(a) * tipOut, math.cos(math.rad(lean)) * l, math.sin(a) * tipOut)
+			local d = tip - foot
+			add({ id = `Tuft{i}Stalk`, size = v(l, 0.04, 0.04), at = (foot + tip) * 0.5, turn = v(0, math.deg(math.atan2(-d.Z, d.X)), math.deg(math.asin(math.clamp(d.Y / d.Magnitude, -1, 1)))),
+				shape = "Cylinder", color = hex(SH.stalk), material = "SmoothPlastic", full = true, group = "Grass" })
+			add({ id = `Tuft{i}Head`, size = v(0.16, SH.length, 0.16), at = tip + d.Unit * (SH.length * 0.4), turn = v(0, -math.deg(a), -lean), shape = "Ellipsoid",
+				color = hex(pick(SH.colors, hrand)), material = "Fabric", full = true, group = "Grass" })
+		end
+	end
+	-- grass clumps along the bed's edges, where the lawn creeps in (one blade of each kept at the low tier), each with a seed head on a stalk;
+	local crand = rng(region.seed, 113)
+	local C = B.clumps
+	for i = 1, C.count do
+		local edge = (i - 1) % 3
+		local x = if edge == 0 then B.x0 + between(crand, 0.3, 1.0) elseif edge == 1 then B.x1 - between(crand, 0.3, 1.0) else between(crand, B.x0 + 2, B.x1 - 2)
+		local z = if edge == 2 then B.z0 + between(crand, 0.3, 1.0) else between(crand, B.z0 + 2, B.z1 - B.landing - 1)
+		local height = between(crand, C.height[1], C.height[2])
+		for j = 1, C.blades do
+			local a = crand() * TAU
+			local lean = between(crand, 10, 30)
+			local l = height * between(crand, 0.7, 1.0)
+			local foot = v(x + math.cos(a) * 0.15, top, z + math.sin(a) * 0.15)
+			local out = math.sin(math.rad(lean)) * l / 2
+			add({ id = `Clump{i}Blade{j}`, size = v(0.05, l, between(crand, 0.14, 0.22)), at = foot + v(math.cos(a) * out, math.cos(math.rad(lean)) * l / 2, math.sin(a) * out),
+				turn = v(0, -math.deg(a), -lean), shape = "Ellipsoid", color = hex(if crand() < 0.15 then B.grass.dry else pick(B.grass.colors, crand)), material = "SmoothPlastic", full = j > 1, group = "Grass" })
+		end
+		add({ id = `Clump{i}Stalk`, size = v(height * 1.25, 0.04, 0.04), at = v(x, top + height * 0.625, z), turn = v(0, 0, 90), shape = "Cylinder", color = hex(SH.stalk), material = "SmoothPlastic", full = true, group = "Grass" })
+		add({ id = `Clump{i}Head`, size = v(0.16, SH.length, 0.16), at = v(x, top + height * 1.25 + SH.length * 0.4, z), shape = "Ellipsoid", color = hex(pick(SH.colors, crand)), material = "Fabric", full = true, group = "Grass" })
+	end
+	-- and more kinds of litter (full tier): skeleton leaves gone to lace, dark rotting ones, small round ones, husks, and an empty snail shell
+	local morerand = rng(region.seed, 127)
+	local X = B.moreLitter
+	for i = 1, X.count do
+		local x, z = onSoil(morerand, 0.3)
+		local kind = X.kinds[1 + (i - 1) % #X.kinds]
+		local s = between(morerand, kind.size[1], kind.size[2])
+		add({ id = "MoreLitter" .. i, size = v(s, 0.035, s * kind.shape), at = v(x, top + 0.025, z), turn = v(between(morerand, 0, 10), morerand() * 360, 0), shape = "Ellipsoid",
+			color = hex(pick(kind.colors, morerand)), material = "Fabric", transparency = kind.transparency, full = true, group = "Litter" })
+	end
+	local sx, sz = onSoil(morerand, 0.6)
+	add({ id = "SnailShell", size = v(1.1, 0.95, 1.1), at = v(sx, top + 0.42, sz), turn = v(0, morerand() * 360, 70), shape = "Ellipsoid", color = hex("b59a6e"), material = "SmoothPlastic", full = true, group = "Litter" })
+	add({ id = "SnailShellBand", size = v(1.12, 0.3, 1.12), at = v(sx, top + 0.42, sz), turn = v(0, 0, 70), shape = "Ellipsoid", color = hex("6b4e2e"), material = "SmoothPlastic", full = true, group = "Litter" })
 	return list
 end
 
 -- ---------------------------------------------------------------- the questions Region asks
 -- The budgets: the most drawn parts a region of the kind may carry at each tier. They are what the generators place now (tests/world.luau builds the looks and
--- holds each tier to them exactly, so a look that grows says so here); the placers stop at them (`sheet`), keeping what they place first. All three together
--- are 568 parts at full and 218 at low, beside the sill's 1,178 and 314 (ROBLOX-96: the wall's 93/73 became 110/75 with the descent's dressing: three cobweb
--- strands, eight lichen patches and six eroded faces; nothing moved).
+-- holds each tier to them exactly, so a look that grows says so here); the placers stop at them (`sheet`), keeping what they place first. ROBLOX-96: the wall's
+-- 93/73 became 110/75 with the descent's dressing. ROBLOX-103 (W3c, more detail): the outer sill 94/36 to 116/39 (fallen petals, seeds, dry leaves, hairline
+-- cracks), the wall 110/75 to 134/75 (drip streaks, weathered joints, moss in the joints), the bed 364/107 to 466/113 (side veins on its seven leaves, seed heads,
+-- six edge clumps, fourteen more pieces of litter and a snail shell), and the new wall_upper 154/59 (the brick to the eaves, the eaves and the gutter, the roof, the
+-- rest of the house drawn round them). All four together are 870 parts at full and 286 at low, beside the sill's Decor (Region's BUDGETS).
 Garden.BUDGETS = {
-	outer_sill = { full = 94, low = 36 },
-	house_wall = { full = 110, low = 75 },
-	bed = { full = 364, low = 107 },
+	outer_sill = { full = 116, low = 39 },
+	house_wall = { full = 134, low = 75 },
+	bed = { full = 466, low = 113 },
+	wall_upper = { full = 154, low = 59 },
 } :: { [string]: { full: number, low: number } }
 
 local piecesCache: { [string]: { Piece } } = {}
@@ -591,7 +901,7 @@ local decorCache: { [string]: { Drawn } } = {}
 
 -- Whether a kind is one of the garden's.
 function Garden.knows(kind: string): boolean
-	return kind == "outer_sill" or kind == "house_wall" or kind == "bed"
+	return kind == "outer_sill" or kind == "house_wall" or kind == "bed" or kind == "wall_upper"
 end
 
 -- The physical boxes of a region of one of the garden's kinds (the same list for the same region; do not change it).
@@ -603,6 +913,7 @@ function Garden.pieces(region: WorldMap.Region): { Piece }
 	if region.kind == "outer_sill" then out = outerPieces()
 	elseif region.kind == "house_wall" then out = wallPieces()
 	elseif region.kind == "bed" then out = bedPieces(region)
+	elseif region.kind == "wall_upper" then out = upperPieces()
 	else error("no generator for the region kind " .. region.kind) end
 	piecesCache[key] = out
 	return out
@@ -618,6 +929,7 @@ function Garden.decor(region: WorldMap.Region): { Drawn }
 	if region.kind == "outer_sill" then out = outerDecor(region, budget)
 	elseif region.kind == "house_wall" then out = wallDecor(region, budget)
 	elseif region.kind == "bed" then out = bedDecor(region, budget)
+	elseif region.kind == "wall_upper" then out = upperDecor(region, budget)
 	else error("no generator for the region kind " .. region.kind) end
 	decorCache[key] = out
 	return out
@@ -628,6 +940,7 @@ function Garden.decorWith(region: WorldMap.Region, budget: { full: number, low: 
 	if region.kind == "outer_sill" then return outerDecor(region, budget) end
 	if region.kind == "house_wall" then return wallDecor(region, budget) end
 	if region.kind == "bed" then return bedDecor(region, budget) end
+	if region.kind == "wall_upper" then return upperDecor(region, budget) end
 	error("no generator for the region kind " .. region.kind)
 end
 
@@ -636,7 +949,7 @@ end
 function Garden.drawnPieces(region: WorldMap.Region): { string }
 	local out: { string } = {}
 	for _, p in Garden.pieces(region) do
-		if region.kind == "house_wall" or string.find(p.id, "_leaf_", 1, true) ~= nil or string.find(p.id, "_stem", 1, true) ~= nil or string.find(p.id, "_stalk", 1, true) ~= nil then
+		if region.kind == "house_wall" or region.kind == "wall_upper" or string.find(p.id, "_leaf_", 1, true) ~= nil or string.find(p.id, "_stem", 1, true) ~= nil or string.find(p.id, "_stalk", 1, true) ~= nil then
 			table.insert(out, p.id)
 		end
 	end

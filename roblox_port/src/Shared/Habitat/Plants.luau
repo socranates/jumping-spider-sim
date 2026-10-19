@@ -345,28 +345,57 @@ local function rudbeckia(parent: Instance, uv: Instance, index: number, spec: Fl
 	end
 end
 
--- A flowering shrub: a ball of foliage with blossom balls on the side that faces the room. `place` is Scenery.viewPosition.
-local function shrubs(parent: Instance, place: (number, number, number) -> (Vector3, number))
+-- A flowering bush to the ground (ROBLOX-103: the shrubs were standards on stems): a rounded core of leaves whose underside is a little above the lawn, lumps of
+-- leaves over its top and sides (the lowest touching the lawn), a woody frame of stems from the lawn up into the crown, and blossoms on the side facing the
+-- house. Each where Flora.garden.shrubs puts it, in the garden's own studs; the low tier keeps the core, a few lumps, two stems and two blossoms. `place` (the
+-- view's projection, Scenery.viewPosition) is no longer needed: the bushes are where they are.
+local function shrubs(parent: Instance, _place: (number, number, number) -> (Vector3, number))
 	local S = G.shrub
 	local rand = Shapes.rng(S.seed)
 	local group = folder(parent, "Shrubs")
-	local function ball(name: string, at: Vector3, diameter: number, color: Color3, optional: boolean)
-		local p = Shapes.block(group, name, Vector3.one * diameter, CFrame.new(at), color, "Plaster")
+	local function ball(name: string, at: Vector3, diameter: number, color: Color3, material: string, optional: boolean)
+		local p = Shapes.block(group, name, Vector3.one * diameter, CFrame.new(at), color, material)
 		p.Shape = Enum.PartType.Ball
 		if optional then Shapes.fullOnly(p) end
 	end
 	local ground = Graphics.view.ground.y
 	for i, spec in G.shrubs do
-		local at, k = place(spec.u, spec.v, spec.depth)
-		local diameter = spec.w * k
-		ball(`Shrub{i}`, at, diameter, hex(pick(S.foliage, rand)), false)
-		-- ROBLOX-95: a woody stem from the lawn up into the ball, so the shrub stands in the garden the spider can now walk to (no draw: the blooms below
-		-- are where they were)
-		Shapes.rod(group, `Shrub{i}Stem`, Vector3.new(at.X, ground, at.Z), at, diameter * S.body.width, hex(S.body.color), "Wood")
+		local h, w = spec.h, spec.w
+		local base = Vector3.new(spec.x, ground, spec.z)
+		-- the core: a rounded mass of leaves from just above the lawn to the top
+		local bottom = ground + h * S.skirt
+		local core = Shapes.ellipsoid(group, `Shrub{i}`, Vector3.new(w * 0.94, (h - h * S.skirt) * 0.98, w * 0.88), CFrame.new(spec.x, (bottom + ground + h) / 2, spec.z)
+			* CFrame.Angles(0, rand() * TAU, 0), hex(pick(S.foliage, rand)), S.material)
+		core.CastShadow = false
+		-- the frame: stems from the lawn splaying up into the crown (the low tier keeps the first two)
+		local F = S.frame
+		for k = 1, F.stems do
+			local a = (k - 1) / F.stems * TAU + rand() * 0.8
+			local foot = base + Vector3.new(math.cos(a) * w * 0.06, 0, math.sin(a) * w * 0.06)
+			local top = Vector3.new(spec.x + math.cos(a) * w * F.reach * 0.5, ground + h * between(rand, 0.35, 0.5), spec.z + math.sin(a) * w * F.reach * 0.5)
+			local stem = Shapes.rod(group, `Shrub{i}Stem{k}`, foot, top, w * F.width * (if k == 1 then 1.2 else 0.85), hex(F.color), F.material)
+			stem.CastShadow = false
+			if k > F.keepStems then Shapes.fullOnly(stem) end
+		end
+		-- the crown's lumps: the first `keep` on top (sunlit), the rest round the sides down to the lawn
+		for k = 1, S.clusters do
+			local top = k <= S.keep
+			local a = rand() * TAU
+			local tilt = if top then between(rand, 0, 0.55) else between(rand, 0.9, 1.75) -- from straight up
+			local dir = Vector3.new(math.cos(a) * math.sin(tilt), math.cos(tilt), math.sin(a) * math.sin(tilt))
+			local size = w * between(rand, S.clusterSize[1], S.clusterSize[2])
+			local centre = Vector3.new(spec.x, ground + h * 0.5, spec.z) + Vector3.new(dir.X * w * 0.36, dir.Y * h * 0.36, dir.Z * w * 0.33)
+			if centre.Y - size / 2 < ground then centre = Vector3.new(centre.X, ground + size / 2 - size * 0.08, centre.Z) end -- down to the lawn, not under it
+			ball(`Shrub{i}Leaf{k}`, centre, size, hex(if top then pick(S.sunlit, rand) else pick(S.foliage, rand)), S.material, not top)
+		end
+		-- the blossoms, on the side facing the house (+z) and upward
 		local colors = if spec.bloom == "pink" then S.pink else S.white
-		for j = 1, S.blooms do
-			local dir = Vector3.new(rand() * 2 - 1, rand() * 1.2 - 0.3, 0.35 + rand() * 0.8).Unit
-			ball(`Shrub{i}Bloom{j}`, at + dir * (diameter * 0.4), between(rand, S.bloomSize[1], S.bloomSize[2]) * diameter, hex(pick(colors, rand)), j > 3)
+		for k = 1, S.blooms do
+			local a = between(rand, 0.15, math.pi - 0.15)
+			local tilt = between(rand, 0.35, 1.35)
+			local dir = Vector3.new(math.cos(a) * math.sin(tilt), math.cos(tilt), math.sin(a) * math.sin(tilt))
+			local at = Vector3.new(spec.x, ground + h * 0.5, spec.z) + Vector3.new(dir.X * w * 0.47, dir.Y * h * 0.47, dir.Z * w * 0.44)
+			ball(`Shrub{i}Bloom{k}`, at, between(rand, S.bloomSize[1], S.bloomSize[2]) * w, hex(pick(colors, rand)), "SmoothPlastic", k > S.bloomKeep)
 		end
 	end
 end

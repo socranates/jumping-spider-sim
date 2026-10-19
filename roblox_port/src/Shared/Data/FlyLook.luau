@@ -87,6 +87,28 @@ FlyLook.wing = {
 -- A soft dark oval on the surface under a standing fly stands in for its shadow (the parts cast none): size, how far above the surface.
 FlyLook.shadow = { size = { 0.34, 0.004, 0.70 }, lift = 0.003, transparency = 0.78 }
 
+-- ROBLOX-103 (W3c): how a body moves, pose only (Client/FlyBodies turns the parts it already has; nothing is added). Every sheet may carry a `motion` table;
+-- the house fly's is this one. Lengths are in the body's own units (before the profile's visual_scale), angles radians, rates per second.
+--   gait ...... the legs step while the body walks on a surface: each leg swings about its hip (`swing`, forward and back) and lifts its foot on the forward
+--               stroke (`lift`); a full cycle per `stride` of ground covered, so a slow walker steps slowly and a still one does not step at all. Six legs go
+--               in two tripods (front and hind of one side with the middle of the other); `wave` (the woodlouse's) is a metachronal wave instead, each
+--               pair `wave` behind the one in front. `settle`: how fast the stepping fades in and out (1/s). `jump`: a move longer than this between two
+--               drawings is a hop or a teleport, not a step.
+--   kick ...... in the jaws the legs kick at this rate (Hz).
+--   antenna ... the antennae sway a little about their bases (`amp`, at `hz`).
+--   flap ...... wings that beat visibly (the moth's): the flight fans swing up and down about their roots at `hz`, `amp` either side; without it the fans are
+--               the fly's soft blur that trembles (FlyLook.wing.fan.shimmer).
+--   resettle .. after landing the resting wings shiver for `seconds`, dying away (the moth settling its wings).
+--   wobble .... the body rocks in flight (`roll`, `pitch` at `hz`: the crane fly's unsteady flight); `dangle`: its hanging legs swing fore and aft.
+--   crouch .... a hopper about to leap (startled, its reaction pending) sinks `depth` and tips `pitch` (nose up for the leafhopper's hind-leg spring).
+--   tumble .... turns end over end in a hop (the springtail's somersault), this many turns per hop.
+-- Reduced Motion (the player's setting, as the spider's rig reads it) keeps the stepping, which is how a body gets anywhere, and stills the rest: no sway,
+-- no trembling or beating fan (a still blur), no shiver, no rocking, no crouch, no somersault.
+FlyLook.motion = { gait = { stride = 0.36, swing = 0.30, lift = 0.32, settle = 9, jump = 0.6 }, kick = 6 }
+-- The far rule (as the rival's and the mate's rigs, Rig/SpiderRig FAR_STUDS and FAR_SECONDS): a body farther than `studs` from the camera is drawn once every
+-- `seconds` with all the time since; the simulation steps it every tick regardless.
+FlyLook.far = { studs = 25, seconds = 0.1 }
+
 -- ROBLOX-96: the bed's prey, drawn from simpler sheets (Client/FlyBodies.buildSmall) in the same body frame (feet at y = -hover, the whole scaled by the profile's
 -- visual_scale: the gnat at 0.45 is about 3 mm, the aphid at 0.4 under 3 mm). `body`: ellipsoids; `rods`: legs, antennae and the like, a rod from `from` to `to`
 -- on the right side, mirrored when `mirror`, with `fly` endpoints for the flight pose where they differ; `wing`: one pair of plain glass wings (folded flat at rest,
@@ -114,6 +136,7 @@ FlyLook.small = {
 		wing = { root = { 0.05, 0.1, -0.06 }, length = 0.5, width = 0.16, thick = 0.005, yaw = 6, pitch = 2, roll = 0, transparency = 0.5, reflectance = 0.08,
 			fan = { reach = 0.34, span = 0.3, roll = 8, yaw = 20, back = 0.02, rise = 0.01, transparency = 0.8 } },
 		shadow = { size = { 0.2, 0.004, 0.55 }, lift = 0.003, transparency = 0.8 },
+		motion = { gait = { stride = 0.42, swing = 0.32, lift = 0.30, settle = 9, jump = 0.6 }, kick = 7, antenna = { amp = 0.14, hz = 1.6 } },
 	},
 	-- an aphid: a pear-shaped green body, a small head, two cornicles at the rear, short legs, long antennae, no wings
 	aphid = {
@@ -132,6 +155,7 @@ FlyLook.small = {
 			{ name = "Cornicle", color = "cornicle", d = 0.02, from = { 0.07, 0.1, 0.26 }, to = { 0.1, 0.17, 0.36 }, mirror = true },
 		},
 		shadow = { size = { 0.3, 0.004, 0.46 }, lift = 0.003, transparency = 0.8 },
+		motion = { gait = { stride = 0.3, swing = 0.28, lift = 0.30, settle = 9, jump = 0.6 }, kick = 4, antenna = { amp = 0.12, hz = 0.9 } },
 	},
 } :: { [string]: any }
 
@@ -159,6 +183,9 @@ FlyLook.small.springtail = {
 		{ name = "Furcula", color = "furcula", d = 0.008, from = { 0, -0.13, 0.075 }, to = { 0, -0.135, 0.02 }, fly = { { 0, -0.13, 0.075 }, { 0, -0.17, 0.13 } }, full = true },
 	} :: { any },
 	shadow = { size = { 0.05, 0.004, 0.14 }, lift = 0.003, transparency = 0.8, full = true },
+	-- (ROBLOX-103) quick little steps, a crouch before the spring and a somersault in the air (springtails tumble as they go)
+	motion = { gait = { stride = 0.07, swing = 0.35, lift = 0.35, settle = 12, jump = 0.4 }, kick = 8, antenna = { amp = 0.16, hz = 2.2 },
+		crouch = { depth = 0.012, pitch = -0.12 }, tumble = 1 },
 }
 FlyLook.small.leafhopper = {
 	colors = { head = "7cb342", eye = "6b5a3a", pronotum = "6fae3c", scutellum = "8bc34a", abdomen = "9ccc65", wing = "6aa636", leg = "8fbf5a", spine = "d6e8b0", antenna = "5e8f30", shadow = "2a241c" },
@@ -187,6 +214,9 @@ FlyLook.small.leafhopper = {
 			transparency = 0, reflectance = 0.05, fan = { reach = 0.24, span = 0.2, roll = 8, yaw = 20, back = 0.02, rise = 0.01, transparency = 0.7 } },
 	} :: { any },
 	shadow = { size = { 0.14, 0.004, 0.36 }, lift = 0.003, transparency = 0.8, full = true },
+	-- (ROBLOX-103) it sidesteps round its stem on these legs, and sinks and tips its nose up on its hind legs before the jump
+	motion = { gait = { stride = 0.14, swing = 0.30, lift = 0.30, settle = 10, jump = 0.6 }, kick = 6, antenna = { amp = 0.10, hz = 1.2 },
+		crouch = { depth = 0.03, pitch = 0.18 } },
 }
 FlyLook.small.moth = {
 	colors = { head = "7a6e5c", eye = "2a2018", thorax = "7a6e5c", abdomen = "8a7f6c", forewing = "8c8170", hindwing = "a39a88", band = "4f4639", antenna = "5e5446", leg = "6b604f", shadow = "2a241c" },
@@ -214,6 +244,9 @@ FlyLook.small.moth = {
 			transparency = 0, reflectance = 0, hide = true, full = true },
 	} :: { any },
 	shadow = { size = { 1.3, 0.004, 0.6 }, lift = 0.003, transparency = 0.82, full = true },
+	-- (ROBLOX-103) a slow, visible flap in the air; on landing the wings shiver and settle flat
+	motion = { gait = { stride = 0.28, swing = 0.25, lift = 0.25, settle = 8, jump = 0.6 }, kick = 5, antenna = { amp = 0.08, hz = 0.7 },
+		flap = { hz = 5, amp = 0.75 }, resettle = { seconds = 0.9, hz = 6, amp = 0.32 } },
 }
 -- (the crane fly's legs: hip, knee, ankle and foot of the right front, middle and hind leg, standing splayed and dangling in flight)
 local craneLegs = {
@@ -251,6 +284,9 @@ FlyLook.small.crane_fly = {
 	} :: { any },
 	shadow = { size = { 0.4, 0.004, 1.8 }, lift = 0.003, transparency = 0.82, full = true },
 	shed = "RightHind", -- the leg left in the jaws (ROBLOX-101): the right hind leg's parts, at either tier
+	-- (ROBLOX-103) long slow steps on its stilts; in the air it rocks and its legs dangle and swing
+	motion = { gait = { stride = 1.3, swing = 0.14, lift = 0.12, settle = 6, jump = 1.0 }, kick = 4, antenna = { amp = 0.10, hz = 1.1 },
+		wobble = { roll = 0.14, pitch = 0.08, hz = 2.1 }, dangle = { amp = 0.18, hz = 1.7 } },
 }
 
 return FlyLook

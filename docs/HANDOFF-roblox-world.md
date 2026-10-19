@@ -253,4 +253,62 @@ What is in it:
 - The crane fly does not rest on the glass: the glass belongs to the sill's region, whose prey is pinned. Say if it should, and the sill's pin can be renegotiated for it.
 - Part B (the ladybird, millipede, snail and harvestman as ambient bugs) is next on the bestiary's list.
 
+## W3c — the look: insects that walk and fly, bushes to the ground, a single-story house, more detail (ROBLOX-103)
+
+Claude → Chet, 2026-10-19, branch `claude/w3c`. Nathan's v33 notes: "better animations for the new insects"; "no holes, shrubs should be bushes and the house a
+single story. more realistic. still more detail. More beauty. Lighting is beautiful". The lighting is untouched and nothing added casts a shadow. `docs/DECISIONS.md`
+ROBLOX-103 has the numbers and the reasons. **Nothing of it has run in Studio.** No prey, rule or save changed; `WorldMap.REVISION` stays `world-2`, so every v33 rest
+comes back where it was.
+
+What is in it:
+
+- **The bodies move** (pose only, no part added; `Client/FlyBodies`, `Client/BugBodies`, `Data/FlyLook` `motion`): legs that step in two tripods while a body walks
+  (a full cycle per stride of ground covered, so an aphid shuffles slowly, a leafhopper steps round its stem, a moth resettles, and a body that stops stops), a
+  metachronal wave down the woodlouse's fourteen legs, legs that kick in the jaws, antennae that sway, the flight blur that trembles as the house fly's always has, the
+  moth's visible flap (5 Hz) and its wings shivering as it lands, the crane fly rocking in the air with its legs dangling, the leafhopper sinking nose-up before its
+  jump, the springtail's somersault through its hop. The woodlouse (*Porcellio scaber*) cannot roll, so it scurries. Reduced Motion keeps the steps and stills the
+  rest; a body more than 25 studs from the camera is drawn ten times a second, as the rival is.
+- **Bushes to the ground**: the view's eight shrubs on stems are ten flowering bushes standing in the garden itself (0.55 to 1.5 m tall), a hedge line west of the bed
+  and two on the east border, each a rounded crown of leaf clusters (`LeafyGrass`) on stems from the lawn, blossoms toward the house.
+- **A single-story house**: a new region, `wall_upper`: the brick above the window up to the eaves at y 110 (on two jambs beside the window, where brick was drawn
+  that nothing held), the soffit (walkable upside down), the fascia, a gutter whose floor is 1.09 m above the sill (a high perch; its spawn is on it), and the eave
+  course of tiles; its look draws the rest of the house round it as a backdrop: the back wall 5 m either way, the roof over the whole house, the eaves and gutter along
+  it, a downpipe, a second window and the back door. No retreat and no prey there yet. The houses across the way are three bungalows beyond a back fence (one
+  storey, one row of windows, pitched roofs), the garden has its back and side fences, the two trees are real trees in the neighbours' gardens, the hills are far.
+- **More detail**: petals, seeds and hairline cracks on the outer sill; drip streaks, weathered joints and moss in the joints on the wall; veins on the bed's leaves,
+  seed heads, grass clumps at the edges, more kinds of litter and a snail shell in the bed. Looks: outer sill 116/39, wall 134/75, bed 466/113, wall above 154/59
+  parts (full/low); the sill's Decor 1,253/355.
+- **The wall's spawn** moved from its east shoulder's top (under the new jamb) to the shoulder's face; nothing rests there, so no save is affected.
+
+## Your Studio checklist (W3c)
+
+1. **The light is the light.** From the sill's usual camera at the spawn and through the window: the sunlight on the sill, the shafts, the shadows, the evening and
+   the night should look exactly as in v33. If anything darkens or a new shadow falls on the sill, say where (nothing added should cast one).
+2. **Insects that walk.** In the bed, watch an aphid shuffle on its leaf and a gnat walk on the soil: the legs should step, not slide, and stop when the body stops.
+   Watch a woodlouse walk and then hurry for cover: a wave down its legs, faster as it hurries; it never rolls. On the wall at dusk watch a moth land: its wings
+   should shiver and settle flat.
+3. **Insects that fly.** A gnat's and a house fly's wings are a soft trembling blur (no strobing); a moth's beat visibly and smoothly; a crane fly rocks and its legs
+   dangle and swing. Turn Reduced Motion on: the blur is still, the moth's wings a still blur, the crane fly flies level, the legs still step.
+4. **The leap.** Rush a leafhopper: just before it jumps it should sink and tip its nose up for a moment. Come at a springtail: it should flip over in its hop.
+5. **Far bugs.** From more than 25 studs away (the camera, not the spider) a bug should still move, a little less smoothly (ten times a second). Say if it looks wrong.
+6. **Bushes to the ground.** From the sill through the window, from the outer sill and from the bed: bushes, not balls on sticks; their crowns touch the lawn; how
+   `LeafyGrass` looks on them at this scale.
+7. **The single-story house.** From the bed and from the descent look up: the brick above the window goes up to the eaves, the soffit, fascia and gutter, the roof
+   above; to either side the house's wall and roof go on, a downpipe, another window, the back door. Nothing above the eaves but the roof. Through the window: the
+   bungalows' roofs low in the middle of the glass (are they too faint in Roblox's haze?), the fences, the trees, the hills.
+8. **Climb to the gutter.** From the wall (the descent's route in reverse, or up from the outer sill's end) climb the brick past the window's head to the eaves, walk
+   out along the soffit upside down to the fascia and into the gutter; walk along it. Output should carry no `[Windowsill] world:` warning on the way (`wall_upper`
+   must arrive whole; tell us if "wall_upper ... has not arrived whole" appears and for how long).
+9. **The wall's shoulders.** Beside the window the spider should no longer walk inside drawn brick over the shoulders: the jambs are solid now.
+10. **Parts and frame time** at both tiers, on the PC and when you can on a phone or the PlayStation: the looks outside are about 300 parts more at full (870 in all)
+    and 70 more at low (286), the sill's Decor 75 more at full and 41 at low.
+
+## Open for Nathan (W3c)
+
+- Do the bugs' steps and wings read as living on the television, or is any of it too busy (the gnat's blur, the crane fly's rocking)?
+- The bushes: the right size and number, the right places (a hedge west of the bed, two on the east border)? Walkable twigs (`shrub_west`) were not begun this round.
+- The bungalows are 14.6 m off beyond the back fence, so from the sill they are small and hazy: would you rather see them closer, or more of the garden?
+- The gutter has no retreat yet; a leaf mat in its corner with a gap under it could be one, with the eaves' house spider (the map plan's region 4).
+- From the lawn the laid bricks round the window show as a patch in a wall of plainer courses until `wall_west` and `wall_east` are built (the drainpipe, the door).
+
 *(W4 — nature's rules and W5 — no hand holding will be appended here as they land.)*

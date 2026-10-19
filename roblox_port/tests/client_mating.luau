@@ -694,7 +694,7 @@ check("the scene: the camera eases into a two-shot and orbits a quarter, the con
 	-- The orbit, and the music.
 	local first = cam.camera.CFrame.Position - mid
 	assert(snd.swell > 1.59 and snd.swell < 1.61, `the music has swelled to 1.6 ({snd.swell})`)
-	if runMusic ~= nil then assert(math.abs(runMusic.Volume - 0.18 * 1.6) < 0.01, `and the music voice is at 1.6 of its level ({runMusic.Volume})`) end
+	if runMusic ~= nil then assert(math.abs(runMusic.Volume - 0.32 * 1.6) < 0.01, `and the music voice is at 1.6 of its level ({runMusic.Volume})`) end -- (ROBLOX-102 raised the music to 0.32; this pin was left at 0.18)
 	untilScene(d, 7.3)
 	assert(mine.settleT ~= nil and theirs.settleT ~= nil and mine.settleLen == 8 and theirs.settleLen == 4, "the settle cue: the male's four seconds, the female's eight")
 	assert(caption() == MateText.SCENE_SETTLE, `the third caption: "{caption()}"`)

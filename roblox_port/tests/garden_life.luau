@@ -925,5 +925,200 @@ case("the bestiary's bodies: under the fly's forty parts at full, fewer at low, 
 	end
 end)
 
+
+-- ================================================================ ROBLOX-103 (W3c): the bodies move, pose only
+case("the bestiary's bodies move: the moth's flap and its wings settling, the crane fly's rocking and dangling legs, the leafhopper's crouch, the springtail's somersault, steps on every kind, nothing added, no NaN", function()
+	local function find(rig: any, name: string): any for _, p in rig.parts do if p.Name == name then return p end end error("no part " .. name) end
+	local function rel(rig: any, ref: string): { [string]: CFrame }
+		local base = find(rig, ref).CFrame
+		local out = {}
+		for _, p in rig.parts do out[p.Name] = base:Inverse() * p.CFrame end
+		return out
+	end
+	local function diff(a: { [string]: CFrame }, b: { [string]: CFrame }, word: string): number
+		local worst = 0
+		for name, f in a do
+			if string.find(name, word, 1, true) then
+				local g = b[name]
+				worst = math.max(worst, (f.Position - g.Position).Magnitude, (f.LookVector - g.LookVector).Magnitude, (f.UpVector - g.UpVector).Magnitude)
+			end
+		end
+		return worst
+	end
+	local function finiteRig(rig: any): boolean
+		for _, p in rig.parts do
+			local c = p.CFrame
+			for _, v in { p.Position, c.RightVector, c.UpVector, c.LookVector } do
+				if v.X ~= v.X or v.Y ~= v.Y or v.Z ~= v.Z or math.abs(v.X) > 1e6 or math.abs(v.Y) > 1e6 or math.abs(v.Z) > 1e6 then return false end
+			end
+		end
+		return true
+	end
+	local function bug(id: string, profile: any, state: string): any
+		return { id = id, state = state, position = Vector3.new(0, 0.16, 0), heading = -Vector3.zAxis, normal = Vector3.yAxis, profile = profile,
+			airborne = function(self: any): boolean return self.state ~= "PERCHED" and self.state ~= "ALERT" and self.state ~= "CAPTURED" end }
+	end
+	local t = 0
+	local function frame(bodies: any, list: { any }, reduced: boolean?)
+		t += 1 / 60
+		bodies:draw(list, t, nil, reduced)
+	end
+	local expect = { springtail = { 15, 11 }, leafhopper = { 25, 13 }, moth = { 20, 9 }, crane_fly = { 31, 11 } }
+	-- every kind steps while it walks and not while it stands, at both tiers, and keeps its part count
+	for kind, counts in expect do
+		for ti, tier in { "full", "low" } do
+			local bodies = FlyBodies.new(workspace, tier)
+			local f = bug("w", (Species :: any)[kind .. "_prototype"], "PERCHED")
+			bodies:draw({ f } :: { any }, t)
+			local rig = bodies.rigs.w
+			local moving, last = 0, rel(rig, "Head")
+			for _ = 1, 40 do
+				f.position += Vector3.new(0.006, 0, 0)
+				frame(bodies, { f })
+				local now = rel(rig, "Head")
+				if diff(now, last, "Front") > 1e-4 or diff(now, last, "Hind") > 1e-4 then moving += 1 end
+				last = now
+			end
+			for _ = 1, 60 do frame(bodies, { f }) end
+			local a = rel(rig, "Head")
+			frame(bodies, { f })
+			local b = rel(rig, "Head")
+			local hasLegs = false
+			for _, part in rig.parts do if string.find(part.Name, "Front", 1, true) then hasLegs = true end end
+			check((moving >= 35 or not hasLegs) and diff(a, b, "Front") < 1e-9 and diff(a, b, "Middle") < 1e-9 and diff(a, b, "Hind") < 1e-9,
+				`{kind} at {tier}: its legs step while it walks ({moving} of 40 frames; the low moth has none drawn) and are still when it stands`)
+			check(#rig.parts == counts[ti] and finiteRig(rig), `{kind} at {tier}: still {#rig.parts} parts, every frame finite`)
+			bodies:draw({}, t)
+		end
+	end
+	-- the moth beats its wings visibly in the air, smoothly (no strobing jumps), and not in Reduced Motion
+	local bodies = FlyBodies.new(workspace, "full")
+	local moth = bug("m", Species.moth_prototype, "SEEK_PERCH")
+	bodies:draw({ moth } :: { any }, t)
+	local mrig = bodies.rigs.m
+	local lo, hi, worstStep = math.huge, -math.huge, 0
+	local lastUp = rel(mrig, "Head").RightForewing.UpVector
+	for _ = 1, 60 do
+		frame(bodies, { moth })
+		local up = rel(mrig, "Head").RightForewing.UpVector
+		lo, hi = math.min(lo, up.X), math.max(hi, up.X)
+		worstStep = math.max(worstStep, math.acos(math.clamp(up:Dot(lastUp), -1, 1)))
+		lastUp = up
+	end
+	check(hi - lo > 0.8 and worstStep < 0.5, `the moth's wings beat up and down in flight (a swing of {string.format("%.2f", hi - lo)}), at most {string.format("%.2f", worstStep)} rad a frame`)
+	local r1 = rel(mrig, "Head"); frame(bodies, { moth }, true); local r2 = rel(mrig, "Head"); frame(bodies, { moth }, true); local r3 = rel(mrig, "Head")
+	check(diff(r2, r3, "Forewing") < 1e-9 and r1 ~= nil, "in Reduced Motion the moth's wings are a still blur")
+	-- landed, its wings shiver for under a second and lie still
+	moth.state = "PERCHED"
+	frame(bodies, { moth })
+	local shiver = 0
+	local prev = rel(mrig, "Head")
+	for _ = 1, 30 do frame(bodies, { moth }); local now = rel(mrig, "Head"); if diff(now, prev, "Forewing") > 1e-4 then shiver += 1 end; prev = now end
+	for _ = 1, 60 do frame(bodies, { moth }) end
+	local s1 = rel(mrig, "Head"); frame(bodies, { moth }); local s2 = rel(mrig, "Head")
+	check(shiver >= 20 and diff(s1, s2, "wing") < 1e-9 and diff(s1, s2, "Band") < 1e-9, `on landing the moth's wings shiver ({shiver} of 30 frames) and then lie still`)
+	-- the crane fly rocks in the air and its dangling legs swing; in Reduced Motion neither
+	local crane = bug("c", Species.crane_fly_prototype, "SEEK_PERCH")
+	bodies:draw({ crane } :: { any }, t)
+	local crig = bodies.rigs.c
+	local rollLo, rollHi, dangle = math.huge, -math.huge, 0
+	local cprev = rel(crig, "Thorax")
+	for _ = 1, 60 do
+		frame(bodies, { crane })
+		local up = find(crig, "Thorax").CFrame.UpVector
+		rollLo, rollHi = math.min(rollLo, up.X), math.max(rollHi, up.X)
+		local now = rel(crig, "Thorax")
+		if diff(now, cprev, "Tarsus") > 1e-4 then dangle += 1 end
+		cprev = now
+	end
+	check(rollHi - rollLo > 0.1 and dangle >= 55, `the crane fly rocks in flight (its back swings {string.format("%.2f", rollHi - rollLo)}) and its dangling legs swing ({dangle} of 60 frames)`)
+	frame(bodies, { crane }, true)
+	local c1 = find(crig, "Thorax").CFrame.UpVector; local cr1 = rel(crig, "Thorax")
+	frame(bodies, { crane }, true)
+	check((find(crig, "Thorax").CFrame.UpVector - c1).Magnitude < 1e-9 and diff(cr1, rel(crig, "Thorax"), "Tarsus") < 1e-9, "in Reduced Motion it flies level with its legs still")
+	-- the leafhopper sinks and tips before its leap (its reaction pending), and not in Reduced Motion
+	local hopper = bug("h", Species.leafhopper_prototype, "ALERT")
+	bodies:draw({ hopper } :: { any }, t)
+	local hrig = bodies.rigs.h
+	local standY = find(hrig, "Abdomen").Position.Y
+	hopper.pending = t + 1
+	for _ = 1, 20 do frame(bodies, { hopper }) end
+	local crouchY = find(hrig, "Abdomen").Position.Y
+	local nose = find(hrig, "Head").Position.Y - find(hrig, "Abdomen").Position.Y
+	for _ = 1, 20 do frame(bodies, { hopper }, true) end
+	local reducedY = find(hrig, "Abdomen").Position.Y
+	hopper.pending = nil
+	for _ = 1, 30 do frame(bodies, { hopper }) end
+	check(crouchY < standY - 0.015 and nose > 0 and math.abs(reducedY - standY) < 1e-9 and math.abs(find(hrig, "Abdomen").Position.Y - standY) < 1e-3,
+		`the leafhopper crouches nose up before the jump ({string.format("%.3f", standY - crouchY)} down), not in Reduced Motion, and stands again`)
+	-- the springtail turns end over end through its hop
+	local spring = bug("s", Species.springtail_prototype, "PERCHED")
+	bodies:draw({ spring } :: { any }, t)
+	local srig = bodies.rigs.s
+	spring.state = "HOP"
+	spring.hop = { time = 0.16 }
+	frame(bodies, { spring })
+	local flipped = false
+	for _ = 1, 9 do
+		frame(bodies, { spring })
+		if find(srig, "Thorax").CFrame.UpVector.Y < -0.5 then flipped = true end
+	end
+	check(flipped and finiteRig(srig), "the springtail somersaults through its hop (upside down part way)")
+	bodies:draw({}, t)
+end)
+
+case("the drawn woodlouse moves: a wave down its fourteen legs while it walks, still when it stops, antennae that sway, the far rule", function()
+	local bugs = BugBodies.new(workspace)
+	local louse = { id = "louse_1", position = Vector3.new(3, -89.88, -40), heading = Vector3.new(1, 0, 0), state = "walk" }
+	local t = 0
+	bugs:draw({ louse }, t)
+	local rig = bugs.rigs.louse_1
+	local function legs(): { CFrame }
+		local base = rig.parts[8].CFrame -- the head
+		local out = {}
+		for i, p in rig.parts do out[i] = base:Inverse() * p.CFrame end
+		return out
+	end
+	local function change(a: { CFrame }, b: { CFrame }, from: number, to: number): number
+		local worst = 0
+		for i = from, to do worst = math.max(worst, (a[i].Position - b[i].Position).Magnitude, (a[i].LookVector - b[i].LookVector).Magnitude) end
+		return worst
+	end
+	-- the parts in the sheet's order: seven plates, the head, then each side's antenna and seven legs
+	check(rig.parts[8].Name == "Head" and rig.parts[9].Name == "LeftAntenna" and rig.parts[10].Name == "LeftLeg1", "the parts in the sheet's order")
+	local moving, last = 0, legs()
+	local waveSeen = false
+	for _ = 1, 60 do
+		t += 1 / 60
+		louse.position += Vector3.new(0.5 / 60, 0, 0)
+		bugs:draw({ louse }, t)
+		local now = legs()
+		if change(now, last, 10, 16) > 1e-4 then moving += 1 end
+		-- a wave: the first and fourth legs of a side are not in step
+		if (now[10].LookVector - now[13].LookVector).Magnitude > 0.05 then waveSeen = true end
+		last = now
+	end
+	check(moving >= 55 and waveSeen, `walking, its legs step in a wave ({moving} of 60 frames)`)
+	for _ = 1, 60 do t += 1 / 60; bugs:draw({ louse }, t) end
+	local a = legs(); t += 1 / 60; bugs:draw({ louse }, t); local b = legs()
+	check(change(a, b, 10, 16) < 1e-9 and change(a, b, 18, 24) < 1e-9 and rig.gait == 0, "standing, its legs are still")
+	check(change(a, b, 9, 9) > 1e-5, "its antennae sway")
+	t += 1 / 60; bugs:draw({ louse }, t, nil, true); local c = legs(); t += 1 / 60; bugs:draw({ louse }, t, nil, true)
+	check(change(c, legs(), 9, 9) < 1e-9, "in Reduced Motion they are still")
+	check(#rig.parts == BugBodies.PARTS, "no part added")
+	louse.state = "hidden"
+	t += 1 / 60; bugs:draw({ louse }, t)
+	for _, p in rig.parts do check(p.Position.Y < -90.5 and p.Position.X == p.Position.X, "hidden, under the soil and finite") end
+	-- far from the camera it is placed ten times a second
+	louse.state = "walk"
+	local placed = 0
+	local original = workspace.BulkMoveTo
+	workspace.BulkMoveTo = function(self: any, ps: { any }, frames: { any }, mode: any) placed += 1; original(self, ps, frames, mode) end
+	for _ = 1, 60 do t += 1 / 60; louse.position += Vector3.new(0.01, 0, 0); bugs:draw({ louse }, t, Vector3.new(3, -60, -40)) end
+	workspace.BulkMoveTo = original
+	check(placed >= 9 and placed <= 11, `beyond 25 studs of the camera, placed {placed} times in a second`)
+	bugs:draw({})
+end)
+
 print(`GARDEN_LIFE passed={passed} failed={failed}`)
 if failed > 0 then error("GARDEN_LIFE failed") end

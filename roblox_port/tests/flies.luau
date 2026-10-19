@@ -429,5 +429,141 @@ do
  check(ar.flying and #ar.parts==15,"a captured aphid is drawn still")
  bodies:draw({},0)
 end
+
+-- ---------------------------------------------------------------- ROBLOX-103 (W3c): the bodies move, pose only
+do
+ local function rel(rig: any, ref: string): { [string]: CFrame }
+  local base = named(rig, ref).CFrame
+  local out = {}
+  for _, p in rig.parts do out[p.Name] = base:Inverse() * p.CFrame end
+  return out
+ end
+ local function diff(a: { [string]: CFrame }, b: { [string]: CFrame }, word: string): number
+  local worst = 0
+  for name, f in a do
+   if string.find(name, word, 1, true) then
+    local g = b[name]
+    worst = math.max(worst, (f.Position - g.Position).Magnitude, (f.LookVector - g.LookVector).Magnitude, (f.UpVector - g.UpVector).Magnitude)
+   end
+  end
+  return worst
+ end
+ local function finiteRig(rig: any): boolean
+  for _, p in rig.parts do
+   local c = p.CFrame
+   if not (finite(p.Position) and finite(c.RightVector) and finite(c.UpVector) and finite(c.LookVector)) then return false end
+  end
+  return true
+ end
+ -- a gnat walks 0.24 studs in a second, then stands for a second
+ local bodies = FlyBodies.new(workspace)
+ local g = fly("walker", "PERCHED", Vector3.new(0, HOVER, 0), -Vector3.zAxis, Vector3.yAxis); g.profile = Species.fungus_gnat_prototype
+ local t = 0
+ bodies:draw({ g }, t)
+ local rig = bodies.rigs.walker
+ local restPose = rel(rig, "Head")
+ local partsBefore = #rig.parts
+ local walkMoves, lowest, last = 0, math.huge, rel(rig, "Head")
+ for _ = 1, 60 do
+  t += 1 / 60
+  g.position += Vector3.new(0, 0, -0.004)
+  bodies:draw({ g }, t)
+  local now = rel(rig, "Head")
+  if diff(now, last, "Femur") > 1e-4 then walkMoves += 1 end
+  last = now
+  for _, p in rig.parts do if string.find(p.Name, "Tibia", 1, true) then lowest = math.min(lowest, endAlong(p, -Vector3.yAxis).Y) end end
+ end
+ check(walkMoves >= 55 and rig.gait > 0.9, `walking, the gnat's legs step (they moved in {walkMoves} of 60 frames; the stepping at {string.format("%.2f", rig.gait)})`)
+ check(lowest > -0.03, `no foot goes through the surface while stepping (lowest {string.format("%.3f", lowest)})`)
+ local cycles = rig.stride
+ for _ = 1, 60 do t += 1 / 60; bodies:draw({ g }, t) end
+ local a = rel(rig, "Head")
+ t += 1 / 60; bodies:draw({ g }, t)
+ local b = rel(rig, "Head")
+ check(diff(a, b, "Femur") < 1e-9 and diff(a, b, "Tibia") < 1e-9 and rig.gait == 0 and rig.stride == cycles, "standing still, its legs do not move")
+ check(diff(a, restPose, "Femur") < 1e-9 and diff(a, restPose, "Tibia") < 1e-9, "and they are back in the standing pose")
+ check(#rig.parts == partsBefore and partsBefore == 22, "and no part was added (22)")
+ -- the antennae sway a little when not in Reduced Motion, and are still in it; the legs step in it all the same
+ local a1 = rel(rig, "Head"); t += 0.2; bodies:draw({ g }, t); local a2 = rel(rig, "Head")
+ check(diff(a1, a2, "Antenna") > 1e-4 and diff(a1, a2, "Antenna") < 0.45, `the antennae sway ({string.format("%.4f", diff(a1, a2, "Antenna"))})`)
+ local r1 = rel(rig, "Head"); t += 0.2; bodies:draw({ g }, t, nil, true); local r2 = rel(rig, "Head"); t += 0.2; bodies:draw({ g }, t, nil, true); local r3 = rel(rig, "Head")
+ check(diff(r2, r3, "Antenna") < 1e-9, "in Reduced Motion the antennae are still")
+ local stepsReduced = 0
+ for _ = 1, 20 do
+  local before = rel(rig, "Head"); t += 1 / 60; g.position += Vector3.new(0.004, 0, 0); bodies:draw({ g }, t, nil, true)
+  if diff(rel(rig, "Head"), before, "Femur") > 1e-4 then stepsReduced += 1 end
+ end
+ check(stepsReduced >= 15 and r1 ~= nil, `in Reduced Motion the legs still step ({stepsReduced} of 20 frames)`)
+ -- the wing's phase runs in flight and not at rest
+ g.state = "FLEE"
+ bodies:draw({ g }, t)
+ local w0 = rig.wing
+ t += 1 / 60; bodies:draw({ g }, t)
+ local w1 = rig.wing
+ g.state = "PERCHED"
+ bodies:draw({ g }, t); t += 1 / 60; bodies:draw({ g }, t)
+ local w2 = rig.wing; t += 1 / 60; bodies:draw({ g }, t)
+ check(w1 ~= w0 and rig.wing == w2, "the wing's phase changes in flight and holds at rest")
+ -- the house fly's legs go in two tripods: the right front and right middle swing opposite ways
+ local hf = fly("house", "PERCHED", Vector3.new(5, HOVER, 0), -Vector3.zAxis, Vector3.yAxis)
+ local opposite, same, kicked = 0, 0, 0
+ bodies:draw({ hf }, t)
+ local hrig = bodies.rigs.house
+ local still = rel(hrig, "Head")
+ for _ = 1, 90 do
+  t += 1 / 60; hf.position += Vector3.new(0, 0, -0.01); bodies:draw({ hf }, t)
+  local now = rel(hrig, "Head")
+  local front = now.RightFrontTibia.Position.Z - still.RightFrontTibia.Position.Z
+  local middle = now.RightMiddleTibia.Position.Z - still.RightMiddleTibia.Position.Z
+  if math.abs(front) > 0.002 and math.abs(middle) > 0.002 then if (front > 0) ~= (middle > 0) then opposite += 1 else same += 1 end end
+ end
+ check(opposite > 40 and same <= opposite / 10, `the house fly walks on two tripods (front and middle of a side opposite in {opposite} frames, together in {same})`)
+ -- in the jaws the legs kick
+ hf.state = "CAPTURED"
+ bodies:draw({ hf }, t)
+ for _ = 1, 30 do
+  local before = rel(hrig, "Head"); t += 1 / 60; bodies:draw({ hf }, t)
+  if diff(rel(hrig, "Head"), before, "Femur") > 1e-4 then kicked += 1 end
+ end
+ check(kicked >= 25, `held in the jaws the legs kick ({kicked} of 30 frames)`)
+ -- the house fly's blur in Reduced Motion is still
+ hf.state = "FLEE"
+ bodies:draw({ hf }, t, nil, true)
+ local b1 = named(hrig, "RightWing").CFrame; t += 1 / 60; bodies:draw({ hf }, t, nil, true)
+ check((named(hrig, "RightWing").CFrame.UpVector - b1.UpVector).Magnitude < 1e-9, "in Reduced Motion the flight blur does not tremble")
+ -- nothing goes NaN: every kind of the sill and the bed walking, flying and held, on awkward headings and normals
+ local bad = 0
+ for _, prof in { Species.fly_like_prototype, Species.fruit_fly_prototype, Species.fungus_gnat_prototype, Species.aphid_prototype } do
+  local f = fly("n", "PERCHED", Vector3.new(0, HOVER, 0), Vector3.yAxis, Vector3.yAxis); f.profile = prof
+  for k = 1, 40 do
+   t += 1 / 60
+   f.state = if k % 13 == 0 then "CAPTURED" elseif k % 7 == 0 then "FLEE" else "PERCHED"
+   f.heading = if k % 5 == 0 then Vector3.new(0, 1, 1e-5) else Vector3.new(math.cos(k), 0, math.sin(k))
+   f.normal = if k % 3 == 0 then Vector3.xAxis else Vector3.yAxis
+   f.position += Vector3.new(0.003, 0, 0.002)
+   bodies:draw({ f }, t, Vector3.new(0, 30, 0), k % 2 == 0)
+   if not finiteRig(bodies.rigs.n) then bad += 1 end
+  end
+  bodies:draw({}, t)
+ end
+ check(bad == 0, "no NaN in any frame of any kind, walking, flying or held")
+ -- the far rule: beyond 25 studs of the camera a body is placed ten times a second; near, every frame
+ local nearFly = fly("near", "PERCHED", Vector3.new(0, HOVER, 0), -Vector3.zAxis, Vector3.yAxis)
+ local farFly = fly("far", "PERCHED", Vector3.new(60, HOVER, 0), -Vector3.zAxis, Vector3.yAxis)
+ local moved: { [any]: number } = {}
+ local original = workspace.BulkMoveTo
+ workspace.BulkMoveTo = function(self: any, ps: { any }, frames: { any }, mode: any)
+  for _, part in ps do moved[part] = (moved[part] or 0) + 1 end
+  original(self, ps, frames, mode)
+ end
+ bodies:draw({ nearFly, farFly }, t, Vector3.new(0, 1, 2))
+ table.clear(moved)
+ for _ = 1, 60 do t += 1 / 60; bodies:draw({ nearFly, farFly }, t, Vector3.new(0, 1, 2)) end
+ workspace.BulkMoveTo = original
+ local nearN, farN = moved[bodies.rigs.near.parts[1]] or 0, moved[bodies.rigs.far.parts[1]] or 0
+ check(nearN == 60 and farN >= 9 and farN <= 11, `a near body is placed every frame ({nearN} of 60), a far one ten times a second ({farN})`)
+ bodies:draw({}, t)
+ check(next(bodies.rigs) == nil, "gone when not drawn")
+end
 print(`FLIES passed={passed} failed={failed}`)
 if failed > 0 then error("fly checks failed") end

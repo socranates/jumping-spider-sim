@@ -177,27 +177,34 @@ Flora.garden = {
 		uv = { color = "b98cff", opacity = 0.85, rise = 0.03, thick = 0.02 },
 		seed = 100,
 	},
-	-- flowering shrubs further out: where they appear on the glass (u across, v up), how far beyond it, how wide they look there. ROBLOX-95: the garden
-	-- under the window is walkable now (bed_a, x -25..25, z -24..-74, its soil at y -90), so no shrub hangs over it: the three that did (depths 36, 52
-	-- and 32) stand further out (80, 80 and 82), where they look the same through the glass, and every shrub stands on a woody stem down to the lawn (`body`).
+	-- ROBLOX-103 (W3c, Nathan: "shrubs should be bushes"): flowering bushes to the ground, standing where they really stand in the garden (world studs: `x`, `z` the
+	-- middle of the bush on the lawn, `h` its height, `w` its width), sized as garden shrubs are (half a metre to a metre and a half), each a dense rounded crown of
+	-- leaf clusters over a woody frame whose stems reach the lawn. They stand round the edges where docs/WORLD_MAP_PLAN.md puts them: a hedge line west of the bed
+	-- (shrub_west, hedge_west) and the flower border east, none over the bed, the wall or a tree's trunk. ROBLOX-95's standards on stems are gone. From the sill
+	-- their crowns show low in the window, as the shrubs did, and from the garden they are bushes.
 	shrubs = {
-		{ u = -24, v = 3.6, depth = 30, w = 6, bloom = "pink" },
-		{ u = -17, v = 3.9, depth = 44, w = 8, bloom = "white" },
-		{ u = -9.5, v = 3.5, depth = 80, w = 6.5, bloom = "pink" },
-		{ u = -2.5, v = 4.1, depth = 80, w = 6.5, bloom = "white" }, -- (and a little narrower, 6.5 for 8.5, so it fits between the bed and the houses)
-		{ u = 4.5, v = 3.6, depth = 82, w = 6, bloom = "pink" },
-		{ u = 11.5, v = 4.0, depth = 46, w = 8, bloom = "white" },
-		{ u = 18, v = 3.5, depth = 34, w = 6.5, bloom = "pink" },
-		{ u = 25, v = 3.8, depth = 48, w = 8, bloom = "white" },
+		{ x = -76, z = -56, h = 60, w = 50, bloom = "pink" },
+		{ x = -150, z = -78, h = 90, w = 76, bloom = "white" },
+		{ x = -110, z = -150, h = 110, w = 100, bloom = "pink" },
+		{ x = -215, z = -130, h = 120, w = 110, bloom = "white" },
+		{ x = -95, z = -250, h = 105, w = 95, bloom = "white" },
+		{ x = 95, z = -60, h = 55, w = 46, bloom = "pink" },
+		{ x = 440, z = -330, h = 120, w = 100, bloom = "pink" },
+		{ x = -430, z = -420, h = 140, w = 120, bloom = "white" },
+		{ x = 430, z = -560, h = 130, w = 110, bloom = "white" },
+		{ x = -400, z = -700, h = 150, w = 130, bloom = "pink" },
 	},
 	shrub = {
-		foliage = { "4a6f3c", "56804a", "3f6334" },
+		foliage = { "4a6f3c", "56804a", "3f6334", "5b8a4c" }, sunlit = { "6f9a52", "7fa85c" }, -- the crown's clusters; the sunlit ones on top
 		pink = { "f4c7d3", "ee9fb9", "f9dbe3", "e98fae" }, white = { "f8f4ec", "efe9de", "fbfaf5", "e6e0d2" },
-		blooms = 14, bloomSize = { 0.13, 0.22 }, -- as a share of the shrub's width
+		material = "LeafyGrass", -- (PBR leaves at 1 stud = 1 cm: the texture's leaves are about a box or privet leaf's size)
+		-- the crown: one rounded core (both tiers) and `clusters` lumps of leaves over its top and sides, `keep` of them at the low tier; `skirt`: how high above the
+		-- lawn the core's underside is, as a share of the height (the lowest clusters still touch the lawn, the stems show under the skirt)
+		clusters = 8, keep = 3, clusterSize = { 0.34, 0.5 }, skirt = 0.06,
+		blooms = 7, bloomKeep = 2, bloomSize = { 0.07, 0.11 }, -- as a share of the bush's width; on the side facing the house
+		-- the woody frame: `stems` stems from the lawn, splaying up into the crown (`keepStems` at the low tier), `width` of the bush's width thick
+		frame = { stems = 3, keepStems = 2, width = 0.045, reach = 0.5, color = "5a4632", material = "Wood" },
 		seed = 40,
-		-- ROBLOX-95: the shrub's stem, a woody trunk from the lawn (Graphics.view.ground.y) up into its ball, `width` of the ball's diameter thick: the shrubs
-		-- are standards, a crown on a stem, as a garden grows them (both tiers: a ball floating over the lawn is what the garden would show otherwise)
-		body = { width = 0.07, color = "5a4632" },
 	},
 }
 

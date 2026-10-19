@@ -38,7 +38,7 @@ Coordinates continue the sill's frame: x across the back of the house (west −,
 | 1 | **outer_sill** | −30…30; −13.5…−24; 0 | stone outer sill | moths, crane flies | built (W2/W3b) |
 | 2 | **house_wall** | −42…42; −24; 0…−90 | brick below the window | moths, crane flies, the descent | built (W2/W3b) |
 | 3 | **bed_a** | −25…25; −24…−74; −90 | bed under the window, the stone home | gnats, aphids, springtails, leafhoppers, woodlice | built (W3/W3b) |
-| 4 | **wall_upper** | −42…42; −24; 14…120 | the wall above the window to the eaves and gutter | a house spider's web in the eaves corner, the gutter as a high perch | next |
+| 4 | **wall_upper** | −42…42; −24; 0…130 | the wall above the window to the eaves (y 110) and gutter (floor y 109), on the window's jambs; its look draws the rest of the house | a house spider's web in the eaves corner, the gutter as a high perch | built (W3c: the boxes and the look; no retreat, no prey yet) |
 | 5 | **wall_west / wall_east** | −500…−42, 42…500; −24; −90…120 | the rest of the back wall: the drainpipe (west, a climbable pipe to the gutter), the back door, its step and frame (east) | woodlice at the drain, an earwig in the door frame | next |
 | 6 | **shrub_west** | −500…−25; −24…−200 | **bushes to the ground** (box, privet): dense twig lattice, leaf litter under, deep shade | the hidden world: the safest cover and the darkest place; a crab spider is not here, a ground beetle is | next |
 | 7 | **patio_east** | 25…500; −24…−200 | patio slabs, a pot on a saucer (water), weeds in the cracks | open ground: heat at noon, the bird's hop, midges at the saucer | after |
@@ -66,12 +66,17 @@ a journey of game days, not minutes, and the map is meant to be lived in a regio
   bungalows; nothing in the view suggests a second floor.
 - Budgets per region at full and low tier; Terrain only as backdrop under the walkable boxes; meshes and textures uploaded through
   Nathan's browser when a box cannot be the thing.
+- (W3c) Until a region is built, the look of its neighbour may draw it as a backdrop, drawn only: `wall_upper`'s look draws the back wall
+  out to x ±500, the roof over the whole house, a downpipe, a window and the back door, which `wall_west`/`wall_east` will make walkable.
 
 ## The order
 
 1. **Now (W3c, the look):** better insect animation (legs that step, wings that beat, antennae), bushes to the ground in the view and
    `shrub_west` begun, the single-story house (`wall_upper` with eaves and gutter, the bungalows in the view), a detail and realism pass
-   on the four built regions.
+   on the four built regions. *Done (ROBLOX-103, 2026-10-19), but for `shrub_west`, which was not begun: the bodies move (pose only), ten
+   bushes to the ground stand round the garden's edges in the view, `wall_upper` is built with the rest of the house drawn round it, the
+   houses across the way are bungalows beyond a back fence and side fences, and the outer sill, the wall, the bed and the view have more
+   detail. The gutter's retreat and the eaves' house spider are still to come.*
 2. **W4 (nature's rules)** and **W5 (no hand holding)** as planned, on the built regions.
 3. Then fill outward in this order: `wall_west`/`wall_east` (the drainpipe and the door), `shrub_west`, `path`, the first lawn chunks,
    `patio_east`, `border_east`, `hedge_west`, the woodpile, the vegetable bed, the shed, the fence — each a round with its bugs and pages

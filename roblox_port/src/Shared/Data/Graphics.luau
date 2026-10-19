@@ -68,7 +68,8 @@ Graphics.window = {
 -- item's centre appears on the glass (studs across and up), `depth` how far beyond the glass it really is; Scenery turns
 -- that into world positions and sizes, so every item shows where it should whatever the depth. kind "block": a box w x h
 -- on the glass, `t` deep; "ball": a sphere of diameter w; "roof": a gable (a square turned 45 degrees) w wide with its
--- eave line at v. `full`: dropped in the low tier.
+-- eave line at v; "hill" (ROBLOX-103): a flattened ellipsoid w x h x t; "trunk" (ROBLOX-103): a round upright rod w across and h tall. `full`: dropped in the
+-- low tier.
 Graphics.view = {
 	eye = Vector3.new(0, 2.5, 5),
 	-- ROBLOX-95: the lawn is at the garden's level now, 0.4 below the soil of the bed under the window (World/WorldMap bed_a, y -90), where the house wall
@@ -76,40 +77,46 @@ Graphics.view = {
 	ground = { y = -90.4, size = 2048, color = "7d8f62" },
 	sky = true,
 	items = {
-		-- far hills
-		{ id = "hill_w", kind = "ball", u = -20, v = -7.0, depth = 320, w = 22, color = "88a08d", full = false },
-		{ id = "hill_m", kind = "ball", u = 3, v = -6.2, depth = 330, w = 24, color = "92a898", full = true },
-		{ id = "hill_e", kind = "ball", u = 24, v = -6.6, depth = 320, w = 22, color = "8aa28f", full = false },
-		-- roofs of the houses across the way
-		{ id = "house_1", kind = "block", u = -24, v = -2.7, depth = 120, w = 6.0, h = 14, t = 5, color = "d8c9a8", full = false },
-		{ id = "roof_1", kind = "roof", u = -24, v = 4.3, depth = 120, w = 6.5, t = 5.4, color = "8d4a3a", full = false },
-		{ id = "house_2", kind = "block", u = -16.5, v = -3.1, depth = 120, w = 5.0, h = 14, t = 5, color = "c9bba0", full = true },
-		{ id = "roof_2", kind = "roof", u = -16.5, v = 3.9, depth = 120, w = 5.5, t = 5.4, color = "5f6a73", full = true },
-		{ id = "house_3", kind = "block", u = -8.5, v = -2.4, depth = 120, w = 6.4, h = 14, t = 5, color = "e0d3b5", full = false },
-		{ id = "roof_3", kind = "roof", u = -8.5, v = 4.6, depth = 120, w = 7.0, t = 5.4, color = "9a5642", full = false },
-		{ id = "house_4", kind = "block", u = 0.5, v = -3.0, depth = 120, w = 5.3, h = 14, t = 5, color = "cdbfa4", full = true },
-		{ id = "roof_4", kind = "roof", u = 0.5, v = 4.0, depth = 120, w = 5.8, t = 5.4, color = "6a5a52", full = true },
-		{ id = "house_5", kind = "block", u = 9, v = -2.35, depth = 120, w = 6.6, h = 14.3, t = 5, color = "d6c6a6", full = false },
-		{ id = "roof_5", kind = "roof", u = 9, v = 4.8, depth = 120, w = 7.2, t = 5.4, color = "7b4a3d", full = false },
-		{ id = "house_6", kind = "block", u = 17.5, v = -2.9, depth = 120, w = 5.5, h = 14, t = 5, color = "c4b99f", full = true },
-		{ id = "roof_6", kind = "roof", u = 17.5, v = 4.1, depth = 120, w = 6.0, t = 5.4, color = "58626b", full = true },
-		{ id = "house_7", kind = "block", u = 25, v = -2.5, depth = 120, w = 6.2, h = 14, t = 5, color = "dccfb0", full = false },
-		{ id = "roof_7", kind = "roof", u = 25, v = 4.5, depth = 120, w = 6.8, t = 5.4, color = "93513f", full = false },
-		{ id = "chimney_3", kind = "block", u = -7.3, v = 6.7, depth = 119, w = 0.6, h = 2.4, t = 0.8, color = "8c5a48", full = true },
-		{ id = "chimney_5", kind = "block", u = 10.3, v = 6.85, depth = 119, w = 0.6, h = 2.5, t = 0.8, color = "86553f", full = true },
-		-- a tree on the left, a smaller one on the right
-		{ id = "trunk_a", kind = "block", u = -17, v = -3.56, depth = 72, w = 1.3, h = 24.22, t = 1.3, color = "4a3e30", full = false },
-		{ id = "canopy_a1", kind = "ball", u = -17, v = 10.5, depth = 72, w = 11, color = "3f6238", full = false },
-		{ id = "canopy_a2", kind = "ball", u = -23.5, v = 8.5, depth = 72, w = 8.5, color = "496f40", full = false },
-		{ id = "canopy_a3", kind = "ball", u = -10.5, v = 9.0, depth = 72, w = 8, color = "35552f", full = true },
-		{ id = "canopy_a4", kind = "ball", u = -19.5, v = 13.5, depth = 72, w = 7, color = "446a3b", full = true },
-		{ id = "canopy_a5", kind = "ball", u = -13.5, v = 13.2, depth = 72, w = 6.5, color = "3a5c34", full = true },
-		{ id = "canopy_a6", kind = "ball", u = -26, v = 12, depth = 72, w = 6, color = "4d7544", full = true },
-		{ id = "trunk_b", kind = "block", u = 18.5, v = -1.42, depth = 100, w = 0.9, h = 19.84, t = 0.9, color = "50443a", full = true },
-		{ id = "canopy_b1", kind = "ball", u = 18.5, v = 7.2, depth = 100, w = 6.5, color = "47703e", full = true },
-		{ id = "canopy_b2", kind = "ball", u = 22, v = 6.2, depth = 100, w = 5, color = "3d6336", full = true },
-		{ id = "canopy_b3", kind = "ball", u = 15, v = 6.0, depth = 100, w = 4.5, color = "4f7746", full = true },
+		-- far hills (ROBLOX-103: kind "hill", a flattened ellipsoid w x h x t on the glass, beyond the bungalows 27 m off, each under a part's 2,048 studs, low and
+		-- wide, their feet under the horizon; the middle one shows only over the roofs; the balls of before stood inside the garden once it could be walked)
+		{ id = "hill_w", kind = "hill", u = -20, v = 4.6, depth = 2700, w = 13.2, h = 5.6, t = 13.2, color = "88a08d", full = false },
+		{ id = "hill_m", kind = "hill", u = 2, v = 4.2, depth = 2700, w = 13.2, h = 4.8, t = 13.2, color = "92a898", full = true },
+		{ id = "hill_e", kind = "hill", u = 22, v = 4.5, depth = 2700, w = 13.2, h = 5.6, t = 13.2, color = "8aa28f", full = false },
+		-- (ROBLOX-103: the seven tall houses that stood 1.2 m beyond the glass are Graphics.view.across's bungalows beyond the back fence)
+		-- a tree on the left, a smaller one on the right. ROBLOX-103: they stood 72 and 100 studs beyond the glass, lollipops a metre tall just past the bed (the
+		-- standards Nathan's "bushes" note was about); now they are real trees in the neighbours' gardens beyond the side fences, 7.4 and 9 m out, the left 5 m tall
+		-- with a crown nearly 5 m across, the right 3.5 m, exactly where they were on the glass; their trunks are round ("trunk": a vertical rod w across, h tall).
+		{ id = "trunk_a", kind = "trunk", u = -17, v = 5.43, depth = 742, w = 1.3, h = 10.14, color = "4a3e30", full = false },
+		{ id = "canopy_a1", kind = "ball", u = -17, v = 10.5, depth = 742, w = 11, color = "3f6238", full = false },
+		{ id = "canopy_a2", kind = "ball", u = -23.5, v = 8.5, depth = 742, w = 8.5, color = "496f40", full = false },
+		{ id = "canopy_a3", kind = "ball", u = -10.5, v = 9.0, depth = 742, w = 8, color = "35552f", full = true },
+		{ id = "canopy_a4", kind = "ball", u = -19.5, v = 13.5, depth = 742, w = 7, color = "446a3b", full = true },
+		{ id = "canopy_a5", kind = "ball", u = -13.5, v = 13.2, depth = 742, w = 6.5, color = "3a5c34", full = true },
+		{ id = "canopy_a6", kind = "ball", u = -26, v = 12, depth = 742, w = 6, color = "4d7544", full = true },
+		{ id = "trunk_b", kind = "trunk", u = 18.5, v = 3.96, depth = 900, w = 0.9, h = 6.47, color = "50443a", full = true },
+		{ id = "canopy_b1", kind = "ball", u = 18.5, v = 7.2, depth = 900, w = 6.5, color = "47703e", full = true },
+		{ id = "canopy_b2", kind = "ball", u = 22, v = 6.2, depth = 900, w = 5, color = "3d6336", full = true },
+		{ id = "canopy_b3", kind = "ball", u = 15, v = 6.0, depth = 900, w = 4.5, color = "4f7746", full = true },
 	} :: { { id: string, kind: string, u: number, v: number, depth: number, w: number, h: number?, t: number?, color: string, full: boolean } },
+	-- ROBLOX-103 (W3c, Nathan: "the house a single story"): the houses across the way are bungalows, one storey under a pitched roof, standing where they
+	-- would really stand, in the garden's own studs: their fronts `front` (z) beyond the back fence, `wall` tall (2.6 m), `depth` deep, the roof's front slope
+	-- rising at `pitch` degrees from eaves that overhang `overhang` to a ridge over the middle; one row of windows and a door, so nothing reads as a second floor.
+	-- Each house: `x` its middle, `w` its width, its render and roof colours, how many windows, a door, a chimney (`chimney`: where along the ridge, -0.5 to 0.5).
+	-- The low tier keeps the walls and the roofs.
+	across = {
+		front = -1460, depth = 800, wall = 260, pitch = 30, overhang = 30, ridgeCap = 14,
+		window = { w = 120, h = 115, sill = 95, color = "3c4852", frame = "f1ede4" }, door = { w = 95, h = 205, color = "5b4636" },
+		chimney = { w = 55, h = 120, t = 55, color = "8c5a48" },
+		wallMaterial = "Plaster", roofMaterial = "Slate",
+		houses = {
+			{ id = "bungalow_1", x = -680, w = 600, wall = "d2bf98", roof = "7d3b2c", windows = 2, door = true, chimney = 0.28 },
+			{ id = "bungalow_2", x = 30, w = 760, wall = "dccaa4", roof = "4c4f57", windows = 3, door = false, chimney = -0.3 },
+			{ id = "bungalow_3", x = 720, w = 520, wall = "c9b48f", roof = "8a4532", windows = 2, door = true },
+		} :: { { id: string, x: number, w: number, wall: string, roof: string, windows: number, door: boolean, chimney: number? } },
+	},
+	-- ROBLOX-103: the garden's fences (docs/WORLD_MAP_PLAN.md: 10 m wide, 14 m deep): the back fence at `back` and the two side fences along x `x0`, `x1`, from the
+	-- house's wall to the back fence, `height` tall (1.8 m), weathered boards; posts along the back (full tier).
+	fence = { back = -1420, x0 = -500, x1 = 500, near = -24, height = 180, thick = 4, posts = 6, post = 9, color = "8a6f52", postColor = "6f5841", material = "WoodPlanks" },
 }
 
 -- ---------------------------------------------------------------- small details on the sill (full tier only)

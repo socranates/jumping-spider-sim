@@ -37,12 +37,12 @@ end
 
 local sill = WorldMap.region("sill") :: WorldMap.Region
 
-case("the world has four regions: the sill with the layout's own numbers, and the three under the window", function()
+case("the world has five regions: the sill with the layout's own numbers, the three under the window and the wall above it", function()
 	local list = WorldMap.regions(WorldMap.SEED)
-	check(#list == 4 and list[1] == sill, "four regions, the sill first, and region() finds it")
+	check(#list == 5 and list[1] == sill, "five regions, the sill first, and region() finds it")
 	local ids = {}
 	for _, r in list do table.insert(ids, r.id) end
-	check(table.concat(ids, ",") == "sill,outer_sill,house_wall,bed_a", `in priority order ({table.concat(ids, ",")})`)
+	check(table.concat(ids, ",") == "sill,outer_sill,house_wall,bed_a,wall_upper", `in priority order ({table.concat(ids, ",")})`)
 	check(sill.id == "sill" and sill.kind == "sill", "the sill's id and kind")
 	check(same(sill.origin, Vector3.zero), "at the origin, as the sill always was")
 	check(same(sill.bounds[1], Layout.PLAY_BOUNDS_MIN) and same(sill.bounds[2], Layout.PLAY_BOUNDS_MAX) and #sill.bounds == 2, "its bounds are the layout's play bounds")
@@ -65,6 +65,12 @@ case("the world has four regions: the sill with the layout's own numbers, and th
 	check(same(bed.retreats[1].min, Vector3.new(8.6, -90, -52.6)) and same(bed.retreats[1].max, Vector3.new(13.4, -88.6, -47.4)), "and its box")
 	check(same(outer.spawn.pos, Vector3.new(0, 0, -18)) and same(outer.spawn.heading, Vector3.new(0, 0, -1)), "the outer sill's spawn is just outside the opening, facing out")
 	check(same(bed.spawn.pos, Vector3.new(11, -90, -43.5)) and WorldMap.at(bed.spawn.pos + Vector3.new(0, 0.31, 0)) == bed, "the bed's is on its soil, in front of the stone")
+	-- ROBLOX-103: the wall above the window, to the eaves and the gutter
+	local upper = WorldMap.region("wall_upper") :: WorldMap.Region
+	check(upper.kind == "wall_upper" and same(upper.bounds[1], Vector3.new(-42, 0, -70)) and same(upper.bounds[2], Vector3.new(42, 130, -13.5)), "the wall above: from the shoulders' tops to over the roof's edge, out past the gutter")
+	check(upper.clockScale == 1.0 and #upper.retreats == 0 and same(upper.spawn.pos, Vector3.new(0, 109, -61)) and WorldMap.at(upper.spawn.pos + Vector3.new(0, 0.31, 0)) == upper,
+		"at the sill's pace, no retreat yet, its spawn in the gutter")
+	check(same(wall.spawn.pos, Vector3.new(35, -1.5, -24)) and same(wall.spawn.heading, Vector3.new(0, 1, 0)), "the wall's spawn is on its east shoulder's face now (its top is under the window's east jamb)")
 	for _, r in WorldMap.regions() do
 		check(r.clockScale > 0 and r.clockScale <= 1.0, `{r.id}: a clock scale in (0, 1]`)
 		check(r.bounds[1].X < r.bounds[2].X and r.bounds[1].Y < r.bounds[2].Y and r.bounds[1].Z < r.bounds[2].Z, `{r.id}: bounds with some volume`)
@@ -87,10 +93,11 @@ case("the seams: each region lists its neighbours, both ways, along the same lin
 		{ "sill", "outer_sill", Vector3.new(-8, 0, -13.5), Vector3.new(8, 0, -13.5) }, -- the rail's outer face meets the stone
 		{ "outer_sill", "house_wall", Vector3.new(-30, -3, -24), Vector3.new(30, -3, -24) }, -- the stone's front face goes on down as brick
 		{ "house_wall", "bed_a", Vector3.new(-25, -90, -24), Vector3.new(25, -90, -24) }, -- the wall's foot meets the soil
+		{ "house_wall", "wall_upper", Vector3.new(31, 0, -24), Vector3.new(40, 0, -24) }, -- (ROBLOX-103) the east shoulder's face goes on up as the east jamb's
 	}
 	local count = 0
 	for _, r in WorldMap.regions() do count += #r.neighbors end
-	check(count == 6, `three seams, each listed by both regions ({count} listings)`)
+	check(count == 8, `four seams, each listed by both regions ({count} listings)`)
 	for _, pr in seams do
 		local ab, ba = seamOf(pr[1], pr[2]), seamOf(pr[2], pr[1])
 		check(ab ~= nil and ba ~= nil, `{pr[1]} and {pr[2]} list each other`)
@@ -121,7 +128,7 @@ end)
 
 case("another world seed changes only the regions' seeds", function()
 	local other = WorldMap.regions(1234)
-	check(#other == 4 and other[1].id == "sill" and other[1].seed == WorldMap.seed(1234, "sill") and other[1].seed ~= sill.seed, "the sill's seed follows the world's")
+	check(#other == 5 and other[1].id == "sill" and other[1].seed == WorldMap.seed(1234, "sill") and other[1].seed ~= sill.seed, "the sill's seed follows the world's")
 	for i, o in other do
 		local d = WorldMap.regions()[i]
 		check(o.id == d.id and o.seed == WorldMap.seed(1234, o.id) and o.seed ~= d.seed and same(o.bounds[1], d.bounds[1]) and same(o.bounds[2], d.bounds[2]) and same(o.spawn.pos, d.spawn.pos)
@@ -157,7 +164,7 @@ end)
 case("at, inBounds and bounds", function()
 	local lo, hi = Layout.PLAY_BOUNDS_MIN, Layout.PLAY_BOUNDS_MAX
 	local blo, bhi = WorldMap.bounds()
-	check(same(blo, Vector3.new(-42, -93, -76)) and same(bhi, Vector3.new(42, 35, 16)), `the union of the four regions' bounds ({blo}, {bhi})`)
+	check(same(blo, Vector3.new(-42, -93, -76)) and same(bhi, Vector3.new(42, 130, 16)), `the union of the five regions' bounds ({blo}, {bhi})`)
 	local ulo, uhi = WorldMap.unionOf(WorldMap.regions())
 	check(same(ulo, blo) and same(uhi, bhi), "is unionOf the regions")
 	check(WorldMap.at(Layout.SPAWN) == sill and WorldMap.at(Vector3.new(0, 10, 0)) == sill, "the spawn and the middle are in the sill")
@@ -188,6 +195,10 @@ case("at, inBounds and bounds", function()
 	check(WorldMap.at(Vector3.new(0, -50, -30)) == wall and WorldMap.at(Vector3.new(0, -50, -30.001)) == bed, "in the air in front of the wall: six studs out the wall's, beyond it the bed's")
 	check(WorldMap.at(Vector3.new(30, -89.69, -50)) == bed and WorldMap.at(Vector3.new(0, -93.001, -50)) == nil and WorldMap.at(Vector3.new(0, -50, -76.001)) == nil, "the bed's air reaches past its soil; under it, and beyond it, nothing")
 	check(WorldMap.at(Vector3.new(0, 0.31, -50)) == bed and WorldMap.at(Vector3.new(0, 20, -20)) == outer, "high over the bed, the bed's; over the outer sill, the outer sill's")
+	local upper = WorldMap.region("wall_upper")
+	check(WorldMap.at(Vector3.new(0, 35, -24.31)) == outer and WorldMap.at(Vector3.new(0, 35.001, -24.31)) == upper and WorldMap.at(Vector3.new(36, 35.001, -24.31)) == upper
+		and WorldMap.at(Vector3.new(36, 20, -24.31)) == wall and WorldMap.at(Vector3.new(0, 109.31, -61)) == upper and WorldMap.at(Vector3.new(0, 130.001, -61)) == nil,
+		"(ROBLOX-103) up the brick past y 35, the wall above's; beside the window lower down, the wall's; in the gutter, the wall above's; over the roof, nothing")
 end)
 
 case("the union of several regions", function()
@@ -283,10 +294,10 @@ case("the keep-out boxes", function()
 end)
 
 case("part budgets", function()
-	check(Region.budget("sill", "full") == 1178 and Region.budget("sill", "low") == 314, "the sill reports what its decor builds now")
+	check(Region.budget("sill", "full") == 1253 and Region.budget("sill", "low") == 355, "the sill reports what its decor builds now (ROBLOX-103: 1178 and 314 before the bushes, the bungalows and the fences)")
 	check((Region.budget("sill", "low") :: number) < (Region.budget("sill", "full") :: number) * 0.6, "the low tier is a good deal thinner")
 	check(Region.budget("pond", "full") == nil and Region.budget("sill", "medium") == nil, "a kind with no budget, or a tier that is not one, has none")
-	for _, kind in { "outer_sill", "house_wall", "bed" } do
+	for _, kind in { "outer_sill", "house_wall", "bed", "wall_upper" } do
 		local full, low = Region.budget(kind, "full") :: number, Region.budget(kind, "low") :: number
 		check(full == Garden.BUDGETS[kind].full and low == Garden.BUDGETS[kind].low and low <= full, `{kind}: {full} drawn parts at full, {low} at low`)
 	end
@@ -393,6 +404,20 @@ case("the garden's generators: the same from the same seed, inside their regions
 	check(clear, "nothing stands on the stone in front of the opening")
 	local wall = Region.pieces(WorldMap.region("house_wall") :: WorldMap.Region)
 	check(#wall == 3 and wall[1].lo.Z == -24 and wall[1].lo.Y <= -90 and wall[1].lo.X == -40 and wall[1].hi.X == 40, "the wall's face at z -24, x -40..40, down past the soil")
+	-- ROBLOX-103: the wall above the window: the jambs stand on the shoulders beside the window's frame, the brick goes up from the window's head to the eaves, the
+	-- gutter hangs on the fascia under the roof's edge with its floor 1.08 m above the sill and a lip to hold a spider in
+	local upper: { [string]: any } = {}
+	for _, piece in Region.pieces(WorldMap.region("wall_upper") :: WorldMap.Region) do upper[piece.id] = piece end
+	local shoulderE, shoulderW = wall[3], wall[2]
+	check(upper.wall_upper_east.lo.Y == shoulderE.hi.Y and upper.wall_upper_east.lo.X >= shoulderE.lo.X and upper.wall_upper_east.hi.X == shoulderE.hi.X
+		and upper.wall_upper_west.lo.Y == shoulderW.hi.Y and upper.wall_upper_west.lo.X == shoulderW.lo.X and upper.wall_upper_east.lo.X == 31 and upper.wall_upper_west.hi.X == -31,
+		"the jambs stand on the shoulders, either side of the window's frame (x 31)")
+	check(upper.wall_upper_brick.lo.Y == 14 and upper.wall_upper_brick.lo.Z == -24 and upper.wall_upper_brick.hi.Y == upper.wall_upper_soffit.lo.Y
+		and upper.wall_upper_brick.lo.Y == upper.wall_upper_east.hi.Y, "the brick from the window's head (y 14) to the eaves, on the jambs")
+	local g, lip, fascia = upper.wall_upper_gutter, upper.wall_upper_gutter_lip, upper.wall_upper_fascia
+	check(g.hi.Y == 109 and g.hi.Z == fascia.lo.Z and lip.hi.Z == g.lo.Z and lip.hi.Y - g.hi.Y >= 5 and upper.wall_upper_roof.lo.Y - g.hi.Y >= 10
+		and upper.wall_upper_roof.lo.Z < g.hi.Z and upper.wall_upper_roof.lo.Z > lip.lo.Z, "the gutter on the fascia: its floor at y 109, a lip 6 high, the roof's edge over half of it with room under")
+	check(#Region.pieces(WorldMap.region("wall_upper") :: WorldMap.Region) == 10 and #Garden.drawnPieces(WorldMap.region("wall_upper") :: WorldMap.Region) == 10, "ten boxes, all drawn by its look")
 end)
 
 case("streaming: the focus follows the spider, and what the spider can reach is inside the radius always sent", function()
@@ -561,7 +586,7 @@ case("the bed's perch list lies inside the bed, each perch on a face of one of i
 	local stone = WorldMap.retreat("bed_a_stone") :: any
 	check(same(crack.door, Vector3.new(-24, 1, 6)) and WorldMap.inRetreat(crack.door) == "sill_crevice" and crack.door.X > crack.min.X, "the crack's door is the point the client has always measured from, just inside its mouth")
 	check(same(stone.door, Vector3.new(11, -89.5, -46.5)) and WorldMap.inRetreat(stone.door) == nil and stone.door.Z > stone.max.Z and WorldMap.at(stone.door) == bed, "the stone's door is in front of the gap's mouth, in the bed")
-	check(Region.budget("house_wall", "full") == 110 and Region.budget("house_wall", "low") == 75, "the wall's budget carries the descent's dressing (93/73 before)")
+	check(Region.budget("house_wall", "full") == 134 and Region.budget("house_wall", "low") == 75, "the wall's budget carries the descent's dressing and ROBLOX-103's drips, joints and moss (93/73, then 110/75)")
 end)
 
 print(`WORLDMAP passed={passed} failed={failed}`)

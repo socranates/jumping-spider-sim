@@ -4259,7 +4259,7 @@ return Plants
           <Properties>
             <string name="Name">Scenery</string>
             <string name="Source"><![CDATA[--!strict
--- Builds the drawn world from Data/Graphics: the sill's physical pieces (looks only), and a "Decor" folder with the window wall,
+-- Builds the drawn world from Data/Graphics: the sill's physical pieces (looks only), and a "Decor" model (a persistent one, ROBLOX-94) with the window wall,
 -- glass and trim, the view out of the window, the dust, the small details, the light shafts, and (Habitat/Plants, Habitat/Patina,
 -- from Data/Flora and Data/Wear) the Pilea, the planting, the garden outside the window, the wear on the sill and the glass and
 -- the silk retreat, and (Habitat/Dressing, ROBLOX-74) the shaded moss, the floor's pebbles and bark, the fallen leaves and the morning dew.
@@ -4326,15 +4326,10 @@ local function replaceable(): { [string]: boolean }
 	return all
 end
 
--- `replaced`: the ids of the pieces whose drawn version exists (Scenery.decor's second result); those turn invisible but stay solid
--- and climbable. A piece whose drawing could not be built stays visible instead of leaving a hole. nil means all the pieces that
--- the decor can replace (the wall and the Pilea's leaves and stems).
-function Scenery.sill(replaced: { [string]: boolean }?): Folder
-	local hide = replaced or replaceable()
-	local sill = Instance.new("Folder")
-	sill.Name = "Windowsill"
-	sill:SetAttribute("ContentRevision", Layout.CONTENT_REVISION)
-	for _, spec in Layout.PIECES do
+-- The physical parts of some pieces, one anchored Part for each, into `parent` (ROBLOX-94: the part-making the sill always had, for any region's pieces; World/WorldBuild builds
+-- each region with it). `hide`: the ids of the pieces whose look is replaced by a drawing; those turn invisible but stay solid and climbable.
+function Scenery.parts(parent: Instance, pieces: { Layout.Piece }, hide: { [string]: boolean })
+	for _, spec in pieces do
 		assert(Surfaces[spec.profile], "unknown surface profile " .. spec.profile)
 		local p = Instance.new("Part")
 		p.Name = spec.id
@@ -4354,8 +4349,19 @@ function Scenery.sill(replaced: { [string]: boolean }?): Folder
 			p.Transparency = 1
 			p.CastShadow = false
 		end
-		p.Parent = sill
+		p.Parent = parent
 	end
+end
+
+-- `replaced`: the ids of the pieces whose drawn version exists (Scenery.decor's second result); those turn invisible but stay solid
+-- and climbable. A piece whose drawing could not be built stays visible instead of leaving a hole. nil means all the pieces that
+-- the decor can replace (the wall and the Pilea's leaves and stems). `pieces`: the sill's boxes (the layout's own unless World/WorldBuild hands in its region's, which are the same).
+function Scenery.sill(replaced: { [string]: boolean }?, pieces: { Layout.Piece }?): Folder
+	local hide = replaced or replaceable()
+	local sill = Instance.new("Folder")
+	sill.Name = "Windowsill"
+	sill:SetAttribute("ContentRevision", Layout.CONTENT_REVISION)
+	Scenery.parts(sill, pieces or Layout.PIECES, hide)
 	return sill
 end
 
@@ -4556,9 +4562,13 @@ local function attempt(decor: Instance, what: string, build: () -> unknown): boo
 	return ok
 end
 
-function Scenery.decor(sun: Vector3?): (Folder, { [string]: boolean })
-	local decor = Instance.new("Folder")
+function Scenery.decor(sun: Vector3?): (Model, { [string]: boolean })
+	-- ROBLOX-94: a Model, and a persistent one, so that with instance streaming on (Workspace.StreamingEnabled) the whole drawn sill, and the far view out of the window above
+	-- all, reaches every client at once and never streams out; a Folder would be streamed part by part around the replication focus, and the view is hundreds of studs away.
+	-- (Without streaming it is exactly the container the Folder was.) The client's one-time reads of it (Breakaway, WorldDetail, DayLight) depend on it being whole.
+	local decor = Instance.new("Model")
 	decor.Name = "Decor"
+	decor.ModelStreamingMode = Enum.ModelStreamingMode.Persistent
 	local replaced: { [string]: boolean } = {}
 	for _, d in Layout.DECOR do
 		if not W.replaces[d.id] then
@@ -5471,6 +5481,11 @@ return Growth
 -- Time is compressed on purpose. A real Phidippus audax lives about a year; one life here is meant to take a few hours to
 -- play (LIFE-03: about 2 to 3 hours over roughly 10 game days).
 -- Checked against Godot's own values in tests/life_reference.json (tools/export_life_reference.gd).
+-- ROBLOX-94: how fast a region's day runs against the sill's is the game's rule, not Godot's: `LifeClock.game.clockScale` multiplies every advance of game
+-- hours (awake, asleep and moulting alike), 1.0 until the client sets it from the region the spider is in each frame (Client/WorldClient, from Shared/World/WorldMap;
+-- the sill is the only region so far and runs at 1.0; a garden region will run slower, docs/OPEN_WORLD_DESIGN.md). The rates above stay Godot's, and the goldens run
+-- at 1.0, which changes nothing, not even the last bit. It is a dial on the module and not a flag on a clock because it is never saved: hours are state, the rate is
+-- not, and a return to a rest builds a new clock that must run at the pace of where the spider now is, not where it rested.
 
 local LifeClock = {}
 LifeClock.__index = LifeClock
@@ -5488,6 +5503,8 @@ LifeClock.START_H = 9.0
 LifeClock.ACTIVE_HOURS_PER_S = 12.0 / (15.0 * 60.0)
 -- A night of sleep (about 11 hours) in about 8 seconds.
 LifeClock.SLEEP_HOURS_PER_S = 1.4
+-- The game's own rule (ROBLOX-94), not a recorded value: the pace of the day where the spider is now, against the rates above.
+LifeClock.game = { clockScale = 1.0 }
 
 export type Record = { day: number, hour: number, sleeping: boolean }
 
@@ -5518,6 +5535,15 @@ function LifeClock.new(): any
 	return setmetatable({ day = LifeClock.START_DAY, hour = LifeClock.START_H, sleeping = false }, LifeClock)
 end
 
+-- The dial, as a usable number: anything that is not a positive finite number runs at the sill's pace rather than stop or poison the clock.
+function LifeClock.currentScale(): number
+	local scale = LifeClock.game.clockScale
+	if type(scale) == "number" and scale > 0.0 and finite(scale) then
+		return scale
+	end
+	return 1.0
+end
+
 function LifeClock._addHours(self: any, hours: number)
 	self.hour += hours
 	while self.hour >= 24.0 do
@@ -5533,7 +5559,7 @@ function LifeClock.advance(self: any, seconds: number, asleep: boolean): number
 		return 0.0
 	end
 	local rate = if asleep then LifeClock.SLEEP_HOURS_PER_S else LifeClock.ACTIVE_HOURS_PER_S
-	local hours = seconds * rate
+	local hours = seconds * rate * LifeClock.currentScale()
 	if asleep then
 		local toMorning = self:hoursUntil(LifeClock.WAKE_H)
 		if toMorning <= hours then
@@ -5556,7 +5582,7 @@ function LifeClock.advanceMoult(self: any, seconds: number): number
 		return 0.0
 	end
 	self.sleeping = false
-	local hours = seconds * LifeClock.SLEEP_HOURS_PER_S
+	local hours = seconds * LifeClock.SLEEP_HOURS_PER_S * LifeClock.currentScale()
 	self:_addHours(hours)
 	return hours
 end
@@ -7741,16 +7767,25 @@ local Silk = {}
 Silk.__index = Silk
 local HEIGHT, RADIUS = 0.31, 0.30
 local DOWN = Vector3.new(0,-1,0)
+-- The game's own rule (ROBLOX-99), opt-in like NeedsModel.game and Data/Catch.game: how fast the spider lets itself down a line, as a share of Godot's
+-- reel speed (Species silk.reel_speed_wu_s, 1.5 studs a second either way). Nathan: "make the hang just go slower by default". Lowering (the stick back, or
+-- the drop key held) runs at `lowerScale` of it; reeling in keeps Godot's speed, so the climb back is as brisk as it was and the rig's head-up climb
+-- (look.hang.climb.speed) still trips. A controller never given the rule (Silk:useGameRules) replays Godot: the tether goldens and the box-world scenarios.
+Silk.game = { lowerScale = 0.5 }
 
 function Silk.new(world, surfaces, tuning, gravity: number)
 	local params = RaycastParams.new()
 	params.FilterType = Enum.RaycastFilterType.Include
 	params.FilterDescendantsInstances = {world}
 	return setmetatable({world=world, surfaces=surfaces, params=params, maximum=tuning.max_line_length_wu,
-		speed=tuning.reel_speed_wu_s, gravity=gravity, mode="none", paid=0, rest=0, taut=false,
+		speed=tuning.reel_speed_wu_s, lowerSpeed=tuning.reel_speed_wu_s, gravity=gravity, mode="none", paid=0, rest=0, taut=false,
 		anchor=Vector3.zero, normal=Vector3.yAxis, anchorPart=nil, bend=nil, bendPart=nil,
 		lowering=false, snagged=false, block="", message="", release=Math.newRelease(), walk=nil,
 		previous=Vector3.zero},Silk)
+end
+-- Opt in to the game's lowering (Silk.game): the let-down at lowerScale of the reel speed. Reeling in is untouched.
+function Silk.useGameRules(self: any)
+	self.lowerSpeed = self.speed * Silk.game.lowerScale
 end
 function Silk.profile(self: any, hit)
 	return if hit then self.surfaces[hit.Instance:GetAttribute("ProfileId")] else nil
@@ -7912,7 +7947,8 @@ function Silk.step(self: any, position: Vector3, velocity: Vector3, intent: numb
 	end
 	if intent<=0 and self.block=="blocked" then self.block="" end
 	local oldRest=self.rest
-	if intent<0 or (self.block=="" and not self.snagged) then self.rest=Math.reel(self.rest,self:prefix(),self.maximum,intent,self.speed) end
+	-- (ROBLOX-99: letting down runs at the game's lowering speed, reeling in at Godot's; both are the reel speed until useGameRules.)
+	if intent<0 or (self.block=="" and not self.snagged) then self.rest=Math.reel(self.rest,self:prefix(),self.maximum,intent,if intent<0 then self.lowerSpeed else self.speed) end
 	-- "Shortest" only when a reel actually ran and could not shorten (Godot sets it inside its not-snagged reel branch);
 	-- a snag while swinging under a leaf must not leave reeling refused once the line is clear again (ROBLOX-10).
 	if intent>0 and not self.snagged and self.rest>=oldRest-1e-6 and self.block=="" then self.block="shortest" end
@@ -8202,8 +8238,10 @@ function Motor.place(self: any, position: Vector3, up: Vector3?, heading: Vector
 	self.safe = { pos = self.pos, up = self.up, heading = self.heading }
 end
 
-function Motor.respawn(self: any)
-	self:place(self.config.spawn + Vector3.new(0, HEIGHT, 0), Vector3.yAxis, self.config.heading)
+-- Back to the start, standing on the support point `spawn` facing `heading` (the config's own when none is given; ROBLOX-94: a rest from another revision of the world
+-- is put back at its region's spawn, Checkpoint.restore).
+function Motor.respawn(self: any, spawn: Vector3?, heading: Vector3?)
+	self:place((spawn or self.config.spawn) + Vector3.new(0, HEIGHT, 0), Vector3.yAxis, heading or self.config.heading)
 end
 
 -- ---------------------------------------------------------------- the planner (port of jump_planner.gd)
@@ -8296,6 +8334,11 @@ end
 
 function Motor.setSpeedFactor(self: any, speed: number)
  self.speedFactor=math.clamp(speed,0.1,1)
+end
+
+-- Opt in to the game's own rules on the line (ROBLOX-99, SilkController.game): the let-down at half Godot's reel speed. A motor never given them replays Godot.
+function Motor.useGameRules(self: any)
+ self.silk:useGameRules()
 end
 
 function Motor.aimPlan(self: any): any
@@ -10714,6 +10757,11 @@ return Signal
 -- ROBLOX-91: nor are the two profiling windows of the live world: the prey director's `cpu` (the last 1200 ticks' microseconds) and the sensor's cost ring. They are
 -- clock readings, different on every run, and were about 2400 floats, twice the rest of the record; capture leaves them out and a restore (of an old record too)
 -- leaves them empty.
+-- ROBLOX-94: where in the world the rest was kept is `world_map` = { seed, revision, region, retreat, diffs } (not `world`: that is the recorded object graph). The world is
+-- never saved, only the seed and the revision it was made from and what changed in it (`diffs`, empty until something in the world can change). A record without one (every
+-- rest before the world) means the sill of the default world with no changes. A region that is not on the map, or a position outside that region's bounds, is refused like
+-- any bad record. A rest made in another revision of the world, or from another seed, is put back at its region's spawn: the position was kept for geometry that may have
+-- moved, so it is not trusted (the rest of the record is: the life, the reserves, the clock).
 
 local Species = require(script.Parent.Parent.Data.Species)
 local ObjectRecord = require(script.Parent.ObjectRecord)
@@ -10733,7 +10781,7 @@ local NeedsModel = require(script.Parent.Parent.Life.NeedsModel)
 local LifeLoop = require(script.Parent.Parent.Life.LifeLoop)
 local LifeClock = require(script.Parent.Parent.Life.LifeClock)
 local Growth = require(script.Parent.Parent.Life.Growth)
-local Layout = require(script.Parent.Parent.Habitat.WindowsillLayout)
+local WorldMap = require(script.Parent.Parent.World.WorldMap)
 local WaspDirector = require(script.Parent.Parent.Predator.WaspDirector)
 
 local RivalSpider = require(script.Parent.Parent.Predator.RivalSpider)
@@ -10806,6 +10854,52 @@ local function vec(t: any): Vector3?
 	return Vector3.new(t[1], t[2], t[3])
 end
 
+-- The world record of a checkpoint with the defaults of a record from before there was a world: the default world's seed and revision, the sill, the retreat the
+-- player block names, no changes. Returns it and what is wrong with a record that has one (an empty list for a good one or an old one).
+export type MapRecord = { seed: number, revision: string, region: string, retreat: string, diffs: { any } }
+local function mapRecord(record: any): (MapRecord, { string })
+	local problems: { string } = {}
+	local p = record.player
+	local out: MapRecord = {
+		seed = WorldMap.SEED, revision = WorldMap.REVISION, region = WorldMap.HOME, diffs = {},
+		retreat = if type(p) == "table" and type(p.retreat_id) == "string" then p.retreat_id else "",
+	}
+	local m = record.world_map
+	if m == nil then return out, problems end
+	local function bad(t: string) table.insert(problems, t) end
+	if type(m) ~= "table" then
+		bad("world: the place in the world is not a record")
+		return out, problems
+	end
+	if not finite(m.seed) or m.seed < 0 or m.seed > 4294967295 or m.seed % 1 ~= 0 then bad("world: the world's seed is not a whole number") else out.seed = m.seed end
+	if type(m.revision) ~= "string" or #m.revision < 1 or #m.revision > 64 then bad("world: the world's revision is not a name") else out.revision = m.revision end
+	if type(m.region) ~= "string" then
+		bad("world: the region is not a name")
+	else
+		out.region = m.region
+	end
+	if type(m.retreat) ~= "string" then bad("world: the retreat is not a name") else out.retreat = m.retreat end
+	if type(m.diffs) ~= "table" or getmetatable(m.diffs) ~= nil then
+		bad("world: the changes to the world are not a list")
+	elseif next(m.diffs) ~= nil then
+		bad("world: the world has changes this game does not know (nothing in it can change yet)") -- later entries are { kind, region, id, data }, each kind with its own check
+	end
+	return out, problems
+end
+
+-- Whether a rest was kept in another world than this game's (another revision of it, or another seed): its position is not to be trusted.
+function Checkpoint.worldMoved(record: any): boolean
+	local map = mapRecord(record)
+	return map.revision ~= WorldMap.REVISION or map.seed ~= WorldMap.SEED
+end
+
+local function hasRetreat(region: WorldMap.Region, id: string): boolean
+	for _, t in region.retreats do
+		if t.id == id then return true end
+	end
+	return false
+end
+
 -- Why a checkpoint cannot be made of the world now; "" when it can.
 function Checkpoint.boundaryProblem(world: World): string
 	local motor, prey = world.motor, world.prey
@@ -10837,13 +10931,16 @@ function Checkpoint.capture(world: World, createdAt: number?): ({ [string]: any 
 	if cpu ~= nil then prey.cpu = cpu end
 	if ring ~= nil then sensor._ring = ring end
 	if not graph then return nil, why end
+	local region = WorldMap.at(motor.pos) or WorldMap.region(WorldMap.HOME) :: WorldMap.Region
+	local retreat = WorldMap.inRetreat(motor.pos) or ""
 	return {
 		schema_version = Checkpoint.SCHEMA_VERSION, kind = Checkpoint.KIND, game = Checkpoint.GAME,
 		content_revision = Checkpoint.CONTENT_REVISION, created_at = createdAt or 0, snapshot_tick = world.prey.tick,
 		player = {
 			position = v3(motor.pos), normal = v3(motor.up), heading = v3(motor.heading), gaze_pitch = motor.gazePitch,
-			retreat_id = if Layout.inRetreat(motor.pos) then "sill_crevice" else "", state = "ATTACHED",
+			retreat_id = retreat, state = "ATTACHED",
 		},
+		world_map = { seed = WorldMap.SEED, revision = WorldMap.REVISION, region = region.id, retreat = retreat, diffs = {} },
 		world = graph,
 		life_rules = { mode = world.life.mode or "main", rules = world.life.rules or "standard" },
 		breakaway = if world.breakaway then world.breakaway:record() else nil,
@@ -10948,21 +11045,29 @@ function Checkpoint.check(record: any, world: World): ({ string }, ObjectRecord.
 	if record.game ~= Checkpoint.GAME then bad("not a checkpoint of this game") end
 	if record.content_revision ~= Checkpoint.CONTENT_REVISION then bad(`made for another windowsill ({tostring(record.content_revision)})`) end
 	if not finite(record.snapshot_tick) or record.snapshot_tick < 0 then bad("the tick is not a number") end
+	-- ROBLOX-94: which region the rest was kept in, and whether this is the world it was kept in.
+	local map, mapProblemList = mapRecord(record)
+	for _, text in mapProblemList do bad(text) end
+	local region = WorldMap.region(map.region)
+	if #mapProblemList == 0 and region == nil then bad("the spider is in a region this world does not have") end
+	local moved = map.revision ~= WorldMap.REVISION or map.seed ~= WorldMap.SEED
+	if region ~= nil and #mapProblemList == 0 and map.retreat ~= "" and not hasRetreat(region, map.retreat) then bad("the spider is in an unknown retreat") end
 	local p = record.player
 	if type(p) ~= "table" then
 		bad("no spider")
 	else
 		local pos, n, h = vec(p.position), vec(p.normal), vec(p.heading)
 		if not pos then bad("the spider has no position")
-		elseif pos.X < Layout.PLAY_BOUNDS_MIN.X or pos.Y < Layout.PLAY_BOUNDS_MIN.Y or pos.Z < Layout.PLAY_BOUNDS_MIN.Z
-			or pos.X > Layout.PLAY_BOUNDS_MAX.X or pos.Y > Layout.PLAY_BOUNDS_MAX.Y or pos.Z > Layout.PLAY_BOUNDS_MAX.Z then
-			bad("the spider is outside the windowsill")
+		elseif region ~= nil and not moved and not WorldMap.inBounds(pos, region.id) then
+			bad(if region.id == WorldMap.HOME then "the spider is outside the windowsill" else `the spider is outside {region.id}`) -- (a rest from another world is put back at the spawn: its position is not tested)
 		end
 		if not n or math.abs(n.Magnitude - 1) > 1e-3 then bad("the spider's surface normal is not a unit vector") end
 		if not h or math.abs(h.Magnitude - 1) > 1e-3 then bad("the spider's heading is not a unit vector") end
 		if not finite(p.gaze_pitch) or math.abs(p.gaze_pitch) > math.pi / 2 then bad("the spider's gaze is not a number") end
 		if p.state ~= "ATTACHED" then bad("the spider is not standing on a surface") end
-		if p.retreat_id ~= "" and p.retreat_id ~= "sill_crevice" then bad("the spider is in an unknown retreat") end
+		if p.retreat_id ~= "" and (type(p.retreat_id) ~= "string" or (region ~= nil and not hasRetreat(region, p.retreat_id)) or (region == nil and WorldMap.retreat(p.retreat_id) == nil)) then bad("the spider is in an unknown retreat") end
+		-- The player block's retreat and the world record's are one answer written twice (capture writes both from the same lookup); a record where they differ was not made by a capture.
+		if type(record.world_map) == "table" and #mapProblemList == 0 and p.retreat_id ~= map.retreat then bad("the spider's retreat and the world record's retreat disagree") end
 	end
 	if not Breakaway.valid(record.breakaway) then bad("invalid falling leaf state") end
 	local rules = record.life_rules
@@ -11003,8 +11108,16 @@ function Checkpoint.restore(record: any, world: World): (boolean, { string })
 	-- The profiling windows are not in the record (an older one holds them): empty, and the sensor's window begins now.
 	world.prey.cpu = {}
 	world.sensor._ring = {}
-	world.motor:place(pos, n.Unit, h.Unit)
-	world.motor.gazePitch = p.gaze_pitch
+	-- ROBLOX-94: a rest from another world than this game's is put back at its region's spawn; its position was kept for geometry that may have moved.
+	local moved = Checkpoint.worldMoved(record)
+	if moved then
+		local home = WorldMap.region(WorldMap.HOME) :: WorldMap.Region
+		local at = (WorldMap.region(mapRecord(record).region) or home).spawn
+		world.motor:respawn(at.pos, at.heading)
+	else
+		world.motor:place(pos, n.Unit, h.Unit)
+		world.motor.gazePitch = p.gaze_pitch
+	end
 	if world.breakaway then world.breakaway:apply(record.breakaway) end
 	if world.wasp ~= nil then world.wasp:load(record.wasp or WaspDirector.defaultRecord()) end
 	-- Godot's apply_record: the rest that was going on goes on, the spider takes a moment to take hold, and the screen says
@@ -11020,7 +11133,8 @@ function Checkpoint.restore(record: any, world: World): (boolean, { string })
 	life.events = {}
 	life.restoreGrace = LifeLoop.RESTORE_GRACE_TICKS
 	life:applyLight()
-	life:showNotice("Returned to your last rest: the sill as it was when you rested in the crack. This is a return to the rest, not an exact resume.")
+	life:showNotice(if moved then "Returned to your last rest, but the world has changed since you rested, so you stand where a life begins in it. Everything else is as you left it."
+		else "Returned to your last rest: the sill as it was when you rested in the crack. This is a return to the rest, not an exact resume.")
 	return true, {}
 end
 
@@ -12954,7 +13068,7 @@ return SaveStores
 local Rules = require(script.Parent.Parent.Data.MatingRules)
 local PreyMath = require(script.Parent.Parent.Prey.PreyMath)
 local PreyRandom = require(script.Parent.Parent.Prey.PreyRandom)
-local Layout = require(script.Parent.Parent.Habitat.WindowsillLayout)
+local WorldMap = require(script.Parent.Parent.World.WorldMap)
 
 local Mate = {}
 
@@ -13185,8 +13299,9 @@ function Mate.percept(m: any): any
 	return { id = "mate_spider", position = m.position, radius = 0.4, velocity = (m.position - m.previous) * 60, maxCategory = "movement" }
 end
 
--- Whether a record is good (nil is: a life that has had no mate). It is on the sill, never in the crack, when it is on the sill.
-function Mate.valid(m: any): boolean
+-- Whether a record is good (nil is: a life that has had no mate). It is on the sill, never in the crack, when it is on the sill. ROBLOX-94: `region` is the region it
+-- belongs to (the sill's unless given): where it may stand is that region's bounds, outside that region's retreats.
+function Mate.valid(m: any, region: string?): boolean
 	if m == nil then return true end
 	if type(m) ~= "table" or not STATES[m.state] then return false end
 	for _, k in { "elapsed", "lost" } do
@@ -13206,8 +13321,8 @@ function Mate.valid(m: any): boolean
 	end
 	if m.up ~= nil and math.abs(m.up.Magnitude - 1) > 0.05 then return false end
 	if not atRest then
-		local p, lo, hi = m.position, Layout.PLAY_BOUNDS_MIN, Layout.PLAY_BOUNDS_MAX
-		if p == nil or p.X < lo.X or p.Y < lo.Y or p.Z < lo.Z or p.X > hi.X or p.Y > hi.Y or p.Z > hi.Z or Layout.inRetreat(Vector3.new(p.X, p.Y, p.Z)) then return false end
+		local p, id = m.position, region or WorldMap.HOME
+		if p == nil or not WorldMap.inBounds(p, id) or WorldMap.inRetreat(Vector3.new(p.X, p.Y, p.Z), id) ~= nil then return false end
 	end
 	return true
 end
@@ -13239,9 +13354,10 @@ local MAP: { [string]: string } = {
 	away = "dormant", wander = "patrol", approach = "stalk", attend = "windup", pair = "windup", leaving = "patrol",
 }
 
--- `motor`: a SpiderMotor made for the mate; `blocked(a, b)`: something opaque between the points (the sight query).
-function MateDrive.new(motor: any, blocked: (Vector3, Vector3) -> any): any
-	local drive = RivalDrive.new(motor, blocked)
+-- `motor`: a SpiderMotor made for the mate; `blocked(a, b)`: something opaque between the points (the sight query). ROBLOX-94: `region` (the sill's unless given) is the
+-- region it walks in (RivalDrive.new).
+function MateDrive.new(motor: any, blocked: (Vector3, Vector3) -> any, region: string?): any
+	local drive = RivalDrive.new(motor, blocked, region)
 	local exit: any = nil
 	local best = math.huge
 	for _, w in drive.waypoints do
@@ -13296,7 +13412,7 @@ return MateDrive
 -- not know the engine: the motor and a sight query are handed in, so the CLI runs it on the box world and Studio on the real sill.
 local Route = require(script.Parent.RivalRoute)
 local Rules = require(script.Parent.Parent.Data.RivalRules)
-local Layout = require(script.Parent.Parent.Habitat.WindowsillLayout)
+local WorldMap = require(script.Parent.Parent.World.WorldMap)
 local SupportMath = require(script.Parent.Parent.Movement.SupportMath)
 local Motor = require(script.Parent.Parent.Movement.SpiderMotor)
 
@@ -13311,13 +13427,14 @@ local function gcd(a: number, b: number): number
 	return a
 end
 
--- `motor`: a SpiderMotor made for the rival (its own world query and probe). `blocked(a, b)`: something opaque between the points.
-function Drive.new(motor: any, blocked: (Vector3, Vector3) -> any): any
+-- `motor`: a SpiderMotor made for the rival (its own world query and probe). `blocked(a, b)`: something opaque between the points. ROBLOX-94: `region` (the sill's unless
+-- given) is the region it walks in, whose retreats it never enters.
+function Drive.new(motor: any, blocked: (Vector3, Vector3) -> any, region: string?): any
 	local waypoints = Route.waypoints()
 	local stride = 7
 	while gcd(stride, math.max(#waypoints, 1)) ~= 1 do stride += 1 end
 	return setmetatable({
-		motor = motor, blocked = blocked, waypoints = waypoints, stride = stride,
+		motor = motor, blocked = blocked, region = region or WorldMap.HOME, waypoints = waypoints, stride = stride,
 		ticks = 0, think = 0.0, face = nil :: number?, route = nil :: { any }?, hop = 1,
 		goal = nil :: any, goalKey = "", prevState = "dormant",
 		lastUp = Vector3.yAxis, sees = false, reach = false, remember = false, seen = nil :: Vector3?, seenUp = Vector3.yAxis, lost = 0.0,
@@ -13513,7 +13630,7 @@ function Drive._reseat(self: any, r: any)
 	local motor = self.motor
 	local up = r.up or Vector3.yAxis
 	local hit = workspace:Raycast(r.position + up * 0.3, -up * 1.2, motor.params)
-	if hit ~= nil and motor:attachable(hit) and not Layout.inRetreat(hit.Position + hit.Normal * SEAT) then
+	if hit ~= nil and motor:attachable(hit) and WorldMap.inRetreat(hit.Position + hit.Normal * SEAT, self.region) == nil then
 		motor:place(hit.Position + hit.Normal * SEAT, hit.Normal, r.heading)
 	else
 		local at = r.origin
@@ -13575,7 +13692,7 @@ function Drive.update(self: any, r: any, dt: number, s: any)
 		self:_hops()
 	end
 	-- The crack is never entered: whatever happened, back to the last place outside it.
-	if Layout.inRetreat(motor.pos) then
+	if WorldMap.inRetreat(motor.pos, self.region) ~= nil then
 		local safe = self.safe
 		motor:place(safe.pos, safe.up, safe.heading)
 		self.route, self.goal = nil, nil
@@ -13676,7 +13793,7 @@ return Grip
           <Properties>
             <string name="Name">RivalRoute</string>
             <string name="Source"><![CDATA[--!strict
--- Where the rival spider can walk, and the ways between (ROBLOX-69). A graph of the windowsill's box faces made from Layout.PIECES alone:
+-- Where the rival spider can walk, and the ways between (ROBLOX-69). A graph of the windowsill's box faces made from the sill region's pieces alone (Region.pieces, ROBLOX-94):
 -- every face of every box is a node; two faces that meet along a line (a box's own edge, convex, or a wall rising from a floor, concave) are
 -- joined by that seam. The rival's own SpiderMotor walks any seam the way the player's does (a wall ahead becomes the support, an edge is wrapped), so a
 -- route is only a list of seams to cross and where to head to cross them. Pure and Vector3-light: the CLI checks it on the boxes, and the
@@ -13685,10 +13802,16 @@ return Grip
 -- Faces are looked up by their box, the axis and the side. A face is "stand-able" at the sample points where a body of the motor's radius fits
 -- without touching another box. The crack (the crevice boxes) is forbidden: no route enters it, and the keep-out box around the retreat turns
 -- every straight walk aside.
-local Layout = require(script.Parent.Parent.Habitat.WindowsillLayout)
 local Rules = require(script.Parent.Parent.Data.RivalRules)
+local WorldMap = require(script.Parent.Parent.World.WorldMap)
+local Region = require(script.Parent.Parent.World.Region)
 
 local Route = {}
+
+-- ROBLOX-94: the graph is the sill's, region 0 of the world: its boxes and the keep-out around its crack come from the region's generator (Region.pieces, Region.keepOut). It
+-- becomes region-scoped, with seams to the neighbours, in the navigation round; until then there is one region and one crack.
+local SILL = WorldMap.region(WorldMap.HOME) :: WorldMap.Region
+local KEEP = Region.keepOut(SILL)[1]
 
 local AXIS = { "X", "Y", "Z" }
 local SEAT = 0.31 -- the motor's body centre above its support (SpiderMotor.HEIGHT)
@@ -13760,7 +13883,7 @@ end
 
 -- The keep-out box: the retreat, grown by a margin. Nothing the rival does goes in.
 function Route.inKeepOut(p: Vector3): boolean
-	local lo, hi = Rules.keepOutMin, Rules.keepOutMax
+	local lo, hi = KEEP.min, KEEP.max
 	return p.X >= lo.X and p.X <= hi.X and p.Y >= lo.Y and p.Y <= hi.Y and p.Z >= lo.Z and p.Z <= hi.Z
 end
 
@@ -13771,7 +13894,7 @@ end
 local function build()
 	if built then return end
 	built = true
-	for _, piece in Layout.PIECES do
+	for _, piece in Region.pieces(SILL) do
 		table.insert(boxes, { id = piece.id, lo = { piece.lo.X, piece.lo.Y, piece.lo.Z }, hi = { piece.hi.X, piece.hi.Y, piece.hi.Z } })
 	end
 	-- Faces: six to a box.
@@ -13864,7 +13987,7 @@ local function build()
 		end
 	end
 	-- The keep-out box is an obstacle like any box (the walk tests and the corners to round count it) but has no faces: nothing walks on it.
-	local ko, ki = Rules.keepOutMin, Rules.keepOutMax
+	local ko, ki = KEEP.min, KEEP.max
 	table.insert(boxes, { id = "keepout", lo = { ko.X, ko.Y, ko.Z }, hi = { ki.X, ki.Y, ki.Z } })
 end
 
@@ -14106,7 +14229,7 @@ end
 
 -- Where to head so a straight walk does not cross the keep-out box: the goal itself, or a corner of the box to round first.
 function Route.aroundKeepOut(from: Vector3, goal: Vector3): Vector3
-	local lo, hi = Rules.keepOutMin, Rules.keepOutMax
+	local lo, hi = KEEP.min, KEEP.max
 	-- The segment against the box, on the plane of the floor (the box is only a little taller than the spider).
 	local function crosses(a: Vector3, b: Vector3): boolean
 		local tmin, tmax = 0, 1
@@ -14199,7 +14322,7 @@ return Route
 local M=require(script.Parent.Parent.Prey.PreyMath)
 local PreyRandom=require(script.Parent.Parent.Prey.PreyRandom)
 local Rules=require(script.Parent.Parent.Data.RivalRules)
-local Layout=require(script.Parent.Parent.Habitat.WindowsillLayout)
+local WorldMap=require(script.Parent.Parent.World.WorldMap)
 local Rival={}
 local function phase(r: any,s: string) if r.state~=s then r.shaken=nil end;r.state=s;r.elapsed=0 end
 Rival.FOOD=.7 -- two housefly-equivalent meals
@@ -14256,9 +14379,10 @@ function Rival.renew(r: any)
  r.subdued=nil
  r.shaken=nil
 end
--- Where the wasp may take it from (ROBLOX-70): nil unless it is on the sill, awake and free; never in the retreat.
-function Rival.target(r: any): any
- if r==nil or not (r.state=="patrol" or r.state=="stalk" or r.state=="windup" or r.state=="recover") or Layout.inRetreat(r.position) then return nil end
+-- Where the wasp may take it from (ROBLOX-70): nil unless it is on the sill, awake and free; never in the retreat. ROBLOX-94: `region` (the sill's unless given) is the
+-- region it belongs to, whose retreats it keeps out of.
+function Rival.target(r: any,region: string?): any
+ if r==nil or not (r.state=="patrol" or r.state=="stalk" or r.state=="windup" or r.state=="recover") or WorldMap.inRetreat(r.position,region or WorldMap.HOME)~=nil then return nil end
  return {position=r.position,up=r.up or Vector3.yAxis,present=true}
 end
 -- The wasp has it: it hangs under the wasp and nothing else touches it.
@@ -14271,7 +14395,8 @@ end
 function Rival.carried(r: any,day: number,hour: number?)
  r.state="consumed";r.elapsed=0;r.food=0;r.day=day;r.hour=hour;r.fate="taken by the wasp";r.shaken=nil
 end
-function Rival.valid(r: any): boolean
+-- ROBLOX-94: `region` is the region the rival belongs to (the sill's unless given): where it may stand is that region's bounds, outside that region's retreats.
+function Rival.valid(r: any,region: string?): boolean
  if r==nil then return true end
  if type(r)~="table" or not states[r.state] then return false end
  for _,k in {"elapsed","notice","food","patrol"} do
@@ -14294,8 +14419,8 @@ function Rival.valid(r: any): boolean
  if r.hour~=nil and (type(r.hour)~="number" or r.hour~=r.hour or r.hour<0 or r.hour>=24) then return false end
  if r.fate~=nil and r.fate~="eaten" and r.fate~="taken by the wasp" then return false end
  if r.state=="patrol" or r.state=="stalk" or r.state=="windup" or r.state=="lunge" or r.state=="recover" then
-  local p,lo,hi=r.position,Layout.PLAY_BOUNDS_MIN,Layout.PLAY_BOUNDS_MAX
-  if p.X<lo.X or p.Y<lo.Y or p.Z<lo.Z or p.X>hi.X or p.Y>hi.Y or p.Z>hi.Z or Layout.inRetreat(Vector3.new(p.X,p.Y,p.Z)) then return false end
+  local p,id=r.position,region or WorldMap.HOME
+  if not WorldMap.inBounds(p,id) or WorldMap.inRetreat(Vector3.new(p.X,p.Y,p.Z),id)~=nil then return false end
  end
  if r.day~=nil and (type(r.day)~="number" or r.day~=r.day or r.day<0 or r.day==math.huge) then return false end
  for _,k in {"position","previous","heading","target","origin"} do
@@ -14380,7 +14505,7 @@ function Rival.step(r: any,dt: number,s: any,blocked: (Vector3,Vector3)->any): (
    r.origin=r.position
    if D then
     -- At the spider's own place, wherever that is; never at the crack.
-    if Layout.inRetreat(s.position) then phase(r,"recover");return "missed",0 end
+    if WorldMap.inRetreat(s.position)~=nil then phase(r,"recover");return "missed",0 end
     r.target=s.position
    else r.target=Vector3.new(math.clamp(s.position.X,18,28),.31,math.clamp(s.position.Z,3,10.8)) end
    phase(r,"lunge")
@@ -21501,17 +21626,318 @@ return WaspText
           </Properties>
         </Item>
       </Item>
+      <Item class="Folder" referent="131">
+        <Properties>
+          <string name="Name">World</string>
+        </Properties>
+        <Item class="ModuleScript" referent="132">
+          <Properties>
+            <string name="Name">Region</string>
+            <string name="Source"><![CDATA[--!strict
+-- What a region is made of (ROBLOX-94, docs/OPEN_WORLD_DESIGN.md): the generators. Each is pure and deterministic from the region (its kind and its
+-- seed), so the same region gives the same boxes forever, on the server and on any client; nothing here touches the engine.
+--   pieces ... the physical boxes: what the motor walks on, the rival's route is built from, and the prey perch on (Habitat/WindowsillLayout.Piece).
+--   decor .... the drawn-only boxes that stand beside them (Habitat/WindowsillLayout.Decor). The sill's drawn world (Habitat/Scenery.decor) is its own
+--              generator and still reads these; a region of any other kind will put its looks here.
+--   keepOut .. the boxes the rival's route keeps out of: the retreats and a margin around them.
+--   budget ... how many drawn parts a region of a kind may carry at each detail tier.
+-- The sill is the one kind so far, and its generator returns the layout's lists as they are: the sill is hand-placed and byte-identical to what it was
+-- before there was a world (tests/worldmap.luau pins that). Every later kind is a seeded placer (soil mounds, litter leaves, grass tufts, stones, stems
+-- and a flower head) that respects its budget; asking for a kind with no generator is a mistake, not an empty region.
+local Layout = require(script.Parent.Parent.Habitat.WindowsillLayout)
+local Rules = require(script.Parent.Parent.Data.RivalRules)
+local WorldMap = require(script.Parent.WorldMap)
+
+local Region = {}
+
+export type Box = { min: Vector3, max: Vector3 }
+
+-- The name of the folder every region's folder of physical boxes is built under, in the workspace (WorldBuild; the client's rays include it).
+Region.WORLD_FOLDER = "World"
+
+-- The physical boxes of the region.
+function Region.pieces(region: WorldMap.Region): { Layout.Piece }
+	if region.kind == "sill" then return Layout.PIECES end
+	error("no generator for the region kind " .. region.kind)
+end
+
+-- The drawn-only boxes of the region.
+function Region.decor(region: WorldMap.Region): { Layout.Decor }
+	if region.kind == "sill" then return Layout.DECOR end
+	error("no generator for the region kind " .. region.kind)
+end
+
+-- The boxes the rival's route keeps out of (RivalRoute: nothing the rival does goes in): the sill's are the crack grown by a margin, authored with the
+-- rival's other rules (Data/RivalRules). One box per retreat, in the retreats' order.
+function Region.keepOut(region: WorldMap.Region): { Box }
+	if region.kind == "sill" then return { { min = Rules.keepOutMin, max = Rules.keepOutMax } } end
+	error("no generator for the region kind " .. region.kind)
+end
+
+-- The folder a region's physical boxes are built into (WorldBuild), by which the client finds it: the sill is "Windowsill", as it was before there was a
+-- world; any other region is named for its id.
+function Region.folderName(region: WorldMap.Region): string
+	return if region.kind == "sill" then "Windowsill" else region.id
+end
+
+-- The most drawn parts (the decor, as tests/world.luau counts them) a region of this kind may carry at a detail tier ("full" or "low", Data/Detail), or nil
+-- for a kind with no budget yet. A stub: the sill's are what its decor builds now, with the sun through the window (the most it ever builds), and
+-- tests/world.luau holds it to them exactly, so a sill that grows says so here; every later kind brings its own numbers with its generator.
+local BUDGETS: { [string]: { full: number, low: number } } = {
+	sill = { full = 1156, low = 292 },
+}
+
+function Region.budget(kind: string, tier: string): number?
+	local b = BUDGETS[kind]
+	if b == nil then return nil end
+	if tier == "full" then return b.full end
+	if tier == "low" then return b.low end
+	return nil
+end
+
+return table.freeze(Region)
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="133">
+          <Properties>
+            <string name="Name">WorldBuild</string>
+            <string name="Source"><![CDATA[--!strict
+-- Builds the physical world (ROBLOX-94, docs/OPEN_WORLD_DESIGN.md): every region of the map, each as a folder of anchored boxes, all under one `World` folder in the
+-- workspace. The server does it once at startup (Server/Main); deterministic generation (Region) means a rebuilt server is the same world. `World` is what the client's rays
+-- include (the motor, the sight and perch casts): it holds the physical boxes of every region and nothing drawn, so the casts see exactly what they saw. The drawn sill
+-- (Scenery.decor) stays beside it in the workspace, as it has always been.
+--
+-- The sill is built by the sill's own part-making (Habitat/Scenery.sill, from the region's pieces), so its folder is exactly the one Main used to parent to the workspace: the
+-- same name ("Windowsill"), the same 28 parts, the same attributes, the same hidden-but-solid pieces where the decor drew its own. Only its parent changed. Any other kind
+-- gets a folder named for its region and the same parts, from its generator (Region.pieces), when it has one.
+local Scenery = require(script.Parent.Parent.Habitat.Scenery)
+local WorldMap = require(script.Parent.WorldMap)
+local Region = require(script.Parent.Region)
+
+local WorldBuild = {}
+
+-- One region's folder of physical parts, under `parent`. `replaced`: the ids of the pieces whose drawing exists (Scenery.decor's second result): those turn invisible but stay
+-- solid; nil means every piece the decor can replace, {} none (as Scenery.sill has it).
+function WorldBuild.region(region: WorldMap.Region, parent: Instance, replaced: { [string]: boolean }?): Folder
+	local pieces = Region.pieces(region)
+	local folder: Folder
+	if region.kind == "sill" then
+		folder = Scenery.sill(replaced, pieces)
+	else
+		folder = Instance.new("Folder")
+		folder.Name = Region.folderName(region)
+		Scenery.parts(folder, pieces, replaced or {})
+	end
+	folder.Parent = parent
+	return folder
+end
+
+-- The whole world: a `World` folder with a folder for every region, under `parent`. It is built before it is parented, so it arrives in one piece. Returns the World folder.
+function WorldBuild.world(parent: Instance, worldSeed: number?, replaced: { [string]: boolean }?): Folder
+	local world = Instance.new("Folder")
+	world.Name = Region.WORLD_FOLDER
+	for _, region in WorldMap.regions(worldSeed) do
+		WorldBuild.region(region, world, replaced)
+	end
+	world.Parent = parent
+	return world
+end
+
+return table.freeze(WorldBuild)
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="134">
+          <Properties>
+            <string name="Name">WorldMap</string>
+            <string name="Source"><![CDATA[--!strict
+-- The map of the world (ROBLOX-94, docs/OPEN_WORLD_DESIGN.md): what regions there are, where each one is, where a life begins in it, where
+-- it can rest, and how fast its day runs. Pure data and pure questions about a point; nothing here builds a part or knows the engine, so the
+-- server, the client and the CLI tests all ask the same thing. The sill is region 0 of one continuous garden: its numbers are the windowsill's
+-- own (Habitat/WindowsillLayout, which stays the sill's data), and everything that used to read them from the layout asks here.
+--
+-- A region: `id`; `kind` (what generates its boxes: Region.pieces/Region.decor); `origin` (world studs; the sill is at the origin exactly as
+-- it always was); `bounds` ({ min, max }, the volume a spider may be in while it is in this region: the motor's fall-off box, a checkpoint's
+-- check); `seed` (the world's seed mixed with the region's id, for the region's placers: WorldMap.seed); `neighbors` (the seams to the regions
+-- it meets: none yet; each will carry the face line, `a` to `b`, where the two walkable surfaces meet); `retreats` (box volumes where the
+-- spider can rest, edges included: the sill's crack); `spawn` (the support point and heading where a life begins here, and where a rest
+-- from another revision of the world is put back); `clockScale` (how fast this region's day runs against the sill's, 1.0: LifeClock.game).
+--
+-- Regions are listed in priority order; bounds may touch at a seam, and a point on a shared edge belongs to the first region listed.
+local Layout = require(script.Parent.Parent.Habitat.WindowsillLayout)
+
+local WorldMap = {}
+
+export type Retreat = { id: string, min: Vector3, max: Vector3 }
+export type Spawn = { pos: Vector3, heading: Vector3 }
+export type Neighbor = { id: string, a: Vector3, b: Vector3 }
+export type Region = {
+	id: string,
+	kind: string,
+	origin: Vector3,
+	bounds: { Vector3 }, -- { min, max }
+	seed: number,
+	neighbors: { Neighbor },
+	retreats: { Retreat },
+	spawn: Spawn,
+	clockScale: number,
+}
+
+-- The world's seed when nothing says otherwise: the same 914 the prey, the wasp and the rival draw from.
+WorldMap.SEED = 914
+-- Changes whenever any region's geometry moves in a way a saved position could no longer be trusted (Checkpoint's revision gate puts such a
+-- rest back at its region's spawn). Adding a region somewhere new does not need it; moving, resizing or removing one does.
+WorldMap.REVISION = "world-1"
+-- The region a new life begins in.
+WorldMap.HOME = "sill"
+
+local MOD = 2147483647 -- 2^31 - 1: the modulus of the placers' own streams (Shapes.rng, PreyRandom), so a region's seed is a good start for either
+
+-- A region's seed from the world's seed and its id: stable forever (it decides every placer of the region), spread so neighbouring world seeds
+-- and similar ids start unrelated streams, and in 1 .. 2^31 - 2. Every product stays below 2^53, so it is exact on every machine.
+function WorldMap.seed(worldSeed: number, regionId: string): number
+	assert(worldSeed == worldSeed and math.abs(worldSeed) ~= math.huge, "the world's seed is not a number")
+	local h = math.floor(worldSeed) % MOD
+	for i = 1, #regionId do
+		h = (h * 16807 + string.byte(regionId, i) * 7919 + 1) % MOD
+	end
+	if h == 0 then h = 1 end
+	for _ = 1, 3 do
+		h = (h * 48271) % MOD
+	end
+	return h
+end
+
+local function freeze(region: Region): Region
+	table.freeze(region.bounds)
+	table.freeze(region.neighbors)
+	for _, r in region.retreats do table.freeze(r) end
+	table.freeze(region.retreats)
+	table.freeze(region.spawn)
+	return table.freeze(region)
+end
+
+-- The authored regions, for a world seed (only each region's `seed` depends on it). One for now.
+local function author(worldSeed: number): { Region }
+	return {
+		freeze({
+			id = "sill", kind = "sill", origin = Vector3.zero,
+			bounds = { Layout.PLAY_BOUNDS_MIN, Layout.PLAY_BOUNDS_MAX },
+			seed = WorldMap.seed(worldSeed, "sill"),
+			neighbors = {} :: { Neighbor },
+			retreats = { { id = "sill_crevice", min = Layout.RETREAT_MIN, max = Layout.RETREAT_MAX } },
+			spawn = { pos = Layout.SPAWN, heading = Layout.SPAWN_HEADING },
+			clockScale = 1.0,
+		}),
+	}
+end
+
+local DEFAULT: { Region } = table.freeze(author(WorldMap.SEED))
+local BY_ID: { [string]: Region } = {}
+for _, r in DEFAULT do BY_ID[r.id] = r end
+
+-- Whether the point is in the box, edges included (Godot's windowsill.gd in_retreat, which every box of the world keeps).
+local function within(lo: Vector3, hi: Vector3, p: Vector3): boolean
+	return p.X >= lo.X and p.X <= hi.X and p.Y >= lo.Y and p.Y <= hi.Y and p.Z >= lo.Z and p.Z <= hi.Z
+end
+
+-- The union box of some regions' bounds (their smallest common axis-aligned box), as `min, max`.
+function WorldMap.unionOf(regions: { Region }): (Vector3, Vector3)
+	local lo, hi = regions[1].bounds[1], regions[1].bounds[2]
+	for i = 2, #regions do
+		local a, b = regions[i].bounds[1], regions[i].bounds[2]
+		lo = Vector3.new(math.min(lo.X, a.X), math.min(lo.Y, a.Y), math.min(lo.Z, a.Z))
+		hi = Vector3.new(math.max(hi.X, b.X), math.max(hi.Y, b.Y), math.max(hi.Z, b.Z))
+	end
+	return lo, hi
+end
+
+local UNION_MIN, UNION_MAX = WorldMap.unionOf(DEFAULT)
+
+-- Every region, in priority order, for a world seed (the default one: the shared, frozen list; do not rely on its identity). Nothing in a
+-- region but its `seed` depends on the world's seed.
+function WorldMap.regions(worldSeed: number?): { Region }
+	if worldSeed == nil or worldSeed == WorldMap.SEED then return DEFAULT end
+	return table.freeze(author(worldSeed))
+end
+
+-- The region with this id, or nil.
+function WorldMap.region(id: string, worldSeed: number?): Region?
+	if worldSeed == nil or worldSeed == WorldMap.SEED then return BY_ID[id] end
+	for _, r in WorldMap.regions(worldSeed) do
+		if r.id == id then return r end
+	end
+	return nil
+end
+
+-- The region whose bounds hold the point (the first listed), or nil outside every region.
+function WorldMap.at(pos: Vector3): Region?
+	for _, r in DEFAULT do
+		if within(r.bounds[1], r.bounds[2], pos) then return r end
+	end
+	return nil
+end
+
+-- Whether the point is inside the bounds of the region (when an id is given) or of any region.
+function WorldMap.inBounds(pos: Vector3, regionId: string?): boolean
+	if regionId ~= nil then
+		local r = BY_ID[regionId]
+		return r ~= nil and within(r.bounds[1], r.bounds[2], pos)
+	end
+	return WorldMap.at(pos) ~= nil
+end
+
+-- The union box of every region: the motor's fall-off box, `min, max`.
+function WorldMap.bounds(): (Vector3, Vector3)
+	return UNION_MIN, UNION_MAX
+end
+
+-- The id of the retreat the point is inside (edges included) in the region (when an id is given) or in any region, or nil.
+function WorldMap.inRetreat(pos: Vector3, regionId: string?): string?
+	if regionId ~= nil then
+		local r = BY_ID[regionId]
+		if r ~= nil then
+			for _, t in r.retreats do
+				if within(t.min, t.max, pos) then return t.id end
+			end
+		end
+		return nil
+	end
+	for _, r in DEFAULT do
+		for _, t in r.retreats do
+			if within(t.min, t.max, pos) then return t.id end
+		end
+	end
+	return nil
+end
+
+-- The retreat with this id (in any region), or nil.
+function WorldMap.retreat(id: string): Retreat?
+	for _, r in DEFAULT do
+		for _, t in r.retreats do
+			if t.id == id then return t end
+		end
+	end
+	return nil
+end
+
+return table.freeze(WorldMap)
+]]></string>
+          </Properties>
+        </Item>
+      </Item>
     </Item>
   </Item>
-  <Item class="ServerScriptService" referent="131">
+  <Item class="ServerScriptService" referent="135">
     <Properties>
       <string name="Name">ServerScriptService</string>
     </Properties>
-    <Item class="Folder" referent="132">
+    <Item class="Folder" referent="136">
       <Properties>
         <string name="Name">PortTests</string>
       </Properties>
-      <Item class="ModuleScript" referent="133">
+      <Item class="ModuleScript" referent="137">
         <Properties>
           <string name="Name">AntMimicSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -21608,15 +22034,15 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="134">
+      <Item class="ModuleScript" referent="138">
         <Properties>
           <string name="Name">BuildInfo</string>
           <string name="Source"><![CDATA[-- Generated by tools/build.py; do not edit.
-return { id = "a83e0b69a7a331ce" }
+return { id = "fb7a1858a2cdcca4" }
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="135">
+      <Item class="ModuleScript" referent="139">
         <Properties>
           <string name="Name">GraphicsSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -21632,8 +22058,8 @@ return function(check)
 	local Materials = require(Shared.Habitat.Materials)
 	local Flora = require(Shared.Data.Flora)
 	local Plants = require(Shared.Habitat.Plants)
-	local sill = workspace:WaitForChild("Windowsill", 15) :: Folder
-	local decor = workspace:WaitForChild("Decor", 15) :: Folder
+	local sill = (workspace:WaitForChild("World", 15) :: Folder):WaitForChild("Windowsill", 15) :: Folder -- (ROBLOX-94: the sill is region 0, inside the World folder)
+	local decor = workspace:WaitForChild("Decor", 15) :: Model -- (a persistent model since ROBLOX-94)
 
 	-- Protected Technology/Use2022Materials are checked by tools/build.py.
 	check("every material name in the graphics table is a real Roblox material", function()
@@ -21732,7 +22158,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="136">
+      <Item class="ModuleScript" referent="140">
         <Properties>
           <string name="Name">GrowthSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -21789,7 +22215,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="137">
+      <Item class="ModuleScript" referent="141">
         <Properties>
           <string name="Name">LifeSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -21965,7 +22391,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="138">
+      <Item class="ModuleScript" referent="142">
         <Properties>
           <string name="Name">NotebookSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -22126,7 +22552,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="139">
+      <Item class="ModuleScript" referent="143">
         <Properties>
           <string name="Name">PeacockSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -22197,7 +22623,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="140">
+      <Item class="ModuleScript" referent="144">
         <Properties>
           <string name="Name">PerceptionSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -22297,7 +22723,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="141">
+      <Item class="ModuleScript" referent="145">
         <Properties>
           <string name="Name">PreySpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -22392,7 +22818,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="142">
+      <Item class="ModuleScript" referent="146">
         <Properties>
           <string name="Name">PromptSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -22494,7 +22920,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="143">
+      <Item class="ModuleScript" referent="147">
         <Properties>
           <string name="Name">RecoveryScenarios</string>
           <string name="Source"><![CDATA[--!strict
@@ -23025,7 +23451,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="144">
+      <Item class="ModuleScript" referent="148">
         <Properties>
           <string name="Name">RivalSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -23120,7 +23546,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Script" referent="145">
+      <Item class="Script" referent="149">
         <Properties>
           <string name="Name">Runner</string>
           <token name="RunContext">0</token>
@@ -23184,7 +23610,7 @@ if failed > 0 then warn("PORT_TEST_FAIL") end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="146">
+      <Item class="ModuleScript" referent="150">
         <Properties>
           <string name="Name">SettingsSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -23384,7 +23810,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="147">
+      <Item class="ModuleScript" referent="151">
         <Properties>
           <string name="Name">SilkSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -23500,7 +23926,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="148">
+      <Item class="ModuleScript" referent="152">
         <Properties>
           <string name="Name">Spec</string>
           <string name="Source"><![CDATA[--!strict
@@ -23631,7 +24057,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="149">
+      <Item class="ModuleScript" referent="153">
         <Properties>
           <string name="Name">StateFixture</string>
           <string name="Source"><![CDATA[--!strict
@@ -23645,7 +24071,7 @@ return {
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="150">
+      <Item class="ModuleScript" referent="154">
         <Properties>
           <string name="Name">StateSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -23835,7 +24261,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="151">
+      <Item class="ModuleScript" referent="155">
         <Properties>
           <string name="Name">WaspSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -23998,11 +24424,11 @@ end
         </Properties>
       </Item>
     </Item>
-    <Item class="Folder" referent="152">
+    <Item class="Folder" referent="156">
       <Properties>
         <string name="Name">Server</string>
       </Properties>
-      <Item class="ModuleScript" referent="153">
+      <Item class="ModuleScript" referent="157">
         <Properties>
           <string name="Name">DataStoreBackend</string>
           <string name="Source"><![CDATA[--!strict
@@ -24037,15 +24463,15 @@ return DataStoreBackend
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Script" referent="154">
+      <Item class="Script" referent="158">
         <Properties>
           <string name="Name">Main</string>
           <token name="RunContext">0</token>
           <string name="Source"><![CDATA[--!strict
--- Builds the windowsill (scripts/habitat/windowsill.gd), the drawn world around it (Habitat/Scenery, from Data/Graphics) and the
--- lighting (Habitat/Lit). The spider itself is client-side (StarterPlayerScripts/Client/SpiderClient): one player, one spider,
--- nothing to replicate yet. Lighting Technology (Future) and MaterialService.Use2022Materials are authored in the Rojo projects;
--- runtime scripts cannot set them.
+-- Builds the world: the windowsill (scripts/habitat/windowsill.gd) as region 0 of the map (World/WorldBuild, ROBLOX-94: every region's physical boxes under one `World`
+-- folder), the drawn world around it (Habitat/Scenery, from Data/Graphics) and the lighting (Habitat/Lit). The spider itself is client-side
+-- (StarterPlayerScripts/Client/SpiderClient): one player, one spider, nothing to replicate yet but where the server streams the world to (Server/WorldFocus).
+-- Lighting Technology (Future), MaterialService.Use2022Materials and the Workspace's streaming settings are authored in the Rojo projects; runtime scripts cannot set them.
 
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
@@ -24055,6 +24481,10 @@ local Workspace = game:GetService("Workspace")
 local Habitat = ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Habitat")
 local Scenery = require(Habitat:WaitForChild("Scenery"))
 local Lit = require(Habitat:WaitForChild("Lit"))
+local World = ReplicatedStorage:WaitForChild("Shared"):WaitForChild("World")
+local WorldMap = require(World:WaitForChild("WorldMap"))
+local WorldBuild = require(World:WaitForChild("WorldBuild"))
+local WorldFocus = require(script.Parent.WorldFocus)
 
 Players.CharacterAutoLoads = false
 Workspace.Gravity = 35 -- species gravity_wu_s2; used by any unanchored props
@@ -24075,14 +24505,22 @@ if not decorOk then
 	warn("[Windowsill] decor failed, the back wall and the Pilea's pieces stay as they were: " .. tostring(decor))
 end
 
--- Only the pieces whose drawing exists turn invisible (still solid); if the decor failed nothing is hidden.
-local sill = Scenery.sill(if decorOk then replaced else {})
+-- Only the pieces whose drawing exists turn invisible (still solid); if the decor failed nothing is hidden. The sill is region 0 of the world: its "Windowsill" folder, exactly
+-- as it was, now inside the `World` folder with every other region's.
 if decorOk then decor.Parent = Workspace end
-sill.Parent = Workspace
+WorldBuild.world(Workspace, WorldMap.SEED, if decorOk then replaced else {})
+
+-- With instance streaming on (Workspace.StreamingEnabled, authored in default.project.json) the server sends a client what is near its replication focus, and a player here
+-- has no character to be the focus: each gets a small invisible part, parked at the home region's spawn (Server/WorldFocus).
+local foci = Instance.new("Folder")
+foci.Name = "ReplicationFoci"
+foci.Parent = Workspace
+local home = WorldMap.region(WorldMap.HOME) :: WorldMap.Region
+WorldFocus.watch(Players, foci, home.spawn.pos + Vector3.new(0, 0.31, 0))
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Script" referent="155">
+      <Item class="Script" referent="159">
         <Properties>
           <string name="Name">Persistence</string>
           <token name="RunContext">0</token>
@@ -24176,7 +24614,7 @@ end)
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="156">
+      <Item class="ModuleScript" referent="160">
         <Properties>
           <string name="Name">SaveService</string>
           <string name="Source"><![CDATA[--!strict
@@ -24383,21 +24821,91 @@ return SaveService
 ]]></string>
         </Properties>
       </Item>
+      <Item class="ModuleScript" referent="161">
+        <Properties>
+          <string name="Name">WorldFocus</string>
+          <string name="Source"><![CDATA[--!strict
+-- Where the server streams the world to (ROBLOX-94, docs/OPEN_WORLD_DESIGN.md). With Workspace.StreamingEnabled the server sends each client only the instances around
+-- that client's replication focus, and decides it on the server: Player.AddReplicationFocus is documented as server-only, and a property written by a client script is not heard
+-- by the server. A player here has no character (CharacterAutoLoads is off; the spider is the client's own, SpiderRig), so there is no default focus to rely on: each player
+-- gets a small invisible anchored part, the focus part, and the server makes it that player's ReplicationFocus. It is parked at the home region's spawn for as long as the
+-- world is the sill and the regions around it (everything the spider can reach is inside StreamingMinRadius of it). The round that lets the spider leave the sill moves it with
+-- the spider (the client reports where it is; WorldFocus.move). The client also points its own ReplicationFocus at the rig's root (Client/WorldClient), which can only help.
+local WorldFocus = {}
+
+local SIZE = 0.2
+
+local function partName(player: Player): string
+	return "ReplicationFocus_" .. tostring(player.UserId)
+end
+
+-- A focus part for the player under `parent`, at `at`, made the player's ReplicationFocus. Returns the part. A player who has one already keeps it where it is.
+function WorldFocus.park(player: Player, parent: Instance, at: Vector3): Part
+	local existing = parent:FindFirstChild(partName(player))
+	if existing ~= nil and existing:IsA("Part") then
+		return existing
+	end
+	local part = Instance.new("Part")
+	part.Name = partName(player)
+	part.Anchored = true
+	part.CanCollide = false
+	part.CanQuery = false
+	part.CanTouch = false
+	part.CastShadow = false
+	part.Transparency = 1
+	part.Size = Vector3.one * SIZE
+	part.Position = at
+	part.Parent = parent
+	player.ReplicationFocus = part
+	return part
+end
+
+-- Moves the player's focus part (nothing calls this yet: the spider does not leave the sill). False if the player has none.
+function WorldFocus.move(player: Player, parent: Instance, to: Vector3): boolean
+	local part = parent:FindFirstChild(partName(player))
+	if part == nil or not part:IsA("Part") then return false end
+	part.Position = to
+	return true
+end
+
+-- Takes the player's focus part away (the player has left).
+function WorldFocus.release(player: Player, parent: Instance)
+	local part = parent:FindFirstChild(partName(player))
+	if part ~= nil then part:Destroy() end
+end
+
+-- A focus for every player now in the game and every one who comes, and the part gone when one leaves. `players` is the Players service.
+function WorldFocus.watch(players: Players, parent: Instance, at: Vector3)
+	for _, player in players:GetPlayers() do
+		WorldFocus.park(player, parent, at)
+	end
+	players.PlayerAdded:Connect(function(player: Player)
+		WorldFocus.park(player, parent, at)
+	end)
+	players.PlayerRemoving:Connect(function(player: Player)
+		WorldFocus.release(player, parent)
+	end)
+end
+
+return table.freeze(WorldFocus)
+]]></string>
+        </Properties>
+      </Item>
     </Item>
   </Item>
-  <Item class="StarterPlayer" referent="157">
+  <Item class="StarterPlayer" referent="162">
     <Properties>
       <string name="Name">StarterPlayer</string>
     </Properties>
-    <Item class="StarterPlayerScripts" referent="158">
+    <Item class="StarterPlayerScripts" referent="163">
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="Folder" referent="159">
+      <Item class="Folder" referent="164">
         <Properties>
           <string name="Name">Client</string>
         </Properties>
-        <Item class="ModuleScript" referent="160">
+        <Item class="ModuleScript" referent="165">
           <Properties>
             <string name="Name">CaughtPanel</string>
             <string name="Source"><![CDATA[--!strict
@@ -24521,7 +25029,7 @@ return CaughtPanel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="161">
+        <Item class="ModuleScript" referent="166">
           <Properties>
             <string name="Name">FlyBodies</string>
             <string name="Source"><![CDATA[--!strict
@@ -24778,7 +25286,7 @@ return FlyBodies
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="162">
+        <Item class="ModuleScript" referent="167">
           <Properties>
             <string name="Name">MateStage</string>
             <string name="Source"><![CDATA[--!strict
@@ -24795,7 +25303,7 @@ return FlyBodies
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Rules = require(Shared:WaitForChild("Data"):WaitForChild("MatingRules"))
-local Layout = require(Shared:WaitForChild("Habitat"):WaitForChild("WindowsillLayout"))
+local WorldMap = require(Shared:WaitForChild("World"):WaitForChild("WorldMap"))
 local SupportMath = require(Shared:WaitForChild("Movement"):WaitForChild("SupportMath"))
 local PreyRandom = require(Shared:WaitForChild("Prey"):WaitForChild("PreyRandom"))
 local SpiderRig = require(Shared:WaitForChild("Rig"):WaitForChild("SpiderRig"))
@@ -24816,10 +25324,11 @@ MateStage.BODY = 0.14 -- the abdomen's diameter in studs (one stud is a centimet
 -- Where a spiderling's two balls sit, in BODY, along its heading from its middle, and the head's diameter: the head overlaps the abdomen (centres 0.77 apart, the radii
 -- 0.5 and 0.35 add to 0.85, so they are 0.08 into each other); at 0.55 and 0.6 across there was a gap of 0.1 BODY (0.014 studs) between them, a head floating in front.
 MateStage.BODY_AT, MateStage.HEAD_AT, MateStage.HEAD = -0.35, 0.42, 0.7
--- The crack's floor, where the spiderlings walk: inside the retreat's box, clear of its walls.
+-- The crack's floor, where the spiderlings walk: inside the retreat's box (the map's: ROBLOX-94), clear of its walls.
 local FLOOR_Y = 0.05
-local LO = Vector3.new(Layout.RETREAT_MIN.X + 0.4, FLOOR_Y, Layout.RETREAT_MIN.Z + 0.4)
-local HI = Vector3.new(Layout.RETREAT_MAX.X - 0.4, FLOOR_Y, Layout.RETREAT_MAX.Z - 0.4)
+local CRACK = WorldMap.retreat("sill_crevice") :: WorldMap.Retreat
+local LO = Vector3.new(CRACK.min.X + 0.4, FLOOR_Y, CRACK.min.Z + 0.4)
+local HI = Vector3.new(CRACK.max.X - 0.4, FLOOR_Y, CRACK.max.Z - 0.4)
 
 local SILK = Color3.fromRGB(236, 232, 214)
 
@@ -25097,7 +25606,7 @@ return MateStage
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="163">
+        <Item class="ModuleScript" referent="168">
           <Properties>
             <string name="Name">NotebookArt</string>
             <string name="Source"><![CDATA[--!strict
@@ -25135,7 +25644,7 @@ return Art
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="164">
+        <Item class="ModuleScript" referent="169">
           <Properties>
             <string name="Name">NotebookPanel</string>
             <string name="Source"><![CDATA[--!strict
@@ -25638,7 +26147,7 @@ return NotebookPanel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="165">
+        <Item class="ModuleScript" referent="170">
           <Properties>
             <string name="Name">OldSkins</string>
             <string name="Source"><![CDATA[--!strict
@@ -25678,7 +26187,7 @@ return OldSkins
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="166">
+        <Item class="ModuleScript" referent="171">
           <Properties>
             <string name="Name">PerceptionHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -25900,7 +26409,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="167">
+        <Item class="ModuleScript" referent="172">
           <Properties>
             <string name="Name">PerceptionStage</string>
             <string name="Source"><![CDATA[--!strict
@@ -25945,7 +26454,7 @@ return Stage
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="168">
+        <Item class="ModuleScript" referent="173">
           <Properties>
             <string name="Name">SaveClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -26070,7 +26579,7 @@ return SaveClient
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="169">
+        <Item class="ModuleScript" referent="174">
           <Properties>
             <string name="Name">SettingsPanel</string>
             <string name="Source"><![CDATA[--!strict
@@ -26771,7 +27280,7 @@ return SettingsPanel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="170">
+        <Item class="ModuleScript" referent="175">
           <Properties>
             <string name="Name">Soundscape</string>
             <string name="Source"><![CDATA[--!strict
@@ -26812,6 +27321,23 @@ local function voice(parent: Instance, name: string, volume: number, looped: boo
 	s.Parent = parent
 	return s
 end
+-- ROBLOX-100: how the music's recording fared, written once to Output for whoever is looking (Studio, the PC's F9 console): the asset's fetch status from
+-- ContentProvider when it has one, and, if the music has still not loaded after MUSIC_LOAD_WARN_S seconds of being asked to play, that too. Nothing on screen.
+Soundscape.MUSIC_LOAD_WARN_S = 20
+local function reportMusicLoad(music: Sound)
+	local okService, provider = pcall(function() return game:GetService("ContentProvider") end)
+	if not okService or provider == nil or typeof((provider :: any).PreloadAsync) ~= "function" then return end
+	task.spawn(function()
+		local ok, err = pcall(function()
+			(provider :: any):PreloadAsync({ music }, function(id: string, status: Enum.AssetFetchStatus)
+				if status ~= Enum.AssetFetchStatus.Success then
+					warn(`[Windowsill] music: {id} did not load ({tostring(status)}); check the asset's moderation and that it is granted to this experience`)
+				end
+			end)
+		end)
+		if not ok then warn("[Windowsill] music: the load report failed: " .. tostring(err)) end
+	end)
+end
 function Soundscape.new(parent: Instance): any
 	local root = Instance.new("Folder")
 	root.Name = "WindowsillAudio"
@@ -26822,8 +27348,10 @@ function Soundscape.new(parent: Instance): any
 	emitter.Transparency = 1; emitter.Size = Vector3.new(0.1, 0.1, 0.1); emitter.Parent = root
 	local hum = voice(emitter, "wasp", MIX.hum, true)
 	hum.RollOffMinDistance = 16; hum.RollOffMaxDistance = 120
+	local music: Sound? = if IDS.music ~= "" then voice(root, "music", MIX.music, true) else nil
+	if music ~= nil then reportMusicLoad(music) end
 	return setmetatable({ root = root, room = voice(root, "room", MIX.room, true),
-		music = if IDS.music ~= "" then voice(root, "music", MIX.music, true) else nil, musicVolume = 1, duck = 1, duckTarget = 1, swell = 1, swellWanted = false,
+		music = music, musicVolume = 1, duck = 1, duckTarget = 1, swell = 1, swellWanted = false, musicAsked = 0, musicWarned = false,
 		waspEmitter = emitter, waspHum = hum, master = 1, ambience = 1, creatures = 1,
 		birds = voice(root, "birds", MIX.birds, false), slots = {}, elapsed = 0, nextBird = 8 }, Soundscape)
 end
@@ -26839,8 +27367,9 @@ function Soundscape.setVolumes(self: any, master: number, ambience: number, crea
 end
 local function playing(s: Sound, wanted: boolean)
 	if wanted then
-		-- (ROBLOX-92: a recording that has not loaded yet cannot play; asking it every frame only restarts the request. The stubs of the CLI tests have no IsLoaded, and are loaded.)
-		if (s.IsLoaded :: any) == false then return end
+		-- A recording that has not loaded yet is asked to play once and plays when it has loaded: Play and Resume set Playing at once, so the next frame
+		-- asks nothing more. ROBLOX-100: the audit's gate on IsLoaded (ROBLOX-92) is gone; the engine is known to leave IsLoaded false for audio that
+		-- loads and plays (devforum 2654049), and the gate then kept the music from ever being asked to play, which is the silence Nathan heard.
 		if not s.Playing then s:Resume(); if not s.Playing then s:Play() end end
 	elseif s.Playing then s:Pause() end
 end
@@ -26861,6 +27390,14 @@ function Soundscape.update(self: any, dt: number, prey: any, daylight: number, p
 	if music then
 		music.Volume = MIX.music * self.master * self.musicVolume * self.duck * self.swell
 		playing(music, audible)
+		-- (ROBLOX-100: a music that has been asked to play for MUSIC_LOAD_WARN_S seconds and still says it has not loaded is reported once, in Output only.)
+		if audible and not self.musicWarned then
+			self.musicAsked += dt
+			if self.musicAsked >= Soundscape.MUSIC_LOAD_WARN_S and (music.IsLoaded :: any) == false then
+				self.musicWarned = true
+				warn(`[Windowsill] music: {music.SoundId} has not loaded after {Soundscape.MUSIC_LOAD_WARN_S} s (IsLoaded false); it plays when it loads, if it loads`)
+			end
+		end
 	end
 	if not audible or daylight < 0.3 then self.birds:Stop() end
 	if audible then
@@ -26919,7 +27456,7 @@ return Soundscape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="171">
+        <Item class="ModuleScript" referent="176">
           <Properties>
             <string name="Name">SpiderCamera</string>
             <string name="Source"><![CDATA[--!strict
@@ -27532,7 +28069,7 @@ return SpiderCamera
 ]]></string>
           </Properties>
         </Item>
-        <Item class="LocalScript" referent="172">
+        <Item class="LocalScript" referent="177">
           <Properties>
             <string name="Name">SpiderClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -27588,7 +28125,6 @@ local ControlText = require(Shared:WaitForChild("UI"):WaitForChild("ControlText"
 local Species = require(Shared:WaitForChild("Data"):WaitForChild("Species"))
 local Surfaces = require(Shared:WaitForChild("Data"):WaitForChild("Surfaces"))
 local Detail = require(Shared:WaitForChild("Data"):WaitForChild("Detail"))
-local Layout = require(Shared:WaitForChild("Habitat"):WaitForChild("WindowsillLayout"))
 local SpiderRig = require(Shared:WaitForChild("Rig"):WaitForChild("SpiderRig"))
 
 local Sensor = require(Shared.Perception.Sensor)
@@ -27631,6 +28167,9 @@ local M = {
 	LifeClock = require(Shared.Life.LifeClock),
 	HudLayout = require(Shared.UI.HudLayout),
 	Heard = require(Shared.UI.Heard),
+	-- The world (ROBLOX-94, Client/WorldClient): where the boxes are, which region the spider is in and how fast its day runs, the streaming focus. One instance, here for the same reason: the
+	-- client is at Luau's limit of 200 locals.
+	World = require(script.Parent.WorldClient).new(Workspace, Players.LocalPlayer),
 }
 local focusState = FocusState.new()
 local DT = SpiderMotor.DT
@@ -27653,20 +28192,20 @@ end
 -- Solo windowsill: the default player list obscures the life-menu button on small screens.
 pcall(function() game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList,false) end)
 local camera = Workspace.CurrentCamera
-local sill = Workspace:WaitForChild("Windowsill")
+local sill = M.World.sill -- region 0's folder (ROBLOX-94): its own pieces, the leaf tip; every ray includes M.World.root, the folder of all the regions' boxes
 local Breakaway = require(Shared.Habitat.Breakaway)
-local breakaway = Breakaway.new(sill,Workspace:FindFirstChild("Decor"))
+local breakaway = Breakaway.new(sill,M.World.decor)
 local params = RaycastParams.new()
 params.FilterType = Enum.RaycastFilterType.Include
-params.FilterDescendantsInstances = { sill }
+params.FilterDescendantsInstances = { M.World.root }
 
 local arc = Instance.new("Folder")
 arc.Name = "JumpArc"
 arc.Parent = Workspace
 local motor: any = SpiderMotor.new({
-	world = sill, surfaces = Surfaces, profile = Species.phidippus_audax_prototype,
-	spawn = Layout.SPAWN, heading = Layout.SPAWN_HEADING,
-	boundsMin = Layout.PLAY_BOUNDS_MIN, boundsMax = Layout.PLAY_BOUNDS_MAX, probeParent = arc,
+	world = M.World.root, surfaces = Surfaces, profile = Species.phidippus_audax_prototype,
+	spawn = M.World.spawnPos, heading = M.World.spawnHeading,
+	boundsMin = M.World.boundsMin, boundsMax = M.World.boundsMax, probeParent = arc,
 })
 local jump: any = JumpInput.new()
 local carry: any = StickCarry.new()
@@ -27675,7 +28214,7 @@ local carry: any = StickCarry.new()
 local detail = Detail.choose(UIS.TouchEnabled and not UIS.KeyboardEnabled, Workspace:GetAttribute("Detail"))
 -- Which spider: the Player attribute Appearance (kept for the session), else the Workspace attribute Appearance, else the first spider.
 local appearance = SpiderChoice.start(player:GetAttribute("Appearance"), Workspace:GetAttribute("Appearance"))
-local rig = SpiderRig.new(Workspace, sill, appearance, detail)
+local rig = SpiderRig.new(Workspace, M.World.root, appearance, detail)
 -- The rival's legs (ROBLOX-69): its own SpiderMotor over the whole sill, made when it first arrives, and its drawn rig; its words (ROBLOX-73); its grip once
 -- caught (ROBLOX-77, `grip` made below with the reserves). One table: the client is at Luau's limit of 200 locals.
 local rivalLegs: any = { drive = nil, rig = nil, Drive = require(Shared.Predator.RivalDrive), Text = require(Shared.UI.RivalText), Grip = require(Shared.Predator.RivalGrip), grip = nil }
@@ -27686,7 +28225,7 @@ local mateLegs: any = { Mating = require(Shared.Life.Mating), Mate = require(Sha
 	-- The mating scene (ROBLOX-89): its pure plan module and its state here (the plan, the scene's seconds as the simulation counts them, the last frame's, the notice held
 	-- until it is over, whether it was skipped and whose it was).
 	Scene = require(Shared.Life.MatingScene), couple = { active = false, plan = nil, t = -1, prev = -1, notice = nil, skipped = false, mateSex = "" } }
-mateLegs.stage = require(script.Parent.MateStage).new(Workspace, sill, detail)
+mateLegs.stage = require(script.Parent.MateStage).new(Workspace, M.World.root, detail)
 local dance = PeacockDance.new() -- the peacock spider's courtship dance (a pose for the rig; nothing else reads it)
 local dancePose: any = nil
 -- The ant-mimicking spider's antennae and drawn walk (a pose for the rig; nothing else reads it): the modules, the state, its latest pose, and where
@@ -27723,7 +28262,7 @@ sensor:configureFrom(Species.phidippus_audax_prototype.perception)
 local sightCast = Sensor.workspaceCast(params)
 local perceptionHud = PerceptionHud.new(player:WaitForChild("PlayerGui"))
 local stage = if Workspace:GetAttribute("TestTarget") == true or (Workspace:GetAttribute("TestTarget") ~= false and script.Parent:FindFirstChild("SilkPlayback")) then PerceptionStage.new(sill) else nil
-local prey = PreyDirector.engine(sill, Species.fly_like_prototype, 914, 4, true)
+local prey = PreyDirector.engine(M.World.root, Species.fly_like_prototype, 914, 4, true)
 local flyBodies = FlyBodies.new(Workspace)
 local soundscape = Soundscape.new(Workspace)
 local waspBody = WaspBody.new(Workspace)
@@ -27731,6 +28270,7 @@ local waspBody = WaspBody.new(Workspace)
 -- switch the model to the gentle rules in applyRules, ROBLOX-91). Feeding grants into the same model. The loop keeps the rest, sleep, daylight and the eyes' reach.
 local needs = NeedsModel.new(true, false)
 needs:useGameRules()
+motor:useGameRules() -- the let-down on a line at half Godot's reel speed (ROBLOX-99, SilkController.game); reeling in keeps its speed
 prey.feeding.needs = needs
 prey.feeding:useGameRules() -- an easier tap on a struggling fly (ROBLOX-72, Data/Catch.game), scaled by the prey's size (ROBLOX-77); Godot's numbers stay Feeding's defaults
 rivalLegs.grip = rivalLegs.Grip.new(needs) -- the grip on a caught rival (ROBLOX-77): its own controller, so the fly's is never disturbed
@@ -27747,7 +28287,7 @@ local wasp: any = WaspDirector.new({
 	world = {
 		ray = function(a: Vector3, b: Vector3): boolean return Workspace:Raycast(a, b - a, params) ~= nil end,
 		clear = function(a: Vector3, b: Vector3, radius: number): boolean return Workspace:Spherecast(a, radius, b - a, params) == nil end,
-		inRetreat = function(p: Vector3): boolean return Layout.inRetreat(p) end,
+		inRetreat = function(p: Vector3): boolean return M.World:inRetreat(p) ~= nil end,
 	},
 })
 local waspSpider: WaspDirector.Spider = { position = Vector3.zero, velocity = Vector3.zero, walkSpeed = Species.phidippus_audax_prototype.locomotion.walk_speed_wu_s, airborne = false, falling = false }
@@ -27981,6 +28521,7 @@ local function backToStart()
 	motor:respawn()
 	dropStrands(false)
 	drawnUp = motor.up
+	M.World:refocus() -- (the streaming focus is set on the drawn spider again)
 	cam:snap()
 end
 
@@ -28004,7 +28545,7 @@ local function setAppearance(id: string)
 	ant.state, ant.pose, ant.last = ant.Pose.new(), nil, nil
 	ant.threat, ant.threatPose = ant.Threat.new(), nil
 	local old = rig
-	rig = SpiderRig.new(Workspace, sill, appearance, detail)
+	rig = SpiderRig.new(Workspace, M.World.root, appearance, detail)
 	rig.gaitMode = old.gaitMode
 	rig:setEyeView(cam.eyeView)
 	rig:setBodyHidden(bodyHidden)
@@ -28232,6 +28773,7 @@ local function returnToCheckpoint()
 	focusState:clear()
 	dropStrands(false)
 	drawnUp = motor.up
+	M.World:refocus()
 	cam:snap()
 	lastLight = nil -- the hour may have changed: set the light again
 	feedPending, cancelPending = false, false
@@ -28266,8 +28808,8 @@ local function fresh(mode: string, easy: boolean, position: Vector3?): boolean
  stores[slot]=newStore();checkpoints=stores[slot]
  life.resting=false;life.notice="";life.noticeSeconds=0;life.restoreGrace=0
  wasp:load(WaspDirector.defaultRecord());wasp.gentle=needs.gentle
- if position then motor:place(position,Vector3.yAxis,Layout.SPAWN_HEADING) end
- closeScreens();dropStrands(false);drawnUp=motor.up;cam:snap();lastLight=nil
+ if position then motor:place(position,Vector3.yAxis,M.World.spawnHeading) end
+ closeScreens();dropStrands(false);drawnUp=motor.up;M.World:refocus();cam:snap();lastLight=nil
  feedPending,cancelPending=false,false
  watch:resync()
  return true
@@ -28456,10 +28998,10 @@ function mateLegs.carryOn()
  closeScreens()
  mateLegs.reset()
  setAppearance(appearance) -- the rig is built again, at the first growth stage
- motor:place(Vector3.new(-25.5,0.31,6.0),Vector3.yAxis,Layout.SPAWN_HEADING)
+ motor:place(Vector3.new(-25.5,0.31,6.0),Vector3.yAxis,M.World.spawnHeading)
  motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor())
  sensor:reset();memory:clear()
- dropStrands(false);drawnUp=motor.up;cam:snap();lastLight=nil
+ dropStrands(false);drawnUp=motor.up;M.World:refocus();cam:snap();lastLight=nil
  feedPending,cancelPending=false,false
  watch:resync()
  hud:toast(mateLegs.Text.generationToast(generation,day),false)
@@ -29005,6 +29547,7 @@ local accumulator = 0
 RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, function(frameDt: number)
 	saveState.frame()
 	spiderPick.update(frameDt) -- (the choose hold's clock and the close look's reasons to end)
+	M.World:update(motor.pos, rig.root) -- (ROBLOX-94: the region the spider is in, the pace of its day, the streaming focus on the drawn spider)
 	if panel:isShowing() then panel:update(frameDt) end
 	if nbPanel:isShowing() then nbPanel:update(frameDt) end
 	if settingsPanel:isShowing() then settingsPanel:update(frameDt) end
@@ -29087,7 +29630,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			life.mealFood = (life.mealFood or 0) + Growth.rivalCredit(prey.feeding.taken-takenBefore)
             local rivalState={
              position=motor.pos,previous=prey.previousPosition or motor.pos,heading=motor.heading,up=motor.up,
-             day=life.clock.day,hour=life.clock.hour,meals=genMeals,born=born,resting=life.resting,safe=Layout.inRetreat(motor.pos),
+             day=life.clock.day,hour=life.clock.hour,meals=genMeals,born=born,resting=life.resting,safe=M.World:inRetreat(motor.pos)~=nil,
              -- the rival keeps away from a courting pair and from the mating scene (ROBLOX-91): it recovers, like for the wasp
              scene=mateLegs.Mate.sceneActive(life.mate),courting=mateLegs.Mate.courting(life.mate,motor.pos),
              wasp=wasp:isVisiting(),gentle=needs.gentle,grounded=motor.mode=="attached",moving=motor.moving,
@@ -29098,10 +29641,10 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
             local rivalEvent,rivalFood=RivalSpider.step(life.rival,DT,rivalState,sightCast)
             if life.rival.state~="dormant" and life.rival.state~="consumed" and rivalLegs.drive==nil then
              rivalLegs.drive=rivalLegs.Drive.new(SpiderMotor.new({
-              world = sill, surfaces = Surfaces, profile = Species.phidippus_audax_prototype,
+              world = M.World.root, surfaces = Surfaces, profile = Species.phidippus_audax_prototype,
               spawn = life.rival.position, heading = life.rival.heading,
-              boundsMin = Layout.PLAY_BOUNDS_MIN, boundsMax = Layout.PLAY_BOUNDS_MAX, probeParent = arc,
-             }),sightCast)
+              boundsMin = M.World.boundsMin, boundsMax = M.World.boundsMax, probeParent = arc,
+             }),sightCast,M.World.home)
             end
             -- A caught rival fights the tapping grip before it can be eaten (ROBLOX-77); it is subdued, or it tears free and recovers (never a harm).
             local gripEvent=rivalLegs.Grip.step(rivalLegs.grip,life.rival,DT,{
@@ -29134,10 +29677,10 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
              local mate=life.mate
              if mate~=nil and mate.state~="away" and mateLegs.drive==nil then
               mateLegs.drive=mateLegs.Drive.new(SpiderMotor.new({
-               world = sill, surfaces = Surfaces, profile = Species.phidippus_audax_prototype,
+               world = M.World.root, surfaces = Surfaces, profile = Species.phidippus_audax_prototype,
                spawn = mate.position, heading = mate.heading,
-               boundsMin = Layout.PLAY_BOUNDS_MIN, boundsMax = Layout.PLAY_BOUNDS_MAX, probeParent = arc,
-              }),sightCast)
+               boundsMin = M.World.boundsMin, boundsMax = M.World.boundsMax, probeParent = arc,
+              }),sightCast,M.World.home)
              end
              if mateLegs.drive~=nil and mate~=nil then mateLegs.drive:update(mate,DT,ms) end
              -- A record restored into the hatching (or a brood out while nothing is playing) goes straight to the ending.
@@ -29146,7 +29689,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			-- The life loop runs last in the tick (Godot's habitat loop, priority 12); the reach it sets is the next tick's.
 			local holding = prey.feeding.held ~= nil or (life.rival~=nil and life.rival.state=="captured")
 			lifeSpider = {
-				inRetreat = Layout.inRetreat(motor.pos), attached = motor.mode == "attached" and not motor.preparing,
+				inRetreat = M.World:inRetreat(motor.pos) ~= nil, attached = motor.mode == "attached" and not motor.preparing,
 				still = input.wish.Magnitude < 0.01 and motor.vel.Magnitude < 0.15,
 				holding = holding, feeding = holding and (prey.feeding.feeding or (life.rival~=nil and life.rival.state=="captured")), position = motor.pos,
 			}
@@ -29262,7 +29805,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
  if not paused then watch:frame(simFrame,cam.eyeView,eyes.moversShown) end
     local rival=life.rival
     if rival and rival.state~="dormant" and rival.state~="consumed" then
-     if not rivalLegs.rig then rivalLegs.rig=SpiderRig.new(Workspace,sill,"rival_spider","low");rivalLegs.rig.model.Name="RivalSpider" end
+     if not rivalLegs.rig then rivalLegs.rig=SpiderRig.new(Workspace,M.World.root,"rival_spider","low");rivalLegs.rig.model.Name="RivalSpider" end
      rivalLegs.rig.reducedMotion=setting("ReducedMotion")==true
      rivalLegs.rig.jumpLoad=if rival.state=="windup" then math.clamp(rival.elapsed,0,1) else 0
      -- (ROBLOX-93: drawn ten times a second when it is more than SpiderRig's FAR_STUDS from the camera, except in a windup, a lunge or when carried; the sim steps it every tick)
@@ -29346,6 +29889,7 @@ if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
 			motor = motor,
 			camera = cam,
 			sill = sill,
+			world = M.World,
 			setDevice = function(name: ControlText.Device) device = name end,
 			place = function(position: Vector3)
 				controls:clear()
@@ -29364,7 +29908,7 @@ end
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="173">
+        <Item class="ModuleScript" referent="178">
           <Properties>
             <string name="Name">SpiderEyes</string>
             <string name="Source"><![CDATA[--!strict
@@ -29830,7 +30374,7 @@ return SpiderEyes
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="174">
+        <Item class="ModuleScript" referent="179">
           <Properties>
             <string name="Name">SpiderHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -30176,7 +30720,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="175">
+        <Item class="ModuleScript" referent="180">
           <Properties>
             <string name="Name">SpiderInput</string>
             <string name="Source"><![CDATA[--!strict
@@ -30433,7 +30977,7 @@ return SpiderInput
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="176">
+        <Item class="ModuleScript" referent="181">
           <Properties>
             <string name="Name">WaspBody</string>
             <string name="Source"><![CDATA[--!strict
@@ -30665,7 +31209,114 @@ return WaspBody
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="177">
+        <Item class="ModuleScript" referent="182">
+          <Properties>
+            <string name="Name">WorldClient</string>
+            <string name="Source"><![CDATA[--!strict
+-- The client's side of the world (ROBLOX-94, docs/OPEN_WORLD_DESIGN.md). The spider, the flies, the wasp, the rival and the mate are all simulated here, on this
+-- client, as they always were; what this module knows is the world they live in:
+--   where the boxes are ... `root`, the folder every ray of the sim includes (the motor, the senses, the flies' perches, the rig's feet): the server's `World` folder, with a folder
+--                            for every region. `sill`, region 0's folder inside it, for what is the sill's alone (the leaf tip). A place with only the sill straight in the workspace
+--                            (the test box worlds, the old places) still works: both are that folder.
+--   which region we are in .. from the spider's place each frame, kept when it is momentarily in none (`region`); the pace of its day (`clockScale`, set on LifeClock's dial each
+--                            frame); and `isActive`, which says whether a creature that belongs to a region is in the region the spider is in. The creatures are regional
+--                            (Predator/RivalSpider, Mate and RivalDrive take their region, the sill's unless given); nothing is sent to sleep yet because there is nowhere else to go.
+--   what to stream .......... with instance streaming on, the server sends what is near the player's replication focus. The server parks each player's (Server/WorldFocus): that
+--                            is the focus streaming follows. This also points the player's own ReplicationFocus at the drawn spider's root, when it is made and again after a respawn
+--                            or a return to a rest: a client's write of that property is not expected to reach the server (the docs say to set it there), so it is belt and braces,
+--                            not the mechanism; a write that raises is warned about once and the game goes on. None of this has run in Studio yet.
+-- The sim must never raycast beyond what is streamed in: StreamingMinRadius (96 studs around the focus) is always there, so a region and its neighbours must fit inside it, and a
+-- creature is only simulated in the region the spider is in or beside. The sill, the only region now, is inside it from every spot on it.
+-- With streaming, the sill's boxes and the drawn sill (the persistent Decor model) arrive after the folders do: `new` waits for every box of the sill and for the Decor, so the
+-- sim begins on a whole sill. Without streaming (the test places, the box worlds) everything is there at once and nothing is waited for.
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local WorldMap = require(Shared:WaitForChild("World"):WaitForChild("WorldMap"))
+local Region = require(Shared:WaitForChild("World"):WaitForChild("Region"))
+local LifeClock = require(Shared:WaitForChild("Life"):WaitForChild("LifeClock"))
+
+local WorldClient = {}
+WorldClient.__index = WorldClient
+
+-- How long, in seconds, the sill may take to arrive under streaming before the sim begins without a missing piece (and says so), and the decor may.
+WorldClient.PIECES_WAIT = 30
+WorldClient.DECOR_WAIT = 10
+
+-- `ws`: the workspace; `player`: the local player; `map`: the world map (WorldMap, unless a test hands in another with the same functions).
+function WorldClient.new(ws: Instance, player: Instance, map: any?): any
+	local m: any = map or WorldMap
+	local home = m.region(m.HOME) :: WorldMap.Region
+	local lo, hi = m.bounds()
+	local name = Region.folderName(home)
+	local flat = ws:FindFirstChild(name)
+	local root: Instance, sill: Instance
+	if flat ~= nil then
+		root, sill = flat, flat
+	else
+		root = ws:WaitForChild(Region.WORLD_FOLDER)
+		sill = root:WaitForChild(name)
+	end
+	local decor = ws:FindFirstChild("Decor")
+	if (ws :: any).StreamingEnabled == true then
+		local deadline = os.clock() + WorldClient.PIECES_WAIT
+		for _, piece in Region.pieces(home) do
+			if sill:FindFirstChild(piece.id) == nil and sill:WaitForChild(piece.id, math.max(0.1, deadline - os.clock())) == nil then
+				warn(`[Windowsill] world: the sill's {piece.id} never streamed in; the spider may fall through where it should be`)
+			end
+		end
+		if decor == nil then decor = ws:WaitForChild("Decor", WorldClient.DECOR_WAIT) end
+	end
+	return setmetatable({
+		map = m, player = player, root = root, sill = sill, decor = decor,
+		home = home.id, region = home,
+		boundsMin = lo, boundsMax = hi, spawnPos = home.spawn.pos, spawnHeading = home.spawn.heading,
+		focused = nil :: Instance?, focusWarned = false,
+	}, WorldClient)
+end
+
+-- The id of the retreat the point is in, in any region, or nil.
+function WorldClient.inRetreat(self: any, pos: Vector3): string?
+	return self.map.inRetreat(pos)
+end
+
+-- The region the spider is in at this place; where it is in none (a frame on the way back from outside the bounds) the region it was last in.
+function WorldClient.regionAt(self: any, pos: Vector3): WorldMap.Region
+	return self.map.at(pos) or self.region
+end
+
+-- Whether the spider is in this region: whether what belongs to the region is in play.
+function WorldClient.isActive(self: any, regionId: string): boolean
+	return self.region.id == regionId
+end
+
+-- Points the player's replication focus at this part (the drawn spider's root), and remembers it. A write that raises is warned about once.
+function WorldClient.focus(self: any, part: Instance?)
+	self.focused = part
+	if part == nil then return end
+	local ok, err = pcall(function() (self.player :: any).ReplicationFocus = part end)
+	if not ok and not self.focusWarned then
+		self.focusWarned = true
+		warn("[Windowsill] world: could not set the replication focus: " .. tostring(err))
+	end
+end
+
+-- After a respawn or a return to a rest: the focus is set again at the next frame.
+function WorldClient.refocus(self: any)
+	self.focused = nil
+end
+
+-- Each frame, before the sim's ticks: the region the spider is in, the pace of its day, and the focus on the drawn spider's root (`root`) when it is not set on it yet.
+function WorldClient.update(self: any, pos: Vector3, root: Instance?)
+	self.region = self.map.at(pos) or self.region
+	LifeClock.game.clockScale = self.region.clockScale
+	if root ~= nil and root ~= self.focused then self:focus(root) end
+end
+
+return WorldClient
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="183">
           <Properties>
             <string name="Name">WorldDetail</string>
             <string name="Source"><![CDATA[--!strict
@@ -30705,7 +31356,7 @@ return WorldDetail
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="178">
+        <Item class="ModuleScript" referent="184">
           <Properties>
             <string name="Name">SilkPlayback</string>
             <string name="Source"><![CDATA[--!strict
@@ -31232,11 +31883,15 @@ end
       </Item>
     </Item>
   </Item>
-  <Item class="Workspace" referent="179">
+  <Item class="Workspace" referent="185">
     <Properties>
       <string name="Name">Workspace</string>
       <float name="Gravity">35</float>
       <bool name="NeedsPivotMigration">false</bool>
+      <bool name="StreamingEnabled">true</bool>
+      <token name="StreamingIntegrityMode">1</token>
+      <int name="StreamingMinRadius">96</int>
+      <int name="StreamingTargetRadius">160</int>
     </Properties>
   </Item>
 </roblox>

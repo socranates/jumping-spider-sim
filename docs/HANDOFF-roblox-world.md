@@ -4,9 +4,10 @@ Claude → Chet, 2026-10-19. Still branch **claude/roblox-sill** (the one bundle
 to this commit). This is the first of the five world rounds planned in `docs/OPEN_WORLD_DESIGN.md` (W1–W5); **W2–W5 will be appended to this
 handoff as they land**, each with its own checklist. CLI at the closing commit: strict clean, 142/142 modules compile (the client at -O0 and
 -O1), all 37 suites green, 61,070 checks; the new suites are `worldmap` (87) and `world_client` (17), and the counts that moved are checkpoint
-375, life 20,922, world 294 and state 491. **Nothing in this round has run in Studio**: the places committed in the repository are still the
-audit round's (evidence `a83e0b69a7a331ce`, playtest v30) and need `tools/build.py` before the next publish. The game is meant to play
-exactly as v30 does; the whole point of W1 is that nothing a player can see has changed yet.
+375, life 20,922, world 294 and state 491. **Nothing in this round has run in Studio** beyond the publish route's
+spot checks. The places were rebuilt at the closing commit of W1 plus the two small decisions below (ROBLOX-99 and 100; 61,072 checks),
+evidence `fb7a1858a2cdcca4`, and published to the playtest as **v31**. The game is meant to play exactly as v30 does but for the slower
+let-down and the music; the whole point of W1 is that nothing a player can see has changed yet.
 
 **The bundle** is `claude-playtest/claude-sill.bundle` on Nathan's PC, overwritten each round so it always holds the whole branch. Names such as
 `claude-sill-v30.bundle` exist only in the cloud outputs of the sessions that made them.

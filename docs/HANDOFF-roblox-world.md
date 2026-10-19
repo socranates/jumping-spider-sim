@@ -86,7 +86,8 @@ Claude → Chet, 2026-10-19, same branch and bundle. The window opens: the middl
 (x -8..8, y 0.7..6 in the back frame) onto the stone outer sill, over its front edge, down 90 cm of brick and onto the bed under the window, and back.
 Nothing lives out there yet (W3); the rival and the mate stay on the sill. `docs/DECISIONS.md` ROBLOX-95 has the numbers and the reasons. CLI at the
 closing commit: strict clean, 143/143 modules compile (the client at -O0, -O1 and -O2), all 37 suites green (see the README for the counts). **Nothing of
-it has run in Studio.** The places in the repository are not rebuilt by this round.
+it has run in Studio** beyond the publish route's spot checks. The places were rebuilt at the closing commit (evidence `8b53da9e6a401c50`) and
+published to the playtest as **v32**.
 
 What is in it:
 

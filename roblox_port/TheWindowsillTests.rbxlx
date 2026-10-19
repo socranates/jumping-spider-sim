@@ -1266,20 +1266,24 @@ Flora.planter = {
 -- flowering shrubs further out. None of it can be reached. The view out is placed as seen from the camera's usual spot
 -- (Graphics.view.eye); the box and the flowers stand where they really are.
 Flora.garden = {
+	-- ROBLOX-95: the window box stands on the stone outer sill (World/Garden's outer_sill: its top is y 0), in two halves either side of the raised sash,
+	-- so the stone in front of the opening is clear: `boxes` are the halves' x spans, each as solid as it looks (World/Garden's window_box_west and
+	-- window_box_east, hidden once this drawing exists). It was one box, x -24.5 to 24.5, sunk to y -3.2 when there was nothing outside the glass.
 	box = {
-		x0 = -24.5, x1 = 24.5, z0 = -21.8, z1 = -13.62, top = 2.8, bottom = -3.2,
+		boxes = { { x0 = -24.5, x1 = -9.5, id = "window_box_west" }, { x0 = 9.5, x1 = 24.5, id = "window_box_east" } },
+		z0 = -21.8, z1 = -13.62, top = 2.8, bottom = 0,
 		color = "6f8796", rim = "7f98a5", paint = "c4d0d2", soil = "392c21", soilTop = 2.55, rimWidth = 0.9,
 		-- patches where the paint has lifted: x, z (on the rim and the far board), width, depth
-		peel = { { -17.0, -21.6, 3.2, 0.6 }, { -2.5, -21.6, 2.4, 0.5 }, { 11.0, -21.6, 4.0, 0.6 }, { 20.5, -13.9, 3.0, 0.5 } },
+		peel = { { -17.0, -21.6, 3.2, 0.6 }, { -12.6, -21.6, 2.4, 0.5 }, { 11.0, -21.6, 4.0, 0.6 }, { 20.5, -13.9, 3.0, 0.5 } },
 	},
 	-- Rudbeckia: head centre height y (above the sill), where it stands in the box (x, z), how much the head nods and turns toward the room (degrees), size
 	flowers = {
 		{ x = -23.2, z = -17.0, y = 5.5, nod = -8, turn = 14, size = 0.9 },
 		{ x = -17.8, z = -15.8, y = 7.0, nod = -12, turn = -10, size = 1.0 },
 		{ x = -12.4, z = -18.6, y = 6.0, nod = -4, turn = 22, size = 1.05 },
-		{ x = -5.6, z = -16.3, y = 4.9, nod = -14, turn = -18, size = 0.95 },
-		{ x = 0.8, z = -19.0, y = 7.7, nod = -9, turn = 6, size = 1.1 },
-		{ x = 6.2, z = -15.9, y = 5.8, nod = -6, turn = -24, size = 1.0 },
+		{ x = -20.4, z = -19.7, y = 4.9, nod = -14, turn = -18, size = 0.95 }, -- (ROBLOX-95: these three stood in the middle, x -5.6, 0.8 and 6.2, where the stone is now clear)
+		{ x = -15.0, z = -15.3, y = 7.7, nod = -9, turn = 6, size = 1.1 },
+		{ x = 15.4, z = -20.0, y = 5.8, nod = -6, turn = -24, size = 1.0 },
 		{ x = 12.6, z = -17.8, y = 7.2, nod = -13, turn = 16, size = 0.9 },
 		{ x = 18.2, z = -16.3, y = 5.1, nod = -10, turn = -8, size = 1.05 },
 		{ x = 23.0, z = -18.4, y = 6.6, nod = -5, turn = -20, size = 0.95 },
@@ -1295,13 +1299,15 @@ Flora.garden = {
 		uv = { color = "b98cff", opacity = 0.85, rise = 0.03, thick = 0.02 },
 		seed = 100,
 	},
-	-- flowering shrubs further out: where they appear on the glass (u across, v up), how far beyond it, how wide they look there
+	-- flowering shrubs further out: where they appear on the glass (u across, v up), how far beyond it, how wide they look there. ROBLOX-95: the garden
+	-- under the window is walkable now (bed_a, x -25..25, z -24..-74, its soil at y -90), so no shrub hangs over it: the three that did (depths 36, 52
+	-- and 32) stand further out (80, 80 and 82), where they look the same through the glass, and every shrub stands on a woody stem down to the lawn (`body`).
 	shrubs = {
 		{ u = -24, v = 3.6, depth = 30, w = 6, bloom = "pink" },
 		{ u = -17, v = 3.9, depth = 44, w = 8, bloom = "white" },
-		{ u = -9.5, v = 3.5, depth = 36, w = 6.5, bloom = "pink" },
-		{ u = -2.5, v = 4.1, depth = 52, w = 8.5, bloom = "white" },
-		{ u = 4.5, v = 3.6, depth = 32, w = 6, bloom = "pink" },
+		{ u = -9.5, v = 3.5, depth = 80, w = 6.5, bloom = "pink" },
+		{ u = -2.5, v = 4.1, depth = 80, w = 6.5, bloom = "white" }, -- (and a little narrower, 6.5 for 8.5, so it fits between the bed and the houses)
+		{ u = 4.5, v = 3.6, depth = 82, w = 6, bloom = "pink" },
 		{ u = 11.5, v = 4.0, depth = 46, w = 8, bloom = "white" },
 		{ u = 18, v = 3.5, depth = 34, w = 6.5, bloom = "pink" },
 		{ u = 25, v = 3.8, depth = 48, w = 8, bloom = "white" },
@@ -1311,6 +1317,9 @@ Flora.garden = {
 		pink = { "f4c7d3", "ee9fb9", "f9dbe3", "e98fae" }, white = { "f8f4ec", "efe9de", "fbfaf5", "e6e0d2" },
 		blooms = 14, bloomSize = { 0.13, 0.22 }, -- as a share of the shrub's width
 		seed = 40,
+		-- ROBLOX-95: the shrub's stem, a woody trunk from the lawn (Graphics.view.ground.y) up into its ball, `width` of the ball's diameter thick: the shrubs
+		-- are standards, a crown on a stem, as a garden grows them (both tiers: a ball floating over the lawn is what the garden would show otherwise)
+		body = { width = 0.07, color = "5a4632" },
 	},
 }
 
@@ -1436,7 +1445,7 @@ Graphics.materials = {
 		upper_ledge = "Wood", garden_step = "Plaster",
 		leaf_garden = "SmoothPlastic", stem_garden = "SmoothPlastic", leaf_high = "SmoothPlastic", stem_high = "SmoothPlastic",
 		sill_floor = "SmoothPlastic", front_lip = "SmoothPlastic",
-		back_frame = "Plaster", left_frame = "Plaster", right_frame = "Plaster",
+		back_frame_west = "Plaster", back_frame_east = "Plaster", back_frame_head = "Plaster", back_frame_rail = "Plaster", left_frame = "Plaster", right_frame = "Plaster",
 		planter = "Plaster", planter_rim = "Plaster",
 		leaf_west = "SmoothPlastic", leaf_middle = "SmoothPlastic", leaf_east = "SmoothPlastic", leaf_tip = "Plaster",
 		stem_west = "SmoothPlastic", stem_middle = "SmoothPlastic", stem_east = "SmoothPlastic",
@@ -1461,16 +1470,23 @@ Graphics.paint = {
 } :: { [string]: { color: string, reflectance: number? } }
 
 -- ---------------------------------------------------------------- the window
--- The back wall is a solid, climbable box (WindowsillLayout back_frame), so the window is drawn: the physical wall turns
+-- The back wall is solid, climbable boxes (WindowsillLayout back_frame_*), so the window is drawn: the physical wall turns
 -- invisible (still solid, still climbable) and Scenery draws a plaster wall behind its face with an opening for the glass.
 Graphics.window = {
-	hidden = "back_frame", -- the piece that turns invisible
+	-- the pieces that turn invisible: the back frame, in four since the lower sash was raised (ROBLOX-95: WindowsillLayout's back_frame_*)
+	hidden = { "back_frame_west", "back_frame_east", "back_frame_head", "back_frame_rail" } :: { string },
 	slabGap = 0.02, -- the drawn wall sits this far behind the climbable face, so the spider's feet never sink into it
 	left = -27.5, right = 27.5, bottom = 3, top = 13, -- the opening: x from/to, y from/to
 	trimWidth = 0.5, trimDepth = 0.10, trimReflectance = 0.04, -- the frame bars around the opening, flush with the climbable face; glossy
 	wallColor = "efe8d8", trimColor = "f4efe3",
 	glass = { color = "cfe3e6", transparency = 0.86, reflectance = 0.12, thickness = 0.04, setback = 0.05 },
 	mullions = { -10, 10 }, mullionWidth = 0.7, -- bars between the panes
+	-- ROBLOX-95: the middle lower sash is raised 6 cm. `opening` is the gap it leaves (the layout's own: back_frame_rail's top to back_frame_head's
+	-- underside, between back_frame_west and back_frame_east), open air from the sill rail up to the sash; the glass over it is gone. The raised sash's
+	-- bottom rail is drawn across the top of the opening (`sashRail` tall, `sashDepth` deep, set back `sashSetback` from the face), the jambs either side
+	-- (`jambWidth`) line the cut through the wall, and the sill rail is trim.
+	opening = { left = -8, right = 8, bottom = 0.7, top = 6 },
+	sashRail = 0.8, sashDepth = 0.45, sashSetback = 0.12, jambWidth = 0.5,
 	-- WindowsillLayout.DECOR entries Scenery draws itself
 	replaces = { window_glass = true, mullion_w = true, mullion_e = true } :: { [string]: boolean },
 }
@@ -1483,7 +1499,9 @@ Graphics.window = {
 -- eave line at v. `full`: dropped in the low tier.
 Graphics.view = {
 	eye = Vector3.new(0, 2.5, 5),
-	ground = { y = -46, size = 2048, color = "7d8f62" },
+	-- ROBLOX-95: the lawn is at the garden's level now, 0.4 below the soil of the bed under the window (World/WorldMap bed_a, y -90), where the house wall
+	-- meets it; it was at -46 when nothing could be walked outside the glass. Everything below stands on it (the trunks and a house were lengthened to reach it).
+	ground = { y = -90.4, size = 2048, color = "7d8f62" },
 	sky = true,
 	items = {
 		-- far hills
@@ -1499,7 +1517,7 @@ Graphics.view = {
 		{ id = "roof_3", kind = "roof", u = -8.5, v = 4.6, depth = 120, w = 7.0, t = 5.4, color = "9a5642", full = false },
 		{ id = "house_4", kind = "block", u = 0.5, v = -3.0, depth = 120, w = 5.3, h = 14, t = 5, color = "cdbfa4", full = true },
 		{ id = "roof_4", kind = "roof", u = 0.5, v = 4.0, depth = 120, w = 5.8, t = 5.4, color = "6a5a52", full = true },
-		{ id = "house_5", kind = "block", u = 9, v = -2.2, depth = 120, w = 6.6, h = 14, t = 5, color = "d6c6a6", full = false },
+		{ id = "house_5", kind = "block", u = 9, v = -2.35, depth = 120, w = 6.6, h = 14.3, t = 5, color = "d6c6a6", full = false },
 		{ id = "roof_5", kind = "roof", u = 9, v = 4.8, depth = 120, w = 7.2, t = 5.4, color = "7b4a3d", full = false },
 		{ id = "house_6", kind = "block", u = 17.5, v = -2.9, depth = 120, w = 5.5, h = 14, t = 5, color = "c4b99f", full = true },
 		{ id = "roof_6", kind = "roof", u = 17.5, v = 4.1, depth = 120, w = 6.0, t = 5.4, color = "58626b", full = true },
@@ -1508,14 +1526,14 @@ Graphics.view = {
 		{ id = "chimney_3", kind = "block", u = -7.3, v = 6.7, depth = 119, w = 0.6, h = 2.4, t = 0.8, color = "8c5a48", full = true },
 		{ id = "chimney_5", kind = "block", u = 10.3, v = 6.85, depth = 119, w = 0.6, h = 2.5, t = 0.8, color = "86553f", full = true },
 		-- a tree on the left, a smaller one on the right
-		{ id = "trunk_a", kind = "block", u = -17, v = -3.2, depth = 72, w = 1.3, h = 23.5, t = 1.3, color = "4a3e30", full = false },
+		{ id = "trunk_a", kind = "block", u = -17, v = -3.56, depth = 72, w = 1.3, h = 24.22, t = 1.3, color = "4a3e30", full = false },
 		{ id = "canopy_a1", kind = "ball", u = -17, v = 10.5, depth = 72, w = 11, color = "3f6238", full = false },
 		{ id = "canopy_a2", kind = "ball", u = -23.5, v = 8.5, depth = 72, w = 8.5, color = "496f40", full = false },
 		{ id = "canopy_a3", kind = "ball", u = -10.5, v = 9.0, depth = 72, w = 8, color = "35552f", full = true },
 		{ id = "canopy_a4", kind = "ball", u = -19.5, v = 13.5, depth = 72, w = 7, color = "446a3b", full = true },
 		{ id = "canopy_a5", kind = "ball", u = -13.5, v = 13.2, depth = 72, w = 6.5, color = "3a5c34", full = true },
 		{ id = "canopy_a6", kind = "ball", u = -26, v = 12, depth = 72, w = 6, color = "4d7544", full = true },
-		{ id = "trunk_b", kind = "block", u = 18.5, v = 1.5, depth = 100, w = 0.9, h = 14, t = 0.9, color = "50443a", full = true },
+		{ id = "trunk_b", kind = "block", u = 18.5, v = -1.42, depth = 100, w = 0.9, h = 19.84, t = 0.9, color = "50443a", full = true },
 		{ id = "canopy_b1", kind = "ball", u = 18.5, v = 7.2, depth = 100, w = 6.5, color = "47703e", full = true },
 		{ id = "canopy_b2", kind = "ball", u = 22, v = 6.2, depth = 100, w = 5, color = "3d6336", full = true },
 		{ id = "canopy_b3", kind = "ball", u = 15, v = 6.0, depth = 100, w = 4.5, color = "4f7746", full = true },
@@ -3719,16 +3737,23 @@ end
 -- Condensation on the lower panes (tiny flattened Glass spheres) and two faint smudges, on the room side of the glass.
 function Patina.glass(parent: Instance): (Folder, Folder)
 	local W = Graphics.window
-	local face = Shapes.piece(W.hidden).hi.Z - W.glass.setback -- the glass's room-side face
+	local face = Shapes.piece(W.hidden[1]).hi.Z - W.glass.setback -- the glass's room-side face
 	local D = Wear.drops
 	local drops = folder(parent, "Condensation", true)
 	local rand = Shapes.rng(D.seed)
+	-- ROBLOX-95: the middle lower sash is raised (Graphics.window.opening); a drop that would sit over the gap sits on the raised sash's pane instead, as high
+	-- above its bottom rail as it would have been above the sill (the same draws, so every other drop is where it was).
+	local O = W.opening
+	local lift = O.top + W.sashRail + 0.25 - D.y[1]
 	for i = 1, D.count do
 		local pane = D.panes[1 + math.floor(rand() * #D.panes)]
 		local d = D.size[1] + (D.size[2] - D.size[1]) * rand() ^ 2.2
 		local run = 1.15 + (d - D.size[1]) / (D.size[2] - D.size[1]) * 0.9 -- bigger drops are longer: they have started to run
+		local x = between(rand, pane[1], pane[2])
+		local y = D.y[1] + (D.y[2] - D.y[1]) * rand() ^ 1.8
+		if x > O.left - W.jambWidth - d and x < O.right + W.jambWidth + d then y += lift end
 		local drop = Shapes.ellipsoid(drops, "Drop" .. i, Vector3.new(d, math.min(d * run, D.size[2]), 2 * D.flat),
-			CFrame.new(between(rand, pane[1], pane[2]), D.y[1] + (D.y[2] - D.y[1]) * rand() ^ 1.8, face + D.flat), hex(D.color), "Glass")
+			CFrame.new(x, y, face + D.flat), hex(D.color), "Glass")
 		drop.Transparency = D.transparency
 		drop.Reflectance = D.reflectance
 	end
@@ -3788,6 +3813,7 @@ return Patina
 -- untouchable); optional detail is marked FullOnly, which Client/WorldDetail removes on phones and tablets. A drawn leaf's top is
 -- its piece's top and a drawn stem stands inside its piece's box, so what the spider walks on is what the player sees.
 local Flora = require(script.Parent.Parent.Data.Flora)
+local Graphics = require(script.Parent.Parent.Data.Graphics)
 local Layout = require(script.Parent.WindowsillLayout)
 local Shapes = require(script.Parent.Shapes)
 
@@ -4035,23 +4061,38 @@ end
 -- ---------------------------------------------------------------- the garden outside the window
 local G = Flora.garden
 
+-- The ids of the outer sill's pieces the window box draws instead (World/Garden's window_box_west and window_box_east): Scenery hides exactly these, and
+-- only once the garden is drawn (ROBLOX-95).
+function Plants.windowBoxIds(): { string }
+	local ids = {}
+	for _, half in G.box.boxes do table.insert(ids, half.id) end
+	return ids
+end
+
+-- ROBLOX-95: two halves either side of the raised sash, standing on the stone outer sill; each half is drawn as the one box was.
 local function windowBox(parent: Instance)
 	local B = G.box
 	local box = folder(parent, "WindowBox")
-	local w, d = B.x1 - B.x0, B.z1 - B.z0
-	local cx, cz = (B.x0 + B.x1) / 2, (B.z0 + B.z1) / 2
+	local d = B.z1 - B.z0
+	local cz = (B.z0 + B.z1) / 2
 	local rimBottom = B.soilTop - 0.1
-	Shapes.block(box, "Body", Vector3.new(w, rimBottom - B.bottom, d), CFrame.new(cx, (rimBottom + B.bottom) / 2, cz), hex(B.color), "Wood")
-	Shapes.block(box, "Soil", Vector3.new(w - 2 * B.rimWidth, 0.4, d - 2 * B.rimWidth), CFrame.new(cx, B.soilTop - 0.2, cz), hex(B.soil), "Ground")
 	local rim = hex(B.rim)
 	local rimHeight = B.top - rimBottom
 	local ry = (B.top + rimBottom) / 2
-	Shapes.block(box, "RimFar", Vector3.new(w, rimHeight, B.rimWidth), CFrame.new(cx, ry, B.z0 + B.rimWidth / 2), rim, "Wood")
-	Shapes.block(box, "RimNear", Vector3.new(w, rimHeight, B.rimWidth), CFrame.new(cx, ry, B.z1 - B.rimWidth / 2), rim, "Wood")
-	Shapes.block(box, "RimWest", Vector3.new(B.rimWidth, rimHeight, d - 2 * B.rimWidth), CFrame.new(B.x0 + B.rimWidth / 2, ry, cz), rim, "Wood")
-	Shapes.block(box, "RimEast", Vector3.new(B.rimWidth, rimHeight, d - 2 * B.rimWidth), CFrame.new(B.x1 - B.rimWidth / 2, ry, cz), rim, "Wood")
-	for i, peel in B.peel do
-		Shapes.block(box, "Peel" .. i, Vector3.new(peel[3], 0.01, peel[4]), CFrame.new(peel[1], B.top + 0.006, peel[2]), hex(B.paint), "SmoothPlastic")
+	for _, span in B.boxes do
+		local half = folder(box, if span.x1 <= 0 then "West" else "East")
+		local w, cx = span.x1 - span.x0, (span.x0 + span.x1) / 2
+		Shapes.block(half, "Body", Vector3.new(w, rimBottom - B.bottom, d), CFrame.new(cx, (rimBottom + B.bottom) / 2, cz), hex(B.color), "Wood")
+		Shapes.block(half, "Soil", Vector3.new(w - 2 * B.rimWidth, 0.4, d - 2 * B.rimWidth), CFrame.new(cx, B.soilTop - 0.2, cz), hex(B.soil), "Ground")
+		Shapes.block(half, "RimFar", Vector3.new(w, rimHeight, B.rimWidth), CFrame.new(cx, ry, B.z0 + B.rimWidth / 2), rim, "Wood")
+		Shapes.block(half, "RimNear", Vector3.new(w, rimHeight, B.rimWidth), CFrame.new(cx, ry, B.z1 - B.rimWidth / 2), rim, "Wood")
+		Shapes.block(half, "RimWest", Vector3.new(B.rimWidth, rimHeight, d - 2 * B.rimWidth), CFrame.new(span.x0 + B.rimWidth / 2, ry, cz), rim, "Wood")
+		Shapes.block(half, "RimEast", Vector3.new(B.rimWidth, rimHeight, d - 2 * B.rimWidth), CFrame.new(span.x1 - B.rimWidth / 2, ry, cz), rim, "Wood")
+		for i, peel in B.peel do
+			if peel[1] > span.x0 and peel[1] < span.x1 then
+				Shapes.block(half, "Peel" .. i, Vector3.new(peel[3], 0.01, peel[4]), CFrame.new(peel[1], B.top + 0.006, peel[2]), hex(B.paint), "SmoothPlastic")
+			end
+		end
 	end
 end
 
@@ -4122,10 +4163,14 @@ local function shrubs(parent: Instance, place: (number, number, number) -> (Vect
 		p.Shape = Enum.PartType.Ball
 		if optional then Shapes.fullOnly(p) end
 	end
+	local ground = Graphics.view.ground.y
 	for i, spec in G.shrubs do
 		local at, k = place(spec.u, spec.v, spec.depth)
 		local diameter = spec.w * k
 		ball(`Shrub{i}`, at, diameter, hex(pick(S.foliage, rand)), false)
+		-- ROBLOX-95: a woody stem from the lawn up into the ball, so the shrub stands in the garden the spider can now walk to (no draw: the blooms below
+		-- are where they were)
+		Shapes.rod(group, `Shrub{i}Stem`, Vector3.new(at.X, ground, at.Z), at, diameter * S.body.width, hex(S.body.color), "Wood")
 		local colors = if spec.bloom == "pink" then S.pink else S.white
 		for j = 1, S.blooms do
 			local dir = Vector3.new(rand() * 2 - 1, rand() * 1.2 - 0.3, 0.35 + rand() * 0.8).Unit
@@ -4321,9 +4366,22 @@ end
 -- ---------------------------------------------------------------- the physical sill
 -- The set of piece ids that drawn decor stands in for: the back wall and the Pilea (Scenery.decor returns the ones it built).
 local function replaceable(): { [string]: boolean }
-	local all: { [string]: boolean } = { [W.hidden] = true }
+	local all: { [string]: boolean } = {}
+	for _, id in W.hidden do all[id] = true end
 	for _, id in Plants.pieceIds() do all[id] = true end
 	return all
+end
+
+-- The box the drawn window wall stands in for: the union of the back frame's pieces (one box until ROBLOX-95, four around the raised sash since). `min, max`.
+function Scenery.wallBox(): (Vector3, Vector3)
+	local first = piece(W.hidden[1])
+	local x0, y0, z0, x1, y1, z1 = first.lo.X, first.lo.Y, first.lo.Z, first.hi.X, first.hi.Y, first.hi.Z
+	for _, id in W.hidden do
+		local p = piece(id)
+		x0, y0, z0 = math.min(x0, p.lo.X), math.min(y0, p.lo.Y), math.min(z0, p.lo.Z)
+		x1, y1, z1 = math.max(x1, p.hi.X), math.max(y1, p.hi.Y), math.max(z1, p.hi.Z)
+	end
+	return Vector3.new(x0, y0, z0), Vector3.new(x1, y1, z1)
 end
 
 -- The physical parts of some pieces, one anchored Part for each, into `parent` (ROBLOX-94: the part-making the sill always had, for any region's pieces; World/WorldBuild builds
@@ -4339,7 +4397,7 @@ function Scenery.parts(parent: Instance, pieces: { Layout.Piece }, hide: { [stri
 		local paint = Graphics.paint[spec.id]
 		p.Color = if paint then hex(paint.color) else spec.color
 		if paint and paint.reflectance then p.Reflectance = paint.reflectance end
-		p.Material = Materials.get(M.pieces[spec.id] or M.fallback)
+		p.Material = Materials.get(M.pieces[spec.id] or (spec :: any).material or M.fallback) -- (a garden piece names its own, ROBLOX-95: World/Garden)
 		p.TopSurface = Enum.SurfaceType.Smooth
 		p.BottomSurface = Enum.SurfaceType.Smooth
 		p:SetAttribute("SurfaceId", spec.id)
@@ -4365,39 +4423,98 @@ function Scenery.sill(replaced: { [string]: boolean }?, pieces: { Layout.Piece }
 	return sill
 end
 
+-- ---------------------------------------------------------------- a drawn look from records (ROBLOX-95)
+-- One drawn-only part for each record of a region's look (World/Garden.Drawn: Region.decor of every kind but the sill's): anchored, nothing collides with it, no
+-- ray sees it, built into a folder per `group` under `parent`; `full` records carry FullOnly (Client/WorldDetail drops them on the low tier). Returns how many.
+export type Drawn = {
+	id: string, size: Vector3, at: Vector3, color: Color3, transparency: number?,
+	material: string?, shape: string?, turn: Vector3?, full: boolean?, group: string?, shadow: boolean?,
+}
+function Scenery.look(parent: Instance, list: { Drawn }): number
+	local groups: { [string]: Instance } = {}
+	for _, d in list do
+		local name = d.group or ""
+		local into: Instance? = groups[name]
+		if into == nil then
+			local made = if name == "" then parent else folder(parent, name)
+			groups[name] = made
+			into = made
+		end
+		local cframe = CFrame.new(d.at)
+		if d.turn ~= nil then cframe *= CFrame.Angles(math.rad(d.turn.X), math.rad(d.turn.Y), math.rad(d.turn.Z)) end
+		local p = drawn(into :: Instance, d.id, d.size, cframe, d.color, d.material or "SmoothPlastic")
+		p.Transparency = d.transparency or 0
+		p.CastShadow = d.shadow == true
+		if d.shape == "Ball" then
+			p.Shape = Enum.PartType.Ball
+		elseif d.shape == "Cylinder" then
+			p.Shape = Enum.PartType.Cylinder
+		elseif d.shape == "Ellipsoid" then
+			local mesh = Instance.new("SpecialMesh")
+			mesh.MeshType = Enum.MeshType.Sphere
+			mesh.Parent = p
+		end
+		if d.full then p:SetAttribute("FullOnly", true) end
+	end
+	return #list
+end
+
 -- ---------------------------------------------------------------- the window wall
+-- ROBLOX-95: the middle lower sash is raised 6 cm (Graphics.window.opening, the layout's own gap between the back frame's four pieces). The wall below the
+-- window is cut there down to the sill rail, the jambs line the cut, the glass over the gap is gone, and the raised sash's bottom rail runs across its top;
+-- the upper part of the middle pane is the raised sash's glass and the side panes are as they were. Everything drawn stays behind the climbable faces
+-- (`slabGap`) or flush with them, as the wall always has.
 function Scenery.window(parent: Instance): Folder
 	local wall = folder(parent, "Wall")
-	local back = piece(W.hidden)
-	local plane = back.hi.Z -- the climbable face
+	local lo, hi = Scenery.wallBox()
+	local plane = hi.Z -- the climbable face
 	local slabFront = plane - W.slabGap
-	local zMid = (slabFront + back.lo.Z) / 2
-	local depth = slabFront - back.lo.Z
+	local zMid = (slabFront + lo.Z) / 2
+	local depth = slabFront - lo.Z
 	local plaster, wood = hex(W.wallColor), hex(W.trimColor)
+	local O, jamb, gap = W.opening, W.jambWidth, W.slabGap
 	local function slab(name: string, x0: number, x1: number, y0: number, y1: number)
 		drawn(wall, name, Vector3.new(x1 - x0, y1 - y0, depth), CFrame.new((x0 + x1) / 2, (y0 + y1) / 2, zMid), plaster, M.wall)
 	end
-	slab("Apron", back.lo.X, back.hi.X, back.lo.Y, W.bottom)
-	slab("Header", back.lo.X, back.hi.X, W.top, back.hi.Y)
-	slab("StileWest", back.lo.X, W.left, W.bottom, W.top)
-	slab("StileEast", W.right, back.hi.X, W.bottom, W.top)
+	slab("ApronWest", lo.X, O.left - jamb, lo.Y, W.bottom)
+	slab("ApronEast", O.right + jamb, hi.X, lo.Y, W.bottom)
+	slab("Header", lo.X, hi.X, W.top, hi.Y)
+	slab("StileWest", lo.X, W.left, W.bottom, W.top)
+	slab("StileEast", W.right, hi.X, W.bottom, W.top)
 	local function bar(name: string, x0: number, x1: number, y0: number, y1: number)
 		local trim = drawn(wall, name, Vector3.new(x1 - x0, y1 - y0, W.trimDepth), CFrame.new((x0 + x1) / 2, (y0 + y1) / 2, plane - W.trimDepth / 2), wood, M.trim)
 		trim.Reflectance = W.trimReflectance
 	end
-	bar("TrimBottom", W.left, W.right, W.bottom, W.bottom + W.trimWidth)
+	bar("TrimBottomWest", W.left, O.left - jamb, W.bottom, W.bottom + W.trimWidth)
+	bar("TrimBottomEast", O.right + jamb, W.right, W.bottom, W.bottom + W.trimWidth)
 	bar("TrimTop", W.left, W.right, W.top - W.trimWidth, W.top)
 	bar("TrimWest", W.left, W.left + W.trimWidth, W.bottom, W.top)
 	bar("TrimEast", W.right - W.trimWidth, W.right, W.bottom, W.top)
 	for i, x in W.mullions do
 		bar("Mullion" .. i, x - W.mullionWidth / 2, x + W.mullionWidth / 2, W.bottom, W.top)
 	end
+	-- the way out: the sill rail (trim, its top a hair under the rail's walkable top), the jambs through the wall's depth either side, and the raised
+	-- sash's bottom rail across the top, set back in the frame
+	local function block(name: string, x0: number, x1: number, y0: number, y1: number, z0: number, z1: number): Part
+		local p = drawn(wall, name, Vector3.new(x1 - x0, y1 - y0, z1 - z0), CFrame.new((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2), wood, M.trim)
+		p.Reflectance = W.trimReflectance
+		return p
+	end
+	block("SillRail", O.left - jamb, O.right + jamb, lo.Y, O.bottom - gap, lo.Z + gap, slabFront)
+	block("JambWest", O.left - jamb, O.left - gap, O.bottom - gap, O.top + W.sashRail, lo.Z + gap, slabFront)
+	block("JambEast", O.right + gap, O.right + jamb, O.bottom - gap, O.top + W.sashRail, lo.Z + gap, slabFront)
+	block("SashRail", O.left - jamb, O.right + jamb, O.top + gap, O.top + W.sashRail, plane - W.sashSetback - W.sashDepth, plane - W.sashSetback)
 	local g = W.glass
-	local glass = drawn(wall, "Glass", Vector3.new(W.right - W.left, W.top - W.bottom, g.thickness),
-		CFrame.new(0, (W.bottom + W.top) / 2, plane - g.setback - g.thickness / 2), hex(g.color), M.glass)
-	glass.Transparency = g.transparency
-	glass.Reflectance = g.reflectance
-	glass.CastShadow = false
+	local gz = plane - g.setback - g.thickness / 2
+	local function pane(name: string, x0: number, x1: number, y0: number, y1: number)
+		local glass = drawn(wall, name, Vector3.new(x1 - x0, y1 - y0, g.thickness), CFrame.new((x0 + x1) / 2, (y0 + y1) / 2, gz), hex(g.color), M.glass)
+		glass.Transparency = g.transparency
+		glass.Reflectance = g.reflectance
+		glass.CastShadow = false
+	end
+	pane("GlassWest", W.left, O.left - jamb, W.bottom, W.top)
+	pane("GlassEast", O.right + jamb, W.right, W.bottom, W.top)
+	pane("Glass", O.left - jamb, O.right + jamb, O.top + W.sashRail, W.top) -- the raised sash's pane
 	return wall
 end
 
@@ -4445,7 +4562,8 @@ end
 -- it looks. The reference eye is the camera's usual spot (Graphics.view.eye).
 function Scenery.viewPosition(u: number, v: number, depth: number): (Vector3, number)
 	local eye = Graphics.view.eye
-	local plane = piece(W.hidden).hi.Z
+	local _, wallHi = Scenery.wallBox()
+	local plane = wallHi.Z
 	local reach = eye.Z - plane
 	local k = (reach + depth) / reach
 	return Vector3.new(eye.X + (u - eye.X) * k, eye.Y + (v - eye.Y) * k, plane - depth), k
@@ -4510,7 +4628,8 @@ function Scenery.shafts(parent: Instance, sun: Vector3): Folder?
 	if sun.Y < 0.15 or sun.Z > -0.05 then return nil end
 	local shafts = folder(parent, "Shafts")
 	shafts:SetAttribute("FullOnly", true)
-	local plane = piece(W.hidden).hi.Z
+	local _, wallHi = Scenery.wallBox()
+	local plane = wallHi.Z
 	for i, x in S.x do
 		local start = Vector3.new(x, S.startY, plane - 0.05)
 		local stop = start - sun * ((start.Y - 0.05) / sun.Y) -- along the sun's rays down to just above the floor
@@ -4577,7 +4696,7 @@ function Scenery.decor(sun: Vector3?): (Model, { [string]: boolean })
 		end
 	end
 	Scenery.window(decor)
-	replaced[W.hidden] = true
+	for _, id in W.hidden do replaced[id] = true end
 	local uv = Shapes.folder(decor, "UVLayer") -- the ultraviolet pattern of the flowers (the eye-view helper fades it in); always present
 	attempt(decor, "dust", function() return Scenery.dust(decor) end)
 	attempt(decor, "view", function() return Scenery.view(decor) end)
@@ -4595,7 +4714,10 @@ function Scenery.decor(sun: Vector3?): (Model, { [string]: boolean })
 	attempt(decor, "litter", function() return Dressing.litter(decor) end)
 	attempt(decor, "windfall", function() return Dressing.windfall(decor) end)
 	attempt(decor, "dew", function() return Dressing.dew(decor) end)
-	attempt(decor, "garden", function() return Plants.garden(decor, uv, Scenery.viewPosition) end)
+	-- (the window box's halves stand on the outer sill, solid: World/Garden's pieces, hidden once drawn here, ROBLOX-95)
+	if attempt(decor, "garden", function() return Plants.garden(decor, uv, Scenery.viewPosition) end) then
+		for _, id in Plants.windowBoxIds() do replaced[id] = true end
+	end
 	return decor, replaced
 end
 
@@ -4926,7 +5048,12 @@ Layout.PIECES = {
 	{ id = "leaf_high", lo = v(-14, 10.8, -9), hi = v(-7, 11.2, -3), profile = "leaf_dry_prototype", color = hex("78985c") },
 	{ id = "stem_high", lo = v(-11, 0, -6.5), hi = v(-10, 10.8, -5.5), profile = "leaf_dry_prototype", color = hex("536b43") },
 	{ id = "sill_floor", lo = v(-30, -1, -12.5), hi = v(30, 0, 12.5), profile = "painted_wood_dry", color = hex("b6a082") },
-	{ id = "back_frame", lo = v(-31, 0, -13.5), hi = v(31, 14, -12.5), profile = "bare_wood_rough", color = hex("ded7c3") },
+	-- ROBLOX-95: the back frame with the lower sash raised 6 cm, an opening x -8..8, y 0.7..6 through it (the way out onto the outer sill): the wall
+	-- west and east of it, the frame above it, and the 0.7 cm sill rail below it. Same profile and colour as the one back_frame box they replace.
+	{ id = "back_frame_west", lo = v(-31, 0, -13.5), hi = v(-8, 14, -12.5), profile = "bare_wood_rough", color = hex("ded7c3") },
+	{ id = "back_frame_east", lo = v(8, 0, -13.5), hi = v(31, 14, -12.5), profile = "bare_wood_rough", color = hex("ded7c3") },
+	{ id = "back_frame_head", lo = v(-8, 6, -13.5), hi = v(8, 14, -12.5), profile = "bare_wood_rough", color = hex("ded7c3") },
+	{ id = "back_frame_rail", lo = v(-8, 0, -13.5), hi = v(8, 0.7, -12.5), profile = "bare_wood_rough", color = hex("ded7c3") },
 	{ id = "left_frame", lo = v(-31, 0, -12.5), hi = v(-30, 14, 12.5), profile = "bare_wood_rough", color = hex("ded7c3") },
 	{ id = "right_frame", lo = v(30, 0, -12.5), hi = v(31, 14, 12.5), profile = "bare_wood_rough", color = hex("ded7c3") },
 	{ id = "front_lip", lo = v(-30, 0, 12.0), hi = v(30, 0.7, 12.5), profile = "bare_wood_rough", color = hex("8b7256") },
@@ -8082,6 +8209,9 @@ export type Config = {
 	boundsMin: Vector3,
 	boundsMax: Vector3,
 	probeParent: Instance?,
+	-- ROBLOX-95: where the play area is, when it is not one box (the world's regions: the client's WorldClient.inBounds). Out of bounds is then outside the box or
+	-- where this says no; without it, the box alone, as Godot has it.
+	inBounds: ((Vector3) -> boolean)?,
 }
 
 function Motor.idleInput(): TickInput
@@ -8618,7 +8748,9 @@ end
 
 function Motor._outOfBounds(self: any, p: Vector3): boolean
 	local lo, hi = self.config.boundsMin, self.config.boundsMax
-	return p.X < lo.X or p.Y < lo.Y or p.Z < lo.Z or p.X > hi.X or p.Y > hi.Y or p.Z > hi.Z
+	if p.X < lo.X or p.Y < lo.Y or p.Z < lo.Z or p.X > hi.X or p.Y > hi.Y or p.Z > hi.Z then return true end
+	local inside = self.config.inBounds
+	return inside ~= nil and not inside(p)
 end
 
 -- Leaving the play area puts the spider back at its last supported spot (Godot _reset_out_of_bounds).
@@ -10762,6 +10894,9 @@ return Signal
 -- rest before the world) means the sill of the default world with no changes. A region that is not on the map, or a position outside that region's bounds, is refused like
 -- any bad record. A rest made in another revision of the world, or from another seed, is put back at its region's spawn: the position was kept for geometry that may have
 -- moved, so it is not trusted (the rest of the record is: the life, the reserves, the clock).
+-- ROBLOX-95: the world is at revision world-2 (the sill's back frame opened, the garden added) and a record without `world_map` is read as world-1's, the sill
+-- of before: every rest kept before this round is put back at its region's spawn with the notice. A rest in the garden (the gap under the bed's stone) records
+-- region bed_a and retreat bed_a_stone and is put back there. SCHEMA_VERSION and CONTENT_REVISION do not change (a new content revision would refuse old records).
 
 local Species = require(script.Parent.Parent.Data.Species)
 local ObjectRecord = require(script.Parent.ObjectRecord)
@@ -10854,14 +10989,16 @@ local function vec(t: any): Vector3?
 	return Vector3.new(t[1], t[2], t[3])
 end
 
--- The world record of a checkpoint with the defaults of a record from before there was a world: the default world's seed and revision, the sill, the retreat the
--- player block names, no changes. Returns it and what is wrong with a record that has one (an empty list for a good one or an old one).
+-- The world record of a checkpoint with the defaults of a record from before there was a world: the default world's seed, the first revision of the world
+-- (WorldMap.FIRST_REVISION, ROBLOX-95: such a rest was kept on the sill before its back frame opened, so it is put back at the spawn like any rest from
+-- world-1), the sill, the retreat the player block names, no changes. Returns it and what is wrong with a record that has one (an empty list for a good one or
+-- an old one).
 export type MapRecord = { seed: number, revision: string, region: string, retreat: string, diffs: { any } }
 local function mapRecord(record: any): (MapRecord, { string })
 	local problems: { string } = {}
 	local p = record.player
 	local out: MapRecord = {
-		seed = WorldMap.SEED, revision = WorldMap.REVISION, region = WorldMap.HOME, diffs = {},
+		seed = WorldMap.SEED, revision = WorldMap.FIRST_REVISION, region = WorldMap.HOME, diffs = {},
 		retreat = if type(p) == "table" and type(p.retreat_id) == "string" then p.retreat_id else "",
 	}
 	local m = record.world_map
@@ -11050,7 +11187,7 @@ function Checkpoint.check(record: any, world: World): ({ string }, ObjectRecord.
 	for _, text in mapProblemList do bad(text) end
 	local region = WorldMap.region(map.region)
 	if #mapProblemList == 0 and region == nil then bad("the spider is in a region this world does not have") end
-	local moved = map.revision ~= WorldMap.REVISION or map.seed ~= WorldMap.SEED
+	local moved = Checkpoint.worldMoved(record)
 	if region ~= nil and #mapProblemList == 0 and map.retreat ~= "" and not hasRetreat(region, map.retreat) then bad("the spider is in an unknown retreat") end
 	local p = record.player
 	if type(p) ~= "table" then
@@ -13793,7 +13930,7 @@ return Grip
           <Properties>
             <string name="Name">RivalRoute</string>
             <string name="Source"><![CDATA[--!strict
--- Where the rival spider can walk, and the ways between (ROBLOX-69). A graph of the windowsill's box faces made from the sill region's pieces alone (Region.pieces, ROBLOX-94):
+-- Where the rival spider can walk, and the ways between (ROBLOX-69). A graph of a region's box faces (the sill's, ROBLOX-94; any region's, ROBLOX-95, below):
 -- every face of every box is a node; two faces that meet along a line (a box's own edge, convex, or a wall rising from a floor, concave) are
 -- joined by that seam. The rival's own SpiderMotor walks any seam the way the player's does (a wall ahead becomes the support, an edge is wrapped), so a
 -- route is only a list of seams to cross and where to head to cross them. Pure and Vector3-light: the CLI checks it on the boxes, and the
@@ -13801,18 +13938,19 @@ return Grip
 --
 -- Faces are looked up by their box, the axis and the side. A face is "stand-able" at the sample points where a body of the motor's radius fits
 -- without touching another box. The crack (the crevice boxes) is forbidden: no route enters it, and the keep-out box around the retreat turns
--- every straight walk aside.
+-- every straight walk aside; the open sash (ROBLOX-95) is a second keep-out box of the sill.
 local Rules = require(script.Parent.Parent.Data.RivalRules)
 local WorldMap = require(script.Parent.Parent.World.WorldMap)
 local Region = require(script.Parent.Parent.World.Region)
 
 local Route = {}
 
--- ROBLOX-94: the graph is the sill's, region 0 of the world: its boxes and the keep-out around its crack come from the region's generator (Region.pieces, Region.keepOut). It
--- becomes region-scoped, with seams to the neighbours, in the navigation round; until then there is one region and one crack.
-local SILL = WorldMap.region(WorldMap.HOME) :: WorldMap.Region
-local KEEP = Region.keepOut(SILL)[1]
-
+-- ROBLOX-94: the graph was the sill's, region 0 of the world. ROBLOX-95: it is region-scoped. `Route.graph(id)` is the graph of one region, built from that region's pieces
+-- (Region.pieces) and keep-outs (Region.keepOut), with its neighbours' boxes as obstacles (a body that fits on a face fits there in the whole world), and with seam edges to
+-- its neighbours' graphs along the seams the map declares (WorldMap neighbors): the faces of two regions that meet along a seam's line, across a corner or flat across the
+-- same plane, are joined by an edge of the seam (`Graph:seamsOf(face)`). The functions of this module (faces, faceAt, adjacent, plan, aroundKeepOut, inKeepOut, waypoints,
+-- walkBlocked) are the sill's graph's, as the rival and the mate have always called them: they are bound to the sill this round, never plan across a seam, and keep out of
+-- its open sash (the sill's second keep-out box). The bed's graph is built and checked (tests/rivalnav.luau) and nothing walks it yet.
 local AXIS = { "X", "Y", "Z" }
 local SEAT = 0.31 -- the motor's body centre above its support (SpiderMotor.HEIGHT)
 local BODY = 0.2 -- a stand-able point keeps this much clear (the motor itself only casts rays, so less than its radius of 0.3 will do)
@@ -13842,10 +13980,15 @@ export type Face = {
 }
 -- A hop is a seam crossed (from one face to the next), or a `via`: a corner of a box standing on the face, rounded so the walk does not run into it.
 export type Hop = { from: number, face: number, seam: Vector3, aim: Vector3, via: boolean? }
+-- An edge of a seam between regions: from a face of one region's graph to a face of a neighbour's (`region`; `to` is the face's id in that region's graph), across a
+-- corner (`convex` or not) or `flat` across one plane.
+export type SeamEdge = { region: string, to: number, samples: { Vector3 }, ahead: Vector3, convex: boolean, flat: boolean }
 
-local boxes: { { id: string, lo: { number }, hi: { number } } } = {}
-local faces: { Face } = {}
-local built = false
+type BoxSpec = { id: string, lo: { number }, hi: { number } }
+
+local Graph = {}
+Graph.__index = Graph
+local graphs: { [string]: any } = {}
 
 local function comp(v: Vector3, axis: number): number
 	return (v :: any)[AXIS[axis]]
@@ -13859,9 +14002,10 @@ local function axisVec(axis: number, s: number): Vector3
 	return if axis == 1 then vec(s, 0, 0) elseif axis == 2 then vec(0, s, 0) else vec(0, 0, s)
 end
 
--- Whether a point is strictly inside any box (a hair of tolerance).
-local function solid(p: Vector3): boolean
-	for _, b in boxes do
+-- Whether a point is strictly inside any box (a hair of tolerance). `real`: only the pieces (the keep-out boxes left out).
+local function solid(g: any, p: Vector3, real: boolean?): boolean
+	for i, b in g.boxes do
+		if real and i > g.real then break end
 		if p.X > b.lo[1] + EPS and p.X < b.hi[1] - EPS and p.Y > b.lo[2] + EPS and p.Y < b.hi[2] - EPS and p.Z > b.lo[3] + EPS and p.Z < b.hi[3] - EPS then
 			return true
 		end
@@ -13869,10 +14013,11 @@ local function solid(p: Vector3): boolean
 	return false
 end
 
--- Whether a body of the motor's radius centred here touches no box.
-local function bodyFits(c: Vector3, radius: number?): boolean
+-- Whether a body of the motor's radius centred here touches no box. `real`: only the pieces (the keep-out boxes left out).
+local function bodyFits(g: any, c: Vector3, radius: number?, real: boolean?): boolean
 	local r = radius or BODY
-	for _, b in boxes do
+	for i, b in g.boxes do
+		if real and i > g.real then break end
 		local dx = math.max(b.lo[1] - c.X, 0, c.X - b.hi[1])
 		local dy = math.max(b.lo[2] - c.Y, 0, c.Y - b.hi[2])
 		local dz = math.max(b.lo[3] - c.Z, 0, c.Z - b.hi[3])
@@ -13881,31 +14026,51 @@ local function bodyFits(c: Vector3, radius: number?): boolean
 	return true
 end
 
--- The keep-out box: the retreat, grown by a margin. Nothing the rival does goes in.
-function Route.inKeepOut(p: Vector3): boolean
-	local lo, hi = KEEP.min, KEEP.max
-	return p.X >= lo.X and p.X <= hi.X and p.Y >= lo.Y and p.Y <= hi.Y and p.Z >= lo.Z and p.Z <= hi.Z
-end
-
-local function forbiddenPiece(id: string): boolean
-	return string.sub(id, 1, 8) == "crevice_" or id == "leaf_tip"
-end
-
-local function build()
-	if built then return end
-	built = true
-	for _, piece in Region.pieces(SILL) do
-		table.insert(boxes, { id = piece.id, lo = { piece.lo.X, piece.lo.Y, piece.lo.Z }, hi = { piece.hi.X, piece.hi.Y, piece.hi.Z } })
+-- The keep-out boxes: the retreats, grown by a margin, and on the sill its open sash. Nothing the region's creatures do goes in.
+function Graph.inKeepOut(self: any, p: Vector3): boolean
+	for _, k in self.keep do
+		local lo, hi = k.min, k.max
+		if p.X >= lo.X and p.X <= hi.X and p.Y >= lo.Y and p.Y <= hi.Y and p.Z >= lo.Z and p.Z <= hi.Z then return true end
 	end
+	return false
+end
+
+local function forbiddenPiece(g: any, id: string): boolean
+	return g.region.kind == "sill" and (string.sub(id, 1, 8) == "crevice_" or id == "leaf_tip")
+end
+
+local function boxOf(piece: { id: string, lo: Vector3, hi: Vector3 }): BoxSpec
+	return { id = piece.id, lo = { piece.lo.X, piece.lo.Y, piece.lo.Z }, hi = { piece.hi.X, piece.hi.Y, piece.hi.Z } }
+end
+
+local function build(g: any)
+	if g.built then return end
+	g.built = true
+	local boxes, faces = g.boxes, g.faces
+	for _, piece in Region.pieces(g.region) do
+		table.insert(boxes, boxOf(piece))
+	end
+	g.own = #boxes
+	-- The neighbours' boxes are obstacles here (a body beside the seam fits only where it fits in the whole world), and have no faces in this graph.
+	for _, n in g.region.neighbors do
+		local other = WorldMap.region(n.id)
+		if other ~= nil then
+			for _, piece in Region.pieces(other) do table.insert(boxes, boxOf(piece)) end
+		end
+	end
+	-- Where the region's creatures may be: the sill's walkable sill (the frames' outer faces and the floor's underside are outside it), any other region's bounds.
+	local slo, shi = Rules.sillMin, Rules.sillMax
+	if g.region.kind ~= "sill" then slo, shi = g.region.bounds[1], g.region.bounds[2] end
 	-- Faces: six to a box.
-	for bi, b in boxes do
+	for bi = 1, g.own do
+		local b = boxes[bi]
 		for axis = 1, 3 do
 			for _, sign in { -1, 1 } do
 				local o1, o2 = (axis % 3) + 1, ((axis + 1) % 3) + 1
 				local face: Face = {
 					id = #faces + 1, piece = b.id, axis = axis, sign = sign, normal = axisVec(axis, sign),
 					plane = if sign > 0 then b.hi[axis] else b.lo[axis], lo = { 0, 0, 0 }, hi = { 0, 0, 0 },
-					area = (b.hi[o1] - b.lo[o1]) * (b.hi[o2] - b.lo[o2]), forbidden = forbiddenPiece(b.id), stand = {}, edges = {},
+					area = (b.hi[o1] - b.lo[o1]) * (b.hi[o2] - b.lo[o2]), forbidden = forbiddenPiece(g, b.id), stand = {}, edges = {},
 				}
 				for k = 1, 3 do
 					face.lo[k], face.hi[k] = b.lo[k], b.hi[k]
@@ -13924,44 +14089,42 @@ local function build()
 						pt[o1] = at(o1, (i + 0.5) / n)
 						pt[o2] = at(o2, (j + 0.5) / n)
 						local surface = vec(pt[1], pt[2], pt[3])
-						if bodyFits(surface + face.normal * SEAT) then table.insert(face.stand, surface) end
+						if bodyFits(g, surface + face.normal * SEAT) then table.insert(face.stand, surface) end
 					end
 				end
-				-- Outer faces (the frames' backs, the floor's underside) are outside the sill: no route enters them.
+				-- Outer faces (the frames' backs, the floor's underside) are outside where the creatures may be: no route enters them.
 				local mid = vec((face.lo[1] + face.hi[1]) / 2, (face.lo[2] + face.hi[2]) / 2, (face.lo[3] + face.hi[3]) / 2) + face.normal * SEAT
-				local slo, shi = Rules.sillMin, Rules.sillMax
 				if mid.X < slo.X or mid.X > shi.X or mid.Y < slo.Y or mid.Y > shi.Y or mid.Z < slo.Z or mid.Z > shi.Z then face.forbidden = true end
 				table.insert(faces, face)
 			end
 		end
-		local _ = bi
 	end
 	-- Seams between faces on different axes.
 	for _, f in faces do
 		local A = boxes[1]
-		for _, b in boxes do
-			if b.id == f.piece then A = b; break end
+		for bi = 1, g.own do
+			if boxes[bi].id == f.piece then A = boxes[bi]; break end
 		end
-		for _, g in faces do
-			if g.axis ~= f.axis then
+		for _, h in faces do
+			if h.axis ~= f.axis then
 				local B = boxes[1]
-				for _, b in boxes do
-					if b.id == g.piece then B = b; break end
+				for bi = 1, g.own do
+					if boxes[bi].id == h.piece then B = boxes[bi]; break end
 				end
-				local a, b = f.axis, g.axis
+				local a, b = f.axis, h.axis
 				local c = 6 - a - b
-				local cA, cB = f.plane, g.plane
+				local cA, cB = f.plane, h.plane
 				if cB >= A.lo[b] - EPS and cB <= A.hi[b] + EPS and cA >= B.lo[a] - EPS and cA <= B.hi[a] + EPS then
 					local lo, hi = math.max(A.lo[c], B.lo[c]), math.min(A.hi[c], B.hi[c])
 					if hi - lo >= MIN_SEAM then
-						local convex = f.piece == g.piece
+						local convex = f.piece == h.piece
 						local mid = { 0, 0, 0 }
 						mid[a], mid[b], mid[c] = cA, cB, (lo + hi) / 2
-						local corner = vec(mid[1], mid[2], mid[3]) + f.normal * 0.15 + g.normal * 0.15
-						if not solid(corner) then
+						local corner = vec(mid[1], mid[2], mid[3]) + f.normal * 0.15 + h.normal * 0.15
+						if not solid(g, corner) then
 							-- From the seam into each face: a face meets a wall of another box on the wall's free side, and meets the rest of its own box
 							-- away from the edge it turns over.
-							local intoF = if convex then -g.normal else g.normal
+							local intoF = if convex then -h.normal else h.normal
 							local intoG = if convex then -f.normal else f.normal
 							local samples: { Vector3 } = {}
 							for _, t in { 0.12, 0.3, 0.5, 0.7, 0.88 } do
@@ -13971,14 +14134,14 @@ local function build()
 									s[a], s[b], s[c] = cA, cB, pc
 									local seam = vec(s[1], s[2], s[3])
 									-- (A crossing may be a narrow strip, such as the underside of the planter's rim: only the places right at the seam are tested.)
-									if bodyFits(seam + intoF * 0.12 + f.normal * SEAT, 0.1) and bodyFits(seam + intoG * 0.12 + g.normal * SEAT, 0.1)
-										and not Route.inKeepOut(seam) then
+									if bodyFits(g, seam + intoF * 0.12 + f.normal * SEAT, 0.1) and bodyFits(g, seam + intoG * 0.12 + h.normal * SEAT, 0.1)
+										and not g:inKeepOut(seam) then
 										table.insert(samples, seam)
 									end
 								end
 							end
 							if #samples > 0 then
-								table.insert(f.edges, { to = g.id, samples = samples, ahead = -intoF, convex = convex })
+								table.insert(f.edges, { to = h.id, samples = samples, ahead = -intoF, convex = convex })
 							end
 						end
 					end
@@ -13986,22 +14149,36 @@ local function build()
 			end
 		end
 	end
-	-- The keep-out box is an obstacle like any box (the walk tests and the corners to round count it) but has no faces: nothing walks on it.
-	local ko, ki = KEEP.min, KEEP.max
-	table.insert(boxes, { id = "keepout", lo = { ko.X, ko.Y, ko.Z }, hi = { ki.X, ki.Y, ki.Z } })
+	-- The keep-out boxes are obstacles like any box (the walk tests and the corners to round count them) but have no faces: nothing walks on them.
+	g.real = #boxes
+	for _, k in g.keep do
+		table.insert(boxes, { id = "keepout", lo = { k.min.X, k.min.Y, k.min.Z }, hi = { k.max.X, k.max.Y, k.max.Z } })
+	end
 end
 
-function Route.faces(): { Face }
-	build()
-	return faces
+-- The graph of a region (the sill's when no id is given), built when first asked. Errors for a region that is not on the map.
+function Route.graph(regionId: string?): any
+	local id = regionId or WorldMap.HOME
+	local g = graphs[id]
+	if g ~= nil then return g end
+	local region = WorldMap.region(id)
+	assert(region ~= nil, "no region " .. id)
+	local made = setmetatable({ region = region, own = 0, real = 0, boxes = {}, faces = {}, keep = Region.keepOut(region), built = false, seamsBuilt = false, seams = {} }, Graph)
+	graphs[id] = made :: any
+	return made
+end
+
+function Graph.allFaces(self: any): { Face }
+	build(self)
+	return self.faces
 end
 
 -- The face a body stands on: its centre, the support's normal. Nil when it is on no known face (in the air, or on a face this graph lacks).
-function Route.faceAt(center: Vector3, up: Vector3): number?
-	build()
+function Graph.faceAt(self: any, center: Vector3, up: Vector3): number?
+	build(self)
 	local surface = center - up * SEAT
 	local best, bestD = nil :: number?, 0.12
-	for _, f in faces do
+	for _, f in self.faces do
 		if f.normal:Dot(up) > 0.98 then
 			local d = math.abs(comp(surface, f.axis) - f.plane)
 			if d < bestD then
@@ -14017,11 +14194,11 @@ function Route.faceAt(center: Vector3, up: Vector3): number?
 end
 
 -- Whether two faces are the same or meet along a seam: the rival may strike from one onto the other.
-function Route.adjacent(a: number?, b: number?): boolean
+function Graph.adjacent(self: any, a: number?, b: number?): boolean
 	if a == nil or b == nil then return false end
 	if a == b then return true end
-	build()
-	for _, e in faces[a].edges do
+	build(self)
+	for _, e in self.faces[a].edges do
 		if e.to == b then return true end
 	end
 	return false
@@ -14029,7 +14206,8 @@ end
 
 -- Whether a straight walk across a face of the box `own` from one surface point to another would run into a box standing on it (the body is a ball of
 -- 0.3, kept 0.2 off; the stretch next to the end points is not tested, they are at seams and walls by design).
-local function walkBlocked(a: Vector3, b: Vector3, normal: Vector3, own: string): boolean
+function Graph.walkBlocked(self: any, a: Vector3, b: Vector3, normal: Vector3, own: string): boolean
+	build(self)
 	local d = b - a
 	local len = d.Magnitude
 	if len < 0.35 then return false end
@@ -14038,7 +14216,7 @@ local function walkBlocked(a: Vector3, b: Vector3, normal: Vector3, own: string)
 	local pa = a + dir * cut + normal * SEAT
 	local pb = b - dir * cut + normal * SEAT
 	local seg = pb - pa
-	for _, box in boxes do
+	for _, box in self.boxes do
 		local tmin, tmax = 0.0, 1.0
 		local hit = box.id ~= own
 		for k = 1, 3 do
@@ -14071,14 +14249,14 @@ local function walkBlocked(a: Vector3, b: Vector3, normal: Vector3, own: string)
 end
 
 -- The places to round a box that stands on a face: just outside each of its corners (0.42 off, the walk test keeps 0.35), where a body fits.
-local function cornersOf(f: Face): { Vector3 }
+local function cornersOf(g: any, f: Face): { Vector3 }
 	if f.corners ~= nil then return f.corners :: { Vector3 } end
 	local out: { Vector3 } = {}
 	f.corners = out
 	local o1, o2 = (f.axis % 3) + 1, ((f.axis + 1) % 3) + 1
 	local level = f.plane + f.sign * SEAT
 	local M = 0.42
-	for _, b in boxes do
+	for _, b in g.boxes do
 		if b.id ~= f.piece and level >= b.lo[f.axis] - 0.35 and level <= b.hi[f.axis] + 0.35
 			and b.hi[o1] + M > f.lo[o1] and b.lo[o1] - M < f.hi[o1] and b.hi[o2] + M > f.lo[o2] and b.lo[o2] - M < f.hi[o2] then
 			for _, c1 in { b.lo[o1] - M, b.hi[o1] + M } do
@@ -14088,7 +14266,7 @@ local function cornersOf(f: Face): { Vector3 }
 						pt[f.axis], pt[o1], pt[o2] = f.plane, c1, c2
 						local surface = vec(pt[1], pt[2], pt[3])
 						local centre = surface + f.normal * SEAT
-						if bodyFits(centre, 0.3) and not Route.inKeepOut(surface) and not Route.inKeepOut(centre) then
+						if bodyFits(g, centre, 0.3) and not g:inKeepOut(surface) and not g:inKeepOut(centre) then
 							table.insert(out, surface)
 						end
 					end
@@ -14131,9 +14309,10 @@ end
 -- The shortest way from a surface point on one face to a surface point on another, as the seams to cross and the corners to round. Nil when there
 -- is none. `from` and `goal` are surface points (not body centres). The search is over crossings and corners, not faces: a face is walked
 -- differently from where it is entered (a floor entered beside a box is not the floor entered on the far side of it), and a straight walk across
--- a face that a box stands on is not a walk at all.
-function Route.plan(fromFace: number, from: Vector3, goalFace: number, goal: Vector3): { Hop }?
-	build()
+-- a face that a box stands on is not a walk at all. Within the region: seams to its neighbours are not crossed.
+function Graph.plan(self: any, fromFace: number, from: Vector3, goalFace: number, goal: Vector3): { Hop }?
+	build(self)
+	local faces = self.faces
 	local TURN = 0.6
 	local BLOCKED = 25.0
 	-- States: 1 is the start; the others are crossings (1), corners (2) and the goal (3), numbered as they are found.
@@ -14172,18 +14351,18 @@ function Route.plan(fromFace: number, from: Vector3, goalFace: number, goal: Vec
 			local here = stPos[id]
 			local cost = stDist[id]
 			if fid == goalFace then
-				local nd = cost + (goal - here).Magnitude + (if walkBlocked(here, goal, face.normal, face.piece) then BLOCKED else 0)
+				local nd = cost + (goal - here).Magnitude + (if self:walkBlocked(here, goal, face.normal, face.piece) then BLOCKED else 0)
 				if nd < goalCost then
 					goalCost = nd
 					add(goalFace, goal, id, 3, goal, nd, stCame[id])
 				end
 			end
 			-- Round the corner of a box standing on this face.
-			for ci, c in cornersOf(face) do
+			for ci, c in cornersOf(self, face) do
 				local key = -(fid * 256 + ci)
 				local nd = cost + (c - here).Magnitude + 0.1
 				local known = bestVia[key]
-				if (known == nil or nd < known - 1e-9) and (c - here).Magnitude > 0.05 and not walkBlocked(here, c, face.normal, face.piece) then
+				if (known == nil or nd < known - 1e-9) and (c - here).Magnitude > 0.05 and not self:walkBlocked(here, c, face.normal, face.piece) then
 					bestVia[key] = nd
 					add(fid, c, id, 2, c + face.normal * SEAT, nd, stCame[id])
 				end
@@ -14196,7 +14375,7 @@ function Route.plan(fromFace: number, from: Vector3, goalFace: number, goal: Vec
 					table.sort(ordered, function(p: Vector3, q: Vector3): boolean return (p - here).Magnitude < (q - here).Magnitude end)
 					local best, bestD = ordered[1], (ordered[1] - here).Magnitude + BLOCKED
 					for i = 1, math.min(#ordered, 3) do
-						if not walkBlocked(here, ordered[i], face.normal, face.piece) then
+						if not self:walkBlocked(here, ordered[i], face.normal, face.piece) then
 							best, bestD = ordered[i], (ordered[i] - here).Magnitude
 							break
 						end
@@ -14227,9 +14406,11 @@ function Route.plan(fromFace: number, from: Vector3, goalFace: number, goal: Vec
 	return hops
 end
 
--- Where to head so a straight walk does not cross the keep-out box: the goal itself, or a corner of the box to round first.
-function Route.aroundKeepOut(from: Vector3, goal: Vector3): Vector3
-	local lo, hi = KEEP.min, KEEP.max
+-- Where to head so a straight walk does not cross the first keep-out box (the retreat's): the goal itself, or a corner of the box to round first.
+function Graph.aroundKeepOut(self: any, from: Vector3, goal: Vector3): Vector3
+	local keep = self.keep[1]
+	if keep == nil then return goal end
+	local lo, hi = keep.min, keep.max
 	-- The segment against the box, on the plane of the floor (the box is only a little taller than the spider).
 	local function crosses(a: Vector3, b: Vector3): boolean
 		local tmin, tmax = 0, 1
@@ -14248,7 +14429,8 @@ function Route.aroundKeepOut(from: Vector3, goal: Vector3): Vector3
 		end
 		return true
 	end
-	if Route.inKeepOut(from) or from.Y > hi.Y + 0.4 or goal.Y > hi.Y + 0.4 then return goal end
+	local inFirst = from.X >= lo.X and from.X <= hi.X and from.Y >= lo.Y and from.Y <= hi.Y and from.Z >= lo.Z and from.Z <= hi.Z
+	if inFirst or from.Y > hi.Y + 0.4 or goal.Y > hi.Y + 0.4 then return goal end
 	if not crosses(from, goal) then return goal end
 	local y = from.Y
 	local best, bestLen = goal, math.huge
@@ -14266,18 +14448,18 @@ end
 
 export type Waypoint = { pos: Vector3, up: Vector3, face: number }
 
--- Places to patrol to, spread over every face the rival may walk: the tops of the boxes and their climbable sides (not undersides, not
+-- Places to patrol to, spread over every face the region's creatures may walk: the tops of the boxes and their climbable sides (not undersides, not
 -- the crack), a few on a big face, always a spot where a body fits.
-function Route.waypoints(): { Waypoint }
-	build()
+function Graph.waypoints(self: any): { Waypoint }
+	build(self)
 	local out: { Waypoint } = {}
-	for _, f in faces do
+	for _, f in self.faces do
 		if not f.forbidden and f.normal.Y > -0.5 and f.area >= 1.5 and #f.stand > 0 then
 			local k = math.clamp(math.floor(f.area / 70) + 1, 1, 5)
 			local picked: { Vector3 } = {}
 			local pool: { Vector3 } = {}
 			for _, s in f.stand do
-				if not Route.inKeepOut(s + f.normal * SEAT) and not Route.inKeepOut(s) then table.insert(pool, s) end
+				if not self:inKeepOut(s + f.normal * SEAT) and not self:inKeepOut(s) then table.insert(pool, s) end
 			end
 			if #pool > 0 then
 				table.insert(picked, pool[math.ceil(#pool / 2)])
@@ -14297,8 +14479,152 @@ function Route.waypoints(): { Waypoint }
 	return out
 end
 
+-- Whether a point lies on the segment a-b (within a hair), and the part of the segment [lo, hi] along `axis` it shares with a line at the other two coordinates.
+local function onLine(a: Vector3, b: Vector3, axis: number, fixed: { number }, lo: number, hi: number): (number, number)
+	for k = 1, 3 do
+		if k ~= axis and (math.abs(comp(a, k) - fixed[k]) > 0.05 or math.abs(comp(b, k) - fixed[k]) > 0.05) then return 0, -1 end
+	end
+	local s0, s1 = math.min(comp(a, axis), comp(b, axis)), math.max(comp(a, axis), comp(b, axis))
+	return math.max(lo, s0), math.min(hi, s1)
+end
+
+-- The seams to this region's neighbours, built when first asked: for every seam the map declares, the pairs of faces (one here, one in the neighbour's graph) that meet
+-- along its line, across a corner or flat across one plane, with the places on the line where a body can cross (both sides tested against the whole world's boxes).
+-- The keep-outs do not prune these: a seam edge is the map's topology, and whether a creature may cross it is its own rule (this round none does).
+local function buildSeams(g: any)
+	if g.seamsBuilt then return end
+	g.seamsBuilt = true
+	build(g)
+	for _, n in g.region.neighbors do
+		local other = Route.graph(n.id)
+		build(other)
+		for _, f in g.faces do
+			for _, h in other.faces do
+				local samplesLine: { number }? = nil
+				local axis, fixed, ahead, convex, flat = 0, { 0, 0, 0 }, Vector3.zero, false, false
+				local nf, nh = f.normal, h.normal
+				if h.axis ~= f.axis then
+					-- across a corner: the line where the two planes meet, along the third axis, inside both faces
+					local a, b = f.axis, h.axis
+					local c = 6 - a - b
+					if h.plane >= f.lo[b] - EPS and h.plane <= f.hi[b] + EPS and f.plane >= h.lo[a] - EPS and f.plane <= h.hi[a] + EPS then
+						fixed[a], fixed[b] = f.plane, h.plane
+						local lo, hi = onLine(n.a, n.b, c, fixed, math.max(f.lo[c], h.lo[c]), math.min(f.hi[c], h.hi[c]))
+						if hi - lo >= MIN_SEAM then
+							local mid = { 0, 0, 0 }
+							mid[a], mid[b], mid[c] = f.plane, h.plane, (lo + hi) / 2
+							local m = vec(mid[1], mid[2], mid[3])
+							if not solid(g, m + nf * 0.15 + nh * 0.15, true) then
+								local isConvex = not solid(g, m + nf * 0.15 - nh * 0.15, true)
+								-- each face must go on from the line the way the corner says (a wall's foot onto the floor in front of it, an edge onto the box's
+								-- own side): a face that lies against the other box (a slab's underside on the wall it sits on) is no way across
+								local intoF = if isConvex then -nh else nh
+								local intoH = if isConvex then -nf else nf
+								local pf, ph = m + intoF * 0.12, m + intoH * 0.12
+								if comp(pf, b) >= f.lo[b] - EPS and comp(pf, b) <= f.hi[b] + EPS and comp(ph, a) >= h.lo[a] - EPS and comp(ph, a) <= h.hi[a] + EPS then
+									convex = isConvex
+									axis = c
+									samplesLine = { lo, hi }
+									ahead = -intoF
+								end
+							end
+						end
+					end
+				elseif h.sign == f.sign and math.abs(h.plane - f.plane) < EPS then
+					-- flat across one plane: the two rectangles touch along an edge
+					local a = f.axis
+					for _, o in { (a % 3) + 1, ((a + 1) % 3) + 1 } do
+						local along = 6 - a - o
+						for _, touch in { { f.hi[o], h.lo[o], 1 }, { f.lo[o], h.hi[o], -1 } } do
+							if samplesLine == nil and math.abs(touch[1] - touch[2]) < EPS then
+								fixed[a], fixed[o] = f.plane, touch[1]
+								local lo, hi = onLine(n.a, n.b, along, fixed, math.max(f.lo[along], h.lo[along]), math.min(f.hi[along], h.hi[along]))
+								if hi - lo >= MIN_SEAM then
+									axis, samplesLine, flat = along, { lo, hi }, true
+									ahead = axisVec(o, touch[3])
+								end
+							end
+						end
+					end
+				end
+				if samplesLine ~= nil then
+					local line = samplesLine :: { number }
+					local samples: { Vector3 } = {}
+					for _, t in { 0.12, 0.3, 0.5, 0.7, 0.88 } do
+						local pc = line[1] + (line[2] - line[1]) * t
+						local s = table.clone(fixed)
+						s[axis] = pc
+						local seam = vec(s[1], s[2], s[3])
+						local intoF = -ahead
+						local intoH = if flat then ahead elseif convex then -nf else nf
+						if bodyFits(g, seam + intoF * 0.12 + nf * SEAT, 0.1, true) and bodyFits(g, seam + intoH * 0.12 + nh * SEAT, 0.1, true) then
+							table.insert(samples, seam)
+						end
+					end
+					if #samples > 0 then
+						local list = g.seams[f.id]
+						if list == nil then list = {}; g.seams[f.id] = list end
+						table.insert(list, { region = n.id, to = h.id, samples = samples, ahead = ahead, convex = convex, flat = flat })
+					end
+				end
+			end
+		end
+	end
+end
+
+-- The seam edges leaving a face of this region's graph for its neighbours' (none for most faces).
+function Graph.seamsOf(self: any, face: number): { SeamEdge }
+	buildSeams(self)
+	return self.seams[face] or {}
+end
+
+-- Every seam edge of this region's graph, as { face, edge } pairs.
+function Graph.allSeams(self: any): { { face: number, edge: SeamEdge } }
+	buildSeams(self)
+	local out = {}
+	for fid = 1, #self.faces do
+		for _, e in self.seams[fid] or {} do table.insert(out, { face = fid, edge = e }) end
+	end
+	return out
+end
+
+-- ---------------------------------------------------------------- the sill's graph, as the rival and the mate call it
+local function sill(): any
+	return Route.graph(WorldMap.HOME)
+end
+
+function Route.faces(): { Face }
+	return sill():allFaces()
+end
+
+function Route.inKeepOut(p: Vector3): boolean
+	return sill():inKeepOut(p)
+end
+
+function Route.faceAt(center: Vector3, up: Vector3): number?
+	return sill():faceAt(center, up)
+end
+
+function Route.adjacent(a: number?, b: number?): boolean
+	return sill():adjacent(a, b)
+end
+
+function Route.plan(fromFace: number, from: Vector3, goalFace: number, goal: Vector3): { Hop }?
+	return sill():plan(fromFace, from, goalFace, goal)
+end
+
+function Route.aroundKeepOut(from: Vector3, goal: Vector3): Vector3
+	return sill():aroundKeepOut(from, goal)
+end
+
+function Route.waypoints(): { Waypoint }
+	return sill():waypoints()
+end
+
 Route.SEAT = SEAT
-Route.walkBlocked = walkBlocked
+Route.walkBlocked = function(a: Vector3, b: Vector3, normal: Vector3, own: string): boolean
+	return sill():walkBlocked(a, b, normal, own)
+end
 
 return Route
 ]]></string>
@@ -21632,46 +21958,696 @@ return WaspText
         </Properties>
         <Item class="ModuleScript" referent="132">
           <Properties>
+            <string name="Name">Garden</string>
+            <string name="Source"><![CDATA[--!strict
+-- The world outside the glass (ROBLOX-95, docs/OPEN_WORLD_DESIGN.md W2): the generators of the three regions under the window, as pure data. Region asks here for every
+-- kind that is not the sill; nothing here builds a part or knows the engine, so the server, the client and the CLI tests all get the same boxes from the same region.
+--   outer_sill .. the stone slab the raised sash opens onto (top y 0, x -30..30, z -24..-13.5) and the window box's two halves that stand on it (Data/Flora's
+--                 garden box, drawn by the sill's Decor and solid here); its look is worn paint over stone, moss in the corners, grit and rain streaks down its face.
+--   house_wall ... the brick wall under it, face at z -24 from y 0 to the lawn at y -90.4, x -40..40: one box below the slab and two shoulders beside it, all
+--                 drawn as brick courses over recessed mortar (the boxes turn invisible once the bricks exist), with the house going on above the outer sill
+--                 around the window (drawn only).
+--   bed .......... the soil under the window (top y -90, x -25..25, z -24..-74): soil mounds, three stones (one raised on two rests over a gap, the bed's
+--                 retreat, World/WorldMap's bed_a_stone), two plants whose stems and leaves are boxes as the Pilea's are, and drawn soil, leaf litter, grass,
+--                 twigs, pebbles, lichen and moss.
+-- Everything placed is placed from the region's own seed (WorldMap.seed), by a Park-Miller stream of its own for each kind of thing, so the same region is the
+-- same garden forever, and a drawn thing that the low tier drops (`full`) never moves what the low tier keeps. The physical pieces are the walkable world: the
+-- motor walks their faces, RivalRoute builds the region's graph from them. A drawn record is one part (Habitat/Scenery.look builds them); the region's budget
+-- (Region.budget) is a ceiling the placer keeps to at both tiers, and tests/world.luau holds the counts.
+local Flora = require(script.Parent.Parent.Data.Flora)
+local WorldMap = require(script.Parent.WorldMap)
+
+local Garden = {}
+
+-- A physical box (WindowsillLayout.Piece) with the material it is drawn in when nothing draws it instead.
+export type Piece = { id: string, lo: Vector3, hi: Vector3, profile: string, color: Color3, material: string? }
+-- A drawn-only part: centred `at`, `size`, turned by `turn` (degrees about X, Y and Z, in that order, as CFrame.Angles), `shape` "Block" (the default),
+-- "Ball", "Cylinder" (its axis along X) or "Ellipsoid" (a sphere mesh); `full`: the low tier drops it (FullOnly); `group`: the folder it is built into.
+export type Drawn = {
+	id: string, size: Vector3, at: Vector3, color: Color3, transparency: number?,
+	material: string?, shape: string?, turn: Vector3?, full: boolean?, group: string?, shadow: boolean?,
+}
+export type Box = { min: Vector3, max: Vector3 }
+
+local TAU = 2 * math.pi
+local MOD = 2147483647
+
+local function hex(s: string): Color3
+	return Color3.fromHex(s)
+end
+local function v(x: number, y: number, z: number): Vector3
+	return Vector3.new(x, y, z)
+end
+-- A Park-Miller stream from the region's seed and a salt for the kind of thing it places (the same stream as Habitat/Shapes.rng).
+local function rng(seed: number, salt: number): () -> number
+	local state = (seed + salt * 7919) % MOD
+	if state <= 0 then state += MOD - 1 end
+	return function(): number
+		state = (state * 16807) % MOD
+		return (state - 1) / (MOD - 1)
+	end
+end
+local function between(rand: () -> number, a: number, b: number): number
+	return a + (b - a) * rand()
+end
+local function pick<T>(list: { T }, rand: () -> number): T
+	return list[1 + math.floor(rand() * #list)]
+end
+local function overlaps(a: Box, b: Box, margin: number): boolean
+	return a.min.X < b.max.X + margin and a.max.X > b.min.X - margin and a.min.Z < b.max.Z + margin and a.max.Z > b.min.Z - margin
+end
+
+-- ---------------------------------------------------------------- the outer sill
+Garden.OUTER = {
+	slab = { lo = v(-30, -3, -24), hi = v(30, 0, -13.5), color = "ddd5c3", material = "Concrete" }, -- painted stone, the paint gone dull
+	stone = { "a29d92", "948f85", "aaa497" }, -- where the paint has gone
+	moss = { "5f7d3a", "6d8c45", "53703a", "7a9450" },
+	grit = { "7d7466", "6a6358", "9b9284", "57514a", "b0a898" },
+	streak = "8e8a80",
+}
+
+-- ---------------------------------------------------------------- the house wall
+Garden.WALL = {
+	face = -24, foot = -90.4, under = -3, top = 0, west = -40, east = 40, back = -13.5,
+	brick = { length = 21.5, height = 6.5, joint = 1.0, depth = 0.6, recess = 0.28, gap = 0.02 },
+	bricks = { "9c4a32", "a65538", "8f4430", "b0603e", "974d36", "a2573c", "7e3c2b" },
+	burnt = "5e3428", pale = "c08a64", mortar = "b8b1a3", plaster = "efe8d8", coping = "c9c2b3",
+	above = 30, window = { x0 = -31, x1 = 31, y1 = 14 }, -- the house above the outer sill goes up to y 30, round the window's frame
+	brickMaterial = "Concrete", mortarMaterial = "Plaster",
+}
+
+-- ---------------------------------------------------------------- the bed
+Garden.BED = {
+	x0 = -25, x1 = 25, z0 = -74, z1 = -24, top = -90, bottom = -92,
+	soil = "4a3a2c", soilMaterial = "Ground",
+	landing = 5.0, -- the strip along the wall's foot kept flat for whatever comes down the wall
+	mounds = { count = 6, w = { 4, 9 }, d = { 3, 7 }, h = { 0.4, 1.3 }, colors = { "4f3e2f", "574433", "45362a", "5c4a39" } },
+	stones = { count = 2, w = { 3.2, 6.0 }, d = { 2.6, 4.8 }, h = { 1.0, 2.2 }, colors = { "8d8a83", "7e7b74", "9a968d" }, material = "Slate" },
+	retreatStone = { over = 1.6, thick = 1.6, rest = 1.4, color = "85827a", rests = "77746d", material = "Slate" }, -- round the map's retreat box
+	-- the plants: a dock seedling (one stem, three leaves along it) and a dandelion (a rosette of four leaves on the soil and a flower stalk)
+	dock = { stem = 0.8, height = 18, leaves = { { y = 6, dir = "x+", l = 6.5, w = 4.4 }, { y = 11, dir = "z+", l = 5.5, w = 3.8 }, { y = 15, dir = "x-", l = 4.5, w = 3.2 } }, thick = 0.3 },
+	dandelion = { leaf = { l = 4.6, w = 2.0, h = 0.25, gap = 0.75 }, stalk = 0.6, height = 12 }, -- (gap: the leaves start clear of the stalk and of each other)
+	leaf = { top = "4d7a36", rim = "3c6630", under = "8fb36a", rib = "a7c98a", stem = "5d8a3e", material = "SmoothPlastic", rimOut = 0.12, underOut = 0.03, underThick = 0.1 },
+	flower = { head = "f2c40c", disc = "d99a06", sepals = "4f7d35" },
+	litter = { count = 70, size = { 0.9, 2.8 }, colors = { "8a6239", "a07445", "6e4d2e", "b88c52", "5b4129", "c4a061" }, lowEvery = 3 },
+	grass = { tufts = 16, blades = 5, keep = 2, height = { 1.4, 3.2 }, colors = { "5c8a3a", "6f9a46", "4f7a33", "86a85a" }, dry = "b8a46a" },
+	twigs = { count = 9, length = { 2, 6 }, width = 0.18, colors = { "5a4632", "6b5640", "4a3a2a" } },
+	pebbles = { count = 24, size = { 0.25, 0.8 }, colors = { "a9a59c", "938f87", "bdb8ad", "7f7b74" } },
+	mottle = { count = 12, size = { 3, 8 }, colors = { "3f3126", "54412f", "463729" } },
+}
+
+-- ---------------------------------------------------------------- the pieces
+local function outerPieces(): { Piece }
+	local O = Garden.OUTER
+	local out: { Piece } = {
+		{ id = "outer_sill_slab", lo = O.slab.lo, hi = O.slab.hi, profile = "brick_rough", color = hex(O.slab.color), material = O.slab.material },
+	}
+	local B = Flora.garden.box
+	for _, half in B.boxes do
+		table.insert(out, { id = half.id, lo = v(half.x0, B.bottom, B.z0), hi = v(half.x1, B.top, B.z1), profile = "painted_wood_dry", color = hex(B.color), material = "Wood" })
+	end
+	return out
+end
+
+local function wallPieces(): { Piece }
+	local W = Garden.WALL
+	local brick = hex(W.bricks[1])
+	return {
+		{ id = "house_wall", lo = v(W.west, W.foot, W.face), hi = v(W.east, W.under, W.back), profile = "brick_rough", color = brick, material = W.brickMaterial },
+		{ id = "house_wall_west", lo = v(W.west, W.under, W.face), hi = v(Garden.OUTER.slab.lo.X, W.top, W.back), profile = "brick_rough", color = brick, material = W.brickMaterial },
+		{ id = "house_wall_east", lo = v(Garden.OUTER.slab.hi.X, W.under, W.face), hi = v(W.east, W.top, W.back), profile = "brick_rough", color = brick, material = W.brickMaterial },
+	}
+end
+
+-- The bed's stone over its retreat: a slab on two rests, the gap between them the map's retreat box (WorldMap bed_a_stone) and a little more.
+local function stoneOver(retreat: WorldMap.Retreat): { Piece }
+	local S = Garden.BED.retreatStone
+	local lo, hi = retreat.min, retreat.max
+	local top = lo.Y + S.over
+	local x0, x1 = lo.X - 0.2 - S.rest, hi.X + 0.2 + S.rest
+	local z0, z1 = lo.Z - 0.8, hi.Z + 0.8
+	return {
+		{ id = "bed_a_stone_top", lo = v(x0, top, z0), hi = v(x1, top + S.thick, z1), profile = "brick_rough", color = hex(S.color), material = S.material },
+		{ id = "bed_a_stone_west", lo = v(x0, lo.Y, z0), hi = v(x0 + S.rest, top, z1), profile = "brick_rough", color = hex(S.rests), material = S.material },
+		{ id = "bed_a_stone_east", lo = v(x1 - S.rest, lo.Y, z0), hi = v(x1, top, z1), profile = "brick_rough", color = hex(S.rests), material = S.material },
+	}
+end
+
+-- The bed: the soil, the stone over the retreat, then from the region's seed the two plants, two more stones and the mounds, each where it overlaps nothing
+-- placed before it (a stride apart), off the landing strip under the wall and clear of the spawn.
+local function bedPieces(region: WorldMap.Region): { Piece }
+	local B = Garden.BED
+	local out: { Piece } = {
+		{ id = "bed_a_soil", lo = v(B.x0, B.bottom, B.z0), hi = v(B.x1, B.top, B.z1), profile = "brick_rough", color = hex(B.soil), material = B.soilMaterial },
+	}
+	local taken: { Box } = {}
+	for _, t in region.retreats do
+		for _, p in stoneOver(t) do table.insert(out, p) end
+		table.insert(taken, { min = t.min - v(2.4, 0, 2.6), max = t.max + v(2.4, 0, 2.6) })
+	end
+	local spawn = region.spawn.pos
+	table.insert(taken, { min = spawn - v(2.5, 0, 2.5), max = spawn + v(2.5, 0, 2.5) })
+	-- somewhere free for a footprint w x d, or nil after sixty tries
+	local function spot(rand: () -> number, w: number, d: number, margin: number): (number?, number?)
+		for _ = 1, 60 do
+			local x = between(rand, B.x0 + 1.5, B.x1 - 1.5 - w)
+			local z = between(rand, B.z0 + 1.5, B.z1 - B.landing - d)
+			local box = { min = v(x, 0, z), max = v(x + w, 0, z + d) }
+			local free = true
+			for _, other in taken do
+				if overlaps(box, other, margin) then free = false; break end
+			end
+			if free then
+				table.insert(taken, box)
+				return x, z
+			end
+		end
+		return nil, nil
+	end
+	-- the dock: a stem and three leaves along it, each leaf's underside on the stem's side (a spider climbing the stem meets it from below and walks out under it)
+	local prand = rng(region.seed, 23)
+	local D = B.dock
+	local reachX, reachZ = 0.0, 0.0
+	for _, leaf in D.leaves do
+		if leaf.dir == "x+" or leaf.dir == "x-" then reachX = math.max(reachX, leaf.l) else reachZ = math.max(reachZ, leaf.l) end
+	end
+	local dx, dz = spot(prand, D.stem + 2 * reachX, D.stem + 2 * reachZ, 1.5)
+	if dx ~= nil and dz ~= nil then
+		local sx, sz = dx + reachX, dz + reachZ
+		local s0, s1 = v(sx, B.top, sz), v(sx + D.stem, B.top + D.height, sz + D.stem)
+		table.insert(out, { id = "bed_a_dock_stem", lo = s0, hi = s1, profile = "leaf_dry_prototype", color = hex(B.leaf.stem) })
+		for i, leaf in D.leaves do
+			local y0, y1 = B.top + leaf.y, B.top + leaf.y + D.thick
+			local half = leaf.w / 2
+			local mz, mx = sz + D.stem / 2, sx + D.stem / 2
+			local lo, hi
+			if leaf.dir == "x+" then lo, hi = v(s1.X, y0, mz - half), v(s1.X + leaf.l, y1, mz + half)
+			elseif leaf.dir == "x-" then lo, hi = v(s0.X - leaf.l, y0, mz - half), v(s0.X, y1, mz + half)
+			elseif leaf.dir == "z+" then lo, hi = v(mx - half, y0, s1.Z), v(mx + half, y1, s1.Z + leaf.l)
+			else lo, hi = v(mx - half, y0, s0.Z - leaf.l), v(mx + half, y1, s0.Z) end
+			table.insert(out, { id = `bed_a_dock_leaf_{i}`, lo = lo, hi = hi, profile = "leaf_dry_prototype", color = hex(B.leaf.top) })
+		end
+	end
+	-- the dandelion: four leaves lying on the soil round a flower stalk
+	local L = B.dandelion
+	local span = 2 * (L.leaf.gap + L.leaf.l) + L.stalk
+	local fx, fz = spot(prand, span, span, 1.2)
+	if fx ~= nil and fz ~= nil then
+		local cx, cz = fx + span / 2, fz + span / 2
+		local h, r = L.stalk / 2, L.stalk / 2 + L.leaf.gap
+		local w = L.leaf.w / 2
+		table.insert(out, { id = "bed_a_dandelion_stalk", lo = v(cx - h, B.top, cz - h), hi = v(cx + h, B.top + L.height, cz + h), profile = "leaf_dry_prototype", color = hex(B.leaf.stem) })
+		local y1 = B.top + L.leaf.h
+		local rosette = {
+			{ v(cx + r, B.top, cz - w), v(cx + r + L.leaf.l, y1, cz + w) },
+			{ v(cx - w, B.top, cz + r), v(cx + w, y1, cz + r + L.leaf.l) },
+			{ v(cx - r - L.leaf.l, B.top, cz - w), v(cx - r, y1, cz + w) },
+			{ v(cx - w, B.top, cz - r - L.leaf.l), v(cx + w, y1, cz - r) },
+		}
+		for i, box in rosette do
+			table.insert(out, { id = `bed_a_dandelion_leaf_{i}`, lo = box[1], hi = box[2], profile = "leaf_dry_prototype", color = hex(B.leaf.top) })
+		end
+	end
+	-- two more stones
+	local S = B.stones
+	local srand = rng(region.seed, 11)
+	for i = 1, S.count do
+		local w, d, h = between(srand, S.w[1], S.w[2]), between(srand, S.d[1], S.d[2]), between(srand, S.h[1], S.h[2])
+		local color = pick(S.colors, srand)
+		local x, z = spot(srand, w, d, 1.2)
+		if x ~= nil and z ~= nil then
+			table.insert(out, { id = `bed_a_stone_{string.char(97 + i)}`, lo = v(x, B.top, z), hi = v(x + w, B.top + h, z + d), profile = "brick_rough", color = hex(color), material = S.material })
+		end
+	end
+	-- the mounds: low heaps of soil
+	local M = B.mounds
+	local mrand = rng(region.seed, 37)
+	for i = 1, M.count do
+		local w, d, h = between(mrand, M.w[1], M.w[2]), between(mrand, M.d[1], M.d[2]), between(mrand, M.h[1], M.h[2])
+		local color = pick(M.colors, mrand)
+		local x, z = spot(mrand, w, d, 1.0)
+		if x ~= nil and z ~= nil then
+			table.insert(out, { id = `bed_a_mound_{i}`, lo = v(x, B.top, z), hi = v(x + w, B.top + h, z + d), profile = "brick_rough", color = hex(color), material = B.soilMaterial })
+		end
+	end
+	return out
+end
+
+-- ---------------------------------------------------------------- the drawn look
+-- A list of drawn records, and a ceiling for each tier: `add` keeps a record only while the tier it shows in has room (a full-only record counts against the
+-- full ceiling, any other against both), so what is placed first is what a tight budget keeps.
+local function sheet(budget: { full: number, low: number })
+	local list: { Drawn } = {}
+	local full, low = 0, 0
+	local function add(d: Drawn): boolean
+		if full + 1 > budget.full or (not d.full and low + 1 > budget.low) then return false end
+		full += 1
+		if not d.full then low += 1 end
+		table.insert(list, d)
+		return true
+	end
+	return list, add
+end
+
+-- A leaf over its box, the Pilea's way (Habitat/Plants): a blade with rounded ends whose top is the box's top, a darker rim band round it and a lighter
+-- underside (full tier), and a midrib along it (full tier).
+local function leafOver(add: (Drawn) -> boolean, name: string, lo: Vector3, hi: Vector3, group: string)
+	local L = Garden.BED.leaf
+	local function rounded(id: string, a: Vector3, b: Vector3, r: number, color: Color3, full: boolean)
+		local width, depth, height = b.X - a.X, b.Z - a.Z, b.Y - a.Y
+		local rr = math.min(r, width * 0.45, depth * 0.45)
+		local c = (a + b) * 0.5
+		add({ id = id .. "A", size = v(width, height, depth - 2 * rr), at = c, color = color, material = L.material, full = full, group = group, shadow = not full })
+		add({ id = id .. "B", size = v(width - 2 * rr, height - 0.0008, depth), at = c - v(0, 0.0004, 0), color = color, material = L.material, full = full, group = group, shadow = not full })
+		local dh = height - 0.0016
+		for i, corner in { { a.X + rr, a.Z + rr }, { b.X - rr, a.Z + rr }, { a.X + rr, b.Z - rr }, { b.X - rr, b.Z - rr } } do
+			add({ id = `{id}C{i}`, size = v(dh, 2 * rr, 2 * rr), at = v(corner[1], a.Y + dh / 2, corner[2]), color = color, material = L.material, shape = "Cylinder", turn = v(0, 0, 90), full = full, group = group })
+		end
+	end
+	local r = math.min(hi.X - lo.X, hi.Z - lo.Z) * 0.45
+	rounded(name .. "Blade", lo, hi, r, hex(L.top), false)
+	rounded(name .. "Under", v(lo.X - L.underOut, lo.Y - 0.012, lo.Z - L.underOut), v(hi.X + L.underOut, lo.Y + L.underThick, hi.Z + L.underOut), r + L.underOut, hex(L.under), true)
+	rounded(name .. "Rim", v(lo.X - L.rimOut, lo.Y + 0.05, lo.Z - L.rimOut), v(hi.X + L.rimOut, hi.Y - 0.06, hi.Z + L.rimOut), r + L.rimOut, hex(L.rim), true)
+	local along = if hi.X - lo.X >= hi.Z - lo.Z then "x" else "z"
+	local c = (lo + hi) * 0.5
+	local length = (if along == "x" then hi.X - lo.X else hi.Z - lo.Z) * 0.82
+	add({ id = name .. "Rib", size = if along == "x" then v(length, 0.008, 0.07) else v(0.07, 0.008, length), at = v(c.X, hi.Y + 0.004, c.Z), color = hex(L.rib), material = L.material, full = true, group = group })
+end
+
+local function outerDecor(region: WorldMap.Region, budget: { full: number, low: number }): { Drawn }
+	local O = Garden.OUTER
+	local list, add = sheet(budget)
+	local slab = O.slab
+	local top, front = slab.hi.Y, slab.lo.Z
+	-- where the paint has worn through to the stone: patches on the top, worst along the front edge (both tiers: it is the stone's look)
+	local wrand = rng(region.seed, 3)
+	for i = 1, 12 do
+		local w, d = between(wrand, 1.2, 4.6), between(wrand, 0.7, 2.6)
+		local x = between(wrand, slab.lo.X + w / 2 + 0.2, slab.hi.X - w / 2 - 0.2)
+		local edge = i <= 5 -- along the front edge, square to it; the others anywhere, turned a little
+		local z = if edge then front + d / 2 + 0.02 else between(wrand, front + 1.6, slab.hi.Z - 1.6)
+		local turn = between(wrand, -25, 25)
+		add({ id = "Worn" .. i, size = v(w, 0.008, d), at = v(x, top + 0.004, z), turn = v(0, if edge then 0 else turn, 0), color = hex(pick(O.stone, wrand)), material = "Concrete", group = "Weather" })
+	end
+	-- rain has run down the front face: dark streaks below the edge (a hair proud of the face, which is walkable)
+	for i = 1, 6 do
+		local x, w, l = between(wrand, slab.lo.X + 2, slab.hi.X - 2), between(wrand, 0.25, 0.7), between(wrand, 1.4, 2.9)
+		add({ id = "Streak" .. i, size = v(w, l, 0.006), at = v(x, top - l / 2 - 0.05, front - 0.004), color = hex(O.streak), material = "Concrete", transparency = 0.35, group = "Weather" })
+	end
+	-- moss in the corners: where the slab meets the frame and the window box's ends, and at its front corners
+	local mrand = rng(region.seed, 5)
+	local corners = { { slab.lo.X + 0.9, slab.hi.Z - 0.8 }, { slab.hi.X - 0.9, slab.hi.Z - 0.8 }, { slab.lo.X + 0.9, front + 0.9 }, { slab.hi.X - 0.9, front + 0.9 },
+		{ -9.1, -21.2 }, { 9.1, -21.2 } }
+	for i, c in corners do
+		for j = 1, 8 do
+			local a, d = mrand() * TAU, 0.9 * math.sqrt(mrand())
+			local size = between(mrand, 0.25, 0.7)
+			add({ id = `Moss{i}_{j}`, size = v(size, size * 0.45, size * between(mrand, 0.7, 1.0)), at = v(c[1] + math.cos(a) * d, top + size * 0.09, c[2] + math.sin(a) * d),
+				turn = v(0, mrand() * 360, 0), shape = "Ellipsoid", color = hex(pick(O.moss, mrand)), material = "Grass", full = j > 3, group = "Moss" })
+		end
+	end
+	-- grit blown onto the stone
+	local grand = rng(region.seed, 7)
+	for i = 1, 28 do
+		local s = between(grand, 0.07, 0.24)
+		add({ id = "Grit" .. i, size = v(s, s * 0.6, s * between(grand, 0.6, 1.0)), at = v(between(grand, slab.lo.X + 0.5, slab.hi.X - 0.5), top + s * 0.25, between(grand, front + 0.4, slab.hi.Z - 0.4)),
+			turn = v(between(grand, -20, 20), grand() * 360, 0), color = hex(pick(O.grit, grand)), material = "Pebble", full = true, group = "Grit" })
+	end
+	return list
+end
+
+local function wallDecor(region: WorldMap.Region, budget: { full: number, low: number }): { Drawn }
+	local W = Garden.WALL
+	local K = W.brick
+	local list, add = sheet(budget)
+	local face = W.face + K.gap -- the bricks' face, a hair behind the walkable face
+	local mortarFace = W.face + K.recess
+	local slab = Garden.OUTER.slab
+	-- the mortar: the wall behind the bricks, recessed; under the slab only (the slab covers the top), up to the shoulders' tops beside it, and the house above
+	add({ id = "Mortar", size = v(W.east - W.west, W.under - W.foot, W.back - mortarFace), at = v(0, (W.under + W.foot) / 2, (W.back + mortarFace) / 2), color = hex(W.mortar), material = W.mortarMaterial, group = "Mortar" })
+	for i, x in { { W.west, slab.lo.X }, { slab.hi.X, W.east } } do
+		add({ id = "MortarShoulder" .. i, size = v(x[2] - x[1], W.top - 0.6 - W.under, W.back - mortarFace), at = v((x[1] + x[2]) / 2, (W.top - 0.6 + W.under) / 2, (W.back + mortarFace) / 2), color = hex(W.mortar), material = W.mortarMaterial, group = "Mortar" })
+		add({ id = "Coping" .. i, size = v(x[2] - x[1], 0.58, W.back - W.face - K.gap), at = v((x[1] + x[2]) / 2, W.top - 0.31, (W.back + W.face + K.gap) / 2), color = hex(W.coping), material = "Concrete", group = "Mortar" })
+	end
+	local win = W.window
+	local skin = 1.0 -- the room's plaster on the inside of the house above the window
+	for i, b in { { W.west, win.x0, W.top, W.above }, { win.x1, W.east, W.top, W.above }, { win.x0, win.x1, win.y1, W.above } } do
+		add({ id = "Above" .. i, size = v(b[2] - b[1], b[4] - b[3], W.back - skin - mortarFace), at = v((b[1] + b[2]) / 2, (b[3] + b[4]) / 2, (W.back - skin + mortarFace) / 2), color = hex(W.mortar), material = W.mortarMaterial, group = "Above" })
+		add({ id = "AboveSkin" .. i, size = v(b[2] - b[1], b[4] - b[3], skin), at = v((b[1] + b[2]) / 2, (b[3] + b[4]) / 2, W.back - skin / 2), color = hex(W.plaster), material = "Plaster", group = "Above" })
+	end
+	-- the courses: stretcher bond, a half brick's offset every other course, from under the coping down to the lawn and up round the window
+	local brand = rng(region.seed, 13)
+	local pitch, course = K.length + K.joint, K.height + K.joint
+	local n = 0
+	local spalled: { { at: Vector3, size: Vector3 } } = {}
+	local function lay(y0: number, y1: number, x0: number, x1: number, offset: number, group: string)
+		local x = W.west - offset
+		while x < W.east do
+			local a, b = math.max(x + K.joint / 2, x0), math.min(x + pitch - K.joint / 2, x1)
+			if b - a >= 2.0 then
+				n += 1
+				local burnt, pale = brand() < 0.08, brand() < 0.06
+				local color = if burnt then hex(W.burnt) elseif pale then hex(W.pale) else hex(pick(W.bricks, brand))
+				local sink = brand() * 0.05
+				local at = v((a + b) / 2, (y0 + y1) / 2, face + sink + K.depth / 2)
+				local size = v(b - a, y1 - y0, K.depth)
+				add({ id = "Brick" .. n, size = size, at = at, color = color, material = W.brickMaterial, group = group })
+				if brand() < 0.1 then table.insert(spalled, { at = at, size = size }) end
+			end
+			x += pitch
+		end
+	end
+	local c = 0
+	local y = W.under - K.joint / 2
+	while y - K.height > W.foot - K.height do -- below the slab
+		local y0 = math.max(y - K.height, W.foot)
+		lay(y0, y, W.west, W.east, (c % 2) * pitch / 2, "Bricks")
+		y -= course
+		c += 1
+	end
+	-- the shoulders beside the slab: a short course under the coping
+	lay(W.under + K.joint / 2, W.top - 0.6 - K.joint / 2, W.west, slab.lo.X, pitch / 2, "Bricks")
+	lay(W.under + K.joint / 2, W.top - 0.6 - K.joint / 2, slab.hi.X, W.east, pitch / 2, "Bricks")
+	-- above the outer sill, round the window
+	c = 1
+	y = W.top + K.joint / 2
+	while y + K.height <= W.above do
+		local y1 = y + K.height
+		if y1 <= win.y1 + 0.5 then
+			lay(y, y1, W.west, win.x0, (c % 2) * pitch / 2, "Above")
+			lay(y, y1, win.x1, W.east, (c % 2) * pitch / 2, "Above")
+		elseif y >= win.y1 then
+			lay(y, y1, W.west, W.east, (c % 2) * pitch / 2, "Above")
+		else
+			lay(y, y1, W.west, win.x0, (c % 2) * pitch / 2, "Above")
+			lay(y, y1, win.x1, W.east, (c % 2) * pitch / 2, "Above")
+		end
+		y += course
+		c += 1
+	end
+	-- weathering (full tier): salt bloom on a few bricks, green algae along the foot where the soil splashes, and the spalled faces
+	local erand = rng(region.seed, 17)
+	for i, s in spalled do
+		add({ id = "Spall" .. i, size = v(s.size.X * between(erand, 0.3, 0.6), s.size.Y * between(erand, 0.3, 0.6), 0.006), at = v(s.at.X + between(erand, -3, 3), s.at.Y + between(erand, -1, 1), face - 0.002),
+			color = hex(W.burnt), material = "Concrete", transparency = 0.25, full = true, group = "Weather" })
+	end
+	for i = 1, 8 do
+		add({ id = "Bloom" .. i, size = v(between(erand, 2, 5), between(erand, 1, 2.5), 0.006), at = v(between(erand, W.west + 5, W.east - 5), between(erand, -60, -10), face - 0.002),
+			color = hex("d9d2c4"), material = "Plaster", transparency = 0.78, full = true, group = "Weather" })
+	end
+	for i = 1, 10 do
+		local w = between(erand, 4, 11)
+		add({ id = "Algae" .. i, size = v(w, between(erand, 1.5, 5), 0.006), at = v(W.west + (i - 0.5) * (W.east - W.west) / 10 + between(erand, -2, 2), W.foot + between(erand, 1, 3), face - 0.002),
+			color = hex("4f6a36"), material = "Grass", transparency = 0.4, full = true, group = "Weather" })
+	end
+	return list
+end
+
+local function bedDecor(region: WorldMap.Region, budget: { full: number, low: number }): { Drawn }
+	local B = Garden.BED
+	local list, add = sheet(budget)
+	local pieces = Garden.pieces(region)
+	local top = B.top
+	-- what stands on the soil, so the litter, the grass and the pebbles go round it
+	local standing: { Box } = {}
+	for _, p in pieces do
+		if p.lo.Y <= top + 0.01 and p.id ~= "bed_a_soil" then table.insert(standing, { min = p.lo, max = p.hi }) end
+	end
+	local function free(x: number, z: number, margin: number): boolean
+		for _, b in standing do
+			if x > b.min.X - margin and x < b.max.X + margin and z > b.min.Z - margin and z < b.max.Z + margin then return false end
+		end
+		return true
+	end
+	local function onSoil(rand: () -> number, margin: number): (number, number)
+		local x, z = 0.0, 0.0
+		for _ = 1, 30 do
+			x, z = between(rand, B.x0 + 0.6, B.x1 - 0.6), between(rand, B.z0 + 0.6, B.z1 - 0.6)
+			if free(x, z, margin) then break end
+		end
+		return x, z
+	end
+	-- the plants first (their leaves are what the spider walks on: the blades are kept at both tiers)
+	for _, p in pieces do
+		if string.find(p.id, "_leaf_", 1, true) ~= nil then
+			leafOver(add, p.id, p.lo, p.hi, "Plants")
+		elseif string.find(p.id, "_stem", 1, true) ~= nil or string.find(p.id, "_stalk", 1, true) ~= nil then
+			local c = (p.lo + p.hi) * 0.5
+			local d = math.min(p.hi.X - p.lo.X, p.hi.Z - p.lo.Z)
+			add({ id = p.id .. "Rod", size = v(p.hi.Y - p.lo.Y, d, d), at = c, turn = v(0, 0, 90), shape = "Cylinder", color = hex(B.leaf.stem), material = B.leaf.material, group = "Plants", shadow = true })
+			if string.find(p.id, "_stalk", 1, true) ~= nil then
+				local F = B.flower
+				local head = v(c.X, p.hi.Y + 0.35, c.Z)
+				add({ id = "FlowerSepals", size = v(1.6, 0.5, 1.6), at = head - v(0, 0.3, 0), shape = "Ellipsoid", color = hex(F.sepals), material = "SmoothPlastic", group = "Plants" })
+				add({ id = "FlowerHead", size = v(2.6, 0.9, 2.6), at = head, shape = "Ellipsoid", color = hex(F.head), material = "SmoothPlastic", group = "Plants" })
+				add({ id = "FlowerDisc", size = v(1.3, 0.3, 1.3), at = head + v(0, 0.42, 0), shape = "Ellipsoid", color = hex(F.disc), material = "SmoothPlastic", full = true, group = "Plants" })
+			end
+		end
+	end
+	-- the mounds' slopes: a flattened heap of the same soil round each, rising to just under its top, so a mound reads as a heap (the walkable top is the box's)
+	for _, p in pieces do
+		if string.find(p.id, "mound", 1, true) ~= nil then
+			local h = p.hi.Y - p.lo.Y
+			add({ id = p.id .. "Slope", size = v((p.hi.X - p.lo.X) * 1.35, h * 1.9, (p.hi.Z - p.lo.Z) * 1.35), at = v((p.lo.X + p.hi.X) / 2, top, (p.lo.Z + p.hi.Z) / 2),
+				shape = "Ellipsoid", color = p.color, material = B.soilMaterial, group = "Soil" })
+		end
+	end
+	-- lichen on the stones and moss at their feet
+	local lrand = rng(region.seed, 41)
+	for _, p in pieces do
+		if string.find(p.id, "stone", 1, true) ~= nil then
+			for j = 1, 2 do
+				local s = between(lrand, 0.5, 1.4)
+				add({ id = `{p.id}Lichen{j}`, size = v(0.01, s, s * between(lrand, 0.6, 1.0)), at = v(between(lrand, p.lo.X + s, p.hi.X - s), p.hi.Y + 0.005, between(lrand, p.lo.Z + s, p.hi.Z - s)),
+					turn = v(0, lrand() * 360, 90), shape = "Cylinder", color = hex(pick({ "b8b48a", "c9c3a0", "9aa77a" }, lrand)), material = "Plaster", full = true, group = "Stones" })
+			end
+			for j = 1, 3 do
+				local side = lrand() < 0.5
+				local x = if side then pick({ p.lo.X - 0.15, p.hi.X + 0.15 }, lrand) else between(lrand, p.lo.X, p.hi.X)
+				local z = if side then between(lrand, p.lo.Z, p.hi.Z) else pick({ p.lo.Z - 0.15, p.hi.Z + 0.15 }, lrand)
+				local s = between(lrand, 0.35, 0.8)
+				add({ id = `{p.id}Moss{j}`, size = v(s, s * 0.5, s), at = v(x, top + s * 0.12, z), shape = "Ellipsoid", turn = v(0, lrand() * 360, 0), color = hex(pick(Garden.OUTER.moss, lrand)), material = "Grass", full = true, group = "Stones" })
+			end
+		end
+	end
+	-- the soil: damper and drier patches (full tier)
+	local srand = rng(region.seed, 43)
+	for i = 1, B.mottle.count do
+		local x, z = onSoil(srand, 0.2)
+		local w = between(srand, B.mottle.size[1], B.mottle.size[2])
+		add({ id = "Mottle" .. i, size = v(w, 0.006, w * between(srand, 0.5, 0.9)), at = v(x, top + 0.003, z), turn = v(0, srand() * 360, 0), shape = "Ellipsoid",
+			color = hex(pick(B.mottle.colors, srand)), material = B.soilMaterial, full = true, group = "Soil" })
+	end
+	-- the grass: tufts along the bed's edges and by the stones, each blade a long thin leaf leaning out from the tuft's foot
+	local grand = rng(region.seed, 47)
+	local G = B.grass
+	for i = 1, G.tufts do
+		local x, z
+		if i % 2 == 0 then
+			local edge = math.floor(grand() * 3)
+			x = if edge == 0 then B.x0 + between(grand, 0.4, 1.6) elseif edge == 1 then B.x1 - between(grand, 0.4, 1.6) else between(grand, B.x0 + 1, B.x1 - 1)
+			z = if edge == 2 then B.z0 + between(grand, 0.4, 1.6) else between(grand, B.z0 + 1, B.z1 - B.landing)
+		else
+			x, z = onSoil(grand, 0.5)
+		end
+		local height = between(grand, G.height[1], G.height[2])
+		for j = 1, G.blades do
+			local a = grand() * TAU
+			local lean = between(grand, 12, 34)
+			local l = height * between(grand, 0.7, 1.0)
+			local color = if grand() < 0.15 then hex(G.dry) else hex(pick(G.colors, grand))
+			local foot = v(x + math.cos(a) * 0.12, top, z + math.sin(a) * 0.12)
+			local out = math.sin(math.rad(lean)) * l / 2
+			add({ id = `Tuft{i}Blade{j}`, size = v(0.05, l, between(grand, 0.14, 0.24)), at = foot + v(math.cos(a) * out, math.cos(math.rad(lean)) * l / 2, math.sin(a) * out),
+				turn = v(0, -math.deg(a), -lean), shape = "Ellipsoid", color = color, material = "SmoothPlastic", full = j > G.keep, group = "Grass" })
+		end
+	end
+	-- the leaf litter: fallen leaves, flat or a little curled, one in `lowEvery` kept at the low tier
+	local frand = rng(region.seed, 53)
+	local F = B.litter
+	for i = 1, F.count do
+		local x, z = onSoil(frand, 0.3)
+		local s = between(frand, F.size[1], F.size[2])
+		local curl = if frand() < 0.3 then between(frand, 8, 22) else between(frand, 0, 4)
+		add({ id = "Litter" .. i, size = v(s, 0.04, s * between(frand, 0.45, 0.7)), at = v(x, top + 0.03 + math.sin(math.rad(curl)) * s * 0.2, z), turn = v(curl, frand() * 360, 0),
+			shape = "Ellipsoid", color = hex(pick(F.colors, frand)), material = "SmoothPlastic", full = i % F.lowEvery ~= 0, group = "Litter" })
+	end
+	-- twigs and pebbles (full tier)
+	local trand = rng(region.seed, 59)
+	local T = B.twigs
+	for i = 1, T.count do
+		local x, z = onSoil(trand, 0.4)
+		local l = between(trand, T.length[1], T.length[2])
+		add({ id = "Twig" .. i, size = v(l, T.width, T.width), at = v(x, top + T.width / 2, z), turn = v(0, trand() * 360, 0), shape = "Cylinder", color = hex(pick(T.colors, trand)), material = "Wood", full = true, group = "Litter" })
+	end
+	local P = B.pebbles
+	for i = 1, P.count do
+		local x, z = onSoil(trand, 0.2)
+		local s = between(trand, P.size[1], P.size[2])
+		add({ id = "Pebble" .. i, size = v(s, s * 0.55, s * between(trand, 0.6, 0.9)), at = v(x, top + s * 0.18, z), turn = v(between(trand, -15, 15), trand() * 360, 0), shape = "Ellipsoid",
+			color = hex(pick(P.colors, trand)), material = "Pebble", full = true, group = "Litter" })
+	end
+	return list
+end
+
+-- ---------------------------------------------------------------- the questions Region asks
+-- The budgets: the most drawn parts a region of the kind may carry at each tier. They are what the generators place now (tests/world.luau builds the looks and
+-- holds each tier to them exactly, so a look that grows says so here); the placers stop at them (`sheet`), keeping what they place first. All three together
+-- are 551 parts at full and 216 at low, beside the sill's 1,178 and 314.
+Garden.BUDGETS = {
+	outer_sill = { full = 94, low = 36 },
+	house_wall = { full = 93, low = 73 },
+	bed = { full = 364, low = 107 },
+} :: { [string]: { full: number, low: number } }
+
+local piecesCache: { [string]: { Piece } } = {}
+local decorCache: { [string]: { Drawn } } = {}
+
+-- Whether a kind is one of the garden's.
+function Garden.knows(kind: string): boolean
+	return kind == "outer_sill" or kind == "house_wall" or kind == "bed"
+end
+
+-- The physical boxes of a region of one of the garden's kinds (the same list for the same region; do not change it).
+function Garden.pieces(region: WorldMap.Region): { Piece }
+	local key = region.id .. "/" .. tostring(region.seed)
+	local cached = piecesCache[key]
+	if cached ~= nil then return cached end
+	local out: { Piece }
+	if region.kind == "outer_sill" then out = outerPieces()
+	elseif region.kind == "house_wall" then out = wallPieces()
+	elseif region.kind == "bed" then out = bedPieces(region)
+	else error("no generator for the region kind " .. region.kind) end
+	piecesCache[key] = out
+	return out
+end
+
+-- The drawn look of a region of one of the garden's kinds, at the full tier (the low tier is the records without `full`).
+function Garden.decor(region: WorldMap.Region): { Drawn }
+	local key = region.id .. "/" .. tostring(region.seed)
+	local cached = decorCache[key]
+	if cached ~= nil then return cached end
+	local budget = Garden.BUDGETS[region.kind]
+	local out: { Drawn }
+	if region.kind == "outer_sill" then out = outerDecor(region, budget)
+	elseif region.kind == "house_wall" then out = wallDecor(region, budget)
+	elseif region.kind == "bed" then out = bedDecor(region, budget)
+	else error("no generator for the region kind " .. region.kind) end
+	decorCache[key] = out
+	return out
+end
+
+-- The drawn look of a region placed under another budget than its kind's (not kept): what a tighter ceiling leaves out, for the tests.
+function Garden.decorWith(region: WorldMap.Region, budget: { full: number, low: number }): { Drawn }
+	if region.kind == "outer_sill" then return outerDecor(region, budget) end
+	if region.kind == "house_wall" then return wallDecor(region, budget) end
+	if region.kind == "bed" then return bedDecor(region, budget) end
+	error("no generator for the region kind " .. region.kind)
+end
+
+-- The pieces of a region that its drawn look stands in for: those turn invisible (still solid) once the look is built. The wall's boxes are drawn as bricks and
+-- the plants' as leaves and stems; the slab, the stones and the soil are their own look.
+function Garden.drawnPieces(region: WorldMap.Region): { string }
+	local out: { string } = {}
+	for _, p in Garden.pieces(region) do
+		if region.kind == "house_wall" or string.find(p.id, "_leaf_", 1, true) ~= nil or string.find(p.id, "_stem", 1, true) ~= nil or string.find(p.id, "_stalk", 1, true) ~= nil then
+			table.insert(out, p.id)
+		end
+	end
+	return out
+end
+
+-- The pieces of a region that the sill's drawn world stands in for: the window box's halves on the outer sill, drawn with the flowers in them by the sill's Decor
+-- (Habitat/Plants.garden), and solid here.
+function Garden.drawnBySill(region: WorldMap.Region): { string }
+	local out: { string } = {}
+	if region.kind == "outer_sill" then
+		for _, half in Flora.garden.box.boxes do table.insert(out, half.id) end
+	end
+	return out
+end
+
+-- The boxes a region's creatures keep out of: each retreat grown by half a stud (the sill's are its own, Region.keepOut).
+function Garden.keepOut(region: WorldMap.Region): { Box }
+	if not Garden.knows(region.kind) then error("no generator for the region kind " .. region.kind) end
+	local out: { Box } = {}
+	for _, t in region.retreats do
+		table.insert(out, { min = t.min - v(0.5, 0.5, 0.5), max = t.max + v(0.5, 0.5, 0.5) })
+	end
+	return out
+end
+
+return table.freeze(Garden)
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="133">
+          <Properties>
             <string name="Name">Region</string>
             <string name="Source"><![CDATA[--!strict
 -- What a region is made of (ROBLOX-94, docs/OPEN_WORLD_DESIGN.md): the generators. Each is pure and deterministic from the region (its kind and its
 -- seed), so the same region gives the same boxes forever, on the server and on any client; nothing here touches the engine.
 --   pieces ... the physical boxes: what the motor walks on, the rival's route is built from, and the prey perch on (Habitat/WindowsillLayout.Piece).
---   decor .... the drawn-only boxes that stand beside them (Habitat/WindowsillLayout.Decor). The sill's drawn world (Habitat/Scenery.decor) is its own
---              generator and still reads these; a region of any other kind will put its looks here.
---   keepOut .. the boxes the rival's route keeps out of: the retreats and a margin around them.
+--   decor .... the drawn-only boxes that stand beside them. The sill's are the layout's DECOR (its drawn world is Habitat/Scenery.decor, which still reads the layout);
+--              every other kind's are its whole drawn look, one record a part (World/Garden.Drawn, built by Habitat/Scenery.look).
+--   keepOut .. the boxes the region's creatures keep out of: the retreats and a margin around them, and the sill's open sash (ROBLOX-95: the rival and the mate
+--              are bound to the sill, so the way out is not theirs).
 --   budget ... how many drawn parts a region of a kind may carry at each detail tier.
--- The sill is the one kind so far, and its generator returns the layout's lists as they are: the sill is hand-placed and byte-identical to what it was
--- before there was a world (tests/worldmap.luau pins that). Every later kind is a seeded placer (soil mounds, litter leaves, grass tufts, stones, stems
--- and a flower head) that respects its budget; asking for a kind with no generator is a mistake, not an empty region.
+-- The sill is hand-placed and its generator returns the layout's lists as they are (tests/worldmap.luau pins that). ROBLOX-95 adds the three kinds under the
+-- window, seeded placers in World/Garden: outer_sill, house_wall and bed. Asking for a kind with no generator is a mistake, not an empty region.
 local Layout = require(script.Parent.Parent.Habitat.WindowsillLayout)
 local Rules = require(script.Parent.Parent.Data.RivalRules)
 local WorldMap = require(script.Parent.WorldMap)
+local Garden = require(script.Parent.Garden)
 
 local Region = {}
 
 export type Box = { min: Vector3, max: Vector3 }
+export type Drawn = Garden.Drawn
 
 -- The name of the folder every region's folder of physical boxes is built under, in the workspace (WorldBuild; the client's rays include it).
 Region.WORLD_FOLDER = "World"
+-- The folder beside it that holds the drawn look of every region but the sill (WorldBuild.looks; the sill's is the Decor model, as it always was).
+Region.LOOKS_FOLDER = "WorldDecor"
+
+-- ROBLOX-95: the open sash, as the sill's creatures keep out of it: the gap between the back frame's pieces (WindowsillLayout back_frame_*), grown by 0.3 across
+-- and up, through the frame's depth and 0.05 into the room (so the floor in front of it is not in it).
+Region.SASH_MIN = Vector3.new(-8.3, -0.05, -13.55)
+Region.SASH_MAX = Vector3.new(8.3, 6.3, -12.45)
 
 -- The physical boxes of the region.
 function Region.pieces(region: WorldMap.Region): { Layout.Piece }
 	if region.kind == "sill" then return Layout.PIECES end
-	error("no generator for the region kind " .. region.kind)
+	return Garden.pieces(region) :: any
 end
 
 -- The drawn-only boxes of the region.
-function Region.decor(region: WorldMap.Region): { Layout.Decor }
-	if region.kind == "sill" then return Layout.DECOR end
-	error("no generator for the region kind " .. region.kind)
+function Region.decor(region: WorldMap.Region): { Drawn }
+	if region.kind == "sill" then return Layout.DECOR :: any end
+	return Garden.decor(region)
 end
 
--- The boxes the rival's route keeps out of (RivalRoute: nothing the rival does goes in): the sill's are the crack grown by a margin, authored with the
--- rival's other rules (Data/RivalRules). One box per retreat, in the retreats' order.
+-- The ids of the region's pieces that its drawn look stands in for (they turn invisible, still solid, once the look exists). The sill's are decided by its Decor
+-- (Habitat/Scenery.decor's second result), so none here.
+function Region.drawnPieces(region: WorldMap.Region): { string }
+	if region.kind == "sill" then return {} end
+	return Garden.drawnPieces(region)
+end
+
+-- Every piece of the region that some drawing may stand in for: its own look's (drawnPieces) and, on the outer sill, the window box's halves, which the sill's
+-- Decor draws (Habitat/Plants.garden). WorldBuild hides these when it is not told which drawings exist.
+function Region.replaceable(region: WorldMap.Region): { string }
+	if region.kind == "sill" then return {} end
+	local out = table.clone(Garden.drawnPieces(region))
+	for _, id in Garden.drawnBySill(region) do table.insert(out, id) end
+	return out
+end
+
+-- The boxes the region's creatures keep out of (RivalRoute: nothing the rival does goes in): for the sill, the crack grown by a margin, authored with the rival's
+-- other rules (Data/RivalRules), then the open sash; for the others, each retreat grown by half a stud. The retreats' boxes come first, in the retreats' order.
 function Region.keepOut(region: WorldMap.Region): { Box }
-	if region.kind == "sill" then return { { min = Rules.keepOutMin, max = Rules.keepOutMax } } end
-	error("no generator for the region kind " .. region.kind)
+	if region.kind == "sill" then return { { min = Rules.keepOutMin, max = Rules.keepOutMax }, { min = Region.SASH_MIN, max = Region.SASH_MAX } } end
+	return Garden.keepOut(region)
 end
 
 -- The folder a region's physical boxes are built into (WorldBuild), by which the client finds it: the sill is "Windowsill", as it was before there was a
@@ -21681,11 +22657,12 @@ function Region.folderName(region: WorldMap.Region): string
 end
 
 -- The most drawn parts (the decor, as tests/world.luau counts them) a region of this kind may carry at a detail tier ("full" or "low", Data/Detail), or nil
--- for a kind with no budget yet. A stub: the sill's are what its decor builds now, with the sun through the window (the most it ever builds), and
--- tests/world.luau holds it to them exactly, so a sill that grows says so here; every later kind brings its own numbers with its generator.
+-- for a kind with no budget. The sill's are what its decor builds now, with the sun through the window (the most it ever builds), and tests/world.luau holds
+-- it to them exactly, so a sill that grows says so here; the garden's kinds are ceilings their placers keep to (World/Garden.BUDGETS).
 local BUDGETS: { [string]: { full: number, low: number } } = {
-	sill = { full = 1156, low = 292 },
+	sill = { full = 1178, low = 314 }, -- (ROBLOX-95: 1156 and 292 before the raised sash, the window box's halves and the shrubs' bodies: 22 more at each tier)
 }
+for kind, b in Garden.BUDGETS do BUDGETS[kind] = b end
 
 function Region.budget(kind: string, tier: string): number?
 	local b = BUDGETS[kind]
@@ -21699,7 +22676,7 @@ return table.freeze(Region)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="133">
+        <Item class="ModuleScript" referent="134">
           <Properties>
             <string name="Name">WorldBuild</string>
             <string name="Source"><![CDATA[--!strict
@@ -21709,16 +22686,20 @@ return table.freeze(Region)
 -- (Scenery.decor) stays beside it in the workspace, as it has always been.
 --
 -- The sill is built by the sill's own part-making (Habitat/Scenery.sill, from the region's pieces), so its folder is exactly the one Main used to parent to the workspace: the
--- same name ("Windowsill"), the same 28 parts, the same attributes, the same hidden-but-solid pieces where the decor drew its own. Only its parent changed. Any other kind
--- gets a folder named for its region and the same parts, from its generator (Region.pieces), when it has one.
+-- same name ("Windowsill"), the same parts, the same attributes, the same hidden-but-solid pieces where the decor drew its own. Only its parent changed. Any other kind
+-- gets a folder named for its region and the same parts, from its generator (Region.pieces).
+--
+-- ROBLOX-95: three regions outside the window (World/Garden). Their drawn looks (Region.decor) are built by `looks` into a `WorldDecor` folder beside `World`, a persistent
+-- Model per region, as the sill's Decor is, so each look reaches a client whole and the low tier can thin it once (Client/WorldDetail); the pieces a look draws instead
+-- (the wall's bricks, the bed's leaves and stems) turn invisible and stay solid, as the sill's back wall and Pilea do.
 local Scenery = require(script.Parent.Parent.Habitat.Scenery)
 local WorldMap = require(script.Parent.WorldMap)
 local Region = require(script.Parent.Region)
 
 local WorldBuild = {}
 
--- One region's folder of physical parts, under `parent`. `replaced`: the ids of the pieces whose drawing exists (Scenery.decor's second result): those turn invisible but stay
--- solid; nil means every piece the decor can replace, {} none (as Scenery.sill has it).
+-- One region's folder of physical parts, under `parent`. `replaced`: the ids of the pieces whose drawing exists (Scenery.decor's second result, and `looks`'): those turn
+-- invisible but stay solid; nil means every piece a drawing can replace, {} none (as Scenery.sill has it).
 function WorldBuild.region(region: WorldMap.Region, parent: Instance, replaced: { [string]: boolean }?): Folder
 	local pieces = Region.pieces(region)
 	local folder: Folder
@@ -21727,7 +22708,13 @@ function WorldBuild.region(region: WorldMap.Region, parent: Instance, replaced: 
 	else
 		folder = Instance.new("Folder")
 		folder.Name = Region.folderName(region)
-		Scenery.parts(folder, pieces, replaced or {})
+		local hide = replaced
+		if hide == nil then
+			local all: { [string]: boolean } = {}
+			for _, id in Region.replaceable(region) do all[id] = true end
+			hide = all
+		end
+		Scenery.parts(folder, pieces, hide :: { [string]: boolean })
 	end
 	folder.Parent = parent
 	return folder
@@ -21744,11 +22731,37 @@ function WorldBuild.world(parent: Instance, worldSeed: number?, replaced: { [str
 	return world
 end
 
+-- The drawn look of every region but the sill (whose look is the Decor, Scenery.decor): a `WorldDecor` folder under `parent` holding a persistent Model per region, named
+-- for its id. Best effort, as the sill's decor is: a region whose look fails is warned about and left out (its pieces stay visible). Returns the folder and the ids of the
+-- pieces the looks that were built stand in for.
+function WorldBuild.looks(parent: Instance, worldSeed: number?): (Folder, { [string]: boolean })
+	local looks = Instance.new("Folder")
+	looks.Name = Region.LOOKS_FOLDER
+	local drawn: { [string]: boolean } = {}
+	for _, region in WorldMap.regions(worldSeed) do
+		if region.kind ~= "sill" then
+			local model = Instance.new("Model")
+			model.Name = region.id
+			model.ModelStreamingMode = Enum.ModelStreamingMode.Persistent
+			local ok, err = pcall(function() return Scenery.look(model, Region.decor(region)) end)
+			if ok then
+				model.Parent = looks
+				for _, id in Region.drawnPieces(region) do drawn[id] = true end
+			else
+				warn(`[Windowsill] decor: the look of {region.id} failed: {tostring(err)}`)
+				model:Destroy()
+			end
+		end
+	end
+	looks.Parent = parent
+	return looks, drawn
+end
+
 return table.freeze(WorldBuild)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="134">
+        <Item class="ModuleScript" referent="135">
           <Properties>
             <string name="Name">WorldMap</string>
             <string name="Source"><![CDATA[--!strict
@@ -21760,11 +22773,20 @@ return table.freeze(WorldBuild)
 -- A region: `id`; `kind` (what generates its boxes: Region.pieces/Region.decor); `origin` (world studs; the sill is at the origin exactly as
 -- it always was); `bounds` ({ min, max }, the volume a spider may be in while it is in this region: the motor's fall-off box, a checkpoint's
 -- check); `seed` (the world's seed mixed with the region's id, for the region's placers: WorldMap.seed); `neighbors` (the seams to the regions
--- it meets: none yet; each will carry the face line, `a` to `b`, where the two walkable surfaces meet); `retreats` (box volumes where the
--- spider can rest, edges included: the sill's crack); `spawn` (the support point and heading where a life begins here, and where a rest
+-- it meets: each the face line, `a` to `b`, where the two regions' walkable surfaces meet); `retreats` (box volumes where the spider can rest, edges
+-- included: the sill's crack, the gap under the bed's stone); `spawn` (the support point and heading where a life begins here, and where a rest
 -- from another revision of the world is put back); `clockScale` (how fast this region's day runs against the sill's, 1.0: LifeClock.game).
 --
--- Regions are listed in priority order; bounds may touch at a seam, and a point on a shared edge belongs to the first region listed.
+-- Regions are listed in priority order; bounds may touch or overlap where two regions meet, and a point in both belongs to the first region listed.
+--
+-- ROBLOX-95 (W2, beyond the glass): the lower sash is raised and the world outside exists. Four regions, from the window down:
+--   sill ........ the windowsill, as it was but for the opening in its back frame (x -8..8, y 0.7..6); its bounds are still the layout's play bounds, whose
+--                 margin reaches 2.5 studs out past the frame (to z -16), so the first steps onto the outer sill are still the sill's.
+--   outer_sill .. the stone slab outside, top y 0, x -30..30, z -24..-13.5, with the window box's halves on it; it meets the sill along the opening's rail
+--                 (z -13.5, x -8..8, where the rail's outer face meets the stone) and the wall where the stone's front face becomes brick (z -24, y -3).
+--   house_wall .. the brick wall below, face at z -24 from y 0 to the lawn, x -40..40; the air 6 studs out from its face is the wall's down to y -89.
+--   bed_a ....... the soil under the window, top y -90, x -25..25, z -24..-74, and the air over it; it meets the wall along the wall's foot (z -24, y -90,
+--                 x -25..25). Its stone is the first garden home. Its day runs at a third of the sill's pace (Nathan's 0.33; W4 tunes it).
 local Layout = require(script.Parent.Parent.Habitat.WindowsillLayout)
 
 local WorldMap = {}
@@ -21788,7 +22810,11 @@ export type Region = {
 WorldMap.SEED = 914
 -- Changes whenever any region's geometry moves in a way a saved position could no longer be trusted (Checkpoint's revision gate puts such a
 -- rest back at its region's spawn). Adding a region somewhere new does not need it; moving, resizing or removing one does.
-WorldMap.REVISION = "world-1"
+-- world-2 (ROBLOX-95): the sill's back frame was opened and the garden added, so a rest kept under world-1 (or before there was a record of the world) is put
+-- back at its region's spawn.
+WorldMap.REVISION = "world-2"
+-- The revision a rest kept before there was a world record belongs to (Persistence/Checkpoint reads a record without one as this).
+WorldMap.FIRST_REVISION = "world-1"
 -- The region a new life begins in.
 WorldMap.HOME = "sill"
 
@@ -21818,17 +22844,57 @@ local function freeze(region: Region): Region
 	return table.freeze(region)
 end
 
--- The authored regions, for a world seed (only each region's `seed` depends on it). One for now.
+local function v(x: number, y: number, z: number): Vector3
+	return Vector3.new(x, y, z)
+end
+
+-- The seams, each the line where two regions' walkable surfaces meet (both regions list it, `a` to `b`).
+local SEAM_SASH = { a = v(-8, 0, -13.5), b = v(8, 0, -13.5) } -- the rail's outer face meets the stone
+local SEAM_STONE = { a = v(-30, -3, -24), b = v(30, -3, -24) } -- the stone's front face goes on down as brick
+local SEAM_FOOT = { a = v(-25, -90, -24), b = v(25, -90, -24) } -- the wall's foot meets the soil
+local function seam(id: string, line: { a: Vector3, b: Vector3 }): Neighbor
+	return table.freeze({ id = id, a = line.a, b = line.b })
+end
+
+-- The authored regions, for a world seed (only each region's `seed` depends on it), in priority order.
 local function author(worldSeed: number): { Region }
 	return {
 		freeze({
 			id = "sill", kind = "sill", origin = Vector3.zero,
 			bounds = { Layout.PLAY_BOUNDS_MIN, Layout.PLAY_BOUNDS_MAX },
 			seed = WorldMap.seed(worldSeed, "sill"),
-			neighbors = {} :: { Neighbor },
+			neighbors = { seam("outer_sill", SEAM_SASH) },
 			retreats = { { id = "sill_crevice", min = Layout.RETREAT_MIN, max = Layout.RETREAT_MAX } },
 			spawn = { pos = Layout.SPAWN, heading = Layout.SPAWN_HEADING },
 			clockScale = 1.0,
+		}),
+		freeze({
+			id = "outer_sill", kind = "outer_sill", origin = v(0, 0, -18.75),
+			bounds = { v(-33, -3, -25.5), v(33, 35, -13.5) },
+			seed = WorldMap.seed(worldSeed, "outer_sill"),
+			neighbors = { seam("sill", SEAM_SASH), seam("house_wall", SEAM_STONE) },
+			retreats = {},
+			spawn = { pos = v(0, 0, -18), heading = v(0, 0, -1) }, -- just outside the opening, facing the garden
+			clockScale = 1.0,
+		}),
+		freeze({
+			id = "house_wall", kind = "house_wall", origin = v(0, -45, -24),
+			bounds = { v(-42, -89, -30), v(42, 35, -13.5) },
+			seed = WorldMap.seed(worldSeed, "house_wall"),
+			neighbors = { seam("outer_sill", SEAM_STONE), seam("bed_a", SEAM_FOOT) },
+			retreats = {},
+			spawn = { pos = v(35, 0, -18.75), heading = v(-1, 0, 0) }, -- the top of the wall's east shoulder, beside the outer sill
+			clockScale = 1.0,
+		}),
+		freeze({
+			id = "bed_a", kind = "bed", origin = v(0, -90, -49),
+			bounds = { v(-42, -93, -76), v(42, 35, -24) },
+			seed = WorldMap.seed(worldSeed, "bed_a"),
+			neighbors = { seam("house_wall", SEAM_FOOT) },
+			-- the gap under the stone, raised on two rests (World/Garden builds the stone round it): the first garden home
+			retreats = { { id = "bed_a_stone", min = v(8.6, -90, -52.6), max = v(13.4, -88.6, -47.4) } },
+			spawn = { pos = v(11, -90, -43.5), heading = v(0, 0, -1) }, -- in front of the stone, facing its way in
+			clockScale = 0.33,
 		}),
 	}
 end
@@ -21929,15 +22995,15 @@ return table.freeze(WorldMap)
       </Item>
     </Item>
   </Item>
-  <Item class="ServerScriptService" referent="135">
+  <Item class="ServerScriptService" referent="136">
     <Properties>
       <string name="Name">ServerScriptService</string>
     </Properties>
-    <Item class="Folder" referent="136">
+    <Item class="Folder" referent="137">
       <Properties>
         <string name="Name">PortTests</string>
       </Properties>
-      <Item class="ModuleScript" referent="137">
+      <Item class="ModuleScript" referent="138">
         <Properties>
           <string name="Name">AntMimicSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -22034,15 +23100,15 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="138">
+      <Item class="ModuleScript" referent="139">
         <Properties>
           <string name="Name">BuildInfo</string>
           <string name="Source"><![CDATA[-- Generated by tools/build.py; do not edit.
-return { id = "fb7a1858a2cdcca4" }
+return { id = "8b53da9e6a401c50" }
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="139">
+      <Item class="ModuleScript" referent="140">
         <Properties>
           <string name="Name">GraphicsSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -22073,15 +23139,21 @@ return function(check)
 			assert(want, "no material for " .. part.Name)
 			assert((part :: BasePart).Material == Enum.Material:FromName(want), `{part.Name}: {tostring((part :: BasePart).Material)}`)
 		end
-		local back = sill:FindFirstChild(Graphics.window.hidden) :: BasePart
-		assert(back.Transparency == 1 and back.CanCollide and back.CanQuery, "the back wall must stay solid and climbable")
+		for _, id in Graphics.window.hidden do
+			local back = sill:FindFirstChild(id) :: BasePart
+			assert(back.Transparency == 1 and back.CanCollide and back.CanQuery, id .. ": the back wall must stay solid and climbable")
+		end
 		local hit = workspace:Raycast(Vector3.new(0, 8, 0), Vector3.new(0, 0, -30))
-		assert(hit and hit.Instance == back and math.abs(hit.Position.Z + 12.5) < 1e-3, "a ray across the sill must land on the solid back wall")
+		assert(hit and hit.Instance == sill:FindFirstChild("back_frame_head") and math.abs(hit.Position.Z + 12.5) < 1e-3, "a ray across the sill must land on the solid back wall")
+		-- ROBLOX-95: the raised sash: a ray low across the middle of the sill goes out through the opening and meets the outer sill's world, not the back wall
+		local low = workspace:Raycast(Vector3.new(0, 3, 0), Vector3.new(0, 0, -30))
+		assert(low == nil or not low.Instance:IsDescendantOf(sill), "the opening in the back frame must be open")
 	end)
 	check("a piece is invisible only where its drawing exists, and then it stays solid; every drawn leaf's top is its piece's top", function()
 		local pilea = decor:FindFirstChild("Pilea")
 		assert(pilea, "the drawn Pilea is missing")
-		local hidden: { [string]: boolean } = { [Graphics.window.hidden] = true }
+		local hidden: { [string]: boolean } = {}
+		for _, id in Graphics.window.hidden do hidden[id] = true end
 		for _, id in Plants.pieceIds() do hidden[id] = true end
 		for _, part in sill:GetChildren() do
 			local p = part :: BasePart
@@ -22120,14 +23192,14 @@ return function(check)
 		local status = tostring(Lighting:GetAttribute("SunPick"))
 		assert(string.sub(status, 1, 3) == "ok:", "SunPick: " .. status)
 		assert(sun.Z < -0.2 and sun.Y > 0.25, "sun direction " .. tostring(sun))
-		assert(Graphics.window.hidden == "back_frame" and decor:FindFirstChild("Shafts") ~= nil, "no light shafts built")
+		assert(Graphics.window.hidden[1] == "back_frame_west" and decor:FindFirstChild("Shafts") ~= nil, "no light shafts built")
 	end)
 	check("the wall casts shadows, the glass does not", function()
 		local wall = decor:FindFirstChild("Wall") :: Folder
-		assert((wall:FindFirstChild("Apron") :: BasePart).CastShadow and (wall:FindFirstChild("Mullion1") :: BasePart).CastShadow)
+		assert((wall:FindFirstChild("ApronWest") :: BasePart).CastShadow and (wall:FindFirstChild("Mullion1") :: BasePart).CastShadow)
 		local glass = wall:FindFirstChild("Glass") :: BasePart
 		assert(not glass.CastShadow and glass.Transparency >= 0.6 and glass.Material == Enum.Material.SmoothPlastic, "window must not refract away translucent UV petals")
-		assert(not (sill:FindFirstChild(Graphics.window.hidden) :: BasePart).CastShadow, "the invisible wall must not shade the room")
+		assert(not (sill:FindFirstChild(Graphics.window.hidden[1]) :: BasePart).CastShadow, "the invisible wall must not shade the room")
 	end)
 	check("atmosphere, sky, grade, bloom, sun rays and clouds are in place; the macro depth of field is on unless switched off", function()
 		for _, name in { "Atmosphere", "Sky", "Grade", "Bloom", "SunRays" } do assert(Lighting:FindFirstChild(name), "missing " .. name) end
@@ -22158,7 +23230,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="140">
+      <Item class="ModuleScript" referent="141">
         <Properties>
           <string name="Name">GrowthSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -22215,7 +23287,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="141">
+      <Item class="ModuleScript" referent="142">
         <Properties>
           <string name="Name">LifeSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -22391,7 +23463,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="142">
+      <Item class="ModuleScript" referent="143">
         <Properties>
           <string name="Name">NotebookSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -22552,7 +23624,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="143">
+      <Item class="ModuleScript" referent="144">
         <Properties>
           <string name="Name">PeacockSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -22623,7 +23695,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="144">
+      <Item class="ModuleScript" referent="145">
         <Properties>
           <string name="Name">PerceptionSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -22723,7 +23795,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="145">
+      <Item class="ModuleScript" referent="146">
         <Properties>
           <string name="Name">PreySpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -22818,7 +23890,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="146">
+      <Item class="ModuleScript" referent="147">
         <Properties>
           <string name="Name">PromptSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -22920,7 +23992,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="147">
+      <Item class="ModuleScript" referent="148">
         <Properties>
           <string name="Name">RecoveryScenarios</string>
           <string name="Source"><![CDATA[--!strict
@@ -23451,7 +24523,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="148">
+      <Item class="ModuleScript" referent="149">
         <Properties>
           <string name="Name">RivalSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -23519,7 +24591,7 @@ return function(check: (string, () -> ()) -> ())
 			{ "sill_floor", function(w: any): boolean return w.pos.X < 0 and w.pos.Z < -2 end },
 			{ "leaf_west", function(w: any): boolean return w.up.Y > 0.9 end },
 			{ "planter_rim", function(w: any): boolean return w.up.Y > 0.9 end },
-			{ "back_frame", function(w: any): boolean return w.up.Z > 0.9 end },
+			{ "back_frame_west", function(w: any): boolean return w.up.Z > 0.9 end },
 		}
 		for _, t in targets do
 			local goal: any = nil
@@ -23546,7 +24618,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Script" referent="149">
+      <Item class="Script" referent="150">
         <Properties>
           <string name="Name">Runner</string>
           <token name="RunContext">0</token>
@@ -23610,7 +24682,7 @@ if failed > 0 then warn("PORT_TEST_FAIL") end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="150">
+      <Item class="ModuleScript" referent="151">
         <Properties>
           <string name="Name">SettingsSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -23810,7 +24882,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="151">
+      <Item class="ModuleScript" referent="152">
         <Properties>
           <string name="Name">SilkSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -23926,7 +24998,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="152">
+      <Item class="ModuleScript" referent="153">
         <Properties>
           <string name="Name">Spec</string>
           <string name="Source"><![CDATA[--!strict
@@ -24057,7 +25129,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="153">
+      <Item class="ModuleScript" referent="154">
         <Properties>
           <string name="Name">StateFixture</string>
           <string name="Source"><![CDATA[--!strict
@@ -24071,7 +25143,7 @@ return {
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="154">
+      <Item class="ModuleScript" referent="155">
         <Properties>
           <string name="Name">StateSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -24261,7 +25333,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="155">
+      <Item class="ModuleScript" referent="156">
         <Properties>
           <string name="Name">WaspSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -24424,11 +25496,11 @@ end
         </Properties>
       </Item>
     </Item>
-    <Item class="Folder" referent="156">
+    <Item class="Folder" referent="157">
       <Properties>
         <string name="Name">Server</string>
       </Properties>
-      <Item class="ModuleScript" referent="157">
+      <Item class="ModuleScript" referent="158">
         <Properties>
           <string name="Name">DataStoreBackend</string>
           <string name="Source"><![CDATA[--!strict
@@ -24463,7 +25535,7 @@ return DataStoreBackend
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Script" referent="158">
+      <Item class="Script" referent="159">
         <Properties>
           <string name="Name">Main</string>
           <token name="RunContext">0</token>
@@ -24505,22 +25577,32 @@ if not decorOk then
 	warn("[Windowsill] decor failed, the back wall and the Pilea's pieces stay as they were: " .. tostring(decor))
 end
 
+-- ROBLOX-95: the looks of the regions outside the window (the outer sill, the brick wall, the bed), a persistent Model each in `WorldDecor`, best effort like the sill's.
+local looksOk, looksOrError, looksDrawn = pcall(WorldBuild.looks, Workspace, WorldMap.SEED)
+if not looksOk then warn("[Windowsill] decor: the garden's looks failed: " .. tostring(looksOrError)) end
+
 -- Only the pieces whose drawing exists turn invisible (still solid); if the decor failed nothing is hidden. The sill is region 0 of the world: its "Windowsill" folder, exactly
 -- as it was, now inside the `World` folder with every other region's.
 if decorOk then decor.Parent = Workspace end
-WorldBuild.world(Workspace, WorldMap.SEED, if decorOk then replaced else {})
+local hidden: { [string]: boolean } = {}
+if decorOk then for id in replaced do hidden[id] = true end end
+if looksOk then for id in looksDrawn do hidden[id] = true end end
+WorldBuild.world(Workspace, WorldMap.SEED, hidden)
 
 -- With instance streaming on (Workspace.StreamingEnabled, authored in default.project.json) the server sends a client what is near its replication focus, and a player here
--- has no character to be the focus: each gets a small invisible part, parked at the home region's spawn (Server/WorldFocus).
+-- has no character to be the focus: each gets a small invisible part, parked at the home region's spawn (Server/WorldFocus). ROBLOX-95: the spider can leave the sill now, so
+-- the part follows it: the client reports where its spider is through the `WorldFocus` remote (when it has moved 8 studs or every 2 seconds, Client/WorldClient) and the
+-- server moves the part there, if the report is a point inside the world and the player is not reporting more than about ten times a second.
 local foci = Instance.new("Folder")
 foci.Name = "ReplicationFoci"
 foci.Parent = Workspace
 local home = WorldMap.region(WorldMap.HOME) :: WorldMap.Region
 WorldFocus.watch(Players, foci, home.spawn.pos + Vector3.new(0, 0.31, 0))
+WorldFocus.listen(ReplicatedStorage, foci)
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Script" referent="159">
+      <Item class="Script" referent="160">
         <Properties>
           <string name="Name">Persistence</string>
           <token name="RunContext">0</token>
@@ -24614,7 +25696,7 @@ end)
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="160">
+      <Item class="ModuleScript" referent="161">
         <Properties>
           <string name="Name">SaveService</string>
           <string name="Source"><![CDATA[--!strict
@@ -24821,17 +25903,26 @@ return SaveService
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="161">
+      <Item class="ModuleScript" referent="162">
         <Properties>
           <string name="Name">WorldFocus</string>
           <string name="Source"><![CDATA[--!strict
 -- Where the server streams the world to (ROBLOX-94, docs/OPEN_WORLD_DESIGN.md). With Workspace.StreamingEnabled the server sends each client only the instances around
 -- that client's replication focus, and decides it on the server: Player.AddReplicationFocus is documented as server-only, and a property written by a client script is not heard
 -- by the server. A player here has no character (CharacterAutoLoads is off; the spider is the client's own, SpiderRig), so there is no default focus to rely on: each player
--- gets a small invisible anchored part, the focus part, and the server makes it that player's ReplicationFocus. It is parked at the home region's spawn for as long as the
--- world is the sill and the regions around it (everything the spider can reach is inside StreamingMinRadius of it). The round that lets the spider leave the sill moves it with
--- the spider (the client reports where it is; WorldFocus.move). The client also points its own ReplicationFocus at the rig's root (Client/WorldClient), which can only help.
+-- gets a small invisible anchored part, the focus part, and the server makes it that player's ReplicationFocus. It is parked at the home region's spawn when the player joins.
+-- ROBLOX-95: the spider can leave the sill, and the bed under the window is about 115 studs from that spawn, past StreamingMinRadius (96): so the part follows the spider. The
+-- client reports where its spider is through a RemoteEvent the server makes at startup (ReplicatedStorage.WorldFocus, `listen`), when it has moved more than 8 studs since its
+-- last report or 2 seconds have passed (Client/WorldClient); the server checks each report (`report`: a finite Vector3 inside the world's bounds, and no more than about ten
+-- a second from a player; anything else is ignored) and moves the part there. The client also points its own ReplicationFocus at the rig's root, which can only help.
+local WorldMap = require(game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("World"):WaitForChild("WorldMap"))
+
 local WorldFocus = {}
+
+-- The name of the RemoteEvent in ReplicatedStorage the client reports on.
+WorldFocus.REMOTE = "WorldFocus"
+-- The fewest seconds between two reports of a player the server acts on (about ten a second); a report sooner than that after the last one acted on is ignored.
+WorldFocus.MIN_INTERVAL = 0.09
 
 local SIZE = 0.2
 
@@ -24860,7 +25951,7 @@ function WorldFocus.park(player: Player, parent: Instance, at: Vector3): Part
 	return part
 end
 
--- Moves the player's focus part (nothing calls this yet: the spider does not leave the sill). False if the player has none.
+-- Moves the player's focus part (a report that passed `report`'s checks). False if the player has none.
 function WorldFocus.move(player: Player, parent: Instance, to: Vector3): boolean
 	local part = parent:FindFirstChild(partName(player))
 	if part == nil or not part:IsA("Part") then return false end
@@ -24874,6 +25965,48 @@ function WorldFocus.release(player: Player, parent: Instance)
 	if part ~= nil then part:Destroy() end
 end
 
+-- Whether a reported value is a point the server may move a focus to: a Vector3 (the engine's own type; a table sent through the remote is not one), every
+-- component finite, inside the world's bounds (WorldMap.bounds, edges included).
+function WorldFocus.valid(at: any): boolean
+	local meta: any = getmetatable
+	if typeof(at) ~= "Vector3" and not (type(at) == "table" and meta(at) ~= nil and meta(at) == meta(Vector3.zero)) then return false end -- (the second: the CLI shim's Vector3)
+	local x, y, z = at.X, at.Y, at.Z
+	if type(x) ~= "number" or type(y) ~= "number" or type(z) ~= "number" then return false end
+	if x ~= x or y ~= y or z ~= z or math.abs(x) == math.huge or math.abs(y) == math.huge or math.abs(z) == math.huge then return false end
+	local lo, hi = WorldMap.bounds()
+	return x >= lo.X and x <= hi.X and y >= lo.Y and y <= hi.Y and z >= lo.Z and z <= hi.Z
+end
+
+local lastReport: { [Player]: number } = {}
+
+-- A report from a player's client: where its spider is. Moves the player's focus part there and returns true, or ignores it (false) if the value is not a point
+-- inside the world or the player reported less than MIN_INTERVAL seconds ago (`now`: the server's clock, os.clock() unless a test gives one).
+function WorldFocus.report(player: Player, parent: Instance, at: any, now: number?): boolean
+	if not WorldFocus.valid(at) then return false end
+	local t = now or os.clock()
+	local last = lastReport[player]
+	if last ~= nil and t - last < WorldFocus.MIN_INTERVAL then return false end
+	if not WorldFocus.move(player, parent, at :: Vector3) then return false end
+	lastReport[player] = t
+	return true
+end
+
+-- Makes the RemoteEvent the clients report on (ReplicatedStorage.WorldFocus) and moves each player's focus part on its reports. Returns the remote.
+function WorldFocus.listen(storage: Instance, parent: Instance): RemoteEvent
+	local remote = storage:FindFirstChild(WorldFocus.REMOTE)
+	if remote == nil or not remote:IsA("RemoteEvent") then
+		local made = Instance.new("RemoteEvent")
+		made.Name = WorldFocus.REMOTE
+		made.Parent = storage
+		remote = made
+	end
+	local event = remote :: RemoteEvent
+	event.OnServerEvent:Connect(function(player: Player, at: any)
+		WorldFocus.report(player, parent, at)
+	end)
+	return event
+end
+
 -- A focus for every player now in the game and every one who comes, and the part gone when one leaves. `players` is the Players service.
 function WorldFocus.watch(players: Players, parent: Instance, at: Vector3)
 	for _, player in players:GetPlayers() do
@@ -24884,6 +26017,7 @@ function WorldFocus.watch(players: Players, parent: Instance, at: Vector3)
 	end)
 	players.PlayerRemoving:Connect(function(player: Player)
 		WorldFocus.release(player, parent)
+		lastReport[player] = nil
 	end)
 end
 
@@ -24893,19 +26027,19 @@ return table.freeze(WorldFocus)
       </Item>
     </Item>
   </Item>
-  <Item class="StarterPlayer" referent="162">
+  <Item class="StarterPlayer" referent="163">
     <Properties>
       <string name="Name">StarterPlayer</string>
     </Properties>
-    <Item class="StarterPlayerScripts" referent="163">
+    <Item class="StarterPlayerScripts" referent="164">
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="Folder" referent="164">
+      <Item class="Folder" referent="165">
         <Properties>
           <string name="Name">Client</string>
         </Properties>
-        <Item class="ModuleScript" referent="165">
+        <Item class="ModuleScript" referent="166">
           <Properties>
             <string name="Name">CaughtPanel</string>
             <string name="Source"><![CDATA[--!strict
@@ -25029,7 +26163,7 @@ return CaughtPanel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="166">
+        <Item class="ModuleScript" referent="167">
           <Properties>
             <string name="Name">FlyBodies</string>
             <string name="Source"><![CDATA[--!strict
@@ -25286,7 +26420,7 @@ return FlyBodies
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="167">
+        <Item class="ModuleScript" referent="168">
           <Properties>
             <string name="Name">MateStage</string>
             <string name="Source"><![CDATA[--!strict
@@ -25606,7 +26740,7 @@ return MateStage
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="168">
+        <Item class="ModuleScript" referent="169">
           <Properties>
             <string name="Name">NotebookArt</string>
             <string name="Source"><![CDATA[--!strict
@@ -25644,7 +26778,7 @@ return Art
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="169">
+        <Item class="ModuleScript" referent="170">
           <Properties>
             <string name="Name">NotebookPanel</string>
             <string name="Source"><![CDATA[--!strict
@@ -26147,7 +27281,7 @@ return NotebookPanel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="170">
+        <Item class="ModuleScript" referent="171">
           <Properties>
             <string name="Name">OldSkins</string>
             <string name="Source"><![CDATA[--!strict
@@ -26187,7 +27321,7 @@ return OldSkins
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="171">
+        <Item class="ModuleScript" referent="172">
           <Properties>
             <string name="Name">PerceptionHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -26409,7 +27543,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="172">
+        <Item class="ModuleScript" referent="173">
           <Properties>
             <string name="Name">PerceptionStage</string>
             <string name="Source"><![CDATA[--!strict
@@ -26454,7 +27588,7 @@ return Stage
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="173">
+        <Item class="ModuleScript" referent="174">
           <Properties>
             <string name="Name">SaveClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -26579,7 +27713,7 @@ return SaveClient
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="174">
+        <Item class="ModuleScript" referent="175">
           <Properties>
             <string name="Name">SettingsPanel</string>
             <string name="Source"><![CDATA[--!strict
@@ -27280,7 +28414,7 @@ return SettingsPanel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="175">
+        <Item class="ModuleScript" referent="176">
           <Properties>
             <string name="Name">Soundscape</string>
             <string name="Source"><![CDATA[--!strict
@@ -27456,7 +28590,7 @@ return Soundscape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="176">
+        <Item class="ModuleScript" referent="177">
           <Properties>
             <string name="Name">SpiderCamera</string>
             <string name="Source"><![CDATA[--!strict
@@ -28069,7 +29203,7 @@ return SpiderCamera
 ]]></string>
           </Properties>
         </Item>
-        <Item class="LocalScript" referent="177">
+        <Item class="LocalScript" referent="178">
           <Properties>
             <string name="Name">SpiderClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -28206,6 +29340,7 @@ local motor: any = SpiderMotor.new({
 	world = M.World.root, surfaces = Surfaces, profile = Species.phidippus_audax_prototype,
 	spawn = M.World.spawnPos, heading = M.World.spawnHeading,
 	boundsMin = M.World.boundsMin, boundsMax = M.World.boundsMax, probeParent = arc,
+	inBounds = function(p: Vector3): boolean return M.World:inBounds(p) end, -- (ROBLOX-95: out of the world only where no region holds the spider)
 })
 local jump: any = JumpInput.new()
 local carry: any = StickCarry.new()
@@ -28240,6 +29375,8 @@ task.spawn(function()
 	local roots: { Instance } = { Lighting }
 	local decor = Workspace:WaitForChild("Decor", 10)
 	if decor then table.insert(roots, decor) end
+	local looks = M.World.looks or Workspace:WaitForChild("WorldDecor", 10) -- (ROBLOX-95: the looks of the regions outside the window)
+	if looks then table.insert(roots, looks) end
 	local terrain = Workspace:FindFirstChild("Terrain")
 	if terrain then table.insert(roots, terrain) end
 	WorldDetail.apply(detail, roots)
@@ -29643,7 +30780,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
              rivalLegs.drive=rivalLegs.Drive.new(SpiderMotor.new({
               world = M.World.root, surfaces = Surfaces, profile = Species.phidippus_audax_prototype,
               spawn = life.rival.position, heading = life.rival.heading,
-              boundsMin = M.World.boundsMin, boundsMax = M.World.boundsMax, probeParent = arc,
+              boundsMin = M.World.homeMin, boundsMax = M.World.homeMax, probeParent = arc, -- (ROBLOX-95: bound to the sill, its bounds)
              }),sightCast,M.World.home)
             end
             -- A caught rival fights the tapping grip before it can be eaten (ROBLOX-77); it is subdued, or it tears free and recovers (never a harm).
@@ -29679,7 +30816,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
               mateLegs.drive=mateLegs.Drive.new(SpiderMotor.new({
                world = M.World.root, surfaces = Surfaces, profile = Species.phidippus_audax_prototype,
                spawn = mate.position, heading = mate.heading,
-               boundsMin = M.World.boundsMin, boundsMax = M.World.boundsMax, probeParent = arc,
+               boundsMin = M.World.homeMin, boundsMax = M.World.homeMax, probeParent = arc, -- (ROBLOX-95: bound to the sill, its bounds)
               }),sightCast,M.World.home)
              end
              if mateLegs.drive~=nil and mate~=nil then mateLegs.drive:update(mate,DT,ms) end
@@ -29908,7 +31045,7 @@ end
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="178">
+        <Item class="ModuleScript" referent="179">
           <Properties>
             <string name="Name">SpiderEyes</string>
             <string name="Source"><![CDATA[--!strict
@@ -30374,7 +31511,7 @@ return SpiderEyes
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="179">
+        <Item class="ModuleScript" referent="180">
           <Properties>
             <string name="Name">SpiderHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -30720,7 +31857,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="180">
+        <Item class="ModuleScript" referent="181">
           <Properties>
             <string name="Name">SpiderInput</string>
             <string name="Source"><![CDATA[--!strict
@@ -30977,7 +32114,7 @@ return SpiderInput
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="181">
+        <Item class="ModuleScript" referent="182">
           <Properties>
             <string name="Name">WaspBody</string>
             <string name="Source"><![CDATA[--!strict
@@ -31209,7 +32346,7 @@ return WaspBody
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="182">
+        <Item class="ModuleScript" referent="183">
           <Properties>
             <string name="Name">WorldClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -31220,15 +32357,22 @@ return WaspBody
 --                            (the test box worlds, the old places) still works: both are that folder.
 --   which region we are in .. from the spider's place each frame, kept when it is momentarily in none (`region`); the pace of its day (`clockScale`, set on LifeClock's dial each
 --                            frame); and `isActive`, which says whether a creature that belongs to a region is in the region the spider is in. The creatures are regional
---                            (Predator/RivalSpider, Mate and RivalDrive take their region, the sill's unless given); nothing is sent to sleep yet because there is nowhere else to go.
+--                            (Predator/RivalSpider, Mate and RivalDrive take their region, the sill's unless given); nothing is sent to sleep yet: the rival and the mate go on on the
+--                            sill while the spider is outside (ROBLOX-95), and the regions outside have no creatures of their own until W3.
 --   what to stream .......... with instance streaming on, the server sends what is near the player's replication focus. The server parks each player's (Server/WorldFocus): that
 --                            is the focus streaming follows. This also points the player's own ReplicationFocus at the drawn spider's root, when it is made and again after a respawn
 --                            or a return to a rest: a client's write of that property is not expected to reach the server (the docs say to set it there), so it is belt and braces,
 --                            not the mechanism; a write that raises is warned about once and the game goes on. None of this has run in Studio yet.
 -- The sim must never raycast beyond what is streamed in: StreamingMinRadius (96 studs around the focus) is always there, so a region and its neighbours must fit inside it, and a
--- creature is only simulated in the region the spider is in or beside. The sill, the only region now, is inside it from every spot on it.
+-- creature is only simulated in the region the spider is in or beside.
 -- With streaming, the sill's boxes and the drawn sill (the persistent Decor model) arrive after the folders do: `new` waits for every box of the sill and for the Decor, so the
 -- sim begins on a whole sill. Without streaming (the test places, the box worlds) everything is there at once and nothing is waited for.
+-- ROBLOX-95 (W2): the window is open and three regions lie outside it (the outer sill, the brick wall, the bed 90 studs below), the bed farther from the sill's spawn than the
+-- radius. So the focus follows the spider: `update` reports the spider's place to the server through the WorldFocus remote (Server/WorldFocus) whenever it has moved more than
+-- REPORT_MOVE studs from the last report or REPORT_EVERY seconds have passed, and the server moves the player's focus part there. And the client knows whether a region it is
+-- in has arrived whole (`regionReady`: its folder holds every piece of Region.pieces); a spider in a region that is not whole is warned about once per region in Output, since
+-- a missing box is a fall. The looks of the regions outside (WorldDecor, persistent models like the Decor) are waited for as the Decor is. The player's motor is out of the
+-- world only where no region holds it (`inBounds`); the rival's and the mate's are bound to the sill and keep its bounds (`homeMin`, `homeMax`).
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local WorldMap = require(Shared:WaitForChild("World"):WaitForChild("WorldMap"))
@@ -31238,9 +32382,20 @@ local LifeClock = require(Shared:WaitForChild("Life"):WaitForChild("LifeClock"))
 local WorldClient = {}
 WorldClient.__index = WorldClient
 
+-- A line in Output (the engine's warn; the CLI tests that drive the client have none unless they collect them).
+local function tell(message: string)
+	local say: any = warn
+	if say ~= nil then say(message) end
+end
+
 -- How long, in seconds, the sill may take to arrive under streaming before the sim begins without a missing piece (and says so), and the decor may.
 WorldClient.PIECES_WAIT = 30
 WorldClient.DECOR_WAIT = 10
+-- The focus report (ROBLOX-95): sent when the spider is more than this many studs from where it last reported, or this many seconds after the last report.
+WorldClient.REPORT_MOVE = 8
+WorldClient.REPORT_EVERY = 2
+-- The name of the remote the server makes for the reports (Server/WorldFocus.REMOTE).
+WorldClient.REMOTE = "WorldFocus"
 
 -- `ws`: the workspace; `player`: the local player; `map`: the world map (WorldMap, unless a test hands in another with the same functions).
 function WorldClient.new(ws: Instance, player: Instance, map: any?): any
@@ -31257,6 +32412,7 @@ function WorldClient.new(ws: Instance, player: Instance, map: any?): any
 		sill = root:WaitForChild(name)
 	end
 	local decor = ws:FindFirstChild("Decor")
+	local looks = ws:FindFirstChild(Region.LOOKS_FOLDER)
 	if (ws :: any).StreamingEnabled == true then
 		local deadline = os.clock() + WorldClient.PIECES_WAIT
 		for _, piece in Region.pieces(home) do
@@ -31265,13 +32421,59 @@ function WorldClient.new(ws: Instance, player: Instance, map: any?): any
 			end
 		end
 		if decor == nil then decor = ws:WaitForChild("Decor", WorldClient.DECOR_WAIT) end
+		if looks == nil then looks = ws:WaitForChild(Region.LOOKS_FOLDER, WorldClient.DECOR_WAIT) end
 	end
 	return setmetatable({
-		map = m, player = player, root = root, sill = sill, decor = decor,
+		map = m, player = player, root = root, sill = sill, decor = decor, looks = looks,
 		home = home.id, region = home,
 		boundsMin = lo, boundsMax = hi, spawnPos = home.spawn.pos, spawnHeading = home.spawn.heading,
+		homeMin = home.bounds[1], homeMax = home.bounds[2],
 		focused = nil :: Instance?, focusWarned = false,
+		-- the focus report: the remote (found when first needed), where and when the last report was, how many were sent
+		remote = nil :: Instance?, reported = nil :: Vector3?, reportedAt = -math.huge, reports = 0,
+		-- the readiness guard: regions found whole, and regions already warned about
+		whole = {} :: { [string]: boolean }, warned = {} :: { [string]: boolean },
 	}, WorldClient)
+end
+
+-- Whether the point is inside some region's bounds: the player's motor is out of the world only where no region holds it (SpiderMotor's `inBounds`), so a fall from the
+-- sill's room side ends where it always did and a fall from the outer sill goes on down to the bed.
+function WorldClient.inBounds(self: any, pos: Vector3): boolean
+	return self.map.at(pos) ~= nil
+end
+
+-- The folder of a region's physical boxes, or nil while it has not arrived (a place with only the sill straight in the workspace has only the sill's).
+function WorldClient.folderOf(self: any, region: WorldMap.Region): Instance?
+	if region.id == self.home then return self.sill end
+	if self.root == self.sill then return nil end
+	return self.root:FindFirstChild(Region.folderName(region))
+end
+
+-- Whether every box of the region is here: its folder holds every piece of Region.pieces(region). With instance streaming the folders arrive at once and their parts as the
+-- server sends them, so a region can be here in part; the sim must not raycast into it until it is whole. False for a region that is not on the map.
+function WorldClient.regionReady(self: any, id: string): boolean
+	local region = self.map.region(id)
+	if region == nil then return false end
+	local folder = self:folderOf(region)
+	if folder == nil then return false end
+	for _, piece in Region.pieces(region) do
+		if folder:FindFirstChild(piece.id) == nil then return false end
+	end
+	return true
+end
+
+-- Sends the server where the spider is (the WorldFocus remote), when it has moved more than REPORT_MOVE studs from the last report or REPORT_EVERY seconds have passed. True
+-- when it sent one. Without the remote (a place whose server has not made it, the box worlds) nothing is sent.
+function WorldClient.report(self: any, pos: Vector3, now: number): boolean
+	local last = self.reported
+	if last ~= nil and (pos - last).Magnitude <= WorldClient.REPORT_MOVE and now - self.reportedAt < WorldClient.REPORT_EVERY then return false end
+	if self.remote == nil then self.remote = ReplicatedStorage:FindFirstChild(WorldClient.REMOTE) end
+	local remote = self.remote
+	if remote == nil or not remote:IsA("RemoteEvent") then return false end
+	(remote :: RemoteEvent):FireServer(pos)
+	self.reported, self.reportedAt = pos, now
+	self.reports += 1
+	return true
 end
 
 -- The id of the retreat the point is in, in any region, or nil.
@@ -31305,18 +32507,29 @@ function WorldClient.refocus(self: any)
 	self.focused = nil
 end
 
--- Each frame, before the sim's ticks: the region the spider is in, the pace of its day, and the focus on the drawn spider's root (`root`) when it is not set on it yet.
-function WorldClient.update(self: any, pos: Vector3, root: Instance?)
+-- Each frame, before the sim's ticks: the region the spider is in, the pace of its day, the focus on the drawn spider's root (`root`) when it is not set on it yet, the
+-- report of where it is to the server (`now`: os.clock() unless a test gives a clock), and whether the region it is in has arrived whole (warned about once if not).
+function WorldClient.update(self: any, pos: Vector3, root: Instance?, now: number?)
 	self.region = self.map.at(pos) or self.region
 	LifeClock.game.clockScale = self.region.clockScale
 	if root ~= nil and root ~= self.focused then self:focus(root) end
+	self:report(pos, now or os.clock())
+	local id = self.region.id
+	if not self.whole[id] then
+		if self:regionReady(id) then
+			self.whole[id] = true
+		elseif not self.warned[id] then
+			self.warned[id] = true
+			tell(`[Windowsill] world: the spider is in {id}, which has not arrived whole; it may fall through where a box should be`)
+		end
+	end
 end
 
 return WorldClient
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="183">
+        <Item class="ModuleScript" referent="184">
           <Properties>
             <string name="Name">WorldDetail</string>
             <string name="Source"><![CDATA[--!strict
@@ -31356,7 +32569,7 @@ return WorldDetail
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="184">
+        <Item class="ModuleScript" referent="185">
           <Properties>
             <string name="Name">SilkPlayback</string>
             <string name="Source"><![CDATA[--!strict
@@ -31883,7 +33096,7 @@ end
       </Item>
     </Item>
   </Item>
-  <Item class="Workspace" referent="185">
+  <Item class="Workspace" referent="186">
     <Properties>
       <string name="Name">Workspace</string>
       <float name="Gravity">35</float>

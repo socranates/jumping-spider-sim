@@ -36,6 +36,23 @@ local function voice(parent: Instance, name: string, volume: number, looped: boo
 	s.Parent = parent
 	return s
 end
+-- ROBLOX-100: how the music's recording fared, written once to Output for whoever is looking (Studio, the PC's F9 console): the asset's fetch status from
+-- ContentProvider when it has one, and, if the music has still not loaded after MUSIC_LOAD_WARN_S seconds of being asked to play, that too. Nothing on screen.
+Soundscape.MUSIC_LOAD_WARN_S = 20
+local function reportMusicLoad(music: Sound)
+	local okService, provider = pcall(function() return game:GetService("ContentProvider") end)
+	if not okService or provider == nil or typeof((provider :: any).PreloadAsync) ~= "function" then return end
+	task.spawn(function()
+		local ok, err = pcall(function()
+			(provider :: any):PreloadAsync({ music }, function(id: string, status: Enum.AssetFetchStatus)
+				if status ~= Enum.AssetFetchStatus.Success then
+					warn(`[Windowsill] music: {id} did not load ({tostring(status)}); check the asset's moderation and that it is granted to this experience`)
+				end
+			end)
+		end)
+		if not ok then warn("[Windowsill] music: the load report failed: " .. tostring(err)) end
+	end)
+end
 function Soundscape.new(parent: Instance): any
 	local root = Instance.new("Folder")
 	root.Name = "WindowsillAudio"
@@ -46,8 +63,10 @@ function Soundscape.new(parent: Instance): any
 	emitter.Transparency = 1; emitter.Size = Vector3.new(0.1, 0.1, 0.1); emitter.Parent = root
 	local hum = voice(emitter, "wasp", MIX.hum, true)
 	hum.RollOffMinDistance = 16; hum.RollOffMaxDistance = 120
+	local music: Sound? = if IDS.music ~= "" then voice(root, "music", MIX.music, true) else nil
+	if music ~= nil then reportMusicLoad(music) end
 	return setmetatable({ root = root, room = voice(root, "room", MIX.room, true),
-		music = if IDS.music ~= "" then voice(root, "music", MIX.music, true) else nil, musicVolume = 1, duck = 1, duckTarget = 1, swell = 1, swellWanted = false,
+		music = music, musicVolume = 1, duck = 1, duckTarget = 1, swell = 1, swellWanted = false, musicAsked = 0, musicWarned = false,
 		waspEmitter = emitter, waspHum = hum, master = 1, ambience = 1, creatures = 1,
 		birds = voice(root, "birds", MIX.birds, false), slots = {}, elapsed = 0, nextBird = 8 }, Soundscape)
 end
@@ -63,8 +82,9 @@ function Soundscape.setVolumes(self: any, master: number, ambience: number, crea
 end
 local function playing(s: Sound, wanted: boolean)
 	if wanted then
-		-- (ROBLOX-92: a recording that has not loaded yet cannot play; asking it every frame only restarts the request. The stubs of the CLI tests have no IsLoaded, and are loaded.)
-		if (s.IsLoaded :: any) == false then return end
+		-- A recording that has not loaded yet is asked to play once and plays when it has loaded: Play and Resume set Playing at once, so the next frame
+		-- asks nothing more. ROBLOX-100: the audit's gate on IsLoaded (ROBLOX-92) is gone; the engine is known to leave IsLoaded false for audio that
+		-- loads and plays (devforum 2654049), and the gate then kept the music from ever being asked to play, which is the silence Nathan heard.
 		if not s.Playing then s:Resume(); if not s.Playing then s:Play() end end
 	elseif s.Playing then s:Pause() end
 end
@@ -85,6 +105,14 @@ function Soundscape.update(self: any, dt: number, prey: any, daylight: number, p
 	if music then
 		music.Volume = MIX.music * self.master * self.musicVolume * self.duck * self.swell
 		playing(music, audible)
+		-- (ROBLOX-100: a music that has been asked to play for MUSIC_LOAD_WARN_S seconds and still says it has not loaded is reported once, in Output only.)
+		if audible and not self.musicWarned then
+			self.musicAsked += dt
+			if self.musicAsked >= Soundscape.MUSIC_LOAD_WARN_S and (music.IsLoaded :: any) == false then
+				self.musicWarned = true
+				warn(`[Windowsill] music: {music.SoundId} has not loaded after {Soundscape.MUSIC_LOAD_WARN_S} s (IsLoaded false); it plays when it loads, if it loads`)
+			end
+		end
 	end
 	if not audible or daylight < 0.3 then self.birds:Stop() end
 	if audible then

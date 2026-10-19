@@ -6,16 +6,25 @@ local Silk = {}
 Silk.__index = Silk
 local HEIGHT, RADIUS = 0.31, 0.30
 local DOWN = Vector3.new(0,-1,0)
+-- The game's own rule (ROBLOX-99), opt-in like NeedsModel.game and Data/Catch.game: how fast the spider lets itself down a line, as a share of Godot's
+-- reel speed (Species silk.reel_speed_wu_s, 1.5 studs a second either way). Nathan: "make the hang just go slower by default". Lowering (the stick back, or
+-- the drop key held) runs at `lowerScale` of it; reeling in keeps Godot's speed, so the climb back is as brisk as it was and the rig's head-up climb
+-- (look.hang.climb.speed) still trips. A controller never given the rule (Silk:useGameRules) replays Godot: the tether goldens and the box-world scenarios.
+Silk.game = { lowerScale = 0.5 }
 
 function Silk.new(world, surfaces, tuning, gravity: number)
 	local params = RaycastParams.new()
 	params.FilterType = Enum.RaycastFilterType.Include
 	params.FilterDescendantsInstances = {world}
 	return setmetatable({world=world, surfaces=surfaces, params=params, maximum=tuning.max_line_length_wu,
-		speed=tuning.reel_speed_wu_s, gravity=gravity, mode="none", paid=0, rest=0, taut=false,
+		speed=tuning.reel_speed_wu_s, lowerSpeed=tuning.reel_speed_wu_s, gravity=gravity, mode="none", paid=0, rest=0, taut=false,
 		anchor=Vector3.zero, normal=Vector3.yAxis, anchorPart=nil, bend=nil, bendPart=nil,
 		lowering=false, snagged=false, block="", message="", release=Math.newRelease(), walk=nil,
 		previous=Vector3.zero},Silk)
+end
+-- Opt in to the game's lowering (Silk.game): the let-down at lowerScale of the reel speed. Reeling in is untouched.
+function Silk.useGameRules(self: any)
+	self.lowerSpeed = self.speed * Silk.game.lowerScale
 end
 function Silk.profile(self: any, hit)
 	return if hit then self.surfaces[hit.Instance:GetAttribute("ProfileId")] else nil
@@ -177,7 +186,8 @@ function Silk.step(self: any, position: Vector3, velocity: Vector3, intent: numb
 	end
 	if intent<=0 and self.block=="blocked" then self.block="" end
 	local oldRest=self.rest
-	if intent<0 or (self.block=="" and not self.snagged) then self.rest=Math.reel(self.rest,self:prefix(),self.maximum,intent,self.speed) end
+	-- (ROBLOX-99: letting down runs at the game's lowering speed, reeling in at Godot's; both are the reel speed until useGameRules.)
+	if intent<0 or (self.block=="" and not self.snagged) then self.rest=Math.reel(self.rest,self:prefix(),self.maximum,intent,if intent<0 then self.lowerSpeed else self.speed) end
 	-- "Shortest" only when a reel actually ran and could not shorten (Godot sets it inside its not-snagged reel branch);
 	-- a snag while swinging under a leaf must not leave reeling refused once the line is clear again (ROBLOX-10).
 	if intent>0 and not self.snagged and self.rest>=oldRest-1e-6 and self.block=="" then self.block="shortest" end

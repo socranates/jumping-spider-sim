@@ -196,6 +196,7 @@ local waspBody = WaspBody.new(Workspace)
 -- switch the model to the gentle rules in applyRules, ROBLOX-91). Feeding grants into the same model. The loop keeps the rest, sleep, daylight and the eyes' reach.
 local needs = NeedsModel.new(true, false)
 needs:useGameRules()
+motor:useGameRules() -- the let-down on a line at half Godot's reel speed (ROBLOX-99, SilkController.game); reeling in keeps its speed
 prey.feeding.needs = needs
 prey.feeding:useGameRules() -- an easier tap on a struggling fly (ROBLOX-72, Data/Catch.game), scaled by the prey's size (ROBLOX-77); Godot's numbers stay Feeding's defaults
 rivalLegs.grip = rivalLegs.Grip.new(needs) -- the grip on a caught rival (ROBLOX-77): its own controller, so the fly's is never disturbed

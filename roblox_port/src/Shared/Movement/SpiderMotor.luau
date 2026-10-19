@@ -321,6 +321,11 @@ function Motor.setSpeedFactor(self: any, speed: number)
  self.speedFactor=math.clamp(speed,0.1,1)
 end
 
+-- Opt in to the game's own rules on the line (ROBLOX-99, SilkController.game): the let-down at half Godot's reel speed. A motor never given them replays Godot.
+function Motor.useGameRules(self: any)
+ self.silk:useGameRules()
+end
+
 function Motor.aimPlan(self: any): any
 	local hit = self:_ray(self.aimOrigin, self.aimDirection * AIM_RANGE)
 	local key = if hit

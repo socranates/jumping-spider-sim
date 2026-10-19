@@ -136,6 +136,42 @@ holding. As design:
   a widget: the HUD stays the hunger bar, the day line and a caption. Reminders come from the world.
 - **MMO direction**: the server-built, seeded world is the groundwork; player spiders replicate in a later round.
 
+## Nathan's direction, continued (2026-10-19, playing v30 on the PlayStation)
+
+In his words, with two screenshots of a peacock on a leaf and a greenbottle hanging under the Pilea while the wasp works the planter and the
+rival waits on its wall: "I should be worried about hunger and watching out for the predators"; "the beautiful scenery and imminence of
+death"; "you should want to explore but have to truly weigh the cost"; "a rival spider after me while I'm slow from moulting is amazing";
+"vulnerability and predation"; "being perched up high avoiding predators and hiding under leaves"; "scared I won't make it home at night";
+"points of man I gotta catch this fly or I'm gonna die, trying to be patient watching your life drain"; "then you hear a wasp"; "that's
+exploration you gotta earn"; "you get time to enjoy the scenery because you are desperately ensuring that predator doesn't sneak up on you";
+"trap door or funnel web spiders"; and of the scene itself, "scenes like this but with beautiful rich detail". As design:
+
+- **Cover and height are real** (W3/W4). Predators hunt by sight lines, as the wasp already does: the underside of a leaf is cover from the
+  wasp and from anything above; a high perch is out of reach of the ground hunters and gives the earliest view of what is coming, at the
+  price of exposure to the sky. The spider is hidden when no predator's line of sight reaches it; standing still halves the chance of
+  being noticed, moving in the open doubles it (the rival's notice logic, generalised). Nothing on the HUD says "hidden": the spider's
+  own senses (the rear eyes, the hum, the shadow) are the readout, and the notebook explains how a wasp sees.
+- **Home before dark** (W4). Night in the garden is the garden's own danger: a spider still out at dusk must reach any retreat or pass the
+  night exposed, and in Normal an exposed night is a real risk (a seeded draw against the ground hunters, the cold, a bird at dawn). Dusk
+  is told by the light and the day line, nothing else. The sill's crack and the stone in the bed are the first two homes; a silk retreat
+  spun where the spider rests three nights is the territory round's.
+- **Ambush at ground level** (W3+). Trapdoor spiders under the soil and funnel-web spiders in the grass are the garden's traps: a burrow
+  lid and a funnel sheet that the eye can learn to read, a lunge when stepped on or walked past within reach, an escape that exists (the
+  jump, the line). They are regional, seeded, and never on the sill. Each gets its sourced page.
+- **Several rivals** (W3/W4). A rival male per two or three regions, each with its own route and its own days; two may meet the player in
+  one afternoon and one may follow across a seam. A rival that finds a moulting spider is the moment Nathan named: the soft-skin window is
+  when the rival notices most.
+- **The look: beautiful rich detail.** The scenes are composed right (hiding under a leaf, the wasp on the planter, the rival on the wall);
+  what they lack is richness. The garden's generators are built for it from the start, within the part budgets: Roblox's own PBR
+  materials for soil, bark, stone and terracotta instead of flat colour; real leaf shape (a drawn rim, veins, a curl, a lighter underside,
+  as the Pilea has) for every plant; weathering and litter everywhere the eye rests; Terrain as the backdrop under the walkable boxes (soil,
+  grass with its animated blades) where it costs no parts, never as a surface the motor walks; meshes from the Creator Store built on the
+  server where `InsertService:CreateMeshPartAsync` allows, for stones and leaves that boxes cannot be; textures and sounds uploaded through
+  Nathan's browser, the way the music was. The sill gets the same pass when the window opens (W2), so the old home is not the plain one.
+  The previewer judges shape and placement only; richness is judged in Studio and on the television.
+- **Quiet HUD, continued** (W5). In the screenshot three "lost sight" labels stack on the soil: the perception captions must not pile up
+  (one at a time, the newest wins, gone in a breath), and nothing is added for the garden but the region's name on the day line.
+
 ## The four pillars, as rounds
 
 1. **Free-roam survival everywhere** (this round and the next): regions, streaming, nav per region, retreats anywhere,

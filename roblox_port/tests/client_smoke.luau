@@ -43,6 +43,10 @@ check("the client loads, binds every action and runs 120 frames", function()
 	assert(gui:FindFirstChild("SpiderHud") and gui:FindFirstChild("SpiderPrompts") and gui:FindFirstChild("SpiderTouch"), "HUD missing")
 	assert(math.abs(spider().Y - 0.31) < 0.05, `spawned at {spider()}`)
 end)
+check("the client lets down on its line at half Godot's reel speed and reels in at Godot's (ROBLOX-99)", function()
+	local motor = ClientStubs.driver.motor
+	assert(math.abs(motor.silk.lowerSpeed - 0.75) < 1e-9 and math.abs(motor.silk.speed - 1.5) < 1e-9, `lowerSpeed {motor.silk.lowerSpeed} speed {motor.silk.speed}`)
+end)
 check("with no last rest yet, Backspace goes back to the start and says why", function()
 	key("Reset", true); frames(1); key("Reset", false); frames(2)
 	assert(string.find(find("SpiderPrompts", "Toast").Text, "No last rest yet", 1, true), find("SpiderPrompts", "Toast").Text)
@@ -490,14 +494,15 @@ check("wasp hum lasts through arrival, pauses, follows slow motion and silences 
 	local kids = s.root:GetChildren()
 	assert(kids[#kids] == later and s.waspHum.Parent == s.root, "the hum was not re-parented while it stays where it is")
 	later:Destroy()
-	-- ... and a recording that has not loaded is not asked to play, every frame; once it has, it plays
+	-- ... and a recording that has not loaded is asked to play once, not every frame (ROBLOX-100: the audit's gate on IsLoaded is gone, the engine can leave
+	-- IsLoaded false for audio that plays; Playing is set at once by the one ask, so the next frames ask nothing more)
 	local cold = Soundscape.new(workspace)
 	;(cold.waspHum :: any).IsLoaded = false
 	cold:updateWasp(d, false, 1, false)
-	assert(not cold.waspHum.Playing, "an unloaded hum is left alone")
-	;(cold.waspHum :: any).IsLoaded = true
-	cold:updateWasp(d, false, 1, false)
-	assert(cold.waspHum.Playing, "and plays once it has loaded")
+	assert(cold.waspHum.Playing, "an unloaded hum is asked to play, and plays when it loads")
+	local plays = (cold.waspHum :: any).plays
+	cold:updateWasp(d, false, 1, false); cold:updateWasp(d, false, 1, false)
+	assert((cold.waspHum :: any).plays == plays, "a hum already asked to play is not asked again each frame")
 	cold:destroy()
 	s:updateWasp(d, true, 0.5, false); assert(not s.waspHum.Playing)
 	s:updateWasp(d, false, 0.5, false); assert(s.waspHum.Playing and s.waspHum.PlaybackSpeed == 0.5)

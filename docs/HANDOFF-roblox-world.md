@@ -65,4 +65,18 @@ exactly as v30 does; the whole point of W1 is that nothing a player can see has 
 - Whether a rest in a retreat should remember the retreat as the home (it does: `world_map.retreat`), and whether the first garden home should be
   the stone in bed_a as the design says.
 
+## Two small ones from the PlayStation (ROBLOX-99, ROBLOX-100), same bundle
+
+- **ROBLOX-99 — the hang goes slower.** Nathan: "make the hang just go slower by default and the mechanic would work perfect". Letting down on
+  the line now runs at half Godot's reel speed (`SilkController.game.lowerScale` = 0.5, so 0.75 studs a second; reeling in keeps 1.5). The dial
+  is one number; Godot's defaults, the tether goldens and your silk spec are untouched. Feel it on a pad: a drop from the frame, the drop key
+  held, the stick back, the climb back up.
+- **ROBLOX-100 — the music plays again.** Nathan: "also i cant hear the music" (v30). The audit's gate on `Sound.IsLoaded` in `Soundscape`'s
+  `playing()` helper is gone (the engine can leave `IsLoaded` false for audio that plays — devforum 2654049 — and the gate then never asked the
+  music to play); the helper is v29's again. Two Output-only reports were added: a `ContentProvider:PreloadAsync` status for the music at
+  startup (warns unless `Success`), and a one-time warning if the music has been asked to play for 20 s with `IsLoaded` still false. **Check in
+  Studio and on the PC client**: Output after Play should carry no `[Windowsill] music:` line, and `workspace.WindowsillAudio.music.IsPlaying`
+  should be true with `TimePosition` advancing. If a `did not load` line appears, the asset is the problem (moderation, the grant to universe
+  10771103250), not the code.
+
 *(W2 — beyond the glass, W3 — garden life, W4 — nature's rules and W5 — no hand holding will be appended here as they land.)*

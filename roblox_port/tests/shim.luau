@@ -258,9 +258,9 @@ function Object.GetAttributeChangedSignal(o, name)
 	return sig
 end
 -- Sound transport only; the shim cannot verify asset loading or audible output.
-function Object.Play(o) o.Playing = true; o.TimePosition = 0 end
+function Object.Play(o) o.Playing = true; o.TimePosition = 0; rawset(o, "plays", (rawget(o, "plays") or 0) + 1) end
 function Object.Pause(o) o.Playing = false end
-function Object.Resume(o) o.Playing = true end
+function Object.Resume(o) o.Playing = true; rawset(o, "plays", (rawget(o, "plays") or 0) + 1) end -- (`plays` counts the asks to play, ROBLOX-100)
 function Object.Stop(o) o.Playing = false; o.TimePosition = 0 end
 function Object.GetAttribute(o, k) return rawget(o, "_attrs")[k] end
 function Object.Destroy(o)

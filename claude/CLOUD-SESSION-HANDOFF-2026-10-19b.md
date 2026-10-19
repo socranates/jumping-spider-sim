@@ -19,9 +19,8 @@ Your jobs, in order:
    `compile` 143/143, `python3 tests/run.py $HOME/luau/luau worldmap.luau` passes (191).
 2. W3 (garden life, ROBLOX-96) FINISHED after this file was first written: commit b5c651d, merged as d741e1f, all 38 suites green
    (134,083 checks), strict clean, 146/146 compile; the places were rebuilt at the commit after the merge (evidence in
-   `tests/studio/BuildInfo.luau`). If the session that wrote this did not manage to publish it (check `claude-playtest/README-sill.txt`
-   on the PC for a v33 note, and the Output's "Add publish notes to" counter: v34 means v33 went out), publish it as **v33** by the route
-   below: nothing of W3 has run in Studio. The W3 helper's open items for Nathan are in `docs/HANDOFF-roblox-world.md` (W3 section):
+   `tests/studio/BuildInfo.luau`). It WAS published as **v33** at 12:41 PC time (Roblox's counter v34); README-sill.txt and the bundle on the PC
+   are current. Nothing of W3 has been walked in Studio beyond the publish route's spot checks. The W3 helper's open items for Nathan are in `docs/HANDOFF-roblox-world.md` (W3 section):
    prey and woodlouse counts (6/4), the 100-stud line (`SilkController.game.maxLine`, needed for the 90-stud let-down), whether woodlice
    should show to the senses, whether aphids should wander the plant; and the page's sources could not be opened from the container
    (DNS refused), so they rest on abstracts: open them in a session that can and correct the page if needed.
@@ -39,7 +38,7 @@ passwords; Nathan logs in himself." "Use 'continue', not 'try again'." "No Publi
 - GitHub `socranates/jumping-spider-sim`: branch `claude/new-session-lqh973` = the Roblox line (main ce64498 + 49 commits + this
   handoff's docs commit); draft PR #31 describes it. Branch `claude/w3-wip` = W3's unfinished tree. The old PC-bundle route still
   works (`claude-playtest/claude-sill.bundle` = e092fc4) but is no longer needed.
-- Playtest is live at **v32** (Roblox's own counter reads v33; our numbering is one behind it). v31 and v32 both went out 2026-10-19.
+- Playtest is live at **v33** (W3; Roblox's own counter reads v34; our numbering is one behind it). v31, v32 and v33 all went out 2026-10-19.
 - Nathan has not played v31 or v32 yet as of this handoff; the open questions for him are in `docs/HANDOFF-roblox-world.md` (W2) and
   in the direction section of the design.
 - Tonight's direction (all recorded in `docs/OPEN_WORLD_DESIGN.md` "Nathan's direction (2026-10-19, evening)"): the peacock replaces

@@ -152,6 +152,7 @@ local first = {
 		legBlack = 0.4, -- the share of the blackest tone on the legs (the rest is dark; white over the pale bands)
 		legLift = { 15, 26 }, -- a leg's hairs lie at this angle off the leg, pointing down it toward the foot
 		legTip = 0.08, -- the share of the legs' hairs with the greyer cast
+		hipBare = { 0.6, 0.6, 0, 0 }, -- ROBLOX-93: the share of each pair's femur, from the hip, that has no hair (the hairs are spread over the rest): legs I and II start at the face, where the anterior lateral eyes are, and a walking leg I swings past them
 	},
 
 	-- ---------------------------------------------------------------- idle motion (drawn rig only, ROBLOX-13)
@@ -187,7 +188,7 @@ local first = {
 		-- The mating scene's two cues (ROBLOX-89; both spiders, ART). Meet: legs I go to `reach` (the body frame, studs: out in front of the head and a little off the floor, the
 		-- knee out and up) and the palps lift `palpLiftDeg` and turn `palpYawDeg` toward the midline, in `riseSeconds`, held, and out over `fallSeconds`, for the cue's `seconds`. Settle:
 		-- the body sinks `lower` studs and the breath is `breath` times as deep, the same way. Grooming and the accents give way to both (the breath goes on).
-		meet = { seconds = 4.0, riseSeconds = 0.8, fallSeconds = 0.8, reach = { x = 0.14, y = -0.02, z = -0.74, kneeOut = 0.08, kneeUp = 0.16 }, palpLiftDeg = 12, palpYawDeg = 8 },
+		meet = { seconds = 4.0, riseSeconds = 0.8, fallSeconds = 0.8, reach = { x = 0.14, y = -0.02, z = -0.74, kneeOut = 0.12, kneeUp = 0.16 }, palpLiftDeg = 12, palpYawDeg = 8 }, -- (ROBLOX-93: kneeOut 0.08 to 0.12, the knees stand out wide enough for the legs to clear the face)
 		settle = { seconds = 4.0, riseSeconds = 0.8, fallSeconds = 0.8, lower = 0.035, breath = 1.6 },
 	},
 
@@ -361,7 +362,7 @@ local volans = {
 		breathe = { period = 3.0, bodyLift = 0.003, lift = 0.008, pitchDeg = 2.4 },
 		tilt = { rollDeg = 7, yawDeg = 6, pitchDeg = 3.5, periods = { 9.1, 5.3, 11.3, 6.7, 8.3 } },
 		-- The mating scene's cues (ROBLOX-89): the first spider's, at this spider's size (0.47): no grooming, no alarm, but the reach and the settle.
-		meet = { seconds = 4.0, riseSeconds = 0.8, fallSeconds = 0.8, reach = { x = 0.066, y = -0.01, z = -0.35, kneeOut = 0.04, kneeUp = 0.075 }, palpLiftDeg = 12, palpYawDeg = 8 },
+		meet = { seconds = 4.0, riseSeconds = 0.8, fallSeconds = 0.8, reach = { x = 0.066, y = -0.01, z = -0.35, kneeOut = 0.056, kneeUp = 0.075 }, palpLiftDeg = 12, palpYawDeg = 8 }, -- (the first spider's kneeOut 0.12 at this size)
 		settle = { seconds = 4.0, riseSeconds = 0.8, fallSeconds = 0.8, lower = 0.016, breath = 1.6 },
 	},
 
@@ -431,6 +432,7 @@ local rivalFuzz: any = {
 	legWidth = 0.0125,
 	legTransparency = 0.2,
 	legBlack = 0.4, -- the share of the blackest tone on the legs (the rest is dark; white over the pale bands)
+	hipBare = { 0.6, 0.6, 0, 0 }, -- ROBLOX-93: as the first spider's
 }
 rival.fuzz=rivalFuzz;rival.gloss=nil
 rival.palp=table.clone(first.palp);rival.palp.fluff={ hairs = 7, length = 0.055, width = 0.012, flat = 0.7, transparency = 0.15 } -- (ROBLOX-85 made the first spider's palp fluff finer)
@@ -633,7 +635,7 @@ local function tarantula(o: any): any
 		palpForm = { split = 0.58, taper = 0.78 },
 		-- Larger fangs than the first spider's, one segment each, under the chelicerae and pointing forward (and a little down).
 		fang = { x = 0.075, y = -0.175, z = -0.525, reflectance = 0.2, color = hex(0x2B1A12), segments = { { dir = { -0.04, -0.34, -0.94 }, length = 0.105, radius = 0.019 } } },
-		frontLegScale = 1.1,
+		frontLegScale = o.frontLegScale or 1.1, -- (the greenbottle's first legs are a tenth heavier again: ROBLOX-93)
 		bandFraction = o.bandFraction,
 		speckleCount = 0, spots = {}, band = { count = 0, step = 0.1, z = 0, rx = 0.01, rz = 0.01 }, speckle = { from = 0.4, step = 0.1, rx = 0.004, rz = 0.005 },
 		-- Bodies in addition to the first spider's four: the rim, and two spinnerets of two segments behind the abdomen (the second segment is full
@@ -710,7 +712,7 @@ local greenbottle = tarantula({
     id = "chromatopelma_cyaneopubescens", name = "Greenbottle blue (Chromatopelma cyaneopubescens)",
     core = 0x1E8062, rim = 0x2A9A7E, tubercle = 0x16285C, abdomen = 0xC4551C, spinneret = 0x3A2418, fangs = 0x308E94,
     leg = 0x1E3F8F, femur = 0x1E3F8F, tibia = 0x1E3F8F, tarsus = 0x1E3F8F, knee = 0x2E62C4, ankle = 0x2E62C4, palpBand = 0x2E62C4, palpTip = 0x2E62C4,
-    gloss = 0.14, legGloss = 0.10, legThickness = 1.12 * 1.15, bandFraction = 0.24,
+    gloss = 0.14, legGloss = 0.10, legThickness = 1.12 * 1.15, frontLegScale = 1.1 * 1.1, bandFraction = 0.24,
     headRadii = { 0.280, 0.120, 0.270 }, rimRadii = { 0.322, 0.105, 0.316 }, rimUp = 0.010,
     abdomenRadii = { 0.245, 0.195, 0.300 },
     marks = {

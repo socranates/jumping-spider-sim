@@ -37,6 +37,30 @@ local made = 0 -- rigs made so far: each one's living motion draws from its own 
 local ANKLE_SHARE = 0.62
 -- The groups a fixed part follows: the body, the head (tilts about the neck) or the abdomen (breathes).
 local G_BODY, G_HEAD, G_ABDOMEN = 0, 1, 2
+-- Drawing only what moved (ROBLOX-93). The hairs follow one frame each (the head's, the abdomen's, a palp's, a leg link's) and are sent to the engine in a second
+-- batch, after the body's: a kind of hair is placed again only when its frame has moved by more than MOVE_STUDS (a place, studs) or MOVE_RADIANS (a turn) since it
+-- was last placed, or when the abdomen's scale (its condition, its breath) has moved by more than SCALE_STEP. The tolerance is measured from where the hairs were last
+-- placed, not from the last frame, so a slow drift cannot hide: it is placed again once it has added up. (The body's batch is every frame as it was.)
+local MOVE_STUDS, MOVE_RADIANS, SCALE_STEP = 1e-4, 1e-3, 1e-4
+-- A leg's pale band is given a new length only when it is more than BAND_STEP off (the rods' own tolerance), so a leg that stands still writes none.
+local BAND_STEP = 1e-3
+local MOVE_TURN = MOVE_RADIANS * MOVE_RADIANS -- (3 minus the trace of the relative rotation is about the turn's square)
+-- A rival or a mate farther than FAR_STUDS from the camera is drawn once every FAR_SECONDS (SpiderRig.drawStep).
+local FAR_STUDS, FAR_SECONDS = 25, 0.1
+-- The lengths of a reach to a foothold, tried in turn (a narrow edge takes the shorter ones).
+local REACHES = { 1.0, 0.65, 0.35, 0.12 }
+local LEG_NAMES = { "femur", "tibia", "tarsus" }
+
+-- One leg hair: its part and where it grows (spec), with what the drawing needs of it worked out once (ROBLOX-93): the angle round the leg as a cosine and a sine,
+-- how far out of the leg it grows (k: 0.8 of the radius, or 1 for a coat that lies along the leg) and its direction in the link's frame.
+type LegHair = { part: Part, spec: Setae.LegHair, c: number, s: number, k: number, dir: Vector3 }
+-- One link of a leg (femur, tibia, tarsus): its rod, the thinner tip rod and the pale band it may have, the length each is drawn at and the diameters of the rods (what
+-- the part's Size holds; kept here so a frame reads no property), the hairs on it, and where they were last placed (its frame and length).
+type Seg = {
+	rod: Part, tip: Part?, band: Part?, hairs: { LegHair },
+	x: number, tipX: number, bandX: number, dy: number, dz: number, tipDy: number, tipDz: number,
+	rc: CFrame, len: number,
+}
 
 type Leg = {
 	side: number,
@@ -61,15 +85,34 @@ type Leg = {
 	bands: {Part}, -- empty for a pair drawn without pale bands (the peacock spider's legs III)
 	hangKnee: Vector3?, -- where the hanging pose puts the knee and the ankle this frame (world space), or nil off the line (ROBLOX-86)
 	hangAnkle: Vector3?,
-	hairs: { { part: Part, spec: Setae.LegHair } },
+	hairs: { LegHair },
+	segs: { Seg }, -- the femur, the tibia, the tarsus
+	rest: Vector3, hip: Vector3, -- where the foot rests and where the hip is, in the body frame at the rig's scale (worked out when the scale changes, not every frame)
+	noise: { number }?, -- the hanging pose's fixed scatter for this leg (six numbers), made the first time it hangs
 }
 
-type Fixed = { part: Part, offset: CFrame, group: number, palp: number?, sweep: number?, glance: boolean?, big: boolean? } -- (glance: a principal eye or its catchlight, which shifts toward what is watched; big: an abdomen mass that is resized as it breathes)
+-- (glance: a principal eye or its catchlight, which shifts toward what is watched; big: an abdomen mass that is resized as it breathes.) `pos` and `rot` are the offset's
+-- two halves, `scaled` the offset at the rig's scale, `size0` the part's size at scale 1 and `size` the size it has now (ROBLOX-93: kept here, so a frame reads no property).
+type Fixed = {
+	part: Part, offset: CFrame, group: number, palp: number?, sweep: number?, glance: boolean?, big: boolean?,
+	pos: Vector3, rot: CFrame, scaled: CFrame, size0: Vector3, size: Vector3,
+}
+
+-- The parts of one BulkMoveTo and where each goes: a rig makes two a frame, the body's and the hairs' (the hairs' only when they moved).
+type Batch = { parts: { BasePart }, frames: { CFrame }, n: number }
+
+-- Where each group of hairs, and each size that follows the abdomen's condition, was last placed (see MOVE_STUDS): the frame it followed, the abdomen's breath then,
+-- the condition its sizes were made for and the scale epoch they were made at.
+type Seen = {
+	body: CFrame, head: CFrame, abdomen: CFrame, palpHead: { CFrame }, pivot: { CFrame },
+	breath: number, sizeKey: Vector3, epoch: number,
+}
 
 -- The peacock spider's fan: flat ellipsoid discs on the abdomen's back face, stacked fringe first, their size set each frame by how far the fan is open.
+-- (`sizes`: what each part's Size holds, kept here so that a frame reads none and writes only what changed.)
 type FanDisc = { part: Part, inset: number, y: number }
 type FanFigure = { part: Part, x: number, z: number, rx: number, rz: number, angle: number }
-type Fan = { front: { FanDisc }, back: { FanDisc }, figure: { FanFigure }, flaps: { { part: Part, side: number } }, cfg: any, parts: { Part } }
+type Fan = { front: { FanDisc }, back: { FanDisc }, figure: { FanFigure }, flaps: { { part: Part, side: number } }, cfg: any, parts: { Part }, sizes: { [BasePart]: Vector3 } }
 
 export type Rig = typeof(setmetatable(
 	{} :: {
@@ -94,8 +137,19 @@ export type Rig = typeof(setmetatable(
 		_bodyHidden: boolean,
 		_highlight: Highlight?,
 		_params: RaycastParams,
-		_parts: { BasePart },
-		_cframes: { CFrame },
+		_bodyBatch: Batch, -- the body's parts and where they go this frame
+		_hairBatch: Batch, -- the hairs that moved this frame (none when nothing did)
+		_bodyFixed: { Fixed }, -- _fixed without the hairs; the hairs by the frame they follow (the head, the body, each palp, the abdomen)
+		_headHairs: { Fixed },
+		_bodyHairs: { Fixed },
+		_palpHairs: { { Fixed } },
+		_abdomenHairs: { Fixed },
+		_seen: Seen,
+		_pose: Idle.Pose, -- the idle pose, made again in place each frame
+		_epoch: number, -- counts the scale changes: what was placed for an earlier scale is placed again
+		_exact: boolean, -- tests: place every hair again every frame, with no tolerance (what the drawing is compared with)
+		_stage: number, -- the growth stage last applied (-1 before the first)
+		_owed: number, _drawn: boolean, -- drawStep: the time not yet drawn, and whether the rig has been drawn at all
 		_k: number,
   _growth: number,
   _softness: number,
@@ -189,6 +243,88 @@ end
 
 local GROUP_OF: { [string]: number } = { head = G_HEAD, abdomen = G_ABDOMEN }
 
+-- ---------------------------------------------------------------- what a frame is made of: module functions, so that nothing is made again every frame (ROBLOX-93)
+
+-- Adds a part and its place to a batch.
+local function put(batch: Batch, p: BasePart, cf: CFrame)
+	local n = batch.n + 1
+	batch.n = n
+	batch.parts[n] = p
+	batch.frames[n] = cf
+end
+
+local function emptyBatch(): Batch
+	return { parts = {}, frames = {}, n = 0 }
+end
+
+local function clearBatch(batch: Batch)
+	table.clear(batch.parts)
+	table.clear(batch.frames)
+	batch.n = 0
+end
+
+-- An offset at the rig's scale: its place is scaled about the body's origin, its turn is not.
+local function scaled(cf: CFrame, g: number): CFrame
+	return if g == 1 then cf else CFrame.new(cf.Position * g) * cf.Rotation
+end
+
+-- Has `now` moved from `was` by more than MOVE_STUDS in place or MOVE_RADIANS in turn? The turn comes from the trace of the relative rotation, the sum of the dot
+-- products of the two frames' three axes (no angle is worked out): it is 3 for no turn and 3 - 2 (1 - cos a) for a turn of a.
+local function moved(was: CFrame, now: CFrame): boolean
+	if (now.Position - was.Position).Magnitude > MOVE_STUDS then return true end
+	local trace = now.RightVector:Dot(was.RightVector) + now.UpVector:Dot(was.UpVector) + now.LookVector:Dot(was.LookVector)
+	return 3 - trace > MOVE_TURN
+end
+
+-- Gives an abdomen part the size it should have, if it differs from what it has (a part's size is kept in `f.size`; the property is written, never read).
+local function resize(f: Fixed, size: Vector3)
+	if (f.size - size).Magnitude > 1e-5 then
+		f.size = size
+		f.part.Size = size
+	end
+end
+
+-- A link of a leg that has not been drawn yet: refreshScale fills in its sizes, and bandX and len at -1 mean "write the band's size, place the hairs" at the first drawing.
+local function newSeg(rod: Part, tip: Part?, band: Part?): Seg
+	return {
+		rod = rod, tip = tip, band = band, hairs = {},
+		x = 0, tipX = 0, bandX = -1, dy = 0, dz = 0, tipDy = 0, tipDz = 0,
+		rc = CFrame.identity, len = -1,
+	}
+end
+
+-- Works out what the rig's scale fixes (ROBLOX-93), when the rig is made and whenever the scale changes: each fixed part's offset and size at that scale (the size
+-- setScale has just given every part), each leg's hip and rest in the body frame, the lengths and diameters its links hold, and the fan's sizes. A frame only reads these.
+local function refreshScale(self: Rig)
+	local g, sizes = self._growth, self._sizes
+	for _, f in self._fixed do
+		f.scaled = scaled(f.offset, g)
+		f.size0 = sizes[f.part]
+		f.size = f.size0 * g
+	end
+	local L = self._appearance.limbs
+	local stance, longer = L.stance, L.pairReach
+	for _, leg in self._legs do
+		local r = stance.reach * (if longer then longer[leg.pair] else 1) -- (the peacock spider's legs III are the longest)
+		leg.rest = Vector3.new(leg.side * stance.x * r, stance.y, L.tipZ[leg.pair] * r) * g
+		leg.hip = Vector3.new(leg.side * L.hipX, L.hipY, L.hipZ[leg.pair]) * g
+		for _, seg in leg.segs do
+			local size = sizes[seg.rod]
+			seg.x, seg.dy, seg.dz = size.X * g, size.Y * g, size.Z * g
+			local tip = seg.tip
+			if tip then
+				local tipSize = sizes[tip]
+				seg.tipX, seg.tipDy, seg.tipDz = tipSize.X * g, tipSize.Y * g, tipSize.Z * g
+			end
+			seg.bandX, seg.len = -1, -1 -- the band is given its size, and the hairs their places, at the next drawing
+		end
+	end
+	local fan = self._fan
+	if fan then
+		for _, part in fan.parts do fan.sizes[part] = sizes[part] * g end
+	end
+end
+
 -- detail "low" is for phones and tablets: fewer hairs, one fur shell, no foot balls, half the speckles, no outline, no
 -- breathing or head tilt (Appearances.detail). Anything else is the full look. `living` (ROBLOX-89: the mate, which has to breathe and take the mating scene's cues
 -- at the low tier) turns the living motion on at a tier that has none, for the same parts.
@@ -243,8 +379,23 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		_bodyHidden = false,
 		_highlight = nil :: Highlight?,
 		_params = params,
-		_parts = {} :: { BasePart },
-		_cframes = {} :: { CFrame },
+		_bodyBatch = emptyBatch(),
+		_hairBatch = emptyBatch(),
+		_bodyFixed = {} :: { Fixed },
+		_headHairs = {} :: { Fixed },
+		_bodyHairs = {} :: { Fixed },
+		_palpHairs = { {}, {} } :: { { Fixed } },
+		_abdomenHairs = {} :: { Fixed },
+		_seen = {
+			body = CFrame.identity, head = CFrame.identity, abdomen = CFrame.identity, palpHead = { CFrame.identity, CFrame.identity }, pivot = { CFrame.identity, CFrame.identity },
+			breath = 0, sizeKey = Vector3.zero, epoch = 0,
+		} :: Seen,
+		_pose = { bodyLift = 0, abdomenLift = 0, abdomenPitch = 0, headRoll = 0, headYaw = 0, headPitch = 0 } :: Idle.Pose,
+		_epoch = 1,
+		_exact = false,
+		_stage = -1,
+		_owed = 0,
+		_drawn = false,
 		_k = look.scale or 1,
   _growth = 1, _softness = 0, _condition = 0.55, _shownCondition = 0.55, jumpLoad = 0, jumpPush = 0, _shownLoad = 0,
   hangDirection=nil :: Vector3?, _hang=0, _spinneret=nil :: Vector3?,
@@ -264,7 +415,11 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		self._living = Living.new(idleLook, Living.hash(look.id) + 7919 * made)
 	end
 	local function fixed(part: Part, at: Vector3, rot: CFrame?, group: number, palp: number?): Fixed
-		local entry: Fixed = { part = part, offset = CFrame.new(at) * (rot or CFrame.identity), group = group, palp = palp, sweep = nil, glance = nil, big = nil }
+		local offset = CFrame.new(at) * (rot or CFrame.identity)
+		local entry: Fixed = {
+			part = part, offset = offset, group = group, palp = palp, sweep = nil, glance = nil, big = nil,
+			pos = offset.Position, rot = offset.Rotation, scaled = offset, size0 = Vector3.zero, size = Vector3.zero,
+		}
 		table.insert(self._fixed, entry)
 		return entry
 	end
@@ -459,22 +614,13 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 			h.Transparency, h.CastShadow = shell.transparency, false
 			fixed(h, A.headCenter + Vector3.new(0, 0, hs.shift + 0.01 * k), nil, G_HEAD)
 		end
-		local seen: { [string]: number } = {}
-		local function keep(kind: string): boolean
-			local every = cfg.every[kind] or 1
-			if every <= 0 then return false end -- 0 drops the whole class
-			local n = (seen[kind] or 0) + 1
-			seen[kind] = n
-			return n % every == 0
-		end
-		for _, hair in Setae.body(look) do
-			if not keep(hair.kind) then continue end
+		-- (A tier keeps one hair in `every` of each class: Setae.thin, which counts the two sides of a mirrored pair each by itself.)
+		for _, hair in Setae.thin(Setae.body(look), cfg.every) do
 			local h = seta(hair.tone, hair.width, hair.thick, hair.length, hair.transparency)
 			local mid = hair.at + hair.dir * (hair.length * 0.5)
 			fixed(h, mid, CFrame.lookAt(Vector3.zero, hair.dir, upFor(hair.dir, hair.normal)), GROUP_OF[hair.group] or G_BODY)
 		end
-		for _, hair in Setae.palp(look) do
-			if not keep("palp") then continue end
+		for _, hair in Setae.thin(Setae.palp(look), cfg.every) do
 			local index = if hair.side < 0 then 1 else 2
 			local h = seta(hair.tone, hair.width, hair.thick, hair.length, hair.transparency)
 			local mid = hair.at + hair.dir * (hair.length * 0.5)
@@ -582,12 +728,24 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 			hangKnee = nil :: Vector3?,
 			hangAnkle = nil :: Vector3?,
 			hairs = {},
+			segs = {},
+			rest = Vector3.zero, hip = Vector3.zero,
+			noise = nil :: { number }?,
 		})
 		local leg = self._legs[#self._legs]
+		leg.segs = { newSeg(leg.femur, leg.femurTip, leg.bands[1]), newSeg(leg.tibia, leg.tibiaTip, leg.bands[2]), newSeg(leg.tarsus, leg.tarsusTip, leg.bands[3]) }
 		if fuzz and fuzz.enabled then
 			for n, spec in Setae.leg(look, i) do
 				if cfg.every.leg <= 0 or n % cfg.every.leg ~= 0 then continue end
-				table.insert(leg.hairs, { part = seta(spec.tone, fuzz.legWidth, fuzz.legWidth, spec.length, fuzz.legTransparency), spec = spec })
+				-- (what the drawing needs of a hair is worked out here, once: see LegHair)
+				local c, sn, lie = math.cos(spec.theta), math.sin(spec.theta), spec.lift
+				local entry: LegHair = {
+					part = seta(spec.tone, fuzz.legWidth, fuzz.legWidth, spec.length, fuzz.legTransparency), spec = spec, c = c, s = sn,
+					k = if lie then 1.0 else 0.8,
+					dir = if lie then Vector3.new(math.cos(lie), math.sin(lie) * c, math.sin(lie) * sn) else Vector3.new(1.3, c, sn).Unit,
+				}
+				table.insert(leg.hairs, entry)
+				table.insert(leg.segs[spec.segment].hairs, entry)
 			end
 		end
 	end
@@ -602,7 +760,7 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 	-- The peacock spider's fan (look.fan): the discs of the front face, the figure on them, the repeat on the back and the folded flaps.
 	local fc = look.fan
 	if fc then
-		local fan: Fan = { front = {}, back = {}, figure = {}, flaps = {}, cfg = fc, parts = {} }
+		local fan: Fan = { front = {}, back = {}, figure = {}, flaps = {}, cfg = fc, parts = {}, sizes = {} }
 		local function add(list: { FanDisc }, spec: any, y: number)
 			local part = disc(model, spec.name, color(spec.color), if spec.name == "FanField" then fc.sheen else 0)
 			table.insert(list, { part = part, inset = spec.inset, y = y })
@@ -640,17 +798,37 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
  for _,p in model:GetChildren() do
   if p:IsA("BasePart") and p~=root then self._sizes[p]=p.Size;self._colors[p]=p.Color end
  end
- model.Parent = parent
+	-- The body's parts are placed every frame; the hairs, by the frame each follows (ROBLOX-93), only when that frame has moved.
+	for _, f in self._fixed do
+		local palp = f.palp
+		if f.part.Name ~= "Seta" then
+			table.insert(self._bodyFixed, f)
+		elseif palp ~= nil then
+			table.insert(self._palpHairs[palp], f)
+		elseif f.group == G_HEAD then
+			table.insert(self._headHairs, f)
+		elseif f.group == G_ABDOMEN then
+			table.insert(self._abdomenHairs, f)
+		else
+			table.insert(self._bodyHairs, f)
+		end
+	end
+	refreshScale(self)
+	model.Parent = parent
 	self:setGrowthStage(0)
 	return self
 end
 
 -- Scale about the support plane, not the collider centre. Planted contacts remain world-space points.
+-- (ROBLOX-93: a stage already applied writes nothing again, and setScale returns at once for the scale it has: the mate stage asks every frame.)
 function SpiderRig.setGrowthStage(self: Rig, stage: number)
  local index=math.clamp(math.floor(stage),0,3)
- self.model:SetAttribute("GrowthStage",index)
- local fade=self._appearance.barFade -- the Greenbottle blue's juvenile bars soften at the last stage
- if fade then for _,bar in self._bars do bar.Transparency=fade[index+1] end end
+ if index~=self._stage then
+  self._stage=index
+  self.model:SetAttribute("GrowthStage",index)
+  local fade=self._appearance.barFade -- the Greenbottle blue's juvenile bars soften at the last stage
+  if fade then for _,bar in self._bars do bar.Transparency=fade[index+1] end end
+ end
  self:setScale(Growth.SCALES[index+1])
 end
 -- Any size, not only a growth stage's (ROBLOX-80: the mate is the played spider's look at the adult scale times its own factor). The same scaling as a stage.
@@ -659,7 +837,9 @@ function SpiderRig.setScale(self: Rig, g: number)
  self._growth=g
  self._k=(self._appearance.scale or 1)*g
  self._drop=0.31-(0.31-(self._appearance.bodyDrop or 0))*g
+ self._epoch+=1 -- what was placed for the old scale is placed again
  for p,size in self._sizes do p.Size=size*g end
+ refreshScale(self)
 end
 function SpiderRig.setSoftness(self: Rig, value: number)
  local s=math.clamp(value,0,1)
@@ -711,19 +891,13 @@ local function legGroup(self: Rig, i: number): number
 	return (j % 4 + j // 4) % 2
 end
 
-local function restLocal(self: Rig, leg: Leg): Vector3
-	local s = self._appearance.limbs.stance
-	local longer = self._appearance.limbs.pairReach
-	local r = s.reach * (if longer then longer[leg.pair] else 1) -- the peacock spider's legs III are the longest
-	return Vector3.new(leg.side * s.x * r, s.y, self._appearance.limbs.tipZ[leg.pair] * r) * self._growth
-end
 
 -- Display-only foothold: retract toward the body at a narrow edge; never invents a platform.
 local function target(self: Rig, body: CFrame, leg: Leg): RaycastResult?
 	local up = body.UpVector
-	local rest = restLocal(self, leg)
+	local rest = leg.rest
 	local k = self._k
-	for _, reach in { 1.0, 0.65, 0.35, 0.12 } do
+	for _, reach in REACHES do
 		local point = body:PointToWorldSpace(Vector3.new(rest.X * reach, 0, rest.Z * reach))
 		local hit = Workspace:Raycast(point + up * (0.35 * k), -up * (1.0 * k), self._params)
 		if hit and hit.Normal:Dot(up) > 0.35 then
@@ -741,27 +915,129 @@ end
 function SpiderRig._hangLeg(self: Rig, leg: Leg, body: CFrame): (Vector3, Vector3, Vector3)
 	local look, L, g = self._appearance, self._appearance.limbs, self._growth
 	local hang = look.hang
-	local hip = Vector3.new(leg.side * L.hipX, L.hipY, L.hipZ[leg.pair]) * g
-	local rest = restLocal(self, leg)
+	local hip, rest = leg.hip, leg.rest
 	local knee0 = hip:Lerp(rest, 0.48) + Vector3.yAxis * (L.kneeLift * g)
 	local ankle0 = knee0:Lerp(rest, ANKLE_SHARE) + Vector3.yAxis * (L.ankleLift * g)
-	local lengths = { (knee0 - hip).Magnitude, (ankle0 - knee0).Magnitude, (rest - ankle0).Magnitude }
+	local len1, len2, len3 = (knee0 - hip).Magnitude, (ankle0 - knee0).Magnitude, (rest - ankle0).Magnitude
 	local spec = hang.legs[leg.pair]
-	local names = { "femur", "tibia", "tarsus" }
+	-- (ROBLOX-93: the scatter of each link is a fixed pair of numbers, worked out the first time the leg hangs and kept, and no table is made of the lengths or the joints)
+	local scatter: { number } = leg.noise or {}
+	if leg.noise == nil then
+		local made = scatter
+		for n = 1, 3 do
+			made[2 * n - 1] = math.sin(leg.pair * 12.9898 + leg.side * 78.233 + n * 37.719)
+			made[2 * n] = math.sin(leg.pair * 39.346 + leg.side * 11.135 + n * 83.155)
+		end
+		leg.noise = made
+	end
 	local climb = self._climb
 	local tremble = if self.reducedMotion then 0 else math.sin(self._t * 3.2 + leg.pair * 1.7 + leg.side) * hang.wiggle
-	local joints: { Vector3 } = {}
+	local j1, j2, j3 = hip, hip, hip
 	local at = hip
 	for n = 1, 3 do
-		local d = spec[names[n]]
-		local noise = math.sin(leg.pair * 12.9898 + leg.side * 78.233 + n * 37.719)
-		local noise2 = math.sin(leg.pair * 39.346 + leg.side * 11.135 + n * 83.155)
+		local d = spec[LEG_NAMES[n]]
+		local noise, noise2 = scatter[2 * n - 1], scatter[2 * n]
 		local dz = d[3] * (1 - (if leg.pair <= 2 then 2.0 else 1.2) * climb) -- going up, legs I and II reach up the line and III and IV go out to grip it
 		local dir = Vector3.new(leg.side * d[1] + noise * hang.asym, d[2] + noise2 * hang.asym + (if n == 3 then tremble else 0), dz + noise * noise2 * hang.asym).Unit
-		at = at + dir * lengths[n]
-		joints[n] = at
+		at = at + dir * (if n == 1 then len1 elseif n == 2 then len2 else len3)
+		if n == 1 then j1 = at elseif n == 2 then j2 = at else j3 = at end
 	end
-	return body:PointToWorldSpace(joints[1]), body:PointToWorldSpace(joints[2]), body:PointToWorldSpace(joints[3])
+	return body:PointToWorldSpace(j1), body:PointToWorldSpace(j2), body:PointToWorldSpace(j3)
+end
+
+-- One link of a leg (ROBLOX-93: a function of the module, so that a frame makes no closure of it): its rod runs from a to b; with a thinner `tip` rod the first runs a to m
+-- and the tip m to b (a tapered femur or tibia, the break in the tarsus). The pale band (one `bandFraction` of the whole link) and the hairs follow the link, not the
+-- pieces. A size is written only when it is more than its step from the one the part has (kept in `seg`, so nothing is read from the part), and the hairs, which
+-- go to the second batch, are placed again only when the link has moved.
+local function drawSegment(seg: Seg, bandFraction: number, g: number, a: Vector3, m: Vector3, b: Vector3, bodyBatch: Batch, hairBatch: Batch, exact: boolean)
+	local rod, tip, band = seg.rod, seg.tip, seg.band
+	local len = math.max((b - a).Magnitude, 0.01)
+	local ends = if tip then m else b
+	local plen = math.max((ends - a).Magnitude, 0.01)
+	if math.abs(seg.x - plen) > 1e-3 then
+		seg.x = plen
+		rod.Size = Vector3.new(plen, seg.dy, seg.dz)
+	end
+	local rc = rodCFrame(a, b) -- local +X runs from a toward b (toward the foot)
+	put(bodyBatch, rod, if tip then rodCFrame(a, m) else rc)
+	local share = plen / len
+	if tip then
+		local tlen = math.max((b - m).Magnitude, 0.01)
+		if math.abs(seg.tipX - tlen) > 1e-3 then
+			seg.tipX = tlen
+			tip.Size = Vector3.new(tlen, seg.tipDy, seg.tipDz)
+		end
+		put(bodyBatch, tip, rodCFrame(m, b))
+	end
+	if band then
+		local blen = len * bandFraction
+		if math.abs(seg.bandX - blen) > BAND_STEP then
+			seg.bandX = blen
+			band.Size = Vector3.new(blen, seg.dy * 1.035, seg.dz * 1.035)
+		end
+		put(bodyBatch, band, rc)
+	end
+	-- Leg setae stand out from the segment and lean toward the foot (or, for a coat that lies along the leg, lie at their own angle).
+	if exact or moved(seg.rc, rc) or math.abs(len - seg.len) > MOVE_STUDS then
+		seg.rc, seg.len = rc, len
+		local radius, tipRadius = seg.dy * 0.5, seg.tipDy * 0.5
+		for _, hair in seg.hairs do
+			local spec = hair.spec
+			local r = if tip and spec.t > share then tipRadius else radius
+			local base = Vector3.new((spec.t - 0.5) * len, r * hair.k * hair.c, r * hair.k * hair.s)
+			local dir = hair.dir
+			put(hairBatch, hair.part, rc * CFrame.lookAt(base + dir * (spec.length * g * 0.5), base + dir * spec.length*g, Vector3.xAxis))
+		end
+	end
+end
+
+-- Writes the size a fan part should have, if it differs from what it has (the fan keeps what each part holds; nothing is read from the part).
+local function fanSize(fan: Fan, part: BasePart, size: Vector3)
+	local was: Vector3? = fan.sizes[part]
+	if was == nil or (was - size).Magnitude > 1e-5 then
+		fan.sizes[part] = size
+		part.Size = size
+	end
+end
+
+-- Sets the fan's discs for how far it is open (0: folded on the abdomen, 1: a near-round disc) in the abdomen's frame. The discs grow from
+-- Appearances.fan.folded to full size; the figure and the repeat on the back follow; the folded flaps swing out from the flanks and end
+-- under the discs. Flat ellipsoids: only their size and place change. Each part lies on the abdomen, so its place (about the abdomen's centre) and its size go with the
+-- abdomen's `condition`; ROBLOX-93: both are worked out once, from the part's own size, and a size is written once or not at all.
+local function drawFan(self: Rig, fan: Fan, abdomen: CFrame, open: number, condition: Vector3, batch: Batch)
+	local fc, A, g = fan.cfg, self._layout, self._growth
+	local center = A.abdomenCenter
+	local sx = fc.folded[1] + (1 - fc.folded[1]) * open
+	local sz = fc.folded[2] + (1 - fc.folded[2]) * open
+	local fold = 1 - open
+	local top = center.Y + A.abdomenRadii.Y + fc.plane - fc.foldedSink * fold
+	local z = center.Z + fc.zShift * open
+	local thick = fc.thickness + (fc.foldedThickness - fc.thickness) * fold
+	local mid = center.Y - A.abdomenRadii.Y
+	for pass = 1, 2 do
+		local discs: { FanDisc } = if pass == 1 then fan.front else fan.back
+		local y0, t = if pass == 1 then top else mid, if pass == 1 then thick else fc.thickness
+		for _, d in discs do
+			local rx, rz = math.max((fc.radii[1] - d.inset) * sx, 0.002), math.max((fc.radii[2] - d.inset) * sz, 0.002)
+			fanSize(fan, d.part, Vector3.new(rx * 2, t, rz * 2) * g * condition)
+			put(batch, d.part, abdomen * CFrame.new((center + (Vector3.new(0, y0 + d.y, z) - center) * condition) * g))
+		end
+	end
+	local figureY = top + #fan.front * fc.layerStep + (thick - fc.thickness) * 0.5
+	local show = open * open * (3 - 2 * open) -- the black figure shows as the fan opens, and is gone when it is folded
+	for _, f in fan.figure do
+		fanSize(fan, f.part, Vector3.new(math.max(f.rx * fc.radii[1] * sx * 2 * show, 0.002), fc.thickness, math.max(f.rz * fc.radii[2] * sz * 2 * show, 0.002)) * g * condition)
+		local at = Vector3.new(f.x * fc.radii[1] * sx, figureY, z + f.z * fc.radii[2] * sz)
+		put(batch, f.part, abdomen * CFrame.new((center + (at - center) * condition) * g) * CFrame.Angles(0, f.angle, 0))
+	end
+	local fl = fc.flaps
+	local angle = math.rad(fl.foldedDeg) * (1 - open)
+	for _, f in fan.flaps do
+		fanSize(fan, f.part, self._sizes[f.part] * g * condition)
+		local hinge = Vector3.new(f.side * fl.hingeX, center.Y + fl.hingeY, center.Z + fc.zShift * open)
+		local cf = CFrame.new(hinge) * CFrame.Angles(0, 0, f.side * angle) * CFrame.new(f.side * fl.radii[1], 0, 0)
+		put(batch, f.part, abdomen * CFrame.new((center + (cf.Position - center) * condition) * g) * cf.Rotation)
+	end
 end
 
 -- body: the drawn body's CFrame. grounded: standing on a surface. moving: walking speed > 0 (for palp drumming and idle motion).
@@ -858,15 +1134,11 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 		body = CFrame.new(pivot) * CFrame.fromAxisAngle(lineUp, self._spin * rest) * lean * CFrame.new(-pivot) * body
 		up = body.UpVector
 	end
- local function scaledFrame(cf: CFrame): CFrame return if g==1 then cf else CFrame.new(cf.Position*g)*cf.Rotation end
-	local parts, cframes = self._parts, self._cframes
-	table.clear(parts)
-	table.clear(cframes)
-	local function put(p: BasePart, cf: CFrame)
-		table.insert(parts, p)
-		table.insert(cframes, cf)
-	end
-	put(self.root, collider)
+	-- The drawing is two batches (ROBLOX-93): the body's parts every frame, then the hairs that moved (see MOVE_STUDS). Both are tables the rig keeps.
+	local bodyBatch, hairBatch = self._bodyBatch, self._hairBatch
+	clearBatch(bodyBatch)
+	clearBatch(hairBatch)
+	put(bodyBatch, self.root, collider)
 	-- The courtship display (rig.dance, a PeacockDance pose), for an appearance that has a fan.
 	local display = self.dance
 	local fan = self._fan
@@ -905,14 +1177,15 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 	local gain = if lp ~= nil then lp.breath else 1 -- (the mating scene's settle: a deeper breath, ROBLOX-89)
 	local breathScale = if cfg.idle then Idle.abdomenScale(self._t, self._breath * (1 - 0.8 * freeze) * gain, look.idle) else 1
 	self._drum = math.clamp(self._drum + (if standing then 3 else -3) * dt, 0, 1)
-	local palpAngle = Idle.palps(self._t, self._drum * (1 - freeze), look.palp)
+	local drum = self._drum * (1 - freeze)
+	local palp1, palp2 = Idle.palp(self._t, drum, look.palp, 1), Idle.palp(self._t, drum, look.palp, 2) -- (the palps' angles)
 	local bodyBase, headBase, abdomenBase = body, body, body
 	if cfg.idle then
 		local idle = look.idle
 		self._calm = math.clamp(self._calm + (if standing then dt / idle.riseSeconds else -dt / idle.fallSeconds), 0, 1)
 		if self._calm > 0 then
 			local c = self._calm * self._calm * (3 - 2 * self._calm) * (1 - freeze)
-			local pose = Idle.pose(self._t, c, idle)
+			local pose = Idle.pose(self._t, c, idle, self._pose)
 			bodyBase = body * CFrame.new(0, pose.bodyLift*g*gain, 0)
 			headBase = bodyBase * CFrame.new(A.neck*g) * CFrame.Angles(pose.headPitch, pose.headYaw, pose.headRoll) * CFrame.new(-A.neck*g)
 			abdomenBase = bodyBase * CFrame.new(0, pose.abdomenLift*g*gain, 0) * CFrame.new(A.pedicelCenter*g)
@@ -948,7 +1221,7 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 		-- The abdomen pitches up about the pedicel and sways side to side (about the body's long axis), the palps flick in unison.
 		abdomenBase = bodyBase * CFrame.new(A.pedicelCenter*g) * CFrame.Angles(0, 0, display.abdomenSway + display.shiver)
 			* CFrame.Angles(-display.abdomenPitch, 0, 0) * CFrame.new(-A.pedicelCenter*g)
-		palpAngle = { palpAngle[1] + display.palp, palpAngle[2] + display.palp }
+		palp1, palp2 = palp1 + display.palp, palp2 + display.palp
 	end
 	-- The threat display: the prosoma (the head with the palps, and every leg's hip) pitches up about the waist; the palps lift at their bases.
 	local prosoma = bodyBase
@@ -958,17 +1231,17 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 		headBase = prosoma * (bodyBase:Inverse() * headBase) -- (keeps any head tilt the idle motion still has)
 	end
 	if threatening then
-		palpAngle = { palpAngle[1] + threatPose.palps, palpAngle[2] + threatPose.palps }
+		palp1, palp2 = palp1 + threatPose.palps, palp2 + threatPose.palps
 	end
  if self._hang > 0 and hang ~= nil then -- hanging: the palps are drawn in toward the jaws
   local tuck = -math.rad(hang.palpTuckDeg) * self._hang
-  palpAngle = { palpAngle[1] + tuck, palpAngle[2] + tuck }
+  palp1, palp2 = palp1 + tuck, palp2 + tuck
  end
  self._spinneret=abdomenBase:PointToWorldSpace((A.abdomenCenter+(A.spinneret-A.abdomenCenter)*condition)*g)
 	-- Grooming: a palp is drawn in toward the jaws (turned toward the midline and tipped down) about its base.
 	local palpYaw1, palpYaw2 = 0, 0
 	if lp ~= nil then
-		palpAngle = { palpAngle[1] - lp.palpPitch[1], palpAngle[2] - lp.palpPitch[2] }
+		palp1, palp2 = palp1 - lp.palpPitch[1], palp2 - lp.palpPitch[2]
 		palpYaw1, palpYaw2 = lp.palpYaw[1], lp.palpYaw[2]
 	end
 	local glanceAt = Vector3.zero -- the principal eyes' shift in the head's frame, studs, toward what is watched
@@ -976,36 +1249,77 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 		local reach = look.idle.attention.glance
 		glanceAt = Vector3.new(lp.glanceX * reach, lp.glanceY * reach * 0.6, 0)
 	end
-	local pivots = {
-		CFrame.new(self._palpBase[1]) * CFrame.Angles(palpAngle[1], palpYaw1, 0),
-		CFrame.new(self._palpBase[2]) * CFrame.Angles(palpAngle[2], palpYaw2, 0),
-	}
-	for _, f in self._fixed do
-		local base = if f.group == G_HEAD then headBase elseif f.group == G_ABDOMEN then abdomenBase else bodyBase
+	local pivot1 = CFrame.new(self._palpBase[1]) * CFrame.Angles(palp1, palpYaw1, 0)
+	local pivot2 = CFrame.new(self._palpBase[2]) * CFrame.Angles(palp2, palpYaw2, 0)
+	-- What has changed since the hairs were last placed: after a change of scale (a new epoch) everything, otherwise the abdomen's condition (its parts' sizes and places)
+	-- and, below, the frame each kind of hair follows.
+	local seen, epoch = self._seen, self._epoch
+	local fresh = seen.epoch ~= epoch or self._exact
+	local abdomenAt = A.abdomenCenter
+	local sizesDue = fresh or (condition - seen.sizeKey).Magnitude > SCALE_STEP
+	local glanced = glanceAt ~= Vector3.zero
+	local sweeping = threatening and threatPose.sweep ~= 0
+	for _, f in self._bodyFixed do
+		local group = f.group
+		local base = if group == G_HEAD then headBase elseif group == G_ABDOMEN then abdomenBase else bodyBase
 		local palp = f.palp
 		if palp then
-			put(f.part, base * scaledFrame(pivots[palp] * f.offset))
+			put(bodyBatch, f.part, base * scaled((if palp == 1 then pivot1 else pivot2) * f.offset, g))
 		else
-			local offset=f.offset
-			if f.glance == true and glanceAt ~= Vector3.zero then offset = CFrame.new(glanceAt) * offset end
-			if threatening and f.sweep ~= nil and threatPose.sweep ~= 0 then
+			local offset, edited = f.offset, false
+			if f.glance == true and glanced then offset, edited = CFrame.new(glanceAt) * offset, true end
+			if sweeping and f.sweep ~= nil then
 				-- A spinneret segment swings side to side about a point just inside the abdomen's rear tip (the second segment farther).
 				local tc = look.threat
 				local at = A.spinneret - Vector3.new(0, 0, tc.sweepBack)
-				offset = CFrame.new(at) * CFrame.Angles(0, threatPose.sweep * (if f.sweep > 1 then tc.tipSweep else 1), 0) * CFrame.new(-at) * offset
+				offset, edited = CFrame.new(at) * CFrame.Angles(0, threatPose.sweep * (if f.sweep > 1 then tc.tipSweep else 1), 0) * CFrame.new(-at) * offset, true
 			end
-    if f.group==G_ABDOMEN then
-     local p=A.abdomenCenter+(offset.Position-A.abdomenCenter)*condition*breathScale -- (the whole abdomen, its hairs and its shells, breathes; only the big masses are resized)
-     offset=CFrame.new(p)*offset.Rotation
-     local size=self._sizes[f.part]*g*condition*(if f.big == true then breathScale else 1)
-     if (f.part.Size-size).Magnitude>1e-5 then f.part.Size=size end
-    end
-    put(f.part, base * scaledFrame(offset))
+			if group == G_ABDOMEN then
+				-- (the whole abdomen, its hairs and its shells, breathes; only the big masses are resized every frame, the rest when the condition has changed)
+				local pos, rot = f.pos, f.rot
+				if edited then pos, rot = offset.Position, offset.Rotation end
+				local p = abdomenAt + (pos - abdomenAt) * condition * breathScale
+				put(bodyBatch, f.part, base * (CFrame.new(if g == 1 then p else p * g) * rot))
+				if f.big == true then
+					resize(f, f.size0 * g * condition * breathScale)
+				elseif sizesDue then
+					resize(f, f.size0 * g * condition)
+				end
+			else
+				put(bodyBatch, f.part, base * (if edited then scaled(offset, g) else f.scaled))
+			end
 		end
 	end
 
+	-- The hairs, in the second batch: a kind is placed again only if the frame it follows has moved since it was last placed (fresh: after a change of scale, all).
+	if fresh or moved(seen.head, headBase) then
+		seen.head = headBase
+		for _, f in self._headHairs do put(hairBatch, f.part, headBase * f.scaled) end
+	end
+	if fresh or moved(seen.body, bodyBase) then
+		seen.body = bodyBase
+		for _, f in self._bodyHairs do put(hairBatch, f.part, bodyBase * f.scaled) end
+	end
+	for index = 1, 2 do
+		local pivot = if index == 1 then pivot1 else pivot2
+		if fresh or moved(seen.palpHead[index], headBase) or moved(seen.pivot[index], pivot) then
+			seen.palpHead[index], seen.pivot[index] = headBase, pivot
+			for _, f in self._palpHairs[index] do put(hairBatch, f.part, headBase * scaled(pivot * f.offset, g)) end
+		end
+	end
+	if sizesDue or math.abs(breathScale - seen.breath) > SCALE_STEP or moved(seen.abdomen, abdomenBase) then
+		seen.abdomen, seen.breath = abdomenBase, breathScale
+		for _, f in self._abdomenHairs do
+			local p = abdomenAt + (f.pos - abdomenAt) * condition * breathScale
+			put(hairBatch, f.part, abdomenBase * (CFrame.new(if g == 1 then p else p * g) * f.rot))
+			if sizesDue then resize(f, f.size0 * g * condition) end
+		end
+	end
+	if sizesDue then seen.sizeKey = condition end
+	seen.epoch = epoch
+
 	if fan then
-		self:_drawFan(abdomenBase, if dancing then display.fanOpen else 0, put)
+		drawFan(self, fan, abdomenBase, if dancing then display.fanOpen else 0, condition, bodyBatch)
 	end
 
 	-- Legs: planted feet stay put in the world; a leg too far from its rest spot steps, in alternating groups.
@@ -1017,7 +1331,7 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 		local worst = STEP_ERROR * k
 		for i, leg in self._legs do
 			if leg.planted then
-				local err = (body:PointToWorldSpace(restLocal(self, leg)) - leg.planted :: Vector3).Magnitude
+				local err = (body:PointToWorldSpace(leg.rest) - leg.planted :: Vector3).Magnitude
 				if err > worst then
 					worst = err
 					self._group = legGroup(self, i)
@@ -1026,9 +1340,11 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 		end
 	end
 	local L = look.limbs
+	local bandFraction = look.bandFraction
+	local exact = self._exact
 	local started = false
 	for i, leg in self._legs do
-		local rest = body:PointToWorldSpace(restLocal(self, leg))
+		local rest = body:PointToWorldSpace(leg.rest)
 		if not grounded then
 			leg.planted = nil
 			leg.swing = -1
@@ -1085,7 +1401,7 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 	end
 	local kneeUp = (if grounded then L.kneeLift else L.kneeLiftAir)*g
 	for index, leg in self._legs do
-		local hip = prosoma:PointToWorldSpace(Vector3.new(leg.side * L.hipX, L.hipY, L.hipZ[leg.pair])*g)
+		local hip = prosoma:PointToWorldSpace(leg.hip)
 		local foot = leg.foot
   local rear = leg.pair >= 3
   if not grounded and rear and push > 0 then
@@ -1138,58 +1454,22 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 		local ankle = knee:Lerp(foot, ANKLE_SHARE) + up * (L.ankleLift*g)
 		if hangKnee ~= nil and hangAnkle ~= nil then ankle = ankle:Lerp(hangAnkle, self._hang) end
 		local form = look.legForm
-		-- One link of the leg: its rod runs from a to b; with a thinner `tip` rod the first runs a to m and the tip m to b (a tapered femur or tibia,
-		-- the break in the tarsus). The pale band (one `bandFraction` of the whole link) and the setae follow the link, not the pieces.
-		local function segment(index: number, p: Part, tip: Part?, band: Part?, a: Vector3, m: Vector3, b: Vector3)
-			local len = math.max((b - a).Magnitude, 0.01)
-			local ends = if tip then m else b
-			local plen = math.max((ends - a).Magnitude, 0.01)
-			if math.abs(p.Size.X - plen) > 1e-3 then
-				p.Size = Vector3.new(plen, p.Size.Y, p.Size.Z)
-			end
-			local rc = rodCFrame(a, b) -- local +X runs from a toward b (toward the foot)
-			put(p, if tip then rodCFrame(a, m) else rc)
-			local share = plen / len
-			if tip then
-				local tlen = math.max((b - m).Magnitude, 0.01)
-				if math.abs(tip.Size.X - tlen) > 1e-3 then
-					tip.Size = Vector3.new(tlen, tip.Size.Y, tip.Size.Z)
-				end
-				put(tip, rodCFrame(m, b))
-			end
-			if band then
-				band.Size = Vector3.new(len * look.bandFraction, p.Size.Y * 1.035, p.Size.Z * 1.035)
-				put(band, rc)
-			end
-			-- Leg setae stand out from the segment and lean toward the foot.
-			for _, hair in leg.hairs do
-				local spec = hair.spec
-				if spec.segment == index then
-					local r = (if tip and spec.t > share then tip.Size.Y else p.Size.Y) * 0.5
-					local c, s = math.cos(spec.theta), math.sin(spec.theta)
-					local lie = spec.lift -- (a coat that lies along the leg, ROBLOX-85) or nil: the first coats' hairs stand out and lean toward the foot
-					local base = Vector3.new((spec.t - 0.5) * len, r * (if lie then 1.0 else 0.8) * c, r * (if lie then 1.0 else 0.8) * s)
-					local dir = if lie then Vector3.new(math.cos(lie), math.sin(lie) * c, math.sin(lie) * s) else Vector3.new(1.3, c, s).Unit
-					put(hair.part, rc * CFrame.lookAt(base + dir * (spec.length * g * 0.5), base + dir * spec.length*g, Vector3.xAxis))
-				end
-			end
-		end
 		local femurMid = if form and leg.femurTip then hip:Lerp(knee, form.femur.split) else knee
 		local tibiaMid = if form and form.tibia and leg.tibiaTip then knee:Lerp(ankle, form.tibia.split) else ankle
 		local tarsusMid = if form and leg.joint then ankle:Lerp(foot, form.tarsus.split) + up * (if leg.tarsusTip then form.tarsus.bend * g else 0) else foot
-		segment(1, leg.femur, leg.femurTip, leg.bands[1], hip, femurMid, knee)
-		segment(2, leg.tibia, leg.tibiaTip, leg.bands[2], knee, tibiaMid, ankle)
-		segment(3, leg.tarsus, leg.tarsusTip, leg.bands[3], ankle, tarsusMid, foot)
+		drawSegment(leg.segs[1], bandFraction, g, hip, femurMid, knee, bodyBatch, hairBatch, exact)
+		drawSegment(leg.segs[2], bandFraction, g, knee, tibiaMid, ankle, bodyBatch, hairBatch, exact)
+		drawSegment(leg.segs[3], bandFraction, g, ankle, tarsusMid, foot, bodyBatch, hairBatch, exact)
 		if form then
 			-- The knee is a patella: a short stout ellipsoid lying along the bend of the leg there.
 			local bend = (knee - hip).Unit + (ankle - knee).Unit
 			local along = if bend.Magnitude > 1e-3 then bend.Unit else (knee - hip).Unit
-			put(leg.knee, rodCFrame(knee - along, knee + along))
+			put(bodyBatch, leg.knee, rodCFrame(knee - along, knee + along))
 		else
-			put(leg.knee, CFrame.new(knee))
+			put(bodyBatch, leg.knee, CFrame.new(knee))
 		end
-		put(leg.ankle, CFrame.new(ankle))
-		if leg.joint then put(leg.joint, CFrame.new(tarsusMid)) end
+		put(bodyBatch, leg.ankle, CFrame.new(ankle))
+		if leg.joint then put(bodyBatch, leg.joint, CFrame.new(tarsusMid)) end
 		local pad = leg.pad
 		if pad and form then
 			-- The tarsal pad lies on the surface under the foot, flattened, its long side along the way the foot points; the first spider's claws leave
@@ -1198,67 +1478,37 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 			local flat = into - up * into:Dot(up)
 			local heading = if flat.Magnitude > 1e-4 then flat.Unit else body.LookVector
 			local center = foot + up * (pad.Size.Y * 0.35)
-			put(pad, CFrame.lookAt(center, center + heading, up) * CFrame.Angles(0, math.pi / 2, 0))
+			put(bodyBatch, pad, CFrame.lookAt(center, center + heading, up) * CFrame.Angles(0, math.pi / 2, 0))
 			local right = heading:Cross(up)
 			for n, claw in leg.toes do
 				-- two claws: from the pad's front, forward and down, splayed apart
 				local from = center + heading * (pad.Size.X * 0.42)
 				local aim = (heading * 0.85 - up * 0.45 + right * ((if n % 2 == 1 then -1 else 1) * form.claws.splay)).Unit
-				put(claw, rodCFrame(from, from + aim * claw.Size.X))
+				put(bodyBatch, claw, rodCFrame(from, from + aim * claw.Size.X))
 			end
 		elseif pad then
-			put(pad, CFrame.new(foot))
+			put(bodyBatch, pad, CFrame.new(foot))
 		end
 	end
-	Workspace:BulkMoveTo(parts, cframes, Enum.BulkMoveMode.FireCFrameChanged)
+	Workspace:BulkMoveTo(bodyBatch.parts, bodyBatch.frames, Enum.BulkMoveMode.FireCFrameChanged)
+	if hairBatch.n > 0 then
+		Workspace:BulkMoveTo(hairBatch.parts, hairBatch.frames, Enum.BulkMoveMode.FireCFrameChanged)
+	end
 end
 
--- Sets the fan's discs for how far it is open (0: folded on the abdomen, 1: a near-round disc) in the abdomen's frame. The discs grow from
--- Appearances.fan.folded to full size; the figure and the repeat on the back follow; the folded flaps swing out from the flanks and end
--- under the discs. Flat ellipsoids: only their size and place change.
-function SpiderRig._drawFan(self: Rig, abdomen: CFrame, open: number, put: (BasePart, CFrame) -> ())
-	local fan = self._fan :: Fan
-	local fc, A = fan.cfg, self._layout
- local g=self._growth
- local c=self._shownCondition
- local condition=Vector3.new(.84+.30*c,.84+.30*c,.93+.12*c)
- local output=put
- local inverse=abdomen:Inverse()
- put=function(p: BasePart,cf: CFrame)
-  local relative=inverse*cf
-  local at=A.abdomenCenter+(relative.Position-A.abdomenCenter)*condition
-  p.Size=p.Size*condition
-  output(p,abdomen*CFrame.new(at*g)*relative.Rotation)
- end
-	local sx = fc.folded[1] + (1 - fc.folded[1]) * open
-	local sz = fc.folded[2] + (1 - fc.folded[2]) * open
-	local fold = 1 - open
-	local top = A.abdomenCenter.Y + A.abdomenRadii.Y + fc.plane - fc.foldedSink * fold
-	local z = A.abdomenCenter.Z + fc.zShift * open
-	local thick = fc.thickness + (fc.foldedThickness - fc.thickness) * fold
-	local function place(d: FanDisc, y: number, t: number)
-		local rx, rz = math.max((fc.radii[1] - d.inset) * sx, 0.002), math.max((fc.radii[2] - d.inset) * sz, 0.002)
-		local size = Vector3.new(rx * 2, t, rz * 2)*g
-		if (d.part.Size - size).Magnitude > 1e-5 then d.part.Size = size end
-		put(d.part, abdomen * CFrame.new(0, y, z))
+-- Draws the rig for a frame (ROBLOX-93): an update when the rig has not been drawn yet or is within FAR_STUDS of the camera (`distance`, studs), otherwise once every
+-- FAR_SECONDS with all the time since the last drawing. The sim goes on stepping every tick; a rival or a mate too far off to show its legs need not be redrawn sixty
+-- times a second. (A caller that must have the full rate, a lunge or a windup, gives a distance of 0.) Returns whether it drew.
+-- (Six frames of 1/60 add up to a hair under 0.1, so the interval is met a millionth of a second early: ten drawings a second at 60 Hz, not eight and a half.)
+function SpiderRig.drawStep(self: Rig, collider: CFrame, dt: number, grounded: boolean, moving: boolean, distance: number): boolean
+	local owed = self._owed + dt
+	if self._drawn and distance > FAR_STUDS and owed < FAR_SECONDS - 1e-6 then
+		self._owed = owed
+		return false
 	end
-	for _, d in fan.front do place(d, top + d.y, thick) end
-	local mid = A.abdomenCenter.Y - A.abdomenRadii.Y
-	for _, d in fan.back do place(d, mid + d.y, fc.thickness) end
-	local figureY = top + #fan.front * fc.layerStep + (thick - fc.thickness) * 0.5
-	local show = open * open * (3 - 2 * open) -- the black figure shows as the fan opens, and is gone when it is folded
-	for _, f in fan.figure do
-		local size = Vector3.new(math.max(f.rx * fc.radii[1] * sx * 2 * show, 0.002), fc.thickness, math.max(f.rz * fc.radii[2] * sz * 2 * show, 0.002))*g
-		if (f.part.Size - size).Magnitude > 1e-5 then f.part.Size = size end
-		put(f.part, abdomen * CFrame.new(f.x * fc.radii[1] * sx, figureY, z + f.z * fc.radii[2] * sz) * CFrame.Angles(0, f.angle, 0))
-	end
-	local fl = fc.flaps
-	local angle = math.rad(fl.foldedDeg) * (1 - open)
-	for _, f in fan.flaps do
-		f.part.Size=self._sizes[f.part]*g
-		local hinge = Vector3.new(f.side * fl.hingeX, A.abdomenCenter.Y + fl.hingeY, A.abdomenCenter.Z + fc.zShift * open)
-		put(f.part, abdomen * CFrame.new(hinge) * CFrame.Angles(0, 0, f.side * angle) * CFrame.new(f.side * fl.radii[1], 0, 0))
-	end
+	self._owed, self._drawn = 0, true
+	self:update(collider, owed, grounded, moving)
+	return true
 end
 
 -- Spider-eye view (Godot SpiderBody.set_eye_view + SurfaceLegs.eye_view): the body, head and palps are hidden and only the

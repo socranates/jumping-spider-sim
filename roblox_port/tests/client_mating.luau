@@ -169,7 +169,28 @@ check("the stage: the sac and the spiderlings are plain display parts, few, and 
 		local seen = 0
 		for _, parts in stage.bodies do if parts.body.Transparency < 1 then seen += 1 end end
 		assert(seen >= 1, "some are out by 3 s")
-		assert(stage:step(5.0, false) == true and stage.running, "still playing at 8 s")
+		-- (ROBLOX-93) A spiderling's head overlaps its abdomen by 0.08 of the abdomen's width (0.011 studs) and is not buried in it: the two balls were 0.014 studs apart, a head floating in front.
+		local function overlaps(): (number, number, number)
+			local count, least, most = 0, math.huge, -math.huge
+			for _, parts in stage.bodies do
+				if parts.body.Transparency < 1 then
+					count += 1
+					local depth = (parts.body.Size.X + parts.head.Size.X) / 2 - (parts.head.Position - parts.body.Position).Magnitude
+					least, most = math.min(least, depth), math.max(most, depth)
+				end
+			end
+			return count, least, most
+		end
+		local count, least, most = overlaps()
+		assert(count >= 1 and least > 0.008 and most < 0.015, `{detail}: the head overlaps the abdomen by {least} studs, no gap and not buried ({count} out)`)
+		assert(most < (MateStage.BODY * MateStage.HEAD) / 2, "and the head is not swallowed")
+		assert(MateStage.BODY_AT < 0 and MateStage.HEAD_AT > 0 and MateStage.HEAD_AT - MateStage.BODY_AT < (1 + MateStage.HEAD) / 2, "(the numbers: the centres are nearer than the radii add up to)")
+		for _, more in { 4.0, 3.0, 4.0 } do
+			stage:step(more, false)
+			count, least, most = overlaps()
+			assert(count == 0 or (least > 0.008 and most < 0.015), `{detail}: at {stage.t} s the head still overlaps the abdomen ({least} to {most})`)
+		end
+		assert(stage.running, "still playing at 14 s")
 		local more = stage:step(20.0, false)
 		assert(more == false and stage.finished and #stage.bodies == 0 and stage:partCount() == 4, "the scene ends and takes its spiderlings away; the sac stays")
 		assert(stage:step(1.0, false) == false, "a finished stage plays nothing")
@@ -178,6 +199,59 @@ check("the stage: the sac and the spiderlings are plain display parts, few, and 
 		assert(workspace:FindFirstChild("Family"):FindFirstChild("EggSac") == nil, "and the sac is out of the world")
 		workspace:FindFirstChild("Family"):Destroy()
 	end
+end)
+
+check("the mate's drawing (ROBLOX-93): its size is set when it is made and when its factor changes (kept to 0.5 to 2), not every frame; far from the camera it is drawn ten times a second", function()
+	local stage = MateStage.new(workspace, workspace, "low")
+	local counters = shim.counters
+	local at = Vector3.new(0, 0.31, 0)
+	local mate = { state = "wander", position = at, previous = at, up = Vector3.yAxis, heading = Vector3.new(0, 0, -1), scale = 0.9 }
+	local function draw(cameraAt: Vector3?, focus: Vector3?) stage:drawMate(mate, "first_spider", 1 / 60, true, focus, nil, cameraAt) end
+	draw(nil)
+	assert(stage.rig ~= nil and math.abs(stage.rig._growth - 1.5 * 0.9) < 1e-9, "made at the adult size times its own factor")
+	for _ = 1, 20 do draw(nil) end
+	local written = counters.sizeWrites
+	for _ = 1, 120 do draw(nil) end
+	assert(counters.sizeWrites == written, `a mate standing still (Reduced Motion) has no Size written in 120 frames ({counters.sizeWrites - written} written)`)
+	local function factorOf(value: any): number
+		mate.scale = value
+		draw(nil)
+		return stage.rig._growth / 1.5
+	end
+	written = counters.sizeWrites
+	assert(math.abs(factorOf(1.3) - 1.3) < 1e-9 and counters.sizeWrites > written, "a new factor sizes the rig")
+	written = counters.sizeWrites
+	for _ = 1, 30 do draw(nil) end
+	assert(counters.sizeWrites == written, "and then it does not again")
+	assert(math.abs(factorOf(3.0) - 2) < 1e-9 and math.abs(factorOf(0.1) - 0.5) < 1e-9 and factorOf(math.huge) == 2 and factorOf(-math.huge) == 0.5, "a factor above 2 is 2 and one below 0.5 is 0.5 (Mate.valid refuses a saved one outside them)")
+	assert(factorOf(0 / 0) == 1 and factorOf(nil) == 1 and factorOf("big") == 1, "and one that is missing, not a number or not a number at all is 1")
+	-- The drawing: every frame near the camera, in the mating scene or about to be; ten times a second beyond 25 studs.
+	mate.scale = 1
+	draw(nil)
+	local updates = 0
+	local real = stage.rig.update
+	stage.rig.update = function(self, ...) updates += 1; return real(self, ...) end
+	local function run(n: number, cameraAt: Vector3?, focus: Vector3?): number
+		updates = 0
+		for _ = 1, n do draw(cameraAt, focus) end
+		return updates
+	end
+	local nearBy, farOff = at + Vector3.new(8, 3, 0), at + Vector3.new(60, 3, 0)
+	local every = run(120, nearBy)
+	assert(every == 120, `near the camera every frame is drawn ({every} of 120)`)
+	local tenth = run(120, farOff)
+	assert(tenth >= 19 and tenth <= 21, `beyond 25 studs ten times a second ({tenth} of 120 frames, two seconds)`)
+	assert(run(120, farOff, at + Vector3.new(1, 0, 0)) == 120, "in the mating scene (it looks at the played spider) every frame, however far")
+	mate.state = "attend"
+	assert(run(60, farOff) == 60, "as it comes to court")
+	mate.state = "pair"
+	assert(run(60, farOff) == 60, "and when they are together")
+	mate.state = "wander"
+	assert(run(60, nil) == 60, "and with no camera to measure from")
+	stage.rig.update = nil
+	stage:reset()
+	local family = workspace:FindFirstChild("Family") -- (the stage's folder: the real client makes its own below)
+	if family ~= nil then family:Destroy() end
 end)
 
 -- ---------------------------------------------------------------- the real client
@@ -413,15 +487,22 @@ check("the hatching: a scene of about 26 seconds in the crack, spiderlings out o
 	d.place(CRACK)
 	-- Balloons: later some are lifting on threads.
 	local lifted, threads = 0, 0
+	local overlapLeast, overlapMost, seenBalls = math.huge, -math.huge, 0
 	for _ = 1, 10 * 16 do
 		wait(0.1)
 		for _, parts in legs.stage.bodies do
 			if parts.thread.Transparency < 1 then threads += 1 end
 			if parts.body.Position.Y > 0.5 and parts.body.Transparency < 1 then lifted += 1 end
+			if parts.body.Transparency < 1 then
+				-- (ROBLOX-93) every drawn spiderling, in every beat of the scene: its head overlaps its abdomen a little, no gap and not buried
+				local depth = (parts.body.Size.X + parts.head.Size.X) / 2 - (parts.head.Position - parts.body.Position).Magnitude
+				overlapLeast, overlapMost, seenBalls = math.min(overlapLeast, depth), math.max(overlapMost, depth), seenBalls + 1
+			end
 		end
 		life.clock.hour = 8.0
 	end
 	assert(lifted > 0 and threads > 0, `spiderlings rose on their threads ({lifted}, {threads})`)
+	assert(seenBalls > 100 and overlapLeast > 0.008 and overlapMost < 0.015, `each spiderling's head overlaps its abdomen throughout ({overlapLeast} to {overlapMost} studs over {seenBalls} sightings)`)
 	assert(legs.stage.t > 19 and legs.stage.t < 24, `about 20 s into the scene ({legs.stage.t})`)
 	assert(find("SpiderPrompts", "Caption").Text == "[silk threads lift the spiderlings away]", `the second caption: "{find("SpiderPrompts", "Caption").Text}"`)
 	assert(not d.caughtPanel:isShowing(), "still no card")

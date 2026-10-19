@@ -153,6 +153,8 @@ end })
 -- ---------------------------------------------------------------- Instances: folders and parts
 local Instance = {}
 local Object = {}
+-- What the engine would be asked to do, counted for the tests that measure the drawn rigs' cost: parts' Size writes, and BulkMoveTo calls and the parts they move.
+local counters = { sizeWrites = 0, bulkCalls = 0, bulkParts = 0 }
 local BASE_PARTS = { Part = true, WedgePart = true, MeshPart = true }
 local HAS_CFRAME = { Part = true, WedgePart = true, MeshPart = true, Camera = true }
 local function children(o) return rawget(o, "_children") end
@@ -165,6 +167,10 @@ local function newSignal()
 end
 local EVENTS = { InputBegan = true, InputEnded = true, InputChanged = true, Activated = true, MouseButton1Click = true, Changed = true }
 Object.__index = function(o, k)
+	if k == "Size" then
+		local s = rawget(o, "_size")
+		if s ~= nil then return s end
+	end
 	if EVENTS[k] then
 		local sig = newSignal()
 		rawset(o, k, sig)
@@ -189,6 +195,9 @@ Object.__newindex = function(o, k, v)
 		rawset(o, "_cframe", cf(v, c._x, c._y, c._z))
 	elseif k == "CFrame" then
 		rawset(o, "_cframe", v)
+	elseif k == "Size" and rawget(o, "_size") ~= nil then -- a part's size: every write is counted (shim.counters, for tests that prove a frame writes none)
+		counters.sizeWrites += 1
+		rawset(o, "_size", v)
 	else
 		rawset(o, k, v)
 	end
@@ -203,7 +212,7 @@ function Instance.new(className: string)
 		rawset(o, "_cframe", CFrame.new())
 	end
 	if BASE_PARTS[className] then
-		rawset(o, "Size", new(4, 1, 2))
+		rawset(o, "_size", new(4, 1, 2))
 		rawset(o, "CanQuery", true)
 		rawset(o, "CanCollide", true)
 		rawset(o, "Anchored", false)
@@ -442,6 +451,8 @@ function workspace.GetPartBoundsInRadius(_self, centre, r, params)
 end
 
 function workspace.BulkMoveTo(_self, parts, cframes)
+	counters.bulkCalls += 1
+	counters.bulkParts += #parts
 	for i, p in parts do p.CFrame = cframes[i] end
 end
 
@@ -534,5 +545,5 @@ end
 
 return { Vector3 = Vector3, CFrame = CFrame, Color3 = Color3, Enum = Enum, Instance = Instance, RaycastParams = RaycastParams,
 	OverlapParams = OverlapParams, workspace = workspace, BoxWorld = BoxWorld, Vector2 = Vector2, game = game, UDim = UDim, UDim2 = UDim2,
-	client = client, services = services, NumberRange = NumberRange, NumberSequence = NumberSequence,
+	client = client, services = services, counters = counters, NumberRange = NumberRange, NumberSequence = NumberSequence,
 	NumberSequenceKeypoint = NumberSequenceKeypoint, ColorSequence = ColorSequence, ColorSequenceKeypoint = ColorSequenceKeypoint, Font = Font }

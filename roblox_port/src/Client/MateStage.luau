@@ -30,6 +30,9 @@ MateStage.LIFT_HEIGHT = 2.4 -- how far a spiderling rises while it is seen
 MateStage.MAX_FULL = 12
 MateStage.MAX_LOW = 4
 MateStage.BODY = 0.14 -- the abdomen's diameter in studs (one stud is a centimetre: a spiderling a millimetre or two is shown larger so it can be seen)
+-- Where a spiderling's two balls sit, in BODY, along its heading from its middle, and the head's diameter: the head overlaps the abdomen (centres 0.77 apart, the radii
+-- 0.5 and 0.35 add to 0.85, so they are 0.08 into each other); at 0.55 and 0.6 across there was a gap of 0.1 BODY (0.014 studs) between them, a head floating in front.
+MateStage.BODY_AT, MateStage.HEAD_AT, MateStage.HEAD = -0.35, 0.42, 0.7
 -- The crack's floor, where the spiderlings walk: inside the retreat's box, clear of its walls.
 local FLOOR_Y = 0.05
 local LO = Vector3.new(Layout.RETREAT_MIN.X + 0.4, FLOOR_Y, Layout.RETREAT_MIN.Z + 0.4)
@@ -155,7 +158,7 @@ function MateStage.new(parent: Instance, world: Instance, detail: string): any
 	folder.Parent = parent
 	return setmetatable({
 		folder = folder, world = world, detail = detail, parent = parent,
-		rig = nil :: any, rigFor = "", sac = nil :: Part?, sacThreads = {} :: { Part },
+		rig = nil :: any, rigFor = "", scaleFor = 0, sac = nil :: Part?, sacThreads = {} :: { Part },
 		plan = {} :: { Spiderling }, bodies = {} :: { { body: Part, head: Part, thread: Part } },
 		t = 0.0, running = false, finished = false,
 	}, MateStage)
@@ -166,7 +169,9 @@ end
 -- Draws the mate where `mate` (the record) stands, or takes its rig away when it is not on the sill. `appearance`: the played spider's look. `focus` (ROBLOX-89): the point
 -- the mate looks at (the player's spider during the mating scene; its drawn body turns a little toward it), and `turn` (radians, 0 for none): how far the drawn body is
 -- turned about its up axis from where the simulation faces it (a female mate turning away in the scene's last beat; the simulation's heading is untouched).
-function MateStage.drawMate(self: any, mate: any, appearance: string, dt: number, reduced: boolean, focus: Vector3?, turn: number?)
+-- `cameraAt` (ROBLOX-93): where the camera is; a mate farther than SpiderRig's FAR_STUDS from it is drawn ten times a second (the simulation steps it every tick), unless it is in
+-- the mating scene or about to be. The mate's scale is set when the rig is made and when the mate's factor changes (clamped to 0.5..2, as Mate.valid allows), not every frame.
+function MateStage.drawMate(self: any, mate: any, appearance: string, dt: number, reduced: boolean, focus: Vector3?, turn: number?, cameraAt: Vector3?)
 	if mate == nil or mate.state == "away" then
 		if self.rig ~= nil then
 			self.rig:destroy()
@@ -178,18 +183,24 @@ function MateStage.drawMate(self: any, mate: any, appearance: string, dt: number
 		if self.rig ~= nil then self.rig:destroy() end
 		self.rig = SpiderRig.new(self.parent, self.world, appearance, "low", true) -- (living: it breathes and takes the mating scene's cues, for the same parts)
 		self.rig.model.Name = "MateSpider"
-		self.rigFor = appearance
+		self.rigFor, self.scaleFor = appearance, 0
 	end
 	local rig = self.rig
 	rig.reducedMotion = reduced
-	rig:setGrowthStage(Growth.ADULT)
-	rig:setScale(Growth.SCALES[Growth.ADULT + 1] * (mate.scale or 1))
+	local factor = mate.scale
+	factor = if type(factor) == "number" and factor == factor then math.clamp(factor, 0.5, 2) else 1
+	if self.scaleFor ~= factor then
+		self.scaleFor = factor
+		rig:setGrowthStage(Growth.ADULT)
+		rig:setScale(Growth.SCALES[Growth.ADULT + 1] * factor)
+	end
 	local moving = (mate.position - (mate.previous or mate.position)).Magnitude > 0.001
 	local up = mate.up or Vector3.yAxis
 	local heading = mate.heading
 	if turn ~= nil and turn ~= 0 then heading = CFrame.fromAxisAngle(up, turn):VectorToWorldSpace(heading) end
 	rig.focusPoint = focus
-	rig:update(SupportMath.bodyCFrame(mate.position, up, heading), dt, true, moving)
+	local near = cameraAt == nil or focus ~= nil or mate.state == "attend" or mate.state == "pair"
+	rig:drawStep(SupportMath.bodyCFrame(mate.position, up, heading), dt, true, moving, if near then 0 else (cameraAt :: Vector3 - mate.position).Magnitude)
 end
 
 -- ---- the egg sac
@@ -223,7 +234,7 @@ function MateStage.begin(self: any, seed: number, generation: number, day: numbe
 	self.plan = MateStage.plan(seed, generation, day, count)
 	for i = 1, count do
 		local body = ball("Spiderling" .. i, MateStage.BODY, Color3.fromRGB(74, 58, 46), self.folder)
-		local head = ball("SpiderlingHead" .. i, MateStage.BODY * 0.6, Color3.fromRGB(98, 80, 62), self.folder)
+		local head = ball("SpiderlingHead" .. i, MateStage.BODY * MateStage.HEAD, Color3.fromRGB(98, 80, 62), self.folder)
 		local thread = strand("SpiderlingThread" .. i, Vector3.zero, Vector3.zAxis * 0.1, self.folder, 0.008)
 		body.Transparency, head.Transparency, thread.Transparency = 1, 1, 1
 		table.insert(self.bodies, { body = body, head = head, thread = thread })
@@ -246,8 +257,8 @@ function MateStage.step(self: any, dt: number, reduced: boolean): boolean
 		if visible then
 			local fwd = pose.heading
 			local at = pose.position + Vector3.yAxis * (MateStage.BODY * 0.5)
-			parts.body.Position = at - fwd * (MateStage.BODY * 0.35)
-			parts.head.Position = at + fwd * (MateStage.BODY * 0.55)
+			parts.body.Position = at + fwd * (MateStage.BODY * MateStage.BODY_AT)
+			parts.head.Position = at + fwd * (MateStage.BODY * MateStage.HEAD_AT)
 		end
 		local th = parts.thread
 		if pose.thread ~= nil and visible then

@@ -298,5 +298,74 @@ check("the Eat key grips a caught rival too, like the Jump key; the touch Feed b
 	needs.energy = 0.8
 	life.rival.state, life.rival.contests, life.rival.subdued = "patrol", 0, nil
 end)
+check("the rival is drawn ten times a second when it is more than 25 studs from the camera, every frame near it and through its windup and lunge, while the sim steps it every tick (ROBLOX-93)", function()
+	local driver = ClientStubs.driver
+	local life, needs = driver.life, driver.needs
+	local camera = workspace.CurrentCamera
+	driver.place(Vector3.new(-5, 0.31, -9))
+	frames(5)
+	life.clock.hour = 9
+	local r = life.rival
+	assert(r and r.state ~= "dormant" and r.state ~= "consumed", "a rival to watch")
+	local rig = driver.rivalLegs.rig
+	assert(rig ~= nil, "it is drawn")
+	local updates = 0
+	local real = rig.update
+	rig.update = function(self, ...) updates += 1; return real(self, ...) end
+	-- The rival is set `away` studs from the spider, along the sill, in `state`, and watched for `n` frames: the frames it was in that state, the times it was drawn in them, how
+	-- many ticks the sim moved it, and its nearest and farthest distance from the camera in them.
+	local function watch(state: string, away: number, n: number): (number, number, number, number, number)
+		r.state, r.elapsed, r.notice = state, 0, 0
+		r.position = driver.motor.pos + Vector3.new(away, 0, 0)
+		r.previous = r.position
+		local counted, drawn, stepped, nearest, farthest = 0, 0, 0, math.huge, 0
+		local last = r.position
+		for _ = 1, n do
+			local before = updates
+			frame(1 / 60)
+			life.clock.hour = 9
+			local d = (camera.CFrame.Position - r.position).Magnitude
+			if r.state == state then
+				counted += 1
+				drawn += updates - before
+				nearest, farthest = math.min(nearest, d), math.max(farthest, d)
+			end
+			if (r.position - last).Magnitude > 0 then stepped += 1 end
+			last = r.position
+		end
+		return counted, drawn, stepped, nearest, farthest
+	end
+	local counted, drawn, stepped, nearest, farthest = watch("patrol", 12, 120)
+	assert(counted == 120 and farthest < 25 and drawn == 120, `near the camera ({string.format("%.0f", nearest)} to {string.format("%.0f", farthest)} studs) every frame is drawn ({drawn} of {counted})`)
+	counted, drawn, stepped, nearest, farthest = watch("patrol", 32, 120)
+	assert(counted == 120 and nearest > 25, `(the rival stayed more than 25 studs off: {nearest})`)
+	assert(drawn >= 19 and drawn <= 21, `beyond 25 studs ten times a second ({drawn} drawings in {counted} frames, two seconds)`)
+	assert(stepped >= 100, `and the simulation moved it nearly every tick ({stepped} of {counted})`)
+	-- A windup and a lunge are drawn every frame (here the spider is 2.5 studs off, so it is near the camera as well).
+	counted, drawn = 0, 0
+	r.state, r.elapsed, r.notice = "patrol", 0, 0
+	r.position = driver.motor.pos + Vector3.new(2.5, 0, 0)
+	r.previous = r.position
+	local seen: { [string]: boolean } = {}
+	for _ = 1, 150 do
+		local before = updates
+		frame(1 / 60)
+		life.clock.hour = 9
+		if r.state == "windup" or r.state == "lunge" then
+			seen[r.state] = true
+			counted += 1
+			drawn += updates - before
+		end
+		if r.state == "recover" and seen.lunge then break end
+	end
+	assert(seen.windup and seen.lunge and counted >= 40 and drawn == counted, `through a windup and a lunge every frame is drawn ({drawn} of {counted} frames)`)
+	rig.update = nil
+	-- Leave it as the other checks expect: a rival of today, patrolling, and the spider's reserves as they were.
+	r.state, r.contests, r.subdued, r.elapsed = "patrol", 0, nil, 0
+	r.position = Vector3.new(-20, 0.31, -9)
+	r.previous = r.position
+	needs.energy = 0.8
+	life.cause = nil
+end)
 print("CLIENT_RIVAL passed=" .. passed .. " failed=" .. failed)
 if failed > 0 then error("CLIENT_RIVAL failed") end

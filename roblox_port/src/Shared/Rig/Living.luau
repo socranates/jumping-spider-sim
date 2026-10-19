@@ -94,8 +94,15 @@ function Living.cue(self: State, name: string, seconds: number?)
 	end
 end
 
--- The scene's cues for one step: their clocks, and their eased weights (a slew-limited share, so a release or a late cue never pops). Under Reduced Motion the
--- weight is a held pose: all or nothing.
+-- A cue's eased weight (a slew-limited share, so a release or a late cue never pops): up while `on`, down otherwise. Under Reduced Motion it is a held pose, all or nothing.
+-- (A function of the module, not made again every step: ROBLOX-93.)
+local function ease(w: number, on: boolean, spec: any, dt: number, reduced: boolean): number
+	if spec == nil then return 0 end
+	if reduced then return if on then 1 else 0 end
+	return math.clamp(w + (if on then dt / spec.riseSeconds else -dt / spec.fallSeconds), 0, 1)
+end
+
+-- The scene's cues for one step: their clocks, and their eased weights.
 local function stepScene(self: State, dt: number, reduced: boolean)
 	local cfg = self.cfg
 	local meet, settle = cfg.meet, cfg.settle
@@ -107,14 +114,9 @@ local function stepScene(self: State, dt: number, reduced: boolean)
 		self.settleT += dt
 		if self.settleT >= self.settleLen then self.settleT = nil end
 	end
-	local function ease(w: number, on: boolean, spec: any): number
-		if spec == nil then return 0 end
-		if reduced then return if on then 1 else 0 end
-		return math.clamp(w + (if on then dt / spec.riseSeconds else -dt / spec.fallSeconds), 0, 1)
-	end
 	-- (a cue's seconds are its whole length, the ease out included: it is let go `fallSeconds` before its end)
-	self.meetW = ease(self.meetW, self.meetT ~= nil and meet ~= nil and self.meetT < self.meetLen - meet.fallSeconds, meet)
-	self.settleW = ease(self.settleW, self.settleT ~= nil and settle ~= nil and self.settleT < self.settleLen - settle.fallSeconds, settle)
+	self.meetW = ease(self.meetW, self.meetT ~= nil and meet ~= nil and self.meetT < self.meetLen - meet.fallSeconds, meet, dt, reduced)
+	self.settleW = ease(self.settleW, self.settleT ~= nil and settle ~= nil and self.settleT < self.settleLen - settle.fallSeconds, settle, dt, reduced)
 end
 
 local function acts(self: State, kind: string): ({ Act }, number)
@@ -150,10 +152,15 @@ local function clearPose(pose: Pose)
 	for _, leg in pose.legs do leg.w = 0 end
 end
 
-local function setLeg(pose: Pose, index: number, w: number, spec: any, rel: boolean)
+-- (the numbers, not a table of them: a grooming leg and a stretch are set every step, ROBLOX-93)
+local function setLeg(pose: Pose, index: number, w: number, x: number, y: number, z: number, kneeOut: number, kneeUp: number, rel: boolean)
 	local leg = pose.legs[index]
-	leg.w, leg.rel, leg.x, leg.y, leg.z = w, rel, spec.x, spec.y, spec.z
-	leg.kneeOut, leg.kneeUp = spec.kneeOut or 0, spec.kneeUp or 0
+	leg.w, leg.rel, leg.x, leg.y, leg.z = w, rel, x, y, z
+	leg.kneeOut, leg.kneeUp = kneeOut, kneeUp
+end
+-- A leg to a look's own place (`spec` = { x, y, z, kneeOut, kneeUp }, the last two optional).
+local function setLegAt(pose: Pose, index: number, w: number, spec: any, rel: boolean)
+	setLeg(pose, index, w, spec.x, spec.y, spec.z, spec.kneeOut or 0, spec.kneeUp or 0, rel)
 end
 
 -- The pose of the scene's cues now (their weights are in the state): legs I reach, the palps come up and in, the body sinks and the breath deepens.
@@ -163,8 +170,8 @@ function Living._sceneLegs(self: State, pose: Pose, legsFree: boolean)
 	local m = smooth(self.meetW)
 	if meet ~= nil and m > 0 then
 		if legsFree then
-			setLeg(pose, 1, m, meet.reach, false)
-			setLeg(pose, 5, m, meet.reach, false)
+			setLegAt(pose, 1, m, meet.reach, false)
+			setLegAt(pose, 5, m, meet.reach, false)
 		end
 		for k = 1, 2 do
 			local inward = if k == 1 then -1 else 1
@@ -220,8 +227,8 @@ function Living.step(self: State, dt: number, standing: boolean, reduced: boolea
 			alarming = true
 			pose.freeze = env
 			if alarmLegs then
-				setLeg(pose, 1, env, alarm.raise, false)
-				setLeg(pose, 5, env, alarm.raise, false)
+				setLegAt(pose, 1, env, alarm.raise, false)
+				setLegAt(pose, 5, env, alarm.raise, false)
 			end
 		end
 	end
@@ -290,7 +297,7 @@ function Living.step(self: State, dt: number, standing: boolean, reduced: boolea
 			local pair = (a.index - 1) % 4 + 1
 			local spec = groom.legs[pair]
 			local sweep = math.sin(TAU * groom.strokes * u) -- the leg is drawn through the palps to and fro
-			setLeg(pose, a.index, w, { x = spec.x, y = spec.y, z = spec.z + spec.sweep * sweep, kneeOut = spec.kneeOut, kneeUp = spec.kneeUp }, false)
+			setLeg(pose, a.index, w, spec.x, spec.y, spec.z + spec.sweep * sweep, spec.kneeOut or 0, spec.kneeUp or 0, false)
 			for k = 1, 2 do -- both palps come in to hold it
 				local inward = if k == 1 then -1 else 1
 				pose.palpYaw[k] = inward * math.rad(groom.legPalpYawDeg) * w
@@ -300,7 +307,7 @@ function Living.step(self: State, dt: number, standing: boolean, reduced: boolea
 			local st = cfg.stretch
 			local pair = (a.index - 1) % 4 + 1
 			local along = if pair <= 2 then -st.along else st.along * 0.6
-			setLeg(pose, a.index, smooth(math.min(u, 1 - u) / 0.35) * self.weight, { x = st.out, y = st.lift, z = along, kneeUp = st.kneeUp }, true)
+			setLeg(pose, a.index, smooth(math.min(u, 1 - u) / 0.35) * self.weight, st.out, st.lift, along, 0, st.kneeUp or 0, true)
 		end
 	end
 	return pose

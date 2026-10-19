@@ -1728,10 +1728,12 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
      if not rivalLegs.rig then rivalLegs.rig=SpiderRig.new(Workspace,sill,"rival_spider","low");rivalLegs.rig.model.Name="RivalSpider" end
      rivalLegs.rig.reducedMotion=setting("ReducedMotion")==true
      rivalLegs.rig.jumpLoad=if rival.state=="windup" then math.clamp(rival.elapsed,0,1) else 0
-     rivalLegs.rig:update(SupportMath.bodyCFrame(rival.position,if rival.state=="taken" then Vector3.yAxis else (rival.up or Vector3.yAxis),rival.heading),if paused then 0 else simFrame,rival.state~="lunge" and rival.state~="taken",(rival.position-rival.previous).Magnitude>.001)
+     -- (ROBLOX-93: drawn ten times a second when it is more than SpiderRig's FAR_STUDS from the camera, except in a windup, a lunge or when carried; the sim steps it every tick)
+     local hurried=rival.state=="windup" or rival.state=="lunge" or rival.state=="taken"
+     rivalLegs.rig:drawStep(SupportMath.bodyCFrame(rival.position,if rival.state=="taken" then Vector3.yAxis else (rival.up or Vector3.yAxis),rival.heading),if paused then 0 else simFrame,rival.state~="lunge" and rival.state~="taken",(rival.position-rival.previous).Magnitude>.001,if hurried then 0 else (camera.CFrame.Position-rival.position).Magnitude)
     elseif rivalLegs.rig then rivalLegs.rig:destroy();rivalLegs.rig=nil end
     -- The mate, the egg sac and the hatching (ROBLOX-80). The scene waits when a screen has the game; when it is over the ending card comes.
-    mateLegs.stage:drawMate(life.mate,appearance,if paused then 0 else simFrame,setting("ReducedMotion")==true,mateLegs.couple.focus,mateLegs.couple.turn)
+    mateLegs.stage:drawMate(life.mate,appearance,if paused then 0 else simFrame,setting("ReducedMotion")==true,mateLegs.couple.focus,mateLegs.couple.turn,camera.CFrame.Position)
     mateLegs.stage:drawSac(mateLegs.Mating.hasSac(life.mating))
     if mateLegs.phase=="scene" and not paused and not mateLegs.stage:step(simFrame,setting("ReducedMotion")==true) then mateLegs.showCard(false) end
 	updateHud(frameDt)

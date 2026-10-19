@@ -5,7 +5,10 @@
 
 local Anatomy = {}
 
-export type Eye = { name: string, side: number, at: Vector3, radii: Vector3, reflectance: number, principal: boolean }
+-- `kind`: "ame" (the principal eyes), "ale", "ple", "pme" or "tubercle" (a tarantula's bead). `margin` (ROBLOX-93): the eye's place on the head's (or the tubercle's) surface is found from
+-- its offsets across and along, so it is only on the surface where those lie inside the ellipse the surface covers: `margin` is 1 minus the sum of their squared shares of
+-- the radii, 0 at the rim (where the place is clamped) and 1 at the middle. The tests keep every eye of every look at 0.02 or more.
+export type Eye = { name: string, side: number, kind: string, at: Vector3, radii: Vector3, reflectance: number, principal: boolean, margin: number }
 export type Glint = { side: number, at: Vector3, radii: Vector3 }
 export type Palp = { side: number, base: Vector3, tip: Vector3 }
 export type Zone = { at: Vector3, radius: number }
@@ -64,6 +67,17 @@ function Anatomy.ellipsoidPoint(c: Vector3, r: Vector3, dir: Vector3): (Vector3,
 	return p, Anatomy.normalAt(c, r, p)
 end
 
+-- Does the segment from a to b come within `pad` studs of the eye (its ellipsoid, axes along the body frame's, each radius grown by `pad`)? The segment's closest point in the
+-- ellipsoid's own space (every axis divided by its radius) is found exactly, not sampled: the squared distance there is a quadratic in the segment's parameter.
+function Anatomy.touchesEye(eye: Eye, a: Vector3, b: Vector3, pad: number): boolean
+	local r = eye.radii + Vector3.one * pad
+	local u0 = Vector3.new((a.X - eye.at.X) / r.X, (a.Y - eye.at.Y) / r.Y, (a.Z - eye.at.Z) / r.Z)
+	local d = Vector3.new((b.X - a.X) / r.X, (b.Y - a.Y) / r.Y, (b.Z - a.Z) / r.Z)
+	local dd = d:Dot(d)
+	local t = if dd > 1e-12 then math.clamp(-u0:Dot(d) / dd, 0, 1) else 0
+	return (u0 + d * t).Magnitude < 1
+end
+
 function Anatomy.layout(look: any): Layout
 	local hc, hr = v3(look.headCenter), v3(look.headRadii)
 	local ac, ar = v3(look.abdomenCenter), v3(look.abdomenRadii)
@@ -71,10 +85,10 @@ function Anatomy.layout(look: any): Layout
 	local eyes: { Eye } = {}
 	local glints: { Glint } = {}
 	local zones: { Zone } = {}
-	local function addEye(name: string, side: number, anchor: Vector3, r: Vector3, out: number, reflectance: number, principal: boolean): Vector3
+	local function addEye(name: string, kind: string, side: number, anchor: Vector3, r: Vector3, out: number, reflectance: number, principal: boolean, margin: number): Vector3
 		local n = Anatomy.normalAt(hc, hr, anchor)
 		local at = anchor + n * (out * math.min(r.X, r.Y, r.Z))
-		table.insert(eyes, { name = name, side = side, at = at, radii = r, reflectance = reflectance, principal = principal })
+		table.insert(eyes, { name = name, side = side, kind = kind, at = at, radii = r, reflectance = reflectance, principal = principal, margin = margin })
 		table.insert(zones, { at = at, radius = math.max(r.X, r.Y, r.Z) * 1.15 + 0.012 })
 		return at
 	end
@@ -90,7 +104,7 @@ function Anatomy.layout(look: any): Layout
 				local anchor = Vector3.new(tc.X + dx, tc.Y + tr.Y * q, tc.Z + dz)
 				local at = anchor + Anatomy.normalAt(tc, tr, anchor) * (0.3 * spec.r)
 				local r3 = Vector3.one * spec.r
-				table.insert(eyes, { name = "Eye", side = side, at = at, radii = r3, reflectance = tub.eyeReflectance, principal = false })
+				table.insert(eyes, { name = "Eye", side = side, kind = "tubercle", at = at, radii = r3, reflectance = tub.eyeReflectance, principal = false, margin = 1 - (dx / tr.X) ^ 2 - (dz / tr.Z) ^ 2 })
 				table.insert(zones, { at = at, radius = spec.r * 1.15 + 0.012 })
 				if n == 1 then
 					local g = tub.glint
@@ -106,7 +120,7 @@ function Anatomy.layout(look: any): Layout
 		local ar3 = v3(a.radii)
 		local ax, ay = side * a.x, a.y
 		local anchor = Vector3.new(hc.X + ax, ay, Anatomy.frontZ(hc, hr, ax, ay - hc.Y))
-		local at = addEye("PrincipalEye", side, anchor, ar3, a.out, a.reflectance, true)
+		local at = addEye("PrincipalEye", "ame", side, anchor, ar3, a.out, a.reflectance, true, 1 - (ax / hr.X) ^ 2 - ((ay - hc.Y) / hr.Y) ^ 2)
 		for _, g in a.glints do
 			local depth = math.sqrt(math.max(1 - (g.dx / ar3.X) ^ 2 - (g.dy / ar3.Y) ^ 2, 0))
 			local gz = -ar3.Z * depth
@@ -119,11 +133,11 @@ function Anatomy.layout(look: any): Layout
 		-- Anterior lateral eyes at the sides of the face.
 		local l = e.ale
 		local lx, ly = side * l.x, l.y
-		addEye("Eye", side, Vector3.new(hc.X + lx, ly, Anatomy.frontZ(hc, hr, lx, ly - hc.Y)), Vector3.one * l.r, l.out, l.reflectance, false)
+		addEye("Eye", "ale", side, Vector3.new(hc.X + lx, ly, Anatomy.frontZ(hc, hr, lx, ly - hc.Y)), Vector3.one * l.r, l.out, l.reflectance, false, 1 - (lx / hr.X) ^ 2 - ((ly - hc.Y) / hr.Y) ^ 2)
 		-- Posterior lateral and median eyes on the dome.
-		for _, d in { e.ple, e.pme } do
+		for n, d in { e.ple, e.pme } do
 			local dx, dz = side * d.x, d.z
-			addEye("Eye", side, Vector3.new(hc.X + dx, Anatomy.topY(hc, hr, dx, dz - hc.Z), dz), Vector3.one * d.r, d.out, d.reflectance, false)
+			addEye("Eye", if n == 1 then "ple" else "pme", side, Vector3.new(hc.X + dx, Anatomy.topY(hc, hr, dx, dz - hc.Z), dz), Vector3.one * d.r, d.out, d.reflectance, false, 1 - (dx / hr.X) ^ 2 - ((dz - hc.Z) / hr.Z) ^ 2)
 		end
 	end
 	local cheeks, jaws, palps = {}, {}, {}

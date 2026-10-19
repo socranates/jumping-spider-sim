@@ -148,7 +148,13 @@ for _, h in hairs do
 		for _, e in front do nearEye = math.min(nearEye, (h.at - e.at).Magnitude) end
 	end
 end
-check(kinds.tuft == 2 * look.fuzz.tuftHairs and tuftsOk, "bold-jumper tufts: a fan on each side, behind and above the eyes, not brows")
+do -- (a block of its own: this file is close to Luau's limit of 200 locals)
+	-- ROBLOX-93: a tuft hair whose length would touch an eye is left out, on both sides alike (the two fans are mirror images): one hair of the seven on each side.
+	local sides = { [-1] = 0, [1] = 0 }
+	for _, h in hairs do if h.kind == "tuft" then sides[h.side] += 1 end end
+	check(kinds.tuft == sides[-1] + sides[1] and sides[-1] == sides[1] and sides[1] == look.fuzz.tuftHairs - 1 and tuftsOk,
+		`bold-jumper tufts: a fan on each side, behind and above the eyes, not brows (the same on both sides, {sides[-1]} and {sides[1]} of {look.fuzz.tuftHairs}: the hair that would touch an eye is left out)`)
+end
 check(nearEye > ame.radii[1], "tufts do not cover the front eyes")
 -- ---------------------------------------------------------------- the coat (ROBLOX-13, second pass; ROBLOX-85, third)
 -- Short, fine hairs that lie along the body at 15 to 25 degrees off the surface, pointing backward and a little outward; only a few short guard hairs
@@ -370,10 +376,18 @@ check(full.total <= 700 and full.other <= 200 and full.hair + full.shell >= 300 
 check(low.total <= 290 and low.hair >= 100 and low.hair <= 260 and low.shell <= 2, `low detail part budget ({low.total})`)
 -- Each tier keeps exactly the hairs its table says: one in `every` of each class, none of a class whose `every` is 0.
 local function kept(count: number, every: number): number return if every <= 0 then 0 else math.floor(count / every) end
+-- (ROBLOX-93: the hairs that come in a mirrored pair, the tufts, the ruff and the palps' fluff, are counted on each side by itself, as Setae.thin does.)
 local function expectedHairs(every: { [string]: number }): number
 	local n = 0
-	for kind, count in kinds do n += kept(count, every[kind] or 1) end
-	n += kept(#Setae.palp(look), every.palp)
+	local per: { [string]: { kind: string, count: number } } = {}
+	for _, list in { hairs, Setae.palp(look) } do
+		for _, h in list do
+			local entry = per[h.kind .. h.side] or { kind = h.kind, count = 0 }
+			entry.count += 1
+			per[h.kind .. h.side] = entry
+		end
+	end
+	for _, entry in per do n += kept(entry.count, every[entry.kind] or 1) end
 	for i = 1, 8 do n += kept(#Setae.leg(look, i), every.leg) end
 	return n
 end
@@ -1327,6 +1341,429 @@ check(d._hang == 0 and d._climb == 0 and not d._climbing, "landing clears the ha
 d:destroy()
 end
 hangChecks()
+
+-- ---------------------------------------------------------------- ROBLOX-93: the audit, part three (the rigs and the frame)
+-- A function of its own: this file is close to Luau's limit of 200 locals. In it: the eyes and the hairs that must not touch them, the mirrored pairs, the legs' hairs and the
+-- anterior lateral eyes, what a frame writes and moves, the tolerance of the hairs that are placed only when they moved (against a rig that places them all every frame),
+-- the throttled drawing of a far spider, and the greenbottle's front legs.
+local function auditThreeChecks()
+	local Living = require("../src/Shared/Rig/Living")
+	local counters = shim.counters
+	local DT = 1 / 60
+	local ground = BoxWorld.folder("AuditFloor", { { name = "floor", lo = Vector3.new(-80, -1, -80), hi = Vector3.new(80, 0, 80), profile = "painted_wood_dry" } })
+	local at = SupportMath.bodyCFrame(Vector3.new(0, 0.31, 0), Vector3.yAxis, Vector3.new(0, 0, -1))
+	local function build(id: string?, detail: string, living: boolean?): any return SpiderRig.new(ground, ground, id, detail, living) end
+	local function f4(x: number): string return string.format("%.4f", x) end
+	local function flip(v: Vector3): Vector3 return Vector3.new(-v.X, v.Y, v.Z) end
+
+	-- ---- the eyes (item 12) and the hairs that must not touch them (item 3)
+	local function eyeChecks()
+		local ids: { string } = {}
+		for id in Appearances.profiles do table.insert(ids, id) end
+		table.sort(ids)
+		local tightest, tightestAt, eyes = math.huge, "", 0
+		for _, id in ids do
+			for _, e in Anatomy.layout(Appearances.profiles[id]).eyes do
+				eyes += 1
+				if e.margin < tightest then tightest, tightestAt = e.margin, `{id} {e.kind} {e.side}` end
+			end
+		end
+		check(#ids >= 6 and eyes >= 48 and tightest >= 0.02, `every eye of every look sits well inside the surface it is placed on (tightest margin {f4(tightest)}, {tightestAt}; {eyes} eyes in {#ids} looks)`)
+		local rim = deepcopy(look)
+		rim.eye.ale.x = look.headRadii[1] * 0.995
+		local rimTight = math.huge
+		for _, e in Anatomy.layout(rim).eyes do rimTight = math.min(rimTight, e.margin) end
+		check(rimTight < 0.02, `(the check does see an eye at the rim: margin {f4(rimTight)})`)
+
+		-- Anatomy.touchesEye: a segment through an eye, grazing it within the pad, just outside the pad and far off
+		local eye = Anatomy.layout(look).eyes[1]
+		local pad, rx, rz = 0.004, eye.radii.X, eye.radii.Z
+		local function across(dx: number): boolean -- a segment along Z, dx studs to the side of the eye's middle
+			return Anatomy.touchesEye(eye, eye.at + Vector3.new(dx, 0, -1), eye.at + Vector3.new(dx, 0, 1), pad)
+		end
+		local function endingAt(z: number): boolean -- a segment from far in front of the eye to z studs from its middle along Z
+			return Anatomy.touchesEye(eye, eye.at + Vector3.new(0, 0, -1), eye.at + Vector3.new(0, 0, z), pad)
+		end
+		check(across(0) and across(rx * 0.5) and across(rx + pad - 0.001) and not across(rx + pad + 0.001) and not across(rx * 3), "a hair that touches an eye is found (through it, grazing within the pad) and one that does not is not")
+		check(endingAt(-rz - pad + 0.001) and not endingAt(-rz - pad - 0.001), "a hair that ends at an eye is found too, one that stops just short of the pad is not")
+
+		-- The hairs themselves, sampled root to tip (41 points) against every eye by a test that shares nothing with touchesEye: no sample is inside any eye
+		for _, id in { "first_spider", "rival_spider" } do
+			local l = Appearances.profiles[id]
+			local layout = Anatomy.layout(l)
+			local hairs = Setae.body(l)
+			local lowest, inside, near_ = math.huge, 0, 0
+			for _, h in hairs do
+				for _, e in layout.eyes do
+					local reach = h.length + math.max(e.radii.X, e.radii.Y, e.radii.Z) + 0.03
+					if (h.at - e.at).Magnitude > reach then continue end
+					near_ += 1
+					for s = 0, 40 do
+						local r = ellipsoidRadius(e.at, e.radii, h.at + h.dir * (h.length * s / 40))
+						lowest = math.min(lowest, r)
+						if r < 1 then inside += 1 end
+					end
+				end
+			end
+			check(#hairs > 250 and near_ > 20 and inside == 0, `{id}: no hair, root to tip, is inside an eye (lowest ellipsoid radius {f4(lowest)} over {near_} hair and eye pairs close enough to matter, {#hairs} hairs)`)
+		end
+		-- a hair that pierces an eye would be seen: the sampler on a made-up hair through the first front eye
+		local layout = Anatomy.layout(look)
+		local pierced = 0
+		for s = 0, 40 do
+			if ellipsoidRadius(layout.eyes[1].at, layout.eyes[1].radii, layout.eyes[1].at + Vector3.new(0.02, 0, -0.06) + Vector3.new(0, 0, 0.12) * (s / 40)) < 1 then pierced += 1 end
+		end
+		check(pierced > 5, "(the sampler does see a hair through an eye)")
+		-- the tufts aimed at the front eyes lose the hairs that would touch them (and both sides lose the same)
+		local aimed = deepcopy(look)
+		aimed.fuzz.tuft.at = { 0.2, 0.55, -0.80 }
+		aimed.fuzz.tuft.lean = { 0.1, 0.3, -1.0 }
+		local sides = { [-1] = 0, [1] = 0 }
+		local touching = 0
+		for _, h in Setae.body(aimed) do
+			if h.kind == "tuft" then
+				sides[h.side] += 1
+				for _, e in layout.eyes do
+					if Anatomy.touchesEye(e, h.at, h.at + h.dir * h.length, 0.004 - 1e-6) then touching += 1 end
+				end
+			end
+		end
+		check(sides[-1] == sides[1] and sides[1] < look.fuzz.tuftHairs and touching == 0, `tufts aimed at the front eyes keep only the hairs that clear them, the same on both sides ({sides[-1]} and {sides[1]} of {look.fuzz.tuftHairs}, {touching} touching)`)
+	end
+
+	-- ---- mirrored pairs (item 9): the tufts, the ruff, the palps' fluff and a leg and its twin are mirror images, hair for hair
+	local function mirrorChecks()
+		for _, id in { "first_spider", "rival_spider" } do
+			local l = Appearances.profiles[id]
+			local byKind: { [string]: { [number]: { any } } } = {}
+			for _, list in { Setae.body(l), Setae.palp(l) } do
+				for _, h in list do
+					if h.side == 0 then continue end
+					byKind[h.kind] = byKind[h.kind] or {}
+					byKind[h.kind][h.side] = byKind[h.kind][h.side] or {}
+					table.insert(byKind[h.kind][h.side], h)
+				end
+			end
+			local kinds, same, worst, tones = 0, true, 0.0, true
+			local report = {}
+			for kind, bySide in byKind do
+				kinds += 1
+				local L, R = bySide[-1] or {}, bySide[1] or {}
+				same = same and #L == #R and #L > 0
+				table.insert(report, `{kind} {#L}/{#R}`)
+				for i = 1, math.min(#L, #R) do
+					local a, b = L[i], R[i]
+					worst = math.max(worst, (flip(a.at) - b.at).Magnitude, (flip(a.dir) - b.dir).Magnitude, (flip(a.normal) - b.normal).Magnitude, math.abs(a.length - b.length), math.abs(a.width - b.width))
+					tones = tones and a.tone == b.tone
+				end
+			end
+			table.sort(report)
+			check(kinds == 3 and same and worst < 1e-9 and tones, `{id}: the tufts, the ruff and the palps' fluff are mirror images, hair for hair ({table.concat(report, ", ")}; worst {string.format("%.1e", worst)})`)
+		end
+		for _, id in { "first_spider", "rival_spider", "brachypelma_hamorii", "chromatopelma_cyaneopubescens" } do
+			local l = Appearances.profiles[id]
+			local count, same, worst = 0, true, 0.0
+			for pair = 1, 4 do
+				local L, R = Setae.leg(l, pair), Setae.leg(l, pair + 4)
+				same = same and #L == #R and #L > 0
+				for n = 1, math.min(#L, #R) do
+					local a, b = L[n], R[n]
+					count += 1
+					same = same and a.segment == b.segment and a.t == b.t and a.length == b.length and a.tone == b.tone and a.lift == b.lift
+					worst = math.max(worst, math.abs(a.theta + b.theta))
+				end
+			end
+			check(same and worst < 1e-12 and count >= 10, `{id}: each leg's hairs are the mirror images of its twin's (same place along the link and length and tone, the angle round the leg turned the other way; {count} hairs)`)
+		end
+		-- as drawn: a rig standing on the floor with no motion, each hair of a left leg has its mirror image on the right leg, root and tip, in the body's frame
+		for _, id in { "first_spider", "rival_spider", "chromatopelma_cyaneopubescens" } do
+			local rig = build(id, "full")
+			rig.reducedMotion = true
+			for _ = 1, 30 do rig:update(at, DT, true, false) end
+			local worst, checked = 0.0, 0
+			local function ends(p: BasePart): (Vector3, Vector3)
+				local c = p.CFrame
+				local half = c.LookVector * (p.Size.Z * 0.5)
+				return at:PointToObjectSpace(c.Position - half), at:PointToObjectSpace(c.Position + half)
+			end
+			for pair = 1, 4 do
+				local L, R = rig._legs[pair].hairs, rig._legs[pair + 4].hairs
+				for n = 1, math.min(#L, #R) do
+					local a0, a1 = ends(L[n].part)
+					local b0, b1 = ends(R[n].part)
+					worst = math.max(worst, (flip(a0) - b0).Magnitude, (flip(a1) - b1).Magnitude)
+					checked += 1
+				end
+			end
+			check(checked >= 10 and worst < 1e-5, `{id}: drawn on the floor, the right legs' hairs are the left legs' mirrored across the body ({checked} hairs, worst {string.format("%.1e", worst)} studs)`)
+			rig:destroy()
+		end
+		-- a tier keeps the same hairs on both sides: each kind of mirrored hair has the same count on both, and so has a pair of legs
+		for _, id in { "first_spider", "rival_spider" } do
+			local l = Appearances.profiles[id]
+			for _, detail in { "full", "low" } do
+				local every = l.detail[detail].every
+				local counts: { [string]: number } = {}
+				for _, list in { Setae.thin(Setae.body(l), every), Setae.thin(Setae.palp(l), every) } do
+					for _, h in list do
+						if h.side ~= 0 then counts[h.kind .. h.side] = (counts[h.kind .. h.side] or 0) + 1 end
+					end
+				end
+				local even = true
+				for _, kind in { "tuft", "ruff", "palp" } do even = even and (counts[kind .. "-1"] or -1) == (counts[kind .. "1"] or -2) and (counts[kind .. "1"] or 0) > 0 end
+				local rig = build(id, detail)
+				local legsEven = true
+				for pair = 1, 4 do legsEven = legsEven and #rig._legs[pair].hairs == #rig._legs[pair + 4].hairs end
+				local seta = 0
+				for _, p in rig.model:GetChildren() do if p.Name == "Seta" then seta += 1 end end
+				check(even and legsEven and (detail == "full" or counts["tuft1"] ~= nil), `{id} {detail}: the tier keeps the same number of tuft, ruff and palp hairs on both sides ({counts["tuft-1"]}/{counts["tuft1"]}, {counts["ruff-1"]}/{counts["ruff1"]}, {counts["palp-1"]}/{counts["palp1"]}) and of hairs on twin legs`)
+				rig:destroy()
+			end
+		end
+	end
+
+	-- ---- the legs' hairs keep off the anterior lateral eyes (item 10): the hairs of legs I and II start at the face; the femur is left bare for the first `hipBare` of its length
+	local function aleChecks()
+		local function gap(a: Vector3, b: Vector3, p: Vector3): number -- the distance from p to the segment ab
+			local ab = b - a
+			local t = math.clamp((p - a):Dot(ab) / math.max(ab:Dot(ab), 1e-12), 0, 1)
+			return (a + ab * t - p).Magnitude
+		end
+		for _, id in { "first_spider", "rival_spider" } do
+			for _, detail in { "full", "low" } do
+				local rig = build(id, detail, true) -- (living: the low tier takes the cues as the mate does)
+				local ales: { Part } = {}
+				local k = 0
+				for _, f in rig._fixed do
+					if f.part.Name == "Eye" or f.part.Name == "PrincipalEye" then
+						k += 1
+						if rig._layout.eyes[k].kind == "ale" then table.insert(ales, f.part) end
+					end
+				end
+				local closest, who, looks, hairs = math.huge, "", 0, 0
+				local phase = "stand"
+				local function measure()
+					looks += 1
+					for _, eye in ales do
+						local centre, radius = eye.Position, eye.Size.X * 0.5
+						for index, leg in rig._legs do
+							for _, h in leg.hairs do
+								local p = h.part
+								local half = p.CFrame.LookVector * (p.Size.Z * 0.5)
+								local room = gap(p.Position - half, p.Position + half, centre) - radius - math.max(p.Size.X, p.Size.Y) * 0.5
+								if room < closest then closest, who = room, `{phase}: leg {index} link {h.spec.segment} at {f4(h.spec.t)}` end
+							end
+						end
+					end
+				end
+				for frame = 1, 60 do
+					rig:update(at, DT, true, false)
+					if frame % 20 == 0 then measure() end
+				end
+				phase = "walk"
+				for i = 1, 100 do
+					rig:update(SupportMath.bodyCFrame(Vector3.new(0.4 * math.sin(i / 40), 0.31, -i * 0.1), Vector3.yAxis, Vector3.new(math.sin(i / 40) * 0.3, 0, -1).Unit), DT, true, true)
+					if i % 10 == 0 then measure() end
+				end
+				phase = "alarm and groom"
+				rig:cue("alarm"); rig:cue("groom")
+				for i = 1, 160 do
+					rig:update(at, DT, true, false)
+					if i % 8 == 0 then measure() end
+				end
+				phase = "meet"
+				rig:cue("meet", 3)
+				for i = 1, 120 do
+					rig:update(at, DT, true, false)
+					if i % 8 == 0 then measure() end
+				end
+				for _, leg in rig._legs do hairs += #leg.hairs end
+				check(#ales == 2 and hairs >= 10 and closest >= 0.004, `{id} {detail}: no leg hair comes within 0.004 studs of an anterior lateral eye, standing, walking, in an alarm, grooming and reaching to meet (closest {f4(closest)}, {who}; {hairs} leg hairs, {looks} looks)`)
+				rig:destroy()
+			end
+		end
+	end
+
+	-- ---- what a frame writes and moves (items 1, 4, 5, 6, 7): the engine calls the shim counts
+	local function spend(warm: number, frames: number, step: (number) -> ()): (number, number, number) -- Size writes, BulkMoveTo calls and parts moved, a frame (after `warm` frames)
+		for i = 1, warm do step(-warm + i) end
+		local w, c, p = counters.sizeWrites, counters.bulkCalls, counters.bulkParts
+		for i = 1, frames do step(i) end
+		return (counters.sizeWrites - w) / frames, (counters.bulkCalls - c) / frames, (counters.bulkParts - p) / frames
+	end
+	local function writeChecks()
+		local lineUp = Vector3.new(0.07, 1, 0.035).Unit
+		local hung = SupportMath.bodyCFrame(Vector3.new(0, 2.0, 0), Vector3.yAxis, Vector3.new(0, 0, -1))
+		-- the first spider, full tier: the body's parts every frame (one call), the hairs not at all while nothing moves
+		local rig = build(nil, "full")
+		local count = rig:count()
+		local bodyParts = count.total - count.hairs
+		rig.reducedMotion = true
+		local writes, calls, parts = spend(30, 120, function() rig:update(at, DT, true, false) end)
+		check(writes == 0 and calls == 1 and parts == bodyParts, `Reduced Motion, standing: no Size is written, one BulkMoveTo a frame and it moves only the {bodyParts} parts that are not hairs (writes {writes}, calls {calls}, parts {parts} of {count.total})`)
+		rig.reducedMotion = false
+		writes, calls, parts = spend(240, 120, function(i) rig:update(at, if i < 0 then DT else 0, true, false) end)
+		check(writes == 0 and calls == 1 and parts == bodyParts, `paused (a frame of no time) after a long stand: nothing is written and the hairs stay put (writes {writes}, calls {calls}, parts {parts})`)
+		writes, calls, parts = spend(240, 240, function() rig:update(at, DT, true, false) end)
+		check(writes <= 12, `standing at full detail, the breathing writes {f4(writes)} Sizes a frame (it wrote 31.8 before ROBLOX-93)`)
+		local walked = 0
+		writes, calls, parts = spend(30, 90, function() walked += 1; rig:update(SupportMath.bodyCFrame(Vector3.new(0.4 * math.sin(walked / 40), 0.31, -walked * 0.1), Vector3.yAxis, Vector3.new(math.sin(walked / 40) * 0.3, 0, -1).Unit), DT, true, true) end)
+		check(calls == 2 and parts == count.total, `walking: every part moves every frame, in two calls (calls {calls}, parts {parts} of {count.total})`)
+		rig:destroy()
+		-- hanging
+		rig = build(nil, "full")
+		rig.reducedMotion = true
+		rig.hangDirection = lineUp
+		writes, calls, parts = spend(150, 120, function() rig:update(hung, DT, false, false) end)
+		check(writes == 0 and calls == 1 and parts == bodyParts, `hanging with Reduced Motion: no Size is written and no hair moves (writes {writes}, calls {calls}, parts {parts})`)
+		rig:destroy()
+		-- the low tier stands without breathing: a part of the hairs moves only with the snap accents
+		rig = build(nil, "low")
+		count = rig:count()
+		writes, calls, parts = spend(120, 600, function() rig:update(at, DT, true, false) end)
+		check(parts <= count.total * 0.7 and writes <= 4, `standing at low detail, {f4(parts / count.total * 100)} percent of the parts move a frame and {f4(writes)} Sizes are written (all of them and 26 before ROBLOX-93)`)
+		rig:destroy()
+		-- a growth stage or a scale already applied writes nothing again; a new one writes every sized part
+		rig = build("maratus_volans_male", "full")
+		rig:setGrowthStage(2)
+		local w0 = counters.sizeWrites
+		rig:setGrowthStage(2); rig:setScale(rig._growth); rig:setGrowthStage(2.9)
+		check(counters.sizeWrites == w0, "setGrowthStage and setScale to the stage and the scale the rig already has write no Size")
+		rig:setScale(rig._growth * 1.5)
+		check(counters.sizeWrites - w0 >= count.total * 0.3, `setScale to a new scale does write them ({counters.sizeWrites - w0})`)
+		-- the peacock spider: the fan's discs are sized once for the pose it holds
+		rig.dance = PeacockDance.rawPose(3.0, false)
+		writes, calls, parts = spend(2, 60, function() rig:update(at, 0, true, false) end)
+		check(writes == 0, `a held display writes no Size (the fan's discs are sized once; writes {writes})`)
+		rig.dance = nil
+		rig.reducedMotion = true
+		writes = spend(30, 60, function() rig:update(at, DT, true, false) end)
+		check(writes == 0, `the peacock spider with Reduced Motion writes no Size (writes {writes})`)
+		rig:destroy()
+	end
+
+	-- ---- the hairs placed only when the frame they follow has moved never stray from where they would be if every frame placed them all (item 7)
+	-- Two rigs get the same frames; one has `_exact` (every hair placed again every frame), and both have the same living motion.
+	local function toleranceChecks()
+		local function hairsOf(rig: any): { BasePart }
+			local out = {}
+			for _, p in rig.model:GetChildren() do if p.Name == "Seta" then table.insert(out, p) end end
+			return out
+		end
+		local function run(id: string?, detail: string, living: boolean, label: string)
+			local a, b = build(id, detail, living), build(id, detail, living)
+			b._exact = true
+			for _, r in { a, b } do
+				if r._living ~= nil then r._living = Living.new(r._appearance.idle, 4242) end
+			end
+			local ha, hb = hairsOf(a), hairsOf(b)
+			local worstPos, worstTilt, worstSize, frames = 0.0, 0.0, 0.0, 0
+			local movedA, movedB = 0, 0
+			local function frame(body: CFrame, grounded: boolean, moving: boolean, dt: number)
+				local p0 = counters.bulkParts
+				a:update(body, dt, grounded, moving)
+				local p1 = counters.bulkParts
+				b:update(body, dt, grounded, moving)
+				movedA += p1 - p0
+				movedB += counters.bulkParts - p1
+				frames += 1
+				for i, pa in ha do
+					local pb = hb[i]
+					local ca, cb = pa.CFrame, pb.CFrame
+					worstPos = math.max(worstPos, (ca.Position - cb.Position).Magnitude)
+					worstTilt = math.max(worstTilt, 3 - (ca.RightVector:Dot(cb.RightVector) + ca.UpVector:Dot(cb.UpVector) + ca.LookVector:Dot(cb.LookVector)))
+					worstSize = math.max(worstSize, (pa.Size - pb.Size).Magnitude)
+				end
+			end
+			local function stand(n: number) for _ = 1, n do frame(at, true, false, DT) end end
+			stand(100)
+			a:cue("alarm"); b:cue("alarm")
+			stand(40)
+			a:cue("groom"); b:cue("groom")
+			stand(100)
+			a.focusPoint, b.focusPoint = Vector3.new(1.5, 0.5, -2), Vector3.new(1.5, 0.5, -2)
+			stand(30)
+			a.focusPoint, b.focusPoint = nil, nil
+			for i = 1, 60 do frame(SupportMath.bodyCFrame(Vector3.new(0.4 * math.sin(i / 40), 0.31, -i * 0.1), Vector3.yAxis, Vector3.new(math.sin(i / 40) * 0.3, 0, -1).Unit), true, true, DT) end
+			a:setGrowthStage(2); b:setGrowthStage(2)
+			stand(15)
+			a:setScale(1.7); b:setScale(1.7)
+			stand(15)
+			a:setCondition(0.1); b:setCondition(0.1)
+			stand(60)
+			local lineUp = Vector3.new(0.07, 1, 0.035).Unit
+			a.hangDirection, b.hangDirection = lineUp, lineUp
+			local hung = SupportMath.bodyCFrame(Vector3.new(0, 2.0, 0), Vector3.yAxis, Vector3.new(0, 0, -1))
+			for _ = 1, 70 do frame(hung, false, false, DT) end
+			a.hangDirection, b.hangDirection = nil, nil
+			stand(30)
+			print(`look: tolerance, {label}: hairs within {string.format("%.2e", worstPos)} studs, {string.format("%.2e", math.sqrt(worstTilt))} radians, {string.format("%.2e", worstSize)} of size of the exact ones over {frames} frames, {string.format("%.1f", 100 * movedA / movedB)} percent of the parts moved`)
+			check(#ha > 20 and #ha == #hb and worstPos < 1.5e-3 and worstTilt < 4e-6 and worstSize < 1e-4 and movedA < movedB, `{label}: the hairs placed only when moved stay within {string.format("%.1e", worstPos)} studs, {string.format("%.1e", math.sqrt(worstTilt))} radians and {string.format("%.1e", worstSize)} studs of size of the hairs placed every frame (over {frames} frames; {string.format("%.0f", 100 * movedA / movedB)} percent of the parts moved)`)
+			a:destroy(); b:destroy()
+		end
+		run(nil, "full", true, "first spider, full")
+		run(nil, "low", true, "first spider, low (as the mate is drawn)")
+		run("brachypelma_hamorii", "full", true, "redknee, full")
+	end
+
+	-- ---- a spider far from the camera is drawn ten times a second (item 13); the simulation goes on stepping it every tick
+	local function drawStepChecks()
+		local function drawn(distance: number, frames: number, rig: any?): (number, any)
+			local r = rig or build("rival_spider", "low")
+			local n = 0
+			for _ = 1, frames do
+				local calls = counters.bulkCalls
+				local did = r:drawStep(at, DT, true, false, distance)
+				check(did == (counters.bulkCalls > calls), "drawStep says whether it drew")
+				if did then n += 1 end
+			end
+			return n, r
+		end
+		local near_, nearRig = drawn(10, 120)
+		local edge = drawn(25, 120)
+		local far, farRig = drawn(60, 120)
+		check(near_ == 120 and edge == 120, `within 25 studs of the camera every frame is drawn ({near_} and {edge} of 120)`)
+		check(far >= 19 and far <= 21, `beyond it ten a second ({far} of 120 frames, two seconds, at 60 Hz)`)
+		check(near(farRig._t + farRig._owed, 120 * DT, 1e-9) and near(nearRig._t + nearRig._owed, 120 * DT, 1e-9), `no time is lost: what is drawn is what has passed (drew {string.format("%.4f", farRig._t)} s and owed {string.format("%.4f", farRig._owed)} of {120 * DT})`)
+		-- the first drawing is at once, however far; a spider that comes near is drawn at once, with the time it was owed
+		local first = build("rival_spider", "low")
+		local did = first:drawStep(at, DT, true, false, 200)
+		check(did and first._drawn, "the first frame is drawn at once, however far")
+		for _ = 1, 3 do first:drawStep(at, DT, true, false, 200) end
+		local owed = first._owed
+		local t0 = first._t
+		did = first:drawStep(at, DT, true, false, 5)
+		check(did and first._owed == 0 and near(first._t - t0, owed + DT, 1e-9), `one that comes near is drawn at once with the time it was owed ({string.format("%.4f", owed + DT)} s)`)
+		-- a long frame is drawn at once whatever the distance
+		local long = build("rival_spider", "low")
+		long:drawStep(at, DT, true, false, 80)
+		check(long:drawStep(at, 0.12, true, false, 80), "a frame as long as the throttle's interval is drawn at once")
+		first:destroy(); long:destroy(); nearRig:destroy(); farRig:destroy()
+	end
+
+	-- ---- the greenbottle's front legs are a tenth heavier (item 14)
+	local function frontLegChecks()
+		local RED, BLUE = "brachypelma_hamorii", "chromatopelma_cyaneopubescens"
+		local red, blue = Appearances.profiles[RED], Appearances.profiles[BLUE]
+		local function femurOne(lk: any): number return lk.limbs.diameters[1][1] * lk.limbs.thickness * lk.frontLegScale end
+		check(near(blue.frontLegScale, 1.1 * 1.1, 1e-9) and red.frontLegScale == 1.1, `the greenbottle's legs I are 1.1 times what they were (frontLegScale {blue.frontLegScale}; the redknee's {red.frontLegScale})`)
+		check(femurOne(blue) < femurOne(red), "and still slimmer than the redknee's")
+		local rigB, rigR = build(BLUE, "full"), build(RED, "full")
+		local d1 = rigB.model:FindFirstChild("Femur1").Size.Y
+		local d2 = rigB.model:FindFirstChild("Femur2").Size.Y
+		check(near(d1 / d2, femurOne(blue) / (blue.limbs.diameters[2][1] * blue.limbs.thickness), 1e-9), `drawn: the first femur is {f4(d1 / d2)} times the second's thickness`)
+		check(rigB:count().total <= 150 and rigR:count().total <= 150, `(both tarantulas stay within 150 parts: {rigB:count().total} and {rigR:count().total})`)
+		rigB:destroy(); rigR:destroy()
+	end
+	eyeChecks()
+	mirrorChecks()
+	aleChecks()
+	writeChecks()
+	toleranceChecks()
+	drawStepChecks()
+	frontLegChecks()
+end
+auditThreeChecks()
 
 print(`LOOK passed={passed} failed={failed}`)
 if failed > 0 then error("look checks failed") end

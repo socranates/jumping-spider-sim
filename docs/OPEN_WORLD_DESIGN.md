@@ -209,3 +209,107 @@ Then full suites, places, bundle, publish.
 - **Save format**: `world` is optional and validated; the revision gate protects positions.
 - **Nav graph size**: region sizing; seams are the only cross-region edges.
 - **Nothing has run in Studio since main ce64498**: this round rides on the audit's green suites and the previewer.
+
+### Nathan's direction (2026-10-19, evening): the peacock as the main spider, the whole life as the game, the world, Steam
+
+In his words: "The peacock spider should be the main spider i think and the game designed to be the whole life cycle to mating but very
+hard, not even mating is a guarantee if you find the mate, etc. Huge detailed world, eventual steam port." And on the web-slinger
+(`docs/WEB_SLINGER_DESIGN.md`): "Only honest play through should even be allowed to purchase. Works everywhere." As design:
+
+- **The peacock is the main spider.** *Maratus volans* becomes the default appearance and the life's protagonist: the spider the game
+  opens on, the one the notebook follows, the one whose courtship is the ending. This reverses ROBLOX-48's plan to sell the peacock as a
+  ~US$0.99 cosmetic: the peacock is the game, so it is free; the sale ideas move to the web-slinger pass and the tarantula pass. The
+  first spider (the daughter's black-and-white reference) stays in the game, free, in the picker, with its own page; nothing is taken from
+  it. What changes when this is built: `Appearances.default`, the title and the Begin-a-new-life text, the rig the HUD and Inspect open
+  on, the eye view's colour (the peacock's sight is the best documented of the three), a save migration (a record with no appearance
+  keeps the first spider, so old lives are not recoloured), and the notebook's first pages. The science goes with it: the peacock's
+  display, its scale (about 5 mm, so 1 stud = 1 cm is unchanged) and its real female (mottled grey-brown, ROBLOX-93's correction).
+  Confirmed by Nathan the same evening: the peacock **replaces** the first spider as the default; the first spider stays, free.
+- **The game is the whole life, to mating, and it is hard.** Normal is a full life: hatch, hunt, moult, grow, find a mate, court. The
+  courtship is the climax and it can fail: the female may not come, may reject the dance (she turns, she walks, she strikes), may eat a
+  male that misreads her; a failed courtship is not death unless she makes it so, and the season gives few more chances. That is W4's
+  "mating that can fail" written large, and the peacock's real courtship (the fan, the third-leg waving, the vibration, the female's
+  rejection and cannibalism) is the sourced model for it. Hard is Nathan's Normal; Easy and Free play keep the kids.
+- **Huge detailed world.** The open-world plan stands (W3–W5, then the pillars), and the bar is "scenes like this but with beautiful rich
+  detail" everywhere the eye rests, with the later levers (Terrain backdrops, meshes, uploaded textures) when the budgets allow.
+- **Eventual Steam port.** A build outside Roblox, later. What it asks of the code now: keep the sim in `Shared/` pure (it is: the shim
+  runs it in the CLI), keep the Godot goldens the source of truth (the Godot project is the natural Steam build, frozen today), and keep
+  every Roblox service behind a module (`Server/*`, `Client/*`, `Persistence/*`). No work on it until the Roblox game is public.
+
+Nothing here is built. Order after W3: W4 (nature's rules, with the courtship that can fail designed against the peacock), W5 (no hand
+holding), then the peacock-as-default round, then the web-slinger.
+
+Later the same evening: "More more more bugs and types of bugs and information on them." The garden's life is to be broad: many kinds of
+prey, ambient bugs and small threats, each with its own sourced notebook page. `docs/GARDEN_BESTIARY.md` is the list to build from; it
+becomes a round of its own (W3b, the bestiary) straight after W3, on W3's pattern (a derived profile or a small ambient sim, a body under
+the part cap, a generated page with named sources), before W4.
+
+And: "there are tons of cool spiders we can add and sell and give away, maybe even be the wasp and keep expanding the world until you
+can participate as anything you want." As design, a fifth pillar after the four in `docs/OPEN_WORLD_DESIGN.md`: **be anything**. The
+spider picker grows into a cast: more jumping spiders (sold, given away, earned; each a costume on the one honest body, each with its
+sourced page, the web-slinger the one that changes the rules), then other spiders whose rules differ (an orb weaver that builds, a crab
+spider that waits in a flower, the trapdoor spider in its burrow: each a new motor or a new sim on the shared world), then the wasp
+(the mud dauber as the player: hunt the spiders the world already runs, provision a nest; the predator's eye as the game's hardest honest
+life), then the rest of the bestiary as the world fills. Every playable kind is a sim on the same server-built world, so what one
+player is, another meets (the shared-world pillar). Pricing stays Nathan's: some sold, some given away, some earned; the first spider,
+the peacock and the full game free. Order: the open-world rounds and the bestiary first (the world must be worth being something in),
+then the cast, one kind a round, each with its decision, its page and its tests.
+
+And: "Tons of detail, Easter eggs, stuff you want to get to if you weren't terrified of everything lol." As design, the world's reward
+structure: **curiosity against fear**. Everywhere the eye rests there is something to find, and the finding costs exposure: a dropped
+coin under the leaf, a child's lost toy in the bed, a snail shell to climb into, a bottle cap with rain in it, the carved initials on
+the sash, a ladybird's shed skin, a shard of glass that shows the spider itself, the far side of the wall where a different plant
+grows. Each is a seeded placed thing (the diff log's `world_map.diffs` records what was found, so it stays found), each has a notebook
+line or a page when it earns one (a shell is a real thing with a real page; the initials are a story, and say so), and each sits where
+getting to it means time in the open, a climb, a drop, a crossing at dusk: the player's own curiosity is the thing the predators use.
+Nothing on the HUD points at them (W5's rule); the spider's own senses and the scenery's composition do. They belong to the detail pass
+of every region (the look's bar: "scenes like this but with beautiful rich detail"), two or three a region, one hidden well, and the
+generators place them so a seed and a diff name the same world for everyone.
+
+And: "Weather patterns eventually." As design: **weather**, seeded like everything else (a day's weather drawn from the world seed and
+the day number, so everyone's Tuesday rains), with the game's own consequences and no new HUD. Rain: the bed goes dark and wet, drops
+hit leaves (a drop is a blow to a 1 cm spider: cover under a leaf is real), the silk holds worse on wet glass and stone, the worms and
+the snails come out, the flies stay in, the puddle appears and brings the midges; the sill behind the sash stays dry and the spider that
+is home before the rain learns why. Wind: the plants move, the line sways, a jump is blown, the wasp does not fly. Heat: the stone and
+the wall warm (a basking spot the spider seeks, the clock of hunger runs faster), the aphids multiply, the afternoon is quiet. Cold and
+overcast: everything slows, the flies are torpid and easy, the spider's own jumps shorten (the sources on temperature and salticid
+activity decide the numbers; nothing invented). Dusk and night already exist; weather is the next layer on `Habitat/DayLight` and
+`SunPick` (the sky, the light, the sun's warmth) and on `LifeClock`'s rates, with the same honesty: the notebook's weather page says what
+spiders do in rain and cold, sourced, and "In this game" says what the game does. Order: after W4's rules (hunger's movement cost and the
+night are the base weather builds on), as its own round, W6 or so; the water in the bed (the saucer, the puddle) comes with it.
+
+And: "Born in the windowsill. Slowly the world outside the windowsill unfolds." As design, the shape of a life and of the whole game:
+**the sill is the nursery, the world is earned.** A life begins on the sill (born there: the sac in the crack, the spiderling's first
+days inside the glass, where the wasp is the only danger and the flies come to the light); the window is closed at first and opens
+when the spider is ready (a moult, or the first day it comes home before dark), and what is outside unfolds one region at a time as the
+spider grows: the outer sill, the wall, the bed; then, round by round, the lawn, the flowers, the fence, the shed, the pond, the next
+garden. A region a player has never reached is not on the map in the notebook; the day line never names a place the spider has not
+been. The unfolding is the spider's (its growth and its courage open the sash and the seams), not a menu's; and it is the game's too
+(each round opens one more region for everyone, and a long-lived save finds the world larger than it was). W2's open sash from the
+start is the current state and the exception: when the nursery is built (with the peacock-as-default round, since the sac and the
+spiderling are its story), the sash starts shut and opens on the spider's first readiness. The pacing is the thing to get right: slow,
+as he says; the sill must be a whole small life before the garden is a promise.
+
+And: "Get stepped on by a random human or animal like 1 percent of the time at random." As design: **the big world passes through**, and
+it does not look where it steps. A footfall (a person on the path by the bed, a cat on the sill, a dog in the garden, a child's hand on
+the sash) is a seeded event, rare (Nathan's number: about one in a hundred, per day or per crossing of the open ground; W4 decides the
+unit and the exact draw, in Normal only; Easy and Free play never), told the way the wasp is told, by the senses first: the ground's
+thud through the feet (the spider's vibration sense, sourced), a shadow that covers everything, the hum of a voice; then the shoe. It is
+not death by dice alone: the draw picks the moment and the place, and the spider that is under cover, on a vertical face, or already
+moving has the honest escape a real one has (the jump, the drop on the line, the crack); a spider in the open on the flat, standing
+still, is the one that is stepped on. It lands as the same recovery flow as the wasp's (Normal loses the day). The notebook's page says
+what the sources say: that most jumping spiders die to predators, weather and people without ever being seen, and that the vibration
+sense is the warning. In the nursery (the sill, behind the glass) the only footfall is the hand on the sash. Order: with W4's rules
+(it is a lingering threat of the simplest kind), after the night and the home-before-dark draw exist.
+
+And: "Low probability random chance stuff is amazing in games." As a rule for every round from here: **rare things happen**, seeded and
+honest, so that a long life has days nobody else had. The footfall is one; the list to draw from (each a sourced thing that does happen
+to real spiders, each with its page when it fires): a bird's shadow that is only a leaf; a hailstone; a lost ladybird on the sill; a
+moth in the room at night; a dropped crumb that brings the ants; a gust that carries the spiderling on its own silk (ballooning: the
+real way jumping spiders travel, and the one way the sill's nursery can empty); the mate who comes a day early; the rival who is
+already dead under the stone; a wasp that misses; a fly that lands on the spider's own back; the sun through the glass that warms the
+sill to the point the spider must move; a second spider of the player's own kind on the fence, which is another player (the shared
+world). The rule of the draw: rare (one in fifty to one in a thousand a day, each named in `X.game`), from the seeded stream so a save
+never rerolls, never on day one, never two in a day, never while a rest is kept, told by the senses before the thing, and always with a
+real way out or a real gift. Nothing is a dice death and nothing is a dice win: the chance is in what the world does, the outcome is in
+what the spider does about it. The notebook keeps the count ("things seen once"), nothing else on the HUD.

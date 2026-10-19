@@ -47,7 +47,9 @@ NeedsModel.LIFE_DRAIN_ASLEEP_PER_H = 0.007
 -- `streakDecay`: a meal in the game eases the starving streak by the hours it covers at the current drain (amount / the awake rate) and ends it altogether
 -- only when the reserve rises above `streakEndsAbove` (0.1); Godot's rule, a full reset at any meal, stays the default, so one tiny catch a day at 0% energy
 -- no longer keeps a spider alive for ever.
-NeedsModel.game = { drain = 1.9, gentleDrain = 1.1, streakDecay = true, streakEndsAbove = 0.1 }
+NeedsModel.game = { drain = 2.4, gentleDrain = 1.1, streakDecay = true, streakEndsAbove = 0.1 }
+-- ROBLOX-102 (Nathan on v33: "still more difficult with faster life depletion"): 1.9 -> 2.4, a day costs 0.773 (11 x 0.021 x 2.4 + 13 x 0.007 x 2.4); a full reserve lasts
+-- about 1.3 days. Gentle modes keep gentleDrain 1.1.
 NeedsModel.PLAY_DRAIN = NeedsModel.game.drain -- (the name the client and tests have used since ROBLOX-61)
 NeedsModel.GENTLE_DRAIN = 0.5
 NeedsModel.GENTLE_FLOOR = 0.1

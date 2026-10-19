@@ -16,7 +16,9 @@ local IDS = {
 }
 Soundscape.IDS = IDS -- (tests/settings.luau gives the music an id to see its voice)
 -- The mix as authored (each voice's own loudness before the player's volumes).
-local MIX = { room = 0.09, birds = 0.16, buzz = 0.23, takeoff = 0.22, hum = 0.42, humArriving = 0.32, music = 0.18 }
+-- ROBLOX-102 (Nathan on v33: "I hear the music but it is quiet and the hum should just be eliminated for now"): the room tone, a constant low hum, is
+-- silenced (0; the voice is kept so the menu and mute wiring stay as they were, and the wasp's hum, a warning, is untouched), and the music goes 0.18 to 0.32.
+local MIX = { room = 0, birds = 0.16, buzz = 0.23, takeoff = 0.22, hum = 0.42, humArriving = 0.32, music = 0.32 }
 -- While the wasp is on the sill the music is this share of itself, reached (and left) over about DUCK_S seconds.
 local DUCK = 0.4
 local DUCK_S = 1.0

@@ -524,14 +524,14 @@ case("the silk-lined crack", function()
 	check(not Layout.inRetreat(Layout.SPAWN), "the spawn is not in the crack")
 end)
 
-case("the game's hunger factor (ROBLOX-78, ROBLOX-88): 1.9, a day costs about 0.61 of the reserve, in every mode, and Godot's defaults are untouched",function()
- check(NeedsModel.game.drain==1.9 and NeedsModel.PLAY_DRAIN==1.9,"the factor is 1.9 (it was 1.55, 1.1 before that)")
+case("the game's hunger factor (ROBLOX-78, 88, 102): 2.4, a day costs about 0.77 of the reserve, in every mode, and Godot's defaults are untouched",function()
+ check(NeedsModel.game.drain==2.4 and NeedsModel.PLAY_DRAIN==2.4,"the factor is 2.4 (ROBLOX-102; it was 1.9, 1.55, 1.1 before that)")
  -- Worked from the constants: 11 waking hours at 0.021 and 13 asleep at 0.007 cost 0.322 at factor 1.
  local base=11*NeedsModel.LIFE_DRAIN_AWAKE_PER_H+13*NeedsModel.LIFE_DRAIN_ASLEEP_PER_H
  check(math.abs(base-0.322)<1e-12,"a day at factor 1 costs 0.322")
- check(math.abs(base*NeedsModel.game.drain-0.612)<0.001,"a day at the game's factor costs 0.612 ("..string.format("%.4f",base*NeedsModel.game.drain)..")")
+ check(math.abs(base*NeedsModel.game.drain-0.773)<0.001,"a day at the game's factor costs 0.773 ("..string.format("%.4f",base*NeedsModel.game.drain)..")")
  check(math.abs(base*1.55-0.499)<0.001,"it was 0.499 at 1.55")
- check(math.abs(11*NeedsModel.LIFE_DRAIN_AWAKE_PER_H*1.9-0.439)<0.001 and math.abs(13*NeedsModel.LIFE_DRAIN_ASLEEP_PER_H*1.9-0.173)<0.001,"0.439 awake and 0.173 asleep")
+ check(math.abs(11*NeedsModel.LIFE_DRAIN_AWAKE_PER_H*2.4-0.5544)<0.001 and math.abs(13*NeedsModel.LIFE_DRAIN_ASLEEP_PER_H*2.4-0.2184)<0.001,"0.554 awake and 0.218 asleep")
  check(math.abs(base*1.1-0.354)<0.001,"it was 0.354 at 1.1")
  local g=NeedsModel.new(true,false);local d=NeedsModel.new(true,false)
  check(d.drainScale==nil and g.drainScale==nil,"a model starts with Godot's rules")
@@ -544,22 +544,22 @@ case("the game's hunger factor (ROBLOX-78, ROBLOX-88): 1.9, a day costs about 0.
    old:addHours(10,asleep);tuned:addHours(10,asleep)
    for _=1,2 do old:advance(.25,false);tuned:advance(.25,false) end
    -- (ROBLOX-91: the gentle modes have their own factor, 1.1, instead of 1.9)
-   check(math.abs((.55-tuned.energy)/(.55-old.energy)-(if gentle then 1.1 else 1.9))<1e-8,`{if gentle then "1.1" else "1.9"} times the drain, awake or asleep, {if gentle then "gentle" else "standard"}`)
+   check(math.abs((.55-tuned.energy)/(.55-old.energy)-(if gentle then 1.1 else 2.4))<1e-8,`{if gentle then "1.1" else "2.4"} times the drain, awake or asleep, {if gentle then "gentle" else "standard"}`)
   end
  end
  -- A whole simulated day: 11 hours awake, 13 asleep, from a full reserve.
  local n=NeedsModel.new(true,false);n:useGameRules();n.energy=1
  for _=1,11 do n:addHours(1,false);for _=1,2 do n:advance(.25,false) end end
  for _=1,13 do n:addHours(1,true);for _=1,2 do n:advance(.25,false) end end
- check(math.abs((1-n.energy)-0.612)<0.002,"a played day takes about 0.61 ("..string.format("%.4f",1-n.energy)..")")
- check(math.abs(1/(1-n.energy)-1.63)<0.01,"a full reserve lasts about 1.63 days")
- -- The pace is two meals a day just to hold steady: a housefly gives 0.35, a fruit fly 0.175, and a daily rival 0.7 is about a day (1.14) and a surplus of 0.09.
+ check(math.abs((1-n.energy)-0.773)<0.002,"a played day takes about 0.77 ("..string.format("%.4f",1-n.energy)..")")
+ check(math.abs(1/(1-n.energy)-1.29)<0.01,"a full reserve lasts about 1.29 days")
+ -- ROBLOX-102: holding steady takes more than two meals a day: a housefly gives 0.35, a fruit fly 0.175, and a daily rival 0.7 no longer covers a day.
  local day=1-n.energy
- check(2*0.35>=day and 0.35<day and 0.7>day and 0.7<2*day,"two house flies cover a day (0.7 against 0.61); one does not; the rival is about a day and 1/7")
- check(0.7-day>0 and 0.7-day<0.1,"the daily rival leaves a surplus of under 0.1 ("..string.format("%.3f",0.7-day)..") and the flies for growth must come on top")
+ check(2*0.35<day and 3*0.35>day,"two house flies no longer cover a day (0.7 against 0.77); three do")
+ check(0.7-day<0 and 0.7-day>-0.1,"the daily rival alone leaves a deficit of under 0.1 ("..string.format("%.3f",0.7-day)..")")
 end)
 case("the gentle modes' own hunger (ROBLOX-91): 1.1 instead of 1.9, about 0.177 a day as ROBLOX-61 had it, whichever order the rules and the flag are set",function()
- check(NeedsModel.game.gentleDrain==1.1 and NeedsModel.GENTLE_DRAIN==0.5 and NeedsModel.game.drain==1.9,"the numbers: gentle 1.1 (x 0.5), standard 1.9")
+ check(NeedsModel.game.gentleDrain==1.1 and NeedsModel.GENTLE_DRAIN==0.5 and NeedsModel.game.drain==2.4,"the numbers: gentle 1.1 (x 0.5), standard 2.4")
  local base=11*NeedsModel.LIFE_DRAIN_AWAKE_PER_H+13*NeedsModel.LIFE_DRAIN_ASLEEP_PER_H
  local function played(n:any):number
   n.energy=1
@@ -568,18 +568,18 @@ case("the gentle modes' own hunger (ROBLOX-91): 1.1 instead of 1.9, about 0.177 
   return 1-n.energy
  end
  local table_={}
- for _,c in {{"standard",false,0.612},{"gentle",true,0.177}} do
+ for _,c in {{"standard",false,0.773},{"gentle",true,0.177}} do
   local n=NeedsModel.new(true,c[2]);n:useGameRules()
   local d=played(n);table_[c[1]]=d
   check(math.abs(d-c[3])<0.002,`{c[1]}: a played day takes {string.format("%.4f",d)} (about {c[3]})`)
  end
- check(math.abs(base*1.1*0.5-0.177)<0.0005 and math.abs(base*1.9-0.612)<0.001,"worked from the constants: 0.322 x 1.1 x 0.5 and 0.322 x 1.9")
+ check(math.abs(base*1.1*0.5-0.177)<0.0005 and math.abs(base*2.4-0.773)<0.001,"worked from the constants: 0.322 x 1.1 x 0.5 and 0.322 x 2.4")
  check(table_.gentle<table_.standard/3 and table_.gentle>0.15,"a gentle day is under a third of a standard one (ROBLOX-61's pace, not the half of ROBLOX-88's 0.306)")
  -- the flag set after the rules, and before (the client sets both, in either order)
  local a=NeedsModel.new(true,false);a:useGameRules();a.gentle=true
  local b=NeedsModel.new(true,true);b:useGameRules()
  check(math.abs(played(a)-played(b))<1e-12 and a:drainFactor()==1.1 and b:drainFactor()==1.1,"set after the rules or before: the same gentle factor")
- a.gentle=false;check(a:drainFactor()==1.9,"and back to the standard one")
+ a.gentle=false;check(a:drainFactor()==2.4,"and back to the standard one")
  check(NeedsModel.new(true,true):drainFactor()==1 and NeedsModel.new(true,false):drainFactor()==1,"a model never given the rules is Godot's (factor 1) in both modes")
  -- gentle still has its floor and never starves
  local g=NeedsModel.new(true,true);g:useGameRules();g:addHours(400,false);for _=1,4 do g:advance(.25,false) end
@@ -596,7 +596,7 @@ case("the starving streak (ROBLOX-91): Godot's rule resets it at any meal; the g
  check(godot:grantEnergy(0.01,"a")>0 and godot.starvingStreakH==0,"Godot's rule, the default: the tiniest meal ends the streak")
  local n=starving(true)
  local before=n.starvingStreakH
- local rate=NeedsModel.LIFE_DRAIN_AWAKE_PER_H*1.9
+ local rate=NeedsModel.LIFE_DRAIN_AWAKE_PER_H*2.4
  check(before>4*0.9 and n.energy==0,`the same, with the game's hunger: {before} hours`)
  local added=n:grantEnergy(0.05,"b")
  check(math.abs(added-0.05)<1e-12 and math.abs(n.starvingStreakH-(before-0.05/rate))<1e-9,`a tiny meal (0.05) at 0% covers {0.05/rate} hours: the streak {before} becomes {n.starvingStreakH}`)

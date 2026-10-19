@@ -88,3 +88,7 @@ Settings and touch update passed 47,547 CLI checks, 111 engine and 24 live-clien
 ## Claude - 2026-10-18 (evening): the sill round, published v24-v26 unverified
 
 Built on `claude/roblox-sill` (contains roblox-daily). Decisions ROBLOX-71..83. Handoff `docs/HANDOFF-roblox-sill.md`. The spider picker, catch and rival feel tuning, the dressed sill, the wasp twice a day, ambient music (asset upload pending, Chet), the meal-scaled struggle, the hunger bar, the complete mating cycle ending in a new generation, and the tarantula pack. Evidence d865b73033b37e93; all CLI suites green, strict clean, 132/132 compile. Published v24/v25/v26 to the playtest from Nathan's PC by Rojo sync with command-bar spot checks; no Studio or device acceptance yet - that pass is Chet's next.
+
+## Claude - 2026-10-18 (late): the detail round, published v29 unverified
+
+`claude/roblox-sill` continues (ROBLOX-84..90): the spiders' anatomy, fur and sheen, the dragline hang, living motion, the pacing Nathan asked for (slower growth, faster hunger, a harder rival), the mating scene and Inspect mode. Handoff `docs/HANDOFF-roblox-detail.md`. Evidence e2986a4a8c0a2de1; all CLI suites green, strict clean, 136/136 compile; the rig work judged in the off-Roblox previewer only. Frame time at full tier (695 parts on the first spider plus living motion) is the first thing to measure in Studio.

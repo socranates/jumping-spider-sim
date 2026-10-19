@@ -68,29 +68,33 @@ local Growth = require(Shared.Life.Growth)
 local LifeSession = require(Shared.Life.LifeSession)
 local session = LifeSession.new()
 local RivalSpider = require(Shared.Predator.RivalSpider)
-local LifeText = require(Shared.UI.LifeText)
-local DayLight = require(Shared.Habitat.DayLight)
-local LifeClock = require(Shared.Life.LifeClock)
 local WaspDirector = require(Shared.Predator.WaspDirector)
-local WaspText = require(Shared.UI.WaspText)
 local SpiderChoice = require(Shared.Rig.SpiderChoice)
 local PeacockDance = require(Shared.Rig.PeacockDance)
 local PeacockText = require(Shared.UI.PeacockText)
-local NotebookPages = require(Shared.Data.NotebookPages)
-local FieldNotebook = require(Shared.Learning.FieldNotebook)
-local NotebookWatch = require(Shared.Learning.NotebookWatch)
-local NotebookText = require(Shared.UI.NotebookText)
 local NotebookPanel = require(script.Parent.NotebookPanel)
-local HudLayout = require(Shared.UI.HudLayout)
-local SettingsPanel = require(script.Parent.SettingsPanel)
-local SettingsSpec = require(Shared.Data.SettingsSpec)
 local Checkpoint = require(Shared.Persistence.Checkpoint)
-local CheckpointStore = require(Shared.Persistence.CheckpointStore)
-local SaveRules = require(Shared.Data.SaveRules)
-local SaveProgress = require(Shared.Persistence.SaveProgress)
-local SaveText = require(Shared.UI.SaveText)
-local SettingsModel = require(Shared.UI.SettingsModel)
 local SaveClient = require(script.Parent.SaveClient)
+-- The modules that are only used inside functions, in one table (the client is at Luau's limit of 200 locals, and a script must also compile unoptimised: ROBLOX-92).
+local M = {
+	SettingsPanel = require(script.Parent.SettingsPanel),
+	SettingsSpec = require(Shared.Data.SettingsSpec),
+	SettingsModel = require(Shared.UI.SettingsModel),
+	SaveRules = require(Shared.Data.SaveRules),
+	SaveProgress = require(Shared.Persistence.SaveProgress),
+	SaveText = require(Shared.UI.SaveText),
+	CheckpointStore = require(Shared.Persistence.CheckpointStore),
+	NotebookPages = require(Shared.Data.NotebookPages),
+	FieldNotebook = require(Shared.Learning.FieldNotebook),
+	NotebookWatch = require(Shared.Learning.NotebookWatch),
+	NotebookText = require(Shared.UI.NotebookText),
+	WaspText = require(Shared.UI.WaspText),
+	LifeText = require(Shared.UI.LifeText),
+	DayLight = require(Shared.Habitat.DayLight),
+	LifeClock = require(Shared.Life.LifeClock),
+	HudLayout = require(Shared.UI.HudLayout),
+	Heard = require(Shared.UI.Heard),
+}
 local focusState = FocusState.new()
 local DT = SpiderMotor.DT
 local SLOW_SPEED = 0.5
@@ -107,7 +111,7 @@ local player = Players.LocalPlayer
 -- A setting's value now (ROBLOX-49): the Player attribute of its name if it holds a clean value, else the default. Every consumer below reads
 -- its setting here each frame, so a change in the settings panel (or a saved one arriving) takes effect at once.
 local function setting(id: string): any
-	return SettingsModel.get(function(key: string): any return player:GetAttribute(key) end, id)
+	return M.SettingsModel.get(function(key: string): any return player:GetAttribute(key) end, id)
 end
 -- Solo windowsill: the default player list obscures the life-menu button on small screens.
 pcall(function() game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList,false) end)
@@ -141,7 +145,7 @@ local rivalLegs: any = { drive = nil, rig = nil, Drive = require(Shared.Predator
 -- The mating cycle (ROBLOX-80): its modules, the stage that draws it (the mate's rig, the egg sac, the hatching), the mate's legs, and where the ending is
 -- ("" while none, "scene" while the spiderlings play, "card" while the ending card is up). One table: the client is at Luau's limit of 200 locals.
 local mateLegs: any = { Mating = require(Shared.Life.Mating), Mate = require(Shared.Predator.Mate), Drive = require(Shared.Predator.MateDrive), Text = require(Shared.UI.MateText),
-	Rules = require(Shared.Data.MatingRules), drive = nil, phase = "",
+	Rules = require(Shared.Data.MatingRules), drive = nil, phase = "", pending = nil, state = {},
 	-- The mating scene (ROBLOX-89): its pure plan module and its state here (the plan, the scene's seconds as the simulation counts them, the last frame's, the notice held
 	-- until it is over, whether it was skipped and whose it was).
 	Scene = require(Shared.Life.MatingScene), couple = { active = false, plan = nil, t = -1, prev = -1, notice = nil, skipped = false, mateSex = "" } }
@@ -175,8 +179,8 @@ refreshPadStyle()
 local memory = ObservationMemory.new()
 local sensor = Sensor.new(memory)
 -- The naturalist's notebook (ROBLOX-37): the player's own, never part of the world, a checkpoint or a life. The watcher opens its pages.
-local book: any = FieldNotebook.new()
-local watch: any = NotebookWatch.new(book)
+local book: any = M.FieldNotebook.new()
+local watch: any = M.NotebookWatch.new(book)
 memory.categoryChanged:connect(function(_contact: any, _old: string, new: string) watch:onCategory(new) end)
 sensor:configureFrom(Species.phidippus_audax_prototype.perception)
 local sightCast = Sensor.workspaceCast(params)
@@ -217,6 +221,10 @@ local panel: any = nil -- the catch screen, made below once returnToCheckpoint e
 local nbPanel: any = nil -- the notebook, made below with the menus
 local settingsPanel: any = nil -- the settings (ROBLOX-49), made below with the menus
 local saveClient: any = nil -- persistent saves (ROBLOX-39), made below with the menus
+-- The saving's state, in one table (the client is at Luau's limit of 200 locals): the settings the player touched this visit, whether a saved value is being applied (not a touch),
+-- the last status and reason told, the last notebook signature and eye seconds sent, when the eye seconds were last looked at; `broken` (ROBLOX-92): the client's saving raised, so it
+-- is off for the visit (the game goes on); `look`: a saved spider waiting for the spider to stand safely.
+local saveState: any = { touched = {} :: { [string]: boolean }, applying = false, status = nil, reason = nil, sig = "", eye = 0.0, eyeCheck = os.clock(), broken = false, look = nil }
 -- Whether a modal screen has the game: the world waits and the controls belong to it. At the very start the world also waits (a second or
 -- so at most) for the server to say what is saved, so the start menu shows the right choices; not in the test place unless the Workspace attribute SaveWait is true.
 local function modal(): boolean
@@ -227,34 +235,36 @@ end
 -- store is DataStore-shaped but in memory only: a checkpoint lasts the session. No live DataStore is written.
 local checkpointWorld: Checkpoint.World = { motor = motor, prey = prey, sensor = sensor, memory = memory, needs = needs, life = life, wasp = wasp, breakaway = breakaway }
 local function newStore(): any
-	return CheckpointStore.new(CheckpointStore.MemoryDataStore.new(), function(r: any): { string } return (Checkpoint.check(r, checkpointWorld)) end)
+	return M.CheckpointStore.new(M.CheckpointStore.MemoryDataStore.new(), function(r: any): { string } return (Checkpoint.check(r, checkpointWorld)) end)
 end
 -- One last rest for each slot (SaveRules.MODES, ROBLOX-91): the standard main life, the main life on Easy's gentle rules (it shared the main slot, so beginning Easy wiped the standard
 -- rest), and free play.
 local stores = {main=newStore(), free=newStore(), easy=newStore()}
 local checkpoints = stores.main
 life.save = function(): LifeLoop.CheckpointResult
-	-- The mating cycle (ROBLOX-80): a rest by a full-grown, well-fed spider makes a mate come, and the night's sleep that reached this morning has made the sac, so
+	-- The mating cycle (ROBLOX-80): the night's sleep that reached this morning has made the sac, and a rest by a full-grown, well-fed spider makes a mate come, so
 	-- this checkpoint keeps what the player has seen and a return to it never loses a night.
-	mateLegs.Mating.atRest(life, life.clock.day, life.clock.hour)
-	-- (ROBLOX-91: a full-grown spider too hungry for a visitor is told so at its rest; the notice rides with the checkpoint's own words)
-	local hungry = if mateLegs.Mating.tooHungry(life) then "\n" .. mateLegs.Text.TOO_HUNGRY else ""
 	for _, e in life.events do
 		if e.kind == "woke" then mateLegs.Mating.woke(life, e.day) end
 	end
+	-- (ROBLOX-92: a rest that is refused is refused before it changes anything, so the mate's morning is not set by a rest that was not kept; the refusal is in the game's own words)
 	local why = Checkpoint.boundaryProblem(checkpointWorld)
-	if why ~= "" then return { ok = false, message = why } end
+	if why ~= "" then return { ok = false, message = M.LifeText.restRefusal(why) } end
+	-- (ROBLOX-91: a full-grown spider too hungry for a visitor is told so at its rest; the notice rides with the checkpoint's own words)
+	local hungry = if mateLegs.Mating.tooHungry(life) then "\n" .. mateLegs.Text.TOO_HUNGRY else ""
+	mateLegs.Mating.atRest(life, life.clock.day, life.clock.hour)
 	local record, err = Checkpoint.capture(checkpointWorld, os.time())
 	if not record then
 		warn("[Windowsill] checkpoint: " .. tostring(err))
-		return { ok = false, message = "this moment could not be recorded" }
+		return { ok = false, message = M.LifeText.KEEP_FAILED }
 	end
 	local r = checkpoints:save(record)
 	if not r.ok then warn("[Windowsill] checkpoint: " .. r.message .. ": " .. table.concat(r.errors, "; ")) end
-	if r.ok and saveClient ~= nil then
+	if r.ok and saveClient ~= nil and not saveState.broken then
 		local slot: string = "main" -- (the store this life rests in, by its name)
 		for name, st in stores :: { [string]: any } do if st == checkpoints then slot = name end end
-		saveClient:sendRest(slot, record)
+		local sent, problem = pcall(function() saveClient:sendRest(slot, record) end) -- (ROBLOX-92: a failing save never takes the rest with it)
+		if not sent then saveState.fail(problem) end
 	end
 	return { ok = r.ok, message = r.message .. hungry }
 end
@@ -447,7 +457,7 @@ local function canChange(): boolean
 end
 -- The spider pick (ROBLOX-71): whether the player chose a spider this visit (only then is the choice sent to be saved), and the one way a choice is
 -- made, shared by the crack's key and the Settings row. One table: the client is at Luau's limit of 200 locals.
-local spiderPick: any = { touched = false, inspecting = false, jumpSwallow = false, hold = nil, touchOn = false, Text = require(Shared.UI.InspectText), View = require(Shared.Movement.InspectView) }
+local spiderPick: any = { touched = false, inspecting = false, jumpSwallow = false, cancelSwallow = false, hold = nil, touchOn = false, Text = require(Shared.UI.InspectText), View = require(Shared.Movement.InspectView) }
 local function setAppearance(id: string)
 	appearance = id
 	player:SetAttribute("Appearance", appearance)
@@ -477,8 +487,14 @@ local function changeSpider()
 	end
 	spiderPick.switch(SpiderChoice.next(appearance))
 end
--- The Settings row's side: standing safely (SpiderChoice.safeToChange) anywhere, not only in the crack. Answers the line the panel shows.
+-- A rest in the crack is not a change of spider, but the Settings row is allowed anywhere; the mating scene, the hatching, sleep, a wasp's visit and the rival's windup have the
+-- spider, and neither the row nor the close look is allowed then (ROBLOX-92: the row was, in a scene).
+function spiderPick.occupied(): boolean
+	return mateLegs.couple.active or mateLegs.phase ~= "" or life.asleep or wasp:isVisiting() or spiderPick.rivalThreat()
+end
+-- The Settings row's side: standing safely (SpiderChoice.safeToChange) anywhere, not only in the crack, and not while something has the spider. Answers the line the panel shows.
 function spiderPick.safe(): boolean
+	if spiderPick.occupied() then return false end
 	return SpiderChoice.safeToChange({
 		mode = motor.mode, seized = motor.seized, preparing = motor.preparing, jumping = jump:isBusy(), onLine = motor:onLine(),
 		moulting = life.growth:isMoulting(), struggling = prey.feeding.struggling or rivalLegs.Grip.active(rivalLegs.grip),
@@ -552,8 +568,7 @@ function spiderPick.rivalThreat(): boolean
 end
 -- Why a close look cannot begin now (a line to say), or nil when it can.
 function spiderPick.refusal(): string?
-	if not session.started or panel:isShowing() or menu:isShowing() or nbPanel:isShowing() or mateLegs.couple.active or mateLegs.phase ~= ""
-		or life.asleep or wasp:isVisiting() or spiderPick.rivalThreat() or not spiderPick.safeLook() then
+	if not session.started or panel:isShowing() or menu:isShowing() or nbPanel:isShowing() or spiderPick.occupied() or not spiderPick.safeLook() then
 		return spiderPick.Text.NOT_NOW
 	end
 	return nil
@@ -578,7 +593,7 @@ function spiderPick.finish(why: string?, instant: boolean)
 	if not spiderPick.inspecting then return end
 	spiderPick.inspecting = false
 	cam:endInspect(instant)
-	if why ~= nil then hud:toast(why, instant) end
+	if why ~= nil then hud:toast(why, if why == spiderPick.Text.DANGER then "danger" else instant) end -- (a danger is kept on the screen until it has had its seconds: ROBLOX-92)
 end
 function spiderPick.inspectFromSettings(): string?
 	local why = spiderPick.refusal()
@@ -605,11 +620,11 @@ function spiderPick.press(action: string)
 	end
 	if canChange() then spiderPick.hold = { action = action, t = 0, fired = false } else changeSpider() end
 end
-function spiderPick.release(action: string)
+function spiderPick.release(action: string, cancelled: boolean?)
 	local h = spiderPick.hold
 	if h == nil or h.action ~= action then return end
 	spiderPick.hold = nil
-	if not h.fired then changeSpider() end
+	if not h.fired and cancelled ~= true then changeSpider() end -- (a button hidden under the finger took the press away: nothing is changed, ROBLOX-92)
 end
 -- Each rendered frame, in real time: the hold's clock, and the reasons to leave the look (a danger first: the wasp, the rival's windup; then anything that makes the spider
 -- unsafe to change, a scene or a screen that has the game).
@@ -657,7 +672,7 @@ local function returnToCheckpoint()
 	if not best.ok then
 		mateLegs.skip(true) -- (a scene is not left playing round a spider put back at the start: the pair part, ROBLOX-89)
 		backToStart()
-		hud:toast(if best.message == "no checkpoint to return to" then "No checkpoint yet: back to the start. Rest in the silk-lined crack to keep one." else "Back to the start: " .. best.message, true)
+		hud:toast(if best.message == "no last rest to return to" then "No last rest yet: back to the start. Rest in the silk-lined crack to keep one." else "Back to the start: " .. best.message, true)
 		return
 	end
 	jump:drop(motor)
@@ -665,7 +680,7 @@ local function returnToCheckpoint()
 	local ok, problems = Checkpoint.restore(best.record, checkpointWorld)
 	if not ok then
 		warn("[Windowsill] checkpoint refused: " .. table.concat(problems, "; "))
-		hud:toast("The checkpoint could not be used: " .. (problems[1] or "unknown"), true)
+		hud:toast("The last rest could not be used: " .. (problems[1] or "unknown"), true)
 		return
 	end
 	session.mode, session.rules, session.ended = life.mode or "main", life.rules or "standard", false
@@ -710,7 +725,7 @@ local function fresh(mode: string, easy: boolean, position: Vector3?): boolean
  mateLegs.reset()
  session:begin(mode,easy);applyRules();motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor())
  sensor:reset();memory:clear()
- local slot=SaveRules.slotOf(mode,session.rules)
+ local slot=M.SaveRules.slotOf(mode,session.rules)
  stores[slot]=newStore();checkpoints=stores[slot]
  life.resting=false;life.notice="";life.noticeSeconds=0;life.restoreGrace=0
  wasp:load(WaspDirector.defaultRecord());wasp.gentle=needs.gentle
@@ -730,7 +745,7 @@ local function continueAnother()
  end
 end
 local function summaryRecord(cause: string): any
- return {cause=cause,hours=math.max((life.clock.day-1)*24+life.clock.hour-LifeClock.START_H,0),
+ return {cause=cause,hours=math.max((life.clock.day-1)*24+life.clock.hour-M.LifeClock.START_H,0),
   meals=prey.feeding.mealsFinished,wasp_visits=wasp.visits,wasp_escapes=wasp.escapes,stage=life.growth.stage}
 end
 local openNotebook: (string?) -> ()
@@ -748,10 +763,10 @@ local function presentEnd(immediate: boolean)
  local choices: {CaughtPanel.Choice}={}
  if checkpoints:loadBest().ok then table.insert(choices,{id="Back",text="Back to your last rest"}) end
  table.insert(choices,{id="Another",text=mateLegs.Text.another(mateLegs.Mating.hasSac(life.mating))}) -- (ROBLOX-91: a new life; the brood is left behind)
- table.insert(choices,{id="Notebook",text=NotebookText.MENU_CHOICE})
- panel:showChoices(if cause=="starved" then "The spider starved." elseif cause=="rival" then "The other spider caught you." else WaspText.LINE,
-  if cause=="starved" then "It went too long without food." elseif cause=="rival" then "A hunter can become prey. You can return to your last rest." else WaspText.SUB,
-  WaspText.summary(rec.hours,rec.meals,rec.wasp_visits,rec.wasp_escapes),choices,immediate)
+ table.insert(choices,{id="Notebook",text=M.NotebookText.MENU_CHOICE})
+ panel:showChoices(if cause=="starved" then "The spider starved." elseif cause=="rival" then "The other spider caught you." else M.WaspText.LINE,
+  if cause=="starved" then "It went too long without food." elseif cause=="rival" then "A hunter can become prey. You can return to your last rest." else M.WaspText.SUB,
+  M.WaspText.summary(rec.hours,rec.meals,rec.wasp_visits,rec.wasp_escapes),choices,immediate)
  panel:setTextScale(if setting("LargeText")==true then 1.5 else 1)
 end
 local function endLife(cause: string)
@@ -769,10 +784,20 @@ local function showCaught() endLife("wasp") end
 function mateLegs.say(text: string?)
  if text ~= nil and text ~= "" then life:showNotice(text);life.noticeSeconds=8 end
 end
+-- Whether the spider could hear or see the mate where it is (ROBLOX-92: the rival's rule, UI/Heard): within earshot, or in clear sight and not too far.
+function mateLegs.heard(mate: any): boolean
+	local far=(mate.position-motor.pos).Magnitude
+	return M.Heard.within(far,far<=M.Heard.farthest() and not sightCast(motor.pos,mate.position))
+end
 function mateLegs.event(e: string,ms: any)
  local mate=life.mate
  if e=="courted" then mateLegs.coupleBegin() end
  local text=mateLegs.Text.notice(e,{sex=if mate then mate.sex else nil,needsDance=ms.needsDance,device=device,reason=if mate then mate.reason else nil})
+ -- A visitor far off and out of sight is not heard arriving, noticing the spider or going (ROBLOX-92). Its arrival is held and told when it first comes within earshot or sight; the rest is simply not told.
+ if (e=="arrived" or e=="noticed" or e=="gone") and mate~=nil and not mateLegs.heard(mate) then
+  if e=="arrived" then mateLegs.pending=text elseif e=="gone" then mateLegs.pending=nil end
+  text=nil
+ elseif e=="gone" or e=="arrived" then mateLegs.pending=nil end
  -- A male mate's walk off the sill is still the scene's last beat: its parting is told when the scene is over (a notice over the two-shot would be read for the captions).
  if e=="mated" and mateLegs.couple.active and mate~=nil and mate.scene==true then mateLegs.couple.notice=text else mateLegs.say(text) end
  if e=="hatched" then mateLegs.begin(true) end
@@ -780,12 +805,17 @@ end
 -- The mating scene (ROBLOX-89). Its clock is the simulation's own (Predator/Mate.sceneTime: the pair's pause, then the male's walk off), so a wasp visit holds it as it holds the
 -- mate, a menu holds it with everything and a rest cannot land inside it (Checkpoint.boundaryProblem). Here it is only drawn: the controls are the scene's (locked but for the
 -- skip, tickInput and the handlers), the camera is the two-shot, both rigs take the cues, the captions, the music swells; Life/Mating owns the parting.
+-- The scene and the hatching have the view (ROBLOX-92): a close look in progress ends first, and does not give the eye view back over them.
+function mateLegs.takeView()
+ cam:cancelEyeRestore()
+ spiderPick.finish(nil,true)
+end
 function mateLegs.coupleBegin()
  local c,mate=mateLegs.couple,life.mate
  if c.active or mate==nil or mate.scene~=true then return end
  c.active,c.t,c.prev,c.notice,c.skipped,c.mateSex,c.turn,c.focus=true,-1,-1,nil,false,mate.sex,nil,nil
  c.plan=mateLegs.Scene.plan(914,if life.mating then life.mating.mates else 0,life.clock.day,mateLegs.Mating.sexOf(appearance))
- dropAll();cam:setEyeView(false);feedPending,cancelPending=false,false
+ mateLegs.takeView();dropAll();cam:setEyeView(false);feedPending,cancelPending=false,false
  soundscape:setSwell(true)
 end
 -- The scene is over: the camera and the music go back, the rigs let go of their poses, the parting is told and (when it was seen to its end) the notebook gets its line.
@@ -803,6 +833,10 @@ function mateLegs.coupleEnd(saw: boolean)
 end
 -- A jump or cancel during the scene: a skip, allowed after Scene.SKIP_AFTER seconds of it (`force`: a wasp visit, which cannot wait). The pair part at once and the mate
 -- walks off in play; the sac, the guard and the hatching are the same.
+function mateLegs.skippable(mate: any): boolean
+ local t=mateLegs.Mate.sceneTime(mate)
+ return t~=nil and mateLegs.Scene.canSkip(t)
+end
 function mateLegs.skip(force: boolean)
  local c,mate=mateLegs.couple,life.mate
  if not c.active or mate==nil then return end
@@ -847,6 +881,7 @@ end
 function mateLegs.begin(scene: boolean)
  local m=life.mating
  if m==nil or m.stage~="hatched" then return end
+ mateLegs.takeView()
  book:notice("hatched")
  if scene then
   mateLegs.stage:begin(914,mateLegs.Mating.generation(life),m.hatch_day,m.brood)
@@ -874,7 +909,7 @@ end
 function mateLegs.reset()
  mateLegs.coupleEnd(false)
  mateLegs.couple.focus,mateLegs.couple.turn=nil,nil
- mateLegs.phase=""
+ mateLegs.phase,mateLegs.pending="",nil
  mateLegs.stage:reset()
 end
 -- Carry on: the next generation is a spiderling again in the crack, the days of the sill go on, the notebook and the look are the player's own.
@@ -901,6 +936,7 @@ menu=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
  if choice=="Notes" then player:SetAttribute("NotebookNotes",not setting("NotebookNotes"));openMenu();return end
  if choice=="Settings" then openSettings("menu");return end
  if choice=="Resume" then closeScreens();return end
+ if choice=="Controls" then closeScreens();helpVisible,helpUntil=true,math.huge;return end -- (the controls card, kept up until H puts it away: ROBLOX-92)
  if choice=="Continue" then checkpoints=stores.main;closeScreens();returnToCheckpoint();return end
  if choice=="ContinueEasy" then checkpoints=stores.easy;closeScreens();returnToCheckpoint();return end
  if choice=="Free" then
@@ -925,21 +961,21 @@ menu=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
 end,"SpiderLifeMenu")
 -- The start menu's body: the saving line, then the Easy note. Also rewritten in place when the saving status changes under an open menu.
 local function menuBody(): string
- return SaveText.menuLine(saveClient:status())..(if session.finishedMain then "" else "\nEasy is not available yet; choose Free play for gentle rules.")
+ return (if saveState.broken then M.SaveText.brokenLine() else M.SaveText.menuLine(saveClient:status()))..(if session.finishedMain then "" else "\nEasy is not available yet; choose Free play for gentle rules.")
 end
 openMenu=function()
  if panel:isShowing() or not initialRecord then return end
  controls:clear();dropAll();setHudShown(false)
  local choices: {CaughtPanel.Choice}={}
- if session.started then table.insert(choices,{id="Resume",text="Resume this spider"}) end
+ if session.started then table.insert(choices,{id="Resume",text="Resume this spider"});table.insert(choices,{id="Controls",text="Controls"}) end
  if stores.main:loadBest().ok then table.insert(choices,{id="Continue",text="Continue from last rest"}) end
  if stores.easy:loadBest().ok then table.insert(choices,{id="ContinueEasy",text="Continue the Easy life from its last rest"}) end
  table.insert(choices,{id="New",text="Begin a new life"})
  if session.finishedMain then table.insert(choices,{id="Easy",text="Begin a new life on Easy"}) end
  table.insert(choices,{id="Free",text="Free play - gentle rules"})
- table.insert(choices,{id="Notebook",text=NotebookText.MENU_CHOICE})
+ table.insert(choices,{id="Notebook",text=M.NotebookText.MENU_CHOICE})
  table.insert(choices,{id="Notes",text=if setting("NotebookNotes") then "Discovery notes: on" else "Discovery notes: off"})
- table.insert(choices,{id="Settings",text=SettingsSpec.WORDS.menuChoice})
+ table.insert(choices,{id="Settings",text=M.SettingsSpec.WORDS.menuChoice})
  table.insert(choices,{id="Large",text=if setting("LargeText")==true then "Text size: large" else "Text size: normal"})
  menu:showChoices("The Windowsill","A small life on a windowsill.",
   menuBody(),choices,true)
@@ -953,7 +989,7 @@ menuButton.Parent=hud.safe;menuButton.Activated:Connect(openMenu)
 -- The naturalist's notebook (ROBLOX-37). Opened from the game (N, the button beside Menu), the life menu or the end screen; closing it
 -- goes back to wherever it was opened from. The world waits while it is open (modal()).
 local function noteScale(): number
- return if setting("LargeText")==true then NotebookText.LARGE else 1
+ return if setting("LargeText")==true then M.NotebookText.LARGE else 1
 end
 nbPanel=NotebookPanel.new(player:WaitForChild("PlayerGui"),book,function(to: string?)
  if to=="menu" then openMenu()
@@ -972,19 +1008,19 @@ end
 book.pageOpened:connect(function(id: string)
  local page=book:view(id)
  if nbPanel:isShowing() then nbPanel:refresh() end
- if page and setting("NotebookNotes") then hud:setNote(NotebookText.note(page.title,device),NotebookPages.noteSeconds) end
+ if page and setting("NotebookNotes") then hud:setNote(M.NotebookText.note(page.title,device),M.NotebookPages.noteSeconds) end
 end)
 local notebookButton=Instance.new("TextButton")
-notebookButton.Name="NotebookButton";notebookButton.Text=NotebookText.BUTTON;notebookButton.TextSize=16
+notebookButton.Name="NotebookButton";notebookButton.Text=M.NotebookText.BUTTON;notebookButton.TextSize=16
 notebookButton.BackgroundColor3=Color3.new(.12,.12,.14);notebookButton.TextColor3=Color3.new(1,1,1)
 notebookButton.Parent=hud.safe;notebookButton.Activated:Connect(function() openNotebook("game") end)
 -- Both buttons are touch targets (48 px tall) and clear of the status lines at every screen size (HudLayout.topLayout, tested).
-local function placeTopButton(button: TextButton,r: HudLayout.Rect)
+local function placeTopButton(button: TextButton,r: { x0: number, y0: number, x1: number, y1: number })
  button.Position=UDim2.fromOffset(r.x0,r.y0);button.Size=UDim2.fromOffset(r.x1-r.x0,r.y1-r.y0)
 end
 local function placeTopButtons()
  local size=hud.safe.AbsoluteSize
- local t=HudLayout.topLayout(size.X,size.Y)
+ local t=M.HudLayout.topLayout(size.X,size.Y)
  placeTopButton(menuButton,t.menu);placeTopButton(notebookButton,t.notebook)
 end
 hud.safe:GetPropertyChangedSignal("AbsoluteSize"):Connect(placeTopButtons)
@@ -994,19 +1030,19 @@ placeTopButtons()
 -- it is open (modal()). The values live as Player attributes named by SettingsSpec ids (the panel asks setting(), tells player:SetAttribute),
 -- so the saving that already watches them (below) keeps them and every consumer in this script reads them live. The one exception is the Spider
 -- row (ROBLOX-71, SettingsModel.live): it reads `appearance` and asks spiderPick, so the spider is kept in the save as before, not as a setting.
-settingsPanel=SettingsPanel.new(player:WaitForChild("PlayerGui"),{
+settingsPanel=M.SettingsPanel.new(player:WaitForChild("PlayerGui"),{
  get=function(id: string): any
-  if SettingsModel.live(id) then return appearance end
+  if M.SettingsModel.live(id) then return appearance end
   return setting(id)
  end,
  set=function(id: string,value: any): string?
   if id=="Inspect" then return spiderPick.inspectFromSettings() end -- (a button, ROBLOX-90: it closes the panel into the close look, or says why not)
-  if SettingsModel.live(id) then return spiderPick.fromSettings(value) end
+  if M.SettingsModel.live(id) then return spiderPick.fromSettings(value) end
   player:SetAttribute(id,value)
   return nil
  end,
- reset=function() for _,id in SettingsModel.ids() do player:SetAttribute(id,SettingsModel.default(id)) end end,
- status=function(): string? local status=saveClient:status();return status end,
+ reset=function() for _,id in M.SettingsModel.ids() do player:SetAttribute(id,M.SettingsModel.default(id)) end end,
+ status=function(): string? if saveState.broken then return "session" end;local status=saveClient:status();return status end,
 },function(to: string?)
  if to=="menu" then openMenu() else setHudShown(true) end
 end)
@@ -1024,20 +1060,13 @@ end
 -- a late reply can never be overwritten by defaults). What the server sends down is applied once, before the start menu, and again if a
 -- retry succeeds later: the notebook and the adult life are only ever added to, the rest of the choices only if the player has not already
 -- made their own this visit.
-local prefTouched: { [string]: boolean } = {}
-local applyingSaved = false
-local savedStatus: string? = nil
-local savedReason: string? = nil
-local lastSig = ""
-local lastEye = 0.0
-local lastEyeCheck = os.clock()
 local function refreshMenu()
 	if menuStarted and menu:isShowing() and confirming == nil then openMenu() end
 end
 local function progressSnapshot(): any
 	local settings: { [string]: any } = {}
-	for key in prefTouched do settings[key] = player:GetAttribute(key) end -- (the snapshot sends only what is clean)
-	return SaveProgress.snapshot(book:toRecord(), session.finishedMain, if spiderPick.touched then appearance else nil, settings)
+	for key in saveState.touched do settings[key] = player:GetAttribute(key) end -- (the snapshot sends only what is clean)
+	return M.SaveProgress.snapshot(book:toRecord(), session.finishedMain, if spiderPick.touched then appearance else nil, settings)
 end
 local function adoptRest(mode: string, record: any)
 	if record == nil or stores[mode] == nil then return end
@@ -1047,7 +1076,7 @@ local function adoptRest(mode: string, record: any)
 end
 local function applySaved(msg: any)
 	if type(msg) ~= "table" then return end
-	local _, p = SaveProgress.sanitize(msg.progress)
+	local _, p = M.SaveProgress.sanitize(msg.progress)
 	if p then
 		local mine = book:toRecord()
 		local ids: { string } = {}
@@ -1059,13 +1088,13 @@ local function applySaved(msg: any)
 		end
 		book:load({ opened = ids, eye_seconds = math.max(mine.eye_seconds, p.notebook.eye_seconds) })
 		if p.finished_main then session.finishedMain = true end
-		applyingSaved = true
+		saveState.applying = true
 		for key, v in p.settings do
-			if not prefTouched[key] then player:SetAttribute(key, v) end
+			if not saveState.touched[key] then player:SetAttribute(key, v) end
 		end
-		applyingSaved = false
+		saveState.applying = false
 		if p.appearance ~= nil and not spiderPick.touched and p.appearance ~= appearance and SpiderChoice.start(p.appearance, nil) == p.appearance then
-			setAppearance(p.appearance)
+			saveState.look = p.appearance -- (ROBLOX-92: the saved spider is put on when the spider stands safely, saveState.settleLook; at the start that is at once)
 		end
 	end
 	if type(msg.rests) == "table" then
@@ -1073,17 +1102,17 @@ local function applySaved(msg: any)
 		adoptRest("free", msg.rests.free)
 		adoptRest("easy", msg.rests.easy)
 	end
-	lastSig = `{#book.opened}:{session.finishedMain}`
-	lastEye = book.eyeSeconds
+	saveState.sig = `{#book.opened}:{session.finishedMain}`
+	saveState.eye = book.eyeSeconds
 	if nbPanel:isShowing() then nbPanel:refresh() end
 	if settingsPanel:isShowing() then settingsPanel:refresh() end
 	if not setting("ControlHints") and helpUntil ~= math.huge then helpVisible = false end
 	refreshMenu()
 end
 saveClient = SaveClient.new({
-	rules = SaveRules, now = os.clock,
+	rules = M.SaveRules, now = os.clock,
 	findRemotes = function(): any
-		local folder = ReplicatedStorage:FindFirstChild(SaveRules.REMOTES_NAME)
+		local folder = ReplicatedStorage:FindFirstChild(M.SaveRules.REMOTES_NAME)
 		if folder == nil then return nil end
 		local toServer, toClient = folder:FindFirstChild("ToServer"), folder:FindFirstChild("ToClient")
 		if toServer == nil or toClient == nil then return nil end
@@ -1094,11 +1123,11 @@ saveClient = SaveClient.new({
 	onStatus = function(_status: string, _reason: string?) end, -- (the status is read each frame below)
 	build = progressSnapshot,
 })
-lastSig = `{#book.opened}:{session.finishedMain}`
-for _, key in SettingsModel.ids() do
+saveState.sig = `{#book.opened}:{session.finishedMain}`
+for _, key in M.SettingsModel.ids() do
 	player:GetAttributeChangedSignal(key):Connect(function()
-		if applyingSaved then return end
-		prefTouched[key] = true
+		if saveState.applying then return end
+		saveState.touched[key] = true
 		saveClient:markDirty()
 	end)
 end
@@ -1106,25 +1135,51 @@ end
 local function updateSaves()
 	saveClient:update()
 	local sig = `{#book.opened}:{session.finishedMain}`
-	if sig ~= lastSig then
-		lastSig = sig
+	if sig ~= saveState.sig then
+		saveState.sig = sig
 		saveClient:markDirty()
 	end
 	local t = os.clock()
-	if t - lastEyeCheck >= SaveRules.CLIENT_EYE_GAP then
-		lastEyeCheck = t
-		if book.eyeSeconds ~= lastEye then
-			lastEye = book.eyeSeconds
+	if t - saveState.eyeCheck >= M.SaveRules.CLIENT_EYE_GAP then
+		saveState.eyeCheck = t
+		if book.eyeSeconds ~= saveState.eye then
+			saveState.eye = book.eyeSeconds
 			saveClient:markDirty()
 		end
 	end
 	local status, reason = saveClient:status()
-	if status ~= nil and (status ~= savedStatus or reason ~= savedReason) then
-		local text = SaveText.toast(savedStatus, savedReason, status, reason)
-		savedStatus, savedReason = status, reason
+	if status ~= nil and (status ~= saveState.status or reason ~= saveState.reason) then
+		local text = M.SaveText.toast(saveState.status, saveState.reason, status, reason)
+		saveState.status, saveState.reason = status, reason
 		if text ~= "" then hud:toast(text, status == "session") end
 		if menuStarted and menu:isShowing() and confirming == nil then menu.summary.Text = menuBody() end
 	end
+end
+
+-- A saved spider waiting to be put on (applySaved): dropped if the player has chosen one since; put on once the spider is standing safely (never in a scene, asleep or in a danger).
+function saveState.settleLook()
+	local want = saveState.look
+	if want == nil then return end
+	if spiderPick.touched or want == appearance then saveState.look = nil;return end
+	if spiderPick.safe() then
+		saveState.look = nil
+		setAppearance(want)
+	end
+end
+-- The saving broke (ROBLOX-92): it is off for the rest of the visit, said once on the status line and in the log; the game goes on.
+function saveState.fail(err: any)
+	if saveState.broken then return end
+	saveState.broken = true
+	warn("[Windowsill] saving is off for this visit: " .. tostring(err))
+	hud:toast(M.SaveText.BROKEN, true)
+	if menuStarted and menu:isShowing() and confirming == nil then menu.summary.Text = menuBody() end
+end
+-- The saving's part of each frame: nothing the saving does can stop the frame (and once it has failed, nothing more is tried).
+function saveState.frame()
+	saveState.settleLook()
+	if saveState.broken then return end
+	local ok, err = pcall(function(): any updateSaves(); return nil end)
+	if not ok then saveState.fail(err) end
 end
 
 controls = SpiderInput.bind({
@@ -1138,13 +1193,14 @@ controls = SpiderInput.bind({
 		elseif phase == "cancel" then focusState:clear() end
 	end,
 	choose = function() spiderPick.press("Choose") end,
-	chooseEnd = function() spiderPick.release("Choose") end,
+	chooseEnd = function(cancelled: boolean?) spiderPick.release("Choose", cancelled) end,
 	display = function() spiderPick.press("Display") end,
-	displayEnd = function() spiderPick.release("Display") end,
+	displayEnd = function(cancelled: boolean?) spiderPick.release("Display", cancelled) end,
 	feed = function()
 		if mateLegs.couple.active or spiderPick.inspecting then return end
 		ant.stopDisplay()
 		prey.feeding:press()
+		if rivalLegs.Grip.active(rivalLegs.grip) then rivalLegs.Grip.tap(rivalLegs.grip) end -- (the Eat key grips a caught rival too, like the Jump key: ROBLOX-92)
 		feedPending = true -- in the crack, with nothing to eat, the same button rests (Godot's interact)
 	end,
 	jump = function(phase: string)
@@ -1177,8 +1233,9 @@ controls = SpiderInput.bind({
 	-- Q / B / touch Cancel (Let go on the line): the same button cancels an aim, stops a walk to the edge (and is nothing
 	-- else's then) and, held on the line, lets go; SilkController counts only a fresh press after the 0.4 s grace, held 0.6 s.
 	cancel = function(phase: string)
-		if phase ~= "begin" then return end
-		if spiderPick.inspecting then spiderPick.finish(nil, false);return end -- (Cancel leaves the close look, and is nothing else)
+		if phase ~= "begin" then spiderPick.cancelSwallow = false;return end
+		spiderPick.cancelSwallow = false
+		if spiderPick.inspecting then spiderPick.finish(nil, false);spiderPick.cancelSwallow = true;return end -- (Cancel leaves the close look, and is nothing else; what is left of the press is swallowed, so a held Q never lets go of the line: ROBLOX-92)
 		if mateLegs.couple.active then mateLegs.skip(false);return end
 		ant.stopDisplay()
 		cancelPending = true -- also ends a rest
@@ -1238,7 +1295,7 @@ local function tickInput(): any
 	rig.focusPoint = focusPoint -- (the drawn body turns a little toward it and the eyes glance at it: ROBLOX-87, display only)
 	return {
 		wish = wish, creep = controls.held.Creep == true, reel = f,
-		dropHeld = controls.held.Drop == true, releaseHeld = controls.held.Cancel == true,
+		dropHeld = controls.held.Drop == true, releaseHeld = controls.held.Cancel == true and not spiderPick.cancelSwallow,
 		focusPoint = focusPoint, gaze = if cam.eyeView then cam.gaze else nil,
 	}
 end
@@ -1277,22 +1334,22 @@ local function updateHud(frameDt: number)
 	local aiming = jump:isAiming()
 	local view: any = {
 		device = device, aiming = aiming, focus = controls.held.Focus == true or focusActive(), eyeView = cam.eyeView,
-		status = {}, helpVisible = helpVisible, helpText = ControlText.helpCard(device) .. PeacockText.helpExtra(device, SpiderChoice.displayKind(appearance)) .. "\n" .. spiderPick.Text.helpLine(device),
+		status = {}, helpVisible = helpVisible, helpText = PeacockText.card(device, SpiderChoice.displayKind(appearance)), -- (ROBLOX-92: one string, the one the Studio spec measures)
 		caption = eyes:captionView(device),
 	}
 	-- Captions for sounds and vibrations (ROBLOX-49): off, normal or large. The eye view's own explanation above is not a sound caption.
-	local captionScale = SettingsSpec.CAPTION_SCALE[setting("Captions")] or 1
+	local captionScale = M.SettingsSpec.CAPTION_SCALE[setting("Captions")] or 1
 	view.captionScale = if captionScale > 0 then captionScale else 1
 	local hints = setting("ControlHints")
 	view.helpVisible = helpVisible and (hints or helpUntil == math.huge) -- (H asks for the card even when the hints are off)
 	local rumble = if dancePose and captionScale > 0 then PeacockText.caption(dancePose.rumble) else nil -- felt through the feet; the wasp's hum below takes precedence
 	if rumble then view.caption = rumble end
 	if wasp:isVisiting() and captionScale > 0 then
-		local direction = WaspText.directionWord(motor.pos, motor.heading, motor.up, wasp.wasp.position)
-		local heard = WaspText.caption(wasp.phase, wasp.phaseS, direction)
+		local direction = M.WaspText.directionWord(motor.pos, motor.heading, motor.up, wasp.wasp.position)
+		local heard = M.WaspText.caption(wasp.phase, wasp.phaseS, direction)
 		-- The wasp going for the rival male is told only to a spider that could hear or see it (ROBLOX-70).
 		local forRival = wasp.phase == "taking" or wasp.phase == "seizing" or wasp.phase == "bearing"
-		if forRival and not WaspText.heardRival((motor.pos - wasp.wasp.position).Magnitude, not sightCast(motor.pos, wasp.wasp.position)) then heard = nil end
+		if forRival and not M.WaspText.heardRival((motor.pos - wasp.wasp.position).Magnitude, not sightCast(motor.pos, wasp.wasp.position)) then heard = nil end
 		if heard then view.caption = heard end
 	end
 	if aiming then
@@ -1308,17 +1365,21 @@ local function updateHud(frameDt: number)
 	else
 		hidePreview()
 	end
-	local waspLine = WaspText.line(wasp.phase, wasp.confusedS > 0, wasp.visits, wasp.sparedThisVisit, device)
+	local waspLine = M.WaspText.line(wasp.phase, wasp.confusedS > 0, wasp.visits, wasp.sparedThisVisit, device)
 	if (wasp.phase == "taking" or wasp.phase == "seizing" or wasp.phase == "bearing")
-		and not WaspText.heardRival((motor.pos - wasp.wasp.position).Magnitude, not sightCast(motor.pos, wasp.wasp.position)) then waspLine = nil end
+		and not M.WaspText.heardRival((motor.pos - wasp.wasp.position).Magnitude, not sightCast(motor.pos, wasp.wasp.position)) then waspLine = nil end
 	if waspLine then table.insert(view.status, waspLine) end
+	if saveState.broken then table.insert(view.status, M.SaveText.BROKEN) end -- (ROBLOX-92: saving failed for this visit)
  do -- the courtship meter, the sac's guard days and the hatching's captions (ROBLOX-80)
   local mate,m=life.mate,life.mating
   if mate~=nil and mateLegs.Mate.courtable(mate) then
    local far=(mate.position-motor.pos).Magnitude
+   local heard=mateLegs.heard(mate)
+   if mateLegs.pending~=nil and heard and not life.asleep then mateLegs.say(mateLegs.pending);mateLegs.pending=nil end -- (the arrival that was too far to hear, told now that it is near: ROBLOX-92)
    if far<=mateLegs.Rules.loseWu or mate.meter>0 then view.court=mate.meter end
-   if far<=14 or mate.meter>0 then table.insert(view.status,mateLegs.Text.courtLine(device,far<=mateLegs.Rules.nearWu,SpiderChoice.canDance(appearance),dance.active,mate.meter)) end
+   if heard or mate.meter>0 then table.insert(view.status,mateLegs.Text.courtLine(device,far<=mateLegs.Rules.nearWu,SpiderChoice.canDance(appearance),dance.active,mate.meter)) end
   end
+  if mateLegs.couple.active and mate~=nil and mateLegs.skippable(mate) then table.insert(view.status,mateLegs.Text.skipLine(device)) end -- (ROBLOX-92: what ends the scene, once it can; not a sound, so the Captions setting does not hide it)
   if mateLegs.couple.active and captionScale>0 and not wasp:isVisiting() then -- the mating scene's captions (ROBLOX-89)
    view.caption=mateLegs.Text.matingCaption(mateLegs.couple.t,mateLegs.Mating.sexOf(appearance)) or view.caption
   end
@@ -1333,17 +1394,17 @@ local function updateHud(frameDt: number)
 	elseif prey.feeding.feeding then table.insert(view.status, "Feeding — move to stop")
 	elseif prey.feeding.held then table.insert(view.status, "Meal paused — " .. ControlText.name(device,"feed") .. " to eat") end
 	local clock = life.clock
-	view.day = LifeText.day(clock.day, clock:partOfDay()) .. " | " .. life.growth:stageName() .. (if session.mode=="free" then " | FREE PLAY" elseif session.rules=="gentle" then " | EASY" else "")
+	view.day = M.LifeText.day(clock.day, clock:partOfDay()) .. " | " .. life.growth:stageName() .. (if session.mode=="free" then " | FREE PLAY" elseif session.rules=="gentle" then " | EASY" else "")
 	view.day ..= mateLegs.Text.dayTag(mateLegs.Mating.generation(life))
 	view.food, view.foodGentle, view.largeText = needs.energy, needs.gentle, setting("LargeText") == true
-	view.growth = LifeText.growth(life.growth, Growth.READY_FOOD, Species.fly_like_prototype.body.nutrition)
-	view.dayLine = LifeText.line(clock:partOfDay(), needs.energy, needs:isStarving(), needs.gentle, LifeLoop.HUNGRY_AT, life:tooHungryToSleep())
+	view.growth = M.LifeText.growth(life.growth, Growth.READY_FOOD, Species.fly_like_prototype.body.nutrition)
+	view.dayLine = M.LifeText.line(clock:partOfDay(), needs.energy, needs:isStarving(), needs.gentle, LifeLoop.HUNGRY_AT, life:tooHungryToSleep())
  if life.growth.ready then view.dayLine=nil
  elseif life.growth:isSoft() then view.dayLine="Soft new skin: slower steps and shorter jumps until it hardens." end
  view.dayLine = view.growth .. (if view.dayLine then "\n" .. view.dayLine else "")
  view.notice = if life.noticeSeconds > 0 and life.notice ~= "" then life.notice else nil
 	local canRest = life:canRest(lifeSpider)
-	local restPrompt = LifeText.prompt(life.asleep, life.resting, canRest, clock:isSleepTime() and not life:tooHungryToSleep(), device, PeacockText.change(device, appearance) .. "    " .. spiderPick.Text.holdHint(device))
+	local restPrompt = M.LifeText.prompt(life.asleep, life.resting, canRest, clock:isSleepTime() and not life:tooHungryToSleep(), device, PeacockText.change(device, appearance) .. "    " .. spiderPick.Text.holdHint(device))
  if life.growth:isMoulting() then
   restPrompt={title="Moulting in the silk-lined crack",hint="The spider pulls free of its old skin. Wait here while the hours pass."}
  elseif life.growth.ready and canRest and not life.resting then
@@ -1381,11 +1442,12 @@ local function updateHud(frameDt: number)
 	end
 	if os.clock() > helpUntil and helpVisible then helpVisible = false end
 	spiderPick.touchFrame()
-	local restLabel = LifeText.touchLabel(life.asleep, life.resting, canRest, clock:isSleepTime() and not life:tooHungryToSleep())
+	local restLabel = M.LifeText.touchLabel(life.asleep, life.resting, canRest, clock:isSleepTime() and not life:tooHungryToSleep())
 	if not spiderPick.inspecting then
-	controls:setTouchVisible("Feed", (prey.feeding.held ~= nil or restLabel ~= nil) and not life.growth:isMoulting())
-	controls:setTouchLabel("Feed", if prey.feeding.held ~= nil then "Eat" else restLabel or "Eat")
-	controls:setTouchLabel("Jump", if prey.feeding.struggling or rivalLegs.Grip.active(rivalLegs.grip) then "Grip" else "Jump")
+	local gripping = prey.feeding.struggling or rivalLegs.Grip.active(rivalLegs.grip)
+	controls:setTouchVisible("Feed", (gripping or prey.feeding.held ~= nil or restLabel ~= nil) and not life.growth:isMoulting())
+	controls:setTouchLabel("Feed", if gripping then "Grip" elseif prey.feeding.held ~= nil then "Eat" else restLabel or "Eat")
+	controls:setTouchLabel("Jump", if prey.feeding.struggling or rivalLegs.Grip.active(rivalLegs.grip) then "Grip" elseif mateLegs.couple.active and life.mate ~= nil and mateLegs.skippable(life.mate) then mateLegs.Text.TOUCH_SKIP else "Jump")
 	controls:setTouchLabel("Cancel", ControlText.touchCancelLabel(onLine))
 	controls:setTouchVisible("Jump", not onLine)
 	controls:setTouchVisible("Creep", not onLine)
@@ -1404,7 +1466,7 @@ end
 -- ---------------------------------------------------------------- the frame
 local accumulator = 0
 RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, function(frameDt: number)
-	updateSaves()
+	saveState.frame()
 	spiderPick.update(frameDt) -- (the choose hold's clock and the close look's reasons to end)
 	if panel:isShowing() then panel:update(frameDt) end
 	if nbPanel:isShowing() then nbPanel:update(frameDt) end
@@ -1470,8 +1532,8 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 					showCaught()
 				elseif signal.kind == "rival_seized" then
 					-- The wasp has the rival male (ROBLOX-70): it hangs under the wasp; the spider is not hunted today.
-					if RivalSpider.seize(life.rival) and WaspText.heardRival((motor.pos - signal.at).Magnitude, not sightCast(motor.pos, signal.at)) then
-						life:showNotice(WaspText.RIVAL_TAKEN)
+					if RivalSpider.seize(life.rival) and M.WaspText.heardRival((motor.pos - signal.at).Magnitude, not sightCast(motor.pos, signal.at)) then
+						life:showNotice(M.WaspText.RIVAL_TAKEN)
 					end
 				elseif signal.kind == "rival_carried_off" and life.rival.state == "taken" then
 					RivalSpider.carried(life.rival, life.clock.day, life.clock.hour)
@@ -1525,7 +1587,9 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
             elseif rivalEvent=="touch" then life:showNotice("The rival touched you. You are safe in this mode.") end
             -- The mating cycle (ROBLOX-80): the mate and the courtship meter, the sac and the guard days, by the same snapshot of the spider the rival has.
             do
-             local ms=table.clone(rivalState)
+             local ms=mateLegs.state
+             table.clear(ms)
+             for k,v in rivalState do ms[k]=v end -- (ROBLOX-92: the one table, filled again, not a clone of the rival's every tick)
              ms.drive,ms.sex,ms.needsDance,ms.dancing,ms.blocked=mateLegs.drive,mateLegs.Mating.sexOf(appearance),SpiderChoice.canDance(appearance),dance.active,sightCast
              if mateLegs.couple.active and wasp:isVisiting() then mateLegs.skip(true) end -- (the controls are the player's again the moment the wasp comes)
              ms.rivalThreat=life.rival.state=="windup" or life.rival.state=="lunge" -- (a scene would not start under a lunge: Mating.tick skips it at once)
@@ -1584,12 +1648,12 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	-- server picked, read once it has arrived (or after a few seconds without it).
 	if dayClock == nil and (Lighting:GetAttribute("SunPick") ~= nil or os.clock() - started > 5) then dayClock = Lighting.ClockTime end
 	local dc = dayClock
-	if dc and DayLight.due(lastLight, life.daylight) then
-		DayLight.apply(Lighting, DayLight.targets(life.daylight, dc), Workspace:FindFirstChild("Decor"))
+	if dc and M.DayLight.due(lastLight, life.daylight) then
+		M.DayLight.apply(Lighting, M.DayLight.targets(life.daylight, dc), Workspace:FindFirstChild("Decor"))
 		lastLight = life.daylight
 	end
 	-- The morning dew follows the hour, not the daylight (ROBLOX-74): it is drawn from the clock and keeps its last level on its own folder.
-	DayLight.applyDew(Workspace:FindFirstChild("Decor"), life.clock.hour)
+	M.DayLight.applyDew(Workspace:FindFirstChild("Decor"), life.clock.hour)
 	-- Drawn frame: the up vector eases so walls and edges do not snap.
 	local simFrame = frameDt * (if slow then SLOW_SPEED else 1)
 	drawnUp = drawnUp:Lerp(motor.up, 1 - math.exp(-24 * simFrame)).Unit
@@ -1734,7 +1798,7 @@ if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
 		local run: any = (require :: any)(playback)
 		run({
 			prey = prey, flyBodies = flyBodies, waspBody = waspBody, life = life, wasp = wasp, caughtPanel = panel, needs = needs, checkpoints = checkpoints, returnToCheckpoint = function() returnToCheckpoint() end, lifeSpider = function() return lifeSpider end, sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
-			input = controls, rivalLegs = rivalLegs, mateLegs = mateLegs, spiderPick = spiderPick,
+			input = controls, rivalLegs = rivalLegs, mateLegs = mateLegs, spiderPick = spiderPick, saveState = saveState, hud = hud,
 			notebook = book, notebookWatch = watch, notebookPanel = nbPanel, openNotebook = openNotebook, settingsPanel = settingsPanel, openSettings = openSettings, setting = setting, cam = cam, soundscape = soundscape, eyes = eyes,
 			session=session, menu=menu, openMenu=openMenu, endLife=endLife, fresh=fresh, stores=stores, continueAnother=continueAnother, currentStore=function() return checkpoints end,
 			changeSpider = function() changeSpider() end, dance = function() return dance end, ant = function() return ant.state end, antPose = function() return ant.pose end, threat = function() return ant.threat end, threatPose = function() return ant.threatPose end, appearance = function() return appearance end, rig = function() return rig end,

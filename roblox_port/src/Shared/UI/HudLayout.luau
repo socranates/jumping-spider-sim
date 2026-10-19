@@ -39,14 +39,19 @@ local COMPACT = {
 	Eye={-188,-120}, Recenter={-128,-120}, Creep={-68,-120},
 	Cancel={-128,-60}, Jump={-68,-60},
 }
+-- A short screen (under 450 px tall: a phone held sideways, whatever its width, ROBLOX-92: it was 568 px and wider only, so a 480 px phone had the tall stack) is laid out in three rows.
+function HudLayout.isShort(width: number, height: number): boolean
+	return width > 0 and height > 0 and height < 450
+end
 function HudLayout.layoutButton(b: Button, width: number, height: number): Button
+	local short = HudLayout.isShort(width, height)
 	-- A narrow phone (under 400 px) has no room for Focus beside the left thumb's cluster: it goes one row up.
-	if b.action == "Focus" and width < 400 and not (width >= 568 and height > 0 and height < 450) then
+	if b.action == "Focus" and width < 400 and not short then
 		local copy = table.clone(b)
 		copy.y = -320
 		return copy
 	end
-	if width >= 568 and height > 0 and height < 450 then
+	if short then
 		local slot = COMPACT[b.action]
 		if slot then
 			local copy = table.clone(b)
@@ -109,9 +114,13 @@ end
 -- top and the column starts under them. Rects are offsets from the safe area's top-left corner.
 HudLayout.MIN_TARGET = 48
 HudLayout.TOP = { menuW = 80, notebookW = 104, h = 48, margin = 12, gap = 8, columnY = 8, columnInset = 16, minColumn = 300 }
+HudLayout.TOP_SHORT = { menuW = 64, notebookW = 92, h = 48, margin = 8, gap = 6, columnY = 8, columnInset = 16, minColumn = 260 }
 export type Top = { menu: Rect, notebook: Rect, columnX0: number, columnX1: number, columnY: number, stacked: boolean }
 function HudLayout.topLayout(width: number, height: number): Top
 	local t = HudLayout.TOP
+	-- (ROBLOX-92) A short, narrow landscape phone (480 x 320) cannot spare a strip of 124 px on each side, and the column under a row of buttons would meet the prompts above the thumbs:
+	-- there the buttons are a little narrower (still 48 px tall, wider than their words) and the stack fits.
+	if HudLayout.isShort(width, height) and width - 2 * (t.margin + t.notebookW + t.gap) < t.minColumn then t = HudLayout.TOP_SHORT end
 	local x1 = width - t.margin
 	local side = t.margin + t.notebookW + t.gap -- the strip the buttons take on each side of a centred column
 	if width - 2 * side >= t.minColumn then

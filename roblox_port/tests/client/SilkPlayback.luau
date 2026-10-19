@@ -182,7 +182,7 @@ return function(driver: any)
   assert(not life.resting,"still resting after walking")
   driver.input:simulate("Reset",true);RunService.Heartbeat:Wait();driver.input:simulate("Reset",false);wait(.3)
   assert(life.resting and driver.lifeSpider().inRetreat,"not back resting in the crack")
-  assert(string.find(life.notice,"checkpoint recovery",1,true),life.notice)
+  assert(string.find(life.notice,"a return to the rest",1,true),life.notice)
   driver.input:simulate("Feed",true);RunService.Heartbeat:Wait();driver.input:simulate("Feed",false);wait(.2)
   life.clock.hour=12
  end)

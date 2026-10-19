@@ -31,11 +31,11 @@ export type Handlers = {
 	blocked: (() -> boolean)?, menu: (() -> ())?,
 	feed: (() -> ())?,
 	choose: (() -> ())?, -- C: change spider (in the crack); held 0.6 s, the close look (ROBLOX-90)
-	chooseEnd: (() -> ())?, -- ... and the last source of it let go (ROBLOX-90: a tap changes spider when it is let go, a hold does not)
+	chooseEnd: ((boolean?) -> ())?, -- ... and the last source of it let go (ROBLOX-90: a tap changes spider when it is let go, a hold does not); true when it did not end by the player's hand (the touch button was hidden under the finger, the engine took the input away: ROBLOX-92, nothing is changed then)
 	notebook: (() -> ())?, -- N: the naturalist's notebook
 	settings: (() -> ())?, -- O: the settings (ROBLOX-49)
 	display: (() -> ())?, -- X / RB: the peacock spider's courtship dance
-	displayEnd: (() -> ())?, -- ... and let go (RB in the crack is a controller's choose key, ROBLOX-90)
+	displayEnd: ((boolean?) -> ())?, -- ... and let go (RB in the crack is a controller's choose key, ROBLOX-90), cancelled as chooseEnd
 	focus: ((string) -> ())?,
 	jump: (string) -> (), -- "begin", "end", or "cancel" (the engine took the input away)
 	cancel: (string) -> (),
@@ -96,9 +96,9 @@ function SpiderInput.bind(h: Handlers)
 		elseif action == "Feed" then
 			if now and h.feed then h.feed() end
 		elseif action == "Choose" then
-			if now and h.choose then h.choose() elseif not now and h.chooseEnd then h.chooseEnd() end
+			if now and h.choose then h.choose() elseif not now and h.chooseEnd then h.chooseEnd(cancelled == true) end
 		elseif action == "Display" then
-			if now and h.display then h.display() elseif not now and h.displayEnd then h.displayEnd() end
+			if now and h.display then h.display() elseif not now and h.displayEnd then h.displayEnd(cancelled == true) end
 		elseif action == "Drop" then
 			if now then h.drop() end
 		elseif ONE_SHOT[action] then
@@ -138,9 +138,14 @@ function SpiderInput.bind(h: Handlers)
 	gui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
 	local active: { [InputObject]: string } = {}
 	local buttons: { [string]: TextButton } = {}
+	-- The fingers that are down on the screen and not on a button, and whether a pinch is under way (ROBLOX-92): a pinch zooms the close look and must not also turn it.
+	local free: { [InputObject]: boolean } = {}
+	local freeCount, pinching = 0, false
 	local function clear()
 		state:clear()
 		table.clear(active)
+		table.clear(free)
+		freeCount, pinching = 0, false
 		h.clear()
 	end
 	local function button(action: string, label: string, position: UDim2, size: number, textSize: number?)
@@ -191,9 +196,20 @@ function SpiderInput.bind(h: Handlers)
 			act(action, false, input)
 		end
 	end)
-	-- Touch look: a drag anywhere that is not on a button turns the view (Roblox marks button touches processed).
+	-- Touch look: a drag anywhere that is not on a button turns the view (Roblox marks button touches processed). Not while a pinch is under way or a second finger is down (ROBLOX-92:
+	-- both fingers of a pinch are moving, and each would have turned the view as well as zooming it).
+	UIS.TouchStarted:Connect(function(input, processed)
+		if not processed and not active[input] and not free[input] then free[input] = true; freeCount += 1 end
+	end)
+	UIS.TouchEnded:Connect(function(input)
+		if free[input] then free[input] = nil; freeCount -= 1 end
+		if freeCount <= 0 then pinching = false end -- (a pinch that never said it ended)
+	end)
+	UIS.TouchPinch:Connect(function(_touches: any, _scale: number, _velocity: number, state2: Enum.UserInputState)
+		pinching = state2 == Enum.UserInputState.Begin or state2 == Enum.UserInputState.Change
+	end)
 	UIS.TouchMoved:Connect(function(input, processed)
-		if not processed and not active[input] then h.touchLook(Vector2.new(input.Delta.X, input.Delta.Y)) end
+		if not processed and not active[input] and not pinching and freeCount <= 1 then h.touchLook(Vector2.new(input.Delta.X, input.Delta.Y)) end
 	end)
 	UIS.WindowFocusReleased:Connect(clear)
 	UIS.TextBoxFocused:Connect(clear)
@@ -219,7 +235,7 @@ function SpiderInput.bind(h: Handlers)
 				for input, a in active do
 					if a == action then
 						active[input] = nil
-						act(action, false, input)
+						act(action, false, input, true) -- (a button hidden under a finger is a press that was taken away, not one let go: ROBLOX-92)
 					end
 				end
 			end

@@ -15,6 +15,7 @@ local TOAST_SECONDS = 2.6
 local CAPTION_TEXT = 15 -- the sound captions' text size at normal; view.captionScale (the Captions setting) multiplies it
 local OK_COLOR = Color3.new(0.92, 0.94, 0.98)
 local WARN_COLOR = Color3.new(1.0, 0.72, 0.1)
+local DANGER_COLOR = Color3.new(1.0, 0.45, 0.36)
 
 local function corner(parent: Instance, r: number)
 	local c = Instance.new("UICorner")
@@ -233,17 +234,22 @@ function Hud.new(playerGui: Instance): any
 		aimTitle = aimTitle, aimHint = aimHint, anchorLabel = anchorLabel,
 		status = status, caption = caption, toastLabel = toast, help = help, notice = notice, day = day, dayLine = dayLine, noteLabel = note, noteLeft = 0,
 		panel = panel, promptTitle = promptTitle, promptHint = promptHint, promptCue = promptCue,
-		toastLeft = 0, device = "keyboard", lastSpan = "",
+		toastLeft = 0, toastRank = 0, device = "keyboard", lastSpan = "",
 	}, Hud)
 	return self
 end
 
-function Hud.toast(self: any, text: string, warn: boolean?)
+-- A toast has a priority (ROBLOX-92; there is one label): `level` is false or nil for information, true (or "warn") for a warning and "danger" for something coming at the spider.
+-- A toast of a lower priority than the one on show waits for it to expire and is dropped (a danger toast is kept for its seconds, whatever the game says next); an equal or higher one replaces it.
+function Hud.toast(self: any, text: string, level: (boolean | string)?)
 	if text == "" then return end
+	local rank = if level == "danger" then 2 elseif level == true or level == "warn" then 1 else 0
+	if self.toastLeft > 0 and rank < self.toastRank then return end
 	self.toastLabel.Text = text
-	self.toastLabel.TextColor3 = if warn then WARN_COLOR else OK_COLOR
+	self.toastLabel.TextColor3 = if rank == 2 then DANGER_COLOR elseif rank == 1 then WARN_COLOR else OK_COLOR
 	self.toastLabel.Visible = true
 	self.toastLeft = TOAST_SECONDS
+	self.toastRank = rank
 end
 
 -- The note that a page opened in the notebook, for `seconds`.
@@ -327,7 +333,7 @@ function Hud.update(self: any, view: any, dt: number)
 	end
 	if self.toastLeft > 0 then
 		self.toastLeft -= dt
-		if self.toastLeft <= 0 then self.toastLabel.Visible = false end
+		if self.toastLeft <= 0 then self.toastLabel.Visible = false; self.toastRank = 0 end
 	end
 end
 

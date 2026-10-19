@@ -33,6 +33,18 @@ MateText.HATCHING = "The eggs are hatching!"
 -- ROBLOX-91: the mating gate (a full-grown spider with energy of at least 0.6, at a rest) said nothing when it was the hunger that was missing.
 MateText.TOO_HUNGRY = "Too hungry for a visitor to come. Eat well, then rest in the crack again."
 
+-- ROBLOX-92: the mating scene can be skipped after four seconds and said nothing of it. From then on the scene shows what ends it (its status line, not a sound
+-- caption: the Captions setting does not hide it), by the device in use; on touch the Jump button is relabelled Skip for the scene, as it is Grip for a struggle.
+MateText.TOUCH_SKIP = "Skip"
+function MateText.skipLine(device: ControlText.Device): string
+	local jump = if device == "touch" then MateText.TOUCH_SKIP else ControlText.name(device, "jump")
+	return `{jump} or {ControlText.name(device, "cancel")}: part`
+end
+
+-- ROBLOX-92: why a rest is not kept as the last rest, in the game's own words (LifeText.restRefusal maps the rest of the reasons).
+MateText.REST_TOGETHER = "Not now — the two of you are together"
+MateText.REST_HATCHING = "Not while the brood is hatching"
+
 -- The end screen's choice to go on as a new spider (ROBLOX-91): a new life, not the family's: the sac and the generation are left behind. While there is an egg sac (or a
 -- hatched brood not yet carried on) it says so; "Back to your last rest" keeps them (the rest has them).
 MateText.ANOTHER = "Continue as another spider"

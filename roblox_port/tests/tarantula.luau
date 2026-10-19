@@ -247,7 +247,7 @@ check(Text.displayHint("gamepad", false) == "R1: rear up" and string.find(Peacoc
 ControlText.setPadStyle("xbox")
 check(Text.displayHint("gamepad", false) == "RB: rear up" and Text.displayHint("touch", false) == "Rear up: rear up" and Text.touchDisplay(false) == "Rear up" and Text.touchDisplay(true) == "Stop", "controller and touch words")
 local card = PeacockText.helpExtra("keyboard", "threat")
-check(string.find(card, "C change spider", 1, true) ~= nil and string.find(card, "rear up", 1, true) ~= nil and string.find(card, "silk mat", 1, true) ~= nil and string.find(card, "courtship", 1, true) == nil and string.find(card, "antennae", 1, true) == nil, "the controls card has the crack's line and the threat line, not the dance or the antennae")
+check(string.find(card, "C change spider", 1, true) ~= nil and string.find(card, "rear up", 1, true) ~= nil and string.find(card, "rear up and turn", 1, true) ~= nil and string.find(card, "silk mat", 1, true) == nil and string.find(card, "courtship", 1, true) == nil and string.find(card, "antennae", 1, true) == nil, "the controls card has the crack's line and the threat line, not the dance or the antennae")
 check(string.find(PeacockText.helpExtra("keyboard", "dance"), "rear up", 1, true) == nil and string.find(PeacockText.helpExtra("keyboard", "antennae"), "rear up", 1, true) == nil and string.find(PeacockText.helpExtra("keyboard", nil), "rear up", 1, true) == nil, "nobody else's card mentions it")
 check(#card <= #PeacockText.helpExtra("keyboard", "dance") + 25 and #Text.helpLine("gamepad") < 100, "the card's new line is about as long as the peacock's")
 check(string.find(Text.STAND, "Stand still", 1, true) == 1, "the refusal says to stand still")

@@ -324,7 +324,7 @@ case("loop records", function()
 	local m = LifeLoop.new(NeedsModel.new(true))
 	check(m:load(r), "and loads")
 	check(m.clock.day == 3 and math.abs(m.clock.hour - 15.25) < 0.01 and m.resting, "day 3, a quarter past three, still resting")
-	check(m.notice:find("checkpoint recovery") ~= nil, "the screen says it is checkpoint recovery, not an exact resume")
+	check(m.notice:find("a return to the rest") ~= nil and m.notice:find("not an exact resume") ~= nil and not m.notice:find("heckpoint"), "the screen says it is a return to the rest, not an exact resume")
 	-- The restored rest is not ended while the spider takes hold again (Godot's grace).
 	m:step(1 / 60, { inRetreat = true, attached = false, still = true, holding = false, feeding = false }, false, false)
 	check(m.resting, "the rest survives the first ticks after a restore")

@@ -3,6 +3,7 @@
 -- the part of it, the one line for the time of day or hunger, and the retreat's prompt. Button names come from ControlText for
 -- the device in use (Godot's interact is the port's feed button, E; cancel is Q). Pure, checked in tests/life.luau.
 local ControlText = require(script.Parent.ControlText)
+local MateText = require(script.Parent.MateText)
 
 local LifeText = {}
 
@@ -61,6 +62,25 @@ function LifeText.touchLabel(asleep: boolean, resting: boolean, canRest: boolean
 	if resting then return "Leave" end
 	if canRest then return if sleepTime then "Sleep" else "Rest" end
 	return nil
+end
+
+-- Why a rest is not kept as the last rest (ROBLOX-92), in the game's own words. The keys are the reasons Persistence/Checkpoint.boundaryProblem gives (engineering words, never
+-- shown); a reason this table does not know says LifeText.REST_FALLBACK, and tests/checkpoint.luau checks that every reason the sim can give is known.
+LifeText.REST_FALLBACK = "Not now"
+LifeText.KEEP_FAILED = "This rest could not be kept"
+LifeText.REST_REFUSALS = {
+	["the spider is not standing on a surface"] = "Not now — stand still on a surface first",
+	["the spider is moving"] = "Not now — keep still first",
+	["the rival in the jaws is still struggling"] = "Not while a fight is on",
+	["the spider is eating its rival"] = "Not while you are feeding",
+	["the two spiders are together"] = MateText.REST_TOGETHER,
+	["the brood is hatching"] = MateText.REST_HATCHING,
+	["the spider is feeding"] = "Not while you are feeding",
+	["the prey in the jaws is still struggling"] = "Not while a fight is on",
+	["a strike is still in progress"] = "Not now — wait for the strike to finish",
+} :: { [string]: string }
+function LifeText.restRefusal(reason: string): string
+	return LifeText.REST_REFUSALS[reason] or LifeText.REST_FALLBACK
 end
 
 -- Housefly-equivalent meals: a small prey counts as half. Partial feeding is retained.

@@ -18,7 +18,7 @@
 -- The picture (field of view, colour, blur: ROBLOX-20) is Client/SpiderEyes'; it only sets the field of view and lookScale here.
 -- The mating scene's two-shot (ROBLOX-89): `setShot` hands the camera the pair's framing (Life/MatingScene.shot: a point, a direction from it and a distance) each frame
 -- of the scene; the view then eases into it over SHOT_EASE_SECONDS from wherever the orbit camera was, the player's own look is ignored while it holds, and when the
--- shot ends (setShot(nil)) it eases back out over the same time to the orbit camera, which has not moved. The boom is cast against the sill like the orbit's, so the
+-- shot ends (setShot(nil)) it eases back out over the same time to the orbit camera, which has not moved (Reduced Motion cuts both ways: ROBLOX-92). The boom is cast against the sill like the orbit's, so the
 -- view is never inside geometry, and the body is never hidden by it.
 -- Inspect mode (ROBLOX-90): `beginInspect` takes the view to an orbit round the spider (Shared/Movement/InspectView: its yaw, elevation and distance in body-lengths,
 -- the slow auto-orbit when the player is idle, the zoom and the preset framings), eased in over InspectView.EASE_SECONDS (0.8 s) from the pose the camera had; the player's
@@ -252,6 +252,8 @@ function SpiderCamera.snap(self: any)
 	self.pivot = CameraMath.PIVOT_HEIGHT
 	self.settle = 2
 	self.boom = 0
+	-- (ROBLOX-92: whatever ease was under way is over; a shot or a close look that was easing out must not blend a stale pose into the snapped view)
+	self.shotT, self.lastShot, self.inspectT, self.inspectLast = 0, nil, 0, nil
 	self:tick(0)
 end
 
@@ -431,7 +433,15 @@ end
 -- The mating scene's two-shot (ROBLOX-89): `shot` is the framing for this frame, or nil when the scene is not playing.
 function SpiderCamera.setShot(self: any, shot: Shot?)
 	self.shot = shot
-	if shot ~= nil then self.lastShot = shot end
+	if shot ~= nil then
+		self.lastShot = shot
+		self.inspectWasEye = false -- (ROBLOX-92: a two-shot has the view; a close look that began from the eye view must not give the eye view back over it)
+	end
+end
+
+-- The close look will not give the eye view back when it ends (ROBLOX-92: the mating scene and the hatching have the view; the eye view is off for them as it always was).
+function SpiderCamera.cancelEyeRestore(self: any)
+	self.inspectWasEye = false
 end
 
 -- Whether the two-shot has any hold on the view now (easing in, held or easing out).
@@ -443,7 +453,11 @@ end
 function SpiderCamera._applyShot(self: any, frameDt: number)
 	local step = frameDt / SHOT_EASE_SECONDS
 	local want = if self.shot ~= nil then 1 else 0
-	self.shotT = math.clamp(self.shotT + math.clamp(want - self.shotT, -step, step), 0, 1)
+	if self.reducedMotion then
+		self.shotT = want -- (ROBLOX-92: Reduced Motion cuts into the two-shot and out of it, as it cuts the close look's ease)
+	else
+		self.shotT = math.clamp(self.shotT + math.clamp(want - self.shotT, -step, step), 0, 1)
+	end
 	local s: Shot? = self.shot or self.lastShot
 	if self.shotT <= 0 or s == nil then
 		if self.shot == nil then self.lastShot = nil end

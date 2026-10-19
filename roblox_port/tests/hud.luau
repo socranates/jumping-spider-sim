@@ -396,5 +396,38 @@ do
 	check(not b.Visible and not grip.Visible, "gone again, and the grip bar is not the one that shows")
 end
 
+-- the one toast label has priorities (ROBLOX-92): danger over warning over information; a lower one waits out the higher and is dropped, an equal or higher one replaces it,
+-- and once the seconds are over anything may show again
+do
+	local parent = Instance.new("Folder")
+	local hud = SpiderHud.new(parent)
+	local function toast(): any return named(parent, "Toast")[1] end
+	hud:toast("A plain thing", false)
+	check(toast().Text == "A plain thing" and toast().Visible, "information shows")
+	hud:toast("A warning", true)
+	check(toast().Text == "A warning", "a warning replaces information")
+	hud:toast("More information", false)
+	check(toast().Text == "A warning", "information does not replace a warning")
+	hud:toast("Something is coming", "danger")
+	check(toast().Text == "Something is coming", "a danger replaces a warning")
+	local dangerColor = toast().TextColor3
+	hud:toast("A warning again", true)
+	hud:toast("Plain again", false)
+	hud:toast("", "danger")
+	check(toast().Text == "Something is coming", "neither a warning nor information replaces a danger, and an empty text is nothing")
+	for _ = 1, 100 do hud:update({ device = "keyboard" }, 0.016) end -- 1.6 s
+	check(toast().Visible and toast().Text == "Something is coming", "a danger is still there before its seconds are over")
+	hud:toast("Another danger", "danger")
+	check(toast().Text == "Another danger" and toast().TextColor3 == dangerColor, "an equal one replaces it, in the danger colour")
+	for _ = 1, 200 do hud:update({ device = "keyboard" }, 0.016) end -- 3.2 s
+	check(not toast().Visible, "it goes when its seconds are over")
+	hud:toast("Plain at last", false)
+	check(toast().Visible and toast().Text == "Plain at last" and toast().TextColor3 ~= dangerColor, "and then the plainest toast shows again, in its own colour")
+	local warnColor
+	hud:toast("A warning", true)
+	warnColor = toast().TextColor3
+	check(warnColor ~= dangerColor, "a warning and a danger differ in colour")
+end
+
 print(`HUD passed={passed} failed={failed}`)
 if failed > 0 then error("hud checks failed") end

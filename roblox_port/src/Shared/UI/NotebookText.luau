@@ -4,6 +4,7 @@
 -- so tests/notebook.luau checks them (and the layout at phone, tablet and desktop sizes) without Roblox. Button names come from
 -- ControlText (PlayStation names on a PlayStation controller).
 local ControlText = require(script.Parent.ControlText)
+local TarantulaText = require(script.Parent.TarantulaText)
 
 local NotebookText = {}
 
@@ -15,10 +16,11 @@ NotebookText.PAGES = "Pages"
 NotebookText.MENU_CHOICE = "Notebook"
 NotebookText.BUTTON = "Notebook"
 
--- Fills {reel}, {letGo}, {drop}, {focus} (any ControlText action name) in a page's "In this game" line with the device's name for it.
+-- Fills {reel}, {letGo}, {drop}, {focus}, {display} (any ControlText action name) in a page's "In this game" line with the device's name for it. {display} is the
+-- display key (ROBLOX-92: the tarantula page's rear-up); on touch its button is the tarantulas' own, "Rear up", not the peacock's "Dance".
 function NotebookText.fill(text: string, device: ControlText.Device): string
 	local out = string.gsub(text, "{(%w+)}", function(action: string): string
-		local name = ControlText.name(device, action)
+		local name = if action == "display" and device == "touch" then TarantulaText.touchDisplay(false) else ControlText.name(device, action)
 		return if name ~= "" then name else "{" .. action .. "}"
 	end)
 	return out

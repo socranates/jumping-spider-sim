@@ -253,5 +253,50 @@ check("a caught rival is a hard meal (ROBLOX-77): the Grip button and the grip b
 	needs.energy = 0.8
 	life.rival.state, life.rival.contests, life.rival.subdued = "patrol", 0, nil
 end)
+check("the Eat key grips a caught rival too, like the Jump key; the touch Feed button says Grip for it (ROBLOX-92)", function()
+	local driver = ClientStubs.driver
+	local life, needs, prey = driver.life, driver.needs, driver.prey
+	local Rival = require("../src/Shared/Predator/RivalSpider")
+	local Grip = require("../src/Shared/Predator/RivalGrip")
+	local function key(action: string, down: boolean)
+		local fn = services.actions["Spider" .. action]
+		fn("Spider" .. action, if down then Enum.UserInputState.Begin else Enum.UserInputState.End,
+			{ KeyCode = Enum.KeyCode[if action == "Feed" then "E" else action], UserInputType = Enum.UserInputType.Keyboard, Position = Vector3.zero })
+	end
+	driver.place(Vector3.new(-5, 0.31, -9))
+	frames(5)
+	life.clock.day += 1
+	life.clock.hour = 9
+	frames(10)
+	needs.energy, needs.gentle = 0.3, false
+	local r = life.rival
+	r.state, r.elapsed, r.notice, r.contests, r.spared, r.food, r.subdued, r.day, r.fate = "patrol", 0, 0, 0, nil, Rival.FOOD, nil, nil, nil
+	r.position = driver.motor.pos + Vector3.new(0.2, 0, 0)
+	r.previous = r.position
+	prey.strikeEnd = prey.tick + 1
+	frames(3)
+	assert(r.state == "captured" and r.subdued == false and Grip.active(driver.rivalLegs.grip), `caught: {r.state}`)
+	local touch = gui:FindFirstChild("SpiderTouch")
+	driver.setDevice("touch")
+	frames(3)
+	assert(touch:FindFirstChild("Feed").Visible ~= false and touch:FindFirstChild("Feed").Text == "Grip", `the Feed button says Grip: "{touch:FindFirstChild("Feed").Text}"`)
+	assert(touch:FindFirstChild("Jump").Text == "Grip", "(and so does Jump)")
+	driver.setDevice("keyboard")
+	local before = Grip.level(driver.rivalLegs.grip)
+	key("Feed", true); frames(1); key("Feed", false)
+	assert(Grip.level(driver.rivalLegs.grip) > before, `one tap of E raised the grip ({before} to {Grip.level(driver.rivalLegs.grip)})`)
+	local count = 0
+	while r.subdued == false and count < 60 * 20 do
+		if count % 11 == 0 then key("Feed", true); frames(1); key("Feed", false) else frames(1) end
+		count += 1
+		assert(r.state == "captured", `the rival left the jaws at frame {count}: {r.state}`)
+		assert(not driver.jump:isBusy() and not driver.life.resting, "a tap of E grips: it does not rest or start a jump")
+	end
+	assert(r.subdued == true, "tapping E did not subdue the rival")
+	frames(60 * 6)
+	assert(r.state == "consumed", `and it was eaten: {r.state}`)
+	needs.energy = 0.8
+	life.rival.state, life.rival.contests, life.rival.subdued = "patrol", 0, nil
+end)
 print("CLIENT_RIVAL passed=" .. passed .. " failed=" .. failed)
 if failed > 0 then error("CLIENT_RIVAL failed") end

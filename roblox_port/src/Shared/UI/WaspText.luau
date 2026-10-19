@@ -9,6 +9,7 @@
 -- one choice is "Back to the start"; with one, the screen also offers another spider as a new life (the client's presentEnd, ROBLOX-91: the sac and the generation are left behind).
 local ControlText = require(script.Parent.ControlText)
 local Data = require(script.Parent.Parent.Data.Wasp)
+local Heard = require(script.Parent.Heard)
 
 local WaspText = {}
 
@@ -67,7 +68,7 @@ end
 
 -- Whether the player hears or sees the wasp take the rival: it is within earshot of the spider, or in clear sight of it (`seen`) and not too far.
 function WaspText.heardRival(distance: number, seen: boolean): boolean
-	return distance <= Data.rival.earshotWu or (seen and distance <= Data.rival.sightWu)
+	return Heard.within(distance, seen) -- (the rule is UI/Heard's, ROBLOX-92; the mate's notices use it too)
 end
 
 -- What the status says while the wasp visits (nil when it is away). The first visit says what wasps do and how to get away.

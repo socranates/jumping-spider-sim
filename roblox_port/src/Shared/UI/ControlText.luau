@@ -209,33 +209,37 @@ function ControlText.touchCancelLabel(onLine: boolean): string
 	return if onLine then "Let go\n(hold)" else "Cancel"
 end
 
--- The controls card (H): the device's own bindings, one action per line pair.
+-- The controls card (H): the device's own bindings, one group of actions to a line. The whole card the player reads is PeacockText.card (this, then the crack's line,
+-- the pointer to the Settings row and the display key's line), and it is at most ten lines at the width the HUD gives it (tests/peacock.luau, the Studio PromptSpec);
+-- each line here is at most 61 characters (the card's width at its text size) so that, on a keyboard or a controller, none wraps. The touch card has the room to wrap.
 function ControlText.helpCard(device: Device): string
 	if device == "gamepad" then
 		local function n(action: string): string return ControlText.name("gamepad", action) end
 		return table.concat({
 			`Left stick walk   Right stick look   {n("creep")} creep`,
-			`Tap {n("jump")} hop   Hold {n("jump")} aim, release to leap   {n("cancel")} cancel`,
-			`{n("drop")} lower on silk   On the line: stick up reel, down lower, hold {n("letGo")} let go`,
-			`{n("eye")} spider-eye view   {n("recenter")} recenter   {n("focus")} focus   {n("slow")} slow motion`,
-			`In the crack: L3 rest (sleep from evening)   {n("reset")}: life menu / last rest`,
+			`Tap {n("jump")} hop   Hold {n("jump")} aim, release to leap`,
+			`{n("drop")} lower on silk   {n("cancel")} cancel   {n("eye")} eye view`,
+			`On the line: up reel, down lower, hold {n("letGo")} let go`,
+			`{n("recenter")} recenter   {n("focus")} focus   {n("slow")} slow motion`,
+			`In the crack: {n("feed")} rest (sleep from evening)`,
+			`{n("menu")}: menu, then last rest, notebook, settings`,
 		}, "\n")
 	elseif device == "touch" then
 		return table.concat({
-			"Arrows walk   Drag to look   Creep (hold)",
+			"Arrows walk   Drag to look   Creep (hold)   Recenter   Focus",
 			"Tap Jump hop   Hold Jump aim, release to leap   Cancel",
 			"Silk lowers on silk   On the line: ↑ reel, ↓ lower, hold Let go",
-			"Eye spider-eye view   Recenter",
-			"In the crack: Rest (Sleep from evening)",
+			"Eye spider-eye view   In the crack: Rest (Sleep from evening)",
+			"Menu: last rest, notebook, settings, this card",
 		}, "\n")
 	end
 	return table.concat({
-		"WASD walk   Mouse look   Shift creep",
+		"WASD walk   Mouse look   Shift creep   Wheel zoom   G gait",
 		"Tap Space hop   Hold Space aim, release to leap   Q cancel",
 		"F lower on silk   On the line: W reel, S lower, hold Q let go",
-		"V spider-eye view   R recenter   Right mouse focus   T slow motion",
-		"In the crack: E rest (sleep from evening)   Backspace: last checkpoint   M: life menu   N: notebook   O: settings",
-		"Wheel zoom   G gait   H hide this",
+		"V eye view   R recenter   Right mouse focus   T slow motion",
+		"In the crack: E rest (sleep from evening)   H: hide this",
+		"Backspace: last rest   M: menu   N: notebook   O: settings",
 	}, "\n")
 end
 

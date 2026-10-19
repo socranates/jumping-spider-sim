@@ -300,5 +300,51 @@ local buttons = {}
 for _, b in HudLayout.TOUCH_BUTTONS do buttons[b.action] = b end
 check(buttons.Choose ~= nil and buttons.Display ~= nil and not buttons.Choose.right and buttons.Display.right, "touch Change and Dance buttons exist")
 
+-- The whole controls card is at most ten lines at the width the HUD gives it (ROBLOX-92: the card exceeded the review's ten-line rule and the Studio spec measured the wrong string).
+-- ~61 characters to a line (516 px at 15 px GothamMedium), wrapped greedily at spaces; the string is Text.card, the very one the HUD shows, for every device, display key and pad style.
+local function wrappedLines(card: string, width: number): number
+	local n = 0
+	for line in string.gmatch(card .. "\n", "([^\n]*)\n") do
+		local used, lines = 0, 1
+		for word in string.gmatch(line, "%S+") do
+			local len = utf8.len(word) or #word
+			if used == 0 then used = len elseif used + 1 + len <= width then used += 1 + len else lines += 1; used = len end
+		end
+		n += lines
+	end
+	return n
+end
+local cardMax: { [string]: number } = {}
+for _, style in { "xbox", "playstation" } do
+	ControlText.setPadStyle(style :: any)
+	for _, device in { "keyboard", "gamepad", "touch" } do
+		for _, kind in { "none", "dance", "antennae", "threat" } do
+			local card = Text.card(device :: any, if kind == "none" then nil else kind)
+			local n = wrappedLines(card, 61)
+			cardMax[device] = math.max(cardMax[device] or 0, n)
+			check(n <= 10, `{device}/{kind}/{style}: the controls card is {n} lines (at most 10 at 61 characters)`)
+			check(string.find(card, "\n\n", 1, true) == nil and string.sub(card, -1) ~= "\n", `{device}/{kind}/{style}: no empty line in the card`)
+			check(card == ControlText.helpCard(device :: any) .. Text.helpExtra(device :: any, if kind == "none" then nil else kind), `{device}/{kind}: the card is the controls and the extras, nothing more`)
+		end
+		if device ~= "touch" then
+			for line in string.gmatch(ControlText.helpCard(device :: any), "[^\n]+") do
+				check((utf8.len(line) or #line) <= 61, `{device}/{style}: no line of the base card wraps ({#line}): {line}`)
+			end
+		end
+	end
+end
+ControlText.setPadStyle("xbox")
+print(`PEACOCK card lines (the longest of every display key and pad style): keyboard {cardMax.keyboard}, gamepad {cardMax.gamepad}, touch {cardMax.touch}`)
+-- Every action is still discoverable on the card (the base lines and the extras together), by the device's own name for it.
+for _, device in { "keyboard", "gamepad", "touch" } do
+	local card = Text.card(device :: any, "dance")
+	for _, word in { "hop", "aim", "silk", "look", "creep", "rest", "menu", "notebook", "settings", "last rest", "change spider" } do
+		check(string.find(string.lower(card), word, 1, true) ~= nil, `{device}: the card says "{word}"`)
+	end
+	check(string.find(card, "checkpoint", 1, true) == nil and string.find(card, "five spiders", 1, true) == nil, `{device}: no engineer's word, no count of spiders`)
+end
+check(string.find(Text.card("touch", nil), "Change change", 1, true) == nil and string.find(Text.crackLine("touch"), "tap Change", 1, true) ~= nil, "touch: the button's label is not doubled in its own sentence")
+check(Text.crackLine("keyboard") == "In the crack: C change spider (hold C: look closely)" and Text.crackLine("gamepad") == "In the crack: RB change spider (hold RB: look closely)", "the crack's line, the close look folded in, by device")
+
 print(`PEACOCK passed={passed} failed={failed}`)
 if failed > 0 then error("peacock checks failed") end

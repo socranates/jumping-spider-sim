@@ -58,20 +58,34 @@ end
 function PeacockText.touchChange(): string return "Change" end
 function PeacockText.touchDisplay(dancing: boolean): string return if dancing then "Stop" else "Dance" end
 
--- Lines added to the controls card (H): the crack's choice for every spider, the pointer to the Settings row (ROBLOX-71), then the display key's line for the spider that has one:
+-- The card's line for the crack (ROBLOX-92): changing spider and, folded in, the close look (ROBLOX-90: the same key held 0.6 s). On touch the key is the Change button's own
+-- label, so it is "tap Change", not "Change change spider".
+function PeacockText.crackLine(device: ControlText.Device): string
+	local choose = ControlText.name(device, "choose")
+	if device == "touch" then return `In the crack: tap {choose} to change spider; hold it to look closely` end
+	return `In the crack: {choose} change spider (hold {choose}: look closely)`
+end
+
+-- Lines added to the controls card (H): the crack's choice for every spider and the close look, the pointer to the Settings row (ROBLOX-71), then the display key's line for the spider that has one:
 -- `display` is "dance" (the peacock spider), "antennae" (the ant-mimicking spider), "threat" (the tarantulas), nil (the first spider). true means "dance" and false nil.
 function PeacockText.helpExtra(device: ControlText.Device, display: (string | boolean)?): string
-	local choose = ControlText.name(device, "choose")
 	local kind: string? = if display == true then "dance" elseif type(display) == "string" then display else nil
-	local lines = { `In the crack: {choose} change spider (five spiders)`, PeacockText.settingsLine(device) }
+	local lines = { PeacockText.crackLine(device), PeacockText.settingsLine(device) }
 	if kind == "dance" then
-		table.insert(lines, `Standing still: {ControlText.name(device, "display")} courtship dance. Any move, jump or Cancel stops it`)
+		local key = ControlText.name(device, "display")
+		table.insert(lines, `{key}{if device == "touch" then " button:" else ""} courtship dance (any move, jump or Cancel stops it)`)
 	elseif kind == "antennae" then
 		table.insert(lines, AntMimicText.helpLine(device))
 	elseif kind == "threat" then
 		table.insert(lines, TarantulaText.helpLine(device))
 	end
 	return "\n" .. table.concat(lines, "\n")
+end
+
+-- The whole controls card the HUD shows (and the Studio spec measures): the device's own bindings, then the crack's line, the Settings pointer and the display key's line.
+-- ROBLOX-92: this one string is what is on the screen; the close look's hint is inside the crack's line, not a line of its own.
+function PeacockText.card(device: ControlText.Device, display: (string | boolean)?): string
+	return ControlText.helpCard(device) .. PeacockText.helpExtra(device, display)
 end
 
 -- The felt caption while a rumble-rump is on: { text, alpha }, or nil when there is none. The vibration is felt through the feet, not seen.

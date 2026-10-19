@@ -257,10 +257,13 @@ check("the words: the name line, one line of controls for each device (PlayStati
 	assert(InspectText.framing("face") == "Framing: Face" and InspectText.framing("side") == "Framing: Side" and InspectText.framing("top") == "Framing: From above", "the framings")
 	assert(InspectText.BUTTON == "Look closely" and InspectText.TOUCH_BACK == "Back" and InspectText.TOUCH_VIEW == "View", "the button and the touch words")
 	for _, d in { "keyboard", "gamepad", "touch" } do
-		local line = InspectText.helpLine(d :: any)
-		assert(string.find(line, "Look closely", 1, true) and not string.find(line, "\n", 1, true), `{d}: the card's line is one line`)
+		-- (ROBLOX-92: the controls card has no line of its own for the close look; the crack's line says how, with the device's own name for the key)
+		local line = PeacockText.crackLine(d :: any)
+		assert(string.find(line, "look closely", 1, true) and not string.find(line, "\n", 1, true), `{d}: the crack's line says it, in one line`)
+		assert(string.find(line, ControlText.name(d :: any, "choose"), 1, true), `{d}: with the device's name for the key`)
+		assert(InspectText.helpLine == nil, "the old card line is gone")
 	end
-	local all = { InspectText.NOT_NOW, InspectText.DANGER, InspectText.ENDED, InspectText.hint("keyboard"), InspectText.helpLine("keyboard") }
+	local all = { InspectText.NOT_NOW, InspectText.DANGER, InspectText.ENDED, InspectText.hint("keyboard"), PeacockText.crackLine("keyboard") }
 	for _, text in all do
 		local lower = string.lower(text)
 		assert(not string.find(lower, "kill") and not string.find(lower, "die") and not string.find(lower, "dead") and not string.find(lower, "blood"), "child-safe: " .. text)
@@ -586,6 +589,29 @@ check("taking over: the right stick, a touch drag, the wheel and a pinch turn an
 	seconds(5)
 	local _, yawB = view(d)
 	assert(near((yawB - yawA + 540) % 360 - 180, 30, 3), `5 s on, 1 s since the last pinch: 4 s of idle is 3 s of orbit, 30 degrees ({(yawB - yawA + 540) % 360 - 180})`)
+	-- ROBLOX-92: the two fingers of a pinch are moving, and neither turns the view as well as zooming it; one finger dragging does
+	local function finger(dx: number): any return { UserInputType = Enum.UserInputType.Touch, Delta = Vector2.new(dx, 0) } end
+	local _, yawP0 = view(d)
+	local f1, f2 = finger(60), finger(-60)
+	UIS.TouchStarted:Fire(f1, false); UIS.TouchStarted:Fire(f2, false)
+	UIS.TouchPinch:Fire({}, 1, 0, Enum.UserInputState.Begin, false)
+	UIS.TouchMoved:Fire(f1, false); UIS.TouchMoved:Fire(f2, false)
+	UIS.TouchPinch:Fire({}, 1.0, 0, Enum.UserInputState.Change, false)
+	UIS.TouchMoved:Fire(f1, false); UIS.TouchMoved:Fire(f2, false)
+	frames(10)
+	local _, yawP1 = view(d)
+	assert(near(angleBetween(yawP0, yawP1), 0, 2.0), `a pinch does not also orbit (a drag of 60 px is 15 degrees; the idle drift is 10 degrees a second) ({yawP0} then {yawP1})`)
+	UIS.TouchPinch:Fire({}, 1.0, 0, Enum.UserInputState.End, false)
+	UIS.TouchMoved:Fire(f1, false) -- (two fingers are still down: still not a drag)
+	frames(10)
+	local _, yawP2 = view(d)
+	assert(near(angleBetween(yawP0, yawP2), 0, 4.0), "nor with both fingers still down after the pinch ended")
+	UIS.TouchEnded:Fire(f2, false)
+	UIS.TouchMoved:Fire(f1, false) -- one finger: a drag
+	frames(10)
+	local _, yawP3 = view(d)
+	assert(angleBetween(yawP2, yawP3) > 5, `one finger dragging orbits ({yawP2} then {yawP3})`)
+	UIS.TouchEnded:Fire(f1, false)
 end)
 
 check("zooming: W and S (the left stick) go in and out between 1.1 and 3 body-lengths, and the spider does not walk", function()
@@ -662,7 +688,7 @@ check("the screen: the spider's name and one line of controls, and nothing else 
 	assert(words("Day") == "" and words("DayLine") == "" and words("Status") == "" and words("Notice") == "" and words("Caption") == "", "no day, no status, no notice, no caption")
 	assert(words("PromptCue") == "", "no cue")
 	tap("Help")
-	assert(string.find(words("Controls"), InspectText.helpLine("keyboard"), 1, true) ~= nil, `the card has its line: "{words("Controls")}"`)
+	assert(string.find(words("Controls"), PeacockText.crackLine("keyboard"), 1, true) ~= nil, `the card has the crack's line, with the close look in it: "{words("Controls")}"`)
 	tap("Help")
 	-- The device in use names the controls.
 	d.setDevice("gamepad")
@@ -838,6 +864,26 @@ check("touch: a long press on Change is the close look, a short one changes spid
 	d.setDevice("keyboard")
 end)
 
+check("touch: Change hidden under the finger mid-hold takes the press away; nothing is changed and nothing is said (ROBLOX-92)", function()
+	local d = ClientStubs.driver
+	d.setDevice("touch")
+	rest(d)
+	frames(3)
+	local touch = gui:FindFirstChild("SpiderTouch")
+	local startAs = d.appearance()
+	local finger = { UserInputType = Enum.UserInputType.Touch, Position = Vector3.zero }
+	touch:FindFirstChild("Choose").InputBegan:Fire(finger); frames(8)
+	assert(d.spiderPick.hold ~= nil and touch:FindFirstChild("Choose").Visible ~= false, "(the finger is down on Change)")
+	tap("Feed") -- the rest ends under the finger: the Change button is hidden
+	frames(3)
+	assert(not d.life.resting and touch:FindFirstChild("Choose").Visible == false, "(the button is hidden)")
+	assert(d.appearance() == startAs and d.spiderPick.hold == nil, "no change of spider, and no hold left")
+	assert(words("Toast") ~= PeacockText.NOT_RESTING, `and no 'not resting' toast either ("{words("Toast")}")`)
+	UIS.InputEnded:Fire(finger); frames(3)
+	assert(d.appearance() == startAs and not d.spiderPick.inspecting, "the finger lifting later does nothing")
+	d.setDevice("keyboard")
+end)
+
 check("losing the key mid-hold changes nothing: focus lost, the menu opened or the spider moved away", function()
 	local d = ClientStubs.driver
 	rest(d)
@@ -913,6 +959,7 @@ check("the rival's windup ends it at once, as does anything that makes the spide
 	rival.state = "windup"
 	ended("the rival's windup")
 	assert(words("Toast") == InspectText.DANGER, `the toast: "{words("Toast")}"`)
+	seconds(3) -- (a danger is kept on the screen for its seconds over any plainer toast, ROBLOX-92)
 	rival.state = state
 	begin()
 	d.motor.seized = true
@@ -1072,6 +1119,22 @@ check("hanging on the line: the close look works there too, the line holds, a ju
 	assert(not d.spiderPick.inspecting, "a jump leaves")
 	seconds(1)
 	assert(d.motor:onLine() and not d.jump:isBusy(), "and is not a jump from the line")
+	-- ROBLOX-92: a Cancel that left the look and is still held does not also let go of the line (it is swallowed until it is released, like the jump's); a fresh hold does
+	enter(d)
+	seconds(1)
+	key("Cancel", true)
+	assert(not d.spiderPick.inspecting and d.spiderPick.cancelSwallow == true, "Cancel leaves, and the rest of its press is swallowed")
+	seconds(1.5)
+	assert(d.motor:onLine() and d.get().line == "locked", "held on for 1.5 s after it left the look: the line is still held")
+	key("Cancel", false)
+	frames(3)
+	assert(d.spiderPick.cancelSwallow == false, "released: nothing is swallowed")
+	-- ... and the touch Back button, which is Cancel, the same
+	enter(d)
+	seconds(1)
+	key("Cancel", true); key("Cancel", false)
+	assert(not d.spiderPick.inspecting and d.spiderPick.cancelSwallow == false, "a tap leaves and leaves nothing swallowed")
+	-- a plain hold of Cancel on the line, outside the look, lets go as before
 	-- from the hold in the crack there is no line, and from a jump in flight it is refused
 	key("Cancel", true); seconds(1.3); key("Cancel", false)
 	frames(60)

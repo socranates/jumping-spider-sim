@@ -8,6 +8,7 @@ local AntMimic = require("../src/Shared/Data/AntMimic")
 local FieldNotebook = require("../src/Shared/Learning/FieldNotebook")
 local NotebookWatch = require("../src/Shared/Learning/NotebookWatch")
 local NotebookText = require("../src/Shared/UI/NotebookText")
+local TarantulaText = require("../src/Shared/UI/TarantulaText")
 local ControlText = require("../src/Shared/UI/ControlText")
 local HudLayout = require("../src/Shared/UI/HudLayout")
 local SpiderInput = require("../src/Client/SpiderInput")
@@ -425,6 +426,21 @@ do
 	ControlText.setPadStyle("playstation")
 	check(NotebookText.fill("{letGo} {drop} {focus}", "gamepad") == "Circle Square L2", "and for a PlayStation controller")
 	check(NotebookText.fill("{nonsense} stays", "keyboard") == "{nonsense} stays", "a name nothing knows is left as it was")
+	-- ROBLOX-92: the tarantula page named its key "(X)" for every device; it says {display}, filled with the device's own key (on touch the tarantulas' button, Rear up, not the peacock's Dance)
+	ControlText.setPadStyle("xbox")
+	check(NotebookText.fill("({display})", "keyboard") == "(X)" and NotebookText.fill("({display})", "gamepad") == "(RB)" and NotebookText.fill("({display})", "touch") == "(Rear up)", "{display} is the display key by device")
+	ControlText.setPadStyle("playstation")
+	check(NotebookText.fill("({display})", "gamepad") == "(R1)", "and on a PlayStation controller")
+	do
+		local page: any = nil
+		for _, p in NotebookPages.pages do if p.id == "tarantula_cousins" then page = p end end
+		check(page ~= nil and string.find(page.game, "({display})", 1, true) ~= nil and string.find(page.game, "(X)", 1, true) == nil, "the tarantula page no longer hardcodes the key")
+		check(page ~= nil and string.find(page.game, "no silk mat is laid", 1, true) ~= nil and string.find(TarantulaText.helpLine("keyboard"), "rear up and turn", 1, true) ~= nil and string.find(TarantulaText.helpLine("keyboard"), "silk mat", 1, true) == nil,
+			"the page and the controls card say the same thing: a rear-up and a turn, no silk mat is laid")
+		for _, device in { "keyboard", "gamepad", "touch" } do
+			check(string.find(NotebookText.fill(page.game, device), "{", 1, true) == nil, `{device}: every name on the page is filled`)
+		end
+	end
 	check(NotebookText.gameLine("", "keyboard") == nil, "a page with nothing to say about the game shows no line (Godot)")
 	check(NotebookText.gameLine("Hello.", "keyboard") == "In this game: Hello.", "a line starts 'In this game: '")
 	local dragline = FieldNotebook.new():view("dragline")

@@ -107,7 +107,7 @@ case("a rest in the crack keeps a checkpoint the store accepts", function()
 	check(Layout.inRetreat(w.motor.pos) and w.motor.mode == "attached", `the spider is at home ({w.motor.pos})`)
 	rest(w)
 	check(w.life.resting, "resting")
-	check(w.life.checkpoints == 1 and w.life.notice == "Checkpoint kept.", `kept: {w.life.notice}`)
+	check(w.life.checkpoints == 1 and w.life.notice == "Last rest kept.", `kept: {w.life.notice}`)
 	local best = w.store:loadBest()
 	check(best.ok and best.source == "current", "the store hands it back: " .. best.message)
 	local size = w.dataStore.sizes.checkpoint or 0
@@ -334,7 +334,7 @@ case("the store keeps the last good checkpoint whatever happens to a write", fun
 	-- An empty store.
 	local empty = CheckpointStore.new(CheckpointStore.MemoryDataStore.new(), function(r) return (Checkpoint.check(r, w)) end)
 	local none = empty:loadBest()
-	check(not none.ok and none.message == "no checkpoint to return to", "nothing to return to")
+	check(not none.ok and none.message == "no last rest to return to", "nothing to return to")
 end)
 
 case("the DataStore stand-in has a DataStore's rules", function()
@@ -751,6 +751,22 @@ case("a capture holds neither the prey director's cpu window nor the sensor's co
 	check(Checkpoint.restore(oldRecord, w) and #w.prey.cpu == 0 and #w.sensor._ring == 0, "and restores with them empty")
 	check(w.sensor:costPercentile(0.9) == 0, "without a reading")
 end)
+
+-- ROBLOX-92: the reasons a rest is refused are engineering words (they are in the tests above); the player is told them in the game's own (LifeText.restRefusal, MateText).
+-- Every reason boundaryProblem can give has words, none is the fallback, and no player-facing word says "checkpoint" or names the machinery.
+check(true, "(the reasons)")
+do
+	local LifeText = require("../src/Shared/UI/LifeText")
+	local reasons = { "the spider is not standing on a surface", "the spider is moving", "the rival in the jaws is still struggling", "the spider is eating its rival", "the two spiders are together",
+		"the brood is hatching", "the spider is feeding", "the prey in the jaws is still struggling", "a strike is still in progress" }
+	for _, why in reasons do
+		local text = LifeText.restRefusal(why)
+		check(text ~= LifeText.REST_FALLBACK and text ~= why and not string.find(string.lower(text), "checkpoint", 1, true) and string.find(text, "Not ", 1, true) == 1, `{why}: "{text}"`)
+	end
+	check(LifeText.restRefusal("the two spiders are together") == "Not now — the two of you are together" and LifeText.restRefusal("the rival in the jaws is still struggling") == "Not while a fight is on"
+		and LifeText.restRefusal("the brood is hatching") == "Not while the brood is hatching", "the three the reviewer named")
+	check(LifeText.restRefusal("anything new") == LifeText.REST_FALLBACK, "a reason nobody wrote words for says the plain fallback")
+end
 
 print(`CHECKPOINT passed={passed} failed={failed}`)
 if failed > 0 then error("CHECKPOINT failed") end

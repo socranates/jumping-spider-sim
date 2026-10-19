@@ -258,8 +258,13 @@ check("a rest by a full-grown, well-fed spider makes a mate come in the morning:
 	assert(life.mate.state == "wander", `the mate did not arrive: {life.mate.state} (hour {life.clock.hour})`)
 	assert(life.mate.sex == "male", "the first spider is the game's female: its mate is male")
 	assert(d.mateLegs.drive ~= nil, "it has legs")
-	assert(string.find(life.notice, "A visitor: a male spider", 1, true), `the arrival's notice: "{life.notice}"`)
-	frames(2)
+	-- (ROBLOX-92: it arrived at the east end, 30 studs and more from the spider: out of earshot, so not announced; the notice is held until the spider is near)
+	assert(not string.find(life.notice, "A visitor", 1, true) and string.find(d.mateLegs.pending or "", "A visitor: a male spider", 1, true), `the arrival is held, not told: "{life.notice}" / "{tostring(d.mateLegs.pending)}"`)
+	d.place(life.mate.position + Vector3.new(-9, 0, 0))
+	frames(4)
+	assert(string.find(life.notice, "A visitor: a male spider", 1, true) and d.mateLegs.pending == nil, `the arrival's notice, told when it came within earshot: "{life.notice}"`)
+	d.place(OPEN)
+	frames(10)
 	local rig = workspace:FindFirstChild("MateSpider")
 	assert(rig ~= nil, "the mate is drawn")
 	local root = rig:FindFirstChild("Root") or rig:FindFirstChildWhichIsA("BasePart")
@@ -719,6 +724,234 @@ check("the scene and a wasp: the controls are the player's the moment it comes, 
 	frames(3)
 end)
 
+-- ---------------------------------------------------------------- the audit, part two (ROBLOX-92)
+local PeacockText = require("../src/Shared/UI/PeacockText")
+local LifeText = require("../src/Shared/UI/LifeText")
+local function statusText(): string return find("SpiderPrompts", "Status").Text end
+local function skipScene(d: any)
+	key("Jump", true); frames(2); key("Jump", false); frames(2)
+end
+
+check("the scene says how to leave it: from four seconds a status line and the touch Skip button, by device; the Captions setting does not hide it; a snap clears the two-shot's ease", function()
+	local d = ClientStubs.driver
+	local legs, cam = d.mateLegs, d.cam
+	local touch = gui:FindFirstChild("SpiderTouch")
+	assert(touch ~= nil and touch:FindFirstChild("Jump") ~= nil, "(the touch buttons are there)")
+	local mate = court(d, "male", false)
+	untilScene(d, 1.5)
+	frames(3)
+	assert(not string.find(statusText(), "part", 1, true), `nothing to say before four seconds: "{statusText()}"`)
+	assert(touch:FindFirstChild("Jump").Text == "Jump", "and the Jump button is the Jump button")
+	untilScene(d, 4.3)
+	frames(3)
+	assert(MateText.skipLine("keyboard") == "Space or Q: part" and string.find(statusText(), "Space or Q: part", 1, true), `from four seconds: "{statusText()}"`)
+	d.setDevice("gamepad")
+	frames(3)
+	assert(MateText.skipLine("gamepad") == "A or B: part" and string.find(statusText(), "A or B: part", 1, true), `a controller: "{statusText()}"`)
+	ControlText.setPadStyle("playstation")
+	assert(MateText.skipLine("gamepad") == "Cross or Circle: part", MateText.skipLine("gamepad"))
+	ControlText.setPadStyle("xbox")
+	d.setDevice("touch")
+	frames(3)
+	assert(MateText.skipLine("touch") == "Skip or Cancel: part" and string.find(statusText(), "Skip or Cancel: part", 1, true), `touch: "{statusText()}"`)
+	assert(touch:FindFirstChild("Jump").Text == MateText.TOUCH_SKIP and MateText.TOUCH_SKIP == "Skip", "and the Jump button says Skip")
+	assert(touch:FindFirstChild("Cancel").Text == "Cancel", "(Cancel is Cancel)")
+	player:SetAttribute("Captions", "off")
+	frames(3)
+	assert(string.find(statusText(), "Skip or Cancel: part", 1, true), "turning the captions off does not hide it: it is a status line, not a sound")
+	player:SetAttribute("Captions", nil)
+	d.setDevice("keyboard")
+	frames(3)
+	skipScene(d)
+	assert(not legs.couple.active and mate.state == "leaving", "(skipped)")
+	assert(not string.find(statusText(), "part", 1, true), `the line goes with the scene: "{statusText()}"`)
+	d.setDevice("touch")
+	frames(3)
+	assert(touch:FindFirstChild("Jump").Text == "Jump", "and so does the Skip label")
+	d.setDevice("keyboard")
+	-- the two-shot is easing out; a snap (a return to a rest, a respawn) ends the ease for good
+	frames(6)
+	assert(cam.shotT > 0 and cam.shotT < 1 and cam.lastShot ~= nil, `(easing out: {cam.shotT})`)
+	cam:snap()
+	assert(cam.shotT == 0 and cam.lastShot == nil and cam.inspectT == 0 and cam.inspectLast == nil, "a snap zeroes the shot's and the close look's eases")
+	frames(3)
+	assert(not cam:shotActive(), "nothing of the two-shot is left")
+	mate.elapsed = Rules.leaveSeconds
+	frames(3)
+end)
+
+check("Reduced Motion cuts the two-shot in and out (ROBLOX-92), where it eased over 0.8 s", function()
+	local d = ClientStubs.driver
+	local legs, cam = d.mateLegs, d.cam
+	player:SetAttribute("ReducedMotion", true)
+	frames(3)
+	local mate = court(d, "male", false)
+	frames(2)
+	assert(legs.couple.active and cam.shotT == 1 and cam:shotActive(), `in at once ({cam.shotT})`)
+	untilScene(d, 4.3)
+	skipScene(d)
+	assert(not legs.couple.active and cam.shot == nil, "(skipped)")
+	assert(cam.shotT == 0 and not cam:shotActive(), `and out at once ({cam.shotT})`)
+	player:SetAttribute("ReducedMotion", nil)
+	frames(3)
+	mate.elapsed = Rules.leaveSeconds
+	frames(3)
+end)
+
+check("a close look begun from the eye view gives way to the mating scene: the two-shot plays, the skip frees the controls, and the eye view stays off", function()
+	local d = ClientStubs.driver
+	local legs, cam = d.mateLegs, d.cam
+	d.place(OPEN)
+	frames(30)
+	d.life.clock.hour = 9.0
+	cam:setEyeView(true)
+	assert(cam.eyeView, "(the eye view is on)")
+	assert(d.spiderPick.begin() == nil and d.spiderPick.inspecting and cam.inspectWasEye == true, "(a close look from the eye view)")
+	local mate = court(d, "male", false)
+	assert(legs.couple.active, "the scene began")
+	assert(not d.spiderPick.inspecting and cam.inspect == nil and cam.inspectWasEye == false, "the close look ended first, and will not give the eye view back")
+	frames(60)
+	assert(not cam.eyeView and cam.shot ~= nil and cam.shotT == 1, `the two-shot plays, not the eye view (eye view {tostring(cam.eyeView)}, shot {cam.shotT})`)
+	local toMid = ((d.motor.pos + mate.position) * 0.5) - cam.camera.CFrame.Position
+	assert(toMid.Unit:Dot(cam.camera.CFrame.LookVector) > 0.9, "the camera is looking at the pair")
+	untilScene(d, 4.3)
+	skipScene(d)
+	assert(not legs.couple.active and not cam.eyeView, "skipped: the scene is over")
+	frames(60)
+	local p0 = d.motor.pos
+	key("Forward", true); frames(40); key("Forward", false)
+	assert((d.motor.pos - p0).Magnitude > 0.3, "the controls are free at once, not after 15 s")
+	wait(1.0)
+	assert(not cam.eyeView and not cam:shotActive(), "and the eye view is still off afterwards (it is the player's to turn on again)")
+	mate.elapsed = Rules.leaveSeconds
+	frames(3)
+end)
+
+check("a close look begun from the eye view gives way to the hatching, which cancels the eye view's return too", function()
+	local d = ClientStubs.driver
+	local life, legs, cam = d.life, d.mateLegs, d.cam
+	local savedMating, savedMate = life.mating, life.mate
+	d.place(CRACK)
+	frames(30)
+	life.clock.hour = 12.0
+	cam:setEyeView(true)
+	assert(d.spiderPick.begin() == nil and d.spiderPick.inspecting and cam.inspectWasEye == true, "(a close look from the eye view in the crack)")
+	life.mating = Mating.normalize({ stage = "hatched", hatch_day = life.clock.day, brood = 6, mates = 1, visits = 1 })
+	legs.begin(true)
+	assert(legs.phase == "scene", "the hatching plays")
+	assert(not d.spiderPick.inspecting and cam.inspect == nil and cam.inspectWasEye == false and not cam.eyeView, "the close look is over and gives no eye view back")
+	frames(30)
+	assert(not cam.eyeView, "and the eye view stays off")
+	legs.reset()
+	life.mating, life.mate = savedMating, savedMate
+	frames(3)
+end)
+
+check("the Spider settings row is refused during the mating scene and the hatching, in its own words, like the close look; it works again after (ROBLOX-92)", function()
+	local d = ClientStubs.driver
+	local life, legs = d.life, d.mateLegs
+	local mate = court(d, "male", false)
+	local before = d.appearance()
+	assert(not d.spiderPick.safe(), "(not safe to change in the scene)")
+	local said = d.spiderPick.fromSettings("maratus_volans_male")
+	assert(said == PeacockText.NOT_NOW and d.appearance() == before, `refused in the mating scene: "{tostring(said)}"`)
+	assert(find("SpiderPrompts", "Toast").Text == PeacockText.NOT_NOW, "and the toast says it")
+	untilScene(d, 4.3)
+	skipScene(d)
+	frames(30)
+	assert(not legs.couple.active and mate.state == "leaving", "(the scene is over)")
+	legs.phase = "scene" -- the hatching
+	assert(d.spiderPick.fromSettings("maratus_volans_male") == PeacockText.NOT_NOW and d.appearance() == before, "refused in the hatching")
+	legs.phase = ""
+	frames(3)
+	d.motor:cancelWalk()
+	assert(d.spiderPick.safe(), "(safe again)")
+	assert(d.spiderPick.fromSettings("maratus_volans_male") == PeacockText.changed("maratus_volans_male") and d.appearance() == "maratus_volans_male", "allowed after")
+	assert(d.spiderPick.fromSettings(before) == PeacockText.changed(before) and d.appearance() == before, "(back to the first spider)")
+	-- asleep and a wasp's visit are refused the same way
+	life.asleep = true
+	assert(d.spiderPick.fromSettings("maratus_volans_male") == PeacockText.NOT_NOW, "refused asleep")
+	life.asleep = false
+	mate.elapsed = Rules.leaveSeconds
+	frames(3)
+end)
+
+check("a visitor far off is not announced, and one that arrives out of earshot is told when it comes near; the courting line is the same rule (ROBLOX-92)", function()
+	local d = ClientStubs.driver
+	local life, legs = d.life, d.mateLegs
+	local Heard = require("../src/Shared/UI/Heard")
+	assert(Heard.within(10, false) and Heard.within(18, false) and not Heard.within(19, false) and Heard.within(24, true) and not Heard.within(25, true), "the rival's rule: 18 studs by ear, 24 in sight")
+	d.place(CRACK)
+	frames(10)
+	life.clock.hour = 12.0
+	life.mating = Mating.normalize({ stage = "none" })
+	local mate = Mate.new()
+	mate.sex, mate.scale, mate.state, mate.elapsed, mate.meter, mate.lost = "male", 1, "attend", 0, 0, 0
+	mate.position = d.motor.pos + Vector3.new(60, 0, 0)
+	mate.previous, mate.heading, mate.up = mate.position, -Vector3.xAxis, Vector3.yAxis
+	life.mate = mate
+	legs.drive = nil
+	life.notice, life.noticeSeconds, legs.pending = "", 0, nil
+	legs.event("arrived", { needsDance = false })
+	assert(life.notice == "" and legs.pending ~= nil, `a far arrival is not announced ({life.notice})`)
+	legs.event("noticed", {})
+	assert(life.notice == "", "nor its noticing the spider")
+	frames(3)
+	assert(not string.find(statusText(), "visitor", 1, true), `no courting line for a visitor too far to hear: "{statusText()}"`)
+	-- it comes near: the arrival is told, and the line shows
+	mate.position = d.motor.pos + Vector3.new(0, 0, 9)
+	mate.previous = mate.position
+	frames(3)
+	assert(string.find(life.notice, "male spider", 1, true) ~= nil and legs.pending == nil, `told when near: "{life.notice}"`)
+	assert(string.find(statusText(), "visitor", 1, true) or string.find(statusText(), "Courting", 1, true), `and the courting line: "{statusText()}"`)
+	-- leaving unheard says nothing; leaving heard does
+	life.notice, life.noticeSeconds = "", 0
+	mate.reason = "dusk"
+	legs.event("gone", {})
+	assert(life.notice == MateText.gone("dusk"), `a heard leaving is told: "{life.notice}"`)
+	life.notice, life.noticeSeconds = "", 0
+	mate.position = d.motor.pos + Vector3.new(60, 0, 0)
+	legs.event("gone", {})
+	assert(life.notice == "" and legs.pending == nil, "an unheard one is not")
+	legs.event("arrived", { needsDance = false })
+	legs.event("gone", {})
+	assert(legs.pending == nil, "and a visitor that has gone is no longer waiting to be told of")
+	-- the mate's snapshot of the spider is one table filled again each tick, not a clone of the rival's every tick (ROBLOX-92)
+	local snap = legs.state
+	frames(3)
+	assert(legs.state == snap and snap.position == d.motor.pos and snap.seed == 914 and snap.heading == d.motor.heading, "the same table, filled with this tick's spider")
+	life.mate = nil
+	legs.drive = nil
+	frames(3)
+end)
+
+check("a rest that is refused says so in the game's words, and does not set the mate's morning (ROBLOX-92)", function()
+	local d = ClientStubs.driver
+	local life = d.life
+	assert(LifeText.restRefusal("the spider is moving") == "Not now — keep still first", "moving")
+	assert(LifeText.restRefusal("the two spiders are together") == MateText.REST_TOGETHER and MateText.REST_TOGETHER == "Not now — the two of you are together", "together")
+	assert(LifeText.restRefusal("the brood is hatching") == "Not while the brood is hatching", "hatching")
+	assert(LifeText.restRefusal("the rival in the jaws is still struggling") == "Not while a fight is on", "a fight")
+	assert(LifeText.restRefusal("something the sim never says") == LifeText.REST_FALLBACK, "an unknown reason has a plain fallback")
+	d.place(OPEN)
+	frames(30)
+	life.growth.stage = 3
+	d.needs.energy = 0.9
+	life.clock.hour = 12.0
+	life.mating = Mating.normalize({ stage = "none" })
+	d.motor.vel = Vector3.new(2, 0, 0) -- (a walking spider's speed is not in `vel`; the checkpoint tests set it the same way)
+	local refused = life.save()
+	d.motor.vel = Vector3.zero
+	assert(not refused.ok and refused.message == "Not now — keep still first", `refused while moving: "{refused.message}"`)
+	assert(life.mating.ready_day == 0, `a refused rest sets no morning for a visitor ({life.mating.ready_day})`)
+	assert(not string.find(string.lower(refused.message), "checkpoint") and not string.find(refused.message, "spider is moving", 1, true), "no engineer's words")
+	wait(1.0)
+	local kept = life.save()
+	assert(kept.ok and life.mating.ready_day > 0, `a rest that is kept does ({kept.message}, ready {life.mating.ready_day})`)
+	assert(not string.find(string.lower(kept.message), "checkpoint"), `and says "rest", not "checkpoint": "{kept.message}"`)
+	life.mating = Mating.normalize({ stage = "none" })
+end)
+
 check("the mirror: a male player's female mate turns to face him, stays and turns away; the captions, the cues, the pause and the entry follow", function()
 	local d = ClientStubs.driver
 	local life, legs, cam, snd = d.life, d.mateLegs, d.cam, d.soundscape
@@ -794,7 +1027,7 @@ check("a record returned to during the scene's world, a reset and a new life lea
 	assert(legs.couple.active, "mid-scene again")
 	local store = d.currentStore()
 	local loadBest = store.loadBest
-	store.loadBest = function() return { ok = false, message = "no checkpoint to return to" } end
+	store.loadBest = function() return { ok = false, message = "no last rest to return to" } end
 	d.returnToCheckpoint()
 	store.loadBest = loadBest
 	frames(3)

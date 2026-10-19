@@ -139,7 +139,7 @@ function CheckpointStore.save(self: any, record: any): Result
 	local placed, perr = try(function() self.store:SetAsync(main, entry) end)
 	if not placed then return result(self, false, "the checkpoint could not be put in place", { tostring(perr) }) end
 	try(function() self.store:RemoveAsync(tmp) end)
-	return result(self, true, "Checkpoint kept.", {})
+	return result(self, true, "Last rest kept.", {}) -- (ROBLOX-92: the player's word for a checkpoint is the last rest)
 end
 
 -- The newest good checkpoint: { ok, record, source = "current" | "backup", message, errors }. Never writes.
@@ -153,14 +153,14 @@ function CheckpointStore.loadBest(self: any): Result
 		end
 		local record, problems, newer = self:read(entry)
 		if record then
-			return result(self, true, if which[2] == "current" then "the checkpoint" else "the backup checkpoint (the newest could not be used)", errors, { record = record, source = which[2] })
+			return result(self, true, if which[2] == "current" then "the last rest" else "the backup of the last rest (the newest could not be used)", errors, { record = record, source = which[2] })
 		end
 		for _, p in problems do table.insert(errors, `{which[2]}: {p}`) end
 		if newer then
-			return result(self, false, "the checkpoint was made by a newer version of the game; it was left as it is", errors)
+			return result(self, false, "the last rest was made by a newer version of the game; it was left as it is", errors)
 		end
 	end
-	return result(self, false, "no checkpoint to return to", errors)
+	return result(self, false, "no last rest to return to", errors)
 end
 
 return CheckpointStore

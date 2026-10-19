@@ -63,6 +63,8 @@ function Soundscape.setVolumes(self: any, master: number, ambience: number, crea
 end
 local function playing(s: Sound, wanted: boolean)
 	if wanted then
+		-- (ROBLOX-92: a recording that has not loaded yet cannot play; asking it every frame only restarts the request. The stubs of the CLI tests have no IsLoaded, and are loaded.)
+		if (s.IsLoaded :: any) == false then return end
 		if not s.Playing then s:Resume(); if not s.Playing then s:Play() end end
 	elseif s.Playing then s:Pause() end
 end
@@ -126,7 +128,8 @@ function Soundscape.updateWasp(self: any, director: any, paused: boolean, speed:
 	local active = director.phase ~= "away" and director.wasp.mode ~= "walking"
 	local hum: Sound = self.waspHum
 	self.waspEmitter.Position = director.wasp.position
-	hum.Parent = if arriving then self.root else self.waspEmitter
+	local home: Instance = if arriving then self.root else self.waspEmitter
+	if hum.Parent ~= home then hum.Parent = home end -- (only on a change: re-parenting a playing sound each frame can restart it, ROBLOX-92)
 	hum.Volume = (if arriving then MIX.humArriving else MIX.hum) * self.master * self.creatures
 	hum.PlaybackSpeed = speed
 	if not active then hum:Stop()

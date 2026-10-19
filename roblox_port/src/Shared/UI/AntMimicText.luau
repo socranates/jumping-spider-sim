@@ -29,7 +29,7 @@ function AntMimicText.touchDisplay(showing: boolean): string return if showing t
 
 -- The controls card's line (legs I rise by themselves when the spider keeps still; the key makes them higher and faster).
 function AntMimicText.helpLine(device: ControlText.Device): string
-	return `Standing still: {key(device)} wave antennae higher. Any move, jump or Cancel stops it`
+	return `{key(device)}{if device == "touch" then " button:" else ""} wave antennae higher (any move, jump or Cancel stops it)`
 end
 
 return AntMimicText

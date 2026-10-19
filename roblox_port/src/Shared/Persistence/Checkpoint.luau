@@ -330,7 +330,7 @@ function Checkpoint.restore(record: any, world: World): (boolean, { string })
 	life.events = {}
 	life.restoreGrace = LifeLoop.RESTORE_GRACE_TICKS
 	life:applyLight()
-	life:showNotice("Returned to the checkpoint: the sill as it was when you rested in the crack. This is checkpoint recovery, not an exact resume.")
+	life:showNotice("Returned to your last rest: the sill as it was when you rested in the crack. This is a return to the rest, not an exact resume.")
 	return true, {}
 end
 

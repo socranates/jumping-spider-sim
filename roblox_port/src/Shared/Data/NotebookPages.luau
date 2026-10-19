@@ -3,7 +3,7 @@
 -- data/notebook/pages.json. Do not edit by hand. Ids, triggers, titles, texts and sources are Godot's, word for word
 -- (docs/NOTEBOOK_SOURCES.md says how far each source was checked: citations were confirmed, no paper was read in full).
 -- `game` is the page's "In this game" line: Godot's own where it is true of the Roblox game, otherwise the Roblox one,
--- with Godot's kept as `godotGame` (tests/notebook.luau lists exactly which). {reel}, {letGo}, {drop} and {focus} are filled
+-- with Godot's kept as `godotGame` (tests/notebook.luau lists exactly which). {reel}, {letGo}, {drop}, {focus} and {display} are filled
 -- in with the name of that control on the device in use. Pages are listed in Godot's order.
 -- Numbers: the thresholds Godot's field_notebook.gd and notebook_watch.gd use for the moments that open a page.
 local NotebookPages = {}
@@ -358,7 +358,7 @@ NotebookPages.pages = {
 		trigger = "tarantula",
 		title = "Velvet cousins (Theraphosidae)",
 		text = "Tarantulas (family Theraphosidae) are large, heavy, long-lived spiders. They are not jumping spiders: their eyes sit close together on a small mound and are poor, and they feel their way with the hairs on their legs. Their fangs strike downward, side by side. Most New World tarantulas have urticating hairs on the abdomen and cast them at an attacker. A threatened tarantula rears up and lifts its front legs, and all of them spin silk from spinnerets at the rear of the abdomen.",
-		game = "The Mexican redknee and the Greenbottle blue are costumes on the first spider's body, nothing more. A real tarantula's body is five or more centimetres long; yours is the first spider's size. You still see, jump, spin your safety line and are hunted exactly as the first spider does, which no real tarantula could do. The rear-up and the turn with the spinnerets sweeping (X) are drawn poses with invented angles and timing, and no silk mat is laid. The colours are stylised, the redknee's rust patch is only a colour (no hairs are cast), and the greenbottle's bars soften at the last growth stage as a game choice.",
+		game = "The Mexican redknee and the Greenbottle blue are costumes on the first spider's body, nothing more. A real tarantula's body is five or more centimetres long; yours is the first spider's size. You still see, jump, spin your safety line and are hunted exactly as the first spider does, which no real tarantula could do. The rear-up and the turn with the spinnerets sweeping ({display}) are drawn poses with invented angles and timing, and no silk mat is laid. The colours are stylised, the redknee's rust patch is only a colour (no hairs are cast), and the greenbottle's bars soften at the last growth stage as a game choice.",
 		sources = {
 			"Foelix, R. F. (2011). Biology of Spiders, 3rd edition. Oxford University Press.",
 			"Bertani, R. & Guadanucci, J. P. L. (2013). Morphology, evolution and usage of urticating setae by tarantulas (Araneae: Theraphosidae). Zoologia 30(4): 403-418. https://doi.org/10.1590/S1984-46702013000400006",

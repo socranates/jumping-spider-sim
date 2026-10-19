@@ -27,9 +27,10 @@ end
 -- The touch button's words.
 function TarantulaText.touchDisplay(showing: boolean): string return if showing then "Stop" else "Rear up" end
 
--- The controls card's line.
+-- The controls card's line (ROBLOX-92: "rear up and turn", as the notebook page says; the pose is a drawn loop and no silk mat is laid). On touch the key is the button's own
+-- label, so it says "button" rather than repeating the label ("Rear up rear up").
 function TarantulaText.helpLine(device: ControlText.Device): string
-	return `Standing still: {key(device)} rear up and lay a silk mat. Any move, jump or Cancel stops it`
+	return `{key(device)}{if device == "touch" then " button:" else ""} rear up and turn (any move, jump or Cancel stops it)`
 end
 
 return TarantulaText

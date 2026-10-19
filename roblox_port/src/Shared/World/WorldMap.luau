@@ -25,7 +25,7 @@ local Layout = require(script.Parent.Parent.Habitat.WindowsillLayout)
 
 local WorldMap = {}
 
-export type Retreat = { id: string, min: Vector3, max: Vector3 }
+export type Retreat = { id: string, min: Vector3, max: Vector3, door: Vector3? } -- `door` (ROBLOX-96): the point outside its way in that the words near home are measured from
 export type Spawn = { pos: Vector3, heading: Vector3 }
 export type Neighbor = { id: string, a: Vector3, b: Vector3 }
 export type Region = {
@@ -98,7 +98,7 @@ local function author(worldSeed: number): { Region }
 			bounds = { Layout.PLAY_BOUNDS_MIN, Layout.PLAY_BOUNDS_MAX },
 			seed = WorldMap.seed(worldSeed, "sill"),
 			neighbors = { seam("outer_sill", SEAM_SASH) },
-			retreats = { { id = "sill_crevice", min = Layout.RETREAT_MIN, max = Layout.RETREAT_MAX } },
+			retreats = { { id = "sill_crevice", min = Layout.RETREAT_MIN, max = Layout.RETREAT_MAX, door = v(-24, 1, 6) } }, -- (the door: where the client has always measured "near home" from)
 			spawn = { pos = Layout.SPAWN, heading = Layout.SPAWN_HEADING },
 			clockScale = 1.0,
 		}),
@@ -126,7 +126,7 @@ local function author(worldSeed: number): { Region }
 			seed = WorldMap.seed(worldSeed, "bed_a"),
 			neighbors = { seam("house_wall", SEAM_FOOT) },
 			-- the gap under the stone, raised on two rests (World/Garden builds the stone round it): the first garden home
-			retreats = { { id = "bed_a_stone", min = v(8.6, -90, -52.6), max = v(13.4, -88.6, -47.4) } },
+			retreats = { { id = "bed_a_stone", min = v(8.6, -90, -52.6), max = v(13.4, -88.6, -47.4), door = v(11, -89.5, -46.5) } }, -- (the door: in front of the gap's mouth)
 			spawn = { pos = v(11, -90, -43.5), heading = v(0, 0, -1) }, -- in front of the stone, facing its way in
 			clockScale = 0.33,
 		}),

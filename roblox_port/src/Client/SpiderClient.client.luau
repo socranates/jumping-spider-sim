@@ -96,6 +96,9 @@ local M = {
 	-- The world (ROBLOX-94, Client/WorldClient): where the boxes are, which region the spider is in and how fast its day runs, the streaming focus. One instance, here for the same reason: the
 	-- client is at Luau's limit of 200 locals.
 	World = require(script.Parent.WorldClient).new(Workspace, Players.LocalPlayer),
+	-- ROBLOX-96 (W3): the world's prey per region (Prey/PreyWorld, kept as M.World.prey) and the drawn woodlice (Client/BugBodies, M.World.bugs); here for the same reason.
+	PreyWorld = require(Shared.Prey.PreyWorld),
+	BugBodies = require(script.Parent.BugBodies),
 }
 local focusState = FocusState.new()
 local DT = SpiderMotor.DT
@@ -202,6 +205,11 @@ needs:useGameRules()
 motor:useGameRules() -- the let-down on a line at half Godot's reel speed (ROBLOX-99, SilkController.game); reeling in keeps its speed
 prey.feeding.needs = needs
 prey.feeding:useGameRules() -- an easier tap on a struggling fly (ROBLOX-72, Data/Catch.game), scaled by the prey's size (ROBLOX-77); Godot's numbers stay Feeding's defaults
+-- ROBLOX-96: the sill's director is the home of the world's prey; the bed's director and its woodlice are made when the bed has arrived whole and the spider is there or
+-- beside it, in M.World.garden (what a rest records), sharing the sill director's jaws and casts.
+M.World.garden = {}
+M.World.prey = M.PreyWorld.new(prey, M.World, M.World.garden, M.World.root, { probe = prey.probe, cast = prey.graph.cast, sweep = prey.graph.sweep, overlap = prey.graph.overlap })
+M.World.bugs = M.BugBodies.new(Workspace)
 rivalLegs.grip = rivalLegs.Grip.new(needs) -- the grip on a caught rival (ROBLOX-77): its own controller, so the fly's is never disturbed
 local life = LifeLoop.new(needs, nil)
 life.growth:useGameRules(needs.gentle) -- five housefly-equivalents to a moult in the standard rules, not Godot's three; three in the gentle modes (ROBLOX-88/91, Growth.game)
@@ -239,7 +247,7 @@ local function modal(): boolean
 end
 -- S01-C retreat checkpoints (ROBLOX-25): resting in the crack, and each morning, keeps one; Backspace / View returns to it. The
 -- store is DataStore-shaped but in memory only: a checkpoint lasts the session. No live DataStore is written.
-local checkpointWorld: Checkpoint.World = { motor = motor, prey = prey, sensor = sensor, memory = memory, needs = needs, life = life, wasp = wasp, breakaway = breakaway }
+local checkpointWorld: Checkpoint.World = { motor = motor, prey = prey, sensor = sensor, memory = memory, needs = needs, life = life, wasp = wasp, breakaway = breakaway, garden = M.World.garden }
 local function newStore(): any
 	return M.CheckpointStore.new(M.CheckpointStore.MemoryDataStore.new(), function(r: any): { string } return (Checkpoint.check(r, checkpointWorld)) end)
 end
@@ -272,7 +280,7 @@ life.save = function(): LifeLoop.CheckpointResult
 		local sent, problem = pcall(function() saveClient:sendRest(slot, record) end) -- (ROBLOX-92: a failing save never takes the rest with it)
 		if not sent then saveState.fail(problem) end
 	end
-	return { ok = r.ok, message = r.message .. hungry }
+	return { ok = r.ok, message = (if r.ok then M.LifeText.restKept(record.world_map.retreat, r.message) else r.message) .. hungry } -- (ROBLOX-96: a rest under the stone says so)
 end
 local feedPending, cancelPending = false, false -- this frame's presses, for the next fixed tick (Godot's just_pressed)
 local lifeSpider: LifeLoop.Spider = { inRetreat = false, attached = true, still = true, holding = false, feeding = false }
@@ -1405,21 +1413,21 @@ local function updateHud(frameDt: number)
 	view.day = M.LifeText.day(clock.day, clock:partOfDay()) .. " | " .. life.growth:stageName() .. (if session.mode=="free" then " | FREE PLAY" elseif session.rules=="gentle" then " | EASY" else "")
 	view.day ..= mateLegs.Text.dayTag(mateLegs.Mating.generation(life))
 	view.food, view.foodGentle, view.largeText = needs.energy, needs.gentle, setting("LargeText") == true
-	view.growth = M.LifeText.growth(life.growth, Growth.READY_FOOD, Species.fly_like_prototype.body.nutrition)
+	view.growth = M.LifeText.growth(life.growth, Growth.READY_FOOD, Species.fly_like_prototype.body.nutrition, if prey.feeding.held then prey.feeding.held.profile.body.prey_kind else nil)
 	view.dayLine = M.LifeText.line(clock:partOfDay(), needs.energy, needs:isStarving(), needs.gentle, LifeLoop.HUNGRY_AT, life:tooHungryToSleep())
  if life.growth.ready then view.dayLine=nil
  elseif life.growth:isSoft() then view.dayLine="Soft new skin: slower steps and shorter jumps until it hardens." end
  view.dayLine = view.growth .. (if view.dayLine then "\n" .. view.dayLine else "")
  view.notice = if life.noticeSeconds > 0 and life.notice ~= "" then life.notice else nil
 	local canRest = life:canRest(lifeSpider)
-	local restPrompt = M.LifeText.prompt(life.asleep, life.resting, canRest, clock:isSleepTime() and not life:tooHungryToSleep(), device, PeacockText.change(device, appearance) .. "    " .. spiderPick.Text.holdHint(device))
+	local restPrompt = M.LifeText.prompt(life.asleep, life.resting, canRest, clock:isSleepTime() and not life:tooHungryToSleep(), device, PeacockText.change(device, appearance) .. "    " .. spiderPick.Text.holdHint(device), M.World:homeRetreat(motor.pos))
  if life.growth:isMoulting() then
   restPrompt={title="Moulting in the silk-lined crack",hint="The spider pulls free of its old skin. Wait here while the hours pass."}
  elseif life.growth.ready and canRest and not life.resting then
   restPrompt={title="Ready to moult",hint=ControlText.name(device,"feed")..": rest and moult in the crack"}
  end
- if not restPrompt and (motor.pos-Vector3.new(-24,1,6)).Magnitude<7 and not prey.feeding.held then
-  restPrompt={title="Home: the silk-lined crack",hint=if lifeSpider.inRetreat then "Keep still on a surface, then "..ControlText.name(device,"feed")..": rest" else "Walk through the silk-framed opening under the wooden roof, then stop to rest."}
+ if not restPrompt and M.World:nearRetreat(motor.pos,M.World.lastRetreat,7) and not prey.feeding.held then
+  restPrompt=M.LifeText.homeLine(M.World.lastRetreat,lifeSpider.inRetreat,device) -- (ROBLOX-96: the crack's words as they were, or the stone's)
  end
  local displayKind = SpiderChoice.displayKind(appearance)
 	local displayOn = if displayKind == "antennae" then ant.state:displaying() elseif displayKind == "threat" then ant.threat:displaying() else dance.active
@@ -1489,7 +1497,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 		motor:setAimRay(origin, dir)
 		while accumulator >= DT do
 			accumulator -= DT
-			local percepts = prey:percepts()
+			local percepts = M.World.prey:percepts() -- (ROBLOX-96: the active regions' flies, and their woodlice as movement)
             life.rival=life.rival or RivalSpider.new()
             local rivalPercept=RivalSpider.percept(life.rival)
             if rivalPercept then table.insert(percepts,rivalPercept) end
@@ -1504,7 +1512,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			local waspPercept = wasp:percept() -- movement to the spider's senses, never prey
 			if waspPercept then table.insert(percepts, waspPercept) end
 			sensor:step(DT,motor:observer(),percepts,sightCast)
-			prey:before(DT,motor.pos,motor:observer(),sensor,sightCast,camera)
+			M.World.prey:before(DT,motor.pos,motor:observer(),sensor,sightCast,camera)
 			if life.growth:isMoulting() then jump:drop(motor);motor:cancelWalk() else jump:step(motor) end
 			if breakaway:step(DT,if jump.last and jump.last.tick==jump.tick then jump.last else nil,motor.pos,setting("ReducedMotion")==true) then
     motor.planKey="";hud:toast("The dry leaf tip gave way. Your dragline catches the miss.",false)
@@ -1554,7 +1562,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			if life.growth.gameRules ~= true then life.growth:useGameRules(needs.gentle) end -- (a family that carries on has a new growth)
 			if prey.feeding.game ~= true then prey.feeding:useGameRules() end -- (a record restored from before the flag has none: the game's struggle again)
 			local takenBefore = prey.feeding.taken
-			prey:after(DT,motor,sensor,sightCast)
+			M.World.prey:after(DT,motor,sensor,sightCast)
 			-- Five houseflies or ten small prey (ROBLOX-88; Godot's three and six are Growth's defaults); credit food, not just spare energy capacity.
 			life.mealFood = (life.mealFood or 0) + Growth.rivalCredit(prey.feeding.taken-takenBefore)
             local rivalState={
@@ -1644,8 +1652,8 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
              end
             end
             watch:step({
-             started=session.started,captures=prey.captures,feeding=prey.feeding.feeding,taken=prey.feeding.taken,
-             energy=needs.energy,gentle=needs.gentle,spider=motor.pos,flies=prey.flies,
+             started=session.started,captures=M.World.prey:captures(),feeding=prey.feeding.feeding,taken=prey.feeding.taken,
+             energy=needs.energy,gentle=needs.gentle,spider=motor.pos,flies=M.World.prey:flies(),region=M.World.region.kind,
             })
             if modal() then accumulator=0;break end
 			if motor.mode ~= "attached" then focusState:clear() end
@@ -1746,12 +1754,13 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
     mateLegs.stage:drawSac(mateLegs.Mating.hasSac(life.mating))
     if mateLegs.phase=="scene" and not paused and not mateLegs.stage:step(simFrame,setting("ReducedMotion")==true) then mateLegs.showCard(false) end
 	updateHud(frameDt)
-	flyBodies:draw(prey.flies,prey.now)
+	flyBodies:draw(M.World.prey:flies(),M.World.prey.clock)
+	M.World.bugs:draw(M.World.prey:woodlice())
 	local soundPaused = GuiService.MenuIsOpen or modal()
 	local soundSpeed = if slow then SLOW_SPEED else 1
 	local soundMuted = setting("SoundMuted") == true
 	soundscape:setVolumes(setting("MasterVolume"), setting("AmbienceVolume"), setting("CreatureVolume"), setting("MusicVolume"))
-	soundscape:update(frameDt, prey, life.daylight, soundPaused, soundSpeed, soundMuted)
+	soundscape:update(frameDt, M.World.prey.view, life.daylight, soundPaused, soundSpeed, soundMuted)
 	soundscape:updateWasp(wasp, soundPaused, soundSpeed, soundMuted)
 	waspBody:draw(wasp.wasp, prey.now)
 	local silk = motor.silk

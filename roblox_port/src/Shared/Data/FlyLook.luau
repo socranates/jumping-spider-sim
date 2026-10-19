@@ -87,4 +87,52 @@ FlyLook.wing = {
 -- A soft dark oval on the surface under a standing fly stands in for its shadow (the parts cast none): size, how far above the surface.
 FlyLook.shadow = { size = { 0.34, 0.004, 0.70 }, lift = 0.003, transparency = 0.78 }
 
+-- ROBLOX-96: the bed's prey, drawn from simpler sheets (Client/FlyBodies.buildSmall) in the same body frame (feet at y = -hover, the whole scaled by the profile's
+-- visual_scale: the gnat at 0.45 is about 3 mm, the aphid at 0.4 under 3 mm). `body`: ellipsoids; `rods`: legs, antennae and the like, a rod from `from` to `to`
+-- on the right side, mirrored when `mirror`, with `fly` endpoints for the flight pose where they differ; `wing`: one pair of plain glass wings (folded flat at rest,
+-- a fan in flight), none for the aphid, which never flies; `shadow` as the fly's.
+FlyLook.small = {
+	-- a fungus gnat (Sciaridae, the small dark flies of damp soil): a thin grey body, long legs, long antennae, one pair of wings over the back
+	fungus_gnat = {
+		colors = { thorax = "3b3a38", abdomen = "4a4744", head = "2f2d2b", eye = "1a1816", leg = "2d2a27", antenna = "2a2725", wing = "cfd6dc", shadow = "2a241c" },
+		body = {
+			{ name = "Thorax", color = "thorax", at = { 0, 0.02, -0.06 }, size = { 0.16, 0.17, 0.22 } },
+			{ name = "Abdomen", color = "abdomen", at = { 0, -0.01, 0.2 }, size = { 0.12, 0.12, 0.42 } },
+			{ name = "Head", color = "head", at = { 0, 0, -0.24 }, size = { 0.11, 0.11, 0.1 } },
+			{ name = "EyeL", color = "eye", reflectance = 0.05, at = { -0.05, 0.01, -0.25 }, size = { 0.05, 0.06, 0.05 } },
+			{ name = "EyeR", color = "eye", reflectance = 0.05, at = { 0.05, 0.01, -0.25 }, size = { 0.05, 0.06, 0.05 } },
+		},
+		rods = {
+			{ name = "FrontFemur", color = "leg", d = 0.012, from = { 0.05, -0.06, -0.15 }, to = { 0.16, 0.06, -0.26 }, fly = { { 0.05, -0.06, -0.15 }, { 0.09, -0.1, -0.24 } }, mirror = true },
+			{ name = "FrontTibia", color = "leg", d = 0.009, from = { 0.16, 0.06, -0.26 }, to = { 0.26, -0.16, -0.36 }, fly = { { 0.09, -0.1, -0.24 }, { 0.08, -0.2, -0.3 } }, mirror = true },
+			{ name = "MiddleFemur", color = "leg", d = 0.012, from = { 0.06, -0.06, -0.04 }, to = { 0.18, 0.07, -0.02 }, fly = { { 0.06, -0.06, -0.04 }, { 0.1, -0.11, 0.0 } }, mirror = true },
+			{ name = "MiddleTibia", color = "leg", d = 0.009, from = { 0.18, 0.07, -0.02 }, to = { 0.3, -0.16, 0.0 }, fly = { { 0.1, -0.11, 0.0 }, { 0.09, -0.21, 0.06 } }, mirror = true },
+			{ name = "HindFemur", color = "leg", d = 0.012, from = { 0.05, -0.06, 0.05 }, to = { 0.17, 0.08, 0.18 }, fly = { { 0.05, -0.06, 0.05 }, { 0.09, -0.11, 0.16 } }, mirror = true },
+			{ name = "HindTibia", color = "leg", d = 0.009, from = { 0.17, 0.08, 0.18 }, to = { 0.27, -0.16, 0.34 }, fly = { { 0.09, -0.11, 0.16 }, { 0.07, -0.21, 0.32 } }, mirror = true },
+			{ name = "Antenna", color = "antenna", d = 0.008, from = { 0.03, 0.04, -0.28 }, to = { 0.07, 0.16, -0.42 }, mirror = true } :: any,
+		},
+		wing = { root = { 0.05, 0.1, -0.06 }, length = 0.5, width = 0.16, thick = 0.005, yaw = 6, pitch = 2, roll = 0, transparency = 0.5, reflectance = 0.08,
+			fan = { reach = 0.34, span = 0.3, roll = 8, yaw = 20, back = 0.02, rise = 0.01, transparency = 0.8 } },
+		shadow = { size = { 0.2, 0.004, 0.55 }, lift = 0.003, transparency = 0.8 },
+	},
+	-- an aphid: a pear-shaped green body, a small head, two cornicles at the rear, short legs, long antennae, no wings
+	aphid = {
+		colors = { abdomen = "7fb04c", head = "6f9e42", eye = "3a2a1a", leg = "5f8a3a", antenna = "567f33", cornicle = "4f7a2e", shadow = "2a241c" },
+		body = {
+			{ name = "Abdomen", color = "abdomen", at = { 0, 0.02, 0.1 }, size = { 0.34, 0.3, 0.46 } },
+			{ name = "Head", color = "head", at = { 0, 0, -0.2 }, size = { 0.14, 0.14, 0.14 } },
+			{ name = "EyeL", color = "eye", reflectance = 0.05, at = { -0.065, 0.02, -0.21 }, size = { 0.04, 0.04, 0.04 } },
+			{ name = "EyeR", color = "eye", reflectance = 0.05, at = { 0.065, 0.02, -0.21 }, size = { 0.04, 0.04, 0.04 } },
+		},
+		rods = {
+			{ name = "FrontLeg", color = "leg", d = 0.014, from = { 0.1, -0.04, -0.12 }, to = { 0.2, -0.16, -0.24 }, mirror = true },
+			{ name = "MiddleLeg", color = "leg", d = 0.014, from = { 0.12, -0.04, 0.0 }, to = { 0.23, -0.16, 0.02 }, mirror = true },
+			{ name = "HindLeg", color = "leg", d = 0.014, from = { 0.11, -0.04, 0.12 }, to = { 0.21, -0.16, 0.26 }, mirror = true },
+			{ name = "Antenna", color = "antenna", d = 0.008, from = { 0.04, 0.06, -0.24 }, to = { 0.1, 0.1, -0.5 }, mirror = true },
+			{ name = "Cornicle", color = "cornicle", d = 0.02, from = { 0.07, 0.1, 0.26 }, to = { 0.1, 0.17, 0.36 }, mirror = true },
+		},
+		shadow = { size = { 0.3, 0.004, 0.46 }, lift = 0.003, transparency = 0.8 },
+	},
+} :: { [string]: any }
+
 return FlyLook

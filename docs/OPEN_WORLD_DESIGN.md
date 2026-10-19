@@ -193,7 +193,8 @@ exploration you gotta earn"; "you get time to enjoy the scenery because you are 
 2. **W2 — beyond the glass** (ROBLOX-95): the raised sash, the outer sill, the brick descent, bed_a, per-region nav. *(Done 2026-10-19: ROBLOX-95 in
    `docs/DECISIONS.md`, Chet's checklist appended to `docs/HANDOFF-roblox-world.md`; CLI only, not run in Studio.)*
 3. **W3 — garden life** (ROBLOX-96): prey in the bed (gnats and aphids join the flies), woodlice as the first ambient
-   bug, the stone retreat, the descent set piece, the page, saves across regions.
+   bug, the stone retreat, the descent set piece, the page, saves across regions. *(Done 2026-10-19: ROBLOX-96 in
+   `docs/DECISIONS.md`, Chet's checklist appended to `docs/HANDOFF-roblox-world.md`; CLI only, not run in Studio.)*
 4. **W4 — nature's rules** (ROBLOX-97): movement cost, death loses the day in Normal, lingering threats, mating that
    can fail, the garden's slow clock.
 5. **W5 — no hand holding** (ROBLOX-98): the HUD and notice audit for Normal — hints only on day one, captions

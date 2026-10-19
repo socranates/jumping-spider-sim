@@ -210,6 +210,27 @@ case("the rest check refuses what is not a whole, sensible rest, and never raise
 	refused("a bed rest in the sill's crack", "main", mutated(function(c) inBed(c); c.world_map.retreat = "sill_crevice"; c.player.retreat_id = "sill_crevice" end))
 	refused("a rest in the bed's stone that says the sill", "main", mutated(function(c) inBed(c); c.world_map.region = "sill" end))
 	check(#SaveRest.check("main", mutated(function(c) c.world_map.revision = "world-0"; c.world_map.seed = 7 end)) == 0, "a rest from another revision or seed of the world is accepted: it is put back at the spawn when used")
+	-- ROBLOX-96: the garden root. An empty one (a world whose bed has not been made yet) is accepted; one naming a region without prey, or a region that is not a record, is refused.
+	local function withGarden(c: any, entries: { any })
+		table.insert(c.world.objects, { e = entries })
+		c.world.roots.garden = { ["$o"] = #c.world.objects }
+	end
+	check(#SaveRest.check("main", mutated(function(c) withGarden(c, {}) end)) == 0, "a rest with an empty garden root is accepted")
+	refused("a garden naming a region the map does not have", "main", mutated(function(c)
+		table.insert(c.world.objects, { e = {} })
+		withGarden(c, { { "moon", { ["$o"] = #c.world.objects } } })
+	end))
+	refused("a garden naming the sill, which has no generated prey", "main", mutated(function(c)
+		table.insert(c.world.objects, { e = {} })
+		withGarden(c, { { "sill", { ["$o"] = #c.world.objects } } })
+	end))
+	refused("a garden whose region is not a record", "main", mutated(function(c) withGarden(c, { { "bed_a", 7 } }) end))
+	refused("a garden whose bed's prey is not a prey director", "main", mutated(function(c)
+		table.insert(c.world.objects, { e = {} })
+		local plain = #c.world.objects
+		table.insert(c.world.objects, { e = { { "prey", { ["$o"] = plain } } } })
+		withGarden(c, { { "bed_a", { ["$o"] = #c.world.objects } } })
+	end))
 	refused("a non-unit normal", "main", mutated(function(c) c.player.normal = { 0, 5, 0 } end))
 	refused("NaN in the pose", "main", mutated(function(c) c.player.position = { 0 / 0, 1, 1 } end))
 	refused("an infinity", "main", mutated(function(c) c.player.gaze_pitch = math.huge end))

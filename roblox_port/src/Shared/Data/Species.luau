@@ -178,4 +178,59 @@ fruit.body.radius_wu = 0.18
 fruit.body.capture_radius_wu = 0.42
 fruit.body.prey_kind = "fruit_fly"
 data.fruit_fly_prototype = fruit
+
+-- ROBLOX-96 (W3, garden life): two prey of the bed under the window, derived the same way (game values; no claim that a fungus gnat or an aphid has the house
+-- fly's measured behaviour, only its model with smaller numbers). Both keep the house fly's hover (the perch graph's number) and are drawn smaller.
+-- The fungus gnat: a third of a housefly meal, a weak flier of short flights (half the cruise and flee speeds, flights of at most 10 studs, hops from 1.2), a
+-- shorter sight and a shorter escape, slow short walks; it comes into the bed from the soil (its vents) and rests on the soil and under leaves.
+local gnat = copy(data.fly_like_prototype)
+gnat.body.nutrition = 0.35 / 3 -- a third of a housefly meal
+gnat.body.visual_scale = 0.45
+gnat.body.radius_wu = 0.12
+gnat.body.capture_radius_wu = 0.40
+gnat.body.prey_kind = "fungus_gnat"
+gnat.senses.sight_range_wu = 9.0
+gnat.senses.startle_range_wu = 5.0
+gnat.flight.takeoff_accel_wu_s2 = 40.0
+gnat.flight.flee_speed_wu_s = 7.0
+gnat.flight.cruise_speed_wu_s = 3.5
+gnat.flight.landing_speed_wu_s = 1.2
+gnat.flight.clearance_radius_wu = 0.10
+gnat.flight.lift_wu = 0.5
+gnat.flight.approach_wu = 0.5
+gnat.flight.min_hop_wu = 1.2
+gnat.flight.max_flight_wu = 10.0
+gnat.flight.safe_distance_wu = 6.0
+gnat.flight.perch_avoid_wu = 2.5
+gnat.flight.open_escape_wu = 3.0
+gnat.behavior.reposition_max_wu = 10.0 -- (its whole flight: the bed's perches are farther apart than the sill's)
+gnat.behavior.restless_per_s = 0.06 -- (restless twice as soon as the house fly: a gnat does not sit long)
+gnat.behavior.hysteresis = 0.1 -- (and changes its mind for less: with move_restless 1.0, a restless gnat on open soil flits to the next perch, one under a leaf stays)
+gnat.utility.move_restless = 1.0
+gnat.behavior.walk_distance_wu = { 0.2, 0.8 }
+gnat.behavior.walk_speed_wu_s = { 0.4, 0.9 }
+gnat.behavior.wander_radius_wu = 1.5
+gnat.behavior.wander_flight_chance = 0.3
+gnat.population.vent_min_distance_wu = 8.0
+gnat.population.entry_min_flight_wu = 4.0
+data.fungus_gnat_prototype = gnat
+-- The aphid: a sixth of a housefly meal, and a walker (body.walker): it never flies (Prey/Fly.launch refuses it, so FlyFlight is never used for it), lives on
+-- the plants' stems and leaves (the bed's walker perches, in small groups) and only shuffles about its perch; startled, it freezes.
+local aphid = copy(data.fly_like_prototype)
+aphid.body.nutrition = 0.35 / 6 -- a sixth of a housefly meal
+aphid.body.visual_scale = 0.40
+aphid.body.radius_wu = 0.10
+aphid.body.capture_radius_wu = 0.38
+aphid.body.prey_kind = "aphid"
+aphid.body.walker = true
+aphid.body.feed_rate_per_s = 0.06
+aphid.senses.sight_range_wu = 4.0
+aphid.senses.startle_range_wu = 3.0
+aphid.behavior.walk_distance_wu = { 0.1, 0.4 }
+aphid.behavior.walk_speed_wu_s = { 0.15, 0.35 }
+aphid.behavior.walk_interval_s = { 4.0, 12.0 }
+aphid.behavior.wander_radius_wu = 0.8
+aphid.behavior.perch_radius_wu = 0.25
+aphid.behavior.fidget_distance_wu = { 0.04, 0.1 }
+data.aphid_prototype = aphid
 return table.freeze(data)

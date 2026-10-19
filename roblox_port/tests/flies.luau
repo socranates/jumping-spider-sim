@@ -402,5 +402,32 @@ do
  check(rig.scale==1 and (first.Size-bodies.template.specs[1].rest.size).Magnitude<1e-6,"restored identity returns original size")
  bodies:draw({},0)
 end
+-- ---------------------------------------------------------------- the bed's prey (ROBLOX-96): the gnat and the aphid under the fly's budget
+do
+ local Species=require("../src/Shared/Data/Species")
+ local bodies=FlyBodies.new(workspace)
+ local g=fly("gnat","PERCHED",Vector3.new(0,HOVER,0),-Vector3.zAxis,Vector3.yAxis);g.profile=Species.fungus_gnat_prototype
+ local a=fly("aphid","PERCHED",Vector3.new(2,HOVER,0),-Vector3.zAxis,Vector3.yAxis);a.profile=Species.aphid_prototype
+ bodies:draw({g,a},0)
+ local gr,ar=bodies.rigs.gnat,bodies.rigs.aphid
+ check(#gr.parts==22 and #ar.parts==15 and #gr.parts<=40 and #ar.parts<=40,`a gnat is {#gr.parts} parts and an aphid {#ar.parts}, under the fly's forty`)
+ check(gr.scale==.45 and ar.scale==.4,"at their own scales")
+ local wings,aWings=0,0
+ for _,p in gr.parts do if string.find(p.Name,"Wing",1,true) then wings+=1 end end
+ for _,p in ar.parts do if string.find(p.Name,"Wing",1,true) then aWings+=1 end end
+ check(wings==2 and aWings==0,"one pair of wings on the gnat, none on the aphid")
+ for _,rig in {gr,ar} do
+  for _,p in rig.parts do check(p.Anchored and p.CanCollide==false and p.CanQuery==false and p.CanTouch==false and p.CastShadow==false,"a bed prey's part is as a fly's: anchored, never solid, never seen, no shadow") end
+ end
+ -- a gnat in the air: its wings become the fan, its legs tuck; the aphid has no flight pose to go to, but a captured one is still drawn
+ g.state="FLEE"
+ bodies:draw({g,a},0.5)
+ local fan=named(gr,"RightWing")
+ check(gr.flying and fan.Transparency>=.75,"in the air the gnat's wing is a blur")
+ a.state="CAPTURED"
+ bodies:draw({g,a},0.6)
+ check(ar.flying and #ar.parts==15,"a captured aphid is drawn still")
+ bodies:draw({},0)
+end
 print(`FLIES passed={passed} failed={failed}`)
 if failed > 0 then error("fly checks failed") end

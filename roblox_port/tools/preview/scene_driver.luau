@@ -11,6 +11,11 @@ local SupportMath = require("../src/Shared/Movement/SupportMath")
 local SpiderRig = require("../src/Shared/Rig/SpiderRig")
 local FlyBodies = require("../src/Client/FlyBodies")
 local WaspBody = require("../src/Client/WaspBody")
+local BugBodies = require("../src/Client/BugBodies")
+local PreyDirector = require("../src/Shared/Prey/PreyDirector")
+local PreyWorld = require("../src/Shared/Prey/PreyWorld")
+local Garden = require("../src/Shared/World/Garden")
+local Species = require("../src/Shared/Data/Species")
 
 -- ---------------------------------------------------------------- the world, as Server/Main builds it
 local el, az = math.rad(SUN_ELEVATION_DEG), math.rad(SUN_AZIMUTH_DEG)
@@ -61,6 +66,20 @@ for _, f in FLIES do
 	})
 end
 bodies:draw(flies, 0.37)
+-- ROBLOX-96 (--world): the bed's prey and woodlice where the seed puts them, through the real director and colony on the outside's boxes (the gnats and the aphids on
+-- their start perches, the woodlice at their starting places), drawn with the flies
+if WORLD then
+	local bed = WorldMap.region("bed_a") :: any
+	local spec = Garden.prey(bed)
+	if spec ~= nil then
+		local d = PreyDirector.engine(outside, Species.fungus_gnat_prototype, spec.seed, spec.target, false, spec)
+		for _, f in d.flies do table.insert(flies, f) end
+		bodies:draw(flies, 0.37)
+		local pw = PreyWorld.new(d, { home = "sill", map = WorldMap, region = bed, regionReady = function() return true end }, {}, outside)
+		local colony = pw:bugs("bed_a")
+		if colony ~= nil then BugBodies.new(flyFolder):draw(colony.lice) end
+	end
+end
 
 -- ---------------------------------------------------------------- wasps (scene.py's WASPS: id, x, y, z, hx, hz, mode, search, beat)
 local waspHolder = Instance.new("Folder")

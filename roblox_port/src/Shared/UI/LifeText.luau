@@ -40,20 +40,59 @@ function LifeText.hunger(fed: number, gentle: boolean): string
 	return string.format("Hunger %d%%", math.floor(v * 100 + 0.5)) .. (if gentle then " · gentle" elseif v <= 0 then " · starving" elseif v <= 0.25 then " · hungry" else "")
 end
 
+-- ROBLOX-96: the homes, by the retreat's id on the map (World/WorldMap): what each is called in the prompts, how a rest there is told, and where it is. The crack
+-- is the default and every word of it is as it was; the gap under the bed's stone is the first garden home. A retreat this table does not know reads as the crack.
+LifeText.HOMES = {
+	sill_crevice = {
+		name = "the silk-lined crack", -- "Asleep in the silk-lined crack", "Resting in the silk-lined crack"
+		title = "The silk-lined crack", -- the prompt when the spider can rest
+		home = "Home: the silk-lined crack", -- the line near home
+		way = "Walk through the silk-framed opening under the wooden roof, then stop to rest.",
+		kept = "Last rest kept.", -- (CheckpointStore's own words, kept as they were)
+	},
+	bed_a_stone = {
+		name = "under the stone",
+		title = "Under the stone",
+		home = "Home: under the stone",
+		way = "Walk into the gap under the big stone in the bed, then stop to rest.",
+		kept = "Last rest kept, under the stone.",
+	},
+} :: { [string]: { name: string, title: string, home: string, way: string, kept: string } }
+LifeText.DEFAULT_HOME = "sill_crevice"
+local function homeOf(retreat: string?): { name: string, title: string, home: string, way: string, kept: string }
+	return LifeText.HOMES[retreat or LifeText.DEFAULT_HOME] or LifeText.HOMES[LifeText.DEFAULT_HOME]
+end
+local function inWords(name: string): string
+	return if string.sub(name, 1, 6) == "under " then name else "in " .. name
+end
+
 -- The retreat's prompt: asleep, resting, or able to rest (sleep in the evening and at night); nil when none of these. `extra` (the crack's
--- way to change spider, ROBLOX-31) is added to the resting hint.
-function LifeText.prompt(asleep: boolean, resting: boolean, canRest: boolean, sleepTime: boolean, device: ControlText.Device, extra: string?): Prompt?
+-- way to change spider, ROBLOX-31) is added to the resting hint. `retreat` (ROBLOX-96): which home, by its id; the crack when nil.
+function LifeText.prompt(asleep: boolean, resting: boolean, canRest: boolean, sleepTime: boolean, device: ControlText.Device, extra: string?, retreat: string?): Prompt?
 	local feed, cancel = ControlText.name(device, "feed"), ControlText.name(device, "cancel")
+	local h = homeOf(retreat)
 	if asleep then
-		return { title = "Asleep in the silk-lined crack", hint = `The night passes. Move, {feed} or {cancel} to wake.` }
+		return { title = `Asleep {inWords(h.name)}`, hint = `The night passes. Move, {feed} or {cancel} to wake.` }
 	end
 	if resting then
-		return { title = "Resting in the silk-lined crack", hint = `Move, {feed} or {cancel} to leave.` .. (if extra and extra ~= "" then "    " .. extra else "") }
+		return { title = `Resting {inWords(h.name)}`, hint = `Move, {feed} or {cancel} to leave.` .. (if extra and extra ~= "" then "    " .. extra else "") }
 	end
 	if canRest then
-		return { title = "The silk-lined crack", hint = if sleepTime then `{feed}: sleep until morning` else `{feed}: rest` }
+		return { title = h.title, hint = if sleepTime then `{feed}: sleep until morning` else `{feed}: rest` }
 	end
 	return nil
+end
+
+-- The line near a home when there is no prompt (ROBLOX-96): "Home: the silk-lined crack" and how to get in, or, inside it, how to rest. `retreat` is the home's id.
+function LifeText.homeLine(retreat: string?, inside: boolean, device: ControlText.Device): Prompt
+	local h = homeOf(retreat)
+	return { title = h.home, hint = if inside then `Keep still on a surface, then {ControlText.name(device, "feed")}: rest` else h.way }
+end
+
+-- What a kept rest says (ROBLOX-96): the store's own words for the crack, and the place for any other home. `message` is what the store said.
+function LifeText.restKept(retreat: string?, message: string): string
+	if retreat == nil or retreat == LifeText.DEFAULT_HOME or LifeText.HOMES[retreat] == nil then return message end
+	return homeOf(retreat).kept
 end
 
 -- What the touch feed button says when it is the retreat's (nil: it is the meal's, or hidden).
@@ -83,15 +122,25 @@ function LifeText.restRefusal(reason: string): string
 	return LifeText.REST_REFUSALS[reason] or LifeText.REST_FALLBACK
 end
 
--- Housefly-equivalent meals: a small prey counts as half. Partial feeding is retained.
-function LifeText.growth(g: any, required: number, meal: number): string
+-- ROBLOX-96: what the meal line says of the prey in the jaws, by its kind (Species body.prey_kind): how many of it make a housefly meal, and how finely the count is
+-- shown (halves for the sill's prey, as always; tenths for the bed's smaller ones, so a gnat's third shows).
+LifeText.MEALS = {
+	fruit_fly = { rule = "2 small prey = 1 housefly", step = 2 },
+	fungus_gnat = { rule = "3 gnats = 1 housefly", step = 10 },
+	aphid = { rule = "6 aphids = 1 housefly", step = 10 },
+} :: { [string]: { rule: string, step: number } }
+local DEFAULT_MEAL = { rule = "2 small prey = 1 housefly", step = 2 }
+
+-- Housefly-equivalent meals: a small prey counts as half. Partial feeding is retained. `kind` (ROBLOX-96): the prey in the jaws, for the rule it says.
+function LifeText.growth(g: any, required: number, meal: number, kind: string?): string
  if g:isAdult() then return "Adult: keep your hunger bar full." end
  if g:isMoulting() then return "Moulting: stay in the crack." end
  if g.ready then return "Ready to moult: rest in the crack." end
  -- (ROBLOX-88: the goal is the growth's own, 3 by Godot's rule and 5 in the game; `required` and `meal` serve a growth that cannot say.)
  local goal = if g.mealGoal ~= nil then g:mealGoal() else math.ceil(required / meal)
  required = if g.readyAt ~= nil then g:readyAt() else required
- local count = math.min(goal, math.floor(g.fedSinceMoult / required * goal * 2 + 1e-8) / 2)
- return `Next moult: {count} of {goal} meals · 2 small prey = 1 housefly`
+ local rule = LifeText.MEALS[kind or ""] or DEFAULT_MEAL
+ local count = math.min(goal, math.floor(g.fedSinceMoult / required * goal * rule.step + 1e-8) / rule.step)
+ return `Next moult: {count} of {goal} meals · {rule.rule}`
 end
 return LifeText

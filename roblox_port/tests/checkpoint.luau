@@ -489,6 +489,170 @@ case("mixed prey keeps the fruit profile across a rest",function()
  for _,prey in w.prey.flies do if prey.id==f.id then found=prey.profile==Species.fruit_fly_prototype and prey.nutrition==.175 end end
  check(found,"restored fruit fly keeps its identity and food")
 end)
+-- ---------------------------------------------------------------- ROBLOX-96: the prey per region (the garden root)
+local Garden = require("../src/Shared/World/Garden")
+local WorldMap2 = require("../src/Shared/World/WorldMap")
+local WorldBuild = require("../src/Shared/World/WorldBuild")
+local Woodlouse = require("../src/Shared/Prey/Woodlouse")
+local Region = require("../src/Shared/World/Region")
+local SaveRest = require("../src/Shared/Persistence/SaveRest")
+-- A world with a garden: the sill and the bed as the server builds them, the sill's director at home and the bed's director and woodlice in `garden`, sharing the jaws
+-- and the casts, with the spider at home on the sill.
+local function gardenWorld(): any
+	local folder = WorldBuild.world(workspace, WorldMap2.SEED) -- (under the workspace: the shim's casts see only what is)
+	local motor = Motor.new({
+		world = folder, surfaces = Surfaces, profile = Species.phidippus_audax_prototype, spawn = Layout.SPAWN,
+		heading = Layout.SPAWN_HEADING, boundsMin = Layout.PLAY_BOUNDS_MIN, boundsMax = Layout.PLAY_BOUNDS_MAX,
+	})
+	local casts = PreyDirector.casts(folder)
+	local prey = PreyDirector.engine(folder, Species.fly_like_prototype, 914, 4, true, nil, casts)
+	local bed = WorldMap2.region("bed_a") :: any
+	local spec = Garden.prey(bed)
+	local bedPrey = PreyDirector.engine(folder, Species.fungus_gnat_prototype, spec.seed, spec.target, false, spec, casts)
+	bedPrey.feeding = prey.feeding
+	local soil: any, boxes = nil, {}
+	for _, piece in Region.pieces(bed) do
+		if piece.id == "bed_a_soil" then soil = { min = piece.lo, max = piece.hi } elseif piece.lo.Y <= -89.99 then table.insert(boxes, { min = piece.lo, max = piece.hi }) end
+	end
+	local bugs = Woodlouse.new(Garden.bugs(bed), soil, boxes)
+	local memory = ObservationMemory.new()
+	local sensor = Sensor.new(memory)
+	sensor:configureFrom(Species.phidippus_audax_prototype.perception)
+	local needs = NeedsModel.new(true, false)
+	prey.feeding.needs = needs
+	local w: any = { motor = motor, prey = prey, sensor = sensor, memory = memory, needs = needs, garden = { bed_a = { prey = bedPrey, bugs = bugs } } }
+	w.life = LifeLoop.new(needs, nil)
+	motor:place(HOME, Vector3.yAxis, Vector3.new(1, 0, 0))
+	return w, bedPrey, bugs
+end
+-- Ticks the garden's director and woodlice as PreyWorld would with the spider in the bed, the sill's waiting.
+local function gardenTick(w: any, bedPrey: any, bugs: any, at: Vector3)
+	local obs = { eye = at, gaze = Vector3.new(0, 0, -1), up = Vector3.yAxis, heading = Vector3.new(0, 0, -1) }
+	bedPrey:before(DT, at, obs, w.sensor, cast, camera)
+	bugs:step(DT, at)
+	w.prey:after(DT, w.motor, w.sensor, cast)
+	bedPrey:afterShared(w.motor, w.sensor, cast)
+end
+local function gardenText(w: any): string
+	local saved = { w.prey.cpu, w.prey.beforeCost, w.sensor._ring, w.garden.bed_a.prey.cpu, w.garden.bed_a.prey.beforeCost }
+	w.prey.cpu, w.prey.beforeCost, w.sensor._ring, w.garden.bed_a.prey.cpu, w.garden.bed_a.prey.beforeCost = {}, 0, {}, {}, 0
+	local rec = assert(ObjectRecord.capture({ prey = w.prey, sensor = w.sensor, memory = w.memory, needs = w.needs, life = w.life, garden = w.garden }, Checkpoint.CLASSES, Checkpoint.refs(w)))
+	w.prey.cpu, w.prey.beforeCost, w.sensor._ring, w.garden.bed_a.prey.cpu, w.garden.bed_a.prey.beforeCost = saved[1], saved[2], saved[3], saved[4], saved[5]
+	local text = assert(Json.canonical(rec))
+	-- (what a return to a rest itself writes: the notice and its seconds, the grace; not the world's state)
+	for _, key in { "notice", "noticeSeconds", "restoreGrace" } do text = string.gsub(text, '%["' .. key .. '",[^%]]*%]', "") end
+	return text
+end
+case("the bed's prey and woodlice are kept with the rest and put back where they were; the sill's record is as it was", function()
+	local w, bedPrey, bugs = gardenWorld()
+	check(#bedPrey.flies == 6 and #bugs.lice == 4 and bedPrey.feeding == w.prey.feeding, "a garden world: six prey in the bed, four woodlice, one jaws")
+	for _ = 1, 600 do gardenTick(w, bedPrey, bugs, Vector3.new(-20, -89.69, -30)) end
+	-- the woodlice went under cover as the spider stood in the bed? one near it did, maybe; either way the state is what is kept
+	check(Checkpoint.boundaryProblem(w) == "", "a rest can be kept")
+	local record = assert(Checkpoint.capture(w, 0))
+	check(record.world.roots.garden ~= nil and record.world.roots.prey ~= nil, "the record has the garden root beside the prey")
+	check(#SaveRest.check("main", record) == 0, "the server's rest check accepts it: " .. table.concat(SaveRest.check("main", record), "; "))
+	local before = gardenText(w)
+	local kept = {}
+	for i, f in bedPrey.flies do kept[i] = { id = f.id, pos = f.position, state = f.state } end
+	local lice = {}
+	for i, l in bugs.lice do lice[i] = { pos = l.position, state = l.state } end
+	-- the world runs on, then the rest is returned to
+	for _ = 1, 600 do gardenTick(w, bedPrey, bugs, Vector3.new(-5, -89.69, -40)) end
+	check(gardenText(w) ~= before, "the garden moved on")
+	local ok, problems = Checkpoint.restore(record, w)
+	check(ok, "restored: " .. table.concat(problems, "; "))
+	local d2 = w.garden.bed_a.prey
+	check(d2 ~= nil and d2 ~= bedPrey and getmetatable(d2) == PreyDirector and #d2.flies == #kept, "the bed's director is rebuilt from the record")
+	for i, f in d2.flies do
+		local k = kept[i]
+		check(k ~= nil and k.id == f.id and (k.pos - f.position).Magnitude < 1e-9 and k.state == f.state, `{f.id} is back where it was`)
+	end
+	check(d2.feeding == w.prey.feeding and d2.graph.cast == w.prey.graph.cast and d2.probe == w.prey.probe, "sharing the jaws and the casts by name")
+	local b2 = w.garden.bed_a.bugs
+	check(b2 ~= nil and getmetatable(b2) == Woodlouse and #b2.lice == #lice, "the woodlice are rebuilt")
+	for i, l in b2.lice do check((lice[i].pos - l.position).Magnitude < 1e-9 and lice[i].state == l.state, `louse {i} is where it was`) end
+	do
+		local after = gardenText(w)
+		if after ~= before then
+			local i = 1
+			while i <= #before and string.byte(before, i) == string.byte(after, i) do i += 1 end
+			print("garden restore, first difference:\n  " .. string.sub(before, math.max(1, i - 200), i + 100) .. "\n  " .. string.sub(after, math.max(1, i - 200), i + 100))
+		end
+		check(after == before, "the whole world, garden included, is the record's again")
+	end
+	check(#w.garden.bed_a.prey.cpu == 0, "the bed director's cpu window is empty after a restore")
+	-- and it runs on from there exactly as it did the first time
+	local w2, bp2, bg2 = gardenWorld()
+	check(Checkpoint.restore(record, w2), "the same record into a fresh world")
+	for _ = 1, 300 do gardenTick(w, w.garden.bed_a.prey, w.garden.bed_a.bugs, Vector3.new(-5, -89.69, -40)); gardenTick(w2, w2.garden.bed_a.prey, w2.garden.bed_a.bugs, Vector3.new(-5, -89.69, -40)) end
+	check(gardenText(w) == gardenText(w2), "two worlds restored from it run on identically")
+end)
+case("an old record (sill-only prey, no garden) restores unchanged and leaves the live garden as it is; a garden that is not in order is refused", function()
+	local w, bedPrey, bugs = gardenWorld()
+	for _ = 1, 120 do gardenTick(w, bedPrey, bugs, Vector3.new(-20, -89.69, -30)) end
+	local record = assert(Checkpoint.capture(w, 0))
+	local old = Json.copy(record)
+	old.world.roots.garden = nil
+	old.world_map = nil -- (a rest from before the world: put back at the spawn)
+	local liveGarden = w.garden
+	local liveDirector = w.garden.bed_a.prey
+	local ok, problems = Checkpoint.restore(old, w)
+	check(ok, "an old record restores: " .. table.concat(problems, "; "))
+	check(w.garden == liveGarden and w.garden.bed_a.prey == liveDirector and #liveDirector.flies == 6, "the live garden is untouched: nothing rerolled")
+	check(#SaveRest.check("main", old) == 0, "and the server accepts it")
+	-- a garden world's record into a world without a garden: the live world is missing a part
+	local plain = newWorld()
+	local ok2, problems2 = Checkpoint.restore(record, plain)
+	check(not ok2 and problems2[1] == "the live world is missing a part", "a garden record needs a garden: " .. table.concat(problems2, "; "))
+	-- refusals, each on a copy, the live world untouched
+	local function refusedGarden(label: string, edit: (any) -> (), part: string)
+		local r = Json.copy(record)
+		edit(r)
+		local ok3, problems3 = Checkpoint.restore(r, w)
+		local text = table.concat(problems3, "; ")
+		check(not ok3 and string.find(text, part, 1, true) ~= nil, `{label} is refused ({if ok3 then "ACCEPTED" else text})`)
+		local server = SaveRest.check("main", r)
+		check(#server > 0, `and the server refuses it too ({table.concat(server, "; ")})`)
+	end
+	local function objectOf(r: any, ref: any): any return r.world.objects[ref["$o"]] end
+	local function entry(o: any, key: string): any
+		for _, e in o.e do if e[1] == key then return e end end
+		return nil
+	end
+	refusedGarden("a region the map does not have", function(r)
+		local g = objectOf(r, r.world.roots.garden)
+		entry(g, "bed_a")[1] = "moon"
+	end, "is not a region with prey")
+	refusedGarden("a bed fly with more meal than a gnat", function(r)
+		local g = objectOf(r, r.world.roots.garden)
+		local bedEntry = objectOf(r, entry(g, "bed_a")[2])
+		local director = objectOf(r, entry(bedEntry, "prey")[2])
+		local flies = objectOf(r, entry(director, "flies")[2])
+		local f = objectOf(r, flies.e[1][2])
+		entry(f, "nutrition")[2] = 0.5
+	end, "nutrition is out of range")
+	refusedGarden("a bed director with jaws of its own", function(r)
+		local g = objectOf(r, r.world.roots.garden)
+		local bedEntry = objectOf(r, entry(g, "bed_a")[2])
+		local director = objectOf(r, entry(bedEntry, "prey")[2])
+		local feeding = objectOf(r, entry(director, "feeding")[2])
+		local copy = { c = feeding.c, e = {} }
+		for _, e in feeding.e do table.insert(copy.e, { e[1], e[2] }) end
+		table.insert(r.world.objects, copy)
+		entry(director, "feeding")[2] = { ["$o"] = #r.world.objects }
+	end, "does not eat with the sill's jaws")
+	refusedGarden("a woodlouse outside the bed", function(r)
+		local g = objectOf(r, r.world.roots.garden)
+		local bedEntry = objectOf(r, entry(g, "bed_a")[2])
+		local colony = objectOf(r, entry(bedEntry, "bugs")[2])
+		local lice = objectOf(r, entry(colony, "lice")[2])
+		local l = objectOf(r, lice.e[1][2])
+		entry(l, "position")[2] = { ["$v"] = { 0, 0, 0 } }
+	end, "outside its region")
+	check(w.garden.bed_a.prey == liveDirector and #liveDirector.flies == 6, "the live garden is still untouched after the refusals")
+end)
+
 case("fallen tip timer survives rest and invalid data is atomic",function()
  local Breakaway=require("../src/Shared/Habitat/Breakaway")
  local w=newWorld();w.breakaway=Breakaway.new(sill)

@@ -518,5 +518,51 @@ case("streaming: the focus follows the spider, and what the spider can reach is 
 	check(outside == 0, `every place a spider can stand is in a region and inside the bounds the server checks reports against ({outside} are not)`)
 end)
 
+-- ---------------------------------------------------------------- ROBLOX-96: the bed's perches, vents and woodlice spots, from its boxes and seed; the retreats' doors
+case("the bed's perch list lies inside the bed, each perch on a face of one of its real boxes, its vents and hide spots on the soil, all from the seed", function()
+	local bed = WorldMap.region("bed_a") :: WorldMap.Region
+	local spec = Garden.prey(bed) :: any
+	local pieces = Garden.pieces(bed)
+	local function onFace(pos: Vector3, normal: Vector3): string?
+		for _, p in pieces do
+			local insideXZ = pos.X >= p.lo.X - 1e-9 and pos.X <= p.hi.X + 1e-9 and pos.Z >= p.lo.Z - 1e-9 and pos.Z <= p.hi.Z + 1e-9
+			local insideYZ = pos.Y >= p.lo.Y - 1e-9 and pos.Y <= p.hi.Y + 1e-9 and pos.Z >= p.lo.Z - 1e-9 and pos.Z <= p.hi.Z + 1e-9
+			if normal.Y > 0.5 and insideXZ and math.abs(pos.Y - p.hi.Y) < 1e-9 then return p.id end
+			if normal.Y < -0.5 and insideXZ and math.abs(pos.Y - p.lo.Y) < 1e-9 then return p.id end
+			if normal.X > 0.5 and insideYZ and math.abs(pos.X - p.hi.X) < 1e-9 then return p.id end
+		end
+		return nil
+	end
+	check(spec ~= nil and #spec.perches == 28 and #spec.vents == 4 and spec.target == 6, `28 perches, 4 vents, six prey ({#spec.perches}, {#spec.vents})`)
+	local ids: { [string]: boolean } = {}
+	for _, p in spec.perches do
+		check(not ids[p.id], `perch ids are unique ({p.id})`)
+		ids[p.id] = true
+		check(WorldMap.inBounds(p.position, "bed_a"), `{p.id} is inside the bed`)
+		local face = onFace(p.position, p.normal)
+		check(face ~= nil, `{p.id} lies on a face of a real box (its normal {p.normal})`)
+		if p.walker then check(face ~= nil and (string.find(face, "_leaf_", 1, true) ~= nil or string.find(face, "_stem", 1, true) ~= nil), `{p.id}, a walker perch, is on a plant`) end
+		if p.kind == "under" then check(p.normal.Y < 0 and p.position.Y > -90 + 5, `{p.id} hangs under a leaf well above the soil`) end
+	end
+	for _, v in spec.vents do
+		check(WorldMap.inBounds(v.position, "bed_a") and (v.walker or onFace(v.position, Vector3.yAxis) == "bed_a_soil"), `vent {v.id} is in the bed, a gnat's on the soil`)
+	end
+	local bugs = Garden.bugs(bed) :: any
+	check(#bugs.woodlice == 4 and #bugs.hides == 7, `four woodlice and seven hide spots ({#bugs.woodlice}, {#bugs.hides})`)
+	for _, w in bugs.woodlice do check(onFace(w.pos, Vector3.yAxis) == "bed_a_soil", "a woodlouse starts on the soil") end
+	for _, h in bugs.hides do check(WorldMap.inBounds(h.pos, "bed_a") and (h.kind == "stone" or h.kind == "litter"), "a hide spot is in the bed, by a stone or under litter") end
+	-- the same from the same seed, other from another
+	local other = table.clone(bed); other.seed = WorldMap.seed(2, "bed_a")
+	local o = Garden.prey(other) :: any
+	check(o ~= spec and (o.perches[1].position - spec.perches[1].position).Magnitude > 0.1, "another seed, other soil perches")
+	check(Garden.prey(bed) == spec and Garden.bugs(bed) == bugs, "asked again, the same lists")
+	-- the retreats' doors: where the words near home are measured from, outside each way in
+	local crack = WorldMap.retreat("sill_crevice") :: any
+	local stone = WorldMap.retreat("bed_a_stone") :: any
+	check(same(crack.door, Vector3.new(-24, 1, 6)) and WorldMap.inRetreat(crack.door) == "sill_crevice" and crack.door.X > crack.min.X, "the crack's door is the point the client has always measured from, just inside its mouth")
+	check(same(stone.door, Vector3.new(11, -89.5, -46.5)) and WorldMap.inRetreat(stone.door) == nil and stone.door.Z > stone.max.Z and WorldMap.at(stone.door) == bed, "the stone's door is in front of the gap's mouth, in the bed")
+	check(Region.budget("house_wall", "full") == 110 and Region.budget("house_wall", "low") == 75, "the wall's budget carries the descent's dressing (93/73 before)")
+end)
+
 print(`WORLDMAP passed={passed} failed={failed}`)
 if failed > 0 then error("WORLDMAP failed") end

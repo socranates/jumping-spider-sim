@@ -20,6 +20,7 @@
 --   hungry, well_fed, starving ... the reserve changes to at or under hungryAt, at or over wellFedAt, or to nothing (not on Easy)
 --   wasp, wasp_escaped, wasp_caught ... the director's visit_started, left (it had noticed the spider), caught
 --   antennae ....... the ant-mimicking spider has stood still with its antennae up for AntMimic.noticeSeconds (the client's pose says how long)
+--   garden_bed ..... (ROBLOX-96, the Roblox game's own) the spider's first step onto a bed of the garden: the view's `region` is a region of kind "bed"
 -- Not wired: felt. It answers to Godot's vibration sense (a felt shake through touching surfaces), which the port does not have, so
 -- that page cannot open yet; the notebook never opens a page for something the game does not do.
 -- Checked in tests/notebook.luau.
@@ -46,6 +47,7 @@ export type View = {
 	gentle: boolean, -- Easy or free play: it cannot starve
 	spider: Vector3,
 	flies: { any }, -- the flies: .id, .position and :airborne()
+	region: string?, -- ROBLOX-96: the kind of the region the spider is in ("sill", "bed", ...); nil in a world without one
 }
 
 function NotebookWatch.new(book: any): any
@@ -165,6 +167,10 @@ function NotebookWatch.step(self: any, v: View)
 		elseif v.energy >= Data.wellFedAt then
 			book:notice("well_fed")
 		end
+	end
+	-- ROBLOX-96: the first step onto a garden bed.
+	if v.region == "bed" then
+		book:notice("garden_bed")
 	end
 	-- A fly taking off near enough to hear.
 	local seen: { [string]: boolean } = {}

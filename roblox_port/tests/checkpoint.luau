@@ -662,7 +662,7 @@ case("the rival's contest (ROBLOX-73): its count is kept, a return to a rest giv
  -- the gentle modes: the same outcome, nothing lost
  Checkpoint.restore(rec,w);r=w.life.rival
  local g,gcost=Rival.step(w.life.rival,1/60,strike(day,true),function() return false end)
- check(g==first and gcost==0,"gentle: the same event, no cost")
+ check(g==Rival.contest(914,day,4,true) and (g~="counter" or gcost==0),"gentle: the gentle odds (ROBLOX-91), the same stream, and a counter-bite costs nothing")
  -- bad records
  for name,set in {["a negative count"]=function(x) x.contests=-1 end,["a fractional count"]=function(x) x.contests=2.5 end,["a count that is not a number"]=function(x) x.contests="3" end,
    ["a count that is not finite"]=function(x) x.contests=0/0 end,["a spared that is not a boolean"]=function(x) x.spared=1 end} do
@@ -703,5 +703,54 @@ case("the struggle with a caught rival (ROBLOX-77) is never recorded: no rest is
  local bad=assert(Checkpoint.capture(w,0))
  check(not Checkpoint.restore(bad,w),"a subdued that is not true or false is refused")
 end)
+-- ---------------------------------------------------------------------------------------------- the profiling windows (ROBLOX-91)
+case("a capture holds neither the prey director's cpu window nor the sensor's cost ring, and the live ones are untouched", function()
+	local w = newWorld()
+	for _ = 1, 150 do tick(w) end
+	check(#w.prey.cpu > 100 and #w.sensor._ring > 50, `(the live windows are full: {#w.prey.cpu} and {#w.sensor._ring})`)
+	local cpuBefore, ringBefore = #w.prey.cpu, #w.sensor._ring
+	local fp = fingerprint(w)
+	local record = assert(Checkpoint.capture(w, 0))
+	check(fingerprint(w) == fp, "capturing changes nothing in the world (the fingerprint is the same)")
+	check(#w.prey.cpu == cpuBefore and #w.sensor._ring == ringBefore, "and the live windows are still there")
+	-- no object of the record holds a long list of timing floats: no `cpu` entry of the prey director, no `_ring` of the sensor
+	local function entriesNamed(key: string): number
+		local n = 0
+		for _, o in record.world.objects do
+			for _, e in o.e do if e[1] == key then n += 1 end end
+		end
+		return n
+	end
+	local preyObj = record.world.objects[record.world.roots.prey["$o"]]
+	local sensorObj = record.world.objects[record.world.roots.sensor["$o"]]
+	local function listOf(obj: any, key: string): any
+		for _, e in obj.e do if e[1] == key then return e[2] end end
+		return nil
+	end
+	local cpuRef, ringRef = listOf(preyObj, "cpu"), listOf(sensorObj, "_ring")
+	check(cpuRef ~= nil and #record.world.objects[cpuRef["$o"]].e == 0, "the prey's cpu is an empty list in the record")
+	check(ringRef ~= nil and #record.world.objects[ringRef["$o"]].e == 0, "and the sensor's ring")
+	local text = assert(Json.canonical(record))
+	local old = assert(ObjectRecord.capture({ prey = w.prey, sensor = w.sensor, memory = w.memory, needs = w.needs, life = w.life }, Checkpoint.CLASSES, Checkpoint.refs(w)))
+	local oldText = assert(Json.canonical(old))
+	check(#oldText - #text > 4000, `the record is smaller by the floats ({#oldText} against {#text} characters)`)
+	check(entriesNamed("cpu") == 1 and entriesNamed("_ring") == 1, "(each key is there, once, and empty)")
+	-- two captures of the same world are the same record, which the timing floats made impossible
+	local again = assert(Checkpoint.capture(w, 0))
+	check(assert(Json.canonical(again)) == text, "two captures of one world are identical")
+	-- restoring leaves the windows empty and the sensor's cost reading well formed
+	local restored = Checkpoint.restore(record, w)
+	check(restored and #w.prey.cpu == 0 and #w.sensor._ring == 0, "a restore leaves both empty")
+	check(w.sensor:costPercentile(0.5) == 0, "and the sensor's cost reading has nothing to say (no reading from nothing)")
+	for _ = 1, 10 do tick(w) end
+	check(#w.prey.cpu == 10 and w.sensor:costTicks() > 0 and w.sensor:costPercentile(0.5) >= 0, "they fill again as the world runs")
+	-- an older record that holds the windows restores too, and the windows come back empty
+	local oldRecord = Json.copy(record)
+	oldRecord.world = old
+	check(#(Checkpoint.check(oldRecord, w)) == 0, "a record made before (with the windows in it) is good")
+	check(Checkpoint.restore(oldRecord, w) and #w.prey.cpu == 0 and #w.sensor._ring == 0, "and restores with them empty")
+	check(w.sensor:costPercentile(0.9) == 0, "without a reading")
+end)
+
 print(`CHECKPOINT passed={passed} failed={failed}`)
 if failed > 0 then error("CHECKPOINT failed") end

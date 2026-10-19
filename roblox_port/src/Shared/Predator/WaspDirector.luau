@@ -31,8 +31,8 @@
 -- (tests/wasp_reference.json, tools/export_wasp_reference.gd) on an analytic world, and the client gives it the real sill's casts.
 -- Random draws come from `rng` (range, unit, int); the tests hand it a scripted one.
 --
--- Not ported: Gentle rules (the wasp touches the spider and leaves; Godot's round 5 modes): the flag exists and the rule is here, but
--- Roblox has no mode choice yet, so it is never set. The sound is the host's (captions only; no audio assets).
+-- Gentle rules (the wasp touches the spider and leaves; Godot's round 5 modes): the flag is `gentle`; the game sets it for Easy and Free play (and never for the
+-- standard rules). The sound is the host's (captions only; no audio assets).
 
 local Data = require(script.Parent.Parent.Data.Wasp)
 local PreyRandom = require(script.Parent.Parent.Prey.PreyRandom)
@@ -41,7 +41,7 @@ local WaspDirector = {}
 WaspDirector.__index = WaspDirector
 
 -- ("taking", "seizing" and "bearing" are the game's wasp going for the rival male, ROBLOX-70: flying to it and hanging over it, the strike, carrying it off.)
-WaspDirector.MAX_SLOTS = 2 -- the most visits a day the record can hold (the game has two)
+WaspDirector.MAX_SLOTS = #Data.game.windows -- the most visits a day the record can hold (the game's windows: two)
 
 WaspDirector.PHASES = table.freeze({ "away", "arriving", "searching", "inspecting", "striking", "carrying", "leaving", "taking", "seizing", "bearing" })
 
@@ -67,7 +67,7 @@ export type Spider = {
 }
 -- The life this tick (Godot: the habitat loop and the feeding controller).
 -- `rival`: the free rival male the wasp may take, if one is on the sill (RivalSpider.target): where it is and which way is up from it.
-export type Block = { day: number, hour: number, resting: boolean, moulting: boolean, meals: number, rival: { position: Vector3, up: Vector3, present: boolean }? }
+export type Block = { day: number, hour: number, resting: boolean, moulting: boolean, meals: number, born: number?, rival: { position: Vector3, up: Vector3, present: boolean }? }
 export type Signal = { kind: string, [string]: any }
 
 -- Godot's one window of the day (the game's two are Data.game.windows).
@@ -177,7 +177,9 @@ end
 
 -- Why a visit could not begin now ("" when it could), apart from the hour.
 function WaspDirector.blocked(_self: any, block: Block): string
-	if block.day < Data.firstDay then return "the first day" end
+	-- (ROBLOX-91: `born` is the day before the family's generation began, 0 for the first, and `meals` its own count: a spiderling of the next generation has its first day and
+	-- first meal protected like a new life, whatever the sill's day counter and the meals of the last family say.)
+	if block.day - (block.born or 0) < Data.firstDay then return "the first day" end
 	if block.meals < 1 then return "no meal yet" end
 	if block.resting or block.moulting then return "resting" end
 	return ""
@@ -542,8 +544,8 @@ function WaspDirector._strike(self: any, dt: number)
 	end
 end
 
--- Gentle rules (Godot round 5: Easy and free play): the wasp touches the spider with its antennae and gives up on it, and leaves. Roblox
--- has no such mode yet, so `gentle` is never set outside the tests.
+-- Gentle rules (Godot round 5: Easy and free play): the wasp touches the spider with its antennae and gives up on it, and leaves. The game sets `gentle`
+-- for Easy and Free play.
 function WaspDirector._spare(self: any)
 	self.sparedThisVisit = true
 	self:_log("spared")

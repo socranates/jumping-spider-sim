@@ -76,6 +76,7 @@ local function snapshot(w: any): any
 		position = p.position, previous = p.previous, heading = p.heading, up = p.up, grounded = p.grounded, moving = p.moving, airborne = p.airborne,
 		onLine = p.onLine, striking = p.striking, holding = p.holding, safe = Layout.inRetreat(p.position),
 		day = clock.day, hour = clock.hour, resting = w.life.resting, wasp = w.wasp, dancing = w.dancing, needsDance = w.needsDance, sex = w.sex, seed = 914,
+		rivalThreat = w.rivalThreat == true,
 	}
 end
 
@@ -1239,6 +1240,155 @@ case("a rest cannot land inside the scene; the record has no scene to restore in
 	-- and the pause still ends on its own
 	for _ = 1, 60 * 13 do fullTick(v) end
 	check(v.life.mate.state ~= "pair", "which ends by its own clock")
+end)
+
+-- --------------------------------------------------------------------------------------------------- the audit, part one (ROBLOX-91)
+local WaspDirector = require("../src/Shared/Predator/WaspDirector")
+local WaspData = require("../src/Shared/Data/Wasp")
+
+case("the eligibility gate says so when it is the hunger: tooHungry (the notice is the client's, with MateText.TOO_HUNGRY)", function()
+	local w = newWorld()
+	local life = w.life
+	life.needs.energy = 0.59
+	check(Mating.tooHungry(life), "a full-grown spider at 0.59 is too hungry for a visitor")
+	life.needs.energy = 0.6
+	check(not Mating.tooHungry(life), "at 0.6 it is not")
+	life.needs.energy = 0.3
+	life.growth.stage = Growth.ADULT - 1
+	check(not Mating.tooHungry(life), "a subadult is not asked for a visitor at all, however hungry")
+	life.growth.stage = Growth.ADULT
+	life.mating = Mating.new()
+	life.mating.ready_day = 4
+	check(not Mating.tooHungry(life), "a mate already wanted: nothing to say")
+	life.mating.ready_day = 0
+	life.mating.stage = "sac"
+	check(not Mating.tooHungry(life), "a cycle going: nothing to say")
+	life.mating = nil
+	check(Mating.tooHungry(life), "no cycle record yet: still hungry")
+	-- the words
+	local MateText = require("../src/Shared/UI/MateText")
+	check(string.find(MateText.TOO_HUNGRY, "Too hungry for a visitor to come", 1, true) ~= nil, "the notice says it")
+	-- at a rest by the player: the gate sets nothing, the hunger is reported, and a fed rest later still sets it
+	setClock(w, 3, 12)
+	w.player.position, w.player.previous = CRACK, CRACK
+	life.needs.energy = 0.5
+	tick(w, true)
+	check(life.resting and life.mating.ready_day == 0 and Mating.tooHungry(life), "the rest at 0.5: no mate wanted, and tooHungry is true for the notice")
+	tick(w, false, true)
+	life.needs.energy = 0.9
+	tick(w, true)
+	check(life.mating.ready_day == 4 and not Mating.tooHungry(life), "the next rest, fed, wants the mate and says nothing")
+end)
+
+case("the rival keeps away from a courting pair: the scene, the courtship and the sac wait for a clear sill", function()
+	local w = withMate()
+	local mate = w.life.mate
+	check(not Mate.sceneActive(mate) and not Mate.courting(mate, Vector3.new(0, 0.31, 0)), "far from the mate, nothing is going on")
+	standNear(w, mate, 2.5)
+	check(Mate.courting(mate, w.player.position), "within courting range of a mate that can be courted: courting")
+	standNear(w, mate, 3.5)
+	check(not Mate.courting(mate, w.player.position), "3.5 studs away with an empty meter: not")
+	mate.meter = 0.3
+	check(Mate.courting(mate, w.player.position), "a meter that is not empty: courting, even from further off (it decays at 0.25 a second)")
+	mate.meter = 0
+	standNear(w, mate, 2.5)
+	run(w, 8.6)
+	check(w.life.mating.stage == "courted" and Mate.sceneActive(mate) and not Mate.courting(mate, w.player.position), "the pair together are the scene, not courting")
+	run(w, 11.5)
+	check(mate.state == "leaving" and Mate.sceneActive(mate), "the male's walk off the sill is still the scene's last beat")
+	run(w, 4.5)
+	check(mate.state == "leaving" and mate.scene == false and not Mate.sceneActive(mate), "and when it is over, it is neither")
+	check(not Mate.sceneActive(nil) and not Mate.courting(nil, Vector3.zero), "no mate: neither")
+end)
+
+case("the scene is skipped at once when the rival is already winding up or lunging as the meter fills", function()
+	for _, threat in { false, true } do
+		local w = withMate()
+		local mate = w.life.mate
+		standNear(w, mate, 2.5)
+		w.rivalThreat = threat
+		run(w, 8.6)
+		local events = {}
+		for _, x in w.log do table.insert(events, x.e) end
+		if threat then
+			check(count(w, "courted") == 1 and count(w, "mated") == 1, "the rival is about to strike: courted and mated in the same breath")
+			check(w.life.mating.stage == "mated" and mate.state == "leaving" and mate.reason == "mated" and mate.scene == false, "the scene is not played: the pair part and the mate walks off")
+			check(not Mate.sceneActive(mate), "no scene is left to hold the player")
+			check(Mating.problemsWith(w.life.mating, mate)[1] == nil, "and the record is a good one")
+		else
+			check(count(w, "courted") == 1 and count(w, "mated") == 0 and mate.state == "pair" and mate.scene == true, "with no rival about, the scene plays as ever")
+		end
+	end
+end)
+
+case("a spiderling of the next generation has its own first day and first meal (grace), for the rival and the wasp", function()
+	-- the first generation: the sill's own day and the meals so far
+	local w = newWorld()
+	local born0, meals0 = Mating.grace(w.life, 7)
+	check(born0 == 0 and meals0 == 7, "generation 0: born 0 and every meal counts")
+	-- carry on from a hatching on day 6 after nine meals
+	w.life.mating = Mating.new()
+	w.life.mating.stage, w.life.mating.hatch_day, w.life.mating.brood = "hatched", 6, 9
+	Mating.carryOn(w.life, w.needs, 9)
+	check(w.life.generation == 1 and w.life.born == 5 and w.life.mealsBase == 9, "carryOn: the generation began on day 6 (born 5) with nine meals already eaten")
+	local born, meals = Mating.grace(w.life, 9)
+	check(born == 5 and meals == 0, "no meal of its own yet")
+	_, meals = Mating.grace(w.life, 11)
+	check(meals == 2, "two since")
+	local _, early = Mating.grace(w.life, 4)
+	check(early == 0, "never below nothing")
+	-- the rival: not on the hatching day, not before its first meal; from the second day with a meal
+	local function rivalDormant(day: number, mealsEaten: number): boolean
+		local r = Rival.new()
+		local s = { position = Vector3.new(0, 0.31, 8), previous = Vector3.new(0, 0.31, 8), heading = Vector3.xAxis, day = day, hour = 12, meals = mealsEaten, born = born,
+			resting = false, safe = false, wasp = false, gentle = false, grounded = true, moving = false, airborne = false, onLine = false, holding = false, striking = false }
+		Rival.step(r, DT, s, function() return false end)
+		return r.state == "dormant"
+	end
+	check(rivalDormant(6, 1), "the hatching day: protected, even with a meal (the sill's day counter says 6)")
+	check(rivalDormant(7, 0), "the next day with no meal of its own: protected")
+	check(not rivalDormant(7, 1), "the next day with a meal: the rival may come")
+	-- the old way, for contrast: nothing in the record means the sill's own day and meals (generation 0)
+	local r = Rival.new()
+	local s0 = { position = Vector3.new(0, 0.31, 8), previous = Vector3.new(0, 0.31, 8), heading = Vector3.xAxis, day = 7, hour = 12, meals = 1, resting = false, safe = false, wasp = false, gentle = false,
+		grounded = true, moving = false, airborne = false, onLine = false, holding = false, striking = false }
+	Rival.step(r, DT, s0, function() return false end)
+	check(r.state ~= "dormant", "a state with no `born` is the first generation's: no change")
+	-- the wasp: Block.born and the block's meals
+	local blocked = function(day: number, mealsEaten: number, b: number?): string
+		return WaspDirector.blocked(nil, { day = day, hour = 12, resting = false, moulting = false, meals = mealsEaten, born = b })
+	end
+	check(blocked(6, 1, 5) == "the first day" and blocked(7, 0, 5) == "no meal yet" and blocked(7, 1, 5) == "", "the wasp: protected on the hatching day and before the first meal, then free")
+	check(blocked(6, 1) == "" and blocked(1, 1) == "the first day", "and the first generation's rules are as before")
+	check(WaspDirector.MAX_SLOTS == #WaspData.game.windows and WaspDirector.MAX_SLOTS == 2, "MAX_SLOTS is the game's windows (two)")
+end)
+
+case("the grace is in the checkpoint's life; bad values are refused and an older record has none", function()
+	local w = fullWorld()
+	w.life.mating = Mating.new()
+	for _ = 1, 5 do fullTick(w) end
+	w.life.born, w.life.mealsBase = 5, 9
+	local good = assert(Checkpoint.capture(w, 0))
+	check(#(Checkpoint.check(good, w)) == 0, "a generation's grace is a good record")
+	local x = fullWorld()
+	check(Checkpoint.restore(good, x) and x.life.born == 5 and x.life.mealsBase == 9, "and restores")
+	for _, key in { "born", "mealsBase" } do
+		for _, bad in { -1, 0.5, 2e9 } do
+			local r = Json.copy(good)
+			local life = r.world.objects[r.world.roots.life["$o"]]
+			local found = false
+			for _, entry in life.e do if entry[1] == key then entry[2] = bad; found = true end end
+			check(found, `({key} is in the record)`)
+			local problems = Checkpoint.check(r, w)
+			check(#problems > 0 and string.find(table.concat(problems, "; "), "invalid " .. key, 1, true) ~= nil, `{key} of {bad} is refused`)
+		end
+	end
+	local plain = fullWorld()
+	for _ = 1, 5 do fullTick(plain) end
+	local rec = assert(Checkpoint.capture(plain, 0))
+	local life = rec.world.objects[rec.world.roots.life["$o"]]
+	for _, entry in life.e do check(entry[1] ~= "born" and entry[1] ~= "mealsBase", "a first-generation record has neither") end
+	check(#(Checkpoint.check(rec, plain)) == 0 and (select(2, Mating.grace(plain.life, 3))) == 3, "and means the sill's own")
 end)
 
 print(`MATING passed={passed} failed={failed}`)

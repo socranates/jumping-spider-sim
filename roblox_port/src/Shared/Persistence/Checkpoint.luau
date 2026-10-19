@@ -21,6 +21,9 @@
 -- Differences from Godot: the record is the port's own (its flies are the port's, Chet's ROBLOX flies, not Godot's), so
 -- Godot checkpoints are not read and schema numbers start again at 1. Schema 3 adds growth and its food ledger cursor.
 -- The passing shadow and notebook are not recorded.
+-- ROBLOX-91: nor are the two profiling windows of the live world: the prey director's `cpu` (the last 1200 ticks' microseconds) and the sensor's cost ring. They are
+-- clock readings, different on every run, and were about 2400 floats, twice the rest of the record; capture leaves them out and a restore (of an old record too)
+-- leaves them empty.
 
 local Species = require(script.Parent.Parent.Data.Species)
 local ObjectRecord = require(script.Parent.ObjectRecord)
@@ -135,7 +138,14 @@ end
 -- could not be recorded (a field this file does not know how to keep; the tests make sure there is none).
 function Checkpoint.capture(world: World, createdAt: number?): ({ [string]: any }?, string?)
 	local motor = world.motor
+	-- (the live windows are put aside for the capture and put straight back)
+	local prey, sensor = world.prey, world.sensor
+	local cpu, ring = prey.cpu, sensor._ring
+	if cpu ~= nil then prey.cpu = {} end
+	if ring ~= nil then sensor._ring = {} end
 	local graph, why = ObjectRecord.capture(liveRoots(world), Checkpoint.CLASSES, Checkpoint.refs(world))
+	if cpu ~= nil then prey.cpu = cpu end
+	if ring ~= nil then sensor._ring = ring end
 	if not graph then return nil, why end
 	return {
 		schema_version = Checkpoint.SCHEMA_VERSION, kind = Checkpoint.KIND, game = Checkpoint.GAME,
@@ -185,6 +195,11 @@ local function checkWorld(roots: { [string]: any }, problems: { string })
  if not Mate.valid(life.mate) then bad("life: invalid mate state") end
  for _, text in Mating.problemsWith(life.mating, life.mate) do bad(text) end
  if life.generation ~= nil and not (finite(life.generation) and life.generation >= 0 and life.generation <= 1e6 and life.generation % 1 == 0) then bad("life: invalid generation") end
+ -- ROBLOX-91: where this generation's grace began (Mating.grace); absent in a record from before (the first generation's: the sill's own day and meals).
+ for _, k in { "born", "mealsBase" } do
+  local v = life[k]
+  if v ~= nil and not (finite(v) and v >= 0 and v <= 1e9 and v % 1 == 0) then bad("life: invalid " .. k) end
+ end
  if type(life.resting) ~= "boolean" then bad("life: 'resting' is not true or false") end
 	-- The flies: unique ids, a known state, finite places, perches held only by flies that exist.
 	if type(prey.flies) ~= "table" then
@@ -295,6 +310,9 @@ function Checkpoint.restore(record: any, world: World): (boolean, { string })
 	if not ObjectRecord.commit(decoded, liveRoots(world)) then
 		return false, { "the live world is missing a part" }
 	end
+	-- The profiling windows are not in the record (an older one holds them): empty, and the sensor's window begins now.
+	world.prey.cpu = {}
+	world.sensor._ring = {}
 	world.motor:place(pos, n.Unit, h.Unit)
 	world.motor.gazePitch = p.gaze_pitch
 	if world.breakaway then world.breakaway:apply(record.breakaway) end

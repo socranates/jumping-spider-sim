@@ -186,20 +186,20 @@ local prey = PreyDirector.engine(sill, Species.fly_like_prototype, 914, 4, true)
 local flyBodies = FlyBodies.new(Workspace)
 local soundscape = Soundscape.new(Workspace)
 local waspBody = WaspBody.new(Workspace)
--- LIFE (ROBLOX-24): the windowsill runs the life clock, so hunger runs by its hours (NeedsModel life mode, Standard rules: the
--- port has no Easy mode yet). Feeding grants into the same model. The loop keeps the rest, sleep, daylight and the eyes' reach.
+-- LIFE (ROBLOX-24): the windowsill runs the life clock, so hunger runs by its hours (NeedsModel life mode, Standard rules to begin with; Easy and Free play
+-- switch the model to the gentle rules in applyRules, ROBLOX-91). Feeding grants into the same model. The loop keeps the rest, sleep, daylight and the eyes' reach.
 local needs = NeedsModel.new(true, false)
 needs:useGameRules()
 prey.feeding.needs = needs
 prey.feeding:useGameRules() -- an easier tap on a struggling fly (ROBLOX-72, Data/Catch.game), scaled by the prey's size (ROBLOX-77); Godot's numbers stay Feeding's defaults
 rivalLegs.grip = rivalLegs.Grip.new(needs) -- the grip on a caught rival (ROBLOX-77): its own controller, so the fly's is never disturbed
 local life = LifeLoop.new(needs, nil)
-life.growth:useGameRules() -- five housefly-equivalents to a moult, not Godot's three (ROBLOX-88, Growth.game)
+life.growth:useGameRules(needs.gentle) -- five housefly-equivalents to a moult in the standard rules, not Godot's three; three in the gentle modes (ROBLOX-88/91, Growth.game)
 -- The mud dauber wasp (ROBLOX-26): a port of Godot's wasp director (Shared/Predator/WaspDirector). It visits by day from the second day (twice a day in the
 -- game, ROBLOX-75), once the first meal is eaten, and not while the spider rests; it is heard (a caption with its direction) for 8 s before it can look.
 -- It reads the sill through the same casts as the senses. In the test place it never comes by itself (Workspace attribute Wasp = true
--- allows it); the attribute WaspForce = a place id ("floor_middle") brings it at once, for Studio and playtests. There is no Gentle
--- mode in Roblox yet, so a catch is always a catch.
+-- allows it); the attribute WaspForce = a place id ("floor_middle") brings it at once, for Studio and playtests. In Easy and Free play (`wasp.gentle`,
+-- set with the rules in applyRules) a catch is a touch and the wasp leaves.
 local testPlace = script.Parent:FindFirstChild("SilkPlayback") ~= nil
 local wasp: any = WaspDirector.new({
 	seed = 914, enabled = not testPlace,
@@ -229,12 +229,16 @@ local checkpointWorld: Checkpoint.World = { motor = motor, prey = prey, sensor =
 local function newStore(): any
 	return CheckpointStore.new(CheckpointStore.MemoryDataStore.new(), function(r: any): { string } return (Checkpoint.check(r, checkpointWorld)) end)
 end
-local stores = {main=newStore(), free=newStore()}
+-- One last rest for each slot (SaveRules.MODES, ROBLOX-91): the standard main life, the main life on Easy's gentle rules (it shared the main slot, so beginning Easy wiped the standard
+-- rest), and free play.
+local stores = {main=newStore(), free=newStore(), easy=newStore()}
 local checkpoints = stores.main
 life.save = function(): LifeLoop.CheckpointResult
 	-- The mating cycle (ROBLOX-80): a rest by a full-grown, well-fed spider makes a mate come, and the night's sleep that reached this morning has made the sac, so
 	-- this checkpoint keeps what the player has seen and a return to it never loses a night.
 	mateLegs.Mating.atRest(life, life.clock.day, life.clock.hour)
+	-- (ROBLOX-91: a full-grown spider too hungry for a visitor is told so at its rest; the notice rides with the checkpoint's own words)
+	local hungry = if mateLegs.Mating.tooHungry(life) then "\n" .. mateLegs.Text.TOO_HUNGRY else ""
 	for _, e in life.events do
 		if e.kind == "woke" then mateLegs.Mating.woke(life, e.day) end
 	end
@@ -247,8 +251,12 @@ life.save = function(): LifeLoop.CheckpointResult
 	end
 	local r = checkpoints:save(record)
 	if not r.ok then warn("[Windowsill] checkpoint: " .. r.message .. ": " .. table.concat(r.errors, "; ")) end
-	if r.ok and saveClient ~= nil then saveClient:sendRest(if checkpoints == stores.free then "free" else "main", record) end
-	return { ok = r.ok, message = r.message }
+	if r.ok and saveClient ~= nil then
+		local slot: string = "main" -- (the store this life rests in, by its name)
+		for name, st in stores :: { [string]: any } do if st == checkpoints then slot = name end end
+		saveClient:sendRest(slot, record)
+	end
+	return { ok = r.ok, message = r.message .. hungry }
 end
 local feedPending, cancelPending = false, false -- this frame's presses, for the next fixed tick (Godot's just_pressed)
 local lifeSpider: LifeLoop.Spider = { inRetreat = false, attached = true, still = true, holding = false, feeding = false }
@@ -663,7 +671,8 @@ local function returnToCheckpoint()
 	session.mode, session.rules, session.ended = life.mode or "main", life.rules or "standard", false
  mateLegs.reset()
  needs:useGameRules()
- life.growth:useGameRules() -- (a record from before has Godot's threshold)
+ prey.feeding:useGameRules() -- (always: a record from before, or one made by another build, may hold Godot's struggle)
+ life.growth:useGameRules(needs.gentle) -- (a record from before has Godot's threshold; Checkpoint.restore has set the record's rules)
  motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor())
  session:finishAdult(life.growth.stage)
 	session.summary = nil
@@ -685,9 +694,10 @@ local function setHudShown(shown: boolean)
 end
 local function applyRules()
  life.mode,life.rules=session.mode,session.rules
- needs:useGameRules()
- life.growth:useGameRules()
  needs.gentle=session.rules=="gentle";wasp.gentle=needs.gentle
+ needs:useGameRules()
+ prey.feeding:useGameRules()
+ life.growth:useGameRules(needs.gentle)
 end
 local function closeScreens()
  panel:hide();menu:hide();setHudShown(true);controls:clear();dropAll()
@@ -700,7 +710,8 @@ local function fresh(mode: string, easy: boolean, position: Vector3?): boolean
  mateLegs.reset()
  session:begin(mode,easy);applyRules();motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor())
  sensor:reset();memory:clear()
- stores[mode]=newStore();checkpoints=stores[mode]
+ local slot=SaveRules.slotOf(mode,session.rules)
+ stores[slot]=newStore();checkpoints=stores[slot]
  life.resting=false;life.notice="";life.noticeSeconds=0;life.restoreGrace=0
  wasp:load(WaspDirector.defaultRecord());wasp.gentle=needs.gentle
  if position then motor:place(position,Vector3.yAxis,Layout.SPAWN_HEADING) end
@@ -736,7 +747,7 @@ local function presentEnd(immediate: boolean)
  local cause=rec.cause
  local choices: {CaughtPanel.Choice}={}
  if checkpoints:loadBest().ok then table.insert(choices,{id="Back",text="Back to your last rest"}) end
- table.insert(choices,{id="Another",text="Continue as another spider"})
+ table.insert(choices,{id="Another",text=mateLegs.Text.another(mateLegs.Mating.hasSac(life.mating))}) -- (ROBLOX-91: a new life; the brood is left behind)
  table.insert(choices,{id="Notebook",text=NotebookText.MENU_CHOICE})
  panel:showChoices(if cause=="starved" then "The spider starved." elseif cause=="rival" then "The other spider caught you." else WaspText.LINE,
   if cause=="starved" then "It went too long without food." elseif cause=="rival" then "A hunter can become prey. You can return to your last rest." else WaspText.SUB,
@@ -868,7 +879,7 @@ function mateLegs.reset()
 end
 -- Carry on: the next generation is a spiderling again in the crack, the days of the sill go on, the notebook and the look are the player's own.
 function mateLegs.carryOn()
- local generation,day=mateLegs.Mating.carryOn(life,needs)
+ local generation,day=mateLegs.Mating.carryOn(life,needs,prey.feeding.mealsFinished)
  lastEnd=nil
  closeScreens()
  mateLegs.reset()
@@ -891,6 +902,7 @@ menu=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
  if choice=="Settings" then openSettings("menu");return end
  if choice=="Resume" then closeScreens();return end
  if choice=="Continue" then checkpoints=stores.main;closeScreens();returnToCheckpoint();return end
+ if choice=="ContinueEasy" then checkpoints=stores.easy;closeScreens();returnToCheckpoint();return end
  if choice=="Free" then
   local saved=stores.free:loadBest()
   if saved.ok then checkpoints=stores.free;closeScreens();returnToCheckpoint()
@@ -903,7 +915,7 @@ menu=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
  if choice=="New" or choice=="Easy" then
   if session.started and confirming~=choice then
    confirming=choice
-   menu:showChoices("Begin a new life?","This replaces the main life's last rest as soon as the new spider rests.","",
+   menu:showChoices("Begin a new life?",if choice=="Easy" then "This replaces the Easy life's last rest as soon as the new spider rests. The standard life's last rest is kept." else "This replaces the standard life's last rest as soon as the new spider rests. The Easy life's last rest is kept.","",
     {{id=choice :: string,text="Begin the new life"},{id="CancelNew",text="Keep this life"}},true)
    return
   end
@@ -921,6 +933,7 @@ openMenu=function()
  local choices: {CaughtPanel.Choice}={}
  if session.started then table.insert(choices,{id="Resume",text="Resume this spider"}) end
  if stores.main:loadBest().ok then table.insert(choices,{id="Continue",text="Continue from last rest"}) end
+ if stores.easy:loadBest().ok then table.insert(choices,{id="ContinueEasy",text="Continue the Easy life from its last rest"}) end
  table.insert(choices,{id="New",text="Begin a new life"})
  if session.finishedMain then table.insert(choices,{id="Easy",text="Begin a new life on Easy"}) end
  table.insert(choices,{id="Free",text="Free play - gentle rules"})
@@ -1027,7 +1040,7 @@ local function progressSnapshot(): any
 	return SaveProgress.snapshot(book:toRecord(), session.finishedMain, if spiderPick.touched then appearance else nil, settings)
 end
 local function adoptRest(mode: string, record: any)
-	if record == nil or (mode ~= "main" and mode ~= "free") then return end
+	if record == nil or stores[mode] == nil then return end
 	if session.started or stores[mode]:loadBest().ok then return end -- this visit has begun, or already has a rest of its own
 	local r = stores[mode]:save(record)
 	if not r.ok then warn("[Windowsill] saved " .. mode .. " rest not used: " .. r.message .. ": " .. table.concat(r.errors, "; ")) end
@@ -1058,6 +1071,7 @@ local function applySaved(msg: any)
 	if type(msg.rests) == "table" then
 		adoptRest("main", msg.rests.main)
 		adoptRest("free", msg.rests.free)
+		adoptRest("easy", msg.rests.easy)
 	end
 	lastSig = `{#book.opened}:{session.finishedMain}`
 	lastEye = book.eyeSeconds
@@ -1311,7 +1325,7 @@ local function updateHud(frameDt: number)
   if m~=nil and (m.stage=="sac" or m.stage=="guarding") then table.insert(view.status,mateLegs.Text.guardLine(m.guard_day,mateLegs.Rules.guardDays)) end
   if mateLegs.phase=="scene" and captionScale>0 then view.caption=mateLegs.Text.sceneCaption(mateLegs.stage.t) or view.caption end
  end
- if life.rival and life.rival.state=="captured" and not RivalSpider.struggling(life.rival) then table.insert(view.status,"Eating rival — stay still (2 meals)") end
+ if life.rival and life.rival.state=="captured" and not RivalSpider.struggling(life.rival) then table.insert(view.status,rivalLegs.Text.eating(Growth.mealsOf(RivalSpider.FOOD))) end
 	view.grip = if prey.feeding.struggling then prey.feeding.grip else rivalLegs.Grip.level(rivalLegs.grip)
 	if rivalLegs.Grip.active(rivalLegs.grip) then table.insert(view.status, rivalLegs.Text.struggle(ControlText.name(device,"jump"))) end
 	if prey.feeding.struggling then
@@ -1438,8 +1452,10 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			waspSpider.position, waspSpider.velocity = motor.pos, motor.vel
 			waspSpider.falling = fallingOnLine
 			waspSpider.airborne = motor.mode == "air" and not fallingOnLine and not motor.seized
+			-- (ROBLOX-91: the first day and first meal protect each generation: a spiderling's `born` and meals count from the hatching, not from the sill's first day)
+			local born, genMeals = mateLegs.Mating.grace(life, prey.feeding.mealsFinished)
 			wasp:step(DT, waspSpider, {
-				day = life.clock.day, hour = life.clock.hour, resting = life.resting, moulting = life.growth:isMoulting(), meals = prey.feeding.mealsFinished,
+				day = life.clock.day, hour = life.clock.hour, resting = life.resting, moulting = life.growth:isMoulting(), meals = genMeals, born = born,
 				rival = RivalSpider.target(life.rival),
 			})
 			for _, signal in wasp:drainSignals() do
@@ -1457,22 +1473,24 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 					if RivalSpider.seize(life.rival) and WaspText.heardRival((motor.pos - signal.at).Magnitude, not sightCast(motor.pos, signal.at)) then
 						life:showNotice(WaspText.RIVAL_TAKEN)
 					end
-				elseif signal.kind == "rival_carried_off" then
-					RivalSpider.carried(life.rival, life.clock.day)
+				elseif signal.kind == "rival_carried_off" and life.rival.state == "taken" then
+					RivalSpider.carried(life.rival, life.clock.day, life.clock.hour)
 				end
 			end
 			if wasp.rivalHeldAt and life.rival.state == "taken" then life.rival.position = wasp.rivalHeldAt end
 			if wasp.heldAt then motor:hold(wasp.heldAt) end
 			prey.feeding.auto = setting("AutomaticGrip") == true or mateLegs.couple.active -- (a meal in the legs is held for a player whose hands are the scene's: ROBLOX-89)
-			if life.growth.gameRules ~= true then life.growth:useGameRules() end -- (a family that carries on has a new growth)
+			if life.growth.gameRules ~= true then life.growth:useGameRules(needs.gentle) end -- (a family that carries on has a new growth)
 			if prey.feeding.game ~= true then prey.feeding:useGameRules() end -- (a record restored from before the flag has none: the game's struggle again)
 			local takenBefore = prey.feeding.taken
 			prey:after(DT,motor,sensor,sightCast)
 			-- Five houseflies or ten small prey (ROBLOX-88; Godot's three and six are Growth's defaults); credit food, not just spare energy capacity.
-			life.mealFood = (life.mealFood or 0) + (prey.feeding.taken-takenBefore) * Growth.READY_FOOD / (3 * Species.fly_like_prototype.body.nutrition)
+			life.mealFood = (life.mealFood or 0) + Growth.rivalCredit(prey.feeding.taken-takenBefore)
             local rivalState={
              position=motor.pos,previous=prey.previousPosition or motor.pos,heading=motor.heading,up=motor.up,
-             day=life.clock.day,hour=life.clock.hour,meals=prey.feeding.mealsFinished,resting=life.resting,safe=Layout.inRetreat(motor.pos),
+             day=life.clock.day,hour=life.clock.hour,meals=genMeals,born=born,resting=life.resting,safe=Layout.inRetreat(motor.pos),
+             -- the rival keeps away from a courting pair and from the mating scene (ROBLOX-91): it recovers, like for the wasp
+             scene=mateLegs.Mate.sceneActive(life.mate),courting=mateLegs.Mate.courting(life.mate,motor.pos),
              wasp=wasp:isVisiting(),gentle=needs.gentle,grounded=motor.mode=="attached",moving=motor.moving,
              airborne=motor.mode=="air",onLine=motor:onLine(),holding=prey.feeding.held~=nil,
              striking=prey.tick<=prey.strikeEnd and not motor.seized,drive=rivalLegs.drive,taken=wasp.holdingRival,
@@ -1495,7 +1513,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
             if rivalLegs.drive then rivalLegs.drive:update(life.rival,DT,rivalState) end
             if rivalFood>0 and rivalEvent~="counter" then -- (a counter-bite's number is what it costs, not what was eaten)
              needs:grantEnergy(rivalFood,"rival_spider_meal")
-             life.mealFood+=rivalFood*Growth.READY_FOOD/(3*Species.fly_like_prototype.body.nutrition)
+             life.mealFood+=Growth.rivalCredit(rivalFood)
             end
             if rivalEvent=="caught" then endLife("rival")
             elseif rivalEvent=="warning" then rig:cue("alarm");spiderPick.finish(spiderPick.Text.DANGER, true);life:showNotice("The other spider crouches to jump. Dodge, drop or jump away!")
@@ -1510,6 +1528,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
              local ms=table.clone(rivalState)
              ms.drive,ms.sex,ms.needsDance,ms.dancing,ms.blocked=mateLegs.drive,mateLegs.Mating.sexOf(appearance),SpiderChoice.canDance(appearance),dance.active,sightCast
              if mateLegs.couple.active and wasp:isVisiting() then mateLegs.skip(true) end -- (the controls are the player's again the moment the wasp comes)
+             ms.rivalThreat=life.rival.state=="windup" or life.rival.state=="lunge" -- (a scene would not start under a lunge: Mating.tick skips it at once)
              for _,e in mateLegs.Mating.tick(life,DT,ms) do mateLegs.event(e,ms) end
              local mate=life.mate
              if mate~=nil and mate.state~="away" and mateLegs.drive==nil then
@@ -1717,7 +1736,7 @@ if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
 			prey = prey, flyBodies = flyBodies, waspBody = waspBody, life = life, wasp = wasp, caughtPanel = panel, needs = needs, checkpoints = checkpoints, returnToCheckpoint = function() returnToCheckpoint() end, lifeSpider = function() return lifeSpider end, sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
 			input = controls, rivalLegs = rivalLegs, mateLegs = mateLegs, spiderPick = spiderPick,
 			notebook = book, notebookWatch = watch, notebookPanel = nbPanel, openNotebook = openNotebook, settingsPanel = settingsPanel, openSettings = openSettings, setting = setting, cam = cam, soundscape = soundscape, eyes = eyes,
-			session=session, menu=menu, openMenu=openMenu, endLife=endLife, fresh=fresh, continueAnother=continueAnother, currentStore=function() return checkpoints end,
+			session=session, menu=menu, openMenu=openMenu, endLife=endLife, fresh=fresh, stores=stores, continueAnother=continueAnother, currentStore=function() return checkpoints end,
 			changeSpider = function() changeSpider() end, dance = function() return dance end, ant = function() return ant.state end, antPose = function() return ant.pose end, threat = function() return ant.threat end, threatPose = function() return ant.threatPose end, appearance = function() return appearance end, rig = function() return rig end,
 			drop = function() motor:requestDrop() end,
 			jump = jump,

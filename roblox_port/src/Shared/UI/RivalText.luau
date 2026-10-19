@@ -18,6 +18,11 @@ function RivalText.counter(gentle: boolean): string
 	return if gentle then RivalText.COUNTER_GENTLE else RivalText.COUNTER
 end
 
+-- The status line while the caught rival is being eaten (ROBLOX-91): `meals` is what it is worth in housefly meals (Growth.mealsOf of its food), not a number written here.
+function RivalText.eating(meals: number): string
+	return `Eating rival — stay still ({meals} meals)`
+end
+
 -- The status line while the rival fights the grip: the fly's wording (Caught — tap Jump to keep your grip), in the rival's own words. `button` is
 -- the name of the jump button on this device.
 function RivalText.struggle(button: string): string

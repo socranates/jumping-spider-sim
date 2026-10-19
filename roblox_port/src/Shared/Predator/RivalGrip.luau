@@ -32,10 +32,11 @@ function Grip.tap(g: any)
 	g.feeding:press()
 end
 
--- The seeded stream of this rival's struggle: the world's seed, the day and which contest it was (the rival's own count), so the same encounter
--- fights the same way. Nothing else in the game draws from it.
-local function seedOf(seed: number, day: number, n: number): number
-	return (seed * 19349663 + (day * 1013 + 7) * 83492791 + n * 73856093 + 54321) % 2147483647
+-- The seeded stream of this rival's struggle: the world's seed, the day, which contest it was (the rival's own count) and, ROBLOX-91, which grip on it this was
+-- (`grips`, kept in its record: a rival that tore free and is caught again, without a contest in between, does not jerk at the same moments as the first time).
+-- The first grip (grips 0) is the seed it always was. Nothing else in the game draws from it.
+local function seedOf(seed: number, day: number, n: number, grips: number): number
+	return (seed * 19349663 + (day * 1013 + 7) * 83492791 + n * 73856093 + grips * 40503793 + 54321) % 2147483647
 end
 
 -- One tick. `r` is the rival's record, `s` the same table RivalSpider.step gets (grounded, gentle, day, seed) plus `auto` (Automatic grip).
@@ -48,7 +49,8 @@ function Grip.step(g: any, r: any, dt: number, s: any): string
 	end
 	local event = ""
 	if not f.struggling then
-		f.rng = PreyRandom.new(seedOf(s.seed or 0, s.day or 0, r.contests or 0))
+		f.rng = PreyRandom.new(seedOf(s.seed or 0, s.day or 0, r.contests or 0, r.grips or 0))
+		r.grips = (r.grips or 0) + 1
 		f:useRivalRules(s.gentle == true)
 		f.tap = false
 		f:capture(r)

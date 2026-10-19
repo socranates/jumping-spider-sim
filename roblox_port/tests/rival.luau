@@ -232,18 +232,18 @@ do -- a holding spider, a lunging rival and a blocked line are not strikes
   check(r.contests==0 and e~="sprang" and e~="counter" and e~="captured",`{c}: no contest`)
  end
 end
-do -- the gentle modes: the bite costs nothing
+do -- the gentle modes: the bite costs nothing (and the odds are ROBLOX-73's, not ROBLOX-88's: ROBLOX-91)
+ local gd,sd
  for d=1,200 do
-  if R.contest(914,d,0)=="counter" then
-   local r=R.new();r.state="stalk";r.position=Vector3.new(24,.31,8);r.previous=r.position
-   local e,cost=R.step(r,1/60,strike(r,d,true),clear)
-   check(e=="counter" and cost==0 and r.state=="recover","gentle: the counter-bite is the same event and costs nothing")
-   local r2=R.new();r2.state="stalk";r2.position=Vector3.new(24,.31,8);r2.previous=r2.position
-   local e2,cost2=R.step(r2,1/60,strike(r2,d,false),clear)
-   check(e2=="counter" and cost2==.30,"and standard rules: 0.30")
-   break
-  end
+  if gd==nil and R.contest(914,d,0,true)=="counter" then gd=d end
+  if sd==nil and R.contest(914,d,0)=="counter" then sd=d end
  end
+ local r=R.new();r.state="stalk";r.position=Vector3.new(24,.31,8);r.previous=r.position
+ local e,cost=R.step(r,1/60,strike(r,gd,true),clear)
+ check(e=="counter" and cost==0 and r.state=="recover","gentle: the counter-bite is the same event and costs nothing")
+ local r2=R.new();r2.state="stalk";r2.position=Vector3.new(24,.31,8);r2.previous=r2.position
+ local e2,cost2=R.step(r2,1/60,strike(r2,sd,false),clear)
+ check(e2=="counter" and cost2==.30,"and standard rules: 0.30")
 end
 do -- the record: the count and the flag are checked
  for _,bad in {-1,0/0,math.huge,1.5,"2",true} do local b=R.new();b.contests=bad;check(not R.valid(b),`a contest count of {tostring(bad)} is refused`) end
@@ -394,11 +394,15 @@ do -- tearing free: simply gone from the fangs, to recover; nothing drawn, nothi
  check(r.state=="patrol" or r.state=="stalk" or r.state=="windup","three seconds on it patrols again")
  s.day=9;s.hour=7.2;R.step(r,1/60,s,clear)
  check(r.state~="dormant" and r.food==R.FOOD and r.contests==c,"the next morning it is the same rival (not renewed, not dormant)")
- -- it can be caught again, and the second fight is its own
+ -- it can be caught again, and the second fight is its own (ROBLOX-91: but not for free: it is shaken, so the strike is the contest again)
  local r2,s2=held(8);fight(r2,s2,0,10)
  r2.position=s2.position+Vector3.xAxis*.2;r2.previous=r2.position
  s2.striking=true;s2.previous=s2.position
- check(R.step(r2,1/60,s2,clear)=="captured" and R.struggling(r2),"a recovering rival can be caught again (recover is a free catch, ROBLOX-73), and it fights again")
+ local n2=r2.contests
+ local want=R.contest(914,8,n2)
+ local e2=R.step(r2,1/60,s2,clear)
+ check(e2==want and r2.contests==n2+1,"a rival that tore free is shaken: the strike at it is the contest again, with its draw")
+ check((e2=="captured")==R.struggling(r2),"and a catch fights again")
  -- tearing free never harms the spider: no event of harm, whatever the mode
  for _,gentle in {false,true} do
   local g1,g2=held(10,gentle)
@@ -440,6 +444,166 @@ do -- the words
  check(string.find(RivalText.SUBDUED,"Stay still to eat",1,true)~=nil and string.find(RivalText.SUBDUED,"two housefly meals",1,true)~=nil,"the subdued line has the old eating words")
  check(RivalText.tore(false)==RivalText.TORE and RivalText.tore(true)==RivalText.TORE_GENTLE and string.find(RivalText.TORE_GENTLE,"safe in this mode",1,true)~=nil,"tearing free: gentle says you are safe")
  check(RivalText.struggle("Space")=="Holding the rival — tap Space to keep your grip","the status line has the fly's words for the rival")
+end
+-- ---------------------------------------------------------------- the audit, part one (ROBLOX-91)
+do -- a rival that tore free is shaken: aware, and the strike at it is the contest (with the counter-bite), not a free re-catch
+ local r,s=held(9);fight(r,s,0,10)
+ check(r.state=="recover" and r.shaken==true and R.aware(r) and R.valid(r),"tearing free leaves it shaken, aware and a good record")
+ local plain=R.new();plain.state="recover"
+ check(not R.aware(plain),"a recovering rival that was not shaken is still not aware (a free catch, as before)")
+ -- a counter-bite after tearing free, with its cost; the contests count moves on
+ local found=false
+ for day=2,200 do
+  local a,sa=held(day);fight(a,sa,0,10)
+  local n=a.contests
+  if R.contest(914,day,n)=="counter" then
+   a.position=sa.position+Vector3.xAxis*.2;a.previous=a.position;sa.striking=true;sa.previous=sa.position
+   local e,cost=R.step(a,1/60,sa,clear)
+   check(e=="counter" and cost==.30 and a.contests==n+1 and a.state=="recover","a strike after tearing free draws the contest and can bite back, costing 0.30 (day "..day..")")
+   check(a.shaken==true,"it is still shaken after springing the strike (the phase did not change)")
+   found=true;break
+  end
+ end
+ check(found,"(a day with a counter-bite was found)")
+ -- the mark goes at the next change of phase: three seconds on it patrols, and is plainly aware only by its notice
+ local b,sb=held(9);fight(b,sb,0,10);sb.hour=12
+ for _=1,60*4 do R.step(b,1/60,sb,clear) end
+ check(b.state~="recover" and b.shaken==nil,"it is no longer shaken when it goes back to patrol")
+ -- a pause (a wasp visit) does not clear it: the state does not change
+ local c,sc=held(9);fight(c,sc,0,10);sc.wasp=true
+ R.step(c,1/60,sc,clear)
+ check(c.shaken==true and c.state=="recover","a pause in recover leaves the mark")
+ -- records: optional boolean; an old record has none
+ local g=R.new();g.shaken=true;check(R.valid(g),"shaken true is a good record")
+ g.shaken=false;check(R.valid(g),"and false")
+ for _,bad in {1,"yes",0} do local x=R.new();x.shaken=bad;check(not R.valid(x),`a shaken of {tostring(bad)} is refused`) end
+ check(R.valid(R.new()) and R.new().shaken==nil,"a record with none restores (an older one)")
+ local used=R.new();used.shaken=true;R.renew(used);check(used.shaken==nil,"a new rival is not shaken")
+ -- a caught rival (a catch is a phase change) has no mark
+ local d,sd=held(9);fight(d,sd,0,10)
+ for day=2,200 do
+  local x,sx=held(day);fight(x,sx,0,10);local n=x.contests
+  if R.contest(914,day,n)=="captured" then
+   x.position=sx.position+Vector3.xAxis*.2;x.previous=x.position;sx.striking=true;sx.previous=sx.position
+   check(R.step(x,1/60,sx,clear)=="captured" and x.shaken==nil and x.contests==n+1,"a re-catch after tearing free is a draw that caught it, and the mark goes")
+   break
+  end
+ end
+end
+do -- the gentle contest keeps ROBLOX-73's odds and the standard ROBLOX-88's; the draw is the same stream
+ check(Rules.contestCaptured==.40 and Rules.contestSprang==.32 and Rules.contestGentle.captured==.55 and Rules.contestGentle.sprang==.25,"the numbers: 40/32/28 standard, 55/25/20 gentle")
+ local N=6000;local std={captured=0,sprang=0,counter=0};local gen={captured=0,sprang=0,counter=0}
+ local differ=0
+ for i=1,N do
+  local a,b=R.contest(914,2+i%9,i//7),R.contest(914,2+i%9,i//7,true)
+  std[a]+=1;gen[b]+=1;if a~=b then differ+=1 end
+ end
+ check(math.abs(std.captured/N-.40)<.03 and math.abs(std.sprang/N-.32)<.03 and math.abs(std.counter/N-.28)<.03,`standard rates {std.captured/N} {std.sprang/N} {std.counter/N}`)
+ check(math.abs(gen.captured/N-.55)<.03 and math.abs(gen.sprang/N-.25)<.03 and math.abs(gen.counter/N-.20)<.03,`gentle rates {gen.captured/N} {gen.sprang/N} {gen.counter/N}`)
+ check(differ>0,"and they are different draws of the same stream")
+ -- through the step: the gentle flag chooses the odds
+ local c1,c2=0,0
+ for i=1,N//4 do
+  for _,gentle in {false,true} do
+   local r=R.new();r.state="stalk";r.position=Vector3.new(24,.31,8);r.previous=r.position;r.contests=i//7
+   local e=R.step(r,1/60,strike(r,2+i%9,gentle),clear)
+   if e=="captured" then if gentle then c2+=1 else c1+=1 end end
+  end
+ end
+ check(c2>c1 and math.abs(c2/(N//4)-.55)<.04 and math.abs(c1/(N//4)-.40)<.04,`a gentle strike catches the aware rival {c2/(N//4)} of the time, a standard one {c1/(N//4)}`)
+ -- the gentle grip and free bite are as they were
+ local gentleGrip=Catch.forRival(true);local scaled=Catch.scaled(1)
+ check(gentleGrip.drainScale==scaled.drainScale and gentleGrip.tire==scaled.tire and gentleGrip.startGrip==scaled.startGrip,"the gentle grip is the house fly's")
+end
+do -- the rival keeps away from a courting pair and from the mating scene (pauses like the wasp), and does not arrive then
+ for _,flag in {"scene","courting"} do
+  for _,st in {"windup","lunge","stalk","patrol"} do
+   local r=R.new();r.state=st;r.position=Vector3.new(24,.31,8);r.previous=r.position;r.origin=r.position;r.target=r.position;r.notice=.8
+   local s=player();s.position=Vector3.new(21,.31,8);s.previous=s.position;s[flag]=true
+   local e=R.step(r,1/60,s,clear)
+   check(r.state=="recover" and r.notice==0 and e=="","paused by "..flag.." while "..st)
+  end
+  local d=R.new();local s=player();s[flag]=true
+  R.step(d,1/60,s,clear)
+  check(d.state=="dormant","no arrival while "..flag)
+  s[flag]=false;R.step(d,1/60,s,clear)
+  check(d.state=="patrol","and it comes once it is over ("..flag..")")
+ end
+ -- a lunge cannot land on a courting spider
+ local r=R.new();r.state="lunge";r.position=Vector3.new(24,.31,8);r.previous=r.position;r.origin=r.position;r.target=Vector3.new(21,.31,8)
+ local s=player();s.position=Vector3.new(21,.31,8);s.previous=s.position;s.courting=true
+ local hit=false
+ for _=1,60 do local e=R.step(r,1/60,s,clear);if e=="caught" or e=="touch" then hit=true end end
+ check(not hit and r.state=="recover","a lunge under way does not land on a courting spider")
+end
+do -- the new rival comes at the next morning (07:00), not at the next value of the day counter
+ local function eatenAt(day,hour)
+  local r=R.new();r.state="captured";r.subdued=true;r.food=.001
+  local s=player();s.position=Vector3.new(24,.31,8);s.previous=s.position;s.day=day;s.hour=hour
+  s.position=r.position-s.heading*.4 -- (the caught rival sits .4 ahead of the spider)
+  local e
+  for _=1,10 do e=R.step(r,1/60,s,clear);if e=="eaten" then break end end
+  return r,s
+ end
+ local function renewsAt(r,s,day,hour)
+  local c=table.clone(r);local t=player();t.day=day;t.hour=hour;t.position=Vector3.new(0,.31,8);t.previous=t.position
+  R.step(c,1/60,t,clear);return c.state~="consumed"
+ end
+ local r,s=eatenAt(3,23.9)
+ check(r.state=="consumed" and r.day==3 and r.hour==23.9,"it was eaten at 23:54 of day 3 (and the hour is kept)")
+ check(not renewsAt(r,s,3,23.99) and not renewsAt(r,s,4,0.5) and not renewsAt(r,s,4,6.99),"it does not come again before the morning")
+ check(renewsAt(r,s,4,7.0),"an eaten rival just before midnight still comes at 07:00 the next morning")
+ local late,sl=eatenAt(4,2.0)
+ check(not renewsAt(late,sl,4,6.9) and renewsAt(late,sl,4,7.0),"one eaten at 02:00 of day 4 belongs to the night before: it comes at 07:00 of the same day 4")
+ local noon,sn=eatenAt(3,12)
+ check(not renewsAt(noon,sn,4,3) and renewsAt(noon,sn,4,7),"one eaten at noon comes at 07:00 the next day (and not in the small hours)")
+ check(not renewsAt(noon,sn,3,20),"and not in the evening of the same day")
+ local early,se=eatenAt(3,6.5)
+ check(renewsAt(early,se,3,7.0),"one eaten at 06:30 is of the night before: it comes at 07:00 that morning")
+ -- an older record (no hour): the day's own morning, as before
+ local old=R.new();old.state="consumed";old.day=3;old.food=0
+ check(R.valid(old) and not renewsAt(old,s,3,12) and not renewsAt(old,s,4,6) and renewsAt(old,s,4,7),"a record with no hour comes the morning after its day, as before")
+ for _,bad in {-1,24,0/0,"7",true} do local x=R.new();x.hour=bad;check(not R.valid(x),`an hour of {tostring(bad)} is refused`) end
+ local g=R.new();g.hour=3.5;check(R.valid(g),"an hour in [0, 24) is good")
+ -- taken by the wasp: the same, with its hour
+ local w=R.new();w.state="taken";local sw=player();sw.day=5;sw.hour=23.5
+ R.step(w,1/60,sw,clear)
+ check(w.state=="consumed" and w.fate=="taken by the wasp" and w.day==5 and w.hour==23.5,"carried off at 23:30: the day and the hour are kept")
+ check(renewsAt(w,sw,6,7.0) and not renewsAt(w,sw,6,6.0),"and a new one comes at 07:00 next morning")
+ check(R.morning(3,6.9)==2 and R.morning(3,7)==3 and R.morning(3,nil)==3,"the morning of an hour")
+end
+do -- a grip is its own: the seed carries how many grips this rival has had (kept in its record), the first one unchanged
+ local PreyRandom=require("../src/Shared/Prey/PreyRandom")
+ local r,s=held(6);local g=Grip.new()
+ check(Grip.step(g,r,1/60,s)=="begin" and r.grips==1,"the first grip counts itself")
+ local oldSeed=(914*19349663+(6*1013+7)*83492791+r.contests*73856093+54321)%2147483647
+ local ref=Feeding.new();ref.rng=PreyRandom.new(oldSeed);ref:useRivalRules(false);ref:capture(r)
+ check(g.feeding.venom==ref.venom and math.abs(g.feeding.jerk-(ref.jerk-1/60))<1e-9,"the first grip draws as it always did (the old seed)")
+ -- the same rival caught again (grips 1): another stream
+ local differ=0
+ for day=2,40 do
+  local a,sa=held(day);local b,sb=held(day);b.grips=1
+  local ga,gb=Grip.new(),Grip.new()
+  Grip.step(ga,a,1/60,sa);Grip.step(gb,b,1/60,sb)
+  if ga.feeding.venom~=gb.feeding.venom or ga.feeding.jerk~=gb.feeding.jerk then differ+=1 end
+  check(a.grips==1 and b.grips==2,"each grip counts")
+ end
+ check(differ>=35,`the second grip on a rival draws differently ({differ} of 39 days)`)
+ -- a tear, a second catch (a re-strike) and a second grip: a new fight, the same rival
+ local x,sx=held(8);fight(x,sx,0,10)
+ check(x.grips==1,"one grip so far")
+ for day=8,8 do
+  x.position=sx.position+Vector3.xAxis*.2;x.previous=x.position;sx.striking=true;sx.previous=sx.position
+  x.contests=0;x.state="recover";x.shaken=nil -- (a catch that needs no draw, as for an unshaken rival)
+  check(R.step(x,1/60,sx,clear)=="captured","caught again")
+ end
+ sx.striking=false;sx.previous=sx.position
+ local g2=Grip.new();Grip.step(g2,x,1/60,sx)
+ check(x.grips==2 and R.valid(x),"the second grip is counted")
+ for _,bad in {-1,1.5,0/0,"2",true,1e10} do local b=R.new();b.grips=bad;check(not R.valid(b),`a grip count of {tostring(bad)} is refused`) end
+ local ok=R.new();ok.grips=4;check(R.valid(ok),"and a whole number is good")
+ local old=R.new();old.grips=nil;check(R.valid(old),"an older record has none (it means none yet)")
+ local used=R.new();used.grips=5;R.renew(used);check(used.grips==0,"a new rival starts again")
 end
 print(`RIVAL passed={passed} failed={failed}`)
 if failed>0 then error("rival tests failed") end

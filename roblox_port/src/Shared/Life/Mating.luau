@@ -88,6 +88,22 @@ function Mating.generation(life: any): number
 	return if type(life.generation) == "number" then life.generation else 0
 end
 
+-- ROBLOX-91: is a full-grown spider at a rest too hungry for a visitor? Only before a cycle has begun (stage none, no morning set) and only when the one thing missing
+-- is the energy: the notice "Too hungry for a visitor to come" (MateText) is for that rest, so the gate no longer fails in silence. Asked at the same moment as atRest.
+function Mating.tooHungry(life: any): boolean
+	local m = life.mating
+	if m ~= nil and (m.stage ~= nil and m.stage ~= "none" or (m.ready_day or 0) > 0) then return false end
+	local g = life.growth
+	return g ~= nil and g:isAdult() and life.needs.energy < Rules.energyMin - 1e-9
+end
+
+-- ROBLOX-91: the protections of a new life (no rival or wasp on the first day, none before the first meal) belong to a generation, not to the sill's day counter and
+-- the meals of every family before: the day before this generation began (0 for the first) and its own count of meals, given the total finished so far.
+function Mating.grace(life: any, mealsFinished: number): (number, number)
+	local base = if type(life.mealsBase) == "number" then life.mealsBase else 0
+	return if type(life.born) == "number" then life.born else 0, math.max(0, mealsFinished - base)
+end
+
 -- The day of the 07:00 morning the clock is in (the hours before it belong to the day before).
 local function morningOf(day: number, hour: number): number
 	return if hour >= Rules.arriveHour then day else day - 1
@@ -115,7 +131,7 @@ end
 
 -- One fixed tick of the whole cycle. `s` is the player's snapshot (see Predator/Mate.step) with day, hour, seed and `sex`, `needsDance`, `dancing`. Returns
 -- the events of the tick, in order: "arrived" (with "new_mate" before it when it is another mate), "noticed", "driven", "courted", "mated", "gone",
--- "guard_day" (the second guard day began) and "hatched".
+-- "guard_day" (the second guard day began) and "hatched". `s.rivalThreat` (the rival is winding up or lunging, ROBLOX-91) turns "courted" into "courted", "mated".
 function Mating.tick(life: any, dt: number, s: any): { string }
 	local events: { string } = {}
 	local m = Mating.normalize(life.mating or Mating.new())
@@ -155,6 +171,12 @@ function Mating.tick(life: any, dt: number, s: any): { string }
 	elseif event == "courted" then
 		m.stage = "courted"
 		table.insert(events, "courted")
+		-- ROBLOX-91: the rival is already winding up or lunging as the meter fills (the caller says so in `s.rivalThreat`): the scene would hold the player in the open, so it is skipped
+		-- at once, as for a wasp's visit, and they have mated.
+		if s.rivalThreat == true and Mate.skip(mate, true) == "mated" then
+			m.stage = "mated"
+			table.insert(events, "mated")
+		end
 	elseif event == "mated" then
 		m.stage = "mated"
 		table.insert(events, "mated")
@@ -185,12 +207,15 @@ end
 
 -- The next generation (after the hatching scene and the ending card). The spider is a spiderling again: the first growth stage and a fresh energy, rested;
 -- the days of the sill go on; the mating state and the mate are new, so the cycle can happen again. Notebook, appearance and the world are not touched.
--- Returns the new generation number and the day it hatched.
-function Mating.carryOn(life: any, needs: any): (number, number)
+-- Returns the new generation number and the day it hatched. ROBLOX-91: it also starts the generation's grace (Mating.grace): the hatching day is its first day, and
+-- `mealsFinished` (the meals eaten so far by every family) is the count its first meal is measured from.
+function Mating.carryOn(life: any, needs: any, mealsFinished: number?): (number, number)
 	local m = Mating.normalize(life.mating or Mating.new())
 	local day = m.hatch_day
 	local generation = Mating.generation(life) + 1
 	life.generation = generation
+	life.born = math.max(0, day - 1)
+	life.mealsBase = math.max(0, mealsFinished or 0)
 	life.growth = Growth.new()
 	life.grantedSeen = needs.grantedTotal
 	life.mealFood = nil

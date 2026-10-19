@@ -806,6 +806,114 @@ check("a record returned to during the scene's world, a reset and a new life lea
 	local _ = mate
 end)
 
+check("the rival keeps away from the courting pair and the scene (ROBLOX-91): it recovers, unaware, and a lunge in progress is not carried into the scene", function()
+	local d = ClientStubs.driver
+	local life = d.life
+	local r = life.rival
+	assert(r ~= nil, "a rival")
+	local function setRival(state: string)
+		r.state, r.elapsed, r.notice, r.contests, r.spared, r.shaken = state, 0, 0.8, 0, nil, nil
+		r.position = Vector3.new(-12, 0.31, -9)
+		r.previous = r.position
+	end
+	setRival("patrol")
+	-- the courting range alone (the mate near, the meter not yet filled)
+	d.place(OPEN)
+	frames(5)
+	life.clock.hour = 9.0
+	local mate = Mate.new()
+	mate.sex, mate.scale = "female", 1
+	local function bring()
+		mate.state, mate.elapsed, mate.meter, mate.lost = "attend", 0, 0, 0
+		mate.position = d.motor.pos + Vector3.new(0, 0, 1.5)
+		mate.previous = mate.position
+		mate.heading, mate.up = -Vector3.zAxis, Vector3.yAxis
+	end
+	bring()
+	life.mate = mate
+	life.mating = Mating.normalize({ stage = "none", ready_day = 1, mates = 1, visits = 1, visit_day = life.clock.day })
+	setRival("stalk")
+	frames(1)
+	assert(r.state == "recover" and r.notice == 0, `a pair in courting range: the rival recovers, unaware ({r.state}, notice {r.notice})`)
+	bring()
+	setRival("windup")
+	frames(1)
+	assert(r.state == "recover" and r.notice == 0, `and a windup does not go on ({r.state})`)
+	-- the scene itself
+	mate = court(d, "female", true)
+	setRival("lunge")
+	frames(2)
+	assert(mate.scene == true and r.state == "recover" and r.notice == 0, `in the scene: the rival keeps away ({r.state})`)
+	untilScene(d, 3.0)
+	assert(d.mateLegs.couple.active and r.state == "recover", "and through it")
+	mate.elapsed = Rules.leaveSeconds
+	for _ = 1, 10 * 20 do
+		if not d.mateLegs.couple.active and not mate.scene then break end
+		wait(0.1)
+		life.clock.hour = 9.0
+	end
+	mate.elapsed = Rules.leaveSeconds
+	frames(3)
+	-- afterwards it goes about its business again (it is no longer held in recover)
+	setRival("patrol")
+	frames(30)
+	assert(r.state ~= "recover", `the rival goes about its business again once the pair have parted ({r.state})`)
+end)
+
+check("a rest too hungry for a visitor says so (ROBLOX-91), and no visitor is set going", function()
+	local d = ClientStubs.driver
+	local life = d.life
+	life.mate = nil
+	life.mating = Mating.normalize({ stage = "none", ready_day = 0, mates = 0, visits = 0 })
+	life.growth.stage = 3
+	d.place(CRACK)
+	frames(30)
+	life.clock.hour = 12.0
+	d.needs.energy = 0.4
+	life.notice, life.noticeSeconds = "", 0
+	frames(2)
+	key("Feed", true); frames(2); key("Feed", false); frames(2)
+	assert(life.resting, "E did not rest")
+	assert(string.find(life.notice, "Too hungry for a visitor to come", 1, true), `the notice: "{life.notice}"`)
+	assert(life.mating.ready_day == 0 and life.mating.stage == "none", "and no morning was set")
+	-- fed, the same rest sets the cycle going and says nothing of hunger
+	key("Feed", true); frames(2); key("Feed", false); frames(2)
+	d.needs.energy = 0.8
+	life.notice, life.noticeSeconds = "", 0
+	key("Feed", true); frames(2); key("Feed", false); frames(2)
+	assert(life.resting and life.mating.ready_day > 0 and not string.find(life.notice, "Too hungry", 1, true), `a fed spider: ready day {life.mating.ready_day}, notice "{life.notice}"`)
+	assert(string.find(MateText.SAC, "Rest in the crack to pass the nights", 1, true), "the sac line says to rest in the crack")
+end)
+
+check("the guard-day end card: starting over is a new life, and says the brood is lost while there is a sac (ROBLOX-91)", function()
+	local d = ClientStubs.driver
+	local life = d.life
+	key("Feed", true); frames(2); key("Feed", false); frames(2)
+	life.resting = false
+	life.mating = Mating.normalize({ stage = "sac", sac_day = 4, guard_day = 1, mates = 1 })
+	assert(Mating.hasSac(life.mating), "a sac")
+	local function allText(): string
+		local out = {}
+		for _, g in gui:GetChildren() do
+			for _, x in g:GetDescendants() do
+				local ok, t = pcall(function() return (x :: any).Text end)
+				if ok and type(t) == "string" then table.insert(out, t) end
+			end
+		end
+		return table.concat(out, "\n")
+	end
+	d.endLife("starved")
+	frames(3)
+	local text = allText()
+	assert(string.find(text, "the brood is lost", 1, true), "the new-spider choice says the brood is lost")
+	assert(string.find(text, "Back to your last rest", 1, true), "and the way back is the last rest")
+	assert(MateText.another(false) == MateText.ANOTHER and not string.find(MateText.another(false), "brood", 1, true), "with no sac it is the plain words")
+	-- A new life is generation 0 with no sac.
+	d.continueAnother()
+	frames(3)
+	assert(not Mating.hasSac(life.mating) and (life.generation or 0) == 0, `a new life: stage {life.mating.stage}, generation {life.generation}`)
+end)
+
 check("the notebook page is sourced and honest: the real citations, the game's departures, no 'no mating simulation' left", function()
 	local page
 	for _, p in NotebookPages.pages do if p.id == "eggs_and_wind" then page = p end end

@@ -44,15 +44,12 @@ function Catch.scaled(factor: number): { [string]: number }
 end
 
 -- ROBLOX-77: "the rival spider should be harder to eat than normal prey, harder tapping mechanic." A rival that has been caught (ROBLOX-73's
--- contest decided that) must still be subdued with the same tapping, and it can tear free. The fly's numbers scaled the other way, by a
--- factor of 1.8 (taps worth 0.067 against a drain of about 0.9 a second at the start), would take 10 or more taps a second and tear free in
--- 0.64 s untouched (a simulation outside the suite), so the rival has
--- numbers of its own, chosen for how it plays: a firmer start (0.6) but each tap worth less than a house fly's (0.085, Godot's, not 0.12), a
--- drain half the fly's that eases only a little (the rival tires to 0.75 of its strength, not 0.5) and no cap, so it is never subdued by waiting.
--- It takes about 3.3 taps a second to hold it (the house fly: 2.5, and it is subdued at 12 s whatever); 4 a second wins in 5.7 to 8.4 s
--- (the fly: 4.6 s); with no taps it tears free in about 2 s (the fly: 1.15 s); a pause of 3 s loses it.
--- ROBLOX-88 ("the rival male should still be harder to take down"): the drain 0.5 to 0.7 and the tiring 0.25 to 0.10 make it harder: about 5 taps
--- a second win in 7 to 10 s (mean 7.6), 3.5 or fewer tear free, 4 a second almost always does and no taps tears free in 1.65 s. The rest is as it was.
+-- contest decided that) must still be subdued with the same tapping, and it can tear free. The fly's numbers scaled the other way would have needed 10 or
+-- more taps a second, so the rival has numbers of its own, chosen for how it plays: a firmer start (0.6), each tap worth less than a house fly's (0.085,
+-- Godot's, not 0.12), no cap (it is never subdued by waiting) and, as ROBLOX-88 ("the rival male should still be harder to take down") set them, a drain
+-- of 0.7 of the fly's that hardly eases (the rival tires to 0.9 of its strength, not 0.5). Measured on 60 seeded rivals (tests/rival.luau): about 4.5 taps
+-- a second is the edge; 5 a second win in 5.6 to 9.8 s (mean 7.6), 3.5 or fewer a second tear free, 4 a second almost always does, and with no taps it tears
+-- free in 1.65 s (the house fly: 1.15 s, and it is subdued at 12 s whatever). The gentle modes (Catch.forRival(true)) are the house fly's struggle with no cap.
 Catch.rival = {
 	startGrip = 0.6,
 	tapGain = 0.085,

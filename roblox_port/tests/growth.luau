@@ -161,5 +161,39 @@ do
  local l=LifeLoop.new(needs);l.growth:useGameRules()
  for i=1,5 do l.mealFood=.3;l:_stepLife(1/60,Vector3.zero);check(l.growth.ready==(i==5),`the life loop: ready only at the fifth fly (fly {i})`) end
 end
+-- ROBLOX-91: the gentle modes keep three housefly-equivalents to a moult (Godot's, ROBLOX-61's); the five are the standard rules'. One credit formula for prey and rival.
+do
+ check(Growth.game.moultFlies==5 and Growth.game.gentleMoultFlies==3,"the numbers: five standard, three gentle")
+ local std,gentle=Growth.new(),Growth.new();std:useGameRules(false);gentle:useGameRules(true)
+ check(std:mealGoal()==5 and gentle:mealGoal()==3 and math.abs(std:readyAt()-1.5)<1e-12 and math.abs(gentle:readyAt()-.9)<1e-9,"the thresholds: 1.5 for five flies, 0.9 for three")
+ check(Growth.new().readyFood==nil and (function() local g=Growth.new();g:useGameRules();return g:mealGoal()==5 end)(),"no argument is the standard rules (the client's old call)")
+ local ready=false
+ for i=1,2 do ready=gentle:eat(.3) end
+ check(not gentle.ready and not ready,"gentle: two flies are not ready")
+ check(gentle:eat(.3)==true and gentle.ready,"and the third is, once")
+ for i=1,3 do std:eat(.3) end
+ check(not std.ready,"standard: three are not")
+ -- small prey: six in the gentle modes
+ local small=Growth.new();small:useGameRules(true)
+ for i=1,5 do small:eat(.15) end
+ check(not small.ready and small:eat(.15) and small.ready,"gentle: the sixth small prey")
+ -- the words (the HUD's "of N meals")
+ local words=Growth.new();words:useGameRules(true)
+ check(string.find(LifeText.growth(words,Growth.READY_FOOD,.35),"0 of 3 meals",1,true)~=nil,"gentle reads 0 of 3 meals")
+ words:eat(.3);words:eat(.15)
+ check(string.find(LifeText.growth(words,Growth.READY_FOOD,.35),"1.5 of 3 meals",1,true)~=nil,"a fly and a small prey are 1.5 of 3")
+ words:eat(.45);check(string.find(LifeText.growth(words,Growth.READY_FOOD,.35),"Ready",1,true)~=nil,"ready at three")
+ local sw=Growth.new();sw:useGameRules(false);sw:eat(.3)
+ check(string.find(LifeText.growth(sw,Growth.READY_FOOD,.35),"1 of 5 meals",1,true)~=nil,"standard reads of 5")
+ -- the life loop credits it
+ local needs=Needs.new(true,true);needs.energy=1
+ local l=LifeLoop.new(needs);l.growth:useGameRules(needs.gentle)
+ for i=1,3 do l.mealFood=.3;l:_stepLife(1/60,Vector3.zero);check(l.growth.ready==(i==3),`gentle life loop: ready only at the third fly (fly {i})`) end
+ -- one credit formula: a housefly (0.35) credits 0.3 and a whole rival (0.7) two flies' worth
+ check(math.abs(Growth.rivalCredit(.35)-.3)<1e-12 and math.abs(Growth.rivalCredit(.7)-.6)<1e-12 and Growth.rivalCredit(0)==0,"credit: a housefly 0.3, a rival 0.6")
+ check(Growth.mealsOf(.7)==2 and Growth.mealsOf(.35)==1 and Growth.mealsOf(.175)==1 and Growth.mealsOf(1.05)==3,"meals of the energy: two for a rival")
+ local RivalSpider=require("../src/Shared/Predator/RivalSpider")
+ check(Growth.mealsOf(RivalSpider.FOOD)==2 and require("../src/Shared/UI/RivalText").eating(Growth.mealsOf(RivalSpider.FOOD))=="Eating rival — stay still (2 meals)","the status text is derived: (2 meals)")
+end
 print(`GROWTH passed={passed} failed={failed}`)
 if failed>0 then error("growth checks failed") end

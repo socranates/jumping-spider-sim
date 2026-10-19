@@ -27,9 +27,19 @@ MateText.NOTICED = "It has seen you."
 MateText.DRIVEN = "You frightened it. It leaves the sill for today."
 MateText.COURTED = "The two spiders stay together for a moment."
 MateText.MATED = "They have parted. The visitor walks away and will not come again."
-MateText.SAC = "An egg sac, made in the night, hangs in the crack. Stay near it for two days."
+MateText.SAC = "An egg sac, made in the night, hangs in the crack. Rest in the crack to pass the nights."
 MateText.GUARD_DAY = "Second day with the eggs. They hatch tomorrow morning."
 MateText.HATCHING = "The eggs are hatching!"
+-- ROBLOX-91: the mating gate (a full-grown spider with energy of at least 0.6, at a rest) said nothing when it was the hunger that was missing.
+MateText.TOO_HUNGRY = "Too hungry for a visitor to come. Eat well, then rest in the crack again."
+
+-- The end screen's choice to go on as a new spider (ROBLOX-91): a new life, not the family's: the sac and the generation are left behind. While there is an egg sac (or a
+-- hatched brood not yet carried on) it says so; "Back to your last rest" keeps them (the rest has them).
+MateText.ANOTHER = "Continue as another spider"
+MateText.ANOTHER_BROOD = "Continue as another spider (a new life: the brood is lost)"
+function MateText.another(hasSac: boolean): string
+	return if hasSac then MateText.ANOTHER_BROOD else MateText.ANOTHER
+end
 
 -- Why the mate left the sill, as a notice (the reasons Predator/Mate gives); "mated" is said by MATED already.
 function MateText.gone(reason: string): string?

@@ -87,8 +87,8 @@ function LifeClock.advance(self: any, seconds: number, asleep: boolean): number
 	return hours
 end
 
--- A moult passing: the hours run at the sleeping rate and do not stop at morning. Returns the hours that passed. (Moulting
--- itself is not ported yet; the clock keeps Godot's whole interface.)
+-- A moult passing: the hours run at the sleeping rate and do not stop at morning. Returns the hours that passed. (LifeLoop
+-- runs the moult on it.)
 function LifeClock.advanceMoult(self: any, seconds: number): number
 	if not finite(seconds) or seconds <= 0.0 then
 		return 0.0

@@ -1,5 +1,6 @@
 --!strict
 -- Frozen Godot scripts/life/growth.gd, LIFE-10..12. Durations and scales are game tuning, not measured instars.
+local Species = require(script.Parent.Parent.Data.Species)
 local Growth = {}
 Growth.__index = Growth
 Growth.STAGES = { "young juvenile", "juvenile", "subadult", "adult" }
@@ -10,7 +11,8 @@ Growth.READY_FOOD = 0.9
 Growth.FLY_FOOD = 0.3
 -- The game's own rules (ROBLOX-88), opt-in like NeedsModel.game and Data/Catch.game: the housefly-equivalents a moult asks for. Godot's is 3 (READY_FOOD,
 -- pinned by tests/growth_reference.json); a Growth never given these replays it. Growth:useGameRules() applies them.
-Growth.game = { moultFlies = 5 }
+-- ROBLOX-91: the gentle modes (Easy, Free play) keep the three of Godot and ROBLOX-61 (`gentleMoultFlies`): the five were for the standard rules.
+Growth.game = { moultFlies = 5, gentleMoultFlies = 3 }
 Growth.MOULT_HOURS = 12
 Growth.SOFT_HOURS = 10
 Growth.SOFT_REACH = 0.7
@@ -21,10 +23,19 @@ end
 function Growth.new(): any
  return setmetatable({stage=0,fedSinceMoult=0,ready=false,moultingHoursLeft=0,softHoursLeft=0,exuviae={}},Growth)
 end
--- The game's moult: `moultFlies` housefly-equivalents instead of three. Sets the instance's own threshold; food already eaten is kept (a spider that has
--- eaten two flies has eaten two flies), and a spider already ready to moult stays ready.
-function Growth.useGameRules(self: any)
- self.readyFood=Growth.game.moultFlies*Growth.FLY_FOOD;self.gameRules=true
+-- The game's moult: `moultFlies` housefly-equivalents instead of three (`gentleMoultFlies`, which is Godot's three, when `gentle`). Sets the instance's own threshold;
+-- food already eaten is kept (a spider that has eaten two flies has eaten two flies), and a spider already ready to moult stays ready.
+function Growth.useGameRules(self: any,gentle: boolean?)
+ self.readyFood=(if gentle==true then Growth.game.gentleMoultFlies else Growth.game.moultFlies)*Growth.FLY_FOOD;self.gameRules=true
+end
+-- What swallowing `energy` (of the reserves, in the units a housefly's meal is 0.35 of) credits toward a moult, in `fedSinceMoult`'s units: a housefly credits
+-- FLY_FOOD (0.3) whatever the moult asks for. One formula for the prey and the rival (a whole rival, Rival.FOOD 0.7, is two houseflies); it was written out twice in the client.
+function Growth.rivalCredit(energy: number): number
+ return energy*Growth.READY_FOOD/(3*Species.fly_like_prototype.body.nutrition)
+end
+-- A meal of `energy` in housefly-equivalents ("2 meals" for a whole rival).
+function Growth.mealsOf(energy: number): number
+ return math.floor(Growth.rivalCredit(energy)/Growth.FLY_FOOD+.5)
 end
 -- The food a moult asks for, in the units of `fedSinceMoult`, and in housefly-equivalents (3 by Godot's rule, 5 in the game).
 function Growth.readyAt(self: any): number return self.readyFood or Growth.READY_FOOD end

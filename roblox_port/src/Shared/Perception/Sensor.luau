@@ -366,10 +366,15 @@ function Sensor.costPercentile(self: any, q: number): number
 	end
 	local xs: { number } = {}
 	for i = 0, n - 1 do
-		table.insert(xs, self._ring[(self.cpuTicks - 1 - i) % Sensor.COST_RING + 1])
+		-- (ROBLOX-91: a checkpoint does not keep the ring, so after a return some of the latest ticks have no reading)
+		local us = self._ring[(self.cpuTicks - 1 - i) % Sensor.COST_RING + 1]
+		if us ~= nil then table.insert(xs, us) end
+	end
+	if #xs == 0 then
+		return 0
 	end
 	table.sort(xs)
-	return xs[math.clamp(math.ceil(q * n), 1, n)]
+	return xs[math.clamp(math.ceil(q * #xs), 1, #xs)]
 end
 
 -- Begins a new measuring window (the totals, the largest and the percentiles start again).

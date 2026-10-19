@@ -224,10 +224,11 @@ local function storedRest(mode: string): any
 	local memory = ObservationMemory.new()
 	local sensor = Sensor.new(memory)
 	sensor:configureFrom(Species.phidippus_audax_prototype.perception)
-	local needs = NeedsModel.new(true, mode == "free")
+	local needs = NeedsModel.new(true, mode == "free" or mode == "easy")
 	prey.feeding.needs = needs
 	local life = LifeLoop.new(needs, function() return { ok = true, message = "" } end)
 	if mode == "free" then life.mode, life.rules = "free", "gentle" end
+	if mode == "easy" then life.mode, life.rules = "main", "gentle" end
 	motor:place(Vector3.new(-25.5, Layout.SPAWN.Y, 6.0), Vector3.yAxis, Vector3.new(1, 0, 0))
 	local w: any = { motor = motor, prey = prey, sensor = sensor, memory = memory, needs = needs, life = life }
 	return assert(Checkpoint.capture(w, 0))
@@ -387,6 +388,56 @@ case("settings (ROBLOX-49): saved numbers and choices are applied as Player attr
 	progress = firedOf("progress")
 	last = progress[#progress]
 	check(last ~= nil and last.progress.settings.Captions == nil and last.progress.settings.InvertX == true, "an unclean value is left out of what is sent")
+end)
+
+case("the Easy life rests in its own slot (ROBLOX-91): a rest goes up as easy, the standard rest is untouched, and the menu offers it", function()
+	local driver: any = ClientStubs.driver
+	local before = canon(driver.stores.main:loadBest().record)
+	check(#SaveRest.check("easy", storedRest("easy")) == 0, "a scripted Easy rest passes the easy check")
+	check(#SaveRest.check("easy", storedRest("main")) > 0 and #SaveRest.check("main", storedRest("main")) == 0, "a standard rest is not an Easy one")
+	check(#SaveRest.check("main", storedRest("easy")) == 0, "(and a legacy Easy rest in the main slot is still accepted)")
+	check(#SaveRest.check("free", storedRest("easy")) > 0, "an Easy rest is not a free-play one")
+	check(driver.fresh("main", true, nil), "a new Easy life begins")
+	check(driver.currentStore() == driver.stores.easy and driver.stores.easy ~= driver.stores.main, "it rests in its own store")
+	check(driver.life.rules == "gentle" and driver.life.mode == "main", "with the gentle rules")
+	check(driver.stores.main:loadBest().ok and canon(driver.stores.main:loadBest().record) == before, "the standard life's rest is intact")
+	frames(60)
+	R.fired = {}
+	local r = driver.life.save()
+	check(r.ok, "the Easy rest was kept: " .. tostring(r.message))
+	realWait(SaveRules.CLIENT_PROGRESS_GAP * 3 + 0.1)
+	frames(3)
+	local rests = firedOf("rest")
+	check(#rests == 1 and rests[1].mode == "easy", `one easy rest went up ({#rests}, {rests[1] and rests[1].mode})`)
+	if rests[1] then
+		check(#SaveRest.check("easy", rests[1].record) == 0, "and the server's easy check accepts it: " .. table.concat(SaveRest.check("easy", rests[1].record), "; "))
+		check(driver.life.rules == "gentle", "gentle rules")
+	end
+	check(canon(driver.stores.main:loadBest().record) == before, "the standard rest is still untouched after the Easy rest")
+	-- the gentle goal is three meals, the standard one five, in the hud's own words
+	local function anyText(needle: string): boolean
+		for _, d in gui:GetDescendants() do
+			local ok, t = pcall(function() return (d :: any).Text end)
+			if ok and type(t) == "string" and string.find(t, needle, 1, true) then return true end
+		end
+		return false
+	end
+	frames(5)
+	check(anyText("of 3 meals") and not anyText("of 5 meals"), "Easy: the next moult is at 3 meals in the hud")
+	-- a restore always puts the game's struggle back, whatever the record held
+	local feeding: any = driver.prey.feeding
+	feeding.game, feeding.startGrip = false, 0.123
+	check(driver.life.save().ok, "a rest with another struggle in it is kept")
+	driver.returnToCheckpoint()
+	feeding = driver.prey.feeding
+	check(feeding.game == true and feeding.startGrip ~= 0.123, `the game's struggle is on after a return to the last rest (game {tostring(feeding.game)}, grip {feeding.startGrip})`)
+	driver.openMenu()
+	check(find("SpiderLifeMenu", "ContinueEasy") ~= nil and find("SpiderLifeMenu", "Continue") ~= nil, "the menu offers both Continues")
+	driver.menu:hide()
+	-- a standard life afterwards uses the main slot again
+	check(driver.fresh("main", false, nil) and driver.currentStore() == driver.stores.main and driver.life.rules == "standard", "a standard life goes back to the main slot")
+	frames(5)
+	check(anyText("of 5 meals") and not anyText("of 3 meals"), "standard: the next moult is at 5 meals in the hud")
 end)
 
 print(`STATE_CLIENT passed={passed} failed={failed}`)

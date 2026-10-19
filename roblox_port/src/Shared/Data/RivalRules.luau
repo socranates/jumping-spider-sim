@@ -35,6 +35,9 @@ RivalRules.awareNotice = 0.3
 RivalRules.contestCaptured = 0.40
 RivalRules.contestSprang = 0.32 -- (and 0.28 is left for the counter-bite)
 RivalRules.counterCost = 0.30
+-- ROBLOX-91: the gentle modes (Easy, Free play) keep ROBLOX-73's contest, 55 caught / 25 sprang clear / 20 a bite that costs nothing: ROBLOX-88's harder rival is for
+-- the standard rules (the draw is the same stream; only the thresholds differ). The gentle grip (Catch.forRival) and the free bite are as they were.
+RivalRules.contestGentle = { captured = 0.55, sprang = 0.25 }
 -- Nothing the rival does goes in here: the retreat grown by half a stud (the crack itself is also a hard check).
 RivalRules.keepOutMin = Vector3.new(-30.0, -0.5, 2.5)
 RivalRules.keepOutMax = Vector3.new(-22.8, 2.0, 9.5)

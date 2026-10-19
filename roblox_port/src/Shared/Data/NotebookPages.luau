@@ -61,7 +61,7 @@ NotebookPages.pages = {
 		trigger = "start",
 		title = "The bold jumping spider",
 		text = "The first spider is inspired by the bold jumping spider, Phidippus audax. It lives across much of North America, often on walls, fences and windowsills. Adults are about 6 to 15 millimetres long, and females are usually bigger than males. Look for its shining green-blue fangs and the pale spots on its black abdomen.",
-		game = "The first spider is inspired by the bold jumper. The peacock is a different species with the same game rules. Our models and three growth stages are stylised; one stud represents a centimetre.",
+		game = "The first spider is inspired by the bold jumper. The peacock is a different species with the same game rules. Our models and four growth stages (three moults) are stylised; one stud represents a centimetre.",
 		godotGame = "This windowsill is built at true scale: one game unit is one centimetre, about the length of the spider.",
 		sources = {
 			"Edwards, G. B. (2004). Revision of the jumping spiders of the genus Phidippus (Araneae: Salticidae). Occasional Papers of the Florida State Collection of Arthropods 11.",
@@ -289,7 +289,7 @@ NotebookPages.pages = {
 		trigger = "wasp_caught",
 		title = "What the wasp does",
 		text = "The wasp's sting does not kill a spider: it paralyses it. The wasp carries the spider to a cell in its mud nest and fills the cell with paralysed spiders, up to twenty or more. It lays an egg on one of them and seals the cell with mud. When the larva hatches, it feeds on the spiders, which have stayed fresh because they are still alive.",
-		game = "A catch ends a Standard life. Return to your last rest or continue as an unrelated spider. In gentle Free play the wasp only touches and leaves.",
+		game = "A catch ends a Standard life. Return to your last rest or continue as an unrelated spider. In Easy and Free play the wasp only touches and leaves.",
 		godotGame = "Being caught ends this spider's life. You go back to your last rest.",
 		sources = {
 			"Powell, E. C. & Taylor, L. A. Black and yellow mud dauber, Sceliphron caementarium (Drury, 1773). Featured Creatures EENY-654 / IN1478, University of Florida IFAS Extension. https://ask.ifas.ufl.edu/publication/IN1478",
@@ -313,7 +313,7 @@ NotebookPages.pages = {
 		trigger = "starving",
 		title = "Going without food",
 		text = "Spiders can go a long time without food. Adult females of the related Phidippus johnsoni were kept for 25 to 31 days without eating. As a spider uses up its reserves its abdomen shrinks: how plump the abdomen is, against the size of the body, is how scientists judge a spider's condition.",
-		game = "Time is compressed here. The hunger bar, full when your spider is fed, empties in a little over a day and a half; a spider that then goes two more days without food dies, after warnings on the screen. On Easy and in free play it cannot starve.",
+		game = "Time is compressed here. The hunger bar, full when your spider is fed, empties in a little over a day and a half; a spider that then goes two more days without food dies, after warnings on the screen. On Easy and in free play it empties much more slowly and cannot starve.",
 		godotGame = "Time is compressed here. A full reserve lasts about three days; a spider that then goes two more days without food dies, after warnings on the screen. On Easy and in free play it cannot starve.",
 		sources = {
 			"Jackson, R. R. (1978). The life history of Phidippus johnsoni (Araneae, Salticidae). Journal of Arachnology 6: 1-29.",

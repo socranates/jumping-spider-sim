@@ -9,7 +9,7 @@
 -- not anti-cheat: it is a solo game with no economy, so a dishonest client can only change its own player's save.
 --
 -- Client to server (ToServer): { kind = "hello", v } | { kind = "progress", progress } | { kind = "rest", mode, record }
--- Server to client (ToClient): { kind = "loaded", v, status, reason, progress, rests = { main?, free? } }
+-- Server to client (ToClient): { kind = "loaded", v, status, reason, progress, rests = { main?, free?, easy? } }
 --                              | { kind = "status", status, reason } | { kind = "rest", mode, record }
 local SaveRules = require(game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Data"):WaitForChild("SaveRules"))
 local SaveSession = require(game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Persistence"):WaitForChild("SaveSession"))
@@ -87,7 +87,11 @@ function SaveService.addPlayer(self: any, player: Player)
 		entry.loaded = true
 		if entry.leaving then
 			local flushed, flushError = pcall(function() entry.session:flush() end)
-			self.departing -= 1
+			-- (ROBLOX-91: only a departure that was counted is uncounted: shutdown also marks a still-loading entry as leaving, and the count went negative)
+			if entry.counted then
+				entry.counted = false
+				self.departing -= 1
+			end
 			if not flushed then log(self, "flush raised: " .. tostring(flushError)) end
 			return
 		end
@@ -139,9 +143,11 @@ function SaveService.removePlayer(self: any, player: Player)
 	if entry == nil then return end
 	self.entries[player] = nil
 	entry.leaving = true
+	entry.counted = true
 	self.departing += 1 -- BindToClose must also await a PlayerRemoving write already in flight.
 	if not entry.loaded then return end -- the loading thread finishes the job (see addPlayer)
 	local ok, err = pcall(function() entry.session:flush() end)
+	entry.counted = false
 	self.departing -= 1
 	if not ok then log(self, "flush raised: " .. tostring(err)) end
 end
@@ -165,6 +171,11 @@ function SaveService.shutdown(self: any)
 	local pending = 0
 	for player, entry in self.entries do
 		entry.leaving = true
+		if not entry.loaded and not entry.counted then
+			-- Still loading: its loading thread will flush it and uncount it, and the shutdown waits for that like for a player who is leaving.
+			entry.counted = true
+			self.departing += 1
+		end
 		if entry.loaded then
 			pending += 1
 			self.cfg.spawn(function()

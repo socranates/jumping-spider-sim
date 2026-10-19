@@ -34,13 +34,13 @@ ADAPTED = {
 
 # Reconciled with the Windows notebook implementation; the JSON remains a frozen reference.
 EXTRA_ADAPTED = {
- "bold_jumper": "The first spider is inspired by the bold jumper. The peacock is a different species with the same game rules. Our models and three growth stages are stylised; one stud represents a centimetre.",
+ "bold_jumper": "The first spider is inspired by the bold jumper. The peacock is a different species with the same game rules. Our models and four growth stages (three moults) are stylised; one stud represents a centimetre.",
  "hearing": "Buzzing is a human-audible cue, not a recording of what a spider experiences.",
  "home_before_dark": "Rest in the crack in the evening to sleep until morning. A day lasts about fifteen minutes of active play.",
  "new_skin": "Your spider is pale and its jumps shorter while its skin hardens. The ten game-hour timing is a design choice. The empty skin stays in the crack.",
  "grown_up": "The game compresses growth into three moults. Adulthood in a Standard main life opens Easy for this session. The male peacock look and dance are cosmetic choices at every gameplay stage.",
- "going_without_food": "Time is compressed here. The hunger bar, full when your spider is fed, empties in a little over a day and a half; a spider that then goes two more days without food dies, after warnings on the screen. On Easy and in free play it cannot starve.",
- "what_the_wasp_does": "A catch ends a Standard life. Return to your last rest or continue as an unrelated spider. In gentle Free play the wasp only touches and leaves.",
+ "going_without_food": "Time is compressed here. The hunger bar, full when your spider is fed, empties in a little over a day and a half; a spider that then goes two more days without food dies, after warnings on the screen. On Easy and in free play it empties much more slowly and cannot starve.",
+ "what_the_wasp_does": "A catch ends a Standard life. Return to your last rest or continue as an unrelated spider. In Easy and Free play the wasp only touches and leaves.",
 }
 for key, line in EXTRA_ADAPTED.items():
  ADAPTED[key] = (line, "Keep the current Roblox rules and artistic choices explicit.")

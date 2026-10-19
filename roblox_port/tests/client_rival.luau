@@ -90,6 +90,31 @@ check("the wasp takes the rival (ROBLOX-70): it is drawn hanging under the wasp,
 	assert(life.rival.state == "patrol" and life.rival.fate == nil, "a new rival the next morning: " .. tostring(life.rival.state))
 	local _ = rig
 end)
+check("a late 'carried off' word for a rival the wasp does not hold changes nothing (ROBLOX-91); for the one it holds, it is gone for the day", function()
+	local driver = ClientStubs.driver
+	local life, wasp = driver.life, driver.wasp
+	driver.place(Vector3.new(-5, 0.31, -9))
+	frames(5)
+	life.clock.hour = 9
+	local r = life.rival
+	assert(r and r.state ~= "dormant" and r.state ~= "consumed", "a rival to keep")
+	r.state, r.elapsed, r.notice, r.fate, r.day = "patrol", 0, 0, nil, nil
+	r.position = Vector3.new(-20, 0.31, -9)
+	r.previous = r.position
+	wasp:_signal({ kind = "rival_carried_off" })
+	frames(2)
+	assert(life.rival.state == "patrol" and life.rival.fate == nil, `a rival that was not taken is left alone: {life.rival.state} {tostring(life.rival.fate)}`)
+	r.state = "taken"
+	wasp:_signal({ kind = "rival_carried_off" })
+	frames(2)
+	assert(life.rival.state == "consumed" and life.rival.fate == "taken by the wasp", `the one that was taken is gone: {life.rival.state}`)
+	-- Leave it as the other checks expect: a rival of today, patrolling.
+	life.clock.day += 1
+	life.clock.hour = 8
+	frames(10)
+	life.clock.hour = 9
+	assert(life.rival.state == "patrol", `a new rival the next morning: {life.rival.state}`)
+end)
 check("striking a rival that has seen the spider is a contest (ROBLOX-73): each outcome has its notice, a counter-bite costs energy (none in the gentle modes), an unaware rival is still caught outright", function()
 	local driver = ClientStubs.driver
 	local life, needs, prey = driver.life, driver.needs, driver.prey
@@ -104,7 +129,7 @@ check("striking a rival that has seen the spider is a contest (ROBLOX-73): each 
 		local r = life.rival
 		local n = 0
 		if want ~= nil then
-			while Rival.contest(914, life.clock.day, n) ~= want do n += 1 end
+			while Rival.contest(914, life.clock.day, n, gentle) ~= want do n += 1 end
 		end
 		r.state, r.elapsed, r.notice, r.contests, r.spared = state, 0, notice, n, nil
 		r.position = driver.motor.pos + Vector3.new(0.2, 0, 0)
@@ -193,7 +218,7 @@ check("a caught rival is a hard meal (ROBLOX-77): the Grip button and the grip b
 	frames(1)
 	assert(life.notice == RivalText.SUBDUED, `the subdued line: "{life.notice}"`)
 	assert(find("SpiderPrompts", "GripBar").Visible == false, "the bar is gone once it is subdued")
-	assert(string.find(status(), "Eating rival", 1, true), `the status line: "{status()}"`)
+	assert(string.find(status(), "Eating rival", 1, true) and string.find(status(), "(2 meals)", 1, true), `the status line, with what it is worth: "{status()}"`)
 	-- Eaten, standing still: five seconds, 0.7 of food, the meal counted.
 	local meals, e0 = prey.feeding.mealsFinished, needs.energy
 	frames(60 * 6)

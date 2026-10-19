@@ -6,7 +6,7 @@
 --
 -- Differences from Godot: the captions say where the hum is, as the flies' "[buzzing, ahead-left]" does (Godot's wasp captions did
 -- not); the second line after a catch does not point to a notebook, which the port does not have yet; with no rest to go back to the
--- one choice is "Back to the start" (Godot offered a new spider as another life, which needs the death rules of round 5, not ported).
+-- one choice is "Back to the start"; with one, the screen also offers another spider as a new life (the client's presentEnd, ROBLOX-91: the sac and the generation are left behind).
 local ControlText = require(script.Parent.ControlText)
 local Data = require(script.Parent.Parent.Data.Wasp)
 

@@ -65,11 +65,11 @@ local function newWorld(seed: number?, mode: string?): any
 	local memory = ObservationMemory.new()
 	local sensor = Sensor.new(memory)
 	sensor:configureFrom(Species.phidippus_audax_prototype.perception)
-	local needs = NeedsModel.new(true, mode == "free")
+	local needs = NeedsModel.new(true, mode == "free" or mode == "easy")
 	prey.feeding.needs = needs
 	local w: any = { motor = motor, prey = prey, sensor = sensor, memory = memory, needs = needs }
 	w.life = LifeLoop.new(needs, function() return { ok = true, message = "" } end)
-	if mode == "free" then w.life.mode, w.life.rules = "free", "gentle" end
+	if mode == "free" then w.life.mode, w.life.rules = "free", "gentle" elseif mode == "easy" then w.life.mode, w.life.rules = "main", "gentle" end
 	motor:place(HOME, Vector3.yAxis, Vector3.new(1, 0, 0))
 	return w
 end
@@ -1650,6 +1650,105 @@ case("future settings versions never get silently downgraded", function()
 	run(e, a, 40)
 	a:flush()
 	check(canon(e.backend.data.P_89) == before, "future settings and their version remain byte-for-byte intact")
+end)
+
+-- ---------------------------------------------------------------------------------------------- the audit, part one (ROBLOX-91)
+case("the Easy slot: the main life on the gentle rules has its own rest, so beginning Easy cannot wipe the standard rest", function()
+	check(SaveRules.slotOf("main", "standard") == "main" and SaveRules.slotOf("main", "gentle") == "easy" and SaveRules.slotOf("free", "gentle") == "free", "the slot of each life: standard main keeps its key")
+	check(table.concat(SaveRules.MODES, ",") == "main,free,easy", "the slots, the old two first")
+	local std = realRest(120, "main")
+	local easy = realRest(120, "easy")
+	local free = realRest(120, "free")
+	check(easy.life_rules.mode == "main" and easy.life_rules.rules == "gentle", "(an Easy rest is a main life on the gentle rules)")
+	check(#SaveRest.check("easy", easy) == 0, "an Easy rest passes as the easy slot's: " .. table.concat(SaveRest.check("easy", easy), "; "))
+	check(#SaveRest.check("easy", std) > 0 and #SaveRest.check("easy", free) > 0, "a standard rest and a free one are not the easy slot's")
+	check(#SaveRest.check("free", easy) > 0, "an Easy rest is not a free one")
+	check(#SaveRest.check("main", std) == 0 and #SaveRest.check("free", free) == 0, "the standard slot and the free one are as they were")
+	check(#SaveRest.check("main", easy) == 0, "(an Easy rest saved before the slot existed was filed as main: it is still accepted there)")
+	check(SaveRest.SPECS.easy ~= nil and SaveRest.SPECS.easy.kind == "rest_easy" and #SaveRest.check("weekly", easy) > 0, "its own envelope kind; other names are refused")
+	-- stored apart, under the keys
+	local e = newEnv()
+	local a = newSession(e, 91, "A")
+	a:load()
+	check(a:setRest("main", std) and a:setRest("easy", easy) and a:setRest("free", free), "all three are accepted")
+	check(not a:setRest("easy", std) and not a:setRest("free", easy), "and the wrong slot refuses")
+	run(e, a, 40)
+	check(storedOf(e, "R_91_main", SaveRest.SPECS.main).status == "ok" and storedOf(e, "R_91_easy", SaveRest.SPECS.easy).status == "ok" and storedOf(e, "R_91_free", SaveRest.SPECS.free).status == "ok", "three values, apart")
+	check(canon(storedOf(e, "R_91_main", SaveRest.SPECS.main).payload) == canon(std), "the standard rest is as it was sent")
+	-- an Easy rest sent later does not touch the standard one
+	local easy2 = realRest(240, "easy")
+	a:setRest("easy", easy2)
+	run(e, a, 25)
+	check(canon(storedOf(e, "R_91_main", SaveRest.SPECS.main).payload) == canon(std), "a later Easy rest leaves the standard rest alone")
+	check(canon(storedOf(e, "R_91_easy", SaveRest.SPECS.easy).payload) == canon(easy2), "and replaces the Easy one")
+	check(select(1, a:status()) == "saved", "saved")
+	a:flush()
+	local b = newSession(e, 91, "B")
+	b:load()
+	check(canon(b.rests.main) == canon(std) and canon(b.rests.easy) == canon(easy2) and canon(b.rests.free) == canon(free), "a rejoin gets all three back")
+	local snap = b:snapshot()
+	check(snap.rests.main ~= nil and snap.rests.easy ~= nil and snap.rests.free ~= nil, "and the snapshot for the client has them")
+	-- an old player (two rests, no Easy): the missing slot reads as nothing, and everything else is as it was
+	local e2 = newEnv()
+	local old = newSession(e2, 92, "OLD")
+	old:load()
+	old:setRest("main", std)
+	run(e2, old, 25)
+	old:flush()
+	local back = newSession(e2, 92, "NEW")
+	check(back:load() == "active" and canon(back.rests.main) == canon(std) and back.rests.easy == nil and back.rests.free == nil, "a save with no Easy slot loads, and the standard rest is where it was")
+	check(select(1, back:status()) == "saved", "(and is saved)")
+end)
+
+case("shutdown with a player still loading: the departing count never goes negative, and the load's flush is awaited", function()
+	-- shutdown marks every entry as leaving; the entry whose load had not finished was uncounted by its loading thread without ever having been counted
+	local e = newEnv()
+	local srv = newServer(e)
+	srv.deferSpawn = true
+	local p = player(93)
+	srv.service:addPlayer(p)
+	local entry = srv.service.entries[p]
+	check(entry ~= nil and not entry.loaded, "the load has not run yet")
+	local lowest = 0
+	srv.service.cfg.sleep = function(seconds: number)
+		e.t += seconds
+		srv.drain()
+		lowest = math.min(lowest, srv.service.departing)
+	end
+	srv.service:shutdown()
+	lowest = math.min(lowest, srv.service.departing)
+	check(entry.loaded and entry.session.closed == true, "the load finished and its session was flushed and closed")
+	check(srv.service.departing == 0 and lowest >= 0, `the count ends at 0 and was never below it (lowest {lowest})`)
+	-- a player who leaves while loading, then the shutdown: counted once, uncounted once
+	local e2 = newEnv()
+	local srv2 = newServer(e2)
+	srv2.deferSpawn = true
+	local q = player(94)
+	srv2.service:addPlayer(q)
+	local entry2 = srv2.service.entries[q]
+	srv2.service:removePlayer(q)
+	check(srv2.service.departing == 1 and srv2.service.entries[q] == nil, "leaving while loading counts one departure")
+	srv2.service.cfg.sleep = function(seconds: number) e2.t += seconds; srv2.drain() end
+	srv2.service:shutdown()
+	check(srv2.service.departing == 0 and entry2.session.closed == true, "and the shutdown awaits it: one in, one out")
+	-- two players loading, one leaves: still balanced
+	local e3 = newEnv()
+	local srv3 = newServer(e3)
+	srv3.deferSpawn = true
+	local r1, r2 = player(95), player(96)
+	srv3.service:addPlayer(r1)
+	srv3.service:addPlayer(r2)
+	srv3.service:removePlayer(r1)
+	srv3.service.cfg.sleep = function(seconds: number) e3.t += seconds; srv3.drain() end
+	srv3.service:shutdown()
+	check(srv3.service.departing == 0, "a mix of a leaver and a shutdown: balanced")
+	-- a loaded player: unchanged (the count stays zero)
+	local e4 = newEnv()
+	local srv4 = newServer(e4)
+	local t = player(97)
+	srv4.service:addPlayer(t)
+	srv4.service:shutdown()
+	check(srv4.service.departing == 0, "a loaded player: unchanged")
 end)
 
 print(`STATE passed={passed} failed={failed}`)

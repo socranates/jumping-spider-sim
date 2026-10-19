@@ -83,6 +83,18 @@ function Mate.courtable(m: any): boolean
 	return m ~= nil and (m.state == "wander" or m.state == "approach" or m.state == "attend")
 end
 
+-- The mating scene is playing, or the pair are together (ROBLOX-91: the rival is paused for it, and so is the arrival of a new one).
+function Mate.sceneActive(m: any): boolean
+	return m ~= nil and (m.scene == true or m.state == "pair")
+end
+
+-- Is the player courting it now (ROBLOX-91)? It can be courted and the courtship meter is rising or falling (it is not empty), or the spider is within courting range of it
+-- (Rules.nearWu). The rival keeps away from a courting pair: Predator/RivalSpider pauses it, like the wasp's visit, so a lunge cannot land on a spider standing still for the meter.
+function Mate.courting(m: any, position: Vector3): boolean
+	if m == nil or not Mate.courtable(m) then return false end
+	return m.meter > 0 or (m.position - position).Magnitude <= Rules.nearWu
+end
+
 local function leave(m: any, reason: string)
 	m.state, m.elapsed, m.meter, m.reason, m.lost, m.scene = "leaving", 0, 0, reason, 0, false
 end

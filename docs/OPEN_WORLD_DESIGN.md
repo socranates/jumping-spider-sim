@@ -105,6 +105,37 @@ The **descent** is the set piece: the spider reaches the outer sill through the 
 90 cm of brick on its dragline (the hang pose, the head-up climb back). The bed under the window is where the garden
 starts; the rest is further out.
 
+## Nathan's direction (2026-10-19), as rules
+
+In his words: think to some extent RPG; minimal HUD; more prey, random bugs, environment details, more rival males and
+other spider species; so serene you forget you are prey too, but not too long before you are reminded; eventually more
+MMO; hunger always a major concern; movement expends more energy; if you die you lose everything from that day;
+beautiful and scary like nature; sometimes you worry about starving because a wasp or other thing won't go away;
+mating should not automatically be successful; Normal mode should feel like it doesn't want you to survive; no hand
+holding. As design:
+
+- **Normal mode is nature.** No mid-day saves, no hints after the first day, no softening. **Death loses the day**:
+  you wake at the last rest with that day's meals, growth and sightings gone ("Back to last rest" is the only path;
+  "another spider" is a true restart). Easy and Free keep ROBLOX-91's gentleness untouched.
+- **Hunger is the engine.** Reserve drains with the clock as today *and with movement*: walking costs, jumps cost
+  more, stillness costs least (a sit-and-wait hunter's economy, `NeedsModel.game.moveCost`). The garden's slow clock
+  (0.33 in the bed, not 0.25, so hunger per real minute stays real) never makes food optional.
+- **Pinned.** Threats can linger: a wasp that hunts the bed for hours, a rival that camps by the retreat. The choice
+  between the risk outside and the bar draining inside is the game. Visit lengths and arrivals vary around their
+  means from seeded streams so the cadence never reads as a schedule — calm long enough to forget, never so long that
+  the reminder stops hurting.
+- **Mating can fail.** The female may reject or drive off a thin or clumsy male (condition and courting quality set
+  the odds), a rival may cut in during a court, a sac can be lost to a lingering predator in Normal. Nothing is
+  automatic; the notebook tells the truth about it afterwards.
+- **Breadth** (content rounds): prey — gnats, aphids, leafhoppers, moths at dusk, crickets; ambient bugs that are not
+  food — ants, woodlice, beetles, ladybirds; several rival males at once; other spiders as neighbours and dangers (a
+  wolf spider on the soil, an orb-weaver's web as a hazard, a crab spider in a flower, another jumper as a rival of
+  a different species).
+- **Light RPG, quiet HUD.** Moults are the levels, the species is the class (the peacock's dance, the ant's disguise,
+  the tarantula's threat), the notebook is the journal and quest log, territory is the endgame — and none of it adds
+  a widget: the HUD stays the hunger bar, the day line and a caption. Reminders come from the world.
+- **MMO direction**: the server-built, seeded world is the groundwork; player spiders replicate in a later round.
+
 ## The four pillars, as rounds
 
 1. **Free-roam survival everywhere** (this round and the next): regions, streaming, nav per region, retreats anywhere,
@@ -117,6 +148,19 @@ starts; the rest is further out.
    Neighbours, rivals, mates — other people.
 4. **Creative mode** (round 6): a placement layer that writes region overrides into the diff log (plants, stones,
    prey, predators) with an in-game palette; play in what you shaped; share a world by its seed + diff.
+
+## This round's plan (W1–W5)
+
+1. **W1 — the world core** (ROBLOX-94): the sill as region 0, WorldMap/Region/WorldBuild/WorldClient, server build,
+   streaming, the world record in the save, `clockScale`. The game plays identically.
+2. **W2 — beyond the glass** (ROBLOX-95): the raised sash, the outer sill, the brick descent, bed_a, per-region nav.
+3. **W3 — garden life** (ROBLOX-96): prey in the bed (gnats and aphids join the flies), woodlice as the first ambient
+   bug, the stone retreat, the descent set piece, the page, saves across regions.
+4. **W4 — nature's rules** (ROBLOX-97): movement cost, death loses the day in Normal, lingering threats, mating that
+   can fail, the garden's slow clock.
+5. **W5 — no hand holding** (ROBLOX-98): the HUD and notice audit for Normal — hints only on day one, captions
+   sparing, nothing added for the garden but a region name on the day line.
+Then full suites, places, bundle, publish.
 
 ## Risks, named
 

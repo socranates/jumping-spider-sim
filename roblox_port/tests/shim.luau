@@ -488,7 +488,7 @@ playback.Name = "SilkPlayback"
 rawset(playback, "run", function(driver) client.driver = driver end)
 playback.Parent = client.scriptFolder
 local uis = { MouseBehavior = nil, MouseIconEnabled = true, TouchEnabled = false, KeyboardEnabled = true, GamepadEnabled = false }
-for _, name in { "InputChanged", "InputEnded", "TouchMoved", "WindowFocusReleased", "TextBoxFocused", "GamepadDisconnected", "LastInputTypeChanged" } do
+for _, name in { "InputChanged", "InputEnded", "TouchMoved", "TouchPinch", "WindowFocusReleased", "TextBoxFocused", "GamepadDisconnected", "LastInputTypeChanged" } do
 	uis[name] = newSignal()
 end
 function uis.GetMouseDelta(_self) return Vector2.zero end

@@ -8,6 +8,7 @@ local ControlText = require("../src/Shared/UI/ControlText")
 local CameraMath = require("../src/Shared/Movement/CameraMath")
 local SpiderChoice = require("../src/Shared/Rig/SpiderChoice")
 local PeacockText = require("../src/Shared/UI/PeacockText")
+local InspectText = require("../src/Shared/UI/InspectText")
 local SaveProgress = require("../src/Shared/Persistence/SaveProgress")
 local SettingsPanel = require("../src/Client/SettingsPanel")
 local stubs = ClientStubs
@@ -237,7 +238,7 @@ check(out.A == 1, "this build has no steps to run yet")
 
 -- ---------------------------------------------------------------- the Spider row: a live row, not a saved setting (ROBLOX-71)
 do
-	check(#Spec.LIVE == 1 and Spec.LIVE[1].id == "Spider" and Spec.LIVE[1].section == "spider" and Spec.LIVE[1].kind == "choice", "one live row: Spider, a choice, in Your spider")
+	check(#Spec.LIVE == 2 and Spec.LIVE[1].id == "Spider" and Spec.LIVE[1].section == "spider" and Spec.LIVE[1].kind == "choice", "two live rows (ROBLOX-90 added the second): Spider, a choice, in Your spider, first")
 	local live = Spec.LIVE[1]
 	check(live.label == "Spider" and #live.label <= 56 and live.note ~= nil and #(live.note :: string) <= 110, "a label and a note that fit a line")
 	check(sectionIds[live.section] == true and Spec.LIST[1].id ~= "Spider", "in a known section")
@@ -286,9 +287,12 @@ do
 	nav:move(-1)
 	check(nav:current().kind == "reset", "and then Reset")
 	nav:move(-1)
-	check(nav:current().id == "Spider", "and then the last row, the Spider")
+	check(nav:current().id == "Inspect", "and then the last row, Inspect your spider (ROBLOX-90)")
+	nav:move(-1)
+	check(nav:current().id == "Spider", "and then the Spider")
 	nav:move(-1)
 	check(nav:current().id == "NotebookNotes", "and then the last saved setting")
+	nav:move(1)
 	nav:move(1)
 	nav:move(1)
 	nav:move(1)
@@ -380,7 +384,7 @@ end
 -- ---------------------------------------------------------------- the panel on its own (SettingsPanel)
 local GuiService = game:GetService("GuiService")
 local function build(width: number, height: number, startValues: { [string]: any }?): (any, any)
-	local state: any = { values = {}, log = {}, resets = 0, status = "saved", refuse = false }
+	local state: any = { values = {}, log = {}, resets = 0, inspects = 0, status = "saved", refuse = false }
 	for k, v in startValues or {} do state.values[k] = v end
 	local io = {
 		get = function(id: string): any
@@ -389,6 +393,11 @@ local function build(width: number, height: number, startValues: { [string]: any
 		end,
 		set = function(id: string, v: any): string?
 			table.insert(state.log, id)
+			if id == "Inspect" then -- (the client: a button; it closes the panel into the close look, or answers why not)
+				state.inspects += 1
+				if state.refuse then return InspectText.NOT_NOW end
+				return nil
+			end
 			if Model.live(id) then
 				if state.refuse then return PeacockText.NOT_NOW end
 				state.spider = v
@@ -631,7 +640,7 @@ do
 	panel:open("game", "keyboard", 1)
 	local w = widgetOf(panel, "Spider")
 	check(w ~= nil and w.label.Text == "Spider" and w.value.Text == "The first spider" and w.note.Visible and w.note.Text == Spec.LIVE[1].note, "the row: its label, the spider it shows, its note")
-	check(panel.widgets[#panel.widgets - 1].kind == "header" and panel.widgets[#panel.widgets - 1].frame.Text == "Your spider" and panel.widgets[#panel.widgets] == w, "it sits last, under Your spider")
+	check(panel.widgets[#panel.widgets - 2].kind == "header" and panel.widgets[#panel.widgets - 2].frame.Text == "Your spider" and panel.widgets[#panel.widgets - 1] == w, "it sits first under Your spider, with the Inspect button after it")
 	panel.nav:selectId("Spider")
 	key("Right")
 	check(st.spider == "maratus_volans_male" and w.value.Text == "The peacock spider" and panel.status.Text == "You are the peacock spider now", "Right: the next spider, shown and said")
@@ -675,6 +684,62 @@ do
 		end
 	end
 	panel:close()
+end
+
+do
+	-- the Inspect row (ROBLOX-90): a button, a live row like the Spider's, but it has no value
+	local live = Spec.LIVE[2]
+	check(live.id == "Inspect" and live.section == "spider" and live.kind == "action" and live.label == "Inspect your spider", "the row: Inspect your spider, an action, in Your spider")
+	check(#live.label <= 56 and live.note ~= nil and #(live.note :: string) <= 110, "a label and a note that fit a line")
+	for _, s in Spec.LIST do check(s.id ~= "Inspect", "no saved setting is called Inspect") end
+	check(Model.live("Inspect") and Model.spec("Inspect") == live and not Model.known("Inspect") and table.find(Model.ids(), "Inspect") == nil and Model.defaults().Inspect == nil, "a live row that ids(), defaults() and known() leave out")
+	local v, pr = Model.clean("Inspect", true)
+	check(v == nil and pr == nil, "clean() drops it quietly")
+	local problems3, cleaned3 = Model.cleanAll({ Inspect = true, InvertY = true })
+	check(#problems3 == 0 and cleaned3.Inspect == nil and cleaned3.InvertY == true, "a saved settings table that holds it keeps nothing of it")
+	local payload = SaveProgress.snapshot({ opened = {}, eye_seconds = 0 }, false, nil, { Inspect = true, InvertY = true })
+	check(payload.settings.Inspect == nil and payload.settings.InvertY == true, "the save never has it")
+	check(Model.valueText("Inspect", nil) == InspectText.BUTTON and Model.valueText("Inspect", true) == "Look closely" and Model.line("Inspect", nil) == "Inspect your spider: Look closely", "its word is the button's")
+	check(Model.step("Inspect", nil, 1) == true and Model.step("Inspect", true, -1) == true, "switching it steps to true, either way")
+	check(Text.controlWidth("action", 1) == 160 and Text.controlWidth("action", 1.5) == 240, "a button 160 wide, scaled with the text")
+	local panel, st = build(1280, 720)
+	panel:open("game", "keyboard", 1)
+	local w = widgetOf(panel, "Inspect")
+	check(w ~= nil and w.label.Text == "Inspect your spider" and w.value.Text == "Look closely" and w.note.Visible and w.note.Text == live.note, "the row shows its label, its button and its note")
+	check(panel.widgets[#panel.widgets] == w and w.prev == nil and w.minus == nil, "it sits last, and is only a button")
+	panel.nav:selectId("Inspect")
+	key("Right")
+	key("Right", Enum.UserInputState.End)
+	key("Left")
+	key("Left", Enum.UserInputState.End)
+	check(st.inspects == 0, "Left and Right do nothing to it")
+	key("Return")
+	check(st.inspects == 1 and st.log[#st.log] == "Inspect" and st.values.Inspect == nil, "Enter switches it: the client is told once, and nothing is held as a setting")
+	key("Space")
+	check(st.inspects == 2, "so does Space")
+	w.value.Activated:Fire()
+	check(st.inspects == 3, "a tap on the button")
+	w.frame.Activated:Fire()
+	check(st.inspects == 4, "and a tap anywhere on the row")
+	st.refuse = true
+	key("Return")
+	check(st.inspects == 5 and panel.status.Text == InspectText.NOT_NOW, "refused, the panel's line says why")
+	st.refuse = false
+	panel.nav:select(#panel.nav.rows - 1)
+	key("Return")
+	key("Return")
+	check(st.resets == 1 and st.inspects == 5, "Reset to defaults does not press it")
+	panel:close()
+	-- the button's word fits at a readable size, and the row's controls are touch targets, on a phone and with large text
+	for _, scr in { { 1280, 720 }, { 360, 640 }, { 568, 320 } } do
+		for _, large in { false, true } do
+			local p2 = build(scr[1], scr[2], { LargeText = large })
+			p2:open("game", "touch", if large then 1.5 else 1)
+			local w2 = widgetOf(p2, "Inspect")
+			check(w2.value.TextSize >= 11 and w2.value.Size.Y.Offset >= Text.MIN_TARGET * (if large then 1.5 else 1) - 1, `{scr[1]}x{scr[2]}{if large then " large" else ""}: "{w2.value.Text}" is {w2.value.TextSize} pt in a button {w2.value.Size.Y.Offset} tall`)
+			p2:close()
+		end
+	end
 end
 
 do
@@ -1252,6 +1317,48 @@ do
 		check(driver.appearance() == "first_spider" and lp:GetAttribute("Appearance") == "first_spider", "and round to the first spider")
 		sp:close()
 		frames(3)
+	end
+
+	-- the Inspect row (ROBLOX-90): the real client closes the panel into the close look (a controller's A too), the world runs on inside it, and the Reduced Motion setting reaches the camera
+	do
+		driver.place(Vector3.new(-5, 0.31, -9))
+		frames(60)
+		local cam, pick = driver.cam, driver.spiderPick
+		check(cam.reducedMotion == false and not pick.inspecting, "(Reduced Motion off, not looking)")
+		setAll({ ReducedMotion = true })
+		frames(2)
+		check(cam.reducedMotion == true, "the Reduced Motion setting reaches the camera")
+		setAll({ ReducedMotion = false })
+		frames(2)
+		check(cam.reducedMotion == false, "and off again")
+		driver.openSettings("game")
+		sp:refresh()
+		sp.nav:selectId("Inspect")
+		local pad = stubs.actions["WindowsillSettings"]
+		pad("WindowsillSettings", Enum.UserInputState.Begin, { KeyCode = Enum.KeyCode.ButtonA, UserInputType = Enum.UserInputType.Gamepad1, Position = Vector3.zero })
+		pad("WindowsillSettings", Enum.UserInputState.End, { KeyCode = Enum.KeyCode.ButtonA, UserInputType = Enum.UserInputType.Gamepad1, Position = Vector3.zero })
+		check(not sp:isShowing() and pick.inspecting and cam.inspect ~= nil, "A on the Inspect row closes the panel into the close look")
+		check(lp:GetAttribute("Inspect") == nil and driver.appearance() == "first_spider", "nothing is kept as a setting, and the spider is the one it was")
+		local t0 = driver.prey.tick
+		frames(60)
+		check(driver.prey.tick > t0 and pick.inspecting, "the world runs on while looking (the panel paused it; the look does not)")
+		pick.finish(nil, true)
+		frames(2)
+		check(not pick.inspecting and not cam:inspectActive(), "(leaving)")
+		-- Reduced Motion: the look is in at once, and leaving is a cut
+		setAll({ ReducedMotion = true })
+		frames(2)
+		driver.openSettings("game")
+		sp:refresh()
+		sp.nav:selectId("Inspect")
+		press("WindowsillSettings", "Return")
+		frame(1 / 60)
+		check(pick.inspecting and cam.inspectT == 1, "with Reduced Motion on, the view is in on the first frame")
+		pick.finish(nil, false)
+		frame(1 / 60)
+		check(cam.inspectT == 0 and not cam:inspectActive(), "and leaving is a cut")
+		setAll({ ReducedMotion = false })
+		frames(2)
 	end
 end
 

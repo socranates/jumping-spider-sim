@@ -15,7 +15,8 @@ SettingsText.LARGE = NotebookText.LARGE
 SettingsText.MIN_TARGET = 44
 -- The widest control cluster of each kind at normal text: a toggle's button; a choice's two arrows and its word; a slider's minus, bar,
 -- number and plus.
-SettingsText.CONTROL = { toggle = 96, choice = 240, slider = 360 } :: { [string]: number }
+-- An action's (ROBLOX-90) is one wider button, for "Look closely".
+SettingsText.CONTROL = { toggle = 96, choice = 240, slider = 360, action = 160 } :: { [string]: number }
 -- A label needs at least this much width beside its control; otherwise the control goes underneath.
 SettingsText.MIN_LABEL = 170
 SettingsText.PAD = 10

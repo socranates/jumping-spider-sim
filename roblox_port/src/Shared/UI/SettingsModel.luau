@@ -11,6 +11,7 @@
 local SettingsSpec = require(script.Parent.Parent.Data.SettingsSpec)
 local SpiderChoice = require(script.Parent.Parent.Rig.SpiderChoice)
 local PeacockText = require(script.Parent.PeacockText)
+local InspectText = require(script.Parent.InspectText)
 
 local SettingsModel = {}
 
@@ -28,14 +29,17 @@ end
 -- the part that owns it.
 local LIVE_BY_ID: { [string]: SettingsSpec.Setting } = {}
 for _, s in SettingsSpec.LIVE do LIVE_BY_ID[s.id] = s end
-local LIVE_STEP: { [string]: (any, number, any) -> string } = {
+local LIVE_STEP: { [string]: (any, number, any) -> any } = {
 	-- `owned` (nil now) is where the Game Pass answer goes when the add-ons are sold: SpiderChoice.locked skips what is not owned.
 	Spider = function(current: any, dir: number, owned: any): string
 		return SpiderChoice.step(SpiderChoice.start(current, nil), dir, owned)
 	end,
+	-- A button (ROBLOX-90): switching it is the whole act, so the value it steps to is only "true, it was pressed".
+	Inspect = function(): boolean return true end,
 }
 local LIVE_TEXT: { [string]: (any) -> string } = {
 	Spider = function(value: any): string return PeacockText.title(SpiderChoice.start(value, nil)) end,
+	Inspect = function(): string return InspectText.BUTTON end,
 }
 
 SettingsModel.VERSION = SettingsSpec.VERSION

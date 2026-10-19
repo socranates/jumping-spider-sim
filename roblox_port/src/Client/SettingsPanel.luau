@@ -10,7 +10,9 @@
 -- Large text (the LargeText setting) takes effect at once, here too; short screens lose the controls line before the list loses room.
 -- Words and sizes are Shared/UI/SettingsText and Data/SettingsSpec; movement through the rows is Shared/UI/SettingsNav.
 -- One row is not a saved setting (ROBLOX-71): Spider, a live row. It reads and drives the spider the game already keeps in the save; io.set may
--- refuse it and answer a line, which the panel shows in place of the saving line, and the row then shows the spider it still is.
+-- refuse it and answer a line, which the panel shows in place of the saving line, and the row then shows the spider it still is. The other is a
+-- button (ROBLOX-90, kind "action"): Inspect your spider. Switching it (a tap, Enter, A) tells io.set once; it has no value, Left and Right do nothing to it,
+-- and the client closes the panel into Inspect mode, or answers a line saying why not.
 local TextService = game:GetService("TextService")
 local CAS = game:GetService("ContextActionService")
 local GuiService = game:GetService("GuiService")
@@ -227,7 +229,7 @@ function SettingsPanel._buildRow(self: any, index: number, id: string): any
 	w.note.TextColor3 = FAINT
 	w.note.Visible = spec.note ~= nil
 	local function pick() self:_pickRow(index) end
-	if spec.kind == "toggle" then
+	if spec.kind == "toggle" or spec.kind == "action" then
 		w.value = pressable("Value", "", frame)
 		w.value.Activated:Connect(function() pick(); self:_change(id, 1) end)
 	elseif spec.kind == "choice" then
@@ -312,7 +314,7 @@ end
 -- A choice's word, at the largest size that fits its button (the Spider row's longest name wraps to two lines; the others fit at full size).
 function SettingsPanel._fitValue(self: any, w: any)
 	local fit = w.fit
-	if fit ~= nil and w.spec.kind == "choice" then
+	if fit ~= nil and (w.spec.kind == "choice" or w.spec.kind == "action") then
 		w.value.TextSize = SettingsText.buttonTextSize(w.value.Text, fit.w, fit.h, fit.size)
 	end
 end
@@ -451,8 +453,12 @@ function SettingsPanel.layout(self: any)
 			local cx = if rl.stacked then pad else m.bodyW - pad - cw
 			local cy = if rl.stacked then rowH - pad - target else math.floor((rowH - target) / 2)
 			local vtext = math.round(sizes.value * s)
-			if kind == "toggle" then
+			if kind == "toggle" or kind == "action" then
 				wd.value.Position, wd.value.Size, wd.value.TextSize = UDim2.fromOffset(cx, cy), UDim2.fromOffset(cw, target), vtext
+				if kind == "action" then
+					wd.fit = { w = cw, h = target, size = vtext }
+					self:_fitValue(wd)
+				end
 			elseif kind == "choice" then
 				wd.prev.Position, wd.prev.Size, wd.prev.TextSize = UDim2.fromOffset(cx, cy), UDim2.fromOffset(target, target), btext
 				wd.next.Position, wd.next.Size, wd.next.TextSize = UDim2.fromOffset(cx + cw - target, cy), UDim2.fromOffset(target, target), btext
@@ -585,7 +591,8 @@ end
 function SettingsPanel._horizontal(self: any, dir: number)
 	local row = self.nav:current()
 	if row.kind == "setting" then
-		self:_change(row.id :: string, dir)
+		local spec = SettingsModel.spec(row.id :: string) :: SettingsSpec.Setting
+		if spec.kind ~= "action" then self:_change(row.id :: string, dir) end -- (a button is only switched, never stepped)
 	elseif row.kind == "reset" or row.kind == "back" then
 		self.nav:select(#self.nav.rows - (if dir < 0 then 1 else 0))
 		self.confirming = false

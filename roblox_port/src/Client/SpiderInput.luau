@@ -9,6 +9,8 @@
 -- Port-only: reset to the start Backspace / View (Select), gait toggle G, controls card H (Godot's H is the field notes).
 -- The peacock spider (ROBLOX-31): C changes spider in the crack (RB / R1 on a controller, the touch Change button); X, or the same RB / R1
 -- outside the crack, starts and stops the courtship dance (the touch Dance button).
+-- Inspect mode (ROBLOX-90): the same C / RB / Change held for 0.6 s in the crack starts the close look (a tap changes spider when it is let go, as before); in the look,
+-- Cancel (Q / B), the same button again or the touch Back leave, Eye (V / Y / the touch View) cycles the framings, the left stick or W and S zoom.
 -- The naturalist's notebook (ROBLOX-37): N opens it. Godot's D-pad up is the port's walking, so a controller reaches it through the life
 -- menu (View / Touchpad, then Notebook); touch has the Notebook button beside Menu (SpiderClient).
 -- The settings (ROBLOX-49): O opens them; a controller and touch reach them through the life menu (then Settings).
@@ -28,10 +30,12 @@ local SpiderInput = {}
 export type Handlers = {
 	blocked: (() -> boolean)?, menu: (() -> ())?,
 	feed: (() -> ())?,
-	choose: (() -> ())?, -- C: change spider (in the crack)
+	choose: (() -> ())?, -- C: change spider (in the crack); held 0.6 s, the close look (ROBLOX-90)
+	chooseEnd: (() -> ())?, -- ... and the last source of it let go (ROBLOX-90: a tap changes spider when it is let go, a hold does not)
 	notebook: (() -> ())?, -- N: the naturalist's notebook
 	settings: (() -> ())?, -- O: the settings (ROBLOX-49)
 	display: (() -> ())?, -- X / RB: the peacock spider's courtship dance
+	displayEnd: (() -> ())?, -- ... and let go (RB in the crack is a controller's choose key, ROBLOX-90)
 	focus: ((string) -> ())?,
 	jump: (string) -> (), -- "begin", "end", or "cancel" (the engine took the input away)
 	cancel: (string) -> (),
@@ -92,9 +96,9 @@ function SpiderInput.bind(h: Handlers)
 		elseif action == "Feed" then
 			if now and h.feed then h.feed() end
 		elseif action == "Choose" then
-			if now and h.choose then h.choose() end
+			if now and h.choose then h.choose() elseif not now and h.chooseEnd then h.chooseEnd() end
 		elseif action == "Display" then
-			if now and h.display then h.display() end
+			if now and h.display then h.display() elseif not now and h.displayEnd then h.displayEnd() end
 		elseif action == "Drop" then
 			if now then h.drop() end
 		elseif ONE_SHOT[action] then

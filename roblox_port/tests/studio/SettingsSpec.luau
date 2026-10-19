@@ -144,7 +144,13 @@ return function(check: (string, () -> ()) -> ())
 		for _, w in panel.widgets do
 			if w.kind == "header" then headers += 1 elseif w.kind == "setting" then rows += 1 end
 		end
-		assert(headers == 5 and rows == 23 + #SettingsSpec.LIVE, `{headers} headers, {rows} rows`)
+		assert(#SettingsSpec.LIST == 23 and #SettingsSpec.LIVE == 2 and SettingsSpec.LIVE[2].id == "Inspect" and SettingsSpec.LIVE[2].kind == "action", "two live rows: Spider and the Inspect button (ROBLOX-90)")
+		assert(headers == 5 and rows == 25, `{headers} headers, {rows} rows`)
+		local inspect
+		for _, w in panel.widgets do
+			if w.kind == "setting" and w.id == "Inspect" then inspect = w end
+		end
+		assert(inspect ~= nil and inspect.value.Text == "Look closely" and inspect.value.Size.Y.Offset >= SettingsText.MIN_TARGET and inspect.prev == nil and inspect.minus == nil, "the Inspect row is one button, a touch target")
 		assert(panel.list.ScrollingDirection == Enum.ScrollingDirection.Y and panel.list.AutomaticCanvasSize ~= Enum.AutomaticSize.X, "the list scrolls up and down")
 		assert(panel.hint.TextTruncate == Enum.TextTruncate.AtEnd, "the controls line truncates")
 		local target = SettingsText.MIN_TARGET

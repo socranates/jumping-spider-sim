@@ -73,6 +73,12 @@ function SpiderChoice.safeToChange(s: Standing): boolean
 	return s.mode == "attached" and not s.seized and not s.preparing and not s.jumping and not s.onLine and not s.moulting and not s.struggling
 end
 
+-- May the close look (Inspect mode, ROBLOX-90) begin or go on? Standing safely, as for a change of spider, and also hanging on a locked dragline: a line is a good place to be
+-- looked at. Not while winding up a jump or in flight (a jump's safety line is a line too), held by the wasp, moulting or holding a struggling fly.
+function SpiderChoice.safeToInspect(s: Standing): boolean
+	return (s.mode == "attached" or s.onLine) and not s.seized and not s.preparing and not s.jumping and not s.moulting and not s.struggling
+end
+
 -- Does this appearance have a fan to display (and so a courtship dance)?
 function SpiderChoice.canDance(id: string): boolean
 	local look = Appearances.profiles[id]

@@ -6,7 +6,8 @@
 -- An id is also the name of the Player attribute that holds the value at run time (the older toggles already were: FocusToggle, ReducedMotion,
 -- ShowLastSeen, AutomaticGrip, NotebookNotes, LargeText, SoundMuted), so a setting nobody has changed is an attribute nobody has set.
 --
--- Kinds: "toggle" (true or false), "slider" (a number from min to max in steps), "choice" (one of the listed options, by id).
+-- Kinds: "toggle" (true or false), "slider" (a number from min to max in steps), "choice" (one of the listed options, by id), and, for a live row only,
+-- "action" (a button that does something when it is switched: Inspect your spider, ROBLOX-90; it has no value).
 -- The words follow the frozen Godot game's settings (scripts/presentation/settings.gd and pause_menu.gd) where a setting matches; the ones
 -- Godot had that the port has no part for (stalk and jump-aim toggles, the jump arc, strike assist, headphones, rumble, slow-motion speed,
 -- remapping keys) are left out on purpose and listed in docs/HANDOFF-roblox-settings.md.
@@ -74,6 +75,9 @@ SettingsSpec.LIST = {
 SettingsSpec.LIVE = {
 	{ id = "Spider", section = "spider", label = "Spider", kind = "choice", default = "first_spider",
 		note = "Change it anywhere you stand safely. Not while jumping, on silk, moulting or holding prey." },
+	-- ROBLOX-90: a button, not a value. It closes the panel into Inspect mode (a slow, close look at the spider), when the spider stands safely.
+	{ id = "Inspect", section = "spider", label = "Inspect your spider", kind = "action", default = false,
+		note = "A slow, close look from every side. Only while you stand safely. Cancel leaves." },
 } :: { Setting }
 
 -- How big the caption text is for each Captions option, as a multiple of the HUD's caption size (0: no captions of sounds at all).

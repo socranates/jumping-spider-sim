@@ -27,7 +27,8 @@ tests/notebook.luau (the naturalist's notebook: Godot's pages word for word, the
 tests/mating.luau (the mating cycle: the eligibility gate, the mate's arrival and legs, the courtship meter, the mating, the sac night, the guard days, the hatching, the next generation and their checkpoint records) and
 tests/state.luau (persistent saves: envelope, progress and rest records, session lock, scheduler, server service) and
 tests/state_client.luau (the client's saving wiring against the real service) and tests/state_offline.luau (no server at all) and
-tests/settings.luau (the settings table and model, their saving, the panel, the live wiring and the touch layout).
+tests/settings.luau (the settings table and model, their saving, the panel, the live wiring and the touch layout) and
+tests/inspect.luau (Inspect mode: its numbers, the camera's ease, orbit and restore, the Settings row, the hold, the lock and the reasons it ends, through the real client).
 Usage (from roblox_port/):  python3 tests/run.py [path/to/luau [test.luau ...]]   (default: all of them)"""
 import pathlib, re, subprocess, sys, tempfile
 
@@ -61,6 +62,7 @@ MODULES = [
     ("TetherMath", "Movement/TetherMath.luau"),
     ("CameraMath", "Movement/CameraMath.luau"),
     ("LineFraming", "Movement/LineFraming.luau"),
+    ("InspectView", "Movement/InspectView.luau"),
     ("InputState", "Movement/InputState.luau"),
     ("JumpInput", "Movement/JumpInput.luau"),
     ("StickCarry", "Movement/StickCarry.luau"),
@@ -116,6 +118,7 @@ MODULES = [
     ("AntMimicText", "UI/AntMimicText.luau"),
     ("TarantulaText", "UI/TarantulaText.luau"),
     ("PeacockText", "UI/PeacockText.luau"),
+    ("InspectText", "UI/InspectText.luau"),
     ("Fly", "Prey/Fly.luau"),
     ("PreyPopulation", "Prey/PreyPopulation.luau"),
     ("Catch", "Data/Catch.luau"),
@@ -170,7 +173,7 @@ CLIENT_MODULES = [
     ("SpiderEyes", "../Client/SpiderEyes.luau"),
     ("SaveClient", "../Client/SaveClient.luau"),
 ]
-CLIENT_TESTS = {"state_client.luau","state_offline.luau","growth.luau","perception_client.luau", "client_smoke.luau", "client_ant.luau", "client_rival.luau", "client_mating.luau", "look.luau", "idle.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "wasp.luau", "notebook.luau", "settings.luau"}
+CLIENT_TESTS = {"state_client.luau","state_offline.luau","growth.luau","perception_client.luau", "client_smoke.luau", "client_ant.luau", "client_rival.luau", "client_mating.luau", "look.luau", "idle.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "wasp.luau", "notebook.luau", "settings.luau", "inspect.luau"}
 REFERENCES = ["jump_reference", "tether_reference", "camera_reference", "framing_reference", "perception_reference", "prey_reference", "life_reference", "wasp_reference", "continuing_reference", "growth_reference", "notebook_reference", "notebook_godot"]
 # A reference only the named tests read (it is large; the other bundles leave it out).
 REFERENCE_ONLY = {"continuing_reference": {"continuing.luau"},"prey_reference": {"prey.luau"}, "perception_reference": {"perception.luau"}, "life_reference": {"life.luau"}, "wasp_reference": {"wasp.luau"}, "notebook_reference": {"notebook.luau"}, "notebook_godot": {"notebook.luau"}}
@@ -226,7 +229,7 @@ def main():
     luau = sys.argv[1] if len(sys.argv) > 1 else "luau"
     status = 0
     named = sys.argv[2:]
-    for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "life.luau", "checkpoint.luau", "wasp.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "client_ant.luau", "client_rival.luau", "client_mating.luau", "look.luau", "idle.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "peacock.luau", "antmimic.luau", "tarantula.luau", "continuing.luau", "growth.luau", "notebook.luau", "state.luau", "state_client.luau", "state_offline.luau", "settings.luau", "rival.luau", "rivalnav.luau", "mating.luau"]:
+    for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "life.luau", "checkpoint.luau", "wasp.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "client_ant.luau", "client_rival.luau", "client_mating.luau", "look.luau", "idle.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "peacock.luau", "antmimic.luau", "tarantula.luau", "continuing.luau", "growth.luau", "notebook.luau", "state.luau", "state_client.luau", "state_offline.luau", "settings.luau", "rival.luau", "rivalnav.luau", "mating.luau", "inspect.luau"]:
         if not (HERE / test_file).exists():
             if named:  # a misspelt name must not look like a pass
                 print(f"no such test file: {test_file} (names are relative to tests/, for example look.luau)", file=sys.stderr)

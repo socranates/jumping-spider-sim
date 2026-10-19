@@ -227,7 +227,8 @@ check("the tarantulas: C reaches them, X plays the threat display and silk mat, 
 	key("Display", true); frames(2); key("Display", false)
 	assert(not driver.threat():displaying(), "X again did not stop it")
 	frames(30)
-	assert(not driver.threat():showing() and driver.rig().threat == nil and math.abs(lift() - calm) < 0.03, "the pose did not ease out")
+	-- (0.045, not 0.03: ROBLOX-90 changes spider when the choose key is let go, two frames later, which moves the breath's phase, and the breath moves this foreleg by about 0.01)
+	assert(not driver.threat():showing() and driver.rig().threat == nil and math.abs(lift() - calm) < 0.045, "the pose did not ease out")
 	-- Cancel ends it; a step ends it the same frame; a jump aim (holding Space) ends it too.
 	key("Display", true); frames(2); key("Display", false); frames(30)
 	assert(driver.threat():displaying(), "X did not start it again")

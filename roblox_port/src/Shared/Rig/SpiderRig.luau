@@ -1306,6 +1306,13 @@ function SpiderRig.setBodyHidden(self: Rig, hidden: boolean)
 	applyVisibility(self)
 end
 
+-- The drawn body's length in studs now, head to abdomen: 0.97 for the first spider at its first stage and 1.455 as an adult (0.455 and 0.68 for the peacock spider,
+-- 0.485 and 0.73 for the ant mimic), times the growth stage. Inspect mode (ROBLOX-90) measures its distances in these.
+SpiderRig.BODY_STUDS = 0.97
+function SpiderRig.bodyLength(self: Rig): number
+	return SpiderRig.BODY_STUDS * self._k
+end
+
 -- Where the dragline leaves the body.
 function SpiderRig.spinneretPoint(self: Rig, body: CFrame): Vector3
 	return self._spinneret or body:PointToWorldSpace(self._layout.spinneret*self._growth - Vector3.new(0, self._drop, 0))

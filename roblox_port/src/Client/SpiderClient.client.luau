@@ -385,6 +385,7 @@ local cam: any = SpiderCamera.new(camera, params, function()
 		pos = motor.pos, drawnUp = drawnUp, heading = motor.heading,
 		onLine = motor:onLine(), rest = motor:lineRestPoint(), lip = motor:lineLip(),
   cameraScale = (rig._appearance.cameraScale or 1)*math.sqrt(rig._growth),
+  bodyLength = rig:bodyLength(), bodyDrop = rig._drop, -- (inspect mode measures its orbit in body-lengths about the drawn body: ROBLOX-90)
 	}
 end, function(on: boolean)
 	rig:setEyeView(on)
@@ -438,7 +439,7 @@ local function canChange(): boolean
 end
 -- The spider pick (ROBLOX-71): whether the player chose a spider this visit (only then is the choice sent to be saved), and the one way a choice is
 -- made, shared by the crack's key and the Settings row. One table: the client is at Luau's limit of 200 locals.
-local spiderPick: any = { touched = false }
+local spiderPick: any = { touched = false, inspecting = false, jumpSwallow = false, hold = nil, touchOn = false, Text = require(Shared.UI.InspectText), View = require(Shared.Movement.InspectView) }
 local function setAppearance(id: string)
 	appearance = id
 	player:SetAttribute("Appearance", appearance)
@@ -471,6 +472,13 @@ end
 -- The Settings row's side: standing safely (SpiderChoice.safeToChange) anywhere, not only in the crack. Answers the line the panel shows.
 function spiderPick.safe(): boolean
 	return SpiderChoice.safeToChange({
+		mode = motor.mode, seized = motor.seized, preparing = motor.preparing, jumping = jump:isBusy(), onLine = motor:onLine(),
+		moulting = life.growth:isMoulting(), struggling = prey.feeding.struggling or rivalLegs.Grip.active(rivalLegs.grip),
+	})
+end
+-- The close look's side: the same standing, and the line allowed.
+function spiderPick.safeLook(): boolean
+	return SpiderChoice.safeToInspect({
 		mode = motor.mode, seized = motor.seized, preparing = motor.preparing, jumping = jump:isBusy(), onLine = motor:onLine(),
 		moulting = life.growth:isMoulting(), struggling = prey.feeding.struggling or rivalLegs.Grip.active(rivalLegs.grip),
 	})
@@ -525,8 +533,118 @@ local function toggleDance()
 	end
 end
 
+-- Inspect mode (ROBLOX-90): a slow, close look at the drawn spider. Entered from the Settings row (Inspect your spider) or by holding the choose key / button for
+-- spiderPick.View.HOLD_SECONDS while resting awake in the crack (a tap still changes spider, now when it is let go), and only while the spider is standing or hanging on a
+-- line safely (SpiderChoice.safeToInspect) and nothing else has the game. The camera does the rest (cam:beginInspect); here are the entry, the exit, the hold and the
+-- lock: the controls are the look's (the motor gets the idle input, the buttons that act are nothing, Cancel and the choose key leave, Eye cycles the framings),
+-- the simulation keeps running, and a wasp's warning or the rival's windup ends it at once. Nothing here is saved, and nothing reads the camera back.
+function spiderPick.rivalThreat(): boolean
+	local r = life.rival
+	return r ~= nil and (r.state == "windup" or r.state == "lunge")
+end
+-- Why a close look cannot begin now (a line to say), or nil when it can.
+function spiderPick.refusal(): string?
+	if not session.started or panel:isShowing() or menu:isShowing() or nbPanel:isShowing() or mateLegs.couple.active or mateLegs.phase ~= ""
+		or life.asleep or wasp:isVisiting() or spiderPick.rivalThreat() or not spiderPick.safeLook() then
+		return spiderPick.Text.NOT_NOW
+	end
+	return nil
+end
+function spiderPick.begin(): string?
+	local why = spiderPick.refusal()
+	if why ~= nil then
+		hud:toast(why, false)
+		return why
+	end
+	spiderPick.hold = nil
+	controls:clear() -- (everything held is let go, with no penalty; dropAll is its clear handler)
+	feedPending, cancelPending = false, false
+	rig.focusPoint = nil
+	if not cam:beginInspect() then return spiderPick.Text.NOT_NOW end
+	spiderPick.inspecting = true
+	hud:setNote("", 0)
+	return nil
+end
+-- Ends it. `why`, if given, is told; `instant` cuts the camera back (a danger, a screen), otherwise it eases (0.8 s; a cut in Reduced Motion).
+function spiderPick.finish(why: string?, instant: boolean)
+	if not spiderPick.inspecting then return end
+	spiderPick.inspecting = false
+	cam:endInspect(instant)
+	if why ~= nil then hud:toast(why, instant) end
+end
+function spiderPick.inspectFromSettings(): string?
+	local why = spiderPick.refusal()
+	if why ~= nil then
+		hud:toast(why, false)
+		return why
+	end
+	settingsPanel.returnTo = "game" -- (even from the life menu: the close look is the game's)
+	settingsPanel:close()
+	return spiderPick.begin()
+end
+-- The choose key (C), or RB in the crack on a controller, or the touch Change button went down: a hold of HOLD_SECONDS starts the close look and a tap, let go sooner,
+-- changes spider. In the look the same press leaves it. Anything else RB does (the dance, outside the crack) is as it was.
+function spiderPick.press(action: string)
+	if mateLegs.couple.active then return end
+	if spiderPick.inspecting then
+		spiderPick.finish(nil, false)
+		spiderPick.hold = { action = action, t = 0, fired = true } -- (letting go of this press is nothing)
+		return
+	end
+	if action == "Display" and not (life.resting and device == "gamepad" and not life.asleep) then
+		toggleDance()
+		return
+	end
+	if canChange() then spiderPick.hold = { action = action, t = 0, fired = false } else changeSpider() end
+end
+function spiderPick.release(action: string)
+	local h = spiderPick.hold
+	if h == nil or h.action ~= action then return end
+	spiderPick.hold = nil
+	if not h.fired then changeSpider() end
+end
+-- Each rendered frame, in real time: the hold's clock, and the reasons to leave the look (a danger first: the wasp, the rival's windup; then anything that makes the spider
+-- unsafe to change, a scene or a screen that has the game).
+function spiderPick.update(frameDt: number)
+	local h = spiderPick.hold
+	if h ~= nil then
+		if controls.held[h.action] ~= true or modal() then
+			spiderPick.hold = nil -- (let go by something else: focus lost, a menu, a hidden button; nothing changes)
+		elseif not h.fired then
+			h.t += frameDt
+			if h.t >= spiderPick.View.HOLD_SECONDS then
+				h.fired = true
+				if canChange() then spiderPick.begin() end
+			end
+		end
+	end
+	if spiderPick.inspecting then
+		if wasp:isVisiting() or spiderPick.rivalThreat() then
+			spiderPick.finish(spiderPick.Text.DANGER, true)
+		elseif modal() or GuiService.MenuIsOpen then
+			spiderPick.finish(nil, true) -- (a menu, the notebook, the settings, the catch screen or Roblox's own menu has the game: the look is simply over)
+		elseif mateLegs.couple.active or mateLegs.phase ~= "" or life.asleep or not spiderPick.safeLook() then
+			spiderPick.finish(spiderPick.Text.ENDED, true)
+		end
+	end
+end
+-- The touch buttons while looking: only the arrows (zoom), Back (Cancel) and View (Eye); everything comes back when it ends. Called every frame.
+function spiderPick.touchFrame()
+	local on: boolean = spiderPick.inspecting
+	if on then
+		for _, a in { "Left", "Right", "Jump", "Creep", "Drop", "Recenter", "Focus", "Feed", "Choose", "Display" } do controls:setTouchVisible(a, false) end
+		controls:setTouchLabel("Cancel", spiderPick.Text.TOUCH_BACK)
+		controls:setTouchLabel("Eye", spiderPick.Text.TOUCH_VIEW)
+	elseif spiderPick.touchOn then
+		for _, a in { "Left", "Right", "Jump", "Creep", "Drop", "Recenter", "Focus", "Feed" } do controls:setTouchVisible(a, true) end
+		controls:setTouchLabel("Eye", "Eye")
+	end
+	spiderPick.touchOn = on
+end
+
 -- Backspace / View: back to the retreat checkpoint (the whole sill as it was), or to the start when there is none yet.
 local function returnToCheckpoint()
+	spiderPick.finish(nil, true) -- (a close look does not survive a return to the last rest)
 	local best = checkpoints:loadBest()
 	if not best.ok then
 		mateLegs.skip(true) -- (a scene is not left playing round a spider put back at the start: the pair part, ROBLOX-89)
@@ -576,6 +694,7 @@ local function closeScreens()
 end
 local function fresh(mode: string, easy: boolean, position: Vector3?): boolean
  if not initialRecord or (easy and not session.finishedMain) then return false end
+ spiderPick.finish(nil, true)
  local ok=Checkpoint.restore(initialRecord,checkpointWorld)
  if not ok then return false end
  mateLegs.reset()
@@ -868,6 +987,7 @@ settingsPanel=SettingsPanel.new(player:WaitForChild("PlayerGui"),{
   return setting(id)
  end,
  set=function(id: string,value: any): string?
+  if id=="Inspect" then return spiderPick.inspectFromSettings() end -- (a button, ROBLOX-90: it closes the panel into the close look, or says why not)
   if SettingsModel.live(id) then return spiderPick.fromSettings(value) end
   player:SetAttribute(id,value)
   return nil
@@ -999,18 +1119,26 @@ controls = SpiderInput.bind({
 	notebook = function() openNotebook("game") end,
 	settings = function() openSettings("game") end,
 	focus = function(phase: string)
+		if spiderPick.inspecting then return end
 		if phase == "begin" then focusState:press(setting("FocusToggle") == true, motor.mode == "attached")
 		elseif phase == "cancel" then focusState:clear() end
 	end,
-	choose = function() if not mateLegs.couple.active then changeSpider() end end,
-	display = function() if not mateLegs.couple.active then toggleDance() end end,
+	choose = function() spiderPick.press("Choose") end,
+	chooseEnd = function() spiderPick.release("Choose") end,
+	display = function() spiderPick.press("Display") end,
+	displayEnd = function() spiderPick.release("Display") end,
 	feed = function()
-		if mateLegs.couple.active then return end
+		if mateLegs.couple.active or spiderPick.inspecting then return end
 		ant.stopDisplay()
 		prey.feeding:press()
 		feedPending = true -- in the crack, with nothing to eat, the same button rests (Godot's interact)
 	end,
 	jump = function(phase: string)
+  if spiderPick.inspecting then -- the close look: a jump press leaves it (and is nothing else; what is left of the press is swallowed)
+   if phase == "begin" then spiderPick.finish(nil, false);spiderPick.jumpSwallow = true end
+   return
+  end
+  if spiderPick.jumpSwallow then if phase ~= "begin" then spiderPick.jumpSwallow = false;return end;spiderPick.jumpSwallow = false end
   if life.growth:isMoulting() then return end
   if mateLegs.couple.active then -- the mating scene (ROBLOX-89): the buttons are its skip, and what is left of a press is swallowed like a grip's
    if phase == "begin" then mateLegs.skip(false);gripPress=true elseif gripPress then gripPress=false end
@@ -1036,6 +1164,7 @@ controls = SpiderInput.bind({
 	-- else's then) and, held on the line, lets go; SilkController counts only a fresh press after the 0.4 s grace, held 0.6 s.
 	cancel = function(phase: string)
 		if phase ~= "begin" then return end
+		if spiderPick.inspecting then spiderPick.finish(nil, false);return end -- (Cancel leaves the close look, and is nothing else)
 		if mateLegs.couple.active then mateLegs.skip(false);return end
 		ant.stopDisplay()
 		cancelPending = true -- also ends a rest
@@ -1044,13 +1173,21 @@ controls = SpiderInput.bind({
 		focusState:cancel(jump:isBusy() or #jump.events > 0 or motor:onLine())
 		jump:cancel()
 	end,
-	drop = function() if life.growth:isMoulting() or mateLegs.couple.active then return end; ant.stopDisplay(); motor:requestDrop() end,
+	drop = function() if life.growth:isMoulting() or mateLegs.couple.active or spiderPick.inspecting then return end; ant.stopDisplay(); motor:requestDrop() end,
 	clear = dropAll,
 	reset = function() if not panel:isShowing() then returnToCheckpoint() end end, -- the catch screen has its own way back
-	gait = function() rig.gaitMode = if rig.gaitMode == "Tetrapod" then "Unilateral" else "Tetrapod" end,
-	eye = function() if not mateLegs.couple.active then cam:toggleEyeView() end end,
-	recenter = function() cam:startRecenter() end,
-	slow = function() slow = not slow end,
+	gait = function() if spiderPick.inspecting then return end; rig.gaitMode = if rig.gaitMode == "Tetrapod" then "Unilateral" else "Tetrapod" end,
+	eye = function()
+		if mateLegs.couple.active then return end
+		if spiderPick.inspecting then -- the close look: the next framing (face, side, top)
+			local id: string? = cam:inspectCycle()
+			if id ~= nil then hud:toast(spiderPick.Text.framing(id), false) end
+			return
+		end
+		cam:toggleEyeView()
+	end,
+	recenter = function() if not spiderPick.inspecting then cam:startRecenter() end end,
+	slow = function() if not spiderPick.inspecting then slow = not slow end end,
 	touchLook = function(delta: Vector2) cam:touchLook(delta) end,
 	help = function()
 		helpVisible = not (helpVisible and (setting("ControlHints") or helpUntil == math.huge))
@@ -1066,7 +1203,7 @@ controls = SpiderInput.bind({
 
 -- One fixed tick's intent from the controls, for the motor.
 local function tickInput(): any
- if life.growth:isMoulting() or mateLegs.couple.active then return SpiderMotor.idleInput() end
+ if life.growth:isMoulting() or mateLegs.couple.active or spiderPick.inspecting then return SpiderMotor.idleInput() end -- (the close look: the spider stays where it is)
 	local r, f = controls:axes()
 	if jump:isAiming() then r, f = 0, 0 end -- left stick aims, never walks during the held jump
 	local wish = Vector3.zero
@@ -1126,7 +1263,7 @@ local function updateHud(frameDt: number)
 	local aiming = jump:isAiming()
 	local view: any = {
 		device = device, aiming = aiming, focus = controls.held.Focus == true or focusActive(), eyeView = cam.eyeView,
-		status = {}, helpVisible = helpVisible, helpText = ControlText.helpCard(device) .. PeacockText.helpExtra(device, SpiderChoice.displayKind(appearance)),
+		status = {}, helpVisible = helpVisible, helpText = ControlText.helpCard(device) .. PeacockText.helpExtra(device, SpiderChoice.displayKind(appearance)) .. "\n" .. spiderPick.Text.helpLine(device),
 		caption = eyes:captionView(device),
 	}
 	-- Captions for sounds and vibrations (ROBLOX-49): off, normal or large. The eye view's own explanation above is not a sound caption.
@@ -1192,7 +1329,7 @@ local function updateHud(frameDt: number)
  view.dayLine = view.growth .. (if view.dayLine then "\n" .. view.dayLine else "")
  view.notice = if life.noticeSeconds > 0 and life.notice ~= "" then life.notice else nil
 	local canRest = life:canRest(lifeSpider)
-	local restPrompt = LifeText.prompt(life.asleep, life.resting, canRest, clock:isSleepTime() and not life:tooHungryToSleep(), device, PeacockText.change(device, appearance))
+	local restPrompt = LifeText.prompt(life.asleep, life.resting, canRest, clock:isSleepTime() and not life:tooHungryToSleep(), device, PeacockText.change(device, appearance) .. "    " .. spiderPick.Text.holdHint(device))
  if life.growth:isMoulting() then
   restPrompt={title="Moulting in the silk-lined crack",hint="The spider pulls free of its old skin. Wait here while the hours pass."}
  elseif life.growth.ready and canRest and not life.resting then
@@ -1229,7 +1366,9 @@ local function updateHud(frameDt: number)
 		view.prompt = { hint = ControlText.walkHint(device) .. (if displayKind ~= nil then "    " .. displayHint else "") }
 	end
 	if os.clock() > helpUntil and helpVisible then helpVisible = false end
+	spiderPick.touchFrame()
 	local restLabel = LifeText.touchLabel(life.asleep, life.resting, canRest, clock:isSleepTime() and not life:tooHungryToSleep())
+	if not spiderPick.inspecting then
 	controls:setTouchVisible("Feed", (prey.feeding.held ~= nil or restLabel ~= nil) and not life.growth:isMoulting())
 	controls:setTouchLabel("Feed", if prey.feeding.held ~= nil then "Eat" else restLabel or "Eat")
 	controls:setTouchLabel("Jump", if prey.feeding.struggling or rivalLegs.Grip.active(rivalLegs.grip) then "Grip" else "Jump")
@@ -1240,6 +1379,11 @@ local function updateHud(frameDt: number)
 	controls:setTouchVisible("Choose", canChange())
 	controls:setTouchVisible("Display", displayKind ~= nil and not onLine and not life.resting and motor.mode == "attached")
 	controls:setTouchLabel("Display", if displayKind == "antennae" then ant.Text.touchDisplay(displayOn) elseif displayKind == "threat" then ant.ThreatText.touchDisplay(displayOn) else PeacockText.touchDisplay(displayOn))
+	end
+	if spiderPick.inspecting then -- the close look shows the spider's name and one line of controls, and nothing else (no hunger, no time, no notices or captions)
+		view = { device = device, status = {}, helpVisible = view.helpVisible, helpText = view.helpText, largeText = view.largeText, captionScale = view.captionScale,
+			prompt = { title = spiderPick.Text.nameLine(appearance), hint = spiderPick.Text.hint(device) } }
+	end
 	hud:update(view, frameDt)
 end
 
@@ -1247,6 +1391,7 @@ end
 local accumulator = 0
 RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, function(frameDt: number)
 	updateSaves()
+	spiderPick.update(frameDt) -- (the choose hold's clock and the close look's reasons to end)
 	if panel:isShowing() then panel:update(frameDt) end
 	if nbPanel:isShowing() then nbPanel:update(frameDt) end
 	if settingsPanel:isShowing() then settingsPanel:update(frameDt) end
@@ -1299,7 +1444,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			})
 			for _, signal in wasp:drainSignals() do
 				watch:onWasp(signal.kind, signal.escaped)
-				if signal.kind == "visit_started" then rig:cue("alarm") end -- the warning begins: legs I up and still for a moment (ROBLOX-87)
+				if signal.kind == "visit_started" then rig:cue("alarm");spiderPick.finish(spiderPick.Text.DANGER, true) end -- the warning begins: legs I up and still for a moment (ROBLOX-87)
 				if signal.kind == "caught" then
 					-- Stung: the spider lets go of everything and is carried (Godot SpiderMotor.seize).
 					motor:seize()
@@ -1353,7 +1498,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
              life.mealFood+=rivalFood*Growth.READY_FOOD/(3*Species.fly_like_prototype.body.nutrition)
             end
             if rivalEvent=="caught" then endLife("rival")
-            elseif rivalEvent=="warning" then rig:cue("alarm");life:showNotice("The other spider crouches to jump. Dodge, drop or jump away!")
+            elseif rivalEvent=="warning" then rig:cue("alarm");spiderPick.finish(spiderPick.Text.DANGER, true);life:showNotice("The other spider crouches to jump. Dodge, drop or jump away!")
             elseif rivalEvent=="captured" or rivalEvent=="sprang" then life:showNotice(rivalLegs.Text.strike(rivalEvent,needs.gentle) or "")
             elseif rivalEvent=="counter" then
              needs:injure(rivalFood) -- the bite costs energy (nothing in the gentle modes)
@@ -1540,10 +1685,17 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	camSettings.invertX, camSettings.invertY = setting("InvertX"), setting("InvertY")
 	camSettings.fov, camSettings.distance, camSettings.framing = setting("FieldOfView"), setting("CameraDistance"), setting("FrameLine")
 	camSettings.levelHorizon = setting("EyeLevelHorizon")
+	camSettings.reducedMotion = setting("ReducedMotion") == true
 	cam:configure(camSettings)
 	-- Looking runs in real time, so slow motion never makes the camera sluggish.
 	local lx, ly = controls:lookAxes(jump:isAiming())
-	if not modal() then cam:render(frameDt, lx, ly) end
+	if not modal() then
+		if spiderPick.inspecting then
+			local _, zoom = controls:axes() -- the left stick, or W and S: forward is closer (the close look)
+			cam:inspectZoom(zoom, frameDt)
+		end
+		cam:render(frameDt, lx, ly)
+	end
 	-- The Focus that feeds the perception HUD also decides how far the principal eyes are in use (the eye view's picture). The
 	-- picture sets the field of view, so it comes before the HUD projects anything.
 	local focusing = motor.mode == "attached" and (controls.held.Focus == true or focusActive())
@@ -1563,7 +1715,7 @@ if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
 		local run: any = (require :: any)(playback)
 		run({
 			prey = prey, flyBodies = flyBodies, waspBody = waspBody, life = life, wasp = wasp, caughtPanel = panel, needs = needs, checkpoints = checkpoints, returnToCheckpoint = function() returnToCheckpoint() end, lifeSpider = function() return lifeSpider end, sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
-			input = controls, rivalLegs = rivalLegs, mateLegs = mateLegs,
+			input = controls, rivalLegs = rivalLegs, mateLegs = mateLegs, spiderPick = spiderPick,
 			notebook = book, notebookWatch = watch, notebookPanel = nbPanel, openNotebook = openNotebook, settingsPanel = settingsPanel, openSettings = openSettings, setting = setting, cam = cam, soundscape = soundscape, eyes = eyes,
 			session=session, menu=menu, openMenu=openMenu, endLife=endLife, fresh=fresh, continueAnother=continueAnother, currentStore=function() return checkpoints end,
 			changeSpider = function() changeSpider() end, dance = function() return dance end, ant = function() return ant.state end, antPose = function() return ant.pose end, threat = function() return ant.threat end, threatPose = function() return ant.threatPose end, appearance = function() return appearance end, rig = function() return rig end,

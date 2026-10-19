@@ -14,15 +14,18 @@ from "### ROBLOX-94" to the end, and `claude/coordination.md` if Nathan attaches
 owns the work).
 
 Your jobs, in order:
-1. Restore: `git clone https://github.com/socranates/jumping-spider-sim` and check out `claude/new-session-lqh973` (head e092fc4 + the
-   docs commit after it = playtest v32, published). Install the toolchain below. Verify `bash $HOME/p2_work/check.sh types` clean,
+1. Restore: `git clone https://github.com/socranates/jumping-spider-sim` and check out `claude/new-session-lqh973` (e092fc4 = playtest v32, published; then the docs commit, the W3
+   merge d741e1f and its build commit). Install the toolchain below. Verify `bash $HOME/p2_work/check.sh types` clean,
    `compile` 143/143, `python3 tests/run.py $HOME/luau/luau worldmap.luau` passes (191).
-2. Finish W3 (garden life, ROBLOX-96). Its work in progress is on the branch `claude/w3-wip` (one WIP commit on top of e092fc4: the
-   helper's uncommitted tree at the moment of the snapshot, mid-round: prey per region, the gnat and the aphid, the woodlouse, the
-   stone home words, the descent case, the page, saves per region). Check it out on a fresh branch from the main line, read
-   `docs/DECISIONS.md`'s ROBLOX-96 draft and the W3 handoff section in it, run the suites named in the brief, fix what is red, finish what
-   is missing, then the whole suite, the records, one commit in the house style. The W3 brief is in this file's end.
-3. Build, bundle, publish as v33 by the route below; then W3b (the bestiary), W4, W5 per the design.
+2. W3 (garden life, ROBLOX-96) FINISHED after this file was first written: commit b5c651d, merged as d741e1f, all 38 suites green
+   (134,083 checks), strict clean, 146/146 compile; the places were rebuilt at the commit after the merge (evidence in
+   `tests/studio/BuildInfo.luau`). If the session that wrote this did not manage to publish it (check `claude-playtest/README-sill.txt`
+   on the PC for a v33 note, and the Output's "Add publish notes to" counter: v34 means v33 went out), publish it as **v33** by the route
+   below: nothing of W3 has run in Studio. The W3 helper's open items for Nathan are in `docs/HANDOFF-roblox-world.md` (W3 section):
+   prey and woodlouse counts (6/4), the 100-stud line (`SilkController.game.maxLine`, needed for the 90-stud let-down), whether woodlice
+   should show to the senses, whether aphids should wander the plant; and the page's sources could not be opened from the container
+   (DNS refused), so they rest on abstracts: open them in a session that can and correct the page if needed.
+3. Then W3b (the bestiary), W4, W5 per the design.
 4. Keep `claude/where-we-left-off.md` in Nathan's claude.ai Project current at every publish (give Nathan the text to paste).
 
 Standing rules from Nathan, verbatim: "Publish only the playtest place." "Never name the daughter." "Peacock and ant mimic stay free

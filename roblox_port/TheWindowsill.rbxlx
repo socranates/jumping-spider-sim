@@ -9326,6 +9326,12 @@ local DOWN = Vector3.new(0,-1,0)
 -- farther than their body length, but no measured length is claimed here). Everything else about the line (the slack, the hang, the release) is Godot's.
 Silk.game = { lowerScale = 0.5, maxLine = 100 }
 
+-- ROBLOX-111: what the line did, counted for the self-test (a Studio run cannot be stepped through): the ticks on the line, how much line was let out
+-- and how far the body fell, the sweeps that stopped a move and what they took off it, the tangent touches let pass, and the push-outs of the skin. Never reset
+-- (a reader takes a copy and the difference); nothing reads it to decide anything.
+function Silk.newStats()
+	return { ticks = 0, letOut = 0, fell = 0, stops = 0, stopped = 0, grazes = 0, pushes = 0, pushed = 0, pushedUp = 0 }
+end
 function Silk.new(world, surfaces, tuning, gravity: number)
 	local params = RaycastParams.new()
 	params.FilterType = Enum.RaycastFilterType.Include
@@ -9337,7 +9343,7 @@ function Silk.new(world, surfaces, tuning, gravity: number)
 		speed=tuning.reel_speed_wu_s, lowerSpeed=tuning.reel_speed_wu_s, gravity=gravity, mode="none", paid=0, rest=0, taut=false,
 		anchor=Vector3.zero, normal=Vector3.yAxis, anchorPart=nil, bend=nil, bendPart=nil,
 		lowering=false, snagged=false, block="", message="", release=Math.newRelease(), walk=nil,
-		previous=Vector3.zero},Silk)
+		previous=Vector3.zero, stats=Silk.newStats()},Silk)
 end
 -- Opt in to the game's lowering (Silk.game): the let-down at lowerScale of the reel speed. Reeling in is untouched.
 function Silk.useGameRules(self: any)
@@ -9489,6 +9495,8 @@ function Silk.unstick(self: any, position: Vector3, velocity: Vector3, intent: n
 			if d > 1e-6 and d < SKIN - 1e-4 then
 				local n = inst.CFrame:VectorToWorldSpace(out / d)
 				local contact = { Instance = inst, Position = inst.CFrame:PointToWorldSpace(near), Normal = n, Distance = 0 }
+				local stats = self.stats
+				stats.pushes += 1; stats.pushed += SKIN - d; stats.pushedUp += n.Y * (SKIN - d)
 				p += n * (SKIN - d)
 				v -= n * math.min(0, v:Dot(n))
 				if d < RADIUS + 1e-3 and self:landable(contact, p, intent) then return p, Vector3.zero, contact end
@@ -9512,20 +9520,40 @@ function Silk.groundUnder(self: any, p: Vector3, hit): boolean
 	return under ~= nil and under.Instance == hit.Instance
 end
 
+-- ROBLOX-111: a contact the move could not have reached. A sweep that reports a face the body is moving along or away from, or one nearer the face than the body
+-- now is by less than the move goes into it, is the engine's tangent touch, not a contact: in exact geometry a sphere outside a box meets it only by closing the gap
+-- (the box world's sweeps never report one, so nothing changes there). Studio, v36: the let-down from the outer sill's front edge, the body hanging plumb 0.31 off
+-- the brick face, ran at 0.559 studs a second where the box world's is 0.752; a sweep that stops the body on such a touch loses the tick's whole move (it
+-- slides once, and the slide meets the same face), so a touch on one tick in four is a quarter of the let-down. The skin is kept by the push-out below.
+function Silk.grazing(hit, p: Vector3, motion: Vector3): boolean
+	local n = hit.Normal
+	local into = -motion:Dot(n)
+	if into <= 1e-4 then return true end
+	local gap = (p - hit.Position):Dot(n) - RADIUS
+	return into < gap - 1e-3
+end
 -- Sweep the body, then slide once. Never satisfy a constraint by teleporting through a wall.
 function Silk.move(self: any, position: Vector3, motion: Vector3, velocity: Vector3, intent: number)
 	local p=position
 	local remaining=motion
+	local stopped=false
 	for _=1,2 do
 		if remaining.Magnitude<1e-7 then break end
 		local hit=workspace:Spherecast(p,RADIUS,remaining,self.params)
+		if hit and Silk.grazing(hit,p,remaining) then self.stats.grazes+=1; hit=nil end
 		if not hit then p+=remaining; break end
 		-- Maintain a skin along the contact normal at grazing angles.
 		p=hit.Position+hit.Normal*(RADIUS+0.01)
 		if self:landable(hit,p,intent) then return p,Vector3.zero,hit end
 		local rest=remaining-remaining.Unit*math.min(hit.Distance,remaining.Magnitude)
 		remaining=rest-hit.Normal*rest:Dot(hit.Normal)
+		stopped=true
 		velocity-=hit.Normal*math.min(0,velocity:Dot(hit.Normal))
+	end
+	if stopped then -- (ROBLOX-111: the counts: a stop, and how much of the move along its own direction it took away)
+		local length=motion.Magnitude
+		self.stats.stops+=1
+		if length>1e-9 then self.stats.stopped+=math.max(0,length-(p-position):Dot(motion/length)) end
 	end
 	-- While lowering alongside the launch wall, a nearly tangent native sweep can
 	-- miss a shallow contact. Maintain the wall's skin without grabbing it again.
@@ -9547,6 +9575,8 @@ function Silk.move(self: any, position: Vector3, motion: Vector3, velocity: Vect
 end
 function Silk.step(self: any, position: Vector3, velocity: Vector3, intent: number, releaseDown: boolean)
 	if self.mode~="locked" or not self:refresh() then return position,velocity,nil end
+	local stats=self.stats
+	stats.ticks+=1
 	if Math.releaseTick(self.release,true,releaseDown) then
 		self:clear(); self.message="Silk released"; return position,velocity,nil
 	end
@@ -9557,7 +9587,7 @@ function Silk.step(self: any, position: Vector3, velocity: Vector3, intent: numb
 	-- "Shortest" only when a reel actually ran and could not shorten (Godot sets it inside its not-snagged reel branch);
 	-- a snag while swinging under a leaf must not leave reeling refused once the line is clear again (ROBLOX-10).
 	if intent>0 and not self.snagged and self.rest>=oldRest-1e-6 and self.block=="" then self.block="shortest" end
-	if intent<0 and self.rest>oldRest then self.block="" end
+	if intent<0 and self.rest>oldRest then self.block=""; stats.letOut+=self.rest-oldRest end
 	local p=position
 	-- A padded bend can leave the shortest line just below the lip. Acquire a nearby
 	-- real face with the legs (0.6 stud reach), never through an intervening obstacle.
@@ -9604,6 +9634,7 @@ function Silk.step(self: any, position: Vector3, velocity: Vector3, intent: numb
 		local ke=0.5*velocity:Dot(velocity)
 		velocity*=if ke>1e-12 then math.sqrt(math.clamp((energy-self.gravity*p.Y)/ke,0,1)) else 0
 	end
+	stats.fell+=position.Y-p.Y
 	local path=self:path(p)
 	self.paid=math.min(math.max(self.paid,path),self.rest)
 	self.taut=path>=self.rest-0.003
@@ -30177,6 +30208,7 @@ function BugBodies.draw(self: any, lice: { any }, now: number?, cameraAt: Vector
 		end
 	end
 	if #parts > 0 then Workspace:BulkMoveTo(parts, frames, Enum.BulkMoveMode.FireCFrameChanged) end
+	self.moved = #parts -- (ROBLOX-111: the parts placed this frame, for the self-test's frame profile)
 end
 
 return BugBodies
@@ -30910,6 +30942,7 @@ function FlyBodies.draw(self: any, flies: { any }, now: number, cameraAt: Vector
 		end
 	end
 	if #parts > 0 then Workspace:BulkMoveTo(parts, frames, Enum.BulkMoveMode.FireCFrameChanged) end
+	self.moved = #parts -- (ROBLOX-111: the parts placed this frame, for the self-test's frame profile)
 end
 
 return FlyBodies
@@ -30917,6 +30950,147 @@ return FlyBodies
           </Properties>
         </Item>
         <Item class="ModuleScript" referent="166">
+          <Properties>
+            <string name="Name">FrameProfile</string>
+            <string name="Source"><![CDATA[--!strict
+-- The client's frame, timed by part (ROBLOX-111): what the self-test prints when it samples the frame time, so a Studio run says where a slow frame's time goes.
+--
+-- The render step's function calls `lap(name)` after each of its parts: the time since the last lap (or the frame's `begin`) is charged to `name`, summed over the
+-- frame (a part of the sim's tick runs as many times as the frame has ticks), and at `finish` each name's frame total goes into its mean and its worst. Off (the
+-- default, and always for a player: only the self-test turns it on) every call returns at once, so the game pays a function call per lap and nothing else. The
+-- clock is os.clock (the engine's high-resolution timer); what is not inside the render step (the engine's rendering and physics, other scripts) is the frame time
+-- minus the sum, which the self-test prints beside it.
+local FrameProfile = {}
+
+export type Row = { name: string, mean: number, worst: number }
+
+local state = {
+	on = false,
+	clock = os.clock,
+	last = 0,
+	began = 0,
+	heap = 0, -- (the Lua heap at the last lap, KB: gcinfo)
+	alloc = {} :: { [string]: number }, -- (KB allocated by each part over the sample: the heap's growth inside it, a step with a collection in it not counted)
+	allocAll = 0,
+	frames = 0,
+	current = {} :: { [string]: number },
+	total = {} :: { [string]: number },
+	worst = {} :: { [string]: number },
+	order = {} :: { string },
+	lua = { total = 0, worst = 0 },
+	counts = {} :: { [string]: number }, -- (a number a frame, summed: `count`)
+	countOrder = {} :: { string },
+}
+FrameProfile.state = state
+
+-- Begins counting from nothing (`clock`: a test's own; os.clock otherwise).
+function FrameProfile.start(clock: (() -> number)?)
+	state.on = true
+	state.clock = clock or os.clock
+	state.frames = 0
+	table.clear(state.current); table.clear(state.total); table.clear(state.worst); table.clear(state.order)
+	state.lua.total, state.lua.worst = 0, 0
+	table.clear(state.counts); table.clear(state.countOrder)
+	table.clear(state.alloc); state.allocAll = 0
+end
+
+-- Stops counting; what was counted stays for `rows`.
+function FrameProfile.stop()
+	state.on = false
+end
+
+function FrameProfile.on(): boolean
+	return state.on
+end
+
+-- The render step's first line.
+function FrameProfile.begin()
+	if not state.on then return end
+	local now = state.clock()
+	state.last, state.began = now, now
+	state.heap = gcinfo()
+	table.clear(state.current)
+end
+
+-- The time since the last lap is this part's.
+function FrameProfile.lap(name: string)
+	if not state.on then return end
+	local now = state.clock()
+	local cur = state.current
+	if cur[name] == nil and state.total[name] == nil then table.insert(state.order, name) end
+	cur[name] = (cur[name] or 0) + (now - state.last)
+	state.last = now
+	local heap = gcinfo()
+	local grew = heap - state.heap
+	if grew > 0 then state.alloc[name] = (state.alloc[name] or 0) + grew; state.allocAll += grew end
+	state.heap = heap
+end
+
+-- A number of this frame's (the parts a drawer moved), summed over the frames for its mean.
+function FrameProfile.count(name: string, n: number)
+	if not state.on then return end
+	if state.counts[name] == nil then state.counts[name] = 0; table.insert(state.countOrder, name) end
+	state.counts[name] += n
+end
+
+-- The render step's last line: the frame's parts into their means and worsts.
+function FrameProfile.finish()
+	if not state.on then return end
+	FrameProfile.lap("other")
+	state.frames += 1
+	local sum = 0
+	for name, t in state.current do
+		state.total[name] = (state.total[name] or 0) + t
+		state.worst[name] = math.max(state.worst[name] or 0, t)
+		sum += t
+	end
+	state.lua.total += sum
+	state.lua.worst = math.max(state.lua.worst, sum)
+end
+
+-- Every part counted, in the order first seen, with its mean per frame and its worst frame (milliseconds); and the frames and the whole render step's mean and worst.
+function FrameProfile.rows(): ({ Row }, number, number, number)
+	local out: { Row } = {}
+	local n = math.max(state.frames, 1)
+	for _, name in state.order do
+		table.insert(out, { name = name, mean = (state.total[name] or 0) / n * 1000, worst = (state.worst[name] or 0) * 1000 })
+	end
+	return out, state.frames, state.lua.total / n * 1000, state.lua.worst * 1000
+end
+
+-- One line: "<part> <mean>/<worst>" for each part over 0.05 ms mean or 1 ms worst (the rest summed as "small"), the step's whole, in milliseconds a frame.
+function FrameProfile.line(): string
+	local rows, frames, mean, worst = FrameProfile.rows()
+	table.sort(rows, function(a, b) return a.mean > b.mean end)
+	local parts: { string } = {}
+	local small = 0
+	for _, row in rows do
+		if row.mean >= 0.05 or row.worst >= 1 then
+			table.insert(parts, string.format("%s %.2f/%.1f", row.name, row.mean, row.worst))
+		else
+			small += row.mean
+		end
+	end
+	if small > 0 then table.insert(parts, string.format("small %.2f", small)) end
+	-- the allocation: KB a frame, the parts that make over 1 KB a frame
+	local n = math.max(frames, 1)
+	local heavy: { string } = {}
+	for _, name in state.order do
+		local kb = (state.alloc[name] or 0) / n
+		if kb >= 1 then table.insert(heavy, string.format("%s %.0f", name, kb)) end
+	end
+	local counts: { string } = {}
+	for _, name in state.countOrder do table.insert(counts, string.format("%s %.0f", name, state.counts[name] / math.max(frames, 1))) end
+	return string.format("%d frames, the render step %.2f ms a frame (worst %.1f): %s (mean/worst ms)%s; allocated %.0f KB a frame%s", frames, mean, worst,
+		table.concat(parts, ", "), if #counts > 0 then "; a frame: " .. table.concat(counts, ", ") else "", state.allocAll / n,
+		if #heavy > 0 then " (" .. table.concat(heavy, ", ") .. ")" else "")
+end
+
+return FrameProfile
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="167">
           <Properties>
             <string name="Name">LookStream</string>
             <string name="Source"><![CDATA[--!strict
@@ -31175,7 +31349,7 @@ return LookStream
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="167">
+        <Item class="ModuleScript" referent="168">
           <Properties>
             <string name="Name">MateStage</string>
             <string name="Source"><![CDATA[--!strict
@@ -31495,7 +31669,7 @@ return MateStage
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="168">
+        <Item class="ModuleScript" referent="169">
           <Properties>
             <string name="Name">NotebookArt</string>
             <string name="Source"><![CDATA[--!strict
@@ -31533,7 +31707,7 @@ return Art
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="169">
+        <Item class="ModuleScript" referent="170">
           <Properties>
             <string name="Name">NotebookPanel</string>
             <string name="Source"><![CDATA[--!strict
@@ -32036,7 +32210,7 @@ return NotebookPanel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="170">
+        <Item class="ModuleScript" referent="171">
           <Properties>
             <string name="Name">OldSkins</string>
             <string name="Source"><![CDATA[--!strict
@@ -32076,7 +32250,7 @@ return OldSkins
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="171">
+        <Item class="ModuleScript" referent="172">
           <Properties>
             <string name="Name">PerceptionHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -32311,7 +32485,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="172">
+        <Item class="ModuleScript" referent="173">
           <Properties>
             <string name="Name">PerceptionStage</string>
             <string name="Source"><![CDATA[--!strict
@@ -32356,7 +32530,7 @@ return Stage
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="173">
+        <Item class="ModuleScript" referent="174">
           <Properties>
             <string name="Name">SaveClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -32481,7 +32655,7 @@ return SaveClient
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="174">
+        <Item class="ModuleScript" referent="175">
           <Properties>
             <string name="Name">SelfTest</string>
             <string name="Source"><![CDATA[--!strict
@@ -32502,9 +32676,12 @@ return SaveClient
 -- sill's front edge at about 0.75 studs a second, on the line all the way; the sill's flies, the bed's gnats, aphids, springtails and leafhoppers and the wall's moths made
 -- and drawn under the fly's part budget; the lock (ROBLOX-110: Recentre locks onto a fly the spider sees, the body turns to it, the sidestep, and lets go); the woodlice made and drawn; the notebook opened and closed; the clock put to dusk and the moths flying; a rest in the crack,
 -- its checkpoint kept and returned to; the music playing and the room tone silent; the frame time over five seconds on the sill and in the bed; the parts in the workspace.
+-- ROBLOX-111: it is also the frame's profiler. Each frame sample prints the client's render step timed by part (Client/FrameProfile), the engine's memory and part
+-- counts and a census of what is drawn; the bed is sampled again once its looks are made, then without the looks and without shadows; the let-down is profiled,
+-- prints what the line did (SilkController's counts) and is judged in the game's time.
 -- Each Studio process writes its own log (%LOCALAPPDATA%\Roblox\logs); tools/studio/selftest.ps1 reads the newest for these lines.
 -- The CLI suite tests/selftest.luau runs the same checks against the real client on the shim's box world, with a host of its own (simulated frames and clock), so the run is
--- proven to complete and print END before it ever reaches Studio. Nothing here has been run in Studio yet.
+-- proven to complete and print END before it ever reaches Studio. First run in Studio at v36 (33 of 34; the line failed, ROBLOX-111); ROBLOX-111's additions not yet.
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
@@ -32530,6 +32707,9 @@ SelfTest.LOWER_BAND = { 0.6, 0.9 }
 -- How long the frame time is sampled in each place, and how long the dusk's moths are given to take wing.
 SelfTest.SAMPLE_S = 5
 SelfTest.DUSK_WAIT = 30
+-- ROBLOX-111: how long the looks near the bed are given to be made, and each of the bed's two comparisons (the looks out, the shadows off) is sampled.
+SelfTest.SETTLE_WAIT = 20
+SelfTest.AB_S = 3
 -- Places on the map the checks use (the motor's body centre, Motor.HEIGHT above the support): the open sill floor, the crack, the outer sill's front edge and the bed's soil.
 SelfTest.SILL = Vector3.new(-5, 0.31, -9)
 SelfTest.CRACK = Vector3.new(-25.5, 0.31, 6)
@@ -32560,7 +32740,7 @@ local function engineHost(): Host
 end
 
 -- ---------------------------------------------------------------- the run's state and its words
-type Run = { ctx: any, host: Host, pass: number, fail: number, skip: number, doing: string, began: number, beat: number }
+type Run = { ctx: any, host: Host, pass: number, fail: number, skip: number, doing: string, began: number, beat: number, bedAt: number?, bedSettled: number? }
 
 local function say(r: Run, text: string)
 	r.host.print(SelfTest.PREFIX .. " " .. text)
@@ -32673,7 +32853,7 @@ local function drawn(r: Run, flies: { any }, what: string): number
 	return n
 end
 
-local function frameSample(r: Run, seconds: number): string
+local function rawSample(r: Run, seconds: number): string
 	if r.host.sample ~= nil then return (r.host.sample :: any)(seconds) end
 	local dts: { number } = {}
 	local conn = RunService.RenderStepped:Connect(function(dt: number) table.insert(dts, dt) end)
@@ -32685,6 +32865,68 @@ local function frameSample(r: Run, seconds: number): string
 	local mean = if #dts > 0 then sum / #dts else 0
 	return string.format("%d frames, mean %.1f ms (%.0f fps), worst %.1f ms, physics %.0f fps",
 		#dts, mean * 1000, if mean > 0 then 1 / mean else 0, worst * 1000, (Workspace :: any):GetRealPhysicsFPS())
+end
+
+-- ROBLOX-111: what the engine says of itself, each in its own pcall (a name the engine does not have is "?"): the client's memory (MB), the Lua heap (MB), the
+-- instances, the physics primitives and the moving ones, and the parts awake in the physics.
+local function engineLine(): string
+	local function ask(fn: () -> any): string
+		local ok, v = pcall(fn)
+		if not ok or v == nil then return "?" end
+		if type(v) == "number" then return if v == math.floor(v) then string.format("%d", v) else string.format("%.1f", v) end
+		return tostring(v)
+	end
+	local stats: any = nil
+	pcall(function() stats = (game :: any):GetService("Stats") end)
+	return string.format("memory %s MB, Lua heap %s MB, instances %s, primitives %s (moving %s), awake parts %s",
+		ask(function() return stats:GetTotalMemoryUsageMb() end), ask(function() return (gcinfo() :: number) / 1024 end),
+		ask(function() return stats.InstanceCount end), ask(function() return stats.PrimitivesCount end), ask(function() return stats.MovingPrimitivesCount end),
+		ask(function() return (Workspace :: any):GetNumAwakeParts() end))
+end
+
+-- ROBLOX-111: what the renderer is given, by top-level child of the workspace: parts, and among them the see-through (Transparency between 0 and 1), the
+-- shadow-casting and the meshed (a SpecialMesh: the ellipsoids); the folders with fewer than 20 parts summed as "the rest".
+local function census(): string
+	local rows: { string } = {}
+	local all = { parts = 0, clear = 0, shadow = 0, mesh = 0 }
+	local rest = { parts = 0, clear = 0, shadow = 0, mesh = 0 }
+	for _, child in Workspace:GetChildren() do
+		local c = { parts = 0, clear = 0, shadow = 0, mesh = 0 }
+		local list = child:GetDescendants()
+		table.insert(list, child)
+		for _, d in list do
+			if d:IsA("BasePart") then
+				c.parts += 1
+				local t = (d :: BasePart).Transparency
+				if t > 0 and t < 1 then c.clear += 1 end
+				if (d :: BasePart).CastShadow and t < 1 then c.shadow += 1 end
+			elseif d:IsA("SpecialMesh") then
+				c.mesh += 1
+			end
+		end
+		for k, v in c do all[k] += v end
+		if c.parts >= 20 then
+			table.insert(rows, `{child.Name} {c.parts}/{c.clear}/{c.shadow}/{c.mesh}`)
+		else
+			for k, v in c do rest[k] += v end
+		end
+	end
+	table.sort(rows)
+	if rest.parts > 0 then table.insert(rows, `the rest {rest.parts}/{rest.clear}/{rest.shadow}/{rest.mesh}`) end
+	return `{all.parts} parts, {all.clear} see-through, {all.shadow} casting shadows, {all.mesh} meshed (parts/see-through/shadow/meshed: {table.concat(rows, ", ")})`
+end
+
+-- The frame time over `seconds`, with the client's frame profiled by part (Client/FrameProfile, when the hooks carry it) and the engine's own numbers: three INFO
+-- lines, `<what>`, `profile <where>` and `engine <where>`. The profile is off again after, whatever happens.
+local function frameSample(r: Run, seconds: number, what: string, where: string)
+	local prof = r.ctx.prof
+	if prof ~= nil then prof.start() end
+	local ok, line = pcall(rawSample, r, seconds)
+	if prof ~= nil then prof.stop() end
+	if not ok then error(line, 0) end
+	say(r, `INFO {what}: {line}`)
+	if prof ~= nil then say(r, `INFO profile {where}: {prof.line()}`) end
+	say(r, `INFO engine {where}: {engineLine()}`)
 end
 
 -- ---------------------------------------------------------------- the checks
@@ -32791,15 +33033,32 @@ local function checks(): { Check }
 			pause(r, 1.0) -- (the line's first slack is paid out at once: measured after it)
 			need(motor:onLine(), "off the line a second after the drop")
 			local y0, t0, x0 = motor.pos.Y, r.host.clock(), motor.pos.X
+			local before = table.clone(motor.silk.stats) -- (ROBLOX-111: what the line does over the measure, SilkController's counts)
+			local prof = ctx.prof
+			if prof ~= nil then prof.start() end -- (and the frame by part while it lets down: the looks are planned again as it goes down)
 			local deadline = t0 + 6
-			while r.host.clock() < deadline do
-				pause(r, 0.25)
-				need(motor:onLine(), string.format("left the line %.1f s into the let-down, at %s", r.host.clock() - t0, fmt(motor.pos)))
-				need(math.abs(motor.pos.X - x0) < 1.0, string.format("swung %.2f studs off the line's fall", math.abs(motor.pos.X - x0)))
-			end
-			local rate = (y0 - motor.pos.Y) / (r.host.clock() - t0)
-			say(r, string.format("INFO line: let down at %.3f studs a second (the game's %.2f)", rate, SelfTest.LOWER))
-			need(rate > SelfTest.LOWER_BAND[1] and rate < SelfTest.LOWER_BAND[2], string.format("let down at %.3f studs a second, not about %.2f", rate, SelfTest.LOWER))
+			local okLine, errLine = pcall(function()
+				while r.host.clock() < deadline do
+					pause(r, 0.25)
+					need(motor:onLine(), string.format("left the line %.1f s into the let-down, at %s", r.host.clock() - t0, fmt(motor.pos)))
+					need(math.abs(motor.pos.X - x0) < 1.0, string.format("swung %.2f studs off the line's fall", math.abs(motor.pos.X - x0)))
+				end
+			end)
+			if prof ~= nil then prof.stop(); say(r, "INFO profile on the line: " .. prof.line()) end
+			if not okLine then error(errLine, 0) end
+			local wall = r.host.clock() - t0
+			local fell = y0 - motor.pos.Y
+			local st = motor.silk.stats
+			local d: { [string]: number } = {}
+			for k, v in st do d[k] = v - (before[k] or 0) end
+			-- The game's time is the ticks the line ran (1/60 s each); the clock's is the wall's. They differ when the client ran fewer ticks than the frames' time
+			-- (a frame over a quarter of a second, a menu, slow motion). The let-down is judged in the game's time: that is the dial (SilkController.game).
+			local game = d.ticks / 60
+			local rate = if game > 0 then fell / game else 0
+			say(r, string.format("INFO line: let down at %.3f studs a second of the game's time (the game's %.2f), %.3f by the clock", rate, SelfTest.LOWER, fell / wall))
+			say(r, string.format("INFO line ticks: %d ticks (%.2f s of the game) in %.2f s by the clock; line let out %.3f, the body fell %.3f (%.1f%% of it); sweeps stopped the body %d times (%.3f taken off), %d tangent touches let pass, %d push-outs (%.3f out, %.3f of it up)",
+				d.ticks, game, wall, d.letOut, d.fell, if d.letOut > 0 then d.fell / d.letOut * 100 else 0, d.stops, d.stopped, d.grazes, d.pushes, d.pushed, if math.abs(d.pushedUp) < 5e-4 then 0 else d.pushedUp))
+			need(rate > SelfTest.LOWER_BAND[1] and rate < SelfTest.LOWER_BAND[2], string.format("let down at %.3f studs a second of the game's time, not about %.2f", rate, SelfTest.LOWER))
 		end)
 		ctx.input:simulate("Drop", false)
 		if not ok then error(err, 0) end
@@ -32873,7 +33132,13 @@ local function checks(): { Check }
 		local ctx = r.ctx
 		need(holdUntilReady(r, "bed_a", SelfTest.BED, nil), "the bed is not whole")
 		put(r, SelfTest.BED, nil)
-		pause(r, 2.0)
+		-- (ROBLOX-111: the looks' settling is timed from here: the first frame with no look being made)
+		r.bedAt = r.host.clock()
+		local looks = ctx.world.looks
+		while r.host.clock() < (r.bedAt :: number) + 2.0 do
+			pause(r, 0)
+			if r.bedSettled == nil and looks ~= nil and #looks.jobs == 0 then r.bedSettled = r.host.clock() end
+		end
 		local bed = ctx.world.garden.bed_a
 		need(bed ~= nil and bed.prey ~= nil, "the bed's prey was not made")
 		local byKind: { [string]: number } = {}
@@ -32908,7 +33173,43 @@ local function checks(): { Check }
 	end)
 
 	add("frame time in the bed", function(r)
-		say(r, "INFO frame time in the bed: " .. frameSample(r, SelfTest.SAMPLE_S))
+		frameSample(r, SelfTest.SAMPLE_S, "frame time in the bed", "in the bed")
+		say(r, "INFO census in the bed: " .. census())
+	end)
+
+	-- ROBLOX-111: the bed's frame again once the looks near it are all made (no build pending), with how long that took from the spider's coming to the bed; then,
+	-- to say whether the looks or their shadows are what the frame pays for, the same with the looks out of the workspace, and with the global shadows off (both
+	-- put back at once, whatever happens).
+	add("frame time in the bed, settled", function(r)
+		local looks = r.ctx.world.looks
+		if looks == nil then skip("no looks are made in this place") end
+		local settled = waitUntil(r, SelfTest.SETTLE_WAIT, function()
+			if #looks.jobs == 0 then r.bedSettled = r.bedSettled or r.host.clock(); return true end
+			r.bedSettled = nil
+			return false
+		end, 0)
+		local at = r.bedAt or r.host.clock()
+		say(r, string.format("INFO looks settled in the bed: %s %.2f s after the spider came, %d parts held of %d planned, %d plans, %d made and %d destroyed this session",
+			if settled then "yes," else "NOT,", (r.bedSettled or r.host.clock()) - at, looks:parts(), looks.planned, looks.plans, looks.made, looks.destroyed))
+		need(settled, `the looks were still being made after {SelfTest.SETTLE_WAIT} s`)
+		local plans0, made0 = looks.plans, looks.made
+		frameSample(r, SelfTest.SAMPLE_S, "frame time in the bed, settled", "in the bed, settled")
+		say(r, string.format("INFO looks while settled: %d plans and %d parts made in the sample", looks.plans - plans0, looks.made - made0))
+		local folder = looks.folder
+		local ok, err = pcall(function()
+			folder.Parent = nil
+			frameSample(r, SelfTest.AB_S, "frame time in the bed without the looks", "in the bed without the looks")
+		end)
+		folder.Parent = Workspace
+		if not ok then error(err, 0) end
+		local Lighting = game:GetService("Lighting")
+		local shadows = Lighting.GlobalShadows
+		local ok2, err2 = pcall(function()
+			Lighting.GlobalShadows = false
+			frameSample(r, SelfTest.AB_S, "frame time in the bed without shadows", "in the bed without shadows")
+		end)
+		Lighting.GlobalShadows = shadows
+		if not ok2 then error(err2, 0) end
 	end)
 
 	add("moths on the wall", function(r)
@@ -32994,7 +33295,8 @@ local function checks(): { Check }
 	end)
 
 	add("frame time on the sill", function(r)
-		say(r, "INFO frame time on the sill: " .. frameSample(r, SelfTest.SAMPLE_S))
+		frameSample(r, SelfTest.SAMPLE_S, "frame time on the sill", "on the sill")
+		say(r, "INFO census on the sill: " .. census())
 	end)
 
 	add("part counts", function(r)
@@ -33065,7 +33367,7 @@ return SelfTest
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="175">
+        <Item class="ModuleScript" referent="176">
           <Properties>
             <string name="Name">SettingsPanel</string>
             <string name="Source"><![CDATA[--!strict
@@ -33766,7 +34068,7 @@ return SettingsPanel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="176">
+        <Item class="ModuleScript" referent="177">
           <Properties>
             <string name="Name">Soundscape</string>
             <string name="Source"><![CDATA[--!strict
@@ -33955,7 +34257,7 @@ return Soundscape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="177">
+        <Item class="ModuleScript" referent="178">
           <Properties>
             <string name="Name">SpiderCamera</string>
             <string name="Source"><![CDATA[--!strict
@@ -34598,7 +34900,7 @@ return SpiderCamera
 ]]></string>
           </Properties>
         </Item>
-        <Item class="LocalScript" referent="178">
+        <Item class="LocalScript" referent="179">
           <Properties>
             <string name="Name">SpiderClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -34720,6 +35022,8 @@ local M = {
 	-- ROBLOX-110: the lock and the sidestep (Movement/LockOn): what the spider has locked onto from its own memory, the distance it keeps, the place it follows; here for the same reason.
 	LockOn = require(Shared.Movement.LockOn),
 	lock = (nil :: any),
+	-- ROBLOX-111: the frame timed by part for the self-test (Client/FrameProfile; off unless the self-test turns it on: a lap is then one call that returns); here for the same reason.
+	Prof = require(script.Parent.FrameProfile),
 }
 M.lock = M.LockOn.new()
 local focusState = FocusState.new()
@@ -36142,6 +36446,7 @@ local function updateHud(frameDt: number)
 	controls:setTouchLabel("Cancel", ControlText.touchCancelLabel(onLine))
 	controls:setTouchVisible("Jump", not onLine)
 	controls:setTouchVisible("Creep", not onLine)
+	M.Prof.lap("hud")
 	do -- the Lock button (ROBLOX-110): only while something can be locked, or a lock holds
 		local o = motor:observer()
 		local origin, dir = cam:aimRay()
@@ -36149,6 +36454,7 @@ local function updateHud(frameDt: number)
 		controls:setTouchVisible("Lock", held or (motor.mode == "attached" and M.LockOn.pick(memory, o.eye, o.heading, origin, dir) ~= nil))
 		controls:setTouchLabel("Lock", ControlText.touchLockLabel(held))
 	end
+	M.Prof.lap("lock button")
 	-- The peacock spider's buttons: Change in the crack, Dance on the open sill (the peacock spider only).
 	controls:setTouchVisible("Choose", canChange())
 	controls:setTouchVisible("Display", displayKind ~= nil and not onLine and not life.resting and motor.mode == "attached")
@@ -36164,12 +36470,15 @@ end
 -- ---------------------------------------------------------------- the frame
 local accumulator = 0
 RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, function(frameDt: number)
+	M.Prof.begin() -- (ROBLOX-111: the frame timed by part, for the self-test; each M.Prof.lap below charges the time since the last to its part)
 	saveState.frame()
 	spiderPick.update(frameDt) -- (the choose hold's clock and the close look's reasons to end)
+	M.Prof.lap("save")
 	M.World:update(motor.pos, rig.root) -- (ROBLOX-94: the region the spider is in, the pace of its day, the streaming focus on the drawn spider)
 	if panel:isShowing() then panel:update(frameDt) end
 	if nbPanel:isShowing() then nbPanel:update(frameDt) end
 	if settingsPanel:isShowing() then settingsPanel:update(frameDt) end
+	M.Prof.lap("panels")
 	if GuiService.MenuIsOpen or modal() then
 		accumulator = 0 -- the Roblox menu is Godot's pause (so is the catch screen): the world waits
 	else
@@ -36178,6 +36487,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 		local origin, dir = cam:aimRay()
 		if M.lock.point and (M.lock.point - origin).Magnitude > 1e-3 then dir = (M.lock.point - origin).Unit end -- (ROBLOX-110: the aim snaps to the locked thing)
 		motor:setAimRay(origin, dir)
+		M.Prof.lap("frame")
 		while accumulator >= DT do
 			accumulator -= DT
 			local percepts = M.World.prey:percepts() -- (ROBLOX-96: the active regions' flies; ROBLOX-105: the woodlice and the ambient bugs are not shown to the senses)
@@ -36194,15 +36504,20 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			end
 			local waspPercept = wasp:percept() -- movement to the spider's senses, never prey
 			if waspPercept then table.insert(percepts, waspPercept) end
+			M.Prof.lap("percepts")
 			sensor:step(DT,motor:observer(),percepts,sightCast)
+			M.Prof.lap("senses")
 			M.LockOn.update(M.lock, memory, motor.pos) -- (ROBLOX-110: the lock follows the memory, and ends when it forgets)
+			M.Prof.lap("lock")
 			M.World.prey:before(DT,motor.pos,motor:observer(),sensor,sightCast,camera,life.clock.hour) -- (ROBLOX-101: the moths and crane flies fly from dusk)
+			M.Prof.lap("prey")
 			if life.growth:isMoulting() then jump:drop(motor);motor:cancelWalk() else jump:step(motor) end
 			if breakaway:step(DT,if jump.last and jump.last.tick==jump.tick then jump.last else nil,motor.pos,setting("ReducedMotion")==true) then
     motor.planKey="";hud:toast("The dry leaf tip gave way. Your dragline catches the miss.",false)
    end
 			local input = tickInput()
 			motor:tick(input)
+			M.Prof.lap("motor")
 			-- ROBLOX-106: moving costs energy (NeedsModel.move pays nothing in the gentle modes) and, in Normal, a leaf overhead and stillness hide the spider (Life/Nature).
 			do
 				local onLine = motor:onLine()
@@ -36211,6 +36526,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 				local walking = motor.mode == "attached" and motor.moving == true
 				M.nature.cover = if needs.gentle then nil else M.Nature.cover(M.Nature.overhead(motor.pos, M.nature.ray), not walking and motor.vel.Magnitude < 0.15)
 			end
+			M.Prof.lap("nature")
 			-- The wasp runs after the spider has moved and before feeding (Godot: physics priority 8).
 			wasp.enabled = not testPlace or Workspace:GetAttribute("Wasp") == true
             wasp:useGameRules()
@@ -36252,12 +36568,14 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			end
 			if wasp.rivalHeldAt and life.rival.state == "taken" then life.rival.position = wasp.rivalHeldAt end
 			if wasp.heldAt then motor:hold(wasp.heldAt) end
+			M.Prof.lap("wasp")
 			prey.feeding.auto = setting("AutomaticGrip") == true or mateLegs.couple.active -- (a meal in the legs is held for a player whose hands are the scene's: ROBLOX-89)
 			if life.growth.gameRules ~= true then life.growth:useGameRules(needs.gentle) end -- (a family that carries on has a new growth)
 			if prey.feeding.game ~= true then prey.feeding:useGameRules() end -- (a record restored from before the flag has none: the game's struggle again)
 			local takenBefore = prey.feeding.taken
 			M.World.prey:after(DT,motor,sensor,sightCast)
 			if M.World.prey.event ~= nil then hud:setNote(M.PreyText.note(M.World.prey.event) or "",M.PreyText.SECONDS);M.World.prey.event=nil end -- (ROBLOX-101: a slip, a shed leg)
+			M.Prof.lap("prey")
 			-- Five houseflies or ten small prey (ROBLOX-88; Godot's three and six are Growth's defaults); credit food, not just spare energy capacity.
 			life.mealFood = (life.mealFood or 0) + Growth.rivalCredit(prey.feeding.taken-takenBefore)
             local rivalState={
@@ -36299,6 +36617,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
              life:showNotice(rivalLegs.Text.counter(needs.gentle))
             elseif rivalEvent=="eaten" then prey.feeding.mealsFinished+=1
             elseif rivalEvent=="touch" then life:showNotice("The rival touched you. You are safe in this mode.") end
+            M.Prof.lap("rival")
             -- The mating cycle (ROBLOX-80): the mate and the courtship meter, the sac and the guard days, by the same snapshot of the spider the rival has.
             do
              local ms=mateLegs.state
@@ -36321,6 +36640,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
              -- A record restored into the hatching (or a brood out while nothing is playing) goes straight to the ending.
              if life.mating~=nil and life.mating.stage=="hatched" and mateLegs.phase=="" and not panel:isShowing() then mateLegs.begin(false) end
             end
+			M.Prof.lap("mating")
 			-- The life loop runs last in the tick (Godot's habitat loop, priority 12); the reach it sets is the next tick's.
 			local holding = prey.feeding.held ~= nil or (life.rival~=nil and life.rival.state=="captured")
 			lifeSpider = {
@@ -36362,7 +36682,9 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
             if modal() then accumulator=0;break end
 			if motor.mode ~= "attached" then focusState:clear() end
 			if stage then stage.target:step(DT); stage.marker.Position = stage.target.position end
+			M.Prof.lap("life")
 			cam:tick(DT)
+			M.Prof.lap("camera")
 		end
 	end
 	-- The light of the hour (DayLight; the eyes' reach comes from the clock, not from this). The daytime sun is the one the
@@ -36375,6 +36697,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	end
 	-- The morning dew follows the hour, not the daylight (ROBLOX-74): it is drawn from the clock and keeps its last level on its own folder.
 	M.DayLight.applyDew(Workspace:FindFirstChild("Decor"), life.clock.hour)
+	M.Prof.lap("light")
 	-- Drawn frame: the up vector eases so walls and edges do not snap.
 	local simFrame = frameDt * (if slow then SLOW_SPEED else 1)
 	drawnUp = drawnUp:Lerp(motor.up, 1 - math.exp(-24 * simFrame)).Unit
@@ -36441,8 +36764,10 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
  local recentJump=jump.last
  rig.jumpPush=if not motor.seized and motor.mode=="air" and recentJump and recentJump.kind=="launched" then math.clamp(1-(jump.tick-recentJump.tick)/8,0,1) else 0
  local paused=GuiService.MenuIsOpen or modal()
+ M.Prof.lap("poses")
  rig:update(body, if paused then 0 else simFrame, motor.mode == "attached", motor.moving)
  skins:draw(life.growth.exuviae)
+ M.Prof.lap("spider rig")
  if not paused then watch:frame(simFrame,cam.eyeView,eyes.moversShown) end
     local rival=life.rival
     if rival and rival.state~="dormant" and rival.state~="consumed" then
@@ -36457,10 +36782,16 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
     mateLegs.stage:drawMate(life.mate,appearance,if paused then 0 else simFrame,setting("ReducedMotion")==true,mateLegs.couple.focus,mateLegs.couple.turn,camera.CFrame.Position)
     mateLegs.stage:drawSac(mateLegs.Mating.hasSac(life.mating))
     if mateLegs.phase=="scene" and not paused and not mateLegs.stage:step(simFrame,setting("ReducedMotion")==true) then mateLegs.showCard(false) end
+	M.Prof.lap("other rigs")
 	updateHud(frameDt)
+	M.Prof.lap("hud")
 	-- (ROBLOX-103: the bodies step, sway and beat by the prey's clock; far ones ten times a second; Reduced Motion stills all but the steps)
 	flyBodies:draw(M.World.prey:flies(),M.World.prey.clock,camera.CFrame.Position,setting("ReducedMotion")==true)
+	M.Prof.lap("fly bodies")
+	M.Prof.count("fly parts placed", flyBodies.moved or 0)
 	M.World.bugs:draw(M.World.prey:crawlers(),M.World.prey.clock,camera.CFrame.Position,setting("ReducedMotion")==true)
+	M.Prof.lap("bug bodies")
+	M.Prof.count("bug parts placed", M.World.bugs.moved or 0)
 	local soundPaused = GuiService.MenuIsOpen or modal()
 	local soundSpeed = if slow then SLOW_SPEED else 1
 	local soundMuted = setting("SoundMuted") == true
@@ -36469,6 +36800,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	soundscape:update(frameDt, M.World.prey.view, life.daylight, soundPaused, soundSpeed, soundMuted)
 	soundscape:updateWasp(wasp, soundPaused, soundSpeed, soundMuted)
 	waspBody:draw(wasp.wasp, prey.now)
+	M.Prof.lap("sound")
 	local silk = motor.silk
 	local live, bend = liveLine, bendLine
 	if live and bend and silk.mode ~= "none" then
@@ -36490,6 +36822,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 		end
 	end
 	-- The camera's settings (ROBLOX-49), read each frame so a change in the panel shows at once.
+	M.Prof.lap("lines")
 	camSettings.mouse, camSettings.stick, camSettings.touch = setting("LookSensitivityMouse"), setting("LookSensitivityStick"), setting("LookSensitivityTouch")
 	camSettings.invertX, camSettings.invertY = setting("InvertX"), setting("InvertY")
 	camSettings.fov, camSettings.distance, camSettings.framing = setting("FieldOfView"), setting("CameraDistance"), setting("FrameLine")
@@ -36510,13 +36843,17 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	-- The Focus that feeds the perception HUD also decides how far the principal eyes are in use (the eye view's picture). The
 	-- picture sets the field of view, so it comes before the HUD projects anything.
 	local focusing = motor.mode == "attached" and (controls.held.Focus == true or focusActive())
+	M.Prof.lap("camera")
 	eyes:update(frameDt, focusing)
+	M.Prof.lap("eyes")
 	perceptionHud:draw(memory,camera,sightCast,focusing,setting("ShowLastSeen") == true,setting("ShowNoticed") ~= false,M.lock.point)
+	M.Prof.lap("perception hud")
 	-- Depth of field: on the spider in third person; in the eye view SpiderEyes owns it and focuses on what is looked at.
 	local dof = Lighting:FindFirstChild("MacroDOF")
 	if not cam.eyeView and dof and dof:IsA("DepthOfFieldEffect") then
 		dof.FocusDistance = (camera.CFrame.Position - motor.pos).Magnitude
 	end
+	M.Prof.finish()
 end)
 
 -- The test-place-only module exercises this controller in Studio. Absent from the playable build. Its hooks are also the live place's self-test's (ROBLOX-104, below).
@@ -36549,6 +36886,7 @@ M.hooks = function(): any
 			title = M.title, -- (ROBLOX-109: the title card and the intro, for the self-test's intro check)
 			lock = M.lock, lockOn = M.LockOn, -- (ROBLOX-110: the lock's state and its rules)
 			nature = M.nature, -- (ROBLOX-106: nature's rules this tick: the cover factor, the night's passes)
+			prof = M.Prof, -- (ROBLOX-111: the frame timed by part, for the self-test's frame samples)
 	}
 end
 local playback = script.Parent:FindFirstChild("SilkPlayback")
@@ -36563,7 +36901,7 @@ if RunService:IsStudio() and Workspace:GetAttribute("SelfTest") == true then req
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="179">
+        <Item class="ModuleScript" referent="180">
           <Properties>
             <string name="Name">SpiderEyes</string>
             <string name="Source"><![CDATA[--!strict
@@ -37029,7 +37367,7 @@ return SpiderEyes
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="180">
+        <Item class="ModuleScript" referent="181">
           <Properties>
             <string name="Name">SpiderHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -37375,7 +37713,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="181">
+        <Item class="ModuleScript" referent="182">
           <Properties>
             <string name="Name">SpiderInput</string>
             <string name="Source"><![CDATA[--!strict
@@ -37635,7 +37973,7 @@ return SpiderInput
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="182">
+        <Item class="ModuleScript" referent="183">
           <Properties>
             <string name="Name">TitleCard</string>
             <string name="Source"><![CDATA[--!strict
@@ -37902,7 +38240,7 @@ return TitleCard
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="183">
+        <Item class="ModuleScript" referent="184">
           <Properties>
             <string name="Name">WaspBody</string>
             <string name="Source"><![CDATA[--!strict
@@ -38134,7 +38472,7 @@ return WaspBody
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="184">
+        <Item class="ModuleScript" referent="185">
           <Properties>
             <string name="Name">WorldClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -38171,6 +38509,7 @@ local WorldMap = require(Shared:WaitForChild("World"):WaitForChild("WorldMap"))
 local Region = require(Shared:WaitForChild("World"):WaitForChild("Region"))
 local LifeClock = require(Shared:WaitForChild("Life"):WaitForChild("LifeClock"))
 local LookStream = require(script.Parent.LookStream)
+local FrameProfile = require(script.Parent.FrameProfile)
 
 local WorldClient = {}
 WorldClient.__index = WorldClient
@@ -38336,7 +38675,9 @@ function WorldClient.update(self: any, pos: Vector3, root: Instance?, now: numbe
 	LifeClock.game.clockScale = self.region.clockScale
 	if root ~= nil and root ~= self.focused then self:focus(root) end
 	self:report(pos, now or os.clock())
+	FrameProfile.lap("world")
 	if self.looks ~= nil then self.looks:update(pos, self.region) end
+	FrameProfile.lap("looks") -- (ROBLOX-111: the self-test's frame profile, Client/FrameProfile)
 	local id = self.region.id
 	if not self.whole[id] then
 		if self:regionReady(id) then
@@ -38352,7 +38693,7 @@ return WorldClient
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="185">
+        <Item class="ModuleScript" referent="186">
           <Properties>
             <string name="Name">WorldDetail</string>
             <string name="Source"><![CDATA[--!strict
@@ -38396,7 +38737,7 @@ return WorldDetail
       </Item>
     </Item>
   </Item>
-  <Item class="Workspace" referent="186">
+  <Item class="Workspace" referent="187">
     <Properties>
       <string name="Name">Workspace</string>
       <float name="Gravity">35</float>

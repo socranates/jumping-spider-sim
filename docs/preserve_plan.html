@@ -1,0 +1,179 @@
+<title>The Preserve Plan</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400&display=swap">
+<style>
+/* Layout: a park warden's survey sheet — the plan first, then the zones as a table, then the phases. */
+:root{
+  --paper:#eef1ec; --sheet:#f9faf7; --ink:#1d2622; --muted:#5d6b64; --rule:#cbd4cd;
+  --meadow:#c9b458; --wood:#3f6b3a; --water:#4a86a8; --scrub:#6b7d3a; --stone:#9a948a; --human:#8a6f5a; --city:#7b8088; --path:#d8cdb4;
+  --start:#c2410c; --hi:#0f766e;
+  --f-display:"Archivo Narrow","Arial Narrow",sans-serif; --f-body:"Source Serif 4",Georgia,serif; --f-data:"JetBrains Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#131916; --sheet:#1a221e; --ink:#e2eae5; --muted:#9aa9a1; --rule:#33403a;
+  --meadow:#c9b458; --wood:#6fa564; --water:#6fb0d4; --scrub:#97ad5c; --stone:#b3ada3; --human:#c29a7c; --city:#9aa0a8; --path:#5c5546;
+  --start:#fb923c; --hi:#5eead4; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#131916; --sheet:#1a221e; --ink:#e2eae5; --muted:#9aa9a1; --rule:#33403a;
+  --meadow:#c9b458; --wood:#6fa564; --water:#6fb0d4; --scrub:#97ad5c; --stone:#b3ada3; --human:#c29a7c; --city:#9aa0a8; --path:#5c5546;
+  --start:#fb923c; --hi:#5eead4; color-scheme:dark}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55}
+.wrap{max-width:1100px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:22px}
+h1{font-family:var(--f-display);font-weight:600;font-size:clamp(28px,4.4vw,40px);margin:0;text-wrap:balance}
+h2{font-family:var(--f-display);font-weight:600;font-size:22px;margin:0 0 8px}
+.lede{margin:6px 0 0;max-width:68ch}
+.muted{color:var(--muted)}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:6px;overflow-x:auto}
+.sheet svg{display:block;width:100%;min-width:640px;height:auto}
+.z{stroke-width:1.2;vector-effect:non-scaling-stroke}
+.zl{font-family:var(--f-display);font-weight:600;font-size:2.3px;fill:var(--ink);paint-order:stroke;stroke:var(--sheet);stroke-width:.6px;text-anchor:middle}
+.zs{font-family:var(--f-data);font-size:1.4px;fill:var(--muted);text-anchor:middle}
+.edge{font-family:var(--f-display);font-size:2px;fill:var(--muted);letter-spacing:.08em;text-anchor:middle}
+.num{font-family:var(--f-data);font-size:1.7px;fill:var(--sheet);text-anchor:middle;dominant-baseline:central}
+.badge{fill:var(--ink)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-family:var(--f-display);font-size:14px}
+.legend span{display:inline-flex;gap:6px;align-items:center}.sw{width:14px;height:14px;border-radius:2px;display:inline-block}
+table{border-collapse:collapse;width:100%;font-size:14px}
+.tablewrap{overflow-x:auto;background:var(--sheet);border:1px solid var(--rule);border-radius:6px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-family:var(--f-display);font-weight:600;letter-spacing:.03em;color:var(--muted);font-size:13px;text-transform:uppercase}
+td:first-child{font-family:var(--f-data);color:var(--muted);white-space:nowrap}
+td b{font-family:var(--f-display);font-size:16px}
+.phases{display:grid;gap:10px}
+.phase{display:grid;grid-template-columns:90px minmax(0,1fr);gap:12px;background:var(--sheet);border:1px solid var(--rule);border-radius:6px;padding:12px 14px}
+.phase .k{font-family:var(--f-display);font-weight:600;font-size:18px}
+.phase .k small{display:block;font-weight:500;font-size:13px;color:var(--muted)}
+.qs{display:grid;gap:8px;max-width:72ch;margin:0;padding-left:20px}
+@media (max-width:520px){.phase{grid-template-columns:minmax(0,1fr)}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>The Preserve Plan</h1>
+    <p class="lede">The full game's world: a small nature preserve held between a railway, a canal and apartment blocks in the middle of a city. One stud is one centimetre, so this 100 × 60 m preserve is a continent to a one-centimetre spider. Each life is lived in one home range at full detail; corridors join them; spiderlings balloon to new ones. Nothing here is built yet. The current windowsill-and-garden world becomes the test level.</p>
+  </header>
+
+  <div class="legend">
+    <span><i class="sw" style="background:var(--start)"></i>Start: the ranger hut's windowsill</span>
+    <span><i class="sw" style="background:var(--meadow)"></i>Meadow</span>
+    <span><i class="sw" style="background:var(--water)"></i>Water</span>
+    <span><i class="sw" style="background:var(--wood)"></i>Woodland</span>
+    <span><i class="sw" style="background:var(--scrub)"></i>Scrub</span>
+    <span><i class="sw" style="background:var(--stone)"></i>Stone</span>
+    <span><i class="sw" style="background:var(--human)"></i>Human things</span>
+    <span><i class="sw" style="background:var(--path)"></i>Paths (corridors)</span>
+  </div>
+
+  <div class="sheet">
+    <svg viewBox="-8 -10 116 83" role="img" aria-label="Plan of the preserve, 100 by 60 metres">
+      <!-- y is drawn as 60 - z so north is up; units are metres -->
+      <rect x="0" y="0" width="100" height="60" style="fill:var(--meadow);fill-opacity:.12;stroke:var(--ink);stroke-width:.3"/>
+      <!-- grid every 10 m -->
+      <g style="stroke:var(--rule);stroke-width:.08">
+        <line x1="10" y1="0" x2="10" y2="60"/><line x1="20" y1="0" x2="20" y2="60"/><line x1="30" y1="0" x2="30" y2="60"/><line x1="40" y1="0" x2="40" y2="60"/><line x1="50" y1="0" x2="50" y2="60"/><line x1="60" y1="0" x2="60" y2="60"/><line x1="70" y1="0" x2="70" y2="60"/><line x1="80" y1="0" x2="80" y2="60"/><line x1="90" y1="0" x2="90" y2="60"/>
+        <line x1="0" y1="10" x2="100" y2="10"/><line x1="0" y1="20" x2="100" y2="20"/><line x1="0" y1="30" x2="100" y2="30"/><line x1="0" y1="40" x2="100" y2="40"/><line x1="0" y1="50" x2="100" y2="50"/>
+      </g>
+      <!-- edges -->
+      <text class="edge" x="50" y="-6">RAILWAY EMBANKMENT</text>
+      <text class="edge" x="50" y="66">CITY STREET · RAILINGS · THE GATE</text>
+      <text class="edge" x="-4" y="30" transform="rotate(-90 -4 30)">CANAL TOWPATH</text>
+      <text class="edge" x="104" y="30" transform="rotate(90 104 30)">APARTMENT BLOCKS</text>
+      <!-- scrub band -->
+      <rect class="z" x="18" y="0" width="74" height="10" style="fill:var(--scrub);fill-opacity:.35;stroke:var(--scrub)"/>
+      <text class="zl" x="55" y="5.6">Bramble &amp; scrub</text>
+      <!-- woodland -->
+      <rect class="z" x="0" y="5" width="18" height="50" style="fill:var(--wood);fill-opacity:.3;stroke:var(--wood)"/>
+      <text class="zl" x="9" y="40">Woodland</text>
+      <circle class="z" cx="14" cy="18" r="3.2" style="fill:var(--wood);fill-opacity:.55;stroke:var(--wood)"/>
+      <text class="zl" x="14" y="13.6">Veteran oak</text>
+      <rect class="z" x="8" y="29" width="4" height="3" style="fill:var(--human);fill-opacity:.55;stroke:var(--human)"/>
+      <text class="zl" x="10" y="27.6">Log pile</text>
+      <rect class="z" x="2" y="51" width="6" height="6" style="fill:var(--human);fill-opacity:.45;stroke:var(--human)"/>
+      <text class="zs" x="5" y="50">compost &amp; shed</text>
+      <!-- meadow -->
+      <rect class="z" x="25" y="12" width="35" height="30" style="fill:var(--meadow);fill-opacity:.42;stroke:var(--meadow)"/>
+      <text class="zl" x="40" y="25">Wildflower meadow</text>
+      <!-- pond -->
+      <ellipse class="z" cx="70" cy="23" rx="8" ry="7" style="fill:var(--water);fill-opacity:.5;stroke:var(--water)"/>
+      <text class="zl" x="70" y="23.8">Pond</text>
+      <path class="z" d="M61 30 L79 30" style="stroke:var(--human);stroke-width:2;vector-effect:none;fill:none"/>
+      <text class="zs" x="70" y="33">boardwalk</text>
+      <!-- stone wall -->
+      <rect class="z" x="92" y="5" width="2" height="50" style="fill:var(--stone);fill-opacity:.85;stroke:var(--stone)"/>
+      <text class="zl" x="88" y="40" transform="rotate(-90 88 40)">Dry stone wall</text>
+      <!-- paths -->
+      <path d="M45.5 60 L45.5 47 Q45 44 40 44 L22 44 Q20 44 20 40 L20 14 Q20 11 24 11 L58 11 Q61 11 61 14 L61 30 M45.5 47 L58 47 Q61 47 61 44 L61 31 M79 30 L90 30" style="fill:none;stroke:var(--path);stroke-width:1.1;stroke-linecap:round;stroke-dasharray:2 .8"/>
+      <!-- hut garden -->
+      <rect class="z" x="38" y="46" width="14" height="8" style="fill:var(--meadow);fill-opacity:.3;stroke:var(--human);stroke-dasharray:1 .6"/>
+      <text class="zl" x="45" y="49.2">Hut garden</text>
+      <!-- bench patch -->
+      <circle class="z" cx="40" cy="44" r="1.4" style="fill:var(--human);fill-opacity:.7;stroke:var(--human)"/>
+      <text class="zs" x="32" y="41.6">bench · bin · lamppost</text>
+      <!-- ranger hut -->
+      <rect class="z" x="44" y="55" width="3.5" height="3" style="fill:var(--start);fill-opacity:.9;stroke:var(--start)"/>
+      <text class="zl" x="45.75" y="62.8" style="font-size:2px">Ranger hut (start)</text>
+      <!-- zone numbers -->
+      <g>
+        <circle class="badge" cx="49.5" cy="56.5" r="1.3"/><text class="num" x="49.5" y="56.5">1</text>
+        <circle class="badge" cx="52.8" cy="48" r="1.3"/><text class="num" x="52.8" y="48">2</text>
+        <circle class="badge" cx="29" cy="20" r="1.3"/><text class="num" x="29" y="20">3</text>
+        <circle class="badge" cx="77" cy="18" r="1.3"/><text class="num" x="77" y="18">4</text>
+        <circle class="badge" cx="13.5" cy="31.5" r="1.3"/><text class="num" x="13.5" y="31.5">5</text>
+        <circle class="badge" cx="17.8" cy="20.5" r="1.3"/><text class="num" x="17.8" y="20.5">6</text>
+        <circle class="badge" cx="96.5" cy="10" r="1.3"/><text class="num" x="96.5" y="10">7</text>
+        <circle class="badge" cx="42" cy="42" r="1.3"/><text class="num" x="42" y="42">8</text>
+        <circle class="badge" cx="80" cy="4" r="1.3"/><text class="num" x="80" y="4">9</text>
+        <circle class="badge" cx="9.5" cy="54" r="1.3"/><text class="num" x="9.5" y="54">10</text>
+      </g>
+      <!-- scale -->
+      <line x1="0" y1="68" x2="10" y2="68" style="stroke:var(--ink);stroke-width:.5"/>
+      <text class="zs" x="5" y="70" style="font-size:1.8px">10 m = 1,000 studs</text>
+      <text class="zs" x="104" y="-6" style="font-size:2px">N ↑</text>
+    </svg>
+  </div>
+
+  <section>
+    <h2>The ten home ranges</h2>
+    <p class="muted" style="margin:0 0 10px;max-width:70ch">Each is a 3 to 5 metre patch built at full spider detail, about the area a real jumping spider lives its life in. Paths, the boardwalk, the wall top, the hedge base and the fence rail are the corridors between them.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>#</th><th>Home range</th><th>To a spider</th><th>Prey</th><th>Danger</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td><b>Ranger hut</b></td><td>The windowsill nursery behind glass; the hut's desk, notice board, specimen jars; the sash opened when the spider is ready</td><td>Fruit flies, a house fly, a moth at the lamp</td><td>The ranger's hand, a house spider in the corner</td></tr>
+          <tr><td>2</td><td><b>Hut garden</b></td><td>Herbs, a pallet planter, the water butt, the bird feeder's spill, the hut's sunny wall</td><td>Aphids, gnats, hoverflies, leafhoppers</td><td>The wasp, a robin, the rival</td></tr>
+          <tr><td>3</td><td><b>Meadow</b></td><td>A forest of grass and flower stems; height is safety and sight</td><td>Leafhoppers, flies on flowers, moths at dusk</td><td>A crab spider in a flower, a bird, ants</td></tr>
+          <tr><td>4</td><td><b>Pond edge</b></td><td>Reeds, lily pads, the dipping platform's planks, wet stones</td><td>Midges, mosquitoes, mayflies</td><td>Water, a frog, a fishing spider</td></tr>
+          <tr><td>5</td><td><b>Log pile</b></td><td>Bark, crevices, leaf litter, fungus, damp shade</td><td>Springtails, gnats</td><td>A centipede, a ground beetle, a wolf spider</td></tr>
+          <tr><td>6</td><td><b>Veteran oak</b></td><td>Bark plates and lichen, the root flare: a vertical world</td><td>Bark lice, aphids, small moths</td><td>A treecreeper, a long fall</td></tr>
+          <tr><td>7</td><td><b>Dry stone wall</b></td><td>Sun-warmed stone and gaps: the jumping spiders' own city</td><td>Flies basking on stone</td><td>Other jumping spiders, wasps</td></tr>
+          <tr><td>8</td><td><b>Bench, bin, lamppost</b></td><td>Painted wood, steel, a crisp packet; the lamp draws moths at night</td><td>Moths, flies at the bin</td><td>Footfall, a dog</td></tr>
+          <tr><td>9</td><td><b>Bramble and railway bank</b></td><td>Thorns, leaves, fence wire, the trains' tremor</td><td>Many flying insects</td><td>Nesting birds</td></tr>
+          <tr><td>10</td><td><b>Compost and tool shed</b></td><td>Warmth and rot, a cobwebbed shed window</td><td>Fruit flies, gnats, springtails</td><td>A centipede</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Building it, phase by phase</h2>
+    <div class="phases">
+      <div class="phase"><div class="k">A<small>2 rounds</small></div><div>The skeleton: the preserve's map of zones and corridors in code, the whole preserve drawn at a distance (terrain, trees, the pond, the city, trains as sound), and a switch between the test level and the preserve.</div></div>
+      <div class="phase"><div class="k">B<small>3–4 rounds</small></div><div>The playable start: the ranger hut and the hut garden at full detail, the nursery rule, the existing life, wasp and rival, and the intro reshot. This becomes the published game.</div></div>
+      <div class="phase"><div class="k">C<small>3 rounds</small></div><div>The meadow, the path and the bench and lamppost patch; the crab spider; moths at the lamp; ballooning to a new home range as each generation's choice.</div></div>
+      <div class="phase"><div class="k">D<small>2–3 rounds</small></div><div>The pond edge and the boardwalk; water as a surface; the frog, midges and mayflies; rain.</div></div>
+      <div class="phase"><div class="k">E<small>3 rounds</small></div><div>The log pile and the veteran oak; the centipede and the ground beetle; bark as a vertical world; the bird.</div></div>
+      <div class="phase"><div class="k">F<small>2–3 rounds</small></div><div>The stone wall and other jumping spiders as neighbours and rivals; the first extra playable species.</div></div>
+      <div class="phase"><div class="k">G<small>ongoing</small></div><div>The scrub and the shed, seasons, rare events, more playable species, multiplayer in the shared preserve; beyond the fence for a Steam edition (the canal, the apartment balconies, a rooftop garden).</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Questions before Phase A</h2>
+    <ol class="qs">
+      <li>American or English preserve? The first spider is the North American <i>Phidippus audax</i>, so an American preserve (fence posts, maples, cardinals) keeps it native; an English one has the stone wall, oak, bramble and robin.</li>
+      <li>Keep the size at 100 × 60 m, or start smaller and denser?</li>
+      <li>Should every life start in the ranger hut, or only the first, with later lives starting where the spiderlings land?</li>
+      <li>The cat and the game room were meant for the house. The hut could have the ranger's cat, and a back room for volunteers with a sofa, a games console and board games. Keep them that way?</li>
+    </ol>
+  </section>
+</div>

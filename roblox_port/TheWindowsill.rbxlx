@@ -1977,6 +1977,10 @@ NotebookPages.triggers = {
 	"look_leafhopper",
 	"look_moth",
 	"look_crane_fly",
+	"look_ladybird",
+	"look_millipede",
+	"look_snail",
+	"look_harvestman",
 }
 
 -- The reserve at or under hungryAt is "hungry"; at or over wellFedAt, "well fed" (LIFE_DESIGN.md round 1).
@@ -1993,7 +1997,9 @@ NotebookPages.hearWu = 10.0
 NotebookPages.noteSeconds = 6.0
 -- ROBLOX-101: a prey of the bestiary within this many studs of the spider is a close look, which opens its kind's page (`looks`: prey kind -> trigger).
 NotebookPages.lookWu = 4.0
-NotebookPages.looks = { springtail = "look_springtail", leafhopper = "look_leafhopper", moth = "look_moth", crane_fly = "look_crane_fly" } :: { [string]: string }
+-- ROBLOX-105: the ambient bugs' close looks too (NotebookWatch: one of the view's bugs of the kind, out in the open, within lookWu).
+NotebookPages.looks = { springtail = "look_springtail", leafhopper = "look_leafhopper", moth = "look_moth", crane_fly = "look_crane_fly",
+	ladybird = "look_ladybird", millipede = "look_millipede", snail = "look_snail", harvestman = "look_harvestman" } :: { [string]: string }
 
 NotebookPages.pages = {
 	{
@@ -2371,6 +2377,49 @@ NotebookPages.pages = {
 			"University of Maine Cooperative Extension (undated, read 2026). Crane Flies. Home and Garden IPM.",
 			"Layton, B. (2019). Crane Fly. Bug's Eye View 5(5), Mississippi State University Extension.",
 			"Jackson, R. R. (1977). Prey of the jumping spider Phidippus johnsoni (Araneae: Salticidae). Journal of Arachnology 5: 145-149.",
+		},
+	},
+	{
+		id = "ladybirds",
+		trigger = "look_ladybird",
+		title = "Ladybirds: bright for a reason",
+		text = "Ladybirds, or lady beetles, are beetles with domed, oval bodies, red, orange, yellow, pink or black and usually spotted. The bright colours are a warning, to discourage animals that might eat them: disturbed, a ladybird releases an odorous, noxious fluid from its leg joints, called reflex bleeding. Adults and larvae both eat aphids and other small, soft-bodied insects. The larva looks nothing like the adult: shaped like a small alligator, spiny and black with bright spots.",
+		game = "Here the ladybirds walk the dock and the dandelion among the aphids and now and then stop over one and eat it. Strike one and you let it go, which is the game's way of saying the spider leaves it alone. The walks, the waits and how often it eats are the game's.",
+		sources = {
+			"Bessin, R. (undated, revised 2026). Ladybugs. University of Kentucky Entomology, ENTFACT-702.",
+			"Bohart Museum of Entomology (undated, read 2026). Lady Bugs & Lady Beetles. Information No. 055, University of California, Davis.",
+		},
+	},
+	{
+		id = "millipedes",
+		trigger = "look_millipede",
+		title = "Millipedes: the coil",
+		text = "Millipedes have long segmented bodies with two pairs of legs on each segment, where centipedes have one pair. Most feed on decaying vegetation, living secretively in soil and leaf mould and beneath stones, logs and bark. When threatened, most roll into a coil with their legs on the inside, offering only their body armour to the predator, and some can release substances that taste or smell foul as a defence.",
+		game = "Here a millipede is about 2.4 cm long and walks the bed's soil slowly, going under the stones for a while; come close and it coils, head in the middle, until you have gone. Strike it and you let it go. The speeds and the waits are the game's.",
+		sources = {
+			"Buglife - The Invertebrate Conservation Trust (undated, read 2026). Millipedes. Bug Directory, buglife.org.uk.",
+		},
+	},
+	{
+		id = "garden_snails",
+		trigger = "look_snail",
+		title = "Snails: eyes on stalks",
+		text = "The brown garden snail's shell grows to 28 to 32 mm across. A land snail's head carries retractable tentacles: the longer, upper pair bears the eyes, which see light and dark but no colours, and the shorter pair tastes and smells. It moves by waves of muscle along its foot, aided by mucus that the foot secretes all the time, which leaves a slimy trail. Most land snails are nocturnal, but after rain they may come out by day.",
+		game = "Here the snail is far bigger than your spider. It crawls about a millimetre a second over the bed and up the foot of the wall, mostly from dusk, and its trail fades in a few minutes. Its eye stalks draw in when you come near; strike it and it draws into its shell. The speeds and the trail's fading are the game's.",
+		sources = {
+			"Dekle, G. W. & Fasulo, T. R. (2001, revised 2024). Brown Garden Snail, Cornu aspersum (Muller, 1774). University of Florida IFAS Extension, EENY240.",
+			"Missouri Department of Conservation (undated, read 2026). Land Snails and Slugs. Missouri Field Guide, mdc.mo.gov.",
+		},
+	},
+	{
+		id = "harvestmen",
+		trigger = "look_harvestman",
+		title = "Harvestmen: not spiders",
+		text = "Harvestmen, or daddy longlegs, are not spiders but opilionids. The body is one simple oval, head and abdomen fused, with only two eyes and no silk or venom glands. Disturbed, they give off a foul odour. A leg falls off easily and goes on twitching, which can distract a predator while the harvestman flees. They are mostly active at night or in shade, and eat many kinds of organic matter, dead animals among them; some prey on aphids and other small insects.",
+		game = "Here one harvestman walks the bed's litter and one the house wall, from dusk through the night, high on legs that span about four studs, and takes no notice of you. Strike one and you let it go. The legs drawn and the speeds are the game's.",
+		sources = {
+			"University of Kentucky Entomology (undated, read 2026). Kentucky Harvestmen. Kentucky Critter Files.",
+			"Missouri Department of Conservation (undated, read 2026). Daddy Longlegs (Harvestmen). Missouri Field Guide, mdc.mo.gov.",
 		},
 	},
 } :: { Page }
@@ -2930,6 +2979,9 @@ aphid.behavior.walk_interval_s = { 4.0, 12.0 }
 aphid.behavior.wander_radius_wu = 0.8
 aphid.behavior.perch_radius_wu = 0.25
 aphid.behavior.fidget_distance_wu = { 0.04, 0.1 }
+-- ROBLOX-105 (Nathan's W3 call, "the aphids wander the plant"): now and then, calm, it walks over its plant's faces to another free perch of the same plant,
+-- slowly (Prey/PreyKinds.creep): every 40 to 110 s, at 0.12 to 0.25 studs a second, a walk of at most 24 studs. Game values.
+aphid.body.creep = { every = { 40.0, 110.0 }, speed = { 0.12, 0.25 }, reach = 24.0 }
 data.aphid_prototype = aphid
 -- ROBLOX-101 (W3b part A, the garden's bestiary): four more prey, derived the same way (game values throughout; no claim that any of them has the house fly's
 -- measured behaviour, only its model with other numbers). Read with Prey/PreyKinds, which owns the new behaviours: `body.hop` (a ballistic escape hop on the
@@ -5927,6 +5979,8 @@ return FieldNotebook
 --   wasp, wasp_escaped, wasp_caught ... the director's visit_started, left (it had noticed the spider), caught
 --   antennae ....... the ant-mimicking spider has stood still with its antennae up for AntMimic.noticeSeconds (the client's pose says how long)
 --   garden_bed ..... (ROBLOX-96, the Roblox game's own) the spider's first step onto a bed of the garden: the view's `region` is a region of kind "bed"
+--   look_ladybird, look_millipede, look_snail, look_harvestman ... (ROBLOX-105) the same for the ambient bugs: one of the view's `bugs` of the kind, not
+--                    hidden, within lookWu of the spider
 --   look_springtail, look_leafhopper, look_moth, look_crane_fly ... (ROBLOX-101) the first close look at a prey of that kind: one of the view's flies of the kind
 --                    (Species body.prey_kind, NotebookPages.looks) within lookWu of the spider, perched or flying; distance only, not the sensor's say
 -- Not wired: felt. It answers to Godot's vibration sense (a felt shake through touching surfaces), which the port does not have, so
@@ -5956,6 +6010,7 @@ export type View = {
 	spider: Vector3,
 	flies: { any }, -- the flies: .id, .position and :airborne()
 	region: string?, -- ROBLOX-96: the kind of the region the spider is in ("sill", "bed", ...); nil in a world without one
+	bugs: { any }?, -- ROBLOX-105: the ambient bugs about (Prey/PreyWorld.crawlers: .kind, .position, .hidden); nil or none in a world without them
 }
 
 function NotebookWatch.new(book: any): any
@@ -6093,6 +6148,11 @@ function NotebookWatch.step(self: any, v: View)
 		end
 	end
 	self.flying = seen
+	-- (ROBLOX-105) a close look at one of the ambient bugs, out in the open (a woodlouse has no `kind`: its page is the ground's)
+	for _, b in (v.bugs or {}) :: { any } do
+		local look = if b.kind ~= nil then Data.looks[b.kind] else nil
+		if look ~= nil and not b.hidden and (b.position - v.spider).Magnitude <= Data.lookWu then book:notice(look) end
+	end
 end
 
 return NotebookWatch
@@ -11533,6 +11593,9 @@ return Signal
 -- the state HOP. A W3 record (its bed with gnats, aphids and woodlice alone) restores unchanged; the bestiary's directors it lacks are made afresh from their
 -- seeds when their region is next whole (Prey/PreyWorld.kinds), so nothing is rerolled that the record had. SCHEMA_VERSION, CONTENT_REVISION and the
 -- world's revision stay as they were (W3's precedent: an optional part an old record lacks needs none of them).
+-- ROBLOX-105: a region's entry may hold `ambient`, the ambient bugs' colonies by kind ({ ladybird = Ladybirds, millipede = Millipedes, snail = Snails,
+-- harvestman = Harvestmen }), each of the kind the region has and in order (its creatures in known states inside the region's bounds). A record without it (every
+-- rest before this round) restores unchanged and the colonies it lacks are made afresh from their seeds when their region is next whole (Prey/PreyWorld.ambient).
 
 local Species = require(script.Parent.Parent.Data.Species)
 local ObjectRecord = require(script.Parent.ObjectRecord)
@@ -11555,6 +11618,10 @@ local Growth = require(script.Parent.Parent.Life.Growth)
 local WorldMap = require(script.Parent.Parent.World.WorldMap)
 local WaspDirector = require(script.Parent.Parent.Predator.WaspDirector)
 local Woodlice = require(script.Parent.Parent.Prey.Woodlouse)
+local Ladybirds = require(script.Parent.Parent.Prey.Ladybird)
+local Millipedes = require(script.Parent.Parent.Prey.Millipede)
+local Snails = require(script.Parent.Parent.Prey.Snail)
+local Harvestmen = require(script.Parent.Parent.Prey.Harvestman)
 local Garden = require(script.Parent.Parent.World.Garden)
 
 local RivalSpider = require(script.Parent.Parent.Predator.RivalSpider)
@@ -11575,6 +11642,7 @@ Checkpoint.ROOTS = { "prey", "sensor", "memory", "needs", "life" }
 Checkpoint.CLASSES = {
 	Fly = Fly, FlyFlight = FlyFlight, FlySenses = FlySenses, PreyRandom = PreyRandom, PreyPopulation = PreyPopulation,
 	PerchGraph = PerchGraph, Feeding = Feeding, PreyDirector = PreyDirector, Woodlice = Woodlice,
+	Ladybirds = Ladybirds, Millipedes = Millipedes, Snails = Snails, Harvestmen = Harvestmen, -- (ROBLOX-105)
 	Sensor = Sensor, SensorCore = SensorCore, ObservationMemory = ObservationMemory, Contact = ObservationMemory.Contact,
 	Observation = Observation,
 	NeedsModel = NeedsModel, LifeLoop = LifeLoop, LifeClock = LifeClock, Growth = Growth,
@@ -11855,6 +11923,20 @@ local function checkWorld(roots: { [string]: any }, problems: { string })
 				if entry.bugs ~= nil then
 					if getmetatable(entry.bugs) ~= Woodlice then bad(`garden: {id}'s bugs are not woodlice`)
 					else for _, text in entry.bugs:problems(region.bounds[1], region.bounds[2]) do bad(`garden: {id}: {text}`) end end
+				end
+				-- ROBLOX-105: the ambient bugs' colonies, one per kind the region has, each of its kind's class
+				if entry.ambient ~= nil then
+					if type(entry.ambient) ~= "table" or getmetatable(entry.ambient) ~= nil then bad(`garden: {id}'s ambient bugs are not a record`)
+					else
+						local known: { [string]: boolean } = {}
+						for _, a in (Garden.ambient(region) or {}) :: { any } do known[a.kind] = true end
+						local classes = { ladybird = Ladybirds, millipede = Millipedes, snail = Snails, harvestman = Harvestmen } :: { [string]: any }
+						for kind, c in entry.ambient do
+							if type(kind) ~= "string" or not known[kind] then bad(`garden: {id} has no ambient bug of the kind {tostring(kind)}`)
+							elseif getmetatable(c) ~= classes[kind] then bad(`garden: {id}'s {kind} is not a colony of its kind`)
+							else for _, text in c:problems(region.bounds[1], region.bounds[2]) do bad(`garden: {id}: {text}`) end end
+						end
+					end
 				end
 			end
 		end
@@ -16684,6 +16766,7 @@ end
 function Fly.rest(self: any,now: number,dt: number)
  local p=self.profile.behavior
  if self.profile.body.sidestep and K.sidestep(self,now,dt) then return end -- (ROBLOX-101: round the stem, away from the spider)
+ if self.profile.body.creep and K.creep(self,now,dt) then return end -- (ROBLOX-105: the aphid's walk over its plant to another perch)
  if self.state=='ALERT' then
   self.groomUntil=0;self.fidgetUntil=0;self.glanceTarget=nil
   if self.profile.body.walker then return end -- (ROBLOX-96: a walker freezes)
@@ -16885,6 +16968,546 @@ return S
         </Item>
         <Item class="ModuleScript" referent="95">
           <Properties>
+            <string name="Name">Harvestman</string>
+            <string name="Source"><![CDATA[--!strict
+-- Harvestmen (ROBLOX-105, W3b part B): ambient, not food, not spiders: a small oval body high on eight very long legs. One walks the bed's soil and litter and one
+-- the house wall's brick, from dusk through the night (the life clock's hour, as the moths'); by day each is away in its corner (the bed's first litter hide
+-- spot, the wall's foot at its west end) and is not drawn. It walks its surface on a seeded wander, round what stands on the soil, and pays the spider no heed:
+-- it neither hides nor hurries. Struck, the strike is refused (Prey/PreyWorld, UI/PreyText) and it walks on. Pure and seeded, no raycast; a checkpoint records
+-- it with the region's prey.
+-- Sources (docs/NOTEBOOK_SOURCES.md, the harvestman page): one oval body, two eyes, no silk and no venom glands; a foul odour when disturbed; legs that come off
+-- easily and twitch; mostly active at night or in shade. The speeds and the leg lengths drawn are the game's.
+local R = require(script.Parent.PreyRandom)
+
+local Harvestmen = {}
+Harvestmen.__index = Harvestmen
+
+Harvestmen.HOVER = 0.9 -- the body's centre above the surface: it rides high on its legs
+Harvestmen.BODY = 0.5 -- studs long: a body about 5 mm
+Harvestmen.RADIUS = 0.35
+Harvestmen.WALK = { 0.8, 1.4 } -- studs a second
+Harvestmen.EDGE = 1.5
+Harvestmen.DUSK = { from = 18, to = 6 }
+
+-- `spec`: one of World/Garden.ambient's (kind "harvestman", surface "soil" or "wall"); `count`: the tier's; for the soil, `soil` and `boxes` as the woodlice's.
+function Harvestmen.new(spec: any, count: number, soil: { min: Vector3, max: Vector3 }?, boxes: { { min: Vector3, max: Vector3 } }?): any
+	local self: any = setmetatable({ kind = "harvestman", rng = R.new(spec.seed + 5059), now = 0, items = {}, boxes = {}, surface = spec.surface or "soil",
+		home = spec.home, rect = spec.rect }, Harvestmen)
+	if soil ~= nil then self.soilMin, self.soilMax, self.top = soil.min, soil.max, soil.max.Y end
+	for _, b in (boxes or {}) :: { any } do table.insert(self.boxes, { min = b.min, max = b.max }) end
+	local normal = if self.surface == "wall" then -Vector3.zAxis else Vector3.yAxis
+	for i, s in spec.starts do
+		if i > count then break end
+		local surf = if self.surface == "wall" then s.pos else Vector3.new(s.pos.X, self.top, s.pos.Z)
+		local pos = surf + normal * Harvestmen.HOVER
+		table.insert(self.items, {
+			id = (spec.prefix or "") .. "harvestman_" .. i, kind = "harvestman", surface = surf, position = pos, prevPosition = pos, normal = normal, heading = s.heading,
+			speed = self.rng:draw(Harvestmen.WALK), state = "away", until_ = 0, nextTurn = self.rng:draw({ 1, 3 }), hidden = true,
+		})
+	end
+	return self
+end
+
+-- Whether a point of its surface is free to stand over.
+function Harvestmen.free(self: any, p: Vector3): boolean
+	if self.surface == "wall" then
+		local r = self.rect
+		return p.X >= r.x[1] and p.X <= r.x[2] and p.Y >= r.y[1] and p.Y <= r.y[2]
+	end
+	if p.X < self.soilMin.X + Harvestmen.EDGE or p.X > self.soilMax.X - Harvestmen.EDGE or p.Z < self.soilMin.Z + Harvestmen.EDGE or p.Z > self.soilMax.Z - Harvestmen.EDGE then return false end
+	for _, b in self.boxes do
+		if p.X > b.min.X - 0.6 and p.X < b.max.X + 0.6 and p.Z > b.min.Z - 0.6 and p.Z < b.max.Z + 0.6 then return false end
+	end
+	return true
+end
+
+-- The heading turned by `degrees` about the surface's normal.
+local function turned(self: any, h: Vector3, degrees: number): Vector3
+	local n = if self.surface == "wall" then -Vector3.zAxis else Vector3.yAxis
+	return CFrame.fromAxisAngle(n, math.rad(degrees)):VectorToWorldSpace(h).Unit
+end
+
+local function dusk(hour: number?): boolean
+	return hour ~= nil and (hour >= Harvestmen.DUSK.from or hour < Harvestmen.DUSK.to)
+end
+
+-- One fixed tick. The spider is ignored. `ctx.hour`: the life clock's hour (nil: day).
+function Harvestmen.step(self: any, dt: number, _spider: Vector3, ctx: any)
+	self.now += dt
+	local now = self.now
+	local out = dusk(if ctx ~= nil then ctx.hour else nil)
+	for _, h in self.items do
+		h.prevPosition = h.position
+		if h.state == "away" then
+			if out then
+				-- out from its corner
+				h.state = "walk"; h.hidden = false
+				local home = self.home
+				if home ~= nil then
+					h.surface = if self.surface == "wall" then home else Vector3.new(home.X, self.top, home.Z)
+					h.position = h.surface + h.normal * Harvestmen.HOVER
+					h.prevPosition = h.position
+				end
+			end
+			continue
+		end
+		if not out and self.home ~= nil then
+			-- day: back to its corner
+			local home = if self.surface == "wall" then self.home else Vector3.new(self.home.X, self.top, self.home.Z)
+			local to = home - h.surface
+			if to.Magnitude <= 0.3 then h.state = "away"; h.hidden = true; continue end
+			h.heading = to.Unit
+			h.surface += h.heading * math.min(to.Magnitude, h.speed * dt)
+			h.position = h.surface + h.normal * Harvestmen.HOVER
+			continue
+		end
+		if h.state == "pause" then
+			if now >= h.until_ then h.state = "walk" end
+			continue
+		end
+		if now >= h.nextTurn then
+			h.heading = turned(self, h.heading, self.rng:draw({ -60, 60 }))
+			h.nextTurn = now + self.rng:draw({ 1, 3 })
+			if self.rng:next() < 0.2 then h.state = "pause"; h.until_ = now + self.rng:draw({ 1, 5 }); continue end
+		end
+		local nextPos = h.surface + h.heading * (h.speed * dt)
+		if self:free(nextPos) then
+			h.surface = nextPos
+			h.position = nextPos + h.normal * Harvestmen.HOVER
+		else
+			h.heading = turned(self, h.heading, self.rng:draw({ 100, 200 }))
+		end
+	end
+end
+
+-- What a strike may hit: the body, while it is out.
+function Harvestmen.targets(self: any): { any }
+	local out = {}
+	for _, h in self.items do
+		if not h.hidden then table.insert(out, { creature = h, position = h.position, radius = Harvestmen.RADIUS }) end
+	end
+	return out
+end
+
+-- Struck: it walks on.
+function Harvestmen.struck(_self: any, _h: any) end
+
+function Harvestmen.creatures(self: any): { any } return self.items end
+
+function Harvestmen.problems(self: any, lo: Vector3, hi: Vector3): { string }
+	local out: { string } = {}
+	local states = { away = true, walk = true, pause = true }
+	if type(self.items) ~= "table" then return { "harvestmen: no list" } end
+	if self.surface ~= "soil" and self.surface ~= "wall" then table.insert(out, "harvestmen: on no known surface") end
+	for i, h in self.items do
+		if type(h) ~= "table" or not states[h.state] then table.insert(out, `harvestmen: {i} is in no known state`); continue end
+		local p = h.position
+		if (typeof(p) ~= "Vector3" and type(p) ~= "table") or p.X ~= p.X or p.Y ~= p.Y or p.Z ~= p.Z or p.X < lo.X or p.X > hi.X or p.Y < lo.Y or p.Y > hi.Y or p.Z < lo.Z or p.Z > hi.Z then
+			table.insert(out, `harvestmen: {i} is outside its region`)
+		end
+	end
+	return out
+end
+
+return Harvestmen
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="96">
+          <Properties>
+            <string name="Name">Ladybird</string>
+            <string name="Source"><![CDATA[--!strict
+-- Ladybirds (ROBLOX-105, W3b part B): ambient beetles, not food, that walk the bed's plants among the aphids (World/Garden.plants: one on the dock, one on the
+-- dandelion at the full tier). Each walks its plant's faces from one place to the next (Prey/PlantWalk over Garden.plantPath), pauses, and now and then, when its
+-- appetite has come back, walks to a perch where an aphid sits and eats it there in plain view: it stands over the aphid for 8 to 14 s and the aphid is gone
+-- (the aphid's director tidies it away and its population owes another, as after the spider's own meal). Struck by the spider it is refused (Prey/PreyWorld,
+-- UI/PreyText) and reflex-bleeds: a drop of the fluid shows at its front leg joints for a while and it keeps still. The spider does not otherwise trouble it.
+-- Pure and seeded (a Prey/PreyRandom stream of its own from the region's ambient seed), no raycast; a checkpoint records the colony with the region's prey and
+-- puts it back where it was (Persistence/Checkpoint's `garden` root, the region's `ambient`).
+-- Sources (docs/NOTEBOOK_SOURCES.md, the ladybird page): adults and larvae eat aphids and other small soft-bodied insects; the colours are a warning; disturbed,
+-- they release a noxious fluid from the leg joints. The speeds, waits and how often it eats are the game's.
+local R = require(script.Parent.PreyRandom)
+local PlantWalk = require(script.Parent.PlantWalk)
+local Garden = require(script.Parent.Parent.World.Garden)
+
+local Ladybirds = {}
+Ladybirds.__index = Ladybirds
+
+Ladybirds.HOVER = 0.17 -- the body's centre above the surface it walks on
+Ladybirds.LENGTH = 0.6 -- studs: a seven-spot ladybird is 5 to 8 mm long
+Ladybirds.RADIUS = 0.3 -- what a strike must come within
+Ladybirds.WALK = { 0.35, 0.6 } -- studs a second
+Ladybirds.PAUSE = { 2, 7 }
+Ladybirds.EAT = { 8, 14 } -- seconds over an aphid
+Ladybirds.APPETITE = { 50, 120 } -- seconds before it goes after another aphid
+Ladybirds.REACH = 0.8 -- an aphid this near when it arrives is the one it eats
+Ladybirds.BLEED_S = 6 -- how long the drop shows and it keeps still, struck
+
+export type Beetle = {
+	id: string, kind: string, plant: string, node: string, walk: PlantWalk.Walk?, surface: Vector3, position: Vector3, prevPosition: Vector3, normal: Vector3,
+	heading: Vector3, speed: number, state: string, -- walk | pause | eat | still
+	until_: number, target: string?, -- the aphid's perch it is making for
+	prey: string?, -- the aphid it is eating
+	nextMeal: number, bleedUntil: number, eaten: number, hidden: boolean,
+}
+
+-- `spec`: one of World/Garden.ambient's (kind "ladybird"); `count`: how many (the tier's); `plants`: the region's World/Garden.plants.
+function Ladybirds.new(spec: any, count: number, plants: { [string]: any }): any
+	local self: any = setmetatable({ kind = "ladybird", rng = R.new(spec.seed + 2027), now = 0, beetles = {} }, Ladybirds)
+	for i, s in spec.starts do
+		if i > count then break end
+		local plant = plants[s.plant]
+		local node = plant and plant.nodes[s.node]
+		if node ~= nil then
+			local p = if #node.route > 0 then node.route[#node.route] else plant.highway[node.hub]
+			local a = self.rng:next() * math.pi * 2
+			local h = Vector3.new(math.cos(a), 0, math.sin(a))
+			local t = h - p.normal * h:Dot(p.normal)
+			if t.Magnitude < 1e-3 then t = Vector3.yAxis - p.normal * p.normal.Y end
+			if t.Magnitude < 1e-3 then t = Vector3.zAxis end
+			local pos = p.pos + p.normal * Ladybirds.HOVER
+			table.insert(self.beetles, {
+				id = (spec.prefix or "") .. "ladybird_" .. i, kind = "ladybird", plant = s.plant, node = s.node, walk = nil, surface = p.pos, position = pos, prevPosition = pos,
+				normal = p.normal, heading = t.Unit, speed = self.rng:draw(Ladybirds.WALK), state = "pause", until_ = self.rng:draw(Ladybirds.PAUSE),
+				target = nil, prey = nil, nextMeal = self.rng:draw(Ladybirds.APPETITE), bleedUntil = -1, eaten = 0, hidden = false,
+			})
+		end
+	end
+	return self
+end
+
+-- The aphid (a fly of the bed's director) with this id, or nil.
+local function aphidById(flies: { any }, id: string?): any
+	if id == nil then return nil end
+	for _, f in flies do if f.id == id then return f end end
+	return nil
+end
+
+-- An aphid that can be eaten: alive, sitting (not in the jaws, not on its way between perches, not another's meal).
+local function edible(f: any, by: string?): boolean
+	return f ~= nil and (f.state == "PERCHED" or f.state == "ALERT") and f.creep == nil and (f.heldBy == nil or f.heldBy == by)
+		and f.profile ~= nil and f.profile.body ~= nil and f.profile.body.prey_kind == "aphid"
+end
+
+-- Sets off for a node of its plant: an aphid's perch on it when its appetite is back and one sits there, else a seeded place of the plant.
+local function setOff(self: any, b: any, plant: any, flies: { any })
+	local to: string? = nil
+	b.target = nil
+	if self.now >= b.nextMeal then
+		for _, f in flies do
+			if edible(f, nil) and f.perch ~= nil and plant.nodes[f.perch.id] ~= nil and f.perch.id ~= b.node then to = f.perch.id; b.target = f.perch.id; break end
+		end
+	end
+	if to == nil then
+		local list = {}
+		for _, id in plant.order do if id ~= b.node then table.insert(list, id) end end
+		if #list == 0 then return end
+		to = list[1 + math.floor(self.rng:next() * #list) % #list]
+	end
+	local path = Garden.plantPath(plant, b.node, to :: string)
+	if path == nil then return end
+	b.walk = PlantWalk.new(path, b.surface, b.normal)
+	if b.target ~= nil then (b.walk :: any).length = math.max(0, (b.walk :: any).length - 0.35) end -- (it stops just short of the aphid, facing it)
+	b.node = to :: string
+	b.state = "walk"
+end
+
+-- One fixed tick. `ctx`: { plants = the region's Garden.plants, flies = the bed's prey director's flies (the aphids among them), hour = the life clock's hour? }.
+function Ladybirds.step(self: any, dt: number, _spider: Vector3, ctx: any)
+	self.now += dt
+	local now = self.now
+	local plants = ctx.plants or {}
+	local flies = ctx.flies or {}
+	for _, b in self.beetles do
+		b.prevPosition = b.position
+		local plant = plants[b.plant]
+		if plant == nil then continue end
+		if b.state == "still" then
+			if now >= b.until_ then b.state = "pause"; b.until_ = now + self.rng:draw(Ladybirds.PAUSE) end
+		elseif b.state == "pause" then
+			if now >= b.until_ then setOff(self, b, plant, flies) end
+		elseif b.state == "eat" then
+			local f = aphidById(flies, b.prey)
+			if not edible(f, b.id) or (f.position - b.position).Magnitude > Ladybirds.REACH + 0.4 then
+				if f ~= nil and f.heldBy == b.id then f.heldBy = nil end
+				b.prey = nil; b.state = "pause"; b.until_ = now + self.rng:draw(Ladybirds.PAUSE)
+			elseif now >= b.until_ then
+				-- the meal is over: the aphid is gone (its director tidies it away; its population owes another)
+				f.heldBy = nil
+				if f.perch ~= nil and f.perch.occupant == f.id then f.perch.occupant = "" end
+				f.state = "CONSUMED"
+				b.eaten += 1
+				b.prey = nil
+				b.nextMeal = now + self.rng:draw(Ladybirds.APPETITE)
+				b.state = "pause"; b.until_ = now + self.rng:draw(Ladybirds.PAUSE)
+			end
+		elseif b.state == "walk" and b.walk ~= nil then
+			local p, n, dir, done = PlantWalk.advance(b.walk, b.speed * dt)
+			b.surface, b.normal = p, n
+			if dir.Magnitude > 0.5 then b.heading = dir end
+			b.position = p + n * Ladybirds.HOVER
+			if done then
+				b.walk = nil
+				local f: any = nil
+				if b.target ~= nil then
+					for _, x in flies do
+						if edible(x, nil) and x.perch ~= nil and x.perch.id == b.target and (x.position - b.position).Magnitude <= Ladybirds.REACH + 0.4 then f = x; break end
+					end
+				end
+				b.target = nil
+				if f ~= nil then
+					f.heldBy = b.id
+					b.prey = f.id
+					b.state = "eat"; b.until_ = now + self.rng:draw(Ladybirds.EAT)
+					local to = f.position - b.position
+					local t = to - n * to:Dot(n)
+					if t.Magnitude > 1e-3 then b.heading = t.Unit end
+				else
+					b.state = "pause"; b.until_ = now + self.rng:draw(Ladybirds.PAUSE)
+				end
+			end
+		end
+	end
+end
+
+-- What a strike may hit: { creature, position, radius }.
+function Ladybirds.targets(self: any): { any }
+	local out = {}
+	for _, b in self.beetles do table.insert(out, { creature = b, position = b.position, radius = Ladybirds.RADIUS }) end
+	return out
+end
+
+-- Struck by the spider: it bleeds from its leg joints and keeps still (a meal under way is left).
+function Ladybirds.struck(self: any, b: any)
+	b.bleedUntil = self.now + Ladybirds.BLEED_S
+	if b.prey ~= nil then b.prey = nil end
+	b.walk = nil
+	b.state = "still"; b.until_ = self.now + Ladybirds.BLEED_S
+end
+
+-- The drawn creatures.
+function Ladybirds.creatures(self: any): { any }
+	return self.beetles
+end
+
+-- What is wrong with a colony put back from a record.
+function Ladybirds.problems(self: any, lo: Vector3, hi: Vector3): { string }
+	local out: { string } = {}
+	local states = { walk = true, pause = true, eat = true, still = true }
+	if type(self.beetles) ~= "table" then return { "ladybirds: no list" } end
+	for i, b in self.beetles do
+		if type(b) ~= "table" or not states[b.state] then table.insert(out, `ladybirds: beetle {i} is in no known state`); continue end
+		local p = b.position
+		if (typeof(p) ~= "Vector3" and type(p) ~= "table") or p.X ~= p.X or p.Y ~= p.Y or p.Z ~= p.Z or p.X < lo.X or p.X > hi.X or p.Y < lo.Y or p.Y > hi.Y or p.Z < lo.Z or p.Z > hi.Z then
+			table.insert(out, `ladybirds: beetle {i} is outside its region`)
+		end
+		if b.plant ~= "dock" and b.plant ~= "dandelion" then table.insert(out, `ladybirds: beetle {i} is on no plant`) end
+		if b.walk ~= nil then
+			local why = PlantWalk.problem(b.walk)
+			if why ~= nil then table.insert(out, `ladybirds: beetle {i}: {why}`) end
+		end
+	end
+	return out
+end
+
+return Ladybirds
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="97">
+          <Properties>
+            <string name="Name">Millipede</string>
+            <string name="Source"><![CDATA[--!strict
+-- Millipedes (ROBLOX-105, W3b part B): ambient, not food. A seeded few in the bed walk the soil slowly round what stands on it, as the woodlice do (Prey/Woodlouse),
+-- and now and then go under the stones for a while (the hide spots by the stones the woodlice use). The body follows the head: the head's track is kept as a
+-- trail of points (`trail`), and Client/BugBodies lays the rings along it. When the spider comes within COIL_WU it stops and coils, head in the middle; it stays
+-- coiled until the spider has been gone a while, then uncoils and walks on. Struck, it coils at once and the strike is refused (Prey/PreyWorld, UI/PreyText).
+-- Pure and seeded, no raycast; a checkpoint records it with the region's prey (Persistence/Checkpoint's `garden` root, the region's `ambient`).
+-- Sources (docs/NOTEBOOK_SOURCES.md, the millipede page): two pairs of legs on each segment; most feed on decaying vegetation and live in soil and leaf mould and
+-- beneath stones; threatened, most roll into a coil with the legs inside, and some release foul-tasting or foul-smelling substances. Speeds and waits are the game's.
+local R = require(script.Parent.PreyRandom)
+
+local Millipedes = {}
+Millipedes.__index = Millipedes
+
+Millipedes.HOVER = 0.12 -- the rings' centres above the soil
+Millipedes.RINGS = 12 -- body rings drawn behind the head
+Millipedes.SPACING = 0.19 -- studs from ring to ring: a body about 2.4 cm long
+Millipedes.RADIUS = 0.3
+Millipedes.WALK = { 0.15, 0.28 } -- studs a second
+Millipedes.COIL_WU = 2.5 -- the spider this near makes it coil
+Millipedes.CALM_WU = 5.0 -- it uncoils once the spider is this far, and has been for CALM_S
+Millipedes.CALM_S = { 6, 12 }
+Millipedes.COIL_S = 1.0 -- seconds to coil
+Millipedes.UNCOIL_S = 2.5
+Millipedes.UNDER_EVERY = { 60, 140 } -- how often it goes under a stone
+Millipedes.UNDER_S = { 20, 45 } -- and how long it stays
+Millipedes.EDGE = 1.0
+Millipedes.TURN = 90 -- degrees a second it turns at, walking on: it steers round in an arc, never folds back on itself
+Millipedes.AHEAD = 0.8 -- how far ahead it feels for what stands in its way
+
+-- `spec`: one of World/Garden.ambient's (kind "millipede"); `count`: the tier's; `soil` the soil's top box; `boxes` the standing boxes' footprints.
+function Millipedes.new(spec: any, count: number, soil: { min: Vector3, max: Vector3 }, boxes: { { min: Vector3, max: Vector3 } }): any
+	local self: any = setmetatable({ kind = "millipede", rng = R.new(spec.seed + 3041), now = 0, hides = {}, boxes = {}, items = {},
+		soilMin = soil.min, soilMax = soil.max, top = soil.max.Y }, Millipedes)
+	for _, h in spec.hides or {} do table.insert(self.hides, { pos = h.pos, kind = h.kind }) end
+	for _, b in boxes do table.insert(self.boxes, { min = b.min, max = b.max }) end
+	for i, s in spec.starts do
+		if i > count then break end
+		local pos = Vector3.new(s.pos.X, self.top + Millipedes.HOVER, s.pos.Z)
+		local trail = {}
+		for k = 1, Millipedes.RINGS do table.insert(trail, pos - s.heading * (k * Millipedes.SPACING)) end
+		table.insert(self.items, {
+			id = (spec.prefix or "") .. "millipede_" .. i, kind = "millipede", position = pos, prevPosition = pos, heading = s.heading, normal = Vector3.yAxis,
+			speed = self.rng:draw(Millipedes.WALK), state = "walk", coil = 0, until_ = 0, nextTurn = self.rng:draw({ 2, 5 }),
+			nextUnder = self.rng:draw(Millipedes.UNDER_EVERY), hide = 0, trail = trail, hidden = false, turn = 0,
+		})
+	end
+	return self
+end
+
+-- Whether a point on the soil is free to stand on (inside the soil's edge, in no standing box's footprint grown by `margin`).
+function Millipedes.free(self: any, p: Vector3, margin: number): boolean
+	if p.X < self.soilMin.X + Millipedes.EDGE or p.X > self.soilMax.X - Millipedes.EDGE or p.Z < self.soilMin.Z + Millipedes.EDGE or p.Z > self.soilMax.Z - Millipedes.EDGE then return false end
+	for _, b in self.boxes do
+		if p.X > b.min.X - margin and p.X < b.max.X + margin and p.Z > b.min.Z - margin and p.Z < b.max.Z + margin then return false end
+	end
+	return true
+end
+
+local function flat(v: Vector3): Vector3 return Vector3.new(v.X, 0, v.Z) end
+local function turned(heading: Vector3, degrees: number): Vector3
+	local a = math.atan2(heading.Z, heading.X) + math.rad(degrees)
+	return Vector3.new(math.cos(a), 0, math.sin(a))
+end
+
+-- The head moved: drop a trail point once it is a ring's spacing from the last.
+local function track(m: any)
+	local last = m.trail[1]
+	if last == nil or (m.position - last).Magnitude >= Millipedes.SPACING then
+		table.insert(m.trail, 1, m.position)
+		while #m.trail > Millipedes.RINGS + 1 do table.remove(m.trail) end
+	end
+end
+
+-- One fixed tick. `spider`: where the spider is.
+function Millipedes.step(self: any, dt: number, spider: Vector3, _ctx: any)
+	self.now += dt
+	local now = self.now
+	for _, m in self.items do
+		m.prevPosition = m.position
+		local d = (flat(spider) - flat(m.position)).Magnitude
+		local near = d <= Millipedes.COIL_WU and math.abs(spider.Y - m.position.Y) < 4
+		if near and (m.state == "walk" or m.state == "pause" or m.state == "going") then m.state = "coiled"; m.until_ = math.huge end
+		if m.state == "coiled" then
+			m.coil = math.min(1, m.coil + dt / Millipedes.COIL_S)
+			if d >= Millipedes.CALM_WU then
+				if m.until_ == math.huge then m.until_ = now + self.rng:draw(Millipedes.CALM_S) end
+				if now >= m.until_ then m.state = "walk"; m.nextTurn = now + self.rng:draw({ 2, 5 }) end
+			else
+				m.until_ = math.huge
+			end
+		elseif m.coil > 0 then
+			m.coil = math.max(0, m.coil - dt / Millipedes.UNCOIL_S) -- (uncoiling: it does not walk until it is straight)
+		elseif m.state == "under" then
+			if now >= m.until_ then m.state = "walk"; m.hidden = false; m.heading = turned(m.heading, self.rng:draw({ 120, 240 })); m.nextUnder = now + self.rng:draw(Millipedes.UNDER_EVERY) end
+		elseif m.state == "going" then
+			local goal = self.hides[m.hide].pos
+			local to = flat(goal) - flat(m.position)
+			if to.Magnitude <= 0.25 then
+				m.state = "under"; m.hidden = true; m.until_ = now + self.rng:draw(Millipedes.UNDER_S)
+			else
+				m.heading = to.Unit
+				m.position += m.heading * math.min(to.Magnitude, m.speed * dt)
+				track(m)
+			end
+		elseif m.state == "pause" then
+			if now >= m.until_ then m.state = "walk"; m.nextTurn = now + self.rng:draw({ 2, 5 }) end
+		elseif m.state == "walk" then
+			if now >= m.nextUnder and #self.hides > 0 then
+				local best, bestD = 0, math.huge
+				for i, h in self.hides do
+					local dd = (flat(h.pos) - flat(m.position)).Magnitude
+					if dd < bestD then best, bestD = i, dd end
+				end
+				m.hide = best
+				m.state = "going"
+			else
+				local paused = false
+				if now >= m.nextTurn then
+					m.turn = self.rng:draw({ -40, 40 })
+					m.nextTurn = now + self.rng:draw({ 2, 5 })
+					if self.rng:next() < 0.2 then m.state = "pause"; m.until_ = now + self.rng:draw({ 2, 6 }); paused = true end
+				end
+				if not paused then
+					-- something ahead: steer away in an arc (the turn is drawn once, then taken a little each tick)
+					if math.abs(m.turn or 0) < 1 and not self:free(m.position + m.heading * Millipedes.AHEAD, 0.3) then
+						m.turn = (if self.rng:next() < 0.5 then -1 else 1) * self.rng:draw({ 90, 180 })
+					end
+					local turn = m.turn or 0
+					if math.abs(turn) > 1e-6 then
+						local by = math.clamp(turn, -Millipedes.TURN * dt, Millipedes.TURN * dt)
+						m.heading = turned(m.heading, by)
+						m.turn = turn - by
+					end
+					local nextPos = m.position + m.heading * (m.speed * dt)
+					if self:free(nextPos, 0.3) then
+						m.position = nextPos
+						track(m)
+					elseif math.abs(m.turn or 0) < 1 then
+						m.turn = (if self.rng:next() < 0.5 then -1 else 1) * self.rng:draw({ 90, 180 })
+					end
+				end
+			end
+		end
+	end
+end
+
+-- What a strike may hit: the head and the body's middle.
+function Millipedes.targets(self: any): { any }
+	local out = {}
+	for _, m in self.items do
+		if not m.hidden then
+			table.insert(out, { creature = m, position = m.position, radius = Millipedes.RADIUS })
+			local mid = m.trail[math.max(1, math.floor(#m.trail / 2))]
+			if mid ~= nil and m.coil < 0.5 then table.insert(out, { creature = m, position = mid, radius = Millipedes.RADIUS }) end
+		end
+	end
+	return out
+end
+
+-- Struck by the spider: it coils at once.
+function Millipedes.struck(self: any, m: any)
+	m.state = "coiled"
+	m.until_ = math.huge
+	m.coil = math.max(m.coil, 0.5)
+end
+
+function Millipedes.creatures(self: any): { any } return self.items end
+
+function Millipedes.problems(self: any, lo: Vector3, hi: Vector3): { string }
+	local out: { string } = {}
+	local states = { walk = true, pause = true, coiled = true, going = true, under = true }
+	if type(self.items) ~= "table" then return { "millipedes: no list" } end
+	for i, m in self.items do
+		if type(m) ~= "table" or not states[m.state] then table.insert(out, `millipedes: {i} is in no known state`); continue end
+		local p = m.position
+		if (typeof(p) ~= "Vector3" and type(p) ~= "table") or p.X ~= p.X or p.Y ~= p.Y or p.Z ~= p.Z or p.X < lo.X or p.X > hi.X or p.Y < lo.Y or p.Y > hi.Y or p.Z < lo.Z or p.Z > hi.Z then
+			table.insert(out, `millipedes: {i} is outside its region`)
+		end
+		if type(m.trail) ~= "table" or #m.trail > Millipedes.RINGS + 1 then table.insert(out, `millipedes: {i} has no body trail`) end
+		if type(m.coil) ~= "number" or m.coil < 0 or m.coil > 1 then table.insert(out, `millipedes: {i} is coiled beyond belief`) end
+		if (m.state == "going" or m.state == "under") and (type(self.hides) ~= "table" or self.hides[m.hide] == nil) then table.insert(out, `millipedes: {i} hides in no known spot`) end
+	end
+	return out
+end
+
+return Millipedes
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="98">
+          <Properties>
             <string name="Name">PerchGraph</string>
             <string name="Source"><![CDATA[--!strict
 -- Geometry adapter for the frozen PerchGraph. Every planned leg and every flight tick is swept.
@@ -16933,7 +17556,79 @@ return G
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="96">
+        <Item class="ModuleScript" referent="99">
+          <Properties>
+            <string name="Name">PlantWalk</string>
+            <string name="Source"><![CDATA[--!strict
+-- A walk along a list of points on surfaces (ROBLOX-105, W3b part B): the aphid's creep from one of its perches to another and the ladybird's rounds over a
+-- plant (World/Garden.plantPath), and the snail's crawl over the soil and up the wall's foot. A walk is plain data (the points, their surfaces' normals, how far
+-- along it is), so a rest records it and puts it back where it was. Pure: no engine, no random draw.
+local PlantWalk = {}
+
+export type Walk = { points: { Vector3 }, normals: { Vector3 }, lengths: { number }, length: number, s: number }
+
+-- A walk over `path` ({ pos, normal } each), from `from` (a place on the first point's surface) when given.
+function PlantWalk.new(path: { any }, from: Vector3?, fromNormal: Vector3?): Walk
+	local points, normals = {}, {}
+	if from ~= nil and (path[1] == nil or (path[1].pos - from).Magnitude > 1e-4) then
+		table.insert(points, from)
+		table.insert(normals, fromNormal or (if path[1] ~= nil then path[1].normal else Vector3.yAxis))
+	end
+	for _, p in path do
+		if #points == 0 or (points[#points] - p.pos).Magnitude > 1e-6 then
+			table.insert(points, p.pos)
+			table.insert(normals, p.normal)
+		end
+	end
+	local lengths, total = {}, 0
+	for i = 2, #points do
+		local d = (points[i] - points[i - 1]).Magnitude
+		table.insert(lengths, d)
+		total += d
+	end
+	return { points = points, normals = normals, lengths = lengths, length = total, s = 0 }
+end
+
+-- Where the walk is at distance `s` along it: the point on the surface, the surface's normal there (turning from one face's to the next's along each leg) and
+-- the direction of travel.
+function PlantWalk.at(w: Walk, s: number): (Vector3, Vector3, Vector3)
+	local pts, nrm = w.points, w.normals
+	if #pts == 1 then return pts[1], nrm[1], Vector3.zero end
+	local left = math.clamp(s, 0, w.length)
+	for i, d in w.lengths do
+		if left <= d or i == #w.lengths then
+			local t = if d > 1e-9 then math.clamp(left / d, 0, 1) else 1
+			local n = nrm[i]:Lerp(nrm[i + 1], t)
+			if n.Magnitude < 1e-6 then n = nrm[i + 1] end
+			local dir = if d > 1e-9 then (pts[i + 1] - pts[i]) / d else Vector3.zero
+			return pts[i]:Lerp(pts[i + 1], t), n.Unit, dir
+		end
+		left -= d
+	end
+	return pts[#pts], nrm[#nrm], Vector3.zero
+end
+
+-- Moves the walk on by `distance`; returns the place, the normal, the direction (laid on the surface) and whether it has arrived.
+function PlantWalk.advance(w: Walk, distance: number): (Vector3, Vector3, Vector3, boolean)
+	w.s = math.min(w.length, w.s + math.max(0, distance))
+	local p, n, dir = PlantWalk.at(w, w.s)
+	local flat = dir - n * dir:Dot(n)
+	return p, n, (if flat.Magnitude > 1e-6 then flat.Unit else Vector3.zero), w.s >= w.length - 1e-9
+end
+
+-- What is wrong with a walk put back from a record (nil for a good one).
+function PlantWalk.problem(w: any): string?
+	if type(w) ~= "table" or type(w.points) ~= "table" or type(w.normals) ~= "table" or type(w.lengths) ~= "table" then return "a walk with no points" end
+	if #w.points < 1 or #w.normals ~= #w.points or #w.lengths ~= #w.points - 1 then return "a walk whose points do not match" end
+	if type(w.s) ~= "number" or w.s ~= w.s or type(w.length) ~= "number" or w.s < 0 or w.s > w.length + 1e-6 then return "a walk out of its length" end
+	return nil
+end
+
+return PlantWalk
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="100">
           <Properties>
             <string name="Name">PreyDirector</string>
             <string name="Source"><![CDATA[--!strict
@@ -17070,7 +17765,7 @@ function D.escape(self: any,f: any)
  end
  if f.profile.body.walker or f.profile.body.flightless then
   -- (ROBLOX-96) a walker that tears free is back on its perch if the perch is still free; if not, it is gone (the population owes another)
-  local perch=f.perch
+  local perch=f.perch;f.creep=nil;f.heldBy=nil -- (ROBLOX-105: a creep or a ladybird's meal does not survive the jaws)
   if perch and perch.occupant=='' then
    perch.occupant=f.id;f.position=self.graph:rest(perch);f.prevPosition=f.position;f.normal=perch.normal;f.velocity=Vector3.zero
    f.state='ALERT';f.stateSince=self.now;f.goal='rest';f.goalSince=self.now;f:beginStay(self.now)
@@ -17155,7 +17850,7 @@ return D
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="97">
+        <Item class="ModuleScript" referent="101">
           <Properties>
             <string name="Name">PreyKinds</string>
             <string name="Source"><![CDATA[--!strict
@@ -17172,9 +17867,68 @@ return D
 --                     restlessness each fly drew is kept, its clock of restlessness starts again at the change (so they do not all take off at once)
 --   the grip ........ the moth's slip (the first grip on it fails at `slip_chance`, once) and the crane fly's shed leg (once, at `shed_chance`, `shed_after`
 --                     seconds into the struggle): the prey leaves the jaws and escapes as a torn-free fly does
+--   the creep ....... (ROBLOX-105, the aphid: body.creep) now and then, perched and calm, it walks slowly over its plant's faces to another free perch of the
+--                     same plant (World/Garden.plantPath: down its stem or round its rosette and out along the other leaf), at `speed`, every `every`
+--                     seconds; startled on the way it freezes where it is; it never leaves its plant
 local Species = require(script.Parent.Parent.Data.Species)
+local Garden = require(script.Parent.Parent.World.Garden)
+local PlantWalk = require(script.Parent.PlantWalk)
 
 local K = {}
+
+-- (ROBLOX-105) The aphid's creep (a profile with body.creep): carries on one under way (true while it moves or stands frozen on the way), or, perched, calm, not
+-- walking or fidgeting and its time come, begins one to a free perch of its own plant within `reach` studs of walking (the stream draws the perch and the next
+-- time). An aphid a ladybird is eating (`heldBy`) does not set off.
+function K.creep(f: any, now: number, dt: number): boolean
+	local c = f.creep
+	local hover = f.profile.body.hover_wu
+	if c ~= nil then
+		if f.state ~= "PERCHED" and f.state ~= "ALERT" then f.creep = nil; return false end
+		if f.state == "ALERT" then return true end -- (startled on the way: it freezes where it is)
+		local p, n, dir, done = PlantWalk.advance(c, (f.creepSpeed or 0.1) * dt)
+		f.position = p + n * hover
+		f.normal = n
+		if dir.Magnitude > 0.5 then f.heading = dir end
+		if done then
+			f.creep = nil
+			f.normal = f.perch.normal
+			f.position = f.graph:rest(f.perch)
+			local t = f.heading - f.normal * f.heading:Dot(f.normal)
+			if t.Magnitude > 1e-3 then f.heading = t.Unit end
+			f.restSpot = f.position; f.homeHeading = f.heading; f.walkLeft = 0; f.fidgetUntil = 0; f.perchedSince = now
+		end
+		return true
+	end
+	local spec = f.profile.body.creep
+	if spec == nil or f.state ~= "PERCHED" or f.walkLeft > 0 or now < f.fidgetUntil or f.heldBy ~= nil or f.perch == nil then return false end
+	if f.creepNext == nil then f.creepNext = now + f.rng:draw(spec.every); return false end
+	if now < f.creepNext then return false end
+	f.creepNext = now + f.rng:draw(spec.every)
+	local here = f.perch
+	local name, plants = Garden.plantOf(here.id)
+	if name == nil or plants == nil then return false end
+	local plant = plants[name]
+	local list = {}
+	for _, other in f.graph.perches do
+		if other ~= here and other.walker and other.valid and other.occupant == "" and other.reserved == "" and plant.nodes[other.id] ~= nil then
+			local path = Garden.plantPath(plant, here.id, other.id)
+			if path ~= nil then
+				local w = PlantWalk.new(path, f.position - f.normal * hover, f.normal)
+				if w.length <= spec.reach then table.insert(list, { perch = other, walk = w }) end
+			end
+		end
+	end
+	if #list == 0 then return false end
+	local pick = list[1 + math.floor(f.rng:next() * #list) % #list]
+	if here.occupant == f.id then here.occupant = "" end
+	pick.perch.occupant = f.id
+	f.perch = pick.perch
+	f.creep = pick.walk
+	f.creepSpeed = f.rng:draw(spec.speed)
+	f.creeps = (f.creeps or 0) + 1
+	f.glanceTarget = nil
+	return true
+end
 
 -- The arc's points along the hop: s from 0 to 1.
 local function arcPoint(from: Vector3, to: Vector3, apex: number, s: number): Vector3
@@ -17408,7 +18162,7 @@ return K
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="98">
+        <Item class="ModuleScript" referent="102">
           <Properties>
             <string name="Name">PreyMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -17498,7 +18252,7 @@ return M
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="99">
+        <Item class="ModuleScript" referent="103">
           <Properties>
             <string name="Name">PreyPopulation</string>
             <string name="Source"><![CDATA[--!strict
@@ -17530,7 +18284,7 @@ return P
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="100">
+        <Item class="ModuleScript" referent="104">
           <Properties>
             <string name="Name">PreyRandom</string>
             <string name="Source"><![CDATA[--!strict
@@ -17543,7 +18297,7 @@ return R
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="101">
+        <Item class="ModuleScript" referent="105">
           <Properties>
             <string name="Name">PreyWorld</string>
             <string name="Source"><![CDATA[--!strict
@@ -17562,15 +18316,31 @@ return R
 -- made). The moths and the crane flies follow the life clock's hour (`before`'s `hour`): restless from dusk through the night (Prey/PreyKinds.light). A moth's
 -- slip and a crane fly's shed leg are decided here, on the jaws, before their step (PreyKinds.grip), and the last of them is kept as `event` for the screen.
 -- The prey outside the sill never runs while the spider is on the sill itself (its neighbour the outer sill has prey now): the sill plays as it always did.
+-- ROBLOX-105 (W3b part B): the garden's ambient bugs that are not food (World/Garden.ambient: ladybirds on the bed's plants, millipedes and a snail on its soil
+-- and a harvestman in its litter, a harvestman on the house wall), a colony per kind per region (Prey/Ladybird, Millipede, Snail, Harvestman), kept in the
+-- region's entry as `ambient` ({ [kind] = colony }), made under the same gate and stepped beside the woodlice. None of them, and no longer the woodlice, is
+-- shown to the spider's senses: the perception modules know only movement, possible prey and fly-like prey, and a movement contact carries no name the HUD
+-- could caption "not food", so (Nathan's W3 call) they are left out of `percepts` rather than shown as movement the player might hunt. A strike that comes
+-- within one of them is refused (`event` { kind = "refused", prey = kind }, UI/PreyText) and the creature answers (a ladybird bleeds, a millipede coils, the
+-- snail withdraws, a woodlouse runs for cover); nothing of theirs is ever held.
 local PreyDirector = require(script.Parent.PreyDirector)
 local PreyKinds = require(script.Parent.PreyKinds)
 local Woodlouse = require(script.Parent.Woodlouse)
+local Ladybird = require(script.Parent.Ladybird)
+local Millipede = require(script.Parent.Millipede)
+local Snail = require(script.Parent.Snail)
+local Harvestman = require(script.Parent.Harvestman)
 local Species = require(script.Parent.Parent.Data.Species)
 local Garden = require(script.Parent.Parent.World.Garden)
 local Region = require(script.Parent.Parent.World.Region)
 
 local PreyWorld = {}
 PreyWorld.__index = PreyWorld
+
+-- (ROBLOX-105) The ambient colonies' classes by kind.
+PreyWorld.AMBIENT = { ladybird = Ladybird, millipede = Millipede, snail = Snail, harvestman = Harvestman } :: { [string]: any }
+-- (ROBLOX-105) Whether the woodlice and the ambient bugs are shown to the spider's senses (see the head of this file: they are not).
+PreyWorld.SENSED = false
 
 -- A neighbouring region's prey runs while its farthest perch is inside this many studs of the spider (Workspace.StreamingMinRadius, 96: what is always sent).
 PreyWorld.ACTIVE_RADIUS = 96
@@ -17588,7 +18358,11 @@ function PreyWorld.new(home: any, world: any, garden: { [string]: any }, root: I
 		made = 0, -- directors made so far
 		tier = "full", -- (ROBLOX-101) the detail tier, for how many of the bestiary's prey a region holds
 		hour = nil :: number?, -- (ROBLOX-101) the life clock's hour, when the client gives it
-		event = nil :: any, -- (ROBLOX-101) the last prey that got out of the jaws by its own trick: { kind = "slip" | "shed", prey = prey kind }
+		event = nil :: any, -- (ROBLOX-101) the last prey that got out of the jaws by its own trick: { kind = "slip" | "shed", prey = prey kind }; (ROBLOX-105) or a strike refused
+		strikeEnd = -1, -- (ROBLOX-105) the ambient strike's window: open until this clock time
+		strikeMode = "attached", -- the motor's mode last tick
+		strikeFrom = nil :: Vector3?, -- where the spider was last tick
+		refused = 0, -- strikes refused so far
 	}, PreyWorld)
 end
 
@@ -17712,12 +18486,49 @@ function PreyWorld.bugs(self: any, id: string): any
 	return w
 end
 
--- Every percept of the active regions: their flies, and their woodlice as movement.
+-- The region's ambient colonies in Garden.AMBIENT's order, each made now if the region is whole and it has none yet (an empty list for a region without any).
+-- A colony on the soil needs the soil and the standing boxes, as the woodlice do.
+function PreyWorld.ambient(self: any, id: string): { any }
+	local out = {}
+	if id == self.world.home then return out end
+	local region = self.world.map.region(id)
+	local specs = if region ~= nil then Garden.ambient(region) else nil
+	if specs == nil then return out end
+	local entry = self.garden[id]
+	local soil: any, boxes: { any }? = nil, nil
+	for _, spec in specs do
+		local c = if entry ~= nil and entry.ambient ~= nil then entry.ambient[spec.kind] else nil
+		if c == nil and self.world:regionReady(id) then
+			local count = if self.tier == "low" then spec.low else spec.full
+			if spec.surface == "soil" and soil == nil then
+				boxes = {}
+				for _, p in Region.pieces(region) do
+					if p.id == region.id .. "_soil" then soil = { min = p.lo, max = p.hi }
+					elseif p.lo.Y <= region.origin.Y + 0.01 then table.insert(boxes :: any, { min = p.lo, max = p.hi }) end
+				end
+			end
+			if spec.kind == "ladybird" then c = Ladybird.new(spec, count, Garden.plants(region) or {})
+			elseif spec.kind == "millipede" and soil ~= nil then c = Millipede.new(spec, count, soil, boxes :: any)
+			elseif spec.kind == "snail" and soil ~= nil then c = Snail.new(spec, count, soil, boxes :: any)
+			elseif spec.kind == "harvestman" then c = Harvestman.new(spec, count, soil, boxes) end
+			if c ~= nil then
+				entry = entry or {}
+				entry.ambient = entry.ambient or {}
+				entry.ambient[spec.kind] = c
+				self.garden[id] = entry
+			end
+		end
+		if c ~= nil then table.insert(out, c) end
+	end
+	return out
+end
+
+-- Every percept of the active regions: their flies (the woodlice and the ambient bugs only if SENSED, as movement).
 function PreyWorld.percepts(self: any): { any }
 	local out = {}
 	for _, id in self.active do
 		for _, d in self:directors(id) do for _, p in d:percepts() do table.insert(out, p) end end
-		local w = self:bugs(id)
+		local w = if PreyWorld.SENSED then self:bugs(id) else nil
 		if w ~= nil then for _, p in w:percepts() do table.insert(out, p) end end
 	end
 	return out
@@ -17739,6 +18550,15 @@ function PreyWorld.before(self: any, dt: number, position: Vector3, observer: an
 		end
 		local w = self:bugs(id)
 		if w ~= nil then w:step(dt, position) end
+		local list = self:ambient(id)
+		if #list > 0 then
+			local region = self.world.map.region(id)
+			local aphids = {}
+			local d = self:director(id)
+			if d ~= nil then for _, f in d.flies do table.insert(aphids, f) end end
+			local ctx = { hour = self.hour, flies = aphids, plants = if region ~= nil then Garden.plants(region) else nil }
+			for _, c in list do c:step(dt, position, ctx) end
+		end
 	end
 end
 
@@ -17782,6 +18602,7 @@ function PreyWorld.after(self: any, dt: number, motor: any, sensor: any, cast: a
 			for _, d in self:directors(id) do d:afterShared(motor, sensor, cast) end
 		end
 	end
+	self:strikeAmbient(motor)
 	local flies = {}
 	for _, id in self.active do
 		for _, d in self:directors(id) do for _, f in d.flies do table.insert(flies, f) end end
@@ -17793,6 +18614,53 @@ end
 -- The active regions' flies, for the drawing and the notebook's watcher.
 function PreyWorld.flies(self: any): { any }
 	return self.view.flies
+end
+
+-- (ROBLOX-105) The strike against what is not food: a window opened by a leap (the motor's `launched` as it leaves the ground, as the directors' own) and closed
+-- just after it lands; while it is open and the jaws are empty, a sweep of the spider's body from last tick's place to this one against every woodlouse and
+-- ambient bug of the active regions. The first one within its radius (and the directors' 0.3) is refused: `event`, the creature's answer, the window shut.
+function PreyWorld.strikeAmbient(self: any, motor: any)
+	local mode = motor.mode
+	if mode == "air" and self.strikeMode ~= "air" then
+		for _, e in motor.events or {} do if e.kind == "launched" then self.strikeEnd = self.clock + 4; break end end
+	end
+	if self.strikeMode == "air" and mode ~= "air" then self.strikeEnd = math.min(self.strikeEnd, self.clock + 0.05) end
+	self.strikeMode = mode
+	local from = self.strikeFrom or motor.pos
+	self.strikeFrom = motor.pos
+	if self.clock > self.strikeEnd or self.home.feeding.held ~= nil then return end
+	local seg = motor.pos - from
+	local len2 = seg:Dot(seg)
+	for _, id in self.active do
+		local colonies = {}
+		local w = self:bugs(id)
+		if w ~= nil then table.insert(colonies, { c = w, kind = "woodlouse" }) end
+		for _, c in self:ambient(id) do table.insert(colonies, { c = c, kind = c.kind }) end
+		for _, e in colonies do
+			for _, t in e.c:targets() do
+				local u = if len2 > 1e-12 then math.clamp((t.position - from):Dot(seg) / len2, 0, 1) else 0
+				if ((from + seg * u) - t.position).Magnitude <= t.radius + 0.3 then
+					e.c:struck(t.creature)
+					self.event = { kind = "refused", prey = e.kind }
+					self.refused += 1
+					self.strikeEnd = -1
+					return
+				end
+			end
+		end
+	end
+end
+
+-- (ROBLOX-105) Every woodlouse and ambient bug of the active regions, for the drawing (Client/BugBodies: a creature with no `kind` is a woodlouse) and the
+-- notebook's close look.
+function PreyWorld.crawlers(self: any): { any }
+	local out = {}
+	for _, id in self.active do
+		local w = self:bugs(id)
+		if w ~= nil then for _, l in w.lice do table.insert(out, l) end end
+		for _, c in self:ambient(id) do for _, b in c:creatures() do table.insert(out, b) end end
+	end
+	return out
 end
 
 -- The active regions' woodlice, for the drawing.
@@ -17819,7 +18687,207 @@ return PreyWorld
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="102">
+        <Item class="ModuleScript" referent="106">
+          <Properties>
+            <string name="Name">Snail</string>
+            <string name="Source"><![CDATA[--!strict
+-- The garden snail (ROBLOX-105, W3b part B): ambient, not food, three times the spider's length. It crawls very slowly over the bed's soil and up the foot of the
+-- house wall (World/Garden.AMBIENT.wallFoot) from one seeded goal to the next (Prey/PlantWalk over a straight leg on the soil, the corner where the soil meets
+-- the brick, and up the brick), resting between; it is a night animal, so by day it mostly rests and from dusk it mostly crawls (the life clock's hour, as the
+-- moths'). It leaves a slime trail (`trail`, points dropped as it goes, drawn by Client/BugBodies fading over FADE_S). Its eye stalks draw in when the spider
+-- comes within EYES_WU and stay in until it has gone past CALM_WU; it does not crawl with them in. Struck, it withdraws into its shell for a while and the strike
+-- is refused (Prey/PreyWorld, UI/PreyText). Pure and seeded, no raycast; a checkpoint records it with the region's prey.
+-- Sources (docs/NOTEBOOK_SOURCES.md, the snail page): the shell 28 to 32 mm across; the eyes on the longer upper tentacles, which are retractable; mucus from
+-- the foot that aids its movement and leaves a slimy trail; mostly nocturnal, out by day after rain. The speeds, waits and distances are the game's.
+local R = require(script.Parent.PreyRandom)
+local PlantWalk = require(script.Parent.PlantWalk)
+
+local Snails = {}
+Snails.__index = Snails
+
+Snails.SHELL = 3.0 -- studs across: 28 to 32 mm
+Snails.RADIUS = 1.5
+Snails.CRAWL = { 0.07, 0.12 } -- studs a second: about a millimetre a second
+Snails.EYES_WU = 5.0 -- the spider this near: the eye stalks draw in
+Snails.CALM_WU = 7.0 -- and come out again once it is this far
+Snails.IN_RATE = 3.0 -- the stalks' travel a second, in and out
+Snails.OUT_RATE = 0.25
+Snails.SHELL_S = { 25, 45 } -- in its shell this long, struck
+Snails.REST_DAY = { 90, 240 }
+Snails.REST_NIGHT = { 8, 30 }
+Snails.DROP = 0.5 -- a trail point every this many studs crawled
+Snails.TRAIL = 25 -- trail points kept (the drawing shows the newest 24 legs at the full tier)
+Snails.FADE_S = 240 -- seconds for a trail to fade
+Snails.EDGE = 2.0
+Snails.WALL = -24 -- the house wall's face (z)
+
+-- `spec`: one of World/Garden.ambient's (kind "snail"); `count`: the tier's; `soil` the soil's top box; `boxes` the standing boxes' footprints.
+function Snails.new(spec: any, count: number, soil: { min: Vector3, max: Vector3 }, boxes: { { min: Vector3, max: Vector3 } }): any
+	local self: any = setmetatable({ kind = "snail", rng = R.new(spec.seed + 4057), now = 0, boxes = {}, items = {}, rect = spec.rect,
+		soilMin = soil.min, soilMax = soil.max, top = soil.max.Y }, Snails)
+	for _, b in boxes do table.insert(self.boxes, { min = b.min, max = b.max }) end
+	for i, s in spec.starts do
+		if i > count then break end
+		local surf = Vector3.new(s.pos.X, self.top, s.pos.Z)
+		table.insert(self.items, {
+			id = (spec.prefix or "") .. "snail_" .. i, kind = "snail", surface = surf, position = surf, prevPosition = surf, normal = Vector3.yAxis, heading = s.heading,
+			speed = self.rng:draw(Snails.CRAWL), state = "rest", until_ = self.rng:draw({ 3, 12 }), walk = nil, eyes = 1.0, trail = {}, lastDrop = surf,
+			crawled = 0, hidden = false,
+		})
+	end
+	return self
+end
+
+-- Whether a point on the soil is clear for the shell (inside the soil's edge, in no standing box's footprint grown by `margin`).
+function Snails.free(self: any, p: Vector3, margin: number): boolean
+	if p.X < self.soilMin.X + Snails.EDGE or p.X > self.soilMax.X - Snails.EDGE or p.Z < self.soilMin.Z + Snails.EDGE or p.Z > self.soilMax.Z - 0.6 then return false end
+	for _, b in self.boxes do
+		if p.X > b.min.X - margin and p.X < b.max.X + margin and p.Z > b.min.Z - margin and p.Z < b.max.Z + margin then return false end
+	end
+	return true
+end
+
+-- Whether a straight leg over the soil is clear all the way.
+local function clearLeg(self: any, a: Vector3, b: Vector3): boolean
+	local n = math.max(1, math.ceil((b - a).Magnitude / 0.5))
+	for i = 0, n do
+		if not self:free(a:Lerp(b, i / n), 1.0) then return false end
+	end
+	return true
+end
+
+-- A new goal and the walk to it: a seeded spot on the soil, or (a third of the time) on the wall's foot, by way of the corner. False when no clear leg was found.
+local function setOff(self: any, s: any): boolean
+	local Y, Z = Vector3.yAxis, -Vector3.zAxis
+	local onWall = s.normal.Z < -0.5
+	for _ = 1, 8 do
+		local path: { any }
+		if self.rng:next() < 0.33 and self.rect ~= nil then
+			-- the wall's foot: up the brick from the corner below the goal
+			local x = self.rng:draw(self.rect.x)
+			local y = self.top + self.rng:draw(self.rect.y)
+			local foot = Vector3.new(x, self.top, Snails.WALL)
+			local goal = Vector3.new(x, y, Snails.WALL)
+			if onWall then
+				path = { { pos = goal, normal = Z } }
+			else
+				local approach = Vector3.new(x, self.top, Snails.WALL - 2.0)
+				if not clearLeg(self, s.surface, approach) then continue end
+				path = { { pos = approach, normal = Y }, { pos = foot, normal = (Y + Z).Unit }, { pos = goal, normal = Z } }
+			end
+		else
+			local goal = Vector3.new(self.rng:draw({ self.soilMin.X + Snails.EDGE, self.soilMax.X - Snails.EDGE }), self.top,
+				self.rng:draw({ self.soilMin.Z + Snails.EDGE, self.soilMax.Z - 2.5 }))
+			if onWall then
+				local foot = Vector3.new(s.surface.X, self.top, Snails.WALL)
+				local away = Vector3.new(s.surface.X, self.top, Snails.WALL - 2.0)
+				if not self:free(away, 1.0) or not clearLeg(self, away, goal) then continue end
+				path = { { pos = foot, normal = (Y + Z).Unit }, { pos = away, normal = Y }, { pos = goal, normal = Y } }
+			else
+				if not self:free(goal, 1.0) or not clearLeg(self, s.surface, goal) then continue end
+				path = { { pos = goal, normal = Y } }
+			end
+		end
+		s.walk = PlantWalk.new(path, s.surface, s.normal)
+		s.state = "crawl"
+		return true
+	end
+	return false
+end
+
+local function night(hour: number?): boolean
+	return hour ~= nil and (hour >= 18 or hour < 6)
+end
+
+-- One fixed tick. `ctx.hour`: the life clock's hour (nil: day).
+function Snails.step(self: any, dt: number, spider: Vector3, ctx: any)
+	self.now += dt
+	local now = self.now
+	local hour = if ctx ~= nil then ctx.hour else nil
+	-- the trail dries
+	for _, s in self.items do
+		s.prevPosition = s.position
+		while #s.trail > 0 and now - s.trail[#s.trail].t > Snails.FADE_S do table.remove(s.trail) end
+		local d = (spider - s.position).Magnitude
+		if s.state ~= "shell" then
+			if d <= Snails.EYES_WU then s.eyes = math.max(0, s.eyes - Snails.IN_RATE * dt)
+			elseif d >= Snails.CALM_WU then s.eyes = math.min(1, s.eyes + Snails.OUT_RATE * dt) end
+		end
+		if s.state == "shell" then
+			if now >= s.until_ then
+				-- out again: a crawl it was on goes on (once its eyes are out), else it rests a little
+				if s.walk ~= nil then s.state = "crawl" else s.state = "rest"; s.until_ = now + self.rng:draw({ 4, 10 }) end
+			end
+		elseif s.state == "rest" then
+			if now >= s.until_ and s.eyes >= 0.6 then
+				if not setOff(self, s) then s.until_ = now + self.rng:draw({ 5, 15 }) end
+			end
+		elseif s.state == "crawl" and s.walk ~= nil then
+			if s.eyes >= 0.6 then
+				local p, n, dir, done = PlantWalk.advance(s.walk, s.speed * dt)
+				s.crawled += (p - s.surface).Magnitude
+				s.surface, s.normal = p, n
+				if dir.Magnitude > 0.5 then s.heading = dir end
+				s.position = p
+				if (p - s.lastDrop).Magnitude >= Snails.DROP then
+					table.insert(s.trail, 1, { p = p, n = n, t = now })
+					while #s.trail > Snails.TRAIL do table.remove(s.trail) end
+					s.lastDrop = p
+				end
+				if done then
+					s.walk = nil
+					s.state = "rest"
+					s.until_ = now + self.rng:draw(if night(hour) then Snails.REST_NIGHT else Snails.REST_DAY)
+				end
+			end
+		end
+	end
+end
+
+-- What a strike may hit: the shell.
+function Snails.targets(self: any): { any }
+	local out = {}
+	for _, s in self.items do
+		table.insert(out, { creature = s, position = s.position + s.normal * (Snails.SHELL * 0.5), radius = Snails.RADIUS })
+	end
+	return out
+end
+
+-- Struck by the spider: into its shell.
+function Snails.struck(self: any, s: any)
+	s.state = "shell"
+	s.eyes = 0
+	s.until_ = self.now + self.rng:draw(Snails.SHELL_S) -- (a crawl under way is kept and taken up again once it is out)
+end
+
+function Snails.creatures(self: any): { any } return self.items end
+
+function Snails.problems(self: any, lo: Vector3, hi: Vector3): { string }
+	local out: { string } = {}
+	local states = { rest = true, crawl = true, shell = true }
+	if type(self.items) ~= "table" then return { "snails: no list" } end
+	for i, s in self.items do
+		if type(s) ~= "table" or not states[s.state] then table.insert(out, `snails: {i} is in no known state`); continue end
+		local p = s.position
+		if (typeof(p) ~= "Vector3" and type(p) ~= "table") or p.X ~= p.X or p.Y ~= p.Y or p.Z ~= p.Z or p.X < lo.X or p.X > hi.X or p.Y < lo.Y or p.Y > hi.Y or p.Z < lo.Z or p.Z > hi.Z then
+			table.insert(out, `snails: {i} is outside its region`)
+		end
+		if type(s.trail) ~= "table" or #s.trail > Snails.TRAIL then table.insert(out, `snails: {i} has a trail beyond belief`) end
+		if type(s.eyes) ~= "number" or s.eyes < 0 or s.eyes > 1 then table.insert(out, `snails: {i}'s eyes are nowhere`) end
+		if s.state == "crawl" and s.walk == nil then table.insert(out, `snails: {i} crawls nowhere`) end
+		if s.walk ~= nil then
+			local why = PlantWalk.problem(s.walk)
+			if why ~= nil then table.insert(out, `snails: {i}: {why}`) end
+		end
+	end
+	return out
+end
+
+return Snails
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="107">
           <Properties>
             <string name="Name">Woodlouse</string>
             <string name="Source"><![CDATA[--!strict
@@ -17972,6 +19040,23 @@ function Woodlice.percepts(self: any): { any }
 	return out
 end
 
+-- (ROBLOX-105) What a strike may hit: { creature, position, radius } for each louse not under cover.
+function Woodlice.targets(self: any): { any }
+	local out = {}
+	for _, w in self.lice do
+		if w.state ~= "hidden" then table.insert(out, { creature = w, position = w.position, radius = Woodlice.RADIUS }) end
+	end
+	return out
+end
+
+-- (ROBLOX-105) Struck by the spider (the strike is refused, Prey/PreyWorld): it makes for cover.
+function Woodlice.struck(self: any, w: any)
+	if w.state ~= "hidden" and #self.hides > 0 then
+		w.state = "hiding"
+		w.hide = self:nearestHide(w.position)
+	end
+end
+
 -- How many are under cover now.
 function Woodlice.hiddenCount(self: any): number
 	local n = 0
@@ -17999,11 +19084,11 @@ return Woodlice
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="103">
+      <Item class="Folder" referent="108">
         <Properties>
           <string name="Name">Rig</string>
         </Properties>
-        <Item class="ModuleScript" referent="104">
+        <Item class="ModuleScript" referent="109">
           <Properties>
             <string name="Name">Anatomy</string>
             <string name="Source"><![CDATA[--!strict
@@ -18193,7 +19278,7 @@ return Anatomy
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="105">
+        <Item class="ModuleScript" referent="110">
           <Properties>
             <string name="Name">AntMimicPose</string>
             <string name="Source"><![CDATA[--!strict
@@ -18313,7 +19398,7 @@ return AntMimicPose
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="106">
+        <Item class="ModuleScript" referent="111">
           <Properties>
             <string name="Name">Idle</string>
             <string name="Source"><![CDATA[--!strict
@@ -18396,7 +19481,7 @@ return Idle
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="107">
+        <Item class="ModuleScript" referent="112">
           <Properties>
             <string name="Name">Living</string>
             <string name="Source"><![CDATA[--!strict
@@ -18718,7 +19803,7 @@ return Living
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="108">
+        <Item class="ModuleScript" referent="113">
           <Properties>
             <string name="Name">PeacockDance</string>
             <string name="Source"><![CDATA[--!strict
@@ -18890,7 +19975,7 @@ return PeacockDance
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="109">
+        <Item class="ModuleScript" referent="114">
           <Properties>
             <string name="Name">Setae</string>
             <string name="Source"><![CDATA[--!strict
@@ -19284,7 +20369,7 @@ return Setae
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="110">
+        <Item class="ModuleScript" referent="115">
           <Properties>
             <string name="Name">SpiderChoice</string>
             <string name="Source"><![CDATA[--!strict
@@ -19399,7 +20484,7 @@ return SpiderChoice
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="111">
+        <Item class="ModuleScript" referent="116">
           <Properties>
             <string name="Name">SpiderRig</string>
             <string name="Source"><![CDATA[--!strict
@@ -20980,7 +22065,7 @@ return SpiderRig
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="112">
+        <Item class="ModuleScript" referent="117">
           <Properties>
             <string name="Name">TarantulaPose</string>
             <string name="Source"><![CDATA[--!strict
@@ -21155,11 +22240,11 @@ return TarantulaPose
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="113">
+      <Item class="Folder" referent="118">
         <Properties>
           <string name="Name">UI</string>
         </Properties>
-        <Item class="ModuleScript" referent="114">
+        <Item class="ModuleScript" referent="119">
           <Properties>
             <string name="Name">AntMimicText</string>
             <string name="Source"><![CDATA[--!strict
@@ -21200,7 +22285,7 @@ return AntMimicText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="115">
+        <Item class="ModuleScript" referent="120">
           <Properties>
             <string name="Name">ControlText</string>
             <string name="Source"><![CDATA[--!strict
@@ -21452,7 +22537,7 @@ return ControlText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="116">
+        <Item class="ModuleScript" referent="121">
           <Properties>
             <string name="Name">EyeOptics</string>
             <string name="Source"><![CDATA[--!strict
@@ -21785,7 +22870,7 @@ return EyeOptics
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="117">
+        <Item class="ModuleScript" referent="122">
           <Properties>
             <string name="Name">Heard</string>
             <string name="Source"><![CDATA[--!strict
@@ -21810,7 +22895,7 @@ return Heard
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="118">
+        <Item class="ModuleScript" referent="123">
           <Properties>
             <string name="Name">HudLayout</string>
             <string name="Source"><![CDATA[--!strict
@@ -21956,7 +23041,7 @@ return HudLayout
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="119">
+        <Item class="ModuleScript" referent="124">
           <Properties>
             <string name="Name">InspectText</string>
             <string name="Source"><![CDATA[--!strict
@@ -22009,7 +23094,7 @@ return InspectText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="120">
+        <Item class="ModuleScript" referent="125">
           <Properties>
             <string name="Name">LifeText</string>
             <string name="Source"><![CDATA[--!strict
@@ -22166,7 +23251,7 @@ return LifeText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="121">
+        <Item class="ModuleScript" referent="126">
           <Properties>
             <string name="Name">MateText</string>
             <string name="Source"><![CDATA[--!strict
@@ -22318,7 +23403,7 @@ return MateText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="122">
+        <Item class="ModuleScript" referent="127">
           <Properties>
             <string name="Name">NotebookText</string>
             <string name="Source"><![CDATA[--!strict
@@ -22469,7 +23554,7 @@ return NotebookText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="123">
+        <Item class="ModuleScript" referent="128">
           <Properties>
             <string name="Name">PeacockText</string>
             <string name="Source"><![CDATA[--!strict
@@ -22572,7 +23657,7 @@ return PeacockText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="124">
+        <Item class="ModuleScript" referent="129">
           <Properties>
             <string name="Name">PerceptionShapes</string>
             <string name="Source"><![CDATA[--!strict
@@ -22665,7 +23750,7 @@ return Shapes
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="125">
+        <Item class="ModuleScript" referent="130">
           <Properties>
             <string name="Name">PerceptionText</string>
             <string name="Source"><![CDATA[--!strict
@@ -22681,7 +23766,7 @@ return table.freeze(Text)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="126">
+        <Item class="ModuleScript" referent="131">
           <Properties>
             <string name="Name">PerceptionView</string>
             <string name="Source"><![CDATA[--!strict
@@ -22730,12 +23815,14 @@ return View
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="127">
+        <Item class="ModuleScript" referent="132">
           <Properties>
             <string name="Name">PreyText</string>
             <string name="Source"><![CDATA[--!strict
 -- What the screen says when a prey gets out of the jaws by its own trick (ROBLOX-101, Prey/PreyKinds.grip, kept by Prey/PreyWorld as `event`): a moth whose
 -- scales came away in the fangs, a crane fly that left a leg. One short note each, shown as the notebook's notes are. Pure; checked in tests/garden_life.luau.
+-- ROBLOX-105: and when a strike comes within something that is not food (Prey/PreyWorld.strikeAmbient: { kind = "refused", prey = kind }): the spider lets it
+-- go, and the note says why in a few words, each reason from the kind's notebook page and its sources (docs/NOTEBOOK_SOURCES.md).
 local PreyText = {}
 
 PreyText.NOTES = {
@@ -22743,12 +23830,22 @@ PreyText.NOTES = {
 	shed = "The crane fly left a leg in your fangs and got away.",
 } :: { [string]: string }
 
+-- (ROBLOX-105) Why a strike at each kind of thing that is not food came to nothing.
+PreyText.REFUSED = {
+	ladybird = "A foul fluid wells from the ladybird's leg joints. You let it go.",
+	millipede = "The millipede coils tight, armour out, and smells foul. You let it go.",
+	snail = "The snail is far too big, and it has drawn into its shell.",
+	harvestman = "The harvestman gives off a foul smell and stalks on. You let it go.",
+	woodlouse = "The woodlouse's glands give off a secretion spiders avoid. You let it go.",
+} :: { [string]: string }
+
 -- How long a note stays (seconds).
 PreyText.SECONDS = 4
 
--- The note for an event ({ kind = "slip" | "shed", prey = kind }), or nil for one this table does not know.
+-- The note for an event ({ kind = "slip" | "shed" | "refused", prey = kind }), or nil for one this table does not know.
 function PreyText.note(event: any): string?
 	if type(event) ~= "table" then return nil end
+	if event.kind == "refused" then return PreyText.REFUSED[event.prey] end
 	return PreyText.NOTES[event.kind]
 end
 
@@ -22756,7 +23853,7 @@ return PreyText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="128">
+        <Item class="ModuleScript" referent="133">
           <Properties>
             <string name="Name">RivalText</string>
             <string name="Source"><![CDATA[--!strict
@@ -22807,7 +23904,7 @@ return RivalText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="129">
+        <Item class="ModuleScript" referent="134">
           <Properties>
             <string name="Name">SaveText</string>
             <string name="Source"><![CDATA[--!strict
@@ -22879,7 +23976,7 @@ return SaveText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="130">
+        <Item class="ModuleScript" referent="135">
           <Properties>
             <string name="Name">SettingsModel</string>
             <string name="Source"><![CDATA[--!strict
@@ -23152,7 +24249,7 @@ return SettingsModel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="131">
+        <Item class="ModuleScript" referent="136">
           <Properties>
             <string name="Name">SettingsNav</string>
             <string name="Source"><![CDATA[--!strict
@@ -23263,7 +24360,7 @@ return SettingsNav
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="132">
+        <Item class="ModuleScript" referent="137">
           <Properties>
             <string name="Name">SettingsText</string>
             <string name="Source"><![CDATA[--!strict
@@ -23388,7 +24485,7 @@ return SettingsText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="133">
+        <Item class="ModuleScript" referent="138">
           <Properties>
             <string name="Name">TarantulaText</string>
             <string name="Source"><![CDATA[--!strict
@@ -23430,7 +24527,7 @@ return TarantulaText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="134">
+        <Item class="ModuleScript" referent="139">
           <Properties>
             <string name="Name">WaspText</string>
             <string name="Source"><![CDATA[--!strict
@@ -23565,11 +24662,11 @@ return WaspText
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="135">
+      <Item class="Folder" referent="140">
         <Properties>
           <string name="Name">World</string>
         </Properties>
-        <Item class="ModuleScript" referent="136">
+        <Item class="ModuleScript" referent="141">
           <Properties>
             <string name="Name">Garden</string>
             <string name="Source"><![CDATA[--!strict
@@ -24903,6 +26000,251 @@ function Garden.bestiary(region: WorldMap.Region): { KindSpec }?
 	return out
 end
 
+-- ---------------------------------------------------------------- the plants as paths (ROBLOX-105, W3b part B)
+-- Each of the bed's plants as a set of walks over its own faces, for the things that walk a plant: an aphid going from one of its perches to another (Prey/PreyKinds
+-- `creep`) and a ladybird (Prey/Ladybird). A plant has a `highway` (points on its faces, each { pos, normal }: the dock's stem's bare north face from its foot to
+-- its top, which no leaf meets; the dandelion's ring of soil round its stalk, a `loop`) and `nodes`, each a `hub` (the highway point it leaves from) and a `route`
+-- from there over the faces to the node, every point on a face or on the edge where two meet (its normal between theirs). A node named by a perch id stands
+-- exactly on that perch (the aphids' walker perches); the others are places only the ladybird goes (the dock's top and foot, the dandelion's stalk).
+export type PlantPoint = { pos: Vector3, normal: Vector3 }
+export type Plant = { id: string, loop: boolean, highway: { PlantPoint }, nodes: { [string]: { hub: number, route: { PlantPoint } } }, order: { string } }
+local plantsCache: { [string]: { [string]: Plant } } = {}
+local plantOfPerch: { [string]: string } = {} -- perch id -> plant id, filled as plants are made
+
+local function unit(a: Vector3, b: Vector3): Vector3
+	return (a + b).Unit
+end
+
+function Garden.plants(region: WorldMap.Region): { [string]: Plant }?
+	if region.kind ~= "bed" then return nil end
+	local key = region.id .. "/" .. tostring(region.seed)
+	local cached = plantsCache[key]
+	if cached ~= nil then return cached end
+	local B = Garden.BED
+	local byId: { [string]: Piece } = {}
+	for _, p in Garden.pieces(region) do byId[p.id] = p end
+	local out: { [string]: Plant } = {}
+	local X, Y, Z = Vector3.xAxis, Vector3.yAxis, Vector3.zAxis
+	local function pt(pos: Vector3, normal: Vector3): PlantPoint return { pos = pos, normal = normal } end
+	-- the dock: the stem's north face (z lo) is the highway, its points at the heights the nodes leave it
+	local stem = byId[region.id .. "_dock_stem"]
+	if stem ~= nil then
+		local s0, s1 = stem.lo, stem.hi
+		local mx, mz = (s0.X + s1.X) / 2, (s0.Z + s1.Z) / 2
+		local heights: { number } = {}
+		local nodes: { [string]: { hub: number, route: { PlantPoint } } } = {}
+		local order: { string } = {}
+		local pending: { { id: string, y: number, route: { PlantPoint } } } = {}
+		local function add(id: string, y: number, route: { PlantPoint })
+			table.insert(pending, { id = id, y = y, route = route })
+			if table.find(heights, y) == nil then table.insert(heights, y) end
+		end
+		add(region.id .. "_dock_foot", B.top + 0.5, {})
+		add(region.id .. "_dock_stem_side", B.top + 3.5, { pt(v(s1.X, B.top + 3.5, s0.Z), unit(X, -Z)), pt(v(s1.X, B.top + 3.5, mz), X) })
+		for i, leaf in B.dock.leaves do
+			local box = byId[`{region.id}_dock_leaf_{i}`]
+			if box ~= nil then
+				local y1 = box.hi.Y
+				local centre = pt(v((box.lo.X + box.hi.X) / 2, y1, (box.lo.Z + box.hi.Z) / 2), Y)
+				local route: { PlantPoint }
+				if leaf.dir == "x+" then
+					route = { pt(v(s1.X, y1, s0.Z), unit(X, -Z)), pt(v(s1.X, y1, mz), unit(X, Y)), centre }
+				elseif leaf.dir == "x-" then
+					route = { pt(v(s0.X, y1, s0.Z), unit(-X, -Z)), pt(v(s0.X, y1, mz), unit(-X, Y)), centre }
+				elseif leaf.dir == "z+" then
+					route = { pt(v(s0.X, y1, s0.Z), unit(-X, -Z)), pt(v(s0.X, y1, s1.Z), unit(-X, Z)), pt(v(mx, y1, s1.Z), unit(Z, Y)), centre }
+				else
+					route = { pt(v(mx, y1, s0.Z), unit(-Z, Y)), centre }
+				end
+				add(box.id .. "_top", y1, route)
+			end
+		end
+		add(region.id .. "_dock_top", s1.Y - 0.6, {})
+		table.sort(heights)
+		local highway: { PlantPoint } = {}
+		for _, y in heights do table.insert(highway, pt(v(mx, y, s0.Z), -Z)) end
+		for _, n in pending do
+			nodes[n.id] = { hub = table.find(heights, n.y) :: number, route = n.route }
+			table.insert(order, n.id)
+			plantOfPerch[n.id] = "dock"
+		end
+		out.dock = { id = "dock", loop = false, highway = highway, nodes = nodes, order = order }
+	end
+	-- the dandelion: a ring of eight points on the soil round the stalk; each rosette leaf leaves from the ring point toward it, up its inner end and out to its
+	-- middle; the stalk is climbed from the east point
+	local stalk = byId[region.id .. "_dandelion_stalk"]
+	if stalk ~= nil then
+		local cx, cz = (stalk.lo.X + stalk.hi.X) / 2, (stalk.lo.Z + stalk.hi.Z) / 2
+		local half = (stalk.hi.X - stalk.lo.X) / 2
+		local L = B.dandelion
+		local ring = half + 0.35
+		local inner = half + L.leaf.gap
+		local highway: { PlantPoint } = {}
+		for k = 0, 7 do
+			local a = k * math.pi / 4
+			table.insert(highway, pt(v(cx + math.cos(a) * ring, B.top, cz + math.sin(a) * ring), Y))
+		end
+		local nodes: { [string]: { hub: number, route: { PlantPoint } } } = {}
+		local order: { string } = {}
+		local dirs = { X, Z, -X, -Z } -- the rosette's leaves 1..4 (Garden's bedPieces), on the ring's points 1, 3, 5, 7
+		for i, d in dirs do
+			local box = byId[`{region.id}_dandelion_leaf_{i}`]
+			if box ~= nil then
+				local y1 = box.hi.Y
+				local foot = v(cx, B.top, cz) + d * inner
+				local id = box.id .. "_top"
+				nodes[id] = { hub = 2 * i - 1, route = {
+					pt(foot, unit(Y, -d)), pt(foot + Y * (y1 - B.top), unit(Y, -d)),
+					pt(v((box.lo.X + box.hi.X) / 2, y1, (box.lo.Z + box.hi.Z) / 2), Y),
+				} }
+				table.insert(order, id)
+				plantOfPerch[id] = "dandelion"
+			end
+		end
+		local up = region.id .. "_dandelion_stalk_up"
+		nodes[up] = { hub = 1, route = { pt(v(stalk.hi.X, B.top, cz), unit(X, Y)), pt(v(stalk.hi.X, B.top + L.height * 0.75, cz), X) } }
+		table.insert(order, up)
+		out.dandelion = { id = "dandelion", loop = true, highway = highway, nodes = nodes, order = order }
+	end
+	plantsCache[key] = out
+	return out
+end
+
+-- The plant a perch is on ("dock", "dandelion") and the bed's plants, or nil for a perch on no plant. Every bed of the map is made the first time it is asked.
+function Garden.plantOf(perchId: string): (string?, { [string]: Plant }?)
+	local name = plantOfPerch[perchId]
+	if name == nil then
+		for _, r in WorldMap.regions() do if r.kind == "bed" then Garden.plants(r) end end
+		name = plantOfPerch[perchId]
+	end
+	if name == nil then return nil, nil end
+	for _, r in WorldMap.regions() do
+		if r.kind == "bed" then
+			local plants = Garden.plants(r) :: { [string]: Plant }
+			local plant = plants[name]
+			if plant ~= nil and plant.nodes[perchId] ~= nil then return name, plants end
+		end
+	end
+	return nil, nil
+end
+
+-- The walk over a plant from one node to another: a list of points, the first on the node left, the last on the node reached (nil when either is not the
+-- plant's). Down the first node's route to the highway, along it (the shorter way round a loop), out along the second's route.
+function Garden.plantPath(plant: Plant, from: string, to: string): { PlantPoint }?
+	local a, b = plant.nodes[from], plant.nodes[to]
+	if a == nil or b == nil then return nil end
+	local out: { PlantPoint } = {}
+	for i = #a.route, 1, -1 do table.insert(out, a.route[i]) end
+	local n = #plant.highway
+	table.insert(out, plant.highway[a.hub])
+	if a.hub ~= b.hub then
+		local step = if b.hub > a.hub then 1 else -1
+		local count = math.abs(b.hub - a.hub)
+		if plant.loop and count > n / 2 then step, count = -step, n - count end
+		local k = a.hub
+		for _ = 1, count do
+			k = ((k - 1 + step) % n) + 1
+			table.insert(out, plant.highway[k])
+		end
+	end
+	for _, p in b.route do table.insert(out, p) end
+	-- the node's own point first and last (a node whose route is empty is its hub)
+	local first = if #a.route > 0 then a.route[#a.route] else plant.highway[a.hub]
+	if out[1] ~= first then table.insert(out, 1, first) end
+	return out
+end
+
+-- ---------------------------------------------------------------- the ambient bugs (ROBLOX-105, W3b part B)
+-- The garden's other life that is not food (docs/GARDEN_BESTIARY.md's ambient table): how many of each kind a region holds at the full tier and the low one,
+-- the streams' salts, and the parts the region's ambient bodies may cost at each tier (Client/BugBodies.partsOf; tests/garden_life.luau holds the sum under it).
+-- The ladybirds walk the bed's plants among the aphids (one on the dock, one on the dandelion), the millipedes the soil and under the stones, the snail the
+-- soil and the wall's foot, a harvestman the bed's litter and one the house wall, from dusk.
+Garden.AMBIENT = {
+	order = { "ladybird", "millipede", "snail", "harvestman" },
+	bed = {
+		ladybird = { full = 2, low = 1, salt = 101 },
+		millipede = { full = 2, low = 1, salt = 103 },
+		snail = { full = 1, low = 1, salt = 107 },
+		harvestman = { full = 1, low = 1, salt = 109 },
+	},
+	house_wall = {
+		harvestman = { full = 1, low = 1, salt = 113 },
+	},
+	budget = { bed = { full = 240, low = 110 }, house_wall = { full = 24, low = 24 } },
+	-- the snail's piece of wall: the brick's foot over the bed (x, and y above the soil); the wall harvestman's walk on the brick and its corner by day
+	wallFoot = { x = { -20, 20 }, y = { 1.5, 14 } },
+	wall = { x = { -36, 36 }, y = { -84, -8 }, home = { -34, -82 } },
+} :: any
+
+export type AmbientSpec = { kind: string, seed: number, full: number, low: number, starts: { any }, prefix: string, hides: { HideSpot }?, home: Vector3?, surface: string?,
+	rect: { x: { number }, y: { number } }? }
+local ambientCache: { [string]: { AmbientSpec } } = {}
+
+-- The region's ambient bugs: one spec per kind, in AMBIENT.order (nil for a region with none). Each has its own seed (the region's mixed with the kind's salt) and
+-- its starting places for the full tier's count (the low tier takes the first `low`).
+function Garden.ambient(region: WorldMap.Region): { AmbientSpec }?
+	local rows = (Garden.AMBIENT :: any)[region.kind]
+	if rows == nil or region.kind == "order" or region.kind == "budget" then return nil end
+	local key = region.id .. "/" .. tostring(region.seed)
+	local cached = ambientCache[key]
+	if cached ~= nil then return cached end
+	local A = Garden.AMBIENT
+	local out: { AmbientSpec } = {}
+	for _, kind in A.order do
+		local row = rows[kind]
+		if row ~= nil then
+			local rand = rng(region.seed, row.salt)
+			local seed = (region.seed + row.salt * 104729) % MOD
+			local spec: AmbientSpec = { kind = kind, seed = seed, full = row.full, low = row.low, starts = {}, prefix = region.id .. "_" } -- (ids: bed_a_ladybird_1 ...)
+			if region.kind == "bed" then
+				local standing = standingOf(region)
+				for _, t in region.retreats do table.insert(standing, { min = t.min - v(0.5, 0, 0.5), max = t.max + v(0.5, 0, 0.5) }) end
+				local hides = (Garden.bugs(region) :: BugSpec).hides
+				local taken: { Vector3 } = {}
+				if kind == "ladybird" then
+					local plants = Garden.plants(region) :: { [string]: Plant }
+					local names = { "dock", "dandelion" }
+					for i = 1, row.full do
+						local plant = plants[names[(i - 1) % #names + 1]]
+						if plant ~= nil then
+							local node = plant.order[1 + math.floor(rand() * #plant.order)]
+							table.insert(spec.starts, { plant = plant.id, node = node })
+						end
+					end
+				else
+					for _ = 1, row.full do
+						local spot = freeSpot(rand, standing, taken, if kind == "snail" then 2.0 else 1.2, 6)
+						if spot then
+							local a = rand() * TAU
+							table.insert(spec.starts, { pos = spot, heading = v(math.cos(a), 0, math.sin(a)) })
+						end
+					end
+					local stones, litter = {}, {}
+					for _, h in hides do if h.kind == "stone" then table.insert(stones, h) else table.insert(litter, h) end end
+					if kind == "millipede" then spec.hides = stones end
+					if kind == "harvestman" then spec.home = if #litter > 0 then litter[1].pos else hides[1].pos end
+					if kind == "snail" then spec.rect = A.wallFoot end
+				end
+				spec.surface = "soil"
+			else
+				-- the house wall: a harvestman on the brick, its corner at the wall's foot by day
+				local W = A.wall
+				for _ = 1, row.full do
+					local p = v(between(rand, W.x[1] + 6, W.x[2] - 6), between(rand, W.y[1] + 10, W.y[2] - 10), Garden.WALL.face)
+					local a = rand() * TAU
+					table.insert(spec.starts, { pos = p, heading = v(math.cos(a), math.sin(a), 0) })
+				end
+				spec.home = v(W.home[1], W.home[2], Garden.WALL.face)
+				spec.rect = W
+				spec.surface = "wall"
+			end
+			table.insert(out, spec)
+		end
+	end
+	ambientCache[key] = out
+	return out
+end
+
 -- The boxes a region's creatures keep out of: each retreat grown by half a stud (the sill's are its own, Region.keepOut).
 function Garden.keepOut(region: WorldMap.Region): { Box }
 	if not Garden.knows(region.kind) then error("no generator for the region kind " .. region.kind) end
@@ -24917,7 +26259,7 @@ return table.freeze(Garden)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="137">
+        <Item class="ModuleScript" referent="142">
           <Properties>
             <string name="Name">Region</string>
             <string name="Source"><![CDATA[--!strict
@@ -25015,7 +26357,7 @@ return table.freeze(Region)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="138">
+        <Item class="ModuleScript" referent="143">
           <Properties>
             <string name="Name">WorldBuild</string>
             <string name="Source"><![CDATA[--!strict
@@ -25100,7 +26442,7 @@ return table.freeze(WorldBuild)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="139">
+        <Item class="ModuleScript" referent="144">
           <Properties>
             <string name="Name">WorldMap</string>
             <string name="Source"><![CDATA[--!strict
@@ -25352,15 +26694,15 @@ return table.freeze(WorldMap)
       </Item>
     </Item>
   </Item>
-  <Item class="ServerScriptService" referent="140">
+  <Item class="ServerScriptService" referent="145">
     <Properties>
       <string name="Name">ServerScriptService</string>
     </Properties>
-    <Item class="Folder" referent="141">
+    <Item class="Folder" referent="146">
       <Properties>
         <string name="Name">Server</string>
       </Properties>
-      <Item class="ModuleScript" referent="142">
+      <Item class="ModuleScript" referent="147">
         <Properties>
           <string name="Name">DataStoreBackend</string>
           <string name="Source"><![CDATA[--!strict
@@ -25395,7 +26737,7 @@ return DataStoreBackend
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Script" referent="143">
+      <Item class="Script" referent="148">
         <Properties>
           <string name="Name">Main</string>
           <token name="RunContext">0</token>
@@ -25462,7 +26804,7 @@ WorldFocus.listen(ReplicatedStorage, foci)
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Script" referent="144">
+      <Item class="Script" referent="149">
         <Properties>
           <string name="Name">Persistence</string>
           <token name="RunContext">0</token>
@@ -25556,7 +26898,7 @@ end)
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="145">
+      <Item class="ModuleScript" referent="150">
         <Properties>
           <string name="Name">SaveService</string>
           <string name="Source"><![CDATA[--!strict
@@ -25763,7 +27105,7 @@ return SaveService
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="146">
+      <Item class="ModuleScript" referent="151">
         <Properties>
           <string name="Name">WorldFocus</string>
           <string name="Source"><![CDATA[--!strict
@@ -25887,19 +27229,19 @@ return table.freeze(WorldFocus)
       </Item>
     </Item>
   </Item>
-  <Item class="StarterPlayer" referent="147">
+  <Item class="StarterPlayer" referent="152">
     <Properties>
       <string name="Name">StarterPlayer</string>
     </Properties>
-    <Item class="StarterPlayerScripts" referent="148">
+    <Item class="StarterPlayerScripts" referent="153">
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="Folder" referent="149">
+      <Item class="Folder" referent="154">
         <Properties>
           <string name="Name">Client</string>
         </Properties>
-        <Item class="ModuleScript" referent="150">
+        <Item class="ModuleScript" referent="155">
           <Properties>
             <string name="Name">BugBodies</string>
             <string name="Source"><![CDATA[--!strict
@@ -25912,6 +27254,18 @@ return table.freeze(WorldFocus)
 -- opposite phase), a full wave per stride of soil covered, so a louse that stops stops stepping and one that scurries for cover steps fast; the antennae sway.
 -- The common garden woodlouse the page names (Porcellio scaber) cannot roll into a ball, so it scurries: no rolling. Far from the camera (FlyLook.far, as the
 -- rival's rig) a louse is drawn ten times a second; Reduced Motion keeps the steps and stills the antennae.
+-- ROBLOX-105 (W3b part B): the garden's other ambient bugs are drawn here too, each creature by its `kind` (a creature with none is a woodlouse), at their true
+-- sizes (1 stud = 1 cm), every part anchored, never solid, never seen by a ray, no shadow, all of them in the same one BulkMoveTo, the same far rule:
+--   ladybird ..... a red domed beetle 0.6 long, its seven black spots, a black pronotum with two pale patches, head, antennae and six legs stepping in two
+--                  tripods; struck, a drop of yellow fluid shows at each front leg joint (reflex bleeding) while `bleedUntil` lasts; eating, its head works
+--   millipede .... a head and twelve rings laid along the head's track (the sim's `trail`), two pairs of legs on each ring (one at the low tier) stepping in a
+--                  wave that runs down the body; coiling, the rings wind into a flat spiral round the head; under a stone, under the soil
+--   snail ........ a brown shell 3 across with its band, spire and lip, the foot and head, the upper eye stalks (drawn in as the sim's `eyes` falls, sliding
+--                  into the head) and the lower feelers; withdrawn into its shell, the soft parts are inside it; and its slime trail, a pale ribbon along the
+--                  sim's trail points, fading over Prey/Snail.FADE_S (24 legs at the full tier, 12 at the low)
+--   harvestman ... a small oval body with its eye turret and palps, high on eight long legs of two segments each (the second pair longest), stepping;
+--                  by day (`hidden`) it is away and drawn nowhere near
+-- Reduced Motion keeps the steps and stills the rest (antennae, the ladybird's head, the snail's feelers' sway).
 local Workspace = game:GetService("Workspace")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
@@ -25925,6 +27279,8 @@ BugBodies.__index = BugBodies
 BugBodies.PARTS = 24
 -- How far under the soil a hidden louse is kept.
 BugBodies.UNDER = 1.5
+-- (ROBLOX-105) Where a creature that is away is kept: far under the world.
+BugBodies.AWAY = -600
 
 -- The sheet: body frame -Z forward, +Y up, the origin the body's centre at Woodlouse.HOVER above the soil, the feet at y = -0.12.
 BugBodies.look = {
@@ -25937,8 +27293,36 @@ BugBodies.look = {
 	motion = { gait = { stride = 0.4, swing = 0.3, lift = 0.28, settle = 10, jump = 1.0, wave = 0.9 }, antenna = { amp = 0.18, hz = 1.4 } },
 }
 
--- `hip`, `side`, `pair` (ROBLOX-103): where a leg turns from and which it is, or an antenna's base (`pair` 0)
-type Spec = { name: string, rod: boolean, color: Color3, size: Vector3, frame: CFrame, hip: Vector3?, side: number?, pair: number? }
+-- (ROBLOX-105) The ambient bugs' sheets: colours, sizes and their gaits (a cycle per `stride` studs covered; `wave` the lag from one leg or ring to the next).
+BugBodies.ambient = {
+	ladybird = {
+		colors = { elytra = "c8261c", black = "141414", patch = "efe9dc", leg = "1a1a1a", drop = "e8b81e" },
+		dome = { at = { 0, 0.02, 0.05 }, size = { 0.5, 0.3, 0.52 } }, -- the wing cases: a dome 0.6 long with the pronotum and head
+		spots = { { 0, -0.2 }, { 0.12, -0.06 }, { -0.12, -0.06 }, { 0.17, 0.1 }, { -0.17, 0.1 }, { 0.09, 0.22 }, { -0.09, 0.22 } }, -- (x, z) on the dome: seven
+		motion = { gait = { stride = 0.22, swing = 0.35, lift = 0.3, settle = 10, jump = 1.0 }, antenna = { amp = 0.2, hz = 1.6 } },
+	},
+	millipede = {
+		colors = { head = "2b211c", ring = "3d2f27", ringDark = "30251f", leg = "c2ab88", antenna = "4a3b30" },
+		ring = { size = { 0.24, 0.22, 0.3 } }, head = { size = { 0.2, 0.17, 0.2 } }, -- (the rings overlap along the body: a cylinder of rings, not beads)
+		motion = { gait = { stride = 0.25, swing = 0.4, lift = 0.25, settle = 8, jump = 1.0, wave = 0.55 }, antenna = { amp = 0.25, hz = 1.2 } },
+		coil = { inner = 0.12, pitch = 0.25 }, -- the spiral round the head: its first radius and how much it widens a turn (the body's width)
+	},
+	snail = {
+		colors = { foot = "8a7a66", head = "7d6e5c", shell = "9a7a4f", band = "4e3a24", spire = "b08a58", lip = "c9b28a", eye = "1c1814", trail = "cfd8dc" },
+		stalk = 0.9, feeler = 0.35, trail = { width = 0.9, thick = 0.025, base = 0.55, full = 24, low = 12, fade = 240 }, -- (fade: Prey/Snail.FADE_S)
+	},
+	harvestman = {
+		colors = { body = "6e5034", turret = "3a2a1c", leg = "5a4330", palp = "6a4e36" },
+		legs = { { a = 35, l = 1.5 }, { a = 75, l = 2.4 }, { a = 110, l = 1.8 }, { a = 145, l = 2.0 } }, -- degrees from ahead and lengths (studs), each side
+		motion = { gait = { stride = 1.1, swing = 0.25, lift = 0.25, settle = 8, jump = 3.0 } },
+	},
+}
+
+-- `hip`, `side`, `pair` (ROBLOX-103): where a leg turns from and which it is, or an antenna's base (`pair` 0); (ROBLOX-105) `role`: what a part of an ambient
+-- bug is to its pose ("leg", "antenna", "drop", "head", "ring", "rleg", "trail", "stalk", "eye", "feeler", "soft", "knee"...), `ring` the ring a millipede's
+-- leg hangs from, `a`/`b` a rod's ends in the body frame
+type Spec = { name: string, rod: boolean, color: Color3, size: Vector3, frame: CFrame, hip: Vector3?, side: number?, pair: number?, role: string?, ring: number?,
+	a: Vector3?, b: Vector3?, material: string? }
 
 local function rodBetween(a: Vector3, b: Vector3, diameter: number): (Vector3, CFrame)
 	local dir = (b - a).Unit
@@ -25975,30 +27359,213 @@ local function build(): { Spec }
 	return specs
 end
 
-function BugBodies.new(parent: Instance): any
+-- ---------------------------------------------------------------- (ROBLOX-105) the ambient bugs' sheets
+local function hex(s: string): Color3 return Color3.fromHex(s) end
+local function v(x: number, y: number, z: number): Vector3 return Vector3.new(x, y, z) end
+
+local function rodSpec(name: string, a: Vector3, b: Vector3, d: number, color: Color3, role: string?, side: number?, pair: number?): Spec
+	local size, frame = rodBetween(a, b, d)
+	return { name = name, rod = true, color = color, size = size, frame = frame, hip = a, side = side, pair = pair, role = role, a = a, b = b }
+end
+local function ball(name: string, at: Vector3, size: Vector3, color: Color3, role: string?): Spec
+	return { name = name, rod = false, color = color, size = size, frame = CFrame.new(at), role = role }
+end
+
+-- The ladybird: the dome of the wing cases, seven spots set into the dome's surface, the pronotum and its two pale patches (full),
+-- the head, antennae (full), six legs (hips under the body, feet on the surface at y -0.17) and two drops of fluid (kept inside the body until it bleeds).
+local function buildLadybird(tier: string): { Spec }
+	local S = BugBodies.ambient.ladybird
+	local C = S.colors
+	local full = tier ~= "low"
+	local out: { Spec } = {}
+	local d = S.dome
+	local c0 = v(d.at[1], d.at[2], d.at[3])
+	local ax, ay, az = d.size[1] / 2, d.size[2] / 2, d.size[3] / 2
+	table.insert(out, ball("Elytra", c0, v(d.size[1], d.size[2], d.size[3]), hex(C.elytra)))
+	for i, s in S.spots do
+		local x, z = s[1], c0.Z + s[2]
+		local q = 1 - (x / ax) ^ 2 - ((z - c0.Z) / az) ^ 2
+		local y = c0.Y + ay * math.sqrt(math.max(0.02, q))
+		local p = v(x, y, z)
+		local n = v(x / (ax * ax), (y - c0.Y) / (ay * ay), (z - c0.Z) / (az * az)).Unit
+		table.insert(out, { name = "Spot" .. i, rod = false, color = hex(C.black), size = v(0.085, 0.085, 0.03), frame = CFrame.lookAt(p - n * 0.008, p + n) })
+	end
+	table.insert(out, ball("Pronotum", v(0, 0.0, -0.22), v(0.34, 0.14, 0.16), hex(C.black)))
+	if full then
+		for _, side in { -1, 1 } do table.insert(out, ball(if side < 0 then "PatchL" else "PatchR", v(0.11 * side, 0.035, -0.235), v(0.08, 0.06, 0.07), hex(C.patch))) end
+	end
+	table.insert(out, ball("Head", v(0, -0.04, -0.31), v(0.2, 0.1, 0.1), hex(C.black), "head"))
+	if full then
+		for _, side in { -1, 1 } do
+			table.insert(out, rodSpec(if side < 0 then "AntennaL" else "AntennaR", v(0.05 * side, -0.02, -0.35), v(0.11 * side, 0.0, -0.43), 0.012, hex(C.black), "antenna", side, 0))
+		end
+	end
+	local zs = { -0.13, 0.0, 0.13 }
+	local reach = { -0.06, 0.0, 0.07 }
+	for _, side in { -1, 1 } do
+		for i, z in zs do
+			table.insert(out, rodSpec(`{if side < 0 then "L" else "R"}Leg{i}`, v(0.1 * side, -0.08, z), v(0.25 * side, -0.17, z + reach[i]), 0.025, hex(C.leg), "leg", side, i))
+		end
+	end
+	for _, side in { -1, 1 } do
+		local s = ball(if side < 0 then "DropL" else "DropR", v(0.14 * side, -0.1, -0.14), v(0.06, 0.06, 0.06), hex(C.drop), "drop")
+		s.side = side
+		table.insert(out, s)
+	end
+	return out
+end
+
+-- The millipede: the head, two antennae, twelve rings, and on each ring two pairs of legs (one pair at the low tier). Ring and leg frames are relative to the
+-- ring's own frame (the pose lays the rings along the track).
+local function buildMillipede(tier: string): { Spec }
+	local S = BugBodies.ambient.millipede
+	local C = S.colors
+	local out: { Spec } = {}
+	table.insert(out, ball("Head", v(0, 0, 0), v(S.head.size[1], S.head.size[2], S.head.size[3]), hex(C.head), "mhead"))
+	for _, side in { -1, 1 } do
+		table.insert(out, rodSpec(if side < 0 then "AntennaL" else "AntennaR", v(0.05 * side, 0.03, -0.07), v(0.13 * side, 0.06, -0.24), 0.014, hex(C.antenna), "mantenna", side, 0))
+	end
+	local rings = 12
+	for k = 1, rings do
+		local s = ball("Ring" .. k, v(0, 0, 0), v(S.ring.size[1], S.ring.size[2], S.ring.size[3]), hex(if k % 2 == 0 then C.ringDark else C.ring), "ring")
+		s.ring = k
+		table.insert(out, s)
+	end
+	local offsets: { number } = if tier == "low" then { 0 } else { -0.055, 0.055 }
+	for k = 1, rings do
+		for _, side in { -1, 1 } do
+			for j, dz in offsets do
+				local s = rodSpec(`Leg{k}{if side < 0 then "L" else "R"}{j}`, v(0.08 * side, -0.06, dz), v(0.15 * side, -0.12, dz - 0.02), 0.018, hex(C.leg), "rleg", side, k * 2 + j)
+				s.ring = k
+				table.insert(out, s)
+			end
+		end
+	end
+	return out
+end
+
+-- The snail, in its frame: the origin on the surface under it, +Y the surface's normal, -Z ahead. The shell's centre is SHELL_AT.
+local SHELL_AT = v(0, 1.55, 0.45)
+local function buildSnail(tier: string): { Spec }
+	local S = BugBodies.ambient.snail
+	local C = S.colors
+	local out: { Spec } = {}
+	local foot = ball("Foot", v(0, 0.25, -0.35), v(1.1, 0.5, 4.0), hex(C.foot), "soft")
+	table.insert(out, foot)
+	table.insert(out, ball("Head", v(0, 0.42, -2.0), v(0.8, 0.6, 1.0), hex(C.head), "soft"))
+	for _, side in { -1, 1 } do
+		local base = v(0.2 * side, 0.62, -2.25)
+		local tip = base + v(0.25 * side, 0.8, -0.4).Unit * S.stalk
+		local s = rodSpec(if side < 0 then "StalkL" else "StalkR", base, tip, 0.09, hex(C.head), "stalk", side, 0)
+		table.insert(out, s)
+	end
+	for _, side in { -1, 1 } do
+		local s = ball(if side < 0 then "EyeL" else "EyeR", v(0, 0, 0), v(0.16, 0.16, 0.16), hex(C.eye), "eye")
+		s.side = side
+		table.insert(out, s)
+	end
+	for _, side in { -1, 1 } do
+		local base = v(0.22 * side, 0.32, -2.45)
+		table.insert(out, rodSpec(if side < 0 then "FeelerL" else "FeelerR", base, base + v(0.15 * side, -0.05, -0.32).Unit * S.feeler, 0.07, hex(C.head), "feeler", side, 0))
+	end
+	table.insert(out, ball("Shell", SHELL_AT, v(2.3, 2.6, 3.0), hex(C.shell)))
+	table.insert(out, ball("ShellBand", SHELL_AT + v(0, -0.25, 0.02), v(2.38, 0.55, 2.66), hex(C.band))) -- (a dark band round the shell's girth)
+	table.insert(out, ball("Spire", SHELL_AT + v(0.82, 0.12, 0.15), v(0.95, 1.35, 1.35), hex(C.spire))) -- (the last whorls, standing out on its right side)
+	table.insert(out, ball("Lip", SHELL_AT + v(-0.25, -1.0, -1.12), v(1.0, 0.45, 0.22), hex(C.lip))) -- (the aperture's lip, over the body)
+	local n = if tier == "low" then S.trail.low else S.trail.full
+	for i = 1, n do
+		local s: Spec = { name = "Trail" .. i, rod = false, color = hex(C.trail), size = v(S.trail.width, S.trail.thick, 0.5), frame = CFrame.new(), role = "trail", pair = i, material = "Glass" }
+		table.insert(out, s)
+	end
+	return out
+end
+
+-- The harvestman, in its frame: the origin the body's centre, +Y up, -Z ahead, the feet at y -HOVER (0.9). Each leg two rods: hip up to the knee, knee down to
+-- the foot.
+local HARVEST_HOVER = 0.9
+local function legPoints(i: number, side: number): (Vector3, Vector3, Vector3)
+	local L = BugBodies.ambient.harvestman.legs[i]
+	local zs = { -0.12, -0.04, 0.04, 0.12 }
+	local hip = v(0.15 * side, 0, zs[i])
+	local a = math.rad(L.a)
+	local d = v(math.sin(a) * side, 0, -math.cos(a))
+	local knee = hip + d * (0.32 * L.l) + v(0, 0.55, 0)
+	local foot = hip + d * L.l + v(0, -HARVEST_HOVER, 0)
+	return hip, knee, foot
+end
+local function buildHarvestman(_tier: string): { Spec }
+	local S = BugBodies.ambient.harvestman
+	local C = S.colors
+	local out: { Spec } = {}
+	table.insert(out, ball("Body", v(0, 0, 0), v(0.42, 0.24, 0.5), hex(C.body)))
+	table.insert(out, ball("Turret", v(0, 0.13, -0.1), v(0.1, 0.1, 0.1), hex(C.turret)))
+	for _, side in { -1, 1 } do
+		table.insert(out, rodSpec(if side < 0 then "PalpL" else "PalpR", v(0.05 * side, -0.04, -0.24), v(0.08 * side, -0.14, -0.34), 0.03, hex(C.palp), nil, side, 0))
+	end
+	for _, side in { -1, 1 } do
+		for i = 1, 4 do
+			local hip, knee, foot = legPoints(i, side)
+			local word = if side < 0 then "L" else "R"
+			local up = rodSpec(`Femur{word}{i}`, hip, knee, 0.022, hex(C.leg), "leg", side, i)
+			local down = rodSpec(`Tibia{word}{i}`, knee, foot, 0.018, hex(C.leg), "leg", side, i)
+			up.hip = hip; down.hip = hip
+			table.insert(out, up)
+			table.insert(out, down)
+		end
+	end
+	return out
+end
+
+local BUILDERS = { ladybird = buildLadybird, millipede = buildMillipede, snail = buildSnail, harvestman = buildHarvestman } :: { [string]: (string) -> { Spec } }
+
+-- (ROBLOX-105) How many parts a creature of `kind` is drawn with at `tier` ("full" or "low"): what World/Garden.AMBIENT's budgets are held against.
+function BugBodies.partsOf(kind: string, tier: string?): number
+	if kind == "woodlouse" then return BugBodies.PARTS end
+	return #BUILDERS[kind](tier or "full")
+end
+
+-- `tier` (ROBLOX-105): the client's detail tier, for the ambient bugs' sheets ("full" when not given); the woodlouse is the same at both.
+function BugBodies.new(parent: Instance, tier: string?): any
 	local folder = Instance.new("Folder")
 	folder.Name = "Bugs"
 	folder.Parent = parent
-	return setmetatable({ folder = folder, rigs = {}, template = build(), parts = {}, frames = {} }, BugBodies)
+	return setmetatable({ folder = folder, rigs = {}, template = build(), templates = {}, tier = tier or "full", parts = {}, frames = {} }, BugBodies)
 end
 
--- One louse's parts.
-function BugBodies.spawn(self: any, id: string): any
+-- The sheet of a kind at this tier.
+function BugBodies.templateOf(self: any, kind: string): { Spec }
+	if kind == "woodlouse" then return self.template end
+	local t = self.templates[kind]
+	if t == nil then
+		t = BUILDERS[kind](self.tier)
+		self.templates[kind] = t
+	end
+	return t
+end
+
+-- One creature's parts (`kind` nil: a woodlouse).
+function BugBodies.spawn(self: any, id: string, kind: string?): any
+	local k = kind or "woodlouse"
 	local folder = Instance.new("Folder")
 	folder.Name = id
 	folder.Parent = self.folder
 	local parts: { Part } = {}
-	for i, spec in self.template do
+	local template = self:templateOf(k)
+	for i, spec in template do
 		local part: Part
 		if spec.rod then
-			part = Shapes.block(folder, spec.name, spec.size, spec.frame, spec.color, "SmoothPlastic")
+			part = Shapes.block(folder, spec.name, spec.size, spec.frame, spec.color, spec.material or "SmoothPlastic")
 			part.Shape = Enum.PartType.Cylinder
+		elseif spec.role == "trail" then
+			part = Shapes.block(folder, spec.name, spec.size, spec.frame, spec.color, spec.material or "SmoothPlastic")
+			part.Transparency = 1
 		else
-			part = Shapes.ellipsoid(folder, spec.name, spec.size, spec.frame, spec.color, "SmoothPlastic")
+			part = Shapes.ellipsoid(folder, spec.name, spec.size, spec.frame, spec.color, spec.material or "SmoothPlastic")
 		end
 		parts[i] = part
 	end
-	local rig = { folder = folder, parts = parts, stride = 0, gait = 0, t = 0, owed = 0, drawn = false, lastPos = nil :: Vector3?, seed = (#id * 1.37) % (2 * math.pi) }
+	local rig = { kind = k, template = template, folder = folder, parts = parts, stride = 0, gait = 0, t = 0, owed = 0, drawn = false, lastPos = nil :: Vector3?,
+		seed = (#id * 1.37) % (2 * math.pi), clear = {} :: { [number]: number } }
 	self.rigs[id] = rig
 	return rig
 end
@@ -26024,8 +27591,260 @@ local function moveOf(spec: Spec, rig: any, reduced: boolean): CFrame?
 	return CFrame.new(hip) * CFrame.fromAxisAngle(Vector3.yAxis, side * swing) * CFrame.fromAxisAngle(Vector3.zAxis, side * lift) * CFrame.new(-hip)
 end
 
--- Places every louse's parts: `lice` are the sim's (id, position, heading, state). `now` (ROBLOX-103): the prey's clock, for the steps and the sway (nil: no
--- motion); `cameraAt`: the camera's place, for the far rule; `reduced`: Reduced Motion.
+-- (ROBLOX-105) a leg's step about its hip for a gait `G` at `phase`, or nil standing
+local function stepAbout(hip: Vector3, side: number, gait: number, G: any, phase: number): CFrame?
+	if gait <= 0 then return nil end
+	local swing = gait * G.swing * math.sin(phase)
+	local lift = gait * G.lift * math.max(0, math.cos(phase))
+	return CFrame.new(hip) * CFrame.fromAxisAngle(Vector3.yAxis, side * swing) * CFrame.fromAxisAngle(Vector3.zAxis, side * lift) * CFrame.new(-hip)
+end
+-- an antenna's sway about its base, or nil in Reduced Motion
+local function sway(spec: Spec, rig: any, A: any, reduced: boolean): CFrame?
+	if reduced or spec.hip == nil then return nil end
+	local side = spec.side or 1
+	local hip = spec.hip :: Vector3
+	local up = A.amp * math.sin(rig.t * A.hz * 2 * math.pi * (1 + rig.gait) + rig.seed + side)
+	local out = A.amp * 0.5 * math.sin(rig.t * A.hz * 1.4 * math.pi + rig.seed * 1.7) * side
+	return CFrame.new(hip) * CFrame.fromAxisAngle(Vector3.xAxis, up) * CFrame.fromAxisAngle(Vector3.yAxis, out) * CFrame.new(-hip)
+end
+
+-- A body frame at `pos` facing `heading` laid on the surface whose normal is `normal`.
+local function surfaceFrame(pos: Vector3, heading: Vector3, normal: Vector3): CFrame
+	local n = if normal.Magnitude > 1e-6 then normal.Unit else Vector3.yAxis
+	local h = heading - n * heading:Dot(n)
+	if h.Magnitude < 1e-4 then
+		h = (if math.abs(n.Y) > 0.9 then -Vector3.zAxis else Vector3.yAxis)
+		h = h - n * h:Dot(n)
+	end
+	return CFrame.lookAt(pos, pos + h.Unit, n)
+end
+
+-- The point and the direction toward the head at arc distance `s` back along a millipede's track (its head, then its trail; straight on past the end).
+local function along(track: { Vector3 }, s: number): (Vector3, Vector3)
+	local left = s
+	for i = 1, #track - 1 do
+		local a, b = track[i], track[i + 1]
+		local d = (b - a).Magnitude
+		if d > 1e-6 then
+			if left <= d then return a:Lerp(b, left / d), (a - b) / d end
+			left -= d
+		end
+	end
+	local last = track[#track]
+	local dir = if #track >= 2 and (track[#track - 1] - last).Magnitude > 1e-6 then (track[#track - 1] - last).Unit else Vector3.zAxis
+	return last - dir * left, dir
+end
+
+-- The ladybird's frames.
+local function poseLadybird(rig: any, b: any, reduced: boolean, now: number): { CFrame }
+	local S = BugBodies.ambient.ladybird
+	local body = surfaceFrame(b.position, b.heading, b.normal)
+	local bleeding = (b.bleedUntil or -1) > (now or 0)
+	local out = {}
+	for i, spec in rig.template do
+		local f = spec.frame
+		if spec.role == "leg" then
+			local phase = rig.stride + (if ((spec.pair or 1) + (if (spec.side or 1) < 0 then 0 else 1)) % 2 == 0 then 0 else math.pi)
+			local m = stepAbout(spec.hip :: Vector3, spec.side or 1, rig.gait, S.motion.gait, phase)
+			if m ~= nil then f = m * f end
+		elseif spec.role == "antenna" then
+			local m = sway(spec, rig, S.motion.antenna, reduced)
+			if m ~= nil then f = m * f end
+		elseif spec.role == "head" and b.state == "eat" and not reduced then
+			f = CFrame.new(0, 0.012 * math.sin(rig.t * 9), -0.01 * math.abs(math.sin(rig.t * 4.5))) * f
+		elseif spec.role == "drop" and not bleeding then
+			f = CFrame.new(0, -0.02, 0.05) -- inside the body
+		end
+		out[i] = body * f
+	end
+	return out
+end
+
+-- The spiral the coiled millipede winds into: for each ring k (0 the head), its place in the spiral's plane (x, z) and the way it faces, round the head.
+local spiralCache: { { x: number, z: number, tx: number, tz: number } }? = nil
+local function spiral(): { { x: number, z: number, tx: number, tz: number } }
+	if spiralCache ~= nil then return spiralCache end
+	local C = BugBodies.ambient.millipede.coil
+	local out = {}
+	local theta, r = 0, C.inner
+	local b = C.pitch / (2 * math.pi)
+	local spacing = 0.19
+	table.insert(out, { x = 0, z = 0, tx = 0, tz = -1 })
+	local s = 0
+	local target = spacing
+	local px, pz = r, 0
+	for k = 1, 12 do
+		target = k * spacing
+		while s < target do
+			local dt = 0.01
+			theta += dt
+			r = C.inner + b * theta
+			local nx, nz = r * math.cos(theta), r * math.sin(theta)
+			s += math.sqrt((nx - px) ^ 2 + (nz - pz) ^ 2)
+			px, pz = nx, nz
+		end
+		-- the ring faces back along the spiral toward the head
+		local tx, tz = -math.sin(theta) * r - b * math.cos(theta), math.cos(theta) * r - b * math.sin(theta)
+		local m = math.sqrt(tx * tx + tz * tz)
+		table.insert(out, { x = px, z = pz, tx = -tx / m, tz = -tz / m })
+	end
+	spiralCache = out
+	return out
+end
+
+-- The millipede's frames: the rings along the track, wound into the spiral as it coils.
+local function poseMillipede(rig: any, b: any, reduced: boolean): { CFrame }
+	local S = BugBodies.ambient.millipede
+	local G = S.motion.gait
+	local spacing = 0.19
+	local track: { Vector3 } = { b.position }
+	for _, p in b.trail or {} do table.insert(track, p) end
+	local c = math.clamp(b.coil or 0, 0, 1)
+	c = c * c * (3 - 2 * c)
+	local under = if b.hidden then Vector3.new(0, -BugBodies.UNDER, 0) else Vector3.zero
+	local head = b.position
+	local fwd0 = Vector3.new(b.heading.X, 0, b.heading.Z)
+	if fwd0.Magnitude < 1e-4 then fwd0 = -Vector3.zAxis end
+	fwd0 = fwd0.Unit
+	local right = fwd0:Cross(Vector3.yAxis)
+	local sp = spiral()
+	local frames: { [number]: CFrame } = {}
+	for k = 0, 12 do
+		local p, toward = along(track, k * spacing + (if k == 0 then 0 else 0.03))
+		if c > 0 then
+			local q = sp[k + 1]
+			local coilP = head + right * q.x + fwd0 * (-q.z) -- (the spiral's z is laid along the head's back)
+			local coilT = (right * q.tx + fwd0 * (-q.tz))
+			p = p:Lerp(coilP, c)
+			local t = toward:Lerp(coilT, c)
+			toward = if t.Magnitude > 1e-4 then t.Unit else toward
+		end
+		local flatT = Vector3.new(toward.X, 0, toward.Z)
+		if flatT.Magnitude < 1e-4 then flatT = fwd0 end
+		frames[k] = CFrame.lookAt(p + under, p + under + flatT.Unit, Vector3.yAxis)
+	end
+	local out = {}
+	for i, spec in rig.template do
+		if spec.role == "mhead" then
+			out[i] = frames[0] * CFrame.new(0, 0, -0.06)
+		elseif spec.role == "mantenna" then
+			local m = sway(spec, rig, S.motion.antenna, reduced or c > 0.5)
+			out[i] = frames[0] * (if m ~= nil then m * spec.frame else spec.frame)
+		elseif spec.role == "ring" then
+			out[i] = frames[spec.ring :: number]
+		elseif spec.role == "rleg" then
+			local k = spec.ring :: number
+			local f = spec.frame
+			if c > 0.05 then
+				f = CFrame.new(0, 0.03 * c, 0) * f -- (coiled: the legs are drawn in under the rings)
+			else
+				local m = stepAbout(spec.hip :: Vector3, spec.side or 1, rig.gait, G, rig.stride - k * G.wave - (if (spec.pair or 0) % 2 == 0 then 0 else G.wave * 0.5))
+				if m ~= nil then f = m * f end
+			end
+			out[i] = frames[k] * f
+		else
+			out[i] = frames[0] * spec.frame
+		end
+	end
+	return out
+end
+
+-- The snail's frames, and its trail's transparencies (set on the parts here when they change).
+local function poseSnail(rig: any, b: any, reduced: boolean, now: number): { CFrame }
+	local S = BugBodies.ambient.snail
+	local body = surfaceFrame(b.position, b.heading, b.normal)
+	local inShell = b.state == "shell"
+	local eyes = math.clamp(b.eyes or 1, 0, 1)
+	local out = {}
+	local trailIdx = 0
+	for i, spec in rig.template do
+		local f = spec.frame
+		if inShell and (spec.role == "soft" or spec.role == "stalk" or spec.role == "eye" or spec.role == "feeler") then
+			f = CFrame.new(SHELL_AT) -- withdrawn: the soft parts inside the shell
+			out[i] = body * f
+		elseif spec.role == "stalk" then
+			local a, tip = spec.a :: Vector3, spec.b :: Vector3
+			local dir = (tip - a).Unit
+			if eyes >= 0.5 then
+				-- drawing in: the rod slides back into the head along its axis, its tip coming down toward the base
+				out[i] = body * CFrame.new(-dir * (S.stalk * (1 - eyes))) * f
+			else
+				out[i] = body * CFrame.new(0.12 * (spec.side or 1), 0.42, -2.0) * CFrame.Angles(0, math.pi / 2, 0) -- (in: laid along the head, inside it)
+			end
+		elseif spec.role == "eye" then
+			local side = spec.side or 1
+			local base = Vector3.new(0.2 * side, 0.62, -2.25)
+			local dir = Vector3.new(0.25 * side, 0.8, -0.4).Unit
+			local wobble = if reduced then 0 else 0.03 * math.sin(rig.t * 0.9 + rig.seed + side)
+			if eyes >= 0.15 then
+				out[i] = body * CFrame.new(base + dir * (S.stalk * eyes + 0.04) + Vector3.new(wobble, 0, 0))
+			else
+				out[i] = body * CFrame.new(0.12 * side, 0.42, -2.1) -- (the eye drawn in with its stalk)
+			end
+		elseif spec.role == "feeler" then
+			local m = if reduced then nil else sway(spec, rig, { amp = 0.12, hz = 0.5 }, false)
+			out[i] = body * (if m ~= nil then m * f else f)
+		elseif spec.role == "trail" then
+			trailIdx += 1
+			local pts = b.trail or {}
+			local a: any = if trailIdx == 1 then { p = b.position, n = b.normal, t = now } else pts[trailIdx - 1]
+			local c: any = pts[trailIdx]
+			local part = rig.parts[i]
+			local want = 1
+			if a ~= nil and c ~= nil and (a.p - c.p).Magnitude > 1e-3 then
+				local mid = (a.p + c.p) / 2 + a.n * (S.trail.thick / 2 + 0.005)
+				local along = (c.p - a.p)
+				local len = along.Magnitude
+				out[i] = CFrame.lookAt(mid, mid + along, a.n) -- (the part's length is the sheet's 0.5, the sim's drop spacing)
+				local age = math.max(0, (now or 0) - (c.t or 0))
+				want = math.clamp(S.trail.base + (1 - S.trail.base) * age / S.trail.fade, S.trail.base, 1)
+				if len > 0.75 then want = 1 end
+			else
+				out[i] = CFrame.new(b.position.X, BugBodies.AWAY, b.position.Z)
+			end
+			if math.abs((rig.clear[i] or -1) - want) > 0.01 then
+				rig.clear[i] = want
+				part.Transparency = want
+			end
+		else
+			out[i] = body * f
+		end
+	end
+	return out
+end
+
+-- The harvestman's frames (away by day: far under the world).
+local function poseHarvestman(rig: any, b: any, _reduced: boolean): { CFrame }
+	local S = BugBodies.ambient.harvestman
+	local out = {}
+	if b.hidden then
+		local away = CFrame.new(b.position.X, BugBodies.AWAY, b.position.Z)
+		for i in rig.template do out[i] = away end
+		return out
+	end
+	local body = surfaceFrame(b.position, b.heading, b.normal)
+	for i, spec in rig.template do
+		local f = spec.frame
+		if spec.role == "leg" then
+			local side = spec.side or 1
+			local phase = rig.stride + (if ((spec.pair or 1) + (if side < 0 then 0 else 1)) % 2 == 0 then 0 else math.pi)
+			local m = stepAbout(spec.hip :: Vector3, side, rig.gait, S.motion.gait, phase)
+			if m ~= nil then f = m * f end
+		end
+		out[i] = body * f
+	end
+	return out
+end
+
+-- The stride a kind's legs cycle over, and the move between drawings that is not a step.
+local function gaitOf(kind: string): any
+	if kind == "woodlouse" then return BugBodies.look.motion.gait end
+	local S = (BugBodies.ambient :: any)[kind]
+	return if S.motion ~= nil then S.motion.gait else { stride = 1, settle = 8, jump = 1 }
+end
+
+-- Places every creature's parts: `lice` are the sims' (id, position, heading, state; ROBLOX-105: `kind` and the kind's own fields). `now` (ROBLOX-103): the
+-- prey's clock, for the steps and the sway (nil: no motion); `cameraAt`: the camera's place, for the far rule; `reduced`: Reduced Motion.
 function BugBodies.draw(self: any, lice: { any }, now: number?, cameraAt: Vector3?, reduced: boolean?)
 	local parts: { BasePart } = self.parts
 	local frames: { CFrame } = self.frames
@@ -26033,36 +27852,51 @@ function BugBodies.draw(self: any, lice: { any }, now: number?, cameraAt: Vector
 	table.clear(frames)
 	local dtAll = if now ~= nil and self.lastNow ~= nil then math.clamp(now - self.lastNow, 0, 0.25) else 0
 	self.lastNow = now
-	local G = BugBodies.look.motion.gait
 	local present: { [string]: boolean } = {}
 	for _, w in lice do
 		present[w.id] = true
-		local rig = self.rigs[w.id] or self:spawn(w.id)
+		local kind = w.kind or "woodlouse"
+		local rig = self.rigs[w.id]
+		if rig ~= nil and rig.kind ~= kind then rig.folder:Destroy(); self.rigs[w.id] = nil; rig = nil end
+		rig = rig or self:spawn(w.id, w.kind)
 		rig.owed += dtAll
 		if rig.drawn and cameraAt ~= nil and (cameraAt - w.position).Magnitude > FlyLook.far.studs and rig.owed < FlyLook.far.seconds - 1e-6 then continue end
 		local dt = rig.owed
 		rig.owed, rig.drawn = 0, true
+		local G = gaitOf(kind)
 		local heading: Vector3 = w.heading
 		if heading.Magnitude < 1e-6 then heading = -Vector3.zAxis end
 		local position: Vector3 = w.position
-		-- the steps: from the soil covered since the last drawing (none under cover, none in a jump of more than `jump`)
-		local moved = if rig.lastPos ~= nil then Vector3.new(position.X - rig.lastPos.X, 0, position.Z - rig.lastPos.Z).Magnitude else 0
+		-- the steps: from the ground covered since the last drawing (none under cover or away, none in a jump of more than `jump`, none coiled)
+		local moved = if rig.lastPos ~= nil then (if kind == "woodlouse" then Vector3.new(position.X - rig.lastPos.X, 0, position.Z - rig.lastPos.Z).Magnitude else (position - rig.lastPos).Magnitude) else 0
 		rig.lastPos = position
 		if dt > 0 then
-			if moved > G.jump or w.state == "hidden" then moved = 0 end
+			if moved > G.jump or w.state == "hidden" or w.hidden == true or (w.coil or 0) > 0.05 then moved = 0 end
 			if moved > 1e-5 then rig.stride = (rig.stride + moved / G.stride * 2 * math.pi) % (2 * math.pi) end
 			local want = if moved > 1e-5 then 1 else 0
 			rig.gait += (want - rig.gait) * math.min(1, dt * G.settle)
 			if want == 0 and rig.gait < 0.02 then rig.gait = 0 end
 			rig.t += dt
 		end
-		if w.state == "hidden" then position -= Vector3.new(0, BugBodies.UNDER, 0) end
-		local body = CFrame.lookAt(position, position + heading, Vector3.yAxis)
-		for i, part in rig.parts do
-			local spec = self.template[i]
-			local move = moveOf(spec, rig, reduced == true)
-			table.insert(parts, part)
-			table.insert(frames, body * (if move ~= nil then move * spec.frame else spec.frame))
+		if kind == "woodlouse" then
+			if w.state == "hidden" then position -= Vector3.new(0, BugBodies.UNDER, 0) end
+			local body = CFrame.lookAt(position, position + heading, Vector3.yAxis)
+			for i, part in rig.parts do
+				local spec = rig.template[i]
+				local move = moveOf(spec, rig, reduced == true)
+				table.insert(parts, part)
+				table.insert(frames, body * (if move ~= nil then move * spec.frame else spec.frame))
+			end
+		else
+			local list: { CFrame }
+			if kind == "ladybird" then list = poseLadybird(rig, w, reduced == true, now or 0)
+			elseif kind == "millipede" then list = poseMillipede(rig, w, reduced == true)
+			elseif kind == "snail" then list = poseSnail(rig, w, reduced == true, now or 0)
+			else list = poseHarvestman(rig, w, reduced == true) end
+			for i, part in rig.parts do
+				table.insert(parts, part)
+				table.insert(frames, list[i])
+			end
 		end
 	end
 	for id, rig in self.rigs do
@@ -26078,7 +27912,7 @@ return BugBodies
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="151">
+        <Item class="ModuleScript" referent="156">
           <Properties>
             <string name="Name">CaughtPanel</string>
             <string name="Source"><![CDATA[--!strict
@@ -26202,7 +28036,7 @@ return CaughtPanel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="152">
+        <Item class="ModuleScript" referent="157">
           <Properties>
             <string name="Name">FlyBodies</string>
             <string name="Source"><![CDATA[--!strict
@@ -26742,7 +28576,7 @@ return FlyBodies
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="153">
+        <Item class="ModuleScript" referent="158">
           <Properties>
             <string name="Name">MateStage</string>
             <string name="Source"><![CDATA[--!strict
@@ -27062,7 +28896,7 @@ return MateStage
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="154">
+        <Item class="ModuleScript" referent="159">
           <Properties>
             <string name="Name">NotebookArt</string>
             <string name="Source"><![CDATA[--!strict
@@ -27100,7 +28934,7 @@ return Art
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="155">
+        <Item class="ModuleScript" referent="160">
           <Properties>
             <string name="Name">NotebookPanel</string>
             <string name="Source"><![CDATA[--!strict
@@ -27603,7 +29437,7 @@ return NotebookPanel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="156">
+        <Item class="ModuleScript" referent="161">
           <Properties>
             <string name="Name">OldSkins</string>
             <string name="Source"><![CDATA[--!strict
@@ -27643,7 +29477,7 @@ return OldSkins
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="157">
+        <Item class="ModuleScript" referent="162">
           <Properties>
             <string name="Name">PerceptionHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -27865,7 +29699,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="158">
+        <Item class="ModuleScript" referent="163">
           <Properties>
             <string name="Name">PerceptionStage</string>
             <string name="Source"><![CDATA[--!strict
@@ -27910,7 +29744,7 @@ return Stage
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="159">
+        <Item class="ModuleScript" referent="164">
           <Properties>
             <string name="Name">SaveClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -28035,7 +29869,513 @@ return SaveClient
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="160">
+        <Item class="ModuleScript" referent="165">
+          <Properties>
+            <string name="Name">SelfTest</string>
+            <string name="Source"><![CDATA[--!strict
+-- The live place's self-test (ROBLOX-104): a run of the real client inside a real Studio Play session, which prints what it finds to Output, so every publish can be
+-- checked in the real engine by someone who can press Play but cannot play. It runs only in Studio and only when the Workspace attribute SelfTest is true (set from the
+-- command bar before Play: workspace:SetAttribute("SelfTest", true)); the client asks for it in one line at its end and hands it the same hooks the test place's
+-- playback gets. Off, nothing of it runs and nothing of it is loaded; a player can never reach it (start refuses outside Studio, whatever the attribute says).
+--
+-- It begins a new life itself (the start menu's "Begin a new life", the same choice a click makes), then walks the checks below, each in its own pcall so an error is a
+-- FAIL and never the end of the run. Every line begins with [SELFTEST]:
+--   PASS <name> / FAIL <name>: <why> / SKIP <name>: <why>   one per check
+--   INFO <what>: <numbers>                                    the frame times and part counts (numbers, not a verdict), and what a check measured
+--   ... <name> (<t> s in)                                      a heartbeat every HEARTBEAT_S seconds of waiting, so a hang shows where it hung
+--   END pass=<n> fail=<m> skip=<k>                             always the last line
+-- The checks: the World folder and every region's folder; for every region, its boxes all there once the spider is held at its spawn (streaming, with a deadline), ground
+-- under the spider there and the spider still there a second later, and the region the client's world reports; a walk on the sill; a let-down on the line from the outer
+-- sill's front edge at about 0.75 studs a second, on the line all the way; the sill's flies, the bed's gnats, aphids, springtails and leafhoppers and the wall's moths made
+-- and drawn under the fly's part budget; the woodlice made and drawn; the notebook opened and closed; the clock put to dusk and the moths flying; a rest in the crack,
+-- its checkpoint kept and returned to; the music playing and the room tone silent; the frame time over five seconds on the sill and in the bed; the parts in the workspace.
+-- Each Studio process writes its own log (%LOCALAPPDATA%\Roblox\logs); tools/studio/selftest.ps1 reads the newest for these lines.
+-- The CLI suite tests/selftest.luau runs the same checks against the real client on the shim's box world, with a host of its own (simulated frames and clock), so the run is
+-- proven to complete and print END before it ever reaches Studio. Nothing here has been run in Studio yet.
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+local Shared = ReplicatedStorage:WaitForChild("Shared")
+local WorldMap = require(Shared:WaitForChild("World"):WaitForChild("WorldMap"))
+local Region = require(Shared:WaitForChild("World"):WaitForChild("Region"))
+local Species = require(Shared:WaitForChild("Data"):WaitForChild("Species"))
+local BugBodies = require(script.Parent.BugBodies)
+
+local SelfTest = {}
+
+SelfTest.PREFIX = "[SELFTEST]"
+-- A heartbeat line at least this often (seconds) while a check waits.
+SelfTest.HEARTBEAT_S = 5
+-- How long the start may take to offer a new life (the server's save reply, the sill streaming in), and a region to arrive whole once the spider is held there.
+SelfTest.LIFE_WAIT = 45
+SelfTest.REGION_WAIT = 30
+-- The most parts a drawn prey may have (the fly's budget, tests/flies.luau) and a drawn woodlouse (BugBodies.PARTS).
+SelfTest.FLY_PARTS = 40
+-- The let-down on the line (ROBLOX-99: SilkController.game, half Godot's 1.5) and the band a measure of it must fall in.
+SelfTest.LOWER = 0.75
+SelfTest.LOWER_BAND = { 0.6, 0.9 }
+-- How long the frame time is sampled in each place, and how long the dusk's moths are given to take wing.
+SelfTest.SAMPLE_S = 5
+SelfTest.DUSK_WAIT = 30
+-- Places on the map the checks use (the motor's body centre, Motor.HEIGHT above the support): the open sill floor, the crack, the outer sill's front edge and the bed's soil.
+SelfTest.SILL = Vector3.new(-5, 0.31, -9)
+SelfTest.CRACK = Vector3.new(-25.5, 0.31, 6)
+SelfTest.EDGE = Vector3.new(2, 0.31, -23.2)
+SelfTest.BED = Vector3.new(-20, -89.69, -30)
+local HEIGHT = 0.31
+
+-- The host: how the run is spawned, waits, reads the time, prints and samples frames. Studio's is the engine's task library, os.clock and print, and samples the render
+-- step; the CLI suite sets its own (SelfTest.host) before the client loads.
+export type Host = {
+	spawn: (fn: () -> ()) -> (),
+	wait: (seconds: number) -> (),
+	clock: () -> number,
+	print: (line: string) -> (),
+	sample: ((seconds: number) -> string)?,
+}
+SelfTest.host = nil :: Host?
+
+local function engineHost(): Host
+	local t: any = task
+	return {
+		spawn = function(fn: () -> ()) t.spawn(fn) end,
+		wait = function(seconds: number) t.wait(seconds) end,
+		clock = os.clock,
+		print = function(line: string) print(line) end,
+		sample = nil,
+	}
+end
+
+-- ---------------------------------------------------------------- the run's state and its words
+type Run = { ctx: any, host: Host, pass: number, fail: number, skip: number, doing: string, began: number, beat: number }
+
+local function say(r: Run, text: string)
+	r.host.print(SelfTest.PREFIX .. " " .. text)
+end
+
+-- A check's condition: false stops the check with this reason (a FAIL).
+local function need(ok: any, why: string)
+	if not ok then error(why, 0) end
+end
+
+-- A check that cannot be made here says why with this (a SKIP, not a FAIL).
+local SKIP = "\0skip:"
+local function skip(why: string)
+	error(SKIP .. why, 0)
+end
+
+-- Waits `seconds`, in steps of at most a second, saying where it is every HEARTBEAT_S seconds.
+local function pause(r: Run, seconds: number)
+	local host = r.host
+	local deadline = host.clock() + seconds
+	repeat
+		host.wait(math.clamp(deadline - host.clock(), 0, 1))
+		local now = host.clock()
+		if now - r.beat >= SelfTest.HEARTBEAT_S then
+			r.beat = now
+			say(r, string.format("... %s (%.0f s in)", r.doing, now - r.began))
+		end
+	until host.clock() >= deadline
+end
+
+-- Waits until `cond` holds (looked at every `step` seconds; a frame when 0) or `seconds` have passed; whether it held.
+local function waitUntil(r: Run, seconds: number, cond: () -> boolean, step: number?): boolean
+	local deadline = r.host.clock() + seconds
+	while not cond() do
+		if r.host.clock() >= deadline then return false end
+		pause(r, step or 0.1)
+	end
+	return true
+end
+
+local function fmt(v: Vector3): string
+	return string.format("(%.2f, %.2f, %.2f)", v.X, v.Y, v.Z)
+end
+
+local function partsUnder(folder: Instance): number
+	local n = 0
+	for _, d in folder:GetDescendants() do
+		if d:IsA("BasePart") then n += 1 end
+	end
+	return n
+end
+
+-- ---------------------------------------------------------------- moving the spider
+-- Puts the spider at `pos` on the surface whose outward normal is `up` (the test place's own place hook), facing `heading` when given.
+local function put(r: Run, pos: Vector3, up: Vector3?, heading: Vector3?)
+	local ctx = r.ctx
+	ctx.place(pos, up)
+	if heading ~= nil then
+		ctx.motor:place(pos, up or Vector3.yAxis, heading)
+		ctx.camera:snap()
+	end
+end
+
+-- The outward normal of the surface a support point lies on: the first of the six axes whose ray back toward the point meets a box at the point.
+local AXES = { Vector3.yAxis, -Vector3.zAxis, Vector3.zAxis, Vector3.xAxis, -Vector3.xAxis, -Vector3.yAxis }
+local function surfaceAt(r: Run, point: Vector3): Vector3?
+	local params = r.ctx.motor.params
+	for _, n in AXES do
+		local hit = Workspace:Raycast(point + n * 0.5, -n, params)
+		if hit ~= nil and (hit.Position - point).Magnitude < 0.1 then return n end
+	end
+	return nil
+end
+
+-- Holds the spider at `pos` (put back every frame, so it cannot fall through what has not streamed in yet) until the region is whole; whether it arrived in time.
+local function holdUntilReady(r: Run, id: string, pos: Vector3, up: Vector3?): boolean
+	local world = r.ctx.world
+	return waitUntil(r, SelfTest.REGION_WAIT, function()
+		if world:regionReady(id) then return true end
+		put(r, pos, up)
+		return false
+	end, 0)
+end
+
+-- The pieces of a region that are not here (the first few, by name).
+local function missing(r: Run, region: any): string
+	local folder = r.ctx.world:folderOf(region)
+	if folder == nil then return "its folder" end
+	local out: { string } = {}
+	for _, piece in Region.pieces(region) do
+		if folder:FindFirstChild(piece.id) == nil then table.insert(out, piece.id) end
+	end
+	local n = #out
+	while #out > 5 do table.remove(out) end
+	return `{n} of {#Region.pieces(region)} pieces, among them {table.concat(out, ", ")}`
+end
+
+-- Every prey of a director is made and drawn: a folder of the fly's id under Flies, with parts, none over the budget. The number drawn.
+local function drawn(r: Run, flies: { any }, what: string): number
+	local folder = Workspace:FindFirstChild("Flies")
+	need(folder ~= nil, "no Flies folder in the workspace")
+	local n = 0
+	for _, f in flies do
+		local body = (folder :: Instance):FindFirstChild(f.id)
+		need(body ~= nil, `{what} {f.id} is not drawn`)
+		local parts = partsUnder(body :: Instance)
+		need(parts > 0 and parts <= SelfTest.FLY_PARTS, `{what} {f.id} is drawn with {parts} parts (1 to {SelfTest.FLY_PARTS})`)
+		n += 1
+	end
+	return n
+end
+
+local function frameSample(r: Run, seconds: number): string
+	if r.host.sample ~= nil then return (r.host.sample :: any)(seconds) end
+	local dts: { number } = {}
+	local conn = RunService.RenderStepped:Connect(function(dt: number) table.insert(dts, dt) end)
+	local ok, err = pcall(function(): any pause(r, seconds); return nil end)
+	conn:Disconnect()
+	if not ok then error(err, 0) end
+	local sum, worst = 0, 0
+	for _, dt in dts do sum += dt; worst = math.max(worst, dt) end
+	local mean = if #dts > 0 then sum / #dts else 0
+	return string.format("%d frames, mean %.1f ms (%.0f fps), worst %.1f ms, physics %.0f fps",
+		#dts, mean * 1000, if mean > 0 then 1 / mean else 0, worst * 1000, (Workspace :: any):GetRealPhysicsFPS())
+end
+
+-- ---------------------------------------------------------------- the checks
+type Check = { name: string, fn: (r: Run) -> () }
+local function checks(): { Check }
+	local list: { Check } = {}
+	local function add(name: string, fn: (r: Run) -> ()) table.insert(list, { name = name, fn = fn }) end
+
+	add("new life", function(r)
+		local ctx = r.ctx
+		local menu, session = ctx.menu, ctx.session
+		need(waitUntil(r, SelfTest.LIFE_WAIT, function() return menu:isShowing() or session.started end), `no start menu and no life after {SelfTest.LIFE_WAIT} s`)
+		if menu:isShowing() then
+			-- the start menu's "Begin a new life": the choice a click makes (CaughtPanel.choose, what the button's Activated calls)
+			need(waitUntil(r, 10, function() return menu:choose("New") end), "the start menu would not take Begin a new life")
+		elseif ctx.fresh ~= nil then
+			-- the test place (no start menu, a life at once): a new life the way the menu's choice makes one
+			need(waitUntil(r, 10, function() return ctx.fresh("main", false, nil) end), "a new life could not begin")
+		end
+		pause(r, 0.5)
+		need(session.started and not menu:isShowing(), "the life did not begin")
+		need(ctx.motor.mode == "attached", `the spider is not standing ({ctx.motor.mode})`)
+	end)
+
+	add("world folders", function(r)
+		local world = r.ctx.world
+		need(Workspace:FindFirstChild(Region.WORLD_FOLDER) ~= nil and world.root.Name == Region.WORLD_FOLDER, "no World folder in the workspace")
+		local absent: { string } = {}
+		for _, region in WorldMap.regions() do
+			if world:folderOf(region) == nil then table.insert(absent, region.id) end
+		end
+		need(#absent == 0, "no folder for " .. table.concat(absent, ", "))
+	end)
+
+	for _, region in WorldMap.regions() do
+		add("region " .. region.id, function(r)
+			local ctx = r.ctx
+			local world, motor = ctx.world, ctx.motor
+			local at = region.spawn.pos
+			need(holdUntilReady(r, region.id, at + Vector3.yAxis * HEIGHT, nil), `not whole after {SelfTest.REGION_WAIT} s: missing {missing(r, region)}`)
+			local up = surfaceAt(r, at)
+			need(up ~= nil, `no surface at its spawn {fmt(at)}`)
+			local u = up :: Vector3
+			put(r, at + u * HEIGHT, u, region.spawn.heading)
+			pause(r, 0.2)
+			local hit = Workspace:Raycast(motor.pos + u * 0.2, -u * 1.0, motor.params)
+			need(hit ~= nil, `no ground under the spider at {fmt(motor.pos)}`)
+			local p0 = motor.pos
+			pause(r, 1.0)
+			need(motor.mode == "attached" and (motor.pos - p0).Magnitude < 0.25, `did not stay put: from {fmt(p0)} to {fmt(motor.pos)}, {motor.mode}`)
+			need(world.region.id == region.id, `the client's world says {world.region.id}`)
+		end)
+	end
+
+	add("walk on the sill", function(r)
+		local ctx = r.ctx
+		local motor = ctx.motor
+		put(r, SelfTest.SILL, nil)
+		pause(r, 0.5)
+		local p0 = motor.pos
+		local lowest, highest = p0.Y, p0.Y
+		ctx.input:simulate("Forward", true)
+		local deadline = r.host.clock() + 3
+		while r.host.clock() < deadline do
+			pause(r, 0)
+			lowest, highest = math.min(lowest, motor.pos.Y), math.max(highest, motor.pos.Y)
+		end
+		ctx.input:simulate("Forward", false)
+		pause(r, 0.2)
+		local moved = (motor.pos - p0).Magnitude
+		say(r, string.format("INFO walk: %.2f studs in 3 s, height %.2f to %.2f", moved, lowest, highest))
+		need(moved > 1.5, string.format("walked only %.2f studs in 3 s", moved))
+		need(lowest > 0.2 and highest < 0.45, string.format("left the floor: between y %.2f and %.2f", lowest, highest))
+	end)
+
+	add("the line", function(r)
+		local ctx = r.ctx
+		local motor = ctx.motor
+		need(holdUntilReady(r, "outer_sill", SelfTest.EDGE, nil), "the outer sill is not whole")
+		put(r, SelfTest.EDGE, Vector3.yAxis, -Vector3.zAxis)
+		pause(r, 0.3)
+		need(ctx.world.region.id == "outer_sill", `not on the outer sill ({ctx.world.region.id})`)
+		ctx.input:simulate("Drop", true)
+		local ok, err = pcall(function()
+			need(waitUntil(r, 15, function() return motor:onLine() end, 0), "never got onto the line from the front edge")
+			pause(r, 1.0) -- (the line's first slack is paid out at once: measured after it)
+			need(motor:onLine(), "off the line a second after the drop")
+			local y0, t0, x0 = motor.pos.Y, r.host.clock(), motor.pos.X
+			local deadline = t0 + 6
+			while r.host.clock() < deadline do
+				pause(r, 0.25)
+				need(motor:onLine(), string.format("left the line %.1f s into the let-down, at %s", r.host.clock() - t0, fmt(motor.pos)))
+				need(math.abs(motor.pos.X - x0) < 1.0, string.format("swung %.2f studs off the line's fall", math.abs(motor.pos.X - x0)))
+			end
+			local rate = (y0 - motor.pos.Y) / (r.host.clock() - t0)
+			say(r, string.format("INFO line: let down at %.3f studs a second (the game's %.2f)", rate, SelfTest.LOWER))
+			need(rate > SelfTest.LOWER_BAND[1] and rate < SelfTest.LOWER_BAND[2], string.format("let down at %.3f studs a second, not about %.2f", rate, SelfTest.LOWER))
+		end)
+		ctx.input:simulate("Drop", false)
+		if not ok then error(err, 0) end
+	end)
+
+	add("prey on the sill", function(r)
+		local ctx = r.ctx
+		put(r, SelfTest.SILL, nil)
+		pause(r, 1.0)
+		local flies = ctx.prey.flies
+		need(#flies >= 1, "the sill has no flies")
+		local n = drawn(r, flies, "the sill's fly")
+		say(r, `INFO prey on the sill: {n} flies drawn`)
+	end)
+
+	add("prey in the bed", function(r)
+		local ctx = r.ctx
+		need(holdUntilReady(r, "bed_a", SelfTest.BED, nil), "the bed is not whole")
+		put(r, SelfTest.BED, nil)
+		pause(r, 2.0)
+		local bed = ctx.world.garden.bed_a
+		need(bed ~= nil and bed.prey ~= nil, "the bed's prey was not made")
+		local byKind: { [string]: number } = {}
+		for _, f in bed.prey.flies do
+			local kind = f.profile.body.prey_kind or "?"
+			byKind[kind] = (byKind[kind] or 0) + 1
+		end
+		need((byKind.fungus_gnat or 0) > 0, "no gnats")
+		need((byKind.aphid or 0) > 0, "no aphids")
+		local kinds = bed.kinds
+		need(kinds ~= nil and kinds.springtail ~= nil and #kinds.springtail.flies > 0, "no springtails")
+		need(kinds.leafhopper ~= nil and #kinds.leafhopper.flies > 0, "no leafhoppers")
+		drawn(r, bed.prey.flies, "the bed's")
+		drawn(r, kinds.springtail.flies, "a springtail")
+		drawn(r, kinds.leafhopper.flies, "a leafhopper")
+		say(r, `INFO prey in the bed: {byKind.fungus_gnat} gnats, {byKind.aphid} aphids, {#kinds.springtail.flies} springtails, {#kinds.leafhopper.flies} leafhoppers, all drawn`)
+	end)
+
+	add("woodlice", function(r)
+		local ctx = r.ctx
+		local bed = ctx.world.garden.bed_a
+		need(bed ~= nil and bed.bugs ~= nil and #bed.bugs.lice > 0, "no woodlice in the bed")
+		local folder = Workspace:FindFirstChild("Bugs")
+		need(folder ~= nil, "no Bugs folder in the workspace")
+		for _, w in bed.bugs.lice do
+			local body = (folder :: Instance):FindFirstChild(w.id)
+			need(body ~= nil, `woodlouse {w.id} is not drawn`)
+			local parts = partsUnder(body :: Instance)
+			need(parts > 0 and parts <= BugBodies.PARTS, `woodlouse {w.id} is drawn with {parts} parts (1 to {BugBodies.PARTS})`)
+		end
+		say(r, `INFO woodlice: {#bed.bugs.lice} made and drawn`)
+	end)
+
+	add("frame time in the bed", function(r)
+		say(r, "INFO frame time in the bed: " .. frameSample(r, SelfTest.SAMPLE_S))
+	end)
+
+	add("moths on the wall", function(r)
+		local ctx = r.ctx
+		local wall = WorldMap.region("house_wall") :: any
+		need(holdUntilReady(r, "house_wall", wall.spawn.pos + Vector3.yAxis * HEIGHT, nil), "the wall is not whole")
+		local up = surfaceAt(r, wall.spawn.pos) or -Vector3.zAxis
+		put(r, wall.spawn.pos + up * HEIGHT, up, wall.spawn.heading)
+		ctx.life.clock.hour = 12
+		pause(r, 2.0)
+		local entry = ctx.world.garden.house_wall
+		need(entry ~= nil and entry.kinds ~= nil and entry.kinds.moth ~= nil, "the wall's moths were not made")
+		local moths = entry.kinds.moth.flies
+		need(#moths > 0, "the wall has no moths")
+		drawn(r, moths, "a moth")
+		say(r, `INFO moths on the wall: {#moths} made and drawn`)
+	end)
+
+	add("dusk: the moths fly", function(r)
+		local ctx = r.ctx
+		local life = ctx.life
+		local entry = ctx.world.garden.house_wall
+		need(entry ~= nil and entry.kinds ~= nil and entry.kinds.moth ~= nil, "the wall's moths were not made")
+		local d = entry.kinds.moth
+		local ok, err = pcall(function()
+			life.clock.hour = 20 -- (the clock's own hour, as the world_client suite sets it; the dial is the region's)
+			need(waitUntil(r, 3, function() return d.p == Species.moth_dusk_prototype end), "the moths did not take the dusk's profile at 20:00")
+			local flew = waitUntil(r, SelfTest.DUSK_WAIT, function()
+				for _, f in d.flies do
+					if f:airborne() then return true end
+				end
+				return false
+			end, 0)
+			need(flew, `no moth took wing in {SelfTest.DUSK_WAIT} s of dusk`)
+		end)
+		life.clock.hour = 12
+		if not ok then error(err, 0) end
+	end)
+
+	add("notebook", function(r)
+		local ctx = r.ctx
+		put(r, SelfTest.SILL, nil)
+		pause(r, 0.3)
+		local panel = ctx.notebookPanel
+		ctx.openNotebook("game")
+		pause(r, 0.5)
+		need(panel:isShowing(), "the notebook did not open")
+		panel:close()
+		pause(r, 0.3)
+		need(not panel:isShowing(), "the notebook did not close")
+	end)
+
+	add("rest and checkpoint", function(r)
+		local ctx = r.ctx
+		local life, input = ctx.life, ctx.input
+		put(r, SelfTest.SILL, nil)
+		pause(r, 0.5)
+		put(r, SelfTest.CRACK, nil)
+		life.clock.hour = 12
+		pause(r, 0.5)
+		need(ctx.world:inRetreat(ctx.motor.pos) == "sill_crevice", "not in the crack")
+		input:simulate("Feed", true); pause(r, 0); input:simulate("Feed", false)
+		need(waitUntil(r, 2, function() return life.resting end), "no rest in the crack: " .. tostring(life.notice))
+		local best = ctx.currentStore():loadBest()
+		need(best.ok and best.record.world_map.retreat == "sill_crevice", "no checkpoint kept: " .. tostring(best.message))
+		put(r, SelfTest.SILL, nil)
+		pause(r, 1.0)
+		need(not life.resting and ctx.world:inRetreat(ctx.motor.pos) == nil, "the rest did not end on leaving the crack")
+		input:simulate("Reset", true); pause(r, 0); input:simulate("Reset", false)
+		pause(r, 0.5)
+		need(ctx.world:inRetreat(ctx.motor.pos) == "sill_crevice" and life.resting, `not back resting in the crack after the return (at {fmt(ctx.motor.pos)})`)
+		put(r, SelfTest.SILL, nil)
+		pause(r, 1.0)
+	end)
+
+	add("sound", function(r)
+		local sound = r.ctx.soundscape
+		local music = sound.music
+		need(music ~= nil, "no music voice")
+		need(music.Playing == true and music.Volume > 0, `the music is not playing (Playing {music.Playing}, Volume {music.Volume})`)
+		need(sound.room.Volume == 0 or sound.room.Playing ~= true, `the room tone is not silent (Volume {sound.room.Volume})`)
+		say(r, `INFO sound: music volume {string.format("%.3f", music.Volume)}, IsLoaded {tostring((music :: any).IsLoaded)}`)
+	end)
+
+	add("frame time on the sill", function(r)
+		say(r, "INFO frame time on the sill: " .. frameSample(r, SelfTest.SAMPLE_S))
+	end)
+
+	add("part counts", function(r)
+		local rows: { string } = {}
+		local total = 0
+		for _, child in Workspace:GetChildren() do
+			local n = partsUnder(child) + (if child:IsA("BasePart") then 1 else 0)
+			if n > 0 then table.insert(rows, `{child.Name} {n}`) end
+			total += n
+		end
+		table.sort(rows)
+		say(r, `INFO parts at the {tostring(r.ctx.detail)} tier: {total} in the workspace ({table.concat(rows, ", ")})`)
+	end)
+	return list
+end
+
+-- ---------------------------------------------------------------- the run
+-- The whole run: every check, then END. Never raises.
+function SelfTest.run(ctx: any, host: Host)
+	local now = host.clock()
+	local r: Run = { ctx = ctx, host = host, pass = 0, fail = 0, skip = 0, doing = "start", began = now, beat = now }
+	say(r, "BEGIN the live place's self-test (ROBLOX-104)")
+	local ok, err = pcall(function()
+		for _, c in checks() do
+			r.doing = c.name
+			local passed, why = pcall(function(): any c.fn(r); return nil end)
+			for _, a in { "Forward", "Drop", "Feed", "Reset" } do pcall(function() ctx.input:simulate(a, false) end) end
+			if passed then
+				r.pass += 1
+				say(r, "PASS " .. c.name)
+			elseif type(why) == "string" and string.sub(why, 1, #SKIP) == SKIP then
+				r.skip += 1
+				say(r, "SKIP " .. c.name .. ": " .. string.sub(why, #SKIP + 1))
+			else
+				r.fail += 1
+				say(r, "FAIL " .. c.name .. ": " .. tostring(why))
+			end
+		end
+		-- home: the spider where a life begins
+		local home = WorldMap.region(WorldMap.HOME) :: any
+		pcall(function() put(r, home.spawn.pos + Vector3.yAxis * HEIGHT, nil) end)
+	end)
+	if not ok then
+		r.fail += 1
+		say(r, "FAIL the run itself: " .. tostring(err))
+	end
+	say(r, string.format("INFO took %.0f s", host.clock() - r.began))
+	say(r, `END pass={r.pass} fail={r.fail} skip={r.skip}`)
+end
+
+-- The client's one line: runs the self-test in its own thread when this is Studio and the Workspace attribute SelfTest is true; refuses otherwise. Whether it began.
+function SelfTest.start(ctx: any): boolean
+	if not RunService:IsStudio() or Workspace:GetAttribute("SelfTest") ~= true then return false end
+	local host = SelfTest.host or engineHost()
+	host.spawn(function() SelfTest.run(ctx, host) end)
+	return true
+end
+
+-- (skip is kept for a check that cannot be made in a place; none of today's needs it)
+SelfTest.skip = skip
+
+return SelfTest
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="166">
           <Properties>
             <string name="Name">SettingsPanel</string>
             <string name="Source"><![CDATA[--!strict
@@ -28736,7 +31076,7 @@ return SettingsPanel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="161">
+        <Item class="ModuleScript" referent="167">
           <Properties>
             <string name="Name">Soundscape</string>
             <string name="Source"><![CDATA[--!strict
@@ -28914,7 +31254,7 @@ return Soundscape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="162">
+        <Item class="ModuleScript" referent="168">
           <Properties>
             <string name="Name">SpiderCamera</string>
             <string name="Source"><![CDATA[--!strict
@@ -29527,7 +31867,7 @@ return SpiderCamera
 ]]></string>
           </Properties>
         </Item>
-        <Item class="LocalScript" referent="163">
+        <Item class="LocalScript" referent="169">
           <Properties>
             <string name="Name">SpiderClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -29633,6 +31973,8 @@ local M = {
 	BugBodies = require(script.Parent.BugBodies),
 	-- ROBLOX-101 (W3b part A): the words for a prey that gets out of the jaws by its own trick (a moth's scales, a crane fly's leg); here for the same reason.
 	PreyText = require(Shared.UI.PreyText),
+	-- ROBLOX-104: the hooks the Studio-only drivers are handed (the test place's playback, the live place's self-test), made at the end; here for the same reason.
+	hooks = (nil :: any),
 }
 local focusState = FocusState.new()
 local DT = SpiderMotor.DT
@@ -29743,7 +32085,7 @@ prey.feeding:useGameRules() -- an easier tap on a struggling fly (ROBLOX-72, Dat
 -- beside it, in M.World.garden (what a rest records), sharing the sill director's jaws and casts.
 M.World.garden = {}
 M.World.prey = M.PreyWorld.new(prey, M.World, M.World.garden, M.World.root, { probe = prey.probe, cast = prey.graph.cast, sweep = prey.graph.sweep, overlap = prey.graph.overlap })
-M.World.bugs = M.BugBodies.new(Workspace)
+M.World.bugs = M.BugBodies.new(Workspace, detail) -- (ROBLOX-105: the ambient bugs' sheets at the detail tier)
 M.World.prey.tier = detail -- (ROBLOX-101: how many of the bestiary's prey a region holds)
 rivalLegs.grip = rivalLegs.Grip.new(needs) -- the grip on a caught rival (ROBLOX-77): its own controller, so the fly's is never disturbed
 local life = LifeLoop.new(needs, nil)
@@ -31032,7 +33374,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 		motor:setAimRay(origin, dir)
 		while accumulator >= DT do
 			accumulator -= DT
-			local percepts = M.World.prey:percepts() -- (ROBLOX-96: the active regions' flies, and their woodlice as movement)
+			local percepts = M.World.prey:percepts() -- (ROBLOX-96: the active regions' flies; ROBLOX-105: the woodlice and the ambient bugs are not shown to the senses)
             life.rival=life.rival or RivalSpider.new()
             local rivalPercept=RivalSpider.percept(life.rival)
             if rivalPercept then table.insert(percepts,rivalPercept) end
@@ -31189,7 +33531,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
             end
             watch:step({
              started=session.started,captures=M.World.prey:captures(),feeding=prey.feeding.feeding,taken=prey.feeding.taken,
-             energy=needs.energy,gentle=needs.gentle,spider=motor.pos,flies=M.World.prey:flies(),region=M.World.region.kind,
+             energy=needs.energy,gentle=needs.gentle,spider=motor.pos,flies=M.World.prey:flies(),region=M.World.region.kind,bugs=M.World.prey:crawlers(),
             })
             if modal() then accumulator=0;break end
 			if motor.mode ~= "attached" then focusState:clear() end
@@ -31292,7 +33634,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	updateHud(frameDt)
 	-- (ROBLOX-103: the bodies step, sway and beat by the prey's clock; far ones ten times a second; Reduced Motion stills all but the steps)
 	flyBodies:draw(M.World.prey:flies(),M.World.prey.clock,camera.CFrame.Position,setting("ReducedMotion")==true)
-	M.World.bugs:draw(M.World.prey:woodlice(),M.World.prey.clock,camera.CFrame.Position,setting("ReducedMotion")==true)
+	M.World.bugs:draw(M.World.prey:crawlers(),M.World.prey.clock,camera.CFrame.Position,setting("ReducedMotion")==true)
 	local soundPaused = GuiService.MenuIsOpen or modal()
 	local soundSpeed = if slow then SLOW_SPEED else 1
 	local soundMuted = setting("SoundMuted") == true
@@ -31348,12 +33690,9 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	end
 end)
 
--- The test-place-only module exercises this controller in Studio. Absent from the playable build.
-local playback = script.Parent:FindFirstChild("SilkPlayback")
-if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
-	task.spawn(function()
-		local run: any = (require :: any)(playback)
-		run({
+-- The test-place-only module exercises this controller in Studio. Absent from the playable build. Its hooks are also the live place's self-test's (ROBLOX-104, below).
+M.hooks = function(): any
+	return {
 			prey = prey, flyBodies = flyBodies, waspBody = waspBody, life = life, wasp = wasp, caughtPanel = panel, needs = needs, checkpoints = checkpoints, returnToCheckpoint = function() returnToCheckpoint() end, lifeSpider = function() return lifeSpider end, sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
 			input = controls, rivalLegs = rivalLegs, mateLegs = mateLegs, spiderPick = spiderPick, saveState = saveState, hud = hud,
 			notebook = book, notebookWatch = watch, notebookPanel = nbPanel, openNotebook = openNotebook, settingsPanel = settingsPanel, openSettings = openSettings, setting = setting, cam = cam, soundscape = soundscape, eyes = eyes,
@@ -31377,13 +33716,22 @@ if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
 			get = function()
 				return { mode = motor.mode, line = motor.silk.mode, taut = motor.silk.taut, position = motor.pos, walking = motor.silk.walk ~= nil }
 			end,
-		})
+			detail = detail, -- (ROBLOX-104: the tier the self-test reports its part counts at)
+	}
+end
+local playback = script.Parent:FindFirstChild("SilkPlayback")
+if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
+	task.spawn(function()
+		local run: any = (require :: any)(playback)
+		run(M.hooks())
 	end)
 end
+-- The live place's self-test (ROBLOX-104, Client/SelfTest): only in Studio with the Workspace attribute SelfTest set true; nothing of it is loaded otherwise.
+if RunService:IsStudio() and Workspace:GetAttribute("SelfTest") == true then require(script.Parent.SelfTest).start(M.hooks()) end
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="164">
+        <Item class="ModuleScript" referent="170">
           <Properties>
             <string name="Name">SpiderEyes</string>
             <string name="Source"><![CDATA[--!strict
@@ -31849,7 +34197,7 @@ return SpiderEyes
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="165">
+        <Item class="ModuleScript" referent="171">
           <Properties>
             <string name="Name">SpiderHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -32195,7 +34543,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="166">
+        <Item class="ModuleScript" referent="172">
           <Properties>
             <string name="Name">SpiderInput</string>
             <string name="Source"><![CDATA[--!strict
@@ -32452,7 +34800,7 @@ return SpiderInput
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="167">
+        <Item class="ModuleScript" referent="173">
           <Properties>
             <string name="Name">WaspBody</string>
             <string name="Source"><![CDATA[--!strict
@@ -32684,7 +35032,7 @@ return WaspBody
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="168">
+        <Item class="ModuleScript" referent="174">
           <Properties>
             <string name="Name">WorldClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -32892,7 +35240,7 @@ return WorldClient
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="169">
+        <Item class="ModuleScript" referent="175">
           <Properties>
             <string name="Name">WorldDetail</string>
             <string name="Source"><![CDATA[--!strict
@@ -32935,7 +35283,7 @@ return WorldDetail
       </Item>
     </Item>
   </Item>
-  <Item class="Workspace" referent="170">
+  <Item class="Workspace" referent="176">
     <Properties>
       <string name="Name">Workspace</string>
       <float name="Gravity">35</float>

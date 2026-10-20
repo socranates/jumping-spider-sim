@@ -706,8 +706,13 @@ check("prey runs only in the spider's region: on the sill the sill's flies alone
 	end
 	assert(gnats == 3 and aphids == 3, `drawn: {gnats} gnats and {aphids} aphids`)
 	local bugs = workspace:FindFirstChild("Bugs") :: Instance
-	assert(bugs ~= nil and #bugs:GetChildren() == 4, "four woodlice drawn")
-	for _, w in bugs:GetChildren() do assert(#w:GetChildren() == 24, "a woodlouse is 24 parts") end
+	local lice, ambient = 0, 0
+	for _, w in bugs:GetChildren() do
+		if string.find(w.Name, "louse_", 1, true) == 1 then lice += 1; assert(#w:GetChildren() == 24, "a woodlouse is 24 parts")
+		elseif string.find(w.Name, "bed_a_", 1, true) == 1 then ambient += 1 end
+	end
+	-- (ROBLOX-105: the bed's ambient bugs are drawn beside them: two ladybirds, two millipedes, a snail and a harvestman at the full tier)
+	assert(bugs ~= nil and lice == 4 and ambient == 6, `four woodlice drawn, and the bed's six ambient bugs ({lice}, {ambient})`)
 	assert(driver.world:regionReady("bed_a"), "the bed is whole")
 end)
 
@@ -725,7 +730,10 @@ check("crossing a seam rerolls nothing: the bed's prey waits while the spider is
 	assert(driver.world.region.id == "house_wall" and table.find(pw.active, "bed_a") == nil and d.now == now, `high on the wall the bed's prey does not run and its clock has stopped ({driver.world.region.id}: {table.concat(pw.active, ",")})`)
 	local drawnBed = 0
 	for _, f in (workspace:FindFirstChild("Flies") :: Instance):GetChildren() do if string.find(f.Name, "bed_a_", 1, true) == 1 then drawnBed += 1 end end
-	assert(drawnBed == 0 and #(workspace:FindFirstChild("Bugs") :: Instance):GetChildren() == 0, "nothing of the bed drawn there (ROBLOX-101: the wall's own moths and crane fly may be)")
+	for _, b in (workspace:FindFirstChild("Bugs") :: Instance):GetChildren() do
+		if string.find(b.Name, "louse_", 1, true) == 1 or string.find(b.Name, "bed_a_", 1, true) == 1 then drawnBed += 1 end
+	end
+	assert(drawnBed == 0, "nothing of the bed drawn there (ROBLOX-101: the wall's own moths and crane fly may be; ROBLOX-105: and its harvestman)")
 	driver.place(Vector3.new(-20, -89.69, -30))
 	frames(1)
 	assert(garden.bed_a.prey == d and pw.made == made, "the same director, not another")

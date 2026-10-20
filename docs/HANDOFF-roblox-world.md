@@ -311,4 +311,66 @@ What is in it:
 - The gutter has no retreat yet; a leaf mat in its corner with a gap under it could be one, with the eaves' house spider (the map plan's region 4).
 - From the lawn the laid bricks round the window show as a patch in a wall of plainer courses until `wall_west` and `wall_east` are built (the drainpipe, the door).
 
+## W3b part B — the garden's ambient life: ladybirds, millipedes, a garden snail, harvestmen (ROBLOX-105)
+
+Claude → Chet, 2026-10-19, branch `claude/w3b-b`. The bestiary's ambient four, none of them food, on the woodlouse's pattern: **ladybirds** walking the dock and the
+dandelion among the aphids (6 mm, red, seven spots; now and then one stops over an aphid and eats it in view), **millipedes** on the soil and under the stones (2.4 cm, slow,
+two pairs of legs a ring stepping in a wave; within 2.5 studs of you one coils), a **garden snail** on the soil and up the foot of the wall (a shell 3 cm across, about a
+millimetre a second, mostly from dusk; its eye stalks draw in near you; it leaves a pale trail that fades in four minutes), and **harvestmen** in the bed's litter and on
+the house wall from 18:00 to 6:00 (a small body high on legs about four studs across; they ignore you). Each is a seeded sim of its own (`Shared/Prey/Ladybird`, `Millipede`,
+`Snail`, `Harvestman`, from `World/Garden.ambient`), drawn in `Client/BugBodies` with its own motion, kept with a rest per region, and has a notebook page opened by the first
+close look (within 4 studs). Strike one and it is refused with a short note in the game's words; the woodlice too. And Nathan's two W3 calls, with defaults: the aphids now
+walk their plant now and then, slowly, perch to perch over its faces; and the woodlice (and the new four) are no longer shown to the perception HUD at all, because the
+perception pipeline has no "not food" it could show without changing the golden sensor. `docs/DECISIONS.md` ROBLOX-105 has the numbers and the reasons. **Nothing of it has
+run in Studio.**
+
+What is in it:
+
+- **Where and how many**: the bed holds two ladybirds (one at low detail), two millipedes (one), a snail and a harvestman; the house wall a harvestman. Their bodies cost
+  226 parts at full and 101 at low in the bed (budgets 240 and 110), 20 on the wall.
+- **The aphids' walk**: every 40 to 110 s an aphid may walk to another free perch of its own plant at 0.12 to 0.25 studs a second (`Prey/PreyKinds.creep`, the plants as
+  paths in `World/Garden.plants`); startled on the way it freezes; it never flies or leaves its plant.
+- **The ladybird's meal**: when its appetite is back (50 to 120 s) it walks to an aphid, stops beside it and eats it over 8 to 14 s; the aphid is gone and the bed's own
+  population brings another later.
+- **New words** (`UI/PreyText.REFUSED`, four seconds on the note line): "A foul fluid wells from the ladybird's leg joints. You let it go.", "The millipede coils tight,
+  armour out, and smells foul. You let it go.", "The snail is far too big, and it has drawn into its shell.", "The harvestman gives off a foul smell and stalks on. You let it
+  go.", "The woodlouse's glands give off a secretion spiders avoid. You let it go."
+- **Pages**: "Ladybirds: bright for a reason", "Millipedes: the coil", "Snails: eyes on stalks", "Harvestmen: not spiders" (37 pages in all).
+- **Saves**: a region's entry may hold `ambient`; a v34 rest restores unchanged and the new bugs are made from their seeds when their region is next whole. `SCHEMA_VERSION`,
+  `CONTENT_REVISION` and `WorldMap.REVISION` unchanged.
+
+## Your Studio checklist (W3b part B)
+
+1. **The perception HUD in the bed.** Walk among the woodlice: no movement ring should appear for a woodlouse, a ladybird, a millipede, the snail or a harvestman (the
+   gnats, aphids and the rest of the prey still show as before). Say if you miss the woodlice's rings.
+2. **Ladybirds on the plants.** `workspace.Bugs` should hold `bed_a_ladybird_1` and `_2` (one at low detail) beside the four `louse_` rigs. Watch the dock and the
+   dandelion: a red beetle walking up and down the stem and out onto the leaves, its legs stepping. Wait a few minutes near (but not on) an aphid: a ladybird should come,
+   stop beside it, its head working, and after about ten seconds the aphid is gone.
+3. **The aphids walk.** Watch an aphid for two minutes: now and then one walks slowly round the stem to another leaf (or round the dandelion's stalk to another rosette leaf)
+   and settles there. It never flies.
+4. **Strike each one.** Leap at a ladybird, a millipede, the snail, a harvestman (after 18:00) and a woodlouse. Each time: no catch, the note for that bug for four
+   seconds, and its answer: a yellow drop at the ladybird's front legs and it keeps still a few seconds; the millipede coils; the snail draws in and stays in its shell
+   about half a minute; the woodlouse runs for cover; the harvestman walks on. A leap that lands nowhere near one should say nothing.
+5. **The millipede.** Find one on the soil (two at full detail): a dark body of rings about 2.4 cm long, legs rippling down it as it walks, turning in arcs. Come within
+   about two and a half studs: it coils, head in the middle; go away and wait about ten seconds: it uncoils and walks on. Now and then one goes under a stone and comes out
+   later.
+6. **The snail.** A brown shell 3 studs across on the soil or on the brick just above it. Watch it crawl (very slowly) and leave a pale trail that fades over a few minutes.
+   Come within five studs: its eye stalks draw into its head and it stops; back off past seven and they come out. Is the trail visible on the soil and on the brick?
+7. **Harvestmen at dusk.** Stay out past 18:00: one in the bed's litter and one on the brick wall, small bodies high on very long legs, walking about and ignoring you; they
+   go back to their corners at 6:00 and are not seen by day.
+8. **The pages.** Come within four studs of each: "Ladybirds: bright for a reason", "Millipedes: the coil", "Snails: eyes on stalks", "Harvestmen: not spiders" open once
+   each.
+9. **Rest and rejoin.** Rest under the stone with the snail in its shell or a millipede coiled; leave, rejoin, return to the rest: they are as they were. A rest made in v34
+   restores with no `[Windowsill] checkpoint refused`, the new bugs appearing fresh.
+10. **Parts and frame time** in the bed at both tiers on the PC and, when you can, a phone: the ambient bugs add about 226 parts at full and 101 at low.
+
+## Open for Nathan (W3b part B)
+
+- The woodlice and the new bugs are now invisible to the perception HUD (a "not food" label would need a new perception category). Keep it, or have them back as movement?
+- The aphids walk their plant every minute or two; more, less, or not at all?
+- A ladybird eats an aphid at most every 50 to 120 s, in view: too often (the spider's own food), or a nice thing to watch?
+- The numbers are first guesses: two ladybirds, two millipedes, one snail, a harvestman in the bed and one on the wall; the snail's trail fading in four minutes (a real one
+  lasts much longer); the harvestmen out from 18:00 to 6:00.
+- Next on the bestiary's list: slugs and the earthworm (with W4's rain), bees, the ant trail, and the centipede at the stone with W4's rules.
+
 *(W4 — nature's rules and W5 — no hand holding will be appended here as they land.)*

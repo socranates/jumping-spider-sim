@@ -139,6 +139,91 @@ if WORLD then
 	end
 end
 
+AMBIENT_AT = {} :: { string } -- (ROBLOX-105: where the ambient bugs stand in place, written on the counts line for the views)
+-- ROBLOX-105 (--world): the ambient bugs, in place and on the tray. In place: the bed's ladybirds, millipedes, snail and harvestman and the wall's harvestman from
+-- their seeds, run for a minute and a half of an evening (21:00, so the harvestmen are out and the snail crawls and leaves a trail) through the real colonies, the
+-- bed's aphids walking with them; on a third row of the tray at z 10: a ladybird walking and one bleeding, a millipede straight and one coiled, a snail with a
+-- trail and one with its stalks drawn in, a harvestman, each a few frames into a walk.
+if WORLD then
+	local Region = require("../src/Shared/World/Region")
+	local Ladybird = require("../src/Shared/Prey/Ladybird")
+	local Millipede = require("../src/Shared/Prey/Millipede")
+	local Snail = require("../src/Shared/Prey/Snail")
+	local Harvestman = require("../src/Shared/Prey/Harvestman")
+	local bed = WorldMap.region("bed_a") :: any
+	local wall = WorldMap.region("house_wall") :: any
+	local soil: any, boxes = nil, {}
+	for _, p in Region.pieces(bed) do
+		if p.id == "bed_a_soil" then soil = { min = p.lo, max = p.hi } elseif p.lo.Y <= -89.99 then table.insert(boxes, { min = p.lo, max = p.hi }) end
+	end
+	local specs = {}
+	for _, a in Garden.ambient(bed) :: { any } do specs[a.kind] = a end
+	local tierN = function(a: any): number return if DETAIL == "low" then a.low else a.full end
+	local plants = Garden.plants(bed) :: any
+	local cols = {
+		Ladybird.new(specs.ladybird, tierN(specs.ladybird), plants), Millipede.new(specs.millipede, tierN(specs.millipede), soil, boxes),
+		Snail.new(specs.snail, tierN(specs.snail), soil, boxes), Harvestman.new(specs.harvestman, tierN(specs.harvestman), soil, boxes),
+		Harvestman.new((Garden.ambient(wall) :: any)[1], 1),
+	}
+	local spec = Garden.prey(bed) :: any
+	local d = PreyDirector.engine(outside, Species.fungus_gnat_prototype, spec.seed, spec.target, false, spec)
+	local far = Vector3.new(-22, 0.31, 6)
+	local cam = { CFrame = CFrame.new(Vector3.new(-22, 5, 12)), FieldOfView = 70, ViewportSize = Vector2.new(1280, 720) }
+	local Sensor = require("../src/Shared/Perception/Sensor")
+	local ObservationMemory = require("../src/Shared/Perception/ObservationMemory")
+	local sensor = Sensor.new(ObservationMemory.new())
+	sensor:configureFrom(Species.phidippus_audax_prototype.perception)
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Include
+	params.FilterDescendantsInstances = { outside }
+	local cast = Sensor.workspaceCast(params)
+	local obs = { eye = far, gaze = Vector3.new(0, 0, -1), up = Vector3.yAxis, heading = Vector3.new(0, 0, -1) }
+	for _ = 1, 60 * 90 do
+		d:before(1 / 60, far, obs, sensor, cast, cam)
+		for _, c in cols do c:step(1 / 60, far, { hour = 21, flies = d.flies, plants = plants }) end
+	end
+	local crawl = {}
+	for _, c in cols do for _, b in c:creatures() do table.insert(crawl, b) end end
+	local amb = BugBodies.new(flyFolder, DETAIL)
+	amb:draw(crawl, 90)
+	-- the aphids where they walked to (the gnats too), drawn with the bestiary's bodies
+	FlyBodies.new(flyFolder, DETAIL):draw(d.flies, 90)
+	-- the tray's third row
+	local plate2 = Instance.new("Part")
+	plate2.Name = "SpecimenPlate2"; plate2.Size = Vector3.new(40, 0.2, 8); plate2.CFrame = CFrame.new(216, -0.1, 11); plate2.Color = Color3.fromRGB(150, 146, 138)
+	plate2.Anchored = true; plate2.Parent = flyFolder
+	local trailM = {}
+	for i = 1, 13 do table.insert(trailM, Vector3.new(204, 0.12, 10 + i * 0.19)) end
+	local trailC = {}
+	for i = 1, 13 do table.insert(trailC, Vector3.new(208, 0.12, 10 + i * 0.19)) end
+	local sTrail = {}
+	for i = 1, 20 do table.insert(sTrail, { p = Vector3.new(214 + 0.15 * math.sin(i * 0.4), 0, 10 + i * 0.5), n = Vector3.yAxis, t = 90 - i * 10 }) end
+	local row = {
+		{ id = "spec_ladybird", kind = "ladybird", position = Vector3.new(200, 0.17, 10), heading = Vector3.new(0, 0, -1), normal = Vector3.yAxis, state = "walk", bleedUntil = -1, hidden = false },
+		{ id = "spec_ladybird_bleed", kind = "ladybird", position = Vector3.new(201.2, 0.17, 10), heading = Vector3.new(0, 0, -1), normal = Vector3.yAxis, state = "still", bleedUntil = 1e9, hidden = false },
+		{ id = "spec_millipede", kind = "millipede", position = Vector3.new(204, 0.12, 10), heading = Vector3.new(0, 0, -1), normal = Vector3.yAxis, state = "walk", coil = 0, trail = trailM, hidden = false },
+		{ id = "spec_millipede_coil", kind = "millipede", position = Vector3.new(208, 0.12, 10), heading = Vector3.new(0, 0, -1), normal = Vector3.yAxis, state = "coiled", coil = 1, trail = trailC, hidden = false },
+		{ id = "spec_snail", kind = "snail", position = Vector3.new(214, 0, 10), heading = Vector3.new(0, 0, -1), normal = Vector3.yAxis, state = "crawl", eyes = 1, trail = sTrail, hidden = false },
+		{ id = "spec_snail_in", kind = "snail", position = Vector3.new(220, 0, 10), heading = Vector3.new(0, 0, -1), normal = Vector3.yAxis, state = "rest", eyes = 0, trail = {}, hidden = false },
+		{ id = "spec_harvestman", kind = "harvestman", position = Vector3.new(228, 0.9, 11), heading = Vector3.new(0, 0, -1), normal = Vector3.yAxis, state = "walk", hidden = false },
+	}
+	local tray = BugBodies.new(flyFolder, DETAIL)
+	local t = 0.37
+	tray:draw(row, t)
+	for _ = 1, 10 do
+		t += 1 / 60
+		for _, b in row do
+			if b.state == "walk" or b.state == "crawl" then
+				local stride = if b.kind == "ladybird" then 0.22 elseif b.kind == "millipede" then 0.25 elseif b.kind == "harvestman" then 1.1 else 0.4
+				b.position += Vector3.new(0, 0, -stride / 4 / 10)
+			end
+		end
+		tray:draw(row, t)
+	end
+	-- where the in-place bugs are, for the views
+	for _, b in crawl do table.insert(AMBIENT_AT, string.format("%s(%.2f,%.2f,%.2f)%s", b.id, b.position.X, b.position.Y, b.position.Z, tostring(b.state))) end
+end
+
 -- ---------------------------------------------------------------- wasps (scene.py's WASPS: id, x, y, z, hx, hz, mode, search, beat)
 local waspHolder = Instance.new("Folder")
 waspHolder.Name = "WaspHolder"
@@ -212,5 +297,5 @@ for k in counts do table.insert(keys, k) end
 table.sort(keys)
 local summary = {}
 for _, k in keys do table.insert(summary, k .. "=" .. counts[k]) end
-print("parts " .. table.concat(summary, " ") .. " total=" .. #rows)
+print("parts " .. table.concat(summary, " ") .. " total=" .. #rows .. (if #AMBIENT_AT > 0 then " ambient=" .. table.concat(AMBIENT_AT, ";") else ""))
 print("[" .. table.concat(rows, ",\n") .. "]")

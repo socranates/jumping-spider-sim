@@ -148,6 +148,23 @@ function Woodlice.percepts(self: any): { any }
 	return out
 end
 
+-- (ROBLOX-105) What a strike may hit: { creature, position, radius } for each louse not under cover.
+function Woodlice.targets(self: any): { any }
+	local out = {}
+	for _, w in self.lice do
+		if w.state ~= "hidden" then table.insert(out, { creature = w, position = w.position, radius = Woodlice.RADIUS }) end
+	end
+	return out
+end
+
+-- (ROBLOX-105) Struck by the spider (the strike is refused, Prey/PreyWorld): it makes for cover.
+function Woodlice.struck(self: any, w: any)
+	if w.state ~= "hidden" and #self.hides > 0 then
+		w.state = "hiding"
+		w.hide = self:nearestHide(w.position)
+	end
+end
+
 -- How many are under cover now.
 function Woodlice.hiddenCount(self: any): number
 	local n = 0

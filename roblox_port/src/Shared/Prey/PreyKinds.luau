@@ -12,9 +12,68 @@
 --                     restlessness each fly drew is kept, its clock of restlessness starts again at the change (so they do not all take off at once)
 --   the grip ........ the moth's slip (the first grip on it fails at `slip_chance`, once) and the crane fly's shed leg (once, at `shed_chance`, `shed_after`
 --                     seconds into the struggle): the prey leaves the jaws and escapes as a torn-free fly does
+--   the creep ....... (ROBLOX-105, the aphid: body.creep) now and then, perched and calm, it walks slowly over its plant's faces to another free perch of the
+--                     same plant (World/Garden.plantPath: down its stem or round its rosette and out along the other leaf), at `speed`, every `every`
+--                     seconds; startled on the way it freezes where it is; it never leaves its plant
 local Species = require(script.Parent.Parent.Data.Species)
+local Garden = require(script.Parent.Parent.World.Garden)
+local PlantWalk = require(script.Parent.PlantWalk)
 
 local K = {}
+
+-- (ROBLOX-105) The aphid's creep (a profile with body.creep): carries on one under way (true while it moves or stands frozen on the way), or, perched, calm, not
+-- walking or fidgeting and its time come, begins one to a free perch of its own plant within `reach` studs of walking (the stream draws the perch and the next
+-- time). An aphid a ladybird is eating (`heldBy`) does not set off.
+function K.creep(f: any, now: number, dt: number): boolean
+	local c = f.creep
+	local hover = f.profile.body.hover_wu
+	if c ~= nil then
+		if f.state ~= "PERCHED" and f.state ~= "ALERT" then f.creep = nil; return false end
+		if f.state == "ALERT" then return true end -- (startled on the way: it freezes where it is)
+		local p, n, dir, done = PlantWalk.advance(c, (f.creepSpeed or 0.1) * dt)
+		f.position = p + n * hover
+		f.normal = n
+		if dir.Magnitude > 0.5 then f.heading = dir end
+		if done then
+			f.creep = nil
+			f.normal = f.perch.normal
+			f.position = f.graph:rest(f.perch)
+			local t = f.heading - f.normal * f.heading:Dot(f.normal)
+			if t.Magnitude > 1e-3 then f.heading = t.Unit end
+			f.restSpot = f.position; f.homeHeading = f.heading; f.walkLeft = 0; f.fidgetUntil = 0; f.perchedSince = now
+		end
+		return true
+	end
+	local spec = f.profile.body.creep
+	if spec == nil or f.state ~= "PERCHED" or f.walkLeft > 0 or now < f.fidgetUntil or f.heldBy ~= nil or f.perch == nil then return false end
+	if f.creepNext == nil then f.creepNext = now + f.rng:draw(spec.every); return false end
+	if now < f.creepNext then return false end
+	f.creepNext = now + f.rng:draw(spec.every)
+	local here = f.perch
+	local name, plants = Garden.plantOf(here.id)
+	if name == nil or plants == nil then return false end
+	local plant = plants[name]
+	local list = {}
+	for _, other in f.graph.perches do
+		if other ~= here and other.walker and other.valid and other.occupant == "" and other.reserved == "" and plant.nodes[other.id] ~= nil then
+			local path = Garden.plantPath(plant, here.id, other.id)
+			if path ~= nil then
+				local w = PlantWalk.new(path, f.position - f.normal * hover, f.normal)
+				if w.length <= spec.reach then table.insert(list, { perch = other, walk = w }) end
+			end
+		end
+	end
+	if #list == 0 then return false end
+	local pick = list[1 + math.floor(f.rng:next() * #list) % #list]
+	if here.occupant == f.id then here.occupant = "" end
+	pick.perch.occupant = f.id
+	f.perch = pick.perch
+	f.creep = pick.walk
+	f.creepSpeed = f.rng:draw(spec.speed)
+	f.creeps = (f.creeps or 0) + 1
+	f.glanceTarget = nil
+	return true
+end
 
 -- The arc's points along the hop: s from 0 to 1.
 local function arcPoint(from: Vector3, to: Vector3, apex: number, s: number): Vector3

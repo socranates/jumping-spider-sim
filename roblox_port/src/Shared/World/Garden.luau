@@ -1329,6 +1329,251 @@ function Garden.bestiary(region: WorldMap.Region): { KindSpec }?
 	return out
 end
 
+-- ---------------------------------------------------------------- the plants as paths (ROBLOX-105, W3b part B)
+-- Each of the bed's plants as a set of walks over its own faces, for the things that walk a plant: an aphid going from one of its perches to another (Prey/PreyKinds
+-- `creep`) and a ladybird (Prey/Ladybird). A plant has a `highway` (points on its faces, each { pos, normal }: the dock's stem's bare north face from its foot to
+-- its top, which no leaf meets; the dandelion's ring of soil round its stalk, a `loop`) and `nodes`, each a `hub` (the highway point it leaves from) and a `route`
+-- from there over the faces to the node, every point on a face or on the edge where two meet (its normal between theirs). A node named by a perch id stands
+-- exactly on that perch (the aphids' walker perches); the others are places only the ladybird goes (the dock's top and foot, the dandelion's stalk).
+export type PlantPoint = { pos: Vector3, normal: Vector3 }
+export type Plant = { id: string, loop: boolean, highway: { PlantPoint }, nodes: { [string]: { hub: number, route: { PlantPoint } } }, order: { string } }
+local plantsCache: { [string]: { [string]: Plant } } = {}
+local plantOfPerch: { [string]: string } = {} -- perch id -> plant id, filled as plants are made
+
+local function unit(a: Vector3, b: Vector3): Vector3
+	return (a + b).Unit
+end
+
+function Garden.plants(region: WorldMap.Region): { [string]: Plant }?
+	if region.kind ~= "bed" then return nil end
+	local key = region.id .. "/" .. tostring(region.seed)
+	local cached = plantsCache[key]
+	if cached ~= nil then return cached end
+	local B = Garden.BED
+	local byId: { [string]: Piece } = {}
+	for _, p in Garden.pieces(region) do byId[p.id] = p end
+	local out: { [string]: Plant } = {}
+	local X, Y, Z = Vector3.xAxis, Vector3.yAxis, Vector3.zAxis
+	local function pt(pos: Vector3, normal: Vector3): PlantPoint return { pos = pos, normal = normal } end
+	-- the dock: the stem's north face (z lo) is the highway, its points at the heights the nodes leave it
+	local stem = byId[region.id .. "_dock_stem"]
+	if stem ~= nil then
+		local s0, s1 = stem.lo, stem.hi
+		local mx, mz = (s0.X + s1.X) / 2, (s0.Z + s1.Z) / 2
+		local heights: { number } = {}
+		local nodes: { [string]: { hub: number, route: { PlantPoint } } } = {}
+		local order: { string } = {}
+		local pending: { { id: string, y: number, route: { PlantPoint } } } = {}
+		local function add(id: string, y: number, route: { PlantPoint })
+			table.insert(pending, { id = id, y = y, route = route })
+			if table.find(heights, y) == nil then table.insert(heights, y) end
+		end
+		add(region.id .. "_dock_foot", B.top + 0.5, {})
+		add(region.id .. "_dock_stem_side", B.top + 3.5, { pt(v(s1.X, B.top + 3.5, s0.Z), unit(X, -Z)), pt(v(s1.X, B.top + 3.5, mz), X) })
+		for i, leaf in B.dock.leaves do
+			local box = byId[`{region.id}_dock_leaf_{i}`]
+			if box ~= nil then
+				local y1 = box.hi.Y
+				local centre = pt(v((box.lo.X + box.hi.X) / 2, y1, (box.lo.Z + box.hi.Z) / 2), Y)
+				local route: { PlantPoint }
+				if leaf.dir == "x+" then
+					route = { pt(v(s1.X, y1, s0.Z), unit(X, -Z)), pt(v(s1.X, y1, mz), unit(X, Y)), centre }
+				elseif leaf.dir == "x-" then
+					route = { pt(v(s0.X, y1, s0.Z), unit(-X, -Z)), pt(v(s0.X, y1, mz), unit(-X, Y)), centre }
+				elseif leaf.dir == "z+" then
+					route = { pt(v(s0.X, y1, s0.Z), unit(-X, -Z)), pt(v(s0.X, y1, s1.Z), unit(-X, Z)), pt(v(mx, y1, s1.Z), unit(Z, Y)), centre }
+				else
+					route = { pt(v(mx, y1, s0.Z), unit(-Z, Y)), centre }
+				end
+				add(box.id .. "_top", y1, route)
+			end
+		end
+		add(region.id .. "_dock_top", s1.Y - 0.6, {})
+		table.sort(heights)
+		local highway: { PlantPoint } = {}
+		for _, y in heights do table.insert(highway, pt(v(mx, y, s0.Z), -Z)) end
+		for _, n in pending do
+			nodes[n.id] = { hub = table.find(heights, n.y) :: number, route = n.route }
+			table.insert(order, n.id)
+			plantOfPerch[n.id] = "dock"
+		end
+		out.dock = { id = "dock", loop = false, highway = highway, nodes = nodes, order = order }
+	end
+	-- the dandelion: a ring of eight points on the soil round the stalk; each rosette leaf leaves from the ring point toward it, up its inner end and out to its
+	-- middle; the stalk is climbed from the east point
+	local stalk = byId[region.id .. "_dandelion_stalk"]
+	if stalk ~= nil then
+		local cx, cz = (stalk.lo.X + stalk.hi.X) / 2, (stalk.lo.Z + stalk.hi.Z) / 2
+		local half = (stalk.hi.X - stalk.lo.X) / 2
+		local L = B.dandelion
+		local ring = half + 0.35
+		local inner = half + L.leaf.gap
+		local highway: { PlantPoint } = {}
+		for k = 0, 7 do
+			local a = k * math.pi / 4
+			table.insert(highway, pt(v(cx + math.cos(a) * ring, B.top, cz + math.sin(a) * ring), Y))
+		end
+		local nodes: { [string]: { hub: number, route: { PlantPoint } } } = {}
+		local order: { string } = {}
+		local dirs = { X, Z, -X, -Z } -- the rosette's leaves 1..4 (Garden's bedPieces), on the ring's points 1, 3, 5, 7
+		for i, d in dirs do
+			local box = byId[`{region.id}_dandelion_leaf_{i}`]
+			if box ~= nil then
+				local y1 = box.hi.Y
+				local foot = v(cx, B.top, cz) + d * inner
+				local id = box.id .. "_top"
+				nodes[id] = { hub = 2 * i - 1, route = {
+					pt(foot, unit(Y, -d)), pt(foot + Y * (y1 - B.top), unit(Y, -d)),
+					pt(v((box.lo.X + box.hi.X) / 2, y1, (box.lo.Z + box.hi.Z) / 2), Y),
+				} }
+				table.insert(order, id)
+				plantOfPerch[id] = "dandelion"
+			end
+		end
+		local up = region.id .. "_dandelion_stalk_up"
+		nodes[up] = { hub = 1, route = { pt(v(stalk.hi.X, B.top, cz), unit(X, Y)), pt(v(stalk.hi.X, B.top + L.height * 0.75, cz), X) } }
+		table.insert(order, up)
+		out.dandelion = { id = "dandelion", loop = true, highway = highway, nodes = nodes, order = order }
+	end
+	plantsCache[key] = out
+	return out
+end
+
+-- The plant a perch is on ("dock", "dandelion") and the bed's plants, or nil for a perch on no plant. Every bed of the map is made the first time it is asked.
+function Garden.plantOf(perchId: string): (string?, { [string]: Plant }?)
+	local name = plantOfPerch[perchId]
+	if name == nil then
+		for _, r in WorldMap.regions() do if r.kind == "bed" then Garden.plants(r) end end
+		name = plantOfPerch[perchId]
+	end
+	if name == nil then return nil, nil end
+	for _, r in WorldMap.regions() do
+		if r.kind == "bed" then
+			local plants = Garden.plants(r) :: { [string]: Plant }
+			local plant = plants[name]
+			if plant ~= nil and plant.nodes[perchId] ~= nil then return name, plants end
+		end
+	end
+	return nil, nil
+end
+
+-- The walk over a plant from one node to another: a list of points, the first on the node left, the last on the node reached (nil when either is not the
+-- plant's). Down the first node's route to the highway, along it (the shorter way round a loop), out along the second's route.
+function Garden.plantPath(plant: Plant, from: string, to: string): { PlantPoint }?
+	local a, b = plant.nodes[from], plant.nodes[to]
+	if a == nil or b == nil then return nil end
+	local out: { PlantPoint } = {}
+	for i = #a.route, 1, -1 do table.insert(out, a.route[i]) end
+	local n = #plant.highway
+	table.insert(out, plant.highway[a.hub])
+	if a.hub ~= b.hub then
+		local step = if b.hub > a.hub then 1 else -1
+		local count = math.abs(b.hub - a.hub)
+		if plant.loop and count > n / 2 then step, count = -step, n - count end
+		local k = a.hub
+		for _ = 1, count do
+			k = ((k - 1 + step) % n) + 1
+			table.insert(out, plant.highway[k])
+		end
+	end
+	for _, p in b.route do table.insert(out, p) end
+	-- the node's own point first and last (a node whose route is empty is its hub)
+	local first = if #a.route > 0 then a.route[#a.route] else plant.highway[a.hub]
+	if out[1] ~= first then table.insert(out, 1, first) end
+	return out
+end
+
+-- ---------------------------------------------------------------- the ambient bugs (ROBLOX-105, W3b part B)
+-- The garden's other life that is not food (docs/GARDEN_BESTIARY.md's ambient table): how many of each kind a region holds at the full tier and the low one,
+-- the streams' salts, and the parts the region's ambient bodies may cost at each tier (Client/BugBodies.partsOf; tests/garden_life.luau holds the sum under it).
+-- The ladybirds walk the bed's plants among the aphids (one on the dock, one on the dandelion), the millipedes the soil and under the stones, the snail the
+-- soil and the wall's foot, a harvestman the bed's litter and one the house wall, from dusk.
+Garden.AMBIENT = {
+	order = { "ladybird", "millipede", "snail", "harvestman" },
+	bed = {
+		ladybird = { full = 2, low = 1, salt = 101 },
+		millipede = { full = 2, low = 1, salt = 103 },
+		snail = { full = 1, low = 1, salt = 107 },
+		harvestman = { full = 1, low = 1, salt = 109 },
+	},
+	house_wall = {
+		harvestman = { full = 1, low = 1, salt = 113 },
+	},
+	budget = { bed = { full = 240, low = 110 }, house_wall = { full = 24, low = 24 } },
+	-- the snail's piece of wall: the brick's foot over the bed (x, and y above the soil); the wall harvestman's walk on the brick and its corner by day
+	wallFoot = { x = { -20, 20 }, y = { 1.5, 14 } },
+	wall = { x = { -36, 36 }, y = { -84, -8 }, home = { -34, -82 } },
+} :: any
+
+export type AmbientSpec = { kind: string, seed: number, full: number, low: number, starts: { any }, prefix: string, hides: { HideSpot }?, home: Vector3?, surface: string?,
+	rect: { x: { number }, y: { number } }? }
+local ambientCache: { [string]: { AmbientSpec } } = {}
+
+-- The region's ambient bugs: one spec per kind, in AMBIENT.order (nil for a region with none). Each has its own seed (the region's mixed with the kind's salt) and
+-- its starting places for the full tier's count (the low tier takes the first `low`).
+function Garden.ambient(region: WorldMap.Region): { AmbientSpec }?
+	local rows = (Garden.AMBIENT :: any)[region.kind]
+	if rows == nil or region.kind == "order" or region.kind == "budget" then return nil end
+	local key = region.id .. "/" .. tostring(region.seed)
+	local cached = ambientCache[key]
+	if cached ~= nil then return cached end
+	local A = Garden.AMBIENT
+	local out: { AmbientSpec } = {}
+	for _, kind in A.order do
+		local row = rows[kind]
+		if row ~= nil then
+			local rand = rng(region.seed, row.salt)
+			local seed = (region.seed + row.salt * 104729) % MOD
+			local spec: AmbientSpec = { kind = kind, seed = seed, full = row.full, low = row.low, starts = {}, prefix = region.id .. "_" } -- (ids: bed_a_ladybird_1 ...)
+			if region.kind == "bed" then
+				local standing = standingOf(region)
+				for _, t in region.retreats do table.insert(standing, { min = t.min - v(0.5, 0, 0.5), max = t.max + v(0.5, 0, 0.5) }) end
+				local hides = (Garden.bugs(region) :: BugSpec).hides
+				local taken: { Vector3 } = {}
+				if kind == "ladybird" then
+					local plants = Garden.plants(region) :: { [string]: Plant }
+					local names = { "dock", "dandelion" }
+					for i = 1, row.full do
+						local plant = plants[names[(i - 1) % #names + 1]]
+						if plant ~= nil then
+							local node = plant.order[1 + math.floor(rand() * #plant.order)]
+							table.insert(spec.starts, { plant = plant.id, node = node })
+						end
+					end
+				else
+					for _ = 1, row.full do
+						local spot = freeSpot(rand, standing, taken, if kind == "snail" then 2.0 else 1.2, 6)
+						if spot then
+							local a = rand() * TAU
+							table.insert(spec.starts, { pos = spot, heading = v(math.cos(a), 0, math.sin(a)) })
+						end
+					end
+					local stones, litter = {}, {}
+					for _, h in hides do if h.kind == "stone" then table.insert(stones, h) else table.insert(litter, h) end end
+					if kind == "millipede" then spec.hides = stones end
+					if kind == "harvestman" then spec.home = if #litter > 0 then litter[1].pos else hides[1].pos end
+					if kind == "snail" then spec.rect = A.wallFoot end
+				end
+				spec.surface = "soil"
+			else
+				-- the house wall: a harvestman on the brick, its corner at the wall's foot by day
+				local W = A.wall
+				for _ = 1, row.full do
+					local p = v(between(rand, W.x[1] + 6, W.x[2] - 6), between(rand, W.y[1] + 10, W.y[2] - 10), Garden.WALL.face)
+					local a = rand() * TAU
+					table.insert(spec.starts, { pos = p, heading = v(math.cos(a), math.sin(a), 0) })
+				end
+				spec.home = v(W.home[1], W.home[2], Garden.WALL.face)
+				spec.rect = W
+				spec.surface = "wall"
+			end
+			table.insert(out, spec)
+		end
+	end
+	ambientCache[key] = out
+	return out
+end
+
 -- The boxes a region's creatures keep out of: each retreat grown by half a stud (the sill's are its own, Region.keepOut).
 function Garden.keepOut(region: WorldMap.Region): { Box }
 	if not Garden.knows(region.kind) then error("no generator for the region kind " .. region.kind) end

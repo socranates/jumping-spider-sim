@@ -14,15 +14,31 @@
 -- made). The moths and the crane flies follow the life clock's hour (`before`'s `hour`): restless from dusk through the night (Prey/PreyKinds.light). A moth's
 -- slip and a crane fly's shed leg are decided here, on the jaws, before their step (PreyKinds.grip), and the last of them is kept as `event` for the screen.
 -- The prey outside the sill never runs while the spider is on the sill itself (its neighbour the outer sill has prey now): the sill plays as it always did.
+-- ROBLOX-105 (W3b part B): the garden's ambient bugs that are not food (World/Garden.ambient: ladybirds on the bed's plants, millipedes and a snail on its soil
+-- and a harvestman in its litter, a harvestman on the house wall), a colony per kind per region (Prey/Ladybird, Millipede, Snail, Harvestman), kept in the
+-- region's entry as `ambient` ({ [kind] = colony }), made under the same gate and stepped beside the woodlice. None of them, and no longer the woodlice, is
+-- shown to the spider's senses: the perception modules know only movement, possible prey and fly-like prey, and a movement contact carries no name the HUD
+-- could caption "not food", so (Nathan's W3 call) they are left out of `percepts` rather than shown as movement the player might hunt. A strike that comes
+-- within one of them is refused (`event` { kind = "refused", prey = kind }, UI/PreyText) and the creature answers (a ladybird bleeds, a millipede coils, the
+-- snail withdraws, a woodlouse runs for cover); nothing of theirs is ever held.
 local PreyDirector = require(script.Parent.PreyDirector)
 local PreyKinds = require(script.Parent.PreyKinds)
 local Woodlouse = require(script.Parent.Woodlouse)
+local Ladybird = require(script.Parent.Ladybird)
+local Millipede = require(script.Parent.Millipede)
+local Snail = require(script.Parent.Snail)
+local Harvestman = require(script.Parent.Harvestman)
 local Species = require(script.Parent.Parent.Data.Species)
 local Garden = require(script.Parent.Parent.World.Garden)
 local Region = require(script.Parent.Parent.World.Region)
 
 local PreyWorld = {}
 PreyWorld.__index = PreyWorld
+
+-- (ROBLOX-105) The ambient colonies' classes by kind.
+PreyWorld.AMBIENT = { ladybird = Ladybird, millipede = Millipede, snail = Snail, harvestman = Harvestman } :: { [string]: any }
+-- (ROBLOX-105) Whether the woodlice and the ambient bugs are shown to the spider's senses (see the head of this file: they are not).
+PreyWorld.SENSED = false
 
 -- A neighbouring region's prey runs while its farthest perch is inside this many studs of the spider (Workspace.StreamingMinRadius, 96: what is always sent).
 PreyWorld.ACTIVE_RADIUS = 96
@@ -40,7 +56,11 @@ function PreyWorld.new(home: any, world: any, garden: { [string]: any }, root: I
 		made = 0, -- directors made so far
 		tier = "full", -- (ROBLOX-101) the detail tier, for how many of the bestiary's prey a region holds
 		hour = nil :: number?, -- (ROBLOX-101) the life clock's hour, when the client gives it
-		event = nil :: any, -- (ROBLOX-101) the last prey that got out of the jaws by its own trick: { kind = "slip" | "shed", prey = prey kind }
+		event = nil :: any, -- (ROBLOX-101) the last prey that got out of the jaws by its own trick: { kind = "slip" | "shed", prey = prey kind }; (ROBLOX-105) or a strike refused
+		strikeEnd = -1, -- (ROBLOX-105) the ambient strike's window: open until this clock time
+		strikeMode = "attached", -- the motor's mode last tick
+		strikeFrom = nil :: Vector3?, -- where the spider was last tick
+		refused = 0, -- strikes refused so far
 	}, PreyWorld)
 end
 
@@ -164,12 +184,49 @@ function PreyWorld.bugs(self: any, id: string): any
 	return w
 end
 
--- Every percept of the active regions: their flies, and their woodlice as movement.
+-- The region's ambient colonies in Garden.AMBIENT's order, each made now if the region is whole and it has none yet (an empty list for a region without any).
+-- A colony on the soil needs the soil and the standing boxes, as the woodlice do.
+function PreyWorld.ambient(self: any, id: string): { any }
+	local out = {}
+	if id == self.world.home then return out end
+	local region = self.world.map.region(id)
+	local specs = if region ~= nil then Garden.ambient(region) else nil
+	if specs == nil then return out end
+	local entry = self.garden[id]
+	local soil: any, boxes: { any }? = nil, nil
+	for _, spec in specs do
+		local c = if entry ~= nil and entry.ambient ~= nil then entry.ambient[spec.kind] else nil
+		if c == nil and self.world:regionReady(id) then
+			local count = if self.tier == "low" then spec.low else spec.full
+			if spec.surface == "soil" and soil == nil then
+				boxes = {}
+				for _, p in Region.pieces(region) do
+					if p.id == region.id .. "_soil" then soil = { min = p.lo, max = p.hi }
+					elseif p.lo.Y <= region.origin.Y + 0.01 then table.insert(boxes :: any, { min = p.lo, max = p.hi }) end
+				end
+			end
+			if spec.kind == "ladybird" then c = Ladybird.new(spec, count, Garden.plants(region) or {})
+			elseif spec.kind == "millipede" and soil ~= nil then c = Millipede.new(spec, count, soil, boxes :: any)
+			elseif spec.kind == "snail" and soil ~= nil then c = Snail.new(spec, count, soil, boxes :: any)
+			elseif spec.kind == "harvestman" then c = Harvestman.new(spec, count, soil, boxes) end
+			if c ~= nil then
+				entry = entry or {}
+				entry.ambient = entry.ambient or {}
+				entry.ambient[spec.kind] = c
+				self.garden[id] = entry
+			end
+		end
+		if c ~= nil then table.insert(out, c) end
+	end
+	return out
+end
+
+-- Every percept of the active regions: their flies (the woodlice and the ambient bugs only if SENSED, as movement).
 function PreyWorld.percepts(self: any): { any }
 	local out = {}
 	for _, id in self.active do
 		for _, d in self:directors(id) do for _, p in d:percepts() do table.insert(out, p) end end
-		local w = self:bugs(id)
+		local w = if PreyWorld.SENSED then self:bugs(id) else nil
 		if w ~= nil then for _, p in w:percepts() do table.insert(out, p) end end
 	end
 	return out
@@ -191,6 +248,15 @@ function PreyWorld.before(self: any, dt: number, position: Vector3, observer: an
 		end
 		local w = self:bugs(id)
 		if w ~= nil then w:step(dt, position) end
+		local list = self:ambient(id)
+		if #list > 0 then
+			local region = self.world.map.region(id)
+			local aphids = {}
+			local d = self:director(id)
+			if d ~= nil then for _, f in d.flies do table.insert(aphids, f) end end
+			local ctx = { hour = self.hour, flies = aphids, plants = if region ~= nil then Garden.plants(region) else nil }
+			for _, c in list do c:step(dt, position, ctx) end
+		end
 	end
 end
 
@@ -234,6 +300,7 @@ function PreyWorld.after(self: any, dt: number, motor: any, sensor: any, cast: a
 			for _, d in self:directors(id) do d:afterShared(motor, sensor, cast) end
 		end
 	end
+	self:strikeAmbient(motor)
 	local flies = {}
 	for _, id in self.active do
 		for _, d in self:directors(id) do for _, f in d.flies do table.insert(flies, f) end end
@@ -245,6 +312,53 @@ end
 -- The active regions' flies, for the drawing and the notebook's watcher.
 function PreyWorld.flies(self: any): { any }
 	return self.view.flies
+end
+
+-- (ROBLOX-105) The strike against what is not food: a window opened by a leap (the motor's `launched` as it leaves the ground, as the directors' own) and closed
+-- just after it lands; while it is open and the jaws are empty, a sweep of the spider's body from last tick's place to this one against every woodlouse and
+-- ambient bug of the active regions. The first one within its radius (and the directors' 0.3) is refused: `event`, the creature's answer, the window shut.
+function PreyWorld.strikeAmbient(self: any, motor: any)
+	local mode = motor.mode
+	if mode == "air" and self.strikeMode ~= "air" then
+		for _, e in motor.events or {} do if e.kind == "launched" then self.strikeEnd = self.clock + 4; break end end
+	end
+	if self.strikeMode == "air" and mode ~= "air" then self.strikeEnd = math.min(self.strikeEnd, self.clock + 0.05) end
+	self.strikeMode = mode
+	local from = self.strikeFrom or motor.pos
+	self.strikeFrom = motor.pos
+	if self.clock > self.strikeEnd or self.home.feeding.held ~= nil then return end
+	local seg = motor.pos - from
+	local len2 = seg:Dot(seg)
+	for _, id in self.active do
+		local colonies = {}
+		local w = self:bugs(id)
+		if w ~= nil then table.insert(colonies, { c = w, kind = "woodlouse" }) end
+		for _, c in self:ambient(id) do table.insert(colonies, { c = c, kind = c.kind }) end
+		for _, e in colonies do
+			for _, t in e.c:targets() do
+				local u = if len2 > 1e-12 then math.clamp((t.position - from):Dot(seg) / len2, 0, 1) else 0
+				if ((from + seg * u) - t.position).Magnitude <= t.radius + 0.3 then
+					e.c:struck(t.creature)
+					self.event = { kind = "refused", prey = e.kind }
+					self.refused += 1
+					self.strikeEnd = -1
+					return
+				end
+			end
+		end
+	end
+end
+
+-- (ROBLOX-105) Every woodlouse and ambient bug of the active regions, for the drawing (Client/BugBodies: a creature with no `kind` is a woodlouse) and the
+-- notebook's close look.
+function PreyWorld.crawlers(self: any): { any }
+	local out = {}
+	for _, id in self.active do
+		local w = self:bugs(id)
+		if w ~= nil then for _, l in w.lice do table.insert(out, l) end end
+		for _, c in self:ambient(id) do for _, b in c:creatures() do table.insert(out, b) end end
+	end
+	return out
 end
 
 -- The active regions' woodlice, for the drawing.

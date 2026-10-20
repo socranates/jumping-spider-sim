@@ -36,8 +36,8 @@ Coordinates continue the sill's frame: x across the back of the house (west −,
 |---|---|---|---|---|---|
 | 0 | **sill** | as built | home, the nursery | rival, wasp, flies | built |
 | 1 | **outer_sill** | −30…30; −13.5…−24; 0 | stone outer sill | moths, crane flies | built (W2/W3b) |
-| 2 | **house_wall** | −42…42; −24; 0…−90 | brick below the window | moths, crane flies, the descent | built (W2/W3b) |
-| 3 | **bed_a** | −25…25; −24…−74; −90 | bed under the window, the stone home | gnats, aphids, springtails, leafhoppers, woodlice | built (W3/W3b) |
+| 2 | **house_wall** | −42…42; −24; 0…−90 | brick below the window | moths, crane flies, a harvestman from dusk, the descent | built (W2/W3b) |
+| 3 | **bed_a** | −25…25; −24…−74; −90 | bed under the window, the stone home | gnats, aphids, springtails, leafhoppers, woodlice, ladybirds, millipedes, a snail, a harvestman | built (W3/W3b) |
 | 4 | **wall_upper** | −42…42; −24; 0…130 | the wall above the window to the eaves (y 110) and gutter (floor y 109), on the window's jambs; its look draws the rest of the house | a house spider's web in the eaves corner, the gutter as a high perch | built (W3c: the boxes and the look; no retreat, no prey yet) |
 | 5 | **wall_west / wall_east** | −500…−42, 42…500; −24; −90…120 | the rest of the back wall: the drainpipe (west, a climbable pipe to the gutter), the back door, its step and frame (east) | woodlice at the drain, an earwig in the door frame | next |
 | 6 | **shrub_west** | −500…−25; −24…−200 | **bushes to the ground** (box, privet): dense twig lattice, leaf litter under, deep shade | the hidden world: the safest cover and the darkest place; a crab spider is not here, a ground beetle is | next |

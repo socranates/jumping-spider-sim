@@ -150,9 +150,42 @@ CRANE_FLIES = {
   "Layton, B. (2019). Crane Fly. Bug's Eye View 5(5), Mississippi State University Extension.",
   "Jackson, R. R. (1977). Prey of the jumping spider Phidippus johnsoni (Araneae: Salticidae). Journal of Arachnology 5: 145-149."]}
 
+# ROBLOX-105 (W3b part B): the garden's ambient bugs, one page each, opened by the first close look at one (NotebookWatch: one of the view's bugs of the kind,
+# out in the open, within lookWu of the spider). Every sentence rests on a source opened for it; docs/NOTEBOOK_SOURCES.md says which supports which.
+LADYBIRDS = {
+ 'id':'ladybirds','trigger':'look_ladybird','title':'Ladybirds: bright for a reason',
+ 'text':"Ladybirds, or lady beetles, are beetles with domed, oval bodies, red, orange, yellow, pink or black and usually spotted. The bright colours are a warning, to discourage animals that might eat them: disturbed, a ladybird releases an odorous, noxious fluid from its leg joints, called reflex bleeding. Adults and larvae both eat aphids and other small, soft-bodied insects. The larva looks nothing like the adult: shaped like a small alligator, spiny and black with bright spots.",
+ 'game':"Here the ladybirds walk the dock and the dandelion among the aphids and now and then stop over one and eat it. Strike one and you let it go, which is the game's way of saying the spider leaves it alone. The walks, the waits and how often it eats are the game's.",
+ 'sources':[
+  "Bessin, R. (undated, revised 2026). Ladybugs. University of Kentucky Entomology, ENTFACT-702.",
+  "Bohart Museum of Entomology (undated, read 2026). Lady Bugs & Lady Beetles. Information No. 055, University of California, Davis."]}
+
+MILLIPEDES = {
+ 'id':'millipedes','trigger':'look_millipede','title':'Millipedes: the coil',
+ 'text':"Millipedes have long segmented bodies with two pairs of legs on each segment, where centipedes have one pair. Most feed on decaying vegetation, living secretively in soil and leaf mould and beneath stones, logs and bark. When threatened, most roll into a coil with their legs on the inside, offering only their body armour to the predator, and some can release substances that taste or smell foul as a defence.",
+ 'game':"Here a millipede is about 2.4 cm long and walks the bed's soil slowly, going under the stones for a while; come close and it coils, head in the middle, until you have gone. Strike it and you let it go. The speeds and the waits are the game's.",
+ 'sources':[
+  "Buglife - The Invertebrate Conservation Trust (undated, read 2026). Millipedes. Bug Directory, buglife.org.uk."]}
+
+SNAILS = {
+ 'id':'garden_snails','trigger':'look_snail','title':'Snails: eyes on stalks',
+ 'text':"The brown garden snail's shell grows to 28 to 32 mm across. A land snail's head carries retractable tentacles: the longer, upper pair bears the eyes, which see light and dark but no colours, and the shorter pair tastes and smells. It moves by waves of muscle along its foot, aided by mucus that the foot secretes all the time, which leaves a slimy trail. Most land snails are nocturnal, but after rain they may come out by day.",
+ 'game':"Here the snail is far bigger than your spider. It crawls about a millimetre a second over the bed and up the foot of the wall, mostly from dusk, and its trail fades in a few minutes. Its eye stalks draw in when you come near; strike it and it draws into its shell. The speeds and the trail's fading are the game's.",
+ 'sources':[
+  "Dekle, G. W. & Fasulo, T. R. (2001, revised 2024). Brown Garden Snail, Cornu aspersum (Muller, 1774). University of Florida IFAS Extension, EENY240.",
+  "Missouri Department of Conservation (undated, read 2026). Land Snails and Slugs. Missouri Field Guide, mdc.mo.gov."]}
+
+HARVESTMEN = {
+ 'id':'harvestmen','trigger':'look_harvestman','title':'Harvestmen: not spiders',
+ 'text':"Harvestmen, or daddy longlegs, are not spiders but opilionids. The body is one simple oval, head and abdomen fused, with only two eyes and no silk or venom glands. Disturbed, they give off a foul odour. A leg falls off easily and goes on twitching, which can distract a predator while the harvestman flees. They are mostly active at night or in shade, and eat many kinds of organic matter, dead animals among them; some prey on aphids and other small insects.",
+ 'game':"Here one harvestman walks the bed's litter and one the house wall, from dusk through the night, high on legs that span about four studs, and takes no notice of you. Strike one and you let it go. The legs drawn and the speeds are the game's.",
+ 'sources':[
+  "University of Kentucky Entomology (undated, read 2026). Kentucky Harvestmen. Kentucky Critter Files.",
+  "Missouri Department of Conservation (undated, read 2026). Daddy Longlegs (Harvestmen). Missouri Field Guide, mdc.mo.gov."]}
+
 # The Roblox game's own pages, after Godot's, in this order: each carries its id, trigger, title, text, "In this game" line and sources, and docs/NOTEBOOK_SOURCES.md
 # says how far each source was checked (ROBLOX-96 adds the ground-life page: the bed's gnats, aphids and woodlice, opened by the first step onto a garden bed).
-ROBLOX_PAGES = [PEACOCK, ANTMIMIC, MATING, TARANTULA, GROUND_LIFE, SPRINGTAILS, LEAFHOPPERS, MOTHS, CRANE_FLIES]
+ROBLOX_PAGES = [PEACOCK, ANTMIMIC, MATING, TARANTULA, GROUND_LIFE, SPRINGTAILS, LEAFHOPPERS, MOTHS, CRANE_FLIES, LADYBIRDS, MILLIPEDES, SNAILS, HARVESTMEN]
 
 def lua_str(s):
     return '"' + s.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n") + '"'
@@ -183,7 +216,8 @@ def main():
     triggers = ["start", "jump", "jump_far", "jump_long", "eye_view", "eye_time_20", "eye_time_60", "shimmer",
                 "fly_recognised", "catch", "meal", "felt", "buzz", "rest", "sleep", "hungry", "well_fed",
                 "moult_ready", "moulted", "adult", "wasp", "wasp_escaped", "wasp_caught", "starving", "dance", "antennae", "hatched", "tarantula", "garden_bed",
-                "look_springtail", "look_leafhopper", "look_moth", "look_crane_fly"]
+                "look_springtail", "look_leafhopper", "look_moth", "look_crane_fly",
+                "look_ladybird", "look_millipede", "look_snail", "look_harvestman"]
     out += ["\t" + lua_str(t) + "," for t in triggers]
     out += [
         "}",
@@ -202,7 +236,9 @@ def main():
         "NotebookPages.noteSeconds = 6.0",
         "-- ROBLOX-101: a prey of the bestiary within this many studs of the spider is a close look, which opens its kind's page (`looks`: prey kind -> trigger).",
         "NotebookPages.lookWu = 4.0",
-        "NotebookPages.looks = { springtail = \"look_springtail\", leafhopper = \"look_leafhopper\", moth = \"look_moth\", crane_fly = \"look_crane_fly\" } :: { [string]: string }",
+        "-- ROBLOX-105: the ambient bugs' close looks too (NotebookWatch: one of the view's bugs of the kind, out in the open, within lookWu).",
+        "NotebookPages.looks = { springtail = \"look_springtail\", leafhopper = \"look_leafhopper\", moth = \"look_moth\", crane_fly = \"look_crane_fly\",",
+        "\tladybird = \"look_ladybird\", millipede = \"look_millipede\", snail = \"look_snail\", harvestman = \"look_harvestman\" } :: { [string]: string }",
         "",
         "NotebookPages.pages = {",
     ]

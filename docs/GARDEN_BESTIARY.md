@@ -6,7 +6,8 @@ bug with its own small module; a body under the fly's part budget; a generated n
 the bug is in the game, its size at the game's scale (1 stud = 1 cm; the first spider is about 1 cm, the peacock about 0.5), where it
 lives, what it does, and what its page can honestly say with a source the builder must open. **Built so far** (marked *built* in the tables):
 the springtail, the leafhopper, the small moth and the crane fly, part A of W3b (ROBLOX-101, 2026-10-19: `docs/DECISIONS.md` has the numbers,
-`docs/NOTEBOOK_SOURCES.md` the pages' sources). The rest is not built. The honesty
+`docs/NOTEBOOK_SOURCES.md` the pages' sources); and the ladybird, the millipede, the garden snail and the harvestman, part B (ROBLOX-105, 2026-10-19:
+ambient bugs, not food, each a seeded sim of its own with a body and a page; a strike at one, or at a woodlouse, is refused in a short note). The rest is not built. The honesty
 rule stands: a sentence without a source is left out, and the page says "In this game" where the game simplifies.
 
 The jumping spider's own rules decide the roles: it hunts by sight what moves and is smaller than itself, it avoids ants and armoured or
@@ -36,11 +37,11 @@ cites pages).
 | Bug | Size | Where | What it does | The page, honestly |
 | --- | --- | --- | --- | --- |
 | **Woodlouse** | 1 | under the stone, litter (W3) | W3 | W3's page |
-| **Ladybird** | 0.6 | the aphids on the plants | walks the stems eating aphids; the spider leaves it: armour and a bitter yellow fluid (reflex bleeding) | the warning colours; the aphids it eats; the larva that looks nothing like it |
-| **Millipede** | 2–3 | soil, under the stone, after rain | slow, many legs, coils when touched; left alone: a chemical defence | two pairs of legs a segment; the coil; the defence (sourced for the family) |
-| **Snail and slug** | 2–4 | the bed in the damp and at night | slow, leaves a trail the spider can see and avoid (silk sticks to it badly: the trail is a surface the line will not hold, honest where sourced, else only drawn) | the trail; the eye stalks; why they come out at night |
+| **Ladybird** (*built*, ROBLOX-105) | 0.6 | the aphids on the plants | walks the stems eating aphids; the spider leaves it: armour and a bitter yellow fluid (reflex bleeding) | the warning colours; the aphids it eats; the larva that looks nothing like it |
+| **Millipede** (*built*, ROBLOX-105) | 2–3 | soil, under the stone, after rain | slow, many legs, coils when touched; left alone: a chemical defence | two pairs of legs a segment; the coil; the defence (sourced for the family) |
+| **Snail and slug** (the snail *built*, ROBLOX-105; the trail only drawn) | 2–4 | the bed in the damp and at night | slow, leaves a trail the spider can see and avoid (silk sticks to it badly: the trail is a surface the line will not hold, honest where sourced, else only drawn) | the trail; the eye stalks; why they come out at night |
 | **Earthworm** | 5–10 | the soil after rain | surfaces at night and in the wet, withdraws fast when touched | the worm's tunnels; why it surfaces in rain (sourced; the folk reason is wrong) |
-| **Harvestman** | 0.5 body, legs 4 | the wall and the litter at dusk | not a spider; eight long legs, one body; walks over the spider's world and ignores it; a leg comes off and keeps twitching | not a spider (one body section, no silk, no venom); the leg that comes off |
+| **Harvestman** (*built*, ROBLOX-105) | 0.5 body, legs 4 | the wall and the litter at dusk | not a spider; eight long legs, one body; walks over the spider's world and ignores it; a leg comes off and keeps twitching | not a spider (one body section, no silk, no venom); the leg that comes off |
 | **Bumblebee / honeybee** | 1.5 / 1.2 | the flowers | loud, ignores the spider; too big to take, not a threat unless grabbed | the hum the spider hears before it sees; the flowers it works |
 | **Ant** (a trail) | 0.3–0.5 | the wall and the bed, a trail to the aphids | a line of ants tending the aphids; the spider avoids them (it is bitten and stung if it walks the trail); the ant mimic's own page already exists | why ants tend aphids (honeydew); why jumping spiders avoid ants (sourced: Nelson & Jackson) |
 
@@ -78,7 +79,7 @@ cites pages).
 ## For Nathan
 
 - Which first? A suggested W3b: springtail, leafhopper, small moth, crane fly (prey; part A, built in ROBLOX-101); ladybird, millipede, snail,
-  harvestman (ambient; part B, next); centipede at the stone (the first new threat, with W4's rules). The rest in later rounds.
+  harvestman (ambient; part B, built in ROBLOX-105); centipede at the stone (the first new threat, with W4's rules). The rest in later rounds.
 - The water: a saucer under a pot or a puddle after rain would bring the midges, the mosquitoes and the earthworms; it needs the
   weather, which is W4's.
 - Every page needs a real source the builder opens; where none is found the bug is drawn and left unexplained rather than explained

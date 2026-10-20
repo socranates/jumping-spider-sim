@@ -156,6 +156,7 @@ end
 function Fly.rest(self: any,now: number,dt: number)
  local p=self.profile.behavior
  if self.profile.body.sidestep and K.sidestep(self,now,dt) then return end -- (ROBLOX-101: round the stem, away from the spider)
+ if self.profile.body.creep and K.creep(self,now,dt) then return end -- (ROBLOX-105: the aphid's walk over its plant to another perch)
  if self.state=='ALERT' then
   self.groomUntil=0;self.fidgetUntil=0;self.glanceTarget=nil
   if self.profile.body.walker then return end -- (ROBLOX-96: a walker freezes)

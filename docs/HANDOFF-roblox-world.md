@@ -312,3 +312,39 @@ What is in it:
 - From the lawn the laid bricks round the window show as a patch in a wall of plainer courses until `wall_west` and `wall_east` are built (the drainpipe, the door).
 
 *(W4 — nature's rules and W5 — no hand holding will be appended here as they land.)*
+
+## The self-test of the live place (ROBLOX-104, 2026-10-19)
+
+The live place carries a self-test (`roblox_port/src/Client/SelfTest.luau`) that plays the parts that matter inside a real Studio Play session and prints a verdict
+to Output; `roblox_port/tools/studio/selftest.ps1` reads it from Studio's log. It runs only in Studio and only with the Workspace attribute `SelfTest` set; a player
+can never reach it. It has not been run in Studio yet: the first run tests the test.
+
+How to run it, at every publish:
+
+1. Open `TheWindowsill.rbxlx` (the live place) in Studio.
+2. In the command bar: `workspace:SetAttribute("SelfTest", true)`
+3. Press **Play**. Click nothing: the test begins a new life itself, through the start menu's "Begin a new life" (the life it plays is Studio's own test save,
+   `WindowsillTest_v1`, not the live game's).
+4. In PowerShell, from the repository: `.\roblox_port\tools\studio\selftest.ps1` (options `-Timeout 400`, `-Minutes 15`, `-LogDir <folder>`, and `-New` to start it before pressing Play and wait only for a run that begins after). It finds the newest
+   log under `%LOCALAPPDATA%\Roblox\logs` with a `[SELFTEST] BEGIN`, prints the run's lines without Studio's prefix as they come, and stops at END: exit 0 when
+   fail=0, 1 with failures, 2 if no END came before the deadline. Output in Studio shows the same lines.
+5. Stop Play. If the place will be saved, clear the attribute first: `workspace:SetAttribute("SelfTest", nil)` (left set it still does nothing outside Studio).
+
+What it prints: `[SELFTEST] PASS <name>` or `FAIL <name>: <why>` (or `SKIP`) for 20 checks: new life, world folders, region sill / outer_sill / house_wall /
+bed_a / wall_upper (every box streamed in with the spider held at the spawn, ground under it, still there a second later, the client's region right), walk on
+the sill, the line (let down at about 0.75 studs a second, on the line throughout), prey on the sill, prey in the bed, woodlice, frame time in the bed, moths on
+the wall, dusk: the moths fly, notebook, rest and checkpoint, sound (the music playing, the room tone silent), frame time on the sill, part counts. `INFO` lines
+carry the numbers (the line's speed, the frame time in the bed and on the sill, the parts by folder), `...` lines are a heartbeat every 5 s, and the last line is
+`[SELFTEST] END pass=<n> fail=<m> skip=<k>`. The run is about a minute and a half plus streaming; well under three minutes.
+
+## Your Studio checklist (ROBLOX-104)
+
+1. **Run it once as above** and send the whole printout (or the log). The answer we want first: does it reach END, and with how many FAILs.
+2. **A FAIL**: read its reason. A region "not whole after 30 s" names the boxes that never came: say whether the game itself shows a hole there. "the start menu
+   would not take Begin a new life" or "no start menu" means the start never offered one in 45 s: say what the screen showed.
+3. **The numbers**: the frame time lines in the bed and on the sill, and the part count at the full tier, are the first frame-time measures of the world rounds.
+   Keep them with the build number, so the next publish can be compared.
+4. **While it runs** the camera jumps from region to region, the clock goes to dusk for half a minute and back, the notebook flashes open: all of it is the test.
+   Do not touch the mouse or keys until END (a key held would be the test's own key too).
+5. If a check fails that you think is the test's fault rather than the game's (a deadline too short on a slow machine, a moth that was simply slow to fly), say
+   so: the deadlines are guesses until this first run.

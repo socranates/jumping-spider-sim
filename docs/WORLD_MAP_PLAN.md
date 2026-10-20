@@ -77,11 +77,13 @@ a journey of game days, not minutes, and the map is meant to be lived in a regio
    bushes to the ground stand round the garden's edges in the view, `wall_upper` is built with the rest of the house drawn round it, the
    houses across the way are bungalows beyond a back fence and side fences, and the outer sill, the wall, the bed and the view have more
    detail. The gutter's retreat and the eaves' house spider are still to come.*
-2. **W4 (nature's rules)** and **W5 (no hand holding)** as planned, on the built regions.
-3. Then fill outward in this order: `wall_west`/`wall_east` (the drainpipe and the door), `shrub_west`, `path`, the first lawn chunks,
+2. *(Between the rounds, ROBLOX-104: a self-test of the live place in Studio, so every region built so far and every one to come is walked in the real
+   engine at each publish: `src/Client/SelfTest.luau`, checklist in `docs/HANDOFF-roblox-world.md`. Not yet run in Studio.)*
+3. **W4 (nature's rules)** and **W5 (no hand holding)** as planned, on the built regions.
+4. Then fill outward in this order: `wall_west`/`wall_east` (the drainpipe and the door), `shrub_west`, `path`, the first lawn chunks,
    `patio_east`, `border_east`, `hedge_west`, the woodpile, the vegetable bed, the shed, the fence — each a round with its bugs and pages
    from `docs/GARDEN_BESTIARY.md`, weather when the patio's saucer and the lawn exist.
-4. The peacock-as-default and the nursery (the sash shut until the spider is ready) can come at any point; the map does not depend on it.
+5. The peacock-as-default and the nursery (the sash shut until the spider is ready) can come at any point; the map does not depend on it.
 
 ## For Nathan
 

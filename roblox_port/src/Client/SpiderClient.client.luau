@@ -101,6 +101,8 @@ local M = {
 	BugBodies = require(script.Parent.BugBodies),
 	-- ROBLOX-101 (W3b part A): the words for a prey that gets out of the jaws by its own trick (a moth's scales, a crane fly's leg); here for the same reason.
 	PreyText = require(Shared.UI.PreyText),
+	-- ROBLOX-104: the hooks the Studio-only drivers are handed (the test place's playback, the live place's self-test), made at the end; here for the same reason.
+	hooks = (nil :: any),
 }
 local focusState = FocusState.new()
 local DT = SpiderMotor.DT
@@ -1816,12 +1818,9 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	end
 end)
 
--- The test-place-only module exercises this controller in Studio. Absent from the playable build.
-local playback = script.Parent:FindFirstChild("SilkPlayback")
-if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
-	task.spawn(function()
-		local run: any = (require :: any)(playback)
-		run({
+-- The test-place-only module exercises this controller in Studio. Absent from the playable build. Its hooks are also the live place's self-test's (ROBLOX-104, below).
+M.hooks = function(): any
+	return {
 			prey = prey, flyBodies = flyBodies, waspBody = waspBody, life = life, wasp = wasp, caughtPanel = panel, needs = needs, checkpoints = checkpoints, returnToCheckpoint = function() returnToCheckpoint() end, lifeSpider = function() return lifeSpider end, sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
 			input = controls, rivalLegs = rivalLegs, mateLegs = mateLegs, spiderPick = spiderPick, saveState = saveState, hud = hud,
 			notebook = book, notebookWatch = watch, notebookPanel = nbPanel, openNotebook = openNotebook, settingsPanel = settingsPanel, openSettings = openSettings, setting = setting, cam = cam, soundscape = soundscape, eyes = eyes,
@@ -1845,6 +1844,15 @@ if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
 			get = function()
 				return { mode = motor.mode, line = motor.silk.mode, taut = motor.silk.taut, position = motor.pos, walking = motor.silk.walk ~= nil }
 			end,
-		})
+			detail = detail, -- (ROBLOX-104: the tier the self-test reports its part counts at)
+	}
+end
+local playback = script.Parent:FindFirstChild("SilkPlayback")
+if RunService:IsStudio() and playback and playback:IsA("ModuleScript") then
+	task.spawn(function()
+		local run: any = (require :: any)(playback)
+		run(M.hooks())
 	end)
 end
+-- The live place's self-test (ROBLOX-104, Client/SelfTest): only in Studio with the Workspace attribute SelfTest set true; nothing of it is loaded otherwise.
+if RunService:IsStudio() and Workspace:GetAttribute("SelfTest") == true then require(script.Parent.SelfTest).start(M.hooks()) end

@@ -210,6 +210,9 @@ Then full suites, places, bundle, publish.
 - **Save format**: `world` is optional and validated; the revision gate protects positions.
 - **Nav graph size**: region sizing; seams are the only cross-region edges.
 - **Nothing has run in Studio since main ce64498**: this round rides on the audit's green suites and the previewer.
+  *(2026-10-19, ROBLOX-104: the live place now carries a self-test, `src/Client/SelfTest.luau`, that walks the regions, the line, the prey, the
+  notebook, a rest and the sound inside a real Studio Play session and prints a verdict for `tools/studio/selftest.ps1` to read; the coordinator runs it at
+  each publish. Not yet run in Studio.)*
 
 ### Nathan's direction (2026-10-19, evening): the peacock as the main spider, the whole life as the game, the world, Steam
 

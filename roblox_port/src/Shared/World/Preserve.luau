@@ -92,7 +92,7 @@ local function home(n: number, id: string, name: string, zoneId: string, x: numb
 end
 Preserve.HOME_RANGES = table.freeze({
 	home(1, "ranger_hut", "Ranger hut", "hut", 45.75, 3.5, 3.5),
-	home(2, "hut_garden", "Hut garden", "hut_garden", 45, 10, 4),
+	home(2, "hut_garden", "Hut garden", "hut_garden", 45.75, 7, 4), -- (ROBLOX-116: in front of the north window, World/Hut's core: x 43.75..47.75, z 5..9)
 	home(3, "meadow", "Meadow", "meadow", 31, 40, 5),
 	home(4, "pond_edge", "Pond edge", "pond", 77, 42, 4),
 	home(5, "log_pile", "Log pile and woodland floor", "woodland", 10, 29.5, 4),
@@ -116,7 +116,9 @@ Preserve.CORRIDORS = table.freeze({
 	corridor("path_loop", "mown", 1.4, { { 45.5, 13 }, { 44.6, 15.4 }, { 40, 16 }, { 22, 16 }, { 20.4, 17.6 }, { 20, 20 }, { 20, 46 }, { 21.2, 48.4 },
 		{ 24, 49 }, { 58, 49 }, { 60.4, 47.8 }, { 61, 46 }, { 61, 30 } }),
 	corridor("path_cross", "mown", 1.4, { { 45.5, 13 }, { 58, 13 }, { 60.4, 14.2 }, { 61, 16 }, { 61, 29 } }),
-	corridor("path_hut", "gravel", 1.2, { { 45.5, 1.4 }, { 48.4, 1.6 }, { 48.7, 5.3 }, { 46.6, 6.1 }, { 45.5, 6.8 }, { 45.5, 13 } }), -- (round the hut's east end, past the water butt, to the garden)
+	-- (round the hut's east end and in through the hut garden's core, World/Hut's gravel path: west along z 6.71 and north along x 45.15, 0.5 to 0.6 m wide; its points
+	-- break at the core's edges, x 47.75 and z 9, ROBLOX-116)
+	corridor("path_hut", "gravel", 0.6, { { 45.5, 1.4 }, { 48.4, 1.6 }, { 48.4, 6.71 }, { 47.75, 6.71 }, { 45.15, 6.71 }, { 45.15, 9 }, { 45.15, 13 } }),
 	corridor("boardwalk", "boardwalk", 1.5, { { 61, 30 }, { 79, 30 } }),
 	corridor("path_wall", "mown", 1.2, { { 79, 30 }, { 90, 30 } }),
 	corridor("hedge_base", "hedge", 0.8, { { 0.6, 1 }, { 0.6, 59 } }),

@@ -678,6 +678,188 @@ local function checks(): { Check }
 				first.kind, first.cars, first.start, first.finish, shown, parts, now, nextPass.start))
 			need(shown > 0, "no car of the first train drawn mid-pass")
 		end)
+
+		-- ROBLOX-116: the ranger hut, walkable. The nursery's window shut (a walk at its gap stays inside), the ranger's moment when the spider is ready (the rule
+		-- made true for a moment: past its first moult, hard, in the morning; an opening the progress record never keeps, put back at the end), the hut's inside
+		-- walked from the sill down to the floor, the way out through the propped sash and down the logs to the bench and the ground, the hut garden's life, the
+		-- homes, and the lamp at night.
+		local function walkUntil(r: Run, seconds: number, cond: () -> boolean): (boolean, { [string]: boolean })
+			local ctx = r.ctx
+			local seen: { [string]: boolean } = {}
+			ctx.input:simulate("Forward", true)
+			local ok = waitUntil(r, seconds, function()
+				seen[ctx.world.region.id] = true
+				return cond()
+			end, 0)
+			ctx.input:simulate("Forward", false)
+			pause(r, 0.2)
+			return ok, seen
+		end
+		local function regions(seen: { [string]: boolean }): string
+			local out = {}
+			for id in seen do table.insert(out, id) end
+			table.sort(out)
+			return table.concat(out, ", ")
+		end
+
+		add("the nursery: the window shut", function(r)
+			local ctx = r.ctx
+			local hut, motor = ctx.world.hut, ctx.motor
+			need(hut ~= nil, "no hut on this client")
+			if hut.open then skip("this save's window is open already: the nursery is over") end
+			need(hut.sash ~= nil and hut.sash.CanQuery, "no sash in the window's gap")
+			put(r, Vector3.new(0, HEIGHT, -8), nil, -Vector3.zAxis)
+			pause(r, 0.3)
+			local least = motor.pos.Z
+			local _, seen = walkUntil(r, 4, function() least = math.min(least, motor.pos.Z); return false end)
+			say(r, string.format("INFO the nursery: a walk at the shut sash came to z %.2f (the sash's outer face is -13.5); regions %s", least, regions(seen)))
+			need(least > -13.5 and not seen.hut_outer_sill, string.format("the spider got through the shut sash (z %.2f, %s)", least, regions(seen)))
+		end)
+
+		add("the nursery: the ranger props the window", function(r)
+			local ctx = r.ctx
+			local hut, life = ctx.world.hut, ctx.life
+			need(hut ~= nil, "no hut on this client")
+			if hut.open then skip("this save's window is open already") end
+			local g, c = life.growth, life.clock
+			local was = { stage = g.stage, soft = g.softHoursLeft, moulting = g.moultingHoursLeft, hour = c.hour }
+			local t0 = r.host.clock()
+			local ok, err = pcall(function()
+				hut.trial = true
+				g.stage, g.softHoursLeft, g.moultingHoursLeft = math.max(g.stage, 1), 0, 0
+				c.hour = 11.5
+				need(waitUntil(r, 3, function() return hut.moment ~= nil or hut.open end), "the ranger did not come in a ready spider's morning")
+				need(waitUntil(r, 12, function() return hut.open end), "the window was not propped in twelve seconds")
+			end)
+			g.stage, g.softHoursLeft, g.moultingHoursLeft, c.hour = was.stage, was.soft, was.moulting, was.hour
+			if not ok then error(err, 0) end
+			need(hut.sash == nil and hut.wedge ~= nil, "the window is open but not wedged")
+			need(not ctx.world:hutOpen(), "the self-test's opening reached the progress record")
+			say(r, string.format("INFO the nursery: the ranger's moment took %.1f s; the wedge at x %.1f..%.1f", r.host.clock() - t0, hut.wedge.Position.X - hut.wedge.Size.X / 2, hut.wedge.Position.X + hut.wedge.Size.X / 2))
+		end)
+
+		add("the hut's inside", function(r)
+			local ctx = r.ctx
+			local world, motor = ctx.world, ctx.motor
+			-- off the sill's front edge, down the apron under it to the floor
+			put(r, Vector3.new(0, HEIGHT, 10.5), nil, Vector3.zAxis)
+			pause(r, 0.3)
+			local ok, seen = walkUntil(r, 30, function() return world.region.id == "hut_floor_b" and motor.mode == "attached" and math.abs(motor.pos.Y - (-70 + HEIGHT)) < 0.1 end)
+			say(r, string.format("INFO the hut's inside: from the sill's front edge to %s at %s; regions %s", world.region.id, fmt(motor.pos), regions(seen)))
+			need(ok, `did not reach the floor from the sill (at {fmt(motor.pos)}, in {world.region.id})`)
+			-- the desk, the board and the shelf hold a spider
+			for _, at in { { id = "hut_desk", pos = Vector3.new(80, 4 + HEIGHT, 45) }, { id = "hut_shelf", pos = Vector3.new(-132, 10 + HEIGHT, 160) }, { id = "hut_chair", pos = Vector3.new(86, -24 + HEIGHT, 108) } } do
+				need(holdUntilReady(r, at.id, at.pos, nil), `{at.id} is not whole`)
+				put(r, at.pos, nil)
+				pause(r, 0.5)
+				need(world.region.id == at.id and motor.mode == "attached" and (motor.pos - at.pos).Magnitude < 0.3, `{at.id}: did not stay put at {fmt(at.pos)} ({world.region.id}, {fmt(motor.pos)})`)
+			end
+		end)
+
+		add("the way out", function(r)
+			local ctx = r.ctx
+			local world, motor, hut = ctx.world, ctx.motor, ctx.world.hut
+			need(hut ~= nil and hut:passable(), "the window is shut")
+			-- through the propped sash onto the outer sill
+			put(r, Vector3.new(-3, HEIGHT, -9), nil, -Vector3.zAxis)
+			pause(r, 0.3)
+			local ok, seen = walkUntil(r, 8, function() return world.region.id == "hut_outer_sill" end)
+			say(r, `INFO the way out: through the sash to {world.region.id} at {fmt(motor.pos)}; regions {regions(seen)}`)
+			need(ok, `did not get through the propped sash (at {fmt(motor.pos)}, {world.region.id})`)
+			-- over the outer sill's front edge and down the logs to the bench's seat
+			need(holdUntilReady(r, "hut_bench", Vector3.new(-20, -40 + HEIGHT, -37), nil), "the bench is not whole")
+			put(r, Vector3.new(-3, HEIGHT, -20), nil, -Vector3.zAxis)
+			pause(r, 0.3)
+			local ok2, seen2 = walkUntil(r, 40, function() return world.region.id == "hut_bench" and motor.mode == "attached" and math.abs(motor.pos.Y - (-40 + HEIGHT)) < 0.1 end)
+			say(r, `INFO the way out: from the outer sill's edge to {world.region.id} at {fmt(motor.pos)}; regions {regions(seen2)}`)
+			need(ok2, `did not come down to the bench's seat (at {fmt(motor.pos)}, {world.region.id})`)
+			-- over the seat's front edge, under it to its west leg and down the leg to the ground
+			need(holdUntilReady(r, "garden_a2", Vector3.new(-50, -84.6 + HEIGHT, -75), nil), "the garden by the bench is not whole")
+			put(r, Vector3.new(-77, -40 + HEIGHT, -56), nil, -Vector3.zAxis)
+			pause(r, 0.3)
+			local ok3, seen3 = walkUntil(r, 40, function() return string.sub(world.region.id, 1, 7) == "garden_" and motor.mode == "attached" and motor.up.Y > 0.9 end)
+			say(r, `INFO the way out: down the bench's leg to {world.region.id} at {fmt(motor.pos)}; regions {regions(seen3)}`)
+			need(ok3, `did not come down the leg to the ground (at {fmt(motor.pos)}, {world.region.id})`)
+		end)
+
+		add("the hut garden", function(r)
+			local ctx = r.ctx
+			local world = ctx.world
+			local function visit(id: string): any
+				local region = WorldMap.region(id) :: any
+				local at = region.spawn.pos + Vector3.yAxis * HEIGHT
+				need(holdUntilReady(r, id, at, nil), `{id} is not whole`)
+				put(r, at, nil, region.spawn.heading)
+				pause(r, 1.5)
+				return world.garden[id]
+			end
+			local c3 = visit("garden_c3")
+			need(c3 ~= nil and c3.prey ~= nil, "the milkweed's gnats and aphids were not made")
+			local byKind: { [string]: number } = {}
+			for _, f in c3.prey.flies do
+				local kind = f.profile.body.prey_kind or "?"
+				byKind[kind] = (byKind[kind] or 0) + 1
+			end
+			need((byKind.fungus_gnat or 0) > 0 and (byKind.aphid or 0) > 0, `the milkweed's cell has {byKind.fungus_gnat or 0} gnats and {byKind.aphid or 0} aphids`)
+			drawn(r, c3.prey.flies, "the milkweed's")
+			need(c3.ambient ~= nil and c3.ambient.ladybird ~= nil, "no ladybird on the milkweed")
+			local d4 = visit("garden_d4")
+			need(d4 ~= nil and d4.kinds ~= nil and d4.kinds.leafhopper ~= nil and #d4.kinds.leafhopper.flies > 0, "no leafhoppers on the goldenrod")
+			drawn(r, d4.kinds.leafhopper.flies, "a leafhopper")
+			local d3 = visit("garden_d3")
+			need(d3 ~= nil and d3.kinds ~= nil and d3.kinds.springtail ~= nil and #d3.kinds.springtail.flies > 0, "no springtails in the mulch")
+			drawn(r, d3.kinds.springtail.flies, "a springtail")
+			local a1 = visit("garden_a1")
+			need(a1 ~= nil and a1.bugs ~= nil and #a1.bugs.lice > 0, "no woodlice by the trough")
+			local folder = Workspace:FindFirstChild("Bugs")
+			need(folder ~= nil, "no Bugs folder in the workspace")
+			for _, w in a1.bugs.lice do need((folder :: Instance):FindFirstChild(w.id) ~= nil, `woodlouse {w.id} is not drawn`) end
+			say(r, `INFO the hut garden: {byKind.fungus_gnat} gnats and {byKind.aphid} aphids on the milkweed with a ladybird, {#d4.kinds.leafhopper.flies} leafhoppers on the goldenrod, {#d3.kinds.springtail.flies} springtails in the mulch, {#a1.bugs.lice} woodlice by the trough, all drawn`)
+		end)
+
+		add("the hut's homes", function(r)
+			local ctx = r.ctx
+			local world = ctx.world
+			local found = {}
+			for _, id in { "hut_desk", "hut_board", "garden_a1", "garden_a3", "garden_d3" } do
+				local region = WorldMap.region(id) :: any
+				local t = region.retreats[1]
+				local inside = Vector3.new((t.min.X + t.max.X) / 2, t.min.Y + HEIGHT, (t.min.Z + t.max.Z) / 2)
+				local up = Vector3.yAxis
+				if id == "hut_board" then inside, up = Vector3.new((t.min.X + t.max.X) / 2, (t.min.Y + t.max.Y) / 2, t.min.Z + HEIGHT), Vector3.zAxis end
+				need(holdUntilReady(r, id, inside, up), `{id} is not whole`)
+				put(r, inside, up)
+				pause(r, 0.3)
+				need(world:inRetreat(ctx.motor.pos) == t.id and ctx.motor.mode == "attached", `not resting-ready in {t.id} (at {fmt(ctx.motor.pos)}, {ctx.motor.mode})`)
+				table.insert(found, t.id)
+			end
+			say(r, `INFO the hut's homes: {table.concat(found, ", ")}`)
+		end)
+
+		add("the hut by night: the lamp", function(r)
+			local ctx = r.ctx
+			local hut, life = ctx.world.hut, ctx.life
+			need(hut ~= nil and hut.lamp ~= nil, "no lamp")
+			local hour = life.clock.hour
+			local ok, err = pcall(function()
+				life.clock.hour = 22
+				need(waitUntil(r, 3, function() return hut.lit end), "the lamp did not light at night")
+				life.clock.hour = 12
+				need(waitUntil(r, 3, function() return not hut.lit end), "the lamp did not go out by day")
+			end)
+			life.clock.hour = hour
+			if not ok then error(err, 0) end
+		end)
+
+		add("the nursery: the window put back", function(r)
+			local hut = r.ctx.world.hut
+			need(hut ~= nil, "no hut on this client")
+			if not hut.trial then skip("the window was not opened by this run") end
+			put(r, SelfTest.SILL, nil)
+			pause(r, 0.3)
+			hut:reshut()
+			need(not hut.open and hut.sash ~= nil, "the window is not shut again")
+		end)
 	end
 
 	add("notebook", function(r)

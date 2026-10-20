@@ -66,6 +66,7 @@
 local Layout = require(script.Parent.Parent.Habitat.WindowsillLayout)
 local Worlds = require(script.Parent.Worlds)
 local Preserve = require(script.Parent.Preserve)
+local Hut = require(script.Parent.Hut)
 
 local WorldMap = {}
 
@@ -332,19 +333,23 @@ function WorldMap.unionOf(regions: { Region }): (Vector3, Vector3)
 	return lo, hi
 end
 
--- (ROBLOX-115) The preserve's walkable regions: the sill alone, in the hut's north window, as the test garden's sill but for its seams (no region meets it yet).
+-- (ROBLOX-115) The preserve's walkable regions: the sill, in the hut's north window, as the test garden's sill but for its seams. (ROBLOX-116) and after it the
+-- ranger hut and its garden (World/Hut): the hut's inside, the window over the sill, the way out and down outside, and the hut garden's core; the sill meets the
+-- outer sill through the sash's gap, the window's glass, the apron under it down to the floor, and the north wall's lining either side (Hut.SILL_SEAMS).
 local function authorPreserve(worldSeed: number): { Region }
-	return {
+	local list: { Region } = {
 		freeze({
 			id = "sill", kind = "sill", origin = Vector3.zero,
 			bounds = { Layout.PLAY_BOUNDS_MIN, Layout.PLAY_BOUNDS_MAX },
 			seed = WorldMap.seed(worldSeed, "sill"),
-			neighbors = {},
+			neighbors = table.clone(Hut.SILL_SEAMS) :: any,
 			retreats = { { id = "sill_crevice", min = Layout.RETREAT_MIN, max = Layout.RETREAT_MAX, door = v(-24, 1, 6) } },
 			spawn = { pos = Layout.SPAWN, heading = Layout.SPAWN_HEADING },
 			clockScale = 1.0,
 		}),
 	}
+	for _, r in Hut.author(worldSeed, WorldMap.seed) do table.insert(list, r :: any) end
+	return list
 end
 
 -- (ROBLOX-115) The preserve's backdrop: each zone of World/Preserve as a drawn-only region record (kind "backdrop", its box its bounds, its own seed), which

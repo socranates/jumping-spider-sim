@@ -131,9 +131,20 @@ default), the map in code (`World/Preserve`: the zones, home ranges and corridor
 streamed by distance (`World/PreserveLook`, 15 zones; 797 parts from the sill at the full tier, 476 at the low), the trains (`World/PreserveTrain`), the
 preserve's drift, the self-test's preserve checks, and lock-on to L2. Round 2: what the first Studio look says (the haze, the hut, the view), then Phase B.
 
+*Round 2 was taken straight into Phase B* (Nathan's go-ahead after ROBLOX-115), the haze and the first Studio look folded into Phase B's Studio checklists.
+
 **Phase B — the vertical slice (3–4 rounds).** Zone 1 (the ranger hut: inside, the sill moved into the hut's window frame with its own
 redrawn window and view, the sash/nursery rule) and zone 2 (the hut garden) at full detail, with their prey, the wasp, the rival and the
 existing life; the title/intro reshot for the preserve; this becomes the published game, replacing the test level for players.
+*Round 1 built (ROBLOX-116, 2026-10-20, not yet run in Studio):* the hut's inside walkable (nine floor cells, the desk with its drawer, lamp, notebook, mug,
+jars and hand lens, the notice board, a bookcase of field guides, the chair, the door with its gap; homes under the drawer and behind the board), the window
+over the sill, the nursery rule (`Life/Nursery`: the sash shut until the first moult has hardened, then the ranger props it on a morning, kept in the save),
+the way out (the outer sill, the logs, the bench a short line drop below, its leg to the ground; the water butt and a trough), and the hut garden's core
+(home range 2 moved to x 43.75..47.75, z 5..9 m, right under the window: sixteen cells of lawn, gravel path, a raised pollinator bed of milkweed,
+coneflower, bee balm and goldenrod under mulch, a herb bed, the feeder on its pole; gnats and aphids, springtails, leafhoppers, woodlice, a ladybird, a
+millipede and a harvestman; homes under the trough, a stone and a bark chip). Round 2: the corridor round the hut's east end and the path on to the meadow's
+edge, the rival walking the garden, the hut's own prey (the fruit flies and the moth at the lamp), the published default; round 3: the volunteers' back room
+and the cat (a doorway in the hut's east wall, `docs/HANDOFF-roblox-world.md`).
 
 **Phase C — the meadow and the path (3 rounds).** Zone 3 and the first corridor (the mown path, the bench/bin/lamppost patch, zone 8),
 crab spider and the lamppost moths, ballooning as the generation's choice.
@@ -183,6 +194,11 @@ the Steam edition (the canal, the apartment balconies and window boxes, a roofto
 
 ## 11. Progress
 
+- **ROBLOX-116 (Phase B, round 1)**: the ranger hut walkable and its way out, the nursery rule, the hut garden's core and its life; 40 regions in the preserve
+  (the sill and 39 new: 285 boxes, 69 seams), the backdrop's hut and garden drawn a hair behind the walkable boxes where both are. Decisions taken in the build:
+  the nursery ends at the first moult hardened, not after a number of days; home range 2 sits right under the north window (z 5..9 m, not 8..12); the hut's
+  walls are walkable to 1.3 m inside and 1.15 m outside (the regions' ceilings), the door's leaf to 1 m; the outside drop is 85 cm as built, taken by the logs
+  or a 40 cm line onto the bench. `docs/DECISIONS.md` ROBLOX-116; `docs/HANDOFF-roblox-world.md` has the Studio checklist.
 - **ROBLOX-115 (Phase A, round 1)**: two worlds in one engine; the preserve's map, backdrop, trains and drift; the hut's sill the only walkable place; L2 is
   the lock on controllers (a tap; held, Focus) and R3 recentres. Decisions taken in the build: the sill 85 cm over the ground outside and 70 over the hut's
   floor; the hut a 3.5 by 3 m log hut with walls 28.5 cm (the sill's reveal) and a 35-degree gable roof; covered ways at both ends of the railway so trains

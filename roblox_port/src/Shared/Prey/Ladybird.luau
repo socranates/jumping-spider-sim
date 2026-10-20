@@ -183,7 +183,7 @@ function Ladybirds.problems(self: any, lo: Vector3, hi: Vector3): { string }
 		if (typeof(p) ~= "Vector3" and type(p) ~= "table") or p.X ~= p.X or p.Y ~= p.Y or p.Z ~= p.Z or p.X < lo.X or p.X > hi.X or p.Y < lo.Y or p.Y > hi.Y or p.Z < lo.Z or p.Z > hi.Z then
 			table.insert(out, `ladybirds: beetle {i} is outside its region`)
 		end
-		if b.plant ~= "dock" and b.plant ~= "dandelion" then table.insert(out, `ladybirds: beetle {i} is on no plant`) end
+		if b.plant ~= "dock" and b.plant ~= "dandelion" and b.plant ~= "milkweed" then table.insert(out, `ladybirds: beetle {i} is on no plant`) end -- (ROBLOX-116: the hut garden's milkweed)
 		if b.walk ~= nil then
 			local why = PlantWalk.problem(b.walk)
 			if why ~= nil then table.insert(out, `ladybirds: beetle {i}: {why}`) end

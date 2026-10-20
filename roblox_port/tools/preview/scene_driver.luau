@@ -90,6 +90,21 @@ if PRESERVE then
 		table.sort(levels)
 		PRESERVE_COUNTS = `looks at {at}: {stream:parts()} parts ({table.concat(levels, " ")})`
 	end
+	-- (ROBLOX-116) the ranger hut and its garden, walkable: every region's boxes as the server builds them (the window's glass hidden under the Decor's), and the
+	-- window's sash as a client in a new save has it (shut), or propped (HUT_OPEN)
+	local hide: { [string]: boolean } = {}
+	for id in drawn do hide[id] = true end
+	for _, region in WorldMap.regions() do
+		if region.kind ~= "sill" then for _, id in Region.drawnPieces(region) do hide[id] = true end end
+	end
+	for _, region in WorldMap.regions() do
+		if region.kind ~= "sill" then WorldBuild.region(region, outside, hide) end
+	end
+	outside.Parent = workspace
+	local HutLife = require("../src/Client/HutLife")
+	local hut = HutLife.new(outside, decor, WorldMap.seed(WorldMap.SEED, "hut_window"), holder)
+	if HUT_OPEN then hut:propped() end
+	PRESERVE_COUNTS ..= `; the hut's window {if HUT_OPEN then "propped" else "shut"}`
 	local PreserveTrain = require("../src/Shared/World/PreserveTrain")
 	local TrainPass = require("../src/Client/TrainPass")
 	local train = TrainPass.new(holder, WorldMap.seed(WorldMap.SEED, "train"), DETAIL)

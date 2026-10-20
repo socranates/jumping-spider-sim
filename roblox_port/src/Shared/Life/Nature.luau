@@ -103,7 +103,9 @@ end
 
 -- The kinds of region inside the house, where the garden's night (its ground hunters, its cold) does not reach: the sill, and (ROBLOX-112) the kitchen's counter and floor.
 -- The inside's own night (the house spider, the lamp's moths) is the inside's round (docs/WORLD_MAP_PLAN.md).
-Nature.INDOORS = table.freeze({ sill = true, counter = true, kitchen_floor = true })
+-- (ROBLOX-116: and the ranger hut's inside, World/Hut.INDOORS: its floor, its furniture and the window over the sill)
+Nature.INDOORS = table.freeze({ sill = true, counter = true, kitchen_floor = true, hut_window = true, hut_floor = true, hut_desk = true, hut_board = true, hut_shelf = true,
+	hut_chair = true })
 
 -- Whether a spider is exposed to the night where it is: in the standard rules, anywhere outside the house (ROBLOX-106: anywhere but the sill), out of every retreat.
 function Nature.exposed(standard: boolean, regionKind: string, inRetreat: boolean): boolean

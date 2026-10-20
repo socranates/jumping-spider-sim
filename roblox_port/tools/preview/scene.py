@@ -51,6 +51,7 @@ ap.add_argument("--looks-at", default="", help="x,y,z: draw the looks outside th
 ap.add_argument("--title", action="store_true", help="ROBLOX-109: add the first minute's camera frames (Shared/Movement/TitleShots.views: title_drift_0, title_drift_18, title_drift_36, intro_glass, intro_sill, intro_out); use with --world")
 ap.add_argument("--lineup", action="store_true", help="ROBLOX-114: stand every creature side by side on a ruler far off at x 400 (views lineup_small, lineup_big and their close-ups) and write what each one measures as drawn to <prefix>lineup.txt")
 ap.add_argument("--preserve", action="store_true", help="ROBLOX-115: the preserve is the world: the sill's Decor without the test garden's view, the backdrop as a client at the sill holds it (or at --looks-at), a train on the line; views pv_* and preserve_drift_*")
+ap.add_argument("--hut-open", action="store_true", help="ROBLOX-116: with --preserve, the hut's window propped open (the nursery over); shut otherwise")
 ap.add_argument("--preserve-all", action="store_true", help="ROBLOX-115: with --preserve, every zone of the backdrop at the --detail tier's whole detail, not the client's plan")
 ap.add_argument("--elevation", type=float, default=30.0, help="sun elevation, degrees")
 ap.add_argument("--set", action="append", default=[], help="lighting knob for scene.gd, key=value (energy, ambient, bias, nbias, blur)")
@@ -68,6 +69,13 @@ SPIDERS = [
     {"name": "bed", "x": 11.0, "y": -89.69, "z": -43.5, "hx": 0, "hz": -1},
     # ROBLOX-112 (--world): one on the kitchen's worktop in front of the toaster
     {"name": "kitchen", "x": -45.0, "y": -3.69, "z": 41.0, "hx": 0, "hz": -1},
+]
+# ROBLOX-116 (--preserve): spiders in the ranger hut and its garden (World/Hut): on the desk, on the floor, on the bench outside, on the pollinator bed's mulch
+HUT_SPIDERS = [
+    {"name": "desk", "x": 80.0, "y": 4.31, "z": 45.0, "hx": -0.7, "hz": -0.7},
+    {"name": "floor", "x": 10.0, "y": -69.69, "z": 60.0, "hx": 0, "hz": -1},
+    {"name": "bench", "x": -10.0, "y": -39.69, "z": -40.0, "hx": 0, "hz": -1},
+    {"name": "garden", "x": 22.0, "y": -74.29, "z": -246.0, "hx": 1, "hz": -0.3},
 ]
 FLIES = [
     {"id": "fly_a", "x": -16.0, "y": 0.16, "z": 4.0, "hx": 1, "hy": 0, "hz": -0.35, "flying": False},  # on the sill floor, hover 0.16
@@ -100,11 +108,11 @@ def dump_parts(path):
     spec.loader.exec_module(run)
     driver = str(HERE / "scene_driver.luau")
     run.CLIENT_TESTS.add(driver)  # the driver needs the client modules (SpiderRig, FlyBodies) in its bundle
-    spiders = SPIDERS if args.world else SPIDERS[:2]
+    spiders = SPIDERS if args.world else (SPIDERS[:2] + HUT_SPIDERS if args.preserve else SPIDERS[:2])
     prefix = (f'DETAIL = {lua(args.detail)}\nSUN_ELEVATION_DEG = {args.elevation}\nSUN_AZIMUTH_DEG = {args.azimuth}\n'
               f'SPIDERS = {lua(spiders)}\nFLIES = {lua(FLIES)}\nWASPS = {lua(WASPS)}\nWORLD = {lua(args.world)}\n'
               f'LOOKS_AT = {lua([float(c) for c in args.looks_at.split(",")] if args.looks_at else False)}\nLINEUP = {lua(args.lineup)}\n'
-              f'PRESERVE = {lua(args.preserve)}\nPRESERVE_ALL = {lua(args.preserve_all)}\n')
+              f'PRESERVE = {lua(args.preserve)}\nPRESERVE_ALL = {lua(args.preserve_all)}\nHUT_OPEN = {lua(args.hut_open)}\n')
     with tempfile.NamedTemporaryFile("w", suffix=".luau", encoding="utf-8", delete=False, dir=out) as f:
         f.write(prefix + run.bundle(driver))
     try:
@@ -372,6 +380,29 @@ VIEWS.update({
     "pv_west": {"fov": 60, "eye": [-1800.0, 110.0, -2200.0], "at": [-3800.0, 400.0, -3300.0], "near": 1.0, "far": 14000, "groups": [], "shadow": 2500},
     "pv_south": {"fov": 60, "eye": [600.0, 120.0, -600.0], "at": [-200.0, 60.0, 800.0], "near": 1.0, "far": 14000, "groups": [], "shadow": 2000},
 })
+
+
+# ROBLOX-116 (--preserve): the ranger hut walkable. Studs, the sill's frame: the room +z of the sill (x -146.5..146.5, z 12.5..255.5, its floor y -70), the garden's
+# core -z of the hut's north wall (x -200..200, z -16..-416, its ground y -84.6).
+VIEWS.update({
+    "hb_inside": {"fov": 64, "eye": [0.0, 8.0, 9.0], "at": [10.0, -45.0, 160.0], "near": 0.1, "far": 14000, "groups": ["desk", "floor"], "shadow": 400},
+    "hb_inside_wide": {"fov": 70, "eye": [-128.0, 45.0, 238.0], "at": [30.0, -35.0, 50.0], "near": 0.5, "far": 14000, "groups": ["desk", "floor"], "shadow": 500},
+    "hb_desk": {"fov": 50, "eye": [62.0, 30.0, 115.0], "at": [86.0, 4.0, 36.0], "near": 0.1, "far": 14000, "groups": ["desk"], "shadow": 200},
+    "hb_game_desk": {**game_camera(80.0, 45.0, -0.7, -0.7), "far": 14000, "groups": ["desk"], "shadow": 60},
+    "hb_board": {"fov": 55, "eye": [-80.0, 22.0, 85.0], "at": [-92.0, 18.0, 14.0], "near": 0.1, "far": 14000, "groups": [], "shadow": 200},
+    "hb_door": {"fov": 60, "eye": [8.0, -62.0, 205.0], "at": [0.0, -69.0, 262.0], "near": 0.1, "far": 14000, "groups": [], "shadow": 200},
+    "hb_out": {"fov": 64, "eye": [0.0, 9.0, -1.0], "at": [10.0, -40.0, -320.0], "near": 0.1, "far": 14000, "groups": [], "shadow": 600},
+    "hb_down": {"fov": 60, "eye": [95.0, 15.0, -170.0], "at": [-15.0, -45.0, -25.0], "near": 0.5, "far": 14000, "groups": ["bench"], "shadow": 400},
+    "hb_down_close": {"fov": 55, "eye": [30.0, -10.0, -75.0], "at": [-5.0, -30.0, -20.0], "near": 0.1, "far": 14000, "groups": ["bench"], "shadow": 200},
+    "hb_garden": {"fov": 62, "eye": [28.0, -70.0, -228.0], "at": [70.0, -38.0, -320.0], "near": 0.1, "far": 14000, "groups": ["garden"], "shadow": 400},
+    "hb_game_garden": {**game_camera(22.0, -246.0, 1, -0.3), "far": 14000, "groups": ["garden"], "shadow": 60},
+    "hb_garden_top": {"fov": 58, "eye": [0.0, 560.0, -150.0], "at": [0.0, -85.0, -232.0], "near": 1.0, "far": 14000, "groups": [], "shadow": 1500},
+})
+# (the game camera's pivot is 0.31 over a support at y 0; on the desk and the mulch the support is higher)
+VIEWS["hb_game_desk"]["eye"][1] += 4.0
+VIEWS["hb_game_desk"]["at"][1] += 4.0
+VIEWS["hb_game_garden"]["eye"][1] += -74.6
+VIEWS["hb_game_garden"]["at"][1] += -74.6
 
 
 def preserve_views():

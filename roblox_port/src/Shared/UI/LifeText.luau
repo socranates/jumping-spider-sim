@@ -76,6 +76,42 @@ LifeText.HOMES = {
 		way = "Walk into the gap under the toaster on the counter, then stop to rest.",
 		kept = "Last rest kept, under the toaster.",
 	},
+	-- ROBLOX-116: the ranger hut's homes, inside and in its garden
+	hut_desk_drawer = {
+		name = "under the drawer",
+		title = "Under the drawer",
+		home = "Home: under the desk's drawer",
+		way = "Walk into the gap under the desk's drawer, then stop to rest.",
+		kept = "Last rest kept, under the drawer.",
+	},
+	hut_board_gap = {
+		name = "behind the notice board",
+		title = "Behind the notice board",
+		home = "Home: behind the notice board",
+		way = "Walk into the gap behind the notice board, then stop to rest.",
+		kept = "Last rest kept, behind the notice board.",
+	},
+	garden_a1_trough = {
+		name = "under the trough",
+		title = "Under the trough",
+		home = "Home: under the trough",
+		way = "Walk into the gap under the trough by the hut, then stop to rest.",
+		kept = "Last rest kept, under the trough.",
+	},
+	garden_a3_stone = {
+		name = "under the stone",
+		title = "Under the stone",
+		home = "Home: under the stone",
+		way = "Walk into the gap under the flat stone in the grass, then stop to rest.",
+		kept = "Last rest kept, under the stone.",
+	},
+	garden_d3_mulch = {
+		name = "under the bark chip",
+		title = "Under the bark chip",
+		home = "Home: under the bark chip",
+		way = "Walk into the gap under the bark chip in the mulch, then stop to rest.",
+		kept = "Last rest kept, under the bark chip.",
+	},
 } :: { [string]: { name: string, title: string, home: string, way: string, kept: string } }
 LifeText.DEFAULT_HOME = "sill_crevice"
 local function homeOf(retreat: string?): { name: string, title: string, home: string, way: string, kept: string }

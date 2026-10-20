@@ -804,3 +804,50 @@ byte for byte as before. **Nothing of it has run in Studio.**
   near from the railway bank. Keep them, or a skyline painted on the sky later?
 - The train's rumble is a procedural recording; upload it (checklist 8) or ask for another.
 - On a controller Focus now starts 0.35 s after L2 goes down (a tap is the lock). Say if you would rather have Focus on another button.
+
+## The ranger hut, walkable: the nursery, the way out, the hut garden (ROBLOX-116, 2026-10-20)
+
+Claude → Chet, 2026-10-20, branch `claude/preserve-b1`. Phase B, round 1 of `docs/PARK_WORLD_DESIGN.md`. In the preserve (the Workspace attribute `World` =
+"preserve"; the published default is still the test garden) the ranger hut is walkable round the sill: its floor, the desk under its lamp with a drawer to
+hide under, the notice board with a gap behind it, a bookcase of field guides, the chair, the door with a 1.5 cm gap under it; the window over the sill is
+**shut** in a new save, and the ranger props it (a hand outside the glass lifts the sash and wedges it) on the first morning after the spider's first moult
+has hardened, and it stays open in that save. Out through the window: the outer sill, the logs, the bench under the window, its leg to the ground, and the
+hut garden's core right under the window (lawn, gravel path, a raised pollinator bed of milkweed, coneflower, bee balm and goldenrod, a herb bed, a trough,
+the bird feeder on its pole) with gnats, aphids, springtails, leafhoppers, woodlice, a ladybird, a millipede and a harvestman. 40 regions in the preserve.
+**Nothing of it has run in Studio.**
+
+## Your Studio checklist (ROBLOX-116)
+
+1. **The test garden, unchanged**: Play the place as it is: `world: The Test Garden`; the self-test as before (39 checks).
+2. **The preserve, a new save**: `workspace:SetAttribute("World", "preserve")`, Play, begin a new life. On the sill look round: the room behind you (the desk
+   to the right with its lamp, the board to the left, the bookcase, the chair, the door), and out of the window the hut garden right under it. Walk at the
+   window's middle: the spider climbs the shut sash's glass and does not get out. Walk off the sill's front edge: down the wall to the floor. Screenshot the
+   room from the sill, the desk, the board, and the view out of the window, for Nathan.
+3. **The ranger's moment**: the quickest way is the self-test (checklist 6), which makes the rule true for a moment. To see it in play, feed the spider to
+   its first moult (five houseflies' worth in Normal) and wait for it to harden (10 hours of its day) and for a morning (7:30 to 9:30): a hand comes up
+   outside the glass, lifts the sash and wedges it, about six seconds. Say how it looks and whether it reads as a person (a sleeve, a forearm, a hand).
+4. **The way out**: through the gap beside the wedge onto the outer sill; over the outer sill's front edge and down the logs to the bench's seat (or drop a
+   line from the edge: 40 cm onto the seat); over the seat's edge and down its leg to the lawn. Try the door's gap from inside: the spider passes under the
+   leaf onto the step and the gravel (beyond it the next round's path; walking off the gravel's edge puts it back).
+5. **The garden from a spider's height**: walk into the pollinator bed (milkweed, coneflower, bee balm, goldenrod, under mulch); climb the milkweed; find the
+   aphids on its leaves and the ladybird among them; the leafhoppers on the goldenrod; the springtails by the bark chip; the woodlice by the trough. Rest
+   under the trough, the stone and the bark chip. Say what reads wrong at true scale.
+6. **The self-test in the preserve**: `workspace:SetAttribute("SelfTest", true)` with World "preserve", Play: 62 checks (every region's, the nursery's two,
+   the hut's inside, the way out, the hut garden, the homes, the lamp, the window put back). Its opening of the window is never saved. Paste the INFO lines.
+7. **Streaming**: with the spider in the garden's far corner (the goldenrod) the hut's lower wall and the sill should still be drawn (the backdrop stands in
+   for streamed-out boxes, a hair behind them); and from the sill, the garden's far beds' plants may not be there until the spider comes near (their boxes
+   are the look). Say if anything pops or is missing, and the frame time in the bed and in the hut.
+8. **The lamp**: at night (the clock past dusk) the desk lamp lights the desk. Say how it looks; the hut's light by day is Roblox's own through the windows.
+9. Set the World attribute back before publishing (the published game stays the test garden until Phase B ends).
+
+## Open for Nathan (ROBLOX-116)
+
+- The nursery ends at the first moult hardened, on a morning, not after a number of days (`Life/Nursery`, `docs/DECISIONS.md` ROBLOX-116 says why). Say if you
+  would rather it opened after a number of days too, for a spider that cannot feed.
+- The hut garden's core sits right under the north window (4 by 4 m, z 5..9 m), not a metre further out as the plan had it, so the window looks onto it and the
+  way down lands in it.
+- The walls are walkable to 1.3 m inside and 1.15 m outside; above that the spider is put back. The ceiling, the upper walls and the volunteers' back room with
+  the cat are round 3 (a doorway in the east wall).
+- The rival and the mate still keep to the sill; the rival walking the garden, the corridor round the hut's east end and the hut's own prey (fruit flies, the
+  moth at the lamp) are round 2. No hoverfly yet (it needs its page).
+- The sash's sound and the ranger's footsteps: none (no recording yet). Say if you want them.

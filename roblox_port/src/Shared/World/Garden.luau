@@ -33,6 +33,7 @@
 -- kettle) and `kitchen_floor` (the floor in front of it, the cupboards). The eaves' look draws the room beyond the window until the rooms are built.
 local Flora = require(script.Parent.Parent.Data.Flora)
 local WorldMap = require(script.Parent.WorldMap)
+local Hut = require(script.Parent.Hut) -- (ROBLOX-116: the preserve's hut garden lives by the same questions; its answers are World/Hut's)
 
 local Garden = {}
 
@@ -193,6 +194,7 @@ local function holdsPipe(region: WorldMap.Region): boolean
 	return b.min.X >= lo.X and b.max.X <= hi.X and b.min.Z >= lo.Z and b.max.Z <= hi.Z
 end
 function Garden.standingFrom(region: WorldMap.Region): { Box }
+	if Hut.knows(region.kind) then return {} end
 	if not holdsPipe(region) then return {} end
 	local b = pipeBox()
 	return { { min = b.min, max = v(b.max.X, b.min.Y + 2, b.max.Z) } }
@@ -2073,6 +2075,7 @@ end
 -- stone's top and under the dock's leaves; the aphids' (walker perches) on the dock's leaves and stem and the dandelion's leaves; the gnats' vents two more spots
 -- on the soil, the aphids' at the plants. Perches sit exactly on a box's face (the director's graph casts for the face and keeps only what it finds).
 function Garden.prey(region: WorldMap.Region): PreySpec?
+	if Hut.knows(region.kind) then return Hut.prey(region :: any) end -- (ROBLOX-116)
 	if region.kind ~= "bed" then return nil end
 	local key = region.id .. "/" .. tostring(region.seed)
 	local cached = preyCache[key]
@@ -2189,6 +2192,7 @@ local function shrubBugs(region: WorldMap.Region): BugSpec
 end
 
 function Garden.bugs(region: WorldMap.Region): BugSpec?
+	if Hut.knows(region.kind) then return Hut.bugs(region :: any) end -- (ROBLOX-116)
 	if region.kind ~= "bed" and region.kind ~= "shrub" then return nil end
 	local key = region.id .. "/" .. tostring(region.seed)
 	local cached = bugsCache[key]
@@ -2397,6 +2401,7 @@ end
 -- (`bed_a_springtail_`...), and for the moths and the crane flies the hours they fly. Every vent is an `appear` vent: the prey comes on a free perch in reach,
 -- out of sight.
 function Garden.bestiary(region: WorldMap.Region): { KindSpec }?
+	if Hut.knows(region.kind) then return Hut.bestiary(region :: any) :: any end -- (ROBLOX-116)
 	local rows = (Garden.BESTIARY :: any)[region.kind]
 	if rows == nil then return nil end
 	local key = region.id .. "/" .. tostring(region.seed)
@@ -2456,6 +2461,7 @@ local function unit(a: Vector3, b: Vector3): Vector3
 end
 
 function Garden.plants(region: WorldMap.Region): { [string]: Plant }?
+	if Hut.knows(region.kind) then return Hut.plants(region :: any) :: any end -- (ROBLOX-116)
 	if region.kind ~= "bed" then return nil end
 	local key = region.id .. "/" .. tostring(region.seed)
 	local cached = plantsCache[key]
@@ -2552,6 +2558,10 @@ end
 
 -- The plant a perch is on ("dock", "dandelion") and the bed's plants, or nil for a perch on no plant. Every bed of the map is made the first time it is asked.
 function Garden.plantOf(perchId: string): (string?, { [string]: Plant }?)
+	if WorldMap.world() ~= "test_garden" then -- (ROBLOX-116: the preserve's plants are World/Hut's)
+		local name, plants = Hut.plantOf(perchId, WorldMap.regions() :: any)
+		return name, plants :: any
+	end
 	local name = plantOfPerch[perchId]
 	if name == nil then
 		for _, r in WorldMap.regions() do if r.kind == "bed" then Garden.plants(r) end end
@@ -2623,6 +2633,7 @@ local ambientCache: { [string]: { AmbientSpec } } = {}
 -- The region's ambient bugs: one spec per kind, in AMBIENT.order (nil for a region with none). Each has its own seed (the region's mixed with the kind's salt) and
 -- its starting places for the full tier's count (the low tier takes the first `low`).
 function Garden.ambient(region: WorldMap.Region): { AmbientSpec }?
+	if Hut.knows(region.kind) then return Hut.ambient(region :: any) :: any end -- (ROBLOX-116)
 	local rows = (Garden.AMBIENT :: any)[region.kind]
 	if rows == nil or region.kind == "order" or region.kind == "budget" then return nil end
 	local key = region.id .. "/" .. tostring(region.seed)

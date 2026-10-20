@@ -86,9 +86,10 @@ local function reach(self: any, region: any, pos: Vector3): number
 	return if any then far else math.huge
 end
 
--- Whether a region has prey at all: the sill's (the home), or a kind Garden places prey in (W3's or the bestiary's).
+-- Whether a region has prey at all: the sill's (the home), or a kind Garden places prey in (W3's or the bestiary's). (ROBLOX-116: or woodlice or ambient bugs alone,
+-- as the hut garden's lawn by the trough and the stone has: every region of the test garden with those has prey too, so nothing there changes.)
 function PreyWorld.hasPrey(self: any, region: any): boolean
-	return region.id == self.world.home or Garden.prey(region) ~= nil or Garden.bestiary(region) ~= nil
+	return region.id == self.world.home or Garden.prey(region) ~= nil or Garden.bestiary(region) ~= nil or Garden.bugs(region) ~= nil or Garden.ambient(region) ~= nil
 end
 
 -- The ids of the regions whose prey runs at this place: the spider's own, and each neighbour with prey whose farthest perch is within ACTIVE_RADIUS (none while

@@ -46,8 +46,8 @@ underside on the real motor, the camera's goal and follow, the words and the tou
 sensor has seen, the camera and the body on it, the sidestep at a creep, the aim on it, its endings, R3, the touch Lock, Reduced Motion, the eye view, and
 the setting that hides the perception HUD while the lock's ticks stay) and
 tests/preserve.luau (ROBLOX-115: two worlds, one engine: the worlds, the map for the active world, the preserve's map and shift, its backdrop's looks, budgets and
-precision, the plan in the preserve, its drift and its trains) and tests/selftest_preserve.luau (ROBLOX-115: the live place's self-test through the real client in
-the preserve) and
+precision, the plan in the preserve, its drift and its trains; ROBLOX-116: the ranger hut and its garden walkable, the nursery rule) and tests/selftest_preserve.luau
+(ROBLOX-115: the live place's self-test through the real client in the preserve; ROBLOX-116: the hut's inside, the way out, the garden's life) and
 tests/quiet.luau (ROBLOX-113, W5: the quiet HUD: every string of the play screen classified, what Normal shows on the first day and after it, Easy's every
 word, the notices line by line, the perception labels calmed, and the same through the real client).
 Usage (from roblox_port/):  python3 tests/run.py [path/to/luau [test.luau ...]]   (default: all of them)"""
@@ -66,6 +66,7 @@ MODULES = [
     ("Worlds", "World/Worlds.luau"),
     ("Preserve", "World/Preserve.luau"),
     ("PreserveTrain", "World/PreserveTrain.luau"),
+    ("Hut", "World/Hut.luau"),
     ("WorldMap", "World/WorldMap.luau"),
     ("Breakaway", "Habitat/Breakaway.luau"),
     ("Detail", "Data/Detail.luau"),
@@ -127,6 +128,7 @@ MODULES = [
     ("PreyMath", "Prey/PreyMath.luau"),
     ("PreyRandom", "Prey/PreyRandom.luau"),
     ("Nature", "Life/Nature.luau"),
+    ("Nursery", "Life/Nursery.luau"),
     ("MatingRules", "Data/MatingRules.luau"),
     ("RivalRoute", "Predator/RivalRoute.luau"),
     ("RivalSpider", "Predator/RivalSpider.luau"),
@@ -224,6 +226,7 @@ CLIENT_MODULES = [
     ("FrameProfile", "../Client/FrameProfile.luau"),
     ("LookStream", "../Client/LookStream.luau"),
     ("TrainPass", "../Client/TrainPass.luau"),
+    ("HutLife", "../Client/HutLife.luau"),
     ("WorldClient", "../Client/WorldClient.luau"),
     ("SelfTest", "../Client/SelfTest.luau"),
 ]

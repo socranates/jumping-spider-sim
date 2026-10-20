@@ -28,6 +28,9 @@
 -- is the retreat the words call home: the one the spider is in, else the first of the region it is in, else the last one it was in (the crack to begin with).
 -- ROBLOX-115 (two worlds, one engine): the world it is (`world`, World/Worlds) is the Workspace attribute World, made WorldMap's active one in `new`; in the preserve
 -- the looks are its backdrop's zones too (World/LookPlan), and `train` (Client/TrainPass) runs the trains on the railway beyond the north fence.
+-- ROBLOX-116 (the ranger hut, walkable): in the preserve `hut` (Client/HutLife) keeps the window's sash shut through the nursery and has the ranger prop it when the
+-- spider is ready (Life/Nursery), and lights the desk lamp at night; `life` is the client's life loop (set by the client), which the rule reads each frame.
+-- `hutOpen` says whether the window is open (the progress record keeps it), `openHut` opens it at once (a save that has it).
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local WorldMap = require(Shared:WaitForChild("World"):WaitForChild("WorldMap"))
@@ -36,6 +39,7 @@ local Region = require(Shared:WaitForChild("World"):WaitForChild("Region"))
 local LifeClock = require(Shared:WaitForChild("Life"):WaitForChild("LifeClock"))
 local LookStream = require(script.Parent.LookStream)
 local TrainPass = require(script.Parent.TrainPass)
+local HutLife = require(script.Parent.HutLife)
 local FrameProfile = require(script.Parent.FrameProfile)
 
 local WorldClient = {}
@@ -110,6 +114,7 @@ function WorldClient.new(ws: Instance, player: Instance, map: any?): any
 		-- ROBLOX-96: the world's prey and the drawn bugs (set by the client), and the last retreat the spider was in or beside
 		prey = nil :: any, bugs = nil :: any, lastRetreat = if #home.retreats > 0 then home.retreats[1].id else nil,
 		world = if m.world ~= nil then m.world() else Worlds.DEFAULT, train = nil :: any, -- (ROBLOX-115: the world it is, and the preserve's train once the looks are made)
+		hut = nil :: any, life = nil :: any, hutPending = false, -- (ROBLOX-116: the hut's sash and lamp in the preserve, the life the nursery rule reads, a save's open window before the hut is made)
 	}, WorldClient)
 end
 
@@ -211,13 +216,18 @@ function WorldClient.streamLooks(self: any, ws: Instance, tier: string): any
 	self.looks = LookStream.new(ws, tier, self.root, self.map)
 	-- (ROBLOX-115) in the preserve, the trains beyond the north fence, with the looks
 	if self.world == Worlds.PRESERVE then self.train = TrainPass.new(self.looks.folder, WorldMap.seed(WorldMap.SEED, "train"), tier) end
+	-- (ROBLOX-116) and the hut's sash and lamp
+	if self.world == Worlds.PRESERVE then
+		self.hut = HutLife.new(self.root, self.decor, WorldMap.seed(WorldMap.SEED, "hut_window"), ws)
+		if self.hutPending then self.hut:restore(true) end
+	end
 	return self.looks
 end
 
--- Each frame, before the sim's ticks: the region the spider is in, the pace of its day, the focus on the drawn spider's root (`root`) when it is not set on it yet, the
+-- Each frame, before the sim's ticks (`dt`, ROBLOX-116: the frame's seconds, for the hut's own moment): the region the spider is in, the pace of its day, the focus on the drawn spider's root (`root`) when it is not set on it yet, the
 -- report of where it is to the server (`now`: os.clock() unless a test gives a clock), the looks near it (ROBLOX-108), and whether the region it is in has arrived
 -- whole (warned about once if not).
-function WorldClient.update(self: any, pos: Vector3, root: Instance?, now: number?)
+function WorldClient.update(self: any, pos: Vector3, root: Instance?, now: number?, dt: number?)
 	self.region = self.map.at(pos) or self.region
 	LifeClock.game.clockScale = self.region.clockScale
 	if root ~= nil and root ~= self.focused then self:focus(root) end
@@ -226,6 +236,9 @@ function WorldClient.update(self: any, pos: Vector3, root: Instance?, now: numbe
 	FrameProfile.lap("world")
 	if self.looks ~= nil then self.looks:update(pos, self.region) end
 	if self.train ~= nil then self.train:update(clock) end
+	-- (ROBLOX-116: the hut's moment runs on the frames' own time when the client gives it, so it keeps the sim's pace; else on the clock)
+	self.hutClock = (self.hutClock or 0) + (if dt ~= nil then dt else 0)
+	if self.hut ~= nil then self.hut:update(self.life, if dt ~= nil then self.hutClock else clock) end
 	FrameProfile.lap("looks") -- (ROBLOX-111: the self-test's frame profile, Client/FrameProfile)
 	local id = self.region.id
 	if not self.whole[id] then
@@ -236,6 +249,18 @@ function WorldClient.update(self: any, pos: Vector3, root: Instance?, now: numbe
 			tell(`[Windowsill] world: the spider is in {id}, which has not arrived whole; it may fall through where a box should be`)
 		end
 	end
+end
+
+-- (ROBLOX-116) Whether the hut's window is open (the preserve's progress: false in the test garden).
+function WorldClient.hutOpen(self: any): boolean
+	if self.hut ~= nil then return self.hut.open == true and not self.hut.trial end -- (the self-test's trial opening is never kept)
+	return self.hutPending == true
+end
+
+-- (ROBLOX-116) The save says the hut's window is open: it opens now, without the ranger's moment (and when the hut is made, if it is not yet).
+function WorldClient.openHut(self: any)
+	self.hutPending = true
+	if self.hut ~= nil then self.hut:restore(true) end
 end
 
 return WorldClient

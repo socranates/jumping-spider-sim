@@ -360,7 +360,8 @@ local function checkWorld(roots: { [string]: any }, problems: { string })
 			for id, entry in garden do
 				local region = if type(id) == "string" then WorldMap.region(id) else nil
 				local kinds = if region ~= nil then Garden.bestiary(region) else nil
-				if region == nil or (Garden.prey(region) == nil and kinds == nil) then bad(`garden: {tostring(id)} is not a region with prey`); continue end
+				-- (ROBLOX-116: or with woodlice or ambient bugs alone, as the hut garden's lawn has)
+				if region == nil or (Garden.prey(region) == nil and kinds == nil and Garden.bugs(region) == nil and Garden.ambient(region) == nil) then bad(`garden: {tostring(id)} is not a region with prey`); continue end
 				if type(entry) ~= "table" or getmetatable(entry) ~= nil then bad(`garden: {id} is not a record`); continue end
 				if entry.prey ~= nil then
 					if getmetatable(entry.prey) ~= PreyDirector then bad(`garden: {id}'s prey is not a prey director`)

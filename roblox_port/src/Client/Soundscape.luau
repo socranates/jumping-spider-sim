@@ -27,6 +27,10 @@ local DUCK_S = 1.0
 local SWELL = 1.6
 local SWELL_S = 1.0
 Soundscape.SWELL, Soundscape.SWELL_S = SWELL, SWELL_S -- (the tests read them)
+-- ROBLOX-109: the title card. While it is up (setTitle(true): no life begun this visit, or the intro of a new one holding), the music plays though the
+-- menu has the game, and the first time it is asked it rises from silence to its level over RISE_S seconds. Nothing else plays over the title card.
+local RISE_S = 8.0
+Soundscape.RISE_S = RISE_S
 local function voice(parent: Instance, name: string, volume: number, looped: boolean): Sound
 	local s = Instance.new("Sound")
 	s.Name = name
@@ -68,7 +72,7 @@ function Soundscape.new(parent: Instance): any
 	local music: Sound? = if IDS.music ~= "" then voice(root, "music", MIX.music, true) else nil
 	if music ~= nil then reportMusicLoad(music) end
 	return setmetatable({ root = root, room = voice(root, "room", MIX.room, true),
-		music = music, musicVolume = 1, duck = 1, duckTarget = 1, swell = 1, swellWanted = false, musicAsked = 0, musicWarned = false,
+		music = music, musicVolume = 1, title = false, rise = 1, risen = false, duck = 1, duckTarget = 1, swell = 1, swellWanted = false, musicAsked = 0, musicWarned = false,
 		waspEmitter = emitter, waspHum = hum, master = 1, ambience = 1, creatures = 1,
 		birds = voice(root, "birds", MIX.birds, false), slots = {}, elapsed = 0, nextBird = 8 }, Soundscape)
 end
@@ -76,6 +80,11 @@ end
 -- the room go on as they were. While the wasp ducks the music the swell is ignored (the duck wins).
 function Soundscape.setSwell(self: any, on: boolean)
 	self.swellWanted = on
+end
+-- The title card is up (true) or not: the music plays under it, and rises from silence the first time (ROBLOX-109).
+function Soundscape.setTitle(self: any, on: boolean)
+	if on and not self.risen then self.risen = true; self.rise = 0 end
+	self.title = on
 end
 -- The player's volumes, each 0 to 1 (`music`, the fourth, is 1 when left out).
 function Soundscape.setVolumes(self: any, master: number, ambience: number, creatures: number, music: number?)
@@ -105,8 +114,10 @@ function Soundscape.update(self: any, dt: number, prey: any, daylight: number, p
 	self.swell += math.clamp(swellTarget - self.swell, -(SWELL - 1) / SWELL_S * dt, (SWELL - 1) / SWELL_S * dt)
 	local music: Sound? = self.music
 	if music then
-		music.Volume = MIX.music * self.master * self.musicVolume * self.duck * self.swell
-		playing(music, audible)
+		local heard = audible or (self.title and not muted) -- (ROBLOX-109: the title card's music, though a menu has the game)
+		if heard then self.rise = math.min(1, self.rise + dt / RISE_S) end
+		music.Volume = MIX.music * self.master * self.musicVolume * self.duck * self.swell * self.rise
+		playing(music, heard)
 		-- (ROBLOX-100: a music that has been asked to play for MUSIC_LOAD_WARN_S seconds and still says it has not loaded is reported once, in Output only.)
 		if audible and not self.musicWarned then
 			self.musicAsked += dt

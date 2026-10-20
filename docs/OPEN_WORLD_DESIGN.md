@@ -202,7 +202,8 @@ exploration you gotta earn"; "you get time to enjoy the scenery because you are 
    `docs/HANDOFF-roblox-world.md`; CLI only, not run in Studio. The footfall and the other rare things are still to come.)*
 5. **W5 — no hand holding** (ROBLOX-98): the HUD and notice audit for Normal — hints only on day one, captions
    sparing, nothing added for the garden but a region name on the day line.
-Then full suites, places, bundle, publish.
+Then full suites, places, bundle, publish. *(Toward the publish, 2026-10-20, ROBLOX-109: the game's own splash, the start menu as a title card, the intro of a
+new life, the cards in one typeface, and the store page's plan in `docs/STORE_PAGE.md`; CLI only, not run in Studio.)*
 
 ## Risks, named
 

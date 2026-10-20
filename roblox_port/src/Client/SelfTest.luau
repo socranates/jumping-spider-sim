@@ -10,7 +10,8 @@
 --   INFO <what>: <numbers>                                    the frame times and part counts (numbers, not a verdict), and what a check measured
 --   ... <name> (<t> s in)                                      a heartbeat every HEARTBEAT_S seconds of waiting, so a hang shows where it hung
 --   END pass=<n> fail=<m> skip=<k>                             always the last line
--- The checks: the World folder and every region's folder; for every region, its boxes all there once the spider is held at its spawn (streaming, with a deadline), ground
+-- The checks: the intro of a new life (ROBLOX-109: playing after the new life, or begun through its hook in the test place, which has no start menu; its skip refused
+-- before two seconds and taken after, the controls and the camera back, the spider standing out of the crack); the World folder and every region's folder; for every region, its boxes all there once the spider is held at its spawn (streaming, with a deadline), ground
 -- under the spider there and the spider still there a second later, and the region the client's world reports; a walk on the sill; a let-down on the line from the outer
 -- sill's front edge at about 0.75 studs a second, on the line all the way; the sill's flies, the bed's gnats, aphids, springtails and leafhoppers and the wall's moths made
 -- and drawn under the fly's part budget; the woodlice made and drawn; the notebook opened and closed; the clock put to dusk and the moths flying; a rest in the crack,
@@ -220,6 +221,24 @@ local function checks(): { Check }
 		pause(r, 0.5)
 		need(session.started and not menu:isShowing(), "the life did not begin")
 		need(ctx.motor.mode == "attached", `the spider is not standing ({ctx.motor.mode})`)
+	end)
+
+	-- ROBLOX-109: the intro of a new life. From the start menu it is playing now (a save that has seen it does not play it: then it is begun here, as in the
+	-- test place, through its hook, whatever was seen); the skip is what the skip key's action calls.
+	add("intro", function(r)
+		local ctx = r.ctx
+		local title = ctx.title
+		need(title ~= nil, "no title card in the hooks")
+		if not title:holding() then need(title:beginIntro(true, false), "the intro would not begin") end
+		need(title:holding(), "the intro is not holding")
+		need(not title:skip(), "the skip was taken before two seconds")
+		pause(r, 2.2)
+		need(title:holding(), "the intro let go of the controls before its end")
+		need(title:skip(), "the skip was refused after two seconds")
+		pause(r, 0.6)
+		need(not title:holding() and not title:playing(), "the intro is still playing after its skip")
+		need(ctx.motor.mode == "attached", `the spider is not standing after the intro ({ctx.motor.mode})`)
+		need(ctx.motor.pos.X >= -21.7, string.format("the spider is still in the crack (x %.2f)", ctx.motor.pos.X))
 	end)
 
 	add("world folders", function(r)

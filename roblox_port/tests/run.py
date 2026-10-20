@@ -37,7 +37,10 @@ tests/selftest.luau (ROBLOX-104: the live place's Studio self-test, Client/SelfT
 tests/nature.luau (ROBLOX-106, W4: movement's cost, cover, the wasp's sliding and lingering visits, the rival's watch by the crack, courtship that can fail and the rival
 that cuts in, the night in the garden, the end screen's words in Normal, and the checkpoint's new optional fields) and
 tests/nature_client.luau (ROBLOX-106: the same rules through the real client on the folders the server builds: walking's cost, the cover factor, a night in the bed that
-ends the life with its own card and Normal's words, a night that spares, the sill's night, and Free play without any of it).
+ends the life with its own card and Normal's words, a night that spares, the sill's night, and Free play without any of it) and
+tests/title.luau (ROBLOX-109: the first minute: the splash and every way it ends, the drift and the intro's shots, the words, the menu's two looks, the progress
+record's intro_seen, and through the real client outside the test place the title card, the music rising, a controller's keys, the intro of a new life, its
+skip, Reduced Motion, a screen over it, and that it plays once in a save).
 Usage (from roblox_port/):  python3 tests/run.py [path/to/luau [test.luau ...]]   (default: all of them)"""
 import pathlib, re, subprocess, sys, tempfile
 
@@ -84,6 +87,8 @@ MODULES = [
     ("SilkController", "Movement/SilkController.luau"),
     ("SpiderMotor", "Movement/SpiderMotor.luau"),
     ("ControlText", "UI/ControlText.luau"),
+    ("TitleText", "UI/TitleText.luau"),
+    ("TitleShots", "Movement/TitleShots.luau"),
     ("HudLayout", "UI/HudLayout.luau"),
     ("MateText", "UI/MateText.luau"),
     ("LifeText", "UI/LifeText.luau"),
@@ -190,6 +195,8 @@ CLIENT_MODULES = [
     ("SpiderInput", "../Client/SpiderInput.luau"),
     ("SpiderHud", "../Client/SpiderHud.luau"),
     ("CaughtPanel", "../Client/CaughtPanel.luau"),
+    ("TitleCard", "../Client/TitleCard.luau"),
+    ("SplashScreen", "../First/SplashScreen.luau"),
     ("NotebookPanel", "../Client/NotebookPanel.luau"),
     ("SettingsPanel", "../Client/SettingsPanel.luau"),
     ("PerceptionStage", "../Client/PerceptionStage.luau"),
@@ -203,7 +210,7 @@ CLIENT_MODULES = [
     ("WorldClient", "../Client/WorldClient.luau"),
     ("SelfTest", "../Client/SelfTest.luau"),
 ]
-CLIENT_TESTS = {"nature_client.luau", "selftest.luau", "garden_life.luau", "world_client.luau","state_client.luau","state_offline.luau","growth.luau","perception_client.luau", "client_smoke.luau", "client_ant.luau", "client_rival.luau", "client_mating.luau", "look.luau", "idle.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "wasp.luau", "notebook.luau", "settings.luau", "inspect.luau"}
+CLIENT_TESTS = {"title.luau", "nature_client.luau", "selftest.luau", "garden_life.luau", "world_client.luau","state_client.luau","state_offline.luau","growth.luau","perception_client.luau", "client_smoke.luau", "client_ant.luau", "client_rival.luau", "client_mating.luau", "look.luau", "idle.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "wasp.luau", "notebook.luau", "settings.luau", "inspect.luau"}
 REFERENCES = ["jump_reference", "tether_reference", "camera_reference", "framing_reference", "perception_reference", "prey_reference", "life_reference", "wasp_reference", "continuing_reference", "growth_reference", "notebook_reference", "notebook_godot"]
 # A reference only the named tests read (it is large; the other bundles leave it out).
 REFERENCE_ONLY = {"continuing_reference": {"continuing.luau"},"prey_reference": {"prey.luau"}, "perception_reference": {"perception.luau"}, "life_reference": {"life.luau"}, "wasp_reference": {"wasp.luau"}, "notebook_reference": {"notebook.luau"}, "notebook_godot": {"notebook.luau"}}
@@ -213,7 +220,7 @@ NAMES = {name for name, _ in MODULES + CLIENT_MODULES}
 def requires(text):
     """Every require of a shared module, in any of the spellings the sources use, becomes the bundled local."""
     text = re.sub(r'require\(script\.Parent(?:\.Parent\.\w+)?\.(\w+)\)', lambda m: f"__mods.{m.group(1)}" if m.group(1) in NAMES else m.group(0), text)
-    text = re.sub(r'require\("\.\./src/(?:Shared/\w+|Client|Server)/(\w+)"\)', lambda m: f"__mods.{m.group(1)}", text)
+    text = re.sub(r'require\("\.\./src/(?:Shared/\w+|Client|Server|First)/(\w+)"\)', lambda m: f"__mods.{m.group(1)}", text)
     text = re.sub(r'require\((?:[^()\n]|\([^()\n]*\))*:WaitForChild\("(\w+)"\)\)', lambda m: f"__mods.{m.group(1)}" if m.group(1) in NAMES else m.group(0), text)
     text = re.sub(r'require\("\.\./src/Client/SpiderClient\.client"\)', lambda m: "(function()\nlocal script = { Parent = ClientStubs.scriptFolder }\nlocal require = function(module) return module.run end\nlocal task = { spawn = function(f, ...) f(...) end }\n" + requires(strict((HERE.parent / "src/Client/SpiderClient.client.luau").read_text(encoding="utf-8"))) + "\nend)()", text)
     text = re.sub(r'require\(Shared\.\w+\.(\w+)\)', lambda m: f"__mods.{m.group(1)}" if m.group(1) in NAMES else m.group(0), text)
@@ -259,7 +266,7 @@ def main():
     luau = sys.argv[1] if len(sys.argv) > 1 else "luau"
     status = 0
     named = sys.argv[2:]
-    for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "life.luau", "checkpoint.luau", "wasp.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "client_ant.luau", "client_rival.luau", "client_mating.luau", "look.luau", "idle.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "peacock.luau", "antmimic.luau", "tarantula.luau", "continuing.luau", "growth.luau", "notebook.luau", "state.luau", "state_client.luau", "state_offline.luau", "settings.luau", "rival.luau", "rivalnav.luau", "mating.luau", "inspect.luau", "worldmap.luau", "world_client.luau", "garden_life.luau", "selftest.luau", "nature.luau", "nature_client.luau"]:
+    for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "life.luau", "checkpoint.luau", "wasp.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "client_ant.luau", "client_rival.luau", "client_mating.luau", "look.luau", "idle.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "peacock.luau", "antmimic.luau", "tarantula.luau", "continuing.luau", "growth.luau", "notebook.luau", "state.luau", "state_client.luau", "state_offline.luau", "settings.luau", "rival.luau", "rivalnav.luau", "mating.luau", "inspect.luau", "worldmap.luau", "world_client.luau", "garden_life.luau", "selftest.luau", "nature.luau", "nature_client.luau", "title.luau"]:
         if not (HERE / test_file).exists():
             if named:  # a misspelt name must not look like a pass
                 print(f"no such test file: {test_file} (names are relative to tests/, for example look.luau)", file=sys.stderr)

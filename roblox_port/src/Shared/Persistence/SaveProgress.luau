@@ -6,6 +6,8 @@
 -- player chose (a free choice, the peacock included). settings: the player's settings the client reads from Player attributes (ROBLOX-49:
 -- Data/SettingsSpec, cleaned by UI/SettingsModel: unknown ids dropped, a wrong type refused, a number clamped into its range) and
 -- settings_version, the SettingsSpec.VERSION they were written at (older ones are carried forward by SettingsModel.migrate).
+-- intro_seen (ROBLOX-109, optional: absent in every record before it, and absent while false): the intro of a new life has been shown in this save, so
+-- it is never shown again. Monotonic like finished_main; no schema change (a record without it reads as not seen).
 -- Schema 1 kept only seven true-or-false toggles as `prefs`; its migration moves them to `settings`.
 -- Everything is bounded. Merging is monotonic where it can be (pages found are a union, the longest eye time and a finished main life
 -- stay), and the last change wins for the choices. Unknown page ids that are well formed are kept: a build that lost a page must not
@@ -17,7 +19,7 @@ local SettingsModel = require(script.Parent.Parent.UI.SettingsModel)
 local SaveProgress = {}
 
 SaveProgress.SCHEMA = 2
-export type Payload = { notebook: { opened: { string }, eye_seconds: number }, finished_main: boolean, appearance: string?, settings: { [string]: SettingsModel.Value }, settings_version: number }
+export type Payload = { notebook: { opened: { string }, eye_seconds: number }, finished_main: boolean, appearance: string?, settings: { [string]: SettingsModel.Value }, settings_version: number, intro_seen: boolean? }
 
 local function finite(x: any): boolean
 	return type(x) == "number" and x == x and x ~= math.huge and x ~= -math.huge
@@ -66,6 +68,9 @@ function SaveProgress.sanitize(raw: any): ({ string }, Payload?)
 	if type(raw.finished_main) ~= "boolean" then bad("finished_main is not true or false") else out.finished_main = raw.finished_main end
 	if raw.appearance ~= nil then
 		if not goodId(raw.appearance) then bad("the appearance is not a short plain name") else out.appearance = raw.appearance end
+	end
+	if raw.intro_seen ~= nil then
+		if type(raw.intro_seen) ~= "boolean" then bad("intro_seen is not true or false") elseif raw.intro_seen then out.intro_seen = true end
 	end
 	local version = SettingsModel.VERSION
 	if raw.settings_version ~= nil then
@@ -120,6 +125,7 @@ function SaveProgress.merge(base: Payload, incoming: Payload, baseTime: number, 
 	end
 	out.notebook.eye_seconds = math.max(base.notebook.eye_seconds, incoming.notebook.eye_seconds)
 	out.finished_main = base.finished_main or incoming.finished_main
+	if base.intro_seen == true or incoming.intro_seen == true then out.intro_seen = true end
 	local newer, older = incoming, base
 	if incomingTime < baseTime then newer, older = base, incoming end
 	out.appearance = if newer.appearance ~= nil then newer.appearance else older.appearance
@@ -131,6 +137,7 @@ end
 -- Whether two payloads say the same thing (for deciding whether a write would change anything).
 function SaveProgress.same(a: Payload, b: Payload): boolean
 	if a.finished_main ~= b.finished_main or a.appearance ~= b.appearance or a.notebook.eye_seconds ~= b.notebook.eye_seconds then return false end
+	if (a.intro_seen == true) ~= (b.intro_seen == true) then return false end
 	if #a.notebook.opened ~= #b.notebook.opened then return false end
 	for i, id in a.notebook.opened do if b.notebook.opened[i] ~= id then return false end end
 	for k, v in a.settings do if b.settings[k] ~= v then return false end end
@@ -139,8 +146,8 @@ function SaveProgress.same(a: Payload, b: Payload): boolean
 end
 
 -- The payload the client sends, built from what it holds. `settings` maps a setting id to its current value or nil (not set); only values
--- that are clean (SettingsModel.clean) are sent.
-function SaveProgress.snapshot(notebookRecord: any, finishedMain: boolean, appearance: string?, settings: { [string]: any }): Payload
+-- that are clean (SettingsModel.clean) are sent. `introSeen` (ROBLOX-109): the intro of a new life has been shown (left out, or false: not said).
+function SaveProgress.snapshot(notebookRecord: any, finishedMain: boolean, appearance: string?, settings: { [string]: any }, introSeen: boolean?): Payload
 	local out = SaveProgress.default()
 	if type(notebookRecord) == "table" then
 		if type(notebookRecord.opened) == "table" then
@@ -151,6 +158,7 @@ function SaveProgress.snapshot(notebookRecord: any, finishedMain: boolean, appea
 		if finite(notebookRecord.eye_seconds) and notebookRecord.eye_seconds >= 0 then out.notebook.eye_seconds = math.min(notebookRecord.eye_seconds, SaveRules.MAX_EYE_SECONDS) end
 	end
 	out.finished_main = finishedMain
+	if introSeen == true then out.intro_seen = true end
 	if appearance ~= nil and goodId(appearance) then out.appearance = appearance end
 	for _, id in SettingsModel.ids() do
 		local v = SettingsModel.clean(id, settings[id])

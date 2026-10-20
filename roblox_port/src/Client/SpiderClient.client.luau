@@ -107,6 +107,10 @@ local M = {
 	-- that finds a leaf overhead (made below, with the raycast params); here for the same reason.
 	Nature = require(Shared.Life.Nature),
 	nature = { move = {}, night = {}, cover = (nil :: number?), ray = (nil :: any) },
+	-- ROBLOX-109: the title card's camera and the intro of a new life (Client/TitleCard, made below with the menus) and their words (UI/TitleText); here for the same reason.
+	TitleCard = require(script.Parent.TitleCard),
+	TitleText = require(Shared.UI.TitleText),
+	title = (nil :: any),
 }
 local focusState = FocusState.new()
 local DT = SpiderMotor.DT
@@ -708,6 +712,7 @@ local function returnToCheckpoint()
 		return
 	end
 	session.mode, session.rules, session.ended = life.mode or "main", life.rules or "standard", false
+	session.started = true -- (ROBLOX-109: a life is running from a rest too: the title card is over, and the life menu offers Resume)
 	table.clear(M.nature.night) -- (ROBLOX-106: the night's passes are counted again from the restored hour)
  mateLegs.reset()
  needs:useGameRules()
@@ -742,6 +747,7 @@ local function applyRules()
 end
 local function closeScreens()
  panel:hide();menu:hide();setHudShown(true);controls:clear();dropAll()
+ if M.title then M.title:stop() end -- (ROBLOX-109: a new life, a rest or Resume ends an intro that was playing)
 end
 local function fresh(mode: string, easy: boolean, position: Vector3?): boolean
  if not initialRecord or (easy and not session.finishedMain) then return false end
@@ -961,7 +967,6 @@ local openSettings: (string?) -> ()
 local confirming: string?=nil
 menu=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
  if choice=="Notebook" then openNotebook("menu");return end
- if choice=="Notes" then player:SetAttribute("NotebookNotes",not setting("NotebookNotes"));openMenu();return end
  if choice=="Settings" then openSettings("menu");return end
  if choice=="Resume" then closeScreens();return end
  if choice=="Controls" then closeScreens();helpVisible,helpUntil=true,math.huge;return end -- (the controls card, kept up until H puts it away: ROBLOX-92)
@@ -970,20 +975,19 @@ menu=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
  if choice=="Free" then
   local saved=stores.free:loadBest()
   if saved.ok then checkpoints=stores.free;closeScreens();returnToCheckpoint()
-  else fresh("free",false,nil) end
+  elseif fresh("free",false,nil) then M.title:beginIntro(M.title.always(),needs.gentle) end -- (ROBLOX-109: the intro, once in a save)
   return
- end
- if choice=="Large" then
-  player:SetAttribute("LargeText",not setting("LargeText"));openMenu();return
  end
  if choice=="New" or choice=="Easy" then
   if session.started and confirming~=choice then
    confirming=choice
    menu:showChoices("Begin a new life?",if choice=="Easy" then "This replaces the Easy life's last rest as soon as the new spider rests. The standard life's last rest is kept." else "This replaces the standard life's last rest as soon as the new spider rests. The Easy life's last rest is kept.","",
-    {{id=choice :: string,text="Begin the new life"},{id="CancelNew",text="Keep this life"}},true)
+    {{id=choice :: string,text="Begin the new life"},{id="CancelNew",text="Keep this life"}},true,"CancelNew")
    return
   end
-  confirming=nil;session:archive();fresh("main",choice=="Easy",nil);return
+  confirming=nil;session:archive()
+  if fresh("main",choice=="Easy",nil) then M.title:beginIntro(M.title.always(),needs.gentle) end -- (ROBLOX-109: the intro, once in a save)
+  return
  end
  confirming=nil;openMenu()
 end,"SpiderLifeMenu")
@@ -991,22 +995,26 @@ end,"SpiderLifeMenu")
 local function menuBody(): string
  return (if saveState.broken then M.SaveText.brokenLine() else M.SaveText.menuLine(saveClient:status()))..(if session.finishedMain then "" else "\nEasy is not available yet; choose Free play for gentle rules.")
 end
+-- ROBLOX-109: before a life has begun this visit the start menu is the title card (CaughtPanel's "title" look over the drifting camera): Continue when a rest
+-- exists, a new life, Free play, Settings, and the Notebook once it has pages, the saving note in small type under them. In a life it is the life menu
+-- (the card look), with Resume (the back button's choice) and Controls first. The discovery notes and the text size are in Settings (ROBLOX-49).
 openMenu=function()
  if panel:isShowing() or not initialRecord then return end
  controls:clear();dropAll();setHudShown(false)
+ local started=session.started
  local choices: {CaughtPanel.Choice}={}
- if session.started then table.insert(choices,{id="Resume",text="Resume this spider"});table.insert(choices,{id="Controls",text="Controls"}) end
- if stores.main:loadBest().ok then table.insert(choices,{id="Continue",text="Continue from last rest"}) end
- if stores.easy:loadBest().ok then table.insert(choices,{id="ContinueEasy",text="Continue the Easy life from its last rest"}) end
- table.insert(choices,{id="New",text="Begin a new life"})
- if session.finishedMain then table.insert(choices,{id="Easy",text="Begin a new life on Easy"}) end
- table.insert(choices,{id="Free",text="Free play - gentle rules"})
- table.insert(choices,{id="Notebook",text=M.NotebookText.MENU_CHOICE})
- table.insert(choices,{id="Notes",text=if setting("NotebookNotes") then "Discovery notes: on" else "Discovery notes: off"})
+ local function add(id: string) table.insert(choices,{id=id,text=M.TitleText.choice(id,started)}) end
+ if started then add("Resume");add("Controls") end
+ if stores.main:loadBest().ok then add("Continue") end
+ if stores.easy:loadBest().ok then add("ContinueEasy") end
+ add("New")
+ if session.finishedMain then add("Easy") end
+ add("Free")
  table.insert(choices,{id="Settings",text=M.SettingsSpec.WORDS.menuChoice})
- table.insert(choices,{id="Large",text=if setting("LargeText")==true then "Text size: large" else "Text size: normal"})
- menu:showChoices("The Windowsill","A small life on a windowsill.",
-  menuBody(),choices,true)
+ if started or #book.opened>0 then table.insert(choices,{id="Notebook",text=M.NotebookText.MENU_CHOICE}) end
+ menu:setLook(if started then "card" else "title")
+ menu:showChoices(M.TitleText.TITLE,M.TitleText.SUBTITLE,menuBody(),choices,true,if started then "Resume" else nil)
+ menu:setHint(M.TitleText.navHint(device))
  menu:setTextScale(if setting("LargeText")==true then 1.5 else 1)
 end
 local menuButton=Instance.new("TextButton")
@@ -1083,6 +1091,29 @@ openSettings=function(to: string?)
  settingsPanel:open(to,device,noteScale())
 end
 
+-- The title card's camera and the intro of a new life (ROBLOX-109, Client/TitleCard). The intro puts the spider in the crack and walks it out (tickInput),
+-- has the controls (SpiderInput's blocked) and the camera (the render step) while it holds, and gives the controls card and the walking hint their time
+-- afresh when it ends. Not in the test place, which has no start menu (the self-test plays the intro through its hook).
+-- In Studio the Workspace attribute IntroAlways = true plays the intro for every new life from the menu, seen or not (for looking at it; nothing outside Studio reads it).
+M.title = M.TitleCard.new({
+ playerGui = player:WaitForChild("PlayerGui"), camera = camera, enabled = not testPlace, clock = time,
+ reduced = function(): boolean return setting("ReducedMotion") == true end,
+ device = function(): string return device end,
+ spider = function(): Vector3 return motor.pos end,
+ place = function(position: Vector3, heading: Vector3)
+  controls:clear();jump:drop(motor)
+  motor:place(position,Vector3.yAxis,heading)
+  dropStrands(false);drawnUp=motor.up;cam:snap()
+ end,
+ gameCamera = function(dt: number): CFrame cam:render(dt,0,0);return camera.CFrame end,
+ onBegin = function() controls:clear();dropAll();setHudShown(false) end,
+ onEnd = function()
+  setHudShown(true)
+  if helpUntil ~= math.huge then helpVisible,helpUntil=true,os.clock()+20 end
+  started=os.clock()
+ end,
+})
+M.title.always = function(): boolean return RunService:IsStudio() and Workspace:GetAttribute("IntroAlways") == true end
 -- ---------------------------------------------------------------- persistent saves (ROBLOX-39)
 -- What this visit changed is sent up (the notebook and an adult life always; the spider and the toggles only if the player changed them, so
 -- a late reply can never be overwritten by defaults). What the server sends down is applied once, before the start menu, and again if a
@@ -1094,7 +1125,7 @@ end
 local function progressSnapshot(): any
 	local settings: { [string]: any } = {}
 	for key in saveState.touched do settings[key] = player:GetAttribute(key) end -- (the snapshot sends only what is clean)
-	return M.SaveProgress.snapshot(book:toRecord(), session.finishedMain, if spiderPick.touched then appearance else nil, settings)
+	return M.SaveProgress.snapshot(book:toRecord(), session.finishedMain, if spiderPick.touched then appearance else nil, settings, M.title.seen) -- (ROBLOX-109: the intro seen)
 end
 local function adoptRest(mode: string, record: any)
 	if record == nil or stores[mode] == nil then return end
@@ -1116,6 +1147,7 @@ local function applySaved(msg: any)
 		end
 		book:load({ opened = ids, eye_seconds = math.max(mine.eye_seconds, p.notebook.eye_seconds) })
 		if p.finished_main then session.finishedMain = true end
+		if p.intro_seen then M.title.seen = true end -- (ROBLOX-109: this save has seen the intro)
 		saveState.applying = true
 		for key, v in p.settings do
 			if not saveState.touched[key] then player:SetAttribute(key, v) end
@@ -1130,7 +1162,7 @@ local function applySaved(msg: any)
 		adoptRest("free", msg.rests.free)
 		adoptRest("easy", msg.rests.easy)
 	end
-	saveState.sig = `{#book.opened}:{session.finishedMain}`
+	saveState.sig = `{#book.opened}:{session.finishedMain}:{M.title.seen}`
 	saveState.eye = book.eyeSeconds
 	if nbPanel:isShowing() then nbPanel:refresh() end
 	if settingsPanel:isShowing() then settingsPanel:refresh() end
@@ -1151,7 +1183,7 @@ saveClient = SaveClient.new({
 	onStatus = function(_status: string, _reason: string?) end, -- (the status is read each frame below)
 	build = progressSnapshot,
 })
-saveState.sig = `{#book.opened}:{session.finishedMain}`
+saveState.sig = `{#book.opened}:{session.finishedMain}:{M.title.seen}`
 for _, key in M.SettingsModel.ids() do
 	player:GetAttributeChangedSignal(key):Connect(function()
 		if saveState.applying then return end
@@ -1162,7 +1194,7 @@ end
 -- Each frame: the connection, what changed, and the status (a toast when it changes, a fresh menu line).
 local function updateSaves()
 	saveClient:update()
-	local sig = `{#book.opened}:{session.finishedMain}`
+	local sig = `{#book.opened}:{session.finishedMain}:{M.title.seen}`
 	if sig ~= saveState.sig then
 		saveState.sig = sig
 		saveClient:markDirty()
@@ -1211,7 +1243,7 @@ function saveState.frame()
 end
 
 controls = SpiderInput.bind({
-	blocked = modal,
+	blocked = function(): boolean return modal() or M.title:holding() end, -- (ROBLOX-109: the intro has the controls while it holds)
 	menu = function() if settingsPanel:isShowing() then settingsPanel:close() elseif nbPanel:isShowing() then nbPanel:close() elseif menu:isShowing() and session.started then closeScreens() else openMenu() end end,
 	notebook = function() openNotebook("game") end,
 	settings = function() openSettings("game") end,
@@ -1302,6 +1334,7 @@ controls = SpiderInput.bind({
 
 -- One fixed tick's intent from the controls, for the motor.
 local function tickInput(): any
+ if M.title:holding() then local i=SpiderMotor.idleInput();i.wish=M.title:wish(motor.pos) or Vector3.zero;return i end -- (ROBLOX-109: the intro walks the spider out of the crack; nothing else moves it)
  if life.growth:isMoulting() or mateLegs.couple.active or spiderPick.inspecting then return SpiderMotor.idleInput() end -- (the close look: the spider stays where it is)
 	local r, f = controls:axes()
 	if jump:isAiming() then r, f = 0, 0 end -- left stick aims, never walks during the held jump
@@ -1680,10 +1713,11 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
              if initialRecord and not menuStarted then
               menuStarted=true
               if not testPlace then openMenu() else session.started=true end
+              player:SetAttribute("TitleReady",true) -- (ROBLOX-109: the splash, First/SplashScreen, fades away over the title card)
              end
             end
             watch:step({
-             started=session.started,captures=M.World.prey:captures(),feeding=prey.feeding.feeding,taken=prey.feeding.taken,
+             started=session.started and not M.title:holding(),captures=M.World.prey:captures(),feeding=prey.feeding.feeding,taken=prey.feeding.taken,
              energy=needs.energy,gentle=needs.gentle,spider=motor.pos,flies=M.World.prey:flies(),region=M.World.region.kind,bugs=M.World.prey:crawlers(),
             })
             if modal() then accumulator=0;break end
@@ -1792,6 +1826,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	local soundSpeed = if slow then SLOW_SPEED else 1
 	local soundMuted = setting("SoundMuted") == true
 	soundscape:setVolumes(setting("MasterVolume"), setting("AmbienceVolume"), setting("CreatureVolume"), setting("MusicVolume"))
+	soundscape:setTitle(not testPlace and (not session.started or M.title:holding())) -- (ROBLOX-109: the music under the title card, rising the first time)
 	soundscape:update(frameDt, M.World.prey.view, life.daylight, soundPaused, soundSpeed, soundMuted)
 	soundscape:updateWasp(wasp, soundPaused, soundSpeed, soundMuted)
 	waspBody:draw(wasp.wasp, prey.now)
@@ -1824,7 +1859,8 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	cam:configure(camSettings)
 	-- Looking runs in real time, so slow motion never makes the camera sluggish.
 	local lx, ly = controls:lookAxes(jump:isAiming())
-	if not modal() then
+	if M.title:frame(frameDt, session.started, modal()) then -- (ROBLOX-109: the title card's drift, or the intro, has the camera this frame)
+	elseif not modal() then
 		if spiderPick.inspecting then
 			local _, zoom = controls:axes() -- the left stick, or W and S: forward is closer (the close look)
 			cam:inspectZoom(zoom, frameDt)
@@ -1870,6 +1906,7 @@ M.hooks = function(): any
 				return { mode = motor.mode, line = motor.silk.mode, taut = motor.silk.taut, position = motor.pos, walking = motor.silk.walk ~= nil }
 			end,
 			detail = detail, -- (ROBLOX-104: the tier the self-test reports its part counts at)
+			title = M.title, -- (ROBLOX-109: the title card and the intro, for the self-test's intro check)
 			nature = M.nature, -- (ROBLOX-106: nature's rules this tick: the cover factor, the night's passes)
 	}
 end

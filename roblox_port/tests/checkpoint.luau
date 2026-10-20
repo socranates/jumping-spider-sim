@@ -1242,6 +1242,26 @@ case("a rest under the bed's stone (ROBLOX-95): it records the bed and its stone
 		"a bed rest from another revision comes back at the bed's spawn, with the notice")
 end)
 
+case("a rest under a dead leaf in the bushes (ROBLOX-107): it records the chunk and its leaf, is checked against the chunk, and comes back there", function()
+	local w = newWorld()
+	for _ = 1, 60 do tick(w) end
+	for _, id in { "shrub_west_a", "shrub_west_j" } do
+		local r = WorldMap.region(id) :: WorldMap.Region
+		local t = r.retreats[1]
+		local under = Vector3.new((t.min.X + t.max.X) / 2, t.min.Y + 0.31, (t.min.Z + t.max.Z) / 2)
+		w.motor:place(under, Vector3.yAxis, Vector3.new(0, 0, 1))
+		local record = assert(Checkpoint.capture(w, 0))
+		check(record.world_map.region == id and record.world_map.retreat == t.id and record.player.retreat_id == t.id and record.world_map.revision == "world-2",
+			`a rest under {id}'s dead leaf records {id}, {t.id} and world-2`)
+		check(#(Checkpoint.check(record, w)) == 0 and #(Checkpoint.check(Json.copy(record), w)) == 0 and #SaveRest.check("main", record) == 0, "a good record, a stored copy, and the server accepts it")
+		w.motor:place(Layout.SPAWN + Vector3.new(0, 0.31, 0), Vector3.yAxis, Vector3.xAxis)
+		check(Checkpoint.restore(record, w) and (w.motor.pos - under).Magnitude < 1e-6 and WorldMap.inRetreat(w.motor.pos) == t.id, "and it comes back under the leaf")
+		local bad = Json.copy(record)
+		bad.player.position = { under.X, under.Y, -300 }
+		check(string.find(table.concat(Checkpoint.check(bad, w), "; "), "outside " .. id, 1, true) ~= nil, "a spot outside the chunk is refused by its name")
+	end
+end)
+
 case("a region that is not on the map, a spot outside its bounds and a bad world record are refused and change nothing (ROBLOX-94)", function()
 	local w = newWorld()
 	for _ = 1, 40 do tick(w) end

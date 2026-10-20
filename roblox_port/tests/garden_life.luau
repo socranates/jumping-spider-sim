@@ -372,7 +372,8 @@ case("the world's prey: the sill's director at home, the bed's made when the bed
 	check(table.find(pw.active, "bed_a") == nil and d.now == now, "away, the bed's clock stops")
 	pw.world = worldAt("bed_a")
 	step(Vector3.new(-20, -89.69, -30))
-	check(garden.bed_a.prey == d and pw.made == 7, "back in the bed, the same director")
+	-- (ROBLOX-107: in the bed by its west edge the bushes' first chunk beside it runs too, its springtails' director made the first time: 8, not 7)
+	check(garden.bed_a.prey == d and pw.made == 8 and table.concat(pw.active, ",") == "bed_a,house_wall,shrub_west_a", "back in the bed, the same director")
 	local same = #d.flies == #before
 	for i, f in d.flies do
 		local b = before[i]
@@ -383,10 +384,10 @@ case("the world's prey: the sill's director at home, the bed's made when the bed
 	local garden2 = {}
 	local pw2 = PreyWorld.new(sillDirector(), worldAt("bed_a", { bed_a = false }), garden2, world)
 	pw2:before(DT, Vector3.new(-20, -89.69, -30), observerAt(FAR), s, cast, cameraFar)
-	check(pw2.active[1] == "bed_a" and garden2.bed_a == nil and pw2.made == 2 and #pw2:flies() == 0, "a bed that has not arrived whole has no prey and no woodlice (the wall beside it, whole, has its own)")
+	check(pw2.active[1] == "bed_a" and garden2.bed_a == nil and pw2.made == 3 and #pw2:flies() == 0, "a bed that has not arrived whole has no prey and no woodlice (the wall and, ROBLOX-107, the bushes beside it, whole, have their own)")
 	pw2.world = worldAt("bed_a")
 	pw2:before(DT, Vector3.new(-20, -89.69, -30), observerAt(FAR), s, cast, cameraFar)
-	check(garden2.bed_a ~= nil and garden2.bed_a.prey ~= nil and garden2.bed_a.kinds ~= nil and garden2.bed_a.kinds.springtail ~= nil and garden2.bed_a.kinds.leafhopper ~= nil and pw2.made == 5, "whole, it has them (W3's and the bestiary's)")
+	check(garden2.bed_a ~= nil and garden2.bed_a.prey ~= nil and garden2.bed_a.kinds ~= nil and garden2.bed_a.kinds.springtail ~= nil and garden2.bed_a.kinds.leafhopper ~= nil and pw2.made == 6, "whole, it has them (W3's and the bestiary's)")
 	-- no engine at all: no director is ever made
 	local pw3 = PreyWorld.new(sillDirector(), worldAt("bed_a"), {}, nil)
 	pw3:before(DT, Vector3.new(-20, -89.69, -30), observerAt(FAR), s, cast, cameraFar)
@@ -1596,6 +1597,59 @@ case("the drawn ambient bugs: their parts at both tiers, safe, stepping while th
 	check(find(hr, "Body").Position.Y < -500, "away, it is drawn nowhere near")
 	bugs:draw({}); low:draw({})
 	check(next(bugs.rigs) == nil, "gone when not drawn")
+end)
+
+-- ---------------------------------------------------------------- ROBLOX-107: the life of the bushes' litter
+case("under the bushes: woodlice in the litter of every chunk, the first two at the drainpipe's damp foot; springtails round the dead leaf and the litter", function()
+	local pipeFoot: Vector3? = nil
+	for _, c in WorldMap.SHRUB_CHUNKS do
+		local r = WorldMap.region(c.id) :: WorldMap.Region
+		local spec = Garden.bugs(r) :: Garden.BugSpec
+		local soil: any, boxes = nil, {}
+		for _, p in Region.pieces(r) do
+			if p.id == r.id .. "_soil" then soil = { min = p.lo, max = p.hi } elseif p.lo.Y <= -89.99 then table.insert(boxes, { min = p.lo, max = p.hi }) end
+		end
+		for _, b in Garden.standingFrom(r) do table.insert(boxes, b) end
+		local w = Woodlouse.new(spec, soil, boxes)
+		local kinds: { [string]: number } = {}
+		for _, h in spec.hides do
+			kinds[h.kind] = (kinds[h.kind] or 0) + 1
+			check(within(r.bounds[1], r.bounds[2], h.pos) and h.pos.Y == -90, `{r.id}: a hide spot on its litter`)
+		end
+		local drain = Garden.drainFoot(r)
+		check(#w.lice == 4 and spec.seed == r.seed and kinds.leaf == 2 and kinds.litter == 3 and (kinds.drain or 0) == (if drain then 1 else 0),
+			`{r.id}: four woodlice from its seed, two hide spots by the dead leaf, three in the litter{if drain then ", one at the drain" else ""}`)
+		if drain then
+			pipeFoot = drain
+			check(c.id == "shrub_west_a" and (Vector3.new(w.lice[1].position.X, 0, w.lice[1].position.Z) - Vector3.new(drain.X, 0, drain.Z)).Magnitude <= 2.6
+				and (Vector3.new(w.lice[2].position.X, 0, w.lice[2].position.Z) - Vector3.new(drain.X, 0, drain.Z)).Magnitude <= 2.6, "the first two woodlice begin on the damp at the drain's foot")
+		end
+		for _, l in w.lice do check(w:free(l.position, 0.0) and within(r.bounds[1], r.bounds[2], l.position), `{r.id} {l.id} begins on free litter`) end
+		check(w.lice[1].id == r.id .. "_louse_1" and w.lice[4].id == r.id .. "_louse_4", `{r.id}: its woodlice carry its id, so two chunks or a chunk and the bed drawn at once never share one ({w.lice[1].id})`)
+		local inBox, off = 0, 0
+		for _ = 1, 60 * 20 do
+			w:step(DT, FAR)
+			for _, l in w.lice do
+				if not w:free(l.position, 0.0) then inBox += 1 end
+				if not within(r.bounds[1], r.bounds[2], l.position) then off += 1 end
+			end
+		end
+		check(inBox == 0 and off == 0 and #w:problems(r.bounds[1], r.bounds[2]) == 0, `{r.id}: twenty seconds of walking, never inside a twig, the drainpipe or off the chunk ({inBox}, {off})`)
+		-- the springtails
+		local k = specOf(r, "springtail")
+		check(k ~= nil and k.target == 4 and k.low == 2 and #k.perches == 12 and #k.vents == 2 and k.prefix == `{r.id}_springtail_fly_`, `{r.id}: four springtails (two at low) on twelve spots, two vents`)
+		for i, p in k.perches do
+			local hit = workspace:Raycast(p.position + p.normal * 0.5, -p.normal * 1.0, params)
+			check(p.position.Y == -90 and within(r.bounds[1], r.bounds[2], p.position) and hit ~= nil and hit.Instance.Name == r.id .. "_soil", `{p.id}: on the litter`)
+			for j = i + 1, #k.perches do check((p.position - k.perches[j].position).Magnitude >= 1.0 - 1e-9, "a stud apart at least") end
+		end
+		for _, low in { false, true } do
+			local d = kindDirector(r, "springtail", low)
+			check(#d.flies == (if low then 2 else 4), `{r.id} springtails at {if low then "low" else "full"}: {#d.flies}`)
+		end
+		check(Garden.prey(r) == nil and Garden.ambient(r) == nil, `{r.id}: no gnats or aphids, no ambient bugs yet`)
+	end
+	check(pipeFoot ~= nil, "one chunk holds the drainpipe's foot")
 end)
 
 print(`GARDEN_LIFE passed={passed} failed={failed}`)

@@ -31,7 +31,7 @@ export type Louse = {
 	nextTurn: number,
 }
 
--- `spec`: World/Garden.bugs (the starting places, the hide spots, the seed); `soil` the soil's top box { min, max }; `boxes` the standing boxes' footprints
+-- `spec`: World/Garden.bugs (the starting places, the hide spots, the seed, and the id prefix a region other than the bed gives its woodlice, ROBLOX-107); `soil` the soil's top box { min, max }; `boxes` the standing boxes' footprints
 -- ({ min, max }, their y ignored).
 function Woodlice.new(spec: any, soil: { min: Vector3, max: Vector3 }, boxes: { { min: Vector3, max: Vector3 } }): any
 	local self: any = setmetatable({
@@ -43,7 +43,7 @@ function Woodlice.new(spec: any, soil: { min: Vector3, max: Vector3 }, boxes: { 
 	for i, w in spec.woodlice do
 		local pos = Vector3.new(w.pos.X, self.top + Woodlice.HOVER, w.pos.Z)
 		table.insert(self.lice, {
-			id = "louse_" .. i, position = pos, prevPosition = pos, heading = w.heading, speed = self.rng:draw(Woodlice.WALK),
+			id = (spec.prefix or "") .. "louse_" .. i, position = pos, prevPosition = pos, heading = w.heading, speed = self.rng:draw(Woodlice.WALK),
 			state = "walk", hide = 0, until_ = 0, nextTurn = self.rng:draw({ 1, 3 }),
 		})
 	end

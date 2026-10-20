@@ -176,6 +176,7 @@ function PreyWorld.bugs(self: any, id: string): any
 		if p.id == region.id .. "_soil" then soil = { min = p.lo, max = p.hi }
 		elseif p.lo.Y <= region.origin.Y + 0.01 then table.insert(boxes, { min = p.lo, max = p.hi }) end
 	end
+	for _, b in Garden.standingFrom(region) do table.insert(boxes, b) end -- (ROBLOX-107: the drainpipe's foot, wall_west's box, on a chunk of the bushes' litter)
 	if soil == nil then return nil end
 	local w = Woodlouse.new(spec, soil, boxes)
 	entry = entry or {}
@@ -204,6 +205,7 @@ function PreyWorld.ambient(self: any, id: string): { any }
 					if p.id == region.id .. "_soil" then soil = { min = p.lo, max = p.hi }
 					elseif p.lo.Y <= region.origin.Y + 0.01 then table.insert(boxes :: any, { min = p.lo, max = p.hi }) end
 				end
+				for _, b in Garden.standingFrom(region) do table.insert(boxes :: any, b) end
 			end
 			if spec.kind == "ladybird" then c = Ladybird.new(spec, count, Garden.plants(region) or {})
 			elseif spec.kind == "millipede" and soil ~= nil then c = Millipede.new(spec, count, soil, boxes :: any)

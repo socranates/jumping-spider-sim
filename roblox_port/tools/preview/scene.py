@@ -18,6 +18,8 @@ With --world (ROBLOX-101): bestiary_stone, bestiary_wall (the bestiary's prey in
 spec_moth_air, spec_crane_fly, spec_crane_fly_shed, spec_crane_fly_air (each kind close on a specimen tray at x 200, at the --detail tier).
 With --world (ROBLOX-105): spec_ladybird, spec_millipede, spec_snail, spec_harvestman (the tray's third row: walking and bleeding, straight and coiled, a trail and
 stalks drawn in) and ambient_dock, ambient_dandelion, ambient_snail, ambient_millipede, ambient_harvestman, ambient_wall (in place, an evening).
+With --world (ROBLOX-107): drainpipe, drain_foot, drain_neck (the wall west of the window and its drainpipe), shrub_strip, shrub_chunk, shrub_leaf, shrub_under
+(the bushes beside the bed, the dead leaf over a retreat, under a bush) and house_west (the west of the house from the lawn).
 --parts renders an already dumped part list (for example the "before" list kept next to the images) instead of running the code."""
 import argparse, importlib.util, json, math, pathlib, subprocess, sys, tempfile
 
@@ -185,6 +187,16 @@ VIEWS = {
     "ambient_millipede": {"fov": 38, "eye": [-18.3, -87.5, -41.2], "at": [-20.9, -89.8, -44.1], "near": 0.05, "far": 2500, "groups": ["bed", "flies"], "shadow": 30},
     "ambient_harvestman": {"fov": 46, "eye": [20.5, -86.0, -52.5], "at": [16.7, -89.4, -57.9], "near": 0.05, "far": 2500, "groups": ["bed", "flies"], "shadow": 30},
     "ambient_wall": {"fov": 46, "eye": [-25.5, -66.5, -33.0], "at": [-29.3, -69.8, -24.6], "near": 0.05, "far": 2500, "groups": ["wall", "flies"], "shadow": 30},
+    # ROBLOX-107 (--world): the wall west of the window with its drainpipe (from the litter, at its foot, at the swan neck into the gutter), the bushes beside the
+    # bed (the strip from over the bed, one chunk, the dead leaf over a retreat, under a bush in the litter) and the west of the house from the lawn
+    "drainpipe": {"fov": 62, "eye": [-20.0, -40.0, -150.0], "at": [-60.0, 10.0, -24.0], "near": 0.5, "far": 6000, "groups": [], "shadow": 300},
+    "drain_foot": {"fov": 50, "eye": [-44.0, -82.0, -44.0], "at": [-50.0, -88.0, -28.0], "near": 0.05, "far": 2500, "groups": [], "shadow": 60},
+    "drain_neck": {"fov": 55, "eye": [-25.0, 125.0, -95.0], "at": [-50.0, 100.0, -50.0], "near": 0.1, "far": 5000, "groups": [], "shadow": 120},
+    "shrub_strip": {"fov": 64, "eye": [40.0, 60.0, -150.0], "at": [-200.0, -80.0, -100.0], "near": 1.0, "far": 6000, "groups": [], "shadow": 600},
+    "shrub_chunk": {"fov": 60, "eye": [-20.0, -40.0, -70.0], "at": [-85.0, -80.0, -75.0], "near": 0.5, "far": 4000, "groups": [], "shadow": 160},
+    "shrub_leaf": {"fov": 50, "eye": [-93.0, -86.0, -71.0], "at": [-93.0, -89.5, -86.0], "near": 0.05, "far": 2500, "groups": [], "shadow": 40},
+    "shrub_under": {"fov": 70, "eye": [-80.0, -87.5, -95.0], "at": [-95.0, -80.0, -80.0], "near": 0.05, "far": 2500, "groups": [], "shadow": 60},
+    "house_west": {"fov": 62, "eye": [-150.0, -40.0, -430.0], "at": [-180.0, 0.0, -24.0], "near": 1.0, "far": 6000, "groups": [], "shadow": 600},
 }
 
 

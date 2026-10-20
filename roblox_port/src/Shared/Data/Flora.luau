@@ -183,10 +183,12 @@ Flora.garden = {
 	-- (shrub_west, hedge_west) and the flower border east, none over the bed, the wall or a tree's trunk. ROBLOX-95's standards on stems are gone. From the sill
 	-- their crowns show low in the window, as the shrubs did, and from the garden they are bushes.
 	shrubs = {
-		{ x = -76, z = -56, h = 60, w = 50, bloom = "pink" },
-		{ x = -150, z = -78, h = 90, w = 76, bloom = "white" },
-		{ x = -110, z = -150, h = 110, w = 100, bloom = "pink" },
-		{ x = -215, z = -130, h = 120, w = 110, bloom = "white" },
+		-- (ROBLOX-107: the first four stood in the strip beside the bed, x -76, -150, -110 and -215, z -56 to -150, where shrub_west's walkable bushes stand now; they
+		-- moved out along the lawn's west edge and the hedge line, the same sizes and blooms)
+		{ x = -200, z = -235, h = 60, w = 50, bloom = "pink" },
+		{ x = -290, z = -250, h = 90, w = 76, bloom = "white" },
+		{ x = -450, z = -270, h = 110, w = 100, bloom = "pink" },
+		{ x = -370, z = -560, h = 120, w = 110, bloom = "white" },
 		{ x = -95, z = -250, h = 105, w = 95, bloom = "white" },
 		{ x = 95, z = -60, h = 55, w = 46, bloom = "pink" },
 		{ x = 440, z = -330, h = 120, w = 100, bloom = "pink" },

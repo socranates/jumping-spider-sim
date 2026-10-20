@@ -419,13 +419,17 @@ local function sphereBox(o, d, r, b)
 	return best
 end
 
+-- ROBLOX-107: `slop` widens what counts as "the sphere starts in it" (0 by default, the box world's exact rule). The real engine was seen to let the
+-- body sit 0.07 from the brick face under the outer sill's lip (the Studio self-test, v35); a sweep that begins within a hair of a face it is tangent to
+-- not seeing that face is the box world's way of reproducing it (tests/scenarios.luau sets it for one case and puts it back).
+local spherecastSlop = { value = 0 }
 function workspace.Spherecast(_self, origin, radius, direction, params)
 	local length = direction.Magnitude
 	if length < 1e-12 then return nil end
 	local d = direction / length
 	local best = nil
 	for _, b in boxes(params) do
-		if (closest(origin, b) - origin).Magnitude >= radius then -- a box the sphere starts in is not seen
+		if (closest(origin, b) - origin).Magnitude >= radius + spherecastSlop.value then -- a box the sphere starts in is not seen
 			local t = sphereBox(origin, d, radius, b)
 			if t and t <= length and (not best or t < best.Distance) then
 				local centre = origin + d * t
@@ -533,6 +537,7 @@ local game = { GetService = function(_self, name) return services[name] end }
 
 -- Builds axis-aligned parts from {lo, hi, profile, name} pieces into a folder in the workspace.
 local BoxWorld = {}
+BoxWorld.spherecastSlop = spherecastSlop
 function BoxWorld.folder(name: string, pieces)
 	local folder = Instance.new("Folder")
 	folder.Name = name

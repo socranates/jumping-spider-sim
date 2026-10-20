@@ -454,3 +454,37 @@ for **Normal only**; Easy and Free play are exactly as they were. `docs/DECISION
 - The night counts on the outer sill and the walls too, not only the bed. Should the outer sill (just outside the glass) be safe?
 - Courtship: about 9 in 10 for a perfect court, 1 in 2 at the least fed a visitor comes for. Too kind, or too harsh for the game's climax?
 - The footfall (the "1 percent" step) and the evening section's other rare things are still to come, after this round as the design orders them.
+## The line fixed, the bushes beside the bed and the drainpipe (ROBLOX-107, 2026-10-20)
+
+Claude → Chet, 2026-10-20, branch `claude/regions6`. Three things. **The line**: the v35 self-test's one failure in Studio ("left the line 2.0 s into the let-down,
+at (2.00, -2.70, -24.07)") is reproduced on the CLI to within two hundredths of a stud and fixed in `Movement/SilkController` (a let-down now lands only where there is
+ground under the body, and the body is pushed back out of any box it has slipped into). **`shrub_west`**: the strip beside the bed from x -25 to -500 and z -24 to -200
+is ten walkable chunks of box and privet bushes to the ground on deep leaf litter, each with a retreat in the gap under a curled dead leaf, woodlice and springtails in the
+litter. **`wall_west`**: the back wall west of the window from x -40 to -120, from the lawn to the eaves, with the **drainpipe**: a climbable column from the litter to a
+swan neck under the gutter and up into it, brackets every 100 studs, the second way up to the gutter; two woodlice begin at its damp foot. `docs/DECISIONS.md` ROBLOX-107
+has the numbers and the reasons. **Nothing of it has run in Studio.**
+
+What is in it:
+
+- **Regions**: 17 now (`wall_west`, `wall_west_upper`, `shrub_west_a` to `_j` added), 486 boxes outside the window (37 before). Each chunk 42 or 43 boxes (the nav
+  graph's ceiling is 60); each region whole inside the streaming target radius from anywhere on it. `WorldMap.REVISION` still `world-2`: nothing that was there moved.
+- **Looks**: a chunk 260 drawn parts at full, 80 at low; the wall west 93/59 below y 0 and 88/71 above; `wall_upper`'s look 150/58 (its drawn downpipe, brackets and shoe
+  are gone: the walkable pipe replaces them). Four of the view's drawn bushes that stood in the strip moved out along the lawn's west edge (`Data/Flora`).
+- **Life**: four woodlice per chunk (40 in all) and four springtails (two at low) in the litter; no gnats, aphids or ambient bugs there yet; the ground beetle later.
+- **The self-test** picks the new regions up by itself: 32 checks now, not 20 (a "region ..." check for each of the 17).
+
+## Your Studio checklist (ROBLOX-107)
+
+1. **The self-test first** (as for ROBLOX-104): `workspace:SetAttribute("SelfTest", true)`, Play, touch nothing, send the printout. The one we want: `PASS the line`.
+   If it still fails, the line says where the body left the line: send it, because it says whether the cause named in ROBLOX-107 was the right one. The twelve new
+   "region ..." checks should pass too; one "not whole after 30 s" names the boxes that never came.
+2. **The let-down by hand**: from the outer sill's front edge, hold the drop key and ride the line all the way to the soil. It should not stop on the brick a few studs
+   down, nor stick to the brick; it should end on the bed.
+3. **The drainpipe**: walk west along the wall from the window (or down the brick to the bed and west over the litter), find the grey pipe at x -50, climb it from the
+   litter, past the brackets, out along the swan neck under the gutter and up into the gutter. Say if any step of it stops you, and if the pipe reads as a pipe.
+4. **The bushes**: walk west from the bed into the bushes. Do they read as dense bushes to the ground from outside, and as a way through from inside (the camera in the
+   leaves)? Is it shady enough under them? Find a dead leaf lying on two twigs under the first bush of a chunk and rest in the gap under it; leave and continue.
+5. **Woodlice at the drain**: two should be on the dark damp patch at the pipe's foot when you first come there.
+6. **The frame time**: the `INFO frame time` lines (the sill's and the bed's, against v35's). The regions' looks are persistent models, always on the client, so the
+   ten chunks' looks are there wherever the spider is: the looks outside the window are 3,647 parts at full now (870 before) and 1,215 at low (286). If the frame time
+   moved, or a phone struggles, say so: the looks can be made to stream with their regions (a choice for a later round, not made here).

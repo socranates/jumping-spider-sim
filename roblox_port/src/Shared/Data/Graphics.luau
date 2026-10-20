@@ -48,7 +48,12 @@ Graphics.window = {
 	-- the pieces that turn invisible: the back frame, in four since the lower sash was raised (ROBLOX-95: WindowsillLayout's back_frame_*)
 	hidden = { "back_frame_west", "back_frame_east", "back_frame_head", "back_frame_rail" } :: { string },
 	slabGap = 0.02, -- the drawn wall sits this far behind the climbable face, so the spider's feet never sink into it
-	left = -27.5, right = 27.5, bottom = 3, top = 13, -- the opening: x from/to, y from/to
+	left = -27.5, right = 27.5, bottom = 3, top = 110.5, -- the opening: x from/to, y from/to (ROBLOX-112: the glass up to y 110.5, 13 before: a real window, 1.1 m)
+	-- ROBLOX-112: the window in true proportion. The frame and the wall round it go up to the head (`head`, y 112.5, where the brick's lintel is) over the back frame's
+	-- 14, standing in for World/Garden's window box above it (`upper`, the region wall_upper's: hidden once drawn here). The sashes meet at the transom (`transom`, its
+	-- bottom, `transomH` tall) across all three lights; the middle light's lower sash, raised 6 cm (`opening`), has its top rail that much over the transom, set back
+	-- in the frame as its bottom rail is, and its glass behind the upper sash's from the transom to there.
+	head = 112.5, upper = "wall_upper_window", transom = 55.5, transomH = 2.5, sashLift = 6,
 	trimWidth = 0.5, trimDepth = 0.10, trimReflectance = 0.04, -- the frame bars around the opening, flush with the climbable face; glossy
 	wallColor = "efe8d8", trimColor = "f4efe3",
 	glass = { color = "cfe3e6", transparency = 0.86, reflectance = 0.12, thickness = 0.04, setback = 0.05 },

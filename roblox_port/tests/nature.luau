@@ -660,6 +660,8 @@ case("the night in the garden: three passes of the ground hunters a night, from 
 	check(Nature.nightOf(3, 12) == nil and Nature.nightOf(3, 18) == 3 and Nature.nightOf(4, 3) == 3 and select(2, Nature.nightOf(4, 3)) == 27, "the night of an hour")
 	check(Nature.exposed(true, "bed", false) and Nature.exposed(true, "house_wall", false) and Nature.exposed(true, "outer_sill", false), "exposed: out in the garden's regions")
 	check(not Nature.exposed(true, "sill", false) and not Nature.exposed(true, "bed", true) and not Nature.exposed(false, "bed", false), "not on the sill, not in a retreat, not in the gentle modes")
+	check(not Nature.exposed(true, "counter", false) and not Nature.exposed(true, "kitchen_floor", false) and Nature.exposed(true, "eaves", false) and Nature.exposed(true, "wall_upper", false),
+		"(ROBLOX-112) not inside the house, on the kitchen's counter or floor; out on the window's glass or in the gutter, exposed")
 	local founds, n = 0, 4000
 	for night = 1, n do
 		local hours = Nature.passHours(914, night)

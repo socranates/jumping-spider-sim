@@ -77,8 +77,9 @@ end
 -- it to them exactly, so a sill that grows says so here; the garden's kinds are ceilings their placers keep to (World/Garden.BUDGETS).
 local BUDGETS: { [string]: { full: number, low: number } } = {
 	-- (ROBLOX-95: 1156 and 292 before the raised sash, the window box's halves and the shrubs' bodies: 22 more at each tier. ROBLOX-103: 1178 and 314 before the bushes
-	-- to the ground, 62 more at full and 40 at low; the bungalows for the tall houses, 4 more at full and 2 fewer at low; the fences, 9 and 3)
-	sill = { full = 1253, low = 355 },
+	-- to the ground, 62 more at full and 40 at low; the bungalows for the tall houses, 4 more at full and 2 fewer at low; the fences, 9 and 3. ROBLOX-112: 1253 and 355
+	-- before the window in true proportion: the upper lights, the transom and the sashes' rails where they meet, 7 more at each tier)
+	sill = { full = 1260, low = 362 },
 }
 for kind, b in Garden.BUDGETS do BUDGETS[kind] = b end
 

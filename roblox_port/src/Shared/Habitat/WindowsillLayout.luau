@@ -81,9 +81,11 @@ Layout.PIECES = {
 
 local decor: { Decor } = {
 	{ id = "soil", size = v(12, 0.01, 6), at = v(10, 4.61, -4), color = hex("665644") },
-	{ id = "window_glass", size = v(55, 10, 0.04), at = v(0, 8, -12.44), color = hex("a9c2c1"), transparency = 0.55 },
-	{ id = "mullion_w", size = v(0.7, 12, 0.1), at = v(-10, 8, -12.35), color = hex("e2dbc7") },
-	{ id = "mullion_e", size = v(0.7, 12, 0.1), at = v(10, 8, -12.35), color = hex("e2dbc7") },
+	-- (the window's record: never drawn, Habitat/Scenery.window draws it from Data/Graphics.window. ROBLOX-112: the window in true proportion, its glass from y 3 to 110.5 and
+	-- its mullions the frame's height; Godot's were 55 by 10 and 12 tall, centred at y 8)
+	{ id = "window_glass", size = v(55, 107.5, 0.04), at = v(0, 56.75, -12.44), color = hex("a9c2c1"), transparency = 0.55 },
+	{ id = "mullion_w", size = v(0.7, 107.5, 0.1), at = v(-10, 56.75, -12.35), color = hex("e2dbc7") },
+	{ id = "mullion_e", size = v(0.7, 107.5, 0.1), at = v(10, 56.75, -12.35), color = hex("e2dbc7") },
 }
 for i = 0, 6 do
 	table.insert(decor, { id = "silk_" .. i, size = v(4.6, 0.012, 0.045), at = v(-25.5, 0.025, 3.3 + i * 0.85), color = hex("ddd9bf") })

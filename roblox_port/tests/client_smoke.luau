@@ -34,6 +34,14 @@ local function find(screen: string, name: string): any
 	for _, d in g:GetDescendants() do if d.Name == name then return d end end
 	return nil
 end
+-- (ROBLOX-112: the start's save status is settled first, as tests/inspect.luau's is since ROBLOX-110. With no server it turns "offline" after
+-- SaveRules.CLIENT_WAIT_REMOTES seconds of the wall clock, and its toast lands on whichever check is running then: in a full run on a loaded machine it covered the
+-- jump's "Jump cancelled". Settled, and its toast let go by, before any check, the run no longer depends on how fast the machine is.)
+if frame ~= nil then
+	local t0 = os.clock()
+	while ClientStubs.driver ~= nil and ClientStubs.driver.saveState.status == nil and os.clock() - t0 < 10 do frame(1 / 60) end
+	frames(170)
+end
 
 check("the client loads, binds every action and runs 120 frames", function()
 	assert(loaded, "SpiderClient did not load")

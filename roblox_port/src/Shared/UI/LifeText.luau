@@ -68,6 +68,14 @@ LifeText.HOMES = {
 		way = "Walk into the gap under the big stone in the bed, then stop to rest.",
 		kept = "Last rest kept, under the stone.",
 	},
+	-- ROBLOX-112: the first home inside, the gap under the toaster on the kitchen's counter
+	kitchen_toaster = {
+		name = "under the toaster",
+		title = "Under the toaster",
+		home = "Home: under the toaster",
+		way = "Walk into the gap under the toaster on the counter, then stop to rest.",
+		kept = "Last rest kept, under the toaster.",
+	},
 } :: { [string]: { name: string, title: string, home: string, way: string, kept: string } }
 LifeText.DEFAULT_HOME = "sill_crevice"
 local function homeOf(retreat: string?): { name: string, title: string, home: string, way: string, kept: string }

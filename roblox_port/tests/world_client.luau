@@ -150,7 +150,9 @@ check("the same rays hit the same boxes at the same places whether the sill stan
 		if a[i].text ~= "-" then hits += 1 end
 	end
 	assert(hits >= 100, `the rays hit something often enough to mean something ({hits} of {#a})`)
-	assert(outside > 0 and outside < 80, `some rays from the sill reach the world outside, most do not ({outside})`)
+	-- (ROBLOX-112: the window's glass above the back frame, its reveal, the room's wall beside it and the counter in front of the sill are other regions' boxes now, all
+	-- round the sill: 124 of the 400 rays meet one of them first, under 80 before)
+	assert(outside > 0 and outside < 160, `some rays from the sill reach the world round it, most do not ({outside})`)
 	workspace:ClearAllChildren()
 end)
 
@@ -323,11 +325,13 @@ check("the focus is reported when the spider has moved more than 8 studs from th
 	workspace:ClearAllChildren()
 end)
 
-check("the world's bounds: out of it is in no region, so a fall from the sill's room side ends where it always did and one from the outer sill goes on to the bed", function()
+check("the world's bounds: out of it is in no region, so a fall from the sill's room side lands on the counter and one from the outer sill goes on to the bed", function()
 	workspace:ClearAllChildren()
 	serverWorld()
 	local c = WorldClient.new(workspace, player())
-	assert(c:inBounds(Vector3.new(0, -4.9, 12.4)) and not c:inBounds(Vector3.new(0, -5.1, 12.4)), "in front of the sill (the room's side), y -5 is the floor of the world, as it was")
+	-- (ROBLOX-112: in front of the sill is the kitchen's counter, 4 cm down: a fall off the sill's front edge lands on its worktop; under the sill board is the wall)
+	assert(c:inBounds(Vector3.new(0, -4.9, 12.4)) and c:inBounds(Vector3.new(0, -5.1, 12.4)) and c:inBounds(Vector3.new(0, -3.69, 40)) and not c:inBounds(Vector3.new(0, -5.1, 0)),
+		"in front of the sill (the room's side) the counter's air goes on down; under the sill board, nothing")
 	assert(c:inBounds(Vector3.new(0, -50, -27)) and c:inBounds(Vector3.new(0, -89.69, -40)) and not c:inBounds(Vector3.new(0, -93.5, -40)), "out over the stone it goes on down past the wall to the bed")
 	assert(not c:inBounds(Vector3.new(60, -50, -40)) and c.homeMin == sill.bounds[1] and c.homeMax == sill.bounds[2], "beside the garden, nothing; the rival's and the mate's bounds are the sill's")
 	local lo, hi = WorldMap.bounds()
@@ -615,7 +619,7 @@ check("a rest under the bed's stone keeps the world it was in (bed_a, bed_a_ston
 	assert(life.resting, "no rest under the stone: " .. tostring(life.notice))
 	local best = driver.currentStore():loadBest()
 	assert(best.ok and best.record.world_map.region == "bed_a" and best.record.world_map.retreat == "bed_a_stone" and best.record.player.retreat_id == "bed_a_stone"
-		and best.record.world_map.revision == "world-2", "the rest carries the bed and its stone")
+		and best.record.world_map.revision == "world-3", "the rest carries the bed and its stone")
 	-- walk out from under it, and come back
 	driver.motor:place(Vector3.new(11, -89.69, -50), Vector3.yAxis, Vector3.new(0, 0, 1))
 	driver.camera:snap()
@@ -915,8 +919,9 @@ check("the looks outside the window are this client's own and follow the spider 
 		if look.sets.Far ~= nil then return "far" end
 		return nil
 	end
-	-- the real client: placed in six regions, the looks it holds once they are made
-	for _, at in { Vector3.new(-5, 0.31, -9), Vector3.new(0, 0.31, -18), Vector3.new(11, -89.69, -43.5), Vector3.new(0, 109.31, -61), Vector3.new(-70, -89.69, -60), Vector3.new(-450, -89.69, -150) } do
+	-- the real client: placed in seven regions (ROBLOX-112: the kitchen too), the looks it holds once they are made
+	for _, at in { Vector3.new(-5, 0.31, -9), Vector3.new(0, 0.31, -18), Vector3.new(11, -89.69, -43.5), Vector3.new(0, 149.31, -71), Vector3.new(-70, -89.69, -60), Vector3.new(-450, -89.69, -150),
+		Vector3.new(-45, -3.69, 41) } do
 		driver.place(at)
 		frames(2)
 		looks:finish()
@@ -957,8 +962,8 @@ check("the looks outside the window are this client's own and follow the spider 
 	-- the low tier, at the twelve places of tests/worldmap.luau: within 500 parts, nothing only the full tier draws
 	local low = LookStream.new(holder, "low", serverFolder)
 	holder.Parent = workspace
-	for _, at in { Vector3.new(-5, 0.31, -9), Vector3.new(0, 0.31, -18), Vector3.new(0, -45, -24.3), Vector3.new(-20, -88, -24.3), Vector3.new(11, -89.69, -43.5), Vector3.new(0, 109.3, -61),
-		Vector3.new(-80, -45, -24.3), Vector3.new(-50, 92, -40), Vector3.new(-30, -89.7, -30), Vector3.new(-120, -89.7, -112), Vector3.new(-262, -89.7, -112), Vector3.new(-495, -89.7, -195) } do
+	for _, at in { Vector3.new(-5, 0.31, -9), Vector3.new(0, 0.31, -18), Vector3.new(0, -45, -24.3), Vector3.new(-20, -88, -24.3), Vector3.new(11, -89.69, -43.5), Vector3.new(0, 149.3, -71),
+		Vector3.new(-80, -45, -24.3), Vector3.new(-50, 132, -40), Vector3.new(-30, -89.7, -30), Vector3.new(-120, -89.7, -112), Vector3.new(-262, -89.7, -112), Vector3.new(-495, -89.7, -195) } do
 		low:update(at, WorldMap.at(at))
 		low:finish()
 		local n = partsIn(holder)

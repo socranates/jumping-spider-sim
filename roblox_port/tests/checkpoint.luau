@@ -1208,7 +1208,12 @@ case("a rest records where in the world it was kept, and a record from before me
 	ghost.player.retreat_id = "stone"
 	check(string.find(table.concat(Checkpoint.check(ghost, w), "; "), "unknown retreat", 1, true) ~= nil, "and an old record in a retreat that is not on the map is refused")
 	-- The current revision's record from the sill is as trusted as ever: it comes back where it was kept.
-	check(Checkpoint.restore(record, w) and (w.motor.pos - HOME).Magnitude < 1e-6 and Layout.inRetreat(w.motor.pos), "a rest kept under world-2 comes back in the crack")
+	check(Checkpoint.restore(record, w) and (w.motor.pos - HOME).Magnitude < 1e-6 and Layout.inRetreat(w.motor.pos), "a rest kept under world-3 comes back in the crack")
+	-- (ROBLOX-112) one kept under world-2, before the window and its eaves moved, is put back at the spawn with the notice
+	local two = Json.copy(record)
+	two.world_map.revision = "world-2"
+	check(Checkpoint.restore(two, w) and (w.motor.pos - spawn).Magnitude < 1e-6 and string.find(w.life.notice, "the world has changed since you rested", 1, true) ~= nil,
+		"a rest kept under world-2 comes back at the spawn, with the notice")
 end)
 
 case("a rest under the bed's stone (ROBLOX-95): it records the bed and its stone, is checked against the bed, and comes back there", function()
@@ -1217,8 +1222,8 @@ case("a rest under the bed's stone (ROBLOX-95): it records the bed and its stone
 	local under = Vector3.new(11, -89.69, -50)
 	w.motor:place(under, Vector3.yAxis, Vector3.new(0, 0, 1))
 	local record = assert(Checkpoint.capture(w, 0))
-	check(record.world_map.region == "bed_a" and record.world_map.retreat == "bed_a_stone" and record.player.retreat_id == "bed_a_stone" and record.world_map.revision == "world-2",
-		"a rest under the stone records bed_a, bed_a_stone and world-2")
+	check(record.world_map.region == "bed_a" and record.world_map.retreat == "bed_a_stone" and record.player.retreat_id == "bed_a_stone" and record.world_map.revision == "world-3",
+		"a rest under the stone records bed_a, bed_a_stone and world-3")
 	check(#(Checkpoint.check(record, w)) == 0 and #(Checkpoint.check(Json.copy(record), w)) == 0, "a good record, and a stored copy of it")
 	w.motor:place(Layout.SPAWN + Vector3.new(0, 0.31, 0), Vector3.yAxis, Vector3.xAxis)
 	check(Checkpoint.restore(record, w) and (w.motor.pos - under).Magnitude < 1e-6 and WorldMap.inRetreat(w.motor.pos) == "bed_a_stone", "and it comes back under the stone")
@@ -1251,8 +1256,8 @@ case("a rest under a dead leaf in the bushes (ROBLOX-107): it records the chunk 
 		local under = Vector3.new((t.min.X + t.max.X) / 2, t.min.Y + 0.31, (t.min.Z + t.max.Z) / 2)
 		w.motor:place(under, Vector3.yAxis, Vector3.new(0, 0, 1))
 		local record = assert(Checkpoint.capture(w, 0))
-		check(record.world_map.region == id and record.world_map.retreat == t.id and record.player.retreat_id == t.id and record.world_map.revision == "world-2",
-			`a rest under {id}'s dead leaf records {id}, {t.id} and world-2`)
+		check(record.world_map.region == id and record.world_map.retreat == t.id and record.player.retreat_id == t.id and record.world_map.revision == "world-3",
+			`a rest under {id}'s dead leaf records {id}, {t.id} and world-3`)
 		check(#(Checkpoint.check(record, w)) == 0 and #(Checkpoint.check(Json.copy(record), w)) == 0 and #SaveRest.check("main", record) == 0, "a good record, a stored copy, and the server accepts it")
 		w.motor:place(Layout.SPAWN + Vector3.new(0, 0.31, 0), Vector3.yAxis, Vector3.xAxis)
 		check(Checkpoint.restore(record, w) and (w.motor.pos - under).Magnitude < 1e-6 and WorldMap.inRetreat(w.motor.pos) == t.id, "and it comes back under the leaf")
@@ -1260,6 +1265,27 @@ case("a rest under a dead leaf in the bushes (ROBLOX-107): it records the chunk 
 		bad.player.position = { under.X, under.Y, -300 }
 		check(string.find(table.concat(Checkpoint.check(bad, w), "; "), "outside " .. id, 1, true) ~= nil, "a spot outside the chunk is refused by its name")
 	end
+end)
+
+case("a rest under the toaster on the kitchen's counter (ROBLOX-112): it records the counter and the toaster, is checked against the counter, and comes back there", function()
+	local w = newWorld()
+	for _ = 1, 60 do tick(w) end
+	local r = WorldMap.region("kitchen_counter") :: WorldMap.Region
+	local t = r.retreats[1]
+	local under = Vector3.new((t.min.X + t.max.X) / 2, t.min.Y + 0.31, (t.min.Z + t.max.Z) / 2)
+	w.motor:place(under, Vector3.yAxis, Vector3.new(0, 0, 1))
+	local record = assert(Checkpoint.capture(w, 0))
+	check(record.world_map.region == "kitchen_counter" and record.world_map.retreat == "kitchen_toaster" and record.player.retreat_id == "kitchen_toaster" and record.world_map.revision == "world-3",
+		"a rest under the toaster records kitchen_counter, kitchen_toaster and world-3")
+	check(#(Checkpoint.check(record, w)) == 0 and #(Checkpoint.check(Json.copy(record), w)) == 0 and #SaveRest.check("main", record) == 0, "a good record, a stored copy, and the server accepts it")
+	w.motor:place(Layout.SPAWN + Vector3.new(0, 0.31, 0), Vector3.yAxis, Vector3.xAxis)
+	check(Checkpoint.restore(record, w) and (w.motor.pos - under).Magnitude < 1e-6 and WorldMap.inRetreat(w.motor.pos) == "kitchen_toaster", "and it comes back under the toaster")
+	local bad = Json.copy(record)
+	bad.player.position = { under.X, under.Y, 200 }
+	check(string.find(table.concat(Checkpoint.check(bad, w), "; "), "outside kitchen_counter", 1, true) ~= nil, "a spot outside the counter is refused by its name")
+	local moved = Json.copy(record)
+	moved.world_map.revision = "world-2"
+	check(Checkpoint.restore(moved, w) and (w.motor.pos - (r.spawn.pos + Vector3.new(0, 0.31, 0))).Magnitude < 1e-6, "one from another revision comes back at the counter's spawn, in front of the toaster")
 end)
 
 case("a region that is not on the map, a spot outside its bounds and a bad world record are refused and change nothing (ROBLOX-94)", function()

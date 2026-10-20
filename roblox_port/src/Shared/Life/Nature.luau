@@ -101,9 +101,13 @@ function Nature.found(seed: number, night: number, pass: number): boolean
 	return found[pass] == true
 end
 
--- Whether a spider is exposed to the night where it is: in the standard rules, anywhere but the sill, out of every retreat.
+-- The kinds of region inside the house, where the garden's night (its ground hunters, its cold) does not reach: the sill, and (ROBLOX-112) the kitchen's counter and floor.
+-- The inside's own night (the house spider, the lamp's moths) is the inside's round (docs/WORLD_MAP_PLAN.md).
+Nature.INDOORS = table.freeze({ sill = true, counter = true, kitchen_floor = true })
+
+-- Whether a spider is exposed to the night where it is: in the standard rules, anywhere outside the house (ROBLOX-106: anywhere but the sill), out of every retreat.
 function Nature.exposed(standard: boolean, regionKind: string, inRetreat: boolean): boolean
-	return standard and regionKind ~= "sill" and not inRetreat
+	return standard and not Nature.INDOORS[regionKind] and not inRetreat
 end
 
 -- One tick of the night. `st` is the caller's (never saved; cleared on a return to a rest and a new life); `life` the LifeLoop (its clock; `cold_day` is set on it,

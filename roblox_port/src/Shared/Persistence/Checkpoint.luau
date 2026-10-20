@@ -32,6 +32,8 @@
 -- ROBLOX-95: the world is at revision world-2 (the sill's back frame opened, the garden added) and a record without `world_map` is read as world-1's, the sill
 -- of before: every rest kept before this round is put back at its region's spawn with the notice. A rest in the garden (the gap under the bed's stone) records
 -- region bed_a and retreat bed_a_stone and is put back there. SCHEMA_VERSION and CONTENT_REVISION do not change (a new content revision would refuse old records).
+-- ROBLOX-112: world-3 (the window in true proportion, the eaves raised, the kitchen): a rest kept under world-2 is put back at its region's spawn the same way, and a
+-- rest under the toaster on the kitchen's counter records region kitchen_counter and retreat kitchen_toaster.
 -- ROBLOX-96: the prey is per region. The `prey` root is still the sill's director, byte for byte what it was (an old record, sill-only prey, restores unchanged);
 -- the regions outside are an optional `garden` root, { [regionId] = { prey = a PreyDirector?, bugs = a Woodlice? } } (Prey/PreyWorld's table), recorded when the
 -- world has one and checked like the sill's: every fly in a known state with a meal inside its own profile's, every held perch held by a living fly, the woodlice

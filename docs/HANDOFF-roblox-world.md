@@ -488,3 +488,29 @@ What is in it:
 6. **The frame time**: the `INFO frame time` lines (the sill's and the bed's, against v35's). The regions' looks are persistent models, always on the client, so the
    ten chunks' looks are there wherever the spider is: the looks outside the window are 3,647 parts at full now (870 before) and 1,215 at low (286). If the frame time
    moved, or a phone struggles, say so: the looks can be made to stream with their regions (a choice for a later round, not made here).
+
+## Performance for a real release (ROBLOX-108, 2026-10-20)
+
+Claude → Chet, 2026-10-20, branch `claude/perf`. For phones and the PlayStation. **The looks outside the window are made on each client near its spider**,
+not by the server for everyone: the server no longer builds `WorldDecor`; each client builds the regions' looks itself from the same seeded generators
+(`Client/LookStream` following `World/LookPlan`'s plan) into its own `Workspace.WorldDecor`, at most 1,500 parts at full and 500 at low (3,647 and 1,215 were
+always there before): the region the spider is in and every region it meets at the tier's detail, the house's walls and roof far off as a few big brick-coloured
+parts so the house never has a hole, the rest nearest first. At most 120 parts are made a frame, but a region the spider is in or beside that has nothing drawn
+is made whole at once. **The rest's hitch**: the frame a rest begins encoded the rest's record (about 300,000 characters after a visit to the garden) four to six
+times; now three to five, each pass cheaper, the same bytes stored. **The low tier**: the house fly is 29 parts at low (39 at full); a PlayStation is always the
+full tier (`GuiService:IsTenFootInterface()`). **The CLI suite is fast**: the shim's queries are cached and gridded and its frames multiply without garbage, with
+every answer as before. `docs/DECISIONS.md` ROBLOX-108 has the numbers. **Nothing of it has run in Studio.**
+
+## Your Studio checklist (ROBLOX-108)
+
+1. **The self-test first**: `workspace:SetAttribute("SelfTest", true)`, Play, touch nothing, send the printout. All checks should pass as before. New: an
+   `INFO looks outside the window: ...` line (how many look parts the client holds; at most 1,500 at full). Send the two `INFO frame time` lines: the sill's
+   comes right after a rest, where the 129 ms frame was.
+2. **Pop-in**: walk out of the window, down the brick to the bed and west into the bushes, and on to the far corner. Watch the edges of what you can see: do
+   bushes or details appear or vanish where you are looking? (Bushes more than about 2.6 m off are not drawn; the house far off is a plain brick wall with its roof,
+   eaves and drainpipe, and its bricks, window and door come in as you come near.)
+3. **The house from far off**: from the far corner of the bushes (x -495), look back at the house. It should be whole: a brick wall to the eaves, the roof, the
+   gutter line, the drainpipe. Does the plain brick read as the same wall as the bricks near you, in Roblox's light and haze?
+4. **A rest and its return**: rest in the crack (and under the bed's stone), leave, return. Any hitch you feel at the moment the rest begins?
+5. **On a phone** (low tier): the same walk; the house flies on the sill are a little plainer (no bristles, no wing sheen). Frame time and heat.
+6. **On the PlayStation**: it should be the full tier (the spider's full fur). If a PlayStation 4 struggles, set `Workspace.Detail = "low"` to compare and say.

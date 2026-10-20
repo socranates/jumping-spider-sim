@@ -22,7 +22,8 @@ export type Drawn = Garden.Drawn
 
 -- The name of the folder every region's folder of physical boxes is built under, in the workspace (WorldBuild; the client's rays include it).
 Region.WORLD_FOLDER = "World"
--- The folder beside it that holds the drawn look of every region but the sill (WorldBuild.looks; the sill's is the Decor model, as it always was).
+-- The folder beside it that holds the drawn look of every region but the sill (the sill's is the Decor model, as it always was): since ROBLOX-108 each client's own,
+-- made near its spider (Client/LookStream); WorldBuild.looks builds every look into one for the previewer and the tests.
 Region.LOOKS_FOLDER = "WorldDecor"
 
 -- ROBLOX-95: the open sash, as the sill's creatures keep out of it: the gap between the back frame's pieces (WindowsillLayout back_frame_*), grown by 0.3 across

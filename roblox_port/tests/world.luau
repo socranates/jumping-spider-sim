@@ -69,6 +69,8 @@ check(Graphics.tiers.low.dustRate < Graphics.tiers.full.dustRate and Graphics.ti
 check(Detail.choose(true, nil) == "low" and Detail.choose(false, nil) == "full", "touch-only devices get the low tier")
 check(Detail.choose(true, "full") == "full" and Detail.choose(false, "low") == "low", "the Detail attribute overrides the guess")
 check(Detail.choose(false, "bogus") == "full" and Detail.choose(true, 42) == "low", "a bad Detail attribute is ignored")
+check(Detail.choose(false, nil, true) == "full" and Detail.choose(true, nil, true) == "full" and Detail.choose(true, "low", true) == "low" and Detail.choose(true, nil, false) == "low",
+	"a console (a PlayStation on a television) is the full tier even if it reports touch; the Detail attribute still wins (ROBLOX-108)")
 
 -- ---------------------------------------------------------------- the sun pick, with invented suns
 -- Declination 0: the sun's (east, up, north) at a clock time and latitude. The world axes are not known, so try both

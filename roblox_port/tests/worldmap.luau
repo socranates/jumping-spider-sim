@@ -681,5 +681,118 @@ case("the bed's perch list lies inside the bed, each perch on a face of one of i
 	check(Region.budget("house_wall", "full") == 134 and Region.budget("house_wall", "low") == 75, "the wall's budget carries the descent's dressing and ROBLOX-103's drips, joints and moss (93/73, then 110/75)")
 end)
 
+
+-- ROBLOX-108: the looks a client holds (World/LookPlan): at most LookPlan.BUDGET parts of the regions' looks outside the window at once, the region the spider is
+-- in and every region it meets always at the tier's detail, the house's shell always there (far at least), and the rest nearest first.
+case("the looks a client holds: the budget at twelve places across the map, the region and its neighbours always drawn, the house never with a hole", function()
+	local LookPlan = require("../src/Shared/World/LookPlan")
+	local everything = { full = 0, low = 0 }
+	for _, r in WorldMap.regions() do
+		if r.kind ~= "sill" then
+			everything.full += LookPlan.count(r, "full")
+			everything.low += LookPlan.count(r, "low")
+			check(LookPlan.count(r, "full") == Region.budget(r.kind, "full") and LookPlan.count(r, "low") == Region.budget(r.kind, "low"), `{r.id}: its full and low looks are its budgets`)
+		end
+	end
+	check(everything.full == 3647 and everything.low == 1215, `every look at once would be {everything.full} parts at full and {everything.low} at low (ROBLOX-107's persistent looks)`)
+	check(LookPlan.BUDGET.full == 1500 and LookPlan.BUDGET.low == 500, "the budgets: 1,500 parts at full, 500 at low")
+	-- the far looks: the house's walls and roof, a handful of big parts each, the mortar beds drawn as brick
+	local brick = Color3.fromHex(Garden.WALL.bricks[1])
+	for kind, ids in LookPlan.FAR do
+		local region: WorldMap.Region? = nil
+		for _, r in WorldMap.regions() do if r.kind == kind then region = r; break end end
+		local far = LookPlan.records(region :: any, "far")
+		check(#far == #ids and #far >= 1 and #far <= 8, `{kind}: a far look of {#far} parts`)
+		for i, d in far do
+			check(d.id == ids[i] and not d.full, `{kind}: far part {i} is {ids[i]}, a part of the low look`)
+			if d.id == "Mortar" then check(d.color.R == brick.R and d.color.G == brick.G and d.color.B == brick.B and d.material == Garden.WALL.brickMaterial, `{kind}: its mortar bed is drawn as brick from far off`) end
+		end
+	end
+	local places = {
+		{ "the sill's spawn", sill.spawn.pos },
+		{ "the outer sill", Vector3.new(0, 0.31, -18) },
+		{ "halfway down the wall", Vector3.new(0, -45, -24.3) },
+		{ "the wall's foot", Vector3.new(-20, -88, -24.3) },
+		{ "the bed's stone", Vector3.new(11, -89.69, -43.5) },
+		{ "the gutter", Vector3.new(0, 109.3, -61) },
+		{ "the wall west", Vector3.new(-80, -45, -24.3) },
+		{ "the drainpipe's swan neck", Vector3.new(-50, 92, -40) },
+		{ "the bushes by the bed and the house", Vector3.new(-30, -89.7, -30) },
+		{ "where four chunks meet", Vector3.new(-120, -89.7, -112) },
+		{ "the bushes' middle", Vector3.new(-262, -89.7, -112) },
+		{ "the far corner of the bushes", Vector3.new(-495, -89.7, -195) },
+	}
+	local held: { [string]: any } = {}
+	for _, place in places do
+		local name, at = place[1], place[2]
+		local own = WorldMap.at(at) :: WorldMap.Region
+		check(own ~= nil, `{name} is in a region`)
+		for _, tier in { "full", "low" } do
+			local plan, total = LookPlan.plan(at, tier, own)
+			local sum = 0
+			for id, level in plan do sum += LookPlan.count(WorldMap.region(id) :: any, level) end
+			check(sum == total and total <= LookPlan.BUDGET[tier], `{name}, {tier}: {total} parts of looks (at most {LookPlan.BUDGET[tier]})`)
+			if own.kind ~= "sill" then check(plan[own.id] == tier, `{name}, {tier}: its own region {own.id} at the tier's detail`) end
+			for _, n in own.neighbors do
+				local r = WorldMap.region(n.id) :: WorldMap.Region
+				if r.kind ~= "sill" then check(plan[n.id] == tier, `{name}, {tier}: its neighbour {n.id} at the tier's detail ({tostring(plan[n.id])})`) end
+			end
+			for kind in LookPlan.FAR do
+				for _, r in WorldMap.regions() do
+					if r.kind == kind then check(plan[r.id] ~= nil, `{name}, {tier}: the house's {r.id} is drawn ({tostring(plan[r.id])})`) end
+				end
+			end
+			for id, level in plan do
+				check(WorldMap.region(id) ~= nil and (WorldMap.region(id) :: any).kind ~= "sill" and (level == "full" or level == "low" or level == "far") and not (tier == "low" and level == "full"),
+					`{name}, {tier}: {id} at {level}`)
+			end
+			local again = LookPlan.plan(at, tier, own)
+			local same = true
+			for id, level in plan do if again[id] ~= level then same = false end end
+			for id in again do if plan[id] == nil then same = false end end
+			check(same, `{name}, {tier}: the same plan asked again`)
+			if tier == "full" then held = plan end
+		end
+		print(string.format("worldmap: the looks at %s: %d parts at full, %d at low", name, select(2, LookPlan.plan(at, "full", own)), select(2, LookPlan.plan(at, "low", own))))
+	end
+	-- the hysteresis: a region held is kept a little beyond the radius; the same region not held is not drawn there
+	local at = Vector3.new(-495, -89.7, -195)
+	local plan = LookPlan.plan(at, "full", WorldMap.at(at))
+	check(plan.bed_a == nil and plan.shrub_west_a == nil, "from the far corner the bed and the first bushes are not drawn")
+	local bed = WorldMap.region("bed_a") :: WorldMap.Region
+	local two = { HOME = "sill", regions = function() return { sill, bed } end, at = function(_p: Vector3) return nil end,
+		region = function(id: string) return if id == "sill" then sill elseif id == "bed_a" then bed else nil end }
+	local edge = Vector3.new(bed.bounds[2].X + LookPlan.RADIUS.full + 15, -89.7, -50)
+	local base = LookPlan.plan(edge, "full", nil, nil, two)
+	local kept = LookPlan.plan(edge, "full", nil, { bed_a = "low" }, two)
+	local gone = LookPlan.plan(edge + Vector3.new(LookPlan.KEEP, 0, 0), "full", nil, { bed_a = "full" }, two)
+	check(base.bed_a == nil and kept.bed_a == "full" and gone.bed_a == nil, `the bed {LookPlan.distance(bed, edge)} studs off: not drawn, unless it is held (then kept to the radius and {LookPlan.KEEP} more)`)
+	-- a walk from the sill's spawn down to the bed and out to the far corner of the bushes, a plan every two studs: always within the budget, always its region and
+	-- neighbours, and the looks it makes along the way
+	local path = { sill.spawn.pos, Vector3.new(0, 0.31, -18), Vector3.new(0, -3.3, -24.3), Vector3.new(0, -89.7, -30), Vector3.new(-30, -89.7, -30), Vector3.new(-262, -89.7, -112), Vector3.new(-495, -89.7, -195) }
+	for _, tier in { "full", "low" } do
+		local holding: { [string]: any } = {}
+		local worst, changes, here = 0, 0, WorldMap.region("sill")
+		local ok = true
+		for k = 1, #path - 1 do
+			local a, b = path[k], path[k + 1]
+			local steps = math.max(1, math.ceil((b - a).Magnitude / 2))
+			for i = 0, steps do
+				local p = a:Lerp(b, i / steps)
+				here = WorldMap.at(p) or here
+				local now, total = LookPlan.plan(p, tier, here, holding)
+				worst = math.max(worst, total)
+				if total > LookPlan.BUDGET[tier] then ok = false end
+				for id, level in now do if holding[id] ~= level then changes += 1 end end
+				for id in holding do if now[id] == nil then changes += 1 end end
+				holding = now
+			end
+		end
+		check(ok and worst <= LookPlan.BUDGET[tier], `the walk at {tier}: at most {worst} parts at once`)
+		check(changes <= 60, `the walk at {tier}: {changes} looks made, changed or dropped over about 640 studs`)
+		print(`worldmap: the walk at {tier}: at most {worst} parts, {changes} changes`)
+	end
+end)
+
 print(`WORLDMAP passed={passed} failed={failed}`)
 if failed > 0 then error("WORLDMAP failed") end

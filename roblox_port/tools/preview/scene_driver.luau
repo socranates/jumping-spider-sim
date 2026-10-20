@@ -2,10 +2,13 @@
 -- spider (Rig/SpiderRig, at the places scene.py asks for) and the real fly bodies (Client/FlyBodies) under the test shim, then prints
 -- every visible part for scene.gd to draw. The shim is not Roblox: this is a layout and colour preview, never Roblox rendering.
 -- scene.py puts these globals in front of the bundle: DETAIL ("full" or "low"), SUN_ELEVATION_DEG, SUN_AZIMUTH_DEG, SPIDERS (a list
--- of { name, x, z, hx, hz }), FLIES (a list of { id, x, y, z, hx, hy, hz, flying }), WASPS (a list of { id, x, y, z, hx, hz, mode, search, beat }).
+-- of { name, x, z, hx, hz }), FLIES (a list of { id, x, y, z, hx, hy, hz, flying }), WASPS (a list of { id, x, y, z, hx, hz, mode, search, beat }), WORLD and
+-- LOOKS_AT (ROBLOX-108: false, or { x, y, z }, where a client's spider is: the looks drawn are the ones that client holds).
 local Scenery = require("../src/Shared/Habitat/Scenery")
 local WorldMap = require("../src/Shared/World/WorldMap")
 local WorldBuild = require("../src/Shared/World/WorldBuild")
+local Region = require("../src/Shared/World/Region")
+local LookStream = require("../src/Client/LookStream")
 local WorldDetail = require("../src/Client/WorldDetail")
 local SupportMath = require("../src/Shared/Movement/SupportMath")
 local SpiderRig = require("../src/Shared/Rig/SpiderRig")
@@ -30,11 +33,25 @@ if DETAIL == "low" then WorldDetail.apply("low", { decor }) end
 local outside = Instance.new("Folder")
 outside.Name = "Outside"
 if WORLD then
-	local looks, looksDrawn = WorldBuild.looks(workspace, WorldMap.SEED)
-	if DETAIL == "low" then WorldDetail.apply("low", { looks }) end
 	local hide: { [string]: boolean } = {}
 	for id in drawn do hide[id] = true end
-	for id in looksDrawn do hide[id] = true end
+	local looks: Instance
+	if LOOKS_AT then
+		-- ROBLOX-108: the looks a client whose spider is at LOOKS_AT holds (Client/LookStream on World/LookPlan's plan), every drawn piece hidden as the server hides them
+		for _, region in WorldMap.regions() do
+			if region.kind ~= "sill" then for _, id in Region.drawnPieces(region) do hide[id] = true end end
+		end
+		local at = Vector3.new(LOOKS_AT[1], LOOKS_AT[2], LOOKS_AT[3])
+		local stream = LookStream.new(workspace, DETAIL, nil)
+		stream:update(at, WorldMap.at(at))
+		stream:finish()
+		looks = stream.folder
+	else
+		local all, looksDrawn = WorldBuild.looks(workspace, WorldMap.SEED)
+		if DETAIL == "low" then WorldDetail.apply("low", { all }) end
+		for id in looksDrawn do hide[id] = true end
+		looks = all
+	end
 	for _, region in WorldMap.regions() do
 		if region.kind ~= "sill" then WorldBuild.region(region, outside, hide) end
 	end

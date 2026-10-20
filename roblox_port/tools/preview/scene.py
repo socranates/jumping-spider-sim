@@ -20,6 +20,8 @@ With --world (ROBLOX-105): spec_ladybird, spec_millipede, spec_snail, spec_harve
 stalks drawn in) and ambient_dock, ambient_dandelion, ambient_snail, ambient_millipede, ambient_harvestman, ambient_wall (in place, an evening).
 With --world (ROBLOX-107): drainpipe, drain_foot, drain_neck (the wall west of the window and its drainpipe), shrub_strip, shrub_chunk, shrub_leaf, shrub_under
 (the bushes beside the bed, the dead leaf over a retreat, under a bush) and house_west (the west of the house from the lawn).
+With --world (ROBLOX-108): far_house (the house from the far corner of the bushes); --looks-at x,y,z draws the looks a client whose spider is there holds
+(World/LookPlan, Client/LookStream: its region and neighbours, the house's walls far, the rest nearest first within the budget) instead of every look at once.
 --parts renders an already dumped part list (for example the "before" list kept next to the images) instead of running the code."""
 import argparse, importlib.util, json, math, pathlib, subprocess, sys, tempfile
 
@@ -38,6 +40,7 @@ ap.add_argument("--format", default="png")
 ap.add_argument("--uv", action="store_true", help="also show the UV layer (as the eye-view helper does) in every view")
 ap.add_argument("--parts", default="")
 ap.add_argument("--world", action="store_true", help="also build the regions outside the window (ROBLOX-95: the outer sill, the wall, the bed) for the outside views, with the bed's prey and woodlice (ROBLOX-96)")
+ap.add_argument("--looks-at", default="", help="x,y,z: draw the looks outside the window as a client whose spider is there holds them (ROBLOX-108, World/LookPlan and Client/LookStream), not every look at once")
 ap.add_argument("--elevation", type=float, default=30.0, help="sun elevation, degrees")
 ap.add_argument("--set", action="append", default=[], help="lighting knob for scene.gd, key=value (energy, ambient, bias, nbias, blur)")
 ap.add_argument("--azimuth", type=float, default=30.0, help="degrees off straight out of the window (-Z); positive turns toward +X")
@@ -86,7 +89,8 @@ def dump_parts(path):
     run.CLIENT_TESTS.add(driver)  # the driver needs the client modules (SpiderRig, FlyBodies) in its bundle
     spiders = SPIDERS if args.world else SPIDERS[:2]
     prefix = (f'DETAIL = {lua(args.detail)}\nSUN_ELEVATION_DEG = {args.elevation}\nSUN_AZIMUTH_DEG = {args.azimuth}\n'
-              f'SPIDERS = {lua(spiders)}\nFLIES = {lua(FLIES)}\nWASPS = {lua(WASPS)}\nWORLD = {lua(args.world)}\n')
+              f'SPIDERS = {lua(spiders)}\nFLIES = {lua(FLIES)}\nWASPS = {lua(WASPS)}\nWORLD = {lua(args.world)}\n'
+              f'LOOKS_AT = {lua([float(c) for c in args.looks_at.split(",")] if args.looks_at else False)}\n')
     with tempfile.NamedTemporaryFile("w", suffix=".luau", encoding="utf-8", delete=False, dir=out) as f:
         f.write(prefix + run.bundle(driver))
     try:
@@ -196,6 +200,8 @@ VIEWS = {
     "shrub_chunk": {"fov": 60, "eye": [-20.0, -40.0, -70.0], "at": [-85.0, -80.0, -75.0], "near": 0.5, "far": 4000, "groups": [], "shadow": 160},
     "shrub_leaf": {"fov": 50, "eye": [-93.0, -86.0, -71.0], "at": [-93.0, -89.5, -86.0], "near": 0.05, "far": 2500, "groups": [], "shadow": 40},
     "shrub_under": {"fov": 70, "eye": [-80.0, -87.5, -95.0], "at": [-95.0, -80.0, -80.0], "near": 0.05, "far": 2500, "groups": [], "shadow": 60},
+    # ROBLOX-108: the house from the far corner of the bushes (with --looks-at -495,-89.7,-195 the walls there are their far looks)
+    "far_house": {"fov": 60, "eye": [-470.0, -60.0, -190.0], "at": [-60.0, 10.0, -24.0], "near": 1.0, "far": 6000, "groups": [], "shadow": 600},
     "house_west": {"fov": 62, "eye": [-150.0, -40.0, -430.0], "at": [-180.0, 0.0, -24.0], "near": 1.0, "far": 6000, "groups": [], "shadow": 600},
 }
 

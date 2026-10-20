@@ -448,6 +448,11 @@ local function checks(): { Check }
 		end
 		table.sort(rows)
 		say(r, `INFO parts at the {tostring(r.ctx.detail)} tier: {total} in the workspace ({table.concat(rows, ", ")})`)
+		-- (ROBLOX-108: the looks outside the window are the client's own, made near the spider within a budget: Client/LookStream)
+		local looks = r.ctx.world.looks
+		if looks ~= nil then
+			say(r, `INFO looks outside the window: {looks:parts()} parts held of {looks.planned} planned at the {looks.tier} tier, {looks.made} made and {looks.destroyed} destroyed this session, {looks.plans} plans`)
+		end
 	end)
 	return list
 end

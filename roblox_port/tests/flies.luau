@@ -565,5 +565,27 @@ do
  bodies:draw({}, t)
  check(next(bodies.rigs) == nil, "gone when not drawn")
 end
+-- ROBLOX-108: the low tier is lighter for the house fly too: no bristles and no films over the wings (29 parts, not 39); its walk and flight are the same
+do
+	local lowBodies = FlyBodies.new(holder, "low")
+	local lowRig = lowBodies:spawn("low1")
+	local fullRig = FlyBodies.new(holder, "full"):spawn("full1")
+	local has = function(r: any, prefix: string): boolean
+		for _, p in r.parts do if string.sub(p.Name, 1, #prefix) == prefix then return true end end
+		return false
+	end
+	check(#fullRig.parts == 39 and #lowRig.parts == 29, `the house fly is {#fullRig.parts} parts at full and {#lowRig.parts} at low`)
+	check(has(fullRig, "Bristle") and has(fullRig, "LeftFilm") and not has(lowRig, "Bristle") and not has(lowRig, "LeftFilm") and has(lowRig, "LeftWing") and has(lowRig, "LeftVein") and has(lowRig, "Shadow"),
+		"at low it keeps its body, stripes, legs, wings, veins and shadow, and leaves out the bristles and the films")
+	local fly = { id = "low1", state = "PERCHED", position = Vector3.new(0, 0.16, 0), heading = -Vector3.zAxis, normal = Vector3.yAxis, airborne = function() return false end }
+	local ok = pcall(function()
+		for k = 0, 30 do fly.position = Vector3.new(0, 0.16, -0.02 * k); lowBodies:draw({ fly } :: { any }, k / 60) end
+		fly.airborne = function() return true end
+		for k = 31, 60 do lowBodies:draw({ fly } :: { any }, k / 60) end
+	end)
+	local finite = true
+	for _, p in lowRig.parts do local q = p.Position; if q.X ~= q.X or q.Y ~= q.Y or q.Z ~= q.Z then finite = false end end
+	check(ok and finite and lowRig.flying == true, "and it walks and flies as the full one does")
+end
 print(`FLIES passed={passed} failed={failed}`)
 if failed > 0 then error("fly checks failed") end

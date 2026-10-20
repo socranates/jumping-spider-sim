@@ -1,7 +1,8 @@
 --!strict
 -- The low-detail tier of the world, applied on one client: phones and tablets drop what the server built for the full tier
 -- (anything carrying the attribute FullOnly: bloom, sun rays, clouds, light shafts, the small details, the busier part of the
--- view) and get a thinner dust. Only this client's copy changes; the server and other players keep theirs.
+-- view) and get a thinner dust. Only this client's copy changes; the server and other players keep theirs. (ROBLOX-108: the looks outside the window are made at
+-- the client's tier by Client/LookStream, so nothing of theirs is dropped here.)
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Graphics = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Data"):WaitForChild("Graphics"))
 

@@ -4,6 +4,7 @@
 -- ContextActionService callbacks the engine calls, frames through the bound render step. It catches wiring and runtime
 -- errors anywhere in the client loop. Not evidence of rendering, input devices or the engine's physics.
 local Layout = require("../src/Shared/Habitat/WindowsillLayout")
+local SaveRules = require("../src/Shared/Data/SaveRules")
 local passed, failed = 0, 0
 local function check(name: string, fn: () -> ())
 	local ok, err = pcall(fn)
@@ -15,6 +16,13 @@ for _, p in Layout.PIECES do table.insert(pieces, { name = p.id, lo = p.lo, hi =
 BoxWorld.folder("Windowsill", pieces)
 local loaded, loadError = pcall(function() require("../src/Client/SpiderClient.client") end)
 if not loaded then print("LOAD ERROR", loadError) end
+-- (ROBLOX-108) The saving client gives up on the server's remotes after SaveRules.CLIENT_WAIT_REMOTES seconds of the real clock and says so in a toast. The suite used to
+-- take longer than that before its first checks, so the toast always came and went in the first frames; with the faster shim it fell in the middle of a check of
+-- another toast. The suite waits it out here, so the toast comes on the first frame, as it always did.
+do
+	local t0 = os.clock()
+	while os.clock() - t0 < SaveRules.CLIENT_WAIT_REMOTES + 0.1 do end
+end
 local services = game:GetService("ContextActionService") and ClientStubs
 local frame = ClientStubs.renderSteps.SpiderSim
 local gui = game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui")

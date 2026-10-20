@@ -15,6 +15,7 @@ local Lit = require(Habitat:WaitForChild("Lit"))
 local World = ReplicatedStorage:WaitForChild("Shared"):WaitForChild("World")
 local WorldMap = require(World:WaitForChild("WorldMap"))
 local WorldBuild = require(World:WaitForChild("WorldBuild"))
+local Region = require(World:WaitForChild("Region"))
 local WorldFocus = require(script.Parent.WorldFocus)
 
 Players.CharacterAutoLoads = false
@@ -36,16 +37,18 @@ if not decorOk then
 	warn("[Windowsill] decor failed, the back wall and the Pilea's pieces stay as they were: " .. tostring(decor))
 end
 
--- ROBLOX-95: the looks of the regions outside the window (the outer sill, the brick wall, the bed), a persistent Model each in `WorldDecor`, best effort like the sill's.
-local looksOk, looksOrError, looksDrawn = pcall(WorldBuild.looks, Workspace, WorldMap.SEED)
-if not looksOk then warn("[Windowsill] decor: the garden's looks failed: " .. tostring(looksOrError)) end
+-- ROBLOX-108: the looks of the regions outside the window are no longer built here. Each client builds them itself near its spider from the same seeded generators
+-- (Client/LookStream, World/LookPlan): nothing to replicate, and a client holds at most LookPlan.BUDGET parts of them instead of all of them everywhere (ROBLOX-95 to
+-- 107 built every one here as a persistent model). The pieces a look stands in for are hidden here as before; a client whose look fails shows its own copies.
 
--- Only the pieces whose drawing exists turn invisible (still solid); if the decor failed nothing is hidden. The sill is region 0 of the world: its "Windowsill" folder, exactly
--- as it was, now inside the `World` folder with every other region's.
+-- Only the pieces whose drawing exists turn invisible (still solid); if the sill's decor failed its pieces are not hidden. The sill is region 0 of the world: its
+-- "Windowsill" folder, exactly as it was, now inside the `World` folder with every other region's.
 if decorOk then decor.Parent = Workspace end
 local hidden: { [string]: boolean } = {}
 if decorOk then for id in replaced do hidden[id] = true end end
-if looksOk then for id in looksDrawn do hidden[id] = true end end
+for _, region in WorldMap.regions(WorldMap.SEED) do
+	if region.kind ~= "sill" then for _, id in Region.drawnPieces(region) do hidden[id] = true end end
+end
 WorldBuild.world(Workspace, WorldMap.SEED, hidden)
 
 -- With instance streaming on (Workspace.StreamingEnabled, authored in default.project.json) the server sends a client what is near its replication focus, and a player here

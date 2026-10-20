@@ -85,6 +85,9 @@ a journey of game days, not minutes, and the map is meant to be lived in a regio
    from `docs/GARDEN_BESTIARY.md`, weather when the patio's saucer and the lawn exist. *(ROBLOX-107, 2026-10-19: `shrub_west` built and
    `wall_west` begun from x −120 to −40 with the drainpipe, the second way up to the gutter; the wall on west to −500 and `wall_east` with the door
    are next. Not run in Studio.)*
+   *(Between the rounds, ROBLOX-108, 2026-10-20: performance for a release. Each region's look is made on the client near the spider within a part budget
+   (`World/LookPlan`, `Client/LookStream`), so every region to come adds to the map without adding to what a phone holds at once; a new region kind with walls
+   seen from afar gets a far look in `LookPlan.FAR`. Not run in Studio.)*
 5. The peacock-as-default and the nursery (the sash shut until the spider is ready) can come at any point; the map does not depend on it.
 
 ## For Nathan

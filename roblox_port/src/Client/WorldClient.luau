@@ -20,7 +20,8 @@
 -- radius. So the focus follows the spider: `update` reports the spider's place to the server through the WorldFocus remote (Server/WorldFocus) whenever it has moved more than
 -- REPORT_MOVE studs from the last report or REPORT_EVERY seconds have passed, and the server moves the player's focus part there. And the client knows whether a region it is
 -- in has arrived whole (`regionReady`: its folder holds every piece of Region.pieces); a spider in a region that is not whole is warned about once per region in Output, since
--- a missing box is a fall. The looks of the regions outside (WorldDecor, persistent models like the Decor) are waited for as the Decor is. The player's motor is out of the
+-- a missing box is a fall. (ROBLOX-108: the looks of the regions outside are this client's own, Client/LookStream, made near the spider by `streamLooks` and `update`;
+-- nothing waits for them.) The player's motor is out of the
 -- world only where no region holds it (`inBounds`); the rival's and the mate's are bound to the sill and keep its bounds (`homeMin`, `homeMax`).
 -- ROBLOX-96 (W3): the garden has life. `prey` is the world's prey (Prey/PreyWorld: a director per region, run where the spider is and gated by `regionReady`) and
 -- `bugs` the drawn woodlice (Client/BugBodies); both are made by the client once it has its sill director, and kept here so the client gains no local. `homeRetreat`
@@ -30,6 +31,7 @@ local Shared = ReplicatedStorage:WaitForChild("Shared")
 local WorldMap = require(Shared:WaitForChild("World"):WaitForChild("WorldMap"))
 local Region = require(Shared:WaitForChild("World"):WaitForChild("Region"))
 local LifeClock = require(Shared:WaitForChild("Life"):WaitForChild("LifeClock"))
+local LookStream = require(script.Parent.LookStream)
 
 local WorldClient = {}
 WorldClient.__index = WorldClient
@@ -64,7 +66,6 @@ function WorldClient.new(ws: Instance, player: Instance, map: any?): any
 		sill = root:WaitForChild(name)
 	end
 	local decor = ws:FindFirstChild("Decor")
-	local looks = ws:FindFirstChild(Region.LOOKS_FOLDER)
 	if (ws :: any).StreamingEnabled == true then
 		local deadline = os.clock() + WorldClient.PIECES_WAIT
 		for _, piece in Region.pieces(home) do
@@ -73,10 +74,9 @@ function WorldClient.new(ws: Instance, player: Instance, map: any?): any
 			end
 		end
 		if decor == nil then decor = ws:WaitForChild("Decor", WorldClient.DECOR_WAIT) end
-		if looks == nil then looks = ws:WaitForChild(Region.LOOKS_FOLDER, WorldClient.DECOR_WAIT) end
 	end
 	return setmetatable({
-		map = m, player = player, root = root, sill = sill, decor = decor, looks = looks,
+		map = m, player = player, root = root, sill = sill, decor = decor, looks = nil :: any, -- (`looks`: the LookStream, once `streamLooks` makes it)
 		home = home.id, region = home,
 		boundsMin = lo, boundsMax = hi, spawnPos = home.spawn.pos, spawnHeading = home.spawn.heading,
 		homeMin = home.bounds[1], homeMax = home.bounds[2],
@@ -181,13 +181,23 @@ function WorldClient.refocus(self: any)
 	self.focused = nil
 end
 
+-- ROBLOX-108: the looks of the regions outside the window, made on this client at its tier ("full" or "low") near the spider from now on (Client/LookStream; each
+-- `update` follows the spider). In a place with only the sill straight in the workspace (the box worlds) there is nothing to draw and nothing is made.
+function WorldClient.streamLooks(self: any, ws: Instance, tier: string): any
+	if self.root == self.sill then return nil end
+	self.looks = LookStream.new(ws, tier, self.root, self.map)
+	return self.looks
+end
+
 -- Each frame, before the sim's ticks: the region the spider is in, the pace of its day, the focus on the drawn spider's root (`root`) when it is not set on it yet, the
--- report of where it is to the server (`now`: os.clock() unless a test gives a clock), and whether the region it is in has arrived whole (warned about once if not).
+-- report of where it is to the server (`now`: os.clock() unless a test gives a clock), the looks near it (ROBLOX-108), and whether the region it is in has arrived
+-- whole (warned about once if not).
 function WorldClient.update(self: any, pos: Vector3, root: Instance?, now: number?)
 	self.region = self.map.at(pos) or self.region
 	LifeClock.game.clockScale = self.region.clockScale
 	if root ~= nil and root ~= self.focused then self:focus(root) end
 	self:report(pos, now or os.clock())
+	if self.looks ~= nil then self.looks:update(pos, self.region) end
 	local id = self.region.id
 	if not self.whole[id] then
 		if self:regionReady(id) then

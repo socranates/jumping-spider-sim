@@ -13,6 +13,7 @@ end
 local ESC: { [string]: string } = { ['"'] = '\\"', ["\\"] = "\\\\", ["\b"] = "\\b", ["\f"] = "\\f", ["\n"] = "\\n", ["\r"] = "\\r", ["\t"] = "\\t" }
 
 local function quote(s: string): string
+	if string.find(s, '[%c"\\]') == nil then return '"' .. s .. '"' end -- (ROBLOX-108: most strings need no escape)
 	return '"' .. string.gsub(s, '[%c"\\]', function(c: string): string
 		return ESC[c] or string.format("\\u%04x", string.byte(c))
 	end) .. '"'
@@ -42,76 +43,103 @@ local function shape(t: { [any]: any }): string?
 end
 
 -- The canonical JSON text of `v`, or nil and why it is not storable.
+-- (ROBLOX-108: the path a problem names is kept as a stack of keys and spelt out only when there is a problem; it was a new string for every value, most of the
+-- cost of a checkpoint's save, which runs on the frame the rest begins. The text and every message are as they were.)
 function Json.canonical(v: any): (string?, string?)
 	local seen: { [any]: boolean } = {}
 	local problem: string? = nil
-	local function enc(x: any, path: string): string
+	local trail: { any } = {}
+	local function where(): string
+		local out = "value"
+		for _, k in trail do
+			if type(k) == "number" then out ..= `[{k}]` else out ..= `.{k}` end
+		end
+		return out
+	end
+	local function enc(x: any): string
 		if problem then return "" end
 		local t = type(x)
 		if t == "string" then return quote(x) end
 		if t == "boolean" then return if x then "true" else "false" end
 		if t == "number" then
 			if not finite(x) then
-				problem = `{path}: a number JSON cannot hold`
+				problem = `{where()}: a number JSON cannot hold`
 				return ""
 			end
 			if x == math.floor(x) and math.abs(x) < 2 ^ 53 then return string.format("%d", x) end
 			return string.format("%.17g", x)
 		end
 		if t ~= "table" then
-			problem = `{path}: a {typeof(x)}`
+			problem = `{where()}: a {typeof(x)}`
 			return ""
 		end
 		if getmetatable(x) ~= nil then
-			problem = `{path}: a table with a metatable`
+			problem = `{where()}: a table with a metatable`
 			return ""
 		end
 		if seen[x] then
-			problem = `{path}: a table met twice`
+			problem = `{where()}: a table met twice`
 			return ""
 		end
 		seen[x] = true
 		local kind = shape(x)
+		local depth = #trail + 1
 		if kind == "list" then
 			local parts = table.create(#x)
-			for i, y in ipairs(x) do parts[i] = enc(y, `{path}[{i}]`) end
+			for i, y in ipairs(x) do
+				trail[depth] = i
+				parts[i] = enc(y)
+			end
+			trail[depth] = nil
 			return "[" .. table.concat(parts, ",") .. "]"
 		elseif kind == "object" then
 			local keys: { string } = {}
 			for k in x do table.insert(keys, k) end
 			table.sort(keys)
 			local parts = table.create(#keys)
-			for i, k in keys do parts[i] = quote(k) .. ":" .. enc(x[k], `{path}.{k}`) end
+			for i, k in keys do
+				trail[depth] = k
+				parts[i] = quote(k) .. ":" .. enc(x[k])
+			end
+			trail[depth] = nil
 			return "{" .. table.concat(parts, ",") .. "}"
 		end
-		problem = `{path}: a table with mixed or sparse keys`
+		problem = `{where()}: a table with mixed or sparse keys`
 		return ""
 	end
-	local text = enc(v, "value")
+	local text = enc(v)
 	if problem then return nil, problem end
 	return text, nil
 end
 
 -- A deep copy of a storable value (what a DataStore hands back is never the table that was given to it).
-function Json.copy(v: any): any
+local function copy(v: any): any
 	if type(v) ~= "table" then return v end
 	local out = {}
-	for k, x in v do out[k] = Json.copy(x) end
+	for k, x in v do out[k] = if type(x) == "table" then copy(x) else x end
 	return out
 end
+Json.copy = copy
 
 -- FNV-1a over the text, two independent 32-bit lanes, as 16 hex digits: enough to catch a record cut short or changed.
--- x * 16777619 (the FNV prime, 2^24 + 403) modulo 2^32, exactly: a plain product of two 32-bit numbers can exceed 2^53.
-local function fnvMul(x: number): number
-	return ((x % 256) * 16777216 + x * 403) % 4294967296
-end
-
+-- x * 16777619 (the FNV prime, 2^24 + 403) modulo 2^32, exactly, as ((x % 256) * 2^24 + x * 403) % 2^32: a plain product of two 32-bit numbers can exceed 2^53.
+-- (ROBLOX-108: the bytes are read a block at a time and the multiply is written out in the loop: the same sums as before, one byte at a time, in less time.)
+local BLOCK = 2048
 function Json.checksum(text: string): string
 	local a, b = 0x811c9dc5, 0x050c5d1f
-	for i = 1, #text do
-		local c = string.byte(text, i)
-		a = fnvMul(bit32.bxor(a, c))
-		b = fnvMul(bit32.bxor(b, (c + i) % 256))
+	local n = #text
+	local bxor = bit32.bxor
+	local i0 = 1
+	while i0 <= n do
+		local i1 = math.min(n, i0 + BLOCK - 1)
+		local bytes = { string.byte(text, i0, i1) }
+		for j, c in bytes do
+			local x = bxor(a, c)
+			a = ((x % 256) * 16777216 + x * 403) % 4294967296
+			local y = bxor(b, (c + i0 + j - 1) % 256)
+			b = ((y % 256) * 16777216 + y * 403) % 4294967296
+		end
+		i0 = i1 + 1
 	end
 	return string.format("%08x%08x", a, b)
 end

@@ -10,7 +10,8 @@
 --
 -- ROBLOX-95: three regions outside the window (World/Garden). Their drawn looks (Region.decor) are built by `looks` into a `WorldDecor` folder beside `World`, a persistent
 -- Model per region, as the sill's Decor is, so each look reaches a client whole and the low tier can thin it once (Client/WorldDetail); the pieces a look draws instead
--- (the wall's bricks, the bed's leaves and stems) turn invisible and stay solid, as the sill's back wall and Pilea do.
+-- (the wall's bricks, the bed's leaves and stems) turn invisible and stay solid, as the sill's back wall and Pilea do. (ROBLOX-108: the looks are each client's own now,
+-- made near its spider, Client/LookStream; the pieces are hidden as before.)
 local Scenery = require(script.Parent.Parent.Habitat.Scenery)
 local WorldMap = require(script.Parent.WorldMap)
 local Region = require(script.Parent.Region)
@@ -53,6 +54,8 @@ end
 -- The drawn look of every region but the sill (whose look is the Decor, Scenery.decor): a `WorldDecor` folder under `parent` holding a persistent Model per region, named
 -- for its id. Best effort, as the sill's decor is: a region whose look fails is warned about and left out (its pieces stay visible). Returns the folder and the ids of the
 -- pieces the looks that were built stand in for.
+-- ROBLOX-108: the server no longer calls this. Each client makes the looks near its spider itself (Client/LookStream, World/LookPlan); every look at once is what the
+-- previewer draws (tools/preview/scene.py without --looks-at) and what tests/world.luau holds to the budgets.
 function WorldBuild.looks(parent: Instance, worldSeed: number?): (Folder, { [string]: boolean })
 	local looks = Instance.new("Folder")
 	looks.Name = Region.LOOKS_FOLDER

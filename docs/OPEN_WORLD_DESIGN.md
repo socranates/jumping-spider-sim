@@ -209,6 +209,9 @@ Then full suites, places, bundle, publish.
 - **Streaming with a custom focus** (no character): `ReplicationFocus` works, but the client's sim must never raycast
   into unstreamed space — the active radius must cover the player's region and neighbors, and AI stays regional.
 - **Part budgets on PlayStation and phones**: per-region budgets, the low tier, and later impostors for far regions.
+  *(2026-10-20, ROBLOX-108: the regions' looks are made on each client near its spider, at most 1,500 parts at full and 500 at low (3,647 and 1,215 were
+  always there), the region and its neighbours always, the house's walls as far impostors (a few big brick-coloured parts), the rest nearest first within a
+  radius; a PlayStation is the full tier; the house fly is lighter at low. Not run in Studio or on a device.)*
 - **The 200-local client**: the world wiring is a new module (`Client/WorldClient`), not more lines in SpiderClient.
 - **Save format**: `world` is optional and validated; the revision gate protects positions.
 - **Nav graph size**: region sizing; seams are the only cross-region edges.

@@ -895,5 +895,110 @@ check("the bestiary through the real client: the bed's springtails and leafhoppe
 	for _, f in (workspace:FindFirstChild("Flies") :: Instance):GetChildren() do assert(string.sub(f.Name, 1, 4) == "fly_", "only the sill's flies drawn on the sill: " .. f.Name) end
 end)
 
+
+check("the looks outside the window are this client's own and follow the spider (ROBLOX-108): within the budget, its region and neighbours drawn, spread over frames, at both tiers", function()
+	local LookPlan = require("../src/Shared/World/LookPlan")
+	local LookStream = require("../src/Client/LookStream")
+	local Scenery = require("../src/Shared/Habitat/Scenery")
+	local driver = ClientStubs.driver
+	local looks = driver.world.looks
+	assert(looks ~= nil and looks.tier == "full" and looks.folder.Parent == workspace and looks.folder.Name == Region.LOOKS_FOLDER, "the client's looks, in WorldDecor, at its tier")
+	local function partsIn(root: Instance): number
+		local n = 0
+		for _, d in root:GetDescendants() do if d:IsA("BasePart") then n += 1 end end
+		return n
+	end
+	local function drawn(stream: any, id: string): string?
+		local look = stream.looks[id]
+		if look == nil then return nil end
+		if look.sets.Base ~= nil then return if look.sets.Full ~= nil then "full" else "low" end
+		if look.sets.Far ~= nil then return "far" end
+		return nil
+	end
+	-- the real client: placed in six regions, the looks it holds once they are made
+	for _, at in { Vector3.new(-5, 0.31, -9), Vector3.new(0, 0.31, -18), Vector3.new(11, -89.69, -43.5), Vector3.new(0, 109.31, -61), Vector3.new(-70, -89.69, -60), Vector3.new(-450, -89.69, -150) } do
+		driver.place(at)
+		frames(2)
+		looks:finish()
+		frames(1)
+		local here = WorldMap.at(at) :: WorldMap.Region
+		local n = partsIn(looks.folder)
+		assert(n == looks:parts() and n == looks.planned and n <= LookPlan.BUDGET.full, `at {at} ({here.id}): {n} parts of looks held, planned {looks.planned}`)
+		if here.kind ~= "sill" then assert(drawn(looks, here.id) == "full", `at {here.id}: its own look at full`) end
+		for _, nb in here.neighbors do
+			if nb.id ~= "sill" then assert(drawn(looks, nb.id) == "full", `at {here.id}: its neighbour {nb.id} at full ({tostring(drawn(looks, nb.id))})`) end
+		end
+		for id, level in looks.plan do assert(drawn(looks, id) == level, `at {here.id}: {id} drawn as planned ({level})`) end
+		print(string.format("world_client: at %s the client holds %d parts of looks", here.id, n))
+	end
+	driver.place(Vector3.new(-5, 0.31, -9))
+	frames(2)
+	-- the work is spread: a new stream at the bed makes its region and neighbours whole at once and the rest at most PARTS_PER_FRAME a frame, within the budget
+	local holder = Instance.new("Folder")
+	holder.Parent = workspace
+	local bedAt = Vector3.new(11, -89.69, -43.5)
+	local fresh = LookStream.new(holder, "full", serverFolder)
+	local first = fresh:update(bedAt, WorldMap.at(bedAt))
+	local urgent = LookPlan.count(WorldMap.region("bed_a") :: any, "low") + LookPlan.count(WorldMap.region("house_wall") :: any, "low") + LookPlan.count(WorldMap.region("shrub_west_a") :: any, "low")
+	assert(first <= urgent + LookStream.PARTS_PER_FRAME and drawn(fresh, "bed_a") ~= nil and drawn(fresh, "house_wall") ~= nil and drawn(fresh, "shrub_west_a") ~= nil,
+		`the first frame made {first} parts: the bed, the wall and the first bushes whole (their base looks), at most {LookStream.PARTS_PER_FRAME} more`)
+	local frameCount, worst = 1, first
+	while #fresh.jobs > 0 do
+		local made = fresh:update(bedAt, WorldMap.at(bedAt))
+		worst = math.max(worst, made)
+		assert(made <= LookStream.PARTS_PER_FRAME, `a later frame made {made} parts`)
+		assert(fresh:parts() <= LookPlan.BUDGET.full, "never more than the budget held")
+		frameCount += 1
+		assert(frameCount < 100, "the looks are made in a few frames")
+	end
+	assert(fresh:parts() == fresh.planned, "then the plan is held whole")
+	print(string.format("world_client: a new stream at the bed: %d parts the first frame, %d frames to %d parts", first, frameCount, fresh:parts()))
+	holder:Destroy()
+	-- the low tier, at the twelve places of tests/worldmap.luau: within 500 parts, nothing only the full tier draws
+	local low = LookStream.new(holder, "low", serverFolder)
+	holder.Parent = workspace
+	for _, at in { Vector3.new(-5, 0.31, -9), Vector3.new(0, 0.31, -18), Vector3.new(0, -45, -24.3), Vector3.new(-20, -88, -24.3), Vector3.new(11, -89.69, -43.5), Vector3.new(0, 109.3, -61),
+		Vector3.new(-80, -45, -24.3), Vector3.new(-50, 92, -40), Vector3.new(-30, -89.7, -30), Vector3.new(-120, -89.7, -112), Vector3.new(-262, -89.7, -112), Vector3.new(-495, -89.7, -195) } do
+		low:update(at, WorldMap.at(at))
+		low:finish()
+		local n = partsIn(holder)
+		assert(n == low.planned and n <= LookPlan.BUDGET.low, `low, at {at}: {n} parts`)
+		for _, d in holder:GetDescendants() do assert(d:GetAttribute("FullOnly") ~= true, "low: a part only the full tier draws: " .. d.Name) end
+	end
+	print(string.format("world_client: the low tier's stream: %d parts made and %d destroyed over twelve places", low.made, low.destroyed))
+	holder:Destroy()
+	-- a look that fails is warned about once, its drawn pieces shown on this client, and never tried again
+	local said: { string } = {}
+	local realWarn = warn
+	local realLook = Scenery.look
+	local bad = LookPlan.records(WorldMap.region("house_wall") :: any, "low")
+	warn = function(m: string) table.insert(said, m) end
+	Scenery.look = function(parent: Instance, list: { any }, a: number?, b: number?, g: any?): number
+		if list == bad then error("boom") end
+		return realLook(parent, list, a, b, g)
+	end
+	local broken = LookStream.new(workspace, "full", serverFolder)
+	local ok, err = pcall(function()
+		broken:update(Vector3.new(0, 0.31, -18), WorldMap.region("outer_sill"))
+		broken:finish()
+	end)
+	Scenery.look = realLook
+	warn = realWarn
+	assert(ok, tostring(err))
+	local wallFolder = serverFolder:FindFirstChild("house_wall") :: Instance
+	local shown = true
+	for _, id in Region.drawnPieces(WorldMap.region("house_wall") :: any) do
+		local p = wallFolder:FindFirstChild(id) :: any
+		if p ~= nil and p.Transparency ~= 0 then shown = false end
+	end
+	assert(#said == 1 and string.find(said[1], "house_wall", 1, true) ~= nil and broken.looks.house_wall == nil and broken.failed.house_wall and shown and drawn(broken, "outer_sill") == "full",
+		`a failed look: {#said} warnings, its bricks shown, the others drawn`)
+	broken.folder:Destroy()
+	for _, id in Region.drawnPieces(WorldMap.region("house_wall") :: any) do
+		local p = wallFolder:FindFirstChild(id) :: any
+		if p ~= nil then p.Transparency = 1 end
+	end
+end)
+
 print("WORLD_CLIENT passed=" .. passed .. " failed=" .. failed)
 if failed > 0 then error("WORLD_CLIENT failed") end

@@ -77,7 +77,10 @@ local function rodBetween(a: Vector3, b: Vector3, diameter: number, extraA: numb
 	return Vector3.new((to - from).Magnitude, diameter, diameter), CFrame.lookAt((from + to) / 2, to, up) * CFrame.Angles(0, math.pi / 2, 0)
 end
 
-local function build(): Template
+-- `detail` (ROBLOX-108): at "low" the house fly leaves out its eight bristles and the two iridescent films over its wings (29 parts, not 39): a phone's screen
+-- shows neither at a fly's size, and four flies on the sill are 40 parts fewer to place every frame.
+local function build(detail: string?): Template
+	local low = detail == "low"
 	local C = FlyLook.colors
 	local specs: { Spec } = {}
 	local fans: { [number]: boolean } = {}
@@ -134,7 +137,8 @@ local function build(): Template
 	-- bristles
 	local B = FlyLook.bristles
 	local n = 0
-	for _, item in B.items do
+	local items: { any } = if low then {} else B.items
+	for _, item in items do
 		local sides: { number } = if item.mirror then { 1, -1 } else { 1 }
 		for _, side in sides do
 			n += 1
@@ -173,12 +177,14 @@ local function build(): Template
 		local veinSize, veinFrame = rodBetween(from, to, V.diameter, 0, 0)
 		add(`{word}Vein`, true, color("vein"), "SmoothPlastic", 0,
 			{ size = veinSize, frame = veinFrame, transparency = V.transparency }, { size = veinSize, frame = veinFrame, transparency = 1 })
-		local F = W.film
-		local fi = add(`{word}Film`, false, color("film"), "SmoothPlastic", 0,
-			{ size = restSize + Vector3.new(F.grow, 0, F.grow), frame = wing * CFrame.new(0, F.rise, 0), transparency = F.transparency },
-			{ size = filmFanSize, frame = filmFan * CFrame.new(0, F.rise, 0), transparency = W.fan.film.transparency })
-		fans[fi] = true
-		anim[fi] = { what = "wing", hip = root, side = side, pair = 0, root = fanRoot, rest = root }
+		if not low then
+			local F = W.film
+			local fi = add(`{word}Film`, false, color("film"), "SmoothPlastic", 0,
+				{ size = restSize + Vector3.new(F.grow, 0, F.grow), frame = wing * CFrame.new(0, F.rise, 0), transparency = F.transparency },
+				{ size = filmFanSize, frame = filmFan * CFrame.new(0, F.rise, 0), transparency = W.fan.film.transparency })
+			fans[fi] = true
+			anim[fi] = { what = "wing", hip = root, side = side, pair = 0, root = fanRoot, rest = root }
+		end
 	end
 
 	-- the shadow: a dark oval on the surface, only while the fly stands
@@ -305,7 +311,7 @@ function FlyBodies.new(parent: Instance, detail: string?): any
 	local folder = Instance.new("Folder")
 	folder.Name = "Flies"
 	folder.Parent = parent
-	return setmetatable({ folder = folder, rigs = {}, template = build(), templates = {} :: { [string]: Template }, parts = {}, frames = {}, detail = detail or "full" }, FlyBodies)
+	return setmetatable({ folder = folder, rigs = {}, template = build(detail), templates = {} :: { [string]: Template }, parts = {}, frames = {}, detail = detail or "full" }, FlyBodies)
 end
 
 -- The template a prey kind is drawn from (Species body.prey_kind): one of FlyLook.small's, built when first asked for, or the house fly's. `kind` may end in

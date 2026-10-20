@@ -121,13 +121,17 @@ end
 -- ---------------------------------------------------------------- a drawn look from records (ROBLOX-95)
 -- One drawn-only part for each record of a region's look (World/Garden.Drawn: Region.decor of every kind but the sill's): anchored, nothing collides with it, no
 -- ray sees it, built into a folder per `group` under `parent`; `full` records carry FullOnly (Client/WorldDetail drops them on the low tier). Returns how many.
+-- ROBLOX-108: `first` and `last` build only that slice of the list (a client spreads a look over a few frames, Client/LookStream), and `folders`, kept by the
+-- caller between slices, holds the group folders already made under `parent`, so a look built in slices is the one built at once.
 export type Drawn = {
 	id: string, size: Vector3, at: Vector3, color: Color3, transparency: number?,
 	material: string?, shape: string?, turn: Vector3?, full: boolean?, group: string?, shadow: boolean?,
 }
-function Scenery.look(parent: Instance, list: { Drawn }): number
-	local groups: { [string]: Instance } = {}
-	for _, d in list do
+function Scenery.look(parent: Instance, list: { Drawn }, first: number?, last: number?, folders: { [string]: Instance }?): number
+	local groups: { [string]: Instance } = folders or {}
+	local i0, i1 = first or 1, math.min(last or #list, #list)
+	for i = i0, i1 do
+		local d = list[i]
 		local name = d.group or ""
 		local into: Instance? = groups[name]
 		if into == nil then
@@ -151,7 +155,7 @@ function Scenery.look(parent: Instance, list: { Drawn }): number
 		end
 		if d.full then p:SetAttribute("FullOnly", true) end
 	end
-	return #list
+	return math.max(0, i1 - i0 + 1)
 end
 
 -- ---------------------------------------------------------------- the window wall

@@ -59,6 +59,7 @@ MODULES = [
     ("Flora", "Data/Flora.luau"),
     ("Garden", "World/Garden.luau"),
     ("Region", "World/Region.luau"),
+    ("LookPlan", "World/LookPlan.luau"),
     ("Wear", "Data/Wear.luau"),
     ("FlyLook", "Data/FlyLook.luau"),
     ("WaspLook", "Data/WaspLook.luau"),
@@ -198,6 +199,7 @@ CLIENT_MODULES = [
     ("PerceptionHud", "../Client/PerceptionHud.luau"),
     ("SpiderEyes", "../Client/SpiderEyes.luau"),
     ("SaveClient", "../Client/SaveClient.luau"),
+    ("LookStream", "../Client/LookStream.luau"),
     ("WorldClient", "../Client/WorldClient.luau"),
     ("SelfTest", "../Client/SelfTest.luau"),
 ]

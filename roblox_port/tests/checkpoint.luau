@@ -1372,5 +1372,59 @@ do
 	check(LifeText.restRefusal("anything new") == LifeText.REST_FALLBACK, "a reason nobody wrote words for says the plain fallback")
 end
 
+case("a rest's save is lighter on the frame it begins (ROBLOX-108): the same entries, its record encoded three times and summed once, not four and twice", function()
+	-- the encoding's text and the checksum are as they were: against a plain one-byte-at-a-time FNV-1a over two lanes and texts across the block's edge
+	local function reference(text: string): string
+		local function mul(x: number): number return ((x % 256) * 16777216 + x * 403) % 4294967296 end
+		local a, b = 0x811c9dc5, 0x050c5d1f
+		for i = 1, #text do
+			local c = string.byte(text, i)
+			a = mul(bit32.bxor(a, c))
+			b = mul(bit32.bxor(b, (c + i) % 256))
+		end
+		return string.format("%08x%08x", a, b)
+	end
+	local agree = true
+	for _, n in { 0, 1, 2047, 2048, 2049, 4096, 9001 } do
+		local t = {}
+		for i = 1, n do t[i] = string.char((i * 37 + n) % 256) end
+		local text = table.concat(t)
+		if Json.checksum(text) ~= reference(text) then agree = false end
+	end
+	check(agree, "the checksum is the one-byte FNV-1a it always was, across the block's edges")
+	check(Json.canonical({ b = { 1, 2.5, "x\n\"y" }, a = true }) == '{"a":true,"b":[1,2.5,"x\\n\\"y"]}', "the canonical text, escapes and order as they were")
+	local _, why = Json.canonical({ a = { 1, { b = 0 / 0 } } })
+	check(why == "value.a[2].b: a number JSON cannot hold", `a problem names its path as it did ({tostring(why)})`)
+	-- count the work of a save
+	local w = newWorld()
+	for _ = 1, 120 do tick(w) end
+	local record = assert(Checkpoint.capture(w, 0))
+	local counts = { canonical = 0, checksum = 0 }
+	local realCanonical, realChecksum = Json.canonical, Json.checksum
+	Json.canonical = function(v: any) counts.canonical += 1; return realCanonical(v) end
+	Json.checksum = function(t: string) counts.checksum += 1; return realChecksum(t) end
+	local first = w.store:save(record)
+	local c1, s1 = counts.canonical, counts.checksum
+	counts.canonical, counts.checksum = 0, 0
+	local second = w.store:save(record)
+	local c2, s2 = counts.canonical, counts.checksum
+	Json.canonical, Json.checksum = realCanonical, realChecksum
+	check(first.ok and second.ok and c1 == 3 and s1 == 1, `the first save: encoded {c1} times, summed {s1} (4 and 2 before)`)
+	check(c2 == 5 and s2 == 1, `a later save, with a current rest to keep as the backup: encoded {c2} times, summed {s2} (6 and 3 before)`)
+	local best = w.store:loadBest()
+	local cur = w.dataStore.data.checkpoint
+	local bak = w.dataStore.data["checkpoint.bak"]
+	check(best.ok and best.source == "current" and cur ~= nil and bak ~= nil and cur.checksum == bak.checksum and Json.canonical(cur) == Json.canonical(bak) and w.dataStore.data["checkpoint.tmp"] == nil,
+		"the current rest and its backup are kept as before, the temporary key gone")
+	-- a current entry changed in the store behind its back is still caught, and set aside, not kept as the backup
+	local w2 = newWorld()
+	for _ = 1, 120 do tick(w2) end
+	local r2 = assert(Checkpoint.capture(w2, 0))
+	check(w2.store:save(r2).ok, "kept")
+	w2.dataStore.data.checkpoint.checkpoint.snapshot_tick = 999999
+	local third = w2.store:save(r2)
+	check(third.ok and w2.dataStore.data["checkpoint.aside.1"] ~= nil and w2.dataStore.data["checkpoint.bak"] == nil, "a current rest changed in the store is set aside, never made the backup")
+end)
+
 print(`CHECKPOINT passed={passed} failed={failed}`)
 if failed > 0 then error("CHECKPOINT failed") end

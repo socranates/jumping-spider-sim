@@ -148,9 +148,9 @@ local motor: any = SpiderMotor.new({
 })
 local jump: any = JumpInput.new()
 local carry: any = StickCarry.new()
--- Touch-only devices (phones, tablets) run the low tier until a real tablet frame-time check (ROBLOX_PORT.md): lighter fuzz and
+-- Touch-only devices (phones, tablets) run the low tier until a real tablet frame-time check (ROBLOX_PORT.md), consoles the full one: lighter fuzz and
 -- no idle extras on the spider, fewer optional parts in the world. Workspace attribute Detail = "low" or "full" overrides the guess.
-local detail = Detail.choose(UIS.TouchEnabled and not UIS.KeyboardEnabled, Workspace:GetAttribute("Detail"))
+local detail = Detail.choose(UIS.TouchEnabled and not UIS.KeyboardEnabled, Workspace:GetAttribute("Detail"), select(2, pcall(function() return GuiService:IsTenFootInterface() end)) == true) -- (ROBLOX-108: a console is the full tier)
 -- Which spider: the Player attribute Appearance (kept for the session), else the Workspace attribute Appearance, else the first spider.
 local appearance = SpiderChoice.start(player:GetAttribute("Appearance"), Workspace:GetAttribute("Appearance"))
 local rig = SpiderRig.new(Workspace, M.World.root, appearance, detail)
@@ -175,12 +175,11 @@ ant.state = ant.Pose.new()
 ant.Threat, ant.ThreatText = require(Shared.Rig.TarantulaPose), require(Shared.UI.TarantulaText)
 ant.threat, ant.threatPose = ant.Threat.new(), nil
 local bodyHidden = false
+M.World:streamLooks(Workspace, detail) -- (ROBLOX-108: the looks of the regions outside the window, this client's own near the spider, at its tier: Client/LookStream)
 task.spawn(function()
 	local roots: { Instance } = { Lighting }
 	local decor = Workspace:WaitForChild("Decor", 10)
 	if decor then table.insert(roots, decor) end
-	local looks = M.World.looks or Workspace:WaitForChild("WorldDecor", 10) -- (ROBLOX-95: the looks of the regions outside the window)
-	if looks then table.insert(roots, looks) end
 	local terrain = Workspace:FindFirstChild("Terrain")
 	if terrain then table.insert(roots, terrain) end
 	WorldDetail.apply(detail, roots)

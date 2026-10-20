@@ -685,3 +685,41 @@ reasoning and `docs/HUD_AUDIT.md` the list of every string with its class. **Not
   only (Normal hears the hum); the rival's crouch warning is Easy's only; the weak starving line and "Last rest kept." stay in Normal.
 - **No region name on the day line**, as decided here. If you would like the place named (say, only when the spider first reaches a region), it is one
   kind in the table.
+## The house in true proportion, and the first of the inside (ROBLOX-112, 2026-10-20)
+
+Claude → Chet, 2026-10-20, branch `claude/house`. Nathan: "The house is still too tall or needs to be made into a whole house with rooms and everything".
+The kitchen window is a real window now (62 wide, its glass 1.1 m tall, its head 1.125 m above the sill, a sash window with the lower sash raised 6 cm as
+before), the eaves are 2.4 m above the lawn (the gutter's floor 1.49 m above the sill, 1.09 before), and the first two regions of the inside are built:
+the kitchen's counter under the sill (the worktop 4 cm under the sill board, a sink, a tap, a toaster whose gap underneath is a home, a kettle) and the floor
+in front of it with the cupboards. The rest of the inside is planned in `docs/WORLD_MAP_PLAN.md` ("The inside"). `docs/DECISIONS.md` ROBLOX-112 has the numbers.
+`WorldMap.REVISION` is world-3: every rest saved before this comes back at its region's spawn with the notice "the world has changed since you rested".
+**Nothing of it has run in Studio.**
+
+## Your Studio checklist (ROBLOX-112)
+
+1. **The self-test**: `workspace:SetAttribute("SelfTest", true)`, Play, touch nothing, send the printout. It walks 21 regions now (17 before: the new ones are
+   `eaves`, `eaves_west`, `kitchen_counter`, `kitchen_floor`; `wall_upper` is rebuilt), so 39 checks. Every `region` line should PASS.
+2. **From the garden**: walk out to the lawn's edge (or fly the Studio camera there) and look at the back of the house: a tall sash window over the bed with
+   its transom and mullions, its head well under the gutter, the house's other window the same size to the west, the back door about as tall as the window's
+   head, the gutter 2.4 m up, the roof showing over it. Through the window a room (a pale ceiling and a far wall), not the sky. Screenshot it for Nathan.
+3. **From the sill**: the view out of the window should be as it was low down (the panes, the raised sash, the shelf across); looking up, the glass goes on
+   up to the frame's head. **The light on the sill should be exactly as it was** (the new glass is above where the sun comes in): say if it is brighter.
+4. **Climb the window**: from the sill, walk up the back frame onto the glass and up to the head; from the outer sill, up the outside of the glass. Both faces
+   should hold the spider; the shelf across the window should be walkable as before.
+5. **Into the kitchen**: walk off the sill's front edge: the spider should land on the worktop 4 cm down. Walk to the toaster (west), into the gap under it, and
+   rest (the prompt says "Under the toaster"); Backspace / the life menu's "Back to last rest" should bring it back there. Then walk to the worktop's front edge
+   and down the cupboard doors to the floor, and under the doors into the dark kick space (the pea and the dust ball are there).
+6. **The sink**: drop into the bowl and climb out up its steel side.
+7. **An old save**: load a save from v37 or before: the spider should come back at its region's spawn with the notice, not where it rested.
+8. **Phone tier**: in the device emulator at a phone size, stand in the bushes where four chunks meet (about x -120, z -112): the looks there are 499 of the
+   low tier's 500 parts; say if the frame rate drops.
+
+## Open for Nathan (ROBLOX-112)
+
+- The inside's plan (`docs/WORLD_MAP_PLAN.md`, "The inside"): a kitchen behind the window, a bathroom west of it (the house's other window), a back hall with
+  the back door east of it, a hallway across the middle, the living room and a bedroom at the front. Is that the house you picture? A cat or no cat? Which room
+  after the kitchen?
+- The window is the sill's width (62 cm), so it is a tall narrow sash window, not a wide one: the sill's pieces had to stay. Say if you want it wider (that
+  means a wider sill, a new round).
+- The worktop is 4 cm under the sill board, so walking off the sill's front edge lands on the counter. Say if you would rather the sill be the counter's back
+  edge (level with it).

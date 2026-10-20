@@ -41,6 +41,22 @@
 --                     whole inside the target radius from anywhere on it, and well under the 60 boxes a graph may carry). Each has two bushes whose twigs are walkable
 --                     boxes and a retreat under the first: the gap under a curled dead leaf lying on two twigs in the litter. The garden's pace (0.33). The view's
 --                     drawn bushes that stood in the strip moved out of it (Data/Flora).
+-- ROBLOX-112 (the house in true proportion, and the first of the inside): the kitchen window is a real window, its glass and frame 1.125 m tall above the sill, and the
+-- eaves 1.5 m above the sill (2.4 m above the lawn), so the wall above the window moved: WorldMap.REVISION is world-3.
+--   wall_upper ...... (rebuilt) the window and the wall round it: the brick jambs outside (x 31..40 either side, y 0..112.5), the window's box above the sill's back frame
+--                     (x -31..31, y 14..112.5: its glass and frame, climbable on both faces, drawn by the sill's Decor), the room's reveal either side of it (the sill's side
+--                     frames going on up) and the room's wall beside it over the counter (x 31..62 either side, its face z 12.5). It meets the sill along the back frame's
+--                     top (the frame's room face goes on up as the window's), the counter along the wall's foot, the house_wall and wall_west_upper as before.
+--   eaves ........... the brick from the window's head to the eaves (y 112.5..150), the room's wall over the window inside, the soffit 40 cm out, the fascia, the gutter
+--                     (its floor y 149, 1.49 m above the sill and 2.39 m above the lawn) and the eave course. (ROBLOX-103's wall_upper above the head.)
+--   wall_west_upper . now to the head only (y 0..112.5), the drainpipe on up through it; eaves_west the same wall from the head to the eaves with the pipe's top, swan neck
+--                     and outlet, and the eaves, fascia, gutter and eave course on west of the eaves'. (Each split, as the walls always were, so a region is whole inside
+--                     the streaming target radius from anywhere on it.)
+--   kitchen_counter . inside, the counter under the window (+z is the room): the worktop 4 cm under the sill board (y -4) on a tiled upstand, from the wall (z 12.5) to
+--                     z 72.5, x -62..62, a sink under the window, the tap, a toaster west of it standing over the region's retreat (the gap under it, kitchen_toaster) and a
+--                     kettle on its base east of it. It meets the sill where the sill board's front face goes on down as the upstand's.
+--   kitchen_floor ... the floor 90 cm under the sill (y -90) in a strip 80 cm deep in front of the counter, the cupboard doors, the plinth recessed under them and the run's
+--                     end panels. It meets the counter along the worktop's front edge. The house's pace (1.0) for both: the inside keeps the sill's day.
 local Layout = require(script.Parent.Parent.Habitat.WindowsillLayout)
 
 local WorldMap = {}
@@ -65,8 +81,8 @@ WorldMap.SEED = 914
 -- Changes whenever any region's geometry moves in a way a saved position could no longer be trusted (Checkpoint's revision gate puts such a
 -- rest back at its region's spawn). Adding a region somewhere new does not need it; moving, resizing or removing one does.
 -- world-2 (ROBLOX-95): the sill's back frame was opened and the garden added, so a rest kept under world-1 (or before there was a record of the world) is put
--- back at its region's spawn.
-WorldMap.REVISION = "world-2"
+-- back at its region's spawn. world-3 (ROBLOX-112): the wall above the window became the window and its eaves rose 40 cm, so a rest kept under world-2 is put back too.
+WorldMap.REVISION = "world-3"
 -- The revision a rest kept before there was a world record belongs to (Persistence/Checkpoint reads a record without one as this).
 WorldMap.FIRST_REVISION = "world-1"
 -- The region a new life begins in.
@@ -107,9 +123,18 @@ local SEAM_SASH = { a = v(-8, 0, -13.5), b = v(8, 0, -13.5) } -- the rail's oute
 local SEAM_STONE = { a = v(-30, -3, -24), b = v(30, -3, -24) } -- the stone's front face goes on down as brick
 local SEAM_FOOT = { a = v(-25, -90, -24), b = v(25, -90, -24) } -- the wall's foot meets the soil
 local SEAM_JAMB = { a = v(31, 0, -24), b = v(40, 0, -24) } -- (ROBLOX-103) the east shoulder's face goes on up as the east jamb's
+-- (ROBLOX-112) the window, its eaves and the kitchen
+local SEAM_FRAME = { a = v(-30, 14, -12.5), b = v(30, 14, -12.5) } -- the back frame's room face goes on up as the window's
+local SEAM_HEAD = { a = v(31, 112.5, -24), b = v(40, 112.5, -24) } -- the east jamb's face goes on up as the brick over the window's
+local SEAM_HEAD_WEST = { a = v(-120, 112.5, -24), b = v(-40, 112.5, -24) } -- the west wall's brick goes on up past the head
+local SEAM_EAVES_WEST = { a = v(-40, 112.5, -24), b = v(-40, 150, -24) } -- the brick over the window goes on west
+local SEAM_UPSTAND = { a = v(-30, -1, 12.5), b = v(30, -1, 12.5) } -- the sill board's front face goes on down as the upstand's tiles
+local SEAM_ROOM_WALL = { a = v(31, 0, 12.5), b = v(62, 0, 12.5) } -- the room's wall beside the window goes on down as the upstand's tiles (the east; the west is the same)
+local SEAM_WORKTOP = { a = v(-15, -7, 72.5), b = v(15, -7, 72.5) } -- the worktop's front edge over the sink: the cupboard doors go on down from it (the middle of the run:
+-- the line's boxes on either side are then all inside the radius always sent from anywhere near it)
 -- (ROBLOX-107) the back wall west of the window and the bushes beside the bed
 local SEAM_WEST = { a = v(-40, -90, -24), b = v(-40, 0, -24) } -- the house_wall's brick goes on west as wall_west's
-local SEAM_WEST_UP = { a = v(-40, 0, -24), b = v(-40, 60, -24) } -- the wall above the window's brick (and its west jamb) goes on west as wall_west_upper's. (Only to
+local SEAM_WEST_UP = { a = v(-40, 0, -24), b = v(-40, 60, -24) } -- the west jamb's brick goes on west as wall_west_upper's. (Only to
 -- y 60: the faces meet all the way to the eaves, but a line 110 long cannot have its far end's boxes inside the radius always sent from its near end; above y 60 the
 -- rest of wall_upper is inside the target radius, tests/worldmap.luau's streaming case)
 local SEAM_WEST_RISE = { a = v(-120, 0, -24), b = v(-40, 0, -24) } -- wall_west's brick goes on up as wall_west_upper's
@@ -183,7 +208,7 @@ local function author(worldSeed: number): { Region }
 			id = "sill", kind = "sill", origin = Vector3.zero,
 			bounds = { Layout.PLAY_BOUNDS_MIN, Layout.PLAY_BOUNDS_MAX },
 			seed = WorldMap.seed(worldSeed, "sill"),
-			neighbors = { seam("outer_sill", SEAM_SASH) },
+			neighbors = { seam("outer_sill", SEAM_SASH), seam("wall_upper", SEAM_FRAME), seam("kitchen_counter", SEAM_UPSTAND) },
 			retreats = { { id = "sill_crevice", min = Layout.RETREAT_MIN, max = Layout.RETREAT_MAX, door = v(-24, 1, 6) } }, -- (the door: where the client has always measured "near home" from)
 			spawn = { pos = Layout.SPAWN, heading = Layout.SPAWN_HEADING },
 			clockScale = 1.0,
@@ -218,15 +243,6 @@ local function author(worldSeed: number): { Region }
 			clockScale = 0.33,
 		}),
 		freeze({
-			id = "wall_upper", kind = "wall_upper", origin = v(0, 60, -24),
-			bounds = { v(-42, 0, -70), v(42, 130, -13.5) },
-			seed = WorldMap.seed(worldSeed, "wall_upper"),
-			neighbors = { seam("house_wall", SEAM_JAMB), seam("wall_west_upper", SEAM_WEST_UP) },
-			retreats = {},
-			spawn = { pos = v(0, 109, -61), heading = v(1, 0, 0) }, -- on the gutter's floor, along it
-			clockScale = 1.0,
-		}),
-		freeze({
 			id = "wall_west", kind = "wall_west", origin = v(-80, -45, -24),
 			bounds = { v(-122, -89, -34), v(-40, 0, -13.5) }, -- its face and the drainpipe's foot, ten studs of air in front, down to y -89 (standing on the litter is the bushes')
 			seed = WorldMap.seed(worldSeed, "wall_west"),
@@ -235,17 +251,65 @@ local function author(worldSeed: number): { Region }
 			spawn = { pos = v(-80, -45, -24), heading = v(0, 1, 0) }, -- on the brick, heading up
 			clockScale = 1.0,
 		}),
+		-- (ROBLOX-112: listed before wall_upper, whose bounds reach west over it to the room's wall beside the window: out here the brick is this region's)
 		freeze({
-			id = "wall_west_upper", kind = "wall_west_upper", origin = v(-80, 60, -24),
-			bounds = { v(-122, 0, -70), v(-40, 130, -13.5) },
+			id = "wall_west_upper", kind = "wall_west_upper", origin = v(-80, 56.25, -24),
+			bounds = { v(-122, 0, -34), v(-40, 112.5, -13.5) },
 			seed = WorldMap.seed(worldSeed, "wall_west_upper"),
-			neighbors = { seam("wall_upper", SEAM_WEST_UP), seam("wall_west", SEAM_WEST_RISE) },
+			neighbors = { seam("wall_upper", SEAM_WEST_UP), seam("wall_west", SEAM_WEST_RISE), seam("eaves_west", SEAM_HEAD_WEST) },
 			retreats = {},
-			spawn = { pos = v(-80, 109, -61), heading = v(-1, 0, 0) }, -- on its gutter's floor, along it
+			spawn = { pos = v(-80, 60, -24), heading = v(0, 1, 0) }, -- on the brick, heading up (ROBLOX-112: the gutter is eaves_west's now)
+			clockScale = 1.0,
+		}),
+		freeze({
+			id = "wall_upper", kind = "wall_upper", origin = v(0, 56.25, -12.5),
+			bounds = { v(-64, 0, -34), v(64, 113.5, 13) },
+			seed = WorldMap.seed(worldSeed, "wall_upper"),
+			neighbors = { seam("house_wall", SEAM_JAMB), seam("wall_west_upper", SEAM_WEST_UP), seam("sill", SEAM_FRAME), seam("eaves", SEAM_HEAD), seam("kitchen_counter", SEAM_ROOM_WALL) },
+			retreats = {},
+			spawn = { pos = v(0, 60, -13.5), heading = v(0, 1, 0) }, -- on the window's glass outside, heading up
+			clockScale = 1.0,
+		}),
+		freeze({
+			id = "eaves_west", kind = "eaves_west", origin = v(-80, 131.25, -24),
+			bounds = { v(-122, 112.5, -82), v(-40, 165, -13.5) },
+			seed = WorldMap.seed(worldSeed, "eaves_west"),
+			neighbors = { seam("wall_west_upper", SEAM_HEAD_WEST), seam("eaves", SEAM_EAVES_WEST) },
+			retreats = {},
+			spawn = { pos = v(-80, 149, -71), heading = v(-1, 0, 0) }, -- on its gutter's floor, along it
+			clockScale = 1.0,
+		}),
+		freeze({
+			id = "eaves", kind = "eaves", origin = v(0, 131.25, -24),
+			bounds = { v(-64, 112.5, -82), v(64, 165, 13) },
+			seed = WorldMap.seed(worldSeed, "eaves"),
+			neighbors = { seam("wall_upper", SEAM_HEAD), seam("eaves_west", SEAM_EAVES_WEST) },
+			retreats = {},
+			spawn = { pos = v(0, 149, -71), heading = v(1, 0, 0) }, -- on the gutter's floor, along it
 			clockScale = 1.0,
 		}),
 	}
 	for _, c in C do table.insert(list, shrubChunk(worldSeed, c)) end
+	-- (ROBLOX-112) the kitchen: the counter under the window and the floor in front of it
+	table.insert(list, freeze({
+		id = "kitchen_counter", kind = "counter", origin = v(0, -4, 42.5),
+		bounds = { v(-64, -26, 12), v(64, 30, 74) },
+		seed = WorldMap.seed(worldSeed, "kitchen_counter"),
+		neighbors = { seam("sill", SEAM_UPSTAND), seam("wall_upper", SEAM_ROOM_WALL), seam("kitchen_floor", SEAM_WORKTOP) },
+		-- the gap under the toaster, between its two feet (World/Garden stands the toaster round it): warm, and full of crumbs
+		retreats = { { id = "kitchen_toaster", min = v(-53.5, -4, 23), max = v(-36.5, -2.6, 35), door = v(-45, -3.5, 36.6) } },
+		spawn = { pos = v(-45, -4, 39.6), heading = v(0, 0, -1) }, -- in front of the toaster, facing its way in
+		clockScale = 1.0,
+	}))
+	table.insert(list, freeze({
+		id = "kitchen_floor", kind = "kitchen_floor", origin = v(0, -90, 52.5),
+		bounds = { v(-64, -93, -14), v(64, -7, 94) }, -- (from the house's wall: the inside of the cupboards is the floor's too)
+		seed = WorldMap.seed(worldSeed, "kitchen_floor"),
+		neighbors = { seam("kitchen_counter", SEAM_WORKTOP) },
+		retreats = {},
+		spawn = { pos = v(0, -90, 85), heading = v(0, 0, -1) }, -- on the floor in front of the cupboards, facing them
+		clockScale = 1.0,
+	}))
 	return list
 end
 

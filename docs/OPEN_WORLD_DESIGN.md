@@ -209,7 +209,9 @@ exploration you gotta earn"; "you get time to enjoy the scenery because you are 
 Then full suites, places, bundle, publish. *(Toward the publish, 2026-10-20, ROBLOX-109: the game's own splash, the start menu as a title card, the intro of a
 new life, the cards in one typeface, and the store page's plan in `docs/STORE_PAGE.md`; CLI only, not run in Studio. ROBLOX-110: lock-on and the sidestep, the
 spider keeping its prey in its principal eyes and sidling round it, taken only from what its senses have placed, and "Show what the spider notices" to turn the
-perception HUD off, the lock's four faint ticks its only cue (W5's quiet HUD); CLI only, not run in Studio.)*
+perception HUD off, the lock's four faint ticks its only cue (W5's quiet HUD); CLI only, not run in Studio. ROBLOX-112: the house in true proportion, the
+kitchen window a real one and the eaves 2.4 m above the lawn (WorldMap.REVISION world-3), the inside planned in `docs/WORLD_MAP_PLAN.md` and its first two
+regions built, the kitchen's counter under the sill with the gap under the toaster as a home, and the floor in front of it; CLI only, not run in Studio.)*
 
 ## Risks, named
 

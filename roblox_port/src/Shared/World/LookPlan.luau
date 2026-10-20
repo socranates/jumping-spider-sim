@@ -34,12 +34,16 @@ LookPlan.KEEP = 30
 -- The mortar beds behind the bricks (`Mortar`, the house_wall's `Above` beds round the window) are drawn in the first brick colour and the bricks' material,
 -- as the drawn house beyond the walkable walls always is (`HouseWest`, `HouseEast`): from far off, a wall of brick.
 LookPlan.FAR = table.freeze({
-	house_wall = table.freeze({ "Mortar", "Above1", "Above2", "Above3" }),
-	wall_upper = table.freeze({ "Mortar", "Soffit", "Fascia", "RoofSlope", "HouseWest", "HouseEast", "EavesWest", "EavesEast" }),
+	house_wall = table.freeze({ "Mortar", "Above1", "Above2" }),
+	-- (ROBLOX-112: the window's jambs; the eaves carry what wall_upper's look did above the head, the house round it among them)
+	wall_upper = table.freeze({ "Jamb1", "Jamb2" }),
+	-- (the room beyond the window, its ceiling and far wall, so the window does not show the sky through the house from afar; its floor is not seen from the garden)
+	eaves = table.freeze({ "Mortar", "Soffit", "Fascia", "RoofSlope", "HouseWest", "HouseEast", "EavesWest", "EavesEast", "RoomCeiling", "RoomFar" }),
 	wall_west = table.freeze({ "Mortar", "Pipe" }),
-	wall_west_upper = table.freeze({ "Mortar", "Soffit", "Pipe", "Neck" }), -- (the drainpipe's boxes are hidden under its drawing: far off it is drawn too)
+	wall_west_upper = table.freeze({ "Mortar", "Pipe" }), -- (the drainpipe's boxes are hidden under its drawing: far off it is drawn too)
+	eaves_west = table.freeze({ "Mortar", "Soffit", "Pipe", "Neck" }),
 })
-local AS_BRICK: { [string]: boolean } = { Mortar = true, Above1 = true, Above2 = true, Above3 = true }
+local AS_BRICK: { [string]: boolean } = { Mortar = true, Above1 = true, Above2 = true, Jamb1 = true, Jamb2 = true }
 
 local recordsCache: { [string]: { Garden.Drawn } } = {}
 

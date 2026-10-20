@@ -27,6 +27,10 @@
 -- back door), all drawn only until wall_west and wall_east are built. And more on the three built looks: drip stains and moss in the wall's joints, petals and
 -- seeds on the outer sill, veins on the bed's leaves, seed heads on its grass and more kinds of litter, each from a stream of its own after what was placed
 -- before, so nothing placed before moves.
+-- ROBLOX-112 (the house in true proportion, and the first of the inside): `wall_upper` is the window and the wall round it (the jambs, the window's box above the back
+-- frame, which the sill's Decor draws, the room's reveal and its wall beside the window), the brick above the window's head is the kind `eaves` (and `eaves_west` on
+-- the west wall, which now stops at the head), and the kitchen begins: `counter` (the worktop under the sill board, the sink, the tap, the toaster over its gap, the
+-- kettle) and `kitchen_floor` (the floor in front of it, the cupboards). The eaves' look draws the room beyond the window until the rooms are built.
 local Flora = require(script.Parent.Parent.Data.Flora)
 local WorldMap = require(script.Parent.WorldMap)
 
@@ -85,24 +89,35 @@ Garden.WALL = {
 	brick = { length = 21.5, height = 6.5, joint = 1.0, depth = 0.6, recess = 0.28, gap = 0.02 },
 	bricks = { "9c4a32", "a65538", "8f4430", "b0603e", "974d36", "a2573c", "7e3c2b" },
 	burnt = "5e3428", pale = "c08a64", mortar = "b8b1a3", plaster = "efe8d8", coping = "c9c2b3",
-	above = 30, window = { x0 = -31, x1 = 31, y1 = 14 }, -- the house above the outer sill goes up to y 30, round the window's frame
+	above = 30, window = { x0 = -31, x1 = 31, y1 = 112.5 }, -- the house above the outer sill goes up to y 30 beside the window's frame (ROBLOX-112: the window goes up to its head, y 112.5)
 	brickMaterial = "Concrete", mortarMaterial = "Plaster",
 }
 
--- ---------------------------------------------------------------- the wall above the window (ROBLOX-103)
--- Studs, the sill's frame. The brick goes on from the house_wall's drawing (which stops at y 30) to the eaves at `top`; the eaves box (the soffit underneath) runs
--- out to the fascia; the gutter hangs on the fascia, its floor at `gutter.floor`; the eave course of tiles over it. `house`: the rest of the house drawn round it.
+-- ---------------------------------------------------------------- the wall above the window (ROBLOX-103) and the window itself (ROBLOX-112)
+-- Studs, the sill's frame. ROBLOX-112 (the house in true proportion): the kitchen window is a real one, its frame and glass from the sill up to the head at `head`
+-- (1.125 m above the sill, on a course joint), so `wall_upper` is now the window and the wall round it: the two brick jambs outside (x 31..40 either side, from the shoulders to the head),
+-- the window above the sill's back frame (`window`: the glass and its frame, climbable on both faces), the room's reveal either side of it (`reveal`, the sill's side
+-- frames going on up) and the room's wall beside it (`inner`, to x 62 either side, over the kitchen's counter). The brick above the head goes on to the eaves at `top`
+-- (1.5 m above the sill, 2.4 m above the lawn), and the eaves box (the soffit underneath) runs out to the fascia 40 cm from the wall; the gutter hangs on the fascia,
+-- its floor at `gutter.floor`; the eave course of tiles over it: those are the region `eaves`. `house`: the rest of the house drawn round it.
 Garden.UPPER = {
-	face = -24, back = -13.5, west = -40, east = 40, jamb = 31, head = 14, top = 110, -- the jambs stand x 31..40 either side of the window, on the shoulders (y 0)
-	eaves = { out = -54, top = 120, edge = 42 }, -- the soffit's box: from the wall out to z -54, y 110..120, x -42..42
-	fascia = { out = -55.5, bottom = 106 },
-	gutter = { floor = 108, thick = 1, lip = 115, out = -66, wall = 1, cap = 1, span = 40 }, -- floor y 108..109; the lip's inner face at z -66
-	roof = { eave = -62, thick = 1.5, pitch = 35, ridge = 376, x = 500, color = "7b4a3d", tiles = { "8d4a3a", "7b4a3d", "934f3e", "6f4236" }, material = "Slate" },
+	face = -24, back = -13.5, west = -40, east = 40, jamb = 31, head = 112.5, top = 150, -- the jambs stand x 31..40 either side of the window, on the shoulders (y 0)
+	window = { bottom = 14, inner = -12.5, color = "ded7c3", profile = "glass_clean" }, -- (on the back frame's top, its room face the frame's)
+	reveal = { x = 30, room = 12.5 }, -- the room's reveal, x 30..31 either side (the sill's left_frame and right_frame go on up), to the room's wall face at z 12.5
+	inner = { x = 62, color = "efe8d8" }, -- the room's wall beside the window, x 31..62 either side, from the sill's level to the head
+	eaves = { out = -64, top = 160, edge = 42 }, -- the soffit's box: from the wall out to z -64 (40 cm), y 150..160, x -42..42
+	fascia = { out = -65.5, bottom = 146 },
+	gutter = { floor = 148, thick = 1, lip = 155, out = -76, wall = 1, cap = 1, span = 40 }, -- floor y 148..149; the lip's inner face at z -76
+	roof = { eave = -72, thick = 1.5, pitch = 35, ridge = 376, x = 500, color = "7b4a3d", tiles = { "8d4a3a", "7b4a3d", "934f3e", "6f4236" }, material = "Slate" },
 	paint = "ece7dc", gutterColor = "3a3c3e", gutterMaterial = "Metal", houseMortar = "a8927e", -- (the long walls' mortar lines, toned toward the brick so they read as courses, not siding)
-	-- (the kitchen's window is the sill's, 62 wide and 14 tall with its sill at y 0: the house's other window is drawn the same; the back door stands on a step)
-	house = { x = 500, foot = -90.4, door = { x = 230, w = 85, h = 180, step = 14, color = "3f5b4a" }, window = { x = -260, w = 62, h = 14, sill = 0 }, pipe = { x = -50, d = 7 } },
+	-- the lintel over the window (drawn, ROBLOX-112): a concrete beam across the head, `lintel` tall, bearing `bearing` into the brick either side
+	lintel = { h = 7.5, bearing = 15, color = "b9b2a4" },
+	-- (the kitchen's window is the sill's, 62 wide and 112.5 tall with its sill at y 0: the house's other window is drawn the same; the back door, 2 m, stands on a step)
+	house = { x = 500, foot = -90.4, door = { x = 230, w = 85, h = 200, step = 14, color = "3f5b4a" }, window = { x = -260, w = 62, h = 112.5, sill = 0, transom = 55.5 }, pipe = { x = -50, d = 7 } },
 	debris = { "6e4d2e", "8a6239", "5b4129", "a07445" },
 }
+-- (ROBLOX-112) The window's box above the back frame: the sill's Decor draws it (Habitat/Scenery.window), so it turns invisible once that drawing exists.
+Garden.WINDOW_PIECE = "wall_upper_window"
 
 -- ---------------------------------------------------------------- the bed
 Garden.BED = {
@@ -150,8 +165,8 @@ Garden.BED = {
 -- 100 studs tie it to the brick (a tie behind it and a collar round it, `band` proud), so the pipe can be climbed onto from the wall. The eaves, the fascia, the
 -- gutter (floor, lip, the west end cap) and the eave course go on from wall_upper's, which keeps its own end cap at x -41..-40 as the joint.
 Garden.WEST = {
-	west = -120, east = -40, face = -24, back = -13.5, foot = -90.4, rise = 0, top = 110,
-	pipe = { x = -50, d = 7, gap = 1.2, foot = -90, neck = { y0 = 92, y1 = 99, out = -61 }, outlet = { w = 5, z0 = -61, z1 = -56 } },
+	west = -120, east = -40, face = -24, back = -13.5, foot = -90.4, rise = 0, head = 112.5, top = 150, -- (ROBLOX-112: split again at the window's head, `head`)
+	pipe = { x = -50, d = 7, gap = 1.2, foot = -90, neck = { y0 = 132, y1 = 139, out = -71 }, outlet = { w = 5, z0 = -71, z1 = -66 } },
 	bracket = { at = { -40, 60 }, h = 1.5, band = 1, tie = 2 },
 	color = "3a3c3e", material = "Metal", -- the pipe's paint, as the gutter's
 	damp = { "2f2a22", "37301f" }, -- the damp patch at the drain's foot, on the litter and the brick
@@ -179,6 +194,32 @@ function Garden.drainFoot(region: WorldMap.Region): Vector3?
 	local b = pipeBox()
 	return v((b.min.X + b.max.X) / 2, Garden.WEST.pipe.foot, b.min.Z - 0.9)
 end
+
+-- ---------------------------------------------------------------- the kitchen: the counter under the window and the floor in front of it (ROBLOX-112)
+-- Studs, the sill's frame, +z into the room (docs/WORLD_MAP_PLAN.md, the inside). The room's wall face is z 12.5, the sill board's front edge: the sill sits in the
+-- window's deep reveal, and the kitchen's counter runs along the wall under it. The worktop's top is `top` (y -4), 4 cm under the sill board, so the board stands
+-- proud of the worktop on a tiled upstand (`upstand`: under the board y -4..-1, and beside the reveal y -4..0 up to the room's wall); the worktop is `thick` deep
+-- and runs out to `front` (60 cm from the wall), x -62..62 with the cupboards' end panels; a sink under the window, its bowl `sink`, and the tap behind it on the
+-- worktop's back strip; a toaster west of the sink standing on its two feet over the region's retreat (WorldMap's kitchen_toaster: the gap under it, warm and full
+-- of crumbs), and a jug kettle on its base east of the sink. Below: the cupboard doors, the plinth recessed under them, the cupboards' base and the floor (`floor`,
+-- y -90: the sill is 90 cm above it) in a strip 80 cm deep in front of the counter.
+Garden.KITCHEN = {
+	x0 = -62, x1 = 62, carcass = 60, wall = 12.5, back = -13.5, top = -4, thick = 3, front = 72.5,
+	upstand = { under = -1, beside = 0, x = 30 }, -- (under the sill board x -30..30 its top is the board's underside; beside it, the reveal's foot)
+	sink = { x0 = -20, x1 = 20, z0 = 20, z1 = 60, bottom = -24, wall = 1 }, -- the bowl's inside: 40 by 40, 20 deep
+	-- the tap: a column on the worktop by the bowl's back corner, east of it (out of the middle of the sill's view into the room), its spout west over the bowl
+	tap = { x0 = 22, x1 = 25, z0 = 18, z1 = 21, h = 14, spout = { w = 2, h = 2, to = 11 } },
+	toaster = { feet = 1.4, foot = 2, h = 18.6, over = 0.8, color = "c9ccd0", feetColor = "2e2f31" }, -- its body from the feet's tops; `over`: how far it overhangs the gap
+	kettle = { x0 = 38, x1 = 56, z0 = 22, z1 = 40, base = 1.2, inset = 1.5, h = 20.8, color = "f1f0ec", baseColor = "2f3133" },
+	doors = { bottom = -80, thick = 2 }, plinth = { setback = 8, thick = 2 }, base = 1, floor = { top = -90, thick = 2, z1 = 92.5 },
+	colors = { worktop = "d8d2c6", edge = "b9b2a6", tile = "eef0ec", grout = "c9cbc6", steel = "c3c7cb", doors = "8fa69a", plinth = "6f8279", floor = "c7b79c", panel = "8fa69a" },
+	-- the drawn things: crumbs on the worktop (the toaster's, most of them by and under it), a few grains of sugar by the kettle, water in the sink; tiles on the
+	-- upstand, the worktop's rounded front edge, the doors' handles, the floor's tiles
+	crumbs = { count = 30, size = { 0.12, 0.55 }, colors = { "c9a46a", "b88a4e", "d9bf8c", "8a5e33", "e3cfa3" } },
+	socket = { x = 47, y = 16, w = 8, h = 8 },
+	-- the room round it, drawn only (by the eaves' look, with the house's shell) until the rest of the inside is built: 3 m across, 3 m deep, the ceiling at the eaves
+	room = { x0 = -150, x1 = 150, z1 = 312.5, wall = "e9e1cf", ceiling = "f4f1ea" }, -- the socket on the wall over the worktop, the kettle's (drawn by wall_upper's look: the wall is that region's)
+}
 
 -- ---------------------------------------------------------------- the bushes beside the bed (ROBLOX-107, docs/WORLD_MAP_PLAN.md region 6)
 -- A chunk (WorldMap.SHRUB_CHUNKS) is a mat of deep leaf litter (top y -90, the bed's soil's, 2 deep) with two bushes to the ground on it, box and privet, `h` tall and
@@ -243,25 +284,43 @@ local function wallPieces(): { Piece }
 	}
 end
 
--- (ROBLOX-103) The wall above the window: the two jambs on the shoulders, the brick up to the eaves, the eaves' box, the fascia, the gutter (floor, lip, two end
--- caps) and the eave course of the roof over the eaves.
+-- (ROBLOX-103, ROBLOX-112) The window and the wall round it: the two brick jambs on the shoulders, up to the window's head; the window above the sill's back frame (its
+-- glass and frame, one box climbable on both faces: the sill's Decor draws it, Habitat/Scenery.window); the room's reveal either side of it, the sill's side frames
+-- going on up; and the room's wall beside the window over the kitchen's counter, its face the reveal's room edge (z 12.5).
 local function upperPieces(): { Piece }
+	local U = Garden.UPPER
+	local Wn, Rv, In = U.window, U.reveal, U.inner
+	local brick = hex(Garden.WALL.bricks[1])
+	local frame, plaster = hex(Wn.color), hex(In.color)
+	return {
+		{ id = "wall_upper_west", lo = v(U.west, 0, U.face), hi = v(-U.jamb, U.head, U.back), profile = "brick_rough", color = brick, material = Garden.WALL.brickMaterial },
+		{ id = "wall_upper_east", lo = v(U.jamb, 0, U.face), hi = v(U.east, U.head, U.back), profile = "brick_rough", color = brick, material = Garden.WALL.brickMaterial },
+		{ id = "wall_upper_window", lo = v(-U.jamb, Wn.bottom, U.back), hi = v(U.jamb, U.head, Wn.inner), profile = Wn.profile, color = frame, material = "Glass" },
+		{ id = "wall_upper_reveal_west", lo = v(-U.jamb, Wn.bottom, Wn.inner), hi = v(-Rv.x, U.head, Rv.room), profile = "plaster_matte", color = plaster, material = "Plaster" },
+		{ id = "wall_upper_reveal_east", lo = v(Rv.x, Wn.bottom, Wn.inner), hi = v(U.jamb, U.head, Rv.room), profile = "plaster_matte", color = plaster, material = "Plaster" },
+		{ id = "wall_upper_inner_west", lo = v(-In.x, 0, U.back), hi = v(-U.jamb, U.head, Rv.room), profile = "plaster_matte", color = plaster, material = "Plaster" },
+		{ id = "wall_upper_inner_east", lo = v(U.jamb, 0, U.back), hi = v(In.x, U.head, Rv.room), profile = "plaster_matte", color = plaster, material = "Plaster" },
+	}
+end
+
+-- (ROBLOX-112; ROBLOX-103's wall_upper above the head) The eaves: the brick from the window's head to the eaves, the room's wall above the window on the inside (to the
+-- ceiling's height), the eaves' box, the fascia, the gutter (floor, lip, two end caps) and the eave course of the roof over the eaves.
+local function eavesPieces(): { Piece }
 	local U = Garden.UPPER
 	local G, E, F, R = U.gutter, U.eaves, U.fascia, U.roof
 	local brick = hex(Garden.WALL.bricks[1])
 	local paint = hex(U.paint)
 	local metal = hex(U.gutterColor)
 	return {
-		{ id = "wall_upper_west", lo = v(U.west, 0, U.face), hi = v(-U.jamb, U.head, U.back), profile = "brick_rough", color = brick, material = Garden.WALL.brickMaterial },
-		{ id = "wall_upper_east", lo = v(U.jamb, 0, U.face), hi = v(U.east, U.head, U.back), profile = "brick_rough", color = brick, material = Garden.WALL.brickMaterial },
-		{ id = "wall_upper_brick", lo = v(U.west, U.head, U.face), hi = v(U.east, U.top, U.back), profile = "brick_rough", color = brick, material = Garden.WALL.brickMaterial },
-		{ id = "wall_upper_soffit", lo = v(-E.edge, U.top, E.out), hi = v(E.edge, E.top, U.back), profile = "painted_wood_dry", color = paint, material = "Wood" },
-		{ id = "wall_upper_fascia", lo = v(-E.edge, F.bottom, F.out), hi = v(E.edge, E.top, E.out), profile = "painted_wood_dry", color = paint, material = "Wood" },
-		{ id = "wall_upper_gutter", lo = v(-G.span, G.floor, G.out), hi = v(G.span, G.floor + G.thick, F.out), profile = "painted_wood_dry", color = metal, material = U.gutterMaterial },
-		{ id = "wall_upper_gutter_lip", lo = v(-G.span, G.floor, G.out - G.wall), hi = v(G.span, G.lip, G.out), profile = "painted_wood_dry", color = metal, material = U.gutterMaterial },
-		{ id = "wall_upper_gutter_west", lo = v(-G.span - G.cap, G.floor, G.out - G.wall), hi = v(-G.span, G.lip, F.out), profile = "painted_wood_dry", color = metal, material = U.gutterMaterial },
-		{ id = "wall_upper_gutter_east", lo = v(G.span, G.floor, G.out - G.wall), hi = v(G.span + G.cap, G.lip, F.out), profile = "painted_wood_dry", color = metal, material = U.gutterMaterial },
-		{ id = "wall_upper_roof", lo = v(-E.edge, E.top, R.eave), hi = v(E.edge, E.top + R.thick, U.back), profile = "brick_rough", color = hex(R.color), material = R.material },
+		{ id = "eaves_brick", lo = v(U.west, U.head, U.face), hi = v(U.east, U.top, U.back), profile = "brick_rough", color = brick, material = Garden.WALL.brickMaterial },
+		{ id = "eaves_inner", lo = v(-U.inner.x, U.head, U.back), hi = v(U.inner.x, U.top, U.reveal.room), profile = "plaster_matte", color = hex(U.inner.color), material = "Plaster" },
+		{ id = "eaves_soffit", lo = v(-E.edge, U.top, E.out), hi = v(E.edge, E.top, U.back), profile = "painted_wood_dry", color = paint, material = "Wood" },
+		{ id = "eaves_fascia", lo = v(-E.edge, F.bottom, F.out), hi = v(E.edge, E.top, E.out), profile = "painted_wood_dry", color = paint, material = "Wood" },
+		{ id = "eaves_gutter", lo = v(-G.span, G.floor, G.out), hi = v(G.span, G.floor + G.thick, F.out), profile = "painted_wood_dry", color = metal, material = U.gutterMaterial },
+		{ id = "eaves_gutter_lip", lo = v(-G.span, G.floor, G.out - G.wall), hi = v(G.span, G.lip, G.out), profile = "painted_wood_dry", color = metal, material = U.gutterMaterial },
+		{ id = "eaves_gutter_west", lo = v(-G.span - G.cap, G.floor, G.out - G.wall), hi = v(-G.span, G.lip, F.out), profile = "painted_wood_dry", color = metal, material = U.gutterMaterial },
+		{ id = "eaves_gutter_east", lo = v(G.span, G.floor, G.out - G.wall), hi = v(G.span + G.cap, G.lip, F.out), profile = "painted_wood_dry", color = metal, material = U.gutterMaterial },
+		{ id = "eaves_roof", lo = v(-E.edge, E.top, R.eave), hi = v(E.edge, E.top + R.thick, U.back), profile = "brick_rough", color = hex(R.color), material = R.material },
 	}
 end
 
@@ -417,9 +476,23 @@ local function westPieces(): { Piece }
 	return out
 end
 
--- (ROBLOX-107) The same wall from y 0 to the eaves: the brick, the drainpipe's top, its swan neck out under the gutter and the outlet up into the gutter's floor, its
--- upper bracket, and the eaves, fascia, gutter (floor, lip, the west end cap) and eave course on west of wall_upper's.
+-- (ROBLOX-107, ROBLOX-112) The same wall from y 0 to the window's head: the brick, the drainpipe on up and its upper bracket.
 local function westUpperPieces(): { Piece }
+	local W = Garden.WEST
+	local P = W.pipe
+	local x0, x1 = P.x - P.d / 2, P.x + P.d / 2
+	local z1 = W.face - P.gap
+	local out: { Piece } = {
+		{ id = "wall_west_upper", lo = v(W.west, W.rise, W.face), hi = v(W.east, W.head, W.back), profile = "brick_rough", color = hex(Garden.WALL.bricks[1]), material = Garden.WALL.brickMaterial },
+		{ id = "wall_west_upper_pipe", lo = v(x0, W.rise, z1 - P.d), hi = v(x1, W.head, z1), profile = "painted_metal_smooth", color = hex(W.color), material = W.material },
+	}
+	brackets(out, "wall_west_upper", W.rise, W.head)
+	return out
+end
+
+-- (ROBLOX-112; ROBLOX-107's wall_west_upper above the head) The same wall from the head to the eaves: the brick, the drainpipe's top, its swan neck out under the gutter
+-- and the outlet up into the gutter's floor, and the eaves, fascia, gutter (floor, lip, the west end cap) and eave course on west of the eaves' own.
+local function eavesWestPieces(): { Piece }
 	local W, U = Garden.WEST, Garden.UPPER
 	local P = W.pipe
 	local G, E, F, R = U.gutter, U.eaves, U.fascia, U.roof
@@ -427,20 +500,20 @@ local function westUpperPieces(): { Piece }
 	local z1 = W.face - P.gap
 	local metal, paint = hex(W.color), hex(U.paint)
 	local gutterMetal = hex(U.gutterColor)
-	local joint = -G.span - G.cap -- the west face of wall_upper's own end cap
+	local joint = -G.span - G.cap -- the west face of the eaves' own end cap
 	local out: { Piece } = {
-		{ id = "wall_west_upper", lo = v(W.west, W.rise, W.face), hi = v(W.east, W.top, W.back), profile = "brick_rough", color = hex(Garden.WALL.bricks[1]), material = Garden.WALL.brickMaterial },
-		{ id = "wall_west_upper_pipe", lo = v(x0, W.rise, z1 - P.d), hi = v(x1, P.neck.y0, z1), profile = "painted_metal_smooth", color = metal, material = W.material },
-		{ id = "wall_west_upper_neck", lo = v(x0, P.neck.y0, P.neck.out), hi = v(x1, P.neck.y1, z1), profile = "painted_metal_smooth", color = metal, material = W.material },
-		{ id = "wall_west_upper_outlet", lo = v(P.x - P.outlet.w / 2, P.neck.y1, P.outlet.z0), hi = v(P.x + P.outlet.w / 2, G.floor, P.outlet.z1), profile = "painted_metal_smooth", color = metal, material = W.material },
-		{ id = "wall_west_upper_soffit", lo = v(W.west, U.top, E.out), hi = v(-E.edge, E.top, U.back), profile = "painted_wood_dry", color = paint, material = "Wood" },
-		{ id = "wall_west_upper_fascia", lo = v(W.west, F.bottom, F.out), hi = v(-E.edge, E.top, E.out), profile = "painted_wood_dry", color = paint, material = "Wood" },
-		{ id = "wall_west_upper_gutter", lo = v(W.west, G.floor, G.out), hi = v(joint, G.floor + G.thick, F.out), profile = "painted_wood_dry", color = gutterMetal, material = U.gutterMaterial },
-		{ id = "wall_west_upper_gutter_lip", lo = v(W.west, G.floor, G.out - G.wall), hi = v(joint, G.lip, G.out), profile = "painted_wood_dry", color = gutterMetal, material = U.gutterMaterial },
-		{ id = "wall_west_upper_gutter_west", lo = v(W.west - G.cap, G.floor, G.out - G.wall), hi = v(W.west, G.lip, F.out), profile = "painted_wood_dry", color = gutterMetal, material = U.gutterMaterial },
-		{ id = "wall_west_upper_roof", lo = v(W.west, E.top, R.eave), hi = v(-E.edge, E.top + R.thick, U.back), profile = "brick_rough", color = hex(R.color), material = R.material },
+		{ id = "eaves_west_brick", lo = v(W.west, W.head, W.face), hi = v(W.east, W.top, W.back), profile = "brick_rough", color = hex(Garden.WALL.bricks[1]), material = Garden.WALL.brickMaterial },
+		{ id = "eaves_west_pipe", lo = v(x0, W.head, z1 - P.d), hi = v(x1, P.neck.y0, z1), profile = "painted_metal_smooth", color = metal, material = W.material },
+		{ id = "eaves_west_neck", lo = v(x0, P.neck.y0, P.neck.out), hi = v(x1, P.neck.y1, z1), profile = "painted_metal_smooth", color = metal, material = W.material },
+		{ id = "eaves_west_outlet", lo = v(P.x - P.outlet.w / 2, P.neck.y1, P.outlet.z0), hi = v(P.x + P.outlet.w / 2, G.floor, P.outlet.z1), profile = "painted_metal_smooth", color = metal, material = W.material },
+		{ id = "eaves_west_soffit", lo = v(W.west, U.top, E.out), hi = v(-E.edge, E.top, U.back), profile = "painted_wood_dry", color = paint, material = "Wood" },
+		{ id = "eaves_west_fascia", lo = v(W.west, F.bottom, F.out), hi = v(-E.edge, E.top, E.out), profile = "painted_wood_dry", color = paint, material = "Wood" },
+		{ id = "eaves_west_gutter", lo = v(W.west, G.floor, G.out), hi = v(joint, G.floor + G.thick, F.out), profile = "painted_wood_dry", color = gutterMetal, material = U.gutterMaterial },
+		{ id = "eaves_west_gutter_lip", lo = v(W.west, G.floor, G.out - G.wall), hi = v(joint, G.lip, G.out), profile = "painted_wood_dry", color = gutterMetal, material = U.gutterMaterial },
+		{ id = "eaves_west_gutter_west", lo = v(W.west - G.cap, G.floor, G.out - G.wall), hi = v(W.west, G.lip, F.out), profile = "painted_wood_dry", color = gutterMetal, material = U.gutterMaterial },
+		{ id = "eaves_west_roof", lo = v(W.west, E.top, R.eave), hi = v(-E.edge, E.top + R.thick, U.back), profile = "brick_rough", color = hex(R.color), material = R.material },
 	}
-	brackets(out, "wall_west_upper", W.rise, P.neck.y0)
+	brackets(out, "eaves_west", W.head, P.neck.y0)
 	return out
 end
 
@@ -571,6 +644,73 @@ local function shrubPieces(region: WorldMap.Region): { Piece }
 		end
 	end
 	return out
+end
+
+-- (ROBLOX-112) The toaster over its retreat: its body on two feet, the gap between them the map's retreat box (WorldMap kitchen_toaster) and a little more, as the bed's
+-- stone stands on its two rests.
+local function toasterOver(retreat: WorldMap.Retreat): { Piece }
+	local T, K = Garden.KITCHEN.toaster, Garden.KITCHEN
+	local lo, hi = retreat.min, retreat.max
+	local x0, x1 = lo.X - 0.2 - T.foot, hi.X + 0.2 + T.foot
+	local z0, z1 = lo.Z - T.over, hi.Z + T.over
+	local feet, body = hex(T.feetColor), hex(T.color)
+	return {
+		{ id = "kitchen_toaster_foot_west", lo = v(x0, K.top, z0), hi = v(x0 + T.foot, K.top + T.feet, z1), profile = "painted_metal_smooth", color = feet, material = "SmoothPlastic" },
+		{ id = "kitchen_toaster_foot_east", lo = v(x1 - T.foot, K.top, z0), hi = v(x1, K.top + T.feet, z1), profile = "painted_metal_smooth", color = feet, material = "SmoothPlastic" },
+		{ id = "kitchen_toaster", lo = v(x0, K.top + T.feet, z0), hi = v(x1, K.top + T.feet + T.h, z1), profile = "painted_metal_smooth", color = body, material = "Metal" },
+	}
+end
+
+-- (ROBLOX-112) The counter under the window: the tiled upstand under the sill board and beside the reveal, the worktop round the sink, the sink's bowl, the tap, the toaster
+-- over the retreat and the kettle on its base.
+local function counterPieces(region: WorldMap.Region): { Piece }
+	local K = Garden.KITCHEN
+	local C = K.colors
+	local S, T, J = K.sink, K.tap, K.kettle
+	local w = S.wall
+	local bottom = K.top - K.thick
+	local tile, top, steel = hex(C.tile), hex(C.worktop), hex(C.steel)
+	local out: { Piece } = {
+		{ id = "kitchen_upstand", lo = v(-K.upstand.x, K.top, K.back), hi = v(K.upstand.x, K.upstand.under, K.wall), profile = "glass_clean", color = tile, material = "SmoothPlastic" },
+		{ id = "kitchen_upstand_west", lo = v(K.x0, K.top, K.back), hi = v(-K.upstand.x, K.upstand.beside, K.wall), profile = "glass_clean", color = tile, material = "SmoothPlastic" },
+		{ id = "kitchen_upstand_east", lo = v(K.upstand.x, K.top, K.back), hi = v(K.x1, K.upstand.beside, K.wall), profile = "glass_clean", color = tile, material = "SmoothPlastic" },
+		{ id = "kitchen_worktop_west", lo = v(K.x0, bottom, K.wall), hi = v(S.x0 - w, K.top, K.front), profile = "varnished_wood_smooth", color = top, material = "SmoothPlastic" },
+		{ id = "kitchen_worktop_east", lo = v(S.x1 + w, bottom, K.wall), hi = v(K.x1, K.top, K.front), profile = "varnished_wood_smooth", color = top, material = "SmoothPlastic" },
+		{ id = "kitchen_worktop_back", lo = v(S.x0 - w, bottom, K.wall), hi = v(S.x1 + w, K.top, S.z0 - w), profile = "varnished_wood_smooth", color = top, material = "SmoothPlastic" },
+		{ id = "kitchen_worktop_front", lo = v(S.x0 - w, bottom, S.z1 + w), hi = v(S.x1 + w, K.top, K.front), profile = "varnished_wood_smooth", color = top, material = "SmoothPlastic" },
+		{ id = "kitchen_sink_floor", lo = v(S.x0 - w, S.bottom - w, S.z0 - w), hi = v(S.x1 + w, S.bottom, S.z1 + w), profile = "painted_metal_smooth", color = steel, material = "Metal" },
+		{ id = "kitchen_sink_west", lo = v(S.x0 - w, S.bottom, S.z0 - w), hi = v(S.x0, K.top, S.z1 + w), profile = "painted_metal_smooth", color = steel, material = "Metal" },
+		{ id = "kitchen_sink_east", lo = v(S.x1, S.bottom, S.z0 - w), hi = v(S.x1 + w, K.top, S.z1 + w), profile = "painted_metal_smooth", color = steel, material = "Metal" },
+		{ id = "kitchen_sink_back", lo = v(S.x0, S.bottom, S.z0 - w), hi = v(S.x1, K.top, S.z0), profile = "painted_metal_smooth", color = steel, material = "Metal" },
+		{ id = "kitchen_sink_front", lo = v(S.x0, S.bottom, S.z1), hi = v(S.x1, K.top, S.z1 + w), profile = "painted_metal_smooth", color = steel, material = "Metal" },
+		{ id = "kitchen_tap", lo = v(T.x0, K.top, T.z0), hi = v(T.x1, K.top + T.h, T.z1), profile = "painted_metal_smooth", color = steel, material = "Metal" },
+		{ id = "kitchen_tap_spout", lo = v(T.spout.to, K.top + T.h - T.spout.h, (T.z0 + T.z1 - T.spout.w) / 2), hi = v(T.x0, K.top + T.h, (T.z0 + T.z1 + T.spout.w) / 2), profile = "painted_metal_smooth",
+			color = steel, material = "Metal" },
+	}
+	for _, t in region.retreats do
+		for _, piece in toasterOver(t) do table.insert(out, piece) end
+	end
+	table.insert(out, { id = "kitchen_kettle_base", lo = v(J.x0, K.top, J.z0), hi = v(J.x1, K.top + J.base, J.z1), profile = "painted_metal_smooth", color = hex(J.baseColor), material = "SmoothPlastic" })
+	table.insert(out, { id = "kitchen_kettle", lo = v(J.x0 + J.inset, K.top + J.base, J.z0 + J.inset), hi = v(J.x1 - J.inset, K.top + J.base + J.h, J.z1 - J.inset), profile = "painted_metal_smooth",
+		color = hex(J.color), material = "SmoothPlastic" })
+	return out
+end
+
+-- (ROBLOX-112) Under the counter: the floor in front of it, the cupboard doors (one front, the worktop's front edge its top), the cupboards' base inside them, the plinth
+-- recessed under the doors, and the run's two end panels.
+local function kitchenFloorPieces(): { Piece }
+	local K = Garden.KITCHEN
+	local C, D, P, F = K.colors, K.doors, K.plinth, K.floor
+	local bottom = K.top - K.thick
+	local doors, panel = hex(C.doors), hex(C.panel)
+	return {
+		{ id = "kitchen_floor", lo = v(K.x0, F.top - F.thick, K.wall), hi = v(K.x1, F.top, F.z1), profile = "varnished_wood_smooth", color = hex(C.floor), material = "SmoothPlastic" },
+		{ id = "kitchen_doors", lo = v(-K.carcass, D.bottom, K.front - D.thick), hi = v(K.carcass, bottom, K.front), profile = "painted_wood_dry", color = doors, material = "Wood" },
+		{ id = "kitchen_base", lo = v(-K.carcass, D.bottom - K.base, K.back), hi = v(K.carcass, D.bottom, K.front - D.thick), profile = "painted_wood_dry", color = doors, material = "Wood" },
+		{ id = "kitchen_plinth", lo = v(-K.carcass, F.top, K.front - P.setback - P.thick), hi = v(K.carcass, D.bottom - K.base, K.front - P.setback), profile = "painted_wood_dry", color = hex(C.plinth), material = "Wood" },
+		{ id = "kitchen_end_west", lo = v(K.x0, F.top, K.back), hi = v(-K.carcass, bottom, K.front), profile = "painted_wood_dry", color = panel, material = "Wood" },
+		{ id = "kitchen_end_east", lo = v(K.carcass, F.top, K.back), hi = v(K.x1, bottom, K.front), profile = "painted_wood_dry", color = panel, material = "Wood" },
+	}
 end
 
 -- ---------------------------------------------------------------- the drawn look
@@ -710,6 +850,7 @@ local function wallDecor(region: WorldMap.Region, budget: { full: number, low: n
 	local win = W.window
 	local skin = 1.0 -- the room's plaster on the inside of the house above the window
 	for i, b in { { W.west, win.x0, W.top, W.above }, { win.x1, W.east, W.top, W.above }, { win.x0, win.x1, win.y1, W.above } } do
+		if b[4] <= b[3] then continue end -- (ROBLOX-112: the window goes on up past y 30 now, so nothing stands over it here)
 		add({ id = "Above" .. i, size = v(b[2] - b[1], b[4] - b[3], W.back - skin - mortarFace), at = v((b[1] + b[2]) / 2, (b[3] + b[4]) / 2, (W.back - skin + mortarFace) / 2), color = hex(W.mortar), material = W.mortarMaterial, group = "Above" })
 		add({ id = "AboveSkin" .. i, size = v(b[2] - b[1], b[4] - b[3], skin), at = v((b[1] + b[2]) / 2, (b[3] + b[4]) / 2, W.back - skin / 2), color = hex(W.plaster), material = "Plaster", group = "Above" })
 	end
@@ -828,19 +969,102 @@ local function wallDecor(region: WorldMap.Region, budget: { full: number, low: n
 	return list
 end
 
--- (ROBLOX-103) The wall above the window and the house round it. Both tiers: the brick courses from y 30 (where the house_wall's look stops) to the eaves over a
--- recessed mortar bed and the room's plaster behind, the soffit, the fascia, the gutter and the eave course of tiles over the pieces they stand in for, the roof's
--- slope from the eaves over the whole house to the ridge, the house's back wall on either side out to 5 m (x 40..500) with its eaves and gutter, and the downpipe.
--- Full tier: the tile joints, the gutter's rolled lip, mortar lines along the long walls, a window and the back door, the downpipe's brackets, leaves, moss and a
--- puddle in the gutter, dirt streaks under it where it overflows, lichen, and an old cobweb in the eaves' corner. Nothing here casts a shadow (no look does), so the
--- light through the window is the light it was.
+-- (ROBLOX-112) The window and the wall round it, outside and in (the window itself, its frame, glass and sashes, is drawn by the sill's Decor, Habitat/Scenery.window,
+-- whose box this region holds). Both tiers: the jambs' mortar beds (their faces in the window's reveal are the render it is finished in) and their brick courses from
+-- y 30 (where the house_wall's look stops) to the head, on the house_wall's bond; the room's reveal either side of the window and its wall beside it, plaster. Full
+-- tier: rain streaks and lichen on the jambs, an old cobweb in the outer reveal's top corner, fly specks on the room's reveal, and the socket over the worktop.
 local function upperDecor(region: WorldMap.Region, budget: { full: number, low: number }): { Drawn }
+	local U, W = Garden.UPPER, Garden.WALL
+	local K = W.brick
+	local Rv, In, Wn = U.reveal, U.inner, U.window
+	local list, add = sheet(budget)
+	local face = U.face + K.gap
+	local mortarFace = U.face + K.recess
+	local gap = 0.02 -- a drawn board sits this far inside the walkable box it stands in for
+	local function inside(id: string, lo: Vector3, hi: Vector3, color: string, material: string, group: string)
+		add({ id = id, size = hi - lo - v(2 * gap, 2 * gap, 2 * gap), at = (lo + hi) * 0.5, color = hex(color), material = material, group = group })
+	end
+	for i, side in { -1, 1 } do
+		local x0, x1 = if side < 0 then U.west else U.jamb, if side < 0 then -U.jamb else U.east
+		add({ id = "Jamb" .. i, size = v(x1 - x0, U.head - W.above, U.back - mortarFace), at = v((x0 + x1) / 2, (U.head + W.above) / 2, (U.back + mortarFace) / 2), color = hex(W.mortar),
+			material = W.mortarMaterial, group = "Mortar" })
+	end
+	inside("RevealWest", v(-U.jamb, Wn.bottom, Wn.inner), v(-Rv.x, U.head, Rv.room), In.color, "Plaster", "Room")
+	inside("RevealEast", v(Rv.x, Wn.bottom, Wn.inner), v(U.jamb, U.head, Rv.room), In.color, "Plaster", "Room")
+	inside("InnerWest", v(-In.x, 0, U.back), v(-U.jamb, U.head, Rv.room), In.color, "Plaster", "Room")
+	inside("InnerEast", v(U.jamb, 0, U.back), v(In.x, U.head, Rv.room), In.color, "Plaster", "Room")
+	-- the courses on the jambs, from y 30 to the head (one course every brick and joint from y 0.5, offset every other course as the house_wall's)
+	local brand = rng(region.seed, 13)
+	local pitch, course = K.length + K.joint, K.height + K.joint
+	local n, c = 0, 0
+	local y = W.top + K.joint / 2
+	while y + K.height <= W.above do y += course; c += 1 end
+	while y + K.height <= U.head do
+		local offset = ((c + 1) % 2) * pitch / 2
+		for _, range in { { U.west, -U.jamb }, { U.jamb, U.east } } do
+			local x = U.west - offset
+			while x < U.east do
+				local a, b = math.max(x + K.joint / 2, range[1]), math.min(x + pitch - K.joint / 2, range[2])
+				if b - a >= 2.0 then
+					n += 1
+					local burnt, pale = brand() < 0.08, brand() < 0.06
+					local color = if burnt then hex(W.burnt) elseif pale then hex(W.pale) else hex(pick(W.bricks, brand))
+					add({ id = "Brick" .. n, size = v(b - a, K.height, K.depth), at = v((a + b) / 2, y + K.height / 2, face + brand() * 0.05 + K.depth / 2), color = color, material = W.brickMaterial, group = "Bricks" })
+				end
+				x += pitch
+			end
+		end
+		y += course
+		c += 1
+	end
+	-- full tier: rain streaks down the jambs from the head, lichen, an old cobweb in the outer reveal's top corner
+	local grand = rng(region.seed, 103)
+	for k = 1, 4 do
+		local side = if k % 2 == 0 then 1 else -1
+		local w, l = between(grand, 1.5, 3.5), between(grand, 12, 40)
+		add({ id = "Streak" .. k, size = v(w, l, 0.006), at = v(side * between(grand, U.jamb + 1 + w / 2, U.east - 1 - w / 2), U.head - l / 2 - 0.5, face - 0.003), color = hex("4e4a3c"), material = "Concrete",
+			transparency = 0.6, full = true, group = "Weather" })
+	end
+	for k = 1, 4 do
+		local w = between(grand, 0.8, 2.0)
+		local side = if k % 2 == 0 then 1 else -1
+		add({ id = "Lichen" .. k, size = v(w, w * between(grand, 0.55, 0.9), 0.008), at = v(side * between(grand, U.jamb + 1.5, U.east - 1.5), between(grand, 35, U.head - 8), face - 0.003),
+			turn = v(0, 0, grand() * 360), shape = "Ellipsoid", color = hex(pick({ "b9b78f", "c7c4a2", "9fa97d", "d0cdb2" }, grand)), material = "Plaster", full = true, group = "Weather" })
+	end
+	local corner = if grand() < 0.5 then -U.jamb + 0.2 else U.jamb - 0.2
+	local inward = if corner < 0 then 1 else -1
+	for k = 1, 3 do
+		local a = v(corner, U.head - 0.05, U.back - between(grand, 0.6, 4))
+		local b = v(corner + inward * between(grand, 2, 6), U.head - between(grand, 1.5, 5), U.back - between(grand, 4, 9.5))
+		local d = b - a
+		add({ id = "Cobweb" .. k, size = v(d.Magnitude, 0.012, 0.012), at = (a + b) * 0.5, turn = v(0, math.deg(math.atan2(-d.Z, d.X)), math.deg(math.asin(math.clamp(d.Y / d.Magnitude, -1, 1)))),
+			shape = "Cylinder", color = hex("e8e4d8"), material = "Glass", transparency = 0.45, full = true, group = "Weather" })
+	end
+	-- full tier, the room's side: fly specks on the reveal's plaster, and the socket on the wall over the worktop (the kettle's)
+	for k = 1, 8 do
+		local side = if k % 2 == 0 then 1 else -1
+		local s = between(grand, 0.08, 0.2)
+		add({ id = "Speck" .. k, size = v(0.006, s, s), at = v(side * (Rv.x - gap + 0.003), between(grand, 20, U.head - 10), between(grand, Wn.inner + 2, Rv.room - 2)), shape = "Ellipsoid",
+			color = hex(pick({ "3a2f25", "4a3d30", "2c241b" }, grand)), material = "Plaster", full = true, group = "Room" })
+	end
+	local So = Garden.KITCHEN.socket
+	add({ id = "Socket", size = v(So.w, So.h, 0.6), at = v(So.x, So.y, Rv.room + 0.3 - 0.6), color = hex("f4f2ec"), material = "SmoothPlastic", full = true, group = "Room" })
+	add({ id = "SocketPins", size = v(3.2, 1.0, 0.02), at = v(So.x - 0.8, So.y - 0.6, Rv.room + 0.005), color = hex("3a3836"), material = "SmoothPlastic", full = true, group = "Room" })
+	return list
+end
+
+-- (ROBLOX-103's wall above the window, ROBLOX-112's eaves) The brick over the window and the house round it. Both tiers: the lintel over the window's head, the brick
+-- courses from the head to the eaves over a recessed mortar bed and the room's wall inside, the soffit, the fascia, the gutter and the eave course of tiles over the
+-- pieces they stand in for, the roof's slope from the eaves over the whole house to the ridge, the house's back wall on either side out to 5 m (x 40..500) with its
+-- eaves and gutter. Full tier: the tile joints, the gutter's rolled lip, mortar lines along the long walls, the house's other window (the kitchen's size, its sashes
+-- drawn as the kitchen's are) and the back door, leaves, moss and a puddle in the gutter, dirt streaks under it where it overflows, lichen, and an old cobweb in the
+-- eaves' corner. Nothing here casts a shadow (no look does), so the light through the window is the light it was.
+local function eavesDecor(region: WorldMap.Region, budget: { full: number, low: number }): { Drawn }
 	local U, W = Garden.UPPER, Garden.WALL
 	local K, G, E, F, R, H = W.brick, U.gutter, U.eaves, U.fascia, U.roof, U.house
 	local list, add = sheet(budget)
 	local face = U.face + K.gap
 	local mortarFace = U.face + K.recess
-	local skin = 1.0
 	local gap = 0.02 -- a drawn board sits this far inside the walkable box it stands in for
 	local function box(id: string, lo: Vector3, hi: Vector3, color: string, material: string, group: string, full: boolean?, transparency: number?)
 		add({ id = id, size = hi - lo, at = (lo + hi) * 0.5, color = hex(color), material = material, group = group, full = full, transparency = transparency })
@@ -848,15 +1072,30 @@ local function upperDecor(region: WorldMap.Region, budget: { full: number, low: 
 	local function inside(id: string, lo: Vector3, hi: Vector3, color: string, material: string, group: string)
 		box(id, lo + v(gap, gap, gap), hi - v(gap, gap, gap), color, material, group)
 	end
-	-- the mortar bed and the room's plaster behind, from y 30 to the eaves
-	box("Mortar", v(U.west, W.above, mortarFace), v(U.east, U.top, U.back - skin), W.mortar, W.mortarMaterial, "Mortar")
-	box("Skin", v(U.west, W.above, U.back - skin), v(U.east, U.top, U.back), W.plaster, "Plaster", "Mortar")
-	-- the courses, on from the house_wall's (its courses above the outer sill start at y 0.5, one every brick and joint)
+	-- the mortar bed from the head to the eaves, the room's wall over the window inside (to the ceiling's height), and the lintel across the head: a concrete beam one
+	-- course tall bearing on the jambs, its underside the head of the window's reveal
+	local L = U.lintel
+	box("Mortar", v(U.west, U.head + gap, mortarFace), v(U.east, U.top, U.back), W.mortar, W.mortarMaterial, "Mortar") -- (behind the lintel too: from afar it is the wall)
+	inside("Skin", v(-U.inner.x, U.head, U.back), v(U.inner.x, U.top, U.reveal.room), U.inner.color, "Plaster", "Mortar")
+	add({ id = "Lintel", size = v(U.east - U.west, L.h, U.back - face), at = v(0, U.head + L.h / 2, (U.back + face) / 2), color = hex(L.color), material = "Concrete", group = "Mortar" })
+	-- (ROBLOX-112) the kitchen beyond the window, drawn only until the inside is built (docs/WORLD_MAP_PLAN.md): its ceiling, its far wall and its sides, its back wall
+	-- beyond the counter's run either side and its floor beyond the walkable strip, so the window shows a room and not the sky, and the sill's view into the room has
+	-- walls. None of it casts a shadow, so the light through the window falls as it did.
+	local Rm = Garden.KITCHEN.room
+	local wallFace, floorTop = U.reveal.room, Garden.KITCHEN.floor.top
+	box("RoomCeiling", v(Rm.x0, U.top, wallFace), v(Rm.x1, U.top + 2, Rm.z1), Rm.ceiling, "Plaster", "Room")
+	box("RoomFar", v(Rm.x0, floorTop, Rm.z1), v(Rm.x1, U.top, Rm.z1 + 2), Rm.wall, "Plaster", "Room")
+	box("RoomFloor", v(Rm.x0, floorTop - 2, wallFace), v(Rm.x1, floorTop - 0.05, Rm.z1), Garden.KITCHEN.colors.floor, "SmoothPlastic", "Room")
+	box("RoomSideWest", v(Rm.x0 - 2, floorTop, wallFace), v(Rm.x0, U.top, Rm.z1), Rm.wall, "Plaster", "Room")
+	box("RoomSideEast", v(Rm.x1, floorTop, wallFace), v(Rm.x1 + 2, U.top, Rm.z1), Rm.wall, "Plaster", "Room")
+	box("RoomBackWest", v(Rm.x0, floorTop, U.back), v(-U.inner.x, U.top, wallFace), Rm.wall, "Plaster", "Room")
+	box("RoomBackEast", v(U.inner.x, floorTop, U.back), v(Rm.x1, U.top, wallFace), Rm.wall, "Plaster", "Room")
+	-- the courses, on from the jambs' (the courses start at y 0.5, one every brick and joint: the head and the eaves are both on a joint), over the lintel
 	local brand = rng(region.seed, 13)
 	local pitch, course = K.length + K.joint, K.height + K.joint
 	local n, c = 0, 0
 	local y = W.top + K.joint / 2
-	while y + K.height <= W.above do y += course; c += 1 end
+	while y + K.height <= U.head + L.h do y += course; c += 1 end
 	while y + K.height <= U.top - K.joint / 2 do
 		local offset = ((c + 1) % 2) * pitch / 2
 		local x = U.west - offset
@@ -913,10 +1152,13 @@ local function upperDecor(region: WorldMap.Region, budget: { full: number, low: 
 	add({ id = "BackStep", size = v(D.w + 30, D.step, 30), at = v(D.x, H.foot + D.step / 2, U.face - 15), color = hex("a29d92"), material = "Concrete", full = true, group = "House" })
 	add({ id = "BackDoorFrame", size = v(D.w + 8, D.h + 4, 1.2), at = v(D.x, stepTop + (D.h + 4) / 2, U.face - 0.4), color = hex(U.paint), material = "Wood", full = true, group = "House" })
 	add({ id = "BackDoor", size = v(D.w, D.h, 1.6), at = v(D.x, stepTop + D.h / 2, U.face - 0.7), color = hex(D.color), material = "WoodPlanks", full = true, group = "House" })
-	-- another window like the kitchen's (the sill's: from y 0 to 14, its glass 3 to 13), along the west wall
-	add({ id = "WindowFrame", size = v(Wn.w + 2, Wn.h + 2, 1.2), at = v(Wn.x, Wn.sill + (Wn.h + 2) / 2, U.face - 0.4), color = hex(U.paint), material = "Wood", full = true, group = "House" })
-	add({ id = "WindowGlass", size = v(Wn.w - 2, Wn.h - 2, 1.4), at = v(Wn.x, Wn.sill + 1 + Wn.h / 2, U.face - 0.6), color = hex("5d7480"), material = "Glass", transparency = 0.2, full = true, group = "House" })
+	-- another window like the kitchen's (ROBLOX-112: the kitchen's own size, 62 wide and from y 0 to the head at 112.5, its sashes meeting at the same transom), along
+	-- the west wall, its lintel over it and its stone sill under it
+	add({ id = "WindowFrame", size = v(Wn.w, Wn.h, 1.2), at = v(Wn.x, Wn.sill + Wn.h / 2, U.face - 0.4), color = hex(U.paint), material = "Wood", full = true, group = "House" })
+	add({ id = "WindowGlass", size = v(Wn.w - 7, Wn.h - 5, 1.4), at = v(Wn.x, Wn.sill + Wn.h / 2 + 0.5, U.face - 0.6), color = hex("5d7480"), material = "Glass", transparency = 0.2, full = true, group = "House" })
+	add({ id = "WindowTransom", size = v(Wn.w - 7, 2.5, 1.6), at = v(Wn.x, Wn.transom + 1.25, U.face - 0.8), color = hex(U.paint), material = "Wood", full = true, group = "House" })
 	add({ id = "WindowSill", size = v(Wn.w + 6, 3, 10.5), at = v(Wn.x, Wn.sill - 1.5, U.face + 5.25 - 10.5), color = hex("ddd5c3"), material = "Concrete", full = true, group = "House" })
+	add({ id = "WindowLintel", size = v(Wn.w + 2 * 9, L.h, 0.6), at = v(Wn.x, U.head + L.h / 2, U.face - 0.3), color = hex(L.color), material = "Concrete", full = true, group = "House" })
 	-- full tier: what collects in a gutter, the dirt it leaves on the brick, lichen, an old cobweb in the eaves' corner
 	local grand = rng(region.seed, 103)
 	for k = 1, 8 do
@@ -939,7 +1181,7 @@ local function upperDecor(region: WorldMap.Region, budget: { full: number, low: 
 	end
 	for k = 1, 4 do
 		local w = between(grand, 0.8, 2.0)
-		add({ id = "Lichen" .. k, size = v(w, w * between(grand, 0.55, 0.9), 0.008), at = v(between(grand, U.west + 4, U.east - 4), between(grand, 40, 100), face - 0.003), turn = v(0, 0, grand() * 360),
+		add({ id = "Lichen" .. k, size = v(w, w * between(grand, 0.55, 0.9), 0.008), at = v(between(grand, U.west + 4, U.east - 4), between(grand, U.head + L.h + 2, U.top - 4), face - 0.003), turn = v(0, 0, grand() * 360),
 			shape = "Ellipsoid", color = hex(pick({ "b9b78f", "c7c4a2", "9fa97d", "d0cdb2" }, grand)), material = "Plaster", full = true, group = "Weather" })
 	end
 	local corner = if grand() < 0.5 then -E.edge + 0.2 else E.edge - 0.2
@@ -1272,9 +1514,33 @@ local function westDecor(region: WorldMap.Region, budget: { full: number, low: n
 	return list
 end
 
--- (ROBLOX-107) The same wall from y 0 to the eaves: the courses over the mortar, the eaves, fascia, gutter and eave course over their boxes, the drainpipe's top, neck,
--- outlet and upper bracket (both tiers), then at the full tier the gutter's rolled lip, leaves and moss in it, dirt streaks down the brick under it, and lichen.
+-- (ROBLOX-107, ROBLOX-112) The same wall from y 0 to the window's head: the courses over the mortar and the drainpipe and its upper bracket (both tiers), then lichen and
+-- a little salt bloom at the full tier.
 local function westUpperDecor(region: WorldMap.Region, budget: { full: number, low: number }): { Drawn }
+	local W, H, K = Garden.WEST, Garden.WALL, Garden.WALL.brick
+	local list, add = sheet(budget)
+	local face = W.face + K.gap
+	local mortarFace = W.face + K.recess
+	add({ id = "Mortar", size = v(W.east - W.west, W.head - W.rise, W.back - mortarFace), at = v((W.west + W.east) / 2, (W.head + W.rise) / 2, (W.back + mortarFace) / 2), color = hex(H.mortar), material = H.mortarMaterial, group = "Mortar" })
+	westBricks(add, rng(region.seed, 13), W.rise, W.head, "Bricks")
+	pipeOver(add, Garden.pieces(region))
+	local grand = rng(region.seed, 103)
+	for k = 1, 4 do
+		local w = between(grand, 0.8, 2.0)
+		add({ id = "Lichen" .. k, size = v(w, w * between(grand, 0.55, 0.9), 0.008), at = v(between(grand, W.west + 4, W.east - 4), between(grand, 20, W.head - 6), face - 0.003), turn = v(0, 0, grand() * 360),
+			shape = "Ellipsoid", color = hex(pick({ "b9b78f", "c7c4a2", "9fa97d", "d0cdb2" }, grand)), material = "Plaster", full = true, group = "Weather" })
+	end
+	for k = 1, 3 do
+		add({ id = "Bloom" .. k, size = v(between(grand, 2, 5), between(grand, 1, 2.5), 0.006), at = v(between(grand, W.west + 5, W.east - 5), between(grand, 10, 60), face - 0.002),
+			color = hex("d9d2c4"), material = "Plaster", transparency = 0.78, full = true, group = "Weather" })
+	end
+	return list
+end
+
+-- (ROBLOX-112; ROBLOX-107's wall_west_upper above the head) The same wall from the head to the eaves: the courses over the mortar, the eaves, fascia, gutter and eave
+-- course over their boxes, the drainpipe's top, neck and outlet (both tiers), then at the full tier the gutter's rolled lip, leaves and moss in it, dirt streaks down
+-- the brick under it, and lichen.
+local function eavesWestDecor(region: WorldMap.Region, budget: { full: number, low: number }): { Drawn }
 	local W, U, H, K = Garden.WEST, Garden.UPPER, Garden.WALL, Garden.WALL.brick
 	local G, E, F, R = U.gutter, U.eaves, U.fascia, U.roof
 	local list, add = sheet(budget)
@@ -1284,8 +1550,8 @@ local function westUpperDecor(region: WorldMap.Region, budget: { full: number, l
 	local function inside(id: string, lo: Vector3, hi: Vector3, color: string, material: string, group: string)
 		add({ id = id, size = hi - lo - v(2 * gap, 2 * gap, 2 * gap), at = (lo + hi) * 0.5, color = hex(color), material = material, group = group })
 	end
-	add({ id = "Mortar", size = v(W.east - W.west, W.top - W.rise, W.back - mortarFace), at = v((W.west + W.east) / 2, (W.top + W.rise) / 2, (W.back + mortarFace) / 2), color = hex(H.mortar), material = H.mortarMaterial, group = "Mortar" })
-	westBricks(add, rng(region.seed, 13), W.rise, W.top, "Bricks")
+	add({ id = "Mortar", size = v(W.east - W.west, W.top - W.head, W.back - mortarFace), at = v((W.west + W.east) / 2, (W.top + W.head) / 2, (W.back + mortarFace) / 2), color = hex(H.mortar), material = H.mortarMaterial, group = "Mortar" })
+	westBricks(add, rng(region.seed, 13), W.head, W.top, "Bricks")
 	local joint = -G.span - G.cap
 	inside("Soffit", v(W.west, U.top, E.out), v(-E.edge, E.top, U.back), U.paint, "Wood", "Eaves")
 	inside("Fascia", v(W.west, F.bottom, F.out), v(-E.edge, E.top, E.out), U.paint, "Wood", "Eaves")
@@ -1312,11 +1578,163 @@ local function westUpperDecor(region: WorldMap.Region, budget: { full: number, l
 		add({ id = "Streak" .. k, size = v(w, l, 0.006), at = v(between(grand, W.west + 4, W.east - 4), U.top - l / 2 - 0.5, face - 0.003), color = hex("4e4a3c"), material = "Concrete",
 			transparency = 0.55, full = true, group = "Weather" })
 	end
-	for k = 1, 4 do
+	for k = 1, 2 do
 		local w = between(grand, 0.8, 2.0)
-		add({ id = "Lichen" .. k, size = v(w, w * between(grand, 0.55, 0.9), 0.008), at = v(between(grand, W.west + 4, W.east - 4), between(grand, 20, 100), face - 0.003), turn = v(0, 0, grand() * 360),
+		add({ id = "Lichen" .. k, size = v(w, w * between(grand, 0.55, 0.9), 0.008), at = v(between(grand, W.west + 4, W.east - 4), between(grand, W.head + 4, U.top - 4), face - 0.003), turn = v(0, 0, grand() * 360),
 			shape = "Ellipsoid", color = hex(pick({ "b9b78f", "c7c4a2", "9fa97d", "d0cdb2" }, grand)), material = "Plaster", full = true, group = "Weather" })
 	end
+	return list
+end
+
+-- (ROBLOX-112) The counter under the window. Both tiers: the tiled upstand, the worktop, the sink's bowl, the tap, the toaster on its feet and the kettle on its base, each
+-- over the boxes they stand in for. Full tier: the upstand's grout joints, the worktop's rounded front edge, the drain, water in the bowl and a drop at the spout, the
+-- tap's handle, the toaster's slots, lever and crumb tray, the kettle's lid, handle, spout and switch, its cord to the socket, crumbs (most of them by and under the
+-- toaster) and spilt sugar by the kettle.
+local function counterDecor(region: WorldMap.Region, budget: { full: number, low: number }): { Drawn }
+	local K = Garden.KITCHEN
+	local C, S, T, J = K.colors, K.sink, K.tap, K.kettle
+	local list, add = sheet(budget)
+	local gap = 0.02
+	local pieces: { [string]: Piece } = {}
+	for _, piece in Garden.pieces(region) do pieces[piece.id] = piece end
+	local function over(id: string, name: string, color: string, material: string, group: string)
+		local piece = pieces[id]
+		add({ id = name, size = piece.hi - piece.lo - v(2 * gap, 2 * gap, 2 * gap), at = (piece.lo + piece.hi) * 0.5, color = hex(color), material = material, group = group })
+	end
+	local function rod(id: string, a: Vector3, b: Vector3, d: number, color: string, material: string, group: string, full: boolean?)
+		local dd = b - a
+		add({ id = id, size = v(dd.Magnitude, d, d), at = (a + b) * 0.5, turn = v(0, math.deg(math.atan2(-dd.Z, dd.X)), math.deg(math.asin(math.clamp(dd.Y / dd.Magnitude, -1, 1)))),
+			shape = "Cylinder", color = hex(color), material = material, full = full, group = group })
+	end
+	over("kitchen_upstand", "Upstand", C.tile, "SmoothPlastic", "Upstand")
+	over("kitchen_upstand_west", "UpstandWest", C.tile, "SmoothPlastic", "Upstand")
+	over("kitchen_upstand_east", "UpstandEast", C.tile, "SmoothPlastic", "Upstand")
+	for _, name in { "west", "east", "back", "front" } do over("kitchen_worktop_" .. name, "Worktop" .. name, C.worktop, "SmoothPlastic", "Worktop") end
+	for _, name in { "floor", "west", "east", "back", "front" } do over("kitchen_sink_" .. name, "Sink" .. name, C.steel, "Metal", "Sink") end
+	-- the tap: a round column and its spout out over the bowl
+	local tap, spout = pieces.kitchen_tap, pieces.kitchen_tap_spout
+	add({ id = "Tap", size = v(tap.hi.Y - tap.lo.Y - gap, T.x1 - T.x0 - 2 * gap, T.z1 - T.z0 - 2 * gap), at = (tap.lo + tap.hi) * 0.5, turn = v(0, 0, 90), shape = "Cylinder", color = hex(C.steel),
+		material = "Metal", group = "Sink" })
+	add({ id = "Spout", size = v(spout.hi.X - spout.lo.X - gap, T.spout.w - 2 * gap, T.spout.w - 2 * gap), at = (spout.lo + spout.hi) * 0.5, shape = "Cylinder", color = hex(C.steel), material = "Metal", group = "Sink" })
+	-- the toaster on its two feet over the gap, and the kettle on its base
+	local To = K.toaster
+	over("kitchen_toaster_foot_west", "ToasterFootWest", To.feetColor, "SmoothPlastic", "Toaster")
+	over("kitchen_toaster_foot_east", "ToasterFootEast", To.feetColor, "SmoothPlastic", "Toaster")
+	over("kitchen_toaster", "Toaster", To.color, "Metal", "Toaster")
+	local base, kettle = pieces.kitchen_kettle_base, pieces.kitchen_kettle
+	local kc = (kettle.lo + kettle.hi) * 0.5
+	local kd = kettle.hi.X - kettle.lo.X
+	add({ id = "KettleBase", size = v(base.hi.Y - base.lo.Y - gap, base.hi.X - base.lo.X - 2 * gap, base.hi.Z - base.lo.Z - 2 * gap), at = (base.lo + base.hi) * 0.5, turn = v(0, 0, 90), shape = "Cylinder",
+		color = hex(J.baseColor), material = "SmoothPlastic", group = "Kettle" })
+	add({ id = "Kettle", size = v(kettle.hi.Y - kettle.lo.Y - gap, kd - 2 * gap, kd - 2 * gap), at = kc, turn = v(0, 0, 90), shape = "Cylinder", color = hex(J.color), material = "SmoothPlastic", group = "Kettle" })
+	-- full tier: the upstand's grout joints, the worktop's rounded front edge
+	local top = K.top
+	for x = K.x0 + 10, K.x1 - 5, 10 do
+		add({ id = "Grout" .. math.floor(x - K.x0), size = v(0.25, (if math.abs(x) < K.upstand.x then K.upstand.under else K.upstand.beside) - top, 0.02), at = v(x, (top + (if math.abs(x) < K.upstand.x then K.upstand.under else K.upstand.beside)) / 2, K.wall - gap + 0.005),
+			color = hex(C.grout), material = "SmoothPlastic", full = true, group = "Upstand" })
+	end
+	add({ id = "Edge", size = v(K.x1 - K.x0 - 2 * gap, K.thick - 2 * gap, K.thick - 2 * gap), at = v(0, top - K.thick / 2, K.front - K.thick / 2), shape = "Cylinder", color = hex(C.edge), material = "SmoothPlastic", full = true, group = "Worktop" })
+	-- the drain and the water in the bowl, a drop hanging at the spout
+	local floorTop = S.bottom
+	add({ id = "Drain", size = v(0.04, 4.5, 4.5), at = v((S.x0 + S.x1) / 2, floorTop + 0.01, (S.z0 + S.z1) / 2 + 6), turn = v(0, 0, 90), shape = "Cylinder", color = hex("6f7378"), material = "Metal", full = true, group = "Sink" })
+	add({ id = "Water", size = v(9, 0.04, 6), at = v((S.x0 + S.x1) / 2 + 3, floorTop + 0.02, (S.z0 + S.z1) / 2 + 4), shape = "Ellipsoid", color = hex("b8c8cf"), material = "Glass", transparency = 0.55, full = true, group = "Sink" })
+	add({ id = "Drop", size = v(0.7, 0.9, 0.7), at = v(T.spout.to + 0.8, spout.lo.Y - 0.45, (spout.lo.Z + spout.hi.Z) / 2), shape = "Ellipsoid", color = hex("cfe0e6"), material = "Glass", transparency = 0.4, full = true, group = "Sink" })
+	add({ id = "TapHandle", size = v(4, 0.8, 0.8), at = v((T.x0 + T.x1) / 2, tap.hi.Y + 0.4, (tap.lo.Z + tap.hi.Z) / 2 + 1), turn = v(0, 90, 0), shape = "Cylinder", color = hex(C.steel), material = "Metal", full = true, group = "Sink" })
+	-- the toaster's slots, its lever and its crumb tray
+	local toaster = pieces.kitchen_toaster
+	local tz = (toaster.lo.Z + toaster.hi.Z) / 2
+	for k, dz in { -2.6, 2.6 } do
+		add({ id = "ToasterSlot" .. k, size = v(toaster.hi.X - toaster.lo.X - 5, 0.04, 1.4), at = v((toaster.lo.X + toaster.hi.X) / 2, toaster.hi.Y + 0.0, tz + dz), color = hex("1e1f21"), material = "SmoothPlastic", full = true, group = "Toaster" })
+	end
+	add({ id = "ToasterLever", size = v(1.2, 1.6, 2.4), at = v(toaster.hi.X - 0.6, toaster.lo.Y + To.h * 0.7, tz), color = hex("2a2b2d"), material = "SmoothPlastic", full = true, group = "Toaster" })
+	add({ id = "CrumbTray", size = v(toaster.hi.X - toaster.lo.X - 4, 0.5, 0.06), at = v((toaster.lo.X + toaster.hi.X) / 2, toaster.lo.Y + 0.6, toaster.hi.Z - gap), color = hex("8d9095"), material = "Metal", full = true, group = "Toaster" })
+	-- the kettle's lid, handle, spout and switch, and its cord back to the socket on the wall over the worktop
+	add({ id = "KettleLid", size = v(0.6, kd * 0.55, kd * 0.55), at = v(kc.X, kettle.hi.Y + 0.25, kc.Z), turn = v(0, 0, 90), shape = "Cylinder", color = hex("d9d7d0"), material = "SmoothPlastic", full = true, group = "Kettle" })
+	add({ id = "KettleHandle", size = v(1.4, kettle.hi.Y - kettle.lo.Y - 6, 3), at = v(kettle.hi.X - 0.6, kc.Y + 1, kc.Z), color = hex("e4e2db"), material = "SmoothPlastic", full = true, group = "Kettle" })
+	rod("KettleSpout", v(kettle.lo.X + 1.2, kettle.hi.Y - 5, kc.Z), v(kettle.lo.X - 2.2, kettle.hi.Y - 1.6, kc.Z), 1.6, J.color, "SmoothPlastic", "Kettle", true)
+	add({ id = "KettleSwitch", size = v(1.2, 0.8, 1.6), at = v(kettle.hi.X - 0.6, kettle.lo.Y + 2.4, kc.Z), color = hex("4d6e8a"), material = "Neon", full = true, group = "Kettle" })
+	local So = K.socket
+	local cordA = v(base.hi.X - 3, top + 0.35, base.lo.Z)
+	local cordB = v(So.x + 1.5, top + 0.35, K.wall - 0.4)
+	rod("Cord1", cordA, cordB, 0.5, "2b2c2e", "SmoothPlastic", "Kettle", true)
+	rod("Cord2", cordB, v(So.x + 1.5, So.y - So.h / 2, K.wall - 0.4), 0.5, "2b2c2e", "SmoothPlastic", "Kettle", true)
+	-- crumbs: most of them by the toaster and under it (the gap is where they gather), the rest along the worktop; spilt sugar by the kettle
+	local crand = rng(region.seed, 31)
+	local Cr = K.crumbs
+	local retreat = region.retreats[1]
+	for k = 1, Cr.count do
+		local d = between(crand, Cr.size[1], Cr.size[2])
+		local x, z
+		if k <= Cr.count * 0.4 then
+			x, z = between(crand, retreat.min.X + 0.5, retreat.max.X - 0.5), between(crand, retreat.min.Z + 0.5, retreat.max.Z - 0.5)
+		elseif k <= Cr.count * 0.75 then
+			x, z = between(crand, toaster.lo.X - 6, toaster.hi.X + 6), between(crand, toaster.hi.Z + 0.5, toaster.hi.Z + 7)
+		else
+			x = if crand() < 0.5 then between(crand, K.x0 + 2, S.x0 - 3) else between(crand, S.x1 + 3, J.x0 - 2)
+			z = between(crand, K.wall + 2, K.front - 3)
+		end
+		add({ id = "Crumb" .. k, size = v(d, d * between(crand, 0.4, 0.8), d * between(crand, 0.6, 1)), at = v(x, top + d * 0.2, z), turn = v(0, crand() * 360, 0), shape = "Ellipsoid",
+			color = hex(pick(Cr.colors, crand)), material = "Sand", full = true, group = "Crumbs" })
+	end
+	for k = 1, 8 do
+		local d = between(crand, 0.08, 0.14)
+		add({ id = "Sugar" .. k, size = v(d, d, d), at = v(between(crand, J.x0 - 4, J.x0 + 2), top + d / 2, between(crand, J.z1 + 1, J.z1 + 6)), turn = v(crand() * 90, crand() * 90, 0),
+			color = hex("f7f6f2"), material = "Glass", transparency = 0.2, full = true, group = "Crumbs" })
+	end
+	return list
+end
+
+-- (ROBLOX-112) Under the counter. Both tiers: the floor, the cupboard doors (four, with their gaps), the plinth, the end panels and the cupboards' base. Full tier: the
+-- floor's tile joints, the doors' handles, crumbs swept against the plinth, a dried pea and a dust ball in the dark under the doors.
+local function kitchenFloorDecor(region: WorldMap.Region, budget: { full: number, low: number }): { Drawn }
+	local K = Garden.KITCHEN
+	local C, D, F = K.colors, K.doors, K.floor
+	local list, add = sheet(budget)
+	local gap = 0.02
+	local pieces: { [string]: Piece } = {}
+	for _, piece in Garden.pieces(region) do pieces[piece.id] = piece end
+	local function over(id: string, name: string, color: string, material: string, group: string)
+		local piece = pieces[id]
+		add({ id = name, size = piece.hi - piece.lo - v(2 * gap, 2 * gap, 2 * gap), at = (piece.lo + piece.hi) * 0.5, color = hex(color), material = material, group = group })
+	end
+	over("kitchen_floor", "Floor", C.floor, "SmoothPlastic", "Floor")
+	over("kitchen_plinth", "Plinth", C.plinth, "Wood", "Cupboards")
+	over("kitchen_end_west", "EndWest", C.panel, "Wood", "Cupboards")
+	over("kitchen_end_east", "EndEast", C.panel, "Wood", "Cupboards")
+	over("kitchen_base", "Base", C.doors, "Wood", "Cupboards")
+	-- the doors: a dark backing (the gaps between them) and four fronts over it, a hair inside the doors' box
+	local doors = pieces.kitchen_doors
+	add({ id = "DoorGaps", size = v(doors.hi.X - doors.lo.X - 2 * gap, doors.hi.Y - doors.lo.Y - 2 * gap, D.thick * 0.5), at = v(0, (doors.lo.Y + doors.hi.Y) / 2, doors.lo.Z + D.thick * 0.25 + gap),
+		color = hex("2b2a27"), material = "Wood", group = "Cupboards" })
+	local w = (doors.hi.X - doors.lo.X) / 4
+	for k = 1, 4 do
+		local x0 = doors.lo.X + (k - 1) * w
+		add({ id = "Door" .. k, size = v(w - 0.4, doors.hi.Y - doors.lo.Y - 0.5, D.thick - 2 * gap), at = v(x0 + w / 2, (doors.lo.Y + doors.hi.Y) / 2 - 0.1, (doors.lo.Z + doors.hi.Z) / 2), color = hex(C.doors),
+			material = "Wood", group = "Cupboards" })
+	end
+	-- full tier: the floor's tile joints, the doors' handles
+	local top = F.top
+	for z = K.wall + 30, F.z1 - 1, 30 do
+		add({ id = "JointZ" .. math.floor(z), size = v(K.x1 - K.x0 - 2 * gap, 0.02, 0.3), at = v(0, top - gap + 0.005, z), color = hex("a89a80"), material = "SmoothPlastic", full = true, group = "Floor" })
+	end
+	for x = K.x0 + 32, K.x1 - 1, 30 do
+		add({ id = "JointX" .. math.floor(x - K.x0), size = v(0.3, 0.02, F.z1 - K.wall - 2 * gap), at = v(x, top - gap + 0.005, (K.wall + F.z1) / 2), color = hex("a89a80"), material = "SmoothPlastic", full = true, group = "Floor" })
+	end
+	for k = 1, 4 do
+		local x0 = doors.lo.X + (k - 1) * w
+		local hx = if k % 2 == 1 then x0 + w - 4 else x0 + 4
+		add({ id = "Handle" .. k, size = v(1.0, 9, 1.0), at = v(hx, doors.hi.Y - 9, doors.hi.Z - 0.5), color = hex("b9bcc0"), material = "Metal", full = true, group = "Cupboards" })
+	end
+	-- crumbs swept against the plinth's foot, a dried pea and a dust ball under the doors, where the light does not reach
+	local crand = rng(region.seed, 31)
+	local plinth = pieces.kitchen_plinth
+	for k = 1, 12 do
+		local d = between(crand, 0.15, 0.5)
+		add({ id = "Crumb" .. k, size = v(d, d * 0.6, d * 0.8), at = v(between(crand, K.x0 + 4, K.x1 - 4), top + d * 0.2, between(crand, plinth.hi.Z + 0.6, plinth.hi.Z + 14)), turn = v(0, crand() * 360, 0),
+			shape = "Ellipsoid", color = hex(pick(K.crumbs.colors, crand)), material = "Sand", full = true, group = "Crumbs" })
+	end
+	add({ id = "Pea", size = v(0.8, 0.75, 0.8), at = v(between(crand, -40, 40), top + 0.38, plinth.hi.Z + 3), shape = "Ball", color = hex("7d8a3c"), material = "SmoothPlastic", full = true, group = "Crumbs" })
+	add({ id = "DustBall", size = v(4, 1.6, 3), at = v(between(crand, -50, 50), top + 0.7, plinth.hi.Z + 3.5), shape = "Ellipsoid", color = hex("9e978c"), material = "Fabric", transparency = 0.25, full = true, group = "Crumbs" })
 	return list
 end
 
@@ -1484,12 +1902,16 @@ end
 -- rest of the house drawn round them). All four together are 870 parts at full and 286 at low, beside the sill's Decor (Region's BUDGETS).
 Garden.BUDGETS = {
 	outer_sill = { full = 116, low = 39 },
-	house_wall = { full = 134, low = 75 },
+	house_wall = { full = 127, low = 69 },
 	bed = { full = 466, low = 113 },
-	wall_upper = { full = 150, low = 58 },
+	wall_upper = { full = 49, low = 28 },
+	eaves = { full = 146, low = 42 },
 	wall_west = { full = 93, low = 59 },
-	wall_west_upper = { full = 88, low = 71 },
+	wall_west_upper = { full = 73, low = 66 },
+	eaves_west = { full = 46, low = 31 },
 	shrub = { full = 260, low = 80 },
+	counter = { full = 83, low = 19 },
+	kitchen_floor = { full = 34, low = 10 },
 } :: { [string]: { full: number, low: number } }
 
 local piecesCache: { [string]: { Piece } } = {}
@@ -1497,7 +1919,8 @@ local decorCache: { [string]: { Drawn } } = {}
 
 -- Whether a kind is one of the garden's.
 function Garden.knows(kind: string): boolean
-	return kind == "outer_sill" or kind == "house_wall" or kind == "bed" or kind == "wall_upper" or kind == "wall_west" or kind == "wall_west_upper" or kind == "shrub"
+	return kind == "outer_sill" or kind == "house_wall" or kind == "bed" or kind == "wall_upper" or kind == "eaves" or kind == "wall_west" or kind == "wall_west_upper"
+		or kind == "eaves_west" or kind == "shrub" or kind == "counter" or kind == "kitchen_floor"
 end
 
 -- The physical boxes of a region of one of the garden's kinds (the same list for the same region; do not change it).
@@ -1510,9 +1933,13 @@ function Garden.pieces(region: WorldMap.Region): { Piece }
 	elseif region.kind == "house_wall" then out = wallPieces()
 	elseif region.kind == "bed" then out = bedPieces(region)
 	elseif region.kind == "wall_upper" then out = upperPieces()
+	elseif region.kind == "eaves" then out = eavesPieces()
 	elseif region.kind == "wall_west" then out = westPieces()
 	elseif region.kind == "wall_west_upper" then out = westUpperPieces()
+	elseif region.kind == "eaves_west" then out = eavesWestPieces()
 	elseif region.kind == "shrub" then out = shrubPieces(region)
+	elseif region.kind == "counter" then out = counterPieces(region)
+	elseif region.kind == "kitchen_floor" then out = kitchenFloorPieces()
 	else error("no generator for the region kind " .. region.kind) end
 	piecesCache[key] = out
 	return out
@@ -1529,9 +1956,13 @@ function Garden.decor(region: WorldMap.Region): { Drawn }
 	elseif region.kind == "house_wall" then out = wallDecor(region, budget)
 	elseif region.kind == "bed" then out = bedDecor(region, budget)
 	elseif region.kind == "wall_upper" then out = upperDecor(region, budget)
+	elseif region.kind == "eaves" then out = eavesDecor(region, budget)
 	elseif region.kind == "wall_west" then out = westDecor(region, budget)
 	elseif region.kind == "wall_west_upper" then out = westUpperDecor(region, budget)
+	elseif region.kind == "eaves_west" then out = eavesWestDecor(region, budget)
 	elseif region.kind == "shrub" then out = shrubDecor(region, budget)
+	elseif region.kind == "counter" then out = counterDecor(region, budget)
+	elseif region.kind == "kitchen_floor" then out = kitchenFloorDecor(region, budget)
 	else error("no generator for the region kind " .. region.kind) end
 	decorCache[key] = out
 	return out
@@ -1543,9 +1974,13 @@ function Garden.decorWith(region: WorldMap.Region, budget: { full: number, low: 
 	if region.kind == "house_wall" then return wallDecor(region, budget) end
 	if region.kind == "bed" then return bedDecor(region, budget) end
 	if region.kind == "wall_upper" then return upperDecor(region, budget) end
+	if region.kind == "eaves" then return eavesDecor(region, budget) end
 	if region.kind == "wall_west" then return westDecor(region, budget) end
 	if region.kind == "wall_west_upper" then return westUpperDecor(region, budget) end
+	if region.kind == "eaves_west" then return eavesWestDecor(region, budget) end
 	if region.kind == "shrub" then return shrubDecor(region, budget) end
+	if region.kind == "counter" then return counterDecor(region, budget) end
+	if region.kind == "kitchen_floor" then return kitchenFloorDecor(region, budget) end
 	error("no generator for the region kind " .. region.kind)
 end
 
@@ -1554,7 +1989,9 @@ end
 function Garden.drawnPieces(region: WorldMap.Region): { string }
 	local out: { string } = {}
 	for _, p in Garden.pieces(region) do
-		if region.kind == "house_wall" or region.kind == "wall_upper" or region.kind == "wall_west" or region.kind == "wall_west_upper" or (region.kind == "shrub" and p.id ~= region.id .. "_soil") or string.find(p.id, "_leaf_", 1, true) ~= nil or string.find(p.id, "_stem", 1, true) ~= nil or string.find(p.id, "_stalk", 1, true) ~= nil then
+		local walls = region.kind == "house_wall" or (region.kind == "wall_upper" and p.id ~= Garden.WINDOW_PIECE) or region.kind == "eaves" or region.kind == "wall_west"
+			or region.kind == "wall_west_upper" or region.kind == "eaves_west" or region.kind == "counter" or region.kind == "kitchen_floor" -- (ROBLOX-112: the window's box is the sill's to draw)
+		if walls or (region.kind == "shrub" and p.id ~= region.id .. "_soil") or string.find(p.id, "_leaf_", 1, true) ~= nil or string.find(p.id, "_stem", 1, true) ~= nil or string.find(p.id, "_stalk", 1, true) ~= nil then
 			table.insert(out, p.id)
 		end
 	end
@@ -1562,11 +1999,13 @@ function Garden.drawnPieces(region: WorldMap.Region): { string }
 end
 
 -- The pieces of a region that the sill's drawn world stands in for: the window box's halves on the outer sill, drawn with the flowers in them by the sill's Decor
--- (Habitat/Plants.garden), and solid here.
+-- (Habitat/Plants.garden), and solid here; and (ROBLOX-112) the window above the back frame, which the sill's Decor draws with the rest of the window.
 function Garden.drawnBySill(region: WorldMap.Region): { string }
 	local out: { string } = {}
 	if region.kind == "outer_sill" then
 		for _, half in Flora.garden.box.boxes do table.insert(out, half.id) end
+	elseif region.kind == "wall_upper" then
+		table.insert(out, Garden.WINDOW_PIECE) -- (ROBLOX-112: the window above the back frame, drawn with the rest of the window by Habitat/Scenery.window)
 	end
 	return out
 end

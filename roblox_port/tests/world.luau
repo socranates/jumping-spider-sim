@@ -144,9 +144,10 @@ check(bad == 0, "every decor part is anchored, non-colliding, not touchable and 
 local sameSet = true
 local expectDrawn = table.clone(expectHidden)
 for _, id in Plants.windowBoxIds() do expectDrawn[id] = true end -- (ROBLOX-95: the window box's halves are the outer sill's pieces, drawn here)
+expectDrawn[W.upper] = true -- (ROBLOX-112: and the window above the back frame, wall_upper's box)
 for id in expectDrawn do sameSet = sameSet and drawnIds[id] == true end
 for id in drawnIds do sameSet = sameSet and expectDrawn[id] == true end
-check(sameSet, "the decor reports exactly the pieces it drew: the wall, the Pilea's leaves, stems and tip, and the window box's two halves on the outer sill")
+check(sameSet, "the decor reports exactly the pieces it drew: the wall, the Pilea's leaves, stems and tip, the window box's two halves on the outer sill and the window above the frame")
 
 -- An optional piece that fails is left out with a warning; the wall and the other pieces stay.
 do
@@ -236,10 +237,20 @@ check(openSamples > 20 and open == openSamples, `and the opening is open: no gla
 local glass = wall:FindFirstChild("Glass")
 local paneWest, paneEast = wall:FindFirstChild("GlassWest"), wall:FindFirstChild("GlassEast")
 check(glass.Transparency >= 0.6 and glass.Position.Z + glass.Size.Z / 2 < plane - 0.02 and near(glass.Position.Y - glass.Size.Y / 2, O.top + W.sashRail, 1e-9)
-	and near(glass.Position.Y + glass.Size.Y / 2, W.top, 1e-9) and near(glass.Size.X, O.right - O.left + 2 * W.jambWidth, 1e-9),
-	"the raised sash's pane fills the middle above its bottom rail, a little behind the climbable face, mostly clear")
-check(paneWest ~= nil and paneEast ~= nil and near(paneWest.Size.Y, W.top - W.bottom, 1e-9) and near(paneWest.Position.X - paneWest.Size.X / 2, W.left, 1e-9)
-	and near(paneEast.Position.X + paneEast.Size.X / 2, W.right, 1e-9) and paneWest.Transparency == glass.Transparency, "the side panes are as they were, either side of the opening")
+	and near(glass.Position.Y + glass.Size.Y / 2, W.transom + W.sashLift, 1e-9) and near(glass.Size.X, O.right - O.left + 2 * W.jambWidth, 1e-9),
+	"the raised sash's pane fills the middle above its bottom rail up to its top rail, raised as far over the transom, a little behind the climbable face, mostly clear")
+check(paneWest ~= nil and paneEast ~= nil and near(paneWest.Size.Y, W.transom - W.bottom, 1e-9) and near(paneWest.Position.X - paneWest.Size.X / 2, W.left, 1e-9)
+	and near(paneEast.Position.X + paneEast.Size.X / 2, W.right, 1e-9) and paneWest.Transparency == glass.Transparency, "the side panes either side of the opening, up to the transom")
+-- ROBLOX-112: the window in true proportion: the upper lights over the transom to the glass's top (1.1 m above the sill), the frame and the wall to the head, the sashes'
+-- rails where they meet
+local upperW, upperE, upperM = wall:FindFirstChild("GlassUpperWest"), wall:FindFirstChild("GlassUpperEast"), wall:FindFirstChild("GlassUpper")
+check(upperW ~= nil and upperE ~= nil and upperM ~= nil and near(upperW.Position.Y + upperW.Size.Y / 2, W.top, 1e-9) and near(upperW.Position.Y - upperW.Size.Y / 2, W.transom + W.transomH, 1e-9)
+	and near(upperM.Position.Y - upperM.Size.Y / 2, W.transom + W.transomH + W.sashLift, 1e-9) and W.top == 110.5 and W.head == 112.5 and upperM.Transparency == glass.Transparency,
+	"the upper lights from the transom to y 110.5, the middle one over the raised sash's top rail")
+local header = wall:FindFirstChild("Header")
+check(header ~= nil and near(header.Position.Y + header.Size.Y / 2, W.head, 1e-9) and near(header.Position.Y - header.Size.Y / 2, W.top, 1e-9)
+	and wall:FindFirstChild("MeetingRail") ~= nil and wall:FindFirstChild("TransomWest") ~= nil and wall:FindFirstChild("SashTop") ~= nil,
+	"the frame's head at y 112.5 over the glass, the transom across the side lights and the sashes' rails where they meet")
 local rail, sash = wall:FindFirstChild("SillRail"), wall:FindFirstChild("SashRail")
 check(rail ~= nil and near(rail.Position.Y + rail.Size.Y / 2, O.bottom - W.slabGap, 1e-9) and sash ~= nil and near(sash.Position.Y - sash.Size.Y / 2, O.top + W.slabGap, 1e-9)
 	and near(sash.Position.Y + sash.Size.Y / 2, O.top + W.sashRail, 1e-9) and sash.Size.X >= O.right - O.left and sash.Position.Z + sash.Size.Z / 2 < plane,
@@ -249,10 +260,10 @@ local opening = 0
 for _, p in wallParts do
 	local inset = W.trimWidth + 0.01 -- the trim bars frame the opening's edge
 	if string.sub(p.Name, 1, 5) ~= "Glass" and p.Position.X > W.left + inset and p.Position.X < W.right - inset and p.Position.Y > W.bottom + inset and p.Position.Y < W.top - inset then
-		if not string.find(p.Name, "Mullion") and not string.find(p.Name, "Jamb") and p.Name ~= "SashRail" then opening += 1 end
+		if not string.find(p.Name, "Mullion") and not string.find(p.Name, "Jamb") and not string.find(p.Name, "Transom") and p.Name ~= "SashRail" and p.Name ~= "SashTop" and p.Name ~= "MeetingRail" then opening += 1 end
 	end
 end
-check(opening == 0, "nothing but mullions, the jambs and the sash's rail crosses the window")
+check(opening == 0, "nothing but mullions, the jambs, the transom and the sashes' rails crosses the window")
 
 -- The view: beyond the wall, placed so that it shows through the glass from the reference eye.
 local view = decor:FindFirstChild("View")
@@ -1053,7 +1064,7 @@ do
 	local holder = Instance.new("Folder")
 	local world = WorldBuild.world(holder)
 	check(Region.WORLD_FOLDER == "World" and world.Name == "World" and world.Parent == holder and #holder:GetChildren() == 1, "the physical world is one folder named World")
-	check(#WorldMap.regions() == 17 and #world:GetChildren() == #WorldMap.regions() and world:GetChildren()[1].Name == "Windowsill", "with a folder for every region; the sill's is still called Windowsill")
+	check(#WorldMap.regions() == 21 and #world:GetChildren() == #WorldMap.regions() and world:GetChildren()[1].Name == "Windowsill", "with a folder for every region; the sill's is still called Windowsill")
 	local inWorld = world:FindFirstChild("Windowsill") :: Folder
 	check(#inWorld:GetChildren() == #Layout.PIECES and dumpFolder(inWorld) == dumpFolder(Scenery.sill()),
 		"the sill's folder inside World is exactly the one Scenery.sill makes: every part's name, size, place, solidity, looks and attributes")
@@ -1179,9 +1190,11 @@ do
 		check(covered == #WorldMap.regions() and under == #WorldMap.regions(), `the lawn lies under every region's whole footprint ({covered}), no higher than its lowest floor ({under})`)
 		local soil = Garden.BED
 		check(gHi.Y < soil.top and gHi.Y > soil.bottom, "the bed's soil stands in the lawn, its top a little above it: no gap at its edge")
-		local upper = looks:FindFirstChild("wall_upper") :: Instance
-		local function part(name: string): any
-			for _, d in upper:GetDescendants() do if d.Name == name and d:IsA("BasePart") then return d end end
+		-- (ROBLOX-112: the house round the window is the eaves' look now; the window's jambs are wall_upper's)
+		local upper = looks:FindFirstChild("eaves") :: Instance
+		local jambs = looks:FindFirstChild("wall_upper") :: Instance
+		local function part(name: string, look: Instance?): any
+			for _, d in (look or upper):GetDescendants() do if d.Name == name and d:IsA("BasePart") then return d end end
 			return nil
 		end
 		local west, east, slope = part("HouseWest"), part("HouseEast"), part("RoofSlope")
@@ -1191,10 +1204,17 @@ do
 			and math.abs(west.Position.Y - west.Size.Y / 2 - Graphics.view.ground.y) < 1e-6 and math.abs(east.Position.Y + east.Size.Y / 2 - U.top) < 1e-6,
 			"the house's back wall goes on either side from the lawn to the eaves, meeting the walkable wall with no slit")
 		check(slope ~= nil and slope.Size.X >= 2 * U.house.x and slope.Position.Y - U.eaves.top > 50, "the roof's slope covers the whole house, rising from the eaves")
-		local mortar = part("Mortar")
-		check(mortar ~= nil and math.abs(mortar.Position.Y - mortar.Size.Y / 2 - Garden.WALL.above) < 1e-6, "the wall above the window takes up the brick where the wall's drawing stops (y 30)")
+		local mortar, jamb, lintel = part("Mortar"), part("Jamb2", jambs), part("Lintel")
+		check(jamb ~= nil and math.abs(jamb.Position.Y - jamb.Size.Y / 2 - Garden.WALL.above) < 1e-6 and math.abs(jamb.Position.Y + jamb.Size.Y / 2 - U.head) < 1e-6,
+			"the window's jambs take up the brick where the wall's drawing stops (y 30), up to the head")
+		check(mortar ~= nil and lintel ~= nil and math.abs(mortar.Position.Y - mortar.Size.Y / 2 - U.head) < 0.05 and math.abs(lintel.Position.Y - lintel.Size.Y / 2 - U.head) < 1e-6
+			and math.abs(mortar.Position.Y + mortar.Size.Y / 2 - U.top) < 1e-6, "and the brick over the window from its lintel at the head (y 112.5) to the eaves (y 150)")
+		local room = part("RoomCeiling")
+		check(room ~= nil and math.abs(room.Position.Y - room.Size.Y / 2 - U.top) < 1e-6 and part("RoomFar") ~= nil, "the room beyond the window has a ceiling at the eaves' height and a far wall")
 		local inLook, quiet = 0, 0
-		for _, d in upper:GetDescendants() do if d:IsA("BasePart") then inLook += 1; if d.CastShadow == false then quiet += 1 end end end
+		for _, look in { upper, jambs, looks:FindFirstChild("kitchen_counter") :: Instance, looks:FindFirstChild("kitchen_floor") :: Instance } do
+			for _, d in look:GetDescendants() do if d:IsA("BasePart") then inLook += 1; if d.CastShadow == false then quiet += 1 end end end
+		end
 		check(inLook > 0 and quiet == inLook, "and nothing of it casts a shadow, so the light through the window is the light it was")
 	end
 	-- what each look stands in for: the wall's boxes (the bricks), the bed's leaves and stems; the slab, the soil, the stones and the mounds are their own look
@@ -1218,7 +1238,9 @@ do
 			end
 		end
 	end
-	check(ok and count == 486, `the {count} boxes outside are solid, queryable parts; the ones a look draws are invisible`)
+	check(ok and count == 519, `the {count} boxes outside are solid, queryable parts; the ones a look draws are invisible (ROBLOX-112: 486 before; the window, the eaves and the kitchen)`)
+	local win = (world:FindFirstChild("wall_upper") :: Instance):FindFirstChild(W.upper) :: any
+	check(win ~= nil and win.Transparency == 1 and win.CanQuery ~= false and win:GetAttribute("ProfileId") == "glass_clean", "the window above the back frame is solid glass, drawn by the sill's Decor")
 	local outerFolder = world:FindFirstChild("outer_sill") :: Instance
 	local slab = outerFolder:FindFirstChild("outer_sill_slab") :: any
 	local box = outerFolder:FindFirstChild("window_box_west") :: any

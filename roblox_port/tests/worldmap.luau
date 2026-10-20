@@ -39,10 +39,11 @@ local sill = WorldMap.region("sill") :: WorldMap.Region
 
 case("the world's regions: the sill with the layout's own numbers, the three under the window, the wall above it, the wall west of it and the bushes", function()
 	local list = WorldMap.regions(WorldMap.SEED)
-	check(#list == 17 and list[1] == sill, `seventeen regions, the sill first, and region() finds it ({#list})`)
+	check(#list == 21 and list[1] == sill, `twenty-one regions, the sill first, and region() finds it ({#list})`)
 	local ids = {}
 	for _, r in list do table.insert(ids, r.id) end
-	check(table.concat(ids, ",") == "sill,outer_sill,house_wall,bed_a,wall_upper,wall_west,wall_west_upper,shrub_west_a,shrub_west_b,shrub_west_c,shrub_west_d,shrub_west_e,shrub_west_f,shrub_west_g,shrub_west_h,shrub_west_i,shrub_west_j",
+	-- (ROBLOX-112: wall_upper after wall_west_upper, whose brick its bounds reach over on their way to the room's wall beside the window; the eaves; the kitchen)
+	check(table.concat(ids, ",") == "sill,outer_sill,house_wall,bed_a,wall_west,wall_west_upper,wall_upper,eaves_west,eaves,shrub_west_a,shrub_west_b,shrub_west_c,shrub_west_d,shrub_west_e,shrub_west_f,shrub_west_g,shrub_west_h,shrub_west_i,shrub_west_j,kitchen_counter,kitchen_floor",
 		`in priority order ({table.concat(ids, ",")})`)
 	check(sill.id == "sill" and sill.kind == "sill", "the sill's id and kind")
 	check(same(sill.origin, Vector3.zero), "at the origin, as the sill always was")
@@ -52,7 +53,7 @@ case("the world's regions: the sill with the layout's own numbers, the three und
 	check(same(sill.spawn.pos, Layout.SPAWN) and same(sill.spawn.heading, Layout.SPAWN_HEADING), "a life begins where the layout's spawn is, facing the layout's heading")
 	check(sill.clockScale == 1.0, "the sill keeps its brisk day (clockScale 1.0)")
 	check(sill.seed == WorldMap.seed(914, "sill"), "its seed is the world's mixed with its id")
-	check(WorldMap.SEED == 914 and WorldMap.HOME == "sill" and WorldMap.REVISION == "world-2" and WorldMap.FIRST_REVISION == "world-1", "the default seed, the home region, the revision (world-2) and the first one")
+	check(WorldMap.SEED == 914 and WorldMap.HOME == "sill" and WorldMap.REVISION == "world-3" and WorldMap.FIRST_REVISION == "world-1", "the default seed, the home region, the revision (world-3, ROBLOX-112) and the first one")
 	check(WorldMap.region("garden") == nil and WorldMap.region("") == nil, "a region that is not on the map is nil")
 	local outer = WorldMap.region("outer_sill") :: WorldMap.Region
 	local wall = WorldMap.region("house_wall") :: WorldMap.Region
@@ -66,18 +67,32 @@ case("the world's regions: the sill with the layout's own numbers, the three und
 	check(same(bed.retreats[1].min, Vector3.new(8.6, -90, -52.6)) and same(bed.retreats[1].max, Vector3.new(13.4, -88.6, -47.4)), "and its box")
 	check(same(outer.spawn.pos, Vector3.new(0, 0, -18)) and same(outer.spawn.heading, Vector3.new(0, 0, -1)), "the outer sill's spawn is just outside the opening, facing out")
 	check(same(bed.spawn.pos, Vector3.new(11, -90, -43.5)) and WorldMap.at(bed.spawn.pos + Vector3.new(0, 0.31, 0)) == bed, "the bed's is on its soil, in front of the stone")
-	-- ROBLOX-103: the wall above the window, to the eaves and the gutter
+	-- ROBLOX-103, ROBLOX-112: the window and the wall round it, outside and in; the eaves over it
 	local upper = WorldMap.region("wall_upper") :: WorldMap.Region
-	check(upper.kind == "wall_upper" and same(upper.bounds[1], Vector3.new(-42, 0, -70)) and same(upper.bounds[2], Vector3.new(42, 130, -13.5)), "the wall above: from the shoulders' tops to over the roof's edge, out past the gutter")
-	check(upper.clockScale == 1.0 and #upper.retreats == 0 and same(upper.spawn.pos, Vector3.new(0, 109, -61)) and WorldMap.at(upper.spawn.pos + Vector3.new(0, 0.31, 0)) == upper,
-		"at the sill's pace, no retreat yet, its spawn in the gutter")
+	check(upper.kind == "wall_upper" and same(upper.bounds[1], Vector3.new(-64, 0, -34)) and same(upper.bounds[2], Vector3.new(64, 113.5, 13)),
+		"the window and the wall round it: from the shoulders' tops to the head, ten studs of air outside, in to the room's wall beside it")
+	check(upper.clockScale == 1.0 and #upper.retreats == 0 and same(upper.spawn.pos, Vector3.new(0, 60, -13.5)) and same(upper.spawn.heading, Vector3.new(0, 1, 0))
+		and WorldMap.at(upper.spawn.pos + Vector3.new(0, 0, -0.31)) == upper, "at the sill's pace, no retreat, its spawn on the window's glass outside, heading up")
+	local eaves, eavesWest = WorldMap.region("eaves") :: WorldMap.Region, WorldMap.region("eaves_west") :: WorldMap.Region
+	check(eaves.kind == "eaves" and same(eaves.bounds[1], Vector3.new(-64, 112.5, -82)) and same(eaves.bounds[2], Vector3.new(64, 165, 13)) and eaves.clockScale == 1.0 and #eaves.retreats == 0
+		and same(eaves.spawn.pos, Vector3.new(0, 149, -71)), "the eaves: from the window's head over the roof's edge, out past the gutter, its spawn in the gutter (1.49 m above the sill)")
+	check(eavesWest.kind == "eaves_west" and same(eavesWest.bounds[1], Vector3.new(-122, 112.5, -82)) and same(eavesWest.bounds[2], Vector3.new(-40, 165, -13.5)) and eavesWest.clockScale == 1.0
+		and same(eavesWest.spawn.pos, Vector3.new(-80, 149, -71)), "and west of them, its spawn in its gutter")
+	-- ROBLOX-112: the kitchen, the counter under the window and the floor in front of it
+	local counter, kfloor = WorldMap.region("kitchen_counter") :: WorldMap.Region, WorldMap.region("kitchen_floor") :: WorldMap.Region
+	check(counter.kind == "counter" and same(counter.bounds[1], Vector3.new(-64, -26, 12)) and same(counter.bounds[2], Vector3.new(64, 30, 74)) and counter.clockScale == 1.0,
+		"the counter: from the wall to the worktop's front, down into the sink, at the house's pace")
+	check(#counter.retreats == 1 and counter.retreats[1].id == "kitchen_toaster" and same(counter.retreats[1].min, Vector3.new(-53.5, -4, 23)) and same(counter.retreats[1].max, Vector3.new(-36.5, -2.6, 35))
+		and same(counter.spawn.pos, Vector3.new(-45, -4, 39.6)) and same(counter.spawn.heading, Vector3.new(0, 0, -1)), "one retreat, the gap under the toaster, its spawn in front of it facing in")
+	check(kfloor.kind == "kitchen_floor" and same(kfloor.bounds[1], Vector3.new(-64, -93, -14)) and same(kfloor.bounds[2], Vector3.new(64, -7, 94)) and kfloor.clockScale == 1.0 and #kfloor.retreats == 0
+		and same(kfloor.spawn.pos, Vector3.new(0, -90, 85)), "the floor: in front of the counter and inside the cupboards, no retreat yet")
 	check(same(wall.spawn.pos, Vector3.new(35, -1.5, -24)) and same(wall.spawn.heading, Vector3.new(0, 1, 0)), "the wall's spawn is on its east shoulder's face now (its top is under the window's east jamb)")
 	-- ROBLOX-107: the back wall west of the window (split at y 0 as house_wall and wall_upper are) and the bushes beside the bed, ten chunks of 95 by 88
 	local west, westUp = WorldMap.region("wall_west") :: WorldMap.Region, WorldMap.region("wall_west_upper") :: WorldMap.Region
 	check(west.kind == "wall_west" and same(west.bounds[1], Vector3.new(-122, -89, -34)) and same(west.bounds[2], Vector3.new(-40, 0, -13.5)) and west.clockScale == 1.0 and #west.retreats == 0,
 		"the wall west of the window below y 0: its face, the drainpipe's foot and ten studs of air, at the sill's pace")
-	check(westUp.kind == "wall_west_upper" and same(westUp.bounds[1], Vector3.new(-122, 0, -70)) and same(westUp.bounds[2], Vector3.new(-40, 130, -13.5)) and westUp.clockScale == 1.0
-		and same(westUp.spawn.pos, Vector3.new(-80, 109, -61)), "and above y 0 to the eaves, its spawn in its gutter")
+	check(westUp.kind == "wall_west_upper" and same(westUp.bounds[1], Vector3.new(-122, 0, -34)) and same(westUp.bounds[2], Vector3.new(-40, 112.5, -13.5)) and westUp.clockScale == 1.0
+		and same(westUp.spawn.pos, Vector3.new(-80, 60, -24)), "and above y 0 to the window's head (ROBLOX-112), its spawn on the brick")
 	local chunks = 0
 	for col = 0, 4 do
 		for row = 0, 1 do
@@ -116,11 +131,19 @@ case("the seams: each region lists its neighbours, both ways, along the same lin
 		{ "house_wall", "wall_upper", Vector3.new(31, 0, -24), Vector3.new(40, 0, -24) }, -- (ROBLOX-103) the east shoulder's face goes on up as the east jamb's
 		-- (ROBLOX-107) the wall west of the window and the bushes
 		{ "house_wall", "wall_west", Vector3.new(-40, -90, -24), Vector3.new(-40, 0, -24) }, -- the brick goes on west
-		{ "wall_upper", "wall_west_upper", Vector3.new(-40, 0, -24), Vector3.new(-40, 60, -24) }, -- above the window too (the line to y 60)
+		{ "wall_upper", "wall_west_upper", Vector3.new(-40, 0, -24), Vector3.new(-40, 60, -24) }, -- the west jamb too (the line to y 60)
 		{ "wall_west", "wall_west_upper", Vector3.new(-120, 0, -24), Vector3.new(-40, 0, -24) }, -- the west wall goes on up
 		{ "wall_west", "shrub_west_a", Vector3.new(-120, -90, -24), Vector3.new(-40, -90, -24) }, -- its foot meets the litter
 		{ "house_wall", "shrub_west_a", Vector3.new(-40, -90, -24), Vector3.new(-25, -90, -24) }, -- the house_wall's foot west of the bed
 		{ "bed_a", "shrub_west_a", Vector3.new(-25, -90, -24), Vector3.new(-25, -90, -74) }, -- the bed's west edge, flat
+		-- (ROBLOX-112) the window, the eaves and the kitchen
+		{ "sill", "wall_upper", Vector3.new(-30, 14, -12.5), Vector3.new(30, 14, -12.5) }, -- the back frame's room face goes on up as the window's
+		{ "wall_upper", "eaves", Vector3.new(31, 112.5, -24), Vector3.new(40, 112.5, -24) }, -- the east jamb's face goes on up over the head
+		{ "wall_west_upper", "eaves_west", Vector3.new(-120, 112.5, -24), Vector3.new(-40, 112.5, -24) }, -- the west wall goes on up past the head
+		{ "eaves_west", "eaves", Vector3.new(-40, 112.5, -24), Vector3.new(-40, 150, -24) }, -- the brick over the window goes on west
+		{ "sill", "kitchen_counter", Vector3.new(-30, -1, 12.5), Vector3.new(30, -1, 12.5) }, -- the sill board's front face goes on down as the upstand's
+		{ "wall_upper", "kitchen_counter", Vector3.new(31, 0, 12.5), Vector3.new(62, 0, 12.5) }, -- the room's wall beside the window goes on down as the upstand's
+		{ "kitchen_counter", "kitchen_floor", Vector3.new(-15, -7, 72.5), Vector3.new(15, -7, 72.5) }, -- the worktop's front edge over the sink: the doors go on down
 	}
 	-- the chunks: across the split at z -112 in each column, and to the next column in each row, flat on the litter
 	for col = 0, 4 do
@@ -134,7 +157,7 @@ case("the seams: each region lists its neighbours, both ways, along the same lin
 	end
 	local count = 0
 	for _, r in WorldMap.regions() do count += #r.neighbors end
-	check(count == 2 * #seams and #seams == 23, `{#seams} seams, each listed by both regions ({count} listings)`)
+	check(count == 2 * #seams and #seams == 30, `{#seams} seams, each listed by both regions ({count} listings)`)
 	for _, pr in seams do
 		local ab, ba = seamOf(pr[1], pr[2]), seamOf(pr[2], pr[1])
 		check(ab ~= nil and ba ~= nil, `{pr[1]} and {pr[2]} list each other`)
@@ -201,12 +224,14 @@ end)
 case("at, inBounds and bounds", function()
 	local lo, hi = Layout.PLAY_BOUNDS_MIN, Layout.PLAY_BOUNDS_MAX
 	local blo, bhi = WorldMap.bounds()
-	check(same(blo, Vector3.new(-500, -93, -200)) and same(bhi, Vector3.new(42, 130, 16)), `the union of the regions' bounds ({blo}, {bhi})`)
+	check(same(blo, Vector3.new(-500, -93, -200)) and same(bhi, Vector3.new(64, 165, 94)), `the union of the regions' bounds ({blo}, {bhi})`)
 	local ulo, uhi = WorldMap.unionOf(WorldMap.regions())
 	check(same(ulo, blo) and same(uhi, bhi), "is unionOf the regions")
 	check(WorldMap.at(Layout.SPAWN) == sill and WorldMap.at(Vector3.new(0, 10, 0)) == sill, "the spawn and the middle are in the sill")
 	check(WorldMap.at(lo) == sill and WorldMap.at(hi) == sill and WorldMap.at(Vector3.new(lo.X, hi.Y, lo.Z)) == sill, "the edges are in it (inclusive)")
-	check(WorldMap.at(Vector3.new(hi.X + 0.001, 0, 0)) == nil and WorldMap.at(Vector3.new(0, lo.Y - 0.001, 0)) == nil and WorldMap.at(Vector3.new(0, 0, hi.Z + 0.001)) == nil, "a hair outside the sill on its own sides is in no region")
+	check(WorldMap.at(Vector3.new(0, lo.Y - 0.001, 0)) == nil, "a hair under the sill is in no region (the wall under the sill board)")
+	check(WorldMap.at(Vector3.new(hi.X + 0.001, 0, 0)) == WorldMap.region("wall_upper") and WorldMap.at(Vector3.new(0, 0, hi.Z + 0.001)) == WorldMap.region("kitchen_counter"),
+		"(ROBLOX-112) a hair outside the sill beside it is the room's wall beside the window, and in front of it the counter's")
 	check(WorldMap.inBounds(Layout.SPAWN) and WorldMap.inBounds(Layout.SPAWN, "sill") and not WorldMap.inBounds(Layout.SPAWN, "garden"), "inBounds by region, and a region that is not there holds nothing")
 	check(not WorldMap.inBounds(Vector3.new(900, 1, 1)) and not WorldMap.inBounds(Vector3.new(900, 1, 1), "sill"), "far away is out of both")
 	-- Over thousands of points, the sill says exactly what the layout's box says: listed first, it is the region of every point in its box.
@@ -216,7 +241,9 @@ case("at, inBounds and bounds", function()
 		local p = Vector3.new((rand() - 0.5) * 90, (rand() - 0.2) * 60, (rand() - 0.5) * 50)
 		local inside = p.X >= lo.X and p.X <= hi.X and p.Y >= lo.Y and p.Y <= hi.Y and p.Z >= lo.Z and p.Z <= hi.Z
 		if (WorldMap.at(p) == sill) ~= inside or WorldMap.inBounds(p, "sill") ~= inside then wrong += 1 end
-		if p.Z > -13.5 and (WorldMap.at(p) ~= nil) ~= inside then wrong += 1 end -- (on the room's side of the frame, nothing but the sill)
+		-- (on the room's side of the frame, outside the sill: since ROBLOX-112 the window and the wall round it, the counter or the floor, or nothing)
+		local at = WorldMap.at(p)
+		if p.Z > -13.5 and not inside and at ~= nil and at.id ~= "wall_upper" and at.id ~= "kitchen_counter" and at.id ~= "kitchen_floor" then wrong += 1 end
 	end
 	check(wrong == 0, `10000 random points: the sill and the layout's box agree ({wrong} differ)`)
 	-- Where the regions meet, the first listed wins.
@@ -234,8 +261,16 @@ case("at, inBounds and bounds", function()
 	check(WorldMap.at(Vector3.new(0, 0.31, -50)) == bed and WorldMap.at(Vector3.new(0, 20, -20)) == outer, "high over the bed, the bed's; over the outer sill, the outer sill's")
 	local upper = WorldMap.region("wall_upper")
 	check(WorldMap.at(Vector3.new(0, 35, -24.31)) == outer and WorldMap.at(Vector3.new(0, 35.001, -24.31)) == upper and WorldMap.at(Vector3.new(36, 35.001, -24.31)) == upper
-		and WorldMap.at(Vector3.new(36, 20, -24.31)) == wall and WorldMap.at(Vector3.new(0, 109.31, -61)) == upper and WorldMap.at(Vector3.new(0, 130.001, -61)) == nil,
-		"(ROBLOX-103) up the brick past y 35, the wall above's; beside the window lower down, the wall's; in the gutter, the wall above's; over the roof, nothing")
+		and WorldMap.at(Vector3.new(36, 20, -24.31)) == wall and WorldMap.at(Vector3.new(0, 112.19, -20)) == upper,
+		"(ROBLOX-103) up the brick past y 35, the window's; beside the window lower down, the wall's; under the head, the window's")
+	-- (ROBLOX-112) the eaves, the window's inside, the kitchen
+	local eaves, westUp = WorldMap.region("eaves"), WorldMap.region("wall_west_upper")
+	check(WorldMap.at(Vector3.new(0, 149.31, -71)) == eaves and WorldMap.at(Vector3.new(0, 165.001, -71)) == nil and WorldMap.at(Vector3.new(36, 120, -24.31)) == eaves
+		and WorldMap.at(Vector3.new(-50, 60, -26)) == westUp and WorldMap.at(Vector3.new(-50, 60, 12.81)) == upper,
+		"in the gutter, the eaves'; over the roof, nothing; out on the west wall's brick, its own, though the window's bounds reach over it to the room's wall")
+	check(WorldMap.at(Vector3.new(0, 40, -12.19)) == upper and WorldMap.at(Vector3.new(0, 20, -12.19)) == sill and WorldMap.at(Vector3.new(-45, -3.69, 40)) == WorldMap.region("kitchen_counter")
+		and WorldMap.at(Vector3.new(0, -89.69, 80)) == WorldMap.region("kitchen_floor") and WorldMap.at(Vector3.new(0, -3.69, 14)) == sill,
+		"the window's room face over y 35 the window's, below it the sill's; on the worktop and the floor, the kitchen's; on the worktop just in front of the sill, the sill's margin")
 end)
 
 case("the union of several regions", function()
@@ -335,10 +370,11 @@ case("the keep-out boxes", function()
 end)
 
 case("part budgets", function()
-	check(Region.budget("sill", "full") == 1253 and Region.budget("sill", "low") == 355, "the sill reports what its decor builds now (ROBLOX-103: 1178 and 314 before the bushes, the bungalows and the fences)")
+	check(Region.budget("sill", "full") == 1260 and Region.budget("sill", "low") == 362,
+		"the sill reports what its decor builds now (ROBLOX-103: 1178 and 314 before the bushes, the bungalows and the fences; ROBLOX-112: 1253 and 355 before the window's upper lights)")
 	check((Region.budget("sill", "low") :: number) < (Region.budget("sill", "full") :: number) * 0.6, "the low tier is a good deal thinner")
 	check(Region.budget("pond", "full") == nil and Region.budget("sill", "medium") == nil, "a kind with no budget, or a tier that is not one, has none")
-	for _, kind in { "outer_sill", "house_wall", "bed", "wall_upper", "wall_west", "wall_west_upper", "shrub" } do
+	for _, kind in { "outer_sill", "house_wall", "bed", "wall_upper", "eaves", "wall_west", "wall_west_upper", "eaves_west", "shrub", "counter", "kitchen_floor" } do
 		local full, low = Region.budget(kind, "full") :: number, Region.budget(kind, "low") :: number
 		check(full == Garden.BUDGETS[kind].full and low == Garden.BUDGETS[kind].low and low <= full, `{kind}: {full} drawn parts at full, {low} at low`)
 	end
@@ -445,30 +481,46 @@ case("the garden's generators: the same from the same seed, inside their regions
 	check(clear, "nothing stands on the stone in front of the opening")
 	local wall = Region.pieces(WorldMap.region("house_wall") :: WorldMap.Region)
 	check(#wall == 3 and wall[1].lo.Z == -24 and wall[1].lo.Y <= -90 and wall[1].lo.X == -40 and wall[1].hi.X == 40, "the wall's face at z -24, x -40..40, down past the soil")
-	-- ROBLOX-103: the wall above the window: the jambs stand on the shoulders beside the window's frame, the brick goes up from the window's head to the eaves, the
-	-- gutter hangs on the fascia under the roof's edge with its floor 1.08 m above the sill and a lip to hold a spider in
+	-- ROBLOX-103, ROBLOX-112: the window in true proportion. The jambs stand on the shoulders beside the window's frame up to the head (y 112.5), the window's box stands
+	-- on the back frame up to the head, the room's reveal goes on up from the sill's side frames, and the room's wall beside it; the eaves' brick goes on from the head
+	-- to the eaves (y 150, 2.4 m over the lawn), and the gutter hangs on the fascia under the roof's edge, its floor 1.49 m above the sill, a lip to hold a spider in
 	local upper: { [string]: any } = {}
 	for _, piece in Region.pieces(WorldMap.region("wall_upper") :: WorldMap.Region) do upper[piece.id] = piece end
+	local ev: { [string]: any } = {}
+	for _, piece in Region.pieces(WorldMap.region("eaves") :: WorldMap.Region) do ev[piece.id] = piece end
+	local layout: { [string]: any } = {}
+	for _, piece in Layout.PIECES do layout[piece.id] = piece end
 	local shoulderE, shoulderW = wall[3], wall[2]
 	check(upper.wall_upper_east.lo.Y == shoulderE.hi.Y and upper.wall_upper_east.lo.X >= shoulderE.lo.X and upper.wall_upper_east.hi.X == shoulderE.hi.X
-		and upper.wall_upper_west.lo.Y == shoulderW.hi.Y and upper.wall_upper_west.lo.X == shoulderW.lo.X and upper.wall_upper_east.lo.X == 31 and upper.wall_upper_west.hi.X == -31,
-		"the jambs stand on the shoulders, either side of the window's frame (x 31)")
-	check(upper.wall_upper_brick.lo.Y == 14 and upper.wall_upper_brick.lo.Z == -24 and upper.wall_upper_brick.hi.Y == upper.wall_upper_soffit.lo.Y
-		and upper.wall_upper_brick.lo.Y == upper.wall_upper_east.hi.Y, "the brick from the window's head (y 14) to the eaves, on the jambs")
-	local g, lip, fascia = upper.wall_upper_gutter, upper.wall_upper_gutter_lip, upper.wall_upper_fascia
-	check(g.hi.Y == 109 and g.hi.Z == fascia.lo.Z and lip.hi.Z == g.lo.Z and lip.hi.Y - g.hi.Y >= 5 and upper.wall_upper_roof.lo.Y - g.hi.Y >= 10
-		and upper.wall_upper_roof.lo.Z < g.hi.Z and upper.wall_upper_roof.lo.Z > lip.lo.Z, "the gutter on the fascia: its floor at y 109, a lip 6 high, the roof's edge over half of it with room under")
-	check(#Region.pieces(WorldMap.region("wall_upper") :: WorldMap.Region) == 10 and #Garden.drawnPieces(WorldMap.region("wall_upper") :: WorldMap.Region) == 10, "ten boxes, all drawn by its look")
-	-- ROBLOX-107: the wall west of the window and its drainpipe: a column of boxes from the litter to the swan neck, out under the gutter and up into its floor, with no
-	-- gap a body would fall through; brackets every 100 studs, each a tie to the brick and a collar round the pipe; the gutter goes on west at wall_upper's floor
+		and upper.wall_upper_west.lo.Y == shoulderW.hi.Y and upper.wall_upper_west.lo.X == shoulderW.lo.X and upper.wall_upper_east.lo.X == 31 and upper.wall_upper_west.hi.X == -31
+		and upper.wall_upper_east.hi.Y == 112.5 and upper.wall_upper_west.hi.Y == 112.5, "the jambs stand on the shoulders, either side of the window's frame (x 31), up to the head (y 112.5)")
+	local win = upper.wall_upper_window
+	check(win.lo.Y == layout.back_frame_west.hi.Y and win.lo.Y == layout.back_frame_head.hi.Y and win.lo.X == layout.back_frame_west.lo.X and win.hi.X == layout.back_frame_east.hi.X
+		and win.lo.Z == layout.back_frame_west.lo.Z and win.hi.Z == layout.back_frame_west.hi.Z and win.hi.Y == 112.5 and win.profile == "glass_clean",
+		"the window's box stands on the back frame, its faces the frame's, up to the head: glass, climbable on both sides")
+	check(upper.wall_upper_reveal_west.lo.Y == layout.left_frame.hi.Y and upper.wall_upper_reveal_west.lo.X == layout.left_frame.lo.X and upper.wall_upper_reveal_west.hi.X == layout.left_frame.hi.X
+		and upper.wall_upper_reveal_east.lo.X == layout.right_frame.lo.X and upper.wall_upper_reveal_east.hi.Z == layout.right_frame.hi.Z and upper.wall_upper_reveal_east.hi.Y == 112.5,
+		"the room's reveal goes on up from the sill's side frames to the head")
+	check(upper.wall_upper_inner_east.lo.X == 31 and upper.wall_upper_inner_east.hi.X == 62 and upper.wall_upper_inner_east.hi.Z == 12.5 and upper.wall_upper_inner_west.lo.X == -62
+		and upper.wall_upper_inner_east.lo.Y == 0, "the room's wall beside the window, its face the sill board's front edge (z 12.5), out to x 62")
+	check(#Region.pieces(WorldMap.region("wall_upper") :: WorldMap.Region) == 7 and #Garden.drawnPieces(WorldMap.region("wall_upper") :: WorldMap.Region) == 6
+		and table.concat(Garden.drawnBySill(WorldMap.region("wall_upper") :: WorldMap.Region), ",") == "wall_upper_window", "seven boxes: six drawn by its look, the window by the sill's Decor")
+	check(ev.eaves_brick.lo.Y == 112.5 and ev.eaves_brick.lo.Z == -24 and ev.eaves_brick.hi.Y == 150 and ev.eaves_brick.hi.Y == ev.eaves_soffit.lo.Y and ev.eaves_inner.hi.Z == 12.5
+		and ev.eaves_inner.lo.Y == 112.5, "the eaves' brick from the head to the eaves (y 150: 2.4 m over the lawn), the room's wall over the window inside")
+	local g, lip, fascia = ev.eaves_gutter, ev.eaves_gutter_lip, ev.eaves_fascia
+	check(g.hi.Y == 149 and g.hi.Z == fascia.lo.Z and lip.hi.Z == g.lo.Z and lip.hi.Y - g.hi.Y >= 5 and ev.eaves_roof.lo.Y - g.hi.Y >= 10
+		and ev.eaves_roof.lo.Z < g.hi.Z and ev.eaves_roof.lo.Z > lip.lo.Z and ev.eaves_soffit.lo.Z == -64, "the gutter on the fascia: its floor at y 149, a lip 6 high, the roof's edge over half of it; the soffit 40 cm out")
+	check(#Region.pieces(WorldMap.region("eaves") :: WorldMap.Region) == 9 and #Garden.drawnPieces(WorldMap.region("eaves") :: WorldMap.Region) == 9, "nine boxes, all drawn by its look")
+	-- ROBLOX-107, ROBLOX-112: the wall west of the window and its drainpipe: a column of boxes from the litter to the swan neck, out under the gutter and up into its floor,
+	-- with no gap a body would fall through, across three regions; brackets every 100 studs, each a tie to the brick and a collar round the pipe; the gutter goes on west
 	local wp: { [string]: any } = {}
-	for _, r in { "wall_west", "wall_west_upper" } do
+	for _, r in { "wall_west", "wall_west_upper", "eaves_west" } do
 		for _, piece in Region.pieces(WorldMap.region(r) :: WorldMap.Region) do wp[piece.id] = piece end
 	end
-	local pipe, upPipe, neck, outlet = wp.wall_west_pipe, wp.wall_west_upper_pipe, wp.wall_west_upper_neck, wp.wall_west_upper_outlet
-	check(pipe.lo.Y == -90 and pipe.hi.Y == upPipe.lo.Y and upPipe.hi.Y == neck.lo.Y and neck.hi.Y == outlet.lo.Y and outlet.hi.Y == upper.wall_upper_gutter.hi.Y - 1
-		and wp.wall_west_upper_gutter.lo.Y == outlet.hi.Y, "the drainpipe stands on the litter and runs unbroken to the swan neck, out and up the outlet into the gutter's floor")
-	check(pipe.hi.Z < -24 and pipe.hi.Z > -26 and neck.hi.Z == pipe.hi.Z and neck.lo.Z <= outlet.lo.Z and outlet.hi.Z <= wp.wall_west_upper_gutter.hi.Z and outlet.lo.Z >= wp.wall_west_upper_gutter.lo.Z,
+	local pipe, upPipe, topPipe, neck, outlet = wp.wall_west_pipe, wp.wall_west_upper_pipe, wp.eaves_west_pipe, wp.eaves_west_neck, wp.eaves_west_outlet
+	check(pipe.lo.Y == -90 and pipe.hi.Y == upPipe.lo.Y and upPipe.hi.Y == topPipe.lo.Y and topPipe.lo.Y == 112.5 and topPipe.hi.Y == neck.lo.Y and neck.hi.Y == outlet.lo.Y and outlet.hi.Y == ev.eaves_gutter.hi.Y - 1
+		and wp.eaves_west_gutter.lo.Y == outlet.hi.Y, "the drainpipe stands on the litter and runs unbroken to the swan neck, out and up the outlet into the gutter's floor")
+	check(pipe.hi.Z < -24 and pipe.hi.Z > -26 and neck.hi.Z == pipe.hi.Z and neck.lo.Z <= outlet.lo.Z and outlet.hi.Z <= wp.eaves_west_gutter.hi.Z and outlet.lo.Z >= wp.eaves_west_gutter.lo.Z,
 		"the pipe 1.2 off the brick, the neck out to the outlet, the outlet under the gutter's floor")
 	local ties, heights = 0, {}
 	for id, piece in wp do
@@ -480,8 +532,33 @@ case("the garden's generators: the same from the same seed, inside their regions
 	end
 	table.sort(heights)
 	check(ties == 2 and heights[2] - heights[1] == 100, `brackets every 100 studs ({ties}, at {table.concat(heights, ", ")})`)
-	check(wp.wall_west_upper_gutter.hi.Y == upper.wall_upper_gutter.hi.Y and wp.wall_west_upper_gutter.hi.X == upper.wall_upper_gutter.lo.X - 1 and wp.wall_west.hi.X == -40 and wp.wall_west.lo.X == -120,
-		"the gutter goes on west at the same floor up to wall_upper's end cap; the brick from x -120 to -40")
+	check(wp.eaves_west_gutter.hi.Y == ev.eaves_gutter.hi.Y and wp.eaves_west_gutter.hi.X == ev.eaves_gutter.lo.X - 1 and wp.wall_west.hi.X == -40 and wp.wall_west.lo.X == -120
+		and wp.wall_west_upper.hi.Y == 112.5 and wp.eaves_west_brick.lo.Y == 112.5 and wp.eaves_west_brick.hi.Y == 150,
+		"the gutter goes on west at the same floor up to the eaves' end cap; the brick from x -120 to -40, split at the head")
+	-- ROBLOX-112: the kitchen. The worktop 4 cm under the sill board, from the room's wall to 60 cm out, round the sink's bowl; the upstand under the board and beside
+	-- the reveal; the toaster on its two feet over the gap the map calls kitchen_toaster; the floor 90 cm under the sill; the doors from the worktop's front edge down
+	local kc: { [string]: any } = {}
+	local counter = WorldMap.region("kitchen_counter") :: WorldMap.Region
+	for _, piece in Region.pieces(counter) do kc[piece.id] = piece end
+	check(kc.kitchen_worktop_west.hi.Y == -4 and kc.kitchen_worktop_west.lo.Z == 12.5 and kc.kitchen_worktop_west.hi.Z == 72.5 and kc.kitchen_worktop_west.lo.X == -62 and kc.kitchen_worktop_east.hi.X == 62
+		and kc.kitchen_upstand.hi.Y == layout.sill_floor.lo.Y and kc.kitchen_upstand.lo.X == layout.sill_floor.lo.X and kc.kitchen_upstand.hi.X == layout.sill_floor.hi.X and kc.kitchen_upstand.hi.Z == layout.sill_floor.hi.Z
+		and kc.kitchen_upstand_east.hi.Y == 0 and kc.kitchen_upstand_east.hi.Z == 12.5,
+		"the worktop 4 cm under the sill board, from the wall 60 cm out; the upstand under the board, its face the board's, and beside it up to the room's wall")
+	local bowl = kc.kitchen_sink_floor
+	check(bowl.hi.Y == -24 and kc.kitchen_sink_west.hi.Y == -4 and kc.kitchen_worktop_back.hi.Z == bowl.lo.Z and kc.kitchen_worktop_front.lo.Z == bowl.hi.Z and kc.kitchen_worktop_west.hi.X == bowl.lo.X,
+		"the sink's bowl, 20 deep, in the worktop's hole")
+	local gapT = counter.retreats[1]
+	local tb, fw, fe = kc.kitchen_toaster, kc.kitchen_toaster_foot_west, kc.kitchen_toaster_foot_east
+	check(tb.lo.Y == gapT.max.Y and fw.hi.X <= gapT.min.X and fe.lo.X >= gapT.max.X and tb.lo.Z <= gapT.min.Z and tb.hi.Z >= gapT.max.Z and fw.lo.Y == -4 and fw.hi.Y == tb.lo.Y,
+		"the toaster stands on its two feet over the gap the map calls kitchen_toaster")
+	check(tb.lo.Y - gapT.min.Y >= 1.4 and counter.retreats[1].door.Z > tb.hi.Z and WorldMap.inRetreat(counter.retreats[1].door) == nil and WorldMap.at(counter.retreats[1].door) == counter,
+		"the gap is tall enough to sit in, and its door is in front of it, on the worktop")
+	check(#Region.pieces(counter) == 19 and #Region.pieces(counter) <= 60 and #Region.keepOut(counter) == 1, "nineteen boxes, its keep-out the toaster's gap and a margin")
+	local kf: { [string]: any } = {}
+	for _, piece in Region.pieces(WorldMap.region("kitchen_floor") :: WorldMap.Region) do kf[piece.id] = piece end
+	check(kf.kitchen_floor.hi.Y == -90 and kf.kitchen_doors.hi.Y == kc.kitchen_worktop_west.lo.Y and kf.kitchen_doors.hi.Z == kc.kitchen_worktop_west.hi.Z and kf.kitchen_plinth.hi.Z < kf.kitchen_doors.lo.Z
+		and kf.kitchen_plinth.lo.Y == -90 and kf.kitchen_end_west.hi.Y == kc.kitchen_worktop_west.lo.Y and kf.kitchen_end_west.lo.X == -62,
+		"the floor 90 cm under the sill, the doors from the worktop's front edge down, the plinth recessed under them, the end panels")
 	-- the bushes: every box of a chunk inside it, on its litter, off the strip by the house's wall; at most 60 boxes; two bushes of walkable twigs and leaf pads; the
 	-- dead leaf over the retreat on its two twigs, a gap to sit in; nothing in front of its way in
 	for _, c in WorldMap.SHRUB_CHUNKS do
@@ -678,7 +755,8 @@ case("the bed's perch list lies inside the bed, each perch on a face of one of i
 	local stone = WorldMap.retreat("bed_a_stone") :: any
 	check(same(crack.door, Vector3.new(-24, 1, 6)) and WorldMap.inRetreat(crack.door) == "sill_crevice" and crack.door.X > crack.min.X, "the crack's door is the point the client has always measured from, just inside its mouth")
 	check(same(stone.door, Vector3.new(11, -89.5, -46.5)) and WorldMap.inRetreat(stone.door) == nil and stone.door.Z > stone.max.Z and WorldMap.at(stone.door) == bed, "the stone's door is in front of the gap's mouth, in the bed")
-	check(Region.budget("house_wall", "full") == 134 and Region.budget("house_wall", "low") == 75, "the wall's budget carries the descent's dressing and ROBLOX-103's drips, joints and moss (93/73, then 110/75)")
+	check(Region.budget("house_wall", "full") == 127 and Region.budget("house_wall", "low") == 69,
+		"the wall's budget carries the descent's dressing and ROBLOX-103's drips, joints and moss (93/73, then 110/75, then 134/75; ROBLOX-112: nothing over the window now, it goes on up)")
 end)
 
 
@@ -694,7 +772,7 @@ case("the looks a client holds: the budget at twelve places across the map, the 
 			check(LookPlan.count(r, "full") == Region.budget(r.kind, "full") and LookPlan.count(r, "low") == Region.budget(r.kind, "low"), `{r.id}: its full and low looks are its budgets`)
 		end
 	end
-	check(everything.full == 3647 and everything.low == 1215, `every look at once would be {everything.full} parts at full and {everything.low} at low (ROBLOX-107's persistent looks)`)
+	check(everything.full == 3833 and everything.low == 1276, `every look at once would be {everything.full} parts at full and {everything.low} at low (ROBLOX-107's 3,647 and 1,215; ROBLOX-112: the window, the eaves and the kitchen)`)
 	check(LookPlan.BUDGET.full == 1500 and LookPlan.BUDGET.low == 500, "the budgets: 1,500 parts at full, 500 at low")
 	-- the far looks: the house's walls and roof, a handful of big parts each, the mortar beds drawn as brick
 	local brick = Color3.fromHex(Garden.WALL.bricks[1])
@@ -702,7 +780,7 @@ case("the looks a client holds: the budget at twelve places across the map, the 
 		local region: WorldMap.Region? = nil
 		for _, r in WorldMap.regions() do if r.kind == kind then region = r; break end end
 		local far = LookPlan.records(region :: any, "far")
-		check(#far == #ids and #far >= 1 and #far <= 8, `{kind}: a far look of {#far} parts`)
+		check(#far == #ids and #far >= 1 and #far <= 12, `{kind}: a far look of {#far} parts`)
 		for i, d in far do
 			check(d.id == ids[i] and not d.full, `{kind}: far part {i} is {ids[i]}, a part of the low look`)
 			if d.id == "Mortar" then check(d.color.R == brick.R and d.color.G == brick.G and d.color.B == brick.B and d.material == Garden.WALL.brickMaterial, `{kind}: its mortar bed is drawn as brick from far off`) end
@@ -714,9 +792,12 @@ case("the looks a client holds: the budget at twelve places across the map, the 
 		{ "halfway down the wall", Vector3.new(0, -45, -24.3) },
 		{ "the wall's foot", Vector3.new(-20, -88, -24.3) },
 		{ "the bed's stone", Vector3.new(11, -89.69, -43.5) },
-		{ "the gutter", Vector3.new(0, 109.3, -61) },
+		{ "the gutter", Vector3.new(0, 149.3, -71) },
+		{ "the window's glass, outside", Vector3.new(0, 60, -13.81) },
+		{ "the kitchen's counter, by the toaster", Vector3.new(-45, -3.69, 41) },
+		{ "the kitchen's floor", Vector3.new(0, -89.69, 80) },
 		{ "the wall west", Vector3.new(-80, -45, -24.3) },
-		{ "the drainpipe's swan neck", Vector3.new(-50, 92, -40) },
+		{ "the drainpipe's swan neck", Vector3.new(-50, 132, -40) },
 		{ "the bushes by the bed and the house", Vector3.new(-30, -89.7, -30) },
 		{ "where four chunks meet", Vector3.new(-120, -89.7, -112) },
 		{ "the bushes' middle", Vector3.new(-262, -89.7, -112) },

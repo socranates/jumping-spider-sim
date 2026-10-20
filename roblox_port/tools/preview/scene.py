@@ -20,6 +20,8 @@ With --world (ROBLOX-105): spec_ladybird, spec_millipede, spec_snail, spec_harve
 stalks drawn in) and ambient_dock, ambient_dandelion, ambient_snail, ambient_millipede, ambient_harvestman, ambient_wall (in place, an evening).
 With --world (ROBLOX-107): drainpipe, drain_foot, drain_neck (the wall west of the window and its drainpipe), shrub_strip, shrub_chunk, shrub_leaf, shrub_under
 (the bushes beside the bed, the dead leaf over a retreat, under a bush) and house_west (the west of the house from the lawn).
+With --world (ROBLOX-112): kitchen, sill_room, counter, toaster, kitchen_floor (the kitchen's counter under the window and the floor in front of it, a spider on the
+worktop by the toaster) and window_up (the window in true proportion, from the outer sill looking up it).
 With --world (ROBLOX-108): far_house (the house from the far corner of the bushes); --looks-at x,y,z draws the looks a client whose spider is there holds
 (World/LookPlan, Client/LookStream: its region and neighbours, the house's walls far, the rest nearest first within the budget) instead of every look at once.
 With --title (ROBLOX-109): title_drift_0, title_drift_18, title_drift_36 (the splash's and the title card's drift: its start, middle and arrival) and intro_glass,
@@ -59,6 +61,8 @@ SPIDERS = [
     {"name": "out", "x": 0.0, "y": 0.31, "z": -18.0, "hx": 0, "hz": -1},
     {"name": "wall", "x": 2.0, "y": -40.0, "z": -24.31, "hx": 0, "hy": -1, "hz": 0, "up": [0, 0, -1]},
     {"name": "bed", "x": 11.0, "y": -89.69, "z": -43.5, "hx": 0, "hz": -1},
+    # ROBLOX-112 (--world): one on the kitchen's worktop in front of the toaster
+    {"name": "kitchen", "x": -45.0, "y": -3.69, "z": 41.0, "hx": 0, "hz": -1},
 ]
 FLIES = [
     {"id": "fly_a", "x": -16.0, "y": 0.16, "z": 4.0, "hx": 1, "hy": 0, "hz": -0.35, "flying": False},  # on the sill floor, hover 0.16
@@ -171,7 +175,7 @@ VIEWS = {
     "world": {"fov": 60, "eye": [75.0, -15.0, -100.0], "at": [0.0, -55.0, -30.0], "near": 1.0, "far": 4000, "groups": [], "shadow": 220},
     # ROBLOX-103 (--world): the wall above the window, its eaves and gutter; the house from the lawn; the garden from the eaves; the bushes from the outer sill;
     # details of the outer sill, the wall's foot and the bed; and the tray's second row walking (the gnat, the aphid, the house fly, the woodlouse) mid-stride
-    "gutter": {"fov": 55, "eye": [22.0, 124.0, -88.0], "at": [0.0, 110.0, -58.0], "near": 0.1, "far": 5000, "groups": [], "shadow": 120},
+    "gutter": {"fov": 55, "eye": [22.0, 164.0, -98.0], "at": [0.0, 150.0, -68.0], "near": 0.1, "far": 5000, "groups": [], "shadow": 120},  # (ROBLOX-112: the gutter 40 up)
     "eaves": {"fov": 62, "eye": [35.0, -70.0, -150.0], "at": [0.0, 55.0, -24.0], "near": 1.0, "far": 6000, "groups": [], "shadow": 300},
     "house": {"fov": 62, "eye": [160.0, -45.0, -430.0], "at": [0.0, 20.0, -24.0], "near": 1.0, "far": 6000, "groups": [], "shadow": 600},
     "garden": {"fov": 72, "eye": [0.0, 175.0, -95.0], "at": [0.0, -60.0, -700.0], "near": 1.0, "far": 6000, "groups": [], "shadow": 900},
@@ -199,7 +203,7 @@ VIEWS = {
     # bed (the strip from over the bed, one chunk, the dead leaf over a retreat, under a bush in the litter) and the west of the house from the lawn
     "drainpipe": {"fov": 62, "eye": [-20.0, -40.0, -150.0], "at": [-60.0, 10.0, -24.0], "near": 0.5, "far": 6000, "groups": [], "shadow": 300},
     "drain_foot": {"fov": 50, "eye": [-44.0, -82.0, -44.0], "at": [-50.0, -88.0, -28.0], "near": 0.05, "far": 2500, "groups": [], "shadow": 60},
-    "drain_neck": {"fov": 55, "eye": [-25.0, 125.0, -95.0], "at": [-50.0, 100.0, -50.0], "near": 0.1, "far": 5000, "groups": [], "shadow": 120},
+    "drain_neck": {"fov": 55, "eye": [-25.0, 165.0, -105.0], "at": [-50.0, 140.0, -60.0], "near": 0.1, "far": 5000, "groups": [], "shadow": 120},
     "shrub_strip": {"fov": 64, "eye": [40.0, 60.0, -150.0], "at": [-200.0, -80.0, -100.0], "near": 1.0, "far": 6000, "groups": [], "shadow": 600},
     "shrub_chunk": {"fov": 60, "eye": [-20.0, -40.0, -70.0], "at": [-85.0, -80.0, -75.0], "near": 0.5, "far": 4000, "groups": [], "shadow": 160},
     "shrub_leaf": {"fov": 50, "eye": [-93.0, -86.0, -71.0], "at": [-93.0, -89.5, -86.0], "near": 0.05, "far": 2500, "groups": [], "shadow": 40},
@@ -207,6 +211,14 @@ VIEWS = {
     # ROBLOX-108: the house from the far corner of the bushes (with --looks-at -495,-89.7,-195 the walls there are their far looks)
     "far_house": {"fov": 60, "eye": [-470.0, -60.0, -190.0], "at": [-60.0, 10.0, -24.0], "near": 1.0, "far": 6000, "groups": [], "shadow": 600},
     "house_west": {"fov": 62, "eye": [-150.0, -40.0, -430.0], "at": [-180.0, 0.0, -24.0], "near": 1.0, "far": 6000, "groups": [], "shadow": 600},
+    # ROBLOX-112 (--world): the kitchen: the counter and the window from the room, the sill's view into the room, the worktop at the spider's height, the gap under the
+    # toaster, the floor in front of the cupboards, and the window from the outer sill looking up it
+    "kitchen": {"fov": 60, "eye": [30.0, 45.0, 200.0], "at": [0.0, 0.0, 20.0], "near": 0.5, "far": 6000, "groups": ["kitchen"], "shadow": 300},
+    "sill_room": {"fov": 70, "eye": [0.0, 6.0, -6.0], "at": [0.0, -12.0, 60.0], "near": 0.05, "far": 6000, "groups": ["kitchen"], "shadow": 120},
+    "counter": {"fov": 60, "eye": [-10.0, 4.0, 55.0], "at": [-40.0, -2.0, 25.0], "near": 0.05, "far": 6000, "groups": ["kitchen"], "shadow": 80},
+    "toaster": {"fov": 50, "eye": [-41.0, -1.4, 47.0], "at": [-45.0, -3.4, 33.0], "near": 0.02, "far": 6000, "groups": ["kitchen"], "shadow": 40},
+    "kitchen_floor": {"fov": 60, "eye": [25.0, -82.0, 112.0], "at": [0.0, -86.0, 62.0], "near": 0.05, "far": 6000, "groups": [], "shadow": 80},
+    "window_up": {"fov": 70, "eye": [0.0, 2.0, -21.0], "at": [0.0, 70.0, -12.0], "near": 0.05, "far": 6000, "groups": [], "shadow": 120},
     # ROBLOX-109 (docs/STORE_PAGE.md): the game icon's composition (render it square: --size 1024x1024), the spider stepping out of the crack at the spawn, three-quarter
     # front and low; and the store thumbnail of the same moment, wider
     "store_icon": {"fov": 32, "eye": [-19.4, 0.8, 7.6], "at": [-22.0, 0.42, 6.0], "near": 0.02, "far": 2500, "groups": ["spawn"], "shadow": 20},

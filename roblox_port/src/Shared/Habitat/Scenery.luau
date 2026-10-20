@@ -170,6 +170,7 @@ function Scenery.window(parent: Instance): Folder
 	local slabFront = plane - W.slabGap
 	local zMid = (slabFront + lo.Z) / 2
 	local depth = slabFront - lo.Z
+	local head = math.max(hi.Y, W.head) -- (ROBLOX-112: the frame goes on up over the back frame to the window's head, over World/Garden's window box)
 	local plaster, wood = hex(W.wallColor), hex(W.trimColor)
 	local O, jamb, gap = W.opening, W.jambWidth, W.slabGap
 	local function slab(name: string, x0: number, x1: number, y0: number, y1: number)
@@ -177,13 +178,14 @@ function Scenery.window(parent: Instance): Folder
 	end
 	slab("ApronWest", lo.X, O.left - jamb, lo.Y, W.bottom)
 	slab("ApronEast", O.right + jamb, hi.X, lo.Y, W.bottom)
-	slab("Header", lo.X, hi.X, W.top, hi.Y)
+	slab("Header", lo.X, hi.X, W.top, head)
 	slab("StileWest", lo.X, W.left, W.bottom, W.top)
 	slab("StileEast", W.right, hi.X, W.bottom, W.top)
 	local function bar(name: string, x0: number, x1: number, y0: number, y1: number)
 		local trim = drawn(wall, name, Vector3.new(x1 - x0, y1 - y0, W.trimDepth), CFrame.new((x0 + x1) / 2, (y0 + y1) / 2, plane - W.trimDepth / 2), wood, M.trim)
 		trim.Reflectance = W.trimReflectance
 	end
+	local t0, t1 = W.transom, W.transom + W.transomH
 	bar("TrimBottomWest", W.left, O.left - jamb, W.bottom, W.bottom + W.trimWidth)
 	bar("TrimBottomEast", O.right + jamb, W.right, W.bottom, W.bottom + W.trimWidth)
 	bar("TrimTop", W.left, W.right, W.top - W.trimWidth, W.top)
@@ -192,6 +194,10 @@ function Scenery.window(parent: Instance): Folder
 	for i, x in W.mullions do
 		bar("Mullion" .. i, x - W.mullionWidth / 2, x + W.mullionWidth / 2, W.bottom, W.top)
 	end
+	-- (ROBLOX-112) the transom across the side lights and the upper sash's bottom rail across the middle one, where the sashes meet
+	bar("TransomWest", W.left, O.left - jamb, t0, t1)
+	bar("TransomEast", O.right + jamb, W.right, t0, t1)
+	bar("MeetingRail", O.left - jamb, O.right + jamb, t0, t1)
 	-- the way out: the sill rail (trim, its top a hair under the rail's walkable top), the jambs through the wall's depth either side, and the raised
 	-- sash's bottom rail across the top, set back in the frame
 	local function block(name: string, x0: number, x1: number, y0: number, y1: number, z0: number, z1: number): Part
@@ -203,6 +209,8 @@ function Scenery.window(parent: Instance): Folder
 	block("JambWest", O.left - jamb, O.left - gap, O.bottom - gap, O.top + W.sashRail, lo.Z + gap, slabFront)
 	block("JambEast", O.right + gap, O.right + jamb, O.bottom - gap, O.top + W.sashRail, lo.Z + gap, slabFront)
 	block("SashRail", O.left - jamb, O.right + jamb, O.top + gap, O.top + W.sashRail, plane - W.sashSetback - W.sashDepth, plane - W.sashSetback)
+	-- (ROBLOX-112) the raised lower sash's top rail, as far over the transom as the sash is raised, set back as its bottom rail is
+	block("SashTop", O.left - jamb, O.right + jamb, t0 + W.sashLift, t1 + W.sashLift, plane - W.sashSetback - W.sashDepth, plane - W.sashSetback)
 	local g = W.glass
 	local gz = plane - g.setback - g.thickness / 2
 	local function pane(name: string, x0: number, x1: number, y0: number, y1: number)
@@ -211,9 +219,13 @@ function Scenery.window(parent: Instance): Folder
 		glass.Reflectance = g.reflectance
 		glass.CastShadow = false
 	end
-	pane("GlassWest", W.left, O.left - jamb, W.bottom, W.top)
-	pane("GlassEast", O.right + jamb, W.right, W.bottom, W.top)
-	pane("Glass", O.left - jamb, O.right + jamb, O.top + W.sashRail, W.top) -- the raised sash's pane
+	pane("GlassWest", W.left, O.left - jamb, W.bottom, t0)
+	pane("GlassEast", O.right + jamb, W.right, W.bottom, t0)
+	pane("Glass", O.left - jamb, O.right + jamb, O.top + W.sashRail, t0 + W.sashLift) -- the raised sash's pane, up behind the upper sash's rail to its own
+	-- (ROBLOX-112) the upper lights over the transom
+	pane("GlassUpperWest", W.left, O.left - jamb, t1, W.top)
+	pane("GlassUpperEast", O.right + jamb, W.right, t1, W.top)
+	pane("GlassUpper", O.left - jamb, O.right + jamb, t1 + W.sashLift, W.top)
 	return wall
 end
 
@@ -459,6 +471,7 @@ function Scenery.decor(sun: Vector3?): (Model, { [string]: boolean })
 	end
 	Scenery.window(decor)
 	for _, id in W.hidden do replaced[id] = true end
+	replaced[W.upper] = true -- (ROBLOX-112: the window above the back frame, World/Garden's box in the region wall_upper, drawn with the rest of it here)
 	local uv = Shapes.folder(decor, "UVLayer") -- the ultraviolet pattern of the flowers (the eye-view helper fades it in); always present
 	attempt(decor, "dust", function() return Scenery.dust(decor) end)
 	attempt(decor, "view", function() return Scenery.view(decor) end)

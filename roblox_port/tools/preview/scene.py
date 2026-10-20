@@ -16,6 +16,8 @@ UV layer faded in), retreat (the crevice), fly (both flies), fly_a (the standing
 fly from above, in front and from the side: fly_top, fly_front, fly_side (standing) and fly_b_top, fly_b_side, fly_b_front (in the air); wasp, wasp_side, wasp_top, wasp_front (hovering and searching), wasp_walk (on the floor) and wasp_hold (carrying).
 With --world (ROBLOX-101): bestiary_stone, bestiary_wall (the bestiary's prey in place) and spec_springtail, spec_springtail_air, spec_leafhopper, spec_moth,
 spec_moth_air, spec_crane_fly, spec_crane_fly_shed, spec_crane_fly_air (each kind close on a specimen tray at x 200, at the --detail tier).
+With --world (ROBLOX-105): spec_ladybird, spec_millipede, spec_snail, spec_harvestman (the tray's third row: walking and bleeding, straight and coiled, a trail and
+stalks drawn in) and ambient_dock, ambient_dandelion, ambient_snail, ambient_millipede, ambient_harvestman, ambient_wall (in place, an evening).
 --parts renders an already dumped part list (for example the "before" list kept next to the images) instead of running the code."""
 import argparse, importlib.util, json, math, pathlib, subprocess, sys, tempfile
 
@@ -171,6 +173,18 @@ VIEWS = {
     "spec_fly_walk": {"fov": 22, "eye": [206.9, 0.75, 4.6], "at": [206.0, 0.12, 3.9], "near": 0.01, "far": 600, "groups": ["flies"], "shadow": 4},
     "spec_woodlouse": {"fov": 28, "eye": [211.4, 1.2, 4.6], "at": [210.0, 0.1, 3.9], "near": 0.01, "far": 600, "groups": ["flies"], "shadow": 6},
     "descent": {"fov": 60, "eye": [6.0, -36.0, -31.0], "at": [2.0, -40.0, -24.31], "near": 0.05, "far": 2500, "groups": ["wall"], "shadow": 40},
+    # ROBLOX-105 (--world): the ambient bugs on the tray's third row (z 10) and in place after a minute and a half of an evening (the driver writes where each
+    # stands on the counts line: these cameras are aimed at those places)
+    "spec_ladybird": {"fov": 30, "eye": [200.6, 1.45, 8.6], "at": [200.6, 0.1, 9.95], "near": 0.01, "far": 600, "groups": ["flies"], "shadow": 4},
+    "spec_millipede": {"fov": 40, "eye": [206.0, 3.0, 7.2], "at": [206.0, 0.1, 10.9], "near": 0.02, "far": 600, "groups": ["flies"], "shadow": 6},
+    "spec_snail": {"fov": 44, "eye": [217.0, 5.5, 3.0], "at": [217.0, 1.0, 11.0], "near": 0.05, "far": 600, "groups": ["flies"], "shadow": 12},
+    "spec_harvestman": {"fov": 48, "eye": [229.5, 3.2, 6.5], "at": [228.0, 0.6, 10.7], "near": 0.05, "far": 600, "groups": ["flies"], "shadow": 12},
+    "ambient_dock": {"fov": 40, "eye": [-9.5, -86.5, -37.5], "at": [-13.1, -89.4, -42.0], "near": 0.05, "far": 2500, "groups": ["bed", "flies"], "shadow": 30},
+    "ambient_dandelion": {"fov": 40, "eye": [0.8, -87.2, -56.8], "at": [-2.3, -89.5, -60.8], "near": 0.05, "far": 2500, "groups": ["bed", "flies"], "shadow": 30},
+    "ambient_snail": {"fov": 50, "eye": [-9.0, -84.0, -33.5], "at": [-15.6, -89.0, -39.0], "near": 0.05, "far": 2500, "groups": ["bed", "flies"], "shadow": 40},
+    "ambient_millipede": {"fov": 38, "eye": [-18.3, -87.5, -41.2], "at": [-20.9, -89.8, -44.1], "near": 0.05, "far": 2500, "groups": ["bed", "flies"], "shadow": 30},
+    "ambient_harvestman": {"fov": 46, "eye": [20.5, -86.0, -52.5], "at": [16.7, -89.4, -57.9], "near": 0.05, "far": 2500, "groups": ["bed", "flies"], "shadow": 30},
+    "ambient_wall": {"fov": 46, "eye": [-25.5, -66.5, -33.0], "at": [-29.3, -69.8, -24.6], "near": 0.05, "far": 2500, "groups": ["wall", "flies"], "shadow": 30},
 }
 
 

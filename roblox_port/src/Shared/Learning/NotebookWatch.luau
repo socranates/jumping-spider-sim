@@ -21,6 +21,8 @@
 --   wasp, wasp_escaped, wasp_caught ... the director's visit_started, left (it had noticed the spider), caught
 --   antennae ....... the ant-mimicking spider has stood still with its antennae up for AntMimic.noticeSeconds (the client's pose says how long)
 --   garden_bed ..... (ROBLOX-96, the Roblox game's own) the spider's first step onto a bed of the garden: the view's `region` is a region of kind "bed"
+--   look_ladybird, look_millipede, look_snail, look_harvestman ... (ROBLOX-105) the same for the ambient bugs: one of the view's `bugs` of the kind, not
+--                    hidden, within lookWu of the spider
 --   look_springtail, look_leafhopper, look_moth, look_crane_fly ... (ROBLOX-101) the first close look at a prey of that kind: one of the view's flies of the kind
 --                    (Species body.prey_kind, NotebookPages.looks) within lookWu of the spider, perched or flying; distance only, not the sensor's say
 -- Not wired: felt. It answers to Godot's vibration sense (a felt shake through touching surfaces), which the port does not have, so
@@ -50,6 +52,7 @@ export type View = {
 	spider: Vector3,
 	flies: { any }, -- the flies: .id, .position and :airborne()
 	region: string?, -- ROBLOX-96: the kind of the region the spider is in ("sill", "bed", ...); nil in a world without one
+	bugs: { any }?, -- ROBLOX-105: the ambient bugs about (Prey/PreyWorld.crawlers: .kind, .position, .hidden); nil or none in a world without them
 }
 
 function NotebookWatch.new(book: any): any
@@ -187,6 +190,11 @@ function NotebookWatch.step(self: any, v: View)
 		end
 	end
 	self.flying = seen
+	-- (ROBLOX-105) a close look at one of the ambient bugs, out in the open (a woodlouse has no `kind`: its page is the ground's)
+	for _, b in (v.bugs or {}) :: { any } do
+		local look = if b.kind ~= nil then Data.looks[b.kind] else nil
+		if look ~= nil and not b.hidden and (b.position - v.spider).Magnitude <= Data.lookWu then book:notice(look) end
+	end
 end
 
 return NotebookWatch

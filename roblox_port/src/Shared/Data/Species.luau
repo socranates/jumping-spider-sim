@@ -232,6 +232,9 @@ aphid.behavior.walk_interval_s = { 4.0, 12.0 }
 aphid.behavior.wander_radius_wu = 0.8
 aphid.behavior.perch_radius_wu = 0.25
 aphid.behavior.fidget_distance_wu = { 0.04, 0.1 }
+-- ROBLOX-105 (Nathan's W3 call, "the aphids wander the plant"): now and then, calm, it walks over its plant's faces to another free perch of the same plant,
+-- slowly (Prey/PreyKinds.creep): every 40 to 110 s, at 0.12 to 0.25 studs a second, a walk of at most 24 studs. Game values.
+aphid.body.creep = { every = { 40.0, 110.0 }, speed = { 0.12, 0.25 }, reach = 24.0 }
 data.aphid_prototype = aphid
 -- ROBLOX-101 (W3b part A, the garden's bestiary): four more prey, derived the same way (game values throughout; no claim that any of them has the house fly's
 -- measured behaviour, only its model with other numbers). Read with Prey/PreyKinds, which owns the new behaviours: `body.hop` (a ballistic escape hop on the

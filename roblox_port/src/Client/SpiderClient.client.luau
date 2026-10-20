@@ -213,7 +213,7 @@ prey.feeding:useGameRules() -- an easier tap on a struggling fly (ROBLOX-72, Dat
 -- beside it, in M.World.garden (what a rest records), sharing the sill director's jaws and casts.
 M.World.garden = {}
 M.World.prey = M.PreyWorld.new(prey, M.World, M.World.garden, M.World.root, { probe = prey.probe, cast = prey.graph.cast, sweep = prey.graph.sweep, overlap = prey.graph.overlap })
-M.World.bugs = M.BugBodies.new(Workspace)
+M.World.bugs = M.BugBodies.new(Workspace, detail) -- (ROBLOX-105: the ambient bugs' sheets at the detail tier)
 M.World.prey.tier = detail -- (ROBLOX-101: how many of the bestiary's prey a region holds)
 rivalLegs.grip = rivalLegs.Grip.new(needs) -- the grip on a caught rival (ROBLOX-77): its own controller, so the fly's is never disturbed
 local life = LifeLoop.new(needs, nil)
@@ -1502,7 +1502,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 		motor:setAimRay(origin, dir)
 		while accumulator >= DT do
 			accumulator -= DT
-			local percepts = M.World.prey:percepts() -- (ROBLOX-96: the active regions' flies, and their woodlice as movement)
+			local percepts = M.World.prey:percepts() -- (ROBLOX-96: the active regions' flies; ROBLOX-105: the woodlice and the ambient bugs are not shown to the senses)
             life.rival=life.rival or RivalSpider.new()
             local rivalPercept=RivalSpider.percept(life.rival)
             if rivalPercept then table.insert(percepts,rivalPercept) end
@@ -1659,7 +1659,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
             end
             watch:step({
              started=session.started,captures=M.World.prey:captures(),feeding=prey.feeding.feeding,taken=prey.feeding.taken,
-             energy=needs.energy,gentle=needs.gentle,spider=motor.pos,flies=M.World.prey:flies(),region=M.World.region.kind,
+             energy=needs.energy,gentle=needs.gentle,spider=motor.pos,flies=M.World.prey:flies(),region=M.World.region.kind,bugs=M.World.prey:crawlers(),
             })
             if modal() then accumulator=0;break end
 			if motor.mode ~= "attached" then focusState:clear() end
@@ -1762,7 +1762,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	updateHud(frameDt)
 	-- (ROBLOX-103: the bodies step, sway and beat by the prey's clock; far ones ten times a second; Reduced Motion stills all but the steps)
 	flyBodies:draw(M.World.prey:flies(),M.World.prey.clock,camera.CFrame.Position,setting("ReducedMotion")==true)
-	M.World.bugs:draw(M.World.prey:woodlice(),M.World.prey.clock,camera.CFrame.Position,setting("ReducedMotion")==true)
+	M.World.bugs:draw(M.World.prey:crawlers(),M.World.prey.clock,camera.CFrame.Position,setting("ReducedMotion")==true)
 	local soundPaused = GuiService.MenuIsOpen or modal()
 	local soundSpeed = if slow then SLOW_SPEED else 1
 	local soundMuted = setting("SoundMuted") == true

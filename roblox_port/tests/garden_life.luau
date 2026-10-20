@@ -157,7 +157,7 @@ case("the bed's director spawns three gnats and three aphids on its start perche
 	check(differs, "another seed gives other streams")
 end)
 
-case("over three minutes with the spider far away, the gnats fly short flights and the aphids never leave their leaves", function()
+case("over three minutes with the spider far away, the gnats fly short flights and the aphids stay by their perches but for a walk to another", function()
 	local d = bedDirector()
 	local s = sensor()
 	local flights, longest, airborneAphid, aphidDrift = 0, 0, 0, 0
@@ -168,7 +168,7 @@ case("over three minutes with the spider far away, the gnats fly short flights a
 			check(finite(f.position) and within(bed.bounds[1], bed.bounds[2], f.position), `{f.id} stays in the bed`)
 			if f.profile == aphid then
 				if f:airborne() then airborneAphid += 1 end
-				aphidDrift = math.max(aphidDrift, (f.position - d.graph:rest(f.perch)).Magnitude)
+				if f.creep == nil then aphidDrift = math.max(aphidDrift, (f.position - d.graph:rest(f.perch)).Magnitude) end -- (ROBLOX-105: on its way to another perch it is on its plant's path, held below)
 			elseif f:airborne() then
 				if takeoff[f.id] == nil then takeoff[f.id] = f.position; flights += 1 end
 			elseif takeoff[f.id] ~= nil then
@@ -180,7 +180,7 @@ case("over three minutes with the spider far away, the gnats fly short flights a
 	check(flights >= 2, `the gnats flew ({flights} flights)`)
 	check(longest <= gnat.flight.max_flight_wu * 1.6 + 1e-6 and longest > 1, `no flight farther than a gnat's ({longest} studs)`)
 	check(airborneAphid == 0, `an aphid was never in the air ({airborneAphid} ticks)`)
-	check(aphidDrift <= aphid.behavior.wander_radius_wu + 0.05, `the aphids only shuffled about their perches ({aphidDrift} studs at most)`)
+	check(aphidDrift <= aphid.behavior.wander_radius_wu + aphid.behavior.fidget_distance_wu[2] + 0.05, `the aphids only shuffled about their perches when not walking to another ({aphidDrift} studs at most: the wander and a fidget; ROBLOX-105's walks drew other numbers from the stream, and one fidget now lands past W3's 0.85)`)
 	local g, a = kinds(d)
 	check(g == 3 and a == 3, "and all six are still there")
 end)
@@ -360,7 +360,7 @@ case("the world's prey: the sill's director at home, the bed's made when the bed
 	local wallFlies, outerFlies = 0, 0
 	for _, k in pw:kinds("house_wall") do wallFlies += #k.flies end
 	for _, k in pw:kinds("outer_sill") do outerFlies += #k.flies end
-	check(wallFlies == 3 and outerFlies == 2 and #pw:flies() == 6 + 4 + 2 + 3 + 2 and #pw:percepts() == 6 + 4 + 2 + 3 + 2 + 4 and #pw:woodlice() == 4, `the view: the bed's flies (W3's six, four springtails, two leafhoppers), the wall's {wallFlies} and the outer sill's {outerFlies}, and the woodlice as movement`)
+	check(wallFlies == 3 and outerFlies == 2 and #pw:flies() == 6 + 4 + 2 + 3 + 2 and #pw:percepts() == 6 + 4 + 2 + 3 + 2 and #pw:woodlice() == 4, `the view: the bed's flies (W3's six, four springtails, two leafhoppers), the wall's {wallFlies} and the outer sill's {outerFlies}; (ROBLOX-105) the woodlice no longer shown to the senses`)
 	-- in the bed, a while; then back to the wall's top (the bed waits), then back: the same director, its flies where they were
 	pw.world = worldAt("bed_a")
 	for _ = 1, 300 do step(Vector3.new(-20, -89.69, -30)) end
@@ -1118,6 +1118,484 @@ case("the drawn woodlouse moves: a wave down its fourteen legs while it walks, s
 	workspace.BulkMoveTo = original
 	check(placed >= 9 and placed <= 11, `beyond 25 studs of the camera, placed {placed} times in a second`)
 	bugs:draw({})
+end)
+
+-- ---------------------------------------------------------------- ROBLOX-105 (W3b part B): the plants as paths, the aphids' walk, the ambient bugs
+local Ladybird = require("../src/Shared/Prey/Ladybird")
+local Millipede = require("../src/Shared/Prey/Millipede")
+local Snail = require("../src/Shared/Prey/Snail")
+local Harvestman = require("../src/Shared/Prey/Harvestman")
+local PlantWalk = require("../src/Shared/Prey/PlantWalk")
+local PreyText = require("../src/Shared/UI/PreyText")
+local bedPieces = Region.pieces(bed)
+-- Whether a point lies on a face (or an edge) of one of the bed's boxes: inside it, on its boundary.
+local function onFace(p: Vector3, eps: number?): boolean
+	local e = eps or 1e-4
+	for _, b in bedPieces do
+		local lo, hi = b.lo, b.hi
+		if p.X >= lo.X - e and p.X <= hi.X + e and p.Y >= lo.Y - e and p.Y <= hi.Y + e and p.Z >= lo.Z - e and p.Z <= hi.Z + e then
+			if math.abs(p.X - lo.X) <= e or math.abs(p.X - hi.X) <= e or math.abs(p.Y - lo.Y) <= e or math.abs(p.Y - hi.Y) <= e or math.abs(p.Z - lo.Z) <= e or math.abs(p.Z - hi.Z) <= e then return true end
+		end
+	end
+	return false
+end
+-- Whether a point lies inside a box of the bed (deeper than `eps` from every face).
+local function insideBox(p: Vector3, eps: number): boolean
+	for _, b in bedPieces do
+		if p.X > b.lo.X + eps and p.X < b.hi.X - eps and p.Y > b.lo.Y + eps and p.Y < b.hi.Y - eps and p.Z > b.lo.Z + eps and p.Z < b.hi.Z - eps then return true end
+	end
+	return false
+end
+local function soilAndBoxes(): (any, { any })
+	local soil: any, boxes = nil, {}
+	for _, p in bedPieces do
+		if p.id == "bed_a_soil" then soil = { min = p.lo, max = p.hi } elseif p.lo.Y <= -89.99 then table.insert(boxes, { min = p.lo, max = p.hi }) end
+	end
+	return soil, boxes
+end
+local function ambientSpec(region: any, kind: string): any
+	for _, a in Garden.ambient(region) :: { any } do if a.kind == kind then return a end end
+	return nil
+end
+
+case("the bed's plants as paths: every aphid perch is a node of its plant, and every walk between two nodes keeps to the faces of the plant's boxes", function()
+	local plants = Garden.plants(bed) :: { [string]: any }
+	check(plants.dock ~= nil and plants.dandelion ~= nil and plants.dandelion.loop and not plants.dock.loop and Garden.plants(bed) == plants, "the dock and the dandelion, the same tables again")
+	check(Garden.plants(WorldMap.region("sill") :: any) == nil and Garden.plants(WorldMap.region("house_wall") :: any) == nil, "no plants outside the bed")
+	local spec = Garden.prey(bed) :: Garden.PreySpec
+	local walkers = 0
+	for _, p in spec.perches do
+		if p.walker then
+			walkers += 1
+			local name, list = Garden.plantOf(p.id)
+			local plant = if name ~= nil and list ~= nil then list[name] else nil
+			local node = if plant ~= nil then plant.nodes[p.id] else nil
+			local at = if node ~= nil then (if #node.route > 0 then node.route[#node.route].pos else plant.highway[node.hub].pos) else nil
+			check(at ~= nil and (at - p.position).Magnitude < 1e-9, `{p.id} is a node of its plant, exactly on the perch`)
+		else
+			check(Garden.plantOf(p.id) == nil, `{p.id} is on no plant`)
+		end
+	end
+	check(walkers == 8, `the eight aphid perches ({walkers})`)
+	for name, plant in plants do
+		for _, h in plant.highway do check(onFace(h.pos), `{name}'s highway is on a face`) end
+		for _, a in plant.order do
+			for _, b in plant.order do
+				local path = Garden.plantPath(plant, a, b)
+				check(path ~= nil and #path >= 1, `a path from {a} to {b}`)
+				if path ~= nil then
+					for i, q in path do
+						check(onFace(q.pos) and math.abs(q.normal.Magnitude - 1) < 1e-6, `{a} to {b}: point {i} on a face, with a normal`)
+						if i > 1 then
+							-- each leg: its middle not inside any box (it runs over a face, not through the plant)
+							check(not insideBox((path[i - 1].pos + q.pos) / 2, 0.02), `{a} to {b}: leg {i} runs over the faces`)
+						end
+					end
+				end
+			end
+		end
+	end
+	local w = PlantWalk.new(Garden.plantPath(plants.dock, "bed_a_dock_leaf_1_top", "bed_a_dock_leaf_3_top") :: any)
+	local p0 = PlantWalk.at(w, 0)
+	local p1, _, _, done = PlantWalk.advance(w, 1e6)
+	check(done and (p0 - w.points[1]).Magnitude < 1e-9 and (p1 - w.points[#w.points]).Magnitude < 1e-9 and w.length > 9 and PlantWalk.problem(w) == nil, `a walk from one leaf to another, ${w.length} studs, start to end`)
+end)
+
+case("the aphids walk their plant now and then: slowly, perch to perch, on its faces, never flying, never leaving it, frozen when startled", function()
+	local d = bedDirector()
+	local s = sensor()
+	check(aphid.body.creep ~= nil and aphid.body.creep.reach == 24 and fly.body.creep == nil and gnat.body.creep == nil, "the aphid's walk is its own, and only its")
+	local creeps, onPath, offPath, airborne, fastest, plantChanged = 0, 0, 0, 0, 0, 0
+	local plantOf: { [string]: string } = {}
+	local lastS: { [string]: number } = {}
+	for _ = 1, 60 * 420 do
+		tick(d, FAR, s)
+		for _, f in d.flies do
+			if f.profile == aphid then
+				if f:airborne() then airborne += 1 end
+				local name = Garden.plantOf(f.perch.id) :: string
+				if plantOf[f.id] ~= nil and plantOf[f.id] ~= name then plantChanged += 1 end
+				plantOf[f.id] = name
+				if f.creep ~= nil then
+					local surface = f.position - f.normal * aphid.body.hover_wu
+					if onFace(surface, 2e-3) then onPath += 1 else offPath += 1 end
+					if lastS[f.id] ~= nil and f.creep.s >= lastS[f.id] then fastest = math.max(fastest, (f.creep.s - lastS[f.id]) / DT) end
+					lastS[f.id] = f.creep.s
+				else
+					lastS[f.id] = nil
+				end
+				creeps = math.max(creeps, f.creeps or 0)
+			end
+		end
+	end
+	local total = 0
+	for _, f in d.flies do if f.profile == aphid then total += f.creeps or 0 end end
+	check(total >= 3, `the aphids walked to other perches ({total} walks in seven minutes)`)
+	check(airborne == 0 and plantChanged == 0, `never in the air, never off its own plant ({airborne}, {plantChanged})`)
+	check(onPath > 100 and offPath == 0, `on its way it stands on the plant's faces ({onPath} ticks; {offPath} off)`)
+	check(fastest <= aphid.body.creep.speed[2] + 1e-6 and fastest > 0, `slowly: {fastest} studs a second at most along its way`)
+	-- startled on the way, it freezes
+	local a: any
+	for _ = 1, 60 * 600 do
+		tick(d, FAR, s)
+		for _, f in d.flies do if f.creep ~= nil then a = f; break end end
+		if a ~= nil then break end
+	end
+	check(a ~= nil, "an aphid on its way")
+	if a ~= nil then
+		a.state = "ALERT"
+		local at = a.position
+		a.stateSince = d.now + 1e6 -- (it stays alert through the test: the fly model's calming is not what is tested)
+		for _ = 1, 30 do a:step(DT, d.now, FAR, 0.3, cast); d.now += DT end
+		check((a.position - at).Magnitude < 1e-9 and a.creep ~= nil, "alert on the way, it does not move")
+		local perch = a.perch
+		a.state = "CAPTURED"; perch.occupant = ""
+		d:escape(a)
+		check(a.creep == nil and (a.state == "ALERT" or a.state == "CONSUMED"), "torn free from the jaws, its walk is over")
+	end
+	-- the same seed, the same walks
+	local d1, d2 = bedDirector(), bedDirector()
+	for _ = 1, 60 * 200 do tick(d1, FAR, s); tick(d2, FAR, s) end
+	local same = #d1.flies == #d2.flies
+	for i, f in d1.flies do if d2.flies[i] == nil or (d2.flies[i].position - f.position).Magnitude > 1e-9 or (d2.flies[i].creeps or 0) ~= (f.creeps or 0) then same = false end end
+	check(same, "two directors from one seed walk alike")
+end)
+
+case("the ambient bugs' specs: per kind, per region, seeded, and their bodies within the region's part budget at both tiers", function()
+	local specs = Garden.ambient(bed) :: { any }
+	local kinds = {}
+	for _, a in specs do table.insert(kinds, a.kind) end
+	check(table.concat(kinds, ",") == "ladybird,millipede,snail,harvestman" and Garden.ambient(bed) == specs, `the bed's four kinds in order ({table.concat(kinds, ",")})`)
+	local wall = WorldMap.region("house_wall") :: any
+	local ws = Garden.ambient(wall) :: { any }
+	check(#ws == 1 and ws[1].kind == "harvestman" and ws[1].surface == "wall", "the house wall's harvestman")
+	for _, id in { "sill", "outer_sill", "wall_upper" } do check(Garden.ambient(WorldMap.region(id) :: any) == nil, `no ambient bugs in {id}`) end
+	for _, region in { bed, wall } do
+		for _, tier in { "full", "low" } do
+			local sum = 0
+			for _, a in Garden.ambient(region) :: { any } do
+				check(#a.starts >= a.full and a.low <= a.full and a.low >= 1, `{region.id} {a.kind}: places for the full tier's {a.full}`)
+				sum += (if tier == "low" then a.low else a.full) * BugBodies.partsOf(a.kind, tier)
+			end
+			local budget = Garden.AMBIENT.budget[region.kind][tier]
+			check(sum <= budget, `{region.id} at {tier}: {sum} parts of ambient bugs, within {budget}`)
+		end
+	end
+	check(BugBodies.partsOf("ladybird", "full") == 22 and BugBodies.partsOf("ladybird", "low") == 18 and BugBodies.partsOf("millipede", "full") == 63
+		and BugBodies.partsOf("millipede", "low") == 39 and BugBodies.partsOf("snail", "full") == 36 and BugBodies.partsOf("snail", "low") == 24
+		and BugBodies.partsOf("harvestman", "full") == 20 and BugBodies.partsOf("woodlouse") == 24,
+		`the bodies' parts: ladybird {BugBodies.partsOf("ladybird")}/{BugBodies.partsOf("ladybird", "low")}, millipede {BugBodies.partsOf("millipede")}/{BugBodies.partsOf("millipede", "low")}, snail {BugBodies.partsOf("snail")}/{BugBodies.partsOf("snail", "low")}, harvestman {BugBodies.partsOf("harvestman")}`)
+	local soil, boxes = soilAndBoxes()
+	local m = Millipede.new(ambientSpec(bed, "millipede"), 2, soil, boxes)
+	local snail = Snail.new(ambientSpec(bed, "snail"), 1, soil, boxes)
+	local h = Harvestman.new(ambientSpec(bed, "harvestman"), 1, soil, boxes)
+	for _, it in m.items do check(m:free(it.position, 0.3), `{it.id} begins on free soil`) end
+	check(snail:free(snail.items[1].position, 1.0) and h:free(h.items[1].surface), "the snail and the harvestman begin on free soil")
+	check(m.items[1].id == "bed_a_millipede_1" and snail.items[1].id == "bed_a_snail_1" and h.items[1].id == "bed_a_harvestman_1", "their ids carry the region")
+	local ids = {}
+	for _, a in ws do ids[1] = Harvestman.new(a, 1).items[1].id end
+	check(ids[1] == "house_wall_harvestman_1", "so the wall's harvestman is not the bed's")
+end)
+
+case("the ladybirds walk their plants among the aphids, on the plants' faces, and now and then eat one in plain view; struck, they bleed and keep still", function()
+	local d = bedDirector()
+	local s = sensor()
+	local plants = Garden.plants(bed) :: { [string]: any }
+	local lb = Ladybird.new(ambientSpec(bed, "ladybird"), 2, plants)
+	check(#lb.beetles == 2 and lb.beetles[1].plant == "dock" and lb.beetles[2].plant == "dandelion", "one on the dock, one on the dandelion")
+	local low = Ladybird.new(ambientSpec(bed, "ladybird"), 1, plants)
+	check(#low.beetles == 1, "one at the low tier")
+	local off, fastest, eaten, sawEating = 0, 0, 0, false
+	local aphidsBefore = select(2, kinds(d))
+	local gone: { [string]: boolean } = {}
+	local lastSurf: { [string]: Vector3 } = {}
+	for _ = 1, 60 * 600 do
+		tick(d, FAR, s)
+		lb:step(DT, FAR, { plants = plants, flies = d.flies })
+		for _, b in lb.beetles do
+			if not onFace(b.position - b.normal * Ladybird.HOVER, 2e-3) then off += 1 end
+			if lastSurf[b.id] ~= nil then fastest = math.max(fastest, (b.surface - lastSurf[b.id]).Magnitude / DT) end
+			lastSurf[b.id] = b.surface
+			if b.state == "eat" then sawEating = true end
+		end
+		for _, f in d.flies do if f.state == "CONSUMED" then gone[f.id] = true end end
+	end
+	for _, b in lb.beetles do eaten += b.eaten end
+	check(off == 0, `always on its plant's faces ({off} ticks off)`)
+	check(fastest <= Ladybird.WALK[2] + 1e-6 and fastest > 0, `walking at most {fastest} studs a second over the plant's faces`)
+	check(sawEating and eaten >= 1, `it ate aphids in view ({eaten} in ten minutes)`)
+	local a = select(2, kinds(d))
+	check(a >= 1 and a <= 3 and aphidsBefore == 3, `the aphids eaten were replaced by the bed's own population ({a} now)`)
+	check(#lb:problems(bed.bounds[1], bed.bounds[2]) == 0, "a colony in order has no problems")
+	-- struck
+	local b = lb.beetles[1]
+	lb:struck(b)
+	check(b.state == "still" and b.bleedUntil > lb.now and b.walk == nil, "struck, it bleeds and keeps still")
+	local at = b.position
+	for _ = 1, 60 * 3 do lb:step(DT, FAR, { plants = plants, flies = d.flies }) end
+	check((b.position - at).Magnitude < 1e-9, "for a while")
+	for _ = 1, 60 * 20 do lb:step(DT, FAR, { plants = plants, flies = d.flies }) end
+	check(b.state ~= "still" and b.bleedUntil < lb.now, "then goes on")
+	-- the same seed, the same rounds
+	local l1, l2 = Ladybird.new(ambientSpec(bed, "ladybird"), 2, plants), Ladybird.new(ambientSpec(bed, "ladybird"), 2, plants)
+	for _ = 1, 600 do l1:step(DT, FAR, { plants = plants, flies = {} }); l2:step(DT, FAR, { plants = plants, flies = {} }) end
+	check((l1.beetles[1].position - l2.beetles[1].position).Magnitude < 1e-12 and (l1.beetles[2].position - l2.beetles[2].position).Magnitude < 1e-12, "one seed, one walk")
+end)
+
+case("the millipedes walk the soil slowly, go under the stones a while, coil when the spider comes close and uncoil once it has gone", function()
+	local soil, boxes = soilAndBoxes()
+	local m = Millipede.new(ambientSpec(bed, "millipede"), 2, soil, boxes)
+	local inBox, fastest, wentUnder = 0, 0, false
+	local start = m.items[1].position
+	for _ = 1, 60 * 240 do
+		m:step(DT, FAR, nil)
+		for _, it in m.items do
+			if not it.hidden and not m:free(it.position, 0.0) and it.state ~= "going" then inBox += 1 end
+			fastest = math.max(fastest, (it.position - it.prevPosition).Magnitude / DT)
+			if it.state == "under" then wentUnder = true; check(it.hidden, "under a stone it is hidden") end
+			check(#it.trail <= Millipede.RINGS + 1, "its body's track is bounded")
+		end
+	end
+	check(inBox == 0, `never inside what stands on the soil ({inBox})`)
+	check(fastest <= Millipede.WALK[2] + 1e-6, `slowly: {fastest} studs a second at most`)
+	check(wentUnder, "it went under a stone")
+	check((m.items[1].position - start).Magnitude > 1 or m.items[1].state == "under", "it wandered")
+	-- the spider comes close to one that is out
+	local it: any
+	for _ = 1, 60 * 120 do
+		m:step(DT, FAR, nil)
+		for _, x in m.items do if x.state == "walk" then it = x end end
+		if it ~= nil then break end
+	end
+	check(it ~= nil, "one out walking")
+	local spider = it.position + Vector3.new(1.5, 0.19, 0)
+	local at = it.position
+	for _ = 1, 90 do m:step(DT, spider, nil) end
+	check(it.state == "coiled" and it.coil >= 0.99 and (it.position - at).Magnitude < 0.2, `it coils where it is ({it.state}, {it.coil})`)
+	for _ = 1, 60 * 20 do m:step(DT, spider, nil) end
+	check(it.state == "coiled", "and stays coiled while the spider stays")
+	local out, waited = false, 0
+	for _ = 1, 60 * 30 do
+		waited += 1
+		m:step(DT, FAR, nil)
+		if it.state ~= "coiled" and it.coil == 0 then out = true; break end
+	end
+	check(out and waited / 60 >= Millipede.CALM_S[1], `it uncoils and walks on {waited / 60} s after the spider has gone`)
+	m:struck(it)
+	check(it.state == "coiled" and it.coil >= 0.5, "struck, it coils at once")
+	check(#m:problems(bed.bounds[1], bed.bounds[2]) == 0, "a colony in order has no problems")
+	local broken = Millipede.new(ambientSpec(bed, "millipede"), 1, soil, boxes)
+	broken.items[1].state = "flying"
+	check(#broken:problems(bed.bounds[1], bed.bounds[2]) == 1, "a millipede in no known state is a problem")
+end)
+
+case("the snail crawls very slowly over the soil and up the wall's foot, leaves a trail that fades, draws in its eye stalks near the spider, withdraws when struck", function()
+	local soil, boxes = soilAndBoxes()
+	local sn = Snail.new(ambientSpec(bed, "snail"), 1, soil, boxes)
+	local it = sn.items[1]
+	local fastest, offSurface, wall, longest = 0, 0, 0, 0
+	for _ = 1, 60 * 1800 do
+		sn:step(DT, FAR, { hour = 22 })
+		fastest = math.max(fastest, (it.position - it.prevPosition).Magnitude / DT)
+		local onBrick = math.abs(it.position.Z - Garden.WALL.face) < 2e-3 and it.position.Y >= -90 - 1e-6 and it.position.Y <= -76 -- (the house wall's face over the bed: not a box of the bed's)
+		if not onFace(it.position, 2e-3) and not onBrick then offSurface += 1 end
+		if it.normal.Z < -0.9 then wall += 1 end
+		check(within(bed.bounds[1], bed.bounds[2], it.position), "the snail stays in the bed")
+		longest = math.max(longest, #it.trail)
+	end
+	check(fastest <= Snail.CRAWL[2] + 1e-6 and it.crawled > 20, `very slowly ({fastest} studs a second at most, {it.crawled} studs in half an hour)`)
+	check(offSurface == 0, `always on the soil or the brick ({offSurface} ticks off)`)
+	check(wall > 0, `it climbed the wall's foot ({wall / 60} s on the brick)`)
+	check(longest >= 10 and longest <= Snail.TRAIL, `a trail behind it ({longest} points at most)`)
+	-- the trail dries: an hour still, by day, far from anything: every point older than FADE_S is gone
+	it.state = "rest"; it.until_ = math.huge; it.walk = nil
+	for _ = 1, 60 * (Snail.FADE_S + 5) do sn:step(DT, FAR, { hour = 12 }) end
+	check(#it.trail == 0, "and the trail fades")
+	-- the spider near: the stalks draw in and it does not crawl; gone, they come out
+	it.until_ = 0
+	local spider = it.position + Vector3.new(3, 0.2, 0)
+	for _ = 1, 60 do sn:step(DT, spider, { hour = 22 }) end
+	local still = it.position
+	for _ = 1, 60 * 5 do sn:step(DT, spider, { hour = 22 }) end
+	check(it.eyes == 0 and (it.position - still).Magnitude < 1e-9, `near the spider its eye stalks are in and it does not crawl ({it.eyes}, {it.state})`)
+	for _ = 1, 60 * 6 do sn:step(DT, FAR, { hour = 22 }) end
+	check(it.eyes >= 0.99, "gone, they are out again")
+	sn:struck(it)
+	check(it.state == "shell" and it.eyes == 0, "struck, it draws into its shell")
+	local at = it.position
+	for _ = 1, 60 * 20 do sn:step(DT, FAR, { hour = 22 }) end
+	check((it.position - at).Magnitude < 1e-9 and it.state == "shell", "and stays in it a while")
+	for _ = 1, 60 * 40 do sn:step(DT, FAR, { hour = 22 }) end
+	check(it.state ~= "shell", "then comes out")
+	check(#sn:problems(bed.bounds[1], bed.bounds[2]) == 0, "in order, no problems")
+end)
+
+case("the harvestmen are away by day and out from dusk, walking their surface at their own pace whatever the spider does", function()
+	local soil, boxes = soilAndBoxes()
+	local h = Harvestman.new(ambientSpec(bed, "harvestman"), 1, soil, boxes)
+	local it = h.items[1]
+	for _ = 1, 600 do h:step(DT, FAR, { hour = 12 }) end
+	check(it.state == "away" and it.hidden, "by day it is away")
+	local inBox, moved = 0, 0
+	local start: Vector3? = nil
+	for i = 1, 60 * 120 do
+		local spider = if i % 2 == 0 then it.position + Vector3.new(0.5, 0, 0) else FAR -- (the spider all over it, or far: it does not care)
+		h:step(DT, spider, { hour = 20 })
+		start = start or it.surface
+		if not h:free(it.surface) then inBox += 1 end
+		check(math.abs(it.position.Y - (-90 + Harvestman.HOVER)) < 1e-9, "high on its legs over the soil")
+	end
+	moved = ((start :: Vector3) - it.surface).Magnitude
+	check(not it.hidden and inBox == 0 and moved > 1, `from dusk it walks the soil round what stands on it ({moved} studs from where it came out)`)
+	for _ = 1, 60 * 120 do h:step(DT, FAR, { hour = 7 }) end
+	check(it.state == "away", "at dawn it goes back to its corner and is away")
+	local wall = WorldMap.region("house_wall") :: any
+	local wh = Harvestman.new((Garden.ambient(wall) :: any)[1], 1)
+	local wi = wh.items[1]
+	local offWall = 0
+	for _ = 1, 60 * 120 do
+		wh:step(DT, FAR, { hour = 23 })
+		if math.abs(wi.position.Z - (-24 - Harvestman.HOVER)) > 1e-9 or not wh:free(wi.surface) then offWall += 1 end
+	end
+	check(offWall == 0 and not wi.hidden and #wh:problems(wall.bounds[1], wall.bounds[2]) == 0, `the wall's walks the brick ({offWall} ticks off it)`)
+end)
+
+case("the world's ambient bugs: made with the bed and the wall at the client's tier, stepped beside the woodlice, never sensed; a strike at one is refused in words", function()
+	local home = sillDirector()
+	local garden = {}
+	local pw = PreyWorld.new(home, worldAt("bed_a"), garden, world, { probe = home.probe, cast = home.graph.cast, sweep = home.graph.sweep, overlap = home.graph.overlap })
+	local s = sensor()
+	local function step(pos: Vector3, strike: boolean?)
+		pw:before(DT, pos, observerAt(pos), s, cast, cameraFar, 21)
+		pw:after(DT, motorAt(pos, strike), s, cast)
+	end
+	step(Vector3.new(-20, -89.69, -30))
+	local amb = garden.bed_a.ambient
+	check(amb ~= nil and amb.ladybird ~= nil and amb.millipede ~= nil and amb.snail ~= nil and amb.harvestman ~= nil, "the bed's four colonies are made with it")
+	check(#amb.ladybird.beetles == 2 and #amb.millipede.items == 2 and #amb.snail.items == 1 and #amb.harvestman.items == 1, "at the full tier's numbers")
+	local crawl = pw:crawlers()
+	check(#crawl >= 4 + 6, `drawn: the woodlice and the ambient bugs ({#crawl})`)
+	local flies = #pw:flies()
+	check(#pw:percepts() == flies, "none of them is sensed: the percepts are the flies alone")
+	-- strikes: at each kind, refused in its own words, nothing held
+	local function strikeAt(target: Vector3)
+		step(target - Vector3.new(0.4, 0, 0)) -- (standing there first: the strike's sweep runs from where the spider was)
+		pw.event = nil
+		step(target - Vector3.new(0.4, 0, 0), true)
+		step(target + Vector3.new(0.4, 0, 0), true)
+		step(target + Vector3.new(0.4, 0, 0)) -- (landed)
+	end
+	local kinds = {
+		{ "woodlouse", garden.bed_a.bugs.lice[1].position },
+		{ "ladybird", amb.ladybird.beetles[1].position },
+		{ "millipede", amb.millipede.items[1].position },
+		{ "snail", amb.snail.items[1].position + Vector3.new(0, 1.5, 0) },
+	}
+	for _ = 1, 30 do step(Vector3.new(-20, -89.69, -30)) end -- (the harvestman out at 21:00)
+	table.insert(kinds, { "harvestman", amb.harvestman.items[1].position })
+	for _, k in kinds do
+		local refusedBefore = pw.refused
+		strikeAt(k[2])
+		check(pw.refused == refusedBefore + 1 and pw.event ~= nil and pw.event.kind == "refused" and pw.event.prey == k[1] and home.feeding.held == nil,
+			`a strike at the {k[1]} is refused ({if pw.event then tostring(pw.event.prey) else "nothing"})`)
+		check(PreyText.note(pw.event) == PreyText.REFUSED[k[1]] and string.find(PreyText.note(pw.event) or "", "%d") == nil and #(PreyText.note(pw.event) or "") <= 80, `in the game's words: "{PreyText.note(pw.event)}"`)
+		for _ = 1, 5 do step(Vector3.new(-20, -89.69, -30)) end
+	end
+	check(amb.ladybird.beetles[1].bleedUntil > amb.ladybird.now and amb.snail.items[1].state == "shell" and amb.millipede.items[1].coil > 0, "each answered: the ladybird bleeds, the snail withdraws, the millipede coils")
+	-- a jump that lands nowhere near anything is no strike at all
+	pw.event = nil
+	strikeAt(Vector3.new(-22, -89.69, -70))
+	check(pw.event == nil, "a jump at nothing is refused nothing")
+	-- the low tier: fewer
+	local garden2 = {}
+	local pw2 = PreyWorld.new(sillDirector(), worldAt("bed_a"), garden2, world)
+	pw2.tier = "low"
+	pw2:before(DT, Vector3.new(-20, -89.69, -30), observerAt(FAR), s, cast, cameraFar)
+	local a2 = garden2.bed_a.ambient
+	check(#a2.ladybird.beetles == 1 and #a2.millipede.items == 1 and #a2.snail.items == 1 and #a2.harvestman.items == 1, "at the low tier, the low tier's numbers")
+	-- the wall's harvestman, made when the wall is active
+	check(garden.house_wall ~= nil and garden.house_wall.ambient ~= nil and garden.house_wall.ambient.harvestman ~= nil, "the wall's harvestman is made with the wall")
+	-- the notebook's close looks: the bugs the watcher is given
+	local seenKinds = {}
+	for _, b in pw:crawlers() do if b.kind ~= nil then seenKinds[b.kind] = true end end
+	check(seenKinds.ladybird and seenKinds.millipede and seenKinds.snail and seenKinds.harvestman, "the crawlers carry their kinds for the notebook")
+end)
+
+case("the drawn ambient bugs: their parts at both tiers, safe, stepping while they walk, the ladybird's drops, the millipede's coil, the snail's stalks and trail, the harvestman away", function()
+	local bugs = BugBodies.new(workspace)
+	local low = BugBodies.new(workspace, "low")
+	local lady = { id = "bed_a_ladybird_1", kind = "ladybird", position = Vector3.new(0, -89.83, -40), heading = Vector3.new(1, 0, 0), normal = Vector3.yAxis, state = "walk", bleedUntil = -1, hidden = false }
+	local snail = { id = "bed_a_snail_1", kind = "snail", position = Vector3.new(4, -90, -40), heading = Vector3.new(0, 0, -1), normal = Vector3.yAxis, state = "crawl", eyes = 1, trail = {}, hidden = false }
+	local trail = {}
+	for i = 1, 10 do table.insert(trail, Vector3.new(-6, -89.88, -40 - (i - 1) * 0.19)) end
+	local milli = { id = "bed_a_millipede_1", kind = "millipede", position = Vector3.new(-6, -89.88, -39.81), heading = Vector3.new(0, 0, 1), normal = Vector3.yAxis, state = "walk", coil = 0, trail = trail, hidden = false }
+	local harv = { id = "bed_a_harvestman_1", kind = "harvestman", position = Vector3.new(8, -89.1, -40), heading = Vector3.new(1, 0, 0), normal = Vector3.yAxis, state = "walk", hidden = false }
+	local all = { lady, snail, milli, harv }
+	local t = 0
+	bugs:draw(all, t)
+	low:draw(all, t)
+	for _, b in all do
+		local rig, lrig = bugs.rigs[b.id], low.rigs[b.id]
+		check(rig ~= nil and #rig.parts == BugBodies.partsOf(b.kind, "full") and #lrig.parts == BugBodies.partsOf(b.kind, "low"), `{b.kind}: {#rig.parts} parts at full, {#lrig.parts} at low`)
+		local safe = true
+		for _, p in rig.parts do if p.CanCollide ~= false or p.CanQuery ~= false or p.CanTouch ~= false or p.CastShadow ~= false or not p.Anchored then safe = false end end
+		check(safe, `{b.kind}: nothing collides, is seen by a ray, is touched or casts a shadow`)
+	end
+	local function find(rig: any, name: string): any for _, p in rig.parts do if p.Name == name then return p end end return nil end
+	local function rel(rig: any, name: string, base: string): CFrame return find(rig, base).CFrame:Inverse() * find(rig, name).CFrame end
+	-- true sizes: the ladybird about 0.6 long, the snail's shell 3 across, the harvestman's legs spanning about four studs
+	local lr = bugs.rigs[lady.id]
+	check(math.abs(find(lr, "Elytra").Size.Z - 0.52) < 1e-9 and math.abs(find(bugs.rigs[snail.id], "Shell").Size.Z - 3.0) < 1e-9, "the ladybird 0.6 long with its head, the snail's shell 3 across")
+	local hr = bugs.rigs[harv.id]
+	local lo, hi = math.huge, -math.huge
+	for _, p in hr.parts do lo = math.min(lo, p.Position.Z); hi = math.max(hi, p.Position.Z) end
+	local spanX = 0
+	for _, p in hr.parts do spanX = math.max(spanX, math.abs(p.Position.X - harv.position.X)) end
+	check(spanX > 1.2 and spanX < 2.6, `the harvestman's legs reach about two studs out each side ({spanX})`)
+	-- the ladybird steps while it walks and is still when it stops; its drops show only while it bleeds
+	local before = rel(lr, "LLeg1", "Elytra")
+	for _ = 1, 30 do t += 1 / 60; lady.position += Vector3.new(0.5 / 60, 0, 0); bugs:draw(all, t) end
+	local during = rel(lr, "LLeg1", "Elytra")
+	check((before.Position - during.Position).Magnitude > 1e-4, "the ladybird's legs step as it walks")
+	for _ = 1, 60 do t += 1 / 60; bugs:draw(all, t) end
+	local a = rel(lr, "LLeg1", "Elytra"); t += 1 / 60; bugs:draw(all, t); local b = rel(lr, "LLeg1", "Elytra")
+	check((a.Position - b.Position).Magnitude < 1e-9 and lr.gait == 0, "and stand still when it stops")
+	local hidden = (find(lr, "DropL").Position - find(lr, "Elytra").Position).Magnitude
+	lady.bleedUntil = t + 5
+	t += 1 / 60; bugs:draw(all, t)
+	local shown = rel(lr, "DropL", "Elytra").Position
+	check(hidden < 0.1 and shown.X < -0.1 and shown.Y < -0.08, `bleeding, a drop shows at its front leg joint ({shown})`)
+	-- the millipede's rings follow its track; coiled, they wind round the head
+	local mr = bugs.rigs[milli.id]
+	local ring6 = find(mr, "Ring6").Position
+	check(math.abs(ring6.X - (-6)) < 1e-6 and ring6.Z < -40, `the rings lie along the track ({ring6})`)
+	milli.coil = 1
+	t += 1 / 60; bugs:draw(all, t)
+	local far = 0
+	for k = 1, 12 do far = math.max(far, (find(mr, "Ring" .. k).Position - milli.position).Magnitude) end
+	check(far < 0.75, `coiled, every ring is within {far} of the head`)
+	local finite = true
+	for _, p in mr.parts do if p.Position.X ~= p.Position.X then finite = false end end
+	check(finite, "and nothing is NaN")
+	-- the snail's stalks draw in; its trail is laid and fades
+	local sr = bugs.rigs[snail.id]
+	local eyeUp = find(sr, "EyeL").Position.Y
+	snail.eyes = 0
+	t += 1 / 60; bugs:draw(all, t)
+	check(find(sr, "EyeL").Position.Y < eyeUp - 0.5, "the eye stalks drawn in, the eyes come down")
+	snail.trail = { { p = Vector3.new(4, -90, -39.5), n = Vector3.yAxis, t = t }, { p = Vector3.new(4, -90, -39.0), n = Vector3.yAxis, t = t - 200 } }
+	t += 1 / 60; bugs:draw(all, t)
+	local t1, t2, t3 = find(sr, "Trail1"), find(sr, "Trail2"), find(sr, "Trail3")
+	check(t1.Transparency < 0.6 and t2.Transparency > 0.85 and t3.Transparency == 1, `the trail: fresh {t1.Transparency}, old {t2.Transparency}, none {t3.Transparency}`)
+	snail.state = "shell"
+	t += 1 / 60; bugs:draw(all, t)
+	check((find(sr, "Head").Position - find(sr, "Shell").Position).Magnitude < 0.1, "withdrawn, the head is in the shell")
+	-- the harvestman away by day
+	harv.hidden = true; harv.state = "away"
+	t += 1 / 60; bugs:draw(all, t)
+	check(find(hr, "Body").Position.Y < -500, "away, it is drawn nowhere near")
+	bugs:draw({}); low:draw({})
+	check(next(bugs.rigs) == nil, "gone when not drawn")
 end)
 
 print(`GARDEN_LIFE passed={passed} failed={failed}`)

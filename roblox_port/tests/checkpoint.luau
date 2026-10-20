@@ -805,6 +805,103 @@ case("ROBLOX-101: a W3 record (the bed's gnats, aphids and woodlice alone) resto
 	check(same and w.garden.bed_a.kinds.springtail == made[1] and w.garden.bed_a.prey.feeding == w.prey.feeding and made[1].feeding == w.prey.feeding, "the springtails and leafhoppers are made from their seeds, as on a first arrival, eating with the jaws")
 end)
 
+case("ROBLOX-105: the ambient bugs of each region are kept with the rest and put back where they were, and run on identically; a record without them restores", function()
+	local Ladybird = require("../src/Shared/Prey/Ladybird")
+	local Millipede = require("../src/Shared/Prey/Millipede")
+	local Snail = require("../src/Shared/Prey/Snail")
+	local Harvestman = require("../src/Shared/Prey/Harvestman")
+	local function ambientWorld(): any
+		local w, bedPrey, bugs = gardenWorld()
+		local bed = WorldMap2.region("bed_a") :: any
+		local wall = WorldMap2.region("house_wall") :: any
+		local soil: any, boxes = nil, {}
+		for _, piece in Region.pieces(bed) do
+			if piece.id == "bed_a_soil" then soil = { min = piece.lo, max = piece.hi } elseif piece.lo.Y <= -89.99 then table.insert(boxes, { min = piece.lo, max = piece.hi }) end
+		end
+		local specs = {}
+		for _, a in Garden.ambient(bed) :: { any } do specs[a.kind] = a end
+		w.garden.bed_a.ambient = {
+			ladybird = Ladybird.new(specs.ladybird, 2, Garden.plants(bed) :: any), millipede = Millipede.new(specs.millipede, 2, soil, boxes),
+			snail = Snail.new(specs.snail, 1, soil, boxes), harvestman = Harvestman.new(specs.harvestman, 1, soil, boxes),
+		}
+		w.garden.house_wall = { ambient = { harvestman = Harvestman.new((Garden.ambient(wall) :: any)[1], 1) } }
+		return w, bedPrey, bugs
+	end
+	local function tickAll(w: any, at: Vector3, hour: number)
+		gardenTick(w, w.garden.bed_a.prey, w.garden.bed_a.bugs, at)
+		local ctx = { hour = hour, flies = w.garden.bed_a.prey.flies, plants = Garden.plants(WorldMap2.region("bed_a") :: any) }
+		for _, kind in { "ladybird", "millipede", "snail", "harvestman" } do w.garden.bed_a.ambient[kind]:step(DT, at, ctx) end
+		w.garden.house_wall.ambient.harvestman:step(DT, at, ctx)
+	end
+	local w = ambientWorld()
+	for _ = 1, 60 * 40 do tickAll(w, Vector3.new(-20, -89.69, -30), 21) end
+	local amb = w.garden.bed_a.ambient
+	-- the snail in its shell with a trail behind it, a millipede coiled, a ladybird bleeding
+	amb.snail:struck(amb.snail.items[1])
+	amb.millipede:struck(amb.millipede.items[1])
+	amb.ladybird:struck(amb.ladybird.beetles[1])
+	check(#amb.snail.items[1].trail > 0 and not amb.harvestman.items[1].hidden and not w.garden.house_wall.ambient.harvestman.items[1].hidden, "a snail with a trail, the harvestmen out at night")
+	check(Checkpoint.boundaryProblem(w) == "", "a rest can be kept")
+	local record = assert(Checkpoint.capture(w, 0))
+	check(#SaveRest.check("main", record) == 0, "the server's rest check accepts it: " .. table.concat(SaveRest.check("main", record), "; "))
+	local before = gardenText(w)
+	for _ = 1, 60 * 30 do tickAll(w, Vector3.new(-5, -89.69, -40), 21) end
+	check(gardenText(w) ~= before, "the world moved on")
+	local ok, problems = Checkpoint.restore(record, w)
+	check(ok, "restored: " .. table.concat(problems, "; "))
+	local a2 = w.garden.bed_a.ambient
+	check(a2 ~= amb and getmetatable(a2.ladybird) == Ladybird and getmetatable(a2.millipede) == Millipede and getmetatable(a2.snail) == Snail and getmetatable(a2.harvestman) == Harvestman
+		and getmetatable(w.garden.house_wall.ambient.harvestman) == Harvestman, "each colony rebuilt from the record, of its own kind")
+	check(a2.snail.items[1].state == "shell" and a2.millipede.items[1].state == "coiled" and a2.ladybird.beetles[1].state == "still", "the snail still in its shell, the millipede coiled, the ladybird still")
+	check(gardenText(w) == before, "the whole world, the ambient bugs included, is the record's again")
+	local w2 = ambientWorld()
+	check(Checkpoint.restore(record, w2), "the same record into a fresh world")
+	for _ = 1, 60 * 20 do tickAll(w, Vector3.new(-5, -89.69, -40), 21); tickAll(w2, Vector3.new(-5, -89.69, -40), 21) end
+	check(gardenText(w) == gardenText(w2), "two worlds restored from it run on identically")
+	-- a record of the round before (no ambient bugs) restores unchanged: they are made afresh when the region is next whole
+	local old = Json.copy(record)
+	local function objectOf(r: any, ref: any): any return r.world.objects[ref["$o"]] end
+	local g = objectOf(old, old.world.roots.garden)
+	local keep = {}
+	for _, e in g.e do if e[1] == "bed_a" then table.insert(keep, e) end end
+	g.e = keep
+	local bedEntry = objectOf(old, keep[1][2])
+	local entries = {}
+	for _, e in bedEntry.e do if e[1] ~= "ambient" then table.insert(entries, e) end end
+	bedEntry.e = entries
+	local ok2, problems2 = Checkpoint.restore(old, w)
+	check(ok2 and #SaveRest.check("main", old) == 0, "a record without ambient bugs restores and the server accepts it: " .. table.concat(problems2, "; "))
+	check(w.garden.bed_a.ambient == nil and w.garden.house_wall == nil, "and the garden has none until they are made")
+	-- refusals: a kind the region does not have, a colony of the wrong kind, a creature out of its region
+	local function refused(label: string, edit: (any) -> (), part: string)
+		local r = Json.copy(record)
+		edit(r)
+		local ok3, problems3 = Checkpoint.restore(r, w)
+		local text = table.concat(problems3, "; ")
+		check(not ok3 and string.find(text, part, 1, true) ~= nil, `{label} is refused ({if ok3 then "ACCEPTED" else text})`)
+		check(#SaveRest.check("main", r) > 0, "and the server refuses it too")
+	end
+	local function entry(o: any, key: string): any
+		for _, e in o.e do if e[1] == key then return e end end
+		return nil
+	end
+	local function ambientRecord(r: any, id: string): any
+		local gg = objectOf(r, r.world.roots.garden)
+		return objectOf(r, entry(objectOf(r, entry(gg, id)[2]), "ambient")[2])
+	end
+	refused("a snail on the wall", function(r) entry(ambientRecord(r, "house_wall"), "harvestman")[1] = "snail" end, "has no ambient bug of the kind snail")
+	refused("a millipede filed as a snail", function(r)
+		local am = ambientRecord(r, "bed_a")
+		local s, m = entry(am, "snail"), entry(am, "millipede")
+		s[2], m[2] = m[2], s[2]
+	end, "is not a colony of its kind")
+	refused("a snail out of the bed", function(r)
+		local sn = objectOf(r, entry(ambientRecord(r, "bed_a"), "snail")[2])
+		local it = objectOf(r, objectOf(r, entry(sn, "items")[2]).e[1][2])
+		entry(it, "position")[2] = { ["$v"] = { 0, 50, -500 } }
+	end, "outside its region")
+end)
+
 case("fallen tip timer survives rest and invalid data is atomic",function()
  local Breakaway=require("../src/Shared/Habitat/Breakaway")
  local w=newWorld();w.breakaway=Breakaway.new(sill)

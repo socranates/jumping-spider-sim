@@ -41,6 +41,9 @@
 -- the state HOP. A W3 record (its bed with gnats, aphids and woodlice alone) restores unchanged; the bestiary's directors it lacks are made afresh from their
 -- seeds when their region is next whole (Prey/PreyWorld.kinds), so nothing is rerolled that the record had. SCHEMA_VERSION, CONTENT_REVISION and the
 -- world's revision stay as they were (W3's precedent: an optional part an old record lacks needs none of them).
+-- ROBLOX-105: a region's entry may hold `ambient`, the ambient bugs' colonies by kind ({ ladybird = Ladybirds, millipede = Millipedes, snail = Snails,
+-- harvestman = Harvestmen }), each of the kind the region has and in order (its creatures in known states inside the region's bounds). A record without it (every
+-- rest before this round) restores unchanged and the colonies it lacks are made afresh from their seeds when their region is next whole (Prey/PreyWorld.ambient).
 
 local Species = require(script.Parent.Parent.Data.Species)
 local ObjectRecord = require(script.Parent.ObjectRecord)
@@ -63,6 +66,10 @@ local Growth = require(script.Parent.Parent.Life.Growth)
 local WorldMap = require(script.Parent.Parent.World.WorldMap)
 local WaspDirector = require(script.Parent.Parent.Predator.WaspDirector)
 local Woodlice = require(script.Parent.Parent.Prey.Woodlouse)
+local Ladybirds = require(script.Parent.Parent.Prey.Ladybird)
+local Millipedes = require(script.Parent.Parent.Prey.Millipede)
+local Snails = require(script.Parent.Parent.Prey.Snail)
+local Harvestmen = require(script.Parent.Parent.Prey.Harvestman)
 local Garden = require(script.Parent.Parent.World.Garden)
 
 local RivalSpider = require(script.Parent.Parent.Predator.RivalSpider)
@@ -83,6 +90,7 @@ Checkpoint.ROOTS = { "prey", "sensor", "memory", "needs", "life" }
 Checkpoint.CLASSES = {
 	Fly = Fly, FlyFlight = FlyFlight, FlySenses = FlySenses, PreyRandom = PreyRandom, PreyPopulation = PreyPopulation,
 	PerchGraph = PerchGraph, Feeding = Feeding, PreyDirector = PreyDirector, Woodlice = Woodlice,
+	Ladybirds = Ladybirds, Millipedes = Millipedes, Snails = Snails, Harvestmen = Harvestmen, -- (ROBLOX-105)
 	Sensor = Sensor, SensorCore = SensorCore, ObservationMemory = ObservationMemory, Contact = ObservationMemory.Contact,
 	Observation = Observation,
 	NeedsModel = NeedsModel, LifeLoop = LifeLoop, LifeClock = LifeClock, Growth = Growth,
@@ -363,6 +371,20 @@ local function checkWorld(roots: { [string]: any }, problems: { string })
 				if entry.bugs ~= nil then
 					if getmetatable(entry.bugs) ~= Woodlice then bad(`garden: {id}'s bugs are not woodlice`)
 					else for _, text in entry.bugs:problems(region.bounds[1], region.bounds[2]) do bad(`garden: {id}: {text}`) end end
+				end
+				-- ROBLOX-105: the ambient bugs' colonies, one per kind the region has, each of its kind's class
+				if entry.ambient ~= nil then
+					if type(entry.ambient) ~= "table" or getmetatable(entry.ambient) ~= nil then bad(`garden: {id}'s ambient bugs are not a record`)
+					else
+						local known: { [string]: boolean } = {}
+						for _, a in (Garden.ambient(region) or {}) :: { any } do known[a.kind] = true end
+						local classes = { ladybird = Ladybirds, millipede = Millipedes, snail = Snails, harvestman = Harvestmen } :: { [string]: any }
+						for kind, c in entry.ambient do
+							if type(kind) ~= "string" or not known[kind] then bad(`garden: {id} has no ambient bug of the kind {tostring(kind)}`)
+							elseif getmetatable(c) ~= classes[kind] then bad(`garden: {id}'s {kind} is not a colony of its kind`)
+							else for _, text in c:problems(region.bounds[1], region.bounds[2]) do bad(`garden: {id}: {text}`) end end
+						end
+					end
 				end
 			end
 		end

@@ -132,7 +132,7 @@ function D.escape(self: any,f: any)
  end
  if f.profile.body.walker or f.profile.body.flightless then
   -- (ROBLOX-96) a walker that tears free is back on its perch if the perch is still free; if not, it is gone (the population owes another)
-  local perch=f.perch
+  local perch=f.perch;f.creep=nil;f.heldBy=nil -- (ROBLOX-105: a creep or a ladybird's meal does not survive the jaws)
   if perch and perch.occupant=='' then
    perch.occupant=f.id;f.position=self.graph:rest(perch);f.prevPosition=f.position;f.normal=perch.normal;f.velocity=Vector3.zero
    f.state='ALERT';f.stateSince=self.now;f.goal='rest';f.goalSince=self.now;f:beginStay(self.now)

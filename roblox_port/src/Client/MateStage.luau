@@ -193,7 +193,7 @@ function MateStage.drawMate(self: any, mate: any, appearance: string, dt: number
 	if self.scaleFor ~= factor then
 		self.scaleFor = factor
 		rig:setGrowthStage(Growth.ADULT)
-		rig:setScale(Growth.SCALES[Growth.ADULT + 1] * factor)
+		rig:setScale(rig:growthScale(Growth.ADULT) * factor) -- (ROBLOX-114: the look's own adult, which is Growth's for the first spider and the tarantulas)
 	end
 	local moving = (mate.position - (mate.previous or mate.position)).Magnitude > 0.001
 	local up = mate.up or Vector3.yAxis

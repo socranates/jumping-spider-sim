@@ -280,12 +280,19 @@ function Scenery.viewPosition(u: number, v: number, depth: number): (Vector3, nu
 	return Vector3.new(eye.X + (u - eye.X) * k, eye.Y + (v - eye.Y) * k, plane - depth), k
 end
 
+Scenery.MAX_PART = 2048 -- (ROBLOX-114) the largest a part may be along any axis in Roblox
+
 function Scenery.view(parent: Instance): Folder
 	local V = Graphics.view
 	local view = folder(parent, "View")
 	local ground = drawn(view, "Ground", Vector3.new(V.ground.size, 2, V.ground.size),
 		CFrame.new(0, V.ground.y - 1, -V.ground.size * 0.5 + 300), hex(V.ground.color), M.ground)
 	ground.CastShadow = false
+	if V.ground.beyond then -- (ROBLOX-114: the same again past its far edge, under the gardens and the houses across the way)
+		local far = drawn(view, "GroundBeyond", Vector3.new(V.ground.size, 2, V.ground.size),
+			CFrame.new(0, V.ground.y - 1, -V.ground.size * 1.5 + 300), hex(V.ground.color), M.ground)
+		far.CastShadow = false
+	end
 	for _, item in V.items do
 		local at, k = Scenery.viewPosition(item.u, item.v, item.depth)
 		local t = (item.t or item.w) * k
@@ -300,9 +307,14 @@ function Scenery.view(parent: Instance): Folder
 			part = drawn(view, item.id, Vector3.new((item.h or item.w) * k, item.w * k, item.w * k), CFrame.new(at) * CFrame.Angles(0, 0, math.rad(90)), hex(item.color), "Wood")
 			part.Shape = Enum.PartType.Cylinder
 		elseif item.kind == "hill" then -- (ROBLOX-103)
-			part = drawn(view, item.id, Vector3.new(item.w * k, (item.h or item.w) * k, t), CFrame.new(at), hex(item.color), M.view)
+			-- (ROBLOX-114: a part is at most 2,048 studs; a bigger hill is a part of at most that with its sphere mesh scaled up to the hill's size)
+			local size = Vector3.new(item.w * k, (item.h or item.w) * k, t)
+			local most = math.max(size.X, size.Y, size.Z)
+			local shrink = if most > Scenery.MAX_PART then Scenery.MAX_PART / most else 1
+			part = drawn(view, item.id, size * shrink, CFrame.new(at), hex(item.color), M.view)
 			local mesh = Instance.new("SpecialMesh")
 			mesh.MeshType = Enum.MeshType.Sphere
+			mesh.Scale = Vector3.one / shrink
 			mesh.Parent = part
 		else
 			part = drawn(view, item.id, Vector3.new(item.w * k, (item.h or item.w) * k, t), CFrame.new(at), hex(item.color), M.view)

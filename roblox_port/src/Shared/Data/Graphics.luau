@@ -79,26 +79,35 @@ Graphics.view = {
 	eye = Vector3.new(0, 2.5, 5),
 	-- ROBLOX-95: the lawn is at the garden's level now, 0.4 below the soil of the bed under the window (World/WorldMap bed_a, y -90), where the house wall
 	-- meets it; it was at -46 when nothing could be walked outside the glass. Everything below stands on it (the trunks and a house were lengthened to reach it).
-	ground = { y = -90.4, size = 2048, color = "7d8f62" },
+	-- ROBLOX-114 (everything to scale): `beyond`: a second ground of the same size past the first's far edge (z -1748), under the gardens and the houses across the
+	-- way, which stand 21 m from this house's back wall now (a part is at most 2,048 studs: one ground could not reach them)
+	ground = { y = -90.4, size = 2048, color = "7d8f62", beyond = true },
 	sky = true,
 	items = {
-		-- far hills (ROBLOX-103: kind "hill", a flattened ellipsoid w x h x t on the glass, beyond the bungalows 27 m off, each under a part's 2,048 studs, low and
-		-- wide, their feet under the horizon; the middle one shows only over the roofs; the balls of before stood inside the garden once it could be walked)
-		{ id = "hill_w", kind = "hill", u = -20, v = 4.6, depth = 2700, w = 13.2, h = 5.6, t = 13.2, color = "88a08d", full = false },
-		{ id = "hill_m", kind = "hill", u = 2, v = 4.2, depth = 2700, w = 13.2, h = 4.8, t = 13.2, color = "92a898", full = true },
-		{ id = "hill_e", kind = "hill", u = 22, v = 4.5, depth = 2700, w = 13.2, h = 5.6, t = 13.2, color = "8aa28f", full = false },
+		-- far hills (ROBLOX-103: kind "hill", a flattened ellipsoid w x h x t on the glass, low and wide, their feet under the horizon; the middle one shows only over
+		-- the roofs; the balls of before stood inside the garden once it could be walked). ROBLOX-114: 36 m off (27 before), behind the bungalows now that those stand
+		-- 21 m from this house; a part is at most 2,048 studs, so Scenery draws a hill bigger than that as a part of 2,048 with its sphere mesh scaled up. They are
+		-- the near rise of the land beyond the houses, not a range kilometres off (no part could stand that far and be seen), and lower than they were (their tops 1.2
+		-- lower on the glass, their feet where they were): at their old height and 36 m off they stood 9 to 11 m tall over the bungalows' 5 m ridges, a dome, not a rise.
+		{ id = "hill_w", kind = "hill", u = -20, v = 4.0, depth = 3600, w = 13.2, h = 4.4, t = 13.2, color = "88a08d", full = false },
+		{ id = "hill_m", kind = "hill", u = 2, v = 3.6, depth = 3600, w = 13.2, h = 3.6, t = 13.2, color = "92a898", full = true },
+		{ id = "hill_e", kind = "hill", u = 22, v = 3.9, depth = 3600, w = 13.2, h = 4.4, t = 13.2, color = "8aa28f", full = false },
 		-- (ROBLOX-103: the seven tall houses that stood 1.2 m beyond the glass are Graphics.view.across's bungalows beyond the back fence)
 		-- a tree on the left, a smaller one on the right. ROBLOX-103: they stood 72 and 100 studs beyond the glass, lollipops a metre tall just past the bed (the
 		-- standards Nathan's "bushes" note was about); now they are real trees in the neighbours' gardens beyond the side fences, 7.4 and 9 m out, the left 5 m tall
 		-- with a crown nearly 5 m across, the right 3.5 m, exactly where they were on the glass; their trunks are round ("trunk": a vertical rod w across, h tall).
-		{ id = "trunk_a", kind = "trunk", u = -17, v = 5.43, depth = 742, w = 1.3, h = 10.14, color = "4a3e30", full = false },
+		-- ROBLOX-114 (to scale): at their depths a stud on the glass is 43.4 (the left) and 52.4 (the right) in the garden, so the left tree is 7.2 m tall with a crown
+		-- 9.8 m across (an old apple or a field maple) and the right 5.1 m with one 6.3 m across; their trunks were 56 and 47 cm thick, an oak's, and are 33 and 24 cm
+		-- now (w 0.75 and 0.45), a garden tree's trunk for those heights (a judgement from the trees' proportions, not a measured rule: urban trees vary widely,
+		-- Vaz Monteiro, Doick & Handley 2016, Urban Forestry & Urban Greening).
+		{ id = "trunk_a", kind = "trunk", u = -17, v = 5.43, depth = 742, w = 0.75, h = 10.14, color = "4a3e30", full = false },
 		{ id = "canopy_a1", kind = "ball", u = -17, v = 10.5, depth = 742, w = 11, color = "3f6238", full = false },
 		{ id = "canopy_a2", kind = "ball", u = -23.5, v = 8.5, depth = 742, w = 8.5, color = "496f40", full = false },
 		{ id = "canopy_a3", kind = "ball", u = -10.5, v = 9.0, depth = 742, w = 8, color = "35552f", full = true },
 		{ id = "canopy_a4", kind = "ball", u = -19.5, v = 13.5, depth = 742, w = 7, color = "446a3b", full = true },
 		{ id = "canopy_a5", kind = "ball", u = -13.5, v = 13.2, depth = 742, w = 6.5, color = "3a5c34", full = true },
 		{ id = "canopy_a6", kind = "ball", u = -26, v = 12, depth = 742, w = 6, color = "4d7544", full = true },
-		{ id = "trunk_b", kind = "trunk", u = 18.5, v = 3.96, depth = 900, w = 0.9, h = 6.47, color = "50443a", full = true },
+		{ id = "trunk_b", kind = "trunk", u = 18.5, v = 3.96, depth = 900, w = 0.45, h = 6.47, color = "50443a", full = true },
 		{ id = "canopy_b1", kind = "ball", u = 18.5, v = 7.2, depth = 900, w = 6.5, color = "47703e", full = true },
 		{ id = "canopy_b2", kind = "ball", u = 22, v = 6.2, depth = 900, w = 5, color = "3d6336", full = true },
 		{ id = "canopy_b3", kind = "ball", u = 15, v = 6.0, depth = 900, w = 4.5, color = "4f7746", full = true },
@@ -107,9 +116,12 @@ Graphics.view = {
 	-- would really stand, in the garden's own studs: their fronts `front` (z) beyond the back fence, `wall` tall (2.6 m), `depth` deep, the roof's front slope
 	-- rising at `pitch` degrees from eaves that overhang `overhang` to a ridge over the middle; one row of windows and a door, so nothing reads as a second floor.
 	-- Each house: `x` its middle, `w` its width, its render and roof colours, how many windows, a door, a chimney (`chimney`: where along the ridge, -0.5 to 0.5).
-	-- The low tier keeps the walls and the roofs.
+	-- The low tier keeps the walls and the roofs. ROBLOX-114 (to scale): their faces stood 40 cm behind the back fence, as if they had no gardens; they stand at z -2150
+	-- now, 21 m from this house's back wall (the usual British least distance between facing windows of one- and two-storey houses: Cheshire East
+	-- Local Plan, policy HOU 13), their gardens 7.3 m deep behind the fence. Ridge 2.6 m + tan 30 x 4.3 m = 5.1 m above the lawn (a bungalow's ridge is about
+	-- 4.5 to 5.5 m).
 	across = {
-		front = -1460, depth = 800, wall = 260, pitch = 30, overhang = 30, ridgeCap = 14,
+		front = -2150, depth = 800, wall = 260, pitch = 30, overhang = 30, ridgeCap = 14,
 		window = { w = 120, h = 115, sill = 95, color = "3c4852", frame = "f1ede4" }, door = { w = 95, h = 205, color = "5b4636" },
 		chimney = { w = 55, h = 120, t = 55, color = "8c5a48" },
 		wallMaterial = "Plaster", roofMaterial = "Slate",

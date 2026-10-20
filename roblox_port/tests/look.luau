@@ -692,7 +692,7 @@ for _ = 1, 240 do
 		if not (near(a1.Y, a2.Y, 1e-6) and near(a1.Z, a2.Z, 1e-6)) then feetAfter = false end
 	end
 end
-check(feetAfter and highest - lowest > 0.02, `waving moves the antennae together ({string.format("%.3f", highest - lowest)} studs of travel)`)
+check(feetAfter and highest - lowest > 0.02 * aFloor._growth, `waving moves the antennae together ({string.format("%.3f", highest - lowest)} studs of travel)`)
 local shown = AntMimicPose.new()
 shown:start(true, false)
 for _ = 1, 40 do aFloor.ant = shown:step(1 / 60, true, false, 0); aFloor:update(body, 1 / 60, true, false) end
@@ -712,7 +712,7 @@ local turned = math.acos(math.clamp(abdomenAfter.LookVector:Dot(abdomenBefore.Lo
 check(near(turned, math.rad(10), 0.01), `the drawn body turns {string.format("%.1f", math.deg(turned))} degrees with the yaw`)
 aFloor.ant = { antennae = 0, high = 0, wave = 0, yaw = 0, lateral = 0.03, walking = true, shownSeconds = 0 }
 aFloor:update(body, 1 / 60, true, true)
-check(near(fanParts(aFloor, "Abdomen")[1].CFrame.Position.X - abdomenBefore.Position.X, 0.03, 1e-6), "and sways to the side by the lateral")
+check(near(fanParts(aFloor, "Abdomen")[1].CFrame.Position.X - abdomenBefore.Position.X, 0.03 * aFloor._growth, 1e-6), "and sways to the side by the lateral (at the look's growth: ROBLOX-114)")
 check((aFloor.root.CFrame.Position - rootBefore.Position).Magnitude < 1e-9 and aFloor.root.CFrame.LookVector.X == rootBefore.LookVector.X, "the root part (the collider's frame) does not turn or sway")
 aFloor.ant = nil
 -- The other appearances ignore the pose.

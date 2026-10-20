@@ -12,6 +12,10 @@ mode. This document is the architecture and the road; the rounds that build it a
 it, a stone path and the shed wall at the end is **about 3 × 4 m = 300 × 400 studs**, roughly eighty sills. To a
 one-centimetre spider that is a continent, and it is still authored and knowable, which is why it beats endless terrain
 for this game: every retreat, stone and flower head can be a place with a name in the notebook.
+*(2026-10-20, ROBLOX-114, Nathan: "make everything to scale": every object in the world and every creature checked against its real size in
+`docs/SCALE_AUDIT.md`, with a source or a standard for each, and the clear errors fixed in the game's own data: the back door, the bed's grass and the
+dandelion's flower, the trees' trunks, the bungalows 21 m off, the fruit fly, the peacock spider, the ant mimic and the mates. What is golden or physical and
+still wrong is listed there for Nathan. `tools/preview/scene.py --lineup` stands every creature on a ruler.)*
 
 Part cost is the constraint. The sill carries about 1,150 decor parts on 1,500 cm²; the garden at that density would be
 ~70,000 parts. So the world is **regions** with their own budgets, built once, and **streamed** around the player.
@@ -211,7 +215,8 @@ new life, the cards in one typeface, and the store page's plan in `docs/STORE_PA
 spider keeping its prey in its principal eyes and sidling round it, taken only from what its senses have placed, and "Show what the spider notices" to turn the
 perception HUD off, the lock's four faint ticks its only cue (W5's quiet HUD); CLI only, not run in Studio. ROBLOX-112: the house in true proportion, the
 kitchen window a real one and the eaves 2.4 m above the lawn (WorldMap.REVISION world-3), the inside planned in `docs/WORLD_MAP_PLAN.md` and its first two
-regions built, the kitchen's counter under the sill with the gap under the toaster as a home, and the floor in front of it; CLI only, not run in Studio.)*
+regions built, the kitchen's counter under the sill with the gap under the toaster as a home, and the floor in front of it; CLI only, not run in Studio.
+ROBLOX-114: everything to scale, `docs/SCALE_AUDIT.md`; CLI only, not run in Studio.)*
 
 ## Risks, named
 

@@ -276,6 +276,10 @@ local volans = {
 	id = "maratus_volans_male",
 	name = "Peacock spider (male)",
 	scale = SCALE, -- SpiderRig scales its own distances (foot search, stepping) by this
+	-- ROBLOX-114 (to scale): the drawn size at each growth stage (SpiderRig.growthScale). At Growth.SCALES (1 to 1.5) the body grew from 4.5 mm to 6.8 mm, past the
+	-- species' 5 mm (both sexes about 5 mm, Wikipedia, Maratus volans); now the adult is 5.0 mm and the younger stages are smaller by Growth's own steps (3.4, 3.8
+	-- and 4.4 mm). The collider, the senses and the camera's rules are the first spider's.
+	growth = { 0.74, 0.85, 0.98, 1.11 },
 	cameraScale = 0.62, -- closer framing for the small appearance; user zoom still applies
  bodyDrop = 0.21, -- the drawn body sits this far (studs) below the collider's centre, so it stands on the surface (the collider is 0.31 high)
 
@@ -457,6 +461,9 @@ local ant = {
 	id = "myrmarachne_formicaria_female",
 	name = "Ant-mimicking spider (female)",
 	scale = 0.5, -- SpiderRig scales its own distances (foot search, stepping) by this
+	-- ROBLOX-114 (to scale): the drawn size at each growth stage (SpiderRig.growthScale): the body is 4.9 mm at 1, so at Growth.SCALES the adult was 7.4 mm, past
+	-- the species' 5 to 6.5 mm (Arachnologische Gesellschaft, European Spider of the Year 2019); now the adult is 6.0 mm and the younger stages 4.1, 4.6 and 5.3 mm.
+	growth = { 0.82, 0.94, 1.08, 1.22 },
 	cameraScale = 0.6, -- closer framing for the small appearance; user zoom still applies
 	bodyDrop = 0.19, -- the drawn body sits this far (studs) below the collider's centre (0.31 over the surface): long legs, the body well off the floor
 

@@ -105,6 +105,16 @@ FlyLook.shadow = { size = { 0.34, 0.004, 0.70 }, lift = 0.003, transparency = 0.
 -- Reduced Motion (the player's setting, as the spider's rig reads it) keeps the stepping, which is how a body gets anywhere, and stills the rest: no sway,
 -- no trembling or beating fan (a still blur), no shiver, no rocking, no crouch, no somersault.
 FlyLook.motion = { gait = { stride = 0.36, swing = 0.30, lift = 0.32, settle = 9, jump = 0.6 }, kick = 6 }
+-- ROBLOX-114 (everything to scale): the scale a prey is drawn at. A profile's `visual_scale` is Godot's (golden, never changed here); a kind listed in `trueScale`
+-- is drawn at that instead, because the golden one draws it at a size it is not: the fruit fly at 0.6 is the house fly's 7.3 mm body made 4.4 mm, and Drosophila
+-- melanogaster is about 2.5 mm long (BioNumbers 100750), so it is drawn at 0.4, 2.9 mm. Only the drawing: its collider, its senses and its meal are the profile's.
+FlyLook.trueScale = { fruit_fly = 0.4 } :: { [string]: number }
+function FlyLook.drawnScale(profile: any): number
+	if profile == nil then return 1 end
+	local kind = profile.body.prey_kind
+	return (if kind ~= nil then FlyLook.trueScale[kind] else nil) or profile.body.visual_scale or 1
+end
+
 -- The far rule (as the rival's and the mate's rigs, Rig/SpiderRig FAR_STUDS and FAR_SECONDS): a body farther than `studs` from the camera is drawn once every
 -- `seconds` with all the time since; the simulation steps it every tick regardless.
 FlyLook.far = { studs = 25, seconds = 0.1 }

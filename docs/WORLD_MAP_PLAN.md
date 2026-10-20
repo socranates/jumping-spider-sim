@@ -12,7 +12,9 @@ A small single-story house with a back garden, the kind the sill already looks o
 window at the back of the house, its sill 90 cm above the garden (true for a single story: sills are usually 80–100 cm up). The window
 is a real one (ROBLOX-112): 62 cm wide, its glass 1.1 m tall and its head 1.125 m above the sill, a sash window whose lower sash is
 raised 6 cm. Above the head a lintel and a little more brick go up to the eaves, 1.5 m above the sill and 2.4 m above the lawn, the soffit
-40 cm out and the gutter on the fascia; nothing above that but a roof at 35°. (Before ROBLOX-112 the window was a 10 cm slit and the eaves
+40 cm out and the gutter on the fascia; nothing above that but a roof at 35°. (ROBLOX-114, everything to scale: every size here was checked
+against the real thing in `docs/SCALE_AUDIT.md`; the back door is a British standard one, 81 by 198 cm, and the bungalows across the way stand 21 m from
+this house's back wall, their gardens behind the back fence.) (Before ROBLOX-112 the window was a 10 cm slit and the eaves
 1.1 m up, which made the house read too tall.) The garden is about **10 m wide and 14 m deep**
 (1,000 × 1,400 studs), fenced, with a lawn in the middle and life around the edges. At 1 cm to a stud that is the size of a small
 country to the spider, and every part of it is a real backyard place a person would recognise.

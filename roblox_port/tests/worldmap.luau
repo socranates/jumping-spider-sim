@@ -370,8 +370,8 @@ case("the keep-out boxes", function()
 end)
 
 case("part budgets", function()
-	check(Region.budget("sill", "full") == 1260 and Region.budget("sill", "low") == 362,
-		"the sill reports what its decor builds now (ROBLOX-103: 1178 and 314 before the bushes, the bungalows and the fences; ROBLOX-112: 1253 and 355 before the window's upper lights)")
+	check(Region.budget("sill", "full") == 1261 and Region.budget("sill", "low") == 363,
+		"the sill reports what its decor builds now (ROBLOX-103: 1178 and 314 before the bushes, the bungalows and the fences; ROBLOX-112: 1253 and 355 before the window's upper lights; ROBLOX-114: 1260 and 362 before the ground beyond the back fence)")
 	check((Region.budget("sill", "low") :: number) < (Region.budget("sill", "full") :: number) * 0.6, "the low tier is a good deal thinner")
 	check(Region.budget("pond", "full") == nil and Region.budget("sill", "medium") == nil, "a kind with no budget, or a tier that is not one, has none")
 	for _, kind in { "outer_sill", "house_wall", "bed", "wall_upper", "eaves", "wall_west", "wall_west_upper", "eaves_west", "shrub", "counter", "kitchen_floor" } do
@@ -772,7 +772,7 @@ case("the looks a client holds: the budget at twelve places across the map, the 
 			check(LookPlan.count(r, "full") == Region.budget(r.kind, "full") and LookPlan.count(r, "low") == Region.budget(r.kind, "low"), `{r.id}: its full and low looks are its budgets`)
 		end
 	end
-	check(everything.full == 3833 and everything.low == 1276, `every look at once would be {everything.full} parts at full and {everything.low} at low (ROBLOX-107's 3,647 and 1,215; ROBLOX-112: the window, the eaves and the kitchen)`)
+	check(everything.full == 3836 and everything.low == 1276, `every look at once would be {everything.full} parts at full and {everything.low} at low (ROBLOX-107's 3,647 and 1,215; ROBLOX-112: the window, the eaves and the kitchen; ROBLOX-114: the back door's glass, panel and handle, 3 more at full)`)
 	check(LookPlan.BUDGET.full == 1500 and LookPlan.BUDGET.low == 500, "the budgets: 1,500 parts at full, 500 at low")
 	-- the far looks: the house's walls and roof, a handful of big parts each, the mortar beds drawn as brick
 	local brick = Color3.fromHex(Garden.WALL.bricks[1])

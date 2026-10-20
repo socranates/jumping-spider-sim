@@ -78,8 +78,9 @@ end
 local BUDGETS: { [string]: { full: number, low: number } } = {
 	-- (ROBLOX-95: 1156 and 292 before the raised sash, the window box's halves and the shrubs' bodies: 22 more at each tier. ROBLOX-103: 1178 and 314 before the bushes
 	-- to the ground, 62 more at full and 40 at low; the bungalows for the tall houses, 4 more at full and 2 fewer at low; the fences, 9 and 3. ROBLOX-112: 1253 and 355
-	-- before the window in true proportion: the upper lights, the transom and the sashes' rails where they meet, 7 more at each tier)
-	sill = { full = 1260, low = 362 },
+	-- before the window in true proportion: the upper lights, the transom and the sashes' rails where they meet, 7 more at each tier. ROBLOX-114: 1260 and 362 before
+	-- the ground beyond the back fence, under the bungalows that stand 21 m off now, 1 more at each tier)
+	sill = { full = 1261, low = 363 },
 }
 for kind, b in Garden.BUDGETS do BUDGETS[kind] = b end
 

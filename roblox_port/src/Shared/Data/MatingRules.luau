@@ -47,7 +47,10 @@ MatingRules.exitRadius = 1.5
 
 -- The mate is drawn with the played spider's look, scaled: a male mate slimmer and smaller, a female mate larger; each mate varies by up to +-scaleSpread
 -- about it (a seeded draw from the mate's number).
-MatingRules.scale = { male = 0.9, female = 1.15 } :: { [string]: number }
+-- ROBLOX-114 (to scale): the first spider's adult is drawn 14.9 mm long and its mate is a male, so at 0.9 he was up to 14.1 mm, past Phidippus audax's adult males
+-- (6 to 13 mm, Wikipedia); at 0.85 he is 12.0 to 13.3. The peacock spider's mate is a female on its 5.0 mm adult; at 1.15 she was up to 6.0 mm against the species'
+-- "about 5 mm" for both sexes (Wikipedia, Maratus volans); at 1.05 she is 5.0 to 5.5.
+MatingRules.scale = { male = 0.85, female = 1.05 } :: { [string]: number }
 MatingRules.scaleSpread = 0.05
 
 -- After mating: the egg sac is made by the next sleep that reaches the morning. It is guarded for guardDays full days (surviving is guarding; nothing can

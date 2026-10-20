@@ -74,7 +74,9 @@ for _,id in {"first_spider","maratus_volans_male"} do
    local anchors={};for i,l in rig._legs do anchors[i]=l.foot end
    rig:update(body,0,true,false)
    for i,l in rig._legs do check((l.foot-anchors[i]).Magnitude<1e-6,"growth keeps planted feet") end
-   check((rig.model:FindFirstChild("Cephalothorax").Size-baseSize*Growth.SCALES[stage+1]).Magnitude<1e-6,"body scaled per stage")
+   -- (ROBLOX-114: a look's own growth, SpiderRig.growthScale: Growth.SCALES for the first spider, the peacock spider's to its real adult's 5 mm)
+   check((rig.model:FindFirstChild("Cephalothorax").Size-baseSize*rig:growthScale(stage)/rig:growthScale(0)).Magnitude<1e-6,"body scaled per stage")
+   check(id~="first_spider" or rig:growthScale(stage)==Growth.SCALES[stage+1],"the first spider grows by Growth's own scales")
    check((rig.root.Position-body.Position).Magnitude<1e-6 and rig.root.Size==rootSize,"collider frame and size unchanged")
    for _=1,15 do rig:update(body,1/30,true,false) end
    for _,l in rig._legs do check(l.planted~=nil and math.abs(l.foot.Y)<1e-5,"feet settle on floor") end

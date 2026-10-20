@@ -27,6 +27,8 @@ With --world (ROBLOX-108): far_house (the house from the far corner of the bushe
 With --title (ROBLOX-109): title_drift_0, title_drift_18, title_drift_36 (the splash's and the title card's drift: its start, middle and arrival) and intro_glass,
 intro_sill, intro_out (the intro of a new life, each shot's middle frame), from Shared/Movement/TitleShots' own numbers; and store_icon, store_spider
 (docs/STORE_PAGE.md: the icon's composition, square, and a thumbnail of the same moment).
+With --lineup (ROBLOX-114): lineup_small, lineup_spiders, lineup_bugs, lineup_big (every creature on a ruler of 1 cm ticks far off at x 400; what each measures
+as drawn goes to <prefix>lineup.txt); with --world: house_eye and garden_eye (the house and the garden from a person's eyes, 1.6 m over the lawn, a normal lens).
 --parts renders an already dumped part list (for example the "before" list kept next to the images) instead of running the code."""
 import argparse, importlib.util, json, math, pathlib, subprocess, sys, tempfile
 
@@ -47,6 +49,7 @@ ap.add_argument("--parts", default="")
 ap.add_argument("--world", action="store_true", help="also build the regions outside the window (ROBLOX-95: the outer sill, the wall, the bed) for the outside views, with the bed's prey and woodlice (ROBLOX-96)")
 ap.add_argument("--looks-at", default="", help="x,y,z: draw the looks outside the window as a client whose spider is there holds them (ROBLOX-108, World/LookPlan and Client/LookStream), not every look at once")
 ap.add_argument("--title", action="store_true", help="ROBLOX-109: add the first minute's camera frames (Shared/Movement/TitleShots.views: title_drift_0, title_drift_18, title_drift_36, intro_glass, intro_sill, intro_out); use with --world")
+ap.add_argument("--lineup", action="store_true", help="ROBLOX-114: stand every creature side by side on a ruler far off at x 400 (views lineup_small, lineup_big and their close-ups) and write what each one measures as drawn to <prefix>lineup.txt")
 ap.add_argument("--elevation", type=float, default=30.0, help="sun elevation, degrees")
 ap.add_argument("--set", action="append", default=[], help="lighting knob for scene.gd, key=value (energy, ambient, bias, nbias, blur)")
 ap.add_argument("--azimuth", type=float, default=30.0, help="degrees off straight out of the window (-Z); positive turns toward +X")
@@ -98,7 +101,7 @@ def dump_parts(path):
     spiders = SPIDERS if args.world else SPIDERS[:2]
     prefix = (f'DETAIL = {lua(args.detail)}\nSUN_ELEVATION_DEG = {args.elevation}\nSUN_AZIMUTH_DEG = {args.azimuth}\n'
               f'SPIDERS = {lua(spiders)}\nFLIES = {lua(FLIES)}\nWASPS = {lua(WASPS)}\nWORLD = {lua(args.world)}\n'
-              f'LOOKS_AT = {lua([float(c) for c in args.looks_at.split(",")] if args.looks_at else False)}\n')
+              f'LOOKS_AT = {lua([float(c) for c in args.looks_at.split(",")] if args.looks_at else False)}\nLINEUP = {lua(args.lineup)}\n')
     with tempfile.NamedTemporaryFile("w", suffix=".luau", encoding="utf-8", delete=False, dir=out) as f:
         f.write(prefix + run.bundle(driver))
     try:
@@ -117,6 +120,54 @@ def dump_parts(path):
 parts_path = pathlib.Path(args.parts).resolve() if args.parts else out / f"{args.prefix}parts.json"
 if not args.parts:
     dump_parts(parts_path)
+
+
+# ROBLOX-114 (--lineup): what each creature measures as drawn, from its parts' boxes (an ellipsoid or a rod counts as its box, so a turned one reads a little long):
+# its whole length along its heading (+X) with legs, antennae and wings, its body's length (head or cephalothorax to the end of the abdomen: the body's own parts,
+# not legs, antennae, palps, fangs, wings, hairs or a shadow), its span across (Z) and its height over the card.
+BODY = ("cephalothorax", "abdomen", "pedicel", "head", "thorax", "gaster", "body", "shell", "ring", "plate", "spire", "petiole", "collar", "scutellum", "turret",
+        "elytr", "pronotum", "carapace", "rostrum", "eye", "face", "lip")
+LEGS = ("abdomenspot", "eyesocket", "eyeface")
+
+
+def measure(rows):
+    found = {}
+    for r in rows:
+        if r["g"] != "lineup":
+            continue
+        bits = r["path"].split("/")
+        if len(bits) < 3:
+            continue
+        cid = bits[1]
+        sx, sy, sz = r["size"]
+        ms = r.get("ms") or [1, 1, 1]
+        sx, sy, sz = sx * (ms[0] if r.get("mesh") else 1), sy * (ms[1] if r.get("mesh") else 1), sz * (ms[2] if r.get("mesh") else 1)
+        lo, hi = [1e9] * 3, [-1e9] * 3
+        for a in (-0.5, 0.5):
+            for b in (-0.5, 0.5):
+                for c in (-0.5, 0.5):
+                    pt = [r["p"][i] + a * sx * r["x"][i] + b * sy * r["y"][i] + c * sz * r["z"][i] for i in range(3)]
+                    lo = [min(lo[i], pt[i]) for i in range(3)]
+                    hi = [max(hi[i], pt[i]) for i in range(3)]
+        name = r["n"].lower()
+        limb = not (name.startswith(BODY) and not name.startswith(LEGS)) or name.endswith(("antenna", "tip", "band"))
+        e = found.setdefault(cid, {"all": [[1e9] * 3, [-1e9] * 3], "body": [[1e9] * 3, [-1e9] * 3], "n": 0})
+        e["n"] += 1
+        for key in ("all",) + (() if limb else ("body",)):
+            e[key][0] = [min(e[key][0][i], lo[i]) for i in range(3)]
+            e[key][1] = [max(e[key][1][i], hi[i]) for i in range(3)]
+    lines = []
+    for cid, e in found.items():
+        a, b = e["all"], e["body"]
+        lines.append(f"{cid:14s} parts {e['n']:4d}  length {10 * (a[1][0] - a[0][0]):6.1f} mm  body {10 * (b[1][0] - b[0][0]):6.1f} mm  span {10 * (a[1][2] - a[0][2]):6.1f} mm"
+                     f"  body width {10 * (b[1][2] - b[0][2]):5.1f} mm  top {10 * a[1][1]:5.1f} mm")
+    return lines
+
+
+if args.lineup:
+    report = measure(json.loads(parts_path.read_text()))
+    (out / f"{args.prefix}lineup.txt").write_text("\n".join(report) + "\n")
+    print("\n".join(report))
 
 # ---------------------------------------------------------------- cameras
 SUN_UNIT = None  # unit vector toward the sun, for the views that want to look at it
@@ -210,6 +261,10 @@ VIEWS = {
     "shrub_under": {"fov": 70, "eye": [-80.0, -87.5, -95.0], "at": [-95.0, -80.0, -80.0], "near": 0.05, "far": 2500, "groups": [], "shadow": 60},
     # ROBLOX-108: the house from the far corner of the bushes (with --looks-at -495,-89.7,-195 the walls there are their far looks)
     "far_house": {"fov": 60, "eye": [-470.0, -60.0, -190.0], "at": [-60.0, 10.0, -24.0], "near": 1.0, "far": 6000, "groups": [], "shadow": 600},
+    # ROBLOX-114: the back of the house as a person sees it, eyes 1.6 m over the lawn 6 m out with a normal lens (45 degrees: the house view's 62 degrees stretch
+    # what stands near the frame's edge, which made the back door read wide), and the garden from there toward the back fence and the bungalows
+    "house_eye": {"fov": 45, "eye": [110.0, 70.0, -620.0], "at": [60.0, 40.0, -24.0], "near": 1.0, "far": 8000, "groups": [], "shadow": 600},
+    "garden_eye": {"fov": 50, "eye": [0.0, 70.0, -60.0], "at": [0.0, 20.0, -1400.0], "near": 1.0, "far": 8000, "groups": [], "shadow": 900},
     "house_west": {"fov": 62, "eye": [-150.0, -40.0, -430.0], "at": [-180.0, 0.0, -24.0], "near": 1.0, "far": 6000, "groups": [], "shadow": 600},
     # ROBLOX-112 (--world): the kitchen: the counter and the window from the room, the sill's view into the room, the worktop at the spider's height, the gap under the
     # toaster, the floor in front of the cupboards, and the window from the outer sill looking up it
@@ -219,6 +274,11 @@ VIEWS = {
     "toaster": {"fov": 50, "eye": [-41.0, -1.4, 47.0], "at": [-45.0, -3.4, 33.0], "near": 0.02, "far": 6000, "groups": ["kitchen"], "shadow": 40},
     "kitchen_floor": {"fov": 60, "eye": [25.0, -82.0, 112.0], "at": [0.0, -86.0, 62.0], "near": 0.05, "far": 6000, "groups": [], "shadow": 80},
     "window_up": {"fov": 70, "eye": [0.0, 2.0, -21.0], "at": [0.0, 70.0, -12.0], "near": 0.05, "far": 6000, "groups": [], "shadow": 120},
+    # ROBLOX-114 (--lineup): every creature on the ruler, from in front and a little above: the small row, the big row, and the big row's two halves closer
+    "lineup_small": {"fov": 40, "eye": [409.5, 3.2, 14.0], "at": [409.5, 0.2, 0.6], "near": 0.05, "far": 600, "groups": ["lineup"], "shadow": 20},
+    "lineup_spiders": {"fov": 40, "eye": [412.0, 4.5, 33.0], "at": [412.0, 0.5, 12.6], "near": 0.05, "far": 600, "groups": ["lineup"], "shadow": 30},
+    "lineup_bugs": {"fov": 40, "eye": [447.0, 7.0, 50.0], "at": [447.0, 0.8, 12.6], "near": 0.1, "far": 600, "groups": ["lineup"], "shadow": 50},
+    "lineup_big": {"fov": 40, "eye": [435.0, 14.0, 95.0], "at": [435.0, 0.5, 12.6], "near": 0.1, "far": 600, "groups": ["lineup"], "shadow": 80},
     # ROBLOX-109 (docs/STORE_PAGE.md): the game icon's composition (render it square: --size 1024x1024), the spider stepping out of the crack at the spawn, three-quarter
     # front and low; and the store thumbnail of the same moment, wider
     "store_icon": {"fov": 32, "eye": [-19.4, 0.8, 7.6], "at": [-22.0, 0.42, 6.0], "near": 0.02, "far": 2500, "groups": ["spawn"], "shadow": 20},

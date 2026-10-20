@@ -282,7 +282,8 @@ check("the drawn body's length in studs, for the camera's body-lengths: 0.97 at 
 	full:setGrowthStage(0)
 	local peacock = SpiderRig.new(floor, floor, "maratus_volans_male", "full")
 	local ant = SpiderRig.new(floor, floor, "myrmarachne_formicaria_female", "full")
-	assert(near(peacock:bodyLength(), 0.97 * 0.47, 1e-9) and near(ant:bodyLength(), 0.97 * 0.5, 1e-9), `smaller bodies for the small spiders ({peacock:bodyLength()}, {ant:bodyLength()})`)
+	-- (ROBLOX-114: at their first stage's own growth, 0.74 and 0.82, so that their adults are the real 5 and 6 mm)
+	assert(near(peacock:bodyLength(), 0.97 * 0.47 * 0.74, 1e-9) and near(ant:bodyLength(), 0.97 * 0.5 * 0.82, 1e-9), `smaller bodies for the small spiders ({peacock:bodyLength()}, {ant:bodyLength()})`)
 	for _, r in { full, low, peacock, ant } do r:destroy() end
 end)
 

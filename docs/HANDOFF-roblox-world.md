@@ -723,3 +723,39 @@ in front of it with the cupboards. The rest of the inside is planned in `docs/WO
   means a wider sill, a new round).
 - The worktop is 4 cm under the sill board, so walking off the sill's front edge lands on the counter. Say if you would rather the sill be the counter's back
   edge (level with it).
+
+## Everything to scale (ROBLOX-114, 2026-10-20)
+
+Claude → Chet, 2026-10-20, branch `claude/scale`. Nathan: "make everything to scale". 1 stud = 1 cm; every object in the world and every creature was checked
+against its real size, with a source or a standard for each, in `docs/SCALE_AUDIT.md` (a table: what the game has, the real size and where it comes from, the
+verdict, the change). The creatures were measured as drawn: `tools/preview/scene.py --lineup` stands them all on a ruler of 1 cm ticks and writes what each
+measures. Fixed: the back door (a British standard 81 by 198 cm leaf with a glazed panel, a lower panel and a handle; it was a blank 85 by 200 slab), the
+bed's grass (5 to 12 cm, blades 3 to 4.5 mm: it was a seedling's 1.4 to 3.2 cm) and the dandelion's flower (3.6 cm), the trees' trunks beyond the fences
+(33 and 24 cm, not 56 and 47), the bungalows across the way (21 m from this house's back wall, not 40 cm behind the fence; a second ground under them, and
+the hills behind them, lower), the fruit fly drawn at 2.9 mm (its golden scale drew it 4.4), the peacock spider growing to its real 5 mm and the ant mimic to
+6 mm (they reached 6.8 and 7.4 at the adult stage), and the mates (the first spider's male mate at most 13.3 mm, the peacock's female 5.5). No physical box
+moved, so `WorldMap.REVISION` is still world-3 and no save is affected. **Nothing of it has run in Studio.**
+
+## Your Studio checklist (ROBLOX-114)
+
+1. **From the garden**: stand on the lawn about 6 m from the house and look at the back door: it should read as an ordinary back door beside the window (a
+   glazed top panel, a panel below, a handle), not a wide blank slab. Screenshot it for Nathan.
+2. **The view**: from the lawn and from the sill, the bungalows across the way should stand well back beyond the back fence (with their own gardens' worth of
+   grass in front of them), not on the fence; the hills behind them low, not a dome. Say if the far ground shows a seam where the two grounds meet (z -1748).
+3. **The bed**: the grass at the bed's edges should stand a hand high with seed heads, and the dandelion's flower should be a proper dandelion's size.
+4. **The peacock spider and the ant mimic**: choose each at the crack; they are smaller at the first stage now (3.4 and 4.1 mm). Say if the camera frames them
+   too far off, and if the peacock's fan still reads in the dance.
+5. **The fruit flies** should be clearly smaller than the house fly (about 3 mm against 7).
+6. **The self-test** as before: nothing in it should move (no box moved).
+
+## Open for Nathan (ROBLOX-114)
+
+- The window box on the outer sill is a miniature (2.8 cm tall, its black-eyed Susans 5 to 8 cm tall with 3.4 cm heads; real ones are 15 to 20 cm and 30 to
+  100 cm with heads to 10 cm). A true one would shade the sill, whose light you asked to keep. Keep it, or a real box hung below the sill on brackets?
+- The window's glazing bars (0.7 cm) and the raised sash's bottom rail (0.8 cm) are thinner than real ones (about 2 and 5 to 8 cm); widening them changes the
+  sun's pattern on the sill. Keep them, or widen them?
+- The kitchen floor is at the lawn's level (a real one stands at least 15 cm higher), because the sill is 90 cm over the garden and the worktop 86 cm over the
+  floor. The tap (14 cm) and the toaster (18.6 cm long) are small. The dandelion's leaves (4.6 cm) are shorter than any real one's (5 to 45). Each is a box
+  something walks on; say which to change in a round of their own.
+- Golden and left as Godot has it: the first spider's first stage is 10 mm, already an adult's size (a spiderling is a few millimetres); the Pilea's stalks
+  are 1 cm boxes (real ones 2 to 4 mm); the planter is a 14 by 8 cm trough.

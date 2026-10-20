@@ -363,10 +363,12 @@ function FlyBodies.pose(self: any, rig: any, flying: boolean)
 	for i, spec in template.specs do
 		local pose = if flying then spec.flight else spec.rest
 		rig.parts[i].Size = pose.size * (rig.scale or 1)
-		rig.parts[i].Transparency = if rig.scale == 0.6 and string.find(spec.name, "Stripe") then 1 else pose.transparency
+		-- (the fruit fly: the house fly's template in a fruit fly's colours; ROBLOX-114: known by its kind, not by its golden visual_scale 0.6, which it is no longer drawn at)
+		local fruit = rig.fruit == true
+		rig.parts[i].Transparency = if fruit and string.find(spec.name, "Stripe") then 1 else pose.transparency
 		local name = spec.name
-		rig.parts[i].Color = if rig.scale == 0.6 and (name == "Head" or name == "Thorax" or name == "Abdomen" or name == "Face") then Color3.fromRGB(178, 132, 65)
-			elseif rig.scale == 0.6 and (name == "EyeL" or name == "EyeR") then Color3.fromRGB(176, 39, 24) else spec.color
+		rig.parts[i].Color = if fruit and (name == "Head" or name == "Thorax" or name == "Abdomen" or name == "Face") then Color3.fromRGB(178, 132, 65)
+			elseif fruit and (name == "EyeL" or name == "EyeR") then Color3.fromRGB(176, 39, 24) else spec.color
 	end
 end
 
@@ -494,7 +496,8 @@ function FlyBodies.draw(self: any, flies: { any }, now: number, cameraAt: Vector
 		rig = rig or self:spawn(fly.id, kind)
 		local template: Template = rig.template or self.template
 		local flying = fly:airborne() or fly.state == "CAPTURED"
-		local scale = if fly.profile then fly.profile.body.visual_scale or 1 else 1
+		local scale = FlyLook.drawnScale(fly.profile)
+		rig.fruit = fly.profile ~= nil and fly.profile.body.prey_kind == "fruit_fly"
 		if flying ~= rig.flying or rig.scale ~= scale then rig.scale = scale; self:pose(rig, flying) end
 		-- the far rule: drawn ten times a second beyond FAR.studs of the camera, with all the time since
 		rig.owed += dtAll

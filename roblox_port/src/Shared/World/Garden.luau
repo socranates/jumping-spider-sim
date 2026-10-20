@@ -113,7 +113,10 @@ Garden.UPPER = {
 	-- the lintel over the window (drawn, ROBLOX-112): a concrete beam across the head, `lintel` tall, bearing `bearing` into the brick either side
 	lintel = { h = 7.5, bearing = 15, color = "b9b2a4" },
 	-- (the kitchen's window is the sill's, 62 wide and 112.5 tall with its sill at y 0: the house's other window is drawn the same; the back door, 2 m, stands on a step)
-	house = { x = 500, foot = -90.4, door = { x = 230, w = 85, h = 200, step = 14, color = "3f5b4a" }, window = { x = -260, w = 62, h = 112.5, sill = 0, transom = 55.5 }, pipe = { x = -50, d = 7 } },
+	-- ROBLOX-114 (to scale): the back door's leaf is a British standard external door's, 81.3 by 198.1 cm (2 ft 8 in by 6 ft 6 in; it was 85 by 200), in a frame
+	-- `frame` wide each side, a glazed upper panel (`glass`: its bottom over the step's top, its size), a panel below and a lever handle at `handle` over the step
+	house = { x = 500, foot = -90.4, door = { x = 230, w = 81.3, h = 198.1, step = 14, color = "3f5b4a", frame = 4.5, glass = { bottom = 105, w = 55, h = 72 },
+		panel = { bottom = 14, w = 55, h = 70 }, handle = 100 }, window = { x = -260, w = 62, h = 112.5, sill = 0, transom = 55.5 }, pipe = { x = -50, d = 7 } },
 	debris = { "6e4d2e", "8a6239", "5b4129", "a07445" },
 }
 -- (ROBLOX-112) The window's box above the back frame: the sill's Decor draws it (Habitat/Scenery.window), so it turns invisible once that drawing exists.
@@ -131,15 +134,19 @@ Garden.BED = {
 	dock = { stem = 0.8, height = 18, leaves = { { y = 6, dir = "x+", l = 6.5, w = 4.4 }, { y = 11, dir = "z+", l = 5.5, w = 3.8 }, { y = 15, dir = "x-", l = 4.5, w = 3.2 } }, thick = 0.3 },
 	dandelion = { leaf = { l = 4.6, w = 2.0, h = 0.25, gap = 0.75 }, stalk = 0.6, height = 12 }, -- (gap: the leaves start clear of the stalk and of each other)
 	leaf = { top = "4d7a36", rim = "3c6630", under = "8fb36a", rib = "a7c98a", stem = "5d8a3e", material = "SmoothPlastic", rimOut = 0.12, underOut = 0.03, underThick = 0.1 },
-	flower = { head = "f2c40c", disc = "d99a06", sepals = "4f7d35" },
+	-- the dandelion's flower head (ROBLOX-114: `head` across, 3.6 cm, a dandelion's 2 to 5; it was 2.6) over its green bracts (`sepals` across) and the darker centre
+	flower = { head = "f2c40c", disc = "d99a06", sepals = "4f7d35", size = 3.6, bracts = 2.2, centre = 1.6 },
 	litter = { count = 70, size = { 0.9, 2.8 }, colors = { "8a6239", "a07445", "6e4d2e", "b88c52", "5b4129", "c4a061" }, lowEvery = 3 },
-	grass = { tufts = 16, blades = 5, keep = 2, height = { 1.4, 3.2 }, colors = { "5c8a3a", "6f9a46", "4f7a33", "86a85a" }, dry = "b8a46a" },
+	-- ROBLOX-114 (to scale): the grass that creeps into a bed from a lawn is 5 to 15 cm long with blades 3 to 5 mm wide (a lawn is mown to 6 to 9 cm in summer, Iowa
+	-- State University Extension, and its uncut edges grow longer); the tufts were 1.4 to 3.2 cm with blades 1.4 to 2.4 mm wide, a seedling's. `width`: the blades'.
+	grass = { tufts = 16, blades = 5, keep = 2, height = { 5, 12 }, width = { 0.3, 0.45 }, colors = { "5c8a3a", "6f9a46", "4f7a33", "86a85a" }, dry = "b8a46a" },
 	twigs = { count = 9, length = { 2, 6 }, width = 0.18, colors = { "5a4632", "6b5640", "4a3a2a" } },
 	pebbles = { count = 24, size = { 0.25, 0.8 }, colors = { "a9a59c", "938f87", "bdb8ad", "7f7b74" } },
 	mottle = { count = 12, size = { 3, 8 }, colors = { "3f3126", "54412f", "463729" } },
 	-- ROBLOX-103: seed heads on the tufts (a stalk `over` the tuft's height, a head `length` long), grass clumps creeping in at the edges, and more kinds of litter
-	seedHeads = { over = { 1.15, 1.45 }, length = 0.7, stalk = "9aa86a", colors = { "c8b47a", "b6a067", "d4c494", "a89060" } },
-	clumps = { count = 6, blades = 5, height = { 1.8, 3.4 } },
+	-- (ROBLOX-114: a grass's flowering head is a few centimetres long, `length`, and `width` across; 0.7 and 0.16 before; the clumps 6 to 14 cm, 1.8 to 3.4 before)
+	seedHeads = { over = { 1.15, 1.45 }, length = 2.2, width = 0.35, stalk = "9aa86a", colors = { "c8b47a", "b6a067", "d4c494", "a89060" } },
+	clumps = { count = 6, blades = 5, height = { 6, 14 } },
 	moreLitter = { count = 14, kinds = {
 		{ size = { 1.4, 2.6 }, shape = 0.6, colors = { "d9c9a0", "cdbb8e" }, transparency = 0.35 }, -- skeleton leaves, gone to lace
 		{ size = { 1.0, 2.2 }, shape = 0.55, colors = { "3d2c1e", "4a3524", "35271b" } }, -- dark, rotting
@@ -1150,8 +1157,14 @@ local function eavesDecor(region: WorldMap.Region, budget: { full: number, low: 
 	local D, Wn = H.door, H.window
 	local stepTop = H.foot + D.step
 	add({ id = "BackStep", size = v(D.w + 30, D.step, 30), at = v(D.x, H.foot + D.step / 2, U.face - 15), color = hex("a29d92"), material = "Concrete", full = true, group = "House" })
-	add({ id = "BackDoorFrame", size = v(D.w + 8, D.h + 4, 1.2), at = v(D.x, stepTop + (D.h + 4) / 2, U.face - 0.4), color = hex(U.paint), material = "Wood", full = true, group = "House" })
-	add({ id = "BackDoor", size = v(D.w, D.h, 1.6), at = v(D.x, stepTop + D.h / 2, U.face - 0.7), color = hex(D.color), material = "WoodPlanks", full = true, group = "House" })
+	add({ id = "BackDoorFrame", size = v(D.w + 2 * D.frame, D.h + D.frame, 1.2), at = v(D.x, stepTop + (D.h + D.frame) / 2, U.face - 0.4), color = hex(U.paint), material = "Wood", full = true, group = "House" })
+	add({ id = "BackDoor", size = v(D.w, D.h, 1.6), at = v(D.x, stepTop + D.h / 2, U.face - 0.7), color = hex(D.color), material = "Wood", full = true, group = "House" })
+	-- (ROBLOX-114) what makes it read as a door at its size: the glazed upper panel, the panel below (a raised field a shade lighter) and the lever handle
+	add({ id = "BackDoorGlass", size = v(D.glass.w, D.glass.h, 0.4), at = v(D.x, stepTop + D.glass.bottom + D.glass.h / 2, U.face - 1.4), color = hex("5d7480"), material = "Glass",
+		transparency = 0.2, full = true, group = "House" })
+	add({ id = "BackDoorPanel", size = v(D.panel.w, D.panel.h, 0.4), at = v(D.x, stepTop + D.panel.bottom + D.panel.h / 2, U.face - 1.4), color = hex("4a6a58"), material = "Wood",
+		full = true, group = "House" })
+	add({ id = "BackDoorHandle", size = v(12, 2, 2), at = v(D.x - D.w / 2 + 9, stepTop + D.handle, U.face - 2.4), color = hex("b9bcc0"), material = "Metal", full = true, group = "House" })
 	-- another window like the kitchen's (ROBLOX-112: the kitchen's own size, 62 wide and from y 0 to the head at 112.5, its sashes meeting at the same transom), along
 	-- the west wall, its lintel over it and its stone sill under it
 	add({ id = "WindowFrame", size = v(Wn.w, Wn.h, 1.2), at = v(Wn.x, Wn.sill + Wn.h / 2, U.face - 0.4), color = hex(U.paint), material = "Wood", full = true, group = "House" })
@@ -1244,9 +1257,9 @@ local function bedDecor(region: WorldMap.Region, budget: { full: number, low: nu
 			if string.find(p.id, "_stalk", 1, true) ~= nil then
 				local F = B.flower
 				local head = v(c.X, p.hi.Y + 0.35, c.Z)
-				add({ id = "FlowerSepals", size = v(1.6, 0.5, 1.6), at = head - v(0, 0.3, 0), shape = "Ellipsoid", color = hex(F.sepals), material = "SmoothPlastic", group = "Plants" })
-				add({ id = "FlowerHead", size = v(2.6, 0.9, 2.6), at = head, shape = "Ellipsoid", color = hex(F.head), material = "SmoothPlastic", group = "Plants" })
-				add({ id = "FlowerDisc", size = v(1.3, 0.3, 1.3), at = head + v(0, 0.42, 0), shape = "Ellipsoid", color = hex(F.disc), material = "SmoothPlastic", full = true, group = "Plants" })
+				add({ id = "FlowerSepals", size = v(F.bracts, 0.6, F.bracts), at = head - v(0, 0.35, 0), shape = "Ellipsoid", color = hex(F.sepals), material = "SmoothPlastic", group = "Plants" })
+				add({ id = "FlowerHead", size = v(F.size, 1.2, F.size), at = head + v(0, 0.1, 0), shape = "Ellipsoid", color = hex(F.head), material = "SmoothPlastic", group = "Plants" })
+				add({ id = "FlowerDisc", size = v(F.centre, 0.35, F.centre), at = head + v(0, 0.62, 0), shape = "Ellipsoid", color = hex(F.disc), material = "SmoothPlastic", full = true, group = "Plants" })
 			end
 		end
 	end
@@ -1306,7 +1319,7 @@ local function bedDecor(region: WorldMap.Region, budget: { full: number, low: nu
 			local color = if grand() < 0.15 then hex(G.dry) else hex(pick(G.colors, grand))
 			local foot = v(x + math.cos(a) * 0.12, top, z + math.sin(a) * 0.12)
 			local out = math.sin(math.rad(lean)) * l / 2
-			add({ id = `Tuft{i}Blade{j}`, size = v(0.05, l, between(grand, 0.14, 0.24)), at = foot + v(math.cos(a) * out, math.cos(math.rad(lean)) * l / 2, math.sin(a) * out),
+			add({ id = `Tuft{i}Blade{j}`, size = v(0.05, l, between(grand, G.width[1], G.width[2])), at = foot + v(math.cos(a) * out, math.cos(math.rad(lean)) * l / 2, math.sin(a) * out),
 				turn = v(0, -math.deg(a), -lean), shape = "Ellipsoid", color = color, material = "SmoothPlastic", full = j > G.keep, group = "Grass" })
 		end
 	end
@@ -1350,7 +1363,7 @@ local function bedDecor(region: WorldMap.Region, budget: { full: number, low: nu
 			local d = tip - foot
 			add({ id = `Tuft{i}Stalk`, size = v(l, 0.04, 0.04), at = (foot + tip) * 0.5, turn = v(0, math.deg(math.atan2(-d.Z, d.X)), math.deg(math.asin(math.clamp(d.Y / d.Magnitude, -1, 1)))),
 				shape = "Cylinder", color = hex(SH.stalk), material = "SmoothPlastic", full = true, group = "Grass" })
-			add({ id = `Tuft{i}Head`, size = v(0.16, SH.length, 0.16), at = tip + d.Unit * (SH.length * 0.4), turn = v(0, -math.deg(a), -lean), shape = "Ellipsoid",
+			add({ id = `Tuft{i}Head`, size = v(SH.width, SH.length, SH.width), at = tip + d.Unit * (SH.length * 0.4), turn = v(0, -math.deg(a), -lean), shape = "Ellipsoid",
 				color = hex(pick(SH.colors, hrand)), material = "Fabric", full = true, group = "Grass" })
 		end
 	end
@@ -1368,11 +1381,11 @@ local function bedDecor(region: WorldMap.Region, budget: { full: number, low: nu
 			local l = height * between(crand, 0.7, 1.0)
 			local foot = v(x + math.cos(a) * 0.15, top, z + math.sin(a) * 0.15)
 			local out = math.sin(math.rad(lean)) * l / 2
-			add({ id = `Clump{i}Blade{j}`, size = v(0.05, l, between(crand, 0.14, 0.22)), at = foot + v(math.cos(a) * out, math.cos(math.rad(lean)) * l / 2, math.sin(a) * out),
+			add({ id = `Clump{i}Blade{j}`, size = v(0.05, l, between(crand, B.grass.width[1], B.grass.width[2])), at = foot + v(math.cos(a) * out, math.cos(math.rad(lean)) * l / 2, math.sin(a) * out),
 				turn = v(0, -math.deg(a), -lean), shape = "Ellipsoid", color = hex(if crand() < 0.15 then B.grass.dry else pick(B.grass.colors, crand)), material = "SmoothPlastic", full = j > 1, group = "Grass" })
 		end
 		add({ id = `Clump{i}Stalk`, size = v(height * 1.25, 0.04, 0.04), at = v(x, top + height * 0.625, z), turn = v(0, 0, 90), shape = "Cylinder", color = hex(SH.stalk), material = "SmoothPlastic", full = true, group = "Grass" })
-		add({ id = `Clump{i}Head`, size = v(0.16, SH.length, 0.16), at = v(x, top + height * 1.25 + SH.length * 0.4, z), shape = "Ellipsoid", color = hex(pick(SH.colors, crand)), material = "Fabric", full = true, group = "Grass" })
+		add({ id = `Clump{i}Head`, size = v(SH.width, SH.length, SH.width), at = v(x, top + height * 1.25 + SH.length * 0.4, z), shape = "Ellipsoid", color = hex(pick(SH.colors, crand)), material = "Fabric", full = true, group = "Grass" })
 	end
 	-- and more kinds of litter (full tier): skeleton leaves gone to lace, dark rotting ones, small round ones, husks, and an empty snail shell
 	local morerand = rng(region.seed, 127)
@@ -1905,7 +1918,7 @@ Garden.BUDGETS = {
 	house_wall = { full = 127, low = 69 },
 	bed = { full = 466, low = 113 },
 	wall_upper = { full = 49, low = 28 },
-	eaves = { full = 146, low = 42 },
+	eaves = { full = 149, low = 42 }, -- (ROBLOX-114: the back door's glass, panel and handle, 3 more at full)
 	wall_west = { full = 93, low = 59 },
 	wall_west_upper = { full = 73, low = 66 },
 	eaves_west = { full = 46, low = 31 },

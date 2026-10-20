@@ -434,8 +434,8 @@ check("the peacock spider: C in the crack changes spider, X dances, any move, ju
 	assert(string.find(words("SpiderPrompts", "Caption"), "[a fine buzzing through your feet]", 1, true), "no felt caption in the rumble-rump: " .. words("SpiderPrompts", "Caption"))
 	assert((spider() - p0).Magnitude < 0.02, "the dance moved the spider")
 	frames(240)
-	local fan = driver.rig()._fan
-	assert(fan ~= nil and driver.rig().dance.fanOpen > 0.9 and fan.front[1].part.Size.X > 0.25, `the fan is not open at {driver.dance().t} s`)
+	local fan = driver.rig()._fan -- (its size at the look's growth: the peacock's first stage is 0.74 since ROBLOX-114)
+	assert(fan ~= nil and driver.rig().dance.fanOpen > 0.9 and fan.front[1].part.Size.X > 0.25 * driver.rig()._growth, `the fan is not open at {driver.dance().t} s`)
 	assert(string.find(words("SpiderPrompts", "Controls"), "courtship dance", 1, true) or not find("SpiderPrompts", "Controls").Visible, "the card")
 	-- Walking stops it at once and the pose is gone 0.2 s later.
 	key("Forward", true); frames(1)

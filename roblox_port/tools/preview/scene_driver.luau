@@ -251,6 +251,91 @@ for _, w in WASPS do
 	body:draw({ position = Vector3.new(w.x, w.y, w.z), heading = Vector3.new(w.hx, 0, w.hz).Unit, mode = w.mode, search = w.search, visible = true }, w.beat)
 end
 
+-- ROBLOX-114 (scene.py --lineup): every creature of the game side by side on a white card far off at x 400, facing +X (so a camera in front, at +z, sees each
+-- one's length along the ruler), next to a ruler of 1 cm ticks (every fifth longer, every tenth longest; millimetre ticks on the small row's). Two rows: the small
+-- (z 0: the aphid to the ladybird, the peacock spider and the ant mimic at their first and last growth stages, the peacock's mate) and the big (z 12: the first spider at every
+-- stage, the rival, the first spider's mate (a male) at his largest, a tarantula costume, the woodlouse, the millipede, the wasp, the snail, the crane fly and the harvestman). Each
+-- creature is built into a folder of its own (Lineup/<id>, its parts' paths say whose they are) by the real body code at its real scale, so scene.py can
+-- measure what is drawn (it writes the measures to <prefix>lineup.txt).
+local lineupHolder = Instance.new("Folder")
+lineupHolder.Name = "Lineup"
+lineupHolder.Parent = workspace
+if LINEUP then
+	local Growth = require("../src/Shared/Life/Growth")
+	local MatingRules = require("../src/Shared/Data/MatingRules")
+	local function card(name: string, size: Vector3, at: Vector3, color: Color3)
+		local p = Instance.new("Part")
+		p.Name = name; p.Size = size; p.CFrame = CFrame.new(at); p.Color = color; p.Anchored = true; p.Material = Enum.Material.SmoothPlastic
+		p.Parent = lineupHolder
+	end
+	local white, black = Color3.fromRGB(236, 234, 228), Color3.fromRGB(20, 20, 20)
+	local function ruler(z: number, x0: number, x1: number, mm: boolean)
+		card("Card" .. z, Vector3.new(x1 - x0 + 2, 0.1, 7), Vector3.new((x0 + x1) / 2, -0.05, z), white)
+		for x = x0, x1 do
+			local k = x - x0
+			local long = if k % 10 == 0 then 1.0 elseif k % 5 == 0 then 0.7 else 0.45
+			card(`Tick{z}_{k}`, Vector3.new(0.03, 0.004, long), Vector3.new(x, 0.002, z + 1.6 + long / 2), black)
+			if mm and x < x1 then
+				for m = 1, 9 do card(`Mm{z}_{k}_{m}`, Vector3.new(0.012, 0.004, if m == 5 then 0.3 else 0.18), Vector3.new(x + m / 10, 0.002, z + 1.6 + (if m == 5 then 0.15 else 0.09)), black) end
+			end
+		end
+	end
+	ruler(0, 400, 421, true)
+	ruler(12, 400, 470, false)
+	local function own(id: string): Folder
+		local f = Instance.new("Folder")
+		f.Name = id
+		f.Parent = lineupHolder
+		return f
+	end
+	local east = Vector3.new(1, 0, 0)
+	local function fly(id: string, profile: string, x: number, z: number)
+		local p = (Species :: any)[profile]
+		FlyBodies.new(own(id), "full"):draw({ { id = id, position = Vector3.new(x, p.body.hover_wu, z), heading = east, normal = Vector3.yAxis, profile = p, state = "PERCHED",
+			airborne = function(_self: any): boolean return false end } }, 0.37)
+	end
+	local function trailOf(kind: string, x: number, y: number, z: number): { Vector3 }
+		local out = {}
+		if kind == "millipede" then for i = 1, 13 do table.insert(out, Vector3.new(x - i * 0.19, y, z)) end end -- (its rings follow its trail: laid out behind it, along -X)
+		return out
+	end
+	local function bug(id: string, kind: string, x: number, z: number, y: number)
+		BugBodies.new(own(id), "full"):draw({ { id = id, kind = if kind == "woodlouse" then nil else kind, position = Vector3.new(x, y, z), heading = east, normal = Vector3.yAxis,
+			state = "still", bleedUntil = -1, coil = 0, trail = trailOf(kind, x, y, z), eyes = 1, hidden = false } }, 0.37)
+	end
+	local function spider(id: string, appearance: string, stage: number, x: number, z: number, scale: number?)
+		local folder = own(id)
+		local rig = SpiderRig.new(folder, folder, appearance, "full")
+		rig:setGrowthStage(stage)
+		if scale ~= nil then rig:setScale(scale) end
+		local body = SupportMath.bodyCFrame(Vector3.new(x, 0.31, z), Vector3.yAxis, east)
+		for _ = 1, 40 do rig:update(body, 1 / 60, true, false) end
+	end
+	-- the small row (z 0)
+	fly("aphid", "aphid_prototype", 400.5, 0); fly("springtail", "springtail_prototype", 401.5, 0); fly("fruit_fly", "fruit_fly_prototype", 402.6, 0)
+	fly("fungus_gnat", "fungus_gnat_prototype", 403.8, 0); fly("leafhopper", "leafhopper_prototype", 405.1, 0); fly("house_fly", "fly_like_prototype", 406.6, 0)
+	fly("moth", "moth_prototype", 408.4, 0); bug("ladybird", "ladybird", 410.3, 0, 0.17)
+	spider("peacock_1", "maratus_volans_male", 0, 412.0, 0); spider("peacock_4", "maratus_volans_male", 3, 413.9, 0)
+	spider("ant_1", "myrmarachne_formicaria_female", 0, 415.8, 0); spider("ant_4", "myrmarachne_formicaria_female", 3, 417.8, 0)
+	-- the big row (z 12)
+	for s = 0, 3 do spider("spider_" .. (s + 1), "first_spider", s, 402 + s * 2.8, 12) end
+	spider("rival", "rival_spider", 0, 413.5, 12)
+	-- the first spider's mate (a male) at his largest, and on the small row's end the peacock spider's mate (a female on the peacock's look) at hers
+	local function mate(id: string, appearance: string, sex: string, x: number, z: number)
+		local probe = SpiderRig.new(lineupHolder, lineupHolder, appearance, "low")
+		local adult = probe:growthScale(Growth.ADULT)
+		probe:destroy()
+		spider(id, appearance, Growth.ADULT, x, z, adult * MatingRules.scale[sex] * (1 + MatingRules.scaleSpread))
+	end
+	mate("mate_male", "first_spider", "male", 417, 12)
+	mate("peacock_mate", "maratus_volans_male", "female", 418.9, 0)
+	spider("tarantula_4", "brachypelma_hamorii", 3, 421, 12)
+	bug("woodlouse", "woodlouse", 425.5, 12, 0.12); bug("millipede", "millipede", 430, 12, 0.12)
+	WaspBody.new(own("wasp")):draw({ position = Vector3.new(436.5, 0.35, 12), heading = east, mode = "walking", search = 0, visible = true }, 0.2)
+	bug("snail", "snail", 444, 12, 0); fly("crane_fly", "crane_fly_prototype", 453, 12)
+	bug("harvestman", "harvestman", 463, 12, 0.9)
+end
+
 -- ---------------------------------------------------------------- the dump
 local function f5(x: number): string return string.format("%.5f", x) end
 local function vec(a: any): string
@@ -309,6 +394,9 @@ counts.flies = #rows - before
 before = #rows
 dump(waspHolder, "wasps", rows)
 counts.wasps = #rows - before
+before = #rows
+dump(lineupHolder, "lineup", rows)
+counts.lineup = #rows - before
 local keys = {}
 for k in counts do table.insert(keys, k) end
 table.sort(keys)

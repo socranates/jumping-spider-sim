@@ -833,7 +833,14 @@ function SpiderRig.setGrowthStage(self: Rig, stage: number)
   local fade=self._appearance.barFade -- the Greenbottle blue's juvenile bars soften at the last stage
   if fade then for _,bar in self._bars do bar.Transparency=fade[index+1] end end
  end
- self:setScale(Growth.SCALES[index+1])
+ self:setScale(self:growthScale(index))
+end
+-- (ROBLOX-114) The scale a growth stage is drawn at: Growth.SCALES (golden), or the appearance's own `growth` where it has one (a costume whose species' adult is
+-- smaller than Growth's adult would draw it: the peacock spider and the ant mimic grow to their real adults' size, 5 and 6 mm). The collider is never touched.
+function SpiderRig.growthScale(self: Rig, stage: number): number
+ local index=math.clamp(math.floor(stage),0,3)
+ local scales=self._appearance.growth or Growth.SCALES
+ return scales[index+1]
 end
 -- Any size, not only a growth stage's (ROBLOX-80: the mate is the played spider's look at the adult scale times its own factor). The same scaling as a stage.
 function SpiderRig.setScale(self: Rig, g: number)

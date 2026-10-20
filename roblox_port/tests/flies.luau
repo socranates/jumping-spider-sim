@@ -391,9 +391,10 @@ do
  small.profile=Species.fruit_fly_prototype
  bodies:draw({small},0)
  local rig=bodies.rigs.fruit
- check(rig.scale==.6,"fruit fly has its own smaller scale")
+ -- (ROBLOX-114: drawn at a fruit fly's 2.9 mm, FlyLook.trueScale's 0.4, not at its golden visual_scale 0.6, which drew it 4.4 mm long)
+ check(rig.scale==.4 and Species.fruit_fly_prototype.body.visual_scale==.6,"fruit fly has its own smaller scale (its true size, the golden scale untouched)")
  for i,p in rig.parts do
-  check((p.Size-bodies.template.specs[i].rest.size*.6).Magnitude<1e-6,"fruit parts scaled")
+  check((p.Size-bodies.template.specs[i].rest.size*.4).Magnitude<1e-6,"fruit parts scaled")
  end
  local first=rig.parts[1]
  check(colour(first,"b28441"),"fruit thorax is warm tan")

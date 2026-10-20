@@ -695,8 +695,10 @@ check("prey runs only in the spider's region: on the sill the sill's flies alone
 	local gnats, aphids = 0, 0
 	for _, f in flyFolder:GetChildren() do
 		if string.sub(f.Name, 1, 4) ~= "fly_" and string.find(f.Name, "bed_a_fly_", 1, true) == nil then
-			-- (ROBLOX-101: the bestiary's, the bed's springtails and leafhoppers and, when near, the wall's moths and crane fly)
-			assert(string.find(f.Name, "bed_a_", 1, true) == 1 or string.find(f.Name, "house_wall_", 1, true) == 1, "a drawn prey of the garden: " .. f.Name)
+			-- (ROBLOX-101: the bestiary's, the bed's springtails and leafhoppers and, when near, the wall's moths and crane fly; ROBLOX-107: and, this near the bed's
+			-- west edge, the springtails of the bushes' first chunk beside it)
+			assert(string.find(f.Name, "bed_a_", 1, true) == 1 or string.find(f.Name, "house_wall_", 1, true) == 1 or string.find(f.Name, "shrub_west_a_", 1, true) == 1,
+				"a drawn prey of the garden: " .. f.Name)
 		elseif string.find(f.Name, "bed_a_fly_", 1, true) then
 			local kind = (workspace:FindFirstChild("Flies") :: Instance) ~= nil and f:FindFirstChild("Cornicle") == nil and f:FindFirstChild("RightWing") ~= nil
 			if f:FindFirstChild("RightCornicle") then aphids += 1 elseif f:FindFirstChild("RightWing") then gnats += 1 end

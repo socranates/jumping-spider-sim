@@ -39,8 +39,8 @@ Coordinates continue the sill's frame: x across the back of the house (west −,
 | 2 | **house_wall** | −42…42; −24; 0…−90 | brick below the window | moths, crane flies, a harvestman from dusk, the descent | built (W2/W3b) |
 | 3 | **bed_a** | −25…25; −24…−74; −90 | bed under the window, the stone home | gnats, aphids, springtails, leafhoppers, woodlice, ladybirds, millipedes, a snail, a harvestman | built (W3/W3b) |
 | 4 | **wall_upper** | −42…42; −24; 0…130 | the wall above the window to the eaves (y 110) and gutter (floor y 109), on the window's jambs; its look draws the rest of the house | a house spider's web in the eaves corner, the gutter as a high perch | built (W3c: the boxes and the look; no retreat, no prey yet) |
-| 5 | **wall_west / wall_east** | −500…−42, 42…500; −24; −90…120 | the rest of the back wall: the drainpipe (west, a climbable pipe to the gutter), the back door, its step and frame (east) | woodlice at the drain, an earwig in the door frame | next |
-| 6 | **shrub_west** | −500…−25; −24…−200 | **bushes to the ground** (box, privet): dense twig lattice, leaf litter under, deep shade | the hidden world: the safest cover and the darkest place; a crab spider is not here, a ground beetle is | next |
+| 5 | **wall_west / wall_east** | −500…−42, 42…500; −24; −90…120 | the rest of the back wall: the drainpipe (west, a climbable pipe to the gutter), the back door, its step and frame (east) | woodlice at the drain, an earwig in the door frame | west begun (ROBLOX-107: `wall_west` and `wall_west_upper`, x −120…−40, the drainpipe to the gutter; on to −500 and the east still to come) |
+| 6 | **shrub_west** | −500…−25; −24…−200 | **bushes to the ground** (box, privet): dense twig lattice, leaf litter under, deep shade | the hidden world: the safest cover and the darkest place; a crab spider is not here, a ground beetle is | built (ROBLOX-107: ten chunks `shrub_west_a`…`_j`, woodlice and springtails in the litter, a retreat under a dead leaf in each; the ground beetle later) |
 | 7 | **patio_east** | 25…500; −24…−200 | patio slabs, a pot on a saucer (water), weeds in the cracks | open ground: heat at noon, the bird's hop, midges at the saucer | after |
 | 8 | **path** | −40…40; −74…−300 | stepping stones from the door to the lawn | the crossing: nothing to hide under between stones | after |
 | 9 | **lawn_n…** (chunks of 100 × 100) | −400…400; −200…−1000 | the grass forest: blades as walkable stems, clover, a dandelion patch, a molehill, the birdbath | leafhoppers, springtails, ants' trail, the bird at dawn, a wolf spider | the big fill |
@@ -82,7 +82,9 @@ a journey of game days, not minutes, and the map is meant to be lived in a regio
 3. **W4 (nature's rules)** and **W5 (no hand holding)** as planned, on the built regions.
 4. Then fill outward in this order: `wall_west`/`wall_east` (the drainpipe and the door), `shrub_west`, `path`, the first lawn chunks,
    `patio_east`, `border_east`, `hedge_west`, the woodpile, the vegetable bed, the shed, the fence — each a round with its bugs and pages
-   from `docs/GARDEN_BESTIARY.md`, weather when the patio's saucer and the lawn exist.
+   from `docs/GARDEN_BESTIARY.md`, weather when the patio's saucer and the lawn exist. *(ROBLOX-107, 2026-10-19: `shrub_west` built and
+   `wall_west` begun from x −120 to −40 with the drainpipe, the second way up to the gutter; the wall on west to −500 and `wall_east` with the door
+   are next. Not run in Studio.)*
 5. The peacock-as-default and the nursery (the sash shut until the spider is ready) can come at any point; the map does not depend on it.
 
 ## For Nathan

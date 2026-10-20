@@ -19,7 +19,10 @@ function Silk.new(world, surfaces, tuning, gravity: number)
 	local params = RaycastParams.new()
 	params.FilterType = Enum.RaycastFilterType.Include
 	params.FilterDescendantsInstances = {world}
-	return setmetatable({world=world, surfaces=surfaces, params=params, maximum=tuning.max_line_length_wu,
+	local overlap = OverlapParams.new()
+	overlap.FilterType = Enum.RaycastFilterType.Include
+	overlap.FilterDescendantsInstances = {world}
+	return setmetatable({world=world, surfaces=surfaces, params=params, overlap=overlap, maximum=tuning.max_line_length_wu,
 		speed=tuning.reel_speed_wu_s, lowerSpeed=tuning.reel_speed_wu_s, gravity=gravity, mode="none", paid=0, rest=0, taut=false,
 		anchor=Vector3.zero, normal=Vector3.yAxis, anchorPart=nil, bend=nil, bendPart=nil,
 		lowering=false, snagged=false, block="", message="", release=Math.newRelease(), walk=nil,
@@ -151,6 +154,53 @@ function Silk.startDrop(self: any, position: Vector3, up: Vector3, push: Vector3
 	return true
 end
 
+-- ROBLOX-107: the body's skin kept by overlap, not by the sweep alone. The real engine's Spherecast does not see a part the sphere starts in, and a
+-- sweep that begins within a hair of a face it is nearly tangent to can miss it (Studio, v35: the self-test's let-down from the outer sill's front edge hung
+-- 0.07 from the brick face, inside its 0.31 skin, where the box world keeps it at 0.31). Once inside the skin nothing pushed it out. So after each move the
+-- body is pushed out of any box of the world it overlaps, by the shortest way out of the nearest point of that box (never through it: a centre already
+-- inside a box is left alone), and the velocity into it is taken away. A box the body is touching (within a thousandth of its radius) that it could land on
+-- by the sweep's own rule is a landing, as the sweep's contact would have been. Boxes only (a Part whose Shape is Block; the world's walkable pieces are
+-- all boxes). With the box world's exact sweeps the body is never inside its skin, so this changes nothing there.
+local SKIN = RADIUS + 0.01
+function Silk.unstick(self: any, position: Vector3, velocity: Vector3, intent: number): (Vector3, Vector3, any)
+	local p, v = position, velocity
+	local ok, parts = pcall(function() return workspace:GetPartBoundsInRadius(p, SKIN, self.overlap) end)
+	if not ok or parts == nil then return p, v, nil end
+	for _, part in parts do
+		local inst = part :: any
+		local shape = if inst.ClassName == "Part" then inst.Shape else nil
+		if inst:IsA("BasePart") and inst.ClassName == "Part" and (shape == nil or shape == Enum.PartType.Block) then
+			local half = inst.Size * 0.5
+			local localP = inst.CFrame:PointToObjectSpace(p)
+			local near = Vector3.new(math.clamp(localP.X, -half.X, half.X), math.clamp(localP.Y, -half.Y, half.Y), math.clamp(localP.Z, -half.Z, half.Z))
+			local out = localP - near
+			local d = out.Magnitude
+			if d > 1e-6 and d < SKIN - 1e-4 then
+				local n = inst.CFrame:VectorToWorldSpace(out / d)
+				local contact = { Instance = inst, Position = inst.CFrame:PointToWorldSpace(near), Normal = n, Distance = 0 }
+				p += n * (SKIN - d)
+				v -= n * math.min(0, v:Dot(n))
+				if d < RADIUS + 1e-3 and self:landable(contact, p, intent) then return p, Vector3.zero, contact end
+			end
+		end
+	end
+	return p, v, nil
+end
+-- The sweep's landing rule: an attachable surface; while letting down, only ground under the body below the anchor (and not on a reel in).
+function Silk.landable(self: any, hit, p: Vector3, intent: number): boolean
+	local profile = self:profile(hit)
+	local allowed = not self.lowering or intent > 0 or (hit.Normal.Y >= 0.707 and hit.Position.Y <= self.anchor.Y - 0.5 and self:groundUnder(p, hit))
+	return profile ~= nil and profile.attachable == true and allowed
+end
+-- ROBLOX-107: while letting down, a landing needs ground under the body. The sweep can meet the rounded edge of a box that another box covers (the brick
+-- wall's top under the outer sill's slab, y -3: Studio, v35, "left the line 2.0 s into the let-down, at (2.00, -2.70, -24.07)"), with a normal steep enough to
+-- pass the landing rule; the spider then stood on a sliver no one can see. A ray straight down from the body's centre must meet the part it touched
+-- within the legs' reach, as standing on it asks; otherwise it slides on.
+function Silk.groundUnder(self: any, p: Vector3, hit): boolean
+	local under = workspace:Raycast(p, DOWN * (HEIGHT + 0.35), self.params)
+	return under ~= nil and under.Instance == hit.Instance
+end
+
 -- Sweep the body, then slide once. Never satisfy a constraint by teleporting through a wall.
 function Silk.move(self: any, position: Vector3, motion: Vector3, velocity: Vector3, intent: number)
 	local p=position
@@ -161,9 +211,7 @@ function Silk.move(self: any, position: Vector3, motion: Vector3, velocity: Vect
 		if not hit then p+=remaining; break end
 		-- Maintain a skin along the contact normal at grazing angles.
 		p=hit.Position+hit.Normal*(RADIUS+0.01)
-		local profile=self:profile(hit)
-		local allowed=not self.lowering or intent>0 or (hit.Normal.Y>=0.707 and hit.Position.Y<=self.anchor.Y-0.5)
-		if profile and profile.attachable and allowed then return p,Vector3.zero,hit end
+		if self:landable(hit,p,intent) then return p,Vector3.zero,hit end
 		local rest=remaining-remaining.Unit*math.min(hit.Distance,remaining.Magnitude)
 		remaining=rest-hit.Normal*rest:Dot(hit.Normal)
 		velocity-=hit.Normal*math.min(0,velocity:Dot(hit.Normal))
@@ -181,6 +229,9 @@ function Silk.move(self: any, position: Vector3, motion: Vector3, velocity: Vect
 			end
 		end
 	end
+	local touched
+	p,velocity,touched=self:unstick(p,velocity,intent)
+	if touched then return p,Vector3.zero,touched end
 	return p,velocity,nil
 end
 function Silk.step(self: any, position: Vector3, velocity: Vector3, intent: number, releaseDown: boolean)

@@ -1051,7 +1051,7 @@ do
 	local holder = Instance.new("Folder")
 	local world = WorldBuild.world(holder)
 	check(Region.WORLD_FOLDER == "World" and world.Name == "World" and world.Parent == holder and #holder:GetChildren() == 1, "the physical world is one folder named World")
-	check(#WorldMap.regions() == 5 and #world:GetChildren() == #WorldMap.regions() and world:GetChildren()[1].Name == "Windowsill", "with a folder for every region; the sill's is still called Windowsill")
+	check(#WorldMap.regions() == 17 and #world:GetChildren() == #WorldMap.regions() and world:GetChildren()[1].Name == "Windowsill", "with a folder for every region; the sill's is still called Windowsill")
 	local inWorld = world:FindFirstChild("Windowsill") :: Folder
 	check(#inWorld:GetChildren() == #Layout.PIECES and dumpFolder(inWorld) == dumpFolder(Scenery.sill()),
 		"the sill's folder inside World is exactly the one Scenery.sill makes: every part's name, size, place, solidity, looks and attributes")
@@ -1134,7 +1134,7 @@ do
 	-- the looks: a persistent Model per region outside the window, in WorldDecor beside World, each tier holding its budget exactly
 	local holder = Instance.new("Folder")
 	local looks, looksDrawn = WorldBuild.looks(holder, WorldMap.SEED)
-	check(looks.Name == Region.LOOKS_FOLDER and looks.Parent == holder and #looks:GetChildren() == 4, "the looks of the four regions outside, in WorldDecor")
+	check(looks.Name == Region.LOOKS_FOLDER and looks.Parent == holder and #looks:GetChildren() == #WorldMap.regions() - 1, `the looks of the {#looks:GetChildren()} regions outside, in WorldDecor`)
 	local full: { [string]: number } = {}
 	local safe = true
 	for _, model in looks:GetChildren() do
@@ -1184,7 +1184,8 @@ do
 		end
 		local west, east, slope = part("HouseWest"), part("HouseEast"), part("RoofSlope")
 		local U = Garden.UPPER
-		check(west ~= nil and east ~= nil and math.abs(west.Position.X + west.Size.X / 2 - U.west) < 1e-6 and math.abs(east.Position.X - east.Size.X / 2 - U.east) < 1e-6
+		-- (ROBLOX-107: on the west it meets wall_west's walkable brick at x -120, the house_wall's and wall_upper's at x -40 being wall_west's and wall_west_upper's now)
+		check(west ~= nil and east ~= nil and math.abs(west.Position.X + west.Size.X / 2 - Garden.WEST.west) < 1e-6 and math.abs(east.Position.X - east.Size.X / 2 - U.east) < 1e-6
 			and math.abs(west.Position.Y - west.Size.Y / 2 - Graphics.view.ground.y) < 1e-6 and math.abs(east.Position.Y + east.Size.Y / 2 - U.top) < 1e-6,
 			"the house's back wall goes on either side from the lawn to the eaves, meeting the walkable wall with no slit")
 		check(slope ~= nil and slope.Size.X >= 2 * U.house.x and slope.Position.Y - U.eaves.top > 50, "the roof's slope covers the whole house, rising from the eaves")
@@ -1215,7 +1216,7 @@ do
 			end
 		end
 	end
-	check(ok and count == 37, `the {count} boxes outside are solid, queryable parts; the ones a look draws are invisible`)
+	check(ok and count == 486, `the {count} boxes outside are solid, queryable parts; the ones a look draws are invisible`)
 	local outerFolder = world:FindFirstChild("outer_sill") :: Instance
 	local slab = outerFolder:FindFirstChild("outer_sill_slab") :: any
 	local box = outerFolder:FindFirstChild("window_box_west") :: any

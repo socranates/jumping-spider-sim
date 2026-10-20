@@ -247,7 +247,8 @@ Later the same evening: "More more more bugs and types of bugs and information o
 prey, ambient bugs and small threats, each with its own sourced notebook page. `docs/GARDEN_BESTIARY.md` is the list to build from; it
 becomes a round of its own (W3b, the bestiary) straight after W3, on W3's pattern (a derived profile or a small ambient sim, a body under
 the part cap, a generated page with named sources), before W4. *W3b is built (ROBLOX-101, part A: springtails, leafhoppers, small moths, crane
-flies; ROBLOX-105, part B: ladybirds, millipedes, a garden snail, harvestmen, as ambient bugs that are not food, each with its page).*
+flies; ROBLOX-105, part B: ladybirds, millipedes, a garden snail, harvestmen, as ambient bugs that are not food, each with its page); and the map has begun to fill outward, ROBLOX-107: the bushes beside the bed (`shrub_west`, ten chunks)
+and the back wall west of the window with its drainpipe to the gutter, woodlice and springtails in their litter.*
 
 And: "there are tons of cool spiders we can add and sell and give away, maybe even be the wasp and keep expanding the world until you
 can participate as anything you want." As design, a fifth pillar after the four in `docs/OPEN_WORLD_DESIGN.md`: **be anything**. The

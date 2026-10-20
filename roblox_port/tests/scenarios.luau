@@ -73,5 +73,74 @@ check("the let-down on a line runs at half speed under the game's rule, reeling 
 	assert(motor.silk.lowerSpeed == 0.75 and motor.silk.speed == 1.5, "the motor's line takes the rule")
 	world:Destroy()
 end)
+-- ROBLOX-107: the let-down from the outer sill's front edge past the brick (the Studio self-test's one failure, v35: "left the line 2.0 s into the
+-- let-down, at (2.00, -2.70, -24.07)"). The engine let the body sit 0.07 from the brick face, inside its 0.31 skin; the sweep down then met the rounded
+-- edge of the wall box's top, which the outer sill's slab covers at y -3, and the landing rule took it: the spider stood on a sliver. Reproduced here on the
+-- real regions' boxes from the very place Studio saw, and with the engine's tangent miss emulated (the shim's Spherecast slop) over a whole let-down.
+check("a let-down past the wall keeps its skin and never ends on a sliver (ROBLOX-107)", function()
+	local WorldMap = require("../src/Shared/World/WorldMap")
+	local WorldBuild = require("../src/Shared/World/WorldBuild")
+	local Motor = deps.Motor
+	local folder = WorldBuild.world(workspace, WorldMap.SEED)
+	local EDGE = Vector3.new(2, 0.31, -23.2)
+	local function drop(): any
+		local motor = Motor.new({ world = folder, surfaces = deps.Surfaces, profile = deps.Species.phidippus_audax_prototype, spawn = EDGE,
+			heading = -Vector3.zAxis, boundsMin = Vector3.new(-50, -95, -80), boundsMax = Vector3.new(50, 40, 20) })
+		motor:useGameRules()
+		motor:place(EDGE, Vector3.yAxis, -Vector3.zAxis)
+		assert(motor:requestDrop(), "the drop was refused at the front edge")
+		return motor
+	end
+	local input = Motor.idleInput()
+	input.dropHeld = true
+	local slop = (BoxWorld :: any).spherecastSlop
+	local ok, err = pcall(function()
+		-- 1. Studio's place: two seconds into the let-down the body is put 0.07 from the brick (where the engine had it) and lowered on.
+		local motor = drop()
+		for _ = 1, 150 do motor:tick(input) end
+		assert(motor:onLine(), "not on the line after the drop")
+		motor.pos = Vector3.new(2, -2.55, -24.07)
+		motor.vel = Vector3.zero
+		local skin = math.huge
+		for t = 1, 360 do
+			motor:tick(input)
+			assert(motor:onLine(), string.format("left the line %d ticks after Studio's place, at (%.2f, %.2f, %.2f)", t, motor.pos.X, motor.pos.Y, motor.pos.Z))
+			skin = math.min(skin, -24 - motor.pos.Z)
+		end
+		assert(skin >= 0.3, string.format("the body came within %.3f of the brick", skin))
+		assert(motor.pos.Y < -6, `lowered only to {motor.pos.Y}`)
+		-- 2. The sliver itself: the sweep down beside the face meets the wall box's covered top, and there is no ground under the body there; over the soil there is.
+		local silk = motor.silk
+		local seam = workspace:Spherecast(Vector3.new(2, -2.68, -24.07), 0.3, Vector3.new(0, -0.05, 0), silk.params)
+		assert(seam ~= nil and seam.Instance.Name == "house_wall" and seam.Normal.Y >= 0.707, "the sweep beside the face meets the wall box's covered top, steep enough to land on")
+		assert(not silk:groundUnder(Vector3.new(2, -2.69, -24.07), seam), "ground under a body beside the seam")
+		local soil = workspace:Raycast(Vector3.new(2, -89.5, -30), Vector3.new(0, -1, 0), silk.params)
+		assert(soil ~= nil and silk:groundUnder(Vector3.new(2, -89.69, -30), soil), "no ground under a body over the soil")
+		-- 3. The engine's tangent miss emulated over the whole let-down: the skin is kept, the rate is the game's, and the line ends on the bed's soil.
+		slop.value = 0.011
+		local m2 = drop()
+		local y0 = 0
+		local closest = math.huge
+		local landed, began = nil, nil
+		for t = 1, 60 * 140 do
+			m2:tick(input)
+			if m2:onLine() and began == nil then began = t end
+			if began ~= nil and m2.mode == "attached" then landed = t; break end
+			assert(m2:onLine() or t < 30, string.format("off the line at tick %d, (%.2f, %.2f, %.2f)", t, m2.pos.X, m2.pos.Y, m2.pos.Z))
+			if t == 120 then y0 = m2.pos.Y end
+			if t > 60 then closest = math.min(closest, -24 - m2.pos.Z) end
+			if t == 480 then
+				local rate = (y0 - m2.pos.Y) / 6
+				assert(rate > 0.6 and rate < 0.9, `let down at {rate} studs a second`)
+			end
+		end
+		assert(closest >= 0.29, string.format("with the engine's miss the body came within %.3f of the brick", closest))
+		assert(landed ~= nil and math.abs(m2.pos.Y - (-89.69)) < 0.05, string.format("the let-down ended at (%.2f, %.2f, %.2f), not on the soil", m2.pos.X, m2.pos.Y, m2.pos.Z))
+		print(string.format("  the let-down past the wall: skin %.3f from Studio's place, %.3f with the engine's miss, on the soil after %.1f s", skin, closest, (landed :: number) / 60))
+	end)
+	slop.value = 0
+	folder:Destroy()
+	if not ok then error(err, 0) end
+end)
 print(`BOXWORLD passed={passed} failed={failed}`)
 if failed > 0 then error("box-world scenarios failed") end

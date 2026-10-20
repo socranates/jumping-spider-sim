@@ -28,6 +28,19 @@
 --                 east; the west is the same and the map lists one line per pair, as it always has). Added somewhere new, so WorldMap.REVISION stays: nothing moved
 --                 but the house_wall's spawn, which stood on the east shoulder's top where the east jamb now stands (a spawn is only where a rest from another
 --                 revision goes back to, and nothing can rest on the wall). No retreat and no prey yet.
+-- ROBLOX-107 (docs/WORLD_MAP_PLAN.md regions 5 and 6): the back wall west of the window with its drainpipe, and the bushes beside the bed. Added somewhere new, so
+-- WorldMap.REVISION stays: no box of any region before moved.
+--   wall_west ....... the back wall west of the house_wall, face z -24, x -120..-40, from the lawn to y 0, and the drainpipe's foot: a column standing on the litter
+--                     1.2 studs off the brick at x -50, joined to the wall by brackets. It meets the house_wall where the brick goes on west (x -40), the wall above it
+--                     at y 0, and the bushes' litter at its foot. The house's pace (1.0), no retreat.
+--   wall_west_upper . the same wall from y 0 to the eaves, the drainpipe's top with its swan neck and outlet into the gutter, and the eaves, fascia, gutter and eave
+--                     course on west of wall_upper's: the second way up to the gutter. (Split from wall_west at y 0, as house_wall and wall_upper are: one region
+--                     from the lawn to the eaves would not be whole inside the streaming target radius from its foot.)
+--   shrub_west_a..j . the bushes beside the bed (box and privet, 44 to 54 studs tall), on a mat of deep leaf litter whose top is the bed's soil's (y -90), from the
+--                     bed's west edge and the house's wall out to x -500 and z -200, in ten chunks of 95 by 88, five columns westward each split at z -112 (each chunk
+--                     whole inside the target radius from anywhere on it, and well under the 60 boxes a graph may carry). Each has two bushes whose twigs are walkable
+--                     boxes and a retreat under the first: the gap under a curled dead leaf lying on two twigs in the litter. The garden's pace (0.33). The view's
+--                     drawn bushes that stood in the strip moved out of it (Data/Flora).
 local Layout = require(script.Parent.Parent.Habitat.WindowsillLayout)
 
 local WorldMap = {}
@@ -94,13 +107,78 @@ local SEAM_SASH = { a = v(-8, 0, -13.5), b = v(8, 0, -13.5) } -- the rail's oute
 local SEAM_STONE = { a = v(-30, -3, -24), b = v(30, -3, -24) } -- the stone's front face goes on down as brick
 local SEAM_FOOT = { a = v(-25, -90, -24), b = v(25, -90, -24) } -- the wall's foot meets the soil
 local SEAM_JAMB = { a = v(31, 0, -24), b = v(40, 0, -24) } -- (ROBLOX-103) the east shoulder's face goes on up as the east jamb's
+-- (ROBLOX-107) the back wall west of the window and the bushes beside the bed
+local SEAM_WEST = { a = v(-40, -90, -24), b = v(-40, 0, -24) } -- the house_wall's brick goes on west as wall_west's
+local SEAM_WEST_UP = { a = v(-40, 0, -24), b = v(-40, 60, -24) } -- the wall above the window's brick (and its west jamb) goes on west as wall_west_upper's. (Only to
+-- y 60: the faces meet all the way to the eaves, but a line 110 long cannot have its far end's boxes inside the radius always sent from its near end; above y 60 the
+-- rest of wall_upper is inside the target radius, tests/worldmap.luau's streaming case)
+local SEAM_WEST_RISE = { a = v(-120, 0, -24), b = v(-40, 0, -24) } -- wall_west's brick goes on up as wall_west_upper's
+local SEAM_WEST_FOOT = { a = v(-120, -90, -24), b = v(-40, -90, -24) } -- wall_west's foot meets the litter
+local SEAM_HOUSE_LITTER = { a = v(-40, -90, -24), b = v(-25, -90, -24) } -- the house_wall's foot west of the bed meets the litter
+local SEAM_BED_LITTER = { a = v(-25, -90, -24), b = v(-25, -90, -74) } -- the bed's west edge meets the litter, flat
 local function seam(id: string, line: { a: Vector3, b: Vector3 }): Neighbor
 	return table.freeze({ id = id, a = line.a, b = line.b })
 end
 
+-- (ROBLOX-107) The bushes' chunks: the strip beside the bed from x -25 to -500 and z -24 to -200 on the litter (top y -90), five columns of 95 studs from the bed
+-- westward, each split at z -112 into a chunk by the house (north, toward it) and one by the lawn: `a` and `b` the first column's, `c` and `d` the next, to `i` and `j`.
+-- Each chunk's retreat (the gap under a curled dead leaf, `rx`, `rz` its middle) lies under its first bush, toward one corner so the second bush has room in the
+-- other (by the house: 27 studs in from its west side; by the lawn: 27 in from its east side; in alternate columns nearer or farther from the house).
+-- World/Garden builds the leaf and the bushes round it.
+local SHRUB_W, SHRUB_SPLIT = 95, -112
+local SHRUB_IDS = { "a", "b", "c", "d", "e", "f", "g", "h", "i", "j" }
+local chunks = {}
+for col = 0, 4 do
+	local x1 = -25 - SHRUB_W * col
+	local x0 = x1 - SHRUB_W
+	local odd = col % 2 == 1
+	table.insert(chunks, table.freeze({ id = "shrub_west_" .. SHRUB_IDS[col * 2 + 1], col = col, row = 0, x0 = x0, x1 = x1, z0 = SHRUB_SPLIT, z1 = -24,
+		rx = x0 + 27, rz = if odd then -55 else -86 }))
+	table.insert(chunks, table.freeze({ id = "shrub_west_" .. SHRUB_IDS[col * 2 + 2], col = col, row = 1, x0 = x0, x1 = x1, z0 = -200, z1 = SHRUB_SPLIT,
+		rx = x1 - 27, rz = if odd then -173 else -140 }))
+end
+WorldMap.SHRUB_CHUNKS = table.freeze(chunks)
+WorldMap.LITTER_TOP = -90 -- the litter's top under the bushes, the bed's soil's
+-- A chunk's seams: to the chunk across the split (the litter flat along z -112) and to those either side (flat along its west or east edge); the first column's
+-- by the house also meets the bed's west edge, the house_wall's foot west of the bed and wall_west's foot.
+local function shrubSeams(c: any): { Neighbor }
+	local top = WorldMap.LITTER_TOP
+	local out: { Neighbor } = {}
+	if c.col == 0 and c.row == 0 then
+		table.insert(out, seam("bed_a", SEAM_BED_LITTER))
+		table.insert(out, seam("house_wall", SEAM_HOUSE_LITTER))
+		table.insert(out, seam("wall_west", SEAM_WEST_FOOT))
+	end
+	for _, o in WorldMap.SHRUB_CHUNKS do
+		if o.col == c.col and o.row ~= c.row then
+			table.insert(out, seam(o.id, { a = v(c.x0, top, SHRUB_SPLIT), b = v(c.x1, top, SHRUB_SPLIT) }))
+		elseif o.row == c.row and math.abs(o.col - c.col) == 1 then
+			local x = if o.col > c.col then c.x0 else c.x1
+			table.insert(out, seam(o.id, { a = v(x, top, c.z0), b = v(x, top, c.z1) }))
+		end
+	end
+	return out
+end
+local function shrubChunk(worldSeed: number, c: any): Region
+	local top = WorldMap.LITTER_TOP
+	local neighbors = shrubSeams(c)
+	-- the gap under the dead leaf: as the bed's stone's, 4.8 by 1.4 by 5.2, its mouth toward the house
+	local min, max = v(c.rx - 2.4, top, c.rz - 2.6), v(c.rx + 2.4, top + 1.4, c.rz + 2.6)
+	return freeze({
+		id = c.id, kind = "shrub", origin = v((c.x0 + c.x1) / 2, top, (c.z0 + c.z1) / 2),
+		bounds = { v(c.x0, -93, c.z0), v(c.x1, -10, c.z1) },
+		seed = WorldMap.seed(worldSeed, c.id),
+		neighbors = neighbors,
+		retreats = { { id = c.id .. "_litter", min = min, max = max, door = v(c.rx, top + 0.5, max.Z + 0.9) } },
+		spawn = { pos = v(c.rx, top, max.Z + 3.9), heading = v(0, 0, -1) }, -- in front of the leaf, facing its way in
+		clockScale = 0.33,
+	})
+end
+
 -- The authored regions, for a world seed (only each region's `seed` depends on it), in priority order.
 local function author(worldSeed: number): { Region }
-	return {
+	local C = WorldMap.SHRUB_CHUNKS
+	local list: { Region } = {
 		freeze({
 			id = "sill", kind = "sill", origin = Vector3.zero,
 			bounds = { Layout.PLAY_BOUNDS_MIN, Layout.PLAY_BOUNDS_MAX },
@@ -123,7 +201,7 @@ local function author(worldSeed: number): { Region }
 			id = "house_wall", kind = "house_wall", origin = v(0, -45, -24),
 			bounds = { v(-42, -89, -30), v(42, 35, -13.5) },
 			seed = WorldMap.seed(worldSeed, "house_wall"),
-			neighbors = { seam("outer_sill", SEAM_STONE), seam("bed_a", SEAM_FOOT), seam("wall_upper", SEAM_JAMB) },
+			neighbors = { seam("outer_sill", SEAM_STONE), seam("bed_a", SEAM_FOOT), seam("wall_upper", SEAM_JAMB), seam("wall_west", SEAM_WEST), seam("shrub_west_a", SEAM_HOUSE_LITTER) },
 			retreats = {},
 			-- on the face of the east shoulder, heading up (ROBLOX-103: it was the shoulder's top, x 35, y 0, z -18.75, where the window's east jamb stands now)
 			spawn = { pos = v(35, -1.5, -24), heading = v(0, 1, 0) },
@@ -133,7 +211,7 @@ local function author(worldSeed: number): { Region }
 			id = "bed_a", kind = "bed", origin = v(0, -90, -49),
 			bounds = { v(-42, -93, -76), v(42, 35, -24) },
 			seed = WorldMap.seed(worldSeed, "bed_a"),
-			neighbors = { seam("house_wall", SEAM_FOOT) },
+			neighbors = { seam("house_wall", SEAM_FOOT), seam("shrub_west_a", SEAM_BED_LITTER) },
 			-- the gap under the stone, raised on two rests (World/Garden builds the stone round it): the first garden home
 			retreats = { { id = "bed_a_stone", min = v(8.6, -90, -52.6), max = v(13.4, -88.6, -47.4), door = v(11, -89.5, -46.5) } }, -- (the door: in front of the gap's mouth)
 			spawn = { pos = v(11, -90, -43.5), heading = v(0, 0, -1) }, -- in front of the stone, facing its way in
@@ -143,12 +221,32 @@ local function author(worldSeed: number): { Region }
 			id = "wall_upper", kind = "wall_upper", origin = v(0, 60, -24),
 			bounds = { v(-42, 0, -70), v(42, 130, -13.5) },
 			seed = WorldMap.seed(worldSeed, "wall_upper"),
-			neighbors = { seam("house_wall", SEAM_JAMB) },
+			neighbors = { seam("house_wall", SEAM_JAMB), seam("wall_west_upper", SEAM_WEST_UP) },
 			retreats = {},
 			spawn = { pos = v(0, 109, -61), heading = v(1, 0, 0) }, -- on the gutter's floor, along it
 			clockScale = 1.0,
 		}),
+		freeze({
+			id = "wall_west", kind = "wall_west", origin = v(-80, -45, -24),
+			bounds = { v(-122, -89, -34), v(-40, 0, -13.5) }, -- its face and the drainpipe's foot, ten studs of air in front, down to y -89 (standing on the litter is the bushes')
+			seed = WorldMap.seed(worldSeed, "wall_west"),
+			neighbors = { seam("house_wall", SEAM_WEST), seam("wall_west_upper", SEAM_WEST_RISE), seam("shrub_west_a", SEAM_WEST_FOOT) },
+			retreats = {},
+			spawn = { pos = v(-80, -45, -24), heading = v(0, 1, 0) }, -- on the brick, heading up
+			clockScale = 1.0,
+		}),
+		freeze({
+			id = "wall_west_upper", kind = "wall_west_upper", origin = v(-80, 60, -24),
+			bounds = { v(-122, 0, -70), v(-40, 130, -13.5) },
+			seed = WorldMap.seed(worldSeed, "wall_west_upper"),
+			neighbors = { seam("wall_upper", SEAM_WEST_UP), seam("wall_west", SEAM_WEST_RISE) },
+			retreats = {},
+			spawn = { pos = v(-80, 109, -61), heading = v(-1, 0, 0) }, -- on its gutter's floor, along it
+			clockScale = 1.0,
+		}),
 	}
+	for _, c in C do table.insert(list, shrubChunk(worldSeed, c)) end
+	return list
 end
 
 local DEFAULT: { Region } = table.freeze(author(WorldMap.SEED))

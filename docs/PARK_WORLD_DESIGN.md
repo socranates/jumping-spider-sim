@@ -163,3 +163,16 @@ the Steam edition (the canal, the apartment balconies and window boxes, a roofto
 3. Should the ranger hut be the start for every life, or only the first (later lives start where the ballooning lands)?
 4. The cat and the game room were for the house. In the preserve, the hut could have a cat (the ranger's), and the "game room" could be the
    hut's back room (a volunteers' room with a sofa, a games console, board games). Keep them that way?
+
+## 10. Decided (Nathan, 2026-10-20: "I trust your judgements")
+
+1. **An American preserve.** The first spider, *Phidippus audax*, is native to North America, so the preserve is an American city's: split-rail
+   and chain-link fences, a stone retaining wall in place of the English dry stone wall (zone 7 stays a sunny stone wall), a bur oak as the
+   veteran tree, maples and a black cherry at the woodland edge, milkweed, goldenrod, coneflower and big bluestem in the meadow, cattails in the
+   pond, a cardinal and a robin at the feeder. Every species page is sourced for North America.
+2. **100 × 60 m**, as designed; only the home ranges are built at full detail, so the size costs nothing until a zone is built.
+3. **The first life starts in the ranger hut.** Later lives start where the spiderlings land (the ballooning choice); a "return to the hut"
+   start stays available from the menu.
+4. **The cat and the game room live in the hut**: the ranger's cat (the hut's danger, heard by its collar bell first) and a volunteers' back
+   room with a sofa, a games console and board games, built in Phase B with the hut.
+5. Lock-on moves to **L2** on controllers (Nathan, 2026-10-20), in Phase A's first round.

@@ -117,6 +117,8 @@ local M = {
 	-- ROBLOX-110: the lock and the sidestep (Movement/LockOn): what the spider has locked onto from its own memory, the distance it keeps, the place it follows; here for the same reason.
 	LockOn = require(Shared.Movement.LockOn),
 	lock = (nil :: any),
+	-- ROBLOX-111: the frame timed by part for the self-test (Client/FrameProfile; off unless the self-test turns it on: a lap is then one call that returns); here for the same reason.
+	Prof = require(script.Parent.FrameProfile),
 }
 M.lock = M.LockOn.new()
 local focusState = FocusState.new()
@@ -1539,6 +1541,7 @@ local function updateHud(frameDt: number)
 	controls:setTouchLabel("Cancel", ControlText.touchCancelLabel(onLine))
 	controls:setTouchVisible("Jump", not onLine)
 	controls:setTouchVisible("Creep", not onLine)
+	M.Prof.lap("hud")
 	do -- the Lock button (ROBLOX-110): only while something can be locked, or a lock holds
 		local o = motor:observer()
 		local origin, dir = cam:aimRay()
@@ -1546,6 +1549,7 @@ local function updateHud(frameDt: number)
 		controls:setTouchVisible("Lock", held or (motor.mode == "attached" and M.LockOn.pick(memory, o.eye, o.heading, origin, dir) ~= nil))
 		controls:setTouchLabel("Lock", ControlText.touchLockLabel(held))
 	end
+	M.Prof.lap("lock button")
 	-- The peacock spider's buttons: Change in the crack, Dance on the open sill (the peacock spider only).
 	controls:setTouchVisible("Choose", canChange())
 	controls:setTouchVisible("Display", displayKind ~= nil and not onLine and not life.resting and motor.mode == "attached")
@@ -1561,12 +1565,15 @@ end
 -- ---------------------------------------------------------------- the frame
 local accumulator = 0
 RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, function(frameDt: number)
+	M.Prof.begin() -- (ROBLOX-111: the frame timed by part, for the self-test; each M.Prof.lap below charges the time since the last to its part)
 	saveState.frame()
 	spiderPick.update(frameDt) -- (the choose hold's clock and the close look's reasons to end)
+	M.Prof.lap("save")
 	M.World:update(motor.pos, rig.root) -- (ROBLOX-94: the region the spider is in, the pace of its day, the streaming focus on the drawn spider)
 	if panel:isShowing() then panel:update(frameDt) end
 	if nbPanel:isShowing() then nbPanel:update(frameDt) end
 	if settingsPanel:isShowing() then settingsPanel:update(frameDt) end
+	M.Prof.lap("panels")
 	if GuiService.MenuIsOpen or modal() then
 		accumulator = 0 -- the Roblox menu is Godot's pause (so is the catch screen): the world waits
 	else
@@ -1575,6 +1582,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 		local origin, dir = cam:aimRay()
 		if M.lock.point and (M.lock.point - origin).Magnitude > 1e-3 then dir = (M.lock.point - origin).Unit end -- (ROBLOX-110: the aim snaps to the locked thing)
 		motor:setAimRay(origin, dir)
+		M.Prof.lap("frame")
 		while accumulator >= DT do
 			accumulator -= DT
 			local percepts = M.World.prey:percepts() -- (ROBLOX-96: the active regions' flies; ROBLOX-105: the woodlice and the ambient bugs are not shown to the senses)
@@ -1591,15 +1599,20 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			end
 			local waspPercept = wasp:percept() -- movement to the spider's senses, never prey
 			if waspPercept then table.insert(percepts, waspPercept) end
+			M.Prof.lap("percepts")
 			sensor:step(DT,motor:observer(),percepts,sightCast)
+			M.Prof.lap("senses")
 			M.LockOn.update(M.lock, memory, motor.pos) -- (ROBLOX-110: the lock follows the memory, and ends when it forgets)
+			M.Prof.lap("lock")
 			M.World.prey:before(DT,motor.pos,motor:observer(),sensor,sightCast,camera,life.clock.hour) -- (ROBLOX-101: the moths and crane flies fly from dusk)
+			M.Prof.lap("prey")
 			if life.growth:isMoulting() then jump:drop(motor);motor:cancelWalk() else jump:step(motor) end
 			if breakaway:step(DT,if jump.last and jump.last.tick==jump.tick then jump.last else nil,motor.pos,setting("ReducedMotion")==true) then
     motor.planKey="";hud:toast("The dry leaf tip gave way. Your dragline catches the miss.",false)
    end
 			local input = tickInput()
 			motor:tick(input)
+			M.Prof.lap("motor")
 			-- ROBLOX-106: moving costs energy (NeedsModel.move pays nothing in the gentle modes) and, in Normal, a leaf overhead and stillness hide the spider (Life/Nature).
 			do
 				local onLine = motor:onLine()
@@ -1608,6 +1621,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 				local walking = motor.mode == "attached" and motor.moving == true
 				M.nature.cover = if needs.gentle then nil else M.Nature.cover(M.Nature.overhead(motor.pos, M.nature.ray), not walking and motor.vel.Magnitude < 0.15)
 			end
+			M.Prof.lap("nature")
 			-- The wasp runs after the spider has moved and before feeding (Godot: physics priority 8).
 			wasp.enabled = not testPlace or Workspace:GetAttribute("Wasp") == true
             wasp:useGameRules()
@@ -1649,12 +1663,14 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			end
 			if wasp.rivalHeldAt and life.rival.state == "taken" then life.rival.position = wasp.rivalHeldAt end
 			if wasp.heldAt then motor:hold(wasp.heldAt) end
+			M.Prof.lap("wasp")
 			prey.feeding.auto = setting("AutomaticGrip") == true or mateLegs.couple.active -- (a meal in the legs is held for a player whose hands are the scene's: ROBLOX-89)
 			if life.growth.gameRules ~= true then life.growth:useGameRules(needs.gentle) end -- (a family that carries on has a new growth)
 			if prey.feeding.game ~= true then prey.feeding:useGameRules() end -- (a record restored from before the flag has none: the game's struggle again)
 			local takenBefore = prey.feeding.taken
 			M.World.prey:after(DT,motor,sensor,sightCast)
 			if M.World.prey.event ~= nil then hud:setNote(M.PreyText.note(M.World.prey.event) or "",M.PreyText.SECONDS);M.World.prey.event=nil end -- (ROBLOX-101: a slip, a shed leg)
+			M.Prof.lap("prey")
 			-- Five houseflies or ten small prey (ROBLOX-88; Godot's three and six are Growth's defaults); credit food, not just spare energy capacity.
 			life.mealFood = (life.mealFood or 0) + Growth.rivalCredit(prey.feeding.taken-takenBefore)
             local rivalState={
@@ -1696,6 +1712,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
              life:showNotice(rivalLegs.Text.counter(needs.gentle))
             elseif rivalEvent=="eaten" then prey.feeding.mealsFinished+=1
             elseif rivalEvent=="touch" then life:showNotice("The rival touched you. You are safe in this mode.") end
+            M.Prof.lap("rival")
             -- The mating cycle (ROBLOX-80): the mate and the courtship meter, the sac and the guard days, by the same snapshot of the spider the rival has.
             do
              local ms=mateLegs.state
@@ -1718,6 +1735,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
              -- A record restored into the hatching (or a brood out while nothing is playing) goes straight to the ending.
              if life.mating~=nil and life.mating.stage=="hatched" and mateLegs.phase=="" and not panel:isShowing() then mateLegs.begin(false) end
             end
+			M.Prof.lap("mating")
 			-- The life loop runs last in the tick (Godot's habitat loop, priority 12); the reach it sets is the next tick's.
 			local holding = prey.feeding.held ~= nil or (life.rival~=nil and life.rival.state=="captured")
 			lifeSpider = {
@@ -1759,7 +1777,9 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
             if modal() then accumulator=0;break end
 			if motor.mode ~= "attached" then focusState:clear() end
 			if stage then stage.target:step(DT); stage.marker.Position = stage.target.position end
+			M.Prof.lap("life")
 			cam:tick(DT)
+			M.Prof.lap("camera")
 		end
 	end
 	-- The light of the hour (DayLight; the eyes' reach comes from the clock, not from this). The daytime sun is the one the
@@ -1772,6 +1792,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	end
 	-- The morning dew follows the hour, not the daylight (ROBLOX-74): it is drawn from the clock and keeps its last level on its own folder.
 	M.DayLight.applyDew(Workspace:FindFirstChild("Decor"), life.clock.hour)
+	M.Prof.lap("light")
 	-- Drawn frame: the up vector eases so walls and edges do not snap.
 	local simFrame = frameDt * (if slow then SLOW_SPEED else 1)
 	drawnUp = drawnUp:Lerp(motor.up, 1 - math.exp(-24 * simFrame)).Unit
@@ -1838,8 +1859,10 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
  local recentJump=jump.last
  rig.jumpPush=if not motor.seized and motor.mode=="air" and recentJump and recentJump.kind=="launched" then math.clamp(1-(jump.tick-recentJump.tick)/8,0,1) else 0
  local paused=GuiService.MenuIsOpen or modal()
+ M.Prof.lap("poses")
  rig:update(body, if paused then 0 else simFrame, motor.mode == "attached", motor.moving)
  skins:draw(life.growth.exuviae)
+ M.Prof.lap("spider rig")
  if not paused then watch:frame(simFrame,cam.eyeView,eyes.moversShown) end
     local rival=life.rival
     if rival and rival.state~="dormant" and rival.state~="consumed" then
@@ -1854,10 +1877,16 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
     mateLegs.stage:drawMate(life.mate,appearance,if paused then 0 else simFrame,setting("ReducedMotion")==true,mateLegs.couple.focus,mateLegs.couple.turn,camera.CFrame.Position)
     mateLegs.stage:drawSac(mateLegs.Mating.hasSac(life.mating))
     if mateLegs.phase=="scene" and not paused and not mateLegs.stage:step(simFrame,setting("ReducedMotion")==true) then mateLegs.showCard(false) end
+	M.Prof.lap("other rigs")
 	updateHud(frameDt)
+	M.Prof.lap("hud")
 	-- (ROBLOX-103: the bodies step, sway and beat by the prey's clock; far ones ten times a second; Reduced Motion stills all but the steps)
 	flyBodies:draw(M.World.prey:flies(),M.World.prey.clock,camera.CFrame.Position,setting("ReducedMotion")==true)
+	M.Prof.lap("fly bodies")
+	M.Prof.count("fly parts placed", flyBodies.moved or 0)
 	M.World.bugs:draw(M.World.prey:crawlers(),M.World.prey.clock,camera.CFrame.Position,setting("ReducedMotion")==true)
+	M.Prof.lap("bug bodies")
+	M.Prof.count("bug parts placed", M.World.bugs.moved or 0)
 	local soundPaused = GuiService.MenuIsOpen or modal()
 	local soundSpeed = if slow then SLOW_SPEED else 1
 	local soundMuted = setting("SoundMuted") == true
@@ -1866,6 +1895,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	soundscape:update(frameDt, M.World.prey.view, life.daylight, soundPaused, soundSpeed, soundMuted)
 	soundscape:updateWasp(wasp, soundPaused, soundSpeed, soundMuted)
 	waspBody:draw(wasp.wasp, prey.now)
+	M.Prof.lap("sound")
 	local silk = motor.silk
 	local live, bend = liveLine, bendLine
 	if live and bend and silk.mode ~= "none" then
@@ -1887,6 +1917,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 		end
 	end
 	-- The camera's settings (ROBLOX-49), read each frame so a change in the panel shows at once.
+	M.Prof.lap("lines")
 	camSettings.mouse, camSettings.stick, camSettings.touch = setting("LookSensitivityMouse"), setting("LookSensitivityStick"), setting("LookSensitivityTouch")
 	camSettings.invertX, camSettings.invertY = setting("InvertX"), setting("InvertY")
 	camSettings.fov, camSettings.distance, camSettings.framing = setting("FieldOfView"), setting("CameraDistance"), setting("FrameLine")
@@ -1907,13 +1938,17 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	-- The Focus that feeds the perception HUD also decides how far the principal eyes are in use (the eye view's picture). The
 	-- picture sets the field of view, so it comes before the HUD projects anything.
 	local focusing = motor.mode == "attached" and (controls.held.Focus == true or focusActive())
+	M.Prof.lap("camera")
 	eyes:update(frameDt, focusing)
+	M.Prof.lap("eyes")
 	perceptionHud:draw(memory,camera,sightCast,focusing,setting("ShowLastSeen") == true,setting("ShowNoticed") ~= false,M.lock.point)
+	M.Prof.lap("perception hud")
 	-- Depth of field: on the spider in third person; in the eye view SpiderEyes owns it and focuses on what is looked at.
 	local dof = Lighting:FindFirstChild("MacroDOF")
 	if not cam.eyeView and dof and dof:IsA("DepthOfFieldEffect") then
 		dof.FocusDistance = (camera.CFrame.Position - motor.pos).Magnitude
 	end
+	M.Prof.finish()
 end)
 
 -- The test-place-only module exercises this controller in Studio. Absent from the playable build. Its hooks are also the live place's self-test's (ROBLOX-104, below).
@@ -1946,6 +1981,7 @@ M.hooks = function(): any
 			title = M.title, -- (ROBLOX-109: the title card and the intro, for the self-test's intro check)
 			lock = M.lock, lockOn = M.LockOn, -- (ROBLOX-110: the lock's state and its rules)
 			nature = M.nature, -- (ROBLOX-106: nature's rules this tick: the cover factor, the night's passes)
+			prof = M.Prof, -- (ROBLOX-111: the frame timed by part, for the self-test's frame samples)
 	}
 end
 local playback = script.Parent:FindFirstChild("SilkPlayback")

@@ -16,9 +16,12 @@
 -- sill's front edge at about 0.75 studs a second, on the line all the way; the sill's flies, the bed's gnats, aphids, springtails and leafhoppers and the wall's moths made
 -- and drawn under the fly's part budget; the lock (ROBLOX-110: Recentre locks onto a fly the spider sees, the body turns to it, the sidestep, and lets go); the woodlice made and drawn; the notebook opened and closed; the clock put to dusk and the moths flying; a rest in the crack,
 -- its checkpoint kept and returned to; the music playing and the room tone silent; the frame time over five seconds on the sill and in the bed; the parts in the workspace.
+-- ROBLOX-111: it is also the frame's profiler. Each frame sample prints the client's render step timed by part (Client/FrameProfile), the engine's memory and part
+-- counts and a census of what is drawn; the bed is sampled again once its looks are made, then without the looks and without shadows; the let-down is profiled,
+-- prints what the line did (SilkController's counts) and is judged in the game's time.
 -- Each Studio process writes its own log (%LOCALAPPDATA%\Roblox\logs); tools/studio/selftest.ps1 reads the newest for these lines.
 -- The CLI suite tests/selftest.luau runs the same checks against the real client on the shim's box world, with a host of its own (simulated frames and clock), so the run is
--- proven to complete and print END before it ever reaches Studio. Nothing here has been run in Studio yet.
+-- proven to complete and print END before it ever reaches Studio. First run in Studio at v36 (33 of 34; the line failed, ROBLOX-111); ROBLOX-111's additions not yet.
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
@@ -44,6 +47,9 @@ SelfTest.LOWER_BAND = { 0.6, 0.9 }
 -- How long the frame time is sampled in each place, and how long the dusk's moths are given to take wing.
 SelfTest.SAMPLE_S = 5
 SelfTest.DUSK_WAIT = 30
+-- ROBLOX-111: how long the looks near the bed are given to be made, and each of the bed's two comparisons (the looks out, the shadows off) is sampled.
+SelfTest.SETTLE_WAIT = 20
+SelfTest.AB_S = 3
 -- Places on the map the checks use (the motor's body centre, Motor.HEIGHT above the support): the open sill floor, the crack, the outer sill's front edge and the bed's soil.
 SelfTest.SILL = Vector3.new(-5, 0.31, -9)
 SelfTest.CRACK = Vector3.new(-25.5, 0.31, 6)
@@ -74,7 +80,7 @@ local function engineHost(): Host
 end
 
 -- ---------------------------------------------------------------- the run's state and its words
-type Run = { ctx: any, host: Host, pass: number, fail: number, skip: number, doing: string, began: number, beat: number }
+type Run = { ctx: any, host: Host, pass: number, fail: number, skip: number, doing: string, began: number, beat: number, bedAt: number?, bedSettled: number? }
 
 local function say(r: Run, text: string)
 	r.host.print(SelfTest.PREFIX .. " " .. text)
@@ -187,7 +193,7 @@ local function drawn(r: Run, flies: { any }, what: string): number
 	return n
 end
 
-local function frameSample(r: Run, seconds: number): string
+local function rawSample(r: Run, seconds: number): string
 	if r.host.sample ~= nil then return (r.host.sample :: any)(seconds) end
 	local dts: { number } = {}
 	local conn = RunService.RenderStepped:Connect(function(dt: number) table.insert(dts, dt) end)
@@ -199,6 +205,68 @@ local function frameSample(r: Run, seconds: number): string
 	local mean = if #dts > 0 then sum / #dts else 0
 	return string.format("%d frames, mean %.1f ms (%.0f fps), worst %.1f ms, physics %.0f fps",
 		#dts, mean * 1000, if mean > 0 then 1 / mean else 0, worst * 1000, (Workspace :: any):GetRealPhysicsFPS())
+end
+
+-- ROBLOX-111: what the engine says of itself, each in its own pcall (a name the engine does not have is "?"): the client's memory (MB), the Lua heap (MB), the
+-- instances, the physics primitives and the moving ones, and the parts awake in the physics.
+local function engineLine(): string
+	local function ask(fn: () -> any): string
+		local ok, v = pcall(fn)
+		if not ok or v == nil then return "?" end
+		if type(v) == "number" then return if v == math.floor(v) then string.format("%d", v) else string.format("%.1f", v) end
+		return tostring(v)
+	end
+	local stats: any = nil
+	pcall(function() stats = (game :: any):GetService("Stats") end)
+	return string.format("memory %s MB, Lua heap %s MB, instances %s, primitives %s (moving %s), awake parts %s",
+		ask(function() return stats:GetTotalMemoryUsageMb() end), ask(function() return (gcinfo() :: number) / 1024 end),
+		ask(function() return stats.InstanceCount end), ask(function() return stats.PrimitivesCount end), ask(function() return stats.MovingPrimitivesCount end),
+		ask(function() return (Workspace :: any):GetNumAwakeParts() end))
+end
+
+-- ROBLOX-111: what the renderer is given, by top-level child of the workspace: parts, and among them the see-through (Transparency between 0 and 1), the
+-- shadow-casting and the meshed (a SpecialMesh: the ellipsoids); the folders with fewer than 20 parts summed as "the rest".
+local function census(): string
+	local rows: { string } = {}
+	local all = { parts = 0, clear = 0, shadow = 0, mesh = 0 }
+	local rest = { parts = 0, clear = 0, shadow = 0, mesh = 0 }
+	for _, child in Workspace:GetChildren() do
+		local c = { parts = 0, clear = 0, shadow = 0, mesh = 0 }
+		local list = child:GetDescendants()
+		table.insert(list, child)
+		for _, d in list do
+			if d:IsA("BasePart") then
+				c.parts += 1
+				local t = (d :: BasePart).Transparency
+				if t > 0 and t < 1 then c.clear += 1 end
+				if (d :: BasePart).CastShadow and t < 1 then c.shadow += 1 end
+			elseif d:IsA("SpecialMesh") then
+				c.mesh += 1
+			end
+		end
+		for k, v in c do all[k] += v end
+		if c.parts >= 20 then
+			table.insert(rows, `{child.Name} {c.parts}/{c.clear}/{c.shadow}/{c.mesh}`)
+		else
+			for k, v in c do rest[k] += v end
+		end
+	end
+	table.sort(rows)
+	if rest.parts > 0 then table.insert(rows, `the rest {rest.parts}/{rest.clear}/{rest.shadow}/{rest.mesh}`) end
+	return `{all.parts} parts, {all.clear} see-through, {all.shadow} casting shadows, {all.mesh} meshed (parts/see-through/shadow/meshed: {table.concat(rows, ", ")})`
+end
+
+-- The frame time over `seconds`, with the client's frame profiled by part (Client/FrameProfile, when the hooks carry it) and the engine's own numbers: three INFO
+-- lines, `<what>`, `profile <where>` and `engine <where>`. The profile is off again after, whatever happens.
+local function frameSample(r: Run, seconds: number, what: string, where: string)
+	local prof = r.ctx.prof
+	if prof ~= nil then prof.start() end
+	local ok, line = pcall(rawSample, r, seconds)
+	if prof ~= nil then prof.stop() end
+	if not ok then error(line, 0) end
+	say(r, `INFO {what}: {line}`)
+	if prof ~= nil then say(r, `INFO profile {where}: {prof.line()}`) end
+	say(r, `INFO engine {where}: {engineLine()}`)
 end
 
 -- ---------------------------------------------------------------- the checks
@@ -305,15 +373,32 @@ local function checks(): { Check }
 			pause(r, 1.0) -- (the line's first slack is paid out at once: measured after it)
 			need(motor:onLine(), "off the line a second after the drop")
 			local y0, t0, x0 = motor.pos.Y, r.host.clock(), motor.pos.X
+			local before = table.clone(motor.silk.stats) -- (ROBLOX-111: what the line does over the measure, SilkController's counts)
+			local prof = ctx.prof
+			if prof ~= nil then prof.start() end -- (and the frame by part while it lets down: the looks are planned again as it goes down)
 			local deadline = t0 + 6
-			while r.host.clock() < deadline do
-				pause(r, 0.25)
-				need(motor:onLine(), string.format("left the line %.1f s into the let-down, at %s", r.host.clock() - t0, fmt(motor.pos)))
-				need(math.abs(motor.pos.X - x0) < 1.0, string.format("swung %.2f studs off the line's fall", math.abs(motor.pos.X - x0)))
-			end
-			local rate = (y0 - motor.pos.Y) / (r.host.clock() - t0)
-			say(r, string.format("INFO line: let down at %.3f studs a second (the game's %.2f)", rate, SelfTest.LOWER))
-			need(rate > SelfTest.LOWER_BAND[1] and rate < SelfTest.LOWER_BAND[2], string.format("let down at %.3f studs a second, not about %.2f", rate, SelfTest.LOWER))
+			local okLine, errLine = pcall(function()
+				while r.host.clock() < deadline do
+					pause(r, 0.25)
+					need(motor:onLine(), string.format("left the line %.1f s into the let-down, at %s", r.host.clock() - t0, fmt(motor.pos)))
+					need(math.abs(motor.pos.X - x0) < 1.0, string.format("swung %.2f studs off the line's fall", math.abs(motor.pos.X - x0)))
+				end
+			end)
+			if prof ~= nil then prof.stop(); say(r, "INFO profile on the line: " .. prof.line()) end
+			if not okLine then error(errLine, 0) end
+			local wall = r.host.clock() - t0
+			local fell = y0 - motor.pos.Y
+			local st = motor.silk.stats
+			local d: { [string]: number } = {}
+			for k, v in st do d[k] = v - (before[k] or 0) end
+			-- The game's time is the ticks the line ran (1/60 s each); the clock's is the wall's. They differ when the client ran fewer ticks than the frames' time
+			-- (a frame over a quarter of a second, a menu, slow motion). The let-down is judged in the game's time: that is the dial (SilkController.game).
+			local game = d.ticks / 60
+			local rate = if game > 0 then fell / game else 0
+			say(r, string.format("INFO line: let down at %.3f studs a second of the game's time (the game's %.2f), %.3f by the clock", rate, SelfTest.LOWER, fell / wall))
+			say(r, string.format("INFO line ticks: %d ticks (%.2f s of the game) in %.2f s by the clock; line let out %.3f, the body fell %.3f (%.1f%% of it); sweeps stopped the body %d times (%.3f taken off), %d tangent touches let pass, %d push-outs (%.3f out, %.3f of it up)",
+				d.ticks, game, wall, d.letOut, d.fell, if d.letOut > 0 then d.fell / d.letOut * 100 else 0, d.stops, d.stopped, d.grazes, d.pushes, d.pushed, if math.abs(d.pushedUp) < 5e-4 then 0 else d.pushedUp))
+			need(rate > SelfTest.LOWER_BAND[1] and rate < SelfTest.LOWER_BAND[2], string.format("let down at %.3f studs a second of the game's time, not about %.2f", rate, SelfTest.LOWER))
 		end)
 		ctx.input:simulate("Drop", false)
 		if not ok then error(err, 0) end
@@ -387,7 +472,13 @@ local function checks(): { Check }
 		local ctx = r.ctx
 		need(holdUntilReady(r, "bed_a", SelfTest.BED, nil), "the bed is not whole")
 		put(r, SelfTest.BED, nil)
-		pause(r, 2.0)
+		-- (ROBLOX-111: the looks' settling is timed from here: the first frame with no look being made)
+		r.bedAt = r.host.clock()
+		local looks = ctx.world.looks
+		while r.host.clock() < (r.bedAt :: number) + 2.0 do
+			pause(r, 0)
+			if r.bedSettled == nil and looks ~= nil and #looks.jobs == 0 then r.bedSettled = r.host.clock() end
+		end
 		local bed = ctx.world.garden.bed_a
 		need(bed ~= nil and bed.prey ~= nil, "the bed's prey was not made")
 		local byKind: { [string]: number } = {}
@@ -422,7 +513,43 @@ local function checks(): { Check }
 	end)
 
 	add("frame time in the bed", function(r)
-		say(r, "INFO frame time in the bed: " .. frameSample(r, SelfTest.SAMPLE_S))
+		frameSample(r, SelfTest.SAMPLE_S, "frame time in the bed", "in the bed")
+		say(r, "INFO census in the bed: " .. census())
+	end)
+
+	-- ROBLOX-111: the bed's frame again once the looks near it are all made (no build pending), with how long that took from the spider's coming to the bed; then,
+	-- to say whether the looks or their shadows are what the frame pays for, the same with the looks out of the workspace, and with the global shadows off (both
+	-- put back at once, whatever happens).
+	add("frame time in the bed, settled", function(r)
+		local looks = r.ctx.world.looks
+		if looks == nil then skip("no looks are made in this place") end
+		local settled = waitUntil(r, SelfTest.SETTLE_WAIT, function()
+			if #looks.jobs == 0 then r.bedSettled = r.bedSettled or r.host.clock(); return true end
+			r.bedSettled = nil
+			return false
+		end, 0)
+		local at = r.bedAt or r.host.clock()
+		say(r, string.format("INFO looks settled in the bed: %s %.2f s after the spider came, %d parts held of %d planned, %d plans, %d made and %d destroyed this session",
+			if settled then "yes," else "NOT,", (r.bedSettled or r.host.clock()) - at, looks:parts(), looks.planned, looks.plans, looks.made, looks.destroyed))
+		need(settled, `the looks were still being made after {SelfTest.SETTLE_WAIT} s`)
+		local plans0, made0 = looks.plans, looks.made
+		frameSample(r, SelfTest.SAMPLE_S, "frame time in the bed, settled", "in the bed, settled")
+		say(r, string.format("INFO looks while settled: %d plans and %d parts made in the sample", looks.plans - plans0, looks.made - made0))
+		local folder = looks.folder
+		local ok, err = pcall(function()
+			folder.Parent = nil
+			frameSample(r, SelfTest.AB_S, "frame time in the bed without the looks", "in the bed without the looks")
+		end)
+		folder.Parent = Workspace
+		if not ok then error(err, 0) end
+		local Lighting = game:GetService("Lighting")
+		local shadows = Lighting.GlobalShadows
+		local ok2, err2 = pcall(function()
+			Lighting.GlobalShadows = false
+			frameSample(r, SelfTest.AB_S, "frame time in the bed without shadows", "in the bed without shadows")
+		end)
+		Lighting.GlobalShadows = shadows
+		if not ok2 then error(err2, 0) end
 	end)
 
 	add("moths on the wall", function(r)
@@ -508,7 +635,8 @@ local function checks(): { Check }
 	end)
 
 	add("frame time on the sill", function(r)
-		say(r, "INFO frame time on the sill: " .. frameSample(r, SelfTest.SAMPLE_S))
+		frameSample(r, SelfTest.SAMPLE_S, "frame time on the sill", "on the sill")
+		say(r, "INFO census on the sill: " .. census())
 	end)
 
 	add("part counts", function(r)

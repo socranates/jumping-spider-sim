@@ -88,6 +88,8 @@ a journey of game days, not minutes, and the map is meant to be lived in a regio
    *(Between the rounds, ROBLOX-108, 2026-10-20: performance for a release. Each region's look is made on the client near the spider within a part budget
    (`World/LookPlan`, `Client/LookStream`), so every region to come adds to the map without adding to what a phone holds at once; a new region kind with walls
    seen from afar gets a far look in `LookPlan.FAR`. Not run in Studio.)*
+   *(ROBLOX-111, 2026-10-20: v36's Studio self-test had the bed at 22 fps beside the bushes; the self-test now profiles the frame and compares the bed
+   without the looks and without shadows, so whether the bushes' look must be lighter is the next Studio run's to say.)*
 5. The peacock-as-default and the nursery (the sash shut until the spider is ready) can come at any point; the map does not depend on it.
 
 ## For Nathan

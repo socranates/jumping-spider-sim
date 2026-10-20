@@ -15,6 +15,12 @@ local DOWN = Vector3.new(0,-1,0)
 -- farther than their body length, but no measured length is claimed here). Everything else about the line (the slack, the hang, the release) is Godot's.
 Silk.game = { lowerScale = 0.5, maxLine = 100 }
 
+-- ROBLOX-111: what the line did, counted for the self-test (a Studio run cannot be stepped through): the ticks on the line, how much line was let out
+-- and how far the body fell, the sweeps that stopped a move and what they took off it, the tangent touches let pass, and the push-outs of the skin. Never reset
+-- (a reader takes a copy and the difference); nothing reads it to decide anything.
+function Silk.newStats()
+	return { ticks = 0, letOut = 0, fell = 0, stops = 0, stopped = 0, grazes = 0, pushes = 0, pushed = 0, pushedUp = 0 }
+end
 function Silk.new(world, surfaces, tuning, gravity: number)
 	local params = RaycastParams.new()
 	params.FilterType = Enum.RaycastFilterType.Include
@@ -26,7 +32,7 @@ function Silk.new(world, surfaces, tuning, gravity: number)
 		speed=tuning.reel_speed_wu_s, lowerSpeed=tuning.reel_speed_wu_s, gravity=gravity, mode="none", paid=0, rest=0, taut=false,
 		anchor=Vector3.zero, normal=Vector3.yAxis, anchorPart=nil, bend=nil, bendPart=nil,
 		lowering=false, snagged=false, block="", message="", release=Math.newRelease(), walk=nil,
-		previous=Vector3.zero},Silk)
+		previous=Vector3.zero, stats=Silk.newStats()},Silk)
 end
 -- Opt in to the game's lowering (Silk.game): the let-down at lowerScale of the reel speed. Reeling in is untouched.
 function Silk.useGameRules(self: any)
@@ -178,6 +184,8 @@ function Silk.unstick(self: any, position: Vector3, velocity: Vector3, intent: n
 			if d > 1e-6 and d < SKIN - 1e-4 then
 				local n = inst.CFrame:VectorToWorldSpace(out / d)
 				local contact = { Instance = inst, Position = inst.CFrame:PointToWorldSpace(near), Normal = n, Distance = 0 }
+				local stats = self.stats
+				stats.pushes += 1; stats.pushed += SKIN - d; stats.pushedUp += n.Y * (SKIN - d)
 				p += n * (SKIN - d)
 				v -= n * math.min(0, v:Dot(n))
 				if d < RADIUS + 1e-3 and self:landable(contact, p, intent) then return p, Vector3.zero, contact end
@@ -201,20 +209,40 @@ function Silk.groundUnder(self: any, p: Vector3, hit): boolean
 	return under ~= nil and under.Instance == hit.Instance
 end
 
+-- ROBLOX-111: a contact the move could not have reached. A sweep that reports a face the body is moving along or away from, or one nearer the face than the body
+-- now is by less than the move goes into it, is the engine's tangent touch, not a contact: in exact geometry a sphere outside a box meets it only by closing the gap
+-- (the box world's sweeps never report one, so nothing changes there). Studio, v36: the let-down from the outer sill's front edge, the body hanging plumb 0.31 off
+-- the brick face, ran at 0.559 studs a second where the box world's is 0.752; a sweep that stops the body on such a touch loses the tick's whole move (it
+-- slides once, and the slide meets the same face), so a touch on one tick in four is a quarter of the let-down. The skin is kept by the push-out below.
+function Silk.grazing(hit, p: Vector3, motion: Vector3): boolean
+	local n = hit.Normal
+	local into = -motion:Dot(n)
+	if into <= 1e-4 then return true end
+	local gap = (p - hit.Position):Dot(n) - RADIUS
+	return into < gap - 1e-3
+end
 -- Sweep the body, then slide once. Never satisfy a constraint by teleporting through a wall.
 function Silk.move(self: any, position: Vector3, motion: Vector3, velocity: Vector3, intent: number)
 	local p=position
 	local remaining=motion
+	local stopped=false
 	for _=1,2 do
 		if remaining.Magnitude<1e-7 then break end
 		local hit=workspace:Spherecast(p,RADIUS,remaining,self.params)
+		if hit and Silk.grazing(hit,p,remaining) then self.stats.grazes+=1; hit=nil end
 		if not hit then p+=remaining; break end
 		-- Maintain a skin along the contact normal at grazing angles.
 		p=hit.Position+hit.Normal*(RADIUS+0.01)
 		if self:landable(hit,p,intent) then return p,Vector3.zero,hit end
 		local rest=remaining-remaining.Unit*math.min(hit.Distance,remaining.Magnitude)
 		remaining=rest-hit.Normal*rest:Dot(hit.Normal)
+		stopped=true
 		velocity-=hit.Normal*math.min(0,velocity:Dot(hit.Normal))
+	end
+	if stopped then -- (ROBLOX-111: the counts: a stop, and how much of the move along its own direction it took away)
+		local length=motion.Magnitude
+		self.stats.stops+=1
+		if length>1e-9 then self.stats.stopped+=math.max(0,length-(p-position):Dot(motion/length)) end
 	end
 	-- While lowering alongside the launch wall, a nearly tangent native sweep can
 	-- miss a shallow contact. Maintain the wall's skin without grabbing it again.
@@ -236,6 +264,8 @@ function Silk.move(self: any, position: Vector3, motion: Vector3, velocity: Vect
 end
 function Silk.step(self: any, position: Vector3, velocity: Vector3, intent: number, releaseDown: boolean)
 	if self.mode~="locked" or not self:refresh() then return position,velocity,nil end
+	local stats=self.stats
+	stats.ticks+=1
 	if Math.releaseTick(self.release,true,releaseDown) then
 		self:clear(); self.message="Silk released"; return position,velocity,nil
 	end
@@ -246,7 +276,7 @@ function Silk.step(self: any, position: Vector3, velocity: Vector3, intent: numb
 	-- "Shortest" only when a reel actually ran and could not shorten (Godot sets it inside its not-snagged reel branch);
 	-- a snag while swinging under a leaf must not leave reeling refused once the line is clear again (ROBLOX-10).
 	if intent>0 and not self.snagged and self.rest>=oldRest-1e-6 and self.block=="" then self.block="shortest" end
-	if intent<0 and self.rest>oldRest then self.block="" end
+	if intent<0 and self.rest>oldRest then self.block=""; stats.letOut+=self.rest-oldRest end
 	local p=position
 	-- A padded bend can leave the shortest line just below the lip. Acquire a nearby
 	-- real face with the legs (0.6 stud reach), never through an intervening obstacle.
@@ -293,6 +323,7 @@ function Silk.step(self: any, position: Vector3, velocity: Vector3, intent: numb
 		local ke=0.5*velocity:Dot(velocity)
 		velocity*=if ke>1e-12 then math.sqrt(math.clamp((energy-self.gravity*p.Y)/ke,0,1)) else 0
 	end
+	stats.fell+=position.Y-p.Y
 	local path=self:path(p)
 	self.paid=math.min(math.max(self.paid,path),self.rest)
 	self.taut=path>=self.rest-0.003

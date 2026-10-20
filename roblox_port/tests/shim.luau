@@ -566,18 +566,29 @@ end
 -- body sit 0.07 from the brick face under the outer sill's lip (the Studio self-test, v35); a sweep that begins within a hair of a face it is tangent to
 -- not seeing that face is the box world's way of reproducing it (tests/scenarios.luau sets it for one case and puts it back).
 local spherecastSlop = { value = 0 }
+-- ROBLOX-111: `graze` (0 by default) makes a sweep report a touch at its start, Distance 0, on a box the sphere is within that much of and is not closing on (the
+-- move along or away from it): the engine's tangent touch, which an exact sweep never reports. `every` reports only one such touch in that many (tests/scenarios.luau).
+local spherecastGraze = { value = 0, every = 1, calls = 0 }
 function workspace.Spherecast(_self, origin, radius, direction, params)
 	local length = direction.Magnitude
 	if length < 1e-12 then return nil end
 	local d = direction / length
 	local best = nil
 	local tip = origin + direction
-	local g = radius + spherecastSlop.value + SKIP_EPS
+	local g = radius + spherecastSlop.value + spherecastGraze.value + SKIP_EPS
 	local lx, ly, lz = math.min(origin.X, tip.X) - g, math.min(origin.Y, tip.Y) - g, math.min(origin.Z, tip.Z) - g
 	local hx, hy, hz = math.max(origin.X, tip.X) + g, math.max(origin.Y, tip.Y) + g, math.max(origin.Z, tip.Z) + g
 	for _, b in near(params, lx, ly, lz, hx, hy, hz) do
 		if not apart(b, lx, ly, lz, hx, hy, hz) and (closest(origin, b) - origin).Magnitude >= radius + spherecastSlop.value then -- a box the sphere starts in is not seen
 			local t = sphereBox(origin, d, radius, b)
+			if spherecastGraze.value > 0 then
+				local c = closest(origin, b)
+				local off = origin - c
+				if off.Magnitude < radius + spherecastGraze.value and off.Magnitude > 1e-9 and d:Dot(off.Unit) > -0.05 then
+					spherecastGraze.calls += 1
+					if spherecastGraze.calls % spherecastGraze.every == 0 then t = 0 end
+				end
+			end
 			if t and t <= length and (not best or t < best.Distance) then
 				local centre = origin + d * t
 				local contact = closest(centre, b)
@@ -687,6 +698,7 @@ local game = { GetService = function(_self, name) return services[name] end }
 -- Builds axis-aligned parts from {lo, hi, profile, name} pieces into a folder in the workspace.
 local BoxWorld = {}
 BoxWorld.spherecastSlop = spherecastSlop
+BoxWorld.spherecastGraze = spherecastGraze
 function BoxWorld.folder(name: string, pieces)
 	local folder = Instance.new("Folder")
 	folder.Name = name

@@ -535,6 +535,7 @@ function FlyBodies.draw(self: any, flies: { any }, now: number, cameraAt: Vector
 		end
 	end
 	if #parts > 0 then Workspace:BulkMoveTo(parts, frames, Enum.BulkMoveMode.FireCFrameChanged) end
+	self.moved = #parts -- (ROBLOX-111: the parts placed this frame, for the self-test's frame profile)
 end
 
 return FlyBodies

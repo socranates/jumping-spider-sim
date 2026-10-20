@@ -601,3 +601,44 @@ Claude → Chet, 2026-10-20, branch `claude/lock`. Nathan asked for "a lock on s
   have fought Focus's toggle setting and left the controller nothing free. Say if you would rather have the Focus tap (or another key).
 - The numbers: 12 studs to lock, 16 to keep, the camera's follow at 5 a second, the creep at 0.65 studs a second while circling.
 - The woodlice, ladybirds, millipedes, snail and harvestmen are not shown to the spider's senses (ROBLOX-105), so they cannot be locked yet.
+
+## What the real engine said, and the self-test as a profiler (ROBLOX-111, 2026-10-20)
+
+Claude → Chet, 2026-10-20, branch `claude/prof`. The v36 self-test in Studio passed 33 of 34: every region, the intro, the lock, the prey, the dusk, the rest and
+the sound. It failed the line (`let down at 0.559 studs a second, not about 0.75`) and measured the bed at 22 fps (mean 45.5 ms, worst 76.8) against the
+sill's 60 (worst 23.0 ms: the 129 ms hitch v35 showed on the sill is gone). `docs/DECISIONS.md` ROBLOX-111 has the reasoning. **Nothing of it has run in Studio.**
+
+- **The line**: the body hangs 0.31 off the brick face, moving along it; an engine sweep that reports a touch of a face the body is moving along stopped the
+  tick's whole move. Such a touch is now let pass (`SilkController`'s `grazing`) and the skin kept by the push-out; the box world is unchanged. The check is
+  now judged in the game's time (the ticks) with the clock's rate beside it, and it prints what the line did.
+- **The bed**: not changed, instrumented. The CLI finds nothing in the client's Lua that explains it (no thrash, no build while still, nothing O(n²)); the
+  bed differs from the sill by the bushes on screen and some 350 more moving body parts. The self-test now times the client's frame by part and compares the
+  bed with the looks out and with the shadows off.
+
+## Your Studio checklist (ROBLOX-111)
+
+1. **The self-test**: `workspace:SetAttribute("SelfTest", true)`, Play, touch nothing, send the whole printout (35 checks now; it takes about 15 s longer). The
+   new and changed lines to read, in order:
+   - `INFO profile on the line:` the client's frame while it lets down (the render step's ms a frame by part, the worst frame).
+   - `INFO line:` the rate in the game's time **and** by the clock. `PASS the line` now means the game's rate is 0.6 to 0.9.
+   - `INFO line ticks:` the cause. Read: the ticks and the game's seconds against the clock's (much less game time than clock: frames over a quarter second
+     lost time, cause 2); `the body fell ... (n% of it)` (about 100% is right; about 74% is v36's loss); `tangent touches let pass` (above 0 confirms cause 1,
+     the fix doing its work); `sweeps stopped the body` and what they took off; `push-outs (... of it up)` (a large upward share is cause 3).
+   - `INFO profile in the bed:` and `INFO engine in the bed:` after the bed's frame time; `INFO census in the bed:` (parts, see-through, casting shadows,
+     meshed, by folder).
+   - `INFO looks settled in the bed:` (yes or NOT, and how long after the spider came) and `INFO looks while settled:` (plans and parts made during the
+     sample: anything above 0 is thrash).
+   - `INFO frame time in the bed, settled:` with its profile and engine lines, then `INFO frame time in the bed without the looks:` and
+     `INFO frame time in the bed without shadows:` with theirs. **The comparison that matters**: if the frame is near 16 ms without the looks, the looks
+     are the cost; near 16 ms without shadows, their shadows are; neither, then the render step's parts (the profile) or the moving bodies are.
+   - `INFO profile on the sill:`, `INFO engine on the sill:`, `INFO census on the sill:` to set against the bed's.
+   - The render step's ms a frame is the client's own Lua; the frame time minus it is the engine's (rendering, physics, other scripts).
+2. **By hand, the let-down**: from the outer sill's front edge, hold the drop key: the spider should go down the brick at an even pace (about 0.75 studs a
+   second), never sticking against the wall, and land on the bed's soil.
+3. **By hand, the bed**: walk in the bed by the bushes with Studio's frame rate showing (View, Stats, or Shift+F5): note the fps looking into the bushes and
+   looking away from them.
+
+## Open for Nathan (ROBLOX-111)
+
+- Nothing to decide yet. If the next printout says the bushes' clusters or their shadows are what the bed pays for, the next round will propose a lighter
+  bush (fewer, larger clusters, or shadows only near the spider) for you to look at before anything changes.

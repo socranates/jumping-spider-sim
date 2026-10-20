@@ -16,12 +16,14 @@ end
 local lines: { string } = {}
 local co: thread? = nil
 local simClock = 0.0
+local sampled = 0.0 -- (the seconds the frame samples took: no heartbeat is said in them, the host's sample being one wait)
 SelfTest.host = {
 	spawn = function(fn: () -> ()) co = coroutine.create(fn) end,
 	wait = function(seconds: number) coroutine.yield(seconds) end,
 	clock = function(): number return simClock end,
 	print = function(line: string) table.insert(lines, line); print(line) end,
 	sample = function(seconds: number): string
+		sampled += seconds
 		local t0 = simClock
 		coroutine.yield(seconds)
 		return string.format("shim: %d simulated frames of 1/60 s (no engine here: not a frame time)", math.floor((simClock - t0) * 60 + 0.5))
@@ -74,7 +76,7 @@ check("the self-test runs through the real client to END, every check passing he
 		if name then passes[name] = true end
 	end
 	assert(fails == 0, `{fails} checks failed here (see the FAIL lines above)`)
-	local want = { "new life", "intro", "world folders", "walk on the sill", "the line", "prey on the sill", "lock", "prey in the bed", "woodlice", "frame time in the bed",
+	local want = { "new life", "intro", "world folders", "walk on the sill", "the line", "prey on the sill", "lock", "prey in the bed", "woodlice", "frame time in the bed", "frame time in the bed, settled",
 		"moths on the wall", "dusk: the moths fly", "notebook", "rest and checkpoint", "sound", "frame time on the sill", "part counts" }
 	for _, region in WorldMap.regions() do table.insert(want, "region " .. region.id) end
 	for _, name in want do assert(passes[name], "no PASS for " .. name) end
@@ -89,8 +91,13 @@ check("a heartbeat while it waits, the measures as INFO lines, and the spider le
 		local what = string.match(line, "^%[SELFTEST%] INFO ([^:]+):")
 		if what then infos[what] = true end
 	end
-	assert(beats >= math.floor(simClock / SelfTest.HEARTBEAT_S) - 3, `{beats} heartbeats in {simClock} s`)
-	for _, what in { "line", "frame time in the bed", "frame time on the sill", "sound", "woodlice", "walk" } do assert(infos[what], "no INFO line for " .. what) end
+	assert(beats >= math.floor((simClock - sampled) / SelfTest.HEARTBEAT_S) - 3, `{beats} heartbeats in {simClock} s ({sampled} s of it frame samples)`)
+	for _, what in { "line", "frame time in the bed", "frame time on the sill", "sound", "woodlice", "walk",
+		-- ROBLOX-111: the profiler's lines: the line's counts, each sample's profile and engine numbers, the census, the looks' settling and the bed's comparisons
+		"line ticks", "profile on the line", "profile in the bed", "engine in the bed", "census in the bed", "looks settled in the bed", "frame time in the bed, settled",
+		"profile in the bed, settled", "frame time in the bed without the looks", "frame time in the bed without shadows", "profile on the sill", "census on the sill" } do
+		assert(infos[what], "no INFO line for " .. what)
+	end
 	local partsLine = false
 	for _, line in lines do if string.find(line, "[SELFTEST] INFO parts at the ", 1, true) == 1 then partsLine = true end end
 	assert(partsLine, "no part counts")

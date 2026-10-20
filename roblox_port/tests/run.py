@@ -211,6 +211,7 @@ CLIENT_MODULES = [
     ("PerceptionHud", "../Client/PerceptionHud.luau"),
     ("SpiderEyes", "../Client/SpiderEyes.luau"),
     ("SaveClient", "../Client/SaveClient.luau"),
+    ("FrameProfile", "../Client/FrameProfile.luau"),
     ("LookStream", "../Client/LookStream.luau"),
     ("WorldClient", "../Client/WorldClient.luau"),
     ("SelfTest", "../Client/SelfTest.luau"),

@@ -142,5 +142,62 @@ check("a let-down past the wall keeps its skin and never ends on a sliver (ROBLO
 	folder:Destroy()
 	if not ok then error(err, 0) end
 end)
+-- ROBLOX-111: the let-down in Studio, v36, ran at 0.559 studs a second where the box world's is 0.752. One way the engine's sweep can cost it that the box world's
+-- exact sweep never does: a tangent touch, the sphere reported touching a face it is moving along (here the brick face, the body 0.31 off it, the line hanging
+-- plumb from the slab's lip). Stopped there, the move loses the tick's motion (it slides once, and the slide meets the same face). The shim's Spherecast reports
+-- such a touch when `spherecastGraze` is set (a face within that much of the sphere that the move is not closing on). With the touch on every sweep and the
+-- controller's rule taken out the let-down all but stops; with the rule it is the game's rate and every touch is counted as let pass. With exact sweeps the rule
+-- lets nothing pass (it changes nothing in the box world), and the counts the self-test prints add up.
+check("a tangent touch of the brick does not stop the let-down (ROBLOX-111)", function()
+	local WorldMap = require("../src/Shared/World/WorldMap")
+	local WorldBuild = require("../src/Shared/World/WorldBuild")
+	local Silk = require("../src/Shared/Movement/SilkController")
+	local Motor = deps.Motor
+	local folder = WorldBuild.world(workspace, WorldMap.SEED)
+	local EDGE = Vector3.new(2, 0.31, -23.2)
+	local graze = (BoxWorld :: any).spherecastGraze
+	local saved = Silk.grazing
+	local input = Motor.idleInput()
+	input.dropHeld = true
+	-- six seconds of letting down measured a second after the line is caught, with the touch emulated from the moment the spider is on the line
+	local function letDown(touch: number): (number, any)
+		local motor = Motor.new({ world = folder, surfaces = deps.Surfaces, profile = deps.Species.phidippus_audax_prototype, spawn = EDGE,
+			heading = -Vector3.zAxis, boundsMin = Vector3.new(-50, -95, -80), boundsMax = Vector3.new(50, 40, 20) })
+		motor:useGameRules()
+		motor:place(EDGE, Vector3.yAxis, -Vector3.zAxis)
+		assert(motor:requestDrop(), "the drop was refused at the front edge")
+		local began, y0, before = nil, 0, nil
+		for t = 1, 60 * 12 do
+			motor:tick(input)
+			if began == nil and motor:onLine() then began = t; graze.value = touch end
+			if began ~= nil and t == began + 60 then y0 = motor.pos.Y; before = table.clone(motor.silk.stats) end
+			if began ~= nil and t == began + 420 then
+				local d = {}
+				for k, v in motor.silk.stats do d[k] = v - before[k] end
+				graze.value = 0
+				return (y0 - motor.pos.Y) / 6, d
+			end
+		end
+		graze.value = 0
+		error("the let-down never began")
+	end
+	local ok, err = pcall(function()
+		local exact, de = letDown(0)
+		assert(exact > 0.74 and exact < 0.76 and de.grazes == 0, `exact sweeps: {exact} studs a second, {de.grazes} touches let pass`)
+		assert(de.ticks == 360 and math.abs(de.letOut - 360 * 0.75 / 60) < 1e-6 and math.abs(de.fell - exact * 6) < 1e-6, "the counts: 360 ticks, the line let out at 0.75, the fall the rate's")
+		local touched, dt = letDown(0.02)
+		assert(touched > 0.74 and touched < 0.76 and dt.grazes >= 300, `with the touch on every sweep: {touched} studs a second, {dt.grazes} touches let pass`)
+		Silk.grazing = function() return false end
+		local stopped, ds = letDown(0.02)
+		Silk.grazing = saved
+		assert(stopped < 0.3 and ds.stops >= 300, `without the rule the touch should stop the let-down: {stopped} studs a second, {ds.stops} stops`)
+		print(string.format("  the tangent touch: %.3f studs a second exact, %.3f with a touch on every sweep (%d let pass), %.3f without the rule (%d stops, %.3f taken off)",
+			exact, touched, dt.grazes, stopped, ds.stops, ds.stopped))
+	end)
+	Silk.grazing = saved
+	graze.value = 0
+	folder:Destroy()
+	if not ok then error(err, 0) end
+end)
 print(`BOXWORLD passed={passed} failed={failed}`)
 if failed > 0 then error("box-world scenarios failed") end

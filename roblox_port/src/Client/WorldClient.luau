@@ -32,6 +32,7 @@ local WorldMap = require(Shared:WaitForChild("World"):WaitForChild("WorldMap"))
 local Region = require(Shared:WaitForChild("World"):WaitForChild("Region"))
 local LifeClock = require(Shared:WaitForChild("Life"):WaitForChild("LifeClock"))
 local LookStream = require(script.Parent.LookStream)
+local FrameProfile = require(script.Parent.FrameProfile)
 
 local WorldClient = {}
 WorldClient.__index = WorldClient
@@ -197,7 +198,9 @@ function WorldClient.update(self: any, pos: Vector3, root: Instance?, now: numbe
 	LifeClock.game.clockScale = self.region.clockScale
 	if root ~= nil and root ~= self.focused then self:focus(root) end
 	self:report(pos, now or os.clock())
+	FrameProfile.lap("world")
 	if self.looks ~= nil then self.looks:update(pos, self.region) end
+	FrameProfile.lap("looks") -- (ROBLOX-111: the self-test's frame profile, Client/FrameProfile)
 	local id = self.region.id
 	if not self.whole[id] then
 		if self:regionReady(id) then

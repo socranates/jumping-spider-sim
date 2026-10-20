@@ -215,13 +215,16 @@ perception HUD off, the lock's four faint ticks its only cue (W5's quiet HUD); C
   *(2026-10-20, ROBLOX-108: the regions' looks are made on each client near its spider, at most 1,500 parts at full and 500 at low (3,647 and 1,215 were
   always there), the region and its neighbours always, the house's walls as far impostors (a few big brick-coloured parts), the rest nearest first within a
   radius; a PlayStation is the full tier; the house fly is lighter at low. Not run in Studio or on a device.)*
+  *(2026-10-20, ROBLOX-111: v36's Studio self-test measured the bed at 22 fps and the sill at 60. The CLI finds no cause in the client's Lua; the self-test
+  now times the client's frame by part and samples the bed again settled, without the looks and without shadows, so the next Studio run names the cost.)*
 - **The 200-local client**: the world wiring is a new module (`Client/WorldClient`), not more lines in SpiderClient.
 - **Save format**: `world` is optional and validated; the revision gate protects positions.
 - **Nav graph size**: region sizing; seams are the only cross-region edges.
 - **Nothing has run in Studio since main ce64498**: this round rides on the audit's green suites and the previewer.
   *(2026-10-19, ROBLOX-104: the live place now carries a self-test, `src/Client/SelfTest.luau`, that walks the regions, the line, the prey, the
   notebook, a rest and the sound inside a real Studio Play session and prints a verdict for `tools/studio/selftest.ps1` to read; the coordinator runs it at
-  each publish. Not yet run in Studio.)*
+  each publish. Not yet run in Studio.)* *(2026-10-20: run in Studio at v36, 33 of 34 passed; the line's let-down ran at 0.559 studs a second, the fix and its
+  counts are ROBLOX-111, and the self-test is now also the frame's profiler.)*
 
 ### Nathan's direction (2026-10-19, evening): the peacock as the main spider, the whole life as the game, the world, Steam
 

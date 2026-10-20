@@ -53,12 +53,33 @@ function MateText.another(hasSac: boolean): string
 	return if hasSac then MateText.ANOTHER_BROOD else MateText.ANOTHER
 end
 
+-- ROBLOX-106: a courtship that failed (the standard rules). The mate refuses on a full meter, by the spider's condition and the court's quality (Life/Mating.acceptChance):
+-- the words say which weighed most, "thin" (the reserve) or "clumsy" (breaks, distance, facing, length), or "choosy" when neither was at fault. Or the rival cut in. Each is the end of that day's visit; a
+-- visitor may come the next morning (Life/Mating: the cycle wants one until the pair have mated), and the words say no more than that.
+MateText.REJECTED_THIN = {
+	female = "She turns away and walks off. She will not take a male this thin. A visitor may come again tomorrow.",
+	male = "He turns away from a female this thin and walks off. A visitor may come again tomorrow.",
+}
+MateText.REJECTED_CLUMSY = {
+	female = "She turns away and walks off: the courtship faltered. A visitor may come again tomorrow.",
+	male = "He turns away and walks off: the courtship faltered. A visitor may come again tomorrow.",
+}
+MateText.REJECTED_CHOOSY = {
+	female = "She watches, then turns away and walks off. Not every female takes a male. A visitor may come again tomorrow.",
+	male = "He watches, then turns away and walks off. Not every male stays. A visitor may come again tomorrow.",
+}
+MateText.CUT = "The other spider pushed in, and the visitor fled the sill for today."
+function MateText.rejected(sex: string, why: string): string
+	local t = if why == "thin" then MateText.REJECTED_THIN elseif why == "choosy" then MateText.REJECTED_CHOOSY else MateText.REJECTED_CLUMSY
+	return if sex == "female" then t.female else t.male
+end
+
 -- Why the mate left the sill, as a notice (the reasons Predator/Mate gives); "mated" is said by MATED already.
 function MateText.gone(reason: string): string?
 	if reason == "dusk" then return "The visitor has gone for the evening. It may come back in the morning." end
 	if reason == "rest" then return "The visitor wandered off while you rested." end
 	if reason == "sex" then return "The visitor is not interested and leaves." end
-	if reason == "driven" then return nil end
+	if reason == "driven" or reason == "rejected" or reason == "cut" then return nil end -- (told when it happened)
 	return nil
 end
 
@@ -73,6 +94,10 @@ function MateText.notice(event: string, ctx: { sex: string?, needsDance: boolean
 	if event == "sac" then return MateText.SAC end
 	if event == "guard_day" then return MateText.GUARD_DAY end
 	if event == "hatched" then return MateText.HATCHING end
+	if event == "rejected_thin" then return MateText.rejected(ctx.sex or "male", "thin") end
+	if event == "rejected_clumsy" then return MateText.rejected(ctx.sex or "male", "clumsy") end
+	if event == "rejected_choosy" then return MateText.rejected(ctx.sex or "male", "choosy") end
+	if event == "cut" then return MateText.CUT end
 	return nil
 end
 

@@ -79,7 +79,7 @@ a journey of game days, not minutes, and the map is meant to be lived in a regio
    detail. The gutter's retreat and the eaves' house spider are still to come.*
 2. *(Between the rounds, ROBLOX-104: a self-test of the live place in Studio, so every region built so far and every one to come is walked in the real
    engine at each publish: `src/Client/SelfTest.luau`, checklist in `docs/HANDOFF-roblox-world.md`. Not yet run in Studio.)*
-3. **W4 (nature's rules)** and **W5 (no hand holding)** as planned, on the built regions.
+3. **W4 (nature's rules)** and **W5 (no hand holding)** as planned, on the built regions. *(W4 built 2026-10-19 as ROBLOX-106; not run in Studio.)*
 4. Then fill outward in this order: `wall_west`/`wall_east` (the drainpipe and the door), `shrub_west`, `path`, the first lawn chunks,
    `patio_east`, `border_east`, `hedge_west`, the woodpile, the vegetable bed, the shed, the fence — each a round with its bugs and pages
    from `docs/GARDEN_BESTIARY.md`, weather when the patio's saucer and the lawn exist.

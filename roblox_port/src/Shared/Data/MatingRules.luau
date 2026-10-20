@@ -58,6 +58,24 @@ MatingRules.broodMax = 12
 -- Where the sac hangs in the retreat, and its size (the crack's interior is x -27.8 to -23.3, z 3 to 9).
 MatingRules.sacAt = Vector3.new(-27.1, 0.5, 8.4)
 MatingRules.sacRadius = 0.42
+-- ROBLOX-106 (W4, Nathan: "mating should not automatically be successful"; "not even mating is a guarantee if you find the mate"): the standard rules only (the client
+-- hands `nature` in the snapshot when the rules are not gentle and `on` is true; Easy, Free play and a snapshot without it are as before: a full meter is a mating).
+-- When the meter fills the mate decides, by a draw of its own (the world's seed, the mate's number, its visit and the courts so far, all in the record): the chance is
+-- `base` x the spider's condition x the courtship's quality. Condition: the reserve, from 0 at `energyLow` up to 1 at `energyFull`, never under `conditionFloor`. Quality, over
+-- the court (from the meter's first rise to its fill): each time the spider broke off (moved, turned away, left) costs (1 / (1 + breakCost x breaks)); its mean distance
+-- while courting costs up to `farCost` from attendWu (where the mate stands, 1) out to nearWu; the share of the court spent not facing it up to `awayCost`; a court that
+-- took more than 1.5 x courtSeconds loses in proportion, to at most `longFloor`. The numbers: a still, close, facing court by a well-fed spider (0.8 or more) is
+-- accepted 0.9 of the time; at 0.6 (the least a visitor comes for) 0.5; with two breaks at full condition 0.53; a thin, halting court (0.6, two breaks) 0.3.
+-- Refused, the mate walks off for the day ("rejected"), and the words say what weighed most: the spider's condition ("thin"), the court ("clumsy"), or, when both
+-- were at least `fairAt`, neither ("choosy": the mate's own choice, the base's 0.1); one may come again the next morning. And on each visit, with `cutChance`, the rival will cut in when the meter
+-- passes a drawn level (`cutLevel`) if it is free on the sill within `cutWu` of the mate then: the mate flees for the day ("cut"). The rival that has been eaten, or
+-- taken by the wasp, cuts in on nothing.
+MatingRules.game = {
+	on = true, base = 0.9, energyLow = 0.35, energyFull = 0.8, conditionFloor = 0.3,
+	breakCost = 0.35, farCost = 0.3, awayCost = 0.5, longFloor = 0.6, fairAt = 0.85,
+	cutChance = 0.35, cutLevel = { 0.35, 0.85 }, cutWu = 10.0,
+}
+
 -- A new generation starts like a new life: the first growth stage and this much energy (NeedsModel.ENERGY_START); the day count goes on.
 MatingRules.freshEnergy = 0.55
 

@@ -357,6 +357,10 @@ check("a rest by a full-grown, well-fed spider makes a mate come in the morning:
 	assert(find("SpiderPrompts", "CourtshipBar").Visible == false, "and the bar is hidden while it is far away")
 end)
 
+-- ROBLOX-106: from here to the second generation the chain after a mating is followed (the courtship, the sac, the guard days, the hatching, carrying on), so the
+-- mate's own decision on a full meter (Normal's rule, Life/Mating.accepts) is set aside: with it off a full meter is a mating, as in Easy and Free play. The refusal
+-- itself is checked through the client after the chain, and on its own in tests/nature.luau.
+Rules.game.on = false
 check("courting: close, facing, still, the meter fills in the hud for eight seconds, then the pair are together for a moment and the mate walks off", function()
 	local d = ClientStubs.driver
 	local life = d.life
@@ -598,6 +602,47 @@ end)
 local Mate = require("../src/Shared/Predator/Mate")
 local MatingScene = require("../src/Shared/Life/MatingScene")
 local player: any = game:GetService("Players").LocalPlayer
+
+Rules.game.on = true -- (ROBLOX-106: Normal's rule again, see above)
+check("in Normal a full meter is the mate's to decide (ROBLOX-106): a thin spider is refused in MateText's words, the mate walks off for the day, the cycle waits", function()
+	local d = ClientStubs.driver
+	local life = d.life
+	if d.caughtPanel:isShowing() then d.caughtPanel:hide() end
+	assert(d.session.rules == "standard", "Normal")
+	life.growth.stage = 3
+	life.clock.day += 1
+	d.place(OPEN)
+	frames(5)
+	life.clock.hour = 9.0
+	local mate = Mate.new()
+	mate.sex, mate.scale = "male", 1
+	mate.state, mate.elapsed, mate.meter, mate.lost = "attend", 0, 0, 0
+	mate.position = d.motor.pos + Vector3.new(0, 0, 1.5)
+	mate.previous, mate.heading, mate.up = mate.position, -Vector3.zAxis, Vector3.yAxis
+	life.mate = mate
+	d.mateLegs.drive = nil
+	life.mating = Mating.normalize({ stage = "none", ready_day = 1, mates = 1, visits = 1, visit_day = life.clock.day })
+	local base = Rules.game.base
+	Rules.game.base = 1e-9 -- (the draw always refuses; which words is the spider's condition against the court's quality)
+	local n = 0
+	while mate.state ~= "leaving" and life.mating.stage == "none" and n < 10 * 16 do
+		wait(0.1)
+		n += 1
+		life.clock.hour = 9.0
+		d.needs.energy = 0.5 -- (condition 0.33: thin)
+	end
+	Rules.game.base = base
+	assert(life.mating.stage == "none" and mate.state == "leaving" and mate.reason == "rejected", `refused: {life.mating.stage} / {mate.state} / {mate.reason} after {n / 10} s`)
+	assert(n / 10 > 4 and n / 10 < 13, `on a full meter ({n / 10} s)`)
+	assert(life.mating.courts == 1 and life.mating.rejections == 1 and life.mating.away_day == life.clock.day, "counted, and away for the day")
+	assert(life.notice == MateText.rejected("male", "thin"), `the words: "{life.notice}"`)
+	mate.elapsed = Rules.leaveSeconds
+	frames(3)
+	assert(mate.state == "away" and life.mating.stage == "none", `gone, and the cycle waits for another day: {mate.state}`)
+	assert(find("SpiderPrompts", "CourtshipBar").Visible == false, "the bar is hidden")
+	life.mate = nil
+	life.mating = Mating.normalize({ stage = "none" })
+end)
 
 -- A fresh courtship set up on the open floor and played to the moment the pair are together. `sex`: the mate's; `dance`: the player owes a dance (the peacock spider).
 local function court(d: any, sex: string, dance: boolean): any

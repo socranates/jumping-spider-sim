@@ -38,6 +38,15 @@ RivalRules.counterCost = 0.30
 -- ROBLOX-91: the gentle modes (Easy, Free play) keep ROBLOX-73's contest, 55 caught / 25 sprang clear / 20 a bite that costs nothing: ROBLOX-88's harder rival is for
 -- the standard rules (the draw is the same stream; only the thresholds differ). The gentle grip (Catch.forRival) and the free bite are as they were.
 RivalRules.contestGentle = { captured = 0.55, sprang = 0.25 }
+-- ROBLOX-106 (W4, Nathan: "a rival that camps by the retreat"): in the standard rules (the client's drive is told `camps`, and the snapshot `nature`), a patrol leg is now
+-- and then a watch by the crack: a draw of its own for each leg (from the world's seed and the leg's number, which the rival's record keeps) makes one leg in `chance`
+-- go to one of `spots` on the floor round the crack's mouth (each a stud or more outside the keep-out, two to five from the retreat's door) and stand there `seconds`
+-- (drawn) before it patrols on. It still sees, stalks and lunges as on any leg; while the spider is in the crack it waits where it is, as it always has. `camp` (the
+-- seconds left, once it is there) is in the rival's record.
+RivalRules.camp = {
+	chance = 0.15, seconds = { 60.0, 180.0 },
+	spots = { Vector3.new(-21.5, 0, 6.0), Vector3.new(-21.5, 0, 3.5), Vector3.new(-21.5, 0, 8.5), Vector3.new(-25.5, 0, 10.8) },
+}
 -- Nothing the rival does goes in here: the retreat grown by half a stud (the crack itself is also a hard check).
 RivalRules.keepOutMin = Vector3.new(-30.0, -0.5, 2.5)
 RivalRules.keepOutMax = Vector3.new(-22.8, 2.0, 9.5)

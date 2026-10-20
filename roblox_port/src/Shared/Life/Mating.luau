@@ -28,6 +28,9 @@ local STAGE: { [string]: boolean } = {}
 for _, name in Mating.STAGES do STAGE[name] = true end
 
 local COUNTERS = { "ready_day", "guard_day", "sac_day", "hatch_day", "brood", "mates", "visits", "visit_day", "away_day", "drive_offs" }
+-- ROBLOX-106: the standard rules' counters (courts decided, refusals, rivals that cut in). Optional: a record without them has had none, and normalize leaves them
+-- absent (so a record of the old game is byte for byte what it was); they are made when first needed.
+local NATURE_COUNTERS = { "courts", "rejections", "cut_ins" }
 
 local function finite(x: any): boolean
 	return type(x) == "number" and x == x and x ~= math.huge and x ~= -math.huge
@@ -129,9 +132,59 @@ function Mating.woke(life: any, day: number): string
 	return "sac"
 end
 
+-- ROBLOX-106: a draw of its own for the mating cycle's standard rules: the world's seed, the mate's number and visit, and a counter (the courts so far) and a salt.
+local function natureStream(seed: number, m: any, n: number, salt: number): any
+	return PreyRandom.mixed(seed, m.mates or 0, m.visits or 0, n, salt)
+end
+
+-- ROBLOX-106: the spider's condition for a mate, 0 to 1, from its reserve (MatingRules.game).
+function Mating.condition(energy: number): number
+	local g = Rules.game
+	return math.clamp((energy - g.energyLow) / (g.energyFull - g.energyLow), g.conditionFloor, 1)
+end
+
+-- ROBLOX-106: the chance the mate accepts this court now (base x condition x quality), and what weighed most against it: "thin" or "clumsy", or "choosy" when both
+-- are good (at least `fairAt`) and the refusal is the mate's own (the base's share): the words never blame a court that was not at fault.
+function Mating.acceptChance(mate: any, energy: number): (number, string)
+	local c, q = Mating.condition(energy), Mate.quality(mate)
+	local why = if math.min(c, q) >= Rules.game.fairAt then "choosy" elseif c < q then "thin" else "clumsy"
+	return Rules.game.base * c * q, why
+end
+
+-- ROBLOX-106: the mate decides on a full meter (the standard rules). Returns whether it accepts and, refused, why. Counts the court.
+function Mating.decide(life: any, mate: any, s: any): (boolean, string)
+	local m = life.mating
+	local n = m.courts or 0
+	m.courts = n + 1
+	local p, why = Mating.acceptChance(mate, life.needs.energy)
+	return natureStream(s.seed or 0, m, n, 7):next() < p, why
+end
+
+-- ROBLOX-106: the decision on a full meter, played out: refused, the mate walks off for the day and the event "rejected_thin", "rejected_clumsy" or
+-- "rejected_choosy" is added.
+function Mating.accepts(life: any, mate: any, s: any, events: { string }): boolean
+	local ok, why = Mating.decide(life, mate, s)
+	if ok then return true end
+	local m = life.mating
+	Mate.refuse(mate, "rejected")
+	m.rejections = (m.rejections or 0) + 1
+	m.away_day = s.day
+	table.insert(events, "rejected_" .. why)
+	return false
+end
+
+-- ROBLOX-106: a new visit's rival: whether the rival will cut in on today's court, and at what level of the meter (nil: it will not).
+function Mating.cutLevel(seed: number, m: any): number?
+	local g = Rules.game
+	local r = natureStream(seed, m, 0, 13)
+	if r:next() >= g.cutChance then return nil end
+	return g.cutLevel[1] + (g.cutLevel[2] - g.cutLevel[1]) * r:next()
+end
+
 -- One fixed tick of the whole cycle. `s` is the player's snapshot (see Predator/Mate.step) with day, hour, seed and `sex`, `needsDance`, `dancing`. Returns
 -- the events of the tick, in order: "arrived" (with "new_mate" before it when it is another mate), "noticed", "driven", "courted", "mated", "gone",
--- "guard_day" (the second guard day began) and "hatched". `s.rivalThreat` (the rival is winding up or lunging, ROBLOX-91) turns "courted" into "courted", "mated".
+-- "guard_day" (the second guard day began) and "hatched"; in the standard rules (ROBLOX-106) "rejected_thin", "rejected_clumsy" or "rejected_choosy" for a refused court and "cut" for
+-- a rival cutting in. `s.rivalThreat` (the rival is winding up or lunging, ROBLOX-91) turns "courted" into "courted", "mated".
 function Mating.tick(life: any, dt: number, s: any): { string }
 	local events: { string } = {}
 	local m = Mating.normalize(life.mating or Mating.new())
@@ -167,7 +220,10 @@ function Mating.tick(life: any, dt: number, s: any): { string }
 		m.visit_day = s.day
 		mate.sex = Mate.opposite(s.sex or "female")
 		mate.scale = Mate.scaleFor(s.seed or 0, m.mates, mate.sex)
+		if s.nature == true then mate.cut = Mating.cutLevel(s.seed or 0, m) end -- (ROBLOX-106)
 		table.insert(events, "arrived")
+	elseif event == "courted" and s.nature == true and not Mating.accepts(life, mate, s, events) then
+		-- (ROBLOX-106: refused; Mating.accepts has sent the mate off and said why)
 	elseif event == "courted" then
 		m.stage = "courted"
 		table.insert(events, "courted")
@@ -189,6 +245,16 @@ function Mating.tick(life: any, dt: number, s: any): { string }
 		table.insert(events, "gone")
 	elseif event ~= "" then
 		table.insert(events, event)
+	end
+	-- ROBLOX-106: the rival cuts in when the meter passes the visit's level, if it is free on the sill and near enough to the mate then.
+	if s.nature == true and mate.cut ~= nil and Mate.courtable(mate) and mate.meter >= mate.cut then
+		local rival = s.rival
+		if rival ~= nil and rival.position ~= nil and (rival.position - mate.position).Magnitude <= Rules.game.cutWu then
+			Mate.refuse(mate, "cut")
+			m.cut_ins = (m.cut_ins or 0) + 1
+			m.away_day = s.day
+			table.insert(events, "cut")
+		end
 	end
 	return events
 end
@@ -236,6 +302,9 @@ function Mating.problems(m: any): { string }
 	if type(m) ~= "table" then bad("not a record"); return e end
 	if m.stage ~= nil and (type(m.stage) ~= "string" or not STAGE[m.stage]) then bad("unknown stage") end
 	for _, k in COUNTERS do
+		if m[k] ~= nil and not whole(m[k]) then bad(`'{k}' is not a whole number`) end
+	end
+	for _, k in NATURE_COUNTERS do
 		if m[k] ~= nil and not whole(m[k]) then bad(`'{k}' is not a whole number`) end
 	end
 	if m.hatch_hour ~= nil and (not finite(m.hatch_hour) or m.hatch_hour < 0 or m.hatch_hour >= 24) then bad("the hatch hour is not in [0, 24)") end

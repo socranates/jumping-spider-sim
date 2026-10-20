@@ -103,6 +103,10 @@ local M = {
 	PreyText = require(Shared.UI.PreyText),
 	-- ROBLOX-104: the hooks the Studio-only drivers are handed (the test place's playback, the live place's self-test), made at the end; here for the same reason.
 	hooks = (nil :: any),
+	-- ROBLOX-106 (W4): nature's rules in Normal (Shared/Life/Nature): what moved last tick, the night's passes counted (never saved), the cover factor this tick and the ray
+	-- that finds a leaf overhead (made below, with the raycast params); here for the same reason.
+	Nature = require(Shared.Life.Nature),
+	nature = { move = {}, night = {}, cover = (nil :: number?), ray = (nil :: any) },
 }
 local focusState = FocusState.new()
 local DT = SpiderMotor.DT
@@ -131,6 +135,7 @@ local breakaway = Breakaway.new(sill,M.World.decor)
 local params = RaycastParams.new()
 params.FilterType = Enum.RaycastFilterType.Include
 params.FilterDescendantsInstances = { M.World.root }
+M.nature.ray = function(from: Vector3, dir: Vector3): any return Workspace:Raycast(from, dir, params) end
 
 local arc = Instance.new("Folder")
 arc.Name = "JumpArc"
@@ -704,6 +709,7 @@ local function returnToCheckpoint()
 		return
 	end
 	session.mode, session.rules, session.ended = life.mode or "main", life.rules or "standard", false
+	table.clear(M.nature.night) -- (ROBLOX-106: the night's passes are counted again from the restored hour)
  mateLegs.reset()
  needs:useGameRules()
  prey.feeding:useGameRules() -- (always: a record from before, or one made by another build, may hold Godot's struggle)
@@ -745,7 +751,7 @@ local function fresh(mode: string, easy: boolean, position: Vector3?): boolean
  if not ok then return false end
  mateLegs.reset()
  session:begin(mode,easy);applyRules();motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor())
- sensor:reset();memory:clear()
+ sensor:reset();memory:clear();table.clear(M.nature.night)
  local slot=M.SaveRules.slotOf(mode,session.rules)
  stores[slot]=newStore();checkpoints=stores[slot]
  life.resting=false;life.notice="";life.noticeSeconds=0;life.restoreGrace=0
@@ -782,12 +788,14 @@ local function presentEnd(immediate: boolean)
  if not rec then return end
  local cause=rec.cause
  local choices: {CaughtPanel.Choice}={}
- if checkpoints:loadBest().ok then table.insert(choices,{id="Back",text="Back to your last rest"}) end
+ local hasRest=checkpoints:loadBest().ok
+ if hasRest then table.insert(choices,{id="Back",text="Back to your last rest"}) end
  table.insert(choices,{id="Another",text=mateLegs.Text.another(mateLegs.Mating.hasSac(life.mating))}) -- (ROBLOX-91: a new life; the brood is left behind)
  table.insert(choices,{id="Notebook",text=M.NotebookText.MENU_CHOICE})
- panel:showChoices(if cause=="starved" then "The spider starved." elseif cause=="rival" then "The other spider caught you." else M.WaspText.LINE,
-  if cause=="starved" then "It went too long without food." elseif cause=="rival" then "A hunter can become prey. You can return to your last rest." else M.WaspText.SUB,
-  M.WaspText.summary(rec.hours,rec.meals,rec.wasp_visits,rec.wasp_escapes),choices,immediate)
+ -- (ROBLOX-106: in Normal the last line says what the way back costs, the day since the rest, and that another spider is a new life; the night has its own words)
+ panel:showChoices(if cause=="starved" then "The spider starved." elseif cause=="rival" then "The other spider caught you." elseif cause=="night" then M.LifeText.NIGHT_LINE else M.WaspText.LINE,
+  if cause=="starved" then "It went too long without food." elseif cause=="rival" then "A hunter can become prey. You can return to your last rest." elseif cause=="night" then M.LifeText.NIGHT_SUB else M.WaspText.SUB,
+  M.WaspText.summary(rec.hours,rec.meals,rec.wasp_visits,rec.wasp_escapes)..(if session.rules=="standard" then "\n"..M.LifeText.dayLost(hasRest) else ""),choices,immediate)
  panel:setTextScale(if setting("LargeText")==true then 1.5 else 1)
 end
 local function endLife(cause: string)
@@ -1524,9 +1532,18 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
    end
 			local input = tickInput()
 			motor:tick(input)
+			-- ROBLOX-106: moving costs energy (NeedsModel.move pays nothing in the gentle modes) and, in Normal, a leaf overhead and stillness hide the spider (Life/Nature).
+			do
+				local onLine = motor:onLine()
+				local moved = M.Nature.moved(M.nature.move, motor.mode, motor.moving == true, motor.dropped == true, motor.seized == true, onLine, if onLine then motor.silk.rest else nil)
+				if moved ~= "" then needs:move(moved, DT) end
+				local walking = motor.mode == "attached" and motor.moving == true
+				M.nature.cover = if needs.gentle then nil else M.Nature.cover(M.Nature.overhead(motor.pos, M.nature.ray), not walking and motor.vel.Magnitude < 0.15)
+			end
 			-- The wasp runs after the spider has moved and before feeding (Godot: physics priority 8).
 			wasp.enabled = not testPlace or Workspace:GetAttribute("Wasp") == true
             wasp:useGameRules()
+			wasp.nature = not needs.gentle -- (ROBLOX-106: the standard rules' wasp: its windows slide, its visits vary and sometimes linger)
 			local forced = if testPlace then Workspace:GetAttribute("WaspForce") else nil
 			if typeof(forced) == "string" and forced ~= "" then
 				Workspace:SetAttribute("WaspForce", nil)
@@ -1536,6 +1553,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			waspSpider.position, waspSpider.velocity = motor.pos, motor.vel
 			waspSpider.falling = fallingOnLine
 			waspSpider.airborne = motor.mode == "air" and not fallingOnLine and not motor.seized
+			waspSpider.cover = M.nature.cover
 			-- (ROBLOX-91: the first day and first meal protect each generation: a spiderling's `born` and meals count from the hatching, not from the sill's first day)
 			local born, genMeals = mateLegs.Mating.grace(life, prey.feeding.mealsFinished)
 			wasp:step(DT, waspSpider, {
@@ -1580,6 +1598,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
              airborne=motor.mode=="air",onLine=motor:onLine(),holding=prey.feeding.held~=nil,
              striking=prey.tick<=prey.strikeEnd and not motor.seized,drive=rivalLegs.drive,taken=wasp.holdingRival,
              seed=914, -- the world's seed, as the prey's and the wasp's: the rival's contest draws from it (ROBLOX-73)
+             noticeScale=M.nature.cover,nature=not needs.gentle, -- (ROBLOX-106: cover, and the watch by the crack)
             }
             local rivalEvent,rivalFood=RivalSpider.step(life.rival,DT,rivalState,sightCast)
             if life.rival.state~="dormant" and life.rival.state~="consumed" and rivalLegs.drive==nil then
@@ -1588,6 +1607,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
               spawn = life.rival.position, heading = life.rival.heading,
               boundsMin = M.World.homeMin, boundsMax = M.World.homeMax, probeParent = arc, -- (ROBLOX-95: bound to the sill, its bounds)
              }),sightCast,M.World.home)
+             rivalLegs.drive.camps=true -- (ROBLOX-106: in Normal a patrol leg may be a watch by the crack)
             end
             -- A caught rival fights the tapping grip before it can be eaten (ROBLOX-77); it is subdued, or it tears free and recovers (never a harm).
             local gripEvent=rivalLegs.Grip.step(rivalLegs.grip,life.rival,DT,{
@@ -1616,6 +1636,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
              ms.drive,ms.sex,ms.needsDance,ms.dancing,ms.blocked=mateLegs.drive,mateLegs.Mating.sexOf(appearance),SpiderChoice.canDance(appearance),dance.active,sightCast
              if mateLegs.couple.active and wasp:isVisiting() then mateLegs.skip(true) end -- (the controls are the player's again the moment the wasp comes)
              ms.rivalThreat=life.rival.state=="windup" or life.rival.state=="lunge" -- (a scene would not start under a lunge: Mating.tick skips it at once)
+             ms.nature=ms.nature==true and mateLegs.Rules.game.on==true;ms.rival=RivalSpider.target(life.rival) -- (ROBLOX-106: courtship can fail, the rival can cut in)
              for _,e in mateLegs.Mating.tick(life,DT,ms) do mateLegs.event(e,ms) end
              local mate=life.mate
              if mate~=nil and mate.state~="away" and mateLegs.drive==nil then
@@ -1639,7 +1660,12 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			life:step(DT, lifeSpider, feedPending, cancelPending)
 			feedPending, cancelPending = false, false
 			sensor.core.rangeScale = life.rangeScale
-			motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor())
+			-- ROBLOX-106: home before dark. Out of every retreat after dark anywhere but the sill, in Normal, the ground hunters' passes are drawn against the spider.
+			do
+				local night = M.Nature.night(M.nature.night, life, { seed = 914, exposed = not life.lifeOver and M.Nature.exposed(not needs.gentle, M.World.region.kind, lifeSpider.inRetreat) })
+				if night == "found" then endLife("night") elseif night == "cold" then life:showNotice(M.LifeText.NIGHT_COLD) end
+			end
+			motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor() * M.Nature.coldSpeed(life))
    for _,event in life:drainEvents() do
     watch:onLife(event.kind,life.growth.stage)
     if event.kind=="woke" then mateLegs.woke(event.day) end
@@ -1845,6 +1871,7 @@ M.hooks = function(): any
 				return { mode = motor.mode, line = motor.silk.mode, taut = motor.silk.taut, position = motor.pos, walking = motor.silk.walk ~= nil }
 			end,
 			detail = detail, -- (ROBLOX-104: the tier the self-test reports its part counts at)
+			nature = M.nature, -- (ROBLOX-106: nature's rules this tick: the cover factor, the night's passes)
 	}
 end
 local playback = script.Parent:FindFirstChild("SilkPlayback")

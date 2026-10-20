@@ -196,7 +196,10 @@ exploration you gotta earn"; "you get time to enjoy the scenery because you are 
    bug, the stone retreat, the descent set piece, the page, saves across regions. *(Done 2026-10-19: ROBLOX-96 in
    `docs/DECISIONS.md`, Chet's checklist appended to `docs/HANDOFF-roblox-world.md`; CLI only, not run in Studio.)*
 4. **W4 — nature's rules** (ROBLOX-97): movement cost, death loses the day in Normal, lingering threats, mating that
-   can fail, the garden's slow clock.
+   can fail, the garden's slow clock. *(Done 2026-10-19 as ROBLOX-106, the number 97 never having been used: movement's cost, the
+   lost day's words, the wasp's sliding and lingering visits, the rival's watch by the crack, courtship that can fail and the rival
+   that cuts in, home before dark, cover; the bed's clock was already 0.33 (ROBLOX-96). In `docs/DECISIONS.md`, Chet's checklist in
+   `docs/HANDOFF-roblox-world.md`; CLI only, not run in Studio. The footfall and the other rare things are still to come.)*
 5. **W5 — no hand holding** (ROBLOX-98): the HUD and notice audit for Normal — hints only on day one, captions
    sparing, nothing added for the garden but a region name on the day line.
 Then full suites, places, bundle, publish.

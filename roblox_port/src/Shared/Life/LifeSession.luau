@@ -20,7 +20,7 @@ function Session.finishAdult(self: any, stage: number): boolean
 	return true
 end
 function Session.endLife(self: any, cause: string, summary: any): boolean
-	if self.ended or self.rules == "gentle" or (cause ~= "wasp" and cause ~= "starved" and cause ~= "rival") then return false end
+	if self.ended or self.rules == "gentle" or (cause ~= "wasp" and cause ~= "starved" and cause ~= "rival" and cause ~= "night") then return false end
 	self.ended, self.deaths = true, self.deaths + 1
 	self.summary = table.clone(summary)
 	self.summary.cause, self.summary.mode, self.summary.rules = cause, self.mode, self.rules

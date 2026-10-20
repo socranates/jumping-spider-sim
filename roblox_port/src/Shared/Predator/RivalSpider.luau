@@ -69,6 +69,7 @@ function Rival.renew(r: any)
  r.fate=nil
  r.subdued=nil
  r.shaken=nil
+ r.camp=nil
 end
 -- Where the wasp may take it from (ROBLOX-70): nil unless it is on the sill, awake and free; never in the retreat. ROBLOX-94: `region` (the sill's unless given) is the
 -- region it belongs to, whose retreats it keeps out of.
@@ -106,6 +107,7 @@ function Rival.valid(r: any,region: string?): boolean
  if r.spared~=nil and type(r.spared)~="boolean" then return false end
  if r.subdued~=nil and type(r.subdued)~="boolean" then return false end
  if r.shaken~=nil and type(r.shaken)~="boolean" then return false end
+ if r.camp~=nil and (type(r.camp)~="number" or r.camp~=r.camp or r.camp<0 or r.camp>1e4) then return false end -- (ROBLOX-106: the watch by the crack)
  if r.grips~=nil and (type(r.grips)~="number" or r.grips~=r.grips or r.grips<0 or r.grips>1e9 or r.grips%1~=0) then return false end
  if r.hour~=nil and (type(r.hour)~="number" or r.hour~=r.hour or r.hour<0 or r.hour>=24) then return false end
  if r.fate~=nil and r.fate~="eaten" and r.fate~="taken by the wasp" then return false end
@@ -205,7 +207,9 @@ function Rival.step(r: any,dt: number,s: any,blocked: (Vector3,Vector3)->any): (
   if not D then r.position=Vector3.new(r.position.X,.31,r.position.Z) end
   if r.elapsed>=3 then phase(r,"patrol") end
  else
-  r.notice=if visible then math.min(1,r.notice+dt) else math.max(0,r.notice-dt*2)
+  -- (ROBLOX-106: `s.noticeScale`, the standard rules' cover factor, Life/Nature.cover: halved under a leaf and when still, doubled moving in the open; absent, 1)
+  local rate=if type(s.noticeScale)=="number" then s.noticeScale else 1
+  r.notice=if visible then math.min(1,r.notice+dt*rate) else math.max(0,r.notice-dt*2)
   if visible and r.notice>=Rules.stalkNotice then
    phase(r,"stalk")
    local flat=if D then delta else Vector3.new(delta.X,0,delta.Z)

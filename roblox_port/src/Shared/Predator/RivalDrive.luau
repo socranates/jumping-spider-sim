@@ -10,6 +10,7 @@ local Rules = require(script.Parent.Parent.Data.RivalRules)
 local WorldMap = require(script.Parent.Parent.World.WorldMap)
 local SupportMath = require(script.Parent.Parent.Movement.SupportMath)
 local Motor = require(script.Parent.Parent.Movement.SpiderMotor)
+local PreyRandom = require(script.Parent.Parent.Prey.PreyRandom)
 
 local Drive = {}
 Drive.__index = Drive
@@ -50,10 +51,49 @@ local function goalFaceOf(self: any): number
 	return if self.goal ~= nil then self.goal.face else -1
 end
 
--- The patrol place for this leg: deterministic from the leg number, spread over every face by a stride that visits all.
-function Drive._pickWaypoint(self: any, r: any): any
+-- ROBLOX-106: the places to watch from (Rules.camp.spots on the floor round the crack's mouth), as goals on the sill's faces, outside the keep-out. Made once; none in a
+-- region without a retreat.
+function Drive.campPlaces(self: any): { any }
+	if self.campList ~= nil then return self.campList end
+	local list: { any } = {}
+	local reg = WorldMap.region(self.region)
+	if reg ~= nil and #reg.retreats > 0 and self.region == WorldMap.HOME then
+		for _, p in Rules.camp.spots do
+			local up = Vector3.yAxis
+			local face = Route.faceAt(p + up * SEAT, up)
+			if face ~= nil and not Route.inKeepOut(p + up * SEAT) and WorldMap.inRetreat(p + up * SEAT, self.region) == nil then
+				table.insert(list, { pos = p, up = up, face = face })
+			end
+		end
+	end
+	self.campList = list
+	return list
+end
+
+-- ROBLOX-106: whether patrol leg `leg` is a watch by the crack, and which place and for how long: a stream of its own from the world's seed and the leg's number.
+function Drive.campLeg(self: any, seed: number, leg: number): (any, number)
+	local places = self:campPlaces()
+	if #places == 0 then return nil, 0 end
+	local g = PreyRandom.mixed(seed, leg, 83)
+	if g:next() >= Rules.camp.chance then return nil, 0 end
+	local w = places[math.min(#places, 1 + math.floor(g:next() * #places))]
+	local secs = Rules.camp.seconds
+	return w, secs[1] + (secs[2] - secs[1]) * g:next()
+end
+
+-- The patrol place for this leg: deterministic from the leg number, spread over every face by a stride that visits all. ROBLOX-106: in the standard rules (`s.nature`, a
+-- drive told it `camps`) a leg may be a watch by the crack instead (Drive.campLeg).
+function Drive._pickWaypoint(self: any, r: any, s: any?): any
 	local n = #self.waypoints
 	if n == 0 then return nil end
+	if self.camps == true and s ~= nil and s.nature == true then
+		local w = self:campLeg(s.seed or 0, r.leg or 0)
+		if w ~= nil then
+			self.campHere = true
+			return w
+		end
+	end
+	self.campHere = false
 	for attempt = 0, 6 do
 		local leg = (r.leg or 0) + attempt
 		local w = self.waypoints[((leg * self.stride) % n) + 1]
@@ -156,7 +196,7 @@ function Drive._think(self: any, r: any, s: any)
 		end
 	else
 		if self.goal == nil or self.goalKey ~= "patrol" then
-			local w = self:_pickWaypoint(r)
+			local w = self:_pickWaypoint(r, s)
 			if w == nil then return end
 			self:_setGoal(w, "patrol")
 		end
@@ -170,6 +210,10 @@ function Drive._think(self: any, r: any, s: any)
 		end
 	end
 	self:_hops()
+	-- ROBLOX-106: standing its watch is not being stuck, and the leg's time does not run out under it.
+	if r.camp ~= nil and self.campHere == true and self.goal ~= nil and (self.goal.pos + self.goal.up * SEAT - motor.pos).Magnitude < 0.6 then
+		self.stuckT, self.stuckAt, self.legT = 0.0, motor.pos, 0.0
+	end
 	-- Progress: a leg that has taken too long, or no movement for a while, is dropped or planned again.
 	self.legT += Rules.thinkSeconds
 	self.stuckT += Rules.thinkSeconds
@@ -181,7 +225,7 @@ function Drive._think(self: any, r: any, s: any)
 		end
 		self.stuckT, self.stuckAt = 0.0, motor.pos
 	end
-	if self.goalKey == "patrol" and self.legT >= Rules.legSeconds then
+	if self.goalKey == "patrol" and self.legT >= Rules.legSeconds and r.camp == nil then
 		r.leg = (r.leg or 0) + 1
 		self.goal = nil
 	end
@@ -201,6 +245,18 @@ function Drive._wish(self: any, r: any, s: any): (Vector3, Vector3?)
 	else
 		target = self.goal.pos + self.goal.up * SEAT
 		if (target - motor.pos).Magnitude < 0.6 then
+			-- ROBLOX-106: at a watch by the crack it stands its time (Drive.update counts it down) before it takes the next place.
+			if self.goalKey == "patrol" and self.campHere == true then
+				if r.camp == nil then
+					self.stats.arrivals += 1
+					local _, secs = self:campLeg(s.seed or 0, r.leg or 0)
+					r.camp = secs
+				end
+				if r.camp > 0 then return Vector3.zero, nil end
+				r.camp = nil
+				r.leg = (r.leg or 0) + 1; self.goal = nil; self.route = nil; self.campHere = false
+				return Vector3.zero, nil
+			end
 			-- Arrived. A patrol takes the next place; a stalk stands where the spider was.
 			self.stats.arrivals += 1
 			if self.goalKey == "patrol" then r.leg = (r.leg or 0) + 1; self.goal = nil; self.route = nil end
@@ -264,6 +320,8 @@ function Drive.update(self: any, r: any, dt: number, s: any)
 		self.stats.resets += 1
 		self:_place(r)
 	end
+	-- ROBLOX-106: a watch by the crack counts down while it patrols (stands there) or waits (the spider in the crack, a wasp's visit); a stalk does not use it up.
+	if r.camp ~= nil and (state == "patrol" or state == "recover") then r.camp = math.max(0, r.camp - dt) end
 	self.think -= dt
 	if self.think <= 0 then
 		self.think += Rules.thinkSeconds

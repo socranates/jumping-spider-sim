@@ -34,6 +34,13 @@ Wasp.game = {
 	-- male instead of the spider, when there is a free rival on the sill that is not in the retreat. Drawn from a stream of its own (the visit's
 	-- seed), so the places and times of the other draws do not change. 0 turns it off.
 	takesRival = 0.10,
+	-- ROBLOX-106 (W4, Nathan: "sometimes you worry about starving because a wasp or other thing won't go away"): the standard rules only (WaspDirector `nature`, which
+	-- the client sets when the rules are not gentle). Each day's two windows slide by up to `shiftH` either way (a draw of their own from the seed, the day and the
+	-- window), so the visits do not keep to the clock; each visit's search lasts its usual 72 s times a draw from `visit` (0.6 to 1.5: 43 to 108 s), and with
+	-- `lingerChance` (about one visit in twelve, so one lingering visit every six days or so at two a day) it lingers, `linger` times as long (3 to 5: 3.6 to 6 minutes
+	-- on the sill, five game hours at the most). The draws come from the seed, the day and the visit's number, which the wasp's record keeps, so a return to a rest meets
+	-- the same visits; a visit going on is not kept, as before.
+	nature = { shiftH = 1.0, visit = { 0.6, 1.5 }, lingerChance = 0.08, linger = { 3.0, 5.0 } },
 }
 
 -- How it takes the rival (the game only; Godot's wasp has no rival): it flies to a place just above it and a little aside (the first of these

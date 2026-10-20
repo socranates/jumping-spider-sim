@@ -64,6 +64,7 @@ export type Spider = {
 	walkSpeed: number,
 	airborne: boolean, -- in a jump
 	falling: boolean, -- let down on its line (or fallen)
+	cover: number?, -- ROBLOX-106: the standard rules' factor on notice (Life/Nature.cover); nil: 1
 }
 -- The life this tick (Godot: the habitat loop and the feeding controller).
 -- `rival`: the free rival male the wasp may take, if one is on the sill (RivalSpider.target): where it is and which way is up from it.
@@ -112,7 +113,7 @@ function WaspDirector.new(config: { seed: number, world: World, enabled: boolean
 			mode = "flying", search = 0.0, visible = false, prev = Vector3.new(0, 0, 0),
 		},
 		phase = "away", visitS = 0.0, phaseS = 0.0, searchLeft = 0.0, notice = 0.0, confusedS = 0.0,
-		noticedThisVisit = false, sparedThisVisit = false, gentle = false,
+		noticedThisVisit = false, sparedThisVisit = false, gentle = false, nature = false, lingers = false,
 		lastVisitDay = 0, lastVisitSlot = 0, visits = 0, escapes = 0,
 		events = {} :: { { kind: string, t: number } },
 		signals = {} :: { Signal },
@@ -149,13 +150,40 @@ function WaspDirector.windows(self: any): { { number } }
 	return self.windowList or ONE_WINDOW
 end
 
+-- ROBLOX-106: the standard rules' wasp (Data.game.nature): the client sets `nature` when the rules are not gentle. A director without it is as it was.
+function WaspDirector.natural(self: any): boolean
+	return self.nature == true and not self.gentle
+end
+
+-- The windows of day `day`: the windows, each slid by its own draw of up to Data.game.nature.shiftH either way in the standard rules (ROBLOX-106).
+function WaspDirector.dayWindows(self: any, day: number): { { number } }
+	local windows = self:windows()
+	if not self:natural() then return windows end
+	local shift = Data.game.nature.shiftH
+	local out: { { number } } = {}
+	for slot, w in windows do
+		local d = -shift + 2 * shift * PreyRandom.mixed(self.seed, day, slot, 47):next()
+		out[slot] = { w[1] + d, w[2] + d }
+	end
+	return out
+end
+
+-- How long visit number `visit` of day `day` searches, as a share of the game's search (1 without the standard rules' draw; ROBLOX-106), and whether it lingers.
+function WaspDirector.visitScale(self: any, day: number, visit: number): (number, boolean)
+	if not self:natural() then return 1.0, false end
+	local n = Data.game.nature
+	local r = PreyRandom.mixed(self.seed, day, visit, 53)
+	if r:next() < n.lingerChance then return r:draw(n.linger), true end
+	return r:draw(n.visit), false
+end
+
 -- Whether each of day `day`'s visits happens, and at what hour: one number for each window, -1 when that visit has none. From the seed, the day
 -- and the visit's place in the day alone (the first visit's stream is the one the Godot replay uses). A visit's hour is in the first part of
 -- its window, up to an hour before the window's end, and not before `minGapH` after the visit before it.
 function WaspDirector.plannedHours(self: any, day: number): { number }
 	local hours: { number } = {}
 	local previous = -math.huge
-	for slot, window in self:windows() do
+	for slot, window in self:dayWindows(day) do
 		local hour = -1.0
 		if day >= Data.firstDay then
 			local r = makeStream(self.seed, day, 6 + slot)
@@ -189,7 +217,7 @@ end
 -- hour to the window's end, and nothing blocks it. A visit whose window passed unused (a rest through all of it) is simply skipped.
 function WaspDirector._maybeBegin(self: any, block: Block)
 	local day = block.day
-	local windows = self:windows()
+	local windows = self:dayWindows(day)
 	local done = if day == self.lastVisitDay then self.lastVisitSlot else 0
 	if done >= #windows then return end
 	local hours = self:plannedHours(day)
@@ -231,7 +259,9 @@ function WaspDirector.beginVisit(self: any, day: number, first: number?, slot: n
 	self.confusedS = 0.0
 	self.noticedThisVisit = false
 	self.sparedThisVisit = false
-	self.searchLeft = Data.searchS * (self.searchScale or 1)
+	local scale, lingers = self:visitScale(day, self.visits)
+	self.lingers = lingers
+	self.searchLeft = Data.searchS * (self.searchScale or 1) * scale
 	self.recent = {}
 	self.lossPos = nil
 	self.holding = false
@@ -446,7 +476,9 @@ function WaspDirector.noticeRate(self: any): number
 	local walk = math.max(s.walkSpeed, 0.1)
 	local motion = math.clamp(s.velocity.Magnitude / walk, 0.0, 1.5)
 	if s.airborne then motion = 1.5 end
-	return (self.noticeScale or 1) * (Data.noticeStill + Data.noticeMoving * motion) * math.max(1.0 - d / Data.sightWu, 0.0)
+	-- (ROBLOX-106: `cover`, the standard rules' cover factor the client hands in with the spider, Life/Nature.cover; absent, 1, as Godot's)
+	local cover = if self:natural() and type(s.cover) == "number" then s.cover else 1
+	return (self.noticeScale or 1) * cover * (Data.noticeStill + Data.noticeMoving * motion) * math.max(1.0 - d / Data.sightWu, 0.0)
 end
 
 function WaspDirector._look(self: any, dt: number)

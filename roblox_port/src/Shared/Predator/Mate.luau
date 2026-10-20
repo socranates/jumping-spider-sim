@@ -23,7 +23,10 @@ local WorldMap = require(script.Parent.Parent.World.WorldMap)
 local Mate = {}
 
 local STATES: { [string]: boolean } = { away = true, wander = true, approach = true, attend = true, pair = true, leaving = true }
-local REASONS: { [string]: boolean } = { [""] = true, driven = true, dusk = true, rest = true, mated = true, sex = true }
+local REASONS: { [string]: boolean } = { [""] = true, driven = true, dusk = true, rest = true, mated = true, sex = true, rejected = true, cut = true }
+-- ROBLOX-106: the courtship's record while it goes on, in the standard rules (Mate.track): seconds of the court, seconds courting well, the distance summed over those,
+-- seconds near it but not facing it, the breaks, and whether it was courting well last tick. All optional (a record from before has none).
+local COURT = { "court_t", "court_ok", "court_near", "court_away", "court_breaks" }
 Mate.STATES = STATES
 
 local function finite(x: any): boolean
@@ -95,12 +98,60 @@ function Mate.courting(m: any, position: Vector3): boolean
 	return m.meter > 0 or (m.position - position).Magnitude <= Rules.nearWu
 end
 
+local function clearCourt(m: any)
+	for _, k in COURT do m[k] = nil end
+	m.court_on = nil
+end
+
 local function leave(m: any, reason: string)
 	m.state, m.elapsed, m.meter, m.reason, m.lost, m.scene = "leaving", 0, 0, reason, 0, false
+	clearCourt(m)
+	m.cut = nil
+end
+
+-- ROBLOX-106: the mate refuses the spider (`reason` "rejected") or flees a rival cutting in ("cut"): out of the pair, off the sill for the day, as a driven-off mate.
+function Mate.refuse(m: any, reason: string)
+	leave(m, reason)
+end
+
+-- ROBLOX-106: one tick of the courtship's record (the standard rules; Mate.step calls it when the snapshot says `nature`). `ok`: courting well this tick (close, in sight,
+-- facing, still); `facing`; `dist` to the spider. The record starts with the court and is cleared when the meter is empty and the spider is not courting.
+function Mate.track(m: any, ok: boolean, facing: boolean, dist: number, dt: number)
+	if not ok and m.meter <= 0 then
+		if m.court_t ~= nil then clearCourt(m) end
+		return
+	end
+	if m.court_t == nil then
+		for _, k in COURT do m[k] = 0 end
+		m.court_on = false
+	end
+	m.court_t += dt
+	if ok then
+		m.court_ok += dt
+		m.court_near += dist * dt
+	else
+		if m.court_on == true then m.court_breaks += 1 end
+		if dist <= Rules.nearWu and not facing then m.court_away += dt end
+	end
+	m.court_on = ok
+end
+
+-- ROBLOX-106: the courtship's quality, 0 to 1 (MatingRules.game), from its record: breaks, distance, facing and length. 1 for a mate with no record.
+function Mate.quality(m: any): number
+	local g = Rules.game
+	if m.court_t == nil or m.court_t <= 0 then return 1.0 end
+	local still = 1 / (1 + g.breakCost * (m.court_breaks or 0))
+	local mean = if (m.court_ok or 0) > 1e-6 then m.court_near / m.court_ok else Rules.attendWu
+	local near = 1 - g.farCost * math.clamp((mean - Rules.attendWu) / (Rules.nearWu - Rules.attendWu), 0, 1)
+	local face = 1 - g.awayCost * math.clamp((m.court_away or 0) / m.court_t, 0, 1)
+	local long = math.clamp(Rules.courtSeconds * 1.5 / m.court_t, g.longFloor, 1)
+	return still * near * face * long
 end
 
 local function gone(m: any)
 	m.state, m.elapsed, m.meter, m.lost, m.scene = "away", 0, 0, 0, false
+	clearCourt(m)
+	m.cut = nil
 end
 
 -- The pause is over (its time, or a rest during it): it leaves, mated. A male mate's walk off the sill is still the scene's last beat.
@@ -231,6 +282,7 @@ function Mate.step(m: any, dt: number, s: any): string
 	end
 	-- The meter.
 	local ok, dance = Mate.conditions(m, s, sees)
+	if s.nature == true then Mate.track(m, ok, Mate.facing(m, s), dist, dt) end -- (ROBLOX-106)
 	if ok and dance then
 		m.meter = math.min(1, m.meter + dt / Rules.courtSeconds)
 	elseif not ok then
@@ -264,6 +316,14 @@ function Mate.valid(m: any, region: string?): boolean
 	if m.scale ~= nil and (not finite(m.scale) or m.scale < 0.5 or m.scale > 2) then return false end
 	if m.reason ~= nil and (type(m.reason) ~= "string" or not REASONS[m.reason]) then return false end
 	if m.scene ~= nil and type(m.scene) ~= "boolean" then return false end
+	-- (ROBLOX-106: the courtship's record and the rival's level, optional)
+	for _, k in COURT do
+		local n = m[k]
+		if n ~= nil and (not finite(n) or n < 0 or n > 1e6) then return false end
+	end
+	if m.court_breaks ~= nil and m.court_breaks % 1 ~= 0 then return false end
+	if m.court_on ~= nil and type(m.court_on) ~= "boolean" then return false end
+	if m.cut ~= nil and (not finite(m.cut) or m.cut < 0 or m.cut > 1) then return false end
 	local atRest = m.state == "away" -- (the scene is the pause, or the walk off after it: never away)
 	if m.scene == true and (atRest or not (m.state == "pair" or (m.state == "leaving" and m.reason == "mated"))) then return false end -- (the scene is the pause, or the walk off after it)
 	for _, k in { "position", "previous", "heading", "up" } do

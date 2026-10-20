@@ -410,3 +410,47 @@ carry the numbers (the line's speed, the frame time in the bed and on the sill, 
    Do not touch the mouse or keys until END (a key held would be the test's own key too).
 5. If a check fails that you think is the test's fault rather than the game's (a deadline too short on a slow machine, a moth that was simply slow to fly), say
    so: the deadlines are guesses until this first run.
+
+## W4 — nature's rules (ROBLOX-106)
+
+Claude → Chet, 2026-10-19, branch `claude/w4`. (The design called this round "ROBLOX-97"; that number was never used, so it is ROBLOX-106.) Six of Nathan's rules
+for **Normal only**; Easy and Free play are exactly as they were. `docs/DECISIONS.md` ROBLOX-106 has the numbers and the reasons. **Nothing of it has run in Studio.**
+
+- **Moving costs food.** Walking, letting down or reeling in on the line and every jump take a little from the reserve; standing still, hanging still and resting cost
+  nothing extra. A still day costs about 2.2 house flies, a typical one 2.7, a restless one 3.5.
+- **Death loses the day.** The end card's last line says so in Normal: back at the last rest, the meals, the growth and what you saw since then are gone; another spider is
+  a new life.
+- **Threats linger.** The wasp's two visits slide up to an hour either way day to day and last 43 to 108 s; about one visit in twelve lingers 3.6 to 6 minutes. The rival
+  now and then (one patrol leg in seven) stands watch for one to three minutes on the floor just outside the crack's mouth.
+- **Mating can fail.** On a full meter the mate decides: about 9 in 10 for a still, close, facing court by a well-fed spider; a thin spider or a halting court far less.
+  Refused, it walks off for the day with words that say why (thin, the courtship faltered, or simply not interested); on a third of visits the rival may push in and the
+  visitor flees for the day. The chain after a mating is as before.
+- **Home before dark.** Outside the glass (the outer sill, the walls, the bed), out of every retreat after dark, three passes of the ground hunters each night; each finds
+  an exposed spider one time in four (the night's own death card), or spares it with a cold, slow morning until 10:00. On the sill nothing changes. No notice warns of
+  dusk: the light does.
+- **Cover.** A leaf (anything solid within 6 studs straight up) halves the wasp's and the rival's notice, standing still halves it, walking in the open doubles it.
+
+## Your Studio checklist (W4)
+
+1. **Walking's cost.** In Normal, with a full-ish bar, walk about for a minute, then stand still for a minute: the bar should fall visibly faster while walking. In Free
+   play the two minutes should look the same.
+2. **The end card in Normal.** Let the wasp or the rival take the spider: the card's last line should read "In Normal a death loses the day: back at your last rest...".
+   With large text on, is the card still readable? Choose "Back to your last rest": the day since the rest is gone.
+3. **The wasp.** Over a few days note the wasp's arrival times: they should not keep to the clock. If you meet a long visit (several minutes), hide in the crack and say
+   how it felt: pinned, or broken?
+4. **The rival by the crack.** Now and then the rival should stand still on the floor just outside the crack's mouth for a minute or more, then patrol on. It must never
+   step inside the crack. Does it look like waiting, or like being stuck?
+5. **Courtship.** Court a visitor well fed, close, still and facing: it usually works. Court one thin (bar under half) or while stepping about: watch for the refusal and
+   its words. Say whether the words read fairly.
+6. **The night.** Stay out in the bed past dark, away from the stone: within a few game hours the night card ("The night found the spider.") or the cold message and a
+   slower walk until 10:00. Then do the same on the sill behind the glass: nothing happens.
+7. **Cover.** Sit under a big leaf while the wasp searches, and again out in the open: being under the leaf and still should get you noticed much less often.
+8. **Old saves.** A rest made in v35 should restore with no `[Windowsill] checkpoint refused`.
+
+## Open for Nathan (W4)
+
+- Each number is a first guess: walking's cost (0.0004 a second), the jump's (0.002), the wasp's linger (one visit in twelve, three to five times as long), the rival's
+  watch (one leg in seven, one to three minutes), the night's passes (three, each one in four), the cold (0.6 of the speed until 10:00). Harder or softer?
+- The night counts on the outer sill and the walls too, not only the bed. Should the outer sill (just outside the glass) be safe?
+- Courtship: about 9 in 10 for a perfect court, 1 in 2 at the least fed a visitor comes for. Too kind, or too harsh for the game's climax?
+- The footfall (the "1 percent" step) and the evening section's other rare things are still to come, after this round as the design orders them.

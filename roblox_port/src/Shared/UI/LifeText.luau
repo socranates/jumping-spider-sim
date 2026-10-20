@@ -9,6 +9,17 @@ local LifeText = {}
 
 export type Prompt = { title: string, hint: string }
 
+-- ROBLOX-106 (W4): the night in the garden (Life/Nature) and the end of a life in the standard rules. Nothing tells the dusk but the light.
+LifeText.NIGHT_LINE = "The night found the spider."
+LifeText.NIGHT_SUB = "Out on the ground after dark, something that hunts there found it."
+LifeText.NIGHT_COLD = "A cold night in the open, and something passed close by. You are stiff and slow until the morning warms."
+-- The end screen's last line in the standard rules (Easy and Free play keep theirs): what "Back to your last rest" costs, and what another spider is.
+LifeText.DAY_LOST = "In Normal a death loses the day: back at your last rest, the meals, the growth and what you saw since then are gone (the notebook keeps its pages). Another spider is a new life from the start."
+LifeText.NO_REST = "There is no rest to go back to. Another spider is a new life from the start."
+function LifeText.dayLost(hasRest: boolean): string
+	return if hasRest then LifeText.DAY_LOST else LifeText.NO_REST
+end
+
 -- "Day 2, evening".
 function LifeText.day(day: number, part: string): string
 	return `Day {day}, {part}`

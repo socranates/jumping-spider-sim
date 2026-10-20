@@ -44,6 +44,9 @@
 -- ROBLOX-105: a region's entry may hold `ambient`, the ambient bugs' colonies by kind ({ ladybird = Ladybirds, millipede = Millipedes, snail = Snails,
 -- harvestman = Harvestmen }), each of the kind the region has and in order (its creatures in known states inside the region's bounds). A record without it (every
 -- rest before this round) restores unchanged and the colonies it lacks are made afresh from their seeds when their region is next whole (Prey/PreyWorld.ambient).
+-- ROBLOX-106: the life may hold `cold_day` (the morning a night out in the garden left cold, Life/Nature), the rival `camp` (its watch by the crack), the mate its
+-- courtship's record and the rival's level (`court_*`, `cut`) and the mating its counters (`courts`, `rejections`, `cut_ins`): all optional, absent in every record
+-- before, checked when present.
 
 local Species = require(script.Parent.Parent.Data.Species)
 local ObjectRecord = require(script.Parent.ObjectRecord)
@@ -76,6 +79,7 @@ local RivalSpider = require(script.Parent.Parent.Predator.RivalSpider)
 local Mate = require(script.Parent.Parent.Predator.Mate)
 local Mating = require(script.Parent.Parent.Life.Mating)
 local Breakaway = require(script.Parent.Parent.Habitat.Breakaway)
+local Nature = require(script.Parent.Parent.Life.Nature)
 local Checkpoint = {}
 
 Checkpoint.SCHEMA_VERSION = 3
@@ -291,6 +295,7 @@ local function checkWorld(roots: { [string]: any }, problems: { string })
  -- ROBLOX-79: the mate, the mating cycle and the generation. All three are missing in a record from before (a life with no mate, stage none, generation 0).
  if not Mate.valid(life.mate) then bad("life: invalid mate state") end
  for _, text in Mating.problemsWith(life.mating, life.mate) do bad(text) end
+ if not Nature.validCold(life.cold_day) then bad("life: invalid cold morning") end -- (ROBLOX-106: optional, set by a night out in the garden)
  if life.generation ~= nil and not (finite(life.generation) and life.generation >= 0 and life.generation <= 1e6 and life.generation % 1 == 0) then bad("life: invalid generation") end
  -- ROBLOX-91: where this generation's grace began (Mating.grace); absent in a record from before (the first generation's: the sill's own day and meals).
  for _, k in { "born", "mealsBase" } do

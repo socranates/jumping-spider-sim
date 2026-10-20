@@ -14,7 +14,7 @@
 -- before two seconds and taken after, the controls and the camera back, the spider standing out of the crack); the World folder and every region's folder; for every region, its boxes all there once the spider is held at its spawn (streaming, with a deadline), ground
 -- under the spider there and the spider still there a second later, and the region the client's world reports; a walk on the sill; a let-down on the line from the outer
 -- sill's front edge at about 0.75 studs a second, on the line all the way; the sill's flies, the bed's gnats, aphids, springtails and leafhoppers and the wall's moths made
--- and drawn under the fly's part budget; the woodlice made and drawn; the notebook opened and closed; the clock put to dusk and the moths flying; a rest in the crack,
+-- and drawn under the fly's part budget; the lock (ROBLOX-110: Recentre locks onto a fly the spider sees, the body turns to it, the sidestep, and lets go); the woodlice made and drawn; the notebook opened and closed; the clock put to dusk and the moths flying; a rest in the crack,
 -- its checkpoint kept and returned to; the music playing and the room tone silent; the frame time over five seconds on the sill and in the bed; the parts in the workspace.
 -- Each Studio process writes its own log (%LOCALAPPDATA%\Roblox\logs); tools/studio/selftest.ps1 reads the newest for these lines.
 -- The CLI suite tests/selftest.luau runs the same checks against the real client on the shim's box world, with a host of its own (simulated frames and clock), so the run is
@@ -327,6 +327,60 @@ local function checks(): { Check }
 		need(#flies >= 1, "the sill has no flies")
 		local n = drawn(r, flies, "the sill's fly")
 		say(r, `INFO prey on the sill: {n} flies drawn`)
+	end)
+
+	-- ROBLOX-110: the lock. The spider on the open sill is turned to the nearest of the sill's flies (the check's own setting-up), and the lock is then taken only from
+	-- what its senses give it: Recentre locks onto it, the body turns to it, the sidestep walks the spider round it at a creep, and Recentre again lets go.
+	add("lock", function(r)
+		local ctx = r.ctx
+		local motor, lock, lockOn, memory = ctx.motor, ctx.lock, ctx.lockOn, ctx.memory
+		need(lock ~= nil and lockOn ~= nil, "no lock in the hooks")
+		lockOn.release(lock, "selftest")
+		-- A fly of the sill on a surface the spider can stand on, and a place 3 studs from it on the same surface in plain view of it: the spider is put there facing it.
+		local nearest: any, best = nil, 0
+		for _, f in ctx.prey.flies do
+			if nearest ~= nil then break end
+			local n = f.normal or Vector3.yAxis
+			local under = Workspace:Raycast(f.position + n * 0.2, -n * 2, motor.params)
+			if under ~= nil and under.Normal:Dot(n) > 0.95 then
+				local tangent = n:Cross(if math.abs(n.Y) < 0.9 then Vector3.yAxis else Vector3.xAxis).Unit
+				for _, side in { tangent, -tangent, n:Cross(tangent), -n:Cross(tangent) } do
+					local at = under.Position + side * 3
+					local ground = Workspace:Raycast(at + n * 0.5, -n * 1.0, motor.params)
+					if ground ~= nil and ground.Normal:Dot(n) > 0.95 then
+						local body = ground.Position + n * HEIGHT
+						if Workspace:Raycast(body + n * 0.1, (f.position - body) * 0.97, motor.params) == nil then
+							put(r, body, n, (f.position - body) - n * (f.position - body):Dot(n))
+							nearest, best = f, (f.position - body).Magnitude
+							break
+						end
+					end
+				end
+			end
+		end
+		if nearest == nil then skip("no fly of the sill with a place in plain view of it on its own surface") end
+		local function sees(): boolean
+			local o = motor:observer()
+			local origin, dir = ctx.cam:aimRay()
+			return lockOn.pick(memory, o.eye, o.heading, origin, dir) ~= nil
+		end
+		if not waitUntil(r, 6, sees, 0) then skip(`the spider saw nothing it could lock in 6 s (the fly {string.format("%.1f", best)} studs away, at {fmt(nearest.position)})`) end
+		ctx.input:simulate("Recenter", true); pause(r, 0); ctx.input:simulate("Recenter", false)
+		need(lock.trackId ~= nil and lock.point ~= nil, "Recentre did not lock onto what the spider sees")
+		pause(r, 0.8)
+		need(lock.trackId ~= nil, `the lock ended by itself at once ({tostring(lock.released)})`)
+		local face = math.deg(math.acos(math.clamp(motor.heading:Dot((lock.point - motor.pos).Unit), -1, 1)))
+		need(face < 25, string.format("the body is %.0f degrees from the locked thing", face))
+		local p0 = motor.pos
+		ctx.input:simulate("Right", true); pause(r, 1.0); ctx.input:simulate("Right", false)
+		pause(r, 0.1)
+		local moved = (motor.pos - p0).Magnitude
+		say(r, string.format("INFO lock: %.1f studs away, facing it within %.0f degrees, a sidestep of %.2f studs in 1 s", best, face, moved))
+		need(motor.mode == "attached" and moved > 0.2 and moved < 1.5, string.format("the sidestep moved the spider %.2f studs (%s)", moved, motor.mode))
+		if lock.trackId ~= nil then
+			ctx.input:simulate("Recenter", true); pause(r, 0); ctx.input:simulate("Recenter", false)
+			need(lock.trackId == nil, "Recentre again did not let go")
+		end
 	end)
 
 	add("prey in the bed", function(r)

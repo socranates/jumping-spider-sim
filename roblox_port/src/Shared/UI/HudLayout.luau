@@ -24,6 +24,8 @@ HudLayout.TOUCH_BUTTONS = {
 	-- The peacock spider (ROBLOX-31): Change (in the crack) beside Eat, Dance (the peacock spider, standing still) above Silk. Both start hidden.
 	{ action = "Choose", label = "Change", x = 82, y = -252, size = 56, right = false, textSize = 13 },
 	{ action = "Display", label = "Dance", x = -86, y = -306, size = 56, right = true, textSize = 14 },
+	-- The lock (ROBLOX-110): a small button left of Cancel, by Jump; shown only while something can be locked or a lock holds.
+	{ action = "Lock", label = "Lock", x = -226, y = -90, size = 50, right = true, textSize = 12 }, -- (12: "Unlock" fits its 44 px)
 } :: { Button }
 
 HudLayout.GAP = 12
@@ -37,7 +39,7 @@ local COMPACT = {
 	Left={16,-120}, Right={136,-120}, Back={76,-60},
 	Focus={-188,-180}, Display={-128,-180}, Drop={-68,-180},
 	Eye={-188,-120}, Recenter={-128,-120}, Creep={-68,-120},
-	Cancel={-128,-60}, Jump={-68,-60},
+	Cancel={-128,-60}, Jump={-68,-60}, Lock={-188,-60},
 }
 -- A short screen (under 450 px tall: a phone held sideways, whatever its width, ROBLOX-92: it was 568 px and wider only, so a 480 px phone had the tall stack) is laid out in three rows.
 function HudLayout.isShort(width: number, height: number): boolean
@@ -49,6 +51,12 @@ function HudLayout.layoutButton(b: Button, width: number, height: number): Butto
 	if b.action == "Focus" and width < 400 and not short then
 		local copy = table.clone(b)
 		copy.y = -320
+		return copy
+	end
+	-- ... nor for Lock left of Cancel: it goes up beside Focus.
+	if b.action == "Lock" and width < 400 and not short then
+		local copy = table.clone(b)
+		copy.x, copy.y = -158, -316
 		return copy
 	end
 	if short then

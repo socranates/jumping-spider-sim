@@ -14,6 +14,8 @@
 -- The naturalist's notebook (ROBLOX-37): N opens it. Godot's D-pad up is the port's walking, so a controller reaches it through the life
 -- menu (View / Touchpad, then Notebook); touch has the Notebook button beside Menu (SpiderClient).
 -- The settings (ROBLOX-49): O opens them; a controller and touch reach them through the life menu (then Settings).
+-- The lock (ROBLOX-110): Recentre (R / middle mouse / right-stick click / the touch Recentre) locks onto what the spider sees, lets go of a lock, or with
+-- nothing to lock recentres; touch also has a small Lock button by Jump (no key: Recentre is the keys' lock), shown while something can be locked.
 --
 -- Every button action is held while any source holds it (InputState): a key, a controller button, a finger. Handlers hear
 -- one "begin" when the first source goes down and one "end" when the last comes up, so a touch hold and a key or button
@@ -45,13 +47,14 @@ export type Handlers = {
 	gait: () -> (),
 	eye: () -> (),
 	recenter: () -> (),
+	lock: (() -> ())?, -- the touch Lock button (ROBLOX-110)
 	slow: () -> (),
 	help: () -> (),
 	touchLook: (Vector2) -> (),
 	device: ((string) -> ())?, -- the last input's UserInputType name
 }
 
-local ONE_SHOT = { Menu = "menu", Notebook = "notebook", Settings = "settings", Reset = "reset", Gait = "gait", Eye = "eye", Recenter = "recenter", Slow = "slow", Help = "help" }
+local ONE_SHOT = { Menu = "menu", Notebook = "notebook", Settings = "settings", Reset = "reset", Gait = "gait", Eye = "eye", Recenter = "recenter", Slow = "slow", Help = "help", Lock = "lock" }
 
 -- Bindings by action. Exported for tests and the controls table in README.md.
 SpiderInput.BINDINGS = {

@@ -559,3 +559,45 @@ reasons; `docs/STORE_PAGE.md` is the store page's plan. **Nothing of it has run 
 - The typeface: Merriweather (Light for the title). Another of Roblox's faces?
 - The intro's length (about 14 s, skippable after 2) and whether it should also play for Free play's first life (it does now, once per save).
 - The description and the icon's concept in `docs/STORE_PAGE.md`.
+
+## Lock-on and the sidestep (ROBLOX-110, 2026-10-20)
+
+Claude → Chet, 2026-10-20, branch `claude/lock`. Nathan asked for "a lock on so you can track prey without the visual cues and the ability to side step".
+`docs/DECISIONS.md` ROBLOX-110 has the numbers and the reasons. **Nothing of it has run in Studio.**
+
+- **The lock** (`Shared/Movement/LockOn`, new): Recentre (R, middle mouse, the right-stick click / R3, the touch Recentre) locks onto what the spider has seen:
+  the thing in its principal eyes nearest the middle of the view, else the nearest it has placed within 12 studs in front of it. With nothing to lock the same
+  press recentres as before; a press while locked lets go (and recentres). Touch also has a small Lock button left of Cancel, shown only while something can
+  be locked or a lock holds (Lock / Unlock). Only the sensor's memory is read: nothing unseen or hidden can be locked.
+- **While locked**: the camera keeps it framed (third person and the eye view; Reduced Motion holds still and cuts at 25 degrees), the body faces it, a held
+  jump aims at it. A / D (the stick's left and right, the touch arrows) sidestep round it at the creep at the distance it had; W / S close or open it.
+- **It ends** on a second press, Cancel (when there is no aim, press, line or edge walk to cancel), when the spider's memory lets it go (6 s out of sight, the
+  spot found empty, eaten) or beyond 16 studs.
+- **The setting** "Show what the spider notices" (Comfort, on by default) hides the perception HUD's rings, marks, words and edge chevrons. The lock's only
+  cue is four faint ticks round the locked thing; no words.
+- **The controls card** names it on every device, still ten lines at most. **The self-test**: one check more, "lock" (34 now).
+
+## Your Studio checklist (ROBLOX-110)
+
+1. **The self-test first**: `workspace:SetAttribute("SelfTest", true)`, Play, touch nothing, send the printout. New: `PASS lock` and its `INFO lock:` line
+   (how far the fly was, the facing, the sidestep in a second). Its SKIP says when no fly of the sill had a place in view of it.
+2. **Lock a fly**: on the sill, walk to within a few studs of a fly, look at it, press R. The camera should turn to keep the fly in view (try looking away with
+   the mouse: the view should come back to it), the spider should face it, and four small ticks should sit round the fly. Hold A, then D: the spider sidles
+   round the fly slowly, staying at the same distance and facing it. W closes in, S backs off. Hold Space: the landing patch should be on or right behind the
+   fly. Press R again: the lock goes and the camera recentres. Then press R with nothing seen near: it only recentres.
+3. **Endings**: lock a fly and let it fly off (walk at it): the lock should end by itself within a few seconds of the fly leaving sight. Lock, then Q: it ends.
+4. **Walls and undersides**: lock a fly from a wall or under a leaf of the Pilea and sidestep: the spider keeps to its surface and keeps facing the fly.
+5. **The eye view** (V) while locked: the view should turn to the fly too.
+6. **Show what the spider notices**: Settings, Comfort, turn it off: no rings or words over what the spider sees; lock a fly: the four ticks and the camera
+   still follow it. Turn it back on.
+7. **Reduced Motion** on, lock a fly and sidestep: the camera should hold still and cut back only when the fly is well off the middle.
+8. **Controller and phone**: on a PlayStation controller R3 locks and unlocks and the stick circles; the controls card (H on a keyboard, the life menu's Controls
+   on a controller) says so. In Studio's device emulator at a phone size: the Lock button appears beside Cancel only when a fly is in view, and says Unlock
+   while locked.
+
+## Open for Nathan (ROBLOX-110)
+
+- The lock is on Recentre (R / R3 / the touch Recentre and a Lock button), not on a tap of Focus as the brief suggested: a tap and a hold of one button would
+  have fought Focus's toggle setting and left the controller nothing free. Say if you would rather have the Focus tap (or another key).
+- The numbers: 12 studs to lock, 16 to keep, the camera's follow at 5 a second, the creep at 0.65 studs a second while circling.
+- The woodlice, ladybirds, millipedes, snail and harvestmen are not shown to the spider's senses (ROBLOX-105), so they cannot be locked yet.

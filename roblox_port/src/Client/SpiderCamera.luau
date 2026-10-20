@@ -24,6 +24,9 @@
 -- the slow auto-orbit when the player is idle, the zoom and the preset framings), eased in over InspectView.EASE_SECONDS (0.8 s) from the pose the camera had; the player's
 -- look, the wheel, the pinch and the stick are the orbit's while it holds; `endInspect` eases back out to the orbit camera (which has not moved) or the eye view, which is given back as it was. The boom
 -- is cast against the sill like the orbit's, and the body is always shown. Reduced motion: no auto-orbit, and the eases and the framings are cuts.
+-- The lock (ROBLOX-110, Movement/LockOn): `setLock` hands the camera the locked thing's place each frame; the orbit then turns (yaw and elevation) to look past the
+-- spider at it and the eye view's gaze turns to it, eased at LockOn.game.cameraRate, or under Reduced Motion held still and cut when the thing has drifted
+-- LockOn.game.reducedCutDeg; the player's own look still arrives but the follow takes it back. Not during the two-shot or the close look.
 -- Mouse: locked to the screen centre while playing (as the Godot game captures it); the Roblox menu frees it.
 -- Placement order (Godot chunk 6B): no boom is trusted until the sill can be seen by queries; until then the camera sits
 -- at the pivot with a boom of 0.
@@ -36,6 +39,7 @@ local CameraMath = require(Movement:WaitForChild("CameraMath"))
 local SupportMath = require(Movement:WaitForChild("SupportMath"))
 local LineFraming = require(Movement:WaitForChild("LineFraming"))
 local InspectView = require(Movement:WaitForChild("InspectView"))
+local LockOn = require(Movement:WaitForChild("LockOn"))
 
 local SpiderCamera = {}
 SpiderCamera.__index = SpiderCamera
@@ -77,6 +81,7 @@ function SpiderCamera.new(camera: Camera, params: RaycastParams, target: () -> T
 		reducedMotion = false, pinchScale = 1, -- (the last scale a pinch reported, to read the next as a ratio)
 		lookScale = 1, -- the eye view only: SpiderEyes sets it with the field of view, so a turn of the view moves the picture as fast at any zoom
 		gaze = -Vector3.zAxis,
+		lockPoint = nil :: Vector3?, -- the locked thing's place (ROBLOX-110), or nil
 		gazeUp = Vector3.yAxis,
 		bodyHidden = false,
 		hide = nil :: ((boolean) -> ())?,
@@ -401,6 +406,7 @@ function SpiderCamera.render(self: any, frameDt: number, lookX: number, lookY: n
 		end
 		if k >= 1 then self.recenterT = -1 end
 	end
+	self:_applyLock(frameDt, t)
 	if self.eyeView then
 		local body = SupportMath.bodyCFrame(t.pos, self.gazeUp, t.heading)
 		local eye = body:PointToWorldSpace(Vector3.new(0, CameraMath.EYE_HEIGHT, -CameraMath.EYE_AHEAD))
@@ -428,6 +434,30 @@ function SpiderCamera.render(self: any, frameDt: number, lookX: number, lookY: n
 	if self.inspect == nil and self.inspectT <= 0 then self:_hideBody(length < CameraMath.BODY_HIDE_LENGTH) end
 	self:_applyShot(frameDt)
 	self:_applyInspect(frameDt)
+end
+
+-- The lock (ROBLOX-110): the locked thing's place for this frame, or nil. A recentre under way gives way to it.
+function SpiderCamera.setLock(self: any, point: Vector3?)
+	self.lockPoint = point
+	if point ~= nil and self.recenterT >= 0 then self.recenterT = -1 end
+end
+
+function SpiderCamera._applyLock(self: any, frameDt: number, t: Target)
+	local point: Vector3? = self.lockPoint
+	if point == nil or self.shot ~= nil or self.inspect ~= nil then return end
+	if self.eyeView then
+		local body = SupportMath.bodyCFrame(t.pos, self.gazeUp, t.heading)
+		local eye = body:PointToWorldSpace(Vector3.new(0, CameraMath.EYE_HEIGHT, -CameraMath.EYE_AHEAD))
+		local to = point - eye
+		if to.Magnitude < 1e-3 then return end
+		local want = CameraMath.clampGaze(to.Unit, self.gazeUp, t.heading)
+		self.gaze = CameraMath.clampGaze(LockOn.followGaze(self.gaze, want, frameDt, self.reducedMotion), self.gazeUp, t.heading)
+		return
+	end
+	if self.framing.assist ~= 0 then self.yaw += self.framing:takeOver() end -- (the line framing's turn is the player's now, so nothing jumps)
+	local yaw, elev = LockOn.orbitGoal(t.pos + self.pivotDir * self.pivot, point)
+	if yaw == nil or elev == nil then return end
+	self.yaw, self.elevation = LockOn.followOrbit(self.yaw, self.elevation, yaw, elev, frameDt, self.reducedMotion)
 end
 
 -- The mating scene's two-shot (ROBLOX-89): `shot` is the framing for this frame, or nil when the scene is not playing.

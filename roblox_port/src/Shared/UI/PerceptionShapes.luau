@@ -67,6 +67,20 @@ function Shapes.focusTicks(cx: number, cy: number): { Bar }
 	return out
 end
 
+-- The lock's cue (ROBLOX-110): four short ticks on the diagonals round the locked thing's place on screen, fainter and wider than Focus's, so
+-- the two never read as one. The only thing the lock draws.
+Shapes.LOCK_RADIUS = 22
+Shapes.LOCK_LENGTH = 7
+Shapes.LOCK_ALPHA = 0.6 -- (0.45 all but vanished on the sunlit floor in the mock of ROBLOX-110; the dark edge at 0.6 reads on light and dark ground)
+function Shapes.lockTicks(cx: number, cy: number): { Bar }
+	local out: { Bar } = {}
+	for i = 0, 3 do
+		local a = math.pi / 4 + i * math.pi / 2
+		out[i + 1] = { x = cx + math.cos(a) * Shapes.LOCK_RADIUS, y = cy + math.sin(a) * Shapes.LOCK_RADIUS, length = Shapes.LOCK_LENGTH, rotation = axis(math.deg(a)) }
+	end
+	return out
+end
+
 -- Where a label's top middle goes. (px, py) is the middle of the ring it names and `offset` PerceptionView's gap from there to the
 -- label (the ring's radius and 8). Under the ring, unless the screen has no room for LABEL_HEIGHT pixels there, then above it. When
 -- the label's width is known (> 0) it is kept LABEL_MARGIN pixels inside the screen sideways. Returns x, y and whether it is below.

@@ -62,7 +62,7 @@ function PeacockText.touchDisplay(dancing: boolean): string return if dancing th
 -- label, so it is "tap Change", not "Change change spider".
 function PeacockText.crackLine(device: ControlText.Device): string
 	local choose = ControlText.name(device, "choose")
-	if device == "touch" then return `In the crack: tap {choose} to change spider; hold it to look closely` end
+	if device == "touch" then return `In the crack: tap {choose} to change spider; hold: look closely` end -- (ROBLOX-110: one line at the card's width, so the lock's line fits in ten)
 	return `In the crack: {choose} change spider (hold {choose}: look closely)`
 end
 

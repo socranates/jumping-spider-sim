@@ -10,6 +10,9 @@
 -- Blocked / Out of reach / Can't land there; release to leap, Q cancels. F lets down on silk (to the nearest edge first on
 -- top of a leaf). On the line W reels in, S lowers and holding Q lets go. V spider-eye view, R recenter, right mouse Focus,
 -- T slow motion, H controls card, Backspace back to the start, Esc the Roblox menu (the game waits).
+-- The lock (ROBLOX-110, Shared/Movement/LockOn): R (middle mouse, right-stick click, the touch Recentre or Lock) locks onto what the spider's senses have placed,
+-- or with nothing to lock recentres; while locked the camera keeps it framed, the body faces it, the jump's aim is on it, and A / D (the stick's left and right)
+-- sidestep round it at a creep, W / S closing or opening the distance. A second press, Cancel, or the memory letting it go ends it.
 -- The peacock spider (ROBLOX-31): resting in the crack, C (RB / R1, the touch Change button) turns the spider into the other one (the first
 -- spider or the peacock spider, Maratus volans); as the peacock spider, standing still, X (RB / R1, Dance) starts its courtship dance and any move,
 -- jump or Cancel stops it. The dance is a pose of the drawn rig only; the motor, senses, silk and the rest are the same for both.
@@ -111,7 +114,11 @@ local M = {
 	TitleCard = require(script.Parent.TitleCard),
 	TitleText = require(Shared.UI.TitleText),
 	title = (nil :: any),
+	-- ROBLOX-110: the lock and the sidestep (Movement/LockOn): what the spider has locked onto from its own memory, the distance it keeps, the place it follows; here for the same reason.
+	LockOn = require(Shared.Movement.LockOn),
+	lock = (nil :: any),
 }
+M.lock = M.LockOn.new()
 local focusState = FocusState.new()
 local DT = SpiderMotor.DT
 local SLOW_SPEED = 0.5
@@ -466,7 +473,7 @@ local function backToStart()
 	ant.stopDisplay()
 	focusState:clear()
 	sensor:reset()
-	memory:clear()
+	memory:clear();M.LockOn.release(M.lock,"reset")
 	jump:drop(motor)
 	motor:respawn()
 	dropStrands(false)
@@ -683,7 +690,7 @@ end
 function spiderPick.touchFrame()
 	local on: boolean = spiderPick.inspecting
 	if on then
-		for _, a in { "Left", "Right", "Jump", "Creep", "Drop", "Recenter", "Focus", "Feed", "Choose", "Display" } do controls:setTouchVisible(a, false) end
+		for _, a in { "Left", "Right", "Jump", "Creep", "Drop", "Recenter", "Focus", "Feed", "Choose", "Display", "Lock" } do controls:setTouchVisible(a, false) end
 		controls:setTouchLabel("Cancel", spiderPick.Text.TOUCH_BACK)
 		controls:setTouchLabel("Eye", spiderPick.Text.TOUCH_VIEW)
 	elseif spiderPick.touchOn then
@@ -756,7 +763,7 @@ local function fresh(mode: string, easy: boolean, position: Vector3?): boolean
  if not ok then return false end
  mateLegs.reset()
  session:begin(mode,easy);applyRules();motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor())
- sensor:reset();memory:clear();table.clear(M.nature.night)
+ sensor:reset();memory:clear();M.LockOn.release(M.lock,"reset");table.clear(M.nature.night)
  local slot=M.SaveRules.slotOf(mode,session.rules)
  stores[slot]=newStore();checkpoints=stores[slot]
  life.resting=false;life.notice="";life.noticeSeconds=0;life.restoreGrace=0
@@ -955,7 +962,7 @@ function mateLegs.carryOn()
  setAppearance(appearance) -- the rig is built again, at the first growth stage
  motor:place(Vector3.new(-25.5,0.31,6.0),Vector3.yAxis,M.World.spawnHeading)
  motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor())
- sensor:reset();memory:clear()
+ sensor:reset();memory:clear();M.LockOn.release(M.lock,"reset")
  dropStrands(false);drawnUp=motor.up;M.World:refocus();cam:snap();lastLight=nil
  feedPending,cancelPending=false,false
  watch:resync()
@@ -1301,7 +1308,9 @@ controls = SpiderInput.bind({
 		cancelPending = true -- also ends a rest
 		prey.feeding:cancel()
 		if motor:cancelWalk() then return end
-		focusState:cancel(jump:isBusy() or #jump.events > 0 or motor:onLine())
+		local busy = jump:isBusy() or #jump.events > 0 or motor:onLine()
+		focusState:cancel(busy)
+		if not busy then M.LockOn.release(M.lock, "cancel") end -- (ROBLOX-110: Cancel lets go of a lock when it has nothing else to cancel)
 		jump:cancel()
 	end,
 	drop = function() if life.growth:isMoulting() or mateLegs.couple.active or spiderPick.inspecting then return end; ant.stopDisplay(); motor:requestDrop() end,
@@ -1317,7 +1326,21 @@ controls = SpiderInput.bind({
 		end
 		cam:toggleEyeView()
 	end,
-	recenter = function() if not spiderPick.inspecting then cam:startRecenter() end end,
+	-- R / middle mouse / right-stick click / the touch Recentre (ROBLOX-110): lock onto what the spider sees, let go of a lock, or, with nothing to lock, recentre
+	-- as before; letting go recentres too, behind a spider that is facing what it watched. The touch Lock button only locks and lets go.
+	recenter = function()
+		if spiderPick.inspecting then return end
+		local o = motor:observer()
+		local origin, dir = cam:aimRay()
+		local r = M.LockOn.press(M.lock, memory, motor.pos, motor.up, o.eye, o.heading, origin, dir)
+		if r ~= "locked" then cam:startRecenter() end
+	end,
+	lock = function()
+		if spiderPick.inspecting then return end
+		local o = motor:observer()
+		local origin, dir = cam:aimRay()
+		M.LockOn.press(M.lock, memory, motor.pos, motor.up, o.eye, o.heading, origin, dir)
+	end,
 	slow = function() if not spiderPick.inspecting then slow = not slow end end,
 	touchLook = function(delta: Vector2) cam:touchLook(delta) end,
 	help = function()
@@ -1339,7 +1362,11 @@ local function tickInput(): any
 	local r, f = controls:axes()
 	if jump:isAiming() then r, f = 0, 0 end -- left stick aims, never walks during the held jump
 	local wish = Vector3.zero
-	if r ~= 0 or f ~= 0 then
+	local locked: Vector3? = if motor.mode == "attached" and not motor.silk.walk then M.lock.point else nil -- (ROBLOX-110: the sidestep, round the locked thing at a creep)
+	if locked then
+		carry:step(0, 0, Vector3.zero, motor.transitionSerial, motor.intent, false)
+		wish, M.lock.keep = M.LockOn.strafe(motor.pos, motor.up, locked, M.lock.keep, r, f)
+	elseif r ~= 0 or f ~= 0 then
 		-- Over a sharp edge the stick keeps carrying the spider the way it was going (Godot's carry), so holding forward
 		-- never walks it straight back when the camera's idea of forward flips from floor to wall.
 		local d = carry:step(r, f, cam:mapStick(r, f, motor.up), motor.transitionSerial, motor.intent, false)
@@ -1347,17 +1374,17 @@ local function tickInput(): any
 	else
 		carry:step(0, 0, Vector3.zero, motor.transitionSerial, motor.intent, false)
 	end
-	local focusPoint: Vector3? = nil
-	if focusState:active(controls.held.Focus == true, setting("FocusToggle") == true, motor.mode == "attached") then
+	local focusPoint: Vector3? = locked -- (a lock turns the body and the gaze to the locked thing, as Focus does)
+	if locked == nil and focusState:active(controls.held.Focus == true, setting("FocusToggle") == true, motor.mode == "attached") then
 		local origin, dir = cam:aimRay()
 		local hit = Workspace:Raycast(origin, dir * SpiderMotor.AIM_RANGE, params)
 		focusPoint = if hit then hit.Position else origin + dir * SpiderMotor.AIM_RANGE
 	end
 	rig.focusPoint = focusPoint -- (the drawn body turns a little toward it and the eyes glance at it: ROBLOX-87, display only)
 	return {
-		wish = wish, creep = controls.held.Creep == true, reel = f,
+		wish = wish, creep = controls.held.Creep == true or locked ~= nil, reel = f,
 		dropHeld = controls.held.Drop == true, releaseHeld = controls.held.Cancel == true and not spiderPick.cancelSwallow,
-		focusPoint = focusPoint, gaze = if cam.eyeView then cam.gaze else nil,
+		focusPoint = focusPoint, gaze = if cam.eyeView then cam.gaze else nil, face = locked,
 	}
 end
 
@@ -1512,6 +1539,13 @@ local function updateHud(frameDt: number)
 	controls:setTouchLabel("Cancel", ControlText.touchCancelLabel(onLine))
 	controls:setTouchVisible("Jump", not onLine)
 	controls:setTouchVisible("Creep", not onLine)
+	do -- the Lock button (ROBLOX-110): only while something can be locked, or a lock holds
+		local o = motor:observer()
+		local origin, dir = cam:aimRay()
+		local held = M.lock.trackId ~= nil
+		controls:setTouchVisible("Lock", held or (motor.mode == "attached" and M.LockOn.pick(memory, o.eye, o.heading, origin, dir) ~= nil))
+		controls:setTouchLabel("Lock", ControlText.touchLockLabel(held))
+	end
 	-- The peacock spider's buttons: Change in the crack, Dance on the open sill (the peacock spider only).
 	controls:setTouchVisible("Choose", canChange())
 	controls:setTouchVisible("Display", displayKind ~= nil and not onLine and not life.resting and motor.mode == "attached")
@@ -1539,6 +1573,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 		local simDt = frameDt * (if slow then SLOW_SPEED else 1)
 		accumulator = math.min(accumulator + simDt, 0.25)
 		local origin, dir = cam:aimRay()
+		if M.lock.point and (M.lock.point - origin).Magnitude > 1e-3 then dir = (M.lock.point - origin).Unit end -- (ROBLOX-110: the aim snaps to the locked thing)
 		motor:setAimRay(origin, dir)
 		while accumulator >= DT do
 			accumulator -= DT
@@ -1557,6 +1592,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			local waspPercept = wasp:percept() -- movement to the spider's senses, never prey
 			if waspPercept then table.insert(percepts, waspPercept) end
 			sensor:step(DT,motor:observer(),percepts,sightCast)
+			M.LockOn.update(M.lock, memory, motor.pos) -- (ROBLOX-110: the lock follows the memory, and ends when it forgets)
 			M.World.prey:before(DT,motor.pos,motor:observer(),sensor,sightCast,camera,life.clock.hour) -- (ROBLOX-101: the moths and crane flies fly from dusk)
 			if life.growth:isMoulting() then jump:drop(motor);motor:cancelWalk() else jump:step(motor) end
 			if breakaway:step(DT,if jump.last and jump.last.tick==jump.tick then jump.last else nil,motor.pos,setting("ReducedMotion")==true) then
@@ -1865,13 +1901,14 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			local _, zoom = controls:axes() -- the left stick, or W and S: forward is closer (the close look)
 			cam:inspectZoom(zoom, frameDt)
 		end
+		cam:setLock(M.lock.point)
 		cam:render(frameDt, lx, ly)
 	end
 	-- The Focus that feeds the perception HUD also decides how far the principal eyes are in use (the eye view's picture). The
 	-- picture sets the field of view, so it comes before the HUD projects anything.
 	local focusing = motor.mode == "attached" and (controls.held.Focus == true or focusActive())
 	eyes:update(frameDt, focusing)
-	perceptionHud:draw(memory,camera,sightCast,focusing,setting("ShowLastSeen") == true)
+	perceptionHud:draw(memory,camera,sightCast,focusing,setting("ShowLastSeen") == true,setting("ShowNoticed") ~= false,M.lock.point)
 	-- Depth of field: on the spider in third person; in the eye view SpiderEyes owns it and focuses on what is looked at.
 	local dof = Lighting:FindFirstChild("MacroDOF")
 	if not cam.eyeView and dof and dof:IsA("DepthOfFieldEffect") then
@@ -1907,6 +1944,7 @@ M.hooks = function(): any
 			end,
 			detail = detail, -- (ROBLOX-104: the tier the self-test reports its part counts at)
 			title = M.title, -- (ROBLOX-109: the title card and the intro, for the self-test's intro check)
+			lock = M.lock, lockOn = M.LockOn, -- (ROBLOX-110: the lock's state and its rules)
 			nature = M.nature, -- (ROBLOX-106: nature's rules this tick: the cover factor, the night's passes)
 	}
 end

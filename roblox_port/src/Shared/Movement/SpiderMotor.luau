@@ -56,6 +56,7 @@ export type TickInput = {
 	focusPoint: Vector3?, -- Focus held: the body turns toward this point
 	focusDir: Vector3?, -- Focus held: the aim ray's direction, which the gaze tilts toward when the point is within 0.2 WU of the eyes
 	gaze: Vector3?, -- spider-eye view: the body turns to face a gaze beyond 30 degrees
+	face: Vector3?, -- the lock's sidestep (ROBLOX-110, Movement/LockOn): walking, the body keeps facing this point instead of turning to the walk
 }
 
 export type Config = {
@@ -656,7 +657,8 @@ function Motor._tickAttached(self: any, input: TickInput)
 	end
 	local stalk = input.creep and not silk.walk
 	local speed = (if stalk then self.loco.stalk_speed_wu_s else self.loco.walk_speed_wu_s)*self.speedFactor
-	self.heading = SupportMath.tangentDir(SupportMath.rotateToward(self.heading, dir, TURN_RATE * DT), self.up)
+	local face = if input.face ~= nil and not silk.walk then SupportMath.tangentDir(input.face - self.pos, self.up) else Vector3.zero
+	self.heading = SupportMath.tangentDir(SupportMath.rotateToward(self.heading, if face ~= Vector3.zero then face else dir, TURN_RATE * DT), self.up) -- (ROBLOX-110: a sidestep faces the locked thing, not the way it walks)
 	local step = dir * speed * DT
 	-- Concave corner: a wall (or a leaf's edge, a stem) ahead becomes the new support.
 	local ahead = self:_ray(self.pos, dir * (HEIGHT + step.Magnitude + 0.02))

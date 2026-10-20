@@ -318,6 +318,14 @@ local function words(name: string): string
 end
 local CRACK = Vector3.new(-25.5, 0.31, 6.0)
 local OPEN = Vector3.new(-5, 0.31, -9)
+-- (ROBLOX-110: the start's save status is settled first. With no server it turns "offline" after SaveRules.CLIENT_WAIT_REMOTES seconds of the wall clock, and its
+-- toast landed on whichever check was running then; since the shim got fast (ROBLOX-108) that was the choose key's refusal, whose toast it covered. Settled here,
+-- before any check, the run no longer depends on how fast the machine is.)
+do
+	local t0 = os.clock()
+	while ClientStubs.driver ~= nil and ClientStubs.driver.saveState.status == nil and os.clock() - t0 < 10 do frame(1 / 60) end
+	frame(1 / 60)
+end
 -- The settings panel's own input (a Context Action above the game's).
 local function panelKey(code: string, state: any?)
 	local fn = services.actions["WindowsillSettings"]

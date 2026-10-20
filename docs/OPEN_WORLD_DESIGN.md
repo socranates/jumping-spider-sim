@@ -203,7 +203,9 @@ exploration you gotta earn"; "you get time to enjoy the scenery because you are 
 5. **W5 — no hand holding** (ROBLOX-98): the HUD and notice audit for Normal — hints only on day one, captions
    sparing, nothing added for the garden but a region name on the day line.
 Then full suites, places, bundle, publish. *(Toward the publish, 2026-10-20, ROBLOX-109: the game's own splash, the start menu as a title card, the intro of a
-new life, the cards in one typeface, and the store page's plan in `docs/STORE_PAGE.md`; CLI only, not run in Studio.)*
+new life, the cards in one typeface, and the store page's plan in `docs/STORE_PAGE.md`; CLI only, not run in Studio. ROBLOX-110: lock-on and the sidestep, the
+spider keeping its prey in its principal eyes and sidling round it, taken only from what its senses have placed, and "Show what the spider notices" to turn the
+perception HUD off, the lock's four faint ticks its only cue (W5's quiet HUD); CLI only, not run in Studio.)*
 
 ## Risks, named
 

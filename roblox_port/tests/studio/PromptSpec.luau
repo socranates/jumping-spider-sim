@@ -61,6 +61,7 @@ return function(check: (string, () -> ()) -> ())
 		end
 		if b.action == "Eye" then labels = { b.label, InspectText.TOUCH_VIEW } end
 		if b.action == "Choose" then labels = { b.label, PeacockText.touchChange() } end
+		if b.action == "Lock" then labels = { b.label, ControlText.touchLockLabel(true) } end -- (ROBLOX-110: Lock, Unlock)
 		return labels
 	end
 	check("touch buttons' words fit their buttons, the relabels too (Rear up, Grip, Back, View, Leave, Sleep, Wake, Skip)", function()

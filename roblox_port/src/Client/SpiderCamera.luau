@@ -30,6 +30,10 @@
 -- Mouse: locked to the screen centre while playing (as the Godot game captures it); the Roblox menu frees it.
 -- Placement order (Godot chunk 6B): no boom is trusted until the sill can be seen by queries; until then the camera sits
 -- at the pivot with a boom of 0.
+-- The cost on the line (ROBLOX-113: v37's Studio run measured the camera at 7.9 ms a frame there, 0.7 on the sill): whether a boom's start touches geometry is
+-- asked once per point a tick, not once per boom (the line framing's search and a squeezed pitch search cast every boom from one pivot: 123 overlap tests a frame
+-- became 2); a squeezed pitch search, and the framing's search when only the rest point has moved, run at most every other tick; the render takes the tick's boom
+-- when the view has not turned since. `stats` counts the queries for the self-test's profile. What the camera does is the same; only when it asks again differs.
 
 local GuiService = game:GetService("GuiService")
 local UIS = game:GetService("UserInputService")
@@ -50,6 +54,9 @@ local TOUCH_DEG_PER_PIXEL = 0.25
 export type Shot = { focus: Vector3, dir: Vector3, distance: number, up: Vector3 }
 local SHOT_EASE_SECONDS = 0.8
 SpiderCamera.SHOT_EASE_SECONDS = SHOT_EASE_SECONDS
+-- ROBLOX-113: how far the pivot may move before a squeezed pitch search, or the line framing's search, must be run again on the very next tick (a let-down moves it
+-- 0.0125 studs a tick, so each still runs every other tick; any turn of the view, a zoom or a change of the lip runs them at once).
+SpiderCamera.SEARCH_REUSE_STUDS = 0.05
 
 export type Target = { pos: Vector3, drawnUp: Vector3, heading: Vector3, onLine: boolean?, rest: Vector3?, lip: Vector3?, cameraScale: number?, bodyLength: number?, bodyDrop: number? }
 
@@ -86,7 +93,18 @@ function SpiderCamera.new(camera: Camera, params: RaycastParams, target: () -> T
 		bodyHidden = false,
 		hide = nil :: ((boolean) -> ())?,
 		framing = LineFraming.new(),
-		wantedKey = "", wantedCache = 0,
+		wantedKey = "", wantedCache = 0, wantedView = "", wantedFrom = Vector3.zero,
+		-- (ROBLOX-113) the world queries since the client last read them, for the self-test's profile: boom casts (sphere casts), overlap tests, sight rays and
+		-- the line framing's searches.
+		stats = { casts = 0, overlaps = 0, rays = 0, searches = 0 },
+		touchMemo = { n = 0, at = {} :: { Vector3 }, hit = {} :: { boolean } }, -- (ROBLOX-113: the points asked this tick or frame and whether a boom from each starts in geometry)
+		searchOffsets = {} :: { number }, searchLengths = {} :: { number }, -- (ROBLOX-113: the pitch search's lists, reused)
+		-- (ROBLOX-113) the tick's own pitch search, kept for the next tick when it had to search (the view's pitch was squeezed): the pivot it searched from, the
+		-- view it searched for, its answer, and whether the next tick may take it (`reuse`, so a squeezed search runs at most every other tick).
+		lastSearch = { from = Vector3.zero, yaw = 0, elevation = 0, distance = 0, wanted = 0, reuse = false },
+		tickBoom = { from = Vector3.zero, yaw = 0, elevation = 0, distance = 0, clear = 0, fresh = false }, -- (ROBLOX-113: the boom the last tick cast, for this frame's render)
+		framingSkip = false, -- (ROBLOX-113: the line framing's search was run last tick only because the rest point moved; this tick it may wait)
+		tickTarget = nil :: Target?, -- (the target of the tick under way, for the framing's search)
 		worldReady = false,
 		mouse = true, -- false in tests: no mouse lock or mouse look (the Studio specs run on the server)
 		-- The player's settings (ROBLOX-49; SpiderCamera.configure, called every frame): look speeds, inversion, the third person's field of
@@ -94,6 +112,11 @@ function SpiderCamera.new(camera: Camera, params: RaycastParams, target: () -> T
 		mouseSens = 1, stickSens = 1, touchSens = 1, invertX = false, invertY = false,
 		fov = CameraMath.FOV_DEG, settingDistance = CameraMath.CAMERA_DISTANCE, framingOn = true, levelHorizon = false, levelUp = Vector3.yAxis,
 	}, SpiderCamera)
+	-- (ROBLOX-113: the line framing's question, made once rather than as a new closure every tick)
+	self.wantedFn = function(): number
+		local t: Target? = self.tickTarget
+		return if t ~= nil then self:_wantedTurn(t) else self.wantedCache
+	end
 	camera.CameraType = Enum.CameraType.Scriptable
 	camera.FieldOfView = CameraMath.FOV_DEG
 	-- A pinch on a touch screen zooms the close look (ROBLOX-90), and nothing else: the game's own camera has never taken a pinch.
@@ -167,11 +190,33 @@ function SpiderCamera._ready(self: any): boolean
 	return self.worldReady
 end
 
+-- Whether a boom from `from` starts touching geometry. ROBLOX-113: asked once per point per tick (or frame): a pitch search and the line framing's search cast
+-- every boom from one pivot, up to a hundred and more a tick on the line, and the answer cannot change inside a tick; `_fresh` forgets it.
+function SpiderCamera._touching(self: any, from: Vector3): boolean
+	local memo = self.touchMemo
+	for i = 1, memo.n do
+		if memo.at[i] == from then return memo.hit[i] end
+	end
+	self.stats.overlaps += 1
+	local touching = #Workspace:GetPartBoundsInRadius(from, CameraMath.BOOM_RADIUS, self.overlap) > 0
+	if memo.n < 8 then
+		memo.n += 1
+		memo.at[memo.n], memo.hit[memo.n] = from, touching
+	end
+	return touching
+end
+
+-- A new tick or frame: the world may have moved, so nothing asked before is trusted.
+function SpiderCamera._fresh(self: any)
+	self.touchMemo.n = 0
+end
+
 -- Boom length clear of the sill from `from` along `motion`. A start touching geometry is blocked at once.
 function SpiderCamera._cast(self: any, from: Vector3, motion: Vector3): number
 	local length = motion.Magnitude
 	if length < 1e-6 or not self:_ready() then return 0 end
-	if #Workspace:GetPartBoundsInRadius(from, CameraMath.BOOM_RADIUS, self.overlap) > 0 then return 0 end
+	if self:_touching(from) then return 0 end
+	self.stats.casts += 1
 	local hit = Workspace:Spherecast(from, CameraMath.BOOM_RADIUS, motion, self.params)
 	return if hit then math.max(0, hit.Distance - 0.01) else length
 end
@@ -184,10 +229,13 @@ function SpiderCamera._boomAt(self: any, from: Vector3, yaw: number, pitch: numb
 	return self:_cast(from, CameraMath.backDirection(yaw, pitch) * self:viewDistance())
 end
 
--- camera_rig._pitch_search: the auto-pitch offset from the pivot `from` at this yaw, and the boom it gives.
-function SpiderCamera._pitchSearch(self: any, from: Vector3, yaw: number): (number, number)
+-- camera_rig._pitch_search: the auto-pitch offset from the pivot `from` at this yaw, and the boom it gives (and, ROBLOX-113, how many pitches it tried: one when the
+-- view's own pitch is comfortable). The offsets and lengths are kept in two lists the camera reuses (a search runs many times a tick on the line).
+function SpiderCamera._pitchSearch(self: any, from: Vector3, yaw: number): (number, number, number)
 	local comfort = math.min(CameraMath.COMFORT_BOOM, self:viewDistance())
-	local offsets, lengths = { 0 }, { self:_boomAt(from, yaw, self.elevation) }
+	local offsets, lengths = self.searchOffsets, self.searchLengths
+	table.clear(offsets); table.clear(lengths)
+	offsets[1], lengths[1] = 0, self:_boomAt(from, yaw, self.elevation)
 	local step = math.rad(CameraMath.AUTO_PITCH_STEP_DEG)
 	local roomDown = math.max(math.rad(CameraMath.MAX_ELEVATION_DEG) - self.elevation, 0)
 	local roomUp = math.max(self.elevation - math.rad(CameraMath.MIN_AUTO_ELEVATION_DEG), 0)
@@ -205,13 +253,14 @@ function SpiderCamera._pitchSearch(self: any, from: Vector3, yaw: number): (numb
 	end
 	local picked = CameraMath.pickPitchOffset(offsets, lengths, comfort)
 	local index = table.find(offsets, picked) or 1
-	return picked, lengths[index]
+	return picked, lengths[index], #offsets
 end
 
 -- True when nothing in the sill stands between the two points (camera_rig._sees).
 function SpiderCamera._sees(self: any, a: Vector3, b: Vector3): boolean
 	local d = b - a
 	if d.Magnitude < 1e-6 then return true end
+	self.stats.rays += 1
 	local hit = Workspace:Raycast(a, d, self.params)
 	return hit == nil or (hit.Position - a).Magnitude >= d.Magnitude - LineFraming.SIGHT_TOLERANCE
 end
@@ -225,18 +274,29 @@ function SpiderCamera._goodView(self: any, from: Vector3, yaw: number, spot: Vec
 	return self:_sees(camPos, spot) and self:_sees(camPos, lip)
 end
 
--- The framing's wanted turn for the rest point and lip, recomputed only when they, the pivot or the player's view move.
+-- The framing's wanted turn for the rest point and lip, recomputed only when they, the pivot or the player's view move. ROBLOX-113: when only the rest point has moved
+-- (a let-down or a reel moves it a little every tick) and by less than SEARCH_REUSE_STUDS, and the search ran on the tick before, the answer is kept one more tick:
+-- the search (up to seven turns, each its own pitch search) then runs at most every other tick on a moving line; anything else that moves runs it at once.
 function SpiderCamera._wantedTurn(self: any, t: Target): number
 	local rest = t.rest or t.pos
 	local lip = t.lip or rest
 	local from = rest + self.pivotDir * self.pivot
 	local function q(v: Vector3): string return string.format("%.2f,%.2f,%.2f", v.X, v.Y, v.Z) end
-	local key = q(from) .. "|" .. q(lip) .. "|" .. string.format("%.4f,%.4f,%.2f,%.4f", self.yaw, self.elevation, self:viewDistance(), self.framing.target)
+	local view = q(lip) .. "|" .. string.format("%.4f,%.4f,%.2f,%.4f", self.yaw, self.elevation, self:viewDistance(), self.framing.target)
+	local key = q(from) .. "|" .. view
 	if key ~= self.wantedKey then
-		self.wantedKey = key
+		if self.framingSkip and view == self.wantedView and (from - self.wantedFrom).Magnitude < SpiderCamera.SEARCH_REUSE_STUDS then
+			self.framingSkip = false
+			return self.wantedCache
+		end
+		self.wantedKey, self.wantedView, self.wantedFrom = key, view, from
+		self.framingSkip = true
+		self.stats.searches += 1
 		self.wantedCache = LineFraming.wantedTurn(self.framing.target, self.framing.maxTurn, function(turn: number): boolean
 			return self:_goodView(from, self.yaw + turn, rest, lip)
 		end)
+	else
+		self.framingSkip = false
 	end
 	return self.wantedCache
 end
@@ -253,6 +313,7 @@ function SpiderCamera.snap(self: any)
 	self.recenterT = -1
 	self.framing:reset()
 	self.wantedKey = ""
+	self.framingSkip, self.lastSearch.reuse = false, false
 	self.pivotDir = t.drawnUp
 	self.pivot = CameraMath.PIVOT_HEIGHT
 	self.settle = 2
@@ -342,9 +403,10 @@ end
 
 -- One fixed 60 Hz tick: pivot, line framing, auto-pitch and boom (orbit), or the gaze carried with the body (eye view).
 function SpiderCamera.tick(self: any, dt: number)
- local wantedScale = math.clamp(self.target().cameraScale or 1,0.5,1.5)
+	self:_fresh()
+	local t = self.target() -- (ROBLOX-113: once a tick, not twice)
+ local wantedScale = math.clamp(t.cameraScale or 1,0.5,1.5)
  self.appearanceScale += (wantedScale-self.appearanceScale)*(1-math.exp(-4*dt))
-	local t = self.target()
 	if self.eyeView then
 		local up = SupportMath.rotateToward(self.gazeUp, t.drawnUp, math.rad(CameraMath.EYE_ROLL_DEG_S) * dt)
 		if SupportMath.angleTo(up, self.gazeUp) > 1e-6 then
@@ -361,10 +423,26 @@ function SpiderCamera.tick(self: any, dt: number)
 	self.pivot = CameraMath.nextLength(self.pivot, self:_cast(t.pos, self.pivotDir * CameraMath.PIVOT_HEIGHT), CameraMath.PIVOT_HEIGHT, CameraMath.RECOVER_SPEED, dt)
 	local from = t.pos + self.pivotDir * self.pivot
 	if dt > 0 then
-		self.yaw += self.framing:tick(t.onLine == true, self.aiming, function(): number return self:_wantedTurn(t) end, dt)
+		self.tickTarget = t
+		self.yaw += self.framing:tick(t.onLine == true, self.aiming, self.wantedFn, dt)
+		self.tickTarget = nil
 	end
 	local yaw = self:viewYaw()
-	local wanted = self:_pitchSearch(from, yaw)
+	-- The auto-pitch's search (ROBLOX-113). Where the view's own pitch has room it is one cast; squeezed (against the brick on the line) it is up to fifteen. A squeezed
+	-- search is taken again on the next tick, instead of searching anew, when the view is the same and the pivot has moved less than SEARCH_REUSE_STUDS: so it runs
+	-- at most every other tick while the spider lets itself down, and at once on any turn of the view. The auto-pitch eases toward it over 0.08 s either way.
+	local last = self.lastSearch
+	local wanted: number
+	if last.reuse and self.settle <= 0 and last.yaw == yaw and last.elevation == self.elevation and last.distance == self:viewDistance()
+		and (from - last.from).Magnitude < SpiderCamera.SEARCH_REUSE_STUDS then
+		wanted = last.wanted
+		last.reuse = false
+	else
+		local tried
+		local picked, _length, count = self:_pitchSearch(from, yaw)
+		wanted, tried = picked, count
+		last.from, last.yaw, last.elevation, last.distance, last.wanted, last.reuse = from, yaw, self.elevation, self:viewDistance(), wanted, tried > 1
+	end
 	if self.settle > 0 then
 		self.settle -= 1
 		self.autoPitch = wanted
@@ -372,7 +450,10 @@ function SpiderCamera.tick(self: any, dt: number)
 		self.autoPitch = CameraMath.easeOffset(self.autoPitch, wanted, dt, CameraMath.AUTO_PITCH_IN_SECONDS, CameraMath.AUTO_PITCH_OUT_SECONDS)
 	end
 	local elev = CameraMath.effectiveElevation(self.elevation, self.autoPitch)
-	self.boom = CameraMath.nextLength(self.boom, self:_boomAt(from, yaw, elev), self:viewDistance(), CameraMath.RECOVER_SPEED, if self.settle > 0 then 1 else dt)
+	local clear = self:_boomAt(from, yaw, elev)
+	self.boom = CameraMath.nextLength(self.boom, clear, self:viewDistance(), CameraMath.RECOVER_SPEED, if self.settle > 0 then 1 else dt)
+	local b = self.tickBoom -- (ROBLOX-113: this frame's render casts the same boom again only if the view has turned since)
+	b.from, b.yaw, b.elevation, b.distance, b.clear, b.fresh = from, yaw, elev, self:viewDistance(), clear, true
 end
 
 local function smooth(k: number): number
@@ -381,6 +462,9 @@ end
 
 -- Every rendered frame: the player's look, recentring and the aim's return, then the camera is placed.
 function SpiderCamera.render(self: any, frameDt: number, lookX: number, lookY: number)
+	self:_fresh()
+	local tickFresh = self.tickBoom.fresh -- (a tick ran in this frame: its boom may serve below)
+	self.tickBoom.fresh = false
 	if self.mouse then
 		local menu = GuiService.MenuIsOpen
 		UIS.MouseBehavior = if menu then Enum.MouseBehavior.Default else Enum.MouseBehavior.LockCenter
@@ -426,8 +510,11 @@ function SpiderCamera.render(self: any, frameDt: number, lookX: number, lookY: n
 	local yaw = self:viewYaw()
 	local elev = CameraMath.effectiveElevation(self.elevation, self.autoPitch)
 	local from = t.pos + self.pivotDir * self.pivot
-	-- A flick between ticks: cast again along the direction about to be used; only shortening is taken.
-	local length = math.min(self.boom, self:_boomAt(from, yaw, elev))
+	-- A flick between ticks: cast again along the direction about to be used; only shortening is taken. (ROBLOX-113: when a tick ran in this frame and the view has
+	-- not turned since, that is the very boom the tick cast, against the same world, so its answer is taken.)
+	local b = self.tickBoom
+	local clear = if tickFresh and b.from == from and b.yaw == yaw and b.elevation == elev and b.distance == self:viewDistance() then b.clear else self:_boomAt(from, yaw, elev)
+	local length = math.min(self.boom, clear)
 	self.boom = length
 	local orbit = CFrame.new(from) * CFrame.Angles(0, yaw, 0) * CFrame.Angles(-elev, 0, 0)
 	self.camera.CFrame = orbit * CFrame.new(0, 0, length) * CFrame.Angles(CameraMath.clampAimPitch(self.aimPitch, elev), 0, 0)

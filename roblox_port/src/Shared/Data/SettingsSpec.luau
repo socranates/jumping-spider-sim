@@ -66,7 +66,7 @@ SettingsSpec.LIST = {
 	{ id = "EyeGrey", section = "comfort", label = "Spider-eye view: grey instead of green", kind = "toggle", default = false },
 	-- ---------------------------------------------------------------- help and hints
 	{ id = "ControlHints", section = "help", label = "Show control hints", kind = "toggle", default = true,
-		note = "The controls card and the walking reminder. Prompts that say what a button does right now stay." },
+		note = "The controls card and the walking reminder; in Normal, a life's first day only. Menu, Controls shows the card." },
 	{ id = "NotebookNotes", section = "help", label = "Say when a new notebook page opens", kind = "toggle", default = true },
 } :: { Setting }
 

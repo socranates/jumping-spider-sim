@@ -111,7 +111,7 @@ type Seen = {
 -- The peacock spider's fan: flat ellipsoid discs on the abdomen's back face, stacked fringe first, their size set each frame by how far the fan is open.
 -- (`sizes`: what each part's Size holds, kept here so that a frame reads none and writes only what changed.)
 type FanDisc = { part: Part, inset: number, y: number }
-type FanFigure = { part: Part, x: number, z: number, rx: number, rz: number, angle: number }
+type FanFigure = { part: Part, x: number, z: number, rx: number, rz: number, angle: number, turn: CFrame } -- (turn: the angle as a CFrame, made once: ROBLOX-113)
 type Fan = { front: { FanDisc }, back: { FanDisc }, figure: { FanFigure }, flaps: { { part: Part, side: number } }, cfg: any, parts: { Part }, sizes: { [BasePart]: Vector3 } }
 
 export type Rig = typeof(setmetatable(
@@ -150,6 +150,7 @@ export type Rig = typeof(setmetatable(
 		_exact: boolean, -- tests: place every hair again every frame, with no tolerance (what the drawing is compared with)
 		_stage: number, -- the growth stage last applied (-1 before the first)
 		_owed: number, _drawn: boolean, -- drawStep: the time not yet drawn, and whether the rig has been drawn at all
+		placed: number?, -- the parts the last drawing placed (ROBLOX-113, for the self-test's profile)
 		_k: number,
   _growth: number,
   _softness: number,
@@ -230,9 +231,10 @@ local function ball(model: Model, name: string, d: number, color: Color3): Part
 	return p
 end
 
--- A cylinder's axis is its local X: aim it from a to b.
+-- A cylinder's axis is its local X: aim it from a to b. (ROBLOX-113: the quarter turn is made once, not with every rod of every frame; the frames are the same to the bit.)
+local QUARTER = CFrame.Angles(0, math.pi / 2, 0)
 local function rodCFrame(a: Vector3, b: Vector3): CFrame
-	return CFrame.lookAt((a + b) * 0.5, b) * CFrame.Angles(0, math.pi / 2, 0)
+	return CFrame.lookAt((a + b) * 0.5, b) * QUARTER
 end
 
 -- A hair's "up" for lookAt: its surface normal, unless that is (nearly) along the hair.
@@ -264,8 +266,10 @@ local function clearBatch(batch: Batch)
 end
 
 -- An offset at the rig's scale: its place is scaled about the body's origin, its turn is not.
+-- (ROBLOX-113: a rotation moved to a place is `rotation + place`, one CFrame where CFrame.new(place) * rotation made two; the same frame to the bit, since the
+-- product with the identity adds only zeros. A frame of the full rig made about 1,700 CFrames for 690 parts; this and the like below are most of the difference.)
 local function scaled(cf: CFrame, g: number): CFrame
-	return if g == 1 then cf else CFrame.new(cf.Position * g) * cf.Rotation
+	return if g == 1 then cf else cf.Rotation + cf.Position * g
 end
 
 -- Has `now` moved from `was` by more than MOVE_STUDS in place or MOVE_RADIANS in turn? The turn comes from the trace of the relative rotation, the sum of the dot
@@ -775,7 +779,7 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		for _, f in fc.figure do
 			if f.fullOnly and detailName == "low" then continue end
 			local part = disc(model, if f.color then "FanGlint" else "FanFigure", color(f.color or fc.figureColor), 0)
-			table.insert(fan.figure, { part = part, x = f.x, z = f.z, rx = f.rx, rz = f.rz, angle = f.angle })
+			table.insert(fan.figure, { part = part, x = f.x, z = f.z, rx = f.rx, rz = f.rz, angle = f.angle, turn = CFrame.Angles(0, f.angle, 0) })
 			table.insert(fan.parts, part)
 		end
 		for _, side in { -1, 1 } do
@@ -1028,14 +1032,14 @@ local function drawFan(self: Rig, fan: Fan, abdomen: CFrame, open: number, condi
 	for _, f in fan.figure do
 		fanSize(fan, f.part, Vector3.new(math.max(f.rx * fc.radii[1] * sx * 2 * show, 0.002), fc.thickness, math.max(f.rz * fc.radii[2] * sz * 2 * show, 0.002)) * g * condition)
 		local at = Vector3.new(f.x * fc.radii[1] * sx, figureY, z + f.z * fc.radii[2] * sz)
-		put(batch, f.part, abdomen * CFrame.new((center + (at - center) * condition) * g) * CFrame.Angles(0, f.angle, 0))
+		put(batch, f.part, abdomen * CFrame.new((center + (at - center) * condition) * g) * f.turn)
 	end
 	local fl = fc.flaps
 	local angle = math.rad(fl.foldedDeg) * (1 - open)
 	for _, f in fan.flaps do
 		fanSize(fan, f.part, self._sizes[f.part] * g * condition)
 		local hinge = Vector3.new(f.side * fl.hingeX, center.Y + fl.hingeY, center.Z + fc.zShift * open)
-		local cf = CFrame.new(hinge) * CFrame.Angles(0, 0, f.side * angle) * CFrame.new(f.side * fl.radii[1], 0, 0)
+		local cf = (CFrame.Angles(0, 0, f.side * angle) + hinge) * CFrame.new(f.side * fl.radii[1], 0, 0)
 		put(batch, f.part, abdomen * CFrame.new((center + (cf.Position - center) * condition) * g) * cf.Rotation)
 	end
 end
@@ -1249,8 +1253,8 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 		local reach = look.idle.attention.glance
 		glanceAt = Vector3.new(lp.glanceX * reach, lp.glanceY * reach * 0.6, 0)
 	end
-	local pivot1 = CFrame.new(self._palpBase[1]) * CFrame.Angles(palp1, palpYaw1, 0)
-	local pivot2 = CFrame.new(self._palpBase[2]) * CFrame.Angles(palp2, palpYaw2, 0)
+	local pivot1 = CFrame.Angles(palp1, palpYaw1, 0) + self._palpBase[1]
+	local pivot2 = CFrame.Angles(palp2, palpYaw2, 0) + self._palpBase[2]
 	-- What has changed since the hairs were last placed: after a change of scale (a new epoch) everything, otherwise the abdomen's condition (its parts' sizes and places)
 	-- and, below, the frame each kind of hair follows.
 	local seen, epoch = self._seen, self._epoch
@@ -1279,7 +1283,7 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 				local pos, rot = f.pos, f.rot
 				if edited then pos, rot = offset.Position, offset.Rotation end
 				local p = abdomenAt + (pos - abdomenAt) * condition * breathScale
-				put(bodyBatch, f.part, base * (CFrame.new(if g == 1 then p else p * g) * rot))
+				put(bodyBatch, f.part, base * (rot + (if g == 1 then p else p * g)))
 				if f.big == true then
 					resize(f, f.size0 * g * condition * breathScale)
 				elseif sizesDue then
@@ -1311,7 +1315,7 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 		seen.abdomen, seen.breath = abdomenBase, breathScale
 		for _, f in self._abdomenHairs do
 			local p = abdomenAt + (f.pos - abdomenAt) * condition * breathScale
-			put(hairBatch, f.part, abdomenBase * (CFrame.new(if g == 1 then p else p * g) * f.rot))
+			put(hairBatch, f.part, abdomenBase * (f.rot + (if g == 1 then p else p * g)))
 			if sizesDue then resize(f, f.size0 * g * condition) end
 		end
 	end
@@ -1478,7 +1482,7 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 			local flat = into - up * into:Dot(up)
 			local heading = if flat.Magnitude > 1e-4 then flat.Unit else body.LookVector
 			local center = foot + up * (pad.Size.Y * 0.35)
-			put(bodyBatch, pad, CFrame.lookAt(center, center + heading, up) * CFrame.Angles(0, math.pi / 2, 0))
+			put(bodyBatch, pad, CFrame.lookAt(center, center + heading, up) * QUARTER)
 			local right = heading:Cross(up)
 			for n, claw in leg.toes do
 				-- two claws: from the pad's front, forward and down, splayed apart
@@ -1490,6 +1494,7 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 			put(bodyBatch, pad, CFrame.new(foot))
 		end
 	end
+	self.placed = bodyBatch.n + hairBatch.n -- (ROBLOX-113: the parts this drawing placed, for the self-test's profile)
 	Workspace:BulkMoveTo(bodyBatch.parts, bodyBatch.frames, Enum.BulkMoveMode.FireCFrameChanged)
 	if hairBatch.n > 0 then
 		Workspace:BulkMoveTo(hairBatch.parts, hairBatch.frames, Enum.BulkMoveMode.FireCFrameChanged)

@@ -695,6 +695,8 @@ check("the screen: the spider's name and one line of controls, and nothing else 
 	assert(not find("SpiderPrompts", "HungerBar").Visible, "no hunger bar")
 	assert(words("Day") == "" and words("DayLine") == "" and words("Status") == "" and words("Notice") == "" and words("Caption") == "", "no day, no status, no notice, no caption")
 	assert(words("PromptCue") == "", "no cue")
+	-- (ROBLOX-113: the start's card is up for 20 s of the wall clock, and since the shim got faster this check can come inside them; put away first, so H shows it)
+	if words("Controls") ~= "" then tap("Help") end
 	tap("Help")
 	assert(string.find(words("Controls"), PeacockText.crackLine("keyboard"), 1, true) ~= nil, `the card has the crack's line, with the close look in it: "{words("Controls")}"`)
 	tap("Help")

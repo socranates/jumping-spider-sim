@@ -170,7 +170,8 @@ exploration you gotta earn"; "you get time to enjoy the scenery because you are 
   Nathan's browser, the way the music was. The sill gets the same pass when the window opens (W2), so the old home is not the plain one.
   The previewer judges shape and placement only; richness is judged in Studio and on the television.
 - **Quiet HUD, continued** (W5). In the screenshot three "lost sight" labels stack on the soil: the perception captions must not pile up
-  (one at a time, the newest wins, gone in a breath), and nothing is added for the garden but the region's name on the day line.
+  (one at a time, the newest wins, gone in a breath), and nothing is added for the garden but the region's name on the day line. *(ROBLOX-113: the labels
+  calmed as asked; the region's name left off too, the regions being seamless and their names the map's.)*
 
 ## The four pillars, as rounds
 
@@ -201,7 +202,10 @@ exploration you gotta earn"; "you get time to enjoy the scenery because you are 
    that cuts in, home before dark, cover; the bed's clock was already 0.33 (ROBLOX-96). In `docs/DECISIONS.md`, Chet's checklist in
    `docs/HANDOFF-roblox-world.md`; CLI only, not run in Studio. The footfall and the other rare things are still to come.)*
 5. **W5 — no hand holding** (ROBLOX-98): the HUD and notice audit for Normal — hints only on day one, captions
-   sparing, nothing added for the garden but a region name on the day line.
+   sparing, nothing added for the garden but a region name on the day line. *(Done 2026-10-20 as ROBLOX-113: every string of the play screen classified
+   in `Shared/UI/QuietHud` and listed in `docs/HUD_AUDIT.md` (needed, first day only, Easy and Free play only; none removed: the gentle modes keep every
+   word), the notices filtered line by line, the perception labels one to an area and "lost sight" gone in a breath; not even the region's name was added
+   to the day line. CLI only, not run in Studio.)*
 Then full suites, places, bundle, publish. *(Toward the publish, 2026-10-20, ROBLOX-109: the game's own splash, the start menu as a title card, the intro of a
 new life, the cards in one typeface, and the store page's plan in `docs/STORE_PAGE.md`; CLI only, not run in Studio. ROBLOX-110: lock-on and the sidestep, the
 spider keeping its prey in its principal eyes and sidling round it, taken only from what its senses have placed, and "Show what the spider notices" to turn the
@@ -217,6 +221,8 @@ perception HUD off, the lock's four faint ticks its only cue (W5's quiet HUD); C
   radius; a PlayStation is the full tier; the house fly is lighter at low. Not run in Studio or on a device.)*
   *(2026-10-20, ROBLOX-111: v36's Studio self-test measured the bed at 22 fps and the sill at 60. The CLI finds no cause in the client's Lua; the self-test
   now times the client's frame by part and samples the bed again settled, without the looks and without shadows, so the next Studio run names the cost.)*
+  *(2026-10-20, ROBLOX-113: v37 ran 35 of 35 at 60 fps everywhere; the two costs it named are cut: the camera on the line asks the world 12 questions a frame
+  where it asked 141 in the CLI, and the spider rig makes a quarter fewer CFrames a frame, its drawing the same to the bit. Not run in Studio.)*
 - **The 200-local client**: the world wiring is a new module (`Client/WorldClient`), not more lines in SpiderClient.
 - **Save format**: `world` is optional and validated; the revision gate protects positions.
 - **Nav graph size**: region sizing; seams are the only cross-region edges.

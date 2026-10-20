@@ -192,6 +192,16 @@ check("a caught rival is a hard meal (ROBLOX-77): the Grip button and the grip b
 		return r
 	end
 	local function status(): string return find("SpiderPrompts", "Status").Text end
+	-- (ROBLOX-113: in Normal after the first day the fight's words are not shown, the grip bar and the body say it; the words are Easy's and the first day's, read
+	-- here for a frame with the HUD in the gentle rules: session.rules is what the quiet HUD reads, the sim's own rules are needs.gentle)
+	local function gentleStatus(): string
+		local shown = status()
+		assert(not (find("SpiderPrompts", "Status").Visible and (string.find(shown, "rival", 1, true) or string.find(shown, "grip", 1, true))), `a fight's words in Normal: "{shown}"`)
+		driver.session.rules = "gentle"; frames(1)
+		local words = status()
+		driver.session.rules = "standard"; frames(1)
+		return words
+	end
 	needs.energy, needs.gentle = 0.2, false
 	local r = catch()
 	local home = driver.motor.pos
@@ -199,7 +209,8 @@ check("a caught rival is a hard meal (ROBLOX-77): the Grip button and the grip b
 	assert(life.notice == RivalText.CAPTURED, `the catch line: "{life.notice}"`)
 	frames(3)
 	assert(Grip.active(driver.rivalLegs.grip), "the grip is on")
-	assert(string.find(status(), "Holding the rival — tap Space to keep your grip", 1, true), `the status line: "{status()}"`)
+	local holding = gentleStatus()
+	assert(string.find(holding, "Holding the rival — tap Space to keep your grip", 1, true), `the status line: "{holding}"`)
 	assert(not string.find(status(), "Eating rival", 1, true), "it is not being eaten yet")
 	assert(find("SpiderPrompts", "GripBar").Visible == true, "the grip bar shows for the rival")
 	local gripFill = find("SpiderPrompts", "Grip")
@@ -218,7 +229,8 @@ check("a caught rival is a hard meal (ROBLOX-77): the Grip button and the grip b
 	frames(1)
 	assert(life.notice == RivalText.SUBDUED, `the subdued line: "{life.notice}"`)
 	assert(find("SpiderPrompts", "GripBar").Visible == false, "the bar is gone once it is subdued")
-	assert(string.find(status(), "Eating rival", 1, true) and string.find(status(), "(2 meals)", 1, true), `the status line, with what it is worth: "{status()}"`)
+	local eating = gentleStatus()
+	assert(string.find(eating, "Eating rival", 1, true) and string.find(eating, "(2 meals)", 1, true), `the status line, with what it is worth: "{eating}"`)
 	-- Eaten, standing still: five seconds, 0.7 of food, the meal counted.
 	local meals, e0 = prey.feeding.mealsFinished, needs.energy
 	frames(60 * 6)

@@ -642,3 +642,46 @@ sill's 60 (worst 23.0 ms: the 129 ms hitch v35 showed on the sill is gone). `doc
 
 - Nothing to decide yet. If the next printout says the bushes' clusters or their shadows are what the bed pays for, the next round will propose a lighter
   bush (fewer, larger clusters, or shadows only near the spider) for you to look at before anything changes.
+
+## No hand holding, and the frame's two costs (ROBLOX-113, 2026-10-20)
+
+Claude → Chet, 2026-10-20, branch `claude/w5`. W5 of the open-world plan and two costs v37's self-test named. `docs/DECISIONS.md` ROBLOX-113 has the
+reasoning and `docs/HUD_AUDIT.md` the list of every string with its class. **Nothing of it has run in Studio.**
+
+- **The quiet HUD** (`Shared/UI/QuietHud`, new). In Normal, after the life's first day (or a spiderling generation's), the screen keeps the hunger bar, the
+  day line with the moult count, the sound captions, the answer to anything pressed, the rest's titles, the line's cue and a missing safety line; the
+  how-to words (the walk's reminder, the card at the start, the line's panel, the crack's prompt and the way home, the aim's "release to leap", the feeding
+  and grip lines, the eye view's and the dance's status lines, the meal rule, hungry and dusk under the day) are the first day's; the wasp's, the
+  courtship's and the guard days' status lines and the soft skin's reminder are Easy's and Free play's only. Easy and Free play keep every word. The
+  notices are filtered line by line ("Last rest kept." stays; the morning's own line goes). The day line names no region. H and Menu, Controls bring the
+  card at any time.
+- **The perception labels**: one to an area of the screen, the newest winning, "lost sight" gone in 1 s (every mode).
+- **The camera on the line**: the overlap test is asked once per point a tick (123 a frame became 2 in the CLI), a squeezed pitch search and the line
+  framing's search run at most every other tick while the rest point moves, the render reuses the tick's boom. What the camera does is the same.
+- **The rig**: 26% fewer CFrames a frame (the first spider at full: 1,650 to 1,211 for its 693 parts), the frames the same to the bit.
+
+## Your Studio checklist (ROBLOX-113)
+
+1. **The self-test**: `workspace:SetAttribute("SelfTest", true)`, Play, touch nothing, send the whole printout (35 checks, as before). The lines that show
+   the gains:
+   - `INFO profile on the line:` the `camera` part's ms (v37: 7.87 mean, 17.5 worst) and, new on the `a frame:` list, `camera casts`, `camera overlaps`,
+     `camera rays`, `framing searches` (the CLI: 10 casts and 2 overlaps a frame on the line, 3 and 2 elsewhere). The render step's ms (v37: 12.5).
+   - `INFO profile on the sill:` and `in the bed:` the `allocated ... KB a frame` and the `spider rig` share of it (v37: about 100 KB a frame for the rig;
+     the count says about three quarters of that now), and the new `spider parts placed` (693 at full for the first spider, as before).
+2. **By hand, Normal's quiet** (a new life, the standard rules): on day 1 the walk's reminder, the controls card for 20 s, the crack's "E: rest", the aim's
+   "release to leap" and the line's panel are there. Sleep to day 2 and check: none of those; the hunger bar still says hungry; the crack shows nothing until
+   E rests, then only "Resting in the silk-lined crack" and "Last rest kept."; on the line only the cue ("Letting go... 40%"); a jump's aim shows its title and
+   a missing safety line, nothing else; H (or Menu, Controls on a controller) still brings the card. When the wasp comes: its hum's caption with the
+   direction, and no status line.
+3. **By hand, Easy**: the same day 2 in Easy has every word it had (the wasp's line, the crack's prompt, "Hungry: time to hunt.").
+4. **The labels**: lose sight of two or three flies close together on the soil: one "lost sight" at a time, fading in about a second.
+5. **By hand, the line's camera**: let down from the outer sill's edge and reel back up: the view should behave as before (turning by its 15-degree steps
+   when squeezed, the player's look taking over at once).
+
+## Open for Nathan (ROBLOX-113)
+
+- **The audit is a proposal you can change line by line** (`docs/HUD_AUDIT.md`): each kind's class is one word in `Shared/UI/QuietHud`. The calls most
+  worth your eye: the courtship's "face it and keep still" is Easy's only (Normal learns it from the notebook's page); the wasp's status lines are Easy's
+  only (Normal hears the hum); the rival's crouch warning is Easy's only; the weak starving line and "Last rest kept." stay in Normal.
+- **No region name on the day line**, as decided here. If you would like the place named (say, only when the spider first reaches a region), it is one
+  kind in the table.

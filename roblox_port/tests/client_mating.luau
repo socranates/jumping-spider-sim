@@ -278,6 +278,19 @@ local function find(screen: string, name: string): any
 	for _, d in g:GetDescendants() do if d.Name == name then return d end end
 	return nil
 end
+-- (ROBLOX-113: in Normal after the first day the courtship's and the guard days' status lines are the gentle modes' only: the meter, the notices and the sac say it.
+-- Their words are read for a frame with the HUD in the gentle rules: session.rules is what the quiet HUD reads, the sim's own rules are needs.gentle. `normal` is the
+-- status Normal shows meanwhile, which must not have them.)
+local function gentleStatus(): (string, string)
+	local d = ClientStubs.driver
+	local normal = find("SpiderPrompts", "Status").Text
+	if not find("SpiderPrompts", "Status").Visible then normal = "" end
+	local was = d.session.rules
+	d.session.rules = "gentle"; frame(1 / 60)
+	local text = find("SpiderPrompts", "Status").Text
+	d.session.rules = was; frame(1 / 60)
+	return text, normal
+end
 local CRACK = Vector3.new(-25.5, 0.31, 6.0)
 local OPEN = Vector3.new(-5, 0.31, -9)
 
@@ -378,7 +391,8 @@ check("courting: close, facing, still, the meter fills in the hud for eight seco
 	frames(60)
 	life.clock.hour = 9.0
 	assert(find("SpiderPrompts", "CourtshipBar").Visible == true, "the courtship bar shows")
-	assert(string.find(find("SpiderPrompts", "Status").Text, "Courting", 1, true), `the status line: "{find("SpiderPrompts", "Status").Text}"`)
+	local courting, normalCourting = gentleStatus()
+	assert(string.find(courting, "Courting", 1, true) and not string.find(normalCourting, "Courting", 1, true), `the status line: "{courting}" (Normal: "{normalCourting}")`)
 	assert(mate.meter > 0.05, `the meter fills ({mate.meter})`)
 	local fill = find("SpiderPrompts", "Courtship")
 	assert(math.abs(fill.Size.X.Scale - mate.meter) < 0.15, `the bar is the meter ({fill.Size.X.Scale} vs {mate.meter})`)
@@ -443,7 +457,8 @@ check("the night's sleep in the crack makes the egg sac: drawn in the crack, in 
 	assert(sac ~= nil, "the sac is drawn")
 	assert((sac.Position - Rules.sacAt).Magnitude < 1e-9 and Layout.inRetreat(sac.Position), "in the crack")
 	assert(not sac.CanCollide and not sac.CanQuery and not sac.CanTouch and sac.Anchored, "non-collidable, non-queryable decor")
-	assert(string.find(find("SpiderPrompts", "Status").Text, "Guarding the eggs: day 1 of 2", 1, true), `the guard line: "{find("SpiderPrompts", "Status").Text}"`)
+	local guarding, normalGuarding = gentleStatus()
+	assert(string.find(guarding, "Guarding the eggs: day 1 of 2", 1, true) and not string.find(normalGuarding, "Guarding", 1, true), `the guard line: "{guarding}" (Normal: "{normalGuarding}")`)
 	-- The morning's checkpoint kept the sac (the sleep that made it is in the record).
 	local rec = d.currentStore():loadBest()
 	assert(rec.ok, "a checkpoint exists")
@@ -454,7 +469,8 @@ check("the night's sleep in the crack makes the egg sac: drawn in the crack, in 
 	assert(life.clock.day == 5 and life.mating.stage == "guarding" and life.mating.guard_day == 2, `second guard day: {life.mating.stage}`)
 	assert(life.notice == MateText.GUARD_DAY or string.find(life.notice, "Morning", 1, true), `the notice: "{life.notice}"`)
 	frames(3)
-	assert(string.find(find("SpiderPrompts", "Status").Text, "day 2 of 2", 1, true), `the guard line: "{find("SpiderPrompts", "Status").Text}"`)
+	local second = gentleStatus()
+	assert(string.find(second, "day 2 of 2", 1, true), `the guard line: "{second}"`)
 	assert(find("SpiderPrompts", "Day").Text:find("Day 5", 1, true) ~= nil and not string.find(find("SpiderPrompts", "Day").Text, "Generation", 1, true), "no generation tag in the first family")
 end)
 
@@ -1029,7 +1045,8 @@ check("a visitor far off is not announced, and one that arrives out of earshot i
 	mate.previous = mate.position
 	frames(3)
 	assert(string.find(life.notice, "male spider", 1, true) ~= nil and legs.pending == nil, `told when near: "{life.notice}"`)
-	assert(string.find(statusText(), "visitor", 1, true) or string.find(statusText(), "Courting", 1, true), `and the courting line: "{statusText()}"`)
+	local near = gentleStatus()
+	assert(string.find(near, "visitor", 1, true) or string.find(near, "Courting", 1, true), `and the courting line: "{near}"`)
 	-- leaving unheard says nothing; leaving heard does
 	life.notice, life.noticeSeconds = "", 0
 	mate.reason = "dusk"

@@ -228,7 +228,8 @@ do
 	local lengthFresh = bars[1].Size.X.Offset
 	check(bars[1].Size.Y.Offset == 2 and near(bars[1].BackgroundTransparency, 1 - view.rings[1].alpha, 1e-9), "2 px thick, at the view's opacity")
 	local label = shown(parent, "Label")[1]
-	check(label ~= nil and label.Text == "lost sight" and near(label.TextTransparency, 1 - view.labels[1].alpha, 1e-9) and label.Position.Y.Offset > 360, "and 'lost sight' under it, as faded as the view says")
+	-- (ROBLOX-113: the drawn label is the calmed one, UI/QuietHud.calmLabels: half a second into its one-second fade, where the view's own is a fifth into 2.5 s)
+	check(label ~= nil and label.Text == "lost sight" and near(view.labels[1].alpha, 0.8, 1e-9) and near(hud.labels[1].alpha, 0.5, 1e-9) and near(label.TextTransparency, 1 - hud.labels[1].alpha, 1e-9) and label.Position.Y.Offset > 360, "and 'lost sight' under it, faded by the calm's breath (0.5 at half a second; the view's 0.8)")
 	-- the same mark, older: the same twelve bars, shorter
 	local old = contact({ position = Vector3.new(0, 5, -10), mark = true, stale = 0.9, age = 2.0 })
 	draw(hud, { old })
@@ -243,9 +244,11 @@ do
 	local bs = children(oldBars[1], "UIStroke")
 	check(#children(oldBars[1], "UICorner") == 1 and #bs == 1 and bs[1].Thickness == 1 and bs[1].Transparency < 1, "rounded, with a thin dark edge")
 	-- hidden marks (the ShowLastSeen switch): no dashes, the words stay
+	check(#hud.view.labels == 1 and #shown(parent, "Label") == 0, "two seconds after sight was lost the view still has its words, the screen not: gone in a breath (ROBLOX-113)")
 	draw(hud, { old }, false, false)
 	check(#shown(parent, "Bar") == 0 and #hud.view.rings == 0, "with the last-seen marks switched off there are no dashes")
-	check(#shown(parent, "Label") == 1 and shown(parent, "Label")[1].Text == "lost sight", "and the words stay, as in the view")
+	draw(hud, { fresh }, false, false)
+	check(#shown(parent, "Bar") == 0 and #shown(parent, "Label") == 1 and shown(parent, "Label")[1].Text == "lost sight", "and the words stay, as in the view")
 	-- a mark that is covered is fainter
 	local covered: any = function(_eye: Vector3, _at: Vector3): Vector3? return Vector3.new(0, 5, -3) end
 	hud:draw(memoryOf({ fresh }), camera, covered, false, nil)
@@ -296,7 +299,8 @@ do
 	}
 	draw(hud, list, true)
 	local made = #parent:GetDescendants()
-	check(#shown(parent, "Circle") == 1 and #shown(parent, "Bar") == 12 + 2 + 4 and #shown(parent, "Label") == 2, "a live circle, a dashed mark, a cue and Focus together: 1 circle, 18 bars, 2 labels")
+	-- (ROBLOX-113: the live label and the mark's are in one area of the screen, so one label is drawn: the live one, what the principal eyes hold now)
+	check(#shown(parent, "Circle") == 1 and #shown(parent, "Bar") == 12 + 2 + 4 and #hud.view.labels == 2 and #shown(parent, "Label") == 1 and shown(parent, "Label")[1].Text == "fly-like prey", "a live circle, a dashed mark, a cue and Focus together: 1 circle, 18 bars, and of the 2 labels the live one")
 	for _ = 1, 30 do draw(hud, list, true) end
 	check(#parent:GetDescendants() == made, "thirty more frames make nothing new")
 	draw(hud, { list[1] })

@@ -31,6 +31,8 @@ function LineFraming.new(): any
 	}, LineFraming)
 end
 
+local SIDES = { 1, -1 } -- (+ before -; ROBLOX-113: one list, not a new one for every step of every search)
+
 -- camera_rig._wanted_yaw_assist: the turn already held while it still works (so the view does not flip as the rest point
 -- moves), else none when the player's own view works, else the smallest working step within the cap (+ before -),
 -- else none (nowhere works: the view is left to the pitch search).
@@ -40,7 +42,7 @@ function LineFraming.wantedTurn(held: number, maxTurn: number, good: (number) ->
 	local step = math.rad(LineFraming.ASSIST_STEP_DEG)
 	local k = 1
 	while k * step <= maxTurn + 1e-6 do
-		for _, side in { 1, -1 } do
+		for _, side in SIDES do
 			local turn = k * step * side
 			if good(turn) then return turn end
 		end

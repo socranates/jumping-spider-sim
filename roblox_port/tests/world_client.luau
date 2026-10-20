@@ -795,6 +795,9 @@ check("the stone is a home in the words: near it the line says so, under it the 
 	local driver = ClientStubs.driver
 	local life = driver.life
 	local hud = driver.hud
+	-- (ROBLOX-113: the way home and the rest's how-to are the first day's words in Normal; read here on a first day, the day put back after)
+	local day = life.clock.day
+	life.clock.day = 1
 	driver.place(Vector3.new(11, -89.69, -44))
 	frames(5)
 	assert(driver.world:homeRetreat(driver.motor.pos) == "bed_a_stone" and driver.world.lastRetreat == "bed_a_stone", "in the bed the home is the stone")
@@ -818,6 +821,7 @@ check("the stone is a home in the words: near it the line says so, under it the 
 	assert(hud.promptTitle.Text == "The silk-lined crack", `in the crack: "{hud.promptTitle.Text}"`)
 	key("Feed", true); frames(2); key("Feed", false); frames(2)
 	assert(life.resting and life.notice == "Last rest kept." and hud.promptTitle.Text == "Resting in the silk-lined crack", `the crack's rest: "{life.notice}" / "{hud.promptTitle.Text}"`)
+	life.clock.day = day
 end)
 
 check("a return to a rest under the stone puts the bed's prey back where it was", function()

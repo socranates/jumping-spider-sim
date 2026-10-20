@@ -119,6 +119,9 @@ local M = {
 	lock = (nil :: any),
 	-- ROBLOX-111: the frame timed by part for the self-test (Client/FrameProfile; off unless the self-test turns it on: a lap is then one call that returns); here for the same reason.
 	Prof = require(script.Parent.FrameProfile),
+	-- ROBLOX-113 (W5): the quiet HUD (UI/QuietHud): what Normal shows after the life's first day, and this frame's context (`quiet`); here for the same reason.
+	QuietHud = require(Shared.UI.QuietHud),
+	quiet = { normal = false, dayOne = true },
 }
 M.lock = M.LockOn.new()
 local focusState = FocusState.new()
@@ -1053,7 +1056,11 @@ end
 book.pageOpened:connect(function(id: string)
  local page=book:view(id)
  if nbPanel:isShowing() then nbPanel:refresh() end
- if page and setting("NotebookNotes") then hud:setNote(M.NotebookText.note(page.title,device),M.NotebookPages.noteSeconds) end
+ if page and setting("NotebookNotes") then
+  local note=M.NotebookText.note(page.title,device)
+  if not M.QuietHud.shows("notebook_open_hint",M.quiet) then note=string.match(note,"^[^\n]+") or note end -- (ROBLOX-113: Normal after the first day: the page's name, not how to open the book)
+  hud:setNote(note,M.NotebookPages.noteSeconds)
+ end
 end)
 local notebookButton=Instance.new("TextButton")
 notebookButton.Name="NotebookButton";notebookButton.Text=M.NotebookText.BUTTON;notebookButton.TextSize=16
@@ -1399,10 +1406,10 @@ local function handleEvents()
 		if kind == "completed" then dropStrands(true) end
 		if kind == "released" or kind == "lost" or kind == "out_of_bounds" then dropStrands(false) end
 		if kind == "out_of_bounds" then
-			hud:toast(ControlText.toast("out_of_bounds", nil), true)
+			hud:toast(ControlText.toast("out_of_bounds", nil), true) -- (QuietHud: needed)
 			drawnUp = motor.up
 			cam:snap()
-		else
+		elseif M.QuietHud.shows("toast:" .. kind, M.quiet) then
 			hud:toast(ControlText.lineToast(kind, e.detail, afterMiss, dropped, device), WARN_EVENTS[kind] == true)
 		end
 		if kind == "completed" or kind == "released" or kind == "lost" or kind == "anchored" then
@@ -1415,22 +1422,25 @@ local function handleEvents()
 		if last.kind == "launched" and last.plan and last.plan.point and last.plan.origin then
 			watch:onJump((last.plan.point - last.plan.origin).Magnitude) -- a committed leap, from take-off to the landing point
 		end
-		hud:toast(ControlText.toast(last.kind, last.plan), last.kind ~= "cancelled")
+		if M.QuietHud.shows("toast:" .. last.kind, M.quiet) then hud:toast(ControlText.toast(last.kind, last.plan), last.kind ~= "cancelled") end
 	end
 end
 
 local function updateHud(frameDt: number)
+	M.quiet = M.QuietHud.context(session.rules, life.clock.day, (mateLegs.Mating.grace(life, prey.feeding.mealsFinished))) -- (ROBLOX-113: Normal after the first day says less)
+	local Q = function(kind: string): boolean return M.QuietHud.shows(kind, M.quiet) end
 	handleEvents()
 	local aiming = jump:isAiming()
 	local view: any = {
 		device = device, aiming = aiming, focus = controls.held.Focus == true or focusActive(), eyeView = cam.eyeView,
 		status = {}, helpVisible = helpVisible, helpText = PeacockText.card(device, SpiderChoice.displayKind(appearance)), -- (ROBLOX-92: one string, the one the Studio spec measures)
-		caption = eyes:captionView(device),
+		caption = if Q("eye_caption") then eyes:captionView(device) else nil,
 	}
 	-- Captions for sounds and vibrations (ROBLOX-49): off, normal or large. The eye view's own explanation above is not a sound caption.
 	local captionScale = M.SettingsSpec.CAPTION_SCALE[setting("Captions")] or 1
 	view.captionScale = if captionScale > 0 then captionScale else 1
 	local hints = setting("ControlHints")
+	if helpUntil ~= math.huge and not Q("controls_card_start") then helpVisible = false end -- (ROBLOX-113: Normal after the first day puts no card up by itself; H and the menu's Controls still do)
 	view.helpVisible = helpVisible and (hints or helpUntil == math.huge) -- (H asks for the card even when the hints are off)
 	local rumble = if dancePose and captionScale > 0 then PeacockText.caption(dancePose.rumble) else nil -- felt through the feet; the wasp's hum below takes precedence
 	if rumble then view.caption = rumble end
@@ -1445,10 +1455,10 @@ local function updateHud(frameDt: number)
 	if aiming then
 		local plan = jump.plan
 		local title, hint = ControlText.describe(plan, device)
-		view.aimTitle, view.aimHint = title, hint
+		view.aimTitle, view.aimHint = title, if Q("aim_hint") then hint else nil
 		view.aimColor = COLORS[if plan then plan.kind else "none"] or COLORS.none
 		local reason = motor:anchorPreview(plan)
-		view.anchorText, view.anchorOk = ControlText.anchorText(reason), reason == "ok"
+		view.anchorText, view.anchorOk = if reason ~= "ok" or Q("anchor_ok") then ControlText.anchorText(reason) else nil, reason == "ok"
 		showPlan(plan)
 	elseif jump.flash then
 		showPlan(jump.flash)
@@ -1458,7 +1468,7 @@ local function updateHud(frameDt: number)
 	local waspLine = M.WaspText.line(wasp.phase, wasp.confusedS > 0, wasp.visits, wasp.sparedThisVisit, device)
 	if (wasp.phase == "taking" or wasp.phase == "seizing" or wasp.phase == "bearing")
 		and not M.WaspText.heardRival((motor.pos - wasp.wasp.position).Magnitude, not sightCast(motor.pos, wasp.wasp.position)) then waspLine = nil end
-	if waspLine then table.insert(view.status, waspLine) end
+	if waspLine and Q("wasp_line") then table.insert(view.status, waspLine) end
 	if saveState.broken then table.insert(view.status, M.SaveText.BROKEN) end -- (ROBLOX-92: saving failed for this visit)
  do -- the courtship meter, the sac's guard days and the hatching's captions (ROBLOX-80)
   local mate,m=life.mate,life.mating
@@ -1467,19 +1477,20 @@ local function updateHud(frameDt: number)
    local heard=mateLegs.heard(mate)
    if mateLegs.pending~=nil and heard and not life.asleep then mateLegs.say(mateLegs.pending);mateLegs.pending=nil end -- (the arrival that was too far to hear, told now that it is near: ROBLOX-92)
    if far<=mateLegs.Rules.loseWu or mate.meter>0 then view.court=mate.meter end
-   if heard or mate.meter>0 then table.insert(view.status,mateLegs.Text.courtLine(device,far<=mateLegs.Rules.nearWu,SpiderChoice.canDance(appearance),dance.active,mate.meter)) end
+   if (heard or mate.meter>0) and Q("court_line") then table.insert(view.status,mateLegs.Text.courtLine(device,far<=mateLegs.Rules.nearWu,SpiderChoice.canDance(appearance),dance.active,mate.meter)) end
   end
   if mateLegs.couple.active and mate~=nil and mateLegs.skippable(mate) then table.insert(view.status,mateLegs.Text.skipLine(device)) end -- (ROBLOX-92: what ends the scene, once it can; not a sound, so the Captions setting does not hide it)
   if mateLegs.couple.active and captionScale>0 and not wasp:isVisiting() then -- the mating scene's captions (ROBLOX-89)
    view.caption=mateLegs.Text.matingCaption(mateLegs.couple.t,mateLegs.Mating.sexOf(appearance)) or view.caption
   end
-  if m~=nil and (m.stage=="sac" or m.stage=="guarding") then table.insert(view.status,mateLegs.Text.guardLine(m.guard_day,mateLegs.Rules.guardDays)) end
+  if m~=nil and (m.stage=="sac" or m.stage=="guarding") and Q("guard_line") then table.insert(view.status,mateLegs.Text.guardLine(m.guard_day,mateLegs.Rules.guardDays)) end
   if mateLegs.phase=="scene" and captionScale>0 then view.caption=mateLegs.Text.sceneCaption(mateLegs.stage.t) or view.caption end
  end
- if life.rival and life.rival.state=="captured" and not RivalSpider.struggling(life.rival) then table.insert(view.status,rivalLegs.Text.eating(Growth.mealsOf(RivalSpider.FOOD))) end
+ if life.rival and life.rival.state=="captured" and not RivalSpider.struggling(life.rival) and Q("feeding_lines") then table.insert(view.status,rivalLegs.Text.eating(Growth.mealsOf(RivalSpider.FOOD))) end
 	view.grip = if prey.feeding.struggling then prey.feeding.grip else rivalLegs.Grip.level(rivalLegs.grip)
-	if rivalLegs.Grip.active(rivalLegs.grip) then table.insert(view.status, rivalLegs.Text.struggle(ControlText.name(device,"jump"))) end
-	if prey.feeding.struggling then
+	if rivalLegs.Grip.active(rivalLegs.grip) and Q("feeding_lines") then table.insert(view.status, rivalLegs.Text.struggle(ControlText.name(device,"jump"))) end
+	if not Q("feeding_lines") then -- (Normal after the first day: the grip bar and the body say it)
+	elseif prey.feeding.struggling then
 		table.insert(view.status, "Caught — tap " .. ControlText.name(device,"jump") .. " to keep your grip")
 	elseif prey.feeding.feeding then table.insert(view.status, "Feeding — move to stop")
 	elseif prey.feeding.held then table.insert(view.status, "Meal paused — " .. ControlText.name(device,"feed") .. " to eat") end
@@ -1489,10 +1500,15 @@ local function updateHud(frameDt: number)
 	view.food, view.foodGentle, view.largeText = needs.energy, needs.gentle, setting("LargeText") == true
 	view.growth = M.LifeText.growth(life.growth, Growth.READY_FOOD, Species.fly_like_prototype.body.nutrition, if prey.feeding.held then prey.feeding.held.profile.body.prey_kind else nil)
 	view.dayLine = M.LifeText.line(clock:partOfDay(), needs.energy, needs:isStarving(), needs.gentle, LifeLoop.HUNGRY_AT, life:tooHungryToSleep())
+	do -- (ROBLOX-113: which of LifeText.line's lines it is: the weak starving line is needed; the bar says hunger and the light says dusk)
+		local lineKind = if life:tooHungryToSleep() then "starving_weak" elseif needs:isStarving() or needs.energy <= LifeLoop.HUNGRY_AT then "hunger_words" else "dusk_words"
+		if view.dayLine ~= nil and not Q(lineKind) then view.dayLine = nil end
+	end
  if life.growth.ready then view.dayLine=nil
- elseif life.growth:isSoft() then view.dayLine="Soft new skin: slower steps and shorter jumps until it hardens." end
- view.dayLine = view.growth .. (if view.dayLine then "\n" .. view.dayLine else "")
- view.notice = if life.noticeSeconds > 0 and life.notice ~= "" then life.notice else nil
+ elseif life.growth:isSoft() and Q("soft_skin") then view.dayLine="Soft new skin: slower steps and shorter jumps until it hardens." end
+	if not Q("growth_rule") then view.growth = M.LifeText.growthQuiet(life.growth, Growth.READY_FOOD, Species.fly_like_prototype.body.nutrition, if prey.feeding.held then prey.feeding.held.profile.body.prey_kind else nil) end
+ view.dayLine = if view.growth and view.dayLine then view.growth .. "\n" .. view.dayLine else view.growth or view.dayLine
+ view.notice = if life.noticeSeconds > 0 and life.notice ~= "" then M.QuietHud.notice(life.notice, M.quiet) else nil -- (ROBLOX-113: line by line, by QuietHud.NOTICES)
 	local canRest = life:canRest(lifeSpider)
 	local restPrompt = M.LifeText.prompt(life.asleep, life.resting, canRest, clock:isSleepTime() and not life:tooHungryToSleep(), device, PeacockText.change(device, appearance) .. "    " .. spiderPick.Text.holdHint(device), M.World:homeRetreat(motor.pos))
  if life.growth:isMoulting() then
@@ -1500,16 +1516,19 @@ local function updateHud(frameDt: number)
  elseif life.growth.ready and canRest and not life.resting then
   restPrompt={title="Ready to moult",hint=ControlText.name(device,"feed")..": rest and moult in the crack"}
  end
- if not restPrompt and M.World:nearRetreat(motor.pos,M.World.lastRetreat,7) and not prey.feeding.held then
+ if not restPrompt and M.World:nearRetreat(motor.pos,M.World.lastRetreat,7) and not prey.feeding.held and Q("home_line") then
   restPrompt=M.LifeText.homeLine(M.World.lastRetreat,lifeSpider.inRetreat,device) -- (ROBLOX-96: the crack's words as they were, or the stone's)
  end
  local displayKind = SpiderChoice.displayKind(appearance)
 	local displayOn = if displayKind == "antennae" then ant.state:displaying() elseif displayKind == "threat" then ant.threat:displaying() else dance.active
 	local displayHint = if displayKind == "antennae" then ant.Text.displayHint(device, displayOn) elseif displayKind == "threat" then ant.ThreatText.displayHint(device, displayOn) elseif displayKind == "dance" then PeacockText.displayHint(device, displayOn) else ""
 	if restPrompt and not lifeSpider.inRetreat and displayKind ~= nil then restPrompt.hint ..= "    " .. displayHint end
-	if displayKind ~= nil and displayOn then table.insert(view.status, if displayKind == "antennae" then ant.Text.statusLine(device) elseif displayKind == "threat" then ant.ThreatText.statusLine(device) else PeacockText.dancingLine(device)) end
+	if restPrompt and not Q("rest_prompt") then -- (ROBLOX-113: Normal after the first day keeps the state's title (asleep, resting, moulting, ready) and drops the how-to)
+		restPrompt = if life.asleep or life.resting or life.growth:isMoulting() or (life.growth.ready and canRest) then { title = restPrompt.title, hint = "" } else nil
+	end
+	if displayKind ~= nil and displayOn and Q("display_status") then table.insert(view.status, if displayKind == "antennae" then ant.Text.statusLine(device) elseif displayKind == "threat" then ant.ThreatText.statusLine(device) else PeacockText.dancingLine(device)) end
 	if focusState.latched then table.insert(view.status, "FOCUS ON    " .. ControlText.name(device,"focus") .. " again to stop" .. (if not jump:isBusy() and not motor:onLine() and not motor.silk.walk then " / " .. ControlText.name(device,"cancel") else "")) end
-	if cam.eyeView then table.insert(view.status, `SPIDER-EYE VIEW    {ControlText.name(device, "eye")}: back`) end
+	if cam.eyeView and Q("eye_status") then table.insert(view.status, `SPIDER-EYE VIEW    {ControlText.name(device, "eye")}: back`) end
 	if slow then
 		local key = ControlText.name(device, "slow")
 		table.insert(view.status, `SLOW MOTION {math.floor(SLOW_SPEED * 100)}%` .. (if key ~= "" then `    {key}: normal speed` else ""))
@@ -1522,12 +1541,12 @@ local function updateHud(frameDt: number)
 			reeling = f > 0.2 and silk.block == "" and not silk.snagged,
 			progress = silk.release.progress, snagged = silk.snagged, block = silk.block,
 		}, device)
-		view.prompt = { title = title, hint = hint, cue = cue }
+		view.prompt = if Q("line_panel") then { title = title, hint = hint, cue = cue } else { cue = cue } -- (ROBLOX-113: the cue stays: letting go, a block, a snag)
 	elseif silk.walk then
-		view.prompt = { hint = ControlText.edgeWalkHint(device) }
+		view.prompt = if Q("edge_walk_hint") then { hint = ControlText.edgeWalkHint(device) } else nil
 	elseif restPrompt and not aiming then
 		view.prompt = { title = restPrompt.title, hint = restPrompt.hint }
-	elseif hints and motor.mode == "attached" and not aiming and (helpVisible or os.clock() - started < WALK_HINT_SECONDS) then
+	elseif hints and Q("walk_hint") and motor.mode == "attached" and not aiming and (helpVisible or os.clock() - started < WALK_HINT_SECONDS) then
 		view.prompt = { hint = ControlText.walkHint(device) .. (if displayKind ~= nil then "    " .. displayHint else "") }
 	end
 	if os.clock() > helpUntil and helpVisible then helpVisible = false end
@@ -1862,6 +1881,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
  M.Prof.lap("poses")
  rig:update(body, if paused then 0 else simFrame, motor.mode == "attached", motor.moving)
  skins:draw(life.growth.exuviae)
+ M.Prof.count("spider parts placed", rig.placed or 0)
  M.Prof.lap("spider rig")
  if not paused then watch:frame(simFrame,cam.eyeView,eyes.moversShown) end
     local rival=life.rival
@@ -1938,6 +1958,11 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	-- The Focus that feeds the perception HUD also decides how far the principal eyes are in use (the eye view's picture). The
 	-- picture sets the field of view, so it comes before the HUD projects anything.
 	local focusing = motor.mode == "attached" and (controls.held.Focus == true or focusActive())
+	do -- (ROBLOX-113: the camera's world queries this frame, for the profile)
+		local st = cam.stats
+		M.Prof.count("camera casts", st.casts); M.Prof.count("camera overlaps", st.overlaps); M.Prof.count("camera rays", st.rays); M.Prof.count("framing searches", st.searches)
+		st.casts, st.overlaps, st.rays, st.searches = 0, 0, 0, 0
+	end
 	M.Prof.lap("camera")
 	eyes:update(frameDt, focusing)
 	M.Prof.lap("eyes")

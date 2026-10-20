@@ -159,4 +159,12 @@ function LifeText.growth(g: any, required: number, meal: number, kind: string?):
  local count = math.min(goal, math.floor(g.fedSinceMoult / required * goal * rule.step + 1e-8) / rule.step)
  return `Next moult: {count} of {goal} meals · {rule.rule}`
 end
+-- ROBLOX-113 (W5, Shared/UI/QuietHud): the growth line in Normal after the first day: the count without the prey's rule ("Next moult: 2 of 5 meals"), "Ready to moult",
+-- or nothing (moulting: the prompt's title says it; an adult: the day line's stage says it). The arguments are growth's.
+function LifeText.growthQuiet(g: any, required: number, meal: number, kind: string?): string?
+	if g:isAdult() or g:isMoulting() then return nil end
+	if g.ready then return "Ready to moult" end
+	local full = LifeText.growth(g, required, meal, kind)
+	return string.match(full, "^(.-) · ") or full
+end
 return LifeText

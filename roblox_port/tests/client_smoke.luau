@@ -40,6 +40,12 @@ check("the client loads, binds every action and runs 120 frames", function()
 	assert(frame ~= nil, "no render step bound")
 	for _, a in { "Jump", "Cancel", "Drop", "Forward", "Eye", "Recenter", "Focus", "Slow", "Reset", "Help" } do assert(services.actions["Spider" .. a], a) end
 	frames(120)
+	-- (ROBLOX-113: the start's save status is settled here, as tests/inspect.luau does since ROBLOX-110: with no server it turns "offline" after
+	-- SaveRules.CLIENT_WAIT_REMOTES seconds of the wall clock, and its warning toast landed on whichever check was then reading a toast, the aim's "Jump cancelled"
+	-- on this machine at HEAD too; settled before the checks, they no longer depend on how fast the machine is.)
+	local t0 = os.clock()
+	while ClientStubs.driver ~= nil and ClientStubs.driver.saveState.status == nil and os.clock() - t0 < 10 do frame(1 / 60) end
+	frames(170)
 	assert(gui:FindFirstChild("SpiderHud") and gui:FindFirstChild("SpiderPrompts") and gui:FindFirstChild("SpiderTouch"), "HUD missing")
 	assert(math.abs(spider().Y - 0.31) < 0.05, `spawned at {spider()}`)
 end)
@@ -194,7 +200,9 @@ check("in the crack E rests; in the evening the spider sleeps until morning, the
 	assert(lighting.ClockTime < dayClock and lighting.Brightness < 2.6, `the light did not dim at night (clock {lighting.ClockTime}, brightness {lighting.Brightness})`)
 	frames(600)
 	assert(life.clock.day == 2 and not life.asleep and life.resting and math.abs(life.clock.hour - 7) < 0.05, `no morning: day {life.clock.day}, {life.clock.hour}`)
-	assert(string.find(find("SpiderPrompts", "Notice").Text, "Morning, day 2", 1, true), find("SpiderPrompts", "Notice").Text)
+	-- (ROBLOX-113: Normal after the first day shows the rest kept and not the morning's own line, which the day line says; the loop's words are as they were)
+	assert(string.find(life.notice, "Morning, day 2", 1, true), life.notice)
+	assert(find("SpiderPrompts", "Notice").Text == "Last rest kept." and string.find(find("SpiderPrompts", "Day").Text, "Day 2, morning", 1, true), find("SpiderPrompts", "Notice").Text)
 	-- Still resting after the morning: when evening comes again the rest becomes sleep by itself; walking wakes the spider.
 	life.clock.hour = 21
 	frames(30)
@@ -252,7 +260,8 @@ check("Backspace returns to the checkpoint kept by a rest, or to the start when 
 	assert(driver.lifeSpider().inRetreat and life.resting, "not back resting in the crack")
 	assert(math.abs(life.clock.hour - hour) < 0.01 and prey.tick < tick + 10, `not the checkpoint's time (hour {life.clock.hour}, tick {prey.tick})`)
 	assert(needs == driver.needs and prey.feeding.needs == needs and math.abs(needs.energy - energy) < 1e-6, "the reserves did not go back")
-	assert(string.find(find("SpiderPrompts", "Notice").Text, "a return to the rest", 1, true), find("SpiderPrompts", "Notice").Text)
+	-- (ROBLOX-113: the return's explanation is the gentle modes' only: Normal's end card says what a return is. The loop's words are as they were.)
+	assert(string.find(life.notice, "a return to the rest", 1, true) and not (find("SpiderPrompts", "Notice").Visible and string.find(find("SpiderPrompts", "Notice").Text, "a return to the rest", 1, true)), find("SpiderPrompts", "Notice").Text)
 end)
 
 
@@ -312,7 +321,8 @@ check("the wasp: heard with a direction, found, caught, carried off; the catch s
 	local caption = find("SpiderPrompts", "Caption")
 	assert(caption.Visible and string.find(caption.Text, "[a deep, heavy hum outside, ", 1, true) and string.find(caption.Text, "coming closer]", 1, true), "no heard caption: " .. tostring(caption.Text))
 	local status = find("SpiderPrompts", "Status")
-	assert(string.find(status.Text, "a wasp is coming", 1, true), "no warning line: " .. tostring(status.Text))
+	-- (ROBLOX-113: in Normal the hum is the warning; the status line telling what wasps do and where to hide is the gentle modes' only)
+	assert(not (status.Visible and string.find(status.Text, "wasp", 1, true)), "a wasp line in Normal: " .. tostring(status.Text))
 	assert(wasp:percept() ~= nil and wasp:percept().maxCategory == "movement", "the wasp is not movement to the senses")
 	-- The 8 s of warning are Godot's numbers and the director suite's business; here they are skipped (the wasp flies at once).
 	wasp.speed = 1e6
@@ -326,13 +336,13 @@ check("the wasp: heard with a direction, found, caught, carried off; the catch s
 	frames(2)
 	assert(wasp.phase == "inspecting", `not found: {wasp.phase}`)
 	assert(string.find(find("SpiderPrompts", "Caption").Text, "[the deep hum turns toward you, ", 1, true), "no caption for the look: " .. find("SpiderPrompts", "Caption").Text)
-	assert(string.find(find("SpiderPrompts", "Status").Text, "has seen you", 1, true), find("SpiderPrompts", "Status").Text)
+	assert(not (find("SpiderPrompts", "Status").Visible and string.find(find("SpiderPrompts", "Status").Text, "has seen you", 1, true)), find("SpiderPrompts", "Status").Text)
 	for _ = 1, 60 * 12 do
 		frame(1 / 60)
 		if driver.motor.seized then seized = true break end
 	end
 	assert(seized, `the spider was never caught: {wasp.phase}`)
-	assert(string.find(find("SpiderPrompts", "Status").Text, "Stung", 1, true), find("SpiderPrompts", "Status").Text)
+	assert(not (find("SpiderPrompts", "Status").Visible and string.find(find("SpiderPrompts", "Status").Text, "Stung", 1, true)), find("SpiderPrompts", "Status").Text)
 	wasp.speed = 1e6 -- the carry, skipped
 	for _ = 1, 60 do
 		frame(1 / 60)
@@ -367,6 +377,7 @@ end)
 check("the peacock spider: C in the crack changes spider, X dances, any move, jump or Cancel stops it; the first spider never sees the dance", function()
 	local driver = ClientStubs.driver
 	local life = driver.life
+	life.clock.day = 1 -- (ROBLOX-113: the crack's and the walk's hints read below are the first day's in Normal)
 	local function words(screen: string, name: string): string
 		local d = find(screen, name)
 		return if d and d.Visible then d.Text else ""

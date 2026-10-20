@@ -488,3 +488,48 @@ What is in it:
 6. **The frame time**: the `INFO frame time` lines (the sill's and the bed's, against v35's). The regions' looks are persistent models, always on the client, so the
    ten chunks' looks are there wherever the spider is: the looks outside the window are 3,647 parts at full now (870 before) and 1,215 at low (286). If the frame time
    moved, or a phone struggles, say so: the looks can be made to stream with their regions (a choice for a later round, not made here).
+## The first minute: the splash, the title card and the intro (ROBLOX-109, 2026-10-20)
+
+Claude → Chet, 2026-10-20, branch `claude/intro`. Nathan asked for "a good splash page and intro". `docs/DECISIONS.md` ROBLOX-109 has the numbers and the
+reasons; `docs/STORE_PAGE.md` is the store page's plan. **Nothing of it has run in Studio.**
+
+- **The splash** (`src/First`, mapped to ReplicatedFirst in `default.project.json` only; the test place has none): Roblox's loading screen is removed; a black
+  field fades up on the garden seen from outside, the camera drawing in toward the window, "The Windowsill" in Merriweather with its one line; a small dot only if
+  the wait is long; it fades away over the title card when the client's start menu opens (the Player attribute `TitleReady`). It always ends: at 45 s whatever
+  happened, and at once on any error (one `[Windowsill] splash:` line in Output).
+- **The title card**: the start menu over the same slow camera, the music rising under it. Continue (when a rest exists), Begin a new life, Free play, Settings,
+  the Notebook once it has pages; the saving note in small type. A controller moves with the D-pad or stick, chooses with Cross / A, and B / Circle is "back"
+  where a screen has one (the confirmation, the life menu). The discovery-notes and text-size buttons are gone from the menu (both are in Settings).
+- **The intro of a new life**, once per save (`intro_seen` in the progress record): about 14 s, the light through the glass, the sill to the crack, the spider
+  walking out, three captions, then the game's camera and the controls. Skippable after 2 s (Space, Enter, E, Cross / A, or a tap). Reduced Motion: still shots
+  and cuts.
+- **The cards** (death, the ending, the life menu): the same typeface; words unchanged.
+- **The self-test**: one check more, "intro" (33 now).
+
+## Your Studio checklist (ROBLOX-109)
+
+1. **The self-test first** (as for ROBLOX-104): `workspace:SetAttribute("SelfTest", true)`, Play, touch nothing, send the printout. New: `PASS intro` (its FAIL
+   says which step: not holding, the skip refused or taken early, the spider still in the crack).
+2. **The splash, from a cold start**: publish to a test place or use Team Test / a real client (Studio's Play loads too fast to see much). From the first frame:
+   no grey Roblox screen, a black field, then the garden fading in with the title and its line; the camera moving slowly in toward the window; no bar. Does
+   the title read? Is Merriweather the face shown (a serif; Gotham or Source Sans would mean the family was not found)?
+3. **The hand-over**: when the menu appears, the splash fades away over it without the camera jumping. Say if there is a jump or a flash of the plain sill.
+4. **The title card**: the camera keeps drifting and then breathing in front of the window; the music comes up from silence. Choose with the mouse, then with a
+   PlayStation controller (D-pad down and up, Cross to choose, Circle on the "Begin a new life?" confirmation keeps the life), then on a phone (Studio's
+   device emulator at a phone size): everything on the screen and readable?
+5. **The intro**: it plays once per save, and the self-test's run marks Studio's test save as having seen it, so for looking at it set
+   `workspace:SetAttribute("IntroAlways", true)` in the command bar before Play (Studio only: every new life from the menu then plays it). Watch it through
+   once: does the spider walk out of the crack cleanly, do the captions read, does the ease into the game's camera land behind the spider without a lurch?
+   Then begin another and skip it at about 3 s (Space; on a controller Cross). Turn on Reduced Motion in Settings and begin another: still shots, cuts. Clear
+   the attribute before saving the place.
+6. **Never twice**: after the intro, leave and come back (or begin another new life): no intro.
+7. **The cards**: let the spider starve or be caught: the death card in the same face, words as before.
+8. **The store page**: read `docs/STORE_PAGE.md`; take the icon and the thumbnails from the cameras listed if you like them, or say what to change.
+
+## Open for Nathan (ROBLOX-109)
+
+- The words: the title's line ("A small life on a windowsill.") and the three captions. The third, "It has not eaten. It must eat today.", is Normal's;
+  in the gentle rules it says hunger is gentler. Too much, too little?
+- The typeface: Merriweather (Light for the title). Another of Roblox's faces?
+- The intro's length (about 14 s, skippable after 2) and whether it should also play for Free play's first life (it does now, once per save).
+- The description and the icon's concept in `docs/STORE_PAGE.md`.

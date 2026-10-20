@@ -20,6 +20,9 @@ With --world (ROBLOX-105): spec_ladybird, spec_millipede, spec_snail, spec_harve
 stalks drawn in) and ambient_dock, ambient_dandelion, ambient_snail, ambient_millipede, ambient_harvestman, ambient_wall (in place, an evening).
 With --world (ROBLOX-107): drainpipe, drain_foot, drain_neck (the wall west of the window and its drainpipe), shrub_strip, shrub_chunk, shrub_leaf, shrub_under
 (the bushes beside the bed, the dead leaf over a retreat, under a bush) and house_west (the west of the house from the lawn).
+With --title (ROBLOX-109): title_drift_0, title_drift_18, title_drift_36 (the splash's and the title card's drift: its start, middle and arrival) and intro_glass,
+intro_sill, intro_out (the intro of a new life, each shot's middle frame), from Shared/Movement/TitleShots' own numbers; and store_icon, store_spider
+(docs/STORE_PAGE.md: the icon's composition, square, and a thumbnail of the same moment).
 --parts renders an already dumped part list (for example the "before" list kept next to the images) instead of running the code."""
 import argparse, importlib.util, json, math, pathlib, subprocess, sys, tempfile
 
@@ -38,6 +41,7 @@ ap.add_argument("--format", default="png")
 ap.add_argument("--uv", action="store_true", help="also show the UV layer (as the eye-view helper does) in every view")
 ap.add_argument("--parts", default="")
 ap.add_argument("--world", action="store_true", help="also build the regions outside the window (ROBLOX-95: the outer sill, the wall, the bed) for the outside views, with the bed's prey and woodlice (ROBLOX-96)")
+ap.add_argument("--title", action="store_true", help="ROBLOX-109: add the first minute's camera frames (Shared/Movement/TitleShots.views: title_drift_0, title_drift_18, title_drift_36, intro_glass, intro_sill, intro_out); use with --world")
 ap.add_argument("--elevation", type=float, default=30.0, help="sun elevation, degrees")
 ap.add_argument("--set", action="append", default=[], help="lighting knob for scene.gd, key=value (energy, ambient, bias, nbias, blur)")
 ap.add_argument("--azimuth", type=float, default=30.0, help="degrees off straight out of the window (-Z); positive turns toward +X")
@@ -197,6 +201,10 @@ VIEWS = {
     "shrub_leaf": {"fov": 50, "eye": [-93.0, -86.0, -71.0], "at": [-93.0, -89.5, -86.0], "near": 0.05, "far": 2500, "groups": [], "shadow": 40},
     "shrub_under": {"fov": 70, "eye": [-80.0, -87.5, -95.0], "at": [-95.0, -80.0, -80.0], "near": 0.05, "far": 2500, "groups": [], "shadow": 60},
     "house_west": {"fov": 62, "eye": [-150.0, -40.0, -430.0], "at": [-180.0, 0.0, -24.0], "near": 1.0, "far": 6000, "groups": [], "shadow": 600},
+    # ROBLOX-109 (docs/STORE_PAGE.md): the game icon's composition (render it square: --size 1024x1024), the spider stepping out of the crack at the spawn, three-quarter
+    # front and low; and the store thumbnail of the same moment, wider
+    "store_icon": {"fov": 32, "eye": [-19.4, 0.8, 7.6], "at": [-22.0, 0.42, 6.0], "near": 0.02, "far": 2500, "groups": ["spawn"], "shadow": 20},
+    "store_spider": {"fov": 40, "eye": [-18.6, 0.9, 8.4], "at": [-22.4, 0.5, 5.6], "near": 0.02, "far": 2500, "groups": ["spawn"], "shadow": 30},
 }
 
 
@@ -242,6 +250,30 @@ VIEWS.update({
     "wasp_walk": around_wasp(WASPS[1], 0, 1.0, d_front=2.3, d_side=-2.3, fov=36, at_up=-0.1),
     "wasp_hold": around_wasp(WASPS[2], 0, 0.8, d_front=3.0, d_side=-2.6, fov=36, at_up=-0.3),
 })
+
+
+def title_views():
+    """ROBLOX-109: the drift's keys and the intro's shots from the real TitleShots module (tools/preview/title_shots.luau prints them)."""
+    spec = importlib.util.spec_from_file_location("jss_tests_run", ROOT / "tests" / "run.py")
+    run = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(run)
+    with tempfile.NamedTemporaryFile("w", suffix=".luau", encoding="utf-8", delete=False, dir=out) as f:
+        f.write(run.bundle(str(HERE / "title_shots.luau")))
+    try:
+        text = subprocess.run([args.luau, f.name], capture_output=True, text=True, check=True).stdout
+    finally:
+        pathlib.Path(f.name).unlink()
+    found = {}
+    for line in text.splitlines():
+        name, *nums = line.split()
+        n = [float(x) for x in nums]
+        # the spider is drawn only where the intro shows it out of the crack (the spawn's spider; in the earlier shots it is still inside)
+        found[name] = {"fov": n[6], "eye": n[0:3], "at": n[3:6], "near": 0.05, "far": 6000, "groups": ["spawn"] if name == "intro_out" else [], "shadow": 300 if name.startswith("title_") else 40}
+    return found
+
+
+if args.title:
+    VIEWS.update(title_views())
 names = [n for n in args.views.split(",") if n]
 for n in names:
     if n not in VIEWS:

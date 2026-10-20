@@ -19,6 +19,11 @@
 -- ROBLOX-111: it is also the frame's profiler. Each frame sample prints the client's render step timed by part (Client/FrameProfile), the engine's memory and part
 -- counts and a census of what is drawn; the bed is sampled again once its looks are made, then without the looks and without shadows; the let-down is profiled,
 -- prints what the line did (SilkController's counts) and is judged in the game's time.
+-- ROBLOX-115 (two worlds): it runs on the world the place runs (the Workspace attribute World). In the test garden, everything above; in the preserve, whose only
+-- walkable place is the ranger hut's sill, the garden's checks (the line from the outer sill, the bed's prey and woodlice and frames, the wall's moths) give way to
+-- the hut's sill (its boxes whole, the Decor without the test garden's view, the hut's look held whole at the tier's detail) and the backdrop near and far (the
+-- looks planned at the sill hold the hut whole and the railway far; planned at the railway's crest, the railway whole and the hut back to its far look; then
+-- planned at the sill again, as they were) and the trains (a pass's cars drawn on the line). The lock is taken with a controller's L2 tap too (ROBLOX-115).
 -- Each Studio process writes its own log (%LOCALAPPDATA%\Roblox\logs); tools/studio/selftest.ps1 reads the newest for these lines.
 -- The CLI suite tests/selftest.luau runs the same checks against the real client on the shim's box world, with a host of its own (simulated frames and clock), so the run is
 -- proven to complete and print END before it ever reaches Studio. First run in Studio at v36 (33 of 34; the line failed, ROBLOX-111); ROBLOX-111's additions not yet.
@@ -28,6 +33,7 @@ local Workspace = game:GetService("Workspace")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local WorldMap = require(Shared:WaitForChild("World"):WaitForChild("WorldMap"))
 local Region = require(Shared:WaitForChild("World"):WaitForChild("Region"))
+local Preserve = require(Shared:WaitForChild("World"):WaitForChild("Preserve"))
 local Species = require(Shared:WaitForChild("Data"):WaitForChild("Species"))
 local BugBodies = require(script.Parent.BugBodies)
 
@@ -274,6 +280,7 @@ type Check = { name: string, fn: (r: Run) -> () }
 local function checks(): { Check }
 	local list: { Check } = {}
 	local function add(name: string, fn: (r: Run) -> ()) table.insert(list, { name = name, fn = fn }) end
+	local preserve = WorldMap.world() == "preserve" -- (ROBLOX-115: the preserve has its own checks where the garden's would be)
 
 	add("new life", function(r)
 		local ctx = r.ctx
@@ -360,7 +367,10 @@ local function checks(): { Check }
 		need(lowest > 0.2 and highest < 0.45, string.format("left the floor: between y %.2f and %.2f", lowest, highest))
 	end)
 
-	add("the line", function(r)
+	-- (ROBLOX-115: the garden's checks are the test garden's; `garden` adds one only there)
+	local function garden(name: string, fn: (r: Run) -> ()) if not preserve then add(name, fn) end end
+
+	garden("the line", function(r)
 		local ctx = r.ctx
 		local motor = ctx.motor
 		need(holdUntilReady(r, "outer_sill", SelfTest.EDGE, nil), "the outer sill is not whole")
@@ -466,9 +476,19 @@ local function checks(): { Check }
 			ctx.input:simulate("Recenter", true); pause(r, 0); ctx.input:simulate("Recenter", false)
 			need(lock.trackId == nil, "Recentre again did not let go")
 		end
+		-- (ROBLOX-115) a controller's L2: a tap locks onto what the spider sees, a tap again lets go
+		if waitUntil(r, 3, sees, 0) then
+			ctx.input:simulate("PadLock", true); pause(r, 0); ctx.input:simulate("PadLock", false)
+			pause(r, 0)
+			need(lock.trackId ~= nil, "an L2 tap did not lock onto what the spider sees")
+			ctx.input:simulate("PadLock", true); pause(r, 0); ctx.input:simulate("PadLock", false)
+			pause(r, 0)
+			need(lock.trackId == nil, "an L2 tap again did not let go")
+			say(r, "INFO lock: L2's tap locks and lets go")
+		end
 	end)
 
-	add("prey in the bed", function(r)
+	garden("prey in the bed", function(r)
 		local ctx = r.ctx
 		need(holdUntilReady(r, "bed_a", SelfTest.BED, nil), "the bed is not whole")
 		put(r, SelfTest.BED, nil)
@@ -497,7 +517,7 @@ local function checks(): { Check }
 		say(r, `INFO prey in the bed: {byKind.fungus_gnat} gnats, {byKind.aphid} aphids, {#kinds.springtail.flies} springtails, {#kinds.leafhopper.flies} leafhoppers, all drawn`)
 	end)
 
-	add("woodlice", function(r)
+	garden("woodlice", function(r)
 		local ctx = r.ctx
 		local bed = ctx.world.garden.bed_a
 		need(bed ~= nil and bed.bugs ~= nil and #bed.bugs.lice > 0, "no woodlice in the bed")
@@ -512,7 +532,7 @@ local function checks(): { Check }
 		say(r, `INFO woodlice: {#bed.bugs.lice} made and drawn`)
 	end)
 
-	add("frame time in the bed", function(r)
+	garden("frame time in the bed", function(r)
 		frameSample(r, SelfTest.SAMPLE_S, "frame time in the bed", "in the bed")
 		say(r, "INFO census in the bed: " .. census())
 	end)
@@ -520,7 +540,7 @@ local function checks(): { Check }
 	-- ROBLOX-111: the bed's frame again once the looks near it are all made (no build pending), with how long that took from the spider's coming to the bed; then,
 	-- to say whether the looks or their shadows are what the frame pays for, the same with the looks out of the workspace, and with the global shadows off (both
 	-- put back at once, whatever happens).
-	add("frame time in the bed, settled", function(r)
+	garden("frame time in the bed, settled", function(r)
 		local looks = r.ctx.world.looks
 		if looks == nil then skip("no looks are made in this place") end
 		local settled = waitUntil(r, SelfTest.SETTLE_WAIT, function()
@@ -552,7 +572,7 @@ local function checks(): { Check }
 		if not ok2 then error(err2, 0) end
 	end)
 
-	add("moths on the wall", function(r)
+	garden("moths on the wall", function(r)
 		local ctx = r.ctx
 		local wall = WorldMap.region("house_wall") :: any
 		need(holdUntilReady(r, "house_wall", wall.spawn.pos + Vector3.yAxis * HEIGHT, nil), "the wall is not whole")
@@ -568,7 +588,7 @@ local function checks(): { Check }
 		say(r, `INFO moths on the wall: {#moths} made and drawn`)
 	end)
 
-	add("dusk: the moths fly", function(r)
+	garden("dusk: the moths fly", function(r)
 		local ctx = r.ctx
 		local life = ctx.life
 		local entry = ctx.world.garden.house_wall
@@ -588,6 +608,77 @@ local function checks(): { Check }
 		life.clock.hour = 12
 		if not ok then error(err, 0) end
 	end)
+
+	-- ROBLOX-115: the preserve's own checks: the ranger hut's sill, the backdrop near and far, the trains
+	if preserve then
+		add("the hut's sill", function(r)
+			local ctx = r.ctx
+			local world = ctx.world
+			put(r, SelfTest.SILL, nil)
+			pause(r, 0.5)
+			need(world:regionReady("sill"), "the sill is not whole")
+			need(world.region.id == "sill", `the client's world says {world.region.id}`)
+			local decor = Workspace:FindFirstChild("Decor")
+			need(decor ~= nil and decor:FindFirstChild("Wall") ~= nil, "no Decor with its window wall")
+			need((decor :: Instance):FindFirstChild("View") == nil, "the Decor draws the test garden's view in the preserve")
+			local looks = world.looks
+			need(looks ~= nil, "no looks are made")
+			need(waitUntil(r, SelfTest.SETTLE_WAIT, function() return #looks.jobs == 0 end, 0), `the looks were still being made after {SelfTest.SETTLE_WAIT} s`)
+			local top = if looks.tier == "low" then "low" else "full"
+			need(looks.plan.hut == top, `the hut is held {tostring(looks.plan.hut)}, not {top}`)
+			local hut = looks.folder:FindFirstChild("hut")
+			need(hut ~= nil and hut:FindFirstChild("Base") ~= nil, "the hut's look is not in the workspace")
+			local named: { [string]: boolean } = {}
+			for _, d in (hut :: Instance):GetDescendants() do named[d.Name] = true end
+			need(named.NorthWest and named.Roof1 and named.OuterSill, "the hut's look has no north wall, roof or outer sill")
+			say(r, `INFO the hut's sill: {partsUnder(hut :: Instance)} parts of the hut at the {looks.tier} tier; {looks:parts()} parts of the backdrop held of {looks.planned} planned`)
+		end)
+
+		add("the backdrop near and far", function(r)
+			local ctx = r.ctx
+			local world, motor = ctx.world, ctx.motor
+			local looks = world.looks
+			need(looks ~= nil, "no looks are made")
+			local top = if looks.tier == "low" then "low" else "full"
+			local function level(id: string): string return tostring(looks.plan[id]) end
+			local function sets(id: string): string
+				local look = looks.looks[id]
+				if look == nil then return "none" end
+				local out = {}
+				for name in look.sets do table.insert(out, name) end
+				table.sort(out)
+				return table.concat(out, "+")
+			end
+			-- (all at once, between two frames: the client's own update would plan at the spider again at the next one)
+			looks:update(motor.pos, world.region); looks:finish()
+			local nearHut, nearRail = level("hut"), level("railway")
+			local crest = Preserve.at(50, Preserve.RAILWAY.crest + 0.5, Preserve.RAILWAY.height)
+			looks:update(crest, nil); looks:finish()
+			local farHut, farRail, farHutSets, farRailSets, held = level("hut"), level("railway"), sets("hut"), sets("railway"), looks:parts()
+			looks:update(motor.pos, world.region); looks:finish()
+			local backHut, backSets = level("hut"), sets("hut")
+			say(r, `INFO backdrop: at the sill the hut {nearHut} and the railway {nearRail}; at the railway's crest the railway {farRail} ({farRailSets}) and the hut {farHut} ({farHutSets}), {held} parts; back at the sill the hut {backHut} ({backSets})`)
+			need(nearHut == top and nearRail == "far", `at the sill: the hut {nearHut} and the railway {nearRail}, not {top} and far`)
+			need(farRail == top and farHut == "far" and farHutSets == "Far", `at the railway's crest: the railway {farRail} and the hut {farHut} ({farHutSets}), not {top} and far`)
+			need(held <= (if top == "low" then 500 else 1500), `{held} parts held at the railway's crest`)
+			need(backHut == top and string.find(backSets, "Base", 1, true) ~= nil and string.find(backSets, "Far", 1, true) == nil, `back at the sill the hut is {backHut} ({backSets})`)
+		end)
+
+		add("the trains", function(r)
+			local world = r.ctx.world
+			local train = world.train
+			need(train ~= nil, "no trains in the preserve")
+			local first = train.schedule.pass(1)
+			local now = r.host.clock()
+			local nextPass = train.schedule.at(now) or train.schedule.pass(1)
+			train:update(first.start + (first.finish - first.start) * 0.5)
+			local shown, parts = train.shownCount, train:parts()
+			train:update(now)
+			say(r, string.format("INFO trains: the first a %s of %d cars at %.0f to %.0f s; mid-pass %d cars (%d parts) drawn; the clock at %.0f s, the next at %.0f s",
+				first.kind, first.cars, first.start, first.finish, shown, parts, now, nextPass.start))
+			need(shown > 0, "no car of the first train drawn mid-pass")
+		end)
+	end
 
 	add("notebook", function(r)
 		local ctx = r.ctx
@@ -664,6 +755,7 @@ function SelfTest.run(ctx: any, host: Host)
 	local now = host.clock()
 	local r: Run = { ctx = ctx, host = host, pass = 0, fail = 0, skip = 0, doing = "start", began = now, beat = now }
 	say(r, "BEGIN the live place's self-test (ROBLOX-104)")
+	say(r, `INFO world: {WorldMap.world()} (revision {WorldMap.revision()})`)
 	local ok, err = pcall(function()
 		for _, c in checks() do
 			r.doing = c.name

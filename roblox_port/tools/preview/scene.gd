@@ -163,7 +163,7 @@ func _init() -> void:
 	e.adjustment_saturation = 1.10
 	e.fog_enabled = true  # Roblox's Atmosphere haze, roughly: far hills fade toward the sky
 	e.fog_light_color = Color(0.78, 0.85, 0.92)
-	e.fog_density = 0.0009
+	e.fog_density = float(sun_cfg.get("fog", 0.0009))  # (ROBLOX-115: a knob, --set fog=..., and a view's own "fog" for a plan)
 	env.environment = e
 	root.add_child(env)
 
@@ -179,6 +179,7 @@ func _init() -> void:
 		cam.near = float(v["near"])
 		cam.far = float(v["far"])
 		sun.directional_shadow_max_distance = float(v.get("shadow", 140.0))
+		e.fog_density = float(v.get("fog", sun_cfg.get("fog", 0.0009)))
 		var eye := Vector3(v["eye"][0], v["eye"][1], v["eye"][2])
 		var at := Vector3(v["at"][0], v["at"][1], v["at"][2])
 		cam.look_at_from_position(eye, at, Vector3.UP)

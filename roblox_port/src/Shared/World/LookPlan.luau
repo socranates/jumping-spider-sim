@@ -14,6 +14,9 @@
 --      spider walking along the edge of a radius does not build and destroy the same look over and over.
 -- Levels: "full" (every record), "low" (the records without `full`, the low tier's look) and "far" (FAR's records, the walls' mortar beds drawn as brick).
 -- A region with no look (the sill) is never in a plan. At the low tier there is no "full".
+-- ROBLOX-115 (the preserve, World/Preserve and World/PreserveLook): the active world's drawn zones (WorldMap.drawn: the backdrop, none in the test garden) are
+-- planned with the regions. Each is held far wherever the spider is (step 2, as the house's shell: its `far` records, the cheap masses, without the full tier's own
+-- at the low tier), and within RADIUS at the tier's detail (step 3) as the budget allows. So a client holds the far preserve as masses and what is near whole.
 local WorldMap = require(script.Parent.WorldMap)
 local Region = require(script.Parent.Region)
 local Garden = require(script.Parent.Garden)
@@ -47,9 +50,11 @@ local AS_BRICK: { [string]: boolean } = { Mortar = true, Above1 = true, Above2 =
 
 local recordsCache: { [string]: { Garden.Drawn } } = {}
 
--- The drawn records of a region's look at a level (the same list for the same region and level; do not change it).
-function LookPlan.records(region: WorldMap.Region, level: Level): { Garden.Drawn }
-	local key = region.id .. "/" .. tostring(region.seed) .. "/" .. level
+-- The drawn records of a region's look at a level (the same list for the same region and level; do not change it). `tier` ("full" or "low") matters only to a
+-- backdrop zone's far look (ROBLOX-115), whose full-tier records the low tier leaves out.
+function LookPlan.records(region: WorldMap.Region, level: Level, tier: string?): { Garden.Drawn }
+	local backdrop = region.kind == "backdrop"
+	local key = region.id .. "/" .. tostring(region.seed) .. "/" .. level .. (if backdrop and level == "far" and tier == "low" then "/low" else "")
 	local cached = recordsCache[key]
 	if cached ~= nil then return cached end
 	local all = Region.decor(region)
@@ -58,6 +63,8 @@ function LookPlan.records(region: WorldMap.Region, level: Level): { Garden.Drawn
 		out = all
 	elseif level == "low" then
 		for _, d in all do if not d.full then table.insert(out, d) end end
+	elseif level == "far" and backdrop then
+		for _, d in all do if d.far and not (tier == "low" and d.full) then table.insert(out, d) end end
 	elseif level == "far" then
 		local keep = LookPlan.FAR[region.kind]
 		if keep ~= nil then
@@ -85,9 +92,27 @@ function LookPlan.records(region: WorldMap.Region, level: Level): { Garden.Drawn
 end
 
 -- How many parts a region's look is at a level (0 for none).
-function LookPlan.count(region: WorldMap.Region, level: Level?): number
+function LookPlan.count(region: WorldMap.Region, level: Level?, tier: string?): number
 	if level == nil then return 0 end
-	return #LookPlan.records(region, level)
+	return #LookPlan.records(region, level, tier)
+end
+
+-- Whether a region (or a drawn zone) has a look the plan streams.
+local function streamed(region: WorldMap.Region): boolean
+	return Region.streamed(region.kind)
+end
+
+-- The active world's drawn zones from a map (none from a map that has no `drawn`, as the tests' stand-ins).
+local function drawnOf(m: any): { WorldMap.Region }
+	if m.drawn == nil then return {} end
+	return m.drawn()
+end
+
+-- A region or a drawn zone by id, from a map.
+function LookPlan.lookup(m: any, id: string): WorldMap.Region?
+	local r = m.region(id)
+	if r == nil and m.drawnZone ~= nil then r = m.drawnZone(id) end
+	return r
 end
 
 -- The distance from a point to a region's bounds (0 inside them).
@@ -107,14 +132,18 @@ function LookPlan.plan(pos: Vector3, tier: string, here: WorldMap.Region?, held:
 	local budget = if tier == "low" then LookPlan.BUDGET.low else LookPlan.BUDGET.full
 	local radius = if tier == "low" then LookPlan.RADIUS.low else LookPlan.RADIUS.full
 	local regions: { WorldMap.Region } = m.regions()
+	local zones = drawnOf(m)
 	local own: WorldMap.Region = m.at(pos) or here or (m.region(m.HOME) :: WorldMap.Region)
 	local plan: Plan = {}
 	local total = 0
 	local function has(region: WorldMap.Region): boolean
-		return Garden.knows(region.kind)
+		return streamed(region)
+	end
+	local function count(region: WorldMap.Region, level: Level?): number
+		return LookPlan.count(region, level, tier)
 	end
 	local function set(region: WorldMap.Region, level: Level?)
-		total += LookPlan.count(region, level) - LookPlan.count(region, plan[region.id])
+		total += count(region, level) - count(region, plan[region.id])
 		plan[region.id] = level :: any
 	end
 	-- 1. the region the spider is in and the regions it meets, at the tier's detail
@@ -137,13 +166,16 @@ function LookPlan.plan(pos: Vector3, tier: string, here: WorldMap.Region?, held:
 			if r ~= own then set(r, "low") end
 		end
 	end
-	-- 2. the house's shell, far, wherever it is not drawn already
+	-- 2. the house's shell, far, wherever it is not drawn already, and (ROBLOX-115) every zone of the backdrop as its masses
 	for _, r in regions do
 		if plan[r.id] == nil and LookPlan.FAR[r.kind] ~= nil then set(r, "far") end
 	end
+	for _, r in zones do
+		if plan[r.id] == nil then set(r, "far") end
+	end
 	-- 3. the others, nearest first, within the radius, as the budget allows
 	local others: { { region: WorldMap.Region, d: number, i: number } } = {}
-	for i, r in regions do
+	local function consider(r: WorldMap.Region, i: number)
 		if has(r) and not required[r.id] then
 			local d = LookPlan.distance(r, pos)
 			local kept = held ~= nil and held[r.id] ~= nil and held[r.id] ~= "far"
@@ -152,16 +184,18 @@ function LookPlan.plan(pos: Vector3, tier: string, here: WorldMap.Region?, held:
 			end
 		end
 	end
+	for i, r in regions do consider(r, i) end
+	for i, r in zones do consider(r, #regions + i) end
 	table.sort(others, function(a, b)
 		if a.d ~= b.d then return a.d < b.d end
 		return a.i < b.i
 	end)
 	for _, o in others do
 		local r = o.region
-		local now = LookPlan.count(r, plan[r.id])
-		if total - now + LookPlan.count(r, top) <= budget then
+		local now = count(r, plan[r.id])
+		if total - now + count(r, top) <= budget then
 			set(r, top)
-		elseif top == "full" and total - now + LookPlan.count(r, "low") <= budget and now < LookPlan.count(r, "low") then
+		elseif top == "full" and total - now + count(r, "low") <= budget and now < count(r, "low") then
 			set(r, "low")
 		end
 	end

@@ -14,6 +14,7 @@ local Layout = require(script.Parent.Parent.Habitat.WindowsillLayout)
 local Rules = require(script.Parent.Parent.Data.RivalRules)
 local WorldMap = require(script.Parent.WorldMap)
 local Garden = require(script.Parent.Garden)
+local PreserveLook = require(script.Parent.PreserveLook)
 
 local Region = {}
 
@@ -34,26 +35,28 @@ Region.SASH_MAX = Vector3.new(8.3, 6.3, -12.45)
 -- The physical boxes of the region.
 function Region.pieces(region: WorldMap.Region): { Layout.Piece }
 	if region.kind == "sill" then return Layout.PIECES end
+	if region.kind == "backdrop" then return {} end -- (ROBLOX-115: the preserve's backdrop has no boxes)
 	return Garden.pieces(region) :: any
 end
 
 -- The drawn-only boxes of the region.
 function Region.decor(region: WorldMap.Region): { Drawn }
 	if region.kind == "sill" then return Layout.DECOR :: any end
+	if region.kind == "backdrop" then return PreserveLook.records(region.id, region.seed) :: any end -- (ROBLOX-115: a zone of the preserve's backdrop, World/PreserveLook)
 	return Garden.decor(region)
 end
 
 -- The ids of the region's pieces that its drawn look stands in for (they turn invisible, still solid, once the look exists). The sill's are decided by its Decor
 -- (Habitat/Scenery.decor's second result), so none here.
 function Region.drawnPieces(region: WorldMap.Region): { string }
-	if region.kind == "sill" then return {} end
+	if region.kind == "sill" or region.kind == "backdrop" then return {} end
 	return Garden.drawnPieces(region)
 end
 
 -- Every piece of the region that some drawing may stand in for: its own look's (drawnPieces) and, on the outer sill, the window box's halves, which the sill's
 -- Decor draws (Habitat/Plants.garden). WorldBuild hides these when it is not told which drawings exist.
 function Region.replaceable(region: WorldMap.Region): { string }
-	if region.kind == "sill" then return {} end
+	if region.kind == "sill" or region.kind == "backdrop" then return {} end
 	local out = table.clone(Garden.drawnPieces(region))
 	for _, id in Garden.drawnBySill(region) do table.insert(out, id) end
 	return out
@@ -63,6 +66,7 @@ end
 -- other rules (Data/RivalRules), then the open sash; for the others, each retreat grown by half a stud. The retreats' boxes come first, in the retreats' order.
 function Region.keepOut(region: WorldMap.Region): { Box }
 	if region.kind == "sill" then return { { min = Rules.keepOutMin, max = Rules.keepOutMax }, { min = Region.SASH_MIN, max = Region.SASH_MAX } } end
+	if region.kind == "backdrop" then return {} end
 	return Garden.keepOut(region)
 end
 
@@ -84,6 +88,12 @@ local BUDGETS: { [string]: { full: number, low: number } } = {
 }
 for kind, b in Garden.BUDGETS do BUDGETS[kind] = b end
 
+-- Whether a region of this kind has a drawn look the looks stream (World/LookPlan, Client/LookStream): the garden's kinds and (ROBLOX-115) the preserve's backdrop.
+function Region.streamed(kind: string): boolean
+	return kind == "backdrop" or Garden.knows(kind)
+end
+
+-- (ROBLOX-115: a zone of the preserve's backdrop has its ceilings in World/PreserveLook.BUDGETS, by zone; its kind has none here.)
 function Region.budget(kind: string, tier: string): number?
 	local b = BUDGETS[kind]
 	if b == nil then return nil end

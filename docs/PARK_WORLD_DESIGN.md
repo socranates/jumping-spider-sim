@@ -126,6 +126,10 @@ CLI suites → previews → Studio self-test → publish)
 layout, the shift that puts the sill at the origin; the **backdrop** of the whole preserve (terrain, trees, the pond's surface, the city's
 blocks, the railway and its trains as sound and silhouette) drawn at distance only; a developer world-switch between the Test Garden and
 the Preserve; the self-test learns zones. Nothing new walkable except the hut.
+*Round 1 built (ROBLOX-115, 2026-10-20, not yet run in Studio):* the world switch (`World/Worlds`, the Workspace attribute `World`; the test garden stays the
+default), the map in code (`World/Preserve`: the zones, home ranges and corridors in metres, the hut's window at the origin), the whole backdrop drawn and
+streamed by distance (`World/PreserveLook`, 15 zones; 797 parts from the sill at the full tier, 476 at the low), the trains (`World/PreserveTrain`), the
+preserve's drift, the self-test's preserve checks, and lock-on to L2. Round 2: what the first Studio look says (the haze, the hut, the view), then Phase B.
 
 **Phase B — the vertical slice (3–4 rounds).** Zone 1 (the ranger hut: inside, the sill moved into the hut's window frame with its own
 redrawn window and view, the sash/nursery rule) and zone 2 (the hut garden) at full detail, with their prey, the wasp, the rival and the
@@ -176,3 +180,11 @@ the Steam edition (the canal, the apartment balconies and window boxes, a roofto
 4. **The cat and the game room live in the hut**: the ranger's cat (the hut's danger, heard by its collar bell first) and a volunteers' back
    room with a sofa, a games console and board games, built in Phase B with the hut.
 5. Lock-on moves to **L2** on controllers (Nathan, 2026-10-20), in Phase A's first round.
+
+## 11. Progress
+
+- **ROBLOX-115 (Phase A, round 1)**: two worlds in one engine; the preserve's map, backdrop, trains and drift; the hut's sill the only walkable place; L2 is
+  the lock on controllers (a tap; held, Focus) and R3 recentres. Decisions taken in the build: the sill 85 cm over the ground outside and 70 over the hut's
+  floor; the hut a 3.5 by 3 m log hut with walls 28.5 cm (the sill's reveal) and a 35-degree gable roof; covered ways at both ends of the railway so trains
+  never appear at the world's edge; the city's towers impostors at the edge (the precision rule). `docs/DECISIONS.md` ROBLOX-115;
+  `docs/HANDOFF-roblox-world.md` has the Studio checklist.

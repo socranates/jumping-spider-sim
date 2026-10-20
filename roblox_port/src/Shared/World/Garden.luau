@@ -43,6 +43,7 @@ export type Piece = { id: string, lo: Vector3, hi: Vector3, profile: string, col
 export type Drawn = {
 	id: string, size: Vector3, at: Vector3, color: Color3, transparency: number?,
 	material: string?, shape: string?, turn: Vector3?, full: boolean?, group: string?, shadow: boolean?,
+	far: boolean?, reflectance: number?, -- (ROBLOX-115: the preserve's backdrop: in the zone's far look; a shine)
 }
 export type Box = { min: Vector3, max: Vector3 }
 

@@ -49,7 +49,7 @@ ControlText.DROP_REFUSED = {
 }
 ControlText.DROP_WALK = "To the edge, to let yourself down"
 
--- What each device calls the controls. Godot's input_setup.gd bindings; the port keeps the D-pad for walking, so lowering on
+-- What each device calls the controls. (ROBLOX-115: on a controller the lock is L2 / LT, a tap, and Focus the same trigger held; the right-stick click recentres.) Godot's input_setup.gd bindings; the port keeps the D-pad for walking, so lowering on
 -- silk is X on a controller (ROBLOX-05). Touch names are the on-screen buttons.
 local NAMES: { [string]: { [string]: string } } = {
 	keyboard = {
@@ -59,7 +59,7 @@ local NAMES: { [string]: { [string]: string } } = {
 	},
 	gamepad = {
 		feed = "Left-stick click", jump = "A", cancel = "B", letGo = "B", drop = "X", reel = "Stick up", lower = "Stick down", walk = "Left stick",
-		look = "Right stick", creep = "LB", focus = "LT", eye = "Y", recenter = "Right-stick click", lock = "Right-stick click", slow = "RT", reset = "View",
+		look = "Right stick", creep = "LB", focus = "LT", eye = "Y", recenter = "Right-stick click", lock = "LT", slow = "RT", reset = "View",
 		help = "", zoom = "", choose = "RB", display = "RB", menu = "View", notebook = "View",
 	},
 	touch = {
@@ -73,7 +73,7 @@ local NAMES: { [string]: { [string]: string } } = {
 -- here (sticks) are the same on both.
 local PLAYSTATION: { [string]: string } = {
 	feed = "L3", jump = "Cross", cancel = "Circle", letGo = "Circle", drop = "Square", creep = "L1", focus = "L2", eye = "Triangle",
-	recenter = "R3", lock = "R3", slow = "R2", reset = "Touchpad", choose = "R1", display = "R1", menu = "Touchpad", notebook = "Touchpad",
+	recenter = "R3", lock = "L2", slow = "R2", reset = "Touchpad", choose = "R1", display = "R1", menu = "Touchpad", notebook = "Touchpad",
 }
 local padStyle = "xbox"
 
@@ -204,6 +204,12 @@ function ControlText.edgeWalkHint(device: Device): string
 	return `{ControlText.DROP_WALK}    {ControlText.name(device, "cancel")} or move: stop`
 end
 
+-- ROBLOX-115: on a controller Focus is L2 / LT held (a tap is the lock), so even a toggled Focus is held to latch and held again to let go: the status line's words.
+function ControlText.focusAgain(device: Device): string
+	if device == "gamepad" then return `Hold {ControlText.name(device, "focus")} again to stop` end
+	return `{ControlText.name(device, "focus")} again to stop`
+end
+
 -- The touch Lock button's words (ROBLOX-110): Lock, or Unlock while a lock holds.
 ControlText.LOCK_LABEL, ControlText.UNLOCK_LABEL = "Lock", "Unlock"
 function ControlText.touchLockLabel(locked: boolean): string
@@ -221,12 +227,13 @@ end
 function ControlText.helpCard(device: Device): string
 	if device == "gamepad" then
 		local function n(action: string): string return ControlText.name("gamepad", action) end
+		-- (ROBLOX-115: the lock is L2 / LT's tap and Focus its hold; the right stick's click recentres)
 		return table.concat({
-			`Left stick walk   Right stick look   {n("creep")} creep   {n("slow")} slow-mo`,
-			`Tap {n("jump")} hop   Hold {n("jump")} aim, release to leap   {n("focus")} focus`,
+			"Left stick walk   Right stick look, click: recentre",
+			`Tap {n("jump")} hop   Hold {n("jump")} aim, release to leap   {n("creep")} creep`,
 			`{n("drop")} lower on silk   {n("cancel")} cancel   {n("eye")} eye view`,
 			`On the line: up reel, down lower, hold {n("letGo")} let go`,
-			`{n("lock")}: lock on (stick circles it) or recentre`,
+			`Tap {n("lock")} lock on (stick circles)   Hold {n("lock")} focus   {n("slow")} slow-mo`,
 			`In the crack: {n("feed")} rest (sleep from evening)`,
 			`{n("menu")}: menu, then last rest, notebook, settings`,
 		}, "\n")

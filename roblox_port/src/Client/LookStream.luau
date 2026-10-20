@@ -25,6 +25,11 @@ local Scenery = require(Shared:WaitForChild("Habitat"):WaitForChild("Scenery"))
 local LookStream = {}
 LookStream.__index = LookStream
 
+-- A region or (ROBLOX-115) a drawn zone of the backdrop, by id, from the stream's map.
+local function regionOf(self: any, id: string): WorldMap.Region?
+	return LookPlan.lookup(self.map, id)
+end
+
 -- The most parts made in one frame (a whole look the spider is beside and cannot see is made at once regardless).
 LookStream.PARTS_PER_FRAME = 120
 -- The plan is asked again when the spider has moved this many studs since it was last asked, or its region changed.
@@ -57,8 +62,8 @@ local function setsOf(level: string?): { [string]: boolean }
 end
 
 -- The records of one set of a region's look.
-local function recordsOf(region: WorldMap.Region, set: string): { any }
-	if set == "Far" then return LookPlan.records(region, "far") end
+local function recordsOf(region: WorldMap.Region, set: string, tier: string): { any }
+	if set == "Far" then return LookPlan.records(region, "far", tier) end
 	if set == "Base" then return LookPlan.records(region, "low") end
 	local out = {}
 	for _, d in LookPlan.records(region, "full") do if d.full then table.insert(out, d) end end
@@ -134,7 +139,7 @@ function LookStream.replan(self: any, pos: Vector3, here: any?)
 	local required = LookPlan.required(pos, here, self.map)
 	local adds: { { id: string, set: string, d: number } } = {}
 	for id, level in plan do
-		local region = self.map.region(id)
+		local region = regionOf(self, id)
 		if region ~= nil then
 			for set in setsOf(level) do
 				local look = self.looks[id]
@@ -154,8 +159,8 @@ function LookStream.replan(self: any, pos: Vector3, here: any?)
 		return a.set < b.set
 	end)
 	for _, a in adds do
-		local region = self.map.region(a.id) :: WorldMap.Region
-		local ok, records = pcall(recordsOf, region, a.set)
+		local region = regionOf(self, a.id) :: WorldMap.Region
+		local ok, records = pcall(recordsOf, region, a.set, self.tier)
 		if not ok then
 			self:fail(region, records)
 			self.plan[a.id] = nil
@@ -181,7 +186,7 @@ function LookStream.work(self: any, required: { [string]: boolean }): number
 		local job: Job = self.jobs[i]
 		local urgent = required[job.id] == true and self.looks[job.id] == nil
 		if allowance <= 0 and not urgent then break end
-		local region = self.map.region(job.id) :: WorldMap.Region
+		local region = regionOf(self, job.id) :: WorldMap.Region
 		local last = if urgent then #job.records else math.min(#job.records, job.at + allowance - 1)
 		local ok, err = pcall(Scenery.look, job.folder, job.records, job.at, last, job.groups)
 		if not ok then

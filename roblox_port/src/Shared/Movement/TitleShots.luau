@@ -28,6 +28,16 @@ TitleShots.DRIFT = {
 	{ t = 18, eye = v(16, -20, -80), at = v(0, 0, -18), fov = 48 }, -- risen in front of the wall, the window in its deep reveal
 	{ t = 36, eye = v(10, 6.5, -45), at = v(0, 2.5, -14), fov = 46 }, -- level with the outer sill, looking in: the window boxes, the glass, the sill beyond
 } :: { Key }
+-- ROBLOX-115: the preserve's drift (World/Preserve: the ranger hut's north window, the sill in it, looking north over the hut garden): from over the hut garden's far
+-- end, at a person's knee, drawing in over the herb beds to the window from outside, arriving where the test garden's does (in front of the glass, looking in).
+TitleShots.PRESERVE_DRIFT = {
+	{ t = 0, eye = v(380, 60, -1250), at = v(0, 30, -16), fov = 55 }, -- over the far end of the hut garden: the beds, the fence, the hut with its window
+	{ t = 18, eye = v(120, 25, -360), at = v(0, 15, -16), fov = 48 }, -- in over the herb beds, the hut's log wall and its green casing
+	{ t = 36, eye = v(10, 6.5, -45), at = v(0, 2.5, -14), fov = 46 }, -- level with the outer sill, looking in: the glass, the sill beyond
+} :: { Key }
+-- The drift of each world (World/Worlds' ids); any other world has the test garden's.
+TitleShots.DRIFTS = { test_garden = TitleShots.DRIFT, preserve = TitleShots.PRESERVE_DRIFT } :: { [string]: { Key } }
+
 -- The breathing once the drift has arrived: amplitudes in studs and the periods' rates (radians a second), slow enough never to be noticed as a move.
 TitleShots.SWAY = { x = 1.6, y = 0.5, rateX = 0.07, rateY = 0.05 }
 
@@ -36,9 +46,10 @@ local function smooth(k: number): number
 	return k * k * (3 - 2 * k)
 end
 
--- The drift's camera and field of view at the game's time `t` (seconds since the client began).
-function TitleShots.drift(t: number): (CFrame, number)
-	local keys = TitleShots.DRIFT
+-- The drift's camera and field of view at the game's time `t` (seconds since the client began), in the world `world` (the Workspace attribute World; the test
+-- garden's drift when nil or unknown).
+function TitleShots.drift(t: number, world: string?): (CFrame, number)
+	local keys = (if world ~= nil then TitleShots.DRIFTS[world] else nil) or TitleShots.DRIFT
 	t = math.max(t, 0)
 	local last = keys[#keys]
 	if t >= last.t then
@@ -121,6 +132,15 @@ function TitleShots.views(): { { name: string, eye: Vector3, at: Vector3, fov: n
 	end
 	for _, s in TitleShots.INTRO.shots do
 		table.insert(out, { name = `intro_{s.name}`, eye = s.eye0:Lerp(s.eye1, 0.5), at = s.at0:Lerp(s.at1, 0.5), fov = s.fov })
+	end
+	return out
+end
+
+-- ROBLOX-115: the preserve's drift's three keys as the previewer's views (tools/preview/scene.py --preserve): preserve_drift_0, _18 and _36.
+function TitleShots.preserveViews(): { { name: string, eye: Vector3, at: Vector3, fov: number } }
+	local out = {}
+	for _, key in TitleShots.PRESERVE_DRIFT do
+		table.insert(out, { name = `preserve_drift_{key.t}`, eye = key.eye, at = key.at, fov = key.fov })
 	end
 	return out
 end

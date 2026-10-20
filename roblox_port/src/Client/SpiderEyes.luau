@@ -388,7 +388,7 @@ function SpiderEyes.captionView(self: any, device: ControlText.Device): { text: 
 	if alpha <= 0 then
 		return nil
 	end
-	return { text = EyeOptics.captionText(ControlText.name(device, "focus"), self.player:GetAttribute("FocusToggle") == true), alpha = alpha }
+	return { text = EyeOptics.captionText(ControlText.name(device, "focus"), self.player:GetAttribute("FocusToggle") == true, device == "gamepad"), alpha = alpha }
 end
 
 -- ---------------------------------------------------------------- the frame

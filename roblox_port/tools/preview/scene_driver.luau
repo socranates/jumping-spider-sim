@@ -23,7 +23,9 @@ local Species = require("../src/Shared/Data/Species")
 -- ---------------------------------------------------------------- the world, as Server/Main builds it
 local el, az = math.rad(SUN_ELEVATION_DEG), math.rad(SUN_AZIMUTH_DEG)
 local sun = Vector3.new(math.sin(az) * math.cos(el), math.sin(el), -math.cos(az) * math.cos(el)) -- unit vector toward the sun
-local built, decor, drawn = pcall(Scenery.decor, sun)
+-- ROBLOX-115 (scene.py --preserve): the preserve is the active world: the sill's Decor without the test garden's view, and the backdrop's looks (below)
+if PRESERVE then WorldMap.use("preserve") end
+local built, decor, drawn = pcall(Scenery.decor, sun, if PRESERVE then "preserve" else nil)
 assert(built, tostring(decor))
 local sill = Scenery.sill(drawn)
 decor.Parent = workspace
@@ -57,6 +59,45 @@ if WORLD then
 	end
 	outside.Parent = workspace
 	looks.Parent = outside
+end
+
+-- ROBLOX-115 (--preserve): the backdrop as a client whose spider is at LOOKS_AT holds it (the sill's spawn unless asked: what a player sees in Phase A), or with
+-- PRESERVE_ALL every zone at the tier's detail; and a train on the line, halfway through the first pass (Client/TrainPass on World/PreserveTrain's timetable)
+PRESERVE_COUNTS = ""
+PRESERVE_HOLDER = nil :: any
+if PRESERVE then
+	local holder = Instance.new("Folder")
+	PRESERVE_HOLDER = holder
+	holder.Name = "Outside"
+	holder.Parent = workspace
+	if PRESERVE_ALL then
+		local LookPlan = require("../src/Shared/World/LookPlan")
+		local n = 0
+		for _, zone in WorldMap.drawn() do
+			local m = Instance.new("Model")
+			m.Name = zone.id
+			m.Parent = holder
+			n += Scenery.look(m, LookPlan.records(zone, if DETAIL == "low" then "low" else "full", DETAIL))
+		end
+		PRESERVE_COUNTS = `all zones at {DETAIL}: {n} parts`
+	else
+		local at = if LOOKS_AT then Vector3.new(LOOKS_AT[1], LOOKS_AT[2], LOOKS_AT[3]) else (WorldMap.region("sill") :: any).spawn.pos
+		local stream = LookStream.new(holder, DETAIL, nil)
+		stream:update(at, WorldMap.at(at))
+		stream:finish()
+		local levels = {}
+		for id, level in stream.plan do table.insert(levels, id .. "=" .. level) end
+		table.sort(levels)
+		PRESERVE_COUNTS = `looks at {at}: {stream:parts()} parts ({table.concat(levels, " ")})`
+	end
+	local PreserveTrain = require("../src/Shared/World/PreserveTrain")
+	local TrainPass = require("../src/Client/TrainPass")
+	local train = TrainPass.new(holder, WorldMap.seed(WorldMap.SEED, "train"), DETAIL)
+	local first = train.schedule.pass(1)
+	local t = first.start + (first.finish - first.start) * 0.5
+	train:update(t)
+	PRESERVE_COUNTS ..= `; a train ({first.kind}, {first.cars} cars) with {train:parts()} parts at {math.floor(t)} s`
+	local _ = PreserveTrain
 end
 
 -- ---------------------------------------------------------------- the spider, standing at each asked-for place
@@ -382,6 +423,7 @@ local rows: { string } = {}
 dump(sill, "world", rows)
 dump(decor, "world", rows)
 dump(outside, "world", rows)
+if PRESERVE_HOLDER ~= nil then dump(PRESERVE_HOLDER, "world", rows) end
 local counts = { world = #rows }
 for name, rig in rigs do
 	local before = #rows
@@ -402,5 +444,5 @@ for k in counts do table.insert(keys, k) end
 table.sort(keys)
 local summary = {}
 for _, k in keys do table.insert(summary, k .. "=" .. counts[k]) end
-print("parts " .. table.concat(summary, " ") .. " total=" .. #rows .. (if #AMBIENT_AT > 0 then " ambient=" .. table.concat(AMBIENT_AT, ";") else ""))
+print("parts " .. table.concat(summary, " ") .. " total=" .. #rows .. (if #AMBIENT_AT > 0 then " ambient=" .. table.concat(AMBIENT_AT, ";") else "") .. (if PRESERVE_COUNTS ~= "" then " preserve: " .. PRESERVE_COUNTS else ""))
 print("[" .. table.concat(rows, ",\n") .. "]")

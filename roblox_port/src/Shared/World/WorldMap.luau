@@ -57,7 +57,15 @@
 --                     kettle on its base east of it. It meets the sill where the sill board's front face goes on down as the upstand's.
 --   kitchen_floor ... the floor 90 cm under the sill (y -90) in a strip 80 cm deep in front of the counter, the cupboard doors, the plinth recessed under them and the run's
 --                     end panels. It meets the counter along the worktop's front edge. The house's pace (1.0) for both: the inside keeps the sill's day.
+-- ROBLOX-115 (docs/PARK_WORLD_DESIGN.md: two worlds, one engine): the map answers for the active world (World/Worlds). Everything above is the test garden's map,
+-- unchanged; the preserve's (World/Preserve) has one walkable region, the same sill at the origin (now the ranger hut's north window, with no neighbours: nothing
+-- outside the hut is walkable in Phase A), and its backdrop, the zones of World/Preserve, which are not regions: they are drawn only (`drawn`, World/PreserveLook,
+-- streamed by World/LookPlan), never in `at`, `inBounds`, `bounds` or a checkpoint. `use(id)` makes a world the active one (the server from the Workspace
+-- attribute World at startup, the client from the same attribute, a test as it likes); every question below then answers for it. `REVISION` stays the test
+-- garden's; `revision()` is the active world's.
 local Layout = require(script.Parent.Parent.Habitat.WindowsillLayout)
+local Worlds = require(script.Parent.Worlds)
+local Preserve = require(script.Parent.Preserve)
 
 local WorldMap = {}
 
@@ -313,15 +321,6 @@ local function author(worldSeed: number): { Region }
 	return list
 end
 
-local DEFAULT: { Region } = table.freeze(author(WorldMap.SEED))
-local BY_ID: { [string]: Region } = {}
-for _, r in DEFAULT do BY_ID[r.id] = r end
-
--- Whether the point is in the box, edges included (Godot's windowsill.gd in_retreat, which every box of the world keeps).
-local function within(lo: Vector3, hi: Vector3, p: Vector3): boolean
-	return p.X >= lo.X and p.X <= hi.X and p.Y >= lo.Y and p.Y <= hi.Y and p.Z >= lo.Z and p.Z <= hi.Z
-end
-
 -- The union box of some regions' bounds (their smallest common axis-aligned box), as `min, max`.
 function WorldMap.unionOf(regions: { Region }): (Vector3, Vector3)
 	local lo, hi = regions[1].bounds[1], regions[1].bounds[2]
@@ -333,13 +332,70 @@ function WorldMap.unionOf(regions: { Region }): (Vector3, Vector3)
 	return lo, hi
 end
 
-local UNION_MIN, UNION_MAX = WorldMap.unionOf(DEFAULT)
+-- (ROBLOX-115) The preserve's walkable regions: the sill alone, in the hut's north window, as the test garden's sill but for its seams (no region meets it yet).
+local function authorPreserve(worldSeed: number): { Region }
+	return {
+		freeze({
+			id = "sill", kind = "sill", origin = Vector3.zero,
+			bounds = { Layout.PLAY_BOUNDS_MIN, Layout.PLAY_BOUNDS_MAX },
+			seed = WorldMap.seed(worldSeed, "sill"),
+			neighbors = {},
+			retreats = { { id = "sill_crevice", min = Layout.RETREAT_MIN, max = Layout.RETREAT_MAX, door = v(-24, 1, 6) } },
+			spawn = { pos = Layout.SPAWN, heading = Layout.SPAWN_HEADING },
+			clockScale = 1.0,
+		}),
+	}
+end
+
+-- (ROBLOX-115) The preserve's backdrop: each zone of World/Preserve as a drawn-only region record (kind "backdrop", its box its bounds, its own seed), which
+-- World/LookPlan streams as one look. They are not on the map: no point is ever in one, nothing walks or rests in one.
+local function authorDrawn(worldId: string, worldSeed: number): { Region }
+	local out: { Region } = {}
+	if worldId ~= Worlds.PRESERVE then return out end
+	for _, z in Preserve.ZONES do
+		local lo, hi = Preserve.zoneBox(z)
+		local mid = (lo + hi) * 0.5
+		table.insert(out, freeze({
+			id = z.id, kind = "backdrop", origin = mid, bounds = { lo, hi }, seed = WorldMap.seed(worldSeed, z.id),
+			neighbors = {}, retreats = {}, spawn = { pos = mid, heading = v(0, 0, -1) }, clockScale = 0.33,
+		}))
+	end
+	return out
+end
+
+local AUTHORS: { [string]: (number) -> { Region } } = { test_garden = author, preserve = authorPreserve }
+
+-- Each world's map for the default seed, made once: its regions in priority order, by id, their union box, and its drawn zones.
+type Map = { regions: { Region }, byId: { [string]: Region }, lo: Vector3, hi: Vector3, drawn: { Region }, drawnById: { [string]: Region } }
+local MAPS: { [string]: Map } = {}
+for _, id in Worlds.IDS do
+	local list = table.freeze(AUTHORS[id](WorldMap.SEED))
+	local byId: { [string]: Region } = {}
+	for _, r in list do byId[r.id] = r end
+	local drawn = table.freeze(authorDrawn(id, WorldMap.SEED))
+	local drawnById: { [string]: Region } = {}
+	for _, r in drawn do drawnById[r.id] = r end
+	local lo, hi = WorldMap.unionOf(list)
+	MAPS[id] = { regions = list, byId = byId, lo = lo, hi = hi, drawn = drawn, drawnById = drawnById }
+end
+
+-- The active world (World/Worlds' default until `use` says otherwise) and its map.
+local ACTIVE = Worlds.DEFAULT
+local DEFAULT: { Region } = MAPS[ACTIVE].regions
+local BY_ID: { [string]: Region } = MAPS[ACTIVE].byId
+
+-- Whether the point is in the box, edges included (Godot's windowsill.gd in_retreat, which every box of the world keeps).
+local function within(lo: Vector3, hi: Vector3, p: Vector3): boolean
+	return p.X >= lo.X and p.X <= hi.X and p.Y >= lo.Y and p.Y <= hi.Y and p.Z >= lo.Z and p.Z <= hi.Z
+end
+
+local UNION_MIN, UNION_MAX = MAPS[ACTIVE].lo, MAPS[ACTIVE].hi
 
 -- Every region, in priority order, for a world seed (the default one: the shared, frozen list; do not rely on its identity). Nothing in a
 -- region but its `seed` depends on the world's seed.
 function WorldMap.regions(worldSeed: number?): { Region }
 	if worldSeed == nil or worldSeed == WorldMap.SEED then return DEFAULT end
-	return table.freeze(author(worldSeed))
+	return table.freeze(AUTHORS[ACTIVE](worldSeed))
 end
 
 -- The region with this id, or nil.
@@ -400,6 +456,38 @@ function WorldMap.retreat(id: string): Retreat?
 		end
 	end
 	return nil
+end
+
+-- ---------------------------------------------------------------- the active world (ROBLOX-115)
+-- Makes a world the active one (an id of World/Worlds; anything else is an error: ask Worlds.choose first) and returns the one that was.
+function WorldMap.use(worldId: string): string
+	assert(Worlds.known(worldId), "no world " .. tostring(worldId))
+	local was = ACTIVE
+	ACTIVE = worldId
+	local m = MAPS[worldId]
+	DEFAULT, BY_ID, UNION_MIN, UNION_MAX = m.regions, m.byId, m.lo, m.hi
+	return was
+end
+
+-- The active world's id.
+function WorldMap.world(): string
+	return ACTIVE
+end
+
+-- The active world's revision (Persistence/Checkpoint's gate): the test garden's is REVISION.
+function WorldMap.revision(): string
+	return Worlds.get(ACTIVE).revision
+end
+
+-- The active world's drawn-only zones (the preserve's backdrop; none in the test garden), as region records, for a world seed.
+function WorldMap.drawn(worldSeed: number?): { Region }
+	if worldSeed == nil or worldSeed == WorldMap.SEED then return MAPS[ACTIVE].drawn end
+	return table.freeze(authorDrawn(ACTIVE, worldSeed))
+end
+
+-- The drawn zone with this id in the active world, or nil.
+function WorldMap.drawnZone(id: string): Region?
+	return MAPS[ACTIVE].drawnById[id]
 end
 
 return table.freeze(WorldMap)

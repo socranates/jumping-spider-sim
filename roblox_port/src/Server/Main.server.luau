@@ -14,11 +14,20 @@ local Scenery = require(Habitat:WaitForChild("Scenery"))
 local Lit = require(Habitat:WaitForChild("Lit"))
 local World = ReplicatedStorage:WaitForChild("Shared"):WaitForChild("World")
 local WorldMap = require(World:WaitForChild("WorldMap"))
+local Worlds = require(World:WaitForChild("Worlds"))
 local WorldBuild = require(World:WaitForChild("WorldBuild"))
 local Region = require(World:WaitForChild("Region"))
 local WorldFocus = require(script.Parent.WorldFocus)
 
 Players.CharacterAutoLoads = false
+
+-- ROBLOX-115: which world this server runs (World/Worlds): the Workspace attribute World if the place sets it to a world's id (in Studio: "preserve" before Play),
+-- else the default (the test garden until Phase B). The choice is written back to the attribute, which every client reads (Client/WorldClient), so the server's
+-- map, the clients' and the saves agree.
+local worldId = Worlds.choose(Workspace:GetAttribute(Worlds.ATTRIBUTE))
+Workspace:SetAttribute(Worlds.ATTRIBUTE, worldId)
+WorldMap.use(worldId)
+print(`[Windowsill] world: {Worlds.get(worldId).name} ({worldId})`)
 Workspace.Gravity = 35 -- species gravity_wu_s2; used by any unanchored props
 
 -- The sill is what the game needs; the looks are best effort. If the lighting or the decor fails (nothing here has run in Roblox
@@ -32,7 +41,7 @@ else
 	warn("[Windowsill] lighting set-up failed: " .. tostring(sun))
 end
 
-local decorOk, decor, replaced = pcall(Scenery.decor, if litOk and sun.ok then sun.direction else nil)
+local decorOk, decor, replaced = pcall(Scenery.decor, if litOk and sun.ok then sun.direction else nil, worldId)
 if not decorOk then
 	warn("[Windowsill] decor failed, the back wall and the Pilea's pieces stay as they were: " .. tostring(decor))
 end

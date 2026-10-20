@@ -1216,6 +1216,51 @@ case("a rest records where in the world it was kept, and a record from before me
 		"a rest kept under world-2 comes back at the spawn, with the notice")
 end)
 
+-- ---------------------------------------------------------------------------------------------- two worlds (ROBLOX-115)
+case("two worlds (ROBLOX-115): a rest in the test garden is written as it always was; one in the preserve names its world; each from the other comes back where a life begins", function()
+	local w = newWorld()
+	for _ = 1, 60 do tick(w) end
+	rest(w)
+	local garden = w.store:loadBest().record
+	check(garden.world_map.world == nil and WorldMap.world() == "test_garden", "a rest in the test garden has no world field (the record is byte for byte as before)")
+	local under = Vector3.new(11, -89.69, -50)
+	w.motor:place(under, Vector3.yAxis, Vector3.new(0, 0, 1))
+	local bed = assert(Checkpoint.capture(w, 0))
+	check(bed.world_map.region == "bed_a" and bed.world_map.world == nil, "(and one under the bed's stone)")
+	local was = WorldMap.use("preserve")
+	local ok, err = pcall(function()
+		check(was == "test_garden" and WorldMap.revision() == "preserve-1", "the preserve is the active world, its revision preserve-1")
+		-- a rest from the test garden, in the preserve: a good record (its region and retreat are the test garden's, not looked for here), put back at the sill's spawn
+		check(Checkpoint.worldMoved(garden) and #(Checkpoint.check(garden, w)) == 0, "a test garden rest is from another world, and good")
+		check(#(Checkpoint.check(bed, w)) == 0, "one from the bed too, though the preserve has no bed")
+		local spawn = Layout.SPAWN + Vector3.new(0, 0.31, 0)
+		check(Checkpoint.restore(bed, w) and (w.motor.pos - spawn).Magnitude < 1e-6 and string.find(w.life.notice, "the world has changed since you rested", 1, true) ~= nil,
+			"and comes back at the sill's spawn with the notice")
+		-- a rest in the preserve's hut: it names its world and revision, and comes back in the crack
+		w.motor:place(HOME, Vector3.yAxis, Vector3.xAxis)
+		local hut = assert(Checkpoint.capture(w, 0))
+		check(hut.world_map.world == "preserve" and hut.world_map.revision == "preserve-1" and hut.world_map.region == "sill" and hut.world_map.retreat == "sill_crevice",
+			"a rest in the hut's crack records the preserve, preserve-1, the sill and the crevice")
+		check(not Checkpoint.worldMoved(hut) and #(Checkpoint.check(Json.copy(hut), w)) == 0, "a good record of this world, stored and copied")
+		check(string.find(assert(Json.canonical(hut)), '"world":"preserve"', 1, true) ~= nil, "its stored text names the world")
+		w.motor:place(spawn, Vector3.yAxis, Vector3.xAxis)
+		check(Checkpoint.restore(hut, w) and (w.motor.pos - HOME).Magnitude < 1e-6, "and it comes back in the crack")
+		-- a world field that is not a name is refused; one that names a world this game does not know is a rest from elsewhere, put back at the spawn
+		local bad = Json.copy(hut)
+		bad.world_map.world = 7
+		check(string.find(table.concat(Checkpoint.check(bad, w), "; "), "world is not a name", 1, true) ~= nil, "a world that is not a name is refused")
+		local elsewhere = Json.copy(hut)
+		elsewhere.world_map.world = "the_cemetery"
+		check(Checkpoint.worldMoved(elsewhere) and #(Checkpoint.check(elsewhere, w)) == 0 and Checkpoint.restore(elsewhere, w) and (w.motor.pos - spawn).Magnitude < 1e-6,
+			"a world this game does not know: a good record put back at the spawn")
+		WorldMap.use("test_garden")
+		-- back in the test garden, the preserve's rest is from another world
+		check(Checkpoint.worldMoved(hut) and #(Checkpoint.check(hut, w)) == 0 and Checkpoint.restore(hut, w) and (w.motor.pos - spawn).Magnitude < 1e-6, "in the test garden the preserve's rest comes back at the spawn")
+	end)
+	WorldMap.use("test_garden")
+	if not ok then error(err) end
+end)
+
 case("a rest under the bed's stone (ROBLOX-95): it records the bed and its stone, is checked against the bed, and comes back there", function()
 	local w = newWorld()
 	for _ = 1, 60 do tick(w) end

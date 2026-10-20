@@ -228,12 +228,13 @@ end
 -- The graph of a region (the sill's when no id is given), built when first asked. Errors for a region that is not on the map.
 function Route.graph(regionId: string?): any
 	local id = regionId or WorldMap.HOME
-	local g = graphs[id]
+	local key = WorldMap.world() .. "/" .. id -- (ROBLOX-115: a region's graph is its world's: the preserve's sill has no neighbours' boxes in it)
+	local g = graphs[key]
 	if g ~= nil then return g end
 	local region = WorldMap.region(id)
 	assert(region ~= nil, "no region " .. id)
 	local made = setmetatable({ region = region, own = 0, real = 0, boxes = {}, faces = {}, keep = Region.keepOut(region), built = false, seamsBuilt = false, seams = {} }, Graph)
-	graphs[id] = made :: any
+	graphs[key] = made :: any
 	return made
 end
 

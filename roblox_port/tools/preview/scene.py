@@ -50,6 +50,8 @@ ap.add_argument("--world", action="store_true", help="also build the regions out
 ap.add_argument("--looks-at", default="", help="x,y,z: draw the looks outside the window as a client whose spider is there holds them (ROBLOX-108, World/LookPlan and Client/LookStream), not every look at once")
 ap.add_argument("--title", action="store_true", help="ROBLOX-109: add the first minute's camera frames (Shared/Movement/TitleShots.views: title_drift_0, title_drift_18, title_drift_36, intro_glass, intro_sill, intro_out); use with --world")
 ap.add_argument("--lineup", action="store_true", help="ROBLOX-114: stand every creature side by side on a ruler far off at x 400 (views lineup_small, lineup_big and their close-ups) and write what each one measures as drawn to <prefix>lineup.txt")
+ap.add_argument("--preserve", action="store_true", help="ROBLOX-115: the preserve is the world: the sill's Decor without the test garden's view, the backdrop as a client at the sill holds it (or at --looks-at), a train on the line; views pv_* and preserve_drift_*")
+ap.add_argument("--preserve-all", action="store_true", help="ROBLOX-115: with --preserve, every zone of the backdrop at the --detail tier's whole detail, not the client's plan")
 ap.add_argument("--elevation", type=float, default=30.0, help="sun elevation, degrees")
 ap.add_argument("--set", action="append", default=[], help="lighting knob for scene.gd, key=value (energy, ambient, bias, nbias, blur)")
 ap.add_argument("--azimuth", type=float, default=30.0, help="degrees off straight out of the window (-Z); positive turns toward +X")
@@ -101,7 +103,8 @@ def dump_parts(path):
     spiders = SPIDERS if args.world else SPIDERS[:2]
     prefix = (f'DETAIL = {lua(args.detail)}\nSUN_ELEVATION_DEG = {args.elevation}\nSUN_AZIMUTH_DEG = {args.azimuth}\n'
               f'SPIDERS = {lua(spiders)}\nFLIES = {lua(FLIES)}\nWASPS = {lua(WASPS)}\nWORLD = {lua(args.world)}\n'
-              f'LOOKS_AT = {lua([float(c) for c in args.looks_at.split(",")] if args.looks_at else False)}\nLINEUP = {lua(args.lineup)}\n')
+              f'LOOKS_AT = {lua([float(c) for c in args.looks_at.split(",")] if args.looks_at else False)}\nLINEUP = {lua(args.lineup)}\n'
+              f'PRESERVE = {lua(args.preserve)}\nPRESERVE_ALL = {lua(args.preserve_all)}\n')
     with tempfile.NamedTemporaryFile("w", suffix=".luau", encoding="utf-8", delete=False, dir=out) as f:
         f.write(prefix + run.bundle(driver))
     try:
@@ -352,6 +355,46 @@ def title_views():
 
 if args.title:
     VIEWS.update(title_views())
+
+# ROBLOX-115 (--preserve): the preserve's views. Studs, the sill's frame: the hut's north window at z -16 looking north (-z) over the hut garden (z -116..-916), the
+# meadow (z -1316..-4316), the pond (x 1625..3225), the railway's embankment (z -5516..-5956) and the towers at the edge; the woodland west (x < -2375), the stone
+# wall and the apartment blocks east (x 4625.., 5525..); the street south (z 484..).
+VIEWS.update({
+    "pv_window": {"fov": 62, "eye": [0.0, 6.0, 8.0], "at": [0.0, 3.0, -100.0], "near": 0.1, "far": 14000, "groups": [], "shadow": 600},
+    "pv_window_high": {"fov": 70, "eye": [0.0, 14.0, 4.0], "at": [0.0, -60.0, -600.0], "near": 0.1, "far": 14000, "groups": [], "shadow": 900},
+    "pv_sill": {**game_camera(0.0, 4.0, 0, -1), "far": 14000, "groups": [], "shadow": 60},
+    "pv_plan": {"fov": 62, "eye": [425.0, 9800.0, -2500.0], "at": [425.0, -85.0, -2516.0], "near": 50.0, "far": 20000, "groups": [], "shadow": 12000, "fog": 0.0},
+    "pv_overview": {"fov": 58, "eye": [3600.0, 3800.0, 2600.0], "at": [300.0, -85.0, -2400.0], "near": 5.0, "far": 20000, "groups": [], "shadow": 12000, "fog": 0.00004},
+    "pv_hut": {"fov": 50, "eye": [320.0, 80.0, -1800.0], "at": [0.0, 60.0, -16.0], "near": 1.0, "far": 14000, "groups": [], "shadow": 1500},
+    "pv_hut_near": {"fov": 55, "eye": [260.0, 40.0, -520.0], "at": [0.0, 40.0, -16.0], "near": 1.0, "far": 14000, "groups": [], "shadow": 700},
+    "pv_railway": {"fov": 60, "eye": [1500.0, 110.0, -4300.0], "at": [2600.0, 220.0, -5900.0], "near": 1.0, "far": 14000, "groups": [], "shadow": 2500},
+    "pv_east": {"fov": 60, "eye": [3600.0, 110.0, -3100.0], "at": [5400.0, 300.0, -2400.0], "near": 1.0, "far": 14000, "groups": [], "shadow": 2500},
+    "pv_west": {"fov": 60, "eye": [-1800.0, 110.0, -2200.0], "at": [-3800.0, 400.0, -3300.0], "near": 1.0, "far": 14000, "groups": [], "shadow": 2500},
+    "pv_south": {"fov": 60, "eye": [600.0, 120.0, -600.0], "at": [-200.0, 60.0, 800.0], "near": 1.0, "far": 14000, "groups": [], "shadow": 2000},
+})
+
+
+def preserve_views():
+    """ROBLOX-115: the preserve's drift from the real TitleShots module (preserveViews)."""
+    spec = importlib.util.spec_from_file_location("jss_tests_run", ROOT / "tests" / "run.py")
+    run = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(run)
+    with tempfile.NamedTemporaryFile("w", suffix=".luau", encoding="utf-8", delete=False, dir=out) as f:
+        f.write(run.bundle(str(HERE / "title_shots.luau")).replace("TitleShots.views()", "TitleShots.preserveViews()"))
+    try:
+        text = subprocess.run([args.luau, f.name], capture_output=True, text=True, check=True).stdout
+    finally:
+        pathlib.Path(f.name).unlink()
+    found = {}
+    for line in text.splitlines():
+        name, *nums = line.split()
+        n = [float(x) for x in nums]
+        found[name] = {"fov": n[6], "eye": n[0:3], "at": n[3:6], "near": 0.5, "far": 14000, "groups": [], "shadow": 1500}
+    return found
+
+
+if args.preserve:
+    VIEWS.update(preserve_views())
 names = [n for n in args.views.split(",") if n]
 for n in names:
     if n not in VIEWS:

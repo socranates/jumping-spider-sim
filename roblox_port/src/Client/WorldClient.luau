@@ -26,12 +26,16 @@
 -- ROBLOX-96 (W3): the garden has life. `prey` is the world's prey (Prey/PreyWorld: a director per region, run where the spider is and gated by `regionReady`) and
 -- `bugs` the drawn woodlice (Client/BugBodies); both are made by the client once it has its sill director, and kept here so the client gains no local. `homeRetreat`
 -- is the retreat the words call home: the one the spider is in, else the first of the region it is in, else the last one it was in (the crack to begin with).
+-- ROBLOX-115 (two worlds, one engine): the world it is (`world`, World/Worlds) is the Workspace attribute World, made WorldMap's active one in `new`; in the preserve
+-- the looks are its backdrop's zones too (World/LookPlan), and `train` (Client/TrainPass) runs the trains on the railway beyond the north fence.
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local WorldMap = require(Shared:WaitForChild("World"):WaitForChild("WorldMap"))
+local Worlds = require(Shared:WaitForChild("World"):WaitForChild("Worlds"))
 local Region = require(Shared:WaitForChild("World"):WaitForChild("Region"))
 local LifeClock = require(Shared:WaitForChild("Life"):WaitForChild("LifeClock"))
 local LookStream = require(script.Parent.LookStream)
+local TrainPass = require(script.Parent.TrainPass)
 local FrameProfile = require(script.Parent.FrameProfile)
 
 local WorldClient = {}
@@ -52,8 +56,25 @@ WorldClient.REPORT_EVERY = 2
 -- The name of the remote the server makes for the reports (Server/WorldFocus.REMOTE).
 WorldClient.REMOTE = "WorldFocus"
 
+-- ROBLOX-115: the world the server runs (World/Worlds) is the Workspace attribute World, which the server writes at startup; with no map handed in, the client makes
+-- that world WorldMap's active one before it asks anything (with streaming, it waits up to WORLD_WAIT seconds for the attribute; without it, an absent attribute is
+-- the default world, as in every test place).
+WorldClient.WORLD_WAIT = 10
+
 -- `ws`: the workspace; `player`: the local player; `map`: the world map (WorldMap, unless a test hands in another with the same functions).
 function WorldClient.new(ws: Instance, player: Instance, map: any?): any
+	if map == nil then
+		local named = ws:GetAttribute(Worlds.ATTRIBUTE)
+		if named == nil and (ws :: any).StreamingEnabled == true then
+			local deadline = os.clock() + WorldClient.WORLD_WAIT
+			local t: any = task
+			while named == nil and os.clock() < deadline and t ~= nil do
+				t.wait(0.1)
+				named = ws:GetAttribute(Worlds.ATTRIBUTE)
+			end
+		end
+		WorldMap.use(Worlds.choose(named))
+	end
 	local m: any = map or WorldMap
 	local home = m.region(m.HOME) :: WorldMap.Region
 	local lo, hi = m.bounds()
@@ -88,6 +109,7 @@ function WorldClient.new(ws: Instance, player: Instance, map: any?): any
 		whole = {} :: { [string]: boolean }, warned = {} :: { [string]: boolean },
 		-- ROBLOX-96: the world's prey and the drawn bugs (set by the client), and the last retreat the spider was in or beside
 		prey = nil :: any, bugs = nil :: any, lastRetreat = if #home.retreats > 0 then home.retreats[1].id else nil,
+		world = if m.world ~= nil then m.world() else Worlds.DEFAULT, train = nil :: any, -- (ROBLOX-115: the world it is, and the preserve's train once the looks are made)
 	}, WorldClient)
 end
 
@@ -187,6 +209,8 @@ end
 function WorldClient.streamLooks(self: any, ws: Instance, tier: string): any
 	if self.root == self.sill then return nil end
 	self.looks = LookStream.new(ws, tier, self.root, self.map)
+	-- (ROBLOX-115) in the preserve, the trains beyond the north fence, with the looks
+	if self.world == Worlds.PRESERVE then self.train = TrainPass.new(self.looks.folder, WorldMap.seed(WorldMap.SEED, "train"), tier) end
 	return self.looks
 end
 
@@ -197,9 +221,11 @@ function WorldClient.update(self: any, pos: Vector3, root: Instance?, now: numbe
 	self.region = self.map.at(pos) or self.region
 	LifeClock.game.clockScale = self.region.clockScale
 	if root ~= nil and root ~= self.focused then self:focus(root) end
-	self:report(pos, now or os.clock())
+	local clock = now or os.clock()
+	self:report(pos, clock)
 	FrameProfile.lap("world")
 	if self.looks ~= nil then self.looks:update(pos, self.region) end
+	if self.train ~= nil then self.train:update(clock) end
 	FrameProfile.lap("looks") -- (ROBLOX-111: the self-test's frame profile, Client/FrameProfile)
 	local id = self.region.id
 	if not self.whole[id] then

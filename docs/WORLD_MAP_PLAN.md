@@ -1,5 +1,7 @@
 # The whole map: a single-story house and its back garden
 
+> ROBLOX-115 (2026-10-20): this map is now **the Test Garden** (`World/Worlds` `test_garden`), the engine's test level, kept as it is; the game's real world is the preserve of `docs/PARK_WORLD_DESIGN.md`.
+
 Nathan, 2026-10-19 (playing v33): "maybe plan a full map to start filling in", with "shrubs should be bushes and the house a single story.
 more realistic. still more detail ... more beauty". This is the map every later round fills in, so the world grows into a known shape
 instead of outward one region at a time. It keeps every rule of `docs/OPEN_WORLD_DESIGN.md` (regions with seeded generators, server

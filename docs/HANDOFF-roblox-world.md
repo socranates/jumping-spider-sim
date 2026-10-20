@@ -759,3 +759,48 @@ moved, so `WorldMap.REVISION` is still world-3 and no save is affected. **Nothin
   something walks on; say which to change in a round of their own.
 - Golden and left as Godot has it: the first spider's first stage is 10 mm, already an adult's size (a spiderling is a few millimetres); the Pilea's stalks
   are 1 cm boxes (real ones 2 to 4 mm); the planter is a 14 by 8 cm trough.
+
+## The preserve's skeleton: two worlds, the backdrop, the trains, lock-on to L2 (ROBLOX-115, 2026-10-20)
+
+Claude → Chet, 2026-10-20, branch `claude/preserve-a`. Phase A, round 1 of `docs/PARK_WORLD_DESIGN.md`. The engine runs either of two worlds (`World/Worlds`):
+the **Test Garden** (everything built in ROBLOX-94..114, unchanged, still the default and the published game) and the **Preserve**, chosen by the Workspace
+attribute `World` = "preserve". In the preserve the only walkable thing is the same windowsill, now the north window of a log ranger hut; everything else is a
+drawn backdrop of the whole 100 by 60 m preserve and the city round it (`World/Preserve`, `World/PreserveLook`), streamed on each client by distance (near
+whole, the rest as its masses: 797 parts from the sill at the full tier, 476 at the low), with commuter and freight trains passing on the railway every few
+minutes (`World/PreserveTrain`, `Client/TrainPass`; their rumble, `assets/audio/train.wav`, is not uploaded yet). On a controller **L2 / LT is the lock** (a
+tap locks and lets go; held past 0.35 s it is Focus) and **R3 only recentres**. Saves kept in the preserve name their world; a test garden save is written
+byte for byte as before. **Nothing of it has run in Studio.**
+
+## Your Studio checklist (ROBLOX-115)
+
+1. **The test garden first, unchanged**: open the place as it is and press Play: Output says `[Windowsill] world: The Test Garden (test_garden)`; everything as
+   at v38. Run the self-test as usual (`workspace:SetAttribute("SelfTest", true)`): its first INFO line is `world: test_garden (revision world-3)` and it should
+   pass as before (39 checks, the lock's now also taken with an L2 tap).
+2. **The preserve**: in Studio's command bar (edit mode) `workspace:SetAttribute("World", "preserve")`, then Play. Output says `world: The Preserve
+   (preserve)`. The title drift comes in over the hut garden's herb beds to the hut's window; the intro is the sill's. On the sill, look out of the window:
+   the hut garden, the bird feeder and the lamppost, the meadow's grasses beyond, the pond to the right, the railway bank and the towers on the horizon.
+   Screenshot the view from the sill, the title drift and (from the camera with the spider anywhere) the hut from outside, for Nathan.
+3. **The haze**: say how the far preserve reads in Roblox's own Atmosphere (density 0.30, as the lighting is): the meadow is 13 to 43 m out, the railway 55 to
+   60 m. If it is lost in the haze, say so; the lighting is Nathan's to change, not ours.
+4. **A train**: within about two minutes of joining one comes out of a covered way and runs along the bank behind the bramble (a silver commuter or a rust
+   freight); another every two and a half to five and a half minutes. Say whether it moves smoothly, and the frame time while it passes.
+5. **The self-test in the preserve**: with the World attribute still "preserve", `workspace:SetAttribute("SelfTest", true)` and Play: 15 checks, among them
+   `the hut's sill`, `the backdrop near and far` and `the trains`; none of the garden's. Paste the INFO lines (the parts held, the census) for Nathan.
+6. **Lock-on to L2** (a controller): look at a fly on the sill and tap LT / L2: the lock takes it (the four faint ticks); tap again: it lets go. Hold LT:
+   after a moment the Focus view (the telephoto field); let go: back. Press the right stick: the camera recentres and a lock lets go; it never takes a lock.
+   Open the controls card (the life menu's Controls): "Tap LT lock on (stick circles)   Hold LT focus   RT slow-mo". R and the middle mouse are as before.
+7. **A rest in the hut**: rest in the crack in the preserve, then switch the attribute back to the test garden and Play: the rest comes back at the sill's
+   spawn with "the world has changed since you rested" (and the other way round). Then set the attribute back to nil (or "test_garden") before publishing.
+8. **The train's sound** (when Nathan wants it): upload `roblox_port/assets/audio/train.wav`, grant it to the experience, put its id in
+   `Client/TrainPass.SOUND` ("rbxassetid://<id>") and in the manifest.
+
+## Open for Nathan (ROBLOX-115)
+
+- The sill in the hut stands 85 cm over the ground outside and 70 cm over the hut's floor (the hut on a 15 cm base); the eaves 2.4 m over the ground. Say if
+  you want the sill lower outside (the design's "~70 cm above the ground").
+- The raised sash still opens onto the hut's outer sill, which is drawn only: a spider that steps out falls to the spawn. The sash shut until the spider is
+  ready (the nursery) is Phase B, with the hut's inside (the desk, the notice board, the cat, the volunteers' room).
+- The city's towers are impostors at the edge of the world (the precision rule keeps everything within 60 m): right from the hut and the meadow, small and
+  near from the railway bank. Keep them, or a skyline painted on the sky later?
+- The train's rumble is a procedural recording; upload it (checklist 8) or ask for another.
+- On a controller Focus now starts 0.35 s after L2 goes down (a tap is the lock). Say if you would rather have Focus on another button.

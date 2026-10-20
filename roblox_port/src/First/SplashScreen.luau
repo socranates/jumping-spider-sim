@@ -87,6 +87,7 @@ SplashScreen.host = {
 	frame = function(): number return (game:GetService("RunService") :: any).RenderStepped:Wait() end,
 	now = function(): number return time() end,
 	loaded = function(): boolean return game:IsLoaded() end,
+	world = function(): string? return workspace:GetAttribute("World") end, -- (ROBLOX-115: the Workspace attribute the server writes, World/Worlds; nil until it has)
 	warn = function(text: string) warn(text) end,
 	find = function(): (any, any)
 		local shared = game:GetService("ReplicatedStorage"):FindFirstChild("Shared")
@@ -191,7 +192,7 @@ function SplashScreen.run(): string
 			local camera = workspace.CurrentCamera
 			if look.drive and shots ~= nil and camera ~= nil then
 				if not took then camera.CameraType = Enum.CameraType.Scriptable; took = true end
-				local cf, fov = shots.drift(h.now())
+				local cf, fov = shots.drift(h.now(), if h.world ~= nil then h.world() else nil) -- (ROBLOX-115: the world the server runs, World/Worlds)
 				camera.CFrame, camera.FieldOfView = cf, fov
 			end
 		end

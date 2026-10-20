@@ -250,7 +250,7 @@ function TitleCard.frame(self: any, dt: number, started: boolean, paused: boolea
 		if self.fade <= 0 then self.gui.Enabled = false end
 	end
 	if self.cfg.enabled and not started and paused then -- (the start menu, a screen opened from it, or the start's wait for the save: never a life's frame)
-		local cf, fov = TitleShots.drift(self.cfg.clock())
+		local cf, fov = TitleShots.drift(self.cfg.clock(), workspace:GetAttribute("World")) -- (ROBLOX-115: the world's own drift)
 		camera.CFrame = cf
 		camera.FieldOfView = fov
 		return true

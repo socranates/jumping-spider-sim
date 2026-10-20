@@ -164,12 +164,14 @@ end
 -- (WorldMap.FIRST_REVISION, ROBLOX-95: such a rest was kept on the sill before its back frame opened, so it is put back at the spawn like any rest from
 -- world-1), the sill, the retreat the player block names, no changes. Returns it and what is wrong with a record that has one (an empty list for a good one or
 -- an old one).
-export type MapRecord = { seed: number, revision: string, region: string, retreat: string, diffs: { any } }
+-- ROBLOX-115: `world`, the world the rest was kept in (World/Worlds), written only outside the test garden: a record without it (every rest before, and every rest
+-- kept in the test garden, byte for byte as before) is the test garden's. A rest from another world than the one running is put back where a life begins here.
+export type MapRecord = { seed: number, revision: string, region: string, retreat: string, diffs: { any }, world: string }
 local function mapRecord(record: any): (MapRecord, { string })
 	local problems: { string } = {}
 	local p = record.player
 	local out: MapRecord = {
-		seed = WorldMap.SEED, revision = WorldMap.FIRST_REVISION, region = WorldMap.HOME, diffs = {},
+		seed = WorldMap.SEED, revision = WorldMap.FIRST_REVISION, region = WorldMap.HOME, diffs = {}, world = "test_garden",
 		retreat = if type(p) == "table" and type(p.retreat_id) == "string" then p.retreat_id else "",
 	}
 	local m = record.world_map
@@ -187,6 +189,9 @@ local function mapRecord(record: any): (MapRecord, { string })
 		out.region = m.region
 	end
 	if type(m.retreat) ~= "string" then bad("world: the retreat is not a name") else out.retreat = m.retreat end
+	if m.world ~= nil then
+		if type(m.world) ~= "string" or #m.world < 1 or #m.world > 64 then bad("world: the world is not a name") else out.world = m.world end
+	end
 	if type(m.diffs) ~= "table" or getmetatable(m.diffs) ~= nil then
 		bad("world: the changes to the world are not a list")
 	elseif next(m.diffs) ~= nil then
@@ -198,7 +203,12 @@ end
 -- Whether a rest was kept in another world than this game's (another revision of it, or another seed): its position is not to be trusted.
 function Checkpoint.worldMoved(record: any): boolean
 	local map = mapRecord(record)
-	return map.revision ~= WorldMap.REVISION or map.seed ~= WorldMap.SEED
+	return map.world ~= WorldMap.world() or map.revision ~= WorldMap.revision() or map.seed ~= WorldMap.SEED
+end
+
+-- Whether a rest was kept in another world than the one running (ROBLOX-115): its region and retreat are that world's, not looked for here.
+local function otherWorld(record: any): boolean
+	return mapRecord(record).world ~= WorldMap.world()
 end
 
 local function hasRetreat(region: WorldMap.Region, id: string): boolean
@@ -256,7 +266,8 @@ function Checkpoint.capture(world: World, createdAt: number?): ({ [string]: any 
 			position = v3(motor.pos), normal = v3(motor.up), heading = v3(motor.heading), gaze_pitch = motor.gazePitch,
 			retreat_id = retreat, state = "ATTACHED",
 		},
-		world_map = { seed = WorldMap.SEED, revision = WorldMap.REVISION, region = region.id, retreat = retreat, diffs = {} },
+		world_map = { seed = WorldMap.SEED, revision = WorldMap.revision(), region = region.id, retreat = retreat, diffs = {},
+			world = if WorldMap.world() == "test_garden" then nil else WorldMap.world() },
 		world = graph,
 		life_rules = { mode = world.life.mode or "main", rules = world.life.rules or "standard" },
 		breakaway = if world.breakaway then world.breakaway:record() else nil,
@@ -429,8 +440,9 @@ function Checkpoint.check(record: any, world: World): ({ string }, ObjectRecord.
 	-- ROBLOX-94: which region the rest was kept in, and whether this is the world it was kept in.
 	local map, mapProblemList = mapRecord(record)
 	for _, text in mapProblemList do bad(text) end
-	local region = WorldMap.region(map.region)
-	if #mapProblemList == 0 and region == nil then bad("the spider is in a region this world does not have") end
+	local elsewhere = otherWorld(record)
+	local region = if elsewhere then nil else WorldMap.region(map.region)
+	if #mapProblemList == 0 and region == nil and not elsewhere then bad("the spider is in a region this world does not have") end
 	local moved = Checkpoint.worldMoved(record)
 	if region ~= nil and #mapProblemList == 0 and map.retreat ~= "" and not hasRetreat(region, map.retreat) then bad("the spider is in an unknown retreat") end
 	local p = record.player
@@ -446,7 +458,7 @@ function Checkpoint.check(record: any, world: World): ({ string }, ObjectRecord.
 		if not h or math.abs(h.Magnitude - 1) > 1e-3 then bad("the spider's heading is not a unit vector") end
 		if not finite(p.gaze_pitch) or math.abs(p.gaze_pitch) > math.pi / 2 then bad("the spider's gaze is not a number") end
 		if p.state ~= "ATTACHED" then bad("the spider is not standing on a surface") end
-		if p.retreat_id ~= "" and (type(p.retreat_id) ~= "string" or (region ~= nil and not hasRetreat(region, p.retreat_id)) or (region == nil and WorldMap.retreat(p.retreat_id) == nil)) then bad("the spider is in an unknown retreat") end
+		if p.retreat_id ~= "" and (type(p.retreat_id) ~= "string" or (region ~= nil and not hasRetreat(region, p.retreat_id)) or (region == nil and not elsewhere and WorldMap.retreat(p.retreat_id) == nil)) then bad("the spider is in an unknown retreat") end
 		-- The player block's retreat and the world record's are one answer written twice (capture writes both from the same lookup); a record where they differ was not made by a capture.
 		if type(record.world_map) == "table" and #mapProblemList == 0 and p.retreat_id ~= map.retreat then bad("the spider's retreat and the world record's retreat disagree") end
 	end
@@ -497,7 +509,7 @@ function Checkpoint.restore(record: any, world: World): (boolean, { string })
 	local moved = Checkpoint.worldMoved(record)
 	if moved then
 		local home = WorldMap.region(WorldMap.HOME) :: WorldMap.Region
-		local at = (WorldMap.region(mapRecord(record).region) or home).spawn
+		local at = (if otherWorld(record) then home else WorldMap.region(mapRecord(record).region) or home).spawn
 		world.motor:respawn(at.pos, at.heading)
 	else
 		world.motor:place(pos, n.Unit, h.Unit)

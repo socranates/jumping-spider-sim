@@ -126,6 +126,7 @@ end
 export type Drawn = {
 	id: string, size: Vector3, at: Vector3, color: Color3, transparency: number?,
 	material: string?, shape: string?, turn: Vector3?, full: boolean?, group: string?, shadow: boolean?,
+	far: boolean?, reflectance: number?, -- (ROBLOX-115: the preserve's backdrop: in the zone's far look; a shine)
 }
 function Scenery.look(parent: Instance, list: { Drawn }, first: number?, last: number?, folders: { [string]: Instance }?): number
 	local groups: { [string]: Instance } = folders or {}
@@ -143,6 +144,7 @@ function Scenery.look(parent: Instance, list: { Drawn }, first: number?, last: n
 		if d.turn ~= nil then cframe *= CFrame.Angles(math.rad(d.turn.X), math.rad(d.turn.Y), math.rad(d.turn.Z)) end
 		local p = drawn(into :: Instance, d.id, d.size, cframe, d.color, d.material or "SmoothPlastic")
 		p.Transparency = d.transparency or 0
+		if d.reflectance ~= nil then p.Reflectance = d.reflectance end
 		p.CastShadow = d.shadow == true
 		if d.shape == "Ball" then
 			p.Shape = Enum.PartType.Ball
@@ -467,7 +469,11 @@ local function attempt(decor: Instance, what: string, build: () -> unknown): boo
 	return ok
 end
 
-function Scenery.decor(sun: Vector3?): (Model, { [string]: boolean })
+-- ROBLOX-115: `world` (World/Worlds' id; the test garden when nil) is the world outside the window. The preserve's sill is the same sill in the ranger hut's window,
+-- but what it looks out on is the preserve's backdrop (World/PreserveLook, streamed on each client by Client/LookStream), so its Decor draws neither the test
+-- garden's view (the lawn, the trees, the bungalows, the fences, the hills) nor its window box on the outer sill.
+function Scenery.decor(sun: Vector3?, world: string?): (Model, { [string]: boolean })
+	local garden = world == nil or world == "test_garden"
 	-- ROBLOX-94: a Model, and a persistent one, so that with instance streaming on (Workspace.StreamingEnabled) the whole drawn sill, and the far view out of the window above
 	-- all, reaches every client at once and never streams out; a Folder would be streamed part by part around the replication focus, and the view is hundreds of studs away.
 	-- (Without streaming it is exactly the container the Folder was.) The client's one-time reads of it (Breakaway, WorldDetail, DayLight) depend on it being whole.
@@ -486,7 +492,7 @@ function Scenery.decor(sun: Vector3?): (Model, { [string]: boolean })
 	replaced[W.upper] = true -- (ROBLOX-112: the window above the back frame, World/Garden's box in the region wall_upper, drawn with the rest of it here)
 	local uv = Shapes.folder(decor, "UVLayer") -- the ultraviolet pattern of the flowers (the eye-view helper fades it in); always present
 	attempt(decor, "dust", function() return Scenery.dust(decor) end)
-	attempt(decor, "view", function() return Scenery.view(decor) end)
+	if garden then attempt(decor, "view", function() return Scenery.view(decor) end) end
 	attempt(decor, "details", function() return Scenery.details(decor) end)
 	if sun then attempt(decor, "shafts", function() return Scenery.shafts(decor, sun) end) end
 	attempt(decor, "wear", function() return Patina.sill(decor) end)
@@ -502,7 +508,7 @@ function Scenery.decor(sun: Vector3?): (Model, { [string]: boolean })
 	attempt(decor, "windfall", function() return Dressing.windfall(decor) end)
 	attempt(decor, "dew", function() return Dressing.dew(decor) end)
 	-- (the window box's halves stand on the outer sill, solid: World/Garden's pieces, hidden once drawn here, ROBLOX-95)
-	if attempt(decor, "garden", function() return Plants.garden(decor, uv, Scenery.viewPosition) end) then
+	if garden and attempt(decor, "garden", function() return Plants.garden(decor, uv, Scenery.viewPosition) end) then
 		for _, id in Plants.windowBoxIds() do replaced[id] = true end
 	end
 	return decor, replaced

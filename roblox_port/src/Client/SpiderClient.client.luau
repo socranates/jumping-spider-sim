@@ -1344,6 +1344,12 @@ controls = SpiderInput.bind({
 		local r = M.LockOn.press(M.lock, memory, motor.pos, motor.up, o.eye, o.heading, origin, dir)
 		if r ~= "locked" then cam:startRecenter() end
 	end,
+	-- ROBLOX-115: a controller's right-stick click recentres only: it lets go of a lock and recentres behind the spider, and never takes one (L2 does)
+	recentre = function()
+		if spiderPick.inspecting then return end
+		M.LockOn.release(M.lock, "recentre")
+		cam:startRecenter()
+	end,
 	lock = function()
 		if spiderPick.inspecting then return end
 		local o = motor:observer()
@@ -1527,7 +1533,7 @@ local function updateHud(frameDt: number)
 		restPrompt = if life.asleep or life.resting or life.growth:isMoulting() or (life.growth.ready and canRest) then { title = restPrompt.title, hint = "" } else nil
 	end
 	if displayKind ~= nil and displayOn and Q("display_status") then table.insert(view.status, if displayKind == "antennae" then ant.Text.statusLine(device) elseif displayKind == "threat" then ant.ThreatText.statusLine(device) else PeacockText.dancingLine(device)) end
-	if focusState.latched then table.insert(view.status, "FOCUS ON    " .. ControlText.name(device,"focus") .. " again to stop" .. (if not jump:isBusy() and not motor:onLine() and not motor.silk.walk then " / " .. ControlText.name(device,"cancel") else "")) end
+	if focusState.latched then table.insert(view.status, "FOCUS ON    " .. ControlText.focusAgain(device) .. (if not jump:isBusy() and not motor:onLine() and not motor.silk.walk then " / " .. ControlText.name(device,"cancel") else "")) end
 	if cam.eyeView and Q("eye_status") then table.insert(view.status, `SPIDER-EYE VIEW    {ControlText.name(device, "eye")}: back`) end
 	if slow then
 		local key = ControlText.name(device, "slow")
@@ -1587,6 +1593,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	M.Prof.begin() -- (ROBLOX-111: the frame timed by part, for the self-test; each M.Prof.lap below charges the time since the last to its part)
 	saveState.frame()
 	spiderPick.update(frameDt) -- (the choose hold's clock and the close look's reasons to end)
+	controls:tick(frameDt) -- (ROBLOX-115: L2 held past its tap is Focus)
 	M.Prof.lap("save")
 	M.World:update(motor.pos, rig.root) -- (ROBLOX-94: the region the spider is in, the pace of its day, the streaming focus on the drawn spider)
 	if panel:isShowing() then panel:update(frameDt) end

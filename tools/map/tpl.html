@@ -1,0 +1,176 @@
+<title>The Windowsill World Map</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400&display=swap">
+<style>
+/* Layout: a surveyor's plan sheet. Header + legend, the plan (scrolls inside its frame), a details card, then the cross-section. */
+:root{
+  --paper:#eef1ee; --sheet:#f8faf8; --ink:#1f2a27; --muted:#5b6a65; --rule:#c9d3cf;
+  --home:#c2410c; --house:#9a5a46; --garden:#4f7a45; --inside:#a07a2c; --plan:#7d8c87;
+  --box:rgba(31,42,39,.30); --hi:#0f766e;
+  --f-display:"Archivo Narrow","Arial Narrow",sans-serif; --f-body:"Source Serif 4",Georgia,serif; --f-data:"JetBrains Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#141a19; --sheet:#1b2321; --ink:#e3ebe8; --muted:#9aaba5; --rule:#33403c;
+  --home:#fb923c; --house:#d08c74; --garden:#86b878; --inside:#d6ad5a; --plan:#7f908a; --box:rgba(227,235,232,.28); --hi:#5eead4; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#141a19; --sheet:#1b2321; --ink:#e3ebe8; --muted:#9aaba5; --rule:#33403c;
+  --home:#fb923c; --house:#d08c74; --garden:#86b878; --inside:#d6ad5a; --plan:#7f908a; --box:rgba(227,235,232,.28); --hi:#5eead4; color-scheme:dark}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:18px}
+header h1{font-family:var(--f-display);font-weight:600;font-size:clamp(26px,4vw,38px);letter-spacing:.01em;margin:0;text-wrap:balance}
+header p{margin:4px 0 0;color:var(--muted);max-width:68ch}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-family:var(--f-display);font-size:14px;letter-spacing:.03em}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:14px;height:14px;border-radius:2px;display:inline-block}
+.sw.home{background:var(--home)}.sw.house{background:var(--house)}.sw.garden{background:var(--garden)}.sw.inside{background:var(--inside)}
+.sw.plan{border:1.5px dashed var(--plan)}.sw.ret{border-radius:50%;border:2px solid var(--hi)}
+.controls{display:flex;gap:8px;flex-wrap:wrap}
+.controls label{font-family:var(--f-display);font-size:14px;display:inline-flex;gap:6px;align-items:center;cursor:pointer}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start}
+@media (max-width:820px){.main{grid-template-columns:minmax(0,1fr)}}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:6px;overflow:auto;max-height:78vh;min-width:0}
+svg.plan{display:block;width:100%;min-width:560px;height:auto}
+.reg rect,.reg circle{vector-effect:non-scaling-stroke}.reg rect{fill-opacity:.16;stroke-width:1.5}
+.g-home rect{fill:var(--home);stroke:var(--home)}.g-house rect{fill:var(--house);stroke:var(--house)}
+.g-garden rect{fill:var(--garden);stroke:var(--garden)}.g-inside rect{fill:var(--inside);stroke:var(--inside)}
+.reg.built .bound{fill-opacity:.2}
+.reg.vert .bound{fill-opacity:.05;stroke-dasharray:4 3}
+.reg.plan rect{fill-opacity:.05;stroke:var(--plan);stroke-dasharray:7 5;stroke-width:1.5}
+.reg.plan text{fill:var(--plan);font-family:var(--f-display);font-size:26px;text-anchor:middle;dominant-baseline:middle;letter-spacing:.04em}
+.reg .box{fill:var(--box);fill-opacity:1;stroke:none}
+.reg .ret{fill:none;stroke:var(--hi);stroke-width:2}
+.blabel{fill:var(--ink);font-family:var(--f-display);font-weight:600;font-size:22px;text-anchor:middle;dominant-baseline:middle;paint-order:stroke;stroke:var(--sheet);stroke-width:6px;pointer-events:none}
+.reg{cursor:pointer}
+.reg:hover rect.bound,.reg.sel rect.bound,.reg.plan:hover rect,.reg.plan.sel rect{stroke:var(--hi);stroke-width:3}
+.inset .blabel{font-size:4px;stroke-width:1.2px}.inset .reg.plan text{font-size:5px}
+.axis{fill:var(--muted);font-family:var(--f-data);font-size:18px}
+.axisline{stroke:var(--rule);stroke-width:2}
+.grid line{stroke:var(--rule);stroke-width:1}
+.hide-plan .reg.plan{display:none}.hide-boxes .box{display:none}
+aside{background:var(--sheet);border:1px solid var(--rule);border-radius:6px;padding:16px;display:grid;gap:10px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px)}
+aside h2{font-family:var(--f-display);font-size:22px;margin:0;letter-spacing:.02em}
+.state{font-family:var(--f-display);font-size:13px;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:999px;width:max-content}
+.state.Built{background:var(--garden);color:var(--sheet)}.state.Planned{border:1.5px dashed var(--plan);color:var(--muted)}
+dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:14px}
+dt{color:var(--muted);font-family:var(--f-display)}dd{margin:0;font-family:var(--f-data);font-size:13px;min-width:0;overflow-wrap:anywhere}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.fact{background:var(--sheet);border:1px solid var(--rule);border-radius:6px;padding:12px}
+.fact b{display:block;font-family:var(--f-display);font-size:26px;font-variant-numeric:tabular-nums}
+.fact span{color:var(--muted);font-size:13px}
+section h2{font-family:var(--f-display);font-size:22px;margin:0 0 8px}
+.xsec{overflow-x:auto;background:var(--sheet);border:1px solid var(--rule);border-radius:6px}
+.xsec svg{display:block;min-width:640px;width:100%;height:auto}
+.xs-ground{fill:var(--garden);fill-opacity:.25}.xs-house{fill:var(--house);fill-opacity:.25;stroke:var(--house);stroke-width:2}
+.xs-in{fill:var(--inside);fill-opacity:.18}.xs-t{fill:var(--ink);font-family:var(--f-display);font-size:13px}.xs-m{fill:var(--muted);font-family:var(--f-data);font-size:11px}
+.xs-home{fill:var(--home)}
+@media (prefers-reduced-motion:no-preference){.reg rect{transition:stroke-width .12s}}
+:focus-visible{outline:2px solid var(--hi);outline-offset:2px}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>The Windowsill World Map</h1>
+    <p>The whole world seen from above, in the game's own units: one stud is one centimetre. The house is at the top and the back garden runs down the sheet. Solid shapes are built and walkable today; dashed shapes are planned. Tap or hover a region for its details.</p>
+  </header>
+
+  <div class="facts">
+    <div class="fact"><b>%%NBUILT%%</b><span>regions built</span></div>
+    <div class="fact"><b>%%NPLAN%%</b><span>regions planned</span></div>
+    <div class="fact"><b>10 × 14 m</b><span>the back garden</span></div>
+    <div class="fact"><b>10 × 7.5 m</b><span>the bungalow inside</span></div>
+  </div>
+
+  <div class="legend">
+    <span><i class="sw home"></i>Home (the sill)</span>
+    <span><i class="sw house"></i>House walls and roofline</span>
+    <span><i class="sw garden"></i>Garden</span>
+    <span><i class="sw inside"></i>Inside the house</span>
+    <span><i class="sw plan"></i>Planned</span>
+    <span><i class="sw ret"></i>Retreat (a place to rest)</span>
+  </div>
+  <div class="controls">
+    <label><input type="checkbox" id="showPlan" checked> Show planned regions</label>
+    <label><input type="checkbox" id="showBoxes" checked> Show walkable boxes</label>
+  </div>
+
+  <div class="main">
+    <div class="sheet" id="sheet">
+      <svg class="plan" id="plan" viewBox="-560 -40 1140 2260" role="img" aria-label="Top-down map of the house and garden">
+        <g class="grid">
+          <line x1="-500" y1="768" x2="500" y2="768"/>
+        </g>
+        %%SVG%%
+        <g>
+          <line class="axisline" x1="-500" y1="2215" x2="-400" y2="2215" style="stroke:var(--ink);stroke-width:5"/>
+          <text class="axis" x="-500" y="2200">1 m</text>
+          <text class="axis" x="560" y="20" text-anchor="end">↑ into the house</text>
+          <text class="axis" x="560" y="2200" text-anchor="end">↓ out to the back fence</text>
+          <text class="axis" x="-540" y="768" transform="rotate(-90 -540 768)" text-anchor="middle">the back wall</text>
+        </g>
+      </svg>
+    </div>
+    <aside id="info" aria-live="polite">
+      <span class="state Built" id="iState">Built</span>
+      <h2 id="iName">sill</h2>
+      <dl>
+        <dt>Size</dt><dd id="iDims">0.66 m × 0.32 m</dd>
+        <dt>About</dt><dd id="iInfo">The windowsill where every life begins.</dd>
+      </dl>
+      <p style="margin:0;color:var(--muted);font-size:13px">The thin dashed strips along the back wall are vertical regions (the brick, the window and the eaves) seen edge-on from above.</p>
+    </aside>
+  </div>
+
+
+  <section>
+    <h2>Close up: the window and everything around it</h2>
+    <p style="margin:0 0 8px;color:var(--muted);max-width:68ch">The sill, the kitchen behind it, the outer sill and the bed under the window, the start of the bushes, at about four times the scale. The small dark shapes are the boxes the spider can walk on.</p>
+    <div class="sheet" style="max-height:none">
+      <svg class="plan inset" id="inset" viewBox="-130 668 260 330" role="img" aria-label="Close-up of the window region">%%SVG%%
+        <line x1="-120" y1="990" x2="-20" y2="990" style="stroke:var(--ink);stroke-width:2"/><text class="axis" x="-120" y="984" style="font-size:7px">1 m</text>
+      </svg>
+    </div>
+  </section>
+  <section>
+    <h2>Section through the window</h2>
+    <div class="xsec">
+      <svg viewBox="0 0 900 300" role="img" aria-label="Cross-section from the garden through the window into the kitchen">
+        <!-- scale: 1 px = 1 cm; garden on the left (z < -24), house on the right; y: sill top 0 at svg y 180 -->
+        <rect class="xs-ground" x="0" y="270" width="380" height="30"/>
+        <text class="xs-m" x="8" y="292">lawn, 90 cm below the sill</text>
+        <rect class="xs-house" x="380" y="30" width="36" height="240"/>
+        <polygon class="xs-house" points="340,30 900,4 900,30"/>
+        <text class="xs-t" x="420" y="24">eaves 150 cm above the sill (2.4 m above the lawn)</text>
+        <rect class="xs-in" x="416" y="182" width="62" height="88"/>
+        <text class="xs-m" x="484" y="214">worktop</text>
+        <rect class="xs-in" x="416" y="270" width="484" height="10"/>
+        <text class="xs-m" x="560" y="296">kitchen floor, 90 cm below the sill</text>
+        <rect class="xs-home" x="380" y="176" width="50" height="4"/>
+        <text class="xs-t" x="300" y="170">the sill ●</text>
+        <line x1="398" y1="70" x2="398" y2="176" style="stroke:var(--hi);stroke-width:3"/>
+        <text class="xs-m" x="404" y="66">window to 112.5 cm</text>
+        <line x1="356" y1="180" x2="356" y2="270" style="stroke:var(--muted);stroke-dasharray:4 4"/>
+        <text class="xs-m" x="220" y="230">the descent on the line: 90 cm</text>
+        <text class="xs-m" x="8" y="20">← the garden</text><text class="xs-m" x="820" y="20">the house →</text>
+      </svg>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  const plan=document.getElementById('plan'), sheet=document.getElementById('sheet');
+  const nm=document.getElementById('iName'), st=document.getElementById('iState'), dm=document.getElementById('iDims'), inf=document.getElementById('iInfo');
+  let sel=null;
+  function show(g){ document.querySelectorAll('.reg.sel').forEach(x=>x.classList.remove('sel')); sel=g; document.querySelectorAll('.reg').forEach(x=>{ if(x.dataset.name===g.dataset.name) x.classList.add('sel'); });
+    nm.textContent=g.dataset.name; st.textContent=g.dataset.state; st.className='state '+g.dataset.state;
+    dm.textContent=g.dataset.dims.replace(' x ',' × '); inf.textContent=g.dataset.info; }
+  document.querySelectorAll('svg.plan .reg').forEach(g=>{ g.setAttribute('tabindex','0');
+    g.addEventListener('mouseenter',()=>show(g)); g.addEventListener('click',()=>show(g));
+    g.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();show(g);} }); });
+  const first=[...plan.querySelectorAll('.reg')].find(g=>g.dataset.name==='sill'); if(first) show(first);
+  document.getElementById('showPlan').addEventListener('change',e=>document.querySelectorAll('svg.plan').forEach(v=>v.classList.toggle('hide-plan',!e.target.checked)));
+  document.getElementById('showBoxes').addEventListener('change',e=>document.querySelectorAll('svg.plan').forEach(v=>v.classList.toggle('hide-boxes',!e.target.checked)));
+  // open the sheet scrolled so the house and the near garden are in view
+  requestAnimationFrame(()=>{ const r=sheet.scrollHeight; sheet.scrollTop=Math.max(0,(r*0.18)); });
+})();
+</script>

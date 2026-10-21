@@ -257,7 +257,7 @@ function Hud.new(playerGui: Instance): any
 	local promptCue = wrapLabel("PromptCue", panel, 16, 3)
 	promptCue.TextColor3 = WARN_COLOR
 	local self = setmetatable({
-		food = food, foodFill = foodFill, foodText = foodText, track = track, foodWords = "", foodCalm = 0, dayWords = "", dayCalm = 0, grip = grip, gripFill = gripFill, court = court, courtFill = courtFill, top = top, centre = centre, safe = safe, reticle = reticle, ticks = ticks,
+		food = food, foodFill = foodFill, foodText = foodText, track = track, foodWords = "", foodCalm = 0, dayWords = "", dayCalm = 0, grip = grip, gripFill = gripFill, court = court, courtFill = courtFill, top = top, centre = centre, safe = safe, reticle = reticle, reticleStroke = stroke, ticks = ticks,
 		aimTitle = aimTitle, aimHint = aimHint, anchorLabel = anchorLabel,
 		status = status, caption = caption, toastLabel = toast, help = help, notice = notice, day = day, dayLine = dayLine, noteLabel = note, noteLeft = 0,
 		panel = panel, promptTitle = promptTitle, promptHint = promptHint, promptCue = promptCue,
@@ -318,7 +318,7 @@ end
 
 -- view: device, aiming, focus, eyeView, aimTitle, aimHint, aimColor, anchorText, anchorOk, status ({string}),
 -- caption ({text, alpha} or nil), prompt ({title, hint, cue} or nil), helpVisible, helpText, notice, day and dayLine (strings or nil).
--- Active preserve play: only the food reserve, and the two earned ability
+-- Active preserve play: the food reserve, a tiny manual aiming dot, and earned ability
 -- notices explicitly requested by the player. An opened controls card is modal
 -- reference material; automatic hints never enter this projection.
 function Hud.minimalView(view: any): any
@@ -326,7 +326,7 @@ function Hud.minimalView(view: any): any
 	for line in string.gmatch(view.notice or "", "[^\n]+") do
 		if string.find(line,"^You can now run%.") or string.find(line,"^You can now lock on%.") then notice=line end
 	end
-	return {minimal=true,device=view.device,food=view.food,foodGentle=view.foodGentle,aiming=false,focus=false,eyeView=false,
+	return {minimal=true,device=view.device,food=view.food,foodGentle=view.foodGentle,dot=view.dot==true,aiming=false,focus=false,eyeView=false,
 		largeText=view.largeText,notice=notice,helpVisible=view.helpVisible and view.helpRequested,
 		helpText=view.helpText,status={}}
 end
@@ -338,9 +338,9 @@ function Hud.update(self: any, view: any, dt: number)
 		self.toastLeft=0;self.noteLeft=0
 	end
 	self.foodText.Visible=not minimal
-	self.food.Size=UDim2.fromOffset(if minimal then 120 else HUNGER_WIDTH,if minimal then 4 else 22)
+	self.food.Size=UDim2.fromOffset(if minimal then 150 else HUNGER_WIDTH,if minimal then 6 else 22)
 	self.food.AutomaticSize=if minimal then Enum.AutomaticSize.None else Enum.AutomaticSize.Y
-	self.track.Size=UDim2.new(1,0,0,if minimal then 4 else 5)
+	self.track.Size=UDim2.new(1,0,0,if minimal then 6 else 5)
 	self.food.Visible = type(view.food) == "number"
 	if self.food.Visible then
 		local food = math.clamp(view.food, 0, 1)
@@ -364,7 +364,9 @@ function Hud.update(self: any, view: any, dt: number)
  if view.court then self.courtFill.Size = UDim2.fromScale(math.clamp(view.court,0,1),1) end
  self.device = view.device
 	self:_place()
-	self.reticle.Visible = view.aiming or view.focus or view.eyeView
+	self.reticle.Visible = view.dot == true or view.aiming or view.focus or view.eyeView
+	self.reticle.Size=UDim2.fromOffset(if minimal then 2 else 6,if minimal then 2 else 6)
+	self.reticleStroke.Thickness=if minimal then .75 else 1.5
 	for _, t in self.ticks do t.Visible = view.focus == true end
 	show(self.aimTitle, view.aimTitle)
 	if view.aimColor then self.aimTitle.TextColor3 = view.aimColor end

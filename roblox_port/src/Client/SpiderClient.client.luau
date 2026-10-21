@@ -129,6 +129,9 @@ local M = {
 	CatText = require(Shared.UI.CatText),
 	catSeed = require(Shared.World.WorldMap).seed(914, "cat"),
 	cat = (nil :: any), catBody = (nil :: any), catHeard = { bell = 0.0 },
+	StationMouse = require(Shared.Prey.StationMouse),
+	StationMouseBody = require(script.Parent.StationMouseBody),
+	mouse = (nil :: any), mouseBody = (nil :: any),
 	-- ROBLOX-119: the crab spiders on the meadow's flowers (Predator/CrabSpider, drawn by Client/CrabBody, its words UI/CrabText), made in the preserve only; here for the same reason.
 	CrabSpider = require(Shared.Predator.CrabSpider),
 	CrabBody = require(script.Parent.CrabBody),
@@ -256,6 +259,7 @@ local flyBodies = FlyBodies.new(Workspace, detail) -- (ROBLOX-101: the bestiary'
 local soundscape = Soundscape.new(Workspace)
 local waspBody = WaspBody.new(Workspace)
 if M.World.world == "preserve" then M.cat = M.Cat.new(M.catSeed); M.catBody = M.CatBody.new(Workspace, detail); M.cat.enabled = script.Parent:FindFirstChild("SilkPlayback") == nil end
+if M.World.world == "preserve" then M.mouse=M.StationMouse.new(914);M.mouseBody=M.StationMouseBody.new(Workspace) end
 if M.World.world == "preserve" then M.crab = M.CrabSpider.new(require(Shared.World.WorldMap).seed(914, "crab_spider")); M.crabBody = M.CrabBody.new(Workspace, detail) end -- (ROBLOX-119)
 if M.World.world == "preserve" then M.bird = M.Bird.new(require(Shared.World.WorldMap).seed(914, "bird")); M.birdBody = M.BirdBody.new(Workspace, detail) end -- (ROBLOX-120)
 if M.World.world == "preserve" then -- (ROBLOX-122)
@@ -1717,6 +1721,7 @@ local function updateHud(frameDt: number)
 			prompt = { title = spiderPick.Text.nameLine(appearance), hint = spiderPick.Text.hint(device) } }
 	end
 	view.minimal=M.World.world=="preserve" and not spiderPick.inspecting
+	view.dot=view.minimal and not modal() and not life.asleep and not life.lifeOver
 	view.helpRequested=helpUntil==math.huge
 	hud:update(view, frameDt)
 end
@@ -1842,8 +1847,16 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 				M.cat.gentle = needs.gentle
 				if testPlace and Workspace:GetAttribute("Cat") ~= nil then M.cat.enabled = Workspace:GetAttribute("Cat") == true end
 				local hidden = M.World:inRetreat(motor.pos) ~= nil or M.Cat.under(motor.pos) or life.resting
-				local speed = if motor.mode == "air" then 10 elseif motor.moving == true then 3 else motor.vel.Magnitude -- (walking: moving; on the line or still: what it drifts)
-				M.cat:step(DT, life.clock.day, life.clock.hour, if life.lifeOver or modal() then nil else { pos = motor.pos, speed = speed, hidden = hidden })
+				-- Attached walking does not write motor.vel. Observe displacement so a
+				-- creep, a run and stillness are distinguishable to the cat.
+				local previous = M.cat.spiderPrevious or motor.pos
+				local speed = (motor.pos - previous).Magnitude / DT
+				M.cat.spiderPrevious = motor.pos
+				local eye = M.Cat.head(M.cat)
+				local sight = motor.pos - eye
+				local visible = Workspace:Raycast(eye, sight, params) == nil
+				M.cat:step(DT, life.clock.day, life.clock.hour, if life.lifeOver or modal() then nil else { pos = motor.pos, speed = speed, hidden = hidden, visible = visible })
+				M.mouse:step(DT, motor.pos, M.cat.pos)
 				for _, signal in M.cat:drainSignals() do
 					if signal.kind == "noticed" then watch:onCat()
 					elseif signal.kind == "struck" then endLife(M.CatText.CAUSE)
@@ -2214,6 +2227,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	soundscape:updateWasp(wasp, soundPaused, soundSpeed, soundMuted)
 	waspBody:draw(wasp.wasp, prey.now)
 	if M.crabBody ~= nil then M.crabBody:draw(M.crab) end -- (ROBLOX-119)
+	if M.mouseBody ~= nil then M.mouseBody:draw(M.mouse,setting("ReducedMotion")==true) end
 	if M.pondBodies ~= nil then -- (ROBLOX-122: the frog and the darner)
 		local dAt, dHeading = M.Pond.darner(914, prey.now, life.clock.hour)
 		if dAt ~= nil and (dAt - motor.pos).Magnitude < 150 then watch:onDarner() end

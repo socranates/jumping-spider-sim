@@ -52,7 +52,7 @@ case("the map answers for the active world: the preserve's sill is the same sill
 	local regions = WorldMap.regions()
 	local sill = regions[1]
 	local infill=0;for _,r in regions do if r.kind=="verge" then infill+=1 end end
-	check(#regions == 181+infill and infill>0 and sill.id == "sill" and sill.kind == "sill" and #sill.neighbors == 5,
+	check(#regions == 182+infill and infill>0 and sill.id == "sill" and sill.kind == "sill" and #sill.neighbors == 5,
 		`181 authored habitat regions plus compact infill (ROBLOX-118: the ceiling, the back room, the eaves, the path round the back room and on to the meadow, 105; ROBLOX-119: the bench patch and the meadow's edge, 41; ROBLOX-122: the mown path, the boardwalk and the pond's edge, 61), the sill first with its five seams into the hut ({#regions}, {#sill.neighbors})`)
 	check(same(sill.bounds[1], Layout.PLAY_BOUNDS_MIN) and same(sill.bounds[2], Layout.PLAY_BOUNDS_MAX) and same(sill.spawn.pos, Layout.SPAWN) and same(sill.spawn.heading, Layout.SPAWN_HEADING)
 		and sill.clockScale == 1.0 and sill.seed == gardenSill.seed and #sill.retreats == 1 and sill.retreats[1].id == "sill_crevice"
@@ -346,9 +346,9 @@ local Nature = require("../src/Shared/Life/Nature")
 local LifeText = require("../src/Shared/UI/LifeText")
 local SaveProgress = require("../src/Shared/Persistence/SaveProgress")
 
-local SEAMS = 295 -- (ROBLOX-116: 69; ROBLOX-117: 78; ROBLOX-118: the ceiling's, the back room's, the eaves' and the new paths', 180; ROBLOX-119: the bench patch's and the meadow's, 64; ROBLOX-122: the mown path's, the boardwalk's and the pond's, 77)
+local SEAMS = 298 -- v49 adds three real seams from the cracked back-room window to the path.
 local HUT_IDS = "sill,hut_window,hut_outer_sill,hut_desk,hut_board,hut_shelf,hut_chair,hut_door,"
-	.. "hut_door_up,hut_doorway,hut_doorway_up,room_window,room_tv,room_games,room_sofa_w,room_sofa_e," -- (ROBLOX-118: the door's head, the doorway, the back room)
+	.. "hut_door_up,hut_doorway,hut_doorway_up,room_window,room_exit,room_tv,room_games,room_sofa_w,room_sofa_e," -- v49: exterior exit follows its window.
 	.. "hut_floor_a,hut_floor_b,hut_floor_c,hut_floor_d,hut_floor_e,hut_floor_f,hut_floor_g,hut_floor_h,hut_floor_i,"
 	.. "room_floor_a,room_floor_b,room_floor_c,room_floor_d,room_floor_e,room_floor_f,room_floor_g,room_floor_h,room_floor_i,"
 	.. "hut_up_a,hut_up_b,hut_up_c,hut_up_d,hut_up_e,hut_up_f,hut_up_g,hut_up_h,hut_up_i,room_up_a,room_up_b,room_up_c,room_up_d,room_up_e,room_up_f,room_up_g,room_up_h,room_up_i,"
@@ -394,9 +394,9 @@ case("the hut's regions: the sill, the hut's inside, the way out and the garden'
 	for _, r in WorldMap.regions() do
 		local indoor = Nature.INDOORS[r.kind] == true
 		if string.sub(r.id, 1, 9) == "hut_floor" or r.id == "hut_desk" or r.id == "hut_board" or r.id == "hut_shelf" or r.id == "hut_chair" or r.id == "hut_window"
-			or string.sub(r.id, 1, 5) == "room_" or string.sub(r.id, 1, 7) == "hut_up_" or string.sub(r.id, 1, 11) == "hut_doorway" or r.id == "hut_door_up" then
+			or (string.sub(r.id, 1, 5) == "room_" and r.id ~= "room_exit") or string.sub(r.id, 1, 7) == "hut_up_" or string.sub(r.id, 1, 11) == "hut_doorway" or r.id == "hut_door_up" then
 			if not indoor or r.clockScale ~= 1.0 or Nature.exposed(true, r.kind, false) then inside = false end
-		elseif string.sub(r.id, 1, 7) == "garden_" or r.id == "hut_bench" or r.id == "hut_butt" or Meadow.knows(r.kind) or Pond.knows(r.kind) then
+		elseif string.sub(r.id, 1, 7) == "garden_" or r.id == "hut_bench" or r.id == "hut_butt" or r.id == "room_exit" or Meadow.knows(r.kind) or Pond.knows(r.kind) then
 			if indoor or r.clockScale ~= 0.33 or not Nature.exposed(true, r.kind, false) then outside = false end
 		end
 	end
@@ -483,8 +483,8 @@ case("the hut's boxes: the same forever, nothing overlapping anything, at most s
 		end
 	end
 	check(overlaps == 0 and dup == 0, `{#all} boxes in the preserve, none in another (the sill's crack is the layout's own), no id twice ({overlaps}, {dup})`)
-	check(Region.drawnPieces(WorldMap.region("hut_window") :: any)[1] == "hut_window_glass" and #Region.drawnPieces(WorldMap.region("hut_desk") :: any) == 0,
-		"the window's glass is drawn by the sill's Decor; the rest of the hut is its own look")
+	check(Region.drawnPieces(WorldMap.region("hut_window") :: any)[1] == "hut_window_glass" and #Region.drawnPieces(WorldMap.region("hut_desk") :: any) == 2,
+		"window glass and the rounded thermos have drawing over physical support")
 end)
 
 case("the hut's looks: within their budgets at both tiers, the same each time, well made", function()
@@ -629,7 +629,7 @@ case("the hut garden's life: its perches on its boxes' faces, its vents and hide
 			if #a.starts < 1 then fine = false; print("  ambient " .. a.kind .. " in " .. r.id) end
 		end
 	end
-	check(fine and counts.prey == 2 and counts.kinds > 34 and originalKinds == 34 and counts.bugs == 2 and counts.ambient == 6,
+	check(fine and counts.prey == 2 and counts.kinds > 37 and originalKinds == 37 and counts.bugs == 2 and counts.ambient == 6,
 		`gnats and aphids in 2 cells, the bestiary's kinds 10 times (ROBLOX-117: with the hoverflies on three cells' flowers, the fruit flies at the caddy, the moth at the lamp; ROBLOX-118: the caddy's flies in the back room, a moth at its window; ROBLOX-119: 25 with the meadow's leafhoppers, hoverflies, house flies and moths, the bin's flies and the lamp's moths; ROBLOX-120: 29 with the four crickets; ROBLOX-122: 34 with the pond's midges, mosquitoes and damselflies), woodlice in 2, ambient bugs in 4 (ROBLOX-119: the ants; ROBLOX-122: 6 with the water striders) (found {counts.prey}, {counts.kinds}, {counts.bugs}, {counts.ambient}), every perch on a face`)
 	-- the milkweed as a plant the aphids and the ladybird walk: its nodes are the aphids' leaf perches
 	local c3 = WorldMap.region("garden_c3") :: any
@@ -975,7 +975,8 @@ case("the cat's reactions: a moving thing near it and awake, a pat in reach; sti
 	check(s6.noticed == 1 and (s6.struck or 0) == 0 and s6.gave_up == 1, "one that keeps still once seen: it loses interest")
 	local _, s7 = trial(false, function(cat, i) return { pos = Vector3.new(cat.pos.X + 60, -69.69, cat.pos.Z) * Vector3.new(1, 1, 1) + Vector3.new(if Cat.roomOf(cat.pos) == "hut" then 400 else -400, 0, 0), speed = 2, hidden = false } end, 4)
 	check((s7.noticed or 0) == 0, "one in the other room is not noticed")
-	-- a sleeping cat notices nothing
+	-- Creeping does not disturb a nap; sustained roaming wakes it onto a real
+	-- route from its perch rather than teleporting it down to the floor.
 	local sleepH = nil
 	for _, s in Cat.plan(seed, 1) do if s.kind == "rest" and s.t1 - s.t0 > 1 then sleepH = s.t0 + 0.8; break end end
 	local sleeper = Cat.new(seed)
@@ -983,11 +984,27 @@ case("the cat's reactions: a moving thing near it and awake, a pat in reach; sti
 	local seen = 0
 	for i = 1, 300 do
 		local c = Cat.chest(sleeper) + sleeper.heading * 8
-		sleeper:step(1 / 60, 1, sleepH :: number, { pos = Vector3.new(c.X, sleeper.surface + 0.31, c.Z), speed = 2, hidden = false })
+		sleeper:step(1 / 60, 1, sleepH :: number, { pos = Vector3.new(c.X, sleeper.surface + 0.31, c.Z), speed = 0.65, hidden = false })
 		seen += #sleeper:drainSignals()
 		local _ = i
 	end
-	check(sleeper.pose == "sleep" and seen == 0, "asleep, it notices nothing")
+	check(sleeper.pose == "sleep" and seen == 0, "creeping past a nap leaves it asleep")
+	local start = sleeper.pos
+	local woke, departure = false, nil
+	for i = 1, 180 do
+		sleeper:step(1 / 60, 1, (sleepH :: number) + i / 60 * Cat.HOUR_PER_S,
+			{ pos = start + Vector3.new(20, -40, 0), speed = 2.5, hidden = false, visible = false })
+		for _, signal in sleeper:drainSignals() do if signal.kind == "woke" then woke = true; departure = sleeper.pos end end
+	end
+	check(woke and departure ~= nil and (departure - start).Magnitude < 0.01, "roaming wakes it at its original perch")
+	check(sleeper.pose ~= "sleep" and (sleeper.pos - start).Magnitude > 1, "awakened cat actually follows its departure route")
+	check(sleeper.notices == 0 and sleeper.swats == 0, "hearing movement never supplies sight through furniture")
+	local _, blocked = trial(false, function(cat, i) local p = near(cat, i); p.visible = false; return p end, 8)
+	check((blocked.noticed or 0) == 0 and (blocked.struck or 0) == 0, "occluded spider is not targeted")
+	local _, lost = trial(false, function(cat, i) local p = near(cat, i); p.visible = i <= 100; return p end, 8)
+	check(lost.noticed == 1 and lost.gave_up == 1 and (lost.struck or 0) == 0, "getting behind a prop interrupts pursuit and prevents a through-wall pat")
+	Cat.load(sleeper, Cat.defaultRecord())
+	check(sleeper.advance == 0 and sleeper.wakeS == 0, "restore clears interrupted patrol and waking state")
 	-- heard first: the bell while it walks, from metres off; the purr close, as it settles
 	local walkH = nil
 	for _, s in Cat.plan(seed, 1) do if s.kind == "walk" and s.t1 - s.t0 > 0.02 then walkH = (s.t0 + s.t1) / 2; break end end

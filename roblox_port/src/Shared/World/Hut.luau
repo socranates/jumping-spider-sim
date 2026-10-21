@@ -164,7 +164,7 @@ Hut.TV = table.freeze({ x0 = 185, x1 = 275, z0 = 14, z1 = 52.5, top = -20, scree
 Hut.GAMES = table.freeze({ x0 = 360, x1 = 440, z0 = 14, z1 = 44, top = 50 })
 Hut.HEATER = table.freeze({ x0 = 425, x1 = 441, z0 = 100, z1 = 158, top = -7, fins = 7 })
 Hut.RUG = table.freeze({ x0 = 230, x1 = 400, z0 = 96, z1 = 164, top = 1 })
-Hut.ROOM_WINDOW = table.freeze({ z0 = 98, z1 = 170, glass = 459, sill = 429, head = 112.5, top = 115 })
+Hut.ROOM_WINDOW = table.freeze({ z0 = 98, z1 = 170, glass = 459, sill = 429, head = 112.5, top = 115, gap = 5 })
 -- The north face outside, to the eaves: the logs to the soffit's underside (EAVE.soffit, 2.18 m over the ground), the boxed soffit under the roof's overhang, the
 -- fascia board and the gutter hung on it (its floor 2.06 m over the ground): the roof's walkable edge. The roof's slope (35 degrees) is drawn only.
 Hut.BUILDING = table.freeze({ x0 = -175, x1 = 473.5 })
@@ -357,6 +357,7 @@ function Hut.author(worldSeed: number, seedOf: (number, string) -> number): { Re
 	region("hut_doorway", "hut_doorway", v(DW.x0, FL - 3, 174.5), v(DW.x1, Hut.WALL_TOP, B.z1), v((DW.x0 + DW.x1) / 2, FL, (DW.z0 + DW.z1) / 2), v(1, 0, 0), 1.0)
 	region("hut_doorway_up", "hut_doorway", v(DW.x0, Hut.WALL_TOP, 174.5), v(DW.x1, Hut.CEIL, B.z1), v((DW.core[1] + DW.core[2]) / 2, 100, DW.z0), v(0, 1, 0), 1.0)
 	region("room_window", "room_window", v(B.x1 - 20, -5, 93.5), v(Hut.ROOM_WINDOW.glass + 1, Hut.ROOM_WINDOW.top + 3, 174.5), v(437, 0, 134), v(1, 0, 0), 1.0)
+	region("room_exit", "room_exit", v(459, GT - 3, 98), v(531, 6, 170), v(480, GT, 134), v(1, 0, 0), 0.33)
 	region("room_tv", "room_tv", v(Hut.TV.x0, FL + 1, Hut.TV.z0), v(Hut.TV.x1, Hut.TV.screen.y1 + 3, Hut.TV.z1 + 3), v(230, Hut.TV.top, 45), v(0, 0, 1), 1.0)
 	region("room_games", "room_games", v(Hut.GAMES.x0, FL + 1, Hut.GAMES.z0), v(Hut.GAMES.x1, Hut.GAMES.top + 5, Hut.GAMES.z1 + 4), v(400, Hut.GAMES.top, 30), v(0, 0, 1), 1.0)
 	region("room_sofa_w", "room_sofa", v(SO.x0 - 5, FL + 0.9, SO.z0 - 5), v(SO.split, SO.back + 3, SO.z1), v(262, SO.seat, 215), v(0, 0, -1), 1.0)
@@ -614,6 +615,9 @@ do
 	seam("room_tv", "room_floor_b", v(267, FL, TV.z1), v(TV.x1 - 2, FL, TV.z1))
 	seam("room_games", "room_floor_c", v(GA.x0 + 4, FL, GA.z1), v(GA.x1 - 4, FL, GA.z1))
 	seam("room_window", "room_floor_f", v(B.x1, -3, Hut.ROOM_WINDOW.z0 + 1), v(B.x1, -3, Hut.ROOM_WINDOW.z1 - 1))
+	seam("room_window", "room_exit", v(459, 0, 102), v(459, 0, 166))
+	seam("room_exit", "path_e2", v(530, GT, 117), v(530, GT, 166))
+	seam("room_exit", "path_e3", v(530, GT, 102), v(530, GT, 109))
 	seam("room_sofa_w", "room_floor_d", v(SO.x0 + 3.5, FL, SO.z0 + 2.5), v(SO.x0 + 8.5, FL, SO.z0 + 2.5))
 	seam("room_sofa_w", "room_floor_g", v(SO.x0 + 3.5, FL, SO.z1 - 8), v(SO.x0 + 8.5, FL, SO.z1 - 8))
 	seam("room_sofa_e", "room_floor_f", v(SO.x1 - 8.5, FL, SO.z0 + 2.5), v(SO.x1 - 3.5, FL, SO.z0 + 2.5))
@@ -1289,8 +1293,18 @@ local function roomWindowPieces(): { Piece }
 	P(out, "room_window_sill", Wn.sill, Wn.glass, -3, 0, Wn.z0, Wn.z1, "painted_wood_dry", C.lining, "WoodPlanks")
 	P(out, "room_window_reveal_s", B.x1, Wn.glass, -3, Wn.top, 93.5, Wn.z0, "painted_wood_dry", C.lining, "WoodPlanks")
 	P(out, "room_window_reveal_n", B.x1, Wn.glass, -3, Wn.top, Wn.z1, 174.5, "painted_wood_dry", C.lining, "WoodPlanks")
-	P(out, "room_window_glass", Wn.glass, Wn.glass + 1, 0, Wn.head, Wn.z0, Wn.z1, "glass_clean", "c9d6d8", "Glass")
+	P(out, "room_window_glass", Wn.glass, Wn.glass + 1, Wn.gap, Wn.head, Wn.z0, Wn.z1, "glass_clean", "c9d6d8", "Glass")
 	P(out, "room_window_head", B.x1, Wn.glass, Wn.head, Wn.top, Wn.z0, Wn.z1, "painted_wood_dry", C.lining, "WoodPlanks")
+	return out
+end
+
+-- The cracked sash leads onto the exterior sill, down the rough logs and onto
+-- real ground beside the existing path. The outside is not resident territory.
+local function roomExitPieces(): { Piece }
+	local out: { Piece } = {}
+	P(out, "room_exit_board", 459, 478, -3, 0, 98, 170, "painted_wood_dry", C.trim, "WoodPlanks")
+	P(out, "room_exit_logs", 471.5, 473.5, GT, -3, 98, 170, "bare_wood_rough", C.log, "Wood")
+	P(out, "room_exit_ground", 473.5, 530, GT - 2, GT, 98, 170, "bare_wood_rough", "71804e", "Ground")
 	return out
 end
 
@@ -1346,7 +1360,7 @@ local KINDS: { [string]: boolean } = {
 	hut_window = true, hut_outer_sill = true, hut_floor = true, hut_desk = true, hut_board = true, hut_shelf = true, hut_chair = true, hut_door = true,
 	hut_wall = true, hut_bench = true, hut_butt = true, garden_pole = true, garden_bed = true, hut_path = true,
 	-- (ROBLOX-118)
-	hut_upper = true, hut_doorway = true, hut_door_up = true, hut_eave = true, room_floor = true, room_sofa = true, room_tv = true, room_games = true, room_window = true,
+	hut_upper = true, hut_doorway = true, hut_door_up = true, hut_eave = true, room_floor = true, room_sofa = true, room_tv = true, room_games = true, room_window = true, room_exit = true,
 }
 -- Whether a kind is the hut's (or its garden's).
 function Hut.knows(kind: string): boolean
@@ -1358,6 +1372,38 @@ Hut.INDOORS = table.freeze({ hut_window = true, hut_floor = true, hut_desk = tru
 	hut_upper = true, hut_doorway = true, hut_door_up = true, room_floor = true, room_sofa = true, room_tv = true, room_games = true, room_window = true })
 
 local piecesCache: { [string]: { Piece } } = {}
+-- Working field gear offers small-scale routes and cover without filling the
+-- cat's walking lanes. These are physical at both detail tiers.
+local function rangerGear(region: Region, out: { Piece })
+	if region.id == "hut_desk" then
+		P(out, "station_radio", 97, 104, 4, 18, 45, 55, "painted_metal_smooth", "303835", "SmoothPlastic")
+		P(out, "station_radio_aerial", 102, 102.6, 18, 33, 46, 46.6, "painted_metal_smooth", "252b29", "Metal")
+		P(out, "station_radio_screen", 98, 102, 12, 16, 55, 55.2, "glass_clean", "819b80", "Glass")
+		P(out, "station_radio_dial", 98, 100, 18, 19, 50, 52, "painted_metal_smooth", "1d2421", "SmoothPlastic")
+		P(out, "station_thermos", 114, 122, 4, 23, 48, 56, "painted_metal_smooth", "456b59", "Metal")
+		P(out, "station_thermos_cap", 114, 122, 23, 26, 48, 56, "painted_metal_smooth", "b5b8ad", "Metal")
+	elseif region.id == "hut_floor_a" then
+		for i, x in { -101, -85 } do
+			local z = if i == 1 then 38 else 40
+			P(out, `station_boot_{i}_sole`, x, x + 12, FL, FL + 2, z, z + 26, "painted_wood_dry", "282d27", "SmoothPlastic")
+			P(out, `station_boot_{i}_foot`, x + 0.5, x + 11.5, FL + 2, FL + 7, z + 0.5, z + 25.5, "painted_wood_dry", "566347", "SmoothPlastic")
+			P(out, `station_boot_{i}_shaft`, x + 0.5, x + 11.5, FL + 7, FL + 30, z + 14, z + 25.5, "painted_wood_dry", "566347", "SmoothPlastic")
+			P(out, `station_boot_{i}_rim`, x + 0.5, x + 11.5, FL + 30, FL + 31, z + 14, z + 25.5, "painted_wood_dry", "343e2e", "SmoothPlastic")
+		end
+		P(out, "station_pack", -140, -124, FL, -35, 59, 81, "painted_wood_dry", "846846", "Fabric")
+		P(out, "station_pack_pocket", -124, -120, -62, -44, 62, 78, "painted_wood_dry", "9b7c53", "Fabric")
+		for i, z in { 61, 77 } do
+			P(out, `station_pack_strap_{i}`, -140.4, -140, -64, -38, z, z + 1.5, "painted_wood_dry", "3c4438", "Fabric")
+		end
+	elseif region.id == "hut_shelf" then
+		P(out, "station_aid_case", -142, -121, 10, 23, 176, 197, "painted_wood_dry", "a33d31", "SmoothPlastic")
+		P(out, "station_aid_lid", -142, -121, 23, 24.5, 176, 197, "painted_wood_dry", "bd4b3e", "SmoothPlastic")
+		-- Cross on the case's outward face, split so no physical boxes overlap.
+		P(out, "station_aid_cross_v", -121, -120.8, 13, 21, 185, 188, "painted_wood_dry", "eee6d5", "SmoothPlastic")
+		P(out, "station_aid_cross_n", -121, -120.8, 15.5, 18.5, 182, 185, "painted_wood_dry", "eee6d5", "SmoothPlastic")
+		P(out, "station_aid_cross_s", -121, -120.8, 15.5, 18.5, 188, 191, "painted_wood_dry", "eee6d5", "SmoothPlastic")
+	end
+end
 function Hut.pieces(region: Region): { Piece }
 	local key = region.id .. "/" .. tostring(region.seed)
 	local cached = piecesCache[key]
@@ -1385,9 +1431,11 @@ function Hut.pieces(region: Region): { Piece }
 	elseif k == "room_tv" then out = tvPieces()
 	elseif k == "room_games" then out = gamesPieces(region)
 	elseif k == "room_window" then out = roomWindowPieces()
+	elseif k == "room_exit" then out = roomExitPieces()
 	elseif k == "hut_eave" then out = eavePieces(region)
 	else error("no generator for the region kind " .. k) end
 	local list = out :: { Piece }
+	rangerGear(region, list)
 	for _, p in list do table.freeze(p) end
 	piecesCache[key] = table.freeze(list)
 	return list
@@ -1397,6 +1445,7 @@ end
 -- Everything else of the hut is its own look (its material and colour), with the drawn detail beside it.
 function Hut.drawnPieces(region: Region): { string }
 	if region.kind == "hut_window" then return { "hut_window_glass" } end
+	if region.id == "hut_desk" then return { "station_thermos", "station_thermos_cap" } end
 	-- (and the herbs' mounds, drawn as leafy masses over their boxes: Hut.decor)
 	local out: { string } = {}
 	for _, p in Hut.pieces(region) do
@@ -1420,14 +1469,14 @@ end
 -- boxes by a hair so that the two never fight where both are drawn: it stands in for them where streaming has not sent them yet.)
 -- The ceilings each kind keeps to at both tiers (a placer stops at them, keeping what it placed first; tests/preserve.luau holds the counts).
 Hut.BUDGETS = table.freeze({
-	hut_floor = { full = 15, low = 2 }, hut_desk = { full = 22, low = 1 }, hut_board = { full = 16, low = 4 }, hut_shelf = { full = 10, low = 0 }, hut_chair = { full = 2, low = 0 },
+	hut_floor = { full = 15, low = 2 }, hut_desk = { full = 24, low = 3 }, hut_board = { full = 16, low = 4 }, hut_shelf = { full = 10, low = 0 }, hut_chair = { full = 2, low = 0 },
 	hut_door = { full = 14, low = 1 }, hut_window = { full = 0, low = 0 }, hut_outer_sill = { full = 6, low = 0 }, hut_wall = { full = 0, low = 0 },
 	hut_bench = { full = 4, low = 0 }, hut_butt = { full = 3, low = 0 }, garden_pole = { full = 4, low = 2 }, garden_bed = { full = 124, low = 8 },
 	-- (ROBLOX-117: the path round the east end, and the patches: the near detail of the garden's cells and the path's lengths, World/LookPlan.PATCH_RADIUS)
 	hut_path = { full = 8, low = 2 }, patch = { full = 90, low = 10 },
 	-- (ROBLOX-118: the ceiling and the upper walls, the doorway, the front door's head, the eaves, and the back room)
 	hut_upper = { full = 26, low = 0 }, hut_doorway = { full = 0, low = 0 }, hut_door_up = { full = 0, low = 0 }, hut_eave = { full = 4, low = 0 },
-	room_floor = { full = 12, low = 1 }, room_sofa = { full = 8, low = 0 }, room_tv = { full = 4, low = 1 }, room_games = { full = 20, low = 0 }, room_window = { full = 4, low = 0 },
+	room_floor = { full = 12, low = 1 }, room_sofa = { full = 8, low = 0 }, room_tv = { full = 4, low = 1 }, room_games = { full = 20, low = 0 }, room_window = { full = 4, low = 0 }, room_exit = { full = 0, low = 0 },
 }) :: { [string]: { full: number, low: number } }
 
 local function sheet(budget: { full: number, low: number })
@@ -2270,7 +2319,7 @@ end
 local function roomWindowDecor(_region: Region, add: (Drawn) -> boolean)
 	local Wn = Hut.ROOM_WINDOW
 	local gx = Wn.glass - 0.4
-	add(rec("FrameLow", v(0.8, 4, Wn.z1 - Wn.z0), v(gx, 2, (Wn.z0 + Wn.z1) / 2), "efe9da", "Wood", true))
+	add(rec("FrameLow", v(0.8, 4, Wn.z1 - Wn.z0), v(gx, Wn.gap + 2, (Wn.z0 + Wn.z1) / 2), "efe9da", "Wood", true))
 	add(rec("FrameHigh", v(0.8, 4, Wn.z1 - Wn.z0), v(gx, Wn.head - 2, (Wn.z0 + Wn.z1) / 2), "efe9da", "Wood", true))
 	add(rec("FrameRail", v(0.8, 3, Wn.z1 - Wn.z0), v(gx, Wn.head / 2, (Wn.z0 + Wn.z1) / 2), "efe9da", "Wood", true))
 	add(rec("Catch", v(1.2, 1.2, 3), v(gx - 0.8, Wn.head / 2 + 2, (Wn.z0 + Wn.z1) / 2), C.brass, "Metal", true))
@@ -2300,7 +2349,10 @@ function Hut.decor(region: Region): { Drawn }
 	local list, add = sheet(budget)
 	local k = region.kind
 	if k == "hut_floor" then floorDecor(region, add)
-	elseif k == "hut_desk" then deskDecor(region, add)
+	elseif k == "hut_desk" then
+		add(rec("Thermos", v(19,8,8), v(118,13.5,52), "456b59", "Metal", false, "Cylinder", v(0,0,90)))
+		add(rec("ThermosCup", v(3,8,8), v(118,24.5,52), "b5b8ad", "Metal", false, "Cylinder", v(0,0,90)))
+		deskDecor(region, add)
 	elseif k == "hut_board" then boardDecor(region, add)
 	elseif k == "hut_shelf" then shelfDecor(region, add)
 	elseif k == "hut_door" then doorDecor(region, add)
@@ -2343,6 +2395,7 @@ Hut.LIFE = table.freeze({
 	-- (ROBLOX-117) the hoverflies on the bed's flowers; the hut's own prey: fruit flies at the compost caddy by the door, a moth at the desk lamp from dusk
 	hoverflies = { garden_c4 = { full = 1, low = 1 }, garden_d4 = { full = 1, low = 1 }, garden_c3 = { full = 1, low = 1 } },
 	fruitflies = { hut_floor_i = { full = 4, low = 2 }, room_floor_g = { full = 2, low = 1 } },
+	floorflies = { hut_floor_e = { full = 1, low = 1 }, room_floor_b = { full = 1, low = 1 }, room_floor_d = { full = 1, low = 1 } },
 	moths = { hut_desk = { full = 1, low = 1 }, room_window = { full = 1, low = 1 } },
 	-- (ROBLOX-120) a field cricket in the pollinator bed's mulch, singing from dusk
 	crickets = { garden_d3 = { full = 1, low = 1, perches = 6 } },
@@ -2480,10 +2533,34 @@ function Hut.bestiary(region: Region): { any }?
 	local spring, hopper = Hut.LIFE.springtails[region.id], Hut.LIFE.leafhoppers[region.id]
 	local hover, fruit, moth = Hut.LIFE.hoverflies[region.id], Hut.LIFE.fruitflies[region.id], Hut.LIFE.moths[region.id]
 	local cricket = Hut.LIFE.crickets[region.id]
-	if spring == nil and hopper == nil and hover == nil and fruit == nil and moth == nil and cricket == nil then return nil end
+	local floorfly = Hut.LIFE.floorflies[region.id]
+	if spring == nil and hopper == nil and hover == nil and fruit == nil and moth == nil and cricket == nil and floorfly == nil then return nil end
 	local key = region.id .. "/" .. tostring(region.seed)
 	if bestiaryCache[key] ~= nil then return bestiaryCache[key] end
-	local out = {}
+	local out: { any } = {}
+	if floorfly ~= nil then
+		local rand = rng(region.seed, 137)
+		local lo, hi = region.bounds[1], region.bounds[2]
+		local standing = standingOn(region, FL)
+		local taken: { Vector3 } = {}
+		local centre = freeSpot(rand, {lo.X + 10, hi.X - 10, lo.Z + 10, hi.Z - 10}, FL, standing, taken, 2, 2)
+		if centre ~= nil then
+			local perches: { Perch } = {}
+			local function add(p: Vector3)
+				table.insert(perches, {id = `{region.id}_floor_fly_{#perches + 1}`, position = p, normal = Vector3.yAxis,
+					shelter = .1, food = .1, start = #perches < floorfly.full, kind = "floor"})
+			end
+			add(centre)
+			for _ = 1, 7 do
+				local p = freeSpot(rand, {centre.X - 9, centre.X + 9, centre.Z - 9, centre.Z + 9}, FL, standing, taken, 2, 2)
+				if p ~= nil then add(p) end
+			end
+			table.insert(out, {kind = "housefly", profile = "fly_like_prototype", perches = perches,
+				vents = {{id = region.id .. "_floor_fly_vent", position = centre + v(0, 8, 0), normal = Vector3.yAxis, appear = true, reach = 40}},
+				target = floorfly.full, low = floorfly.low, seed = (region.seed + 137 * 104729) % MOD,
+				prefix = region.id .. "_floor_fly_", floor = FL - 2, ceiling = FL + 18})
+		end
+	end
 	if spring ~= nil then
 		local salt = 71
 		local rand = rng(region.seed, salt)

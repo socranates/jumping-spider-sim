@@ -250,8 +250,13 @@ local function hutDecor(out: List, rand: () -> number)
 	sblock(out, "EndWindow1", -HX - 1, -HX, 30, 100, 105, 165, C.glass, "SmoothPlastic", { far = true, reflectance = 0.2 })
 	sblock(out, "EndWindowIn1", -ix, -ix + 1, 30, 100, 105, 165, C.glass, "SmoothPlastic", { reflectance = 0.15 })
 	sblock(out, "EndCasing1", -HX - 1.5, -HX, 24, 106, 99, 171, C.trim, "WoodPlanks", { full = true })
-	sblock(out, "EndWindow2", RW.glass + R, RW.glass + 1 - R, 0, RW.y1, RW.z0, RW.z1, C.glass, "SmoothPlastic", { far = true, reflectance = 0.2 })
-	sblock(out, "EndCasing2", HE, HE + 1.5, -6, RW.y1 + 6, RW.z0 - 6, RW.z1 + 6, C.trim, "WoodPlanks", { full = true })
+	sblock(out, "EndWindow2", RW.glass + R, RW.glass + 1 - R, 5, RW.y1, RW.z0, RW.z1, C.glass, "SmoothPlastic", { far = true, reflectance = 0.2 })
+	-- A casing surrounds the opening; a single box here used to conceal the
+	-- entire window. Keep all four rails outside the actual five-cm crack.
+	sblock(out, "EndCasing2Low", HE, HE + 1.5, -6, 0, RW.z0 - 6, RW.z1 + 6, C.trim, "WoodPlanks", { far = true })
+	sblock(out, "EndCasing2High", HE, HE + 1.5, RW.y1, RW.y1 + 6, RW.z0 - 6, RW.z1 + 6, C.trim, "WoodPlanks", { far = true })
+	sblock(out, "EndCasing2North", HE, HE + 1.5, 0, RW.y1, RW.z0 - 6, RW.z0, C.trim, "WoodPlanks", { far = true })
+	sblock(out, "EndCasing2South", HE, HE + 1.5, 0, RW.y1, RW.z1, RW.z1 + 6, C.trim, "WoodPlanks", { far = true })
 	-- the gable ends: each half a box turned to the roof's pitch, its corner at the eave (it stays inside the wall's outline and under the roof)
 	local p = math.rad(PITCH)
 	local run = (HZ1 - HZ0) / 2

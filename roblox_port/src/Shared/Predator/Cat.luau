@@ -30,11 +30,13 @@ local v = Vector3.new
 -- ---------------------------------------------------------------- the numbers
 Cat.WALK_SPEED = 60 -- studs a second: a cat's unhurried walk, 0.6 m/s
 Cat.JUMP_S = 0.55 -- seconds a jump up or down takes
-Cat.NOTICE = 90 -- how near (studs, in plan, from its head) a moving thing catches its eye
+Cat.NOTICE = 125 -- how near (studs, in plan, from its head) a moving thing catches its eye
 Cat.NOTICE_UP = 130 -- and how high over the surface it stands on (it watches what moves on a wall)
 Cat.REACH = 24 -- how far its pat reaches in plan from its chest
 Cat.REACH_UP = 50 -- and how high over its surface (up on its hind legs)
 Cat.MOVING = 0.5 -- studs a second: slower than this, a spider is keeping still
+Cat.WAKE_SPEED = 1.1 -- creeping can pass a sleeping cat; sustained walking wakes it
+Cat.WAKE_S = 2 -- seconds of nearby roaming before it gets up
 Cat.STILL_LOSE = 2.5 -- seconds of stillness and it loses interest
 Cat.HIGH_LOSE = 5.0 -- seconds staring at what it cannot reach and it gives up
 Cat.WATCH = table.freeze({ 1.2, 3.0 }) -- seconds it watches before it moves on what it watches (a draw per notice)
@@ -42,7 +44,7 @@ Cat.CROUCH_S = 0.6 -- the crouch and the wiggle before the pat
 Cat.SWAT_S = 0.25 -- the pat itself (the paw is at the far end of its reach halfway through)
 Cat.STALK_SPEED = 20 -- studs a second, low and slow toward the thing
 Cat.STALK_MAX = 80 -- the farthest it steps off its schedule's place to stalk
-Cat.COOLDOWN = 20 -- seconds after it gives up before anything catches its eye again
+Cat.COOLDOWN = 12 -- seconds after it gives up before anything catches its eye again
 Cat.MISSES = 2 -- pats that miss before it gives up
 Cat.CATCH_UP = 0.5 -- after a reaction its schedule runs this much faster until it has caught up
 Cat.HEAR_BELL = 350 -- studs: how far the bell is heard (about 3.5 m)
@@ -78,6 +80,7 @@ Cat.ROOMS = table.freeze({ hut = table.freeze({ -146.5, 146.5 }), back = table.f
 local BLOCKS = {
 	{ 225, 425, 165.5, 254 }, { 185, 275, 14, 52.5 }, { 360, 440, 14, 44 }, { 425, 441, 100, 163 }, -- the sofa, the television's unit, the games, the radiator
 	{ -146.5, -118.5, 116, 204 }, { 68, 90, 228, 246 }, -- the bookcase, the caddy
+	{ -101, -73, 38, 66 }, { -140.4, -120, 59, 81 }, -- station boots and field pack
 }
 Cat.BLOCKS = BLOCKS
 
@@ -264,7 +267,7 @@ function Cat.at(seed: number, day: number, hour: number): Place
 end
 
 -- ---------------------------------------------------------------- the live cat
-export type Spider = { pos: Vector3, speed: number, hidden: boolean }
+export type Spider = { pos: Vector3, speed: number, hidden: boolean, visible: boolean? }
 export type Signal = { kind: string, at: Vector3?, away: Vector3? }
 
 -- A new cat for a world seed (WorldMap.seed(914, "cat")).
@@ -278,7 +281,7 @@ function Cat.new(seed: number): any
 		react = "none", reactS = 0, watchS = 0, stillS = 0, highS = 0, misses = 0, cooldown = 0, lag = 0, offset = Vector3.zero, pawAt = nil :: Vector3?, swatHit = false,
 		-- this life's record (saved)
 		notices = 0, pats = 0, swats = 0, lastSwatDay = 0,
-		gentle = false, enabled = true,
+		gentle = false, enabled = true, wakeS = 0, advance = 0,
 		signals = {} :: { Signal },
 	}, Cat)
 	return self
@@ -345,10 +348,36 @@ function Cat.step(self: any, dt: number, day: number, hour: number, spider: Spid
 	-- the schedule's place at its own time (behind by its lag while it caught up after a reaction)
 	if self.react == "none" and self.lag > 0 then self.lag = math.max(0, self.lag - dt * Cat.CATCH_UP * HOUR_PER_S) end
 	if self.react ~= "none" then self.lag += dt * HOUR_PER_S end
-	local h = hour - self.lag
+	local h = hour - self.lag + self.advance
 	local dd = day
 	while h < 0 do h += 24; dd -= 1 end
+	while h >= 24 do h -= 24; dd += 1 end
 	local place = Cat.at(self.seed, math.max(dd, 1), h)
+	-- Movement can disturb a nap. Skip the remaining rest, not the trip off the
+	-- furniture: the next authored walk begins at precisely the same perch.
+	local resting = place.pose == "sleep" or place.pose == "rest"
+	local disturbing = self.enabled and spider ~= nil and not spider.hidden
+		and spider.speed >= Cat.WAKE_SPEED and sameRoom(place.pos, spider.pos)
+		and flat(place.pos, spider.pos) <= Cat.NOTICE and math.abs(spider.pos.Y - place.surface) <= Cat.NOTICE_UP
+	self.wakeS = if resting and disturbing then self.wakeS + dt else math.max(0, self.wakeS - dt * 2)
+	if self.react == "none" and resting and self.cooldown <= 0 and self.wakeS >= Cat.WAKE_S then
+		local departure: Segment? = nil
+		local departureDay = math.max(dd, 1)
+		for _, seg in Cat.plan(self.seed, departureDay) do
+			if seg.kind == "walk" and seg.from == place.spot and seg.t0 >= h then departure = seg; break end
+		end
+		-- The final rest is on the sofa; its next departure is tomorrow morning.
+		if departure == nil and place.spot == "sofa" then
+			departureDay += 1
+			departure = Cat.plan(self.seed, departureDay)[2]
+		end
+		if departure ~= nil then
+			self.advance += (departureDay - math.max(dd, 1)) * 24 + departure.t0 - h
+			place = Cat.at(self.seed, departureDay, departure.t0)
+			self.wakeS = 0
+			emit(self, "woke", place.pos)
+		end
+	end
 	-- the stalk's offset comes back to nothing when it is not stalking
 	if self.react == "none" and self.offset.Magnitude > 0 then
 		local back = math.min(self.offset.Magnitude, Cat.WALK_SPEED * dt)
@@ -366,7 +395,7 @@ function Cat.step(self: any, dt: number, day: number, hour: number, spider: Spid
 	local awake = place.pose ~= "sleep" and place.pose ~= "jump"
 	local moving = spider.speed >= Cat.MOVING
 	if self.react == "none" then
-		if awake and self.cooldown <= 0 and moving and not spider.hidden and sameRoom(Cat.head(self), spider.pos)
+		if awake and self.cooldown <= 0 and moving and not spider.hidden and spider.visible ~= false and sameRoom(Cat.head(self), spider.pos)
 			and flat(Cat.head(self), spider.pos) <= Cat.NOTICE and spider.pos.Y - self.surface <= Cat.NOTICE_UP and spider.pos.Y >= self.surface - 5 then
 			self.react, self.reactS, self.stillS, self.highS, self.misses = "watch", 0, 0, 0, 0
 			self.watchS = Cat.WATCH[1] + (Cat.WATCH[2] - Cat.WATCH[1]) * draw(self, 1)
@@ -389,7 +418,9 @@ function Cat.step(self: any, dt: number, day: number, hour: number, spider: Spid
 		self.react, self.cooldown, self.look = "none", Cat.COOLDOWN, nil
 		emit(self, "gave_up", spider.pos)
 	end
-	if spider.hidden then giveUp(); return end
+	-- Losing sight behind a prop stops tracking immediately, including a pat.
+	-- Hearing may wake the cat, but never supplies a target through a wall.
+	if spider.hidden or spider.visible == false then giveUp(); return end
 	self.stillS = if moving then 0 else self.stillS + dt
 	local high = spider.pos.Y - self.surface > Cat.REACH_UP
 	self.highS = if high then self.highS + dt else 0
@@ -500,6 +531,8 @@ end
 function Cat.load(self: any, d: Record)
 	self.notices, self.pats, self.swats, self.lastSwatDay = d.notices, d.pats, d.swats, d.last_swat_day
 	self.react, self.reactS, self.lag, self.offset, self.cooldown, self.look, self.misses = "none", 0, 0, Vector3.zero, 0, nil, 0
+	self.wakeS, self.advance = 0, 0
+	self.spiderPrevious = nil
 	table.clear(self.signals)
 end
 

@@ -1,0 +1,11 @@
+{
+  "source": "1ba2eb3a2b296e72d3cb753e68740b6d62ea8e89",
+  "evidence_id": "06be0270d414ffc2",
+  "playable_sha256": "2f36ff0a4cb8c27bb429d07e68e67255a3a4b6683c36e1bda1e0e737dc6b4322",
+  "source_count": 207,
+  "expected_count": 207,
+  "different_sources": [],
+  "extra_sources": [],
+  "method": "XML source bytes compared to canonical frozen archive after CRLF normalization",
+  "path": "C:\\Users\\natha\\claude-xfer\\v48-release-1ba2eb3\\roblox_port\\TheWindowsill.rbxlx"
+}

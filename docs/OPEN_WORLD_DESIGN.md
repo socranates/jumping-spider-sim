@@ -347,3 +347,7 @@ world). The rule of the draw: rare (one in fifty to one in a thousand a day, eac
 never rerolls, never on day one, never two in a day, never while a rest is kept, told by the senses before the thing, and always with a
 real way out or a real gift. Nothing is a dice death and nothing is a dice win: the chance is in what the world does, the outcome is in
 what the spider does about it. The notebook keeps the count ("things seen once"), nothing else on the HUD.
+
+And (2026-10-20): Nathan has installed Blender on his PC and decided to **save it for the Steam port**. The Roblox game keeps building
+its world from boxes and Roblox's own materials (no mesh uploads for now); Blender is the modelling and rendering tool for the Steam
+build, when that work starts.

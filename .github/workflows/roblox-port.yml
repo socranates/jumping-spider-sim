@@ -1,0 +1,35 @@
+# The Roblox port's CLI checks on every push and pull request: strict types, every module compiles, all the suites.
+# Nothing here runs Roblox; the suites run the shared code under the plain luau CLI with tests/shim.luau (see roblox_port/README.md).
+name: roblox-port
+on:
+  push:
+    paths: ["roblox_port/**", ".github/workflows/roblox-port.yml"]
+  pull_request:
+    paths: ["roblox_port/**", ".github/workflows/roblox-port.yml"]
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    defaults:
+      run:
+        working-directory: roblox_port
+    steps:
+      - uses: actions/checkout@v4
+      - name: Toolchain (luau, luau-lsp, rojo 7.7.1)
+        run: |
+          mkdir -p $HOME/luau $HOME/lsp $HOME/bin && cd $RUNNER_TEMP
+          curl -sSfL -o luau.zip https://github.com/luau-lang/luau/releases/latest/download/luau-ubuntu.zip
+          curl -sSfL -o lsp.zip https://github.com/JohnnyMorganz/luau-lsp/releases/latest/download/luau-lsp-linux-x86_64.zip
+          curl -sSfL -o rojo.zip https://github.com/rojo-rbx/rojo/releases/download/v7.7.1/rojo-7.7.1-linux-x86_64.zip
+          curl -sSfL -o $HOME/lsp/globalTypes.d.luau https://raw.githubusercontent.com/JohnnyMorganz/luau-lsp/main/scripts/globalTypes.d.luau
+          unzip -oq luau.zip -d $HOME/luau && unzip -oq lsp.zip -d $HOME/lsp && unzip -oq rojo.zip -d $HOME/bin
+          chmod +x $HOME/luau/* $HOME/lsp/luau-lsp $HOME/bin/rojo
+      - name: Every module compiles
+        run: bash tools/check.sh compile
+      - name: Strict types
+        run: |
+          out=$(bash tools/check.sh types 2>&1 | grep -v '^\[INFO\]\|didChangeWatchedFiles' || true)
+          echo "$out"
+          test -z "$out"
+      - name: All suites
+        run: python3 tests/run.py $HOME/luau/luau

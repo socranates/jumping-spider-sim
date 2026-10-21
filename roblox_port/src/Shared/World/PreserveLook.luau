@@ -19,6 +19,7 @@
 -- and the meadow, and said so here because from the railway bank they would read as nearer and smaller than they are.
 local Preserve = require(script.Parent.Preserve)
 local Meadow = require(script.Parent.Meadow) -- (ROBLOX-119: the bench patch's backdrop stands in for its walkable boxes)
+local Pond = require(script.Parent.Pond) -- (ROBLOX-122: the pond's water at its true level round the walkable edge)
 
 local PreserveLook = {}
 
@@ -35,7 +36,7 @@ PreserveLook.BUDGETS = table.freeze({
 	bench = { full = 24, low = 14, far = 8, farLow = 8 }, -- (ROBLOX-119: the walkable patch's stand-ins)
 	ground = { full = 90, low = 64, far = 64, farLow = 62 },
 	meadow = { full = 140, low = 70, far = 110, farLow = 64 },
-	pond = { full = 110, low = 40, far = 30, farLow = 24 },
+	pond = { full = 140, low = 40, far = 30, farLow = 24 }, -- (ROBLOX-122: 140, the bank's strips round the walkable edge, the full tier's)
 	compost = { full = 40, low = 26, far = 16, farLow = 16 },
 	woodland = { full = 90, low = 70, far = 64, farLow = 52 },
 	wall = { full = 70, low = 40, far = 30, farLow = 30 },
@@ -418,11 +419,35 @@ local function benchDecor(out: List, _rand: () -> number)
 end
 
 -- ---------------------------------------------------------------- the ground: the mown grass, the meadow's, the wood's and the scrub's floors, the paths, the fences
+-- (ROBLOX-122) The hole the lawn leaves round the pond (metres), the pond's water level and its walkable core and corridor deck (World/Pond: the backdrop draws none of
+-- its own ground or water over them).
+local PONDHOLE = { x0 = 61, x1 = 79, z0 = 29.25, z1 = 45 }
+local WATER_M = (Pond.WATER - Preserve.GROUND_Y) / 100
+local function walkable(x0: number, x1: number, z0: number, z1: number): boolean
+	local cx0, cx1 = Pond.CORE.x0 / 100 + Preserve.ORIGIN_X_M, Pond.CORE.x1 / 100 + Preserve.ORIGIN_X_M
+	local cz0, cz1 = Preserve.NORTH_FACE_M - (Pond.CORE.z1 - Preserve.NORTH_FACE_Z) / 100, Preserve.NORTH_FACE_M - (Pond.CORE.z0 - Preserve.NORTH_FACE_Z) / 100
+	local inCore = x1 > cx0 + 1e-6 and x0 < cx1 - 1e-6 and z1 > cz0 + 1e-6 and z0 < cz1 - 1e-6
+	local inWalk = x1 > 60.65 + 1e-6 and x0 < cx0 - 1e-6 and z1 > 29.25 + 1e-6 and z0 < 30.75 - 1e-6
+	return inCore or inWalk
+end
+
 local function groundDecor(out: List, rand: () -> number)
 	-- the mown grass under everything: 5 by 3 tiles of 20 m (a part is at most 2,048 studs), their tops at the ground
 	for i = 0, 4 do
 		for j = 0, 2 do
-			block(out, `Grass{i}_{j}`, i * 20, i * 20 + 20, j * 20, j * 20 + 20, -0.02, 0, if (i + j) % 2 == 0 then C.mown else "698743", "Grass", { far = true })
+			-- (ROBLOX-122: the two tiles over the pond leave a hole round it, x 61..79 and z 29.25..45 (PONDHOLE), where the pond's own ground lies lower)
+			local color = if (i + j) % 2 == 0 then C.mown else "698743"
+			if i == 3 and j == 1 then
+				block(out, `Grass{i}_{j}`, 60, 80, 20, PONDHOLE.z0, -0.02, 0, color, "Grass", { far = true })
+				block(out, `Grass{i}_{j}w`, 60, PONDHOLE.x0, PONDHOLE.z0, 40, -0.02, 0, color, "Grass", { far = true })
+				block(out, `Grass{i}_{j}e`, PONDHOLE.x1, 80, PONDHOLE.z0, 40, -0.02, 0, color, "Grass", { far = true })
+			elseif i == 3 and j == 2 then
+				block(out, `Grass{i}_{j}`, 60, 80, PONDHOLE.z1, 60, -0.02, 0, color, "Grass", { far = true })
+				block(out, `Grass{i}_{j}w`, 60, PONDHOLE.x0, 40, PONDHOLE.z1, -0.02, 0, color, "Grass", { far = true })
+				block(out, `Grass{i}_{j}e`, PONDHOLE.x1, 80, 40, PONDHOLE.z1, -0.02, 0, color, "Grass", { far = true })
+			else
+				block(out, `Grass{i}_{j}`, i * 20, i * 20 + 20, j * 20, j * 20 + 20, -0.02, 0, color, "Grass", { far = true })
+			end
 		end
 	end
 	-- the floors laid over it (4 mm up): the meadow's tawny ground, the wood's leaf litter, the scrub's
@@ -450,7 +475,7 @@ local function groundDecor(out: List, rand: () -> number)
 				local inCore = math.min(a[1], b[1]) >= 43.75 - 1e-6 and math.max(a[1], b[1]) <= 47.75 + 1e-6 and math.min(a[2], b[2]) >= 5 - 1e-6 and math.max(a[2], b[2]) <= 9 + 1e-6
 				-- (ROBLOX-117: the gravel by the hut, path_gate and path_hut, lies a hair under the walkable gravel of the door's step and the path round the east end,
 				-- World/Hut's, standing in for it where streaming has not sent it; the mown paths are the full tier's, a shade on the mown grass the low tier leaves out)
-				local under = c.id == "path_hut" or c.id == "path_gate"
+				local under = c.id == "path_hut" or c.id == "path_gate" or c.id == "path_cross" -- (ROBLOX-122: and the mown path to the pond, World/Pond's)
 				for s = 1, if inCore then 0 else parts do
 					local t0, t1 = (s - 1) / parts, s / parts
 					n += 1
@@ -550,20 +575,50 @@ end
 -- ---------------------------------------------------------------- the pond (x 62..78, z 30..44) and the boardwalk along its south (z 30)
 local function pondDecor(out: List, rand: () -> number)
 	local P = Preserve.POND
-	-- the mud margin, the water's surface (flat lenses whose tops lie a few millimetres over the grass), the lily rafts
-	add(out, "Margin", Vector3.new((P.rx * 2 + 1.6) * 100, 6, (P.rz * 2 + 1.6) * 100), M(P.x, P.z, -0.024), C.mud, "Mud", { far = true }, "Ellipsoid")
-	add(out, "Water", Vector3.new(P.rx * 2 * 100, 6, P.rz * 2 * 100), M(P.x, P.z, -0.018), C.water, "SmoothPlastic", { far = true, reflectance = 0.32 }, "Ellipsoid")
+	-- (ROBLOX-122) the water at its true level, 6 cm under the lawn (World/Pond.WATER): the lawn leaves a hole round the pond (groundDecor's PONDHOLE), the pond's own
+	-- mud floor lies in it under the water, the water a flat lens a hair under the walkable margin's own (its gaps filled by World/Pond's looks), and near at the full
+	-- tier the bank in strips a metre wide from the hole's edge to the shore, a millimetre under the walkable bank; none of it over the walkable core and deck (World/Pond)
+	local H = PONDHOLE
+	block(out, "Basin", H.x0, H.x1, H.z0, H.z1, WATER_M - 0.03, WATER_M - 0.006, C.mud, "Mud", { far = true })
+	add(out, "Water", Vector3.new(P.rx * 2 * 100, 0.6, P.rz * 2 * 100), M(P.x, P.z, WATER_M - 0.006), C.water, "Glass", { far = true, reflectance = 0.25, transparency = 0.35 }, "Ellipsoid")
+	for x = H.x0, H.x1 - 1 do
+		local mid = x + 0.5
+		local dx = (mid - P.x) / P.rx
+		local zs, zn = H.z1, H.z1
+		if math.abs(dx) < 1 then
+			local half = P.rz * math.sqrt(1 - dx * dx)
+			zs, zn = P.z - half, P.z + half
+		end
+		local function bank(id: string, z0: number, z1: number)
+			if z1 - z0 < 0.05 then return end
+			-- (cut round the walkable core and the corridor's deck)
+			local cuts = { { z0, z1 } }
+			if walkable(x, x + 1, z0, z1) then
+				local cz1 = Preserve.NORTH_FACE_M - (Pond.CORE.z0 - Preserve.NORTH_FACE_Z) / 100
+				local over = if x >= 63.999 then cz1 else 30.75
+				cuts = { { math.max(z0, over), z1 } }
+			end
+			for k, c in cuts do
+				if c[2] - c[1] > 0.05 then block(out, `{id}{k}`, x, x + 1, c[1], c[2], WATER_M, (Pond.GROUND - Preserve.GROUND_Y) / 100 - 0.001, C.mud, "Ground", { full = true }) end
+			end
+		end
+		bank(`BankS{x}`, H.z0, math.min(zs, H.z1))
+		if zn < H.z1 then bank(`BankN{x}`, zn, H.z1) end
+	end
 	for i = 1, 3 do
 		local a = between(rand, 0, 2 * math.pi)
 		local r = between(rand, 0.25, 0.6)
-		blob(out, "LilyRaft" .. i, P.x + math.cos(a) * P.rx * r, P.z + math.sin(a) * P.rz * r, 0.013, between(rand, 1.2, 2.4), 0.02, between(rand, 0.9, 1.8), C.lily, { far = true })
+		local x, z = P.x + math.cos(a) * P.rx * r, P.z + math.sin(a) * P.rz * r
+		if not walkable(x - 1.2, x + 1.2, z - 0.9, z + 0.9) then blob(out, "LilyRaft" .. i, x, z, WATER_M + 0.001, between(rand, 1.2, 2.4), 0.02, between(rand, 0.9, 1.8), C.lily, { far = true }) end
 	end
 	for i = 1, 10 do
 		local a = between(rand, 0, 2 * math.pi)
 		local r = between(rand, 0.2, 0.75)
 		local s = between(rand, 0.18, 0.3)
-		add(out, "Lily" .. i, Vector3.new(1.2, s * 100, s * 100), M(P.x + math.cos(a) * P.rx * r, P.z + math.sin(a) * P.rz * r, 0.016), "56833f", "SmoothPlastic",
-			{ full = true }, "Cylinder", Vector3.new(0, 0, 90))
+		local x, z = P.x + math.cos(a) * P.rx * r, P.z + math.sin(a) * P.rz * r
+		if not walkable(x - s, x + s, z - s, z + s) then
+			add(out, "Lily" .. i, Vector3.new(0.4, s * 100, s * 100), M(x, z, WATER_M + 0.002), "56833f", "SmoothPlastic", { full = true }, "Cylinder", Vector3.new(0, 0, 90))
+		end
 	end
 	-- the cattails and reeds round the north and east margins (none along the boardwalk), their brown heads near
 	local m = 0
@@ -580,22 +635,31 @@ local function pondDecor(out: List, rand: () -> number)
 			end
 		end
 	end
-	-- the boardwalk: a deck 1.5 m wide 40 cm over the ground on posts, its boards' seams near; the dipping platform out over the water with rails on three sides
-	block(out, "Boardwalk", 61, 79, 29.25, 30.75, 0.34, 0.4, C.board, "WoodPlanks", { far = true })
+	-- the boardwalk: a deck 1.5 m wide 40 cm over the ground on posts, its boards' seams near; the dipping platform out over the water with rails on three sides.
+	-- (ROBLOX-122: from its west end to x 68 it is World/Pond's, walkable: the backdrop's deck lies under its boards there (a stand-in until they are streamed) and its
+	-- posts and seams begin east of it)
+	local deckTop = (Pond.DECK - Pond.BOARD.thick - Preserve.GROUND_Y) / 100 - 0.002
+	block(out, "Boardwalk", 60.65, 79, 29.25, 30.75, deckTop - 0.06, deckTop, C.board, "WoodPlanks", { far = true })
 	for k = 0, 6 do
 		local x = 61.2 + k * 2.93
-		post(out, `WalkPost{k}a`, x, 29.3, 0, 0.34, 0.12, C.boardDark, "Wood")
-		post(out, `WalkPost{k}b`, x, 30.7, 0, 0.34, 0.12, C.boardDark, "Wood", { full = true })
+		if x > 68.1 then
+			post(out, `WalkPost{k}a`, x, 29.3, 0, deckTop - 0.06, 0.12, C.boardDark, "Wood")
+			post(out, `WalkPost{k}b`, x, 30.7, WATER_M - 0.03, deckTop - 0.06, 0.12, C.boardDark, "Wood", { full = true })
+		end
 	end
 	for k = 1, 14 do
 		local x = 61 + k * 18 / 15
-		block(out, "Seam" .. k, x - 0.006, x + 0.006, 29.26, 30.74, 0.4, 0.402, "5a4a38", "WoodPlanks", { full = true })
+		if x > 68.05 then block(out, "Seam" .. k, x - 0.006, x + 0.006, 29.26, 30.74, deckTop, deckTop + 0.002, "5a4a38", "WoodPlanks", { full = true }) end
 	end
 	block(out, "Platform", 68, 71, 30.75, 33.25, 0.34, 0.4, C.board, "WoodPlanks", { far = true })
-	block(out, "RailWest", 68, 68.06, 30.75, 33.25, 0.4, 1.0, C.boardDark, "Wood")
-	block(out, "RailEast", 70.94, 71, 30.75, 33.25, 0.4, 1.0, C.boardDark, "Wood")
-	block(out, "RailNorth", 68, 71, 33.19, 33.25, 0.85, 0.95, C.boardDark, "Wood", { far = true })
-	for k, x in { 68.1, 70.9 } do post(out, "PlatformPost" .. k, x, 33.1, -0.3, 0.34, 0.12, C.boardDark, "Wood", { full = true }) end
+	-- (ROBLOX-122: open rails, a top rail and a mid rail on posts, where there were solid panels a spider's eye read as walls)
+	for _, x in { 68.03, 70.97 } do
+		block(out, `RailTop{x}`, x - 0.03, x + 0.03, 30.75, 33.25, 0.94, 1.0, C.boardDark, "Wood")
+		block(out, `RailMid{x}`, x - 0.025, x + 0.025, 30.75, 33.25, 0.66, 0.71, C.boardDark, "Wood", { full = true })
+		for _, z in { 30.8, 32.0, 33.2 } do post(out, `RailPost{x}_{z}`, x, z, 0.4, 1.0, 0.07, C.boardDark, "Wood") end
+	end
+	block(out, "RailNorth", 68, 71, 33.19, 33.25, 0.94, 1.0, C.boardDark, "Wood", { far = true })
+	for k, x in { 68.1, 70.9 } do post(out, "PlatformPost" .. k, x, 33.1, WATER_M - 0.2, 0.34, 0.12, C.boardDark, "Wood", { full = true }) end
 end
 
 -- ---------------------------------------------------------------- the woodland (x 0..18, z 5..55): the bur oak, the maples, the black cherry, the log pile

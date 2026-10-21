@@ -283,6 +283,8 @@ Meadow.HUT_SEAMS = table.freeze({
 	table.freeze({ hut = "path_m4", id = "pad_a2", a = v(-88, GT, -816), b = v(-32, GT, -816) }),
 })
 for _, s in Meadow.HUT_SEAMS do seam(s.hut, s.id, s.a, s.b) end
+-- (ROBLOX-122) the mown path east to the pond leaves the bench patch's gravel at pad_b3's east edge (World/Pond's mown_e1, which lists this seam on its own side)
+seam("pad_b3", "mown_e1", v(90, GT, -1011), v(90, GT, -935))
 
 do
 	-- the pad's cells to one another, flat on the gravel (row c's lines between columns on the gravel south of the slab)

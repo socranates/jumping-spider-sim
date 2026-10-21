@@ -35,6 +35,7 @@ local Flora = require(script.Parent.Parent.Data.Flora)
 local WorldMap = require(script.Parent.WorldMap)
 local Hut = require(script.Parent.Hut) -- (ROBLOX-116: the preserve's hut garden lives by the same questions; its answers are World/Hut's)
 local Meadow = require(script.Parent.Meadow) -- (ROBLOX-119: and the meadow's edge and the bench patch, World/Meadow's)
+local Pond = require(script.Parent.Pond) -- (ROBLOX-122: and the pond's edge, World/Pond's)
 
 local Garden = {}
 
@@ -2405,6 +2406,7 @@ end
 function Garden.bestiary(region: WorldMap.Region): { KindSpec }?
 	if Hut.knows(region.kind) then return Hut.bestiary(region :: any) :: any end -- (ROBLOX-116)
 	if Meadow.knows(region.kind) then return Meadow.bestiary(region :: any) :: any end -- (ROBLOX-119)
+	if Pond.knows(region.kind) then return Pond.bestiary(region :: any) :: any end -- (ROBLOX-122)
 	local rows = (Garden.BESTIARY :: any)[region.kind]
 	if rows == nil then return nil end
 	local key = region.id .. "/" .. tostring(region.seed)
@@ -2638,6 +2640,7 @@ local ambientCache: { [string]: { AmbientSpec } } = {}
 function Garden.ambient(region: WorldMap.Region): { AmbientSpec }?
 	if Hut.knows(region.kind) then return Hut.ambient(region :: any) :: any end -- (ROBLOX-116)
 	if Meadow.knows(region.kind) then return Meadow.ambient(region :: any) :: any end -- (ROBLOX-119: the ants at their hill)
+	if Pond.knows(region.kind) then return Pond.ambient(region :: any) :: any end -- (ROBLOX-122: the water striders)
 	local rows = (Garden.AMBIENT :: any)[region.kind]
 	if rows == nil or region.kind == "order" or region.kind == "budget" then return nil end
 	local key = region.id .. "/" .. tostring(region.seed)

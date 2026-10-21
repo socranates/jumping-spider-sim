@@ -418,6 +418,60 @@ if PRESERVE then
 	end
 end
 
+-- ROBLOX-122 (--preserve): the pond's edge's life: the midges, mosquitoes and damselflies on their start perches (the midges and mosquitoes in the air over the water
+-- with POND_DUSK, as from dusk), the water striders half a minute out on the open water at noon, the green frog on its seat on day 1 and the green darner over the
+-- pond (Client/PondBodies); the views pd_frog and pd_frog_far at the frog where the day puts it.
+if PRESERVE then
+	local Pond = require("../src/Shared/World/Pond")
+	local Skater = require("../src/Shared/Prey/Skater")
+	local Frog = require("../src/Shared/Predator/Frog")
+	local PondBodies = require("../src/Client/PondBodies")
+	local tiered = FlyBodies.new(flyFolder, DETAIL)
+	local all = {}
+	for _, region in WorldMap.regions() do
+		if Pond.knows(region.kind) then
+			for _, k in Garden.bestiary(region) or {} do
+				local d = PreyDirector.engine(outside, (Species :: any)[k.profile], k.seed, if DETAIL == "low" then k.low else k.target, false, k)
+				for i, f in d.flies do
+					if POND_DUSK and (k.kind == "midge" or k.kind == "mosquito") then
+						local a = i * 2.1
+						f.position = f.position + Vector3.new(math.cos(a) * 9, 14 + (i % 3) * 5, math.sin(a) * 9)
+						f.heading = Vector3.new(-math.sin(a), 0, math.cos(a))
+						f.state = "FLEE"
+					end
+					table.insert(all, f)
+				end
+			end
+		end
+	end
+	tiered:draw(all, 0.37)
+	local skaters = {}
+	for _, id in { "pond_b3", "pond_c2" } do
+		local r = WorldMap.region(id) :: any
+		local spec = (Garden.ambient(r) :: any)[1]
+		local sk = Skater.new(spec, if DETAIL == "low" then spec.low else spec.full)
+		for _ = 1, 60 * 30 do sk:step(1 / 60, Vector3.zero, { hour = 12 }) end
+		for _, a in sk:creatures() do table.insert(skaters, a) end
+	end
+	BugBodies.new(flyFolder, DETAIL):draw(skaters, 30)
+	local frog = Frog.new(WorldMap.seed(WorldMap.SEED, "frog"))
+	frog:step(1 / 60, 1, nil)
+	local bodies = PondBodies.new(flyFolder, DETAIL)
+	local dAt, dHeading = Pond.darner(914, 7.0, 12)
+	bodies:draw(frog, nil, dAt, dHeading, 1.0)
+	local fp = frog.pos
+	local side = Vector3.new(-frog.rest.Z, 0, frog.rest.X)
+	local eye = fp + frog.rest * 16 + side * 9 + Vector3.new(0, 7, 0)
+	EXTRA_VIEWS ..= string.format(" VIEW pd_frog %.3f %.3f %.3f %.3f %.3f %.3f 45", eye.X, eye.Y, eye.Z, fp.X, fp.Y + 2.5, fp.Z)
+	local far = fp + frog.rest * 45 + side * 20 + Vector3.new(0, 18, 0)
+	EXTRA_VIEWS ..= string.format(" VIEW pd_frog_far %.3f %.3f %.3f %.3f %.3f %.3f 55", far.X, far.Y, far.Z, fp.X, fp.Y + 2, fp.Z)
+	if dAt ~= nil then
+		local de = dAt + Vector3.new(30, 10, 40)
+		EXTRA_VIEWS ..= string.format(" VIEW pd_darner %.3f %.3f %.3f %.3f %.3f %.3f 40", de.X, de.Y, de.Z, dAt.X, dAt.Y, dAt.Z)
+	end
+	PRESERVE_COUNTS ..= `; the pond's prey {#all}, striders {#skaters}, the frog on {Pond.FROG_SITES[frog.seat].piece} at {fp}`
+end
+
 -- ROBLOX-114 (scene.py --lineup): every creature of the game side by side on a white card far off at x 400, facing +X (so a camera in front, at +z, sees each
 -- one's length along the ruler), next to a ruler of 1 cm ticks (every fifth longer, every tenth longest; millimetre ticks on the small row's). Two rows: the small
 -- (z 0: the aphid to the ladybird, the peacock spider and the ant mimic at their first and last growth stages, the peacock's mate) and the big (z 12: the first spider at every

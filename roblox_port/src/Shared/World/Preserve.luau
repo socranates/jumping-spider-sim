@@ -94,7 +94,7 @@ Preserve.HOME_RANGES = table.freeze({
 	home(1, "ranger_hut", "Ranger hut", "hut", 45.75, 3.5, 3.5),
 	home(2, "hut_garden", "Hut garden", "hut_garden", 45.75, 7, 4), -- (ROBLOX-116: in front of the north window, World/Hut's core: x 43.75..47.75, z 5..9)
 	home(3, "meadow", "Meadow", "meadow", 45.15, 18.5, 5), -- (ROBLOX-119: the meadow's edge north of the bench patch, World/Meadow's core: x 42.65..47.65, z 16..21; it was 31, 40)
-	home(4, "pond_edge", "Pond edge", "pond", 77, 42, 4),
+	home(4, "pond_edge", "Pond edge", "pond", 66, 31.25, 4), -- (ROBLOX-122: where the boardwalk runs along the pond's south shore, World/Pond's core: x 64..68, z 29.25..33.25; it was 77, 42)
 	home(5, "log_pile", "Log pile and woodland floor", "woodland", 10, 29.5, 4),
 	home(6, "veteran_oak", "Veteran oak", "woodland", 14, 42, 3),
 	home(7, "stone_wall", "Stone retaining wall", "wall", 92, 50, 5),
@@ -116,13 +116,14 @@ Preserve.CORRIDORS = table.freeze({
 	-- (ROBLOX-119: they leave the bench patch's gravel at its west and east edges, World/Meadow's pad, north of the garden's split-rail fence)
 	corridor("path_loop", "mown", 1.4, { { 43.6, 15.3 }, { 40, 16 }, { 22, 16 }, { 20.4, 17.6 }, { 20, 20 }, { 20, 46 }, { 21.2, 48.4 },
 		{ 24, 49 }, { 58, 49 }, { 60.4, 47.8 }, { 61, 46 }, { 61, 30 } }),
-	corridor("path_cross", "mown", 1.4, { { 46.7, 15.2 }, { 58, 15.2 }, { 60.4, 15.8 }, { 61, 17 }, { 61, 29 } }),
+	-- (ROBLOX-122: walkable, World/Pond's mown_e1..e15 and mown_n1..n14: east from the bench patch's gravel along z 14.64 and north along x 61.15 to the boardwalk)
+	corridor("path_cross", "mown", 1.4, { { 46.65, 14.64 }, { 61.15, 14.64 }, { 61.15, 29.25 } }),
 	-- (round the hut's east end and in through the hut garden's core, World/Hut's gravel path: west along z 6.71 and north along x 45.15, 0.5 to 0.6 m wide; its points
 	-- break at the core's edges, x 47.75 and z 9, ROBLOX-116. ROBLOX-117: walkable round the east end too, World/Hut.WALK: along the south wall's foot at z 1.67 from
 	-- the door, north along x 48.4 and in at z 6.55)
 	-- (ROBLOX-118: round the back room's east end instead, along x 51.35, World/Hut.WALK)
 	corridor("path_hut", "gravel", 0.6, { { 45.5, 1.67 }, { 51.35, 1.67 }, { 51.35, 6.55 }, { 47.75, 6.55 }, { 45.15, 6.55 }, { 45.15, 9 }, { 45.15, 13 } }),
-	corridor("boardwalk", "boardwalk", 1.5, { { 61, 30 }, { 79, 30 } }),
+	corridor("boardwalk", "boardwalk", 1.5, { { 60.65, 30 }, { 79, 30 } }), -- (ROBLOX-122: walkable from its west end to x 68, World/Pond's walk_* and deck_*)
 	corridor("path_wall", "mown", 1.2, { { 79, 30 }, { 90, 30 } }),
 	corridor("hedge_base", "hedge", 0.8, { { 0.6, 1 }, { 0.6, 59 } }),
 	corridor("wall_top", "stone", 0.5, { { 93, 5 }, { 93, 55 } }),

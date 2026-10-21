@@ -1013,3 +1013,49 @@ run in Studio.**
 - The robin is the open ground's bird; the design's other birds (a treecreeper on the oak, the heron) wait for their zones.
 - A mate still comes only to the hut garden, and the egg sac and the hatching are still drawn in the sill's crack wherever the spider rested: a lineage that ballooned to the meadow has its family at the hut. Say if the mate and the sac should follow the spider's home.
 - Ballooning lands only in the hut garden and the meadow's edge (only built zones); the pond, the oak and the wall join as they are built.
+
+
+## The pond's edge, the boardwalk and the mown path to it; the water and the frog (ROBLOX-122, 2026-10-21)
+
+Claude → Chet, 2026-10-21, branch `claude/preserve-d1`. Phase D, round 1 of `docs/PARK_WORLD_DESIGN.md`. The pond is walkable at its south shore (home range 4, x 64..68 m and
+z 29.25..33.25 m, `Shared/World/Pond`), and the spider can walk there from the meadow: from the bench patch's gravel a mown path (a metre wide, coarse: cut lawn with tufts, a
+plantain or a clover) runs east 15 m and north 13.5 m to the boardwalk's west end; it climbs the boardwalk's 40 cm fascia and walks its boards (14 cm wide, a centimetre's gap
+between, one wider gap a home; a kerb rail along each edge on spacer blocks; posts and beams under it) east into the pond's edge. North of the boardwalk the margin: the mud bank
+in strips stepping down to the water (lawn level, damp mud 3 cm lower, wet mud a centimetre over the water), wet stones at the waterline (a flat one the frog sits on), sedge
+and soft rush, two stands of common cattails (leaves 1.5 cm wide and 1.5 to 2.2 m tall, the brown spike 18 cm), lily pads 15 to 27 cm across (they float: a spider stands on
+one), a water lily's flower, duckweed and floating seeds near the spider. **The water is no surface to stand on**: a spider whose body goes under it (walking off a pad, down a
+stem, or a jump into it) struggles there for three seconds; then, by a seeded draw, it climbs out onto a stem, a stone, a pad or the bank it can reach (within 4 cm; a fall from
+higher than 20 cm halves the chance) or, in Normal, drowns: "The water held on." (a long fall into open water always does). On Easy and in free play it is always pulled out.
+The pond's life: midges and mosquitoes on the rushes and the cattails, hanging in the air over the water from dusk; eastern forktail damselflies on the cattails by day (a big,
+wary, thrashing catch); water striders skating the open water, which come toward a struggling spider's ripples; a green frog (7.8 cm) sitting still on its stone or a lily pad,
+which turns to face a spider that moves near it and strikes with its tongue if it keeps moving within 11 cm (Normal: "The frog's tongue was quicker."; Easy and Free: it misses);
+a green darner patrolling over the pond by day (drawn only). Seven notebook pages. The robin now also forages on the mown path. Ballooning may land at the pond's edge (1 family
+in 200). **Nothing of it has run in Studio.**
+
+## Your Studio checklist (ROBLOX-122)
+
+1. **The walk to the pond**: from the bench patch's gravel walk east onto the mown path (or put the spider at x 800, z -980) and on to the boardwalk; climb its fascia and walk
+   its boards east. Say whether the motor crosses the boards' gaps smoothly, whether the climb up the fascia and over the edge works, and how long the walk feels.
+2. **The pond's edge from the boardwalk**: stand on the kerb rail at the north edge (about x 2075, z -2587) and look out. Screenshot it. Say whether the water reads as water (its
+   transparency, Roblox's reflections), whether the bank's steps read as mud, and whether the cattails, pads and the lily look right at true size.
+3. **Falling in**: walk off a lily pad's edge (pond_a3's pad, x about 2103, z -2653) into the water, in Easy first: the spider should be held at the surface splashing (the caption
+   "[splashing at the surface]") for three seconds and then put on something it can reach with "You scrambled out of the water." or "The ripples carried you to something to
+   climb.". Then in Normal: a slip by a pad mostly gets out; jump from the boardwalk into open water and it should drown with the card "The water held on.". Say whether it is
+   fair, and whether the striders come toward you while you struggle.
+4. **The frog**: it sits on the flat stone at the water's edge (pond_a2) or the big pad (pond_b4), by the day. Walk near it in the open: it turns to face you; keep moving within
+   about 11 cm and its tongue strikes. Keep still and it gives up. In Normal "The frog's tongue was quicker."; on Easy it misses and you jump clear. Screenshot it close.
+5. **The pond's life at dusk**: from 18:30 midges and mosquitoes leave the stems and hang over the water; catch one. By day try a damselfly on the cattails: it should see you far
+   off, and a catch should thrash hard. Say how many taps a second it takes.
+6. **The homes**: the wide gap in the boardwalk (deck_s2), under the flat stone on the bank (pond_a2) and under the dead cattail leaf (pond_a1): rest in each and return to it.
+7. **The self-test** (`workspace:SetAttribute("SelfTest", true)`, Play): 245 checks, among them `the mown path and the boardwalk`, `the water`, `the pond's life`, `the green frog`
+   and a region check for each of the 61 new regions. Paste the INFO lines and the frame time near the pond.
+
+## Open for Nathan (ROBLOX-122)
+
+- The water's numbers are the game's: three seconds of struggle, a reach of 4 cm, a 90% chance at a stem's foot falling to 40% at 4 cm, halved after a fall of more than 20 cm.
+  Say whether drowning in Normal is too harsh, or should come only after a longer struggle.
+- The jump's aim still offers the pond's bed under the water as a landing (the planner sees the bed's box through the drawn water): a jump there ends in the water. Say if the aim
+  should refuse water instead.
+- The frog is one of two danger kinds the design names for the pond; the fishing spider (which does run on the water) waits for a later round, as do mayflies, rain and worms.
+- The bank is boxes in steps (strips 20 cm wide, three levels): honest to walk, blocky to look at from close. Meshes from Blender would make it a slope.
+- The mown path is coarse (cut lawn with a few tufts): the design's corridor detail. Say if it should be as rich as the cores.

@@ -176,6 +176,14 @@ garden about three times in four, the meadow's edge the rest, only built zones) 
 **Phase D — water (2–3 rounds).** Zone 4 (the pond edge and the boardwalk), water as a surface, the frog, damselflies, midges; weather
 (rain makes worms and stops hunting).
 
+*Round 1 built (ROBLOX-122, 2026-10-21, not yet run in Studio):* the pond's edge (home range 4, moved to where the boardwalk meets the shore: x 64..68, z 29.25..33.25 m;
+`World/Pond`) at true size: the boardwalk's boards with their gaps, kerb rails, beams and posts, the mud bank stepping down to the waterline, wet stones, sedge and soft rush, two
+stands of cattails, lily pads (walkable: they float) and a water lily; the water drawn at its true level, 6 cm under the lawn, and no surface to stand on (`Life/Water`: a
+struggle, then a seeded way out onto what the spider can reach, or in Normal drowning); the corridor from the meadow (the mown path from the bench patch's gravel to the
+boardwalk, and the boardwalk on to the pond); midges and mosquitoes at dusk, damselflies, water striders drawn to a struggling spider's ripples, the green frog
+(`Predator/Frog`), a green darner over the water; seven pages. Ballooning lands there now and then. Left for round 2: rain and worms, mayflies, the fishing spider, the dipping
+platform walkable.
+
 **Phase E — dead wood and the old tree (3 rounds).** Zones 5 and 6, the centipede and the ground beetle as threats, bark as a vertical world,
 the bird.
 
@@ -217,6 +225,13 @@ the Steam edition (the canal, the apartment balconies and window boxes, a roofto
 5. Lock-on moves to **L2** on controllers (Nathan, 2026-10-20), in Phase A's first round.
 
 ## 11. Progress
+
+- **ROBLOX-122 (Phase D, round 1)**: the pond's edge and the boardwalk walkable (`World/Pond`), the mown path from the bench patch (a corridor), the water (`Life/Water`, `UI/WaterText`),
+  the pond's life (`Data/Species.midge_prototype`, `mosquito_prototype`, `damselfly_prototype` and their `Data/FlyLook` sheets; `Prey/Skater`), the green frog (`Predator/Frog`,
+  `UI/FrogText`, drawn with the darner by `Client/PondBodies`). 207 regions, 321 seams. Decisions taken in the build: home range 4 moved to the shore where the boardwalk runs (it was
+  planned at the pond's far north-east); the water a drawn surface with no box (a struggle when the body goes under it), its chances the game's; the bank in strips stepping to the
+  waterline (boxes); the corridor coarse (a metre of cut lawn); the frog strikes only what moves (the sources' frog eye); damselflies a hard, big catch rather than none; the darner
+  drawn only, no danger. `docs/DECISIONS.md` ROBLOX-122; `docs/HANDOFF-roblox-world.md` has the Studio checklist.
 
 - **ROBLOX-120 (Phase C, round 2)**: the robin (`Predator/Bird`, `Client/BirdBody`, `UI/BirdText`), the field cricket (`Data/Species.cricket_prototype` and its night's, `Prey/PreyKinds`'
   ear and kick, `Data/FlyLook.small.cricket`, in `World/Hut` and `World/Meadow`), ballooning (`Life/Ballooning`, the card's "Follow one", the ride, `life.start_zone`). Decisions taken in

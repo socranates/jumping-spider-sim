@@ -29,6 +29,7 @@ local Millipede = require(script.Parent.Millipede)
 local Snail = require(script.Parent.Snail)
 local Harvestman = require(script.Parent.Harvestman)
 local Ant = require(script.Parent.Ant) -- (ROBLOX-119: the meadow's ants)
+local Skater = require(script.Parent.Skater) -- (ROBLOX-122: the pond's water striders)
 local Species = require(script.Parent.Parent.Data.Species)
 local Garden = require(script.Parent.Parent.World.Garden)
 local Region = require(script.Parent.Parent.World.Region)
@@ -37,7 +38,7 @@ local PreyWorld = {}
 PreyWorld.__index = PreyWorld
 
 -- (ROBLOX-105) The ambient colonies' classes by kind.
-PreyWorld.AMBIENT = { ladybird = Ladybird, millipede = Millipede, snail = Snail, harvestman = Harvestman, ant = Ant } :: { [string]: any }
+PreyWorld.AMBIENT = { ladybird = Ladybird, millipede = Millipede, snail = Snail, harvestman = Harvestman, ant = Ant, skater = Skater } :: { [string]: any }
 -- (ROBLOX-105) Whether the woodlice and the ambient bugs are shown to the spider's senses (see the head of this file: they are not).
 PreyWorld.SENSED = false
 
@@ -213,7 +214,8 @@ function PreyWorld.ambient(self: any, id: string): { any }
 			elseif spec.kind == "millipede" and soil ~= nil then c = Millipede.new(spec, count, soil, boxes :: any)
 			elseif spec.kind == "snail" and soil ~= nil then c = Snail.new(spec, count, soil, boxes :: any)
 			elseif spec.kind == "harvestman" then c = Harvestman.new(spec, count, soil, boxes)
-			elseif spec.kind == "ant" and soil ~= nil then c = Ant.new(spec, count, soil, boxes) end
+			elseif spec.kind == "ant" and soil ~= nil then c = Ant.new(spec, count, soil, boxes)
+			elseif spec.kind == "skater" then c = Skater.new(spec, count) end
 			if c ~= nil then
 				entry = entry or {}
 				entry.ambient = entry.ambient or {}
@@ -259,7 +261,7 @@ function PreyWorld.before(self: any, dt: number, position: Vector3, observer: an
 			local aphids = {}
 			local d = self:director(id)
 			if d ~= nil then for _, f in d.flies do table.insert(aphids, f) end end
-			local ctx = { hour = self.hour, flies = aphids, plants = if region ~= nil then Garden.plants(region) else nil }
+			local ctx = { hour = self.hour, flies = aphids, plants = if region ~= nil then Garden.plants(region) else nil, ripple = self.ripple } -- (ROBLOX-122: `ripple`, a spider struggling in the water: Life/Water)
 			for _, c in list do c:step(dt, position, ctx) end
 		end
 	end

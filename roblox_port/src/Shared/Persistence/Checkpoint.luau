@@ -79,8 +79,10 @@ local Millipedes = require(script.Parent.Parent.Prey.Millipede)
 local Snails = require(script.Parent.Parent.Prey.Snail)
 local Harvestmen = require(script.Parent.Parent.Prey.Harvestman)
 local Ants = require(script.Parent.Parent.Prey.Ant) -- (ROBLOX-119: the meadow's ants)
+local Skaters = require(script.Parent.Parent.Prey.Skater) -- (ROBLOX-122: the pond's water striders)
 local Garden = require(script.Parent.Parent.World.Garden)
 local Ballooning = require(script.Parent.Parent.Life.Ballooning) -- (ROBLOX-120: a generation's start)
+local Water = require(script.Parent.Parent.Life.Water) -- (ROBLOX-122: the water's falls counted)
 
 local RivalSpider = require(script.Parent.Parent.Predator.RivalSpider)
 local Mate = require(script.Parent.Parent.Predator.Mate)
@@ -103,6 +105,7 @@ Checkpoint.CLASSES = {
 	PerchGraph = PerchGraph, Feeding = Feeding, PreyDirector = PreyDirector, Woodlice = Woodlice,
 	Ladybirds = Ladybirds, Millipedes = Millipedes, Snails = Snails, Harvestmen = Harvestmen, -- (ROBLOX-105)
 	Ants = Ants, -- (ROBLOX-119)
+	Skaters = Skaters, -- (ROBLOX-122)
 	Sensor = Sensor, SensorCore = SensorCore, ObservationMemory = ObservationMemory, Contact = ObservationMemory.Contact,
 	Observation = Observation,
 	NeedsModel = NeedsModel, LifeLoop = LifeLoop, LifeClock = LifeClock, Growth = Growth,
@@ -115,6 +118,7 @@ export type World = {
 	breakaway: any?,
 	wasp: any?, -- the WaspDirector (nil: no wasp in this world)
 	cat: any?, -- (ROBLOX-118) the ranger's cat, Predator/Cat (nil: no cat in this world: the test garden)
+	water: any?, -- (ROBLOX-122) the water, Life/Water: its falls counted (nil: no pond in this world: the test garden)
 	garden: { [string]: any }?, -- ROBLOX-96: the regions' prey and bugs outside the sill (Prey/PreyWorld's table; nil: a world of the sill alone)
 	extraRefs: { [string]: any }?, -- anything else the world's state points at that the record should keep by name
 }
@@ -129,7 +133,9 @@ function Checkpoint.refs(world: World): { [string]: any }
 	-- (ROBLOX-101: the bestiary's prey, by day and from dusk)
 	for _, pair in { { "springtailProfile", Species.springtail_prototype }, { "leafhopperProfile", Species.leafhopper_prototype }, { "mothProfile", Species.moth_prototype },
 		{ "mothDuskProfile", Species.moth_dusk_prototype }, { "craneFlyProfile", Species.crane_fly_prototype }, { "craneFlyDuskProfile", Species.crane_fly_dusk_prototype },
-		{ "hoverflyProfile", Species.hoverfly_prototype } } :: { { any } } do -- (ROBLOX-117: the hut garden's hoverflies)
+		{ "hoverflyProfile", Species.hoverfly_prototype }, -- (ROBLOX-117: the hut garden's hoverflies)
+		{ "midgeProfile", Species.midge_prototype }, { "midgeDuskProfile", Species.midge_dusk_prototype }, { "mosquitoProfile", Species.mosquito_prototype },
+		{ "mosquitoDuskProfile", Species.mosquito_dusk_prototype }, { "damselflyProfile", Species.damselfly_prototype } } :: { { any } } do -- (ROBLOX-122: the pond's)
 		local name: string, profile: any = pair[1], pair[2]
 		ObjectRecord.constants(name, profile, refs)
 	end
@@ -281,6 +287,7 @@ function Checkpoint.capture(world: World, createdAt: number?): ({ [string]: any 
 		breakaway = if world.breakaway then world.breakaway:record() else nil,
 		wasp = if world.wasp ~= nil then world.wasp:toRecord() else nil,
 		cat = if world.cat ~= nil then world.cat:toRecord() else nil, -- (ROBLOX-118: optional; a test garden rest has none)
+		water = if world.water ~= nil then world.water:toRecord() else nil, -- (ROBLOX-122: optional; a test garden rest has none)
 	}, nil
 end
 
@@ -411,7 +418,7 @@ local function checkWorld(roots: { [string]: any }, problems: { string })
 					else
 						local known: { [string]: boolean } = {}
 						for _, a in (Garden.ambient(region) or {}) :: { any } do known[a.kind] = true end
-						local classes = { ladybird = Ladybirds, millipede = Millipedes, snail = Snails, harvestman = Harvestmen, ant = Ants } :: { [string]: any }
+						local classes = { ladybird = Ladybirds, millipede = Millipedes, snail = Snails, harvestman = Harvestmen, ant = Ants, skater = Skaters } :: { [string]: any }
 						for kind, c in entry.ambient do
 							if type(kind) ~= "string" or not known[kind] then bad(`garden: {id} has no ambient bug of the kind {tostring(kind)}`)
 							elseif getmetatable(c) ~= classes[kind] then bad(`garden: {id}'s {kind} is not a colony of its kind`)
@@ -487,6 +494,9 @@ function Checkpoint.check(record: any, world: World): ({ string }, ObjectRecord.
 	if record.cat ~= nil then
 		for _, text in Cat.problems(record.cat) do bad(text) end
 	end
+	if record.water ~= nil then
+		for _, text in Water.problems(record.water) do bad(text) end
+	end
 	if #problems > 0 then return problems, nil end
 	local decoded, why = ObjectRecord.decode(record.world, Checkpoint.CLASSES, Checkpoint.refs(world))
 	if not decoded then
@@ -536,6 +546,7 @@ function Checkpoint.restore(record: any, world: World): (boolean, { string })
 	if world.breakaway then world.breakaway:apply(record.breakaway) end
 	if world.wasp ~= nil then world.wasp:load(record.wasp or WaspDirector.defaultRecord()) end
 	if world.cat ~= nil then world.cat:load(record.cat or Cat.defaultRecord()) end -- (ROBLOX-118: a rest without one is a cat that has not met this spider)
+	if world.water ~= nil then world.water:load(record.water or Water.defaultRecord()) end -- (ROBLOX-122: a rest without one has counted no falls)
 	-- Godot's apply_record: the rest that was going on goes on, the spider takes a moment to take hold, and the screen says
 	-- this is checkpoint recovery. What was owed or announced at that tick is not done again.
 	local life = world.life

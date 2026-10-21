@@ -54,6 +54,7 @@ local Meadow = require(Shared:WaitForChild("World"):WaitForChild("Meadow")) -- (
 local PreyKinds = require(Shared:WaitForChild("Prey"):WaitForChild("PreyKinds")) -- (ROBLOX-120: the crickets' song)
 local Garden = require(Shared:WaitForChild("World"):WaitForChild("Garden")) -- (ROBLOX-120: the crickets' places)
 local Ballooning = require(Shared:WaitForChild("Life"):WaitForChild("Ballooning")) -- (ROBLOX-120: where a followed spiderling lands)
+local Pond = require(Shared:WaitForChild("World"):WaitForChild("Pond")) -- (ROBLOX-122: the pond's edge, the boardwalk and the water)
 local BugBodies = require(script.Parent.BugBodies)
 
 local SelfTest = {}
@@ -316,6 +317,7 @@ local function checks(): { Check }
 		if ctx.cat ~= nil then ctx.cat.enabled = false end -- (ROBLOX-118: the cat is held off the run but for its own check)
 		if ctx.crab ~= nil then ctx.crab.enabled = false end -- (ROBLOX-119: and the crab spiders)
 		if ctx.bird ~= nil then ctx.bird.enabled = false end -- (ROBLOX-120: and the robin)
+		if ctx.frog ~= nil then ctx.frog.enabled = false end -- (ROBLOX-122: and the frog)
 		need(session.started and not menu:isShowing(), "the life did not begin")
 		need(ctx.motor.mode == "attached", `the spider is not standing ({ctx.motor.mode})`)
 	end)
@@ -1238,8 +1240,14 @@ local function checks(): { Check }
 			local day, hour = life.clock.day, life.clock.hour
 			local visit = Bird.plan(bird.seed, day)[1]
 			local land = visit.site.line[1]
+			-- (a place on the ground under its way in: 120 studs back along it, or nearer where that is off every region, ROBLOX-122)
 			local under = land + visit.site.from * 120
 			local region = WorldMap.at(under + Vector3.new(0, 1, 0))
+			for _, d in { 100, 80, 60, 40, 20 } do
+				if region ~= nil then break end
+				under = land + visit.site.from * d
+				region = WorldMap.at(under + Vector3.new(0, 1, 0))
+			end
 			need(region ~= nil, `no region under the robin's way in at {fmt(under)}`)
 			local at = Vector3.new(under.X, Bird.GROUND + HEIGHT, under.Z)
 			local shadows, landings = bird.shadows, bird.landings
@@ -1329,6 +1337,165 @@ local function checks(): { Check }
 				need(Ballooning.valid(z) and Ballooning.landsIn(z, id), `the wind's draw for family {gen} landed in {z} / {id}`)
 			end
 			say(r, `INFO ballooning's landings: stood on {#stood} ({table.concat(stood, ", ")})`)
+		end)
+
+		-- ROBLOX-122: the mown path from the bench patch and the boardwalk (walked: off the gravel onto the mown path, up the boardwalk's fascia onto its deck, along it
+		-- into the pond's edge; its three homes), the water (a walk off a lily pad's edge into the pond, the struggle at the surface and the way out, under the gentle
+		-- rules for the moment so the run goes on; on the sim, a long fall into open water drowned in Normal and a slip by a pad that gets out), the pond's life
+		-- (the midges at dusk on the cattails, the water striders on the open water, made and drawn) and the green frog (held off the rest of the run: on its seat and
+		-- drawn, a close look opening its page; on the sim, a spider moving near it struck in Normal and missed in the gentle rules, a still one spared).
+		add("the mown path and the boardwalk", function(r)
+			local ctx = r.ctx
+			local world, motor = ctx.world, ctx.motor
+			local GT = Pond.GROUND
+			local legs = {
+				{ from = "pad_b3", to = "mown_e1", at = Vector3.new(80, GT + HEIGHT, -980), heading = Vector3.xAxis, until_ = function() return world.region.id == "mown_e1" end },
+				{ from = "mown_n14", to = "walk_s1", at = Vector3.new(1540, GT + HEIGHT, -2425), heading = -Vector3.zAxis,
+					until_ = function() return world.region.id == "walk_s1" and motor.pos.Y > Pond.DECK end },
+				{ from = "walk_s4", to = "deck_s1", at = Vector3.new(1815, Pond.DECK + HEIGHT, (Pond.BOARDS[2][1] + Pond.BOARDS[2][2]) / 2), heading = Vector3.xAxis,
+					until_ = function() return world.region.id == "deck_s1" end },
+			}
+			local crossed: { string } = {}
+			for _, leg in legs do
+				need(holdUntilReady(r, leg.to, leg.at, nil) and holdUntilReady(r, leg.from, leg.at, nil), `{leg.from} and {leg.to} are not whole`)
+				put(r, leg.at, nil, leg.heading)
+				pause(r, 0.3)
+				local ok, seen = walkUntil(r, 45, function() return leg.until_() and motor.mode == "attached" end) -- (up the fascia's 40 cm takes a while)
+				need(ok, `did not walk from {leg.from} into {leg.to} (at {fmt(motor.pos)}, {world.region.id}; regions {regions(seen)})`)
+				table.insert(crossed, `{leg.from} to {leg.to}`)
+			end
+			local found = {}
+			for _, id in { "deck_s2", "pond_a2", "pond_a1" } do
+				local region = WorldMap.region(id) :: any
+				local t = region.retreats[1]
+				local inside = Vector3.new((t.min.X + t.max.X) / 2, t.min.Y + HEIGHT, (t.min.Z + t.max.Z) / 2)
+				local up = Vector3.yAxis
+				if id == "deck_s2" then inside, up = Vector3.new((t.min.X + t.max.X) / 2, (t.min.Y + t.max.Y) / 2, t.min.Z + HEIGHT), Vector3.zAxis end
+				need(holdUntilReady(r, id, inside, up), `{id} is not whole`)
+				put(r, inside, up)
+				pause(r, 0.3)
+				need(world:inRetreat(motor.pos) == t.id and motor.mode == "attached", `not resting-ready in {t.id} (at {fmt(motor.pos)}, {motor.mode})`)
+				table.insert(found, t.id)
+			end
+			say(r, `INFO the mown path and the boardwalk: walked {table.concat(crossed, ", ")}; homes {table.concat(found, ", ")}`)
+		end)
+
+		add("the water", function(r)
+			local ctx = r.ctx
+			local motor, life, needs = ctx.motor, ctx.life, ctx.needs
+			local water, Water = ctx.water, ctx.Water
+			need(water ~= nil and Water ~= nil, "no water in the preserve")
+			-- a walk off the edge of pond_a3's lily pad into the water
+			local pad = nil
+			for _, p in Region.pieces(WorldMap.region("pond_a3") :: any) do if p.id == "pond_a3_pad_1_mid" then pad = p end end
+			need(pad ~= nil, "no lily pad in pond_a3")
+			local at = Vector3.new(pad.hi.X - 2, pad.hi.Y + HEIGHT, (pad.lo.Z + pad.hi.Z) / 2)
+			local falls, gentle = water.falls, needs.gentle
+			local struggled, outcome = false, ""
+			local ok, err = pcall(function()
+				need(holdUntilReady(r, "pond_a3", at, nil), "pond_a3 is not whole")
+				needs.gentle = true
+				put(r, at, nil, Vector3.xAxis)
+				pause(r, 0.3)
+				need(not Pond.inWater(motor.pos) and motor.mode == "attached", `a spider on the pad is not standing on it ({fmt(motor.pos)}, {motor.mode})`)
+				walkUntil(r, 8, function() struggled = struggled or water:struggling(); return water.falls > falls end)
+				need(water.falls > falls, `walking off the pad's edge did not take it into the water (at {fmt(motor.pos)}, {motor.mode})`)
+				need(waitUntil(r, Water.STRUGGLE + 2, function() struggled = struggled or water:struggling(); return not water:struggling() end, 0), "the struggle did not end")
+				outcome = if motor.mode == "attached" and not Pond.inWater(motor.pos) then "out" else motor.mode
+				need(struggled and outcome == "out" and not life.lifeOver, `after the struggle the spider is not out of the water ({outcome}, at {fmt(motor.pos)})`)
+			end)
+			needs.gentle = gentle
+			if not ok then error(err, 0) end
+			-- on the sim: a long fall into open water drowns in Normal; a slip by a pad gets out or not by the seeded draw
+			local boxes = {}
+			for _, id in { "pond_b3", "pond_a3" } do for _, p in Region.pieces(WorldMap.region(id) :: any) do table.insert(boxes, p) end end
+			local trial = Water.new(water.seed)
+			trial:fall(Vector3.new(2075, Pond.WATER, -2745), 40, life.clock.day, boxes, Pond.WATER)
+			local kind = nil
+			for _ = 1, 60 * 4 do trial:step(1 / 60); for _, s in trial:drainSignals() do if s.kind ~= "fell" then kind = s.kind end end end
+			need(kind == "drowned", `a long fall into open water was {tostring(kind)} in Normal`)
+			say(r, `INFO the water: walked off a lily pad's edge, struggled {Water.STRUGGLE} s and got {outcome} (the gentle rules for the moment); on the sim a long fall into open water drowned in Normal`)
+		end)
+
+		add("the pond's life", function(r)
+			local ctx = r.ctx
+			local world, life = ctx.world, ctx.life
+			local a3 = WorldMap.region("pond_a3") :: any
+			local b3 = WorldMap.region("pond_b3") :: any
+			local hour = life.clock.hour
+			local midges, striders, shown = 0, 0, 0
+			local ok, err = pcall(function()
+				life.clock.hour = 19.5
+				local at = a3.spawn.pos + Vector3.new(0, HEIGHT, 0)
+				need(holdUntilReady(r, "pond_a3", at, nil), "pond_a3 is not whole")
+				put(r, at, nil)
+				pause(r, 1.0)
+				local entry = world.garden.pond_a3
+				need(entry ~= nil and entry.kinds ~= nil and entry.kinds.midge ~= nil and #entry.kinds.midge.flies > 0, "no midges on pond_a3's stems")
+				midges = #entry.kinds.midge.flies
+				drawn(r, entry.kinds.midge.flies, "a midge")
+				life.clock.hour = 12
+				local bt = b3.spawn.pos + Vector3.new(0, HEIGHT, 0)
+				need(holdUntilReady(r, "pond_b3", bt, nil), "pond_b3 is not whole")
+				put(r, bt, nil)
+				pause(r, 1.0)
+				local e3 = world.garden.pond_b3
+				need(e3 ~= nil and e3.ambient ~= nil and e3.ambient.skater ~= nil and #e3.ambient.skater.items > 0, "no water striders on pond_b3")
+				striders = #e3.ambient.skater.items
+				local folder = Workspace:FindFirstChild("Bugs")
+				for _, a in e3.ambient.skater.items do if folder ~= nil and folder:FindFirstChild(a.id) ~= nil then shown += 1 end end
+				need(shown > 0, "the water striders are not drawn")
+			end)
+			life.clock.hour = hour
+			if not ok then error(err, 0) end
+			say(r, `INFO the pond's life: {midges} midges at dusk on pond_a3's stems; {striders} water striders on pond_b3's open water ({shown} drawn)`)
+		end)
+
+		add("the green frog", function(r)
+			local ctx = r.ctx
+			local frog, Frog, life = ctx.frog, ctx.Frog, ctx.life
+			need(frog ~= nil and Frog ~= nil, "no frog in the preserve")
+			need(frog.here, "the frog is on no seat")
+			local site = Pond.FROG_SITES[frog.seat]
+			local seen = false
+			local ok, err = pcall(function()
+				local seat = nil
+				for _, p in Region.pieces(WorldMap.region(site.region) :: any) do if p.id == site.piece then seat = p end end
+				need(seat ~= nil, `no seat {site.piece}`)
+				local at = Vector3.new(seat.lo.X + 1.5, seat.hi.Y + HEIGHT, seat.lo.Z + 1.5) -- (on its seat's corner, keeping still)
+				need(holdUntilReady(r, site.region, at, nil), `{site.region} is not whole`)
+				frog.met = false
+				frog.enabled = true
+				put(r, at, nil)
+				need(waitUntil(r, 2, function() return frog.met end, 0), `a close look did not see it ({string.format("%.1f", (ctx.motor.pos - frog.pos).Magnitude)} studs off)`)
+				seen = true
+				local folder = Workspace:FindFirstChild("PondAnimals")
+				local body = if folder ~= nil then folder:FindFirstChild("GreenFrog") else nil
+				need(body ~= nil and #body:GetChildren() >= 20, "the frog is not drawn")
+			end)
+			frog.enabled = false
+			if not ok then error(err, 0) end
+			local day = life.clock.day
+			for _, gentle in { false, true } do
+				local trial = Frog.new(frog.seed)
+				trial.gentle = gentle
+				trial:step(1 / 60, day, nil)
+				local kind = nil
+				for _ = 1, 60 * 3 do
+					trial:step(1 / 60, day, { pos = trial.pos + trial.rest * 8 + Vector3.new(0, 1, 0), speed = 3, hidden = false })
+					for _, s in trial:drainSignals() do if s.kind == "struck" or s.kind == "missed" then kind = kind or s.kind end end
+				end
+				need(kind == (if gentle then "missed" else "struck"), `in the {if gentle then "gentle" else "standard"} rules a spider moving near it was {tostring(kind)}`)
+			end
+			local still = Frog.new(frog.seed)
+			still:step(1 / 60, day, nil)
+			local touched = false
+			for _ = 1, 60 * 3 do
+				still:step(1 / 60, day, { pos = still.pos + still.rest * 8 + Vector3.new(0, 1, 0), speed = 0, hidden = false })
+				for _, s in still:drainSignals() do if s.kind == "struck" then touched = true end end
+			end
+			need(not touched, "a still spider was struck")
+			say(r, `INFO the green frog: on {site.piece}, drawn, the close look saw it ({seen}); on the sim struck in Normal, missed in the gentle rules, a still spider spared`)
 		end)
 
 		add("the nursery: the window put back", function(r)

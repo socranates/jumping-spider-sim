@@ -57,6 +57,13 @@ NotebookPages.triggers = {
 	"crab_spider",
 	"robin",
 	"look_cricket",
+	"water",
+	"frog",
+	"look_midge",
+	"look_mosquito",
+	"look_damselfly",
+	"look_skater",
+	"darner",
 }
 
 -- The reserve at or under hungryAt is "hungry"; at or over wellFedAt, "well fed" (LIFE_DESIGN.md round 1).
@@ -75,7 +82,8 @@ NotebookPages.noteSeconds = 6.0
 NotebookPages.lookWu = 4.0
 -- ROBLOX-105: the ambient bugs' close looks too (NotebookWatch: one of the view's bugs of the kind, out in the open, within lookWu).
 NotebookPages.looks = { springtail = "look_springtail", leafhopper = "look_leafhopper", moth = "look_moth", crane_fly = "look_crane_fly",
-	ladybird = "look_ladybird", millipede = "look_millipede", snail = "look_snail", harvestman = "look_harvestman", hoverfly = "look_hoverfly", cricket = "look_cricket" } :: { [string]: string }
+	ladybird = "look_ladybird", millipede = "look_millipede", snail = "look_snail", harvestman = "look_harvestman", hoverfly = "look_hoverfly", cricket = "look_cricket",
+	midge = "look_midge", mosquito = "look_mosquito", damselfly = "look_damselfly", skater = "look_skater" } :: { [string]: string }
 
 NotebookPages.pages = {
 	{
@@ -556,6 +564,87 @@ NotebookPages.pages = {
 			"Wikipedia (read 2026). Gryllus pennsylvanicus.",
 			"Minnesota Seasons (undated, read 2026). Fall field cricket, Gryllus pennsylvanicus. minnesotaseasons.com.",
 			"Geological Society of America (2011). The sound of crickets in the Eocene night: fossil insect ears from the Green River Formation. Northeastern Section meeting, abstract (paper 184321), gsa.confex.com.",
+		},
+	},
+	{
+		id = "water",
+		trigger = "water",
+		title = "Spiders and water",
+		text = "Most spiders are not built for water. Fishing spiders and many wolf spiders stay dry on the surface film and row across it, but in a comparison of 166 species outside that group only two jumping spiders rowed at all, and in another study the jumping spiders' rowing gave them no clear benefit over walking. Water striders hunt what falls onto the water and struggles: insects, and spiders. They find it by its ripples.",
+		game = "Here the pond's water is no place to stand. Fall or walk in and you struggle at the surface; a stem, a stone, a pad or the bank within a few centimetres gives you a chance to climb out. In Normal a spider that cannot reach one drowns, and a long fall into open water is the worst. On Easy and in free play you are always pulled out. The chances are the game's.",
+		sources = {
+			"Stratton, G. E., Suter, R. B. & Miller, P. R. (2004). Evolution of water surface locomotion by spiders: a comparative approach. Biological Journal of the Linnean Society 81: 63-78.",
+			"Suter, R. B., Stratton, G. & Miller, P. R. (2003). Water surface locomotion by spiders: distinct gaits in diverse families. Journal of Arachnology 31: 428-432.",
+			"Missouri Department of Conservation (undated, read 2026). Water striders. Missouri Field Guide, mdc.mo.gov.",
+		},
+	},
+	{
+		id = "green_frog",
+		trigger = "frog",
+		title = "The green frog",
+		text = "The green frog (Lithobates clamitans) of eastern North America is 5 to 10 cm from snout to vent, its head green and its body brown, grey or green. It lives at the edges of shallow ponds and hunts by sitting and waiting, eating any animal of a mouthful that comes within reach: insects, spiders, snails, crayfish, small frogs. A frog's eye answers to small things that move; food that keeps still is not food to it. Its tongue strikes and is back in under 0.07 seconds.",
+		game = "Here a green frog sits on a stone at the water's edge or on a lily pad, one or the other by the day, and keeps still. Move near it and it turns to face you; keep moving within its reach and its tongue strikes: in Normal that ends the life; on Easy and in free play it misses. Keep still and it loses interest. Its reach, its turn and its patience are the game's.",
+		sources = {
+			"Wikipedia (read 2026). Lithobates clamitans.",
+			"Tennessee Wildlife Resources Agency (undated, read 2026). Green Frog, Lithobates clamitans. tn.gov/twra.",
+			"Lettvin, J. Y., Maturana, H. R., McCulloch, W. S. & Pitts, W. H. (1959). What the frog's eye tells the frog's brain. Proceedings of the IRE 47: 1940-1951 (as summarised in D. Heeger's perception lecture notes, cns.nyu.edu).",
+			"Georgia Institute of Technology, School of Physics (2017, read 2026). The frog tongue is a high-speed adhesive (on Noel, A. C. et al., Journal of the Royal Society Interface 14: 20160764).",
+		},
+	},
+	{
+		id = "midges",
+		trigger = "look_midge",
+		title = "Midges over the water",
+		text = "Non-biting midges (Chironomidae) are delicate flies, most under 1 cm long, with clear wings and long front legs; the males have feathery antennae that sense the females' wingbeats. They do not bite. Males gather in swarms in the evening when the sun is low, over a bush or a body of water. Their larvae live in the mud of pond bottoms, some red with haemoglobin: bloodworms. Adults live only a few days. Dragonflies catch midges on passes through their swarms.",
+		game = "Here midges rest on the rushes and the cattails by day and rise at dusk to hang over the margin, each a third of a housefly's meal. Their swarms here are a few, the game's.",
+		sources = {
+			"Missouri Department of Conservation (undated, read 2026). Midges. Missouri Field Guide, mdc.mo.gov.",
+			"Virginia Cooperative Extension (undated, read 2026). Non-biting midges. Publication ENTO-438, Virginia Tech.",
+		},
+	},
+	{
+		id = "mosquitoes",
+		trigger = "look_mosquito",
+		title = "Mosquitoes",
+		text = "Only female mosquitoes take blood, which they need for their eggs; males feed on nectar. Eggs are laid on water or on damp ground that floods, and the larvae, wrigglers, live in the water and come up to breathe. Most kinds bite from just before dark into the night. In East Africa one jumping spider, Evarcha culicivora, chooses female mosquitoes carrying blood as its prey, Anopheles above all, and can pick them out by how they rest.",
+		game = "Here mosquitoes rest in the rushes by day and fly at dusk over the water's edge. None bites you; each is a small meal, a third of a housefly.",
+		sources = {
+			"Oklahoma State University Extension (undated, read 2026). Mosquitoes. Digital Diagnostics, extension.okstate.edu.",
+			"Nelson, X. J. & Jackson, R. R. (2006). A predator from East Africa that chooses malaria vectors as preferred prey. PLoS ONE 1: e132.",
+		},
+	},
+	{
+		id = "damselflies",
+		trigger = "look_damselfly",
+		title = "The eastern forktail",
+		text = "The eastern forktail (Ischnura verticalis) is a damselfly 22 to 30 mm long of ponds, marshes and slow streams in eastern North America. The male's thorax is striped black and green and the tip of his abdomen blue. At rest it holds its four wings together over its back. A weak flier, it keeps low in the plants at the water's edge and eats flying insects. Phidippus audax has been seen eating a cicada three times its own length, and leaping at dragonflies far bigger than itself.",
+		game = "Here forktails perch on the cattails by day. One is two and a half housefly meals, but it sees you from far off, and caught it thrashes: few holds last. Its wariness and its struggle are the game's numbers.",
+		sources = {
+			"Wikipedia (read 2026). Eastern forktail.",
+			"Minnesota Seasons (undated, read 2026). Eastern forktail, Ischnura verticalis. minnesotaseasons.com.",
+			"Lockley, T. C. & Young, O. P. (1987). Phidippus audax (Araneae, Salticidae) predation upon a cicada (Tibicen sp.) (Homoptera, Cicadidae). Journal of Arachnology 14: 393-394.",
+		},
+	},
+	{
+		id = "water_striders",
+		trigger = "look_skater",
+		title = "Water striders",
+		text = "Water striders (Gerridae) spend their lives on the water. Water-repellent hairs on their long middle and hind legs let them skate on the surface film: the middle legs row, the hind legs steer, and the short front legs are held ready to grab. Each foot makes a dimple in the surface. They eat insects, and spiders, that fall onto the water and struggle there, finding them by their ripples, and several may share one meal.",
+		game = "Here striders skate the open water of the margin, and if you fall in the near ones come toward your ripples. They are not your prey: a strike at one finds it gone.",
+		sources = {
+			"Missouri Department of Conservation (undated, read 2026). Water striders. Missouri Field Guide, mdc.mo.gov.",
+			"Wikipedia (read 2026). Gerris lacustris.",
+			"U.S. Geological Survey (undated, read 2026). Surface tension allows a water strider to walk on water. usgs.gov.",
+		},
+	},
+	{
+		id = "green_darner",
+		trigger = "darner",
+		title = "The green darner",
+		text = "The common green darner (Anax junius) is one of the commonest dragonflies in North America, 6.8 to 8 cm long with wings to 10 cm across. Its young grow in ponds, lakes and slow streams, eating small water animals. The adults catch flying insects in the air: mosquitoes, flies, moths, wasps, even other dragonflies. In autumn many fly south, on average about 900 km.",
+		game = "Here a darner patrols over the pond by day. It hunts what flies, not what clings to a stem: it is no danger to you, and you cannot catch it.",
+		sources = {
+			"Wikipedia (read 2026). Green darner.",
 		},
 	},
 } :: { Page }

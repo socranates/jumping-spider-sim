@@ -70,6 +70,12 @@ BugBodies.ambient = {
 		colors = { head = "3a2618", thorax = "5a3a22", gaster = "2e1f14", leg = "4a3020", antenna = "3a2618" },
 		motion = { gait = { stride = 0.18, swing = 0.4, lift = 0.3, settle = 12, jump = 1.0 } },
 	},
+	-- (ROBLOX-122) a water strider of the pond, about 1.2 cm: a slim dark body, short front legs held up to grab, the long middle legs (the oars) and hind legs (the
+	-- rudders) spread wide on the water, each foot in a dimple of the surface
+	skater = {
+		colors = { body = "2e2a24", belly = "6a6458", leg = "3a342c", dimple = "c8d4d6" },
+		motion = { gait = { stride = 3.0, swing = 0.2, lift = 0.0, settle = 8, jump = 30.0 } },
+	},
 	harvestman = {
 		colors = { body = "6e5034", turret = "3a2a1c", leg = "5a4330", palp = "6a4e36" },
 		legs = { { a = 35, l = 1.5 }, { a = 75, l = 2.4 }, { a = 110, l = 1.8 }, { a = 145, l = 2.0 } }, -- degrees from ahead and lengths (studs), each side
@@ -309,7 +315,34 @@ local function buildAnt(tier: string): { Spec }
 	return out
 end
 
-local BUILDERS = { ladybird = buildLadybird, millipede = buildMillipede, snail = buildSnail, harvestman = buildHarvestman, ant = buildAnt } :: { [string]: (string) -> { Spec } }
+-- (ROBLOX-122) The water strider: its body, the front legs held up, the middle and hind legs spread out over the water on their thighs and resting on it, a dimple
+-- under each of their feet (full tier). Its body's middle rides Prey/Skater.HOVER over the surface.
+local SKATER_HOVER = 0.15
+local function buildSkater(tier: string): { Spec }
+	local C = BugBodies.ambient.skater.colors
+	local out: { Spec } = {}
+	table.insert(out, ball("Body", v(0, 0, 0.05), v(0.16, 0.1, 0.95), hex(C.body)))
+	table.insert(out, ball("Head", v(0, 0.01, -0.5), v(0.1, 0.08, 0.14), hex(C.body)))
+	for _, side in { -1, 1 } do
+		local word = if side < 0 then "L" else "R"
+		-- the front legs, short, up and forward
+		table.insert(out, rodSpec(`Front{word}`, v(0.05 * side, 0, -0.32), v(0.14 * side, -0.02, -0.62), 0.02, hex(C.leg), nil, side, 1))
+		-- the middle legs: the oars, long, out and back; the hind legs trailing
+		for i, leg in { { from = v(0.06 * side, 0, -0.12), knee = v(0.7 * side, 0.05, -0.05), foot = v(1.5 * side, -SKATER_HOVER, 0.35) },
+			{ from = v(0.06 * side, 0, 0.0), knee = v(0.5 * side, 0.04, 0.45), foot = v(0.75 * side, -SKATER_HOVER, 1.35) } } do
+			table.insert(out, rodSpec(`Femur{word}{i}`, leg.from, leg.knee, 0.022, hex(C.leg), nil, side, i + 1))
+			table.insert(out, rodSpec(`Tarsus{word}{i}`, leg.knee, leg.foot, 0.016, hex(C.leg), nil, side, i + 1))
+			if tier ~= "low" then
+				local d = ball(`Dimple{word}{i}`, leg.foot + v(0, 0.005, 0), v(0.4, 0.01, 0.4), hex(C.dimple))
+				d.material = "Glass"
+				table.insert(out, d)
+			end
+		end
+	end
+	return out
+end
+
+local BUILDERS = { ladybird = buildLadybird, millipede = buildMillipede, snail = buildSnail, harvestman = buildHarvestman, ant = buildAnt, skater = buildSkater } :: { [string]: (string) -> { Spec } }
 
 -- (ROBLOX-105) How many parts a creature of `kind` is drawn with at `tier` ("full" or "low"): what World/Garden.AMBIENT's budgets are held against.
 function BugBodies.partsOf(kind: string, tier: string?): number
@@ -686,6 +719,7 @@ function BugBodies.draw(self: any, lice: { any }, now: number?, cameraAt: Vector
 			elseif kind == "millipede" then list = poseMillipede(rig, w, reduced == true)
 			elseif kind == "snail" then list = poseSnail(rig, w, reduced == true, now or 0)
 			elseif kind == "ant" then list = poseHarvestman(rig, w, reduced == true, "ant")
+			elseif kind == "skater" then list = poseHarvestman(rig, w, reduced == true, "skater")
 			else list = poseHarvestman(rig, w, reduced == true) end
 			for i, part in rig.parts do
 				table.insert(parts, part)

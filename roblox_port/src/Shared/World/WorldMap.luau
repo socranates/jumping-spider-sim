@@ -68,6 +68,7 @@ local Worlds = require(script.Parent.Worlds)
 local Preserve = require(script.Parent.Preserve)
 local Hut = require(script.Parent.Hut)
 local Meadow = require(script.Parent.Meadow)
+local Pond = require(script.Parent.Pond) -- (ROBLOX-122: the pond's edge, the boardwalk and the mown path to it)
 
 local WorldMap = {}
 
@@ -352,6 +353,8 @@ local function authorPreserve(worldSeed: number): { Region }
 	for _, r in Hut.author(worldSeed, WorldMap.seed) do table.insert(list, r :: any) end
 	-- (ROBLOX-119) and the bench patch and the meadow's edge where the garden's path comes out (World/Meadow)
 	for _, r in Meadow.author(worldSeed, WorldMap.seed) do table.insert(list, r :: any) end
+	-- (ROBLOX-122) and the mown path east and north from the bench patch, the boardwalk and the pond's edge (World/Pond)
+	for _, r in Pond.author(worldSeed, WorldMap.seed) do table.insert(list, r :: any) end
 	return list
 end
 
@@ -391,6 +394,7 @@ for _, id in Worlds.IDS do
 	if id == Worlds.PRESERVE then
 		for _, p in Hut.patches(list :: any, WorldMap.SEED, WorldMap.seed) do table.insert(patchList, p :: any) end
 		for _, p in Meadow.patches(list :: any, WorldMap.SEED, WorldMap.seed) do table.insert(patchList, p :: any) end
+		for _, p in Pond.patches(list :: any, WorldMap.SEED, WorldMap.seed) do table.insert(patchList, p :: any) end -- (ROBLOX-122)
 	end
 	local patches: { Region } = table.freeze(patchList) :: any
 	local patchById: { [string]: Region } = {}

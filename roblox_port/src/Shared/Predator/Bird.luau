@@ -6,7 +6,8 @@
 -- the self-test, the previewer and the CLI suites ask exactly the same bird.
 --
 -- Its day is a seeded schedule (`Bird.plan(seed, day)`: the world's seed through WorldMap.seed(914, "bird"), a Park-Miller stream per day): four to six visits between
--- 06:00 and 19:30, each to one of SITES (the hut garden's lawn west and east of the path, the bench patch's gravel by the path's end, the meadow's mown edge), so where
+-- 06:00 and 19:30, each to one of SITES (the hut garden's lawn west and east of the path, the bench patch's gravel by the path's end, the meadow's mown edge; ROBLOX-122:
+-- the mown path east toward the pond), so where
 -- the robin is at an hour of a day is a pure function of the seed, the day and the hour, and a return to a rest finds it where the schedule says (restores never reroll;
 -- nothing of it is saved). A visit, in seconds at the outdoors' pace (HOUR_PER_S: the garden's clock, 0.33 of the hut's):
 --   approach ..... it flies in low over the ground from FLY_FROM studs off, gliding down onto the site's first point: its SHADOW sweeps over the ground ahead of it,
@@ -74,6 +75,8 @@ Bird.SITES = table.freeze({
 	site("lawn_e", "hut_garden", v(1, 0, -0.3), { { 20, -130 }, { 80, -125 }, { 130, -100 }, { 185, -112 } }),
 	site("gravel", "bench", v(0.4, 0, 1), { { -190, -850 }, { -100, -880 }, { -20, -845 }, { 70, -890 } }),
 	site("edge", "meadow", v(-1, 0, 0.5), { { -290, -1126 }, { -180, -1122 }, { -60, -1127 }, { 60, -1123 }, { 170, -1126 } }),
+	-- (ROBLOX-122) the mown path east from the bench patch toward the pond (World/Pond's mown_e*): the long open way between the meadow and the boardwalk
+	site("path", "ground", v(0.3, 0, 1), { { 300, -982 }, { 560, -975 }, { 820, -985 }, { 1080, -978 }, { 1340, -983 } }),
 }) :: { Site }
 Bird.GROUND = GT
 

@@ -1332,6 +1332,47 @@ case("the meadow's edge and the bench patch (ROBLOX-119): a rest under the curle
 	if not ok then error(err) end
 end)
 
+-- ---------------------------------------------------------------------------------------------- the pond's edge (ROBLOX-122)
+case("the pond's edge (ROBLOX-122): a rest in the boardwalk's gap, under the flat stone or under the cattail leaf is kept, checked, accepted and comes back there; the water's falls counted are kept, a bad count refused, an older rest without them none", function()
+	local Water = require("../src/Shared/Life/Water")
+	local w = newWorld()
+	for _ = 1, 60 do tick(w) end
+	local was = WorldMap.use("preserve")
+	local ok, err = pcall(function()
+		w.water = Water.new(WorldMap.seed(WorldMap.SEED, "water"))
+		w.water.falls, w.water.out = 4, 3
+		for _, row in { { id = "deck_s2", up = Vector3.zAxis }, { id = "pond_a2", up = Vector3.yAxis }, { id = "pond_a1", up = Vector3.yAxis } } do
+			local r = WorldMap.region(row.id) :: WorldMap.Region
+			local t = r.retreats[1]
+			local inside = if row.up == Vector3.zAxis then Vector3.new((t.min.X + t.max.X) / 2, (t.min.Y + t.max.Y) / 2, t.min.Z + 0.31)
+				else Vector3.new((t.min.X + t.max.X) / 2, t.min.Y + 0.31, (t.min.Z + t.max.Z) / 2)
+			w.motor:place(inside, row.up, if row.up == Vector3.zAxis then Vector3.yAxis else Vector3.xAxis)
+			local record = assert(Checkpoint.capture(w, 0))
+			check(record.world_map.world == "preserve" and record.world_map.revision == "preserve-2" and record.world_map.region == row.id and record.world_map.retreat == t.id,
+				`a rest in {t.id} records the preserve, preserve-2, {row.id} and {t.id}`)
+			check(#(Checkpoint.check(record, w)) == 0 and #(Checkpoint.check(Json.copy(record), w)) == 0 and #SaveRest.check("main", record) == 0, "a good record, a stored copy, and the server accepts it")
+			w.motor:place(HOME, Vector3.yAxis, Vector3.xAxis)
+			check(Checkpoint.restore(record, w) and (w.motor.pos - inside).Magnitude < 1e-6 and WorldMap.inRetreat(w.motor.pos) == t.id, `and it comes back in {t.id}`)
+		end
+		local rest = assert(Checkpoint.capture(w, 0))
+		check(rest.water ~= nil and rest.water.falls == 4 and rest.water.out == 3, "the rest keeps the falls counted (the water's draws never reroll)")
+		local bad = Json.copy(rest)
+		bad.water.out = 9
+		check(string.find(table.concat(Checkpoint.check(bad, w), "; "), "water: more got out than fell in", 1, true) ~= nil, "a water record with more out than in is refused")
+		w.water.falls = 7
+		check(Checkpoint.restore(rest, w) and w.water.falls == 4 and w.water.out == 3, "it comes back with the falls counted")
+		local old = Json.copy(rest)
+		old.water = nil
+		check(Checkpoint.restore(old, w) and w.water.falls == 0, "a rest without one (from before ROBLOX-122): no falls counted")
+		w.water = nil
+	end)
+	w.water = nil
+	WorldMap.use(was)
+	if not ok then error(err) end
+	local garden = assert(Checkpoint.capture(w, 0))
+	check(garden.water == nil, "a test garden rest has no water field")
+end)
+
 -- ---------------------------------------------------------------------------------------------- ballooning (ROBLOX-120)
 case("ballooning (ROBLOX-120): a generation that landed in the meadow keeps its start zone and landing in a rest; a record without them is the hut's; a bad one is refused", function()
 	local Ballooning = require("../src/Shared/Life/Ballooning")
@@ -1353,7 +1394,7 @@ case("ballooning (ROBLOX-120): a generation that landed in the meadow keeps its 
 			check(refused, `a start of {tostring(bad[1])} / {tostring(bad[2])} is refused`)
 		end
 		w.life.start_zone, w.life.start_region = nil, nil
-		check(Ballooning.valid("hut") and Ballooning.valid("hut_garden") and Ballooning.valid("meadow") and not Ballooning.valid("pond_edge"), "only the hut and the built zones are starts")
+		check(Ballooning.valid("hut") and Ballooning.valid("hut_garden") and Ballooning.valid("meadow") and Ballooning.valid("pond_edge") and not Ballooning.valid("log_pile"), "only the hut and the built zones are starts (ROBLOX-122: the pond's edge built)")
 	end)
 	w.life.start_zone, w.life.start_region = nil, nil
 	WorldMap.use(was)

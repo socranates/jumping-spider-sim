@@ -484,4 +484,109 @@ cricketNight.body.chirp = true
 cricketNight.behavior.restless_per_s = 0.008
 cricketNight.behavior.walk_interval_s = { 3.0, 9.0 }
 data.cricket_night_prototype = cricketNight
+-- ROBLOX-122: the pond's prey (World/Pond.LIFE), the Roblox game's own profiles appended after Godot's (game values; the notebook's pages say what is the sources').
+-- Non-biting midges (Chironomidae): delicate flies of about 5 mm (the sources' 5 to 12.7), a third of a housefly meal as the fungus gnat, resting on the rushes and
+-- the cattails by day and restless from dusk, when they hold in the air over the water as a swarm does, as far as the flight model allows (body.hover: a hold of a
+-- second or two, wavering, then on). Weak fliers, slow to notice.
+local midge = copy(data.fly_like_prototype)
+midge.body.nutrition = 0.35 / 3
+midge.body.visual_scale = 1.0
+midge.body.radius_wu = 0.25
+midge.body.capture_radius_wu = 0.4
+midge.body.prey_kind = "midge"
+midge.body.catch_factor = 0.8
+midge.body.feed_rate_per_s = 0.2
+midge.body.dusk = "midge_dusk_prototype"
+midge.senses.sight_range_wu = 5.0
+midge.senses.startle_range_wu = 2.0
+midge.flight.takeoff_accel_wu_s2 = 20.0
+midge.flight.flee_speed_wu_s = 3.0
+midge.flight.cruise_speed_wu_s = 1.6
+midge.flight.cruise_accel_wu_s2 = 10.0
+midge.flight.landing_speed_wu_s = 0.6
+midge.flight.turn_rate_deg_s = 360.0
+midge.flight.clearance_radius_wu = 0.12
+midge.flight.lift_wu = 1.0
+midge.flight.approach_wu = 0.8
+midge.flight.min_hop_wu = 2.0
+midge.flight.max_flight_wu = 16.0
+midge.flight.safe_distance_wu = 5.0
+midge.flight.perch_avoid_wu = 2.0
+midge.flight.open_escape_wu = 3.0
+midge.flight.home_in = true
+midge.flight.wander_local = true
+midge.behavior.restless_per_s = 0.002
+midge.behavior.hysteresis = 0.1
+midge.behavior.reposition_max_wu = 16.0
+midge.behavior.wander_flight_chance = 0.9
+midge.behavior.wander_radius_wu = 0.6
+midge.population.replenish_delay_s = { 30.0, 70.0 }
+midge.population.entry_min_flight_wu = 3.0
+data.midge_prototype = midge
+local midgeDusk = copy(midge)
+midgeDusk.body.dusk = nil
+midgeDusk.body.day = "midge_prototype"
+midgeDusk.body.hover = { hold = { 0.8, 2.5 }, waver = 0.25, chance = 0.9 }
+midgeDusk.behavior.restless_per_s = 0.12
+midgeDusk.behavior.hysteresis = 0.05
+data.midge_dusk_prototype = midgeDusk
+-- Mosquitoes (Culicidae): about 5 mm of body on long legs, a third of a housefly meal, resting in the rushes by day and out from dusk (the sources: most bite from
+-- just before dark into the night), wavering in the air over the margin as the midges do. Only the drawing says male or female; none bites the spider.
+local mosquito = copy(midge)
+mosquito.body.prey_kind = "mosquito"
+mosquito.body.radius_wu = 0.28
+mosquito.body.dusk = "mosquito_dusk_prototype"
+mosquito.senses.sight_range_wu = 6.0
+mosquito.senses.startle_range_wu = 2.5
+mosquito.flight.cruise_speed_wu_s = 1.4
+data.mosquito_prototype = mosquito
+local mosquitoDusk = copy(mosquito)
+mosquitoDusk.body.dusk = nil
+mosquitoDusk.body.day = "mosquito_prototype"
+mosquitoDusk.body.hover = { hold = { 0.6, 2.0 }, waver = 0.2, chance = 0.8 }
+mosquitoDusk.behavior.restless_per_s = 0.1
+mosquitoDusk.behavior.hysteresis = 0.05
+data.mosquito_dusk_prototype = mosquitoDusk
+-- The eastern forktail (Ischnura verticalis), a damselfly 22 to 30 mm long, perched on the cattails by day with its wings folded over its back. Twice the spider's
+-- length and more: the honest choice is a hard catch (catch_factor 1.45, by its meal it would be the ceiling) whose wings and long abdomen thrash in the jaws
+-- (body.kick, as the cricket's legs), worth two and a half housefly meals; its big eyes see the spider coming from far off, and it flies well.
+local damsel = copy(data.fly_like_prototype)
+damsel.body.nutrition = 0.35 * 2.5
+damsel.body.visual_scale = 1.0
+damsel.body.radius_wu = 0.5
+damsel.body.capture_radius_wu = 0.7
+damsel.body.prey_kind = "damselfly"
+damsel.body.catch_factor = 1.45
+damsel.body.feed_rate_per_s = 0.12
+damsel.body.kick = { first = { 0.2, 0.5 }, every = { 0.5, 1.1 }, size = 0.12 }
+damsel.senses.sight_range_wu = 14.0
+damsel.senses.startle_range_wu = 6.0
+damsel.reaction.delay_startle_alert_s = { 0.03, 0.08 }
+damsel.flight.takeoff_accel_wu_s2 = 40.0
+damsel.flight.flee_speed_wu_s = 6.0
+damsel.flight.cruise_speed_wu_s = 2.5
+damsel.flight.cruise_accel_wu_s2 = 20.0
+damsel.flight.landing_speed_wu_s = 1.0
+damsel.flight.turn_rate_deg_s = 360.0
+damsel.flight.clearance_radius_wu = 0.14
+damsel.flight.lift_wu = 2.0
+damsel.flight.approach_wu = 1.2
+damsel.flight.min_hop_wu = 3.0
+damsel.flight.max_flight_wu = 30.0
+damsel.flight.safe_distance_wu = 10.0
+damsel.flight.perch_avoid_wu = 4.0
+damsel.flight.open_escape_wu = 5.0
+damsel.flight.home_in = true
+damsel.flight.wander_local = true
+damsel.behavior.restless_per_s = 0.006
+damsel.behavior.hysteresis = 0.1
+damsel.behavior.reposition_max_wu = 30.0
+damsel.behavior.wander_flight_chance = 0.8
+damsel.behavior.walk_interval_s = { 12.0, 30.0 }
+damsel.behavior.walk_distance_wu = { 0.1, 0.4 }
+damsel.behavior.walk_speed_wu_s = { 0.2, 0.4 }
+damsel.behavior.wander_radius_wu = 0.8
+damsel.population.replenish_delay_s = { 60.0, 140.0 }
+damsel.population.entry_min_flight_wu = 4.0
+data.damselfly_prototype = damsel
 return table.freeze(data)

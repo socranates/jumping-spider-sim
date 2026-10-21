@@ -6,6 +6,8 @@ Work from GitHub branch [`codex/v48-living-habitat`](https://github.com/socranat
 
 For a cloud Claude session, clone that GitHub branch. Local `C:` links alone cannot transfer the project. The exact portable Roblox source archive is `C:\Users\natha\claude-xfer\v48-full-1ba2eb3.zip`, SHA256 `18FC46895BE6AF5D58FB3AC14D1B6F360861FF78F673C17A7F23C772A56E7E77`. It contains `roblox_port/`; the branch contains all review documents and raw evidence as well.
 
+**Use the source, not an older generated place file in the checkout/archive.** The final v48 distributable has not been rebuilt. After validation, build in a separate release copy with `python tools/build.py <rojo>`; retain the immutable regression snapshot unchanged. The existing cloud editor receives reviewed source through Rojo, not by opening a stale generated `.rbxlx`.
+
 Nathan asked for a rich, lived-in tiny-spider world: dust bunnies, fleas, soda cans, ant hills, occasional emerging grubs, an outdoor dog, realistic moving sun, wind and weather. He also wants dense small habitats rather than empty distances, secure ground off the stone path and nearby insect life. Do not replace this with a decorative checklist: inspect the normal camera and ordinary connected travel.
 
 ## What changed

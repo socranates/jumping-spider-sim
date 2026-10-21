@@ -1,0 +1,6 @@
+FAIL LIVING_WORLD flea 1 has no teleport at a hop boundary
+FAIL LIVING_WORLD flea 2 has no teleport at a hop boundary
+FAIL LIVING_WORLD flea 3 has no teleport at a hop boundary
+FAIL LIVING_WORLD flea 4 has no teleport at a hop boundary
+FAIL LIVING_WORLD flea 5 has no teleport at a hop boundary
+LIVING_WORLD passed=3850 failed=5

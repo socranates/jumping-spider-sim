@@ -1,0 +1,286 @@
+{
+  "suites": 55,
+  "passed": 52,
+  "failed": [
+    "client_mating.luau",
+    "notebook.luau",
+    "preserve.luau"
+  ],
+  "results": [
+    {
+      "name": "run.luau",
+      "exit_code": 0,
+      "seconds": 1.09
+    },
+    {
+      "name": "perception.luau",
+      "exit_code": 0,
+      "seconds": 1.14
+    },
+    {
+      "name": "sensor.luau",
+      "exit_code": 0,
+      "seconds": 1.41
+    },
+    {
+      "name": "prey.luau",
+      "exit_code": 0,
+      "seconds": 1.02
+    },
+    {
+      "name": "life.luau",
+      "exit_code": 0,
+      "seconds": 0.97
+    },
+    {
+      "name": "checkpoint.luau",
+      "exit_code": 0,
+      "seconds": 9.69
+    },
+    {
+      "name": "wasp.luau",
+      "exit_code": 0,
+      "seconds": 10.36
+    },
+    {
+      "name": "gaze.luau",
+      "exit_code": 0,
+      "seconds": 1.08
+    },
+    {
+      "name": "perception_view.luau",
+      "exit_code": 0,
+      "seconds": 0.98
+    },
+    {
+      "name": "scenarios.luau",
+      "exit_code": 0,
+      "seconds": 5.25
+    },
+    {
+      "name": "client_smoke.luau",
+      "exit_code": 0,
+      "seconds": 53.86
+    },
+    {
+      "name": "perception_client.luau",
+      "exit_code": 0,
+      "seconds": 3.26
+    },
+    {
+      "name": "client_ant.luau",
+      "exit_code": 0,
+      "seconds": 19.5
+    },
+    {
+      "name": "client_rival.luau",
+      "exit_code": 0,
+      "seconds": 59.81
+    },
+    {
+      "name": "client_mating.luau",
+      "exit_code": 1,
+      "seconds": 104.7
+    },
+    {
+      "name": "look.luau",
+      "exit_code": 0,
+      "seconds": 91.2
+    },
+    {
+      "name": "idle.luau",
+      "exit_code": 0,
+      "seconds": 70.53
+    },
+    {
+      "name": "world.luau",
+      "exit_code": 0,
+      "seconds": 2.58
+    },
+    {
+      "name": "flies.luau",
+      "exit_code": 0,
+      "seconds": 1.69
+    },
+    {
+      "name": "eyes.luau",
+      "exit_code": 0,
+      "seconds": 6.16
+    },
+    {
+      "name": "hud.luau",
+      "exit_code": 0,
+      "seconds": 1.02
+    },
+    {
+      "name": "peacock.luau",
+      "exit_code": 0,
+      "seconds": 1.19
+    },
+    {
+      "name": "antmimic.luau",
+      "exit_code": 0,
+      "seconds": 1.55
+    },
+    {
+      "name": "tarantula.luau",
+      "exit_code": 0,
+      "seconds": 1.44
+    },
+    {
+      "name": "continuing.luau",
+      "exit_code": 0,
+      "seconds": 1.0
+    },
+    {
+      "name": "growth.luau",
+      "exit_code": 0,
+      "seconds": 1.69
+    },
+    {
+      "name": "notebook.luau",
+      "exit_code": 1,
+      "seconds": 16.3
+    },
+    {
+      "name": "state.luau",
+      "exit_code": 0,
+      "seconds": 22.67
+    },
+    {
+      "name": "state_client.luau",
+      "exit_code": 0,
+      "seconds": 47.5
+    },
+    {
+      "name": "state_offline.luau",
+      "exit_code": 0,
+      "seconds": 1.48
+    },
+    {
+      "name": "settings.luau",
+      "exit_code": 0,
+      "seconds": 10.5
+    },
+    {
+      "name": "rival.luau",
+      "exit_code": 0,
+      "seconds": 2.02
+    },
+    {
+      "name": "rivalnav.luau",
+      "exit_code": 0,
+      "seconds": 41.33
+    },
+    {
+      "name": "mating.luau",
+      "exit_code": 0,
+      "seconds": 3.89
+    },
+    {
+      "name": "inspect.luau",
+      "exit_code": 0,
+      "seconds": 94.45
+    },
+    {
+      "name": "worldmap.luau",
+      "exit_code": 0,
+      "seconds": 34.8
+    },
+    {
+      "name": "world_client.luau",
+      "exit_code": 0,
+      "seconds": 208.88
+    },
+    {
+      "name": "garden_life.luau",
+      "exit_code": 0,
+      "seconds": 26.03
+    },
+    {
+      "name": "selftest.luau",
+      "exit_code": 0,
+      "seconds": 57.88
+    },
+    {
+      "name": "nature.luau",
+      "exit_code": 0,
+      "seconds": 7.64
+    },
+    {
+      "name": "nature_client.luau",
+      "exit_code": 0,
+      "seconds": 18.44
+    },
+    {
+      "name": "title.luau",
+      "exit_code": 0,
+      "seconds": 13.2
+    },
+    {
+      "name": "lock.luau",
+      "exit_code": 0,
+      "seconds": 34.03
+    },
+    {
+      "name": "quiet.luau",
+      "exit_code": 0,
+      "seconds": 10.01
+    },
+    {
+      "name": "preserve.luau",
+      "exit_code": 1,
+      "seconds": 75.55
+    },
+    {
+      "name": "selftest_preserve.luau",
+      "exit_code": 0,
+      "seconds": 465.16
+    },
+    {
+      "name": "shadows.luau",
+      "exit_code": 0,
+      "seconds": 1.41
+    },
+    {
+      "name": "bodies.luau",
+      "exit_code": 0,
+      "seconds": 11.67
+    },
+    {
+      "name": "living_world.luau",
+      "exit_code": 0,
+      "seconds": 4.16
+    },
+    {
+      "name": "station_threats.luau",
+      "exit_code": 0,
+      "seconds": 6.11
+    },
+    {
+      "name": "minimal_hud.luau",
+      "exit_code": 0,
+      "seconds": 0.73
+    },
+    {
+      "name": "compact_layout.luau",
+      "exit_code": 0,
+      "seconds": 0.92
+    },
+    {
+      "name": "verge_litter.luau",
+      "exit_code": 0,
+      "seconds": 1.33
+    },
+    {
+      "name": "route_preparation.luau",
+      "exit_code": 0,
+      "seconds": 4.11
+    },
+    {
+      "name": "dog_gait.luau",
+      "exit_code": 0,
+      "seconds": 0.98
+    }
+  ]
+}

@@ -44,7 +44,12 @@ function LivingWorld.rig(self: any,kind: string,index: number): any
  end
  if kind=="Flea" then
   ell("SideFlattenedBody",Vector3.new(.07,.17,.23),"4a2b1e")
-  ell("LongHindLegs",Vector3.new(.13,.055,.26),"60422a")
+  ell("Head",Vector3.new(.075,.095,.09),"60422a")
+  for j=1,4 do table.insert(r.parts,self:part(folder,"Foreleg"..j,Vector3.new(.12,.014,.014),"60422a")) end
+  for _,side in {"Left","Right"} do
+   table.insert(r.parts,self:part(folder,side.."HindThigh",Vector3.new(.10,.025,.025),"60422a"))
+   table.insert(r.parts,self:part(folder,side.."HindTibia",Vector3.new(.12,.014,.014),"60422a"))
+  end
  elseif kind=="Grub" then
   for j=1,if self.low then 5 else 7 do ell(if j==1 then "BrownHead" else "CreamSegment"..j,Vector3.new(.32,.32,.32),if j==1 then "76462c" else "dbd0ae") end
  elseif kind=="Ant" then
@@ -254,10 +259,27 @@ function LivingWorld.small(self: any,pos: Vector3,region: any,state: any,reduced
    on=on and r.supported
    visible(r,on)
    if not on then continue end
-   local delta,hop=Environment.flea(state.totalHours*75,i)
-   if reduced then delta=Vector3.zero end
-   r.parts[1].CFrame=CFrame.new(at+delta)
-   r.parts[2].CFrame=CFrame.new(at+delta+Vector3.new(0,-.06,.04))*CFrame.Angles(if hop then -.7 else .3,0,0)
+   local delta,hop,heading=Environment.flea(if reduced then 0 else state.totalHours*75,i)
+   if reduced then delta=Vector3.zero;hop=false end
+   local frame=CFrame.lookAt(at+delta,at+delta+heading)
+   r.parts[1].CFrame=frame
+   r.parts[2].CFrame=frame*CFrame.new(0,.025,-.145)
+   local function segment(part: BasePart,a: Vector3,b: Vector3)
+    part.CFrame=frame*CFrame.lookAt((a+b)*.5,b)*CFrame.Angles(0,math.pi/2,0)
+   end
+   for leg=1,4 do
+    local sign=if leg%2==0 then 1 else -1
+    local hip=Vector3.new(sign*.025,-.035,if leg<=2 then -.08 else 0)
+    local direction=Vector3.new(sign*.8,if hop then -.2 else -.6,if leg<=2 then -.2 else .1).Unit
+    segment(r.parts[leg+2],hip,hip+direction*.12)
+   end
+   for side=1,2 do
+    local sign=if side==1 then -1 else 1
+    local hip=Vector3.new(sign*.035,-.015,.06)
+    local knee=hip+Vector3.new(sign*.5,if hop then -.15 else -.7,.4).Unit*.10
+    local foot=knee+Vector3.new(sign*.3,if hop then .5 else -.2,if hop then -.9 else .9).Unit*.12
+    segment(r.parts[5+side*2],hip,knee);segment(r.parts[6+side*2],knee,foot)
+   end
   end
  end
  for i,r in self.grubs do

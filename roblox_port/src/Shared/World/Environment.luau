@@ -79,12 +79,22 @@ function Environment.grub(day: number, hour: number, index: number, wetness: num
  local show=if wetness>.18 and phase<7 then math.sin(math.pi*phase/7) else 0
  return show,phase
 end
-function Environment.flea(seconds: number, index: number): (Vector3, boolean)
+function Environment.flea(seconds: number, index: number): (Vector3, boolean, Vector3)
  local period=2.7+Environment.hash(914,index,59)*2.2
  local phase=(seconds+index*.83)%period;local hop=.22
  local u=math.clamp(phase/hop,0,1)
- local heading=Environment.hash(914,math.floor((seconds+index*.83)/period),index+61)*TAU
- return Vector3.new(math.cos(heading)*u*1.6,if phase<hop then 4*1.8*u*(1-u) else 0,math.sin(heading)*u*1.6),phase<hop
+ local cycle=math.floor((seconds+index*.83)/period)
+ local function landing(n: number): Vector3
+  local angle=Environment.hash(914,n,index+61)*TAU
+  local radius=.25+Environment.hash(914,n,index+67)*.95
+  return Vector3.new(math.cos(angle)*radius,0,math.sin(angle)*radius)
+ end
+ local from,to=landing(cycle-1),landing(cycle)
+ local direction=to-from
+ local heading=if direction.Magnitude>1e-6 then direction.Unit else Vector3.zAxis
+ -- Endpoints depend only on the clock. The next hop begins at this landing;
+ -- keeping the movement local never requires snapping back to the spawn.
+ return from:Lerp(to,u)+Vector3.new(0,if phase<hop then 4*1.8*u*(1-u) else 0,0),phase<hop,heading
 end
 -- A leashed-sized park dog on a lawn circuit, with stops to sniff. No attack or save outcome is added.
 -- The dog needs room for its whole body, not merely four supported paw points.

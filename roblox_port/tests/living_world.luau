@@ -76,6 +76,71 @@ case("small lives respect their habitat and motion bounds",function()
  check(stopped and moved,"dog travels and stops to sniff")
  check(grounded,"dog stays on the ground throughout its route")
 end)
+case("fleas start each hop from their last landing rather than snapping home",function()
+ for index=1,5 do
+  local previous,wasHop=Environment.flea(0,index)
+  local horizontal,vertical,held=0,0,true
+  local sawHop,sawRest=wasHop,not wasHop
+  for step=1,8000 do
+   local point,hop=Environment.flea(step*.005,index)
+   local delta=point-previous
+   horizontal=math.max(horizontal,Vector3.new(delta.X,0,delta.Z).Magnitude)
+   vertical=math.max(vertical,math.abs(delta.Y))
+   if not hop and not wasHop then held=held and delta.Magnitude<1e-6 end
+   sawHop=sawHop or hop;sawRest=sawRest or not hop
+   previous,wasHop=point,hop
+  end
+  check(horizontal<.07 and vertical<.17,"flea "..index.." has no teleport at a hop boundary")
+  check(held and sawHop and sawRest,"flea "..index.." rests where it landed between jumps")
+  local a=Environment.flea(17.125,index);local b=Environment.flea(17.125,index)
+  check((a-b).Magnitude<1e-9,"flea pose is reconstructed from the saved clock")
+ end
+end)
+case("flea legs meet the floor at rest and Reduced Motion holds the entire rig",function()
+ WorldMap.use("preserve")
+ local region=WorldMap.region("hut_floor_i")
+ local root=Instance.new("Folder");root.Parent=workspace;WorldBuild.region(region,root)
+ for _,tier in {"full","low"} do
+  local living=LivingWorld.new(workspace,root,tier,WorldMap)
+  local state=Environment.sample(1,12);local pos=nil
+  for x=region.bounds[1].X+3,region.bounds[2].X-3,10 do
+   if pos then break end
+   for z=region.bounds[1].Z+3,region.bounds[2].Z-3,10 do
+    local point=Vector3.new(x,-69.69,z)
+    living:small(point,region,state,false)
+    for _,flea in living.fleas do if flea.shown then pos=point;break end end
+    if pos then break end
+   end
+  end
+  check(pos~=nil,tier.." floor traversal can actually find a supported flea")
+  if pos then
+   local samples,gap=0,0
+   for step=0,120 do
+    state.totalHours=12+step*.05/75;living:small(pos,region,state,false)
+    for _,flea in living.fleas do
+     local _,hop=Environment.flea(state.totalHours*75,flea.index)
+     if not flea.shown or hop then continue end
+     for _,name in {"LeftHindTibia","RightHindTibia"} do
+      local leg=assert(flea.folder:FindFirstChild(name))
+      local a=leg.CFrame:PointToWorldSpace(Vector3.new(-leg.Size.X*.5,0,0))
+      local b=leg.CFrame:PointToWorldSpace(Vector3.new(leg.Size.X*.5,0,0))
+      gap=math.max(gap,math.abs(math.min(a.Y,b.Y)+70));samples+=1
+     end
+    end
+   end
+   check(samples>0 and gap<.02,tier.." resting hind feet touch the actual floor")
+   living:small(pos,region,state,true)
+   local still={}
+   for _,flea in living.fleas do for _,part in flea.parts do still[part]=part.CFrame end end
+   state.totalHours+=3;living:small(pos,region,state,true)
+   local held=true
+   for part,frame in still do held=held and (part.Position-frame.Position).Magnitude<1e-6 and part.CFrame.LookVector:Dot(frame.LookVector)>.99999 end
+   check(held,tier.." Reduced Motion stops body, head and legs without an orientation flicker")
+  end
+  living:destroy()
+ end
+ root:Destroy();WorldMap.use("test_garden")
+end)
 case("new props are additive and the cans are truly hollow",function()
  WorldMap.use("preserve")
  local ids={};local seen=0

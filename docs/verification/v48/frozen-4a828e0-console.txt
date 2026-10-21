@@ -1,0 +1,170 @@
+FROZEN_SUITE source=C:\Users\natha\claude-xfer\v48-full-4a828e0\roblox_port suites=55
+BEGIN 1/55 run.luau
+END run.luau exit=0 seconds=1.09
+BEGIN 2/55 perception.luau
+END perception.luau exit=0 seconds=1.14
+BEGIN 3/55 sensor.luau
+END sensor.luau exit=0 seconds=1.41
+BEGIN 4/55 prey.luau
+END prey.luau exit=0 seconds=1.02
+BEGIN 5/55 life.luau
+END life.luau exit=0 seconds=0.97
+BEGIN 6/55 checkpoint.luau
+END checkpoint.luau exit=0 seconds=9.69
+BEGIN 7/55 wasp.luau
+END wasp.luau exit=0 seconds=10.36
+BEGIN 8/55 gaze.luau
+END gaze.luau exit=0 seconds=1.08
+BEGIN 9/55 perception_view.luau
+END perception_view.luau exit=0 seconds=0.98
+BEGIN 10/55 scenarios.luau
+END scenarios.luau exit=0 seconds=5.25
+BEGIN 11/55 client_smoke.luau
+END client_smoke.luau exit=0 seconds=53.86
+BEGIN 12/55 perception_client.luau
+END perception_client.luau exit=0 seconds=3.26
+BEGIN 13/55 client_ant.luau
+END client_ant.luau exit=0 seconds=19.5
+BEGIN 14/55 client_rival.luau
+END client_rival.luau exit=0 seconds=59.81
+BEGIN 15/55 client_mating.luau
+END client_mating.luau exit=1 seconds=104.7
+ setting does not hide it; a snap clears the two-shot's ease
+    C:/Users/natha/AppData/Local/Temp/tmp9mw031d9.luau:56623: courted: attend none after 20 s (resting false, asleep false, meter 0)
+FAIL client_mating: Reduced Motion cuts the two-shot in and out (ROBLOX-92), where it eased over 0.8 s
+    C:/Users/natha/AppData/Local/Temp/tmp9mw031d9.luau:56623: courted: attend none after 20 s (resting false, asleep false, meter 0)
+FAIL client_mating: a close look begun from the eye view gives way to the mating scene: the two-shot plays, the skip frees the controls, and the eye view stays off
+    C:/Users/natha/AppData/Local/Temp/tmp9mw031d9.luau:56623: courted: attend none after 20 s (resting false, asleep false, meter 0)
+FAIL client_mating: a close look begun from the eye view gives way to the hatching, which cancels the eye view's return too
+    C:/Users/natha/AppData/Local/Temp/tmp9mw031d9.luau:56912: (a close look from the eye view in the crack)
+FAIL client_mating: the Spider settings row is refused during the mating scene and the hatching, in its own words, like the close look; it works again after (ROBLOX-92)
+    C:/Users/natha/AppData/Local/Temp/tmp9mw031d9.luau:56623: courted: attend none after 20 s (resting false, asleep false, meter 0)
+FAIL client_mating: a visitor far off is not announced, and one that arrives out of earshot is told when it comes near; the courting line is the same rule (ROBLOX-92)
+    C:/Users/natha/AppData/Local/Temp/tmp9mw031d9.luau:56981: and the courting line: ""
+FAIL client_mating: the mirror: a male player's female mate turns to face him, stayC:/Users/natha/AppData/Local/Temp/tmp9mw031d9.luau:57240: CLIENT_MATING failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmp9mw031d9.luau:57240
+s and turns away; the captions, the cues, the pause and the entry follow
+    C:/Users/natha/AppData/Local/Temp/tmp9mw031d9.luau:57041: resting
+FAIL client_mating: a record returned to during the scene's world, a reset and a new life leave nothing of the scene behind
+    C:/Users/natha/AppData/Local/Temp/tmp9mw031d9.luau:56623: courted: attend none after 20 s (resting false, asleep false, meter 0)
+FAIL client_mating: the rival keeps away from the courting pair and the scene (ROBLOX-91): it recovers, unaware, and a lunge in progress is not carried into the scene
+    C:/Users/natha/AppData/Local/Temp/tmp9mw031d9.luau:56623: courted: attend none after 20 s (resting false, asleep false, meter 0)
+CLIENT_MATING passed=11 failed=18
+
+BEGIN 16/55 look.luau
+END look.luau exit=0 seconds=91.2
+BEGIN 17/55 idle.luau
+END idle.luau exit=0 seconds=70.53
+BEGIN 18/55 world.luau
+END world.luau exit=0 seconds=2.58
+BEGIN 19/55 flies.luau
+END flies.luau exit=0 seconds=1.69
+BEGIN 20/55 eyes.luau
+END eyes.luau exit=0 seconds=6.16
+BEGIN 21/55 hud.luau
+END hud.luau exit=0 seconds=1.02
+BEGIN 22/55 peacock.luau
+END peacock.luau exit=0 seconds=1.19
+BEGIN 23/55 antmimic.luau
+END antmimic.luau exit=0 seconds=1.55
+BEGIN 24/55 tarantula.luau
+END tarantula.luau exit=0 seconds=1.44
+BEGIN 25/55 continuing.luau
+END continuing.luau exit=0 seconds=1.0
+BEGIN 26/55 growth.luau
+END growth.luau exit=0 seconds=1.69
+BEGIN 27/55 notebook.luau
+END notebook.luau exit=1 seconds=16.3
+C:/Users/natha/AppData/Local/Temp/tmpy2i458x1.luau:57564: notebook failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmpy2i458x1.luau:57564
+NOTEBOOK client: after the first 120 frames the book holds: bold_jumper,hunting_by_sight
+FAIL NOTEBOOK the screen counts the moult out of five (Next moult: 3 of 7 meals � 2 small prey = 1 housefly)
+FAIL NOTEBOOK being ready to moult opens its page
+FAIL NOTEBOOK a rest in the crack begins the moult
+NOTEBOOK passed=1496 failed=3
+
+BEGIN 28/55 state.luau
+END state.luau exit=0 seconds=22.67
+BEGIN 29/55 state_client.luau
+END state_client.luau exit=0 seconds=47.5
+BEGIN 30/55 state_offline.luau
+END state_offline.luau exit=0 seconds=1.48
+BEGIN 31/55 settings.luau
+END settings.luau exit=0 seconds=10.5
+BEGIN 32/55 rival.luau
+END rival.luau exit=0 seconds=2.02
+BEGIN 33/55 rivalnav.luau
+END rivalnav.luau exit=0 seconds=41.33
+BEGIN 34/55 mating.luau
+END mating.luau exit=0 seconds=3.89
+BEGIN 35/55 inspect.luau
+END inspect.luau exit=0 seconds=94.45
+BEGIN 36/55 worldmap.luau
+END worldmap.luau exit=0 seconds=34.8
+BEGIN 37/55 world_client.luau
+END world_client.luau exit=0 seconds=208.88
+BEGIN 38/55 garden_life.luau
+END garden_life.luau exit=0 seconds=26.03
+BEGIN 39/55 selftest.luau
+END selftest.luau exit=0 seconds=57.88
+BEGIN 40/55 nature.luau
+END nature.luau exit=0 seconds=7.64
+BEGIN 41/55 nature_client.luau
+END nature_client.luau exit=0 seconds=18.44
+BEGIN 42/55 title.luau
+END title.luau exit=0 seconds=13.2
+BEGIN 43/55 lock.luau
+END lock.luau exit=0 seconds=34.03
+BEGIN 44/55 quiet.luau
+END quiet.luau exit=0 seconds=10.01
+BEGIN 45/55 preserve.luau
+END preserve.luau exit=1 seconds=75.55
+C:/Users/natha/AppData/Local/Temp/tmpwfzg259e.luau:55443: PRESERVE failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmpwfzg259e.luau:55443
+preserve: the backdrop's records: 1147 at full, 492 at low; the far look 488 at full, 378 at low
+preserve: from the sill at full: 1500 parts
+preserve: the walk at full: at most 1500 parts, 584 changes
+preserve: from the sill at low: 487 parts
+preserve: the walk at low: at most 500 parts, 339 changes
+preserve: the sill's Decor: 721 parts (the test garden's 1258)
+preserve: the hut's looks: 1367 records at full, 159 at low; (ROBLOX-119) the meadow's and the bench patch's 3322 at full, 102 at low
+FAIL [the hut's looks: within their budgets at both tiers, the same each time, well made] the low tier draws little of the hut beyond its boxes (159 records)
+preserve: (ROBLOX-122) the pond's, the boardwalk's and the mown path's looks: 1106 at full, 98 at low
+preserve: the hut's regions: from anywhere on one, its farthest box at most 151.1 studs
+preserve: the hut's regions at full: at most 1500 parts
+preserve: the hut's regions at low: at most 500 parts
+preserve: the patches: 1135, at most 90 records at full and 10 at low
+preserve: in the mulch at full: 16 patches, 697 parts of them, 1500 in all
+preserve: in the mulch at low: 5 patches, 38 parts of them, 492 in all
+preserve: the cricket's struggle: wins at 4, 5 and 6 taps a second 4, 60, 60 of 60; at 5 a second 7.6 s, 6.8 kicks
+preserve: ballooning: of 200 families the hut garden 115, the meadow's edge 47, the pond's edge 38
+preserve: the water: of 60 slips by a pad 2 cm off, 38 got out and 22 drowned in Normal; 60 pulled out in the gentle rules
+PRESERVE passed=1147 failed=1
+
+BEGIN 46/55 selftest_preserve.luau
+END selftest_preserve.luau exit=0 seconds=465.16
+BEGIN 47/55 shadows.luau
+END shadows.luau exit=0 seconds=1.41
+BEGIN 48/55 bodies.luau
+END bodies.luau exit=0 seconds=11.67
+BEGIN 49/55 living_world.luau
+END living_world.luau exit=0 seconds=4.16
+BEGIN 50/55 station_threats.luau
+END station_threats.luau exit=0 seconds=6.11
+BEGIN 51/55 minimal_hud.luau
+END minimal_hud.luau exit=0 seconds=0.73
+BEGIN 52/55 compact_layout.luau
+END compact_layout.luau exit=0 seconds=0.92
+BEGIN 53/55 verge_litter.luau
+END verge_litter.luau exit=0 seconds=1.33
+BEGIN 54/55 route_preparation.luau
+END route_preparation.luau exit=0 seconds=4.11
+BEGIN 55/55 dog_gait.luau
+END dog_gait.luau exit=0 seconds=0.98
+FROZEN_COMPLETE suites=55 passed=52 failed=3

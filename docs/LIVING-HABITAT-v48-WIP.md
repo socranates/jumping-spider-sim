@@ -103,6 +103,13 @@ Working branch: `codex/v48-living-habitat`, based on v47 receipt commit `9d442ff
 - Current-source reruns: mating 725/0, real-client mating 29/0, notebook 1,499/0, living world 3,840/0, preserve 1,148/0. Strict analysis clean; 207/207 compile. See `docs/verification/v48/REGRESSION-REVIEW.md`.
 - The immutable 4a828e0 run remains active in its preserve self-test and predates the colony/repairs. Finish observing it, address any further failures, then freeze current source for a complete release regression. Native flea/continuity, weather, ordinary traversal and performance reviews still remain; no publication claim.
 
+### Flea close review and frozen baseline completion
+
+- Fleas now jump from their previous landing instead of snapping back to an anchor. They have a separate head and six legs, with folding hind joints, at their existing body scale. Five/two pooled animals remain; no save fields or feeding rules change.
+- Living-world checks 3,917/0; clean strict analysis; 207/207 compile. Native full/low floor samples visibly show a nearby flea, retain attachment and measure 0.00354 cm resting hind-foot gap. Mean/worst frame times: full 16.71/32.56 ms; low 16.69/57.17 ms. These are bounded scene samples, not final performance gates. See `docs/verification/v48/FLEA-REVIEW.md`.
+- The old frozen `4a828e0` run is now **finished: 52/55 suites pass, three fail**. Its three failures have current-source repairs and passing reruns in the regression review. Preserve self-test 270/0/0, all seven outer checks pass. See `docs/verification/v48/FROZEN-4a828e0-RESULT.md`; no process remains to wait on.
+- Next continuity repairs before a final source freeze: retain nearby flea sites across floor-region changes (catalogue fixed floor sites, reuse the existing five/two rigs without reassignment while visible, derive motion from stable site identity, and retry unsupported sites when streaming completes). Regression pose: floor `hut_floor_i` near `(140,-69.69,226)` to the doorway near `(148,-69.69,226)` at a fixed clock. Also align the detail rebuild key with `LivingWorld.CELL=12`; it still divides X/Z by 24. Then inspect weather transitions and ordinary travel, freeze current source for all suites and complete native/release gates. No v48 publication.
+
 ## Platform judgment
 
 Roblox limits density, draw calls, memory and simulation cost, especially on phones. The current barren travel and missing ground are implementation/design problems. Compact, authored habitats with reused meshes, bounded active wildlife and selective detail remain a viable direction. No engine migration is needed to address these reported problems.

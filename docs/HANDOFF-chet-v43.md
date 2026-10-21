@@ -26,7 +26,7 @@ Studio had the three v43 sound IDs in TrainPass/CatBody before the engine run an
 
 The measured foreground sill sample was mean 22.0 ms / 45 fps, worst 32.8 ms, physics 60 fps. Studio viewport and concurrent work limit the result. The sequential shadow/preserve-removal samples are not a controlled causal comparison. No phone pass or human/gamepad feel approval is claimed. Review: `chet/review-4.md`.
 
-## Audio: wired, grants pending
+## Audio: wired, grants confirmed
 
 Claude already wired these in v43. Do not re-upload or redo the source integration.
 
@@ -38,7 +38,7 @@ Claude already wired these in v43. Do not re-upload or redo the source integrati
 
 Dashboard: [train](https://create.roblox.com/dashboard/creations/store/127788334000523/configure), [bell](https://create.roblox.com/dashboard/creations/store/78706177142395/configure), [purr](https://create.roblox.com/dashboard/creations/store/81495950754571/configure).
 
-**Experience permissions remain unconfirmed.** Each sound needs Creator Dashboard > Permissions > experience **10771103250**. The browser helper stopped on the configure pages in earlier turns, and later failed twice with `foreground window did not report a process id`. Nathan asked for help finding Permissions; Chet provided the steps, with confirmation of saved grants still pending. The manifest deliberately retains `experience_access_saved: false`; uploading or an owner's Studio load is not proof of the experience grant. Once Nathan confirms all three saves or the dashboard shows them, update that record and check the published game's audio. Do not claim the sound work is fully verified before then.
+Creator Dashboard verified on 2026-10-21 in the signed-in socranates in-app browser: train 127788334000523, bell 78706177142395 and purr 81495950754571 each resolved The Windowsill (10771103250) with **Already added** in Permissions > Experiences > Add experiences. Each dialog was finished with Done. Screenshots are in docs/verification/v43/audio/. These are existing access confirmations; no new runtime source edit, republish or audible live-client claim is implied.
 
 ## Meshes: ready for your integration
 

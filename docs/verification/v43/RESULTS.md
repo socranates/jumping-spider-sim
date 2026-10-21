@@ -26,9 +26,9 @@ windows-transition-cli.txt is an earlier successful 351,194-check, 47-suite run 
 
 The foreground sill sample was 22.0 ms mean (45 fps), 32.8 ms worst, physics 60 fps in a small Studio viewport. Later sequential samples with far preserve or shadows removed were slower; this is not a controlled comparison. No phone, published-player performance, human feel, gamepad feel or new art integration approval is claimed.
 
-## Remaining audio verification
+## Audio permissions verified
 
-Train 127788334000523, bell 78706177142395 and purr 81495950754571 are wired in published v43. Experience grants to 10771103250 remain unconfirmed. Manifest access flags remain false. Upload or owner-Studio loading is not grant evidence. Browser helper failed to identify the foreground process on both recovery attempts. Nathan requested help finding Permissions; instructions were provided. Confirmation of the three saved grants remains pending.
+Creator Dashboard verified on 2026-10-21 in the signed-in socranates in-app browser: train 127788334000523, bell 78706177142395 and purr 81495950754571 each resolved The Windowsill (10771103250) with **Already added** in Permissions > Experiences > Add experiences. Each dialog was finished with Done. Screenshots are in docs/verification/v43/audio/. These are existing access confirmations; no new runtime source edit, republish or audible live-client claim is implied.
 
 ## Art and scope
 

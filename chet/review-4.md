@@ -17,7 +17,7 @@ The automated route passed the nursery, hut descent, garden, meadow, boardwalk, 
 
 ## Sound and art
 
-Claude's v43 wiring for train, cat bell and purr is preserved. All three sounds were uploaded; experience grants are still awaiting confirmation. Owner-Studio loading does not establish published-experience permission.
+Claude's v43 wiring for train, cat bell and purr is preserved. All three sounds were uploaded. Creator Dashboard now confirms The Windowsill (10771103250) as Already added for all three sounds; each dialog was finished with Done. Screenshots are recorded in docs/verification/v43/audio/. Audible published-client playback has not been checked.
 
 Six original Blender mesh studies were uploaded, their actual dimensions checked within 0.00001 stud, and six unparented SpecialMesh preloads succeeded. See docs/MESHES.md and assets/meshes/manifest.json. The corrected model is 105970842890511; do not use oversized trial 131555390945988. No mesh was added to the live world and no World source was edited.
 

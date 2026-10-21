@@ -73,21 +73,21 @@
       "sha256": "2611d1a21b2bbea044b2f0cf23a9edf104449b84a55357401ad84f0b9e3474fb",
       "bytes": 529244,
       "roblox_asset_id": "127788334000523",
-      "experience_access_saved": false
+      "experience_access_saved": true
     },
     {
       "file": "cat_bell.wav",
       "sha256": "45c867b5f046ad55b77236089fdbd5094839efb38332a8e7a85da519d57a3c4c",
       "bytes": 88244,
       "roblox_asset_id": "78706177142395",
-      "experience_access_saved": false
+      "experience_access_saved": true
     },
     {
       "file": "cat_purr.wav",
       "sha256": "65f5218db03e8121b16da28225c93972386817708c0b72fcbaea8c3f6cfc8653",
       "bytes": 176444,
       "roblox_asset_id": "81495950754571",
-      "experience_access_saved": false
+      "experience_access_saved": true
     },
     {
       "file": "cricket_chirp.wav",

@@ -1,0 +1,10 @@
+2026-10-21T20:08:50.099Z,218.099457,340c,6,Info [FLog::CreatorOutput] [CHET_UPPER_INSTALLED] true
+2026-10-21T20:09:29.841Z,257.841827,93d0,6,Info [FLog::CreatorOutput] [CHET_UPPER_AXIS] hut_up_g 1, 0, 0 1, 0, 0 -87.75, 143, 215 Workspace.World.hut_up_g.hut_up_g_joist_1
+2026-10-21T20:09:31.071Z,259.071655,8af0,6,Info [FLog::CreatorOutput] [CHET_UPPER_RESULT] hut_up_g -87.75, 143, 215 1, 0, 0 -87.44000244140625, 143, 215 1, 0, 0 attached hut_up_g hut_up_g false false false arriving
+2026-10-21T20:09:31.071Z,259.071655,8af0,6,Info [FLog::CreatorOutput] [CHET_UPPER_AXIS] hut_up_h 1, 0, 0 1, 0, 0 -27.75, 143, 215 Workspace.World.hut_up_h.hut_up_h_joist_2
+2026-10-21T20:09:32.290Z,260.290527,93d0,6,Info [FLog::CreatorOutput] [CHET_UPPER_RESULT] hut_up_h -27.75, 143, 215 1, 0, 0 -27.440000534057617, 143, 215 1, 0, 0 attached hut_up_h hut_up_h false false false arriving
+2026-10-21T20:09:32.290Z,260.290527,93d0,6,Info [FLog::CreatorOutput] [CHET_UPPER_AXIS] hut_up_i 1, 0, 0 1, 0, 0 92.25, 143, 215 Workspace.World.hut_up_i.hut_up_i_joist_4
+2026-10-21T20:09:33.503Z,261.503143,8af0,6,Info [FLog::CreatorOutput] [CHET_UPPER_RESULT] hut_up_i 92.25, 143, 215 1, 0, 0 92.55999755859375, 143, 215 1, 0, 0 attached hut_up_i hut_up_i false false false arriving
+2026-10-21T20:09:33.504Z,261.504150,8af0,6,Info [FLog::CreatorOutput] [CHET_UPPER_AXIS] room_up_a 1, 0, 0 1, 0, 0 222.25, 143, 53 Workspace.World.room_up_a.room_up_a_joist_1
+2026-10-21T20:09:34.720Z,262.720337,33ac,6,Info [FLog::CreatorOutput] [CHET_UPPER_RESULT] room_up_a 222.25, 143, 53 1, 0, 0 222.55999755859375, 143, 53 1, 0, 0 attached room_up_a room_up_a false false false arriving
+2026-10-21T20:09:34.720Z,262.720337,33ac,6,Info [FLog::CreatorOutput] [CHET_UPPER_DONE]

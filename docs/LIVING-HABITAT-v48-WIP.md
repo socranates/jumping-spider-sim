@@ -135,6 +135,13 @@ Working branch: `codex/v48-living-habitat`, based on v47 receipt commit `9d442ff
 - Studio then exited before END. Its process is absent; this native run is terminal/incomplete, not a passing gate or a live wait. See `docs/verification/v48/NATIVE-0ca748a-INTERRUPTED.md` and its bounded log. Investigate the streaming assumption and reproduce the region-ownership result, then run the native gate again. Verify/clear debug attributes when reopening Studio.
 - An immutable 0ca748a candidate archive is prepared, but its complete CLI run has not started. The older 7236420 CLI job remains live in session 38032 at its preserve self-test; keep observing it rather than restarting it. Full habitat acceptance remains open.
 
+### Frozen baseline green; streaming entry check repaired
+
+- The immutable 7236420 run is now terminal, exit 0: **55/55 suites pass**, including preserve self-test 270/0/0 and all seven outer checks. Session 38032 is finished; do not poll/restart it. Complete raw outputs and exact snapshot identity are in `docs/verification/v48/FROZEN-7236420-RESULT.md`. This baseline predates later rain/wind/self-test changes.
+- The initial self-test now respects client streaming, while retaining every later region's full physical/readiness/support check. A real-client regression begins with a distant folder absent and still requires its later visit. All 39 inner / five outer checks pass; strict analysis clean. See `docs/verification/v48/SELFTEST-STREAMING-REVIEW.md`.
+- Focused updated-Studio reproduction of the four upper poses, including hut_up_i, passes with expected joist normals, attachment and region ownership. The earlier integrated mismatch remains unexplained, so movement/regions are unchanged. Its failure now reports enough state to diagnose the full sequence.
+- A new integrated native run is live on `C:\Users\natha\claude-xfer\Windowsill-v48-native-review.rbxlx` (local PlaceId/GameId 0), Studio log `0.744.0.7441077_20261021T200511Z_Studio_9837B_last.log`. Observe from the later `[CHET_UPPER_CLEAN_NATIVE_RERUN]` setup marker. It has SelfTest=true/Detail=full and no SilkPlayback or Wasp override; clear debug attributes after completion. It is not a live-place audio/publication check.
+
 ## Platform judgment
 
 Roblox limits density, draw calls, memory and simulation cost, especially on phones. The current barren travel and missing ground are implementation/design problems. Compact, authored habitats with reused meshes, bounded active wildlife and selective detail remain a viable direction. No engine migration is needed to address these reported problems.

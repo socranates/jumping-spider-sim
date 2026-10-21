@@ -1,0 +1,112 @@
+FROZEN_SUITE source=C:\Users\natha\claude-xfer\v48-full-7236420\roblox_port suites=55
+BEGIN 1/55 run.luau
+END run.luau exit=0 seconds=1.08
+BEGIN 2/55 perception.luau
+END perception.luau exit=0 seconds=1.19
+BEGIN 3/55 sensor.luau
+END sensor.luau exit=0 seconds=1.42
+BEGIN 4/55 prey.luau
+END prey.luau exit=0 seconds=1.05
+BEGIN 5/55 life.luau
+END life.luau exit=0 seconds=0.94
+BEGIN 6/55 checkpoint.luau
+END checkpoint.luau exit=0 seconds=10.11
+BEGIN 7/55 wasp.luau
+END wasp.luau exit=0 seconds=12.64
+BEGIN 8/55 gaze.luau
+END gaze.luau exit=0 seconds=0.89
+BEGIN 9/55 perception_view.luau
+END perception_view.luau exit=0 seconds=0.91
+BEGIN 10/55 scenarios.luau
+END scenarios.luau exit=0 seconds=3.22
+BEGIN 11/55 client_smoke.luau
+END client_smoke.luau exit=0 seconds=47.88
+BEGIN 12/55 perception_client.luau
+END perception_client.luau exit=0 seconds=3.45
+BEGIN 13/55 client_ant.luau
+END client_ant.luau exit=0 seconds=21.23
+BEGIN 14/55 client_rival.luau
+END client_rival.luau exit=0 seconds=71.45
+BEGIN 15/55 client_mating.luau
+END client_mating.luau exit=0 seconds=116.27
+BEGIN 16/55 look.luau
+END look.luau exit=0 seconds=94.36
+BEGIN 17/55 idle.luau
+END idle.luau exit=0 seconds=56.5
+BEGIN 18/55 world.luau
+END world.luau exit=0 seconds=1.8
+BEGIN 19/55 flies.luau
+END flies.luau exit=0 seconds=1.59
+BEGIN 20/55 eyes.luau
+END eyes.luau exit=0 seconds=6.19
+BEGIN 21/55 hud.luau
+END hud.luau exit=0 seconds=0.98
+BEGIN 22/55 peacock.luau
+END peacock.luau exit=0 seconds=0.86
+BEGIN 23/55 antmimic.luau
+END antmimic.luau exit=0 seconds=0.84
+BEGIN 24/55 tarantula.luau
+END tarantula.luau exit=0 seconds=0.98
+BEGIN 25/55 continuing.luau
+END continuing.luau exit=0 seconds=1.45
+BEGIN 26/55 growth.luau
+END growth.luau exit=0 seconds=1.98
+BEGIN 27/55 notebook.luau
+END notebook.luau exit=0 seconds=18.48
+BEGIN 28/55 state.luau
+END state.luau exit=0 seconds=22.22
+BEGIN 29/55 state_client.luau
+END state_client.luau exit=0 seconds=45.44
+BEGIN 30/55 state_offline.luau
+END state_offline.luau exit=0 seconds=1.19
+BEGIN 31/55 settings.luau
+END settings.luau exit=0 seconds=15.33
+BEGIN 32/55 rival.luau
+END rival.luau exit=0 seconds=2.34
+BEGIN 33/55 rivalnav.luau
+END rivalnav.luau exit=0 seconds=32.67
+BEGIN 34/55 mating.luau
+END mating.luau exit=0 seconds=3.03
+BEGIN 35/55 inspect.luau
+END inspect.luau exit=0 seconds=108.19
+BEGIN 36/55 worldmap.luau
+END worldmap.luau exit=0 seconds=32.89
+BEGIN 37/55 world_client.luau
+END world_client.luau exit=0 seconds=219.55
+BEGIN 38/55 garden_life.luau
+END garden_life.luau exit=0 seconds=22.45
+BEGIN 39/55 selftest.luau
+END selftest.luau exit=0 seconds=75.28
+BEGIN 40/55 nature.luau
+END nature.luau exit=0 seconds=10.33
+BEGIN 41/55 nature_client.luau
+END nature_client.luau exit=0 seconds=25.91
+BEGIN 42/55 title.luau
+END title.luau exit=0 seconds=16.3
+BEGIN 43/55 lock.luau
+END lock.luau exit=0 seconds=37.27
+BEGIN 44/55 quiet.luau
+END quiet.luau exit=0 seconds=10.41
+BEGIN 45/55 preserve.luau
+END preserve.luau exit=0 seconds=92.44
+BEGIN 46/55 selftest_preserve.luau
+END selftest_preserve.luau exit=0 seconds=597.55
+BEGIN 47/55 shadows.luau
+END shadows.luau exit=0 seconds=1.88
+BEGIN 48/55 bodies.luau
+END bodies.luau exit=0 seconds=19.02
+BEGIN 49/55 living_world.luau
+END living_world.luau exit=0 seconds=6.03
+BEGIN 50/55 station_threats.luau
+END station_threats.luau exit=0 seconds=9.89
+BEGIN 51/55 minimal_hud.luau
+END minimal_hud.luau exit=0 seconds=1.0
+BEGIN 52/55 compact_layout.luau
+END compact_layout.luau exit=0 seconds=1.27
+BEGIN 53/55 verge_litter.luau
+END verge_litter.luau exit=0 seconds=1.59
+BEGIN 54/55 route_preparation.luau
+END route_preparation.luau exit=0 seconds=4.84
+BEGIN 55/55 dog_gait.luau
+END dog_gait.luau exit=0 seconds=0.97
+FROZEN_COMPLETE suites=55 passed=55 failed=0

@@ -17,11 +17,20 @@ local lines: { string } = {}
 local co: thread? = nil
 local simClock = 0.0
 local sampled = 0.0 -- (the seconds the frame samples took: no heartbeat is said in them, the host's sample being one wait)
+local deferredFolder: Instance? = nil
+local deferredParent: Instance? = nil
+local checkedWhileDistantAbsent = false
 SelfTest.host = {
 	spawn = function(fn: () -> ()) co = coroutine.create(fn) end,
 	wait = function(seconds: number) coroutine.yield(seconds) end,
 	clock = function(): number return simClock end,
-	print = function(line: string) table.insert(lines, line); print(line) end,
+	print = function(line: string)
+		table.insert(lines, line); print(line)
+		if string.find(line,"world folders",1,true) and deferredFolder then
+			checkedWhileDistantAbsent=deferredFolder.Parent==nil and string.find(line,"PASS world folders",1,true)~=nil
+			deferredFolder.Parent=deferredParent
+		end
+	end,
 	sample = function(seconds: number): string
 		sampled += seconds
 		local t0 = simClock
@@ -36,6 +45,13 @@ local decorModel = Instance.new("Model")
 decorModel.Name = "Decor"
 decorModel.Parent = workspace
 WorldBuild.world(workspace, WorldMap.SEED)
+-- Native streaming does not retain every far folder at the home pose. Restore
+-- this one after the initial guard, so its later region visit still checks all
+-- actual support pieces rather than being skipped.
+workspace.StreamingEnabled=true
+deferredParent=assert(workspace:FindFirstChild("World"))
+deferredFolder=assert(deferredParent:FindFirstChild("shrub_west_j"))
+deferredFolder.Parent=nil
 local focusRemote = Instance.new("RemoteEvent")
 focusRemote.Name = "WorldFocus"
 focusRemote.Parent = game:GetService("ReplicatedStorage")
@@ -82,6 +98,15 @@ check("the self-test runs through the real client to END, every check passing he
 	for _, name in want do assert(passes[name], "no PASS for " .. name) end
 	assert(last == `[SELFTEST] END pass={#want} fail=0 skip=0`, "the END line: " .. last)
 	assert(simClock < 180, string.format("the run took %.0f s of play, more than three minutes", simClock))
+end)
+
+check("streaming defers distant folders but still visits and validates the missing-at-start region",function()
+ assert(checkedWhileDistantAbsent,"the initial guard required a distant folder to remain loaded")
+ assert(deferredFolder.Parent==deferredParent,"the distant region was not restored for its actual visit")
+ local visited=false
+ for _,line in lines do if line=="[SELFTEST] PASS region shrub_west_j" then visited=true end end
+ assert(visited,"streaming must not skip the distant region's support/readiness check")
+ workspace.StreamingEnabled=false
 end)
 
 check("a heartbeat while it waits, the measures as INFO lines, and the spider left standing where a life begins", function()

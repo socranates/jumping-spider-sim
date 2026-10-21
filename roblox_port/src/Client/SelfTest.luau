@@ -400,7 +400,11 @@ local function checks(): { Check }
 		local world = r.ctx.world
 		need(Workspace:FindFirstChild(Region.WORLD_FOLDER) ~= nil and world.root.Name == Region.WORLD_FOLDER, "no World folder in the workspace")
 		local absent: { string } = {}
-		for _, region in WorldMap.regions() do
+		-- A streamed client deliberately does not retain every distant folder.
+		-- Check its current region now; the visits below still require every
+		-- region's complete pieces, real support and stable attachment.
+		local required: { WorldMap.Region } = if Workspace.StreamingEnabled then { world.region } else WorldMap.regions()
+		for _, region in required do
 			if world:folderOf(region) == nil then table.insert(absent, region.id) end
 		end
 		need(#absent == 0, "no folder for " .. table.concat(absent, ", "))
@@ -422,7 +426,8 @@ local function checks(): { Check }
 			local p0 = motor.pos
 			pause(r, 1.0)
 			need(motor.mode == "attached" and (motor.pos - p0).Magnitude < 0.25, `did not stay put: from {fmt(p0)} to {fmt(motor.pos)}, {motor.mode}`)
-			need(world.region.id == region.id, `the client's world says {world.region.id}`)
+			local owned=WorldMap.at(motor.pos)
+			need(world.region.id == region.id, `the client's world says {world.region.id}; map owns {if owned then owned.id else "none"} at {fmt(motor.pos)}, up {fmt(motor.up)}; expected {fmt(at)}, normal {fmt(u)}; panel {ctx.caughtPanel:isShowing()}, ended {ctx.session.ended}, lifeOver {ctx.life.lifeOver}`)
 		end)
 	end
 

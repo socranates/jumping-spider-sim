@@ -1,0 +1,98 @@
+[SELFTEST] BEGIN the live place's self-test (ROBLOX-104)
+[SELFTEST] INFO world: test_garden (revision world-3)
+[SELFTEST] PASS new life
+[SELFTEST] PASS intro
+[SELFTEST] FAIL world folders: no folder for shrub_west_j
+[SELFTEST] PASS region sill
+[SELFTEST] ... region outer_sill (6 s in)
+[SELFTEST] PASS region outer_sill
+[SELFTEST] PASS region house_wall
+[SELFTEST] PASS region bed_a
+[SELFTEST] PASS region wall_west
+[SELFTEST] PASS region wall_west_upper
+[SELFTEST] ... region wall_upper (11 s in)
+[SELFTEST] PASS region wall_upper
+[SELFTEST] PASS region eaves_west
+[SELFTEST] PASS region eaves
+[SELFTEST] PASS region shrub_west_a
+[SELFTEST] ... region shrub_west_b (17 s in)
+[SELFTEST] PASS region shrub_west_b
+[SELFTEST] PASS region shrub_west_c
+[SELFTEST] PASS region shrub_west_d
+[SELFTEST] PASS region shrub_west_e
+[SELFTEST] PASS region shrub_west_f
+[SELFTEST] ... region shrub_west_g (22 s in)
+[SELFTEST] PASS region shrub_west_g
+[SELFTEST] PASS region shrub_west_h
+[SELFTEST] PASS region shrub_west_i
+[SELFTEST] PASS region shrub_west_j
+[SELFTEST] ... region kitchen_counter (28 s in)
+[SELFTEST] PASS region kitchen_counter
+[SELFTEST] PASS region kitchen_floor
+[SELFTEST] INFO walk: 7.54 studs in 3 s, height 0.31 to 0.31
+[SELFTEST] PASS walk on the sill
+[SELFTEST] ... the line (33 s in)
+[SELFTEST] ... the line (38 s in)
+[SELFTEST] INFO profile on the line: 368 frames, the render step 10.94 ms a frame (worst 34.2): spider rig 7.08/26.4, camera 1.30/8.2, fly bodies 0.89/7.9, prey 0.43/2.2, hud 0.24/0.9, senses 0.20/2.6, motor 0.17/0.5, life 0.10/0.3, bug bodies 0.07/0.3, percepts 0.05/0.3, poses 0.05/0.2, small 0.34 (mean/worst ms); a frame: spider parts placed 707, fly parts placed 49, bug parts placed 3, camera casts 10, camera overlaps 2, camera rays 0, framing searches 0; allocated 2058 KB a frame (percepts 3, senses 24, prey 34, motor 13, nature 1, rival 1, life 4, camera 277, poses 2, spider rig 1474, hud 4, lock button 4, fly bodies 208, sound 1, lines 4, perception hud 2)
+[SELFTEST] INFO line: let down at 0.753 studs a second of the game's time (the game's 0.75), 0.753 by the clock
+[SELFTEST] INFO line ticks: 368 ticks (6.13 s of the game) in 6.13 s by the clock; line let out 4.600, the body fell 4.618 (100.4% of it); sweeps stopped the body 0 times (0.000 taken off), 0 tangent touches let pass, 184 push-outs (0.052 out, 0.000 of it up)
+[SELFTEST] PASS the line
+[SELFTEST] INFO prey on the sill: 4 flies drawn
+[SELFTEST] PASS prey on the sill
+[SELFTEST] ... lock (44 s in)
+[SELFTEST] INFO lock: 3.0 studs away, facing it within 1 degrees, a sidestep of 0.67 studs in 1 s
+[SELFTEST] INFO lock: L1 holds creep, locks on press, and lets go on the next press
+[SELFTEST] PASS lock
+[SELFTEST] INFO prey in the bed: 3 gnats, 3 aphids, 4 springtails, 2 leafhoppers, all drawn
+[SELFTEST] PASS prey in the bed
+[SELFTEST] INFO woodlice: 4 made and drawn
+[SELFTEST] PASS woodlice
+[SELFTEST] INFO frame time in the bed: shim: 300 simulated frames of 1/60 s (no engine here: not a frame time)
+[SELFTEST] INFO profile in the bed: 300 frames, the render step 38.62 ms a frame (worst 220.9): spider rig 14.87/183.9, bug bodies 10.68/149.5, fly bodies 7.55/68.0, prey 1.81/12.0, senses 0.75/7.2, hud 0.58/18.8, camera 0.50/9.4, life 0.40/12.1, percepts 0.30/2.8, perception hud 0.18/13.7, motor 0.18/2.3, sound 0.13/3.4, lock button 0.12/4.3, poses 0.12/4.5, rival 0.11/2.8, save 0.06/5.5, mating 0.04/2.0, looks 0.01/1.1, shadows 0.01/2.1, lines 0.01/1.1, small 0.19 (mean/worst ms); a frame: spider parts placed 653, fly parts placed 162, bug parts placed 190, camera casts 3, camera overlaps 2, camera rays 0, framing searches 0; allocated 3335 KB a frame (percepts 7, senses 52, prey 59, motor 3, nature 1, rival 1, life 7, camera 21, poses 2, spider rig 1324, hud 4, lock button 5, fly bodies 767, bug bodies 1075, sound 2, perception hud 5)
+[SELFTEST] INFO engine in the bed: memory ? MB, Lua heap 57.4 MB, instances ?, primitives ? (moving ?), awake parts ?
+[SELFTEST] INFO census in the bed: 3567 parts, 633 see-through, 211 casting shadows, 1150 meshed (parts/see-through/shadow/meshed: Bugs 438/0/0/130, Flies 352/27/0/138, JumpArc 32/0/0/0, Spider 707/514/86/94, World 553/0/0/0, WorldDecor 1475/92/125/788, the rest 10/0/0/0)
+[SELFTEST] PASS frame time in the bed
+[SELFTEST] INFO looks settled in the bed: yes, 0.03 s after the spider came, 1475 parts held of 1475 planned, 34 plans, 7539 made and 6064 destroyed this session
+[SELFTEST] INFO frame time in the bed, settled: shim: 300 simulated frames of 1/60 s (no engine here: not a frame time)
+[SELFTEST] INFO profile in the bed, settled: 300 frames, the render step 29.81 ms a frame (worst 146.1): spider rig 11.46/99.5, bug bodies 8.21/76.4, fly bodies 5.57/56.2, prey 1.51/12.8, senses 0.79/18.6, hud 0.42/8.8, camera 0.38/7.4, percepts 0.37/33.4, life 0.25/5.3, sound 0.15/6.6, motor 0.15/3.0, perception hud 0.11/1.7, poses 0.07/1.2, rival 0.07/0.9, lock button 0.06/1.5, other 0.01/1.9, small 0.22 (mean/worst ms); a frame: spider parts placed 649, fly parts placed 162, bug parts placed 190, camera casts 3, camera overlaps 2, camera rays 0, framing searches 0; allocated 3317 KB a frame (percepts 7, senses 59, prey 61, motor 3, nature 1, rival 1, life 6, camera 20, poses 2, spider rig 1326, hud 4, lock button 5, fly bodies 755, bug bodies 1058, sound 2, perception hud 5)
+[SELFTEST] INFO engine in the bed, settled: memory ? MB, Lua heap 50.0 MB, instances ?, primitives ? (moving ?), awake parts ?
+[SELFTEST] INFO looks while settled: 0 plans and 0 parts made in the sample
+[SELFTEST] INFO frame time in the bed without the looks: shim: 180 simulated frames of 1/60 s (no engine here: not a frame time)
+[SELFTEST] INFO profile in the bed without the looks: 180 frames, the render step 18.92 ms a frame (worst 62.1): spider rig 7.57/30.8, bug bodies 5.23/38.3, fly bodies 3.39/23.7, prey 0.90/2.2, senses 0.46/4.5, hud 0.26/0.7, camera 0.22/0.5, percepts 0.17/0.8, life 0.16/0.5, perception hud 0.09/0.3, motor 0.09/0.2, sound 0.09/1.3, small 0.30 (mean/worst ms); a frame: spider parts placed 649, fly parts placed 162, bug parts placed 190, camera casts 3, camera overlaps 2, camera rays 0, framing searches 0; allocated 3352 KB a frame (percepts 7, senses 54, prey 60, motor 3, nature 1, rival 1, life 6, camera 20, poses 2, spider rig 1336, hud 4, lock button 5, fly bodies 734, bug bodies 1110, sound 2, perception hud 6)
+[SELFTEST] INFO engine in the bed without the looks: memory ? MB, Lua heap 60.1 MB, instances ?, primitives ? (moving ?), awake parts ?
+[SELFTEST] INFO frame time in the bed without shadows: shim: 180 simulated frames of 1/60 s (no engine here: not a frame time)
+[SELFTEST] INFO profile in the bed without shadows: 180 frames, the render step 18.68 ms a frame (worst 50.3): spider rig 6.91/26.3, bug bodies 5.29/33.5, fly bodies 3.88/27.7, prey 0.90/2.6, senses 0.40/2.8, hud 0.25/0.7, camera 0.22/0.6, percepts 0.16/0.5, life 0.15/0.3, motor 0.08/0.2, sound 0.08/0.2, perception hud 0.07/0.1, small 0.29 (mean/worst ms); a frame: spider parts placed 654, fly parts placed 162, bug parts placed 190, camera casts 3, camera overlaps 2, camera rays 0, framing searches 0; allocated 3314 KB a frame (percepts 7, senses 49, prey 64, motor 3, nature 1, rival 1, life 7, camera 21, poses 2, spider rig 1321, hud 4, lock button 4, fly bodies 784, bug bodies 1040, sound 2, perception hud 4)
+[SELFTEST] INFO engine in the bed without shadows: memory ? MB, Lua heap 46.6 MB, instances ?, primitives ? (moving ?), awake parts ?
+[SELFTEST] PASS frame time in the bed, settled
+[SELFTEST] ... moths on the wall (63 s in)
+[SELFTEST] INFO moths on the wall: 2 made and drawn
+[SELFTEST] PASS moths on the wall
+[SELFTEST] ... dusk: the moths fly (68 s in)
+[SELFTEST] ... dusk: the moths fly (73 s in)
+[SELFTEST] PASS dusk: the moths fly
+[SELFTEST] PASS notebook
+[SELFTEST] ... rest and checkpoint (78 s in)
+[SELFTEST] PASS rest and checkpoint
+[SELFTEST] INFO sound: music volume 0.320, IsLoaded nil
+[SELFTEST] PASS sound
+[SELFTEST] INFO frame time on the sill: shim: 300 simulated frames of 1/60 s (no engine here: not a frame time)
+C:/Users/natha/AppData/Local/Temp/tmp3symzr4f.luau:56240: SELFTEST failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmp3symzr4f.luau:56240
+[SELFTEST] INFO profile on the sill: 300 frames, the render step 11.03 ms a frame (worst 31.3): spider rig 7.01/22.2, fly bodies 2.23/9.8, camera 0.39/1.3, senses 0.35/2.4, hud 0.24/0.5, prey 0.19/1.0, perception hud 0.07/0.4, motor 0.07/0.2, life 0.07/0.4, small 0.39 (mean/worst ms); a frame: spider parts placed 664, fly parts placed 124, bug parts placed 0, camera casts 3, camera overlaps 2, camera rays 0, framing searches 0; allocated 1962 KB a frame (percepts 2, senses 37, prey 17, motor 4, nature 2, rival 1, life 2, camera 57, poses 2, spider rig 1346, hud 3, lock button 4, fly bodies 477, sound 1, perception hud 5)
+[SELFTEST] INFO engine on the sill: memory ? MB, Lua heap 41.2 MB, instances ?, primitives ? (moving ?), awake parts ?
+[SELFTEST] INFO census on the sill: 2950 parts, 673 see-through, 159 casting shadows, 856 meshed (parts/see-through/shadow/meshed: Flies 156/52/0/68, JumpArc 32/0/0/0, Spider 707/514/86/94, World 553/0/0/0, WorldDecor 1496/107/73/694, the rest 6/0/0/0)
+[SELFTEST] INFO shadows on the sill: 23 of 23 visible walkable boxes cast, 0 too small to see at their distance cast none (25 passes, 0 writes)
+[SELFTEST] PASS frame time on the sill
+[SELFTEST] INFO parts at the full tier: 2950 in the workspace (Flies 156, FlyClearanceProbe 1, JumpArc 32, Spider 707, WindowsillAudio 5, World 553, WorldDecor 1496)
+[SELFTEST] INFO looks outside the window: 1496 parts held of 1496 planned at the full tier, 7734 made and 6238 destroyed this session, 40 plans
+[SELFTEST] PASS part counts
+[SELFTEST] INFO took 85 s
+[SELFTEST] END pass=38 fail=1 skip=0
+selftest: the run took 84.8 s of play (5089 frames)
+FAIL selftest: the self-test runs through the real client to END, every check passing here, in under three minutes of play
+    C:/Users/natha/AppData/Local/Temp/tmp3symzr4f.luau:56186: 1 checks failed here (see the FAIL lines above)
+FAIL selftest: streaming defers distant folders but still visits and validates the missing-at-start region
+    C:/Users/natha/AppData/Local/Temp/tmp3symzr4f.luau:56196: the initial guard required a distant folder to remain loaded
+SELFTEST passed=3 failed=2

@@ -6,7 +6,7 @@ v43 is pushed and published to the existing playtest place 120119801868085 in un
 
 - Native Windows Studio, preserve default, foreground throughout: **245 pass, 0 fail, 0 skip**, 520 seconds. The earlier background v42 run was 244/245, with the hut descent timing out. The original hut check and timeout passed in foreground v43; no test was weakened and no movement source was changed.
 - v43 targeted CLI: preserve 1,133 checks and world_client 30 checks, all passed.
-- The first complete CLI run passed 351,194 checks across 47 suites, but it overlapped the v42-to-v43 checkout update. Its report is explicitly transition evidence, not a frozen release gate. A second complete run is running from an immutable archive of f014636; its final result will be recorded in the release handback.
+- The first complete CLI run passed 351,194 checks across 47 suites, but it overlapped the v42-to-v43 checkout update. Its report is explicitly transition evidence, not a frozen release gate. The second complete run finished from an immutable archive of f014636: **351,194 passed, 0 failed across 47 suites, exit 0**. See docs/verification/v43/windows-v43-frozen-full-cli.txt.
 - Studio streaming remained enabled, integrity disabled, radii 96/160 as observed in Properties. SelfTest was cleared before publishing. Rojo was stopped before Publish. Only File > Publish was used.
 
 ## Performance and feel limits

@@ -1,0 +1,298 @@
+{
+  "source": "1447d6b74c9aa6b6b4725ad3bdaa6e30d972fd24",
+  "evidence": "97cdf8a2827b4734",
+  "suites": 48,
+  "passed": 352162,
+  "failed": 0,
+  "method": "45 unchanged suites from frozen full run plus 3 corrected-suite reruns; original full process exited 1 for four stale Focus-label assertions. Playable bytes unchanged.",
+  "results": [
+    {
+      "suite": "SUMMARY",
+      "passed": 196,
+      "failed": 0,
+      "run": "corrected test expectation rerun"
+    },
+    {
+      "suite": "PERCEPTION",
+      "passed": 4669,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "SENSOR",
+      "passed": 507,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "PREY",
+      "passed": 1668,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "LIFE",
+      "passed": 20922,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "CHECKPOINT",
+      "passed": 545,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "WASP",
+      "passed": 16884,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "GAZE",
+      "passed": 74,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "PRESENTATION",
+      "passed": 11,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "BOXWORLD",
+      "passed": 21,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "CLIENT",
+      "passed": 26,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "PERCEPTION_CLIENT",
+      "passed": 1,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "CLIENT_ANT",
+      "passed": 3,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "CLIENT_RIVAL",
+      "passed": 9,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "CLIENT_MATING",
+      "passed": 29,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "LOOK",
+      "passed": 1442,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "IDLE",
+      "passed": 5719,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "WORLD",
+      "passed": 355,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "FLIES",
+      "passed": 283,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "EYES",
+      "passed": 231,
+      "failed": 0,
+      "run": "corrected test expectation rerun"
+    },
+    {
+      "suite": "HUD",
+      "passed": 103,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "PEACOCK",
+      "passed": 272,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "ANTMIMIC",
+      "passed": 89,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "TARANTULA",
+      "passed": 86,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "CONTINUING",
+      "passed": 87,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "GROWTH",
+      "passed": 493,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "NOTEBOOK",
+      "passed": 1499,
+      "failed": 0,
+      "run": "corrected test expectation rerun"
+    },
+    {
+      "suite": "STATE",
+      "passed": 503,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "STATE_CLIENT",
+      "passed": 140,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "STATE_OFFLINE",
+      "passed": 8,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "SETTINGS",
+      "passed": 1163,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "RIVAL",
+      "passed": 2843,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "RIVALNAV",
+      "passed": 581,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "MATING",
+      "passed": 715,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "INSPECT",
+      "passed": 37,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "WORLDMAP",
+      "passed": 2077,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "WORLD_CLIENT",
+      "passed": 30,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "GARDEN_LIFE",
+      "passed": 256701,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "SELFTEST",
+      "passed": 4,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "NATURE",
+      "passed": 28890,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "NATURE_CLIENT",
+      "passed": 6,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "TITLE",
+      "passed": 16,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "LOCK",
+      "passed": 130,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "QUIET",
+      "passed": 10,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "PRESERVE",
+      "passed": 1144,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "SELFTEST_PRESERVE",
+      "passed": 7,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "SHADOWS",
+      "passed": 25,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    },
+    {
+      "suite": "BODIES",
+      "passed": 908,
+      "failed": 0,
+      "run": "full frozen 6283a59"
+    }
+  ]
+}

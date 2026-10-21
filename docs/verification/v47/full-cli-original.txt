@@ -1,0 +1,724 @@
+C:/Users/natha/AppData/Local/Temp/tmp9e464b50.luau:41543: port check failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmp9e464b50.luau:41543
+fuzz: 402 body hairs, 80 leg hairs, 32 white
+FAIL a PlayStation controller gets its own button names
+SUMMARY passed=195 failed=1
+PERCEPTION passed=4669 failed=0
+SENSOR passed=507 failed=0
+PREY feel: fruit fly idle 1.68 s, 2 taps/s won 60/60, 4 taps/s 1.00 s; house fly idle 1.15 s, 4 taps/s 4.61 s
+PREY feel (ROBLOX-96): gnat idle 1.94 s, aphid idle 2.34 s
+PREY feel (ROBLOX-101): crane fly idle 0.99 s, won 33/60 at 4 taps/s and 60/60 at 6; house fly 60/60 at 4
+PREY passed=1668 failed=0
+LIFE passed=20922 failed=0
+checkpoint: 17884 characters, 87 tables
+CHECKPOINT passed=545 failed=0
+WASP rival reach: 95 of 105 places the rival patrols to can be reached by the wasp
+WASP passed=16884 failed=0
+GAZE passed=74 failed=0
+PRESENTATION passed=11 failed=0
+  1 east leaf, front: caught true, settled true, reel true, 269 ticks, max turn 0
+  2 east leaf, back: caught true, settled true, reel true, 269 ticks, max turn 0
+  3 middle leaf, front: caught true, settled true, reel true, 206 ticks, max turn 0
+  4 middle leaf, back: caught true, settled true, reel true, 206 ticks, max turn 0
+  5 west leaf, front: caught true, settled true, reel true, 206 ticks, max turn 0
+  6 west leaf, west side: caught true, settled true, reel true, 62 ticks, max turn 0
+  7 planter rim, front: caught true, settled true, reel true, 60 ticks, max turn 0
+  8 middle leaf, front, then lower: caught true, settled true, lower true, 138 ticks, max turn 0
+  9 east leaf, front, then lower: caught true, settled true, lower true, 159 ticks, max turn 0
+  10 west leaf, front, then let go: caught true, settled true, letgo true, 127 ticks, max turn 0
+  the let-down past the wall: skin 0.310 from Studio's place, 0.310 with the engine's miss, on the soil after 118.9 s
+  the tangent touch: 0.753 studs a second exact, 0.753 with a touch on every sweep (360 let pass), 0.000 without the rule (360 stops, 4.111 taken off)
+BOXWORLD passed=21 failed=0
+CLIENT passed=26 failed=0
+PERCEPTION_CLIENT passed=1 failed=0
+CLIENT_ANT passed=3 failed=0
+CLIENT_RIVAL passed=9 failed=0
+CLIENT_MATING passed=29 failed=0
+look: full 707 parts (504 hairs, 8 shells, 195 other), low 265 (134 hairs, 2 shells, 129 other)
+look: peacock spider full 119 parts, low 80
+look: ant-mimicking spider full 79 parts, low 69
+look: Mexican redknee full 146 parts, low 84; Greenbottle blue full 148 parts (36 bristles), low 84
+look: tolerance, first spider, full: hairs within 6.68e-04 studs, 9.99e-04 radians, 0.00e+00 of size of the exact ones over 520 frames, 91.6 percent of the parts moved
+look: tolerance, first spider, low (as the mate is drawn): hairs within 6.68e-04 studs, 9.62e-04 radians, 0.00e+00 of size of the exact ones over 520 frames, 94.8 percent of the parts moved
+look: tolerance, redknee, full: hairs within 1.80e-04 studs, 9.92e-04 radians, 0.00e+00 of size of the exact ones over 520 frames, 90.8 percent of the parts moved
+look: rival full 622 parts, low 211
+look: the male mate, low (living) 270 parts
+LOOK passed=1442 failed=0
+IDLE passed=5719 failed=0
+world: invented sun, z flip 1: picks clock 9.75, latitude 40.7, 39 degrees high, 46 degrees off straight-out-of-the-window
+world: invented sun, z flip -1: picks clock 9.75, latitude -40.7, 39 degrees high, 46 degrees off straight-out-of-the-window
+world: decor 1261 parts at full detail, 363 at low (view 45 items at full), dust 7 -> 2.8 per second
+world: the looks outside the window (full/low): outer_sill 116/39, house_wall 127/69, bed_a 466/113, wall_west 93/59, wall_west_upper 73/66, wall_upper 49/28, eaves_west 46/31, eaves 149/42, shrub_west_a 260/80, shrub_west_b 260/80, shrub_west_c 260/80, shrub_west_d 260/80, shrub_west_e 260/80, shrub_west_f 260/80, shrub_west_g 260/80, shrub_west_h 260/80, shrub_west_i 260/80, shrub_west_j 260/80, kitchen_counter 83/19, kitchen_floor 34/10
+WORLD passed=355 failed=0
+FLIES passed=283 failed=0
+C:/Users/natha/AppData/Local/Temp/tmpvr00wwjh.luau:54941: eyes checks failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmpvr00wwjh.luau:54941
+FAIL eyes: and the controller's and the screen's own words
+EYES passed=230 failed=1
+HUD passed=103 failed=0
+PEACOCK card lines (the longest of every display key and pad style): keyboard 10, gamepad 10, touch 10
+PEACOCK passed=272 failed=0
+ANTMIMIC passed=89 failed=0
+TARANTULA passed=86 failed=0
+CONTINUING passed=87 failed=0
+GROWTH passed=493 failed=0
+C:/Users/natha/AppData/Local/Temp/tmpah8by067.luau:55756: notebook failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmpah8by067.luau:55756
+FAIL NOTEBOOK and for an Xbox controller
+FAIL NOTEBOOK and for a PlayStation controller
+NOTEBOOK client: after the first 120 frames the book holds: bold_jumper,hunting_by_sight
+NOTEBOOK passed=1497 failed=2
+state: a rest is 17822 characters early and 21534 at most after 3 samples of a long life (cap 262144, Roblox 4194304)
+slow [random operations, faults and two sessions: stored progress only ever grows, every stored value is a good save, and nothing raises] 13.1 s
+STATE passed=503 failed=0
+STATE_CLIENT passed=140 failed=0
+STATE_OFFLINE passed=8 failed=0
+SETTINGS passed=1163 failed=0
+RIVAL contest rates over 6000 strikes: caught 0.400, sprang clear 0.322, counter-bite 0.278
+RIVAL feel: no taps tears free in 1.65 s; 2, 3, 3.5 a second tear free; 4 a second tears free (59 of 60 in 40 s); 5 a second wins in 5.6 to 9.8 s (mean 7.6); 5.5 in 4.6; 6 in 3.2; gentle idle 1.14 s, gentle 4 in 5.5 s, automatic grip alone 11.3 s, a 1 s lapse at 3 s costs 6.3 s
+RIVAL passed=2843 failed=0
+RIVALNAV perf: 5400 ticks, 2.00 rays/tick, 900 thinks, 4 plans, 0 replans, 0 resets, 4538 ticks/s of CPU shim time
+RIVALNAV places to patrol to: sill 105, outer_sill 18, house_wall 13, bed_a 79
+RIVALNAV the preserve: the rival in 15 minutes crossed 3 seams and walked 4 of its roam's regions (the garden's 16 cells, ROBLOX-119: and the path, the bench patch and the meadow's edge); 8 places reached
+RIVALNAV the meadow's edge: in 10 minutes the rival walked 3 regions (2 crossings), 77 studs from where it began, in pad_c3, its record good true
+RIVALNAV passed=581 failed=0
+MATING passed=715 failed=0
+INSPECT passed=37 failed=0
+worldmap: from the parked focus, the sill's farthest box corner is 57.8 studs, the outer sill's 55.5 (always sent: 96)
+worldmap: sill: from anywhere on it, its farthest box is 61.8 studs away (nearest point or centre, the farther), 69.8 from a focus 8 behind
+worldmap: outer_sill: from anywhere on it, its farthest box is 44.1 studs away (nearest point or centre, the farther), 52.1 from a focus 8 behind
+worldmap: house_wall: from anywhere on it, its farthest box is 112.7 studs away (nearest point or centre, the farther), 120.7 from a focus 8 behind
+worldmap: bed_a: from anywhere on it, its farthest box is 59.1 studs away (nearest point or centre, the farther), 67.1 from a focus 8 behind
+worldmap: wall_west: from anywhere on it, its farthest box is 88.5 studs away (nearest point or centre, the farther), 96.5 from a focus 8 behind
+worldmap: wall_west_upper: from anywhere on it, its farthest box is 93.1 studs away (nearest point or centre, the farther), 101.1 from a focus 8 behind
+worldmap: wall_upper: from anywhere on it, its farthest box is 120.2 studs away (nearest point or centre, the farther), 128.2 from a focus 8 behind
+worldmap: eaves_west: from anywhere on it, its farthest box is 96.4 studs away (nearest point or centre, the farther), 104.4 from a focus 8 behind
+worldmap: eaves: from anywhere on it, its farthest box is 136.5 studs away (nearest point or centre, the farther), 144.5 from a focus 8 behind
+worldmap: shrub_west_a: from anywhere on it, its farthest box is 98.4 studs away (nearest point or centre, the farther), 106.4 from a focus 8 behind
+worldmap: shrub_west_b: from anywhere on it, its farthest box is 101.2 studs away (nearest point or centre, the farther), 109.2 from a focus 8 behind
+worldmap: shrub_west_c: from anywhere on it, its farthest box is 98.3 studs away (nearest point or centre, the farther), 106.3 from a focus 8 behind
+worldmap: shrub_west_d: from anywhere on it, its farthest box is 98.4 studs away (nearest point or centre, the farther), 106.4 from a focus 8 behind
+worldmap: shrub_west_e: from anywhere on it, its farthest box is 98.1 studs away (nearest point or centre, the farther), 106.1 from a focus 8 behind
+worldmap: shrub_west_f: from anywhere on it, its farthest box is 98.8 studs away (nearest point or centre, the farther), 106.8 from a focus 8 behind
+worldmap: shrub_west_g: from anywhere on it, its farthest box is 111.6 studs away (nearest point or centre, the farther), 119.6 from a focus 8 behind
+worldmap: shrub_west_h: from anywhere on it, its farthest box is 100.6 studs away (nearest point or centre, the farther), 108.6 from a focus 8 behind
+worldmap: shrub_west_i: from anywhere on it, its farthest box is 97.2 studs away (nearest point or centre, the farther), 105.2 from a focus 8 behind
+worldmap: shrub_west_j: from anywhere on it, its farthest box is 100.1 studs away (nearest point or centre, the farther), 108.1 from a focus 8 behind
+worldmap: kitchen_counter: from anywhere on it, its farthest box is 128.7 studs away (nearest point or centre, the farther), 136.7 from a focus 8 behind
+worldmap: kitchen_floor: from anywhere on it, its farthest box is 143.0 studs away (nearest point or centre, the farther), 151.0 from a focus 8 behind
+worldmap: sill to outer_sill: within 10 studs of the seam (330 places), the 1 boxes of outer_sill on the seam are at most 19.2 studs away, the rest 34.6
+worldmap: sill to wall_upper: within 10 studs of the seam (679 places), the 3 boxes of wall_upper on the seam are at most 85.2 studs away, the rest 92.9
+worldmap: sill to kitchen_counter: within 10 studs of the seam (744 places), the 3 boxes of kitchen_counter on the seam are at most 77.3 studs away, the rest 88.1
+worldmap: outer_sill to sill: within 10 studs of the seam (159 places), the 3 boxes of sill on the seam are at most 36.8 studs away, the rest 50.7
+worldmap: outer_sill to house_wall: within 10 studs of the seam (371 places), the 3 boxes of house_wall on the seam are at most 61.7 studs away, the rest 0.0
+worldmap: house_wall to outer_sill: within 10 studs of the seam (59 places), the 1 boxes of outer_sill on the seam are at most 39.2 studs away, the rest 56.3
+worldmap: house_wall to bed_a: within 10 studs of the seam (7 places), the 1 boxes of bed_a on the seam are at most 36.6 studs away, the rest 60.2
+worldmap: house_wall to wall_upper: within 10 studs of the seam (57 places), the 1 boxes of wall_upper on the seam are at most 65.2 studs away, the rest 110.4
+worldmap: house_wall to wall_west: within 10 studs of the seam (34 places), the 1 boxes of wall_west on the seam are at most 66.4 studs away, the rest 49.9
+worldmap: house_wall to shrub_west_a: within 10 studs of the seam (3 places), the 1 boxes of shrub_west_a on the seam are at most 70.4 studs away, the rest 110.5
+worldmap: bed_a to house_wall: within 10 studs of the seam (300 places), the 1 boxes of house_wall on the seam are at most 53.4 studs away, the rest 109.3
+worldmap: bed_a to shrub_west_a: within 10 studs of the seam (133 places), the 1 boxes of shrub_west_a on the seam are at most 69.4 studs away, the rest 111.1
+worldmap: wall_west to house_wall: within 10 studs of the seam (276 places), the 2 boxes of house_wall on the seam are at most 85.0 studs away, the rest 118.6
+worldmap: wall_west to wall_west_upper: within 10 studs of the seam (43 places), the 1 boxes of wall_west_upper on the seam are at most 73.7 studs away, the rest 100.2
+worldmap: wall_west to shrub_west_a: within 10 studs of the seam (44 places), the 1 boxes of shrub_west_a on the seam are at most 71.3 studs away, the rest 106.3
+worldmap: wall_west_upper to wall_upper: within 10 studs of the seam (216 places), the 1 boxes of wall_upper on the seam are at most 52.5 studs away, the rest 110.7
+worldmap: wall_west_upper to wall_west: within 10 studs of the seam (43 places), the 1 boxes of wall_west on the seam are at most 65.7 studs away, the rest 88.1
+worldmap: wall_west_upper to eaves_west: within 10 studs of the seam (43 places), the 1 boxes of eaves_west on the seam are at most 47.8 studs away, the rest 100.1
+worldmap: wall_upper to house_wall: within 10 studs of the seam (23 places), the 1 boxes of house_wall on the seam are at most 10.6 studs away, the rest 75.9
+worldmap: wall_upper to wall_west_upper: within 10 studs of the seam (65 places), the 1 boxes of wall_west_upper on the seam are at most 70.2 studs away, the rest 59.5
+worldmap: wall_upper to sill: within 10 studs of the seam (48 places), the 6 boxes of sill on the seam are at most 65.8 studs away, the rest 67.3
+worldmap: wall_upper to eaves: within 10 studs of the seam (23 places), the 1 boxes of eaves on the seam are at most 47.8 studs away, the rest 107.7
+worldmap: wall_upper to kitchen_counter: within 10 studs of the seam (12 places), the 1 boxes of kitchen_counter on the seam are at most 21.6 studs away, the rest 119.8
+worldmap: eaves_west to wall_west_upper: within 10 studs of the seam (167 places), the 1 boxes of wall_west_upper on the seam are at most 74.7 studs away, the rest 95.2
+worldmap: eaves_west to eaves: within 10 studs of the seam (149 places), the 2 boxes of eaves on the seam are at most 65.7 studs away, the rest 107.8
+worldmap: eaves to wall_upper: within 10 studs of the seam (20 places), the 1 boxes of wall_upper on the seam are at most 63.6 studs away, the rest 109.5
+worldmap: eaves to eaves_west: within 10 studs of the seam (11 places), the 1 boxes of eaves_west on the seam are at most 48.9 studs away, the rest 104.0
+worldmap: shrub_west_a to bed_a: within 10 studs of the seam (51 places), the 1 boxes of bed_a on the seam are at most 45.1 studs away, the rest 70.6
+worldmap: shrub_west_a to house_wall: within 10 studs of the seam (4 places), the 1 boxes of house_wall on the seam are at most 62.2 studs away, the rest 118.9
+worldmap: shrub_west_a to wall_west: within 10 studs of the seam (15 places), the 1 boxes of wall_west on the seam are at most 62.0 studs away, the rest 86.6
+worldmap: shrub_west_a to shrub_west_b: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_b on the seam are at most 64.6 studs away, the rest 108.5
+worldmap: shrub_west_a to shrub_west_c: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_c on the seam are at most 65.8 studs away, the rest 107.5
+worldmap: shrub_west_b to shrub_west_a: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_a on the seam are at most 64.6 studs away, the rest 95.0
+worldmap: shrub_west_b to shrub_west_d: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_d on the seam are at most 65.8 studs away, the rest 102.9
+worldmap: shrub_west_c to shrub_west_a: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_a on the seam are at most 65.8 studs away, the rest 103.1
+worldmap: shrub_west_c to shrub_west_d: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_d on the seam are at most 64.6 studs away, the rest 105.6
+worldmap: shrub_west_c to shrub_west_e: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_e on the seam are at most 65.8 studs away, the rest 107.2
+worldmap: shrub_west_d to shrub_west_b: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_b on the seam are at most 65.8 studs away, the rest 108.6
+worldmap: shrub_west_d to shrub_west_c: within 10 studs of the seam (143 places), the 1 boxes of shrub_west_c on the seam are at most 64.6 studs away, the rest 104.7
+worldmap: shrub_west_d to shrub_west_f: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_f on the seam are at most 65.8 studs away, the rest 107.8
+worldmap: shrub_west_e to shrub_west_c: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_c on the seam are at most 65.8 studs away, the rest 102.6
+worldmap: shrub_west_e to shrub_west_f: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_f on the seam are at most 64.6 studs away, the rest 104.4
+worldmap: shrub_west_e to shrub_west_g: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_g on the seam are at most 65.8 studs away, the rest 120.0
+worldmap: shrub_west_f to shrub_west_d: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_d on the seam are at most 65.8 studs away, the rest 107.5
+worldmap: shrub_west_f to shrub_west_e: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_e on the seam are at most 64.6 studs away, the rest 92.6
+worldmap: shrub_west_f to shrub_west_h: within 10 studs of the seam (88 places), the 1 boxes of shrub_west_h on the seam are at most 65.8 studs away, the rest 101.4
+worldmap: shrub_west_g to shrub_west_e: within 10 studs of the seam (103 places), the 1 boxes of shrub_west_e on the seam are at most 68.5 studs away, the rest 95.0
+worldmap: shrub_west_g to shrub_west_h: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_h on the seam are at most 64.6 studs away, the rest 107.3
+worldmap: shrub_west_g to shrub_west_i: within 10 studs of the seam (117 places), the 1 boxes of shrub_west_i on the seam are at most 69.4 studs away, the rest 108.8
+worldmap: shrub_west_h to shrub_west_f: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_f on the seam are at most 65.8 studs away, the rest 105.8
+worldmap: shrub_west_h to shrub_west_g: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_g on the seam are at most 64.6 studs away, the rest 118.8
+worldmap: shrub_west_h to shrub_west_j: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_j on the seam are at most 65.8 studs away, the rest 92.1
+worldmap: shrub_west_i to shrub_west_g: within 10 studs of the seam (88 places), the 1 boxes of shrub_west_g on the seam are at most 65.8 studs away, the rest 118.6
+worldmap: shrub_west_i to shrub_west_j: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_j on the seam are at most 64.6 studs away, the rest 99.5
+worldmap: shrub_west_j to shrub_west_h: within 10 studs of the seam (58 places), the 1 boxes of shrub_west_h on the seam are at most 65.8 studs away, the rest 108.8
+worldmap: shrub_west_j to shrub_west_i: within 10 studs of the seam (18 places), the 1 boxes of shrub_west_i on the seam are at most 64.6 studs away, the rest 97.7
+worldmap: kitchen_counter to sill: within 10 studs of the seam (578 places), the 1 boxes of sill on the seam are at most 41.2 studs away, the rest 71.5
+worldmap: kitchen_counter to wall_upper: within 10 studs of the seam (248 places), the 1 boxes of wall_upper on the seam are at most 68.2 studs away, the rest 126.7
+worldmap: kitchen_counter to kitchen_floor: within 10 studs of the seam (227 places), the 1 boxes of kitchen_floor on the seam are at most 46.3 studs away, the rest 104.7
+worldmap: kitchen_floor to kitchen_counter: within 10 studs of the seam (6 places), the 1 boxes of kitchen_counter on the seam are at most 15.7 studs away, the rest 94.7
+worldmap: on the wall's face over the bed, the soil below is at most 81.9 studs down (89.9 from a lagging focus); the whole bed is in everywhere below y -17.8
+worldmap: from the stone's front edge, the soil below is 90.7 studs from the spider or from its focus 8 studs back over the stone
+worldmap: the looks at the sill's spawn: 1469 parts at full, 497 at low
+worldmap: the looks at the outer sill: 1469 parts at full, 497 at low
+worldmap: the looks at halfway down the wall: 1475 parts at full, 497 at low
+worldmap: the looks at the wall's foot: 1475 parts at full, 497 at low
+worldmap: the looks at the bed's stone: 1483 parts at full, 487 at low
+worldmap: the looks at the gutter: 1496 parts at full, 466 at low
+worldmap: the looks at the window's glass, outside: 1496 parts at full, 476 at low
+worldmap: the looks at the kitchen's counter, by the toaster: 1469 parts at full, 497 at low
+worldmap: the looks at the kitchen's floor: 1475 parts at full, 497 at low
+worldmap: the looks at the wall west: 1498 parts at full, 493 at low
+worldmap: the looks at the drainpipe's swan neck: 1496 parts at full, 476 at low
+worldmap: the looks at the bushes by the bed and the house: 1483 parts at full, 487 at low
+worldmap: the looks at where four chunks meet: 1494 parts at full, 499 at low
+worldmap: the looks at the bushes' middle: 1493 parts at full, 423 at low
+worldmap: the looks at the far corner of the bushes: 1403 parts at full, 343 at low
+worldmap: the walk at full: at most 1496 parts, 56 changes
+worldmap: the walk at low: at most 499 parts, 35 changes
+WORLDMAP passed=2077 failed=0
+world_client: walked through sill > outer_sill > house_wall > bed_a, now at 0.0000, -89.6900, -24.3100, mode attached
+world_client: the descent took 109.88333333333334 s; lowering measured at 0.7500052922541158 studs a second
+world_client: at sill the client holds 1469 parts of looks
+world_client: at outer_sill the client holds 1469 parts of looks
+world_client: at bed_a the client holds 1483 parts of looks
+world_client: at eaves the client holds 1496 parts of looks
+world_client: at shrub_west_a the client holds 1494 parts of looks
+world_client: at shrub_west_j the client holds 1483 parts of looks
+world_client: at kitchen_counter the client holds 1469 parts of looks
+world_client: a new stream at the bed: 382 parts the first frame, 11 frames to 1483 parts
+world_client: the low tier's stream: 1560 parts made and 1137 destroyed over twelve places
+WORLD_CLIENT passed=30 failed=0
+GARDEN_LIFE passed=256701 failed=0
+[SELFTEST] BEGIN the live place's self-test (ROBLOX-104)
+[SELFTEST] INFO world: test_garden (revision world-3)
+[SELFTEST] PASS new life
+[SELFTEST] PASS intro
+[SELFTEST] PASS world folders
+[SELFTEST] PASS region sill
+[SELFTEST] ... region outer_sill (6 s in)
+[SELFTEST] PASS region outer_sill
+[SELFTEST] PASS region house_wall
+[SELFTEST] PASS region bed_a
+[SELFTEST] PASS region wall_west
+[SELFTEST] PASS region wall_west_upper
+[SELFTEST] ... region wall_upper (11 s in)
+[SELFTEST] PASS region wall_upper
+[SELFTEST] PASS region eaves_west
+[SELFTEST] PASS region eaves
+[SELFTEST] PASS region shrub_west_a
+[SELFTEST] ... region shrub_west_b (17 s in)
+[SELFTEST] PASS region shrub_west_b
+[SELFTEST] PASS region shrub_west_c
+[SELFTEST] PASS region shrub_west_d
+[SELFTEST] PASS region shrub_west_e
+[SELFTEST] PASS region shrub_west_f
+[SELFTEST] ... region shrub_west_g (22 s in)
+[SELFTEST] PASS region shrub_west_g
+[SELFTEST] PASS region shrub_west_h
+[SELFTEST] PASS region shrub_west_i
+[SELFTEST] PASS region shrub_west_j
+[SELFTEST] ... region kitchen_counter (28 s in)
+[SELFTEST] PASS region kitchen_counter
+[SELFTEST] PASS region kitchen_floor
+[SELFTEST] INFO walk: 7.54 studs in 3 s, height 0.31 to 0.31
+[SELFTEST] PASS walk on the sill
+[SELFTEST] ... the line (33 s in)
+[SELFTEST] ... the line (38 s in)
+[SELFTEST] INFO profile on the line: 368 frames, the render step 13.79 ms a frame (worst 50.7): spider rig 8.88/38.0, camera 1.68/14.1, fly bodies 1.23/19.1, prey 0.51/1.9, hud 0.29/1.0, senses 0.23/2.6, motor 0.21/1.4, life 0.12/1.0, bug bodies 0.08/1.2, percepts 0.07/0.9, poses 0.07/0.9, sound 0.06/0.5, rival 0.05/0.3, small 0.31 (mean/worst ms); a frame: spider parts placed 707, fly parts placed 49, bug parts placed 3, camera casts 10, camera overlaps 2, camera rays 0, framing searches 0; allocated 2041 KB a frame (percepts 3, senses 27, prey 35, motor 13, nature 1, rival 1, life 4, camera 275, poses 2, spider rig 1469, hud 3, lock button 5, fly bodies 196, sound 1, lines 4, perception hud 2)
+[SELFTEST] INFO line: let down at 0.753 studs a second of the game's time (the game's 0.75), 0.753 by the clock
+[SELFTEST] INFO line ticks: 368 ticks (6.13 s of the game) in 6.13 s by the clock; line let out 4.600, the body fell 4.618 (100.4% of it); sweeps stopped the body 0 times (0.000 taken off), 0 tangent touches let pass, 184 push-outs (0.052 out, 0.000 of it up)
+[SELFTEST] PASS the line
+[SELFTEST] INFO prey on the sill: 4 flies drawn
+[SELFTEST] PASS prey on the sill
+[SELFTEST] ... lock (44 s in)
+[SELFTEST] INFO lock: 3.0 studs away, facing it within 1 degrees, a sidestep of 0.67 studs in 1 s
+[SELFTEST] INFO lock: L1 holds creep, locks on press, and lets go on the next press
+[SELFTEST] PASS lock
+[SELFTEST] INFO prey in the bed: 3 gnats, 3 aphids, 4 springtails, 2 leafhoppers, all drawn
+[SELFTEST] PASS prey in the bed
+[SELFTEST] INFO woodlice: 4 made and drawn
+[SELFTEST] PASS woodlice
+[SELFTEST] INFO frame time in the bed: shim: 300 simulated frames of 1/60 s (no engine here: not a frame time)
+[SELFTEST] INFO profile in the bed: 300 frames, the render step 26.85 ms a frame (worst 254.7): spider rig 9.84/104.3, bug bodies 7.87/62.9, fly bodies 5.08/72.9, prey 1.38/23.7, senses 0.65/29.4, camera 0.38/11.7, hud 0.37/6.9, life 0.26/7.9, percepts 0.22/2.3, motor 0.16/7.0, perception hud 0.11/2.0, sound 0.11/1.7, lock button 0.08/1.0, rival 0.06/0.8, poses 0.06/0.9, other rigs 0.04/2.4, light 0.02/2.1, lock 0.01/1.3, small 0.16 (mean/worst ms); a frame: spider parts placed 653, fly parts placed 162, bug parts placed 190, camera casts 3, camera overlaps 2, camera rays 0, framing searches 0; allocated 3325 KB a frame (percepts 7, senses 50, prey 58, motor 3, nature 1, rival 1, life 7, camera 21, poses 2, spider rig 1357, hud 3, lock button 5, fly bodies 778, bug bodies 1025, sound 2, perception hud 5)
+[SELFTEST] INFO engine in the bed: memory ? MB, Lua heap 50.9 MB, instances ?, primitives ? (moving ?), awake parts ?
+[SELFTEST] INFO census in the bed: 3567 parts, 633 see-through, 211 casting shadows, 1150 meshed (parts/see-through/shadow/meshed: Bugs 438/0/0/130, Flies 352/27/0/138, JumpArc 32/0/0/0, Spider 707/514/86/94, World 553/0/0/0, WorldDecor 1475/92/125/788, the rest 10/0/0/0)
+[SELFTEST] PASS frame time in the bed
+[SELFTEST] INFO looks settled in the bed: yes, 0.03 s after the spider came, 1475 parts held of 1475 planned, 34 plans, 7539 made and 6064 destroyed this session
+[SELFTEST] INFO frame time in the bed, settled: shim: 300 simulated frames of 1/60 s (no engine here: not a frame time)
+[SELFTEST] INFO profile in the bed, settled: 300 frames, the render step 22.60 ms a frame (worst 80.9): spider rig 8.51/30.7, bug bodies 6.16/42.6, fly bodies 4.63/34.5, prey 1.10/4.0, senses 0.56/3.2, hud 0.30/1.0, camera 0.27/1.3, life 0.20/1.2, percepts 0.19/0.6, motor 0.11/0.6, perception hud 0.10/0.5, sound 0.09/0.3, lock button 0.07/0.3, poses 0.06/0.7, rival 0.06/0.2, small 0.20 (mean/worst ms); a frame: spider parts placed 649, fly parts placed 162, bug parts placed 190, camera casts 3, camera overlaps 2, camera rays 0, framing searches 0; allocated 3330 KB a frame (percepts 7, senses 64, prey 63, motor 3, nature 1, rival 1, life 6, camera 21, poses 2, spider rig 1345, hud 3, lock button 5, fly bodies 741, bug bodies 1061, sound 2, perception hud 6)
+[SELFTEST] INFO engine in the bed, settled: memory ? MB, Lua heap 56.0 MB, instances ?, primitives ? (moving ?), awake parts ?
+[SELFTEST] INFO looks while settled: 0 plans and 0 parts made in the sample
+[SELFTEST] INFO frame time in the bed without the looks: shim: 180 simulated frames of 1/60 s (no engine here: not a frame time)
+[SELFTEST] INFO profile in the bed without the looks: 180 frames, the render step 20.37 ms a frame (worst 57.4): spider rig 7.79/32.1, bug bodies 5.78/38.9, fly bodies 3.86/25.5, prey 0.94/2.2, senses 0.50/3.1, hud 0.28/0.6, camera 0.25/1.3, percepts 0.17/0.5, life 0.17/0.4, perception hud 0.10/0.3, motor 0.10/1.1, sound 0.09/0.6, lock button 0.06/0.2, rival 0.05/0.1, small 0.22 (mean/worst ms); a frame: spider parts placed 649, fly parts placed 162, bug parts placed 190, camera casts 3, camera overlaps 2, camera rays 0, framing searches 0; allocated 3294 KB a frame (percepts 7, senses 55, prey 59, motor 3, nature 1, rival 1, life 6, camera 20, poses 2, spider rig 1321, hud 3, lock button 5, fly bodies 728, bug bodies 1075, sound 2, perception hud 6)
+[SELFTEST] INFO engine in the bed without the looks: memory ? MB, Lua heap 31.6 MB, instances ?, primitives ? (moving ?), awake parts ?
+[SELFTEST] INFO frame time in the bed without shadows: shim: 180 simulated frames of 1/60 s (no engine here: not a frame time)
+[SELFTEST] INFO profile in the bed without shadows: 180 frames, the render step 20.20 ms a frame (worst 55.6): spider rig 7.77/28.0, bug bodies 5.43/27.9, fly bodies 4.10/25.3, prey 0.99/4.0, senses 0.43/2.2, hud 0.26/0.5, camera 0.24/1.2, percepts 0.18/1.3, life 0.18/0.5, motor 0.10/0.4, perception hud 0.09/0.3, sound 0.08/0.5, lock button 0.06/0.4, rival 0.06/0.3, small 0.22 (mean/worst ms); a frame: spider parts placed 654, fly parts placed 162, bug parts placed 190, camera casts 3, camera overlaps 2, camera rays 0, framing searches 0; allocated 3383 KB a frame (percepts 7, senses 50, prey 63, motor 3, nature 1, rival 1, life 7, camera 21, poses 2, spider rig 1311, hud 3, lock button 5, fly bodies 795, bug bodies 1108, sound 2, perception hud 4)
+[SELFTEST] INFO engine in the bed without shadows: memory ? MB, Lua heap 50.5 MB, instances ?, primitives ? (moving ?), awake parts ?
+[SELFTEST] PASS frame time in the bed, settled
+[SELFTEST] ... moths on the wall (63 s in)
+[SELFTEST] INFO moths on the wall: 2 made and drawn
+[SELFTEST] PASS moths on the wall
+[SELFTEST] ... dusk: the moths fly (68 s in)
+[SELFTEST] ... dusk: the moths fly (73 s in)
+[SELFTEST] PASS dusk: the moths fly
+[SELFTEST] PASS notebook
+[SELFTEST] ... rest and checkpoint (78 s in)
+[SELFTEST] PASS rest and checkpoint
+[SELFTEST] INFO sound: music volume 0.320, IsLoaded nil
+[SELFTEST] PASS sound
+[SELFTEST] INFO frame time on the sill: shim: 300 simulated frames of 1/60 s (no engine here: not a frame time)
+[SELFTEST] INFO profile on the sill: 300 frames, the render step 11.88 ms a frame (worst 36.9): spider rig 7.63/28.8, fly bodies 2.35/10.3, camera 0.42/1.6, senses 0.34/2.6, hud 0.28/0.9, prey 0.20/0.9, perception hud 0.08/0.4, life 0.08/0.3, motor 0.07/0.2, lock button 0.06/0.4, sound 0.05/0.2, rival 0.05/0.2, small 0.26 (mean/worst ms); a frame: spider parts placed 664, fly parts placed 124, bug parts placed 0, camera casts 3, camera overlaps 2, camera rays 0, framing searches 0; allocated 1980 KB a frame (percepts 2, senses 39, prey 18, motor 4, nature 2, rival 1, life 2, camera 58, poses 2, spider rig 1352, hud 3, lock button 5, fly bodies 486, sound 1, perception hud 4)
+[SELFTEST] INFO engine on the sill: memory ? MB, Lua heap 67.5 MB, instances ?, primitives ? (moving ?), awake parts ?
+[SELFTEST] INFO census on the sill: 2950 parts, 673 see-through, 159 casting shadows, 856 meshed (parts/see-through/shadow/meshed: Flies 156/52/0/68, JumpArc 32/0/0/0, Spider 707/514/86/94, World 553/0/0/0, WorldDecor 1496/107/73/694, the rest 6/0/0/0)
+[SELFTEST] INFO shadows on the sill: 23 of 23 visible walkable boxes cast, 0 too small to see at their distance cast none (25 passes, 0 writes)
+[SELFTEST] PASS frame time on the sill
+[SELFTEST] INFO parts at the full tier: 2950 in the workspace (Flies 156, FlyClearanceProbe 1, JumpArc 32, Spider 707, WindowsillAudio 5, World 553, WorldDecor 1496)
+[SELFTEST] INFO looks outside the window: 1496 parts held of 1496 planned at the full tier, 7734 made and 6238 destroyed this session, 40 plans
+[SELFTEST] PASS part counts
+[SELFTEST] INFO took 85 s
+[SELFTEST] END pass=39 fail=0 skip=0
+selftest: the run took 84.8 s of play (5089 frames)
+SELFTEST passed=4 failed=0
+NATURE passed=28890 failed=0
+NATURE_CLIENT passed=6 failed=0
+TITLE passed=16 failed=0
+LOCK sidestep on the floor: distance off by at most 0.001, facing at most 0.31 degrees off, 37.2 degrees round
+LOCK sidestep on the wall: distance off by at most 0.001, facing at most 0.31 degrees off, 37.2 degrees round
+LOCK sidestep on the underside: distance off by at most 0.001, facing at most 0.31 degrees off, 37.2 degrees round
+LOCK camera: 5.82 degrees from the middle 1.5 s after a lock taken 70 degrees away
+LOCK client sidestep: 0.968 in 1.5 s, distance 2.400 to 2.401, facing 0.01 degrees off
+LOCK lost: ended (forgotten) after 0.57 s
+LOCK passed=130 failed=0
+  quiet: 53 kinds, 25 needed, 24 on the first day only, 4 in the gentle modes only; 11 notice lines classified
+QUIET passed=10 failed=0
+preserve: the backdrop's records: 1213 at full, 515 at low; the far look 515 at full, 386 at low
+preserve: from the sill at full: 1477 parts
+preserve: the walk at full: at most 1500 parts, 809 changes
+preserve: from the sill at low: 460 parts
+preserve: the walk at low: at most 500 parts, 410 changes
+preserve: the sill's Decor: 721 parts (the test garden's 1258)
+preserve: the hut's looks: 1197 records at full, 64 at low; (ROBLOX-119) the meadow's and the bench patch's 3322 at full, 102 at low
+preserve: (ROBLOX-122) the pond's, the boardwalk's and the mown path's looks: 1710 at full, 124 at low
+preserve: the hut's regions: from anywhere on one, its farthest box at most 151.1 studs
+preserve: the hut's regions at full: at most 1500 parts
+preserve: the hut's regions at low: at most 500 parts
+preserve: the patches: 1171, at most 90 records at full and 10 at low
+preserve: in the mulch at full: 14 patches, 679 parts of them, 1500 in all
+preserve: in the mulch at low: 5 patches, 38 parts of them, 496 in all
+preserve: the cricket's struggle: wins at 4, 5 and 6 taps a second 4, 60, 60 of 60; at 5 a second 7.6 s, 6.8 kicks
+preserve: ballooning: of 200 families the hut garden 152, the meadow's edge 47, the pond's edge 1
+preserve: the water: of 60 slips by a pad 2 cm off, 38 got out and 22 drowned in Normal; 60 pulled out in the gentle rules
+PRESERVE passed=1144 failed=0
+[SELFTEST] BEGIN the live place's self-test (ROBLOX-104)
+[SELFTEST] INFO world: preserve (revision preserve-2)
+[SELFTEST] PASS new life
+[SELFTEST] PASS intro
+[SELFTEST] PASS world folders
+[SELFTEST] PASS region sill
+[SELFTEST] ... region hut_window (6 s in)
+[SELFTEST] PASS region hut_window
+[SELFTEST] PASS region hut_outer_sill
+[SELFTEST] PASS region hut_desk
+[SELFTEST] PASS region hut_board
+[SELFTEST] PASS region hut_shelf
+[SELFTEST] ... region hut_chair (11 s in)
+[SELFTEST] PASS region hut_chair
+[SELFTEST] PASS region hut_door
+[SELFTEST] PASS region hut_door_up
+[SELFTEST] PASS region hut_doorway
+[SELFTEST] ... region hut_doorway_up (17 s in)
+[SELFTEST] PASS region hut_doorway_up
+[SELFTEST] PASS region room_window
+[SELFTEST] PASS region room_tv
+[SELFTEST] PASS region room_games
+[SELFTEST] PASS region room_sofa_w
+[SELFTEST] ... region room_sofa_e (22 s in)
+[SELFTEST] PASS region room_sofa_e
+[SELFTEST] PASS region hut_floor_a
+[SELFTEST] PASS region hut_floor_b
+[SELFTEST] PASS region hut_floor_c
+[SELFTEST] ... region hut_floor_d (28 s in)
+[SELFTEST] PASS region hut_floor_d
+[SELFTEST] PASS region hut_floor_e
+[SELFTEST] PASS region hut_floor_f
+[SELFTEST] PASS region hut_floor_g
+[SELFTEST] PASS region hut_floor_h
+[SELFTEST] ... region hut_floor_i (33 s in)
+[SELFTEST] PASS region hut_floor_i
+[SELFTEST] PASS region room_floor_a
+[SELFTEST] PASS region room_floor_b
+[SELFTEST] PASS region room_floor_c
+[SELFTEST] ... region room_floor_d (39 s in)
+[SELFTEST] PASS region room_floor_d
+[SELFTEST] PASS region room_floor_e
+[SELFTEST] PASS region room_floor_f
+[SELFTEST] PASS region room_floor_g
+[SELFTEST] PASS region room_floor_h
+[SELFTEST] ... region room_floor_i (44 s in)
+[SELFTEST] PASS region room_floor_i
+[SELFTEST] PASS region hut_up_a
+[SELFTEST] PASS region hut_up_b
+[SELFTEST] PASS region hut_up_c
+[SELFTEST] ... region hut_up_d (50 s in)
+[SELFTEST] PASS region hut_up_d
+[SELFTEST] PASS region hut_up_e
+[SELFTEST] PASS region hut_up_f
+[SELFTEST] PASS region hut_up_g
+[SELFTEST] PASS region hut_up_h
+[SELFTEST] ... region hut_up_i (55 s in)
+[SELFTEST] PASS region hut_up_i
+[SELFTEST] PASS region room_up_a
+[SELFTEST] PASS region room_up_b
+[SELFTEST] PASS region room_up_c
+[SELFTEST] ... region room_up_d (61 s in)
+[SELFTEST] PASS region room_up_d
+[SELFTEST] PASS region room_up_e
+[SELFTEST] PASS region room_up_f
+[SELFTEST] PASS region room_up_g
+[SELFTEST] PASS region room_up_h
+[SELFTEST] ... region room_up_i (66 s in)
+[SELFTEST] PASS region room_up_i
+[SELFTEST] PASS region hut_wall_mid
+[SELFTEST] PASS region hut_wall_w
+[SELFTEST] PASS region hut_wall_e
+[SELFTEST] ... region hut_wall_x1 (72 s in)
+[SELFTEST] PASS region hut_wall_x1
+[SELFTEST] PASS region hut_wall_x2
+[SELFTEST] PASS region hut_wall_x3
+[SELFTEST] PASS region hut_eave_w2
+[SELFTEST] PASS region hut_eave_w1
+[SELFTEST] ... region hut_eave_mid (77 s in)
+[SELFTEST] PASS region hut_eave_mid
+[SELFTEST] PASS region hut_eave_e1
+[SELFTEST] PASS region hut_eave_e2
+[SELFTEST] PASS region hut_eave_x1
+[SELFTEST] ... region hut_eave_x2 (83 s in)
+[SELFTEST] PASS region hut_eave_x2
+[SELFTEST] PASS region hut_eave_x3
+[SELFTEST] PASS region hut_eave_x4
+[SELFTEST] PASS region hut_bench
+[SELFTEST] PASS region hut_butt
+[SELFTEST] ... region garden_feeder (88 s in)
+[SELFTEST] PASS region garden_feeder
+[SELFTEST] PASS region garden_pole
+[SELFTEST] PASS region garden_a1
+[SELFTEST] PASS region garden_a2
+[SELFTEST] ... region garden_a3 (94 s in)
+[SELFTEST] PASS region garden_a3
+[SELFTEST] PASS region garden_a4
+[SELFTEST] PASS region garden_b1
+[SELFTEST] PASS region garden_b2
+[SELFTEST] PASS region garden_b3
+[SELFTEST] ... region garden_b4 (99 s in)
+[SELFTEST] PASS region garden_b4
+[SELFTEST] PASS region garden_c1
+[SELFTEST] PASS region garden_c2
+[SELFTEST] PASS region garden_c3
+[SELFTEST] ... region garden_c4 (105 s in)
+[SELFTEST] PASS region garden_c4
+[SELFTEST] PASS region garden_d1
+[SELFTEST] PASS region garden_d2
+[SELFTEST] PASS region garden_d3
+[SELFTEST] PASS region garden_d4
+[SELFTEST] ... region path_s1 (111 s in)
+[SELFTEST] PASS region path_s1
+[SELFTEST] PASS region path_s2
+[SELFTEST] PASS region path_s3
+[SELFTEST] PASS region path_s4
+[SELFTEST] ... region path_s5 (117 s in)
+[SELFTEST] PASS region path_s5
+[SELFTEST] PASS region path_e1
+[SELFTEST] PASS region path_e2
+[SELFTEST] PASS region path_e3
+[SELFTEST] PASS region path_e4
+[SELFTEST] ... region path_e5 (122 s in)
+[SELFTEST] PASS region path_e5
+[SELFTEST] PASS region path_n3
+[SELFTEST] PASS region path_n2
+[SELFTEST] PASS region path_n1
+[SELFTEST] ... region path_e6 (128 s in)
+[SELFTEST] PASS region path_e6
+[SELFTEST] PASS region path_m1
+[SELFTEST] PASS region path_m2
+[SELFTEST] PASS region path_m3
+[SELFTEST] PASS region path_m4
+[SELFTEST] ... region bench_w (133 s in)
+[SELFTEST] PASS region bench_w
+[SELFTEST] PASS region bench_e
+[SELFTEST] PASS region bin
+[SELFTEST] PASS region lamp_1
+[SELFTEST] ... region lamp_2 (138 s in)
+[SELFTEST] PASS region lamp_2
+[SELFTEST] PASS region lamp_3
+[SELFTEST] PASS region lamp_4
+[SELFTEST] PASS region pad_a1
+[SELFTEST] PASS region pad_a2
+[SELFTEST] ... region pad_a3 (143 s in)
+[SELFTEST] PASS region pad_a3
+[SELFTEST] PASS region pad_b1
+[SELFTEST] PASS region pad_b2
+[SELFTEST] PASS region pad_b3
+[SELFTEST] ... region pad_c1 (149 s in)
+[SELFTEST] PASS region pad_c1
+[SELFTEST] PASS region pad_c2
+[SELFTEST] PASS region pad_c3
+[SELFTEST] PASS region meadow_a1
+[SELFTEST] PASS region meadow_a2
+[SELFTEST] ... region meadow_a3 (154 s in)
+[SELFTEST] PASS region meadow_a3
+[SELFTEST] PASS region meadow_a4
+[SELFTEST] PASS region meadow_a5
+[SELFTEST] PASS region meadow_b1
+[SELFTEST] ... region meadow_b2 (160 s in)
+[SELFTEST] PASS region meadow_b2
+[SELFTEST] PASS region meadow_b3
+[SELFTEST] PASS region meadow_b4
+[SELFTEST] PASS region meadow_b5
+[SELFTEST] PASS region meadow_c1
+[SELFTEST] ... region meadow_c2 (165 s in)
+[SELFTEST] PASS region meadow_c2
+[SELFTEST] PASS region meadow_c3
+[SELFTEST] PASS region meadow_c4
+[SELFTEST] PASS region meadow_c5
+[SELFTEST] ... region meadow_d1 (171 s in)
+[SELFTEST] PASS region meadow_d1
+[SELFTEST] PASS region meadow_d2
+[SELFTEST] PASS region meadow_d3
+[SELFTEST] PASS region meadow_d4
+[SELFTEST] PASS region meadow_d5
+[SELFTEST] ... region meadow_e1 (176 s in)
+[SELFTEST] PASS region meadow_e1
+[SELFTEST] PASS region meadow_e2
+[SELFTEST] PASS region meadow_e3
+[SELFTEST] PASS region meadow_e4
+[SELFTEST] ... region meadow_e5 (182 s in)
+[SELFTEST] PASS region meadow_e5
+[SELFTEST] PASS region cattail_1a
+[SELFTEST] PASS region cattail_1b
+[SELFTEST] PASS region cattail_2a
+[SELFTEST] PASS region cattail_2b
+[SELFTEST] ... region walk_s1 (187 s in)
+[SELFTEST] PASS region walk_s1
+[SELFTEST] PASS region walk_n1
+[SELFTEST] PASS region walk_s2
+[SELFTEST] PASS region walk_n2
+[SELFTEST] ... region walk_s3 (192 s in)
+[SELFTEST] PASS region walk_s3
+[SELFTEST] PASS region walk_n3
+[SELFTEST] PASS region walk_s4
+[SELFTEST] PASS region walk_n4
+[SELFTEST] PASS region deck_s1
+[SELFTEST] ... region deck_n1 (197 s in)
+[SELFTEST] PASS region deck_n1
+[SELFTEST] PASS region deck_s2
+[SELFTEST] PASS region deck_n2
+[SELFTEST] PASS region deck_s3
+[SELFTEST] ... region deck_n3 (203 s in)
+[SELFTEST] PASS region deck_n3
+[SELFTEST] PASS region deck_s4
+[SELFTEST] PASS region deck_n4
+[SELFTEST] PASS region pond_a1
+[SELFTEST] PASS region pond_a2
+[SELFTEST] ... region pond_a3 (208 s in)
+[SELFTEST] PASS region pond_a3
+[SELFTEST] PASS region pond_a4
+[SELFTEST] PASS region pond_b1
+[SELFTEST] PASS region pond_b2
+[SELFTEST] ... region pond_b3 (214 s in)
+[SELFTEST] PASS region pond_b3
+[SELFTEST] PASS region pond_b4
+[SELFTEST] PASS region pond_c1
+[SELFTEST] PASS region pond_c2
+[SELFTEST] PASS region pond_c3
+[SELFTEST] ... region pond_c4 (219 s in)
+[SELFTEST] PASS region pond_c4
+[SELFTEST] PASS region mown_e1
+[SELFTEST] PASS region mown_e2
+[SELFTEST] PASS region mown_e3
+[SELFTEST] ... region mown_e4 (225 s in)
+[SELFTEST] PASS region mown_e4
+[SELFTEST] PASS region mown_e5
+[SELFTEST] PASS region mown_e6
+[SELFTEST] PASS region mown_e7
+[SELFTEST] PASS region mown_e8
+[SELFTEST] ... region mown_e9 (230 s in)
+[SELFTEST] PASS region mown_e9
+[SELFTEST] PASS region mown_e10
+[SELFTEST] PASS region mown_e11
+[SELFTEST] PASS region mown_e12
+[SELFTEST] ... region mown_e13 (236 s in)
+[SELFTEST] PASS region mown_e13
+[SELFTEST] PASS region mown_e14
+[SELFTEST] PASS region mown_e15
+[SELFTEST] PASS region mown_n1
+[SELFTEST] PASS region mown_n2
+[SELFTEST] ... region mown_n3 (241 s in)
+[SELFTEST] PASS region mown_n3
+[SELFTEST] PASS region mown_n4
+[SELFTEST] PASS region mown_n5
+[SELFTEST] PASS region mown_n6
+[SELFTEST] ... region mown_n7 (246 s in)
+[SELFTEST] PASS region mown_n7
+[SELFTEST] PASS region mown_n8
+[SELFTEST] PASS region mown_n9
+[SELFTEST] PASS region mown_n10
+[SELFTEST] PASS region mown_n11
+[SELFTEST] ... region mown_n12 (251 s in)
+[SELFTEST] PASS region mown_n12
+[SELFTEST] PASS region mown_n13
+[SELFTEST] PASS region mown_n14
+[SELFTEST] ... walk on the sill (256 s in)
+[SELFTEST] INFO walk: 7.54 studs in 3 s, height 0.31 to 0.31
+[SELFTEST] PASS walk on the sill
+[SELFTEST] INFO prey on the sill: 4 flies drawn
+[SELFTEST] PASS prey on the sill
+[SELFTEST] ... lock (261 s in)
+[SELFTEST] INFO lock: 3.0 studs away, facing it within 2 degrees, a sidestep of 0.62 studs in 1 s
+[SELFTEST] INFO lock: L1 holds creep, locks on press, and lets go on the next press
+[SELFTEST] PASS lock
+[SELFTEST] INFO the hut's sill: 153 parts of the hut at the full tier; 1486 parts of the backdrop held of 1486 planned
+[SELFTEST] PASS the hut's sill
+[SELFTEST] INFO backdrop: at the sill the hut full and the railway far; at the railway's crest the railway full (Base+Full) and the hut far (Far), 584 parts; back at the sill the hut full (Base+Full)
+[SELFTEST] PASS the backdrop near and far
+[SELFTEST] INFO trains: the pass a commuter of 5 cars at 403 to 416 s; mid-pass 5 cars (15 parts) drawn; the clock at 263 s, the next at 403 s
+[SELFTEST] PASS the trains
+[SELFTEST] ... the nursery: the window shut (266 s in)
+[SELFTEST] INFO the nursery: a walk at the shut sash came to z -12.19 (the sash's outer face is -13.5); regions sill
+[SELFTEST] PASS the nursery: the window shut
+[SELFTEST] ... the nursery: the ranger props the window (272 s in)
+[SELFTEST] INFO the nursery: the ranger's moment took 5.8 s; the wedge at x 6.2..8.0
+[SELFTEST] PASS the nursery: the ranger props the window
+[SELFTEST] ... the hut's inside (277 s in)
+[SELFTEST] ... the hut's inside (282 s in)
+[SELFTEST] ... the hut's inside (287 s in)
+[SELFTEST] ... the hut's inside (292 s in)
+[SELFTEST] ... the hut's inside (297 s in)
+[SELFTEST] ... the hut's inside (302 s in)
+[SELFTEST] INFO the hut's inside: from the sill's front edge to hut_floor_b at (0.00, -69.61, 14.31); regions hut_floor_b, sill
+[SELFTEST] PASS the hut's inside
+[SELFTEST] ... the way out (307 s in)
+[SELFTEST] INFO the way out: through the sash to hut_outer_sill at (-3.00, 0.31, -16.06); regions hut_outer_sill, sill
+[SELFTEST] ... the way out (312 s in)
+[SELFTEST] ... the way out (317 s in)
+[SELFTEST] ... the way out (322 s in)
+[SELFTEST] ... the way out (327 s in)
+[SELFTEST] INFO the way out: from the outer sill's edge to hut_bench at (-3.00, -39.69, -24.06); regions hut_bench, hut_outer_sill, hut_wall_mid
+[SELFTEST] ... the way out (332 s in)
+[SELFTEST] ... the way out (337 s in)
+[SELFTEST] ... the way out (342 s in)
+[SELFTEST] ... the way out (347 s in)
+[SELFTEST] INFO the way out: down the bench's leg to garden_a2 at (-77.00, -84.29, -61.06); regions garden_a2, hut_bench
+[SELFTEST] PASS the way out
+[SELFTEST] ... the hut garden (353 s in)
+[SELFTEST] ... the hut garden (358 s in)
+[SELFTEST] INFO the hut garden: 1 gnats and 3 aphids on the milkweed with a ladybird, 1 leafhoppers on the goldenrod, 4 springtails in the mulch, 3 woodlice by the trough, all drawn
+[SELFTEST] PASS the hut garden
+[SELFTEST] INFO the garden's near detail: 14 patches, 679 parts of them, 1500 parts of looks at full; dew at dawn on 13 of 13 drops
+[SELFTEST] PASS the garden's near detail
+[SELFTEST] ... the garden's rival and mate (363 s in)
+[SELFTEST] ... the garden's rival and mate (368 s in)
+[SELFTEST] INFO the garden's rival and mate: the rival came in at garden_d2 and walked 3.2 studs, in garden_d2; the mate came in at garden_b4, in garden_b4
+[SELFTEST] PASS the garden's rival and mate
+[SELFTEST] INFO the hut's homes: hut_desk_drawer, hut_board_gap, garden_a1_trough, garden_a3_stone, garden_d3_mulch
+[SELFTEST] PASS the hut's homes
+[SELFTEST] PASS the hut by night: the lamp
+[SELFTEST] ... the ceiling and the upper walls (373 s in)
+[SELFTEST] INFO the ceiling: up the west wall past WALL_TOP to hut_up_d at (-146.19, 66.04, 134.00); regions hut_floor_d, hut_up_d
+[SELFTEST] ... the ceiling and the upper walls (378 s in)
+[SELFTEST] INFO the ceiling: head down under the boards at (-146.19, 149.69, 134.00) in hut_up_d
+[SELFTEST] PASS the ceiling and the upper walls
+[SELFTEST] ... the back room (383 s in)
+[SELFTEST] ... the back room (388 s in)
+[SELFTEST] ... the back room (393 s in)
+[SELFTEST] ... the back room (398 s in)
+[SELFTEST] ... the back room (403 s in)
+[SELFTEST] INFO the back room: through the doorway to room_floor_g at (180.04, -69.69, 215.00); regions hut_doorway, hut_floor_i, room_floor_g
+[SELFTEST] ... the back room (409 s in)
+[SELFTEST] PASS the back room
+[SELFTEST] ... the eaves (414 s in)
+[SELFTEST] ... the eaves (419 s in)
+[SELFTEST] ... the eaves (424 s in)
+[SELFTEST] INFO the eaves: along the gutter to hut_eave_e1 at (37.04, 122.81, -54.00) (208 cm over the ground); regions hut_eave_e1, hut_eave_mid
+[SELFTEST] PASS the eaves
+[SELFTEST] INFO the cat: walking from the bowls to the window (walk), moved 59.9 studs in a second; the bell 0.66 at 176 studs
+[SELFTEST] ... the cat (429 s in)
+[SELFTEST] INFO the cat: at its bowls it noticed a spider moving in front of it (true), crouched to pat (true), gave up once it was up on the desk (true); notices 1, pats 1, swats 0
+[SELFTEST] PASS the cat
+[SELFTEST] ... the bench patch (434 s in)
+[SELFTEST] ... the bench patch (439 s in)
+[SELFTEST] INFO the bench patch: walked path_m4 to pad_a2, pad_a2 to pad_b2, pad_c2 to meadow_a3; homes bench_slats, bin_lip, meadow_b2_leaf; the lamppost lit at night (true) and out by day (true)
+[SELFTEST] PASS the bench patch
+[SELFTEST] INFO the meadow's edge: on the coneflower's cone 74 cm over the ground; 1 leafhoppers on the bluestem, 6 ants at the hill (6 drawn)
+[SELFTEST] PASS the meadow's edge
+[SELFTEST] INFO the crab spiders: a yellow one on meadow_e3 and a white one on meadow_d4, 2 drawn; the close look opened its page
+[SELFTEST] PASS the crab spiders
+[SELFTEST] ... the robin (444 s in)
+[SELFTEST] INFO the robin: in on gravel at 6.12 h, its shadow over the spider, landed and drawn (stand); on the sim struck in Normal, missed in the gentle rules
+[SELFTEST] PASS the robin
+[SELFTEST] ... the field crickets (449 s in)
+[SELFTEST] INFO the field crickets: one in meadow_b2's thatch, drawn, singing at 22:00 once the spider kept still
+[SELFTEST] PASS the field crickets
+[SELFTEST] ... ballooning's landings (454 s in)
+[SELFTEST] ... ballooning's landings (459 s in)
+[SELFTEST] INFO ballooning's landings: stood on 15 (garden_a2, garden_a4, garden_b1, garden_c2, garden_d2, meadow_b1, meadow_b3, meadow_c3, meadow_d2, meadow_d5, meadow_e3, pond_a1, pond_b1, deck_n2, deck_s3)
+[SELFTEST] PASS ballooning's landings
+[SELFTEST] ... the mown path and the boardwalk (464 s in)
+[SELFTEST] ... the mown path and the boardwalk (469 s in)
+[SELFTEST] ... the mown path and the boardwalk (474 s in)
+[SELFTEST] ... the mown path and the boardwalk (479 s in)
+[SELFTEST] ... the mown path and the boardwalk (484 s in)
+[SELFTEST] ... the mown path and the boardwalk (489 s in)
+[SELFTEST] INFO the mown path and the boardwalk: walked pad_b3 to mown_e1, mown_n14 to walk_s1, walk_s4 to deck_s1; homes deck_gap, pond_stone, cattail_leaf
+[SELFTEST] PASS the mown path and the boardwalk
+[SELFTEST] ... the water (494 s in)
+[SELFTEST] INFO the water: walked off a lily pad's edge, struggled 3 s and got out (the gentle rules for the moment); on the sim a long fall into open water drowned in Normal
+[SELFTEST] PASS the water
+[SELFTEST] INFO the pond's life: 1 midges at dusk on pond_a3's stems; 4 water striders on pond_b3's open water (4 drawn)
+[SELFTEST] PASS the pond's life
+[SELFTEST] INFO the green frog: on pond_a2_flat, drawn, the close look saw it (true); on the sim struck in Normal, missed in the gentle rules, a still spider spared
+[SELFTEST] PASS the green frog
+[SELFTEST] PASS the nursery: the window put back
+[SELFTEST] ... notebook (499 s in)
+[SELFTEST] PASS notebook
+[SELFTEST] PASS rest and checkpoint
+[SELFTEST] INFO sound: music volume 0.320, IsLoaded nil
+[SELFTEST] PASS sound
+[SELFTEST] INFO frame time on the sill: shim: 300 simulated frames of 1/60 s (no engine here: not a frame time)
+[SELFTEST] INFO profile on the sill: 300 frames, the render step 14.82 ms a frame (worst 44.5): spider rig 7.54/30.1, sound 2.24/8.2, fly bodies 2.18/9.9, camera 0.72/2.7, senses 0.56/10.3, hud 0.36/1.1, prey 0.30/1.1, wasp 0.19/1.5, motor 0.10/0.5, life 0.10/0.8, perception hud 0.10/0.4, lock button 0.07/2.7, poses 0.06/0.4, small 0.33 (mean/worst ms); a frame: spider parts placed 653, fly parts placed 124, bug parts placed 0, camera casts 3, camera overlaps 2, camera rays 0, framing searches 0; allocated 2456 KB a frame (percepts 2, senses 48, prey 24, motor 5, nature 3, wasp 2, rival 1, life 2, camera 100, poses 2, spider rig 1361, hud 6, lock button 5, fly bodies 461, sound 429, perception hud 5)
+[SELFTEST] INFO engine on the sill: memory ? MB, Lua heap 279.5 MB, instances ?, primitives ? (moving ?), awake parts ?
+[SELFTEST] INFO census on the sill: 5245 parts, 754 see-through, 406 casting shadows, 1119 meshed (parts/see-through/shadow/meshed: Cat 62/0/32/52, CrabSpiders 46/0/0/22, Decor 721/149/42/388, Flies 156/52/0/68, JumpArc 34/0/0/0, PondAnimals 43/4/0/43, Robin 24/0/0/20, Spider 707/514/86/94, World 1958/1/214/0, WorldDecor 1486/34/32/432, the rest 8/0/0/0)
+[SELFTEST] INFO shadows on the sill: 1121 of 1922 visible walkable boxes cast, 801 too small to see at their distance cast none (281 passes, 13673 writes)
+[SELFTEST] INFO frame time on the sill without the far preserve: shim: 180 simulated frames of 1/60 s (no engine here: not a frame time)
+[SELFTEST] INFO profile on the sill without the far preserve: 180 frames, the render step 17.13 ms a frame (worst 48.8): spider rig 8.89/28.4, fly bodies 2.62/13.8, sound 2.43/8.3, camera 0.78/2.4, senses 0.65/14.0, hud 0.40/1.8, prey 0.30/1.5, wasp 0.21/1.0, life 0.12/0.4, perception hud 0.11/0.4, motor 0.11/1.3, lock button 0.08/1.5, poses 0.08/0.3, small 0.35 (mean/worst ms); a frame: spider parts placed 663, fly parts placed 124, bug parts placed 0, camera casts 3, camera overlaps 2, camera rays 0, framing searches 0; allocated 2514 KB a frame (percepts 2, senses 51, prey 22, motor 4, nature 2, wasp 2, rival 1, life 3, camera 96, poses 2, spider rig 1382, hud 5, lock button 5, fly bodies 506, sound 425, perception hud 6)
+[SELFTEST] INFO engine on the sill without the far preserve: memory ? MB, Lua heap 272.1 MB, instances ?, primitives ? (moving ?), awake parts ?
+[SELFTEST] INFO frame time on the sill without shadows: shim: 180 simulated frames of 1/60 s (no engine here: not a frame time)
+[SELFTEST] INFO profile on the sill without shadows: 180 frames, the render step 13.18 ms a frame (worst 45.2): spider rig 6.71/22.6, sound 1.97/8.4, fly bodies 1.85/9.1, senses 0.67/29.2, camera 0.62/2.0, hud 0.32/0.7, prey 0.25/1.3, wasp 0.16/0.4, life 0.09/0.3, perception hud 0.09/0.3, motor 0.08/0.3, lock button 0.05/0.2, small 0.33 (mean/worst ms); a frame: spider parts placed 652, fly parts placed 124, bug parts placed 0, camera casts 3, camera overlaps 2, camera rays 0, framing searches 0; allocated 2441 KB a frame (percepts 2, senses 63, prey 23, motor 5, nature 3, wasp 2, rival 1, life 3, camera 99, poses 2, spider rig 1366, hud 5, lock button 5, fly bodies 435, sound 422, perception hud 6)
+[SELFTEST] INFO engine on the sill without shadows: memory ? MB, Lua heap 247.2 MB, instances ?, primitives ? (moving ?), awake parts ?
+[SELFTEST] INFO the far preserve on the sill: mean ? ms as it is, ? ms without the far preserve (157 folders, 1938 parts out), ? ms without shadows
+[SELFTEST] PASS frame time on the sill
+[SELFTEST] INFO parts at the full tier: 5245 in the workspace (Cat 62, CrabSpiders 46, Decor 721, Flies 156, FlyClearanceProbe 1, HutLamp 1, JumpArc 34, PondAnimals 43, Robin 24, Spider 707, StreetLamp 1, WindowsillAudio 5, World 1958, WorldDecor 1486)
+[SELFTEST] INFO looks outside the window: 1486 parts held of 1486 planned at the full tier, 118835 made and 117327 destroyed this session, 500 plans
+[SELFTEST] PASS part counts
+[SELFTEST] INFO took 514 s
+[SELFTEST] END pass=245 fail=0 skip=0
+selftest_preserve: the run took 514.3 s of play (30830 frames)
+SELFTEST_PRESERVE passed=7 failed=0
+SHADOWS: the test garden from the sill, 0 of 23 visible boxes cast none
+SHADOWS passed=25 failed=0
+BODIES passed=908 failed=0

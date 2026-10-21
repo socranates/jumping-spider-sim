@@ -1,0 +1,3 @@
+fuzz: 402 body hairs, 80 leg hairs, 32 white
+SUMMARY passed=196 failed=0
+EYES passed=231 failed=0

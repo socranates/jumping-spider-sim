@@ -1,6 +1,9 @@
 -- Temporary Studio-only driver. Insert as Client/SilkPlayback, never publish it.
 return function(d)
  _G.ChetStation=d
+ d.cam.mouse=false -- diagnostic camera/input only: keep Studio's command bar usable
+ game:GetService("UserInputService").MouseBehavior=Enum.MouseBehavior.Default
+ game:GetService("UserInputService").MouseIconEnabled=true
  local RS=game:GetService("RunService")
  local function wait(s) local t=os.clock()+s;while os.clock()<t do RS.RenderStepped:Wait() end end
  local deadline=os.clock()+30
@@ -74,4 +77,20 @@ return function(d)
  assert(probe.pos.X>530 and detached==0,"native ground to stone path")
  print("[CHET_V49_NATIVE_ROUTES]",detached,probe.pos)
  print("[CHET_V49_REVIEW_END]",d.detail,game.PlaceId,game.GameId)
+ view="boots";print("[CHET_V49_BOOTS_VIEW]");wait(8)
+ -- Observe the real ambient actor on an open part of its route, rather than
+ -- forcing it out of its refuge or drawing a separate posed replacement.
+ local mouseBody=workspace.StationMouse:FindFirstChild("Body")
+ local deadline=os.clock()+45
+ while mouseBody and os.clock()<deadline do
+  local p=mouseBody.Position
+  if p.X> -105 and p.X<125 and p.Z>170 then break end
+  RS.RenderStepped:Wait()
+ end
+ view="mouse"
+ local mouseStart=mouseBody and mouseBody.Position
+ print("[CHET_V49_MOUSE_VIEW]",mouseStart,#workspace.StationMouse:GetChildren())
+ wait(10)
+ print("[CHET_V49_MOUSE_MOVED]",mouseStart,mouseBody and mouseBody.Position)
+ view="cat"
 end

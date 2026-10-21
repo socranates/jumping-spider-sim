@@ -1,5 +1,21 @@
 # Verification checkpoint — not published
 
+## Current final-source verification
+
+Final production commit is **`1f81d7c`**, rebuilt evidence **`5818d38f61841238`**. Frozen archive: `C:\Users\natha\claude-xfer\v49-final-1f81d7c.zip`, SHA256 `b487ace3b6fc18b39fac0b1dc06beb28e5513c6f38404f2f5044df9b1ef811ee`. Immutable extraction: `v49-final-1f81d7c\roblox_port`; separate rebuilt copy: `v49-release-1f81d7c\roblox_port`.
+
+Full current-source **56-suite** CLI run is live in unified exec session **18183**, with results in `C:\Users\natha\claude-xfer\v49-final-1f81d7c-results`. The old **19772** baseline run was deliberately stopped after the window/sight fixes and is terminal exit 1; it is not a full pass and must not be resumed or restarted.
+
+Final strict analysis is clean, final compile **209/209**. Rebuilt playable XML matches all **209/209** source files exactly after newline normalization (`playable-source-comparison.json`); native Studio source length/checksums also match **209/209**, logged at 23:30:35Z. Current rebuilt playable SHA256: `5dc6f27428555f2c26d8b94ae2c0060192b5109416e2f355e7585a96b891c1bb`.
+
+Current-source native full-tier traversal/wake/HUD diagnostic passed at 23:31:41Z and 23:34:59Z. Live mouse observed and photographed; it moved from `(124.6,-68.2,215)` to `(-76.0,-68.2,215)` over the ten-second sample, with sixteen parts. Floor props and transparent window reviewed in full and low. These are controlled Free Play diagnostics, not a Normal-mode completion claim or performance benchmark.
+
+Native cover check initially used the ordinary floor height while the spider was on the one-cm rug, embedding its sight target in the rug. The corrected fixture **passed at 23:41:03Z**: zero notices through cover, one notice after removing it, zero swats, explicit `NATIVE_COVER_END`. No production change was made for the fixture error.
+
+Final low-tier replay passed at **23:44:17Z**, followed by all three floor-fly groups activating through normal proximity and drawing **one fly each, 29 parts per fly**, at **23:44:20–26Z**, explicit `FLOOR_LIFE_END`. Actual low-tier fly screenshot saved. Temporary playback was removed and diagnostic overrides cleared at **23:46:23Z**; local Studio is now starting the full native self-test (`SelfTest=true`, `Detail=full`). Wait for its new `[SELFTEST] END`; do not stop a live run based on a quiet log. All other diagnostic attributes are nil.
+
+Remaining: current-source full CLI terminal result; final low native pass after the seated-head fix; native self-test; ordinary station floor-hunt/route and performance observations; remove diagnostic source/Workspace overrides, verify source in correct cloud place, publish and verify Dashboard; synchronize receipt/package/GitHub. The old sections below are historical baseline details.
+
 ## New findings after the first freeze
 
 The `60b1c47` archive/rebuilt copy below is now a **baseline**, not final source. Low-tier native review found the back-room glass opaque; the working branch now draws transparent panes at both tiers. A related AI defect was found: standing-head coordinates placed the seated cat's sight origin outside the window, and the recess was incorrectly outside its room. Both are corrected, with dedicated regression checks. Make a new final source freeze/rebuild after the remaining visual review; do not publish the old `dba164426fa79a2b` candidate.

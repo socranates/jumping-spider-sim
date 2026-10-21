@@ -1120,7 +1120,7 @@ openMenu=function()
 end
 local menuButton=Instance.new("TextButton")
 menuButton.Name="LifeMenu";menuButton.Text="Menu";menuButton.TextSize=18
-menuButton.BackgroundColor3=Color3.new(.12,.12,.14);menuButton.TextColor3=Color3.new(1,1,1)
+menuButton.BackgroundColor3=Color3.new(.12,.12,.14);menuButton.TextColor3=Color3.new(1,1,1);menuButton.BackgroundTransparency=.7;menuButton.TextTransparency=.3;menuButton.AutoButtonColor=true -- (ROBLOX-125: quiet, still a 48 px touch target)
 menuButton.Parent=hud.safe;menuButton.Activated:Connect(openMenu)
 
 -- The naturalist's notebook (ROBLOX-37). Opened from the game (N, the button beside Menu), the life menu or the end screen; closing it
@@ -1153,7 +1153,7 @@ book.pageOpened:connect(function(id: string)
 end)
 local notebookButton=Instance.new("TextButton")
 notebookButton.Name="NotebookButton";notebookButton.Text=M.NotebookText.BUTTON;notebookButton.TextSize=16
-notebookButton.BackgroundColor3=Color3.new(.12,.12,.14);notebookButton.TextColor3=Color3.new(1,1,1)
+notebookButton.BackgroundColor3=Color3.new(.12,.12,.14);notebookButton.TextColor3=Color3.new(1,1,1);notebookButton.BackgroundTransparency=.7;notebookButton.TextTransparency=.3;notebookButton.AutoButtonColor=true -- (ROBLOX-125: quiet, still a 48 px touch target)
 notebookButton.Parent=hud.safe;notebookButton.Activated:Connect(function() openNotebook("game") end)
 -- Both buttons are touch targets (48 px tall) and clear of the status lines at every screen size (HudLayout.topLayout, tested).
 local function placeTopButton(button: TextButton,r: { x0: number, y0: number, x1: number, y1: number })

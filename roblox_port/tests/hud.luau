@@ -368,6 +368,17 @@ do
 	check(t.Text == "Hunger 0% · gentle", "gentle play never says starving")
 	b, f, t = bar(0.5, false, true)
 	check(t.TextSize == 24, "large text")
+	-- the quiet screen (ROBLOX-125): a thin line without a plate, settling once read, never while hungry
+	b, f, t = bar(0.8)
+	check(b.BackgroundTransparency == 1 and f.Parent.Size.Y.Offset == 5 and b.Size.X.Offset == 220, "a 5 px line, 220 px wide, no plate")
+	check(t.TextTransparency == 0, "new words at full strength")
+	for _ = 1, 500 do bar(0.8) end
+	check(t.TextTransparency > 0.7 and f.BackgroundTransparency > 0.5, "after eight seconds unchanged the line has settled to a trace")
+	bar(0.75)
+	check(t.TextTransparency == 0, "a change brings it back")
+	bar(0.3); for _ = 1, 500 do bar(0.3) end
+	check(t.TextTransparency == 0, "hungry: it never settles")
+	check(SpiderHud.settle(0) == 0 and SpiderHud.settle(4.9) == 0 and math.abs(SpiderHud.settle(99) - 0.8) < 1e-9, "settle: full, then 0.8 at rest")
 	b = bar(nil)
 	check(not b.Visible, "no reserve in the view: the bar is hidden")
 	for _, d in parent:GetDescendants() do

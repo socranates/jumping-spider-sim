@@ -13,6 +13,15 @@ local authored: {[number]: {any}} = {}
 local pieceCache: {[string]: {any}} = {}
 local footprints: {[string]: {any}} = {}
 local decorCache: {[string]: {any}} = {}
+local function largestFootprint(id: string): {number}?
+ local largest: {number}?=nil
+ local area=0
+ for _,fragment in (footprints[id] or {}) :: {{number}} do
+  local nextArea=(fragment[2]-fragment[1])*(fragment[4]-fragment[3])
+  if nextArea>area then largest=fragment;area=nextArea end
+ end
+ return largest
+end
 -- Rectangle subtraction leaves intentional drain pits and existing authored ground untouched.
 local function subtract(rect: {number}, hole: {number}): {{number}}
  local a,b,c,d=math.max(rect[1],hole[1]),math.min(rect[2],hole[2]),math.max(rect[3],hole[3]),math.min(rect[4],hole[4])
@@ -79,6 +88,37 @@ function Verge.pieces(r: any): {any}
   table.insert(out,{id=r.id.."_soil_"..i,lo=Vector3.new(b[1],Verge.TOP-2,b[3]),
    hi=Vector3.new(b[2],Verge.TOP,b[4]),profile="bare_wood_rough",color=Color3.fromHex("71804e"),material="Ground"})
  end
+ -- Two small litter shelters in the largest real soil fragment. Keep the
+ -- spawn corridor clear and never bridge an excluded drain, bed or water gap.
+ local largest=largestFootprint(r.id)
+ if largest then
+  local b=largest :: {number}
+  local width,depth=b[2]-b[1],b[4]-b[3]
+  if width>=7 and depth>=16 then
+   for i,fraction in {.25,.75} do
+    local h=(r.seed+i*104729)%2147483647
+    local leafWidth=math.min(12,width-2)*(.78+.22*(h%997)/997)
+    local leafDepth=math.min(6,depth/4)*(.85+.15*((h*17)%991)/991)
+    local height=1.05+.35*((h*31)%983)/983
+    local palette=if r.seed%3==0 then {"94714a","a78451","856346","b18b59"} else {"6b864d","7d9259","677e42","8a975e"}
+    local color=palette[1+h%4]
+    local x,z=(b[1]+b[2])/2,b[3]+depth*fraction
+    local function box(name: string,a: Vector3,c: Vector3,color: string)
+     table.insert(out,{id=r.id..`_litter_{i}_`..name,lo=a,hi=c,profile="bare_wood_rough",color=Color3.fromHex(color),material="Wood"})
+    end
+    local y=Verge.TOP
+    for _,side in {-1,1} do
+     local edge=x+side*(leafWidth/2-.18)
+     box("curl_"..side,Vector3.new(edge-.12,y,z-leafDepth/2),Vector3.new(edge+.12,y+height,z+leafDepth/2),color)
+    end
+    box("leaf",Vector3.new(x-leafWidth/2,y+height,z-leafDepth/2),Vector3.new(x+leafWidth/2,y+height+.18,z+leafDepth/2),color)
+    if width>=18 and depth>=30 then
+     local tx=x+leafWidth/2+1.6
+     box("stem",Vector3.new(tx-.4,y,z-6),Vector3.new(tx+.4,y+.8,z+6),"756047")
+    end
+   end
+  end
+ end
  pieceCache[r.id]=table.freeze(out) :: any
  return pieceCache[r.id]
 end
@@ -89,11 +129,16 @@ function Verge.decor(r: any): {any}
  local out: {any}={}
  -- Small overlapping clover islands: wide silhouettes remain readable between
  -- landmarks, individual leaves replace part-heavy carpets of upright grass.
+ local soil: {{number}}={}
+ for _,fragment in (footprints[r.id] or {}) :: {{number}} do
+  if fragment[2]-fragment[1]>=8.2 and fragment[4]-fragment[3]>=7 then table.insert(soil,fragment) end
+ end
  for i=1,12 do
+  if #soil==0 then break end
   local h=(r.seed+i*7919)%2147483647
-  local a,b=r.bounds[1],r.bounds[2]
-  local x=a.X+5+(h%997)/997*math.max(0,b.X-a.X-10)
-  local z=a.Z+5+((h*17)%991)/991*math.max(0,b.Z-a.Z-10)
+  local fragment=soil[1+(i-1)%#soil]
+  local x=fragment[1]+4.1+(h%997)/997*math.max(0,fragment[2]-fragment[1]-8.2)
+  local z=fragment[3]+3.5+((h*17)%991)/991*math.max(0,fragment[4]-fragment[3]-7)
   for l=1,3 do
    local angle=l*math.pi*2/3
    table.insert(out,{id=r.id..`_clover_{i}_{l}`,size=Vector3.new(4.5,.16,3.2),
@@ -101,7 +146,26 @@ function Verge.decor(r: any): {any}
     shape="Ellipsoid",color=Color3.fromHex(if i%3==0 then "718b44" else "54713e"),material="Grass",full=i>4})
   end
  end
+ for _,piece in Verge.pieces(r) do
+  if string.find(piece.id,"_litter_",1,true) then
+   local size,at=piece.hi-piece.lo,(piece.lo+piece.hi)/2
+   local roof=string.sub(piece.id,-5)=="_leaf"
+   table.insert(out,{id=piece.id.."_look",size=size,at=at,color=piece.color,
+    material=if string.sub(piece.id,-5)=="_stem" then "Wood" else "SmoothPlastic",
+    -- Reuse the preserve's approved leaf/bark meshes and their actual veins,
+    -- rather than making a leaf look like a little table of primitive slabs.
+    shape=if roof then (if r.seed%3==0 then "Mesh:bark_chip" else "Mesh:milkweed_leaf") else "Ellipsoid",full=false})
+  end
+ end
  decorCache[key]=out
+ return out
+end
+
+function Verge.drawnPieces(r: any): {string}
+ local out: {string}={}
+ for _,piece in Verge.pieces(r) do
+  if string.find(piece.id,"_litter_",1,true) then table.insert(out,piece.id) end
+ end
  return out
 end
 
@@ -112,10 +176,7 @@ function Verge.bestiary(r: any): {any}
  local perches: {any}={}
  local a,b=r.bounds[1],r.bounds[2]
  if r.kind=="verge" then
-  local largest: any=nil
-  for _,f in (footprints[r.id] or {}) :: {any} do
-   if largest==nil or (f[2]-f[1])*(f[4]-f[3])>(largest[2]-largest[1])*(largest[4]-largest[3]) then largest=f end
-  end
+  local largest=largestFootprint(r.id)
   if largest==nil or largest[2]-largest[1]<3 or largest[4]-largest[3]<3 then bestiaryCache[key]={};return bestiaryCache[key] end
   a,b=Vector3.new(largest[1],Verge.TOP,largest[3]),Vector3.new(largest[2],Verge.TOP,largest[4])
  end

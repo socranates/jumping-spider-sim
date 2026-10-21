@@ -1,0 +1,10 @@
+{
+  "package": "C:\\Users\\natha\\claude-xfer\\Windowsill-v48-06be0270d414ffc2-candidate.zip",
+  "bytes": 16378079,
+  "sha256": "4ccc0ef4ae47c6919cc69dd616f5b72b0499425bd7ae857b93c7228e30786719",
+  "files": 596,
+  "source": "1ba2eb3a2b296e72d3cb753e68740b6d62ea8e89",
+  "docs_commit": "0841dfe",
+  "evidence_id": "06be0270d414ffc2",
+  "status": "unpublished candidate; final frozen CLI still running"
+}

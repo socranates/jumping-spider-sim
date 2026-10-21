@@ -8,6 +8,8 @@ For a cloud Claude session, clone that GitHub branch. Local `C:` links alone can
 
 **Use the source, not an older generated place file in the checkout/archive.** Tracked generated places have not been replaced. A separate release copy was rebuilt at `C:\Users\natha\claude-xfer\v48-release-1ba2eb3\roblox_port`, evidence **06be0270d414ffc2**; all 207 playable XML script sources match the frozen archive byte-for-byte after line-ending normalization. See `docs/verification/v48/release-build-1ba2eb3.json`. Rebuild with `python tools/build.py <rojo>` in a separate copy when needed; retain the regression snapshot unchanged. The existing cloud editor receives reviewed source through Rojo.
 
+A bounded portable candidate package is ready at `C:\Users\natha\claude-xfer\Windowsill-v48-06be0270d414ffc2-candidate.zip` (**16,378,079 bytes**, 596 entries, SHA256 **4ccc0ef4ae47c6919cc69dd616f5b72b0499425bd7ae857b93c7228e30786719**). It contains rebuilt playable/test places, source, assets, tests, tools, this handoff and v48 evidence through review commit 0841dfe. Its README explicitly labels it unpublished and awaiting final CLI acceptance. `candidate-package.json` records that immutable identity. The current branch may contain later receipt-only updates.
+
 Nathan asked for a rich, lived-in tiny-spider world: dust bunnies, fleas, soda cans, ant hills, occasional emerging grubs, an outdoor dog, realistic moving sun, wind and weather. He also wants dense small habitats rather than empty distances, secure ground off the stone path and nearby insect life. Do not replace this with a decorative checklist: inspect the normal camera and ordinary connected travel.
 
 ## What changed
@@ -57,12 +59,12 @@ The cloud editor is open in Studio window **4131012**, distinct from local revie
 
 The existing-place editor then connected to Rojo **34872**, accepted the source sync, cleared `SelfTest`, `Detail`, `TestTarget` and `Wasp`, and asserted no SilkPlayback. Post-sync fingerprints match all **207/207** current scripts with no extras. Fingerprints use DJB2 modulo 2^32 after CRLF normalization: useful change detection, not a cryptographic proof. JSON manifests are in `docs/verification/v48/cloud-draft-134-comparison.json` and `cloud-sync-1ba2eb3.json`.
 
-`[CHET_V48_CLOUD_SYNC_CLEAN]` at **2026-10-21T20:49:02.622Z** confirms target identities and count in Studio log `0.744.0.7441077_20261021T204424Z_Studio_B411D_last.log`. This preparation does not publish or complete the final native/release gates. Recheck actual debug state after any subsequent native test. The cloud editor remains Rojo-connected; source mutations will synchronize, so avoid further source edits during final acceptance.
+`[CHET_V48_CLOUD_SYNC_CLEAN]` at **2026-10-21T20:49:02.622Z** confirms target identities and count in Studio log `0.744.0.7441077_20261021T204424Z_Studio_B411D_last.log`. The later final native run is complete and clean as recorded above. The existing cloud editor is now **disconnected from Rojo**; its UI confirms "Disconnected from session". It remains stopped on the correct existing place, ready for final pre-publish assertions after CLI acceptance. No publication has occurred. Recheck actual debug state after any subsequent native test.
 
 ## Local working rules
 
 Writable clone: `C:\Users\natha\windowsill-publish`. Push only remote `github` (`https://github.com/socranates/jumping-spider-sim.git`). Remote `origin` points to a read-only OneDrive clone; never push it. The OneDrive project and mirrored `sources/` are read-only. Do not merge main or change Claude's branch. No subagents requested.
 
-Rojo is serving the writable clone on localhost **34872**. Both the local review editor and the existing cloud editor are connected. The post-sync manifest above verifies the cloud script changes; it does not prove publication. Keep cloud and local identities distinct.
+Rojo is serving the writable clone on localhost **34872**. The local review editor remains connected; the cloud editor is deliberately disconnected after source sync/native acceptance. The post-sync manifest verifies its script changes; it does not prove publication. Keep cloud and local identities distinct.
 
 Regression wrapper: `C:\Users\natha\claude-xfer\v48_frozen_regression.py`; it runs the snapshot's own 55 declared suites unchanged and writes per-suite raw output/progress/summary. The Python runtime is under `C:\Users\natha\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe`; Luau tools are in this ChatGPT project's `roblox_tools/` directory. Preserve raw failed or interrupted evidence rather than rewriting it as a pass.

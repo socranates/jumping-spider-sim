@@ -160,6 +160,12 @@ gentle rules) with its notebook page, the path round the back room's east end (p
 **Phase C — the meadow and the path (3 rounds).** Zone 3 and the first corridor (the mown path, the bench/bin/lamppost patch, zone 8),
 crab spider and the lamppost moths, ballooning as the generation's choice.
 
+*Round 1 built (ROBLOX-119, 2026-10-20, not yet run in Studio):* the bench patch (home range 8, moved to where the garden's path comes out: x 43.65..46.65, z 13..16 m) with its
+bench, litter bin, lamppost (lit at dusk, moths at its lantern) and drain grate, and the meadow's edge (home range 3 at its near edge: x 42.65..47.65, z 16..21 m), big and
+little bluestem, black-eyed Susan, yarrow, milkweed, coneflower, bergamot and goldenrod at true size, an ant hill and a curled leaf; their life (leafhoppers, house flies,
+hoverflies, moths, ants), the goldenrod crab spider with its page, the rival roaming the edge. Left for round 2: the bird's shadow over open ground, a cricket, more of the meadow
+and the mown loop as a corridor; round 3: ballooning as the generation's choice.
+
 **Phase D — water (2–3 rounds).** Zone 4 (the pond edge and the boardwalk), water as a surface, the frog, damselflies, midges; weather
 (rain makes worms and stops hunting).
 
@@ -204,6 +210,12 @@ the Steam edition (the canal, the apartment balconies and window boxes, a roofto
 5. Lock-on moves to **L2** on controllers (Nathan, 2026-10-20), in Phase A's first round.
 
 ## 11. Progress
+
+- **ROBLOX-119 (Phase C, round 1)**: the bench patch and the meadow's edge walkable (`World/Meadow`), their life (`Prey/Ant`), the crab spider (`Predator/CrabSpider`, `Client/CrabBody`,
+  `UI/CrabText`), the lamppost's light, the rival's roam to the meadow's edge; fixed the flights that never left the sill's band (`Prey/PerchGraph`'s band per spec) and the
+  hoverfly's probe. 146 regions, 244 seams. Decisions taken in the build: home ranges 3 and 8 moved to where the garden's path comes out (the plan's places were nowhere near the
+  hut); the bench patch at 3 by 3 m in nine cells, the meadow in twenty-five; two crab spiders, each on one of two flowers by the day; the bird left for round 2.
+  `docs/DECISIONS.md` ROBLOX-119; `docs/HANDOFF-roblox-world.md` has the Studio checklist.
 
 - **ROBLOX-118 (Phase B, round 3)**: the ceiling and the walls to it, the eaves outside, the back room and the cat (`Predator/Cat`, `Rig/CatPose`, `Client/CatBody`, `UI/CatText`),
   the path round the back room and on toward the meadow, the preserve the default world. 105 regions, 180 seams. Decisions taken in the build: the back room east of the hut (the path

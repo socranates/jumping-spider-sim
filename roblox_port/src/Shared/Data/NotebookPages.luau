@@ -54,6 +54,7 @@ NotebookPages.triggers = {
 	"look_harvestman",
 	"look_hoverfly",
 	"cat",
+	"crab_spider",
 }
 
 -- The reserve at or under hungryAt is "hungry"; at or over wellFedAt, "well fed" (LIFE_DESIGN.md round 1).
@@ -517,6 +518,18 @@ NotebookPages.pages = {
 			"Loss, S. R., Will, T. & Marra, P. P. (2013). The impact of free-ranging domestic cats on wildlife of the United States. Nature Communications 4: 1396. https://doi.org/10.1038/ncomms2380",
 			"Ruxton, G. D., Thomas, S. & Wright, J. W. (2002). Bells reduce predation of wildlife by domestic cats (Felis catus). Journal of Zoology 256: 81-83 (as summarised by Conservation Evidence).",
 			"Shamble, P. S., Menda, G., Golden, J. R., Nitzany, E. I., Walden, K., Beatus, T., Elias, D. O., Cohen, I., Miles, R. N. & Hoy, R. R. (2016). Airborne acoustic perception by a jumping spider. Current Biology 26: 2913-2920 (as reported by NPR, 14 October 2016).",
+		},
+	},
+	{
+		id = "crab_spider",
+		trigger = "crab_spider",
+		title = "The crab spider on the flower",
+		text = "The goldenrod crab spider (Misumena vatia) lives in North America and Europe. Females are 6 to 9 mm long, males 3 to 4 mm. It waits on a flower, usually a yellow or white one, its first two pairs of legs held open, and grabs what comes near, injecting venom with small fangs. It takes flies, bees, butterflies and hoverflies. It can turn from white to yellow to match its flower; that change takes 10 to 25 days, and the change back about six. In North America it is most common on goldenrod.",
+		game = "Here two crab spiders sit on the meadow's flowers, a yellow one on goldenrod and a white one on yarrow, still and nearly the flower's colour, front legs open. Walk or land within their reach and they grab: in Normal that ends the life; on Easy and in free play you drop clear. Their reach and where they sit are the game's.",
+		sources = {
+			"Animal Diversity Web, University of Michigan Museum of Zoology (read 2026). Misumena vatia, goldenrod crab spider.",
+			"University of Minnesota Extension (undated, read 2026). Goldenrod crab spider.",
+			"Wikipedia (read 2026). Misumena vatia.",
 		},
 	},
 } :: { Page }

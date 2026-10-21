@@ -76,6 +76,7 @@ local Ladybirds = require(script.Parent.Parent.Prey.Ladybird)
 local Millipedes = require(script.Parent.Parent.Prey.Millipede)
 local Snails = require(script.Parent.Parent.Prey.Snail)
 local Harvestmen = require(script.Parent.Parent.Prey.Harvestman)
+local Ants = require(script.Parent.Parent.Prey.Ant) -- (ROBLOX-119: the meadow's ants)
 local Garden = require(script.Parent.Parent.World.Garden)
 
 local RivalSpider = require(script.Parent.Parent.Predator.RivalSpider)
@@ -98,6 +99,7 @@ Checkpoint.CLASSES = {
 	Fly = Fly, FlyFlight = FlyFlight, FlySenses = FlySenses, PreyRandom = PreyRandom, PreyPopulation = PreyPopulation,
 	PerchGraph = PerchGraph, Feeding = Feeding, PreyDirector = PreyDirector, Woodlice = Woodlice,
 	Ladybirds = Ladybirds, Millipedes = Millipedes, Snails = Snails, Harvestmen = Harvestmen, -- (ROBLOX-105)
+	Ants = Ants, -- (ROBLOX-119)
 	Sensor = Sensor, SensorCore = SensorCore, ObservationMemory = ObservationMemory, Contact = ObservationMemory.Contact,
 	Observation = Observation,
 	NeedsModel = NeedsModel, LifeLoop = LifeLoop, LifeClock = LifeClock, Growth = Growth,
@@ -401,7 +403,7 @@ local function checkWorld(roots: { [string]: any }, problems: { string })
 					else
 						local known: { [string]: boolean } = {}
 						for _, a in (Garden.ambient(region) or {}) :: { any } do known[a.kind] = true end
-						local classes = { ladybird = Ladybirds, millipede = Millipedes, snail = Snails, harvestman = Harvestmen } :: { [string]: any }
+						local classes = { ladybird = Ladybirds, millipede = Millipedes, snail = Snails, harvestman = Harvestmen, ant = Ants } :: { [string]: any }
 						for kind, c in entry.ambient do
 							if type(kind) ~= "string" or not known[kind] then bad(`garden: {id} has no ambient bug of the kind {tostring(kind)}`)
 							elseif getmetatable(c) ~= classes[kind] then bad(`garden: {id}'s {kind} is not a colony of its kind`)

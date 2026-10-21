@@ -32,6 +32,9 @@ function D.new(graph: any,profile: any,seed: number,target: number,mixed: boolea
   captures=0,enabled=true,cpu={},candidates=0,entryChecks=0},D)
  if spec then
   self.prefix=spec.prefix or 'fly_' -- (a region's flies carry its name, so no two flies of the world share an id)
+  -- (ROBLOX-119: a spec may name the band its flights climb in, `floor` and `ceiling`, PerchGraph.plan; World/Meadow's and the hut's moths and hoverflies do)
+  local band=spec::any
+  if type(band.floor)=="number" and type(band.ceiling)=="number" then graph.floor=band.floor;graph.ceiling=band.ceiling end
   for _,row in spec.perches do
    local p=graph:add(row.id,row.position,row.normal,row.shelter,row.food,row.start==true)
    if row.walker then p.walker=true end

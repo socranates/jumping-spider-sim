@@ -129,6 +129,11 @@ local M = {
 	CatText = require(Shared.UI.CatText),
 	catSeed = require(Shared.World.WorldMap).seed(914, "cat"),
 	cat = (nil :: any), catBody = (nil :: any), catHeard = { bell = 0.0 },
+	-- ROBLOX-119: the crab spiders on the meadow's flowers (Predator/CrabSpider, drawn by Client/CrabBody, its words UI/CrabText), made in the preserve only; here for the same reason.
+	CrabSpider = require(Shared.Predator.CrabSpider),
+	CrabBody = require(script.Parent.CrabBody),
+	CrabText = require(Shared.UI.CrabText),
+	crab = (nil :: any), crabBody = (nil :: any),
 }
 M.lock = M.LockOn.new()
 local focusState = FocusState.new()
@@ -230,6 +235,7 @@ local flyBodies = FlyBodies.new(Workspace, detail) -- (ROBLOX-101: the bestiary'
 local soundscape = Soundscape.new(Workspace)
 local waspBody = WaspBody.new(Workspace)
 if M.World.world == "preserve" then M.cat = M.Cat.new(M.catSeed); M.catBody = M.CatBody.new(Workspace, detail); M.cat.enabled = script.Parent:FindFirstChild("SilkPlayback") == nil end
+if M.World.world == "preserve" then M.crab = M.CrabSpider.new(require(Shared.World.WorldMap).seed(914, "crab_spider")); M.crabBody = M.CrabBody.new(Workspace, detail) end -- (ROBLOX-119)
 -- LIFE (ROBLOX-24): the windowsill runs the life clock, so hunger runs by its hours (NeedsModel life mode, Standard rules to begin with; Easy and Free play
 -- switch the model to the gentle rules in applyRules, ROBLOX-91). Feeding grants into the same model. The loop keeps the rest, sleep, daylight and the eyes' reach.
 local needs = NeedsModel.new(true, false)
@@ -820,8 +826,8 @@ local function presentEnd(immediate: boolean)
  table.insert(choices,{id="Another",text=mateLegs.Text.another(mateLegs.Mating.hasSac(life.mating))}) -- (ROBLOX-91: a new life; the brood is left behind)
  table.insert(choices,{id="Notebook",text=M.NotebookText.MENU_CHOICE})
  -- (ROBLOX-106: in Normal the last line says what the way back costs, the day since the rest, and that another spider is a new life; the night has its own words)
- panel:showChoices(if cause=="starved" then "The spider starved." elseif cause=="rival" then "The other spider caught you." elseif cause=="night" then M.LifeText.NIGHT_LINE elseif cause==M.CatText.CAUSE then M.CatText.LINE else M.WaspText.LINE,
-  if cause=="starved" then "It went too long without food." elseif cause=="rival" then "A hunter can become prey. You can return to your last rest." elseif cause=="night" then M.LifeText.NIGHT_SUB elseif cause==M.CatText.CAUSE then M.CatText.SUB else M.WaspText.SUB,
+ panel:showChoices(if cause=="starved" then "The spider starved." elseif cause=="rival" then "The other spider caught you." elseif cause=="night" then M.LifeText.NIGHT_LINE elseif cause==M.CatText.CAUSE then M.CatText.LINE elseif cause==M.CrabText.CAUSE then M.CrabText.LINE else M.WaspText.LINE,
+  if cause=="starved" then "It went too long without food." elseif cause=="rival" then "A hunter can become prey. You can return to your last rest." elseif cause=="night" then M.LifeText.NIGHT_SUB elseif cause==M.CatText.CAUSE then M.CatText.SUB elseif cause==M.CrabText.CAUSE then M.CrabText.SUB else M.WaspText.SUB,
   M.WaspText.summary(rec.hours,rec.meals,rec.wasp_visits,rec.wasp_escapes)..(if session.rules=="standard" then "\n"..M.LifeText.dayLost(hasRest) else ""),choices,immediate)
  panel:setTextScale(if setting("LargeText")==true then 1.5 else 1)
 end
@@ -1725,6 +1731,20 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 					end
 				end
 			end
+			-- ROBLOX-119: the crab spiders on the meadow's flowers: a spider that comes in reach of one is grabbed (a death in Normal; in the gentle rules it lunges and the
+			-- spider drops clear). Its first close look opens its page.
+			if M.crab ~= nil then
+				M.crab.gentle = needs.gentle
+				M.crab:step(DT, life.clock.day, life.clock.hour, if life.lifeOver or modal() then nil else { pos = motor.pos, hidden = M.World:inRetreat(motor.pos) ~= nil or life.resting })
+				for _, signal in M.crab:drainSignals() do
+					if signal.kind == "seen" then watch:onCrab()
+					elseif signal.kind == "struck" then endLife(M.CrabText.CAUSE)
+					elseif signal.kind == "nudged" and motor.mode == "attached" then
+						motor:_launch((signal.away or Vector3.zero) * 6 + Vector3.yAxis * 5, 40)
+						life:showNotice(M.CrabText.NUDGED)
+					end
+				end
+			end
 			M.Prof.lap("wasp")
 			prey.feeding.auto = setting("AutomaticGrip") == true or mateLegs.couple.active -- (a meal in the legs is held for a player whose hands are the scene's: ROBLOX-89)
 			if life.growth.gameRules ~= true then life.growth:useGameRules(needs.gentle) end -- (a family that carries on has a new growth)
@@ -1965,6 +1985,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	soundscape:update(frameDt, M.World.prey.view, life.daylight, soundPaused, soundSpeed, soundMuted)
 	soundscape:updateWasp(wasp, soundPaused, soundSpeed, soundMuted)
 	waspBody:draw(wasp.wasp, prey.now)
+	if M.crabBody ~= nil then M.crabBody:draw(M.crab) end -- (ROBLOX-119)
 	if M.catBody ~= nil then
 		local bell, purr = M.cat:sound(motor.pos)
 		M.catBody:draw(M.cat, prey.now, frameDt, if soundMuted or soundPaused then 0 else bell, if soundMuted or soundPaused then 0 else purr)
@@ -2062,6 +2083,7 @@ M.hooks = function(): any
 			nature = M.nature, -- (ROBLOX-106: nature's rules this tick: the cover factor, the night's passes)
 			prof = M.Prof, -- (ROBLOX-111: the frame timed by part, for the self-test's frame samples)
 			cat = M.cat, Cat = M.Cat, -- (ROBLOX-118: the ranger's cat, nil in the test garden, and its rules)
+			crab = M.crab, CrabSpider = M.CrabSpider, -- (ROBLOX-119: the crab spiders, nil in the test garden, and their rules)
 	}
 end
 local playback = script.Parent:FindFirstChild("SilkPlayback")

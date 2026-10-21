@@ -307,6 +307,51 @@ for _, w in WASPS do
 	body:draw({ position = Vector3.new(w.x, w.y, w.z), heading = Vector3.new(w.hx, 0, w.hz).Unit, mode = w.mode, search = w.search, visible = true }, w.beat)
 end
 
+-- ROBLOX-119 (--preserve): the meadow's edge and the bench patch's life: the bestiary's prey on their start perches (the bluestem's leafhoppers, the flowers' house flies
+-- and hoverflies, the grass heads' and the lantern's moths, the bin's flies), the ants a minute out from their hill at noon, and the crab spiders on their flowers on day 1
+-- (Client/CrabBody); NIGHT_MOTHS: the lantern's moths in flight round it, as they are from dusk.
+if PRESERVE then
+	local Meadow = require("../src/Shared/World/Meadow")
+	local Ant = require("../src/Shared/Prey/Ant")
+	local CrabSpider = require("../src/Shared/Predator/CrabSpider")
+	local CrabBody = require("../src/Client/CrabBody")
+	local tiered = FlyBodies.new(flyFolder, DETAIL)
+	local all = {}
+	for _, region in WorldMap.regions() do
+		if Meadow.knows(region.kind) then
+			for _, k in Garden.bestiary(region) or {} do
+				local d = PreyDirector.engine(outside, (Species :: any)[k.profile], k.seed, if DETAIL == "low" then k.low else k.target, false, k)
+				for i, f in d.flies do
+					if NIGHT_MOTHS and region.id == "lamp_4" then
+						-- in flight round the lantern
+						local a = i * 2.4
+						f.position = Meadow.LANTERN.at + Vector3.new(math.cos(a) * 15, (i % 2) * 6 - 3, math.sin(a) * 15)
+						f.heading = Vector3.new(-math.sin(a), 0, math.cos(a))
+						f.state = "FLEE"
+					end
+					table.insert(all, f)
+				end
+			end
+		end
+	end
+	tiered:draw(all, 0.37)
+	local b4 = WorldMap.region("meadow_b4") :: any
+	local spec = (Garden.ambient(b4) :: any)[1]
+	local soil: any, boxes = nil, {}
+	for _, p in Region.pieces(b4) do
+		if p.id == "meadow_b4_soil" then soil = { min = p.lo, max = p.hi } elseif p.lo.Y <= Meadow.GROUND + 0.01 then table.insert(boxes, { min = p.lo, max = p.hi }) end
+	end
+	local ants = Ant.new(spec, if DETAIL == "low" then spec.low else spec.full, soil, boxes)
+	for _ = 1, 60 * 60 do ants:step(1 / 60, Vector3.zero, { hour = 12 }) end
+	BugBodies.new(flyFolder, DETAIL):draw(ants:creatures(), 60)
+	local crabs = CrabSpider.new(WorldMap.seed(WorldMap.SEED, "crab_spider"))
+	crabs:step(1 / 60, 1, 12, nil)
+	CrabBody.new(flyFolder, DETAIL):draw(crabs)
+	local where = {}
+	for _, c in crabs.crabs do table.insert(where, `{c.form} {c.region} {c.pos}`) end
+	PRESERVE_COUNTS ..= `; the meadow's prey {#all}, ants {#ants.items}, crab spiders {table.concat(where, ", ")}`
+end
+
 -- ROBLOX-118 (scene.py --cats): the ranger's cat (Client/CatBody drawing Rig/CatPose) where scene.py puts it: { id, x, y, z, hx, hz, pose, t, look = {x,y,z}? }
 local catHolder = Instance.new("Folder")
 catHolder.Name = "CatHolder"

@@ -56,6 +56,7 @@ ap.add_argument("--lineup", action="store_true", help="ROBLOX-114: stand every c
 ap.add_argument("--preserve", action="store_true", help="ROBLOX-115: the preserve is the world: the sill's Decor without the test garden's view, the backdrop as a client at the sill holds it (or at --looks-at), a train on the line; views pv_* and preserve_drift_*")
 ap.add_argument("--hut-open", action="store_true", help="ROBLOX-116: with --preserve, the hut's window propped open (the nursery over); shut otherwise")
 ap.add_argument("--preserve-all", action="store_true", help="ROBLOX-115: with --preserve, every zone of the backdrop at the --detail tier's whole detail, not the client's plan")
+ap.add_argument("--night-moths", action="store_true", help="ROBLOX-119: with --preserve, the lamppost's moths in flight round its lantern, as from dusk")
 ap.add_argument("--cats", default="", help="ROBLOX-118: comma list of the cat's presets to draw (CAT_PRESETS: sofa, window, walk, watch, chair, swat)")
 ap.add_argument("--elevation", type=float, default=30.0, help="sun elevation, degrees")
 ap.add_argument("--set", action="append", default=[], help="lighting knob for scene.gd, key=value (energy, ambient, bias, nbias, blur)")
@@ -85,6 +86,10 @@ HUT_SPIDERS = [
     {"name": "leaf", "x": 60.0, "y": -51.89, "z": -266.0, "hx": 1, "hz": 0},
     {"name": "path", "x": 265.0, "y": -84.29, "z": 60.0, "hx": 0, "hz": -1},
     {"name": "feeder", "x": -128.0, "y": -84.29, "z": -170.0, "hx": -1, "hz": 0.4},
+    # ROBLOX-119: on the gravel at the meadow's edge, on the coneflower's cone in meadow_a3, on the bench's seat
+    {"name": "medge", "x": -60.0, "y": -84.29, "z": -1110.0, "hx": 0, "hz": -1},
+    {"name": "mcone", "x": -79.2, "y": -10.69, "z": -1152.1, "hx": 0.2, "hz": -1},
+    {"name": "mbench", "x": -40.0, "y": -37.29, "z": -1052.5, "hx": 0, "hz": 1},
 ]
 # ROBLOX-118 (--cats): the ranger's cat where its schedule puts it (Predator/Cat.SPOTS), drawn by Client/CatBody from Rig/CatPose
 CAT_PRESETS = {
@@ -133,7 +138,8 @@ def dump_parts(path):
     prefix = (f'DETAIL = {lua(args.detail)}\nSUN_ELEVATION_DEG = {args.elevation}\nSUN_AZIMUTH_DEG = {args.azimuth}\n'
               f'SPIDERS = {lua(spiders)}\nFLIES = {lua(FLIES)}\nWASPS = {lua(WASPS)}\nWORLD = {lua(args.world)}\n'
               f'LOOKS_AT = {lua([float(c) for c in args.looks_at.split(",")] if args.looks_at else False)}\nLINEUP = {lua(args.lineup)}\n'
-              f'PRESERVE = {lua(args.preserve)}\nPRESERVE_ALL = {lua(args.preserve_all)}\nHUT_OPEN = {lua(args.hut_open)}\nCATS = {lua(CATS)}\n')
+              f'PRESERVE = {lua(args.preserve)}\nPRESERVE_ALL = {lua(args.preserve_all)}\nHUT_OPEN = {lua(args.hut_open)}\nCATS = {lua(CATS)}\n'
+              f'NIGHT_MOTHS = {lua(args.night_moths)}\n')
     with tempfile.NamedTemporaryFile("w", suffix=".luau", encoding="utf-8", delete=False, dir=out) as f:
         f.write(prefix + run.bundle(driver))
     try:
@@ -453,6 +459,30 @@ VIEWS.update({
     "cat_swat": {"fov": 55, "eye": [300.0, -55.0, 165.0], "at": [305.0, -60.0, 118.0], "near": 0.05, "far": 14000, "groups": ["cats"], "shadow": 120},
     "cat_chair": {"fov": 52, "eye": [40.0, -5.0, 150.0], "at": [86.0, -18.0, 108.0], "near": 0.05, "far": 14000, "groups": ["cats"], "shadow": 120},
 })
+# ROBLOX-119 (--preserve, with --looks-at where the spider is): the meadow's edge and the bench patch (World/Meadow: the gravel x -210..90, z -816..-1116, the meadow
+# x -310..190, z -1116..-1616, the ground y -84.6). The spider's eye on the gravel at the meadow's edge (mc_eye_edge) and its game camera (mc_edge); on the coneflower's
+# cone 74 cm up (mc_cone, and mc_cone_view: what it sees from there); the yellow crab spider on its goldenrod (mc_crab, mc_crab_close); the meadow's edge from a person's
+# knee (mc_wide); the bench patch by day (mc_bench) and at night with the moths at the lantern (mc_bench_night, mc_lamp: with --night-moths and a night sky); the
+# spider on the bench's seat (mc_bench_game); the ant hill (mc_hill); the drain grate (mc_grate); the bin's foot with its can and packet (mc_bin).
+VIEWS.update({
+    "mc_eye_edge": {"fov": 75, "eye": [-60.0, -83.9, -1111.0], "at": [-60.0, -66.0, -1200.0], "near": 0.02, "far": 14000, "groups": [], "shadow": 120},
+    "mc_edge": {**game_camera(-60.0, -1110.0, 0, -1), "far": 14000, "groups": ["medge", "flies"], "shadow": 60},
+    "mc_cone": {**game_camera(-79.2, -1152.1, 0.2, -1), "far": 14000, "groups": ["mcone", "flies"], "shadow": 60},
+    "mc_cone_view": {"fov": 70, "eye": [-79.2, -9.6, -1153.5], "at": [-60.0, -30.0, -1450.0], "near": 0.05, "far": 14000, "groups": ["flies"], "shadow": 300},
+    "mc_crab": {"fov": 45, "eye": [-58.0, 22.0, -1535.0], "at": [-76.5, 12.0, -1549.6], "near": 0.05, "far": 14000, "groups": ["flies"], "shadow": 60},
+    "mc_crab_close": {"fov": 40, "eye": [-70.5, 19.5, -1544.5], "at": [-76.5, 16.8, -1549.6], "near": 0.02, "far": 14000, "groups": ["flies"], "shadow": 30},
+    "mc_wide": {"fov": 62, "eye": [150.0, -25.0, -1085.0], "at": [-80.0, -60.0, -1350.0], "near": 0.2, "far": 14000, "groups": ["flies", "medge", "mcone"], "shadow": 600},
+    "mc_bench": {"fov": 60, "eye": [160.0, -20.0, -840.0], "at": [-60.0, -55.0, -1060.0], "near": 0.2, "far": 14000, "groups": ["flies", "mbench"], "shadow": 600},
+    "mc_bench_night": {"fov": 64, "eye": [160.0, 20.0, -820.0], "at": [-90.0, 60.0, -1060.0], "near": 0.2, "far": 14000, "groups": ["flies", "mbench"], "shadow": 600},
+    "mc_lamp": {"fov": 55, "eye": [-150.0, 276.0, -1040.0], "at": [-180.0, 272.0, -1068.0], "near": 0.1, "far": 14000, "groups": ["flies"], "shadow": 120},
+    "mc_bench_game": {**game_camera(-40.0, -1052.5, 0, 1), "far": 14000, "groups": ["mbench", "flies"], "shadow": 60},
+    "mc_hill": {"fov": 55, "eye": [45.0, -71.0, -1212.0], "at": [22.0, -83.0, -1252.0], "near": 0.05, "far": 14000, "groups": ["flies"], "shadow": 120},
+    "mc_grate": {"fov": 55, "eye": [50.0, -65.0, -925.0], "at": [35.0, -86.0, -945.0], "near": 0.05, "far": 14000, "groups": [], "shadow": 120},
+    "mc_bin": {"fov": 55, "eye": [20.0, -70.0, -1000.0], "at": [55.0, -80.0, -1040.0], "near": 0.05, "far": 14000, "groups": ["flies"], "shadow": 120},
+})
+for _n, _dy in (("mc_edge", -84.6), ("mc_cone", -11.0), ("mc_bench_game", -37.6)):
+    VIEWS[_n]["eye"][1] += _dy
+    VIEWS[_n]["at"][1] += _dy
 for _n, _dy in (("pb_lawn", -84.6), ("pb_leaf", -52.2), ("pb_path", -84.6), ("pb_feeder_game", -84.6)):
     VIEWS[_n]["eye"][1] += _dy
     VIEWS[_n]["at"][1] += _dy

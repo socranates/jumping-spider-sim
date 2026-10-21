@@ -18,6 +18,7 @@
 -- are impostors there, each drawn the size a real tower about 600 m off would look from the hut (a 100 m tower drawn 12 m tall 60 m away): honest from the hut
 -- and the meadow, and said so here because from the railway bank they would read as nearer and smaller than they are.
 local Preserve = require(script.Parent.Preserve)
+local Meadow = require(script.Parent.Meadow) -- (ROBLOX-119: the bench patch's backdrop stands in for its walkable boxes)
 
 local PreserveLook = {}
 
@@ -31,7 +32,7 @@ export type Drawn = {
 PreserveLook.BUDGETS = table.freeze({
 	hut = { full = 170, low = 80, far = 50, farLow = 44 },
 	hut_garden = { full = 230, low = 50, far = 30, farLow = 24 },
-	bench = { full = 24, low = 14, far = 8, farLow = 6 },
+	bench = { full = 24, low = 14, far = 8, farLow = 8 }, -- (ROBLOX-119: the walkable patch's stand-ins)
 	ground = { full = 90, low = 64, far = 64, farLow = 62 },
 	meadow = { full = 140, low = 70, far = 110, farLow = 64 },
 	pond = { full = 110, low = 40, far = 30, farLow = 24 },
@@ -344,7 +345,8 @@ local function gardenDecor(out: List, rand: () -> number)
 	-- three beds edged in timber: two either side of the path, a long herb border along the north
 	-- (ROBLOX-116: the east bed starts clear of the core, World/Hut's walkable garden x 43.75..47.75, z 5..9, which has its own beds and the feeder)
 	-- (ROBLOX-118: the herb border along the north is in two, a gap for the path to the meadow, World/Hut's path_m4, x 44.85..45.45)
-	local beds = { { 39, 43.6, 7, 8.4 }, { 47.9, 51.6, 7, 8.4 }, { 38.6, 44.65, 12.4, 13.6 }, { 45.65, 51.6, 12.4, 13.6 } }
+	-- (ROBLOX-119: the border's two halves end at the bench patch's gravel, World/Meadow's pad x 43.65..46.65 from z 13)
+	local beds = { { 39, 43.6, 7, 8.4 }, { 47.9, 51.6, 7, 8.4 }, { 38.6, 43.5, 12.4, 13.6 }, { 46.8, 51.6, 12.4, 13.6 } }
 	for i, b in beds do
 		block(out, "Edging" .. i, b[1], b[2], b[3], b[4], 0, 0.22, C.board, "WoodPlanks", { far = true })
 		block(out, "BedSoil" .. i, b[1] + 0.05, b[2] - 0.05, b[3] + 0.05, b[4] - 0.05, 0.22, 0.24, C.soil, "Ground")
@@ -382,7 +384,7 @@ local function gardenDecor(out: List, rand: () -> number)
 	end
 	-- (ROBLOX-116: the bird feeder is World/Hut's, walkable, in the core)
 	-- the split-rail fence along the garden's north side, a gap for the path
-	for i, span in { { 38, 44.6 }, { 46.4, 52 } } do
+	for i, span in { { 38, 43.5 }, { 46.8, 52 } } do -- (ROBLOX-119: the gap is the bench patch's, x 43.65..46.65)
 		post(out, `RailPost{i}a`, span[1], 14.3, 0, 1.1, 0.14, "7a6a55", "Wood", { far = true })
 		post(out, `RailPost{i}b`, span[2], 14.3, 0, 1.1, 0.14, "7a6a55", "Wood", { far = true })
 		post(out, `RailPost{i}c`, (span[1] + span[2]) / 2, 14.3, 0, 1.1, 0.14, "7a6a55", "Wood", { full = true })
@@ -392,25 +394,27 @@ local function gardenDecor(out: List, rand: () -> number)
 	end
 end
 
--- ---------------------------------------------------------------- the bench, the bin and the lamppost (x 40, z 16)
+-- ---------------------------------------------------------------- the bench, the bin and the lamppost (ROBLOX-119: x 43.65..46.65, z 13..16, World/Meadow's walkable patch)
+-- Drawn a hair inside World/Meadow's walkable boxes (the bench patch's pad, the bench, the bin and the lamppost), standing in for them where streaming has not sent them
+-- and from afar; the gravel a hair under the walkable gravel.
 local function benchDecor(out: List, _rand: () -> number)
-	local bx, bz = Preserve.BENCH.x, Preserve.BENCH.z
-	block(out, "Seat", bx - 0.8, bx + 0.8, bz + 0.62, bz + 1.02, 0.42, 0.46, C.board, "WoodPlanks", { far = true })
-	block(out, "Back", bx - 0.8, bx + 0.8, bz + 1.02, bz + 1.06, 0.55, 0.85, C.board, "WoodPlanks", { far = true })
-	for i, x in { bx - 0.7, bx + 0.7 } do
-		block(out, "Leg" .. i, x - 0.03, x + 0.03, bz + 0.62, bz + 1.06, 0, 0.42, C.black, "Metal")
-		block(out, "Arm" .. i, x - 0.03, x + 0.03, bz + 0.62, bz + 1.04, 0.62, 0.66, C.black, "Metal", { full = true })
+	local K, S, B, N, L = Meadow.PAD, Meadow.SLAB, Meadow.BENCH, Meadow.BIN, Meadow.LAMP
+	local g = GROUND
+	local sl = S.top
+	local e = 0.15 -- (the hair)
+	sblock(out, "Pad", K.x0 + e, K.x1 - e, g + 0.05, g + 0.25, K.z0 + e, K.z1 - e, C.gravel, "Pebble", { far = true })
+	sblock(out, "Slab", S.x0 + e, S.x1 - e, g + 0.3, sl - e, S.z0 + e, S.z1 - e, C.concrete, "Concrete", { far = true })
+	sblock(out, "Seat", B.x0 + e, B.x1 - e, sl + B.seat - B.thick + e, sl + B.seat - e, Meadow.SLATS[4][1] + e, B.front - e, C.board, "WoodPlanks", { far = true })
+	sblock(out, "Back", B.x0 + e, B.x1 - e, sl + B.back[1][1] + e, sl + B.back[3][2] - e, B.backZ[1] + e, B.backZ[2] - e, C.board, "WoodPlanks", { far = true })
+	for i, fx in B.ends do
+		sblock(out, "End" .. i, fx + e, fx + B.frame - e, sl + e, sl + B.legTop - e, B.front - 4 + e, B.front - e, C.black, "Metal", { full = true })
+		sblock(out, "Post" .. i, fx + e, fx + B.frame - e, sl + e, sl + B.back[3][2] + 2 - e, B.post[1] + e, B.post[2] - e, C.black, "Metal", { full = true })
 	end
-	for k = 1, 3 do
-		block(out, "SeatSlat" .. k, bx - 0.81, bx + 0.81, bz + 0.62 + (k - 1) * 0.135, bz + 0.62 + (k - 1) * 0.135 + 0.01, 0.461, 0.465, C.boardDark, "WoodPlanks", { full = true })
-	end
-	post(out, "Bin", bx + 1.3, bz + 0.9, 0, 0.8, 0.5, C.bin, "Metal", { far = true })
-	post(out, "BinLid", bx + 1.3, bz + 0.9, 0.8, 0.86, 0.54, "2c372d", "Metal", { full = true })
-	post(out, "LampPole", bx - 1.4, bz + 1.0, 0, 4.2, 0.1, C.black, "Metal", { far = true })
-	block(out, "LampArm", bx - 1.4, bx - 1.0, bz + 0.98, bz + 1.02, 4.1, 4.16, C.black, "Metal", { full = true })
-	block(out, "LampHead", bx - 1.12, bx - 0.88, bz + 0.88, bz + 1.12, 3.86, 4.1, C.black, "Metal", { far = true })
-	block(out, "LampGlass", bx - 1.08, bx - 0.92, bz + 0.92, bz + 1.08, 3.8, 3.86, C.lamp, "SmoothPlastic", { full = true })
-	blob(out, "Worn", bx, bz + 0.4, 0, 2.4, 0.02, 1.2, "8a8358", { full = true }) -- the grass worn thin in front of it
+	sblock(out, "Bin", N.x0 + e, N.x1 - e, sl + N.base + e, sl + N.lid - e, N.z0 + e, N.z1 - e, C.bin, "Metal", { far = true })
+	sblock(out, "Pole", L.x - L.half + e, L.x + L.half - e, sl + e, sl + L.top - e, L.z - L.half + e, L.z + L.half - e, C.black, "Metal", { far = true })
+	local y = sl + L.top + L.plate.h
+	sblock(out, "Lantern", L.x - L.glass.half + e, L.x + L.glass.half - e, y + e, y + L.glass.h - e, L.z - L.glass.half + e, L.z + L.glass.half - e, C.lamp, "SmoothPlastic", { far = true })
+	sblock(out, "LampCap", L.x - L.cap.half + e, L.x + L.cap.half - e, y + L.glass.h + e, y + L.glass.h + L.cap.h - e, L.z - L.cap.half + e, L.z + L.cap.half - e, C.black, "Metal", { full = true })
 end
 
 -- ---------------------------------------------------------------- the ground: the mown grass, the meadow's, the wood's and the scrub's floors, the paths, the fences
@@ -424,7 +428,8 @@ local function groundDecor(out: List, rand: () -> number)
 	-- the floors laid over it (4 mm up): the meadow's tawny ground, the wood's leaf litter, the scrub's
 	for i = 0, 1 do
 		for j = 0, 1 do
-			block(out, `MeadowFloor{i}_{j}`, 25 + i * 17.5, 25 + (i + 1) * 17.5, 18 + j * 15, 18 + (j + 1) * 15, 0, 0.004, C.meadowFloor, "Grass", { far = true })
+			-- (ROBLOX-119: 2 mm up, under World/Meadow's walkable floor at the meadow's edge, 4 mm up)
+			block(out, `MeadowFloor{i}_{j}`, 25 + i * 17.5, 25 + (i + 1) * 17.5, 18 + j * 15, 18 + (j + 1) * 15, 0, 0.002, C.meadowFloor, "Grass", { far = true })
 		end
 	end
 	for j = 0, 2 do
@@ -468,6 +473,13 @@ local function groundDecor(out: List, rand: () -> number)
 end
 
 -- ---------------------------------------------------------------- the meadow (x 25..60, z 18..48)
+-- (ROBLOX-119) Whether a mass at (x, z) metres, `r` across its half, would stand over World/Meadow's walkable core (x 42.65..47.65, z 16..21).
+local function nearCore(x: number, z: number, r: number): boolean
+	local K = Meadow.CORE
+	local x0, x1 = K.x0 / 100 + Preserve.ORIGIN_X_M, K.x1 / 100 + Preserve.ORIGIN_X_M
+	local z0, z1 = Preserve.NORTH_FACE_M - (K.z1 - Preserve.NORTH_FACE_Z) / 100, Preserve.NORTH_FACE_M - (K.z0 - Preserve.NORTH_FACE_Z) / 100
+	return x + r > x0 and x - r < x1 and z + r > z0 and z - r < z1
+end
 local function meadowDecor(out: List, rand: () -> number)
 	local mx, mz = Preserve.MEADOW.x, Preserve.MEADOW.z
 	local cols, rows = 9, 8
@@ -480,7 +492,37 @@ local function meadowDecor(out: List, rand: () -> number)
 			local w, d = between(rand, 4.2, 5.6), between(rand, 3.6, 5.0)
 			local h = between(rand, 1.2, 1.9) -- big bluestem and switchgrass stand 0.9 to 1.5 m in late summer; the masses' tops reach 0.8 to 1.2
 			-- (ROBLOX-117: every second mass is the full tier's: 36 at the low tier, which were 48)
-			blob(out, `Grass{k}`, x, z, h * 0.22, w, h, d, pick(C.grass, rand), { far = true, full = k % 2 == 0 }, between(rand, 0, 180))
+			-- (ROBLOX-119: none over the walkable meadow's edge and a margin round it: its own clumps are drawn there)
+			local color, yaw = pick(C.grass, rand), between(rand, 0, 180)
+			if not nearCore(x, z, w / 2 + 0.6) then
+				blob(out, `Grass{k}`, x, z, h * 0.22, w, h, d, color, { far = true, full = k % 2 == 0 }, yaw)
+			end
+		end
+	end
+	-- (ROBLOX-119) the masses taken off round the walkable edge leave a gap the grid's would have filled: smaller masses round its west, north and east sides, each
+	-- standing clear of the edge's own cells, in the meadow's ground (z 18 on)
+	do
+		local K = Meadow.CORE
+		local x0, x1 = K.x0 / 100 + Preserve.ORIGIN_X_M, K.x1 / 100 + Preserve.ORIGIN_X_M
+		local z0, z1 = Preserve.NORTH_FACE_M - (K.z1 - Preserve.NORTH_FACE_Z) / 100, Preserve.NORTH_FACE_M - (K.z0 - Preserve.NORTH_FACE_Z) / 100
+		local n = 0
+		local gx = x0 - 3.1
+		while gx <= x1 + 3.1 do
+			local gz = mz[1] + 0.5
+			while gz <= z1 + 3.1 do
+				local x, z = gx + between(rand, -0.3, 0.3), gz + between(rand, -0.3, 0.3)
+				local dx = math.max(x0 - x, 0, x - x1)
+				local dz = math.max(z0 - z, 0, z - z1)
+				local d = math.sqrt(dx * dx + dz * dz)
+				local w = math.min(2.4, 2 * d - 0.2)
+				local h, color, yaw = between(rand, 0.9, 1.4), pick(C.grass, rand), between(rand, 0, 180)
+				if d > 0.5 and d <= 3.3 and w >= 0.8 then
+					n += 1
+					blob(out, `EdgeGrass{n}`, x, z, h * 0.22, w, h, w * between(rand, 0.75, 1.0), color, { full = n % 3 ~= 0 }, yaw)
+				end
+				gz += 1.7
+			end
+			gx += 1.7
 		end
 	end
 	-- drifts of flowers over the grass: goldenrod, coneflower, milkweed, black-eyed Susan, Queen Anne's lace, bergamot
@@ -490,7 +532,11 @@ local function meadowDecor(out: List, rand: () -> number)
 		local z = between(rand, mz[1] + 1, mz[2] - 1)
 		local w = between(rand, 1.0, 2.6)
 		local kind = pick(kinds, rand)
-		blob(out, `Drift{d}`, x, z, between(rand, 0.86, 1.08), w, 0.22, w * between(rand, 0.5, 0.9), (C.flowers :: any)[kind], { far = d <= 30, full = d % 2 == 0 }, between(rand, 0, 180))
+		local y, deep = between(rand, 0.86, 1.08), w * between(rand, 0.5, 0.9)
+		local yaw = between(rand, 0, 180)
+		if not nearCore(x, z, w / 2 + 0.3) then
+			blob(out, `Drift{d}`, x, z, y, w, 0.22, deep, (C.flowers :: any)[kind], { far = d <= 30, full = d % 2 == 0 }, yaw)
+		end
 	end
 	-- a few milkweed clumps' broad leaves, the ant hills by the path and the bee hotel on its post (near detail)
 	for a = 1, 4 do

@@ -57,7 +57,7 @@ end
 Preserve.ZONES = table.freeze({
 	zone("hut", "The ranger hut", 42, 52, -1, 7, -0.2, 3.6), -- (ROBLOX-118: and its back room east of it, to x 50.8 with the roof's overhang) -- the hut, the bench and water butt under its window, the info board and the bike rack by the gate
 	zone("hut_garden", "The hut garden", 38, 52, 6, 14, 0, 2.6), -- herb border, pallet planters, the bird feeder
-	zone("bench", "The bench, bin and lamppost", 37, 43, 14, 18.5, 0, 4.6),
+	zone("bench", "The bench, bin and lamppost", 43.5, 47, 13, 16.4, 0, 3.9), -- (ROBLOX-119: where the garden's path comes out at the meadow's edge, World/Meadow; it was x 37..43, z 14..18.5)
 	zone("ground", "The ground and the paths", 0, 100, 0, 60, -0.3, 1.9), -- the mown grass, the meadow's and the wood's floors, the paths, the boundary fences
 	zone("meadow", "The wildflower meadow", 24, 61, 17, 49, 0, 1.8),
 	zone("pond", "The pond and the boardwalk", 60, 80, 28, 45, -0.4, 2.6),
@@ -93,12 +93,12 @@ end
 Preserve.HOME_RANGES = table.freeze({
 	home(1, "ranger_hut", "Ranger hut", "hut", 45.75, 3.5, 3.5),
 	home(2, "hut_garden", "Hut garden", "hut_garden", 45.75, 7, 4), -- (ROBLOX-116: in front of the north window, World/Hut's core: x 43.75..47.75, z 5..9)
-	home(3, "meadow", "Meadow", "meadow", 31, 40, 5),
+	home(3, "meadow", "Meadow", "meadow", 45.15, 18.5, 5), -- (ROBLOX-119: the meadow's edge north of the bench patch, World/Meadow's core: x 42.65..47.65, z 16..21; it was 31, 40)
 	home(4, "pond_edge", "Pond edge", "pond", 77, 42, 4),
 	home(5, "log_pile", "Log pile and woodland floor", "woodland", 10, 29.5, 4),
 	home(6, "veteran_oak", "Veteran oak", "woodland", 14, 42, 3),
 	home(7, "stone_wall", "Stone retaining wall", "wall", 92, 50, 5),
-	home(8, "bench", "The bench, bin and lamppost", "bench", 40, 16, 3),
+	home(8, "bench", "The bench, bin and lamppost", "bench", 45.15, 14.5, 3), -- (ROBLOX-119: where the path comes out, World/Meadow's pad: x 43.65..46.65, z 13..16)
 	home(9, "bramble", "Bramble and railway bank", "scrub", 80, 56, 4),
 	home(10, "compost", "Compost and tool shed", "compost", 5, 6, 4),
 }) :: { HomeRange }
@@ -113,9 +113,10 @@ end
 Preserve.CORRIDORS = table.freeze({
 	-- the path from the gate past the hut, round the meadow and to the pond, and its cross path (mown grass and fine gravel, 1.4 m wide)
 	corridor("path_gate", "gravel", 1.6, { { 45.5, 0 }, { 45.5, 1.4 } }), -- (from the gate to the hut's door, in its south wall)
-	corridor("path_loop", "mown", 1.4, { { 45.5, 13 }, { 44.6, 15.4 }, { 40, 16 }, { 22, 16 }, { 20.4, 17.6 }, { 20, 20 }, { 20, 46 }, { 21.2, 48.4 },
+	-- (ROBLOX-119: they leave the bench patch's gravel at its west and east edges, World/Meadow's pad, north of the garden's split-rail fence)
+	corridor("path_loop", "mown", 1.4, { { 43.6, 15.3 }, { 40, 16 }, { 22, 16 }, { 20.4, 17.6 }, { 20, 20 }, { 20, 46 }, { 21.2, 48.4 },
 		{ 24, 49 }, { 58, 49 }, { 60.4, 47.8 }, { 61, 46 }, { 61, 30 } }),
-	corridor("path_cross", "mown", 1.4, { { 45.5, 13 }, { 58, 13 }, { 60.4, 14.2 }, { 61, 16 }, { 61, 29 } }),
+	corridor("path_cross", "mown", 1.4, { { 46.7, 15.2 }, { 58, 15.2 }, { 60.4, 15.8 }, { 61, 17 }, { 61, 29 } }),
 	-- (round the hut's east end and in through the hut garden's core, World/Hut's gravel path: west along z 6.71 and north along x 45.15, 0.5 to 0.6 m wide; its points
 	-- break at the core's edges, x 47.75 and z 9, ROBLOX-116. ROBLOX-117: walkable round the east end too, World/Hut.WALK: along the south wall's foot at z 1.67 from
 	-- the door, north along x 48.4 and in at z 6.55)
@@ -138,7 +139,7 @@ Preserve.OAK = table.freeze({ x = 14, z = 42, trunk = 1.3, height = 19.5, crown 
 Preserve.POND = table.freeze({ x = 70, z = 37, rx = 8, rz = 7 })
 Preserve.MEADOW = table.freeze({ x = table.freeze({ 25, 60 }), z = table.freeze({ 18, 48 }) })
 Preserve.WALL = table.freeze({ x = table.freeze({ 92, 94 }), z = table.freeze({ 5, 55 }), height = 1.2 })
-Preserve.BENCH = table.freeze({ x = 40, z = 16 })
+Preserve.BENCH = table.freeze({ x = 45.05, z = 15.55 }) -- (ROBLOX-119: the bench's middle, World/Meadow.BENCH; it was x 40, z 16)
 Preserve.LOG_PILE = table.freeze({ x = table.freeze({ 8, 12 }), z = table.freeze({ 28, 31 }) })
 Preserve.COMPOST = table.freeze({ x = table.freeze({ 2, 8 }), z = table.freeze({ 3, 9 }) })
 Preserve.HUT_GARDEN = table.freeze({ x = table.freeze({ 38, 52 }), z = table.freeze({ 6, 14 }) })

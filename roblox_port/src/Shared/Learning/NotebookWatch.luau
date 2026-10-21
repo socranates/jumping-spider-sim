@@ -118,6 +118,11 @@ function NotebookWatch.onCat(self: any)
 	self.book:notice("cat")
 end
 
+-- (ROBLOX-119) The spider came close to a crab spider on its flower (Predator/CrabSpider's "seen"): the crab spider's page.
+function NotebookWatch.onCrab(self: any)
+	self.book:notice("crab_spider")
+end
+
 -- Each rendered frame while the ant-mimicking spider is being played: how long its antennae (legs I) have been fully up. Standing still long
 -- enough for the pose (AntMimic.noticeSeconds) is what opens the walking-like-an-ant page. The client calls this; nothing here reads the pose.
 function NotebookWatch.antennae(self: any, shownSeconds: number)

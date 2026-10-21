@@ -10,10 +10,13 @@
 -- progress record keeps it (Persistence/SaveProgress hut_window, through Client/SpiderClient). A save that has it opens the window at once, without the moment.
 --
 -- The lamp. A warm point light under the desk lamp's shade (World/Hut's look draws the bulb), lit while the light of the hour is low (the life clock's daylight).
+-- (ROBLOX-119) And the lamppost by the bench at the meadow's edge: its lantern (World/Meadow.LANTERN) lit by the same rule, a wider, whiter light; its moths are the
+-- bestiary's at the lantern (World/Meadow.LIFE), restless from dusk.
 -- Nothing here has run in Studio: the hand's motion, the light's look and the sash's feel are untested in the engine.
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Hut = require(Shared:WaitForChild("World"):WaitForChild("Hut"))
+local Meadow = require(Shared:WaitForChild("World"):WaitForChild("Meadow"))
 local Nursery = require(Shared:WaitForChild("Life"):WaitForChild("Nursery"))
 
 local HutLife = {}
@@ -26,6 +29,7 @@ HutLife.WEDGE = table.freeze({ min = Vector3.new(6.2, 0.7, -13.5), max = Vector3
 HutLife.LIFT = 5.3
 -- The lamp: lit below this daylight (Life/LifeClock.daylight), its light's colour, brightness and range (studs).
 HutLife.LAMP = table.freeze({ below = 0.35, at = Vector3.new(110, 31, 24), brightness = 1.6, range = 90, color = Color3.fromRGB(255, 214, 160) })
+HutLife.STREET = table.freeze({ at = Meadow.LANTERN.at, brightness = 2.2, range = 60, color = Color3.fromRGB(255, 226, 190) }) -- (ROBLOX-119: the lamppost's lantern)
 -- The folder this client's parts of the hut go in, in the World folder (the rays see the sash and the wedge; the drawn ones are never queried).
 HutLife.FOLDER = "HutLife"
 
@@ -64,7 +68,7 @@ function HutLife.new(root: Instance, decor: Instance?, seed: number, ws: Instanc
 		trial = false, -- (the self-test's own opening: the progress record never keeps it, HutLife.reshut puts the window back)
 		moment = nil :: number?, -- when the ranger's moment began (the clock's), while it runs
 		sash = nil :: BasePart?, rail = nil :: BasePart?, wedge = nil :: BasePart?, hand = nil :: { BasePart }?,
-		lamp = nil :: Instance?, lit = false, hidden = {} :: { [Instance]: number },
+		lamp = nil :: Instance?, lit = false, hidden = {} :: { [Instance]: number }, street = nil :: Instance?, -- (ROBLOX-119: the lamppost's light, lit with the lamp)
 	}, HutLife)
 	self:shut()
 	local holder = Instance.new("Part")
@@ -86,6 +90,26 @@ function HutLife.new(root: Instance, decor: Instance?, seed: number, ws: Instanc
 	light.Parent = holder
 	holder.Parent = ws
 	self.lamp = holder
+	-- (ROBLOX-119) the lamppost's lantern
+	local street = Instance.new("Part")
+	street.Name = "StreetLamp"
+	street.Anchored = true
+	street.CanCollide = false
+	street.CanQuery = false
+	street.CanTouch = false
+	street.Transparency = 1
+	street.Size = Vector3.new(1, 1, 1)
+	street.Position = HutLife.STREET.at
+	local sl = Instance.new("PointLight")
+	sl.Name = "Light"
+	;(sl :: any).Brightness = HutLife.STREET.brightness
+	;(sl :: any).Range = HutLife.STREET.range -- (a PointLight reaches 60 studs at most: 60 cm round the lantern)
+	;(sl :: any).Color = HutLife.STREET.color
+	;(sl :: any).Shadows = true
+	;(sl :: any).Enabled = false
+	sl.Parent = street
+	street.Parent = ws
+	self.street = street
 	return self
 end
 
@@ -211,6 +235,8 @@ function HutLife.update(self: any, life: any, now: number)
 			self.lit = lit
 			local light = self.lamp:FindFirstChild("Light")
 			if light ~= nil then (light :: any).Enabled = lit end
+			local street = if self.street ~= nil then self.street:FindFirstChild("Light") else nil
+			if street ~= nil then (street :: any).Enabled = lit end
 		end
 	end
 end

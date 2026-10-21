@@ -219,6 +219,8 @@ end
 -- The seams, by pair: the line where the two regions' walkable surfaces meet (both list it).
 type Seam = { a: string, b: string, p: Vector3, q: Vector3 }
 local SEAMS: { Seam } = {}
+-- (ROBLOX-119) the regions beyond the hut's that its seams may name: World/Meadow's, authored after these (World/WorldMap.authorPreserve); only this side is listed here
+local OUTSIDE: { [string]: boolean } = { pad_a2 = true }
 local function seam(a: string, b: string, p: Vector3, q: Vector3)
 	table.insert(SEAMS, { a = a, b = b, p = p, q = q })
 end
@@ -424,9 +426,9 @@ function Hut.author(worldSeed: number, seedOf: (number, string) -> number): { Re
 	for _, n in Hut.SILL_SEAMS do table.insert(byId[n.id].neighbors, { id = "sill", a = n.a, b = n.b }) end
 	for _, s in SEAMS do
 		local a, b = byId[s.a], byId[s.b]
-		assert(a ~= nil and b ~= nil, `a seam of {s.a} and {s.b}`)
+		assert(a ~= nil and (b ~= nil or OUTSIDE[s.b]), `a seam of {s.a} and {s.b}`)
 		table.insert(a.neighbors, { id = s.b, a = s.p, b = s.q })
-		table.insert(b.neighbors, { id = s.a, a = s.p, b = s.q })
+		if b ~= nil then table.insert(b.neighbors, { id = s.a, a = s.p, b = s.q }) end
 	end
 	for _, r in list do freeze(r) end
 	return list
@@ -503,6 +505,8 @@ do
 	seam("path_m1", "path_m2", v(-88, GT, -516), v(-32, GT, -516))
 	seam("path_m2", "path_m3", v(-88, GT, -616), v(-32, GT, -616))
 	seam("path_m3", "path_m4", v(-88, GT, -716), v(-32, GT, -716))
+	-- (ROBLOX-119) on into the bench patch at the meadow's edge (World/Meadow's pad_a2, which lists this seam on its side)
+	seam("path_m4", "pad_a2", v(-88, GT, -816), v(-32, GT, -816))
 	local P = Hut.POLE
 	seam("garden_pole", "garden_b1", v(P.x - P.half, GT, P.z - P.half), v(P.x + P.half, GT, P.z - P.half))
 	seam("garden_pole", "garden_feeder", v(P.x + P.half, GT + P.split, P.z - P.half), v(P.x + P.half, GT + P.split, P.z + P.half))
@@ -942,6 +946,8 @@ local function plantPieces(out: { Piece }, id: string, plant: { kind: string, x:
 		P(out, base .. "_pod", sx1, sx1 + Q.w, y0 + Q.h - Q.l, y0 + Q.h, sz0, sz0 + Q.w, "leaf_dry_prototype", C.pod)
 	end
 end
+
+Hut.plantPieces = plantPieces -- (ROBLOX-119: World/Meadow's plants of the same kinds)
 
 -- A low herb of the herb bed: chives (a clump of stalks and two flower heads), sage (a mound), thyme (a mat).
 local function herbPieces(out: { Piece }, id: string, kind: string, x: number, z: number, y0: number)
@@ -1598,11 +1604,12 @@ local function yawTo(dx: number, dz: number): number
 end
 
 -- A plant's drawn form over its walkable boxes (`tag` "" for a cell's first plant, "2" for its second).
-local function plantDecor(region: Region, plant: { kind: string, x: number, z: number, scale: number? }, tag: string, add: (Drawn) -> boolean, rand: () -> number)
+-- (ROBLOX-119: World/Meadow draws its milkweed, coneflower, bee balm and goldenrod the same way, from its own boxes and soil: Hut.drawPlant)
+local function drawPlant(byId: { [string]: Piece }, regionId: string, plant: { kind: string, x: number, z: number, scale: number? }, tag: string, add: (Drawn) -> boolean,
+	rand: () -> number, S: number)
 	local spec = PLANT_SPECS[plant.kind]
 	local k = plant.scale or 1
-	local byId = piecesById(region)
-	local base = `{region.id}_{plant.kind}{tag}`
+	local base = `{regionId}_{plant.kind}{tag}`
 	local top = S + spec.height * k
 	local kind = plant.kind
 	-- the leaves: each a blade over its box (a little longer and wider, so the box's corners hardly show), the milkweed's with its pale midrib
@@ -1661,10 +1668,11 @@ local function plantDecor(region: Region, plant: { kind: string, x: number, z: n
 		local cone = byId[base .. "_cone"]
 		if cone ~= nil then
 			local cc = (cone.lo + cone.hi) * 0.5
-			add(rec(`Cone{tag}`, v(4.2, 4.0, 4.2), cc + v(0, 0.3, 0), "9a4b1c", "Sand", true, "Ball"))
+			-- (ROBLOX-119: the dome's top at the box's, so a spider standing on the cone stands on it, not inside it; it was 0.8 over)
+			add(rec(`Cone{tag}`, v(4.2, 3.4, 4.2), cc + v(0, -0.25, 0), "9a4b1c", "Sand", true, "Ball"))
 			for i = 1, 6 do
 				local a = i / 6 * TAU
-				add(rec(`Spine{tag}_{i}`, v(0.7, 0.7, 0.7), cc + v(math.cos(a) * 1.7, 1.2 + (i % 2) * 0.6, math.sin(a) * 1.7), "c0702a", "SmoothPlastic", true, "Ball"))
+				add(rec(`Spine{tag}_{i}`, v(0.7, 0.7, 0.7), cc + v(math.cos(a) * 1.7, 0.4 + (i % 2) * 0.4, math.sin(a) * 1.7), "c0702a", "SmoothPlastic", true, "Ball"))
 			end
 		end
 		for i = 1, 3 do
@@ -1701,7 +1709,8 @@ local function plantDecor(region: Region, plant: { kind: string, x: number, z: n
 				v(0, yawTo(out.X, out.Z), 16)))
 		end
 		-- the plume: the axis on up through the head, branches arching out to one side and the other, each with its sprays of florets along its upper side
-		add(rec(`Axis{tag}`, v(0.5, (head.hi.Y - head.lo.Y) + 4, 0.5), hc + v(0, 2, 0), spec.color, "SmoothPlastic", true))
+		-- (ROBLOX-119: the axis and the crown end at the plume's top box, so what sits on it (a spider, a crab spider) is on it, not inside: they stood 4 cm over)
+		add(rec(`Axis{tag}`, v(0.5, (head.hi.Y - head.lo.Y) + 0.4, 0.5), hc + v(0, 0.2, 0), spec.color, "SmoothPlastic", true))
 		for i = 1, 11 do
 			local t = (i - 0.5) / 11
 			local y = head.lo.Y + t * (head.hi.Y - head.lo.Y)
@@ -1716,10 +1725,15 @@ local function plantDecor(region: Region, plant: { kind: string, x: number, z: n
 			add(rec(`Spray{tag}_{i}`, v(reach * 0.95, 1.8, 2.0), (root + tip) * 0.5 + v(0, 1.0, 0) + out * 0.8, pick({ C.goldenrod, "e2c24a", "c9a22e" }, rand), "SmoothPlastic", true,
 				"Ellipsoid", v(0, yawTo(d.X, d.Z), 14)))
 		end
-		add(rec(`Crown{tag}`, v(3.6, 6, 3.6), v(plant.x, head.hi.Y + 1.0, plant.z), C.goldenrod, "SmoothPlastic", true, "Ellipsoid"))
+		add(rec(`Crown{tag}`, v(3.6, 4, 3.6), v(plant.x, head.hi.Y - 1.8, plant.z), C.goldenrod, "SmoothPlastic", true, "Ellipsoid"))
 		add(rec(`Core{tag}`, v(4.2, (head.hi.Y - head.lo.Y) * 0.9, 4.2), hc, "c9a830", "SmoothPlastic", true, "Ellipsoid"))
 	end
 end
+
+local function plantDecor(region: Region, plant: { kind: string, x: number, z: number, scale: number? }, tag: string, add: (Drawn) -> boolean, rand: () -> number)
+	drawPlant(piecesById(region), region.id, plant, tag, add, rand, S)
+end
+Hut.drawPlant = drawPlant
 
 -- Whether (x, z) lies on the garden's gravel path (with a margin `m`).
 local function onPath(x: number, z: number, m: number): boolean
@@ -2570,9 +2584,10 @@ function Hut.bestiary(region: Region): { any }?
 		if region.id == "room_window" then
 			-- (ROBLOX-118) a moth at the back room's window at night: on the glass, the sill, the reveals and under the head
 			local Wn = Hut.ROOM_WINDOW
+			-- (ROBLOX-119: in pairs a short flight apart, the moth's flights being 14 cm at most: no two of them were nearer, so none was ever good)
 			list = {
-				spot(v(Wn.glass, 60, 120), -Vector3.xAxis, 0.2, 0.2), spot(v(Wn.glass, 85, 150), -Vector3.xAxis, 0.2, 0.2), spot(v(440, 0, 108), Vector3.yAxis, 0.2, 0.1),
-				spot(v(452, 70, Wn.z0), Vector3.zAxis, 0.3, 0.1), spot(v(452, 40, Wn.z1), -Vector3.zAxis, 0.3, 0.1), spot(v(452, Wn.head, 140), -Vector3.yAxis, 0.3, 0.1),
+				spot(v(Wn.glass, 60, 120), -Vector3.xAxis, 0.2, 0.2), spot(v(Wn.glass, 68, 129), -Vector3.xAxis, 0.2, 0.2), spot(v(440, 0, 108), Vector3.yAxis, 0.2, 0.1),
+				spot(v(446, 0, 117), Vector3.yAxis, 0.2, 0.1), spot(v(452, Wn.head, 140), -Vector3.yAxis, 0.3, 0.1), spot(v(452, Wn.head, 129), -Vector3.yAxis, 0.3, 0.1),
 			}
 			vents = { { id = `{region.id}_vent_moth`, position = v(445, 70, 134), normal = -Vector3.xAxis, appear = true, reach = 40 } }
 		else
@@ -2587,6 +2602,15 @@ function Hut.bestiary(region: Region): { any }?
 		local salt = 131
 		table.insert(out, { kind = "moth", profile = "moth_prototype", perches = spots("moth", list, moth.full), vents = vents, target = moth.full, low = moth.low,
 			seed = (region.seed + salt * 104729) % MOD, prefix = `{region.id}_moth_fly_`, dusk = { from = 18.0, to = 6.0 } })
+	end
+	-- (ROBLOX-119) the moths' and the hoverflies' flights climb in a band of their own, from under their lowest perch to 11 cm over their highest (PerchGraph.plan):
+	-- the sill's 0 to 11 studs sent every route from the lamp, the window and the flowers to it, and none was clear, so none of their perches was ever good
+	for _, k in out do
+		if k.kind == "moth" or k.kind == "hoverfly" then
+			local lo, hi = math.huge, -math.huge
+			for _, p in k.perches do lo, hi = math.min(lo, p.position.Y), math.max(hi, p.position.Y) end
+			k.floor, k.ceiling = lo - 2, hi + 11
+		end
 	end
 	bestiaryCache[key] = out
 	return out

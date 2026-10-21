@@ -205,7 +205,18 @@ HARVESTMEN = {
 
 # The Roblox game's own pages, after Godot's, in this order: each carries its id, trigger, title, text, "In this game" line and sources, and docs/NOTEBOOK_SOURCES.md
 # says how far each source was checked (ROBLOX-96 adds the ground-life page: the bed's gnats, aphids and woodlice, opened by the first step onto a garden bed).
-ROBLOX_PAGES = [PEACOCK, ANTMIMIC, MATING, TARANTULA, GROUND_LIFE, SPRINGTAILS, LEAFHOPPERS, MOTHS, CRANE_FLIES, LADYBIRDS, MILLIPEDES, SNAILS, HARVESTMEN, HOVERFLIES, CAT]
+# ROBLOX-119: the crab spider on the meadow's flowers, opened the first time the spider comes close to one (NotebookWatch.onCrab). Sources opened this round
+# (docs/NOTEBOOK_SOURCES.md).
+CRAB = {
+ 'id':'crab_spider','trigger':'crab_spider','title':'The crab spider on the flower',
+ 'text':"The goldenrod crab spider (Misumena vatia) lives in North America and Europe. Females are 6 to 9 mm long, males 3 to 4 mm. It waits on a flower, usually a yellow or white one, its first two pairs of legs held open, and grabs what comes near, injecting venom with small fangs. It takes flies, bees, butterflies and hoverflies. It can turn from white to yellow to match its flower; that change takes 10 to 25 days, and the change back about six. In North America it is most common on goldenrod.",
+ 'game':"Here two crab spiders sit on the meadow's flowers, a yellow one on goldenrod and a white one on yarrow, still and nearly the flower's colour, front legs open. Walk or land within their reach and they grab: in Normal that ends the life; on Easy and in free play you drop clear. Their reach and where they sit are the game's.",
+ 'sources':[
+  "Animal Diversity Web, University of Michigan Museum of Zoology (read 2026). Misumena vatia, goldenrod crab spider.",
+  "University of Minnesota Extension (undated, read 2026). Goldenrod crab spider.",
+  "Wikipedia (read 2026). Misumena vatia."]}
+
+ROBLOX_PAGES = [PEACOCK, ANTMIMIC, MATING, TARANTULA, GROUND_LIFE, SPRINGTAILS, LEAFHOPPERS, MOTHS, CRANE_FLIES, LADYBIRDS, MILLIPEDES, SNAILS, HARVESTMEN, HOVERFLIES, CAT, CRAB]
 
 def lua_str(s):
     return '"' + s.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n") + '"'
@@ -237,7 +248,7 @@ def main():
                 "fly_recognised", "catch", "meal", "felt", "buzz", "rest", "sleep", "hungry", "well_fed",
                 "moult_ready", "moulted", "adult", "wasp", "wasp_escaped", "wasp_caught", "starving", "dance", "antennae", "hatched", "tarantula", "garden_bed",
                 "look_springtail", "look_leafhopper", "look_moth", "look_crane_fly",
-                "look_ladybird", "look_millipede", "look_snail", "look_harvestman", "look_hoverfly", "cat"]
+                "look_ladybird", "look_millipede", "look_snail", "look_harvestman", "look_hoverfly", "cat", "crab_spider"]
     out += ["\t" + lua_str(t) + "," for t in triggers]
     out += [
         "}",

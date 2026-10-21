@@ -567,20 +567,22 @@ case("the preserve: the rival arrives in the hut garden and roams its cells acro
 		-- the garden's boxes and what stands round it, as a box world
 		local pieces = {}
 		for _, r in WorldMap.regions() do
-			if Hut.ROAM[r.id] or r.kind == "garden_pole" or r.id == "hut_bench" or r.id == "hut_butt" or r.kind == "hut_wall" or r.id == "path_e6" then
+			-- (ROBLOX-119: the rival's roam goes on up the path to the bench patch and the meadow's edge: their boxes and the furniture's too)
+			if Rival.PRESERVE_ROAM[r.id] or r.kind == "garden_pole" or r.id == "hut_bench" or r.id == "hut_butt" or r.kind == "hut_wall" or r.id == "path_e6"
+				or r.kind == "park_bench" or r.kind == "park_bin" or r.id == "lamp_1" or r.id == "pad_b3" or r.id == "meadow_b2" or r.id == "meadow_b3" then
 				for _, p in Region.pieces(r) do table.insert(pieces, p) end
 			end
 		end
 		local garden = BoxWorld.folder("NavGarden", pieces)
 		local list = {}
-		for id in Hut.ROAM do table.insert(list, WorldMap.region(id)) end
+		for id in Rival.PRESERVE_ROAM do table.insert(list, WorldMap.region(id)) end
 		local lo, hi = WorldMap.unionOf(list :: any)
 		local function motorAt(at: Vector3): any
 			return Motor.new({ world = garden, surfaces = Surfaces, profile = Species.phidippus_audax_prototype, spawn = at, heading = Vector3.new(-1, 0, 0),
 				boundsMin = lo, boundsMax = hi, probeParent = garden })
 		end
 		local r = Rival.new()
-		check(r.region == "garden_d2" and (r.position - Hut.CREATURES.rival.at).Magnitude < 1e-6 and Rival.roam() == Hut.ROAM, "a preserve rival arrives on the garden's path, its region kept")
+		check(r.region == "garden_d2" and (r.position - Hut.CREATURES.rival.at).Magnitude < 1e-6 and Rival.roam() == Rival.PRESERVE_ROAM, "a preserve rival arrives on the garden's path, its region kept")
 		check(Rival.valid(r) and not Rival.misplaced(r), "and its record is good and of this world")
 		local m = motorAt(r.position)
 		local d = Drive.new(m, function() return true end, r.region, Rival.roam())
@@ -596,14 +598,14 @@ case("the preserve: the rival arrives in the hut garden and roams its cells acro
 			Drive.update(d, r, DT, s)
 			local p = d.motor.pos
 			local here = WorldMap.at(p)
-			if here ~= nil and Hut.knows(here.kind) and not Hut.ROAM[here.id] and here.kind ~= "garden_pole" then inHut += 1 end
+			if here ~= nil and Hut.knows(here.kind) and not Rival.PRESERVE_ROAM[here.id] and here.kind ~= "garden_pole" then inHut += 1 end
 			if WorldMap.inRetreat(p) ~= nil then inRetreat += 1 end
 			if p.X < lo.X - 0.5 or p.X > hi.X + 0.5 or p.Z < lo.Z - 0.5 or p.Z > hi.Z + 0.5 then outside += 1 end
 			if here ~= nil and here.id ~= r.region and not WorldMap.inBounds(p, r.region) then mismatch += 1 end
 			visited[r.region] = true
 		end
 		for _ in visited do n += 1 end
-		print(`RIVALNAV the preserve: the rival in 15 minutes crossed {d.stats.crossings or 0} seams and walked {n} of the garden's 16 cells; {d.stats.arrivals} places reached`)
+		print(`RIVALNAV the preserve: the rival in 15 minutes crossed {d.stats.crossings or 0} seams and walked {n} of its roam's regions (the garden's 16 cells, ROBLOX-119: and the path, the bench patch and the meadow's edge); {d.stats.arrivals} places reached`)
 		check((d.stats.crossings or 0) >= 2 and n >= 3, `it crosses from cell to cell ({d.stats.crossings or 0} crossings, {n} cells)`)
 		check(inHut == 0 and inRetreat == 0 and outside == 0, `never in the hut ({inHut} ticks), a retreat ({inRetreat}) or out of the garden ({outside})`)
 		check(mismatch < 60 * 5, `its record's region is the one it stands in (out of it {mismatch} ticks, crossing)`)
@@ -626,6 +628,30 @@ case("the preserve: the rival arrives in the hut garden and roams its cells acro
 			if r2.region == (other :: WorldMap.Region).id then crossed = true; break end
 		end
 		check(crossed, "a stalk goes over the seam after the spider (garden_b3 to garden_a3)")
+		-- (ROBLOX-119) on the meadow's edge: a rival in the grass by the bench patch walks the edge's cells and the gravel, never out of its roam
+		do
+			local a3 = WorldMap.region("meadow_a3") :: any
+			local md = Drive.new(motorAt(a3.spawn.pos + Vector3.new(0, 0.31, 0)), function() return true end, "meadow_a3", Rival.roam())
+			local r3 = Rival.new()
+			r3.state = "patrol"
+			md.motor:place(a3.spawn.pos + Vector3.new(0, 0.31, 0), Vector3.yAxis, Vector3.new(1, 0, 0))
+			r3.position, r3.previous, r3.origin, r3.region = md.motor.pos, md.motor.pos, md.motor.pos, "meadow_a3"
+			md.prevState = "patrol"
+			local s3 = snapshot()
+			s3.position, s3.previous, s3.seed = Vector3.new(0, 0.31, 0), Vector3.new(0, 0.31, 0), 914
+			local cells: { [string]: boolean } = {}
+			local astray, start = 0, md.motor.pos
+			for _ = 1, 60 * 600 do
+				Drive.update(md, r3, DT, s3)
+				cells[r3.region] = true
+				local here = WorldMap.at(md.motor.pos)
+				if here ~= nil and not Rival.PRESERVE_ROAM[here.id] and not WorldMap.inBounds(md.motor.pos, r3.region) then astray += 1 end
+			end
+			local nc = 0
+			for _ in cells do nc += 1 end
+			print(`RIVALNAV the meadow's edge: in 10 minutes the rival walked {nc} regions ({md.stats.crossings or 0} crossings), {string.format("%.0f", (md.motor.pos - start).Magnitude)} studs from where it began, in {tostring(r3.region)}, its record good {Rival.valid(r3)}`)
+			check((md.motor.pos - start).Magnitude > 5 and astray < 60 * 5 and Rival.valid(r3) and Rival.PRESERVE_ROAM[r3.region], `a rival at the meadow's edge walks it, in its roam ({nc} regions, astray {astray} ticks)`)
+		end
 		-- the mate: arrives where it comes in from the path round the east end, roams, and its record keeps its region
 		local mate = Mate.new()
 		check(mate.region == "garden_b4" and (mate.position - Hut.CREATURES.mate.at).Magnitude < 1e-6 and (Mate.exitAt() - Hut.CREATURES.mate.exit).Magnitude < 1e-6,

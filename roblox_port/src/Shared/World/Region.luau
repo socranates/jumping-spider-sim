@@ -16,6 +16,7 @@ local WorldMap = require(script.Parent.WorldMap)
 local Garden = require(script.Parent.Garden)
 local PreserveLook = require(script.Parent.PreserveLook)
 local Hut = require(script.Parent.Hut)
+local Meadow = require(script.Parent.Meadow)
 
 local Region = {}
 
@@ -38,6 +39,7 @@ function Region.pieces(region: WorldMap.Region): { Layout.Piece }
 	if region.kind == "sill" then return Layout.PIECES end
 	if region.kind == "backdrop" or region.kind == "patch" then return {} end -- (ROBLOX-115: the preserve's backdrop has no boxes; ROBLOX-117: nor a patch)
 	if Hut.knows(region.kind) then return Hut.pieces(region :: any) :: any end -- (ROBLOX-116: the ranger hut and its garden, World/Hut)
+	if Meadow.knows(region.kind) then return Meadow.pieces(region :: any) :: any end -- (ROBLOX-119: the bench patch and the meadow's edge, World/Meadow)
 	return Garden.pieces(region) :: any
 end
 
@@ -45,6 +47,7 @@ end
 function Region.decor(region: WorldMap.Region): { Drawn }
 	if region.kind == "sill" then return Layout.DECOR :: any end
 	if region.kind == "backdrop" then return PreserveLook.records(region.id, region.seed) :: any end -- (ROBLOX-115: a zone of the preserve's backdrop, World/PreserveLook)
+	if Meadow.knows(region.kind) or (region.kind == "patch" and Meadow.patchParent(region :: any) ~= nil) then return Meadow.decor(region :: any) :: any end -- (ROBLOX-119)
 	if region.kind == "patch" or Hut.knows(region.kind) then return Hut.decor(region :: any) :: any end -- (ROBLOX-117: a patch is the hut garden's near detail)
 	return Garden.decor(region)
 end
@@ -54,6 +57,7 @@ end
 function Region.drawnPieces(region: WorldMap.Region): { string }
 	if region.kind == "sill" or region.kind == "backdrop" or region.kind == "patch" then return {} end
 	if Hut.knows(region.kind) then return Hut.drawnPieces(region :: any) end
+	if Meadow.knows(region.kind) then return Meadow.drawnPieces(region :: any) end
 	return Garden.drawnPieces(region)
 end
 
@@ -62,6 +66,7 @@ end
 function Region.replaceable(region: WorldMap.Region): { string }
 	if region.kind == "sill" or region.kind == "backdrop" or region.kind == "patch" then return {} end
 	if Hut.knows(region.kind) then return table.clone(Hut.drawnPieces(region :: any)) end
+	if Meadow.knows(region.kind) then return table.clone(Meadow.drawnPieces(region :: any)) end
 	local out = table.clone(Garden.drawnPieces(region))
 	for _, id in Garden.drawnBySill(region) do table.insert(out, id) end
 	return out
@@ -73,6 +78,7 @@ function Region.keepOut(region: WorldMap.Region): { Box }
 	if region.kind == "sill" then return { { min = Rules.keepOutMin, max = Rules.keepOutMax }, { min = Region.SASH_MIN, max = Region.SASH_MAX } } end
 	if region.kind == "backdrop" or region.kind == "patch" then return {} end
 	if Hut.knows(region.kind) then return Hut.keepOut(region :: any) end
+	if Meadow.knows(region.kind) then return Meadow.keepOut(region :: any) end
 	return Garden.keepOut(region)
 end
 
@@ -94,10 +100,11 @@ local BUDGETS: { [string]: { full: number, low: number } } = {
 }
 for kind, b in Garden.BUDGETS do BUDGETS[kind] = b end
 for kind, b in Hut.BUDGETS do BUDGETS[kind] = b end -- (ROBLOX-116: the hut's and its garden's kinds)
+for kind, b in Meadow.BUDGETS do BUDGETS[kind] = b end -- (ROBLOX-119: the bench patch's and the meadow's)
 
 -- Whether a region of this kind has a drawn look the looks stream (World/LookPlan, Client/LookStream): the garden's kinds and (ROBLOX-115) the preserve's backdrop.
 function Region.streamed(kind: string): boolean
-	return kind == "backdrop" or kind == "patch" or Garden.knows(kind) or Hut.knows(kind)
+	return kind == "backdrop" or kind == "patch" or Garden.knows(kind) or Hut.knows(kind) or Meadow.knows(kind)
 end
 
 -- (ROBLOX-115: a zone of the preserve's backdrop has its ceilings in World/PreserveLook.BUDGETS, by zone; its kind has none here.)

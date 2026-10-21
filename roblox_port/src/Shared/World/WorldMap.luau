@@ -67,6 +67,7 @@ local Layout = require(script.Parent.Parent.Habitat.WindowsillLayout)
 local Worlds = require(script.Parent.Worlds)
 local Preserve = require(script.Parent.Preserve)
 local Hut = require(script.Parent.Hut)
+local Meadow = require(script.Parent.Meadow)
 
 local WorldMap = {}
 
@@ -349,6 +350,8 @@ local function authorPreserve(worldSeed: number): { Region }
 		}),
 	}
 	for _, r in Hut.author(worldSeed, WorldMap.seed) do table.insert(list, r :: any) end
+	-- (ROBLOX-119) and the bench patch and the meadow's edge where the garden's path comes out (World/Meadow)
+	for _, r in Meadow.author(worldSeed, WorldMap.seed) do table.insert(list, r :: any) end
 	return list
 end
 
@@ -383,7 +386,13 @@ for _, id in Worlds.IDS do
 	for _, r in drawn do drawnById[r.id] = r end
 	local lo, hi = WorldMap.unionOf(list)
 	-- (ROBLOX-117) the patches: the near detail of the preserve's garden and path, drawn-only looks of their own (World/Hut.patches); none in the test garden
-	local patches: { Region } = table.freeze(if id == Worlds.PRESERVE then Hut.patches(list :: any, WorldMap.SEED, WorldMap.seed) :: any else {}) :: any
+	-- (ROBLOX-119: and the meadow's and the bench patch's, World/Meadow.patches)
+	local patchList: { Region } = {}
+	if id == Worlds.PRESERVE then
+		for _, p in Hut.patches(list :: any, WorldMap.SEED, WorldMap.seed) do table.insert(patchList, p :: any) end
+		for _, p in Meadow.patches(list :: any, WorldMap.SEED, WorldMap.seed) do table.insert(patchList, p :: any) end
+	end
+	local patches: { Region } = table.freeze(patchList) :: any
 	local patchById: { [string]: Region } = {}
 	for _, r in patches do patchById[r.id] = r end
 	MAPS[id] = { regions = list, byId = byId, lo = lo, hi = hi, drawn = drawn, drawnById = drawnById, patches = patches, patchById = patchById }

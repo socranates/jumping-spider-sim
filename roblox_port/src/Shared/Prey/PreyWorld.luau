@@ -28,6 +28,7 @@ local Ladybird = require(script.Parent.Ladybird)
 local Millipede = require(script.Parent.Millipede)
 local Snail = require(script.Parent.Snail)
 local Harvestman = require(script.Parent.Harvestman)
+local Ant = require(script.Parent.Ant) -- (ROBLOX-119: the meadow's ants)
 local Species = require(script.Parent.Parent.Data.Species)
 local Garden = require(script.Parent.Parent.World.Garden)
 local Region = require(script.Parent.Parent.World.Region)
@@ -36,7 +37,7 @@ local PreyWorld = {}
 PreyWorld.__index = PreyWorld
 
 -- (ROBLOX-105) The ambient colonies' classes by kind.
-PreyWorld.AMBIENT = { ladybird = Ladybird, millipede = Millipede, snail = Snail, harvestman = Harvestman } :: { [string]: any }
+PreyWorld.AMBIENT = { ladybird = Ladybird, millipede = Millipede, snail = Snail, harvestman = Harvestman, ant = Ant } :: { [string]: any }
 -- (ROBLOX-105) Whether the woodlice and the ambient bugs are shown to the spider's senses (see the head of this file: they are not).
 PreyWorld.SENSED = false
 
@@ -211,7 +212,8 @@ function PreyWorld.ambient(self: any, id: string): { any }
 			if spec.kind == "ladybird" then c = Ladybird.new(spec, count, Garden.plants(region) or {})
 			elseif spec.kind == "millipede" and soil ~= nil then c = Millipede.new(spec, count, soil, boxes :: any)
 			elseif spec.kind == "snail" and soil ~= nil then c = Snail.new(spec, count, soil, boxes :: any)
-			elseif spec.kind == "harvestman" then c = Harvestman.new(spec, count, soil, boxes) end
+			elseif spec.kind == "harvestman" then c = Harvestman.new(spec, count, soil, boxes)
+			elseif spec.kind == "ant" and soil ~= nil then c = Ant.new(spec, count, soil, boxes) end
 			if c ~= nil then
 				entry = entry or {}
 				entry.ambient = entry.ambient or {}

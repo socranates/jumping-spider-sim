@@ -939,3 +939,41 @@ back room's east end (the preserve's revision is preserve-2), and a gravel path 
 - The house spider in the ceiling's corner is drawn, not a hazard; a tangle web that catches a jumping spider would be its own round with its own page.
 - The back room's window has no outer sill and its outside wall is not walkable (only the north face is); the cat never goes out.
 - The bell and the purr are captions until the recordings are uploaded.
+
+## The meadow's edge and the bench, bin and lamppost; the crab spider (ROBLOX-119, 2026-10-20)
+
+Claude → Chet, 2026-10-20, branch `claude/preserve-c1`. Phase C, round 1 of `docs/PARK_WORLD_DESIGN.md`. Where the garden's gravel path comes out (4 m north of the garden,
+z 13 m) there is now a bench patch of fine gravel (3 by 3 m) with a park bench facing the path, a litter bin with a drinks can and a crisp packet by it, a lamppost whose lantern
+lights at dusk, and a drain grate; north of it a 5 by 5 m edge of the wildflower meadow at true size: big and little bluestem clumps up to 1.1 m, black-eyed Susan, yarrow, milkweed,
+coneflower, bergamot and goldenrod, an ant hill, a curled dead leaf. Every culm, leaf and flower head can be climbed. Homes: between the bench's seat slats, under the bin's lip,
+under the curled leaf. Life: leafhoppers on the bluestem, house flies and hoverflies on the flowers and at the bin, moths on the grass heads and at the lantern from dusk, ants at
+their hill (not food). Two goldenrod crab spiders sit on a goldenrod and a yarrow, legs open: walk or land within their reach and they grab (a death in Normal, a drop clear on Easy
+and Free play). The rival now roams up the path to the meadow's edge. Fixed on the way: no hoverfly ever perched (here or in the hut garden), the moths at the desk lamp and the
+back room's window never perched, and a spider on a coneflower's cone or a goldenrod's plume stood inside its drawing. **Nothing of it has run in Studio.**
+
+## Your Studio checklist (ROBLOX-119)
+
+1. **The way there**: from the hut garden walk north up the gravel path (4 m) onto the bench patch's gravel; across it to the meadow's edge. Say how long it takes and how the
+   gravel and the mown edge read at the spider's eye; screenshot the meadow from the gravel, at the spider's height.
+2. **The meadow**: walk in among the grass; climb a big bluestem culm to its turkey-foot head (about 1 m up), a coneflower to its cone (74 cm), a black-eyed Susan. Say how
+   the motor takes the 5 mm culms and the bent blades, and what the spider can see from a flower head. Frame time in the grass (the patches and the clumps' blades).
+3. **The crab spiders**: find the yellow one on a goldenrod's plume (it changes plume by the day) and the white one on a yarrow. Can you see it before you land? (its legs held
+   open, its colour a shade off). Land beside it in Normal: "The crab spider's legs closed."; on Easy: a lunge, a drop clear and a notice. The first close look opens its
+   notebook page. Screenshot each, close.
+4. **The bench, bin and lamppost**: climb a bench leg to the seat (45 cm), rest between the seat slats (its home); rest under the bin's lip; climb the lamppost to the lantern
+   (3.4 m); go down through the drain grate's slots into the pit. Screenshot the patch by day.
+5. **Night**: set the clock to night (or wait): the lantern lights (a warm light reaching 60 cm round it) and moths come to its glass; the meadow's moths stir on the grass heads. Hunt
+   at the lamp. Screenshot it; say whether the light reads and how far.
+6. **The ants**: by day at the hill in the meadow (two metres east of the curled leaf) six ants wander and turn back to the hill; a strike at one is refused. By night they are gone.
+7. **The rival**: it may come up the path to the meadow's edge now; say if it reads in the grass.
+8. **The flies that never perched**: in the hut garden, hoverflies now settle on the flowers; at night a moth sits at the desk lamp and at the back room's window.
+9. **The self-test** (`workspace:SetAttribute("SelfTest", true)`, Play): 177 checks, among them `the bench patch`, `the meadow's edge`, `the crab spiders` and a region check for
+   each of the 146 regions. Paste the INFO lines and the frame and part counts.
+
+## Open for Nathan (ROBLOX-119)
+
+- The bird's shadow over open ground is not built (the wasp is the open-ground danger for now); a cricket is not built (no source opened yet). Next round, with ballooning?
+- The crab spider never leaves its flower in a day and does not hunt the meadow's flies; it kills at once in Normal. Say if a near miss (it lunges, the spider escapes if it
+  was moving) would be better.
+- At the low graphics tier the meadow is its culms and its clumps' crowns only (the blades and the thatch are the full tier's); say how it reads on a phone.
+- The bench patch moved from the plan's x 40, z 16 to where the path comes out (x 45, z 14.5), and the meadow's core from x 31, z 40 to its near edge (x 45, z 18.5).

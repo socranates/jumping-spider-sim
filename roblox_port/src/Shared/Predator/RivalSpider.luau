@@ -15,9 +15,11 @@ local PreyRandom=require(script.Parent.Parent.Prey.PreyRandom)
 local Rules=require(script.Parent.Parent.Data.RivalRules)
 local WorldMap=require(script.Parent.Parent.World.WorldMap)
 local Hut=require(script.Parent.Parent.World.Hut)
+local Meadow=require(script.Parent.Parent.World.Meadow) -- (ROBLOX-119: the meadow's edge is the rival's too)
 local Rival={}
 local function phase(r: any,s: string) if r.state~=s then r.shaken=nil end;r.state=s;r.elapsed=0 end
 Rival.FOOD=.7 -- two housefly-equivalent meals
+Rival.FAR=6000 -- (ROBLOX-119) how far from the sill a record's places may be: World/Preserve.LIMIT
 local states={dormant=true,patrol=true,stalk=true,windup=true,lunge=true,recover=true,captured=true,consumed=true,taken=true}
 -- "dormant" is "has not arrived yet". `day` (nil in a record from before the daily rival) is the day it was eaten, so the next one comes after it.
 -- ROBLOX-117: where a rival arrives, and its region: the sill's east end in the test garden (Data/RivalRules; no region, as every record there has always been), the
@@ -26,9 +28,14 @@ function Rival.arriveAt(): (Vector3,string?)
  if WorldMap.world()=="preserve" then return Hut.CREATURES.rival.at,Hut.CREATURES.rival.region end
  return Rules.arriveAt,nil
 end
--- The regions a rival of this world roams (nil: it keeps to its own, the sill).
+-- The regions a rival of this world roams (nil: it keeps to its own, the sill). (ROBLOX-119: in the preserve the hut garden's cells and, up the path, the bench
+-- patch's gravel and the meadow's edge, World/Meadow.ROAM; the mate keeps to the garden.)
+local PRESERVE_ROAM: {[string]:boolean} = {}
+for id in Hut.ROAM do PRESERVE_ROAM[id]=true end
+for id in Meadow.ROAM do PRESERVE_ROAM[id]=true end
+Rival.PRESERVE_ROAM=table.freeze(PRESERVE_ROAM)
 function Rival.roam(): {[string]:boolean}?
- if WorldMap.world()=="preserve" then return Hut.ROAM end
+ if WorldMap.world()=="preserve" then return Rival.PRESERVE_ROAM end
  return nil
 end
 function Rival.new(): any
@@ -141,9 +148,10 @@ function Rival.valid(r: any,region: string?): boolean
   if WorldMap.region(id)~=nil and (not WorldMap.inBounds(p,id) or WorldMap.inRetreat(Vector3.new(p.X,p.Y,p.Z),id)~=nil) then return false end
  end
  if r.day~=nil and (type(r.day)~="number" or r.day~=r.day or r.day<0 or r.day==math.huge) then return false end
+ -- (ROBLOX-119: within the preserve's precision limit, World/Preserve.LIMIT: its roam reaches the meadow's edge, 16 m from the sill; it was 1000 studs)
  for _,k in {"position","previous","heading","target","origin"} do
   local v=r[k];if typeof(v)~="Vector3" and type(v)~="table" then return false end
-  if type(v.X)~="number" or type(v.Y)~="number" or type(v.Z)~="number" or type(v.Magnitude)~="number" or v.X~=v.X or v.Y~=v.Y or v.Z~=v.Z or v.Magnitude>1000 then return false end
+  if type(v.X)~="number" or type(v.Y)~="number" or type(v.Z)~="number" or type(v.Magnitude)~="number" or v.X~=v.X or v.Y~=v.Y or v.Z~=v.Z or v.Magnitude>Rival.FAR then return false end
  end
  return true
 end

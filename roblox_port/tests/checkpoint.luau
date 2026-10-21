@@ -1300,6 +1300,38 @@ case("the cat (ROBLOX-118): a preserve's rest keeps the cat's record; a bad one 
 	check(garden.cat == nil and garden.world_map.world == nil, "a test garden rest has no cat field and no world field")
 end)
 
+-- ---------------------------------------------------------------------------------------------- the bench patch and the meadow's edge (ROBLOX-119)
+case("the meadow's edge and the bench patch (ROBLOX-119): a rest under the curled leaf, in the bench's slats or under the bin's lip is kept, checked, accepted and comes back there; a rival met at the meadow's edge is a good record", function()
+	local Rival = require("../src/Shared/Predator/RivalSpider")
+	local w = newWorld()
+	for _ = 1, 60 do tick(w) end
+	local was = WorldMap.use("preserve")
+	local ok, err = pcall(function()
+		for _, row in { { id = "meadow_b2", up = Vector3.yAxis }, { id = "bench_w", up = Vector3.zAxis }, { id = "bin", up = Vector3.yAxis } } do
+			local r = WorldMap.region(row.id) :: WorldMap.Region
+			local t = r.retreats[1]
+			local inside = if row.up == Vector3.zAxis then Vector3.new((t.min.X + t.max.X) / 2, (t.min.Y + t.max.Y) / 2, t.min.Z + 0.31)
+				else Vector3.new((t.min.X + t.max.X) / 2, t.min.Y + 0.31, (t.min.Z + t.max.Z) / 2)
+			w.motor:place(inside, row.up, if row.up == Vector3.zAxis then Vector3.yAxis else Vector3.xAxis)
+			local record = assert(Checkpoint.capture(w, 0))
+			check(record.world_map.world == "preserve" and record.world_map.revision == "preserve-2" and record.world_map.region == row.id and record.world_map.retreat == t.id,
+				`a rest in {t.id} records the preserve, preserve-2, {row.id} and {t.id}`)
+			check(#(Checkpoint.check(record, w)) == 0 and #(Checkpoint.check(Json.copy(record), w)) == 0 and #SaveRest.check("main", record) == 0, "a good record, a stored copy, and the server accepts it")
+			w.motor:place(HOME, Vector3.yAxis, Vector3.xAxis)
+			check(Checkpoint.restore(record, w) and (w.motor.pos - inside).Magnitude < 1e-6 and WorldMap.inRetreat(w.motor.pos) == t.id, `and it comes back in {t.id}`)
+		end
+		-- the rival roams the meadow's edge now (Rival.roam): a record of it there, 11 to 16 m from the sill, is a good one
+		local a3 = WorldMap.region("meadow_a3") :: WorldMap.Region
+		local r = Rival.new()
+		r.state, r.region = "patrol", "meadow_a3"
+		local at = a3.spawn.pos + Vector3.new(0, 0.31, 0)
+		r.position, r.previous, r.target, r.origin = at, at, at, at
+		check(Rival.valid(r) and not Rival.misplaced(r) and Rival.roam()[r.region] == true, "a rival patrolling at the meadow's edge is a good record of this world")
+	end)
+	WorldMap.use(was)
+	if not ok then error(err) end
+end)
+
 case("a rest under the bed's stone (ROBLOX-95): it records the bed and its stone, is checked against the bed, and comes back there", function()
 	local w = newWorld()
 	for _ = 1, 60 do tick(w) end

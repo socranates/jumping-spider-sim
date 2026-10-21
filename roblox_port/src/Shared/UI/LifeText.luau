@@ -120,6 +120,28 @@ LifeText.HOMES = {
 		way = "Walk in under the sofa in the back room, deep into the dark, then stop to rest.",
 		kept = "Last rest kept, under the sofa.",
 	},
+	-- ROBLOX-119: the meadow's edge and the bench patch
+	meadow_b2_leaf = {
+		name = "under the curled leaf",
+		title = "Under the curled leaf",
+		home = "Home: under the curled leaf",
+		way = "Walk in under the curled dead leaf in the meadow's grass, then stop to rest.",
+		kept = "Last rest kept, under the curled leaf.",
+	},
+	bench_slats = {
+		name = "the gap in the bench's slats",
+		title = "The gap in the bench's slats",
+		home = "Home: the gap in the bench's slats",
+		way = "Climb down into the gap between the bench's seat slats, then stop to rest.",
+		kept = "Last rest kept, in the bench's slats.",
+	},
+	bin_lip = {
+		name = "under the bin's lip",
+		title = "Under the bin's lip",
+		home = "Home: under the bin's lip",
+		way = "Walk in under the litter bin's base, between its feet, then stop to rest.",
+		kept = "Last rest kept, under the bin's lip.",
+	},
 } :: { [string]: { name: string, title: string, home: string, way: string, kept: string } }
 LifeText.DEFAULT_HOME = "sill_crevice"
 local function homeOf(retreat: string?): { name: string, title: string, home: string, way: string, kept: string }

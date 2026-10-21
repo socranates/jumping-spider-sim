@@ -65,6 +65,11 @@ BugBodies.ambient = {
 		colors = { foot = "8a7a66", head = "7d6e5c", shell = "9a7a4f", band = "4e3a24", spire = "b08a58", lip = "c9b28a", eye = "1c1814", trail = "cfd8dc" },
 		stalk = 0.9, feeler = 0.35, trail = { width = 0.9, thick = 0.025, base = 0.55, full = 24, low = 12, fade = 240 }, -- (fade: Prey/Snail.FADE_S)
 	},
+	-- (ROBLOX-119) a small brown field ant of the meadow's hill, about 4 mm: head, thorax, the waist's node and the gaster, six legs, elbowed antennae
+	ant = {
+		colors = { head = "3a2618", thorax = "5a3a22", gaster = "2e1f14", leg = "4a3020", antenna = "3a2618" },
+		motion = { gait = { stride = 0.18, swing = 0.4, lift = 0.3, settle = 12, jump = 1.0 } },
+	},
 	harvestman = {
 		colors = { body = "6e5034", turret = "3a2a1c", leg = "5a4330", palp = "6a4e36" },
 		legs = { { a = 35, l = 1.5 }, { a = 75, l = 2.4 }, { a = 110, l = 1.8 }, { a = 145, l = 2.0 } }, -- degrees from ahead and lengths (studs), each side
@@ -270,7 +275,41 @@ local function buildHarvestman(_tier: string): { Spec }
 	return out
 end
 
-local BUILDERS = { ladybird = buildLadybird, millipede = buildMillipede, snail = buildSnail, harvestman = buildHarvestman } :: { [string]: (string) -> { Spec } }
+-- (ROBLOX-119) The ant: its head, thorax, the node of its waist and its gaster in a line, six legs from the thorax (a femur up and a tibia down), two elbowed antennae
+-- (full tier). Its body's middle rides Prey/Ant.HOVER over the floor.
+local ANT_HOVER = 0.12
+local function buildAnt(tier: string): { Spec }
+	local C = BugBodies.ambient.ant.colors
+	local out: { Spec } = {}
+	table.insert(out, ball("Head", v(0, 0.02, -0.15), v(0.09, 0.08, 0.1), hex(C.head)))
+	table.insert(out, ball("Thorax", v(0, 0.02, -0.04), v(0.07, 0.07, 0.13), hex(C.thorax)))
+	table.insert(out, ball("Node", v(0, 0.03, 0.04), v(0.04, 0.05, 0.03), hex(C.thorax)))
+	table.insert(out, ball("Gaster", v(0, 0.03, 0.12), v(0.11, 0.1, 0.14), hex(C.gaster)))
+	for _, side in { -1, 1 } do
+		for i, z in { -0.08, -0.04, 0.0 } do
+			local hip = v(0.03 * side, 0, z)
+			local a = math.rad(({ 40, 90, 135 })[i])
+			local d = v(math.sin(a) * side, 0, -math.cos(a))
+			local knee = hip + d * 0.07 + v(0, 0.05, 0)
+			local foot = hip + d * 0.17 + v(0, -ANT_HOVER, 0)
+			local word = if side < 0 then "L" else "R"
+			local up = rodSpec(`Femur{word}{i}`, hip, knee, 0.012, hex(C.leg), "leg", side, i)
+			local down = rodSpec(`Tibia{word}{i}`, knee, foot, 0.01, hex(C.leg), "leg", side, i)
+			up.hip = hip; down.hip = hip
+			table.insert(out, up)
+			table.insert(out, down)
+		end
+		if tier ~= "low" then
+			local base = v(0.03 * side, 0.05, -0.19)
+			local elbow = base + v(0.05 * side, 0.03, -0.04)
+			table.insert(out, rodSpec(`Scape{side}`, base, elbow, 0.01, hex(C.antenna), nil, side, 0))
+			table.insert(out, rodSpec(`Flagellum{side}`, elbow, elbow + v(0.04 * side, -0.02, -0.07), 0.01, hex(C.antenna), nil, side, 0))
+		end
+	end
+	return out
+end
+
+local BUILDERS = { ladybird = buildLadybird, millipede = buildMillipede, snail = buildSnail, harvestman = buildHarvestman, ant = buildAnt } :: { [string]: (string) -> { Spec } }
 
 -- (ROBLOX-105) How many parts a creature of `kind` is drawn with at `tier` ("full" or "low"): what World/Garden.AMBIENT's budgets are held against.
 function BugBodies.partsOf(kind: string, tier: string?): number
@@ -567,9 +606,9 @@ local function poseSnail(rig: any, b: any, reduced: boolean, now: number): { CFr
 	return out
 end
 
--- The harvestman's frames (away by day: far under the world).
-local function poseHarvestman(rig: any, b: any, _reduced: boolean): { CFrame }
-	local S = BugBodies.ambient.harvestman
+-- The harvestman's frames (away by day: far under the world); (ROBLOX-119) the ant's the same way (away in its nest by night), `kind` its sheet.
+local function poseHarvestman(rig: any, b: any, _reduced: boolean, kind: string?): { CFrame }
+	local S = (BugBodies.ambient :: any)[kind or "harvestman"]
 	local out = {}
 	if b.hidden then
 		local away = CFrame.new(b.position.X, BugBodies.AWAY, b.position.Z)
@@ -646,6 +685,7 @@ function BugBodies.draw(self: any, lice: { any }, now: number?, cameraAt: Vector
 			if kind == "ladybird" then list = poseLadybird(rig, w, reduced == true, now or 0)
 			elseif kind == "millipede" then list = poseMillipede(rig, w, reduced == true)
 			elseif kind == "snail" then list = poseSnail(rig, w, reduced == true, now or 0)
+			elseif kind == "ant" then list = poseHarvestman(rig, w, reduced == true, "ant")
 			else list = poseHarvestman(rig, w, reduced == true) end
 			for i, part in rig.parts do
 				table.insert(parts, part)

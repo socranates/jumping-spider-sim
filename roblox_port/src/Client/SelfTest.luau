@@ -30,6 +30,9 @@
 -- doorway, its sofa, the television's unit, the games' shelf and the window sill hold a spider, the gap under the sofa a home), the eaves (along the gutter from region to region)
 -- and the cat (held off the rest of the run: heard and moving on a walk of its day; at a stop on the floor it notices a spider walking in front of it and crouches to pat,
 -- and gives up once the spider is up on the desk; on the sim, its pat lands as a death in the standard rules and a knock aside in the gentle ones).
+-- ROBLOX-119: in the preserve also the bench patch (up the path's end onto its gravel, across it and into the meadow; its three homes; the lamppost lit at night), the
+-- meadow's edge (a spider on a coneflower's cone; its leafhoppers and its ants made and drawn) and the crab spiders (held off the rest of the run: placed and drawn, a
+-- close look from its flower's stem noticed; on the sim, a spider on its flower grabbed in the standard rules and knocked clear in the gentle ones).
 -- Each Studio process writes its own log (%LOCALAPPDATA%\Roblox\logs); tools/studio/selftest.ps1 reads the newest for these lines.
 -- The CLI suite tests/selftest.luau runs the same checks against the real client on the shim's box world, with a host of its own (simulated frames and clock), so the run is
 -- proven to complete and print END before it ever reaches Studio. First run in Studio at v36 (33 of 34; the line failed, ROBLOX-111); ROBLOX-111's additions not yet.
@@ -44,6 +47,7 @@ local Species = require(Shared:WaitForChild("Data"):WaitForChild("Species"))
 local LookPlan = require(Shared:WaitForChild("World"):WaitForChild("LookPlan"))
 local RivalSpider = require(Shared:WaitForChild("Predator"):WaitForChild("RivalSpider"))
 local Mate = require(Shared:WaitForChild("Predator"):WaitForChild("Mate"))
+local Meadow = require(Shared:WaitForChild("World"):WaitForChild("Meadow")) -- (ROBLOX-119: the bench patch and the meadow's edge)
 local BugBodies = require(script.Parent.BugBodies)
 
 local SelfTest = {}
@@ -304,6 +308,7 @@ local function checks(): { Check }
 		end
 		pause(r, 0.5)
 		if ctx.cat ~= nil then ctx.cat.enabled = false end -- (ROBLOX-118: the cat is held off the run but for its own check)
+		if ctx.crab ~= nil then ctx.crab.enabled = false end -- (ROBLOX-119: and the crab spiders)
 		need(session.started and not menu:isShowing(), "the life did not begin")
 		need(ctx.motor.mode == "attached", `the spider is not standing ({ctx.motor.mode})`)
 	end)
@@ -1085,6 +1090,135 @@ local function checks(): { Check }
 			cat.enabled = false
 			life.clock.hour, life.clock.day = hour, day
 			if not ok then error(err, 0) end
+		end)
+
+		-- ROBLOX-119: the bench patch where the garden's path comes out (up the path onto its gravel and across it to the meadow's edge, its three homes, the lamppost
+		-- lit at night), the meadow's edge (into it from the gravel, a spider on a coneflower's cone, its leafhoppers and its ants made and drawn) and the crab spiders
+		-- (held off the rest of the run: on their flowers and drawn, the first close look opening the page; on the sim, a spider on its flower grabbed in the standard
+		-- rules and knocked clear in the gentle ones).
+		add("the bench patch", function(r)
+			local ctx = r.ctx
+			local world, motor = ctx.world, ctx.motor
+			local GT = Meadow.GROUND
+			-- from the path's end onto the gravel, and across it to the meadow's edge
+			local legs = { { from = "path_m4", to = "pad_a2", at = Vector3.new(-60, GT + HEIGHT, -808) }, { from = "pad_a2", to = "pad_b2", at = Vector3.new(-60, GT + HEIGHT, -908) },
+				{ from = "pad_c2", to = "meadow_a3", at = Vector3.new(-60, GT + HEIGHT, -1110) } }
+			local crossed: { string } = {}
+			for _, leg in legs do
+				need(holdUntilReady(r, leg.to, leg.at, nil) and holdUntilReady(r, leg.from, leg.at, nil), `{leg.from} and {leg.to} are not whole`)
+				put(r, leg.at, nil, -Vector3.zAxis)
+				pause(r, 0.3)
+				local ok, seen = walkUntil(r, 12, function() return world.region.id == leg.to and motor.mode == "attached" end)
+				need(ok, `did not walk from {leg.from} into {leg.to} (at {fmt(motor.pos)}, {world.region.id}; regions {regions(seen)})`)
+				table.insert(crossed, `{leg.from} to {leg.to}`)
+			end
+			-- the homes: between the bench's seat slats (against a slat's side), under the bin's lip, under the curled leaf in the meadow
+			local found = {}
+			for _, id in { "bench_w", "bin", "meadow_b2" } do
+				local region = WorldMap.region(id) :: any
+				local t = region.retreats[1]
+				local inside = Vector3.new((t.min.X + t.max.X) / 2, t.min.Y + HEIGHT, (t.min.Z + t.max.Z) / 2)
+				local up = Vector3.yAxis
+				if id == "bench_w" then inside, up = Vector3.new((t.min.X + t.max.X) / 2, (t.min.Y + t.max.Y) / 2, t.min.Z + HEIGHT), Vector3.zAxis end
+				need(holdUntilReady(r, id, inside, up), `{id} is not whole`)
+				put(r, inside, up)
+				pause(r, 0.3)
+				need(world:inRetreat(motor.pos) == t.id and motor.mode == "attached", `not resting-ready in {t.id} (at {fmt(motor.pos)}, {motor.mode})`)
+				table.insert(found, t.id)
+			end
+			-- the lamppost's lantern lit at night, out by day
+			local hut, life = world.hut, ctx.life
+			need(hut ~= nil and hut.street ~= nil, "no lamppost light")
+			local light = (hut.street :: Instance):FindFirstChild("Light") :: any
+			local hour = life.clock.hour
+			local lit, out = false, false
+			local ok, err = pcall(function()
+				life.clock.hour = 22
+				lit = waitUntil(r, 3, function() return light.Enabled == true end)
+				life.clock.hour = 12
+				out = waitUntil(r, 3, function() return light.Enabled == false end)
+			end)
+			life.clock.hour = hour
+			if not ok then error(err, 0) end
+			say(r, `INFO the bench patch: walked {table.concat(crossed, ", ")}; homes {table.concat(found, ", ")}; the lamppost lit at night ({lit}) and out by day ({out})`)
+			need(lit and out, "the lamppost's lantern did not light at night and go out by day")
+		end)
+
+		add("the meadow's edge", function(r)
+			local ctx = r.ctx
+			local world, motor = ctx.world, ctx.motor
+			-- on the purple coneflower's cone in meadow_a3: a spider stays put up there
+			local a3 = WorldMap.region("meadow_a3") :: any
+			local cone = nil
+			for _, p in Region.pieces(a3) do if p.id == "meadow_a3_coneflower_cone" then cone = p end end
+			need(cone ~= nil, "no coneflower in meadow_a3")
+			local top = Vector3.new((cone.lo.X + cone.hi.X) / 2, cone.hi.Y + HEIGHT, (cone.lo.Z + cone.hi.Z) / 2)
+			need(holdUntilReady(r, "meadow_a3", top, nil), "meadow_a3 is not whole")
+			put(r, top, nil)
+			pause(r, 1.0)
+			need(world.region.id == "meadow_a3" and motor.mode == "attached" and (motor.pos - top).Magnitude < 0.3,
+				`did not stay on the coneflower's cone at {fmt(top)} ({world.region.id}, {fmt(motor.pos)}, {motor.mode})`)
+			local high = string.format("%.0f", top.Y - Meadow.GROUND)
+			-- its life: the leafhoppers on the bluestem by the gravel, the ants at their hill
+			local hop = world.garden.meadow_a3
+			need(hop ~= nil and hop.kinds ~= nil and hop.kinds.leafhopper ~= nil and #hop.kinds.leafhopper.flies > 0, "no leafhoppers on the bluestem")
+			drawn(r, hop.kinds.leafhopper.flies, "a leafhopper")
+			local b4 = WorldMap.region("meadow_b4") :: any
+			local at = b4.spawn.pos + Vector3.yAxis * HEIGHT
+			need(holdUntilReady(r, "meadow_b4", at, nil), "meadow_b4 is not whole")
+			put(r, at, nil, b4.spawn.heading)
+			local hour = ctx.life.clock.hour
+			ctx.life.clock.hour = 12
+			pause(r, 1.5)
+			ctx.life.clock.hour = hour
+			local hill = world.garden.meadow_b4
+			need(hill ~= nil and hill.ambient ~= nil and hill.ambient.ant ~= nil and #hill.ambient.ant.items > 0, "no ants at the hill")
+			local folder = Workspace:FindFirstChild("Bugs")
+			local shown = 0
+			for _, a in hill.ambient.ant.items do if folder ~= nil and folder:FindFirstChild(a.id) ~= nil then shown += 1 end end
+			need(shown > 0, "the ants are not drawn")
+			say(r, `INFO the meadow's edge: on the coneflower's cone {high} cm over the ground; {#hop.kinds.leafhopper.flies} leafhoppers on the bluestem, {#hill.ambient.ant.items} ants at the hill ({shown} drawn)`)
+		end)
+
+		add("the crab spiders", function(r)
+			local ctx = r.ctx
+			local crab, Crab, life = ctx.crab, ctx.CrabSpider, ctx.life
+			need(crab ~= nil and Crab ~= nil, "no crab spiders in the preserve")
+			need(#crab.crabs == 2, `{#crab.crabs} crab spiders placed`)
+			local folder = Workspace:FindFirstChild("CrabSpiders")
+			need(folder ~= nil and #folder:GetChildren() >= 2, "the crab spiders are not drawn")
+			local c = crab.crabs[1]
+			-- a close look (from the side of its goldenrod's plume, a little under it, out of its reach) opens its page; it is held off again after
+			local head = nil
+			for _, p in Region.pieces(WorldMap.region(c.region) :: any) do if p.id == Meadow.CRAB_SITES[1][c.site].piece then head = p end end
+			need(head ~= nil and c.form == "yellow", `no goldenrod plume under the first crab spider in {c.region}`)
+			local below = Vector3.new(head.hi.X + HEIGHT, c.pos.Y - Crab.REACH - 2.5, (head.lo.Z + head.hi.Z) / 2)
+			local ok, err = pcall(function()
+				need(holdUntilReady(r, c.region, below, Vector3.xAxis), `{c.region} is not whole`)
+				crab.met = false
+				crab.enabled = true
+				put(r, below, Vector3.xAxis, Vector3.yAxis)
+				need(waitUntil(r, 2, function() return crab.met end, 0), `a close look did not notice it (at {fmt(ctx.motor.pos)}, {string.format("%.1f", (ctx.motor.pos - c.pos).Magnitude)} studs off)`)
+				need(ctx.motor.mode == "attached" and not ctx.life.lifeOver, `the spider out of its reach did not stay on the plume ({ctx.motor.mode}, life over {ctx.life.lifeOver}, at {fmt(ctx.motor.pos)})`)
+			end)
+			crab.enabled = false
+			if not ok then error(err, 0) end
+			-- on the sim: a spider on its flower is grabbed in the standard rules and knocked clear in the gentle ones
+			local day = life.clock.day
+			for _, gentle in { false, true } do
+				local trial = Crab.new(crab.seed)
+				trial.gentle = gentle
+				trial:step(1 / 60, day, 12, nil)
+				local t = trial.crabs[1]
+				local kind = nil
+				for _ = 1, 60 do
+					trial:step(1 / 60, day, 12, { pos = t.top + Vector3.new(0.6, HEIGHT, 0), hidden = false })
+					for _, s in trial:drainSignals() do if s.kind == "struck" or s.kind == "nudged" then kind = s.kind end end
+					if kind then break end
+				end
+				need(kind == (if gentle then "nudged" else "struck"), `in the {if gentle then "gentle" else "standard"} rules a spider on its flower was {tostring(kind)}`)
+			end
+			say(r, `INFO the crab spiders: a {c.form} one on {c.region} and a {crab.crabs[2].form} one on {crab.crabs[2].region}, {#folder:GetChildren()} drawn; the close look opened its page`)
 		end)
 
 		add("the nursery: the window put back", function(r)

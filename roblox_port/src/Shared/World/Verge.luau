@@ -1,6 +1,7 @@
 --!strict
 -- Walkable infill around the developed garden and its paths. Existing landmarks win
 -- overlapping bounds. Do not fill the pond, drain pits, hut interior or water margins.
+local Environment = require(script.Parent.Environment)
 local Verge = {}
 Verge.TOP = -84.6
 Verge.CELL = 100
@@ -127,24 +128,44 @@ function Verge.decor(r: any): {any}
  local key=r.id.."/"..tostring(r.seed)
  if decorCache[key] then return decorCache[key] end
  local out: {any}={}
- -- Small overlapping clover islands: wide silhouettes remain readable between
- -- landmarks, individual leaves replace part-heavy carpets of upright grass.
+ -- Small trifoliate plants, raised on a petiole. Smooth material avoids the
+ -- terrain-grass texture stretching across these thin individual leaflets.
  local soil: {{number}}={}
  for _,fragment in (footprints[r.id] or {}) :: {{number}} do
   if fragment[2]-fragment[1]>=8.2 and fragment[4]-fragment[3]>=7 then table.insert(soil,fragment) end
  end
- for i=1,12 do
+ for i=1,8 do
   if #soil==0 then break end
   local h=(r.seed+i*7919)%2147483647
   local fragment=soil[1+(i-1)%#soil]
   local x=fragment[1]+4.1+(h%997)/997*math.max(0,fragment[2]-fragment[1]-8.2)
   local z=fragment[3]+3.5+((h*17)%991)/991*math.max(0,fragment[4]-fragment[3]-7)
+  local height=.28+.24*(h%991)/991
+  table.insert(out,{id=r.id..`_clover_{i}_stem`,size=Vector3.new(.035,height,.035),
+   at=Vector3.new(x,Verge.TOP+height/2,z),shape="Ellipsoid",color=Color3.fromHex("6c8749"),material="SmoothPlastic",full=i>4})
   for l=1,3 do
-   local angle=l*math.pi*2/3
-   table.insert(out,{id=r.id..`_clover_{i}_{l}`,size=Vector3.new(4.5,.16,3.2),
-    at=Vector3.new(x+math.cos(angle)*1.8,Verge.TOP+.12,z+math.sin(angle)*1.8),
-    shape="Ellipsoid",color=Color3.fromHex(if i%3==0 then "718b44" else "54713e"),material="Grass",full=i>4})
+   local angle=l*math.pi*2/3+(h%97)*.03
+   table.insert(out,{id=r.id..`_clover_{i}_{l}`,size=Vector3.new(1.25,.055,.95),
+    at=Vector3.new(x+math.cos(angle)*.45,Verge.TOP+height,z+math.sin(angle)*.45),turn=Vector3.new(math.deg(.06),math.deg(-angle),math.deg(.08)),
+    shape="Ellipsoid",color=Color3.fromHex(if i%3==0 then "658645" else "48713d"),material="SmoothPlastic",full=i>4})
   end
+ end
+ -- A background layer persists beyond the small close-detail neighbourhood.
+ -- Twenty curved clumps replace some clover parts within the same look cap.
+ for i=1,20 do
+  if #soil==0 then break end
+  local h=(r.seed+i*2971)%2147483647
+  local fragment=soil[1+(i-1)%#soil]
+  -- A stratified 5 by 4 scatter avoids correlated hash remainders lining up
+  -- the whole meadow in one narrow strip. The first four also span both axes.
+  local u=(((i-1)*2)%5+.15+.7*Environment.hash(r.seed,i,197))/5
+  local v=(((i-1)*3)%4+.15+.7*Environment.hash(r.seed,i,199))/4
+  local x=fragment[1]+4.1+u*math.max(0,fragment[2]-fragment[1]-8.2)
+  local z=fragment[3]+3.5+v*math.max(0,fragment[4]-fragment[3]-7)
+  local height=6+4*((h*31)%977)/977
+  table.insert(out,{id=r.id..`_grass_clump_{i}`,size=Vector3.new(height*.38,height,height*.45),
+   at=Vector3.new(x,Verge.TOP+height/2,z),turn=Vector3.new(0,h%360,0),
+   shape="Mesh:grass_clump",color=Color3.new(1,1,1),material="SmoothPlastic",full=i>4})
  end
  for _,piece in Verge.pieces(r) do
   if string.find(piece.id,"_litter_",1,true) then
@@ -173,7 +194,7 @@ local bestiaryCache: {[string]: {any}} = {}
 function Verge.bestiary(r: any): {any}
  local key=r.id.."/"..tostring(r.seed)
  if bestiaryCache[key] then return bestiaryCache[key] end
- local perches: {any}={}
+ local grid: {any}={}
  local a,b=r.bounds[1],r.bounds[2]
  if r.kind=="verge" then
   local largest=largestFootprint(r.id)
@@ -182,25 +203,29 @@ function Verge.bestiary(r: any): {any}
  end
  for i=1,12 do
   local col,row=(i-1)%4,math.floor((i-1)/4)
-  table.insert(perches,{id=r.id..`_springtail_perch_{i}`,
+  table.insert(grid,{id=r.id..`_springtail_perch_{i}`,
    position=Vector3.new(a.X+(col+.5)*(b.X-a.X)/4,r.spawn.pos.Y,a.Z+(row+.5)*(b.Z-a.Z)/3),
-   -- Occupy all three rows at startup. Clustering every animal in the first
-   -- row left the far end of a narrow shoulder apparently lifeless.
-   normal=Vector3.yAxis,shelter=.6,food=.4,start=i==2 or i==7 or i==10,kind="soil",hop=true})
+   normal=Vector3.yAxis,shelter=.6,food=.4,start=false,kind="soil",hop=true})
+ end
+ -- Prioritise one start in every row even at low detail, then fill a second
+ -- group per row. Existing perch IDs/positions stay stable for saved creatures.
+ local perches: {any}={}
+ for order,index in {2,7,10,4,9,5,1,3,6,8,11,12} do
+  local p=table.clone(grid[index]);p.start=order<=6;table.insert(perches,p)
  end
  local floor=r.spawn.pos.Y
  local flies: {any}={}
- for i,p in perches do
-  local fly=table.clone(p)
-  fly.id=r.id..`_housefly_perch_{i}`;fly.hop=false;fly.start=i==4 or i==9
+ for order,index in {8,1,12,6,2,3,4,5,7,9,10,11} do
+  local fly=table.clone(grid[index])
+  fly.id=r.id..`_housefly_perch_{index}`;fly.hop=false;fly.start=order<=4
   table.insert(flies,fly)
  end
  local out={{kind="springtail",profile="springtail_prototype",perches=perches,
   vents={{id=r.id.."_litter",position=perches[12].position,normal=Vector3.yAxis,appear=true,reach=8}},
-  target=3,low=2,seed=r.seed,prefix=r.id.."_springtail_",floor=floor-2,ceiling=floor+11},
+  target=6,low=3,seed=r.seed,prefix=r.id.."_springtail_",floor=floor-2,ceiling=floor+11},
   {kind="housefly",profile="fly_like_prototype",perches=flies,
    vents={{id=r.id.."_fly_arrival",position=flies[12].position+Vector3.new(0,5,0),normal=Vector3.yAxis,appear=true,reach=30}},
-   target=2,low=1,seed=(r.seed+104729)%2147483647,prefix=r.id.."_housefly_",floor=floor-2,ceiling=floor+11}}
+   target=4,low=3,seed=(r.seed+104729)%2147483647,prefix=r.id.."_housefly_",floor=floor-2,ceiling=floor+11}}
  bestiaryCache[key]=out
  return out
 end

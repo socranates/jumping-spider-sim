@@ -124,7 +124,7 @@ end
 
 -- (ROBLOX-115: a zone of the preserve's backdrop has its ceilings in World/PreserveLook.BUDGETS, by zone; its kind has none here.)
 function Region.budget(kind: string, tier: string): number?
-	if kind == "verge" then return if tier == "full" then 46 else 24 end
+	if kind == "verge" then return if tier == "full" then 60 else 28 end
 	local b = BUDGETS[kind]
 	if b == nil then return nil end
 	local extra = if kind == "hut_floor" or kind == "room_floor" then 30 elseif kind == "garden_bed" then 240 else 0

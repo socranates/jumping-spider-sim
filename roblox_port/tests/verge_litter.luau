@@ -21,22 +21,84 @@ local lo,hi=Map.bounds()
 local motor=Motor.new({world=root,surfaces=Surfaces,profile=Species.phidippus_audax_prototype,
  spawn=Vector3.new(-25.5,.31,6),heading=Vector3.xAxis,boundsMin=lo,boundsMax=hi})
 local idle=Motor.idleInput()
+-- The old two corner starts left a normal edge walk outside encounter range.
+-- Measure coverage over a whole soil cell, not only the review's chosen pose.
+local sampleRegion=assert(Map.region("verge_-400_-216"))
+local sampleSpecs=Verge.bestiary(sampleRegion)
+-- Background grass must cover the cell, not all collapse onto one hash-aligned
+-- stripe; the low tier's first four clumps need broad distribution too.
+for _,tier in {"full","low"} do
+ local columns,rows={},{}
+ local xmin,xmax,zmin,zmax=math.huge,-math.huge,math.huge,-math.huge
+ for _,d in Region.decor(sampleRegion) do
+  if not string.find(d.id,"_grass_clump_",1,true) or (tier=="low" and d.full) then continue end
+  columns[math.floor((d.at.X+400)/20)]=true
+  rows[math.floor((d.at.Z+216)/25)]=true
+  xmin=math.min(xmin,d.at.X);xmax=math.max(xmax,d.at.X)
+  zmin=math.min(zmin,d.at.Z);zmax=math.max(zmax,d.at.Z)
+ end
+ local nc,nr=0,0;for _ in columns do nc+=1 end;for _ in rows do nr+=1 end
+ check(nc>=(if tier=="full" then 5 else 3) and nr>=(if tier=="full" then 4 else 3),tier.." background grass spans soil columns and rows")
+ check(xmax-xmin>55 and zmax-zmin>55,tier.." background cover spreads across the cell")
+end
+local flySpec=sampleSpecs[2]
+local fullStarts,lowStarts,oldStarts,oldLow={},{},{},{}
+for _,p in flySpec.perches do
+ if p.start then table.insert(fullStarts,p.position);if #lowStarts<flySpec.low then table.insert(lowStarts,p.position) end end
+ if string.sub(p.id,-2)=="_4" or string.sub(p.id,-2)=="_9" then table.insert(oldStarts,p.position) end
+ if string.sub(p.id,-2)=="_4" then table.insert(oldLow,p.position) end
+end
+local function coverage(points)
+ local hits=0
+ for x=0,19 do for z=0,19 do
+  local at=Vector3.new(-400+(x+.5)*5,Verge.TOP,-216+(z+.5)*5)
+  for _,p in points do if (Vector3.new(p.X,Verge.TOP,p.Z)-at).Magnitude<=25 then hits+=1;break end end
+ end end
+ return hits
+end
+check(coverage(fullStarts)>coverage(oldStarts)*1.4,"full starting populations cover more soil than the old opposite corners")
+check(coverage(lowStarts)>coverage(oldLow)*1.7,"low starting populations also improve encounter coverage")
+for _,spec in sampleSpecs do
+ local rows={}
+ local n=0
+ for _,p in spec.perches do if p.start and n<spec.low then n+=1;rows[math.floor((p.position.Z+216)/ (100/3))]=true end end
+ local count=0;for _ in rows do count+=1 end
+ check(count==3,"low "..spec.kind.." starts occupy all three soil rows")
+end
 local walked={}
 for _,r in Map.regions() do
  if r.kind~="verge" then continue end
  local pieces=Verge.pieces(r)
- local looks={};local full,low=0,0
+ local looks={};local full,low,grassFull,grassLow=0,0,0,0
  for _,d in Region.decor(r) do
   looks[d.id]=d;full+=1;if not d.full then low+=1 end
-  if string.find(d.id,"_clover_",1,true) then
+  local clover=string.find(d.id,"_clover_",1,true)~=nil
+  local grass=string.find(d.id,"_grass_clump_",1,true)~=nil
+  if clover then
+   check(d.material=="SmoothPlastic",d.id.." avoids stretched terrain-grass texture")
+   check(d.size.X<=1.5 and d.size.Z<=1.5,d.id.." is a small leaflet or stem rather than a broad slab")
+   if string.match(d.id,"_clover_%d+_%d+$") then
+    local stem=looks[(string.gsub(d.id,"_%d+$","_stem"))]
+    local radial=Vector3.new(d.at.X-stem.at.X,0,d.at.Z-stem.at.Z).Unit
+    local yaw=math.rad(d.turn.Y)
+    check(radial:Dot(Vector3.new(math.cos(yaw),0,-math.sin(yaw)))>.999,"leaflet yaw uses the renderer's degrees and points away from its stem")
+   end
+  end
+  if grass then
+   grassFull+=1;if not d.full then grassLow+=1 end
+   check(d.shape=="Mesh:grass_clump","far cover uses the approved mesh")
+  end
+  if clover or grass then
    local supported=false
+   local radius=math.sqrt(d.size.X^2+d.size.Z^2)/2
    for _,soil in pieces do
-    if string.find(soil.id,"_soil_",1,true) and d.at.X-d.size.X/2>=soil.lo.X-1e-6 and d.at.X+d.size.X/2<=soil.hi.X+1e-6
-     and d.at.Z-d.size.Z/2>=soil.lo.Z-1e-6 and d.at.Z+d.size.Z/2<=soil.hi.Z+1e-6 then supported=true end
+    if string.find(soil.id,"_soil_",1,true) and d.at.X-radius>=soil.lo.X-1e-6 and d.at.X+radius<=soil.hi.X+1e-6
+     and d.at.Z-radius>=soil.lo.Z-1e-6 and d.at.Z+radius<=soil.hi.Z+1e-6 then supported=true end
    end
    check(supported,d.id.." stays above actual ground rather than an excluded region")
   end
  end
+ if grassFull>0 then check(grassLow>=3,"low detail retains background grass rather than a bare field") end
  check(full<=Region.budget(r.kind,"full") and low<=Region.budget(r.kind,"low"),r.id.." fits both detail budgets")
  for i,a in pieces do
   for j=i+1,#pieces do check(not overlap(a,pieces[j]),a.id.." has no overlapping collision") end

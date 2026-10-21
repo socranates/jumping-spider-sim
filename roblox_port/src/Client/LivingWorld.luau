@@ -7,10 +7,11 @@ local Shapes=require(Shared.Habitat.Shapes)
 local DayLight=require(Shared.Habitat.DayLight)
 local DogGait=require(Shared.Rig.DogGait)
 local DogGround=require(Shared.World.DogGround)
+local Meshes=require(Shared.Data.Meshes)
 local LivingWorld={}
 LivingWorld.__index=LivingWorld
 LivingWorld.BUDGET={full=420,low=150}
-LivingWorld.CELL=24
+LivingWorld.CELL=12
 local AWAY=CFrame.new(0,-900,0)
 local TAU=math.pi*2
 
@@ -22,8 +23,15 @@ local function visible(rig: any,on: boolean)
 end
 function LivingWorld.part(self: any,parent: Instance,name: string,size: Vector3,color: string,shape: string?,material: string?,alpha: number?): BasePart
  assert(self.count<self.limit,"living-world part budget exceeded")
- local p=if shape=="ellipsoid" then Shapes.ellipsoid(parent,name,size,AWAY,hex(color),material or "SmoothPlastic")
+ local p: BasePart=if shape=="ellipsoid" then Shapes.ellipsoid(parent,name,size,AWAY,hex(color),material or "SmoothPlastic")
   else Shapes.block(parent,name,size,AWAY,hex(color),material or "SmoothPlastic")
+ if shape=="grass" then
+  p.Color=Color3.new(1,1,1)
+  local mesh=Instance.new("SpecialMesh");mesh.MeshType=Enum.MeshType.FileMesh
+  mesh.MeshId=Meshes.list.grass_clump.id;mesh.TextureId=Meshes.TEXTURE
+  local native=Meshes.list.grass_clump.size
+  mesh.Scale=Vector3.new(size.X/native.X,size.Y/native.Y,size.Z/native.Z);mesh.Parent=p
+ end
  p:SetAttribute("VisibleAlpha",alpha or 0);p.Transparency=alpha or 0
  self.count+=1;return p
 end
@@ -105,11 +113,12 @@ end
 function LivingWorld.rebuild(self: any,pos: Vector3,region: any)
  self.static:Destroy();self.count-=self.staticCount;self.staticCount=0
  self.static=Shapes.folder(self.folder,"CloseDetail")
- self.patches={};local indoor=Environment.INDOORS[region.kind]==true
+ self.grass={};self.grassParts={};self.grassFrames={}
+ self.patches={}
  local floor=region.kind=="hut_floor" or region.kind=="room_floor" or region.kind=="kitchen_floor"
  local soil=region.kind=="verge" or region.kind=="hut_path" or region.kind=="mown_path" or string.match(region.id,"^garden_[a-d][1-4]$")~=nil or string.match(region.id,"^meadow_")~=nil or region.kind=="bed" or region.kind=="shrub"
  if not floor and not soil then return end
- local limit=if self.low then 42 else 150
+ local limit=if self.low then 48 else 150
  local cx,cz=math.floor(pos.X/LivingWorld.CELL),math.floor(pos.Z/LivingWorld.CELL)
  local offsets={{0,0},{-1,0},{1,0},{0,-1},{0,1},{-1,-1},{1,1},{-1,1},{1,-1}}
  for _,off in offsets do
@@ -122,7 +131,10 @@ function LivingWorld.rebuild(self: any,pos: Vector3,region: any)
    local hit=self:ground(point)
    if hit==nil or hit.Normal.Y<.75 or math.abs(hit.Position.Y-pos.Y)>30 then continue end
    local at=hit.Position+Vector3.new(0,.025,0)
-   if not indoor and i==1 then table.insert(self.patches,at) end
+   local groundPart=hit.Instance
+   local grows=(region.kind=="verge" and groundPart.Material==Enum.Material.Ground and string.find(groundPart.Name,"_soil_",1,true)~=nil)
+    or (string.match(region.id,"^meadow_")~=nil and groundPart.Material==Enum.Material.Grass)
+   if grows and i==1 then table.insert(self.patches,at) end
    local before=self.count
    local function part(n: string,size: Vector3,cf: CFrame,c: string,shape: string?,material: string?,alpha: number?): BasePart?
     if self.staticCount+self.count-before>=limit or self.count>=self.limit then return nil end
@@ -139,6 +151,15 @@ function LivingWorld.rebuild(self: any,pos: Vector3,region: any)
     part("BreadCrumb",Vector3.new(.10+.15*i,.12,.18),CFrame.new(at+Vector3.new(0,.045,0))*CFrame.Angles(.15,a,.1),"ba9b69","ellipsoid")
    elseif floor then
     part(if i==4 then "LooseHair" else "TextileThread",Vector3.new(1.1,.018,.024),CFrame.new(at)*CFrame.Angles(0,a,.04),if i==4 then "51473b" else "8a8a96")
+   elseif grows and (i%3==2 or (not self.low and i>=4)) then
+     local height=4+Environment.hash(914,salt,i*71)*3.5
+     local size=Meshes.list.grass_clump.size*(height/Meshes.list.grass_clump.size.Y)
+     local cf=CFrame.new(at)*CFrame.Angles(0,a,0)*CFrame.new(0,height/2,0)
+     local p=part("GrassClump",size,cf,"ffffff","grass")
+     if p then
+      table.insert(self.grass,{part=p,base=cf,pivot=at,rootLocal=cf:PointToObjectSpace(at),phase=a})
+      table.insert(self.grassParts,p);table.insert(self.grassFrames,cf)
+     end
    elseif i%3==0 then
     part("SeedHusk",Vector3.new(.24,.12,.66),CFrame.new(at+Vector3.new(0,.06,0))*CFrame.Angles(0,a,.15),"b79a63","ellipsoid")
    elseif i%3==1 then
@@ -189,7 +210,8 @@ function LivingWorld.sway(self: any,pos: Vector3,state: any,reduced: boolean)
   if decor then
    for _,p in decor:GetDescendants() do
     if #self.windParts>=(if self.low then 8 else 28) then break end
-    if p:IsA("BasePart") and not p.CanQuery and (string.find(p.Name,"Leaf",1,true) or string.find(p.Name,"Blade",1,true)) and (p.Position-pos).Magnitude<60 then
+    if p:IsA("BasePart") and not p.CanQuery and not string.find(p.Name,"_litter_",1,true)
+     and (string.find(p.Name,"Leaf",1,true) or string.find(p.Name,"Blade",1,true)) and (p.Position-pos).Magnitude<60 then
      table.insert(self.windParts,{part=p,base=p.CFrame,phase=p.Position.X*.3+p.Position.Z*.14})
     end
    end
@@ -198,6 +220,11 @@ function LivingWorld.sway(self: any,pos: Vector3,state: any,reduced: boolean)
  for _,row in self.windParts do
   if row.part.Parent then row.part.CFrame=row.base*CFrame.Angles(if reduced then 0 else math.sin(self.elapsed*2+row.phase)*math.min(.012,state.wind.Magnitude*.003),0,0) end
  end
+ for i,row in self.grass or {} do
+  local angle=if reduced then 0 else math.sin(self.elapsed*2+row.phase)*math.min(.1,state.wind.Magnitude*.025)
+  self.grassFrames[i]=CFrame.new(row.pivot)*CFrame.Angles(angle,0,-angle*.4)*CFrame.new(-row.pivot)*row.base
+ end
+ if self.grassParts and #self.grassParts>0 then self.ws:BulkMoveTo(self.grassParts,self.grassFrames,Enum.BulkMoveMode.FireCFrameChanged) end
 end
 function LivingWorld.small(self: any,pos: Vector3,region: any,state: any,reduced: boolean)
  local indoor=region.kind=="hut_floor" or region.kind=="room_floor"

@@ -268,5 +268,45 @@ case("distant dog uses authored terrain when native ground is not streamed",func
  check(nose~=nil and nose.Position.Y+84.6>2 and nose.Position.Y+84.6<8,"sniffing nose reaches near the ground")
  living:destroy();root:Destroy();WorldMap.use("test_garden")
 end)
+case("close grass is rooted, wind-responsive, bounded and absent from hard props",function()
+ WorldMap.use("preserve")
+ local root=WorldBuild.world(workspace)
+ local at=Vector3.new(-310,Verge.TOP+.31,-155)
+ local region=assert(WorldMap.at(at))
+ local decor=Instance.new("Folder");decor.Name="WorldDecor";decor.Parent=workspace
+ local roof=Instance.new("Part");roof.Name="verge_review_litter_1_Leaf_look";roof.CanQuery=false;roof.CFrame=CFrame.new(at);roof.Parent=decor
+ local fixed=roof.CFrame
+ for _,tier in {"full","low"} do
+  local living=LivingWorld.new(workspace,root,tier,WorldMap)
+  living:update(.1,at,{day=1,hour=12},region,false,false)
+  check(#living.grass>=(if tier=="full" then 12 else 6),tier.." has close upright grass")
+  check(living.count<=LivingWorld.BUDGET[tier],tier.." cover stays within the existing total part limit")
+  living.elapsed+=.7;living:sway(at,{wind=Vector3.new(3,0,1)},false)
+  local moved=false
+  for _,row in living.grass do
+   local p=row.part
+   check(not p.CanCollide and not p.CanQuery and not p.CanTouch,"grass is purely visual")
+   local mesh=p:FindFirstChildWhichIsA("SpecialMesh")
+   check(mesh and mesh.MeshId=="rbxassetid://93421946013090" and mesh.TextureId=="rbxassetid://116765351721069","both tiers use the approved curved mesh and atlas")
+   local base=p.CFrame:PointToWorldSpace(row.rootLocal)
+   check((base-row.pivot).Magnitude<1e-5,"wind keeps each grass root fixed to its ground point")
+   moved=moved or (p.CFrame.UpVector-row.base.UpVector).Magnitude>.001
+  end
+  check(moved,"wind actually bends the grass")
+  check((roof.CFrame.UpVector-fixed.UpVector).Magnitude<1e-8,"wind never moves the visual collision roof")
+  living:sway(at,{wind=Vector3.new(3,0,1)},true)
+  for _,row in living.grass do check((row.part.CFrame.UpVector-row.base.UpVector).Magnitude<1e-8,"reduced motion restores still grass") end
+  local old=living.grassParts[1]
+  living:rebuild(at+Vector3.new(12,0,0),region)
+  check(old.Parent==nil,"moving detail cells cleans up the previous tuft instances")
+  living:destroy()
+ end
+ local plate=Instance.new("Part");plate.Name="MetalLid";plate.Size=Vector3.new(60,1,60)
+ plate.Material=Enum.Material.Metal;plate.CFrame=CFrame.new(at-Vector3.yAxis*.31+Vector3.yAxis*1.5);plate.Parent=root
+ local living=LivingWorld.new(workspace,root,"full",WorldMap)
+ living:rebuild(at,region)
+ check(#living.grass==0 and #living.patches==0,"metal surfaces grow neither grass nor emerging soil grubs")
+ living:destroy();decor:Destroy();root:Destroy();WorldMap.use("test_garden")
+end)
 print(`LIVING_WORLD passed={passed} failed={failed}`)
 if failed>0 then error("living habitat checks failed") end

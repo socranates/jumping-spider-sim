@@ -77,6 +77,13 @@ Working branch: `codex/v48-living-habitat`, based on v47 receipt commit `9d442ff
 - Legacy wasp 16,884/0, rival 2,843/0 and outdoor navigation 581/0 passed. A world-client regression queried `map.world()` on a stub without that function; the client now uses its stable `world` identifier and the rerun passes 30/0. The task stub also supports `wait` for batched air-grid warmup. Current compile is 204/204 and strict analysis has no diagnostics. A final frozen full CLI run remains required.
 - The preserve self-test now expects a station resident rival and garden mate, explicitly sets up and restores an acquired-lock stage outside the ranger's morning, and walks the relocated meadow/pond connections. After repairing its two old fixture assumptions, the replacement completed in 545 simulated seconds with **270 pass / 0 fail / 0 skip**; all seven outer checks pass, including save/window/shadow checks. Raw output is `docs/verification/v48/compact-selftest.txt`. These are shim results, not native Studio performance or a published playtest.
 
+### Ground cover and nearby prey follow-up
+
+- Soil now has small stemmed clover and curved grass clumps, with a bounded close layer that sways from rooted pivots. The regional background scatter spans each soil cell; low detail retains fewer instances of the same plants. Structural litter roofs no longer move away from their colliders in the decorative wind path.
+- New verge populations start with six springtails and four houseflies at full detail, three of each at low detail, spread across all three rows. Perch identities/positions and saved director state remain stable. Escape, capture and feeding code are unchanged.
+- Targeted checks: litter 11,258/0, living detail 3,630/0, compact layout/save 294/0. Native ordinary-camera 25 cm walks stayed attached and visibly approached a fly at both tiers. Walking frame mean/worst: full 17.95/49.84 ms; low 16.98/59.18 ms. An unattributed 265.76 ms low-detail arrival hitch keeps performance verification open. See `docs/verification/v48/GROUND-COVER-REVIEW.md`.
+- Remaining review includes can geometry, indoor dust/fleas, ants and emerging grubs, weather continuity, broader ordinary traversal and low-detail density, then a frozen full regression/native gate and release. No v48 publication claim is made.
+
 ## Platform judgment
 
 Roblox limits density, draw calls, memory and simulation cost, especially on phones. The current barren travel and missing ground are implementation/design problems. Compact, authored habitats with reused meshes, bounded active wildlife and selective detail remain a viable direction. No engine migration is needed to address these reported problems.

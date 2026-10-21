@@ -311,6 +311,12 @@ VIEWS = {
     "spec_millipede": {"fov": 40, "eye": [206.0, 3.0, 7.2], "at": [206.0, 0.1, 10.9], "near": 0.02, "far": 600, "groups": ["flies"], "shadow": 6},
     "spec_snail": {"fov": 44, "eye": [217.0, 5.5, 3.0], "at": [217.0, 1.0, 11.0], "near": 0.05, "far": 600, "groups": ["flies"], "shadow": 12},
     "spec_harvestman": {"fov": 48, "eye": [229.5, 3.2, 6.5], "at": [228.0, 0.6, 10.7], "near": 0.05, "far": 600, "groups": ["flies"], "shadow": 12},
+    # ROBLOX-128 (--world): the tray's fourth row (z 14): a house fly grooming its head and one its wings, a field cricket singing, a water strider mid-stroke, an ant
+    "spec_groom_front": {"fov": 20, "eye": [200.75, 0.55, 13.15], "at": [200.0, 0.12, 13.95], "near": 0.01, "far": 600, "groups": ["flies"], "shadow": 4},
+    "spec_groom_hind": {"fov": 24, "eye": [204.0, 0.55, 14.95], "at": [203.0, 0.12, 14.0], "near": 0.01, "far": 600, "groups": ["flies"], "shadow": 4},
+    "spec_cricket_sing": {"fov": 30, "eye": [210.4, 2.6, 16.6], "at": [207.0, 0.35, 14.0], "near": 0.02, "far": 600, "groups": ["flies"], "shadow": 8},
+    "spec_strider": {"fov": 40, "eye": [214.5, 3.2, 17.2], "at": [213.0, 0.1, 14.0], "near": 0.02, "far": 600, "groups": ["flies"], "shadow": 8},
+    "spec_ant": {"fov": 30, "eye": [217.9, 0.9, 14.8], "at": [217.0, 0.05, 13.85], "near": 0.01, "far": 600, "groups": ["flies"], "shadow": 4},
     "ambient_dock": {"fov": 40, "eye": [-9.5, -86.5, -37.5], "at": [-13.1, -89.4, -42.0], "near": 0.05, "far": 2500, "groups": ["bed", "flies"], "shadow": 30},
     "ambient_dandelion": {"fov": 40, "eye": [0.8, -87.2, -56.8], "at": [-2.3, -89.5, -60.8], "near": 0.05, "far": 2500, "groups": ["bed", "flies"], "shadow": 30},
     "ambient_snail": {"fov": 50, "eye": [-9.0, -84.0, -33.5], "at": [-15.6, -89.0, -39.0], "near": 0.05, "far": 2500, "groups": ["bed", "flies"], "shadow": 40},

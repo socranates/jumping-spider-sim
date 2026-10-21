@@ -8,7 +8,8 @@ lives, what it does, and what its page can honestly say with a source the builde
 the springtail, the leafhopper, the small moth and the crane fly, part A of W3b (ROBLOX-101, 2026-10-19: `docs/DECISIONS.md` has the numbers,
 `docs/NOTEBOOK_SOURCES.md` the pages' sources); and the ladybird, the millipede, the garden snail and the harvestman, part B (ROBLOX-105, 2026-10-19:
 ambient bugs, not food, each a seeded sim of its own with a body and a page; a strike at one, or at a woodlouse, is refused in a short note). The rest is not built. The honesty
-rule stands: a sentence without a source is left out, and the page says "In this game" where the game simplifies.
+rule stands: a sentence without a source is left out, and the page says "In this game" where the game simplifies. The bodies' motion was audited
+and the biggest gaps filled in ROBLOX-128 (the table near the end).
 
 The jumping spider's own rules decide the roles: it hunts by sight what moves and is smaller than itself, it avoids ants and armoured or
 chemically defended things, and it is itself hunted by wasps, larger spiders, centipedes and birds (sources: Foelix, *Biology of
@@ -75,6 +76,38 @@ cites pages).
 - Budget: per-region caps on living bugs at full and low tier (the phone is the limit); far regions keep none.
 - Scale: the kinds that outsize a 1 cm spider (crane fly, millipede, snail, bee, centipede) are the ones that make the garden feel big
   from the spider's eye, which is the point; their bodies cost parts, so each is budgeted alone.
+
+## The bodies and their motion, audited (ROBLOX-128, 2026-10-21)
+
+Every creature but the spiders (the other round's), its parts at the full and low tiers, how it moves, and what this round changed (`docs/DECISIONS.md` ROBLOX-128 has the
+sources). "Steps" means legs that swing and lift by ground covered (ROBLOX-103); "far rule" every body beyond 25 studs drawn ten times a second.
+
+| Creature | Parts (full / low) | How it moves | Against the real animal; what changed |
+| --- | --- | --- | --- |
+| House fly (and fruit fly) | 39 / 29 | steps on two tripods, kicks in the jaws, a trembling wing blur | stood dead still: now **grooms** in bouts and **readies** before take-off; **venation** R4+5 and M1+2 with its bend (six bristles gave their parts) |
+| Fungus gnat | 22 / 22 | steps, antennae sway, blur | now grooms and readies |
+| Aphid | 15 / 15 | steps along the plants | as it was (a sap feeder that barely moves) |
+| Springtail | 15 / 11 | quick steps, crouch, somersault in the hop | as it was |
+| Leafhopper | 25 / 13 | steps, sidesteps its stem, nose-up crouch before the jump | as it was |
+| Moth | 20 / 9 | a visible 5 Hz beat, wings shiver on landing | as it was (a beat slow enough to draw) |
+| Crane fly | 31 / 11 | long steps, rocking flight, dangling legs | as it was |
+| Hoverfly | 19 / 10 | steps, the sim's hover and dart | its 30 Hz flap **strobed**: now the blur; grooms and readies |
+| Field cricket | 23 / 13 | steps, crouch, kicks in the jaws | did nothing as it sang: now **raises its forewings** to about 45 degrees and dips them each chirp |
+| Midge, mosquito | 22 / 13, 21 / 12 | steps, swarm hover | 40 Hz flaps **strobed**: now the blur; grooms and readies |
+| Eastern forktail | 23 / 16 | steps, thrashes in the jaws | a 25 Hz flap **strobed**: now the blur; readies |
+| Woodlouse | 24 / 24 | a metachronal wave down 14 legs | as it was |
+| Ladybird | 22 / 18 | tripods, head works as it eats, reflex bleeding | as it was |
+| Millipede | 63 / 39 | a wave down its rings' legs, coils into a spiral | as it was |
+| Garden snail | 36 / 24 | glides, eye stalks drawn in, a fading trail | as it was |
+| Harvestman | 20 / 20 | high steps on long legs | as it was |
+| Ant | 20 / 16 | tripods | rigid antennae: now they **sweep** |
+| Water strider | 16 / 12 | glided with its legs still | now **rows**: the middle legs sweep back together and reach forward, dimples with them |
+| Crab spider | 19 / 16 | still, legs open; closes on a strike | as it was (it waits: that is the tell) |
+| Mud dauber wasp | about 60 | Godot's: wing blur, striding legs, flicking antennae | as it was |
+| Robin | 22 / 11 (and its shadow's 2) | glide, hop, stop, peck, the tell, strike | stood head-down and cocked at every stop: now **erect**, its head turning and tipping now and then; the watch a level crouch, head cocked and still |
+| Green frog | 32 / 15 | turns to face, tongue strike | its throat **never moved** and its tongue was drawn 1 cm long (parts never resized): now it **breathes** (a flutter, a lung breath every 5.2 s) and the tongue reaches |
+| Green darner | 10 / 7 | patrols, wings a blur | as it was |
+| Ranger's cat | 62 / 41 | breath, blink, lateral walk, stalk, crouch, tail twitch, swat | as it was (the richest body already) |
 
 ## For Nathan
 

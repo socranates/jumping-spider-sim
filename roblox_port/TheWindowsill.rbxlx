@@ -1920,6 +1920,37 @@ FlyLook.small.crane_fly = {
 		wobble = { roll = 0.14, pitch = 0.08, hz = 2.1 }, dangle = { amp = 0.18, hz = 1.7 } },
 }
 
+-- ROBLOX-120: the fall field cricket (Gryllus pennsylvanicus) of the meadow's thatch and the hut garden's mulch, drawn at its true size (about 2.2 cm, the sources' 15 to
+-- 25 mm): shiny black to dark brown, a big round head, the saddle of its pronotum, its forewings lying flat over the abdomen, two cerci at the tail, antennae longer
+-- than the body, thin front and middle legs and the stout, long hind legs it jumps and kicks with (docs/NOTEBOOK_SOURCES.md, the field cricket's page).
+FlyLook.small.cricket = {
+	colors = { head = "1c1714", eye = "0b0908", pronotum = "221c18", abdomen = "2a221c", tegmen = "2e241c", leg = "2e2620", femur = "3a2f26", antenna = "2a231d",
+		cercus = "3a3028", shadow = "2a241c" },
+	body = {
+		{ name = "Head", color = "head", at = { 0, 0.22, -0.85 }, size = { 0.5, 0.48, 0.45 } },
+		{ name = "EyeL", color = "eye", reflectance = 0.06, at = { -0.2, 0.32, -0.92 }, size = { 0.14, 0.16, 0.14 }, full = true },
+		{ name = "EyeR", color = "eye", reflectance = 0.06, at = { 0.2, 0.32, -0.92 }, size = { 0.14, 0.16, 0.14 }, full = true },
+		{ name = "Pronotum", color = "pronotum", at = { 0, 0.26, -0.52 }, size = { 0.6, 0.42, 0.38 } },
+		{ name = "Abdomen", color = "abdomen", at = { 0, 0.18, 0.25 }, size = { 0.6, 0.38, 1.2 } },
+		{ name = "Forewings", color = "tegmen", at = { 0, 0.35, 0.12 }, size = { 0.58, 0.1, 1.0 }, full = true },
+	} :: { any },
+	rods = {
+		{ name = "Antenna", color = "antenna", d = 0.025, from = { 0.08, 0.36, -1.05 }, to = { 0.75, 0.42, -2.7 }, mirror = true },
+		{ name = "Cercus", color = "cercus", d = 0.04, from = { 0.1, 0.2, 0.82 }, to = { 0.24, 0.24, 1.38 }, mirror = true, full = true },
+		{ name = "FrontFemur", color = "leg", d = 0.06, from = { 0.18, 0.1, -0.62 }, to = { 0.36, 0.12, -0.86 }, fly = { { 0.18, 0.1, -0.62 }, { 0.26, 0.0, -0.8 } }, mirror = true },
+		{ name = "FrontTibia", color = "leg", d = 0.045, from = { 0.36, 0.12, -0.86 }, to = { 0.45, -0.16, -1.02 }, fly = { { 0.26, 0.0, -0.8 }, { 0.24, -0.1, -0.6 } }, mirror = true, full = true },
+		{ name = "MiddleFemur", color = "leg", d = 0.06, from = { 0.24, 0.1, -0.36 }, to = { 0.5, 0.12, -0.3 }, fly = { { 0.24, 0.1, -0.36 }, { 0.36, 0.0, -0.25 } }, mirror = true },
+		{ name = "MiddleTibia", color = "leg", d = 0.045, from = { 0.5, 0.12, -0.3 }, to = { 0.64, -0.16, -0.24 }, fly = { { 0.36, 0.0, -0.25 }, { 0.32, -0.08, -0.05 } }, mirror = true, full = true },
+		-- the hind legs: a stout femur up along the abdomen's side, the tibia folded back under it to the foot
+		{ name = "HindFemur", color = "femur", d = 0.17, from = { 0.24, 0.14, -0.02 }, to = { 0.42, 0.44, 0.74 }, fly = { { 0.24, 0.14, -0.02 }, { 0.36, 0.2, 0.8 } }, mirror = true },
+		{ name = "HindTibia", color = "leg", d = 0.07, from = { 0.42, 0.44, 0.74 }, to = { 0.38, -0.16, 1.24 }, fly = { { 0.36, 0.2, 0.8 }, { 0.36, -0.05, 1.5 } }, mirror = true },
+	} :: { any },
+	shadow = { size = { 0.8, 0.004, 2.0 }, lift = 0.003, transparency = 0.8, full = true },
+	-- quick bursts of steps, a crouch on its hind legs before the jump, the antennae always moving
+	motion = { gait = { stride = 0.5, swing = 0.3, lift = 0.3, settle = 9, jump = 1.0 }, kick = 7, antenna = { amp = 0.18, hz = 1.3 },
+		crouch = { depth = 0.06, pitch = 0.16 } },
+}
+
 return FlyLook
 ]]></string>
           </Properties>
@@ -2309,6 +2340,8 @@ NotebookPages.triggers = {
 	"look_hoverfly",
 	"cat",
 	"crab_spider",
+	"robin",
+	"look_cricket",
 }
 
 -- The reserve at or under hungryAt is "hungry"; at or over wellFedAt, "well fed" (LIFE_DESIGN.md round 1).
@@ -2327,7 +2360,7 @@ NotebookPages.noteSeconds = 6.0
 NotebookPages.lookWu = 4.0
 -- ROBLOX-105: the ambient bugs' close looks too (NotebookWatch: one of the view's bugs of the kind, out in the open, within lookWu).
 NotebookPages.looks = { springtail = "look_springtail", leafhopper = "look_leafhopper", moth = "look_moth", crane_fly = "look_crane_fly",
-	ladybird = "look_ladybird", millipede = "look_millipede", snail = "look_snail", harvestman = "look_harvestman", hoverfly = "look_hoverfly" } :: { [string]: string }
+	ladybird = "look_ladybird", millipede = "look_millipede", snail = "look_snail", harvestman = "look_harvestman", hoverfly = "look_hoverfly", cricket = "look_cricket" } :: { [string]: string }
 
 NotebookPages.pages = {
 	{
@@ -2623,7 +2656,7 @@ NotebookPages.pages = {
 		trigger = "hatched",
 		title = "Eggs, silk and wind",
 		text = "Jumping spiders court mostly by sight, and often by vibration too: a male shows a display and the female decides. She lays her eggs in a silken nest. A Phidippus johnsoni mother stays with it until the young hatch and leave: in the lab the eggs hatched about three weeks after laying, and the spiderlings left about three weeks after that. Many young spiders then travel by ballooning: they climb high, let out a thread of silk and are carried off by the air. The electric field in the air can trigger the take-off.",
-		game = "A game day is about fifteen minutes, so weeks become days: a mate on the sill, a courtship you hold for eight seconds, one night to the sac and two guard days. In Normal the mate decides when the courtship is full: a thin spider, or a court that broke off, stood far or looked away, is often refused, and a rival may cut in. The real mother makes and guards the sac; here the sac is drawn the same whichever spider you play, and no claim is made that a male guards eggs. A real brood is far larger than the eight to twelve shown: a Phidippus johnsoni female laid about 200 eggs in all. The first spider's sex is the game's choice (a female), and the peacock spider's mate is drawn with the male's colours although the real female is mottled grey-brown. Nothing can harm the sac, and you carry on as one of the spiderlings, which a real one could not choose.",
+		game = "A game day is about fifteen minutes, so weeks become days: a mate on the sill, a courtship you hold for eight seconds, one night to the sac and two guard days. In Normal the mate decides when the courtship is full: a thin spider, or a court that broke off, stood far or looked away, is often refused, and a rival may cut in. The real mother makes and guards the sac; here the sac is drawn the same whichever spider you play, and no claim is made that a male guards eggs. A real brood is far larger than the eight to twelve shown: a Phidippus johnsoni female laid about 200 eggs in all. The first spider's sex is the game's choice (a female), and the peacock spider's mate is drawn with the male's colours although the real female is mottled grey-brown. Nothing can harm the sac. In the preserve you may follow one spiderling on its thread: the wind, the game's seeded draw, mostly sets it down near the hut, in the hut garden or at the meadow's edge, and the next life begins where it lands; or you stay at the hut as one of them. A real spiderling could not choose.",
 		sources = {
 			"Jackson, R. R. (1978). The life history of Phidippus johnsoni (Araneae, Salticidae). Journal of Arachnology 6: 1-29.",
 			"Foelix, R. F. (2011). Biology of Spiders, 3rd edition. Oxford University Press.",
@@ -2784,6 +2817,30 @@ NotebookPages.pages = {
 			"Animal Diversity Web, University of Michigan Museum of Zoology (read 2026). Misumena vatia, goldenrod crab spider.",
 			"University of Minnesota Extension (undated, read 2026). Goldenrod crab spider.",
 			"Wikipedia (read 2026). Misumena vatia.",
+		},
+	},
+	{
+		id = "robin",
+		trigger = "robin",
+		title = "The robin on the lawn",
+		text = "The American robin is a thrush 20 to 28 cm long, about 77 to 85 g, its breast rusty red and its head blackish with a white eye ring broken in front and behind. It forages on the ground: it runs a few steps, stops abruptly, and stares at the ground with its head cocked to one side, finding its food by sight. It eats many earthworms, and insects, snails, spiders and much fruit. Its call is a sharp \"pick! tut-tut-tut\".",
+		game = "Here a robin comes to the hut garden's lawn, the gravel by the bench and the meadow's mown edge a few times a day, its shadow and its call first. Move in the open near it and it hops close, cocks its head at you and pauses, then strikes: in Normal that ends the life; on Easy and in free play it misses. Under cover, low in the meadow's grass or keeping still, you are lost to it. Its visits, its reach and its pause are the game's.",
+		sources = {
+			"National Audubon Society (undated, read 2026). American Robin, Turdus migratorius. Guide to North American Birds, audubon.org.",
+			"Cornell Lab of Ornithology (undated, read 2026). American Robin: Life History. All About Birds.",
+			"Missouri Department of Conservation (undated, read 2026). American Robin. Missouri Field Guide, mdc.mo.gov.",
+		},
+	},
+	{
+		id = "field_crickets",
+		trigger = "look_cricket",
+		title = "The field cricket",
+		text = "The fall field cricket (Gryllus pennsylvanicus) lives across much of North America in grassy places, often near people. Adults are 15 to 25 mm long, shiny black to dark brown, with long antennae and stout hind legs. It eats seeds, seedlings and small fruits, and dead and dying insects. Males sing mostly at night from a burrow or a crack in the ground: short chirps, two or three a second. A cricket's ears are on its front legs. Scared, it escapes into its burrow.",
+		game = "Here crickets live in the meadow's thatch and the hut garden's mulch, each worth about three houseflies, and the males chirp from dusk. Move near one and it falls silent and still; come closer and it jumps away. Caught, it kicks hard, and a weak grip loses it. Its hearing, its jump and its kicks are the game's numbers.",
+		sources = {
+			"Wikipedia (read 2026). Gryllus pennsylvanicus.",
+			"Minnesota Seasons (undated, read 2026). Fall field cricket, Gryllus pennsylvanicus. minnesotaseasons.com.",
+			"Geological Society of America (2011). The sound of crickets in the Eocene night: fossil insect ears from the Green River Formation. Northeastern Section meeting, abstract (paper 184321), gsa.confex.com.",
 		},
 	},
 } :: { Page }
@@ -3563,6 +3620,49 @@ hover.behavior.wander_radius_wu = 0.6
 hover.population.replenish_delay_s = { 40.0, 90.0 }
 hover.population.entry_min_flight_wu = 4.0
 data.hoverfly_prototype = hover
+-- ROBLOX-120: the fall field cricket (Gryllus pennsylvanicus) of the meadow's thatch and the hut garden's mulch: three housefly meals in one (an adult is 15 to 25 mm long,
+-- the notebook's page "The field cricket"), drawn at its true size (Data/FlyLook.small.cricket, about 2.2 cm), flightless and a strong jumper (a hop of 8 to 24 studs), and a
+-- hard catch (catch_factor 1.45: by its meal it would be the ceiling, 1.6) whose hind legs kick (body.kick: Prey/PreyKinds.grip, a jolt off the grip every 0.7 to 1.5 s from
+-- its own stream). It hears: a spider moving within `hear.range` studs hushes it (it falls silent and holds still for `hear.hold` seconds, Prey/PreyKinds.hear), and
+-- alert it freezes where it stands (body.freeze) until it jumps. By day it sits still in its shelter; from dusk (its `dusk` profile, the night's) it is restless, walks and
+-- the males chirp (body.chirp). Game values; the page says what is the sources'.
+local cricket = copy(data.fly_like_prototype)
+cricket.body.nutrition = 0.35 * 3
+cricket.body.visual_scale = 1.0
+cricket.body.radius_wu = 0.6
+cricket.body.capture_radius_wu = 0.8
+cricket.body.prey_kind = "cricket"
+cricket.body.flightless = true
+cricket.body.freeze = true
+cricket.body.catch_factor = 1.15
+cricket.body.feed_rate_per_s = 0.15
+cricket.body.hop = { min = 8.0, max = 24.0, time = 0.35, apex = 4.0 }
+cricket.body.kick = { first = { 0.3, 0.8 }, every = { 0.7, 1.5 }, size = 0.1 }
+cricket.body.hear = { range = 30.0, still = 0.5, hold = 6.0 }
+cricket.body.dusk = "cricket_night_prototype"
+cricket.senses.sight_range_wu = 9.0
+cricket.senses.startle_range_wu = 4.0
+cricket.reaction.delay_startle_alert_s = { 0.03, 0.08 }
+cricket.flight.clearance_radius_wu = 0.14 -- (under the hover over a perch, 0.16, as every fly's is: ROBLOX-119)
+cricket.flight.safe_distance_wu = 6.0
+cricket.flight.perch_avoid_wu = 4.0
+cricket.behavior.restless_per_s = 0.0005
+cricket.behavior.walk_interval_s = { 6.0, 18.0 }
+cricket.behavior.walk_distance_wu = { 0.3, 1.5 }
+cricket.behavior.walk_speed_wu_s = { 0.6, 1.5 }
+cricket.behavior.wander_radius_wu = 3.0
+cricket.behavior.perch_radius_wu = 0.5
+cricket.behavior.fidget_distance_wu = { 0.05, 0.15 }
+cricket.population.replenish_delay_s = { 120.0, 240.0 }
+cricket.population.vent_min_distance_wu = 8.0
+data.cricket_prototype = cricket
+local cricketNight = copy(cricket)
+cricketNight.body.dusk = nil
+cricketNight.body.day = "cricket_prototype"
+cricketNight.body.chirp = true
+cricketNight.behavior.restless_per_s = 0.008
+cricketNight.behavior.walk_interval_s = { 3.0, 9.0 }
+data.cricket_night_prototype = cricketNight
 return table.freeze(data)
 ]]></string>
           </Properties>
@@ -6544,6 +6644,11 @@ function NotebookWatch.onCrab(self: any)
 	self.book:notice("crab_spider")
 end
 
+-- (ROBLOX-120) The robin was told to the spider (Predator/Bird: its shadow passed near, it landed near, or it noticed the spider): the robin's page.
+function NotebookWatch.onBird(self: any)
+	self.book:notice("robin")
+end
+
 -- Each rendered frame while the ant-mimicking spider is being played: how long its antennae (legs I) have been fully up. Standing still long
 -- enough for the pose (AntMimic.noticeSeconds) is what opens the walking-like-an-ant page. The client calls this; nothing here reads the pose.
 function NotebookWatch.antennae(self: any, shownSeconds: number)
@@ -6638,6 +6743,164 @@ return NotebookWatch
           <string name="Name">Life</string>
         </Properties>
         <Item class="ModuleScript" referent="46">
+          <Properties>
+            <string name="Name">Ballooning</string>
+            <string name="Source"><![CDATA[--!strict
+-- Ballooning, the lineage moves (ROBLOX-120, docs/PARK_WORLD_DESIGN.md section 5: "the spiderlings balloon. The player chooses one to follow: where it lands is drawn from
+-- the wind (seeded, honest: mostly nearby zones, rarely far), and the next life starts in that zone"). The notebook's page "Eggs, silk and wind" says what is known: many
+-- young spiders travel by climbing high, letting out a thread of silk and being carried off by the air. Pure: the client plays the ride (Client/MateStage's rider and the
+-- camera's shot) and starts the next generation where it lands; the CLI suites and the self-test ask the same draw.
+--
+-- The draw (`land`): a pure function of the world's seed, the family's number and the day the eggs hatched, so a choice seen again lands in the same place and a
+-- restore never rerolls it. Each zone of ZONES has a weight that falls off with its distance from the hut (WEIGHT_M metres: exp(-d / WEIGHT_M)), so the near zones are
+-- the likely ones and the far ones rare; only a zone that is built (`built`, walkable in the preserve: World/Hut, World/Meadow) can be landed in, the others are listed
+-- for when they are, and drop out of the draw. In a built zone the landing is one of its `landings`, regions whose spawn is a place to stand (a spiderling's thread
+-- snags on what stands up, and it comes down there). Now: the hut garden (about three quarters of draws) and the meadow's edge (the rest).
+--
+-- The ride (`ride`, `at`): RIDE_S seconds from the egg sac in the sill's crack out through the window's sash and up over the garden on the wind, its thread streaming
+-- ahead and above it, then down onto the landing; a seeded drift and a sway, never the same twice for two families and always the same for one.
+-- `life.start_zone` (optional in a rest, Persistence/Checkpoint: absent is "hut", the generation that began in the crack) and `life.start_region` keep where this
+-- generation began; the ending card, the toast and the notebook's dated line say it (UI/MateText). The nursery's shut window (Life/Nursery) is the hut's inside: a
+-- generation that lands outside is in the wild, and nothing puts it back.
+local Preserve = require(script.Parent.Parent.World.Preserve)
+
+local Ballooning = {}
+
+Ballooning.RIDE_S = 12.0
+Ballooning.WEIGHT_M = 10.0
+Ballooning.HUT = "hut" -- (the start of a generation that stayed in the crack)
+Ballooning.SAC = Vector3.new(-27.1, 0.5, 8.4) -- (Data/MatingRules.sacAt: the egg sac in the sill's crack)
+Ballooning.SASH = Vector3.new(0, 4, -16) -- the window's lower sash, out of which the threads go (World/Hut.SASH, just outside it)
+Ballooning.UP = 260 -- how high over the garden's ground a ride climbs (studs), at most
+
+export type Zone = { zone: string, name: string, built: boolean, landings: { string } }
+local function zone(id: string, name: string, built: boolean, landings: { string }): Zone
+	return table.freeze({ zone = id, name = name, built = built, landings = table.freeze(landings) })
+end
+Ballooning.ZONES = table.freeze({
+	zone("hut_garden", "the hut garden", true, { "garden_a2", "garden_a4", "garden_b1", "garden_c2", "garden_d2" }),
+	zone("meadow", "the meadow's edge", true, { "meadow_b1", "meadow_b3", "meadow_c3", "meadow_d2", "meadow_d5", "meadow_e3" }),
+	zone("pond_edge", "the pond's edge", false, {}),
+	zone("log_pile", "the log pile", false, {}),
+	zone("veteran_oak", "the old oak", false, {}),
+	zone("stone_wall", "the stone wall", false, {}),
+	zone("bramble", "the bramble by the railway", false, {}),
+	zone("compost", "the compost bays", false, {}),
+}) :: { Zone }
+local BY_ZONE: { [string]: Zone } = {}
+for _, z in Ballooning.ZONES do BY_ZONE[z.zone] = z end
+function Ballooning.zone(id: string): Zone?
+	return BY_ZONE[id]
+end
+
+-- A zone's distance from the hut (metres, home range to home range: World/Preserve.HOME_RANGES).
+function Ballooning.distance(id: string): number
+	local hut, here = nil :: Preserve.HomeRange?, nil :: Preserve.HomeRange?
+	for _, h in Preserve.HOME_RANGES do
+		if h.id == "ranger_hut" then hut = h end
+		if h.id == id then here = h end
+	end
+	if hut == nil or here == nil then return math.huge end
+	return math.sqrt((here.at[1] - hut.at[1]) ^ 2 + (here.at[2] - hut.at[2]) ^ 2)
+end
+-- A zone's weight in the draw (0 for one not built).
+function Ballooning.weight(z: Zone): number
+	if not z.built or #z.landings == 0 then return 0 end
+	return math.exp(-Ballooning.distance(z.zone) / Ballooning.WEIGHT_M)
+end
+
+local MOD = 2147483647
+local function stream(seed: number, generation: number, day: number, salt: number): () -> number
+	local s = (math.floor(seed) * 83492791 + generation * 19349663 + day * 73856093 + salt * 2654435) % MOD
+	if s <= 0 then s += MOD - 1 end
+	return function(): number
+		s = (s * 48271) % MOD
+		return (s - 1) / (MOD - 1)
+	end
+end
+
+-- Where the followed spiderling lands: its zone and its landing region.
+function Ballooning.land(seed: number, generation: number, day: number): (string, string)
+	local rand = stream(seed, generation, day, 41)
+	rand()
+	local total = 0
+	for _, z in Ballooning.ZONES do total += Ballooning.weight(z) end
+	local x = rand() * total
+	local pick = Ballooning.ZONES[1]
+	for _, z in Ballooning.ZONES do
+		local w = Ballooning.weight(z)
+		if w > 0 then
+			pick = z
+			x -= w
+			if x <= 0 then break end
+		end
+	end
+	local i = 1 + math.floor(rand() * #pick.landings) % #pick.landings
+	return pick.zone, pick.landings[i]
+end
+
+-- Whether a start zone is one a rest may name: the hut, or a zone that can be landed in.
+function Ballooning.valid(id: any): boolean
+	if id == Ballooning.HUT then return true end
+	local z = if type(id) == "string" then BY_ZONE[id] else nil
+	return z ~= nil and z.built
+end
+-- Whether a landing region belongs to a start zone.
+function Ballooning.landsIn(zoneId: string, region: any): boolean
+	local z = BY_ZONE[zoneId]
+	return z ~= nil and type(region) == "string" and table.find(z.landings, region) ~= nil
+end
+
+-- The ride from the sac to `to` (the landing region's spawn): its seconds and the seeded drift.
+export type Ride = { from: Vector3, sash: Vector3, apex: Vector3, over: Vector3, to: Vector3, seconds: number, sway: number, phase: number, wind: Vector3 }
+function Ballooning.ride(seed: number, generation: number, day: number, to: Vector3): Ride
+	local rand = stream(seed, generation, day, 43)
+	rand()
+	local mid = Ballooning.SASH:Lerp(to, 0.5)
+	local wind = Vector3.new(rand() - 0.5, 0, rand() - 0.5)
+	local up = math.min(Ballooning.UP, 120 + (to - Ballooning.SASH).Magnitude * 0.18)
+	return table.freeze({
+		from = Ballooning.SAC, sash = Ballooning.SASH,
+		apex = Vector3.new(mid.X + wind.X * 120, Preserve.GROUND_Y + up + rand() * 40, mid.Z + wind.Z * 60),
+		over = to + Vector3.new(wind.X * 20, 40, wind.Z * 20), to = to,
+		seconds = Ballooning.RIDE_S, sway = 6 + rand() * 6, phase = rand() * 2 * math.pi, wind = wind,
+	})
+end
+
+local function bezier(a: Vector3, b: Vector3, c: Vector3, t: number): Vector3
+	local u = 1 - t
+	return a * (u * u) + b * (2 * u * t) + c * (t * t)
+end
+-- Where the rider is `t` seconds into the ride, and the thread's far end (ahead of it and above, downwind). Done at `seconds`: on the landing.
+function Ballooning.at(r: Ride, t: number, reduced: boolean?): (Vector3, Vector3)
+	local k = math.clamp(t / r.seconds, 0, 1)
+	local p: Vector3
+	if k < 0.12 then
+		local e = k / 0.12
+		p = r.from:Lerp(r.sash, e * e * (3 - 2 * e))
+	elseif k < 0.86 then
+		local e = (k - 0.12) / 0.74
+		p = bezier(r.sash, r.apex, r.over, e)
+		if not reduced then
+			local s = math.sin(e * math.pi) -- (the sway is nothing at either end)
+			p += Vector3.new(math.sin(t * 1.3 + r.phase) * r.sway * s, math.sin(t * 0.9 + r.phase) * r.sway * 0.4 * s, math.cos(t * 1.1 + r.phase) * r.sway * 0.6 * s)
+		end
+	else
+		local e = (k - 0.86) / 0.14
+		p = r.over:Lerp(r.to, e * e * (3 - 2 * e))
+	end
+	local ahead = (r.over - r.sash)
+	local dir = Vector3.new(ahead.X, 0, ahead.Z)
+	dir = if dir.Magnitude > 1e-3 then dir.Unit else -Vector3.zAxis
+	local thread = p + (dir * 0.6 + Vector3.yAxis).Unit * (if k < 0.95 then 30 else 30 * (1 - (k - 0.95) / 0.05))
+	return p, thread
+end
+
+return table.freeze(Ballooning)
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="47">
           <Properties>
             <string name="Name">Growth</string>
             <string name="Source"><![CDATA[--!strict
@@ -6748,7 +7011,7 @@ return Growth
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="47">
+        <Item class="ModuleScript" referent="48">
           <Properties>
             <string name="Name">LifeClock</string>
             <string name="Source"><![CDATA[--!strict
@@ -6947,7 +7210,7 @@ return LifeClock
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="48">
+        <Item class="ModuleScript" referent="49">
           <Properties>
             <string name="Name">LifeLoop</string>
             <string name="Source"><![CDATA[--!strict
@@ -7212,7 +7475,7 @@ return LifeLoop
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="49">
+        <Item class="ModuleScript" referent="50">
           <Properties>
             <string name="Name">LifeSession</string>
             <string name="Source"><![CDATA[--!strict
@@ -7261,7 +7524,7 @@ return Session
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="50">
+        <Item class="ModuleScript" referent="51">
           <Properties>
             <string name="Name">Mating</string>
             <string name="Source"><![CDATA[--!strict
@@ -7603,7 +7866,7 @@ return Mating
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="51">
+        <Item class="ModuleScript" referent="52">
           <Properties>
             <string name="Name">MatingScene</string>
             <string name="Source"><![CDATA[--!strict
@@ -7771,7 +8034,7 @@ return MatingScene
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="52">
+        <Item class="ModuleScript" referent="53">
           <Properties>
             <string name="Name">Nature</string>
             <string name="Source"><![CDATA[--!strict
@@ -7942,7 +8205,7 @@ return Nature
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="53">
+        <Item class="ModuleScript" referent="54">
           <Properties>
             <string name="Name">NeedsModel</string>
             <string name="Source"><![CDATA[--!strict
@@ -8318,7 +8581,7 @@ return NeedsModel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="54">
+        <Item class="ModuleScript" referent="55">
           <Properties>
             <string name="Name">Nursery</string>
             <string name="Source"><![CDATA[--!strict
@@ -8367,11 +8630,11 @@ return table.freeze(Nursery)
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="55">
+      <Item class="Folder" referent="56">
         <Properties>
           <string name="Name">Movement</string>
         </Properties>
-        <Item class="ModuleScript" referent="56">
+        <Item class="ModuleScript" referent="57">
           <Properties>
             <string name="Name">CameraMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -8669,7 +8932,7 @@ return CameraMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="57">
+        <Item class="ModuleScript" referent="58">
           <Properties>
             <string name="Name">FocusState</string>
             <string name="Source"><![CDATA[--!strict
@@ -8692,7 +8955,7 @@ return Focus
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="58">
+        <Item class="ModuleScript" referent="59">
           <Properties>
             <string name="Name">InputState</string>
             <string name="Source"><![CDATA[--!strict
@@ -8785,7 +9048,7 @@ return InputState
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="59">
+        <Item class="ModuleScript" referent="60">
           <Properties>
             <string name="Name">InspectView</string>
             <string name="Source"><![CDATA[--!strict
@@ -8938,7 +9201,7 @@ return InspectView
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="60">
+        <Item class="ModuleScript" referent="61">
           <Properties>
             <string name="Name">JumpInput</string>
             <string name="Source"><![CDATA[--!strict
@@ -9109,7 +9372,7 @@ return JumpInput
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="61">
+        <Item class="ModuleScript" referent="62">
           <Properties>
             <string name="Name">JumpMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -9267,7 +9530,7 @@ return JumpMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="62">
+        <Item class="ModuleScript" referent="63">
           <Properties>
             <string name="Name">LineFraming</string>
             <string name="Source"><![CDATA[--!strict
@@ -9368,7 +9631,7 @@ return LineFraming
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="63">
+        <Item class="ModuleScript" referent="64">
           <Properties>
             <string name="Name">LockOn</string>
             <string name="Source"><![CDATA[--!strict
@@ -9556,7 +9819,7 @@ return LockOn
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="64">
+        <Item class="ModuleScript" referent="65">
           <Properties>
             <string name="Name">SilkController</string>
             <string name="Source"><![CDATA[--!strict
@@ -9896,7 +10159,7 @@ return Silk
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="65">
+        <Item class="ModuleScript" referent="66">
           <Properties>
             <string name="Name">SpiderMotor</string>
             <string name="Source"><![CDATA[--!strict
@@ -10710,7 +10973,7 @@ return Motor
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="66">
+        <Item class="ModuleScript" referent="67">
           <Properties>
             <string name="Name">StickCarry</string>
             <string name="Source"><![CDATA[--!strict
@@ -10770,7 +11033,7 @@ return StickCarry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="67">
+        <Item class="ModuleScript" referent="68">
           <Properties>
             <string name="Name">SupportMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -10852,7 +11115,7 @@ return SupportMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="68">
+        <Item class="ModuleScript" referent="69">
           <Properties>
             <string name="Name">TetherMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -10920,7 +11183,7 @@ return T
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="69">
+        <Item class="ModuleScript" referent="70">
           <Properties>
             <string name="Name">TitleShots</string>
             <string name="Source"><![CDATA[--!strict
@@ -11093,11 +11356,11 @@ return TitleShots
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="70">
+      <Item class="Folder" referent="71">
         <Properties>
           <string name="Name">Perception</string>
         </Properties>
-        <Item class="ModuleScript" referent="71">
+        <Item class="ModuleScript" referent="72">
           <Properties>
             <string name="Name">Observation</string>
             <string name="Source"><![CDATA[--!strict
@@ -11254,7 +11517,7 @@ return Observation
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="72">
+        <Item class="ModuleScript" referent="73">
           <Properties>
             <string name="Name">ObservationMemory</string>
             <string name="Source"><![CDATA[--!strict
@@ -11708,7 +11971,7 @@ return ObservationMemory
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="73">
+        <Item class="ModuleScript" referent="74">
           <Properties>
             <string name="Name">PerceptionMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -11885,7 +12148,7 @@ return PerceptionMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="74">
+        <Item class="ModuleScript" referent="75">
           <Properties>
             <string name="Name">Sensor</string>
             <string name="Source"><![CDATA[--!strict
@@ -12305,7 +12568,7 @@ return Sensor
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="75">
+        <Item class="ModuleScript" referent="76">
           <Properties>
             <string name="Name">SensorCore</string>
             <string name="Source"><![CDATA[--!strict
@@ -12748,7 +13011,7 @@ return SensorCore
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="76">
+        <Item class="ModuleScript" referent="77">
           <Properties>
             <string name="Name">Signal</string>
             <string name="Source"><![CDATA[--!strict
@@ -12789,11 +13052,11 @@ return Signal
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="77">
+      <Item class="Folder" referent="78">
         <Properties>
           <string name="Name">Persistence</string>
         </Properties>
-        <Item class="ModuleScript" referent="78">
+        <Item class="ModuleScript" referent="79">
           <Properties>
             <string name="Name">Checkpoint</string>
             <string name="Source"><![CDATA[--!strict
@@ -12847,6 +13110,8 @@ return Signal
 -- ROBLOX-106: the life may hold `cold_day` (the morning a night out in the garden left cold, Life/Nature), the rival `camp` (its watch by the crack), the mate its
 -- courtship's record and the rival's level (`court_*`, `cut`) and the mating its counters (`courts`, `rejections`, `cut_ins`): all optional, absent in every record
 -- before, checked when present.
+-- ROBLOX-120: the life may hold `start_zone` and `start_region` (where a generation followed on the wind came down, Life/Ballooning): optional, absent in every record
+-- before and in a generation that stayed at the hut, checked when present. The robin (Predator/Bird) keeps nothing: its day is the seed's, as the crab spiders' is.
 
 local Species = require(script.Parent.Parent.Data.Species)
 local ObjectRecord = require(script.Parent.ObjectRecord)
@@ -12876,6 +13141,7 @@ local Snails = require(script.Parent.Parent.Prey.Snail)
 local Harvestmen = require(script.Parent.Parent.Prey.Harvestman)
 local Ants = require(script.Parent.Parent.Prey.Ant) -- (ROBLOX-119: the meadow's ants)
 local Garden = require(script.Parent.Parent.World.Garden)
+local Ballooning = require(script.Parent.Parent.Life.Ballooning) -- (ROBLOX-120: a generation's start)
 
 local RivalSpider = require(script.Parent.Parent.Predator.RivalSpider)
 local Mate = require(script.Parent.Parent.Predator.Mate)
@@ -13114,6 +13380,11 @@ local function checkWorld(roots: { [string]: any }, problems: { string })
  for _, text in Mating.problemsWith(life.mating, life.mate) do bad(text) end
  if not Nature.validCold(life.cold_day) then bad("life: invalid cold morning") end -- (ROBLOX-106: optional, set by a night out in the garden)
  if life.generation ~= nil and not (finite(life.generation) and life.generation >= 0 and life.generation <= 1e6 and life.generation % 1 == 0) then bad("life: invalid generation") end
+ -- ROBLOX-120: where this generation began (Life/Ballooning): absent in every record before, and in a generation that stayed at the hut; a zone that can be landed in,
+ -- and its landing region with it.
+ if life.start_zone ~= nil and (not Ballooning.valid(life.start_zone) or life.start_zone == Ballooning.HUT) then bad("life: invalid start zone") end
+ if life.start_region ~= nil and (life.start_zone == nil or not Ballooning.landsIn(life.start_zone, life.start_region)) then bad("life: invalid start region") end
+ if life.start_zone ~= nil and life.start_region == nil then bad("life: a start zone with no landing") end
  -- ROBLOX-91: where this generation's grace began (Mating.grace); absent in a record from before (the first generation's: the sill's own day and meals).
  for _, k in { "born", "mealsBase" } do
   local v = life[k]
@@ -13348,7 +13619,7 @@ return Checkpoint
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="79">
+        <Item class="ModuleScript" referent="80">
           <Properties>
             <string name="Name">CheckpointStore</string>
             <string name="Source"><![CDATA[--!strict
@@ -13561,7 +13832,7 @@ return CheckpointStore
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="80">
+        <Item class="ModuleScript" referent="81">
           <Properties>
             <string name="Name">Json</string>
             <string name="Source"><![CDATA[--!strict
@@ -13714,7 +13985,7 @@ return Json
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="81">
+        <Item class="ModuleScript" referent="82">
           <Properties>
             <string name="Name">MemoryBackend</string>
             <string name="Source"><![CDATA[--!strict
@@ -13821,7 +14092,7 @@ return MemoryBackend
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="82">
+        <Item class="ModuleScript" referent="83">
           <Properties>
             <string name="Name">ObjectRecord</string>
             <string name="Source"><![CDATA[--!strict
@@ -14156,7 +14427,7 @@ return ObjectRecord
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="83">
+        <Item class="ModuleScript" referent="84">
           <Properties>
             <string name="Name">SaveEnvelope</string>
             <string name="Source"><![CDATA[--!strict
@@ -14315,7 +14586,7 @@ return SaveEnvelope
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="84">
+        <Item class="ModuleScript" referent="85">
           <Properties>
             <string name="Name">SaveProgress</string>
             <string name="Source"><![CDATA[--!strict
@@ -14500,7 +14771,7 @@ return SaveProgress
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="85">
+        <Item class="ModuleScript" referent="86">
           <Properties>
             <string name="Name">SaveRest</string>
             <string name="Source"><![CDATA[--!strict
@@ -14605,7 +14876,7 @@ return SaveRest
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="86">
+        <Item class="ModuleScript" referent="87">
           <Properties>
             <string name="Name">SaveScheduler</string>
             <string name="Source"><![CDATA[--!strict
@@ -14731,7 +15002,7 @@ return SaveScheduler
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="87">
+        <Item class="ModuleScript" referent="88">
           <Properties>
             <string name="Name">SaveSession</string>
             <string name="Source"><![CDATA[--!strict
@@ -15279,7 +15550,7 @@ return SaveSession
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="88">
+        <Item class="ModuleScript" referent="89">
           <Properties>
             <string name="Name">SaveStores</string>
             <string name="Source"><![CDATA[--!strict
@@ -15333,11 +15604,392 @@ return SaveStores
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="89">
+      <Item class="Folder" referent="90">
         <Properties>
           <string name="Name">Predator</string>
         </Properties>
-        <Item class="ModuleScript" referent="90">
+        <Item class="ModuleScript" referent="91">
+          <Properties>
+            <string name="Name">Bird</string>
+            <string name="Source"><![CDATA[--!strict
+-- The robin of the open ground (ROBLOX-120, docs/PARK_WORLD_DESIGN.md sections 4 and 5: the bird is the danger of the hut garden, the meadow and the open ground
+-- between; section 10 names the American robin at the feeder). An American robin (Turdus migratorius), at true size: 25 cm from bill to tail (the sources give 20 to
+-- 28 cm), foraging on the ground as the sources describe it: it runs or hops a few steps, stops abruptly, stands still with its head cocked to one side looking at the
+-- ground, and takes what it sees (earthworms most of all, and insects, snails and spiders). Pure: no engine, no drawing (Client/BirdBody draws it), so the client,
+-- the self-test, the previewer and the CLI suites ask exactly the same bird.
+--
+-- Its day is a seeded schedule (`Bird.plan(seed, day)`: the world's seed through WorldMap.seed(914, "bird"), a Park-Miller stream per day): four to six visits between
+-- 06:00 and 19:30, each to one of SITES (the hut garden's lawn west and east of the path, the bench patch's gravel by the path's end, the meadow's mown edge), so where
+-- the robin is at an hour of a day is a pure function of the seed, the day and the hour, and a return to a rest finds it where the schedule says (restores never reroll;
+-- nothing of it is saved). A visit, in seconds at the outdoors' pace (HOUR_PER_S: the garden's clock, 0.33 of the hut's):
+--   approach ..... it flies in low over the ground from FLY_FROM studs off, gliding down onto the site's first point: its SHADOW sweeps over the ground ahead of it,
+--                  and it calls ("pick, tut-tut-tut") as it comes in. This is how it is told first: a shadow and a call.
+--   ground ....... it forages along the site's line, a stop (STOP seconds, its head cocked, now and then a peck at the ground) and a hop (HOP_LEN studs in HOP_S), over
+--                  and back, for FORAGE seconds.
+--   leave ........ it flies off up and away (its shadow again), calling.
+--
+-- What it does to a jumping spider (`step`): on the ground, a spider that MOVES in the open within NOTICE of its head catches its eye (`noticed`). It hops toward it
+-- (never more than STALK_MAX off its line), and in REACH it stops dead with its head cocked at the spider for TELL seconds: the honest tell, a pause anyone watching
+-- can see. If the spider is still moving in the open at the end of it, the robin strikes: in the standard rules a death with its own card (UI/BirdText, `struck`), in
+-- the gentle rules (Easy, Free play) the bill misses (`missed`). The way out is cover or stillness: a spider in a retreat or resting (`hidden`), under something
+-- (`Bird.covered`: a box over it within COVER_UP), low in the meadow's grass (`Bird.inGrass`), or keeping still for STILL_LOSE seconds, is lost (`lost`), and the
+-- robin goes back to its foraging for COOLDOWN seconds before anything catches its eye again. It never reacts while it flies, and a spider high up (more than HIGH over
+-- the ground it stands on) is not on its ground. Live state that is not saved: the reaction, how far it hopped off its line (eased back after).
+-- Studs (a stud is a centimetre), the sill's frame (World/Preserve: +x east, -z north; the garden's ground World/Hut.GROUND).
+local Bird = {}
+Bird.__index = Bird
+
+local GT = -84.6 -- the ground of the hut garden and the meadow (World/Hut.GROUND, World/Meadow.GROUND)
+local v = Vector3.new
+
+-- ---------------------------------------------------------------- the numbers (the game's, but the bird's size and its run-and-stop are the sources')
+Bird.LENGTH = 25 -- studs, bill to tail
+Bird.HEAD_Y = 13 -- its head over the ground, standing
+Bird.HOUR_PER_S = 12.0 / (15.0 * 60.0) * 0.33 -- game hours a second at the outdoors' pace (Life/LifeClock.ACTIVE_HOURS_PER_S x the garden's clockScale)
+Bird.APPROACH_S = 3.0 -- the flight in
+Bird.LEAVE_S = 2.5 -- and off
+Bird.FLY_FROM = 900 -- how far off (studs, in plan) the flight in starts
+Bird.FLY_UP = 320 -- and how high over the ground
+Bird.FORAGE = table.freeze({ 70.0, 150.0 }) -- seconds on the ground a visit
+Bird.STOP = table.freeze({ 1.2, 3.6 }) -- a stop, head cocked
+Bird.HOP_S = 0.3 -- a hop (a few quick steps: the "run")
+Bird.HOP_LEN = table.freeze({ 10.0, 26.0 })
+Bird.PECK = 0.35 -- a share of the stops end in a peck at the ground
+Bird.VISITS = table.freeze({ 4, 6 })
+Bird.DAY = table.freeze({ 6.0, 19.5 })
+Bird.NOTICE = 70 -- how near (studs, in plan, from its head) a moving spider catches its eye
+Bird.HIGH = 30 -- a spider more than this over the ground it stands on is not on its ground
+Bird.REACH = 16 -- in plan from its bill's base: the dash and the stab
+Bird.STALK_MAX = 90 -- how far it hops off its line toward what it saw
+Bird.STALK_SPEED = 45 -- studs a second, hopping toward it
+Bird.TELL = 0.85 -- the pause, head cocked at the spider, before the strike
+Bird.STRIKE_S = 0.2 -- the stab
+Bird.MOVING = 0.5 -- studs a second: slower than this, a spider is keeping still
+Bird.STILL_LOSE = 1.2 -- seconds still and it loses the spider
+Bird.COOLDOWN = 6.0 -- seconds after it lost one before anything catches its eye again
+Bird.COVER_UP = 60 -- a box over the spider within this is cover from a bird's eye
+Bird.GRASS_LOW = 25 -- in the meadow, lower than this over the ground is down in the grass
+Bird.SHADOW_NEAR = 80 -- a shadow passing within this (in plan) of the spider is told
+Bird.HEAR = 2500 -- studs: how far its call carries for the caption (25 m)
+Bird.CALL_S = 2.5 -- it calls this long as it lands and as it leaves
+
+-- The sites it forages, each a line on the ground it hops along (over and back): the hut garden's lawn either side of the path (clear of the trough, the stone and the
+-- feeder's pole), the bench patch's gravel by the path's end (clear of the slab and the grate) and the meadow's mown edge along the gravel. `from`: the way it flies in
+-- from (in plan), `zone` World/Preserve's.
+export type Site = { id: string, zone: string, line: { Vector3 }, from: Vector3 }
+local function site(id: string, zone: string, from: Vector3, pts: { { number } }): Site
+	local line = {}
+	for _, p in pts do table.insert(line, v(p[1], GT, p[2])) end
+	return table.freeze({ id = id, zone = zone, line = table.freeze(line), from = from.Unit })
+end
+Bird.SITES = table.freeze({
+	site("lawn_w", "hut_garden", v(-1, 0, -0.4), { { -185, -80 }, { -130, -115 }, { -70, -90 }, { -15, -125 } }),
+	site("lawn_e", "hut_garden", v(1, 0, -0.3), { { 20, -130 }, { 80, -125 }, { 130, -100 }, { 185, -112 } }),
+	site("gravel", "bench", v(0.4, 0, 1), { { -190, -850 }, { -100, -880 }, { -20, -845 }, { 70, -890 } }),
+	site("edge", "meadow", v(-1, 0, 0.5), { { -290, -1126 }, { -180, -1122 }, { -60, -1127 }, { 60, -1123 }, { 170, -1126 } }),
+}) :: { Site }
+Bird.GROUND = GT
+
+-- ---------------------------------------------------------------- the schedule
+local MOD = 2147483647
+local function rng(seed: number, salt: number): () -> number
+	local state = (seed + salt * 7919) % MOD
+	if state <= 0 then state += MOD - 1 end
+	return function(): number
+		state = (state * 16807) % MOD
+		return (state - 1) / (MOD - 1)
+	end
+end
+local function between(rand: () -> number, a: number, b: number): number
+	return a + (b - a) * rand()
+end
+
+-- A move on the ground: a stop from t0 (head cocked; a peck from `peck` if it pecks) and a hop from t1 to t2 from `a` to `b`.
+export type Move = { t0: number, t1: number, t2: number, a: Vector3, b: Vector3, heading: Vector3, peck: number? }
+-- A visit: its start (hours), its site, its seconds (approach, ground, leave) and its moves on the ground.
+export type Visit = { h0: number, h1: number, site: Site, forage: number, moves: { Move }, leaveFrom: Vector3, leaveTo: Vector3, cock: number }
+
+-- The point `d` studs along a line walked over and back (a ping-pong), and the way it faces there.
+local function along(line: { Vector3 }, d: number): (Vector3, Vector3)
+	local total = 0
+	for i = 2, #line do total += (line[i] - line[i - 1]).Magnitude end
+	local s = d % (2 * total)
+	local back = s > total
+	if back then s = 2 * total - s end
+	for i = 2, #line do
+		local a, b = line[i - 1], line[i]
+		local l = (b - a).Magnitude
+		if s <= l or i == #line then
+			local k = math.clamp(s / l, 0, 1)
+			local dir = (b - a).Unit
+			return a:Lerp(b, k), if back then -dir else dir
+		end
+		s -= l
+	end
+	return line[1], Vector3.xAxis
+end
+
+local planCache: { [string]: { Visit } } = {}
+-- The robin's day: its visits, in order (none overlap).
+function Bird.plan(seed: number, day: number): { Visit }
+	local key = tostring(seed) .. "/" .. tostring(day)
+	if planCache[key] then return planCache[key] end
+	local rand = rng(seed, 2000 + day)
+	local n = Bird.VISITS[1] + math.floor(rand() * (Bird.VISITS[2] - Bird.VISITS[1] + 1))
+	local span = (Bird.DAY[2] - Bird.DAY[1]) / n
+	local out: { Visit } = {}
+	for i = 1, n do
+		local s = Bird.SITES[1 + math.floor(rand() * #Bird.SITES) % #Bird.SITES]
+		local forage = between(rand, Bird.FORAGE[1], Bird.FORAGE[2])
+		local whole = (Bird.APPROACH_S + forage + Bird.LEAVE_S) * Bird.HOUR_PER_S
+		local h0 = Bird.DAY[1] + (i - 1) * span + rand() * math.max(0, span - whole)
+		-- the moves: from the line's first point, a stop and a hop, over and back
+		local moves: { Move } = {}
+		local t = 0.0
+		local d = 0.0
+		local here, heading = along(s.line, 0)
+		while t < forage do
+			local stop = between(rand, Bird.STOP[1], Bird.STOP[2])
+			local peck = if rand() < Bird.PECK then t + stop * between(rand, 0.4, 0.75) else nil
+			d += between(rand, Bird.HOP_LEN[1], Bird.HOP_LEN[2])
+			local nextAt, nextHeading = along(s.line, d)
+			local t1 = math.min(t + stop, forage)
+			local t2 = math.min(t1 + Bird.HOP_S, forage)
+			table.insert(moves, table.freeze({ t0 = t, t1 = t1, t2 = t2, a = here, b = if t2 > t1 then nextAt else here, heading = heading, peck = peck }))
+			here, heading = (if t2 > t1 then nextAt else here), nextHeading
+			t = t2
+		end
+		local up = Vector3.new(-s.from.X, 0, -s.from.Z)
+		table.insert(out, table.freeze({
+			h0 = h0, h1 = h0 + whole, site = s, forage = forage, moves = table.freeze(moves), leaveFrom = here,
+			leaveTo = here + up * Bird.FLY_FROM + Vector3.yAxis * Bird.FLY_UP, cock = if rand() < 0.5 then -1 else 1,
+		}))
+	end
+	planCache[key] = table.freeze(out)
+	return out
+end
+
+-- Where the schedule has it at `hour` of `day`: nil when it is not here; else its place (pos: its feet, or its body in flight), heading, pose ("fly", "land",
+-- "hop", "stand", "peck", "leave"), the shadow's place on the ground (nil while it stands: then the shadow is under it, drawn by the body), and whether it calls.
+export type Place = { pos: Vector3, heading: Vector3, pose: string, shadow: Vector3?, calling: boolean, visit: Visit, secs: number, flying: boolean }
+function Bird.at(seed: number, day: number, hour: number): Place?
+	for _, visit in Bird.plan(seed, day) do
+		if hour >= visit.h0 and hour < visit.h1 then
+			local secs = (hour - visit.h0) / Bird.HOUR_PER_S
+			local s = visit.site
+			if secs < Bird.APPROACH_S then
+				-- the glide in: from FLY_FROM off and FLY_UP up, down onto the line's first point, flattening out at the end
+				local k = secs / Bird.APPROACH_S
+				local land = s.line[1]
+				local start = land + s.from * Bird.FLY_FROM + Vector3.yAxis * Bird.FLY_UP
+				local e = 1 - (1 - k) * (1 - k)
+				local flat = land:Lerp(start, 1 - k)
+				local p = v(flat.X, land.Y + Bird.FLY_UP * (1 - e), flat.Z)
+				local h = -s.from
+				return { pos = p, heading = h, pose = if k > 0.85 then "land" else "fly", shadow = v(p.X, GT, p.Z), calling = true, visit = visit, secs = secs, flying = k <= 0.85 }
+			end
+			local g = secs - Bird.APPROACH_S
+			if g < visit.forage then
+				for _, m in visit.moves do
+					if g < m.t2 or m == visit.moves[#visit.moves] then
+						local calling = g < Bird.CALL_S
+						if g < m.t1 then
+							local pose = if m.peck ~= nil and g >= m.peck and g < m.peck + 0.4 then "peck" else "stand"
+							return { pos = m.a, heading = m.heading, pose = pose, shadow = nil, calling = calling, visit = visit, secs = secs, flying = false }
+						end
+						local k = math.clamp((g - m.t1) / math.max(m.t2 - m.t1, 1e-6), 0, 1)
+						local flat = m.b - m.a
+						local hd = if flat.Magnitude > 1e-3 then v(flat.X, 0, flat.Z).Unit else m.heading
+						return { pos = m.a:Lerp(m.b, k) + Vector3.yAxis * (math.sin(k * math.pi) * 3), heading = hd, pose = "hop", shadow = nil, calling = calling, visit = visit,
+							secs = secs, flying = false }
+					end
+				end
+			end
+			-- off: up and away along the way it came, the other way
+			local k = math.clamp((g - visit.forage) / Bird.LEAVE_S, 0, 1)
+			local e = k * k
+			local flat = visit.leaveFrom:Lerp(visit.leaveTo, e)
+			local p = v(flat.X, GT + (visit.leaveTo.Y - GT) * e, flat.Z)
+			local hd = v(visit.leaveTo.X - visit.leaveFrom.X, 0, visit.leaveTo.Z - visit.leaveFrom.Z).Unit
+			return { pos = p, heading = hd, pose = "leave", shadow = v(p.X, GT, p.Z), calling = k < 0.6, visit = visit, secs = secs, flying = k > 0.08 }
+		end
+	end
+	return nil
+end
+
+-- ---------------------------------------------------------------- cover (pure: the client hands in the region's boxes)
+-- Whether a box of `pieces` is over a spider at `p`: its footprint over the point and its underside above it, within COVER_UP.
+function Bird.covered(pieces: { any }, p: Vector3): boolean
+	for _, b in pieces do
+		local lo, hi = b.lo or b.min, b.hi or b.max
+		if lo.Y > p.Y + 0.3 and lo.Y < p.Y + Bird.COVER_UP and p.X > lo.X - 0.2 and p.X < hi.X + 0.2 and p.Z > lo.Z - 0.2 and p.Z < hi.Z + 0.2 then return true end
+	end
+	return false
+end
+-- Whether a spider at `p` in a region of `kind` is down in the meadow's grass.
+function Bird.inGrass(kind: string?, p: Vector3): boolean
+	return kind == "meadow" and p.Y - GT < Bird.GRASS_LOW
+end
+
+-- ---------------------------------------------------------------- the live robin
+export type Spider = { pos: Vector3, speed: number, hidden: boolean, covered: boolean }
+export type Signal = { kind: string, at: Vector3? }
+
+function Bird.new(seed: number): any
+	return setmetatable({
+		seed = seed, day = 1, hour = 0, here = false,
+		pos = Vector3.zero, heading = Vector3.xAxis, pose = "away", shadow = nil :: Vector3?, calling = false, flying = false, site = nil :: string?,
+		look = nil :: Vector3?, cock = 1, -- the point its cocked head looks at, and which side the head tips
+		react = "none", reactS = 0, stillS = 0, cooldown = 0, offset = Vector3.zero, strikeAt = nil :: Vector3?, strikeS = -1,
+		notices = 0, strikes = 0, misses = 0, losses = 0, shadows = 0, landings = 0, -- (this session's: the self-test reads them)
+		gentle = false, enabled = true, signals = {} :: { Signal }, shadowNear = false, wasHere = false,
+	}, Bird)
+end
+
+-- Its head (where it looks from) and its bill's base (where it strikes from).
+function Bird.head(self: any): Vector3
+	return self.pos + self.heading * 6 + Vector3.yAxis * Bird.HEAD_Y
+end
+function Bird.bill(self: any): Vector3
+	return v(self.pos.X, GT, self.pos.Z) + self.heading * 9
+end
+local function flat(a: Vector3, b: Vector3): number
+	return v(a.X - b.X, 0, a.Z - b.Z).Magnitude
+end
+local function emit(self: any, kind: string, at: Vector3?)
+	table.insert(self.signals, { kind = kind, at = at })
+end
+
+-- One step of `dt` seconds at the life clock's (day, hour), with the spider as it is now (nil while there is no life to touch). Signals: "landed" (it is on the
+-- ground: told by its call), "shadow" (its shadow passed near the spider), "noticed", "lost", "struck" (standard rules), "missed" (gentle rules).
+function Bird.step(self: any, dt: number, day: number, hour: number, spider: Spider?)
+	self.day, self.hour = day, hour
+	self.cooldown = math.max(0, self.cooldown - dt)
+	if self.strikeS >= 0 then self.strikeS += dt; if self.strikeS > Bird.STRIKE_S + 0.3 then self.strikeS = -1 end end
+	local place = Bird.at(self.seed, day, hour)
+	if place == nil then
+		self.here, self.pose, self.shadow, self.calling, self.flying, self.site = false, "away", nil, false, false, nil
+		self.react, self.look, self.offset, self.wasHere = "none", nil, Vector3.zero, false
+		return
+	end
+	self.here = true
+	self.site = place.visit.site.id
+	self.cock = place.visit.cock
+	if not self.wasHere then self.wasHere = true end
+	local onGround = not place.flying and place.pose ~= "fly" and place.pose ~= "leave" and place.pose ~= "land"
+	if onGround and self.pose ~= "stand" and self.pose ~= "hop" and self.pose ~= "peck" and self.pose ~= "watch" and self.pose ~= "strike" then
+		self.landings += 1
+		emit(self, "landed", place.pos)
+	end
+	-- the stalk's offset eases back when it is not reacting, and is gone once it flies
+	if not onGround then self.offset, self.react, self.look = Vector3.zero, "none", nil end
+	if self.react == "none" and self.offset.Magnitude > 0 then
+		local back = math.min(self.offset.Magnitude, Bird.STALK_SPEED * 0.5 * dt)
+		self.offset -= self.offset.Unit * back
+	end
+	self.pos = place.pos + self.offset
+	self.shadow, self.calling, self.flying = place.shadow, place.calling, place.flying
+	if self.react == "none" then self.heading, self.pose, self.look = place.heading, place.pose, nil end
+	-- the shadow passing over the spider (told once a pass)
+	if spider ~= nil and place.shadow ~= nil then
+		local near = flat(place.shadow, spider.pos) <= Bird.SHADOW_NEAR
+		if near and not self.shadowNear then self.shadows += 1; emit(self, "shadow", place.shadow) end
+		self.shadowNear = near
+	else
+		self.shadowNear = false
+	end
+	if not self.enabled or spider == nil or not onGround then return end
+	local moving = spider.speed >= Bird.MOVING
+	local open = not spider.hidden and not spider.covered and spider.pos.Y - GT <= Bird.HIGH
+	if self.react == "none" then
+		if self.cooldown <= 0 and moving and open and flat(Bird.head(self), spider.pos) <= Bird.NOTICE then
+			self.react, self.reactS, self.stillS = "stalk", 0, 0
+			self.notices += 1
+			emit(self, "noticed", spider.pos)
+		end
+		return
+	end
+	-- a reaction under way: it faces the spider
+	self.reactS += dt
+	self.look = spider.pos
+	local toward = v(spider.pos.X - self.pos.X, 0, spider.pos.Z - self.pos.Z)
+	if toward.Magnitude > 0.5 then self.heading = toward.Unit end
+	self.stillS = if moving then 0 else self.stillS + dt
+	local function lose()
+		self.react, self.cooldown, self.look = "none", Bird.COOLDOWN, nil
+		self.losses += 1
+		emit(self, "lost", spider.pos)
+	end
+	if not open or self.stillS >= Bird.STILL_LOSE or flat(Bird.head(self), spider.pos) > Bird.NOTICE * 1.4 then lose(); return end
+	if self.react == "stalk" then
+		if flat(Bird.bill(self), spider.pos) <= Bird.REACH then
+			self.react, self.reactS, self.pose = "tell", 0, "watch"
+			return
+		end
+		-- hop toward it, never far off its line
+		self.pose = "hop"
+		local step = toward.Unit * math.min(Bird.STALK_SPEED * dt, math.max(0, toward.Magnitude - Bird.REACH * 0.5))
+		local nextOffset = self.offset + step
+		if nextOffset.Magnitude <= Bird.STALK_MAX then self.offset = nextOffset; self.pos = place.pos + nextOffset else self.pose = "watch" end
+		return
+	end
+	if self.react == "tell" then
+		self.pose = "watch" -- (the head cocked at the spider, still: the tell)
+		if self.reactS >= Bird.TELL then
+			self.react, self.reactS, self.pose = "none", 0, "strike"
+			self.strikeS, self.strikeAt = 0, spider.pos
+			self.cooldown = Bird.COOLDOWN
+			if flat(Bird.bill(self), spider.pos) <= Bird.REACH * 1.25 and moving then
+				if self.gentle then
+					self.misses += 1
+					emit(self, "missed", spider.pos)
+				else
+					self.strikes += 1
+					emit(self, "struck", spider.pos)
+				end
+			else
+				self.losses += 1
+				emit(self, "lost", spider.pos)
+			end
+		end
+	end
+end
+
+-- Takes the signals since the last call.
+function Bird.drainSignals(self: any): { Signal }
+	local out = self.signals
+	self.signals = {}
+	return out
+end
+
+-- How loud its call is to a spider at `at` (0..1): while it calls, by distance.
+function Bird.call(self: any, at: Vector3): number
+	if not self.here or not self.calling then return 0 end
+	return math.clamp(1 - (self.pos - at).Magnitude / Bird.HEAR, 0, 1)
+end
+
+-- Whether it is in the middle of something with the spider.
+function Bird.reacting(self: any): boolean
+	return self.react ~= "none"
+end
+
+-- The first visit of a day to a site (for the self-test and the previewer: a place and an hour where it is on the ground there), or nil.
+function Bird.visitTo(seed: number, day: number, siteId: string): Visit?
+	for _, visit in Bird.plan(seed, day) do
+		if visit.site.id == siteId then return visit end
+	end
+	return nil
+end
+-- The hour `secs` seconds into a visit.
+function Bird.hourOf(visit: Visit, secs: number): number
+	return visit.h0 + secs * Bird.HOUR_PER_S
+end
+
+return Bird
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="92">
           <Properties>
             <string name="Name">Cat</string>
             <string name="Source"><![CDATA[--!strict
@@ -15849,7 +16501,7 @@ return Cat
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="91">
+        <Item class="ModuleScript" referent="93">
           <Properties>
             <string name="Name">CrabSpider</string>
             <string name="Source"><![CDATA[--!strict
@@ -16000,7 +16652,7 @@ return CrabSpider
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="92">
+        <Item class="ModuleScript" referent="94">
           <Properties>
             <string name="Name">Mate</string>
             <string name="Source"><![CDATA[--!strict
@@ -16376,7 +17028,7 @@ return Mate
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="93">
+        <Item class="ModuleScript" referent="95">
           <Properties>
             <string name="Name">MateDrive</string>
             <string name="Source"><![CDATA[--!strict
@@ -16461,7 +17113,7 @@ return MateDrive
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="94">
+        <Item class="ModuleScript" referent="96">
           <Properties>
             <string name="Name">RivalDrive</string>
             <string name="Source"><![CDATA[--!strict
@@ -16926,7 +17578,7 @@ return Drive
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="95">
+        <Item class="ModuleScript" referent="97">
           <Properties>
             <string name="Name">RivalGrip</string>
             <string name="Source"><![CDATA[--!strict
@@ -17009,7 +17661,7 @@ return Grip
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="96">
+        <Item class="ModuleScript" referent="98">
           <Properties>
             <string name="Name">RivalRoute</string>
             <string name="Source"><![CDATA[--!strict
@@ -17714,7 +18366,7 @@ return Route
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="97">
+        <Item class="ModuleScript" referent="99">
           <Properties>
             <string name="Name">RivalSpider</string>
             <string name="Source"><![CDATA[--!strict
@@ -17990,7 +18642,7 @@ return Rival
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="98">
+        <Item class="ModuleScript" referent="100">
           <Properties>
             <string name="Name">WaspDirector</string>
             <string name="Source"><![CDATA[--!strict
@@ -18883,11 +19535,11 @@ return WaspDirector
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="99">
+      <Item class="Folder" referent="101">
         <Properties>
           <string name="Name">Prey</string>
         </Properties>
-        <Item class="ModuleScript" referent="100">
+        <Item class="ModuleScript" referent="102">
           <Properties>
             <string name="Name">Ant</string>
             <string name="Source"><![CDATA[--!strict
@@ -19027,7 +19679,7 @@ return Ants
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="101">
+        <Item class="ModuleScript" referent="103">
           <Properties>
             <string name="Name">Feeding</string>
             <string name="Source"><![CDATA[--!strict
@@ -19106,7 +19758,7 @@ return F
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="102">
+        <Item class="ModuleScript" referent="104">
           <Properties>
             <string name="Name">Fly</string>
             <string name="Source"><![CDATA[--!strict
@@ -19118,6 +19770,7 @@ return F
 -- by PreyKinds.step instead of FlyFlight) and a `flightless` one never begins a flight; a `sidestep` profile goes round its stem when watched; a profile with
 -- `flight.wander_local` keeps its wander loops near the height it flew from (the sill's 0.8 to 10 band is the sill's, and the wall and the bed are far below it).
 -- ROBLOX-117: a `hover` profile (the hoverfly) holds still in the air on a calm flight now and then (PreyKinds.hover) instead of stepping its flight.
+-- ROBLOX-120: a `hear` profile (the field cricket) is hushed by a spider moving near (PreyKinds.hear: it holds still), and a `freeze` one alert freezes as a walker does.
 local M=require(script.Parent.PreyMath)
 local S=require(script.Parent.FlySenses)
 local F=require(script.Parent.FlyFlight)
@@ -19271,10 +19924,11 @@ function Fly.rest(self: any,now: number,dt: number)
  if self.profile.body.creep and K.creep(self,now,dt) then return end -- (ROBLOX-105: the aphid's walk over its plant to another perch)
  if self.state=='ALERT' then
   self.groomUntil=0;self.fidgetUntil=0;self.glanceTarget=nil
-  if self.profile.body.walker then return end -- (ROBLOX-96: a walker freezes)
+  if self.profile.body.walker or self.profile.body.freeze then return end -- (ROBLOX-96: a walker freezes; ROBLOX-120: so does a cricket)
   if self.senses.hasLastSeen then local d=self.senses.lastSeenPosition-self.position;local flat=d-self.normal*d:Dot(self.normal);if flat.Magnitude>.001 then self:turn(flat.Unit,dt) end end
   return
  end
+ if self.profile.body.hear and K.hushed(self,now) then self.walkLeft=0;self.glanceTarget=nil;return end -- (ROBLOX-120: hushed, the cricket holds still)
  if now<self.fidgetUntil then
   local t=math.clamp((now-self.fidgetStarted)/(self.fidgetUntil-self.fidgetStarted),0,1)
   self.position=self.fidgetFrom:Lerp(self.fidgetTo,t*t*(3-2*t));return
@@ -19327,6 +19981,7 @@ function Fly.step(self: any,dt: number,now: number,stimulus: Vector3,radius: num
  self.prevPosition=self.position
  if not self:alive() or not self.enabled then return end
  local p=self.profile
+ if p.body.hear then K.hear(self,now,dt,stimulus) end -- (ROBLOX-120: the cricket's ear)
  if self.senses:shouldCheck(now) then
   local vigilant=if self.state=='ALERT' then p.senses.vigilance_alert elseif now<self.groomUntil then p.senses.vigilance_grooming else p.senses.vigilance_relaxed
   self.senses:update(cast,self.position+self.normal*.1,if self:airborne() and self.velocity.Magnitude>.1 then self.velocity.Unit else self.heading,if self:airborne() then Vector3.yAxis else self.normal,stimulus,radius,now,vigilant,if self.state=='ALERT' then p.senses.decay_alert_per_s else p.senses.decay_relaxed_per_s)
@@ -19341,7 +19996,7 @@ return Fly
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="103">
+        <Item class="ModuleScript" referent="105">
           <Properties>
             <string name="Name">FlyFlight</string>
             <string name="Source"><![CDATA[--!strict
@@ -19406,7 +20061,7 @@ return F
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="104">
+        <Item class="ModuleScript" referent="106">
           <Properties>
             <string name="Name">FlySenses</string>
             <string name="Source"><![CDATA[--!strict
@@ -19468,7 +20123,7 @@ return S
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="105">
+        <Item class="ModuleScript" referent="107">
           <Properties>
             <string name="Name">Harvestman</string>
             <string name="Source"><![CDATA[--!strict
@@ -19615,7 +20270,7 @@ return Harvestmen
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="106">
+        <Item class="ModuleScript" referent="108">
           <Properties>
             <string name="Name">Ladybird</string>
             <string name="Source"><![CDATA[--!strict
@@ -19816,7 +20471,7 @@ return Ladybirds
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="107">
+        <Item class="ModuleScript" referent="109">
           <Properties>
             <string name="Name">Millipede</string>
             <string name="Source"><![CDATA[--!strict
@@ -20008,7 +20663,7 @@ return Millipedes
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="108">
+        <Item class="ModuleScript" referent="110">
           <Properties>
             <string name="Name">PerchGraph</string>
             <string name="Source"><![CDATA[--!strict
@@ -20061,7 +20716,7 @@ return G
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="109">
+        <Item class="ModuleScript" referent="111">
           <Properties>
             <string name="Name">PlantWalk</string>
             <string name="Source"><![CDATA[--!strict
@@ -20133,7 +20788,7 @@ return PlantWalk
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="110">
+        <Item class="ModuleScript" referent="112">
           <Properties>
             <string name="Name">PreyDirector</string>
             <string name="Source"><![CDATA[--!strict
@@ -20358,7 +21013,7 @@ return D
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="111">
+        <Item class="ModuleScript" referent="113">
           <Properties>
             <string name="Name">PreyKinds</string>
             <string name="Source"><![CDATA[--!strict
@@ -20375,6 +21030,11 @@ return D
 --                     restlessness each fly drew is kept, its clock of restlessness starts again at the change (so they do not all take off at once)
 --   the grip ........ the moth's slip (the first grip on it fails at `slip_chance`, once) and the crane fly's shed leg (once, at `shed_chance`, `shed_after`
 --                     seconds into the struggle): the prey leaves the jaws and escapes as a torn-free fly does
+--   the ear ......... (ROBLOX-120, the field cricket: body.hear) a spider moving faster than `still` studs a second within `range` studs hushes it: it falls silent and
+--                     holds still (no walk, no fidget) for `hold` seconds after the last it heard; a `freeze` profile alert freezes where it stands (as a walker
+--                     does) until it jumps; a `chirp` profile (the night's) sings while it is perched, calm and not hushed, the males only (odd serials)
+--   the kick ........ (ROBLOX-120, the field cricket: body.kick) in the jaws its hind legs kick: `first` seconds in and then every `every`, each takes `size` times its
+--                     strength off the grip (on top of the struggle's jerks), from its own stream; a grip that falls to nothing is a prey torn free
 --   the creep ....... (ROBLOX-105, the aphid: body.creep) now and then, perched and calm, it walks slowly over its plant's faces to another free perch of the
 --                     same plant (World/Garden.plantPath: down its stem or round its rosette and out along the other leaf), at `speed`, every `every`
 --                     seconds; startled on the way it freezes where it is; it never leaves its plant
@@ -20667,12 +21327,43 @@ function K.isDusk(hour: number, from: number, to: number): boolean
 	return hour >= from or hour < to
 end
 
--- The grip on a struggling prey, each tick before the jaws' own step: a moth's first grip may slip, a crane fly may leave a leg. Returns "slip" or "shed" when
--- the prey got away (it is out of the jaws and `escape` has taken it), else nil.
+-- (ROBLOX-120) The ear (a profile with body.hear), each tick before the fly's senses: the spider at `stimulus` moving within range hushes it.
+function K.hear(f: any, now: number, dt: number, stimulus: Vector3)
+	local h = f.profile.body.hear
+	local last = f.heardFrom
+	f.heardFrom = stimulus
+	if last == nil or dt <= 0 or not f:alive() then return end
+	if (stimulus - last).Magnitude / dt >= h.still and (stimulus - f.position).Magnitude <= h.range then
+		if now >= (f.hushUntil or 0) then f.hushes = (f.hushes or 0) + 1 end
+		f.hushUntil = now + h.hold
+	end
+	f.hushed = now < (f.hushUntil or 0) -- (what the drawing and the client's ears read, with no clock of the director's)
+end
+-- (ROBLOX-120) Whether it is hushed (it heard the spider lately): it holds still.
+function K.hushed(f: any, now: number): boolean
+	return f.profile.body.hear ~= nil and now < (f.hushUntil or 0)
+end
+-- (ROBLOX-120) Whether it is singing now: a chirping profile (the night's), a male (an odd serial), perched and calm, not hushed, alive.
+function K.chirping(f: any): boolean
+	return f.profile.body.chirp == true and f.serial % 2 == 1 and f.state == "PERCHED" and f.hop == nil and f.hushed ~= true and f:alive()
+end
+
+-- The grip on a struggling prey, each tick before the jaws' own step: a moth's first grip may slip, a crane fly may leave a leg, a cricket kicks (ROBLOX-120: its kicks
+-- take grip; the jaws' own step lets it go when the grip is gone). Returns "slip" or "shed" when the prey got away (it is out of the jaws and `escape` has taken it),
+-- else nil.
 function K.grip(feeding: any, escape: (any) -> ()): string?
 	local f = feeding.held
 	if f == nil or not feeding.struggling then return nil end
 	local b = f.profile.body
+	if b.kick ~= nil and feeding.elapsed > 0 then
+		if f.kickAt == nil then f.kickAt = f.rng:draw(b.kick.first) end
+		if feeding.elapsed >= f.kickAt then
+			local strength = 1 - (feeding.tire or 0.5) * math.clamp(feeding.elapsed / math.max(feeding.venom, 1e-3), 0, 1)
+			feeding.grip -= b.kick.size * strength
+			f.kicks = (f.kicks or 0) + 1
+			f.kickAt = feeding.elapsed + f.rng:draw(b.kick.every)
+		end
+	end
 	local what: string? = nil
 	if b.slip_chance ~= nil and not f.slipDrawn then
 		f.slipDrawn = true
@@ -20700,7 +21391,7 @@ return K
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="112">
+        <Item class="ModuleScript" referent="114">
           <Properties>
             <string name="Name">PreyMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -20790,7 +21481,7 @@ return M
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="113">
+        <Item class="ModuleScript" referent="115">
           <Properties>
             <string name="Name">PreyPopulation</string>
             <string name="Source"><![CDATA[--!strict
@@ -20822,7 +21513,7 @@ return P
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="114">
+        <Item class="ModuleScript" referent="116">
           <Properties>
             <string name="Name">PreyRandom</string>
             <string name="Source"><![CDATA[--!strict
@@ -20852,7 +21543,7 @@ return R
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="115">
+        <Item class="ModuleScript" referent="117">
           <Properties>
             <string name="Name">PreyWorld</string>
             <string name="Source"><![CDATA[--!strict
@@ -21247,7 +21938,7 @@ return PreyWorld
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="116">
+        <Item class="ModuleScript" referent="118">
           <Properties>
             <string name="Name">Snail</string>
             <string name="Source"><![CDATA[--!strict
@@ -21447,7 +22138,7 @@ return Snails
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="117">
+        <Item class="ModuleScript" referent="119">
           <Properties>
             <string name="Name">Woodlouse</string>
             <string name="Source"><![CDATA[--!strict
@@ -21644,11 +22335,11 @@ return Woodlice
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="118">
+      <Item class="Folder" referent="120">
         <Properties>
           <string name="Name">Rig</string>
         </Properties>
-        <Item class="ModuleScript" referent="119">
+        <Item class="ModuleScript" referent="121">
           <Properties>
             <string name="Name">Anatomy</string>
             <string name="Source"><![CDATA[--!strict
@@ -21838,7 +22529,7 @@ return Anatomy
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="120">
+        <Item class="ModuleScript" referent="122">
           <Properties>
             <string name="Name">AntMimicPose</string>
             <string name="Source"><![CDATA[--!strict
@@ -21958,7 +22649,7 @@ return AntMimicPose
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="121">
+        <Item class="ModuleScript" referent="123">
           <Properties>
             <string name="Name">CatPose</string>
             <string name="Source"><![CDATA[--!strict
@@ -22307,7 +22998,7 @@ return table.freeze(CatPose)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="122">
+        <Item class="ModuleScript" referent="124">
           <Properties>
             <string name="Name">Idle</string>
             <string name="Source"><![CDATA[--!strict
@@ -22390,7 +23081,7 @@ return Idle
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="123">
+        <Item class="ModuleScript" referent="125">
           <Properties>
             <string name="Name">Living</string>
             <string name="Source"><![CDATA[--!strict
@@ -22712,7 +23403,7 @@ return Living
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="124">
+        <Item class="ModuleScript" referent="126">
           <Properties>
             <string name="Name">PeacockDance</string>
             <string name="Source"><![CDATA[--!strict
@@ -22884,7 +23575,7 @@ return PeacockDance
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="125">
+        <Item class="ModuleScript" referent="127">
           <Properties>
             <string name="Name">Setae</string>
             <string name="Source"><![CDATA[--!strict
@@ -23278,7 +23969,7 @@ return Setae
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="126">
+        <Item class="ModuleScript" referent="128">
           <Properties>
             <string name="Name">SpiderChoice</string>
             <string name="Source"><![CDATA[--!strict
@@ -23393,7 +24084,7 @@ return SpiderChoice
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="127">
+        <Item class="ModuleScript" referent="129">
           <Properties>
             <string name="Name">SpiderRig</string>
             <string name="Source"><![CDATA[--!strict
@@ -24986,7 +25677,7 @@ return SpiderRig
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="128">
+        <Item class="ModuleScript" referent="130">
           <Properties>
             <string name="Name">TarantulaPose</string>
             <string name="Source"><![CDATA[--!strict
@@ -25161,11 +25852,11 @@ return TarantulaPose
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="129">
+      <Item class="Folder" referent="131">
         <Properties>
           <string name="Name">UI</string>
         </Properties>
-        <Item class="ModuleScript" referent="130">
+        <Item class="ModuleScript" referent="132">
           <Properties>
             <string name="Name">AntMimicText</string>
             <string name="Source"><![CDATA[--!strict
@@ -25206,7 +25897,36 @@ return AntMimicText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="131">
+        <Item class="ModuleScript" referent="133">
+          <Properties>
+            <string name="Name">BirdText</string>
+            <string name="Source"><![CDATA[--!strict
+-- The robin in words (ROBLOX-120; the robin is Predator/Bird): its death card, the notice when its bill misses (the gentle rules), and the captions of what tells of it
+-- first (the Captions setting, as the cat's bell is captioned): its call as it comes in and goes, and its shadow sweeping over the ground. Pure: tests/preserve.luau
+-- checks the words, tests/quiet.luau their classes.
+local BirdText = {}
+
+BirdText.LINE = "The robin's bill came down."
+BirdText.SUB = "It stood still with its head cocked, watching what moved in the open. Under cover, or keeping still, the spider would have lived."
+BirdText.MISSED = "The robin stabbed at you and missed."
+BirdText.CAUSE = "bird" -- (the end of a life's cause, LifeSession)
+BirdText.SHADOW = "[a shadow sweeps over the ground]"
+
+-- The caption of what is heard or seen of it now, or nil: its call (`call` 0..1, Predator/Bird.call; `direction` UI/WaspText.directionWord's) or its shadow passing
+-- (`shadow`: the seconds since one passed near, nil if none lately).
+function BirdText.caption(call: number, direction: string, shadow: number?): { text: string, alpha: number }?
+	if shadow ~= nil and shadow < 2.0 then return { text = BirdText.SHADOW, alpha = 1 } end
+	if call > 0.05 then
+		return { text = `[a robin calls, {direction}: pick, tut-tut-tut]`, alpha = math.clamp(0.4 + call, 0, 1) }
+	end
+	return nil
+end
+
+return table.freeze(BirdText)
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="134">
           <Properties>
             <string name="Name">CatText</string>
             <string name="Source"><![CDATA[--!strict
@@ -25236,7 +25956,7 @@ return table.freeze(CatText)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="132">
+        <Item class="ModuleScript" referent="135">
           <Properties>
             <string name="Name">ControlText</string>
             <string name="Source"><![CDATA[--!strict
@@ -25503,7 +26223,7 @@ return ControlText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="133">
+        <Item class="ModuleScript" referent="136">
           <Properties>
             <string name="Name">CrabText</string>
             <string name="Source"><![CDATA[--!strict
@@ -25520,7 +26240,7 @@ return table.freeze(CrabText)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="134">
+        <Item class="ModuleScript" referent="137">
           <Properties>
             <string name="Name">EyeOptics</string>
             <string name="Source"><![CDATA[--!strict
@@ -25854,7 +26574,7 @@ return EyeOptics
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="135">
+        <Item class="ModuleScript" referent="138">
           <Properties>
             <string name="Name">Heard</string>
             <string name="Source"><![CDATA[--!strict
@@ -25879,7 +26599,7 @@ return Heard
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="136">
+        <Item class="ModuleScript" referent="139">
           <Properties>
             <string name="Name">HudLayout</string>
             <string name="Source"><![CDATA[--!strict
@@ -26033,7 +26753,7 @@ return HudLayout
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="137">
+        <Item class="ModuleScript" referent="140">
           <Properties>
             <string name="Name">InspectText</string>
             <string name="Source"><![CDATA[--!strict
@@ -26086,7 +26806,7 @@ return InspectText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="138">
+        <Item class="ModuleScript" referent="141">
           <Properties>
             <string name="Name">LifeText</string>
             <string name="Source"><![CDATA[--!strict
@@ -26337,7 +27057,7 @@ return LifeText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="139">
+        <Item class="ModuleScript" referent="142">
           <Properties>
             <string name="Name">MateText</string>
             <string name="Source"><![CDATA[--!strict
@@ -26494,14 +27214,29 @@ function MateText.sceneCaption(seconds: number): { text: string, alpha: number }
 end
 
 -- The ending card: the title, the line about the generation and the body (the brood, the day). `brood` is the number of spiderlings that hatched.
-function MateText.card(brood: number, day: number, generation: number): (string, string, string)
+-- ROBLOX-120: in the preserve (`wind`) the body offers the two ways on: follow one on the wind, or stay at the hut as one of them.
+function MateText.card(brood: number, day: number, generation: number, wind: boolean?): (string, string, string)
 	local sub = `{brood} spiderlings hatched on day {day}, climbed into the light and floated away on silk, one by one.`
-	local body = `You were generation {generation + 1}. You carry on as one of them, small again, in the same crack on the same sill.`
+	local body = if wind == true then `You were generation {generation + 1}. Follow one of them on the wind to wherever it comes down, or stay at the hut as one of them, small again in the same crack.`
+		else `You were generation {generation + 1}. You carry on as one of them, small again, in the same crack on the same sill.`
 	return MateText.TITLE, sub, body
 end
+-- (ROBLOX-120) The card's two ways on in the preserve (Life/Ballooning), the ride's caption and the words where it lands.
+MateText.FOLLOW = "Follow one"
+MateText.STAY = "Stay at the hut"
+MateText.RIDE_CAPTION = "[the wind takes the thread]"
+function MateText.landed(place: string): string
+	return `The thread came down in {place}. A new life begins here, in the wild.`
+end
+-- The notebook's dated line for "Eggs, silk and wind" when one was followed.
+function MateText.rideEntry(day: number, place: string): string
+	return `Day {day}: One spiderling went up on its thread, and the wind set it down in {place}.`
+end
 
--- The toast of the new generation. `generation` is the number carryOn returns (1 for the first carry on); the first spider is generation 1.
-function MateText.generationToast(generation: number, day: number): string
+-- The toast of the new generation. `generation` is the number carryOn returns (1 for the first carry on); the first spider is generation 1. ROBLOX-120: `place`, where
+-- it landed when it was followed on the wind (nil: it stayed at the hut).
+function MateText.generationToast(generation: number, day: number, place: string?): string
+	if place ~= nil then return `Generation {generation + 1} — hatched on day {day}, landed in {place}` end
 	return `Generation {generation + 1} — hatched on day {day}`
 end
 
@@ -26514,7 +27249,7 @@ return MateText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="140">
+        <Item class="ModuleScript" referent="143">
           <Properties>
             <string name="Name">NotebookText</string>
             <string name="Source"><![CDATA[--!strict
@@ -26665,7 +27400,7 @@ return NotebookText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="141">
+        <Item class="ModuleScript" referent="144">
           <Properties>
             <string name="Name">PeacockText</string>
             <string name="Source"><![CDATA[--!strict
@@ -26768,7 +27503,7 @@ return PeacockText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="142">
+        <Item class="ModuleScript" referent="145">
           <Properties>
             <string name="Name">PerceptionShapes</string>
             <string name="Source"><![CDATA[--!strict
@@ -26875,7 +27610,7 @@ return Shapes
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="143">
+        <Item class="ModuleScript" referent="146">
           <Properties>
             <string name="Name">PerceptionText</string>
             <string name="Source"><![CDATA[--!strict
@@ -26891,7 +27626,7 @@ return table.freeze(Text)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="144">
+        <Item class="ModuleScript" referent="147">
           <Properties>
             <string name="Name">PerceptionView</string>
             <string name="Source"><![CDATA[--!strict
@@ -26940,7 +27675,7 @@ return View
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="145">
+        <Item class="ModuleScript" referent="148">
           <Properties>
             <string name="Name">PreyText</string>
             <string name="Source"><![CDATA[--!strict
@@ -26965,6 +27700,13 @@ PreyText.REFUSED = {
 	woodlouse = "The woodlouse's glands give off a secretion spiders avoid. You let it go.",
 } :: { [string]: string }
 
+-- (ROBLOX-120) The field cricket's song, captioned (the Captions setting) when the nearest singing cricket (Prey/PreyKinds.chirping) is within CHIRP_HEAR studs of the
+-- spider; `direction` UI/WaspText.directionWord's. How loud it is to the spider: 1 at the cricket, nothing at CHIRP_HEAR.
+PreyText.CHIRP_HEAR = 400
+function PreyText.chirp(direction: string, loud: number): { text: string, alpha: number }
+	return { text = `[a cricket chirping, {direction}]`, alpha = math.clamp(0.35 + loud, 0, 1) }
+end
+
 -- How long a note stays (seconds).
 PreyText.SECONDS = 4
 
@@ -26979,7 +27721,7 @@ return PreyText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="146">
+        <Item class="ModuleScript" referent="149">
           <Properties>
             <string name="Name">QuietHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -27175,7 +27917,7 @@ return QuietHud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="147">
+        <Item class="ModuleScript" referent="150">
           <Properties>
             <string name="Name">RivalText</string>
             <string name="Source"><![CDATA[--!strict
@@ -27226,7 +27968,7 @@ return RivalText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="148">
+        <Item class="ModuleScript" referent="151">
           <Properties>
             <string name="Name">SaveText</string>
             <string name="Source"><![CDATA[--!strict
@@ -27298,7 +28040,7 @@ return SaveText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="149">
+        <Item class="ModuleScript" referent="152">
           <Properties>
             <string name="Name">SettingsModel</string>
             <string name="Source"><![CDATA[--!strict
@@ -27571,7 +28313,7 @@ return SettingsModel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="150">
+        <Item class="ModuleScript" referent="153">
           <Properties>
             <string name="Name">SettingsNav</string>
             <string name="Source"><![CDATA[--!strict
@@ -27682,7 +28424,7 @@ return SettingsNav
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="151">
+        <Item class="ModuleScript" referent="154">
           <Properties>
             <string name="Name">SettingsText</string>
             <string name="Source"><![CDATA[--!strict
@@ -27807,7 +28549,7 @@ return SettingsText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="152">
+        <Item class="ModuleScript" referent="155">
           <Properties>
             <string name="Name">TarantulaText</string>
             <string name="Source"><![CDATA[--!strict
@@ -27849,7 +28591,7 @@ return TarantulaText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="153">
+        <Item class="ModuleScript" referent="156">
           <Properties>
             <string name="Name">TitleText</string>
             <string name="Source"><![CDATA[--!strict
@@ -27927,7 +28669,7 @@ return TitleText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="154">
+        <Item class="ModuleScript" referent="157">
           <Properties>
             <string name="Name">WaspText</string>
             <string name="Source"><![CDATA[--!strict
@@ -28062,11 +28804,11 @@ return WaspText
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="155">
+      <Item class="Folder" referent="158">
         <Properties>
           <string name="Name">World</string>
         </Properties>
-        <Item class="ModuleScript" referent="156">
+        <Item class="ModuleScript" referent="159">
           <Properties>
             <string name="Name">Garden</string>
             <string name="Source"><![CDATA[--!strict
@@ -30785,7 +31527,7 @@ return table.freeze(Garden)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="157">
+        <Item class="ModuleScript" referent="160">
           <Properties>
             <string name="Name">Hut</string>
             <string name="Source"><![CDATA[--!strict
@@ -33127,6 +33869,8 @@ Hut.LIFE = table.freeze({
 	hoverflies = { garden_c4 = { full = 1, low = 1 }, garden_d4 = { full = 1, low = 1 }, garden_c3 = { full = 1, low = 1 } },
 	fruitflies = { hut_floor_i = { full = 4, low = 2 }, room_floor_g = { full = 2, low = 1 } },
 	moths = { hut_desk = { full = 1, low = 1 }, room_window = { full = 1, low = 1 } },
+	-- (ROBLOX-120) a field cricket in the pollinator bed's mulch, singing from dusk
+	crickets = { garden_d3 = { full = 1, low = 1, perches = 6 } },
 })
 -- (ROBLOX-117) The compost caddy by the door, on the floor east of the doorway against the south wall: a kitchen caddy of green plastic, its lid down, a banana peel over
 -- its rim; the fruit flies' home in the hut.
@@ -33260,7 +34004,8 @@ local bestiaryCache: { [string]: any } = {}
 function Hut.bestiary(region: Region): { any }?
 	local spring, hopper = Hut.LIFE.springtails[region.id], Hut.LIFE.leafhoppers[region.id]
 	local hover, fruit, moth = Hut.LIFE.hoverflies[region.id], Hut.LIFE.fruitflies[region.id], Hut.LIFE.moths[region.id]
-	if spring == nil and hopper == nil and hover == nil and fruit == nil and moth == nil then return nil end
+	local cricket = Hut.LIFE.crickets[region.id]
+	if spring == nil and hopper == nil and hover == nil and fruit == nil and moth == nil and cricket == nil then return nil end
 	local key = region.id .. "/" .. tostring(region.seed)
 	if bestiaryCache[key] ~= nil then return bestiaryCache[key] end
 	local out = {}
@@ -33284,6 +34029,24 @@ function Hut.bestiary(region: Region): { any }?
 		for i, c in centres do if i <= 2 then table.insert(vents, { id = `{region.id}_vent_springtail_{i}`, position = c, normal = Vector3.yAxis, appear = true, reach = 6 }) end end
 		table.insert(out, { kind = "springtail", profile = "springtail_prototype", perches = perches, vents = vents, target = spring.full, low = spring.low,
 			seed = (region.seed + salt * 104729) % MOD, prefix = `{region.id}_springtail_fly_` })
+	end
+	if cricket ~= nil then
+		-- (ROBLOX-120) the field cricket: spots on the mulch a jump apart (8 to 24 studs), clear of the plants' stems and the stones; it comes up out of the mulch
+		local salt = 79
+		local rand = rng(region.seed, salt)
+		local area = bedArea(region) :: { number }
+		local standing = standingOn(region, S)
+		for _, t in region.retreats do table.insert(standing, { min = t.min - v(1, 0, 1), max = t.max + v(1, 0, 1) }) end
+		local perches: { Perch } = {}
+		local taken: { Vector3 } = {}
+		for i = 1, cricket.perches do
+			local spot = freeSpot(rand, area, S, standing, taken, 1.5, 9)
+			if spot then table.insert(perches, { id = `{region.id}_cricket_{i}`, position = spot, normal = Vector3.yAxis, shelter = 0.6, food = 0.3, start = #perches < cricket.full, kind = "soil", hop = true }) end
+		end
+		local vents: { Vent } = {}
+		if #perches > 1 then table.insert(vents, { id = `{region.id}_vent_cricket`, position = perches[#perches].position, normal = Vector3.yAxis, appear = true, reach = 10 }) end
+		table.insert(out, { kind = "cricket", profile = "cricket_prototype", perches = perches, vents = vents, target = cricket.full, low = cricket.low,
+			seed = (region.seed + salt * 104729) % MOD, prefix = `{region.id}_cricket_fly_`, dusk = { from = 19.0, to = 6.5 } })
 	end
 	if hopper ~= nil then
 		local salt = 73
@@ -33525,7 +34288,7 @@ return Hut
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="158">
+        <Item class="ModuleScript" referent="161">
           <Properties>
             <string name="Name">LookPlan</string>
             <string name="Source"><![CDATA[--!strict
@@ -33794,7 +34557,7 @@ return table.freeze(LookPlan)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="159">
+        <Item class="ModuleScript" referent="162">
           <Properties>
             <string name="Name">Meadow</string>
             <string name="Source"><![CDATA[--!strict
@@ -34827,6 +35590,8 @@ Meadow.LIFE = table.freeze({
 	houseflies = { meadow_c1 = { full = 1, low = 1 }, meadow_e5 = { full = 1, low = 1 }, meadow_a1 = { full = 1, low = 1 }, bin = { full = 2, low = 1 } },
 	moths = { meadow_d1 = { full = 1, low = 1 }, meadow_e2 = { full = 1, low = 1 }, lamp_4 = { full = 2, low = 1 } },
 	ants = { meadow_b4 = { full = 6, low = 3, salt = 151 } },
+	-- (ROBLOX-120) field crickets in the thatch, singing from dusk
+	crickets = { meadow_b2 = { full = 1, low = 1, perches = 6 }, meadow_d3 = { full = 1, low = 1, perches = 6 }, meadow_c5 = { full = 1, low = 1, perches = 6 } },
 })
 
 export type Perch = Hut.Perch
@@ -34849,7 +35614,8 @@ local bestiaryCache: { [string]: any } = {}
 function Meadow.bestiary(region: Region): { any }?
 	local L = Meadow.LIFE
 	local hopper, hover, house, moth = L.leafhoppers[region.id], L.hoverflies[region.id], L.houseflies[region.id], L.moths[region.id]
-	if hopper == nil and hover == nil and house == nil and moth == nil then return nil end
+	local cricket = L.crickets[region.id]
+	if hopper == nil and hover == nil and house == nil and moth == nil and cricket == nil then return nil end
 	local key = region.id .. "/" .. tostring(region.seed)
 	if bestiaryCache[key] ~= nil then return bestiaryCache[key] end
 	local out = {}
@@ -34966,6 +35732,31 @@ function Meadow.bestiary(region: Region): { any }?
 				seed = (region.seed + salt * 104729) % MOD, prefix = `{region.id}_moth_fly_`, dusk = { from = 18.0, to = 6.0 } })
 		end
 	end
+	if cricket ~= nil then
+		-- (ROBLOX-120) the field cricket: spots on the meadow's floor in the thatch between the clumps, a jump apart, clear of the culms, the stems and the leaf
+		local salt = 157
+		local rand = rng(region.seed, salt)
+		local boxes = standing(region)
+		for _, t in region.retreats do table.insert(boxes, { min = t.min - v(1, 0, 1), max = t.max + v(1, 0, 1) }) end
+		local lo, hi = region.bounds[1], region.bounds[2]
+		local perches: { Perch } = {}
+		for i = 1, cricket.perches do
+			for _ = 1, 60 do
+				local x, z = between(rand, lo.X + 6, hi.X - 6), between(rand, lo.Z + 6, hi.Z - 6)
+				local ok = clear(boxes, x, z, 2.0)
+				if ok then for _, q in perches do if (v(x, 0, z) - v(q.position.X, 0, q.position.Z)).Magnitude < 9 then ok = false; break end end end
+				if ok then
+					table.insert(perches, { id = `{region.id}_cricket_{i}`, position = v(x, GT, z), normal = Vector3.yAxis, shelter = 0.7, food = 0.3, start = #perches < cricket.full,
+						kind = "soil", hop = true } :: any)
+					break
+				end
+			end
+		end
+		local vents = {}
+		if #perches > 1 then table.insert(vents, { id = `{region.id}_vent_cricket`, position = perches[#perches].position, normal = Vector3.yAxis, appear = true, reach = 10 }) end
+		table.insert(out, { kind = "cricket", profile = "cricket_prototype", perches = perches, vents = vents, target = cricket.full, low = cricket.low,
+			seed = (region.seed + salt * 104729) % MOD, prefix = `{region.id}_cricket_fly_`, dusk = { from = 19.0, to = 6.5 } })
+	end
 	-- (the band each kind's flights climb in: from under its lowest perch to 11 cm over its highest, PerchGraph.plan; the sill's 0 to 11 would send them down to it)
 	for _, k in out do
 		local lo, hi = math.huge, -math.huge
@@ -35041,7 +35832,7 @@ return Meadow
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="160">
+        <Item class="ModuleScript" referent="163">
           <Properties>
             <string name="Name">Preserve</string>
             <string name="Source"><![CDATA[--!strict
@@ -35197,7 +35988,7 @@ return table.freeze(Preserve)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="161">
+        <Item class="ModuleScript" referent="164">
           <Properties>
             <string name="Name">PreserveLook</string>
             <string name="Source"><![CDATA[--!strict
@@ -36148,7 +36939,7 @@ return table.freeze(PreserveLook)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="162">
+        <Item class="ModuleScript" referent="165">
           <Properties>
             <string name="Name">PreserveTrain</string>
             <string name="Source"><![CDATA[--!strict
@@ -36252,7 +37043,7 @@ return table.freeze(PreserveTrain)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="163">
+        <Item class="ModuleScript" referent="166">
           <Properties>
             <string name="Name">Region</string>
             <string name="Source"><![CDATA[--!strict
@@ -36377,7 +37168,7 @@ return table.freeze(Region)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="164">
+        <Item class="ModuleScript" referent="167">
           <Properties>
             <string name="Name">WorldBuild</string>
             <string name="Source"><![CDATA[--!strict
@@ -36465,7 +37256,7 @@ return table.freeze(WorldBuild)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="165">
+        <Item class="ModuleScript" referent="168">
           <Properties>
             <string name="Name">WorldMap</string>
             <string name="Source"><![CDATA[--!strict
@@ -36993,7 +37784,7 @@ return table.freeze(WorldMap)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="166">
+        <Item class="ModuleScript" referent="169">
           <Properties>
             <string name="Name">Worlds</string>
             <string name="Source"><![CDATA[--!strict
@@ -37053,15 +37844,15 @@ return table.freeze(Worlds)
       </Item>
     </Item>
   </Item>
-  <Item class="ServerScriptService" referent="167">
+  <Item class="ServerScriptService" referent="170">
     <Properties>
       <string name="Name">ServerScriptService</string>
     </Properties>
-    <Item class="Folder" referent="168">
+    <Item class="Folder" referent="171">
       <Properties>
         <string name="Name">Server</string>
       </Properties>
-      <Item class="ModuleScript" referent="169">
+      <Item class="ModuleScript" referent="172">
         <Properties>
           <string name="Name">DataStoreBackend</string>
           <string name="Source"><![CDATA[--!strict
@@ -37096,7 +37887,7 @@ return DataStoreBackend
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Script" referent="170">
+      <Item class="Script" referent="173">
         <Properties>
           <string name="Name">Main</string>
           <token name="RunContext">0</token>
@@ -37175,7 +37966,7 @@ WorldFocus.listen(ReplicatedStorage, foci)
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Script" referent="171">
+      <Item class="Script" referent="174">
         <Properties>
           <string name="Name">Persistence</string>
           <token name="RunContext">0</token>
@@ -37269,7 +38060,7 @@ end)
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="172">
+      <Item class="ModuleScript" referent="175">
         <Properties>
           <string name="Name">SaveService</string>
           <string name="Source"><![CDATA[--!strict
@@ -37476,7 +38267,7 @@ return SaveService
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="173">
+      <Item class="ModuleScript" referent="176">
         <Properties>
           <string name="Name">WorldFocus</string>
           <string name="Source"><![CDATA[--!strict
@@ -37600,19 +38391,217 @@ return table.freeze(WorldFocus)
       </Item>
     </Item>
   </Item>
-  <Item class="StarterPlayer" referent="174">
+  <Item class="StarterPlayer" referent="177">
     <Properties>
       <string name="Name">StarterPlayer</string>
     </Properties>
-    <Item class="StarterPlayerScripts" referent="175">
+    <Item class="StarterPlayerScripts" referent="178">
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="Folder" referent="176">
+      <Item class="Folder" referent="179">
         <Properties>
           <string name="Name">Client</string>
         </Properties>
-        <Item class="ModuleScript" referent="177">
+        <Item class="ModuleScript" referent="180">
+          <Properties>
+            <string name="Name">BirdBody</string>
+            <string name="Source"><![CDATA[--!strict
+-- The robin in the world (ROBLOX-120): Predator/Bird's American robin drawn at its true size, 25 cm from bill to tail (Bird.LENGTH), from `parts` (pure: the previewer
+-- draws it too): a grey-brown back and folded wings, the rusty red-orange breast, a blackish head with the white eye ring broken in front and behind, a yellow bill, a
+-- white throat streaked dark, white under the tail, the dark tail and thin legs. Its poses: standing (its head cocked to one side, as a robin looks at the ground), a
+-- hop, a peck at the ground, the watch (head cocked at the spider, still: the honest tell), the strike (bill driven down and forward), and in the air its wings out.
+-- Its shadow is a dark soft oval on the ground under it, broad and faint high up, small and dark when it stands. Every part anchored, never collides, never seen by a
+-- ray, the body casts no engine shadow of its own (the drawn one is the shadow, so the two never double). One Workspace:BulkMoveTo a frame. Display only.
+-- The open ground's voices are here too (SOUNDS, "" until Nathan uploads tools/make_meadow_sounds.py's robin_call.wav and cricket_chirp.wav): the robin's call while it
+-- calls, as loud as Predator/Bird.call says, and the nearest singing field cricket's chirps (Prey/PreyKinds.chirping), as loud as the client hears it.
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
+local Shapes = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Habitat"):WaitForChild("Shapes"))
+
+local BirdBody = {}
+BirdBody.__index = BirdBody
+
+BirdBody.SOUNDS = { call = "", chirp = "" } :: { [string]: string }
+BirdBody.COLORS = {
+	back = "514940", wing = "443d35", breast = "c0562a", belly = "d0753d", head = "26231f", eye = "0d0c0b", ring = "eeeae0", bill = "e0b020", billTip = "6a5420",
+	throat = "e8e4da", streak = "2a2622", vent = "efece4", tail = "2d2925", leg = "6b5444", shadow = "141210",
+}
+
+export type Spec = { name: string, size: Vector3, frame: CFrame, color: string, ball: boolean, full: boolean?, transparency: number? }
+
+-- The parts in its own frame (its feet's middle on the ground at the origin, ahead -z). `pose`: "stand", "hop", "peck", "watch", "strike", "fly", "land", "leave";
+-- `t` seconds for the wingbeat; `cock` -1 or 1, the side the head tips; `strike` 0..1 through the stab.
+function BirdBody.parts(pose: string, t: number, cock: number, strike: number): { Spec }
+	local C = BirdBody.COLORS
+	local out: { Spec } = {}
+	local function ell(name: string, frame: CFrame, size: Vector3, color: string, full: boolean?)
+		table.insert(out, { name = name, size = size, frame = frame, color = color, ball = true, full = full })
+	end
+	local function rod(name: string, a: Vector3, b: Vector3, d: number, color: string, full: boolean?)
+		local len = (b - a).Magnitude
+		table.insert(out, { name = name, size = Vector3.new(d, d, len), frame = CFrame.lookAt((a + b) / 2, b), color = color, ball = false, full = full })
+	end
+	local flying = pose == "fly" or pose == "land" or pose == "leave"
+	-- the body: level in flight, its tail tipped down a little standing
+	local lift = if flying then 0 else 6.2
+	local pitch = if flying then 0 elseif pose == "peck" or pose == "strike" then math.rad(-22) else math.rad(-8)
+	local body = CFrame.new(0, lift + 3.2, 0.5) * CFrame.Angles(pitch, 0, 0)
+	ell("Body", body, Vector3.new(7.6, 7.4, 13.5), C.back)
+	ell("Breast", body * CFrame.new(0, -0.7, -2.9), Vector3.new(7.3, 6.9, 9.2), C.breast)
+	ell("Belly", body * CFrame.new(0, -2.4, 1.2), Vector3.new(5.6, 3.6, 6.4), C.belly, true)
+	ell("Vent", body * CFrame.new(0, -1.8, 4.6), Vector3.new(3.6, 2.6, 3.4), C.vent, true)
+	-- the head: on the neck at the body's front; cocked (rolled to a side, looking down at the ground with one eye), down for a peck, forward and down in the stab
+	local neck = body * CFrame.new(0, 2.6, -5.6)
+	local headTurn = CFrame.new()
+	if pose == "stand" or pose == "watch" then headTurn = CFrame.Angles(math.rad(-10), 0, math.rad(32) * cock)
+	elseif pose == "peck" then headTurn = CFrame.Angles(math.rad(-60), 0, 0) * CFrame.new(0, -1.5, -1.0)
+	elseif pose == "strike" then headTurn = CFrame.new(0, -2.5 * strike, -3.0 * strike) * CFrame.Angles(math.rad(-55) * strike, 0, 0) end
+	local head = neck * headTurn * CFrame.new(0, 1.4, -0.8)
+	ell("Head", head, Vector3.new(4.2, 4.1, 4.7), C.head)
+	-- the white throat under the bill, streaked dark
+	ell("Throat", head * CFrame.new(0, -1.75, -1.5), Vector3.new(1.7, 1.0, 1.5), C.throat, true)
+	ell("Streak", head * CFrame.new(0, -1.85, -1.75), Vector3.new(0.35, 0.9, 1.2), C.streak, true)
+	for _, s in { -1, 1 } do
+		local side = if s < 0 then "L" else "R"
+		ell("Eye" .. side, head * CFrame.new(1.85 * s, 0.5, -0.9), Vector3.new(0.6, 1.0, 1.0), C.eye)
+		-- the white eye ring, broken in front and behind: an arc over the eye and one under it
+		ell("RingTop" .. side, head * CFrame.new(1.8 * s, 1.1, -0.9), Vector3.new(0.4, 0.3, 0.9), C.ring, true)
+		ell("RingLow" .. side, head * CFrame.new(1.8 * s, -0.1, -0.9), Vector3.new(0.4, 0.3, 0.9), C.ring, true)
+	end
+	-- the bill: yellow, a little dusky at the tip, tapering (two ellipsoids)
+	ell("Bill", head * CFrame.new(0, -0.1, -2.7) * CFrame.Angles(math.rad(-8), 0, 0), Vector3.new(1.0, 0.85, 2.2), C.bill)
+	ell("BillTip", head * CFrame.new(0, -0.3, -3.9) * CFrame.Angles(math.rad(-8), 0, 0), Vector3.new(0.55, 0.45, 1.4), C.billTip, true)
+	-- the tail: long, dark, from the back of the body
+	local tailBase = body * CFrame.new(0, 0.8, 6.0)
+	local tailDown = if flying then 0 else math.rad(-12)
+	ell("Tail", tailBase * CFrame.Angles(tailDown, 0, 0) * CFrame.new(0, 0, 4.2), Vector3.new(4.2, 0.9, 9.4), C.tail)
+	-- the wings: folded along its sides standing, out and beating in the air
+	for _, s in { -1, 1 } do
+		local side = if s < 0 then "L" else "R"
+		if flying then
+			local beat = if pose == "land" then math.rad(40) else math.sin(t * 2 * math.pi * 6) * math.rad(35)
+			local root = body * CFrame.new(3.0 * s, 2.0, -1.0)
+			ell("Wing" .. side, root * CFrame.Angles(0, 0, beat * s) * CFrame.new(8.0 * s, 0, 1.0), Vector3.new(16, 0.7, 7.5), C.wing)
+		else
+			ell("Wing" .. side, body * CFrame.new(3.0 * s, 1.2, 2.0) * CFrame.Angles(math.rad(-6), math.rad(4) * s, 0), Vector3.new(1.2, 4.6, 11.0), C.wing)
+		end
+	end
+	-- the legs: thin, from under the body to the ground, tucked in the air
+	for _, s in { -1, 1 } do
+		local side = if s < 0 then "L" else "R"
+		local hip = (body * CFrame.new(1.3 * s, -3.2, 0.6)).Position
+		local foot = if flying then hip + Vector3.new(0, -1.5, 2.5) elseif pose == "hop" then Vector3.new(1.3 * s, 1.0, 0.4) else Vector3.new(1.4 * s, 0.25, -0.4)
+		rod("Leg" .. side, hip, foot, 0.45, C.leg)
+		if not flying then rod("Toe" .. side, foot, foot + Vector3.new(0, -0.2, -2.0), 0.3, C.leg, true) end
+	end
+	return out
+end
+
+function BirdBody.new(parent: Instance, detail: string): any
+	local folder = Instance.new("Folder")
+	folder.Name = "Robin"
+	folder.Parent = parent
+	local shadow = Shapes.ellipsoid(folder, "Shadow", Vector3.new(14, 0.05, 20), CFrame.new(), Color3.fromHex(BirdBody.COLORS.shadow), "SmoothPlastic")
+	shadow.Transparency = 1
+	shadow.CastShadow = false
+	-- (in the air the shadow is a bird's: the wings' oval across and the body and tail's along, a cross that sweeps over the ground)
+	local shadowBody = Shapes.ellipsoid(folder, "ShadowBody", Vector3.new(8, 0.05, 26), CFrame.new(), Color3.fromHex(BirdBody.COLORS.shadow), "SmoothPlastic")
+	shadowBody.Transparency = 1
+	shadowBody.CastShadow = false
+	local self = setmetatable({ folder = folder, detail = detail, model = nil :: Instance?, parts = {} :: { [string]: BasePart }, shadow = shadow, shadowBody = shadowBody, t = 0,
+		voices = {} :: { [string]: Sound }, shown = false }, BirdBody)
+	for name, id in BirdBody.SOUNDS do
+		if id ~= "" then
+			local s = Instance.new("Sound")
+			s.Name = name
+			s.SoundId = id
+			s.Looped = true
+			s.Volume = 0
+			s.Parent = folder
+			self.voices[name] = s
+		end
+	end
+	return self
+end
+
+-- Builds the model's parts once (by name: the poses move the same parts).
+local function build(self: any)
+	local model = Instance.new("Folder")
+	model.Name = "Body"
+	for _, pose in { "stand", "fly" } do
+		for _, spec in BirdBody.parts(pose, 0, 1, 0) do
+			if self.parts[spec.name] == nil and not (spec.full and self.detail == "low") then
+				local material = if string.sub(spec.name, 1, 3) == "Eye" or string.sub(spec.name, 1, 4) == "Bill" then "SmoothPlastic" else "Fabric" -- (feathers are matte)
+				local p = if spec.ball then Shapes.ellipsoid(model, spec.name, spec.size, CFrame.new(), Color3.fromHex(spec.color), material)
+					else Shapes.block(model, spec.name, spec.size, CFrame.new(), Color3.fromHex(spec.color), material)
+				p.CastShadow = false
+				self.parts[spec.name] = p
+			end
+		end
+	end
+	model.Parent = self.folder
+	self.model = model
+end
+
+-- Draws the robin (`bird`, Predator/Bird's) where it is, in its pose, with its shadow; hides it when it is away. `dt` the frame's seconds; `call` how loud its call is,
+-- `chirp` how loud the nearest cricket's song (0..1 each).
+function BirdBody.draw(self: any, bird: any, dt: number, call: number, chirp: number?)
+	self.t += dt
+	for name, s in self.voices do
+		local loud = if name == "chirp" then chirp or 0 else call
+		s.Volume = loud * 0.6
+		if loud > 0 and not s.IsPlaying then s:Play() elseif loud <= 0 and s.IsPlaying then s:Stop() end
+	end
+	if bird == nil or not bird.here then
+		if self.shown then
+			for _, p in self.parts do p.Transparency = 1 end
+			self.shadow.Transparency = 1
+			self.shadowBody.Transparency = 1
+			self.shown = false
+		end
+		return
+	end
+	if self.model == nil then build(self) end
+	local strike = if bird.strikeS ~= nil and bird.strikeS >= 0 then math.clamp(bird.strikeS / 0.1, 0, 1) * (1 - math.clamp((bird.strikeS - 0.2) / 0.3, 0, 1)) else 0
+	local pose = if strike > 0 then "strike" else bird.pose
+	local frame = CFrame.lookAt(bird.pos, bird.pos + bird.heading)
+	local moved: { BasePart } = {}
+	local frames: { CFrame } = {}
+	local seen: { [string]: boolean } = {}
+	for _, spec in BirdBody.parts(pose, self.t, bird.cock or 1, strike) do
+		local p = self.parts[spec.name]
+		if p ~= nil then
+			seen[spec.name] = true
+			if p.Size ~= spec.size then p.Size = spec.size end
+			table.insert(moved, p)
+			table.insert(frames, frame * spec.frame)
+		end
+	end
+	for name, p in self.parts do p.Transparency = if seen[name] then 0 else 1 end
+	-- the shadow: under it on the ground, broad and faint the higher it flies
+	local ground = bird.shadow or Vector3.new(bird.pos.X, bird.pos.Y, bird.pos.Z)
+	local high = math.max(0, bird.pos.Y - ground.Y)
+	local spread = 1 + high / 220
+	local flying = bird.flying == true or bird.pose == "land" or bird.pose == "leave"
+	self.shadow.Size = if flying then Vector3.new(34 * spread, 0.05, 9 * spread) else Vector3.new(9, 0.05, 18)
+	self.shadow.Transparency = math.clamp(0.45 + high / 700, 0.45, 0.85)
+	self.shadowBody.Size = Vector3.new(7 * spread, 0.05, 24 * spread)
+	self.shadowBody.Transparency = if flying then self.shadow.Transparency else 1
+	local onGround = CFrame.lookAt(ground + Vector3.new(0, 0.12, 0), ground + Vector3.new(0, 0.12, 0) + bird.heading)
+	table.insert(moved, self.shadow)
+	table.insert(frames, onGround * CFrame.new(0, 0, -2 * spread))
+	table.insert(moved, self.shadowBody)
+	table.insert(frames, onGround * CFrame.new(0, 0.01, 0))
+	Workspace:BulkMoveTo(moved, frames, Enum.BulkMoveMode.FireCFrameChanged)
+	self.shown = true
+end
+
+return BirdBody
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="181">
           <Properties>
             <string name="Name">BugBodies</string>
             <string name="Source"><![CDATA[--!strict
@@ -38324,7 +39313,7 @@ return BugBodies
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="178">
+        <Item class="ModuleScript" referent="182">
           <Properties>
             <string name="Name">CatBody</string>
             <string name="Source"><![CDATA[--!strict
@@ -38441,7 +39430,7 @@ return CatBody
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="179">
+        <Item class="ModuleScript" referent="183">
           <Properties>
             <string name="Name">CaughtPanel</string>
             <string name="Source"><![CDATA[--!strict
@@ -38628,7 +39617,7 @@ return CaughtPanel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="180">
+        <Item class="ModuleScript" referent="184">
           <Properties>
             <string name="Name">CrabBody</string>
             <string name="Source"><![CDATA[--!strict
@@ -38751,7 +39740,7 @@ return CrabBody
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="181">
+        <Item class="ModuleScript" referent="185">
           <Properties>
             <string name="Name">FlyBodies</string>
             <string name="Source"><![CDATA[--!strict
@@ -39301,7 +40290,7 @@ return FlyBodies
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="182">
+        <Item class="ModuleScript" referent="186">
           <Properties>
             <string name="Name">FrameProfile</string>
             <string name="Source"><![CDATA[--!strict
@@ -39442,7 +40431,7 @@ return FrameProfile
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="183">
+        <Item class="ModuleScript" referent="187">
           <Properties>
             <string name="Name">HutLife</string>
             <string name="Source"><![CDATA[--!strict
@@ -39697,7 +40686,7 @@ return HutLife
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="184">
+        <Item class="ModuleScript" referent="188">
           <Properties>
             <string name="Name">LookStream</string>
             <string name="Source"><![CDATA[--!strict
@@ -39979,7 +40968,7 @@ return LookStream
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="185">
+        <Item class="ModuleScript" referent="189">
           <Properties>
             <string name="Name">MateStage</string>
             <string name="Source"><![CDATA[--!strict
@@ -40145,7 +41134,7 @@ function MateStage.new(parent: Instance, world: Instance, detail: string): any
 		folder = folder, world = world, detail = detail, parent = parent,
 		rig = nil :: any, rigFor = "", scaleFor = 0, sac = nil :: Part?, sacThreads = {} :: { Part },
 		plan = {} :: { Spiderling }, bodies = {} :: { { body: Part, head: Part, thread: Part } },
-		t = 0.0, running = false, finished = false,
+		t = 0.0, running = false, finished = false, rider = nil :: any,
 	}, MateStage)
 end
 
@@ -40278,8 +41267,40 @@ function MateStage.clearScene(self: any)
 	self.running, self.finished, self.t = false, false, 0.0
 end
 
+-- ---- the ride (ROBLOX-120: "Follow one", Life/Ballooning)
+
+-- Draws the followed spiderling at `at` on its thread to `thread` (made when first asked), or takes it away (`at` nil). The rider is drawn bigger than the brood's
+-- (RIDER: the camera rides with it, close): a body, a head and the thread, the same colours.
+MateStage.RIDER = 0.3
+function MateStage.drawRider(self: any, at: Vector3?, thread: Vector3?)
+	if at == nil then
+		if self.rider ~= nil then
+			for _, part in self.rider do part:Destroy() end
+			self.rider = nil
+		end
+		return
+	end
+	if self.rider == nil then
+		self.rider = {
+			body = ball("Rider", MateStage.RIDER, Color3.fromRGB(74, 58, 46), self.folder),
+			head = ball("RiderHead", MateStage.RIDER * MateStage.HEAD, Color3.fromRGB(98, 80, 62), self.folder),
+			thread = strand("RiderThread", Vector3.zero, Vector3.zAxis * 0.1, self.folder, 0.03),
+		}
+	end
+	local r = self.rider
+	local top = thread or (at + Vector3.yAxis)
+	local fwd = Vector3.new(top.X - at.X, 0, top.Z - at.Z)
+	fwd = if fwd.Magnitude > 1e-3 then fwd.Unit else -Vector3.zAxis
+	r.body.Position = at + fwd * (MateStage.RIDER * MateStage.BODY_AT)
+	r.head.Position = at + fwd * (MateStage.RIDER * MateStage.HEAD_AT)
+	local a = at + Vector3.yAxis * (MateStage.RIDER * 0.5)
+	r.thread.Size = Vector3.new(0.03, 0.03, math.max((top - a).Magnitude, 0.01))
+	r.thread.CFrame = CFrame.lookAt((a + top) * 0.5, top)
+end
+
 -- Everything away: a new life, a restored rest.
 function MateStage.reset(self: any)
+	self:drawRider(nil)
 	self:clearScene()
 	self:drawSac(false)
 	if self.rig ~= nil then
@@ -40299,7 +41320,7 @@ return MateStage
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="186">
+        <Item class="ModuleScript" referent="190">
           <Properties>
             <string name="Name">NotebookArt</string>
             <string name="Source"><![CDATA[--!strict
@@ -40337,7 +41358,7 @@ return Art
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="187">
+        <Item class="ModuleScript" referent="191">
           <Properties>
             <string name="Name">NotebookPanel</string>
             <string name="Source"><![CDATA[--!strict
@@ -40840,7 +41861,7 @@ return NotebookPanel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="188">
+        <Item class="ModuleScript" referent="192">
           <Properties>
             <string name="Name">OldSkins</string>
             <string name="Source"><![CDATA[--!strict
@@ -40885,7 +41906,7 @@ return OldSkins
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="189">
+        <Item class="ModuleScript" referent="193">
           <Properties>
             <string name="Name">PerceptionHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -41125,7 +42146,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="190">
+        <Item class="ModuleScript" referent="194">
           <Properties>
             <string name="Name">PerceptionStage</string>
             <string name="Source"><![CDATA[--!strict
@@ -41170,7 +42191,7 @@ return Stage
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="191">
+        <Item class="ModuleScript" referent="195">
           <Properties>
             <string name="Name">SaveClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -41295,7 +42316,7 @@ return SaveClient
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="192">
+        <Item class="ModuleScript" referent="196">
           <Properties>
             <string name="Name">SelfTest</string>
             <string name="Source"><![CDATA[--!strict
@@ -41333,6 +42354,9 @@ return SaveClient
 -- ROBLOX-119: in the preserve also the bench patch (up the path's end onto its gravel, across it and into the meadow; its three homes; the lamppost lit at night), the
 -- meadow's edge (a spider on a coneflower's cone; its leafhoppers and its ants made and drawn) and the crab spiders (held off the rest of the run: placed and drawn, a
 -- close look from its flower's stem noticed; on the sim, a spider on its flower grabbed in the standard rules and knocked clear in the gentle ones).
+-- ROBLOX-120: and the robin (held off the rest of the run: its shadow over a spider under its way in, its landing and its drawing; on the sim, a spider moving in the
+-- open taken in the standard rules and missed in the gentle ones), the field crickets (in the meadow's thatch at night, drawn, singing once the spider keeps still) and
+-- ballooning's landings (a spider stands on each landing of each built zone, and the wind's draw lands only there).
 -- Each Studio process writes its own log (%LOCALAPPDATA%\Roblox\logs); tools/studio/selftest.ps1 reads the newest for these lines.
 -- The CLI suite tests/selftest.luau runs the same checks against the real client on the shim's box world, with a host of its own (simulated frames and clock), so the run is
 -- proven to complete and print END before it ever reaches Studio. First run in Studio at v36 (33 of 34; the line failed, ROBLOX-111); ROBLOX-111's additions not yet.
@@ -41348,6 +42372,9 @@ local LookPlan = require(Shared:WaitForChild("World"):WaitForChild("LookPlan"))
 local RivalSpider = require(Shared:WaitForChild("Predator"):WaitForChild("RivalSpider"))
 local Mate = require(Shared:WaitForChild("Predator"):WaitForChild("Mate"))
 local Meadow = require(Shared:WaitForChild("World"):WaitForChild("Meadow")) -- (ROBLOX-119: the bench patch and the meadow's edge)
+local PreyKinds = require(Shared:WaitForChild("Prey"):WaitForChild("PreyKinds")) -- (ROBLOX-120: the crickets' song)
+local Garden = require(Shared:WaitForChild("World"):WaitForChild("Garden")) -- (ROBLOX-120: the crickets' places)
+local Ballooning = require(Shared:WaitForChild("Life"):WaitForChild("Ballooning")) -- (ROBLOX-120: where a followed spiderling lands)
 local BugBodies = require(script.Parent.BugBodies)
 
 local SelfTest = {}
@@ -41609,6 +42636,7 @@ local function checks(): { Check }
 		pause(r, 0.5)
 		if ctx.cat ~= nil then ctx.cat.enabled = false end -- (ROBLOX-118: the cat is held off the run but for its own check)
 		if ctx.crab ~= nil then ctx.crab.enabled = false end -- (ROBLOX-119: and the crab spiders)
+		if ctx.bird ~= nil then ctx.bird.enabled = false end -- (ROBLOX-120: and the robin)
 		need(session.started and not menu:isShowing(), "the life did not begin")
 		need(ctx.motor.mode == "attached", `the spider is not standing ({ctx.motor.mode})`)
 	end)
@@ -42521,6 +43549,109 @@ local function checks(): { Check }
 			say(r, `INFO the crab spiders: a {c.form} one on {c.region} and a {crab.crabs[2].form} one on {crab.crabs[2].region}, {#folder:GetChildren()} drawn; the close look opened its page`)
 		end)
 
+		-- ROBLOX-120: the robin (held off the rest of the run: its shadow over a spider on its way in, its landing and its drawing; on the sim, a spider moving in the open
+		-- taken in the standard rules and missed in the gentle ones), the field crickets (in the meadow's thatch at night, drawn, singing once the spider keeps still) and
+		-- ballooning's landings (a spider stands on each landing of each built zone; the wind's draw lands only there).
+		add("the robin", function(r)
+			local ctx = r.ctx
+			local bird, Bird, life = ctx.bird, ctx.Bird, ctx.life
+			need(bird ~= nil and Bird ~= nil, "no robin in the preserve")
+			local day, hour = life.clock.day, life.clock.hour
+			local visit = Bird.plan(bird.seed, day)[1]
+			local land = visit.site.line[1]
+			local under = land + visit.site.from * 120
+			local region = WorldMap.at(under + Vector3.new(0, 1, 0))
+			need(region ~= nil, `no region under the robin's way in at {fmt(under)}`)
+			local at = Vector3.new(under.X, Bird.GROUND + HEIGHT, under.Z)
+			local shadows, landings = bird.shadows, bird.landings
+			local ok, err = pcall(function()
+				need(holdUntilReady(r, (region :: any).id, at, nil), `{(region :: any).id} is not whole`)
+				put(r, at, nil)
+				pause(r, 0.2)
+				life.clock.hour = visit.h0 - Bird.HOUR_PER_S * 0.5
+				need(waitUntil(r, 8, function() return bird.shadows > shadows end, 0), `its shadow did not pass over the spider on its way in to {visit.site.id} (it is {bird.pose})`)
+				need(waitUntil(r, 8, function() return bird.landings > landings end, 0), `it did not land on {visit.site.id} ({bird.pose})`)
+				local folder = Workspace:FindFirstChild("Robin")
+				local body = if folder ~= nil then folder:FindFirstChild("Body") else nil
+				local shown = 0
+				if body ~= nil then for _, p in body:GetChildren() do if p:IsA("BasePart") and p.Transparency < 1 then shown += 1 end end end
+				need(shown >= 15, `the robin is not drawn on the ground ({shown} parts shown)`)
+				need(not life.lifeOver, "the robin took the spider while it was held off")
+			end)
+			life.clock.day, life.clock.hour = day, hour
+			if not ok then error(err, 0) end
+			-- on the sim: a spider moving in the open in front of it, in each rules
+			local h = Bird.hourOf(visit, Bird.APPROACH_S + 4)
+			for _, gentle in { false, true } do
+				local trial = Bird.new(bird.seed)
+				trial.gentle = gentle
+				trial:step(1 / 60, day, h, nil)
+				local spot = trial.pos + Vector3.new(trial.heading.X, 0, trial.heading.Z).Unit * 30 + Vector3.new(0, HEIGHT, 0)
+				local kind = nil
+				local hh = h
+				for i = 1, 60 * 6 do
+					hh += Bird.HOUR_PER_S / 60
+					spot += Vector3.new(math.sin(i * 0.2) * 0.05, 0, math.cos(i * 0.2) * 0.05)
+					trial:step(1 / 60, day, hh, { pos = spot, speed = 3, hidden = false, covered = false })
+					for _, sg in trial:drainSignals() do if sg.kind == "struck" or sg.kind == "missed" then kind = sg.kind end end
+					if kind then break end
+				end
+				need(kind == (if gentle then "missed" else "struck"), `in the {if gentle then "gentle" else "standard"} rules a spider moving in the open was {tostring(kind)}`)
+			end
+			say(r, `INFO the robin: in on {visit.site.id} at {string.format("%.2f", visit.h0)} h, its shadow over the spider, landed and drawn ({bird.pose}); on the sim struck in Normal, missed in the gentle rules`)
+		end)
+
+		add("the field crickets", function(r)
+			local ctx = r.ctx
+			local world, motor, life = ctx.world, ctx.motor, ctx.life
+			local b2 = WorldMap.region("meadow_b2") :: any
+			local spec = nil
+			for _, k in (Garden.bestiary(b2) or {}) :: { any } do if k.kind == "cricket" then spec = k end end
+			need(spec ~= nil and #spec.perches > 0, "no cricket in meadow_b2")
+			local first = spec.perches[1].position
+			local at = Vector3.new(first.X + 12, Meadow.GROUND + HEIGHT, first.Z)
+			if WorldMap.at(at + Vector3.new(0, 1, 0)) ~= b2 then at = b2.spawn.pos + Vector3.new(0, HEIGHT, 0) end
+			local hour = life.clock.hour
+			local ok, err = pcall(function()
+				need(holdUntilReady(r, "meadow_b2", at, nil), "meadow_b2 is not whole")
+				life.clock.hour = 22
+				put(r, at, nil)
+				pause(r, 1.0)
+				local entry = world.garden.meadow_b2
+				need(entry ~= nil and entry.kinds ~= nil and entry.kinds.cricket ~= nil and #entry.kinds.cricket.flies > 0, "no cricket made in meadow_b2")
+				drawn(r, entry.kinds.cricket.flies, "a cricket")
+				local f = entry.kinds.cricket.flies[1]
+				need(waitUntil(r, 9, function() return PreyKinds.chirping(f) end, 0), `the cricket did not sing at night once the spider kept still ({f.state}, hushed {tostring(f.hushed)}, {f.profile.id})`)
+				need(motor.mode == "attached", "the spider did not stay put")
+			end)
+			life.clock.hour = hour
+			if not ok then error(err, 0) end
+			say(r, "INFO the field crickets: one in meadow_b2's thatch, drawn, singing at 22:00 once the spider kept still")
+		end)
+
+		add("ballooning's landings", function(r)
+			local ctx = r.ctx
+			local world, motor = ctx.world, ctx.motor
+			local stood: { string } = {}
+			for _, z in Ballooning.ZONES do
+				for _, id in z.landings do
+					local region = WorldMap.region(id) :: any
+					need(region ~= nil, `{id} is not a region`)
+					local at = region.spawn.pos + Vector3.new(0, HEIGHT, 0)
+					need(holdUntilReady(r, id, at, nil), `{id} is not whole`)
+					put(r, at, nil, region.spawn.heading)
+					pause(r, 0.4)
+					need(world.region.id == id and motor.mode == "attached" and (motor.pos - at).Magnitude < 0.5, `a spiderling landing in {id} does not stand there ({world.region.id}, {motor.mode}, {fmt(motor.pos)})`)
+					table.insert(stood, id)
+				end
+			end
+			for gen = 0, 3 do
+				local z, id = Ballooning.land(914, gen, ctx.life.clock.day)
+				need(Ballooning.valid(z) and Ballooning.landsIn(z, id), `the wind's draw for family {gen} landed in {z} / {id}`)
+			end
+			say(r, `INFO ballooning's landings: stood on {#stood} ({table.concat(stood, ", ")})`)
+		end)
+
 		add("the nursery: the window put back", function(r)
 			local hut = r.ctx.world.hut
 			need(hut ~= nil, "no hut on this client")
@@ -42651,7 +43782,7 @@ return SelfTest
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="193">
+        <Item class="ModuleScript" referent="197">
           <Properties>
             <string name="Name">SettingsPanel</string>
             <string name="Source"><![CDATA[--!strict
@@ -43352,7 +44483,7 @@ return SettingsPanel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="194">
+        <Item class="ModuleScript" referent="198">
           <Properties>
             <string name="Name">Soundscape</string>
             <string name="Source"><![CDATA[--!strict
@@ -43541,7 +44672,7 @@ return Soundscape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="195">
+        <Item class="ModuleScript" referent="199">
           <Properties>
             <string name="Name">SpiderCamera</string>
             <string name="Source"><![CDATA[--!strict
@@ -44271,7 +45402,7 @@ return SpiderCamera
 ]]></string>
           </Properties>
         </Item>
-        <Item class="LocalScript" referent="196">
+        <Item class="LocalScript" referent="200">
           <Properties>
             <string name="Name">SpiderClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -44410,6 +45541,15 @@ local M = {
 	CrabBody = require(script.Parent.CrabBody),
 	CrabText = require(Shared.UI.CrabText),
 	crab = (nil :: any), crabBody = (nil :: any),
+	-- ROBLOX-120: the robin of the open ground (Predator/Bird, drawn by Client/BirdBody, its words UI/BirdText), made in the preserve only; `birdSeen` the seconds since its
+	-- shadow last passed near the spider (the caption), nil when none has lately.
+	Bird = require(Shared.Predator.Bird),
+	BirdBody = require(script.Parent.BirdBody),
+	BirdText = require(Shared.UI.BirdText),
+	Region = require(Shared.World.Region),
+	bird = (nil :: any), birdBody = (nil :: any), birdSeen = (nil :: number?),
+	-- ROBLOX-120: the field crickets' song: how loud the nearest singing one is to the spider (0..1, for BirdBody's chirp voice), set by the HUD's caption each frame.
+	PreyKinds = require(Shared.Prey.PreyKinds), chirp = 0.0,
 }
 M.lock = M.LockOn.new()
 local focusState = FocusState.new()
@@ -44467,7 +45607,9 @@ local mateLegs: any = { Mating = require(Shared.Life.Mating), Mate = require(Sha
 	Rules = require(Shared.Data.MatingRules), drive = nil, phase = "", pending = nil, state = {},
 	-- The mating scene (ROBLOX-89): its pure plan module and its state here (the plan, the scene's seconds as the simulation counts them, the last frame's, the notice held
 	-- until it is over, whether it was skipped and whose it was).
-	Scene = require(Shared.Life.MatingScene), couple = { active = false, plan = nil, t = -1, prev = -1, notice = nil, skipped = false, mateSex = "" } }
+	Scene = require(Shared.Life.MatingScene), couple = { active = false, plan = nil, t = -1, prev = -1, notice = nil, skipped = false, mateSex = "" },
+	-- ROBLOX-120: ballooning (Life/Ballooning): in the preserve the ending card offers "Follow one"; the ride ("ride" phase) and where it lands.
+	Balloon = require(Shared.Life.Ballooning), WorldMap = require(Shared.World.WorldMap), ride = nil :: any }
 mateLegs.stage = require(script.Parent.MateStage).new(Workspace, M.World.root, detail)
 local dance = PeacockDance.new() -- the peacock spider's courtship dance (a pose for the rig; nothing else reads it)
 local dancePose: any = nil
@@ -44512,6 +45654,7 @@ local soundscape = Soundscape.new(Workspace)
 local waspBody = WaspBody.new(Workspace)
 if M.World.world == "preserve" then M.cat = M.Cat.new(M.catSeed); M.catBody = M.CatBody.new(Workspace, detail); M.cat.enabled = script.Parent:FindFirstChild("SilkPlayback") == nil end
 if M.World.world == "preserve" then M.crab = M.CrabSpider.new(require(Shared.World.WorldMap).seed(914, "crab_spider")); M.crabBody = M.CrabBody.new(Workspace, detail) end -- (ROBLOX-119)
+if M.World.world == "preserve" then M.bird = M.Bird.new(require(Shared.World.WorldMap).seed(914, "bird")); M.birdBody = M.BirdBody.new(Workspace, detail) end -- (ROBLOX-120)
 -- LIFE (ROBLOX-24): the windowsill runs the life clock, so hunger runs by its hours (NeedsModel life mode, Standard rules to begin with; Easy and Free play
 -- switch the model to the gentle rules in applyRules, ROBLOX-91). Feeding grants into the same model. The loop keeps the rest, sleep, daylight and the eyes' reach.
 local needs = NeedsModel.new(true, false)
@@ -44558,7 +45701,7 @@ local saveState: any = { touched = {} :: { [string]: boolean }, applying = false
 -- Whether a modal screen has the game: the world waits and the controls belong to it. At the very start the world also waits (a second or
 -- so at most) for the server to say what is saved, so the start menu shows the right choices; not in the test place unless the Workspace attribute SaveWait is true.
 local function modal(): boolean
-	return panel:isShowing() or menu:isShowing() or nbPanel:isShowing() or settingsPanel:isShowing()
+	return panel:isShowing() or menu:isShowing() or nbPanel:isShowing() or settingsPanel:isShowing() or mateLegs.phase == "ride" -- (ROBLOX-120: the ride on the wind has the game)
 		or (not menuStarted and (not testPlace or Workspace:GetAttribute("SaveWait") == true) and saveClient ~= nil and saveClient:waiting() == true)
 end
 -- S01-C retreat checkpoints (ROBLOX-25): resting in the crack, and each morning, keeps one; Backspace / View returns to it. The
@@ -45089,6 +46232,7 @@ local lastEnd: any=nil -- the summary of the life that just ended, while its end
 panel=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
  if choice=="Notebook" then openNotebook("end")
  elseif choice=="Carry" then mateLegs.carryOn()
+ elseif choice=="Follow" then mateLegs.follow() -- (ROBLOX-120: one spiderling on the wind)
  elseif choice=="Another" then lastEnd=nil;continueAnother()
  elseif choice=="Back" then lastEnd=nil;closeScreens();wasp:clearVisit();returnToCheckpoint() end
 end)
@@ -45102,8 +46246,8 @@ local function presentEnd(immediate: boolean)
  table.insert(choices,{id="Another",text=mateLegs.Text.another(mateLegs.Mating.hasSac(life.mating))}) -- (ROBLOX-91: a new life; the brood is left behind)
  table.insert(choices,{id="Notebook",text=M.NotebookText.MENU_CHOICE})
  -- (ROBLOX-106: in Normal the last line says what the way back costs, the day since the rest, and that another spider is a new life; the night has its own words)
- panel:showChoices(if cause=="starved" then "The spider starved." elseif cause=="rival" then "The other spider caught you." elseif cause=="night" then M.LifeText.NIGHT_LINE elseif cause==M.CatText.CAUSE then M.CatText.LINE elseif cause==M.CrabText.CAUSE then M.CrabText.LINE else M.WaspText.LINE,
-  if cause=="starved" then "It went too long without food." elseif cause=="rival" then "A hunter can become prey. You can return to your last rest." elseif cause=="night" then M.LifeText.NIGHT_SUB elseif cause==M.CatText.CAUSE then M.CatText.SUB elseif cause==M.CrabText.CAUSE then M.CrabText.SUB else M.WaspText.SUB,
+ panel:showChoices(if cause=="starved" then "The spider starved." elseif cause=="rival" then "The other spider caught you." elseif cause=="night" then M.LifeText.NIGHT_LINE elseif cause==M.CatText.CAUSE then M.CatText.LINE elseif cause==M.CrabText.CAUSE then M.CrabText.LINE elseif cause==M.BirdText.CAUSE then M.BirdText.LINE else M.WaspText.LINE,
+  if cause=="starved" then "It went too long without food." elseif cause=="rival" then "A hunter can become prey. You can return to your last rest." elseif cause=="night" then M.LifeText.NIGHT_SUB elseif cause==M.CatText.CAUSE then M.CatText.SUB elseif cause==M.CrabText.CAUSE then M.CrabText.SUB elseif cause==M.BirdText.CAUSE then M.BirdText.SUB else M.WaspText.SUB,
   M.WaspText.summary(rec.hours,rec.meals,rec.wasp_visits,rec.wasp_escapes)..(if session.rules=="standard" then "\n"..M.LifeText.dayLost(hasRest) else ""),choices,immediate)
  panel:setTextScale(if setting("LargeText")==true then 1.5 else 1)
 end
@@ -45231,9 +46375,10 @@ end
 function mateLegs.showCard(immediate: boolean)
  local m=life.mating
  if m==nil then return end
- local title,sub,body=mateLegs.Text.card(m.brood,m.hatch_day,mateLegs.Mating.generation(life))
+ local wind=M.World.world=="preserve" -- (ROBLOX-120: in the preserve the spiderlings balloon, and one can be followed)
+ local title,sub,body=mateLegs.Text.card(m.brood,m.hatch_day,mateLegs.Mating.generation(life),wind)
  controls:clear();dropAll();setHudShown(false)
- panel:showChoices(title,sub,body,{{id="Carry",text=mateLegs.Text.BUTTON}},immediate)
+ panel:showChoices(title,sub,body,if wind then {{id="Follow",text=mateLegs.Text.FOLLOW},{id="Carry",text=mateLegs.Text.STAY}} else {{id="Carry",text=mateLegs.Text.BUTTON}},immediate)
  panel:setTextScale(if setting("LargeText")==true then 1.5 else 1)
  mateLegs.phase="card"
 end
@@ -45247,23 +46392,70 @@ end
 function mateLegs.reset()
  mateLegs.coupleEnd(false)
  mateLegs.couple.focus,mateLegs.couple.turn=nil,nil
- mateLegs.phase,mateLegs.pending="",nil
+ if mateLegs.ride~=nil then cam:setShot(nil) end
+ mateLegs.phase,mateLegs.pending,mateLegs.ride="",nil,nil
  mateLegs.stage:reset()
 end
--- Carry on: the next generation is a spiderling again in the crack, the days of the sill go on, the notebook and the look are the player's own.
-function mateLegs.carryOn()
+-- (ROBLOX-120) Follow one: the wind's draw (Life/Ballooning.land: a pure function of the seed, the family and the hatching's day) picks where it comes down; the ride
+-- plays (the "ride" phase has the game: the world waits, the camera rides with the spiderling), and at its end the next generation begins there (carryOn's landing).
+function mateLegs.follow()
+ local m=life.mating
+ if m==nil or m.stage~="hatched" then return end
+ local B=mateLegs.Balloon
+ local generation=mateLegs.Mating.generation(life)
+ local zone,regionId=B.land(914,generation,m.hatch_day)
+ local region=mateLegs.WorldMap.region(regionId)
+ if region==nil then mateLegs.carryOn();return end
+ lastEnd=nil
+ closeScreens()
+ mateLegs.stage:clearScene()
+ local z=B.zone(zone)
+ mateLegs.ride={plan=B.ride(914,generation,m.hatch_day,region.spawn.pos),t=0,zone=zone,region=regionId,place=if z then z.name else zone,
+  heading=region.spawn.heading,at=B.SAC}
+ mateLegs.phase="ride"
+ controls:clear();dropAll()
+ cam:cancelEyeRestore();cam:setEyeView(false)
+end
+-- (ROBLOX-120) A frame of the ride: the rider on its thread and the camera with it, from behind and a little above; at its end, the landing.
+function mateLegs.rideFrame(dt: number)
+ local r=mateLegs.ride
+ if r==nil then return end
+ r.t+=dt
+ local at,thread=mateLegs.Balloon.at(r.plan,r.t,setting("ReducedMotion")==true)
+ r.at=at
+ mateLegs.stage:drawRider(at,thread)
+ local back=Vector3.new(at.X-thread.X,0,at.Z-thread.Z)
+ back=if back.Magnitude>1e-3 then back.Unit else Vector3.zAxis
+ cam:setShot({focus=at,dir=(back*0.85+Vector3.yAxis*0.5).Unit,distance=if r.t<r.plan.seconds*0.12 then 5 else 7,up=Vector3.yAxis})
+ if r.t>=r.plan.seconds then
+  mateLegs.stage:drawRider(nil)
+  cam:setShot(nil)
+  mateLegs.carryOn(r)
+ end
+end
+-- Carry on: the next generation is a spiderling again in the crack, the days of the sill go on, the notebook and the look are the player's own. ROBLOX-120: `landed`, a
+-- ride's end (mateLegs.follow): the spiderling begins where the wind set it down, and the life keeps where (`start_zone`, `start_region`); without it, the hut's crack.
+function mateLegs.carryOn(landed: any?)
  local generation,day=mateLegs.Mating.carryOn(life,needs,prey.feeding.mealsFinished)
+ life.start_zone=if landed~=nil then landed.zone else nil
+ life.start_region=if landed~=nil then landed.region else nil
  lastEnd=nil
  closeScreens()
  mateLegs.reset()
  setAppearance(appearance) -- the rig is built again, at the first growth stage
- motor:place(Vector3.new(-25.5,0.31,6.0),Vector3.yAxis,M.World.spawnHeading)
+ if landed~=nil then
+  local region=mateLegs.WorldMap.region(landed.region)
+  motor:place((if region then region.spawn.pos else landed.plan.to)+Vector3.new(0,0.31,0),Vector3.yAxis,landed.heading or M.World.spawnHeading)
+ else
+  motor:place(Vector3.new(-25.5,0.31,6.0),Vector3.yAxis,M.World.spawnHeading)
+ end
  motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor())
  sensor:reset();memory:clear();M.LockOn.release(M.lock,"reset")
  dropStrands(false);drawnUp=motor.up;M.World:refocus();cam:snap();lastLight=nil
  feedPending,cancelPending=false,false
  watch:resync()
- hud:toast(mateLegs.Text.generationToast(generation,day),false)
+ hud:toast(mateLegs.Text.generationToast(generation,day,if landed~=nil then landed.place else nil),false)
+ if landed~=nil then mateLegs.say(mateLegs.Text.landed(landed.place));book:addEntry("eggs_and_wind",day,mateLegs.Text.rideEntry(day,landed.place)) end
  if saveClient~=nil then saveClient:markDirty() end
 end
 local openMenu: () -> ()
@@ -45751,11 +46943,32 @@ local function updateHud(frameDt: number)
 		if forRival and not M.WaspText.heardRival((motor.pos - wasp.wasp.position).Magnitude, not sightCast(motor.pos, wasp.wasp.position)) then heard = nil end
 		if heard then view.caption = heard end
 	end
+	-- (ROBLOX-120) the field crickets singing in the thatch and the mulch at night: the nearest one heard (the cat, the robin and the wasp win the caption)
+	do
+		local best, far = nil :: any, M.PreyText.CHIRP_HEAR
+		for _, f in M.World.prey:flies() do
+			if f.profile.body.prey_kind == "cricket" and M.PreyKinds.chirping(f) then
+				local d = (f.position - motor.pos).Magnitude
+				if d < far then best, far = f, d end
+			end
+		end
+		M.chirp = if best ~= nil then 1 - far / M.PreyText.CHIRP_HEAR else 0
+		if best ~= nil and captionScale > 0 and not wasp:isVisiting() then
+			view.caption = M.PreyText.chirp(M.WaspText.directionWord(motor.pos, motor.heading, motor.up, best.position), M.chirp)
+		end
+	end
 	-- (ROBLOX-118) the cat is heard before it is seen: its bell as it moves, its purr close by; the wasp's hum wins
 	if M.cat ~= nil and captionScale > 0 and not wasp:isVisiting() then
 		local bell, purr = M.cat:sound(motor.pos)
 		local heard = M.CatText.caption(bell, purr, M.WaspText.directionWord(motor.pos, motor.heading, motor.up, M.Cat.head(M.cat)), bell > M.catHeard.bell + 1e-3)
 		M.catHeard.bell = bell
+		if heard then view.caption = heard end
+	end
+	-- (ROBLOX-120) the robin: its shadow sweeping over, and its call as it comes in and goes; the wasp's hum wins
+	if M.bird ~= nil and captionScale > 0 and not wasp:isVisiting() then
+		if M.birdSeen ~= nil then M.birdSeen += frameDt; if M.birdSeen > 3 then M.birdSeen = nil end end
+		local call = M.bird:call(motor.pos)
+		local heard = M.BirdText.caption(call, M.WaspText.directionWord(motor.pos, motor.heading, motor.up, M.bird.pos), M.birdSeen)
 		if heard then view.caption = heard end
 	end
 	if aiming then
@@ -45791,6 +47004,7 @@ local function updateHud(frameDt: number)
   end
   if m~=nil and (m.stage=="sac" or m.stage=="guarding") and Q("guard_line") then table.insert(view.status,mateLegs.Text.guardLine(m.guard_day,mateLegs.Rules.guardDays)) end
   if mateLegs.phase=="scene" and captionScale>0 then view.caption=mateLegs.Text.sceneCaption(mateLegs.stage.t) or view.caption end
+  if mateLegs.phase=="ride" and captionScale>0 then view.caption={text=mateLegs.Text.RIDE_CAPTION,alpha=1} end -- (ROBLOX-120)
  end
  if life.rival and life.rival.state=="captured" and not RivalSpider.struggling(life.rival) and Q("feeding_lines") then table.insert(view.status,rivalLegs.Text.eating(Growth.mealsOf(RivalSpider.FOOD))) end
 	view.grip = if prey.feeding.struggling then prey.feeding.grip else rivalLegs.Grip.level(rivalLegs.grip)
@@ -45895,7 +47109,9 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	spiderPick.update(frameDt) -- (the choose hold's clock and the close look's reasons to end)
 	controls:tick(frameDt) -- (ROBLOX-115: L2 held past its tap is Focus)
 	M.Prof.lap("save")
-	M.World:update(motor.pos, rig.root, nil, frameDt) -- (ROBLOX-94: the region the spider is in, the pace of its day, the streaming focus on the drawn spider)
+	-- (ROBLOX-94: the region the spider is in, the pace of its day, the streaming focus on the drawn spider; ROBLOX-120: on the wind, the rider's place, so the world
+	-- where it comes down is streamed in before the spiderling stands there)
+	M.World:update(if mateLegs.ride ~= nil and mateLegs.ride.at ~= nil then mateLegs.ride.at else motor.pos, rig.root, nil, frameDt)
 	if panel:isShowing() then panel:update(frameDt) end
 	if nbPanel:isShowing() then nbPanel:update(frameDt) end
 	if settingsPanel:isShowing() then settingsPanel:update(frameDt) end
@@ -46018,6 +47234,30 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 					elseif signal.kind == "nudged" and motor.mode == "attached" then
 						motor:_launch((signal.away or Vector3.zero) * 6 + Vector3.yAxis * 5, 40)
 						life:showNotice(M.CrabText.NUDGED)
+					end
+				end
+			end
+			-- ROBLOX-120: the robin on the open ground, on its seeded visits: told first by its shadow and its call; a spider moving in the open in its reach after its
+			-- tell is taken (a death in Normal; in the gentle rules the bill misses). Cover (a home, a box over the spider, the meadow's grass low down) or keeping still saves.
+			if M.bird ~= nil then
+				M.bird.gentle = needs.gentle
+				if testPlace and Workspace:GetAttribute("Bird") ~= nil then M.bird.enabled = Workspace:GetAttribute("Bird") == true end
+				local spiderNow: any = nil
+				if not (life.lifeOver or modal()) then
+					local region = M.World.region
+					local hidden = M.World:inRetreat(motor.pos) ~= nil or life.resting
+					local covered = M.bird.here and (M.Bird.inGrass(region.kind, motor.pos) or M.Bird.covered(M.Region.pieces(region), motor.pos))
+					spiderNow = { pos = motor.pos, speed = if motor.mode == "air" then 10 elseif motor.moving == true then 3 else motor.vel.Magnitude, hidden = hidden, covered = covered }
+				end
+				M.bird:step(DT, life.clock.day, life.clock.hour, spiderNow)
+				for _, signal in M.bird:drainSignals() do
+					if signal.kind == "shadow" then M.birdSeen = 0; watch:onBird()
+					elseif signal.kind == "noticed" then watch:onBird()
+					elseif signal.kind == "landed" and signal.at ~= nil and (signal.at - motor.pos).Magnitude < 400 then watch:onBird()
+					elseif signal.kind == "struck" then endLife(M.BirdText.CAUSE)
+					elseif signal.kind == "missed" then
+						if motor.mode == "attached" then motor:_launch(Vector3.new(motor.pos.X - M.bird.pos.X, 0, motor.pos.Z - M.bird.pos.Z).Unit * 7 + Vector3.yAxis * 6, 40) end
+						life:showNotice(M.BirdText.MISSED)
 					end
 				end
 			end
@@ -46243,6 +47483,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
     mateLegs.stage:drawMate(life.mate,appearance,if paused then 0 else simFrame,setting("ReducedMotion")==true,mateLegs.couple.focus,mateLegs.couple.turn,camera.CFrame.Position)
     mateLegs.stage:drawSac(mateLegs.Mating.hasSac(life.mating))
     if mateLegs.phase=="scene" and not paused and not mateLegs.stage:step(simFrame,setting("ReducedMotion")==true) then mateLegs.showCard(false) end
+    if mateLegs.phase=="ride" and not GuiService.MenuIsOpen then mateLegs.rideFrame(frameDt) end -- (ROBLOX-120)
 	M.Prof.lap("other rigs")
 	updateHud(frameDt)
 	M.Prof.lap("hud")
@@ -46262,6 +47503,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	soundscape:updateWasp(wasp, soundPaused, soundSpeed, soundMuted)
 	waspBody:draw(wasp.wasp, prey.now)
 	if M.crabBody ~= nil then M.crabBody:draw(M.crab) end -- (ROBLOX-119)
+	if M.birdBody ~= nil then M.birdBody:draw(M.bird, frameDt, if soundMuted or soundPaused then 0 else M.bird:call(motor.pos), if soundMuted or soundPaused then 0 else M.chirp) end -- (ROBLOX-120)
 	if M.catBody ~= nil then
 		local bell, purr = M.cat:sound(motor.pos)
 		M.catBody:draw(M.cat, prey.now, frameDt, if soundMuted or soundPaused then 0 else bell, if soundMuted or soundPaused then 0 else purr)
@@ -46360,6 +47602,7 @@ M.hooks = function(): any
 			prof = M.Prof, -- (ROBLOX-111: the frame timed by part, for the self-test's frame samples)
 			cat = M.cat, Cat = M.Cat, -- (ROBLOX-118: the ranger's cat, nil in the test garden, and its rules)
 			crab = M.crab, CrabSpider = M.CrabSpider, -- (ROBLOX-119: the crab spiders, nil in the test garden, and their rules)
+			bird = M.bird, Bird = M.Bird, -- (ROBLOX-120: the robin, nil in the test garden, and its rules)
 	}
 end
 local playback = script.Parent:FindFirstChild("SilkPlayback")
@@ -46374,7 +47617,7 @@ if RunService:IsStudio() and Workspace:GetAttribute("SelfTest") == true then req
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="197">
+        <Item class="ModuleScript" referent="201">
           <Properties>
             <string name="Name">SpiderEyes</string>
             <string name="Source"><![CDATA[--!strict
@@ -46840,7 +48083,7 @@ return SpiderEyes
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="198">
+        <Item class="ModuleScript" referent="202">
           <Properties>
             <string name="Name">SpiderHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -47186,7 +48429,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="199">
+        <Item class="ModuleScript" referent="203">
           <Properties>
             <string name="Name">SpiderInput</string>
             <string name="Source"><![CDATA[--!strict
@@ -47479,7 +48722,7 @@ return SpiderInput
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="200">
+        <Item class="ModuleScript" referent="204">
           <Properties>
             <string name="Name">TitleCard</string>
             <string name="Source"><![CDATA[--!strict
@@ -47746,7 +48989,7 @@ return TitleCard
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="201">
+        <Item class="ModuleScript" referent="205">
           <Properties>
             <string name="Name">TrainPass</string>
             <string name="Source"><![CDATA[--!strict
@@ -47889,7 +49132,7 @@ return TrainPass
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="202">
+        <Item class="ModuleScript" referent="206">
           <Properties>
             <string name="Name">WaspBody</string>
             <string name="Source"><![CDATA[--!strict
@@ -48121,7 +49364,7 @@ return WaspBody
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="203">
+        <Item class="ModuleScript" referent="207">
           <Properties>
             <string name="Name">WorldClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -48426,7 +49669,7 @@ return WorldClient
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="204">
+        <Item class="ModuleScript" referent="208">
           <Properties>
             <string name="Name">WorldDetail</string>
             <string name="Source"><![CDATA[--!strict
@@ -48470,7 +49713,7 @@ return WorldDetail
       </Item>
     </Item>
   </Item>
-  <Item class="Workspace" referent="205">
+  <Item class="Workspace" referent="209">
     <Properties>
       <string name="Name">Workspace</string>
       <float name="Gravity">35</float>

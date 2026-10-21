@@ -9,6 +9,7 @@ local Verge=require("../src/Shared/World/Verge")
 local Garden=require("../src/Shared/World/Garden")
 local Pocket=require("../src/Shared/World/GardenPocket")
 local AntForage=require("../src/Shared/World/AntForage")
+local Hut=require("../src/Shared/World/Hut")
 local passed,failed=0,0
 local function check(ok,name)
  if ok then passed+=1 else failed+=1;print("FAIL LIVING_WORLD "..name) end
@@ -597,6 +598,36 @@ case("close grass is rooted, wind-responsive, bounded and absent from hard props
  living:rebuild(at,region)
  check(#living.grass==0 and #living.patches==0,"metal surfaces grow neither grass nor emerging soil grubs")
  living:destroy();decor:Destroy();root:Destroy();WorldMap.use("test_garden")
+end)
+case("garden lawns have close living cover while paths and beds stay distinct",function()
+ WorldMap.use("preserve")
+ local root=WorldBuild.world(workspace)
+ local lawn=Vector3.new(-182,-84.29,-190)
+ for _,tier in {"full","low"} do
+  local living=LivingWorld.new(workspace,root,tier,WorldMap)
+  local region=assert(WorldMap.at(lawn))
+  living:rebuild(lawn,region)
+  check(#living.grass>0,tier.." the station garden lawn has upright close grass, not just distant blades")
+  local planted=true
+  for _,row in living.grass do
+   planted=planted and Hut.surfaceAt(region,row.pivot.X,row.pivot.Z)=="lawn"
+   local hit=living:ground(row.pivot+Vector3.yAxis*.1,1,3)
+   planted=planted and hit~=nil and hit.Instance.Material==Enum.Material.Grass
+    and string.match(hit.Instance.Name,"^garden_[a-d][1-4]_soil$")~=nil
+  end
+  check(planted,tier.." garden cover grows only on the actual lawn, not over a path or prop")
+  check(living.count<=living.limit and living.staticCount<=(if tier=="low" then 48 else 150),tier.." lawn cover keeps the existing part limits")
+  for _,at in {Vector3.new(-65,-84.29,-270),Vector3.new(-150,-74.29,-270)} do
+   living:rebuild(at,assert(WorldMap.at(at)))
+   check(#living.grass==0,tier.." gravel paths and the planted herb bed do not acquire lawn grass")
+  end
+  local plate=Instance.new("Part");plate.Name="GardenMetalProp";plate.Material=Enum.Material.Metal
+  plate.Size=Vector3.new(70,1,70);plate.CFrame=CFrame.new(lawn+Vector3.yAxis*1.5);plate.Parent=root
+  living:rebuild(lawn,region)
+  check(#living.grass==0,tier.." a hard prop above the lawn never grows grass")
+  plate:Destroy();living:destroy()
+ end
+ root:Destroy();WorldMap.use("test_garden")
 end)
 case("stationary rain notices streamed shelter without an unbounded cast burst",function()
  for _,tier in {"full","low"} do

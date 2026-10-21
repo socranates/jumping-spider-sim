@@ -1944,6 +1944,9 @@ local function surfaceAt(region: Region, x: number, z: number): (string, number)
 	if z > -46 then return "drip", GT end
 	return "lawn", GT
 end
+-- The base slab also runs beneath drawn paths/beds. Close cover must use the
+-- same authored classification as the existing garden patches.
+Hut.surfaceAt = surfaceAt
 
 local GRASS = { "5c8a3a", "6f9a46", "4f7a33", "86a85a", "7d8f48", "668f3e", "93a860", "a8a066" }
 local CHIPS = { "5a3c26", "6b4a30", "4a3220", "7a5536", "3f2a1b", "6e5a48", "5e4434", "4d3a2c", "7e6650" }

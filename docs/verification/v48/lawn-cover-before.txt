@@ -1,0 +1,7 @@
+C:/Users/natha/AppData/Local/Temp/tmpa5pxu5a9.luau:54428: living habitat checks failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmpa5pxu5a9.luau:54428
+FAIL LIVING_WORLD full the station garden lawn has upright close grass, not just distant blades
+FAIL LIVING_WORLD low the station garden lawn has upright close grass, not just distant blades
+LIVING_WORLD passed=3976 failed=2

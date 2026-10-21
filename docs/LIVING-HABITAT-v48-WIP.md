@@ -142,6 +142,13 @@ Working branch: `codex/v48-living-habitat`, based on v47 receipt commit `9d442ff
 - Focused updated-Studio reproduction of the four upper poses, including hut_up_i, passes with expected joist normals, attachment and region ownership. The earlier integrated mismatch remains unexplained, so movement/regions are unchanged. Its failure now reports enough state to diagnose the full sequence.
 - A new integrated native run is live on `C:\Users\natha\claude-xfer\Windowsill-v48-native-review.rbxlx` (local PlaceId/GameId 0), Studio log `0.744.0.7441077_20261021T200511Z_Studio_9837B_last.log`. Observe from the later `[CHET_UPPER_CLEAN_NATIVE_RERUN]` setup marker. It has SelfTest=true/Detail=full and no SilkPlayback or Wasp override; clear debug attributes after completion. It is not a live-place audio/publication check.
 
+### Native integration complete; garden close-cover gap filled
+
+- Native Studio 0.744 integration on source 80096ec is terminal: **270 pass / zero fail / zero skip** after 552 seconds. Every region and the scripted continuous hut/bench/meadow/pond connections pass. See `docs/verification/v48/NATIVE-80096ec-RESULT.md`. The full sill averages 19.4 ms but has unattributed whole-frame spikes; the receipt keeps those measurements and does not promise constant 60 fps or phone performance.
+- Full/low continuous mound crossings show no sustained body hiding at the earlier endpoint after the camera settles; moving steps have brief existing hide transitions. Camera/movement are unchanged. See `MOUND-TRAVEL-REVIEW.md`.
+- The low view exposed a real close-cover gap on the garden lawn. LivingWorld now reuses Hut's existing surface classifier to grow the approved curved mesh there, excluding gravel, herb beds and hard props. Current checks: living world 3,978/0, compact map/save 294/0, strict clean, 207/207 compile. Current native full/low repeats stay attached; returned poses have 32/8 clumps and 295/136 living parts, within the unchanged ceilings. See `LAWN-COVER-REVIEW.md`.
+- All native runs are finished and stopped; `[CHET_MOUND_LAWN_CLEAN]` verifies no SilkPlayback or SelfTest/Detail/TestTarget/Wasp overrides. The local GameId/PlaceId 0 review file is never a publication destination. Final frozen-source CLI verification, existing-place release confirmation, synchronization and final handoff remain open.
+
 ## Platform judgment
 
 Roblox limits density, draw calls, memory and simulation cost, especially on phones. The current barren travel and missing ground are implementation/design problems. Compact, authored habitats with reused meshes, bounded active wildlife and selective detail remain a viable direction. No engine migration is needed to address these reported problems.

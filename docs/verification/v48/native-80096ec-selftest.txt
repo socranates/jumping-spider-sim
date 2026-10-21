@@ -1,0 +1,426 @@
+2026-10-21T20:11:31.089Z,379.089722,340c,6,Info [FLog::CreatorOutput] [SELFTEST] BEGIN the live place's self-test (ROBLOX-104)
+2026-10-21T20:11:31.090Z,379.090698,340c,6,Info [FLog::CreatorOutput] [SELFTEST] INFO world: preserve (revision preserve-3)
+2026-10-21T20:11:32.026Z,380.026825,340c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS new life
+2026-10-21T20:11:34.847Z,382.847107,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS intro
+2026-10-21T20:11:34.848Z,382.848114,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS world folders
+2026-10-21T20:11:36.072Z,384.072510,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region sill
+2026-10-21T20:11:36.276Z,384.276184,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] ... region hut_window (5 s in)
+2026-10-21T20:11:37.282Z,385.282379,8b28,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_window
+2026-10-21T20:11:38.501Z,386.501617,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_outer_sill
+2026-10-21T20:11:39.727Z,387.727020,1560,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_desk
+2026-10-21T20:11:40.948Z,388.948181,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_board
+2026-10-21T20:11:42.170Z,390.170563,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... region hut_shelf (11 s in)
+2026-10-21T20:11:42.171Z,390.171570,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_shelf
+2026-10-21T20:11:43.396Z,391.396790,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_chair
+2026-10-21T20:11:44.613Z,392.613190,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_door
+2026-10-21T20:11:45.847Z,393.847626,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_door_up
+2026-10-21T20:11:47.061Z,395.061890,8b28,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_doorway
+2026-10-21T20:11:47.278Z,395.278046,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] ... region hut_doorway_up (16 s in)
+2026-10-21T20:11:48.278Z,396.278625,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_doorway_up
+2026-10-21T20:11:49.511Z,397.511322,8b28,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_window
+2026-10-21T20:11:50.728Z,398.728302,8b28,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_tv
+2026-10-21T20:11:51.962Z,399.962585,340c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_games
+2026-10-21T20:11:53.178Z,401.178925,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... region room_sofa_w (22 s in)
+2026-10-21T20:11:53.178Z,401.178925,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_sofa_w
+2026-10-21T20:11:54.395Z,402.395508,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_sofa_e
+2026-10-21T20:11:55.610Z,403.610413,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_floor_a
+2026-10-21T20:11:56.830Z,404.830872,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_floor_b
+2026-10-21T20:11:58.063Z,406.063538,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_floor_c
+2026-10-21T20:11:58.280Z,406.280121,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... region hut_floor_d (27 s in)
+2026-10-21T20:11:59.296Z,407.296173,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_floor_d
+2026-10-21T20:12:00.528Z,408.528076,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_floor_e
+2026-10-21T20:12:01.750Z,409.750519,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_floor_f
+2026-10-21T20:12:03.010Z,411.010132,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_floor_g
+2026-10-21T20:12:04.220Z,412.220520,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... region hut_floor_h (33 s in)
+2026-10-21T20:12:04.220Z,412.220520,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_floor_h
+2026-10-21T20:12:05.448Z,413.448151,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_floor_i
+2026-10-21T20:12:06.663Z,414.663055,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_floor_a
+2026-10-21T20:12:07.894Z,415.894531,8b28,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_floor_b
+2026-10-21T20:12:09.120Z,417.120148,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_floor_c
+2026-10-21T20:12:09.330Z,417.330292,8b28,6,Info [FLog::CreatorOutput] [SELFTEST] ... region room_floor_d (38 s in)
+2026-10-21T20:12:10.347Z,418.347778,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_floor_d
+2026-10-21T20:12:11.570Z,419.570251,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_floor_e
+2026-10-21T20:12:12.777Z,420.777466,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_floor_f
+2026-10-21T20:12:13.979Z,421.979950,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_floor_g
+2026-10-21T20:12:15.188Z,423.188385,340c,6,Info [FLog::CreatorOutput] [SELFTEST] ... region room_floor_h (44 s in)
+2026-10-21T20:12:15.189Z,423.189392,340c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_floor_h
+2026-10-21T20:12:16.396Z,424.396698,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_floor_i
+2026-10-21T20:12:17.613Z,425.613800,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_up_a
+2026-10-21T20:12:18.833Z,426.833954,8b28,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_up_b
+2026-10-21T20:12:20.052Z,428.052032,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_up_c
+2026-10-21T20:12:20.261Z,428.261719,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... region hut_up_d (49 s in)
+2026-10-21T20:12:21.263Z,429.263367,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_up_d
+2026-10-21T20:12:22.479Z,430.479492,340c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_up_e
+2026-10-21T20:12:23.706Z,431.706848,340c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_up_f
+2026-10-21T20:12:24.942Z,432.942993,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_up_g
+2026-10-21T20:12:26.182Z,434.182983,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] ... region hut_up_h (55 s in)
+2026-10-21T20:12:26.182Z,434.182983,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_up_h
+2026-10-21T20:12:27.401Z,435.401733,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_up_i
+2026-10-21T20:12:28.636Z,436.636017,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_up_a
+2026-10-21T20:12:29.840Z,437.840668,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_up_b
+2026-10-21T20:12:31.065Z,439.065491,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_up_c
+2026-10-21T20:12:31.267Z,439.267639,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... region room_up_d (60 s in)
+2026-10-21T20:12:32.273Z,440.273132,340c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_up_d
+2026-10-21T20:12:33.500Z,441.500183,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_up_e
+2026-10-21T20:12:34.714Z,442.714386,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_up_f
+2026-10-21T20:12:35.927Z,443.927460,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_up_g
+2026-10-21T20:12:37.141Z,445.141296,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] ... region room_up_h (66 s in)
+2026-10-21T20:12:37.141Z,445.141296,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_up_h
+2026-10-21T20:12:38.362Z,446.362793,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_up_i
+2026-10-21T20:12:39.584Z,447.584930,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_wall_mid
+2026-10-21T20:12:40.811Z,448.811615,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_wall_w
+2026-10-21T20:12:42.027Z,450.027771,1560,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_wall_e
+2026-10-21T20:12:42.248Z,450.248444,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... region hut_wall_x1 (71 s in)
+2026-10-21T20:12:43.255Z,451.255707,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_wall_x1
+2026-10-21T20:12:44.476Z,452.476257,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_wall_x2
+2026-10-21T20:12:45.682Z,453.682281,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_wall_x3
+2026-10-21T20:12:46.898Z,454.898590,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_eave_w2
+2026-10-21T20:12:48.128Z,456.128296,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] ... region hut_eave_w1 (77 s in)
+2026-10-21T20:12:48.128Z,456.128296,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_eave_w1
+2026-10-21T20:12:49.355Z,457.355682,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_eave_mid
+2026-10-21T20:12:50.562Z,458.562103,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_eave_e1
+2026-10-21T20:12:51.775Z,459.775879,340c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_eave_e2
+2026-10-21T20:12:53.004Z,461.004120,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_eave_x1
+2026-10-21T20:12:53.219Z,461.219818,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... region hut_eave_x2 (82 s in)
+2026-10-21T20:12:54.222Z,462.222321,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_eave_x2
+2026-10-21T20:12:55.450Z,463.450287,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_eave_x3
+2026-10-21T20:12:56.680Z,464.680573,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_eave_x4
+2026-10-21T20:12:57.901Z,465.901093,8b28,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_bench
+2026-10-21T20:12:59.129Z,467.129974,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] ... region hut_butt (88 s in)
+2026-10-21T20:12:59.129Z,467.129974,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_butt
+2026-10-21T20:13:00.349Z,468.349426,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_feeder
+2026-10-21T20:13:01.587Z,469.587952,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_pole
+2026-10-21T20:13:02.797Z,470.797699,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_a1
+2026-10-21T20:13:04.042Z,472.042633,340c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_a2
+2026-10-21T20:13:04.248Z,472.248962,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... region garden_a3 (93 s in)
+2026-10-21T20:13:05.250Z,473.250153,340c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_a3
+2026-10-21T20:13:06.461Z,474.461578,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_a4
+2026-10-21T20:13:07.687Z,475.687317,340c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_b1
+2026-10-21T20:13:08.902Z,476.902161,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_b2
+2026-10-21T20:13:10.115Z,478.115051,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] ... region garden_b3 (99 s in)
+2026-10-21T20:13:10.115Z,478.115051,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_b3
+2026-10-21T20:13:11.350Z,479.350800,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_b4
+2026-10-21T20:13:12.596Z,480.596039,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_c1
+2026-10-21T20:13:13.826Z,481.826050,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_c2
+2026-10-21T20:13:15.043Z,483.043152,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_c3
+2026-10-21T20:13:15.272Z,483.272003,340c,6,Info [FLog::CreatorOutput] [SELFTEST] ... region garden_c4 (104 s in)
+2026-10-21T20:13:16.284Z,484.284943,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_c4
+2026-10-21T20:13:17.498Z,485.498077,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_d1
+2026-10-21T20:13:18.708Z,486.708984,340c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_d2
+2026-10-21T20:13:19.943Z,487.943268,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_d3
+2026-10-21T20:13:21.181Z,489.181274,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... region garden_d4 (110 s in)
+2026-10-21T20:13:21.181Z,489.181274,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_d4
+2026-10-21T20:13:22.414Z,490.414917,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_s1
+2026-10-21T20:13:23.628Z,491.628754,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_s2
+2026-10-21T20:13:24.848Z,492.848022,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_s3
+2026-10-21T20:13:26.056Z,494.056427,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_s4
+2026-10-21T20:13:26.279Z,494.279602,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] ... region path_s5 (115 s in)
+2026-10-21T20:13:27.289Z,495.289337,8b28,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_s5
+2026-10-21T20:13:28.531Z,496.531433,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_e1
+2026-10-21T20:13:29.754Z,497.754272,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_e2
+2026-10-21T20:13:30.982Z,498.982483,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_e3
+2026-10-21T20:13:32.247Z,500.247223,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] ... region path_e4 (121 s in)
+2026-10-21T20:13:32.248Z,500.248230,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_e4
+2026-10-21T20:13:33.507Z,501.507721,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_e5
+2026-10-21T20:13:34.773Z,502.773346,8b28,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_n3
+2026-10-21T20:13:36.056Z,504.056061,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_n2
+2026-10-21T20:13:37.282Z,505.282318,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] ... region path_n1 (126 s in)
+2026-10-21T20:13:37.282Z,505.282318,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_n1
+2026-10-21T20:13:38.505Z,506.505402,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_e6
+2026-10-21T20:13:39.778Z,507.778137,340c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_m1
+2026-10-21T20:13:41.082Z,509.082672,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_m2
+2026-10-21T20:13:42.304Z,510.304199,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] ... region path_m3 (131 s in)
+2026-10-21T20:13:42.305Z,510.305176,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_m3
+2026-10-21T20:13:43.539Z,511.539185,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_m4
+2026-10-21T20:13:45.171Z,513.171387,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region bench_w
+2026-10-21T20:13:46.417Z,514.417786,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region bench_e
+2026-10-21T20:13:47.650Z,515.650696,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... region bin (137 s in)
+2026-10-21T20:13:47.650Z,515.650696,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region bin
+2026-10-21T20:13:48.879Z,516.879211,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region lamp_1
+2026-10-21T20:13:50.094Z,518.094604,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region lamp_2
+2026-10-21T20:13:51.329Z,519.329407,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region lamp_3
+2026-10-21T20:13:52.557Z,520.557251,340c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region lamp_4
+2026-10-21T20:13:52.768Z,520.768494,8b28,6,Info [FLog::CreatorOutput] [SELFTEST] ... region pad_a1 (142 s in)
+2026-10-21T20:13:53.793Z,521.793884,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pad_a1
+2026-10-21T20:13:55.058Z,523.058289,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pad_a2
+2026-10-21T20:13:56.293Z,524.293640,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pad_a3
+2026-10-21T20:13:57.547Z,525.547485,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pad_b1
+2026-10-21T20:13:57.778Z,525.778931,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] ... region pad_b2 (147 s in)
+2026-10-21T20:13:58.789Z,526.789734,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pad_b2
+2026-10-21T20:13:59.996Z,527.996155,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pad_b3
+2026-10-21T20:14:01.217Z,529.217712,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pad_c1
+2026-10-21T20:14:02.454Z,530.454468,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pad_c2
+2026-10-21T20:14:03.665Z,531.665771,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... region pad_c3 (153 s in)
+2026-10-21T20:14:03.665Z,531.665771,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pad_c3
+2026-10-21T20:14:04.885Z,532.885681,340c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_a1
+2026-10-21T20:14:06.153Z,534.153503,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_a2
+2026-10-21T20:14:07.380Z,535.380981,340c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_a3
+2026-10-21T20:14:08.586Z,536.586365,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_a4
+2026-10-21T20:14:08.795Z,536.795471,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] ... region meadow_a5 (158 s in)
+2026-10-21T20:14:09.798Z,537.798218,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_a5
+2026-10-21T20:14:11.010Z,539.010559,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_b1
+2026-10-21T20:14:12.233Z,540.233337,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_b2
+2026-10-21T20:14:13.460Z,541.460205,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_b3
+2026-10-21T20:14:14.685Z,542.685730,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] ... region meadow_b4 (164 s in)
+2026-10-21T20:14:14.686Z,542.686768,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_b4
+2026-10-21T20:14:15.956Z,543.956177,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_b5
+2026-10-21T20:14:17.177Z,545.177307,340c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_c1
+2026-10-21T20:14:18.401Z,546.401245,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_c2
+2026-10-21T20:14:19.629Z,547.629395,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_c3
+2026-10-21T20:14:19.835Z,547.835510,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] ... region meadow_c4 (169 s in)
+2026-10-21T20:14:20.850Z,548.850281,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_c4
+2026-10-21T20:14:22.075Z,550.075623,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_c5
+2026-10-21T20:14:23.293Z,551.293823,340c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_d1
+2026-10-21T20:14:24.516Z,552.516846,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_d2
+2026-10-21T20:14:25.743Z,553.743469,340c,6,Info [FLog::CreatorOutput] [SELFTEST] ... region meadow_d3 (175 s in)
+2026-10-21T20:14:25.743Z,553.743469,340c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_d3
+2026-10-21T20:14:26.965Z,554.965332,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_d4
+2026-10-21T20:14:28.180Z,556.180237,340c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_d5
+2026-10-21T20:14:29.397Z,557.397095,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_e1
+2026-10-21T20:14:30.620Z,558.620422,8b28,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_e2
+2026-10-21T20:14:30.832Z,558.832336,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] ... region meadow_e3 (180 s in)
+2026-10-21T20:14:31.840Z,559.840332,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_e3
+2026-10-21T20:14:33.055Z,561.055176,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_e4
+2026-10-21T20:14:34.263Z,562.263428,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_e5
+2026-10-21T20:14:35.827Z,563.827698,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region cattail_1a
+2026-10-21T20:14:36.044Z,564.044373,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] ... region cattail_1b (185 s in)
+2026-10-21T20:14:37.059Z,565.059448,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region cattail_1b
+2026-10-21T20:14:38.275Z,566.275330,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region cattail_2a
+2026-10-21T20:14:39.508Z,567.508118,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region cattail_2b
+2026-10-21T20:14:40.741Z,568.741577,8b28,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region walk_s1
+2026-10-21T20:14:41.957Z,569.957947,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] ... region walk_n1 (191 s in)
+2026-10-21T20:14:41.957Z,569.957947,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region walk_n1
+2026-10-21T20:14:43.175Z,571.175232,8b28,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region walk_s2
+2026-10-21T20:14:44.390Z,572.390747,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region walk_n2
+2026-10-21T20:14:45.607Z,573.607422,0788,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region walk_s3
+2026-10-21T20:14:46.841Z,574.841309,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region walk_n3
+2026-10-21T20:14:47.043Z,575.043518,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] ... region walk_s4 (196 s in)
+2026-10-21T20:14:48.058Z,576.058105,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region walk_s4
+2026-10-21T20:14:49.275Z,577.275940,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region walk_n4
+2026-10-21T20:14:50.489Z,578.489380,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region deck_s1
+2026-10-21T20:14:51.707Z,579.707825,1560,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region deck_n1
+2026-10-21T20:14:52.925Z,580.925171,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... region deck_s2 (202 s in)
+2026-10-21T20:14:52.925Z,580.925171,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region deck_s2
+2026-10-21T20:14:54.154Z,582.154602,340c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region deck_n2
+2026-10-21T20:14:55.382Z,583.382202,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region deck_s3
+2026-10-21T20:14:56.608Z,584.608826,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region deck_n3
+2026-10-21T20:14:57.825Z,585.825378,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region deck_s4
+2026-10-21T20:14:58.040Z,586.040222,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... region deck_n4 (207 s in)
+2026-10-21T20:14:59.055Z,587.055115,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region deck_n4
+2026-10-21T20:15:00.290Z,588.290222,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pond_a1
+2026-10-21T20:15:01.511Z,589.511292,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pond_a2
+2026-10-21T20:15:02.721Z,590.721619,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pond_a3
+2026-10-21T20:15:03.944Z,591.944031,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] ... region pond_a4 (213 s in)
+2026-10-21T20:15:03.944Z,591.944031,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pond_a4
+2026-10-21T20:15:05.164Z,593.164856,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pond_b1
+2026-10-21T20:15:06.380Z,594.380493,8b28,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pond_b2
+2026-10-21T20:15:07.604Z,595.604736,340c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pond_b3
+2026-10-21T20:15:08.804Z,596.804626,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pond_b4
+2026-10-21T20:15:09.010Z,597.010559,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] ... region pond_c1 (218 s in)
+2026-10-21T20:15:10.015Z,598.015015,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pond_c1
+2026-10-21T20:15:11.223Z,599.223938,1560,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pond_c2
+2026-10-21T20:15:12.428Z,600.428406,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pond_c3
+2026-10-21T20:15:13.660Z,601.660828,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pond_c4
+2026-10-21T20:15:14.889Z,602.889648,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... region mown_e1 (224 s in)
+2026-10-21T20:15:14.890Z,602.890625,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region mown_e1
+2026-10-21T20:15:16.094Z,604.094788,8b28,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region mown_e2
+2026-10-21T20:15:17.309Z,605.309143,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region mown_n1
+2026-10-21T20:15:18.527Z,606.527466,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-400_-1416
+2026-10-21T20:15:19.736Z,607.736023,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-400_-1316
+2026-10-21T20:15:19.947Z,607.947449,8b28,6,Info [FLog::CreatorOutput] [SELFTEST] ... region verge_-400_-1216 (229 s in)
+2026-10-21T20:15:20.960Z,608.960632,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-400_-1216
+2026-10-21T20:15:22.165Z,610.165344,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-400_-1116
+2026-10-21T20:15:23.392Z,611.392273,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-400_-1016
+2026-10-21T20:15:24.616Z,612.616028,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-400_-916
+2026-10-21T20:15:25.825Z,613.825439,340c,6,Info [FLog::CreatorOutput] [SELFTEST] ... region verge_-400_-816 (235 s in)
+2026-10-21T20:15:25.825Z,613.825439,340c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-400_-816
+2026-10-21T20:15:27.046Z,615.046387,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-400_-716
+2026-10-21T20:15:28.260Z,616.260437,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-400_-616
+2026-10-21T20:15:29.478Z,617.478577,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-400_-516
+2026-10-21T20:15:30.699Z,618.699646,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-400_-416
+2026-10-21T20:15:30.909Z,618.909363,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... region verge_-400_-316 (240 s in)
+2026-10-21T20:15:31.915Z,619.915894,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-400_-316
+2026-10-21T20:15:33.139Z,621.139404,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-400_-216
+2026-10-21T20:15:34.359Z,622.359314,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-400_-116
+2026-10-21T20:15:35.589Z,623.589478,1560,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-300_-1416
+2026-10-21T20:15:36.801Z,624.801208,340c,6,Info [FLog::CreatorOutput] [SELFTEST] ... region verge_-300_-816 (246 s in)
+2026-10-21T20:15:36.801Z,624.801208,340c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-300_-816
+2026-10-21T20:15:38.031Z,626.031494,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-300_-716
+2026-10-21T20:15:39.262Z,627.262329,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-300_-616
+2026-10-21T20:15:40.496Z,628.496399,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-300_-516
+2026-10-21T20:15:41.739Z,629.739929,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-300_-416
+2026-10-21T20:15:41.944Z,629.944153,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... region verge_-300_-316 (251 s in)
+2026-10-21T20:15:42.954Z,630.954102,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-300_-316
+2026-10-21T20:15:44.196Z,632.196411,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-300_-216
+2026-10-21T20:15:45.397Z,633.397888,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-300_-116
+2026-10-21T20:15:46.631Z,634.631531,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-200_-1416
+2026-10-21T20:15:47.850Z,635.850342,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... region verge_-200_-516 (257 s in)
+2026-10-21T20:15:47.851Z,635.851318,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-200_-516
+2026-10-21T20:15:49.077Z,637.077881,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-100_-1416
+2026-10-21T20:15:50.297Z,638.297607,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-100_-516
+2026-10-21T20:15:51.514Z,639.514832,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_0_-1416
+2026-10-21T20:15:52.740Z,640.740479,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_0_-816
+2026-10-21T20:15:52.944Z,640.944153,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... region verge_0_-716 (262 s in)
+2026-10-21T20:15:53.948Z,641.948059,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_0_-716
+2026-10-21T20:15:55.163Z,643.163635,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_0_-616
+2026-10-21T20:15:56.378Z,644.378357,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_0_-516
+2026-10-21T20:15:57.589Z,645.589417,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_100_-1416
+2026-10-21T20:15:58.818Z,646.818176,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... region verge_100_-816 (268 s in)
+2026-10-21T20:15:58.819Z,646.819153,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_100_-816
+2026-10-21T20:16:00.032Z,648.032898,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_100_-716
+2026-10-21T20:16:01.244Z,649.244751,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_100_-616
+2026-10-21T20:16:02.483Z,650.483826,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_100_-516
+2026-10-21T20:16:03.710Z,651.710022,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_190_-666
+2026-10-21T20:16:03.926Z,651.926453,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... region verge_190_-566 (273 s in)
+2026-10-21T20:16:04.930Z,652.930847,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_190_-566
+2026-10-21T20:16:06.152Z,654.152405,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_290_-866
+2026-10-21T20:16:07.369Z,655.369324,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_290_-766
+2026-10-21T20:16:08.588Z,656.588501,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_290_-666
+2026-10-21T20:16:09.812Z,657.812378,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... region verge_290_-566 (279 s in)
+2026-10-21T20:16:09.814Z,657.814575,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_290_-566
+2026-10-21T20:16:11.036Z,659.036743,8b28,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_390_-866
+2026-10-21T20:16:12.276Z,660.276245,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_390_-766
+2026-10-21T20:16:13.486Z,661.486267,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_390_-666
+2026-10-21T20:16:14.711Z,662.711975,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_390_-566
+2026-10-21T20:16:14.915Z,662.915100,340c,6,Info [FLog::CreatorOutput] [SELFTEST] ... region verge_490_-866 (284 s in)
+2026-10-21T20:16:15.982Z,663.982971,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_490_-866
+2026-10-21T20:16:17.223Z,665.223022,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_490_-766
+2026-10-21T20:16:18.452Z,666.452087,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_490_-666
+2026-10-21T20:16:19.673Z,667.673096,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_490_-566
+2026-10-21T20:16:20.181Z,668.181946,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... walk on the sill (289 s in)
+2026-10-21T20:16:23.395Z,671.395203,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] INFO walk: 7.54 studs in 3 s, height 0.31 to 0.31
+2026-10-21T20:16:23.396Z,671.396240,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS walk on the sill
+2026-10-21T20:16:24.426Z,672.426453,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] INFO prey on the sill: 4 flies drawn
+2026-10-21T20:16:24.426Z,672.426453,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS prey on the sill
+2026-10-21T20:16:25.316Z,673.316223,340c,6,Info [FLog::CreatorOutput] [SELFTEST] ... lock (294 s in)
+2026-10-21T20:16:26.444Z,674.444275,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] INFO lock: 3.0 studs away, facing it within 2 degrees, a sidestep of 0.66 studs in 1 s
+2026-10-21T20:16:26.543Z,674.543335,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] INFO lock: L1 holds creep, locks on press, and lets go on the next press
+2026-10-21T20:16:26.543Z,674.543335,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS lock
+2026-10-21T20:16:27.057Z,675.057617,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the hut's sill: 153 parts of the hut at the full tier; 1488 parts of the backdrop held of 1488 planned
+2026-10-21T20:16:27.059Z,675.059631,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the hut's sill
+2026-10-21T20:16:27.150Z,675.150452,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] INFO backdrop: at the sill the hut full and the railway far; at the railway's crest the railway full (Base+Full) and the hut far (Far), 557 parts; back at the sill the hut full (Base+Full)
+2026-10-21T20:16:27.150Z,675.150452,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the backdrop near and far
+2026-10-21T20:16:27.155Z,675.155457,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] INFO trains: the pass a commuter of 4 cars at 676 to 688 s; mid-pass 4 cars (12 parts) drawn; the clock at 668 s, the next at 676 s
+2026-10-21T20:16:27.155Z,675.155457,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the trains
+2026-10-21T20:16:30.319Z,678.319580,1560,6,Info [FLog::CreatorOutput] [SELFTEST] ... the nursery: the window shut (299 s in)
+2026-10-21T20:16:31.713Z,679.713318,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the nursery: a walk at the shut sash came to z -12.19 (the sash's outer face is -13.5); regions sill
+2026-10-21T20:16:31.714Z,679.714294,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the nursery: the window shut
+2026-10-21T20:16:35.342Z,683.342529,340c,6,Info [FLog::CreatorOutput] [SELFTEST] ... the nursery: the ranger props the window (304 s in)
+2026-10-21T20:16:37.548Z,685.548401,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the nursery: the ranger's moment took 5.8 s; the wedge at x 6.2..8.0
+2026-10-21T20:16:37.549Z,685.549377,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the nursery: the ranger props the window
+2026-10-21T20:16:40.349Z,688.349792,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] ... the hut's inside (309 s in)
+2026-10-21T20:16:45.352Z,693.352112,8b28,6,Info [FLog::CreatorOutput] [SELFTEST] ... the hut's inside (314 s in)
+2026-10-21T20:16:50.353Z,698.353699,340c,6,Info [FLog::CreatorOutput] [SELFTEST] ... the hut's inside (319 s in)
+2026-10-21T20:16:55.369Z,703.369263,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... the hut's inside (324 s in)
+2026-10-21T20:17:00.369Z,708.369995,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] ... the hut's inside (329 s in)
+2026-10-21T20:17:05.382Z,713.382996,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] ... the hut's inside (334 s in)
+2026-10-21T20:17:07.236Z,715.236389,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the hut's inside: from the sill's front edge to hut_floor_b at (0.00, -69.61, 14.31); regions hut_floor_b, sill
+2026-10-21T20:17:08.774Z,716.774414,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the hut's inside
+2026-10-21T20:17:10.406Z,718.406372,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] ... the way out (339 s in)
+2026-10-21T20:17:12.073Z,720.073059,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the way out: through the sash to hut_outer_sill at (-3.00, 0.31, -16.06); regions hut_outer_sill, sill
+2026-10-21T20:17:15.411Z,723.411499,340c,6,Info [FLog::CreatorOutput] [SELFTEST] ... the way out (344 s in)
+2026-10-21T20:17:20.416Z,728.416626,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... the way out (349 s in)
+2026-10-21T20:17:25.417Z,733.417725,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] ... the way out (354 s in)
+2026-10-21T20:17:30.436Z,738.436584,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... the way out (359 s in)
+2026-10-21T20:17:34.425Z,742.425232,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the way out: from the outer sill's edge to hut_bench at (-3.00, -39.69, -24.06); regions hut_bench, hut_outer_sill, hut_wall_mid
+2026-10-21T20:17:35.450Z,743.450867,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] ... the way out (364 s in)
+2026-10-21T20:17:40.459Z,748.459534,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... the way out (369 s in)
+2026-10-21T20:17:45.460Z,753.460632,1560,6,Info [FLog::CreatorOutput] [SELFTEST] ... the way out (374 s in)
+2026-10-21T20:17:50.471Z,758.471252,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... the way out (379 s in)
+2026-10-21T20:17:55.470Z,763.470764,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] ... the way out (384 s in)
+2026-10-21T20:17:56.606Z,764.606628,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the way out: down the bench's leg to garden_a2 at (-77.00, -84.29, -61.06); regions garden_a2, hut_bench
+2026-10-21T20:17:56.607Z,764.607666,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the way out
+2026-10-21T20:18:00.644Z,768.644470,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... the hut garden (390 s in)
+2026-10-21T20:18:02.673Z,770.673889,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the hut garden: 1 gnats and 3 aphids on the milkweed with a ladybird, 1 leafhoppers on the goldenrod, 4 springtails in the mulch, 3 woodlice by the trough, all drawn
+2026-10-21T20:18:02.673Z,770.673889,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the hut garden
+2026-10-21T20:18:05.210Z,773.210022,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the garden's near detail: 16 patches, 697 parts of them, 1500 parts of looks at full; dew at dawn on 13 of 13 drops
+2026-10-21T20:18:05.210Z,773.210999,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the garden's near detail
+2026-10-21T20:18:06.216Z,774.216614,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... the station's rival and garden's mate (395 s in)
+2026-10-21T20:18:11.223Z,779.223389,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] ... the station's rival and garden's mate (400 s in)
+2026-10-21T20:18:13.220Z,781.220459,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the station's rival and garden's mate: the rival came in at hut_floor_b and walked 3.1 studs, in hut_floor_b; the mate came in at garden_b4, in garden_b4
+2026-10-21T20:18:13.220Z,781.220459,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the station's rival and garden's mate
+2026-10-21T20:18:14.783Z,782.783936,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the hut's homes: hut_desk_drawer, hut_board_gap, garden_a1_trough, garden_a3_stone, garden_d3_mulch
+2026-10-21T20:18:14.783Z,782.783936,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the hut's homes
+2026-10-21T20:18:15.012Z,783.012695,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the hut by night: the lamp
+2026-10-21T20:18:16.236Z,784.236450,340c,6,Info [FLog::CreatorOutput] [SELFTEST] ... the ceiling and the upper walls (405 s in)
+2026-10-21T20:18:21.250Z,789.250732,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... the ceiling and the upper walls (410 s in)
+2026-10-21T20:18:21.934Z,789.934143,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the ceiling: up the west wall past WALL_TOP to hut_up_d at (-146.19, 66.00, 134.00); regions hut_floor_d, hut_up_d
+2026-10-21T20:18:26.326Z,794.326599,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] ... the ceiling and the upper walls (415 s in)
+2026-10-21T20:18:27.331Z,795.331055,340c,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the ceiling: head down under the boards at (-146.19, 149.69, 134.00) in hut_up_d
+2026-10-21T20:18:27.332Z,795.332092,340c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the ceiling and the upper walls
+2026-10-21T20:18:31.332Z,799.332581,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... the back room (420 s in)
+2026-10-21T20:18:36.343Z,804.343201,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] ... the back room (425 s in)
+2026-10-21T20:18:41.347Z,809.347534,340c,6,Info [FLog::CreatorOutput] [SELFTEST] ... the back room (430 s in)
+2026-10-21T20:18:46.354Z,814.354553,8b28,6,Info [FLog::CreatorOutput] [SELFTEST] ... the back room (435 s in)
+2026-10-21T20:18:51.357Z,819.357666,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... the back room (440 s in)
+2026-10-21T20:18:51.848Z,819.848328,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the back room: through the doorway to room_floor_g at (180.01, -69.69, 215.00); regions hut_doorway, hut_floor_i, room_floor_g
+2026-10-21T20:18:54.196Z,822.196777,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the back room
+2026-10-21T20:18:56.368Z,824.368225,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... the eaves (445 s in)
+2026-10-21T20:19:01.378Z,829.378418,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... the eaves (450 s in)
+2026-10-21T20:19:06.380Z,834.380981,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... the eaves (455 s in)
+2026-10-21T20:19:09.549Z,837.549316,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the eaves: along the gutter to hut_eave_e1 at (37.08, 122.81, -54.00) (208 cm over the ground); regions hut_eave_e1, hut_eave_mid
+2026-10-21T20:19:09.550Z,837.550293,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the eaves
+2026-10-21T20:19:10.769Z,838.769165,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the cat: walking from the bowls to the window (walk), moved 59.9 studs in a second; the bell 0.66 at 176 studs
+2026-10-21T20:19:11.390Z,839.390320,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... the cat (460 s in)
+2026-10-21T20:19:13.398Z,841.398682,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the cat: at its bowls it noticed a spider moving in front of it (true), crouched to pat (true), gave up once it was up on the desk (true); notices 1, pats 1, swats 0
+2026-10-21T20:19:13.400Z,841.400696,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the cat
+2026-10-21T20:19:16.405Z,844.405518,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] ... the bench patch (465 s in)
+2026-10-21T20:19:21.424Z,849.424194,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... the bench patch (470 s in)
+2026-10-21T20:19:24.987Z,852.987610,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the bench patch: walked path_m4 to pad_a2, pad_a2 to pad_b2, pad_c2 to meadow_a3; homes bench_slats, bin_lip, meadow_b2_leaf; the lamppost lit at night (true) and out by day (true)
+2026-10-21T20:19:24.987Z,852.987610,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the bench patch
+2026-10-21T20:19:27.016Z,855.016479,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] ... the meadow's edge (476 s in)
+2026-10-21T20:19:27.508Z,855.508911,340c,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the meadow's edge: on the coneflower's cone 74 cm over the ground; 1 leafhoppers on the bluestem, 6 ants at the hill (6 drawn)
+2026-10-21T20:19:27.508Z,855.508911,340c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the meadow's edge
+2026-10-21T20:19:27.563Z,855.563049,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the crab spiders: a yellow one on meadow_e3 and a white one on meadow_d4, 2 drawn; the close look opened its page
+2026-10-21T20:19:27.563Z,855.563049,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the crab spiders
+2026-10-21T20:19:31.300Z,859.300049,8b28,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the robin: in on gravel at 6.12 h, its shadow over the spider, landed and drawn (stand); on the sim struck in Normal, missed in the gentle rules
+2026-10-21T20:19:31.300Z,859.300049,8b28,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the robin
+2026-10-21T20:19:32.395Z,860.395203,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... the field crickets (481 s in)
+2026-10-21T20:19:37.325Z,865.325134,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the field crickets: one in meadow_b2's thatch, drawn, singing at 22:00 once the spider kept still
+2026-10-21T20:19:37.326Z,865.326111,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the field crickets
+2026-10-21T20:19:37.735Z,865.735901,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] ... ballooning's landings (487 s in)
+2026-10-21T20:19:43.064Z,871.064270,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] ... ballooning's landings (492 s in)
+2026-10-21T20:19:43.474Z,871.474670,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] INFO ballooning's landings: stood on 15 (garden_a2, garden_a4, garden_b1, garden_c2, garden_d2, meadow_b1, meadow_b3, meadow_c3, meadow_d2, meadow_d5, meadow_e3, pond_a1, pond_b1, deck_n2, deck_s3)
+2026-10-21T20:19:43.475Z,871.475647,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS ballooning's landings
+2026-10-21T20:19:48.367Z,876.367432,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... the mown path and the boardwalk (497 s in)
+2026-10-21T20:19:53.371Z,881.371704,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... the mown path and the boardwalk (502 s in)
+2026-10-21T20:19:58.371Z,886.371338,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... the mown path and the boardwalk (507 s in)
+2026-10-21T20:20:03.385Z,891.385620,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] ... the mown path and the boardwalk (512 s in)
+2026-10-21T20:20:08.395Z,896.395142,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... the mown path and the boardwalk (517 s in)
+2026-10-21T20:20:13.405Z,901.405823,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... the mown path and the boardwalk (522 s in)
+2026-10-21T20:20:16.168Z,904.168823,340c,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the mown path and the boardwalk: walked pad_b3 to mown_e1, mown_n1 to walk_s1, walk_s4 to deck_s1; homes deck_gap, pond_stone, cattail_leaf
+2026-10-21T20:20:16.168Z,904.168823,340c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the mown path and the boardwalk
+2026-10-21T20:20:18.412Z,906.412354,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] ... the water (527 s in)
+2026-10-21T20:20:20.366Z,908.366638,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the water: walked off a lily pad's edge, struggled 3 s and got out (the gentle rules for the moment); on the sim a long fall into open water drowned in Normal
+2026-10-21T20:20:20.367Z,908.367615,8af0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the water
+2026-10-21T20:20:22.374Z,910.374268,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the pond's life: 1 midges at dusk on pond_a3's stems; 4 water striders on pond_b3's open water (4 drawn)
+2026-10-21T20:20:22.374Z,910.374268,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the pond's life
+2026-10-21T20:20:22.424Z,910.424683,340c,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the green frog: on pond_a2_flat, drawn, the close look saw it (true); on the sim struck in Normal, missed in the gentle rules, a still spider spared
+2026-10-21T20:20:22.424Z,910.424683,340c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the green frog
+2026-10-21T20:20:22.728Z,910.728394,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the nursery: the window put back
+2026-10-21T20:20:23.643Z,911.643250,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] ... notebook (533 s in)
+2026-10-21T20:20:23.955Z,911.955322,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS notebook
+2026-10-21T20:20:29.655Z,917.655945,340c,6,Info [FLog::CreatorOutput] [SELFTEST] ... rest and checkpoint (539 s in)
+2026-10-21T20:20:32.169Z,920.169861,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS rest and checkpoint
+2026-10-21T20:20:32.169Z,920.169861,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] INFO sound: music volume 0.128, IsLoaded true
+2026-10-21T20:20:32.169Z,920.169861,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] PASS sound
+2026-10-21T20:20:35.208Z,923.208374,340c,6,Info [FLog::CreatorOutput] [SELFTEST] ... frame time on the sill (544 s in)
+2026-10-21T20:20:37.182Z,925.182983,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] INFO frame time on the sill: 258 frames, mean 19.4 ms (52 fps), worst 178.9 ms, physics 56 fps
+2026-10-21T20:20:37.182Z,925.182983,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] INFO profile on the sill: 258 frames, the render step 7.00 ms a frame (worst 26.7): spider rig 2.39/5.0, sound 1.01/3.9, camera 0.49/4.0, fly bodies 0.43/2.7, senses 0.41/3.9, light 0.41/8.2, hud 0.36/1.3, other rigs 0.30/2.5, prey 0.23/1.7, wasp 0.17/1.3, rival 0.16/1.2, life 0.15/1.1, looks 0.12/11.7, motor 0.10/0.7, small 0.29 (mean/worst ms); a frame: spider parts placed 652, fly parts placed 124, bug parts placed 0, camera casts 4, camera overlaps 2, camera rays 0, framing searches 0; allocated 222 KB a frame (percepts 3, senses 3, prey 2, wasp 2, rival 2, life 2, camera 2, light 10, spider rig 74, other rigs 5, hud 3, fly bodies 40, sound 73)
+2026-10-21T20:20:37.185Z,925.185974,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] INFO engine on the sill: memory 432.9 MB, Lua heap 109.9 MB, instances 59857, primitives 6235 (moving 1126), awake parts 0
+2026-10-21T20:20:37.204Z,925.204956,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] INFO census on the sill: 6235 parts, 910 see-through, 1518 casting shadows, 1204 meshed (parts/see-through/shadow/meshed: Cat 62/0/32/52, CrabSpiders 46/0/0/22, Decor 724/149/71/388, Flies 156/52/0/68, JumpArc 34/0/0/0, LivingHabitat 231/32/3/95, PondAnimals 43/4/0/43, RivalSpider 211/112/60/44, Robin 24/0/0/20, Spider 707/514/86/94, Wasp 56/12/0/19, World 2437/1/1201/0, WorldDecor 1494/34/64/359, the rest 10/0/1/0)
+2026-10-21T20:20:37.206Z,925.206909,8a8c,6,Info [FLog::CreatorOutput] [SELFTEST] INFO shadows on the sill: 1185 of 1907 visible walkable boxes cast, 722 too small to see at their distance cast none (304 passes, 16072 writes)
+2026-10-21T20:20:40.382Z,928.382935,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] ... frame time on the sill (549 s in)
+2026-10-21T20:20:40.386Z,928.386902,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] INFO frame time on the sill without the far preserve: 166 frames, mean 19.3 ms (52 fps), worst 228.6 ms, physics 60 fps
+2026-10-21T20:20:40.386Z,928.386902,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] INFO profile on the sill without the far preserve: 166 frames, the render step 6.62 ms a frame (worst 16.8): spider rig 2.21/4.0, sound 0.86/1.4, light 0.46/3.0, camera 0.45/3.0, fly bodies 0.39/0.7, hud 0.33/0.6, senses 0.29/2.8, other rigs 0.26/2.1, prey 0.25/1.2, wasp 0.22/7.9, looks 0.22/1.3, rival 0.15/1.1, life 0.14/0.9, motor 0.11/0.6, small 0.26 (mean/worst ms); a frame: spider parts placed 639, fly parts placed 124, bug parts placed 0, camera casts 3, camera overlaps 2, camera rays 0, framing searches 0; allocated 231 KB a frame (percepts 3, senses 2, prey 2, wasp 8, rival 2, life 2, camera 2, light 11, spider rig 73, other rigs 4, hud 3, fly bodies 41, sound 76)
+2026-10-21T20:20:40.386Z,928.386902,33ac,6,Info [FLog::CreatorOutput] [SELFTEST] INFO engine on the sill without the far preserve: memory 446.6 MB, Lua heap 148.0 MB, instances 57174, primitives 3910 (moving 1122), awake parts 0
+2026-10-21T20:20:43.463Z,931.463501,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] INFO frame time on the sill without shadows: 159 frames, mean 19.3 ms (52 fps), worst 128.8 ms, physics 60 fps
+2026-10-21T20:20:43.464Z,931.464478,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] INFO profile on the sill without shadows: 159 frames, the render step 7.13 ms a frame (worst 17.1): spider rig 2.32/4.8, sound 1.02/2.3, camera 0.49/2.2, light 0.44/6.1, senses 0.41/9.2, fly bodies 0.40/0.8, hud 0.37/1.9, looks 0.30/1.3, other rigs 0.29/2.1, prey 0.23/1.6, wasp 0.21/1.0, rival 0.15/0.8, life 0.13/0.7, motor 0.09/0.5, small 0.27 (mean/worst ms); a frame: spider parts placed 653, fly parts placed 124, bug parts placed 0, camera casts 4, camera overlaps 2, camera rays 0, framing searches 0; allocated 221 KB a frame (looks 1, percepts 3, senses 3, prey 2, wasp 2, rival 2, life 2, camera 2, light 11, spider rig 74, other rigs 4, hud 3, fly bodies 41, sound 68)
+2026-10-21T20:20:43.464Z,931.464478,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] INFO engine on the sill without shadows: memory 438.0 MB, Lua heap 114.0 MB, instances 59873, primitives 6247 (moving 1142), awake parts 0
+2026-10-21T20:20:43.465Z,931.465515,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the far preserve on the sill: mean 19.4 ms as it is, 19.3 ms without the far preserve (180 folders, 2331 parts out), 19.3 ms without shadows
+2026-10-21T20:20:43.465Z,931.465515,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS frame time on the sill
+2026-10-21T20:20:43.471Z,931.471558,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] INFO parts at the full tier: 6247 in the workspace (Cat 62, CrabSpiders 46, Decor 724, Flies 156, FlyClearanceProbe 1, HutLamp 1, JumpArc 34, LivingHabitat 231, PondAnimals 43, ReplicationFoci 1, RivalSpider 211, Robin 24, Spider 707, StreetLamp 1, Terrain 1, Wasp 56, WindowsillAudio 5, World 2437, WorldDecor 1506)
+2026-10-21T20:20:43.473Z,931.473572,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] INFO looks outside the window: 1488 parts held of 1488 planned at the full tier, 148666 made and 147124 destroyed this session, 525 plans
+2026-10-21T20:20:43.473Z,931.473572,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS part counts
+2026-10-21T20:20:43.475Z,931.475586,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] INFO took 552 s
+2026-10-21T20:20:43.475Z,931.475586,93d0,6,Info [FLog::CreatorOutput] [SELFTEST] END pass=270 fail=0 skip=0

@@ -9,6 +9,7 @@ local DogGait=require(Shared.Rig.DogGait)
 local DogGround=require(Shared.World.DogGround)
 local Meshes=require(Shared.Data.Meshes)
 local AntForage=require(Shared.World.AntForage)
+local Hut=require(Shared.World.Hut)
 local LivingWorld={}
 LivingWorld.__index=LivingWorld
 LivingWorld.BUDGET={full=420,low=150}
@@ -136,7 +137,8 @@ function LivingWorld.rebuild(self: any,pos: Vector3,region: any)
  self.grass={};self.grassParts={};self.grassFrames={}
  self.patches={}
  local floor=region.kind=="hut_floor" or region.kind=="room_floor" or region.kind=="kitchen_floor" or region.kind=="hut_doorway"
- local soil=region.kind=="verge" or region.kind=="hut_path" or region.kind=="mown_path" or string.match(region.id,"^garden_[a-d][1-4]$")~=nil or string.match(region.id,"^meadow_")~=nil or region.kind=="bed" or region.kind=="shrub"
+ local garden=string.match(region.id,"^garden_[a-d][1-4]$")~=nil
+ local soil=region.kind=="verge" or region.kind=="hut_path" or region.kind=="mown_path" or garden or string.match(region.id,"^meadow_")~=nil or region.kind=="bed" or region.kind=="shrub"
  if not floor and not soil then return end
  local limit=if self.low then 48 else 150
  local cx,cz=math.floor(pos.X/LivingWorld.CELL),math.floor(pos.Z/LivingWorld.CELL)
@@ -154,6 +156,8 @@ function LivingWorld.rebuild(self: any,pos: Vector3,region: any)
    local groundPart=hit.Instance
    local grows=(region.kind=="verge" and groundPart.Material==Enum.Material.Ground and string.find(groundPart.Name,"_soil_",1,true)~=nil)
     or (string.match(region.id,"^meadow_")~=nil and groundPart.Material==Enum.Material.Grass)
+    or (garden and groundPart.Material==Enum.Material.Grass and string.match(groundPart.Name,"^garden_[a-d][1-4]_soil$")~=nil
+     and Hut.surfaceAt(region,at.X,at.Z)=="lawn")
    if grows and i==1 then table.insert(self.patches,at) end
    local before=self.count
    local function part(n: string,size: Vector3,cf: CFrame,c: string,shape: string?,material: string?,alpha: number?): BasePart?

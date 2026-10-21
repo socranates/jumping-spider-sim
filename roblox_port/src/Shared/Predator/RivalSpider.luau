@@ -1,6 +1,7 @@
 --!strict
--- Intraguild predator, one at a time on the eastern sill: present in every life from the first day it is allowed (Data/RivalRules), and a new one
--- arrives on the morning after one is eaten (ROBLOX-67). Timings/reward are game tuning, not species measurements.
+-- Intraguild predator: the preserve's resident ranger-station patrol, present
+-- from the first day. The frozen test garden retains its daily visiting rival.
+-- Timings/reward are game tuning, not species measurements.
 -- Plain state lives in LifeLoop's checkpoint graph; no clock, engine instance or hidden player tracking.
 -- ROBLOX-73: the spider's strike catches a rival that has not seen it coming outright, but a rival that has (stalking, winding up, or patrolling
 -- with a notice of Rules.awareNotice) is a contest: caught, sprang clear, or a counter-bite that costs energy. The draw is the rival's own stream.
@@ -14,8 +15,7 @@ local M=require(script.Parent.Parent.Prey.PreyMath)
 local PreyRandom=require(script.Parent.Parent.Prey.PreyRandom)
 local Rules=require(script.Parent.Parent.Data.RivalRules)
 local WorldMap=require(script.Parent.Parent.World.WorldMap)
-local Hut=require(script.Parent.Parent.World.Hut)
-local Meadow=require(script.Parent.Parent.World.Meadow) -- (ROBLOX-119: the meadow's edge is the rival's too)
+local Station=require(script.Parent.Parent.World.StationTerritory)
 local Rival={}
 local function phase(r: any,s: string) if r.state~=s then r.shaken=nil end;r.state=s;r.elapsed=0 end
 Rival.FOOD=.7 -- two housefly-equivalent meals
@@ -23,19 +23,14 @@ Rival.FAR=6000 -- (ROBLOX-119) how far from the sill a record's places may be: W
 local states={dormant=true,patrol=true,stalk=true,windup=true,lunge=true,recover=true,captured=true,consumed=true,taken=true}
 -- "dormant" is "has not arrived yet". `day` (nil in a record from before the daily rival) is the day it was eaten, so the next one comes after it.
 -- ROBLOX-117: where a rival arrives, and its region: the sill's east end in the test garden (Data/RivalRules; no region, as every record there has always been), the
--- hut garden's path in the preserve (World/Hut.CREATURES), with the region kept in its record (`region`: the drive walks it from region to region, Hut.ROAM).
+-- station floor in the preserve (StationTerritory), with its region kept in the record.
 function Rival.arriveAt(): (Vector3,string?)
- if WorldMap.world()=="preserve" then return Hut.CREATURES.rival.at,Hut.CREATURES.rival.region end
+ if WorldMap.world()=="preserve" then return Station.ARRIVE,Station.REGION end
  return Rules.arriveAt,nil
 end
--- The regions a rival of this world roams (nil: it keeps to its own, the sill). (ROBLOX-119: in the preserve the hut garden's cells and, up the path, the bench
--- patch's gravel and the meadow's edge, World/Meadow.ROAM; the mate keeps to the garden.)
-local PRESERVE_ROAM: {[string]:boolean} = {}
-for id in Hut.ROAM do PRESERVE_ROAM[id]=true end
-for id in Meadow.ROAM do PRESERVE_ROAM[id]=true end
-Rival.PRESERVE_ROAM=table.freeze(PRESERVE_ROAM)
+-- The regions a rival roams (nil: the legacy sill). The preserve's mate keeps its garden territory.
 function Rival.roam(): {[string]:boolean}?
- if WorldMap.world()=="preserve" then return Rival.PRESERVE_ROAM end
+ if WorldMap.world()=="preserve" then return Station.roam() end
  return nil
 end
 function Rival.new(): any
@@ -50,7 +45,7 @@ end
 function Rival.misplaced(r: any): boolean
  local _,region=Rival.arriveAt()
  if region==nil then return r.region~=nil end
- return type(r.region)~="string" or WorldMap.region(r.region)==nil
+ return not Station.contains(r.region)
 end
 -- The morning an hour of the clock belongs to: the hours before 07:00 are the night of the day before.
 function Rival.morning(day: number,hour: number?): number
@@ -169,11 +164,21 @@ function Rival.step(r: any,dt: number,s: any,blocked: (Vector3,Vector3)->any): (
   Rival.carried(r,s.day or 0,s.hour);return "taken",0
  end
  if r.state=="consumed" then
+  if WorldMap.world()=="preserve" then
+   r.elapsed+=dt
+   local at=Station.ARRIVE
+   -- A defeated rival stays defeated. A later replacement enters below the window,
+   -- only after a quiet minute and out of sight, never on top of the player.
+   if r.elapsed>=Station.REPLACE_SECONDS and (s.position-at).Magnitude>Rules.arriveDistance and blocked(s.position,at) then
+    Rival.renew(r)
+   else return "",0 end
+  else
   -- An old record has no day: the day it is first seen eaten is the day it was eaten. A new rival comes on a later morning.
   if r.day==nil then r.day=s.day end
   -- (ROBLOX-91: by morning, not by the day counter: one eaten in the small hours belongs to the night before, and one eaten just before midnight still
   -- gives way at the next 07:00.)
   if Rival.morning(s.day,s.hour)>Rival.morning(r.day,r.hour or Rules.arriveHour) then Rival.renew(r) else return "",0 end
+  end
  end
  if r.state=="captured" then
   r.position=s.position+s.heading*.4;r.heading=s.heading
@@ -185,14 +190,20 @@ function Rival.step(r: any,dt: number,s: any,blocked: (Vector3,Vector3)->any): (
  end
  if r.state=="dormant" then
   -- (`s.born` ROBLOX-91: the day before this generation began, and `s.meals` this generation's: the first day and first meal of a spiderling are protected too.)
-  if s.day-(s.born or 0)<Rules.firstDay or s.meals<Rules.firstMeals or (s.hour or Rules.arriveHour)<Rules.arriveHour
-   or (s.position-r.position).Magnitude<Rules.arriveDistance or s.resting or s.wasp or s.scene or s.courting then return "",0 end
+  if WorldMap.world()~="preserve" and (s.day-(s.born or 0)<Rules.firstDay or s.meals<Rules.firstMeals or (s.hour or Rules.arriveHour)<Rules.arriveHour
+   or (s.position-r.position).Magnitude<Rules.arriveDistance or s.resting or s.wasp or s.scene or s.courting) then return "",0 end
   phase(r,"patrol")
   if s.drive then r.leg=(s.day or 0)*5 end -- a different first place to patrol to each day
  end
  -- Never stack two attackers or pursue into the retreat. No hidden-target chase.
  -- (ROBLOX-91: and while the spider is courting or mating, so a lunge cannot land on a pair: the rival keeps away from them.)
- if s.safe or s.resting or s.wasp or s.scene or s.courting then phase(r,"recover");r.notice=0;return "",0 end
+ if s.safe or s.resting or s.wasp or s.scene or s.courting then
+  if WorldMap.world()=="preserve" then
+   if r.state~="patrol" then phase(r,"patrol") end
+   r.elapsed+=dt;r.notice=0
+  else phase(r,"recover");r.notice=0 end
+  return "",0
+ end
  r.elapsed+=dt
  local delta=s.position-r.position
  -- Driven by a RivalDrive (its own motor over the whole sill): what it sees is decided ten times a second, at any height; otherwise

@@ -43,6 +43,7 @@ local HutLife = require(script.Parent.HutLife)
 local WorldShadows = require(script.Parent.WorldShadows)
 local FrameProfile = require(script.Parent.FrameProfile)
 local LivingWorld = require(script.Parent.LivingWorld)
+local Station = require(Shared.World.StationTerritory)
 
 local WorldClient = {}
 WorldClient.__index = WorldClient
@@ -201,6 +202,16 @@ end
 -- waits where it is until the spider comes near).
 function WorldClient.creatureLive(self: any, regionId: string?): boolean
 	if regionId == nil then return true end
+	-- Residents can cross either room while the player shelters elsewhere in the
+	-- station. Its physical models are persistent; wait for every one before
+	-- allowing a resident to plan beyond the player's streamed neighbourhood.
+	if Station.contains(regionId) then
+		if not self.stationWhole then
+			for id in Station.roam() do if not self:regionReady(id) then return false end end
+			self.stationWhole=true
+		end
+		return true
+	end
 	local here = self.region
 	local near = here.id == regionId
 	if not near then

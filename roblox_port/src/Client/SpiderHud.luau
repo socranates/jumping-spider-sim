@@ -318,14 +318,36 @@ end
 
 -- view: device, aiming, focus, eyeView, aimTitle, aimHint, aimColor, anchorText, anchorOk, status ({string}),
 -- caption ({text, alpha} or nil), prompt ({title, hint, cue} or nil), helpVisible, helpText, notice, day and dayLine (strings or nil).
+-- Active preserve play: only the food reserve, and the two earned ability
+-- notices explicitly requested by the player. An opened controls card is modal
+-- reference material; automatic hints never enter this projection.
+function Hud.minimalView(view: any): any
+	local notice=nil
+	for line in string.gmatch(view.notice or "", "[^\n]+") do
+		if string.find(line,"^You can now run%.") or string.find(line,"^You can now lock on%.") then notice=line end
+	end
+	return {minimal=true,device=view.device,food=view.food,foodGentle=view.foodGentle,aiming=false,focus=false,eyeView=false,
+		largeText=view.largeText,notice=notice,helpVisible=view.helpVisible and view.helpRequested,
+		helpText=view.helpText,status={}}
+end
 function Hud.update(self: any, view: any, dt: number)
+	local minimal=view.minimal==true
+	if minimal then
+		view=Hud.minimalView(view)
+		self.toastLabel.Visible=false;self.noteLabel.Visible=false
+		self.toastLeft=0;self.noteLeft=0
+	end
+	self.foodText.Visible=not minimal
+	self.food.Size=UDim2.fromOffset(if minimal then 120 else HUNGER_WIDTH,if minimal then 4 else 22)
+	self.food.AutomaticSize=if minimal then Enum.AutomaticSize.None else Enum.AutomaticSize.Y
+	self.track.Size=UDim2.new(1,0,0,if minimal then 4 else 5)
 	self.food.Visible = type(view.food) == "number"
 	if self.food.Visible then
 		local food = math.clamp(view.food, 0, 1)
 		self.foodFill.Size = UDim2.fromScale(food, 1)
 		self.foodFill.BackgroundColor3 = if food <= 0.25 then Color3.fromRGB(196, 104, 40) else Color3.fromRGB(120, 170, 110)
 		local words = LifeText.hunger(food, view.foodGentle == true)
-		self.foodText.Text = words
+		self.foodText.Text = if minimal then "" else words
 		self.foodText.TextSize = if view.largeText then 24 else 13
 		-- Settles once read: full for SETTLE_SECONDS after the words change, then fades to a trace; never while hungry.
 		if words ~= self.foodWords or food <= CALM_FOOD then self.foodWords = words; self.foodCalm = 0 else self.foodCalm += dt end
@@ -334,6 +356,7 @@ function Hud.update(self: any, view: any, dt: number)
 		self.foodText.TextStrokeTransparency = STROKE + (1 - STROKE) * a
 		self.foodFill.BackgroundTransparency = a * 0.7
 		self.track.BackgroundTransparency = 0.6 + 0.3 * a
+		if minimal then self.foodFill.BackgroundTransparency=.15;self.track.BackgroundTransparency=.55 end
 	end
 	self.grip.Visible = view.grip ~= nil
  if view.grip then self.gripFill.Size = UDim2.fromScale(math.clamp(view.grip,0,1),1) end

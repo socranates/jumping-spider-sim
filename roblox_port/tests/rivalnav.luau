@@ -558,9 +558,12 @@ case("the rival walks along the back wall's foot past the open sash and never go
 end)
 
 -- ---------------------------------------------------------------- ROBLOX-117: the rival and the mate in the preserve's hut garden
-case("the preserve: the rival arrives in the hut garden and roams its cells across their seams, never the hut, never a retreat; the mate too", function()
+case("legacy outdoor drive routes still cross garden and meadow seams; the mate keeps its garden", function()
 	local Hut = require("../src/Shared/World/Hut")
-	local Mate = require("../src/Shared/Predator/Mate")
+	local legacyRoam={}
+ for id in Hut.ROAM do legacyRoam[id]=true end
+ for id in require("../src/Shared/World/Meadow").ROAM do legacyRoam[id]=true end
+ local Mate = require("../src/Shared/Predator/Mate")
 	local MateDrive = require("../src/Shared/Predator/MateDrive")
 	WorldMap.use("preserve")
 	local ok, err = pcall(function()
@@ -568,24 +571,26 @@ case("the preserve: the rival arrives in the hut garden and roams its cells acro
 		local pieces = {}
 		for _, r in WorldMap.regions() do
 			-- (ROBLOX-119: the rival's roam goes on up the path to the bench patch and the meadow's edge: their boxes and the furniture's too)
-			if Rival.PRESERVE_ROAM[r.id] or r.kind == "garden_pole" or r.id == "hut_bench" or r.id == "hut_butt" or r.kind == "hut_wall" or r.id == "path_e6"
+			if legacyRoam[r.id] or r.kind == "garden_pole" or r.id == "hut_bench" or r.id == "hut_butt" or r.kind == "hut_wall" or r.id == "path_e6"
 				or r.kind == "park_bench" or r.kind == "park_bin" or r.id == "lamp_1" or r.id == "pad_b3" or r.id == "meadow_b2" or r.id == "meadow_b3" then
 				for _, p in Region.pieces(r) do table.insert(pieces, p) end
 			end
 		end
 		local garden = BoxWorld.folder("NavGarden", pieces)
 		local list = {}
-		for id in Rival.PRESERVE_ROAM do table.insert(list, WorldMap.region(id)) end
+		for id in legacyRoam do table.insert(list, WorldMap.region(id)) end
 		local lo, hi = WorldMap.unionOf(list :: any)
 		local function motorAt(at: Vector3): any
 			return Motor.new({ world = garden, surfaces = Surfaces, profile = Species.phidippus_audax_prototype, spawn = at, heading = Vector3.new(-1, 0, 0),
 				boundsMin = lo, boundsMax = hi, probeParent = garden })
 		end
 		local r = Rival.new()
-		check(r.region == "garden_d2" and (r.position - Hut.CREATURES.rival.at).Magnitude < 1e-6 and Rival.roam() == Rival.PRESERVE_ROAM, "a preserve rival arrives on the garden's path, its region kept")
+		check(r.region == "hut_floor_b", "the resident now begins indoors")
 		check(Rival.valid(r) and not Rival.misplaced(r), "and its record is good and of this world")
+        -- Keep the old outdoor motor traversal as a regression fixture; this is no longer its residency policy.
+        r.region="garden_d2";r.position=Hut.CREATURES.rival.at;r.previous=r.position;r.origin=r.position;r.target=r.position
 		local m = motorAt(r.position)
-		local d = Drive.new(m, function() return true end, r.region, Rival.roam())
+		local d = Drive.new(m, function() return true end, r.region, legacyRoam)
 		r.state = "patrol"
 		m:place(r.position, Vector3.yAxis, Vector3.new(-1, 0, 0))
 		r.position, r.previous, r.origin = m.pos, m.pos, m.pos
@@ -598,7 +603,7 @@ case("the preserve: the rival arrives in the hut garden and roams its cells acro
 			Drive.update(d, r, DT, s)
 			local p = d.motor.pos
 			local here = WorldMap.at(p)
-			if here ~= nil and Hut.knows(here.kind) and not Rival.PRESERVE_ROAM[here.id] and here.kind ~= "garden_pole" then inHut += 1 end
+			if here ~= nil and Hut.knows(here.kind) and not legacyRoam[here.id] and here.kind ~= "garden_pole" then inHut += 1 end
 			if WorldMap.inRetreat(p) ~= nil then inRetreat += 1 end
 			if p.X < lo.X - 0.5 or p.X > hi.X + 0.5 or p.Z < lo.Z - 0.5 or p.Z > hi.Z + 0.5 then outside += 1 end
 			if here ~= nil and here.id ~= r.region and not WorldMap.inBounds(p, r.region) then mismatch += 1 end
@@ -612,7 +617,7 @@ case("the preserve: the rival arrives in the hut garden and roams its cells acro
 		check(Rival.valid(r), "its record after a walk is good")
 		-- the stalk follows the spider over a seam: the spider stands in the cell beside it, seen
 		local start = Vector3.new(40, Hut.GROUND + 0.31, -121)
-		local seen = Drive.new(motorAt(start), function() return nil end, "garden_b3", Rival.roam())
+		local seen = Drive.new(motorAt(start), function() return nil end, "garden_b3", legacyRoam)
 		local r2 = Rival.new()
 		r2.state = "stalk"
 		local other = WorldMap.region("garden_a3")
@@ -631,7 +636,7 @@ case("the preserve: the rival arrives in the hut garden and roams its cells acro
 		-- (ROBLOX-119) on the meadow's edge: a rival in the grass by the bench patch walks the edge's cells and the gravel, never out of its roam
 		do
 			local a3 = WorldMap.region("meadow_a3") :: any
-			local md = Drive.new(motorAt(a3.spawn.pos + Vector3.new(0, 0.31, 0)), function() return true end, "meadow_a3", Rival.roam())
+			local md = Drive.new(motorAt(a3.spawn.pos + Vector3.new(0, 0.31, 0)), function() return true end, "meadow_a3", legacyRoam)
 			local r3 = Rival.new()
 			r3.state = "patrol"
 			md.motor:place(a3.spawn.pos + Vector3.new(0, 0.31, 0), Vector3.yAxis, Vector3.new(1, 0, 0))
@@ -645,12 +650,12 @@ case("the preserve: the rival arrives in the hut garden and roams its cells acro
 				Drive.update(md, r3, DT, s3)
 				cells[r3.region] = true
 				local here = WorldMap.at(md.motor.pos)
-				if here ~= nil and not Rival.PRESERVE_ROAM[here.id] and not WorldMap.inBounds(md.motor.pos, r3.region) then astray += 1 end
+				if here ~= nil and not legacyRoam[here.id] and not WorldMap.inBounds(md.motor.pos, r3.region) then astray += 1 end
 			end
 			local nc = 0
 			for _ in cells do nc += 1 end
 			print(`RIVALNAV the meadow's edge: in 10 minutes the rival walked {nc} regions ({md.stats.crossings or 0} crossings), {string.format("%.0f", (md.motor.pos - start).Magnitude)} studs from where it began, in {tostring(r3.region)}, its record good {Rival.valid(r3)}`)
-			check((md.motor.pos - start).Magnitude > 5 and astray < 60 * 5 and Rival.valid(r3) and Rival.PRESERVE_ROAM[r3.region], `a rival at the meadow's edge walks it, in its roam ({nc} regions, astray {astray} ticks)`)
+			check((md.motor.pos - start).Magnitude > 5 and astray < 60 * 5 and Rival.valid(r3) and legacyRoam[r3.region], `a rival at the meadow's edge walks it, in its roam ({nc} regions, astray {astray} ticks)`)
 		end
 		-- the mate: arrives where it comes in from the path round the east end, roams, and its record keeps its region
 		local mate = Mate.new()

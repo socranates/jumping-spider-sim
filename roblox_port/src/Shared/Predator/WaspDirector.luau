@@ -36,6 +36,7 @@
 
 local Data = require(script.Parent.Parent.Data.Wasp)
 local PreyRandom = require(script.Parent.Parent.Prey.PreyRandom)
+local StationAir = require(script.Parent.Parent.World.StationAir)
 
 local WaspDirector = {}
 WaspDirector.__index = WaspDirector
@@ -122,7 +123,7 @@ function WaspDirector.new(config: { seed: number, world: World, enabled: boolean
 		-- The rival male (ROBLOX-70): whether this visit is for it, whether it hangs under the wasp, and where.
 		takeRival = false, holdingRival = false, rivalHeldAt = nil :: Vector3?, rivalNow = nil :: any, takeSub = "fly", takeOpen = Vector3.new(0, 0, 0),
 		-- The visit in progress.
-		rng = nil :: Rng?, path = {} :: { Vector3 }, pathI = 1, speed = Data.flySpeed, point = 1, recent = {} :: { number },
+		points = Data.points, rng = nil :: Rng?, path = {} :: { Vector3 }, pathI = 1, speed = Data.flySpeed, point = 1, recent = {} :: { number },
 		sub = "", subS = 0.0, walkDir = Vector3.new(0, 0, 0), stepS = 0.0, openPos = Vector3.new(0, 0, 0), lastSeen = Vector3.new(0, 0, 0),
 		unseenS = 0.0, holdS = 0.0, lossPos = nil :: Vector3?, strikeFrom = Vector3.new(0, 0, 0), strikeTo = Vector3.new(0, 0, 0),
 		dt = 1 / 60, spider = nil :: Spider?,
@@ -139,8 +140,20 @@ function WaspDirector.useGameRules(self: any)
 	self.windowList, self.minGapH = g.windows, g.minGapH
 end
 
+function WaspDirector.useStationRules(self: any): boolean
+	if self.station then return false end
+	self.station=StationAir;self.points=StationAir.points
+	return true
+end
+
 function WaspDirector.isVisiting(self: any): boolean
 	return self.phase ~= "away"
+end
+
+-- A resident's ordinary patrol is not a perpetual combat/modal lock.
+function WaspDirector.isThreatening(self: any): boolean
+	if not self.station then return self:isVisiting() end
+	return self.phase=="inspecting" or self.phase=="striking" or self.phase=="carrying"
 end
 
 -- ---------------------------------------------------------------------------------------------------------------- when it comes
@@ -216,6 +229,7 @@ end
 -- Begins the day's next visit if its hour has come: the first of the day's visits not yet had whose window the hour is in, from its planned
 -- hour to the window's end, and nothing blocks it. A visit whose window passed unused (a rest through all of it) is simply skipped.
 function WaspDirector._maybeBegin(self: any, block: Block)
+	if self.station then self:beginVisit(block.day,1);return end
 	local day = block.day
 	local windows = self:dayWindows(day)
 	local done = if day == self.lastVisitDay then self.lastVisitSlot else 0
@@ -242,7 +256,9 @@ end
 -- when it is already here. It uses up the day's next visit.
 function WaspDirector.force(self: any, day: number, at: string?): boolean
 	if self.phase ~= "away" then return false end
-	self:beginVisit(day, if at then WaspDirector.pointIndex(at) else nil)
+	local first=nil
+	if at then for i,point in self.points do if point.id==at then first=i;break end end end
+	self:beginVisit(day, first)
 	return true
 end
 
@@ -269,18 +285,22 @@ function WaspDirector.beginVisit(self: any, day: number, first: number?, slot: n
 	self.holdingRival, self.rivalHeldAt = false, nil
 	-- Whether this visit is for the rival male (the game's wasp only): a draw from a stream of its own, so the other draws are as before.
 	self.takeRival = self.rivalChance ~= nil and makeStream(self.seed, day * 1009 + 29, self.visits):unit() < self.rivalChance
-	self.point = first or self.rng:int(1, #Data.points)
-	local to: Vector3 = Data.points[self.point].hover
+	self.point = first or self.rng:int(1, #self.points)
+	local to: Vector3 = self.points[self.point].hover
 	self.path = { Data.entry, Data.over, Vector3.new(to.X, Data.cruiseY, to.Z), to }
+	if self.station then
+		self.takeRival=false
+		self.path=self.station.route(self.station.entry,to)
+	end
 	self.pathI = 2
 	self.speed = pathLength(self.path) / Data.arriveS
-	self:_place(Data.entry)
+	self:_place(if self.station then self.station.entry else Data.entry)
 	self.wasp.mode = "flying"
 	self.wasp.search = 0.0
 	self.wasp.visible = true
 	self:_setPhase("arriving")
 	self:_log("warning")
-	self:_signal({ kind = "visit_started", first = self.visits == 1, point = Data.points[self.point].id })
+	self:_signal({ kind = "visit_started", first = self.visits == 1, point = self.points[self.point].id })
 end
 
 -- ---------------------------------------------------------------------------------------------------------------- the tick
@@ -291,6 +311,7 @@ function WaspDirector.step(self: any, dt: number, spider: Spider, block: Block)
 	self.dt = dt
 	self.spider = spider
 	self.rivalNow = block.rival
+	self.protected=self.station~=nil and (block.resting or block.moulting)
 	local phase: string = self.phase
 	if phase == "away" then
 		if self.enabled then self:_maybeBegin(block) end
@@ -299,7 +320,7 @@ function WaspDirector.step(self: any, dt: number, spider: Spider, block: Block)
 	self.visitS += dt
 	self.phaseS += dt
 	if phase == "arriving" then
-		if self:_advance(dt) then
+		if self:_advance(dt) and (not self.station or self.phaseS>=Data.arriveS) then
 			self.openPos = self.wasp.position
 			if self.takeRival and self:_beginTaking() then return end
 			self:_setPhase("searching")
@@ -336,10 +357,11 @@ function WaspDirector.step(self: any, dt: number, spider: Spider, block: Block)
 		local done = self:_advance(dt)
 		self:_holdRival()
 		if done then
-			self:_setPhase("away")
-			self.wasp.visible = false
+			self:_setPhase(if self.station then "searching" else "away")
+			self.wasp.visible = self.station~=nil
 			self.holdingRival, self.rivalHeldAt, self.takeRival = false, nil, false
 			self:_signal({ kind = "rival_carried_off" })
+			if self.station then self:_beginLeaving() end
 		end
 	elseif phase == "leaving" then
 		if self:_advance(dt) then
@@ -370,7 +392,7 @@ function WaspDirector._search(self: any, dt: number)
 		self:_moveTo(wasp.position, rotateY(wasp.heading, math.rad(Data.scanDegS) * dt), dt)
 		self.subS -= dt
 		if self.subS <= 0.0 then
-			local p = Data.points[self.point]
+			local p = self.points[self.point]
 			if p.land ~= nil and self.rng:unit() < Data.landChance and self.searchLeft > Data.landS + Data.walkS then
 				self.sub = "land"
 				self.path = { wasp.position, p.land }
@@ -431,25 +453,38 @@ function WaspDirector._walk(self: any, dt: number)
 end
 
 function WaspDirector._nextPoint(self: any)
+	if self.station then
+		-- A complete circuit through both rooms, rather than repeatedly choosing
+		-- the nearest few sites. Unreachable authored sites are skipped, never
+		-- reached by teleporting through their support or a wall.
+		for _=1,#self.points do
+			self.point=self.point%#self.points+1
+			local path=self.station.route(self.wasp.position,self.points[self.point].hover)
+			if #path>1 then
+				self.path=path;self.pathI=2;self.speed=12;self.sub="fly";return
+			end
+		end
+		self.sub="hover";self.subS=2;return
+	end
 	table.insert(self.recent, self.point)
 	while #self.recent > 3 do table.remove(self.recent, 1) end
 	local here: Vector3 = self.wasp.position
 	local choices: { number } = {}
-	for i, pt in Data.points do
+	for i, pt in self.points do
 		if table.find(self.recent, i) then continue end
 		local hover: Vector3 = pt.hover
 		local loss: Vector3? = self.lossPos
 		if loss ~= nil and (hover - loss).Magnitude < Data.farFromLossWu then continue end
 		table.insert(choices, i)
 	end
-	if #choices == 0 then table.insert(choices, (self.point % #Data.points) + 1) end
+	if #choices == 0 then table.insert(choices, (self.point % #self.points) + 1) end
 	-- A local search: the nearer half of the places it has not just looked at.
 	table.sort(choices, function(a: number, b: number): boolean
-		return (here - Data.points[a].hover).Magnitude < (here - Data.points[b].hover).Magnitude
+		return (here - self.points[a].hover).Magnitude < (here - self.points[b].hover).Magnitude
 	end)
 	local count = math.max(1, (#choices + 1) // 2)
 	self.point = choices[self.rng:int(1, count)]
-	self:_flyTo(Data.points[self.point].hover, Data.flySpeed)
+	self:_flyTo(self.points[self.point].hover, Data.flySpeed)
 	self.sub = "fly"
 end
 
@@ -459,6 +494,7 @@ end
 function WaspDirector.canSeeSpider(self: any): boolean
 	local s: Spider? = self.spider
 	if s == nil or self.holding or not self.wasp.visible then return false end
+	if self.protected then return false end
 	if self.world.inRetreat(s.position) then return false end
 	local eye = self:eyePosition()
 	if (eye - s.position).Magnitude > Data.sightWu then return false end
@@ -566,7 +602,9 @@ end
 
 function WaspDirector._strike(self: any, dt: number)
 	local k = math.clamp(self.phaseS / Data.strikeS, 0.0, 1.0)
-	self:_moveTo(self.strikeFrom:Lerp(self.strikeTo, k), self.strikeTo - self.strikeFrom, dt)
+	local nextPos=self.strikeFrom:Lerp(self.strikeTo,k)
+	if self.station and (self.protected or not self:_clear(self.wasp.position,nextPos,Data.radius)) then self:_lose("blocked");return end
+	self:_moveTo(nextPos, self.strikeTo - self.strikeFrom, dt)
 	if k < 1.0 then return end
 	local s: Spider = self.spider
 	if (self.wasp.position - s.position).Magnitude <= Data.catchWu and not self.world.inRetreat(s.position) and not s.airborne then
@@ -592,6 +630,7 @@ function WaspDirector._catch(self: any)
 	wasp.search = 0.0
 	local p: Vector3 = wasp.position
 	self.path = { p, p + UP * 2.5, Data.over }
+	if self.station then self.path=self.station.route(p,self.station.entry) end
 	self.pathI = 2
 	self.speed = pathLength(self.path) / Data.carryS
 	self:_setPhase("carrying")
@@ -615,6 +654,16 @@ function WaspDirector._lose(self: any, why: string)
 end
 
 function WaspDirector._beginLeaving(self: any)
+	if self.station then
+		-- It abandons this hunt, not its home. The recovery/confusion interval
+		-- still gives the spider time to get clear before the next patrol leg.
+		if self.noticedThisVisit then self.escapes+=1 end
+		self.noticedThisVisit=false;self.notice=0;self.confusedS=Data.confuseS
+		self.searchLeft=Data.searchS*(self.searchScale or 1)
+		self:_setPhase("searching");self:_nextPoint()
+		if self.rivalChance and self.rng:unit()<self.rivalChance then self:_beginTaking() end
+		return
+	end
 	local p: Vector3 = self.wasp.position
 	local path = self:_route(p, Data.over)
 	table.insert(path, Data.entry)
@@ -711,6 +760,10 @@ function WaspDirector._seize(self: any, dt: number)
 	self.path = { p, p + UP * 2.5, Data.over }
 	self.pathI = 2
 	self.speed = pathLength(self.path) / Data.carryS
+	if self.station then
+		self.path=self.station.route(p,self.station.entry)
+		self.speed=pathLength(self.path)/Data.carryS
+	end
 	self:_setPhase("bearing")
 	self:_log("seized")
 	self:_holdRival()
@@ -731,6 +784,7 @@ end
 
 -- Up to cruising height (from somewhere open above it), across, and down to `to`.
 function WaspDirector._route(self: any, from: Vector3, to: Vector3): { Vector3 }
+	if self.station then return self.station.route(from,to) end
 	local path: { Vector3 } = { from }
 	local start = from
 	if from.Y < Data.cruiseY and not self:_clear(from, Vector3.new(from.X, Data.cruiseY, from.Z), Data.radius) then
@@ -762,6 +816,9 @@ function WaspDirector._advance(self: any, dt: number): boolean
 		end
 	end
 	local dir = p - wasp.position
+	if self.station and not self:_clear(wasp.position,p,Data.radius) then
+		self.pathI=#path+1;p=wasp.position;dir=Vector3.zero
+	end
 	self:_moveTo(p, if dir.Magnitude > 1e-5 then dir else wasp.heading, self.dt)
 	return self.pathI > #path
 end

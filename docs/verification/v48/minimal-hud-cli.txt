@@ -1,0 +1,4 @@
+MINIMAL passed=32 failed=0
+STATION physical parts=368 regions=51
+STATION wasp circuit visited=14/16
+STATION passed=32832 failed=0

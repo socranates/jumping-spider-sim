@@ -15,6 +15,7 @@
 local Scenery = require(script.Parent.Parent.Habitat.Scenery)
 local WorldMap = require(script.Parent.WorldMap)
 local Region = require(script.Parent.Region)
+local Station = require(script.Parent.StationTerritory)
 
 local WorldBuild = {}
 
@@ -28,7 +29,7 @@ function WorldBuild.region(region: WorldMap.Region, parent: Instance, replaced: 
 	else
 		local model = Instance.new("Model")
 		-- A region is the unit used by prey readiness: never replicate half a region.
-		model.ModelStreamingMode = if region.kind == "verge" then Enum.ModelStreamingMode.Persistent else Enum.ModelStreamingMode.Atomic
+		model.ModelStreamingMode = if region.kind == "verge" or Station.contains(region.id) then Enum.ModelStreamingMode.Persistent else Enum.ModelStreamingMode.Atomic
 		folder = model
 		folder.Name = Region.folderName(region)
 		local hide = replaced

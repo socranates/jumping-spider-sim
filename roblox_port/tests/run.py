@@ -74,6 +74,7 @@ MODULES = [
     ("Meadow", "World/Meadow.luau"),
     ("Pond", "World/Pond.luau"),
     ("WorldMap", "World/WorldMap.luau"),
+    ("StationTerritory", "World/StationTerritory.luau"),
     ("Breakaway", "Habitat/Breakaway.luau"),
     ("Detail", "Data/Detail.luau"),
     ("Graphics", "Data/Graphics.luau"),
@@ -83,6 +84,7 @@ MODULES = [
     ("Garden", "World/Garden.luau"),
     ("PreserveLook", "World/PreserveLook.luau"),
     ("Region", "World/Region.luau"),
+    ("StationAir", "World/StationAir.luau"),
     ("LookPlan", "World/LookPlan.luau"),
     ("Wear", "Data/Wear.luau"),
     ("FlyLook", "Data/FlyLook.luau"),
@@ -258,7 +260,7 @@ CLIENT_MODULES = [
     ("WorldClient", "../Client/WorldClient.luau"),
     ("SelfTest", "../Client/SelfTest.luau"),
 ]
-CLIENT_TESTS = {"living_world.luau","bodies.luau", "shadows.luau", "preserve.luau", "selftest_preserve.luau", "quiet.luau", "lock.luau", "title.luau", "nature_client.luau", "selftest.luau", "garden_life.luau", "world_client.luau","state_client.luau","state_offline.luau","growth.luau","perception_client.luau", "client_smoke.luau", "client_ant.luau", "client_rival.luau", "client_mating.luau", "look.luau", "idle.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "wasp.luau", "notebook.luau", "settings.luau", "inspect.luau"}
+CLIENT_TESTS = {"minimal_hud.luau","living_world.luau","bodies.luau", "shadows.luau", "preserve.luau", "selftest_preserve.luau", "quiet.luau", "lock.luau", "title.luau", "nature_client.luau", "selftest.luau", "garden_life.luau", "world_client.luau","state_client.luau","state_offline.luau","growth.luau","perception_client.luau", "client_smoke.luau", "client_ant.luau", "client_rival.luau", "client_mating.luau", "look.luau", "idle.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "wasp.luau", "notebook.luau", "settings.luau", "inspect.luau"}
 REFERENCES = ["jump_reference", "tether_reference", "camera_reference", "framing_reference", "perception_reference", "prey_reference", "life_reference", "wasp_reference", "continuing_reference", "growth_reference", "notebook_reference", "notebook_godot"]
 # A reference only the named tests read (it is large; the other bundles leave it out).
 REFERENCE_ONLY = {"continuing_reference": {"continuing.luau"},"prey_reference": {"prey.luau"}, "perception_reference": {"perception.luau"}, "life_reference": {"life.luau"}, "wasp_reference": {"wasp.luau"}, "notebook_reference": {"notebook.luau"}, "notebook_godot": {"notebook.luau"}}
@@ -270,7 +272,7 @@ def requires(text):
     text = re.sub(r'require\(script\.Parent(?:\.Parent\.\w+)?\.(\w+)\)', lambda m: f"__mods.{m.group(1)}" if m.group(1) in NAMES else m.group(0), text)
     text = re.sub(r'require\("\.\./src/(?:Shared/\w+|Client|Server|First)/(\w+)"\)', lambda m: f"__mods.{m.group(1)}", text)
     text = re.sub(r'require\((?:[^()\n]|\([^()\n]*\))*:WaitForChild\("(\w+)"\)\)', lambda m: f"__mods.{m.group(1)}" if m.group(1) in NAMES else m.group(0), text)
-    text = re.sub(r'require\("\.\./src/Client/SpiderClient\.client"\)', lambda m: "(function()\nlocal script = { Parent = ClientStubs.scriptFolder }\nlocal require = function(module) return module.run end\nlocal task = { spawn = function(f, ...) f(...) end }\n" + requires(strict((HERE.parent / "src/Client/SpiderClient.client.luau").read_text(encoding="utf-8"))) + "\nend)()", text)
+    text = re.sub(r'require\("\.\./src/Client/SpiderClient\.client"\)', lambda m: "(function()\nlocal script = { Parent = ClientStubs.scriptFolder }\nlocal require = function(module) return module.run end\nlocal task = { spawn = function(f, ...) f(...) end, wait = function() end }\n" + requires(strict((HERE.parent / "src/Client/SpiderClient.client.luau").read_text(encoding="utf-8"))) + "\nend)()", text)
     text = re.sub(r'require\(Shared\.\w+\.(\w+)\)', lambda m: f"__mods.{m.group(1)}" if m.group(1) in NAMES else m.group(0), text)
     text = re.sub(r'require\("\./(\w+)"\)', lambda m: f"__refs.{m.group(1)}" if m.group(1) in REFERENCES else m.group(0), text)
     text = re.sub(r'require\("\./studio/(\w+)"\)', lambda m: chunk(HERE / "studio" / (m.group(1) + ".luau")), text)
@@ -314,7 +316,7 @@ def main():
     luau = sys.argv[1] if len(sys.argv) > 1 else "luau"
     status = 0
     named = sys.argv[2:]
-    for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "life.luau", "checkpoint.luau", "wasp.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "client_ant.luau", "client_rival.luau", "client_mating.luau", "look.luau", "idle.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "peacock.luau", "antmimic.luau", "tarantula.luau", "continuing.luau", "growth.luau", "notebook.luau", "state.luau", "state_client.luau", "state_offline.luau", "settings.luau", "rival.luau", "rivalnav.luau", "mating.luau", "inspect.luau", "worldmap.luau", "world_client.luau", "garden_life.luau", "selftest.luau", "nature.luau", "nature_client.luau", "title.luau", "lock.luau", "quiet.luau", "preserve.luau", "selftest_preserve.luau", "shadows.luau", "bodies.luau", "living_world.luau"]:
+    for test_file in named or ["run.luau", "perception.luau", "sensor.luau", "prey.luau", "life.luau", "checkpoint.luau", "wasp.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "client_ant.luau", "client_rival.luau", "client_mating.luau", "look.luau", "idle.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "peacock.luau", "antmimic.luau", "tarantula.luau", "continuing.luau", "growth.luau", "notebook.luau", "state.luau", "state_client.luau", "state_offline.luau", "settings.luau", "rival.luau", "rivalnav.luau", "mating.luau", "inspect.luau", "worldmap.luau", "world_client.luau", "garden_life.luau", "selftest.luau", "nature.luau", "nature_client.luau", "title.luau", "lock.luau", "quiet.luau", "preserve.luau", "selftest_preserve.luau", "shadows.luau", "bodies.luau", "living_world.luau", "station_threats.luau", "minimal_hud.luau"]:
         if not (HERE / test_file).exists():
             if named:  # a misspelt name must not look like a pass
                 print(f"no such test file: {test_file} (names are relative to tests/, for example look.luau)", file=sys.stderr)

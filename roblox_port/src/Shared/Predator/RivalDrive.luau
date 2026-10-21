@@ -16,6 +16,7 @@ local WorldMap = require(script.Parent.Parent.World.WorldMap)
 local SupportMath = require(script.Parent.Parent.Movement.SupportMath)
 local Motor = require(script.Parent.Parent.Movement.SpiderMotor)
 local PreyRandom = require(script.Parent.Parent.Prey.PreyRandom)
+local Station = require(script.Parent.Parent.World.StationTerritory)
 
 local Drive = {}
 Drive.__index = Drive
@@ -70,12 +71,17 @@ function Drive.crossTo(self: any, toward: Vector3?, only: string?): any
 	local best, bestD = nil, math.huge
 	for _, pair in self.g:allSeams() do
 		local e = pair.edge
-		if e.flat and self.roam[e.region] and (only == nil or e.region == only) and #e.samples > 0 then
+		if (e.flat or Station.contains(self.region)) and self.roam[e.region] and (only == nil or e.region == only) and #e.samples > 0 then
 			local face = self.g.faces[pair.face]
 			for _, sp in e.samples do
 				local d = if toward ~= nil then (sp - toward).Magnitude else 0
-				if face ~= nil and face.normal.Y > 0.9 and not self.g:inKeepOut(sp + face.normal * SEAT) and d < bestD then
-					best, bestD = { pos = sp, up = face.normal, face = pair.face, cross = { to = e.region, aim = sp + e.ahead * 2.5 } }, d
+				if face ~= nil and (face.normal.Y > 0.9 or Station.contains(self.region)) and not self.g:inKeepOut(sp + face.normal * SEAT) and d < bestD then
+					local nextFace=Route.graph(e.region).faces[e.to]
+					local across=if e.flat then e.ahead elseif e.convex then -face.normal else face.normal
+					best, bestD = { pos = sp, up = face.normal, face = pair.face, cross = {
+						to = e.region, aim = sp + across * 2.5 + nextFace.normal * SEAT,
+						ahead=if e.flat then nil else e.ahead, up=face.normal,
+					} }, d
 				end
 			end
 			if toward == nil and best ~= nil then break end
@@ -230,7 +236,7 @@ function Drive._think(self: any, r: any, s: any)
 	local motor = self.motor
 	self.stats.thinks += 1
 	local delta = s.position - r.position
-	self.sees = delta.Magnitude < Rules.sightWu and not self.blocked(r.position, s.position)
+	self.sees = not (s.safe or s.resting or s.scene or s.courting or s.wasp) and delta.Magnitude < Rules.sightWu and not self.blocked(r.position, s.position)
 	if self.sees then
 		self.seen, self.seenUp, self.lost = s.position, s.up or Vector3.yAxis, 0.0
 	else
@@ -319,6 +325,7 @@ function Drive._wish(self: any, r: any, s: any): (Vector3, Vector3?)
 	if state == "windup" then return Vector3.zero, s.position end
 	-- (ROBLOX-117) walking in over the seam it has crossed
 	if (state == "patrol" or state == "stalk") and self.crossing ~= nil then
+		if self.crossing.ahead and motor.up:Dot(self.crossing.up)>.9 then return SupportMath.tangentDir(self.crossing.ahead,motor.up),nil end
 		return SupportMath.tangentDir(self.crossing.aim - motor.pos, motor.up), nil
 	end
 	if (state ~= "patrol" and state ~= "stalk") or self.goal == nil or self.route == nil then return Vector3.zero, nil end
@@ -336,7 +343,7 @@ function Drive._wish(self: any, r: any, s: any): (Vector3, Vector3?)
 			self.stats.arrivals += 1
 			self:useRegion(cross.to)
 			r.region = cross.to
-			self.crossing = { aim = cross.aim, t = 0 }
+			self.crossing = { aim = cross.aim, t = 0, ahead=cross.ahead, up=cross.up }
 			self.stats.crossings = (self.stats.crossings or 0) + 1
 			return SupportMath.tangentDir(cross.aim - motor.pos, motor.up), nil
 		end

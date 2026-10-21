@@ -446,6 +446,7 @@ end
 
 local function showPlan(plan: any)
 	hidePreview()
+	if M.World.map.world()=="preserve" then return end -- Learn the leap from the spider, not a trajectory overlay.
 	if not plan or plan.kind == "none" or not plan.point then return end
 	local color = COLORS[plan.kind] or COLORS.none
 	-- Beyond 6 studs from the camera the whole patch grows with the distance (up to four times), so it stays readable;
@@ -570,7 +571,7 @@ end
 -- A rest in the crack is not a change of spider, but the Settings row is allowed anywhere; the mating scene, the hatching, sleep, a wasp's visit and the rival's windup have the
 -- spider, and neither the row nor the close look is allowed then (ROBLOX-92: the row was, in a scene).
 function spiderPick.occupied(): boolean
-	return mateLegs.couple.active or mateLegs.phase ~= "" or life.asleep or wasp:isVisiting() or spiderPick.rivalThreat()
+	return mateLegs.couple.active or mateLegs.phase ~= "" or life.asleep or wasp:isThreatening() or spiderPick.rivalThreat()
 end
 -- The Settings row's side: standing safely (SpiderChoice.safeToChange) anywhere, not only in the crack, and not while something has the spider. Answers the line the panel shows.
 function spiderPick.safe(): boolean
@@ -722,7 +723,7 @@ function spiderPick.update(frameDt: number)
 		end
 	end
 	if spiderPick.inspecting then
-		if wasp:isVisiting() or spiderPick.rivalThreat() then
+		if wasp:isThreatening() or spiderPick.rivalThreat() then
 			spiderPick.finish(spiderPick.Text.DANGER, true)
 		elseif modal() or GuiService.MenuIsOpen then
 			spiderPick.finish(nil, true) -- (a menu, the notebook, the settings, the catch screen or Roblox's own menu has the game: the look is simply over)
@@ -1161,6 +1162,10 @@ local function placeTopButton(button: TextButton,r: { x0: number, y0: number, x1
  button.Position=UDim2.fromOffset(r.x0,r.y0);button.Size=UDim2.fromOffset(r.x1-r.x0,r.y1-r.y0)
 end
 local function placeTopButtons()
+	local minimal=M.World.map.world()=="preserve"
+	menuButton.Visible=not minimal or UIS.TouchEnabled
+	menuButton.Text=if minimal then "≡" else "Menu"
+	notebookButton.Visible=not minimal -- The notebook remains available inside the menu and on N.
  local size=hud.safe.AbsoluteSize
  local t=M.HudLayout.topLayout(size.X,size.Y)
  placeTopButton(menuButton,t.menu);placeTopButton(notebookButton,t.notebook)
@@ -1709,6 +1714,8 @@ local function updateHud(frameDt: number)
 		view = { device = device, status = {}, helpVisible = view.helpVisible, helpText = view.helpText, largeText = view.largeText, captionScale = view.captionScale,
 			prompt = { title = spiderPick.Text.nameLine(appearance), hint = spiderPick.Text.hint(device) } }
 	end
+	view.minimal=M.World.map.world()=="preserve" and not spiderPick.inspecting
+	view.helpRequested=helpUntil==math.huge
 	hud:update(view, frameDt)
 end
 
@@ -1778,6 +1785,9 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			-- The wasp runs after the spider has moved and before feeding (Godot: physics priority 8).
 			wasp.enabled = not testPlace or Workspace:GetAttribute("Wasp") == true
             wasp:useGameRules()
+			if M.World.map.world()=="preserve" and wasp:useStationRules() then
+				task.spawn(function() wasp.station.prepare(function() task.wait() end) end)
+			end
 			wasp.nature = not needs.gentle -- (ROBLOX-106: the standard rules' wasp: its windows slide, its visits vary and sometimes linger)
 			local forced = if testPlace then Workspace:GetAttribute("WaspForce") else nil
 			if typeof(forced) == "string" and forced ~= "" then
@@ -1952,7 +1962,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
              day=life.clock.day,hour=life.clock.hour,meals=genMeals,born=born,resting=life.resting,safe=M.World:inRetreat(motor.pos)~=nil,
              -- the rival keeps away from a courting pair and from the mating scene (ROBLOX-91): it recovers, like for the wasp
              scene=mateLegs.Mate.sceneActive(life.mate),courting=mateLegs.Mate.courting(life.mate,motor.pos),
-             wasp=wasp:isVisiting(),gentle=needs.gentle,grounded=motor.mode=="attached",moving=motor.moving,
+             wasp=wasp:isThreatening(),gentle=needs.gentle,grounded=motor.mode=="attached",moving=motor.moving,
              airborne=motor.mode=="air",onLine=motor:onLine(),holding=prey.feeding.held~=nil,
              striking=prey.tick<=prey.strikeEnd and not motor.seized,drive=rivalLegs.drive,taken=wasp.holdingRival,
              seed=914, -- the world's seed, as the prey's and the wasp's: the rival's contest draws from it (ROBLOX-73)
@@ -1999,7 +2009,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
              table.clear(ms)
              for k,v in rivalState do ms[k]=v end -- (ROBLOX-92: the one table, filled again, not a clone of the rival's every tick)
              ms.drive,ms.sex,ms.needsDance,ms.dancing,ms.blocked=mateLegs.drive,mateLegs.Mating.sexOf(appearance),SpiderChoice.canDance(appearance),dance.active,sightCast
-             if mateLegs.couple.active and wasp:isVisiting() then mateLegs.skip(true) end -- (the controls are the player's again the moment the wasp comes)
+             if mateLegs.couple.active and wasp:isThreatening() then mateLegs.skip(true) end -- A resident's routine patrol does not cancel every scene.
              ms.rivalThreat=life.rival.state=="windup" or life.rival.state=="lunge" -- (a scene would not start under a lunge: Mating.tick skips it at once)
              ms.nature=ms.nature==true and mateLegs.Rules.game.on==true;ms.rival=RivalSpider.target(life.rival) -- (ROBLOX-106: courtship can fail, the rival can cut in)
              if mateLegs.drive~=nil and life.mate~=nil and not M.World:creatureLive(life.mate.region) then mateLegs.drive.sees=false end -- (ROBLOX-117: a mate out of play sees nothing)
@@ -2255,7 +2265,8 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	M.Prof.lap("camera")
 	eyes:update(frameDt, focusing)
 	M.Prof.lap("eyes")
-	perceptionHud:draw(memory,camera,sightCast,focusing,setting("ShowLastSeen") == true,setting("ShowNoticed") ~= false,M.lock.point)
+	perceptionHud.gui.Enabled=M.World.map.world()~="preserve"
+	if perceptionHud.gui.Enabled then perceptionHud:draw(memory,camera,sightCast,focusing,setting("ShowLastSeen") == true,setting("ShowNoticed") ~= false,M.lock.point) end
 	M.Prof.lap("perception hud")
 	-- Depth of field: on the spider in third person; in the eye view SpiderEyes owns it and focuses on what is looked at.
 	local dof = Lighting:FindFirstChild("MacroDOF")

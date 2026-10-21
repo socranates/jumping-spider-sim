@@ -583,5 +583,38 @@ case("close grass is rooted, wind-responsive, bounded and absent from hard props
  check(#living.grass==0 and #living.patches==0,"metal surfaces grow neither grass nor emerging soil grubs")
  living:destroy();decor:Destroy();root:Destroy();WorldMap.use("test_garden")
 end)
+case("stationary rain notices streamed shelter without an unbounded cast burst",function()
+ for _,tier in {"full","low"} do
+  local root=Instance.new("Folder");root.Parent=workspace
+  local floor=Instance.new("Part");floor.Size=Vector3.new(100,1,100);floor.CFrame=CFrame.new(0,-1,0);floor.Parent=root
+  local living=LivingWorld.new(workspace,root,tier,WorldMap)
+  local region={kind="meadow"};local state={rain=1,wind=Vector3.zero}
+  local casts=0;local ground=living.ground
+  living.ground=function(self,...) casts+=1;return ground(self,...) end
+  living:rainfall(Vector3.zero,region,state,false)
+  local initial=true;for _,drop in living.rain do initial=initial and near(drop.floor,-.5) end
+  check(initial,tier.." rain initially stops at the physical floor")
+  local roof=Instance.new("Part");roof.Size=Vector3.new(100,1,100);roof.CFrame=CFrame.new(0,6,0);roof.Parent=root
+  local bounded=true
+  for step=1,20 do
+   living.elapsed+=.05;local before=casts
+   living:rainfall(Vector3.zero,region,state,false)
+   bounded=bounded and casts-before<=(if tier=="low" then 1 else 2)
+  end
+  local sheltered=true;for _,drop in living.rain do sheltered=sheltered and near(drop.floor,6.5) end
+  check(sheltered,tier.." streamed roof is noticed while the observer stands still")
+  check(bounded,tier.." stationary shelter refresh uses at most two/full or one/low casts per update")
+  roof:Destroy()
+  for step=1,20 do living.elapsed+=.05;living:rainfall(Vector3.zero,region,state,false) end
+  local exposed=true;for _,drop in living.rain do exposed=exposed and near(drop.floor,-.5) end
+  check(exposed,tier.." unloading the roof restores rain down to the floor")
+  local before=casts
+  state.rain=0;living:rainfall(Vector3.new(20,0,0),region,state,false)
+  check(casts==before,tier.." fair weather does no rain support casts")
+  state.rain=1;living:rainfall(Vector3.new(40,0,0),region,state,true)
+  check(casts==before,tier.." Reduced Motion does no rain support casts")
+  living:destroy();root:Destroy()
+ end
+end)
 print(`LIVING_WORLD passed={passed} failed={failed}`)
 if failed>0 then error("living habitat checks failed") end

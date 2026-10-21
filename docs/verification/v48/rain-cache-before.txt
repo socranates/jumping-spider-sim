@@ -1,0 +1,7 @@
+FAIL LIVING_WORLD full streamed roof is noticed while the observer stands still
+FAIL LIVING_WORLD full fair weather does no rain support casts
+FAIL LIVING_WORLD full Reduced Motion does no rain support casts
+FAIL LIVING_WORLD low streamed roof is noticed while the observer stands still
+FAIL LIVING_WORLD low fair weather does no rain support casts
+FAIL LIVING_WORLD low Reduced Motion does no rain support casts
+LIVING_WORLD passed=3942 failed=6

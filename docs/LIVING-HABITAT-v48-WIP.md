@@ -116,6 +116,12 @@ Working branch: `codex/v48-living-habitat`, based on v47 receipt commit `9d442ff
 - Living-world checks 3,936/0, world client 30/0, strict analysis clean, 207/207 compile. Native full/low crossings retain the same flea on screen with zero anchor movement, while the spider remains attached. See `docs/verification/v48/CONTINUITY-REVIEW.md` for the diagnostic scope, frame samples and cleanup evidence.
 - This resolves the continuity tasks in the previous entry. Weather transitions and broader ordinary travel remain next; a fresh immutable full regression is required for the updated source. No v48 publication claim.
 
+### Weather sampling and streaming follow-up
+
+- Native actual-client samples complete at dawn/noon/dusk/night, heavy rain outdoors, inside the station and back outdoors at both tiers. The accepted fourteen samples match native sun direction within 0.028 degrees and applied wind exactly; rain stays off the station floor. The diagnostic uses Free play and observer placement, so it does not prove survival/travel feel or natural weather transitions. See `docs/verification/v48/WEATHER-REVIEW.md`.
+- Fixed a subsequently reproduced rain-cache issue: streamed shelter is now discovered while the player stands still, using two/full or one/low probe refreshes per update. No rain probes run during fair weather or Reduced Motion. Living-world checks 3,948/0; clean strict analysis; 207/207 compile. Native streamed-shelter review remains pending.
+- Fresh immutable full run: source `7236420a5403935e7eb9b649cbde90d40eca73e5`, archive `C:\Users\natha\claude-xfer\v48-full-7236420.zip`, SHA256 `0D6A052DC815084B9AA1420E0331DD7A5D784C15225E578903225713B45E5060`; results at `C:\Users\natha\claude-xfer\v48-full-7236420-results`. It was started in exec session 38032 and is still running, with no completed-suite failures at the last observation. It predates the rain-cache repair; finish observing it and address failures before the final source freeze. Do not treat a quiet suite as terminal or restart it because a tool observation expires.
+
 ## Platform judgment
 
 Roblox limits density, draw calls, memory and simulation cost, especially on phones. The current barren travel and missing ground are implementation/design problems. Compact, authored habitats with reused meshes, bounded active wildlife and selective detail remain a viable direction. No engine migration is needed to address these reported problems.

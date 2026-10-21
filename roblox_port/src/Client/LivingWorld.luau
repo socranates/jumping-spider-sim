@@ -402,17 +402,28 @@ function LivingWorld.drawDog(self: any,pos: Vector3,state: any,reduced: boolean,
 end
 function LivingWorld.rainfall(self: any,pos: Vector3,region: any,state: any,reduced: boolean)
  local indoor=Environment.INDOORS[region.kind]==true
+ local raining=state.rain>.035 and not reduced and (not indoor or math.abs(pos.Z)<40)
  local centre=pos
  if indoor then centre=Vector3.new(pos.X,pos.Y,-105) end
- if self.rainAt==nil or (centre-self.rainAt).Magnitude>8 then
-  self.rainAt=centre
-  for _,r in self.rain do
+ if raining then
+  local function refresh(r: any)
    local hit=self:ground(centre+r.offset,220,500)
    r.floor=if hit then hit.Position.Y else pos.Y-60
   end
+  if self.rainAt==nil or (centre-self.rainAt).Magnitude>8 then
+   self.rainAt=centre;self.rainCursor=0
+   for _,r in self.rain do refresh(r) end
+  else
+   -- Streaming can change shelter even when the spider stands still. Spread
+   -- refreshes across the 20 Hz updates: a full pass takes at most .8 seconds.
+   for _=1,if self.low then 1 else 2 do
+    self.rainCursor=(self.rainCursor or 0)%#self.rain+1
+    refresh(self.rain[self.rainCursor])
+   end
+  end
  end
  for i,r in self.rain do
-  local on=state.rain>.035 and not reduced and (not indoor or math.abs(pos.Z)<40)
+  local on=raining
   local phase=(self.elapsed*400+i*13.77)%65
   local at=centre+r.offset+Vector3.new(0,45-phase,0)
   on=on and at.Y>r.floor+.15

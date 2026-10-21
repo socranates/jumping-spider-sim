@@ -55,6 +55,8 @@ NotebookPages.triggers = {
 	"look_hoverfly",
 	"cat",
 	"crab_spider",
+	"robin",
+	"look_cricket",
 }
 
 -- The reserve at or under hungryAt is "hungry"; at or over wellFedAt, "well fed" (LIFE_DESIGN.md round 1).
@@ -73,7 +75,7 @@ NotebookPages.noteSeconds = 6.0
 NotebookPages.lookWu = 4.0
 -- ROBLOX-105: the ambient bugs' close looks too (NotebookWatch: one of the view's bugs of the kind, out in the open, within lookWu).
 NotebookPages.looks = { springtail = "look_springtail", leafhopper = "look_leafhopper", moth = "look_moth", crane_fly = "look_crane_fly",
-	ladybird = "look_ladybird", millipede = "look_millipede", snail = "look_snail", harvestman = "look_harvestman", hoverfly = "look_hoverfly" } :: { [string]: string }
+	ladybird = "look_ladybird", millipede = "look_millipede", snail = "look_snail", harvestman = "look_harvestman", hoverfly = "look_hoverfly", cricket = "look_cricket" } :: { [string]: string }
 
 NotebookPages.pages = {
 	{
@@ -369,7 +371,7 @@ NotebookPages.pages = {
 		trigger = "hatched",
 		title = "Eggs, silk and wind",
 		text = "Jumping spiders court mostly by sight, and often by vibration too: a male shows a display and the female decides. She lays her eggs in a silken nest. A Phidippus johnsoni mother stays with it until the young hatch and leave: in the lab the eggs hatched about three weeks after laying, and the spiderlings left about three weeks after that. Many young spiders then travel by ballooning: they climb high, let out a thread of silk and are carried off by the air. The electric field in the air can trigger the take-off.",
-		game = "A game day is about fifteen minutes, so weeks become days: a mate on the sill, a courtship you hold for eight seconds, one night to the sac and two guard days. In Normal the mate decides when the courtship is full: a thin spider, or a court that broke off, stood far or looked away, is often refused, and a rival may cut in. The real mother makes and guards the sac; here the sac is drawn the same whichever spider you play, and no claim is made that a male guards eggs. A real brood is far larger than the eight to twelve shown: a Phidippus johnsoni female laid about 200 eggs in all. The first spider's sex is the game's choice (a female), and the peacock spider's mate is drawn with the male's colours although the real female is mottled grey-brown. Nothing can harm the sac, and you carry on as one of the spiderlings, which a real one could not choose.",
+		game = "A game day is about fifteen minutes, so weeks become days: a mate on the sill, a courtship you hold for eight seconds, one night to the sac and two guard days. In Normal the mate decides when the courtship is full: a thin spider, or a court that broke off, stood far or looked away, is often refused, and a rival may cut in. The real mother makes and guards the sac; here the sac is drawn the same whichever spider you play, and no claim is made that a male guards eggs. A real brood is far larger than the eight to twelve shown: a Phidippus johnsoni female laid about 200 eggs in all. The first spider's sex is the game's choice (a female), and the peacock spider's mate is drawn with the male's colours although the real female is mottled grey-brown. Nothing can harm the sac. In the preserve you may follow one spiderling on its thread: the wind, the game's seeded draw, mostly sets it down near the hut, in the hut garden or at the meadow's edge, and the next life begins where it lands; or you stay at the hut as one of them. A real spiderling could not choose.",
 		sources = {
 			"Jackson, R. R. (1978). The life history of Phidippus johnsoni (Araneae, Salticidae). Journal of Arachnology 6: 1-29.",
 			"Foelix, R. F. (2011). Biology of Spiders, 3rd edition. Oxford University Press.",
@@ -530,6 +532,30 @@ NotebookPages.pages = {
 			"Animal Diversity Web, University of Michigan Museum of Zoology (read 2026). Misumena vatia, goldenrod crab spider.",
 			"University of Minnesota Extension (undated, read 2026). Goldenrod crab spider.",
 			"Wikipedia (read 2026). Misumena vatia.",
+		},
+	},
+	{
+		id = "robin",
+		trigger = "robin",
+		title = "The robin on the lawn",
+		text = "The American robin is a thrush 20 to 28 cm long, about 77 to 85 g, its breast rusty red and its head blackish with a white eye ring broken in front and behind. It forages on the ground: it runs a few steps, stops abruptly, and stares at the ground with its head cocked to one side, finding its food by sight. It eats many earthworms, and insects, snails, spiders and much fruit. Its call is a sharp \"pick! tut-tut-tut\".",
+		game = "Here a robin comes to the hut garden's lawn, the gravel by the bench and the meadow's mown edge a few times a day, its shadow and its call first. Move in the open near it and it hops close, cocks its head at you and pauses, then strikes: in Normal that ends the life; on Easy and in free play it misses. Under cover, low in the meadow's grass or keeping still, you are lost to it. Its visits, its reach and its pause are the game's.",
+		sources = {
+			"National Audubon Society (undated, read 2026). American Robin, Turdus migratorius. Guide to North American Birds, audubon.org.",
+			"Cornell Lab of Ornithology (undated, read 2026). American Robin: Life History. All About Birds.",
+			"Missouri Department of Conservation (undated, read 2026). American Robin. Missouri Field Guide, mdc.mo.gov.",
+		},
+	},
+	{
+		id = "field_crickets",
+		trigger = "look_cricket",
+		title = "The field cricket",
+		text = "The fall field cricket (Gryllus pennsylvanicus) lives across much of North America in grassy places, often near people. Adults are 15 to 25 mm long, shiny black to dark brown, with long antennae and stout hind legs. It eats seeds, seedlings and small fruits, and dead and dying insects. Males sing mostly at night from a burrow or a crack in the ground: short chirps, two or three a second. A cricket's ears are on its front legs. Scared, it escapes into its burrow.",
+		game = "Here crickets live in the meadow's thatch and the hut garden's mulch, each worth about three houseflies, and the males chirp from dusk. Move near one and it falls silent and still; come closer and it jumps away. Caught, it kicks hard, and a weak grip loses it. Its hearing, its jump and its kicks are the game's numbers.",
+		sources = {
+			"Wikipedia (read 2026). Gryllus pennsylvanicus.",
+			"Minnesota Seasons (undated, read 2026). Fall field cricket, Gryllus pennsylvanicus. minnesotaseasons.com.",
+			"Geological Society of America (2011). The sound of crickets in the Eocene night: fossil insect ears from the Green River Formation. Northeastern Section meeting, abstract (paper 184321), gsa.confex.com.",
 		},
 	},
 } :: { Page }

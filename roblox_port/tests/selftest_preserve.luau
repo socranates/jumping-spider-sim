@@ -73,6 +73,8 @@ check("the client reads the attribute: the preserve is its world, its looks the 
 	local hooks = ClientStubs.driver
 	assert(hooks.cat ~= nil and workspace:FindFirstChild("Cat") ~= nil, "no cat in the preserve, or not drawn")
 	-- (ROBLOX-119) the crab spiders on the meadow's flowers: made, placed and drawn
+	-- (ROBLOX-120) the robin of the open ground: made and drawn (its folder), away at the day's start
+	assert(hooks.bird ~= nil and workspace:FindFirstChild("Robin") ~= nil and not hooks.bird.here, "no robin in the preserve, or not away at night")
 	assert(hooks.crab ~= nil and #hooks.crab.crabs == 2 and workspace:FindFirstChild("CrabSpiders") ~= nil and #(workspace:FindFirstChild("CrabSpiders") :: Instance):GetChildren() == 2, "no crab spiders in the preserve, or not drawn")
 end)
 
@@ -108,6 +110,7 @@ check("the self-test runs to END in the preserve, its own checks in place of the
 		"the nursery: the window shut", "the nursery: the ranger props the window", "the hut's inside", "the way out", "the hut garden", "the garden's near detail", "the garden's rival and mate", "the hut's homes",
 		"the hut by night: the lamp", "the ceiling and the upper walls", "the back room", "the eaves", "the cat", -- (ROBLOX-118)
 		"the bench patch", "the meadow's edge", "the crab spiders", -- (ROBLOX-119)
+		"the robin", "the field crickets", "ballooning's landings", -- (ROBLOX-120)
 		"the nursery: the window put back", "notebook", "rest and checkpoint", "sound", "frame time on the sill", "part counts" }
 	WorldMap.use("preserve")
 	for _, region in WorldMap.regions() do table.insert(want, "region " .. region.id) end
@@ -115,7 +118,8 @@ check("the self-test runs to END in the preserve, its own checks in place of the
 	for _, garden in { "the line", "prey in the bed", "woodlice", "moths on the wall" } do assert(not passes[garden], "a garden check ran in the preserve: " .. garden) end
 	assert(last == `[SELFTEST] END pass={#want} fail=0 skip=0`, "the END line: " .. last)
 	for _, what in { "world", "the hut's sill", "backdrop", "trains", "lock", "the nursery", "the hut's inside", "the way out", "the hut garden", "the garden's near detail", "the garden's rival and mate", "the hut's homes",
-		"the ceiling", "the back room", "the eaves", "the cat", "the bench patch", "the meadow's edge", "the crab spiders" } do assert(infos[what], "no INFO line for " .. what) end
+		"the ceiling", "the back room", "the eaves", "the cat", "the bench patch", "the meadow's edge", "the crab spiders",
+		"the robin", "the field crickets", "ballooning's landings" } do assert(infos[what], "no INFO line for " .. what) end
 	local worldLine = false
 	for _, line in lines do if line == "[SELFTEST] INFO world: preserve (revision preserve-2)" then worldLine = true end end
 	assert(worldLine, "the world line names the preserve")
@@ -134,6 +138,48 @@ check("the self-test's opening of the window was put back and never kept: the pr
 	local driver = ClientStubs.driver
 	assert(driver.world.hut ~= nil and not driver.world.hut.open and driver.world.hut.sash ~= nil and not driver.world:hutOpen(), "the window is shut again")
 	assert(driver.world.hut.opened == 1, `the window opened once this session ({driver.world.hut.opened})`)
+end)
+
+-- ROBLOX-120: ballooning through the real client: a brood hatched, the card's two ways on, "Follow one", the ride (the world waits, the camera on the rider), and the
+-- next generation where the wind's draw set it down, its start kept in the rest it makes and in the notebook.
+check("ballooning through the real client: the card offers Follow one and Stay at the hut; the ride; the next generation begins where the wind's draw lands it", function()
+	local driver = ClientStubs.driver
+	local Mating = require("../src/Shared/Life/Mating")
+	local Ballooning = require("../src/Shared/Life/Ballooning")
+	local life, mateLegs, panel = driver.life, driver.mateLegs, driver.caughtPanel
+	driver.place(Vector3.new(-25.5, 0.31, 6.0), Vector3.yAxis)
+	for _ = 1, 10 do frame(1 / 60) end
+	local m = Mating.normalize(Mating.new())
+	m.stage, m.hatch_day, m.hatch_hour, m.brood, m.mates, m.sac_day = "hatched", life.clock.day, 7.0, 9, 1, math.max(1, life.clock.day - 2)
+	life.mating = m
+	local generation = Mating.generation(life)
+	local zone, region = Ballooning.land(914, generation, m.hatch_day)
+	for _ = 1, 30 do frame(1 / 60); if panel:isShowing() then break end end
+	assert(panel:isShowing() and mateLegs.phase == "card", `the ending card is up ({mateLegs.phase})`)
+	local ids = {}
+	for _, c in panel.choices or {} do table.insert(ids, c.id) end
+	assert(table.concat(ids, ",") == "Follow,Carry", "the card's two ways on: " .. table.concat(ids, ","))
+	local chose = false
+	for _ = 1, 600 do if panel:choose("Follow") then chose = true; break end; frame(1 / 60) end
+	assert(chose, "Follow one could not be chosen")
+	assert(mateLegs.phase == "ride" and mateLegs.ride ~= nil and mateLegs.ride.zone == zone and mateLegs.ride.region == region, `the ride to {zone} / {region} began ({mateLegs.phase})`)
+	local day = life.clock.day
+	local riders = 0
+	for _ = 1, 60 * 13 do
+		frame(1 / 60)
+		if workspace:FindFirstChild("Family") and (workspace:FindFirstChild("Family") :: Instance):FindFirstChild("Rider") then riders += 1 end
+		if mateLegs.phase ~= "ride" then break end
+	end
+	assert(riders > 60 * 10, `the rider was drawn through the ride ({riders} frames)`)
+	assert(life.clock.day == day, "the world waited through the ride")
+	assert(mateLegs.phase == "" and Mating.generation(life) == generation + 1 and life.start_zone == zone and life.start_region == region, `the next generation began in {tostring(life.start_zone)} / {tostring(life.start_region)}`)
+	local spawn = (WorldMap.region(region) :: any).spawn.pos + Vector3.new(0, 0.31, 0)
+	for _ = 1, 30 do frame(1 / 60) end
+	assert((driver.motor.pos - spawn).Magnitude < 1 and driver.world.region.id == region and driver.motor.mode == "attached", `it stands where it landed ({driver.world.region.id})`)
+	assert(life.growth.stage == 0 and not life.lifeOver, "a spiderling, alive")
+	local told = false
+	for _, e in driver.notebook:entriesFor("eggs_and_wind") do if string.find(e.text, "the wind set it down", 1, true) then told = true end end
+	assert(told, "the notebook's dated line says where the wind set it down")
 end)
 
 print("SELFTEST_PRESERVE passed=" .. passed .. " failed=" .. failed)

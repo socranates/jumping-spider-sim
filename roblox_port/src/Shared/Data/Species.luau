@@ -441,4 +441,47 @@ hover.behavior.wander_radius_wu = 0.6
 hover.population.replenish_delay_s = { 40.0, 90.0 }
 hover.population.entry_min_flight_wu = 4.0
 data.hoverfly_prototype = hover
+-- ROBLOX-120: the fall field cricket (Gryllus pennsylvanicus) of the meadow's thatch and the hut garden's mulch: three housefly meals in one (an adult is 15 to 25 mm long,
+-- the notebook's page "The field cricket"), drawn at its true size (Data/FlyLook.small.cricket, about 2.2 cm), flightless and a strong jumper (a hop of 8 to 24 studs), and a
+-- hard catch (catch_factor 1.45: by its meal it would be the ceiling, 1.6) whose hind legs kick (body.kick: Prey/PreyKinds.grip, a jolt off the grip every 0.7 to 1.5 s from
+-- its own stream). It hears: a spider moving within `hear.range` studs hushes it (it falls silent and holds still for `hear.hold` seconds, Prey/PreyKinds.hear), and
+-- alert it freezes where it stands (body.freeze) until it jumps. By day it sits still in its shelter; from dusk (its `dusk` profile, the night's) it is restless, walks and
+-- the males chirp (body.chirp). Game values; the page says what is the sources'.
+local cricket = copy(data.fly_like_prototype)
+cricket.body.nutrition = 0.35 * 3
+cricket.body.visual_scale = 1.0
+cricket.body.radius_wu = 0.6
+cricket.body.capture_radius_wu = 0.8
+cricket.body.prey_kind = "cricket"
+cricket.body.flightless = true
+cricket.body.freeze = true
+cricket.body.catch_factor = 1.15
+cricket.body.feed_rate_per_s = 0.15
+cricket.body.hop = { min = 8.0, max = 24.0, time = 0.35, apex = 4.0 }
+cricket.body.kick = { first = { 0.3, 0.8 }, every = { 0.7, 1.5 }, size = 0.1 }
+cricket.body.hear = { range = 30.0, still = 0.5, hold = 6.0 }
+cricket.body.dusk = "cricket_night_prototype"
+cricket.senses.sight_range_wu = 9.0
+cricket.senses.startle_range_wu = 4.0
+cricket.reaction.delay_startle_alert_s = { 0.03, 0.08 }
+cricket.flight.clearance_radius_wu = 0.14 -- (under the hover over a perch, 0.16, as every fly's is: ROBLOX-119)
+cricket.flight.safe_distance_wu = 6.0
+cricket.flight.perch_avoid_wu = 4.0
+cricket.behavior.restless_per_s = 0.0005
+cricket.behavior.walk_interval_s = { 6.0, 18.0 }
+cricket.behavior.walk_distance_wu = { 0.3, 1.5 }
+cricket.behavior.walk_speed_wu_s = { 0.6, 1.5 }
+cricket.behavior.wander_radius_wu = 3.0
+cricket.behavior.perch_radius_wu = 0.5
+cricket.behavior.fidget_distance_wu = { 0.05, 0.15 }
+cricket.population.replenish_delay_s = { 120.0, 240.0 }
+cricket.population.vent_min_distance_wu = 8.0
+data.cricket_prototype = cricket
+local cricketNight = copy(cricket)
+cricketNight.body.dusk = nil
+cricketNight.body.day = "cricket_prototype"
+cricketNight.body.chirp = true
+cricketNight.behavior.restless_per_s = 0.008
+cricketNight.behavior.walk_interval_s = { 3.0, 9.0 }
+data.cricket_night_prototype = cricketNight
 return table.freeze(data)

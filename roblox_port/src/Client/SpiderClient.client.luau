@@ -134,6 +134,15 @@ local M = {
 	CrabBody = require(script.Parent.CrabBody),
 	CrabText = require(Shared.UI.CrabText),
 	crab = (nil :: any), crabBody = (nil :: any),
+	-- ROBLOX-120: the robin of the open ground (Predator/Bird, drawn by Client/BirdBody, its words UI/BirdText), made in the preserve only; `birdSeen` the seconds since its
+	-- shadow last passed near the spider (the caption), nil when none has lately.
+	Bird = require(Shared.Predator.Bird),
+	BirdBody = require(script.Parent.BirdBody),
+	BirdText = require(Shared.UI.BirdText),
+	Region = require(Shared.World.Region),
+	bird = (nil :: any), birdBody = (nil :: any), birdSeen = (nil :: number?),
+	-- ROBLOX-120: the field crickets' song: how loud the nearest singing one is to the spider (0..1, for BirdBody's chirp voice), set by the HUD's caption each frame.
+	PreyKinds = require(Shared.Prey.PreyKinds), chirp = 0.0,
 }
 M.lock = M.LockOn.new()
 local focusState = FocusState.new()
@@ -191,7 +200,9 @@ local mateLegs: any = { Mating = require(Shared.Life.Mating), Mate = require(Sha
 	Rules = require(Shared.Data.MatingRules), drive = nil, phase = "", pending = nil, state = {},
 	-- The mating scene (ROBLOX-89): its pure plan module and its state here (the plan, the scene's seconds as the simulation counts them, the last frame's, the notice held
 	-- until it is over, whether it was skipped and whose it was).
-	Scene = require(Shared.Life.MatingScene), couple = { active = false, plan = nil, t = -1, prev = -1, notice = nil, skipped = false, mateSex = "" } }
+	Scene = require(Shared.Life.MatingScene), couple = { active = false, plan = nil, t = -1, prev = -1, notice = nil, skipped = false, mateSex = "" },
+	-- ROBLOX-120: ballooning (Life/Ballooning): in the preserve the ending card offers "Follow one"; the ride ("ride" phase) and where it lands.
+	Balloon = require(Shared.Life.Ballooning), WorldMap = require(Shared.World.WorldMap), ride = nil :: any }
 mateLegs.stage = require(script.Parent.MateStage).new(Workspace, M.World.root, detail)
 local dance = PeacockDance.new() -- the peacock spider's courtship dance (a pose for the rig; nothing else reads it)
 local dancePose: any = nil
@@ -236,6 +247,7 @@ local soundscape = Soundscape.new(Workspace)
 local waspBody = WaspBody.new(Workspace)
 if M.World.world == "preserve" then M.cat = M.Cat.new(M.catSeed); M.catBody = M.CatBody.new(Workspace, detail); M.cat.enabled = script.Parent:FindFirstChild("SilkPlayback") == nil end
 if M.World.world == "preserve" then M.crab = M.CrabSpider.new(require(Shared.World.WorldMap).seed(914, "crab_spider")); M.crabBody = M.CrabBody.new(Workspace, detail) end -- (ROBLOX-119)
+if M.World.world == "preserve" then M.bird = M.Bird.new(require(Shared.World.WorldMap).seed(914, "bird")); M.birdBody = M.BirdBody.new(Workspace, detail) end -- (ROBLOX-120)
 -- LIFE (ROBLOX-24): the windowsill runs the life clock, so hunger runs by its hours (NeedsModel life mode, Standard rules to begin with; Easy and Free play
 -- switch the model to the gentle rules in applyRules, ROBLOX-91). Feeding grants into the same model. The loop keeps the rest, sleep, daylight and the eyes' reach.
 local needs = NeedsModel.new(true, false)
@@ -282,7 +294,7 @@ local saveState: any = { touched = {} :: { [string]: boolean }, applying = false
 -- Whether a modal screen has the game: the world waits and the controls belong to it. At the very start the world also waits (a second or
 -- so at most) for the server to say what is saved, so the start menu shows the right choices; not in the test place unless the Workspace attribute SaveWait is true.
 local function modal(): boolean
-	return panel:isShowing() or menu:isShowing() or nbPanel:isShowing() or settingsPanel:isShowing()
+	return panel:isShowing() or menu:isShowing() or nbPanel:isShowing() or settingsPanel:isShowing() or mateLegs.phase == "ride" -- (ROBLOX-120: the ride on the wind has the game)
 		or (not menuStarted and (not testPlace or Workspace:GetAttribute("SaveWait") == true) and saveClient ~= nil and saveClient:waiting() == true)
 end
 -- S01-C retreat checkpoints (ROBLOX-25): resting in the crack, and each morning, keeps one; Backspace / View returns to it. The
@@ -813,6 +825,7 @@ local lastEnd: any=nil -- the summary of the life that just ended, while its end
 panel=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
  if choice=="Notebook" then openNotebook("end")
  elseif choice=="Carry" then mateLegs.carryOn()
+ elseif choice=="Follow" then mateLegs.follow() -- (ROBLOX-120: one spiderling on the wind)
  elseif choice=="Another" then lastEnd=nil;continueAnother()
  elseif choice=="Back" then lastEnd=nil;closeScreens();wasp:clearVisit();returnToCheckpoint() end
 end)
@@ -826,8 +839,8 @@ local function presentEnd(immediate: boolean)
  table.insert(choices,{id="Another",text=mateLegs.Text.another(mateLegs.Mating.hasSac(life.mating))}) -- (ROBLOX-91: a new life; the brood is left behind)
  table.insert(choices,{id="Notebook",text=M.NotebookText.MENU_CHOICE})
  -- (ROBLOX-106: in Normal the last line says what the way back costs, the day since the rest, and that another spider is a new life; the night has its own words)
- panel:showChoices(if cause=="starved" then "The spider starved." elseif cause=="rival" then "The other spider caught you." elseif cause=="night" then M.LifeText.NIGHT_LINE elseif cause==M.CatText.CAUSE then M.CatText.LINE elseif cause==M.CrabText.CAUSE then M.CrabText.LINE else M.WaspText.LINE,
-  if cause=="starved" then "It went too long without food." elseif cause=="rival" then "A hunter can become prey. You can return to your last rest." elseif cause=="night" then M.LifeText.NIGHT_SUB elseif cause==M.CatText.CAUSE then M.CatText.SUB elseif cause==M.CrabText.CAUSE then M.CrabText.SUB else M.WaspText.SUB,
+ panel:showChoices(if cause=="starved" then "The spider starved." elseif cause=="rival" then "The other spider caught you." elseif cause=="night" then M.LifeText.NIGHT_LINE elseif cause==M.CatText.CAUSE then M.CatText.LINE elseif cause==M.CrabText.CAUSE then M.CrabText.LINE elseif cause==M.BirdText.CAUSE then M.BirdText.LINE else M.WaspText.LINE,
+  if cause=="starved" then "It went too long without food." elseif cause=="rival" then "A hunter can become prey. You can return to your last rest." elseif cause=="night" then M.LifeText.NIGHT_SUB elseif cause==M.CatText.CAUSE then M.CatText.SUB elseif cause==M.CrabText.CAUSE then M.CrabText.SUB elseif cause==M.BirdText.CAUSE then M.BirdText.SUB else M.WaspText.SUB,
   M.WaspText.summary(rec.hours,rec.meals,rec.wasp_visits,rec.wasp_escapes)..(if session.rules=="standard" then "\n"..M.LifeText.dayLost(hasRest) else ""),choices,immediate)
  panel:setTextScale(if setting("LargeText")==true then 1.5 else 1)
 end
@@ -955,9 +968,10 @@ end
 function mateLegs.showCard(immediate: boolean)
  local m=life.mating
  if m==nil then return end
- local title,sub,body=mateLegs.Text.card(m.brood,m.hatch_day,mateLegs.Mating.generation(life))
+ local wind=M.World.world=="preserve" -- (ROBLOX-120: in the preserve the spiderlings balloon, and one can be followed)
+ local title,sub,body=mateLegs.Text.card(m.brood,m.hatch_day,mateLegs.Mating.generation(life),wind)
  controls:clear();dropAll();setHudShown(false)
- panel:showChoices(title,sub,body,{{id="Carry",text=mateLegs.Text.BUTTON}},immediate)
+ panel:showChoices(title,sub,body,if wind then {{id="Follow",text=mateLegs.Text.FOLLOW},{id="Carry",text=mateLegs.Text.STAY}} else {{id="Carry",text=mateLegs.Text.BUTTON}},immediate)
  panel:setTextScale(if setting("LargeText")==true then 1.5 else 1)
  mateLegs.phase="card"
 end
@@ -971,23 +985,70 @@ end
 function mateLegs.reset()
  mateLegs.coupleEnd(false)
  mateLegs.couple.focus,mateLegs.couple.turn=nil,nil
- mateLegs.phase,mateLegs.pending="",nil
+ if mateLegs.ride~=nil then cam:setShot(nil) end
+ mateLegs.phase,mateLegs.pending,mateLegs.ride="",nil,nil
  mateLegs.stage:reset()
 end
--- Carry on: the next generation is a spiderling again in the crack, the days of the sill go on, the notebook and the look are the player's own.
-function mateLegs.carryOn()
+-- (ROBLOX-120) Follow one: the wind's draw (Life/Ballooning.land: a pure function of the seed, the family and the hatching's day) picks where it comes down; the ride
+-- plays (the "ride" phase has the game: the world waits, the camera rides with the spiderling), and at its end the next generation begins there (carryOn's landing).
+function mateLegs.follow()
+ local m=life.mating
+ if m==nil or m.stage~="hatched" then return end
+ local B=mateLegs.Balloon
+ local generation=mateLegs.Mating.generation(life)
+ local zone,regionId=B.land(914,generation,m.hatch_day)
+ local region=mateLegs.WorldMap.region(regionId)
+ if region==nil then mateLegs.carryOn();return end
+ lastEnd=nil
+ closeScreens()
+ mateLegs.stage:clearScene()
+ local z=B.zone(zone)
+ mateLegs.ride={plan=B.ride(914,generation,m.hatch_day,region.spawn.pos),t=0,zone=zone,region=regionId,place=if z then z.name else zone,
+  heading=region.spawn.heading,at=B.SAC}
+ mateLegs.phase="ride"
+ controls:clear();dropAll()
+ cam:cancelEyeRestore();cam:setEyeView(false)
+end
+-- (ROBLOX-120) A frame of the ride: the rider on its thread and the camera with it, from behind and a little above; at its end, the landing.
+function mateLegs.rideFrame(dt: number)
+ local r=mateLegs.ride
+ if r==nil then return end
+ r.t+=dt
+ local at,thread=mateLegs.Balloon.at(r.plan,r.t,setting("ReducedMotion")==true)
+ r.at=at
+ mateLegs.stage:drawRider(at,thread)
+ local back=Vector3.new(at.X-thread.X,0,at.Z-thread.Z)
+ back=if back.Magnitude>1e-3 then back.Unit else Vector3.zAxis
+ cam:setShot({focus=at,dir=(back*0.85+Vector3.yAxis*0.5).Unit,distance=if r.t<r.plan.seconds*0.12 then 5 else 7,up=Vector3.yAxis})
+ if r.t>=r.plan.seconds then
+  mateLegs.stage:drawRider(nil)
+  cam:setShot(nil)
+  mateLegs.carryOn(r)
+ end
+end
+-- Carry on: the next generation is a spiderling again in the crack, the days of the sill go on, the notebook and the look are the player's own. ROBLOX-120: `landed`, a
+-- ride's end (mateLegs.follow): the spiderling begins where the wind set it down, and the life keeps where (`start_zone`, `start_region`); without it, the hut's crack.
+function mateLegs.carryOn(landed: any?)
  local generation,day=mateLegs.Mating.carryOn(life,needs,prey.feeding.mealsFinished)
+ life.start_zone=if landed~=nil then landed.zone else nil
+ life.start_region=if landed~=nil then landed.region else nil
  lastEnd=nil
  closeScreens()
  mateLegs.reset()
  setAppearance(appearance) -- the rig is built again, at the first growth stage
- motor:place(Vector3.new(-25.5,0.31,6.0),Vector3.yAxis,M.World.spawnHeading)
+ if landed~=nil then
+  local region=mateLegs.WorldMap.region(landed.region)
+  motor:place((if region then region.spawn.pos else landed.plan.to)+Vector3.new(0,0.31,0),Vector3.yAxis,landed.heading or M.World.spawnHeading)
+ else
+  motor:place(Vector3.new(-25.5,0.31,6.0),Vector3.yAxis,M.World.spawnHeading)
+ end
  motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor())
  sensor:reset();memory:clear();M.LockOn.release(M.lock,"reset")
  dropStrands(false);drawnUp=motor.up;M.World:refocus();cam:snap();lastLight=nil
  feedPending,cancelPending=false,false
  watch:resync()
- hud:toast(mateLegs.Text.generationToast(generation,day),false)
+ hud:toast(mateLegs.Text.generationToast(generation,day,if landed~=nil then landed.place else nil),false)
+ if landed~=nil then mateLegs.say(mateLegs.Text.landed(landed.place));book:addEntry("eggs_and_wind",day,mateLegs.Text.rideEntry(day,landed.place)) end
  if saveClient~=nil then saveClient:markDirty() end
 end
 local openMenu: () -> ()
@@ -1475,11 +1536,32 @@ local function updateHud(frameDt: number)
 		if forRival and not M.WaspText.heardRival((motor.pos - wasp.wasp.position).Magnitude, not sightCast(motor.pos, wasp.wasp.position)) then heard = nil end
 		if heard then view.caption = heard end
 	end
+	-- (ROBLOX-120) the field crickets singing in the thatch and the mulch at night: the nearest one heard (the cat, the robin and the wasp win the caption)
+	do
+		local best, far = nil :: any, M.PreyText.CHIRP_HEAR
+		for _, f in M.World.prey:flies() do
+			if f.profile.body.prey_kind == "cricket" and M.PreyKinds.chirping(f) then
+				local d = (f.position - motor.pos).Magnitude
+				if d < far then best, far = f, d end
+			end
+		end
+		M.chirp = if best ~= nil then 1 - far / M.PreyText.CHIRP_HEAR else 0
+		if best ~= nil and captionScale > 0 and not wasp:isVisiting() then
+			view.caption = M.PreyText.chirp(M.WaspText.directionWord(motor.pos, motor.heading, motor.up, best.position), M.chirp)
+		end
+	end
 	-- (ROBLOX-118) the cat is heard before it is seen: its bell as it moves, its purr close by; the wasp's hum wins
 	if M.cat ~= nil and captionScale > 0 and not wasp:isVisiting() then
 		local bell, purr = M.cat:sound(motor.pos)
 		local heard = M.CatText.caption(bell, purr, M.WaspText.directionWord(motor.pos, motor.heading, motor.up, M.Cat.head(M.cat)), bell > M.catHeard.bell + 1e-3)
 		M.catHeard.bell = bell
+		if heard then view.caption = heard end
+	end
+	-- (ROBLOX-120) the robin: its shadow sweeping over, and its call as it comes in and goes; the wasp's hum wins
+	if M.bird ~= nil and captionScale > 0 and not wasp:isVisiting() then
+		if M.birdSeen ~= nil then M.birdSeen += frameDt; if M.birdSeen > 3 then M.birdSeen = nil end end
+		local call = M.bird:call(motor.pos)
+		local heard = M.BirdText.caption(call, M.WaspText.directionWord(motor.pos, motor.heading, motor.up, M.bird.pos), M.birdSeen)
 		if heard then view.caption = heard end
 	end
 	if aiming then
@@ -1515,6 +1597,7 @@ local function updateHud(frameDt: number)
   end
   if m~=nil and (m.stage=="sac" or m.stage=="guarding") and Q("guard_line") then table.insert(view.status,mateLegs.Text.guardLine(m.guard_day,mateLegs.Rules.guardDays)) end
   if mateLegs.phase=="scene" and captionScale>0 then view.caption=mateLegs.Text.sceneCaption(mateLegs.stage.t) or view.caption end
+  if mateLegs.phase=="ride" and captionScale>0 then view.caption={text=mateLegs.Text.RIDE_CAPTION,alpha=1} end -- (ROBLOX-120)
  end
  if life.rival and life.rival.state=="captured" and not RivalSpider.struggling(life.rival) and Q("feeding_lines") then table.insert(view.status,rivalLegs.Text.eating(Growth.mealsOf(RivalSpider.FOOD))) end
 	view.grip = if prey.feeding.struggling then prey.feeding.grip else rivalLegs.Grip.level(rivalLegs.grip)
@@ -1619,7 +1702,9 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	spiderPick.update(frameDt) -- (the choose hold's clock and the close look's reasons to end)
 	controls:tick(frameDt) -- (ROBLOX-115: L2 held past its tap is Focus)
 	M.Prof.lap("save")
-	M.World:update(motor.pos, rig.root, nil, frameDt) -- (ROBLOX-94: the region the spider is in, the pace of its day, the streaming focus on the drawn spider)
+	-- (ROBLOX-94: the region the spider is in, the pace of its day, the streaming focus on the drawn spider; ROBLOX-120: on the wind, the rider's place, so the world
+	-- where it comes down is streamed in before the spiderling stands there)
+	M.World:update(if mateLegs.ride ~= nil and mateLegs.ride.at ~= nil then mateLegs.ride.at else motor.pos, rig.root, nil, frameDt)
 	if panel:isShowing() then panel:update(frameDt) end
 	if nbPanel:isShowing() then nbPanel:update(frameDt) end
 	if settingsPanel:isShowing() then settingsPanel:update(frameDt) end
@@ -1742,6 +1827,30 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 					elseif signal.kind == "nudged" and motor.mode == "attached" then
 						motor:_launch((signal.away or Vector3.zero) * 6 + Vector3.yAxis * 5, 40)
 						life:showNotice(M.CrabText.NUDGED)
+					end
+				end
+			end
+			-- ROBLOX-120: the robin on the open ground, on its seeded visits: told first by its shadow and its call; a spider moving in the open in its reach after its
+			-- tell is taken (a death in Normal; in the gentle rules the bill misses). Cover (a home, a box over the spider, the meadow's grass low down) or keeping still saves.
+			if M.bird ~= nil then
+				M.bird.gentle = needs.gentle
+				if testPlace and Workspace:GetAttribute("Bird") ~= nil then M.bird.enabled = Workspace:GetAttribute("Bird") == true end
+				local spiderNow: any = nil
+				if not (life.lifeOver or modal()) then
+					local region = M.World.region
+					local hidden = M.World:inRetreat(motor.pos) ~= nil or life.resting
+					local covered = M.bird.here and (M.Bird.inGrass(region.kind, motor.pos) or M.Bird.covered(M.Region.pieces(region), motor.pos))
+					spiderNow = { pos = motor.pos, speed = if motor.mode == "air" then 10 elseif motor.moving == true then 3 else motor.vel.Magnitude, hidden = hidden, covered = covered }
+				end
+				M.bird:step(DT, life.clock.day, life.clock.hour, spiderNow)
+				for _, signal in M.bird:drainSignals() do
+					if signal.kind == "shadow" then M.birdSeen = 0; watch:onBird()
+					elseif signal.kind == "noticed" then watch:onBird()
+					elseif signal.kind == "landed" and signal.at ~= nil and (signal.at - motor.pos).Magnitude < 400 then watch:onBird()
+					elseif signal.kind == "struck" then endLife(M.BirdText.CAUSE)
+					elseif signal.kind == "missed" then
+						if motor.mode == "attached" then motor:_launch(Vector3.new(motor.pos.X - M.bird.pos.X, 0, motor.pos.Z - M.bird.pos.Z).Unit * 7 + Vector3.yAxis * 6, 40) end
+						life:showNotice(M.BirdText.MISSED)
 					end
 				end
 			end
@@ -1967,6 +2076,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
     mateLegs.stage:drawMate(life.mate,appearance,if paused then 0 else simFrame,setting("ReducedMotion")==true,mateLegs.couple.focus,mateLegs.couple.turn,camera.CFrame.Position)
     mateLegs.stage:drawSac(mateLegs.Mating.hasSac(life.mating))
     if mateLegs.phase=="scene" and not paused and not mateLegs.stage:step(simFrame,setting("ReducedMotion")==true) then mateLegs.showCard(false) end
+    if mateLegs.phase=="ride" and not GuiService.MenuIsOpen then mateLegs.rideFrame(frameDt) end -- (ROBLOX-120)
 	M.Prof.lap("other rigs")
 	updateHud(frameDt)
 	M.Prof.lap("hud")
@@ -1986,6 +2096,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	soundscape:updateWasp(wasp, soundPaused, soundSpeed, soundMuted)
 	waspBody:draw(wasp.wasp, prey.now)
 	if M.crabBody ~= nil then M.crabBody:draw(M.crab) end -- (ROBLOX-119)
+	if M.birdBody ~= nil then M.birdBody:draw(M.bird, frameDt, if soundMuted or soundPaused then 0 else M.bird:call(motor.pos), if soundMuted or soundPaused then 0 else M.chirp) end -- (ROBLOX-120)
 	if M.catBody ~= nil then
 		local bell, purr = M.cat:sound(motor.pos)
 		M.catBody:draw(M.cat, prey.now, frameDt, if soundMuted or soundPaused then 0 else bell, if soundMuted or soundPaused then 0 else purr)
@@ -2084,6 +2195,7 @@ M.hooks = function(): any
 			prof = M.Prof, -- (ROBLOX-111: the frame timed by part, for the self-test's frame samples)
 			cat = M.cat, Cat = M.Cat, -- (ROBLOX-118: the ranger's cat, nil in the test garden, and its rules)
 			crab = M.crab, CrabSpider = M.CrabSpider, -- (ROBLOX-119: the crab spiders, nil in the test garden, and their rules)
+			bird = M.bird, Bird = M.Bird, -- (ROBLOX-120: the robin, nil in the test garden, and its rules)
 	}
 end
 local playback = script.Parent:FindFirstChild("SilkPlayback")

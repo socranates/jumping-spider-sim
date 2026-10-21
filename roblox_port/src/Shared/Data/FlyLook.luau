@@ -327,4 +327,35 @@ FlyLook.small.crane_fly = {
 		wobble = { roll = 0.14, pitch = 0.08, hz = 2.1 }, dangle = { amp = 0.18, hz = 1.7 } },
 }
 
+-- ROBLOX-120: the fall field cricket (Gryllus pennsylvanicus) of the meadow's thatch and the hut garden's mulch, drawn at its true size (about 2.2 cm, the sources' 15 to
+-- 25 mm): shiny black to dark brown, a big round head, the saddle of its pronotum, its forewings lying flat over the abdomen, two cerci at the tail, antennae longer
+-- than the body, thin front and middle legs and the stout, long hind legs it jumps and kicks with (docs/NOTEBOOK_SOURCES.md, the field cricket's page).
+FlyLook.small.cricket = {
+	colors = { head = "1c1714", eye = "0b0908", pronotum = "221c18", abdomen = "2a221c", tegmen = "2e241c", leg = "2e2620", femur = "3a2f26", antenna = "2a231d",
+		cercus = "3a3028", shadow = "2a241c" },
+	body = {
+		{ name = "Head", color = "head", at = { 0, 0.22, -0.85 }, size = { 0.5, 0.48, 0.45 } },
+		{ name = "EyeL", color = "eye", reflectance = 0.06, at = { -0.2, 0.32, -0.92 }, size = { 0.14, 0.16, 0.14 }, full = true },
+		{ name = "EyeR", color = "eye", reflectance = 0.06, at = { 0.2, 0.32, -0.92 }, size = { 0.14, 0.16, 0.14 }, full = true },
+		{ name = "Pronotum", color = "pronotum", at = { 0, 0.26, -0.52 }, size = { 0.6, 0.42, 0.38 } },
+		{ name = "Abdomen", color = "abdomen", at = { 0, 0.18, 0.25 }, size = { 0.6, 0.38, 1.2 } },
+		{ name = "Forewings", color = "tegmen", at = { 0, 0.35, 0.12 }, size = { 0.58, 0.1, 1.0 }, full = true },
+	} :: { any },
+	rods = {
+		{ name = "Antenna", color = "antenna", d = 0.025, from = { 0.08, 0.36, -1.05 }, to = { 0.75, 0.42, -2.7 }, mirror = true },
+		{ name = "Cercus", color = "cercus", d = 0.04, from = { 0.1, 0.2, 0.82 }, to = { 0.24, 0.24, 1.38 }, mirror = true, full = true },
+		{ name = "FrontFemur", color = "leg", d = 0.06, from = { 0.18, 0.1, -0.62 }, to = { 0.36, 0.12, -0.86 }, fly = { { 0.18, 0.1, -0.62 }, { 0.26, 0.0, -0.8 } }, mirror = true },
+		{ name = "FrontTibia", color = "leg", d = 0.045, from = { 0.36, 0.12, -0.86 }, to = { 0.45, -0.16, -1.02 }, fly = { { 0.26, 0.0, -0.8 }, { 0.24, -0.1, -0.6 } }, mirror = true, full = true },
+		{ name = "MiddleFemur", color = "leg", d = 0.06, from = { 0.24, 0.1, -0.36 }, to = { 0.5, 0.12, -0.3 }, fly = { { 0.24, 0.1, -0.36 }, { 0.36, 0.0, -0.25 } }, mirror = true },
+		{ name = "MiddleTibia", color = "leg", d = 0.045, from = { 0.5, 0.12, -0.3 }, to = { 0.64, -0.16, -0.24 }, fly = { { 0.36, 0.0, -0.25 }, { 0.32, -0.08, -0.05 } }, mirror = true, full = true },
+		-- the hind legs: a stout femur up along the abdomen's side, the tibia folded back under it to the foot
+		{ name = "HindFemur", color = "femur", d = 0.17, from = { 0.24, 0.14, -0.02 }, to = { 0.42, 0.44, 0.74 }, fly = { { 0.24, 0.14, -0.02 }, { 0.36, 0.2, 0.8 } }, mirror = true },
+		{ name = "HindTibia", color = "leg", d = 0.07, from = { 0.42, 0.44, 0.74 }, to = { 0.38, -0.16, 1.24 }, fly = { { 0.36, 0.2, 0.8 }, { 0.36, -0.05, 1.5 } }, mirror = true },
+	} :: { any },
+	shadow = { size = { 0.8, 0.004, 2.0 }, lift = 0.003, transparency = 0.8, full = true },
+	-- quick bursts of steps, a crouch on its hind legs before the jump, the antennae always moving
+	motion = { gait = { stride = 0.5, swing = 0.3, lift = 0.3, settle = 9, jump = 1.0 }, kick = 7, antenna = { amp = 0.18, hz = 1.3 },
+		crouch = { depth = 0.06, pitch = 0.16 } },
+}
+
 return FlyLook

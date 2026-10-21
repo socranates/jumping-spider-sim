@@ -1028,6 +1028,8 @@ Meadow.LIFE = table.freeze({
 	houseflies = { meadow_c1 = { full = 1, low = 1 }, meadow_e5 = { full = 1, low = 1 }, meadow_a1 = { full = 1, low = 1 }, bin = { full = 2, low = 1 } },
 	moths = { meadow_d1 = { full = 1, low = 1 }, meadow_e2 = { full = 1, low = 1 }, lamp_4 = { full = 2, low = 1 } },
 	ants = { meadow_b4 = { full = 6, low = 3, salt = 151 } },
+	-- (ROBLOX-120) field crickets in the thatch, singing from dusk
+	crickets = { meadow_b2 = { full = 1, low = 1, perches = 6 }, meadow_d3 = { full = 1, low = 1, perches = 6 }, meadow_c5 = { full = 1, low = 1, perches = 6 } },
 })
 
 export type Perch = Hut.Perch
@@ -1050,7 +1052,8 @@ local bestiaryCache: { [string]: any } = {}
 function Meadow.bestiary(region: Region): { any }?
 	local L = Meadow.LIFE
 	local hopper, hover, house, moth = L.leafhoppers[region.id], L.hoverflies[region.id], L.houseflies[region.id], L.moths[region.id]
-	if hopper == nil and hover == nil and house == nil and moth == nil then return nil end
+	local cricket = L.crickets[region.id]
+	if hopper == nil and hover == nil and house == nil and moth == nil and cricket == nil then return nil end
 	local key = region.id .. "/" .. tostring(region.seed)
 	if bestiaryCache[key] ~= nil then return bestiaryCache[key] end
 	local out = {}
@@ -1166,6 +1169,31 @@ function Meadow.bestiary(region: Region): { any }?
 				vents = { { id = `{region.id}_vent_moth`, position = vent, normal = Vector3.yAxis, appear = true, reach = 60 } }, target = moth.full, low = moth.low,
 				seed = (region.seed + salt * 104729) % MOD, prefix = `{region.id}_moth_fly_`, dusk = { from = 18.0, to = 6.0 } })
 		end
+	end
+	if cricket ~= nil then
+		-- (ROBLOX-120) the field cricket: spots on the meadow's floor in the thatch between the clumps, a jump apart, clear of the culms, the stems and the leaf
+		local salt = 157
+		local rand = rng(region.seed, salt)
+		local boxes = standing(region)
+		for _, t in region.retreats do table.insert(boxes, { min = t.min - v(1, 0, 1), max = t.max + v(1, 0, 1) }) end
+		local lo, hi = region.bounds[1], region.bounds[2]
+		local perches: { Perch } = {}
+		for i = 1, cricket.perches do
+			for _ = 1, 60 do
+				local x, z = between(rand, lo.X + 6, hi.X - 6), between(rand, lo.Z + 6, hi.Z - 6)
+				local ok = clear(boxes, x, z, 2.0)
+				if ok then for _, q in perches do if (v(x, 0, z) - v(q.position.X, 0, q.position.Z)).Magnitude < 9 then ok = false; break end end end
+				if ok then
+					table.insert(perches, { id = `{region.id}_cricket_{i}`, position = v(x, GT, z), normal = Vector3.yAxis, shelter = 0.7, food = 0.3, start = #perches < cricket.full,
+						kind = "soil", hop = true } :: any)
+					break
+				end
+			end
+		end
+		local vents = {}
+		if #perches > 1 then table.insert(vents, { id = `{region.id}_vent_cricket`, position = perches[#perches].position, normal = Vector3.yAxis, appear = true, reach = 10 }) end
+		table.insert(out, { kind = "cricket", profile = "cricket_prototype", perches = perches, vents = vents, target = cricket.full, low = cricket.low,
+			seed = (region.seed + salt * 104729) % MOD, prefix = `{region.id}_cricket_fly_`, dusk = { from = 19.0, to = 6.5 } })
 	end
 	-- (the band each kind's flights climb in: from under its lowest perch to 11 cm over its highest, PerchGraph.plan; the sill's 0 to 11 would send them down to it)
 	for _, k in out do

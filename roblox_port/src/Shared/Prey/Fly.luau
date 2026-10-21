@@ -7,6 +7,7 @@
 -- by PreyKinds.step instead of FlyFlight) and a `flightless` one never begins a flight; a `sidestep` profile goes round its stem when watched; a profile with
 -- `flight.wander_local` keeps its wander loops near the height it flew from (the sill's 0.8 to 10 band is the sill's, and the wall and the bed are far below it).
 -- ROBLOX-117: a `hover` profile (the hoverfly) holds still in the air on a calm flight now and then (PreyKinds.hover) instead of stepping its flight.
+-- ROBLOX-120: a `hear` profile (the field cricket) is hushed by a spider moving near (PreyKinds.hear: it holds still), and a `freeze` one alert freezes as a walker does.
 local M=require(script.Parent.PreyMath)
 local S=require(script.Parent.FlySenses)
 local F=require(script.Parent.FlyFlight)
@@ -160,10 +161,11 @@ function Fly.rest(self: any,now: number,dt: number)
  if self.profile.body.creep and K.creep(self,now,dt) then return end -- (ROBLOX-105: the aphid's walk over its plant to another perch)
  if self.state=='ALERT' then
   self.groomUntil=0;self.fidgetUntil=0;self.glanceTarget=nil
-  if self.profile.body.walker then return end -- (ROBLOX-96: a walker freezes)
+  if self.profile.body.walker or self.profile.body.freeze then return end -- (ROBLOX-96: a walker freezes; ROBLOX-120: so does a cricket)
   if self.senses.hasLastSeen then local d=self.senses.lastSeenPosition-self.position;local flat=d-self.normal*d:Dot(self.normal);if flat.Magnitude>.001 then self:turn(flat.Unit,dt) end end
   return
  end
+ if self.profile.body.hear and K.hushed(self,now) then self.walkLeft=0;self.glanceTarget=nil;return end -- (ROBLOX-120: hushed, the cricket holds still)
  if now<self.fidgetUntil then
   local t=math.clamp((now-self.fidgetStarted)/(self.fidgetUntil-self.fidgetStarted),0,1)
   self.position=self.fidgetFrom:Lerp(self.fidgetTo,t*t*(3-2*t));return
@@ -216,6 +218,7 @@ function Fly.step(self: any,dt: number,now: number,stimulus: Vector3,radius: num
  self.prevPosition=self.position
  if not self:alive() or not self.enabled then return end
  local p=self.profile
+ if p.body.hear then K.hear(self,now,dt,stimulus) end -- (ROBLOX-120: the cricket's ear)
  if self.senses:shouldCheck(now) then
   local vigilant=if self.state=='ALERT' then p.senses.vigilance_alert elseif now<self.groomUntil then p.senses.vigilance_grooming else p.senses.vigilance_relaxed
   self.senses:update(cast,self.position+self.normal*.1,if self:airborne() and self.velocity.Magnitude>.1 then self.velocity.Unit else self.heading,if self:airborne() then Vector3.yAxis else self.normal,stimulus,radius,now,vigilant,if self.state=='ALERT' then p.senses.decay_alert_per_s else p.senses.decay_relaxed_per_s)

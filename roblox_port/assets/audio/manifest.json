@@ -88,6 +88,20 @@
       "bytes": 176444,
       "roblox_asset_id": "",
       "experience_access_saved": false
+    },
+    {
+      "file": "cricket_chirp.wav",
+      "sha256": "d23315bfbb66e0ab93a6643b0c30be3cdacc342ffd27c8da5cc946da88965e7d",
+      "bytes": 88244,
+      "roblox_asset_id": "",
+      "experience_access_saved": false
+    },
+    {
+      "file": "robin_call.wav",
+      "sha256": "424bcdbaa332f2ed796380ef313938287f0619264abbaf27bbe6a206bc2cc419",
+      "bytes": 132344,
+      "roblox_asset_id": "",
+      "experience_access_saved": false
     }
   ],
   "status": "Uploaded 2026-10-16 to socranates; room, buzz, takeoff, birds and wasp granted to universe 10771103250. Original sound playtest confirmed; wasp sound loaded and transport verified in Studio build 52123df9177323c8. sill_music.wav (ROBLOX-76, the original ambient loop from tools/make_sill_music.py, not from sound_bank.gd) was uploaded 2026-10-18 by socranates through the Creator Dashboard (Claude, with Nathan's go-ahead; no Robux charged): asset 114531800455832, restricted (owner-only) privacy, which covers the owner's own universe; IDS.music carries it. Seen loaded in Studio in the playtest place (IsLoaded true, TimeLength 64) with no permission prompt, then published as playtest v28 (2026-10-18). Checked again 2026-10-19: thrum.wav, thud.wav and whoosh.wav are uploaded (the asset ids above) but nothing uses them yet: no script names them in Soundscape.IDS, and their experience access was never saved (experience_access_saved false), so each would need granting to universe 10771103250 before a script plays it. For sill_music.wav the byte count and sha256 above describe the repository copy, which is 44 header bytes plus exactly 64 seconds of 22,050 Hz mono 16-bit samples; the uploaded asset is recorded at 2,828,210 bytes (5,766 more) with the same samples, so the two sizes are not expected to match."

@@ -977,3 +977,39 @@ back room's window never perched, and a spider on a coneflower's cone or a golde
   was moving) would be better.
 - At the low graphics tier the meadow is its culms and its clumps' crowns only (the blades and the thatch are the full tier's); say how it reads on a phone.
 - The bench patch moved from the plan's x 40, z 16 to where the path comes out (x 45, z 14.5), and the meadow's core from x 31, z 40 to its near edge (x 45, z 18.5).
+
+## The robin, the field cricket and ballooning (ROBLOX-120, 2026-10-20)
+
+Claude → Chet, 2026-10-20, branch `claude/preserve-c2`. Phase C, round 2 of `docs/PARK_WORLD_DESIGN.md`. An American robin, 25 cm from bill to tail, now visits the open ground
+four to six times a day: the hut garden's lawn either side of the path, the bench patch's gravel and the meadow's mown edge. It is told first by its shadow, a bird's cross sweeping
+over the ground as it glides in, and its call ("pick, tut-tut-tut", a caption); then it lands, hops and stops with its head cocked, pecking now and then. A spider that moves in the
+open near it is seen: it hops closer, stops dead with its head cocked at the spider (the tell, under a second), and strikes. Normal: "The robin's bill came down."; Easy and Free:
+it misses. Keeping still, a home, anything over the spider (a leaf, the flat stone, the bench) or the meadow's grass low down is the way out. Field crickets live in the meadow's
+thatch (three cells) and the pollinator bed's mulch: they sing from dusk (a caption), fall silent and freeze when the spider moves within 30 cm, jump away when it comes close, are
+worth three houseflies and kick hard in the jaws (about five taps a second to hold one). After a hatching in the preserve the card now offers "Follow one" (a twelve-second ride on a
+spiderling's thread out of the window and over the garden on the wind, then the next generation begins where it comes down: the hut garden about three times in four, the
+meadow's edge otherwise) or "Stay at the hut" (as before). Sounds made by `tools/make_meadow_sounds.py` (`robin_call.wav`, `cricket_chirp.wav`), not uploaded. **Nothing of it has
+run in Studio.**
+
+## Your Studio checklist (ROBLOX-120)
+
+1. **The robin's shadow**: in the hut garden by day (from 06:00), stay on the lawn and watch for it: a shadow sweeping over, the caption "[a shadow sweeps over the ground]", its
+   call; then it lands. Say whether the shadow reads (and whether Roblox's own light also casts one: the body casts none on purpose). Screenshot it coming in and on the lawn.
+2. **The robin on the ground**: walk toward it in the open. It should hop at you, cock its head at you and pause, then strike: in Normal the card "The robin's bill came down.";
+   on Easy "The robin stabbed at you and missed." and a jump aside. Try again keeping still when it cocks its head (it loses you), and again under the flat stone or a leaf, and in
+   the meadow's grass. Say if the pause is long enough to see and react to, and if its reach feels fair.
+3. **Its look**: close up, a grey-brown back, the rusty breast, a blackish head with the broken white eye ring, a yellow bill; screenshot it from the spider's eye.
+4. **The crickets**: at night (22:00) in the meadow's thatch (cells b2, c5, d3) or the pollinator bed's mulch: the caption "[a cricket chirping, ...]". Walk toward it: it
+   goes silent and still; come close and it jumps. Catch one: the struggle is long and it kicks (the grip jolts); say how many taps a second it takes on your device.
+5. **Ballooning**: reach a hatching in the preserve (or restore a rest from one): the card says "Follow one" and "Stay at the hut". Follow one: the ride (12 s, the camera on the
+   spiderling and its thread out of the window and over the garden), then the new spiderling stands where it landed with the notice "The thread came down in ...", the toast
+   names the place, and the notebook's "Eggs, silk and wind" has the dated line. Say whether the ride reads and whether the world is streamed in where it lands.
+6. **The self-test** (`workspace:SetAttribute("SelfTest", true)`, Play): 180 checks, among them `the robin`, `the field crickets` and `ballooning's landings`. Paste the INFO lines.
+
+## Open for Nathan (ROBLOX-120)
+
+- The robin's numbers are the game's: it notices a moving spider within 70 cm, reaches 16 cm, pauses 0.85 s, and loses one that keeps still for 1.2 s; four to six visits a day.
+  Say if it should come more often or less, and whether a death without a near miss is too hard in Normal.
+- The robin is the open ground's bird; the design's other birds (a treecreeper on the oak, the heron) wait for their zones.
+- A mate still comes only to the hut garden, and the egg sac and the hatching are still drawn in the sill's crack wherever the spider rested: a lineage that ballooned to the meadow has its family at the hut. Say if the mate and the sac should follow the spider's home.
+- Ballooning lands only in the hut garden and the meadow's edge (only built zones); the pond, the oak and the wall join as they are built.

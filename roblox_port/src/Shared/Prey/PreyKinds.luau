@@ -12,6 +12,11 @@
 --                     restlessness each fly drew is kept, its clock of restlessness starts again at the change (so they do not all take off at once)
 --   the grip ........ the moth's slip (the first grip on it fails at `slip_chance`, once) and the crane fly's shed leg (once, at `shed_chance`, `shed_after`
 --                     seconds into the struggle): the prey leaves the jaws and escapes as a torn-free fly does
+--   the ear ......... (ROBLOX-120, the field cricket: body.hear) a spider moving faster than `still` studs a second within `range` studs hushes it: it falls silent and
+--                     holds still (no walk, no fidget) for `hold` seconds after the last it heard; a `freeze` profile alert freezes where it stands (as a walker
+--                     does) until it jumps; a `chirp` profile (the night's) sings while it is perched, calm and not hushed, the males only (odd serials)
+--   the kick ........ (ROBLOX-120, the field cricket: body.kick) in the jaws its hind legs kick: `first` seconds in and then every `every`, each takes `size` times its
+--                     strength off the grip (on top of the struggle's jerks), from its own stream; a grip that falls to nothing is a prey torn free
 --   the creep ....... (ROBLOX-105, the aphid: body.creep) now and then, perched and calm, it walks slowly over its plant's faces to another free perch of the
 --                     same plant (World/Garden.plantPath: down its stem or round its rosette and out along the other leaf), at `speed`, every `every`
 --                     seconds; startled on the way it freezes where it is; it never leaves its plant
@@ -304,12 +309,43 @@ function K.isDusk(hour: number, from: number, to: number): boolean
 	return hour >= from or hour < to
 end
 
--- The grip on a struggling prey, each tick before the jaws' own step: a moth's first grip may slip, a crane fly may leave a leg. Returns "slip" or "shed" when
--- the prey got away (it is out of the jaws and `escape` has taken it), else nil.
+-- (ROBLOX-120) The ear (a profile with body.hear), each tick before the fly's senses: the spider at `stimulus` moving within range hushes it.
+function K.hear(f: any, now: number, dt: number, stimulus: Vector3)
+	local h = f.profile.body.hear
+	local last = f.heardFrom
+	f.heardFrom = stimulus
+	if last == nil or dt <= 0 or not f:alive() then return end
+	if (stimulus - last).Magnitude / dt >= h.still and (stimulus - f.position).Magnitude <= h.range then
+		if now >= (f.hushUntil or 0) then f.hushes = (f.hushes or 0) + 1 end
+		f.hushUntil = now + h.hold
+	end
+	f.hushed = now < (f.hushUntil or 0) -- (what the drawing and the client's ears read, with no clock of the director's)
+end
+-- (ROBLOX-120) Whether it is hushed (it heard the spider lately): it holds still.
+function K.hushed(f: any, now: number): boolean
+	return f.profile.body.hear ~= nil and now < (f.hushUntil or 0)
+end
+-- (ROBLOX-120) Whether it is singing now: a chirping profile (the night's), a male (an odd serial), perched and calm, not hushed, alive.
+function K.chirping(f: any): boolean
+	return f.profile.body.chirp == true and f.serial % 2 == 1 and f.state == "PERCHED" and f.hop == nil and f.hushed ~= true and f:alive()
+end
+
+-- The grip on a struggling prey, each tick before the jaws' own step: a moth's first grip may slip, a crane fly may leave a leg, a cricket kicks (ROBLOX-120: its kicks
+-- take grip; the jaws' own step lets it go when the grip is gone). Returns "slip" or "shed" when the prey got away (it is out of the jaws and `escape` has taken it),
+-- else nil.
 function K.grip(feeding: any, escape: (any) -> ()): string?
 	local f = feeding.held
 	if f == nil or not feeding.struggling then return nil end
 	local b = f.profile.body
+	if b.kick ~= nil and feeding.elapsed > 0 then
+		if f.kickAt == nil then f.kickAt = f.rng:draw(b.kick.first) end
+		if feeding.elapsed >= f.kickAt then
+			local strength = 1 - (feeding.tire or 0.5) * math.clamp(feeding.elapsed / math.max(feeding.venom, 1e-3), 0, 1)
+			feeding.grip -= b.kick.size * strength
+			f.kicks = (f.kicks or 0) + 1
+			f.kickAt = feeding.elapsed + f.rng:draw(b.kick.every)
+		end
+	end
 	local what: string? = nil
 	if b.slip_chance ~= nil and not f.slipDrawn then
 		f.slipDrawn = true

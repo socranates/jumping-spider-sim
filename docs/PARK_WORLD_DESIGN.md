@@ -166,6 +166,13 @@ little bluestem, black-eyed Susan, yarrow, milkweed, coneflower, bergamot and go
 hoverflies, moths, ants), the goldenrod crab spider with its page, the rival roaming the edge. Left for round 2: the bird's shadow over open ground, a cricket, more of the meadow
 and the mown loop as a corridor; round 3: ballooning as the generation's choice.
 
+*Round 2 built (ROBLOX-120, 2026-10-20, not yet run in Studio):* the sky's danger, an American robin (`Predator/Bird`, `Client/BirdBody`, `UI/BirdText`) at true size on a seeded
+day of four to six visits to the hut garden's lawn, the bench patch's gravel and the meadow's mown edge, told first by its shadow and its call; a spider moving in the open in its
+reach after its tell (the head cocked, a pause) is taken in Normal and missed in the gentle rules; cover or stillness saves it; with its page. The field cricket (*Gryllus
+pennsylvanicus*) in the meadow's thatch and the hut garden's mulch, singing from dusk, hushed by a spider moving near, three houseflies' worth and a struggle that kicks; with its
+page. And ballooning, brought forward from round 3: after a hatching in the preserve the card offers "Follow one" (the ride on the wind, `Life/Ballooning`'s seeded draw: the hut
+garden about three times in four, the meadow's edge the rest, only built zones) or "Stay at the hut". Left for round 3: more of the meadow and the mown loop as a corridor.
+
 **Phase D — water (2–3 rounds).** Zone 4 (the pond edge and the boardwalk), water as a surface, the frog, damselflies, midges; weather
 (rain makes worms and stops hunting).
 
@@ -210,6 +217,13 @@ the Steam edition (the canal, the apartment balconies and window boxes, a roofto
 5. Lock-on moves to **L2** on controllers (Nathan, 2026-10-20), in Phase A's first round.
 
 ## 11. Progress
+
+- **ROBLOX-120 (Phase C, round 2)**: the robin (`Predator/Bird`, `Client/BirdBody`, `UI/BirdText`), the field cricket (`Data/Species.cricket_prototype` and its night's, `Prey/PreyKinds`'
+  ear and kick, `Data/FlyLook.small.cricket`, in `World/Hut` and `World/Meadow`), ballooning (`Life/Ballooning`, the card's "Follow one", the ride, `life.start_zone`). Decisions taken in
+  the build: a robin (not a house sparrow: the design's American preserve names it, and the sources say it takes spiders); its danger only on the ground, never from the air; cover is
+  a home, a box over the spider within 60 cm, or the meadow's grass under 25 cm; the cricket's hearing a hush, not an alarm (it jumps on sight as the other hoppers do); ballooning
+  brought into this round as the brief asked, landing only in the hut garden and the meadow's edge (the bench patch's gravel is not where a thread snags), on a landing region's
+  spawn. `docs/DECISIONS.md` ROBLOX-120; `docs/HANDOFF-roblox-world.md` has the Studio checklist.
 
 - **ROBLOX-119 (Phase C, round 1)**: the bench patch and the meadow's edge walkable (`World/Meadow`), their life (`Prey/Ant`), the crab spider (`Predator/CrabSpider`, `Client/CrabBody`,
   `UI/CrabText`), the lamppost's light, the rival's roam to the meadow's edge; fixed the flights that never left the sill's band (`Prey/PerchGraph`'s band per spec) and the

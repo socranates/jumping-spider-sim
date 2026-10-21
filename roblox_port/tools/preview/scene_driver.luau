@@ -318,8 +318,9 @@ if PRESERVE then
 	local tiered = FlyBodies.new(flyFolder, DETAIL)
 	local all = {}
 	for _, region in WorldMap.regions() do
-		if Meadow.knows(region.kind) then
+		if Meadow.knows(region.kind) or region.id == "garden_d3" then -- (ROBLOX-120: and the hut garden's cricket in the mulch)
 			for _, k in Garden.bestiary(region) or {} do
+				if not Meadow.knows(region.kind) and k.kind ~= "cricket" then continue end
 				local d = PreyDirector.engine(outside, (Species :: any)[k.profile], k.seed, if DETAIL == "low" then k.low else k.target, false, k)
 				for i, f in d.flies do
 					if NIGHT_MOTHS and region.id == "lamp_4" then
@@ -366,6 +367,54 @@ if CATS ~= nil then
 			reactS = c.swat or 0 }
 		if c.seated then cat.spot = "window" end
 		body:draw(cat, c.t or 3.0, 0)
+	end
+end
+
+-- ROBLOX-120 (scene.py --robins, --ride, --preserve): the robin (Client/BirdBody) where scene.py puts it: { id, x, y, z, hx, hz, pose, cock, shadow }; the ride on the wind
+-- (Life/Ballooning, to RIDE_TO's spawn) at the shares of its seconds in RIDE, each frame's rider and thread drawn and a view from behind it as the client's shot frames
+-- it; and the crickets' places (the first perch of garden_d3's and meadow_b2's) for the cr_* views. The views go out on the first line as "VIEW name eye at fov".
+EXTRA_VIEWS = ""
+if ROBINS ~= nil then
+	local BirdBody = require("../src/Client/BirdBody")
+	for _, b in ROBINS do
+		local body = BirdBody.new(catHolder, DETAIL)
+		body.folder.Name = b.id
+		local pos = Vector3.new(b.x, b.y, b.z)
+		body:draw({ here = true, pos = pos, heading = Vector3.new(b.hx, 0, b.hz).Unit, pose = b.pose, cock = b.cock or 1, strikeS = -1,
+			shadow = if b.shadow then Vector3.new(b.x, -84.6, b.z) else nil, flying = b.pose == "fly" }, 0.04, 0, 0)
+	end
+end
+if PRESERVE and RIDE ~= nil and #RIDE > 0 then
+	local Ballooning = require("../src/Shared/Life/Ballooning")
+	local Shapes = require("../src/Shared/Habitat/Shapes")
+	local to = (WorldMap.region(RIDE_TO) :: any).spawn.pos
+	local ride = Ballooning.ride(914, 1, 9, to)
+	for i, k in RIDE do
+		local t = ride.seconds * k
+		local at, thread = Ballooning.at(ride, t)
+		local fwd = Vector3.new(thread.X - at.X, 0, thread.Z - at.Z)
+		fwd = if fwd.Magnitude > 1e-3 then fwd.Unit else -Vector3.zAxis
+		Shapes.ellipsoid(catHolder, "Rider" .. i, Vector3.one * 0.3, CFrame.new(at - fwd * 0.1), Color3.fromRGB(74, 58, 46), "SmoothPlastic")
+		Shapes.ellipsoid(catHolder, "RiderHead" .. i, Vector3.one * 0.21, CFrame.new(at + fwd * 0.13), Color3.fromRGB(98, 80, 62), "SmoothPlastic")
+		local a = at + Vector3.yAxis * 0.15
+		local th = Shapes.block(catHolder, "RiderThread" .. i, Vector3.new(0.03, 0.03, (thread - a).Magnitude), CFrame.lookAt((a + thread) / 2, thread), Color3.fromRGB(236, 232, 214), "Neon")
+		th.Transparency = 0.35
+		local back = -fwd
+		local dir = (back * 0.85 + Vector3.yAxis * 0.5).Unit
+		local eye = at + dir * (if k < 0.12 then 5 else 7)
+		EXTRA_VIEWS ..= string.format(" VIEW ride_%d %.3f %.3f %.3f %.3f %.3f %.3f 60", math.floor(k * 100 + 0.5), eye.X, eye.Y, eye.Z, at.X, at.Y, at.Z)
+	end
+end
+if PRESERVE then
+	local Garden = require("../src/Shared/World/Garden")
+	for _, row in { { "garden_d3", "cr_mulch" }, { "meadow_b2", "cr_thatch" } } do
+		for _, k in (Garden.bestiary(WorldMap.region(row[1]) :: any) or {}) :: { any } do
+			if k.kind == "cricket" then
+				local p = k.perches[1].position
+				EXTRA_VIEWS ..= string.format(" VIEW %s %.3f %.3f %.3f %.3f %.3f %.3f 50", row[2], p.X + 5, p.Y + 3.2, p.Z + 5, p.X, p.Y + 0.3, p.Z)
+				EXTRA_VIEWS ..= string.format(" VIEW %s_far %.3f %.3f %.3f %.3f %.3f %.3f 60", row[2], p.X + 14, p.Y + 9, p.Z + 14, p.X, p.Y, p.Z)
+			end
+		end
 	end
 end
 
@@ -524,5 +573,5 @@ for k in counts do table.insert(keys, k) end
 table.sort(keys)
 local summary = {}
 for _, k in keys do table.insert(summary, k .. "=" .. counts[k]) end
-print("parts " .. table.concat(summary, " ") .. " total=" .. #rows .. (if #AMBIENT_AT > 0 then " ambient=" .. table.concat(AMBIENT_AT, ";") else "") .. (if PRESERVE_COUNTS ~= "" then " preserve: " .. PRESERVE_COUNTS else ""))
+print("parts " .. table.concat(summary, " ") .. " total=" .. #rows .. (if #AMBIENT_AT > 0 then " ambient=" .. table.concat(AMBIENT_AT, ";") else "") .. (if PRESERVE_COUNTS ~= "" then " preserve: " .. PRESERVE_COUNTS else "") .. EXTRA_VIEWS)
 print("[" .. table.concat(rows, ",\n") .. "]")

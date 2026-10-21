@@ -20,6 +20,13 @@ PreyText.REFUSED = {
 	woodlouse = "The woodlouse's glands give off a secretion spiders avoid. You let it go.",
 } :: { [string]: string }
 
+-- (ROBLOX-120) The field cricket's song, captioned (the Captions setting) when the nearest singing cricket (Prey/PreyKinds.chirping) is within CHIRP_HEAR studs of the
+-- spider; `direction` UI/WaspText.directionWord's. How loud it is to the spider: 1 at the cricket, nothing at CHIRP_HEAR.
+PreyText.CHIRP_HEAR = 400
+function PreyText.chirp(direction: string, loud: number): { text: string, alpha: number }
+	return { text = `[a cricket chirping, {direction}]`, alpha = math.clamp(0.35 + loud, 0, 1) }
+end
+
 -- How long a note stays (seconds).
 PreyText.SECONDS = 4
 

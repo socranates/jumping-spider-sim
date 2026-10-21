@@ -1296,7 +1296,7 @@ check("the notebook page is sourced and honest: the real citations, the game's d
 	assert(page ~= nil and page.trigger == "hatched" and page.title == "Eggs, silk and wind", "the page")
 	assert(#page.text <= 520 and #page.sources == 4, "short, and four sources")
 	assert(string.find(page.sources[1], "Journal of Arachnology 6: 1-29", 1, true) and string.find(page.sources[4], "Current Biology 28(14): 2324-2330", 1, true), "real citations in the notebook's style")
-	for _, word in { "fifteen minutes", "male", "eight to twelve", "mottled grey-brown", "carry on" } do
+	for _, word in { "fifteen minutes", "male", "eight to twelve", "mottled grey-brown", "follow one spiderling", "stay at the hut" } do -- (ROBLOX-120: the ballooning choice)
 		assert(string.find(page.game, word, 1, true) ~= nil, "the game note says: " .. word)
 	end
 	for _, p in NotebookPages.pages do

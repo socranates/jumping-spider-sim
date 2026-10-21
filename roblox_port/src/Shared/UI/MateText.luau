@@ -152,14 +152,29 @@ function MateText.sceneCaption(seconds: number): { text: string, alpha: number }
 end
 
 -- The ending card: the title, the line about the generation and the body (the brood, the day). `brood` is the number of spiderlings that hatched.
-function MateText.card(brood: number, day: number, generation: number): (string, string, string)
+-- ROBLOX-120: in the preserve (`wind`) the body offers the two ways on: follow one on the wind, or stay at the hut as one of them.
+function MateText.card(brood: number, day: number, generation: number, wind: boolean?): (string, string, string)
 	local sub = `{brood} spiderlings hatched on day {day}, climbed into the light and floated away on silk, one by one.`
-	local body = `You were generation {generation + 1}. You carry on as one of them, small again, in the same crack on the same sill.`
+	local body = if wind == true then `You were generation {generation + 1}. Follow one of them on the wind to wherever it comes down, or stay at the hut as one of them, small again in the same crack.`
+		else `You were generation {generation + 1}. You carry on as one of them, small again, in the same crack on the same sill.`
 	return MateText.TITLE, sub, body
 end
+-- (ROBLOX-120) The card's two ways on in the preserve (Life/Ballooning), the ride's caption and the words where it lands.
+MateText.FOLLOW = "Follow one"
+MateText.STAY = "Stay at the hut"
+MateText.RIDE_CAPTION = "[the wind takes the thread]"
+function MateText.landed(place: string): string
+	return `The thread came down in {place}. A new life begins here, in the wild.`
+end
+-- The notebook's dated line for "Eggs, silk and wind" when one was followed.
+function MateText.rideEntry(day: number, place: string): string
+	return `Day {day}: One spiderling went up on its thread, and the wind set it down in {place}.`
+end
 
--- The toast of the new generation. `generation` is the number carryOn returns (1 for the first carry on); the first spider is generation 1.
-function MateText.generationToast(generation: number, day: number): string
+-- The toast of the new generation. `generation` is the number carryOn returns (1 for the first carry on); the first spider is generation 1. ROBLOX-120: `place`, where
+-- it landed when it was followed on the wind (nil: it stayed at the hut).
+function MateText.generationToast(generation: number, day: number, place: string?): string
+	if place ~= nil then return `Generation {generation + 1} — hatched on day {day}, landed in {place}` end
 	return `Generation {generation + 1} — hatched on day {day}`
 end
 

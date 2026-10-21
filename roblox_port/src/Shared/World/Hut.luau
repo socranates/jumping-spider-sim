@@ -2337,6 +2337,8 @@ Hut.LIFE = table.freeze({
 	hoverflies = { garden_c4 = { full = 1, low = 1 }, garden_d4 = { full = 1, low = 1 }, garden_c3 = { full = 1, low = 1 } },
 	fruitflies = { hut_floor_i = { full = 4, low = 2 }, room_floor_g = { full = 2, low = 1 } },
 	moths = { hut_desk = { full = 1, low = 1 }, room_window = { full = 1, low = 1 } },
+	-- (ROBLOX-120) a field cricket in the pollinator bed's mulch, singing from dusk
+	crickets = { garden_d3 = { full = 1, low = 1, perches = 6 } },
 })
 -- (ROBLOX-117) The compost caddy by the door, on the floor east of the doorway against the south wall: a kitchen caddy of green plastic, its lid down, a banana peel over
 -- its rim; the fruit flies' home in the hut.
@@ -2470,7 +2472,8 @@ local bestiaryCache: { [string]: any } = {}
 function Hut.bestiary(region: Region): { any }?
 	local spring, hopper = Hut.LIFE.springtails[region.id], Hut.LIFE.leafhoppers[region.id]
 	local hover, fruit, moth = Hut.LIFE.hoverflies[region.id], Hut.LIFE.fruitflies[region.id], Hut.LIFE.moths[region.id]
-	if spring == nil and hopper == nil and hover == nil and fruit == nil and moth == nil then return nil end
+	local cricket = Hut.LIFE.crickets[region.id]
+	if spring == nil and hopper == nil and hover == nil and fruit == nil and moth == nil and cricket == nil then return nil end
 	local key = region.id .. "/" .. tostring(region.seed)
 	if bestiaryCache[key] ~= nil then return bestiaryCache[key] end
 	local out = {}
@@ -2494,6 +2497,24 @@ function Hut.bestiary(region: Region): { any }?
 		for i, c in centres do if i <= 2 then table.insert(vents, { id = `{region.id}_vent_springtail_{i}`, position = c, normal = Vector3.yAxis, appear = true, reach = 6 }) end end
 		table.insert(out, { kind = "springtail", profile = "springtail_prototype", perches = perches, vents = vents, target = spring.full, low = spring.low,
 			seed = (region.seed + salt * 104729) % MOD, prefix = `{region.id}_springtail_fly_` })
+	end
+	if cricket ~= nil then
+		-- (ROBLOX-120) the field cricket: spots on the mulch a jump apart (8 to 24 studs), clear of the plants' stems and the stones; it comes up out of the mulch
+		local salt = 79
+		local rand = rng(region.seed, salt)
+		local area = bedArea(region) :: { number }
+		local standing = standingOn(region, S)
+		for _, t in region.retreats do table.insert(standing, { min = t.min - v(1, 0, 1), max = t.max + v(1, 0, 1) }) end
+		local perches: { Perch } = {}
+		local taken: { Vector3 } = {}
+		for i = 1, cricket.perches do
+			local spot = freeSpot(rand, area, S, standing, taken, 1.5, 9)
+			if spot then table.insert(perches, { id = `{region.id}_cricket_{i}`, position = spot, normal = Vector3.yAxis, shelter = 0.6, food = 0.3, start = #perches < cricket.full, kind = "soil", hop = true }) end
+		end
+		local vents: { Vent } = {}
+		if #perches > 1 then table.insert(vents, { id = `{region.id}_vent_cricket`, position = perches[#perches].position, normal = Vector3.yAxis, appear = true, reach = 10 }) end
+		table.insert(out, { kind = "cricket", profile = "cricket_prototype", perches = perches, vents = vents, target = cricket.full, low = cricket.low,
+			seed = (region.seed + salt * 104729) % MOD, prefix = `{region.id}_cricket_fly_`, dusk = { from = 19.0, to = 6.5 } })
 	end
 	if hopper ~= nil then
 		local salt = 73

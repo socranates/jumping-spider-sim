@@ -130,6 +130,7 @@ MODULES = [
     ("PreyRandom", "Prey/PreyRandom.luau"),
     ("Nature", "Life/Nature.luau"),
     ("Nursery", "Life/Nursery.luau"),
+    ("Ballooning", "Life/Ballooning.luau"),
     ("MatingRules", "Data/MatingRules.luau"),
     ("RivalRoute", "Predator/RivalRoute.luau"),
     ("RivalSpider", "Predator/RivalSpider.luau"),
@@ -153,10 +154,12 @@ MODULES = [
     ("WaspDirector", "Predator/WaspDirector.luau"),
     ("Cat", "Predator/Cat.luau"),
     ("CrabSpider", "Predator/CrabSpider.luau"),
+    ("Bird", "Predator/Bird.luau"),
     ("Heard", "UI/Heard.luau"),
     ("WaspText", "UI/WaspText.luau"),
     ("CatText", "UI/CatText.luau"),
     ("CrabText", "UI/CrabText.luau"),
+    ("BirdText", "UI/BirdText.luau"),
     ("RivalText", "UI/RivalText.luau"),
     ("AntMimicText", "UI/AntMimicText.luau"),
     ("TarantulaText", "UI/TarantulaText.luau"),
@@ -229,6 +232,7 @@ CLIENT_MODULES = [
     ("WaspBody", "../Client/WaspBody.luau"),
     ("CatBody", "../Client/CatBody.luau"),
     ("CrabBody", "../Client/CrabBody.luau"),
+    ("BirdBody", "../Client/BirdBody.luau"),
     ("PerceptionHud", "../Client/PerceptionHud.luau"),
     ("SpiderEyes", "../Client/SpiderEyes.luau"),
     ("SaveClient", "../Client/SaveClient.luau"),
@@ -239,7 +243,7 @@ CLIENT_MODULES = [
     ("WorldClient", "../Client/WorldClient.luau"),
     ("SelfTest", "../Client/SelfTest.luau"),
 ]
-CLIENT_TESTS = {"selftest_preserve.luau", "quiet.luau", "lock.luau", "title.luau", "nature_client.luau", "selftest.luau", "garden_life.luau", "world_client.luau","state_client.luau","state_offline.luau","growth.luau","perception_client.luau", "client_smoke.luau", "client_ant.luau", "client_rival.luau", "client_mating.luau", "look.luau", "idle.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "wasp.luau", "notebook.luau", "settings.luau", "inspect.luau"}
+CLIENT_TESTS = {"preserve.luau", "selftest_preserve.luau", "quiet.luau", "lock.luau", "title.luau", "nature_client.luau", "selftest.luau", "garden_life.luau", "world_client.luau","state_client.luau","state_offline.luau","growth.luau","perception_client.luau", "client_smoke.luau", "client_ant.luau", "client_rival.luau", "client_mating.luau", "look.luau", "idle.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "wasp.luau", "notebook.luau", "settings.luau", "inspect.luau"}
 REFERENCES = ["jump_reference", "tether_reference", "camera_reference", "framing_reference", "perception_reference", "prey_reference", "life_reference", "wasp_reference", "continuing_reference", "growth_reference", "notebook_reference", "notebook_godot"]
 # A reference only the named tests read (it is large; the other bundles leave it out).
 REFERENCE_ONLY = {"continuing_reference": {"continuing.luau"},"prey_reference": {"prey.luau"}, "perception_reference": {"perception.luau"}, "life_reference": {"life.luau"}, "wasp_reference": {"wasp.luau"}, "notebook_reference": {"notebook.luau"}, "notebook_godot": {"notebook.luau"}}

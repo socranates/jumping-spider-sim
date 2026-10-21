@@ -49,6 +49,8 @@
 -- ROBLOX-106: the life may hold `cold_day` (the morning a night out in the garden left cold, Life/Nature), the rival `camp` (its watch by the crack), the mate its
 -- courtship's record and the rival's level (`court_*`, `cut`) and the mating its counters (`courts`, `rejections`, `cut_ins`): all optional, absent in every record
 -- before, checked when present.
+-- ROBLOX-120: the life may hold `start_zone` and `start_region` (where a generation followed on the wind came down, Life/Ballooning): optional, absent in every record
+-- before and in a generation that stayed at the hut, checked when present. The robin (Predator/Bird) keeps nothing: its day is the seed's, as the crab spiders' is.
 
 local Species = require(script.Parent.Parent.Data.Species)
 local ObjectRecord = require(script.Parent.ObjectRecord)
@@ -78,6 +80,7 @@ local Snails = require(script.Parent.Parent.Prey.Snail)
 local Harvestmen = require(script.Parent.Parent.Prey.Harvestman)
 local Ants = require(script.Parent.Parent.Prey.Ant) -- (ROBLOX-119: the meadow's ants)
 local Garden = require(script.Parent.Parent.World.Garden)
+local Ballooning = require(script.Parent.Parent.Life.Ballooning) -- (ROBLOX-120: a generation's start)
 
 local RivalSpider = require(script.Parent.Parent.Predator.RivalSpider)
 local Mate = require(script.Parent.Parent.Predator.Mate)
@@ -316,6 +319,11 @@ local function checkWorld(roots: { [string]: any }, problems: { string })
  for _, text in Mating.problemsWith(life.mating, life.mate) do bad(text) end
  if not Nature.validCold(life.cold_day) then bad("life: invalid cold morning") end -- (ROBLOX-106: optional, set by a night out in the garden)
  if life.generation ~= nil and not (finite(life.generation) and life.generation >= 0 and life.generation <= 1e6 and life.generation % 1 == 0) then bad("life: invalid generation") end
+ -- ROBLOX-120: where this generation began (Life/Ballooning): absent in every record before, and in a generation that stayed at the hut; a zone that can be landed in,
+ -- and its landing region with it.
+ if life.start_zone ~= nil and (not Ballooning.valid(life.start_zone) or life.start_zone == Ballooning.HUT) then bad("life: invalid start zone") end
+ if life.start_region ~= nil and (life.start_zone == nil or not Ballooning.landsIn(life.start_zone, life.start_region)) then bad("life: invalid start region") end
+ if life.start_zone ~= nil and life.start_region == nil then bad("life: a start zone with no landing") end
  -- ROBLOX-91: where this generation's grace began (Mating.grace); absent in a record from before (the first generation's: the sill's own day and meals).
  for _, k in { "born", "mealsBase" } do
   local v = life[k]

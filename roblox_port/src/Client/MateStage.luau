@@ -161,7 +161,7 @@ function MateStage.new(parent: Instance, world: Instance, detail: string): any
 		folder = folder, world = world, detail = detail, parent = parent,
 		rig = nil :: any, rigFor = "", scaleFor = 0, sac = nil :: Part?, sacThreads = {} :: { Part },
 		plan = {} :: { Spiderling }, bodies = {} :: { { body: Part, head: Part, thread: Part } },
-		t = 0.0, running = false, finished = false,
+		t = 0.0, running = false, finished = false, rider = nil :: any,
 	}, MateStage)
 end
 
@@ -294,8 +294,40 @@ function MateStage.clearScene(self: any)
 	self.running, self.finished, self.t = false, false, 0.0
 end
 
+-- ---- the ride (ROBLOX-120: "Follow one", Life/Ballooning)
+
+-- Draws the followed spiderling at `at` on its thread to `thread` (made when first asked), or takes it away (`at` nil). The rider is drawn bigger than the brood's
+-- (RIDER: the camera rides with it, close): a body, a head and the thread, the same colours.
+MateStage.RIDER = 0.3
+function MateStage.drawRider(self: any, at: Vector3?, thread: Vector3?)
+	if at == nil then
+		if self.rider ~= nil then
+			for _, part in self.rider do part:Destroy() end
+			self.rider = nil
+		end
+		return
+	end
+	if self.rider == nil then
+		self.rider = {
+			body = ball("Rider", MateStage.RIDER, Color3.fromRGB(74, 58, 46), self.folder),
+			head = ball("RiderHead", MateStage.RIDER * MateStage.HEAD, Color3.fromRGB(98, 80, 62), self.folder),
+			thread = strand("RiderThread", Vector3.zero, Vector3.zAxis * 0.1, self.folder, 0.03),
+		}
+	end
+	local r = self.rider
+	local top = thread or (at + Vector3.yAxis)
+	local fwd = Vector3.new(top.X - at.X, 0, top.Z - at.Z)
+	fwd = if fwd.Magnitude > 1e-3 then fwd.Unit else -Vector3.zAxis
+	r.body.Position = at + fwd * (MateStage.RIDER * MateStage.BODY_AT)
+	r.head.Position = at + fwd * (MateStage.RIDER * MateStage.HEAD_AT)
+	local a = at + Vector3.yAxis * (MateStage.RIDER * 0.5)
+	r.thread.Size = Vector3.new(0.03, 0.03, math.max((top - a).Magnitude, 0.01))
+	r.thread.CFrame = CFrame.lookAt((a + top) * 0.5, top)
+end
+
 -- Everything away: a new life, a restored rest.
 function MateStage.reset(self: any)
+	self:drawRider(nil)
 	self:clearScene()
 	self:drawSac(false)
 	if self.rig ~= nil then

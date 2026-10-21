@@ -33,6 +33,9 @@
 -- ROBLOX-119: in the preserve also the bench patch (up the path's end onto its gravel, across it and into the meadow; its three homes; the lamppost lit at night), the
 -- meadow's edge (a spider on a coneflower's cone; its leafhoppers and its ants made and drawn) and the crab spiders (held off the rest of the run: placed and drawn, a
 -- close look from its flower's stem noticed; on the sim, a spider on its flower grabbed in the standard rules and knocked clear in the gentle ones).
+-- ROBLOX-120: and the robin (held off the rest of the run: its shadow over a spider under its way in, its landing and its drawing; on the sim, a spider moving in the
+-- open taken in the standard rules and missed in the gentle ones), the field crickets (in the meadow's thatch at night, drawn, singing once the spider keeps still) and
+-- ballooning's landings (a spider stands on each landing of each built zone, and the wind's draw lands only there).
 -- Each Studio process writes its own log (%LOCALAPPDATA%\Roblox\logs); tools/studio/selftest.ps1 reads the newest for these lines.
 -- The CLI suite tests/selftest.luau runs the same checks against the real client on the shim's box world, with a host of its own (simulated frames and clock), so the run is
 -- proven to complete and print END before it ever reaches Studio. First run in Studio at v36 (33 of 34; the line failed, ROBLOX-111); ROBLOX-111's additions not yet.
@@ -48,6 +51,9 @@ local LookPlan = require(Shared:WaitForChild("World"):WaitForChild("LookPlan"))
 local RivalSpider = require(Shared:WaitForChild("Predator"):WaitForChild("RivalSpider"))
 local Mate = require(Shared:WaitForChild("Predator"):WaitForChild("Mate"))
 local Meadow = require(Shared:WaitForChild("World"):WaitForChild("Meadow")) -- (ROBLOX-119: the bench patch and the meadow's edge)
+local PreyKinds = require(Shared:WaitForChild("Prey"):WaitForChild("PreyKinds")) -- (ROBLOX-120: the crickets' song)
+local Garden = require(Shared:WaitForChild("World"):WaitForChild("Garden")) -- (ROBLOX-120: the crickets' places)
+local Ballooning = require(Shared:WaitForChild("Life"):WaitForChild("Ballooning")) -- (ROBLOX-120: where a followed spiderling lands)
 local BugBodies = require(script.Parent.BugBodies)
 
 local SelfTest = {}
@@ -309,6 +315,7 @@ local function checks(): { Check }
 		pause(r, 0.5)
 		if ctx.cat ~= nil then ctx.cat.enabled = false end -- (ROBLOX-118: the cat is held off the run but for its own check)
 		if ctx.crab ~= nil then ctx.crab.enabled = false end -- (ROBLOX-119: and the crab spiders)
+		if ctx.bird ~= nil then ctx.bird.enabled = false end -- (ROBLOX-120: and the robin)
 		need(session.started and not menu:isShowing(), "the life did not begin")
 		need(ctx.motor.mode == "attached", `the spider is not standing ({ctx.motor.mode})`)
 	end)
@@ -1219,6 +1226,109 @@ local function checks(): { Check }
 				need(kind == (if gentle then "nudged" else "struck"), `in the {if gentle then "gentle" else "standard"} rules a spider on its flower was {tostring(kind)}`)
 			end
 			say(r, `INFO the crab spiders: a {c.form} one on {c.region} and a {crab.crabs[2].form} one on {crab.crabs[2].region}, {#folder:GetChildren()} drawn; the close look opened its page`)
+		end)
+
+		-- ROBLOX-120: the robin (held off the rest of the run: its shadow over a spider on its way in, its landing and its drawing; on the sim, a spider moving in the open
+		-- taken in the standard rules and missed in the gentle ones), the field crickets (in the meadow's thatch at night, drawn, singing once the spider keeps still) and
+		-- ballooning's landings (a spider stands on each landing of each built zone; the wind's draw lands only there).
+		add("the robin", function(r)
+			local ctx = r.ctx
+			local bird, Bird, life = ctx.bird, ctx.Bird, ctx.life
+			need(bird ~= nil and Bird ~= nil, "no robin in the preserve")
+			local day, hour = life.clock.day, life.clock.hour
+			local visit = Bird.plan(bird.seed, day)[1]
+			local land = visit.site.line[1]
+			local under = land + visit.site.from * 120
+			local region = WorldMap.at(under + Vector3.new(0, 1, 0))
+			need(region ~= nil, `no region under the robin's way in at {fmt(under)}`)
+			local at = Vector3.new(under.X, Bird.GROUND + HEIGHT, under.Z)
+			local shadows, landings = bird.shadows, bird.landings
+			local ok, err = pcall(function()
+				need(holdUntilReady(r, (region :: any).id, at, nil), `{(region :: any).id} is not whole`)
+				put(r, at, nil)
+				pause(r, 0.2)
+				life.clock.hour = visit.h0 - Bird.HOUR_PER_S * 0.5
+				need(waitUntil(r, 8, function() return bird.shadows > shadows end, 0), `its shadow did not pass over the spider on its way in to {visit.site.id} (it is {bird.pose})`)
+				need(waitUntil(r, 8, function() return bird.landings > landings end, 0), `it did not land on {visit.site.id} ({bird.pose})`)
+				local folder = Workspace:FindFirstChild("Robin")
+				local body = if folder ~= nil then folder:FindFirstChild("Body") else nil
+				local shown = 0
+				if body ~= nil then for _, p in body:GetChildren() do if p:IsA("BasePart") and p.Transparency < 1 then shown += 1 end end end
+				need(shown >= 15, `the robin is not drawn on the ground ({shown} parts shown)`)
+				need(not life.lifeOver, "the robin took the spider while it was held off")
+			end)
+			life.clock.day, life.clock.hour = day, hour
+			if not ok then error(err, 0) end
+			-- on the sim: a spider moving in the open in front of it, in each rules
+			local h = Bird.hourOf(visit, Bird.APPROACH_S + 4)
+			for _, gentle in { false, true } do
+				local trial = Bird.new(bird.seed)
+				trial.gentle = gentle
+				trial:step(1 / 60, day, h, nil)
+				local spot = trial.pos + Vector3.new(trial.heading.X, 0, trial.heading.Z).Unit * 30 + Vector3.new(0, HEIGHT, 0)
+				local kind = nil
+				local hh = h
+				for i = 1, 60 * 6 do
+					hh += Bird.HOUR_PER_S / 60
+					spot += Vector3.new(math.sin(i * 0.2) * 0.05, 0, math.cos(i * 0.2) * 0.05)
+					trial:step(1 / 60, day, hh, { pos = spot, speed = 3, hidden = false, covered = false })
+					for _, sg in trial:drainSignals() do if sg.kind == "struck" or sg.kind == "missed" then kind = sg.kind end end
+					if kind then break end
+				end
+				need(kind == (if gentle then "missed" else "struck"), `in the {if gentle then "gentle" else "standard"} rules a spider moving in the open was {tostring(kind)}`)
+			end
+			say(r, `INFO the robin: in on {visit.site.id} at {string.format("%.2f", visit.h0)} h, its shadow over the spider, landed and drawn ({bird.pose}); on the sim struck in Normal, missed in the gentle rules`)
+		end)
+
+		add("the field crickets", function(r)
+			local ctx = r.ctx
+			local world, motor, life = ctx.world, ctx.motor, ctx.life
+			local b2 = WorldMap.region("meadow_b2") :: any
+			local spec = nil
+			for _, k in (Garden.bestiary(b2) or {}) :: { any } do if k.kind == "cricket" then spec = k end end
+			need(spec ~= nil and #spec.perches > 0, "no cricket in meadow_b2")
+			local first = spec.perches[1].position
+			local at = Vector3.new(first.X + 12, Meadow.GROUND + HEIGHT, first.Z)
+			if WorldMap.at(at + Vector3.new(0, 1, 0)) ~= b2 then at = b2.spawn.pos + Vector3.new(0, HEIGHT, 0) end
+			local hour = life.clock.hour
+			local ok, err = pcall(function()
+				need(holdUntilReady(r, "meadow_b2", at, nil), "meadow_b2 is not whole")
+				life.clock.hour = 22
+				put(r, at, nil)
+				pause(r, 1.0)
+				local entry = world.garden.meadow_b2
+				need(entry ~= nil and entry.kinds ~= nil and entry.kinds.cricket ~= nil and #entry.kinds.cricket.flies > 0, "no cricket made in meadow_b2")
+				drawn(r, entry.kinds.cricket.flies, "a cricket")
+				local f = entry.kinds.cricket.flies[1]
+				need(waitUntil(r, 9, function() return PreyKinds.chirping(f) end, 0), `the cricket did not sing at night once the spider kept still ({f.state}, hushed {tostring(f.hushed)}, {f.profile.id})`)
+				need(motor.mode == "attached", "the spider did not stay put")
+			end)
+			life.clock.hour = hour
+			if not ok then error(err, 0) end
+			say(r, "INFO the field crickets: one in meadow_b2's thatch, drawn, singing at 22:00 once the spider kept still")
+		end)
+
+		add("ballooning's landings", function(r)
+			local ctx = r.ctx
+			local world, motor = ctx.world, ctx.motor
+			local stood: { string } = {}
+			for _, z in Ballooning.ZONES do
+				for _, id in z.landings do
+					local region = WorldMap.region(id) :: any
+					need(region ~= nil, `{id} is not a region`)
+					local at = region.spawn.pos + Vector3.new(0, HEIGHT, 0)
+					need(holdUntilReady(r, id, at, nil), `{id} is not whole`)
+					put(r, at, nil, region.spawn.heading)
+					pause(r, 0.4)
+					need(world.region.id == id and motor.mode == "attached" and (motor.pos - at).Magnitude < 0.5, `a spiderling landing in {id} does not stand there ({world.region.id}, {motor.mode}, {fmt(motor.pos)})`)
+					table.insert(stood, id)
+				end
+			end
+			for gen = 0, 3 do
+				local z, id = Ballooning.land(914, gen, ctx.life.clock.day)
+				need(Ballooning.valid(z) and Ballooning.landsIn(z, id), `the wind's draw for family {gen} landed in {z} / {id}`)
+			end
+			say(r, `INFO ballooning's landings: stood on {#stood} ({table.concat(stood, ", ")})`)
 		end)
 
 		add("the nursery: the window put back", function(r)

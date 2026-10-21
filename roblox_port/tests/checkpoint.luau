@@ -1332,6 +1332,34 @@ case("the meadow's edge and the bench patch (ROBLOX-119): a rest under the curle
 	if not ok then error(err) end
 end)
 
+-- ---------------------------------------------------------------------------------------------- ballooning (ROBLOX-120)
+case("ballooning (ROBLOX-120): a generation that landed in the meadow keeps its start zone and landing in a rest; a record without them is the hut's; a bad one is refused", function()
+	local Ballooning = require("../src/Shared/Life/Ballooning")
+	local w = newWorld()
+	for _ = 1, 60 do tick(w) end
+	local was = WorldMap.use("preserve")
+	local ok, err = pcall(function()
+		local plain = assert(Checkpoint.capture(w, 0))
+		check(plain.world ~= nil and #(Checkpoint.check(plain, w)) == 0, "a rest of a generation that stayed at the hut (no start zone) is a good record")
+		w.life.start_zone, w.life.start_region = "meadow", "meadow_c3"
+		local record = assert(Checkpoint.capture(w, 0))
+		check(#(Checkpoint.check(record, w)) == 0 and #(Checkpoint.check(Json.copy(record), w)) == 0 and #SaveRest.check("main", record) == 0, "a meadow generation's rest is good, stored and accepted")
+		w.life.start_zone, w.life.start_region = nil, nil
+		check(Checkpoint.restore(record, w) and w.life.start_zone == "meadow" and w.life.start_region == "meadow_c3", "and its start comes back with it")
+		for _, bad in { { "pond_edge", "garden_a2" }, { "hut", "garden_a2" }, { "meadow", "garden_a2" }, { "meadow", nil }, { nil, "meadow_c3" }, { 7, "meadow_c3" } } do
+			w.life.start_zone, w.life.start_region = bad[1], bad[2]
+			local r = Checkpoint.capture(w, 0)
+			local refused = r == nil or #(Checkpoint.check(r, w)) > 0
+			check(refused, `a start of {tostring(bad[1])} / {tostring(bad[2])} is refused`)
+		end
+		w.life.start_zone, w.life.start_region = nil, nil
+		check(Ballooning.valid("hut") and Ballooning.valid("hut_garden") and Ballooning.valid("meadow") and not Ballooning.valid("pond_edge"), "only the hut and the built zones are starts")
+	end)
+	w.life.start_zone, w.life.start_region = nil, nil
+	WorldMap.use(was)
+	if not ok then error(err) end
+end)
+
 case("a rest under the bed's stone (ROBLOX-95): it records the bed and its stone, is checked against the bed, and comes back there", function()
 	local w = newWorld()
 	for _ = 1, 60 do tick(w) end

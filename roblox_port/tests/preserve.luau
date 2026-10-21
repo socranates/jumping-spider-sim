@@ -616,8 +616,8 @@ case("the hut garden's life: its perches on its boxes' faces, its vents and hide
 			if #a.starts < 1 then fine = false; print("  ambient " .. a.kind .. " in " .. r.id) end
 		end
 	end
-	check(fine and counts.prey == 2 and counts.kinds == 25 and counts.bugs == 2 and counts.ambient == 4,
-		`gnats and aphids in 2 cells, the bestiary's kinds 10 times (ROBLOX-117: with the hoverflies on three cells' flowers, the fruit flies at the caddy, the moth at the lamp; ROBLOX-118: the caddy's flies in the back room, a moth at its window; ROBLOX-119: 25 with the meadow's leafhoppers, hoverflies, house flies and moths, the bin's flies and the lamp's moths), woodlice in 2, ambient bugs in 4 (ROBLOX-119: the ants) (found {counts.prey}, {counts.kinds}, {counts.bugs}, {counts.ambient}), every perch on a face`)
+	check(fine and counts.prey == 2 and counts.kinds == 29 and counts.bugs == 2 and counts.ambient == 4,
+		`gnats and aphids in 2 cells, the bestiary's kinds 10 times (ROBLOX-117: with the hoverflies on three cells' flowers, the fruit flies at the caddy, the moth at the lamp; ROBLOX-118: the caddy's flies in the back room, a moth at its window; ROBLOX-119: 25 with the meadow's leafhoppers, hoverflies, house flies and moths, the bin's flies and the lamp's moths; ROBLOX-120: 29 with the four crickets), woodlice in 2, ambient bugs in 4 (ROBLOX-119: the ants) (found {counts.prey}, {counts.kinds}, {counts.bugs}, {counts.ambient}), every perch on a face`)
 	-- the milkweed as a plant the aphids and the ladybird walk: its nodes are the aphids' leaf perches
 	local c3 = WorldMap.region("garden_c3") :: any
 	local plants = Garden.plants(c3) :: any
@@ -1167,7 +1167,7 @@ case("the meadow's life: leafhoppers on the culms, flies on the flowers and at t
 			end
 		end
 		built:Destroy()
-		check(n == 25 and #idle == 0, `each of the {n} kinds starts with a fly on a good perch (none: {table.concat(idle, ", ")})`)
+		check(n == 29 and #idle == 0, `each of the {n} kinds starts with a fly on a good perch (none: {table.concat(idle, ", ")})`)
 	end
 	-- the ants: their colony on the meadow's floor round the hill; out by day within their range, in the nest by night, never in a box; a strike refused
 	local b4 = WorldMap.region("meadow_b4") :: any
@@ -1245,6 +1245,283 @@ case("the crab spiders: on their flowers by a seeded day, still; what comes in r
 	end
 	check(lunges == 1, `one lunge, then it waits ({lunges} in five seconds)`)
 	check(CrabText.CAUSE == CrabSpider.CAUSE and string.find(CrabText.SUB, "careful look", 1, true) ~= nil and CrabText.NUDGED ~= "", "its death card says what would have saved the spider")
+end)
+
+-- ---------------------------------------------------------------- ROBLOX-120: the robin, the field cricket and ballooning
+case("the robin's day: seeded, the same for the same day, four to six visits by day to its sites on the ground of the hut garden, the bench patch and the meadow's edge", function()
+	local Bird = require("../src/Shared/Predator/Bird")
+	WorldMap.use("preserve")
+	local seed = WorldMap.seed(WorldMap.SEED, "bird")
+	check(Bird.LENGTH == 25 and Bird.HOUR_PER_S > 0, "a robin 25 cm from bill to tail, its visits at the outdoors' pace")
+	-- every site's line on the ground of a walkable region of the preserve, clear of its standing boxes
+	for _, site in Bird.SITES do
+		for i, pt in site.line do
+			local r = WorldMap.at(pt + Vector3.new(0, 0.5, 0))
+			check(r ~= nil and (r.kind == "garden_bed" or r.kind == "pad" or r.kind == "meadow"), `{site.id} point {i} lies in the hut garden, the bench patch or the meadow ({if r then r.id else "none"})`)
+			local inside = false
+			if r ~= nil then for _, b in Region.pieces(r) do if pt.X > b.lo.X and pt.X < b.hi.X and pt.Z > b.lo.Z and pt.Z < b.hi.Z and b.hi.Y > pt.Y + 1 then inside = true end end end
+			check(not inside, `{site.id} point {i} is not inside a box`)
+		end
+	end
+	local zones: { [string]: number } = {}
+	for day = 1, 12 do
+		local plan = Bird.plan(seed, day)
+		check(plan == Bird.plan(seed, day) and #plan >= 4 and #plan <= 6, `day {day}: four to six visits, the same each time ({#plan})`)
+		for i, visit in plan do
+			zones[visit.site.zone] = (zones[visit.site.zone] or 0) + 1
+			check(visit.h0 >= 6 and visit.h1 <= 19.5 + 1e-6 and (i == 1 or visit.h0 >= plan[i - 1].h1), `day {day} visit {i} by day, after the one before`)
+			local a = Bird.at(seed, day, visit.h0 + 1e-6) :: any
+			local mid = Bird.at(seed, day, Bird.hourOf(visit, Bird.APPROACH_S + visit.forage / 2)) :: any
+			local off = Bird.at(seed, day, visit.h1 - 1e-6) :: any
+			check(a ~= nil and a.pose == "fly" and a.shadow ~= nil and a.pos.Y > Bird.GROUND + 200 and a.calling, `day {day} visit {i}: it comes in high, calling, its shadow on the ground`)
+			check(mid ~= nil and (mid.pose == "stand" or mid.pose == "hop" or mid.pose == "peck") and mid.pos.Y < Bird.GROUND + 4 and mid.shadow == nil, `day {day} visit {i}: on the ground in the middle of it`)
+			check(off ~= nil and off.pose == "leave" and off.pos.Y > Bird.GROUND + 100, `day {day} visit {i}: off up and away at the end`)
+		end
+		check(Bird.at(seed, day, 5.5) == nil and Bird.at(seed, day, 21) == nil, `day {day}: not here at night`)
+	end
+	check((zones.hut_garden or 0) > 0 and (zones.meadow or 0) > 0 and (zones.bench or 0) > 0, `it visits the hut garden, the bench patch and the meadow's edge (in twelve days: {zones.hut_garden}, {zones.bench}, {zones.meadow})`)
+	-- restores never reroll: two robins of the seed are where the schedule says, the same
+	local a, b = Bird.new(seed), Bird.new(seed)
+	local visit = Bird.plan(seed, 2)[1]
+	local h = Bird.hourOf(visit, Bird.APPROACH_S + 20)
+	a:step(1 / 60, 2, h, nil); b:step(1 / 60, 2, h, nil)
+	check(a.here and b.here and a.pos == b.pos and a.pose == b.pose, "two robins of one seed at one hour are the same robin")
+end)
+
+case("the robin's reactions: a spider moving in the open near it is seen, hopped at, given the tell and struck in the standard rules (missed in the gentle ones); cover or stillness saves it", function()
+	local Bird = require("../src/Shared/Predator/Bird")
+	local BirdText = require("../src/Shared/UI/BirdText")
+	WorldMap.use("preserve")
+	local seed = WorldMap.seed(WorldMap.SEED, "bird")
+	local day, visit = 1, nil :: any
+	for d = 1, 20 do visit = Bird.visitTo(seed, d, "lawn_e"); if visit then day = d; break end end
+	check(visit ~= nil, "a visit to the lawn east of the path in the first twenty days")
+	local h0 = Bird.hourOf(visit, Bird.APPROACH_S + 5)
+	-- `run` steps a robin from that hour with a spider `at` (relative to where the robin stands) moving or still, open or covered, and says what came of it
+	local function run(gentle: boolean, moving: boolean, covered: boolean, hidden: boolean, dist: number, seconds: number?): ({ [string]: number }, any)
+		local bird = Bird.new(seed)
+		bird.gentle = gentle
+		bird:step(1 / 60, day, h0, nil)
+		local base = bird.pos
+		local away = Vector3.new(bird.heading.X, 0, bird.heading.Z).Unit
+		local pos = base + away * dist + Vector3.new(0, 0.31, 0)
+		local seen: { [string]: number } = {}
+		local hour = h0
+		for i = 1, math.floor((seconds or 6) * 60) do
+			hour += Bird.HOUR_PER_S / 60
+			local wiggle = if moving then Vector3.new(math.sin(i * 0.2) * 0.05, 0, math.cos(i * 0.2) * 0.05) else Vector3.zero
+			pos += wiggle
+			bird:step(1 / 60, day, hour, { pos = pos, speed = if moving then 3 else 0, hidden = hidden, covered = covered })
+			for _, sg in bird:drainSignals() do seen[sg.kind] = (seen[sg.kind] or 0) + 1 end
+			if (seen.struck or 0) + (seen.missed or 0) > 0 then break end
+		end
+		return seen, bird
+	end
+	local s1, b1 = run(false, true, false, false, 40)
+	check((s1.noticed or 0) == 1 and (s1.struck or 0) == 1 and (s1.missed or 0) == 0, `moving in the open 40 cm off: seen, hopped at and struck (noticed {s1.noticed}, struck {s1.struck}, lost {s1.lost})`)
+	check(b1.offset.Magnitude > 5, `it hopped toward the spider ({string.format("%.0f", b1.offset.Magnitude)} studs off its line)`)
+	local s2 = run(true, true, false, false, 40)
+	check((s2.missed or 0) == 1 and (s2.struck or 0) == 0, "in the gentle rules the bill misses")
+	local s3 = run(false, false, false, false, 20)
+	check((s3.noticed or 0) == 0 and (s3.struck or 0) == 0, "a spider keeping still is never seen")
+	local s4 = run(false, true, true, false, 20)
+	check((s4.noticed or 0) == 0 and (s4.struck or 0) == 0, "a spider under cover is never seen")
+	local s5 = run(false, true, false, true, 20)
+	check((s5.noticed or 0) == 0, "nor one in a home")
+	local s6 = run(false, true, false, false, 150)
+	check((s6.noticed or 0) == 0, "nor one far off")
+	-- seen, then still: the tell passes and it is lost
+	do
+		local bird = Bird.new(seed)
+		bird:step(1 / 60, day, h0, nil)
+		local away = Vector3.new(bird.heading.X, 0, bird.heading.Z).Unit
+		local pos = bird.pos + away * 14 + Vector3.new(0, 0.31, 0)
+		local hour = h0
+		local seen: { [string]: number } = {}
+		for i = 1, 60 * 4 do
+			hour += Bird.HOUR_PER_S / 60
+			local moving = i <= 6
+			bird:step(1 / 60, day, hour, { pos = pos, speed = if moving then 3 else 0, hidden = false, covered = false })
+			for _, sg in bird:drainSignals() do seen[sg.kind] = (seen[sg.kind] or 0) + 1 end
+		end
+		check((seen.noticed or 0) == 1 and (seen.struck or 0) == 0 and (seen.lost or 0) >= 1, `seen, then keeping still: lost, not struck (lost {seen.lost})`)
+	end
+	-- the approach: its shadow passes the spider, told once
+	do
+		local bird = Bird.new(seed)
+		local land = visit.site.line[1]
+		local hour = visit.h0
+		local shadows = 0
+		for _ = 1, 60 * 4 do
+			hour += Bird.HOUR_PER_S / 60
+			bird:step(1 / 60, day, hour, { pos = land + visit.site.from * 120 + Vector3.new(0, 0.31, 0), speed = 0, hidden = false, covered = false })
+			for _, sg in bird:drainSignals() do if sg.kind == "shadow" then shadows += 1 end end
+		end
+		check(shadows == 1, `its shadow sweeps over a spider on its way in, told once ({shadows})`)
+	end
+	-- cover, from the region's boxes: under the hut garden's flat stone; low in the meadow's grass
+	local a3 = WorldMap.region("garden_a3") :: any
+	check(Bird.covered(Region.pieces(a3), Vector3.new(65, Bird.GROUND + 0.5, -88)) and not Bird.covered(Region.pieces(a3), Vector3.new(30, Bird.GROUND + 0.5, -110)), "under the flat stone is cover, the open lawn is not")
+	check(Bird.inGrass("meadow", Vector3.new(0, Bird.GROUND + 3, -1300)) and not Bird.inGrass("meadow", Vector3.new(0, Bird.GROUND + 60, -1300)) and not Bird.inGrass("garden_bed", Vector3.new(0, Bird.GROUND + 3, -100)), "low in the meadow's grass is cover, up a stem or on the lawn it is not")
+	check(BirdText.CAUSE == "bird" and string.find(BirdText.SUB, "keeping still", 1, true) ~= nil and BirdText.MISSED ~= "" and BirdText.caption(0.5, "ahead", nil) ~= nil and BirdText.caption(0, "ahead", 1) ~= nil and BirdText.caption(0, "ahead", nil) == nil, "its card says what would have saved the spider; its call and its shadow are captioned")
+end)
+
+case("the robin drawn: an American robin at true size in every pose, the same parts standing and in the air, within its budget", function()
+	local BirdBody = require("../src/Client/BirdBody")
+	for _, pose in { "stand", "hop", "peck", "watch", "strike", "fly", "land", "leave" } do
+		local parts = BirdBody.parts(pose, 0.3, 1, 0.5)
+		local lo, hi = math.huge, -math.huge
+		local names: { [string]: boolean } = {}
+		for _, p in parts do
+			local c = p.frame.Position
+			lo = math.min(lo, c.Z - p.size.Z / 2); hi = math.max(hi, c.Z + p.size.Z / 2)
+			names[p.name] = true
+		end
+		check(#parts <= 30 and names.Head and names.Breast and names.Bill and names.Tail and names.WingL and names.WingR, `{pose}: {#parts} parts, its head, breast, bill, tail and wings`)
+		if pose == "stand" then check(hi - lo > 22 and hi - lo < 29, `standing it is {string.format("%.1f", hi - lo)} cm from bill to tail (a robin is 20 to 28)`) end
+	end
+end)
+
+case("the field crickets: in the hut garden's mulch and the meadow's thatch, three housefly meals, a hard struggle that kicks; it hears a spider move and hushes; it sings by night", function()
+	local Species = require("../src/Shared/Data/Species")
+	local Garden = require("../src/Shared/World/Garden")
+	local Feeding = require("../src/Shared/Prey/Feeding")
+	local PreyKinds = require("../src/Shared/Prey/PreyKinds")
+	local PreyRandom = require("../src/Shared/Prey/PreyRandom")
+	local Catch = require("../src/Shared/Data/Catch")
+	local Fly = require("../src/Shared/Prey/Fly")
+	local Graph = require("../src/Shared/Prey/PerchGraph")
+	WorldMap.use("preserve")
+	local c, n = Species.cricket_prototype, Species.cricket_night_prototype
+	check(c.body.nutrition == Species.fly_like_prototype.body.nutrition * 3 and c.body.prey_kind == "cricket" and c.body.flightless and c.body.freeze and n.body.chirp and not c.body.chirp
+		and c.body.dusk == "cricket_night_prototype" and n.body.day == "cricket_prototype", "three housefly meals, flightless, a jumper that freezes, singing by night")
+	check(Catch.factorFor(c) == 1.15 and c.body.kick ~= nil, "a harder catch than a house fly, and it kicks")
+	local cells: { string } = {}
+	for _, r in WorldMap.regions() do
+		for _, k in Garden.bestiary(r) or {} do
+			if k.kind == "cricket" then
+				table.insert(cells, r.id)
+				check(#k.perches >= 4 and k.dusk ~= nil and k.target == 1, `{r.id}: a cricket of the night with {#k.perches} spots on the ground`)
+				for _, pe in k.perches do
+					check(math.abs(pe.position.Y - (if r.id == "garden_d3" then -74.6 else -84.6)) < 1e-6 and pe.hop, `{pe.id} lies on the ground it walks`)
+				end
+			end
+		end
+	end
+	table.sort(cells)
+	check(table.concat(cells, ",") == "garden_d3,meadow_b2,meadow_c5,meadow_d3", "in the pollinator bed's mulch and three of the meadow's cells: " .. table.concat(cells, ","))
+	-- the struggle: 60 seeded crickets, a steady tapper at 4, 5 and 6 taps a second
+	local function trial(rate: number, seed: number): (boolean, number, number)
+		local fd = Feeding.new(); fd:useGameRules()
+		fd.rng = PreyRandom.new(seed)
+		local f: any = { profile = c, rng = PreyRandom.new(seed * 7919 + 104729), nutrition = c.body.nutrition }
+		fd:capture(f)
+		local escaped = false
+		local every, nextTap, t = 1 / rate, 1 / rate, 0
+		for _ = 1, 60 * 14 do
+			t += 1 / 60
+			if t >= nextTap then fd.tap = true; nextTap += every end
+			PreyKinds.grip(fd, function() escaped = true end)
+			fd:struggle(1 / 60, true, function() escaped = true end)
+			if escaped or not fd.struggling then break end
+		end
+		return not escaped, t, f.kicks or 0
+	end
+	local wins: { [number]: number } = {}
+	local kicks, time = 0, 0
+	for _, rate in { 4, 5, 6 } do
+		wins[rate] = 0
+		for seed = 1, 60 do
+			local won, t, k = trial(rate, seed)
+			if won then wins[rate] += 1 end
+			if rate == 5 then kicks += k; time += t end
+		end
+	end
+	print(`preserve: the cricket's struggle: wins at 4, 5 and 6 taps a second {wins[4]}, {wins[5]}, {wins[6]} of 60; at 5 a second {string.format("%.1f", time / 60)} s, {string.format("%.1f", kicks / 60)} kicks`)
+	check(wins[4] <= 10 and wins[5] >= 50 and wins[6] == 60 and kicks / 60 >= 3, "four taps a second mostly lose it, five mostly hold it, six always do, and it kicks all the while")
+	-- the ear: a fly of the profile on a flat box, a spider walking near hushes it, standing still does not; it sings only unhushed, by night, perched
+	local cast = function(a: Vector3, b: Vector3): any
+		if a.Y > 0 and b.Y <= 0 then return { Position = Vector3.new(a.X, 0, a.Z), Normal = Vector3.yAxis } end
+		return nil
+	end
+	local graph = Graph.new(cast, function() return false end, function() return false end, n)
+	local perch = graph:add("p1", Vector3.new(0, 0, 0), Vector3.yAxis, 0.6, 0.3, true)
+	local f = Fly.new("cricket_1", 1, 4242, perch, graph, n, 0)
+	check(PreyKinds.chirping(f), "a cricket of the night, calm and perched, sings")
+	local now, hushes = 0, 0
+	local spider = Vector3.new(20, 0.3, 0)
+	for i = 1, 60 do
+		now += 1 / 60
+		spider += Vector3.new(-0.05, 0, 0)
+		PreyKinds.hear(f, now, 1 / 60, spider)
+	end
+	check(f.hushed == true and not PreyKinds.chirping(f) and (f.hushes or 0) == 1, "a spider walking within 30 cm hushes it: silent and still")
+	for _ = 1, 60 * 7 do now += 1 / 60; PreyKinds.hear(f, now, 1 / 60, spider) end
+	check(f.hushed == false and PreyKinds.chirping(f), "a spider standing still lets it sing again after its hold")
+	local far = Fly.new("cricket_2", 1, 4243, graph:add("p2", Vector3.new(100, 0, 0), Vector3.yAxis, 0.6, 0.3, true), graph, n, 0)
+	local sp2 = Vector3.new(160, 0.3, 0)
+	for _ = 1, 60 do now += 1 / 60; sp2 += Vector3.new(-0.05, 0, 0); PreyKinds.hear(far, now, 1 / 60, sp2) end
+	check(far.hushed == false, "one walking farther off does not")
+	local day = Fly.new("cricket_3", 1, 4244, graph:add("p3", Vector3.new(-100, 0, 0), Vector3.yAxis, 0.6, 0.3, true), graph, c, 0)
+	PreyKinds.hear(day, 0, 1 / 60, Vector3.new(500, 0, 0))
+	check(not PreyKinds.chirping(day), "by day it does not sing")
+	local even = Fly.new("cricket_4", 2, 4245, graph:add("p4", Vector3.new(-200, 0, 0), Vector3.yAxis, 0.6, 0.3, true), graph, n, 0)
+	PreyKinds.hear(even, 0, 1 / 60, Vector3.new(500, 0, 0))
+	check(not PreyKinds.chirping(even), "a female (an even number) does not sing")
+end)
+
+case("ballooning: the wind's draw, seeded, mostly the hut garden, sometimes the meadow's edge, only built zones; the ride from the sac out of the sash and down onto the landing", function()
+	local Ballooning = require("../src/Shared/Life/Ballooning")
+	local MateText = require("../src/Shared/UI/MateText")
+	WorldMap.use("preserve")
+	local counts: { [string]: number } = {}
+	for gen = 0, 9 do
+		for day = 5, 24 do
+			local z, r = Ballooning.land(914, gen, day)
+			local z2, r2 = Ballooning.land(914, gen, day)
+			check(z == z2 and r == r2, "the same family and day, the same landing")
+			counts[z] = (counts[z] or 0) + 1
+			check(Ballooning.valid(z) and z ~= Ballooning.HUT and Ballooning.landsIn(z, r), `{z} is a built zone and {r} one of its landings`)
+		end
+	end
+	local garden, meadow = counts.hut_garden or 0, counts.meadow or 0
+	print(`preserve: ballooning: of 200 families the hut garden {garden}, the meadow's edge {meadow}`)
+	check(garden + meadow == 200 and garden > 120 and garden < 185 and meadow > 15, "mostly the hut garden, sometimes the meadow's edge, nowhere else")
+	for _, z in Ballooning.ZONES do
+		check(z.built == (#z.landings > 0) and (Ballooning.weight(z) > 0) == z.built, `{z.zone}: landed in only when built`)
+		for _, id in z.landings do
+			local r = WorldMap.region(id)
+			check(r ~= nil and Region.pieces(r :: any) ~= nil, `{id} is a region of the preserve`)
+			if r ~= nil then
+				local stands = false
+				for _, b in Region.pieces(r) do
+					local p = r.spawn.pos
+					if p.X >= b.lo.X and p.X <= b.hi.X and p.Z >= b.lo.Z and p.Z <= b.hi.Z and math.abs(b.hi.Y - p.Y) < 0.05 then stands = true end
+				end
+				check(stands, `{id}'s spawn stands on a box`)
+				local ride = Ballooning.ride(914, 1, 9, r.spawn.pos)
+				local a, _ = Ballooning.at(ride, 0)
+				local e, _ = Ballooning.at(ride, ride.seconds)
+				local _, top = Ballooning.at(ride, ride.seconds * 0.5)
+				local mid, _ = Ballooning.at(ride, ride.seconds * 0.5)
+				local high = -math.huge
+				local inside = true
+				for t = 0, ride.seconds, 0.25 do
+					local p = Ballooning.at(ride, t)
+					high = math.max(high, p.Y)
+					if math.abs(p.X) > Preserve.LIMIT or math.abs(p.Z) > Preserve.LIMIT then inside = false end
+				end
+				check((a - Ballooning.SAC).Magnitude < 1e-6 and (e - r.spawn.pos).Magnitude < 1e-3 and high > Preserve.GROUND_Y + 100 and inside and top.Y > mid.Y,
+					`{id}: from the sac, up over the garden ({string.format("%.0f", high - Preserve.GROUND_Y)} cm), down onto the landing, its thread above it`)
+			end
+		end
+	end
+	local _, _, body = MateText.card(9, 12, 0, true)
+	check(string.find(body, "Follow one of them on the wind", 1, true) ~= nil and MateText.FOLLOW == "Follow one" and MateText.STAY == "Stay at the hut"
+		and MateText.generationToast(1, 12, "the meadow's edge") == "Generation 2 — hatched on day 12, landed in the meadow's edge" and MateText.generationToast(1, 12) == "Generation 2 — hatched on day 12"
+		and string.find(MateText.landed("the hut garden"), "in the wild", 1, true) ~= nil, "the card, the choices, the toast and the landing say it")
+	local _, _, plain = MateText.card(9, 12, 0)
+	check(string.find(plain, "carry on as one of them", 1, true) ~= nil, "the test garden's card is as it was")
 end)
 
 print(`PRESERVE passed={passed} failed={failed}`)

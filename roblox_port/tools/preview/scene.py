@@ -57,6 +57,9 @@ ap.add_argument("--preserve", action="store_true", help="ROBLOX-115: the preserv
 ap.add_argument("--hut-open", action="store_true", help="ROBLOX-116: with --preserve, the hut's window propped open (the nursery over); shut otherwise")
 ap.add_argument("--preserve-all", action="store_true", help="ROBLOX-115: with --preserve, every zone of the backdrop at the --detail tier's whole detail, not the client's plan")
 ap.add_argument("--night-moths", action="store_true", help="ROBLOX-119: with --preserve, the lamppost's moths in flight round its lantern, as from dusk")
+ap.add_argument("--robins", default="", help="ROBLOX-120: comma list of the robin's presets to draw (ROBIN_PRESETS: lawn, watch, peck, fly, edge)")
+ap.add_argument("--ride", default="", help="ROBLOX-120: with --preserve, comma list of shares (0..1) of the ballooning ride to --ride-to's spawn: the rider drawn and a view ride_<percent> behind it")
+ap.add_argument("--ride-to", default="meadow_c3", help="ROBLOX-120: the landing region of the --ride frames")
 ap.add_argument("--cats", default="", help="ROBLOX-118: comma list of the cat's presets to draw (CAT_PRESETS: sofa, window, walk, watch, chair, swat)")
 ap.add_argument("--elevation", type=float, default=30.0, help="sun elevation, degrees")
 ap.add_argument("--set", action="append", default=[], help="lighting knob for scene.gd, key=value (energy, ambient, bias, nbias, blur)")
@@ -102,6 +105,16 @@ CAT_PRESETS = {
     "swat": {"id": "cat_swat", "x": 320.0, "y": -70.0, "z": 120.0, "hx": -1, "hz": 0, "pose": "swat", "t": 0.4, "paw": [296.0, -69.0, 116.0], "swat": 0.125},
 }
 CATS = [CAT_PRESETS[n] for n in args.cats.split(",") if n]
+# ROBLOX-120 (--robins): the robin (Client/BirdBody) on the hut garden's lawn east of the path (lawn: standing, its head cocked; watch: the tell; peck), in the air coming in over
+# the lawn with its shadow under it on the ground (fly), and on the meadow's mown edge (edge). The ground is y -84.6.
+ROBIN_PRESETS = {
+    "lawn": {"id": "robin_lawn", "x": 80.0, "y": -84.6, "z": -125.0, "hx": -1, "hz": -0.15, "pose": "stand", "cock": 1},
+    "watch": {"id": "robin_watch", "x": -60.0, "y": -84.6, "z": -95.0, "hx": 1, "hz": 0.1, "pose": "watch", "cock": -1},
+    "peck": {"id": "robin_peck", "x": 150.0, "y": -84.6, "z": -105.0, "hx": -1, "hz": 0.3, "pose": "peck", "cock": 1},
+    "fly": {"id": "robin_fly", "x": 30.0, "y": 25.0, "z": -105.0, "hx": -1, "hz": 0.35, "pose": "fly", "shadow": True},
+    "edge": {"id": "robin_edge", "x": -60.0, "y": -84.6, "z": -1124.0, "hx": 1, "hz": 0, "pose": "stand", "cock": 1},
+}
+ROBINS = [ROBIN_PRESETS[n] for n in args.robins.split(",") if n]
 
 FLIES = [
     {"id": "fly_a", "x": -16.0, "y": 0.16, "z": 4.0, "hx": 1, "hy": 0, "hz": -0.35, "flying": False},  # on the sill floor, hover 0.16
@@ -139,7 +152,7 @@ def dump_parts(path):
               f'SPIDERS = {lua(spiders)}\nFLIES = {lua(FLIES)}\nWASPS = {lua(WASPS)}\nWORLD = {lua(args.world)}\n'
               f'LOOKS_AT = {lua([float(c) for c in args.looks_at.split(",")] if args.looks_at else False)}\nLINEUP = {lua(args.lineup)}\n'
               f'PRESERVE = {lua(args.preserve)}\nPRESERVE_ALL = {lua(args.preserve_all)}\nHUT_OPEN = {lua(args.hut_open)}\nCATS = {lua(CATS)}\n'
-              f'NIGHT_MOTHS = {lua(args.night_moths)}\n')
+              f'NIGHT_MOTHS = {lua(args.night_moths)}\nROBINS = {lua(ROBINS)}\nRIDE = {lua([float(x) for x in args.ride.split(",") if x])}\nRIDE_TO = {lua(args.ride_to)}\n')
     with tempfile.NamedTemporaryFile("w", suffix=".luau", encoding="utf-8", delete=False, dir=out) as f:
         f.write(prefix + run.bundle(driver))
     try:
@@ -151,10 +164,18 @@ def dump_parts(path):
         pathlib.Path(f.name).unlink()
     first, _, rest = text.partition("\n")
     path.write_text(rest)
+    # (ROBLOX-120) views the driver computed (the ride's frames, the crickets' places): "VIEW name ex ey ez ax ay az fov"
+    bits = first.split(" VIEW ")
+    for b in bits[1:]:
+        name, *nums = b.split()
+        n = [float(x) for x in nums[:7]]
+        EXTRA[name] = {"fov": n[6], "eye": n[0:3], "at": n[3:6], "near": 0.02, "far": 14000, "groups": ["cats", "flies"], "shadow": 60}
+    first = bits[0]
     (out / f"{args.prefix}counts.txt").write_text(first + "\n")
     print(first)
 
 
+EXTRA = {}
 parts_path = pathlib.Path(args.parts).resolve() if args.parts else out / f"{args.prefix}parts.json"
 if not args.parts:
     dump_parts(parts_path)
@@ -514,6 +535,19 @@ def preserve_views():
 
 if args.preserve:
     VIEWS.update(preserve_views())
+VIEWS.update(EXTRA)
+# ROBLOX-120 (--robins): the robin on the lawn from a little way off (rb_lawn), its head close (rb_head), coming in over the lawn with its shadow on the ground (rb_shadow), the
+# same from a spider's eye on the lawn (rb_shadow_eye), the tell (rb_watch), a peck (rb_peck) and on the meadow's mown edge (rb_edge).
+VIEWS.update({
+    "rb_lawn": {"fov": 55, "eye": [10.0, -66.0, -175.0], "at": [78.0, -76.0, -125.0], "near": 0.05, "far": 14000, "groups": ["cats", "flies"], "shadow": 300},
+    "rb_head": {"fov": 40, "eye": [58.0, -70.0, -138.0], "at": [72.5, -72.0, -126.5], "near": 0.02, "far": 14000, "groups": ["cats"], "shadow": 80},
+    "rb_shadow": {"fov": 60, "eye": [150.0, -10.0, -330.0], "at": [30.0, -84.0, -105.0], "near": 0.1, "far": 14000, "groups": ["cats", "flies"], "shadow": 400},
+    "rb_shadow_top": {"fov": 50, "eye": [40.0, 10.0, -60.0], "at": [30.0, -84.0, -105.0], "near": 0.1, "far": 14000, "groups": ["cats", "flies"], "shadow": 300},
+    "rb_shadow_eye": {"fov": 75, "eye": [70.0, -84.0, -60.0], "at": [30.0, 10.0, -110.0], "near": 0.05, "far": 14000, "groups": ["cats", "flies"], "shadow": 400},
+    "rb_watch": {"fov": 45, "eye": [-35.0, -80.0, -92.0], "at": [-55.0, -74.0, -95.0], "near": 0.02, "far": 14000, "groups": ["cats"], "shadow": 80},
+    "rb_peck": {"fov": 45, "eye": [125.0, -72.0, -120.0], "at": [145.0, -80.0, -104.0], "near": 0.02, "far": 14000, "groups": ["cats"], "shadow": 80},
+    "rb_edge": {"fov": 55, "eye": [-10.0, -70.0, -1090.0], "at": [-58.0, -78.0, -1124.0], "near": 0.05, "far": 14000, "groups": ["cats", "flies"], "shadow": 300},
+})
 names = [n for n in args.views.split(",") if n]
 for n in names:
     if n not in VIEWS:

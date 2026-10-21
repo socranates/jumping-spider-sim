@@ -5,6 +5,8 @@ local Environment=require(Shared.World.Environment)
 local Sites=require(Shared.World.LivedInSites)
 local Shapes=require(Shared.Habitat.Shapes)
 local DayLight=require(Shared.Habitat.DayLight)
+local DogGait=require(Shared.Rig.DogGait)
+local DogGround=require(Shared.World.DogGround)
 local LivingWorld={}
 LivingWorld.__index=LivingWorld
 LivingWorld.BUDGET={full=420,low=150}
@@ -68,7 +70,7 @@ function LivingWorld.new(ws: any,root: Instance,tier: string,map: any): any
 end
 function LivingWorld.makeDog(self: any)
  local folder=Shapes.folder(self.folder,"ParkDog")
- local rig={folder=folder,parts={},shown=true,frames={},moved={}}
+ local rig={folder=folder,parts={},shown=true,frames={},moved={},gait=DogGait.new(),wander={},sniff=0}
  local function add(name: string,size: Vector3,at: Vector3,c: string,turn: Vector3?)
   local p=self:part(folder,name,size,c,"ellipsoid")
   p.CastShadow=not self.low and (name=="Ribcage" or name=="Chest" or name=="Head")
@@ -91,8 +93,8 @@ function LivingWorld.makeDog(self: any)
  add("Tail",Vector3.new(4,4,25),Vector3.new(0,40,38),"9b7a51",Vector3.new(-.35,0,0))
  rig.legStart=#rig.parts+1
  for _,z in {-20,19} do for _,x in {-8,8} do
-  add("UpperLeg",Vector3.new(6,20,7),Vector3.new(x,23,z),"a48660")
-  add("LowerLeg",Vector3.new(4.5,15,5),Vector3.new(x,8,z),"b79e7a")
+  add("UpperLeg",Vector3.new(6,DogGait.UPPER,7),Vector3.new(x,23,z),"a48660")
+  add("LowerLeg",Vector3.new(4.5,DogGait.LOWER,5),Vector3.new(x,8,z),"b79e7a")
   add("Paw",Vector3.new(7,3,10),Vector3.new(x,1.7,z-2),"c0aa87")
  end end
  self.dog=rig
@@ -249,20 +251,46 @@ function LivingWorld.small(self: any,pos: Vector3,region: any,state: any,reduced
   end
  end
 end
-function LivingWorld.drawDog(self: any,pos: Vector3,state: any,reduced: boolean)
- local pose=Environment.dog(state.totalHours*75,state.rain)
- local r=self.dog;local on=pose.visible and (pose.position-pos).Magnitude<520
- visible(r,on);if not on then return end
- local frame=CFrame.lookAt(pose.position,pose.position+pose.heading)
+function LivingWorld.drawDog(self: any,pos: Vector3,state: any,reduced: boolean,dt: number)
+ local r=self.dog
+ local pose=Environment.stepDog(r.wander,state.totalHours*75,state.rain)
+ local on=pose.visible and (pose.position-pos).Magnitude<520
+ if not on then visible(r,false);r.gait.previous=nil;return end
+ if r.terrain==nil then r.terrain=DogGround.new(self.map) end
+ local function terrain(at: Vector3,up: number,down: number): Vector3?
+  local hit=self:ground(at,up,down)
+  if hit and hit.Normal.Y>.5 then return hit.Position end
+  return DogGround.at(r.terrain,at,up,down)
+ end
+ local base=terrain(pose.position,6,18)
+ if base==nil then visible(r,false);r.gait.previous=nil;return end
+ local frame=CFrame.lookAt(base,base+pose.heading)
+ local gait=DogGait.step(r.gait,frame,dt,function(at: Vector3): Vector3?
+  local hit=terrain(at,10,30)
+  return if hit and math.abs(hit.Y-base.Y)<8 then hit else nil
+ end,reduced)
+ visible(r,gait.supported);if not gait.supported then return end
  local stride=if reduced or pose.sniff then 0 else pose.stride
+ r.sniff=if reduced then (if pose.sniff then 1 else 0) else math.clamp(r.sniff+(if pose.sniff then dt*3.5 else -dt*5),0,1)
+ local headTurn=CFrame.new(0,-36*r.sniff,-12*r.sniff)*CFrame.new(0,55,-31)*CFrame.Angles(-.55*r.sniff,0,0)*CFrame.new(0,-55,31)
  for i,p in r.parts do
   local f=r.frames[i]
   if p.Name=="Head" or p.Name=="Muzzle" or p.Name=="Nose" or p.Name=="Jaw" or string.find(p.Name,"Eye",1,true) or string.find(p.Name,"Ear",1,true) then
-   if pose.sniff then f=CFrame.new(0,20,-25)*CFrame.Angles(.65,0,0)*CFrame.new(0,-20,25)*f end
-  elseif p.Name=="Tail" then f*=CFrame.Angles(0,if reduced then 0 else pose.tail,0)
+   f=headTurn*f
+  elseif p.Name=="Neck" then f=CFrame.new(0,45-15*r.sniff,-24-6.5*r.sniff)*CFrame.Angles(.882*r.sniff,0,0)
+  elseif p.Name=="Tail" then f=CFrame.new(0,36,27)*CFrame.Angles(0,if reduced then 0 else pose.tail,0)*CFrame.new(0,-36,-27)*f
   elseif i>=r.legStart then
-   local leg=math.floor((i-r.legStart)/3);local step=stride*(if leg==0 or leg==3 then 1 else -1)
-   f=CFrame.new(0,math.max(0,step)*2.5,step*12)*f
+   local leg=math.floor((i-r.legStart)/3)+1
+   local bone=(i-r.legStart)%3
+   local foot=gait.feet[leg]
+   if bone<2 then
+    local a,b=if bone==0 then foot.hip else foot.knee,if bone==0 then foot.knee else foot.ankle
+    r.moved[i]=CFrame.lookAt((a+b)/2,b)*CFrame.Angles(math.pi/2,0,0)
+   else
+    local at=foot.anchor+Vector3.yAxis*1.5
+    r.moved[i]=CFrame.lookAt(at,at+foot.heading)
+   end
+   continue
   end
   r.moved[i]=frame*CFrame.new(0,math.abs(stride)*.6,0)*f
  end
@@ -309,12 +337,18 @@ end
 function LivingWorld.update(self: any,dt: number,pos: Vector3,clock: any,region: any,reduced: boolean,paused: boolean)
  if paused then return end
  self.elapsed+=math.clamp(dt,0,.15);self.acc+=dt
+ local first=self.state==nil
+ if not first then
+  -- Body and planted feet run every rendered frame. Weather/detail keep their
+  -- bounded 20 Hz update; cached rain does not quantise the animal's travel.
+  self:drawDog(pos,{totalHours=(clock.day-1)*24+clock.hour,rain=self.state.rain},reduced,dt)
+ end
  if self.acc<.05 then return end;self.acc=0
  local state=Environment.sample(clock.day,clock.hour,self.seed);self.state=state
  local key=region.id..":"..math.floor(pos.X/24)..":"..math.floor(pos.Z/24)..":"..math.floor(pos.Y/30)
  if key~=self.key then self.key=key;self:rebuild(pos,region) end
  if self.elapsed-self.lastLight>.5 then self:lighting(state,clock);self.lastLight=self.elapsed end
- self:small(pos,region,state,reduced);self:drawDog(pos,state,reduced)
+ self:small(pos,region,state,reduced);if first then self:drawDog(pos,state,reduced,dt) end
  self:rainfall(pos,region,state,reduced);self:sway(pos,state,reduced)
  self.folder:SetAttribute("Parts",self.count)
 end

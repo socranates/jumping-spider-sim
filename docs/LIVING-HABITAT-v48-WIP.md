@@ -57,6 +57,12 @@ Working branch: `codex/v48-living-habitat`, based on v47 receipt commit `9d442ff
 - Still required: finish current regression/compile checks, inspect native compact travel and ground coverage, inspect close detail/animal grounding, benchmark both detail tiers, then build/publish/synchronize a verified release. A refreshed strict analysis completed with no diagnostics after compaction.
 - Do not claim the habitat is rich or the falls fixed in the live game based on isolated fixtures or CLI checks. User report of no outdoor insects is a player-experience failure until normal travel visibly encounters them.
 
+### Dog motion and outdoor presence follow-up
+
+- The dog now uses planted paws and articulated legs, settles its feet on stops, turns during sniff pauses, lowers its nose toward the ground and wags from the tail base. Its body updates each rendered frame; other close detail retains the bounded 20 Hz update. No new dog parts or player colliders are added.
+- Rain brings it to a reached sniff stop near the hut along its existing circuit, then it resumes when rain eases. The former straight-line shortcut through scenery is gone. The compact northern-lawn route clears both actual raised beds and the far garden's decorative planters. Authored terrain supplies visual support when native ground is not streamed; unknown ground remains unsupported.
+- Dog gait 29,959/0; living world 3,438/0; clean strict analysis; 206/206 source compile. Final V4 native sample: 1,735 frames, mean 17.30 ms, worst 49.33 ms; dog rendered throughout, no measured stance-paw slide or foot gap. Normal spider view and diagnostic close-ups were inspected. See `docs/verification/v48/DOG-REVIEW.md`; this is not a published build or complete performance gate.
+
 ### Incremental station navigation follow-up
 
 - Surface route preparation now runs privately across frames, with atomic publication of completed graphs and explicit readiness for the rival's drive. The 51 station graph fingerprints match the archived pre-change baseline. Cold crossings retain their seeded patrol choice while waiting; station territory and movement rules remain intact.

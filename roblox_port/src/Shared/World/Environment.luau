@@ -87,8 +87,10 @@ function Environment.flea(seconds: number, index: number): (Vector3, boolean)
  return Vector3.new(math.cos(heading)*u*1.6,if phase<hop then 4*1.8*u*(1-u) else 0,math.sin(heading)*u*1.6),phase<hop
 end
 -- A leashed-sized park dog on a lawn circuit, with stops to sniff. No attack or save outcome is added.
-Environment.DOG_ROUTE=table.freeze({Vector3.new(-240,-84.6,-105),Vector3.new(-100,-84.6,-115),
- Vector3.new(-62,-84.6,-171),Vector3.new(-62,-84.6,-395),Vector3.new(-240,-84.6,-510),Vector3.new(-240,-84.6,-280)})
+-- The dog needs room for its whole body, not merely four supported paw points.
+-- This lawn loop stays west of the raised beds and inside the authored ground.
+Environment.DOG_ROUTE=table.freeze({Vector3.new(-340,-84.6,-100),Vector3.new(-235,-84.6,-100),
+ Vector3.new(-285,-84.6,-150)})
 function Environment.dog(seconds: number, rain: number): any
  local route=Environment.DOG_ROUTE;local durations={};local total=0
  for i,a in route do
@@ -101,11 +103,32 @@ function Environment.dog(seconds: number, rain: number): any
  local moving=durations[leg]-5.5;local sniff=cycle>=moving
  local u=math.clamp(cycle/moving,0,1)
  local position=a:Lerp(b,u)
- -- A rain front gradually brings the dog under the hut's north overhang; it never vanishes at a rain threshold.
- local shelter=smooth((rain-.4)/.5)
- position=position:Lerp(Vector3.new(-170,-84.6,-50),shelter)
- return {position=position,heading=(b-a).Unit,sniff=sniff or shelter>.7,visible=true,
-  stride=if sniff or shelter>.7 then 0 else math.sin(seconds*TAU*2.4),tail=math.sin(seconds*TAU*2.2)*.3}
+ local heading=(b-a).Unit
+ if sniff then
+  local nextHeading=(route[(leg+1)%#route+1]-b).Unit
+  local turn=smooth(math.clamp((cycle-moving-4)/1.5,0,1))
+  local yaw=math.atan2(heading.Z,heading.X)
+  local nextYaw=math.atan2(nextHeading.Z,nextHeading.X)
+  local delta=math.atan2(math.sin(nextYaw-yaw),math.cos(nextYaw-yaw))
+  yaw+=delta*turn;heading=Vector3.new(math.cos(yaw),0,math.sin(yaw))
+ end
+ return {position=position,heading=heading,sniff=sniff,visible=true,
+  stride=if sniff then 0 else math.sin(seconds*TAU*2.4),tail=math.sin(seconds*TAU*2.2)*(.3-.2*math.clamp(rain,0,1))}
+end
+
+-- Local presentation state, separate from the saved ecology. In rain, finish
+-- the supported circuit to a sniff stop near the hut; never cut across beds.
+-- Keep the route clock there until rain eases, then resume without a jump.
+function Environment.stepDog(wander: any,seconds: number,rain: number): any
+ local delta=if wander.raw then seconds-wander.raw else 0
+ if wander.time==nil or delta<0 or delta>2 then wander.time=seconds;wander.rest=false;delta=0 end
+ wander.raw=seconds
+ if wander.rest and rain<.45 then wander.rest=false end
+ if not wander.rest then wander.time+=delta end
+ local pose=Environment.dog(wander.time,rain)
+ if rain>.7 and pose.sniff and pose.position.Z>-130 then wander.rest=true end
+ pose.rainRest=wander.rest==true
+ return pose
 end
 
 return table.freeze(Environment)

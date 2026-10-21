@@ -192,5 +192,81 @@ case("real renderer remains bounded while moving and pauses cleanly",function()
  end
  root:Destroy();WorldMap.use("test_garden")
 end)
+case("dog feet have actual physical ground throughout the outdoor circuit",function()
+ WorldMap.use("preserve")
+ local root=WorldBuild.world(workspace)
+ local living=LivingWorld.new(workspace,root,"full",WorldMap)
+ local hidden=0;local first=nil;local gap=0;local blocked=0
+ local obstacles={}
+ for _,r in WorldMap.regions() do for _,p in Region.pieces(r) do
+  if p.hi.Y> -76.6 and p.lo.Y< -24.6 then table.insert(obstacles,p) end
+ end end
+ -- The far garden includes non-physical planters. They still occupy visual
+ -- space: a native close-up caught a route which passed the collider test but
+ -- sent the dog through these drawn beds.
+ local PreserveLook=require("../src/Shared/World/PreserveLook")
+ for _,p in PreserveLook.records("hut_garden",WorldMap.seed(914,"hut_garden")) do
+  if p.size.Y>8 then table.insert(obstacles,{lo=p.at-p.size/2,hi=p.at+p.size/2}) end
+ end
+ for _,rain in {0,.5,1} do for i=0,1200 do
+  local seconds=i/20;local pose=Environment.dog(seconds,rain)
+  living:drawDog(pose.position,{totalHours=seconds/75,rain=rain},false,.05)
+  if not living.dog.shown then hidden+=1;first=first or pose.position end
+  for _,f in living.dog.gait.feet do gap=math.max(gap,(f.ankle-f.anchor-Vector3.yAxis*3.5).Magnitude) end
+  if i%100==0 and living.dog.shown then
+   for leg,f in living.dog.gait.feet do
+    for bone=0,1 do
+     local p=living.dog.parts[living.dog.legStart+(leg-1)*3+bone]
+     local a,b=if bone==0 then f.hip else f.knee,if bone==0 then f.knee else f.ankle
+     local start=p.CFrame:PointToWorldSpace(Vector3.new(0,-p.Size.Y/2,0))
+     local finish=p.CFrame:PointToWorldSpace(Vector3.new(0,p.Size.Y/2,0))
+     check(math.min((start-a).Magnitude+(finish-b).Magnitude,(start-b).Magnitude+(finish-a).Magnitude)<.001,"drawn dog bones meet their world-space joints")
+    end
+   end
+  end
+  if rain==0 and i%5==0 then
+   local frame=CFrame.lookAt(pose.position,pose.position+pose.heading)
+   -- Sample the animal's length with ten-centimetre body clearance. Thin
+   -- leaves may brush it, but walls/raised beds cannot contain the body.
+   for _,y in {5,20,35,50} do for z=-50,45,5 do
+    local at=frame:PointToWorldSpace(Vector3.new(0,y,z))
+    for _,p in obstacles do
+     if at.X>p.lo.X-10 and at.X<p.hi.X+10 and at.Y>p.lo.Y and at.Y<p.hi.Y
+      and at.Z>p.lo.Z-10 and at.Z<p.hi.Z+10 then blocked+=1 end
+    end
+   end end
+  end
+ end end
+ check(hidden==0,`dog circuit has supported paws: {hidden} missing frames, first {first}`)
+ check(gap<.001,`dog paws remain joined to the legs through turns and stops: gap {gap}`)
+ check(blocked==0,`dog's body clears raised beds and walls: {blocked} intersecting samples`)
+ living:destroy();root:Destroy();WorldMap.use("test_garden")
+end)
+case("distant dog uses authored terrain when native ground is not streamed",function()
+ local Ground=require("../src/Shared/World/DogGround")
+ WorldMap.use("preserve")
+ local root=WorldBuild.world(workspace)
+ local living=LivingWorld.new(workspace,root,"full",WorldMap)
+ local terrain=Ground.new(WorldMap)
+ local rawGround=living.ground
+ for i=0,120 do
+  local pose=Environment.dog(i*.5,0)
+  local native=rawGround(living,pose.position,6,18)
+  local known=Ground.at(terrain,pose.position,6,18)
+  check(native~=nil and known~=nil and (native.Position-known).Magnitude<.001,"terrain proxy agrees with the server-built physical surface")
+ end
+ check(Ground.at(terrain,Vector3.new(10000,-84.6,10000),6,18)==nil,"terrain proxy never invents an out-of-map floor")
+ living.ground=function() return nil end
+ for i=0,1200 do
+  local seconds=i/20;local pose=Environment.dog(seconds,0)
+  living:drawDog(pose.position,{totalHours=seconds/75,rain=0},false,.05)
+  check(living.dog.shown,"distant dog remains visible over known unloaded ground")
+ end
+ living.dog.wander={}
+ for _=1,20 do living:drawDog(Vector3.new(-100,-84.6,-115),{totalHours=3/75,rain=0},false,.05) end
+ local nose=nil;for _,p in living.dog.parts do if p.Name=="Nose" then nose=p end end
+ check(nose~=nil and nose.Position.Y+84.6>2 and nose.Position.Y+84.6<8,"sniffing nose reaches near the ground")
+ living:destroy();root:Destroy();WorldMap.use("test_garden")
+end)
 print(`LIVING_WORLD passed={passed} failed={failed}`)
 if failed>0 then error("living habitat checks failed") end

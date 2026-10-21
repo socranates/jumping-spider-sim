@@ -150,7 +150,7 @@ for _, p in rig.parts do
 		check(p.Shape == Enum.PartType.Cylinder and p.Size.Y <= 0.01 and p.Size.X < 0.12 and brightness(p) < 0.2, p.Name .. " is a tiny dark bristle")
 	end
 end
-check(bristles >= 8 and bristles % 2 == 0, `{bristles} bristles, in mirrored pairs`)
+check(bristles == 2 and bristles % 2 == 0, `{bristles} bristles, in mirrored pairs (ROBLOX-128: the thorax's pair; the other six parts are the wings' veins)`)
 
 -- ---------------------------------------------------------------- the legs, standing
 local restFootOut: { [string]: number } = {}

@@ -25,6 +25,18 @@ if ANT_MODE ~= "" then
 		end
 	end
 end
+if CONTEST ~= "" then
+	-- The male rival's display (ROBLOX-127), played by Predator/RivalDisplay from the rival's state for CONTEST_SECONDS: faceoff (stalking 5 studs off), spread (the
+	-- windup), grapple (the lunge), retreat (backing off after it sprang clear, the smaller of the two).
+	local d = RIVALDISPLAY.new()
+	local input = { state = "stalk", distance = 5, event = "", smaller = true, seed = 914, day = 3, contests = 0, leg = 15, reduced = false }
+	if CONTEST == "spread" then input.state = "windup" elseif CONTEST == "grapple" then input.state = "lunge" elseif CONTEST == "retreat" then input.state, input.event = "recover", "sprang" end
+	for i = 1, math.floor(CONTEST_SECONDS * 60 + 0.5) do
+		rig.threat = RIVALDISPLAY.step(d, 1 / 60, input)
+		input.event = ""
+		rig:update(body, 1 / 60, true, false)
+	end
+end
 if CUE ~= "" then rig:cue(CUE) end
 if FOCUS ~= "" then
 	local x, y, z = string.match(FOCUS, "^(%-?[%d%.]+),(%-?[%d%.]+),(%-?[%d%.]+)$")

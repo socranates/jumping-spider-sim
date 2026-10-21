@@ -200,7 +200,8 @@ local appearance = SpiderChoice.start(player:GetAttribute("Appearance"), Workspa
 local rig = SpiderRig.new(Workspace, M.World.root, appearance, detail)
 -- The rival's legs (ROBLOX-69): its own SpiderMotor over the whole sill, made when it first arrives, and its drawn rig; its words (ROBLOX-73); its grip once
 -- caught (ROBLOX-77, `grip` made below with the reserves). One table: the client is at Luau's limit of 200 locals.
-local rivalLegs: any = { drive = nil, rig = nil, Drive = require(Shared.Predator.RivalDrive), Text = require(Shared.UI.RivalText), Grip = require(Shared.Predator.RivalGrip), grip = nil }
+local rivalLegs: any = { drive = nil, rig = nil, Drive = require(Shared.Predator.RivalDrive), Text = require(Shared.UI.RivalText), Grip = require(Shared.Predator.RivalGrip), grip = nil,
+	Display = require(Shared.Predator.RivalDisplay), display = nil, event = "", input = {} } -- (ROBLOX-127: the male's contest display, drawn on the rival's rig)
 -- The mating cycle (ROBLOX-80): its modules, the stage that draws it (the mate's rig, the egg sac, the hatching), the mate's legs, and where the ending is
 -- ("" while none, "scene" while the spiderlings play, "card" while the ending card is up). One table: the client is at Luau's limit of 200 locals.
 local mateLegs: any = { Mating = require(Shared.Life.Mating), Mate = require(Shared.Predator.Mate), Drive = require(Shared.Predator.MateDrive), Text = require(Shared.UI.MateText),
@@ -1978,6 +1979,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
              needs:grantEnergy(rivalFood,"rival_spider_meal")
              life.mealFood+=Growth.rivalCredit(rivalFood)
             end
+            if rivalLegs.Display.BACKS_OFF[rivalEvent] then rivalLegs.event=rivalEvent elseif gripEvent=="tore" then rivalLegs.event="tore" end -- (ROBLOX-127: the display backs off at the next drawing)
             if rivalEvent=="caught" then endLife("rival")
             elseif rivalEvent=="warning" then rig:cue("alarm");spiderPick.finish(spiderPick.Text.DANGER, true);life:showNotice("The other spider crouches to jump. Dodge, drop or jump away!")
             elseif rivalEvent=="captured" or rivalEvent=="sprang" then life:showNotice(rivalLegs.Text.strike(rivalEvent,needs.gentle) or "")
@@ -2143,8 +2145,14 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
  if not paused then watch:frame(simFrame,cam.eyeView,eyes.moversShown) end
     local rival=life.rival
     if rival and rival.state~="dormant" and rival.state~="consumed" then
-     if not rivalLegs.rig then rivalLegs.rig=SpiderRig.new(Workspace,M.World.root,"rival_spider","low");rivalLegs.rig.model.Name="RivalSpider" end
+     if not rivalLegs.rig then rivalLegs.rig=SpiderRig.new(Workspace,M.World.root,"rival_spider","low");rivalLegs.rig.model.Name="RivalSpider";rivalLegs.display=rivalLegs.Display.new() end
      rivalLegs.rig.reducedMotion=setting("ReducedMotion")==true
+     -- (ROBLOX-127) the contest display: face-off, spread, grapple or backing off, from the rival's state, how far it is from the spider and which is the bigger
+     local di=rivalLegs.input
+     di.state,di.distance,di.event,di.smaller=rival.state,(rival.position-motor.pos).Magnitude,rivalLegs.event,rivalLegs.rig:bodyLength()<rig:bodyLength()
+     di.seed,di.day,di.contests,di.leg,di.reduced=914,life.clock.day,rival.contests or 0,rival.leg or 0,setting("ReducedMotion")==true
+     rivalLegs.event=""
+     rivalLegs.rig.threat=rivalLegs.Display.step(rivalLegs.display,if paused then 0 else simFrame,di)
      rivalLegs.rig.jumpLoad=if rival.state=="windup" then math.clamp(rival.elapsed,0,1) else 0
      -- (ROBLOX-93: drawn ten times a second when it is more than SpiderRig's FAR_STUDS from the camera, except in a windup, a lunge or when carried; the sim steps it every tick)
      local hurried=rival.state=="windup" or rival.state=="lunge" or rival.state=="taken"

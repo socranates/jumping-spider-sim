@@ -165,6 +165,8 @@ exploration you gotta earn"; "you get time to enjoy the scenery because you are 
 - **Several rivals** (W3/W4). A rival male per two or three regions, each with its own route and its own days; two may meet the player in
   one afternoon and one may follow across a seam. A rival that finds a moulting spider is the moment Nathan named: the soft-skin window is
   when the rival notices most.
+  (ROBLOX-127: the rival is drawn as a male tan jumping spider and meets the spider with a male's contest display: face-off, legs I spread, chelicerae
+  open, skitters, a grapple pose in the lunge, backing off or holding by size. Still one rival at a time; several are to come.)
 - **The look: beautiful rich detail.** The scenes are composed right (hiding under a leaf, the wasp on the planter, the rival on the wall);
   what they lack is richness. The garden's generators are built for it from the start, within the part budgets: Roblox's own PBR
   materials for soil, bark, stone and terracotta instead of flat colour; real leaf shape (a drawn rim, veins, a curl, a lighter underside,

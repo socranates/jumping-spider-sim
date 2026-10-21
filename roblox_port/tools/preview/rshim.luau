@@ -27,6 +27,9 @@ C.__mul = function(a, b)
 	if getmetatable(b) == C then return cnew(rot(a, b.p) + a.p, rot(a, b.x), rot(a, b.y), rot(a, b.z)) end
 	return rot(a, b) + a.p
 end
+-- CFrame + Vector3 and CFrame - Vector3 move the frame (the rig places the palps' pivots this way since ROBLOX-87).
+C.__add = function(a, b) return cnew(a.p + b, a.x, a.y, a.z) end
+C.__sub = function(a, b) return cnew(a.p - b, a.x, a.y, a.z) end
 local cm = {}
 function cm.PointToWorldSpace(c, v) return rot(c, v) + c.p end
 function cm.VectorToWorldSpace(c, v) return rot(c, v) end

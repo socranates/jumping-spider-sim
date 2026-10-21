@@ -10,12 +10,14 @@ local SupportMath = require("../src/Shared/Movement/SupportMath")
 local SpiderRig = require("../src/Shared/Rig/SpiderRig")
 local PeacockDance = require("../src/Shared/Rig/PeacockDance")
 local AntMimicPose = require("../src/Shared/Rig/AntMimicPose")
+local SpiderChoice = require("../src/Shared/Rig/SpiderChoice")
 
 local passed, failed = 0, 0
 local function check(ok: boolean, what: string)
 	if ok then passed += 1 else failed += 1; print("FAIL look: " .. what) end
 end
 local function near(a: number, b: number, eps: number): boolean return math.abs(a - b) <= eps end
+local function f3(x: number): string return string.format("%.3f", x) end
 local function same(a, b): boolean
 	if #a ~= #b then return false end
 	for i = 1, #a do if a[i] ~= b[i] then return false end end
@@ -372,7 +374,8 @@ local full, low = census(fullParts), census(lowParts)
 print(`look: full {full.total} parts ({full.hair} hairs, {full.shell} shells, {full.other} other), low {low.total} ({low.hair} hairs, {low.shell} shells, {low.other} other)`)
 -- Budgets: the first coat had 705 parts at full detail and 272 at low. ROBLOX-84 gives the legs, feet and fangs their segments (53 parts more at full
 -- detail, 10 at low) and sets the ceiling at 700 and 290; `other` (everything that is not a hair or a shell) was 141 and is 193.
-check(full.total <= 700 and full.other <= 200 and full.hair + full.shell >= 300 and full.hair + full.shell <= 720, `full detail part budget ({full.total})`)
+-- ROBLOX-127: the fringe on legs I (12 hairs) and a retina behind each front eye (2) at full detail: the ceiling 700 to 710 (707; `other` 195); the low tier is as it was.
+check(full.total <= 710 and full.other <= 200 and full.hair + full.shell >= 300 and full.hair + full.shell <= 720, `full detail part budget ({full.total})`)
 check(low.total <= 290 and low.hair >= 100 and low.hair <= 260 and low.shell <= 2, `low detail part budget ({low.total})`)
 -- Each tier keeps exactly the hairs its table says: one in `every` of each class, none of a class whose `every` is 0.
 local function kept(count: number, every: number): number return if every <= 0 then 0 else math.floor(count / every) end
@@ -388,7 +391,7 @@ local function expectedHairs(every: { [string]: number }): number
 		end
 	end
 	for _, entry in per do n += kept(entry.count, every[entry.kind] or 1) end
-	for i = 1, 8 do n += kept(#Setae.leg(look, i), every.leg) end
+	for i = 1, 8 do n += kept(#Setae.leg(look, i), every.leg) + kept(#Setae.legFringe(look, i), every.legFringe or 1) end
 	return n
 end
 check(full.hair == expectedHairs(look.detail.full.every), `full detail keeps the hairs its table says ({full.hair} of {expectedHairs(look.detail.full.every)})`)
@@ -969,8 +972,9 @@ tarantulaChecks()
 -- ---------------------------------------------------------------- the segments of a leg, the feet and the fangs (ROBLOX-84)
 -- The first spider and the two tarantulas draw each leg link as the segments a spider has: a tapered femur (two rods), a patella for a knee, a
 -- tapered tibia (the first spider), a break in the tarsus, a flattened pad and its claws (the first spider), and fangs under the
--- chelicerae. The solver, the targets and the gait are untouched: the joints are where they were. The rival (a clone of the first spider's
--- look, ROBLOX-72) and the peacock and ant spiders are drawn as before.
+-- chelicerae. The solver, the targets and the gait are untouched: the joints are where they were. The peacock and ant spiders are drawn as before. (ROBLOX-127: the rival,
+-- a clone of the first spider's look with the plain legs until now, is a male tan jumping spider with the shaped legs; the plain-legged reference is a test-only copy of
+-- the first spider without its legForm and fang.)
 local function shapeChecks()
 local RED, BLUE = "brachypelma_hamorii", "chromatopelma_cyaneopubescens"
 local function build(id: string?, detail: string, parent: Instance?): any
@@ -980,14 +984,19 @@ end
 local function endOf(p: BasePart, sign: number): Vector3 return p.CFrame * Vector3.new(sign * p.Size.X / 2, 0, 0) end -- a rod's end (-1 start, 1 end)
 local function pick(rig: any, name: string): BasePart return rig.model:FindFirstChild(name) :: BasePart end
 local first, firstLow = build(nil, "full", floor), build(nil, "low", floor)
-local rival = build("rival_spider", "full", floor)
+local PLAIN = "plain_legs_test_spider"
+local plainLook = deepcopy(look)
+plainLook.id, plainLook.legForm, plainLook.fang = PLAIN, nil, nil
+Appearances.profiles[PLAIN] = plainLook
+local rival = build(PLAIN, "full", floor)
+Appearances.profiles[PLAIN] = nil
 for _, r in { first, firstLow, rival } do settle(r, 1) end
 local nf, nl, nr = names(first), names(firstLow), names(rival)
 check((nf.FemurTip1 or 0) == 1 and (nf.FemurTip8 or 0) == 1 and (nf.TibiaTip1 or 0) == 1 and (nf.TarsusTip8 or 0) == 1 and (nf.TarsalJoint1 or 0) == 1 and (nf.TarsalJoint8 or 0) == 1, "the first spider's legs: a tapered femur and tibia and a break in the tarsus, on all eight")
 check((nf.Claw or 0) == 16 and (nf.Fang or 0) == 4 and (nf.Foot1 or 0) == 1 and (nf.Foot8 or 0) == 1, "two claws on every foot (16), and two fangs of two segments (4)")
 check((nl.FemurTip1 or 0) == 1 and (nl.TibiaTip1 or 0) == 0 and (nl.TarsalJoint1 or 0) == 0 and (nl.TarsusTip1 or 0) == 0 and (nl.Claw or 0) == 0 and (nl.Foot1 or 0) == 0 and (nl.Fang or 0) == 2, "at low detail: the femur still tapers and the fangs are one segment; no tibia taper, tarsus break, pad or claws")
-check(next(nr) ~= nil and (nr.FemurTip1 or 0) == 0 and (nr.TarsalJoint1 or 0) == 0 and (nr.Claw or 0) == 0 and (nr.Fang or 0) == 0, "the rival, a clone of the first spider's look, keeps the plain legs and no fangs")
-check(Appearances.profiles.rival_spider.legForm == nil and Appearances.profiles.rival_spider.fang == nil and Appearances.profiles.maratus_volans_male.legForm == nil and Appearances.profiles.myrmarachne_formicaria_female.legForm == nil, "the rival, the peacock spider and the ant mimic have no legForm and no fang")
+check(next(nr) ~= nil and (nr.FemurTip1 or 0) == 0 and (nr.TarsalJoint1 or 0) == 0 and (nr.Claw or 0) == 0 and (nr.Fang or 0) == 0, "a look without legForm and fang draws the plain legs and no fangs")
+check(Appearances.profiles.maratus_volans_male.legForm == nil and Appearances.profiles.myrmarachne_formicaria_female.legForm == nil and Appearances.profiles.rival_spider.legForm ~= nil and Appearances.profiles.rival_spider.fang ~= nil, "the peacock spider and the ant mimic have no legForm; the rival (ROBLOX-127) has the shaped legs and fangs")
 -- The shaped legs share the plain legs' joints exactly: the same feet, the same knees and ankles (the solver was not touched).
 local same3 = true
 for i, leg in first._legs do
@@ -1764,6 +1773,93 @@ local function auditThreeChecks()
 	frontLegChecks()
 end
 auditThreeChecks()
+
+-- ---------------------------------------------------------------- the spiders' look pass (ROBLOX-127)
+-- The first spider gains green chelicerae, a retina behind each front lens and a pale fringe on legs I (the daughter's pins above are unchanged); the rival is a male tan
+-- jumping spider with a male's build and its contest display; the first spider's mate is a male with a male's build. Judged by eye in tools/preview; not in Studio.
+local function spiderLookChecks()
+	local RivalDisplay = require("../src/Shared/Predator/RivalDisplay")
+	local ground = BoxWorld.folder("SpiderLookFloor", { { name = "floor", lo = Vector3.new(-5, -1, -5), hi = Vector3.new(5, 0, 5), profile = "painted_wood_dry" } })
+	local function build(id: string?, detail: string, living: boolean?): any return SpiderRig.new(ground, ground, id, detail, living) end
+	local function count(rig: any, name: string): number
+		local n = 0
+		for _, p in rig.model:GetChildren() do if p:IsA("BasePart") and p.Name == name then n += 1 end end
+		return n
+	end
+	local function part(rig: any, name: string): BasePart return rig.model:FindFirstChild(name) :: BasePart end
+	-- the first spider
+	local first, firstLow = build(nil, "full"), build(nil, "low")
+	settle(first, 0.5); settle(firstLow, 0.5)
+	local jaw = part(first, "Chelicera")
+	check(jaw.Color.G > jaw.Color.R * 3 and jaw.Color.G > jaw.Color.B and jaw.Reflectance == look.chelicerae.reflectance and same(look.fangs, { 0.025, 0.025, 0.025 }), "the first spider's chelicerae are a black-green with a sheen (her fang colour pin is unchanged)")
+	check(count(first, "Retina") == 2 and count(firstLow, "Retina") == 0 and part(first, "PrincipalEye").Transparency == look.eye.ame.lens.transparency and part(firstLow, "PrincipalEye").Transparency == 0, "a retina behind each front lens, at full detail only; the low tier's eyes are as they were")
+	local retina, lens = part(first, "Retina"), part(first, "PrincipalEye")
+	check(retina.Size.X < lens.Size.X, "the retina is smaller than the lens it sits behind")
+	check(#Setae.legFringe(look, 1) == 6 and #Setae.legFringe(look, 5) == 6 and #Setae.legFringe(look, 2) == 0, "a fringe of six on each leg I's tibia, none on the other legs")
+	local fringeOk = true
+	for _, h in Setae.legFringe(look, 1) do fringeOk = fringeOk and h.segment == 2 and h.frost and h.lift ~= nil and h.lift > math.rad(50) end
+	check(fringeOk, "the fringe stands out from the tibia, pale")
+	check(firstLow:count().total == 265, `the low tier is the 265 parts it was ({firstLow:count().total})`)
+	first:destroy(); firstLow:destroy()
+	-- the rival: a male
+	local R = Appearances.profiles.rival_spider
+	check(R.name == "Tan jumping spider (male)" and R.growth[1] == 0.9 and R.growth[4] == 0.9, "the rival is a male tan jumping spider, drawn at 0.9 (9.1 mm) and not growing")
+	check(R.abdomenRadii[1] < look.abdomenRadii[1] * 0.8 and R.abdomenRadii[3] >= look.abdomenRadii[3], "a slim male abdomen: narrower than the first spider's, as long")
+	check(R.headRadii[2] / R.headRadii[1] < 0.75, "a flat carapace")
+	check(R.limbs.pairReach[1] > 1.1 and R.pairs[1] ~= nil and R.pairs[1].bands == false, "legs I reach farther, unbanded")
+	check(R.chelicerae.radii[2] > look.chelicerae.radii[2] * 1.25 and R.chelicerae.pitch < look.chelicerae.pitch and R.fang ~= nil, "bigger chelicerae set more forward, with fangs")
+	local rival, rivalLow = build("rival_spider", "full"), build("rival_spider", "low")
+	settle(rival, 0.5); settle(rivalLow, 0.5)
+	print(`look: rival full {rival:count().total} parts, low {rivalLow:count().total}`)
+	check(rivalLow:count().total <= 262, `the rival at the low tier (how the game draws it) is no more parts than before: {rivalLow:count().total} (262 before)`)
+	check(count(rivalLow, "FaceBand") == 1 and count(rivalLow, "CarapaceSide") == 1 and count(rivalLow, "AbdomenChevron") == 4 and count(rival, "AbdomenChevron") == 6 and count(rivalLow, "AbdomenSpot") == 0 and count(rivalLow, "FrontBand") == 0, "the male's orange face band, the dark carapace sides, grey chevrons and none of the first spider's white pattern")
+	local band = part(rivalLow, "FaceBand")
+	check(band.Color.R > 0.7 and band.Color.R > band.Color.B * 4, "the face band is orange")
+	local legI, legII = part(rivalLow, "Femur1"), part(rivalLow, "Femur2")
+	check(legI.Size.Y > legII.Size.Y * 1.1 and legI.Color.R < legII.Color.R * 0.6, "legs I are heavier and darker than legs II")
+	local keptFringe = 0
+	for i = 1, 8 do keptFringe += #Setae.legFringe(R, i) end
+	check(keptFringe == 24, `a dark fringe on legs I, kept at the low tier: {keptFringe} hairs`)
+	local reach1 = (rivalLow._legs[1].rest - rivalLow._legs[1].hip).Magnitude
+	local reach2 = (rivalLow._legs[2].rest - rivalLow._legs[2].hip).Magnitude
+	check(reach1 > reach2, "legs I are the longest")
+	-- the display on the drawn rig
+	local function feetAndJaws(rig: any): (number, number, Vector3)
+		local jaws = {}
+		for _, p in rig.model:GetChildren() do if p:IsA("BasePart") and p.Name == "Chelicera" then table.insert(jaws, p.CFrame.Position) end end
+		return (rig.model:FindFirstChild("Ankle1") :: BasePart).CFrame.Position.Y, (jaws[1] - jaws[2]).Magnitude, rig.root.CFrame.Position -- (the ankle of leg I: a pose does not move the planted foot)
+	end
+	local footRest, jawsRest, rootRest = feetAndJaws(rivalLow)
+	local d = RivalDisplay.new()
+	for _ = 1, 60 do
+		rivalLow.threat = RivalDisplay.step(d, 1 / 60, { state = "windup", distance = 2, event = "", smaller = true, seed = 914, day = 3, contests = 0, leg = 15 })
+		rivalLow:update(body, 1 / 60, true, false)
+	end
+	local footUp, jawsOpen, rootNow = feetAndJaws(rivalLow)
+	check(footUp > footRest + 0.25 and jawsOpen > jawsRest * 1.05 and (rootNow - rootRest).Magnitude < 1e-9, `the display raises legs I ({f3(footRest)} to {f3(footUp)}) and opens the chelicerae ({f3(jawsRest)} to {f3(jawsOpen)} apart); the root stays at the collider`)
+	rivalLow.threat = nil
+	for _ = 1, 30 do rivalLow:update(body, 1 / 60, true, false) end
+	local footBack = feetAndJaws(rivalLow)
+	check(footBack < footRest + 0.02, "without the pose legs I are the motor's again")
+	local first2 = build(nil, "low")
+	settle(first2, 0.3)
+	local before = part(first2, "Ankle1").CFrame.Position
+	first2.threat = RivalDisplay.step(RivalDisplay.new(), 1, { state = "windup", distance = 2, event = "" })
+	settle(first2, 0.3)
+	check((part(first2, "Ankle1").CFrame.Position - before).Magnitude < 1e-6, "a look without `contest` ignores the pose")
+	rival:destroy(); rivalLow:destroy(); first2:destroy()
+	-- the first spider's mate, a male
+	local M = Appearances.profiles.first_spider_male
+	check(Appearances.mateLook("first_spider", "male") == "first_spider_male" and Appearances.mateLook("maratus_volans_male", "female") == "maratus_volans_male" and Appearances.mateLook("first_spider", "female") == "first_spider", "the first spider's male mate is drawn with his own build; every other mate as before")
+	check(same(M.spots[1] and { M.spots[1].x, M.spots[1].rx } or {}, { look.spots[1].x, look.spots[1].rx }) and same(M.white, look.white) and same(M.body, look.body), "he keeps her pattern and colours")
+	check(M.abdomenRadii[1] < look.abdomenRadii[1] and M.limbs.pairReach[1] > 1 and M.frontLegScale > look.frontLegScale and M.chelicerae.radii[2] > look.chelicerae.radii[2] and M.fuzz.tuftLength > look.fuzz.tuftLength, "a male's build: a slimmer abdomen, longer heavier legs I, bigger chelicerae, longer tufts")
+	local mate = build("first_spider_male", "low", true)
+	print(`look: the male mate, low (living) {mate:count().total} parts`)
+	check(mate:count().total <= 280, `the male mate at the low tier: {mate:count().total} parts`)
+	mate:destroy()
+	check(table.find(SpiderChoice.ORDER, "first_spider_male") == nil and table.find(SpiderChoice.ORDER, "rival_spider") == nil, "neither is a spider the player puts on")
+end
+spiderLookChecks()
 
 print(`LOOK passed={passed} failed={failed}`)
 if failed > 0 then error("look checks failed") end

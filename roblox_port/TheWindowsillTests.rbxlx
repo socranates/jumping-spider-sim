@@ -143,7 +143,9 @@ local first = {
 	neck = { 0, 0.0, -0.06 }, -- the head tilts about this point
 	-- Pale side patches (the daughter's "cheeks"): placed on the head's side at height y, depth z (body frame).
 	cheek = { y = 0.055, z = -0.235, radii = { 0.02, 0.07, 0.115 }, inset = 0.006 },
-	chelicerae = { x = 0.055, y = -0.085, z = -0.447, radii = { 0.05, 0.072, 0.045 }, pitch = -0.35, splay = 0.12, reflectance = 0.1 },
+	-- ROBLOX-127: the chelicerae of the bold jumping spider are iridescent green (DOC: Wikipedia, Phidippus audax). `color` (new) is a black-green, a shade off the
+	-- daughter's black (her `fangs` colour below is unchanged and still colours the claws), Foil at a stronger sheen (0.1 to 0.28), so a highlight finds the green.
+	chelicerae = { x = 0.055, y = -0.085, z = -0.447, radii = { 0.05, 0.072, 0.045 }, pitch = -0.35, splay = 0.12, reflectance = 0.28, color = { 0.03, 0.14, 0.105 } },
 	-- Eyes. Never a human face: no brows, no mouth. Big glossy front eyes read as an animal's.
 	eye = {
 		-- Principal (front) eyes: large, glossy, set low in a big forehead. x, y: where on the head they sit; `out`: how far
@@ -153,6 +155,10 @@ local first = {
 			x = 0.115, y = 0.095, radii = { 0.100, 0.100, 0.082 }, out = 0.30, reflectance = 0.5,
 			socket = { scale = 1.13, color = { 0.11, 0.11, 0.11 } }, -- a dark-grey rim so the black eye reads against the black head
 			glints = { { dx = 0.030, dy = 0.036, r = 0.022 }, { dx = -0.028, dy = -0.034, r = 0.010 } },
+			-- ROBLOX-127: depth. The principal eye is a lens at the front of a long eye tube, the retina deep behind it; the drawn lens lets a little light through
+			-- (`transparency`, Glass) onto a dark amber-brown retina (`retina`: radii as a share of the lens's, pushed `depth` of the lens's depth back toward the head).
+			-- Full tier only (detail `retina`). ART.
+			lens = { transparency = 0.32, retina = { scale = 0.62, depth = 0.42, color = { 0.10, 0.055, 0.025 } } },
 		},
 		ale = { x = 0.235, y = 0.085, r = 0.050, out = 0.15, reflectance = 0.3 }, -- anterior lateral, at the sides of the face
 		ple = { x = 0.150, z = -0.150, r = 0.052, out = 0.10, reflectance = 0.3 }, -- posterior lateral, on the dome
@@ -254,6 +260,11 @@ local first = {
 		legLift = { 15, 26 }, -- a leg's hairs lie at this angle off the leg, pointing down it toward the foot
 		legTip = 0.08, -- the share of the legs' hairs with the greyer cast
 		hipBare = { 0.6, 0.6, 0, 0 }, -- ROBLOX-93: the share of each pair's femur, from the hip, that has no hair (the hairs are spread over the rest): legs I and II start at the face, where the anterior lateral eyes are, and a walking leg I swings past them
+		-- ROBLOX-127: the fringe. A bold jumping spider's legs and palps have "white banding with fringes" (DOC: Wikipedia, Phidippus audax): longer pale hairs standing out
+		-- from the sides and underside of the tibia of legs I (Setae.legFringe). `pairs` gives, for a pair of legs, the count on the femur, tibia and tarsus; `edge` is where round
+		-- the leg (degrees from its top, one side then the other), `lift` how far off the leg they stand (leaning toward the foot), `tone` their colour. Full tier only for her
+		-- (detail every.legFringe 0 at low); the male mate's and the rival's are heavier (below). ART.
+		legFringe = { pairs = { [1] = { 0, 6, 0 } }, length = { 0.050, 0.064 }, width = 0.006, lift = { 56, 70 }, edge = { 80, 130 }, tone = "frost", transparency = 0.15 },
 	},
 
 	-- ---------------------------------------------------------------- idle motion (drawn rig only, ROBLOX-13)
@@ -326,14 +337,14 @@ local first = {
 	-- The pattern, eyes, catchlights and tufts stay.
 	detail = {
 		full = {
-			every = { lock = 1, guard = 1, fringe = 1, pale = 1, tuft = 1, ruff = 1, palp = 1, leg = 1 },
+			every = { lock = 1, guard = 1, fringe = 1, pale = 1, tuft = 1, ruff = 1, palp = 1, leg = 1, legFringe = 1 },
 			shells = 4, speckleEvery = 1, pads = true, sockets = true, idle = true, highlight = true,
-			taper = true, tibiaTaper = true, jointBreak = true, claws = 2, fangSegments = 2,
+			taper = true, tibiaTaper = true, jointBreak = true, claws = 2, fangSegments = 2, retina = true,
 		},
 		low = {
-			every = { lock = 4, guard = 0, fringe = 3, pale = 2, tuft = 2, ruff = 2, palp = 2, leg = 4 },
+			every = { lock = 4, guard = 0, fringe = 3, pale = 2, tuft = 2, ruff = 2, palp = 2, leg = 4, legFringe = 0 },
 			shells = 1, speckleEvery = 2, pads = false, sockets = false, idle = false, highlight = false,
-			taper = true, tibiaTaper = false, jointBreak = false, claws = 0, fangSegments = 1,
+			taper = true, tibiaTaper = false, jointBreak = false, claws = 0, fangSegments = 1, retina = false,
 		},
 	},
 }
@@ -368,6 +379,7 @@ limbs.stance = { x = limbs.stance.x, y = -0.10, reach = 0.62 } -- ART: low and c
 limbs.pairReach = { 1.0, 1.0, 1.2, 1.0 } -- legs III are the longest (DOC)
 local eye = scaled(first.eye, SCALE, FACE_SKIP)
 eye.ame.socket = { scale = 1.12, color = { 0.50, 0.31, 0.14 } } -- tan and orange ocular setae frame the big eyes (DOC)
+eye.ame.lens = nil -- (ROBLOX-127: the lens and retina are the first spider's; at this size they would be a pixel)
 local palp = scaled(first.palp, SCALE, PALP_SKIP)
 palp.club = { 0.021, 0.019, 0.026 } -- the white brushes clothe the palps (DOC; sizes ART)
 palp.tipRadii = { 0.014, 0.012, 0.014 }
@@ -485,6 +497,10 @@ local volans = {
 	},
 }
 
+-- (ROBLOX-127: the first spider's green chelicerae are hers; the peacock spider's stay in its fang colour, at the sheen they had.)
+volans.chelicerae.color = nil
+volans.chelicerae.reflectance = 0.1
+
 -- ART: six fine teal scale streaks catch light on the open fan. Full detail only; mobile keeps its 80-part budget.
 for _,side in {-1,1} do
  for _,z in {-0.36,0,0.36} do
@@ -493,62 +509,129 @@ for _,side in {-1,1} do
  end
 end
 
--- A brown rival, distinct from the player; illustrative salticid, no species identification.
-local rival: any=table.clone(first)
--- The rival keeps the coat the first spider had before ROBLOX-85 (ROBLOX-13's second coat, whose numbers are below), as it was drawn.
-local rivalFuzz: any = {
-	enabled = true,
-	-- The coat is short and sleek, like a real jumping spider's, and it takes its colour from the pattern it grows on:
-	-- black hairs on the black areas, white hairs only inside the white spots and the band, nothing grey or frosted on the
-	-- body (the daughter's white stays crisp, and a hair is never a pale shard). The softness comes from the fur shells.
-	-- `abdomen` and `head` are Fibonacci sample points before the belly is skipped (about 60 % of them become hairs).
-	-- `length` and `lift` are ranges (studs; degrees off the surface: 0 lies flat, 90 stands up); `yaw` scatters the
-	-- combing (degrees either side of straight back); `flat` is the thickness as a share of the width; `black` is the share
-	-- of the blackest tone (the rest is `dark`); `transparency` keeps the coat a little see-through.
-	-- Locks: the pelt, lying nearly flat and combed toward the rear.
-	locks = { abdomen = 340, head = 130, length = { 0.024, 0.040 }, width = 0.018, flat = 0.22, lift = { 3, 13 }, yaw = 18, black = 0.45, transparency = 0.10 },
-	-- Guard hairs: a few short, fine hairs that stand up from the pelt.
-	guard = { abdomen = 50, head = 24, length = { 0.030, 0.046 }, width = 0.0085, flat = 1.0, lift = { 50, 75 }, yaw = 35, black = 0.5, transparency = 0.20 },
-	-- The fringe: short hairs along the sides (`side`: how far round to the side, as a share of the radius, a hair has to
-	-- be), lifted a little, so the outline is ragged by a pixel or two and not by a spike.
-	fringe = { abdomen = 170, head = 60, side = 0.78, length = { 0.026, 0.040 }, width = 0.011, flat = 0.5, lift = { 14, 32 }, yaw = 22, black = 0.5, transparency = 0.20 },
-	-- White hairs inside the white spots and the band: `density` per square stud of marking, lying on it, kept only when the
-	-- whole hair stays `margin` studs inside the edge, so the white keeps its edge.
-	pale = { density = 600, length = { 0.021, 0.028 }, width = 0.013, flat = 0.3, lift = { 3, 10 }, yaw = 14, margin = 0.004, transparency = 0.05 },
-	clear = 0.006, -- black hairs stay this far (studs) from any white marking
-	black = { 0.03, 0.03, 0.03 },
-	dark = { 0.13, 0.13, 0.13 },
-	grey = { 0.50, 0.50, 0.48 }, -- grey and frost: the face (tufts, ruff) and the palps' fluff only
-	frost = { 0.76, 0.76, 0.73 },
-	-- Fur shells: see-through layers outside the body, strongest nearest it, so the outline goes soft. Four at full detail,
-	-- one at low. A shell tints what is under it as well as what is around it, so they are dark and faint: the white of the
-	-- pattern must stay white.
-	shellColor = { 0.08, 0.08, 0.08 },
-	shells = { { scale = 1.05, transparency = 0.86 }, { scale = 1.10, transparency = 0.92 }, { scale = 1.16, transparency = 0.955 }, { scale = 1.23, transparency = 0.975 } },
-	headShell = { zScale = 0.80, shift = 0.05 }, -- the head's shells sit back from the eye row so the eyes stay clear
-	-- Little tufts that bold jumping spiders have above the eyes, at the upper sides of the head: a fan of dark and
-	-- silvery hairs that sweeps up and out. Not eyebrows: they sit behind the eyes at the sides, not over them.
-	tuftHairs = 10, -- per side
-	tuftLength = 0.078,
-	tuft = { at = { 0.52, 0.80, -0.28 }, lean = { 0.60, 1.0, -0.22 }, fan = 0.46, spread = 0.02, width = 0.0165, flat = 0.8, transparency = 0.1 },
-	-- A soft ruff of pale hair low on each cheek, beside the jaws (not a moustache: it sits at the sides).
-	ruff = { hairs = 5, length = 0.052, width = 0.0135, flat = 0.7, at = { 0.52, -0.36, -0.74 }, lean = { 0.65, -0.55, -0.45 }, whiteShare = 0.6, transparency = 0.15 },
-	legHairs = { 7, 6, 3 }, -- femur, tibia, tarsus, per leg (front legs carry 1.6 x as many on femur and tibia)
-	legLength = 0.052,
-	legWidth = 0.0125,
-	legTransparency = 0.2,
-	legBlack = 0.4, -- the share of the blackest tone on the legs (the rest is dark; white over the pale bands)
-	hipBare = { 0.6, 0.6, 0, 0 }, -- ROBLOX-93: as the first spider's
+-- ================================================================ the rival: a male tan jumping spider (ROBLOX-127)
+-- The other spider is a male. It was a brown recolour of the first spider (ROBLOX-67; until ROBLOX-127 it kept ROBLOX-13's coat and the plain legs); it is now drawn
+-- as a male of the tan jumping spider, Platycryptus undatus, a common salticid of tree trunks and building walls from the eastern United States to Wisconsin and
+-- Texas (DOC: Wikipedia), so of a hut garden's walls and posts. What the sources say of it (DOC: Wikipedia, Platycryptus undatus; minnesotaseasons.com, Tan jumping
+-- spider): mottled tan, a thin flattened body; the carapace orangish-brown on top with white and reddish-brown hairs, its lower sides blackish-brown; a band of hair
+-- through and under the front eyes, white in general and reddish or orange in the male; a tuft of long black hairs under each posterior median eye; brown chelicerae;
+-- palps densely white-haired; the abdomen grey in front, blackish-brown at the sides, with a grey pattern down the middle that reads as chevrons; legs mottled
+-- orangish-brown and blackish-brown, the metatarsus dark at both ends and pale in the middle; males 8.5 to 9.5 mm (Wikipedia) or 6.7 to 9.2 mm (minnesotaseasons).
+-- What makes it read as a male, beyond those (the general salticid male look: in Phidippus audax the male's first legs are the longest and their fringes and the
+-- chelicerae are more striking, DOC: Wikipedia, Phidippus audax): a slimmer abdomen, longer, darker and heavier legs I with a dark fringe, bigger chelicerae and
+-- palps swollen at the tip (the palpal organ) under their white hair. Every number is ART; the species is the model for the look, honestly a likeness, not a
+-- measured animal. `contest` is the male-male display (Predator/RivalDisplay says when and how much; SpiderRig draws it).
+local function deep(t: any): any
+	if type(t) ~= "table" then return t end
+	local out: { [any]: any } = {}
+	for k, v in t do out[k] = deep(v) end
+	return out
+end
+local TAN, DARK_BROWN, GREY_TAN = { 0.42, 0.26, 0.13 }, { 0.13, 0.08, 0.05 }, { 0.50, 0.46, 0.40 }
+local rival: any = deep(first)
+rival.id = "rival_spider"
+rival.name = "Tan jumping spider (male)"
+rival.growth = { 0.9, 0.9, 0.9, 0.9 } -- drawn 9.1 mm long, the male's 8.5 to 9.5 (at 1 the body is 10.1 mm); it does not grow
+rival.gloss = 0.03
+rival.body = TAN -- the carapace's top
+rival.legs = { 0.38, 0.23, 0.11 }
+rival.white = { 0.82, 0.79, 0.72 } -- the pale hair: the cheeks, the palps' bands
+rival.joint = DARK_BROWN
+rival.fangs = { 0.09, 0.05, 0.03 } -- the claws
+rival.abdomenColor = { 0.15, 0.095, 0.06 } -- blackish-brown; the grey is in `marks`
+-- A flat, long carapace and a slim male abdomen.
+rival.headCenter = { 0, 0.015, -0.20 }
+rival.headRadii = { 0.255, 0.175, 0.29 }
+rival.abdomenCenter = { 0, 0.03, 0.225 }
+rival.abdomenRadii = { 0.185, 0.145, 0.30 }
+rival.face = { center = { 0, 0.03, -0.37 }, radii = { 0.215, 0.15, 0.12 } }
+rival.cheek = { y = 0.02, z = -0.25, radii = { 0.02, 0.05, 0.10 }, inset = 0.006 }
+rival.spots, rival.speckleCount = {}, 0
+rival.band = { count = 0, step = 0.1, z = 0, rx = 0.01, rz = 0.01 }
+-- The male's chelicerae: bigger, longer and set more forward, brown with a sheen; the fang under each a single dark curved segment at the low tier, two at full.
+rival.chelicerae = { x = 0.064, y = -0.09, z = -0.462, radii = { 0.058, 0.098, 0.052 }, pitch = -0.55, splay = 0.10, reflectance = 0.16, color = { 0.24, 0.13, 0.065 } }
+rival.fang = { x = 0.062, y = -0.170, z = -0.505, reflectance = 0.25, color = { 0.10, 0.045, 0.03 },
+	segments = { { dir = { -0.10, -0.70, -0.70 }, length = 0.048, radius = 0.012 }, { dir = { -0.55, -0.80, -0.10 }, length = 0.036, radius = 0.009 } } }
+-- Palps: brown stalks, the tip swollen (the male's palpal organ) and white with hair.
+rival.palp.club = { 0.046, 0.043, 0.055 }
+rival.palp.tipRadii = { 0.032, 0.028, 0.032 }
+rival.palpColors = { stalk = { 0.30, 0.18, 0.09 }, club = { 0.78, 0.76, 0.70 }, tip = { 0.70, 0.67, 0.60 } }
+-- The eyes keep the salticid's layout; the front pair's rim is the male's orange band of hair (full tier), the band under them the `FaceBand` (both tiers).
+rival.eye.ame.socket = { scale = 1.14, color = { 0.78, 0.40, 0.12 } }
+rival.eye.ame.lens = nil
+rival.eye.ale = { x = 0.212, y = 0.075, r = 0.048, out = 0.15, reflectance = 0.3 } -- (on the narrower, flatter head: inside its edge)
+-- More bodies: the carapace's blackish-brown lower sides (a wider, lower shell under the tan top) and the orange band of hair under the front eyes.
+rival.extras = {
+	{ name = "CarapaceSide", center = { 0, -0.045, -0.20 }, radii = { 0.266, 0.15, 0.30 }, group = "head", color = DARK_BROWN },
+	{ name = "FaceBand", center = { 0, 0.020, -0.452 }, radii = { 0.16, 0.034, 0.05 }, group = "head", color = { 0.80, 0.42, 0.14 } },
 }
-rival.fuzz=rivalFuzz;rival.gloss=nil
-rival.palp=table.clone(first.palp);rival.palp.fluff={ hairs = 7, length = 0.055, width = 0.012, flat = 0.7, transparency = 0.15 } -- (ROBLOX-85 made the first spider's palp fluff finer)
-rival.id="rival_spider";rival.body={.22,.14,.08};rival.legs={.27,.18,.10};rival.white={.64,.48,.29}
--- ROBLOX-84 gave the first spider shaped legs and fangs; the rival (a clone of it) keeps the plain tubes and balls, as it was drawn.
-rival.legForm=nil;rival.fang=nil
-rival.detail={
- full={every={lock=1,guard=1,fringe=1,pale=1,tuft=1,ruff=1,palp=1,leg=1},shells=4,speckleEvery=1,pads=true,sockets=true,idle=true,highlight=true},
- low={every={lock=3,guard=0,fringe=3,pale=2,tuft=2,ruff=2,palp=2,leg=4},shells=1,speckleEvery=2,pads=false,sockets=false,idle=false,highlight=false},
+-- The abdomen's grey: a grey front, a midline and three chevrons down it (bars slanting back toward the midline from each side), on the blackish-brown.
+rival.marks = {
+	{ name = "AbdomenGrey", color = GREY_TAN, x = 0, z = -0.60, rx = 0.105, rz = 0.06, angle = 0 },
+	{ name = "AbdomenMidline", color = GREY_TAN, x = 0, z = 0.08, rx = 0.018, rz = 0.20, angle = 0 },
+	{ name = "AbdomenChevron", color = GREY_TAN, x = 0.20, z = -0.22, rx = 0.015, rz = 0.068, angle = -0.95, mirror = true },
+	{ name = "AbdomenChevron", color = GREY_TAN, x = 0.20, z = 0.12, rx = 0.015, rz = 0.068, angle = -0.95, mirror = true },
+	{ name = "AbdomenChevron", color = GREY_TAN, x = 0.17, z = 0.46, rx = 0.013, rz = 0.055, angle = -0.95, mirror = true, fullOnly = true },
 }
+-- Legs: mottled; each link has its own colour and band (the femur's band dark, the tarsus' pale between dark ends: the metatarsus), knees and ankles dark.
+rival.legColors = { femur = { 0.38, 0.23, 0.11 }, tibia = { 0.33, 0.20, 0.10 }, tarsus = DARK_BROWN, knee = DARK_BROWN, ankle = DARK_BROWN }
+rival.legBands = { femur = { 0.16, 0.095, 0.05 }, tarsus = { 0.66, 0.53, 0.35 } }
+-- The male's legs I: longer (their rest spot a fifth farther out), heavier and darker, no bands.
+rival.frontLegScale = 1.18
+rival.limbs.pairReach = { 1.2, 1.0, 1.0, 1.0 }
+rival.pairs = { [1] = { colors = { { 0.17, 0.10, 0.05 }, { 0.11, 0.065, 0.04 }, { 0.20, 0.12, 0.06 } }, thick = { 1.0, 1.08, 0.95 }, bands = false } }
+-- The coat: the first spider's lying fur in the tan spider's colours (reddish-brown and dark hairs, a share of white ones: "white and reddish-brown hairs"), sparser;
+-- black tufts at the sides of the head; a dark fringe on legs I.
+local rf = rival.fuzz
+rf.black, rf.dark, rf.grey, rf.frost = { 0.11, 0.07, 0.04 }, { 0.36, 0.20, 0.09 }, { 0.66, 0.62, 0.56 }, { 0.86, 0.84, 0.78 }
+rf.shellColor = { 0.17, 0.11, 0.06 }
+rf.locks.abdomen, rf.locks.head, rf.locks.black, rf.locks.tip = 360, 210, 0.35, 0.22
+rf.fringe.abdomen, rf.fringe.head = 180, 60
+rf.legBlack = 0.5
+rf.legFringe = { pairs = { [1] = { 4, 8, 0 } }, length = { 0.070, 0.092 }, width = 0.0085, lift = { 55, 72 }, edge = { 70, 140 }, tone = "black", transparency = 0.1 }
+rival.contest = {
+	pair = 1,
+	-- where legs I's feet go (the body frame of the drawn prosoma, studs at scale 1, x mirrored for the left): held forward and raised (`up`, the face-off), high and spread
+	-- (`wide`, the full display), and forward and down (`hook`, grappling); the knee pushed out and up; how much the raised feet tremble.
+	up = { x = 0.24, y = 0.18, z = -0.74 }, wide = { x = 0.50, y = 0.40, z = -0.52 }, hook = { x = 0.13, y = -0.12, z = -0.98 },
+	kneeOut = 0.12, kneeUp = 0.20, tremor = 0.02,
+	spreadDeg = 22, -- each chelicera swings out this far: the basal segments 44 degrees apart (DOC: 30 to 90 in Cosmophasis umbratica's contests)
+	lower = 0.05, -- how far the body sinks when it backs off
+	-- (what the pose's tipSweep and sweepBack mean for a tarantula's spinnerets; the rival has none)
+	tipSweep = 1, sweepBack = 0,
+}
+rival.detail = {
+	full = {
+		every = { lock = 1, guard = 1, fringe = 1, pale = 1, tuft = 1, ruff = 1, palp = 1, leg = 1, legFringe = 1 },
+		shells = 3, speckleEvery = 1, pads = true, sockets = true, idle = true, highlight = true,
+		taper = true, tibiaTaper = true, jointBreak = true, claws = 2, fangSegments = 2, retina = false,
+	},
+	-- the game draws the rival at the low tier on every device (ROBLOX-108)
+	low = {
+		every = { lock = 5, guard = 0, fringe = 4, pale = 2, tuft = 2, ruff = 2, palp = 2, leg = 5, legFringe = 1 },
+		shells = 1, speckleEvery = 2, pads = false, sockets = false, idle = false, highlight = false,
+		taper = true, tibiaTaper = false, jointBreak = false, claws = 0, fangSegments = 1, retina = false,
+	},
+}
+
+-- ================================================================ the first spider's mate, a male (ROBLOX-127)
+-- The first spider is the game's female (ROBLOX-79), so her mate is a male; until now he was drawn with her look at 0.85 of her size. He keeps her pattern (the
+-- daughter's colours and markings) with a male bold jumping spider's build (DOC: Wikipedia, Phidippus audax: the male's first legs are the longest, his fringes,
+-- chelicerae and markings more striking than the female's, tufts of hair over his eyes): a slimmer abdomen, longer and heavier legs I with a heavier white fringe, bigger
+-- greener chelicerae, longer tufts. Drawn by Client/MateStage at the low tier (Appearances.mateLook); never a spider the player puts on. ART.
+local male: any = deep(first)
+male.id = "first_spider_male"
+male.name = "First spider (male)"
+male.abdomenRadii = { 0.215, 0.18, 0.265 }
+male.frontLegScale = 1.42
+male.limbs.pairReach = { 1.16, 1.0, 1.0, 1.0 }
+male.chelicerae.radii = { 0.058, 0.086, 0.052 }
+male.chelicerae.color = { 0.035, 0.19, 0.14 }
+male.chelicerae.reflectance = 0.34
+male.fuzz.tuftHairs, male.fuzz.tuftLength = 9, 0.074
+male.fuzz.legFringe = { pairs = { [1] = { 3, 8, 0 } }, length = { 0.060, 0.078 }, width = 0.0065, lift = { 56, 72 }, edge = { 75, 135 }, tone = "frost", transparency = 0.12 }
+male.detail.low.every.legFringe = 1
+male.detail.low.every.lock = 5 -- (his fringe's 22 hairs at the low tier paid for with a sparser pelt)
 
 -- ================================================================ the ant-mimicking spider (ROBLOX-64)
 -- Myrmarachne formicaria, the female: a third profile beside the daughter's and the peacock's, chosen from the crack (Client/SpiderClient).
@@ -849,7 +932,16 @@ greenbottle.barFade = { 0, 0, 0, 0.6 } -- the bars' transparency at each growth 
 volans.hang = first.hang
 ant.hang = first.hang
 
-return { default = "first_spider", profiles = { first_spider = first, maratus_volans_male = volans, myrmarachne_formicaria_female = ant, rival_spider = rival, brachypelma_hamorii = redknee, chromatopelma_cyaneopubescens = greenbottle } }
+local Appearances = { default = "first_spider", profiles = { first_spider = first, maratus_volans_male = volans, myrmarachne_formicaria_female = ant, rival_spider = rival, brachypelma_hamorii = redknee, chromatopelma_cyaneopubescens = greenbottle, first_spider_male = male } }
+
+-- (ROBLOX-127) The look a mate of `sex` ("male" or "female") is drawn with when `played` is the played spider's: the first spider's male mate has his own build
+-- (first_spider_male); every other mate is the played spider's own look, as before (ROBLOX-80).
+function Appearances.mateLook(played: string, sex: string?): string
+	if played == "first_spider" and sex == "male" then return "first_spider_male" end
+	return played
+end
+
+return Appearances
 
 ]]></string>
           </Properties>
@@ -1416,10 +1508,8 @@ FlyLook.legs = {
 FlyLook.bristles = {
 	diameter = 0.007,
 	items = {
-		{ from = { 0.027, 0.061, -0.284 }, to = { 0.043, 0.119, -0.319 }, mirror = true }, -- on the head, pointing up and forward
+		-- (ROBLOX-128: the head's, the thorax's rear and the abdomen's pairs gave their six parts to the wings' veins, which show far more at the spider's eye)
 		{ from = { 0.047, 0.124, -0.022 }, to = { 0.066, 0.176, 0.011 }, mirror = true }, -- on the thorax's back
-		{ from = { 0.037, 0.098, 0.044 }, to = { 0.05, 0.132, 0.103 }, mirror = true }, -- at the thorax's rear, pointing back
-		{ from = { 0.078, 0.051, 0.267 }, to = { 0.111, 0.084, 0.317 }, mirror = true }, -- on the abdomen's side
 	},
 } :: { diameter: number, items: { { from: { number }, to: { number }, mirror: boolean } } }
 
@@ -1433,6 +1523,18 @@ FlyLook.wing = {
 	yaw = 9, pitch = 4, roll = 5,
 	transparency = 0.55, reflectance = 0.1,
 	vein = { diameter = 0.008, offset = 0.055, from = -0.42, to = 0.40, transparency = 0.2 }, -- from, to: along the wing, as shares of its length from the middle
+	-- (ROBLOX-128) the venation inside the leading vein, full tier only, at rest only (hidden in the blur): R4+5 out toward the tip, and M1+2 down the middle of the
+	-- wing with the house fly's sharp bend up toward R4+5 near the margin (BugGuide's Musca note: "sharply bent vein M1+2 that almost touches vein R4+5 at the wing
+	-- margin"). Each a rod on the wing's upper face from (x, z) to (x, z): x across the wing as a share of its half-width (+ toward the leading edge), z along it as a
+	-- share of its length from the middle (+ toward the tip).
+	veins = {
+		diameter = 0.006, transparency = 0.35,
+		items = {
+			{ name = "VeinR45", from = { 0.05, -0.36 }, to = { 0.12, 0.47 } },
+			{ name = "VeinM1", from = { -0.22, -0.30 }, to = { -0.30, 0.32 } },
+			{ name = "VeinM2", from = { -0.30, 0.32 }, to = { 0.07, 0.465 } }, -- the bend
+		},
+	},
 	film = { rise = 0.004, grow = 0.004, transparency = 0.82 },
 	fan = {
 		reach = 0.36, span = 0.34, roll = 8, yaw = 20, back = 0.02, rise = 0.01, transparency = 0.80, -- the denser blur near the root
@@ -1461,7 +1563,21 @@ FlyLook.shadow = { size = { 0.34, 0.004, 0.70 }, lift = 0.003, transparency = 0.
 --   tumble .... turns end over end in a hop (the springtail's somersault), this many turns per hop.
 -- Reduced Motion (the player's setting, as the spider's rig reads it) keeps the stepping, which is how a body gets anywhere, and stills the rest: no sway,
 -- no trembling or beating fan (a still blur), no shiver, no rocking, no crouch, no somersault.
-FlyLook.motion = { gait = { stride = 0.36, swing = 0.30, lift = 0.32, settle = 9, jump = 0.6 }, kick = 6 }
+--   groom ..... (ROBLOX-128) standing calm and still, it grooms in bouts: after `after` seconds and then every `every` (each wait drawn from a hash of the body's id
+--               and the bout's number, never math.random), a bout of `bout` seconds: the front legs drawn in under the head and rubbed together, or the hind
+--               legs drawn back under the abdomen's tip and rubbed together (the drawing's short legs cannot sweep over the wings), the front first (Seeds et al. 2014, eLife 3:e02951: the front legs clean the head, the
+--               hind legs the abdomen and wings, rubbing bouts between; the order of priority front to back). `hz` the rub. A walk, a flight, an alarm or a
+--               scheduled take-off ends a bout at once. The timing is the game's.
+--   ready ..... (ROBLOX-128) a take-off scheduled (its reaction pending), it readies: the body raised `lift` on its legs and tipped `pitch` nose up, the middle legs
+--               swung forward `legs` (Card & Dickinson 2008, Current Biology: a fly sets its middle legs and leans in the 100 ms or so before its escape jump).
+FlyLook.groom = { after = { 2.5, 5 }, every = { 3, 7 }, bout = { 1.2, 2.4 }, hz = 5, amp = 0.16 }
+FlyLook.ready = { lift = 0.03, pitch = 0.16, legs = 0.35 }
+FlyLook.motion = { gait = { stride = 0.36, swing = 0.30, lift = 0.32, settle = 9, jump = 0.6 }, kick = 6, groom = FlyLook.groom, ready = FlyLook.ready }
+-- (ROBLOX-128) The fastest wingbeat drawn as a beat: a fly's wings beat 190 to 330 times a second, a mosquito's 600 and some midges' 1,000 (hypertextbook's
+-- table of wingbeat frequencies, after Chapman and Wigglesworth), and at 60 frames a second anything over half that, 30 Hz, steps backward or stands still on the
+-- screen (it strobes). A sheet's `flap` above BLUR_HZ is drawn as the blur that trembles (FlyLook.wing.fan.shimmer), as the house fly's always was; the moth's 5 Hz
+-- is drawn as a beat.
+FlyLook.BLUR_HZ = 12
 -- ROBLOX-114 (everything to scale): the scale a prey is drawn at. A profile's `visual_scale` is Godot's (golden, never changed here); a kind listed in `trueScale`
 -- is drawn at that instead, because the golden one draws it at a size it is not: the fruit fly at 0.6 is the house fly's 7.3 mm body made 4.4 mm, and Drosophila
 -- melanogaster is about 2.5 mm long (BioNumbers 100750), so it is drawn at 0.4, 2.9 mm. Only the drawing: its collider, its senses and its meal are the profile's.
@@ -1503,7 +1619,7 @@ FlyLook.small = {
 		wing = { root = { 0.05, 0.1, -0.06 }, length = 0.5, width = 0.16, thick = 0.005, yaw = 6, pitch = 2, roll = 0, transparency = 0.5, reflectance = 0.08,
 			fan = { reach = 0.34, span = 0.3, roll = 8, yaw = 20, back = 0.02, rise = 0.01, transparency = 0.8 } },
 		shadow = { size = { 0.2, 0.004, 0.55 }, lift = 0.003, transparency = 0.8 },
-		motion = { gait = { stride = 0.42, swing = 0.32, lift = 0.30, settle = 9, jump = 0.6 }, kick = 7, antenna = { amp = 0.14, hz = 1.6 } },
+		motion = { gait = { stride = 0.42, swing = 0.32, lift = 0.30, settle = 9, jump = 0.6 }, kick = 7, antenna = { amp = 0.14, hz = 1.6 }, groom = FlyLook.groom, ready = FlyLook.ready },
 	},
 	-- an aphid: a pear-shaped green body, a small head, two cornicles at the rear, short legs, long antennae, no wings
 	aphid = {
@@ -1641,7 +1757,7 @@ FlyLook.small.hoverfly = {
 			transparency = 0.5, reflectance = 0.08, fan = { reach = 0.55, span = 0.4, roll = 6, yaw = 30, back = 0.02, rise = 0.02, transparency = 0.82 } },
 	} :: { any },
 	shadow = { size = { 0.4, 0.004, 0.9 }, lift = 0.003, transparency = 0.82, full = true },
-	motion = { gait = { stride = 0.25, swing = 0.25, lift = 0.25, settle = 10, jump = 0.6 }, kick = 6, antenna = { amp = 0.06, hz = 1.0 }, flap = { hz = 30, amp = 0.4 } },
+	motion = { gait = { stride = 0.25, swing = 0.25, lift = 0.25, settle = 10, jump = 0.6 }, kick = 6, antenna = { amp = 0.06, hz = 1.0 }, flap = { hz = 30, amp = 0.4 }, groom = FlyLook.groom, ready = FlyLook.ready },
 }
 -- (the crane fly's legs: hip, knee, ankle and foot of the right front, middle and hind leg, standing splayed and dangling in flight)
 local craneLegs = {
@@ -1696,7 +1812,7 @@ FlyLook.small.cricket = {
 		{ name = "EyeR", color = "eye", reflectance = 0.06, at = { 0.2, 0.32, -0.92 }, size = { 0.14, 0.16, 0.14 }, full = true },
 		{ name = "Pronotum", color = "pronotum", at = { 0, 0.26, -0.52 }, size = { 0.6, 0.42, 0.38 } },
 		{ name = "Abdomen", color = "abdomen", at = { 0, 0.18, 0.25 }, size = { 0.6, 0.38, 1.2 } },
-		{ name = "Forewings", color = "tegmen", at = { 0, 0.35, 0.12 }, size = { 0.58, 0.1, 1.0 }, full = true },
+		{ name = "Forewings", color = "tegmen", at = { 0, 0.35, 0.12 }, size = { 0.58, 0.1, 1.0 }, full = true, hinge = { 0, 0.33, -0.36 } },
 	} :: { any },
 	rods = {
 		{ name = "Antenna", color = "antenna", d = 0.025, from = { 0.08, 0.36, -1.05 }, to = { 0.75, 0.42, -2.7 }, mirror = true },
@@ -1712,7 +1828,11 @@ FlyLook.small.cricket = {
 	shadow = { size = { 0.8, 0.004, 2.0 }, lift = 0.003, transparency = 0.8, full = true },
 	-- quick bursts of steps, a crouch on its hind legs before the jump, the antennae always moving
 	motion = { gait = { stride = 0.5, swing = 0.3, lift = 0.3, settle = 9, jump = 1.0 }, kick = 7, antenna = { amp = 0.18, hz = 1.3 },
-		crouch = { depth = 0.06, pitch = 0.16 } },
+		crouch = { depth = 0.06, pitch = 0.16 },
+		-- (ROBLOX-128) singing (Prey/PreyKinds.chirping), a male raises his forewings over the abdomen to about 45 degrees (`raise`) and closes them a little in each
+		-- chirp, a scraper on one wing drawn over the file on the other, a pulse a closing stroke (UF/IFAS's field crickets, EENY/IN222). The game's sound is five chirps
+		-- of four pulses in 2 s, so a chirp every `period` s lasting `chirp` s; the pulses themselves are too quick to draw, so the wings dip by `dip` through each chirp.
+		sing = { raise = 0.75, period = 0.4, chirp = 0.18, dip = 0.12, ease = 6 } },
 }
 
 -- ROBLOX-122: the pond's prey, drawn at their true sizes (docs/NOTEBOOK_SOURCES.md, their pages). A non-biting midge (Chironomidae): about 5.5 mm, a slender pale
@@ -1742,7 +1862,7 @@ FlyLook.small.midge = {
 			transparency = 0.55, reflectance = 0.08, fan = { reach = 0.24, span = 0.2, roll = 6, yaw = 25, back = 0.02, rise = 0.01, transparency = 0.85 } },
 	} :: { any },
 	shadow = { size = { 0.14, 0.004, 0.4 }, lift = 0.003, transparency = 0.82, full = true },
-	motion = { gait = { stride = 0.18, swing = 0.3, lift = 0.3, settle = 10, jump = 0.6 }, kick = 6, antenna = { amp = 0.1, hz = 1.4 }, flap = { hz = 40, amp = 0.35 } },
+	motion = { gait = { stride = 0.18, swing = 0.3, lift = 0.3, settle = 10, jump = 0.6 }, kick = 6, antenna = { amp = 0.1, hz = 1.4 }, flap = { hz = 40, amp = 0.35 }, groom = FlyLook.groom, ready = FlyLook.ready },
 }
 -- A mosquito (Culicidae): about 5 mm of body, a brown-grey thorax and a banded abdomen, a long straight proboscis, long thin legs, one pair of scaled wings laid
 -- over the back.
@@ -1771,7 +1891,7 @@ FlyLook.small.mosquito = {
 			transparency = 0.45, reflectance = 0.06, fan = { reach = 0.26, span = 0.2, roll = 6, yaw = 25, back = 0.02, rise = 0.01, transparency = 0.85 } },
 	} :: { any },
 	shadow = { size = { 0.3, 0.004, 0.45 }, lift = 0.003, transparency = 0.82, full = true },
-	motion = { gait = { stride = 0.2, swing = 0.3, lift = 0.3, settle = 10, jump = 0.6 }, kick = 6, antenna = { amp = 0.08, hz = 1.2 }, flap = { hz = 40, amp = 0.35 } },
+	motion = { gait = { stride = 0.2, swing = 0.3, lift = 0.3, settle = 10, jump = 0.6 }, kick = 6, antenna = { amp = 0.08, hz = 1.2 }, flap = { hz = 40, amp = 0.35 }, groom = FlyLook.groom, ready = FlyLook.ready },
 }
 -- The eastern forktail (Ischnura verticalis), a damselfly about 2.8 cm long: wide-set eyes, a green and black striped thorax, a slender black abdomen ringed pale
 -- with blue on its tip (the male), four clear wings held together over the back at rest; short spiny legs.
@@ -1805,7 +1925,7 @@ FlyLook.small.damselfly = {
 			transparency = 0, reflectance = 0, hide = true, full = true },
 	} :: { any },
 	shadow = { size = { 0.5, 0.004, 2.6 }, lift = 0.003, transparency = 0.84, full = true },
-	motion = { gait = { stride = 0.2, swing = 0.25, lift = 0.25, settle = 8, jump = 0.8 }, kick = 5, antenna = { amp = 0.02, hz = 0.5 }, flap = { hz = 25, amp = 0.5 } },
+	motion = { gait = { stride = 0.2, swing = 0.25, lift = 0.25, settle = 8, jump = 0.8 }, kick = 5, antenna = { amp = 0.02, hz = 0.5 }, flap = { hz = 25, amp = 0.5 }, ready = FlyLook.ready },
 }
 
 return FlyLook
@@ -17588,6 +17708,183 @@ return MateDrive
         </Item>
         <Item class="ModuleScript" referent="96">
           <Properties>
+            <string name="Name">RivalDisplay</string>
+            <string name="Source"><![CDATA[--!strict
+-- The male rival's contest display (ROBLOX-127): how a male jumping spider meets another spider, drawn on top of the rival's rules. Pure, Vector3-free and
+-- display only: nothing here moves the rival, its collider, its senses, its timing or any outcome (Predator/RivalSpider and RivalDrive decide all of that as
+-- before); SpiderRig reads the pose (look.contest) and the client hands it the rival's state each frame.
+--
+-- What the sources describe (DOC): male contests open at a distance with the males facing each other, the body raised and legs I held up and forward (Phidippus
+-- clarus, Elias et al. 2008, PMC2598435: a hunched posture, the front legs curled in front, then approaches or retreats with legs I stretched out); in Cosmophasis
+-- umbratica (Lim & Li 2004) the males close by short skittering with legs I raised in two positions and the chelicerae held open, the basal segments 30 to 90 degrees
+-- apart, lunge, and grapple (hooking and pushing down each other's legs, locked chelicerae) only in the contests that go that far; the one pushed back, and in a
+-- mismatched pair the smaller, decamps (both papers; in P. clarus the bigger male mostly won because its rival retreated). Phidippus males also zigzag in display
+-- (Edwards 1981, Psyche 88:199, of courting P. mystaceus). The game's ritual, mapped onto the rival's states (ART: which state shows which act, every number):
+--   "faceoff"  stalking within FACE_WU of the spider: body raised, legs I up and forward, palps up, the chelicerae a little open, and stop-and-go sideways skitters
+--              (the zigzag: the drawn body steps a little to one side or the other in seeded bursts and pauses; the simulation's path is the drive's, untouched)
+--   "spread"   stalking within SPREAD_WU, and the windup: legs I high and spread wide, the chelicerae open, a tremor in the raised legs, the skitters
+--   "grapple"  the lunge (the escalation, when neither has backed down): legs I forward and down to hook, the chelicerae wide
+--   "retreat"  recovering after the spider got clear of its lunge, sprang clear of the spider's strike, bit back, or tore free: legs I lowered, the body low and turned a
+--              little away, when it is the smaller of the two; the bigger holds its ground, legs I half up (`hold`)
+--   "none"     anything else (patrol, far off, held, carried, gone): the pose eases out and the motor's legs are the rig's again
+-- The skitters' rhythm and the side the retreat turns to are drawn from the rival's own seeded stream (the world's seed, the day, its contests and its patrol
+-- leg, all kept in its record, and the display's own count of bouts): the same rival in the same moment shows the same display, and a return to a rest rerolls nothing
+-- of the simulation (the display keeps no record; it starts again from rest).
+local PreyRandom = require(script.Parent.Parent.Prey.PreyRandom)
+
+local RivalDisplay = {}
+
+export type Pose = {
+	phase: string, presence: number,
+	rear: number, legs: number, palps: number, yaw: number, sweep: number, tremor: number, -- (the tarantula's pose's fields, as SpiderRig reads them)
+	reach: number, hook: number, spread: number, lateral: number, lower: number,
+}
+
+RivalDisplay.FACE_WU = 6.0 -- studs: within this, a stalking rival faces off (its sight is 8)
+RivalDisplay.SPREAD_WU = 4.4 -- within this, the full display (the windup begins at 3.2, RivalRules.reachWu)
+RivalDisplay.RETREAT_SECONDS = 3.0 -- as long as the rival's recover lasts
+RivalDisplay.RISE = 1 / 0.35 -- how fast a level goes up (per second) and comes down
+RivalDisplay.FALL = 1 / 0.5
+RivalDisplay.SKITTER = { step = { 0.18, 0.42 }, pause = { 0.25, 0.70 }, amplitude = 0.11, yawDeg = 12 } -- a burst's seconds, a pause's, how far the drawn body steps (studs at scale 1), the turn with it
+RivalDisplay.REAR_DEG = 9 -- the prosoma raised in the face-off and the display
+RivalDisplay.PALPS_DEG = 16
+RivalDisplay.TURN_AWAY_DEG = 28 -- the retreat's turn
+RivalDisplay.TREMOR_HZ = 7
+
+-- The levels each phase asks for: legs I raised (legs), how high and spread (reach), hooked (hook), the chelicerae (spread), the body raised (rear, a share of REAR_DEG),
+-- the palps (palps, a share of PALPS_DEG), the crouch (lower) and whether the skitters run (skitter).
+RivalDisplay.TARGETS = {
+	none = { legs = 0, reach = 0, hook = 0, spread = 0, rear = 0, palps = 0, lower = 0, skitter = 0 },
+	faceoff = { legs = 0.85, reach = 0, hook = 0, spread = 0.35, rear = 0.8, palps = 0.6, lower = 0, skitter = 1 },
+	spread = { legs = 1, reach = 1, hook = 0, spread = 1, rear = 1, palps = 1, lower = 0, skitter = 1 },
+	grapple = { legs = 1, reach = 0, hook = 1, spread = 1, rear = 0.3, palps = 0.4, lower = 0, skitter = 0 },
+	retreat = { legs = 0, reach = 0, hook = 0, spread = 0, rear = 0, palps = 0, lower = 1, skitter = 0 },
+	hold = { legs = 0.55, reach = 0, hook = 0, spread = 0.3, rear = 0.5, palps = 0.4, lower = 0, skitter = 0 },
+} :: { [string]: { [string]: number } }
+
+-- The rival's events after which it backs off (RivalSpider.step's and RivalGrip.step's): its lunge missed, the spider sprang clear or bit back, or it tore free.
+RivalDisplay.BACKS_OFF = { missed = true, sprang = true, counter = true, tore = true, touch = true } :: { [string]: boolean }
+
+export type State = {
+	phase: string, t: number, bout: number, rng: any?, key: string,
+	skitterSide: number, skitterFrom: number, skitterTo: number, skitterT: number, skitterLeft: number, moving: boolean,
+	retreatLeft: number, awaySide: number,
+	levels: { [string]: number }, lateral: number, yaw: number, presence: number,
+	pose: Pose,
+}
+
+function RivalDisplay.new(): State
+	return {
+		phase = "none", t = 0, bout = 0, rng = nil, key = "",
+		skitterSide = 1, skitterFrom = 0, skitterTo = 0, skitterT = 0, skitterLeft = 0, moving = false,
+		retreatLeft = 0, awaySide = 1,
+		levels = { legs = 0, reach = 0, hook = 0, spread = 0, rear = 0, palps = 0, lower = 0, skitter = 0 },
+		lateral = 0, yaw = 0, presence = 0,
+		pose = { phase = "none", presence = 0, rear = 0, legs = 0, palps = 0, yaw = 0, sweep = 0, tremor = 0, reach = 0, hook = 0, spread = 0, lateral = 0, lower = 0 },
+	}
+end
+
+-- The phase the rival's state asks for. `i`: state (the rival's), distance (studs, to the spider), event (this tick's, "" for none), smaller (the rival is the smaller
+-- of the two, by drawn body length).
+function RivalDisplay.phaseFor(d: State, i: any): string
+	local s = i.state
+	if s == "lunge" then return "grapple" end
+	if d.retreatLeft > 0 and (s == "recover" or s == "patrol") then return if i.smaller then "retreat" else "hold" end
+	if s == "windup" then return "spread" end
+	if s == "stalk" and type(i.distance) == "number" then
+		if i.distance <= RivalDisplay.SPREAD_WU then return "spread" end
+		if i.distance <= RivalDisplay.FACE_WU then return "faceoff" end
+	end
+	return "none"
+end
+
+-- The seeded stream of one bout of display (a face-off that begins after none): the world's seed, the day, the rival's contests and patrol leg, the bout.
+function RivalDisplay.stream(seed: number, day: number, contests: number, leg: number, bout: number): any
+	return PreyRandom.mixed(seed, day, contests, leg, bout, 127)
+end
+
+local function smooth(x: number): number
+	local c = math.clamp(x, 0, 1)
+	return c * c * (3 - 2 * c)
+end
+
+-- One frame. `dt` is the frame's simulated time (0 when paused: nothing moves). `i` = { state, distance, event, smaller, seed, day, contests, leg, reduced }.
+-- Returns the pose (the same table each time) for rig.threat.
+function RivalDisplay.step(d: State, dt: number, i: any): Pose
+	dt = math.max(0, dt)
+	if RivalDisplay.BACKS_OFF[i.event or ""] then
+		d.retreatLeft = RivalDisplay.RETREAT_SECONDS
+		local g = RivalDisplay.stream(i.seed or 0, i.day or 0, i.contests or 0, i.leg or 0, d.bout + 1000)
+		d.awaySide = if g:next() < 0.5 then -1 else 1
+	end
+	d.retreatLeft = math.max(0, d.retreatLeft - dt)
+	local phase = RivalDisplay.phaseFor(d, i)
+	if phase ~= d.phase then
+		if (phase == "faceoff" or phase == "spread") and (d.phase == "none" or d.phase == "retreat" or d.phase == "hold") then
+			-- a new bout of display: its own stream, from where the rival is in its record
+			d.bout += 1
+			d.rng = RivalDisplay.stream(i.seed or 0, i.day or 0, i.contests or 0, i.leg or 0, d.bout)
+			d.skitterLeft, d.moving = 0, false
+		end
+		d.phase = phase
+	end
+	d.t += dt
+	local target = RivalDisplay.TARGETS[phase]
+	for k, v in target do
+		local now = d.levels[k] or 0
+		local rate = if v > now then RivalDisplay.RISE else RivalDisplay.FALL
+		d.levels[k] = now + math.clamp(v - now, -rate * dt, rate * dt)
+	end
+	-- The skitters: a burst to a new side, then a pause; the drawn body steps there and back on the seeded rhythm.
+	local sk = RivalDisplay.SKITTER
+	if d.levels.skitter > 0 and d.rng ~= nil and not i.reduced then
+		d.skitterLeft -= dt
+		if d.skitterLeft <= 0 then
+			local g = d.rng
+			if d.moving then
+				d.moving = false
+				d.skitterFrom = d.skitterTo
+				d.skitterLeft = sk.pause[1] + (sk.pause[2] - sk.pause[1]) * g:next()
+			else
+				d.moving = true
+				d.skitterSide = -d.skitterSide
+				d.skitterFrom = d.lateral / sk.amplitude
+				d.skitterTo = d.skitterSide * (0.45 + 0.55 * g:next())
+				d.skitterT = sk.step[1] + (sk.step[2] - sk.step[1]) * g:next()
+				d.skitterLeft = d.skitterT
+			end
+		end
+		local u = if d.moving and d.skitterT > 0 then smooth(1 - d.skitterLeft / d.skitterT) else 1
+		local at = d.skitterFrom + (d.skitterTo - d.skitterFrom) * u
+		d.lateral = at * sk.amplitude * d.levels.skitter
+		d.yaw = (if d.moving then -d.skitterSide else 0) * math.rad(sk.yawDeg) * d.levels.skitter * math.sin(math.pi * u)
+	else
+		-- (no skitter: the step eases back to the middle; Reduced Motion has none at all)
+		d.lateral = if i.reduced then 0 else d.lateral * math.max(0, 1 - 4 * dt)
+		d.yaw = 0
+	end
+	local away = d.awaySide * math.rad(RivalDisplay.TURN_AWAY_DEG) * d.levels.lower
+	local L = d.levels
+	local presence = math.max(L.legs, L.reach, L.hook, L.spread, L.rear, L.palps, L.lower, math.abs(d.lateral) / RivalDisplay.SKITTER.amplitude)
+	local p = d.pose
+	p.phase = if presence > 0 then phase else "none"
+	p.presence = presence
+	p.legs, p.reach, p.hook, p.spread, p.lower = L.legs, L.reach, L.hook, L.spread, L.lower
+	p.rear = math.rad(RivalDisplay.REAR_DEG) * L.rear
+	p.palps = math.rad(RivalDisplay.PALPS_DEG) * L.palps
+	p.yaw = d.yaw + away
+	p.lateral = d.lateral
+	p.sweep = 0
+	p.tremor = if i.reduced then 0 else math.sin(math.pi * 2 * RivalDisplay.TREMOR_HZ * d.t) * L.reach
+	return p
+end
+
+return RivalDisplay
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="97">
+          <Properties>
             <string name="Name">RivalDrive</string>
             <string name="Source"><![CDATA[--!strict
 -- The rival spider's legs (ROBLOX-69): its own SpiderMotor, the player's proven surface-walking motor with the same collider, drives it over
@@ -18051,7 +18348,7 @@ return Drive
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="97">
+        <Item class="ModuleScript" referent="98">
           <Properties>
             <string name="Name">RivalGrip</string>
             <string name="Source"><![CDATA[--!strict
@@ -18134,7 +18431,7 @@ return Grip
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="98">
+        <Item class="ModuleScript" referent="99">
           <Properties>
             <string name="Name">RivalRoute</string>
             <string name="Source"><![CDATA[--!strict
@@ -18839,7 +19136,7 @@ return Route
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="99">
+        <Item class="ModuleScript" referent="100">
           <Properties>
             <string name="Name">RivalSpider</string>
             <string name="Source"><![CDATA[--!strict
@@ -19115,7 +19412,7 @@ return Rival
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="100">
+        <Item class="ModuleScript" referent="101">
           <Properties>
             <string name="Name">WaspDirector</string>
             <string name="Source"><![CDATA[--!strict
@@ -20008,11 +20305,11 @@ return WaspDirector
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="101">
+      <Item class="Folder" referent="102">
         <Properties>
           <string name="Name">Prey</string>
         </Properties>
-        <Item class="ModuleScript" referent="102">
+        <Item class="ModuleScript" referent="103">
           <Properties>
             <string name="Name">Ant</string>
             <string name="Source"><![CDATA[--!strict
@@ -20152,7 +20449,7 @@ return Ants
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="103">
+        <Item class="ModuleScript" referent="104">
           <Properties>
             <string name="Name">Feeding</string>
             <string name="Source"><![CDATA[--!strict
@@ -20231,7 +20528,7 @@ return F
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="104">
+        <Item class="ModuleScript" referent="105">
           <Properties>
             <string name="Name">Fly</string>
             <string name="Source"><![CDATA[--!strict
@@ -20469,7 +20766,7 @@ return Fly
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="105">
+        <Item class="ModuleScript" referent="106">
           <Properties>
             <string name="Name">FlyFlight</string>
             <string name="Source"><![CDATA[--!strict
@@ -20534,7 +20831,7 @@ return F
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="106">
+        <Item class="ModuleScript" referent="107">
           <Properties>
             <string name="Name">FlySenses</string>
             <string name="Source"><![CDATA[--!strict
@@ -20596,7 +20893,7 @@ return S
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="107">
+        <Item class="ModuleScript" referent="108">
           <Properties>
             <string name="Name">Harvestman</string>
             <string name="Source"><![CDATA[--!strict
@@ -20743,7 +21040,7 @@ return Harvestmen
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="108">
+        <Item class="ModuleScript" referent="109">
           <Properties>
             <string name="Name">Ladybird</string>
             <string name="Source"><![CDATA[--!strict
@@ -20944,7 +21241,7 @@ return Ladybirds
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="109">
+        <Item class="ModuleScript" referent="110">
           <Properties>
             <string name="Name">Millipede</string>
             <string name="Source"><![CDATA[--!strict
@@ -21136,7 +21433,7 @@ return Millipedes
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="110">
+        <Item class="ModuleScript" referent="111">
           <Properties>
             <string name="Name">PerchGraph</string>
             <string name="Source"><![CDATA[--!strict
@@ -21189,7 +21486,7 @@ return G
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="111">
+        <Item class="ModuleScript" referent="112">
           <Properties>
             <string name="Name">PlantWalk</string>
             <string name="Source"><![CDATA[--!strict
@@ -21261,7 +21558,7 @@ return PlantWalk
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="112">
+        <Item class="ModuleScript" referent="113">
           <Properties>
             <string name="Name">PreyDirector</string>
             <string name="Source"><![CDATA[--!strict
@@ -21486,7 +21783,7 @@ return D
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="113">
+        <Item class="ModuleScript" referent="114">
           <Properties>
             <string name="Name">PreyKinds</string>
             <string name="Source"><![CDATA[--!strict
@@ -21864,7 +22161,7 @@ return K
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="114">
+        <Item class="ModuleScript" referent="115">
           <Properties>
             <string name="Name">PreyMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -21954,7 +22251,7 @@ return M
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="115">
+        <Item class="ModuleScript" referent="116">
           <Properties>
             <string name="Name">PreyPopulation</string>
             <string name="Source"><![CDATA[--!strict
@@ -21986,7 +22283,7 @@ return P
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="116">
+        <Item class="ModuleScript" referent="117">
           <Properties>
             <string name="Name">PreyRandom</string>
             <string name="Source"><![CDATA[--!strict
@@ -22016,7 +22313,7 @@ return R
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="117">
+        <Item class="ModuleScript" referent="118">
           <Properties>
             <string name="Name">PreyWorld</string>
             <string name="Source"><![CDATA[--!strict
@@ -22413,7 +22710,7 @@ return PreyWorld
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="118">
+        <Item class="ModuleScript" referent="119">
           <Properties>
             <string name="Name">Skater</string>
             <string name="Source"><![CDATA[--!strict
@@ -22542,7 +22839,7 @@ return Skaters
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="119">
+        <Item class="ModuleScript" referent="120">
           <Properties>
             <string name="Name">Snail</string>
             <string name="Source"><![CDATA[--!strict
@@ -22742,7 +23039,7 @@ return Snails
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="120">
+        <Item class="ModuleScript" referent="121">
           <Properties>
             <string name="Name">Woodlouse</string>
             <string name="Source"><![CDATA[--!strict
@@ -22939,11 +23236,11 @@ return Woodlice
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="121">
+      <Item class="Folder" referent="122">
         <Properties>
           <string name="Name">Rig</string>
         </Properties>
-        <Item class="ModuleScript" referent="122">
+        <Item class="ModuleScript" referent="123">
           <Properties>
             <string name="Name">Anatomy</string>
             <string name="Source"><![CDATA[--!strict
@@ -23133,7 +23430,7 @@ return Anatomy
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="123">
+        <Item class="ModuleScript" referent="124">
           <Properties>
             <string name="Name">AntMimicPose</string>
             <string name="Source"><![CDATA[--!strict
@@ -23253,7 +23550,7 @@ return AntMimicPose
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="124">
+        <Item class="ModuleScript" referent="125">
           <Properties>
             <string name="Name">CatPose</string>
             <string name="Source"><![CDATA[--!strict
@@ -23602,7 +23899,7 @@ return table.freeze(CatPose)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="125">
+        <Item class="ModuleScript" referent="126">
           <Properties>
             <string name="Name">Idle</string>
             <string name="Source"><![CDATA[--!strict
@@ -23685,7 +23982,7 @@ return Idle
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="126">
+        <Item class="ModuleScript" referent="127">
           <Properties>
             <string name="Name">Living</string>
             <string name="Source"><![CDATA[--!strict
@@ -24007,7 +24304,7 @@ return Living
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="127">
+        <Item class="ModuleScript" referent="128">
           <Properties>
             <string name="Name">PeacockDance</string>
             <string name="Source"><![CDATA[--!strict
@@ -24179,7 +24476,7 @@ return PeacockDance
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="128">
+        <Item class="ModuleScript" referent="129">
           <Properties>
             <string name="Name">Setae</string>
             <string name="Source"><![CDATA[--!strict
@@ -24204,7 +24501,7 @@ export type Hair = {
 	at: Vector3, dir: Vector3, normal: Vector3, length: number, width: number, thick: number, transparency: number,
 	kind: string, group: string, side: number, tone: string, white: boolean, grey: boolean, frost: boolean,
 }
-export type LegHair = { segment: number, t: number, theta: number, length: number, tone: string, white: boolean, grey: boolean, frost: boolean, lift: number? }
+export type LegHair = { segment: number, t: number, theta: number, length: number, tone: string, white: boolean, grey: boolean, frost: boolean, lift: number?, width: number?, transparency: number? } -- (width, transparency: a fringe's own, ROBLOX-127)
 export type Patch = { x: number, z: number, rx: number, rz: number, angle: number }
 
 local GOLDEN = 2.399963229728653
@@ -24540,6 +24837,38 @@ function Setae.leg(look: any, legIndex: number): { LegHair }
 	return out
 end
 
+-- The fringe on a leg (ROBLOX-127; look.fuzz.legFringe): longer hairs standing out from the sides and underside of a link, leaning toward the foot, the fringes a
+-- bold jumping spider has on its first legs (and a male's heavier and, in the rival, dark). `pairs[pair]` gives the count on the femur, tibia and tarsus; the hairs
+-- are spread over the middle of the link (0.15 to 0.9 of it), one side and then the other between `edge`'s two angles (degrees from the top of the leg). Legs 5 to 8
+-- mirror 1 to 4 as Setae.leg's do. The same LegHair shape: SpiderRig draws them with the leg's own hairs, and a tier keeps one in `every.legFringe`.
+function Setae.legFringe(look: any, legIndex: number): { LegHair }
+	local out: { LegHair } = {}
+	local f = look.fuzz
+	local spec = if f and f.enabled then f.legFringe else nil
+	if spec == nil then return out end
+	local twin = (legIndex - 1) % 4 + 1
+	local mirror = if legIndex > 4 then -1 else 1
+	local counts = spec.pairs[twin]
+	if counts == nil then return out end
+	local bare = if f.hipBare then f.hipBare[twin] else 0
+	for segment = 1, 3 do
+		local n = counts[segment] or 0
+		for k = 1, n do
+			local i = twin * 1000 + segment * 100 + k
+			local t = 0.15 + 0.75 * (k - 0.5) / n
+			if segment == 1 then t = bare + (1 - bare) * t end -- (as the leg's own hairs: none on the femur's bare stretch by the face, where the anterior lateral eyes are)
+			local theta = mirror * (if k % 2 == 0 then 1 else -1) * math.rad(between(spec.edge, hash(i, 51)))
+			table.insert(out, {
+				segment = segment, t = t, theta = theta,
+				length = between(spec.length, hash(i, 53)) * (if segment == 1 then 0.8 else 1),
+				tone = spec.tone, white = spec.tone == "white", grey = spec.tone == "grey", frost = spec.tone == "frost",
+				lift = math.rad(between(spec.lift, hash(i, 57))), width = spec.width, transparency = spec.transparency,
+			})
+		end
+	end
+	return out
+end
+
 -- A tarantula's urticating patch (ROBLOX-85): a denser cluster of short, ginger-rust hairs standing out of the patch on the abdomen's back, combed
 -- toward the rear, in the body frame. `look.cluster` = { mark (the name of the patch in look.marks), hairs, length, lift, yaw, width, flat, color, paler }.
 function Setae.cluster(look: any): { Hair }
@@ -24573,7 +24902,7 @@ return Setae
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="129">
+        <Item class="ModuleScript" referent="130">
           <Properties>
             <string name="Name">SpiderChoice</string>
             <string name="Source"><![CDATA[--!strict
@@ -24688,7 +25017,7 @@ return SpiderChoice
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="130">
+        <Item class="ModuleScript" referent="131">
           <Properties>
             <string name="Name">SpiderRig</string>
             <string name="Source"><![CDATA[--!strict
@@ -24789,6 +25118,7 @@ type Leg = {
 type Fixed = {
 	part: Part, offset: CFrame, group: number, palp: number?, sweep: number?, glance: boolean?, big: boolean?,
 	pos: Vector3, rot: CFrame, scaled: CFrame, size0: Vector3, size: Vector3,
+	jaw: number?, pivot: Vector3?, -- (ROBLOX-127) a chelicera or a fang: its side, and the point at the chelicera's base it swings out about in the rival's display
 }
 
 -- The parts of one BulkMoveTo and where each goes: a rig makes two a frame, the body's and the hairs' (the hairs' only when they moved).
@@ -25115,7 +25445,7 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		local offset = CFrame.new(at) * (rot or CFrame.identity)
 		local entry: Fixed = {
 			part = part, offset = offset, group = group, palp = palp, sweep = nil, glance = nil, big = nil,
-			pos = offset.Position, rot = offset.Rotation, scaled = offset, size0 = Vector3.zero, size = Vector3.zero,
+			pos = offset.Position, rot = offset.Rotation, scaled = offset, size0 = Vector3.zero, size = Vector3.zero, jaw = nil, pivot = nil,
 		}
 		table.insert(self._fixed, entry)
 		return entry
@@ -25233,6 +25563,15 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		eye.Reflectance = e.reflectance
 		eye.CastShadow = false
 		fixed(eye, e.at, nil, G_HEAD).glance = e.principal
+		-- (ROBLOX-127) depth: the lens lets a little light through onto a dark retina set back in the eye (look.eye.ame.lens; the full tier's `retina`)
+		local lens = if e.principal and look.eye.ame then look.eye.ame.lens else nil
+		if lens and cfg.retina then
+			eye.Transparency = lens.transparency
+			local rt = lens.retina
+			local retina = ellipsoid(model, "Retina", e.radii * rt.scale, color(rt.color), fabric)
+			retina.CastShadow = false
+			fixed(retina, e.at + Vector3.new(0, 0, e.radii.Z * rt.depth), nil, G_HEAD).glance = true
+		end
 		if e.principal and cfg.sockets then
 			local socket = ellipsoid(model, "EyeSocket", e.radii * look.eye.ame.socket.scale, SOCKET, fabric)
 			socket.CastShadow = false
@@ -25246,10 +25585,13 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		fixed(glint, g.at, nil, G_HEAD).glance = tubercle == nil -- (the catchlights of the big front eyes; a tarantula's are on its tubercle's beads)
 	end
 	local cl = look.chelicerae
+	local jawPivot: { [number]: Vector3 } = {}
 	for _, j in A.jaws do
-		local fang = ellipsoid(model, "Chelicera", j.radii, FANG, Enum.Material.Foil)
+		local fang = ellipsoid(model, "Chelicera", j.radii, if cl.color then color(cl.color) else FANG, Enum.Material.Foil) -- (ROBLOX-127: a colour of their own, the bold jumper's green)
 		fang.Reflectance = cl.reflectance
-		fixed(fang, j.at, CFrame.Angles(cl.pitch, 0, j.side * cl.splay), G_HEAD)
+		local entry = fixed(fang, j.at, CFrame.Angles(cl.pitch, 0, j.side * cl.splay), G_HEAD)
+		jawPivot[j.side] = j.at + Vector3.new(0, j.radii.Y * 0.75, j.radii.Z * 0.3) -- the chelicera's base, high at the back, where it joins the face
+		entry.jaw, entry.pivot = j.side, jawPivot[j.side]
 	end
 	-- Fangs (look.fang): chains of dark, glossy ellipsoids hanging from the chelicerae's lower front, each segment turned along its own direction.
 	for _, f in A.fangs do
@@ -25257,7 +25599,8 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		local tooth = ellipsoid(model, "Fang", f.radii, if look.fang.color then color(look.fang.color) else FANG, Enum.Material.Foil)
 		tooth.Reflectance = look.fang.reflectance
 		tooth.CastShadow = false
-		fixed(tooth, f.at, CFrame.lookAt(Vector3.zero, f.dir), G_HEAD)
+		local entry = fixed(tooth, f.at, CFrame.lookAt(Vector3.zero, f.dir), G_HEAD)
+		entry.jaw, entry.pivot = f.side, jawPivot[f.side] -- (a fang goes where its chelicera goes)
 	end
 	-- Pedipalps: stalk, pale band, club and pale tip, rotating about a pivot at the base (they drum when the spider stands).
 	local pl = look.palp
@@ -25444,6 +25787,19 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 				table.insert(leg.hairs, entry)
 				table.insert(leg.segs[spec.segment].hairs, entry)
 			end
+			-- (ROBLOX-127) the fringe: longer hairs of their own width standing out from the link's sides (look.fuzz.legFringe), one in `every.legFringe` kept
+			local keepFringe = cfg.every.legFringe or 1
+			for n, spec in Setae.legFringe(look, i) do
+				if keepFringe <= 0 or n % keepFringe ~= 0 then continue end
+				local c, sn, lie = math.cos(spec.theta), math.sin(spec.theta), spec.lift or 1
+				local width = spec.width or fuzz.legWidth
+				local entry: LegHair = {
+					part = seta(spec.tone, width, width, spec.length, spec.transparency or fuzz.legTransparency), spec = spec, c = c, s = sn, k = 0.9,
+					dir = Vector3.new(math.cos(lie), math.sin(lie) * c, math.sin(lie) * sn),
+				}
+				table.insert(leg.hairs, entry)
+				table.insert(leg.segs[spec.segment].hairs, entry)
+			end
 		end
 	end
 	if look.legGloss then -- the Greenbottle blue's legs are a little glossy
@@ -25551,7 +25907,7 @@ function SpiderRig.setSoftness(self: Rig, value: number)
  self._softness=s
  for p,c in self._colors do
   -- The eyes stay dark and readable; pigment returns as the skin hardens.
-  if p.Material~=Enum.Material.Glass and p.Name~="Catchlight" then p.Color=c:Lerp(Color3.new(0.88,0.82,0.69),s*0.72) end
+  if p.Material~=Enum.Material.Glass and p.Name~="Catchlight" and p.Name~="Retina" then p.Color=c:Lerp(Color3.new(0.88,0.82,0.69),s*0.72) end
  end
 end
 function SpiderRig.setCondition(self: Rig, energy: number)
@@ -25757,8 +26113,14 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 	end
 	-- A tarantula's threat display and silk mat (ROBLOX-82): the drawn body pivots about its up axis (the root and the collider do not); what else
 	-- the pose does (rears the prosoma, raises legs I and the palps, swings the spinnerets) is further down.
-	local threatPose = if self._appearance.threat ~= nil then self.threat else nil
+	-- (ROBLOX-127) the rival's contest display (look.contest, a RivalDisplay pose) goes the same way, with a sideways step of the drawn body (`lateral`, studs at scale 1:
+	-- the zigzag), legs I between three places (`reach`, `hook`), the chelicerae spread (`spread`) and a crouch (`lower`).
+	local tc = self._appearance.threat or self._appearance.contest
+	local threatPose = if tc ~= nil then self.threat else nil
 	local threatening = threatPose ~= nil and threatPose.presence > 0
+	if threatening and (threatPose.lateral or 0) ~= 0 then
+		body = body * CFrame.new(threatPose.lateral * self._growth, 0, 0)
+	end
 	if threatening and threatPose.yaw ~= 0 then
 		body = body * CFrame.Angles(0, threatPose.yaw, 0)
 	end
@@ -25936,7 +26298,13 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 	end
 	if threatening then
 		palp1, palp2 = palp1 + threatPose.palps, palp2 + threatPose.palps
+		local sink = (threatPose.lower or 0) * (if tc.lower then tc.lower else 0)
+		if sink ~= 0 then -- backing off: the whole drawn body low to the surface (the planted feet stay where they are)
+			local down = body * CFrame.new(0, -sink * g, 0) * body:Inverse()
+			bodyBase, headBase, abdomenBase, prosoma = down * bodyBase, down * headBase, down * abdomenBase, down * prosoma
+		end
 	end
+	local spreadAngle = if threatening and tc.spreadDeg then math.rad(tc.spreadDeg) * (threatPose.spread or 0) else 0
  if self._hang > 0 and hang ~= nil then -- hanging: the palps are drawn in toward the jaws
   local tuck = -math.rad(hang.palpTuckDeg) * self._hang
   palp1, palp2 = palp1 + tuck, palp2 + tuck
@@ -25972,9 +26340,13 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 		else
 			local offset, edited = f.offset, false
 			if f.glance == true and glanced then offset, edited = CFrame.new(glanceAt) * offset, true end
+			if spreadAngle ~= 0 and f.jaw ~= nil and f.pivot ~= nil then
+				-- The rival's display: each chelicera (and its fang) swings out about its base, the tip outward and a little apart (ROBLOX-127).
+				local side, at = f.jaw, f.pivot
+				offset, edited = CFrame.new(at) * CFrame.Angles(0, -side * spreadAngle * 0.35, side * spreadAngle) * CFrame.new(-at) * offset, true
+			end
 			if sweeping and f.sweep ~= nil then
 				-- A spinneret segment swings side to side about a point just inside the abdomen's rear tip (the second segment farther).
-				local tc = look.threat
 				local at = A.spinneret - Vector3.new(0, 0, tc.sweepBack)
 				offset, edited = CFrame.new(at) * CFrame.Angles(0, threatPose.sweep * (if f.sweep > 1 then tc.tipSweep else 1), 0) * CFrame.new(-at) * offset, true
 			end
@@ -26145,9 +26517,11 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 			knee = knee:Lerp(raisedKnee, antPose.antennae)
 		end
 		-- The threat posture: legs I go up and out in front of the reared prosoma, trembling a little; the planted foot below is untouched.
-		local tc = look.threat
 		if threatening and tc ~= nil and leg.pair == tc.pair and threatPose.legs > 0 then
 			local upAt = Vector3.new(leg.side * tc.up.x, tc.up.y + threatPose.tremor * tc.tremor, tc.up.z)
+			local reach, hook = threatPose.reach or 0, threatPose.hook or 0
+			if reach > 0 and tc.wide then upAt = upAt:Lerp(Vector3.new(leg.side * tc.wide.x, tc.wide.y + threatPose.tremor * tc.tremor, tc.wide.z), reach) end -- (ROBLOX-127: high and spread)
+			if hook > 0 and tc.hook then upAt = upAt:Lerp(Vector3.new(leg.side * tc.hook.x, tc.hook.y, tc.hook.z), hook) end -- (forward and down, grappling)
 			local raised = prosoma:PointToWorldSpace(upAt * g)
 			foot = foot:Lerp(raised, threatPose.legs)
 			local raisedKnee = hip:Lerp(raised, 0.5) + prosoma.RightVector * (leg.side * tc.kneeOut * g) + up * (tc.kneeUp * g)
@@ -26281,7 +26655,7 @@ return SpiderRig
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="131">
+        <Item class="ModuleScript" referent="132">
           <Properties>
             <string name="Name">TarantulaPose</string>
             <string name="Source"><![CDATA[--!strict
@@ -26456,11 +26830,11 @@ return TarantulaPose
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="132">
+      <Item class="Folder" referent="133">
         <Properties>
           <string name="Name">UI</string>
         </Properties>
-        <Item class="ModuleScript" referent="133">
+        <Item class="ModuleScript" referent="134">
           <Properties>
             <string name="Name">AntMimicText</string>
             <string name="Source"><![CDATA[--!strict
@@ -26501,7 +26875,7 @@ return AntMimicText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="134">
+        <Item class="ModuleScript" referent="135">
           <Properties>
             <string name="Name">BirdText</string>
             <string name="Source"><![CDATA[--!strict
@@ -26530,7 +26904,7 @@ return table.freeze(BirdText)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="135">
+        <Item class="ModuleScript" referent="136">
           <Properties>
             <string name="Name">CatText</string>
             <string name="Source"><![CDATA[--!strict
@@ -26560,7 +26934,7 @@ return table.freeze(CatText)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="136">
+        <Item class="ModuleScript" referent="137">
           <Properties>
             <string name="Name">ControlText</string>
             <string name="Source"><![CDATA[--!strict
@@ -26826,7 +27200,7 @@ return ControlText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="137">
+        <Item class="ModuleScript" referent="138">
           <Properties>
             <string name="Name">CrabText</string>
             <string name="Source"><![CDATA[--!strict
@@ -26843,7 +27217,7 @@ return table.freeze(CrabText)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="138">
+        <Item class="ModuleScript" referent="139">
           <Properties>
             <string name="Name">EyeOptics</string>
             <string name="Source"><![CDATA[--!strict
@@ -27177,7 +27551,7 @@ return EyeOptics
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="139">
+        <Item class="ModuleScript" referent="140">
           <Properties>
             <string name="Name">FrogText</string>
             <string name="Source"><![CDATA[--!strict
@@ -27194,7 +27568,7 @@ return table.freeze(FrogText)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="140">
+        <Item class="ModuleScript" referent="141">
           <Properties>
             <string name="Name">Heard</string>
             <string name="Source"><![CDATA[--!strict
@@ -27219,7 +27593,7 @@ return Heard
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="141">
+        <Item class="ModuleScript" referent="142">
           <Properties>
             <string name="Name">HudLayout</string>
             <string name="Source"><![CDATA[--!strict
@@ -27379,7 +27753,7 @@ return HudLayout
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="142">
+        <Item class="ModuleScript" referent="143">
           <Properties>
             <string name="Name">InspectText</string>
             <string name="Source"><![CDATA[--!strict
@@ -27432,7 +27806,7 @@ return InspectText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="143">
+        <Item class="ModuleScript" referent="144">
           <Properties>
             <string name="Name">LifeText</string>
             <string name="Source"><![CDATA[--!strict
@@ -27705,7 +28079,7 @@ return LifeText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="144">
+        <Item class="ModuleScript" referent="145">
           <Properties>
             <string name="Name">MateText</string>
             <string name="Source"><![CDATA[--!strict
@@ -27897,7 +28271,7 @@ return MateText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="145">
+        <Item class="ModuleScript" referent="146">
           <Properties>
             <string name="Name">NotebookText</string>
             <string name="Source"><![CDATA[--!strict
@@ -28048,7 +28422,7 @@ return NotebookText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="146">
+        <Item class="ModuleScript" referent="147">
           <Properties>
             <string name="Name">PeacockText</string>
             <string name="Source"><![CDATA[--!strict
@@ -28151,7 +28525,7 @@ return PeacockText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="147">
+        <Item class="ModuleScript" referent="148">
           <Properties>
             <string name="Name">PerceptionShapes</string>
             <string name="Source"><![CDATA[--!strict
@@ -28258,7 +28632,7 @@ return Shapes
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="148">
+        <Item class="ModuleScript" referent="149">
           <Properties>
             <string name="Name">PerceptionText</string>
             <string name="Source"><![CDATA[--!strict
@@ -28274,7 +28648,7 @@ return table.freeze(Text)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="149">
+        <Item class="ModuleScript" referent="150">
           <Properties>
             <string name="Name">PerceptionView</string>
             <string name="Source"><![CDATA[--!strict
@@ -28323,7 +28697,7 @@ return View
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="150">
+        <Item class="ModuleScript" referent="151">
           <Properties>
             <string name="Name">PreyText</string>
             <string name="Source"><![CDATA[--!strict
@@ -28370,7 +28744,7 @@ return PreyText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="151">
+        <Item class="ModuleScript" referent="152">
           <Properties>
             <string name="Name">QuietHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -28566,7 +28940,7 @@ return QuietHud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="152">
+        <Item class="ModuleScript" referent="153">
           <Properties>
             <string name="Name">RivalText</string>
             <string name="Source"><![CDATA[--!strict
@@ -28617,7 +28991,7 @@ return RivalText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="153">
+        <Item class="ModuleScript" referent="154">
           <Properties>
             <string name="Name">SaveText</string>
             <string name="Source"><![CDATA[--!strict
@@ -28689,7 +29063,7 @@ return SaveText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="154">
+        <Item class="ModuleScript" referent="155">
           <Properties>
             <string name="Name">SettingsModel</string>
             <string name="Source"><![CDATA[--!strict
@@ -28962,7 +29336,7 @@ return SettingsModel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="155">
+        <Item class="ModuleScript" referent="156">
           <Properties>
             <string name="Name">SettingsNav</string>
             <string name="Source"><![CDATA[--!strict
@@ -29073,7 +29447,7 @@ return SettingsNav
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="156">
+        <Item class="ModuleScript" referent="157">
           <Properties>
             <string name="Name">SettingsText</string>
             <string name="Source"><![CDATA[--!strict
@@ -29198,7 +29572,7 @@ return SettingsText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="157">
+        <Item class="ModuleScript" referent="158">
           <Properties>
             <string name="Name">TarantulaText</string>
             <string name="Source"><![CDATA[--!strict
@@ -29240,7 +29614,7 @@ return TarantulaText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="158">
+        <Item class="ModuleScript" referent="159">
           <Properties>
             <string name="Name">TitleText</string>
             <string name="Source"><![CDATA[--!strict
@@ -29318,7 +29692,7 @@ return TitleText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="159">
+        <Item class="ModuleScript" referent="160">
           <Properties>
             <string name="Name">WaspText</string>
             <string name="Source"><![CDATA[--!strict
@@ -29452,7 +29826,7 @@ return WaspText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="160">
+        <Item class="ModuleScript" referent="161">
           <Properties>
             <string name="Name">WaterText</string>
             <string name="Source"><![CDATA[--!strict
@@ -29472,11 +29846,11 @@ return table.freeze(WaterText)
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="161">
+      <Item class="Folder" referent="162">
         <Properties>
           <string name="Name">World</string>
         </Properties>
-        <Item class="ModuleScript" referent="162">
+        <Item class="ModuleScript" referent="163">
           <Properties>
             <string name="Name">Garden</string>
             <string name="Source"><![CDATA[--!strict
@@ -32198,7 +32572,7 @@ return table.freeze(Garden)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="163">
+        <Item class="ModuleScript" referent="164">
           <Properties>
             <string name="Name">Hut</string>
             <string name="Source"><![CDATA[--!strict
@@ -34963,7 +35337,7 @@ return Hut
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="164">
+        <Item class="ModuleScript" referent="165">
           <Properties>
             <string name="Name">LookPlan</string>
             <string name="Source"><![CDATA[--!strict
@@ -35232,7 +35606,7 @@ return table.freeze(LookPlan)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="165">
+        <Item class="ModuleScript" referent="166">
           <Properties>
             <string name="Name">Meadow</string>
             <string name="Source"><![CDATA[--!strict
@@ -36509,7 +36883,7 @@ return Meadow
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="166">
+        <Item class="ModuleScript" referent="167">
           <Properties>
             <string name="Name">Pond</string>
             <string name="Source"><![CDATA[--!strict
@@ -37821,7 +38195,7 @@ return Pond
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="167">
+        <Item class="ModuleScript" referent="168">
           <Properties>
             <string name="Name">Preserve</string>
             <string name="Source"><![CDATA[--!strict
@@ -37978,7 +38352,7 @@ return table.freeze(Preserve)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="168">
+        <Item class="ModuleScript" referent="169">
           <Properties>
             <string name="Name">PreserveLook</string>
             <string name="Source"><![CDATA[--!strict
@@ -38993,7 +39367,7 @@ return table.freeze(PreserveLook)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="169">
+        <Item class="ModuleScript" referent="170">
           <Properties>
             <string name="Name">PreserveTrain</string>
             <string name="Source"><![CDATA[--!strict
@@ -39097,7 +39471,7 @@ return table.freeze(PreserveTrain)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="170">
+        <Item class="ModuleScript" referent="171">
           <Properties>
             <string name="Name">Region</string>
             <string name="Source"><![CDATA[--!strict
@@ -39229,7 +39603,7 @@ return table.freeze(Region)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="171">
+        <Item class="ModuleScript" referent="172">
           <Properties>
             <string name="Name">WorldBuild</string>
             <string name="Source"><![CDATA[--!strict
@@ -39317,7 +39691,7 @@ return table.freeze(WorldBuild)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="172">
+        <Item class="ModuleScript" referent="173">
           <Properties>
             <string name="Name">WorldMap</string>
             <string name="Source"><![CDATA[--!strict
@@ -39849,7 +40223,7 @@ return table.freeze(WorldMap)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="173">
+        <Item class="ModuleScript" referent="174">
           <Properties>
             <string name="Name">Worlds</string>
             <string name="Source"><![CDATA[--!strict
@@ -39909,15 +40283,15 @@ return table.freeze(Worlds)
       </Item>
     </Item>
   </Item>
-  <Item class="ServerScriptService" referent="174">
+  <Item class="ServerScriptService" referent="175">
     <Properties>
       <string name="Name">ServerScriptService</string>
     </Properties>
-    <Item class="Folder" referent="175">
+    <Item class="Folder" referent="176">
       <Properties>
         <string name="Name">PortTests</string>
       </Properties>
-      <Item class="ModuleScript" referent="176">
+      <Item class="ModuleScript" referent="177">
         <Properties>
           <string name="Name">AntMimicSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -40014,15 +40388,15 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="177">
+      <Item class="ModuleScript" referent="178">
         <Properties>
           <string name="Name">BuildInfo</string>
           <string name="Source"><![CDATA[-- Generated by tools/build.py; do not edit.
-return { id = "ba13f0c9aa9f4cc6" }
+return { id = "eb473b6da5edf1dc" }
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="178">
+      <Item class="ModuleScript" referent="179">
         <Properties>
           <string name="Name">GraphicsSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -40144,7 +40518,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="179">
+      <Item class="ModuleScript" referent="180">
         <Properties>
           <string name="Name">GrowthSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -40201,7 +40575,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="180">
+      <Item class="ModuleScript" referent="181">
         <Properties>
           <string name="Name">LifeSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -40377,7 +40751,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="181">
+      <Item class="ModuleScript" referent="182">
         <Properties>
           <string name="Name">NotebookSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -40538,7 +40912,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="182">
+      <Item class="ModuleScript" referent="183">
         <Properties>
           <string name="Name">PeacockSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -40609,7 +40983,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="183">
+      <Item class="ModuleScript" referent="184">
         <Properties>
           <string name="Name">PerceptionSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -40709,7 +41083,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="184">
+      <Item class="ModuleScript" referent="185">
         <Properties>
           <string name="Name">PreySpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -40804,7 +41178,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="185">
+      <Item class="ModuleScript" referent="186">
         <Properties>
           <string name="Name">PromptSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -40907,7 +41281,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="186">
+      <Item class="ModuleScript" referent="187">
         <Properties>
           <string name="Name">RecoveryScenarios</string>
           <string name="Source"><![CDATA[--!strict
@@ -41438,7 +41812,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="187">
+      <Item class="ModuleScript" referent="188">
         <Properties>
           <string name="Name">RivalSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -41533,7 +41907,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Script" referent="188">
+      <Item class="Script" referent="189">
         <Properties>
           <string name="Name">Runner</string>
           <token name="RunContext">0</token>
@@ -41597,7 +41971,7 @@ if failed > 0 then warn("PORT_TEST_FAIL") end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="189">
+      <Item class="ModuleScript" referent="190">
         <Properties>
           <string name="Name">SettingsSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -41797,7 +42171,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="190">
+      <Item class="ModuleScript" referent="191">
         <Properties>
           <string name="Name">SilkSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -41913,7 +42287,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="191">
+      <Item class="ModuleScript" referent="192">
         <Properties>
           <string name="Name">Spec</string>
           <string name="Source"><![CDATA[--!strict
@@ -42044,7 +42418,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="192">
+      <Item class="ModuleScript" referent="193">
         <Properties>
           <string name="Name">StateFixture</string>
           <string name="Source"><![CDATA[--!strict
@@ -42058,7 +42432,7 @@ return {
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="193">
+      <Item class="ModuleScript" referent="194">
         <Properties>
           <string name="Name">StateSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -42248,7 +42622,7 @@ end
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="194">
+      <Item class="ModuleScript" referent="195">
         <Properties>
           <string name="Name">WaspSpec</string>
           <string name="Source"><![CDATA[--!strict
@@ -42411,11 +42785,11 @@ end
         </Properties>
       </Item>
     </Item>
-    <Item class="Folder" referent="195">
+    <Item class="Folder" referent="196">
       <Properties>
         <string name="Name">Server</string>
       </Properties>
-      <Item class="ModuleScript" referent="196">
+      <Item class="ModuleScript" referent="197">
         <Properties>
           <string name="Name">DataStoreBackend</string>
           <string name="Source"><![CDATA[--!strict
@@ -42450,7 +42824,7 @@ return DataStoreBackend
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Script" referent="197">
+      <Item class="Script" referent="198">
         <Properties>
           <string name="Name">Main</string>
           <token name="RunContext">0</token>
@@ -42529,7 +42903,7 @@ WorldFocus.listen(ReplicatedStorage, foci)
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Script" referent="198">
+      <Item class="Script" referent="199">
         <Properties>
           <string name="Name">Persistence</string>
           <token name="RunContext">0</token>
@@ -42623,7 +42997,7 @@ end)
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="199">
+      <Item class="ModuleScript" referent="200">
         <Properties>
           <string name="Name">SaveService</string>
           <string name="Source"><![CDATA[--!strict
@@ -42830,7 +43204,7 @@ return SaveService
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="200">
+      <Item class="ModuleScript" referent="201">
         <Properties>
           <string name="Name">WorldFocus</string>
           <string name="Source"><![CDATA[--!strict
@@ -42954,19 +43328,19 @@ return table.freeze(WorldFocus)
       </Item>
     </Item>
   </Item>
-  <Item class="StarterPlayer" referent="201">
+  <Item class="StarterPlayer" referent="202">
     <Properties>
       <string name="Name">StarterPlayer</string>
     </Properties>
-    <Item class="StarterPlayerScripts" referent="202">
+    <Item class="StarterPlayerScripts" referent="203">
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="Folder" referent="203">
+      <Item class="Folder" referent="204">
         <Properties>
           <string name="Name">Client</string>
         </Properties>
-        <Item class="ModuleScript" referent="204">
+        <Item class="ModuleScript" referent="205">
           <Properties>
             <string name="Name">BirdBody</string>
             <string name="Source"><![CDATA[--!strict
@@ -42976,6 +43350,9 @@ return table.freeze(WorldFocus)
 -- hop, a peck at the ground, the watch (head cocked at the spider, still: the honest tell), the strike (bill driven down and forward), and in the air its wings out.
 -- Its shadow is a dark soft oval on the ground under it, broad and faint high up, small and dark when it stands. Every part anchored, never collides, never seen by a
 -- ray, the body casts no engine shadow of its own (the drawn one is the shadow, so the two never double). One Workspace:BulkMoveTo a frame. Display only.
+-- ROBLOX-128: the foraging posture as the BC Field Ornithologists' note on robins finding worms describes it: stopped, it stands erect and still, turning its head
+-- now and then as if looking at the ground; once it has seen something (the watch, the tell) it crouches into a horizontal posture and cocks its head at it. The
+-- hop is level. Its parts' transparency is written only when it changes, and the frame's lists are kept, not made anew.
 -- The open ground's voices are here too (SOUNDS, "" until Nathan uploads tools/make_meadow_sounds.py's robin_call.wav and cricket_chirp.wav): the robin's call while it
 -- calls, as loud as Predator/Bird.call says, and the nearest singing field cricket's chirps (Prey/PreyKinds.chirping), as loud as the client hears it.
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -43007,8 +43384,10 @@ function BirdBody.parts(pose: string, t: number, cock: number, strike: number): 
 	end
 	local flying = pose == "fly" or pose == "land" or pose == "leave"
 	-- the body: level in flight, its tail tipped down a little standing
-	local lift = if flying then 0 else 6.2
-	local pitch = if flying then 0 elseif pose == "peck" or pose == "strike" then math.rad(-22) else math.rad(-8)
+	-- (ROBLOX-128) erect standing, level hopping, crouched level watching
+	local lift = if flying then 0 elseif pose == "watch" then 5.2 else 6.2
+	local pitch = if flying then 0 elseif pose == "peck" or pose == "strike" then math.rad(-22) elseif pose == "stand" then math.rad(10)
+		elseif pose == "watch" then math.rad(-2) else math.rad(-6)
 	local body = CFrame.new(0, lift + 3.2, 0.5) * CFrame.Angles(pitch, 0, 0)
 	ell("Body", body, Vector3.new(7.6, 7.4, 13.5), C.back)
 	ell("Breast", body * CFrame.new(0, -0.7, -2.9), Vector3.new(7.3, 6.9, 9.2), C.breast)
@@ -43017,7 +43396,12 @@ function BirdBody.parts(pose: string, t: number, cock: number, strike: number): 
 	-- the head: on the neck at the body's front; cocked (rolled to a side, looking down at the ground with one eye), down for a peck, forward and down in the stab
 	local neck = body * CFrame.new(0, 2.6, -5.6)
 	local headTurn = CFrame.new()
-	if pose == "stand" or pose == "watch" then headTurn = CFrame.Angles(math.rad(-10), 0, math.rad(32) * cock)
+	if pose == "stand" then
+		-- (ROBLOX-128) looking about: its head turns slowly from side to side and tips toward the ground now and then
+		local glance = math.sin(t * 0.83) * 0.6 + math.sin(t * 2.1 + 1.3) * 0.25
+		local tilt = math.max(0, math.sin(t * 0.47 + 0.4))
+		headTurn = CFrame.Angles(math.rad(-6 - 14 * tilt), math.rad(28) * glance, math.rad(32) * cock * tilt)
+	elseif pose == "watch" then headTurn = CFrame.Angles(math.rad(-10), 0, math.rad(32) * cock)
 	elseif pose == "peck" then headTurn = CFrame.Angles(math.rad(-60), 0, 0) * CFrame.new(0, -1.5, -1.0)
 	elseif pose == "strike" then headTurn = CFrame.new(0, -2.5 * strike, -3.0 * strike) * CFrame.Angles(math.rad(-55) * strike, 0, 0) end
 	local head = neck * headTurn * CFrame.new(0, 1.4, -0.8)
@@ -43073,7 +43457,7 @@ function BirdBody.new(parent: Instance, detail: string): any
 	shadowBody.Transparency = 1
 	shadowBody.CastShadow = false
 	local self = setmetatable({ folder = folder, detail = detail, model = nil :: Instance?, parts = {} :: { [string]: BasePart }, shadow = shadow, shadowBody = shadowBody, t = 0,
-		voices = {} :: { [string]: Sound }, shown = false }, BirdBody)
+		voices = {} :: { [string]: Sound }, shown = false, moved = {} :: { BasePart }, frames = {} :: { CFrame }, seen = {} :: { [string]: boolean } }, BirdBody)
 	for name, id in BirdBody.SOUNDS do
 		if id ~= "" then
 			local s = Instance.new("Sound")
@@ -43129,9 +43513,12 @@ function BirdBody.draw(self: any, bird: any, dt: number, call: number, chirp: nu
 	local strike = if bird.strikeS ~= nil and bird.strikeS >= 0 then math.clamp(bird.strikeS / 0.1, 0, 1) * (1 - math.clamp((bird.strikeS - 0.2) / 0.3, 0, 1)) else 0
 	local pose = if strike > 0 then "strike" else bird.pose
 	local frame = CFrame.lookAt(bird.pos, bird.pos + bird.heading)
-	local moved: { BasePart } = {}
-	local frames: { CFrame } = {}
-	local seen: { [string]: boolean } = {}
+	local moved: { BasePart } = self.moved -- (ROBLOX-128: kept, not made anew each frame)
+	local frames: { CFrame } = self.frames
+	local seen: { [string]: boolean } = self.seen
+	table.clear(moved)
+	table.clear(frames)
+	table.clear(seen)
 	for _, spec in BirdBody.parts(pose, self.t, bird.cock or 1, strike) do
 		local p = self.parts[spec.name]
 		if p ~= nil then
@@ -43141,7 +43528,10 @@ function BirdBody.draw(self: any, bird: any, dt: number, call: number, chirp: nu
 			table.insert(frames, frame * spec.frame)
 		end
 	end
-	for name, p in self.parts do p.Transparency = if seen[name] then 0 else 1 end
+	for name, p in self.parts do
+		local want = if seen[name] then 0 else 1
+		if p.Transparency ~= want then p.Transparency = want end
+	end
 	-- the shadow: under it on the ground, broad and faint the higher it flies
 	local ground = bird.shadow or Vector3.new(bird.pos.X, bird.pos.Y, bird.pos.Z)
 	local high = math.max(0, bird.pos.Y - ground.Y)
@@ -43164,7 +43554,7 @@ return BirdBody
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="205">
+        <Item class="ModuleScript" referent="206">
           <Properties>
             <string name="Name">BugBodies</string>
             <string name="Source"><![CDATA[--!strict
@@ -43189,6 +43579,9 @@ return BirdBody
 --   harvestman ... a small oval body with its eye turret and palps, high on eight long legs of two segments each (the second pair longest), stepping;
 --                  by day (`hidden`) it is away and drawn nowhere near
 -- Reduced Motion keeps the steps and stills the rest (antennae, the ladybird's head, the snail's feelers' sway).
+-- ROBLOX-128 (the small lives): the ant's elbowed antennae sweep as it goes (both sides, each its own phase); the water strider rows: its middle legs, the oars, sweep
+-- back together in a quick stroke and come forward slowly while it glides (a stroke per `stride` of water covered, about a body length; MIT's 2003 note on Hu, Chan
+-- and Bush: the middle legs row, a glide carries it about a body length), its feet's dimples going with them. No part added.
 local Workspace = game:GetService("Workspace")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
@@ -43237,13 +43630,14 @@ BugBodies.ambient = {
 	-- (ROBLOX-119) a small brown field ant of the meadow's hill, about 4 mm: head, thorax, the waist's node and the gaster, six legs, elbowed antennae
 	ant = {
 		colors = { head = "3a2618", thorax = "5a3a22", gaster = "2e1f14", leg = "4a3020", antenna = "3a2618" },
-		motion = { gait = { stride = 0.18, swing = 0.4, lift = 0.3, settle = 12, jump = 1.0 } },
+		motion = { gait = { stride = 0.18, swing = 0.4, lift = 0.3, settle = 12, jump = 1.0 }, antenna = { amp = 0.3, hz = 1.8 } },
 	},
 	-- (ROBLOX-122) a water strider of the pond, about 1.2 cm: a slim dark body, short front legs held up to grab, the long middle legs (the oars) and hind legs (the
 	-- rudders) spread wide on the water, each foot in a dimple of the surface
 	skater = {
 		colors = { body = "2e2a24", belly = "6a6458", leg = "3a342c", dimple = "c8d4d6" },
-		motion = { gait = { stride = 3.0, swing = 0.2, lift = 0.0, settle = 8, jump = 30.0 } },
+		-- (ROBLOX-128) `row`: the oar's sweep back (rad) and the share of a stroke spent pulling (the rest is the slow reach forward)
+		motion = { gait = { stride = 1.5, swing = 0.2, lift = 0.0, settle = 8, jump = 30.0 }, row = { sweep = 0.38, pull = 0.3 } },
 	},
 	harvestman = {
 		colors = { body = "6e5034", turret = "3a2a1c", leg = "5a4330", palp = "6a4e36" },
@@ -43477,8 +43871,11 @@ local function buildAnt(tier: string): { Spec }
 		if tier ~= "low" then
 			local base = v(0.03 * side, 0.05, -0.19)
 			local elbow = base + v(0.05 * side, 0.03, -0.04)
-			table.insert(out, rodSpec(`Scape{side}`, base, elbow, 0.01, hex(C.antenna), nil, side, 0))
-			table.insert(out, rodSpec(`Flagellum{side}`, elbow, elbow + v(0.04 * side, -0.02, -0.07), 0.01, hex(C.antenna), nil, side, 0))
+			local scape = rodSpec(`Scape{side}`, base, elbow, 0.01, hex(C.antenna), "antenna", side, 0)
+			local flag = rodSpec(`Flagellum{side}`, elbow, elbow + v(0.04 * side, -0.02, -0.07), 0.01, hex(C.antenna), "antenna", side, 0)
+			flag.hip = base -- (ROBLOX-128: the whole antenna sweeps from its base)
+			table.insert(out, scape)
+			table.insert(out, flag)
 		end
 	end
 	return out
@@ -43499,11 +43896,16 @@ local function buildSkater(tier: string): { Spec }
 		-- the middle legs: the oars, long, out and back; the hind legs trailing
 		for i, leg in { { from = v(0.06 * side, 0, -0.12), knee = v(0.7 * side, 0.05, -0.05), foot = v(1.5 * side, -SKATER_HOVER, 0.35) },
 			{ from = v(0.06 * side, 0, 0.0), knee = v(0.5 * side, 0.04, 0.45), foot = v(0.75 * side, -SKATER_HOVER, 1.35) } } do
-			table.insert(out, rodSpec(`Femur{word}{i}`, leg.from, leg.knee, 0.022, hex(C.leg), nil, side, i + 1))
-			table.insert(out, rodSpec(`Tarsus{word}{i}`, leg.knee, leg.foot, 0.016, hex(C.leg), nil, side, i + 1))
+			local role = if i == 1 then "oar" else nil -- (ROBLOX-128: the middle legs row)
+			local femur = rodSpec(`Femur{word}{i}`, leg.from, leg.knee, 0.022, hex(C.leg), role, side, i + 1)
+			local tarsus = rodSpec(`Tarsus{word}{i}`, leg.knee, leg.foot, 0.016, hex(C.leg), role, side, i + 1)
+			tarsus.hip = leg.from
+			table.insert(out, femur)
+			table.insert(out, tarsus)
 			if tier ~= "low" then
-				local d = ball(`Dimple{word}{i}`, leg.foot + v(0, 0.005, 0), v(0.4, 0.01, 0.4), hex(C.dimple))
+				local d = ball(`Dimple{word}{i}`, leg.foot + v(0, 0.005, 0), v(0.4, 0.01, 0.4), hex(C.dimple), role)
 				d.material = "Glass"
+				d.hip, d.side = leg.from, side
 				table.insert(out, d)
 			end
 		end
@@ -43524,7 +43926,7 @@ function BugBodies.new(parent: Instance, tier: string?): any
 	local folder = Instance.new("Folder")
 	folder.Name = "Bugs"
 	folder.Parent = parent
-	return setmetatable({ folder = folder, rigs = {}, template = build(), templates = {}, tier = tier or "full", parts = {}, frames = {} }, BugBodies)
+	return setmetatable({ folder = folder, rigs = {}, template = build(), templates = {}, tier = tier or "full", parts = {}, frames = {}, present = {} :: { [string]: boolean } }, BugBodies)
 end
 
 -- The sheet of a kind at this tier.
@@ -43809,7 +44211,7 @@ local function poseSnail(rig: any, b: any, reduced: boolean, now: number): { CFr
 end
 
 -- The harvestman's frames (away by day: far under the world); (ROBLOX-119) the ant's the same way (away in its nest by night), `kind` its sheet.
-local function poseHarvestman(rig: any, b: any, _reduced: boolean, kind: string?): { CFrame }
+local function poseHarvestman(rig: any, b: any, reduced: boolean, kind: string?): { CFrame }
 	local S = (BugBodies.ambient :: any)[kind or "harvestman"]
 	local out = {}
 	if b.hidden then
@@ -43818,6 +44220,14 @@ local function poseHarvestman(rig: any, b: any, _reduced: boolean, kind: string?
 		return out
 	end
 	local body = surfaceFrame(b.position, b.heading, b.normal)
+	-- (ROBLOX-128) the strider's stroke: a quick pull back, then a slow reach forward, both oars together
+	local oar = 0
+	local R = S.motion.row
+	if R ~= nil and rig.gait > 0 then
+		local u = (rig.stride / (2 * math.pi)) % 1
+		local back = if u < R.pull then math.sin(u / R.pull * math.pi / 2) else math.cos((u - R.pull) / (1 - R.pull) * math.pi / 2)
+		oar = rig.gait * R.sweep * (back - 0.5)
+	end
 	for i, spec in rig.template do
 		local f = spec.frame
 		if spec.role == "leg" then
@@ -43825,6 +44235,12 @@ local function poseHarvestman(rig: any, b: any, _reduced: boolean, kind: string?
 			local phase = rig.stride + (if ((spec.pair or 1) + (if side < 0 then 0 else 1)) % 2 == 0 then 0 else math.pi)
 			local m = stepAbout(spec.hip :: Vector3, side, rig.gait, S.motion.gait, phase)
 			if m ~= nil then f = m * f end
+		elseif spec.role == "antenna" and S.motion.antenna ~= nil then
+			local m = sway(spec, rig, S.motion.antenna, reduced)
+			if m ~= nil then f = m * f end
+		elseif spec.role == "oar" and oar ~= 0 then
+			local hip = spec.hip :: Vector3
+			f = CFrame.new(hip) * CFrame.fromAxisAngle(Vector3.yAxis, -(spec.side or 1) * oar) * CFrame.new(-hip) * f
 		end
 		out[i] = body * f
 	end
@@ -43847,7 +44263,8 @@ function BugBodies.draw(self: any, lice: { any }, now: number?, cameraAt: Vector
 	table.clear(frames)
 	local dtAll = if now ~= nil and self.lastNow ~= nil then math.clamp(now - self.lastNow, 0, 0.25) else 0
 	self.lastNow = now
-	local present: { [string]: boolean } = {}
+	local present: { [string]: boolean } = self.present -- (ROBLOX-128: kept, not made anew each frame)
+	table.clear(present)
 	for _, w in lice do
 		present[w.id] = true
 		local kind = w.kind or "woodlouse"
@@ -43910,7 +44327,7 @@ return BugBodies
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="206">
+        <Item class="ModuleScript" referent="207">
           <Properties>
             <string name="Name">CatBody</string>
             <string name="Source"><![CDATA[--!strict
@@ -44027,7 +44444,7 @@ return CatBody
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="207">
+        <Item class="ModuleScript" referent="208">
           <Properties>
             <string name="Name">CaughtPanel</string>
             <string name="Source"><![CDATA[--!strict
@@ -44214,7 +44631,7 @@ return CaughtPanel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="208">
+        <Item class="ModuleScript" referent="209">
           <Properties>
             <string name="Name">CrabBody</string>
             <string name="Source"><![CDATA[--!strict
@@ -44337,7 +44754,7 @@ return CrabBody
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="209">
+        <Item class="ModuleScript" referent="210">
           <Properties>
             <string name="Name">FlyBodies</string>
             <string name="Source"><![CDATA[--!strict
@@ -44359,6 +44776,11 @@ return CrabBody
 -- dangling; a hopper crouches before its leap and a springtail somersaults through it. Every number is the sheet's `motion` (Data/FlyLook). `draw` takes the
 -- camera's place (a body farther than FlyLook.far.studs is drawn ten times a second, as the rival's rig is) and the Reduced Motion setting (the steps stay,
 -- everything else is still). Phases come from the clock `draw` is given and from distance walked, so a paused game is a still one.
+-- ROBLOX-128 (the small lives): a wingbeat too fast to draw at 60 frames (a sheet's `flap` over FlyLook.BLUR_HZ: the hoverfly's, the midge's, the mosquito's, the
+-- damselfly's) is the trembling blur, never a strobing flap; a fly standing calm and still grooms in seeded bouts (its front legs rubbed together under its
+-- head, or its hind legs drawn back under its abdomen and rubbed); a fly whose take-off is scheduled readies itself (raised, nose up, its middle legs forward); a singing
+-- field cricket holds its forewings raised and dips them through each chirp; the house fly's wings carry two more veins each at the full tier, M1+2 with its
+-- bend (six of its eight bristles gave up their parts: still 39). No part is added to any body; nothing feeds back to the sim.
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
@@ -44393,6 +44815,24 @@ type Leg = { name: string, hip: { number }, knee: { number }, foot: { number } }
 -- (ROBLOX-103) how a part moves: a leg segment turns about its leg's hip (`pair` 1 front to 3 hind, `side` -1 left, +1 right); an antenna about its base; a wing
 -- about its root at rest (`rest`) and in flight (`root`); the furcula is left to its two poses.
 type Anim = { what: string, hip: Vector3, side: number, pair: number, root: Vector3?, rest: Vector3? }
+
+-- (ROBLOX-128) A number in [0, 1) from a body's seed and a count: the grooming schedule's draws (a pure hash, so the same body grooms the same way every time).
+local function hash01(seed: number, n: number): number
+	local x = math.sin(seed * 12.9898 + n * 78.233) * 43758.5453
+	return x - math.floor(x)
+end
+local function between(range: { number }, u: number): number
+	return range[1] + (range[2] - range[1]) * u
+end
+-- (ROBLOX-128) Whether a sheet's flap is drawn as a beat (slow enough for 60 frames) or as the blur.
+local function beats(M: any): boolean
+	return M.flap ~= nil and M.flap.hz <= FlyLook.BLUR_HZ
+end
+-- (ROBLOX-128) Whether a fly sings now (Prey/PreyKinds.chirping's rule, read here so the drawing needs nothing of the sim's modules).
+local function singing(fly: any): boolean
+	local p = fly.profile
+	return p ~= nil and p.body.chirp == true and (fly.serial or 0) % 2 == 1 and fly.state == "PERCHED" and fly.hop == nil and fly.hushed ~= true
+end
 type Template = {
 	specs: { Spec },
 	restFrames: { CFrame },
@@ -44520,6 +44960,17 @@ local function build(detail: string?): Template
 		add(`{word}Vein`, true, color("vein"), "SmoothPlastic", 0,
 			{ size = veinSize, frame = veinFrame, transparency = V.transparency }, { size = veinSize, frame = veinFrame, transparency = 1 })
 		if not low then
+			-- (ROBLOX-128) R4+5 and M1+2 with its bend, on the upper face, hidden in the blur
+			local VS = W.veins
+			for _, item in VS.items do
+				local a = wing * Vector3.new(side * item.from[1] * W.width / 2, W.thick, item.from[2] * W.length)
+				local b = wing * Vector3.new(side * item.to[1] * W.width / 2, W.thick, item.to[2] * W.length)
+				local size, frame = rodBetween(a, b, VS.diameter, 0, 0)
+				add(`{word}{item.name}`, true, color("vein"), "SmoothPlastic", 0,
+					{ size = size, frame = frame, transparency = VS.transparency }, { size = size, frame = frame, transparency = 1 })
+			end
+		end
+		if not low then
 			local F = W.film
 			local fi = add(`{word}Film`, false, color("film"), "SmoothPlastic", 0,
 				{ size = restSize + Vector3.new(F.grow, 0, F.grow), frame = wing * CFrame.new(0, F.rise, 0), transparency = F.transparency },
@@ -44581,7 +45032,8 @@ local function buildSmall(L: any, tier: string?, shed: boolean?): Template
 		local centre, size = vec(item.at), vec(item.size)
 		local frame = CFrame.new(centre)
 		if item.turn then frame *= CFrame.Angles(math.rad(item.turn[1]), math.rad(item.turn[2]), math.rad(item.turn[3])) end
-		add(item.name, false, color(item.color), "SmoothPlastic", item.reflectance or 0, { size = size, frame = frame, transparency = 0 })
+		local index = add(item.name, false, color(item.color), "SmoothPlastic", item.reflectance or 0, { size = size, frame = frame, transparency = 0 })
+		if item.hinge ~= nil then anim[index] = { what = "sing", hip = vec(item.hinge), side = 0, pair = 0 } end -- (ROBLOX-128: the cricket's forewings)
 	end
 	for _, item in L.rods do
 		local sides: { number } = if item.mirror then { -1, 1 } else { 1 }
@@ -44653,7 +45105,8 @@ function FlyBodies.new(parent: Instance, detail: string?): any
 	local folder = Instance.new("Folder")
 	folder.Name = "Flies"
 	folder.Parent = parent
-	return setmetatable({ folder = folder, rigs = {}, template = build(detail), templates = {} :: { [string]: Template }, parts = {}, frames = {}, detail = detail or "full" }, FlyBodies)
+	return setmetatable({ folder = folder, rigs = {}, template = build(detail), templates = {} :: { [string]: Template }, parts = {}, frames = {}, detail = detail or "full",
+		present = {} :: { [string]: boolean } }, FlyBodies)
 end
 
 -- The template a prey kind is drawn from (Species body.prey_kind): one of FlyLook.small's, built when first asked for, or the house fly's. `kind` may end in
@@ -44693,7 +45146,9 @@ function FlyBodies.spawn(self: any, id: string, kind: string?): any
 	end
 	local rig = { folder = folder, parts = parts, flying = false, kind = kind, template = template,
 		-- (ROBLOX-103) the motion: stride phase, stepping envelope, wing phase, the rig's clock, take-off and landing, the crouch, the far rule's owed time
-		stride = 0, gait = 0, wing = 0, t = 0, crouch = 0, owed = 0, drawn = false, wasFlying = false, seed = offsetOf(id) }
+		stride = 0, gait = 0, wing = 0, t = 0, crouch = 0, owed = 0, drawn = false, wasFlying = false, seed = offsetOf(id),
+		-- (ROBLOX-128) grooming: seconds still and calm, the bout's number, when it begins and ends (in seconds still), its kind; the song's raise
+		still = 0, groomN = 0, groomAt = 0, groomEnd = 0, groomKind = "front", sing = 0 }
 	self.rigs[id] = rig
 	return rig
 end
@@ -44743,14 +45198,47 @@ function FlyBodies.advance(self: any, rig: any, fly: any, dt: number, flying: bo
 	rig.t += dt
 	if flying then
 		if not rig.wasFlying then rig.tookOff = rig.t end
-		local hz = if M.flap then M.flap.hz else 19 / TAU
+		local hz = if beats(M) then M.flap.hz else 19 / TAU
 		rig.wing = (rig.wing + dt * hz * TAU) % TAU
 	elseif rig.wasFlying then
 		rig.landed = rig.t
 	end
 	rig.wasFlying = flying
-	local hop = M.crouch ~= nil and fly.pending ~= nil and not flying
+	local hop = (M.crouch ~= nil or M.ready ~= nil) and fly.pending ~= nil and not flying
 	rig.crouch += ((if hop then 1 else 0) - rig.crouch) * math.min(1, dt * 14)
+	-- (ROBLOX-128) grooming: only standing calm (perched, not alarmed, nothing pending, not walking); anything else starts the count again
+	local Gr = M.groom
+	if Gr ~= nil and not flying and fly.state == "PERCHED" and fly.pending == nil and not walking and rig.gait == 0 then
+		if rig.still == 0 then
+			rig.groomN = 1
+			rig.groomAt = between(Gr.after, hash01(rig.seed, 1))
+			rig.groomEnd = rig.groomAt + between(Gr.bout, hash01(rig.seed, 2))
+			rig.groomKind = "front"
+		end
+		rig.still += dt
+		if rig.still >= rig.groomEnd then
+			rig.groomN += 1
+			local n = rig.groomN
+			rig.groomAt = rig.still + between(Gr.every, hash01(rig.seed, n * 3))
+			rig.groomEnd = rig.groomAt + between(Gr.bout, hash01(rig.seed, n * 3 + 1))
+			-- the front first, and mostly; the hind legs over the wings now and then
+			rig.groomKind = if n % 2 == 1 or hash01(rig.seed, n * 3 + 2) < 0.35 then "front" else "hind"
+		end
+	else
+		rig.still = 0
+	end
+	-- (ROBLOX-128) the song: the forewings rise and settle
+	if M.sing ~= nil then
+		rig.sing += ((if singing(fly) and not flying then 1 else 0) - rig.sing) * math.min(1, dt * M.sing.ease)
+		if rig.sing < 1e-3 then rig.sing = 0 end
+	end
+end
+
+-- (ROBLOX-128) How far into a grooming bout the rig is (0 outside one, easing in and out over a fifth of a second), and the bout's own clock.
+local function grooming(rig: any): (number, number)
+	if rig.still <= 0 or rig.still < rig.groomAt or rig.still >= rig.groomEnd then return 0, 0 end
+	local into, left = rig.still - rig.groomAt, rig.groomEnd - rig.still
+	return math.clamp(math.min(into, left) / 0.2, 0, 1), into
 end
 
 -- (ROBLOX-103) How a part moves within its pose, in the body frame (before the profile's scale), or nil for not at all.
@@ -44761,6 +45249,26 @@ local function moveOf(a: Anim, rig: any, M: any, flying: boolean, reduced: boole
 			if M.dangle == nil or reduced then return nil end
 			local swing = M.dangle.amp * math.sin(rig.t * M.dangle.hz * TAU + a.pair * 1.9 + a.side * 0.7 + seed)
 			return CFrame.new(a.hip) * CFrame.fromAxisAngle(Vector3.xAxis, swing) * CFrame.new(-a.hip)
+		end
+		if not flying and not reduced and rig.gait <= 0 then
+			-- (ROBLOX-128) readying for take-off: the middle legs swung forward
+			if M.ready ~= nil and rig.crouch > 1e-3 and M.crouch == nil and a.pair == 2 then
+				return CFrame.new(a.hip) * CFrame.fromAxisAngle(Vector3.yAxis, a.side * M.ready.legs * rig.crouch) * CFrame.new(-a.hip)
+			end
+			-- (ROBLOX-128) grooming: the front legs in under the head, raised, rubbing against each other; or the hind legs drawn back and rubbed together
+			local Gr = M.groom
+			local k, into = grooming(rig)
+			if Gr ~= nil and k > 0 then
+				local rub = math.sin(into * Gr.hz * TAU)
+				if rig.groomKind == "front" and a.pair == 1 then
+					local inward = k * (0.55 + Gr.amp * rub * a.side)
+					return CFrame.new(a.hip) * CFrame.fromAxisAngle(Vector3.yAxis, a.side * inward) * CFrame.fromAxisAngle(Vector3.zAxis, a.side * k * (0.55 + 0.5 * Gr.amp * rub)) * CFrame.new(-a.hip)
+				elseif rig.groomKind == "hind" and a.pair == 3 then
+					-- drawn back under the abdomen's tip and rubbed against each other, a little raised (a short leg cannot reach over a fat abdomen in a drawing)
+					local back = k * (0.45 + Gr.amp * rub * a.side)
+					return CFrame.new(a.hip) * CFrame.fromAxisAngle(Vector3.yAxis, -a.side * back) * CFrame.fromAxisAngle(Vector3.zAxis, a.side * k * 0.2) * CFrame.new(-a.hip)
+				end
+			end
 		end
 		if rig.gait <= 0 then return nil end
 		local offset = if G.wave ~= nil then -a.pair * G.wave + (if a.side < 0 then math.pi else 0)
@@ -44779,7 +45287,7 @@ local function moveOf(a: Anim, rig: any, M: any, flying: boolean, reduced: boole
 	elseif a.what == "wing" then
 		if reduced then return nil end
 		if flying then
-			if M.flap == nil or a.root == nil then return nil end
+			if not beats(M) or a.root == nil then return nil end
 			local stroke = a.side * M.flap.amp * math.sin(rig.wing)
 			return CFrame.new(a.root) * CFrame.fromAxisAngle(Vector3.zAxis, stroke) * CFrame.new(-(a.root :: Vector3))
 		end
@@ -44789,6 +45297,12 @@ local function moveOf(a: Anim, rig: any, M: any, flying: boolean, reduced: boole
 		if since >= R.seconds then return nil end
 		local stroke = a.side * R.amp * (1 - since / R.seconds) * math.sin(since * R.hz * TAU)
 		return CFrame.new(a.rest) * CFrame.fromAxisAngle(Vector3.zAxis, stroke) * CFrame.new(-(a.rest :: Vector3))
+	elseif a.what == "sing" then
+		local S = M.sing
+		if reduced or S == nil or rig.sing <= 0 or flying then return nil end
+		local into = (rig.t % S.period) / S.chirp
+		local dip = if into < 1 then S.dip * math.sin(into * math.pi) else 0
+		return CFrame.new(a.hip) * CFrame.fromAxisAngle(Vector3.xAxis, -rig.sing * (S.raise - dip)) * CFrame.new(-a.hip)
 	end
 	return nil
 end
@@ -44810,6 +45324,10 @@ local function bodyMove(rig: any, fly: any, M: any, flying: boolean, reduced: bo
 		local C = M.crouch
 		return CFrame.new(0, -C.depth * rig.crouch, 0) * CFrame.fromAxisAngle(Vector3.xAxis, C.pitch * rig.crouch)
 	end
+	if not flying and M.ready ~= nil and rig.crouch > 1e-3 then -- (ROBLOX-128) raised on its legs, leaning back, about to go
+		local R = M.ready
+		return CFrame.new(0, R.lift * rig.crouch, 0) * CFrame.fromAxisAngle(Vector3.xAxis, R.pitch * rig.crouch)
+	end
 	return nil
 end
 
@@ -44823,7 +45341,8 @@ function FlyBodies.draw(self: any, flies: { any }, now: number, cameraAt: Vector
 	local still = reduced == true
 	local dtAll = if self.lastNow ~= nil then math.clamp(now - self.lastNow, 0, 0.25) else 0
 	self.lastNow = now
-	local present: { [string]: boolean } = {}
+	local present: { [string]: boolean } = self.present -- (ROBLOX-128: kept, not made anew each frame)
+	table.clear(present)
 	local shimmer = FlyLook.wing.fan.shimmer
 	local FAR = FlyLook.far
 	for _, fly in flies do
@@ -44868,7 +45387,7 @@ function FlyBodies.draw(self: any, flies: { any }, now: number, cameraAt: Vector
 				if move ~= nil then localFrame = move * localFrame end
 			end
 			local frame = body * (CFrame.new(localFrame.Position * scale) * localFrame.Rotation)
-			if flying and template.fans[i] and not still and M.flap == nil then frame *= CFrame.Angles(math.sin(now * shimmer[1] + i) * shimmer[2], 0, 0) end
+			if flying and template.fans[i] and not still and not beats(M) then frame *= CFrame.Angles(math.sin(now * shimmer[1] + i) * shimmer[2], 0, 0) end
 			table.insert(parts, part)
 			table.insert(frames, frame)
 		end
@@ -44887,7 +45406,7 @@ return FlyBodies
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="210">
+        <Item class="ModuleScript" referent="211">
           <Properties>
             <string name="Name">FrameProfile</string>
             <string name="Source"><![CDATA[--!strict
@@ -45028,7 +45547,7 @@ return FrameProfile
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="211">
+        <Item class="ModuleScript" referent="212">
           <Properties>
             <string name="Name">HutLife</string>
             <string name="Source"><![CDATA[--!strict
@@ -45283,7 +45802,7 @@ return HutLife
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="212">
+        <Item class="ModuleScript" referent="213">
           <Properties>
             <string name="Name">LookStream</string>
             <string name="Source"><![CDATA[--!strict
@@ -45565,7 +46084,7 @@ return LookStream
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="213">
+        <Item class="ModuleScript" referent="214">
           <Properties>
             <string name="Name">MateStage</string>
             <string name="Source"><![CDATA[--!strict
@@ -45587,6 +46106,7 @@ local SupportMath = require(Shared:WaitForChild("Movement"):WaitForChild("Suppor
 local PreyRandom = require(Shared:WaitForChild("Prey"):WaitForChild("PreyRandom"))
 local SpiderRig = require(Shared:WaitForChild("Rig"):WaitForChild("SpiderRig"))
 local Growth = require(Shared:WaitForChild("Life"):WaitForChild("Growth"))
+local Appearances = require(Shared:WaitForChild("Data"):WaitForChild("Appearances"))
 
 local MateStage = {}
 MateStage.__index = MateStage
@@ -45750,6 +46270,7 @@ function MateStage.drawMate(self: any, mate: any, appearance: string, dt: number
 		end
 		return
 	end
+	appearance = Appearances.mateLook(appearance, mate.sex) -- (ROBLOX-127: the first spider's male mate has a male's build)
 	if self.rig == nil or self.rigFor ~= appearance then
 		if self.rig ~= nil then self.rig:destroy() end
 		self.rig = SpiderRig.new(self.parent, self.world, appearance, "low", true) -- (living: it breathes and takes the mating scene's cues, for the same parts)
@@ -45917,7 +46438,7 @@ return MateStage
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="214">
+        <Item class="ModuleScript" referent="215">
           <Properties>
             <string name="Name">NotebookArt</string>
             <string name="Source"><![CDATA[--!strict
@@ -45955,7 +46476,7 @@ return Art
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="215">
+        <Item class="ModuleScript" referent="216">
           <Properties>
             <string name="Name">NotebookPanel</string>
             <string name="Source"><![CDATA[--!strict
@@ -46458,7 +46979,7 @@ return NotebookPanel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="216">
+        <Item class="ModuleScript" referent="217">
           <Properties>
             <string name="Name">OldSkins</string>
             <string name="Source"><![CDATA[--!strict
@@ -46503,7 +47024,7 @@ return OldSkins
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="217">
+        <Item class="ModuleScript" referent="218">
           <Properties>
             <string name="Name">PerceptionHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -46743,7 +47264,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="218">
+        <Item class="ModuleScript" referent="219">
           <Properties>
             <string name="Name">PerceptionStage</string>
             <string name="Source"><![CDATA[--!strict
@@ -46788,7 +47309,7 @@ return Stage
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="219">
+        <Item class="ModuleScript" referent="220">
           <Properties>
             <string name="Name">PondBodies</string>
             <string name="Source"><![CDATA[--!strict
@@ -46798,7 +47319,10 @@ return Stage
 --   the frog ..... a green frog (Lithobates clamitans) about 7.8 cm from snout to vent, sitting low: its head green, its back olive-brown and mottled, the ridge down each
 --                  side of its back, its big golden eyes up on top of its head, the eardrum behind each (a male's, twice the eye's width), a white throat that
 --                  pumps as it breathes, its front legs propped and its long hind legs folded under it; when it strikes, its pink tongue out to the spider and
---                  back (Predator/Frog.tongue). Matte, but the eyes.
+--                  back (Predator/Frog.tongue). Matte, but the eyes. (ROBLOX-128) It breathes as a frog does (J. Exp. Biol. 204:2647, the effects of tonic
+--                  lung inflation on ventilation in the frog: the floor of the mouth moves up and down continuously between breaths, the glottis shut, and now
+--                  and then a lung breath, a deeper pump that fills the lungs): the throat flutters, and every few seconds pumps deep and the flanks swell.
+--                  The rates are the game's (a lung breath every 5.2 s, well under the paper's ceiling near 30 a minute).
 --   the darner ... a male common green darner (Anax junius) about 7.5 cm long with a 10 cm wingspan: its big eyes, a green thorax, a long blue abdomen with a dark line
 --                  along it, four clear wings held out flat, a blur as it flies.
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -46823,14 +47347,17 @@ local function rod(out: { Spec }, name: string, a: Vector3, b: Vector3, d: numbe
 	return s
 end
 
+PondBodies.BREATH = 5.2 -- (ROBLOX-128) seconds from one lung breath to the next
 PondBodies.FROG = { head = "6f9a3a", back = "6a6a3a", mottle = "3e4a26", ridge = "8a8a52", belly = "e8e4d0", throat = "f0ecd8", eye = "a8782a", pupil = "141210",
 	tympanum = "6a5a3a", leg = "5e6a34", band = "3a4426", tongue = "d88a8a" }
 -- The frog's parts in its own frame (its seat under it at y 0, ahead -z), the throat pumped by `throat` (0..1), its tongue out `tongue` studs (0: in).
-function PondBodies.frogParts(throat: number, tongue: number): { Spec }
+-- (ROBLOX-128) `swell` (0..1): the flanks filled by a lung breath.
+function PondBodies.frogParts(throat: number, tongue: number, swell: number?): { Spec }
 	local C = PondBodies.FROG
 	local out: { Spec } = {}
 	local pitch = CFrame.Angles(math.rad(-9), 0, 0) -- (it sits low, its front a little up on its short arms)
-	ell(out, "Body", v(0, 1.05, 0.5), v(4.6, 2.3, 5.6), C.back, false, pitch)
+	local sw = 1 + 0.05 * (swell or 0)
+	ell(out, "Body", v(0, 1.05, 0.5), v(4.6 * sw, 2.3 * sw, 5.6), C.back, false, pitch)
 	ell(out, "Belly", v(0, 0.6, 0.6), v(4.2, 1.2, 5.2), C.belly, true, pitch)
 	ell(out, "Head", v(0, 1.4, -2.7), v(3.8, 1.8, 3.0), C.head)
 	ell(out, "Snout", v(0, 1.15, -3.8), v(2.6, 1.1, 1.4), C.head)
@@ -46908,6 +47435,9 @@ local function place(rig: any, specs: { Spec }, frame: CFrame)
 		local part = rig.parts[i]
 		local spec = specs[i]
 		if part ~= nil then
+			-- (ROBLOX-128) a part whose size the pose changes takes it: the throat's pump, the flanks' swell and the tongue's reach were built once and never
+			-- resized before, so the throat never moved and the tongue was drawn a centimetre long halfway out
+			if spec ~= nil and part.Size ~= spec.size then part.Size = spec.size end
 			table.insert(moved, part)
 			table.insert(frames, if spec ~= nil then frame * spec.frame else AWAY)
 		end
@@ -46921,7 +47451,11 @@ function PondBodies.draw(self: any, frog: any, target: Vector3?, darnerAt: Vecto
 	if frog ~= nil and frog.here then
 		local tip = frog:tongue(target)
 		local tongue = if tip ~= nil then (tip - frog:mouth()).Magnitude else 0
-		local specs = PondBodies.frogParts(0.5 + 0.5 * math.sin(now * 5.5), tongue)
+		-- (ROBLOX-128) the throat's flutter between breaths, and a lung breath every BREATH seconds: a deep pump, the flanks swelling and settling
+		local inBreath = (now % PondBodies.BREATH) / 0.9
+		local breath = if inBreath < 1 then math.sin(inBreath * math.pi) else 0
+		local throat = 0.3 + 0.2 * math.sin(now * 2 * math.pi * 1.7) * (1 - breath) + 0.7 * breath
+		local specs = PondBodies.frogParts(throat, tongue, breath)
 		if self.frog == nil then self.frog = build(self, "GreenFrog", PondBodies.frogParts(0.5, 1)) end
 		local h = frog.heading
 		local frame = CFrame.lookAt(frog.pos, frog.pos + Vector3.new(h.X, 0, h.Z))
@@ -46943,7 +47477,7 @@ return PondBodies
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="220">
+        <Item class="ModuleScript" referent="221">
           <Properties>
             <string name="Name">SaveClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -47068,7 +47602,7 @@ return SaveClient
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="221">
+        <Item class="ModuleScript" referent="222">
           <Properties>
             <string name="Name">SelfTest</string>
             <string name="Source"><![CDATA[--!strict
@@ -47097,7 +47631,7 @@ return SaveClient
 -- walkable place is the ranger hut's sill, the garden's checks (the line from the outer sill, the bed's prey and woodlice and frames, the wall's moths) give way to
 -- the hut's sill (its boxes whole, the Decor without the test garden's view, the hut's look held whole at the tier's detail) and the backdrop near and far (the
 -- looks planned at the sill hold the hut whole and the railway far; planned at the railway's crest, the railway whole and the hut back to its far look; then
--- planned at the sill again, as they were) and the trains (a pass's cars drawn on the line). The lock is taken with a controller's L1 creep/lock press too (ROBLOX-127).
+-- planned at the sill again, as they were) and the trains (a pass's cars drawn on the line). The lock is taken with a controller's L1 creep/lock press too (ROBLOX-129).
 -- ROBLOX-117: in the preserve also the garden's near detail (the patches drawn by the spider in the mulch within the budgets, the dew shown at dawn and gone by noon) and the
 -- garden's rival and mate (each put where it comes into the garden, the spider beside its cell: it walks there, in the garden; both put back after).
 -- ROBLOX-118: in the preserve also the ceiling and the upper walls (up the west wall past 1.3 m, round onto the ceiling's underside, hanging there), the back room (through the
@@ -47454,7 +47988,9 @@ local function checks(): { Check }
 		local ctx = r.ctx
 		local title = ctx.title
 		need(title ~= nil, "no title card in the hooks")
-		if not title:holding() then need(title:beginIntro(true, false), "the intro would not begin") end
+		-- A new-life intro may already be older than two seconds after engine loading. Test the skip boundary from a fresh start.
+		title:stop()
+		need(title:beginIntro(true, false), "the intro would not begin")
 		need(title:holding(), "the intro is not holding")
 		need(not title:skip(), "the skip was taken before two seconds")
 		pause(r, 2.2)
@@ -47626,7 +48162,7 @@ local function checks(): { Check }
 			ctx.input:simulate("Recenter", true); pause(r, 0); ctx.input:simulate("Recenter", false)
 			need(lock.trackId == nil, "Recentre again did not let go")
 		end
-		-- (ROBLOX-127) L1 holds creep and locks onto what the spider sees; a second press lets go
+		-- (ROBLOX-129) L1 holds creep and locks onto what the spider sees; a second press lets go
 		if waitUntil(r, 3, sees, 0) then
 			ctx.input:simulate("Creep", true, Enum.KeyCode.ButtonL1); need(ctx.input.held.Creep == true, "L1 did not hold creep"); pause(r, 0); ctx.input:simulate("Creep", false, Enum.KeyCode.ButtonL1)
 			pause(r, 0)
@@ -48761,7 +49297,7 @@ return SelfTest
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="222">
+        <Item class="ModuleScript" referent="223">
           <Properties>
             <string name="Name">SettingsPanel</string>
             <string name="Source"><![CDATA[--!strict
@@ -49462,7 +49998,7 @@ return SettingsPanel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="223">
+        <Item class="ModuleScript" referent="224">
           <Properties>
             <string name="Name">Soundscape</string>
             <string name="Source"><![CDATA[--!strict
@@ -49651,7 +50187,7 @@ return Soundscape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="224">
+        <Item class="ModuleScript" referent="225">
           <Properties>
             <string name="Name">SpiderCamera</string>
             <string name="Source"><![CDATA[--!strict
@@ -50381,7 +50917,7 @@ return SpiderCamera
 ]]></string>
           </Properties>
         </Item>
-        <Item class="LocalScript" referent="225">
+        <Item class="LocalScript" referent="226">
           <Properties>
             <string name="Name">SpiderClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -50586,7 +51122,8 @@ local appearance = SpiderChoice.start(player:GetAttribute("Appearance"), Workspa
 local rig = SpiderRig.new(Workspace, M.World.root, appearance, detail)
 -- The rival's legs (ROBLOX-69): its own SpiderMotor over the whole sill, made when it first arrives, and its drawn rig; its words (ROBLOX-73); its grip once
 -- caught (ROBLOX-77, `grip` made below with the reserves). One table: the client is at Luau's limit of 200 locals.
-local rivalLegs: any = { drive = nil, rig = nil, Drive = require(Shared.Predator.RivalDrive), Text = require(Shared.UI.RivalText), Grip = require(Shared.Predator.RivalGrip), grip = nil }
+local rivalLegs: any = { drive = nil, rig = nil, Drive = require(Shared.Predator.RivalDrive), Text = require(Shared.UI.RivalText), Grip = require(Shared.Predator.RivalGrip), grip = nil,
+	Display = require(Shared.Predator.RivalDisplay), display = nil, event = "", input = {} } -- (ROBLOX-127: the male's contest display, drawn on the rival's rig)
 -- The mating cycle (ROBLOX-80): its modules, the stage that draws it (the mate's rig, the egg sac, the hatching), the mate's legs, and where the ending is
 -- ("" while none, "scene" while the spiderlings play, "card" while the ending card is up). One table: the client is at Luau's limit of 200 locals.
 local mateLegs: any = { Mating = require(Shared.Life.Mating), Mate = require(Shared.Predator.Mate), Drive = require(Shared.Predator.MateDrive), Text = require(Shared.UI.MateText),
@@ -52364,6 +52901,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
              needs:grantEnergy(rivalFood,"rival_spider_meal")
              life.mealFood+=Growth.rivalCredit(rivalFood)
             end
+            if rivalLegs.Display.BACKS_OFF[rivalEvent] then rivalLegs.event=rivalEvent elseif gripEvent=="tore" then rivalLegs.event="tore" end -- (ROBLOX-127: the display backs off at the next drawing)
             if rivalEvent=="caught" then endLife("rival")
             elseif rivalEvent=="warning" then rig:cue("alarm");spiderPick.finish(spiderPick.Text.DANGER, true);life:showNotice("The other spider crouches to jump. Dodge, drop or jump away!")
             elseif rivalEvent=="captured" or rivalEvent=="sprang" then life:showNotice(rivalLegs.Text.strike(rivalEvent,needs.gentle) or "")
@@ -52529,8 +53067,14 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
  if not paused then watch:frame(simFrame,cam.eyeView,eyes.moversShown) end
     local rival=life.rival
     if rival and rival.state~="dormant" and rival.state~="consumed" then
-     if not rivalLegs.rig then rivalLegs.rig=SpiderRig.new(Workspace,M.World.root,"rival_spider","low");rivalLegs.rig.model.Name="RivalSpider" end
+     if not rivalLegs.rig then rivalLegs.rig=SpiderRig.new(Workspace,M.World.root,"rival_spider","low");rivalLegs.rig.model.Name="RivalSpider";rivalLegs.display=rivalLegs.Display.new() end
      rivalLegs.rig.reducedMotion=setting("ReducedMotion")==true
+     -- (ROBLOX-127) the contest display: face-off, spread, grapple or backing off, from the rival's state, how far it is from the spider and which is the bigger
+     local di=rivalLegs.input
+     di.state,di.distance,di.event,di.smaller=rival.state,(rival.position-motor.pos).Magnitude,rivalLegs.event,rivalLegs.rig:bodyLength()<rig:bodyLength()
+     di.seed,di.day,di.contests,di.leg,di.reduced=914,life.clock.day,rival.contests or 0,rival.leg or 0,setting("ReducedMotion")==true
+     rivalLegs.event=""
+     rivalLegs.rig.threat=rivalLegs.Display.step(rivalLegs.display,if paused then 0 else simFrame,di)
      rivalLegs.rig.jumpLoad=if rival.state=="windup" then math.clamp(rival.elapsed,0,1) else 0
      -- (ROBLOX-93: drawn ten times a second when it is more than SpiderRig's FAR_STUDS from the camera, except in a windup, a lunge or when carried; the sim steps it every tick)
      local hurried=rival.state=="windup" or rival.state=="lunge" or rival.state=="taken"
@@ -52680,7 +53224,7 @@ if RunService:IsStudio() and Workspace:GetAttribute("SelfTest") == true then req
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="226">
+        <Item class="ModuleScript" referent="227">
           <Properties>
             <string name="Name">SpiderEyes</string>
             <string name="Source"><![CDATA[--!strict
@@ -53146,7 +53690,7 @@ return SpiderEyes
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="227">
+        <Item class="ModuleScript" referent="228">
           <Properties>
             <string name="Name">SpiderHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -53541,7 +54085,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="228">
+        <Item class="ModuleScript" referent="229">
           <Properties>
             <string name="Name">SpiderInput</string>
             <string name="Source"><![CDATA[--!strict
@@ -53809,7 +54353,7 @@ return SpiderInput
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="229">
+        <Item class="ModuleScript" referent="230">
           <Properties>
             <string name="Name">TitleCard</string>
             <string name="Source"><![CDATA[--!strict
@@ -54076,7 +54620,7 @@ return TitleCard
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="230">
+        <Item class="ModuleScript" referent="231">
           <Properties>
             <string name="Name">TrainPass</string>
             <string name="Source"><![CDATA[--!strict
@@ -54219,7 +54763,7 @@ return TrainPass
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="231">
+        <Item class="ModuleScript" referent="232">
           <Properties>
             <string name="Name">WaspBody</string>
             <string name="Source"><![CDATA[--!strict
@@ -54451,7 +54995,7 @@ return WaspBody
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="232">
+        <Item class="ModuleScript" referent="233">
           <Properties>
             <string name="Name">WorldClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -54762,7 +55306,7 @@ return WorldClient
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="233">
+        <Item class="ModuleScript" referent="234">
           <Properties>
             <string name="Name">WorldDetail</string>
             <string name="Source"><![CDATA[--!strict
@@ -54803,7 +55347,7 @@ return WorldDetail
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="234">
+        <Item class="ModuleScript" referent="235">
           <Properties>
             <string name="Name">WorldShadows</string>
             <string name="Source"><![CDATA[--!strict
@@ -54975,7 +55519,7 @@ return WorldShadows
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="235">
+        <Item class="ModuleScript" referent="236">
           <Properties>
             <string name="Name">SilkPlayback</string>
             <string name="Source"><![CDATA[--!strict
@@ -55502,7 +56046,7 @@ end
       </Item>
     </Item>
   </Item>
-  <Item class="Workspace" referent="236">
+  <Item class="Workspace" referent="237">
     <Properties>
       <string name="Name">Workspace</string>
       <float name="Gravity">35</float>

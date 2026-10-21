@@ -17,6 +17,7 @@ local SupportMath = require(Shared:WaitForChild("Movement"):WaitForChild("Suppor
 local PreyRandom = require(Shared:WaitForChild("Prey"):WaitForChild("PreyRandom"))
 local SpiderRig = require(Shared:WaitForChild("Rig"):WaitForChild("SpiderRig"))
 local Growth = require(Shared:WaitForChild("Life"):WaitForChild("Growth"))
+local Appearances = require(Shared:WaitForChild("Data"):WaitForChild("Appearances"))
 
 local MateStage = {}
 MateStage.__index = MateStage
@@ -180,6 +181,7 @@ function MateStage.drawMate(self: any, mate: any, appearance: string, dt: number
 		end
 		return
 	end
+	appearance = Appearances.mateLook(appearance, mate.sex) -- (ROBLOX-127: the first spider's male mate has a male's build)
 	if self.rig == nil or self.rigFor ~= appearance then
 		if self.rig ~= nil then self.rig:destroy() end
 		self.rig = SpiderRig.new(self.parent, self.world, appearance, "low", true) -- (living: it breathes and takes the mating scene's cues, for the same parts)

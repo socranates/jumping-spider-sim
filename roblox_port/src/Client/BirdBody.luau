@@ -5,6 +5,9 @@
 -- hop, a peck at the ground, the watch (head cocked at the spider, still: the honest tell), the strike (bill driven down and forward), and in the air its wings out.
 -- Its shadow is a dark soft oval on the ground under it, broad and faint high up, small and dark when it stands. Every part anchored, never collides, never seen by a
 -- ray, the body casts no engine shadow of its own (the drawn one is the shadow, so the two never double). One Workspace:BulkMoveTo a frame. Display only.
+-- ROBLOX-128: the foraging posture as the BC Field Ornithologists' note on robins finding worms describes it: stopped, it stands erect and still, turning its head
+-- now and then as if looking at the ground; once it has seen something (the watch, the tell) it crouches into a horizontal posture and cocks its head at it. The
+-- hop is level. Its parts' transparency is written only when it changes, and the frame's lists are kept, not made anew.
 -- The open ground's voices are here too (SOUNDS, "" until Nathan uploads tools/make_meadow_sounds.py's robin_call.wav and cricket_chirp.wav): the robin's call while it
 -- calls, as loud as Predator/Bird.call says, and the nearest singing field cricket's chirps (Prey/PreyKinds.chirping), as loud as the client hears it.
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -36,8 +39,10 @@ function BirdBody.parts(pose: string, t: number, cock: number, strike: number): 
 	end
 	local flying = pose == "fly" or pose == "land" or pose == "leave"
 	-- the body: level in flight, its tail tipped down a little standing
-	local lift = if flying then 0 else 6.2
-	local pitch = if flying then 0 elseif pose == "peck" or pose == "strike" then math.rad(-22) else math.rad(-8)
+	-- (ROBLOX-128) erect standing, level hopping, crouched level watching
+	local lift = if flying then 0 elseif pose == "watch" then 5.2 else 6.2
+	local pitch = if flying then 0 elseif pose == "peck" or pose == "strike" then math.rad(-22) elseif pose == "stand" then math.rad(10)
+		elseif pose == "watch" then math.rad(-2) else math.rad(-6)
 	local body = CFrame.new(0, lift + 3.2, 0.5) * CFrame.Angles(pitch, 0, 0)
 	ell("Body", body, Vector3.new(7.6, 7.4, 13.5), C.back)
 	ell("Breast", body * CFrame.new(0, -0.7, -2.9), Vector3.new(7.3, 6.9, 9.2), C.breast)
@@ -46,7 +51,12 @@ function BirdBody.parts(pose: string, t: number, cock: number, strike: number): 
 	-- the head: on the neck at the body's front; cocked (rolled to a side, looking down at the ground with one eye), down for a peck, forward and down in the stab
 	local neck = body * CFrame.new(0, 2.6, -5.6)
 	local headTurn = CFrame.new()
-	if pose == "stand" or pose == "watch" then headTurn = CFrame.Angles(math.rad(-10), 0, math.rad(32) * cock)
+	if pose == "stand" then
+		-- (ROBLOX-128) looking about: its head turns slowly from side to side and tips toward the ground now and then
+		local glance = math.sin(t * 0.83) * 0.6 + math.sin(t * 2.1 + 1.3) * 0.25
+		local tilt = math.max(0, math.sin(t * 0.47 + 0.4))
+		headTurn = CFrame.Angles(math.rad(-6 - 14 * tilt), math.rad(28) * glance, math.rad(32) * cock * tilt)
+	elseif pose == "watch" then headTurn = CFrame.Angles(math.rad(-10), 0, math.rad(32) * cock)
 	elseif pose == "peck" then headTurn = CFrame.Angles(math.rad(-60), 0, 0) * CFrame.new(0, -1.5, -1.0)
 	elseif pose == "strike" then headTurn = CFrame.new(0, -2.5 * strike, -3.0 * strike) * CFrame.Angles(math.rad(-55) * strike, 0, 0) end
 	local head = neck * headTurn * CFrame.new(0, 1.4, -0.8)
@@ -102,7 +112,7 @@ function BirdBody.new(parent: Instance, detail: string): any
 	shadowBody.Transparency = 1
 	shadowBody.CastShadow = false
 	local self = setmetatable({ folder = folder, detail = detail, model = nil :: Instance?, parts = {} :: { [string]: BasePart }, shadow = shadow, shadowBody = shadowBody, t = 0,
-		voices = {} :: { [string]: Sound }, shown = false }, BirdBody)
+		voices = {} :: { [string]: Sound }, shown = false, moved = {} :: { BasePart }, frames = {} :: { CFrame }, seen = {} :: { [string]: boolean } }, BirdBody)
 	for name, id in BirdBody.SOUNDS do
 		if id ~= "" then
 			local s = Instance.new("Sound")
@@ -158,9 +168,12 @@ function BirdBody.draw(self: any, bird: any, dt: number, call: number, chirp: nu
 	local strike = if bird.strikeS ~= nil and bird.strikeS >= 0 then math.clamp(bird.strikeS / 0.1, 0, 1) * (1 - math.clamp((bird.strikeS - 0.2) / 0.3, 0, 1)) else 0
 	local pose = if strike > 0 then "strike" else bird.pose
 	local frame = CFrame.lookAt(bird.pos, bird.pos + bird.heading)
-	local moved: { BasePart } = {}
-	local frames: { CFrame } = {}
-	local seen: { [string]: boolean } = {}
+	local moved: { BasePart } = self.moved -- (ROBLOX-128: kept, not made anew each frame)
+	local frames: { CFrame } = self.frames
+	local seen: { [string]: boolean } = self.seen
+	table.clear(moved)
+	table.clear(frames)
+	table.clear(seen)
 	for _, spec in BirdBody.parts(pose, self.t, bird.cock or 1, strike) do
 		local p = self.parts[spec.name]
 		if p ~= nil then
@@ -170,7 +183,10 @@ function BirdBody.draw(self: any, bird: any, dt: number, call: number, chirp: nu
 			table.insert(frames, frame * spec.frame)
 		end
 	end
-	for name, p in self.parts do p.Transparency = if seen[name] then 0 else 1 end
+	for name, p in self.parts do
+		local want = if seen[name] then 0 else 1
+		if p.Transparency ~= want then p.Transparency = want end
+	end
 	-- the shadow: under it on the ground, broad and faint the higher it flies
 	local ground = bird.shadow or Vector3.new(bird.pos.X, bird.pos.Y, bird.pos.Z)
 	local high = math.max(0, bird.pos.Y - ground.Y)

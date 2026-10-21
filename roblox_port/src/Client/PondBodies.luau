@@ -5,7 +5,10 @@
 --   the frog ..... a green frog (Lithobates clamitans) about 7.8 cm from snout to vent, sitting low: its head green, its back olive-brown and mottled, the ridge down each
 --                  side of its back, its big golden eyes up on top of its head, the eardrum behind each (a male's, twice the eye's width), a white throat that
 --                  pumps as it breathes, its front legs propped and its long hind legs folded under it; when it strikes, its pink tongue out to the spider and
---                  back (Predator/Frog.tongue). Matte, but the eyes.
+--                  back (Predator/Frog.tongue). Matte, but the eyes. (ROBLOX-128) It breathes as a frog does (J. Exp. Biol. 204:2647, the effects of tonic
+--                  lung inflation on ventilation in the frog: the floor of the mouth moves up and down continuously between breaths, the glottis shut, and now
+--                  and then a lung breath, a deeper pump that fills the lungs): the throat flutters, and every few seconds pumps deep and the flanks swell.
+--                  The rates are the game's (a lung breath every 5.2 s, well under the paper's ceiling near 30 a minute).
 --   the darner ... a male common green darner (Anax junius) about 7.5 cm long with a 10 cm wingspan: its big eyes, a green thorax, a long blue abdomen with a dark line
 --                  along it, four clear wings held out flat, a blur as it flies.
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -30,14 +33,17 @@ local function rod(out: { Spec }, name: string, a: Vector3, b: Vector3, d: numbe
 	return s
 end
 
+PondBodies.BREATH = 5.2 -- (ROBLOX-128) seconds from one lung breath to the next
 PondBodies.FROG = { head = "6f9a3a", back = "6a6a3a", mottle = "3e4a26", ridge = "8a8a52", belly = "e8e4d0", throat = "f0ecd8", eye = "a8782a", pupil = "141210",
 	tympanum = "6a5a3a", leg = "5e6a34", band = "3a4426", tongue = "d88a8a" }
 -- The frog's parts in its own frame (its seat under it at y 0, ahead -z), the throat pumped by `throat` (0..1), its tongue out `tongue` studs (0: in).
-function PondBodies.frogParts(throat: number, tongue: number): { Spec }
+-- (ROBLOX-128) `swell` (0..1): the flanks filled by a lung breath.
+function PondBodies.frogParts(throat: number, tongue: number, swell: number?): { Spec }
 	local C = PondBodies.FROG
 	local out: { Spec } = {}
 	local pitch = CFrame.Angles(math.rad(-9), 0, 0) -- (it sits low, its front a little up on its short arms)
-	ell(out, "Body", v(0, 1.05, 0.5), v(4.6, 2.3, 5.6), C.back, false, pitch)
+	local sw = 1 + 0.05 * (swell or 0)
+	ell(out, "Body", v(0, 1.05, 0.5), v(4.6 * sw, 2.3 * sw, 5.6), C.back, false, pitch)
 	ell(out, "Belly", v(0, 0.6, 0.6), v(4.2, 1.2, 5.2), C.belly, true, pitch)
 	ell(out, "Head", v(0, 1.4, -2.7), v(3.8, 1.8, 3.0), C.head)
 	ell(out, "Snout", v(0, 1.15, -3.8), v(2.6, 1.1, 1.4), C.head)
@@ -115,6 +121,9 @@ local function place(rig: any, specs: { Spec }, frame: CFrame)
 		local part = rig.parts[i]
 		local spec = specs[i]
 		if part ~= nil then
+			-- (ROBLOX-128) a part whose size the pose changes takes it: the throat's pump, the flanks' swell and the tongue's reach were built once and never
+			-- resized before, so the throat never moved and the tongue was drawn a centimetre long halfway out
+			if spec ~= nil and part.Size ~= spec.size then part.Size = spec.size end
 			table.insert(moved, part)
 			table.insert(frames, if spec ~= nil then frame * spec.frame else AWAY)
 		end
@@ -128,7 +137,11 @@ function PondBodies.draw(self: any, frog: any, target: Vector3?, darnerAt: Vecto
 	if frog ~= nil and frog.here then
 		local tip = frog:tongue(target)
 		local tongue = if tip ~= nil then (tip - frog:mouth()).Magnitude else 0
-		local specs = PondBodies.frogParts(0.5 + 0.5 * math.sin(now * 5.5), tongue)
+		-- (ROBLOX-128) the throat's flutter between breaths, and a lung breath every BREATH seconds: a deep pump, the flanks swelling and settling
+		local inBreath = (now % PondBodies.BREATH) / 0.9
+		local breath = if inBreath < 1 then math.sin(inBreath * math.pi) else 0
+		local throat = 0.3 + 0.2 * math.sin(now * 2 * math.pi * 1.7) * (1 - breath) + 0.7 * breath
+		local specs = PondBodies.frogParts(throat, tongue, breath)
 		if self.frog == nil then self.frog = build(self, "GreenFrog", PondBodies.frogParts(0.5, 1)) end
 		local h = frog.heading
 		local frame = CFrame.lookAt(frog.pos, frog.pos + Vector3.new(h.X, 0, h.Z))

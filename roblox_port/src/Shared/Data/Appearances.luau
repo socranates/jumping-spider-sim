@@ -42,7 +42,9 @@ local first = {
 	neck = { 0, 0.0, -0.06 }, -- the head tilts about this point
 	-- Pale side patches (the daughter's "cheeks"): placed on the head's side at height y, depth z (body frame).
 	cheek = { y = 0.055, z = -0.235, radii = { 0.02, 0.07, 0.115 }, inset = 0.006 },
-	chelicerae = { x = 0.055, y = -0.085, z = -0.447, radii = { 0.05, 0.072, 0.045 }, pitch = -0.35, splay = 0.12, reflectance = 0.1 },
+	-- ROBLOX-127: the chelicerae of the bold jumping spider are iridescent green (DOC: Wikipedia, Phidippus audax). `color` (new) is a black-green, a shade off the
+	-- daughter's black (her `fangs` colour below is unchanged and still colours the claws), Foil at a stronger sheen (0.1 to 0.28), so a highlight finds the green.
+	chelicerae = { x = 0.055, y = -0.085, z = -0.447, radii = { 0.05, 0.072, 0.045 }, pitch = -0.35, splay = 0.12, reflectance = 0.28, color = { 0.03, 0.14, 0.105 } },
 	-- Eyes. Never a human face: no brows, no mouth. Big glossy front eyes read as an animal's.
 	eye = {
 		-- Principal (front) eyes: large, glossy, set low in a big forehead. x, y: where on the head they sit; `out`: how far
@@ -52,6 +54,10 @@ local first = {
 			x = 0.115, y = 0.095, radii = { 0.100, 0.100, 0.082 }, out = 0.30, reflectance = 0.5,
 			socket = { scale = 1.13, color = { 0.11, 0.11, 0.11 } }, -- a dark-grey rim so the black eye reads against the black head
 			glints = { { dx = 0.030, dy = 0.036, r = 0.022 }, { dx = -0.028, dy = -0.034, r = 0.010 } },
+			-- ROBLOX-127: depth. The principal eye is a lens at the front of a long eye tube, the retina deep behind it; the drawn lens lets a little light through
+			-- (`transparency`, Glass) onto a dark amber-brown retina (`retina`: radii as a share of the lens's, pushed `depth` of the lens's depth back toward the head).
+			-- Full tier only (detail `retina`). ART.
+			lens = { transparency = 0.32, retina = { scale = 0.62, depth = 0.42, color = { 0.10, 0.055, 0.025 } } },
 		},
 		ale = { x = 0.235, y = 0.085, r = 0.050, out = 0.15, reflectance = 0.3 }, -- anterior lateral, at the sides of the face
 		ple = { x = 0.150, z = -0.150, r = 0.052, out = 0.10, reflectance = 0.3 }, -- posterior lateral, on the dome
@@ -153,6 +159,11 @@ local first = {
 		legLift = { 15, 26 }, -- a leg's hairs lie at this angle off the leg, pointing down it toward the foot
 		legTip = 0.08, -- the share of the legs' hairs with the greyer cast
 		hipBare = { 0.6, 0.6, 0, 0 }, -- ROBLOX-93: the share of each pair's femur, from the hip, that has no hair (the hairs are spread over the rest): legs I and II start at the face, where the anterior lateral eyes are, and a walking leg I swings past them
+		-- ROBLOX-127: the fringe. A bold jumping spider's legs and palps have "white banding with fringes" (DOC: Wikipedia, Phidippus audax): longer pale hairs standing out
+		-- from the sides and underside of the tibia of legs I (Setae.legFringe). `pairs` gives, for a pair of legs, the count on the femur, tibia and tarsus; `edge` is where round
+		-- the leg (degrees from its top, one side then the other), `lift` how far off the leg they stand (leaning toward the foot), `tone` their colour. Full tier only for her
+		-- (detail every.legFringe 0 at low); the male mate's and the rival's are heavier (below). ART.
+		legFringe = { pairs = { [1] = { 0, 6, 0 } }, length = { 0.050, 0.064 }, width = 0.006, lift = { 56, 70 }, edge = { 80, 130 }, tone = "frost", transparency = 0.15 },
 	},
 
 	-- ---------------------------------------------------------------- idle motion (drawn rig only, ROBLOX-13)
@@ -225,14 +236,14 @@ local first = {
 	-- The pattern, eyes, catchlights and tufts stay.
 	detail = {
 		full = {
-			every = { lock = 1, guard = 1, fringe = 1, pale = 1, tuft = 1, ruff = 1, palp = 1, leg = 1 },
+			every = { lock = 1, guard = 1, fringe = 1, pale = 1, tuft = 1, ruff = 1, palp = 1, leg = 1, legFringe = 1 },
 			shells = 4, speckleEvery = 1, pads = true, sockets = true, idle = true, highlight = true,
-			taper = true, tibiaTaper = true, jointBreak = true, claws = 2, fangSegments = 2,
+			taper = true, tibiaTaper = true, jointBreak = true, claws = 2, fangSegments = 2, retina = true,
 		},
 		low = {
-			every = { lock = 4, guard = 0, fringe = 3, pale = 2, tuft = 2, ruff = 2, palp = 2, leg = 4 },
+			every = { lock = 4, guard = 0, fringe = 3, pale = 2, tuft = 2, ruff = 2, palp = 2, leg = 4, legFringe = 0 },
 			shells = 1, speckleEvery = 2, pads = false, sockets = false, idle = false, highlight = false,
-			taper = true, tibiaTaper = false, jointBreak = false, claws = 0, fangSegments = 1,
+			taper = true, tibiaTaper = false, jointBreak = false, claws = 0, fangSegments = 1, retina = false,
 		},
 	},
 }
@@ -267,6 +278,7 @@ limbs.stance = { x = limbs.stance.x, y = -0.10, reach = 0.62 } -- ART: low and c
 limbs.pairReach = { 1.0, 1.0, 1.2, 1.0 } -- legs III are the longest (DOC)
 local eye = scaled(first.eye, SCALE, FACE_SKIP)
 eye.ame.socket = { scale = 1.12, color = { 0.50, 0.31, 0.14 } } -- tan and orange ocular setae frame the big eyes (DOC)
+eye.ame.lens = nil -- (ROBLOX-127: the lens and retina are the first spider's; at this size they would be a pixel)
 local palp = scaled(first.palp, SCALE, PALP_SKIP)
 palp.club = { 0.021, 0.019, 0.026 } -- the white brushes clothe the palps (DOC; sizes ART)
 palp.tipRadii = { 0.014, 0.012, 0.014 }
@@ -384,6 +396,10 @@ local volans = {
 	},
 }
 
+-- (ROBLOX-127: the first spider's green chelicerae are hers; the peacock spider's stay in its fang colour, at the sheen they had.)
+volans.chelicerae.color = nil
+volans.chelicerae.reflectance = 0.1
+
 -- ART: six fine teal scale streaks catch light on the open fan. Full detail only; mobile keeps its 80-part budget.
 for _,side in {-1,1} do
  for _,z in {-0.36,0,0.36} do
@@ -392,62 +408,129 @@ for _,side in {-1,1} do
  end
 end
 
--- A brown rival, distinct from the player; illustrative salticid, no species identification.
-local rival: any=table.clone(first)
--- The rival keeps the coat the first spider had before ROBLOX-85 (ROBLOX-13's second coat, whose numbers are below), as it was drawn.
-local rivalFuzz: any = {
-	enabled = true,
-	-- The coat is short and sleek, like a real jumping spider's, and it takes its colour from the pattern it grows on:
-	-- black hairs on the black areas, white hairs only inside the white spots and the band, nothing grey or frosted on the
-	-- body (the daughter's white stays crisp, and a hair is never a pale shard). The softness comes from the fur shells.
-	-- `abdomen` and `head` are Fibonacci sample points before the belly is skipped (about 60 % of them become hairs).
-	-- `length` and `lift` are ranges (studs; degrees off the surface: 0 lies flat, 90 stands up); `yaw` scatters the
-	-- combing (degrees either side of straight back); `flat` is the thickness as a share of the width; `black` is the share
-	-- of the blackest tone (the rest is `dark`); `transparency` keeps the coat a little see-through.
-	-- Locks: the pelt, lying nearly flat and combed toward the rear.
-	locks = { abdomen = 340, head = 130, length = { 0.024, 0.040 }, width = 0.018, flat = 0.22, lift = { 3, 13 }, yaw = 18, black = 0.45, transparency = 0.10 },
-	-- Guard hairs: a few short, fine hairs that stand up from the pelt.
-	guard = { abdomen = 50, head = 24, length = { 0.030, 0.046 }, width = 0.0085, flat = 1.0, lift = { 50, 75 }, yaw = 35, black = 0.5, transparency = 0.20 },
-	-- The fringe: short hairs along the sides (`side`: how far round to the side, as a share of the radius, a hair has to
-	-- be), lifted a little, so the outline is ragged by a pixel or two and not by a spike.
-	fringe = { abdomen = 170, head = 60, side = 0.78, length = { 0.026, 0.040 }, width = 0.011, flat = 0.5, lift = { 14, 32 }, yaw = 22, black = 0.5, transparency = 0.20 },
-	-- White hairs inside the white spots and the band: `density` per square stud of marking, lying on it, kept only when the
-	-- whole hair stays `margin` studs inside the edge, so the white keeps its edge.
-	pale = { density = 600, length = { 0.021, 0.028 }, width = 0.013, flat = 0.3, lift = { 3, 10 }, yaw = 14, margin = 0.004, transparency = 0.05 },
-	clear = 0.006, -- black hairs stay this far (studs) from any white marking
-	black = { 0.03, 0.03, 0.03 },
-	dark = { 0.13, 0.13, 0.13 },
-	grey = { 0.50, 0.50, 0.48 }, -- grey and frost: the face (tufts, ruff) and the palps' fluff only
-	frost = { 0.76, 0.76, 0.73 },
-	-- Fur shells: see-through layers outside the body, strongest nearest it, so the outline goes soft. Four at full detail,
-	-- one at low. A shell tints what is under it as well as what is around it, so they are dark and faint: the white of the
-	-- pattern must stay white.
-	shellColor = { 0.08, 0.08, 0.08 },
-	shells = { { scale = 1.05, transparency = 0.86 }, { scale = 1.10, transparency = 0.92 }, { scale = 1.16, transparency = 0.955 }, { scale = 1.23, transparency = 0.975 } },
-	headShell = { zScale = 0.80, shift = 0.05 }, -- the head's shells sit back from the eye row so the eyes stay clear
-	-- Little tufts that bold jumping spiders have above the eyes, at the upper sides of the head: a fan of dark and
-	-- silvery hairs that sweeps up and out. Not eyebrows: they sit behind the eyes at the sides, not over them.
-	tuftHairs = 10, -- per side
-	tuftLength = 0.078,
-	tuft = { at = { 0.52, 0.80, -0.28 }, lean = { 0.60, 1.0, -0.22 }, fan = 0.46, spread = 0.02, width = 0.0165, flat = 0.8, transparency = 0.1 },
-	-- A soft ruff of pale hair low on each cheek, beside the jaws (not a moustache: it sits at the sides).
-	ruff = { hairs = 5, length = 0.052, width = 0.0135, flat = 0.7, at = { 0.52, -0.36, -0.74 }, lean = { 0.65, -0.55, -0.45 }, whiteShare = 0.6, transparency = 0.15 },
-	legHairs = { 7, 6, 3 }, -- femur, tibia, tarsus, per leg (front legs carry 1.6 x as many on femur and tibia)
-	legLength = 0.052,
-	legWidth = 0.0125,
-	legTransparency = 0.2,
-	legBlack = 0.4, -- the share of the blackest tone on the legs (the rest is dark; white over the pale bands)
-	hipBare = { 0.6, 0.6, 0, 0 }, -- ROBLOX-93: as the first spider's
+-- ================================================================ the rival: a male tan jumping spider (ROBLOX-127)
+-- The other spider is a male. It was a brown recolour of the first spider (ROBLOX-67; until ROBLOX-127 it kept ROBLOX-13's coat and the plain legs); it is now drawn
+-- as a male of the tan jumping spider, Platycryptus undatus, a common salticid of tree trunks and building walls from the eastern United States to Wisconsin and
+-- Texas (DOC: Wikipedia), so of a hut garden's walls and posts. What the sources say of it (DOC: Wikipedia, Platycryptus undatus; minnesotaseasons.com, Tan jumping
+-- spider): mottled tan, a thin flattened body; the carapace orangish-brown on top with white and reddish-brown hairs, its lower sides blackish-brown; a band of hair
+-- through and under the front eyes, white in general and reddish or orange in the male; a tuft of long black hairs under each posterior median eye; brown chelicerae;
+-- palps densely white-haired; the abdomen grey in front, blackish-brown at the sides, with a grey pattern down the middle that reads as chevrons; legs mottled
+-- orangish-brown and blackish-brown, the metatarsus dark at both ends and pale in the middle; males 8.5 to 9.5 mm (Wikipedia) or 6.7 to 9.2 mm (minnesotaseasons).
+-- What makes it read as a male, beyond those (the general salticid male look: in Phidippus audax the male's first legs are the longest and their fringes and the
+-- chelicerae are more striking, DOC: Wikipedia, Phidippus audax): a slimmer abdomen, longer, darker and heavier legs I with a dark fringe, bigger chelicerae and
+-- palps swollen at the tip (the palpal organ) under their white hair. Every number is ART; the species is the model for the look, honestly a likeness, not a
+-- measured animal. `contest` is the male-male display (Predator/RivalDisplay says when and how much; SpiderRig draws it).
+local function deep(t: any): any
+	if type(t) ~= "table" then return t end
+	local out: { [any]: any } = {}
+	for k, v in t do out[k] = deep(v) end
+	return out
+end
+local TAN, DARK_BROWN, GREY_TAN = { 0.42, 0.26, 0.13 }, { 0.13, 0.08, 0.05 }, { 0.50, 0.46, 0.40 }
+local rival: any = deep(first)
+rival.id = "rival_spider"
+rival.name = "Tan jumping spider (male)"
+rival.growth = { 0.9, 0.9, 0.9, 0.9 } -- drawn 9.1 mm long, the male's 8.5 to 9.5 (at 1 the body is 10.1 mm); it does not grow
+rival.gloss = 0.03
+rival.body = TAN -- the carapace's top
+rival.legs = { 0.38, 0.23, 0.11 }
+rival.white = { 0.82, 0.79, 0.72 } -- the pale hair: the cheeks, the palps' bands
+rival.joint = DARK_BROWN
+rival.fangs = { 0.09, 0.05, 0.03 } -- the claws
+rival.abdomenColor = { 0.15, 0.095, 0.06 } -- blackish-brown; the grey is in `marks`
+-- A flat, long carapace and a slim male abdomen.
+rival.headCenter = { 0, 0.015, -0.20 }
+rival.headRadii = { 0.255, 0.175, 0.29 }
+rival.abdomenCenter = { 0, 0.03, 0.225 }
+rival.abdomenRadii = { 0.185, 0.145, 0.30 }
+rival.face = { center = { 0, 0.03, -0.37 }, radii = { 0.215, 0.15, 0.12 } }
+rival.cheek = { y = 0.02, z = -0.25, radii = { 0.02, 0.05, 0.10 }, inset = 0.006 }
+rival.spots, rival.speckleCount = {}, 0
+rival.band = { count = 0, step = 0.1, z = 0, rx = 0.01, rz = 0.01 }
+-- The male's chelicerae: bigger, longer and set more forward, brown with a sheen; the fang under each a single dark curved segment at the low tier, two at full.
+rival.chelicerae = { x = 0.064, y = -0.09, z = -0.462, radii = { 0.058, 0.098, 0.052 }, pitch = -0.55, splay = 0.10, reflectance = 0.16, color = { 0.24, 0.13, 0.065 } }
+rival.fang = { x = 0.062, y = -0.170, z = -0.505, reflectance = 0.25, color = { 0.10, 0.045, 0.03 },
+	segments = { { dir = { -0.10, -0.70, -0.70 }, length = 0.048, radius = 0.012 }, { dir = { -0.55, -0.80, -0.10 }, length = 0.036, radius = 0.009 } } }
+-- Palps: brown stalks, the tip swollen (the male's palpal organ) and white with hair.
+rival.palp.club = { 0.046, 0.043, 0.055 }
+rival.palp.tipRadii = { 0.032, 0.028, 0.032 }
+rival.palpColors = { stalk = { 0.30, 0.18, 0.09 }, club = { 0.78, 0.76, 0.70 }, tip = { 0.70, 0.67, 0.60 } }
+-- The eyes keep the salticid's layout; the front pair's rim is the male's orange band of hair (full tier), the band under them the `FaceBand` (both tiers).
+rival.eye.ame.socket = { scale = 1.14, color = { 0.78, 0.40, 0.12 } }
+rival.eye.ame.lens = nil
+rival.eye.ale = { x = 0.212, y = 0.075, r = 0.048, out = 0.15, reflectance = 0.3 } -- (on the narrower, flatter head: inside its edge)
+-- More bodies: the carapace's blackish-brown lower sides (a wider, lower shell under the tan top) and the orange band of hair under the front eyes.
+rival.extras = {
+	{ name = "CarapaceSide", center = { 0, -0.045, -0.20 }, radii = { 0.266, 0.15, 0.30 }, group = "head", color = DARK_BROWN },
+	{ name = "FaceBand", center = { 0, 0.020, -0.452 }, radii = { 0.16, 0.034, 0.05 }, group = "head", color = { 0.80, 0.42, 0.14 } },
 }
-rival.fuzz=rivalFuzz;rival.gloss=nil
-rival.palp=table.clone(first.palp);rival.palp.fluff={ hairs = 7, length = 0.055, width = 0.012, flat = 0.7, transparency = 0.15 } -- (ROBLOX-85 made the first spider's palp fluff finer)
-rival.id="rival_spider";rival.body={.22,.14,.08};rival.legs={.27,.18,.10};rival.white={.64,.48,.29}
--- ROBLOX-84 gave the first spider shaped legs and fangs; the rival (a clone of it) keeps the plain tubes and balls, as it was drawn.
-rival.legForm=nil;rival.fang=nil
-rival.detail={
- full={every={lock=1,guard=1,fringe=1,pale=1,tuft=1,ruff=1,palp=1,leg=1},shells=4,speckleEvery=1,pads=true,sockets=true,idle=true,highlight=true},
- low={every={lock=3,guard=0,fringe=3,pale=2,tuft=2,ruff=2,palp=2,leg=4},shells=1,speckleEvery=2,pads=false,sockets=false,idle=false,highlight=false},
+-- The abdomen's grey: a grey front, a midline and three chevrons down it (bars slanting back toward the midline from each side), on the blackish-brown.
+rival.marks = {
+	{ name = "AbdomenGrey", color = GREY_TAN, x = 0, z = -0.60, rx = 0.105, rz = 0.06, angle = 0 },
+	{ name = "AbdomenMidline", color = GREY_TAN, x = 0, z = 0.08, rx = 0.018, rz = 0.20, angle = 0 },
+	{ name = "AbdomenChevron", color = GREY_TAN, x = 0.20, z = -0.22, rx = 0.015, rz = 0.068, angle = -0.95, mirror = true },
+	{ name = "AbdomenChevron", color = GREY_TAN, x = 0.20, z = 0.12, rx = 0.015, rz = 0.068, angle = -0.95, mirror = true },
+	{ name = "AbdomenChevron", color = GREY_TAN, x = 0.17, z = 0.46, rx = 0.013, rz = 0.055, angle = -0.95, mirror = true, fullOnly = true },
 }
+-- Legs: mottled; each link has its own colour and band (the femur's band dark, the tarsus' pale between dark ends: the metatarsus), knees and ankles dark.
+rival.legColors = { femur = { 0.38, 0.23, 0.11 }, tibia = { 0.33, 0.20, 0.10 }, tarsus = DARK_BROWN, knee = DARK_BROWN, ankle = DARK_BROWN }
+rival.legBands = { femur = { 0.16, 0.095, 0.05 }, tarsus = { 0.66, 0.53, 0.35 } }
+-- The male's legs I: longer (their rest spot a fifth farther out), heavier and darker, no bands.
+rival.frontLegScale = 1.18
+rival.limbs.pairReach = { 1.2, 1.0, 1.0, 1.0 }
+rival.pairs = { [1] = { colors = { { 0.17, 0.10, 0.05 }, { 0.11, 0.065, 0.04 }, { 0.20, 0.12, 0.06 } }, thick = { 1.0, 1.08, 0.95 }, bands = false } }
+-- The coat: the first spider's lying fur in the tan spider's colours (reddish-brown and dark hairs, a share of white ones: "white and reddish-brown hairs"), sparser;
+-- black tufts at the sides of the head; a dark fringe on legs I.
+local rf = rival.fuzz
+rf.black, rf.dark, rf.grey, rf.frost = { 0.11, 0.07, 0.04 }, { 0.36, 0.20, 0.09 }, { 0.66, 0.62, 0.56 }, { 0.86, 0.84, 0.78 }
+rf.shellColor = { 0.17, 0.11, 0.06 }
+rf.locks.abdomen, rf.locks.head, rf.locks.black, rf.locks.tip = 360, 210, 0.35, 0.22
+rf.fringe.abdomen, rf.fringe.head = 180, 60
+rf.legBlack = 0.5
+rf.legFringe = { pairs = { [1] = { 4, 8, 0 } }, length = { 0.070, 0.092 }, width = 0.0085, lift = { 55, 72 }, edge = { 70, 140 }, tone = "black", transparency = 0.1 }
+rival.contest = {
+	pair = 1,
+	-- where legs I's feet go (the body frame of the drawn prosoma, studs at scale 1, x mirrored for the left): held forward and raised (`up`, the face-off), high and spread
+	-- (`wide`, the full display), and forward and down (`hook`, grappling); the knee pushed out and up; how much the raised feet tremble.
+	up = { x = 0.24, y = 0.18, z = -0.74 }, wide = { x = 0.50, y = 0.40, z = -0.52 }, hook = { x = 0.13, y = -0.12, z = -0.98 },
+	kneeOut = 0.12, kneeUp = 0.20, tremor = 0.02,
+	spreadDeg = 22, -- each chelicera swings out this far: the basal segments 44 degrees apart (DOC: 30 to 90 in Cosmophasis umbratica's contests)
+	lower = 0.05, -- how far the body sinks when it backs off
+	-- (what the pose's tipSweep and sweepBack mean for a tarantula's spinnerets; the rival has none)
+	tipSweep = 1, sweepBack = 0,
+}
+rival.detail = {
+	full = {
+		every = { lock = 1, guard = 1, fringe = 1, pale = 1, tuft = 1, ruff = 1, palp = 1, leg = 1, legFringe = 1 },
+		shells = 3, speckleEvery = 1, pads = true, sockets = true, idle = true, highlight = true,
+		taper = true, tibiaTaper = true, jointBreak = true, claws = 2, fangSegments = 2, retina = false,
+	},
+	-- the game draws the rival at the low tier on every device (ROBLOX-108)
+	low = {
+		every = { lock = 5, guard = 0, fringe = 4, pale = 2, tuft = 2, ruff = 2, palp = 2, leg = 5, legFringe = 1 },
+		shells = 1, speckleEvery = 2, pads = false, sockets = false, idle = false, highlight = false,
+		taper = true, tibiaTaper = false, jointBreak = false, claws = 0, fangSegments = 1, retina = false,
+	},
+}
+
+-- ================================================================ the first spider's mate, a male (ROBLOX-127)
+-- The first spider is the game's female (ROBLOX-79), so her mate is a male; until now he was drawn with her look at 0.85 of her size. He keeps her pattern (the
+-- daughter's colours and markings) with a male bold jumping spider's build (DOC: Wikipedia, Phidippus audax: the male's first legs are the longest, his fringes,
+-- chelicerae and markings more striking than the female's, tufts of hair over his eyes): a slimmer abdomen, longer and heavier legs I with a heavier white fringe, bigger
+-- greener chelicerae, longer tufts. Drawn by Client/MateStage at the low tier (Appearances.mateLook); never a spider the player puts on. ART.
+local male: any = deep(first)
+male.id = "first_spider_male"
+male.name = "First spider (male)"
+male.abdomenRadii = { 0.215, 0.18, 0.265 }
+male.frontLegScale = 1.42
+male.limbs.pairReach = { 1.16, 1.0, 1.0, 1.0 }
+male.chelicerae.radii = { 0.058, 0.086, 0.052 }
+male.chelicerae.color = { 0.035, 0.19, 0.14 }
+male.chelicerae.reflectance = 0.34
+male.fuzz.tuftHairs, male.fuzz.tuftLength = 9, 0.074
+male.fuzz.legFringe = { pairs = { [1] = { 3, 8, 0 } }, length = { 0.060, 0.078 }, width = 0.0065, lift = { 56, 72 }, edge = { 75, 135 }, tone = "frost", transparency = 0.12 }
+male.detail.low.every.legFringe = 1
+male.detail.low.every.lock = 5 -- (his fringe's 22 hairs at the low tier paid for with a sparser pelt)
 
 -- ================================================================ the ant-mimicking spider (ROBLOX-64)
 -- Myrmarachne formicaria, the female: a third profile beside the daughter's and the peacock's, chosen from the crack (Client/SpiderClient).
@@ -748,5 +831,14 @@ greenbottle.barFade = { 0, 0, 0, 0.6 } -- the bars' transparency at each growth 
 volans.hang = first.hang
 ant.hang = first.hang
 
-return { default = "first_spider", profiles = { first_spider = first, maratus_volans_male = volans, myrmarachne_formicaria_female = ant, rival_spider = rival, brachypelma_hamorii = redknee, chromatopelma_cyaneopubescens = greenbottle } }
+local Appearances = { default = "first_spider", profiles = { first_spider = first, maratus_volans_male = volans, myrmarachne_formicaria_female = ant, rival_spider = rival, brachypelma_hamorii = redknee, chromatopelma_cyaneopubescens = greenbottle, first_spider_male = male } }
+
+-- (ROBLOX-127) The look a mate of `sex` ("male" or "female") is drawn with when `played` is the played spider's: the first spider's male mate has his own build
+-- (first_spider_male); every other mate is the played spider's own look, as before (ROBLOX-80).
+function Appearances.mateLook(played: string, sex: string?): string
+	if played == "first_spider" and sex == "male" then return "first_spider_male" end
+	return played
+end
+
+return Appearances
 

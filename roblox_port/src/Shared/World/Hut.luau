@@ -1445,6 +1445,7 @@ end
 -- Everything else of the hut is its own look (its material and colour), with the drawn detail beside it.
 function Hut.drawnPieces(region: Region): { string }
 	if region.kind == "hut_window" then return { "hut_window_glass" } end
+	if region.kind == "room_window" then return { "room_window_glass" } end
 	if region.id == "hut_desk" then return { "station_thermos", "station_thermos_cap" } end
 	-- (and the herbs' mounds, drawn as leafy masses over their boxes: Hut.decor)
 	local out: { string } = {}
@@ -1476,7 +1477,7 @@ Hut.BUDGETS = table.freeze({
 	hut_path = { full = 8, low = 2 }, patch = { full = 90, low = 10 },
 	-- (ROBLOX-118: the ceiling and the upper walls, the doorway, the front door's head, the eaves, and the back room)
 	hut_upper = { full = 26, low = 0 }, hut_doorway = { full = 0, low = 0 }, hut_door_up = { full = 0, low = 0 }, hut_eave = { full = 4, low = 0 },
-	room_floor = { full = 12, low = 1 }, room_sofa = { full = 8, low = 0 }, room_tv = { full = 4, low = 1 }, room_games = { full = 20, low = 0 }, room_window = { full = 4, low = 0 }, room_exit = { full = 0, low = 0 },
+	room_floor = { full = 12, low = 1 }, room_sofa = { full = 8, low = 0 }, room_tv = { full = 4, low = 1 }, room_games = { full = 20, low = 0 }, room_window = { full = 5, low = 1 }, room_exit = { full = 0, low = 0 },
 }) :: { [string]: { full: number, low: number } }
 
 local function sheet(budget: { full: number, low: number })
@@ -2319,6 +2320,9 @@ end
 local function roomWindowDecor(_region: Region, add: (Drawn) -> boolean)
 	local Wn = Hut.ROOM_WINDOW
 	local gx = Wn.glass - 0.4
+	local pane=rec("CrackedGlass", v(.1,Wn.head-Wn.gap,Wn.z1-Wn.z0), v(Wn.glass+.05,(Wn.head+Wn.gap)/2,(Wn.z0+Wn.z1)/2), "c9d6d8", "Glass", false)
+	pane.transparency=.65;pane.reflectance=.08
+	add(pane)
 	add(rec("FrameLow", v(0.8, 4, Wn.z1 - Wn.z0), v(gx, Wn.gap + 2, (Wn.z0 + Wn.z1) / 2), "efe9da", "Wood", true))
 	add(rec("FrameHigh", v(0.8, 4, Wn.z1 - Wn.z0), v(gx, Wn.head - 2, (Wn.z0 + Wn.z1) / 2), "efe9da", "Wood", true))
 	add(rec("FrameRail", v(0.8, 3, Wn.z1 - Wn.z0), v(gx, Wn.head / 2, (Wn.z0 + Wn.z1) / 2), "efe9da", "Wood", true))

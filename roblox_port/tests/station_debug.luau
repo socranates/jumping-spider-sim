@@ -11,6 +11,8 @@ local Surfaces=require("../src/Shared/Data/Surfaces")
 local Mouse=require("../src/Shared/Prey/StationMouse")
 local Body=require("../src/Client/StationMouseBody")
 local Director=require("../src/Shared/Prey/PreyDirector")
+local Cat=require("../src/Shared/Predator/Cat")
+local CatPose=require("../src/Shared/Rig/CatPose")
 local passed,failed=0,0
 local function check(ok,msg) if ok then passed+=1 else failed+=1;print("FAIL STATION DEBUG "..msg) end end
 Map.use("preserve")
@@ -34,6 +36,26 @@ input.wish=Vector3.xAxis
 for _=1,60*24 do motor:tick(input);if motor.mode~="attached" then detached+=1 end end
 check(motor.pos.X>530 and detached==0,"ground connects all the way to existing stone path")
 check(not Station.contains("room_exit"),"resident rival cannot follow onto exterior exit")
+local transparent=false
+for _,pane in Hut.decor(assert(Map.region("room_window"))) do
+ if pane.id=="CrackedGlass" then
+  transparent=pane.material=="Glass" and pane.transparency>=.6 and not pane.full
+   and pane.at.Y-pane.size.Y/2>=Hut.ROOM_WINDOW.gap-.001
+ end
+end
+check(transparent,"both tiers show transparent glass above the open crack")
+check(Region.drawnPieces(assert(Map.region("room_window")))[1]=="room_window_glass","opaque collision pane is replaced visually")
+local windowCat=Cat.new(Map.seed(914,"cat"));local windowHour
+for _,segment in Cat.plan(windowCat.seed,1) do
+ if segment.spot=="window" and segment.kind=="sit" then windowHour=(segment.t0+segment.t1)/2;break end
+end
+assert(windowHour)
+windowCat:step(1/60,1,windowHour,nil)
+local drawnHead=CatPose.frame(windowCat.pos,windowCat.heading):PointToWorldSpace(CatPose.skeleton({pose="sit",t=0}).head)
+check((Cat.head(windowCat)-drawnHead).Magnitude<.01,"seated cat senses from its drawn head inside the window")
+windowCat:step(1/60,1,windowHour,{pos=Vector3.new(450,.31,134),speed=2.5,hidden=false,visible=true})
+check(windowCat.notices==1,"window recess is guarded rather than incorrectly treated as outdoors")
+check(Cat.roomOf(Vector3.new(460,.31,134))==nil,"exterior ledge remains outside the cat's room")
 local floorRoot=Instance.new("Folder");floorRoot.Parent=workspace
 for _,r in Map.regions() do if Station.contains(r.id) then Build.region(r,floorRoot) end end
 local params=RaycastParams.new();params.FilterType=Enum.RaycastFilterType.Include;params.FilterDescendantsInstances={floorRoot}

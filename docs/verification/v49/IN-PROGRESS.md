@@ -1,5 +1,17 @@
 # Verification checkpoint — not published
 
+## New findings after the first freeze
+
+The `60b1c47` archive/rebuilt copy below is now a **baseline**, not final source. Low-tier native review found the back-room glass opaque; the working branch now draws transparent panes at both tiers. A related AI defect was found: standing-head coordinates placed the seated cat's sight origin outside the window, and the recess was incorrectly outside its room. Both are corrected, with dedicated regression checks. Make a new final source freeze/rebuild after the remaining visual review; do not publish the old `dba164426fa79a2b` candidate.
+
+Current focused station suite: **38 passed, 0 failed**; HUD: **37 passed, 0 failed**. Controlled paw-response benchmark (`cat-escape-benchmark.luau`): 31 starting distances, ordinary walking struck in 17, earned Run struck in 0. This proves improved response margin in that fixture, not universal safety or a full escape playthrough.
+
+Low-tier native station diagnostic completed again at 23:25:07Z with zero detached route ticks, after transparent glass but before the seated-head correction. The low gear and corrected window screenshots are saved here. Native full/low final-source checks, mouse visual review, source fingerprint comparison and native self-test remain required. The review driver now exposes `_G.ChetStation` for local diagnostic commands and supports `ChetStationView:Fire("mouse")`.
+
+Scratch `v49-source-audit.luau` currently targets the **old baseline** and must be regenerated from the new release XML before use. Do not use it as proof of the final source.
+
+## Baseline run and files
+
 Production source commit: `60b1c47e5e9c9d021d99b7721db9f70b035ff757`, pushed to `github/codex/v49-ranger-station`.
 
 Frozen input: `C:\Users\natha\claude-xfer\v49-full-60b1c47.zip`, SHA256 `4cb5aea1603bc5d3b9ba5a4186949de1785dfe612584cee6def287ce27b5f57b`.

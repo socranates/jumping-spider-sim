@@ -290,6 +290,9 @@ end
 -- The room a point is in, in plan ("hut", "back", or "doorway" for the doorway between, which is both).
 function Cat.roomOf(p: Vector3): string?
 	if p.X >= 146.5 and p.X <= 175 and p.Z >= 180 and p.Z <= 250 then return "doorway" end
+	-- The window recess belongs to the room up to the pane. Otherwise both
+	-- a spider on the sill and the seated cat's eyes were classified outside.
+	if p.X > 445 and p.X < 459 and p.Z >= 98 and p.Z <= 170 then return "back" end
 	for name, r in Cat.ROOMS do if p.X >= r[1] - 1 and p.X <= r[2] + 1 and p.Z >= 12.5 - 30 and p.Z <= 255.5 + 1 then return name end end
 	return nil
 end
@@ -316,6 +319,10 @@ end
 
 -- Its head and its chest, where it looks from and pats from.
 function Cat.head(self: any): Vector3
+	local seated = self.pose == "sit" or self.pose == "groom"
+		or (self.pose == "watch" and (self.spot == "window" or self.surface > -60))
+	-- Match CatPose's seated head, not its standing head outside the glass.
+	if seated then return self.pos + self.heading * 12.5 + v(0,29,0) end
 	return self.pos + self.heading * 24 + v(0, if self.pose == "sleep" or self.pose == "rest" then 8 else 22, 0)
 end
 function Cat.chest(self: any): Vector3

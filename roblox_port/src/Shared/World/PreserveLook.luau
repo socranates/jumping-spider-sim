@@ -250,7 +250,7 @@ local function hutDecor(out: List, rand: () -> number)
 	sblock(out, "EndWindow1", -HX - 1, -HX, 30, 100, 105, 165, C.glass, "SmoothPlastic", { far = true, reflectance = 0.2 })
 	sblock(out, "EndWindowIn1", -ix, -ix + 1, 30, 100, 105, 165, C.glass, "SmoothPlastic", { reflectance = 0.15 })
 	sblock(out, "EndCasing1", -HX - 1.5, -HX, 24, 106, 99, 171, C.trim, "WoodPlanks", { full = true })
-	sblock(out, "EndWindow2", RW.glass + R, RW.glass + 1 - R, 5, RW.y1, RW.z0, RW.z1, C.glass, "SmoothPlastic", { far = true, reflectance = 0.2 })
+	sblock(out, "EndWindow2", RW.glass + R, RW.glass + 1 - R, 5, RW.y1, RW.z0, RW.z1, C.glass, "Glass", { far = true, reflectance = 0.08, transparency = .85 })
 	-- A casing surrounds the opening; a single box here used to conceal the
 	-- entire window. Keep all four rails outside the actual five-cm crack.
 	sblock(out, "EndCasing2Low", HE, HE + 1.5, -6, 0, RW.z0 - 6, RW.z1 + 6, C.trim, "WoodPlanks", { far = true })

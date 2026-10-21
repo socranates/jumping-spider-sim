@@ -1,5 +1,6 @@
 -- Temporary Studio-only driver. Insert as Client/SilkPlayback, never publish it.
 return function(d)
+ _G.ChetStation=d
  local RS=game:GetService("RunService")
  local function wait(s) local t=os.clock()+s;while os.clock()<t do RS.RenderStepped:Wait() end end
  local deadline=os.clock()+30
@@ -20,6 +21,9 @@ return function(d)
   if view=="window" then at=Vector3.new(460,1,134);offset=Vector3.new(-25,13,24)
   elseif view=="boots" then at=Vector3.new(-111,-51,65);offset=Vector3.new(57,21,60)
   elseif view=="cat" then at=d.cat.pos+Vector3.new(0,12,0);offset=Vector3.new(68,28,-65)
+  elseif view=="mouse" then
+   local body=workspace.StationMouse:FindFirstChild("Body")
+   if body then at=body.Position;offset=Vector3.new(12,7,14) end
   elseif view=="gear" then at=Vector3.new(102,10,48);offset=Vector3.new(31,21,39)
   else return end
   local cam=workspace.CurrentCamera;cam.CFrame=CFrame.lookAt(at+offset,at);cam.Focus=CFrame.new(at);cam.FieldOfView=48

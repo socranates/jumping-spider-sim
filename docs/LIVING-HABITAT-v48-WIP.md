@@ -129,6 +129,12 @@ Working branch: `codex/v48-living-habitat`, based on v47 receipt commit `9d442ff
 - Weather playback is removed. Studio is now prepared for its built-in native client self-test (`SelfTest=true`, `Detail=full`); both attributes must be cleared after the run and before release. The native run is not yet complete. The earlier immutable 7236420 CLI run remains live in session 38032, with its completed suites passing; do not restart it. It cannot cover the later rain/wind changes.
 - `docs/verification/v48/HABITAT-ACCEPTANCE.md` maps the full requested habitat scope to existing evidence and remaining integrated acceptance. Ordinary travel/hunting, mound camera framing, final-source regression, native integration/performance, publication and synchronization remain open.
 
+### Native integrated review interrupted
+
+- The built-in native self-test began on source `0ca748a` and passed its opening life/intro and many local station visits. It recorded an initial all-world-folders failure and an upper-region visit reporting `hut_up_h` instead of `hut_up_i`.
+- Studio then exited before END. Its process is absent; this native run is terminal/incomplete, not a passing gate or a live wait. See `docs/verification/v48/NATIVE-0ca748a-INTERRUPTED.md` and its bounded log. Investigate the streaming assumption and reproduce the region-ownership result, then run the native gate again. Verify/clear debug attributes when reopening Studio.
+- An immutable 0ca748a candidate archive is prepared, but its complete CLI run has not started. The older 7236420 CLI job remains live in session 38032 at its preserve self-test; keep observing it rather than restarting it. Full habitat acceptance remains open.
+
 ## Platform judgment
 
 Roblox limits density, draw calls, memory and simulation cost, especially on phones. The current barren travel and missing ground are implementation/design problems. Compact, authored habitats with reused meshes, bounded active wildlife and selective detail remain a viable direction. No engine migration is needed to address these reported problems.

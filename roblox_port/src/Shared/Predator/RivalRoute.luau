@@ -118,6 +118,7 @@ local function build(g: any)
 	local boxes, faces = g.boxes, g.faces
 	for _, piece in Region.pieces(g.region) do
 		table.insert(boxes, boxOf(piece))
+		if g.work then g.work() end
 	end
 	g.own = #boxes
 	-- The neighbours' boxes are obstacles here (a body beside the seam fits only where it fits in the whole world), and have no faces in this graph.
@@ -149,6 +150,7 @@ local function build(g: any)
 				local n = if face.area > 60 then 9 else 5
 				for i = 0, n - 1 do
 					for j = 0, n - 1 do
+						if g.work then g.work() end
 						local pt = { 0, 0, 0 }
 						pt[axis] = face.plane
 						local function at(k: number, t: number): number
@@ -176,6 +178,7 @@ local function build(g: any)
 		end
 		for _, h in faces do
 			if h.axis ~= f.axis then
+				if g.work then g.work() end
 				local B = boxes[1]
 				for bi = 1, g.own do
 					if boxes[bi].id == h.piece then B = boxes[bi]; break end
@@ -524,11 +527,13 @@ function Graph.waypoints(self: any): { Waypoint }
 	build(self)
 	local out: { Waypoint } = {}
 	for _, f in self.faces do
+		if self.work then self.work() end
 		if not f.forbidden and f.normal.Y > -0.5 and f.area >= 1.5 and #f.stand > 0 then
 			local k = math.clamp(math.floor(f.area / 70) + 1, 1, 5)
 			local picked: { Vector3 } = {}
 			local pool: { Vector3 } = {}
 			for _, s in f.stand do
+				if self.work then self.work() end
 				if not self:inKeepOut(s + f.normal * SEAT) and not self:inKeepOut(s) then table.insert(pool, s) end
 			end
 			if #pool > 0 then
@@ -536,6 +541,7 @@ function Graph.waypoints(self: any): { Waypoint }
 				while #picked < math.min(k, #pool) do
 					local far, farD = pool[1], -1.0
 					for _, s in pool do
+						if self.work then self.work() end
 						local nearest = math.huge
 						for _, q in picked do nearest = math.min(nearest, (s - q).Magnitude) end
 						if nearest > farD then far, farD = s, nearest end
@@ -566,10 +572,11 @@ local function buildSeams(g: any)
 	g.seamsBuilt = true
 	build(g)
 	for _, n in g.region.neighbors do
-		local other = Route.graph(n.id)
+		local other = if g.resolve then g.resolve(n.id) else Route.graph(n.id)
 		build(other)
 		for _, f in g.faces do
 			for _, h in other.faces do
+				if g.work then g.work() end
 				local samplesLine: { number }? = nil
 				local axis, fixed, ahead, convex, flat = 0, { 0, 0, 0 }, Vector3.zero, false, false
 				local nf, nh = f.normal, h.normal
@@ -655,6 +662,129 @@ function Graph.allSeams(self: any): { { face: number, edge: SeamEdge } }
 	for fid = 1, #self.faces do
 		for _, e in self.seams[fid] or {} do table.insert(out, { face = fid, edge = e }) end
 	end
+	return out
+end
+
+-- Opt-in frame-budgeted preparation. Legacy graph queries stay synchronous.
+-- Jobs own their construction tables; the public cache receives only completed
+-- face graphs, and prepared() requires complete seams and patrol waypoints too.
+local pending: { [string]: any } = {}
+local queue: { any } = {}
+local active: any = nil
+local budget = { left = 0, deadline = 0.0 }
+local preparation = { completed = 0, cancelled = 0, failed = 0, lastUnits = 0, lastSeconds = 0.0, largestSlice = 0.0, error = "" }
+
+local function keyOf(id: string): string return WorldMap.world() .. "/" .. id end
+local function ready(g: any): boolean
+	return g ~= nil and g.built == true and g.seamsBuilt == true and g.preparedWaypoints ~= nil
+end
+function Route.prepared(id: string): any
+	local g = graphs[keyOf(id)]
+	return if ready(g) then g else nil
+end
+function Route.preparedWaypoints(g: any): { Waypoint }
+	assert(ready(g), "route is not prepared")
+	local out = {}
+	for _, p in g.preparedWaypoints do table.insert(out, table.clone(p)) end
+	return out
+end
+local function checkpoint()
+	budget.left -= 1
+	if budget.left <= 0 or os.clock() >= budget.deadline then coroutine.yield() end
+end
+local function privateGraph(id: string): any
+	local old = graphs[keyOf(id)]
+	if old ~= nil and old.built then
+		-- Built faces/obstacles are stable. Seams are written only on this clone.
+		return setmetatable(table.clone(old), Graph)
+	end
+	local region = WorldMap.region(id)
+	assert(region ~= nil, "no region " .. id)
+	return setmetatable({ region = region, own = 0, real = 0, boxes = {}, faces = {}, keep = Region.keepOut(region), built = false, seamsBuilt = false, seams = {} }, Graph)
+end
+function Route.request(id: string, priority: boolean?): boolean
+	if Route.prepared(id) ~= nil then return true end
+	assert(WorldMap.region(id) ~= nil, "no region " .. id)
+	local key = keyOf(id)
+	local job = pending[key]
+	if job ~= nil then
+		if priority ~= false and job ~= active then
+			local at = table.find(queue, job)
+			if at ~= nil and at > 1 then table.remove(queue, at); table.insert(queue, 1, job) end
+		end
+		return false
+	end
+	job = { id = id, key = key, world = WorldMap.world() }
+	job.thread = coroutine.create(function()
+		local shadows: { [string]: any } = {}
+		local function resolve(otherId: string): any
+			if shadows[otherId] ~= nil then return shadows[otherId] end
+			local old = graphs[keyOf(otherId)]
+			if old ~= nil and old.built then return old end
+			local made = privateGraph(otherId)
+			made.work = checkpoint
+			shadows[otherId] = made
+			return made
+		end
+		local root = privateGraph(id)
+		-- A pending clone must never append to a public partial seam table.
+		if not root.seamsBuilt then root.seams = {} end
+		root.work, root.resolve = checkpoint, resolve
+		shadows[id] = root
+		buildSeams(root)
+		root.preparedWaypoints = root:waypoints()
+		-- No yields during publication. A world change cancels the job before
+		-- its next resume, so these keys always name the world being prepared.
+		for otherId, made in shadows do
+			made.work, made.resolve = nil, nil
+			local old = graphs[keyOf(otherId)]
+			if otherId == id then
+				if not ready(old) then graphs[keyOf(otherId)] = made end
+			elseif old == nil or not old.built then graphs[keyOf(otherId)] = made end
+		end
+	end)
+	pending[key] = job
+	if priority == false then table.insert(queue, job) else table.insert(queue, 1, job) end
+	return false
+end
+function Route.cancelPreparation()
+	for _ in pending do preparation.cancelled += 1 end
+	pending, queue, active = {}, {}, nil
+end
+function Route.advance(maxUnits: number?, seconds: number?): (boolean, string?)
+	local started = os.clock()
+	local units = math.max(1, math.floor(maxUnits or 512))
+	budget.left, budget.deadline = units, started + math.max(0, seconds or .002)
+	local ok, problem = true, nil :: string?
+	while budget.left > 0 and os.clock() < budget.deadline do
+		if active == nil then active = table.remove(queue, 1) end
+		if active == nil then break end
+		local job = active
+		if job.world ~= WorldMap.world() then
+			pending[job.key], active = nil, nil
+			preparation.cancelled += 1
+			continue
+		end
+		local resumed, why = coroutine.resume(job.thread)
+		if not resumed then
+			preparation.failed += 1; preparation.error = tostring(why)
+			pending[job.key], active = nil, nil
+			ok, problem = false, tostring(why)
+			break
+		elseif coroutine.status(job.thread) == "dead" then
+			pending[job.key], active = nil, nil
+			preparation.completed += 1
+		else break end
+	end
+	preparation.lastUnits = units - budget.left
+	preparation.lastSeconds = os.clock() - started
+	preparation.largestSlice = math.max(preparation.largestSlice, preparation.lastSeconds)
+	return ok, problem
+end
+function Route.preparationStats(): any
+	local out: any = table.clone(preparation)
+	local count = 0; for _ in pending do count += 1 end
+	out.pending, out.active = count, if active then active.id else nil
 	return out
 end
 

@@ -31,14 +31,33 @@ end
 
 -- `motor`: a SpiderMotor made for the rival (its own world query and probe). `blocked(a, b)`: something opaque between the points. ROBLOX-94: `region` (the sill's unless
 -- given) is the region it walks in, whose retreats it never enters.
-function Drive.new(motor: any, blocked: (Vector3, Vector3) -> any, region: string?, roam: { [string]: boolean }?): any
-	local id = region or WorldMap.HOME
+local function graphAndPoints(id: string, incremental: boolean?): (any, { any })
+	if incremental then
+		Route.request(id)
+		local g = Route.prepared(id)
+		return g, if g ~= nil then Route.preparedWaypoints(g) else {}
+	end
 	local g = Route.graph(id)
-	local waypoints = g:waypoints()
+	return g, g:waypoints()
+end
+function Drive.prepare(roam: { [string]: boolean }?, first: string)
+	local ids = {}
+	if roam ~= nil then for id in roam do table.insert(ids, id) end end
+	table.sort(ids)
+	for _, id in ids do Route.request(id, false) end
+	Route.request(first)
+end
+-- Time limits the cost on slower devices; the secondary work quota also
+-- prevents an unusually fast clock/read from making this an unbounded loop.
+function Drive.advance(): (boolean, string?) return Route.advance(2048, .002) end
+function Drive.new(motor: any, blocked: (Vector3, Vector3) -> any, region: string?, roam: { [string]: boolean }?, incremental: boolean?): any
+	local id = region or WorldMap.HOME
+	local g, waypoints = graphAndPoints(id, incremental)
 	local stride = 7
 	while gcd(stride, math.max(#waypoints, 1)) ~= 1 do stride += 1 end
 	return setmetatable({
 		motor = motor, blocked = blocked, region = id, g = g, waypoints = waypoints, stride = stride, roam = roam, crossing = nil :: any,
+		incremental = incremental == true, preparingCross = false,
 		ticks = 0, think = 0.0, face = nil :: number?, route = nil :: { any }?, hop = 1,
 		goal = nil :: any, goalKey = "", prevState = "dormant",
 		lastUp = Vector3.yAxis, sees = false, reach = false, remember = false, seen = nil :: Vector3?, seenUp = Vector3.yAxis, lost = 0.0,
@@ -55,8 +74,7 @@ end
 function Drive.useRegion(self: any, id: string)
 	if id == self.region and self.g ~= nil then return end
 	self.region = id
-	self.g = Route.graph(id)
-	self.waypoints = self.g:waypoints()
+	self.g, self.waypoints = graphAndPoints(id, self.incremental)
 	local stride = 7
 	while gcd(stride, math.max(#self.waypoints, 1)) ~= 1 do stride += 1 end
 	self.stride = stride
@@ -67,6 +85,7 @@ end
 -- (ROBLOX-117) A crossing to a neighbour of the roam: the seam point of this region's graph nearest `toward` (or any) on a flat seam to a region of the roam (only
 -- `only`, if given), as a goal { pos, up, face, cross = { to, aim } }; nil when there is none.
 function Drive.crossTo(self: any, toward: Vector3?, only: string?): any
+	self.preparingCross = false
 	if self.roam == nil then return nil end
 	local best, bestD = nil, math.huge
 	for _, pair in self.g:allSeams() do
@@ -87,6 +106,11 @@ function Drive.crossTo(self: any, toward: Vector3?, only: string?): any
 			if toward == nil and best ~= nil then break end
 		end
 	end
+	if best ~= nil and self.incremental and Route.prepared(best.cross.to) == nil then
+		Route.request(best.cross.to)
+		self.preparingCross = true
+		return nil
+	end
 	return best
 end
 
@@ -94,6 +118,7 @@ end
 -- the neighbours of the roam in a drawn order that has a flat seam.
 Drive.CROSS_CHANCE = 0.4
 function Drive.crossLeg(self: any, seed: number, leg: number): any
+	self.preparingCross = false
 	if self.roam == nil then return nil end
 	local g = PreyRandom.mixed(seed, leg, 89)
 	if g:next() >= Drive.CROSS_CHANCE then return nil end
@@ -106,6 +131,7 @@ function Drive.crossLeg(self: any, seed: number, leg: number): any
 	for k = 0, #options - 1 do
 		local w = self:crossTo(nil, options[((start - 1 + k) % #options) + 1])
 		if w ~= nil then return w end
+		if self.preparingCross then return nil end -- retain the same seeded choice until it is ready
 	end
 	return nil
 end
@@ -165,6 +191,7 @@ function Drive._pickWaypoint(self: any, r: any, s: any?): any
 	if s ~= nil and self.roam ~= nil then
 		local w = self:crossLeg(s.seed or 0, r.leg or 0)
 		if w ~= nil then return w end
+		if self.preparingCross then return nil end
 	end
 	for attempt = 0, 6 do
 		local leg = (r.leg or 0) + attempt
@@ -405,6 +432,11 @@ function Drive.update(self: any, r: any, dt: number, s: any)
 	if r.region ~= nil and r.region ~= self.region and WorldMap.region(r.region) ~= nil then
 		self:useRegion(r.region)
 		self.crossing = nil
+	end
+	if self.incremental and self.g == nil then
+		Route.request(self.region)
+		if Route.prepared(self.region) == nil then self.wish = Vector3.zero; return end
+		self:useRegion(self.region)
 	end
 	local prev = self.prevState
 	self.prevState = state

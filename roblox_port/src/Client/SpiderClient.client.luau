@@ -202,6 +202,8 @@ local rig = SpiderRig.new(Workspace, M.World.root, appearance, detail)
 -- caught (ROBLOX-77, `grip` made below with the reserves). One table: the client is at Luau's limit of 200 locals.
 local rivalLegs: any = { drive = nil, rig = nil, Drive = require(Shared.Predator.RivalDrive), Text = require(Shared.UI.RivalText), Grip = require(Shared.Predator.RivalGrip), grip = nil,
 	Display = require(Shared.Predator.RivalDisplay), display = nil, event = "", input = {} } -- (ROBLOX-127: the male's contest display, drawn on the rival's rig)
+rivalLegs.incremental = M.World.world == "preserve"
+if rivalLegs.incremental then rivalLegs.Drive.prepare(RivalSpider.roam(), select(2, RivalSpider.arriveAt()) or M.World.home) end
 -- The mating cycle (ROBLOX-80): its modules, the stage that draws it (the mate's rig, the egg sac, the hatching), the mate's legs, and where the ending is
 -- ("" while none, "scene" while the spiderlings play, "card" while the ending card is up). One table: the client is at Luau's limit of 200 locals.
 local mateLegs: any = { Mating = require(Shared.Life.Mating), Mate = require(Shared.Predator.Mate), Drive = require(Shared.Predator.MateDrive), Text = require(Shared.UI.MateText),
@@ -1723,6 +1725,14 @@ end
 local accumulator = 0
 RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, function(frameDt: number)
 	M.Prof.begin() -- (ROBLOX-111: the frame timed by part, for the self-test; each M.Prof.lap below charges the time since the last to its part)
+	if rivalLegs.incremental then
+		rivalLegs.navOK, rivalLegs.navError = rivalLegs.Drive.advance()
+		if not rivalLegs.navOK and rivalLegs.navError ~= rivalLegs.navReported then
+			rivalLegs.navReported = rivalLegs.navError
+			warn("[Windowsill] surface route preparation: " .. tostring(rivalLegs.navError))
+		end
+		M.Prof.lap("surface routes")
+	end
 	saveState.frame()
 	spiderPick.update(frameDt) -- (the choose hold's clock and the close look's reasons to end)
 	M.Prof.lap("save")
@@ -1979,7 +1989,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
               world = M.World.root, surfaces = Surfaces, profile = Species.phidippus_audax_prototype,
               spawn = life.rival.position, heading = life.rival.heading,
               boundsMin = rivalLegs.range[1], boundsMax = rivalLegs.range[2], probeParent = arc, -- (ROBLOX-95: bound to the sill, its bounds; ROBLOX-117: the hut garden's in the preserve)
-             }),sightCast,life.rival.region or M.World.home,RivalSpider.roam())
+             }),sightCast,life.rival.region or M.World.home,RivalSpider.roam(),rivalLegs.incremental)
              rivalLegs.drive.camps=true -- (ROBLOX-106: in Normal a patrol leg may be a watch by the crack)
             end
             -- A caught rival fights the tapping grip before it can be eaten (ROBLOX-77); it is subdued, or it tears free and recovers (never a harm).

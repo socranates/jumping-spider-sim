@@ -57,6 +57,12 @@ Working branch: `codex/v48-living-habitat`, based on v47 receipt commit `9d442ff
 - Still required: finish current regression/compile checks, inspect native compact travel and ground coverage, inspect close detail/animal grounding, benchmark both detail tiers, then build/publish/synchronize a verified release. A refreshed strict analysis completed with no diagnostics after compaction.
 - Do not claim the habitat is rich or the falls fixed in the live game based on isolated fixtures or CLI checks. User report of no outdoor insects is a player-experience failure until normal travel visibly encounters them.
 
+### Incremental station navigation follow-up
+
+- Surface route preparation now runs privately across frames, with atomic publication of completed graphs and explicit readiness for the rival's drive. The 51 station graph fingerprints match the archived pre-change baseline. Cold crossings retain their seeded patrol choice while waiting; station territory and movement rules remain intact.
+- Targeted regression results: route preparation 11,067/0, rival 2,843/0, rival navigation 581/0, station threats 32,883/0, world client 30/0; strict analysis clean, 204/204 source files compile.
+- Uncontended native station repeat: all 51 jobs complete by the 20-second report, no errors, rival travels 52.52 cm. Rival profile mean/worst 0.17/1.3 ms; frames after ten seconds average 19.55 ms, worst 61.57 ms. Startup-inclusive worst remains 1,005 ms. The cooperative 2 ms route budget can overrun (4 ms measured), and this is not a universal performance claim. See `docs/verification/v48/ROUTE-REVIEW.md` for evidence and remaining gates.
+
 ### Resident/HUD work, later than the frozen run
 
 - Native Studio review: stage 0, goal 7 meals, zero visible gameplay TextLabels; the rival patrolled the station floor and the wasp searched the desk. The review uses a protected resting spider and a Studio-only driver, so it does not prove ordinary hunt/escape feel or published behavior.

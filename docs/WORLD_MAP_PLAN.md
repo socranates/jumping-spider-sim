@@ -145,7 +145,7 @@ its sourced notebook page before it ships, as the garden's did.
 
 1. **Now (W3c, the look):** better insect animation (legs that step, wings that beat, antennae), bushes to the ground in the view and
    `shrub_west` begun, the single-story house (`wall_upper` with eaves and gutter, the bungalows in the view), a detail and realism pass
-   on the four built regions. *Done (ROBLOX-103, 2026-10-19), but for `shrub_west`, which was not begun: the bodies move (pose only), ten
+   on the four built regions. *(ROBLOX-128, 2026-10-21: the creatures' motion audited and taken further: grooming, readying, a singing cricket, a rowing strider, a robin's posture, a breathing frog, and fast wings as a blur that never strobes; `docs/GARDEN_BESTIARY.md`'s table.)* *Done (ROBLOX-103, 2026-10-19), but for `shrub_west`, which was not begun: the bodies move (pose only), ten
    bushes to the ground stand round the garden's edges in the view, `wall_upper` is built with the rest of the house drawn round it, the
    houses across the way are bungalows beyond a back fence and side fences, and the outer sill, the wall, the bed and the view have more
    detail. The gutter's retreat and the eaves' house spider are still to come.*

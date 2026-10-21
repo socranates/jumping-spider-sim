@@ -59,10 +59,8 @@ FlyLook.legs = {
 FlyLook.bristles = {
 	diameter = 0.007,
 	items = {
-		{ from = { 0.027, 0.061, -0.284 }, to = { 0.043, 0.119, -0.319 }, mirror = true }, -- on the head, pointing up and forward
+		-- (ROBLOX-128: the head's, the thorax's rear and the abdomen's pairs gave their six parts to the wings' veins, which show far more at the spider's eye)
 		{ from = { 0.047, 0.124, -0.022 }, to = { 0.066, 0.176, 0.011 }, mirror = true }, -- on the thorax's back
-		{ from = { 0.037, 0.098, 0.044 }, to = { 0.05, 0.132, 0.103 }, mirror = true }, -- at the thorax's rear, pointing back
-		{ from = { 0.078, 0.051, 0.267 }, to = { 0.111, 0.084, 0.317 }, mirror = true }, -- on the abdomen's side
 	},
 } :: { diameter: number, items: { { from: { number }, to: { number }, mirror: boolean } } }
 
@@ -76,6 +74,18 @@ FlyLook.wing = {
 	yaw = 9, pitch = 4, roll = 5,
 	transparency = 0.55, reflectance = 0.1,
 	vein = { diameter = 0.008, offset = 0.055, from = -0.42, to = 0.40, transparency = 0.2 }, -- from, to: along the wing, as shares of its length from the middle
+	-- (ROBLOX-128) the venation inside the leading vein, full tier only, at rest only (hidden in the blur): R4+5 out toward the tip, and M1+2 down the middle of the
+	-- wing with the house fly's sharp bend up toward R4+5 near the margin (BugGuide's Musca note: "sharply bent vein M1+2 that almost touches vein R4+5 at the wing
+	-- margin"). Each a rod on the wing's upper face from (x, z) to (x, z): x across the wing as a share of its half-width (+ toward the leading edge), z along it as a
+	-- share of its length from the middle (+ toward the tip).
+	veins = {
+		diameter = 0.006, transparency = 0.35,
+		items = {
+			{ name = "VeinR45", from = { 0.05, -0.36 }, to = { 0.12, 0.47 } },
+			{ name = "VeinM1", from = { -0.22, -0.30 }, to = { -0.30, 0.32 } },
+			{ name = "VeinM2", from = { -0.30, 0.32 }, to = { 0.07, 0.465 } }, -- the bend
+		},
+	},
 	film = { rise = 0.004, grow = 0.004, transparency = 0.82 },
 	fan = {
 		reach = 0.36, span = 0.34, roll = 8, yaw = 20, back = 0.02, rise = 0.01, transparency = 0.80, -- the denser blur near the root
@@ -104,7 +114,21 @@ FlyLook.shadow = { size = { 0.34, 0.004, 0.70 }, lift = 0.003, transparency = 0.
 --   tumble .... turns end over end in a hop (the springtail's somersault), this many turns per hop.
 -- Reduced Motion (the player's setting, as the spider's rig reads it) keeps the stepping, which is how a body gets anywhere, and stills the rest: no sway,
 -- no trembling or beating fan (a still blur), no shiver, no rocking, no crouch, no somersault.
-FlyLook.motion = { gait = { stride = 0.36, swing = 0.30, lift = 0.32, settle = 9, jump = 0.6 }, kick = 6 }
+--   groom ..... (ROBLOX-128) standing calm and still, it grooms in bouts: after `after` seconds and then every `every` (each wait drawn from a hash of the body's id
+--               and the bout's number, never math.random), a bout of `bout` seconds: the front legs drawn in under the head and rubbed together, or the hind
+--               legs drawn back under the abdomen's tip and rubbed together (the drawing's short legs cannot sweep over the wings), the front first (Seeds et al. 2014, eLife 3:e02951: the front legs clean the head, the
+--               hind legs the abdomen and wings, rubbing bouts between; the order of priority front to back). `hz` the rub. A walk, a flight, an alarm or a
+--               scheduled take-off ends a bout at once. The timing is the game's.
+--   ready ..... (ROBLOX-128) a take-off scheduled (its reaction pending), it readies: the body raised `lift` on its legs and tipped `pitch` nose up, the middle legs
+--               swung forward `legs` (Card & Dickinson 2008, Current Biology: a fly sets its middle legs and leans in the 100 ms or so before its escape jump).
+FlyLook.groom = { after = { 2.5, 5 }, every = { 3, 7 }, bout = { 1.2, 2.4 }, hz = 5, amp = 0.16 }
+FlyLook.ready = { lift = 0.03, pitch = 0.16, legs = 0.35 }
+FlyLook.motion = { gait = { stride = 0.36, swing = 0.30, lift = 0.32, settle = 9, jump = 0.6 }, kick = 6, groom = FlyLook.groom, ready = FlyLook.ready }
+-- (ROBLOX-128) The fastest wingbeat drawn as a beat: a fly's wings beat 190 to 330 times a second, a mosquito's 600 and some midges' 1,000 (hypertextbook's
+-- table of wingbeat frequencies, after Chapman and Wigglesworth), and at 60 frames a second anything over half that, 30 Hz, steps backward or stands still on the
+-- screen (it strobes). A sheet's `flap` above BLUR_HZ is drawn as the blur that trembles (FlyLook.wing.fan.shimmer), as the house fly's always was; the moth's 5 Hz
+-- is drawn as a beat.
+FlyLook.BLUR_HZ = 12
 -- ROBLOX-114 (everything to scale): the scale a prey is drawn at. A profile's `visual_scale` is Godot's (golden, never changed here); a kind listed in `trueScale`
 -- is drawn at that instead, because the golden one draws it at a size it is not: the fruit fly at 0.6 is the house fly's 7.3 mm body made 4.4 mm, and Drosophila
 -- melanogaster is about 2.5 mm long (BioNumbers 100750), so it is drawn at 0.4, 2.9 mm. Only the drawing: its collider, its senses and its meal are the profile's.
@@ -146,7 +170,7 @@ FlyLook.small = {
 		wing = { root = { 0.05, 0.1, -0.06 }, length = 0.5, width = 0.16, thick = 0.005, yaw = 6, pitch = 2, roll = 0, transparency = 0.5, reflectance = 0.08,
 			fan = { reach = 0.34, span = 0.3, roll = 8, yaw = 20, back = 0.02, rise = 0.01, transparency = 0.8 } },
 		shadow = { size = { 0.2, 0.004, 0.55 }, lift = 0.003, transparency = 0.8 },
-		motion = { gait = { stride = 0.42, swing = 0.32, lift = 0.30, settle = 9, jump = 0.6 }, kick = 7, antenna = { amp = 0.14, hz = 1.6 } },
+		motion = { gait = { stride = 0.42, swing = 0.32, lift = 0.30, settle = 9, jump = 0.6 }, kick = 7, antenna = { amp = 0.14, hz = 1.6 }, groom = FlyLook.groom, ready = FlyLook.ready },
 	},
 	-- an aphid: a pear-shaped green body, a small head, two cornicles at the rear, short legs, long antennae, no wings
 	aphid = {
@@ -284,7 +308,7 @@ FlyLook.small.hoverfly = {
 			transparency = 0.5, reflectance = 0.08, fan = { reach = 0.55, span = 0.4, roll = 6, yaw = 30, back = 0.02, rise = 0.02, transparency = 0.82 } },
 	} :: { any },
 	shadow = { size = { 0.4, 0.004, 0.9 }, lift = 0.003, transparency = 0.82, full = true },
-	motion = { gait = { stride = 0.25, swing = 0.25, lift = 0.25, settle = 10, jump = 0.6 }, kick = 6, antenna = { amp = 0.06, hz = 1.0 }, flap = { hz = 30, amp = 0.4 } },
+	motion = { gait = { stride = 0.25, swing = 0.25, lift = 0.25, settle = 10, jump = 0.6 }, kick = 6, antenna = { amp = 0.06, hz = 1.0 }, flap = { hz = 30, amp = 0.4 }, groom = FlyLook.groom, ready = FlyLook.ready },
 }
 -- (the crane fly's legs: hip, knee, ankle and foot of the right front, middle and hind leg, standing splayed and dangling in flight)
 local craneLegs = {
@@ -339,7 +363,7 @@ FlyLook.small.cricket = {
 		{ name = "EyeR", color = "eye", reflectance = 0.06, at = { 0.2, 0.32, -0.92 }, size = { 0.14, 0.16, 0.14 }, full = true },
 		{ name = "Pronotum", color = "pronotum", at = { 0, 0.26, -0.52 }, size = { 0.6, 0.42, 0.38 } },
 		{ name = "Abdomen", color = "abdomen", at = { 0, 0.18, 0.25 }, size = { 0.6, 0.38, 1.2 } },
-		{ name = "Forewings", color = "tegmen", at = { 0, 0.35, 0.12 }, size = { 0.58, 0.1, 1.0 }, full = true },
+		{ name = "Forewings", color = "tegmen", at = { 0, 0.35, 0.12 }, size = { 0.58, 0.1, 1.0 }, full = true, hinge = { 0, 0.33, -0.36 } },
 	} :: { any },
 	rods = {
 		{ name = "Antenna", color = "antenna", d = 0.025, from = { 0.08, 0.36, -1.05 }, to = { 0.75, 0.42, -2.7 }, mirror = true },
@@ -355,7 +379,11 @@ FlyLook.small.cricket = {
 	shadow = { size = { 0.8, 0.004, 2.0 }, lift = 0.003, transparency = 0.8, full = true },
 	-- quick bursts of steps, a crouch on its hind legs before the jump, the antennae always moving
 	motion = { gait = { stride = 0.5, swing = 0.3, lift = 0.3, settle = 9, jump = 1.0 }, kick = 7, antenna = { amp = 0.18, hz = 1.3 },
-		crouch = { depth = 0.06, pitch = 0.16 } },
+		crouch = { depth = 0.06, pitch = 0.16 },
+		-- (ROBLOX-128) singing (Prey/PreyKinds.chirping), a male raises his forewings over the abdomen to about 45 degrees (`raise`) and closes them a little in each
+		-- chirp, a scraper on one wing drawn over the file on the other, a pulse a closing stroke (UF/IFAS's field crickets, EENY/IN222). The game's sound is five chirps
+		-- of four pulses in 2 s, so a chirp every `period` s lasting `chirp` s; the pulses themselves are too quick to draw, so the wings dip by `dip` through each chirp.
+		sing = { raise = 0.75, period = 0.4, chirp = 0.18, dip = 0.12, ease = 6 } },
 }
 
 -- ROBLOX-122: the pond's prey, drawn at their true sizes (docs/NOTEBOOK_SOURCES.md, their pages). A non-biting midge (Chironomidae): about 5.5 mm, a slender pale
@@ -385,7 +413,7 @@ FlyLook.small.midge = {
 			transparency = 0.55, reflectance = 0.08, fan = { reach = 0.24, span = 0.2, roll = 6, yaw = 25, back = 0.02, rise = 0.01, transparency = 0.85 } },
 	} :: { any },
 	shadow = { size = { 0.14, 0.004, 0.4 }, lift = 0.003, transparency = 0.82, full = true },
-	motion = { gait = { stride = 0.18, swing = 0.3, lift = 0.3, settle = 10, jump = 0.6 }, kick = 6, antenna = { amp = 0.1, hz = 1.4 }, flap = { hz = 40, amp = 0.35 } },
+	motion = { gait = { stride = 0.18, swing = 0.3, lift = 0.3, settle = 10, jump = 0.6 }, kick = 6, antenna = { amp = 0.1, hz = 1.4 }, flap = { hz = 40, amp = 0.35 }, groom = FlyLook.groom, ready = FlyLook.ready },
 }
 -- A mosquito (Culicidae): about 5 mm of body, a brown-grey thorax and a banded abdomen, a long straight proboscis, long thin legs, one pair of scaled wings laid
 -- over the back.
@@ -414,7 +442,7 @@ FlyLook.small.mosquito = {
 			transparency = 0.45, reflectance = 0.06, fan = { reach = 0.26, span = 0.2, roll = 6, yaw = 25, back = 0.02, rise = 0.01, transparency = 0.85 } },
 	} :: { any },
 	shadow = { size = { 0.3, 0.004, 0.45 }, lift = 0.003, transparency = 0.82, full = true },
-	motion = { gait = { stride = 0.2, swing = 0.3, lift = 0.3, settle = 10, jump = 0.6 }, kick = 6, antenna = { amp = 0.08, hz = 1.2 }, flap = { hz = 40, amp = 0.35 } },
+	motion = { gait = { stride = 0.2, swing = 0.3, lift = 0.3, settle = 10, jump = 0.6 }, kick = 6, antenna = { amp = 0.08, hz = 1.2 }, flap = { hz = 40, amp = 0.35 }, groom = FlyLook.groom, ready = FlyLook.ready },
 }
 -- The eastern forktail (Ischnura verticalis), a damselfly about 2.8 cm long: wide-set eyes, a green and black striped thorax, a slender black abdomen ringed pale
 -- with blue on its tip (the male), four clear wings held together over the back at rest; short spiny legs.
@@ -448,7 +476,7 @@ FlyLook.small.damselfly = {
 			transparency = 0, reflectance = 0, hide = true, full = true },
 	} :: { any },
 	shadow = { size = { 0.5, 0.004, 2.6 }, lift = 0.003, transparency = 0.84, full = true },
-	motion = { gait = { stride = 0.2, swing = 0.25, lift = 0.25, settle = 8, jump = 0.8 }, kick = 5, antenna = { amp = 0.02, hz = 0.5 }, flap = { hz = 25, amp = 0.5 } },
+	motion = { gait = { stride = 0.2, swing = 0.25, lift = 0.25, settle = 8, jump = 0.8 }, kick = 5, antenna = { amp = 0.02, hz = 0.5 }, flap = { hz = 25, amp = 0.5 }, ready = FlyLook.ready },
 }
 
 return FlyLook

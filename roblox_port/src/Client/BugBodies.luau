@@ -20,6 +20,9 @@
 --   harvestman ... a small oval body with its eye turret and palps, high on eight long legs of two segments each (the second pair longest), stepping;
 --                  by day (`hidden`) it is away and drawn nowhere near
 -- Reduced Motion keeps the steps and stills the rest (antennae, the ladybird's head, the snail's feelers' sway).
+-- ROBLOX-128 (the small lives): the ant's elbowed antennae sweep as it goes (both sides, each its own phase); the water strider rows: its middle legs, the oars, sweep
+-- back together in a quick stroke and come forward slowly while it glides (a stroke per `stride` of water covered, about a body length; MIT's 2003 note on Hu, Chan
+-- and Bush: the middle legs row, a glide carries it about a body length), its feet's dimples going with them. No part added.
 local Workspace = game:GetService("Workspace")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
@@ -68,13 +71,14 @@ BugBodies.ambient = {
 	-- (ROBLOX-119) a small brown field ant of the meadow's hill, about 4 mm: head, thorax, the waist's node and the gaster, six legs, elbowed antennae
 	ant = {
 		colors = { head = "3a2618", thorax = "5a3a22", gaster = "2e1f14", leg = "4a3020", antenna = "3a2618" },
-		motion = { gait = { stride = 0.18, swing = 0.4, lift = 0.3, settle = 12, jump = 1.0 } },
+		motion = { gait = { stride = 0.18, swing = 0.4, lift = 0.3, settle = 12, jump = 1.0 }, antenna = { amp = 0.3, hz = 1.8 } },
 	},
 	-- (ROBLOX-122) a water strider of the pond, about 1.2 cm: a slim dark body, short front legs held up to grab, the long middle legs (the oars) and hind legs (the
 	-- rudders) spread wide on the water, each foot in a dimple of the surface
 	skater = {
 		colors = { body = "2e2a24", belly = "6a6458", leg = "3a342c", dimple = "c8d4d6" },
-		motion = { gait = { stride = 3.0, swing = 0.2, lift = 0.0, settle = 8, jump = 30.0 } },
+		-- (ROBLOX-128) `row`: the oar's sweep back (rad) and the share of a stroke spent pulling (the rest is the slow reach forward)
+		motion = { gait = { stride = 1.5, swing = 0.2, lift = 0.0, settle = 8, jump = 30.0 }, row = { sweep = 0.38, pull = 0.3 } },
 	},
 	harvestman = {
 		colors = { body = "6e5034", turret = "3a2a1c", leg = "5a4330", palp = "6a4e36" },
@@ -308,8 +312,11 @@ local function buildAnt(tier: string): { Spec }
 		if tier ~= "low" then
 			local base = v(0.03 * side, 0.05, -0.19)
 			local elbow = base + v(0.05 * side, 0.03, -0.04)
-			table.insert(out, rodSpec(`Scape{side}`, base, elbow, 0.01, hex(C.antenna), nil, side, 0))
-			table.insert(out, rodSpec(`Flagellum{side}`, elbow, elbow + v(0.04 * side, -0.02, -0.07), 0.01, hex(C.antenna), nil, side, 0))
+			local scape = rodSpec(`Scape{side}`, base, elbow, 0.01, hex(C.antenna), "antenna", side, 0)
+			local flag = rodSpec(`Flagellum{side}`, elbow, elbow + v(0.04 * side, -0.02, -0.07), 0.01, hex(C.antenna), "antenna", side, 0)
+			flag.hip = base -- (ROBLOX-128: the whole antenna sweeps from its base)
+			table.insert(out, scape)
+			table.insert(out, flag)
 		end
 	end
 	return out
@@ -330,11 +337,16 @@ local function buildSkater(tier: string): { Spec }
 		-- the middle legs: the oars, long, out and back; the hind legs trailing
 		for i, leg in { { from = v(0.06 * side, 0, -0.12), knee = v(0.7 * side, 0.05, -0.05), foot = v(1.5 * side, -SKATER_HOVER, 0.35) },
 			{ from = v(0.06 * side, 0, 0.0), knee = v(0.5 * side, 0.04, 0.45), foot = v(0.75 * side, -SKATER_HOVER, 1.35) } } do
-			table.insert(out, rodSpec(`Femur{word}{i}`, leg.from, leg.knee, 0.022, hex(C.leg), nil, side, i + 1))
-			table.insert(out, rodSpec(`Tarsus{word}{i}`, leg.knee, leg.foot, 0.016, hex(C.leg), nil, side, i + 1))
+			local role = if i == 1 then "oar" else nil -- (ROBLOX-128: the middle legs row)
+			local femur = rodSpec(`Femur{word}{i}`, leg.from, leg.knee, 0.022, hex(C.leg), role, side, i + 1)
+			local tarsus = rodSpec(`Tarsus{word}{i}`, leg.knee, leg.foot, 0.016, hex(C.leg), role, side, i + 1)
+			tarsus.hip = leg.from
+			table.insert(out, femur)
+			table.insert(out, tarsus)
 			if tier ~= "low" then
-				local d = ball(`Dimple{word}{i}`, leg.foot + v(0, 0.005, 0), v(0.4, 0.01, 0.4), hex(C.dimple))
+				local d = ball(`Dimple{word}{i}`, leg.foot + v(0, 0.005, 0), v(0.4, 0.01, 0.4), hex(C.dimple), role)
 				d.material = "Glass"
+				d.hip, d.side = leg.from, side
 				table.insert(out, d)
 			end
 		end
@@ -355,7 +367,7 @@ function BugBodies.new(parent: Instance, tier: string?): any
 	local folder = Instance.new("Folder")
 	folder.Name = "Bugs"
 	folder.Parent = parent
-	return setmetatable({ folder = folder, rigs = {}, template = build(), templates = {}, tier = tier or "full", parts = {}, frames = {} }, BugBodies)
+	return setmetatable({ folder = folder, rigs = {}, template = build(), templates = {}, tier = tier or "full", parts = {}, frames = {}, present = {} :: { [string]: boolean } }, BugBodies)
 end
 
 -- The sheet of a kind at this tier.
@@ -640,7 +652,7 @@ local function poseSnail(rig: any, b: any, reduced: boolean, now: number): { CFr
 end
 
 -- The harvestman's frames (away by day: far under the world); (ROBLOX-119) the ant's the same way (away in its nest by night), `kind` its sheet.
-local function poseHarvestman(rig: any, b: any, _reduced: boolean, kind: string?): { CFrame }
+local function poseHarvestman(rig: any, b: any, reduced: boolean, kind: string?): { CFrame }
 	local S = (BugBodies.ambient :: any)[kind or "harvestman"]
 	local out = {}
 	if b.hidden then
@@ -649,6 +661,14 @@ local function poseHarvestman(rig: any, b: any, _reduced: boolean, kind: string?
 		return out
 	end
 	local body = surfaceFrame(b.position, b.heading, b.normal)
+	-- (ROBLOX-128) the strider's stroke: a quick pull back, then a slow reach forward, both oars together
+	local oar = 0
+	local R = S.motion.row
+	if R ~= nil and rig.gait > 0 then
+		local u = (rig.stride / (2 * math.pi)) % 1
+		local back = if u < R.pull then math.sin(u / R.pull * math.pi / 2) else math.cos((u - R.pull) / (1 - R.pull) * math.pi / 2)
+		oar = rig.gait * R.sweep * (back - 0.5)
+	end
 	for i, spec in rig.template do
 		local f = spec.frame
 		if spec.role == "leg" then
@@ -656,6 +676,12 @@ local function poseHarvestman(rig: any, b: any, _reduced: boolean, kind: string?
 			local phase = rig.stride + (if ((spec.pair or 1) + (if side < 0 then 0 else 1)) % 2 == 0 then 0 else math.pi)
 			local m = stepAbout(spec.hip :: Vector3, side, rig.gait, S.motion.gait, phase)
 			if m ~= nil then f = m * f end
+		elseif spec.role == "antenna" and S.motion.antenna ~= nil then
+			local m = sway(spec, rig, S.motion.antenna, reduced)
+			if m ~= nil then f = m * f end
+		elseif spec.role == "oar" and oar ~= 0 then
+			local hip = spec.hip :: Vector3
+			f = CFrame.new(hip) * CFrame.fromAxisAngle(Vector3.yAxis, -(spec.side or 1) * oar) * CFrame.new(-hip) * f
 		end
 		out[i] = body * f
 	end
@@ -678,7 +704,8 @@ function BugBodies.draw(self: any, lice: { any }, now: number?, cameraAt: Vector
 	table.clear(frames)
 	local dtAll = if now ~= nil and self.lastNow ~= nil then math.clamp(now - self.lastNow, 0, 0.25) else 0
 	self.lastNow = now
-	local present: { [string]: boolean } = {}
+	local present: { [string]: boolean } = self.present -- (ROBLOX-128: kept, not made anew each frame)
+	table.clear(present)
 	for _, w in lice do
 		present[w.id] = true
 		local kind = w.kind or "woodlouse"

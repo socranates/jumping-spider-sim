@@ -17,6 +17,11 @@
 -- dangling; a hopper crouches before its leap and a springtail somersaults through it. Every number is the sheet's `motion` (Data/FlyLook). `draw` takes the
 -- camera's place (a body farther than FlyLook.far.studs is drawn ten times a second, as the rival's rig is) and the Reduced Motion setting (the steps stay,
 -- everything else is still). Phases come from the clock `draw` is given and from distance walked, so a paused game is a still one.
+-- ROBLOX-128 (the small lives): a wingbeat too fast to draw at 60 frames (a sheet's `flap` over FlyLook.BLUR_HZ: the hoverfly's, the midge's, the mosquito's, the
+-- damselfly's) is the trembling blur, never a strobing flap; a fly standing calm and still grooms in seeded bouts (its front legs rubbed together under its
+-- head, or its hind legs drawn back under its abdomen and rubbed); a fly whose take-off is scheduled readies itself (raised, nose up, its middle legs forward); a singing
+-- field cricket holds its forewings raised and dips them through each chirp; the house fly's wings carry two more veins each at the full tier, M1+2 with its
+-- bend (six of its eight bristles gave up their parts: still 39). No part is added to any body; nothing feeds back to the sim.
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
@@ -51,6 +56,24 @@ type Leg = { name: string, hip: { number }, knee: { number }, foot: { number } }
 -- (ROBLOX-103) how a part moves: a leg segment turns about its leg's hip (`pair` 1 front to 3 hind, `side` -1 left, +1 right); an antenna about its base; a wing
 -- about its root at rest (`rest`) and in flight (`root`); the furcula is left to its two poses.
 type Anim = { what: string, hip: Vector3, side: number, pair: number, root: Vector3?, rest: Vector3? }
+
+-- (ROBLOX-128) A number in [0, 1) from a body's seed and a count: the grooming schedule's draws (a pure hash, so the same body grooms the same way every time).
+local function hash01(seed: number, n: number): number
+	local x = math.sin(seed * 12.9898 + n * 78.233) * 43758.5453
+	return x - math.floor(x)
+end
+local function between(range: { number }, u: number): number
+	return range[1] + (range[2] - range[1]) * u
+end
+-- (ROBLOX-128) Whether a sheet's flap is drawn as a beat (slow enough for 60 frames) or as the blur.
+local function beats(M: any): boolean
+	return M.flap ~= nil and M.flap.hz <= FlyLook.BLUR_HZ
+end
+-- (ROBLOX-128) Whether a fly sings now (Prey/PreyKinds.chirping's rule, read here so the drawing needs nothing of the sim's modules).
+local function singing(fly: any): boolean
+	local p = fly.profile
+	return p ~= nil and p.body.chirp == true and (fly.serial or 0) % 2 == 1 and fly.state == "PERCHED" and fly.hop == nil and fly.hushed ~= true
+end
 type Template = {
 	specs: { Spec },
 	restFrames: { CFrame },
@@ -178,6 +201,17 @@ local function build(detail: string?): Template
 		add(`{word}Vein`, true, color("vein"), "SmoothPlastic", 0,
 			{ size = veinSize, frame = veinFrame, transparency = V.transparency }, { size = veinSize, frame = veinFrame, transparency = 1 })
 		if not low then
+			-- (ROBLOX-128) R4+5 and M1+2 with its bend, on the upper face, hidden in the blur
+			local VS = W.veins
+			for _, item in VS.items do
+				local a = wing * Vector3.new(side * item.from[1] * W.width / 2, W.thick, item.from[2] * W.length)
+				local b = wing * Vector3.new(side * item.to[1] * W.width / 2, W.thick, item.to[2] * W.length)
+				local size, frame = rodBetween(a, b, VS.diameter, 0, 0)
+				add(`{word}{item.name}`, true, color("vein"), "SmoothPlastic", 0,
+					{ size = size, frame = frame, transparency = VS.transparency }, { size = size, frame = frame, transparency = 1 })
+			end
+		end
+		if not low then
 			local F = W.film
 			local fi = add(`{word}Film`, false, color("film"), "SmoothPlastic", 0,
 				{ size = restSize + Vector3.new(F.grow, 0, F.grow), frame = wing * CFrame.new(0, F.rise, 0), transparency = F.transparency },
@@ -239,7 +273,8 @@ local function buildSmall(L: any, tier: string?, shed: boolean?): Template
 		local centre, size = vec(item.at), vec(item.size)
 		local frame = CFrame.new(centre)
 		if item.turn then frame *= CFrame.Angles(math.rad(item.turn[1]), math.rad(item.turn[2]), math.rad(item.turn[3])) end
-		add(item.name, false, color(item.color), "SmoothPlastic", item.reflectance or 0, { size = size, frame = frame, transparency = 0 })
+		local index = add(item.name, false, color(item.color), "SmoothPlastic", item.reflectance or 0, { size = size, frame = frame, transparency = 0 })
+		if item.hinge ~= nil then anim[index] = { what = "sing", hip = vec(item.hinge), side = 0, pair = 0 } end -- (ROBLOX-128: the cricket's forewings)
 	end
 	for _, item in L.rods do
 		local sides: { number } = if item.mirror then { -1, 1 } else { 1 }
@@ -311,7 +346,8 @@ function FlyBodies.new(parent: Instance, detail: string?): any
 	local folder = Instance.new("Folder")
 	folder.Name = "Flies"
 	folder.Parent = parent
-	return setmetatable({ folder = folder, rigs = {}, template = build(detail), templates = {} :: { [string]: Template }, parts = {}, frames = {}, detail = detail or "full" }, FlyBodies)
+	return setmetatable({ folder = folder, rigs = {}, template = build(detail), templates = {} :: { [string]: Template }, parts = {}, frames = {}, detail = detail or "full",
+		present = {} :: { [string]: boolean } }, FlyBodies)
 end
 
 -- The template a prey kind is drawn from (Species body.prey_kind): one of FlyLook.small's, built when first asked for, or the house fly's. `kind` may end in
@@ -351,7 +387,9 @@ function FlyBodies.spawn(self: any, id: string, kind: string?): any
 	end
 	local rig = { folder = folder, parts = parts, flying = false, kind = kind, template = template,
 		-- (ROBLOX-103) the motion: stride phase, stepping envelope, wing phase, the rig's clock, take-off and landing, the crouch, the far rule's owed time
-		stride = 0, gait = 0, wing = 0, t = 0, crouch = 0, owed = 0, drawn = false, wasFlying = false, seed = offsetOf(id) }
+		stride = 0, gait = 0, wing = 0, t = 0, crouch = 0, owed = 0, drawn = false, wasFlying = false, seed = offsetOf(id),
+		-- (ROBLOX-128) grooming: seconds still and calm, the bout's number, when it begins and ends (in seconds still), its kind; the song's raise
+		still = 0, groomN = 0, groomAt = 0, groomEnd = 0, groomKind = "front", sing = 0 }
 	self.rigs[id] = rig
 	return rig
 end
@@ -401,14 +439,47 @@ function FlyBodies.advance(self: any, rig: any, fly: any, dt: number, flying: bo
 	rig.t += dt
 	if flying then
 		if not rig.wasFlying then rig.tookOff = rig.t end
-		local hz = if M.flap then M.flap.hz else 19 / TAU
+		local hz = if beats(M) then M.flap.hz else 19 / TAU
 		rig.wing = (rig.wing + dt * hz * TAU) % TAU
 	elseif rig.wasFlying then
 		rig.landed = rig.t
 	end
 	rig.wasFlying = flying
-	local hop = M.crouch ~= nil and fly.pending ~= nil and not flying
+	local hop = (M.crouch ~= nil or M.ready ~= nil) and fly.pending ~= nil and not flying
 	rig.crouch += ((if hop then 1 else 0) - rig.crouch) * math.min(1, dt * 14)
+	-- (ROBLOX-128) grooming: only standing calm (perched, not alarmed, nothing pending, not walking); anything else starts the count again
+	local Gr = M.groom
+	if Gr ~= nil and not flying and fly.state == "PERCHED" and fly.pending == nil and not walking and rig.gait == 0 then
+		if rig.still == 0 then
+			rig.groomN = 1
+			rig.groomAt = between(Gr.after, hash01(rig.seed, 1))
+			rig.groomEnd = rig.groomAt + between(Gr.bout, hash01(rig.seed, 2))
+			rig.groomKind = "front"
+		end
+		rig.still += dt
+		if rig.still >= rig.groomEnd then
+			rig.groomN += 1
+			local n = rig.groomN
+			rig.groomAt = rig.still + between(Gr.every, hash01(rig.seed, n * 3))
+			rig.groomEnd = rig.groomAt + between(Gr.bout, hash01(rig.seed, n * 3 + 1))
+			-- the front first, and mostly; the hind legs over the wings now and then
+			rig.groomKind = if n % 2 == 1 or hash01(rig.seed, n * 3 + 2) < 0.35 then "front" else "hind"
+		end
+	else
+		rig.still = 0
+	end
+	-- (ROBLOX-128) the song: the forewings rise and settle
+	if M.sing ~= nil then
+		rig.sing += ((if singing(fly) and not flying then 1 else 0) - rig.sing) * math.min(1, dt * M.sing.ease)
+		if rig.sing < 1e-3 then rig.sing = 0 end
+	end
+end
+
+-- (ROBLOX-128) How far into a grooming bout the rig is (0 outside one, easing in and out over a fifth of a second), and the bout's own clock.
+local function grooming(rig: any): (number, number)
+	if rig.still <= 0 or rig.still < rig.groomAt or rig.still >= rig.groomEnd then return 0, 0 end
+	local into, left = rig.still - rig.groomAt, rig.groomEnd - rig.still
+	return math.clamp(math.min(into, left) / 0.2, 0, 1), into
 end
 
 -- (ROBLOX-103) How a part moves within its pose, in the body frame (before the profile's scale), or nil for not at all.
@@ -419,6 +490,26 @@ local function moveOf(a: Anim, rig: any, M: any, flying: boolean, reduced: boole
 			if M.dangle == nil or reduced then return nil end
 			local swing = M.dangle.amp * math.sin(rig.t * M.dangle.hz * TAU + a.pair * 1.9 + a.side * 0.7 + seed)
 			return CFrame.new(a.hip) * CFrame.fromAxisAngle(Vector3.xAxis, swing) * CFrame.new(-a.hip)
+		end
+		if not flying and not reduced and rig.gait <= 0 then
+			-- (ROBLOX-128) readying for take-off: the middle legs swung forward
+			if M.ready ~= nil and rig.crouch > 1e-3 and M.crouch == nil and a.pair == 2 then
+				return CFrame.new(a.hip) * CFrame.fromAxisAngle(Vector3.yAxis, a.side * M.ready.legs * rig.crouch) * CFrame.new(-a.hip)
+			end
+			-- (ROBLOX-128) grooming: the front legs in under the head, raised, rubbing against each other; or the hind legs drawn back and rubbed together
+			local Gr = M.groom
+			local k, into = grooming(rig)
+			if Gr ~= nil and k > 0 then
+				local rub = math.sin(into * Gr.hz * TAU)
+				if rig.groomKind == "front" and a.pair == 1 then
+					local inward = k * (0.55 + Gr.amp * rub * a.side)
+					return CFrame.new(a.hip) * CFrame.fromAxisAngle(Vector3.yAxis, a.side * inward) * CFrame.fromAxisAngle(Vector3.zAxis, a.side * k * (0.55 + 0.5 * Gr.amp * rub)) * CFrame.new(-a.hip)
+				elseif rig.groomKind == "hind" and a.pair == 3 then
+					-- drawn back under the abdomen's tip and rubbed against each other, a little raised (a short leg cannot reach over a fat abdomen in a drawing)
+					local back = k * (0.45 + Gr.amp * rub * a.side)
+					return CFrame.new(a.hip) * CFrame.fromAxisAngle(Vector3.yAxis, -a.side * back) * CFrame.fromAxisAngle(Vector3.zAxis, a.side * k * 0.2) * CFrame.new(-a.hip)
+				end
+			end
 		end
 		if rig.gait <= 0 then return nil end
 		local offset = if G.wave ~= nil then -a.pair * G.wave + (if a.side < 0 then math.pi else 0)
@@ -437,7 +528,7 @@ local function moveOf(a: Anim, rig: any, M: any, flying: boolean, reduced: boole
 	elseif a.what == "wing" then
 		if reduced then return nil end
 		if flying then
-			if M.flap == nil or a.root == nil then return nil end
+			if not beats(M) or a.root == nil then return nil end
 			local stroke = a.side * M.flap.amp * math.sin(rig.wing)
 			return CFrame.new(a.root) * CFrame.fromAxisAngle(Vector3.zAxis, stroke) * CFrame.new(-(a.root :: Vector3))
 		end
@@ -447,6 +538,12 @@ local function moveOf(a: Anim, rig: any, M: any, flying: boolean, reduced: boole
 		if since >= R.seconds then return nil end
 		local stroke = a.side * R.amp * (1 - since / R.seconds) * math.sin(since * R.hz * TAU)
 		return CFrame.new(a.rest) * CFrame.fromAxisAngle(Vector3.zAxis, stroke) * CFrame.new(-(a.rest :: Vector3))
+	elseif a.what == "sing" then
+		local S = M.sing
+		if reduced or S == nil or rig.sing <= 0 or flying then return nil end
+		local into = (rig.t % S.period) / S.chirp
+		local dip = if into < 1 then S.dip * math.sin(into * math.pi) else 0
+		return CFrame.new(a.hip) * CFrame.fromAxisAngle(Vector3.xAxis, -rig.sing * (S.raise - dip)) * CFrame.new(-a.hip)
 	end
 	return nil
 end
@@ -468,6 +565,10 @@ local function bodyMove(rig: any, fly: any, M: any, flying: boolean, reduced: bo
 		local C = M.crouch
 		return CFrame.new(0, -C.depth * rig.crouch, 0) * CFrame.fromAxisAngle(Vector3.xAxis, C.pitch * rig.crouch)
 	end
+	if not flying and M.ready ~= nil and rig.crouch > 1e-3 then -- (ROBLOX-128) raised on its legs, leaning back, about to go
+		local R = M.ready
+		return CFrame.new(0, R.lift * rig.crouch, 0) * CFrame.fromAxisAngle(Vector3.xAxis, R.pitch * rig.crouch)
+	end
 	return nil
 end
 
@@ -481,7 +582,8 @@ function FlyBodies.draw(self: any, flies: { any }, now: number, cameraAt: Vector
 	local still = reduced == true
 	local dtAll = if self.lastNow ~= nil then math.clamp(now - self.lastNow, 0, 0.25) else 0
 	self.lastNow = now
-	local present: { [string]: boolean } = {}
+	local present: { [string]: boolean } = self.present -- (ROBLOX-128: kept, not made anew each frame)
+	table.clear(present)
 	local shimmer = FlyLook.wing.fan.shimmer
 	local FAR = FlyLook.far
 	for _, fly in flies do
@@ -526,7 +628,7 @@ function FlyBodies.draw(self: any, flies: { any }, now: number, cameraAt: Vector
 				if move ~= nil then localFrame = move * localFrame end
 			end
 			local frame = body * (CFrame.new(localFrame.Position * scale) * localFrame.Rotation)
-			if flying and template.fans[i] and not still and M.flap == nil then frame *= CFrame.Angles(math.sin(now * shimmer[1] + i) * shimmer[2], 0, 0) end
+			if flying and template.fans[i] and not still and not beats(M) then frame *= CFrame.Angles(math.sin(now * shimmer[1] + i) * shimmer[2], 0, 0) end
 			table.insert(parts, part)
 			table.insert(frames, frame)
 		end

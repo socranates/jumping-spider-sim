@@ -1082,3 +1082,37 @@ in 200). **Nothing of it has run in Studio.**
 - The frog is one of two danger kinds the design names for the pond; the fishing spider (which does run on the water) waits for a later round, as do mayflies, rain and worms.
 - The bank is boxes in steps (strips 20 cm wide, three levels): honest to walk, blocky to look at from close. Meshes from Blender would make it a slope.
 - The mown path is coarse (cut lawn with a few tufts): the design's corridor detail. Say if it should be as rich as the cores.
+
+## The small lives (ROBLOX-128, 2026-10-21)
+
+Presentation only, every creature but the spiders: the fast fliers' wings (hoverfly, midge, mosquito, damselfly) are a trembling blur instead of a strobing flap; flies
+standing calm groom in bouts (front legs rubbed together under the head, or hind legs rubbed under the abdomen) and ready themselves just before they take off; a singing
+field cricket raises its forewings and dips them each chirp; the house fly's wings show R4+5 and M1+2 with its bend; the water strider rows; the ant's antennae sweep;
+the robin stands erect with its head turning, and crouches level for the tell; the green frog breathes, and its throat and tongue are drawn at their true sizes at last
+(they were never resized). No part added, no rule or save changed. New suite `tests/bodies.luau`. **Nothing of it has run in Studio.**
+
+## Your Studio checklist (ROBLOX-128)
+
+1. **A fly up close**: on the sill, stand still about 3 cm from a house fly that is calm and wait. Within about five seconds it should rub its front legs together under its
+   head for a second or two, rest, and do it again now and then (sometimes its hind legs instead). Say whether it reads as grooming or as twitching, and whether the rub is too
+   fast. Inspect it (hold the choose key): are the two new veins on each wing visible, and does the bend near the tip read?
+2. **Before it flies**: creep toward a fly until it leaves. Just before it goes it should rise a little, nose up, middle legs forward (a tenth of a second). Say whether you
+   can see it at all at the game camera.
+3. **The fast wings**: in the hut garden watch a hoverfly hover, and at dusk the midges and mosquitoes over the pond, and a damselfly flying: each should be a soft blur that
+   trembles, never a flicker. Compare the moth at the lamppost at dusk, which should still flap visibly.
+4. **The cricket**: in the meadow at night (from 22:00) keep still near a singing cricket (the caption "[a cricket chirping, ahead]"): its forewings should stand up over its
+   back and dip with each chirp; move and it hushes and lowers them. Screenshot it.
+5. **The strider and the ants**: watch a water strider on the open water: the long middle legs should sweep back together and come forward as it glides. Watch an ant at the
+   meadow's hill: its antennae should sweep as it walks.
+6. **The robin**: watch it forage on the hut garden's lawn: at each stop it should stand upright and look about; move in the open near it and it should drop level and cock its
+   head (the tell). Say whether the stops read as a robin's.
+7. **The frog**: on its stone at the pond, its white throat should flutter and every five seconds or so pump deep with its flanks swelling. On Easy let it strike: its pink
+   tongue should reach all the way to you now. Screenshot both.
+8. **Frame time**: the self-test's INFO frame lines on the sill, in the bed and near the pond, against v45's.
+
+## Open for Nathan (ROBLOX-128)
+
+- The grooming's timing (a first bout after 2.5 to 5 s still, then every 3 to 7 s) and the readying's size are the game's, not measured: say if the flies fidget too much.
+- The hind-leg bout is a rub under the abdomen, not the sweep over the wings a real fly makes: the drawn legs are too short to reach over the body. A longer hind leg would
+  change the fly's silhouette; say if it is worth it.
+- Not touched: the cat (already the richest), the wasp, the crab spider (stillness is its tell), the darner. A robin's tail-flick was left out: no source opened says it.

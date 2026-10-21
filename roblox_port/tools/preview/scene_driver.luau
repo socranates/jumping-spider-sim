@@ -210,6 +210,48 @@ if WORLD then
 		tiered:draw(all, t)
 		lice:draw({ louse }, t)
 	end
+	-- ROBLOX-128: a fourth row at z 14, each on its own drawer run until it is in the moment shown: a house fly grooming its head (its front legs rubbed together) at
+	-- x 200 and one grooming its wings (its hind legs over them) at 203; a field cricket of the night singing, mid-chirp, at 207; a water strider mid-stroke at 213
+	-- and an ant walking at 217 (views spec_groom_front, spec_groom_hind, spec_cricket_sing, spec_strider, spec_ant). A drawer whose code has none of these
+	-- moments (an older tree) draws each standing as it is after the same time.
+	local function groomer(id: string, x: number, want: string)
+		local d = FlyBodies.new(flyFolder, DETAIL)
+		local f = { id = id, position = Vector3.new(x, 0.16, 14), heading = Vector3.new(0, 0, -1), normal = Vector3.yAxis, profile = Species.fly_like_prototype, state = "PERCHED",
+			serial = 1, airborne = function(self: any): boolean return self.state ~= "PERCHED" end }
+		local tt = 0
+		d:draw({ f }, tt)
+		local rig = d.rigs[id]
+		for _ = 1, 60 * 90 do
+			tt += 1 / 60
+			d:draw({ f }, tt)
+			if rig.groomKind == want and rig.still ~= nil and rig.still > (rig.groomAt or 0) + 0.45 and rig.still < (rig.groomEnd or 0) - 0.3 then break end
+		end
+	end
+	groomer("spec_groom_front", 200, "front")
+	groomer("spec_groom_hind", 203, "hind")
+	do
+		local d = FlyBodies.new(flyFolder, DETAIL)
+		local c = { id = "spec_cricket_sing", position = Vector3.new(207, 0.16, 14), heading = Vector3.new(0, 0, -1), normal = Vector3.yAxis, profile = Species.cricket_night_prototype,
+			state = "PERCHED", serial = 1, airborne = function(self: any): boolean return self.state ~= "PERCHED" end }
+		local tt = 0
+		d:draw({ c }, tt)
+		for _ = 1, 60 * 2 do tt += 1 / 60; d:draw({ c }, tt) end
+		while tt % 0.4 > 0.1 or tt % 0.4 < 0.07 do tt += 1 / 60; d:draw({ c }, tt) end -- (mid-chirp)
+	end
+	do
+		local d = BugBodies.new(flyFolder, DETAIL)
+		local s = { id = "spec_strider", kind = "skater", position = Vector3.new(213, 0.15, 14.5), heading = Vector3.new(0, 0, -1), normal = Vector3.yAxis, state = "skate", hidden = false }
+		local a = { id = "spec_ant", kind = "ant", position = Vector3.new(217, 0.12, 14), heading = Vector3.new(0, 0, -1), normal = Vector3.yAxis, state = "walk", hidden = false }
+		local tt = 0
+		d:draw({ s, a }, tt)
+		for k = 1, 16 do
+			tt += 1 / 60
+			s.position += Vector3.new(0, 0, -0.03)
+			a.position += Vector3.new(0, 0, -0.004)
+			d:draw({ s, a }, tt)
+			local _ = k
+		end
+	end
 end
 
 AMBIENT_AT = {} :: { string } -- (ROBLOX-105: where the ambient bugs stand in place, written on the counts line for the views)

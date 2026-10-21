@@ -159,6 +159,17 @@ HOVERFLIES = {
   "University of Wisconsin-Madison Extension, Division of Horticulture (undated, read 2026). Hover, Flower, or Syrphid Flies, Syrphidae.",
   "University of Minnesota Extension (undated, read 2026). Syrphid flies. Beneficial insects."]}
 
+# ROBLOX-118: the ranger's cat, opened the first time it notices the spider (NotebookWatch.onCat). Sources opened this round (docs/NOTEBOOK_SOURCES.md).
+CAT = {
+ 'id':'the_cat','trigger':'cat','title':'The cat and the bell',
+ 'text':"A house cat stands 23 to 25 cm at the shoulder and weighs 4 to 5 kg. It hunts small mammals and birds first, and invertebrates last. Free-ranging cats kill an estimated 1.3 to 4.0 billion birds and 6.3 to 22.3 billion mammals a year in the United States. A bell on the collar warns prey: in one study, cats brought home about half as many mammals while they wore bells. A bold jumping spider can hear airborne sound, through special hairs, from more than 3 m away.",
+ 'game':"Here the ranger's cat lives in the hut and never goes outside. It sleeps much of the day and walks the two rooms at dawn and dusk, and you hear its bell before you see it. It pats at what moves near it: get up high, into a gap, or keep still. In Normal a pat that lands kills; on Easy and in free play it knocks you aside. Its day and its reach are the game's.",
+ 'sources':[
+  "Gouvernement du Quebec (undated, read 2026). Chat domestique. Fiches des especes fauniques, quebec.ca.",
+  "Loss, S. R., Will, T. & Marra, P. P. (2013). The impact of free-ranging domestic cats on wildlife of the United States. Nature Communications 4: 1396. https://doi.org/10.1038/ncomms2380",
+  "Ruxton, G. D., Thomas, S. & Wright, J. W. (2002). Bells reduce predation of wildlife by domestic cats (Felis catus). Journal of Zoology 256: 81-83 (as summarised by Conservation Evidence).",
+  "Shamble, P. S., Menda, G., Golden, J. R., Nitzany, E. I., Walden, K., Beatus, T., Elias, D. O., Cohen, I., Miles, R. N. & Hoy, R. R. (2016). Airborne acoustic perception by a jumping spider. Current Biology 26: 2913-2920 (as reported by NPR, 14 October 2016)."]}
+
 # ROBLOX-105 (W3b part B): the garden's ambient bugs, one page each, opened by the first close look at one (NotebookWatch: one of the view's bugs of the kind,
 # out in the open, within lookWu of the spider). Every sentence rests on a source opened for it; docs/NOTEBOOK_SOURCES.md says which supports which.
 LADYBIRDS = {
@@ -194,7 +205,7 @@ HARVESTMEN = {
 
 # The Roblox game's own pages, after Godot's, in this order: each carries its id, trigger, title, text, "In this game" line and sources, and docs/NOTEBOOK_SOURCES.md
 # says how far each source was checked (ROBLOX-96 adds the ground-life page: the bed's gnats, aphids and woodlice, opened by the first step onto a garden bed).
-ROBLOX_PAGES = [PEACOCK, ANTMIMIC, MATING, TARANTULA, GROUND_LIFE, SPRINGTAILS, LEAFHOPPERS, MOTHS, CRANE_FLIES, LADYBIRDS, MILLIPEDES, SNAILS, HARVESTMEN, HOVERFLIES]
+ROBLOX_PAGES = [PEACOCK, ANTMIMIC, MATING, TARANTULA, GROUND_LIFE, SPRINGTAILS, LEAFHOPPERS, MOTHS, CRANE_FLIES, LADYBIRDS, MILLIPEDES, SNAILS, HARVESTMEN, HOVERFLIES, CAT]
 
 def lua_str(s):
     return '"' + s.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n") + '"'
@@ -226,7 +237,7 @@ def main():
                 "fly_recognised", "catch", "meal", "felt", "buzz", "rest", "sleep", "hungry", "well_fed",
                 "moult_ready", "moulted", "adult", "wasp", "wasp_escaped", "wasp_caught", "starving", "dance", "antennae", "hatched", "tarantula", "garden_bed",
                 "look_springtail", "look_leafhopper", "look_moth", "look_crane_fly",
-                "look_ladybird", "look_millipede", "look_snail", "look_harvestman", "look_hoverfly"]
+                "look_ladybird", "look_millipede", "look_snail", "look_harvestman", "look_hoverfly", "cat"]
     out += ["\t" + lua_str(t) + "," for t in triggers]
     out += [
         "}",

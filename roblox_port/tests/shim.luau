@@ -333,6 +333,9 @@ function OverlapParams.new() return { FilterType = Enum.RaycastFilterType.Exclud
 -- ---------------------------------------------------------------- the box world
 local workspace = Instance.new("Workspace")
 workspace.Name = "Workspace"
+-- (ROBLOX-118: the game's default world is the preserve; the CLI suites' place authors the test garden, as a place in Studio may, World/Worlds. A suite that
+-- wants the preserve sets the attribute itself: tests/selftest_preserve.luau.)
+workspace:SetAttribute("World", "test_garden")
 workspaceRef = workspace
 
 -- The queryable boxes a query sees (Include or Exclude filters, as the engine): {part, lo, hi}, in the workspace's descendant order (a query's ties go

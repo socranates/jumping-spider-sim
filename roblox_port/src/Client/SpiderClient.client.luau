@@ -122,6 +122,13 @@ local M = {
 	-- ROBLOX-113 (W5): the quiet HUD (UI/QuietHud): what Normal shows after the life's first day, and this frame's context (`quiet`); here for the same reason.
 	QuietHud = require(Shared.UI.QuietHud),
 	quiet = { normal = false, dayOne = true },
+	-- ROBLOX-118: the ranger's cat (Predator/Cat, drawn by Client/CatBody, its words UI/CatText), made in the preserve only (`cat` nil in the test garden), and what the spider
+	-- last heard of it (`heard`: the bell's loudness a moment ago, to say whether it comes closer); here for the same reason.
+	Cat = require(Shared.Predator.Cat),
+	CatBody = require(script.Parent.CatBody),
+	CatText = require(Shared.UI.CatText),
+	catSeed = require(Shared.World.WorldMap).seed(914, "cat"),
+	cat = (nil :: any), catBody = (nil :: any), catHeard = { bell = 0.0 },
 }
 M.lock = M.LockOn.new()
 local focusState = FocusState.new()
@@ -222,6 +229,7 @@ local prey = PreyDirector.engine(M.World.root, Species.fly_like_prototype, 914, 
 local flyBodies = FlyBodies.new(Workspace, detail) -- (ROBLOX-101: the bestiary's bodies draw fewer parts at the low tier)
 local soundscape = Soundscape.new(Workspace)
 local waspBody = WaspBody.new(Workspace)
+if M.World.world == "preserve" then M.cat = M.Cat.new(M.catSeed); M.catBody = M.CatBody.new(Workspace, detail); M.cat.enabled = script.Parent:FindFirstChild("SilkPlayback") == nil end
 -- LIFE (ROBLOX-24): the windowsill runs the life clock, so hunger runs by its hours (NeedsModel life mode, Standard rules to begin with; Easy and Free play
 -- switch the model to the gentle rules in applyRules, ROBLOX-91). Feeding grants into the same model. The loop keeps the rest, sleep, daylight and the eyes' reach.
 local needs = NeedsModel.new(true, false)
@@ -273,7 +281,7 @@ local function modal(): boolean
 end
 -- S01-C retreat checkpoints (ROBLOX-25): resting in the crack, and each morning, keeps one; Backspace / View returns to it. The
 -- store is DataStore-shaped but in memory only: a checkpoint lasts the session. No live DataStore is written.
-local checkpointWorld: Checkpoint.World = { motor = motor, prey = prey, sensor = sensor, memory = memory, needs = needs, life = life, wasp = wasp, breakaway = breakaway, garden = M.World.garden }
+local checkpointWorld: Checkpoint.World = { motor = motor, prey = prey, sensor = sensor, memory = memory, needs = needs, life = life, wasp = wasp, breakaway = breakaway, garden = M.World.garden, cat = M.cat }
 local function newStore(): any
 	return M.CheckpointStore.new(M.CheckpointStore.MemoryDataStore.new(), function(r: any): { string } return (Checkpoint.check(r, checkpointWorld)) end)
 end
@@ -774,6 +782,7 @@ local function fresh(mode: string, easy: boolean, position: Vector3?): boolean
  stores[slot]=newStore();checkpoints=stores[slot]
  life.resting=false;life.notice="";life.noticeSeconds=0;life.restoreGrace=0
  wasp:load(WaspDirector.defaultRecord());wasp.gentle=needs.gentle
+ if M.cat then M.cat:load(M.Cat.defaultRecord()) end -- (ROBLOX-118: a new life meets the cat anew)
  if position then motor:place(position,Vector3.yAxis,M.World.spawnHeading) end
  closeScreens();dropStrands(false);drawnUp=motor.up;M.World:refocus();cam:snap();lastLight=nil
  feedPending,cancelPending=false,false
@@ -811,8 +820,8 @@ local function presentEnd(immediate: boolean)
  table.insert(choices,{id="Another",text=mateLegs.Text.another(mateLegs.Mating.hasSac(life.mating))}) -- (ROBLOX-91: a new life; the brood is left behind)
  table.insert(choices,{id="Notebook",text=M.NotebookText.MENU_CHOICE})
  -- (ROBLOX-106: in Normal the last line says what the way back costs, the day since the rest, and that another spider is a new life; the night has its own words)
- panel:showChoices(if cause=="starved" then "The spider starved." elseif cause=="rival" then "The other spider caught you." elseif cause=="night" then M.LifeText.NIGHT_LINE else M.WaspText.LINE,
-  if cause=="starved" then "It went too long without food." elseif cause=="rival" then "A hunter can become prey. You can return to your last rest." elseif cause=="night" then M.LifeText.NIGHT_SUB else M.WaspText.SUB,
+ panel:showChoices(if cause=="starved" then "The spider starved." elseif cause=="rival" then "The other spider caught you." elseif cause=="night" then M.LifeText.NIGHT_LINE elseif cause==M.CatText.CAUSE then M.CatText.LINE else M.WaspText.LINE,
+  if cause=="starved" then "It went too long without food." elseif cause=="rival" then "A hunter can become prey. You can return to your last rest." elseif cause=="night" then M.LifeText.NIGHT_SUB elseif cause==M.CatText.CAUSE then M.CatText.SUB else M.WaspText.SUB,
   M.WaspText.summary(rec.hours,rec.meals,rec.wasp_visits,rec.wasp_escapes)..(if session.rules=="standard" then "\n"..M.LifeText.dayLost(hasRest) else ""),choices,immediate)
  panel:setTextScale(if setting("LargeText")==true then 1.5 else 1)
 end
@@ -1460,6 +1469,13 @@ local function updateHud(frameDt: number)
 		if forRival and not M.WaspText.heardRival((motor.pos - wasp.wasp.position).Magnitude, not sightCast(motor.pos, wasp.wasp.position)) then heard = nil end
 		if heard then view.caption = heard end
 	end
+	-- (ROBLOX-118) the cat is heard before it is seen: its bell as it moves, its purr close by; the wasp's hum wins
+	if M.cat ~= nil and captionScale > 0 and not wasp:isVisiting() then
+		local bell, purr = M.cat:sound(motor.pos)
+		local heard = M.CatText.caption(bell, purr, M.WaspText.directionWord(motor.pos, motor.heading, motor.up, M.Cat.head(M.cat)), bell > M.catHeard.bell + 1e-3)
+		M.catHeard.bell = bell
+		if heard then view.caption = heard end
+	end
 	if aiming then
 		local plan = jump.plan
 		local title, hint = ControlText.describe(plan, device)
@@ -1691,6 +1707,24 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			end
 			if wasp.rivalHeldAt and life.rival.state == "taken" then life.rival.position = wasp.rivalHeldAt end
 			if wasp.heldAt then motor:hold(wasp.heldAt) end
+			-- ROBLOX-118: the ranger's cat, on its seeded day, noticing what moves near it and patting at it (Predator/Cat). A pat that lands ends the life in Normal and
+			-- knocks the spider aside in the gentle rules. (The test place has no cat unless the Workspace attribute Cat is true; the self-test holds it off but for its own check.)
+			if M.cat ~= nil then
+				M.cat.gentle = needs.gentle
+				if testPlace and Workspace:GetAttribute("Cat") ~= nil then M.cat.enabled = Workspace:GetAttribute("Cat") == true end
+				local hidden = M.World:inRetreat(motor.pos) ~= nil or M.Cat.under(motor.pos) or life.resting
+				local speed = if motor.mode == "air" then 10 elseif motor.moving == true then 3 else motor.vel.Magnitude -- (walking: moving; on the line or still: what it drifts)
+				M.cat:step(DT, life.clock.day, life.clock.hour, if life.lifeOver or modal() then nil else { pos = motor.pos, speed = speed, hidden = hidden })
+				for _, signal in M.cat:drainSignals() do
+					if signal.kind == "noticed" then watch:onCat()
+					elseif signal.kind == "struck" then endLife(M.CatText.CAUSE)
+					elseif signal.kind == "nudged" and motor.mode == "attached" then
+						local away = signal.away or Vector3.zero
+						motor:_launch(away * 9 + Vector3.yAxis * 8, 40)
+						life:showNotice(M.CatText.NUDGED)
+					end
+				end
+			end
 			M.Prof.lap("wasp")
 			prey.feeding.auto = setting("AutomaticGrip") == true or mateLegs.couple.active -- (a meal in the legs is held for a player whose hands are the scene's: ROBLOX-89)
 			if life.growth.gameRules ~= true then life.growth:useGameRules(needs.gentle) end -- (a family that carries on has a new growth)
@@ -1931,6 +1965,10 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	soundscape:update(frameDt, M.World.prey.view, life.daylight, soundPaused, soundSpeed, soundMuted)
 	soundscape:updateWasp(wasp, soundPaused, soundSpeed, soundMuted)
 	waspBody:draw(wasp.wasp, prey.now)
+	if M.catBody ~= nil then
+		local bell, purr = M.cat:sound(motor.pos)
+		M.catBody:draw(M.cat, prey.now, frameDt, if soundMuted or soundPaused then 0 else bell, if soundMuted or soundPaused then 0 else purr)
+	end
 	M.Prof.lap("sound")
 	local silk = motor.silk
 	local live, bend = liveLine, bendLine
@@ -2023,6 +2061,7 @@ M.hooks = function(): any
 			lock = M.lock, lockOn = M.LockOn, -- (ROBLOX-110: the lock's state and its rules)
 			nature = M.nature, -- (ROBLOX-106: nature's rules this tick: the cover factor, the night's passes)
 			prof = M.Prof, -- (ROBLOX-111: the frame timed by part, for the self-test's frame samples)
+			cat = M.cat, Cat = M.Cat, -- (ROBLOX-118: the ranger's cat, nil in the test garden, and its rules)
 	}
 end
 local playback = script.Parent:FindFirstChild("SilkPlayback")

@@ -113,6 +113,11 @@ function NotebookWatch.onWasp(self: any, kind: string, escaped: boolean?)
 	end
 end
 
+-- (ROBLOX-118) The ranger's cat noticed the spider (Predator/Cat's "noticed"): the cat's page.
+function NotebookWatch.onCat(self: any)
+	self.book:notice("cat")
+end
+
 -- Each rendered frame while the ant-mimicking spider is being played: how long its antennae (legs I) have been fully up. Standing still long
 -- enough for the pose (AntMimic.noticeSeconds) is what opens the walking-like-an-ant page. The client calls this; nothing here reads the pose.
 function NotebookWatch.antennae(self: any, shownSeconds: number)

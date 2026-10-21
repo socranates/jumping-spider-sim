@@ -24,7 +24,7 @@ local function near(a: number, b: number, eps: number): boolean return math.abs(
 
 -- ---------------------------------------------------------------- the words
 check("the words: the title, its line, the choices on the title card and in a life, a controller's line in its own names, the skip, the captions", function()
-	assert(TitleText.TITLE == "The Windowsill" and TitleText.SUBTITLE == "A small life on a windowsill.", "the title and its line")
+	assert(TitleText.TITLE == "The Windowsill" and TitleText.SUBTITLE == "A small life in a city's nature preserve.", "the title and its line")
 	assert(TitleText.titleSize(1920) == 58 and TitleText.titleSize(360) == 36 and TitleText.titleSize(200) == 30, "the title's size by the screen's width")
 	assert(TitleText.choice("Continue", false) == "Continue" and TitleText.choice("Continue", true) == "Continue from last rest", "Continue, short on the title card")
 	assert(TitleText.choice("New", false) == "Begin a new life" and TitleText.choice("Free", false) == "Free play - gentle rules", "a new life and Free play")
@@ -57,15 +57,15 @@ for _, region in WorldMap.regions() do for _, piece in Region.pieces(region) do 
 check("the drift: it starts over the lawn, arrives in front of the window at DRIFT_S and breathes there, never jumps and never enters a box of the world", function()
 	local keys = TitleShots.DRIFT
 	assert(#keys == 3 and keys[#keys].t == TitleShots.DRIFT_S, "three keys, the last at DRIFT_S")
-	local cf0 = TitleShots.drift(0)
+	local cf0 = TitleShots.drift(0, "test_garden")
 	assert((cf0.Position - keys[1].eye).Magnitude < 1e-6, "it starts at the first key")
-	local cfA = TitleShots.drift(TitleShots.DRIFT_S)
+	local cfA = TitleShots.drift(TitleShots.DRIFT_S, "test_garden")
 	assert((cfA.Position - keys[3].eye).Magnitude < 1e-6, "it arrives at the last")
 	local prev = cf0.Position
 	local worst = 0
 	local t = 0
 	while t <= 240 do
-		local cf, fov = TitleShots.drift(t)
+		local cf, fov = TitleShots.drift(t, "test_garden")
 		local p = cf.Position
 		worst = math.max(worst, (p - prev).Magnitude)
 		prev = p
@@ -79,7 +79,7 @@ check("the drift: it starts over the lawn, arrives in front of the window at DRI
 		t += 0.05
 	end
 	assert(worst < 0.6, `never more than 0.6 studs in a twentieth of a second ({worst})`) -- (12 studs, 12 cm, a second at most: a slow drift over a garden of metres)
-	assert((TitleShots.drift(-5).Position - keys[1].eye).Magnitude < 1e-6, "a time before the start is the start")
+	assert((TitleShots.drift(-5, "test_garden").Position - keys[1].eye).Magnitude < 1e-6, "a time before the start is the start")
 end)
 
 check("the intro's timing: skippable after 2 s, shots one after another to the end, captions in order and apart, the last over the game, the walk", function()
@@ -361,7 +361,7 @@ check("the title card: the client sets TitleReady when its start menu opens, the
 	frames(1)
 	local after = os.clock()
 	local p = camera.CFrame.Position
-	local a, b = TitleShots.drift(before).Position, TitleShots.drift(after).Position
+	local a, b = TitleShots.drift(before, "test_garden").Position, TitleShots.drift(after, "test_garden").Position
 	assert((p - a).Magnitude <= (b - a).Magnitude + 0.01, "the camera is on the drift at the game's clock")
 	assert(snd.rise > 0 and snd.rise < 1 and snd.music ~= nil and snd.music.Playing, `the music plays under the menu, rising ({snd.rise})`)
 	ctx.setDevice("gamepad")

@@ -70,6 +70,7 @@ local LifeClock = require(script.Parent.Parent.Life.LifeClock)
 local Growth = require(script.Parent.Parent.Life.Growth)
 local WorldMap = require(script.Parent.Parent.World.WorldMap)
 local WaspDirector = require(script.Parent.Parent.Predator.WaspDirector)
+local Cat = require(script.Parent.Parent.Predator.Cat)
 local Woodlice = require(script.Parent.Parent.Prey.Woodlouse)
 local Ladybirds = require(script.Parent.Parent.Prey.Ladybird)
 local Millipedes = require(script.Parent.Parent.Prey.Millipede)
@@ -108,6 +109,7 @@ export type World = {
 	motor: any, prey: any, sensor: any, memory: any, needs: any, life: any,
 	breakaway: any?,
 	wasp: any?, -- the WaspDirector (nil: no wasp in this world)
+	cat: any?, -- (ROBLOX-118) the ranger's cat, Predator/Cat (nil: no cat in this world: the test garden)
 	garden: { [string]: any }?, -- ROBLOX-96: the regions' prey and bugs outside the sill (Prey/PreyWorld's table; nil: a world of the sill alone)
 	extraRefs: { [string]: any }?, -- anything else the world's state points at that the record should keep by name
 }
@@ -273,6 +275,7 @@ function Checkpoint.capture(world: World, createdAt: number?): ({ [string]: any 
 		life_rules = { mode = world.life.mode or "main", rules = world.life.rules or "standard" },
 		breakaway = if world.breakaway then world.breakaway:record() else nil,
 		wasp = if world.wasp ~= nil then world.wasp:toRecord() else nil,
+		cat = if world.cat ~= nil then world.cat:toRecord() else nil, -- (ROBLOX-118: optional; a test garden rest has none)
 	}, nil
 end
 
@@ -471,6 +474,9 @@ function Checkpoint.check(record: any, world: World): ({ string }, ObjectRecord.
 	if record.wasp ~= nil then
 		for _, text in WaspDirector.problems(record.wasp) do bad(text) end
 	end
+	if record.cat ~= nil then
+		for _, text in Cat.problems(record.cat) do bad(text) end
+	end
 	if #problems > 0 then return problems, nil end
 	local decoded, why = ObjectRecord.decode(record.world, Checkpoint.CLASSES, Checkpoint.refs(world))
 	if not decoded then
@@ -519,6 +525,7 @@ function Checkpoint.restore(record: any, world: World): (boolean, { string })
 	end
 	if world.breakaway then world.breakaway:apply(record.breakaway) end
 	if world.wasp ~= nil then world.wasp:load(record.wasp or WaspDirector.defaultRecord()) end
+	if world.cat ~= nil then world.cat:load(record.cat or Cat.defaultRecord()) end -- (ROBLOX-118: a rest without one is a cat that has not met this spider)
 	-- Godot's apply_record: the rest that was going on goes on, the spider takes a moment to take hold, and the screen says
 	-- this is checkpoint recovery. What was owed or announced at that tick is not done again.
 	local life = world.life

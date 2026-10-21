@@ -26,6 +26,10 @@
 -- planned at the sill again, as they were) and the trains (a pass's cars drawn on the line). The lock is taken with a controller's L2 tap too (ROBLOX-115).
 -- ROBLOX-117: in the preserve also the garden's near detail (the patches drawn by the spider in the mulch within the budgets, the dew shown at dawn and gone by noon) and the
 -- garden's rival and mate (each put where it comes into the garden, the spider beside its cell: it walks there, in the garden; both put back after).
+-- ROBLOX-118: in the preserve also the ceiling and the upper walls (up the west wall past 1.3 m, round onto the ceiling's underside, hanging there), the back room (through the
+-- doorway, its sofa, the television's unit, the games' shelf and the window sill hold a spider, the gap under the sofa a home), the eaves (along the gutter from region to region)
+-- and the cat (held off the rest of the run: heard and moving on a walk of its day; at a stop on the floor it notices a spider walking in front of it and crouches to pat,
+-- and gives up once the spider is up on the desk; on the sim, its pat lands as a death in the standard rules and a knock aside in the gentle ones).
 -- Each Studio process writes its own log (%LOCALAPPDATA%\Roblox\logs); tools/studio/selftest.ps1 reads the newest for these lines.
 -- The CLI suite tests/selftest.luau runs the same checks against the real client on the shim's box world, with a host of its own (simulated frames and clock), so the run is
 -- proven to complete and print END before it ever reaches Studio. First run in Studio at v36 (33 of 34; the line failed, ROBLOX-111); ROBLOX-111's additions not yet.
@@ -299,6 +303,7 @@ local function checks(): { Check }
 			need(waitUntil(r, 10, function() return ctx.fresh("main", false, nil) end), "a new life could not begin")
 		end
 		pause(r, 0.5)
+		if ctx.cat ~= nil then ctx.cat.enabled = false end -- (ROBLOX-118: the cat is held off the run but for its own check)
 		need(session.started and not menu:isShowing(), "the life did not begin")
 		need(ctx.motor.mode == "attached", `the spider is not standing ({ctx.motor.mode})`)
 	end)
@@ -673,15 +678,18 @@ local function checks(): { Check }
 			local world = r.ctx.world
 			local train = world.train
 			need(train ~= nil, "no trains in the preserve")
-			local first = train.schedule.pass(1)
 			local now = r.host.clock()
-			local nextPass = train.schedule.at(now) or train.schedule.pass(1)
+			-- (ROBLOX-118: the pass under way or the next one; the run is longer now, and the first may be long gone by the time this check comes)
+			local k = 1
+			while train.schedule.pass(k).finish < now and k < 50 do k += 1 end
+			local first = train.schedule.pass(k)
+			local nextPass = train.schedule.at(now) or first
 			train:update(first.start + (first.finish - first.start) * 0.5)
 			local shown, parts = train.shownCount, train:parts()
 			train:update(now)
-			say(r, string.format("INFO trains: the first a %s of %d cars at %.0f to %.0f s; mid-pass %d cars (%d parts) drawn; the clock at %.0f s, the next at %.0f s",
+			say(r, string.format("INFO trains: the pass a %s of %d cars at %.0f to %.0f s; mid-pass %d cars (%d parts) drawn; the clock at %.0f s, the next at %.0f s",
 				first.kind, first.cars, first.start, first.finish, shown, parts, now, nextPass.start))
-			need(shown > 0, "no car of the first train drawn mid-pass")
+			need(shown > 0, "no car of the train drawn mid-pass")
 		end)
 
 		-- ROBLOX-116: the ranger hut, walkable. The nursery's window shut (a walk at its gap stays inside), the ranger's moment when the spider is ready (the rule
@@ -944,6 +952,138 @@ local function checks(): { Check }
 				need(waitUntil(r, 3, function() return not hut.lit end), "the lamp did not go out by day")
 			end)
 			life.clock.hour = hour
+			if not ok then error(err, 0) end
+		end)
+
+		-- ROBLOX-118: the ceiling and the walls up to it (nothing puts a spider back there now), the back room through the doorway with its sofa's home, the eaves outside,
+		-- and the ranger's cat: heard, moving, noticing a spider that moves near it, and the way out of its reach (up high); its pat's outcome by the rules, on the sim.
+		add("the ceiling and the upper walls", function(r)
+			local ctx = r.ctx
+			local world, motor = ctx.world, ctx.motor
+			local R = { x0 = -146.5 }
+			need(holdUntilReady(r, "hut_up_d", Vector3.new(R.x0 + HEIGHT, 50, 134), Vector3.xAxis), "the wall's upper cell is not whole")
+			need(holdUntilReady(r, "hut_floor_d", Vector3.new(R.x0 + HEIGHT, 50, 134), Vector3.xAxis), "the wall's lower cell is not whole")
+			put(r, Vector3.new(R.x0 + HEIGHT, 50, 134), Vector3.xAxis, Vector3.yAxis)
+			pause(r, 0.3)
+			local ok, seen = walkUntil(r, 12, function() return world.region.id == "hut_up_d" and motor.pos.Y > 66 end)
+			say(r, `INFO the ceiling: up the west wall past WALL_TOP to {world.region.id} at {fmt(motor.pos)}; regions {regions(seen)}`)
+			need(ok, `did not climb on past 1.3 m (at {fmt(motor.pos)}, {world.region.id})`)
+			-- near the top of the wall, on round the corner onto the ceiling's underside
+			put(r, Vector3.new(R.x0 + HEIGHT, 140, 134), Vector3.xAxis, Vector3.yAxis)
+			pause(r, 0.3)
+			local ok2 = walkUntil(r, 15, function() return motor.mode == "attached" and motor.up.Y < -0.9 end)
+			need(ok2, `did not get onto the ceiling (at {fmt(motor.pos)}, up {fmt(motor.up)})`)
+			local p0 = motor.pos
+			pause(r, 1.0)
+			need(motor.mode == "attached" and motor.up.Y < -0.9 and (motor.pos - p0).Magnitude < 0.3 and string.sub(world.region.id, 1, 7) == "hut_up_",
+				`not hanging on the ceiling a second later ({motor.mode}, {fmt(motor.pos)}, {world.region.id})`)
+			say(r, `INFO the ceiling: head down under the boards at {fmt(motor.pos)} in {world.region.id}`)
+		end)
+
+		add("the back room", function(r)
+			local ctx = r.ctx
+			local world, motor = ctx.world, ctx.motor
+			need(holdUntilReady(r, "room_floor_g", Vector3.new(200, -70 + HEIGHT, 215), nil), "the back room's floor by the doorway is not whole")
+			need(holdUntilReady(r, "hut_doorway", Vector3.new(160, -70 + HEIGHT, 215), nil), "the doorway is not whole")
+			need(holdUntilReady(r, "hut_floor_i", Vector3.new(120, -70 + HEIGHT, 215), nil), "the hut's floor by the doorway is not whole")
+			put(r, Vector3.new(120, -70 + HEIGHT, 215), nil, Vector3.xAxis)
+			pause(r, 0.3)
+			local ok, seen = walkUntil(r, 30, function() return world.region.id == "room_floor_g" and motor.pos.X > 180 end)
+			say(r, `INFO the back room: through the doorway to {world.region.id} at {fmt(motor.pos)}; regions {regions(seen)}`)
+			need(ok, `did not go through the doorway (at {fmt(motor.pos)}, {world.region.id})`)
+			-- the sofa's seat, the television's unit and the games' shelf hold a spider; the gap under the sofa is a home
+			for _, at in { { id = "room_sofa_w", pos = Vector3.new(262, -25 + HEIGHT, 215) }, { id = "room_tv", pos = Vector3.new(250, -20 + HEIGHT, 45) },
+				{ id = "room_games", pos = Vector3.new(420, 50 + HEIGHT, 30) }, { id = "room_window", pos = Vector3.new(437, HEIGHT, 110) } } do
+				need(holdUntilReady(r, at.id, at.pos, nil), `{at.id} is not whole`)
+				put(r, at.pos, nil)
+				pause(r, 0.5)
+				need(world.region.id == at.id and motor.mode == "attached" and (motor.pos - at.pos).Magnitude < 0.3, `{at.id}: did not stay put at {fmt(at.pos)} ({world.region.id}, {fmt(motor.pos)})`)
+			end
+			local t = (WorldMap.region("room_floor_h") :: any).retreats[1]
+			local inside = Vector3.new((t.min.X + t.max.X) / 2, t.min.Y + HEIGHT, (t.min.Z + t.max.Z) / 2)
+			need(holdUntilReady(r, "room_floor_h", inside, nil), "the floor under the sofa is not whole")
+			put(r, inside, nil)
+			pause(r, 0.3)
+			need(world:inRetreat(motor.pos) == "room_sofa_under" and motor.mode == "attached", `not resting-ready under the sofa (at {fmt(motor.pos)}, {motor.mode})`)
+		end)
+
+		add("the eaves", function(r)
+			local ctx = r.ctx
+			local world, motor = ctx.world, ctx.motor
+			local mid, east = WorldMap.region("hut_eave_mid") :: any, WorldMap.region("hut_eave_e1") :: any
+			need(holdUntilReady(r, "hut_eave_mid", mid.spawn.pos + Vector3.yAxis * HEIGHT, nil) and holdUntilReady(r, "hut_eave_e1", east.spawn.pos + Vector3.yAxis * HEIGHT, nil), "the eaves are not whole")
+			put(r, mid.spawn.pos + Vector3.yAxis * HEIGHT, nil, Vector3.xAxis)
+			pause(r, 0.3)
+			local ok, seen = walkUntil(r, 20, function() return world.region.id == "hut_eave_e1" end)
+			say(r, `INFO the eaves: along the gutter to {world.region.id} at {fmt(motor.pos)} ({string.format("%.0f", motor.pos.Y + 85)} cm over the ground); regions {regions(seen)}`)
+			need(ok and motor.mode == "attached", `did not walk the gutter (at {fmt(motor.pos)}, {world.region.id}, {motor.mode})`)
+		end)
+
+		add("the cat", function(r)
+			local ctx = r.ctx
+			local cat, Cat, life, motor = ctx.cat, ctx.Cat, ctx.life, ctx.motor
+			need(cat ~= nil and Cat ~= nil, "no cat in the preserve")
+			local plan = Cat.plan(cat.seed, life.clock.day)
+			local hour, day = life.clock.hour, life.clock.day
+			local ok, err = pcall(function()
+				-- heard and moving: in a walk of its day that starts in the hut's room, the spider on the hut's floor
+				local walk = nil
+				for _, s in plan do if s.kind == "walk" and (s.from == "bowls" or s.from == "door" or s.from == "chair") and s.t1 - s.t0 > 0.03 then walk = s; break end end
+				need(walk ~= nil, "no walk from the hut's room in its day")
+				put(r, Vector3.new(0, -70 + HEIGHT, 160), nil)
+				life.clock.hour = walk.t0 + (walk.t1 - walk.t0) * 0.3
+				pause(r, 0.2)
+				local a = cat.pos
+				local bell = cat:sound(motor.pos)
+				pause(r, 1.0)
+				local moved = (cat.pos - a).Magnitude
+				say(r, string.format("INFO the cat: walking from the %s to the %s (%s), moved %.1f studs in a second; the bell %.2f at %.0f studs", tostring(walk.from), walk.spot, cat.pose, moved, bell, (Cat.head(cat) - motor.pos).Magnitude))
+				need(moved > 5, string.format("the cat did not move (%.1f studs)", moved))
+				need(bell > 0, "its bell was not heard")
+				-- it notices a spider that moves in front of it, and gives up on one that gets up out of its reach
+				local stop = nil
+				for _, s in plan do if (s.spot == "rug" or s.spot == "door" or s.spot == "bowls") and s.kind ~= "walk" and s.t1 - s.t0 > 0.05 then stop = s; break end end
+				need(stop ~= nil, "no stop on the floor in its day")
+				life.clock.hour = (stop.t0 + stop.t1) / 2
+				pause(r, 0.3)
+				local front = Cat.chest(cat) + cat.heading * 20
+				local at = Vector3.new(front.X, cat.surface + HEIGHT, front.Z)
+				local region = WorldMap.at(at)
+				need(region ~= nil and holdUntilReady(r, region.id, at, nil), "the floor in front of the cat is not whole")
+				cat.enabled = true
+				cat.cooldown = 0
+				put(r, at, nil, -cat.heading)
+				ctx.input:simulate("Forward", true)
+				local noticed = waitUntil(r, 3, function() return cat.react ~= "none" end, 0)
+				local crouched = noticed and waitUntil(r, 5, function() return cat.react == "crouch" or cat.react == "swat" end, 0)
+				ctx.input:simulate("Forward", false)
+				-- up out of its reach: on the desk's top
+				put(r, Vector3.new(80, 4 + HEIGHT, 45), nil)
+				local gaveUp = waitUntil(r, 8, function() return cat.react == "none" end, 0)
+				cat.enabled = false
+				say(r, `INFO the cat: at its {stop.spot} it noticed a spider moving in front of it ({noticed}), crouched to pat ({crouched}), gave up once it was up on the desk ({gaveUp}); notices {cat.notices}, pats {cat.pats}, swats {cat.swats}`)
+				need(noticed, "it did not notice a spider moving in front of it")
+				need(crouched, "it did not crouch to pat")
+				need(gaveUp and cat.swats == 0, "it did not give up on a spider out of its reach")
+				-- its pat by the rules (on the sim, so this life goes on): in Normal a pat that lands is a death, in the gentle rules a knock aside
+				for _, gentle in { false, true } do
+					local trial = Cat.new(cat.seed)
+					trial.gentle = gentle
+					local ph = (stop.t0 + stop.t1) / 2
+					trial:step(1 / 60, day, ph, nil)
+					local spot = Cat.chest(trial) + trial.heading * 8
+					local p = Vector3.new(spot.X, trial.surface + HEIGHT, spot.Z)
+					local kind = nil
+					for i = 1, 60 * 8 do
+						trial:step(1 / 60, day, ph, { pos = p + Vector3.new(math.sin(i * 0.2) * 1.5, 0, 0), speed = 2, hidden = false })
+						for _, s in trial:drainSignals() do if s.kind == "struck" or s.kind == "nudged" then kind = s.kind end end
+						if kind then break end
+					end
+					need(kind == (if gentle then "nudged" else "struck"), `in the {if gentle then "gentle" else "standard"} rules its pat was {tostring(kind)}`)
+				end
+			end)
+			cat.enabled = false
+			life.clock.hour, life.clock.day = hour, day
 			if not ok then error(err, 0) end
 		end)
 

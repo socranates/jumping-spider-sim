@@ -894,3 +894,48 @@ door's gap round the hut's east end into the garden. The low tier's far looks ar
   their ground may not be streamed in). They never go into the hut, even after the window is open; say if the rival should follow the spider up the bench and the logs.
 - The hoverfly does not yet make the spider hesitate for its bee look (the bestiary's idea); it is a meal like any fly. Say if you want the hesitation.
 - The hut's own prey is fruit flies at a compost caddy and the moth at the lamp; the house flies at the window are the sill's, as before.
+
+## The ceiling, the back room and the ranger's cat, the eaves, the meadow path; the preserve is the game (ROBLOX-118, 2026-10-20)
+
+Claude → Chet, 2026-10-20, branch `claude/preserve-b3`. Phase B, round 3 of `docs/PARK_WORLD_DESIGN.md`. **The preserve is now the default world**: a place that does not author the
+Workspace attribute `World` runs the preserve; `workspace:SetAttribute("World", "test_garden")` before Play reaches the test garden. In the hut the walls are walkable to a ceiling of
+boards on joists 2.2 m over the floor (nothing puts the spider back any more), with a house spider's web in the north-west corner (drawn); outside, the north face to the soffit,
+the fascia and the gutter (the roof's slope is drawn only). Through a doorway in the hut's east wall is the volunteers' back room: a sofa (the gap under it a home), a television on a
+low unit with a games console, the controller on the cushion, a shelf of board games, a rug, an oil-filled radiator under the east window, cables along the skirting; fruit flies
+drift in from the caddy, a moth comes to its window at night. The ranger's cat lives in the two rooms on a seeded day: asleep on the sofa or the chair much of the day, about at dawn
+and dusk, at its bowls, by the door, on the rug, sitting on the back room's window sill. Its bell is heard (as a caption; the recordings are not uploaded) before it is seen; it
+notices what moves near it and pats at it; in Normal a pat that lands kills (its own card), on Easy and Free play it knocks the spider aside. The path round the hut now goes round the
+back room's east end (the preserve's revision is preserve-2), and a gravel path goes on north from the garden toward the meadow. **Nothing of it has run in Studio.**
+
+## Your Studio checklist (ROBLOX-118)
+
+1. **The default world**: open the place as it is (no World attribute) and Play: Output says `[Windowsill] world: The Preserve (preserve)`; the splash and the title card drift
+   over the hut garden to the hut's window; the title card's line reads "A small life in a city's nature preserve." Begin a new life: the intro opens inside the hut, from the room
+   over the sill, looking out of the window; then the sill and the spider stepping out of the crack. Screenshot the intro's first frame and the title card for Nathan.
+2. **The test garden still**: `workspace:SetAttribute("World", "test_garden")` in the command bar before Play: everything as at ROBLOX-117 (its self-test 39 checks). Set it back to nil.
+3. **An old save**: Continue a life whose last rest was kept in the test garden (any published save): it comes back at the hut's sill with "the world has changed since you rested".
+4. **The ceiling**: walk the spider up a wall of the hut past 1.3 m (it is no longer put back) and round onto the ceiling; walk head down across the boards and the joists to the
+   north-west corner (the house spider's web over the notice board). Say how the wall-to-ceiling corner reads to the motor and the camera, and the frame time up there.
+5. **The back room**: walk from the hut's floor through the doorway in the east wall (the caddy's corner). Climb the sofa, the television's unit, the games' shelf and the
+   radiator; go under the sofa and rest there (its home: "under the sofa"). Screenshot the room from the floor and from the sofa's arm. Say what reads wrong at true size.
+6. **The cat**: from the start of a life it is asleep on the sofa; watch it over a day (or set `life.clock.hour` through a hook) walk to its bowls by the front door, the window,
+   the rug, the chair at the desk. Turn Captions on: "[a small bell, ...]" while it walks near. Walk in front of it while it is awake: it stops, its head follows the spider, it
+   crouches and pats. Get up on the desk, into a home, or keep still: it gives up. In Normal a pat that lands ends the life ("The cat's paw came down."); try it on Easy too (a
+   knock aside and a notice). Screenshot it asleep, walking, at the window and close to its face; say how it moves (the walk's legs, the tail, the breathing, the slow blink), and the
+   frame time with it on screen (62 parts moved each frame).
+7. **The eaves**: from the outer sill climb the logs past the casing to the soffit, round onto the fascia and down into the gutter; walk the gutter its whole length (x -205 to 503.5).
+8. **The paths**: from the door's gravel round the back room's east end to the garden; from the garden's north path north toward the meadow (4 m of gravel; off its edge the
+   spider is put back, as on every path).
+9. **The self-test in the preserve** (no attribute needed now): `workspace:SetAttribute("SelfTest", true)`, Play: 133 checks, among them `the ceiling and the upper walls`, `the back
+   room`, `the eaves`, `the cat` and a region check for each of the 105 regions. Paste the INFO lines (the cat's notice, crouch and giving up, the bell's level).
+10. **The cat's sounds** (when Nathan wants them): upload `roblox_port/assets/audio/cat_bell.wav` and `cat_purr.wav` (made by `tools/make_cat_sounds.py`, not recordings of a
+    cat), grant them to the experience, put their ids in `Client/CatBody.SOUNDS` and the manifest.
+
+## Open for Nathan (ROBLOX-118)
+
+- The cat keeps to the floor, the sofa, the chair and the back room's window sill; it does not jump onto the desk or the bookcase (so they are the way out up high). Say if it should.
+- Its pat in Normal kills at once. Real cats often bat a small thing about first; say if you want a first pat that only stuns.
+- The roof's slope is drawn only (a box cannot be pitched at 35 degrees); its walkable edge is the fascia and the gutter. Say if you want the roof walkable (it needs a mesh or steps).
+- The house spider in the ceiling's corner is drawn, not a hazard; a tangle web that catches a jumping spider would be its own round with its own page.
+- The back room's window has no outer sill and its outside wall is not walkable (only the north face is); the cat never goes out.
+- The bell and the purr are captions until the recordings are uploaded.

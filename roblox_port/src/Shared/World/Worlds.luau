@@ -1,12 +1,13 @@
 --!strict
 -- The worlds the engine can run (ROBLOX-115, docs/PARK_WORLD_DESIGN.md). One engine, two worlds:
 --   test_garden ... "The Test Garden": the windowsill at the house, the bed under it, the bushes, the walls, the kitchen (ROBLOX-94..114), unchanged. The engine's
---                   proving ground and the published game until Phase B; the self-test and every CLI suite run on it unless they ask for the preserve.
+--                   proving ground (the published game until ROBLOX-118); every CLI suite runs on it unless it asks for the preserve, and a place reaches it with
+--                   the Workspace attribute World = "test_garden".
 --   preserve ...... "The Preserve": the game's real world, a nature preserve of 100 by 60 m in the middle of an American city (World/Preserve). Phase A builds its
 --                   map and its backdrop; the only walkable thing in it is the ranger hut's windowsill (the same sill, byte for byte, at the origin).
 -- Which world a server runs is the Workspace attribute `World` (ATTRIBUTE): a place may author it (Studio: select the preserve by setting it to "preserve" before
 -- Play), and the server writes the world it chose back to it at startup, so every client reads the same answer. A value that is not a world's id is the
--- default's. The default stays the test garden until Phase B makes the preserve playable (then DEFAULT becomes "preserve").
+-- default's. ROBLOX-118 (Phase B, round 3): the preserve is the game, so it is the default: a place that does not say runs the preserve.
 -- Pure data; World/WorldMap answers for the active world.
 local Worlds = {}
 
@@ -14,8 +15,8 @@ export type World = { id: string, name: string, revision: string }
 
 Worlds.TEST_GARDEN = "test_garden"
 Worlds.PRESERVE = "preserve"
--- The world a server runs when the place does not say (Phase B: the preserve).
-Worlds.DEFAULT = Worlds.TEST_GARDEN
+-- The world a server runs when the place does not say: the preserve (ROBLOX-118; the test garden before).
+Worlds.DEFAULT = Worlds.PRESERVE
 -- The Workspace attribute that names the world.
 Worlds.ATTRIBUTE = "World"
 
@@ -23,7 +24,7 @@ Worlds.ATTRIBUTE = "World"
 -- as the test garden's). The test garden's is WorldMap.REVISION, as it always was.
 Worlds.LIST = table.freeze({
 	test_garden = table.freeze({ id = "test_garden", name = "The Test Garden", revision = "world-3" }),
-	preserve = table.freeze({ id = "preserve", name = "The Preserve", revision = "preserve-1" }),
+	preserve = table.freeze({ id = "preserve", name = "The Preserve", revision = "preserve-2" }), -- (ROBLOX-118: the path round the east end moved round the back room)
 }) :: { [string]: World }
 
 -- The ids in a fixed order (the test garden first).

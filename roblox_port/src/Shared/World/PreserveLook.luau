@@ -165,6 +165,12 @@ end
 -- 30 cm of overhang; the window with the sill in its north wall (drawn by the sill's Decor: its frame, glass and reveal to the frame's 14), a door in the south
 -- wall to the gate, a small window in each end wall. Under the north window, a bench and a water butt fed from the gutter (the design's steps up to the sill).
 local HX, HZ0, HZ1, HT = 175, -16, 284, 28.5 -- the hut's half width, its north and south faces, its walls' thickness
+-- (ROBLOX-118) the volunteers' back room built on against the hut's east end (World/Hut.BACK): the building runs from -HX to HE, the hut's old east logs between the
+-- two rooms with a doorway cut through them, the roof carried on over it; the back room's window in its east end over the radiator
+local HE = 473.5
+local BX0, BX1 = 175, 445 -- the back room between its linings
+local DWZ, DW_HEAD = { 180, 250 }, 135 -- the doorway between the rooms
+local RW = { z0 = 98, z1 = 170, y1 = 112.5, glass = 459 } -- the back room's window
 local FLOOR, EAVES, CEIL = Preserve.FLOOR_Y, Preserve.EAVES_Y, 150
 local PITCH = 35
 local OVER = 30
@@ -179,59 +185,76 @@ local function hutDecor(out: List, rand: () -> number)
 	local ix, iz0, iz1 = HX - HT, HZ0 + HT, HZ1 - HT -- the inside: x -146.5..146.5, z 12.5..255.5
 	-- (ROBLOX-116: the hut's inside to WALL_TOP, the north wall outside to OUT_TOP, the outer sill, the door, the bench and the water butt are walkable boxes now,
 	-- World/Hut, each its own look. What of the hut is drawn here where those boxes are stands a hair (REC studs) behind their faces: the boxes hide it when
-	-- they are there, and it stands in for them where streaming has not sent them, from far across the preserve.)
+	-- they are there, and it stands in for them where streaming has not sent them, from far across the preserve. ROBLOX-118: so do the ceiling, the walls to it, the
+	-- back room, the north face to the eaves and the eaves themselves.)
 	local R = REC
-	-- the base and the floor
-	sblock(out, "Base", -HX - 3 + R, HX + 3 - R, GROUND, FLOOR - R, HZ0 - 3 + R, HZ1 + 3 - R, C.concrete, "Concrete", { far = true })
+	-- the base and the floors
+	sblock(out, "Base", -HX - 3 + R, HE + 3 - R, GROUND, FLOOR - R, HZ0 - 3 + R, HZ1 + 3 - R, C.concrete, "Concrete", { far = true })
 	sblock(out, "Floor", -ix, ix, FLOOR - 2 - R, FLOOR - R, iz0, iz1, C.floor, "WoodPlanks")
-	sblock(out, "Ceiling", -ix, ix, CEIL, CEIL + 2, iz0, iz1, C.ceiling, "WoodPlanks")
-	-- the north wall: the cladding round the window and the lining inside it
+	sblock(out, "FloorBack", BX0, BX1, FLOOR - 2 - R, FLOOR - R, iz0, iz1, C.floor, "WoodPlanks")
+	sblock(out, "Ceiling", -ix, ix, CEIL + R, CEIL + 2 + R, iz0, iz1, C.ceiling, "WoodPlanks")
+	sblock(out, "CeilingBack", BX0, BX1, CEIL + R, CEIL + 2 + R, iz0, iz1, C.ceiling, "WoodPlanks")
+	-- the north wall: the cladding round the window and the linings inside it
 	sblock(out, "NorthWest", -HX, -WIN.x, FLOOR, EAVES, HZ0 + R, HZ0 + CL, C.log, "Wood", { far = true, shadow = true })
-	sblock(out, "NorthEast", WIN.x, HX, FLOOR, EAVES, HZ0 + R, HZ0 + CL, C.log, "Wood", { far = true, shadow = true })
+	sblock(out, "NorthEast", WIN.x, HE, FLOOR, EAVES, HZ0 + R, HZ0 + CL, C.log, "Wood", { far = true, shadow = true })
 	sblock(out, "NorthBelow", -WIN.x, WIN.x, FLOOR, -4, HZ0 + R, HZ0 + CL, C.log, "Wood", { far = true })
-	sblock(out, "NorthAbove", -WIN.x, WIN.x, WIN.top, EAVES, HZ0, HZ0 + CL, C.log, "Wood", { far = true })
+	sblock(out, "NorthAbove", -WIN.x, WIN.x, WIN.top, EAVES, HZ0 + R, HZ0 + CL, C.log, "Wood", { far = true })
 	sblock(out, "OuterSill", -36 + R, 36 - R, -4 + R, -R, -22 + R, HZ0 + CL, C.board, "Wood", { far = true }) -- the window's outer sill, its top level with the sill's
 	sblock(out, "LiningWest", -ix, -WIN.x, FLOOR, CEIL, iz0 - CL, iz0 - R, C.lining, "WoodPlanks")
 	sblock(out, "LiningEast", WIN.x, ix, FLOOR, CEIL, iz0 - CL, iz0 - R, C.lining, "WoodPlanks")
 	sblock(out, "LiningBelow", -WIN.x, WIN.x, FLOOR, -1, iz0 - CL, iz0 - R, C.lining, "WoodPlanks")
-	sblock(out, "LiningAbove", -WIN.x, WIN.x, WIN.top + 1, CEIL, iz0 - CL, iz0, C.lining, "WoodPlanks")
+	sblock(out, "LiningAbove", -WIN.x, WIN.x, WIN.top + 1, CEIL, iz0 - CL, iz0 - R, C.lining, "WoodPlanks")
+	sblock(out, "LiningNorthBack", BX0, BX1, FLOOR, CEIL, iz0 - CL, iz0 - R, C.lining, "WoodPlanks")
 	-- (the window's reveal over the sill's side frames and its head are World/Hut's hut_window)
 	-- the green casing round the window outside
 	-- (ROBLOX-116: at both tiers now: the walkable casing's boxes go only to the hut's walls' height, and the window would have none above them on the low tier)
-	sblock(out, "CasingWest", -37 + R, -31, -4, WIN.top + 6, HZ0 - 1.2 + R, HZ0, C.trim, "WoodPlanks", { far = true })
-	sblock(out, "CasingEast", 31, 37 - R, -4, WIN.top + 6, HZ0 - 1.2 + R, HZ0, C.trim, "WoodPlanks", { far = true })
-	sblock(out, "CasingHead", -37, 37, WIN.top, WIN.top + 6, HZ0 - 1.2, HZ0, C.trim, "WoodPlanks", { far = true, full = true })
+	sblock(out, "CasingWest", -37 + R, -31 - R, -4, WIN.top + 6 - R, HZ0 - 1.2 + R, HZ0, C.trim, "WoodPlanks", { far = true })
+	sblock(out, "CasingEast", 31 + R, 37 - R, -4, WIN.top + 6 - R, HZ0 - 1.2 + R, HZ0, C.trim, "WoodPlanks", { far = true })
+	sblock(out, "CasingHead", -37 + R, 37 - R, WIN.top + R, WIN.top + 6 - R, HZ0 - 1.2 + R, HZ0, C.trim, "WoodPlanks", { far = true, full = true })
 	-- the other walls: cladding outside, lining inside; the south wall round the doorway (x -45..45, to DOOR_HEAD)
 	sblock(out, "South", -HX, -DOOR.x - R, FLOOR, EAVES, HZ1 - CL, HZ1, C.log, "Wood", { far = true })
-	sblock(out, "SouthEast", DOOR.x + R, HX, FLOOR, EAVES, HZ1 - CL, HZ1, C.log, "Wood", { far = true })
+	sblock(out, "SouthEast", DOOR.x + R, HE, FLOOR, EAVES, HZ1 - CL, HZ1, C.log, "Wood", { far = true })
 	sblock(out, "SouthAbove", -DOOR.x - R, DOOR.x + R, DOOR_HEAD, EAVES, HZ1 - CL, HZ1, C.log, "Wood", { far = true })
 	sblock(out, "West", -HX, -HX + CL, FLOOR, EAVES, HZ0, HZ1, C.log, "Wood", { far = true })
-	sblock(out, "East", HX - CL, HX, FLOOR, EAVES, HZ0, HZ1, C.log, "Wood", { far = true })
+	-- the back room's east end, round its window
+	sblock(out, "EastLow", HE - CL, HE, FLOOR, 0, HZ0, HZ1, C.log, "Wood", { far = true })
+	sblock(out, "EastHigh", HE - CL, HE, RW.y1, EAVES, HZ0, HZ1, C.log, "Wood", { far = true })
+	sblock(out, "EastNorth", HE - CL, HE, 0, RW.y1, HZ0, RW.z0, C.log, "Wood", { far = true })
+	sblock(out, "EastSouth", HE - CL, HE, 0, RW.y1, RW.z1, HZ1, C.log, "Wood", { far = true })
 	sblock(out, "LiningSouth", -ix, -DOOR.x - R, FLOOR, CEIL, iz1 + R, iz1 + CL, C.lining, "WoodPlanks")
 	sblock(out, "LiningSouthEast", DOOR.x + R, ix, FLOOR, CEIL, iz1 + R, iz1 + CL, C.lining, "WoodPlanks")
 	sblock(out, "LiningSouthAbove", -DOOR.x - R, DOOR.x + R, DOOR_HEAD, CEIL, iz1, iz1 + CL, C.lining, "WoodPlanks")
+	sblock(out, "LiningSouthBack", BX0, BX1, FLOOR, CEIL, iz1 + R, iz1 + CL, C.lining, "WoodPlanks")
 	sblock(out, "LiningWestWall", -ix - CL, -ix - R, FLOOR, CEIL, iz0, iz1, C.lining, "WoodPlanks")
-	sblock(out, "LiningEastWall", ix + R, ix + CL, FLOOR, CEIL, iz0, iz1, C.lining, "WoodPlanks")
+	-- the hut's old east logs between the rooms, lined on both faces, the doorway cut through them
+	for k, side in { { ix + R, ix + CL }, { BX0 - CL, BX0 - R } } do
+		sblock(out, `Partition{k}a`, side[1], side[2], FLOOR, CEIL, iz0, DWZ[1], C.lining, "WoodPlanks")
+		sblock(out, `Partition{k}b`, side[1], side[2], FLOOR, CEIL, DWZ[2], iz1, C.lining, "WoodPlanks")
+		sblock(out, `Partition{k}c`, side[1], side[2], DW_HEAD + R, CEIL, DWZ[1], DWZ[2], C.lining, "WoodPlanks")
+	end
+	-- the back room's east lining round its window (the sill, the reveals and the head are World/Hut's room_window)
+	sblock(out, "LiningBackEastLow", BX1 + R, BX1 + CL, FLOOR, -3, iz0, iz1, C.lining, "WoodPlanks")
+	sblock(out, "LiningBackEastHigh", BX1 + R, BX1 + CL, 115, CEIL, iz0, iz1, C.lining, "WoodPlanks")
+	sblock(out, "LiningBackEastN", BX1 + R, BX1 + CL, -3, 115, iz0, 93.5, C.lining, "WoodPlanks")
+	sblock(out, "LiningBackEastS", BX1 + R, BX1 + CL, -3, 115, 174.5, iz1, C.lining, "WoodPlanks")
 	-- the door, set in its doorway (World/Hut's hut_door: its leaf the walkable box to the regions' height, the gap under it a spider's way out), the doorway's
-	-- reveal, and the end walls' small windows, both faces
-	sblock(out, "Door", -DOOR.x + R, DOOR.x - R, FLOOR + 1.5, DOOR_HEAD, DOOR.leaf[1] + R, DOOR.leaf[2] - R, C.trim, "WoodPlanks", { far = true })
-	sblock(out, "DoorHead", -DOOR.x, DOOR.x, DOOR_HEAD, DOOR_HEAD + 2, iz1, HZ1, C.lining, "WoodPlanks")
-	sblock(out, "RevealWestDoor", -DOOR.x - 1, -DOOR.x, 30, DOOR_HEAD, iz1, HZ1, C.lining, "WoodPlanks")
-	sblock(out, "RevealEastDoor", DOOR.x, DOOR.x + 1, 30, DOOR_HEAD, iz1, HZ1, C.lining, "WoodPlanks")
+	-- reveal, and the end windows: the hut's west window, both faces, and the back room's in its east end
+	sblock(out, "Door", -DOOR.x + R, DOOR.x - R, FLOOR + 1.5, DOOR_HEAD - R, DOOR.leaf[1] + R, DOOR.leaf[2] - R, C.trim, "WoodPlanks", { far = true })
+	sblock(out, "DoorHead", -DOOR.x, DOOR.x, DOOR_HEAD + R, DOOR_HEAD + 2, iz1 + R, HZ1, C.lining, "WoodPlanks")
+	sblock(out, "RevealWestDoor", -DOOR.x - 1, -DOOR.x - R, 30, DOOR_HEAD, iz1 + R, HZ1, C.lining, "WoodPlanks")
+	sblock(out, "RevealEastDoor", DOOR.x + R, DOOR.x + 1, 30, DOOR_HEAD, iz1 + R, HZ1, C.lining, "WoodPlanks")
 	sblock(out, "DoorHandle", 30, 36, 60, 64, DOOR.leaf[2], DOOR.leaf[2] + 2.5, C.black, "Metal", { full = true })
 	sblock(out, "DoorHandleIn", 30, 36, 60, 64, DOOR.leaf[1] - 2.5, DOOR.leaf[1], C.black, "Metal", { full = true })
-	for i, sx in { -1, 1 } do
-		local face, inner = sx * HX, sx * ix
-		sblock(out, "EndWindow" .. i, math.min(face, face + sx * 1), math.max(face, face + sx * 1), 30, 100, 105, 165, C.glass, "SmoothPlastic", { far = true, reflectance = 0.2 })
-		sblock(out, "EndWindowIn" .. i, math.min(inner, inner - sx * 1), math.max(inner, inner - sx * 1), 30, 100, 105, 165, C.glass, "SmoothPlastic", { reflectance = 0.15 })
-		sblock(out, "EndCasing" .. i, math.min(face, face + sx * 1.5), math.max(face, face + sx * 1.5), 24, 106, 99, 171, C.trim, "WoodPlanks", { full = true })
-	end
+	sblock(out, "EndWindow1", -HX - 1, -HX, 30, 100, 105, 165, C.glass, "SmoothPlastic", { far = true, reflectance = 0.2 })
+	sblock(out, "EndWindowIn1", -ix, -ix + 1, 30, 100, 105, 165, C.glass, "SmoothPlastic", { reflectance = 0.15 })
+	sblock(out, "EndCasing1", -HX - 1.5, -HX, 24, 106, 99, 171, C.trim, "WoodPlanks", { full = true })
+	sblock(out, "EndWindow2", RW.glass + R, RW.glass + 1 - R, 0, RW.y1, RW.z0, RW.z1, C.glass, "SmoothPlastic", { far = true, reflectance = 0.2 })
+	sblock(out, "EndCasing2", HE, HE + 1.5, -6, RW.y1 + 6, RW.z0 - 6, RW.z1 + 6, C.trim, "WoodPlanks", { full = true })
 	-- the gable ends: each half a box turned to the roof's pitch, its corner at the eave (it stays inside the wall's outline and under the roof)
 	local p = math.rad(PITCH)
 	local run = (HZ1 - HZ0) / 2
 	local L, D = run / math.cos(p), run * math.sin(p) + 2
-	for i, sx in { -1, 1 } do
-		local x = sx * (HX - CL / 2)
+	for i, x in { -HX + CL / 2, HE - CL / 2 } do
 		for j, side in { 1, -1 } do -- the north half (rising southward from the north eave) and the south half
 			local ez = if side == 1 then HZ0 else HZ1
 			local uy, uz = math.sin(p), side * math.cos(p)
@@ -241,8 +264,10 @@ local function hutDecor(out: List, rand: () -> number)
 			add(out, `Gable{i}_{j}`, Vector3.new(CL - 0.4, D, L), Vector3.new(x, cy, cz), C.log, "Wood", { far = true }, nil, Vector3.new(-side * PITCH, 0, 0))
 		end
 	end
-	-- the roof: two slopes of green standing-seam metal, the ridge cap, the north gutter and its downpipe into the water butt
+	-- the roof: two slopes of green standing-seam metal over both rooms, the ridge cap; under the north eave the soffit, the fascia and the gutter (World/Hut's
+	-- walkable eaves, ROBLOX-118; drawn a hair inside them), and the downpipe into the water butt
 	local ridgeY = EAVES + run * math.tan(p)
+	local mx, len = (HE - HX) / 2, HE + HX + 2 * OVER
 	for j, side in { 1, -1 } do
 		local ez = if side == 1 then HZ0 else HZ1
 		local slope = (run + OVER) / math.cos(p)
@@ -250,12 +275,15 @@ local function hutDecor(out: List, rand: () -> number)
 		local midRun = (run - OVER) / 2 -- from the eave line toward the ridge, flat
 		local cy = EAVES + midRun * math.tan(p) + nY * 4
 		local cz = ez + side * midRun + nZ * 4
-		add(out, "Roof" .. j, Vector3.new(2 * HX + 2 * OVER, 5, slope), Vector3.new(0, cy, cz), C.roof, "Metal", { far = true, shadow = true }, nil, Vector3.new(-side * PITCH, 0, 0))
+		add(out, "Roof" .. j, Vector3.new(len, 5, slope), Vector3.new(mx, cy, cz), C.roof, "Metal", { far = true, shadow = true }, nil, Vector3.new(-side * PITCH, 0, 0))
 	end
-	sblock(out, "Ridge", -HX - OVER, HX + OVER, ridgeY + 4, ridgeY + 10, (HZ0 + HZ1) / 2 - 7, (HZ0 + HZ1) / 2 + 7, C.roof, "Metal", { far = true })
-	local gutterY, gutterZ = EAVES - OVER * math.tan(p) - 4, HZ0 - OVER - 4
-	add(out, "Gutter", Vector3.new(2 * HX + 2 * OVER, 12, 12), Vector3.new(0, gutterY, gutterZ), C.metal, "Metal", { far = true }, "Cylinder")
-	add(out, "Downpipe", Vector3.new(gutterY - 30, 7, 7), Vector3.new(130, (gutterY + 30) / 2, gutterZ), C.metal, "Metal", { full = true }, "Cylinder", Vector3.new(0, 0, 90))
+	sblock(out, "Ridge", -HX - OVER, HE + OVER, ridgeY + 4, ridgeY + 10, (HZ0 + HZ1) / 2 - 7, (HZ0 + HZ1) / 2 + 7, C.roof, "Metal", { far = true })
+	local ex0, ex1 = -HX - OVER, HE + OVER
+	sblock(out, "Soffit", ex0, ex1, 133 + R, 135 - R, -46 + R, HZ0 - R, C.trim, "WoodPlanks", { far = true })
+	sblock(out, "Fascia", ex0, ex1, 121 + R, 135 - R, -48 + R, -46 - R, C.trim, "WoodPlanks", { far = true })
+	sblock(out, "GutterFloor", ex0, ex1, 121 + R, 122.5 - R, -60 + R, -48 - R, C.metal, "Metal", { far = true })
+	sblock(out, "GutterLip", ex0, ex1, 121 + R, 131 - R, -61.5 + R, -60 - R, C.metal, "Metal", { far = true })
+	add(out, "Downpipe", Vector3.new(121 - 30, 7, 7), Vector3.new(130, (121 + 30) / 2, -54), C.metal, "Metal", { full = true }, "Cylinder", Vector3.new(0, 0, 90))
 	-- the water butt on its stand of blocks, and the bench under the window (ROBLOX-116: World/Hut's hut_butt and hut_bench, walkable; drawn here a hair inside them)
 	local G = GROUND + 0.4
 	sblock(out, "ButtStand", 100 + R, 160 - R, G, -66 - R, -75 + R, -21 - R, C.concrete, "Concrete")
@@ -274,22 +302,27 @@ local function hutDecor(out: List, rand: () -> number)
 		end
 		if y > -4 and y < WIN.top + 6 then
 			line(`CourseN{row}a`, -HX, -37, HZ0 - 0.4, HZ0)
-			line(`CourseN{row}b`, 37, HX, HZ0 - 0.4, HZ0)
+			line(`CourseN{row}b`, 37, HE, HZ0 - 0.4, HZ0)
 		else
-			line(`CourseN{row}`, -HX, HX, HZ0 - 0.4, HZ0)
+			line(`CourseN{row}`, -HX, HE, HZ0 - 0.4, HZ0)
 		end
 		if y < 135 then
 			line(`CourseS{row}a`, -HX, -45, HZ1, HZ1 + 0.4)
-			line(`CourseS{row}b`, 45, HX, HZ1, HZ1 + 0.4)
+			line(`CourseS{row}b`, 45, HE, HZ1, HZ1 + 0.4)
 		else
-			line(`CourseS{row}`, -HX, HX, HZ1, HZ1 + 0.4)
+			line(`CourseS{row}`, -HX, HE, HZ1, HZ1 + 0.4)
 		end
 		line(`CourseW{row}`, -HX - 0.4, -HX, HZ0, HZ1)
-		line(`CourseE{row}`, HX, HX + 0.4, HZ0, HZ1)
+		if y > -6 and y < RW.y1 + 6 then
+			line(`CourseE{row}a`, HE, HE + 0.4, HZ0, RW.z0 - 6)
+			line(`CourseE{row}b`, HE, HE + 0.4, RW.z1 + 6, HZ1)
+		else
+			line(`CourseE{row}`, HE, HE + 0.4, HZ0, HZ1)
+		end
 		y += 20
 	end
-	for i, c in { { -1, HZ0 }, { 1, HZ0 }, { -1, HZ1 }, { 1, HZ1 } } do
-		local cx, cz = c[1] * HX, c[2]
+	for i, c in { { -HX, HZ0 }, { HE, HZ0 }, { -HX, HZ1 }, { HE, HZ1 } } do
+		local cx, cz = c[1], c[2]
 		sblock(out, "Corner" .. i, cx - 9 + REC, cx + 9 - REC, FLOOR, EAVES, cz - 9 + REC, cz + 9 - REC, C.logDark, "Wood", { full = true })
 	end
 	-- by the gate: the information board on two posts under its own little roof, and the bike rack's hoops
@@ -310,7 +343,8 @@ end
 local function gardenDecor(out: List, rand: () -> number)
 	-- three beds edged in timber: two either side of the path, a long herb border along the north
 	-- (ROBLOX-116: the east bed starts clear of the core, World/Hut's walkable garden x 43.75..47.75, z 5..9, which has its own beds and the feeder)
-	local beds = { { 39, 43.6, 7, 8.4 }, { 47.9, 51.6, 7, 8.4 }, { 38.6, 51.6, 12.4, 13.6 } }
+	-- (ROBLOX-118: the herb border along the north is in two, a gap for the path to the meadow, World/Hut's path_m4, x 44.85..45.45)
+	local beds = { { 39, 43.6, 7, 8.4 }, { 47.9, 51.6, 7, 8.4 }, { 38.6, 44.65, 12.4, 13.6 }, { 45.65, 51.6, 12.4, 13.6 } }
 	for i, b in beds do
 		block(out, "Edging" .. i, b[1], b[2], b[3], b[4], 0, 0.22, C.board, "WoodPlanks", { far = true })
 		block(out, "BedSoil" .. i, b[1] + 0.05, b[2] - 0.05, b[3] + 0.05, b[4] - 0.05, 0.22, 0.24, C.soil, "Ground")

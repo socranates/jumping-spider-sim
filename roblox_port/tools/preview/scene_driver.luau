@@ -307,6 +307,23 @@ for _, w in WASPS do
 	body:draw({ position = Vector3.new(w.x, w.y, w.z), heading = Vector3.new(w.hx, 0, w.hz).Unit, mode = w.mode, search = w.search, visible = true }, w.beat)
 end
 
+-- ROBLOX-118 (scene.py --cats): the ranger's cat (Client/CatBody drawing Rig/CatPose) where scene.py puts it: { id, x, y, z, hx, hz, pose, t, look = {x,y,z}? }
+local catHolder = Instance.new("Folder")
+catHolder.Name = "CatHolder"
+catHolder.Parent = workspace
+if CATS ~= nil then
+	local CatBody = require("../src/Client/CatBody")
+	for _, c in CATS do
+		local body = CatBody.new(catHolder, DETAIL)
+		body.folder.Name = c.id
+		local cat = { pos = Vector3.new(c.x, c.y, c.z), heading = Vector3.new(c.hx, 0, c.hz).Unit, pose = c.pose, spot = c.spot or "", surface = c.y,
+			look = if c.look then Vector3.new(c.look[1], c.look[2], c.look[3]) else nil, pawAt = if c.paw then Vector3.new(c.paw[1], c.paw[2], c.paw[3]) else nil,
+			reactS = c.swat or 0 }
+		if c.seated then cat.spot = "window" end
+		body:draw(cat, c.t or 3.0, 0)
+	end
+end
+
 -- ROBLOX-114 (scene.py --lineup): every creature of the game side by side on a white card far off at x 400, facing +X (so a camera in front, at +z, sees each
 -- one's length along the ruler), next to a ruler of 1 cm ticks (every fifth longer, every tenth longest; millimetre ticks on the small row's). Two rows: the small
 -- (z 0: the aphid to the ladybird, the peacock spider and the ant mimic at their first and last growth stages, the peacock's mate) and the big (z 12: the first spider at every
@@ -451,6 +468,9 @@ counts.flies = #rows - before
 before = #rows
 dump(waspHolder, "wasps", rows)
 counts.wasps = #rows - before
+before = #rows
+dump(catHolder, "cats", rows)
+counts.cats = #rows - before
 before = #rows
 dump(lineupHolder, "lineup", rows)
 counts.lineup = #rows - before

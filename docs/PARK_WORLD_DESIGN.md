@@ -151,6 +151,12 @@ whole), the rival and the mate coming into the garden and roaming its cells (nev
 and the moth at the lamp, the gravel path round the hut's east end to the door's gap, the low tier's far looks thinner. Left for round 3 with the back room and the cat:
 the path on to the meadow's edge and the published default.
 
+*Round 3 built (ROBLOX-118, 2026-10-20, not yet run in Studio):* the hut's ceiling on joists and its walls to it (nothing puts the spider back), the north face outside to the
+soffit, fascia and gutter, the volunteers' back room through a doorway in the east wall (a sofa with the darkest home under it, a television and a games console, board games, a rug,
+a radiator under the window, cables), the ranger's cat living in the two rooms on a seeded day (heard by its bell, noticing what moves, patting; a death in Normal, a knock aside in the
+gentle rules) with its notebook page, the path round the back room's east end (preserve-2) and a gravel path on north toward the meadow, and **the preserve as the default world**
+(the test garden by the attribute), its drift, an intro that opens inside the hut, the title card's line and the store page. Phase B's game is built; its Studio pass is next.
+
 **Phase C — the meadow and the path (3 rounds).** Zone 3 and the first corridor (the mown path, the bench/bin/lamppost patch, zone 8),
 crab spider and the lamppost moths, ballooning as the generation's choice.
 
@@ -198,6 +204,12 @@ the Steam edition (the canal, the apartment balconies and window boxes, a roofto
 5. Lock-on moves to **L2** on controllers (Nathan, 2026-10-20), in Phase A's first round.
 
 ## 11. Progress
+
+- **ROBLOX-118 (Phase B, round 3)**: the ceiling and the walls to it, the eaves outside, the back room and the cat (`Predator/Cat`, `Rig/CatPose`, `Client/CatBody`, `UI/CatText`),
+  the path round the back room and on toward the meadow, the preserve the default world. 105 regions, 180 seams. Decisions taken in the build: the back room east of the hut (the path
+  moved round it, preserve-2); the upper walls and the ceiling in nine regions a room (streaming); the roof's slope drawn only, its gutter the walkable edge; the cat's day a pure function
+  of the seed, the day and the hour, its reaction live and never saved; it keeps to the floor, the sofa, the chair and the window sill; the house spider drawn, not a hazard.
+  `docs/DECISIONS.md` ROBLOX-118; `docs/HANDOFF-roblox-world.md` has the Studio checklist.
 
 - **ROBLOX-117 (Phase B, round 2)**: the hut garden rich at the spider's eye (354 patches of near detail, World/LookPlan's step 2b), the plants' seconds and their drawing,
   the dew on the looks, the rival and the mate in the garden (`Hut.CREATURES`, `Hut.ROAM`, RivalDrive's `roam`), the hoverfly, the fruit flies' caddy and the lamp's moth,

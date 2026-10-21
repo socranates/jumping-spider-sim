@@ -112,6 +112,14 @@ LifeText.HOMES = {
 		way = "Walk into the gap under the bark chip in the mulch, then stop to rest.",
 		kept = "Last rest kept, under the bark chip.",
 	},
+	-- ROBLOX-118: the darkest place in the hut, the gap under the back room's sofa
+	room_sofa_under = {
+		name = "under the sofa",
+		title = "Under the sofa",
+		home = "Home: under the sofa",
+		way = "Walk in under the sofa in the back room, deep into the dark, then stop to rest.",
+		kept = "Last rest kept, under the sofa.",
+	},
 } :: { [string]: { name: string, title: string, home: string, way: string, kept: string } }
 LifeText.DEFAULT_HOME = "sill_crevice"
 local function homeOf(retreat: string?): { name: string, title: string, home: string, way: string, kept: string }

@@ -10,8 +10,8 @@
 --
 -- The hut inside (3.5 by 3 m outside, 2.93 by 2.43 m between its linings, x -146.5..146.5, z 12.5..255.5, its floor 70 cm under the sill):
 --   hut_floor_a..i .. the floorboards in nine cells of about a metre (a region whole inside the streaming radius from anywhere on it), the skirting, and the walls'
---                     linings to WALL_TOP (a metre and a third over the floor: what the regions hold; the upper walls and the ceiling are drawn only, Phase B round 3
---                     with the volunteers' back room). The apron under the sill in hut_floor_b: the sill's front face goes on down to the floor.
+--                     linings to WALL_TOP (a metre and a third over the floor; ROBLOX-118: the upper walls and the ceiling are the hut_up_* cells over them). The apron
+--                     under the sill in hut_floor_b: the sill's front face goes on down to the floor.
 --   hut_desk ........ a desk east of the window against the north wall (90 by 60 cm, its top 74 cm over the floor), its drawer and the runner under it (the gap between
 --                     them is a retreat, hut_desk_drawer), a lamp, a notebook, a mug, three specimen jars and a hand lens; and the north wall's lining east of the window.
 --   hut_board ....... the notice board on two battens west of the window (the gap behind it is a retreat, hut_board_gap), and the lining west of the window.
@@ -43,6 +43,16 @@
 --                        cardinal's feather under the feeder, petals under the flowers, and the morning's dew; World/LookPlan draws them only near the spider.
 --   the life ............ the hoverflies on the bed's flowers, the fruit flies at a compost caddy by the door, a moth at the desk lamp from dusk; and where the rival
 --                        and the mate come into the garden and the cells they roam (CREATURES, ROAM: never the hut).
+-- ROBLOX-118 (Phase B round 3: the ceiling, the back room, the eaves, the meadow path):
+--   hut_up_a..i, room_up_a..i .. over each floor cell of both rooms, the walls' linings from WALL_TOP to the ceiling and the ceiling's boards on their joists (CEIL, JOISTS);
+--                        the house spider's web drawn in hut_up_a's corner.
+--   hut_door_up ........ the front door's leaf and jambs above DOOR.top to its head, and the wall over it to the ceiling.
+--   hut_doorway(_up) ... the doorway cut through the hut's old east logs into the back room (DOORWAY), in two at WALL_TOP.
+--   room_floor_a..i .... the volunteers' back room's floor (BACK), its linings, skirting, rug, the radiator under the window, the cables and sockets.
+--   room_sofa_w/e, room_tv, room_games, room_window .. its sofa (the gap under it, room_sofa_under, is room_floor_h's home), the television's unit, the board games' shelf,
+--                        the east window and its deep sill.
+--   hut_wall_x1..x3, hut_eave_w2..x4 .. the back room's north logs outside, and the whole north face from OUT_TOP to the soffit, the fascia and the gutter (EAVE, EAVES).
+--   path_s3..s5, path_e1..e5 (moved), path_n1..n3, path_m1..m4 .. the path round the back room's east end, and on north toward the meadow (WALK).
 local Preserve = require(script.Parent.Preserve)
 
 local Hut = {}
@@ -110,16 +120,56 @@ Hut.SASH = table.freeze({ min = v(-8, 0.7, -13.5), max = v(8, 6, -12.5) }) -- th
 -- (ROBLOX-117) The gravel path round the hut's east end: from the door's gravel (hut_door, x -60..60) east along the south wall's foot (z 287..347, the hut's base
 -- lip at 284..287 is the backdrop's), north past the east end 57 cm out from the logs (x 235..295), and west into the garden's own path at the core's edge (x 200,
 -- z -196..-146). 60 cm wide, fine gravel at true size (2 to 10 mm stones: the patches' look). Each region whole inside the streaming radius from anywhere on it.
+-- (ROBLOX-118) The volunteers' back room stands against the hut's east end, so the path goes round the back room's east end instead: along the south wall's foot to
+-- x 590, north 57 cm out from the back room's east logs (x 530..590), and west along z -196..-146 to the garden's path (path_e6, where it always met it). The lengths
+-- path_e1..e5 keep their ids at their new place (WorldMap's preserve revision moved: preserve-2). And the meadow path, path_m1..m4: the garden's own north-south
+-- gravel path goes on north out of the core (x -90..-30) to the herb border's gap and the mown loop at z 13 m, so the world visibly goes on toward the meadow.
 Hut.WALK = table.freeze({
 	table.freeze({ id = "path_s1", x0 = 60, x1 = 178, z0 = 287, z1 = 347 }),
 	table.freeze({ id = "path_s2", x0 = 178, x1 = 295, z0 = 287, z1 = 347 }),
-	table.freeze({ id = "path_e1", x0 = 235, x1 = 295, z0 = 200, z1 = 287 }),
-	table.freeze({ id = "path_e2", x0 = 235, x1 = 295, z0 = 113, z1 = 200 }),
-	table.freeze({ id = "path_e3", x0 = 235, x1 = 295, z0 = 26, z1 = 113 }),
-	table.freeze({ id = "path_e4", x0 = 235, x1 = 295, z0 = -60, z1 = 26 }),
-	table.freeze({ id = "path_e5", x0 = 235, x1 = 295, z0 = -146, z1 = -60 }),
+	table.freeze({ id = "path_s3", x0 = 295, x1 = 412, z0 = 287, z1 = 347 }),
+	table.freeze({ id = "path_s4", x0 = 412, x1 = 530, z0 = 287, z1 = 347 }),
+	table.freeze({ id = "path_s5", x0 = 530, x1 = 590, z0 = 287, z1 = 347 }),
+	table.freeze({ id = "path_e1", x0 = 530, x1 = 590, z0 = 200, z1 = 287 }),
+	table.freeze({ id = "path_e2", x0 = 530, x1 = 590, z0 = 113, z1 = 200 }),
+	table.freeze({ id = "path_e3", x0 = 530, x1 = 590, z0 = 26, z1 = 113 }),
+	table.freeze({ id = "path_e4", x0 = 530, x1 = 590, z0 = -60, z1 = 26 }),
+	table.freeze({ id = "path_e5", x0 = 530, x1 = 590, z0 = -146, z1 = -60 }),
+	table.freeze({ id = "path_n3", x0 = 530, x1 = 590, z0 = -196, z1 = -146 }),
+	table.freeze({ id = "path_n2", x0 = 412, x1 = 530, z0 = -196, z1 = -146 }),
+	table.freeze({ id = "path_n1", x0 = 295, x1 = 412, z0 = -196, z1 = -146 }),
 	table.freeze({ id = "path_e6", x0 = 200, x1 = 295, z0 = -196, z1 = -146 }),
+	table.freeze({ id = "path_m1", x0 = -90, x1 = -30, z0 = -516, z1 = -416 }),
+	table.freeze({ id = "path_m2", x0 = -90, x1 = -30, z0 = -616, z1 = -516 }),
+	table.freeze({ id = "path_m3", x0 = -90, x1 = -30, z0 = -716, z1 = -616 }),
+	table.freeze({ id = "path_m4", x0 = -90, x1 = -30, z0 = -816, z1 = -716 }),
 })
+
+-- (ROBLOX-118) The ceiling, the back room and the hut's outside to its eaves.
+-- The ceiling: boards whose underside is CEIL (2.2 m over the floor), on joists 4.5 by 14 cm every 60 cm across the short span (north to south), in both rooms.
+Hut.CEIL = 150
+Hut.JOISTS = table.freeze({ hut = table.freeze({ -90, -30, 30, 90 }), back = table.freeze({ 220, 280, 340, 400 }), w = 4.5, d = 14 })
+-- The volunteers' back room: a log room built on against the hut's east end, 2.7 by 2.43 m between its linings (its east logs' outer face at x 473.5), the same floor
+-- and ceiling as the hut's; the doorway cut through the hut's old east logs (x 146.5..175) at z 180..250, its head 2.05 m over the floor.
+Hut.BACK = table.freeze({ x0 = 175, x1 = 445, z0 = 12.5, z1 = 255.5, east = 473.5 })
+Hut.BACK_COLS = table.freeze({ 175, 265, 355, 445 })
+Hut.DOORWAY = table.freeze({ x0 = 146.5, x1 = 175, z0 = 180, z1 = 250, head = 135, core = table.freeze({ 156.5, 165 }) })
+-- What is in it, true sizes: a two-seat sofa 2 m long against the south wall (its seat 45 cm over the floor, its back 85, its arms 70, on legs 8 cm tall: the gap under it
+-- is the darkest place in the hut, and a home); a low unit against the north wall with a 32-inch television on it and a games console on its shelf (the controller lies
+-- on the sofa's cushion); a shelf of board games in the north-east corner, 1.2 m tall; a rug; the window in the east wall over an oil-filled radiator (a space heater
+-- on its feet, its fins 7 cm apart); the cables along the skirting to their sockets.
+Hut.SOFA = table.freeze({ x0 = 225, x1 = 425, z0 = 165.5, z1 = 254, arm = 20, leg = -62, frame = -38, seat = -25, back = 15, armTop = 0, split = 325,
+	under = table.freeze({ min = v(275, -70, 195), max = v(315, -68.6, 235), door = v(295, -69.5, 163.5) }) })
+Hut.TV = table.freeze({ x0 = 185, x1 = 275, z0 = 14, z1 = 52.5, top = -20, screen = table.freeze({ x0 = 193.5, x1 = 266.5, y0 = -14, y1 = 29, z0 = 25, z1 = 29 }) })
+Hut.GAMES = table.freeze({ x0 = 360, x1 = 440, z0 = 14, z1 = 44, top = 50 })
+Hut.HEATER = table.freeze({ x0 = 425, x1 = 441, z0 = 100, z1 = 158, top = -7, fins = 7 })
+Hut.RUG = table.freeze({ x0 = 230, x1 = 400, z0 = 96, z1 = 164, top = 1 })
+Hut.ROOM_WINDOW = table.freeze({ z0 = 98, z1 = 170, glass = 459, sill = 429, head = 112.5, top = 115 })
+-- The north face outside, to the eaves: the logs to the soffit's underside (EAVE.soffit, 2.18 m over the ground), the boxed soffit under the roof's overhang, the
+-- fascia board and the gutter hung on it (its floor 2.06 m over the ground): the roof's walkable edge. The roof's slope (35 degrees) is drawn only.
+Hut.BUILDING = table.freeze({ x0 = -175, x1 = 473.5 })
+Hut.EAVE = table.freeze({ x0 = -205, x1 = 503.5, soffit = 133, soffitTop = 135, out = -46, fascia = table.freeze({ out = -48, bottom = 124 }),
+	gutter = table.freeze({ floor = 121, thick = 1.5, out = -60, wall = 1.5, lip = 131, cap = 2 }) })
 
 local GT = Hut.GROUND
 local FL = Hut.FLOOR
@@ -138,6 +188,10 @@ local C = {
 	stem = "5d8a3e", leaf = "4d7a36", leafPale = "6f9a52", milkweedLeaf = "6d8f5a", milkweedUnder = "a8b89a", umbel = "c48a96", pod = "7a9a5a",
 	goldenrod = "d4b23a", goldenLeaf = "5a7a3a", petal = "b36a8f", cone = "a5531f", monarda = "a88bb0", sage = "8a9a7a", thyme = "6d7f55", chive = "4f7d35",
 	chiveFlower = "b48ac0", butt = "3e5d44", buttLid = "2f4734", seed = { "2a2420", "d8c8a0", "3a3028", "c9b48a" },
+	-- (ROBLOX-118) the ceiling and the back room
+	ceiling = "cdb08a", joist = "a88a62", rug = "7a3b32", cable = "1e1e1e", heater = "e6e2d8", heaterDark = "8f8b84", sofa = "4f6170", sofaDark = "3f4e5a",
+	controller = "26282b", unit = "8e6a45", unitDark = "6f5235", console = "f0f0ee", screen = "16181b", gutter = "6f7377",
+	games = { "b8322a", "2f5f8a", "e0b23a", "3e7a4a", "e8e2d0", "6a3d7a", "d97a2b", "2b2b2b", "9fb8c8", "c7a27c" },
 }
 
 -- (ROBLOX-117) The rival and the mate in the preserve: they come into the hut garden, the rival along the gravel path from the north (it arrives at the path's end in
@@ -235,7 +289,41 @@ local RETREATS: { [string]: { id: string, min: Vector3, max: Vector3, door: Vect
 	garden_a1 = { id = "garden_a1_trough", min = v(-140, GT, -48), max = v(-128, GT + 1.4, -36), door = v(-134, GT + 0.5, -63.5) },
 	garden_a3 = { id = "garden_a3_stone", min = v(61, GT, -92), max = v(69, GT + 1.4, -84), door = v(65, GT + 0.5, -78) },
 	garden_d3 = { id = "garden_d3_mulch", min = v(29, S, -372), max = v(37, S + 1.4, -366), door = v(33, S + 0.5, -360.5) },
+	-- (ROBLOX-118) the gap under the back room's sofa, deep in from its front edge: the darkest place in the hut (the floor's: the sofa's own region starts at its frame)
+	room_floor_h = { id = "room_sofa_under", min = Hut.SOFA.under.min, max = Hut.SOFA.under.max, door = Hut.SOFA.under.door },
 }
+
+-- (ROBLOX-118) The upper cells (the walls from WALL_TOP to the ceiling, the ceiling and its joists over each floor cell of both rooms): their room and rectangle.
+local UPPER: { [string]: { room: string, x0: number, x1: number, z0: number, z1: number } } = {}
+local UPPER_IDS: { string } = {}
+for r = 1, 3 do
+	for c = 1, 3 do
+		local letter = FLOOR_IDS[(r - 1) * 3 + c]
+		for _, room in { "hut", "back" } do
+			local cols = if room == "hut" then Hut.COLS else Hut.BACK_COLS
+			local id = (if room == "hut" then "hut_up_" else "room_up_") .. letter
+			UPPER[id] = { room = room, x0 = cols[c], x1 = cols[c + 1], z0 = Hut.ROWS[r], z1 = Hut.ROWS[r + 1] }
+		end
+	end
+end
+for _, room in { "hut", "back" } do
+	for _, letter in FLOOR_IDS do table.insert(UPPER_IDS, (if room == "hut" then "hut_up_" else "room_up_") .. letter) end
+end
+Hut.UPPER = UPPER
+-- The outside regions of the north face from WALL_TOP's outside height (OUT_TOP) to the eaves, west to east: x0..x1 of their logs and of their share of the eaves.
+-- (each about 72 to 100 studs along the wall, so a region is whole inside the streaming radius from anywhere on it: the logs are a metre high)
+local EAVES: { { id: string, x0: number, x1: number, ex0: number, ex1: number } } = {
+	{ id = "hut_eave_w2", x0 = -175, x1 = -103, ex0 = -205, ex1 = -103 },
+	{ id = "hut_eave_w1", x0 = -103, x1 = -31, ex0 = -103, ex1 = -31 },
+	{ id = "hut_eave_mid", x0 = -31, x1 = 31, ex0 = -31, ex1 = 31 },
+	{ id = "hut_eave_e1", x0 = 31, x1 = 103, ex0 = 31, ex1 = 103 },
+	{ id = "hut_eave_e2", x0 = 103, x1 = 175, ex0 = 103, ex1 = 175 },
+	{ id = "hut_eave_x1", x0 = 175, x1 = 250, ex0 = 175, ex1 = 250 },
+	{ id = "hut_eave_x2", x0 = 250, x1 = 325, ex0 = 250, ex1 = 325 },
+	{ id = "hut_eave_x3", x0 = 325, x1 = 400, ex0 = 325, ex1 = 400 },
+	{ id = "hut_eave_x4", x0 = 400, x1 = 473.5, ex0 = 400, ex1 = 503.5 },
+}
+Hut.EAVES = EAVES
 
 -- The authored regions of the hut and its garden, for a world seed (`seedOf`: World/WorldMap.seed), in priority order (after the sill, which World/WorldMap
 -- authors as it always has: the sill's neighbours are `Hut.SILL_SEAMS`).
@@ -260,15 +348,57 @@ function Hut.author(worldSeed: number, seedOf: (number, string) -> number): { Re
 	region("hut_shelf", "hut_shelf", v(R.x0, -69, 114), v(-116, 30, 206), v(-132, 10, 160), v(0, 0, -1), 1.0)
 	region("hut_chair", "hut_chair", v(64, -69, 86), v(108, 20, 130), v(86, -24, 108), v(0, 0, -1), 1.0)
 	region("hut_door", "hut_door", v(-Hut.DOOR.jamb, -88, R.z1), v(Hut.DOOR.jamb, Hut.DOOR.top, Hut.DOOR.gravel), v(0, FL, 272), v(0, 0, 1), 1.0)
+	-- (ROBLOX-118) the door's leaf and jambs above WALL_TOP's door height to its head, and the wall over it to the ceiling; the doorway to the back room; the back room's
+	-- window over the radiator, the television's unit, the shelf of board games and the sofa (in two halves, each whole inside the streaming radius)
+	local D, DW, B, SO = Hut.DOOR, Hut.DOORWAY, Hut.BACK, Hut.SOFA
+	region("hut_door_up", "hut_door_up", v(-D.jamb, D.top, R.z1), v(D.jamb, Hut.CEIL, D.outer), v(0, 80, D.leaf[1]), v(0, 1, 0), 1.0)
+	region("hut_doorway", "hut_doorway", v(DW.x0, FL - 3, 174.5), v(DW.x1, Hut.WALL_TOP, B.z1), v((DW.x0 + DW.x1) / 2, FL, (DW.z0 + DW.z1) / 2), v(1, 0, 0), 1.0)
+	region("hut_doorway_up", "hut_doorway", v(DW.x0, Hut.WALL_TOP, 174.5), v(DW.x1, Hut.CEIL, B.z1), v((DW.core[1] + DW.core[2]) / 2, 100, DW.z0), v(0, 1, 0), 1.0)
+	region("room_window", "room_window", v(B.x1 - 20, -5, 93.5), v(Hut.ROOM_WINDOW.glass + 1, Hut.ROOM_WINDOW.top + 3, 174.5), v(437, 0, 134), v(1, 0, 0), 1.0)
+	region("room_tv", "room_tv", v(Hut.TV.x0, FL + 1, Hut.TV.z0), v(Hut.TV.x1, Hut.TV.screen.y1 + 3, Hut.TV.z1 + 3), v(230, Hut.TV.top, 45), v(0, 0, 1), 1.0)
+	region("room_games", "room_games", v(Hut.GAMES.x0, FL + 1, Hut.GAMES.z0), v(Hut.GAMES.x1, Hut.GAMES.top + 5, Hut.GAMES.z1 + 4), v(400, Hut.GAMES.top, 30), v(0, 0, 1), 1.0)
+	region("room_sofa_w", "room_sofa", v(SO.x0 - 5, FL + 0.9, SO.z0 - 5), v(SO.split, SO.back + 3, SO.z1), v(262, SO.seat, 215), v(0, 0, -1), 1.0)
+	region("room_sofa_e", "room_sofa", v(SO.split, FL + 0.9, SO.z0 - 5), v(SO.x1 + 5, SO.back + 3, SO.z1), v(365, SO.seat, 200), v(0, 0, -1), 1.0)
 	for r = 1, 3 do
 		for c = 1, 3 do
 			local x0, x1, z0, z1 = Hut.COLS[c], Hut.COLS[c + 1], Hut.ROWS[r], Hut.ROWS[r + 1]
 			region(floorCell(c, r), "hut_floor", v(x0, FL - 3, z0), v(x1, Hut.WALL_TOP, z1), v((x0 + x1) / 2, FL, (z0 + z1) / 2), v(0, 0, -1), 1.0)
 		end
 	end
+	-- (ROBLOX-118) the back room's floor in nine cells, as the hut's
+	for r = 1, 3 do
+		for c = 1, 3 do
+			local x0, x1, z0, z1 = Hut.BACK_COLS[c], Hut.BACK_COLS[c + 1], Hut.ROWS[r], Hut.ROWS[r + 1]
+			local spawn = v((x0 + x1) / 2, FL + (if (x0 + x1) / 2 > Hut.RUG.x0 and (x0 + x1) / 2 < Hut.RUG.x1 and (z0 + z1) / 2 > Hut.RUG.z0 and (z0 + z1) / 2 < Hut.RUG.z1 then Hut.RUG.top else 0), (z0 + z1) / 2)
+			if r == 3 and c == 2 then spawn = v(340, FL, 215) end -- (under the sofa, beside its gap)
+			if r == 2 and c == 3 then spawn = v(415, FL, 134) end -- (off the rug's edge, short of the radiator)
+			region("room_floor_" .. FLOOR_IDS[(r - 1) * 3 + c], "room_floor", v(x0, FL - 3, z0), v(x1, Hut.WALL_TOP, z1), spawn, v(0, 0, -1), 1.0)
+		end
+	end
+	-- (ROBLOX-118) the upper walls and the ceiling over every floor cell of both rooms: the spider walks them all, head down on the ceiling
+	for _, id in UPPER_IDS do
+		local U = UPPER[id]
+		-- (the cells by the doorway reach into the old logs to the doorway's cut, where their lining meets it)
+		local bx0 = if id == "room_up_g" then Hut.DOORWAY.core[2] - 0.5 else U.x0
+		local bx1 = if id == "hut_up_i" then Hut.DOORWAY.core[1] + 0.5 else U.x1
+		-- (its spawn on the east face of its joist, part way up: a place a body can be put, where the ceiling's underside cannot)
+		local J = Hut.JOISTS
+		local jx = U.x0
+		for _, x in (if U.room == "hut" then J.hut else J.back) :: { number } do if x > U.x0 and x < U.x1 then jx = x; break end end
+		region(id, "hut_upper", v(bx0, Hut.WALL_TOP, U.z0), v(bx1, Hut.CEIL + 2, U.z1), v(jx + J.w / 2, Hut.CEIL - J.d / 2, (U.z0 + U.z1) / 2), v(0, 0, -1), 1.0)
+	end
 	region("hut_wall_mid", "hut_wall", v(-31, -71, -24), v(31, -4, -16), v(0, -20, -16), v(0, 1, 0), 1.0)
 	region("hut_wall_w", "hut_wall", v(-185, -71, -26), v(-31, Hut.OUT_TOP, -16), v(-120, -20, -16), v(0, 1, 0), 1.0)
-	region("hut_wall_e", "hut_wall", v(31, -71, -26), v(185, Hut.OUT_TOP, -16), v(120, -20, -16), v(0, 1, 0), 1.0)
+	region("hut_wall_e", "hut_wall", v(31, -71, -26), v(175, Hut.OUT_TOP, -16), v(120, -20, -16), v(0, 1, 0), 1.0)
+	-- (ROBLOX-118) the back room's north logs outside, and the north face from OUT_TOP to the eaves, its soffit, fascia and gutter
+	region("hut_wall_x1", "hut_wall", v(175, GT - 0.5, -26), v(275, Hut.OUT_TOP, -16), v(225, -20, -16), v(0, 1, 0), 1.0)
+	region("hut_wall_x2", "hut_wall", v(275, GT - 0.5, -26), v(375, Hut.OUT_TOP, -16), v(325, -20, -16), v(0, 1, 0), 1.0)
+	region("hut_wall_x3", "hut_wall", v(375, GT - 0.5, -26), v(483.5, Hut.OUT_TOP, -16), v(425, -20, -16), v(0, 1, 0), 1.0)
+	local EV = Hut.EAVE
+	for _, e in EAVES do
+		region(e.id, "hut_eave", v(e.ex0 - (if e.id == "hut_eave_mid" then 6 else 0), Hut.OUT_TOP, EV.gutter.out - 3), v(e.ex1 + (if e.id == "hut_eave_mid" then 6 else 0), EV.soffitTop + 4, Hut.WALL_SPLIT),
+			v((e.x0 + e.x1) / 2, EV.gutter.floor + EV.gutter.thick, (EV.gutter.out + EV.fascia.out) / 2), v(1, 0, 0), 1.0)
+	end
 	-- (the bench's and the butt's reach down to the ground: a spider at their feet is theirs)
 	region("hut_bench", "hut_bench", v(-88, GT - 0.5, -61), v(48, -30, -16), v(-20, -40, -37), v(0, 0, -1), 0.33)
 	region("hut_butt", "hut_butt", v(95, GT - 0.5, -82), v(165, 32, -17), v(130, 28.5, -49), v(0, 0, -1), 0.33)
@@ -354,13 +484,25 @@ do
 	-- (ROBLOX-117) the path round the east end: out of the door's gravel, along the south wall, round the corner, north and into the garden's path
 	seam("hut_door", "path_s1", v(60, GT, 290), v(60, GT, 338))
 	seam("path_s1", "path_s2", v(178, GT, 290), v(178, GT, 344))
-	seam("path_s2", "path_e1", v(238, GT, 287), v(292, GT, 287))
-	seam("path_e1", "path_e2", v(238, GT, 200), v(292, GT, 200))
-	seam("path_e2", "path_e3", v(238, GT, 113), v(292, GT, 113))
-	seam("path_e3", "path_e4", v(238, GT, 26), v(292, GT, 26))
-	seam("path_e4", "path_e5", v(238, GT, -60), v(292, GT, -60))
-	seam("path_e5", "path_e6", v(238, GT, -146), v(292, GT, -146))
+	-- (ROBLOX-118) on round the back room's east end
+	seam("path_s2", "path_s3", v(295, GT, 290), v(295, GT, 344))
+	seam("path_s3", "path_s4", v(412, GT, 290), v(412, GT, 344))
+	seam("path_s4", "path_s5", v(530, GT, 290), v(530, GT, 344))
+	seam("path_s5", "path_e1", v(533, GT, 287), v(587, GT, 287))
+	seam("path_e1", "path_e2", v(533, GT, 200), v(587, GT, 200))
+	seam("path_e2", "path_e3", v(533, GT, 113), v(587, GT, 113))
+	seam("path_e3", "path_e4", v(533, GT, 26), v(587, GT, 26))
+	seam("path_e4", "path_e5", v(533, GT, -60), v(587, GT, -60))
+	seam("path_e5", "path_n3", v(533, GT, -146), v(587, GT, -146))
+	seam("path_n3", "path_n2", v(530, GT, -193), v(530, GT, -149))
+	seam("path_n2", "path_n1", v(412, GT, -193), v(412, GT, -149))
+	seam("path_n1", "path_e6", v(295, GT, -193), v(295, GT, -149))
 	seam("path_e6", "garden_b4", v(200, GT, -193), v(200, GT, -149))
+	-- (ROBLOX-118) the meadow path out of the garden's north edge
+	seam("garden_d2", "path_m1", v(-88, GT, -416), v(-32, GT, -416))
+	seam("path_m1", "path_m2", v(-88, GT, -516), v(-32, GT, -516))
+	seam("path_m2", "path_m3", v(-88, GT, -616), v(-32, GT, -616))
+	seam("path_m3", "path_m4", v(-88, GT, -716), v(-32, GT, -716))
 	local P = Hut.POLE
 	seam("garden_pole", "garden_b1", v(P.x - P.half, GT, P.z - P.half), v(P.x + P.half, GT, P.z - P.half))
 	seam("garden_pole", "garden_feeder", v(P.x + P.half, GT + P.split, P.z - P.half), v(P.x + P.half, GT + P.split, P.z + P.half))
@@ -385,6 +527,110 @@ do
 				seam(gardenCell(r, c), gardenCell(r + 1, c), v(xa, y, z0), v(xb, y, z0))
 			end
 		end
+	end
+	-- (ROBLOX-118) the ceiling, the back room and the outside to the eaves
+	local CE, DW, D = Hut.CEIL, Hut.DOORWAY, Hut.DOOR
+	seam("hut_door", "hut_door_up", v(-44, D.top, D.leaf[1]), v(44, D.top, D.leaf[1]))
+	seam("hut_floor_i", "hut_doorway", v(DW.x0, FL, DW.z0 + 2), v(DW.x0, FL, DW.z1 - 2))
+	seam("hut_doorway", "room_floor_g", v(DW.x1, FL, DW.z0 + 2), v(DW.x1, FL, DW.z1 - 2))
+	-- the upper cells: to one another flat on the ceiling's underside, and each to what is under it along a wall at WALL_TOP
+	for _, room in { "hut", "back" } do
+		local cols = if room == "hut" then Hut.COLS else Hut.BACK_COLS
+		local pre = if room == "hut" then "hut_up_" else "room_up_"
+		for r = 1, 3 do
+			for c = 1, 3 do
+				local x0, x1, z0, z1 = cols[c], cols[c + 1], Hut.ROWS[r], Hut.ROWS[r + 1]
+				local here = pre .. FLOOR_IDS[(r - 1) * 3 + c]
+				if c < 3 then seam(here, pre .. FLOOR_IDS[(r - 1) * 3 + c + 1], v(x1, CE, z0 + 4), v(x1, CE, z1 - 4)) end
+				if r < 3 then seam(here, pre .. FLOOR_IDS[r * 3 + c], v(x0 + 4, CE, z1), v(x1 - 4, CE, z1)) end
+			end
+		end
+	end
+	local T = Hut.WALL_TOP
+	seam("hut_up_a", "hut_floor_a", v(R.x0, T, 16.5), v(R.x0, T, 89.5))
+	seam("hut_up_a", "hut_board", v(-142, T, R.z0), v(-53, T, R.z0))
+	seam("hut_up_b", "hut_board", v(-46, T, R.z0), v(-33, T, R.z0))
+	seam("hut_up_b", "hut_desk", v(33, T, R.z0), v(46, T, R.z0))
+	seam("hut_up_b", "hut_window", v(-29, 113.5, R.z0), v(29, 113.5, R.z0))
+	seam("hut_up_c", "hut_desk", v(53, T, R.z0), v(142, T, R.z0))
+	seam("hut_up_c", "hut_floor_c", v(R.x1, T, 16.5), v(R.x1, T, 89.5))
+	seam("hut_up_d", "hut_floor_d", v(R.x0, T, 97.5), v(R.x0, T, 170.5))
+	seam("hut_up_f", "hut_floor_f", v(R.x1, T, 97.5), v(R.x1, T, 170.5))
+	seam("hut_up_g", "hut_floor_g", v(R.x0, T, 178.5), v(R.x0, T, 251.5))
+	seam("hut_up_i", "hut_floor_i", v(64, T, R.z1), v(142, T, R.z1))
+	seam("hut_up_h", "hut_door_up", v(-44, CE, R.z1), v(44, CE, R.z1))
+	seam("hut_up_g", "hut_door_up", v(-D.jamb, T + 4, R.z1), v(-D.jamb, DW.head - 4, R.z1))
+	seam("hut_up_i", "hut_door_up", v(D.jamb, T + 4, R.z1), v(D.jamb, DW.head - 4, R.z1))
+	seam("hut_up_i", "hut_doorway_up", v(DW.core[1], T + 4, DW.z0), v(DW.core[1], DW.head - 4, DW.z0))
+	seam("room_up_g", "hut_doorway_up", v(DW.core[2], T + 4, DW.z0), v(DW.core[2], DW.head - 4, DW.z0))
+	seam("hut_doorway", "hut_doorway_up", v(DW.core[1] + 0.5, T, DW.z0), v(DW.core[2] - 0.5, T, DW.z0))
+	local B = Hut.BACK
+	seam("room_up_a", "room_floor_a", v(B.x0, T, 16.5), v(B.x0, T, 89.5))
+	seam("room_up_b", "room_floor_b", v(269, T, B.z0), v(351, T, B.z0))
+	seam("room_up_c", "room_floor_c", v(B.x1, T, 16.5), v(B.x1, T, 89.5))
+	seam("room_up_d", "room_floor_d", v(B.x0, T, 97.5), v(B.x0, T, 170.5))
+	seam("room_up_f", "room_window", v(B.x1, Hut.ROOM_WINDOW.top, 120), v(B.x1, Hut.ROOM_WINDOW.top, 148))
+	seam("room_up_g", "room_floor_g", v(179, T, B.z1), v(261, T, B.z1))
+	seam("room_up_h", "room_floor_h", v(269, T, B.z1), v(351, T, B.z1))
+	seam("room_up_i", "room_floor_i", v(B.x1, T, 178.5), v(B.x1, T, 251.5))
+	-- the back room's floor cells to one another: on the boards, or on the rug where it lies across the line, clear of the television's unit
+	local G = Hut.RUG
+	local function floorLine(a: string, b: string, p: Vector3, q: Vector3)
+		-- (a line along x or z on the floor: the part of it on the rug, if the rug covers some of it, else the boards short of the rug)
+		local alongX = math.abs(q.X - p.X) > math.abs(q.Z - p.Z)
+		local fixed = if alongX then p.Z else p.X
+		local across = if alongX then fixed > G.z0 and fixed < G.z1 else fixed > G.x0 and fixed < G.x1
+		local lo, hi = if alongX then p.X else p.Z, if alongX then q.X else q.Z
+		local r0, r1 = if alongX then G.x0 else G.z0, if alongX then G.x1 else G.z1
+		if across and math.min(hi, r1) > math.max(lo, r0) then
+			local a0, a1 = math.max(lo, r0 + 4), math.min(hi, r1 - 4)
+			if a1 - a0 >= 10 then
+				seam(a, b, if alongX then v(a0, FL + G.top, fixed) else v(fixed, FL + G.top, a0), if alongX then v(a1, FL + G.top, fixed) else v(fixed, FL + G.top, a1))
+				return
+			end
+			-- (the boards' longer part off the rug)
+			if r0 - lo >= hi - r1 then hi = math.min(hi, r0 - 3) else lo = math.max(lo, r1 + 3) end
+		end
+		seam(a, b, if alongX then v(lo, FL, fixed) else v(fixed, FL, lo), if alongX then v(hi, FL, fixed) else v(fixed, FL, hi))
+	end
+	for r = 1, 3 do
+		for c = 1, 3 do
+			local x0, x1, z0, z1 = Hut.BACK_COLS[c], Hut.BACK_COLS[c + 1], Hut.ROWS[r], Hut.ROWS[r + 1]
+			local here = "room_floor_" .. FLOOR_IDS[(r - 1) * 3 + c]
+			if c < 3 then
+				local za, zb = z0 + 4, z1 - 4
+				if r == 1 then za = Hut.TV.z1 + 3 end -- (clear of the television's unit)
+				floorLine(here, "room_floor_" .. FLOOR_IDS[(r - 1) * 3 + c + 1], v(x1, FL, za), v(x1, FL, zb))
+			end
+			if r < 3 then floorLine(here, "room_floor_" .. FLOOR_IDS[r * 3 + c], v(x0 + 4, FL, z1), v(x1 - 4, FL, z1)) end
+		end
+	end
+	local TV, GA, SO = Hut.TV, Hut.GAMES, Hut.SOFA
+	seam("room_tv", "room_floor_a", v(TV.x0 + 4, FL, TV.z1), v(261, FL, TV.z1))
+	seam("room_tv", "room_floor_b", v(267, FL, TV.z1), v(TV.x1 - 2, FL, TV.z1))
+	seam("room_games", "room_floor_c", v(GA.x0 + 4, FL, GA.z1), v(GA.x1 - 4, FL, GA.z1))
+	seam("room_window", "room_floor_f", v(B.x1, -3, Hut.ROOM_WINDOW.z0 + 1), v(B.x1, -3, Hut.ROOM_WINDOW.z1 - 1))
+	seam("room_sofa_w", "room_floor_d", v(SO.x0 + 3.5, FL, SO.z0 + 2.5), v(SO.x0 + 8.5, FL, SO.z0 + 2.5))
+	seam("room_sofa_w", "room_floor_g", v(SO.x0 + 3.5, FL, SO.z1 - 8), v(SO.x0 + 8.5, FL, SO.z1 - 8))
+	seam("room_sofa_e", "room_floor_f", v(SO.x1 - 8.5, FL, SO.z0 + 2.5), v(SO.x1 - 3.5, FL, SO.z0 + 2.5))
+	seam("room_sofa_e", "room_floor_i", v(SO.x1 - 8.5, FL, SO.z1 - 8), v(SO.x1 - 3.5, FL, SO.z1 - 8))
+	seam("room_sofa_w", "room_sofa_e", v(SO.split, SO.leg + 1, SO.z0), v(SO.split, SO.frame - 1, SO.z0))
+	-- outside: the logs at OUT_TOP to the eaves' logs, the back room's north logs to the hut's, and the eaves to one another along the soffit's underside
+	local OT, EV = Hut.OUT_TOP, Hut.EAVE
+	seam("hut_wall_w", "hut_eave_w2", v(-160, OT, -16), v(-108, OT, -16))
+	seam("hut_wall_w", "hut_eave_w1", v(-98, OT, -16), v(-40, OT, -16))
+	seam("hut_wall_e", "hut_eave_e1", v(40, OT, -16), v(98, OT, -16))
+	seam("hut_wall_e", "hut_eave_e2", v(108, OT, -16), v(170, OT, -16))
+	seam("hut_wall_x1", "hut_eave_x1", v(180, OT, -16), v(245, OT, -16))
+	seam("hut_wall_x2", "hut_eave_x2", v(280, OT, -16), v(320, OT, -16))
+	seam("hut_wall_x2", "hut_eave_x3", v(330, OT, -16), v(370, OT, -16))
+	seam("hut_wall_x3", "hut_eave_x4", v(405, OT, -16), v(460, OT, -16))
+	seam("hut_wall_e", "hut_wall_x1", v(175, -50, -16), v(175, OT - 10, -16))
+	seam("hut_wall_x1", "hut_wall_x2", v(275, -50, -16), v(275, OT - 10, -16))
+	seam("hut_wall_x2", "hut_wall_x3", v(375, -50, -16), v(375, OT - 10, -16))
+	for k = 1, #EAVES - 1 do
+		local x = EAVES[k].ex1
+		seam(EAVES[k].id, EAVES[k + 1].id, v(x, EV.soffit, EV.out + 2), v(x, EV.soffit, -18))
 	end
 end
 
@@ -423,8 +669,16 @@ local function floorPieces(region: Region): { Piece }
 		for k, run in runs do P(out, `{id}_skirting_w{k}`, R.x0, R.x0 + sk, FL, st, run[1], run[2], "painted_wood_dry", C.skirting, "Wood") end
 	end
 	if east then
-		P(out, id .. "_wall_e", R.x1, R.x1 + W, FL, top, z0, z1, "painted_wood_dry", C.lining, "WoodPlanks")
-		P(out, id .. "_skirting_e", R.x1 - sk, R.x1, FL, st, if north then z0 + sk else z0, if south then z1 - sk else z1, "painted_wood_dry", C.skirting, "Wood")
+		-- (ROBLOX-118: the doorway to the back room is cut through the east wall at z 180..250)
+		local DW = Hut.DOORWAY
+		local runs: { { number } } = if z0 < DW.z0 and z1 > DW.z1 then { { z0, DW.z0 }, { DW.z1, z1 } } else { { z0, z1 } }
+		local s0, s1 = if north then z0 + sk else z0, if south then z1 - sk else z1
+		for k, run in runs do
+			local tag = if #runs > 1 then tostring(k) else ""
+			P(out, id .. "_wall_e" .. tag, R.x1, R.x1 + W, FL, top, run[1], run[2], "painted_wood_dry", C.lining, "WoodPlanks")
+			local a, b = math.max(run[1], s0), math.min(run[2], s1)
+			if b - a >= 10 then P(out, id .. "_skirting_e" .. tag, R.x1 - sk, R.x1, FL, st, a, b, "painted_wood_dry", C.skirting, "Wood") end
+		end
 	end
 	if north then
 		P(out, id .. "_skirting_n", x0, x1, FL, st, R.z0, R.z0 + sk, "painted_wood_dry", C.skirting, "Wood")
@@ -577,10 +831,21 @@ local function wallPieces(region: Region): { Piece }
 	local function box(id: string, a: number, b: number, y0: number, y1: number, za: number, zb: number, profile: string, color: string, material: string)
 		P(out, id, math.min(s * a, s * b), math.max(s * a, s * b), y0, y1, za, zb, profile, color, material)
 	end
+	if region.id == "hut_wall_e" then
+		-- (ROBLOX-118: in two along the wall, so what meets the back room's logs at x 175 is near the seam)
+		for k, span in { { 31, 103 }, { 103, 175 } } do
+			local a = if k == 1 then 37 else 103
+			box(`{region.id}_logs_low{k}`, span[1], span[2], FL, -4, z0, z1, "bare_wood_rough", C.log, "Wood")
+			box(`{region.id}_logs_side{k}`, a, span[2], -4, 0, z0, z1, "bare_wood_rough", C.log, "Wood")
+			box(`{region.id}_logs_high{k}`, span[1], span[2], 0, top, z0, z1, "bare_wood_rough", C.log, "Wood")
+		end
+		return out
+	end
 	box(region.id .. "_logs_low", 31, 175, FL, -4, z0, z1, "bare_wood_rough", C.log, "Wood")
 	box(region.id .. "_logs_side", 37, 175, -4, 0, z0, z1, "bare_wood_rough", C.log, "Wood")
 	box(region.id .. "_logs_high", 31, 175, 0, top, z0, z1, "bare_wood_rough", C.log, "Wood")
-	box(region.id .. "_corner", 166, 184, FL, top, -25, -16, "bare_wood_rough", C.logDark, "Wood") -- (the corner's log ends, proud of the face)
+	-- (the corner's log ends, proud of the face; ROBLOX-118: the east end's are the back room's now, Hut.BUILDING.x1)
+	if region.id == "hut_wall_w" then box(region.id .. "_corner", 166, 184, FL, top, -25, -16, "bare_wood_rough", C.logDark, "Wood") end
 	return out
 end
 
@@ -792,16 +1057,299 @@ local function pathPieces(region: Region): { Piece }
 	return out
 end
 
+-- ---------------------------------------------------------------- (ROBLOX-118) the ceiling, the back room and the outside to the eaves
+local LINING_W = 10 -- a lining's box depth into its wall (the hut's floor cells' W)
+-- An upper cell: the ceiling's boards over it, the joists under them, and the walls' linings from WALL_TOP to the ceiling on its sides (cut round the window's head,
+-- the door's head and the doorway).
+local function upperPieces(region: Region): { Piece }
+	local out: { Piece } = {}
+	local U = UPPER[region.id]
+	local id = region.id
+	local hut = U.room == "hut"
+	local Rm = if hut then Hut.ROOM else Hut.BACK
+	local T, CE, W = Hut.WALL_TOP, Hut.CEIL, LINING_W
+	local DW = Hut.DOORWAY
+	P(out, id .. "_ceiling", U.x0, U.x1, CE, CE + 2, U.z0, U.z1, "painted_wood_dry", C.ceiling, "WoodPlanks")
+	local J = Hut.JOISTS
+	for k, x in (if hut then J.hut else J.back) :: { number } do
+		if x - J.w / 2 > U.x0 and x + J.w / 2 < U.x1 then P(out, `{id}_joist_{k}`, x - J.w / 2, x + J.w / 2, CE - J.d, CE, U.z0, U.z1, "bare_wood_rough", C.joist, "Wood") end
+	end
+	-- a wall's lining from T to the ceiling along z (x a..b) with the doorway's opening cut out of it where it is
+	local function alongZ(tag: string, a: number, b: number, cut: boolean, y0: number?)
+		if cut then
+			if DW.z0 > U.z0 then P(out, `{id}_{tag}1`, a, b, T, CE, U.z0, DW.z0, "painted_wood_dry", C.lining, "WoodPlanks") end
+			if DW.z1 < U.z1 then P(out, `{id}_{tag}2`, a, b, T, CE, DW.z1, U.z1, "painted_wood_dry", C.lining, "WoodPlanks") end
+		else
+			P(out, `{id}_{tag}`, a, b, y0 or T, CE, U.z0, U.z1, "painted_wood_dry", C.lining, "WoodPlanks")
+		end
+	end
+	if U.x0 == Rm.x0 then alongZ("wall_w", Rm.x0 - W, Rm.x0, not hut and U.z0 < DW.z0 and U.z1 > DW.z1) end
+	if U.x1 == Rm.x1 then
+		local window = not hut and U.z0 <= Hut.ROOM_WINDOW.z0 and U.z1 >= Hut.ROOM_WINDOW.z1
+		alongZ("wall_e", Rm.x1, Rm.x1 + W, hut and U.z0 < DW.z0 and U.z1 > DW.z1, if window then Hut.ROOM_WINDOW.top else nil)
+	end
+	if U.z0 == Rm.z0 then
+		local z0 = if hut then Hut.WALL_SPLIT else Rm.z0 - W
+		if hut then
+			-- (beside the window to the ceiling, and over its head)
+			if U.x0 < -31 then P(out, id .. "_wall_n", U.x0, math.min(U.x1, -31), T, CE, z0, Rm.z0, "painted_wood_dry", C.lining, "WoodPlanks") end
+			if U.x1 > 31 then P(out, id .. "_wall_n2", math.max(U.x0, 31), U.x1, T, CE, z0, Rm.z0, "painted_wood_dry", C.lining, "WoodPlanks") end
+			local a, b = math.max(U.x0, -31), math.min(U.x1, 31)
+			if b > a then P(out, id .. "_over_window", a, b, 113.5, CE, z0, Rm.z0, "painted_wood_dry", C.lining, "WoodPlanks") end
+		else
+			P(out, id .. "_wall_n", U.x0, U.x1, T, CE, z0, Rm.z0, "painted_wood_dry", C.lining, "WoodPlanks")
+		end
+	end
+	if U.z1 == Rm.z1 then
+		local D = Hut.DOOR
+		local runs = { { U.x0, U.x1 } }
+		if hut then
+			runs = {}
+			if U.x0 < -D.jamb then table.insert(runs, { U.x0, math.min(U.x1, -D.jamb) }) end
+			if U.x1 > D.jamb then table.insert(runs, { math.max(U.x0, D.jamb), U.x1 }) end
+		end
+		for k, run in runs do P(out, `{id}_wall_s{k}`, run[1], run[2], T, CE, Rm.z1, Rm.z1 + W, "painted_wood_dry", C.lining, "WoodPlanks") end
+	end
+	return out
+end
+
+-- The back room's floor in a cell: the boards, the linings to WALL_TOP and the skirting (the doorway cut out of the west wall's, the window's sill and reveals over
+-- the east wall's in its row), the rug, the radiator under the window, the cables along the skirting and their sockets.
+local function roomFloorPieces(region: Region): { Piece }
+	local out: { Piece } = {}
+	local id = region.id
+	local B, DW, T, W, sk = Hut.BACK, Hut.DOORWAY, Hut.WALL_TOP, LINING_W, 1.5
+	local lo, hi = region.bounds[1], region.bounds[2]
+	local x0, x1, z0, z1 = lo.X, hi.X, lo.Z, hi.Z
+	local st = FL + 10
+	P(out, id .. "_boards", x0, x1, FL - 2, FL, z0, z1, "varnished_wood_smooth", C.floor, "WoodPlanks")
+	local west, east, north, south = x0 == B.x0, x1 == B.x1, z0 == B.z0, z1 == B.z1
+	local s0, s1 = if north then z0 + sk else z0, if south then z1 - sk else z1
+	if west then
+		local door = z0 < DW.z0 and z1 > DW.z1
+		local runs: { { number } } = if door then { { z0, DW.z0 }, { DW.z1, z1 } } else { { z0, z1 } }
+		for k, run in runs do
+			P(out, `{id}_wall_w{k}`, B.x0 - W, B.x0, FL, T, run[1], run[2], "painted_wood_dry", C.lining, "WoodPlanks")
+			local a, b = math.max(run[1], s0), math.min(run[2], s1)
+			if b - a >= 10 then P(out, `{id}_skirting_w{k}`, B.x0, B.x0 + sk, FL, st, a, b, "painted_wood_dry", C.skirting, "Wood") end
+		end
+	end
+	if east then
+		local window = z0 <= Hut.ROOM_WINDOW.z0 and z1 >= Hut.ROOM_WINDOW.z1
+		P(out, id .. "_wall_e", B.x1, B.x1 + W, FL, if window then -3 else T, z0, z1, "painted_wood_dry", C.lining, "WoodPlanks")
+		P(out, id .. "_skirting_e", B.x1 - sk, B.x1, FL, st, s0, s1, "painted_wood_dry", C.skirting, "Wood")
+	end
+	if north then
+		P(out, id .. "_wall_n", x0, x1, FL, T, B.z0 - W, B.z0, "painted_wood_dry", C.lining, "WoodPlanks")
+		P(out, id .. "_skirting_n", x0, x1, FL, st, B.z0, B.z0 + sk, "painted_wood_dry", C.skirting, "Wood")
+	end
+	if south then
+		P(out, id .. "_wall_s", x0, x1, FL, T, B.z1, B.z1 + W, "painted_wood_dry", C.lining, "WoodPlanks")
+		local a, b = math.max(x0, B.x0 + sk), math.min(x1, B.x1 - sk)
+		P(out, id .. "_skirting_s", a, b, FL, st, B.z1 - sk, B.z1, "painted_wood_dry", C.skirting, "Wood")
+	end
+	-- the rug, where it lies in this cell
+	local G = Hut.RUG
+	local a, b, c, d = clip(G.x0, G.x1, G.z0, G.z1, x0, x1, z0, z1)
+	if a ~= nil then P(out, id .. "_rug", a, b :: number, FL, FL + G.top, c :: number, d :: number, "painted_wood_dry", C.rug, "Fabric") end
+	if id == "room_floor_a" then
+		-- the television's cable: from its unit along the floor to the skirting, along it, up to the socket on the west wall
+		P(out, id .. "_socket", B.x0, B.x0 + 0.8, -55, -47, 56, 64, "painted_metal_smooth", "e8e4da", "SmoothPlastic")
+		P(out, id .. "_plug", B.x0 + 0.8, B.x0 + 1.5, -53, -49, 58, 62, "painted_metal_smooth", "2a2724", "SmoothPlastic")
+		P(out, id .. "_cable_up", B.x0 + 1.5, B.x0 + 2.1, FL, -53, 59.7, 60.3, "painted_metal_smooth", C.cable, "SmoothPlastic")
+		P(out, id .. "_cable_run", B.x0 + 1.5, B.x0 + 2.1, FL, FL + 0.6, 30, 59.7, "painted_metal_smooth", C.cable, "SmoothPlastic")
+		P(out, id .. "_cable_in", B.x0 + 2.1, Hut.TV.x0, FL, FL + 0.6, 30, 30.6, "painted_metal_smooth", C.cable, "SmoothPlastic")
+	elseif id == "room_floor_f" then
+		-- the oil-filled radiator under the window: its fins on a spine on two feet, its control box at the south end; its cord to the skirting
+		local H = Hut.HEATER
+		for k, z in { 106, 148 } do P(out, `{id}_heater_foot{k}`, H.x0 - 2, H.x1 + 2, FL, FL + 4, z, z + 2, "painted_metal_smooth", C.heaterDark, "Metal") end
+		P(out, id .. "_heater_spine", 431, 435, FL + 4, FL + 8, 102, 155.4, "painted_metal_smooth", C.heater, "Metal")
+		for k = 0, H.fins - 1 do
+			local z = 102 + k * 8.5
+			P(out, `{id}_heater_fin{k + 1}`, H.x0, H.x1, FL + 8, H.top, z, z + 2.4, "painted_metal_smooth", C.heater, "Metal")
+		end
+		P(out, id .. "_heater_box", 427, 439, -60, -12, 157, 163, "painted_metal_smooth", C.heater, "Metal")
+		P(out, id .. "_heater_cord", 439, B.x1 - sk - 0.6, FL, FL + 0.6, 159.7, 160.3, "painted_metal_smooth", C.cable, "SmoothPlastic")
+		P(out, id .. "_heater_cord2", B.x1 - sk - 0.6, B.x1 - sk, FL, FL + 0.6, 160.3, 169.7, "painted_metal_smooth", C.cable, "SmoothPlastic")
+		P(out, id .. "_heater_cord_up", B.x1 - sk - 0.6, B.x1 - sk, FL, -53, 169.7, 170.3, "painted_metal_smooth", C.cable, "SmoothPlastic")
+		P(out, id .. "_plug", B.x1 - sk, B.x1 - 0.8, -53, -49, 168, 172, "painted_metal_smooth", "2a2724", "SmoothPlastic")
+		P(out, id .. "_socket", B.x1 - 0.8, B.x1, -55, -47, 166, 174, "painted_metal_smooth", "e8e4da", "SmoothPlastic")
+	end
+	return out
+end
+
+-- The doorway through the hut's old east logs: its threshold, the logs' cut ends either side (between the two rooms' linings) and its head to the ceiling.
+local function doorwayPieces(region: Region): { Piece }
+	local out: { Piece } = {}
+	local DW, B, T = Hut.DOORWAY, Hut.BACK, Hut.WALL_TOP
+	local id = region.id
+	if id == "hut_doorway" then
+		P(out, id .. "_threshold", DW.x0, DW.x1, FL - 2, FL, DW.z0, DW.z1, "varnished_wood_smooth", C.boardDark, "Wood")
+		P(out, id .. "_log_n", DW.core[1], DW.core[2], FL, T, Hut.ROWS[3], DW.z0, "bare_wood_rough", C.log, "Wood")
+		P(out, id .. "_log_s", DW.core[1], DW.core[2], FL, T, DW.z1, B.z1, "bare_wood_rough", C.log, "Wood")
+	else
+		P(out, id .. "_log_n", DW.core[1], DW.core[2], T, Hut.CEIL, Hut.ROWS[3], DW.z0, "bare_wood_rough", C.log, "Wood")
+		P(out, id .. "_log_s", DW.core[1], DW.core[2], T, Hut.CEIL, DW.z1, B.z1, "bare_wood_rough", C.log, "Wood")
+		P(out, id .. "_head", DW.x0, DW.x1, DW.head, Hut.CEIL, DW.z0, DW.z1, "painted_wood_dry", C.lining, "WoodPlanks")
+	end
+	return out
+end
+
+-- The front door above the height its region below keeps (Hut.DOOR.top): its leaf, its jambs to its head, and the wall over it to the ceiling.
+local function doorUpPieces(): { Piece }
+	local out: { Piece } = {}
+	local D, R = Hut.DOOR, Hut.ROOM
+	local head = Hut.DOORWAY.head
+	P(out, "hut_door_up_leaf", -D.x, D.x, D.top, head, D.leaf[1], D.leaf[2], "painted_wood_dry", C.trim, "WoodPlanks")
+	P(out, "hut_door_up_jamb_w", -D.jamb, -D.x, D.top, head, R.z1, D.outer, "painted_wood_dry", C.lining, "WoodPlanks")
+	P(out, "hut_door_up_jamb_e", D.x, D.jamb, D.top, head, R.z1, D.outer, "painted_wood_dry", C.lining, "WoodPlanks")
+	P(out, "hut_door_up_head", -D.jamb, D.jamb, head, Hut.CEIL, R.z1, D.outer, "painted_wood_dry", C.lining, "WoodPlanks")
+	return out
+end
+
+-- The sofa, a half of it (`west`): its legs, its frame, its arm, its seat cushion, its back and the back's cushion; on the west half's cushion, the controller.
+local function sofaPieces(region: Region): { Piece }
+	local out: { Piece } = {}
+	local S0 = Hut.SOFA
+	local west = region.id == "room_sofa_w"
+	local id = region.id
+	local xa, xb = if west then S0.x0 else S0.split, if west then S0.split else S0.x1
+	local lx = if west then S0.x0 + 3 else S0.x1 - 9
+	for k, z in { S0.z0 + 2.5, S0.z1 - 8 } do P(out, `{id}_leg{k}`, lx, lx + 6, FL, S0.leg, z, z + 6, "varnished_wood_smooth", C.chair, "Wood") end
+	P(out, id .. "_frame", xa, xb, S0.leg, S0.frame, S0.z0, S0.z1, "painted_wood_dry", C.sofaDark, "Fabric")
+	local ax0, ax1 = if west then S0.x0 else S0.x1 - S0.arm, if west then S0.x0 + S0.arm else S0.x1
+	P(out, id .. "_arm", ax0, ax1, S0.frame, S0.armTop, S0.z0, S0.z1, "painted_wood_dry", C.sofa, "Fabric")
+	local ia, ib = if west then S0.x0 + S0.arm else S0.split, if west then S0.split else S0.x1 - S0.arm
+	P(out, id .. "_cushion", if west then ia else ia + 0.5, if west then ib - 0.5 else ib, S0.frame, S0.seat, S0.z0 + 2.5, 236, "painted_wood_dry", C.sofa, "Fabric")
+	P(out, id .. "_back", ia, ib, S0.frame, S0.back, 236, S0.z1, "painted_wood_dry", C.sofaDark, "Fabric")
+	P(out, id .. "_back_cushion", if west then ia + 2 else ia + 0.5, if west then ib - 0.5 else ib - 2, S0.seat, S0.back - 5, 228, 236, "painted_wood_dry", C.sofa, "Fabric")
+	if west then P(out, id .. "_controller", 280, 295, S0.seat, S0.seat + 4, 196, 206, "painted_metal_smooth", C.controller, "SmoothPlastic") end
+	return out
+end
+
+-- The low unit against the north wall with the television on its stand on it, and the games console on the unit's lower shelf.
+local function tvPieces(): { Piece }
+	local out: { Piece } = {}
+	local V = Hut.TV
+	local Sc = V.screen
+	P(out, "room_tv_base", V.x0, V.x1, FL, -66, V.z0, V.z1, "varnished_wood_smooth", C.unitDark, "Wood")
+	P(out, "room_tv_side_w", V.x0, V.x0 + 2, -66, V.top - 2, V.z0, V.z1, "varnished_wood_smooth", C.unit, "Wood")
+	P(out, "room_tv_side_e", V.x1 - 2, V.x1, -66, V.top - 2, V.z0, V.z1, "varnished_wood_smooth", C.unit, "Wood")
+	P(out, "room_tv_back", V.x0 + 2, V.x1 - 2, -66, V.top - 2, V.z0, V.z0 + 1.5, "varnished_wood_smooth", C.unitDark, "Wood")
+	P(out, "room_tv_shelf", V.x0 + 2, V.x1 - 2, -46, -44, V.z0 + 1.5, V.z1, "varnished_wood_smooth", C.unit, "Wood")
+	P(out, "room_tv_top", V.x0, V.x1, V.top - 2, V.top, V.z0, V.z1, "varnished_wood_smooth", C.unit, "Wood")
+	P(out, "room_tv_console", 195, 225, -66, -60, 22, 47, "painted_metal_smooth", C.console, "SmoothPlastic")
+	P(out, "room_tv_foot", 215, 245, V.top, V.top + 1, 22, 36, "painted_metal_smooth", C.screen, "Metal")
+	P(out, "room_tv_neck", 228, 232, V.top + 1, Sc.y0, 26, 29, "painted_metal_smooth", C.screen, "Metal")
+	P(out, "room_tv_screen", Sc.x0, Sc.x1, Sc.y0, Sc.y1, Sc.z0, Sc.z1, "painted_metal_smooth", C.screen, "SmoothPlastic")
+	return out
+end
+
+-- The shelf of board games in the north-east corner: its carcass and two shelves, and the games lying in piles on each, from the shelf's own stream.
+local function gamesPieces(region: Region): { Piece }
+	local out: { Piece } = {}
+	local G = Hut.GAMES
+	P(out, "room_games_side_w", G.x0, G.x0 + 2, FL, G.top - 2, G.z0, G.z1, "varnished_wood_smooth", C.unit, "Wood")
+	P(out, "room_games_side_e", G.x1 - 2, G.x1, FL, G.top - 2, G.z0, G.z1, "varnished_wood_smooth", C.unit, "Wood")
+	P(out, "room_games_back", G.x0 + 2, G.x1 - 2, FL, G.top - 2, G.z0, G.z0 + 1, "varnished_wood_smooth", C.unitDark, "Wood")
+	P(out, "room_games_top", G.x0, G.x1, G.top - 2, G.top, G.z0, G.z1, "varnished_wood_smooth", C.unit, "Wood")
+	P(out, "room_games_bottom", G.x0 + 2, G.x1 - 2, FL, -66, G.z0 + 1, G.z1, "varnished_wood_smooth", C.unitDark, "Wood")
+	local shelves = { { y = -66, top = -30 }, { y = -28, top = 8 }, { y = 10, top = G.top - 2 } }
+	P(out, "room_games_shelf_1", G.x0 + 2, G.x1 - 2, -30, -28, G.z0 + 1, G.z1, "varnished_wood_smooth", C.unit, "Wood")
+	P(out, "room_games_shelf_2", G.x0 + 2, G.x1 - 2, 8, 10, G.z0 + 1, G.z1, "varnished_wood_smooth", C.unit, "Wood")
+	local rand = rng(region.seed, 7)
+	for s, shelf in shelves do
+		for pile, px in { G.x0 + 4, G.x0 + 42 } do
+			local y = shelf.y
+			local w, dz = between(rand, 26, 30), between(rand, 25, 28)
+			for k = 1, 4 do
+				local h = between(rand, 4, 8)
+				if y + h > shelf.top - 3 then break end
+				local ww, dd = w - between(rand, 0, 4), dz - between(rand, 0, 3)
+				P(out, `room_games_box_{s}_{pile}_{k}`, px, px + ww, y, y + h, G.z1 - 1 - dd, G.z1 - 1, "painted_wood_dry", pick(C.games, rand), "SmoothPlastic")
+				y += h
+				w, dz = ww, dd
+			end
+		end
+	end
+	P(out, "room_games_cards", G.x0 + 30, G.x0 + 39, G.top, G.top + 2.2, G.z0 + 12, G.z0 + 18.5, "painted_wood_dry", "b8322a", "SmoothPlastic")
+	return out
+end
+
+-- The back room's window in its east wall: its sill board (30 cm deep, wide enough for a cat), the reveals either side, the glass and the head.
+local function roomWindowPieces(): { Piece }
+	local out: { Piece } = {}
+	local Wn, B = Hut.ROOM_WINDOW, Hut.BACK
+	P(out, "room_window_sill", Wn.sill, Wn.glass, -3, 0, Wn.z0, Wn.z1, "painted_wood_dry", C.lining, "WoodPlanks")
+	P(out, "room_window_reveal_s", B.x1, Wn.glass, -3, Wn.top, 93.5, Wn.z0, "painted_wood_dry", C.lining, "WoodPlanks")
+	P(out, "room_window_reveal_n", B.x1, Wn.glass, -3, Wn.top, Wn.z1, 174.5, "painted_wood_dry", C.lining, "WoodPlanks")
+	P(out, "room_window_glass", Wn.glass, Wn.glass + 1, 0, Wn.head, Wn.z0, Wn.z1, "glass_clean", "c9d6d8", "Glass")
+	P(out, "room_window_head", B.x1, Wn.glass, Wn.head, Wn.top, Wn.z0, Wn.z1, "painted_wood_dry", C.lining, "WoodPlanks")
+	return out
+end
+
+-- The north face outside from OUT_TOP (or the window's head) to the soffit, its corners' log ends, the window's casing, and the eaves: the boxed soffit, the fascia,
+-- the gutter's floor and lip, an end cap at each end of the run.
+local function eavePieces(region: Region): { Piece }
+	local out: { Piece } = {}
+	local e: { id: string, x0: number, x1: number, ex0: number, ex1: number }? = nil
+	for _, x in EAVES do if x.id == region.id then e = x end end
+	local E = e :: any
+	local id = region.id
+	local EV, OT, z1 = Hut.EAVE, Hut.OUT_TOP, Hut.WALL_SPLIT
+	local Gu = EV.gutter
+	if id == "hut_eave_mid" then
+		P(out, id .. "_logs", E.x0, E.x1, 113.5, EV.soffit, -16, z1, "bare_wood_rough", C.log, "Wood")
+		P(out, id .. "_casing", -37, 37, 112.5, 118.5, -17.2, -16, "painted_wood_dry", C.trim, "WoodPlanks")
+	else
+		P(out, id .. "_logs", E.x0, E.x1, OT, EV.soffit, -16, z1, "bare_wood_rough", C.log, "Wood")
+	end
+	if id == "hut_eave_w1" then
+		P(out, id .. "_casing", -37, -31, OT, 112.5, -17.2, -16, "painted_wood_dry", C.trim, "WoodPlanks")
+	elseif id == "hut_eave_w2" then
+		P(out, id .. "_corner", -184, -166, OT, EV.soffit, -25, -16, "bare_wood_rough", C.logDark, "Wood")
+	elseif id == "hut_eave_e1" then
+		P(out, id .. "_casing", 31, 37, OT, 112.5, -17.2, -16, "painted_wood_dry", C.trim, "WoodPlanks")
+	elseif id == "hut_eave_x4" then
+		P(out, id .. "_corner", Hut.BUILDING.x1 - 9, Hut.BUILDING.x1 + 9, OT, EV.soffit, -25, -16, "bare_wood_rough", C.logDark, "Wood")
+	end
+	P(out, id .. "_soffit", E.ex0, E.ex1, EV.soffit, EV.soffitTop, EV.out, -16, "painted_wood_dry", C.trim, "WoodPlanks")
+	P(out, id .. "_fascia", E.ex0, E.ex1, Gu.floor, EV.soffitTop, EV.fascia.out, EV.out, "painted_wood_dry", C.trim, "WoodPlanks")
+	P(out, id .. "_gutter", E.ex0, E.ex1, Gu.floor, Gu.floor + Gu.thick, Gu.out, EV.fascia.out, "painted_metal_smooth", C.gutter, "Metal")
+	P(out, id .. "_gutter_lip", E.ex0, E.ex1, Gu.floor, Gu.lip, Gu.out - Gu.wall, Gu.out, "painted_metal_smooth", C.gutter, "Metal")
+	if E.ex0 == EV.x0 then P(out, id .. "_gutter_cap", EV.x0 - Gu.cap, EV.x0, Gu.floor, Gu.lip, Gu.out - Gu.wall, EV.fascia.out, "painted_metal_smooth", C.gutter, "Metal") end
+	if E.ex1 == EV.x1 then P(out, id .. "_gutter_cap", EV.x1, EV.x1 + Gu.cap, Gu.floor, Gu.lip, Gu.out - Gu.wall, EV.fascia.out, "painted_metal_smooth", C.gutter, "Metal") end
+	return out
+end
+
+-- The back room's north logs outside (west and east of x 325) to OUT_TOP, the base's lip at their foot, and the room's north-east corner's log ends.
+local function wallXPieces(region: Region): { Piece }
+	local out: { Piece } = {}
+	local lo, hi = region.bounds[1], region.bounds[2]
+	local x0 = lo.X
+	local x1 = math.min(hi.X, Hut.BUILDING.x1)
+	P(out, region.id .. "_logs", x0, x1, FL, Hut.OUT_TOP, -16, Hut.WALL_SPLIT, "bare_wood_rough", C.log, "Wood")
+	P(out, region.id .. "_base", math.max(x0, 178), if region.id == "hut_wall_x3" then x1 + 3 else x1, GT, FL, -19, -16, "brick_rough", C.concrete, "Concrete")
+	if region.id == "hut_wall_x3" then
+		P(out, region.id .. "_corner", Hut.BUILDING.x1 - 9, Hut.BUILDING.x1 + 9, FL, Hut.OUT_TOP, -25, -16, "bare_wood_rough", C.logDark, "Wood")
+	end
+	return out
+end
+
 local KINDS: { [string]: boolean } = {
 	hut_window = true, hut_outer_sill = true, hut_floor = true, hut_desk = true, hut_board = true, hut_shelf = true, hut_chair = true, hut_door = true,
 	hut_wall = true, hut_bench = true, hut_butt = true, garden_pole = true, garden_bed = true, hut_path = true,
+	-- (ROBLOX-118)
+	hut_upper = true, hut_doorway = true, hut_door_up = true, hut_eave = true, room_floor = true, room_sofa = true, room_tv = true, room_games = true, room_window = true,
 }
 -- Whether a kind is the hut's (or its garden's).
 function Hut.knows(kind: string): boolean
 	return KINDS[kind] == true
 end
 -- The kinds inside the hut (Life/Nature: the night's ground hunters never come in; the hut keeps the sill's day).
-Hut.INDOORS = table.freeze({ hut_window = true, hut_floor = true, hut_desk = true, hut_board = true, hut_shelf = true, hut_chair = true })
+Hut.INDOORS = table.freeze({ hut_window = true, hut_floor = true, hut_desk = true, hut_board = true, hut_shelf = true, hut_chair = true,
+	-- (ROBLOX-118) the ceiling and the upper walls, the doorway, the front door's head, and the volunteers' back room
+	hut_upper = true, hut_doorway = true, hut_door_up = true, room_floor = true, room_sofa = true, room_tv = true, room_games = true, room_window = true })
 
 local piecesCache: { [string]: { Piece } } = {}
 function Hut.pieces(region: Region): { Piece }
@@ -817,12 +1365,21 @@ function Hut.pieces(region: Region): { Piece }
 	elseif k == "hut_door" then out = doorPieces()
 	elseif k == "hut_window" then out = windowPieces()
 	elseif k == "hut_outer_sill" then out = outerPieces()
-	elseif k == "hut_wall" then out = wallPieces(region)
+	elseif k == "hut_wall" then out = if string.sub(region.id, 1, 10) == "hut_wall_x" then wallXPieces(region) else wallPieces(region)
 	elseif k == "hut_bench" then out = benchPieces()
 	elseif k == "hut_butt" then out = buttPieces()
 	elseif k == "garden_pole" then out = polePieces(region)
 	elseif k == "garden_bed" then out = gardenPieces(region)
 	elseif k == "hut_path" then out = pathPieces(region)
+	elseif k == "hut_upper" then out = upperPieces(region)
+	elseif k == "room_floor" then out = roomFloorPieces(region)
+	elseif k == "hut_doorway" then out = doorwayPieces(region)
+	elseif k == "hut_door_up" then out = doorUpPieces()
+	elseif k == "room_sofa" then out = sofaPieces(region)
+	elseif k == "room_tv" then out = tvPieces()
+	elseif k == "room_games" then out = gamesPieces(region)
+	elseif k == "room_window" then out = roomWindowPieces()
+	elseif k == "hut_eave" then out = eavePieces(region)
 	else error("no generator for the region kind " .. k) end
 	local list = out :: { Piece }
 	for _, p in list do table.freeze(p) end
@@ -862,6 +1419,9 @@ Hut.BUDGETS = table.freeze({
 	hut_bench = { full = 4, low = 0 }, hut_butt = { full = 3, low = 0 }, garden_pole = { full = 4, low = 2 }, garden_bed = { full = 124, low = 8 },
 	-- (ROBLOX-117: the path round the east end, and the patches: the near detail of the garden's cells and the path's lengths, World/LookPlan.PATCH_RADIUS)
 	hut_path = { full = 8, low = 2 }, patch = { full = 90, low = 10 },
+	-- (ROBLOX-118: the ceiling and the upper walls, the doorway, the front door's head, the eaves, and the back room)
+	hut_upper = { full = 26, low = 0 }, hut_doorway = { full = 0, low = 0 }, hut_door_up = { full = 0, low = 0 }, hut_eave = { full = 4, low = 0 },
+	room_floor = { full = 12, low = 1 }, room_sofa = { full = 8, low = 0 }, room_tv = { full = 4, low = 1 }, room_games = { full = 20, low = 0 }, room_window = { full = 4, low = 0 },
 }) :: { [string]: { full: number, low: number } }
 
 local function sheet(budget: { full: number, low: number })
@@ -894,6 +1454,13 @@ local function floorDecor(region: Region, add: (Drawn) -> boolean)
 	local rand = rng(region.seed, 5)
 	for i = 1, 3 do
 		add(rec(`Knot{i}`, v(1.2, 0.02, 2.2), v(between(rand, lo.X + 4, hi.X - 4), FL + 0.012, between(rand, lo.Z + 4, hi.Z - 4)), "5e4430", "Wood", true, "Ellipsoid"))
+	end
+	if region.id == "hut_floor_g" then
+		-- (ROBLOX-118) the cat's bowls by the door: its biscuits and its water
+		add(rec("FoodBowl", v(4, 13, 13), v(-98, FL + 2, 232), "b8bcc0", "Metal", true, "Cylinder", v(0, 0, 90)))
+		add(rec("Biscuits", v(0.6, 10, 10), v(-98, FL + 3.8, 232), "8a5a2e", "Sand", true, "Cylinder", v(0, 0, 90)))
+		add(rec("WaterBowl", v(4, 14, 14), v(-76, FL + 2, 238), "b8bcc0", "Metal", true, "Cylinder", v(0, 0, 90)))
+		add(rec("Water", v(0.3, 11.5, 11.5), v(-76, FL + 3.7, 238), "9fb6bd", "Glass", true, "Cylinder", v(0, 0, 90)))
 	end
 	if region.id == "hut_floor_i" then
 		-- (ROBLOX-117) the caddy's handle and the banana peel over its rim
@@ -1564,6 +2131,143 @@ local function patchDecor(patch: Region, add: (Drawn) -> boolean)
 	end
 end
 
+-- ---------------------------------------------------------------- (ROBLOX-118) the looks of the ceiling, the back room and the eaves
+-- A thread from a to b, `dia` across (a web's silk, a cable): a Cylinder turned onto the line (World/PreserveLook's rod).
+local function thread(add: (Drawn) -> boolean, id: string, a: Vector3, b: Vector3, dia: number, color: string, full: boolean, transparency: number?)
+	local d = b - a
+	local len = d.Magnitude
+	local u = d / len
+	local d0 = rec(id, v(len, dia, dia), (a + b) * 0.5, color, "SmoothPlastic", full, "Cylinder", v(0, math.deg(math.atan2(-u.Z, u.X)), math.deg(math.asin(math.clamp(u.Y, -1, 1)))))
+	d0.transparency = transparency
+	return add(d0)
+end
+
+-- The ceiling over a cell: the boards' joints (they run east and west across the joists); in the hut's north-west corner over the notice board, a house spider's web:
+-- the American house spider (Parasteatoda tepidariorum) hangs a tangle of threads in a ceiling's corner, sits in it head down, and wraps what it catches.
+local function upperDecor(region: Region, add: (Drawn) -> boolean)
+	local U = UPPER[region.id]
+	local CE = Hut.CEIL
+	local z = math.ceil(U.z0 / 12) * 12
+	local k = 0
+	while z < U.z1 - 1 do
+		k += 1
+		add(rec(`Joint{k}`, v(U.x1 - U.x0, 0.02, 0.2), v((U.x0 + U.x1) / 2, CE - 0.01, z), "a88a62", "WoodPlanks", true))
+		z += 12
+	end
+	if region.id == "hut_up_a" then
+		local R = Hut.ROOM
+		local corner = v(R.x0, CE, R.z0)
+		local rand = rng(region.seed, 11)
+		local hub = corner + v(9, -10, 8) -- (where the spider waits, in the tangle's heart)
+		for i = 1, 14 do
+			-- (from the ceiling, the west wall or the north wall near the corner to a point in the tangle)
+			local face = i % 3
+			local a = if face == 0 then corner + v(between(rand, 2, 24), 0, between(rand, 2, 22))
+				elseif face == 1 then corner + v(0, between(rand, -22, -2), between(rand, 2, 24)) else corner + v(between(rand, 2, 24), between(rand, -22, -2), 0)
+			local b = hub + v(between(rand, -6, 6), between(rand, -6, 5), between(rand, -6, 6))
+			thread(add, `Silk{i}`, a, b, 0.08, "e9e6de", true, 0.2)
+		end
+		-- two gumfooted lines down toward the wall's lining, and the spider: its round abdomen and small cephalothorax, head down; a wrapped fly hanging by it
+		thread(add, "SilkFoot1", hub, corner + v(3, -46, 26), 0.08, "e9e6de", true, 0.2)
+		thread(add, "SilkFoot2", hub, corner + v(24, -50, 2), 0.08, "e9e6de", true, 0.2)
+		add(rec("HouseSpider", v(0.55, 0.6, 0.55), hub + v(0, -0.2, 0), "6b5a44", "SmoothPlastic", true, "Ball"))
+		add(rec("HouseSpiderHead", v(0.25, 0.3, 0.25), hub + v(0, -0.65, 0), "8a6a46", "SmoothPlastic", true, "Ball"))
+		add(rec("Wrapped", v(0.4, 0.7, 0.4), hub + v(3, -2, 2), "d9d3c6", "SmoothPlastic", true, "Ellipsoid"))
+	end
+end
+
+-- The back room's floor: the boards' joints (north and south, as the hut's), a knot or two, the rug's border and its pattern's bands where it lies.
+local function roomFloorDecor(region: Region, add: (Drawn) -> boolean)
+	local lo, hi = region.bounds[1], region.bounds[2]
+	local x = math.ceil(lo.X / 14) * 14
+	local k = 0
+	while x < hi.X - 1 do
+		k += 1
+		add(rec(`Joint{k}`, v(0.18, 0.02, hi.Z - lo.Z), v(x, FL + 0.01, (lo.Z + hi.Z) / 2), C.floorDark, "WoodPlanks", true))
+		x += 14
+	end
+	local rand = rng(region.seed, 5)
+	for i = 1, 2 do
+		add(rec(`Knot{i}`, v(1.2, 0.02, 2.2), v(between(rand, lo.X + 4, hi.X - 4), FL + 0.012, between(rand, lo.Z + 4, hi.Z - 4)), "5e4430", "Wood", true, "Ellipsoid"))
+	end
+	local G = Hut.RUG
+	local a, b, c, d = clip(G.x0 + 6, G.x1 - 6, G.z0 + 6, G.z1 - 6, lo.X, hi.X, lo.Z, hi.Z)
+	if a ~= nil then
+		-- (a border band 6 cm in from the rug's edge, and its middle field a shade darker)
+		add(rec("RugField", v((b :: number) - a, 0.03, (d :: number) - (c :: number)), v((a + (b :: number)) / 2, FL + G.top + 0.015, ((c :: number) + (d :: number)) / 2), "6a3029", "Fabric", false))
+	end
+	for side, zz in { G.z0 + 3, G.z1 - 3 } do
+		local a2, b2 = math.max(G.x0 + 2, lo.X), math.min(G.x1 - 2, hi.X)
+		if b2 > a2 and zz > lo.Z and zz < hi.Z then add(rec(`RugBand{side}`, v(b2 - a2, 0.03, 1.4), v((a2 + b2) / 2, FL + G.top + 0.015, zz), "c9a45a", "Fabric", true)) end
+	end
+end
+
+-- The sofa: the piping along the cushions' fronts and the back's top, a throw folded over the east arm; the controller's sticks and buttons.
+local function sofaDecor(region: Region, add: (Drawn) -> boolean)
+	local S0 = Hut.SOFA
+	local west = region.id == "room_sofa_w"
+	local ia, ib = if west then S0.x0 + S0.arm else S0.split, if west then S0.split else S0.x1 - S0.arm
+	add(rec("Piping", v(ib - ia - 1, 0.5, 0.5), v((ia + ib) / 2, S0.seat - 0.2, S0.z0 + 2.4), C.sofaDark, "Fabric", true))
+	add(rec("BackPiping", v(ib - ia, 0.5, 0.5), v((ia + ib) / 2, S0.back + 0.2, 245), C.sofaDark, "Fabric", true))
+	local ax = if west then S0.x0 + S0.arm / 2 else S0.x1 - S0.arm / 2
+	add(rec("ArmTop", v(S0.arm + 1, 2.5, S0.z1 - S0.z0 + 1), v(ax, S0.armTop - 0.5, (S0.z0 + S0.z1) / 2), C.sofa, "Fabric", true, "Cylinder", v(90, 90, 0)))
+	if west then
+		add(rec("StickL", v(1.4, 0.8, 1.4), v(284, S0.seat + 4.3, 200), "3a3c40", "SmoothPlastic", true, "Cylinder", v(0, 0, 90)))
+		add(rec("StickR", v(1.4, 0.8, 1.4), v(291, S0.seat + 4.3, 203), "3a3c40", "SmoothPlastic", true, "Cylinder", v(0, 0, 90)))
+		for i, c in { "3f8f5a", "c0392b", "2e86c1", "e0b23a" } do
+			add(rec(`Button{i}`, v(0.7, 0.3, 0.7), v(292 + (i % 2) * 1.2, S0.seat + 4.1, 199 + math.floor((i - 1) / 2) * 1.2), c, "SmoothPlastic", true, "Ball"))
+		end
+	else
+		add(rec("Throw", v(S0.arm + 3, 12, 40), v(S0.x1 - S0.arm / 2, S0.armTop - 4, 200), "b9a27a", "Fabric", true))
+	end
+end
+
+-- The television: its screen's glass (low: the dark face that tells it is a screen), its maker's light; the console's light and its cable to the television.
+local function tvDecor(_region: Region, add: (Drawn) -> boolean)
+	local Sc = Hut.TV.screen
+	local glass = rec("Screen", v(Sc.x1 - Sc.x0 - 2, Sc.y1 - Sc.y0 - 2, 0.05), v((Sc.x0 + Sc.x1) / 2, (Sc.y0 + Sc.y1) / 2, Sc.z1 + 0.03), "0b0c0e", "Glass", false)
+	glass.reflectance = 0.25
+	add(glass)
+	add(rec("TvLight", v(0.4, 0.4, 0.1), v(230, Sc.y0 + 0.6, Sc.z1 + 0.06), "d23a2a", "Neon", true))
+	add(rec("ConsoleLight", v(4, 0.3, 0.1), v(210, -62, 47.06), "6fb7ff", "Neon", true))
+	add(rec("Hdmi", v(0.6, 18, 0.6), v(224, -54, 24), "1e1e1e", "SmoothPlastic", true))
+end
+
+-- The board games: a label band on the front edge of each box, its own colour lighter or darker.
+local function gamesDecor(region: Region, add: (Drawn) -> boolean)
+	local k = 0
+	for _, p in Hut.pieces(region) do
+		if string.find(p.id, "_box_", 1, true) ~= nil and k < 20 then
+			k += 1
+			local h = p.hi.Y - p.lo.Y
+			add(rec(`Label{k}`, v((p.hi.X - p.lo.X) * 0.6, h * 0.45, 0.05), v((p.lo.X + p.hi.X) / 2, (p.lo.Y + p.hi.Y) / 2, p.hi.Z + 0.03), if k % 2 == 0 then "f2eee2" else "1f1f1f", "SmoothPlastic", true))
+		end
+	end
+end
+
+-- The back room's window: the sash's frame round its glass inside, and its catch.
+local function roomWindowDecor(_region: Region, add: (Drawn) -> boolean)
+	local Wn = Hut.ROOM_WINDOW
+	local gx = Wn.glass - 0.4
+	add(rec("FrameLow", v(0.8, 4, Wn.z1 - Wn.z0), v(gx, 2, (Wn.z0 + Wn.z1) / 2), "efe9da", "Wood", true))
+	add(rec("FrameHigh", v(0.8, 4, Wn.z1 - Wn.z0), v(gx, Wn.head - 2, (Wn.z0 + Wn.z1) / 2), "efe9da", "Wood", true))
+	add(rec("FrameRail", v(0.8, 3, Wn.z1 - Wn.z0), v(gx, Wn.head / 2, (Wn.z0 + Wn.z1) / 2), "efe9da", "Wood", true))
+	add(rec("Catch", v(1.2, 1.2, 3), v(gx - 0.8, Wn.head / 2 + 2, (Wn.z0 + Wn.z1) / 2), C.brass, "Metal", true))
+end
+
+-- The eaves: the gutter's hangers over it every 60 cm.
+local function eaveDecor(region: Region, add: (Drawn) -> boolean)
+	local lo, hi = region.bounds[1], region.bounds[2]
+	local Gu = Hut.EAVE.gutter
+	local k = 0
+	local x = math.ceil((lo.X + 10) / 60) * 60
+	while x < hi.X - 5 and k < 4 do
+		k += 1
+		add(rec(`Hanger{k}`, v(1.2, 0.3, Hut.EAVE.fascia.out - Gu.out + Gu.wall), v(x, Gu.lip - 0.4, (Gu.out - Gu.wall + Hut.EAVE.fascia.out) / 2), C.gutter, "Metal", true))
+		x += 60
+	end
+end
+
 local decorCache: { [string]: { Drawn } } = {}
 -- The drawn look of a region of the hut or its garden, at the full tier (the low tier is the records without `full`). (ROBLOX-117: and of a patch.)
 function Hut.decor(region: Region): { Drawn }
@@ -1585,7 +2289,14 @@ function Hut.decor(region: Region): { Drawn }
 	elseif k == "garden_pole" then poleDecor(region, add)
 	elseif k == "garden_bed" then gardenDecor(region, add)
 	elseif k == "hut_path" then pathDecor(region, add)
-	elseif k == "patch" then patchDecor(region, add) end
+	elseif k == "patch" then patchDecor(region, add)
+	elseif k == "hut_upper" then upperDecor(region, add)
+	elseif k == "room_floor" then roomFloorDecor(region, add)
+	elseif k == "room_sofa" then sofaDecor(region, add)
+	elseif k == "room_tv" then tvDecor(region, add)
+	elseif k == "room_games" then gamesDecor(region, add)
+	elseif k == "room_window" then roomWindowDecor(region, add)
+	elseif k == "hut_eave" then eaveDecor(region, add) end
 	for _, d in list do table.freeze(d) end
 	decorCache[key] = table.freeze(list)
 	return list
@@ -1610,8 +2321,8 @@ Hut.LIFE = table.freeze({
 		garden_c3 = { ladybird = { full = 1, low = 1, salt = 101 } } },
 	-- (ROBLOX-117) the hoverflies on the bed's flowers; the hut's own prey: fruit flies at the compost caddy by the door, a moth at the desk lamp from dusk
 	hoverflies = { garden_c4 = { full = 1, low = 1 }, garden_d4 = { full = 1, low = 1 }, garden_c3 = { full = 1, low = 1 } },
-	fruitflies = { hut_floor_i = { full = 4, low = 2 } },
-	moths = { hut_desk = { full = 1, low = 1 } },
+	fruitflies = { hut_floor_i = { full = 4, low = 2 }, room_floor_g = { full = 2, low = 1 } },
+	moths = { hut_desk = { full = 1, low = 1 }, room_window = { full = 1, low = 1 } },
 })
 -- (ROBLOX-117) The compost caddy by the door, on the floor east of the doorway against the south wall: a kitchen caddy of green plastic, its lid down, a banana peel over
 -- its rim; the fruit flies' home in the hut.
@@ -1828,27 +2539,51 @@ function Hut.bestiary(region: Region): { any }?
 			seed = (region.seed + salt * 104729) % MOD, prefix = `{region.id}_hoverfly_fly_` })
 	end
 	if fruit ~= nil then
-		-- the fruit flies: on the caddy's lid and its sides, the peel, and the floor in front of it
-		local K = Hut.CADDY
-		local top = FL + K.h + K.lid
-		local list: { { any } } = {
-			spot(v(K.x0 + 5, top, K.z0 + 6), Vector3.yAxis, 0.3, 0.9), spot(v(K.x1 - 5, top, K.z0 + 10), Vector3.yAxis, 0.3, 0.9), spot(v(K.x0 + 11, top, K.z1 - 5), Vector3.yAxis, 0.3, 0.8),
-			spot(v(K.x1 - 4, top, K.z1 - 4), Vector3.yAxis, 0.3, 0.8), spot(v(K.x0 + 6, FL + 12, K.z0), -Vector3.zAxis, 0.2, 0.6), spot(v(K.x1 - 7, FL + 8, K.z0), -Vector3.zAxis, 0.2, 0.6),
-			spot(v(K.x1, FL + 10, K.z0 + 8), Vector3.xAxis, 0.2, 0.6), spot(v(K.x0 - 6, FL, K.z0 - 5), Vector3.yAxis, 0.1, 0.4), spot(v(K.x0 + 14, FL, K.z0 - 8), Vector3.yAxis, 0.1, 0.4),
-		}
-		local vents: { Vent } = { { id = `{region.id}_vent_fruit_fly`, position = v((K.x0 + K.x1) / 2, top + 6, (K.z0 + K.z1) / 2), normal = Vector3.yAxis, appear = true, reach = 40 } }
+		local list: { { any } }
+		local vents: { Vent }
+		if region.id == "room_floor_g" then
+			-- (ROBLOX-118) the caddy's fruit flies drifting through the doorway into the back room: on the boards inside it, the skirting, the wall's lining by it
+			local B = Hut.BACK
+			list = {
+				spot(v(B.x0 + 8, FL, 195), Vector3.yAxis, 0.1, 0.3), spot(v(B.x0 + 16, FL, 232), Vector3.yAxis, 0.1, 0.3), spot(v(B.x0 + 30, FL, 212), Vector3.yAxis, 0.1, 0.3),
+				spot(v(B.x0 + 4, FL, 186), Vector3.yAxis, 0.1, 0.3), spot(v(B.x0, -40, 177), Vector3.xAxis, 0.3, 0.1), spot(v(B.x0, -30, 252), Vector3.xAxis, 0.3, 0.1),
+			}
+			vents = { { id = `{region.id}_vent_fruit_fly`, position = v(B.x0 + 6, FL + 14, 215), normal = Vector3.yAxis, appear = true, reach = 40 } }
+		else
+			-- the fruit flies: on the caddy's lid and its sides, the peel, and the floor in front of it
+			local K = Hut.CADDY
+			local top = FL + K.h + K.lid
+			list = {
+				spot(v(K.x0 + 5, top, K.z0 + 6), Vector3.yAxis, 0.3, 0.9), spot(v(K.x1 - 5, top, K.z0 + 10), Vector3.yAxis, 0.3, 0.9), spot(v(K.x0 + 11, top, K.z1 - 5), Vector3.yAxis, 0.3, 0.8),
+				spot(v(K.x1 - 4, top, K.z1 - 4), Vector3.yAxis, 0.3, 0.8), spot(v(K.x0 + 6, FL + 12, K.z0), -Vector3.zAxis, 0.2, 0.6), spot(v(K.x1 - 7, FL + 8, K.z0), -Vector3.zAxis, 0.2, 0.6),
+				spot(v(K.x1, FL + 10, K.z0 + 8), Vector3.xAxis, 0.2, 0.6), spot(v(K.x0 - 6, FL, K.z0 - 5), Vector3.yAxis, 0.1, 0.4), spot(v(K.x0 + 14, FL, K.z0 - 8), Vector3.yAxis, 0.1, 0.4),
+			}
+			vents = { { id = `{region.id}_vent_fruit_fly`, position = v((K.x0 + K.x1) / 2, top + 6, (K.z0 + K.z1) / 2), normal = Vector3.yAxis, appear = true, reach = 40 } }
+		end
 		local salt = 127
 		table.insert(out, { kind = "fruit_fly", profile = "fruit_fly_prototype", perches = spots("fruit_fly", list, fruit.full), vents = vents, target = fruit.full, low = fruit.low,
 			seed = (region.seed + salt * 104729) % MOD, prefix = `{region.id}_fruit_fly_fly_` })
 	end
 	if moth ~= nil then
-		-- the moth: on the lamp's shade, the wall's lining behind the lamp and the desk by its base; restless from dusk, when the lamp is lit
-		local R = Hut.ROOM
-		local list: { { any } } = {
-			spot(v(110, 44, 24), Vector3.yAxis, 0.2, 0.2), spot(v(118, 39, 24), Vector3.xAxis, 0.2, 0.2), spot(v(100, 50, R.z0), Vector3.zAxis, 0.3, 0.1),
-			spot(v(126, 42, R.z0), Vector3.zAxis, 0.3, 0.1), spot(v(88, 30, R.z0), Vector3.zAxis, 0.3, 0.1), spot(v(96, 4, 26), Vector3.yAxis, 0.2, 0.1),
-		}
-		local vents: { Vent } = { { id = `{region.id}_vent_moth`, position = v(110, 52, 34), normal = Vector3.yAxis, appear = true, reach = 40 } }
+		local list: { { any } }
+		local vents: { Vent }
+		if region.id == "room_window" then
+			-- (ROBLOX-118) a moth at the back room's window at night: on the glass, the sill, the reveals and under the head
+			local Wn = Hut.ROOM_WINDOW
+			list = {
+				spot(v(Wn.glass, 60, 120), -Vector3.xAxis, 0.2, 0.2), spot(v(Wn.glass, 85, 150), -Vector3.xAxis, 0.2, 0.2), spot(v(440, 0, 108), Vector3.yAxis, 0.2, 0.1),
+				spot(v(452, 70, Wn.z0), Vector3.zAxis, 0.3, 0.1), spot(v(452, 40, Wn.z1), -Vector3.zAxis, 0.3, 0.1), spot(v(452, Wn.head, 140), -Vector3.yAxis, 0.3, 0.1),
+			}
+			vents = { { id = `{region.id}_vent_moth`, position = v(445, 70, 134), normal = -Vector3.xAxis, appear = true, reach = 40 } }
+		else
+			-- the moth: on the lamp's shade, the wall's lining behind the lamp and the desk by its base; restless from dusk, when the lamp is lit
+			local R = Hut.ROOM
+			list = {
+				spot(v(110, 44, 24), Vector3.yAxis, 0.2, 0.2), spot(v(118, 39, 24), Vector3.xAxis, 0.2, 0.2), spot(v(100, 50, R.z0), Vector3.zAxis, 0.3, 0.1),
+				spot(v(126, 42, R.z0), Vector3.zAxis, 0.3, 0.1), spot(v(88, 30, R.z0), Vector3.zAxis, 0.3, 0.1), spot(v(96, 4, 26), Vector3.yAxis, 0.2, 0.1),
+			}
+			vents = { { id = `{region.id}_vent_moth`, position = v(110, 52, 34), normal = Vector3.yAxis, appear = true, reach = 40 } }
+		end
 		local salt = 131
 		table.insert(out, { kind = "moth", profile = "moth_prototype", perches = spots("moth", list, moth.full), vents = vents, target = moth.full, low = moth.low,
 			seed = (region.seed + salt * 104729) % MOD, prefix = `{region.id}_moth_fly_`, dusk = { from = 18.0, to = 6.0 } })

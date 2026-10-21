@@ -33,11 +33,12 @@ local function same(a: Vector3, b: Vector3): boolean
 	return a.X == b.X and a.Y == b.Y and a.Z == b.Z
 end
 
-case("the worlds: the test garden and the preserve, the test garden the default until Phase B, any other value the default", function()
-	check(Worlds.DEFAULT == "test_garden" and Worlds.ATTRIBUTE == "World" and #Worlds.IDS == 2 and Worlds.IDS[1] == "test_garden" and Worlds.IDS[2] == "preserve", "two worlds, the test garden first and the default")
-	check(Worlds.choose(nil) == "test_garden" and Worlds.choose("preserve") == "preserve" and Worlds.choose("test_garden") == "test_garden" and Worlds.choose("Preserve") == "test_garden"
-		and Worlds.choose(7) == "test_garden", "an attribute names a world exactly, anything else is the default")
-	check(Worlds.get("test_garden").revision == WorldMap.REVISION and Worlds.get("preserve").revision == "preserve-1", "the test garden's revision is the map's, the preserve's its own")
+case("the worlds: the test garden and the preserve, the preserve the default (ROBLOX-118), any other value the default", function()
+	check(Worlds.DEFAULT == "preserve" and Worlds.ATTRIBUTE == "World" and #Worlds.IDS == 2 and Worlds.IDS[1] == "test_garden" and Worlds.IDS[2] == "preserve", "two worlds, the test garden first, the preserve the default")
+	check(Worlds.choose(nil) == "preserve" and Worlds.choose("preserve") == "preserve" and Worlds.choose("test_garden") == "test_garden" and Worlds.choose("Preserve") == "preserve"
+		and Worlds.choose(7) == "preserve", "an attribute names a world exactly, anything else is the default")
+	check(WorldMap.world() == "test_garden", "the map starts on the test garden, the CLI suites' world, until a server or client chooses")
+	check(Worlds.get("test_garden").revision == WorldMap.REVISION and Worlds.get("preserve").revision == "preserve-2", "the test garden's revision is the map's, the preserve's its own (ROBLOX-118: preserve-2)")
 	check(Worlds.get("test_garden").name == "The Test Garden" and Worlds.get("preserve").name == "The Preserve", "their names")
 	check(not pcall(Worlds.get, "garden") and not pcall(WorldMap.use, "garden"), "no world by another name")
 end)
@@ -47,16 +48,17 @@ case("the map answers for the active world: the preserve's sill is the same sill
 	local lo0, hi0 = WorldMap.bounds()
 	check(WorldMap.world() == "test_garden" and before > 10 and #WorldMap.drawn() == 0 and WorldMap.drawnZone("hut") == nil, "the test garden is active: its regions, no drawn zones")
 	local gardenSill = WorldMap.region("sill") :: WorldMap.Region
-	check(WorldMap.use("preserve") == "test_garden" and WorldMap.world() == "preserve" and WorldMap.revision() == "preserve-1", "the preserve made active (the test garden was)")
+	check(WorldMap.use("preserve") == "test_garden" and WorldMap.world() == "preserve" and WorldMap.revision() == "preserve-2", "the preserve made active (the test garden was)")
 	local regions = WorldMap.regions()
 	local sill = regions[1]
-	check(#regions == 48 and sill.id == "sill" and sill.kind == "sill" and #sill.neighbors == 5, `forty-eight regions (ROBLOX-117: and the path round the east end), the sill first with its five seams into the hut ({#regions}, {#sill.neighbors})`)
+	check(#regions == 105 and sill.id == "sill" and sill.kind == "sill" and #sill.neighbors == 5,
+		`a hundred and five regions (ROBLOX-118: the ceiling, the back room, the eaves, the path round the back room and on to the meadow), the sill first with its five seams into the hut ({#regions}, {#sill.neighbors})`)
 	check(same(sill.bounds[1], Layout.PLAY_BOUNDS_MIN) and same(sill.bounds[2], Layout.PLAY_BOUNDS_MAX) and same(sill.spawn.pos, Layout.SPAWN) and same(sill.spawn.heading, Layout.SPAWN_HEADING)
 		and sill.clockScale == 1.0 and sill.seed == gardenSill.seed and #sill.retreats == 1 and sill.retreats[1].id == "sill_crevice"
 		and same(sill.retreats[1].min, Layout.RETREAT_MIN) and same(sill.retreats[1].max, Layout.RETREAT_MAX), "its numbers are the layout's, as the test garden's sill's")
 	check(Region.pieces(sill) == Layout.PIECES and Region.decor(sill) == Layout.DECOR :: any, "its boxes are the layout's own tables, byte for byte")
 	local lo, hi = WorldMap.bounds()
-	check(lo.X <= -200 and hi.X >= 200 and lo.Z <= -416 and hi.Z >= 340 and lo.Y <= -87 and hi.Y >= 113.5, "the motor's fall-off box holds the hut and its garden")
+	check(lo.X <= -205 and hi.X >= 590 and lo.Z <= -816 and hi.Z >= 340 and lo.Y <= -87 and hi.Y >= 152, "the motor's fall-off box holds the hut, its back room, its eaves, its garden and the paths")
 	check(WorldMap.at(Vector3.new(0, 0.31, 0)) == sill and WorldMap.at(Vector3.new(0, -89.7, -30)) == nil and WorldMap.at(Preserve.at(31, 40, 0.5)) == nil, "a point on the sill is the sill's; the bed and the meadow are no region")
 	check(WorldMap.inRetreat(Vector3.new(-25.5, 0.31, 6)) == "sill_crevice" and WorldMap.inRetreat(Vector3.new(11, -89.69, -50)) == nil and WorldMap.retreat("bed_a_stone") == nil, "the crack is a retreat; the bed's stone is not")
 	check(WorldMap.region("bed_a") == nil and WorldMap.region("outer_sill") == nil and WorldMap.region("hut") == nil, "no garden regions, and a zone is not a region")
@@ -109,7 +111,7 @@ case("the preserve's map: 100 by 60 m, the hut's window at the origin, north out
 	end
 	check(#Preserve.HOME_RANGES == 10 and homes and Preserve.HOME_RANGES[1].id == "ranger_hut", "the ten home ranges in the design's order, each in a zone, the hut first")
 	local hutBox = { Preserve.zoneBox(Preserve.zone("hut") :: any) }
-	check(hutBox[1].X <= -175 and hutBox[2].X >= 175 and hutBox[1].Z <= -16 and hutBox[2].Z >= 284, "the hut's zone holds the hut (x -175..175, z -16..284)")
+	check(hutBox[1].X <= -205 and hutBox[2].X >= 503.5 and hutBox[1].Z <= -16 and hutBox[2].Z >= 284, "the hut's zone holds the hut and its back room under their roof (x -205..503.5, z -16..284)")
 	local paths = true
 	for _, c in Preserve.CORRIDORS do
 		for _, p in c.points do
@@ -187,7 +189,10 @@ case("the plan in the preserve: near the hut whole, the far preserve its masses,
 	for _, tier in { "full", "low" } do
 		local top = if tier == "low" then "low" else "full"
 		local plan, total = LookPlan.plan(sill.spawn.pos, tier, sill, nil)
-		check(plan.hut == top and plan.hut_garden == top and plan.ground == top, `{tier}: the hut, its garden and the ground at the tier's detail from the sill`)
+		-- (ROBLOX-118: the hut's ceiling, back room and eaves are walkable regions near the sill now, planned before the backdrop's zones, so at the full tier the
+		-- hut garden's backdrop beyond the walkable core may be held at the low tier's detail from the sill)
+		check(plan.hut == top and (plan.hut_garden == top or (tier == "full" and plan.hut_garden == "low")) and plan.ground == top,
+			`{tier}: the hut and the ground at the tier's detail from the sill, the hut garden at least the low tier's ({tostring(plan.hut_garden)})`)
 		local farOk = true
 		for _, id in { "meadow", "pond", "woodland", "railway", "city_east", "city_west", "towers", "scrub", "wall", "compost" } do
 			if plan[id] ~= "far" then farOk = false; print(`  {id} {tostring(plan[id])}`) end
@@ -235,8 +240,10 @@ case("the preserve's drift: from over the hut garden to the window, clear of the
 	local b, fb = TitleShots.drift(0, nil)
 	local c = TitleShots.drift(0, "elsewhere")
 	local function at(p: Vector3, q: Vector3): boolean return (p - q).Magnitude < 1e-6 end
-	check(at(a.Position, keys[1].eye) and fa == keys[1].fov and at(b.Position, TitleShots.DRIFT[1].eye) and fb == TitleShots.DRIFT[1].fov
-		and at(c.Position, TitleShots.DRIFT[1].eye), "the preserve's from its first key; nil and an unknown world are the test garden's")
+	local g = TitleShots.drift(0, "test_garden")
+	check(at(a.Position, keys[1].eye) and fa == keys[1].fov and at(b.Position, keys[1].eye) and fb == keys[1].fov and at(c.Position, keys[1].eye)
+		and at(g.Position, TitleShots.DRIFT[1].eye) and TitleShots.DEFAULT_WORLD == Worlds.DEFAULT,
+		"the preserve's from its first key; nil and an unknown world are the default world's, the preserve's (ROBLOX-118); the test garden's its own")
 	local arrive = TitleShots.drift(TitleShots.DRIFT_S, "preserve")
 	check((arrive.Position - keys[3].eye).Magnitude < 1e-6, "it arrives at its last key")
 	-- the boxes it must stay clear of: every axis-aligned record of the hut and the hut garden, grown by 2 studs
@@ -259,7 +266,8 @@ case("the preserve's drift: from over the hut garden to the window, clear of the
 		if hit then break end
 	end
 	check(hit == nil, `the camera never enters a part of the hut, its garden or the bench ({tostring(hit)})`)
-	check(#TitleShots.preserveViews() == 3 and TitleShots.preserveViews()[1].name == "preserve_drift_0", "its three frames for the previewer")
+	check(#TitleShots.preserveViews() == 4 and TitleShots.preserveViews()[1].name == "preserve_drift_0" and TitleShots.preserveViews()[4].name == "preserve_intro_glass",
+		"its three frames for the previewer, and (ROBLOX-118) the intro's first shot in the hut")
 end)
 
 case("the trains: a seeded timetable, a few minutes apart, every car drawn inside the line", function()
@@ -332,10 +340,18 @@ local Nature = require("../src/Shared/Life/Nature")
 local LifeText = require("../src/Shared/UI/LifeText")
 local SaveProgress = require("../src/Shared/Persistence/SaveProgress")
 
-local HUT_IDS = "sill,hut_window,hut_outer_sill,hut_desk,hut_board,hut_shelf,hut_chair,hut_door,hut_floor_a,hut_floor_b,hut_floor_c,hut_floor_d,hut_floor_e,hut_floor_f,"
-	.. "hut_floor_g,hut_floor_h,hut_floor_i,hut_wall_mid,hut_wall_w,hut_wall_e,hut_bench,hut_butt,garden_feeder,garden_pole,garden_a1,garden_a2,garden_a3,garden_a4,"
+local SEAMS = 180 -- (ROBLOX-116: 69; ROBLOX-117: 78; ROBLOX-118: the ceiling's, the back room's, the eaves' and the new paths')
+local HUT_IDS = "sill,hut_window,hut_outer_sill,hut_desk,hut_board,hut_shelf,hut_chair,hut_door,"
+	.. "hut_door_up,hut_doorway,hut_doorway_up,room_window,room_tv,room_games,room_sofa_w,room_sofa_e," -- (ROBLOX-118: the door's head, the doorway, the back room)
+	.. "hut_floor_a,hut_floor_b,hut_floor_c,hut_floor_d,hut_floor_e,hut_floor_f,hut_floor_g,hut_floor_h,hut_floor_i,"
+	.. "room_floor_a,room_floor_b,room_floor_c,room_floor_d,room_floor_e,room_floor_f,room_floor_g,room_floor_h,room_floor_i,"
+	.. "hut_up_a,hut_up_b,hut_up_c,hut_up_d,hut_up_e,hut_up_f,hut_up_g,hut_up_h,hut_up_i,room_up_a,room_up_b,room_up_c,room_up_d,room_up_e,room_up_f,room_up_g,room_up_h,room_up_i,"
+	.. "hut_wall_mid,hut_wall_w,hut_wall_e,hut_wall_x1,hut_wall_x2,hut_wall_x3,"
+	.. "hut_eave_w2,hut_eave_w1,hut_eave_mid,hut_eave_e1,hut_eave_e2,hut_eave_x1,hut_eave_x2,hut_eave_x3,hut_eave_x4,"
+	.. "hut_bench,hut_butt,garden_feeder,garden_pole,garden_a1,garden_a2,garden_a3,garden_a4,"
 	.. "garden_b1,garden_b2,garden_b3,garden_b4,garden_c1,garden_c2,garden_c3,garden_c4,garden_d1,garden_d2,garden_d3,garden_d4,"
-	.. "path_s1,path_s2,path_e1,path_e2,path_e3,path_e4,path_e5,path_e6" -- (ROBLOX-117: the path round the hut's east end)
+	.. "path_s1,path_s2,path_s3,path_s4,path_s5,path_e1,path_e2,path_e3,path_e4,path_e5,path_n3,path_n2,path_n1,path_e6," -- (ROBLOX-117/118: round the hut and the back room)
+	.. "path_m1,path_m2,path_m3,path_m4" -- (ROBLOX-118: on toward the meadow)
 
 case("the hut's regions: the sill, the hut's inside, the way out and the garden's core, in priority order, each with its seed, spawn, retreats and pace", function()
 	WorldMap.use("preserve")
@@ -358,19 +374,20 @@ case("the hut's regions: the sill, the hut's inside, the way out and the garden'
 	end
 	check(okAll, "each: its own seed, bounds with volume inside LIMIT, a body on its spawn in it, its retreats in it, a pace in (0, 1], frozen")
 	table.sort(homes)
-	check(table.concat(homes, ",") == "garden_a1_trough,garden_a3_stone,garden_d3_mulch,hut_board_gap,hut_desk_drawer,sill_crevice", `the homes: {table.concat(homes, ", ")}`)
+	check(table.concat(homes, ",") == "garden_a1_trough,garden_a3_stone,garden_d3_mulch,hut_board_gap,hut_desk_drawer,room_sofa_under,sill_crevice", `the homes: {table.concat(homes, ", ")}`)
 	for _, id in homes do check(LifeText.HOMES[id] ~= nil, `{id} has its words`) end
 	-- the inside keeps the sill's day, the garden the garden's; the night's hunters never come inside
 	local inside, outside = true, true
 	for _, r in WorldMap.regions() do
 		local indoor = Nature.INDOORS[r.kind] == true
-		if string.sub(r.id, 1, 9) == "hut_floor" or r.id == "hut_desk" or r.id == "hut_board" or r.id == "hut_shelf" or r.id == "hut_chair" or r.id == "hut_window" then
+		if string.sub(r.id, 1, 9) == "hut_floor" or r.id == "hut_desk" or r.id == "hut_board" or r.id == "hut_shelf" or r.id == "hut_chair" or r.id == "hut_window"
+			or string.sub(r.id, 1, 5) == "room_" or string.sub(r.id, 1, 7) == "hut_up_" or string.sub(r.id, 1, 11) == "hut_doorway" or r.id == "hut_door_up" then
 			if not indoor or r.clockScale ~= 1.0 or Nature.exposed(true, r.kind, false) then inside = false end
 		elseif string.sub(r.id, 1, 7) == "garden_" or r.id == "hut_bench" or r.id == "hut_butt" then
 			if indoor or r.clockScale ~= 0.33 or not Nature.exposed(true, r.kind, false) then outside = false end
 		end
 	end
-	check(inside, "the hut's inside is indoors, at the sill's pace (1.0), and never exposed to the night")
+	check(inside, "the hut's inside (ROBLOX-118: its ceiling, its doorway and its back room too) is indoors, at the sill's pace (1.0), and never exposed to the night")
 	check(outside, "the bench, the butt and the garden are outdoors at the garden's pace (0.33)")
 	check(Hut.FLOOR == -70 and Hut.GROUND == -84.6 and Hut.WALL_TOP == 60 and Hut.DOOR_GAP == 1.5 and Hut.ROOM.x1 - Hut.ROOM.x0 == 293 and Hut.ROOM.z1 - Hut.ROOM.z0 == 243,
 		"the floor 70 cm under the sill, the garden 84.6, the walls walkable 1.3 m up, the door's gap 1.5 cm, the room 2.93 by 2.43 m")
@@ -398,7 +415,7 @@ case("the hut's seams: each listed both ways along one line at both regions' bou
 			end
 		end
 	end
-	check(count == 2 * 78 and lines, `{count / 2} seams, each both ways along one line at both regions' bounds`)
+	check(count == 2 * SEAMS and lines, `{count / 2} seams, each both ways along one line at both regions' bounds`)
 	local joined = true
 	for _, region in WorldMap.regions() do
 		local g = Route.graph(region.id)
@@ -476,7 +493,8 @@ case("the hut's looks: within their budgets at both tiers, the same each time, w
 	end
 	check(okAll, "every region's look within its kind's budget at both tiers, the same list each time, known materials")
 	print(`preserve: the hut's looks: {full} records at full, {low} at low`)
-	check(low <= 60, `the low tier draws little of the hut beyond its boxes ({low} records)`)
+	-- (ROBLOX-118: 80, the paths round the back room and to the meadow each keep a tuft of the lawn's edge at the low tier)
+	check(low <= 80, `the low tier draws little of the hut beyond its boxes ({low} records)`)
 end)
 
 case("streaming: every hut region whole inside the target radius from anywhere on it, what is near inside the radius always sent, the way down there before it is taken", function()
@@ -590,8 +608,8 @@ case("the hut garden's life: its perches on its boxes' faces, its vents and hide
 			if #a.starts < 1 then fine = false; print("  ambient " .. a.kind .. " in " .. r.id) end
 		end
 	end
-	check(fine and counts.prey == 2 and counts.kinds == 8 and counts.bugs == 2 and counts.ambient == 3,
-		`gnats and aphids in 2 cells, the bestiary's kinds 8 times (ROBLOX-117: with the hoverflies on three cells' flowers, the fruit flies at the caddy, the moth at the lamp), woodlice in 2, ambient bugs in 3 (found {counts.prey}, {counts.kinds}, {counts.bugs}, {counts.ambient}), every perch on a face`)
+	check(fine and counts.prey == 2 and counts.kinds == 10 and counts.bugs == 2 and counts.ambient == 3,
+		`gnats and aphids in 2 cells, the bestiary's kinds 10 times (ROBLOX-117: with the hoverflies on three cells' flowers, the fruit flies at the caddy, the moth at the lamp; ROBLOX-118: the caddy's flies in the back room, a moth at its window), woodlice in 2, ambient bugs in 3 (found {counts.prey}, {counts.kinds}, {counts.bugs}, {counts.ambient}), every perch on a face`)
 	-- the milkweed as a plant the aphids and the ladybird walk: its nodes are the aphids' leaf perches
 	local c3 = WorldMap.region("garden_c3") :: any
 	local plants = Garden.plants(c3) :: any
@@ -656,7 +674,8 @@ end)
 -- ---------------------------------------------------------------- ROBLOX-117: the garden rich at the spider's eye, the path round the east end, the garden's new life
 case("the path round the hut's east end: from the door's gravel along the south wall, north past the east end and into the garden's path, gravel all the way", function()
 	WorldMap.use("preserve")
-	local chain = { "hut_door", "path_s1", "path_s2", "path_e1", "path_e2", "path_e3", "path_e4", "path_e5", "path_e6", "garden_b4" }
+	local chain = { "hut_door", "path_s1", "path_s2", "path_s3", "path_s4", "path_s5", "path_e1", "path_e2", "path_e3", "path_e4", "path_e5", "path_n3", "path_n2", "path_n1",
+		"path_e6", "garden_b4", "garden_c4", "garden_d4", "garden_d3", "garden_d2", "path_m1", "path_m2", "path_m3", "path_m4" } -- (ROBLOX-118: round the back room, and on to the meadow)
 	local linked = true
 	for i = 1, #chain - 1 do
 		local a = WorldMap.region(chain[i]) :: WorldMap.Region
@@ -664,15 +683,15 @@ case("the path round the hut's east end: from the door's gravel along the south 
 		for _, n in a.neighbors do if n.id == chain[i + 1] then found = true end end
 		if not found then linked = false; print(`  {chain[i]} does not meet {chain[i + 1]}`) end
 	end
-	check(linked, "the door's gravel, eight lengths of path and the garden's own path meet seam to seam")
+	check(linked, "the door's gravel, fourteen lengths of path round the hut and its back room, the garden's own cells and four lengths on toward the meadow meet seam to seam")
 	local fine = true
 	for _, w in Hut.WALK do
 		local r = WorldMap.region(w.id) :: WorldMap.Region
 		local pieces = Region.pieces(r)
 		if r.kind ~= "hut_path" or r.clockScale ~= 0.33 or #pieces ~= 1 or pieces[1].material ~= "Pebble" or math.abs(pieces[1].hi.Y - Hut.GROUND) > 1e-6 then fine = false end
-		if w.x0 < 178 - 1e-6 and w.z0 < 287 - 1e-6 then fine = false; print("  " .. w.id .. " in the hut") end
+		if w.x0 < Hut.BUILDING.x1 + 9 and w.x1 > Hut.BUILDING.x0 - 9 and w.z1 > -25 and w.z0 < 287 - 1e-6 then fine = false; print("  " .. w.id .. " in the hut") end
 	end
-	check(fine, "each a length of gravel at the garden's ground, outdoors at the garden's pace, clear of the hut's logs and base")
+	check(fine, "each a length of gravel at the garden's ground, outdoors at the garden's pace, clear of the hut's and the back room's logs and base")
 	check(Nature.exposed(true, "hut_path", false) == true, "the path is out in the night")
 	-- the backdrop's gravel by the hut lies a hair under the walkable gravel, standing in for it
 	local under = true
@@ -689,7 +708,7 @@ case("the patches: the near detail of the garden and the path, drawn only near t
 	for _, r in WorldMap.regions() do
 		if r.kind == "garden_bed" then cells += 1 elseif r.kind == "hut_path" then paths += 1 end
 	end
-	check(#patches >= cells * 16 and #patches < 400, `{#patches} patches over the garden's {cells} cells and the path's {paths} lengths`)
+	check(#patches >= cells * 16 and #patches < 500, `{#patches} patches over the garden's {cells} cells and the path's {paths} lengths`)
 	local fine, dews, worstFull, worstLow = true, 0, 0, 0
 	local B = Region.budget("patch", "full") :: number
 	for _, p in patches do
@@ -770,6 +789,228 @@ case("the garden's plants drawn whole over their boxes, a second of each kind, a
 		if not string.find(id, "^garden_") then fine = false end
 	end
 	check(roam == 16, "they roam the garden's sixteen cells and never the hut")
+end)
+
+-- ---------------------------------------------------------------- ROBLOX-118: the ceiling, the back room, the eaves, the cat, the meadow path
+local Cat = require("../src/Shared/Predator/Cat")
+local CatPose = require("../src/Shared/Rig/CatPose")
+local CatText = require("../src/Shared/UI/CatText")
+
+case("the ceiling and the walls to it, inside and out: nowhere a spider can climb is out of every region (the put-back above 1.3 m is gone)", function()
+	WorldMap.use("preserve")
+	local CE = Hut.CEIL
+	local holes = {}
+	local function at(p: Vector3, what: string)
+		if WorldMap.at(p) == nil then table.insert(holes, `{what} {p}`) end
+	end
+	-- up every wall's lining, both rooms, from the floor to the ceiling, and over the whole ceiling's underside
+	for _, room in { { x0 = Hut.ROOM.x0, x1 = Hut.ROOM.x1 }, { x0 = Hut.BACK.x0, x1 = Hut.BACK.x1 } } do
+		for y = -69, CE - 1, 5 do
+			for z = 20, 250, 23 do
+				at(Vector3.new(room.x0 + 0.31, y, z), "west wall")
+				at(Vector3.new(room.x1 - 0.31, y, z), "east wall")
+			end
+			for x = room.x0 + 5, room.x1 - 5, 24 do
+				at(Vector3.new(x, y, Hut.ROOM.z0 + 0.31), "north wall")
+				at(Vector3.new(x, y, Hut.ROOM.z1 - 0.31), "south wall")
+			end
+		end
+		for x = room.x0 + 2, room.x1 - 2, 9 do
+			for z = 14, 254, 9 do at(Vector3.new(x, CE - 0.31, z), "ceiling") end
+		end
+	end
+	-- the north face outside from the logs' foot to the soffit, and along the gutter from end to end
+	for x = -170, 470, 10 do
+		for y = -60, Hut.EAVE.soffit - 1, 6 do at(Vector3.new(x, y, -16.31), "north face") end
+		at(Vector3.new(x, Hut.EAVE.soffit - 0.31, -30), "soffit")
+	end
+	for x = Hut.EAVE.x0 + 1, Hut.EAVE.x1 - 1, 7 do at(Vector3.new(x, Hut.EAVE.gutter.floor + Hut.EAVE.gutter.thick + 0.31, -54), "gutter") end
+	check(#holes == 0, `every wall to the ceiling and the north face to the gutter is in a region ({#holes} holes: {table.concat(holes, "; ", 1, math.min(#holes, 4))})`)
+	-- the ceiling's boards cover both rooms, on joists 60 cm apart
+	local area, joists = 0, 0
+	for _, r in WorldMap.regions() do
+		if r.kind == "hut_upper" then
+			for _, p in Region.pieces(r) do
+				if string.sub(p.id, -8) == "_ceiling" then area += (p.hi.X - p.lo.X) * (p.hi.Z - p.lo.Z) end
+				if string.find(p.id, "_joist_", 1, true) then joists += 1; if math.abs(p.hi.Y - CE) > 1e-6 or p.hi.Y - p.lo.Y ~= Hut.JOISTS.d then joists -= 100 end end
+			end
+		end
+	end
+	local want = (Hut.ROOM.x1 - Hut.ROOM.x0 + Hut.BACK.x1 - Hut.BACK.x0) * (Hut.ROOM.z1 - Hut.ROOM.z0)
+	check(math.abs(area - want) < 1e-3 and joists == 24, `the ceiling's boards over both rooms ({area} of {want} square studs), 24 joist lengths ({joists}) 2.2 m over the floor`)
+	check(CE - Hut.FLOOR == 220 and Hut.EAVE.soffit - Preserve.GROUND_Y == 218, "the ceiling 2.2 m over the floor; the soffit 2.18 m over the ground outside")
+	check(Hut.UPPER.hut_up_a ~= nil and #Region.decor(WorldMap.region("hut_up_a") :: any) >= 20, "the house spider's web drawn in the hut's north-west ceiling corner")
+end)
+
+case("the volunteers' back room: through the doorway, its furniture at true size, the gap under the sofa a home, the caddy's flies and a moth at its window", function()
+	WorldMap.use("preserve")
+	local doorway = WorldMap.region("hut_doorway") :: any
+	local floorI, roomG = WorldMap.region("hut_floor_i") :: any, WorldMap.region("room_floor_g") :: any
+	local linked = 0
+	for _, n in doorway.neighbors do if n.id == "hut_floor_i" or n.id == "room_floor_g" then linked += 1 end end
+	check(linked == 2 and floorI ~= nil and roomG ~= nil, "the doorway joins the hut's floor and the back room's")
+	local DW = Hut.DOORWAY
+	check(DW.z1 - DW.z0 == 70 and DW.head - Hut.FLOOR == 205, "the doorway 70 cm wide and 2.05 m high")
+	local S0 = Hut.SOFA
+	check(S0.x1 - S0.x0 == 200 and S0.seat - Hut.FLOOR == 45 and S0.back - Hut.FLOOR == 85 and S0.armTop - Hut.FLOOR == 70 and S0.leg - Hut.FLOOR == 8,
+		"the sofa 2 m long, its seat 45 cm, back 85 cm, arms 70 cm, on 8 cm legs")
+	local Sc = Hut.TV.screen
+	check(Sc.x1 - Sc.x0 == 73 and Sc.y1 - Sc.y0 == 43 and Hut.GAMES.top - Hut.FLOOR == 120 and Hut.HEATER.top - Hut.FLOOR == 63, "a 32-inch screen (73 by 43 cm), the games' shelf 1.2 m, the radiator 63 cm")
+	check(Hut.ROOM_WINDOW.glass - Hut.ROOM_WINDOW.sill == 30 and Hut.BACK.x1 - Hut.BACK.x0 == 270, "the window's sill 30 cm deep (a cat sits on it), the room 2.7 m across")
+	check(WorldMap.inRetreat(Vector3.new(295, Hut.FLOOR + 0.31, 215)) == "room_sofa_under" and Cat.under(Vector3.new(295, Hut.FLOOR + 0.31, 215)), "the gap under the sofa is a home, and out of the cat's reach")
+	local tv, controller = false, false
+	for _, p in Region.pieces(WorldMap.region("room_tv") :: any) do if p.id == "room_tv_console" then tv = true end end
+	for _, p in Region.pieces(WorldMap.region("room_sofa_w") :: any) do if p.id == "room_sofa_w_controller" and math.abs(p.lo.Y - S0.seat) < 1e-6 then controller = true end end
+	check(tv and controller, "the games console on the unit's shelf, its controller on the sofa's cushion")
+	local cables = 0
+	for _, id in { "room_floor_a", "room_floor_f" } do for _, p in Region.pieces(WorldMap.region(id) :: any) do if string.find(p.id, "cable", 1, true) or string.find(p.id, "cord", 1, true) then cables += 1 end end end
+	check(cables >= 5, `the cables along the skirting to their sockets ({cables})`)
+	local fruit, moth = nil, nil
+	for _, k in Garden.bestiary(roomG) or {} do if k.kind == "fruit_fly" then fruit = k end end
+	for _, k in Garden.bestiary(WorldMap.region("room_window") :: any) or {} do if k.kind == "moth" then moth = k end end
+	check(fruit ~= nil and moth ~= nil and moth.dusk ~= nil, "fruit flies by the doorway from the caddy, a moth at the window from dusk")
+	check(Nature.INDOORS.room_floor and Nature.INDOORS.hut_upper and not Nature.INDOORS.hut_eave, "the back room and the ceiling indoors, the eaves out")
+end)
+
+case("the meadow path: the garden's own path goes on north out of the core toward the meadow, gravel at the garden's ground", function()
+	WorldMap.use("preserve")
+	local ok = true
+	for i = 1, 4 do
+		local r = WorldMap.region("path_m" .. i) :: any
+		if r == nil or r.kind ~= "hut_path" or r.bounds[2].X - r.bounds[1].X ~= 60 then ok = false end
+	end
+	local last = WorldMap.region("path_m4") :: any
+	local _, zm = Preserve.metres(Vector3.new(0, 0, last.bounds[1].Z))
+	check(ok and math.abs(zm - 13) < 1e-6, `four lengths 60 cm wide to z {zm} m, where the mown loop begins`)
+end)
+
+case("the cat's day: seeded, the same for the same day, every day from the sofa to the sofa, its stops on its spots and its walks on the floor's ways", function()
+	local seed = WorldMap.seed(WorldMap.SEED, "cat")
+	local fine, kinds, rested = true, {}, 0
+	for day = 1, 12 do
+		local plan = Cat.plan(seed, day)
+		if plan ~= Cat.plan(seed, day) then fine = false end
+		if plan[1].t0 ~= 0 or plan[#plan].t1 ~= 24 or plan[1].spot ~= "sofa" or plan[#plan].spot ~= "sofa" then fine = false end
+		for i, s in plan do
+			if i > 1 and math.abs(s.t0 - plan[i - 1].t1) > 1e-9 then fine = false end
+			if s.t1 < s.t0 then fine = false end
+			kinds[s.kind] = true
+			if s.kind == "rest" and s.t0 < 17 and s.t1 > 8.5 then rested += math.min(s.t1, 17) - math.max(s.t0, 8.5) end
+		end
+		-- a place every few game minutes: in a room (or the doorway), never inside the furniture it walks round
+		for h = 0, 23.99, 0.05 do
+			local p = Cat.at(seed, day, h)
+			local same = Cat.at(seed, day, h)
+			if p.pos ~= same.pos or Cat.roomOf(p.pos) == nil then fine = false; print(`  day {day} at {h}: {p.pos}`) end
+			if p.pose == "walk" and not Cat.free(p.pos.X, p.pos.Z) and (p.pos - Cat.NODES.rug).Magnitude > 1 then
+				local onNode = false
+				for _, n in Cat.NODES do if (n - p.pos).Magnitude < 12 then onNode = true end end
+				if not onNode then fine = false; print(`  day {day} at {h}: walking through furniture at {p.pos}`) end
+			end
+		end
+	end
+	check(fine, "twelve days: contiguous from 0 to 24 hours, the sofa first and last, the same place for the same hour (a return to a rest finds it where it was), always in its rooms")
+	check(kinds.rest and kinds.walk and kinds.sit and kinds.eat and kinds.groom, "it rests, walks, sits, eats and grooms")
+	check(rested / (12 * 8.5) > 0.4, `it sleeps much of the day ({math.floor(100 * rested / (12 * 8.5))}% of 8:30 to 17:00 resting)`)
+	check(Cat.plan(seed, 1) ~= Cat.plan(seed, 2) and Cat.plan(seed, 1)[2].t0 ~= Cat.plan(seed, 2)[2].t0, "another day, another schedule")
+end)
+
+case("the cat's reactions: a moving thing near it and awake, a pat in reach; still, hidden, out of reach or in the other room, it loses interest; the rules decide the pat", function()
+	local seed = WorldMap.seed(WorldMap.SEED, "cat")
+	-- a stop of its first day on the floor where it is awake
+	local stop = nil
+	for _, s in Cat.plan(seed, 1) do if (s.spot == "rug" or s.spot == "door" or s.spot == "bowls") and s.kind ~= "walk" then stop = s; break end end
+	assert(stop ~= nil, "no stop on the floor")
+	local h = (stop.t0 + stop.t1) / 2
+	local function trial(gentle: boolean, spider: (any, number) -> any, seconds: number): (any, { [string]: number })
+		local cat = Cat.new(seed)
+		cat.gentle = gentle
+		cat:step(1 / 60, 1, h, nil)
+		local seen: { [string]: number } = {}
+		for i = 1, math.floor(seconds * 60) do
+			cat:step(1 / 60, 1, h, spider(cat, i))
+			for _, s in cat:drainSignals() do seen[s.kind] = (seen[s.kind] or 0) + 1 end
+		end
+		return cat, seen
+	end
+	local function near(cat: any, i: number, dy: number?, speed: number?): any
+		local c = Cat.chest(cat) + cat.heading * 8
+		return { pos = Vector3.new(c.X + math.sin(i * 0.2), cat.surface + 0.31 + (dy or 0), c.Z), speed = speed or 2, hidden = false }
+	end
+	local _, s1 = trial(false, function(cat, i) return near(cat, i) end, 8)
+	check(s1.noticed == 1 and s1.struck == 1, "standard rules: it notices a spider moving in front of it and its pat lands: a death")
+	local _, s2 = trial(true, function(cat, i) return near(cat, i) end, 8)
+	check(s2.noticed == 1 and s2.nudged == 1 and (s2.struck or 0) == 0, "gentle rules: the same pat only knocks the spider aside")
+	local _, s3 = trial(false, function(cat, i) return near(cat, i, nil, 0) end, 8)
+	check((s3.noticed or 0) == 0, "a spider keeping still is not noticed")
+	local c4, s4 = trial(false, function(cat, i) local p = near(cat, i); p.hidden = i > 30; return p end, 8)
+	check(s4.noticed == 1 and (s4.struck or 0) == 0 and s4.gave_up == 1 and c4.cooldown > 0, "one that gets into a gap: it gives up")
+	local _, s5 = trial(false, function(cat, i) return near(cat, i, if i > 30 then 70 else 0) end, 10)
+	check(s5.noticed == 1 and (s5.struck or 0) == 0 and s5.gave_up == 1, "one that gets up out of its reach (70 cm over its floor): it stares, then gives up")
+	local _, s6 = trial(false, function(cat, i) local p = near(cat, i); if i > 30 then p.speed = 0 end; return p end, 8)
+	check(s6.noticed == 1 and (s6.struck or 0) == 0 and s6.gave_up == 1, "one that keeps still once seen: it loses interest")
+	local _, s7 = trial(false, function(cat, i) return { pos = Vector3.new(cat.pos.X + 60, -69.69, cat.pos.Z) * Vector3.new(1, 1, 1) + Vector3.new(if Cat.roomOf(cat.pos) == "hut" then 400 else -400, 0, 0), speed = 2, hidden = false } end, 4)
+	check((s7.noticed or 0) == 0, "one in the other room is not noticed")
+	-- a sleeping cat notices nothing
+	local sleepH = nil
+	for _, s in Cat.plan(seed, 1) do if s.kind == "rest" and s.t1 - s.t0 > 1 then sleepH = s.t0 + 0.8; break end end
+	local sleeper = Cat.new(seed)
+	sleeper:step(1 / 60, 1, sleepH :: number, nil)
+	local seen = 0
+	for i = 1, 300 do
+		local c = Cat.chest(sleeper) + sleeper.heading * 8
+		sleeper:step(1 / 60, 1, sleepH :: number, { pos = Vector3.new(c.X, sleeper.surface + 0.31, c.Z), speed = 2, hidden = false })
+		seen += #sleeper:drainSignals()
+		local _ = i
+	end
+	check(sleeper.pose == "sleep" and seen == 0, "asleep, it notices nothing")
+	-- heard first: the bell while it walks, from metres off; the purr close, as it settles
+	local walkH = nil
+	for _, s in Cat.plan(seed, 1) do if s.kind == "walk" and s.t1 - s.t0 > 0.02 then walkH = (s.t0 + s.t1) / 2; break end end
+	local walker = Cat.new(seed)
+	walker:step(1 / 60, 1, walkH :: number, nil)
+	local bell = walker:sound(walker.pos + Vector3.new(0, 0, 200))
+	local far = walker:sound(walker.pos + Vector3.new(0, 0, 600))
+	check(walker.pose == "walk" and bell > 0 and far == 0, `the bell heard 2 m off while it walks ({string.format("%.2f", bell)}), not 6 m off`)
+	check(CatText.caption(bell, 0, "ahead", true) ~= nil and string.find((CatText.caption(bell, 0, "ahead", true) :: any).text, "bell", 1, true) ~= nil
+		and CatText.caption(0, 0.5, "left", false) ~= nil and CatText.caption(0, 0, "left", false) == nil, "its captions: the bell, the purr, nothing when silent")
+	-- the record
+	check(#Cat.problems(Cat.defaultRecord()) == 0 and #Cat.problems({ notices = 1.5, pats = 0, swats = 0, last_swat_day = 0 }) == 1 and #Cat.problems(7) == 1, "its record: counts only")
+end)
+
+case("the cat drawn: a domestic cat at true size in every pose, the same parts in each, within its budget", function()
+	local poses = { "walk", "jump", "sit", "rest", "sleep", "eat", "groom", "watch", "stalk", "crouch", "swat" }
+	local first = CatPose.parts({ pose = "walk", t = 1.1, speed = 60 })
+	local same, low = true, 0
+	for _, p in first do if not p.full then low += 1 end end
+	for _, pose in poses do
+		local list = CatPose.parts({ pose = pose, t = 2.3, speed = 40, look = Vector3.new(10, 5, -40), paw = Vector3.new(3, 2, -34), swat = 0.5 })
+		if #list ~= #first then same = false end
+		for i, p in list do if p.name ~= first[i].name or p.size.X <= 0 then same = false end end
+	end
+	check(same and #first <= 70 and low <= 45, `{#first} parts in every pose, the same names; {low} at the low tier`)
+	-- measured standing: the shoulder's top, the length from the nose's tip to the hips' back, the head's width
+	local lo, hi = Vector3.new(1e9, 1e9, 1e9), Vector3.new(-1e9, -1e9, -1e9)
+	local stand = CatPose.parts({ pose = "walk", t = 0, speed = 0 })
+	local shoulder, nose, rump, headW = 0, 0, 0, 0
+	for _, p in stand do
+		local c = p.cf.Position
+		if p.name == "Chest" then shoulder = c.Y + p.size.Y / 2 end
+		if p.name == "Nose" then nose = c.Z - p.size.Z / 2 end
+		if p.name == "Hips" then rump = c.Z + p.size.Z / 2 end
+		if p.name == "Head" then headW = p.size.X end
+		lo, hi = lo:Min(c), hi:Max(c)
+	end
+	check(shoulder >= 22 and shoulder <= 26 and rump - nose >= 42 and rump - nose <= 48.5 and headW >= 8.5 and headW <= 10.5,
+		string.format("standing: %.1f cm at the shoulder, %.1f cm from the nose to the root of the tail, its head %.1f cm across (a house cat: 23 to 25, about 46)", shoulder, rump - nose, headW))
+	-- it breathes and blinks: the chest swells; sitting, now and then the lids come down
+	local a, b = CatPose.parts({ pose = "sit", t = 0.0 }), CatPose.parts({ pose = "sit", t = 0.6 })
+	local shut = false
+	for t = 0, 30, 0.05 do
+		for _, p in CatPose.parts({ pose = "sit", t = t }) do if p.name == "LidL" and p.size.Y > 2 then shut = true end end
+	end
+	check(a[1].size.X ~= b[1].size.X and shut, "it breathes (the chest's size moves) and gives a slow blink sitting")
+	check(CatText.LINE ~= "" and string.find(CatText.SUB, "keeping still", 1, true) ~= nil and CatText.CAUSE == "cat", "its death card says what would have saved the spider")
 end)
 
 print(`PRESERVE passed={passed} failed={failed}`)

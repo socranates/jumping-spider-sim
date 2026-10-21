@@ -389,8 +389,9 @@ for _, id in Worlds.IDS do
 	MAPS[id] = { regions = list, byId = byId, lo = lo, hi = hi, drawn = drawn, drawnById = drawnById, patches = patches, patchById = patchById }
 end
 
--- The active world (World/Worlds' default until `use` says otherwise) and its map.
-local ACTIVE = Worlds.DEFAULT
+-- The active world and its map. (ROBLOX-118: the map starts on the test garden, the CLI suites' world, though the game's default is the preserve: a server and a
+-- client always choose theirs before they ask anything, Server/Main and Client/WorldClient.new from the Workspace attribute World, World/Worlds.choose.)
+local ACTIVE = Worlds.TEST_GARDEN
 local DEFAULT: { Region } = MAPS[ACTIVE].regions
 local BY_ID: { [string]: Region } = MAPS[ACTIVE].byId
 

@@ -35,8 +35,10 @@ TitleShots.PRESERVE_DRIFT = {
 	{ t = 18, eye = v(120, 25, -360), at = v(0, 15, -16), fov = 48 }, -- in over the herb beds, the hut's log wall and its green casing
 	{ t = 36, eye = v(10, 6.5, -45), at = v(0, 2.5, -14), fov = 46 }, -- level with the outer sill, looking in: the glass, the sill beyond
 } :: { Key }
--- The drift of each world (World/Worlds' ids); any other world has the test garden's.
+-- The drift of each world (World/Worlds' ids); any other world (or none: the splash before the server has said) has the default world's, the preserve's
+-- (ROBLOX-118: World/Worlds.DEFAULT, the game's world; this module is required by the splash before World/ is known to have replicated, so it names it itself).
 TitleShots.DRIFTS = { test_garden = TitleShots.DRIFT, preserve = TitleShots.PRESERVE_DRIFT } :: { [string]: { Key } }
+TitleShots.DEFAULT_WORLD = "preserve"
 
 -- The breathing once the drift has arrived: amplitudes in studs and the periods' rates (radians a second), slow enough never to be noticed as a move.
 TitleShots.SWAY = { x = 1.6, y = 0.5, rateX = 0.07, rateY = 0.05 }
@@ -46,10 +48,10 @@ local function smooth(k: number): number
 	return k * k * (3 - 2 * k)
 end
 
--- The drift's camera and field of view at the game's time `t` (seconds since the client began), in the world `world` (the Workspace attribute World; the test
--- garden's drift when nil or unknown).
+-- The drift's camera and field of view at the game's time `t` (seconds since the client began), in the world `world` (the Workspace attribute World; the
+-- default world's drift when nil or unknown: the preserve's since ROBLOX-118).
 function TitleShots.drift(t: number, world: string?): (CFrame, number)
-	local keys = (if world ~= nil then TitleShots.DRIFTS[world] else nil) or TitleShots.DRIFT
+	local keys = (if world ~= nil then TitleShots.DRIFTS[world] else nil) or TitleShots.DRIFTS[TitleShots.DEFAULT_WORLD]
 	t = math.max(t, 0)
 	local last = keys[#keys]
 	if t >= last.t then
@@ -89,12 +91,25 @@ TitleShots.INTRO = {
 	captionsEnd = 16.0,
 }
 
+-- ROBLOX-118: in the preserve the intro opens inside the ranger hut: from the room, low over the sill's front edge, the morning coming in through the hut's window
+-- over the sill (the sill, its crack and the spider's walk out of it are the same in both worlds: the sill is the same sill at the origin). The other shots are the same.
+TitleShots.PRESERVE_GLASS = { name = "glass", t0 = 0, t1 = 3.8, eye0 = v(-4.0, 9.0, 34.0), eye1 = v(-9.0, 6.5, 24.0), at0 = v(0.0, 16.0, -14.0), at1 = v(-3.0, 9.0, -13.0), fov = 58 } :: Shot
+
+-- The intro's shots in a world (the Workspace attribute World): the preserve's opens in the hut; any other world's (or none) is the shared list.
+function TitleShots.introShots(world: string?): { Shot }
+	local shots: { Shot } = TitleShots.INTRO.shots
+	if world ~= "preserve" then return shots end
+	local out = table.clone(shots)
+	out[1] = TitleShots.PRESERVE_GLASS
+	return out
+end
+
 -- One frame of the intro at `t` seconds. `reduced`: Reduced Motion. `spider`: where the spider's body is now (the "out" shot looks at it; the planned
 -- path when nil). `blend` is how far the view has eased into the game's camera (0 none, 1 all of it; the caller lerps); `holding` is whether the intro
 -- still has the camera and the controls, `done` whether everything, the last caption included, is over.
-function TitleShots.intro(t: number, reduced: boolean, spider: Vector3?): Frame
+function TitleShots.intro(t: number, reduced: boolean, spider: Vector3?, world: string?): Frame
 	local I = TitleShots.INTRO
-	local shots: { Shot } = I.shots
+	local shots: { Shot } = TitleShots.introShots(world) -- (ROBLOX-118: `world` the Workspace attribute World; the preserve's opens in the hut)
 	local shot = shots[#shots]
 	for _, s in shots do
 		if t < s.t1 then shot = s; break end
@@ -142,6 +157,9 @@ function TitleShots.preserveViews(): { { name: string, eye: Vector3, at: Vector3
 	for _, key in TitleShots.PRESERVE_DRIFT do
 		table.insert(out, { name = `preserve_drift_{key.t}`, eye = key.eye, at = key.at, fov = key.fov })
 	end
+	-- (ROBLOX-118) and the preserve's first shot of the intro, in the hut
+	local g = TitleShots.PRESERVE_GLASS
+	table.insert(out, { name = "preserve_intro_glass", eye = g.eye0:Lerp(g.eye1, 0.5), at = g.at0:Lerp(g.at1, 0.5), fov = g.fov })
 	return out
 end
 

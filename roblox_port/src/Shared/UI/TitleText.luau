@@ -10,7 +10,7 @@ local ControlText = require(script.Parent.ControlText)
 local TitleText = {}
 
 TitleText.TITLE = "The Windowsill"
-TitleText.SUBTITLE = "A small life on a windowsill."
+TitleText.SUBTITLE = "A small life in a city's nature preserve." -- (ROBLOX-118: the preserve is the game; it begins on the ranger hut's windowsill)
 
 TitleText.FAMILY = "rbxasset://fonts/families/Merriweather.json"
 -- The colours: warm paper white for the words, a deep brown-black for the veil and the choices' ground.

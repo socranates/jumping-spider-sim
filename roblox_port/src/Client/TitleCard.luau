@@ -147,7 +147,7 @@ function TitleCard.beginIntro(self: any, force: boolean?, gentle: boolean?): boo
 	self.tap.Visible = true
 	self:_bind(true)
 	self.cfg.onBegin()
-	self:_draw(TitleShots.intro(0, self.cfg.reduced(), self.cfg.spider()))
+	self:_draw(TitleShots.intro(0, self.cfg.reduced(), self.cfg.spider(), workspace:GetAttribute("World")))
 	return true
 end
 
@@ -222,7 +222,7 @@ function TitleCard.frame(self: any, dt: number, started: boolean, paused: boolea
 	local i = self.intro
 	if i ~= nil then
 		if not paused then i.t += dt end
-		local f = TitleShots.intro(i.t, self.cfg.reduced(), self.cfg.spider())
+		local f = TitleShots.intro(i.t, self.cfg.reduced(), self.cfg.spider(), workspace:GetAttribute("World")) -- (ROBLOX-118: the preserve's opens in the hut)
 		local wrote = false
 		if not i.released then
 			if f.holding then

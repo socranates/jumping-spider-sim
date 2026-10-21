@@ -55,7 +55,7 @@ local function zone(id: string, name: string, x0: number, x1: number, z0: number
 	return table.freeze({ id = id, name = name, x = table.freeze({ x0, x1 }), z = table.freeze({ z0, z1 }), y = table.freeze({ y0, y1 }) })
 end
 Preserve.ZONES = table.freeze({
-	zone("hut", "The ranger hut", 42, 50, -1, 7, -0.2, 3.6), -- the hut, the bench and water butt under its window, the info board and the bike rack by the gate
+	zone("hut", "The ranger hut", 42, 52, -1, 7, -0.2, 3.6), -- (ROBLOX-118: and its back room east of it, to x 50.8 with the roof's overhang) -- the hut, the bench and water butt under its window, the info board and the bike rack by the gate
 	zone("hut_garden", "The hut garden", 38, 52, 6, 14, 0, 2.6), -- herb border, pallet planters, the bird feeder
 	zone("bench", "The bench, bin and lamppost", 37, 43, 14, 18.5, 0, 4.6),
 	zone("ground", "The ground and the paths", 0, 100, 0, 60, -0.3, 1.9), -- the mown grass, the meadow's and the wood's floors, the paths, the boundary fences
@@ -119,7 +119,8 @@ Preserve.CORRIDORS = table.freeze({
 	-- (round the hut's east end and in through the hut garden's core, World/Hut's gravel path: west along z 6.71 and north along x 45.15, 0.5 to 0.6 m wide; its points
 	-- break at the core's edges, x 47.75 and z 9, ROBLOX-116. ROBLOX-117: walkable round the east end too, World/Hut.WALK: along the south wall's foot at z 1.67 from
 	-- the door, north along x 48.4 and in at z 6.55)
-	corridor("path_hut", "gravel", 0.6, { { 45.5, 1.67 }, { 48.4, 1.67 }, { 48.4, 6.55 }, { 47.75, 6.55 }, { 45.15, 6.55 }, { 45.15, 9 }, { 45.15, 13 } }),
+	-- (ROBLOX-118: round the back room's east end instead, along x 51.35, World/Hut.WALK)
+	corridor("path_hut", "gravel", 0.6, { { 45.5, 1.67 }, { 51.35, 1.67 }, { 51.35, 6.55 }, { 47.75, 6.55 }, { 45.15, 6.55 }, { 45.15, 9 }, { 45.15, 13 } }),
 	corridor("boardwalk", "boardwalk", 1.5, { { 61, 30 }, { 79, 30 } }),
 	corridor("path_wall", "mown", 1.2, { { 79, 30 }, { 90, 30 } }),
 	corridor("hedge_base", "hedge", 0.8, { { 0.6, 1 }, { 0.6, 59 } }),
@@ -130,6 +131,8 @@ Preserve.CORRIDORS = table.freeze({
 
 -- ---------------------------------------------------------------- features the looks place from (metres)
 Preserve.HUT = table.freeze({ x = table.freeze({ 44, 47.5 }), z = table.freeze({ 2, 5 }), wall = 0.285 }) -- a log hut: walls 28.5 cm, the sill's reveal
+-- (ROBLOX-118) the volunteers' back room, built on against the hut's east end: its logs to x 50.485, the hut's roof carried on over it
+Preserve.BACK_ROOM = table.freeze({ x = table.freeze({ 47.5, 50.485 }), z = table.freeze({ 2, 5 }) })
 Preserve.GATE = table.freeze({ x = table.freeze({ 44.3, 46.9 }), z = 0 })
 Preserve.OAK = table.freeze({ x = 14, z = 42, trunk = 1.3, height = 19.5, crown = 22 }) -- a bur oak: trunk 1.3 m across, 19.5 m tall, its crown 22 m across
 Preserve.POND = table.freeze({ x = 70, z = 37, rx = 8, rz = 7 })

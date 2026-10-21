@@ -105,7 +105,9 @@ end
 -- The inside's own night (the house spider, the lamp's moths) is the inside's round (docs/WORLD_MAP_PLAN.md).
 -- (ROBLOX-116: and the ranger hut's inside, World/Hut.INDOORS: its floor, its furniture and the window over the sill)
 Nature.INDOORS = table.freeze({ sill = true, counter = true, kitchen_floor = true, hut_window = true, hut_floor = true, hut_desk = true, hut_board = true, hut_shelf = true,
-	hut_chair = true })
+	hut_chair = true,
+	-- (ROBLOX-118: the ceiling and the upper walls, the doorway, the front door's head and the volunteers' back room, World/Hut.INDOORS)
+	hut_upper = true, hut_doorway = true, hut_door_up = true, room_floor = true, room_sofa = true, room_tv = true, room_games = true, room_window = true })
 
 -- Whether a spider is exposed to the night where it is: in the standard rules, anywhere outside the house (ROBLOX-106: anywhere but the sill), out of every retreat.
 function Nature.exposed(standard: boolean, regionKind: string, inRetreat: boolean): boolean

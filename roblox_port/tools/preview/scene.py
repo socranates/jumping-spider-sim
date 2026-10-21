@@ -56,6 +56,7 @@ ap.add_argument("--lineup", action="store_true", help="ROBLOX-114: stand every c
 ap.add_argument("--preserve", action="store_true", help="ROBLOX-115: the preserve is the world: the sill's Decor without the test garden's view, the backdrop as a client at the sill holds it (or at --looks-at), a train on the line; views pv_* and preserve_drift_*")
 ap.add_argument("--hut-open", action="store_true", help="ROBLOX-116: with --preserve, the hut's window propped open (the nursery over); shut otherwise")
 ap.add_argument("--preserve-all", action="store_true", help="ROBLOX-115: with --preserve, every zone of the backdrop at the --detail tier's whole detail, not the client's plan")
+ap.add_argument("--cats", default="", help="ROBLOX-118: comma list of the cat's presets to draw (CAT_PRESETS: sofa, window, walk, watch, chair, swat)")
 ap.add_argument("--elevation", type=float, default=30.0, help="sun elevation, degrees")
 ap.add_argument("--set", action="append", default=[], help="lighting knob for scene.gd, key=value (energy, ambient, bias, nbias, blur)")
 ap.add_argument("--azimuth", type=float, default=30.0, help="degrees off straight out of the window (-Z); positive turns toward +X")
@@ -85,6 +86,18 @@ HUT_SPIDERS = [
     {"name": "path", "x": 265.0, "y": -84.29, "z": 60.0, "hx": 0, "hz": -1},
     {"name": "feeder", "x": -128.0, "y": -84.29, "z": -170.0, "hx": -1, "hz": 0.4},
 ]
+# ROBLOX-118 (--cats): the ranger's cat where its schedule puts it (Predator/Cat.SPOTS), drawn by Client/CatBody from Rig/CatPose
+CAT_PRESETS = {
+    "sofa": {"id": "cat_sofa", "x": 300.0, "y": -25.0, "z": 205.0, "hx": 1, "hz": 0, "pose": "sleep", "t": 2.0},
+    "window": {"id": "cat_window", "x": 437.0, "y": 0.0, "z": 134.0, "hx": 1, "hz": 0, "pose": "sit", "t": 1.0, "spot": "window"},
+    "walk": {"id": "cat_walk", "x": 60.0, "y": -70.0, "z": 200.0, "hx": 1, "hz": 0.1, "pose": "walk", "t": 1.13},
+    "watch": {"id": "cat_watch", "x": 320.0, "y": -70.0, "z": 120.0, "hx": -1, "hz": 0.2, "pose": "watch", "t": 0.4, "look": [280.0, -69.0, 112.0]},
+    "face": {"id": "cat_face", "x": 300.0, "y": -69.0, "z": 120.0, "hx": -1, "hz": 0, "pose": "watch", "t": 0.4, "look": [262.0, -38.0, 112.0], "seated": True},
+    "chair": {"id": "cat_chair", "x": 86.0, "y": -24.0, "z": 108.0, "hx": 0, "hz": -1, "pose": "rest", "t": 0.2},
+    "swat": {"id": "cat_swat", "x": 320.0, "y": -70.0, "z": 120.0, "hx": -1, "hz": 0, "pose": "swat", "t": 0.4, "paw": [296.0, -69.0, 116.0], "swat": 0.125},
+}
+CATS = [CAT_PRESETS[n] for n in args.cats.split(",") if n]
+
 FLIES = [
     {"id": "fly_a", "x": -16.0, "y": 0.16, "z": 4.0, "hx": 1, "hy": 0, "hz": -0.35, "flying": False},  # on the sill floor, hover 0.16
     {"id": "fly_b", "x": -12.0, "y": 3.0, "z": 2.0, "hx": 1, "hy": 0.1, "hz": 0.4, "flying": True},
@@ -120,7 +133,7 @@ def dump_parts(path):
     prefix = (f'DETAIL = {lua(args.detail)}\nSUN_ELEVATION_DEG = {args.elevation}\nSUN_AZIMUTH_DEG = {args.azimuth}\n'
               f'SPIDERS = {lua(spiders)}\nFLIES = {lua(FLIES)}\nWASPS = {lua(WASPS)}\nWORLD = {lua(args.world)}\n'
               f'LOOKS_AT = {lua([float(c) for c in args.looks_at.split(",")] if args.looks_at else False)}\nLINEUP = {lua(args.lineup)}\n'
-              f'PRESERVE = {lua(args.preserve)}\nPRESERVE_ALL = {lua(args.preserve_all)}\nHUT_OPEN = {lua(args.hut_open)}\n')
+              f'PRESERVE = {lua(args.preserve)}\nPRESERVE_ALL = {lua(args.preserve_all)}\nHUT_OPEN = {lua(args.hut_open)}\nCATS = {lua(CATS)}\n')
     with tempfile.NamedTemporaryFile("w", suffix=".luau", encoding="utf-8", delete=False, dir=out) as f:
         f.write(prefix + run.bundle(driver))
     try:
@@ -422,6 +435,23 @@ VIEWS.update({
     "pb_feeder": {"fov": 60, "eye": [-112.0, -76.0, -126.0], "at": [-150.0, -82.0, -160.0], "near": 0.05, "far": 14000, "groups": ["feeder"], "shadow": 120},
     "pb_caddy": {"fov": 55, "eye": [40.0, -50.0, 185.0], "at": [79.0, -58.0, 237.0], "near": 0.1, "far": 14000, "groups": [], "shadow": 200},
     "pb_path_wide": {"fov": 62, "eye": [330.0, -40.0, 330.0], "at": [240.0, -84.0, 40.0], "near": 0.2, "far": 14000, "groups": ["path"], "shadow": 500},
+})
+# ROBLOX-118 (--preserve): the ceiling, the back room and the cat (with --cats). The back room is east of the hut through the doorway (x 175..445, z 12.5..255.5, its floor
+# y -70): from the floor at a spider's height by the doorway (rb_floor), from the sofa's west arm (rb_arm), the doorway from the hut (rb_doorway), the ceiling's north-west
+# corner with the house spider's web (rb_ceiling), the north face outside to the gutter (rb_eaves); the cat asleep on the sofa (cat_sofa), sitting at the window (cat_window),
+# walking in the hut (cat_walk), its face close as it watches (cat_face), crouched to pat (cat_swat), and on the chair (cat_chair).
+VIEWS.update({
+    "rb_floor": {"fov": 70, "eye": [200.0, -66.0, 92.0], "at": [400.0, -38.0, 170.0], "near": 0.1, "far": 14000, "groups": ["cats"], "shadow": 400},
+    "rb_arm": {"fov": 66, "eye": [236.0, 4.0, 196.0], "at": [330.0, -45.0, 40.0], "near": 0.1, "far": 14000, "groups": ["cats"], "shadow": 400},
+    "rb_doorway": {"fov": 64, "eye": [20.0, -40.0, 160.0], "at": [200.0, -45.0, 215.0], "near": 0.1, "far": 14000, "groups": ["cats"], "shadow": 400},
+    "rb_ceiling": {"fov": 60, "eye": [-112.0, 118.0, 48.0], "at": [-138.0, 140.0, 20.0], "near": 0.05, "far": 14000, "groups": [], "shadow": 300},
+    "rb_eaves": {"fov": 60, "eye": [160.0, 60.0, -170.0], "at": [60.0, 120.0, -40.0], "near": 0.1, "far": 14000, "groups": [], "shadow": 600},
+    "cat_sofa": {"fov": 50, "eye": [252.0, 8.0, 160.0], "at": [300.0, -18.0, 205.0], "near": 0.05, "far": 14000, "groups": ["cats"], "shadow": 120},
+    "cat_window": {"fov": 52, "eye": [385.0, 12.0, 104.0], "at": [440.0, 16.0, 134.0], "near": 0.05, "far": 14000, "groups": ["cats"], "shadow": 120},
+    "cat_walk": {"fov": 55, "eye": [108.0, -50.0, 246.0], "at": [60.0, -56.0, 200.0], "near": 0.05, "far": 14000, "groups": ["cats"], "shadow": 120},
+    "cat_face": {"fov": 45, "eye": [262.0, -38.0, 112.0], "at": [287.0, -40.0, 120.0], "near": 0.02, "far": 14000, "groups": ["cats"], "shadow": 60},
+    "cat_swat": {"fov": 55, "eye": [300.0, -55.0, 165.0], "at": [305.0, -60.0, 118.0], "near": 0.05, "far": 14000, "groups": ["cats"], "shadow": 120},
+    "cat_chair": {"fov": 52, "eye": [40.0, -5.0, 150.0], "at": [86.0, -18.0, 108.0], "near": 0.05, "far": 14000, "groups": ["cats"], "shadow": 120},
 })
 for _n, _dy in (("pb_lawn", -84.6), ("pb_leaf", -52.2), ("pb_path", -84.6), ("pb_feeder_game", -84.6)):
     VIEWS[_n]["eye"][1] += _dy

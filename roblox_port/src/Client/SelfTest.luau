@@ -24,6 +24,8 @@
 -- the hut's sill (its boxes whole, the Decor without the test garden's view, the hut's look held whole at the tier's detail) and the backdrop near and far (the
 -- looks planned at the sill hold the hut whole and the railway far; planned at the railway's crest, the railway whole and the hut back to its far look; then
 -- planned at the sill again, as they were) and the trains (a pass's cars drawn on the line). The lock is taken with a controller's L2 tap too (ROBLOX-115).
+-- ROBLOX-117: in the preserve also the garden's near detail (the patches drawn by the spider in the mulch within the budgets, the dew shown at dawn and gone by noon) and the
+-- garden's rival and mate (each put where it comes into the garden, the spider beside its cell: it walks there, in the garden; both put back after).
 -- Each Studio process writes its own log (%LOCALAPPDATA%\Roblox\logs); tools/studio/selftest.ps1 reads the newest for these lines.
 -- The CLI suite tests/selftest.luau runs the same checks against the real client on the shim's box world, with a host of its own (simulated frames and clock), so the run is
 -- proven to complete and print END before it ever reaches Studio. First run in Studio at v36 (33 of 34; the line failed, ROBLOX-111); ROBLOX-111's additions not yet.
@@ -35,6 +37,9 @@ local WorldMap = require(Shared:WaitForChild("World"):WaitForChild("WorldMap"))
 local Region = require(Shared:WaitForChild("World"):WaitForChild("Region"))
 local Preserve = require(Shared:WaitForChild("World"):WaitForChild("Preserve"))
 local Species = require(Shared:WaitForChild("Data"):WaitForChild("Species"))
+local LookPlan = require(Shared:WaitForChild("World"):WaitForChild("LookPlan"))
+local RivalSpider = require(Shared:WaitForChild("Predator"):WaitForChild("RivalSpider"))
+local Mate = require(Shared:WaitForChild("Predator"):WaitForChild("Mate"))
 local BugBodies = require(script.Parent.BugBodies)
 
 local SelfTest = {}
@@ -815,6 +820,97 @@ local function checks(): { Check }
 			need(folder ~= nil, "no Bugs folder in the workspace")
 			for _, w in a1.bugs.lice do need((folder :: Instance):FindFirstChild(w.id) ~= nil, `woodlouse {w.id} is not drawn`) end
 			say(r, `INFO the hut garden: {byKind.fungus_gnat} gnats and {byKind.aphid} aphids on the milkweed with a ladybird, {#d4.kinds.leafhopper.flies} leafhoppers on the goldenrod, {#d3.kinds.springtail.flies} springtails in the mulch, {#a1.bugs.lice} woodlice by the trough, all drawn`)
+		end)
+
+		-- ROBLOX-117: the garden's near detail where the spider is (the patches: blades, chips, stones, the morning's dew), within the budgets at the client's tier
+		add("the garden's near detail", function(r)
+			local ctx = r.ctx
+			local world = ctx.world
+			local looks = world.looks
+			need(looks ~= nil, "no looks on this client")
+			local at = Vector3.new(22, -74.6 + HEIGHT, -246) -- (in the pollinator bed's mulch by the milkweed)
+			need(holdUntilReady(r, "garden_c3", at, nil), "garden_c3 is not whole")
+			put(r, at, nil, Vector3.new(1, 0, -0.3).Unit)
+			pause(r, 1.5)
+			looks:finish()
+			local n, parts = 0, 0
+			for id, level in looks.plan do
+				if string.find(id, "~", 1, true) ~= nil then
+					n += 1
+					parts += LookPlan.count(LookPlan.lookup(WorldMap, id) :: any, level, looks.tier)
+				end
+			end
+			local held = looks:parts()
+			need(n > 0, "no patches drawn by the spider in the mulch")
+			need(parts <= LookPlan.PATCH_SHARE[looks.tier] and held <= LookPlan.BUDGET[looks.tier], `{parts} parts of patches and {held} of looks, over the budget at {looks.tier}`)
+			-- the morning's dew on them: shown at dawn, gone by noon
+			local life = ctx.life
+			local hour = life.clock.hour
+			local drops, shown = 0, 0
+			local ok, err = pcall(function()
+				local function count(): (number, number)
+					local d, v = 0, 0
+					for _, part in looks.folder:GetDescendants() do
+						if part:IsA("BasePart") and part:GetAttribute("Lag") ~= nil then
+							d += 1
+							if part.Transparency < 1 then v += 1 end
+						end
+					end
+					return d, v
+				end
+				life.clock.hour = 6
+				pause(r, 0.5)
+				drops, shown = count()
+				if looks.tier == "full" then need(drops > 0 and shown > 0, `no dew at dawn ({drops} drops, {shown} shown)`) end
+				life.clock.hour = 12
+				pause(r, 0.5)
+				local _, noon = count()
+				need(noon == 0, `dew still shown at noon ({noon})`)
+			end)
+			life.clock.hour = hour
+			if not ok then error(err, 0) end
+			say(r, `INFO the garden's near detail: {n} patches, {parts} parts of them, {held} parts of looks at {looks.tier}; dew at dawn on {shown} of {drops} drops`)
+		end)
+
+		-- ROBLOX-117: the rival and the mate come into the hut garden and roam it (never the hut): each put where it comes in, the spider beside its cell, a few seconds
+		add("the garden's rival and mate", function(r)
+			local ctx = r.ctx
+			local life, world = ctx.life, ctx.world
+			need(life.rival ~= nil, "no rival in this life")
+			local saved = table.clone(life.rival)
+			local savedMate = life.mate
+			local ok, err = pcall(function()
+				RivalSpider.renew(life.rival)
+				local at, region = RivalSpider.arriveAt()
+				need(region ~= nil and life.rival.region == region and string.sub(region :: string, 1, 7) == "garden_", `the rival comes in at {tostring(region)}`)
+				life.rival.state = "patrol"
+				local spot = Vector3.new(10, -74.6 + HEIGHT, -340) -- (in garden_d3, the mulch by the bee balm, beside the rival's cell)
+				need(holdUntilReady(r, "garden_d3", spot, nil) and holdUntilReady(r, region :: string, at, nil), "the cells are not whole")
+				put(r, spot, nil)
+				pause(r, 4)
+				local p = life.rival.position
+				local here = WorldMap.at(p)
+				need(life.rival.region ~= nil and string.sub(life.rival.region, 1, 7) == "garden_" and here ~= nil and string.sub(here.id, 1, 7) == "garden_",
+					`the rival is not in the garden (at {fmt(p)}, {tostring(life.rival.region)})`)
+				need(world:creatureLive(life.rival.region), "the rival's cell is not in play beside the spider")
+				local moved = (p - at).Magnitude
+				-- the mate
+				local mate = Mate.new()
+				local mat, mregion = Mate.arriveAt()
+				mate.state = "wander"
+				life.mate = mate
+				need(holdUntilReady(r, mregion :: string, mat, nil), "the mate's cell is not whole")
+				put(r, Vector3.new(150, -84.6 + HEIGHT, -130), nil) -- (on the lawn in the mate's own cell, well away from where it comes in)
+				pause(r, 4)
+				local mp = life.mate and life.mate.position or mat
+				local mhere = WorldMap.at(mp)
+				need(life.mate ~= nil and life.mate.region ~= nil and mhere ~= nil and string.sub(mhere.id, 1, 7) == "garden_", `the mate is not in the garden (at {fmt(mp)})`)
+				say(r, `INFO the garden's rival and mate: the rival came in at {region} and walked {string.format("%.1f", moved)} studs, in {life.rival.region}; the mate came in at {mregion}, in {life.mate.region}`)
+			end)
+			for k in life.rival do life.rival[k] = nil end
+			for k, v in saved do life.rival[k] = v end
+			life.mate = savedMate
+			if not ok then error(err, 0) end
 		end)
 
 		add("the hut's homes", function(r)

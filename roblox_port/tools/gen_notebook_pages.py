@@ -150,6 +150,15 @@ CRANE_FLIES = {
   "Layton, B. (2019). Crane Fly. Bug's Eye View 5(5), Mississippi State University Extension.",
   "Jackson, R. R. (1977). Prey of the jumping spider Phidippus johnsoni (Araneae: Salticidae). Journal of Arachnology 5: 145-149."]}
 
+# ROBLOX-117: the hoverfly of the hut garden's flowers, opened by the first close look at one. Sources opened this round (docs/NOTEBOOK_SOURCES.md).
+HOVERFLIES = {
+ 'id':'hoverflies','trigger':'look_hoverfly','title':'Hoverflies: a fly dressed as a bee',
+ 'text':"Hoverflies, or flower flies (Syrphidae), are flies that look like bees or wasps, many with black and yellow stripes across the abdomen; they mimic them as protection from predators. They do not bite or sting. Tell one from a bee by its single pair of wings, its large eyes and short antennae. The adults hover over flowers and dart about, feeding on nectar and pollen. Their larvae hunt aphids: one can eat up to 400 of them.",
+ 'game':"Here a hoverfly is a housefly meal and a half that struggles like one. It holds still in the air a moment over the flowers and then darts on; the hovers, the darts and the meal are the game's numbers.",
+ 'sources':[
+  "University of Wisconsin-Madison Extension, Division of Horticulture (undated, read 2026). Hover, Flower, or Syrphid Flies, Syrphidae.",
+  "University of Minnesota Extension (undated, read 2026). Syrphid flies. Beneficial insects."]}
+
 # ROBLOX-105 (W3b part B): the garden's ambient bugs, one page each, opened by the first close look at one (NotebookWatch: one of the view's bugs of the kind,
 # out in the open, within lookWu of the spider). Every sentence rests on a source opened for it; docs/NOTEBOOK_SOURCES.md says which supports which.
 LADYBIRDS = {
@@ -185,7 +194,7 @@ HARVESTMEN = {
 
 # The Roblox game's own pages, after Godot's, in this order: each carries its id, trigger, title, text, "In this game" line and sources, and docs/NOTEBOOK_SOURCES.md
 # says how far each source was checked (ROBLOX-96 adds the ground-life page: the bed's gnats, aphids and woodlice, opened by the first step onto a garden bed).
-ROBLOX_PAGES = [PEACOCK, ANTMIMIC, MATING, TARANTULA, GROUND_LIFE, SPRINGTAILS, LEAFHOPPERS, MOTHS, CRANE_FLIES, LADYBIRDS, MILLIPEDES, SNAILS, HARVESTMEN]
+ROBLOX_PAGES = [PEACOCK, ANTMIMIC, MATING, TARANTULA, GROUND_LIFE, SPRINGTAILS, LEAFHOPPERS, MOTHS, CRANE_FLIES, LADYBIRDS, MILLIPEDES, SNAILS, HARVESTMEN, HOVERFLIES]
 
 def lua_str(s):
     return '"' + s.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n") + '"'
@@ -217,7 +226,7 @@ def main():
                 "fly_recognised", "catch", "meal", "felt", "buzz", "rest", "sleep", "hungry", "well_fed",
                 "moult_ready", "moulted", "adult", "wasp", "wasp_escaped", "wasp_caught", "starving", "dance", "antennae", "hatched", "tarantula", "garden_bed",
                 "look_springtail", "look_leafhopper", "look_moth", "look_crane_fly",
-                "look_ladybird", "look_millipede", "look_snail", "look_harvestman"]
+                "look_ladybird", "look_millipede", "look_snail", "look_harvestman", "look_hoverfly"]
     out += ["\t" + lua_str(t) + "," for t in triggers]
     out += [
         "}",
@@ -238,7 +247,7 @@ def main():
         "NotebookPages.lookWu = 4.0",
         "-- ROBLOX-105: the ambient bugs' close looks too (NotebookWatch: one of the view's bugs of the kind, out in the open, within lookWu).",
         "NotebookPages.looks = { springtail = \"look_springtail\", leafhopper = \"look_leafhopper\", moth = \"look_moth\", crane_fly = \"look_crane_fly\",",
-        "\tladybird = \"look_ladybird\", millipede = \"look_millipede\", snail = \"look_snail\", harvestman = \"look_harvestman\" } :: { [string]: string }",
+        "\tladybird = \"look_ladybird\", millipede = \"look_millipede\", snail = \"look_snail\", harvestman = \"look_harvestman\", hoverfly = \"look_hoverfly\" } :: { [string]: string }",
         "",
         "NotebookPages.pages = {",
     ]

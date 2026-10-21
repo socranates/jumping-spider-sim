@@ -557,5 +557,110 @@ case("the rival walks along the back wall's foot past the open sash and never go
 	check(inSash == 0 and behind == 0, `never in the sash ({inSash} ticks) nor through the frame ({behind})`)
 end)
 
+-- ---------------------------------------------------------------- ROBLOX-117: the rival and the mate in the preserve's hut garden
+case("the preserve: the rival arrives in the hut garden and roams its cells across their seams, never the hut, never a retreat; the mate too", function()
+	local Hut = require("../src/Shared/World/Hut")
+	local Mate = require("../src/Shared/Predator/Mate")
+	local MateDrive = require("../src/Shared/Predator/MateDrive")
+	WorldMap.use("preserve")
+	local ok, err = pcall(function()
+		-- the garden's boxes and what stands round it, as a box world
+		local pieces = {}
+		for _, r in WorldMap.regions() do
+			if Hut.ROAM[r.id] or r.kind == "garden_pole" or r.id == "hut_bench" or r.id == "hut_butt" or r.kind == "hut_wall" or r.id == "path_e6" then
+				for _, p in Region.pieces(r) do table.insert(pieces, p) end
+			end
+		end
+		local garden = BoxWorld.folder("NavGarden", pieces)
+		local list = {}
+		for id in Hut.ROAM do table.insert(list, WorldMap.region(id)) end
+		local lo, hi = WorldMap.unionOf(list :: any)
+		local function motorAt(at: Vector3): any
+			return Motor.new({ world = garden, surfaces = Surfaces, profile = Species.phidippus_audax_prototype, spawn = at, heading = Vector3.new(-1, 0, 0),
+				boundsMin = lo, boundsMax = hi, probeParent = garden })
+		end
+		local r = Rival.new()
+		check(r.region == "garden_d2" and (r.position - Hut.CREATURES.rival.at).Magnitude < 1e-6 and Rival.roam() == Hut.ROAM, "a preserve rival arrives on the garden's path, its region kept")
+		check(Rival.valid(r) and not Rival.misplaced(r), "and its record is good and of this world")
+		local m = motorAt(r.position)
+		local d = Drive.new(m, function() return true end, r.region, Rival.roam())
+		r.state = "patrol"
+		m:place(r.position, Vector3.yAxis, Vector3.new(-1, 0, 0))
+		r.position, r.previous, r.origin = m.pos, m.pos, m.pos
+		d.prevState = "patrol"
+		local s = snapshot()
+		s.position, s.previous, s.seed = Vector3.new(0, 0.31, 0), Vector3.new(0, 0.31, 0), 914 -- (the spider on the sill, in the hut: the rival never sees it)
+		local visited: { [string]: boolean } = { [r.region] = true }
+		local inHut, inRetreat, outside, mismatch, n = 0, 0, 0, 0, 0
+		for _ = 1, 60 * 900 do
+			Drive.update(d, r, DT, s)
+			local p = d.motor.pos
+			local here = WorldMap.at(p)
+			if here ~= nil and Hut.knows(here.kind) and not Hut.ROAM[here.id] and here.kind ~= "garden_pole" then inHut += 1 end
+			if WorldMap.inRetreat(p) ~= nil then inRetreat += 1 end
+			if p.X < lo.X - 0.5 or p.X > hi.X + 0.5 or p.Z < lo.Z - 0.5 or p.Z > hi.Z + 0.5 then outside += 1 end
+			if here ~= nil and here.id ~= r.region and not WorldMap.inBounds(p, r.region) then mismatch += 1 end
+			visited[r.region] = true
+		end
+		for _ in visited do n += 1 end
+		print(`RIVALNAV the preserve: the rival in 15 minutes crossed {d.stats.crossings or 0} seams and walked {n} of the garden's 16 cells; {d.stats.arrivals} places reached`)
+		check((d.stats.crossings or 0) >= 2 and n >= 3, `it crosses from cell to cell ({d.stats.crossings or 0} crossings, {n} cells)`)
+		check(inHut == 0 and inRetreat == 0 and outside == 0, `never in the hut ({inHut} ticks), a retreat ({inRetreat}) or out of the garden ({outside})`)
+		check(mismatch < 60 * 5, `its record's region is the one it stands in (out of it {mismatch} ticks, crossing)`)
+		check(Rival.valid(r), "its record after a walk is good")
+		-- the stalk follows the spider over a seam: the spider stands in the cell beside it, seen
+		local start = Vector3.new(40, Hut.GROUND + 0.31, -121)
+		local seen = Drive.new(motorAt(start), function() return nil end, "garden_b3", Rival.roam())
+		local r2 = Rival.new()
+		r2.state = "stalk"
+		local other = WorldMap.region("garden_a3")
+		local target = Vector3.new(40, Hut.GROUND + 0.31, -114.5)
+		seen.motor:place(start, Vector3.yAxis, Vector3.zAxis)
+		r2.position, r2.previous, r2.up, r2.heading, r2.origin, r2.region = seen.motor.pos, seen.motor.pos, seen.motor.up, Vector3.zAxis, seen.motor.pos, "garden_b3"
+		seen.prevState = "stalk"
+		local s2 = snapshot()
+		s2.position, s2.previous, s2.seed = target, target, 914
+		local crossed = false
+		for _ = 1, 60 * 120 do
+			seen:update(r2, DT, s2)
+			if r2.region == (other :: WorldMap.Region).id then crossed = true; break end
+		end
+		check(crossed, "a stalk goes over the seam after the spider (garden_b3 to garden_a3)")
+		-- the mate: arrives where it comes in from the path round the east end, roams, and its record keeps its region
+		local mate = Mate.new()
+		check(mate.region == "garden_b4" and (mate.position - Hut.CREATURES.mate.at).Magnitude < 1e-6 and (Mate.exitAt() - Hut.CREATURES.mate.exit).Magnitude < 1e-6,
+			"a preserve mate comes in on the garden's path from the east, and leaves the same way")
+		mate.state = "wander"
+		local md = MateDrive.new(motorAt(mate.position), function() return true end, mate.region, Mate.roam())
+		md.drive.motor:place(mate.position, Vector3.yAxis, Vector3.new(-1, 0, 0))
+		mate.position = md.drive.motor.pos
+		local mateCells: { [string]: boolean } = {}
+		local ms = snapshot()
+		ms.position, ms.seed = Vector3.new(0, 0.31, 0), 914
+		for _ = 1, 60 * 600 do
+			MateDrive.update(md, mate, DT, ms)
+			mateCells[mate.region] = true
+		end
+		local mc = 0
+		for _ in mateCells do mc += 1 end
+		check(mc >= 2 and Mate.valid(mate), `the mate roams the garden too ({mc} cells) and its record is good`)
+		-- another world's: a sill rival in the preserve is not here (a new one comes), and a preserve rival in the test garden
+		local old = Rival.new()
+		old.region = nil
+		old.position = Vector3.new(25, 0.31, 8)
+		check(Rival.misplaced(old) and Rival.valid(old), "a rival of the sill's kept in a rest is misplaced in the preserve (and a good record)")
+		WorldMap.use("test_garden")
+		check(Rival.misplaced(r) and Rival.valid(r) and not Rival.misplaced(Rival.new()) and Rival.new().region == nil, "a preserve rival is misplaced in the test garden, whose rivals have no region")
+		local renewed = table.clone(r)
+		renewed.state = "patrol"
+		Rival.step(renewed, DT, snapshot(), function() return nil end)
+		check(renewed.region == nil and (renewed.position - Rules.arriveAt).Magnitude < 0.1 and (renewed.contests or 0) == 0, `and a step there makes it the test garden's next rival, arriving at the sill's east end ({renewed.state})`)
+		local mm = Mate.new()
+		check(mm.region == nil and (mm.position - Vector3.new(26.0, 0.31, 3.0)).Magnitude < 1e-6, "the test garden's mate is as it was")
+	end)
+	WorldMap.use("test_garden")
+	if not ok then error(err) end
+end)
+
 print(`RIVALNAV passed={passed} failed={failed}`)
 if failed > 0 then error("RIVALNAV failed") end

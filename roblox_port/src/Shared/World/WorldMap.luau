@@ -371,7 +371,8 @@ end
 local AUTHORS: { [string]: (number) -> { Region } } = { test_garden = author, preserve = authorPreserve }
 
 -- Each world's map for the default seed, made once: its regions in priority order, by id, their union box, and its drawn zones.
-type Map = { regions: { Region }, byId: { [string]: Region }, lo: Vector3, hi: Vector3, drawn: { Region }, drawnById: { [string]: Region } }
+type Map = { regions: { Region }, byId: { [string]: Region }, lo: Vector3, hi: Vector3, drawn: { Region }, drawnById: { [string]: Region },
+	patches: { Region }, patchById: { [string]: Region } }
 local MAPS: { [string]: Map } = {}
 for _, id in Worlds.IDS do
 	local list = table.freeze(AUTHORS[id](WorldMap.SEED))
@@ -381,7 +382,11 @@ for _, id in Worlds.IDS do
 	local drawnById: { [string]: Region } = {}
 	for _, r in drawn do drawnById[r.id] = r end
 	local lo, hi = WorldMap.unionOf(list)
-	MAPS[id] = { regions = list, byId = byId, lo = lo, hi = hi, drawn = drawn, drawnById = drawnById }
+	-- (ROBLOX-117) the patches: the near detail of the preserve's garden and path, drawn-only looks of their own (World/Hut.patches); none in the test garden
+	local patches: { Region } = table.freeze(if id == Worlds.PRESERVE then Hut.patches(list :: any, WorldMap.SEED, WorldMap.seed) :: any else {}) :: any
+	local patchById: { [string]: Region } = {}
+	for _, r in patches do patchById[r.id] = r end
+	MAPS[id] = { regions = list, byId = byId, lo = lo, hi = hi, drawn = drawn, drawnById = drawnById, patches = patches, patchById = patchById }
 end
 
 -- The active world (World/Worlds' default until `use` says otherwise) and its map.
@@ -493,6 +498,15 @@ end
 -- The drawn zone with this id in the active world, or nil.
 function WorldMap.drawnZone(id: string): Region?
 	return MAPS[ACTIVE].drawnById[id]
+end
+
+-- (ROBLOX-117) The active world's patches (the near detail of the preserve's hut garden and path: World/Hut.patches, region-shaped records of kind "patch"; none in
+-- the test garden), and one by id. Not on the map: no point is in one; World/LookPlan draws them only near the spider.
+function WorldMap.patches(): { Region }
+	return MAPS[ACTIVE].patches
+end
+function WorldMap.patch(id: string): Region?
+	return MAPS[ACTIVE].patchById[id]
 end
 
 return table.freeze(WorldMap)

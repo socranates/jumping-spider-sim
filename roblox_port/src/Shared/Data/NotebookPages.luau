@@ -52,6 +52,7 @@ NotebookPages.triggers = {
 	"look_millipede",
 	"look_snail",
 	"look_harvestman",
+	"look_hoverfly",
 }
 
 -- The reserve at or under hungryAt is "hungry"; at or over wellFedAt, "well fed" (LIFE_DESIGN.md round 1).
@@ -70,7 +71,7 @@ NotebookPages.noteSeconds = 6.0
 NotebookPages.lookWu = 4.0
 -- ROBLOX-105: the ambient bugs' close looks too (NotebookWatch: one of the view's bugs of the kind, out in the open, within lookWu).
 NotebookPages.looks = { springtail = "look_springtail", leafhopper = "look_leafhopper", moth = "look_moth", crane_fly = "look_crane_fly",
-	ladybird = "look_ladybird", millipede = "look_millipede", snail = "look_snail", harvestman = "look_harvestman" } :: { [string]: string }
+	ladybird = "look_ladybird", millipede = "look_millipede", snail = "look_snail", harvestman = "look_harvestman", hoverfly = "look_hoverfly" } :: { [string]: string }
 
 NotebookPages.pages = {
 	{
@@ -491,6 +492,17 @@ NotebookPages.pages = {
 		sources = {
 			"University of Kentucky Entomology (undated, read 2026). Kentucky Harvestmen. Kentucky Critter Files.",
 			"Missouri Department of Conservation (undated, read 2026). Daddy Longlegs (Harvestmen). Missouri Field Guide, mdc.mo.gov.",
+		},
+	},
+	{
+		id = "hoverflies",
+		trigger = "look_hoverfly",
+		title = "Hoverflies: a fly dressed as a bee",
+		text = "Hoverflies, or flower flies (Syrphidae), are flies that look like bees or wasps, many with black and yellow stripes across the abdomen; they mimic them as protection from predators. They do not bite or sting. Tell one from a bee by its single pair of wings, its large eyes and short antennae. The adults hover over flowers and dart about, feeding on nectar and pollen. Their larvae hunt aphids: one can eat up to 400 of them.",
+		game = "Here a hoverfly is a housefly meal and a half that struggles like one. It holds still in the air a moment over the flowers and then darts on; the hovers, the darts and the meal are the game's numbers.",
+		sources = {
+			"University of Wisconsin-Madison Extension, Division of Horticulture (undated, read 2026). Hover, Flower, or Syrphid Flies, Syrphidae.",
+			"University of Minnesota Extension (undated, read 2026). Syrphid flies. Beneficial insects.",
 		},
 	},
 } :: { Page }

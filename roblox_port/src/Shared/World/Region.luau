@@ -36,7 +36,7 @@ Region.SASH_MAX = Vector3.new(8.3, 6.3, -12.45)
 -- The physical boxes of the region.
 function Region.pieces(region: WorldMap.Region): { Layout.Piece }
 	if region.kind == "sill" then return Layout.PIECES end
-	if region.kind == "backdrop" then return {} end -- (ROBLOX-115: the preserve's backdrop has no boxes)
+	if region.kind == "backdrop" or region.kind == "patch" then return {} end -- (ROBLOX-115: the preserve's backdrop has no boxes; ROBLOX-117: nor a patch)
 	if Hut.knows(region.kind) then return Hut.pieces(region :: any) :: any end -- (ROBLOX-116: the ranger hut and its garden, World/Hut)
 	return Garden.pieces(region) :: any
 end
@@ -45,14 +45,14 @@ end
 function Region.decor(region: WorldMap.Region): { Drawn }
 	if region.kind == "sill" then return Layout.DECOR :: any end
 	if region.kind == "backdrop" then return PreserveLook.records(region.id, region.seed) :: any end -- (ROBLOX-115: a zone of the preserve's backdrop, World/PreserveLook)
-	if Hut.knows(region.kind) then return Hut.decor(region :: any) :: any end
+	if region.kind == "patch" or Hut.knows(region.kind) then return Hut.decor(region :: any) :: any end -- (ROBLOX-117: a patch is the hut garden's near detail)
 	return Garden.decor(region)
 end
 
 -- The ids of the region's pieces that its drawn look stands in for (they turn invisible, still solid, once the look exists). The sill's are decided by its Decor
 -- (Habitat/Scenery.decor's second result), so none here.
 function Region.drawnPieces(region: WorldMap.Region): { string }
-	if region.kind == "sill" or region.kind == "backdrop" then return {} end
+	if region.kind == "sill" or region.kind == "backdrop" or region.kind == "patch" then return {} end
 	if Hut.knows(region.kind) then return Hut.drawnPieces(region :: any) end
 	return Garden.drawnPieces(region)
 end
@@ -60,7 +60,7 @@ end
 -- Every piece of the region that some drawing may stand in for: its own look's (drawnPieces) and, on the outer sill, the window box's halves, which the sill's
 -- Decor draws (Habitat/Plants.garden). WorldBuild hides these when it is not told which drawings exist.
 function Region.replaceable(region: WorldMap.Region): { string }
-	if region.kind == "sill" or region.kind == "backdrop" then return {} end
+	if region.kind == "sill" or region.kind == "backdrop" or region.kind == "patch" then return {} end
 	if Hut.knows(region.kind) then return table.clone(Hut.drawnPieces(region :: any)) end
 	local out = table.clone(Garden.drawnPieces(region))
 	for _, id in Garden.drawnBySill(region) do table.insert(out, id) end
@@ -71,7 +71,7 @@ end
 -- other rules (Data/RivalRules), then the open sash; for the others, each retreat grown by half a stud. The retreats' boxes come first, in the retreats' order.
 function Region.keepOut(region: WorldMap.Region): { Box }
 	if region.kind == "sill" then return { { min = Rules.keepOutMin, max = Rules.keepOutMax }, { min = Region.SASH_MIN, max = Region.SASH_MAX } } end
-	if region.kind == "backdrop" then return {} end
+	if region.kind == "backdrop" or region.kind == "patch" then return {} end
 	if Hut.knows(region.kind) then return Hut.keepOut(region :: any) end
 	return Garden.keepOut(region)
 end
@@ -97,7 +97,7 @@ for kind, b in Hut.BUDGETS do BUDGETS[kind] = b end -- (ROBLOX-116: the hut's an
 
 -- Whether a region of this kind has a drawn look the looks stream (World/LookPlan, Client/LookStream): the garden's kinds and (ROBLOX-115) the preserve's backdrop.
 function Region.streamed(kind: string): boolean
-	return kind == "backdrop" or Garden.knows(kind) or Hut.knows(kind)
+	return kind == "backdrop" or kind == "patch" or Garden.knows(kind) or Hut.knows(kind)
 end
 
 -- (ROBLOX-115: a zone of the preserve's backdrop has its ceilings in World/PreserveLook.BUDGETS, by zone; its kind has none here.)

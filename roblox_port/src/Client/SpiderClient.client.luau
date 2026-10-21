@@ -1712,13 +1712,18 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
              seed=914, -- the world's seed, as the prey's and the wasp's: the rival's contest draws from it (ROBLOX-73)
              noticeScale=M.nature.cover,nature=not needs.gentle, -- (ROBLOX-106: cover, and the watch by the crack)
             }
-            local rivalEvent,rivalFood=RivalSpider.step(life.rival,DT,rivalState,sightCast)
+            -- (ROBLOX-117: in the preserve the rival roams the hut garden, and is simulated only while the spider is in its region or beside it, its boxes there)
+            local rivalEvent,rivalFood="",0
+            if M.World:creatureLive(life.rival.region) or not (life.rival.state=="patrol" or life.rival.state=="stalk" or life.rival.state=="windup" or life.rival.state=="lunge" or life.rival.state=="recover") then
+             rivalEvent,rivalFood=RivalSpider.step(life.rival,DT,rivalState,sightCast)
+            end
             if life.rival.state~="dormant" and life.rival.state~="consumed" and rivalLegs.drive==nil then
+             rivalLegs.range={M.World:rangeOf(RivalSpider.roam())}
              rivalLegs.drive=rivalLegs.Drive.new(SpiderMotor.new({
               world = M.World.root, surfaces = Surfaces, profile = Species.phidippus_audax_prototype,
               spawn = life.rival.position, heading = life.rival.heading,
-              boundsMin = M.World.homeMin, boundsMax = M.World.homeMax, probeParent = arc, -- (ROBLOX-95: bound to the sill, its bounds)
-             }),sightCast,M.World.home)
+              boundsMin = rivalLegs.range[1], boundsMax = rivalLegs.range[2], probeParent = arc, -- (ROBLOX-95: bound to the sill, its bounds; ROBLOX-117: the hut garden's in the preserve)
+             }),sightCast,life.rival.region or M.World.home,RivalSpider.roam())
              rivalLegs.drive.camps=true -- (ROBLOX-106: in Normal a patrol leg may be a watch by the crack)
             end
             -- A caught rival fights the tapping grip before it can be eaten (ROBLOX-77); it is subdued, or it tears free and recovers (never a harm).
@@ -1727,7 +1732,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
             })
             if gripEvent=="subdued" then life:showNotice(rivalLegs.Text.SUBDUED)
             elseif gripEvent=="tore" then life:showNotice(rivalLegs.Text.tore(needs.gentle)) end
-            if rivalLegs.drive then rivalLegs.drive:update(life.rival,DT,rivalState) end
+            if rivalLegs.drive and M.World:creatureLive(life.rival.region) then rivalLegs.drive:update(life.rival,DT,rivalState) end
             if rivalFood>0 and rivalEvent~="counter" then -- (a counter-bite's number is what it costs, not what was eaten)
              needs:grantEnergy(rivalFood,"rival_spider_meal")
              life.mealFood+=Growth.rivalCredit(rivalFood)
@@ -1750,16 +1755,18 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
              if mateLegs.couple.active and wasp:isVisiting() then mateLegs.skip(true) end -- (the controls are the player's again the moment the wasp comes)
              ms.rivalThreat=life.rival.state=="windup" or life.rival.state=="lunge" -- (a scene would not start under a lunge: Mating.tick skips it at once)
              ms.nature=ms.nature==true and mateLegs.Rules.game.on==true;ms.rival=RivalSpider.target(life.rival) -- (ROBLOX-106: courtship can fail, the rival can cut in)
+             if mateLegs.drive~=nil and life.mate~=nil and not M.World:creatureLive(life.mate.region) then mateLegs.drive.sees=false end -- (ROBLOX-117: a mate out of play sees nothing)
              for _,e in mateLegs.Mating.tick(life,DT,ms) do mateLegs.event(e,ms) end
              local mate=life.mate
              if mate~=nil and mate.state~="away" and mateLegs.drive==nil then
+              mateLegs.range={M.World:rangeOf(mateLegs.Mate.roam())}
               mateLegs.drive=mateLegs.Drive.new(SpiderMotor.new({
                world = M.World.root, surfaces = Surfaces, profile = Species.phidippus_audax_prototype,
                spawn = mate.position, heading = mate.heading,
-               boundsMin = M.World.homeMin, boundsMax = M.World.homeMax, probeParent = arc, -- (ROBLOX-95: bound to the sill, its bounds)
-              }),sightCast,M.World.home)
+               boundsMin = mateLegs.range[1], boundsMax = mateLegs.range[2], probeParent = arc, -- (ROBLOX-95: bound to the sill, its bounds; ROBLOX-117: the hut garden's in the preserve)
+              }),sightCast,mate.region or M.World.home,mateLegs.Mate.roam())
              end
-             if mateLegs.drive~=nil and mate~=nil then mateLegs.drive:update(mate,DT,ms) end
+             if mateLegs.drive~=nil and mate~=nil and M.World:creatureLive(mate.region) then mateLegs.drive:update(mate,DT,ms) end
              -- A record restored into the hatching (or a brood out while nothing is playing) goes straight to the ending.
              if life.mating~=nil and life.mating.stage=="hatched" and mateLegs.phase=="" and not panel:isShowing() then mateLegs.begin(false) end
             end

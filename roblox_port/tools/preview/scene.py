@@ -29,6 +29,9 @@ intro_sill, intro_out (the intro of a new life, each shot's middle frame), from 
 (docs/STORE_PAGE.md: the icon's composition, square, and a thumbnail of the same moment).
 With --lineup (ROBLOX-114): lineup_small, lineup_spiders, lineup_bugs, lineup_big (every creature on a ruler of 1 cm ticks far off at x 400; what each measures
 as drawn goes to <prefix>lineup.txt); with --world: house_eye and garden_eye (the house and the garden from a person's eyes, 1.6 m over the lawn, a normal lens).
+With --preserve and --looks-at where the spider is (ROBLOX-117): pb_lawn, pb_leaf, pb_path, pb_feeder_game (the game camera on the lawn, a milkweed leaf, the path round the
+east end, the feeder's foot), pb_eye_mulch and pb_eye_lawn (the spider's own eye), pb_bed (the bed from 30 cm up), pb_feeder, pb_caddy (the compost caddy by the door),
+pb_path_wide; with --world: spec_hoverfly and spec_hoverfly_air on the tray.
 --parts renders an already dumped part list (for example the "before" list kept next to the images) instead of running the code."""
 import argparse, importlib.util, json, math, pathlib, subprocess, sys, tempfile
 
@@ -76,6 +79,11 @@ HUT_SPIDERS = [
     {"name": "floor", "x": 10.0, "y": -69.69, "z": 60.0, "hx": 0, "hz": -1},
     {"name": "bench", "x": -10.0, "y": -39.69, "z": -40.0, "hx": 0, "hz": -1},
     {"name": "garden", "x": 22.0, "y": -74.29, "z": -246.0, "hx": 1, "hz": -0.3},
+    # ROBLOX-117: on the lawn by the stone, on the milkweed's first leaf, on the path round the east end, at the feeder's foot
+    {"name": "lawn", "x": 30.0, "y": -84.29, "z": -120.0, "hx": 0.3, "hz": -1},
+    {"name": "leaf", "x": 60.0, "y": -51.89, "z": -266.0, "hx": 1, "hz": 0},
+    {"name": "path", "x": 265.0, "y": -84.29, "z": 60.0, "hx": 0, "hz": -1},
+    {"name": "feeder", "x": -128.0, "y": -84.29, "z": -170.0, "hx": -1, "hz": 0.4},
 ]
 FLIES = [
     {"id": "fly_a", "x": -16.0, "y": 0.16, "z": 4.0, "hx": 1, "hy": 0, "hz": -0.35, "flying": False},  # on the sill floor, hover 0.16
@@ -233,6 +241,8 @@ VIEWS = {
     "spec_moth_air": {"fov": 30, "eye": [209.5, 2.6, -3.0], "at": [208.0, 1.16, -5.0], "near": 0.02, "far": 600, "groups": ["flies"], "shadow": 6},
     "spec_crane_fly": {"fov": 40, "eye": [220.0, 4.0, 5.0], "at": [216.0, 0.2, -0.3], "near": 0.02, "far": 600, "groups": ["flies"], "shadow": 12},
     "spec_crane_fly_shed": {"fov": 40, "eye": [228.0, 4.0, 5.0], "at": [224.0, 0.2, -0.3], "near": 0.02, "far": 600, "groups": ["flies"], "shadow": 12},
+    "spec_hoverfly": {"fov": 30, "eye": [229.6, 1.5, 1.6], "at": [228.0, 0.2, 0.0], "near": 0.02, "far": 600, "groups": ["flies"], "shadow": 8},  # ROBLOX-117
+    "spec_hoverfly_air": {"fov": 30, "eye": [229.8, 2.2, -3.0], "at": [228.0, 1.16, -5.0], "near": 0.02, "far": 600, "groups": ["flies"], "shadow": 8},
     "spec_crane_fly_air": {"fov": 40, "eye": [221.0, 3.5, 0.0], "at": [216.0, 2.0, -5.0], "near": 0.02, "far": 600, "groups": ["flies"], "shadow": 12},
     "world": {"fov": 60, "eye": [75.0, -15.0, -100.0], "at": [0.0, -55.0, -30.0], "near": 1.0, "far": 4000, "groups": [], "shadow": 220},
     # ROBLOX-103 (--world): the wall above the window, its eaves and gutter; the house from the lawn; the garden from the eaves; the bushes from the outer sill;
@@ -398,6 +408,24 @@ VIEWS.update({
     "hb_game_garden": {**game_camera(22.0, -246.0, 1, -0.3), "far": 14000, "groups": ["garden"], "shadow": 60},
     "hb_garden_top": {"fov": 58, "eye": [0.0, 560.0, -150.0], "at": [0.0, -85.0, -232.0], "near": 1.0, "far": 14000, "groups": [], "shadow": 1500},
 })
+# ROBLOX-117 (--preserve, with --looks-at where the spider is): the garden at the spider's eye. The game camera on the lawn by the stone (pb_lawn), on the milkweed's
+# first leaf (pb_leaf), in the mulch (hb_game_garden) and on the path round the east end (pb_path); the spider's own eye low in the mulch and in the grass (pb_eye_mulch,
+# pb_eye_lawn); the pollinator bed from 30 cm up (pb_bed); the feeder's foot (pb_feeder); the path round the east end from a person's knee (pb_path_wide).
+VIEWS.update({
+    "pb_lawn": {**game_camera(30.0, -120.0, 0.3, -1), "far": 14000, "groups": ["lawn"], "shadow": 60},
+    "pb_leaf": {**game_camera(60.0, -266.0, 1, 0), "far": 14000, "groups": ["leaf"], "shadow": 60},
+    "pb_path": {**game_camera(265.0, 60.0, 0, -1), "far": 14000, "groups": ["path"], "shadow": 60},
+    "pb_feeder_game": {**game_camera(-128.0, -170.0, -1, 0.4), "far": 14000, "groups": ["feeder"], "shadow": 60},
+    "pb_eye_mulch": {"fov": 75, "eye": [22.5, -73.9, -246.2], "at": [60.0, -72.0, -258.0], "near": 0.02, "far": 14000, "groups": [], "shadow": 60},
+    "pb_eye_lawn": {"fov": 75, "eye": [30.2, -83.9, -120.6], "at": [40.0, -82.0, -150.0], "near": 0.02, "far": 14000, "groups": [], "shadow": 60},
+    "pb_bed": {"fov": 62, "eye": [-20.0, -54.6, -200.0], "at": [90.0, -70.0, -320.0], "near": 0.1, "far": 14000, "groups": ["garden", "leaf"], "shadow": 300},
+    "pb_feeder": {"fov": 60, "eye": [-112.0, -76.0, -126.0], "at": [-150.0, -82.0, -160.0], "near": 0.05, "far": 14000, "groups": ["feeder"], "shadow": 120},
+    "pb_caddy": {"fov": 55, "eye": [40.0, -50.0, 185.0], "at": [79.0, -58.0, 237.0], "near": 0.1, "far": 14000, "groups": [], "shadow": 200},
+    "pb_path_wide": {"fov": 62, "eye": [330.0, -40.0, 330.0], "at": [240.0, -84.0, 40.0], "near": 0.2, "far": 14000, "groups": ["path"], "shadow": 500},
+})
+for _n, _dy in (("pb_lawn", -84.6), ("pb_leaf", -52.2), ("pb_path", -84.6), ("pb_feeder_game", -84.6)):
+    VIEWS[_n]["eye"][1] += _dy
+    VIEWS[_n]["at"][1] += _dy
 # (the game camera's pivot is 0.31 over a support at y 0; on the desk and the mulch the support is higher)
 VIEWS["hb_game_desk"]["eye"][1] += 4.0
 VIEWS["hb_game_desk"]["at"][1] += 4.0

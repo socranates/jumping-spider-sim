@@ -258,6 +258,34 @@ FlyLook.small.moth = {
 	motion = { gait = { stride = 0.28, swing = 0.25, lift = 0.25, settle = 8, jump = 0.6 }, kick = 5, antenna = { amp = 0.08, hz = 0.7 },
 		flap = { hz = 5, amp = 0.75 }, resettle = { seconds = 0.9, hz = 6, amp = 0.32 } },
 }
+-- ROBLOX-117: the hoverfly (Syrphidae) of the hut garden's flowers, drawn at its true size (about 1 cm long, as the spider): a fly dressed as a bee, its abdomen banded
+-- black and yellow, big red-brown eyes, short antennae and one pair of clear wings (docs/NOTEBOOK_SOURCES.md, the hoverflies' page), the wings a blur in its hover.
+FlyLook.small.hoverfly = {
+	colors = { head = "2a2620", eye = "8a3a24", thorax = "3a3326", yellow = "e0b62a", black = "1f1c18", wing = "d8dde0", leg = "5a4a2e", antenna = "3a3020", shadow = "2a241c" },
+	body = {
+		{ name = "Head", color = "head", at = { 0, 0.0, -0.4 }, size = { 0.2, 0.16, 0.12 } },
+		{ name = "EyeL", color = "eye", at = { -0.07, 0.01, -0.41 }, size = { 0.1, 0.14, 0.1 } },
+		{ name = "EyeR", color = "eye", at = { 0.07, 0.01, -0.41 }, size = { 0.1, 0.14, 0.1 } },
+		{ name = "Thorax", color = "thorax", at = { 0, 0.02, -0.22 }, size = { 0.22, 0.2, 0.26 } },
+		{ name = "Abdomen", color = "black", at = { 0, -0.01, 0.12 }, size = { 0.24, 0.1, 0.48 } },
+		{ name = "Band1", color = "yellow", at = { 0, -0.008, -0.01 }, size = { 0.252, 0.106, 0.07 }, full = true },
+		{ name = "Band2", color = "yellow", at = { 0, -0.008, 0.11 }, size = { 0.252, 0.106, 0.075 } },
+		{ name = "Band3", color = "yellow", at = { 0, -0.008, 0.24 }, size = { 0.22, 0.09, 0.06 }, full = true },
+	} :: { any },
+	rods = {
+		{ name = "Antenna", color = "antenna", d = 0.012, from = { 0.02, 0.03, -0.46 }, to = { 0.04, 0.06, -0.52 }, mirror = true, full = true },
+		{ name = "FrontLeg", color = "leg", d = 0.018, from = { 0.05, -0.06, -0.27 }, to = { 0.12, -0.13, -0.33 }, fly = { { 0.05, -0.06, -0.27 }, { 0.06, -0.15, -0.25 } }, mirror = true, full = true },
+		{ name = "MiddleLeg", color = "leg", d = 0.018, from = { 0.06, -0.06, -0.2 }, to = { 0.15, -0.13, -0.17 }, fly = { { 0.06, -0.06, -0.2 }, { 0.07, -0.16, -0.16 } }, mirror = true, full = true },
+		{ name = "HindLeg", color = "leg", d = 0.018, from = { 0.05, -0.06, -0.12 }, to = { 0.14, -0.13, -0.02 }, fly = { { 0.05, -0.06, -0.12 }, { 0.06, -0.16, -0.05 } }, mirror = true },
+	} :: { any },
+	-- one pair of clear wings, held out over the abdomen at rest; a blur in the hover
+	wings = {
+		{ name = "Wing", color = "wing", material = "Glass", root = { 0.06, 0.07, -0.24 }, length = 0.62, width = 0.2, thick = 0.008, yaw = 28, pitch = 2, roll = 0,
+			transparency = 0.5, reflectance = 0.08, fan = { reach = 0.55, span = 0.4, roll = 6, yaw = 30, back = 0.02, rise = 0.02, transparency = 0.82 } },
+	} :: { any },
+	shadow = { size = { 0.4, 0.004, 0.9 }, lift = 0.003, transparency = 0.82, full = true },
+	motion = { gait = { stride = 0.25, swing = 0.25, lift = 0.25, settle = 10, jump = 0.6 }, kick = 6, antenna = { amp = 0.06, hz = 1.0 }, flap = { hz = 30, amp = 0.4 } },
+}
 -- (the crane fly's legs: hip, knee, ankle and foot of the right front, middle and hind leg, standing splayed and dangling in flight)
 local craneLegs = {
 	{ name = "Front", stand = { { 0.1, 0.08, -0.5 }, { 0.55, 0.75, -1.1 }, { 0.95, 0.25, -1.9 }, { 1.3, -0.16, -3.5 } }, fly = { { 0.1, 0.08, -0.5 }, { 0.35, -0.3, -0.4 }, { 0.5, -1.25, -0.1 }, { 0.6, -2.4, 0.3 } } },

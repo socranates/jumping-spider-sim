@@ -404,4 +404,41 @@ craneDusk.body.day = "crane_fly_prototype"
 craneDusk.behavior.restless_per_s = 0.07
 craneDusk.behavior.hysteresis = 0.05
 data.crane_fly_dusk_prototype = craneDusk
+-- ROBLOX-117: the hoverfly (Syrphidae) of the hut garden's flowers: a housefly meal and a half that struggles as a house fly does (catch_factor 1.0), a quick flier that
+-- holds still in the air over the flowers and darts on (Prey/PreyKinds.hover: body.hover, `every` seconds into a calm flight it holds for `hold` seconds, wavering
+-- `waver` studs), sees well and leaves early. Game values; the page says what is the source's.
+local hover = copy(data.fly_like_prototype)
+hover.body.nutrition = 0.35 * 1.5
+hover.body.visual_scale = 1.0
+hover.body.radius_wu = 0.45
+hover.body.capture_radius_wu = 0.6
+hover.body.prey_kind = "hoverfly"
+hover.body.catch_factor = 1.0
+hover.body.feed_rate_per_s = 0.1
+hover.body.hover = { hold = { 1.2, 3.5 }, waver = 0.12, chance = 0.85 }
+hover.senses.sight_range_wu = 10.0
+hover.senses.startle_range_wu = 4.0
+hover.flight.takeoff_accel_wu_s2 = 70.0
+hover.flight.flee_speed_wu_s = 9.0
+hover.flight.cruise_speed_wu_s = 6.0
+hover.flight.cruise_accel_wu_s2 = 40.0
+hover.flight.landing_speed_wu_s = 1.5
+hover.flight.turn_rate_deg_s = 900.0
+hover.flight.clearance_radius_wu = 0.2
+hover.flight.lift_wu = 2.0
+hover.flight.approach_wu = 1.0
+hover.flight.min_hop_wu = 3.0
+hover.flight.max_flight_wu = 30.0
+hover.flight.safe_distance_wu = 8.0
+hover.flight.perch_avoid_wu = 3.0
+hover.flight.open_escape_wu = 5.0
+hover.flight.home_in = true
+hover.flight.wander_local = true
+hover.behavior.restless_per_s = 0.02
+hover.behavior.reposition_max_wu = 30.0
+hover.behavior.wander_flight_chance = 0.9
+hover.behavior.wander_radius_wu = 0.6
+hover.population.replenish_delay_s = { 40.0, 90.0 }
+hover.population.entry_min_flight_wu = 4.0
+data.hoverfly_prototype = hover
 return table.freeze(data)

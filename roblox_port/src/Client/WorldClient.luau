@@ -193,6 +193,34 @@ function WorldClient.isActive(self: any, regionId: string): boolean
 	return self.region.id == regionId
 end
 
+-- (ROBLOX-117) Whether a creature in this region is simulated now: a region with no id (the sill's rival and mate, as they have always been) always; a region of the
+-- preserve's roam when the spider is in it or in a region that meets it, and its boxes have arrived (a creature walks only on what is streamed in; elsewhere it
+-- waits where it is until the spider comes near).
+function WorldClient.creatureLive(self: any, regionId: string?): boolean
+	if regionId == nil then return true end
+	local here = self.region
+	local near = here.id == regionId
+	if not near then
+		for _, n in here.neighbors do if n.id == regionId then near = true; break end end
+	end
+	if not near then return false end
+	if self.whole[regionId] then return true end
+	if self:regionReady(regionId) then self.whole[regionId] = true; return true end
+	return false
+end
+
+-- (ROBLOX-117) The box a creature's motor keeps to: the union of the roam's regions (the preserve's rival and mate walk the whole hut garden), else the sill's.
+function WorldClient.rangeOf(self: any, roam: { [string]: boolean }?): (Vector3, Vector3)
+	if roam == nil then return self.homeMin, self.homeMax end
+	local list = {}
+	for id in roam do
+		local r = self.map.region(id)
+		if r ~= nil then table.insert(list, r) end
+	end
+	if #list == 0 then return self.homeMin, self.homeMax end
+	return WorldMap.unionOf(list)
+end
+
 -- Points the player's replication focus at this part (the drawn spider's root), and remembers it. A write that raises is warned about once.
 function WorldClient.focus(self: any, part: Instance?)
 	self.focused = part
@@ -234,7 +262,12 @@ function WorldClient.update(self: any, pos: Vector3, root: Instance?, now: numbe
 	local clock = now or os.clock()
 	self:report(pos, clock)
 	FrameProfile.lap("world")
-	if self.looks ~= nil then self.looks:update(pos, self.region) end
+	if self.looks ~= nil then
+		self.looks:update(pos, self.region)
+		-- (ROBLOX-117: the morning's dew on the looks, by the life's hour)
+		local life = self.life
+		if life ~= nil and type(life.clock) == "table" and type(life.clock.hour) == "number" then self.looks:dew(life.clock.hour) end
+	end
 	if self.train ~= nil then self.train:update(clock) end
 	-- (ROBLOX-116: the hut's moment runs on the frames' own time when the client gives it, so it keeps the sim's pace; else on the clock)
 	self.hutClock = (self.hutClock or 0) + (if dt ~= nil then dt else 0)

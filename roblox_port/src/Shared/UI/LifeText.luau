@@ -188,6 +188,7 @@ LifeText.MEALS = {
 	leafhopper = { rule = "2 leafhoppers = 1 housefly", step = 2 },
 	moth = { rule = "1 moth = 1 housefly", step = 2 },
 	crane_fly = { rule = "1 crane fly = 2 houseflies", step = 2 },
+	hoverfly = { rule = "2 hoverflies = 3 houseflies", step = 2 }, -- (ROBLOX-117)
 } :: { [string]: { rule: string, step: number } }
 local DEFAULT_MEAL = { rule = "2 small prey = 1 housefly", step = 2 }
 

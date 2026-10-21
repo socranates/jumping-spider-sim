@@ -34,6 +34,15 @@
 --                     on two others in the mulch (garden_d3_mulch).
 --   garden_pole, garden_feeder .. the bird feeder's pole, climbable, in two regions split at 90 cm, and its tray, hopper and roof at 1.6 m; its seed spilled
 --                     on the lawn round its foot (garden_b1's look).
+-- ROBLOX-117 (Phase B round 2: the garden rich at the spider's eye, its life, the path round the east end):
+--   path_s1..path_e6 .. the gravel path round the hut's east end, from the door's gravel to the garden's path (Hut.WALK), 60 cm wide.
+--   the plants ......... a second milkweed, coneflower, bee balm and goldenrod (MORE_PLANTS), every plant drawn whole over its walkable boxes (the leaves as blades
+--                        with midribs, the umbels, rays and cone, whorled heads and arching plumes); the bed's mulch mottled and chipped in the cells' looks.
+--   the patches ........ each garden cell and length of path cut into patches of PATCH studs, drawn-only looks (kind "patch") of what the spider sees close: grass
+--                        blades at true size in tufts, seed heads and clover, layered shredded bark, leaf bits, twigs, seeds and soil, gravel stones, the husks and a
+--                        cardinal's feather under the feeder, petals under the flowers, and the morning's dew; World/LookPlan draws them only near the spider.
+--   the life ............ the hoverflies on the bed's flowers, the fruit flies at a compost caddy by the door, a moth at the desk lamp from dusk; and where the rival
+--                        and the mate come into the garden and the cells they roam (CREATURES, ROAM: never the hut).
 local Preserve = require(script.Parent.Preserve)
 
 local Hut = {}
@@ -48,6 +57,7 @@ export type Piece = { id: string, lo: Vector3, hi: Vector3, profile: string, col
 export type Drawn = {
 	id: string, size: Vector3, at: Vector3, color: Color3, transparency: number?,
 	material: string?, shape: string?, turn: Vector3?, full: boolean?, group: string?, shadow: boolean?, far: boolean?, reflectance: number?,
+	dew: number?, -- (ROBLOX-117: a dew drop's lag, Habitat/DayLight.applyDew; its `transparency` is the one it has at full dew)
 }
 export type Box = { min: Vector3, max: Vector3 }
 
@@ -97,6 +107,19 @@ Hut.PATH = table.freeze({ ew = { x0 = -90, x1 = 200, z0 = -196, z1 = -146 }, ns 
 -- on it); the hopper on its tray at the top under a little roof (the feeder's region).
 Hut.POLE = table.freeze({ x = -150, z = -150, half = 2, split = 90, top = 160, tray = { half = 8, thick = 2 }, hopper = { half = 5, h = 16 }, roof = { half = 9, thick = 2 } })
 Hut.SASH = table.freeze({ min = v(-8, 0.7, -13.5), max = v(8, 6, -12.5) }) -- the lower sash's gap (the sill's own opening, WindowsillLayout back_frame_*)
+-- (ROBLOX-117) The gravel path round the hut's east end: from the door's gravel (hut_door, x -60..60) east along the south wall's foot (z 287..347, the hut's base
+-- lip at 284..287 is the backdrop's), north past the east end 57 cm out from the logs (x 235..295), and west into the garden's own path at the core's edge (x 200,
+-- z -196..-146). 60 cm wide, fine gravel at true size (2 to 10 mm stones: the patches' look). Each region whole inside the streaming radius from anywhere on it.
+Hut.WALK = table.freeze({
+	table.freeze({ id = "path_s1", x0 = 60, x1 = 178, z0 = 287, z1 = 347 }),
+	table.freeze({ id = "path_s2", x0 = 178, x1 = 295, z0 = 287, z1 = 347 }),
+	table.freeze({ id = "path_e1", x0 = 235, x1 = 295, z0 = 200, z1 = 287 }),
+	table.freeze({ id = "path_e2", x0 = 235, x1 = 295, z0 = 113, z1 = 200 }),
+	table.freeze({ id = "path_e3", x0 = 235, x1 = 295, z0 = 26, z1 = 113 }),
+	table.freeze({ id = "path_e4", x0 = 235, x1 = 295, z0 = -60, z1 = 26 }),
+	table.freeze({ id = "path_e5", x0 = 235, x1 = 295, z0 = -146, z1 = -60 }),
+	table.freeze({ id = "path_e6", x0 = 200, x1 = 295, z0 = -196, z1 = -146 }),
+})
 
 local GT = Hut.GROUND
 local FL = Hut.FLOOR
@@ -116,6 +139,17 @@ local C = {
 	goldenrod = "d4b23a", goldenLeaf = "5a7a3a", petal = "b36a8f", cone = "a5531f", monarda = "a88bb0", sage = "8a9a7a", thyme = "6d7f55", chive = "4f7d35",
 	chiveFlower = "b48ac0", butt = "3e5d44", buttLid = "2f4734", seed = { "2a2420", "d8c8a0", "3a3028", "c9b48a" },
 }
+
+-- (ROBLOX-117) The rival and the mate in the preserve: they come into the hut garden, the rival along the gravel path from the north (it arrives at the path's end in
+-- garden_d2) and the mate along the path round the east end (at the garden's path where it comes in, garden_b4), and roam its sixteen cells (ROAM: Predator/RivalDrive's
+-- `roam`), never the hut: while the nursery is shut the spider is in it, and it is the spider's alone. The mate leaves the way it came.
+Hut.CREATURES = table.freeze({
+	rival = table.freeze({ region = "garden_d2", at = v(-60, GT + 0.31, -380) }),
+	mate = table.freeze({ region = "garden_b4", at = v(185, GT + 0.31, -171), exit = v(192, GT + 0.31, -171) }),
+})
+local ROAM: { [string]: boolean } = {}
+for _, row in { "a", "b", "c", "d" } do for c = 1, 4 do ROAM[`garden_{row}{c}`] = true end end
+Hut.ROAM = table.freeze(ROAM)
 
 -- ---------------------------------------------------------------- the regions
 local function freeze(r: Region): Region
@@ -152,13 +186,23 @@ end
 Hut.gardenBox = gardenBox
 
 -- Whether a garden cell has a tall plant (its region goes higher), and its plant.
-local PLANTS: { [string]: { kind: string, x: number, z: number } } = {
+local PLANTS: { [string]: { kind: string, x: number, z: number, scale: number? } } = {
 	garden_c3 = { kind = "milkweed", x = 50, z = -266 },
 	garden_c4 = { kind = "coneflower", x = 150, z = -266 },
 	garden_d3 = { kind = "beebalm", x = 70, z = -380 },
 	garden_d4 = { kind = "goldenrod", x = 150, z = -362 },
 }
 Hut.PLANTS = PLANTS
+-- (ROBLOX-117) A second plant of the same kind in each of the bed's cells, younger and a little shorter, so the bed is a stand and not four stems: a milkweed
+-- sucker beside the first (milkweed spreads by its roots into colonies), a second coneflower, bee balm and goldenrod. Walkable as the first; the life keeps to
+-- the first (its perches, its highway).
+local MORE_PLANTS: { [string]: { kind: string, x: number, z: number, scale: number? } } = {
+	garden_c3 = { kind = "milkweed", x = 22, z = -290, scale = 0.8 },
+	garden_c4 = { kind = "coneflower", x = 128, z = -296, scale = 0.9 },
+	garden_d3 = { kind = "beebalm", x = 40, z = -340, scale = 0.9 },
+	garden_d4 = { kind = "goldenrod", x = 122, z = -392, scale = 0.85 },
+}
+Hut.MORE_PLANTS = MORE_PLANTS
 
 -- Whether a point (x, z) is in a bed (the soil's top is then S), and which.
 local function bedAt(x: number, z: number): string?
@@ -241,6 +285,10 @@ function Hut.author(worldSeed: number, seedOf: (number, string) -> number): { Re
 			region(id, "garden_bed", v(x0, -87, z0), v(x1, top, z1), v(s[1], groundAt(s[1], s[2]), s[2]), v(0, 0, -1), 0.33)
 		end
 	end
+	-- (ROBLOX-117) the gravel path round the hut's east end, from the door's gravel to the garden's path
+	for _, w in Hut.WALK do
+		region(w.id, "hut_path", v(w.x0, -87, w.z0), v(w.x1, GT + 40, w.z1), v((w.x0 + w.x1) / 2, GT, (w.z0 + w.z1) / 2), v(0, 0, -1), 0.33)
+	end
 	-- the seams, both ways
 	-- the sill's seams (World/WorldMap lists them on the sill), listed on this side too
 	for _, n in Hut.SILL_SEAMS do table.insert(byId[n.id].neighbors, { id = "sill", a = n.a, b = n.b }) end
@@ -303,6 +351,16 @@ do
 	seam("hut_wall_mid", "garden_a3", v(2, FL, -16), v(28, FL, -16))
 	seam("hut_wall_e", "garden_a3", v(35, FL, -16), v(95, FL, -16))
 	seam("hut_wall_e", "garden_a4", v(104, FL, -16), v(160, FL, -16))
+	-- (ROBLOX-117) the path round the east end: out of the door's gravel, along the south wall, round the corner, north and into the garden's path
+	seam("hut_door", "path_s1", v(60, GT, 290), v(60, GT, 338))
+	seam("path_s1", "path_s2", v(178, GT, 290), v(178, GT, 344))
+	seam("path_s2", "path_e1", v(238, GT, 287), v(292, GT, 287))
+	seam("path_e1", "path_e2", v(238, GT, 200), v(292, GT, 200))
+	seam("path_e2", "path_e3", v(238, GT, 113), v(292, GT, 113))
+	seam("path_e3", "path_e4", v(238, GT, 26), v(292, GT, 26))
+	seam("path_e4", "path_e5", v(238, GT, -60), v(292, GT, -60))
+	seam("path_e5", "path_e6", v(238, GT, -146), v(292, GT, -146))
+	seam("path_e6", "garden_b4", v(200, GT, -193), v(200, GT, -149))
 	local P = Hut.POLE
 	seam("garden_pole", "garden_b1", v(P.x - P.half, GT, P.z - P.half), v(P.x + P.half, GT, P.z - P.half))
 	seam("garden_pole", "garden_feeder", v(P.x + P.half, GT + P.split, P.z - P.half), v(P.x + P.half, GT + P.split, P.z + P.half))
@@ -374,6 +432,11 @@ local function floorPieces(region: Region): { Piece }
 			-- the apron: the sill's front face goes on down to the floor
 			P(out, id .. "_apron", -31, 31, FL, -1, Hut.WALL_SPLIT, R.z0, "painted_wood_dry", C.lining, "WoodPlanks")
 		end
+	end
+	if id == "hut_floor_i" then
+		local K = Hut.CADDY
+		P(out, id .. "_caddy", K.x0, K.x1, FL, FL + K.h, K.z0, K.z1, "painted_metal_smooth", "4f7d4a", "SmoothPlastic")
+		P(out, id .. "_caddy_lid", K.x0 - 0.5, K.x1 + 0.5, FL + K.h, FL + K.h + K.lid, K.z0 - 0.5, K.z1 + 0.5, "painted_metal_smooth", "3f6a3c", "SmoothPlastic")
 	end
 	if south then
 		local D = Hut.DOOR
@@ -571,25 +634,27 @@ local PLANT_SPECS: { [string]: any } = {
 	-- Canada goldenrod (Solidago canadensis): 0.6 to 1.5 m, narrow alternate leaves 8 to 12 cm, a yellow plume
 	goldenrod = { stem = 0.8, height = 85, thick = 0.25, leaves = { { h = 18, dir = "x+", l = 11, w = 1.6 }, { h = 27, dir = "z-", l = 11, w = 1.6 }, { h = 36, dir = "x-", l = 11, w = 1.6 },
 		{ h = 45, dir = "z+", l = 10, w = 1.5 }, { h = 54, dir = "x+", l = 10, w = 1.5 }, { h = 63, dir = "z-", l = 9, w = 1.4 }, { h = 72, dir = "x-", l = 9, w = 1.4 } },
-		head = { w = 12, h = 20, d = 10 }, color = "6f7f45", leaf = C.goldenLeaf, flower = C.goldenrod },
+		head = { w = 3, h = 16, d = 3 }, color = "6f7f45", leaf = C.goldenLeaf, flower = C.goldenrod },
 }
 Hut.PLANT_SPECS = PLANT_SPECS
 
-local function plantPieces(out: { Piece }, id: string, plant: { kind: string, x: number, z: number }, y0: number)
+-- (ROBLOX-117: a second plant of a kind in a cell is `tag` "2" and may stand `scale` of the first's height; its ids `<cell>_<kind>2_...`)
+local function plantPieces(out: { Piece }, id: string, plant: { kind: string, x: number, z: number, scale: number? }, y0: number, tag: string?)
 	local spec = PLANT_SPECS[plant.kind]
 	local half = spec.stem / 2
+	local k = plant.scale or 1
 	local sx0, sx1, sz0, sz1 = plant.x - half, plant.x + half, plant.z - half, plant.z + half
-	local base = `{id}_{plant.kind}`
-	P(out, base .. "_stem", sx0, sx1, y0, y0 + spec.height, sz0, sz1, "leaf_dry_prototype", spec.color)
+	local base = `{id}_{plant.kind}{tag or ""}`
+	P(out, base .. "_stem", sx0, sx1, y0, y0 + spec.height * k, sz0, sz1, "leaf_dry_prototype", spec.color)
 	for i, leaf in spec.leaves :: { Leaf } do
-		local ya, yb = y0 + leaf.h, y0 + leaf.h + spec.thick
+		local ya, yb = y0 + leaf.h * k, y0 + leaf.h * k + spec.thick
 		local w = leaf.w / 2
 		if leaf.dir == "x+" then P(out, `{base}_leaf_{i}`, sx1, sx1 + leaf.l, ya, yb, plant.z - w, plant.z + w, "leaf_dry_prototype", spec.leaf)
 		elseif leaf.dir == "x-" then P(out, `{base}_leaf_{i}`, sx0 - leaf.l, sx0, ya, yb, plant.z - w, plant.z + w, "leaf_dry_prototype", spec.leaf)
 		elseif leaf.dir == "z+" then P(out, `{base}_leaf_{i}`, plant.x - w, plant.x + w, ya, yb, sz1, sz1 + leaf.l, "leaf_dry_prototype", spec.leaf)
 		else P(out, `{base}_leaf_{i}`, plant.x - w, plant.x + w, ya, yb, sz0 - leaf.l, sz0, "leaf_dry_prototype", spec.leaf) end
 	end
-	local top = y0 + spec.height
+	local top = y0 + spec.height * k
 	local H = spec.head
 	if plant.kind == "coneflower" then
 		-- the basal rosette on the soil (clear of the stem, as the dandelion's), the ray of petals and the cone over it
@@ -606,7 +671,7 @@ local function plantPieces(out: { Piece }, id: string, plant: { kind: string, x:
 	else
 		P(out, base .. "_head", plant.x - H.w / 2, plant.x + H.w / 2, top, top + H.h, plant.z - H.w / 2, plant.z + H.w / 2, "leaf_dry_prototype", spec.flower)
 	end
-	if spec.pod ~= nil then
+	if spec.pod ~= nil and tag == nil then
 		-- the milkweed's pod, against the stem's east face between the first and second pairs of leaves
 		local Q = spec.pod
 		P(out, base .. "_pod", sx1, sx1 + Q.w, y0 + Q.h - Q.l, y0 + Q.h, sz0, sz0 + Q.w, "leaf_dry_prototype", C.pod)
@@ -712,14 +777,24 @@ local function gardenPieces(region: Region): { Piece }
 	end
 	local plant = PLANTS[id]
 	if plant ~= nil then plantPieces(out, id, plant, S) end
+	local more = MORE_PLANTS[id]
+	if more ~= nil then plantPieces(out, id, more, S, "2") end
 	local herbs = HERBS[id]
 	if herbs ~= nil then for _, h in herbs do herbPieces(out, id, h.kind, h.x, h.z, S) end end
 	return out
 end
 
+-- (ROBLOX-117) A length of the path round the east end: its gravel, one box (the stones are the patches' look).
+local function pathPieces(region: Region): { Piece }
+	local out: { Piece } = {}
+	local lo, hi = region.bounds[1], region.bounds[2]
+	P(out, region.id .. "_gravel", lo.X, hi.X, -87, GT, lo.Z, hi.Z, "brick_rough", C.gravel, "Pebble")
+	return out
+end
+
 local KINDS: { [string]: boolean } = {
 	hut_window = true, hut_outer_sill = true, hut_floor = true, hut_desk = true, hut_board = true, hut_shelf = true, hut_chair = true, hut_door = true,
-	hut_wall = true, hut_bench = true, hut_butt = true, garden_pole = true, garden_bed = true,
+	hut_wall = true, hut_bench = true, hut_butt = true, garden_pole = true, garden_bed = true, hut_path = true,
 }
 -- Whether a kind is the hut's (or its garden's).
 function Hut.knows(kind: string): boolean
@@ -747,6 +822,7 @@ function Hut.pieces(region: Region): { Piece }
 	elseif k == "hut_butt" then out = buttPieces()
 	elseif k == "garden_pole" then out = polePieces(region)
 	elseif k == "garden_bed" then out = gardenPieces(region)
+	elseif k == "hut_path" then out = pathPieces(region)
 	else error("no generator for the region kind " .. k) end
 	local list = out :: { Piece }
 	for _, p in list do table.freeze(p) end
@@ -781,9 +857,11 @@ end
 -- boxes by a hair so that the two never fight where both are drawn: it stands in for them where streaming has not sent them yet.)
 -- The ceilings each kind keeps to at both tiers (a placer stops at them, keeping what it placed first; tests/preserve.luau holds the counts).
 Hut.BUDGETS = table.freeze({
-	hut_floor = { full = 12, low = 0 }, hut_desk = { full = 22, low = 1 }, hut_board = { full = 16, low = 4 }, hut_shelf = { full = 10, low = 0 }, hut_chair = { full = 2, low = 0 },
+	hut_floor = { full = 15, low = 2 }, hut_desk = { full = 22, low = 1 }, hut_board = { full = 16, low = 4 }, hut_shelf = { full = 10, low = 0 }, hut_chair = { full = 2, low = 0 },
 	hut_door = { full = 14, low = 1 }, hut_window = { full = 0, low = 0 }, hut_outer_sill = { full = 6, low = 0 }, hut_wall = { full = 0, low = 0 },
-	hut_bench = { full = 4, low = 0 }, hut_butt = { full = 3, low = 0 }, garden_pole = { full = 4, low = 2 }, garden_bed = { full = 72, low = 8 },
+	hut_bench = { full = 4, low = 0 }, hut_butt = { full = 3, low = 0 }, garden_pole = { full = 4, low = 2 }, garden_bed = { full = 124, low = 8 },
+	-- (ROBLOX-117: the path round the east end, and the patches: the near detail of the garden's cells and the path's lengths, World/LookPlan.PATCH_RADIUS)
+	hut_path = { full = 8, low = 2 }, patch = { full = 90, low = 10 },
 }) :: { [string]: { full: number, low: number } }
 
 local function sheet(budget: { full: number, low: number })
@@ -816,6 +894,14 @@ local function floorDecor(region: Region, add: (Drawn) -> boolean)
 	local rand = rng(region.seed, 5)
 	for i = 1, 3 do
 		add(rec(`Knot{i}`, v(1.2, 0.02, 2.2), v(between(rand, lo.X + 4, hi.X - 4), FL + 0.012, between(rand, lo.Z + 4, hi.Z - 4)), "5e4430", "Wood", true, "Ellipsoid"))
+	end
+	if region.id == "hut_floor_i" then
+		-- (ROBLOX-117) the caddy's handle and the banana peel over its rim
+		local K = Hut.CADDY
+		local top = FL + K.h + K.lid
+		add(rec("CaddyHandle", v(16, 0.8, 0.8), v((K.x0 + K.x1) / 2, top + 0.4, (K.z0 + K.z1) / 2), "2f4f2c", "SmoothPlastic", false))
+		add(rec("Peel", v(9, 0.8, 3.2), v(K.x0 + 4, top + 0.3, K.z0 + 2), "c9a83a", "SmoothPlastic", false, "Ellipsoid", v(0, 30, -8)))
+		add(rec("PeelEnd", v(4, 0.8, 2.6), v(K.x0 + 0.4, top - 1.3, K.z0 + 0.6), "a07a2a", "SmoothPlastic", true, "Ellipsoid", v(0, 30, -70)))
 	end
 end
 
@@ -903,7 +989,230 @@ local function poleDecor(region: Region, add: (Drawn) -> boolean)
 	add(rec("TraySeed", v(14, 0.3, 14), v(Q.x, y + 0.15, Q.z), "a8875a", "Sand", false))
 end
 
--- The garden: the surfaces (the path's gravel, the drip strip), the lawn's grass, the mulch, the seed under the feeder, the flowers' detail.
+-- A region's pieces by id.
+local function piecesById(region: Region): { [string]: Piece }
+	local out: { [string]: Piece } = {}
+	for _, p in Hut.pieces(region) do out[p.id] = p end
+	return out
+end
+
+-- ---------------------------------------------------------------- the garden's look (ROBLOX-117: rich at the spider's eye)
+-- A cell's own look is what reads from a metre or two off and what stands in for the plants' boxes' shapes: the surfaces (the path's gravel, the drip strip, the
+-- seed under the feeder), the herbs' mounds, the plants drawn whole over their walkable boxes (World/Hut.PLANTS and MORE_PLANTS: the milkweed's broad leaves with
+-- their pale midribs, its umbels of florets and a second umbel on a peduncle, its pod; the coneflower's drooping rays and spiky cone; the bee balm's whorled head
+-- of tubes over its bracts; the goldenrod's arching plume of one-sided sprays; every leaf a blade over its box), the lawn's clumps and the dew on the leaves. What
+-- the spider sees close (the blades, the chips, the stones) is the patches' (below), drawn only near it.
+
+-- A dew drop on a surface at `at` (its top): a flat glass bead in the "Dew" group, shown by the hour (Habitat/DayLight.applyDew: it appears from `dew`, its lag,
+-- to its `transparency` at full dew). Full tier only.
+local function drop(id: string, at: Vector3, size: number, rand: () -> number): Drawn
+	local d = rec(id, v(size, size * 0.62, size), at + v(0, size * 0.25, 0), "dfeaee", "Glass", true, "Ellipsoid")
+	d.group = "Dew"
+	d.dew = rand() * 0.6
+	d.transparency = between(rand, 0.3, 0.45)
+	d.reflectance = 0.3
+	return d
+end
+
+-- A leaf box's middle, its length along its long axis, its width, and which axis is long.
+local function leafShape(box: Piece): (Vector3, number, number, string)
+	local size = box.hi - box.lo
+	local c = (box.lo + box.hi) * 0.5
+	if size.X >= size.Z then return c, size.X, size.Z, "x" end
+	return c, size.Z, size.X, "z"
+end
+-- A size along a leaf's long axis `ax`: `l` along it, `w` across, `t` thick.
+local function along(ax: string, l: number, t: number, w: number): Vector3
+	return if ax == "x" then v(l, t, w) else v(w, t, l)
+end
+-- The yaw (degrees) that turns a record's +X onto (dx, dz) in plan.
+local function yawTo(dx: number, dz: number): number
+	return math.deg(math.atan2(-dz, dx))
+end
+
+-- A plant's drawn form over its walkable boxes (`tag` "" for a cell's first plant, "2" for its second).
+local function plantDecor(region: Region, plant: { kind: string, x: number, z: number, scale: number? }, tag: string, add: (Drawn) -> boolean, rand: () -> number)
+	local spec = PLANT_SPECS[plant.kind]
+	local k = plant.scale or 1
+	local byId = piecesById(region)
+	local base = `{region.id}_{plant.kind}{tag}`
+	local top = S + spec.height * k
+	local kind = plant.kind
+	-- the leaves: each a blade over its box (a little longer and wider, so the box's corners hardly show), the milkweed's with its pale midrib
+	local leafColor = if kind == "milkweed" then C.milkweedLeaf elseif kind == "goldenrod" then C.goldenLeaf else C.leaf
+	local tones = { leafColor, C.leafPale, leafColor }
+	for i = 1, #spec.leaves do
+		local box = byId[`{base}_leaf_{i}`]
+		if box ~= nil then
+			local c, l, w, ax = leafShape(box)
+			local wide = if kind == "goldenrod" then 1.7 elseif kind == "beebalm" then 1.5 else 1.3
+			add(rec(`Leaf{tag}_{i}`, along(ax, l * 1.22, 0.5, w * wide), c + v(0, 0.05, 0), if i % 3 == 0 then tones[2] else leafColor, "SmoothPlastic", true, "Ellipsoid"))
+			if kind == "milkweed" then add(rec(`Midrib{tag}_{i}`, along(ax, l * 1.05, 0.08, 0.32), c + v(0, 0.27, 0), C.milkweedUnder, "SmoothPlastic", true)) end
+			if tag == "" and i <= 3 then add(drop(`LeafDew{i}`, c + v(between(rand, -1.5, 1.5), box.hi.Y - c.Y, between(rand, -1.5, 1.5)), between(rand, 0.35, 0.6), rand)) end
+		end
+	end
+	local head = byId[base .. "_head"]
+	if head == nil then return end
+	local hc = (head.lo + head.hi) * 0.5
+	if kind == "milkweed" then
+		-- the umbel: florets over a dome (the golden angle spreads them), pink to mauve; and a second umbel on a peduncle from the third node
+		local n = if tag == "" then 26 else 18
+		for i = 1, n do
+			local t = (i - 0.5) / n
+			local el = math.asin(t) * 1.15 - 0.2 -- (from just under the dome's rim up to its crown: the umbel droops a little)
+			local a = i * 2.39996
+			local r = 4.2
+			add(rec(`Floret{tag}_{i}`, v(1.6, 1.4, 1.6), hc + v(math.cos(a) * r * math.cos(el), 0.3 + r * 0.75 * math.sin(el) - 0.6, math.sin(a) * r * math.cos(el)),
+				pick({ C.umbel, "d9a1ab", "b47a86", "c995a0" }, rand), "SmoothPlastic", true, "Ball"))
+		end
+		if tag == "" then
+			local node = S + spec.leaves[5].h * k
+			local from = v(plant.x + 0.6, node, plant.z)
+			local to = from + v(7, 5, 2)
+			local mid = (from + to) * 0.5
+			local d = to - from
+			add(rec("Peduncle", v(d.Magnitude, 0.35, 0.35), mid, spec.color, "SmoothPlastic", true, "Cylinder", v(0, yawTo(d.X, d.Z), math.deg(math.asin(d.Y / d.Magnitude)))))
+			for i = 1, 8 do
+				local a = i * 2.39996
+				add(rec(`Floret2_{i}`, v(1.2, 1.1, 1.2), to + v(math.cos(a) * 2.6, between(rand, -0.6, 0.9), math.sin(a) * 2.6), pick({ C.umbel, "d9a1ab", "b47a86" }, rand), "SmoothPlastic", true, "Ball"))
+			end
+			local pod = byId[base .. "_pod"]
+			if pod ~= nil then
+				local pc = (pod.lo + pod.hi) * 0.5
+				local ps = pod.hi - pod.lo
+				add(rec("Pod", v(ps.X * 1.5, ps.Y * 1.08, ps.Z * 1.5), pc, C.pod, "SmoothPlastic", true, "Ellipsoid"))
+				add(rec("PodTip", v(0.9, 1.6, 0.9), pc + v(0.4, ps.Y * 0.55, 0), "8aa86a", "SmoothPlastic", true, "Ellipsoid"))
+			end
+		end
+	elseif kind == "coneflower" then
+		-- the rays droop from the cone's foot; the cone is a dome of spiny orange-brown florets
+		for i = 1, 13 do
+			local a = i / 13 * TAU + between(rand, -0.08, 0.08)
+			add(rec(`Ray{tag}_{i}`, v(4.6, 0.12, 1.15), v(plant.x + math.cos(a) * 5.4, top + 0.1 - 1.1, plant.z + math.sin(a) * 5.4), pick({ C.petal, "c27a9c", "a85f84" }, rand),
+				"SmoothPlastic", true, nil, v(0, -math.deg(a), -28)))
+		end
+		local cone = byId[base .. "_cone"]
+		if cone ~= nil then
+			local cc = (cone.lo + cone.hi) * 0.5
+			add(rec(`Cone{tag}`, v(4.2, 4.0, 4.2), cc + v(0, 0.3, 0), "9a4b1c", "Sand", true, "Ball"))
+			for i = 1, 6 do
+				local a = i / 6 * TAU
+				add(rec(`Spine{tag}_{i}`, v(0.7, 0.7, 0.7), cc + v(math.cos(a) * 1.7, 1.2 + (i % 2) * 0.6, math.sin(a) * 1.7), "c0702a", "SmoothPlastic", true, "Ball"))
+			end
+		end
+		for i = 1, 3 do
+			local box = byId[`{base}_basal_{i}`]
+			if box ~= nil then
+				local c, l, w, ax = leafShape(box)
+				add(rec(`Basal{tag}_{i}`, along(ax, l * 1.2, 0.35, w * 1.25), c + v(0, 0.05, 0), C.leaf, "SmoothPlastic", true, "Ellipsoid"))
+			end
+		end
+	elseif kind == "beebalm" then
+		-- the head: a whorl of lavender tubes curving out and up from a green button, over a ring of pale bracts
+		add(rec(`Button{tag}`, v(5.2, 4.4, 5.2), hc, "7a7a52", "SmoothPlastic", true, "Ellipsoid"))
+		for i = 1, 16 do
+			local a = i / 16 * TAU + between(rand, -0.1, 0.1)
+			local up = between(rand, 15, 60)
+			local len = between(rand, 2.6, 3.4)
+			local out = v(math.cos(a), 0, math.sin(a))
+			local dir = (out * math.cos(math.rad(up)) + v(0, math.sin(math.rad(up)), 0))
+			add(rec(`Tube{tag}_{i}`, v(len, 0.45, 0.45), hc + out * 2.3 + dir * (len / 2) + v(0, 0.6 + (i % 3) * 0.5, 0), pick({ C.monarda, "b79cc0", "9a7aa6" }, rand), "SmoothPlastic", true, nil,
+				v(0, yawTo(out.X, out.Z), up)))
+		end
+		for i = 1, 5 do
+			local a = i / 5 * TAU + 0.3
+			add(rec(`Bract{tag}_{i}`, v(3.0, 0.15, 1.4), hc + v(math.cos(a) * 2.6, -1.6, math.sin(a) * 2.6), "c9b8a6", "SmoothPlastic", true, "Ellipsoid", v(0, -math.deg(a), -18)))
+		end
+	elseif kind == "goldenrod" then
+		-- the many narrow leaves up the stem between the walkable ones (drawn only: 6 to 8 cm, too narrow to stand on)
+		for i = 1, 10 do
+			local y = S + (14 + i * 6.3) * k
+			local a = i * 2.39996
+			local l = between(rand, 6, 8)
+			local out = v(math.cos(a), 0, math.sin(a))
+			add(rec(`Narrow{tag}_{i}`, v(l, 0.2, 1.1), v(plant.x, y, plant.z) + out * (l / 2 + 0.4) + v(0, l * 0.15, 0), C.goldenLeaf, "SmoothPlastic", true, "Ellipsoid",
+				v(0, yawTo(out.X, out.Z), 16)))
+		end
+		-- the plume: the axis on up through the head, branches arching out to one side and the other, each with its sprays of florets along its upper side
+		add(rec(`Axis{tag}`, v(0.5, (head.hi.Y - head.lo.Y) + 4, 0.5), hc + v(0, 2, 0), spec.color, "SmoothPlastic", true))
+		for i = 1, 11 do
+			local t = (i - 0.5) / 11
+			local y = head.lo.Y + t * (head.hi.Y - head.lo.Y)
+			local a = i * 2.39996
+			local reach = 8 * (1 - t * 0.6)
+			local out = v(math.cos(a), 0, math.sin(a))
+			local tip = v(plant.x, y + 2.2, plant.z) + out * reach
+			local root = v(plant.x, y, plant.z)
+			local d = tip - root
+			add(rec(`Branch{tag}_{i}`, v(d.Magnitude, 0.25, 0.25), (root + tip) * 0.5, spec.color, "SmoothPlastic", true, "Cylinder",
+				v(0, yawTo(d.X, d.Z), math.deg(math.asin(d.Y / d.Magnitude)))))
+			add(rec(`Spray{tag}_{i}`, v(reach * 0.95, 1.8, 2.0), (root + tip) * 0.5 + v(0, 1.0, 0) + out * 0.8, pick({ C.goldenrod, "e2c24a", "c9a22e" }, rand), "SmoothPlastic", true,
+				"Ellipsoid", v(0, yawTo(d.X, d.Z), 14)))
+		end
+		add(rec(`Crown{tag}`, v(3.6, 6, 3.6), v(plant.x, head.hi.Y + 1.0, plant.z), C.goldenrod, "SmoothPlastic", true, "Ellipsoid"))
+		add(rec(`Core{tag}`, v(4.2, (head.hi.Y - head.lo.Y) * 0.9, 4.2), hc, "c9a830", "SmoothPlastic", true, "Ellipsoid"))
+	end
+end
+
+-- Whether (x, z) lies on the garden's gravel path (with a margin `m`).
+local function onPath(x: number, z: number, m: number): boolean
+	local Pa = Hut.PATH
+	return (x > Pa.ew.x0 - m and x < Pa.ew.x1 + m and z > Pa.ew.z0 - m and z < Pa.ew.z1 + m) or (x > Pa.ns.x0 - m and x < Pa.ns.x1 + m and z > Pa.ns.z0 - m and z < Pa.ns.z1 + m)
+end
+
+-- Whether (x, z) is clear of every box standing on the surface at `top` (by `m`).
+local function clear(standing: { Box }, x: number, z: number, m: number): boolean
+	for _, b in standing do
+		if x > b.min.X - m and x < b.max.X + m and z > b.min.Z - m and z < b.max.Z + m then return false end
+	end
+	return true
+end
+
+-- The standing boxes of a region at or near a surface (`top`: the ground or the beds' soil): what a drawn thing on that surface keeps clear of.
+local function standingNear(region: Region, top: number): { Box }
+	local out: { Box } = {}
+	if region.kind == "garden_bed" and top == GT then
+		-- (and what stands on the lawn from the regions beside it: the bench's legs, the water butt's stand, the feeder's pole)
+		for _, p in benchPieces() do if p.lo.Y <= GT + 0.6 then table.insert(out, { min = p.lo, max = p.hi }) end end
+		for _, p in buttPieces() do if p.lo.Y <= GT + 0.6 then table.insert(out, { min = p.lo, max = p.hi }) end end
+		local Q = Hut.POLE
+		table.insert(out, { min = v(Q.x - Q.half, GT, Q.z - Q.half), max = v(Q.x + Q.half, GT + Q.split, Q.z + Q.half) })
+	end
+	for _, p in Hut.pieces(region) do
+		if p.lo.Y <= top + 0.6 and p.hi.Y > top + 0.05 and not string.find(p.id, "_soil", 1, true) and not string.find(p.id, "_bed", 1, true)
+			and not string.find(p.id, "_gravel", 1, true) then
+			table.insert(out, { min = p.lo, max = p.hi })
+		end
+	end
+	return out
+end
+
+-- A blade of grass from its foot at `at`: `h` tall, `w` wide, leaning `lean` degrees toward the yaw `yaw` (degrees); `bend`, if given, the upper half leans that much
+-- more (a second segment). Returns how many records it took.
+local function blade(add: (Drawn) -> boolean, id: string, at: Vector3, h: number, w: number, yaw: number, lean: number, bend: number?, color: string, full: boolean): number
+	local function seg(sid: string, from: Vector3, len: number, l: number): Vector3
+		local r = math.rad(l)
+		local dir = v(-math.sin(r) * math.cos(math.rad(yaw)), math.cos(r), math.sin(r) * math.sin(math.rad(yaw)))
+		add(rec(sid, v(w, len, 0.06), from + dir * (len / 2), color, "SmoothPlastic", full, nil, v(0, yaw, l)))
+		return from + dir * len
+	end
+	if bend == nil then
+		seg(id, at, h, lean)
+		return 1
+	end
+	local knee = seg(id .. "a", at, h * 0.55, lean)
+	seg(id .. "b", knee, h * 0.45, lean + bend)
+	return 2
+end
+
+-- The part of the pollinator bed's soil inside a cell, { x0, x1, z0, z1 }.
+local function bedArea(region: Region): { number }?
+	local b, E = Hut.POLLINATOR, Hut.EDGING.thick
+	local lo, hi = region.bounds[1], region.bounds[2]
+	local a, bb, c, d = clip(b.x0 + E, b.x1 - E, b.z0 + E, b.z1 - E, lo.X, hi.X, lo.Z, hi.Z)
+	if a == nil then return nil end
+	return { a, bb :: number, c :: number, d :: number }
+end
 local function gardenDecor(region: Region, add: (Drawn) -> boolean)
 	local lo, hi = region.bounds[1], region.bounds[2]
 	local cx0, cx1, cz0, cz1 = lo.X, hi.X, lo.Z, hi.Z
@@ -931,60 +1240,332 @@ local function gardenDecor(region: Region, add: (Drawn) -> boolean)
 		local Q = Hut.POLE
 		add(rec("Spill", v(34, 0.05, 26), v(Q.x + 3, GT + 0.025, Q.z - 4), "8f7d5a", "Sand", false, "Ellipsoid"))
 	end
+	-- the lawn's clumps (two at the low tier): what the lawn is from further off, the patches' blades standing among them close up
 	local rand = rng(region.seed, 29)
-	-- the plants' flowers: the milkweed's florets, the coneflower's drooping rays, the bergamot's tubes, the goldenrod's sprays
-	local plant = PLANTS[id]
-	if plant ~= nil then
-		local spec = PLANT_SPECS[plant.kind]
-		local top = S + spec.height
-		if plant.kind == "milkweed" then
-			for i = 1, 7 do
-				local a = i / 7 * TAU
-				add(rec(`Floret{i}`, v(1.3, 1.3, 1.3), v(plant.x + math.cos(a) * 3.2, top + 5 + between(rand, -0.6, 0.8), plant.z + math.sin(a) * 3.2), pick({ C.umbel, "d9a1ab", "b47a86" }, rand), "SmoothPlastic", true, "Ball"))
-			end
-		elseif plant.kind == "coneflower" then
-			for i = 1, 10 do
-				local a = i / 10 * TAU
-				add(rec(`Ray{i}`, v(4.2, 0.12, 1.1), v(plant.x + math.cos(a) * 5.6, top + 0.1 - 0.9, plant.z + math.sin(a) * 5.6), C.petal, "SmoothPlastic", true, nil, v(0, -math.deg(a), -24)))
-			end
-		elseif plant.kind == "beebalm" then
-			for i = 1, 8 do
-				local a = i / 8 * TAU
-				add(rec(`Tube{i}`, v(0.4, 2.6, 0.4), v(plant.x + math.cos(a) * 2.4, top + 3.6, plant.z + math.sin(a) * 2.4), C.monarda, "SmoothPlastic", true, nil, v(math.sin(a) * 30, 0, -math.cos(a) * 30)))
-			end
-		else
-			for i = 1, 6 do
-				local a = i / 6 * TAU
-				add(rec(`Spray{i}`, v(7, 1.6, 2), v(plant.x + math.cos(a) * 5, top + 6 + i * 1.6, plant.z + math.sin(a) * 4), C.goldenrod, "SmoothPlastic", true, nil, v(0, -math.deg(a), -30)))
+	local standing = standingNear(region, GT)
+	local placed = 0
+	for _ = 1, 60 do
+		if placed >= 8 then break end
+		local x, z = between(rand, cx0 + 4, cx1 - 4), between(rand, cz0 + 4, cz1 - 4)
+		if bedAt(x, z) == nil and not onPath(x, z, 5) and z < -50 and clear(standing, x, z, 6) and not (bedAt(x - 6, z) or bedAt(x + 6, z) or bedAt(x, z - 6) or bedAt(x, z + 6)) then
+			placed += 1
+			local spin = between(rand, 0, 360)
+			for b = 1, 3 do
+				local yaw = spin + b * 120 + between(rand, -20, 20)
+				blade(add, `Clump{placed}_{b}`, v(x, GT, z), between(rand, 6, 13), between(rand, 0.35, 0.5), yaw, between(rand, 4, 16), nil, pick(C.lawnColors, rand), placed > 2 or b > 1)
 			end
 		end
 	end
-	-- the lawn's grass: tufts of blades on the open ground, and the mulch's chips on the pollinator bed (full)
-	local placed = 0
-	for _ = 1, 80 do
-		if placed >= 34 then break end
-		local x, z = between(rand, cx0 + 3, cx1 - 3), between(rand, cz0 + 3, cz1 - 3)
-		local onPath = (x > Pa.ew.x0 - 4 and x < Pa.ew.x1 and z > Pa.ew.z0 - 4 and z < Pa.ew.z1 + 4) or (x > Pa.ns.x0 - 4 and x < Pa.ns.x1 + 4 and z > Pa.ns.z0 and z < Pa.ns.z1 + 4)
-		local bed = bedAt(x, z)
-		local free = true
-		for _, p in Hut.pieces(region) do
-			if p.id ~= id .. "_soil" and not string.find(p.id, "_bed", 1, true) and x > p.lo.X - 1.5 and x < p.hi.X + 1.5 and z > p.lo.Z - 1.5 and z < p.hi.Z + 1.5 then free = false; break end
+	-- the mulch from further off: its layers of shredded bark in their tones and the bigger pieces over them (the patches' chips stand among them close up)
+	local bed = bedArea(region)
+	if bed ~= nil then
+		local onBed = standingNear(region, S)
+		local n = 0
+		for _ = 1, 60 do
+			if n >= 22 then break end
+			local x, z = between(rand, bed[1] + 3, bed[2] - 3), between(rand, bed[3] + 3, bed[4] - 3)
+			if clear(onBed, x, z, 2) then
+				n += 1
+				if n % 2 == 1 then
+					local w = between(rand, 6, 14)
+					add(rec(`Mottle{n}`, v(w, 0.1, w * between(rand, 0.4, 0.8)), v(x, S + between(rand, 0.03, 0.1), z), pick({ "3f2a1b", "4a3220", "5a3c26", "553826", "61442e", "6b5040" }, rand),
+						"Ground", true, "Ellipsoid", v(0, between(rand, 0, 180), 0)))
+				else
+					local l = between(rand, 1.5, 3.5)
+					add(rec(`Bark{n}`, v(l, between(rand, 0.15, 0.3), l * between(rand, 0.3, 0.6)), v(x, S + 0.2, z), pick({ "5a3c26", "6b4a30", "4a3220", "3f2a1b", "6e5a48" }, rand), "Wood", true, nil,
+						v(between(rand, -10, 10), between(rand, 0, 180), between(rand, -8, 8))))
+				end
+			end
 		end
-		if free and not onPath and z < -48 then
-			placed += 1
-			if bed == "pollinator" then
-				local w = between(rand, 0.8, 2.2)
-				add(rec(`Chip{placed}`, v(w, 0.25, w * between(rand, 0.4, 0.8)), v(x, S + 0.12, z), pick(C.mulchColors, rand), "Wood", true, nil, v(0, between(rand, 0, 180), 0)))
-			elseif bed == nil then
-				local h = between(rand, 5, 10)
-				add(rec(`Tuft{placed}`, v(0.4, h, 0.4), v(x, GT + h / 2, z), pick(C.lawnColors, rand), "Grass", true, nil, v(between(rand, -14, 14), 0, between(rand, -14, 14))))
+	end
+	-- the plants, drawn whole over their boxes
+	local plant = PLANTS[id]
+	if plant ~= nil then plantDecor(region, plant, "", add, rand) end
+	local more = MORE_PLANTS[id]
+	if more ~= nil then plantDecor(region, more, "2", add, rand) end
+end
+
+-- The path round the east end: the lawn's edge leaning over the gravel either side (its own stones are the patches').
+local function pathDecor(region: Region, add: (Drawn) -> boolean)
+	local lo, hi = region.bounds[1], region.bounds[2]
+	local rand = rng(region.seed, 37)
+	local alongX = hi.X - lo.X > hi.Z - lo.Z
+	for i = 1, 3 do
+		local side = if i % 2 == 0 then 1 else -1
+		local x, z
+		if alongX then x, z = between(rand, lo.X + 5, hi.X - 5), if side > 0 then hi.Z + 1 else lo.Z - 1
+		else x, z = if side > 0 then hi.X + 1 else lo.X - 1, between(rand, lo.Z + 5, hi.Z - 5) end
+		-- (a tuft of the lawn's edge, its blades leaning out over the gravel)
+		local out = if alongX then (if side > 0 then 90 else 270) else (if side > 0 then 180 else 0)
+		for b = 1, 3 do
+			blade(add, `Edge{i}_{b}`, v(x + between(rand, -0.6, 0.6), GT, z + between(rand, -0.6, 0.6)), between(rand, 6, 13), between(rand, 0.35, 0.5), out + between(rand, -35, 35),
+				between(rand, 8, 25), nil, pick(C.lawnColors, rand), i > 1 or b > 1)
+		end
+	end
+end
+
+-- ---------------------------------------------------------------- the patches (ROBLOX-117): what the spider sees close
+-- Each garden cell and each length of the path is cut into patches of about PATCH studs square, drawn-only looks of their own (kind "patch", World/WorldMap.patches)
+-- that World/LookPlan draws only near the spider (LookPlan.PATCH_RADIUS): the dense detail of the ground at true size where the eye is, and nothing beyond it.
+--   the lawn ........ tufts of grass blades 3 to 5 mm wide and 5 to 15 cm tall, leaning and bending, each round a clump; seed heads on taller stalks; white clover;
+--   the mulch ....... shredded bark in layers (chips of 1 to 6 cm in reds, browns and weathered greys, tilted over one another), shredded leaf, twigs, seeds, the
+--                     soil showing between, and now and then a seedling;
+--   the gravel ...... stones of 2 to 12 mm in the path's tones;
+-- and where they fall, the petals and florets under the flowers, the husks and millet under the feeder and a cardinal's feather, and the morning's dew on blades
+-- and chips (the "Dew" group, shown by the hour).
+Hut.PATCH = 25
+local PATCHED: { [string]: boolean } = { garden_bed = true, hut_path = true }
+local patchParent: { [string]: Region } = {}
+
+-- The patches of the hut's regions, for a world seed: region-shaped records of kind "patch", their bounds the patch's footprint from the ground to 30 studs over the beds.
+function Hut.patches(regions: { Region }, worldSeed: number, seedOf: (number, string) -> number): { Region }
+	local out: { Region } = {}
+	for _, r in regions do
+		if PATCHED[r.kind] then
+			local lo, hi = r.bounds[1], r.bounds[2]
+			local nx = math.max(1, math.ceil((hi.X - lo.X) / Hut.PATCH - 1e-6))
+			local nz = math.max(1, math.ceil((hi.Z - lo.Z) / Hut.PATCH - 1e-6))
+			local dx, dz = (hi.X - lo.X) / nx, (hi.Z - lo.Z) / nz
+			for i = 1, nx do
+				for j = 1, nz do
+					local pid = `{r.id}~{i}_{j}`
+					local plo, phi = v(lo.X + (i - 1) * dx, GT - 2, lo.Z + (j - 1) * dz), v(lo.X + i * dx, S + 30, lo.Z + j * dz)
+					local mid = (plo + phi) * 0.5
+					local p = table.freeze({
+						id = pid, kind = "patch", origin = mid, bounds = table.freeze({ plo, phi }), seed = seedOf(worldSeed, pid), neighbors = table.freeze({}),
+						retreats = table.freeze({}), spawn = table.freeze({ pos = mid, heading = v(0, 0, -1) }), clockScale = r.clockScale,
+					}) :: any
+					patchParent[pid] = r
+					table.insert(out, p)
+				end
+			end
+		end
+	end
+	return out
+end
+
+-- The region a patch belongs to.
+function Hut.patchParent(patch: Region): Region?
+	return patchParent[patch.id]
+end
+
+-- What the ground is at (x, z) of a region: "lawn", "mulch", "soil" (the herb bed), "gravel" (a path), "drip" (the strip along the hut's foot), and its top.
+local function surfaceAt(region: Region, x: number, z: number): (string, number)
+	if region.kind == "hut_path" then return "gravel", GT end
+	local bed = bedAt(x, z)
+	if bed == "pollinator" then return "mulch", S end
+	if bed == "herbs" then return "soil", S end
+	if onPath(x, z, 0) then return "gravel", GT end
+	if z > -46 then return "drip", GT end
+	return "lawn", GT
+end
+
+local GRASS = { "5c8a3a", "6f9a46", "4f7a33", "86a85a", "7d8f48", "668f3e", "93a860", "a8a066" }
+local CHIPS = { "5a3c26", "6b4a30", "4a3220", "7a5536", "3f2a1b", "6e5a48", "5e4434", "4d3a2c", "7e6650" }
+local LAYERS = { "3f2a1b", "4a3220", "5a3c26", "553826", "3a2a20", "61442e" }
+local STONES = { "b3a68a", "938870", "c9bfa8", "8f8676", "a69a80", "d1c7b0", "7d7466", "bfae92" }
+
+-- The patch's look: low records first (the few the low tier keeps), then the full tier's, to its budget.
+local function patchDecor(patch: Region, add: (Drawn) -> boolean)
+	local parent = patchParent[patch.id]
+	if parent == nil then return end
+	local lo, hi = patch.bounds[1], patch.bounds[2]
+	local rand = rng(patch.seed, 41)
+	local onGround = standingNear(parent, GT)
+	local onBed = standingNear(parent, S)
+	local Q = Hut.POLE
+	local feeder = parent.id == "garden_b1" or parent.id == "garden_a1" or parent.id == "garden_b2" or parent.id == "garden_a2"
+	-- the spots: a jittered grid of 5 by 5, in a seeded order
+	local spots: { Vector3 } = {}
+	local n = 5
+	for i = 1, n do
+		for j = 1, n do
+			local x = lo.X + (i - 1 + between(rand, 0.15, 0.85)) * (hi.X - lo.X) / n
+			local z = lo.Z + (j - 1 + between(rand, 0.15, 0.85)) * (hi.Z - lo.Z) / n
+			table.insert(spots, v(x, 0, z))
+		end
+	end
+	for i = #spots, 2, -1 do
+		local j = 1 + math.floor(rand() * i) % i
+		spots[i], spots[j] = spots[j], spots[i]
+	end
+	local function free(kind: string, x: number, z: number, m: number): boolean
+		if kind == "mulch" or kind == "soil" then return clear(onBed, x, z, m) end
+		return clear(onGround, x, z, m)
+	end
+	local k = 0
+	-- a tuft of grass: blades from one crown, each leaning out from it (its yaw away from the crown), a few bent over at the knee; `low` of them the low tier keeps
+	local function tuft(x: number, z: number, low: number, bladesN: number)
+		k += 1
+		local tone = pick(GRASS, rand)
+		local spin = between(rand, 0, 360)
+		for b = 1, bladesN do
+			local yaw = spin + b / bladesN * 360 + between(rand, -25, 25)
+			local r = between(rand, 0.15, 0.7)
+			local foot = v(x + math.cos(math.rad(yaw)) * r, GT, z - math.sin(math.rad(yaw)) * r)
+			blade(add, `Blade{k}_{b}`, foot, between(rand, 5, 15), between(rand, 0.3, 0.5), yaw + 180, between(rand, 3, 18),
+				if rand() < 0.3 then between(rand, 15, 45) else nil, if rand() < 0.5 then tone else pick(GRASS, rand), b > low)
+		end
+	end
+	-- shredded bark: mostly strips (2 to 5 cm long, 4 to 10 mm wide, thin), some chunks; each tilted over the ones under it, in layers
+	local function chip(x: number, z: number, y: number, full: boolean, big: boolean)
+		k += 1
+		local strip = not big and rand() < 0.65
+		local l = if big then between(rand, 2.0, 3.5) elseif strip then between(rand, 1.5, 4) else between(rand, 0.8, 2.0)
+		local w = if strip then between(rand, 0.3, 0.8) else l * between(rand, 0.45, 0.75)
+		local t = if strip then between(rand, 0.1, 0.18) else between(rand, 0.18, 0.35)
+		add(rec(`Chip{k}`, v(l, t, w), v(x, y + t / 2 + between(rand, 0, 0.25), z), pick(CHIPS, rand), "Wood", full, nil,
+			v(between(rand, -14, 14), between(rand, 0, 180), between(rand, -12, 12))))
+	end
+	-- a layer of the mulch: a broad, flat, irregular patch of one tone over the bed's own, so the mulch reads mottled and layered
+	local function layer(x: number, z: number, y: number, full: boolean)
+		k += 1
+		local w = between(rand, 4, 8)
+		add(rec(`Layer{k}`, v(w, 0.12, w * between(rand, 0.5, 0.85)), v(x, y + between(rand, 0.04, 0.14), z), pick(LAYERS, rand), "Ground", full, "Ellipsoid", v(0, between(rand, 0, 180), 0)))
+	end
+	local function stone(x: number, z: number, y: number, full: boolean, dark: boolean)
+		k += 1
+		local s = between(rand, 0.2, 0.9)
+		add(rec(`Stone{k}`, v(s, s * between(rand, 0.55, 0.85), s * between(rand, 0.75, 1.15)), v(x, y + s * 0.2, z), if dark then pick({ "7d7466", "938870", "6e665a" }, rand) else pick(STONES, rand),
+			"Pebble", full, "Ellipsoid", v(0, between(rand, 0, 180), 0)))
+	end
+	-- the low tier's few: a clump on the lawn, the bigger chips on the mulch, the bigger stones on the gravel
+	for s = 1, 4 do
+		local p = spots[s]
+		local kind, top = surfaceAt(parent, p.X, p.Z)
+		if free(kind, p.X, p.Z, 2) then
+			if kind == "lawn" then
+				if s <= 2 then tuft(p.X, p.Z, 5, 5) end
+			elseif kind == "mulch" then
+				layer(p.X, p.Z, top, false)
+				chip(p.X + between(rand, -2, 2), p.Z + between(rand, -2, 2), top, false, s == 1)
+			elseif kind == "gravel" or kind == "drip" then
+				for _ = 1, 2 do stone(p.X + between(rand, -2, 2), p.Z + between(rand, -2, 2), top, false, kind == "drip") end
+			end
+		end
+	end
+	-- what falls where: the husks and millet under the feeder and a cardinal's feather; petals and florets under the flowers
+	local function near(x: number, z: number, r: number): boolean
+		local cx, cz = math.clamp(x, lo.X, hi.X), math.clamp(z, lo.Z, hi.Z)
+		return (cx - x) ^ 2 + (cz - z) ^ 2 <= r * r
+	end
+	if feeder and near(Q.x, Q.z, 30) then
+		for i = 1, 9 do
+			local x, z = between(rand, lo.X + 1, hi.X - 1), between(rand, lo.Z + 1, hi.Z - 1)
+			if (v(x, 0, z) - v(Q.x, 0, Q.z)).Magnitude < 32 and free("lawn", x, z, 0.8) then
+				if i % 3 == 0 then
+					add(rec(`Millet{i}`, v(0.25, 0.2, 0.25), v(x, GT + 0.1, z), "d8c08a", "SmoothPlastic", true, "Ball"))
+				else
+					add(rec(`Husk{i}`, v(1.0, 0.16, 0.5), v(x, GT + 0.12, z), pick({ "2a2420", "3a3430", "4a4440" }, rand), "SmoothPlastic", true, "Ellipsoid",
+						v(between(rand, -20, 20), between(rand, 0, 180), 0)))
+				end
+			end
+		end
+		if near(Q.x + 14, Q.z - 12, 0.1) then
+			-- a cardinal's contour feather, 5 cm, lying where it fell under the feeder
+			local at = v(Q.x + 14, GT + 0.15, Q.z - 12)
+			add(rec("FeatherShaft", v(5.2, 0.12, 0.12), at, "e6dcd2", "SmoothPlastic", true, "Cylinder", v(0, 35, 2)))
+			add(rec("FeatherVane1", v(4.2, 0.03, 0.9), at + v(-0.2, 0.05, -0.45), "b2242a", "Fabric", true, "Ellipsoid", v(0, 35, 4)))
+			add(rec("FeatherVane2", v(3.8, 0.03, 0.8), at + v(0.1, 0.05, 0.45), "9c1f26", "Fabric", true, "Ellipsoid", v(0, 35, -3)))
+		end
+	end
+	for _, list in { { PLANTS[parent.id] }, { MORE_PLANTS[parent.id] } } :: { { any } } do
+		local plant = list[1]
+		if plant ~= nil and near(plant.x, plant.z, 16) then
+			for i = 1, 4 do
+				local a, r = between(rand, 0, TAU), between(rand, 3, 14)
+				local x, z = plant.x + math.cos(a) * r, plant.z + math.sin(a) * r
+				if x > lo.X and x < hi.X and z > lo.Z and z < hi.Z and free("mulch", x, z, 0.5) then
+					if plant.kind == "coneflower" then
+						add(rec(`Petal{i}`, v(4.2, 0.06, 1.0), v(x, S + 0.45, z), pick({ C.petal, "9c6a84", "c79bb2" }, rand), "SmoothPlastic", true, nil, v(between(rand, -8, 8), between(rand, 0, 180), 0)))
+					elseif plant.kind == "milkweed" then
+						add(rec(`Fallen{i}`, v(1.0, 0.7, 1.0), v(x, S + 0.6, z), pick({ "b88a8e", "a07a7e", C.umbel }, rand), "SmoothPlastic", true, "Ball"))
+					elseif plant.kind == "goldenrod" then
+						add(rec(`Fleck{i}`, v(0.5, 0.3, 0.5), v(x, S + 0.5, z), "c9a22e", "SmoothPlastic", true, "Ball"))
+					end
+				end
+			end
+		end
+	end
+	-- the rest of the full tier's detail, spot by spot, to the patch's budget
+	local dews = 0
+	for pass = 1, 5 do
+		for s, p in spots do
+			local x, z = p.X + between(rand, -2.2, 2.2) * (pass - 1), p.Z + between(rand, -2.2, 2.2) * (pass - 1)
+			local kind, top = surfaceAt(parent, x, z)
+			if free(kind, x, z, 1.5) then
+				if kind == "lawn" then
+					if (s + pass) % 3 ~= 0 then tuft(x, z, 0, 8)
+					elseif pass == 1 and s % 5 == 0 then
+						-- a seed head on a taller stalk
+						k += 1
+						local h = between(rand, 14, 20)
+						local lean = between(rand, 3, 12)
+						local yaw = between(rand, 0, 360)
+						local r = math.rad(lean)
+						local dir = v(-math.sin(r) * math.cos(math.rad(yaw)), math.cos(r), math.sin(r) * math.sin(math.rad(yaw)))
+						add(rec(`Stalk{k}`, v(0.18, h, 0.18), v(x, GT, z) + dir * (h / 2), "a8a066", "SmoothPlastic", true, nil, v(0, yaw, lean)))
+						add(rec(`Seedhead{k}`, v(0.7, 2.6, 0.7), v(x, GT, z) + dir * (h + 1.0), pick({ "b5a36a", "9a8a5a", "c2b27a" }, rand), "SmoothPlastic", true, "Ellipsoid", v(0, yaw, lean)))
+					elseif pass == 1 and s % 7 == 1 then
+						-- white clover: three round leaflets on a stalk
+						k += 1
+						local hh = between(rand, 2, 4)
+						add(rec(`CloverStalk{k}`, v(0.12, hh, 0.12), v(x, GT + hh / 2, z), "7a9a52", "SmoothPlastic", true))
+						for q = 1, 3 do
+							local a = q / 3 * TAU + between(rand, 0, 0.5)
+							add(rec(`Clover{k}_{q}`, v(1.3, 0.1, 1.1), v(x + math.cos(a) * 0.65, GT + hh, z + math.sin(a) * 0.65), "4f7d3a", "SmoothPlastic", true, "Ellipsoid", v(0, -math.deg(a), 0)))
+						end
+					elseif dews < 3 then
+						dews += 1
+						add(drop(`Dew{dews}`, v(x, GT + between(rand, 3, 8), z), between(rand, 0.3, 0.55), rand))
+					end
+				elseif kind == "mulch" then
+					local roll = rand()
+					if pass == 1 and s % 4 == 0 then layer(x, z, top, true)
+					elseif roll < 0.7 then
+						chip(x, z, top, true, rand() < 0.15)
+						for _ = 1, 2 do chip(x + between(rand, -2, 2), z + between(rand, -2, 2), top, true, false) end
+					elseif roll < 0.74 then
+						k += 1
+						add(rec(`LeafBit{k}`, v(between(rand, 1, 2.5), 0.05, between(rand, 0.5, 1.2)), v(x, top + 0.45, z), pick({ "6b5a32", "7a6a3a", "5a5a2e", "8a6a3a" }, rand), "Fabric", true, nil,
+							v(between(rand, -10, 10), between(rand, 0, 180), 0)))
+					elseif roll < 0.8 then
+						k += 1
+						add(rec(`Twig{k}`, v(between(rand, 3, 8), between(rand, 0.18, 0.32), between(rand, 0.18, 0.32)), v(x, top + 0.4, z), pick({ "6e5e4e", "5a4a3a", "7e6e5a" }, rand), "Wood", true,
+							"Cylinder", v(0, between(rand, 0, 180), between(rand, -4, 4))))
+					elseif roll < 0.86 then
+						k += 1
+						add(rec(`Seed{k}`, v(0.55, 0.3, 0.35), v(x, top + 0.35, z), pick({ "2e2620", "c9b48a", "6a4a2a" }, rand), "SmoothPlastic", true, "Ellipsoid", v(0, between(rand, 0, 180), 0)))
+					elseif roll < 0.93 then
+						k += 1
+						local w = between(rand, 3, 6)
+						add(rec(`Earth{k}`, v(w, 0.08, w * between(rand, 0.5, 0.9)), v(x, top + 0.03, z), C.soilDark, "Ground", true, "Ellipsoid", v(0, between(rand, 0, 180), 0)))
+					elseif pass == 1 then
+						-- a seedling coming up through the mulch: a stem and its first two leaves
+						k += 1
+						local h = between(rand, 2, 4)
+						add(rec(`Seedling{k}`, v(0.15, h, 0.15), v(x, top + h / 2, z), "7a9a52", "SmoothPlastic", true))
+						add(rec(`SeedLeaf{k}a`, v(1.4, 0.08, 0.7), v(x + 0.7, top + h, z), "6f9a46", "SmoothPlastic", true, "Ellipsoid", v(0, 0, 12)))
+						add(rec(`SeedLeaf{k}b`, v(1.4, 0.08, 0.7), v(x - 0.7, top + h, z), "6f9a46", "SmoothPlastic", true, "Ellipsoid", v(0, 0, -12)))
+					elseif dews < 2 then
+						dews += 1
+						add(drop(`Dew{dews}`, v(x, top + 0.6, z), between(rand, 0.25, 0.45), rand))
+					end
+				elseif kind == "soil" then
+					if rand() < 0.5 then chip(x, z, top, true, false) else
+						k += 1
+						add(rec(`Crumb{k}`, v(1.2, 0.4, 0.9), v(x, top + 0.15, z), C.soilDark, "Ground", true, "Ellipsoid"))
+					end
+				else
+					for _ = 1, 4 do stone(x + between(rand, -2.4, 2.4), z + between(rand, -2.4, 2.4), top, true, kind == "drip") end
+				end
 			end
 		end
 	end
 end
 
 local decorCache: { [string]: { Drawn } } = {}
--- The drawn look of a region of the hut or its garden, at the full tier (the low tier is the records without `full`).
+-- The drawn look of a region of the hut or its garden, at the full tier (the low tier is the records without `full`). (ROBLOX-117: and of a patch.)
 function Hut.decor(region: Region): { Drawn }
 	local key = region.id .. "/" .. tostring(region.seed)
 	local cached = decorCache[key]
@@ -1002,7 +1583,9 @@ function Hut.decor(region: Region): { Drawn }
 	elseif k == "hut_bench" then benchDecor(region, add)
 	elseif k == "hut_butt" then buttDecor(region, add)
 	elseif k == "garden_pole" then poleDecor(region, add)
-	elseif k == "garden_bed" then gardenDecor(region, add) end
+	elseif k == "garden_bed" then gardenDecor(region, add)
+	elseif k == "hut_path" then pathDecor(region, add)
+	elseif k == "patch" then patchDecor(region, add) end
 	for _, d in list do table.freeze(d) end
 	decorCache[key] = table.freeze(list)
 	return list
@@ -1025,7 +1608,14 @@ Hut.LIFE = table.freeze({
 	woodlice = { garden_a1 = 3, garden_a3 = 3 },
 	ambient = { garden_a1 = { harvestman = { full = 1, low = 1, salt = 109 } }, garden_a3 = { millipede = { full = 1, low = 1, salt = 103 } },
 		garden_c3 = { ladybird = { full = 1, low = 1, salt = 101 } } },
+	-- (ROBLOX-117) the hoverflies on the bed's flowers; the hut's own prey: fruit flies at the compost caddy by the door, a moth at the desk lamp from dusk
+	hoverflies = { garden_c4 = { full = 1, low = 1 }, garden_d4 = { full = 1, low = 1 }, garden_c3 = { full = 1, low = 1 } },
+	fruitflies = { hut_floor_i = { full = 4, low = 2 } },
+	moths = { hut_desk = { full = 1, low = 1 } },
 })
+-- (ROBLOX-117) The compost caddy by the door, on the floor east of the doorway against the south wall: a kitchen caddy of green plastic, its lid down, a banana peel over
+-- its rim; the fruit flies' home in the hut.
+Hut.CADDY = table.freeze({ x0 = 68, x1 = 90, z0 = 228, z1 = 246, h = 19, lid = 1.5 })
 
 -- The standing boxes of a cell on a surface at `top` (their footprints), and a free spot on that surface inside `area` clear of them.
 local function standingOn(region: Region, top: number): { Box }
@@ -1050,14 +1640,6 @@ local function freeSpot(rand: () -> number, area: { number }, top: number, stand
 		end
 	end
 	return nil
-end
--- The part of the pollinator bed's soil inside a cell, { x0, x1, z0, z1 }.
-local function bedArea(region: Region): { number }?
-	local b, E = Hut.POLLINATOR, Hut.EDGING.thick
-	local lo, hi = region.bounds[1], region.bounds[2]
-	local a, bb, c, d = clip(b.x0 + E, b.x1 - E, b.z0 + E, b.z1 - E, lo.X, hi.X, lo.Z, hi.Z)
-	if a == nil then return nil end
-	return { a, bb :: number, c :: number, d :: number }
 end
 local function byIdOf(region: Region): { [string]: Piece }
 	local out: { [string]: Piece } = {}
@@ -1162,7 +1744,8 @@ local bestiaryCache: { [string]: any } = {}
 -- either side of the plant's stem, low and high, and its leaves.
 function Hut.bestiary(region: Region): { any }?
 	local spring, hopper = Hut.LIFE.springtails[region.id], Hut.LIFE.leafhoppers[region.id]
-	if spring == nil and hopper == nil then return nil end
+	local hover, fruit, moth = Hut.LIFE.hoverflies[region.id], Hut.LIFE.fruitflies[region.id], Hut.LIFE.moths[region.id]
+	if spring == nil and hopper == nil and hover == nil and fruit == nil and moth == nil then return nil end
 	local key = region.id .. "/" .. tostring(region.seed)
 	if bestiaryCache[key] ~= nil then return bestiaryCache[key] end
 	local out = {}
@@ -1209,6 +1792,66 @@ function Hut.bestiary(region: Region): { any }?
 		local vents: { Vent } = { { id = `{stem.id}_vent_leafhopper`, position = v(mx, S, stem.lo.Z - 0.8), normal = Vector3.yAxis, appear = true, reach = 60 } }
 		table.insert(out, { kind = "leafhopper", profile = "leafhopper_prototype", perches = perches, vents = vents, target = hopper.full, low = hopper.low,
 			seed = (region.seed + salt * 104729) % MOD, prefix = `{region.id}_leafhopper_fly_` })
+	end
+	-- (ROBLOX-117) a perch list of `kind` with these spots ({ position, normal, shelter, food }), the first `starts` of them starting perches
+	local function spot(p: Vector3, n: Vector3, sh: number, fo: number): { any }
+		return { p, n, sh, fo }
+	end
+	local function spots(kind: string, list: { { any } }, starts: number): { Perch }
+		local perches: { Perch } = {}
+		for i, sp in list do
+			table.insert(perches, { id = `{region.id}_{kind}_{i}`, position = sp[1], normal = sp[2], shelter = sp[3], food = sp[4], start = i <= starts, kind = "leaf" })
+		end
+		return perches
+	end
+	if hover ~= nil then
+		-- the hoverflies: on the flowers' heads and the plants' upper leaves (the cell's two plants), coming in out of sight over the bed
+		local byId = piecesById(region)
+		local list: { { any } } = {}
+		for _, pl in { { PLANTS[region.id], "" }, { MORE_PLANTS[region.id], "2" } } :: { { any } } do
+			local plant = pl[1]
+			if plant ~= nil then
+				local base = `{region.id}_{plant.kind}{pl[2]}`
+				local head = byId[base .. "_cone"] or byId[base .. "_head"]
+				if head ~= nil then table.insert(list, spot(v((head.lo.X + head.hi.X) / 2, head.hi.Y, (head.lo.Z + head.hi.Z) / 2), Vector3.yAxis, 0.2, 0.9)) end
+				local spec = PLANT_SPECS[plant.kind]
+				for i = #spec.leaves, math.max(1, #spec.leaves - 2), -1 do
+					local leaf = byId[`{base}_leaf_{i}`]
+					if leaf ~= nil then table.insert(list, spot(v((leaf.lo.X + leaf.hi.X) / 2 + (leaf.hi.X - leaf.lo.X) * 0.25, leaf.hi.Y, (leaf.lo.Z + leaf.hi.Z) / 2), Vector3.yAxis, 0.3, 0.5)) end
+				end
+			end
+		end
+		local plant = PLANTS[region.id] :: any
+		local vents: { Vent } = { { id = `{region.id}_vent_hoverfly`, position = v(plant.x, S + PLANT_SPECS[plant.kind].height + 14, plant.z), normal = Vector3.yAxis, appear = true, reach = 80 } }
+		local salt = 113
+		table.insert(out, { kind = "hoverfly", profile = "hoverfly_prototype", perches = spots("hoverfly", list, hover.full), vents = vents, target = hover.full, low = hover.low,
+			seed = (region.seed + salt * 104729) % MOD, prefix = `{region.id}_hoverfly_fly_` })
+	end
+	if fruit ~= nil then
+		-- the fruit flies: on the caddy's lid and its sides, the peel, and the floor in front of it
+		local K = Hut.CADDY
+		local top = FL + K.h + K.lid
+		local list: { { any } } = {
+			spot(v(K.x0 + 5, top, K.z0 + 6), Vector3.yAxis, 0.3, 0.9), spot(v(K.x1 - 5, top, K.z0 + 10), Vector3.yAxis, 0.3, 0.9), spot(v(K.x0 + 11, top, K.z1 - 5), Vector3.yAxis, 0.3, 0.8),
+			spot(v(K.x1 - 4, top, K.z1 - 4), Vector3.yAxis, 0.3, 0.8), spot(v(K.x0 + 6, FL + 12, K.z0), -Vector3.zAxis, 0.2, 0.6), spot(v(K.x1 - 7, FL + 8, K.z0), -Vector3.zAxis, 0.2, 0.6),
+			spot(v(K.x1, FL + 10, K.z0 + 8), Vector3.xAxis, 0.2, 0.6), spot(v(K.x0 - 6, FL, K.z0 - 5), Vector3.yAxis, 0.1, 0.4), spot(v(K.x0 + 14, FL, K.z0 - 8), Vector3.yAxis, 0.1, 0.4),
+		}
+		local vents: { Vent } = { { id = `{region.id}_vent_fruit_fly`, position = v((K.x0 + K.x1) / 2, top + 6, (K.z0 + K.z1) / 2), normal = Vector3.yAxis, appear = true, reach = 40 } }
+		local salt = 127
+		table.insert(out, { kind = "fruit_fly", profile = "fruit_fly_prototype", perches = spots("fruit_fly", list, fruit.full), vents = vents, target = fruit.full, low = fruit.low,
+			seed = (region.seed + salt * 104729) % MOD, prefix = `{region.id}_fruit_fly_fly_` })
+	end
+	if moth ~= nil then
+		-- the moth: on the lamp's shade, the wall's lining behind the lamp and the desk by its base; restless from dusk, when the lamp is lit
+		local R = Hut.ROOM
+		local list: { { any } } = {
+			spot(v(110, 44, 24), Vector3.yAxis, 0.2, 0.2), spot(v(118, 39, 24), Vector3.xAxis, 0.2, 0.2), spot(v(100, 50, R.z0), Vector3.zAxis, 0.3, 0.1),
+			spot(v(126, 42, R.z0), Vector3.zAxis, 0.3, 0.1), spot(v(88, 30, R.z0), Vector3.zAxis, 0.3, 0.1), spot(v(96, 4, 26), Vector3.yAxis, 0.2, 0.1),
+		}
+		local vents: { Vent } = { { id = `{region.id}_vent_moth`, position = v(110, 52, 34), normal = Vector3.yAxis, appear = true, reach = 40 } }
+		local salt = 131
+		table.insert(out, { kind = "moth", profile = "moth_prototype", perches = spots("moth", list, moth.full), vents = vents, target = moth.full, low = moth.low,
+			seed = (region.seed + salt * 104729) % MOD, prefix = `{region.id}_moth_fly_`, dusk = { from = 18.0, to = 6.0 } })
 	end
 	bestiaryCache[key] = out
 	return out

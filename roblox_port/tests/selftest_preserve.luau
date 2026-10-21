@@ -63,7 +63,7 @@ check("the client reads the attribute: the preserve is its world, its looks the 
 	assert(loaded, "SpiderClient did not load: " .. tostring(loadError))
 	assert(WorldMap.world() == "preserve", "the client did not make the preserve the active world")
 	local driver = ClientStubs.driver
-	assert(driver.world.world == "preserve" and #WorldMap.regions() == preserveRegions and preserveRegions == 40, `the client's world is the preserve's ({#WorldMap.regions()} regions)`)
+	assert(driver.world.world == "preserve" and #WorldMap.regions() == preserveRegions and preserveRegions == 48, `the client's world is the preserve's ({#WorldMap.regions()} regions)`)
 	assert(driver.world.hut ~= nil and not driver.world.hut.open and driver.world.hut.sash ~= nil, "the hut's window is shut in a new save")
 	for _ = 1, 30 do frame(1 / 60); simClock += 1 / 60 end
 	local looks = driver.world.looks
@@ -100,14 +100,14 @@ check("the self-test runs to END in the preserve, its own checks in place of the
 	end
 	assert(fails == 0, `{fails} checks failed here (see the FAIL lines above)`)
 	local want = { "new life", "intro", "world folders", "walk on the sill", "prey on the sill", "lock", "the hut's sill", "the backdrop near and far", "the trains",
-		"the nursery: the window shut", "the nursery: the ranger props the window", "the hut's inside", "the way out", "the hut garden", "the hut's homes",
+		"the nursery: the window shut", "the nursery: the ranger props the window", "the hut's inside", "the way out", "the hut garden", "the garden's near detail", "the garden's rival and mate", "the hut's homes",
 		"the hut by night: the lamp", "the nursery: the window put back", "notebook", "rest and checkpoint", "sound", "frame time on the sill", "part counts" }
 	WorldMap.use("preserve")
 	for _, region in WorldMap.regions() do table.insert(want, "region " .. region.id) end
 	for _, name in want do assert(passes[name], "no PASS for " .. name) end
 	for _, garden in { "the line", "prey in the bed", "woodlice", "moths on the wall" } do assert(not passes[garden], "a garden check ran in the preserve: " .. garden) end
 	assert(last == `[SELFTEST] END pass={#want} fail=0 skip=0`, "the END line: " .. last)
-	for _, what in { "world", "the hut's sill", "backdrop", "trains", "lock", "the nursery", "the hut's inside", "the way out", "the hut garden", "the hut's homes" } do assert(infos[what], "no INFO line for " .. what) end
+	for _, what in { "world", "the hut's sill", "backdrop", "trains", "lock", "the nursery", "the hut's inside", "the way out", "the hut garden", "the garden's near detail", "the garden's rival and mate", "the hut's homes" } do assert(infos[what], "no INFO line for " .. what) end
 	local worldLine = false
 	for _, line in lines do if line == "[SELFTEST] INFO world: preserve (revision preserve-1)" then worldLine = true end end
 	assert(worldLine, "the world line names the preserve")

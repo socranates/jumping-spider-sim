@@ -187,3 +187,15 @@ Four pages, one for each ambient bug of the bestiary's part B (`docs/GARDEN_BEST
 - Left out: playing dead (MDC says they can; the game's harvestman does not), any leg length (the game's legs, about four studs across, are its own), that the second pair of legs is used as feelers (no source opened; the game only draws it longest).
 
 The game notes: the ladybirds' walks and how often they eat (every 50 to 120 s at most), the millipede's 2.4 cm and its coil at 2.5 studs, the snail's crawl (0.07 to 0.12 studs a second) and its trail's four minutes, the harvestman's legs and its hours (18:00 to 6:00) are game numbers. None of the four is named to a species on its page but the snail, whose shell size is the brown garden snail's (EENY240); the ladybird is drawn as a seven-spot without saying so.
+
+## The hoverflies - 2026-10-20 (ROBLOX-117)
+
+**Hoverflies: a fly dressed as a bee** (`hoverflies`, trigger `look_hoverfly`, the first close look at a hoverfly within `NotebookPages.lookWu`). The page is the game's own; both sources were **opened** this round with WebFetch, and the quotation each sentence rests on is given.
+- "Hoverflies, or flower flies (Syrphidae), are flies that look like bees or wasps, many with black and yellow stripes across the abdomen; they mimic them as protection from predators." University of Wisconsin-Madison Extension, Division of Horticulture, "Hover, Flower, or Syrphid Flies, Syrphidae": "The adults resemble bees or wasps", many with black-and-yellow abdominal stripes, and (the page's description) with "only one pair of wings, they're actually a type of fly"; University of Minnesota Extension, "Syrphid flies": "They mimic these insects as a form of protection from predators."
+- "They do not bite or sting." UMN: "Syrphid flies do not bite or sting."
+- "Tell one from a bee by its single pair of wings, its large eyes and short antennae." UMN: "You will only see one pair of wings, while wasps and bees have two pairs", "Adults have large eyes"; Wisconsin: "All have short antennae."
+- "The adults hover over flowers and dart about, feeding on nectar and pollen." Wisconsin: "hovering over the flowers and darting around", "Adult hoverflies feed on nectar and pollen."
+- "Their larvae hunt aphids: one can eat up to 400 of them." Wisconsin: the larvae "feed on aphids or other insects", each can consume "up to 400 aphids"; UMN: "A single larva can feed on dozens of aphids a day."
+- Left out: that jumping spiders hesitate at a bee's look (the bestiary's idea; no source opened), any species name (the drawing is of no one species: black banded yellow, as the sources describe many).
+
+The game note says the meal (a housefly and a half), the hover's hold and the dart are the game's numbers.

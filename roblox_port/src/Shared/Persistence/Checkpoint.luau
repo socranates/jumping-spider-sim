@@ -121,7 +121,8 @@ function Checkpoint.refs(world: World): { [string]: any }
 	ObjectRecord.constants("aphidProfile", Species.aphid_prototype, refs)
 	-- (ROBLOX-101: the bestiary's prey, by day and from dusk)
 	for _, pair in { { "springtailProfile", Species.springtail_prototype }, { "leafhopperProfile", Species.leafhopper_prototype }, { "mothProfile", Species.moth_prototype },
-		{ "mothDuskProfile", Species.moth_dusk_prototype }, { "craneFlyProfile", Species.crane_fly_prototype }, { "craneFlyDuskProfile", Species.crane_fly_dusk_prototype } } :: { { any } } do
+		{ "mothDuskProfile", Species.moth_dusk_prototype }, { "craneFlyProfile", Species.crane_fly_prototype }, { "craneFlyDuskProfile", Species.crane_fly_dusk_prototype },
+		{ "hoverflyProfile", Species.hoverfly_prototype } } :: { { any } } do -- (ROBLOX-117: the hut garden's hoverflies)
 		local name: string, profile: any = pair[1], pair[2]
 		ObjectRecord.constants(name, profile, refs)
 	end

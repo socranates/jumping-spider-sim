@@ -50,7 +50,7 @@ case("the map answers for the active world: the preserve's sill is the same sill
 	check(WorldMap.use("preserve") == "test_garden" and WorldMap.world() == "preserve" and WorldMap.revision() == "preserve-1", "the preserve made active (the test garden was)")
 	local regions = WorldMap.regions()
 	local sill = regions[1]
-	check(#regions == 40 and sill.id == "sill" and sill.kind == "sill" and #sill.neighbors == 5, `forty regions, the sill first with its five seams into the hut ({#regions}, {#sill.neighbors})`)
+	check(#regions == 48 and sill.id == "sill" and sill.kind == "sill" and #sill.neighbors == 5, `forty-eight regions (ROBLOX-117: and the path round the east end), the sill first with its five seams into the hut ({#regions}, {#sill.neighbors})`)
 	check(same(sill.bounds[1], Layout.PLAY_BOUNDS_MIN) and same(sill.bounds[2], Layout.PLAY_BOUNDS_MAX) and same(sill.spawn.pos, Layout.SPAWN) and same(sill.spawn.heading, Layout.SPAWN_HEADING)
 		and sill.clockScale == 1.0 and sill.seed == gardenSill.seed and #sill.retreats == 1 and sill.retreats[1].id == "sill_crevice"
 		and same(sill.retreats[1].min, Layout.RETREAT_MIN) and same(sill.retreats[1].max, Layout.RETREAT_MAX), "its numbers are the layout's, as the test garden's sill's")
@@ -334,7 +334,8 @@ local SaveProgress = require("../src/Shared/Persistence/SaveProgress")
 
 local HUT_IDS = "sill,hut_window,hut_outer_sill,hut_desk,hut_board,hut_shelf,hut_chair,hut_door,hut_floor_a,hut_floor_b,hut_floor_c,hut_floor_d,hut_floor_e,hut_floor_f,"
 	.. "hut_floor_g,hut_floor_h,hut_floor_i,hut_wall_mid,hut_wall_w,hut_wall_e,hut_bench,hut_butt,garden_feeder,garden_pole,garden_a1,garden_a2,garden_a3,garden_a4,"
-	.. "garden_b1,garden_b2,garden_b3,garden_b4,garden_c1,garden_c2,garden_c3,garden_c4,garden_d1,garden_d2,garden_d3,garden_d4"
+	.. "garden_b1,garden_b2,garden_b3,garden_b4,garden_c1,garden_c2,garden_c3,garden_c4,garden_d1,garden_d2,garden_d3,garden_d4,"
+	.. "path_s1,path_s2,path_e1,path_e2,path_e3,path_e4,path_e5,path_e6" -- (ROBLOX-117: the path round the hut's east end)
 
 case("the hut's regions: the sill, the hut's inside, the way out and the garden's core, in priority order, each with its seed, spawn, retreats and pace", function()
 	WorldMap.use("preserve")
@@ -397,7 +398,7 @@ case("the hut's seams: each listed both ways along one line at both regions' bou
 			end
 		end
 	end
-	check(count == 2 * 69 and lines, `{count / 2} seams, each both ways along one line at both regions' bounds`)
+	check(count == 2 * 78 and lines, `{count / 2} seams, each both ways along one line at both regions' bounds`)
 	local joined = true
 	for _, region in WorldMap.regions() do
 		local g = Route.graph(region.id)
@@ -589,8 +590,8 @@ case("the hut garden's life: its perches on its boxes' faces, its vents and hide
 			if #a.starts < 1 then fine = false; print("  ambient " .. a.kind .. " in " .. r.id) end
 		end
 	end
-	check(fine and counts.prey == 2 and counts.kinds == 3 and counts.bugs == 2 and counts.ambient == 3,
-		`gnats and aphids in 2 cells, the bestiary in 3, woodlice in 2, ambient bugs in 3 (found {counts.prey}, {counts.kinds}, {counts.bugs}, {counts.ambient}), every perch on a face`)
+	check(fine and counts.prey == 2 and counts.kinds == 8 and counts.bugs == 2 and counts.ambient == 3,
+		`gnats and aphids in 2 cells, the bestiary's kinds 8 times (ROBLOX-117: with the hoverflies on three cells' flowers, the fruit flies at the caddy, the moth at the lamp), woodlice in 2, ambient bugs in 3 (found {counts.prey}, {counts.kinds}, {counts.bugs}, {counts.ambient}), every perch on a face`)
 	-- the milkweed as a plant the aphids and the ladybird walk: its nodes are the aphids' leaf perches
 	local c3 = WorldMap.region("garden_c3") :: any
 	local plants = Garden.plants(c3) :: any
@@ -650,6 +651,125 @@ case("the plan in the hut and its garden: the region and its seams drawn, within
 		check(okAll, `{tier}: from every region's spawn the region and its neighbours are drawn, within {LookPlan.BUDGET[tier]} (at most {worst})`)
 		print(`preserve: the hut's regions at {tier}: at most {worst} parts`)
 	end
+end)
+
+-- ---------------------------------------------------------------- ROBLOX-117: the garden rich at the spider's eye, the path round the east end, the garden's new life
+case("the path round the hut's east end: from the door's gravel along the south wall, north past the east end and into the garden's path, gravel all the way", function()
+	WorldMap.use("preserve")
+	local chain = { "hut_door", "path_s1", "path_s2", "path_e1", "path_e2", "path_e3", "path_e4", "path_e5", "path_e6", "garden_b4" }
+	local linked = true
+	for i = 1, #chain - 1 do
+		local a = WorldMap.region(chain[i]) :: WorldMap.Region
+		local found = false
+		for _, n in a.neighbors do if n.id == chain[i + 1] then found = true end end
+		if not found then linked = false; print(`  {chain[i]} does not meet {chain[i + 1]}`) end
+	end
+	check(linked, "the door's gravel, eight lengths of path and the garden's own path meet seam to seam")
+	local fine = true
+	for _, w in Hut.WALK do
+		local r = WorldMap.region(w.id) :: WorldMap.Region
+		local pieces = Region.pieces(r)
+		if r.kind ~= "hut_path" or r.clockScale ~= 0.33 or #pieces ~= 1 or pieces[1].material ~= "Pebble" or math.abs(pieces[1].hi.Y - Hut.GROUND) > 1e-6 then fine = false end
+		if w.x0 < 178 - 1e-6 and w.z0 < 287 - 1e-6 then fine = false; print("  " .. w.id .. " in the hut") end
+	end
+	check(fine, "each a length of gravel at the garden's ground, outdoors at the garden's pace, clear of the hut's logs and base")
+	check(Nature.exposed(true, "hut_path", false) == true, "the path is out in the night")
+	-- the backdrop's gravel by the hut lies a hair under the walkable gravel, standing in for it
+	local under = true
+	for _, d in PreserveLook.records("ground", WorldMap.drawnZone("ground").seed) do
+		if string.sub(d.id, 1, 4) == "Path" and d.material == "Pebble" and d.at.Y + d.size.Y / 2 > Hut.GROUND - 0.1 and d.at.Z > -500 then under = false; print("  " .. d.id) end
+	end
+	check(under, "the backdrop's gravel by the hut is under the walkable gravel")
+end)
+
+case("the patches: the near detail of the garden and the path, drawn only near the spider, within their budgets, deterministic, with the dew", function()
+	WorldMap.use("preserve")
+	local patches = WorldMap.patches()
+	local cells, paths = 0, 0
+	for _, r in WorldMap.regions() do
+		if r.kind == "garden_bed" then cells += 1 elseif r.kind == "hut_path" then paths += 1 end
+	end
+	check(#patches >= cells * 16 and #patches < 400, `{#patches} patches over the garden's {cells} cells and the path's {paths} lengths`)
+	local fine, dews, worstFull, worstLow = true, 0, 0, 0
+	local B = Region.budget("patch", "full") :: number
+	for _, p in patches do
+		local parent = Hut.patchParent(p) :: any
+		local plo, phi = p.bounds[1], p.bounds[2]
+		if parent == nil or plo.X < parent.bounds[1].X - 1e-6 or phi.X > parent.bounds[2].X + 1e-6 or plo.Z < parent.bounds[1].Z - 1e-6 or phi.Z > parent.bounds[2].Z + 1e-6 then fine = false end
+		if WorldMap.patch(p.id) ~= p or WorldMap.region(p.id) ~= nil or WorldMap.at(p.origin) == p then fine = false end
+		local list = Region.decor(p)
+		local low = 0
+		for _, d in list do
+			if not d.full then low += 1 end
+			if not Materials.known(d.material or "SmoothPlastic") then fine = false end
+			if d.dew ~= nil then
+				dews += 1
+				if d.group ~= "Dew" or not d.full or d.dew < 0 or d.dew >= 1 or (d.transparency or 0) <= 0 then fine = false end
+			end
+		end
+		worstFull, worstLow = math.max(worstFull, #list), math.max(worstLow, low)
+		if #list > B or low > (Region.budget("patch", "low") :: number) or Region.decor(p) ~= list then fine = false end
+	end
+	check(fine, "each inside its region's footprint, its own look within the patch's budget at both tiers, the same list each time, known materials, its dew in the Dew group")
+	check(dews > 100, `the morning's dew on the blades and the chips ({dews} drops)`)
+	print(`preserve: the patches: {#patches}, at most {worstFull} records at full and {worstLow} at low`)
+	-- the plan: patches near the spider only, at the tier's detail close, thinner a little further at the full tier, within their share
+	for _, tier in { "full", "low" } do
+		local at = Vector3.new(22, Hut.GROUND + 10 + 0.31, -246) -- (in the pollinator bed's mulch by the milkweed)
+		local plan, total = LookPlan.plan(at, tier, WorldMap.at(at), nil)
+		local n, parts, far = 0, 0, 0
+		for id, level in plan do
+			local p = WorldMap.patch(id)
+			if p ~= nil then
+				n += 1
+				parts += LookPlan.count(p, level, tier)
+				local d = LookPlan.distance(p, at)
+				if d > (if tier == "low" then LookPlan.PATCH_RADIUS.low else LookPlan.PATCH_RING) then far += 1 end
+				if tier == "low" and level ~= "low" then far += 1 end
+				if tier == "full" and level == "full" and d > LookPlan.PATCH_RADIUS.full then far += 1 end
+			end
+		end
+		check(n > 0 and far == 0 and parts <= LookPlan.PATCH_SHARE[tier] and total <= LookPlan.BUDGET[tier], `{tier}: {n} patches drawn ({parts} parts), none beyond their radius, within the share and the budget ({total})`)
+		print(`preserve: in the mulch at {tier}: {n} patches, {parts} parts of them, {total} in all`)
+	end
+	local inHut = LookPlan.plan(Vector3.new(0, Hut.FLOOR + 0.31, 120), "full", WorldMap.region("hut_floor_e"), nil)
+	local none = true
+	for id in inHut do if WorldMap.patch(id) ~= nil then none = false end end
+	check(none, "in the hut, no patch is drawn")
+	check(#WorldMap.patches() == #patches and (function() WorldMap.use("test_garden"); local z = #WorldMap.patches(); WorldMap.use("preserve"); return z == 0 end)(), "the test garden has none")
+end)
+
+case("the garden's plants drawn whole over their boxes, a second of each kind, and the bed's cells within their budgets", function()
+	WorldMap.use("preserve")
+	local fine = true
+	for id, more in Hut.MORE_PLANTS do
+		local r = WorldMap.region(id) :: WorldMap.Region
+		local byId: { [string]: any } = {}
+		for _, p in Region.pieces(r) do byId[p.id] = p end
+		local stem = byId[`{id}_{more.kind}2_stem`]
+		if stem == nil or not WorldMap.inBounds(stem.hi, id) then fine = false; print("  " .. id .. " second " .. more.kind) end
+		local look = Region.decor(r)
+		local leaves = 0
+		for _, d in look do if string.sub(d.id, 1, 5) == "Leaf2" or string.sub(d.id, 1, 4) == "Ray2" or string.sub(d.id, 1, 5) == "Tube2" or string.sub(d.id, 1, 6) == "Spray2" or string.sub(d.id, 1, 8) == "Floret2_" then leaves += 1 end end
+		if leaves < 5 then fine = false; print(`  {id}: the second plant drawn with {leaves}`) end
+	end
+	check(fine, "milkweed, coneflower, bee balm and goldenrod each a second, walkable, inside its cell, and drawn")
+	local c3 = Region.decor(WorldMap.region("garden_c3") :: any)
+	local florets, midribs = 0, 0
+	for _, d in c3 do
+		if string.sub(d.id, 1, 6) == "Floret" then florets += 1 end
+		if string.sub(d.id, 1, 6) == "Midrib" then midribs += 1 end
+	end
+	check(florets >= 30 and midribs >= 12, `the milkweed's umbels ({florets} florets) and its leaves' pale midribs ({midribs})`)
+	local rival, mate = Hut.CREATURES.rival, Hut.CREATURES.mate
+	check(WorldMap.inBounds(rival.at, rival.region) and WorldMap.inBounds(mate.at, mate.region) and Hut.ROAM[rival.region] and Hut.ROAM[mate.region]
+		and WorldMap.inRetreat(rival.at) == nil and WorldMap.inRetreat(mate.at) == nil, "the rival and the mate come into the garden on its path, in cells of their roam")
+	local roam = 0
+	for id in Hut.ROAM do
+		roam += 1
+		if not string.find(id, "^garden_") then fine = false end
+	end
+	check(roam == 16, "they roam the garden's sixteen cells and never the hut")
 end)
 
 print(`PRESERVE passed={passed} failed={failed}`)

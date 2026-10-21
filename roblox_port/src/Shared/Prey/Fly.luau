@@ -6,6 +6,7 @@
 -- ROBLOX-101: the bestiary's behaviours are Prey/PreyKinds', called only for a profile that asks: a `hop` profile flees by a ballistic hop (state HOP, stepped
 -- by PreyKinds.step instead of FlyFlight) and a `flightless` one never begins a flight; a `sidestep` profile goes round its stem when watched; a profile with
 -- `flight.wander_local` keeps its wander loops near the height it flew from (the sill's 0.8 to 10 band is the sill's, and the wall and the bed are far below it).
+-- ROBLOX-117: a `hover` profile (the hoverfly) holds still in the air on a calm flight now and then (PreyKinds.hover) instead of stepping its flight.
 local M=require(script.Parent.PreyMath)
 local S=require(script.Parent.FlySenses)
 local F=require(script.Parent.FlyFlight)
@@ -220,7 +221,7 @@ function Fly.step(self: any,dt: number,now: number,stimulus: Vector3,radius: num
   self.senses:update(cast,self.position+self.normal*.1,if self:airborne() and self.velocity.Magnitude>.1 then self.velocity.Unit else self.heading,if self:airborne() then Vector3.yAxis else self.normal,stimulus,radius,now,vigilant,if self.state=='ALERT' then p.senses.decay_alert_per_s else p.senses.decay_relaxed_per_s)
  end
  self:think(now)
- if self:airborne() then if self.hop then K.step(self,now,dt) else self.flight:step(now,dt) end;self.fatigue=math.min(1,self.fatigue+p.behavior.fatigue_up_per_s*dt)
+ if self:airborne() then if self.hop then K.step(self,now,dt) elseif not (p.body.hover and K.hover(self,now,dt)) then self.flight:step(now,dt) end;self.fatigue=math.min(1,self.fatigue+p.behavior.fatigue_up_per_s*dt)
  else self:rest(now,dt);self.fatigue=math.max(0,self.fatigue-p.behavior.fatigue_down_per_s*dt) end
  if not self:airborne() and math.abs(self.heading:Dot(self.normal))>.9 then K.upright(self) end -- (ROBLOX-101: landed on a wall facing it; never on the sill's flat perches)
  self.velocity=(self.position-self.prevPosition)/dt

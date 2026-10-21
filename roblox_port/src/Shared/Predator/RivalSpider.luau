@@ -14,15 +14,36 @@ local M=require(script.Parent.Parent.Prey.PreyMath)
 local PreyRandom=require(script.Parent.Parent.Prey.PreyRandom)
 local Rules=require(script.Parent.Parent.Data.RivalRules)
 local WorldMap=require(script.Parent.Parent.World.WorldMap)
+local Hut=require(script.Parent.Parent.World.Hut)
 local Rival={}
 local function phase(r: any,s: string) if r.state~=s then r.shaken=nil end;r.state=s;r.elapsed=0 end
 Rival.FOOD=.7 -- two housefly-equivalent meals
 local states={dormant=true,patrol=true,stalk=true,windup=true,lunge=true,recover=true,captured=true,consumed=true,taken=true}
 -- "dormant" is "has not arrived yet". `day` (nil in a record from before the daily rival) is the day it was eaten, so the next one comes after it.
+-- ROBLOX-117: where a rival arrives, and its region: the sill's east end in the test garden (Data/RivalRules; no region, as every record there has always been), the
+-- hut garden's path in the preserve (World/Hut.CREATURES), with the region kept in its record (`region`: the drive walks it from region to region, Hut.ROAM).
+function Rival.arriveAt(): (Vector3,string?)
+ if WorldMap.world()=="preserve" then return Hut.CREATURES.rival.at,Hut.CREATURES.rival.region end
+ return Rules.arriveAt,nil
+end
+-- The regions a rival of this world roams (nil: it keeps to its own, the sill).
+function Rival.roam(): {[string]:boolean}?
+ if WorldMap.world()=="preserve" then return Hut.ROAM end
+ return nil
+end
 function Rival.new(): any
- local at=Rules.arriveAt
- return {state="dormant",position=at,previous=at,heading=-Vector3.xAxis,
+ local at,region=Rival.arriveAt()
+ local r={state="dormant",position=at,previous=at,heading=-Vector3.xAxis,
   elapsed=0,notice=0,food=Rival.FOOD,target=at,origin=at,patrol=0,up=Vector3.yAxis,leg=0,contests=0,grips=0}
+ if region~=nil then r.region=region end
+ return r
+end
+-- ROBLOX-117: a record of another world's rival (a rest kept in one world and put back in the other): a preserve rival in the test garden, or a sill rival (or one of a
+-- region this world has not) in the preserve. That rival is not here: this world's is a new one, yet to arrive.
+function Rival.misplaced(r: any): boolean
+ local _,region=Rival.arriveAt()
+ if region==nil then return r.region~=nil end
+ return type(r.region)~="string" or WorldMap.region(r.region)==nil
 end
 -- The morning an hour of the clock belongs to: the hours before 07:00 are the night of the day before.
 function Rival.morning(day: number,hour: number?): number
@@ -63,6 +84,7 @@ function Rival.struggling(r: any): boolean
 end
 -- The next rival, in the same table (the world holds this table): a fresh one that has not yet arrived.
 function Rival.renew(r: any)
+ r.region=nil -- (ROBLOX-117: Rival.new gives it again where this world has one)
  for k,v in Rival.new() do r[k]=v end
  r.day=nil
  r.hour=nil
@@ -74,7 +96,7 @@ end
 -- Where the wasp may take it from (ROBLOX-70): nil unless it is on the sill, awake and free; never in the retreat. ROBLOX-94: `region` (the sill's unless given) is the
 -- region it belongs to, whose retreats it keeps out of.
 function Rival.target(r: any,region: string?): any
- if r==nil or not (r.state=="patrol" or r.state=="stalk" or r.state=="windup" or r.state=="recover") or WorldMap.inRetreat(r.position,region or WorldMap.HOME)~=nil then return nil end
+ if r==nil or not (r.state=="patrol" or r.state=="stalk" or r.state=="windup" or r.state=="recover") or WorldMap.inRetreat(r.position,region or r.region or WorldMap.HOME)~=nil then return nil end
  return {position=r.position,up=r.up or Vector3.yAxis,present=true}
 end
 -- The wasp has it: it hangs under the wasp and nothing else touches it.
@@ -111,9 +133,12 @@ function Rival.valid(r: any,region: string?): boolean
  if r.grips~=nil and (type(r.grips)~="number" or r.grips~=r.grips or r.grips<0 or r.grips>1e9 or r.grips%1~=0) then return false end
  if r.hour~=nil and (type(r.hour)~="number" or r.hour~=r.hour or r.hour<0 or r.hour>=24) then return false end
  if r.fate~=nil and r.fate~="eaten" and r.fate~="taken by the wasp" then return false end
+ -- ROBLOX-117: `region` (optional: the preserve's rival roams the hut garden) names a region of 1 to 64 characters. One this world has not is another world's rival
+ -- (Rival.misplaced: a new one comes); its place is not looked at here.
+ if r.region~=nil and (type(r.region)~="string" or #r.region<1 or #r.region>64) then return false end
  if r.state=="patrol" or r.state=="stalk" or r.state=="windup" or r.state=="lunge" or r.state=="recover" then
-  local p,id=r.position,region or WorldMap.HOME
-  if not WorldMap.inBounds(p,id) or WorldMap.inRetreat(Vector3.new(p.X,p.Y,p.Z),id)~=nil then return false end
+  local p,id=r.position,region or r.region or WorldMap.HOME
+  if WorldMap.region(id)~=nil and (not WorldMap.inBounds(p,id) or WorldMap.inRetreat(Vector3.new(p.X,p.Y,p.Z),id)~=nil) then return false end
  end
  if r.day~=nil and (type(r.day)~="number" or r.day~=r.day or r.day<0 or r.day==math.huge) then return false end
  for _,k in {"position","previous","heading","target","origin"} do
@@ -128,6 +153,7 @@ end
 -- swallowed. `s.seed` is the world's seed (nil: 0).
 function Rival.step(r: any,dt: number,s: any,blocked: (Vector3,Vector3)->any): (string,number)
  if dt<=0 or dt~=dt then return "",0 end
+ if r.state~="captured" and r.state~="taken" and Rival.misplaced(r) then Rival.renew(r) end -- (ROBLOX-117: another world's rival is not here)
  dt=math.min(dt,.05);r.previous=r.position
  if r.state=="taken" then
   -- In the wasp's grip. If the wasp no longer holds it (a record returned to), it is gone: carried off.

@@ -75,6 +75,36 @@ function K.creep(f: any, now: number, dt: number): boolean
 	return true
 end
 
+-- (ROBLOX-117) The hoverfly's hover (a profile with body.hover): on a calm flight (REPOSITION: not a flight from the spider), once a flight and at `chance`, part of the way
+-- along, it stops dead in the air and holds there, wavering a little, for `hold` seconds drawn from its stream; then the flight goes on from a standstill at its quick
+-- cruise (the dart). Startled while it holds, it flees as any fly does. Returns true while it holds (the flight does not step).
+function K.hover(f: any, now: number, _dt: number): boolean
+	local h = f.profile.body.hover
+	local flight = f.flight
+	if f.state ~= "REPOSITION" or flight.length <= 1e-6 then f.hoverUntil = nil; return false end
+	if f.hoverUntil ~= nil then
+		if now < f.hoverUntil then
+			local t = now - (f.hoverSince or now)
+			local at = f.hoverAt :: Vector3
+			f.position = at + Vector3.new(math.sin(t * 7.3) * h.waver, math.sin(t * 5.1) * h.waver * 0.6, math.cos(t * 6.1) * h.waver)
+			flight.speed = 0
+			return true
+		end
+		f.hoverUntil = nil
+		return false
+	end
+	if f.hoveredFlight ~= flight.started and flight.s > flight.length * 0.3 and flight.s < flight.length * 0.75 then
+		f.hoveredFlight = flight.started
+		if f.rng:next() < h.chance then
+			f.hoverSince, f.hoverUntil, f.hoverAt = now, now + f.rng:draw(h.hold), f.position
+			f.hovers = (f.hovers or 0) + 1
+			flight.speed = 0
+			return true
+		end
+	end
+	return false
+end
+
 -- The arc's points along the hop: s from 0 to 1.
 local function arcPoint(from: Vector3, to: Vector3, apex: number, s: number): Vector3
 	return from:Lerp(to, s) + Vector3.yAxis * (4 * apex * s * (1 - s))

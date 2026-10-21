@@ -19,8 +19,30 @@ local Rules = require(script.Parent.Parent.Data.MatingRules)
 local PreyMath = require(script.Parent.Parent.Prey.PreyMath)
 local PreyRandom = require(script.Parent.Parent.Prey.PreyRandom)
 local WorldMap = require(script.Parent.Parent.World.WorldMap)
+local Hut = require(script.Parent.Parent.World.Hut)
 
 local Mate = {}
+
+-- ROBLOX-117: where the mate arrives (and its region) and where it leaves by: the sill's east end in the test garden (Data/MatingRules; no region, as before), the hut
+-- garden's path where it comes in from round the hut's east end in the preserve (World/Hut.CREATURES); and the regions it roams there (Hut.ROAM).
+function Mate.arriveAt(): (Vector3, string?)
+	if WorldMap.world() == "preserve" then return Hut.CREATURES.mate.at, Hut.CREATURES.mate.region end
+	return Rules.arriveAt, nil
+end
+function Mate.exitAt(): Vector3
+	if WorldMap.world() == "preserve" then return Hut.CREATURES.mate.exit end
+	return Rules.exitAt
+end
+function Mate.roam(): { [string]: boolean }?
+	if WorldMap.world() == "preserve" then return Hut.ROAM end
+	return nil
+end
+-- A record of another world's mate (a rest put back in the other world): it is not here.
+function Mate.misplaced(m: any): boolean
+	local _, region = Mate.arriveAt()
+	if region == nil then return m.region ~= nil end
+	return type(m.region) ~= "string" or WorldMap.region(m.region) == nil
+end
 
 local STATES: { [string]: boolean } = { away = true, wander = true, approach = true, attend = true, pair = true, leaving = true }
 local REASONS: { [string]: boolean } = { [""] = true, driven = true, dusk = true, rest = true, mated = true, sex = true, rejected = true, cut = true }
@@ -38,11 +60,13 @@ local function vec3(v: any): boolean
 end
 
 function Mate.new(): any
-	local at = Rules.arriveAt
-	return {
+	local at, region = Mate.arriveAt()
+	local m = {
 		state = "away", position = at, previous = at, up = Vector3.yAxis, heading = -Vector3.xAxis,
 		leg = 0, elapsed = 0, meter = 0, lost = 0, sex = "male", scale = 1, reason = "", scene = false,
 	}
+	if region ~= nil then (m :: any).region = region end
+	return m
 end
 
 -- How long the pair are together before the mate leaves: a male mate for the first three beats of the scene, a female mate through all four.
@@ -199,13 +223,17 @@ function Mate.step(m: any, dt: number, s: any): string
 	if dt <= 0 or dt ~= dt then return "" end
 	dt = math.min(dt, 0.05)
 	m.previous = m.position
+	-- (ROBLOX-117) another world's mate is not here: away, and it comes again where this world's does
+	if m.state ~= "away" and m.scene ~= true and Mate.misplaced(m) then gone(m) end
 	local st = m.state
 	if st == "away" then
 		if not s.mayArrive or s.day < Rules.firstDay or s.hour < Rules.arriveHour or s.hour >= Rules.arriveUntil then return "" end
 		if s.resting or s.wasp then return "" end
-		if (s.position - Rules.arriveAt).Magnitude < Rules.arriveDistance then return "" end
+		local at, region = Mate.arriveAt()
+		if (s.position - at).Magnitude < Rules.arriveDistance then return "" end
 		m.state, m.elapsed, m.meter, m.lost, m.reason = "wander", 0, 0, 0, ""
-		m.position, m.previous, m.up, m.heading, m.leg = Rules.arriveAt, Rules.arriveAt, Vector3.yAxis, -Vector3.xAxis, (s.day or 0) * 7
+		m.position, m.previous, m.up, m.heading, m.leg = at, at, Vector3.yAxis, -Vector3.xAxis, (s.day or 0) * 7
+		if region ~= nil then m.region = region elseif m.region ~= nil then m.region = nil end
 		return "arrived"
 	end
 	-- The player rests: it is gone without being seen to go. (A pair that is together finishes first: the mating is not cut short.)
@@ -225,7 +253,7 @@ function Mate.step(m: any, dt: number, s: any): string
 	local dist = delta.Magnitude
 	if st == "leaving" then
 		if m.scene == true and Mate.pairLength(m) + m.elapsed >= Rules.sceneSeconds then m.scene = false end -- (the scene's last beat is over)
-		local out = (m.position - Rules.exitAt)
+		local out = (m.position - Mate.exitAt())
 		if m.elapsed >= Rules.leaveSeconds or Vector3.new(out.X, 0, out.Z).Magnitude <= Rules.exitRadius then
 			gone(m)
 			return "gone"
@@ -330,9 +358,11 @@ function Mate.valid(m: any, region: string?): boolean
 		if m[k] ~= nil and not vec3(m[k]) then return false end
 	end
 	if m.up ~= nil and math.abs(m.up.Magnitude - 1) > 0.05 then return false end
+	-- (ROBLOX-117: `region`, optional, names a region; one this world has not is another world's mate, Mate.misplaced, and its place is not looked at here)
+	if m.region ~= nil and (type(m.region) ~= "string" or #m.region < 1 or #m.region > 64) then return false end
 	if not atRest then
-		local p, id = m.position, region or WorldMap.HOME
-		if p == nil or not WorldMap.inBounds(p, id) or WorldMap.inRetreat(Vector3.new(p.X, p.Y, p.Z), id) ~= nil then return false end
+		local p, id = m.position, region or m.region or WorldMap.HOME
+		if p == nil or (WorldMap.region(id) ~= nil and (not WorldMap.inBounds(p, id) or WorldMap.inRetreat(Vector3.new(p.X, p.Y, p.Z), id) ~= nil)) then return false end
 	end
 	return true
 end

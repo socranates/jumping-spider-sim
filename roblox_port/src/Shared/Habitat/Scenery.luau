@@ -127,6 +127,7 @@ export type Drawn = {
 	id: string, size: Vector3, at: Vector3, color: Color3, transparency: number?,
 	material: string?, shape: string?, turn: Vector3?, full: boolean?, group: string?, shadow: boolean?,
 	far: boolean?, reflectance: number?, -- (ROBLOX-115: the preserve's backdrop: in the zone's far look; a shine)
+	dew: number?, -- (ROBLOX-117: a dew drop's lag)
 }
 function Scenery.look(parent: Instance, list: { Drawn }, first: number?, last: number?, folders: { [string]: Instance }?): number
 	local groups: { [string]: Instance } = folders or {}
@@ -156,6 +157,12 @@ function Scenery.look(parent: Instance, list: { Drawn }, first: number?, last: n
 			mesh.Parent = p
 		end
 		if d.full then p:SetAttribute("FullOnly", true) end
+		-- (ROBLOX-117) a dew drop: hidden until Habitat/DayLight.applyDew shows it by the hour, from its lag to its transparency at full dew
+		if d.dew ~= nil then
+			p:SetAttribute("Lag", d.dew)
+			p:SetAttribute("Base", d.transparency or 0.35)
+			p.Transparency = 1
+		end
 	end
 	return math.max(0, i1 - i0 + 1)
 end

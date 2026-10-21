@@ -21,6 +21,7 @@ local WorldMap = require(Shared:WaitForChild("World"):WaitForChild("WorldMap"))
 local Region = require(Shared:WaitForChild("World"):WaitForChild("Region"))
 local LookPlan = require(Shared:WaitForChild("World"):WaitForChild("LookPlan"))
 local Scenery = require(Shared:WaitForChild("Habitat"):WaitForChild("Scenery"))
+local DayLight = require(Shared:WaitForChild("Habitat"):WaitForChild("DayLight"))
 
 local LookStream = {}
 LookStream.__index = LookStream
@@ -49,6 +50,7 @@ function LookStream.new(ws: Instance, tier: string, root: Instance?, map: any?):
 		looks = {} :: { [string]: { model: Model, sets: { [string]: Folder } } }, -- what is built: per region, its whole parts
 		jobs = {} :: { Job }, -- what is being built, in order
 		at = nil :: Vector3?, here = nil :: any, failed = {} :: { [string]: boolean },
+		dewHour = nil :: number?, dewDirty = false, -- (ROBLOX-117: the hour the looks' dew was last set for, and whether a look has been made since)
 		made = 0, destroyed = 0, plans = 0, -- (counts, for the tests and the self-test's INFO line)
 	}, LookStream)
 end
@@ -212,6 +214,7 @@ function LookStream.work(self: any, required: { [string]: boolean }): number
 				end
 				job.folder.Parent = look.model
 				look.sets[job.set] = job.folder
+				if (job.groups :: any).Dew ~= nil then self.dewDirty = true end
 				self:settle(job.id)
 			else
 				i += 1
@@ -232,6 +235,21 @@ function LookStream.update(self: any, pos: Vector3, here: any?): number
 	end
 	if #self.jobs == 0 then return 0 end
 	return self:work(LookPlan.required(self.at :: Vector3, self.here, self.map))
+end
+
+-- (ROBLOX-117) The morning's dew on the looks (the patches' drops on the blades and the chips, the leaves' drops): each set's "Dew" group shown by the hour as the
+-- sill's is (Habitat/DayLight.applyDew, which keeps its own level on each group). Asked each frame; it does anything only when the hour has moved a little or a
+-- look with dew has been made since. Returns whether it touched the drops.
+function LookStream.dew(self: any, hour: number): boolean
+	if not self.dewDirty and self.dewHour ~= nil and math.abs(hour - self.dewHour) < 0.05 then return false end
+	self.dewHour, self.dewDirty = hour, false
+	local any = false
+	for _, look in self.looks do
+		for _, f in look.sets do
+			if DayLight.applyDew(f, hour) then any = true end
+		end
+	end
+	return any
 end
 
 -- How many look parts this client holds now (whole sets only: a set being made is not in the workspace yet).

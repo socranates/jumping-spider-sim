@@ -24,7 +24,7 @@ local PreserveLook = {}
 export type Drawn = {
 	id: string, size: Vector3, at: Vector3, color: Color3, transparency: number?,
 	material: string?, shape: string?, turn: Vector3?, full: boolean?, group: string?, shadow: boolean?,
-	far: boolean?, reflectance: number?,
+	far: boolean?, reflectance: number?, dew: number?,
 }
 
 -- The ceilings per zone: every record (`full`), the low tier's (`low`), the far look at the full tier (`far`) and at the low tier (`farLow`).
@@ -409,11 +409,15 @@ local function groundDecor(out: List, rand: () -> number)
 				local parts = if len > 20 then 2 else 1
 				-- (ROBLOX-116: a segment inside the hut garden's core, x 43.75..47.75 and z 5..9 m, is World/Hut's walkable gravel)
 				local inCore = math.min(a[1], b[1]) >= 43.75 - 1e-6 and math.max(a[1], b[1]) <= 47.75 + 1e-6 and math.min(a[2], b[2]) >= 5 - 1e-6 and math.max(a[2], b[2]) <= 9 + 1e-6
+				-- (ROBLOX-117: the gravel by the hut, path_gate and path_hut, lies a hair under the walkable gravel of the door's step and the path round the east end,
+				-- World/Hut's, standing in for it where streaming has not sent it; the mown paths are the full tier's, a shade on the mown grass the low tier leaves out)
+				local under = c.id == "path_hut" or c.id == "path_gate"
 				for s = 1, if inCore then 0 else parts do
 					local t0, t1 = (s - 1) / parts, s / parts
 					n += 1
 					strip(out, `Path{n}`, a[1] + (b[1] - a[1]) * t0, a[2] + (b[2] - a[2]) * t0, a[1] + (b[1] - a[1]) * t1, a[2] + (b[2] - a[2]) * t1, c.width,
-						0.6, 1, if c.kind == "gravel" then C.gravel else C.mownStripe, if c.kind == "gravel" then "Pebble" else "Grass", { far = true })
+						if under then 0.15 else 0.6, 1, if c.kind == "gravel" then C.gravel else C.mownStripe, if c.kind == "gravel" then "Pebble" else "Grass",
+						{ far = true, full = c.kind == "mown" })
 				end
 			end
 		end
@@ -421,7 +425,7 @@ local function groundDecor(out: List, rand: () -> number)
 	-- the chain-link along the railway (z 60), a mesh you can see through, its top rail and posts
 	for i = 0, 4 do
 		block(out, "ChainLink" .. i, i * 20, i * 20 + 20, 59.99, 60.01, 0, 1.8, C.metal, "Metal", { far = true, transparency = 0.72 })
-		rod(out, "TopRail" .. i, M(i * 20, 60, 1.8), M(i * 20 + 20, 60, 1.8), 4, C.metal, "Metal", { far = true })
+		rod(out, "TopRail" .. i, M(i * 20, 60, 1.8), M(i * 20 + 20, 60, 1.8), 4, C.metal, "Metal", { far = true, full = true })
 	end
 	for k = 0, 20 do
 		post(out, "FencePost" .. k, k * 5, 60, 0, 1.85, 0.06, C.metal, "Metal", { full = true })
@@ -441,7 +445,8 @@ local function meadowDecor(out: List, rand: () -> number)
 			local z = mz[1] + (j - 0.5) * (mz[2] - mz[1]) / rows + between(rand, -1.1, 1.1)
 			local w, d = between(rand, 4.2, 5.6), between(rand, 3.6, 5.0)
 			local h = between(rand, 1.2, 1.9) -- big bluestem and switchgrass stand 0.9 to 1.5 m in late summer; the masses' tops reach 0.8 to 1.2
-			blob(out, `Grass{k}`, x, z, h * 0.22, w, h, d, pick(C.grass, rand), { far = true, full = k % 3 == 0 }, between(rand, 0, 180))
+			-- (ROBLOX-117: every second mass is the full tier's: 36 at the low tier, which were 48)
+			blob(out, `Grass{k}`, x, z, h * 0.22, w, h, d, pick(C.grass, rand), { far = true, full = k % 2 == 0 }, between(rand, 0, 180))
 		end
 	end
 	-- drifts of flowers over the grass: goldenrod, coneflower, milkweed, black-eyed Susan, Queen Anne's lace, bergamot
@@ -710,8 +715,9 @@ local function southDecor(out: List, rand: () -> number)
 		local x1 = math.min(x + w, 105)
 		local h = between(rand, 7, 11.5)
 		block(out, "Terrace" .. i, x, x1, -14.8, -11.4, 0, h, pick(C.shop, rand), "Brick", { far = true })
-		block(out, "Cornice" .. i, x, x1, -11.6, -11.4, h - 0.5, h - 0.3, "d8d0c0", "Concrete", { far = true })
-		block(out, "Shopfront" .. i, x + 0.4, x1 - 0.4, -11.42, -11.38, 0.4, 3.0, C.window, "SmoothPlastic", { far = true, reflectance = 0.15 })
+		-- (ROBLOX-117: the cornices and the shopfronts are the full tier's, far and near: the low tier keeps the terrace's masses, room for the garden's near detail)
+		block(out, "Cornice" .. i, x, x1, -11.6, -11.4, h - 0.5, h - 0.3, "d8d0c0", "Concrete", { far = true, full = true })
+		block(out, "Shopfront" .. i, x + 0.4, x1 - 0.4, -11.42, -11.38, 0.4, 3.0, C.window, "SmoothPlastic", { far = true, full = true, reflectance = 0.15 })
 		block(out, "Sign" .. i, x + 0.4, x1 - 0.4, -11.46, -11.4, 3.05, 3.55, ({ "2f4f6f", "7a2e2e", "2e5a3a", "c9a227", "3a3a3a" })[1 + math.floor(rand() * 5)], "SmoothPlastic", { full = true })
 		local storeys = math.floor((h - 3.4) / 3)
 		for s = 1, storeys do
@@ -729,7 +735,7 @@ local function southDecor(out: List, rand: () -> number)
 	end
 	-- honey locusts along the near pavement, and its street lamps
 	for k, tx in { 8, 30, 62, 84 } do
-		post(out, "StreetTreeTrunk" .. k, tx, -1.4, 0, 3.4, 0.24, "4a4038", "Wood", { far = true })
+		post(out, "StreetTreeTrunk" .. k, tx, -1.4, 0, 3.4, 0.24, "4a4038", "Wood", { far = true, full = true })
 		blob(out, "StreetTree" .. k, tx, -1.4, 5.2, 5.5, 4.2, 5.0, "7b9a48", { far = true })
 	end
 	for k, lx in { 18, 52, 76 } do

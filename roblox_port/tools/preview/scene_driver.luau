@@ -170,8 +170,8 @@ if WORLD then
 	local plate = Instance.new("Part")
 	plate.Name = "SpecimenPlate"; plate.Size = Vector3.new(40, 0.2, 14); plate.CFrame = CFrame.new(212, -0.1, 0); plate.Color = Color3.fromRGB(150, 146, 138)
 	plate.Anchored = true; plate.Parent = flyFolder
-	local kinds = { "springtail", "leafhopper", "moth", "crane_fly" }
-	local xs = { 200, 203, 208, 216 }
+	local kinds = { "springtail", "leafhopper", "moth", "crane_fly", "hoverfly" } -- (ROBLOX-117: and the hoverfly, at x 228)
+	local xs = { 200, 203, 208, 216, 228 }
 	for i, kind in kinds do
 		local profile = (Species :: any)[kind .. "_prototype"]
 		local function specimen(id: string, at: Vector3, flying: boolean, legsLost: number?)

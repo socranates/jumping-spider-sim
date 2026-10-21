@@ -32,6 +32,15 @@ LookPlan.BUDGET = table.freeze({ full = 1500, low = 500 })
 LookPlan.RADIUS = table.freeze({ full = 260, low = 160 })
 -- The hysteresis: a region already held is reckoned this many studs nearer, and is kept out to RADIUS + KEEP.
 LookPlan.KEEP = 30
+-- (ROBLOX-117) The patches (the preserve's near detail of the ground: World/Hut.patches, WorldMap.patches) are drawn only this near the spider (studs, from the
+-- spider to a patch's bounds), by tier, nearest first right after what must be drawn and the far looks (step 2b below), at the tier's detail as the budget allows;
+-- and at the full tier, out to PATCH_RING, at the low tier's detail (a few blades and stones); a patch already held is kept PATCH_KEEP further. So the blades,
+-- chips and stones stand thick where the eye is, thin a little further off, and nowhere else.
+LookPlan.PATCH_RADIUS = table.freeze({ full = 22, low = 20 })
+LookPlan.PATCH_RING = 42
+LookPlan.PATCH_KEEP = 8
+-- (ROBLOX-117) The most parts of patches a plan holds, by tier: the rest of the budget is the garden's cells and the backdrop's (step 3).
+LookPlan.PATCH_SHARE = table.freeze({ full = 700, low = 100 })
 
 -- The house's shell, drawn far wherever the spider is: per kind, the ids of the records its far look keeps (the big ones a distant eye reads), in order.
 -- The mortar beds behind the bricks (`Mortar`, the house_wall's `Above` beds round the window) are drawn in the first brick colour and the bricks' material,
@@ -108,10 +117,17 @@ local function drawnOf(m: any): { WorldMap.Region }
 	return m.drawn()
 end
 
--- A region or a drawn zone by id, from a map.
+-- The active world's patches from a map (none from a map that has no `patches`).
+local function patchesOf(m: any): { WorldMap.Region }
+	if m.patches == nil then return {} end
+	return m.patches()
+end
+
+-- A region, a drawn zone or (ROBLOX-117) a patch by id, from a map.
 function LookPlan.lookup(m: any, id: string): WorldMap.Region?
 	local r = m.region(id)
 	if r == nil and m.drawnZone ~= nil then r = m.drawnZone(id) end
+	if r == nil and m.patch ~= nil then r = m.patch(id) end
 	return r
 end
 
@@ -173,6 +189,34 @@ function LookPlan.plan(pos: Vector3, tier: string, here: WorldMap.Region?, held:
 	for _, r in zones do
 		if plan[r.id] == nil then set(r, "far") end
 	end
+	-- 2b. (ROBLOX-117) the patches near the spider, nearest first, at the tier's detail as the budget allows
+	local patches = patchesOf(m)
+	if #patches > 0 then
+		local pr = if tier == "low" then LookPlan.PATCH_RADIUS.low else LookPlan.PATCH_RADIUS.full
+		local ring = if tier == "low" then pr else LookPlan.PATCH_RING
+		local close: { { region: WorldMap.Region, d: number, i: number, level: Level } } = {}
+		for i, r in patches do
+			local d = LookPlan.distance(r, pos)
+			local was = if held ~= nil then held[r.id] else nil
+			local level: Level? = nil
+			if d <= pr or (was == top and d <= pr + LookPlan.PATCH_KEEP) then level = top
+			elseif d <= ring or (was ~= nil and d <= ring + LookPlan.PATCH_KEEP) then level = "low" end
+			if level ~= nil then table.insert(close, { region = r, d = if was ~= nil then d - LookPlan.PATCH_KEEP else d, i = i, level = level :: Level }) end
+		end
+		table.sort(close, function(a, b)
+			if a.d ~= b.d then return a.d < b.d end
+			return a.i < b.i
+		end)
+		local share = if tier == "low" then LookPlan.PATCH_SHARE.low else LookPlan.PATCH_SHARE.full
+		local used = 0
+		for _, o in close do
+			local c = count(o.region, o.level)
+			if used + c <= share and total + c <= budget then
+				set(o.region, o.level)
+				used += c
+			end
+		end
+	end
 	-- 3. the others, nearest first, within the radius, as the budget allows
 	local others: { { region: WorldMap.Region, d: number, i: number } } = {}
 	local function consider(r: WorldMap.Region, i: number)
@@ -186,7 +230,12 @@ function LookPlan.plan(pos: Vector3, tier: string, here: WorldMap.Region?, held:
 	end
 	for i, r in regions do consider(r, i) end
 	for i, r in zones do consider(r, #regions + i) end
+	-- (ROBLOX-117: the walkable regions before the backdrop's zones, each nearest first: in the preserve's garden its cells' plants come before the zone round it.
+	-- A map with no zones, the test garden's, is ordered as it always was)
+	local nRegions = #regions
 	table.sort(others, function(a, b)
+		local za, zb = a.i > nRegions, b.i > nRegions
+		if za ~= zb then return zb end
 		if a.d ~= b.d then return a.d < b.d end
 		return a.i < b.i
 	end)

@@ -45,6 +45,7 @@ export type Drawn = {
 	id: string, size: Vector3, at: Vector3, color: Color3, transparency: number?,
 	material: string?, shape: string?, turn: Vector3?, full: boolean?, group: string?, shadow: boolean?,
 	far: boolean?, reflectance: number?, -- (ROBLOX-115: the preserve's backdrop: in the zone's far look; a shine)
+	dew: number?, -- (ROBLOX-117: a dew drop's lag: Habitat/DayLight.applyDew shows it by the hour, Habitat/Scenery.look hides it until then)
 }
 export type Box = { min: Vector3, max: Vector3 }
 

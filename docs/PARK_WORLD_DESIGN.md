@@ -145,6 +145,11 @@ coneflower, bee balm and goldenrod under mulch, a herb bed, the feeder on its po
 millipede and a harvestman; homes under the trough, a stone and a bark chip). Round 2: the corridor round the hut's east end and the path on to the meadow's
 edge, the rival walking the garden, the hut's own prey (the fruit flies and the moth at the lamp), the published default; round 3: the volunteers' back room
 and the cat (a doorway in the hut's east wall, `docs/HANDOFF-roblox-world.md`).
+*Round 2 built (ROBLOX-117, 2026-10-20, not yet run in Studio):* the hut garden rich at the spider's eye (patches of near detail drawn only round the spider: grass blades
+at true size in tufts, layered bark mulch, gravel, husks and a feather under the feeder, petals, the dew; a second of each of the bed's plants and every plant drawn
+whole), the rival and the mate coming into the garden and roaming its cells (never the hut), the hoverfly with its page, the fruit flies at a compost caddy by the door
+and the moth at the lamp, the gravel path round the hut's east end to the door's gap, the low tier's far looks thinner. Left for round 3 with the back room and the cat:
+the path on to the meadow's edge and the published default.
 
 **Phase C — the meadow and the path (3 rounds).** Zone 3 and the first corridor (the mown path, the bench/bin/lamppost patch, zone 8),
 crab spider and the lamppost moths, ballooning as the generation's choice.
@@ -193,6 +198,12 @@ the Steam edition (the canal, the apartment balconies and window boxes, a roofto
 5. Lock-on moves to **L2** on controllers (Nathan, 2026-10-20), in Phase A's first round.
 
 ## 11. Progress
+
+- **ROBLOX-117 (Phase B, round 2)**: the hut garden rich at the spider's eye (354 patches of near detail, World/LookPlan's step 2b), the plants' seconds and their drawing,
+  the dew on the looks, the rival and the mate in the garden (`Hut.CREATURES`, `Hut.ROAM`, RivalDrive's `roam`), the hoverfly, the fruit flies' caddy and the lamp's moth,
+  the path round the east end (eight regions), the low tier's far looks thinner; 48 regions, 332 boxes, 78 seams. Decisions taken in the build: near detail as patches
+  planned by distance rather than a denser look per region; the rival and the mate simulated only beside the spider's cell; the hut never theirs.
+  `docs/DECISIONS.md` ROBLOX-117; `docs/HANDOFF-roblox-world.md` has the Studio checklist.
 
 - **ROBLOX-116 (Phase B, round 1)**: the ranger hut walkable and its way out, the nursery rule, the hut garden's core and its life; 40 regions in the preserve
   (the sill and 39 new: 285 boxes, 69 seams), the backdrop's hut and garden drawn a hair behind the walkable boxes where both are. Decisions taken in the build:

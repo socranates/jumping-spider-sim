@@ -117,8 +117,9 @@ Preserve.CORRIDORS = table.freeze({
 		{ 24, 49 }, { 58, 49 }, { 60.4, 47.8 }, { 61, 46 }, { 61, 30 } }),
 	corridor("path_cross", "mown", 1.4, { { 45.5, 13 }, { 58, 13 }, { 60.4, 14.2 }, { 61, 16 }, { 61, 29 } }),
 	-- (round the hut's east end and in through the hut garden's core, World/Hut's gravel path: west along z 6.71 and north along x 45.15, 0.5 to 0.6 m wide; its points
-	-- break at the core's edges, x 47.75 and z 9, ROBLOX-116)
-	corridor("path_hut", "gravel", 0.6, { { 45.5, 1.4 }, { 48.4, 1.6 }, { 48.4, 6.71 }, { 47.75, 6.71 }, { 45.15, 6.71 }, { 45.15, 9 }, { 45.15, 13 } }),
+	-- break at the core's edges, x 47.75 and z 9, ROBLOX-116. ROBLOX-117: walkable round the east end too, World/Hut.WALK: along the south wall's foot at z 1.67 from
+	-- the door, north along x 48.4 and in at z 6.55)
+	corridor("path_hut", "gravel", 0.6, { { 45.5, 1.67 }, { 48.4, 1.67 }, { 48.4, 6.55 }, { 47.75, 6.55 }, { 45.15, 6.55 }, { 45.15, 9 }, { 45.15, 13 } }),
 	corridor("boardwalk", "boardwalk", 1.5, { { 61, 30 }, { 79, 30 } }),
 	corridor("path_wall", "mown", 1.2, { { 79, 30 }, { 90, 30 } }),
 	corridor("hedge_base", "hedge", 0.8, { { 0.6, 1 }, { 0.6, 59 } }),

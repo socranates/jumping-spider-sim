@@ -851,3 +851,46 @@ the bird feeder on its pole) with gnats, aphids, springtails, leafhoppers, woodl
 - The rival and the mate still keep to the sill; the rival walking the garden, the corridor round the hut's east end and the hut's own prey (fruit flies, the
   moth at the lamp) are round 2. No hoverfly yet (it needs its page).
 - The sash's sound and the ranger's footsteps: none (no recording yet). Say if you want them.
+
+## The hut garden rich at the spider's eye, its life, the path round the east end (ROBLOX-117, 2026-10-20)
+
+Claude → Chet, 2026-10-20, branch `claude/preserve-b2`. Phase B, round 2 of `docs/PARK_WORLD_DESIGN.md`. In the preserve (the Workspace attribute `World` = "preserve"; the
+published default is still the test garden) the hut garden is drawn at true size where the spider is: the ground near it is cut into patches (`World/Hut.patches`)
+drawn only within about 20 studs at full detail and 42 thinner (`World/LookPlan`): tufts of grass blades with seed heads and clover on the lawn, layered shredded bark,
+leaf bits, twigs and seeds on the bed, gravel stones on the paths, husks and a cardinal's feather under the feeder, petals under the flowers, dew in the morning. Each
+of the bed's plants has a second beside it and every plant is drawn whole over its boxes (leaf blades, umbels, rays and cone, whorled heads, plumes). The rival and the
+mate come into the garden (the rival on the gravel path from the north, the mate from round the hut's east end) and roam its cells across their seams, never the hut.
+Hoverflies hover and dart over the flowers (a new page); fruit flies at a compost caddy by the door; a moth at the desk lamp from dusk. A gravel path now leads from the
+door's gap round the hut's east end into the garden. The low tier's far looks are thinner, so both tiers stay in budget. **Nothing of it has run in Studio.**
+
+## Your Studio checklist (ROBLOX-117)
+
+1. **The test garden, unchanged**: Play the place as it is: `world: The Test Garden`; the self-test as before (39 checks).
+2. **The preserve, the garden at the spider's eye**: `workspace:SetAttribute("World", "preserve")`, Play; the quickest way into the garden is the self-test (checklist
+   6) or a save with the window open. Walk the spider into the pollinator bed's mulch by the milkweed, onto the lawn by the stone, along the path, to the feeder's foot.
+   Screenshot each from the game camera and from the eye view for Nathan. Say how the blades, the bark and the gravel read in Roblox's own materials (the previewer
+   has none of their textures), and whether blades or chips pop in as the spider walks (they are built at most 120 a frame within about 20 studs).
+3. **Frame time in the garden**: at the full tier the looks are at the 1,500-part budget there (about 650 of them the patches). Say the frame time standing in the
+   mulch and walking across the lawn, and at the low tier.
+4. **The dew**: set the clock to dawn (the self-test does: hour 6) and look at the blades by the spider; by noon the drops are gone.
+5. **The path round the east end**: from inside, pass under the door's gap onto the gravel, turn east along the hut's south wall, round the corner and north along the
+   east end into the garden's own path. Say if the gravel's edge or the lawn beside it reads wrong, and whether the backdrop's gravel shows through anywhere.
+6. **The self-test in the preserve**: `workspace:SetAttribute("SelfTest", true)` with World "preserve", Play: 72 checks, among them the garden's near detail and the
+   garden's rival and mate. Paste the INFO lines (the patches and parts held, the dew, where the rival and the mate went).
+7. **The rival and the mate**: in a long life in the garden, the rival comes in on the gravel path from the north end of the garden (from day 2, after the first
+   meal, from 07:00); a mate (when the spider is grown and well fed) comes in along the path from round the hut's east end. Say whether they cross from cell to cell
+   smoothly at the seams, and whether either is ever seen standing in the air (a cell not streamed in).
+8. **The hoverfly**: on the coneflowers and the goldenrod; it holds still in the air a moment and darts. Say whether the hover reads, and whether the notebook's
+   hoverfly page opens at the first close look.
+9. **The hut's prey**: the fruit flies at the green caddy by the door (east of the doorway on the floor), and at night (the clock past dusk) the moth at the desk
+   lamp.
+10. Set the World attribute back before publishing (the published game stays the test garden until Phase B ends).
+
+## Open for Nathan (ROBLOX-117)
+
+- The garden's near detail is a budget: about 90 parts for every 25-stud patch within 20 studs of the spider, 10 for those to 42, at most 700 parts at the full tier
+  and 100 at the low. Say if you want it thicker (the cost is frame time on phones) or thinner.
+- The rival and the mate roam only the sixteen cells of the hut garden, and only while the spider is in a cell beside theirs (elsewhere they wait where they are:
+  their ground may not be streamed in). They never go into the hut, even after the window is open; say if the rival should follow the spider up the bench and the logs.
+- The hoverfly does not yet make the spider hesitate for its bee look (the bestiary's idea); it is a meal like any fly. Say if you want the hesitation.
+- The hut's own prey is fruit flies at a compost caddy and the moth at the lamp; the house flies at the window are the sill's, as before.

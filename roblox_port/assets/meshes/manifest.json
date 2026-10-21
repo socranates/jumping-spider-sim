@@ -1,0 +1,133 @@
+{
+  "version": 1,
+  "authored_on": "2026-10-21",
+  "authoring": "original procedural Blender geometry; no third-party model assets",
+  "scale": "1 coordinate unit = 1 project stud = 1 cm; import Scale Unit Stud",
+  "axes": "Blender Z up; FBX -Z forward / Y up",
+  "assets": [
+    {
+      "name": "grass_clump",
+      "file": "grass_clump.fbx",
+      "dimensions_studs": [
+        9.73953,
+        26.041445,
+        11.812691
+      ],
+      "triangles": 1400,
+      "vertices": 714,
+      "mesh_id": "rbxassetid://93421946013090",
+      "texture_id": "rbxassetid://116765351721069",
+      "verified_in_studio": true,
+      "sha256": "1f53a6cb22a277181040809db18438b37d97f73b11566288740012d7e22dd9fa",
+      "imported_size_studs": [
+        9.739529609680176,
+        26.041444778442383,
+        11.812690734863281
+      ]
+    },
+    {
+      "name": "milkweed_leaf",
+      "file": "milkweed_leaf.fbx",
+      "dimensions_studs": [
+        7.0,
+        2.125,
+        19.5
+      ],
+      "triangles": 1466,
+      "vertices": 765,
+      "mesh_id": "rbxassetid://128470594939908",
+      "texture_id": "rbxassetid://116765351721069",
+      "verified_in_studio": true,
+      "sha256": "7082edc354627df83e0b4507da671540c20aae8de89bbdbdc47797f3f35d2098",
+      "imported_size_studs": [
+        7,
+        2.125,
+        19.5
+      ]
+    },
+    {
+      "name": "coneflower_head",
+      "file": "coneflower_head.fbx",
+      "dimensions_studs": [
+        10.344988,
+        3.975,
+        10.288317
+      ],
+      "triangles": 4948,
+      "vertices": 2956,
+      "mesh_id": "rbxassetid://136400030278193",
+      "texture_id": "rbxassetid://116765351721069",
+      "verified_in_studio": true,
+      "sha256": "44aa13f5872a635a32006a822556b48fd7d560bbf2fbd22a8a350b4f8720b83c",
+      "imported_size_studs": [
+        10.344987869262695,
+        3.9749999046325684,
+        10.28831672668457
+      ]
+    },
+    {
+      "name": "bark_chip",
+      "file": "bark_chip.fbx",
+      "dimensions_studs": [
+        4.599804,
+        0.684588,
+        9.0
+      ],
+      "triangles": 1496,
+      "vertices": 750,
+      "mesh_id": "rbxassetid://90087253428470",
+      "texture_id": "rbxassetid://116765351721069",
+      "verified_in_studio": true,
+      "sha256": "4c4955a3c92a888e1ed36fd2f78d39c597446b59257cf11ba1750129a956746f",
+      "imported_size_studs": [
+        4.599803924560547,
+        0.6845884323120117,
+        9
+      ]
+    },
+    {
+      "name": "stone",
+      "file": "stone.fbx",
+      "dimensions_studs": [
+        5.345497,
+        1.815153,
+        3.794619
+      ],
+      "triangles": 320,
+      "vertices": 162,
+      "mesh_id": "rbxassetid://93673725524671",
+      "texture_id": "rbxassetid://116765351721069",
+      "verified_in_studio": true,
+      "sha256": "613849c1a948a9881dfcafa4ed3d781a2c4bac2b1b15848e57b1218ba80179ab",
+      "imported_size_studs": [
+        5.345497131347656,
+        1.8151531219482422,
+        3.794618606567383
+      ]
+    },
+    {
+      "name": "bench_slat_end",
+      "file": "bench_slat_end.fbx",
+      "dimensions_studs": [
+        14.0,
+        3.2,
+        10.0
+      ],
+      "triangles": 188,
+      "vertices": 96,
+      "mesh_id": "rbxassetid://109006316168913",
+      "texture_id": "rbxassetid://116765351721069",
+      "verified_in_studio": true,
+      "sha256": "f3654498537f82c113c40bd15df05c1166f201271994655ccce4972a537e44a7",
+      "imported_size_studs": [
+        14,
+        3.200000047683716,
+        10
+      ]
+    }
+  ],
+  "model_asset_id": "105970842890511",
+  "combined_file": "preserve_first_set_cm.fbx",
+  "fbx_export_scale": 0.01,
+  "studio_import_scale": 1
+}

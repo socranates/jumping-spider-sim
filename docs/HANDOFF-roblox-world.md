@@ -1013,3 +1013,27 @@ run in Studio.**
 - The robin is the open ground's bird; the design's other birds (a treecreeper on the oak, the heron) wait for their zones.
 - A mate still comes only to the hut garden, and the egg sac and the hatching are still drawn in the sill's crack wherever the spider rested: a lineage that ballooned to the meadow has its family at the hut. Say if the mate and the sac should follow the spider's home.
 - Ballooning lands only in the hut garden and the meadow's edge (only built zones); the pond, the oak and the wall join as they are built.
+
+## Frame time in the preserve: the boxes' shadows (ROBLOX-121, 2026-10-21)
+
+Claude → Chet, 2026-10-21, branch `claude/perf2`. v41's self-test measured the sill at 38 fps (mean 26.6 ms) where v39 had 54 to 60. In the CLI the client's own Lua on the sill
+costs the same in v39's tree and v41's (about 4.7 ms a frame, the same parts by part, the same writes a frame); what grew is what the engine is given: 3,699 parts to 4,654, and
+shadow casters from 841 to 1,614, because every box of the meadow's edge and the bench patch (773, culms 1 cm across 11 to 16 m away) casts. Now this client turns off the shadow of
+a walkable box whose shadow would be under about two pixels wide from where the spider is (`Client/WorldShadows`: its middle extent under 1/500 of its distance), and on again as the
+spider comes near; from the sill 611 boxes cast none and the casters fall to 1,003. Nothing drawn changes. The self-test in the preserve now samples the sill twice more, without
+the far preserve and without shadows, and prints one line comparing the three. **Not run in Studio.**
+
+## Your Studio checklist (ROBLOX-121)
+
+1. **The self-test** (`workspace:SetAttribute("SelfTest", true)`, Play, the preserve at the full tier): 180 checks. Paste these INFO lines: `frame time on the sill`, `profile on the
+   sill`, `census on the sill`, `shadows on the sill`, `frame time on the sill without the far preserve`, `frame time on the sill without shadows` and `the far preserve on the
+   sill`. The last says it: the sill near 60 fps as it is means the shadows were the cost; still slow as it is but fast without the far preserve means the far boxes' drawing is
+   (the next round streams them out or draws them as masses); fast only without shadows means the shadows left (the hut's, the garden's) are.
+2. **The look**: walk from the hut garden to the meadow's edge by day and watch the meadow's grass and the bench as you come: their shadows should be there when you are close
+   enough to see them (a culm's within about 5 m, the bench's from across the garden) and nothing should pop that you can see. Screenshot the meadow from the bench patch.
+3. **A phone** if you can: the low tier's sill frame time with the same lines.
+
+## Open for Nathan (ROBLOX-121)
+
+- If the sill is still under 60 fps at the full tier, say what the far preserve's line reads; the levers left are the far boxes' drawing (stream them out, or draw the far meadow as
+  masses) and the shadows inside the hut, both of which change what is drawn a little and want your eye first.

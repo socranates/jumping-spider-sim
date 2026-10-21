@@ -40,6 +40,7 @@ local LifeClock = require(Shared:WaitForChild("Life"):WaitForChild("LifeClock"))
 local LookStream = require(script.Parent.LookStream)
 local TrainPass = require(script.Parent.TrainPass)
 local HutLife = require(script.Parent.HutLife)
+local WorldShadows = require(script.Parent.WorldShadows)
 local FrameProfile = require(script.Parent.FrameProfile)
 
 local WorldClient = {}
@@ -115,6 +116,7 @@ function WorldClient.new(ws: Instance, player: Instance, map: any?): any
 		prey = nil :: any, bugs = nil :: any, lastRetreat = if #home.retreats > 0 then home.retreats[1].id else nil,
 		world = if m.world ~= nil then m.world() else Worlds.DEFAULT, train = nil :: any, -- (ROBLOX-115: the world it is, and the preserve's train once the looks are made)
 		hut = nil :: any, life = nil :: any, hutPending = false, -- (ROBLOX-116: the hut's sash and lamp in the preserve, the life the nursery rule reads, a save's open window before the hut is made)
+		shadows = nil :: any, -- (ROBLOX-121: the walkable boxes' shadows kept to those an eye at the spider could see, Client/WorldShadows; made at the first update)
 	}, WorldClient)
 end
 
@@ -253,8 +255,8 @@ function WorldClient.streamLooks(self: any, ws: Instance, tier: string): any
 end
 
 -- Each frame, before the sim's ticks (`dt`, ROBLOX-116: the frame's seconds, for the hut's own moment): the region the spider is in, the pace of its day, the focus on the drawn spider's root (`root`) when it is not set on it yet, the
--- report of where it is to the server (`now`: os.clock() unless a test gives a clock), the looks near it (ROBLOX-108), and whether the region it is in has arrived
--- whole (warned about once if not).
+-- report of where it is to the server (`now`: os.clock() unless a test gives a clock), the looks near it (ROBLOX-108), the boxes' shadows (ROBLOX-121), and whether
+-- the region it is in has arrived whole (warned about once if not).
 function WorldClient.update(self: any, pos: Vector3, root: Instance?, now: number?, dt: number?)
 	self.region = self.map.at(pos) or self.region
 	LifeClock.game.clockScale = self.region.clockScale
@@ -273,6 +275,10 @@ function WorldClient.update(self: any, pos: Vector3, root: Instance?, now: numbe
 	self.hutClock = (self.hutClock or 0) + (if dt ~= nil then dt else 0)
 	if self.hut ~= nil then self.hut:update(self.life, if dt ~= nil then self.hutClock else clock) end
 	FrameProfile.lap("looks") -- (ROBLOX-111: the self-test's frame profile, Client/FrameProfile)
+	-- (ROBLOX-121: a box's shadow only where it could be seen from the spider; not in a place with only the sill straight in the workspace)
+	if self.shadows == nil and self.root ~= self.sill then self.shadows = WorldShadows.new(self.root, self.map, self.home) end
+	if self.shadows ~= nil then self.shadows:update(pos, clock) end
+	FrameProfile.lap("shadows")
 	local id = self.region.id
 	if not self.whole[id] then
 		if self:regionReady(id) then

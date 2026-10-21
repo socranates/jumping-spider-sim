@@ -18,7 +18,8 @@
 -- its checkpoint kept and returned to; the music playing and the room tone silent; the frame time over five seconds on the sill and in the bed; the parts in the workspace.
 -- ROBLOX-111: it is also the frame's profiler. Each frame sample prints the client's render step timed by part (Client/FrameProfile), the engine's memory and part
 -- counts and a census of what is drawn; the bed is sampled again once its looks are made, then without the looks and without shadows; the let-down is profiled,
--- prints what the line did (SilkController's counts) and is judged in the game's time.
+-- prints what the line did (SilkController's counts) and is judged in the game's time. ROBLOX-121: the sill's sample says how many walkable boxes cast a shadow
+-- (Client/WorldShadows), and in the preserve the sill is sampled again without the far preserve and without shadows, one line comparing the three.
 -- ROBLOX-115 (two worlds): it runs on the world the place runs (the Workspace attribute World). In the test garden, everything above; in the preserve, whose only
 -- walkable place is the ranger hut's sill, the garden's checks (the line from the outer sill, the bed's prey and woodlice and frames, the wall's moths) give way to
 -- the hut's sill (its boxes whole, the Decor without the test garden's view, the hut's look held whole at the tier's detail) and the backdrop near and far (the
@@ -105,7 +106,8 @@ local function engineHost(): Host
 end
 
 -- ---------------------------------------------------------------- the run's state and its words
-type Run = { ctx: any, host: Host, pass: number, fail: number, skip: number, doing: string, began: number, beat: number, bedAt: number?, bedSettled: number? }
+type Run = { ctx: any, host: Host, pass: number, fail: number, skip: number, doing: string, began: number, beat: number, bedAt: number?, bedSettled: number?,
+	lastSample: string?, sillSample: string? } -- (ROBLOX-121: the last frame sample's line, and the sill's, for the far preserve's comparison)
 
 local function say(r: Run, text: string)
 	r.host.print(SelfTest.PREFIX .. " " .. text)
@@ -289,9 +291,60 @@ local function frameSample(r: Run, seconds: number, what: string, where: string)
 	local ok, line = pcall(rawSample, r, seconds)
 	if prof ~= nil then prof.stop() end
 	if not ok then error(line, 0) end
+	r.lastSample = line
+	if what == "frame time on the sill" then r.sillSample = line end
 	say(r, `INFO {what}: {line}`)
 	if prof ~= nil then say(r, `INFO profile {where}: {prof.line()}`) end
 	say(r, `INFO engine {where}: {engineLine()}`)
+end
+
+-- ROBLOX-121: what the far preserve costs the sill's frame. The frame is sampled again with the far preserve out of the workspace (every region's boxes farther than the
+-- looks' radius, LookPlan.RADIUS, from the spider but its own region's and its neighbours', and the looks held at their far level: the backdrop's masses), and again with the
+-- global shadows off; both put back at once, whatever happens; then one line says the three means side by side (the shim's samples have no means: "?").
+local function meanOf(line: string?): string
+	return if line ~= nil then (string.match(line, "mean ([%d%.]+) ms") or "?") else "?"
+end
+local function farPreserve(r: Run)
+	local ctx = r.ctx
+	local world = ctx.world
+	local root: Instance = world.root
+	local pos = ctx.motor.pos
+	local near: { [string]: boolean } = { [world.region.id] = true, [world.home] = true }
+	for _, n in world.region.neighbors do near[n.id] = true end
+	local out: { { it: Instance, parent: Instance? } } = {}
+	local parts = 0
+	for _, region in WorldMap.regions() do
+		if not near[region.id] and LookPlan.distance(region, pos) > LookPlan.RADIUS.full then
+			local f = root:FindFirstChild(Region.folderName(region))
+			if f ~= nil then table.insert(out, { it = f, parent = f.Parent }); parts += partsUnder(f) end
+		end
+	end
+	local looks = world.looks
+	if looks ~= nil then
+		for id, look in looks.looks do
+			if looks.plan[id] == "far" then table.insert(out, { it = look.model, parent = look.model.Parent }); parts += partsUnder(look.model) end
+		end
+	end
+	local lines: { [string]: string } = {}
+	local function sample(what: string, where: string)
+		frameSample(r, SelfTest.AB_S, what, where)
+		lines[what] = r.lastSample or "?"
+	end
+	local ok, err = pcall(function()
+		for _, o in out do o.it.Parent = nil end
+		sample("frame time on the sill without the far preserve", "on the sill without the far preserve")
+	end)
+	for _, o in out do o.it.Parent = o.parent end
+	if not ok then error(err, 0) end
+	local Lighting = game:GetService("Lighting")
+	local was = Lighting.GlobalShadows
+	local ok2, err2 = pcall(function()
+		Lighting.GlobalShadows = false
+		sample("frame time on the sill without shadows", "on the sill without shadows")
+	end)
+	Lighting.GlobalShadows = was
+	if not ok2 then error(err2, 0) end
+	say(r, `INFO the far preserve on the sill: mean {meanOf(r.sillSample)} ms as it is, {meanOf(lines["frame time on the sill without the far preserve"])} ms without the far preserve ({#out} folders, {parts} parts out), {meanOf(lines["frame time on the sill without shadows"])} ms without shadows`)
 end
 
 -- ---------------------------------------------------------------- the checks
@@ -1390,6 +1443,13 @@ local function checks(): { Check }
 	add("frame time on the sill", function(r)
 		frameSample(r, SelfTest.SAMPLE_S, "frame time on the sill", "on the sill")
 		say(r, "INFO census on the sill: " .. census())
+		-- (ROBLOX-121: the walkable boxes' shadows this client keeps, Client/WorldShadows)
+		local shadows = r.ctx.world.shadows
+		if shadows ~= nil then
+			local kept, on = shadows:counts()
+			say(r, `INFO shadows on the sill: {on} of {kept} visible walkable boxes cast, {kept - on} too small to see at their distance cast none ({shadows.passes} passes, {shadows.writes} writes)`)
+		end
+		if preserve then farPreserve(r) end
 	end)
 
 	add("part counts", function(r)

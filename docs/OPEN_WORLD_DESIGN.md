@@ -230,6 +230,9 @@ ROBLOX-114: everything to scale, `docs/SCALE_AUDIT.md`; CLI only, not run in Stu
   now times the client's frame by part and samples the bed again settled, without the looks and without shadows, so the next Studio run names the cost.)*
   *(2026-10-20, ROBLOX-113: v37 ran 35 of 35 at 60 fps everywhere; the two costs it named are cut: the camera on the line asks the world 12 questions a frame
   where it asked 141 in the CLI, and the spider rig makes a quarter fewer CFrames a frame, its drawing the same to the bit. Not run in Studio.)*
+  *(2026-10-21, ROBLOX-121: v41 had the preserve's sill at 38 fps; the client's Lua was as v39's, the engine's share had grown: the meadow's and the bench's boxes all cast
+  shadows. A walkable box's shadow is now kept only while it could be seen from the spider (Client/WorldShadows: casters on the sill 1,614 to 1,003), and the self-test compares
+  the sill with and without the far preserve and without shadows. Not run in Studio.)*
 - **The 200-local client**: the world wiring is a new module (`Client/WorldClient`), not more lines in SpiderClient.
 - **Save format**: `world` is optional and validated; the revision gate protects positions.
 - **Nav graph size**: region sizing; seams are the only cross-region edges.

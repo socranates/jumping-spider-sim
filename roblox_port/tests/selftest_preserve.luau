@@ -140,6 +140,41 @@ check("the self-test's opening of the window was put back and never kept: the pr
 	assert(driver.world.hut.opened == 1, `the window opened once this session ({driver.world.hut.opened})`)
 end)
 
+-- ROBLOX-121: the walkable boxes' shadows through the real client (Client/WorldShadows): the sill's line counts every visible box outside the sill, and from the sill
+-- more than 600 of them cast none; the far preserve's comparison was sampled and everything it took out is back, the shadows on again.
+check("the sill's shadows and the far preserve's comparison through the real client, everything put back", function()
+	local driver = ClientStubs.driver
+	local sh = driver.world.shadows
+	assert(sh ~= nil and sh.at ~= nil, "the client keeps the boxes' shadows")
+	local shadowLine, farLine = nil, nil
+	for _, line in lines do
+		if string.find(line, "[SELFTEST] INFO shadows on the sill: ", 1, true) == 1 then shadowLine = line end
+		if string.find(line, "[SELFTEST] INFO the far preserve on the sill: ", 1, true) == 1 then farLine = line end
+	end
+	assert(shadowLine ~= nil and farLine ~= nil, "the shadows' line and the far preserve's line")
+	local on, kept = string.match(shadowLine :: string, "INFO shadows on the sill: (%d+) of (%d+) visible walkable boxes cast")
+	WorldMap.use("preserve")
+	local world = workspace:FindFirstChild("World") :: Instance
+	local entries = 0
+	for _, f in world:GetChildren() do
+		local region = WorldMap.region(f.Name)
+		if f.Name ~= "Windowsill" and region ~= nil then
+			for _, p in f:GetChildren() do if (p :: any).Transparency < 1 then entries += 1 end end
+		end
+	end
+	assert(tonumber(kept) == entries and tonumber(on) ~= nil and (tonumber(on) :: number) < entries - 600, `the line: {on} of {kept} cast ({entries} visible boxes outside the sill)`)
+	assert(string.find(farLine :: string, "without the far preserve (", 1, true) ~= nil and string.match(farLine :: string, "%((%d+) folders, (%d+) parts out%)") ~= nil, "the far preserve's line: " .. tostring(farLine))
+	local folders, parts = string.match(farLine :: string, "%((%d+) folders, (%d+) parts out%)")
+	assert((tonumber(folders) :: number) > 50 and (tonumber(parts) :: number) > 1000, `the far preserve's {folders} folders and {parts} parts`)
+	assert(#world:GetChildren() == preserveRegions + 1, `every region's folder back in World ({#world:GetChildren()})`)
+	assert(game:GetService("Lighting").GlobalShadows ~= false, "the shadows on again")
+	for _, what in { "frame time on the sill without the far preserve", "profile on the sill without the far preserve", "frame time on the sill without shadows", "profile on the sill without shadows" } do
+		local found = false
+		for _, line in lines do if string.find(line, "[SELFTEST] INFO " .. what .. ":", 1, true) == 1 then found = true end end
+		assert(found, "no INFO line: " .. what)
+	end
+end)
+
 -- ROBLOX-120: ballooning through the real client: a brood hatched, the card's two ways on, "Follow one", the ride (the world waits, the camera on the rider), and the
 -- next generation where the wind's draw set it down, its start kept in the rest it makes and in the notebook.
 check("ballooning through the real client: the card offers Follow one and Stay at the hut; the ride; the next generation begins where the wind's draw lands it", function()

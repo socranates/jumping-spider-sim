@@ -218,6 +218,11 @@ the Steam edition (the canal, the apartment balconies and window boxes, a roofto
 
 ## 11. Progress
 
+- **ROBLOX-121 (frame time)**: v41's sill at 38 fps traced to the engine's share (the client's Lua the same as v39's in the CLI): the meadow's and the bench's 773 boxes all cast
+  shadows. `Client/WorldShadows` keeps a walkable box's shadow only while it could be seen from the spider (its middle extent at least 1/500 of its distance): from the sill 611 cut,
+  casters 1,614 to 1,003; the self-test compares the sill with and without the far preserve and without shadows. A zone round from here keeps its boxes' count in mind: every box
+  is a part the engine draws wherever the spider is. `docs/DECISIONS.md` ROBLOX-121; `docs/HANDOFF-roblox-world.md` has the Studio checklist.
+
 - **ROBLOX-120 (Phase C, round 2)**: the robin (`Predator/Bird`, `Client/BirdBody`, `UI/BirdText`), the field cricket (`Data/Species.cricket_prototype` and its night's, `Prey/PreyKinds`'
   ear and kick, `Data/FlyLook.small.cricket`, in `World/Hut` and `World/Meadow`), ballooning (`Life/Ballooning`, the card's "Follow one", the ride, `life.start_zone`). Decisions taken in
   the build: a robin (not a house sparrow: the design's American preserve names it, and the sources say it takes spiders); its danger only on the ground, never from the air; cover is

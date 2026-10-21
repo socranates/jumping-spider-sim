@@ -1069,10 +1069,10 @@ if loaded and d then
 	d.needs:grantEnergy(0.9, "test_meal")
  d.life.mealFood=.9 -- three consumed meals: Godot's moult, no longer the game's (ROBLOX-88)
 	frames(3)
-	check(not d.life.growth.ready and d.life.growth.gameRules == true, "three houseflies do not ready a moult in the game: it asks for five")
+	check(not d.life.growth.ready and d.life.growth.gameRules == true, "three houseflies do not ready the first moult: it asks for seven")
 	local line = find("SpiderPrompts", "DayLine")
-	check(line ~= nil and string.find(line.Text, "Next moult: 3 of 5 meals", 1, true) ~= nil, `the screen counts the moult out of five ({if line then line.Text else "no line"})`)
-	d.life.mealFood=.6 -- two more: five consumed meals in all, independent of reserve capacity
+	check(line ~= nil and string.find(line.Text, "Next moult: 3 of 7 meals", 1, true) ~= nil, `the reference garden screen counts the first moult out of seven ({if line then line.Text else "no line"})`)
+	d.life.mealFood=1.2 -- four more: seven consumed meals in all, independent of reserve capacity
 	frames(3)
 	check(d.life.growth.ready and book:isOpen("outgrowing_a_skin"), "being ready to moult opens its page")
 	tap("Feed"); frames(3)

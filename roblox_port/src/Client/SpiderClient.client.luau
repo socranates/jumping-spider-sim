@@ -1965,7 +1965,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			M.World.prey:after(DT,motor,sensor,sightCast)
 			if M.World.prey.event ~= nil then hud:setNote(M.PreyText.note(M.World.prey.event) or "",M.PreyText.SECONDS);M.World.prey.event=nil end -- (ROBLOX-101: a slip, a shed leg)
 			M.Prof.lap("prey")
-			-- Five houseflies or ten small prey (ROBLOX-88; Godot's three and six are Growth's defaults); credit food, not just spare energy capacity.
+			-- Credit consumed food toward the stage's moult threshold, independent of spare reserve capacity.
 			life.mealFood = (life.mealFood or 0) + Growth.rivalCredit(prey.feeding.taken-takenBefore)
             local rivalState={
              position=motor.pos,previous=prey.previousPosition or motor.pos,heading=motor.heading,up=motor.up,

@@ -96,6 +96,13 @@ Working branch: `codex/v48-living-habitat`, based on v47 receipt commit `9d442ff
 - Living-world checks 3,842/0, clean strict analysis and 207/207 compile. Native full-detail inspection shows workers and mouth fragments; a normal-camera grub encounter is captured. See `docs/verification/v48/COLONY-REVIEW.md` for scope and limits.
 - Frozen 55-suite run on `4a828e0` remains in progress at `C:\Users\natha\claude-xfer\v48-full-4a828e0-results`. It has already found mating-client failures and notebook assertions tied to the old moult threshold. This is not a green release gate; investigate before publishing. The frozen run does not include the later colony source.
 
+### Regression repair follow-up
+
+- Fixed a real courtship integration bug: the mate's reused rival drive was suppressing sight under the very courtship/scene flags meant to protect the pair from the rival. Its private snapshot now omits those two rival-only flags, preserving the caller's state and all retreat/rest/wasp/occlusion restrictions.
+- Updated notebook fixtures for the first seven-fly moult. Optimized can and low-tier anthill dressing instead of raising the existing 150-record hut-decoration cap; all three low-tier workers, mouth fragments, can rims and tabs remain.
+- Current-source reruns: mating 725/0, real-client mating 29/0, notebook 1,499/0, living world 3,840/0, preserve 1,148/0. Strict analysis clean; 207/207 compile. See `docs/verification/v48/REGRESSION-REVIEW.md`.
+- The immutable 4a828e0 run remains active in its preserve self-test and predates the colony/repairs. Finish observing it, address any further failures, then freeze current source for a complete release regression. Native flea/continuity, weather, ordinary traversal and performance reviews still remain; no publication claim.
+
 ## Platform judgment
 
 Roblox limits density, draw calls, memory and simulation cost, especially on phones. The current barren travel and missing ground are implementation/design problems. Compact, authored habitats with reused meshes, bounded active wildlife and selective detail remain a viable direction. No engine migration is needed to address these reported problems.

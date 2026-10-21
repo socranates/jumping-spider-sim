@@ -607,6 +607,7 @@ end
 -- One tick of the world with the drive after the step (the client's order).
 local function walkTick(w: any)
 	local s = snapshot(w)
+	s.courting, s.scene = Mate.courting(w.life.mate,w.player.position), Mate.sceneActive(w.life.mate)
 	s.drive = w.legs
 	local events = Mating.tick(w.life, DT, s)
 	for _, e in events do table.insert(w.log, { e = e, day = s.day, hour = s.hour }) end
@@ -614,6 +615,25 @@ local function walkTick(w: any)
 	w.life:step(DT, { inRetreat = Layout.inRetreat(w.player.position), attached = true, still = true, holding = false, feeding = false, position = w.player.position }, false, false)
 	w.life:drainEvents()
 end
+
+case("the mate sees its own courtship without removing rival protections or safety restrictions",function()
+ local w=newWorld();local d=legs(w)
+ local mate=Mate.new();mate.state="attend";mate.position=Vector3.new(-5,.31,-7.5);mate.previous=mate.position
+ w.player.position=Vector3.new(-5,.31,-9);w.player.previous=w.player.position;w.player.heading=Vector3.zAxis
+ local s=snapshot(w);s.courting=true;s.scene=true
+ local blocked=false;d.drive.blocked=function() return blocked end
+ local function advance() for _=1,20 do d:update(mate,DT,s) end end
+ advance()
+ check(d.sees,"mate can see the partner while rival-only courtship/scene guards are set")
+ check(s.courting==true and s.scene==true,"adapter retains the caller's rival protections")
+ for _,flag in {"safe","resting","wasp"} do
+  s[flag]=true;advance();check(not d.sees,"mate still respects "..flag)
+  s[flag]=false;advance();check(d.sees,"mate can see again after "..flag)
+ end
+ blocked=true;advance();check(not d.sees,"courtship does not see through a real obstruction")
+ blocked=false;advance();check(d.sees,"unobstructed sight returns")
+ d:destroy()
+end)
 
 case("the legs: it walks the sill, comes up to a spider it sees, stands facing it, leaves by the exit, never enters the crack", function()
 	local w = newWorld()

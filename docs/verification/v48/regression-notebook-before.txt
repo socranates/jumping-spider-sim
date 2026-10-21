@@ -1,0 +1,9 @@
+C:/Users/natha/AppData/Local/Temp/tmpy2i458x1.luau:57564: notebook failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmpy2i458x1.luau:57564
+NOTEBOOK client: after the first 120 frames the book holds: bold_jumper,hunting_by_sight
+FAIL NOTEBOOK the screen counts the moult out of five (Next moult: 3 of 7 meals · 2 small prey = 1 housefly)
+FAIL NOTEBOOK being ready to moult opens its page
+FAIL NOTEBOOK a rest in the crack begins the moult
+NOTEBOOK passed=1496 failed=3

@@ -73,22 +73,23 @@ function Sites.decor(region: any): {any}
   for i=1,12 do
    local angle=i*2.39996;local radius=2.1+(i%4)*.7
    local offset=Vector3.new(math.cos(angle)*radius,0,math.sin(angle)*radius)
-   table.insert(out,{id=hill.id.."_grain"..i,size=Vector3.new(.22,.17,.27),at=hill.at+offset+Vector3.new(0,Sites.antHeight(offset)+.06,0),color=Color3.fromHex("8b7151"),shape="Ball",full=i>4})
+   table.insert(out,{id=hill.id.."_grain"..i,size=Vector3.new(.22,.17,.27),at=hill.at+offset+Vector3.new(0,Sites.antHeight(offset)+.06,0),color=Color3.fromHex("8b7151"),shape="Ball",full=true})
   end
   for i=1,8 do
    local route=AntForage.route(i)
-   table.insert(out,{id=hill.id.."_forage_fragment"..i,size=Vector3.new(.13,.08,.18),at=hill.at+route.direction*route.distance+Vector3.new(0,.04,0),color=Color3.fromHex("b5a57c"),shape="Ellipsoid",full=i>3})
+   table.insert(out,{id=hill.id.."_forage_fragment"..i,size=Vector3.new(.13,.08,.18),at=hill.at+route.direction*route.distance+Vector3.new(0,.04,0),color=Color3.fromHex("b5a57c"),shape="Ellipsoid",full=i>1})
   end
   return out
  end
  local site=Sites.CANS[region.id];if not site then return {} end
  local out: {any}={};local p=site.at
- local function part(name: string,size: Vector3,at: Vector3,color: string,shape: string?,turn: Vector3?,material: string?)
-  table.insert(out,{id=site.id.."_"..name,size=size,at=p+at,color=Color3.fromHex(color),material=material or "Metal",shape=shape,turn=turn,shadow=true})
+ local function part(name: string,size: Vector3,at: Vector3,color: string,shape: string?,turn: Vector3?,material: string?,full: boolean?)
+  table.insert(out,{id=site.id.."_"..name,size=size,at=p+at,color=Color3.fromHex(color),material=material or "Metal",shape=shape,turn=turn,shadow=true,full=full})
  end
  -- Keep the existing walkable shell and aperture; exposed ends are aluminium,
  -- with a rolled rim and a hollow pull tab rather than a painted solid face.
  for _,spec in Sites.pieces(region) do
+  if spec.id==site.id.."_base" then continue end -- the rolled aluminium base below already draws this closed end
   local lid=string.find(spec.id,"_lid_",1,true)~=nil or spec.id==site.id.."_base"
   part(spec.id,spec.hi-spec.lo,(spec.lo+spec.hi)*.5-p,if lid then "aeb5b5" else site.color)
  end
@@ -99,14 +100,14 @@ function Sites.decor(region: any): {any}
   part("rolled_lid_"..i,Vector3.new(.20,math.sqrt(dy*dy+dz*dz)+.08,.20),
    Vector3.new(12.24,(a[1]+b[1])*.5,(a[2]+b[2])*.5),"c4cbcb",nil,Vector3.new(math.deg(math.atan2(dz,dy)),0,0))
  end
- part("label",Vector3.new(7,.025,3.2),Vector3.new(5.8,6.62,0),"ded6bd",nil,nil,"SmoothPlastic")
- part("label_band",Vector3.new(1,.028,3.2),Vector3.new(4.3,6.63,0),site.color,nil,nil,"SmoothPlastic")
+ part("label",Vector3.new(7,.025,3.2),Vector3.new(5.8,6.62,0),"ded6bd",nil,nil,"SmoothPlastic",true)
+ part("label_band",Vector3.new(1,.028,3.2),Vector3.new(4.3,6.63,0),site.color,nil,nil,"SmoothPlastic",true)
  part("tab_left",Vector3.new(.12,.75,.12),Vector3.new(12.36,5.65,-.38),"d4d9d9")
  part("tab_right",Vector3.new(.12,.75,.12),Vector3.new(12.36,5.65,.38),"d4d9d9")
  part("tab_top",Vector3.new(.12,.12,.88),Vector3.new(12.36,6.025,0),"d4d9d9")
  part("tab_bottom",Vector3.new(.12,.12,.88),Vector3.new(12.36,5.275,0),"d4d9d9")
- part("dry_syrup",Vector3.new(2.2,.018,1.3),Vector3.new(13.3,.014,.3),"75523b","Ellipsoid",nil,"SmoothPlastic")
- part("scuff1",Vector3.new(.035,.04,1.4),Vector3.new(4,6.66,-.25),"a4aca7",nil,Vector3.new(0,17,0))
+ part("dry_syrup",Vector3.new(2.2,.018,1.3),Vector3.new(13.3,.014,.3),"75523b","Ellipsoid",nil,"SmoothPlastic",true)
+ part("scuff1",Vector3.new(.035,.04,1.4),Vector3.new(4,6.66,-.25),"a4aca7",nil,Vector3.new(0,17,0),nil,true)
  return out
 end
 function Sites.drawnPieces(region: any): {string}

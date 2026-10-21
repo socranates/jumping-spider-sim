@@ -1,0 +1,8 @@
+MATING_TRACE	1	wasp	false	safe	false	grounded	true	moving	false	air	false	line	false	driveSees	false
+MATING_POSE	-5.0000, 0.3100, -7.5000	-5.0000, 0.3100, -9.0000	0.0000, 0.0000, 1.0000	blocked	nil	facing	true
+MATING_TRACE	2	wasp	false	safe	false	grounded	true	moving	false	air	false	line	false	driveSees	false
+MATING_POSE	-5.0000, 0.3100, -7.5000	-5.0000, 0.3100, -9.0000	0.0000, 0.0000, 1.0000	blocked	nil	facing	true
+MATING_TRACE	3	wasp	false	safe	false	grounded	true	moving	false	air	false	line	false	driveSees	false
+MATING_POSE	-5.0000, 0.3100, -7.5000	-5.0000, 0.3100, -9.0000	0.0000, 0.0000, 1.0000	blocked	nil	facing	true
+MATING_TRACE	4	wasp	false	safe	false	grounded	true	moving	false	air	false	line	false	driveSees	false
+MATING_POSE	-5.0000, 0.3100, -7.5000	-5.0000, 0.3100, -9.0000	0.0000, 0.0000, 1.0000	blocked	nil	facing	true

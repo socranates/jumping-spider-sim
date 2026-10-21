@@ -37,7 +37,7 @@ end
 function MateDrive.new(motor: any, blocked: (Vector3, Vector3) -> any, region: string?, roam: { [string]: boolean }?): any
 	local drive = RivalDrive.new(motor, blocked, region, roam)
 	return setmetatable({
-		drive = drive, exit = exitOf(drive), exitRegion = drive.region, leaving = false, sees = false,
+		drive = drive, exit = exitOf(drive), exitRegion = drive.region, leaving = false, sees = false, player = {},
 		proxy = { state = "dormant", position = motor.pos, previous = motor.pos, up = motor.up, heading = motor.heading, origin = motor.pos, leg = 0, elapsed = 0, notice = 0 },
 	}, MateDrive)
 end
@@ -69,7 +69,14 @@ function MateDrive.update(self: any, mate: any, dt: number, s: any)
 	else
 		self.leaving = false
 	end
-	self.drive:update(proxy, dt, s)
+	-- Courtship/scene flags keep the rival away from this pair. They must not
+	-- blind the mate to its own partner. Preserve retreat, rest, wasp and sight
+	-- restrictions in a reused private snapshot; never mutate the caller's table.
+	local player = self.player
+	table.clear(player)
+	for k,v in s do player[k]=v end
+	player.courting, player.scene = nil, nil
+	self.drive:update(proxy, dt, player)
 	mate.position, mate.up, mate.heading, mate.leg = proxy.position, proxy.up, proxy.heading, proxy.leg
 	if proxy.region ~= nil then mate.region = proxy.region end
 	if self.drive.region ~= self.exitRegion then self.exit, self.exitRegion = exitOf(self.drive), self.drive.region end

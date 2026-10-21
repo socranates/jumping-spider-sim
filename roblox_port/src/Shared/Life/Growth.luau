@@ -11,7 +11,8 @@ Growth.READY_FOOD = 0.9
 Growth.FLY_FOOD = 0.3
 -- The game's own rules (ROBLOX-88), opt-in like NeedsModel.game and Data/Catch.game: the housefly-equivalents a moult asks for. Godot's is 3 (READY_FOOD,
 -- pinned by tests/growth_reference.json); a Growth never given these replays it. Growth:useGameRules() applies them.
--- ROBLOX-91: the gentle modes (Easy, Free play) keep the three of Godot and ROBLOX-61 (`gentleMoultFlies`): the five were for the standard rules.
+-- First and second game moults require seven and ten flies in every mode.
+-- The later adult moult retains five in Normal and three in the gentle modes.
 Growth.game = { firstMoultFlies = 7, secondMoultFlies = 10, moultFlies = 5, gentleMoultFlies = 3 }
 Growth.MOULT_HOURS = 12
 Growth.SOFT_HOURS = 10

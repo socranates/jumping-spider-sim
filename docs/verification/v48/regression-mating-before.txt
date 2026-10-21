@@ -1,0 +1,41 @@
+FAIL client_mating: courting: close, facing, still, the meter fills in the hud for eight seconds, then the pair are together for a moment and the mate walks off
+    C:/Users/natha/AppData/Local/Temp/tmp9mw031d9.luau:56328: the meter fills (0)
+FAIL client_mating: the night's sleep in the crack makes the egg sac: drawn in the crack, in the checkpoint, with the guard days in the hud; the second day, then the hatching
+    C:/Users/natha/AppData/Local/Temp/tmp9mw031d9.luau:56383: 3 none
+FAIL client_mating: the hatching: a scene of about 26 seconds in the crack, spiderlings out of the sac, ballooning away one by one; the camera and the controls are free
+    C:/Users/natha/AppData/Local/Temp/tmp9mw031d9.luau:56415: the eggs hatched: none on day 4
+FAIL client_mating: Carry on: the next generation is a spiderling again in the crack, the days go on, the toast says so, the notebook and the look are kept, saves work
+    C:/Users/natha/AppData/Local/Temp/tmp9mw031d9.luau:56488: the button works
+FAIL client_mating: a record restored into the hatching goes straight to the ending card, and carrying on again counts the generation up
+    C:/Users/natha/AppData/Local/Temp/tmp9mw031d9.luau:56542: the next generation after that
+FAIL client_mating: in Normal a full meter is the mate's to decide (ROBLOX-106): a thin spider is refused in MateText's words, the mate walks off for the day, the cycle waits
+    C:/Users/natha/AppData/Local/Temp/tmp9mw031d9.luau:56583: refused: none / approach /  after 16 s
+FAIL client_mating: the scene: the camera eases into a two-shot and orbits a quarter, the controls are locked, a skip after four seconds parts them and everything goes back
+    C:/Users/natha/AppData/Local/Temp/tmp9mw031d9.luau:56623: courted: attend none after 20 s (resting false, asleep false, meter 0)
+FAIL client_mating: the scene played to its end: the notice is held, the walk off is the last beat, the camera and music go back; Reduced Motion is a static two-shot
+    C:/Users/natha/AppData/Local/Temp/tmp9mw031d9.luau:56623: courted: attend none after 20 s (resting false, asleep false, meter 0)
+FAIL client_mating: the scene and a wasp: the controls are the player's the moment it comes, the duck wins over the swell
+    C:/Users/natha/AppData/Local/Temp/tmp9mw031d9.luau:56623: courted: attend none after 20 s (resting false, asleep false, meter 0)
+FAIL client_mating: the scene says how to leave it: from four seconds a status line and the touch Skip button, by device; the Captions setting does not hide it; a snap clears the two-shot's ease
+    C:/Users/natha/AppData/Local/Temp/tmp9mw031d9.luau:56623: courted: attend none after 20 s (resting false, asleep false, meter 0)
+FAIL client_mating: Reduced Motion cuts the two-shot in and out (ROBLOX-92), where it eased over 0.8 s
+    C:/Users/natha/AppData/Local/Temp/tmp9mw031d9.luau:56623: courted: attend none after 20 s (resting false, asleep false, meter 0)
+FAIL client_mating: a close look begun from the eye view gives way to the mating scene: the two-shot plays, the skip frees the controls, and the eye view stays off
+    C:/Users/natha/AppData/Local/Temp/tmp9mw031d9.luau:56623: courted: attend none after 20 s (resting false, asleep false, meter 0)
+FAIL client_mating: a close look begun from the eye view gives way to the hatching, which cancels the eye view's return too
+    C:/Users/natha/AppData/Local/Temp/tmp9mw031d9.luau:56912: (a close look from the eye view in the crack)
+FAIL client_mating: the Spider settings row is refused during the mating scene and the hatching, in its own words, like the close look; it works again after (ROBLOX-92)
+    C:/Users/natha/AppData/Local/Temp/tmp9mw031d9.luau:56623: courted: attend none after 20 s (resting false, asleep false, meter 0)
+FAIL client_mating: a visitor far off is not announced, and one that arrives out of earshot is told when it comes near; the courting line is the same rule (ROBLOX-92)
+    C:/Users/natha/AppData/Local/Temp/tmp9mw031d9.luau:56981: and the courting line: ""
+FAIL client_mating: the mirror: a male player's female mate turns to face him, stayC:/Users/natha/AppData/Local/Temp/tmp9mw031d9.luau:57240: CLIENT_MATING failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmp9mw031d9.luau:57240
+s and turns away; the captions, the cues, the pause and the entry follow
+    C:/Users/natha/AppData/Local/Temp/tmp9mw031d9.luau:57041: resting
+FAIL client_mating: a record returned to during the scene's world, a reset and a new life leave nothing of the scene behind
+    C:/Users/natha/AppData/Local/Temp/tmp9mw031d9.luau:56623: courted: attend none after 20 s (resting false, asleep false, meter 0)
+FAIL client_mating: the rival keeps away from the courting pair and the scene (ROBLOX-91): it recovers, unaware, and a lunge in progress is not carried into the scene
+    C:/Users/natha/AppData/Local/Temp/tmp9mw031d9.luau:56623: courted: attend none after 20 s (resting false, asleep false, meter 0)
+CLIENT_MATING passed=11 failed=18

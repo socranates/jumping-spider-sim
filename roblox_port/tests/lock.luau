@@ -306,6 +306,8 @@ local camera = workspace.CurrentCamera
 -- The test target where the spider sees it (perception_client's set-up): on the sill's floor, 2.4 ahead.
 local SPOT = Vector3.new(-26, 2.31, -3.5)
 local function setUp(targetAt: Vector3, faceIt: boolean)
+	d.life.growth.stage=2 -- The following combat/camera fixtures exercise the acquired ability.
+	d.life.growth.softHoursLeft=0;d.life.growth.moultingHoursLeft=0
 	d.input:clear(); d.sensor:reset(); d.memory:clear(); d.lockOn.release(d.lock, "test")
 	d.stage.target.frozen = true
 	d.stage.target.position = targetAt; d.stage.target.velocity = Vector3.zero
@@ -317,6 +319,24 @@ end
 local AHEAD = Vector3.new(-26, 2.8, -5.9)
 
 check(loaded and d ~= nil and d.lock ~= nil and d.lockOn == LockOn, "the client loads and hands its lock to the hooks")
+
+case("client: second moult reveals lock; earlier L1 only creeps", function()
+	for _,stage in {0,1} do
+		setUp(AHEAD,true);d.life.growth.stage=stage;frames(240)
+		key("Creep",true,"ButtonL1");frames(1)
+		check(d.input.held.Creep==true and d.lock.trackId==nil,`stage {stage}: L1 creeps without lock`)
+		key("Creep",false,"ButtonL1")
+		tap("Recenter")
+		check(d.lock.trackId==nil,`stage {stage}: keyboard cannot bypass the gate`)
+		d.input:simulate("Lock",true);frames(1);d.input:simulate("Lock",false);frames(1)
+		check(d.lock.trackId==nil and not touchButton("Lock").Visible,`stage {stage}: touch cannot bypass or spoil the gate`)
+	end
+	d.life.growth.moultingHoursLeft=.000001;frames(3)
+	check(d.life.growth.stage==2 and string.find(d.life.notice,"You can now lock on",1,true)~=nil,"second moult explains the acquired ability")
+	frames(240);tap("Creep","ButtonL1")
+	check(d.lock.trackId~=nil,"L1 now locks a perceived target")
+	d.lockOn.release(d.lock,"test")
+end)
 
 case("client: a target the spider has not seen cannot be locked; R recentres instead", function()
 	setUp(AHEAD, false) -- behind the spider, still: no inspection, no cue

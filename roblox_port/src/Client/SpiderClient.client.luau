@@ -1430,6 +1430,7 @@ controls = SpiderInput.bind({
 	-- as before; letting go recentres too, behind a spider that is facing what it watched. The touch Lock button only locks and lets go.
 	recenter = function()
 		if spiderPick.inspecting then return end
+		if not life.growth:canLock() then cam:startRecenter();return end
 		local o = motor:observer()
 		local origin, dir = cam:aimRay()
 		local r = M.LockOn.press(M.lock, memory, motor.pos, motor.up, o.eye, o.heading, origin, dir)
@@ -1442,7 +1443,7 @@ controls = SpiderInput.bind({
 		cam:startRecenter()
 	end,
 	lock = function()
-		if spiderPick.inspecting then return end
+		if spiderPick.inspecting or not life.growth:canLock() then return end
 		local o = motor:observer()
 		local origin, dir = cam:aimRay()
 		M.LockOn.press(M.lock, memory, motor.pos, motor.up, o.eye, o.heading, origin, dir)
@@ -1487,9 +1488,10 @@ local function tickInput(): any
 		focusPoint = if hit then hit.Position else origin + dir * SpiderMotor.AIM_RANGE
 	end
 	rig.focusPoint = focusPoint -- (the drawn body turns a little toward it and the eyes glance at it: ROBLOX-87, display only)
+	local running = controls.held.Run == true and life.growth:canRun()
 	return {
-		wish = wish, run = controls.held.Run == true,
-		creep = controls.held.Creep == true or locked ~= nil or (r * r + f * f > 0 and r * r + f * f < 0.25 and controls.held.Run ~= true), reel = f,
+		wish = wish, run = running,
+		creep = controls.held.Creep == true or locked ~= nil or (r * r + f * f > 0 and r * r + f * f < 0.25 and not running), reel = f,
 		dropHeld = controls.held.Drop == true, releaseHeld = controls.held.Cancel == true and not spiderPick.cancelSwallow,
 		focusPoint = focusPoint, gaze = if cam.eyeView then cam.gaze else nil, face = locked,
 	}
@@ -1531,7 +1533,7 @@ local function updateHud(frameDt: number)
 	local aiming = jump:isAiming()
 	local view: any = {
 		device = device, aiming = aiming, focus = controls.held.Focus == true or focusActive(), eyeView = cam.eyeView,
-		status = {}, helpVisible = helpVisible, helpText = PeacockText.card(device, SpiderChoice.displayKind(appearance)), -- (ROBLOX-92: one string, the one the Studio spec measures)
+		status = {}, helpVisible = helpVisible, helpText = PeacockText.card(device, SpiderChoice.displayKind(appearance), life.growth.stage >= 1, life.growth.stage >= 2), -- (ROBLOX-92: one string, the one the Studio spec measures)
 		caption = if Q("eye_caption") then eyes:captionView(device) else nil,
 	}
 	-- Captions for sounds and vibrations (ROBLOX-49): off, normal or large. The eye view's own explanation above is not a sound caption.
@@ -1688,12 +1690,13 @@ local function updateHud(frameDt: number)
 	controls:setTouchLabel("Cancel", ControlText.touchCancelLabel(onLine))
 	controls:setTouchVisible("Jump", not onLine)
 	controls:setTouchVisible("Creep", not onLine)
+	controls:setTouchVisible("Run", life.growth.stage >= 1 and not onLine and not life.growth:isMoulting() and not spiderPick.inspecting)
 	M.Prof.lap("hud")
 	do -- the Lock button (ROBLOX-110): only while something can be locked, or a lock holds
 		local o = motor:observer()
 		local origin, dir = cam:aimRay()
 		local held = M.lock.trackId ~= nil
-		controls:setTouchVisible("Lock", held or (motor.mode == "attached" and M.LockOn.pick(memory, o.eye, o.heading, origin, dir) ~= nil))
+		controls:setTouchVisible("Lock", life.growth:canLock() and (held or (motor.mode == "attached" and M.LockOn.pick(memory, o.eye, o.heading, origin, dir) ~= nil)))
 		controls:setTouchLabel("Lock", ControlText.touchLockLabel(held))
 	end
 	M.Prof.lap("lock button")
@@ -1752,6 +1755,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			sensor:step(DT,motor:observer(),percepts,sightCast)
 			M.Prof.lap("senses")
 			M.LockOn.update(M.lock, memory, motor.pos) -- (ROBLOX-110: the lock follows the memory, and ends when it forgets)
+			if not life.growth:canLock() then M.LockOn.release(M.lock,"growth") end
 			M.Prof.lap("lock")
 			M.World.prey:before(DT,motor.pos,motor:observer(),sensor,sightCast,camera,life.clock.hour) -- (ROBLOX-101: the moths and crane flies fly from dusk)
 			M.Prof.lap("prey")
@@ -2035,9 +2039,15 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
     if event.kind=="woke" then mateLegs.woke(event.day) end
     if event.kind=="starved" then endLife("starved")
     elseif event.kind=="moult_started" then dropAll()
-    elseif event.kind=="moulted" and session:finishAdult(life.growth.stage) then
-     life:showNotice("Your spider is an adult! Easy is now available in the life menu for this session.")
-     life.noticeSeconds=12
+    elseif event.kind=="moulted" then
+     if life.growth.stage==1 then
+      life:showNotice(life.morningText .. "\n" .. ControlText.runUnlocked(device));life.noticeSeconds=12
+     elseif life.growth.stage==2 then
+      life:showNotice(life.morningText .. "\n" .. ControlText.lockUnlocked(device));life.noticeSeconds=12
+     elseif session:finishAdult(life.growth.stage) then
+      life:showNotice("Your spider is an adult! Easy is now available in the life menu for this session.")
+      life.noticeSeconds=12
+     end
     end
    end
             if not initialRecord and Checkpoint.boundaryProblem(checkpointWorld)=="" then

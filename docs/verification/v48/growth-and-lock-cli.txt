@@ -1,0 +1,8 @@
+GROWTH passed=571 failed=0
+LOCK sidestep on the floor: distance off by at most 0.001, facing at most 0.31 degrees off, 37.2 degrees round
+LOCK sidestep on the wall: distance off by at most 0.001, facing at most 0.31 degrees off, 37.2 degrees round
+LOCK sidestep on the underside: distance off by at most 0.001, facing at most 0.31 degrees off, 37.2 degrees round
+LOCK camera: 5.28 degrees from the middle 1.5 s after a lock taken 70 degrees away
+LOCK client sidestep: 0.632 in 1.5 s, distance 2.400 to 2.401, facing 0.01 degrees off
+LOCK lost: ended (forgotten) after 0.57 s
+LOCK passed=138 failed=0

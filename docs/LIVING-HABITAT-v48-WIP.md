@@ -4,6 +4,11 @@ User direction: dense, small areas like the original windowsill. Every area shou
 
 ## Required layout change
 
+- Discovery is deliberate: let readable creature behavior and environmental cues teach the player. Run is a surprise: no button or control reference before the first completed moult. At completion, explain the newly acquired ability with a brief device-specific control notice. Its availability is derived from growth stage; softness still slows movement. This supersedes the earlier no-announcement interpretation.
+- New opening challenge requested: resident male rival and wasp roaming throughout the ranger station. Their navigation, presence and safe retreat boundaries still need implementation and native verification; do not claim this is shipped.
+- First moult requires seven whole-fly equivalents; second requires ten, in every game mode. Later requirements remain unchanged. Small prey retain proportional food credit. Saved instar determines the threshold; meals already eaten remain credited and a previously ready moult is not revoked merely by applying current game rules.
+- Lock-on unlocks after the second completed moult. Until then L1/LB only creeps, keyboard Recentre still recentres, and neither the touch button nor help card previews lock-on. At completion, show the device-specific lock/strafe explanation. Existing line-of-sight and perception-memory restrictions still apply.
+
 - Build around compact, distinct habitat pockets: window and desk, floor beneath furniture, garden immediately below the window, litter and flower stems, bench and can, pond margin.
 - Target an initial pocket approximately 80–150 cm across, adjusted for the real sizes of its plants and props. This is an authoring target, not a performance guarantee.
 - Bring worthwhile surfaces and discoveries within a few ordinary jumps. Avoid long runs on flat ground. Provide overlapping overhead cover, climbable layers, quiet observation perches and short alternate routes.

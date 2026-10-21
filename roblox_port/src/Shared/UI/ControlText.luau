@@ -223,7 +223,15 @@ end
 -- The controls card (H): the device's own bindings, one group of actions to a line. The whole card the player reads is PeacockText.card (this, then the crack's line,
 -- the pointer to the Settings row and the display key's line), and it is at most ten lines at the width the HUD gives it (tests/peacock.luau, the Studio PromptSpec);
 -- each line here is at most 61 characters (the card's width at its text size) so that, on a keyboard or a controller, none wraps. The touch card has the room to wrap.
-function ControlText.helpCard(device: Device): string
+function ControlText.runUnlocked(device: Device): string
+	return `You can now run. Hold {ControlText.name(device, "run")} while moving.`
+end
+
+function ControlText.lockUnlocked(device: Device): string
+	return `You can now lock on. Press {ControlText.name(device, "lock")} near visible prey, then move to circle it.`
+end
+
+function ControlText.helpCard(device: Device, runAvailable: boolean?, lockAvailable: boolean?): string
 	if device == "gamepad" then
 		local function n(action: string): string return ControlText.name("gamepad", action) end
 		-- L1 locks, R2 focuses, and L2 runs; the right-stick click recentres.
@@ -232,26 +240,26 @@ function ControlText.helpCard(device: Device): string
 			`Tap {n("jump")} hop   Hold {n("jump")} aim, release to leap`,
 			`{n("drop")} lower on silk   {n("cancel")} cancel   {n("eye")} eye view`,
 			`On the line: up reel, down lower, hold {n("letGo")} let go`,
-			`{n("lock")} creep/lock (circle)   {n("focus")} focus   {n("run")} run`,
+			(if lockAvailable == false then `{n("creep")} creep   {n("focus")} focus` else `{n("lock")} creep/lock (circle)   {n("focus")} focus`) .. (if runAvailable == false then "" else `   {n("run")} run`),
 			`In the crack: {n("feed")} rest (sleep from evening)`,
 			`{n("menu")}: menu, then last rest, notebook, settings`,
 		}, "\n")
 	elseif device == "touch" then
 		return table.concat({
-			"Arrows walk   Drag to look   Hold Run or Creep",
+			if runAvailable == false then "Arrows walk   Drag to look   Hold Creep" else "Arrows walk   Drag to look   Hold Run or Creep",
 			"Tap Jump hop   Hold Jump aim, release to leap   Cancel",
 			"Silk: lower on a line   On it: ↑ reel, ↓ lower, hold Let go",
-			"Lock (← → circle)   Recentre   Focus   Eye",
+			if lockAvailable == false then "Recentre   Focus   Eye" else "Lock (← → circle)   Recentre   Focus   Eye",
 			"In the crack: Rest (Sleep from evening)",
 			"Menu: last rest, notebook, settings, this card",
 		}, "\n")
 	end
 	return table.concat({
-		"WASD walk   Mouse look   Shift run   Ctrl creep   G gait",
+		if runAvailable == false then "WASD walk   Mouse look   Ctrl creep   G gait" else "WASD walk   Mouse look   Shift run   Ctrl creep   G gait",
 		"Tap Space hop   Hold Space aim, release to leap   Q cancel",
 		"F lower on silk   On the line: W reel, S lower, hold Q let go",
 		"V eye view   Right mouse focus   T slow motion   H: hide this",
-		"R lock on or recentre   Locked: A/D circle, W/S close in",
+		if lockAvailable == false then "R recentre" else "R lock on or recentre   Locked: A/D circle, W/S close in",
 		"In the crack: E rest (sleep from evening)",
 		"Backspace: last rest   M: menu   N: notebook   O: settings",
 	}, "\n")

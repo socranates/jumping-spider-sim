@@ -12,7 +12,7 @@ Growth.FLY_FOOD = 0.3
 -- The game's own rules (ROBLOX-88), opt-in like NeedsModel.game and Data/Catch.game: the housefly-equivalents a moult asks for. Godot's is 3 (READY_FOOD,
 -- pinned by tests/growth_reference.json); a Growth never given these replays it. Growth:useGameRules() applies them.
 -- ROBLOX-91: the gentle modes (Easy, Free play) keep the three of Godot and ROBLOX-61 (`gentleMoultFlies`): the five were for the standard rules.
-Growth.game = { moultFlies = 5, gentleMoultFlies = 3 }
+Growth.game = { firstMoultFlies = 7, secondMoultFlies = 10, moultFlies = 5, gentleMoultFlies = 3 }
 Growth.MOULT_HOURS = 12
 Growth.SOFT_HOURS = 10
 Growth.SOFT_REACH = 0.7
@@ -23,7 +23,8 @@ end
 function Growth.new(): any
  return setmetatable({stage=0,fedSinceMoult=0,ready=false,moultingHoursLeft=0,softHoursLeft=0,exuviae={}},Growth)
 end
--- The game's moult: `moultFlies` housefly-equivalents instead of three (`gentleMoultFlies`, which is Godot's three, when `gentle`). Sets the instance's own threshold;
+-- First/second game moults ask for seven/ten full-fly equivalents in every mode.
+-- The last moult retains `moultFlies` (`gentleMoultFlies` when gentle). Stores the later threshold;
 -- food already eaten is kept (a spider that has eaten two flies has eaten two flies), and a spider already ready to moult stays ready.
 function Growth.useGameRules(self: any,gentle: boolean?)
  self.readyFood=(if gentle==true then Growth.game.gentleMoultFlies else Growth.game.moultFlies)*Growth.FLY_FOOD;self.gameRules=true
@@ -38,10 +39,20 @@ function Growth.mealsOf(energy: number): number
  return math.floor(Growth.rivalCredit(energy)/Growth.FLY_FOOD+.5)
 end
 -- The food a moult asks for, in the units of `fedSinceMoult`, and in housefly-equivalents (3 by Godot's rule, 5 in the game).
-function Growth.readyAt(self: any): number return self.readyFood or Growth.READY_FOOD end
+function Growth.readyAt(self: any): number
+ if self.gameRules then
+  if self.stage==0 then return Growth.game.firstMoultFlies*Growth.FLY_FOOD end
+  if self.stage==1 then return Growth.game.secondMoultFlies*Growth.FLY_FOOD end
+ end
+ return self.readyFood or Growth.READY_FOOD
+end
 function Growth.mealGoal(self: any): number return math.floor(self:readyAt()/Growth.FLY_FOOD+.5) end
 function Growth.isAdult(self: any): boolean return self.stage>=Growth.ADULT end
 function Growth.isMoulting(self: any): boolean return self.moultingHoursLeft>0 end
+-- Discovered through movement after the first completed moult. Derive this from
+-- the saved instar so old saves and a new generation need no extra unlock flag.
+function Growth.canRun(self: any): boolean return self.stage>=1 and not self:isMoulting() end
+function Growth.canLock(self: any): boolean return self.stage>=2 and not self:isMoulting() end
 function Growth.isSoft(self: any): boolean return self.softHoursLeft>0 end
 function Growth.stageName(self: any): string return Growth.STAGES[self.stage+1] end
 function Growth.reachFactor(self: any): number return if self:isSoft() or self:isMoulting() then Growth.SOFT_REACH else 1 end

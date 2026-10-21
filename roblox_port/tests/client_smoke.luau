@@ -608,5 +608,26 @@ check("Run accepts simultaneous sources and clears on focus loss; no controller 
 	assert(not d.input.held.Run, "Run stuck on focus loss")
 	assert(find("SpiderTouch","Run") ~= nil, "touch Run button missing")
 end)
+check("Run stays hidden and refuses motor input until the first moult", function()
+	local d=ClientStubs.driver
+	local oldStage=d.life.growth.stage
+	local oldTick=d.motor.tick
+	local seen=nil
+	d.motor.tick=function(self,input) seen=input;oldTick(self,input) end
+	local ok,err=pcall(function()
+		d.life.growth.stage=0
+		key("Forward",true);key("Run",true);frames(3)
+		assert(seen and not seen.run,"young spider received sprint intent")
+		assert(not find("SpiderTouch","Run").Visible,"touch button spoiled the unlock")
+		d.life.growth.moultingHoursLeft=.000001;frames(3)
+		assert(d.life.growth.stage==1,"first moult did not complete")
+		assert(string.find(d.life.notice,"You can now run",1,true),"unlock was not explained at completion")
+		assert(seen.run,"first moult did not enable held run input")
+		assert(find("SpiderTouch","Run").Visible,"touch button absent after unlock")
+	end)
+	key("Forward",false);key("Run",false)
+	d.motor.tick=oldTick;d.life.growth.stage=oldStage
+	assert(ok,err)
+end)
 print(`CLIENT passed={passed} failed={failed}`)
 if failed > 0 then error("client smoke failed") end

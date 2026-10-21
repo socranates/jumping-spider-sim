@@ -84,8 +84,8 @@ end
 
 -- The whole controls card the HUD shows (and the Studio spec measures): the device's own bindings, then the crack's line, the Settings pointer and the display key's line.
 -- ROBLOX-92: this one string is what is on the screen; the close look's hint is inside the crack's line, not a line of its own.
-function PeacockText.card(device: ControlText.Device, display: (string | boolean)?): string
-	return ControlText.helpCard(device) .. PeacockText.helpExtra(device, display)
+function PeacockText.card(device: ControlText.Device, display: (string | boolean)?, runAvailable: boolean?, lockAvailable: boolean?): string
+	return ControlText.helpCard(device, runAvailable, lockAvailable) .. PeacockText.helpExtra(device, display)
 end
 
 -- The felt caption while a rumble-rump is on: { text, alpha }, or nil when there is none. The vibration is felt through the feet, not seen.

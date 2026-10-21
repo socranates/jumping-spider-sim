@@ -171,6 +171,7 @@ function SpiderInput.bind(h: Handlers)
 		b.Size = UDim2.fromOffset(size, size)
 		b.Position = position
 		b.AutoButtonColor = true
+		b.Visible = action ~= "Run" and action ~= "Lock" -- The HUD reveals acquired abilities after their moults.
 		b.Parent = gui
 		local corner = Instance.new("UICorner")
 		corner.CornerRadius = UDim.new(0, 14)

@@ -20,13 +20,16 @@ local WorldBuild = {}
 
 -- One region's folder of physical parts, under `parent`. `replaced`: the ids of the pieces whose drawing exists (Scenery.decor's second result, and `looks`'): those turn
 -- invisible but stay solid; nil means every piece a drawing can replace, {} none (as Scenery.sill has it).
-function WorldBuild.region(region: WorldMap.Region, parent: Instance, replaced: { [string]: boolean }?): Folder
+function WorldBuild.region(region: WorldMap.Region, parent: Instance, replaced: { [string]: boolean }?): Instance
 	local pieces = Region.pieces(region)
-	local folder: Folder
+	local folder: Instance
 	if region.kind == "sill" then
 		folder = Scenery.sill(replaced, pieces)
 	else
-		folder = Instance.new("Folder")
+		local model = Instance.new("Model")
+		-- A region is the unit used by prey readiness: never replicate half a region.
+		model.ModelStreamingMode = if region.kind == "verge" then Enum.ModelStreamingMode.Persistent else Enum.ModelStreamingMode.Atomic
+		folder = model
 		folder.Name = Region.folderName(region)
 		local hide = replaced
 		if hide == nil then

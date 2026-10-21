@@ -2064,7 +2064,9 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	-- server picked, read once it has arrived (or after a few seconds without it).
 	if dayClock == nil and (Lighting:GetAttribute("SunPick") ~= nil or os.clock() - started > 5) then dayClock = Lighting.ClockTime end
 	local dc = dayClock
-	if dc and M.DayLight.due(lastLight, life.daylight) then
+	if M.World.living then
+        M.World.living:update(frameDt * (if slow then SLOW_SPEED else 1),motor.pos,life.clock,M.World.region,setting("ReducedMotion")==true,GuiService.MenuIsOpen or modal())
+    elseif dc and M.DayLight.due(lastLight, life.daylight) then
 		M.DayLight.apply(Lighting, M.DayLight.targets(life.daylight, dc), Workspace:FindFirstChild("Decor"))
 		lastLight = life.daylight
 	end

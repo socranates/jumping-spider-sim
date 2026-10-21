@@ -19,6 +19,9 @@ local Hut = require(script.Parent.Hut)
 local Meadow = require(script.Parent.Meadow)
 local Pond = require(script.Parent.Pond)
 
+local Verge = require(script.Parent.Verge)
+local LivedInSites = require(script.Parent.LivedInSites)
+
 local Region = {}
 
 export type Box = { min: Vector3, max: Vector3 }
@@ -36,7 +39,8 @@ Region.SASH_MIN = Vector3.new(-8.3, -0.05, -13.55)
 Region.SASH_MAX = Vector3.new(8.3, 6.3, -12.45)
 
 -- The physical boxes of the region.
-function Region.pieces(region: WorldMap.Region): { Layout.Piece }
+local function base_pieces(region: WorldMap.Region): { Layout.Piece }
+	if region.kind == "verge" then return Verge.pieces(region) end
 	if region.kind == "sill" then return Layout.PIECES end
 	if region.kind == "backdrop" or region.kind == "patch" then return {} end -- (ROBLOX-115: the preserve's backdrop has no boxes; ROBLOX-117: nor a patch)
 	if Hut.knows(region.kind) then return Hut.pieces(region :: any) :: any end -- (ROBLOX-116: the ranger hut and its garden, World/Hut)
@@ -46,7 +50,8 @@ function Region.pieces(region: WorldMap.Region): { Layout.Piece }
 end
 
 -- The drawn-only boxes of the region.
-function Region.decor(region: WorldMap.Region): { Drawn }
+local function base_decor(region: WorldMap.Region): { Drawn }
+	if region.kind == "verge" then return Verge.decor(region) end
 	if region.kind == "sill" then return Layout.DECOR :: any end
 	if region.kind == "backdrop" then return PreserveLook.records(region.id, region.seed) :: any end -- (ROBLOX-115: a zone of the preserve's backdrop, World/PreserveLook)
 	if Meadow.knows(region.kind) or (region.kind == "patch" and Meadow.patchParent(region :: any) ~= nil) then return Meadow.decor(region :: any) :: any end -- (ROBLOX-119)
@@ -57,7 +62,8 @@ end
 
 -- The ids of the region's pieces that its drawn look stands in for (they turn invisible, still solid, once the look exists). The sill's are decided by its Decor
 -- (Habitat/Scenery.decor's second result), so none here.
-function Region.drawnPieces(region: WorldMap.Region): { string }
+local function base_drawnPieces(region: WorldMap.Region): { string }
+	if region.kind == "verge" then return {} end
 	if region.kind == "sill" or region.kind == "backdrop" or region.kind == "patch" then return {} end
 	if Hut.knows(region.kind) then return Hut.drawnPieces(region :: any) end
 	if Meadow.knows(region.kind) then return Meadow.drawnPieces(region :: any) end
@@ -67,7 +73,8 @@ end
 
 -- Every piece of the region that some drawing may stand in for: its own look's (drawnPieces) and, on the outer sill, the window box's halves, which the sill's
 -- Decor draws (Habitat/Plants.garden). WorldBuild hides these when it is not told which drawings exist.
-function Region.replaceable(region: WorldMap.Region): { string }
+local function base_replaceable(region: WorldMap.Region): { string }
+	if region.kind == "verge" then return {} end
 	if region.kind == "sill" or region.kind == "backdrop" or region.kind == "patch" then return {} end
 	if Hut.knows(region.kind) then return table.clone(Hut.drawnPieces(region :: any)) end
 	if Meadow.knows(region.kind) then return table.clone(Meadow.drawnPieces(region :: any)) end
@@ -80,6 +87,7 @@ end
 -- The boxes the region's creatures keep out of (RivalRoute: nothing the rival does goes in): for the sill, the crack grown by a margin, authored with the rival's
 -- other rules (Data/RivalRules), then the open sash; for the others, each retreat grown by half a stud. The retreats' boxes come first, in the retreats' order.
 function Region.keepOut(region: WorldMap.Region): { Box }
+	if region.kind == "verge" then return {} end
 	if region.kind == "sill" then return { { min = Rules.keepOutMin, max = Rules.keepOutMax }, { min = Region.SASH_MIN, max = Region.SASH_MAX } } end
 	if region.kind == "backdrop" or region.kind == "patch" then return {} end
 	if Hut.knows(region.kind) then return Hut.keepOut(region :: any) end
@@ -111,16 +119,47 @@ for kind, b in Pond.BUDGETS do BUDGETS[kind] = b end -- (ROBLOX-122: the pond's,
 
 -- Whether a region of this kind has a drawn look the looks stream (World/LookPlan, Client/LookStream): the garden's kinds and (ROBLOX-115) the preserve's backdrop.
 function Region.streamed(kind: string): boolean
-	return kind == "backdrop" or kind == "patch" or Garden.knows(kind) or Hut.knows(kind) or Meadow.knows(kind) or Pond.knows(kind)
+	return kind == "verge" or kind == "backdrop" or kind == "patch" or Garden.knows(kind) or Hut.knows(kind) or Meadow.knows(kind) or Pond.knows(kind)
 end
 
 -- (ROBLOX-115: a zone of the preserve's backdrop has its ceilings in World/PreserveLook.BUDGETS, by zone; its kind has none here.)
 function Region.budget(kind: string, tier: string): number?
+	if kind == "verge" then return if tier == "full" then 36 else 12 end
 	local b = BUDGETS[kind]
 	if b == nil then return nil end
-	if tier == "full" then return b.full end
-	if tier == "low" then return b.low end
+	local extra = if kind == "hut_floor" or kind == "room_floor" then 30 elseif kind == "garden_bed" then 240 else 0
+	if tier == "full" then return b.full + extra end
+	if tier == "low" then return b.low + (if kind == "garden_bed" then 40 else extra) end
 	return nil
+end
+
+local addedPieces: {[string]: {Layout.Piece}} = {}
+local addedDecor: {[string]: {Drawn}} = {}
+-- Additive lived-in landmarks share the normal streaming, support and preview paths.
+function Region.pieces(region: WorldMap.Region): { Layout.Piece }
+ local key=region.id.."/"..region.seed
+ if addedPieces[key] then return addedPieces[key] end
+ local extra=LivedInSites.pieces(region)
+ local base=base_pieces(region)
+ if #extra==0 then return base end
+ local out=table.clone(base);for _,p in extra do table.insert(out,p) end;addedPieces[key]=table.freeze(out);return addedPieces[key]
+end
+function Region.decor(region: WorldMap.Region): { Drawn }
+ local key=region.id.."/"..region.seed
+ if addedDecor[key] then return addedDecor[key] end
+ local extra=LivedInSites.decor(region)
+ local base=base_decor(region)
+ if #extra==0 then return base end
+ local out=table.clone(base);for _,p in extra do table.insert(out,p) end;addedDecor[key]=table.freeze(out);return addedDecor[key]
+end
+function Region.drawnPieces(region: WorldMap.Region): { string }
+ local out=base_drawnPieces(region)
+ if #LivedInSites.pieces(region)==0 then return out end
+ out=table.clone(out);for _,id in LivedInSites.drawnPieces(region) do table.insert(out,id) end;return out
+end
+function Region.replaceable(region: WorldMap.Region): { string }
+ local out=base_replaceable(region)
+ for _,id in LivedInSites.drawnPieces(region) do table.insert(out,id) end;return out
 end
 
 return table.freeze(Region)

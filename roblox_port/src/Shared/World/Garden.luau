@@ -37,6 +37,8 @@ local Hut = require(script.Parent.Hut) -- (ROBLOX-116: the preserve's hut garden
 local Meadow = require(script.Parent.Meadow) -- (ROBLOX-119: and the meadow's edge and the bench patch, World/Meadow's)
 local Pond = require(script.Parent.Pond) -- (ROBLOX-122: and the pond's edge, World/Pond's)
 
+local Pocket = require(script.Parent.GardenPocket)
+local Verge = require(script.Parent.Verge)
 local Garden = {}
 
 -- A physical box (WindowsillLayout.Piece) with the material it is drawn in when nothing draws it instead.
@@ -2404,6 +2406,8 @@ end
 -- (`bed_a_springtail_`...), and for the moths and the crane flies the hours they fly. Every vent is an `appear` vent: the prey comes on a free perch in reach,
 -- out of sight.
 function Garden.bestiary(region: WorldMap.Region): { KindSpec }?
+	if region.id==Pocket.REGION then return Pocket.bestiary() end
+	if region.kind == "verge" or region.kind == "hut_path" or region.kind == "mown_path" then return Verge.bestiary(region) end
 	if Hut.knows(region.kind) then return Hut.bestiary(region :: any) :: any end -- (ROBLOX-116)
 	if Meadow.knows(region.kind) then return Meadow.bestiary(region :: any) :: any end -- (ROBLOX-119)
 	if Pond.knows(region.kind) then return Pond.bestiary(region :: any) :: any end -- (ROBLOX-122)

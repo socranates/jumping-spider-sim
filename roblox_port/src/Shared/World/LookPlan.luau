@@ -234,8 +234,9 @@ function LookPlan.plan(pos: Vector3, tier: string, here: WorldMap.Region?, held:
 	-- A map with no zones, the test garden's, is ordered as it always was)
 	local nRegions = #regions
 	table.sort(others, function(a, b)
-		local za, zb = a.i > nRegions, b.i > nRegions
-		if za ~= zb then return zb end
+		local ra = if a.region.kind == "verge" then 2 elseif a.i > nRegions then 1 else 0
+		local rb = if b.region.kind == "verge" then 2 elseif b.i > nRegions then 1 else 0
+		if ra ~= rb then return ra < rb end
 		if a.d ~= b.d then return a.d < b.d end
 		return a.i < b.i
 	end)

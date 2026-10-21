@@ -42,6 +42,7 @@ local TrainPass = require(script.Parent.TrainPass)
 local HutLife = require(script.Parent.HutLife)
 local WorldShadows = require(script.Parent.WorldShadows)
 local FrameProfile = require(script.Parent.FrameProfile)
+local LivingWorld = require(script.Parent.LivingWorld)
 
 local WorldClient = {}
 WorldClient.__index = WorldClient
@@ -249,6 +250,7 @@ function WorldClient.streamLooks(self: any, ws: Instance, tier: string): any
 	-- (ROBLOX-116) and the hut's sash and lamp
 	if self.world == Worlds.PRESERVE then
 		self.hut = HutLife.new(self.root, self.decor, WorldMap.seed(WorldMap.SEED, "hut_window"), ws)
+		self.living = LivingWorld.new(ws, self.root, tier, self.map)
 		if self.hutPending then self.hut:restore(true) end
 	end
 	return self.looks

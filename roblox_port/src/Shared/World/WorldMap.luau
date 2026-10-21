@@ -68,6 +68,7 @@ local Worlds = require(script.Parent.Worlds)
 local Preserve = require(script.Parent.Preserve)
 local Hut = require(script.Parent.Hut)
 local Meadow = require(script.Parent.Meadow)
+local Verge = require(script.Parent.Verge)
 local Pond = require(script.Parent.Pond) -- (ROBLOX-122: the pond's edge, the boardwalk and the mown path to it)
 
 local WorldMap = {}
@@ -355,6 +356,8 @@ local function authorPreserve(worldSeed: number): { Region }
 	for _, r in Meadow.author(worldSeed, WorldMap.seed) do table.insert(list, r :: any) end
 	-- (ROBLOX-122) and the mown path east and north from the bench patch, the boardwalk and the pond's edge (World/Pond)
 	for _, r in Pond.author(worldSeed, WorldMap.seed) do table.insert(list, r :: any) end
+	-- Authored landmarks retain priority; adjacent scenery now has real ground.
+	for _, r in Verge.author(worldSeed, WorldMap.seed, list :: any) do table.insert(list, freeze(r :: any)) end
 	return list
 end
 

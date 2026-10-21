@@ -1,0 +1,19 @@
+LIVING_WORLD passed=1306 failed=0
+preserve: the backdrop's records: 1213 at full, 515 at low; the far look 515 at full, 386 at low
+preserve: from the sill at full: 1491 parts
+preserve: the walk at full: at most 1500 parts, 929 changes
+preserve: from the sill at low: 495 parts
+preserve: the walk at low: at most 500 parts, 524 changes
+preserve: the sill's Decor: 721 parts (the test garden's 1258)
+preserve: the hut's looks: 1351 records at full, 143 at low; (ROBLOX-119) the meadow's and the bench patch's 3322 at full, 102 at low
+preserve: (ROBLOX-122) the pond's, the boardwalk's and the mown path's looks: 1710 at full, 124 at low
+preserve: the hut's regions: from anywhere on one, its farthest box at most 151.1 studs
+preserve: the hut's regions at full: at most 1500 parts
+preserve: the hut's regions at low: at most 500 parts
+preserve: the patches: 1171, at most 90 records at full and 10 at low
+preserve: in the mulch at full: 14 patches, 679 parts of them, 1500 in all
+preserve: in the mulch at low: 5 patches, 38 parts of them, 500 in all
+preserve: the cricket's struggle: wins at 4, 5 and 6 taps a second 4, 60, 60 of 60; at 5 a second 7.6 s, 6.8 kicks
+preserve: ballooning: of 200 families the hut garden 152, the meadow's edge 47, the pond's edge 1
+preserve: the water: of 60 slips by a pad 2 cm off, 38 got out and 22 drowned in Normal; 60 pulled out in the gentle rules
+PRESERVE passed=1144 failed=0

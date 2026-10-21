@@ -9,6 +9,7 @@
 -- look is replaced by a drawing (the back wall, the Pilea's leaves and stems) turns invisible only once that drawing exists.
 local Graphics = require(script.Parent.Parent.Data.Graphics)
 local Flora = require(script.Parent.Parent.Data.Flora)
+local Meshes = require(script.Parent.Parent.Data.Meshes)
 local Surfaces = require(script.Parent.Parent.Data.Surfaces)
 local Layout = require(script.Parent.WindowsillLayout)
 local Materials = require(script.Parent.Materials)
@@ -143,7 +144,15 @@ function Scenery.look(parent: Instance, list: { Drawn }, first: number?, last: n
 		end
 		local cframe = CFrame.new(d.at)
 		if d.turn ~= nil then cframe *= CFrame.Angles(math.rad(d.turn.X), math.rad(d.turn.Y), math.rad(d.turn.Z)) end
-		local p = drawn(into :: Instance, d.id, d.size, cframe, d.color, d.material or "SmoothPlastic")
+		-- (ROBLOX-126) a mesh record: the part turned a quarter when the mesh's long axis lies the other way, the box's size kept
+		local fileMesh = Meshes.of(d.shape)
+		local size, meshScale = d.size, Vector3.one
+		if fileMesh ~= nil then
+			local quarter, scale = Meshes.fit(fileMesh, d.size)
+			meshScale = scale
+			if quarter then cframe *= CFrame.Angles(0, math.rad(90), 0); size = Vector3.new(d.size.Z, d.size.Y, d.size.X) end
+		end
+		local p = drawn(into :: Instance, d.id, size, cframe, if fileMesh ~= nil then Color3.new(1, 1, 1) else d.color, d.material or "SmoothPlastic")
 		p.Transparency = d.transparency or 0
 		if d.reflectance ~= nil then p.Reflectance = d.reflectance end
 		p.CastShadow = d.shadow == true
@@ -154,6 +163,13 @@ function Scenery.look(parent: Instance, list: { Drawn }, first: number?, last: n
 		elseif d.shape == "Ellipsoid" then
 			local mesh = Instance.new("SpecialMesh")
 			mesh.MeshType = Enum.MeshType.Sphere
+			mesh.Parent = p
+		elseif fileMesh ~= nil then
+			local mesh = Instance.new("SpecialMesh")
+			mesh.MeshType = Enum.MeshType.FileMesh
+			mesh.MeshId = fileMesh.id
+			mesh.TextureId = Meshes.TEXTURE
+			mesh.Scale = meshScale
 			mesh.Parent = p
 		end
 		if d.full then p:SetAttribute("FullOnly", true) end

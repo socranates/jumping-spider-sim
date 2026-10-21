@@ -75,6 +75,7 @@ MODULES = [
     ("Graphics", "Data/Graphics.luau"),
     ("Materials", "Habitat/Materials.luau"),
     ("Flora", "Data/Flora.luau"),
+    ("Meshes", "Data/Meshes.luau"),
     ("Garden", "World/Garden.luau"),
     ("PreserveLook", "World/PreserveLook.luau"),
     ("Region", "World/Region.luau"),

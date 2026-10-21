@@ -793,12 +793,14 @@ case("the garden's plants drawn whole over their boxes, a second of each kind, a
 	end
 	check(fine, "milkweed, coneflower, bee balm and goldenrod each a second, walkable, inside its cell, and drawn")
 	local c3 = Region.decor(WorldMap.region("garden_c3") :: any)
-	local florets, midribs = 0, 0
+	local florets, meshLeaves, midribs = 0, 0, 0
 	for _, d in c3 do
 		if string.sub(d.id, 1, 6) == "Floret" then florets += 1 end
+		if string.sub(d.id, 1, 4) == "Leaf" and d.shape == "Mesh:milkweed_leaf" then meshLeaves += 1 end
 		if string.sub(d.id, 1, 6) == "Midrib" then midribs += 1 end
 	end
-	check(florets >= 30 and midribs >= 12, `the milkweed's umbels ({florets} florets) and its leaves' pale midribs ({midribs})`)
+	-- (ROBLOX-126: the leaves are Chet's mesh, its midrib and veins in it, so no separate midrib)
+	check(florets >= 30 and meshLeaves >= 12 and midribs == 0, `the milkweed's umbels ({florets} florets) and its leaves the mesh leaf ({meshLeaves}, {midribs} separate midribs)`)
 	local rival, mate = Hut.CREATURES.rival, Hut.CREATURES.mate
 	check(WorldMap.inBounds(rival.at, rival.region) and WorldMap.inBounds(mate.at, mate.region) and Hut.ROAM[rival.region] and Hut.ROAM[mate.region]
 		and WorldMap.inRetreat(rival.at) == nil and WorldMap.inRetreat(mate.at) == nil, "the rival and the mate come into the garden on its path, in cells of their roam")
@@ -1804,6 +1806,27 @@ case("the green frog: on its stone or its pad by a seeded day, still; what moves
 	local mx, mz = Preserve.metres(at :: Vector3)
 	check(at ~= nil and none == nil and ((mx - Preserve.POND.x) / Preserve.POND.rx) ^ 2 + ((mz - Preserve.POND.z) / Preserve.POND.rz) ^ 2 < 1.2 and (at :: Vector3).Y > Pond.WATER + 60,
 		"the green darner over the pond by day, a metre up; away by night")
+end)
+
+-- ---------------------------------------------------------------- ROBLOX-126: the first meshes
+case("the meshes: Chet's six at their verified sizes; a mesh record drawn as a textured FileMesh scaled to its box, turned a quarter when its long axis lies the other way", function()
+	local Meshes = require("../src/Shared/Data/Meshes")
+	local Scenery = require("../src/Shared/Habitat/Scenery")
+	local n = 0
+	for _, m in Meshes.list do n += 1; check(string.match(m.id, "^rbxassetid://%d+$") ~= nil and m.size.X > 0 and m.triangles > 0, "a mesh id and its size") end
+	check(n == 6 and Meshes.of("Mesh:milkweed_leaf") == Meshes.list.milkweed_leaf and Meshes.of("Ellipsoid") == nil and Meshes.of(nil) == nil, "six meshes, named by a record's shape")
+	local leaf = Meshes.list.milkweed_leaf
+	local turned, scale = Meshes.fit(leaf, Vector3.new(14, 2.125, 39)) -- long along z, as the leaf is: no turn
+	check(not turned and math.abs(scale.X - 2) < 1e-9 and math.abs(scale.Y - 1) < 1e-9 and math.abs(scale.Z - 2) < 1e-9, "a box the leaf's way: scaled, not turned")
+	turned, scale = Meshes.fit(leaf, Vector3.new(39, 1.0625, 14)) -- long along x: a quarter turn
+	check(turned and math.abs(scale.X - 2) < 1e-9 and math.abs(scale.Y - 0.5) < 1e-9 and math.abs(scale.Z - 2) < 1e-9, "a box across: turned a quarter, then scaled")
+	local folder = Instance.new("Folder")
+	Scenery.look(folder, { { id = "MeshLeaf", size = Vector3.new(39, 2.125, 14), at = Vector3.new(1, 2, 3), color = Color3.new(0.2, 0.5, 0.2), shape = "Mesh:milkweed_leaf", full = true } } :: any)
+	local p = folder:FindFirstChild("MeshLeaf") :: any
+	local mesh = p and p:FindFirstChildWhichIsA("SpecialMesh")
+	check(mesh ~= nil and mesh.MeshType == Enum.MeshType.FileMesh and mesh.MeshId == leaf.id and mesh.TextureId == Meshes.TEXTURE, "drawn with the leaf's mesh and the atlas")
+	check(p ~= nil and same(p.Size, Vector3.new(14, 2.125, 39)) and p.Color.R == 1 and p.Color.G == 1 and p.Color.B == 1 and p.CanCollide == false and p:GetAttribute("FullOnly") == true,
+		"the part's box turned with it, white under the texture, drawn only, the full tier's")
 end)
 
 print(`PRESERVE passed={passed} failed={failed}`)

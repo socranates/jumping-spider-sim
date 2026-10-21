@@ -1620,8 +1620,12 @@ local function drawPlant(byId: { [string]: Piece }, regionId: string, plant: { k
 		if box ~= nil then
 			local c, l, w, ax = leafShape(box)
 			local wide = if kind == "goldenrod" then 1.7 elseif kind == "beebalm" then 1.5 else 1.3
-			add(rec(`Leaf{tag}_{i}`, along(ax, l * 1.22, 0.5, w * wide), c + v(0, 0.05, 0), if i % 3 == 0 then tones[2] else leafColor, "SmoothPlastic", true, "Ellipsoid"))
-			if kind == "milkweed" then add(rec(`Midrib{tag}_{i}`, along(ax, l * 1.05, 0.08, 0.32), c + v(0, 0.27, 0), C.milkweedUnder, "SmoothPlastic", true)) end
+			if kind == "milkweed" then
+				-- (ROBLOX-126) the milkweed's leaf is Chet's mesh (Data/Meshes: its raised midrib and veins are in it), over its box as the blade was
+				add(rec(`Leaf{tag}_{i}`, along(ax, l * 1.22, 0.9, w * wide), c + v(0, 0.2, 0), leafColor, "SmoothPlastic", true, "Mesh:milkweed_leaf"))
+			else
+				add(rec(`Leaf{tag}_{i}`, along(ax, l * 1.22, 0.5, w * wide), c + v(0, 0.05, 0), if i % 3 == 0 then tones[2] else leafColor, "SmoothPlastic", true, "Ellipsoid"))
+			end
 			if tag == "" and i <= 3 then add(drop(`LeafDew{i}`, c + v(between(rand, -1.5, 1.5), box.hi.Y - c.Y, between(rand, -1.5, 1.5)), between(rand, 0.35, 0.6), rand)) end
 		end
 	end

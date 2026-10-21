@@ -14,7 +14,7 @@ local TrainPass = {}
 TrainPass.__index = TrainPass
 
 -- The rumble's asset (assets/audio/train.wav once uploaded); "" makes no voice.
-TrainPass.SOUND = ""
+TrainPass.SOUND = "rbxassetid://127788334000523"
 TrainPass.VOLUME = 0.5
 -- The most cars a train has (PreserveTrain.CARS), so the most made.
 TrainPass.MOST = math.max(PreserveTrain.CARS.commuter[2], PreserveTrain.CARS.freight[2])

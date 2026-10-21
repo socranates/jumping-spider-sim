@@ -675,7 +675,7 @@ do
 	sc.run(1, 60, false)
 	local c = sc.eyes:captionView("keyboard")
 	check(c ~= nil and c.alpha == 1 and string.find(c.text, "Spider-eye impression: a clear colour centre, muted edges that still catch movement.", 1, true) ~= nil and string.find(c.text, "Hold Right mouse for the principal eyes", 1, true) ~= nil, "the first time: both lines, the key of the device")
-	check(string.find(sc.eyes:captionView("gamepad").text, "Hold LT for", 1, true) ~= nil and string.find(sc.eyes:captionView("touch").text, "Hold Focus for", 1, true) ~= nil, "and the controller's and the screen's own words")
+	check(string.find(sc.eyes:captionView("gamepad").text, "Hold RT for", 1, true) ~= nil and string.find(sc.eyes:captionView("touch").text, "Hold Focus for", 1, true) ~= nil, "and the controller's and the screen's own words")
 	sc.player:SetAttribute("FocusToggle", true)
 	check(string.find(sc.eyes:captionView("keyboard").text, "Press Right mouse for", 1, true) ~= nil, "a toggled Focus is pressed")
 	sc.player:SetAttribute("FocusToggle", nil)

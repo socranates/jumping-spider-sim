@@ -517,7 +517,7 @@ end
 
 
 ControlText.setPadStyle(ControlText.padStyleFor("ButtonCross"))
-check(ControlText.padStyle() == "playstation" and ControlText.name("gamepad", "jump") == "Cross" and ControlText.name("gamepad", "focus") == "L2"
+check(ControlText.padStyle() == "playstation" and ControlText.name("gamepad", "jump") == "Cross" and ControlText.name("gamepad", "focus") == "R2"
 	and ControlText.name("gamepad", "eye") == "Triangle" and ControlText.name("gamepad", "walk") == "Left stick" and ControlText.name("keyboard", "jump") == "Space"
 	and string.find(ControlText.helpCard("gamepad"), "Hold Cross", 1, true) ~= nil, "a PlayStation controller gets its own button names")
 ControlText.setPadStyle(ControlText.padStyleFor("ButtonA"))

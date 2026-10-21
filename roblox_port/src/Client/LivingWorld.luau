@@ -66,8 +66,21 @@ function LivingWorld.new(ws: any,root: Instance,tier: string,map: any): any
  local self=setmetatable({ws=ws,root=root,map=map,folder=folder,static=Shapes.folder(folder,"CloseDetail"),
   animals=Shapes.folder(folder,"SmallLives"),weather=Shapes.folder(folder,"Weather"),count=0,staticCount=0,
   low=tier=="low",limit=LivingWorld.BUDGET[if tier=="low" then "low" else "full"],elapsed=0,acc=0,key="",windParts={},windAt=-100,
-  rain={},fleas={},grubs={},ants={},litter={},lastLight=-100,rainAt=nil,state=nil,seed=914},LivingWorld)
+  rain={},fleas={},fleaSites={},fleaCandidates={},fleaPresent={},fleaUsed={},grubs={},ants={},litter={},lastLight=-100,rainAt=nil,state=nil,seed=914},LivingWorld)
  self.params=RaycastParams.new();self.params.FilterType=Enum.RaycastFilterType.Include;self.params.FilterDescendantsInstances={root}
+ -- Author fixed floor sites once. Pool size is a rendering choice, not a
+ -- different population seeded whenever the observer changes region.
+ if type(map.regions)=="function" then
+  for _,region in map.regions() do
+   if region.kind~="hut_floor" and region.kind~="room_floor" and region.kind~="kitchen_floor" then continue end
+   local lo,hi=region.bounds[1],region.bounds[2]
+   for i=1,5 do
+    table.insert(self.fleaSites,{id=region.id.."_flea_"..i,region=region.id,
+     at=Vector3.new(lo.X+(hi.X-lo.X)*(.12+i*.14),region.spawn.pos.Y+.11,lo.Z+(hi.Z-lo.Z)*Environment.hash(region.seed,i,73)),
+     motionIndex=1+math.floor(Environment.hash(region.seed,i,83)*1000000)})
+   end
+  end
+ end
  for i=1,if self.low then 2 else 5 do table.insert(self.fleas,self:rig("Flea",i)) end
  for i=1,if self.low then 1 else 3 do table.insert(self.grubs,self:rig("Grub",i)) end
  for i=1,if self.low then 3 else 8 do table.insert(self.ants,self:rig("Ant",i)) end
@@ -244,22 +257,51 @@ function LivingWorld.sway(self: any,pos: Vector3,state: any,reduced: boolean)
  end
  if self.grassParts and #self.grassParts>0 then self.ws:BulkMoveTo(self.grassParts,self.grassFrames,Enum.BulkMoveMode.FireCFrameChanged) end
 end
+function LivingWorld.assignFleas(self: any,pos: Vector3)
+ local candidates,present,used=self.fleaCandidates,self.fleaPresent,self.fleaUsed
+ table.clear(candidates);table.clear(present);table.clear(used)
+ if math.abs(pos.Y+70)<12 then
+  for _,site in self.fleaSites do
+   site.distance=((site.anchor or site.at)-pos).Magnitude
+   if site.distance>=30 then continue end
+   local supported=site.part~=nil and site.part:IsDescendantOf(self.root)
+   if not supported and (site.checked==nil or self.elapsed-site.checked>.5) then
+    local hit=self:ground(site.at,2,5)
+    supported=hit~=nil and hit.Normal.Y>.75 and math.abs(hit.Position.Y-(site.at.Y-.11))<.5
+    site.part=if supported then hit.Instance else nil
+    site.anchor=if supported then hit.Position+Vector3.yAxis*.11 else nil
+    site.checked=self.elapsed
+   end
+   if supported then table.insert(candidates,site);present[site]=true end
+  end
+ end
+ table.sort(candidates,function(a: any,b: any): boolean
+  if a.distance==b.distance then return a.id<b.id end
+  return a.distance<b.distance
+ end)
+ -- Keep every still-visible assignment. Only recycle a rig after its site is
+ -- out of range or has lost its physical floor; never swap it at a doorway.
+ for _,flea in self.fleas do
+  if flea.site and present[flea.site] and not used[flea.site] then used[flea.site]=true
+  else flea.site=nil;flea.motionIndex=nil end
+ end
+ for _,flea in self.fleas do
+  if flea.site then continue end
+  for _,site in candidates do
+   if used[site] then continue end
+   flea.site=site;flea.motionIndex=site.motionIndex;used[site]=true;break
+  end
+ end
+end
 function LivingWorld.small(self: any,pos: Vector3,region: any,state: any,reduced: boolean)
  local indoor=region.kind=="hut_floor" or region.kind=="room_floor"
  local patches=self.patches or {}
+ self:assignFleas(pos)
  for i,r in self.fleas do
-  local on=indoor and math.abs(pos.Y+70)<12;visible(r,on)
+  local on=r.site~=nil;visible(r,on)
   if on then
-   local lo,hi=region.bounds[1],region.bounds[2]
-   local at=Vector3.new(lo.X+(hi.X-lo.X)*(.12+i*.14),-69.89,lo.Z+(hi.Z-lo.Z)*Environment.hash(region.seed,i,73))
-   on=(at-pos).Magnitude<30
-   if r.region~=region.id then
-    r.region=region.id;r.supported=self:ground(at,2,5)~=nil
-   end
-   on=on and r.supported
-   visible(r,on)
-   if not on then continue end
-   local delta,hop,heading=Environment.flea(if reduced then 0 else state.totalHours*75,i)
+   local at=r.site.anchor
+   local delta,hop,heading=Environment.flea(if reduced then 0 else state.totalHours*75,r.motionIndex)
    if reduced then delta=Vector3.zero;hop=false end
    local frame=CFrame.lookAt(at+delta,at+delta+heading)
    r.parts[1].CFrame=frame
@@ -407,7 +449,7 @@ function LivingWorld.update(self: any,dt: number,pos: Vector3,clock: any,region:
  end
  if self.acc<.05 then return end;self.acc=0
  local state=Environment.sample(clock.day,clock.hour,self.seed);self.state=state
- local key=region.id..":"..math.floor(pos.X/24)..":"..math.floor(pos.Z/24)..":"..math.floor(pos.Y/30)
+ local key=region.id..":"..math.floor(pos.X/LivingWorld.CELL)..":"..math.floor(pos.Z/LivingWorld.CELL)..":"..math.floor(pos.Y/30)
  if key~=self.key then self.key=key;self:rebuild(pos,region) end
  if self.elapsed-self.lastLight>.5 then self:lighting(state,clock);self.lastLight=self.elapsed end
  self:small(pos,region,state,reduced);if first then self:drawDog(pos,state,reduced,dt) end

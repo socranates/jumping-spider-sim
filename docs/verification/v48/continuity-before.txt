@@ -1,0 +1,5 @@
+FAIL LIVING_WORLD full the same nearby flea remains at the same clock-derived position across the doorway
+FAIL LIVING_WORLD low nearby floor life is visible on the can-to-door walk
+FAIL LIVING_WORLD low the same nearby flea remains at the same clock-derived position across the doorway
+FAIL LIVING_WORLD walking 12 cm does not leave the leading edge of close cover behind
+LIVING_WORLD passed=3918 failed=4

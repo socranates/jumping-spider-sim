@@ -77,7 +77,7 @@ case("small lives respect their habitat and motion bounds",function()
  check(grounded,"dog stays on the ground throughout its route")
 end)
 case("fleas start each hop from their last landing rather than snapping home",function()
- for index=1,5 do
+ for _,index in {1,2,3,4,5,984371} do
   local previous,wasHop=Environment.flea(0,index)
   local horizontal,vertical,held=0,0,true
   local sawHop,sawRest=wasHop,not wasHop
@@ -118,7 +118,7 @@ case("flea legs meet the floor at rest and Reduced Motion holds the entire rig",
    for step=0,120 do
     state.totalHours=12+step*.05/75;living:small(pos,region,state,false)
     for _,flea in living.fleas do
-     local _,hop=Environment.flea(state.totalHours*75,flea.index)
+     local _,hop=Environment.flea(state.totalHours*75,flea.motionIndex or flea.index)
      if not flea.shown or hop then continue end
      for _,name in {"LeftHindTibia","RightHindTibia"} do
       local leg=assert(flea.folder:FindFirstChild(name))
@@ -140,6 +140,89 @@ case("flea legs meet the floor at rest and Reduced Motion holds the entire rig",
   living:destroy()
  end
  root:Destroy();WorldMap.use("test_garden")
+end)
+case("nearby fleas persist when walking from the floor into the doorway",function()
+ WorldMap.use("preserve")
+ local floor=WorldMap.region("hut_floor_i");local door=WorldMap.region("hut_doorway")
+ local root=Instance.new("Folder");root.Parent=workspace
+ WorldBuild.region(floor,root);WorldBuild.region(door,root)
+ for _,tier in {"full","low"} do
+  local living=LivingWorld.new(workspace,root,tier,WorldMap)
+  local state=Environment.sample(1,12)
+  living:small(Vector3.new(140,-69.69,226),floor,state,false)
+  local before={}
+  for _,flea in living.fleas do if flea.shown then table.insert(before,flea.parts[1].Position) end end
+  check(#before>0,tier.." nearby floor life is visible on the can-to-door walk")
+  living:small(Vector3.new(148,-69.69,226),door,state,false)
+  local retained=true
+  for _,point in before do
+   local found=false
+   for _,flea in living.fleas do if flea.shown and (flea.parts[1].Position-point).Magnitude<1e-6 then found=true end end
+   retained=retained and found
+  end
+  check(#before>0 and retained,tier.." the same nearby flea remains at the same clock-derived position across the doorway")
+  local identities={};local unique=true
+  for _,flea in living.fleas do
+   if not flea.shown then continue end
+   unique=unique and not identities[flea.site.id]
+   identities[flea.site.id]=flea.parts[1].Position
+  end
+  check(unique,tier.." a site is never drawn by two pooled rigs")
+  local cold=LivingWorld.new(workspace,root,tier,WorldMap)
+  cold:small(Vector3.new(148,-69.69,226),door,state,false)
+  local common,same=0,true
+  for _,flea in cold.fleas do
+   if flea.shown and identities[flea.site.id] then
+    common+=1;same=same and (flea.parts[1].Position-identities[flea.site.id]).Magnitude<1e-6
+   end
+  end
+  check(common>0 and same,tier.." restoring from the doorway reconstructs the same site poses independently of pool history")
+  cold:destroy()
+  living:small(Vector3.new(5000,-69.69,5000),door,state,false)
+  local released=true;for _,flea in living.fleas do released=released and not flea.shown and flea.site==nil end
+  check(released,tier.." leaving the habitat releases all local assignments")
+  living:destroy()
+ end
+ root:Destroy();WorldMap.use("test_garden")
+end)
+case("floor sites wait for streaming, retry and stop rendering when support goes away",function()
+ WorldMap.use("preserve")
+ local floor=WorldMap.region("hut_floor_i")
+ local root=Instance.new("Folder");root.Parent=workspace
+ local living=LivingWorld.new(workspace,root,"full",WorldMap)
+ local pos=Vector3.new(140,-69.69,226);local clock={day=1,hour=12}
+ local function anyShown() for _,flea in living.fleas do if flea.shown then return true end end;return false end
+ living:update(.1,pos,clock,floor,false,false)
+ check(not anyShown(),"missing floor geometry never produces a floating flea")
+ local built=WorldBuild.region(floor,root)
+ for _=1,10 do living:update(.1,pos,clock,floor,false,false) end
+ check(anyShown(),"a negatively cached site is retried after the floor streams in")
+ built:Destroy();living:update(.1,pos,clock,floor,false,false)
+ check(not anyShown(),"an unloaded support invalidates its old positive cache")
+ WorldBuild.region(floor,root)
+ for _=1,10 do living:update(.1,pos,clock,floor,false,false) end
+ check(anyShown(),"a replacement floor instance can support the same sites again")
+ living:destroy();root:Destroy();WorldMap.use("test_garden")
+end)
+case("close cover stays ahead after walking one detail cell",function()
+ WorldMap.use("preserve")
+ local region=WorldMap.region("verge_-400_-216")
+ local root=Instance.new("Folder");root.Parent=workspace;WorldBuild.region(region,root)
+ local living=LivingWorld.new(workspace,root,"full",WorldMap)
+ local clock={day=1,hour=12}
+ living:update(.1,Vector3.new(-350,-84.29,-170),clock,region,false,false)
+ local nextPoint=Vector3.new(-338,-84.29,-170)
+ living:update(.1,nextPoint,clock,region,false,false)
+ local furthest=-math.huge
+ for _,part in living.static:GetChildren() do if part.Name=="GrassClump" then furthest=math.max(furthest,part.Position.X) end end
+ check(furthest-nextPoint.X>8,"walking 12 cm does not leave the leading edge of close cover behind")
+ living:update(.1,Vector3.new(-350,-84.29,-206),clock,region,false,false)
+ nextPoint=Vector3.new(-350,-84.29,-194)
+ living:update(.1,nextPoint,clock,region,false,false)
+ furthest=-math.huge
+ for _,part in living.static:GetChildren() do if part.Name=="GrassClump" then furthest=math.max(furthest,part.Position.Z) end end
+ check(furthest-nextPoint.Z>8,"the same leading-edge coverage holds along Z")
+ living:destroy();root:Destroy();WorldMap.use("test_garden")
 end)
 case("new props are additive and the cans are truly hollow",function()
  WorldMap.use("preserve")

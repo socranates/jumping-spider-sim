@@ -35,7 +35,7 @@ return function(d)
    local body=chosen.parts[1]
    local projection,onScreen=workspace.CurrentCamera:WorldToViewportPoint(body.Position)
    if chosen.shown and onScreen and projection.Z>0 then visible+=1 end
-   local _,hop=Environment.flea(living.state.totalHours*75,chosen.index)
+   local _,hop=Environment.flea(living.state.totalHours*75,chosen.motionIndex or chosen.index)
    if chosen.shown and not hop then
     for _,name in {"LeftHindTibia","RightHindTibia"} do
      local leg=assert(chosen.folder:FindFirstChild(name))

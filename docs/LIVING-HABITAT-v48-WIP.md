@@ -110,6 +110,12 @@ Working branch: `codex/v48-living-habitat`, based on v47 receipt commit `9d442ff
 - The old frozen `4a828e0` run is now **finished: 52/55 suites pass, three fail**. Its three failures have current-source repairs and passing reruns in the regression review. Preserve self-test 270/0/0, all seven outer checks pass. See `docs/verification/v48/FROZEN-4a828e0-RESULT.md`; no process remains to wait on.
 - Next continuity repairs before a final source freeze: retain nearby flea sites across floor-region changes (catalogue fixed floor sites, reuse the existing five/two rigs without reassignment while visible, derive motion from stable site identity, and retry unsupported sites when streaming completes). Regression pose: floor `hut_floor_i` near `(140,-69.69,226)` to the doorway near `(148,-69.69,226)` at a fixed clock. Also align the detail rebuild key with `LivingWorld.CELL=12`; it still divides X/Z by 24. Then inspect weather transitions and ordinary travel, freeze current source for all suites and complete native/release gates. No v48 publication.
 
+### Close-layer continuity completed
+
+- Fixed floor sites now retain nearby fleas across region seams, including the doorway. The existing five/two animal pool is reused; absent floor support retries after streaming and unloads invalidate cached support. Close vegetation now rebuilds on its actual 12 cm grid rather than a 24 cm key.
+- Living-world checks 3,936/0, world client 30/0, strict analysis clean, 207/207 compile. Native full/low crossings retain the same flea on screen with zero anchor movement, while the spider remains attached. See `docs/verification/v48/CONTINUITY-REVIEW.md` for the diagnostic scope, frame samples and cleanup evidence.
+- This resolves the continuity tasks in the previous entry. Weather transitions and broader ordinary travel remain next; a fresh immutable full regression is required for the updated source. No v48 publication claim.
+
 ## Platform judgment
 
 Roblox limits density, draw calls, memory and simulation cost, especially on phones. The current barren travel and missing ground are implementation/design problems. Compact, authored habitats with reused meshes, bounded active wildlife and selective detail remain a viable direction. No engine migration is needed to address these reported problems.

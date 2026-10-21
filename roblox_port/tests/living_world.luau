@@ -91,6 +91,23 @@ case("new props are additive and the cans are truly hollow",function()
   end
   check(clear,"can interior and drinking aperture are traversable")
   check(spawnClear,"new shell does not enclose an existing spawn")
+  local decor=Sites.decor(region)
+  check(#decor<=30,"can detailing fits the existing thirty-record allowance")
+  local rim,tab=0,0
+  for _,d in decor do
+   if string.find(d.id,"_rolled_lid_",1,true) then rim+=1;check(not d.full,"low detail keeps the rolled rim") end
+   if string.find(d.id,"_tab_",1,true) then tab+=1;check(not d.full,"low detail keeps the hollow pull tab") end
+   if string.find(d.id,"_lid_",1,true) and not string.find(d.id,"_rolled_",1,true) then
+    local metal=Color3.fromHex("aeb5b5")
+    check(near(d.color.R,metal.R) and near(d.color.G,metal.G) and near(d.color.B,metal.B),"lid reads as exposed aluminium")
+   end
+   local frame=CFrame.new(d.at)
+   if d.turn then frame*=CFrame.Angles(math.rad(d.turn.X),math.rad(d.turn.Y),math.rad(d.turn.Z)) end
+   local q=frame:PointToObjectSpace(opening)
+   check(math.abs(q.X)>d.size.X*.5 or math.abs(q.Y)>d.size.Y*.5 or math.abs(q.Z)>d.size.Z*.5,
+    "drawn can does not paint over the real drinking aperture")
+  end
+  check(rim==8 and tab==4,"rolled perimeter and open pull tab survive both graphics tiers")
   local drawn=Region.drawnPieces(region)
   for _,p in pieces do check(table.find(drawn,p.id)~=nil,"support has a replacement look: "..p.id) end
   check(#Region.decor(region)>#Sites.decor(region),"existing room dressing retained")
@@ -157,6 +174,27 @@ case("the first outdoor pocket has close climbable layers and living prey",funct
  check(leafLow>=18,"structural leaves remain visible on the low graphics tier")
  check(Garden.bestiary(region)==Pocket.bestiary() and Pocket.bestiary()[1].low==2,"real hoverflies live in the pocket at both tiers")
  WorldMap.use("test_garden")
+end)
+case("floor detail continues through the station doorway",function()
+ WorldMap.use("preserve")
+ local root=Instance.new("Folder");root.Parent=workspace
+ local floor=WorldMap.region("hut_floor_i");local door=WorldMap.region("hut_doorway")
+ WorldBuild.region(floor,root);WorldBuild.region(door,root)
+ local pos=Vector3.new(148,-69.69,226)
+ for _,tier in {"full","low"} do
+  local living=LivingWorld.new(workspace,root,tier,WorldMap)
+  living:rebuild(pos,floor)
+  local before={}
+  for _,p in living.static:GetChildren() do if p.Name=="DustBunny" then table.insert(before,p.Position) end end
+  living:rebuild(pos,door)
+  local after={}
+  for _,p in living.static:GetChildren() do if p.Name=="DustBunny" then table.insert(after,p.Position) end end
+  check(#before>0 and #after==#before,tier.." doorway retains nearby floor dust")
+  for i,p in before do check((after[i]-p).Magnitude<1e-6,"approaching the doorway does not move or erase existing clumps") end
+  check(living.count<=LivingWorld.BUDGET[tier],tier.." doorway stays within the existing living budget")
+  living:destroy()
+ end
+ root:Destroy();WorldMap.use("test_garden")
 end)
 case("real renderer remains bounded while moving and pauses cleanly",function()
  WorldMap.use("preserve")

@@ -63,19 +63,27 @@ function Sites.decor(region: any): {any}
  local function part(name: string,size: Vector3,at: Vector3,color: string,shape: string?,turn: Vector3?,material: string?)
   table.insert(out,{id=site.id.."_"..name,size=size,at=p+at,color=Color3.fromHex(color),material=material or "Metal",shape=shape,turn=turn,shadow=true})
  end
- -- The same stepped shell as collision; decorative narrow facets bridge its corners without blocking the aperture.
+ -- Keep the existing walkable shell and aperture; exposed ends are aluminium,
+ -- with a rolled rim and a hollow pull tab rather than a painted solid face.
  for _,spec in Sites.pieces(region) do
-  part(spec.id,spec.hi-spec.lo,(spec.lo+spec.hi)*.5-p,site.color)
+  local lid=string.find(spec.id,"_lid_",1,true)~=nil or spec.id==site.id.."_base"
+  part(spec.id,spec.hi-spec.lo,(spec.lo+spec.hi)*.5-p,if lid then "aeb5b5" else site.color)
  end
  part("rolled_base",Vector3.new(.20,6.7,6.7),Vector3.new(.14,3.3,0),"aeb5b5","Cylinder")
+ local rim={{0,-2.1},{0,2.1},{1.7,3.3},{4.9,3.3},{6.6,2.1},{6.6,-2.1},{4.9,-3.3},{1.7,-3.3}}
+ for i,a in rim do
+  local b=rim[i%#rim+1];local dy,dz=b[1]-a[1],b[2]-a[2]
+  part("rolled_lid_"..i,Vector3.new(.20,math.sqrt(dy*dy+dz*dz)+.08,.20),
+   Vector3.new(12.24,(a[1]+b[1])*.5,(a[2]+b[2])*.5),"c4cbcb",nil,Vector3.new(math.deg(math.atan2(dz,dy)),0,0))
+ end
  part("label",Vector3.new(7,.025,3.2),Vector3.new(5.8,6.62,0),"ded6bd",nil,nil,"SmoothPlastic")
  part("label_band",Vector3.new(1,.028,3.2),Vector3.new(4.3,6.63,0),site.color,nil,nil,"SmoothPlastic")
- part("tab_left",Vector3.new(.12,.15,.35),Vector3.new(12.25,5.28,-.38),"bcc2c3")
- part("tab_right",Vector3.new(.12,.15,.35),Vector3.new(12.25,5.28,.38),"bcc2c3")
+ part("tab_left",Vector3.new(.12,.75,.12),Vector3.new(12.36,5.65,-.38),"d4d9d9")
+ part("tab_right",Vector3.new(.12,.75,.12),Vector3.new(12.36,5.65,.38),"d4d9d9")
+ part("tab_top",Vector3.new(.12,.12,.88),Vector3.new(12.36,6.025,0),"d4d9d9")
+ part("tab_bottom",Vector3.new(.12,.12,.88),Vector3.new(12.36,5.275,0),"d4d9d9")
  part("dry_syrup",Vector3.new(2.2,.018,1.3),Vector3.new(13.3,.014,.3),"75523b","Ellipsoid",nil,"SmoothPlastic")
- for i=1,3 do
-  part("scuff"..i,Vector3.new(.035,.04,1.4),Vector3.new(2+i*2,6.66,-.5+i*.25),"a4aca7",nil,Vector3.new(0,17*i,0))
- end
+ part("scuff1",Vector3.new(.035,.04,1.4),Vector3.new(4,6.66,-.25),"a4aca7",nil,Vector3.new(0,17,0))
  return out
 end
 function Sites.drawnPieces(region: any): {string}

@@ -115,7 +115,7 @@ function LivingWorld.rebuild(self: any,pos: Vector3,region: any)
  self.static=Shapes.folder(self.folder,"CloseDetail")
  self.grass={};self.grassParts={};self.grassFrames={}
  self.patches={}
- local floor=region.kind=="hut_floor" or region.kind=="room_floor" or region.kind=="kitchen_floor"
+ local floor=region.kind=="hut_floor" or region.kind=="room_floor" or region.kind=="kitchen_floor" or region.kind=="hut_doorway"
  local soil=region.kind=="verge" or region.kind=="hut_path" or region.kind=="mown_path" or string.match(region.id,"^garden_[a-d][1-4]$")~=nil or string.match(region.id,"^meadow_")~=nil or region.kind=="bed" or region.kind=="shrub"
  if not floor and not soil then return end
  local limit=if self.low then 48 else 150
@@ -142,10 +142,21 @@ function LivingWorld.rebuild(self: any,pos: Vector3,region: any)
    end
    local a=Environment.hash(914,salt,i+81)*TAU
    if floor and i==1 then
-    part("DustBunny",Vector3.new(1.3,.32,.9),CFrame.new(at+Vector3.new(0,.12,0)),"99918b","ellipsoid","SmoothPlastic",.28)
-    for j=1,if self.low then 2 else 6 do
+    part("DustBunny",Vector3.new(1.1,.19,.75),CFrame.new(at+Vector3.new(0,.08,0)),"99918b","ellipsoid","SmoothPlastic",.42)
+    if not self.low then
+     part("DustFibreClump",Vector3.new(.64,.21,.47),CFrame.new(at+Vector3.new(.3,.09,-.18)),"8c8681","ellipsoid","SmoothPlastic",.38)
+     part("DustFibreClump",Vector3.new(.72,.16,.52),CFrame.new(at+Vector3.new(-.29,.065,.12)),"a39b91","ellipsoid","SmoothPlastic",.4)
+    end
+    -- Joined strands lie mostly along the boards; part count stays 7/3.
+    for j=1,if self.low then 1 else 2 do
      local h=a+j*2.4
-     part("EntangledFibre",Vector3.new(.65,.018,.018),CFrame.new(at+Vector3.new(math.sin(h)*.5,.17+math.cos(h)*.08,math.cos(h)*.3))*CFrame.Angles(0,h,j*.3),"bbb3a5",nil,nil,.18)
+     local joint=at+Vector3.new(math.sin(h)*.25,.13,math.cos(h)*.18)
+     for k,angle in {h,h+.7} do
+      local direction=Vector3.new(math.cos(angle),.10*(if k==1 then 1 else -1),math.sin(angle)).Unit
+      local length=if k==1 then .5 else .36
+      local centre=joint+direction*length*(if k==1 then -.5 else .5)
+      part("EntangledFibre",Vector3.new(length,.012,.012),CFrame.lookAt(centre,centre+direction)*CFrame.Angles(0,math.pi/2,0),"b7b0a5",nil,nil,.12)
+     end
     end
    elseif floor and i<=3 then
     part("BreadCrumb",Vector3.new(.10+.15*i,.12,.18),CFrame.new(at+Vector3.new(0,.045,0))*CFrame.Angles(.15,a,.1),"ba9b69","ellipsoid")

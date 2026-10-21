@@ -84,6 +84,12 @@ Working branch: `codex/v48-living-habitat`, based on v47 receipt commit `9d442ff
 - Targeted checks: litter 11,258/0, living detail 3,630/0, compact layout/save 294/0. Native ordinary-camera 25 cm walks stayed attached and visibly approached a fly at both tiers. Walking frame mean/worst: full 17.95/49.84 ms; low 16.98/59.18 ms. An unattributed 265.76 ms low-detail arrival hitch keeps performance verification open. See `docs/verification/v48/GROUND-COVER-REVIEW.md`.
 - Remaining review includes can geometry, indoor dust/fleas, ants and emerging grubs, weather continuity, broader ordinary traversal and low-detail density, then a frozen full regression/native gate and release. No v48 publication claim is made.
 
+### Indoor prop and floor continuity follow-up
+
+- Both discarded cans now expose aluminium lids, rolled edges and hollow pull tabs within the existing thirty-record allowance. Their climbable shells, apertures and support identities stay unchanged. Native frontal and oblique inspection confirms the drinking opening remains visible; the props retain their faceted shell.
+- Dust now uses low overlapping clumps and bent horizontal fibres at the same seven/three part cost. The station doorway shares adjoining floor scatter, fixing dust disappearing during an approach across that region boundary.
+- Living-world checks 3,748/0; strict analysis clean; 206/206 compile. Native evidence and explicit limits are in `docs/verification/v48/INTERIOR-REVIEW.md`. Fleas still need a convincing ordinary-play encounter; no v48 release or final performance claim is made.
+
 ## Platform judgment
 
 Roblox limits density, draw calls, memory and simulation cost, especially on phones. The current barren travel and missing ground are implementation/design problems. Compact, authored habitats with reused meshes, bounded active wildlife and selective detail remain a viable direction. No engine migration is needed to address these reported problems.

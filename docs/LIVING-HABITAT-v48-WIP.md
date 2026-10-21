@@ -1,4 +1,6 @@
-# Living habitat work in progress
+# Living habitat implementation history
+
+**Current status: released as v48 / Roblox place version 137**, 2026-10-21T21:18:00Z. Final source 1ba2eb3: **55/55 CLI suites**, **270/0/0 native Studio**, and full/low longer habitat journeys complete. See `docs/verification/v48/RELEASE-v48-place137.md`, `COMPLETION-AUDIT.md` and `docs/HANDOFF-living-habitat-v48.md`. Dated pending-run notes below are historical and are superseded by those final receipts.
 
 User direction: dense, small areas like the original windowsill. Every area should feel enormous to a spider because of its connected surfaces, shelter, life and detail. It Takes Two is a reference for the variety and pacing of spaces. Do not interpret this as a request for more square metres or a particle carpet.
 

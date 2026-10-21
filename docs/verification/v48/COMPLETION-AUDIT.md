@@ -1,0 +1,27 @@
+# Completion audit — environmental pass
+
+Production **1ba2eb3**, rebuilt evidence **06be0270d414ffc2**, published existing place **137**. This audit evaluates the requested environmental pass, not every future feature in the earlier game-design roadmap.
+
+| Requested result / invariant | Authoritative implementation and observed evidence | Judgment |
+| --- | --- | --- |
+| Dust bunnies and lived-in indoor litter | `LivingWorld` pooled clumps/joined fibres; `INTERIOR-REVIEW.md`, doorway continuity and normal-camera station journey capture | Implemented and observed in travel; no seam erasure in the reviewed crossings |
+| Fleas | Fixed floor sites, articulated continuous hops, bounded 5/2 pool; `FLEA-REVIEW.md`, `CONTINUITY-REVIEW.md`, current full/low journey telemetry with on-screen floor fleas | Implemented, observed and retained across nearby region changes |
+| Empty soda cans | `LivedInSites.CANS`, physical hollow shells and real apertures; native interior/can review, current station walk, final source living-world checks | Implemented and encountered; faceted art limitation disclosed |
+| Outdoor ant hills/life | Added supported garden mound plus existing meadow colony; `AntForage`, `COLONY-REVIEW.md`, supported full/low mound crossings and native meadow-ant check | Implemented; traffic/crumb-return and weather shelter verified |
+| Occasional emerging grubs | Damp-ground pooled grubs with intermittent rise/withdrawal; colony capture and current full/low longer journeys, including normal-camera path capture | Implemented and observed; no artificial feeding credit |
+| A dog running around outside | Authored outdoor circuit, grounded articulated gait and rain stop; `DOG-REVIEW.md`, native paw/circuit review, final `dog_gait` suite | Implemented and verified; dog source unchanged by subsequent lawn/self-test edits |
+| Dense, rich small habitats / nearby living prey | Compact map and migration; authored shelters, clover/grass/litter and verge prey; current full/low journeys, native verge/fly photo, meadow/pond functional checks | Visual and traversal acceptance demonstrated over reviewed routes; not a claim of an insect in every frame |
+| Connected ground outside the stone path | Real verge support, compact joins, save migration; every region's streamed support/attachment passes final native gate, longer shoulder and garden crossings have zero detached frames | Implemented and verified at both tiers on reviewed routes |
+| Realistic moving sun | Solar season/latitude mathematics, native direction within 0.028 degrees in the reviewed states; `WEATHER-REVIEW.md`; solar code unchanged in final freeze | Implemented and verified; authored location/late-summer setting, not real-world player weather/location |
+| Wind and weather | Gradual deterministic fronts, applied directional wind and planted-root grass bend, rain/wetness with stationary streamed-roof refresh; weather/stream/wind native reviews and final living-world suite | Implemented and verified at both tiers; bounded pools retained |
+| Preserve movement, camera and long jumps | Production motor/camera unchanged by environmental drawing; final native traversal, full/low journeys and existing movement suites | Retained; brief step/foliage visual occlusion disclosed |
+| Progression / discovery / controls | Seven then ten whole-fly equivalents, earned Run then lock, L1 creep/contextual earned lock, L2 Run/R2 Focus, manual early aim; growth/station/lock/client suites pass | Retained and verified; no advance ability spoilers |
+| Minimal persistent HUD | Steady wordless 120×4 bar; 32/0 minimal HUD suite, actual native views. Opened interfaces/touch controls/earned unlock notices remain agreed exceptions | Implemented and verified |
+| Final-source verification | Immutable source archive; complete **55/55** terminal CLI reports, **270/0/0** final native Studio run, strict clean / **207/207** compile; playable XML source comparison **207/207** | Complete, with raw evidence archived and no substituted failed suite |
+| Release and portable handoff | Correct existing target asserted; debug overrides removed, Rojo disconnected; Studio publish success + Dashboard published-only **137**; GitHub branch and rebuilt package/handoff | Complete after final receipt/package synchronization; OneDrive/mirror remain read-only |
+
+The original named environmental features are real active code, not only mockups or review fixtures. Final source identity, functional evidence and publication form the release chain. Dedicated visual reviews plus current ordinary-input journeys demonstrate the intended close-scale character; counts alone are not used as proof of appearance.
+
+Practical limitations remain explicit: native Studio/CLI instead of an unassisted published-client or phone/controller playtest; no constant-frame-rate guarantee; some long whole-frame spikes in PC samples; sparse low-tier detail relative to full; faceted cans; occasional animals are not forced into every view. These are bounded quality/platform limits, not hidden failed gates or deferred implementation of a named requested feature.
+
+No production work, required test run, diagnostic cleanup or publication confirmation remains pending. Final receipts and the transfer package must be synchronized before reporting completion. Old WIP/pending entries and the earlier candidate package are historical, not current status.

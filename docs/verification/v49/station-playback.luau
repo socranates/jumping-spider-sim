@@ -10,11 +10,11 @@ return function(d)
  if d.title:holding() then d.title:skip() end
  wait(2)
  d.fresh("free",true)
- d.life.clock.hour=.8
+ d.life.clock.hour=12
  workspace:SetAttribute("Wasp",false);workspace:SetAttribute("Cat",false)
  local command=Instance.new("BindableEvent");command.Name="ChetStationView";command.Parent=game.Players.LocalPlayer.PlayerScripts
  local view="gear"
- command.Event:Connect(function(which) view=which end)
+ command.Event:Connect(function(which) view=which;d.life.clock.hour=12 end)
  local at,offset=Vector3.new(102,10,48),Vector3.new(31,21,39)
  RS:BindToRenderStep("ChetStationCamera",Enum.RenderPriority.Camera.Value+20,function()
   if view=="window" then at=Vector3.new(460,1,134);offset=Vector3.new(-25,13,24)
@@ -34,7 +34,7 @@ return function(d)
  print("[CHET_V49_VIEW_READY]",d.detail,"gear; use ChetStationView:Fire(window/boots/cat/player)")
  wait(15)
  -- The real client supplies speeds and raycast visibility, not fabricated prey.
- view="cat";d.place(Vector3.new(290,-69.69,145));d.Cat.load(d.cat,d.Cat.defaultRecord())
+ view="cat";d.life.clock.hour=.8;d.place(Vector3.new(290,-69.69,145));d.Cat.load(d.cat,d.Cat.defaultRecord())
  workspace:SetAttribute("Cat",true)
  d.input:simulate("Creep",true,"station-review");d.input:simulate("Forward",true,"station-review")
  wait(3);d.input:clear()
@@ -46,7 +46,7 @@ return function(d)
  print("[CHET_V49_WAKE]",d.cat.pose,d.cat.pos,d.cat.advance,d.cat.notices)
  wait(4)
  workspace:SetAttribute("Cat",false)
- view="window";d.place(Vector3.new(450,.31,134));wait(3)
+ view="window";d.life.clock.hour=12;d.place(Vector3.new(450,.31,134));wait(3)
  print("[CHET_V49_WINDOW_READY]",d.motor.pos,d.motor.mode)
  -- Native casts against the exact same collision as the player.
  local Shared=game.ReplicatedStorage.Shared

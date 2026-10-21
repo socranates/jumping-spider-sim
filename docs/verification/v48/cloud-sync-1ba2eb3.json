@@ -1,0 +1,1046 @@
+{
+  "expected_source": "1ba2eb3a2b296e72d3cb753e68740b6d62ea8e89",
+  "cloud_place": 120119801868085,
+  "universe": 10771103250,
+  "count": 207,
+  "different_paths": [],
+  "extra_paths": [],
+  "method": "DJB2 modulo 2^32 on UTF-8 source after CRLF normalization; change detection, not a cryptographic identity proof",
+  "scripts": [
+    {
+      "bytes": 10779,
+      "path": "ReplicatedFirst.SplashScreen",
+      "hash": 2326288566
+    },
+    {
+      "bytes": 565,
+      "path": "ReplicatedFirst.Splash",
+      "hash": 3352963403
+    },
+    {
+      "bytes": 66100,
+      "path": "ReplicatedStorage.Shared.Data.Appearances",
+      "hash": 2679321513
+    },
+    {
+      "bytes": 1282,
+      "path": "ReplicatedStorage.Shared.Data.Detail",
+      "hash": 1712396700
+    },
+    {
+      "bytes": 12720,
+      "path": "ReplicatedStorage.Shared.Data.Eyes",
+      "hash": 1393083921
+    },
+    {
+      "bytes": 15833,
+      "path": "ReplicatedStorage.Shared.Data.Flora",
+      "hash": 2262811677
+    },
+    {
+      "bytes": 45777,
+      "path": "ReplicatedStorage.Shared.Data.FlyLook",
+      "hash": 93898888
+    },
+    {
+      "bytes": 19623,
+      "path": "ReplicatedStorage.Shared.Data.Graphics",
+      "hash": 3674241072
+    },
+    {
+      "bytes": 26753,
+      "path": "ReplicatedStorage.Shared.Data.Species",
+      "hash": 63751827
+    },
+    {
+      "bytes": 2548,
+      "path": "ReplicatedStorage.Shared.Data.Surfaces",
+      "hash": 2965330061
+    },
+    {
+      "bytes": 4336,
+      "path": "ReplicatedStorage.Shared.Data.Wear",
+      "hash": 2949602139
+    },
+    {
+      "bytes": 5201,
+      "path": "ReplicatedStorage.Shared.Data.Peacock",
+      "hash": 487929421
+    },
+    {
+      "bytes": 8223,
+      "path": "ReplicatedStorage.Shared.Data.Wasp",
+      "hash": 2718616495
+    },
+    {
+      "bytes": 5360,
+      "path": "ReplicatedStorage.Shared.Data.WaspLook",
+      "hash": 1496976439
+    },
+    {
+      "bytes": 57165,
+      "path": "ReplicatedStorage.Shared.Data.NotebookPages",
+      "hash": 70733668
+    },
+    {
+      "bytes": 4654,
+      "path": "ReplicatedStorage.Shared.Data.SaveRules",
+      "hash": 1390076055
+    },
+    {
+      "bytes": 8340,
+      "path": "ReplicatedStorage.Shared.Data.SettingsSpec",
+      "hash": 973538631
+    },
+    {
+      "bytes": 4763,
+      "path": "ReplicatedStorage.Shared.Data.RivalRules",
+      "hash": 3252840466
+    },
+    {
+      "bytes": 4899,
+      "path": "ReplicatedStorage.Shared.Data.AntMimic",
+      "hash": 1404341676
+    },
+    {
+      "bytes": 4563,
+      "path": "ReplicatedStorage.Shared.Data.Catch",
+      "hash": 3988177174
+    },
+    {
+      "bytes": 3708,
+      "path": "ReplicatedStorage.Shared.Data.Tarantula",
+      "hash": 1095912248
+    },
+    {
+      "bytes": 7184,
+      "path": "ReplicatedStorage.Shared.Data.MatingRules",
+      "hash": 3608379298
+    },
+    {
+      "bytes": 2299,
+      "path": "ReplicatedStorage.Shared.Data.Meshes",
+      "hash": 2298141068
+    },
+    {
+      "bytes": 4810,
+      "path": "ReplicatedStorage.Shared.Habitat.Lit",
+      "hash": 1436408905
+    },
+    {
+      "bytes": 1466,
+      "path": "ReplicatedStorage.Shared.Habitat.Materials",
+      "hash": 4211248618
+    },
+    {
+      "bytes": 6262,
+      "path": "ReplicatedStorage.Shared.Habitat.Patina",
+      "hash": 3060260474
+    },
+    {
+      "bytes": 27579,
+      "path": "ReplicatedStorage.Shared.Habitat.Plants",
+      "hash": 3217877250
+    },
+    {
+      "bytes": 29496,
+      "path": "ReplicatedStorage.Shared.Habitat.Scenery",
+      "hash": 2824589871
+    },
+    {
+      "bytes": 7047,
+      "path": "ReplicatedStorage.Shared.Habitat.Shapes",
+      "hash": 3508111113
+    },
+    {
+      "bytes": 3346,
+      "path": "ReplicatedStorage.Shared.Habitat.SunPick",
+      "hash": 2398621770
+    },
+    {
+      "bytes": 1328,
+      "path": "ReplicatedStorage.Shared.Habitat.TestTarget",
+      "hash": 2127766768
+    },
+    {
+      "bytes": 6495,
+      "path": "ReplicatedStorage.Shared.Habitat.WindowsillLayout",
+      "hash": 2525442432
+    },
+    {
+      "bytes": 6871,
+      "path": "ReplicatedStorage.Shared.Habitat.DayLight",
+      "hash": 861847035
+    },
+    {
+      "bytes": 3112,
+      "path": "ReplicatedStorage.Shared.Habitat.Breakaway",
+      "hash": 2204596067
+    },
+    {
+      "bytes": 11073,
+      "path": "ReplicatedStorage.Shared.Habitat.Dressing",
+      "hash": 1213220938
+    },
+    {
+      "bytes": 12417,
+      "path": "ReplicatedStorage.Shared.Movement.CameraMath",
+      "hash": 1822542129
+    },
+    {
+      "bytes": 732,
+      "path": "ReplicatedStorage.Shared.Movement.FocusState",
+      "hash": 1242296663
+    },
+    {
+      "bytes": 3450,
+      "path": "ReplicatedStorage.Shared.Movement.InputState",
+      "hash": 3934760939
+    },
+    {
+      "bytes": 5289,
+      "path": "ReplicatedStorage.Shared.Movement.JumpInput",
+      "hash": 898646233
+    },
+    {
+      "bytes": 4603,
+      "path": "ReplicatedStorage.Shared.Movement.JumpMath",
+      "hash": 2158459936
+    },
+    {
+      "bytes": 4513,
+      "path": "ReplicatedStorage.Shared.Movement.LineFraming",
+      "hash": 759504631
+    },
+    {
+      "bytes": 18959,
+      "path": "ReplicatedStorage.Shared.Movement.SilkController",
+      "hash": 2949102595
+    },
+    {
+      "bytes": 34581,
+      "path": "ReplicatedStorage.Shared.Movement.SpiderMotor",
+      "hash": 2440724541
+    },
+    {
+      "bytes": 2297,
+      "path": "ReplicatedStorage.Shared.Movement.StickCarry",
+      "hash": 3455381493
+    },
+    {
+      "bytes": 2534,
+      "path": "ReplicatedStorage.Shared.Movement.SupportMath",
+      "hash": 3169058144
+    },
+    {
+      "bytes": 2635,
+      "path": "ReplicatedStorage.Shared.Movement.TetherMath",
+      "hash": 657849322
+    },
+    {
+      "bytes": 8232,
+      "path": "ReplicatedStorage.Shared.Movement.InspectView",
+      "hash": 276674237
+    },
+    {
+      "bytes": 9753,
+      "path": "ReplicatedStorage.Shared.Movement.LockOn",
+      "hash": 2471296814
+    },
+    {
+      "bytes": 10378,
+      "path": "ReplicatedStorage.Shared.Movement.TitleShots",
+      "hash": 2809572105
+    },
+    {
+      "bytes": 6341,
+      "path": "ReplicatedStorage.Shared.Perception.Observation",
+      "hash": 3865450877
+    },
+    {
+      "bytes": 16249,
+      "path": "ReplicatedStorage.Shared.Perception.ObservationMemory",
+      "hash": 2887369982
+    },
+    {
+      "bytes": 8423,
+      "path": "ReplicatedStorage.Shared.Perception.PerceptionMath",
+      "hash": 2802896998
+    },
+    {
+      "bytes": 18908,
+      "path": "ReplicatedStorage.Shared.Perception.Sensor",
+      "hash": 1002243545
+    },
+    {
+      "bytes": 19990,
+      "path": "ReplicatedStorage.Shared.Perception.SensorCore",
+      "hash": 1387888599
+    },
+    {
+      "bytes": 1011,
+      "path": "ReplicatedStorage.Shared.Perception.Signal",
+      "hash": 3714035856
+    },
+    {
+      "bytes": 5044,
+      "path": "ReplicatedStorage.Shared.Prey.Feeding",
+      "hash": 1333458049
+    },
+    {
+      "bytes": 17131,
+      "path": "ReplicatedStorage.Shared.Prey.Fly",
+      "hash": 3808253719
+    },
+    {
+      "bytes": 3416,
+      "path": "ReplicatedStorage.Shared.Prey.FlyFlight",
+      "hash": 1597337087
+    },
+    {
+      "bytes": 3610,
+      "path": "ReplicatedStorage.Shared.Prey.FlySenses",
+      "hash": 383848783
+    },
+    {
+      "bytes": 3025,
+      "path": "ReplicatedStorage.Shared.Prey.PerchGraph",
+      "hash": 73509722
+    },
+    {
+      "bytes": 13884,
+      "path": "ReplicatedStorage.Shared.Prey.PreyDirector",
+      "hash": 4169094516
+    },
+    {
+      "bytes": 4477,
+      "path": "ReplicatedStorage.Shared.Prey.PreyMath",
+      "hash": 1329492845
+    },
+    {
+      "bytes": 1245,
+      "path": "ReplicatedStorage.Shared.Prey.PreyPopulation",
+      "hash": 240730588
+    },
+    {
+      "bytes": 1287,
+      "path": "ReplicatedStorage.Shared.Prey.PreyRandom",
+      "hash": 2077072510
+    },
+    {
+      "bytes": 20920,
+      "path": "ReplicatedStorage.Shared.Prey.PreyWorld",
+      "hash": 23623364
+    },
+    {
+      "bytes": 9035,
+      "path": "ReplicatedStorage.Shared.Prey.Woodlouse",
+      "hash": 2767680047
+    },
+    {
+      "bytes": 18728,
+      "path": "ReplicatedStorage.Shared.Prey.PreyKinds",
+      "hash": 4180173149
+    },
+    {
+      "bytes": 9709,
+      "path": "ReplicatedStorage.Shared.Prey.Ladybird",
+      "hash": 935678711
+    },
+    {
+      "bytes": 9416,
+      "path": "ReplicatedStorage.Shared.Prey.Snail",
+      "hash": 3854829869
+    },
+    {
+      "bytes": 9598,
+      "path": "ReplicatedStorage.Shared.Prey.Millipede",
+      "hash": 1178358857
+    },
+    {
+      "bytes": 3261,
+      "path": "ReplicatedStorage.Shared.Prey.PlantWalk",
+      "hash": 41251161
+    },
+    {
+      "bytes": 6696,
+      "path": "ReplicatedStorage.Shared.Prey.Harvestman",
+      "hash": 2518265685
+    },
+    {
+      "bytes": 6109,
+      "path": "ReplicatedStorage.Shared.Prey.Ant",
+      "hash": 1373019525
+    },
+    {
+      "bytes": 6168,
+      "path": "ReplicatedStorage.Shared.Prey.Skater",
+      "hash": 2730036855
+    },
+    {
+      "bytes": 9933,
+      "path": "ReplicatedStorage.Shared.Rig.Anatomy",
+      "hash": 2331822200
+    },
+    {
+      "bytes": 4016,
+      "path": "ReplicatedStorage.Shared.Rig.Idle",
+      "hash": 2819725579
+    },
+    {
+      "bytes": 23670,
+      "path": "ReplicatedStorage.Shared.Rig.Setae",
+      "hash": 1933362686
+    },
+    {
+      "bytes": 87895,
+      "path": "ReplicatedStorage.Shared.Rig.SpiderRig",
+      "hash": 1656848434
+    },
+    {
+      "bytes": 6993,
+      "path": "ReplicatedStorage.Shared.Rig.PeacockDance",
+      "hash": 1767769598
+    },
+    {
+      "bytes": 6421,
+      "path": "ReplicatedStorage.Shared.Rig.SpiderChoice",
+      "hash": 3838229349
+    },
+    {
+      "bytes": 5418,
+      "path": "ReplicatedStorage.Shared.Rig.AntMimicPose",
+      "hash": 2234664127
+    },
+    {
+      "bytes": 6700,
+      "path": "ReplicatedStorage.Shared.Rig.TarantulaPose",
+      "hash": 2923615266
+    },
+    {
+      "bytes": 15490,
+      "path": "ReplicatedStorage.Shared.Rig.Living",
+      "hash": 3891264419
+    },
+    {
+      "bytes": 19168,
+      "path": "ReplicatedStorage.Shared.Rig.CatPose",
+      "hash": 1406838851
+    },
+    {
+      "bytes": 3926,
+      "path": "ReplicatedStorage.Shared.Rig.DogGait",
+      "hash": 3533433494
+    },
+    {
+      "bytes": 13322,
+      "path": "ReplicatedStorage.Shared.UI.ControlText",
+      "hash": 598288848
+    },
+    {
+      "bytes": 15843,
+      "path": "ReplicatedStorage.Shared.UI.EyeOptics",
+      "hash": 1968623040
+    },
+    {
+      "bytes": 8647,
+      "path": "ReplicatedStorage.Shared.UI.HudLayout",
+      "hash": 1472397006
+    },
+    {
+      "bytes": 5291,
+      "path": "ReplicatedStorage.Shared.UI.PerceptionShapes",
+      "hash": 3273270073
+    },
+    {
+      "bytes": 461,
+      "path": "ReplicatedStorage.Shared.UI.PerceptionText",
+      "hash": 4177727865
+    },
+    {
+      "bytes": 1969,
+      "path": "ReplicatedStorage.Shared.UI.PerceptionView",
+      "hash": 1872709198
+    },
+    {
+      "bytes": 7025,
+      "path": "ReplicatedStorage.Shared.UI.WaspText",
+      "hash": 1144237175
+    },
+    {
+      "bytes": 5844,
+      "path": "ReplicatedStorage.Shared.UI.PeacockText",
+      "hash": 4064195047
+    },
+    {
+      "bytes": 14217,
+      "path": "ReplicatedStorage.Shared.UI.LifeText",
+      "hash": 1786812933
+    },
+    {
+      "bytes": 7692,
+      "path": "ReplicatedStorage.Shared.UI.NotebookText",
+      "hash": 2448711150
+    },
+    {
+      "bytes": 3087,
+      "path": "ReplicatedStorage.Shared.UI.SaveText",
+      "hash": 3508064691
+    },
+    {
+      "bytes": 11353,
+      "path": "ReplicatedStorage.Shared.UI.SettingsModel",
+      "hash": 3776673096
+    },
+    {
+      "bytes": 3047,
+      "path": "ReplicatedStorage.Shared.UI.SettingsNav",
+      "hash": 1494639148
+    },
+    {
+      "bytes": 6827,
+      "path": "ReplicatedStorage.Shared.UI.SettingsText",
+      "hash": 1508481124
+    },
+    {
+      "bytes": 1617,
+      "path": "ReplicatedStorage.Shared.UI.AntMimicText",
+      "hash": 3727201833
+    },
+    {
+      "bytes": 2387,
+      "path": "ReplicatedStorage.Shared.UI.RivalText",
+      "hash": 1322547999
+    },
+    {
+      "bytes": 11986,
+      "path": "ReplicatedStorage.Shared.UI.MateText",
+      "hash": 1288958355
+    },
+    {
+      "bytes": 1763,
+      "path": "ReplicatedStorage.Shared.UI.TarantulaText",
+      "hash": 2043453601
+    },
+    {
+      "bytes": 2402,
+      "path": "ReplicatedStorage.Shared.UI.InspectText",
+      "hash": 4080985330
+    },
+    {
+      "bytes": 1070,
+      "path": "ReplicatedStorage.Shared.UI.Heard",
+      "hash": 3402188101
+    },
+    {
+      "bytes": 2472,
+      "path": "ReplicatedStorage.Shared.UI.PreyText",
+      "hash": 3282489050
+    },
+    {
+      "bytes": 4007,
+      "path": "ReplicatedStorage.Shared.UI.TitleText",
+      "hash": 2199677439
+    },
+    {
+      "bytes": 15618,
+      "path": "ReplicatedStorage.Shared.UI.QuietHud",
+      "hash": 1863681853
+    },
+    {
+      "bytes": 1492,
+      "path": "ReplicatedStorage.Shared.UI.CatText",
+      "hash": 1510137400
+    },
+    {
+      "bytes": 699,
+      "path": "ReplicatedStorage.Shared.UI.CrabText",
+      "hash": 1443788810
+    },
+    {
+      "bytes": 1407,
+      "path": "ReplicatedStorage.Shared.UI.BirdText",
+      "hash": 82432094
+    },
+    {
+      "bytes": 660,
+      "path": "ReplicatedStorage.Shared.UI.FrogText",
+      "hash": 3579366940
+    },
+    {
+      "bytes": 799,
+      "path": "ReplicatedStorage.Shared.UI.WaterText",
+      "hash": 3234474641
+    },
+    {
+      "bytes": 40305,
+      "path": "ReplicatedStorage.Shared.Persistence.Checkpoint",
+      "hash": 4165010091
+    },
+    {
+      "bytes": 10961,
+      "path": "ReplicatedStorage.Shared.Persistence.CheckpointStore",
+      "hash": 969390951
+    },
+    {
+      "bytes": 4986,
+      "path": "ReplicatedStorage.Shared.Persistence.Json",
+      "hash": 1154341072
+    },
+    {
+      "bytes": 11819,
+      "path": "ReplicatedStorage.Shared.Persistence.ObjectRecord",
+      "hash": 3623203133
+    },
+    {
+      "bytes": 5167,
+      "path": "ReplicatedStorage.Shared.Persistence.SaveRest",
+      "hash": 794700079
+    },
+    {
+      "bytes": 9182,
+      "path": "ReplicatedStorage.Shared.Persistence.SaveEnvelope",
+      "hash": 899466052
+    },
+    {
+      "bytes": 10275,
+      "path": "ReplicatedStorage.Shared.Persistence.SaveProgress",
+      "hash": 1181296187
+    },
+    {
+      "bytes": 2972,
+      "path": "ReplicatedStorage.Shared.Persistence.SaveStores",
+      "hash": 90302067
+    },
+    {
+      "bytes": 22113,
+      "path": "ReplicatedStorage.Shared.Persistence.SaveSession",
+      "hash": 1950808661
+    },
+    {
+      "bytes": 4391,
+      "path": "ReplicatedStorage.Shared.Persistence.MemoryBackend",
+      "hash": 3225673222
+    },
+    {
+      "bytes": 4859,
+      "path": "ReplicatedStorage.Shared.Persistence.SaveScheduler",
+      "hash": 1876913709
+    },
+    {
+      "bytes": 5046,
+      "path": "ReplicatedStorage.Shared.Persistence.CompactMigration",
+      "hash": 3553835746
+    },
+    {
+      "bytes": 38964,
+      "path": "ReplicatedStorage.Shared.Predator.WaspDirector",
+      "hash": 1759278639
+    },
+    {
+      "bytes": 18184,
+      "path": "ReplicatedStorage.Shared.Predator.RivalSpider",
+      "hash": 14139675
+    },
+    {
+      "bytes": 22874,
+      "path": "ReplicatedStorage.Shared.Predator.RivalDrive",
+      "hash": 3856545874
+    },
+    {
+      "bytes": 34725,
+      "path": "ReplicatedStorage.Shared.Predator.RivalRoute",
+      "hash": 3820266270
+    },
+    {
+      "bytes": 3477,
+      "path": "ReplicatedStorage.Shared.Predator.RivalGrip",
+      "hash": 897191335
+    },
+    {
+      "bytes": 4673,
+      "path": "ReplicatedStorage.Shared.Predator.MateDrive",
+      "hash": 2446932206
+    },
+    {
+      "bytes": 18742,
+      "path": "ReplicatedStorage.Shared.Predator.Mate",
+      "hash": 1870388021
+    },
+    {
+      "bytes": 26306,
+      "path": "ReplicatedStorage.Shared.Predator.Cat",
+      "hash": 2249770768
+    },
+    {
+      "bytes": 20897,
+      "path": "ReplicatedStorage.Shared.Predator.Bird",
+      "hash": 10686565
+    },
+    {
+      "bytes": 6801,
+      "path": "ReplicatedStorage.Shared.Predator.CrabSpider",
+      "hash": 3281754509
+    },
+    {
+      "bytes": 7743,
+      "path": "ReplicatedStorage.Shared.Predator.Frog",
+      "hash": 2029192109
+    },
+    {
+      "bytes": 10511,
+      "path": "ReplicatedStorage.Shared.Predator.RivalDisplay",
+      "hash": 1820431106
+    },
+    {
+      "bytes": 7624,
+      "path": "ReplicatedStorage.Shared.Life.LifeClock",
+      "hash": 3607624940
+    },
+    {
+      "bytes": 10742,
+      "path": "ReplicatedStorage.Shared.Life.LifeLoop",
+      "hash": 2004943913
+    },
+    {
+      "bytes": 2048,
+      "path": "ReplicatedStorage.Shared.Life.LifeSession",
+      "hash": 3811505892
+    },
+    {
+      "bytes": 17894,
+      "path": "ReplicatedStorage.Shared.Life.NeedsModel",
+      "hash": 3966795685
+    },
+    {
+      "bytes": 6771,
+      "path": "ReplicatedStorage.Shared.Life.Growth",
+      "hash": 2494056984
+    },
+    {
+      "bytes": 18174,
+      "path": "ReplicatedStorage.Shared.Life.Mating",
+      "hash": 218898175
+    },
+    {
+      "bytes": 9653,
+      "path": "ReplicatedStorage.Shared.Life.MatingScene",
+      "hash": 2436154193
+    },
+    {
+      "bytes": 9574,
+      "path": "ReplicatedStorage.Shared.Life.Nature",
+      "hash": 3911742393
+    },
+    {
+      "bytes": 2770,
+      "path": "ReplicatedStorage.Shared.Life.Nursery",
+      "hash": 2829788232
+    },
+    {
+      "bytes": 8372,
+      "path": "ReplicatedStorage.Shared.Life.Ballooning",
+      "hash": 2334292760
+    },
+    {
+      "bytes": 8295,
+      "path": "ReplicatedStorage.Shared.Life.Water",
+      "hash": 3314598755
+    },
+    {
+      "bytes": 7663,
+      "path": "ReplicatedStorage.Shared.Learning.FieldNotebook",
+      "hash": 3093233620
+    },
+    {
+      "bytes": 10403,
+      "path": "ReplicatedStorage.Shared.Learning.NotebookWatch",
+      "hash": 1398285069
+    },
+    {
+      "bytes": 11484,
+      "path": "ReplicatedStorage.Shared.World.Region",
+      "hash": 4248965823
+    },
+    {
+      "bytes": 5013,
+      "path": "ReplicatedStorage.Shared.World.WorldBuild",
+      "hash": 777080929
+    },
+    {
+      "bytes": 34013,
+      "path": "ReplicatedStorage.Shared.World.WorldMap",
+      "hash": 3921959880
+    },
+    {
+      "bytes": 182601,
+      "path": "ReplicatedStorage.Shared.World.Garden",
+      "hash": 599826048
+    },
+    {
+      "bytes": 14254,
+      "path": "ReplicatedStorage.Shared.World.LookPlan",
+      "hash": 2066453680
+    },
+    {
+      "bytes": 5117,
+      "path": "ReplicatedStorage.Shared.World.PreserveTrain",
+      "hash": 4034812896
+    },
+    {
+      "bytes": 12259,
+      "path": "ReplicatedStorage.Shared.World.Preserve",
+      "hash": 523304376
+    },
+    {
+      "bytes": 65086,
+      "path": "ReplicatedStorage.Shared.World.PreserveLook",
+      "hash": 1842791531
+    },
+    {
+      "bytes": 2991,
+      "path": "ReplicatedStorage.Shared.World.Worlds",
+      "hash": 2439387336
+    },
+    {
+      "bytes": 175528,
+      "path": "ReplicatedStorage.Shared.World.Hut",
+      "hash": 1712048218
+    },
+    {
+      "bytes": 74919,
+      "path": "ReplicatedStorage.Shared.World.Meadow",
+      "hash": 3760662192
+    },
+    {
+      "bytes": 71247,
+      "path": "ReplicatedStorage.Shared.World.Pond",
+      "hash": 2006085191
+    },
+    {
+      "bytes": 10721,
+      "path": "ReplicatedStorage.Shared.World.Verge",
+      "hash": 3469439201
+    },
+    {
+      "bytes": 6661,
+      "path": "ReplicatedStorage.Shared.World.LivedInSites",
+      "hash": 3135264276
+    },
+    {
+      "bytes": 7926,
+      "path": "ReplicatedStorage.Shared.World.Environment",
+      "hash": 504021954
+    },
+    {
+      "bytes": 4353,
+      "path": "ReplicatedStorage.Shared.World.GardenPocket",
+      "hash": 2705120466
+    },
+    {
+      "bytes": 1245,
+      "path": "ReplicatedStorage.Shared.World.StationTerritory",
+      "hash": 843031275
+    },
+    {
+      "bytes": 6550,
+      "path": "ReplicatedStorage.Shared.World.StationAir",
+      "hash": 2752564185
+    },
+    {
+      "bytes": 1852,
+      "path": "ReplicatedStorage.Shared.World.DogGround",
+      "hash": 3190786653
+    },
+    {
+      "bytes": 1778,
+      "path": "ReplicatedStorage.Shared.World.AntForage",
+      "hash": 2340568956
+    },
+    {
+      "bytes": 5128,
+      "path": "ServerScriptService.Server.Main",
+      "hash": 956360980
+    },
+    {
+      "bytes": 8896,
+      "path": "ServerScriptService.Server.SaveService",
+      "hash": 166512635
+    },
+    {
+      "bytes": 4204,
+      "path": "ServerScriptService.Server.Persistence",
+      "hash": 2281391392
+    },
+    {
+      "bytes": 1373,
+      "path": "ServerScriptService.Server.DataStoreBackend",
+      "hash": 645675932
+    },
+    {
+      "bytes": 6060,
+      "path": "ServerScriptService.Server.WorldFocus",
+      "hash": 4031976840
+    },
+    {
+      "bytes": 37214,
+      "path": "StarterPlayer.StarterPlayerScripts.Client.FlyBodies",
+      "hash": 3180521748
+    },
+    {
+      "bytes": 9166,
+      "path": "StarterPlayer.StarterPlayerScripts.Client.PerceptionHud",
+      "hash": 1176937936
+    },
+    {
+      "bytes": 1751,
+      "path": "StarterPlayer.StarterPlayerScripts.Client.PerceptionStage",
+      "hash": 2287692918
+    },
+    {
+      "bytes": 38971,
+      "path": "StarterPlayer.StarterPlayerScripts.Client.SpiderCamera",
+      "hash": 251206089
+    },
+    {
+      "bytes": 148432,
+      "path": "StarterPlayer.StarterPlayerScripts.Client.SpiderClient",
+      "hash": 2077989027
+    },
+    {
+      "bytes": 17288,
+      "path": "StarterPlayer.StarterPlayerScripts.Client.SpiderEyes",
+      "hash": 1464303727
+    },
+    {
+      "bytes": 19639,
+      "path": "StarterPlayer.StarterPlayerScripts.Client.SpiderHud",
+      "hash": 3686614321
+    },
+    {
+      "bytes": 14756,
+      "path": "StarterPlayer.StarterPlayerScripts.Client.SpiderInput",
+      "hash": 1308246312
+    },
+    {
+      "bytes": 1553,
+      "path": "StarterPlayer.StarterPlayerScripts.Client.WorldDetail",
+      "hash": 789491387
+    },
+    {
+      "bytes": 11263,
+      "path": "StarterPlayer.StarterPlayerScripts.Client.Soundscape",
+      "hash": 1599375374
+    },
+    {
+      "bytes": 10657,
+      "path": "StarterPlayer.StarterPlayerScripts.Client.WaspBody",
+      "hash": 3707516069
+    },
+    {
+      "bytes": 10867,
+      "path": "StarterPlayer.StarterPlayerScripts.Client.CaughtPanel",
+      "hash": 707978417
+    },
+    {
+      "bytes": 1848,
+      "path": "StarterPlayer.StarterPlayerScripts.Client.OldSkins",
+      "hash": 1433143069
+    },
+    {
+      "bytes": 21273,
+      "path": "StarterPlayer.StarterPlayerScripts.Client.NotebookPanel",
+      "hash": 4242627130
+    },
+    {
+      "bytes": 1631,
+      "path": "StarterPlayer.StarterPlayerScripts.Client.NotebookArt",
+      "hash": 216313923
+    },
+    {
+      "bytes": 4888,
+      "path": "StarterPlayer.StarterPlayerScripts.Client.SaveClient",
+      "hash": 2360151432
+    },
+    {
+      "bytes": 29480,
+      "path": "StarterPlayer.StarterPlayerScripts.Client.SettingsPanel",
+      "hash": 2884351336
+    },
+    {
+      "bytes": 17576,
+      "path": "StarterPlayer.StarterPlayerScripts.Client.MateStage",
+      "hash": 449694325
+    },
+    {
+      "bytes": 20403,
+      "path": "StarterPlayer.StarterPlayerScripts.Client.WorldClient",
+      "hash": 870232897
+    },
+    {
+      "bytes": 40591,
+      "path": "StarterPlayer.StarterPlayerScripts.Client.BugBodies",
+      "hash": 196710512
+    },
+    {
+      "bytes": 98315,
+      "path": "StarterPlayer.StarterPlayerScripts.Client.SelfTest",
+      "hash": 689229605
+    },
+    {
+      "bytes": 10951,
+      "path": "StarterPlayer.StarterPlayerScripts.Client.TitleCard",
+      "hash": 1238255230
+    },
+    {
+      "bytes": 12993,
+      "path": "StarterPlayer.StarterPlayerScripts.Client.LookStream",
+      "hash": 1381740091
+    },
+    {
+      "bytes": 5674,
+      "path": "StarterPlayer.StarterPlayerScripts.Client.FrameProfile",
+      "hash": 268835991
+    },
+    {
+      "bytes": 5350,
+      "path": "StarterPlayer.StarterPlayerScripts.Client.TrainPass",
+      "hash": 540836538
+    },
+    {
+      "bytes": 12652,
+      "path": "StarterPlayer.StarterPlayerScripts.Client.HutLife",
+      "hash": 1083118856
+    },
+    {
+      "bytes": 5236,
+      "path": "StarterPlayer.StarterPlayerScripts.Client.CatBody",
+      "hash": 1488120316
+    },
+    {
+      "bytes": 6335,
+      "path": "StarterPlayer.StarterPlayerScripts.Client.CrabBody",
+      "hash": 2897153430
+    },
+    {
+      "bytes": 12750,
+      "path": "StarterPlayer.StarterPlayerScripts.Client.BirdBody",
+      "hash": 2701105840
+    },
+    {
+      "bytes": 10161,
+      "path": "StarterPlayer.StarterPlayerScripts.Client.PondBodies",
+      "hash": 211399858
+    },
+    {
+      "bytes": 8351,
+      "path": "StarterPlayer.StarterPlayerScripts.Client.WorldShadows",
+      "hash": 1900416729
+    },
+    {
+      "bytes": 26044,
+      "path": "StarterPlayer.StarterPlayerScripts.Client.LivingWorld",
+      "hash": 1826008862
+    }
+  ]
+}

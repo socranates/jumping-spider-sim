@@ -49,22 +49,22 @@ ControlText.DROP_REFUSED = {
 }
 ControlText.DROP_WALK = "To the edge, to let yourself down"
 
--- What each device calls the controls. (ROBLOX-115: on a controller the lock is L2 / LT, a tap, and Focus the same trigger held; the right-stick click recentres.) Godot's input_setup.gd bindings; the port keeps the D-pad for walking, so lowering on
+-- What each device calls the controls. (L1 / LB locks, R2 / RT focuses, L2 / LT runs; the right-stick click recentres.) Godot's input_setup.gd bindings; the port keeps the D-pad for walking, so lowering on
 -- silk is X on a controller (ROBLOX-05). Touch names are the on-screen buttons.
 local NAMES: { [string]: { [string]: string } } = {
 	keyboard = {
 		feed = "E", jump = "Space", cancel = "Q", letGo = "Q", drop = "F", reel = "W", lower = "S", walk = "WASD", look = "Mouse",
-		creep = "Shift", focus = "Right mouse", eye = "V", recenter = "R", lock = "R", slow = "T", reset = "Backspace", help = "H", zoom = "Wheel",
+		creep = "Ctrl", run = "Shift", focus = "Right mouse", eye = "V", recenter = "R", lock = "R", slow = "T", reset = "Backspace", help = "H", zoom = "Wheel",
 		choose = "C", display = "X", menu = "M", notebook = "N", settings = "O",
 	},
 	gamepad = {
 		feed = "Left-stick click", jump = "A", cancel = "B", letGo = "B", drop = "X", reel = "Stick up", lower = "Stick down", walk = "Left stick",
-		look = "Right stick", creep = "LB", focus = "LT", eye = "Y", recenter = "Right-stick click", lock = "LT", slow = "RT", reset = "View",
+		look = "Right stick", creep = "LB", run = "LT", focus = "RT", eye = "Y", recenter = "Right-stick click", lock = "LB", slow = "", reset = "View",
 		help = "", zoom = "", choose = "RB", display = "RB", menu = "View", notebook = "View",
 	},
 	touch = {
 		feed = "Eat", jump = "Jump", cancel = "Cancel", letGo = "Let go", drop = "Silk", reel = "↑", lower = "↓", walk = "Arrows",
-		look = "Drag", creep = "Creep", focus = "Focus", eye = "Eye", recenter = "Recentre", lock = "Lock", slow = "", reset = "", help = "", zoom = "", choose = "Change", display = "Dance", menu = "Menu", notebook = "Notebook",
+		look = "Drag", creep = "Creep", run = "Run", focus = "Focus", eye = "Eye", recenter = "Recentre", lock = "Lock", slow = "", reset = "", help = "", zoom = "", choose = "Change", display = "Dance", menu = "Menu", notebook = "Notebook",
 	},
 }
 
@@ -72,8 +72,8 @@ local NAMES: { [string]: { [string]: string } } = {
 -- calls setPadStyle from UserInputService:GetStringForKeyCode(ButtonA) at start and after each controller input; names not listed
 -- here (sticks) are the same on both.
 local PLAYSTATION: { [string]: string } = {
-	feed = "L3", jump = "Cross", cancel = "Circle", letGo = "Circle", drop = "Square", creep = "L1", focus = "L2", eye = "Triangle",
-	recenter = "R3", lock = "L2", slow = "R2", reset = "Touchpad", choose = "R1", display = "R1", menu = "Touchpad", notebook = "Touchpad",
+	feed = "L3", jump = "Cross", cancel = "Circle", letGo = "Circle", drop = "Square", creep = "L1", run = "L2", focus = "R2", eye = "Triangle",
+	recenter = "R3", lock = "L1", slow = "", reset = "Touchpad", choose = "R1", display = "R1", menu = "Touchpad", notebook = "Touchpad",
 }
 local padStyle = "xbox"
 
@@ -204,9 +204,8 @@ function ControlText.edgeWalkHint(device: Device): string
 	return `{ControlText.DROP_WALK}    {ControlText.name(device, "cancel")} or move: stop`
 end
 
--- ROBLOX-115: on a controller Focus is L2 / LT held (a tap is the lock), so even a toggled Focus is held to latch and held again to let go: the status line's words.
+-- Focus can be held or latched with the existing accessibility option.
 function ControlText.focusAgain(device: Device): string
-	if device == "gamepad" then return `Hold {ControlText.name(device, "focus")} again to stop` end
 	return `{ControlText.name(device, "focus")} again to stop`
 end
 
@@ -227,28 +226,28 @@ end
 function ControlText.helpCard(device: Device): string
 	if device == "gamepad" then
 		local function n(action: string): string return ControlText.name("gamepad", action) end
-		-- (ROBLOX-115: the lock is L2 / LT's tap and Focus its hold; the right stick's click recentres)
+		-- L1 locks, R2 focuses, and L2 runs; the right-stick click recentres.
 		return table.concat({
-			"Left stick walk   Right stick look, click: recentre",
-			`Tap {n("jump")} hop   Hold {n("jump")} aim, release to leap   {n("creep")} creep`,
+			"Left stick: walk/creep   Right stick look, click: recentre",
+			`Tap {n("jump")} hop   Hold {n("jump")} aim, release to leap`,
 			`{n("drop")} lower on silk   {n("cancel")} cancel   {n("eye")} eye view`,
 			`On the line: up reel, down lower, hold {n("letGo")} let go`,
-			`Tap {n("lock")} lock on (stick circles)   Hold {n("lock")} focus   {n("slow")} slow-mo`,
+			`{n("lock")} creep/lock (circle)   {n("focus")} focus   {n("run")} run`,
 			`In the crack: {n("feed")} rest (sleep from evening)`,
 			`{n("menu")}: menu, then last rest, notebook, settings`,
 		}, "\n")
 	elseif device == "touch" then
 		return table.concat({
-			"Arrows walk   Drag to look   Creep (hold)   Focus   Eye view",
+			"Arrows walk   Drag to look   Hold Run or Creep",
 			"Tap Jump hop   Hold Jump aim, release to leap   Cancel",
 			"Silk: lower on a line   On it: ↑ reel, ↓ lower, hold Let go",
-			"Lock follows what you see (← → circle it)   Recentre",
+			"Lock (← → circle)   Recentre   Focus   Eye",
 			"In the crack: Rest (Sleep from evening)",
 			"Menu: last rest, notebook, settings, this card",
 		}, "\n")
 	end
 	return table.concat({
-		"WASD walk   Mouse look   Shift creep   Wheel zoom   G gait",
+		"WASD walk   Mouse look   Shift run   Ctrl creep   G gait",
 		"Tap Space hop   Hold Space aim, release to leap   Q cancel",
 		"F lower on silk   On the line: W reel, S lower, hold Q let go",
 		"V eye view   Right mouse focus   T slow motion   H: hide this",

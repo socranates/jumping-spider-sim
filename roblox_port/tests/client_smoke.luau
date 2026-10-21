@@ -18,7 +18,7 @@ local services = game:GetService("ContextActionService") and ClientStubs
 local frame = ClientStubs.renderSteps.SpiderSim
 local gui = game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui")
 local function frames(n: number) for _ = 1, n do frame(1 / 60) end end
-local KEYS = { Feed = "E", Jump = "Space", Cancel = "Q", Drop = "F", Forward = "W", Back = "S", Eye = "V", Recenter = "R", Creep = "LeftShift", Reset = "Backspace", Choose = "C", Display = "X", Slow = "T" }
+local KEYS = { Feed = "E", Jump = "Space", Cancel = "Q", Drop = "F", Forward = "W", Back = "S", Eye = "V", Recenter = "R", Creep = "LeftControl", Run = "LeftShift", Reset = "Backspace", Choose = "C", Display = "X", Slow = "T" }
 local function key(action: string, down: boolean)
 	local fn = services.actions["Spider" .. action]
 	assert(fn, "no binding for " .. action)
@@ -589,6 +589,24 @@ check("main and free play keep independent last rests and restore their own rule
  d.openMenu();assert(d.menu:choose("Free"));frames(3)
  assert(d.session.mode=="free" and d.needs.gentle and d.needs.energy<.4)
  assert(d.fresh("main",false,nil))
+end)
+check("Run accepts simultaneous sources and clears on focus loss; no controller key conflict", function()
+	local Input = require("../src/Client/SpiderInput")
+	local seen = {}
+	for action, codes in Input.BINDINGS do
+		for _, code in codes do
+			local k = tostring(code)
+			assert(seen[k] == nil, `binding collision: {action} and {seen[k]} share {k}`)
+			seen[k] = action
+		end
+	end
+	local d = ClientStubs.driver
+	d.input:simulate("Run",true,"keyboard"); d.input:simulate("Run",true,"touch")
+	d.input:simulate("Run",false,"keyboard"); assert(d.input.held.Run, "keyboard release cancelled touch run")
+	d.input:simulate("Run",false,"touch"); assert(not d.input.held.Run, "Run stuck after release")
+	d.input:simulate("Run",true,"gamepad"); game:GetService("UserInputService").WindowFocusReleased:Fire()
+	assert(not d.input.held.Run, "Run stuck on focus loss")
+	assert(find("SpiderTouch","Run") ~= nil, "touch Run button missing")
 end)
 print(`CLIENT passed={passed} failed={failed}`)
 if failed > 0 then error("client smoke failed") end

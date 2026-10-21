@@ -60,7 +60,7 @@ SettingsSpec.LIST = {
 	{ id = "FocusToggle", section = "comfort", label = "Focus toggles (press to start and stop)", kind = "toggle", default = false },
 	{ id = "AutomaticGrip", section = "comfort", label = "Struggling prey: hold on automatically", kind = "toggle", default = false },
 	{ id = "ShowNoticed", section = "comfort", label = "Show what the spider notices", kind = "toggle", default = true,
-		note = "The rings, marks and words over what it sees. A lock (R or L2) still follows it." }, -- (ROBLOX-110; ROBLOX-115: L2 locks on a controller)
+		note = "The rings, marks and words over what it sees. A lock (R or L1) still follows it." }, -- L1 locks on a controller
 	{ id = "ShowLastSeen", section = "comfort", label = "Show the last-seen mark", kind = "toggle", default = true },
 	{ id = "EyeLevelHorizon", section = "comfort", label = "Spider-eye view: level horizon (no roll on walls)", kind = "toggle", default = false },
 	{ id = "EyeGrey", section = "comfort", label = "Spider-eye view: grey instead of green", kind = "toggle", default = false },

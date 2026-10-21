@@ -1,10 +1,10 @@
 --!strict
 -- One action path for keyboard, mouse, gamepad and held on-screen touch buttons, all at once.
 -- Bindings follow the frozen Godot game's scripts/core/input_setup.gd wherever the action exists in the port:
---   walk WASD / left stick (D-pad too), look mouse / arrow keys / right stick / touch drag, creep Shift / LB,
+--   walk WASD / left stick (D-pad too), look mouse / arrow keys / right stick / touch drag, run Shift / LT, creep Ctrl / LB / gentle stick,
 --   jump Space / A (tap hop, hold aim, release leap), cancel Q / B (cancels an aim or a walk to the edge; held on the
---   line it lets go), focus right mouse / LT, spider-eye view V / Y, recenter R / middle mouse / right-stick click,
---   slow motion T / RT, lower on silk F / X (Godot: F / D-pad down; the port keeps the D-pad for walking, ROBLOX-05).
+--   line it lets go), focus right mouse / RT, spider-eye view V / Y, recenter R / middle mouse / right-stick click,
+--   slow motion T, lower on silk F / X (Godot: F / D-pad down; the port keeps the D-pad for walking, ROBLOX-05).
 --   Esc / Menu open Roblox's own menu: the game drops every press and hold and waits (Godot's pause).
 -- Port-only: reset to the start Backspace / View (Select), gait toggle G, controls card H (Godot's H is the field notes).
 -- The peacock spider (ROBLOX-31): C changes spider in the crack (RB / R1 on a controller, the touch Change button); X, or the same RB / R1
@@ -16,10 +16,8 @@
 -- The settings (ROBLOX-49): O opens them; a controller and touch reach them through the life menu (then Settings).
 -- The lock (ROBLOX-110): Recentre (R / middle mouse / right-stick click / the touch Recentre) locks onto what the spider sees, lets go of a lock, or with
 -- nothing to lock recentres; touch also has a small Lock button by Jump (no key: Recentre is the keys' lock), shown while something can be locked.
--- ROBLOX-115 (Nathan: lock-on to L2): on a controller L2 / LT is the lock: a tap (let go within L2_HOLD seconds) locks onto what the spider sees or lets go of
--- the lock, as the touch Lock button does; held past L2_HOLD it is Focus, held, until it is let go (the Focus toggle setting latches it as a press of Focus
--- would). The right-stick click is Recentre only (it locks no more), and the keys keep theirs: R / middle mouse lock or recentre, right mouse is Focus.
--- The hold is timed in the frames' own time: the client calls `tick(dt)` every frame.
+-- Nathan's run/lock controls: L1 / LB holds creep and takes a contextual lock on press; R2 / RT holds Focus.
+-- Run is held on Shift / L2 / the touch Run button; Ctrl creeps. A gentle left-stick push creeps too.
 --
 -- Every button action is held while any source holds it (InputState): a key, a controller button, a finger. Handlers hear
 -- one "begin" when the first source goes down and one "end" when the last comes up, so a touch hold and a key or button
@@ -52,7 +50,7 @@ export type Handlers = {
 	eye: () -> (),
 	recenter: () -> (),
 	recentre: (() -> ())?, -- (ROBLOX-115) a controller's right-stick click: recentre only, never a lock
-	lock: (() -> ())?, -- the touch Lock button (ROBLOX-110), and a controller's L2 tap (ROBLOX-115)
+	lock: (() -> ())?, -- the touch Lock button (ROBLOX-110), and a controller's L1 press
 	slow: () -> (),
 	help: () -> (),
 	touchLook: (Vector2) -> (),
@@ -62,9 +60,6 @@ export type Handlers = {
 local ONE_SHOT = { Menu = "menu", Notebook = "notebook", Settings = "settings", Reset = "reset", Gait = "gait", Eye = "eye", Recenter = "recenter", Slow = "slow", Help = "help", Lock = "lock",
 	PadRecenter = "recentre" }
 
--- ROBLOX-115: how long L2 is held before it is Focus and not a tap of the lock, seconds.
-SpiderInput.L2_HOLD = 0.35
-
 -- Bindings by action. Exported for tests and the controls table in README.md.
 SpiderInput.BINDINGS = {
 	Forward = { Enum.KeyCode.W, Enum.KeyCode.DPadUp }, Back = { Enum.KeyCode.S, Enum.KeyCode.DPadDown },
@@ -73,12 +68,12 @@ SpiderInput.BINDINGS = {
 	Jump = { Enum.KeyCode.Space, Enum.KeyCode.ButtonA }, Cancel = { Enum.KeyCode.Q, Enum.KeyCode.ButtonB },
 	Feed = { Enum.KeyCode.E, Enum.KeyCode.ButtonL3 },
 	Drop = { Enum.KeyCode.F, Enum.KeyCode.ButtonX },
-	Creep = { Enum.KeyCode.LeftShift, Enum.KeyCode.RightShift, Enum.KeyCode.ButtonL1 },
-	Focus = { Enum.UserInputType.MouseButton2 }, -- (ROBLOX-115: a controller's Focus is L2 held, PadLock)
-	PadLock = { Enum.KeyCode.ButtonL2 }, -- (ROBLOX-115: a tap locks, a hold is Focus)
+	Creep = { Enum.KeyCode.LeftControl, Enum.KeyCode.RightControl, Enum.KeyCode.ButtonL1 },
+	Focus = { Enum.UserInputType.MouseButton2, Enum.KeyCode.ButtonR2 },
+	Run = { Enum.KeyCode.LeftShift, Enum.KeyCode.RightShift, Enum.KeyCode.ButtonL2 },
 	Eye = { Enum.KeyCode.V, Enum.KeyCode.ButtonY },
 	Recenter = { Enum.KeyCode.R, Enum.UserInputType.MouseButton3 }, PadRecenter = { Enum.KeyCode.ButtonR3 }, -- (ROBLOX-115: R3 recentres only)
-	Slow = { Enum.KeyCode.T, Enum.KeyCode.ButtonR2 }, Help = { Enum.KeyCode.H },
+	Slow = { Enum.KeyCode.T }, Help = { Enum.KeyCode.H },
 	Reset = { Enum.KeyCode.Backspace }, Menu = { Enum.KeyCode.M, Enum.KeyCode.ButtonSelect }, Gait = { Enum.KeyCode.G },
 	Choose = { Enum.KeyCode.C }, Notebook = { Enum.KeyCode.N }, Settings = { Enum.KeyCode.O }, Display = { Enum.KeyCode.X, Enum.KeyCode.ButtonR1 },
 } :: { [string]: { any } }
@@ -94,12 +89,14 @@ end
 function SpiderInput.bind(h: Handlers)
 	local state = InputState.new()
 	local handlers: { [string]: any } = h :: any
-	local pad = { down = false, held = 0, focusing = false } -- (ROBLOX-115: L2 down, for how long, and whether it has become Focus)
 	-- One source of one action went down (down) or up; "cancel" means the engine took the input away (treated as up).
 	local function act(action: string, down: boolean, source: any, cancelled: boolean?)
 		local blocked: boolean = if h.blocked then h.blocked() else false
 		if down and blocked and action ~= tostring("Menu") then return end
+		local hadSource = state.sources[action] ~= nil and state.sources[action][source] == true
 		local was, now = state:set(action, down, source)
+		-- L1 still locks when another source is already holding Creep; repeated Begin is not another press.
+		if action == "Creep" and down and not hadSource and source == Enum.KeyCode.ButtonL1 and h.lock then h.lock() end
 		if was == now then return end
 		if action == "Jump" then
 			h.jump(if now then "begin" elseif cancelled then "cancel" else "end")
@@ -115,18 +112,6 @@ function SpiderInput.bind(h: Handlers)
 			if now and h.display then h.display() elseif not now and h.displayEnd then h.displayEnd(cancelled == true) end
 		elseif action == "Drop" then
 			if now then h.drop() end
-		elseif action == "PadLock" then
-			if now then
-				pad.down, pad.held, pad.focusing = true, 0, false
-			else
-				local focusing = pad.focusing
-				pad.down, pad.focusing = false, false
-				if focusing then
-					act("Focus", false, "padhold", cancelled)
-				elseif not cancelled and h.lock then
-					h.lock()
-				end
-			end
 		elseif ONE_SHOT[action] then
 			local fn = if now then handlers[ONE_SHOT[action]] else nil
 			if fn then fn() end
@@ -168,7 +153,6 @@ function SpiderInput.bind(h: Handlers)
 	local free: { [InputObject]: boolean } = {}
 	local freeCount, pinching = 0, false
 	local function clear()
-		pad.down, pad.held, pad.focusing = false, 0, false
 		state:clear()
 		table.clear(active)
 		table.clear(free)
@@ -269,15 +253,6 @@ function SpiderInput.bind(h: Handlers)
 		end
 	end
 	api.touchGui = gui
-	-- ROBLOX-115: each frame, the time L2 has been held; past L2_HOLD it becomes Focus, held (once), until it is let go.
-	function api.tick(_self: any, dt: number)
-		if not pad.down or pad.focusing then return end
-		pad.held += dt
-		if pad.held >= SpiderInput.L2_HOLD then
-			pad.focusing = true
-			act("Focus", true, "padhold")
-		end
-	end
 	-- The test place's playback drives the same path a key, button or finger takes (tests/client/SilkPlayback.luau).
 	function api.simulate(_self: any, action: string, down: boolean, source: any?)
 		act(action, down, source or "playback")

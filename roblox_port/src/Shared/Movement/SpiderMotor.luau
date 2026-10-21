@@ -23,6 +23,7 @@ Motor.__index = Motor
 
 local DT = 1 / 60
 Motor.DT = DT
+Motor.RUN_MULTIPLIER = 2 -- faster ground travel; jumps and the safety line retain their own speeds
 Motor.HEIGHT = 0.31 -- body centre above the support plane: radius 0.3 + skin 0.01 (Godot seat distance)
 local HEIGHT = Motor.HEIGHT
 local SWEEP_RADIUS = 0.303 -- body radius + JumpPlanner.SWEEP_MARGIN
@@ -50,6 +51,7 @@ local FREE_UP_RATE = math.rad(240) -- the drawn up turns to world up while falli
 export type TickInput = {
 	wish: Vector3, -- walking direction on the support plane (unit or zero), from the view
 	creep: boolean,
+	run: boolean?, -- held; creep/lock and an automatic edge walk take priority
 	reel: number, -- on the line: +1 reels in, -1 lowers
 	dropHeld: boolean, -- F / X / Silk held: lowers on the line
 	releaseHeld: boolean, -- Q / B / Let go held: a deliberate let-go after the grace
@@ -657,6 +659,7 @@ function Motor._tickAttached(self: any, input: TickInput)
 	end
 	local stalk = input.creep and not silk.walk
 	local speed = (if stalk then self.loco.stalk_speed_wu_s else self.loco.walk_speed_wu_s)*self.speedFactor
+	if input.run == true and not stalk and not silk.walk then speed *= Motor.RUN_MULTIPLIER end
 	local face = if input.face ~= nil and not silk.walk then SupportMath.tangentDir(input.face - self.pos, self.up) else Vector3.zero
 	self.heading = SupportMath.tangentDir(SupportMath.rotateToward(self.heading, if face ~= Vector3.zero then face else dir, TURN_RATE * DT), self.up) -- (ROBLOX-110: a sidestep faces the locked thing, not the way it walks)
 	local step = dir * speed * DT

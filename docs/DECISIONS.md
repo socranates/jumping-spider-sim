@@ -2147,3 +2147,12 @@ Nathan, asked whether Chet's Blender meshes go into the Roblox game or wait for 
 - **The milkweed's leaves** (`World/Hut.drawPlant`: the hut garden's milkweed and the meadow edge's, World/Meadow drawing its plants the same way) are the mesh leaf over each walkable leaf box, 1.22 times its length and 1.3 its width as the blade was, 0.9 studs thick (the midrib and veins stand up in it). The separate pale midrib box is gone (the mesh has its own). The full tier's only, as the leaves were: the low tier keeps nothing of them, as before. Nothing walkable moved: the leaf boxes, their surfaces and every save id are the same.
 
 Next, once Nathan or Chet has seen the leaf in a published client: the coneflower's head (5k triangles, the few in the hut garden and the meadow edge only), then the grass clump near the camera, the stone and the bark chip in the litter, the bench's slat ends. Tests: `tests/preserve.luau` PRESERVE 1133 to 1144 (the six meshes, `of`, `fit` both ways, a mesh record drawn with its id, atlas, turned box, white, drawn-only and full-tier; garden_c3's milkweed has at least 12 mesh leaves and no separate midrib).
+
+
+## ROBLOX-127 — Run and the left shoulder (2026-10-21, Nathan)
+
+Nathan requested a run button, selected L2 for it, and specified that L1 must still creep and also lock on when prey is nearby. L1/LB is a single combined action: held creep plus the existing contextual lock on each press, using only sensed contacts in the existing 12-stud range. With no eligible contact it simply creeps. A second press releases a lock; Cancel and memory expiry retain their existing behavior. A lock persists after shoulder release, as the prior toggle did, and its sidestep still stalks.
+
+L2/LT, Shift and a new touch Run button hold ground speed at twice walk speed. Ctrl and the touch Creep button creep; a gentle left-stick push also creeps. Creep (including a lock) takes priority when Run is held too. Growth/cold multipliers, jump reach/flight, line reel/lower, automatic edge walks and saved data keep their existing rules. R2/RT now holds Focus immediately; slow motion stays on T. Help cards, the settings' shoulder navigation hint and the README table follow these bindings. Settings navigation itself is unchanged.
+
+This is v46 on top of Claude's v45 milkweed mesh and v44 quiet HUD. No woodland/weather source or habitat layout was edited by Chet. See chet/review-5.md for engine, mesh, publish and performance evidence.

@@ -5,7 +5,7 @@
 -- (SpiderRig) and the screen (SpiderHud, words from Shared/UI/ControlText for the device in use). Ports the frozen Godot
 -- game at c87ce00: scripts/core/input_setup.gd, player_controller.gd, jump_controller.gd, tether_controller.gd.
 --
--- Controls (README.md has the full table): WASD walk relative to the view, mouse looks, Shift creeps. Tap Space: a short
+-- Controls (README.md has the full table): WASD walk relative to the view, mouse looks, Shift runs, Ctrl creeps. Tap Space: a short
 -- hop. Hold Space (0.15 s): the spider holds still and turns toward the centre dot; the landing patch says Reachable /
 -- Blocked / Out of reach / Can't land there; release to leap, Q cancels. F lets down on silk (to the nearest edge first on
 -- top of a leaf). On the line W reels in, S lowers and holding Q lets go. V spider-eye view, R recenter, right mouse Focus,
@@ -1434,7 +1434,7 @@ controls = SpiderInput.bind({
 		local r = M.LockOn.press(M.lock, memory, motor.pos, motor.up, o.eye, o.heading, origin, dir)
 		if r ~= "locked" then cam:startRecenter() end
 	end,
-	-- ROBLOX-115: a controller's right-stick click recentres only: it lets go of a lock and recentres behind the spider, and never takes one (L2 does)
+	-- ROBLOX-115: a controller's right-stick click recentres only: it lets go of a lock and recentres behind the spider, and never takes one (L1 does)
 	recentre = function()
 		if spiderPick.inspecting then return end
 		M.LockOn.release(M.lock, "recentre")
@@ -1487,7 +1487,8 @@ local function tickInput(): any
 	end
 	rig.focusPoint = focusPoint -- (the drawn body turns a little toward it and the eyes glance at it: ROBLOX-87, display only)
 	return {
-		wish = wish, creep = controls.held.Creep == true or locked ~= nil, reel = f,
+		wish = wish, run = controls.held.Run == true,
+		creep = controls.held.Creep == true or locked ~= nil or (r * r + f * f > 0 and r * r + f * f < 0.25 and controls.held.Run ~= true), reel = f,
 		dropHeld = controls.held.Drop == true, releaseHeld = controls.held.Cancel == true and not spiderPick.cancelSwallow,
 		focusPoint = focusPoint, gaze = if cam.eyeView then cam.gaze else nil, face = locked,
 	}
@@ -1713,7 +1714,6 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	M.Prof.begin() -- (ROBLOX-111: the frame timed by part, for the self-test; each M.Prof.lap below charges the time since the last to its part)
 	saveState.frame()
 	spiderPick.update(frameDt) -- (the choose hold's clock and the close look's reasons to end)
-	controls:tick(frameDt) -- (ROBLOX-115: L2 held past its tap is Focus)
 	M.Prof.lap("save")
 	-- (ROBLOX-94: the region the spider is in, the pace of its day, the streaming focus on the drawn spider; ROBLOX-120: on the wind, the rider's place, so the world
 	-- where it comes down is streamed in before the spiderling stands there)

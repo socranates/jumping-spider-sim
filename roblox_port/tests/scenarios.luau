@@ -199,5 +199,25 @@ check("a tangent touch of the brick does not stop the let-down (ROBLOX-111)", fu
 	folder:Destroy()
 	if not ok then error(err, 0) end
 end)
+check("running doubles ground travel; creep, growth and collision remain authoritative", function()
+	local Motor = deps.Motor
+	local world = Instance.new("Folder"); world.Name = "RunTestWorld"; world.Parent = workspace
+	local floor = Instance.new("Part"); floor.Name = "Floor"; floor.Position = Vector3.new(200, -0.5, 0); floor.Size = Vector3.new(80, 1, 80); floor.Anchored = true; floor:SetAttribute("ProfileId", "bare_wood_rough"); floor.Parent = world
+	local motor = Motor.new({world = world, surfaces = deps.Surfaces, profile = deps.Species.phidippus_audax_prototype, spawn = Vector3.new(200, 0, 0), heading = Vector3.xAxis, boundsMin = Vector3.new(150,-10,-50), boundsMax = Vector3.new(250,40,50)})
+	local function travel(run: boolean, creep: boolean, factor: number): number
+		motor:place(Vector3.new(200, Motor.HEIGHT, 0), Vector3.yAxis, Vector3.xAxis); motor:setSpeedFactor(factor)
+		local i = Motor.idleInput(); i.wish = Vector3.xAxis; i.run = run; i.creep = creep
+		for _ = 1,60 do motor:tick(i) end
+		assert(motor.mode == "attached", "running lost flat support")
+		return motor.pos.X - 200
+	end
+	local walk, run, creep, both = travel(false,false,1), travel(true,false,1), travel(false,true,1), travel(true,true,1)
+	assert(math.abs(run - 2*walk) < 1e-6 and run > walk, "run is not twice walk")
+	assert(math.abs(both-creep) < 1e-6, "run overrode stalking")
+	assert(math.abs(travel(true,false,0.5)-run*0.5) < 1e-6, "run ignored growth/cold speed")
+	local wall = Instance.new("Part"); wall.Name = "ClimbableWall"; wall.Position = Vector3.new(203, 3, 0); wall.Size = Vector3.new(1, 6, 12); wall.Anchored = true; wall:SetAttribute("ProfileId", "bare_wood_rough"); wall.Parent = world
+	travel(true,false,1); assert(motor.pos.X < 202.5, "running crossed the wall")
+	world:Destroy()
+end)
 print(`BOXWORLD passed={passed} failed={failed}`)
 if failed > 0 then error("box-world scenarios failed") end

@@ -40,7 +40,7 @@ end
 function SettingsText.controls(device: ControlText.Device): string
 	if device == "gamepad" then
 		local n = function(action: string): string return ControlText.name("gamepad", action) end
-		return `Stick or D-pad: choose and change    {n("jump")}: switch    {n("creep")} and {n("choose")}: sections    {n("cancel")}: back`
+		return `Stick or D-pad: choose and change    {n("jump")}: switch    {n("lock")} and {n("choose")}: sections    {n("cancel")}: back`
 	elseif device == "touch" then
 		return "Tap a setting to switch it. Use - and + or drag a bar."
 	end

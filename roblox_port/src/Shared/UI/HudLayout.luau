@@ -18,6 +18,7 @@ HudLayout.TOUCH_BUTTONS = {
 	{ action = "Creep", label = "Creep", x = -86, y = -172, size = 60, right = true },
 	{ action = "Drop", label = "Silk", x = -86, y = -242, size = 60, right = true },
 	{ action = "Recenter", label = "Re-\ncentre", x = -160, y = -168, size = 52, right = true, textSize = 14 },
+	{ action = "Run", label = "Run", x = 146, y = -242, size = 52, right = false, textSize = 14 },
 	{ action = "Feed", label = "Eat", x = 22, y = -242, size = 52, right = false, textSize = 14 },
 	{ action = "Focus", label = "Focus", x = -236, y = -242, size = 60, right = true, textSize = 14 },
 	{ action = "Eye", label = "Eye", x = -156, y = -242, size = 60, right = true },
@@ -39,7 +40,7 @@ local COMPACT = {
 	Left={16,-120}, Right={136,-120}, Back={76,-60},
 	Focus={-188,-180}, Display={-128,-180}, Drop={-68,-180},
 	Eye={-188,-120}, Recenter={-128,-120}, Creep={-68,-120},
-	Cancel={-128,-60}, Jump={-68,-60}, Lock={-188,-60},
+	Cancel={-128,-60}, Jump={-68,-60}, Lock={-188,-60}, Run={196,-60},
 }
 -- A short screen (under 450 px tall: a phone held sideways, whatever its width, ROBLOX-92: it was 568 px and wider only, so a 480 px phone had the tall stack) is laid out in three rows.
 function HudLayout.isShort(width: number, height: number): boolean
@@ -47,6 +48,11 @@ function HudLayout.isShort(width: number, height: number): boolean
 end
 function HudLayout.layoutButton(b: Button, width: number, height: number): Button
 	local short = HudLayout.isShort(width, height)
+	if b.action == "Run" and width < 400 and not short then
+		local copy = table.clone(b)
+		copy.x, copy.y = 22, -304
+		return copy
+	end
 	-- A narrow phone (under 400 px) has no room for Focus beside the left thumb's cluster: it goes one row up.
 	if b.action == "Focus" and width < 400 and not short then
 		local copy = table.clone(b)

@@ -3356,7 +3356,7 @@ SettingsSpec.LIST = {
 	{ id = "FocusToggle", section = "comfort", label = "Focus toggles (press to start and stop)", kind = "toggle", default = false },
 	{ id = "AutomaticGrip", section = "comfort", label = "Struggling prey: hold on automatically", kind = "toggle", default = false },
 	{ id = "ShowNoticed", section = "comfort", label = "Show what the spider notices", kind = "toggle", default = true,
-		note = "The rings, marks and words over what it sees. A lock (R or L2) still follows it." }, -- (ROBLOX-110; ROBLOX-115: L2 locks on a controller)
+		note = "The rings, marks and words over what it sees. A lock (R or L1) still follows it." }, -- L1 locks on a controller
 	{ id = "ShowLastSeen", section = "comfort", label = "Show the last-seen mark", kind = "toggle", default = true },
 	{ id = "EyeLevelHorizon", section = "comfort", label = "Spider-eye view: level horizon (no roll on walls)", kind = "toggle", default = false },
 	{ id = "EyeGrey", section = "comfort", label = "Spider-eye view: grey instead of green", kind = "toggle", default = false },
@@ -10705,6 +10705,7 @@ Motor.__index = Motor
 
 local DT = 1 / 60
 Motor.DT = DT
+Motor.RUN_MULTIPLIER = 2 -- faster ground travel; jumps and the safety line retain their own speeds
 Motor.HEIGHT = 0.31 -- body centre above the support plane: radius 0.3 + skin 0.01 (Godot seat distance)
 local HEIGHT = Motor.HEIGHT
 local SWEEP_RADIUS = 0.303 -- body radius + JumpPlanner.SWEEP_MARGIN
@@ -10732,6 +10733,7 @@ local FREE_UP_RATE = math.rad(240) -- the drawn up turns to world up while falli
 export type TickInput = {
 	wish: Vector3, -- walking direction on the support plane (unit or zero), from the view
 	creep: boolean,
+	run: boolean?, -- held; creep/lock and an automatic edge walk take priority
 	reel: number, -- on the line: +1 reels in, -1 lowers
 	dropHeld: boolean, -- F / X / Silk held: lowers on the line
 	releaseHeld: boolean, -- Q / B / Let go held: a deliberate let-go after the grace
@@ -11339,6 +11341,7 @@ function Motor._tickAttached(self: any, input: TickInput)
 	end
 	local stalk = input.creep and not silk.walk
 	local speed = (if stalk then self.loco.stalk_speed_wu_s else self.loco.walk_speed_wu_s)*self.speedFactor
+	if input.run == true and not stalk and not silk.walk then speed *= Motor.RUN_MULTIPLIER end
 	local face = if input.face ~= nil and not silk.walk then SupportMath.tangentDir(input.face - self.pos, self.up) else Vector3.zero
 	self.heading = SupportMath.tangentDir(SupportMath.rotateToward(self.heading, if face ~= Vector3.zero then face else dir, TURN_RATE * DT), self.up) -- (ROBLOX-110: a sidestep faces the locked thing, not the way it walks)
 	local step = dir * speed * DT
@@ -26847,22 +26850,22 @@ ControlText.DROP_REFUSED = {
 }
 ControlText.DROP_WALK = "To the edge, to let yourself down"
 
--- What each device calls the controls. (ROBLOX-115: on a controller the lock is L2 / LT, a tap, and Focus the same trigger held; the right-stick click recentres.) Godot's input_setup.gd bindings; the port keeps the D-pad for walking, so lowering on
+-- What each device calls the controls. (L1 / LB locks, R2 / RT focuses, L2 / LT runs; the right-stick click recentres.) Godot's input_setup.gd bindings; the port keeps the D-pad for walking, so lowering on
 -- silk is X on a controller (ROBLOX-05). Touch names are the on-screen buttons.
 local NAMES: { [string]: { [string]: string } } = {
 	keyboard = {
 		feed = "E", jump = "Space", cancel = "Q", letGo = "Q", drop = "F", reel = "W", lower = "S", walk = "WASD", look = "Mouse",
-		creep = "Shift", focus = "Right mouse", eye = "V", recenter = "R", lock = "R", slow = "T", reset = "Backspace", help = "H", zoom = "Wheel",
+		creep = "Ctrl", run = "Shift", focus = "Right mouse", eye = "V", recenter = "R", lock = "R", slow = "T", reset = "Backspace", help = "H", zoom = "Wheel",
 		choose = "C", display = "X", menu = "M", notebook = "N", settings = "O",
 	},
 	gamepad = {
 		feed = "Left-stick click", jump = "A", cancel = "B", letGo = "B", drop = "X", reel = "Stick up", lower = "Stick down", walk = "Left stick",
-		look = "Right stick", creep = "LB", focus = "LT", eye = "Y", recenter = "Right-stick click", lock = "LT", slow = "RT", reset = "View",
+		look = "Right stick", creep = "LB", run = "LT", focus = "RT", eye = "Y", recenter = "Right-stick click", lock = "LB", slow = "", reset = "View",
 		help = "", zoom = "", choose = "RB", display = "RB", menu = "View", notebook = "View",
 	},
 	touch = {
 		feed = "Eat", jump = "Jump", cancel = "Cancel", letGo = "Let go", drop = "Silk", reel = "↑", lower = "↓", walk = "Arrows",
-		look = "Drag", creep = "Creep", focus = "Focus", eye = "Eye", recenter = "Recentre", lock = "Lock", slow = "", reset = "", help = "", zoom = "", choose = "Change", display = "Dance", menu = "Menu", notebook = "Notebook",
+		look = "Drag", creep = "Creep", run = "Run", focus = "Focus", eye = "Eye", recenter = "Recentre", lock = "Lock", slow = "", reset = "", help = "", zoom = "", choose = "Change", display = "Dance", menu = "Menu", notebook = "Notebook",
 	},
 }
 
@@ -26870,8 +26873,8 @@ local NAMES: { [string]: { [string]: string } } = {
 -- calls setPadStyle from UserInputService:GetStringForKeyCode(ButtonA) at start and after each controller input; names not listed
 -- here (sticks) are the same on both.
 local PLAYSTATION: { [string]: string } = {
-	feed = "L3", jump = "Cross", cancel = "Circle", letGo = "Circle", drop = "Square", creep = "L1", focus = "L2", eye = "Triangle",
-	recenter = "R3", lock = "L2", slow = "R2", reset = "Touchpad", choose = "R1", display = "R1", menu = "Touchpad", notebook = "Touchpad",
+	feed = "L3", jump = "Cross", cancel = "Circle", letGo = "Circle", drop = "Square", creep = "L1", run = "L2", focus = "R2", eye = "Triangle",
+	recenter = "R3", lock = "L1", slow = "", reset = "Touchpad", choose = "R1", display = "R1", menu = "Touchpad", notebook = "Touchpad",
 }
 local padStyle = "xbox"
 
@@ -27002,9 +27005,8 @@ function ControlText.edgeWalkHint(device: Device): string
 	return `{ControlText.DROP_WALK}    {ControlText.name(device, "cancel")} or move: stop`
 end
 
--- ROBLOX-115: on a controller Focus is L2 / LT held (a tap is the lock), so even a toggled Focus is held to latch and held again to let go: the status line's words.
+-- Focus can be held or latched with the existing accessibility option.
 function ControlText.focusAgain(device: Device): string
-	if device == "gamepad" then return `Hold {ControlText.name(device, "focus")} again to stop` end
 	return `{ControlText.name(device, "focus")} again to stop`
 end
 
@@ -27025,28 +27027,28 @@ end
 function ControlText.helpCard(device: Device): string
 	if device == "gamepad" then
 		local function n(action: string): string return ControlText.name("gamepad", action) end
-		-- (ROBLOX-115: the lock is L2 / LT's tap and Focus its hold; the right stick's click recentres)
+		-- L1 locks, R2 focuses, and L2 runs; the right-stick click recentres.
 		return table.concat({
-			"Left stick walk   Right stick look, click: recentre",
-			`Tap {n("jump")} hop   Hold {n("jump")} aim, release to leap   {n("creep")} creep`,
+			"Left stick: walk/creep   Right stick look, click: recentre",
+			`Tap {n("jump")} hop   Hold {n("jump")} aim, release to leap`,
 			`{n("drop")} lower on silk   {n("cancel")} cancel   {n("eye")} eye view`,
 			`On the line: up reel, down lower, hold {n("letGo")} let go`,
-			`Tap {n("lock")} lock on (stick circles)   Hold {n("lock")} focus   {n("slow")} slow-mo`,
+			`{n("lock")} creep/lock (circle)   {n("focus")} focus   {n("run")} run`,
 			`In the crack: {n("feed")} rest (sleep from evening)`,
 			`{n("menu")}: menu, then last rest, notebook, settings`,
 		}, "\n")
 	elseif device == "touch" then
 		return table.concat({
-			"Arrows walk   Drag to look   Creep (hold)   Focus   Eye view",
+			"Arrows walk   Drag to look   Hold Run or Creep",
 			"Tap Jump hop   Hold Jump aim, release to leap   Cancel",
 			"Silk: lower on a line   On it: ↑ reel, ↓ lower, hold Let go",
-			"Lock follows what you see (← → circle it)   Recentre",
+			"Lock (← → circle)   Recentre   Focus   Eye",
 			"In the crack: Rest (Sleep from evening)",
 			"Menu: last rest, notebook, settings, this card",
 		}, "\n")
 	end
 	return table.concat({
-		"WASD walk   Mouse look   Shift creep   Wheel zoom   G gait",
+		"WASD walk   Mouse look   Shift run   Ctrl creep   G gait",
 		"Tap Space hop   Hold Space aim, release to leap   Q cancel",
 		"F lower on silk   On the line: W reel, S lower, hold Q let go",
 		"V eye view   Right mouse focus   T slow motion   H: hide this",
@@ -27476,6 +27478,7 @@ HudLayout.TOUCH_BUTTONS = {
 	{ action = "Creep", label = "Creep", x = -86, y = -172, size = 60, right = true },
 	{ action = "Drop", label = "Silk", x = -86, y = -242, size = 60, right = true },
 	{ action = "Recenter", label = "Re-\ncentre", x = -160, y = -168, size = 52, right = true, textSize = 14 },
+	{ action = "Run", label = "Run", x = 146, y = -242, size = 52, right = false, textSize = 14 },
 	{ action = "Feed", label = "Eat", x = 22, y = -242, size = 52, right = false, textSize = 14 },
 	{ action = "Focus", label = "Focus", x = -236, y = -242, size = 60, right = true, textSize = 14 },
 	{ action = "Eye", label = "Eye", x = -156, y = -242, size = 60, right = true },
@@ -27497,7 +27500,7 @@ local COMPACT = {
 	Left={16,-120}, Right={136,-120}, Back={76,-60},
 	Focus={-188,-180}, Display={-128,-180}, Drop={-68,-180},
 	Eye={-188,-120}, Recenter={-128,-120}, Creep={-68,-120},
-	Cancel={-128,-60}, Jump={-68,-60}, Lock={-188,-60},
+	Cancel={-128,-60}, Jump={-68,-60}, Lock={-188,-60}, Run={196,-60},
 }
 -- A short screen (under 450 px tall: a phone held sideways, whatever its width, ROBLOX-92: it was 568 px and wider only, so a 480 px phone had the tall stack) is laid out in three rows.
 function HudLayout.isShort(width: number, height: number): boolean
@@ -27505,6 +27508,11 @@ function HudLayout.isShort(width: number, height: number): boolean
 end
 function HudLayout.layoutButton(b: Button, width: number, height: number): Button
 	local short = HudLayout.isShort(width, height)
+	if b.action == "Run" and width < 400 and not short then
+		local copy = table.clone(b)
+		copy.x, copy.y = 22, -304
+		return copy
+	end
 	-- A narrow phone (under 400 px) has no room for Focus beside the left thumb's cluster: it goes one row up.
 	if b.action == "Focus" and width < 400 and not short then
 		local copy = table.clone(b)
@@ -29346,7 +29354,7 @@ end
 function SettingsText.controls(device: ControlText.Device): string
 	if device == "gamepad" then
 		local n = function(action: string): string return ControlText.name("gamepad", action) end
-		return `Stick or D-pad: choose and change    {n("jump")}: switch    {n("creep")} and {n("choose")}: sections    {n("cancel")}: back`
+		return `Stick or D-pad: choose and change    {n("jump")}: switch    {n("lock")} and {n("choose")}: sections    {n("cancel")}: back`
 	elseif device == "touch" then
 		return "Tap a setting to switch it. Use - and + or drag a bar."
 	end
@@ -48121,7 +48129,7 @@ return SpiderCamera
 -- (SpiderRig) and the screen (SpiderHud, words from Shared/UI/ControlText for the device in use). Ports the frozen Godot
 -- game at c87ce00: scripts/core/input_setup.gd, player_controller.gd, jump_controller.gd, tether_controller.gd.
 --
--- Controls (README.md has the full table): WASD walk relative to the view, mouse looks, Shift creeps. Tap Space: a short
+-- Controls (README.md has the full table): WASD walk relative to the view, mouse looks, Shift runs, Ctrl creeps. Tap Space: a short
 -- hop. Hold Space (0.15 s): the spider holds still and turns toward the centre dot; the landing patch says Reachable /
 -- Blocked / Out of reach / Can't land there; release to leap, Q cancels. F lets down on silk (to the nearest edge first on
 -- top of a leaf). On the line W reels in, S lowers and holding Q lets go. V spider-eye view, R recenter, right mouse Focus,
@@ -49550,7 +49558,7 @@ controls = SpiderInput.bind({
 		local r = M.LockOn.press(M.lock, memory, motor.pos, motor.up, o.eye, o.heading, origin, dir)
 		if r ~= "locked" then cam:startRecenter() end
 	end,
-	-- ROBLOX-115: a controller's right-stick click recentres only: it lets go of a lock and recentres behind the spider, and never takes one (L2 does)
+	-- ROBLOX-115: a controller's right-stick click recentres only: it lets go of a lock and recentres behind the spider, and never takes one (L1 does)
 	recentre = function()
 		if spiderPick.inspecting then return end
 		M.LockOn.release(M.lock, "recentre")
@@ -49603,7 +49611,8 @@ local function tickInput(): any
 	end
 	rig.focusPoint = focusPoint -- (the drawn body turns a little toward it and the eyes glance at it: ROBLOX-87, display only)
 	return {
-		wish = wish, creep = controls.held.Creep == true or locked ~= nil, reel = f,
+		wish = wish, run = controls.held.Run == true,
+		creep = controls.held.Creep == true or locked ~= nil or (r * r + f * f > 0 and r * r + f * f < 0.25 and controls.held.Run ~= true), reel = f,
 		dropHeld = controls.held.Drop == true, releaseHeld = controls.held.Cancel == true and not spiderPick.cancelSwallow,
 		focusPoint = focusPoint, gaze = if cam.eyeView then cam.gaze else nil, face = locked,
 	}
@@ -49829,7 +49838,6 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	M.Prof.begin() -- (ROBLOX-111: the frame timed by part, for the self-test; each M.Prof.lap below charges the time since the last to its part)
 	saveState.frame()
 	spiderPick.update(frameDt) -- (the choose hold's clock and the close look's reasons to end)
-	controls:tick(frameDt) -- (ROBLOX-115: L2 held past its tap is Focus)
 	M.Prof.lap("save")
 	-- (ROBLOX-94: the region the spider is in, the pace of its day, the streaming focus on the drawn spider; ROBLOX-120: on the wind, the rider's place, so the world
 	-- where it comes down is streamed in before the spiderling stands there)
@@ -51277,10 +51285,10 @@ return Hud
             <string name="Source"><![CDATA[--!strict
 -- One action path for keyboard, mouse, gamepad and held on-screen touch buttons, all at once.
 -- Bindings follow the frozen Godot game's scripts/core/input_setup.gd wherever the action exists in the port:
---   walk WASD / left stick (D-pad too), look mouse / arrow keys / right stick / touch drag, creep Shift / LB,
+--   walk WASD / left stick (D-pad too), look mouse / arrow keys / right stick / touch drag, run Shift / LT, creep Ctrl / LB / gentle stick,
 --   jump Space / A (tap hop, hold aim, release leap), cancel Q / B (cancels an aim or a walk to the edge; held on the
---   line it lets go), focus right mouse / LT, spider-eye view V / Y, recenter R / middle mouse / right-stick click,
---   slow motion T / RT, lower on silk F / X (Godot: F / D-pad down; the port keeps the D-pad for walking, ROBLOX-05).
+--   line it lets go), focus right mouse / RT, spider-eye view V / Y, recenter R / middle mouse / right-stick click,
+--   slow motion T, lower on silk F / X (Godot: F / D-pad down; the port keeps the D-pad for walking, ROBLOX-05).
 --   Esc / Menu open Roblox's own menu: the game drops every press and hold and waits (Godot's pause).
 -- Port-only: reset to the start Backspace / View (Select), gait toggle G, controls card H (Godot's H is the field notes).
 -- The peacock spider (ROBLOX-31): C changes spider in the crack (RB / R1 on a controller, the touch Change button); X, or the same RB / R1
@@ -51292,10 +51300,8 @@ return Hud
 -- The settings (ROBLOX-49): O opens them; a controller and touch reach them through the life menu (then Settings).
 -- The lock (ROBLOX-110): Recentre (R / middle mouse / right-stick click / the touch Recentre) locks onto what the spider sees, lets go of a lock, or with
 -- nothing to lock recentres; touch also has a small Lock button by Jump (no key: Recentre is the keys' lock), shown while something can be locked.
--- ROBLOX-115 (Nathan: lock-on to L2): on a controller L2 / LT is the lock: a tap (let go within L2_HOLD seconds) locks onto what the spider sees or lets go of
--- the lock, as the touch Lock button does; held past L2_HOLD it is Focus, held, until it is let go (the Focus toggle setting latches it as a press of Focus
--- would). The right-stick click is Recentre only (it locks no more), and the keys keep theirs: R / middle mouse lock or recentre, right mouse is Focus.
--- The hold is timed in the frames' own time: the client calls `tick(dt)` every frame.
+-- Nathan's run/lock controls: L1 / LB holds creep and takes a contextual lock on press; R2 / RT holds Focus.
+-- Run is held on Shift / L2 / the touch Run button; Ctrl creeps. A gentle left-stick push creeps too.
 --
 -- Every button action is held while any source holds it (InputState): a key, a controller button, a finger. Handlers hear
 -- one "begin" when the first source goes down and one "end" when the last comes up, so a touch hold and a key or button
@@ -51328,7 +51334,7 @@ export type Handlers = {
 	eye: () -> (),
 	recenter: () -> (),
 	recentre: (() -> ())?, -- (ROBLOX-115) a controller's right-stick click: recentre only, never a lock
-	lock: (() -> ())?, -- the touch Lock button (ROBLOX-110), and a controller's L2 tap (ROBLOX-115)
+	lock: (() -> ())?, -- the touch Lock button (ROBLOX-110), and a controller's L1 press
 	slow: () -> (),
 	help: () -> (),
 	touchLook: (Vector2) -> (),
@@ -51338,9 +51344,6 @@ export type Handlers = {
 local ONE_SHOT = { Menu = "menu", Notebook = "notebook", Settings = "settings", Reset = "reset", Gait = "gait", Eye = "eye", Recenter = "recenter", Slow = "slow", Help = "help", Lock = "lock",
 	PadRecenter = "recentre" }
 
--- ROBLOX-115: how long L2 is held before it is Focus and not a tap of the lock, seconds.
-SpiderInput.L2_HOLD = 0.35
-
 -- Bindings by action. Exported for tests and the controls table in README.md.
 SpiderInput.BINDINGS = {
 	Forward = { Enum.KeyCode.W, Enum.KeyCode.DPadUp }, Back = { Enum.KeyCode.S, Enum.KeyCode.DPadDown },
@@ -51349,12 +51352,12 @@ SpiderInput.BINDINGS = {
 	Jump = { Enum.KeyCode.Space, Enum.KeyCode.ButtonA }, Cancel = { Enum.KeyCode.Q, Enum.KeyCode.ButtonB },
 	Feed = { Enum.KeyCode.E, Enum.KeyCode.ButtonL3 },
 	Drop = { Enum.KeyCode.F, Enum.KeyCode.ButtonX },
-	Creep = { Enum.KeyCode.LeftShift, Enum.KeyCode.RightShift, Enum.KeyCode.ButtonL1 },
-	Focus = { Enum.UserInputType.MouseButton2 }, -- (ROBLOX-115: a controller's Focus is L2 held, PadLock)
-	PadLock = { Enum.KeyCode.ButtonL2 }, -- (ROBLOX-115: a tap locks, a hold is Focus)
+	Creep = { Enum.KeyCode.LeftControl, Enum.KeyCode.RightControl, Enum.KeyCode.ButtonL1 },
+	Focus = { Enum.UserInputType.MouseButton2, Enum.KeyCode.ButtonR2 },
+	Run = { Enum.KeyCode.LeftShift, Enum.KeyCode.RightShift, Enum.KeyCode.ButtonL2 },
 	Eye = { Enum.KeyCode.V, Enum.KeyCode.ButtonY },
 	Recenter = { Enum.KeyCode.R, Enum.UserInputType.MouseButton3 }, PadRecenter = { Enum.KeyCode.ButtonR3 }, -- (ROBLOX-115: R3 recentres only)
-	Slow = { Enum.KeyCode.T, Enum.KeyCode.ButtonR2 }, Help = { Enum.KeyCode.H },
+	Slow = { Enum.KeyCode.T }, Help = { Enum.KeyCode.H },
 	Reset = { Enum.KeyCode.Backspace }, Menu = { Enum.KeyCode.M, Enum.KeyCode.ButtonSelect }, Gait = { Enum.KeyCode.G },
 	Choose = { Enum.KeyCode.C }, Notebook = { Enum.KeyCode.N }, Settings = { Enum.KeyCode.O }, Display = { Enum.KeyCode.X, Enum.KeyCode.ButtonR1 },
 } :: { [string]: { any } }
@@ -51370,12 +51373,14 @@ end
 function SpiderInput.bind(h: Handlers)
 	local state = InputState.new()
 	local handlers: { [string]: any } = h :: any
-	local pad = { down = false, held = 0, focusing = false } -- (ROBLOX-115: L2 down, for how long, and whether it has become Focus)
 	-- One source of one action went down (down) or up; "cancel" means the engine took the input away (treated as up).
 	local function act(action: string, down: boolean, source: any, cancelled: boolean?)
 		local blocked: boolean = if h.blocked then h.blocked() else false
 		if down and blocked and action ~= tostring("Menu") then return end
+		local hadSource = state.sources[action] ~= nil and state.sources[action][source] == true
 		local was, now = state:set(action, down, source)
+		-- L1 still locks when another source is already holding Creep; repeated Begin is not another press.
+		if action == "Creep" and down and not hadSource and source == Enum.KeyCode.ButtonL1 and h.lock then h.lock() end
 		if was == now then return end
 		if action == "Jump" then
 			h.jump(if now then "begin" elseif cancelled then "cancel" else "end")
@@ -51391,18 +51396,6 @@ function SpiderInput.bind(h: Handlers)
 			if now and h.display then h.display() elseif not now and h.displayEnd then h.displayEnd(cancelled == true) end
 		elseif action == "Drop" then
 			if now then h.drop() end
-		elseif action == "PadLock" then
-			if now then
-				pad.down, pad.held, pad.focusing = true, 0, false
-			else
-				local focusing = pad.focusing
-				pad.down, pad.focusing = false, false
-				if focusing then
-					act("Focus", false, "padhold", cancelled)
-				elseif not cancelled and h.lock then
-					h.lock()
-				end
-			end
 		elseif ONE_SHOT[action] then
 			local fn = if now then handlers[ONE_SHOT[action]] else nil
 			if fn then fn() end
@@ -51444,7 +51437,6 @@ function SpiderInput.bind(h: Handlers)
 	local free: { [InputObject]: boolean } = {}
 	local freeCount, pinching = 0, false
 	local function clear()
-		pad.down, pad.held, pad.focusing = false, 0, false
 		state:clear()
 		table.clear(active)
 		table.clear(free)
@@ -51545,15 +51537,6 @@ function SpiderInput.bind(h: Handlers)
 		end
 	end
 	api.touchGui = gui
-	-- ROBLOX-115: each frame, the time L2 has been held; past L2_HOLD it becomes Focus, held (once), until it is let go.
-	function api.tick(_self: any, dt: number)
-		if not pad.down or pad.focusing then return end
-		pad.held += dt
-		if pad.held >= SpiderInput.L2_HOLD then
-			pad.focusing = true
-			act("Focus", true, "padhold")
-		end
-	end
 	-- The test place's playback drives the same path a key, button or finger takes (tests/client/SilkPlayback.luau).
 	function api.simulate(_self: any, action: string, down: boolean, source: any?)
 		act(action, down, source or "playback")

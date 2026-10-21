@@ -1,6 +1,10 @@
 # The Windowsill — active Roblox project
 
-Open **TheWindowsill.rbxlx** in Roblox Studio and press **Play**. After updating Git, close/reopen the place so Studio reads the new file. Keep this folder name: `.gdignore` keeps the frozen Godot project from importing it. Scale remains 1 Godot WU = 1 stud; gravity is 35.
+## Current release — v48, 2026-10-21
+
+The living habitat pass is published as **Roblox place version 137**, existing place **120119801868085**, universe **10771103250**. Production source **1ba2eb3** is on GitHub branch `codex/v48-living-habitat`; later receipt commits do not change the game. Final checks: **55/55 CLI suites**, **270/0/0 native Studio**, strict clean and **207/207 source compile**. See [the current handoff](../docs/HANDOFF-living-habitat-v48.md) and [release receipt](../docs/verification/v48/RELEASE-v48-place137.md).
+
+Use the rebuilt **place137** transfer package, or run `python tools/build.py /path/to/rojo` before opening a generated place. Tracked `.rbxlx` files may be older than current source. Keep this folder name: `.gdignore` keeps the frozen Godot project from importing it. Scale remains 1 Godot WU = 1 stud; gravity is 35. The dated sections below are historical snapshots, superseded by the current release receipt.
 
 ## Where it stands (2026-10-19)
 

@@ -251,9 +251,13 @@ function LivingWorld.sway(self: any,pos: Vector3,state: any,reduced: boolean)
  for _,row in self.windParts do
   if row.part.Parent then row.part.CFrame=row.base*CFrame.Angles(if reduced then 0 else math.sin(self.elapsed*2+row.phase)*math.min(.012,state.wind.Magnitude*.003),0,0) end
  end
+ local speed=state.wind.Magnitude
  for i,row in self.grass or {} do
-  local angle=if reduced then 0 else math.sin(self.elapsed*2+row.phase)*math.min(.1,state.wind.Magnitude*.025)
-  self.grassFrames[i]=CFrame.new(row.pivot)*CFrame.Angles(angle,0,-angle*.4)*CFrame.new(-row.pivot)*row.base
+  -- A gust varies the bend, but the plant still leans with the actual world
+  -- wind. Rotate about the root rather than sliding the whole clump.
+  local bend=if reduced or speed<1e-6 then Vector3.zero
+   else state.wind*(math.min(.1,speed*.025)*(.6+.4*math.sin(self.elapsed*2+row.phase))/speed)
+  self.grassFrames[i]=CFrame.new(row.pivot)*CFrame.Angles(bend.Z,0,-bend.X)*CFrame.new(-row.pivot)*row.base
  end
  if self.grassParts and #self.grassParts>0 then self.ws:BulkMoveTo(self.grassParts,self.grassFrames,Enum.BulkMoveMode.FireCFrameChanged) end
 end

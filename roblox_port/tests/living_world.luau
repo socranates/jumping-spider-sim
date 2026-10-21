@@ -568,7 +568,22 @@ case("close grass is rooted, wind-responsive, bounded and absent from hard props
    moved=moved or (p.CFrame.UpVector-row.base.UpVector).Magnitude>.001
   end
   check(moved,"wind actually bends the grass")
+  for _,wind in {Vector3.new(3,0,0),Vector3.new(-3,0,0),Vector3.new(0,0,3),Vector3.new(0,0,-3)} do
+   living:sway(at,{wind=wind},false)
+   local follows,rooted=true,true
+   for _,row in living.grass do
+    local up=row.part.CFrame.UpVector
+    follows=follows and Vector3.new(up.X,0,up.Z):Dot(wind)>.001
+    rooted=rooted and (row.part.CFrame:PointToWorldSpace(row.rootLocal)-row.pivot).Magnitude<1e-5
+   end
+   check(#living.grass>0 and follows,"grass bends downwind on both world axes")
+   check(rooted,"directional wind leaves the grass roots planted")
+  end
   check((roof.CFrame.UpVector-fixed.UpVector).Magnitude<1e-8,"wind never moves the visual collision roof")
+  living:sway(at,{wind=Vector3.zero},false)
+  local calm=true
+  for _,row in living.grass do calm=calm and (row.part.CFrame.UpVector-row.base.UpVector).Magnitude<1e-8 end
+  check(calm,"calm air restores upright grass without a zero-vector normalization")
   living:sway(at,{wind=Vector3.new(3,0,1)},true)
   for _,row in living.grass do check((row.part.CFrame.UpVector-row.base.UpVector).Magnitude<1e-8,"reduced motion restores still grass") end
   local old=living.grassParts[1]

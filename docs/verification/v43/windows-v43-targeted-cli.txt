@@ -1,0 +1,30 @@
+preserve: the backdrop's records: 1213 at full, 515 at low; the far look 515 at full, 386 at low
+preserve: from the sill at full: 1493 parts
+preserve: the walk at full: at most 1500 parts, 796 changes
+preserve: from the sill at low: 460 parts
+preserve: the walk at low: at most 500 parts, 410 changes
+preserve: the sill's Decor: 721 parts (the test garden's 1258)
+preserve: the hut's looks: 1213 records at full, 64 at low; (ROBLOX-119) the meadow's and the bench patch's 3346 at full, 102 at low
+preserve: (ROBLOX-122) the pond's, the boardwalk's and the mown path's looks: 1710 at full, 124 at low
+preserve: the hut's regions: from anywhere on one, its farthest box at most 151.1 studs
+preserve: the hut's regions at full: at most 1500 parts
+preserve: the hut's regions at low: at most 500 parts
+preserve: the patches: 1171, at most 90 records at full and 10 at low
+preserve: in the mulch at full: 12 patches, 662 parts of them, 1500 in all
+preserve: in the mulch at low: 5 patches, 38 parts of them, 496 in all
+preserve: the cricket's struggle: wins at 4, 5 and 6 taps a second 4, 60, 60 of 60; at 5 a second 7.6 s, 6.8 kicks
+preserve: ballooning: of 200 families the hut garden 152, the meadow's edge 47, the pond's edge 1
+preserve: the water: of 60 slips by a pad 2 cm off, 38 got out and 22 drowned in Normal; 60 pulled out in the gentle rules
+PRESERVE passed=1133 failed=0
+world_client: walked through sill > outer_sill > house_wall > bed_a, now at 0.0000, -89.6900, -24.3100, mode attached
+world_client: the descent took 109.88333333333334 s; lowering measured at 0.7500052922541158 studs a second
+world_client: at sill the client holds 1469 parts of looks
+world_client: at outer_sill the client holds 1469 parts of looks
+world_client: at bed_a the client holds 1483 parts of looks
+world_client: at eaves the client holds 1496 parts of looks
+world_client: at shrub_west_a the client holds 1494 parts of looks
+world_client: at shrub_west_j the client holds 1483 parts of looks
+world_client: at kitchen_counter the client holds 1469 parts of looks
+world_client: a new stream at the bed: 382 parts the first frame, 11 frames to 1483 parts
+world_client: the low tier's stream: 1560 parts made and 1137 destroyed over twelve places
+WORLD_CLIENT passed=30 failed=0

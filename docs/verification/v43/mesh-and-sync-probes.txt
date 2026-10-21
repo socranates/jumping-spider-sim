@@ -1,0 +1,22 @@
+2026-10-21T09:21:56.476Z,24481.476562,7490,6,Info [FLog::CreatorOutput] [CHET_V43_SYNC] 120119801868085 true true true true
+2026-10-21T09:29:28.160Z,24933.160156,7490,6,Info [FLog::CreatorOutput] [CHET_MESH_CM] {"name":"bark_chip","mesh_size":[4.599803924560547,0.6845884323120117,9],"size":[4.599803924560547,0.6845884323120117,9],"texture_id":"rbxassetid://116765351721069","mesh_id":"rbxassetid://90087253428470"}
+2026-10-21T09:29:28.162Z,24933.162109,7490,6,Info [FLog::CreatorOutput] [CHET_MESH_CM] {"name":"bench_slat_end","mesh_size":[14,3.200000047683716,10],"size":[14,3.200000047683716,10],"texture_id":"rbxassetid://116765351721069","mesh_id":"rbxassetid://109006316168913"}
+2026-10-21T09:29:28.162Z,24933.162109,7490,6,Info [FLog::CreatorOutput] [CHET_MESH_CM] {"name":"coneflower_head","mesh_size":[10.344987869262696,3.9749999046325685,10.28831672668457],"size":[10.344987869262696,3.9749999046325685,10.28831672668457],"texture_id":"rbxassetid://116765351721069","mesh_id":"rbxassetid://136400030278193"}
+2026-10-21T09:29:28.162Z,24933.162109,7490,6,Info [FLog::CreatorOutput] [CHET_MESH_CM] {"name":"grass_clump","mesh_size":[9.739529609680176,26.041444778442384,11.812690734863282],"size":[9.739529609680176,26.041444778442384,11.812690734863282],"texture_id":"rbxassetid://116765351721069","mesh_id":"rbxassetid://93421946013090"}
+2026-10-21T09:29:28.164Z,24933.164062,7490,6,Info [FLog::CreatorOutput] [CHET_MESH_CM] {"name":"milkweed_leaf","mesh_size":[7,2.125,19.5],"size":[7,2.125,19.5],"texture_id":"rbxassetid://116765351721069","mesh_id":"rbxassetid://128470594939908"}
+2026-10-21T09:29:28.164Z,24933.164062,7490,6,Info [FLog::CreatorOutput] [CHET_MESH_CM] {"name":"stone","mesh_size":[5.345497131347656,1.8151531219482422,3.794618606567383],"size":[5.345497131347656,1.8151531219482422,3.794618606567383],"texture_id":"rbxassetid://116765351721069","mesh_id":"rbxassetid://93673725524671"}
+2026-10-21T09:29:28.164Z,24933.164062,7490,6,Info [FLog::CreatorOutput] [CHET_MESH_CM_MODEL] Model nil
+2026-10-21T09:30:08.449Z,24973.449219,24d0,6,Info [FLog::CreatorOutput] > local m=game:GetService("InsertService"):LoadAsset(105970842890511); local probes={}; for _,p in m:GetDescendants() do if p:IsA("MeshPart") then local holder=Instance.new("Part"); local s=Instance.new("SpecialMesh"); s.MeshType=Enum.MeshType.FileMesh; s.MeshId=p.MeshId; s.TextureId=p.TextureID; s.Parent=holder; table.insert(probes,s) end end; local bad=0; game:GetService("ContentProvider"):PreloadAsync(probes,function(id,status) print("[CHET_SPECIALMESH]",id,status.Name); if status~=Enum.AssetFetchStatus.Success then bad+=1 end end); print("[CHET_SPECIALMESH_END]",#probes,bad)
+2026-10-21T09:30:09.140Z,24974.140625,7490,6,Info [FLog::CreatorOutput] [CHET_SPECIALMESH] rbxassetid://109006316168913 Success
+2026-10-21T09:30:09.154Z,24974.154297,24d0,6,Info [FLog::CreatorOutput] [CHET_SPECIALMESH] rbxassetid://90087253428470 Success
+2026-10-21T09:30:09.203Z,24974.203125,7490,6,Info [FLog::CreatorOutput] [CHET_SPECIALMESH] rbxassetid://128470594939908 Success
+2026-10-21T09:30:09.320Z,24974.320312,24d0,6,Info [FLog::CreatorOutput] [CHET_SPECIALMESH] rbxassetid://136400030278193 Success
+2026-10-21T09:30:09.322Z,24974.322266,24d0,6,Info [FLog::CreatorOutput] [CHET_SPECIALMESH] rbxassetid://93673725524671 Success
+2026-10-21T09:30:09.337Z,24974.337891,7490,6,Info [FLog::CreatorOutput] [CHET_SPECIALMESH] rbxassetid://93421946013090 Success
+2026-10-21T09:30:11.687Z,24976.687500,24d0,6,Info [FLog::CreatorOutput] [CHET_SPECIALMESH] rbxassetid://116765351721069 Success
+2026-10-21T09:30:11.687Z,24976.687500,24d0,6,Info [FLog::CreatorOutput] [CHET_SPECIALMESH] rbxassetid://116765351721069 Success
+2026-10-21T09:30:11.687Z,24976.687500,24d0,6,Info [FLog::CreatorOutput] [CHET_SPECIALMESH] rbxassetid://116765351721069 Success
+2026-10-21T09:30:11.687Z,24976.687500,24d0,6,Info [FLog::CreatorOutput] [CHET_SPECIALMESH] rbxassetid://116765351721069 Success
+2026-10-21T09:30:11.687Z,24976.687500,24d0,6,Info [FLog::CreatorOutput] [CHET_SPECIALMESH] rbxassetid://116765351721069 Success
+2026-10-21T09:30:11.687Z,24976.687500,24d0,6,Info [FLog::CreatorOutput] [CHET_SPECIALMESH] rbxassetid://116765351721069 Success
+2026-10-21T09:30:11.705Z,24976.705078,6404,6,Info [FLog::CreatorOutput] [CHET_SPECIALMESH_END] 6 0

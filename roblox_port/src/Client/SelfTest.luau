@@ -26,7 +26,7 @@
 -- looks planned at the sill hold the hut whole and the railway far; planned at the railway's crest, the railway whole and the hut back to its far look; then
 -- planned at the sill again, as they were) and the trains (a pass's cars drawn on the line). The lock is taken with a controller's L1 creep/lock press too (ROBLOX-129).
 -- ROBLOX-117: in the preserve also the garden's near detail (the patches drawn by the spider in the mulch within the budgets, the dew shown at dawn and gone by noon) and the
--- garden's rival and mate (each put where it comes into the garden, the spider beside its cell: it walks there, in the garden; both put back after).
+-- station's resident rival and garden's mate (each checked in its own territory, both put back after).
 -- ROBLOX-118: in the preserve also the ceiling and the upper walls (up the west wall past 1.3 m, round onto the ceiling's underside, hanging there), the back room (through the
 -- doorway, its sofa, the television's unit, the games' shelf and the window sill hold a spider, the gap under the sofa a home), the eaves (along the gutter from region to region)
 -- and the cat (held off the rest of the run: heard and moving on a walk of its day; at a stop on the floor it notices a spider walking in front of it and crouches to pat,
@@ -50,6 +50,7 @@ local Preserve = require(Shared:WaitForChild("World"):WaitForChild("Preserve"))
 local Species = require(Shared:WaitForChild("Data"):WaitForChild("Species"))
 local LookPlan = require(Shared:WaitForChild("World"):WaitForChild("LookPlan"))
 local RivalSpider = require(Shared:WaitForChild("Predator"):WaitForChild("RivalSpider"))
+local StationTerritory = require(Shared:WaitForChild("World"):WaitForChild("StationTerritory"))
 local Mate = require(Shared:WaitForChild("Predator"):WaitForChild("Mate"))
 local Meadow = require(Shared:WaitForChild("World"):WaitForChild("Meadow")) -- (ROBLOX-119: the bench patch and the meadow's edge)
 local PreyKinds = require(Shared:WaitForChild("Prey"):WaitForChild("PreyKinds")) -- (ROBLOX-120: the crickets' song)
@@ -507,6 +508,15 @@ local function checks(): { Check }
 	-- what its senses give it: Recentre locks onto it, the body turns to it, the sidestep walks the spider round it at a creep, and Recentre again lets go.
 	add("lock", function(r)
 		local ctx = r.ctx
+		-- Exercise acquired controls without granting an unlock to the real life.
+		-- Restore even when a streaming/visibility check skips or fails.
+		local stage = ctx.life.growth.stage
+		local hour = ctx.life.clock.hour
+		-- Acquiring an adult fixture during the ranger's morning must not open
+		-- the nursery window behind the subsequent nursery checks.
+		ctx.life.clock.hour = 12
+		ctx.life.growth.stage = math.max(stage, 2)
+		local ok, err = pcall(function()
 		local motor, lock, lockOn, memory = ctx.motor, ctx.lock, ctx.lockOn, ctx.memory
 		need(lock ~= nil and lockOn ~= nil, "no lock in the hooks")
 		lockOn.release(lock, "selftest")
@@ -565,6 +575,14 @@ local function checks(): { Check }
 			need(lock.trackId == nil, "a second L1 press did not let go")
 			say(r, "INFO lock: L1 holds creep, locks on press, and lets go on the next press")
 		end
+		end)
+		ctx.life.growth.stage = stage
+		ctx.life.clock.hour = hour
+		ctx.lockOn.release(ctx.lock, "selftest ended")
+		ctx.input:simulate("Right", false)
+		ctx.input:simulate("Recenter", false)
+		ctx.input:simulate("Creep", false, Enum.KeyCode.ButtonL1)
+		if not ok then error(err, 0) end
 	end)
 
 	garden("prey in the bed", function(r)
@@ -949,8 +967,8 @@ local function checks(): { Check }
 			say(r, `INFO the garden's near detail: {n} patches, {parts} parts of them, {held} parts of looks at {looks.tier}; dew at dawn on {shown} of {drops} drops`)
 		end)
 
-		-- ROBLOX-117: the rival and the mate come into the hut garden and roam it (never the hut): each put where it comes in, the spider beside its cell, a few seconds
-		add("the garden's rival and mate", function(r)
+		-- The resident rival patrols the station; the mate retains its garden territory.
+		add("the station's rival and garden's mate", function(r)
 			local ctx = r.ctx
 			local life, world = ctx.life, ctx.world
 			need(life.rival ~= nil, "no rival in this life")
@@ -959,18 +977,20 @@ local function checks(): { Check }
 			local ok, err = pcall(function()
 				RivalSpider.renew(life.rival)
 				local at, region = RivalSpider.arriveAt()
-				need(region ~= nil and life.rival.region == region and string.sub(region :: string, 1, 7) == "garden_", `the rival comes in at {tostring(region)}`)
+				need(region ~= nil and life.rival.region == region and StationTerritory.contains(region), `the rival comes in at {tostring(region)}`)
 				life.rival.state = "patrol"
-				local spot = Vector3.new(10, -74.6 + HEIGHT, -340) -- (in garden_d3, the mulch by the bee balm, beside the rival's cell)
-				need(holdUntilReady(r, "garden_d3", spot, nil) and holdUntilReady(r, region :: string, at, nil), "the cells are not whole")
+				-- A protected perch lets the autonomous patrol move without provoking a hunt.
+				local spot = SelfTest.CRACK
+				need(holdUntilReady(r, WorldMap.HOME, spot, nil) and holdUntilReady(r, region :: string, at, nil), "the cells are not whole")
 				put(r, spot, nil)
 				pause(r, 4)
 				local p = life.rival.position
 				local here = WorldMap.at(p)
-				need(life.rival.region ~= nil and string.sub(life.rival.region, 1, 7) == "garden_" and here ~= nil and string.sub(here.id, 1, 7) == "garden_",
-					`the rival is not in the garden (at {fmt(p)}, {tostring(life.rival.region)})`)
+				need(StationTerritory.contains(life.rival.region) and here ~= nil and StationTerritory.contains(here.id),
+					`the rival is not in the station (at {fmt(p)}, {tostring(life.rival.region)})`)
 				need(world:creatureLive(life.rival.region), "the rival's cell is not in play beside the spider")
 				local moved = (p - at).Magnitude
+				need(moved > 0.2, "the resident rival did not patrol")
 				-- the mate
 				local mate = Mate.new()
 				local mat, mregion = Mate.arriveAt()
@@ -982,7 +1002,7 @@ local function checks(): { Check }
 				local mp = life.mate and life.mate.position or mat
 				local mhere = WorldMap.at(mp)
 				need(life.mate ~= nil and life.mate.region ~= nil and mhere ~= nil and string.sub(mhere.id, 1, 7) == "garden_", `the mate is not in the garden (at {fmt(mp)})`)
-				say(r, `INFO the garden's rival and mate: the rival came in at {region} and walked {string.format("%.1f", moved)} studs, in {life.rival.region}; the mate came in at {mregion}, in {life.mate.region}`)
+				say(r, `INFO the station's rival and garden's mate: the rival came in at {region} and walked {string.format("%.1f", moved)} studs, in {life.rival.region}; the mate came in at {mregion}, in {life.mate.region}`)
 			end)
 			for k in life.rival do life.rival[k] = nil end
 			for k, v in saved do life.rival[k] = v end
@@ -1165,8 +1185,8 @@ local function checks(): { Check }
 			local world, motor = ctx.world, ctx.motor
 			local GT = Meadow.GROUND
 			-- from the path's end onto the gravel, and across it to the meadow's edge
-			local legs = { { from = "path_m4", to = "pad_a2", at = Vector3.new(-60, GT + HEIGHT, -808) }, { from = "pad_a2", to = "pad_b2", at = Vector3.new(-60, GT + HEIGHT, -908) },
-				{ from = "pad_c2", to = "meadow_a3", at = Vector3.new(-60, GT + HEIGHT, -1110) } }
+			local legs = { { from = "path_m4", to = "pad_a2", at = Vector3.new(-60, GT + HEIGHT, -508) }, { from = "pad_a2", to = "pad_b2", at = Vector3.new(-60, GT + HEIGHT, -608) },
+				{ from = "pad_c2", to = "meadow_a3", at = Vector3.new(-60, GT + HEIGHT, -810) } }
 			local crossed: { string } = {}
 			for _, leg in legs do
 				need(holdUntilReady(r, leg.to, leg.at, nil) and holdUntilReady(r, leg.from, leg.at, nil), `{leg.from} and {leg.to} are not whole`)
@@ -1404,10 +1424,10 @@ local function checks(): { Check }
 			local world, motor = ctx.world, ctx.motor
 			local GT = Pond.GROUND
 			local legs = {
-				{ from = "pad_b3", to = "mown_e1", at = Vector3.new(80, GT + HEIGHT, -980), heading = Vector3.xAxis, until_ = function() return world.region.id == "mown_e1" end },
-				{ from = "mown_n14", to = "walk_s1", at = Vector3.new(1540, GT + HEIGHT, -2425), heading = -Vector3.zAxis,
+				{ from = "pad_b3", to = "mown_e1", at = Vector3.new(80, GT + HEIGHT, -680), heading = Vector3.xAxis, until_ = function() return world.region.id == "mown_e1" end },
+				{ from = "mown_n1", to = "walk_s1", at = Vector3.new(240, GT + HEIGHT, -800), heading = -Vector3.zAxis,
 					until_ = function() return world.region.id == "walk_s1" and motor.pos.Y > Pond.DECK end },
-				{ from = "walk_s4", to = "deck_s1", at = Vector3.new(1815, Pond.DECK + HEIGHT, (Pond.BOARDS[2][1] + Pond.BOARDS[2][2]) / 2), heading = Vector3.xAxis,
+				{ from = "walk_s4", to = "deck_s1", at = Vector3.new(515, Pond.DECK + HEIGHT, (Pond.BOARDS[2][1] + Pond.BOARDS[2][2]) / 2), heading = Vector3.xAxis,
 					until_ = function() return world.region.id == "deck_s1" end },
 			}
 			local crossed: { string } = {}
@@ -1465,7 +1485,7 @@ local function checks(): { Check }
 			local boxes = {}
 			for _, id in { "pond_b3", "pond_a3" } do for _, p in Region.pieces(WorldMap.region(id) :: any) do table.insert(boxes, p) end end
 			local trial = Water.new(water.seed)
-			trial:fall(Vector3.new(2075, Pond.WATER, -2745), 40, life.clock.day, boxes, Pond.WATER)
+			trial:fall(Vector3.new(775, Pond.WATER, -1120), 40, life.clock.day, boxes, Pond.WATER)
 			local kind = nil
 			for _ = 1, 60 * 4 do trial:step(1 / 60); for _, s in trial:drainSignals() do if s.kind ~= "fell" then kind = s.kind end end end
 			need(kind == "drowned", `a long fall into open water was {tostring(kind)} in Normal`)

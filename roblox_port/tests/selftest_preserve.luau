@@ -63,7 +63,7 @@ check("the client reads the attribute: the preserve is its world, its looks the 
 	assert(loaded, "SpiderClient did not load: " .. tostring(loadError))
 	assert(WorldMap.world() == "preserve", "the client did not make the preserve the active world")
 	local driver = ClientStubs.driver
-	assert(driver.world.world == "preserve" and #WorldMap.regions() == preserveRegions and preserveRegions == 207, `the client's world is the preserve's ({#WorldMap.regions()} regions; ROBLOX-122: 207)`)
+	assert(driver.world.world == "preserve" and #WorldMap.regions() == preserveRegions and preserveRegions == 232, `the client's world is the compact preserve ({#WorldMap.regions()} regions; 181 authored plus 51 infill)`)
 	assert(driver.world.hut ~= nil and not driver.world.hut.open and driver.world.hut.sash ~= nil, "the hut's window is shut in a new save")
 	for _ = 1, 30 do frame(1 / 60); simClock += 1 / 60 end
 	local looks = driver.world.looks
@@ -110,7 +110,7 @@ check("the self-test runs to END in the preserve, its own checks in place of the
 	end
 	assert(fails == 0, `{fails} checks failed here (see the FAIL lines above)`)
 	local want = { "new life", "intro", "world folders", "walk on the sill", "prey on the sill", "lock", "the hut's sill", "the backdrop near and far", "the trains",
-		"the nursery: the window shut", "the nursery: the ranger props the window", "the hut's inside", "the way out", "the hut garden", "the garden's near detail", "the garden's rival and mate", "the hut's homes",
+		"the nursery: the window shut", "the nursery: the ranger props the window", "the hut's inside", "the way out", "the hut garden", "the garden's near detail", "the station's rival and garden's mate", "the hut's homes",
 		"the hut by night: the lamp", "the ceiling and the upper walls", "the back room", "the eaves", "the cat", -- (ROBLOX-118)
 		"the bench patch", "the meadow's edge", "the crab spiders", -- (ROBLOX-119)
 		"the robin", "the field crickets", "ballooning's landings", -- (ROBLOX-120)
@@ -121,18 +121,18 @@ check("the self-test runs to END in the preserve, its own checks in place of the
 	for _, name in want do assert(passes[name], "no PASS for " .. name) end
 	for _, garden in { "the line", "prey in the bed", "woodlice", "moths on the wall" } do assert(not passes[garden], "a garden check ran in the preserve: " .. garden) end
 	assert(last == `[SELFTEST] END pass={#want} fail=0 skip=0`, "the END line: " .. last)
-	for _, what in { "world", "the hut's sill", "backdrop", "trains", "lock", "the nursery", "the hut's inside", "the way out", "the hut garden", "the garden's near detail", "the garden's rival and mate", "the hut's homes",
+	for _, what in { "world", "the hut's sill", "backdrop", "trains", "lock", "the nursery", "the hut's inside", "the way out", "the hut garden", "the garden's near detail", "the station's rival and garden's mate", "the hut's homes",
 		"the ceiling", "the back room", "the eaves", "the cat", "the bench patch", "the meadow's edge", "the crab spiders",
 		"the robin", "the field crickets", "ballooning's landings", "the mown path and the boardwalk", "the water", "the pond's life", "the green frog" } do assert(infos[what], "no INFO line for " .. what) end
 	local worldLine = false
-	for _, line in lines do if line == "[SELFTEST] INFO world: preserve (revision preserve-2)" then worldLine = true end end
+	for _, line in lines do if line == "[SELFTEST] INFO world: preserve (revision preserve-3)" then worldLine = true end end
 	assert(worldLine, "the world line names the preserve")
 end)
 
 check("a rest kept in the hut's crack names the preserve", function()
 	local driver = ClientStubs.driver
 	local best = driver.currentStore():loadBest()
-	assert(best.ok and best.record.world_map.world == "preserve" and best.record.world_map.revision == "preserve-2" and best.record.world_map.retreat == "sill_crevice",
+	assert(best.ok and best.record.world_map.world == "preserve" and best.record.world_map.revision == "preserve-3" and best.record.world_map.retreat == "sill_crevice",
 		"the kept rest: " .. tostring(best.ok and best.record.world_map.world))
 	local home = WorldMap.region(WorldMap.HOME) :: any
 	assert((driver.motor.pos - (home.spawn.pos + Vector3.new(0, 0.31, 0))).Magnitude < 0.3 and driver.world.region.id == "sill", "back at the sill's spawn")

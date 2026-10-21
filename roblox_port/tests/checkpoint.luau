@@ -1229,7 +1229,7 @@ case("two worlds (ROBLOX-115): a rest in the test garden is written as it always
 	check(bed.world_map.region == "bed_a" and bed.world_map.world == nil, "(and one under the bed's stone)")
 	local was = WorldMap.use("preserve")
 	local ok, err = pcall(function()
-		check(was == "test_garden" and WorldMap.revision() == "preserve-2", "the preserve is the active world, its revision preserve-2 (ROBLOX-118)")
+		check(was == "test_garden" and WorldMap.revision() == "preserve-3", "the preserve is the active world, its revision preserve-3 (ROBLOX-118)")
 		-- a rest from the test garden, in the preserve: a good record (its region and retreat are the test garden's, not looked for here), put back at the sill's spawn
 		check(Checkpoint.worldMoved(garden) and #(Checkpoint.check(garden, w)) == 0, "a test garden rest is from another world, and good")
 		check(#(Checkpoint.check(bed, w)) == 0, "one from the bed too, though the preserve has no bed")
@@ -1239,8 +1239,8 @@ case("two worlds (ROBLOX-115): a rest in the test garden is written as it always
 		-- a rest in the preserve's hut: it names its world and revision, and comes back in the crack
 		w.motor:place(HOME, Vector3.yAxis, Vector3.xAxis)
 		local hut = assert(Checkpoint.capture(w, 0))
-		check(hut.world_map.world == "preserve" and hut.world_map.revision == "preserve-2" and hut.world_map.region == "sill" and hut.world_map.retreat == "sill_crevice",
-			"a rest in the hut's crack records the preserve, preserve-2, the sill and the crevice")
+		check(hut.world_map.world == "preserve" and hut.world_map.revision == "preserve-3" and hut.world_map.region == "sill" and hut.world_map.retreat == "sill_crevice",
+			"a rest in the hut's crack records the preserve, preserve-3, the sill and the crevice")
 		check(not Checkpoint.worldMoved(hut) and #(Checkpoint.check(Json.copy(hut), w)) == 0, "a good record of this world, stored and copied")
 		check(string.find(assert(Json.canonical(hut)), '"world":"preserve"', 1, true) ~= nil, "its stored text names the world")
 		w.motor:place(spawn, Vector3.yAxis, Vector3.xAxis)
@@ -1314,8 +1314,8 @@ case("the meadow's edge and the bench patch (ROBLOX-119): a rest under the curle
 				else Vector3.new((t.min.X + t.max.X) / 2, t.min.Y + 0.31, (t.min.Z + t.max.Z) / 2)
 			w.motor:place(inside, row.up, if row.up == Vector3.zAxis then Vector3.yAxis else Vector3.xAxis)
 			local record = assert(Checkpoint.capture(w, 0))
-			check(record.world_map.world == "preserve" and record.world_map.revision == "preserve-2" and record.world_map.region == row.id and record.world_map.retreat == t.id,
-				`a rest in {t.id} records the preserve, preserve-2, {row.id} and {t.id}`)
+			check(record.world_map.world == "preserve" and record.world_map.revision == "preserve-3" and record.world_map.region == row.id and record.world_map.retreat == t.id,
+				`a rest in {t.id} records the preserve, preserve-3, {row.id} and {t.id}`)
 			check(#(Checkpoint.check(record, w)) == 0 and #(Checkpoint.check(Json.copy(record), w)) == 0 and #SaveRest.check("main", record) == 0, "a good record, a stored copy, and the server accepts it")
 			w.motor:place(HOME, Vector3.yAxis, Vector3.xAxis)
 			check(Checkpoint.restore(record, w) and (w.motor.pos - inside).Magnitude < 1e-6 and WorldMap.inRetreat(w.motor.pos) == t.id, `and it comes back in {t.id}`)
@@ -1326,7 +1326,7 @@ case("the meadow's edge and the bench patch (ROBLOX-119): a rest under the curle
 		r.state, r.region = "patrol", "meadow_a3"
 		local at = a3.spawn.pos + Vector3.new(0, 0.31, 0)
 		r.position, r.previous, r.target, r.origin = at, at, at, at
-		check(Rival.valid(r) and not Rival.misplaced(r) and Rival.roam()[r.region] == true, "a rival patrolling at the meadow's edge is a good record of this world")
+		check(Rival.valid(r) and Rival.misplaced(r) and Rival.roam()[r.region] ~= true, "an old outdoor rival is structurally valid but will migrate to station residency")
 	end)
 	WorldMap.use(was)
 	if not ok then error(err) end
@@ -1348,8 +1348,8 @@ case("the pond's edge (ROBLOX-122): a rest in the boardwalk's gap, under the fla
 				else Vector3.new((t.min.X + t.max.X) / 2, t.min.Y + 0.31, (t.min.Z + t.max.Z) / 2)
 			w.motor:place(inside, row.up, if row.up == Vector3.zAxis then Vector3.yAxis else Vector3.xAxis)
 			local record = assert(Checkpoint.capture(w, 0))
-			check(record.world_map.world == "preserve" and record.world_map.revision == "preserve-2" and record.world_map.region == row.id and record.world_map.retreat == t.id,
-				`a rest in {t.id} records the preserve, preserve-2, {row.id} and {t.id}`)
+			check(record.world_map.world == "preserve" and record.world_map.revision == "preserve-3" and record.world_map.region == row.id and record.world_map.retreat == t.id,
+				`a rest in {t.id} records the preserve, preserve-3, {row.id} and {t.id}`)
 			check(#(Checkpoint.check(record, w)) == 0 and #(Checkpoint.check(Json.copy(record), w)) == 0 and #SaveRest.check("main", record) == 0, "a good record, a stored copy, and the server accepts it")
 			w.motor:place(HOME, Vector3.yAxis, Vector3.xAxis)
 			check(Checkpoint.restore(record, w) and (w.motor.pos - inside).Magnitude < 1e-6 and WorldMap.inRetreat(w.motor.pos) == t.id, `and it comes back in {t.id}`)

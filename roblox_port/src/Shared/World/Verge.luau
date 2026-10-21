@@ -5,9 +5,8 @@ local Verge = {}
 Verge.TOP = -84.6
 Verge.CELL = 100
 local RECTANGLES = {
- {-400,600,-1716,-16}, -- hut garden, bench and meadow surround
- {90,1690,-1130,-830}, -- east path shoulders
- {1390,1690,-2441,-1030}, -- north path shoulders; stops before the pond
+ {-400,190,-1416,-16}, -- compact garden/bench/meadow shoulders
+ {90,525,-966,-530}, -- short pond approach and dry bank under the western boardwalk
 }
 
 local authored: {[number]: {any}} = {}
@@ -30,6 +29,12 @@ function Verge.author(seed: number, seedOf: (number,string)->number, existing: {
  local occupied: {{number}}={}
  for _,r in (existing or {}) :: {any} do
   if (r.spawn.pos.Y>=Verge.TOP-3 and r.spawn.pos.Y<=Verge.TOP+3) or r.kind=="garden_bed" then
+   local a,b=r.bounds[1],r.bounds[2]
+   table.insert(occupied,{a.X,b.X,a.Z,b.Z})
+  end
+  if r.kind=="boardwalk" then
+   -- Its authored bank strips already support the dry ground below the deck.
+   -- Keep that footprint owned by the boardwalk, including its narrow seams.
    local a,b=r.bounds[1],r.bounds[2]
    table.insert(occupied,{a.X,b.X,a.Z,b.Z})
   end
@@ -118,13 +123,15 @@ function Verge.bestiary(r: any): {any}
   local col,row=(i-1)%4,math.floor((i-1)/4)
   table.insert(perches,{id=r.id..`_springtail_perch_{i}`,
    position=Vector3.new(a.X+(col+.5)*(b.X-a.X)/4,r.spawn.pos.Y,a.Z+(row+.5)*(b.Z-a.Z)/3),
-   normal=Vector3.yAxis,shelter=.6,food=.4,start=i<=3,kind="soil",hop=true})
+   -- Occupy all three rows at startup. Clustering every animal in the first
+   -- row left the far end of a narrow shoulder apparently lifeless.
+   normal=Vector3.yAxis,shelter=.6,food=.4,start=i==2 or i==7 or i==10,kind="soil",hop=true})
  end
  local floor=r.spawn.pos.Y
  local flies: {any}={}
  for i,p in perches do
   local fly=table.clone(p)
-  fly.id=r.id..`_housefly_perch_{i}`;fly.hop=false;fly.start=i<=2
+  fly.id=r.id..`_housefly_perch_{i}`;fly.hop=false;fly.start=i==4 or i==9
   table.insert(flies,fly)
  end
  local out={{kind="springtail",profile="springtail_prototype",perches=perches,

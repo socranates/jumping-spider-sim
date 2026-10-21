@@ -63,25 +63,25 @@ local GT = Hut.GROUND
 Meadow.GROUND = GT
 Meadow.CELL = 100
 -- The bench patch's pad and the meadow's core (studs).
-Meadow.PAD = table.freeze({ x0 = -210, x1 = 90, z0 = -1116, z1 = -816 })
-Meadow.CORE = table.freeze({ x0 = -310, x1 = 190, z0 = -1616, z1 = -1116 })
+Meadow.PAD = table.freeze({ x0 = -210, x1 = 90, z0 = -816, z1 = -516 })
+Meadow.CORE = table.freeze({ x0 = -310, x1 = 190, z0 = -1316, z1 = -816 })
 -- The concrete slab under the furniture, its top SL (2 cm over the gravel).
-Meadow.SLAB = table.freeze({ x0 = -200, x1 = 86, z0 = -1106, z1 = -1030, top = GT + 2 })
+Meadow.SLAB = table.freeze({ x0 = -200, x1 = 86, z0 = -806, z1 = -730, top = GT + 2 })
 local SL = Meadow.SLAB.top
 -- The bench, facing south: its ends' frames, its seat's four slats (front to back, `w` deep with `gap` between), its back's three slats, true size (a seat 45 cm over the
 -- slab and 42 deep, its back to 81 cm; 1.64 m long). Split at `mid` into two regions.
-Meadow.BENCH = table.freeze({ x0 = -152, x1 = 12, mid = -70, ends = table.freeze({ -144, 0 }), frame = 4, front = -1048, w = 9, gap = 1.8, thick = 3, seat = 45,
-	legTop = 38, railZ = table.freeze({ -1092, -1048 }), post = table.freeze({ -1096, -1092 }), back = table.freeze({ { 50, 59 }, { 61, 70 }, { 72, 81 } }), backZ = table.freeze({ -1092, -1089 }),
-	armZ = table.freeze({ -1092, -1046 }), arm = table.freeze({ 62, 65 }), armPost = table.freeze({ -1050, -1047 }) })
+Meadow.BENCH = table.freeze({ x0 = -152, x1 = 12, mid = -70, ends = table.freeze({ -144, 0 }), frame = 4, front = -748, w = 9, gap = 1.8, thick = 3, seat = 45,
+	legTop = 38, railZ = table.freeze({ -792, -748 }), post = table.freeze({ -796, -792 }), back = table.freeze({ { 50, 59 }, { 61, 70 }, { 72, 81 } }), backZ = table.freeze({ -792, -789 }),
+	armZ = table.freeze({ -792, -746 }), arm = table.freeze({ 62, 65 }), armPost = table.freeze({ -750, -747 }) })
 -- The litter bin: its body, its base plate (the lip) on four feet 1.4 cm tall, its rolled rim and its lid; the can and the crisp packet by it on the gravel.
-Meadow.BIN = table.freeze({ x0 = 40, x1 = 80, z0 = -1094, z1 = -1054, feet = 1.4, base = 4, lip = 3, top = 80, rim = 83, lid = 88 })
-Meadow.CAN = table.freeze({ x0 = 52, x1 = 64, z0 = -1028, z1 = -1021.4 }) -- a 12 oz can (12.2 cm by 6.6 cm) lying on its side
-Meadow.PACKET = table.freeze({ x0 = 18, x1 = 32, z0 = -1026, z1 = -1017, h = 2.2 }) -- a crisp packet, crumpled flat
+Meadow.BIN = table.freeze({ x0 = 40, x1 = 80, z0 = -794, z1 = -754, feet = 1.4, base = 4, lip = 3, top = 80, rim = 83, lid = 88 })
+Meadow.CAN = table.freeze({ x0 = 52, x1 = 64, z0 = -728, z1 = -721.4 }) -- a 12 oz can (12.2 cm by 6.6 cm) lying on its side
+Meadow.PACKET = table.freeze({ x0 = 18, x1 = 32, z0 = -726, z1 = -717, h = 2.2 }) -- a crisp packet, crumpled flat
 -- The lamppost: a cast base, the pole 10 cm square to `top`, the lantern on it (its plate, glass, cap and finial); the regions split up the pole at `splits`.
-Meadow.LAMP = table.freeze({ x = -180, z = -1068, half = 5, base = table.freeze({ half = 10, h = 14 }), top = 340, splits = table.freeze({ 90, 180, 270 }),
+Meadow.LAMP = table.freeze({ x = -180, z = -768, half = 5, base = table.freeze({ half = 10, h = 14 }), top = 340, splits = table.freeze({ 90, 180, 270 }),
 	plate = table.freeze({ half = 12, h = 3 }), glass = table.freeze({ half = 10, h = 26 }), cap = table.freeze({ half = 15, h = 4 }), finial = table.freeze({ half = 2, h = 6 }) })
 -- The drain grate in pad_b3: its hole, its bars across it (x-long), the pit's floor `deep` under the gravel.
-Meadow.GRATE = table.freeze({ x0 = 20, x1 = 50, z0 = -960, z1 = -930, wall = 2, bars = 6, bar = 2.0, deep = 12 })
+Meadow.GRATE = table.freeze({ x0 = 20, x1 = 50, z0 = -660, z1 = -630, wall = 2, bars = 6, bar = 2, deep = 12 })
 local LAMP_TOP = SL + Meadow.LAMP.top
 Meadow.LANTERN = table.freeze({ at = v(Meadow.LAMP.x, LAMP_TOP + Meadow.LAMP.plate.h + Meadow.LAMP.glass.h * 0.5, Meadow.LAMP.z) }) -- the light (Client/HutLife)
 
@@ -238,10 +238,10 @@ function Meadow.author(worldSeed: number, seedOf: (number, string) -> number): {
 		byId[id] = r :: any
 	end
 	-- the furniture first (its bounds reach down over the pad's cells: a spider at their feet is theirs)
-	region("bench_w", "park_bench", v(B.x0, SL - 0.5, -1098), v(B.mid, SL + 88, -1044), v(-110, SL + B.seat, (SLATS[1][1] + SLATS[1][2]) / 2), v(0, 0, 1))
-	region("bench_e", "park_bench", v(B.mid, SL - 0.5, -1098), v(B.x1, SL + 88, -1044), v(-30, SL + B.seat, (SLATS[1][1] + SLATS[1][2]) / 2), v(0, 0, 1))
+	region("bench_w", "park_bench", v(B.x0, SL - 0.5, -798), v(B.mid, SL + 88, -744), v(-110, SL + B.seat, (SLATS[1][1] + SLATS[1][2]) / 2), v(0, 0, 1))
+	region("bench_e", "park_bench", v(B.mid, SL - 0.5, -798), v(B.x1, SL + 88, -744), v(-30, SL + B.seat, (SLATS[1][1] + SLATS[1][2]) / 2), v(0, 0, 1))
 	local N = Meadow.BIN
-	region("bin", "park_bin", v(14, GT - 0.5, -1100), v(88, SL + N.lid + 4, -1016.5), v(60, SL + N.lid, -1074), v(0, 0, 1))
+	region("bin", "park_bin", v(14, GT - 0.5, -800), v(88, SL + N.lid + 4, -716.5), v(60, SL + N.lid, -774), v(0, 0, 1))
 	local L = Meadow.LAMP
 	local cuts = { 0, L.splits[1], L.splits[2], L.splits[3], L.top + L.plate.h + L.glass.h + L.cap.h + L.finial.h + 3 }
 	for k = 1, 4 do
@@ -256,8 +256,8 @@ function Meadow.author(worldSeed: number, seedOf: (number, string) -> number): {
 			local x0, x1, z0, z1 = padBox(r, c)
 			local id = `pad_{PAD_ROWS[r]}{c}`
 			local sx, sz = (x0 + x1) / 2, (z0 + z1) / 2
-			if r == 3 then sz = -1022; if c == 3 then sx = 0 end end -- (on the gravel south of the slab, clear of the furniture's bounds)
-			if r == 2 and c == 3 then sx, sz = 75, -985 end -- (clear of the grate)
+			if r == 3 then sz = -722; if c == 3 then sx = 0 end end -- (on the gravel south of the slab, clear of the furniture's bounds)
+			if r == 2 and c == 3 then sx, sz = 75, -685 end -- (clear of the grate)
 			region(id, "pad", v(x0, GT - Meadow.GRATE.deep - 3, z0), v(x1, GT + 40, z1), v(sx, GT, sz), v(0, 0, -1))
 		end
 	end
@@ -280,11 +280,11 @@ end
 
 -- The seams that meet World/Hut's regions (the path's end): World/WorldMap adds these to path_m4's neighbours.
 Meadow.HUT_SEAMS = table.freeze({
-	table.freeze({ hut = "path_m4", id = "pad_a2", a = v(-88, GT, -816), b = v(-32, GT, -816) }),
+	table.freeze({ hut = "path_m4", id = "pad_a2", a = v(-88, GT, -516), b = v(-32, GT, -516) }),
 })
 for _, s in Meadow.HUT_SEAMS do seam(s.hut, s.id, s.a, s.b) end
 -- (ROBLOX-122) the mown path east to the pond leaves the bench patch's gravel at pad_b3's east edge (World/Pond's mown_e1, which lists this seam on its own side)
-seam("pad_b3", "mown_e1", v(90, GT, -1011), v(90, GT, -935))
+seam("pad_b3", "mown_e1", v(90, GT, -711), v(90, GT, -635))
 
 do
 	-- the pad's cells to one another, flat on the gravel (row c's lines between columns on the gravel south of the slab)
@@ -294,7 +294,7 @@ do
 			local here = `pad_{PAD_ROWS[r]}{c}`
 			if c < 3 then
 				local za, zb = z1 - 92, z1 - 8
-				if r == 3 then za, zb = -1027, -1019 end
+				if r == 3 then za, zb = -727, -719 end
 				seam(here, `pad_{PAD_ROWS[r]}{c + 1}`, v(x1, GT, za), v(x1, GT, zb))
 			end
 			if r < 3 then
@@ -478,7 +478,7 @@ local function clumpPieces(out: { Piece }, id: string, k: number, clump: { kind:
 	local base = `{id}_{clump.kind}{k}`
 	for i, o in G.at do
 		local x, z = clump.x + o[1], clump.z + o[2]
-		local h = G.h[i] * between(rand, 0.92, 1.0)
+		local h = G.h[i] * between(rand, 0.92, 1)
 		P(out, `{base}_culm_{i}`, x - G.half, x + G.half, GT, GT + h, z - G.half, z + G.half, "leaf_dry_prototype", pick(if clump.kind == "big" then C.big else C.little, rand))
 		if i == 1 or i == 4 then
 			P(out, `{base}_head_{i}`, x - G.head.half, x + G.head.half, GT + h, GT + h + G.head.h, z - G.head.half, z + G.head.half, "leaf_dry_prototype",
@@ -726,7 +726,7 @@ local function meadowDecor(region: Region, add: (Drawn) -> boolean)
 	if at.leaf ~= nil then
 		local L = Meadow.LEAF
 		add(rec("CurledLeaf", v(L.l + 1, 3.2, L.w + 1), v(at.leaf.x, GT + L.gap + 0.9, at.leaf.z), C.leaf, "Fabric", false, "Ellipsoid", v(0, 15, 0)))
-		add(rec("LeafCurl", v(L.l, 1.2, 2.2), v(at.leaf.x, GT + L.gap + 2.0, at.leaf.z - L.w / 2 + 0.6), C.leafDark, "Fabric", true, "Cylinder", v(0, 15, 0)))
+		add(rec("LeafCurl", v(L.l, 1.2, 2.2), v(at.leaf.x, GT + L.gap + 2, at.leaf.z - L.w / 2 + 0.6), C.leafDark, "Fabric", true, "Cylinder", v(0, 15, 0)))
 		add(rec("LeafVein", v(L.l * 0.9, 0.1, 0.25), v(at.leaf.x, GT + L.gap + L.thick + 0.1, at.leaf.z), "a08454", "Fabric", true, nil, v(0, 15, 0)))
 	end
 	-- the full tier: the forb and the grasses whole, then the thatch and the floor's mottle
@@ -985,7 +985,7 @@ local function patchDecor(patch: Region, add: (Drawn) -> boolean)
 					elseif roll < 0.75 then sprout(x, z, true, false)
 					elseif roll < 0.85 then
 						k += 1
-						add(rec(`Crumb{k}`, v(1.0, 0.4, 0.8), v(x, GT + 0.15, z), "5a4a34", "Ground", true, "Ellipsoid"))
+						add(rec(`Crumb{k}`, v(1, 0.4, 0.8), v(x, GT + 0.15, z), "5a4a34", "Ground", true, "Ellipsoid"))
 					elseif roll < 0.92 then
 						k += 1
 						add(rec(`Seed{k}`, v(0.5, 0.25, 0.3), v(x, GT + 0.3, z), pick({ "6a5a3a", "8a7a52", "3a3024" }, rand), "SmoothPlastic", true, "Ellipsoid", v(0, between(rand, 0, 180), 0)))
@@ -1131,9 +1131,9 @@ function Meadow.bestiary(region: Region): { any }?
 				spot(v(N.x0 + 8, SL + N.lid, N.z0 + 8), Vector3.yAxis, 0.2, 0.6), spot(v(N.x1 - 8, SL + N.lid, N.z0 + 12), Vector3.yAxis, 0.2, 0.6),
 				spot(v(N.x0 - 1, SL + N.top + 1.5, (N.z0 + N.z1) / 2), -Vector3.xAxis, 0.2, 0.5), spot(v(N.x1 + 1, SL + N.top + 1.5, N.z0 + 10), Vector3.xAxis, 0.2, 0.5),
 				spot(v(58, GT + (K.z1 - K.z0), (K.z0 + K.z1) / 2), Vector3.yAxis, 0.1, 0.8), spot(v(K.x1, GT + 3.3, (K.z0 + K.z1) / 2), Vector3.xAxis, 0.1, 0.8),
-				spot(v(25, GT + Q.h, -1021), Vector3.yAxis, 0.1, 0.8),
+				spot(v(25, GT + Q.h, -721), Vector3.yAxis, 0.1, 0.8),
 			}
-			vent = v(60, SL + N.lid + 12, -1074)
+			vent = v(60, SL + N.lid + 12, -774)
 		else
 			list = flowerSpots()
 			vent = (if #list > 0 then list[1][1] :: Vector3 else region.origin) + v(0, 16, 0)
@@ -1169,7 +1169,7 @@ function Meadow.bestiary(region: Region): { any }?
 			local salt = 131
 			table.insert(out, { kind = "moth", profile = "moth_prototype", perches = spots(region, "moth", list, moth.full),
 				vents = { { id = `{region.id}_vent_moth`, position = vent, normal = Vector3.yAxis, appear = true, reach = 60 } }, target = moth.full, low = moth.low,
-				seed = (region.seed + salt * 104729) % MOD, prefix = `{region.id}_moth_fly_`, dusk = { from = 18.0, to = 6.0 } })
+				seed = (region.seed + salt * 104729) % MOD, prefix = `{region.id}_moth_fly_`, dusk = { from = 18, to = 6 } })
 		end
 	end
 	if cricket ~= nil then
@@ -1183,7 +1183,7 @@ function Meadow.bestiary(region: Region): { any }?
 		for i = 1, cricket.perches do
 			for _ = 1, 60 do
 				local x, z = between(rand, lo.X + 6, hi.X - 6), between(rand, lo.Z + 6, hi.Z - 6)
-				local ok = clear(boxes, x, z, 2.0)
+				local ok = clear(boxes, x, z, 2)
 				if ok then for _, q in perches do if (v(x, 0, z) - v(q.position.X, 0, q.position.Z)).Magnitude < 9 then ok = false; break end end end
 				if ok then
 					table.insert(perches, { id = `{region.id}_cricket_{i}`, position = v(x, GT, z), normal = Vector3.yAxis, shelter = 0.7, food = 0.3, start = #perches < cricket.full,
@@ -1195,7 +1195,7 @@ function Meadow.bestiary(region: Region): { any }?
 		local vents = {}
 		if #perches > 1 then table.insert(vents, { id = `{region.id}_vent_cricket`, position = perches[#perches].position, normal = Vector3.yAxis, appear = true, reach = 10 }) end
 		table.insert(out, { kind = "cricket", profile = "cricket_prototype", perches = perches, vents = vents, target = cricket.full, low = cricket.low,
-			seed = (region.seed + salt * 104729) % MOD, prefix = `{region.id}_cricket_fly_`, dusk = { from = 19.0, to = 6.5 } })
+			seed = (region.seed + salt * 104729) % MOD, prefix = `{region.id}_cricket_fly_`, dusk = { from = 19, to = 6.5 } })
 	end
 	-- (the band each kind's flights climb in: from under its lowest perch to 11 cm over its highest, PerchGraph.plan; the sill's 0 to 11 would send them down to it)
 	for _, k in out do
@@ -1225,7 +1225,7 @@ function Meadow.ambient(region: Region): { any }?
 		for _ = 1, 30 do
 			local a, r = between(rand, 0, TAU), between(rand, foot + 3, foot + 30)
 			local x, z = hill.x + math.cos(a) * r, hill.z + math.sin(a) * r
-			if clear(boxes, x, z, 1.0) then
+			if clear(boxes, x, z, 1) then
 				local h = between(rand, 0, TAU)
 				table.insert(spec.starts, { pos = v(x, GT, z), heading = v(math.cos(h), 0, math.sin(h)) })
 				break

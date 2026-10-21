@@ -139,10 +139,10 @@ Hut.WALK = table.freeze({
 	table.freeze({ id = "path_n2", x0 = 412, x1 = 530, z0 = -196, z1 = -146 }),
 	table.freeze({ id = "path_n1", x0 = 295, x1 = 412, z0 = -196, z1 = -146 }),
 	table.freeze({ id = "path_e6", x0 = 200, x1 = 295, z0 = -196, z1 = -146 }),
-	table.freeze({ id = "path_m1", x0 = -90, x1 = -30, z0 = -516, z1 = -416 }),
-	table.freeze({ id = "path_m2", x0 = -90, x1 = -30, z0 = -616, z1 = -516 }),
-	table.freeze({ id = "path_m3", x0 = -90, x1 = -30, z0 = -716, z1 = -616 }),
-	table.freeze({ id = "path_m4", x0 = -90, x1 = -30, z0 = -816, z1 = -716 }),
+	table.freeze({ id = "path_m1", x0 = -90, x1 = -30, z0 = -441, z1 = -416 }),
+	table.freeze({ id = "path_m2", x0 = -90, x1 = -30, z0 = -466, z1 = -441 }),
+	table.freeze({ id = "path_m3", x0 = -90, x1 = -30, z0 = -491, z1 = -466 }),
+	table.freeze({ id = "path_m4", x0 = -90, x1 = -30, z0 = -516, z1 = -491 }),
 })
 
 -- (ROBLOX-118) The ceiling, the back room and the hut's outside to its eaves.
@@ -502,11 +502,11 @@ do
 	seam("path_e6", "garden_b4", v(200, GT, -193), v(200, GT, -149))
 	-- (ROBLOX-118) the meadow path out of the garden's north edge
 	seam("garden_d2", "path_m1", v(-88, GT, -416), v(-32, GT, -416))
-	seam("path_m1", "path_m2", v(-88, GT, -516), v(-32, GT, -516))
-	seam("path_m2", "path_m3", v(-88, GT, -616), v(-32, GT, -616))
-	seam("path_m3", "path_m4", v(-88, GT, -716), v(-32, GT, -716))
+	seam("path_m1", "path_m2", v(-88, GT, -441), v(-32, GT, -441))
+	seam("path_m2", "path_m3", v(-88, GT, -466), v(-32, GT, -466))
+	seam("path_m3", "path_m4", v(-88, GT, -491), v(-32, GT, -491))
 	-- (ROBLOX-119) on into the bench patch at the meadow's edge (World/Meadow's pad_a2, which lists this seam on its side)
-	seam("path_m4", "pad_a2", v(-88, GT, -816), v(-32, GT, -816))
+	seam("path_m4", "pad_a2", v(-88, GT, -516), v(-32, GT, -516))
 	local P = Hut.POLE
 	seam("garden_pole", "garden_b1", v(P.x - P.half, GT, P.z - P.half), v(P.x + P.half, GT, P.z - P.half))
 	seam("garden_pole", "garden_feeder", v(P.x + P.half, GT + P.split, P.z - P.half), v(P.x + P.half, GT + P.split, P.z + P.half))

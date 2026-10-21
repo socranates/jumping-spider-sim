@@ -73,10 +73,10 @@ end
 Bird.SITES = table.freeze({
 	site("lawn_w", "hut_garden", v(-1, 0, -0.4), { { -185, -80 }, { -130, -115 }, { -70, -90 }, { -15, -125 } }),
 	site("lawn_e", "hut_garden", v(1, 0, -0.3), { { 20, -130 }, { 80, -125 }, { 130, -100 }, { 185, -112 } }),
-	site("gravel", "bench", v(0.4, 0, 1), { { -190, -850 }, { -100, -880 }, { -20, -845 }, { 70, -890 } }),
-	site("edge", "meadow", v(-1, 0, 0.5), { { -290, -1126 }, { -180, -1122 }, { -60, -1127 }, { 60, -1123 }, { 170, -1126 } }),
+	site("gravel", "bench", v(0.4, 0, 1), { { -190, -550 }, { -100, -580 }, { -20, -545 }, { 70, -590 } }),
+	site("edge", "meadow", v(-1, 0, 0.5), { { -290, -826 }, { -180, -822 }, { -60, -827 }, { 60, -823 }, { 170, -826 } }),
 	-- (ROBLOX-122) the mown path east from the bench patch toward the pond (World/Pond's mown_e*): the long open way between the meadow and the boardwalk
-	site("path", "ground", v(0.3, 0, 1), { { 300, -982 }, { 560, -975 }, { 820, -985 }, { 1080, -978 }, { 1340, -983 } }),
+	site("path", "ground", v(0.3, 0, 1), { { 110, -682 }, { 150, -675 }, { 190, -685 }, { 230, -678 }, { 270, -683 } }),
 }) :: { Site }
 Bird.GROUND = GT
 

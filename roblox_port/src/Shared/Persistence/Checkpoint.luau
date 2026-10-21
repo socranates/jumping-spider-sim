@@ -89,6 +89,7 @@ local Mate = require(script.Parent.Parent.Predator.Mate)
 local Mating = require(script.Parent.Parent.Life.Mating)
 local Breakaway = require(script.Parent.Parent.Habitat.Breakaway)
 local Nature = require(script.Parent.Parent.Life.Nature)
+local CompactMigration = require(script.Parent.CompactMigration)
 local Checkpoint = {}
 
 Checkpoint.SCHEMA_VERSION = 3
@@ -211,6 +212,7 @@ local function mapRecord(record: any): (MapRecord, { string })
 	elseif next(m.diffs) ~= nil then
 		bad("world: the world has changes this game does not know (nothing in it can change yet)") -- later entries are { kind, region, id, data }, each kind with its own check
 	end
+	if #problems==0 and CompactMigration.applies(out) then out.region=CompactMigration.alias(out.region) end
 	return out, problems
 end
 
@@ -292,7 +294,7 @@ function Checkpoint.capture(world: World, createdAt: number?): ({ [string]: any 
 end
 
 -- The checks on the rebuilt (fresh, not live) world: what a good world must be.
-local function checkWorld(roots: { [string]: any }, problems: { string })
+local function checkWorld(roots: { [string]: any }, problems: { string }, legacyCompact: boolean?)
 	local function bad(t: string) table.insert(problems, t) end
 	for _, name in Checkpoint.ROOTS do
 		if type(roots[name]) ~= "table" then bad(`world: no {name}`) end
@@ -379,8 +381,9 @@ local function checkWorld(roots: { [string]: any }, problems: { string })
 			bad("garden: not a record of regions")
 		else
 			for id, entry in garden do
-				local region = if type(id) == "string" then WorldMap.region(id) else nil
-				local kinds = if region ~= nil then Garden.bestiary(region) else nil
+				local region = if type(id) == "string" then (if legacyCompact then CompactMigration.legacyRegion(id) else WorldMap.region(id)) else nil
+				local kinds: any = if region ~= nil then Garden.bestiary(region) else nil
+				if legacyCompact and region~=nil and region.kind=="verge" then kinds={{kind="springtail"},{kind="housefly"}} end
 				-- (ROBLOX-116: or with woodlice or ambient bugs alone, as the hut garden's lawn has)
 				if region == nil or (Garden.prey(region) == nil and kinds == nil and Garden.bugs(region) == nil and Garden.ambient(region) == nil) then bad(`garden: {tostring(id)} is not a region with prey`); continue end
 				if type(entry) ~= "table" or getmetatable(entry) ~= nil then bad(`garden: {id} is not a record`); continue end
@@ -509,7 +512,16 @@ function Checkpoint.check(record: any, world: World): ({ string }, ObjectRecord.
   if roots.life.growth == nil then roots.life.growth=Growth.new() end
   if roots.life.grantedSeen == nil then roots.life.grantedSeen=roots.needs.grantedTotal end
  end
-	local ok: boolean, err: any = (pcall :: any)(checkWorld, roots, problems)
+	local ok: boolean, err: any = pcall(function()
+		if CompactMigration.applies(map) then
+			CompactMigration.prepareRival(decoded)
+			checkWorld(roots,problems,true) -- Validate before retiring any old route ecology.
+			if #problems==0 then
+				CompactMigration.apply(decoded)
+				checkWorld(roots,problems)
+			end
+		else checkWorld(roots,problems) end
+	end)
 	if not ok then bad("world: " .. tostring(err)) end
 	if #problems > 0 then return problems, nil end
 	return problems, decoded
@@ -537,8 +549,16 @@ function Checkpoint.restore(record: any, world: World): (boolean, { string })
 	local moved = Checkpoint.worldMoved(record)
 	if moved then
 		local home = WorldMap.region(WorldMap.HOME) :: WorldMap.Region
-		local at = (if otherWorld(record) then home else WorldMap.region(mapRecord(record).region) or home).spawn
-		world.motor:respawn(at.pos, at.heading)
+		local map=mapRecord(record)
+		local offset=if CompactMigration.applies(map) then CompactMigration.offset(record.world_map.region) else nil
+		if offset and WorldMap.inBounds(pos+offset,map.region) then
+			world.motor:place(pos+offset,n.Unit,h.Unit)
+			world.motor.gazePitch=p.gaze_pitch
+		else
+			local at = (if otherWorld(record) then home else WorldMap.region(map.region) or home).spawn
+			world.motor:respawn(at.pos, at.heading)
+		end
+		if CompactMigration.applies(map) then world.sensor:reset();world.memory:clear() end
 	else
 		world.motor:place(pos, n.Unit, h.Unit)
 		world.motor.gazePitch = p.gaze_pitch

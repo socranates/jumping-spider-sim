@@ -105,7 +105,7 @@ end)
 case("path shoulders have ground and living populations",function()
  WorldMap.use("preserve")
  local total=0
- for x=-350,550,50 do for z=-1690,-40,50 do
+ for x=-375,175,25 do for z=-1390,-40,25 do
   local r=WorldMap.at(Vector3.new(x,Verge.TOP+.31,z))
   check(r~=nil,`walkable outside the stone path at {x},{z}`)
   total+=1
@@ -125,7 +125,7 @@ case("path shoulders have ground and living populations",function()
  end
  -- Infill must stop before the intentional water hazard rather than putting a floor on the pond.
  for _,v in Verge.author(914,WorldMap.seed) do
-  check(v.bounds[2].Z<=-16 and v.bounds[1].Z>=-2441,"ground infill excludes the hut interior and pond")
+  check(v.bounds[2].Z<=-16 and v.bounds[1].Z>=-1416,"ground infill excludes the hut interior and pond")
  end
  check(total>500,"coverage checks sample ordinary travel, not just landmark spawns")
  WorldMap.use("test_garden")

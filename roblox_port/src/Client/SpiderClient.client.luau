@@ -446,7 +446,7 @@ end
 
 local function showPlan(plan: any)
 	hidePreview()
-	if M.World.map.world()=="preserve" then return end -- Learn the leap from the spider, not a trajectory overlay.
+	if M.World.world=="preserve" then return end -- Learn the leap from the spider, not a trajectory overlay.
 	if not plan or plan.kind == "none" or not plan.point then return end
 	local color = COLORS[plan.kind] or COLORS.none
 	-- Beyond 6 studs from the camera the whole patch grows with the distance (up to four times), so it stays readable;
@@ -1162,7 +1162,7 @@ local function placeTopButton(button: TextButton,r: { x0: number, y0: number, x1
  button.Position=UDim2.fromOffset(r.x0,r.y0);button.Size=UDim2.fromOffset(r.x1-r.x0,r.y1-r.y0)
 end
 local function placeTopButtons()
-	local minimal=M.World.map.world()=="preserve"
+	local minimal=M.World.world=="preserve"
 	menuButton.Visible=not minimal or UIS.TouchEnabled
 	menuButton.Text=if minimal then "≡" else "Menu"
 	notebookButton.Visible=not minimal -- The notebook remains available inside the menu and on N.
@@ -1714,7 +1714,7 @@ local function updateHud(frameDt: number)
 		view = { device = device, status = {}, helpVisible = view.helpVisible, helpText = view.helpText, largeText = view.largeText, captionScale = view.captionScale,
 			prompt = { title = spiderPick.Text.nameLine(appearance), hint = spiderPick.Text.hint(device) } }
 	end
-	view.minimal=M.World.map.world()=="preserve" and not spiderPick.inspecting
+	view.minimal=M.World.world=="preserve" and not spiderPick.inspecting
 	view.helpRequested=helpUntil==math.huge
 	hud:update(view, frameDt)
 end
@@ -1785,7 +1785,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 			-- The wasp runs after the spider has moved and before feeding (Godot: physics priority 8).
 			wasp.enabled = not testPlace or Workspace:GetAttribute("Wasp") == true
             wasp:useGameRules()
-			if M.World.map.world()=="preserve" and wasp:useStationRules() then
+			if M.World.world=="preserve" and wasp:useStationRules() then
 				task.spawn(function() wasp.station.prepare(function() task.wait() end) end)
 			end
 			wasp.nature = not needs.gentle -- (ROBLOX-106: the standard rules' wasp: its windows slide, its visits vary and sometimes linger)
@@ -2265,7 +2265,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	M.Prof.lap("camera")
 	eyes:update(frameDt, focusing)
 	M.Prof.lap("eyes")
-	perceptionHud.gui.Enabled=M.World.map.world()~="preserve"
+	perceptionHud.gui.Enabled=M.World.world~="preserve"
 	if perceptionHud.gui.Enabled then perceptionHud:draw(memory,camera,sightCast,focusing,setting("ShowLastSeen") == true,setting("ShowNoticed") ~= false,M.lock.point) end
 	M.Prof.lap("perception hud")
 	-- Depth of field: on the spider in third person; in the eye view SpiderEyes owns it and focuses on what is looked at.

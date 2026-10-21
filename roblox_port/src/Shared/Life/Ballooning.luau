@@ -8,8 +8,8 @@
 -- restore never rerolls it. Each zone of ZONES has a weight that falls off with its distance from the hut (WEIGHT_M metres: exp(-d / WEIGHT_M)), so the near zones are
 -- the likely ones and the far ones rare; only a zone that is built (`built`, walkable in the preserve: World/Hut, World/Meadow) can be landed in, the others are listed
 -- for when they are, and drop out of the draw. In a built zone the landing is one of its `landings`, regions whose spawn is a place to stand (a spiderling's thread
--- snags on what stands up, and it comes down there). Now: the hut garden (about three quarters of draws), the meadow's edge (most of the rest) and (ROBLOX-122) the
--- pond's edge, 34 m off, rarely (1 of 200 families).
+-- snags on what stands up, and it comes down there). The compact preserve keeps the garden most likely, then the meadow and pond. Their odds follow the actual
+-- relocated home ranges rather than retaining probabilities for the former distant pond.
 --
 -- The ride (`ride`, `at`): RIDE_S seconds from the egg sac in the sill's crack out through the window's sash and up over the garden on the wind, its thread streaming
 -- ahead and above it, then down onto the landing; a seeded drift and a sway, never the same twice for two families and always the same for one.

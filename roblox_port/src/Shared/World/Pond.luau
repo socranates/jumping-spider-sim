@@ -9,13 +9,12 @@
 -- Studs, the sill's frame (World/Preserve: x east, -z north, a stud a centimetre; the ground GROUND as the meadow's and the hut garden's). True scale.
 --
 -- The corridor (walkable at a coarser detail, docs/PARK_WORLD_DESIGN.md section 3):
---   mown_e1..e15 ..... the mown path east from the bench patch's gravel (World/Meadow's pad_b3, its east edge at x 90) along z -930..-1030 (z 14.14..15.14 m), a metre
---                      of short-cut lawn a cell, to x 1590 (x 61.65 m); the backdrop's mown strip either side of it.
---   mown_n1..n14 ..... north from there along x 1490..1590 (x 60.65..61.65 m) to the boardwalk's south face at z -2441 (z 29.25 m).
---   walk_s1..s4, ..... the boardwalk from its west end (x 1490) to the core (x 1825): a deck 1.5 m wide of boards 14 cm wide laid along it with gaps between, 40 cm
+--   mown_e1..e2 ...... two metres east from the bench patch's gravel (pad_b3), x 90..290, z -730..-630.
+--   mown_n1 .......... 86 cm north from there, x 190..290, to the boardwalk's south face at z -816.
+--   walk_s1..s4, ..... the boardwalk from its west end (x 190) to the core (x 525): a deck 1.5 m wide of boards 14 cm wide laid along it with gaps between, 40 cm
 --   walk_n1..n4        over the ground on its fascia, beams and posts, a low kerb rail along each edge on spacer blocks; in two rows (the south five boards and the north
 --                      five), each whole inside the streaming radius. A spider climbs its south fascia from the path.
--- The pond's edge (home range 4, 4 by 4 m: x 1825..2225, z -2441..-2841, that is x 64..68 m, z 29.25..33.25 m), the boardwalk on its south side and the margin north
+-- The pond's edge (home range 4, 4 by 4 m: x 525..925, z -816..-1216), the boardwalk on its south side and the margin north
 -- of it, where the pond's south shore (World/Preserve.POND's ellipse) runs from the north-west to the south-east, so the west is bank and the east is water:
 --   deck_s1..s4, ..... the boardwalk on over the bank and the water's edge (the same deck), its posts down to the mud or the pond's bed.
 --   deck_n1..n4
@@ -74,13 +73,13 @@ Pond.CUT = table.freeze({ GT + 70, GT + 150 }) -- where a cattail stand's leaves
 Pond.STRIP = 20 -- the bank's strips, along x
 local WATER, BED, FLOOR, DECK = Pond.WATER, Pond.BED, Pond.FLOOR, Pond.DECK
 -- the corridor and the core (studs)
-Pond.PATH_E = table.freeze({ x0 = 90, x1 = 1590, z0 = -1030, z1 = -930, n = 15 })
-Pond.PATH_N = table.freeze({ x0 = 1490, x1 = 1590, z0 = -2441, z1 = -1030, n = 14 })
-Pond.WALK_X = table.freeze({ 1490, 1575, 1660, 1745, 1825 })
-Pond.CORE_X = table.freeze({ 1825, 1925, 2025, 2125, 2225 })
-Pond.DECK_Z = table.freeze({ s = table.freeze({ -2516, -2441 }), n = table.freeze({ -2591, -2516 }) })
-Pond.ROW_Z = table.freeze({ a = table.freeze({ -2691, -2591 }), b = table.freeze({ -2791, -2691 }), c = table.freeze({ -2841, -2791 }) })
-Pond.CORE = table.freeze({ x0 = 1825, x1 = 2225, z0 = -2841, z1 = -2441 })
+Pond.PATH_E = table.freeze({ x0 = 90, x1 = 290, z0 = -730, z1 = -630, n = 2 })
+Pond.PATH_N = table.freeze({ x0 = 190, x1 = 290, z0 = -816, z1 = -730, n = 1 })
+Pond.WALK_X = table.freeze({ 190, 275, 360, 445, 525 })
+Pond.CORE_X = table.freeze({ 525, 625, 725, 825, 925 })
+Pond.DECK_Z = table.freeze({ s = table.freeze({ -891, -816 }), n = table.freeze({ -966, -891 }) })
+Pond.ROW_Z = table.freeze({ a = table.freeze({ -1066, -966 }), b = table.freeze({ -1166, -1066 }), c = table.freeze({ -1216, -1166 }) })
+Pond.CORE = table.freeze({ x0 = 525, x1 = 925, z0 = -1216, z1 = -816 })
 local CUT1, CUT2 = Pond.CUT[1], Pond.CUT[2]
 
 -- The palette.
@@ -122,7 +121,7 @@ function Pond.inWater(p: Vector3): boolean
 	if zw == nil or p.Z >= zw then return false end
 	local P = Preserve.POND
 	local xm, zm = Preserve.metres(p)
-	return ((xm - P.x) / P.rx) ^ 2 + ((zm - P.z) / P.rz) ^ 2 < 1.0
+	return ((xm - P.x) / P.rx) ^ 2 + ((zm - P.z) / P.rz) ^ 2 < 1
 end
 
 -- ---------------------------------------------------------------- the regions
@@ -148,7 +147,7 @@ local BOARDS: { { number } } = {}
 do
 	local B = Pond.BOARD
 	for k = 1, B.count do
-		local z1 = -2441 - (k - 1) * (B.w + B.gap)
+		local z1 = -816 - (k - 1) * (B.w + B.gap)
 		table.insert(BOARDS, { z1 - B.w, z1 })
 	end
 end
@@ -235,15 +234,15 @@ local PLAN: { [string]: CellPlan } = {
 Pond.PLAN = PLAN
 -- The cattail stands: each three shoots of leaves in a fan and one flowering stalk with its brown spike, in the shallow water (centres, studs).
 Pond.STANDS = table.freeze({
-	table.freeze({ cell = "a3", x = 2075, z = -2652 }),
-	table.freeze({ cell = "b2", x = 1972, z = -2742 }),
+	table.freeze({ cell = "a3", x = 775, z = -1027 }),
+	table.freeze({ cell = "b2", x = 672, z = -1117 }),
 })
 -- True sizes (studs = cm). Common cattail (Typha latifolia): leaves flat, 1 to 2 cm wide (1.5 here), 1.5 to 2.5 m tall; the brown female spike 15 to 20 cm long on its
 -- stalk, the thin male spike above it. Sedge and soft rush: 45 to 75 cm.
-Pond.CATTAIL = table.freeze({ leafW = 1.5, leafT = 0.35, leafGap = 1.0, leaves = table.freeze({ 150, 172, 196, 214, 186, 160, 205, 178, 220 }), stalk = 0.8, spike = table.freeze({ w = 2.6, from = 150, to = 168 }),
+Pond.CATTAIL = table.freeze({ leafW = 1.5, leafT = 0.35, leafGap = 1, leaves = table.freeze({ 150, 172, 196, 214, 186, 160, 205, 178, 220 }), stalk = 0.8, spike = table.freeze({ w = 2.6, from = 150, to = 168 }),
 	male = table.freeze({ w = 0.6, to = 182 }), shoots = table.freeze({ { 0, 0, "x" } :: { any }, { 6.5, 3.5, "z" }, { -4.5, 6, "x" } }) :: any }) :: any
 Pond.SEDGE = table.freeze({ at = table.freeze({ { 0, 0 }, { 2.2, 1 }, { -1.6, 1.8 }, { 1, -2.2 }, { -2, -1.2 } }), h = table.freeze({ 62, 55, 48, 58, 44 }), half = 0.25 })
-Pond.RUSH = table.freeze({ at = table.freeze({ { 0, 0 }, { 1.4, 0.6 }, { -1.1, 1.2 }, { 0.7, -1.5 }, { -1.4, -0.9 }, { 2.0, -1.0 }, { -0.4, 2.4 } }),
+Pond.RUSH = table.freeze({ at = table.freeze({ { 0, 0 }, { 1.4, 0.6 }, { -1.1, 1.2 }, { 0.7, -1.5 }, { -1.4, -0.9 }, { 2, -1 }, { -0.4, 2.4 } }),
 	h = table.freeze({ 74, 66, 70, 61, 68, 58, 64 }), half = 0.13 })
 Pond.LEAF = table.freeze({ l = 20, w = 2.6, rest = 1.4, gap = 1.4, thick = 0.5 }) -- the dead cattail leaf, broad at its base, lying curled on two old stems
 Pond.SHELTER = table.freeze({ l = 11, w = 9, rest = 2, gap = 1.4, thick = 2.2 }) -- the flat stone on two others
@@ -356,7 +355,7 @@ end
 
 -- The seam that meets World/Meadow's regions (the bench patch's east edge): World/Meadow lists it on pad_b3's side.
 Pond.MEADOW_SEAMS = table.freeze({
-	table.freeze({ meadow = "pad_b3", id = "mown_e1", a = v(90, GT, -1011), b = v(90, GT, -935) }),
+	table.freeze({ meadow = "pad_b3", id = "mown_e1", a = v(90, GT, -711), b = v(90, GT, -635) }),
 })
 for _, s in Pond.MEADOW_SEAMS do seam(s.meadow, s.id, s.a, s.b) end
 
@@ -387,8 +386,8 @@ do
 	end
 	deckSeams("walk", Pond.WALK_X)
 	deckSeams("deck", Pond.CORE_X)
-	seam("walk_s4", "deck_s1", v(1825, DECK, BOARDS[2][1] + 1), v(1825, DECK, BOARDS[2][2] - 1))
-	seam("walk_n4", "deck_n1", v(1825, DECK, BOARDS[9][1] + 1), v(1825, DECK, BOARDS[9][2] - 1))
+	seam("walk_s4", "deck_s1", v(525, DECK, BOARDS[2][1] + 1), v(525, DECK, BOARDS[2][2] - 1))
+	seam("walk_n4", "deck_n1", v(525, DECK, BOARDS[9][1] + 1), v(525, DECK, BOARDS[9][2] - 1))
 	-- under the boardwalk across its two rows, and off its north edge to the margin's ground, and the margin's cells to one another: flat across the ground (the
 	-- bank's strips or the bed under the water) along the longest stretch of their shared edge where both sides' ground is at one height
 	local function across(a: string, b: string, alongX: boolean, at: number, s0: number, s1: number)
@@ -421,11 +420,11 @@ do
 	for _, prefix in { "walk", "deck" } do
 		local xs: { number } = if prefix == "walk" then Pond.WALK_X else Pond.CORE_X
 		for c = 1, #xs - 1 do
-			across(`{prefix}_s{c}`, `{prefix}_n{c}`, true, -2516, xs[c] + 4, xs[c + 1] - 4)
+			across(`{prefix}_s{c}`, `{prefix}_n{c}`, true, -891, xs[c] + 4, xs[c + 1] - 4)
 		end
 	end
 	for c = 1, 4 do
-		across(`deck_n{c}`, `pond_a{c}`, true, -2591, Pond.CORE_X[c] + 16, Pond.CORE_X[c + 1] - 4)
+		across(`deck_n{c}`, `pond_a{c}`, true, -966, Pond.CORE_X[c] + 16, Pond.CORE_X[c + 1] - 4)
 	end
 	for r = 1, 3 do
 		for c = 1, 4 do
@@ -502,7 +501,7 @@ local function clumpPieces(out: { Piece }, base: string, kind: string, x: number
 	local S: any = if kind == "sedge" then Pond.SEDGE else Pond.RUSH
 	for i, o in S.at :: { { number } } do
 		local cx, cz = x + o[1], z + o[2]
-		local top = y0 + S.h[i] * between(rand, 0.93, 1.0)
+		local top = y0 + S.h[i] * between(rand, 0.93, 1)
 		if kind == "rush" then top = math.min(top, CUT1 - 1) end
 		P(out, `{base}_culm_{i}`, cx - S.half, cx + S.half, y0, top, cz - S.half, cz + S.half, "leaf_dry_prototype", pick(if kind == "sedge" then C.sedge else C.rush, rand))
 		if kind == "sedge" and (i == 1 or i == 4) then
@@ -623,10 +622,10 @@ local function deckPieces(region: Region): { Piece }
 	if south then
 		-- the fascia board on the south face, from the lawn to under the boards
 		P(out, id .. "_fascia", x0, x1, GT, under, z1 - 3, z1, "bare_wood_rough", C.boardDark, "Wood")
-		P(out, id .. "_beam", x0, x1, under - 15, under, -2516, -2513, "bare_wood_rough", C.post, "Wood")
+		P(out, id .. "_beam", x0, x1, under - 15, under, -891, -888, "bare_wood_rough", C.post, "Wood")
 	else
 		P(out, id .. "_beam", x0, x1, under - 15, under, z0, z0 + 5, "bare_wood_rough", C.post, "Wood")
-		P(out, id .. "_beam_mid", x0, x1, under - 15, under, -2519, -2516, "bare_wood_rough", C.post, "Wood")
+		P(out, id .. "_beam_mid", x0, x1, under - 15, under, -894, -891, "bare_wood_rough", C.post, "Wood")
 		local px = x0 + 8
 		local foot = -math.huge
 		for _, l in (terrain(px - 5, px + 5, z0, z0 + 10)) do foot = math.max(foot, l.top) end
@@ -1217,7 +1216,7 @@ function Pond.bestiary(region: Region): { any }?
 		local spec: any = { kind = name, profile = profile, perches = spots(region, name, list, row.full),
 			vents = { { id = `{region.id}_vent_{name}`, position = first + v(0, 14, 0), normal = Vector3.yAxis, appear = true, reach = 60 } }, target = row.full, low = row.low,
 			seed = (region.seed + salt * 104729) % MOD, prefix = `{region.id}_{name}_fly_` }
-		if dusk then spec.dusk = { from = 18.5, to = 6.0 } end
+		if dusk then spec.dusk = { from = 18.5, to = 6 } end
 		table.insert(out, spec)
 	end
 	if midge ~= nil then kind("midge", "midge_prototype", midge, 173, 10, 45, 7, true) end
@@ -1249,7 +1248,7 @@ function Pond.ambient(region: Region): { any }?
 		for _ = 1, 40 do
 			local x, z = between(rand, lo.X + 6, hi.X - 6), between(rand, lo.Z + 6, hi.Z - 6)
 			local zw = Pond.waterline(x)
-			if zw ~= nil and z < zw - 4 and clear(boxes, x, z, 2.0) then
+			if zw ~= nil and z < zw - 4 and clear(boxes, x, z, 2) then
 				local h = between(rand, 0, TAU)
 				table.insert(spec.starts, { pos = v(x, WATER, z), heading = v(math.cos(h), 0, math.sin(h)) })
 				break
@@ -1287,7 +1286,7 @@ end
 -- ---------------------------------------------------------------- the dragonfly's beat (drawn only: Client/PondBodies)
 -- A green darner (Anax junius) patrols over the open pond by day: a loop over the water east and north of the core 0.8 to 1.6 m up, at about 2 m a second, with a
 -- seeded weave, darting now and then. A pure function of the seed and the time: where it is, which way it faces, and whether it is out (by day, 8:00 to 19:00).
-Pond.DARNER = table.freeze({ x = 2425, z = -3141, rx = 420, rz = 300, speed = 200, from = 8.0, to = 19.0 })
+Pond.DARNER = table.freeze({ x = 1125, z = -1516, rx = 420, rz = 300, speed = 200, from = 8, to = 19 })
 function Pond.darner(seed: number, t: number, hour: number): (Vector3?, Vector3)
 	local D = Pond.DARNER
 	if hour < D.from or hour >= D.to then return nil, Vector3.xAxis end

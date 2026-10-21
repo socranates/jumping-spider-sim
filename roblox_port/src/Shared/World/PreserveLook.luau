@@ -347,7 +347,7 @@ local function gardenDecor(out: List, rand: () -> number)
 	-- (ROBLOX-116: the east bed starts clear of the core, World/Hut's walkable garden x 43.75..47.75, z 5..9, which has its own beds and the feeder)
 	-- (ROBLOX-118: the herb border along the north is in two, a gap for the path to the meadow, World/Hut's path_m4, x 44.85..45.45)
 	-- (ROBLOX-119: the border's two halves end at the bench patch's gravel, World/Meadow's pad x 43.65..46.65 from z 13)
-	local beds = { { 39, 43.6, 7, 8.4 }, { 47.9, 51.6, 7, 8.4 }, { 38.6, 43.5, 12.4, 13.6 }, { 46.8, 51.6, 12.4, 13.6 } }
+	local beds = { { 39, 43.6, 7, 8.4 }, { 47.9, 51.6, 7, 8.4 }, { 38.6, 43.5, 9.4, 10.6 }, { 46.8, 51.6, 9.4, 10.6 } }
 	for i, b in beds do
 		block(out, "Edging" .. i, b[1], b[2], b[3], b[4], 0, 0.22, C.board, "WoodPlanks", { far = true })
 		block(out, "BedSoil" .. i, b[1] + 0.05, b[2] - 0.05, b[3] + 0.05, b[4] - 0.05, 0.22, 0.24, C.soil, "Ground")
@@ -386,11 +386,11 @@ local function gardenDecor(out: List, rand: () -> number)
 	-- (ROBLOX-116: the bird feeder is World/Hut's, walkable, in the core)
 	-- the split-rail fence along the garden's north side, a gap for the path
 	for i, span in { { 38, 43.5 }, { 46.8, 52 } } do -- (ROBLOX-119: the gap is the bench patch's, x 43.65..46.65)
-		post(out, `RailPost{i}a`, span[1], 14.3, 0, 1.1, 0.14, "7a6a55", "Wood", { far = true })
-		post(out, `RailPost{i}b`, span[2], 14.3, 0, 1.1, 0.14, "7a6a55", "Wood", { far = true })
-		post(out, `RailPost{i}c`, (span[1] + span[2]) / 2, 14.3, 0, 1.1, 0.14, "7a6a55", "Wood", { full = true })
+		post(out, `RailPost{i}a`, span[1], 11.3, 0, 1.1, 0.14, "7a6a55", "Wood", { far = true })
+		post(out, `RailPost{i}b`, span[2], 11.3, 0, 1.1, 0.14, "7a6a55", "Wood", { far = true })
+		post(out, `RailPost{i}c`, (span[1] + span[2]) / 2, 11.3, 0, 1.1, 0.14, "7a6a55", "Wood", { full = true })
 		for k, h in { 0.45, 0.9 } do
-			rod(out, `Rail{i}_{k}`, M(span[1], 14.3, h), M(span[2], 14.3, h), 9, "8a7a62", "Wood", { far = k == 2 })
+			rod(out, `Rail{i}_{k}`, M(span[1], 11.3, h), M(span[2], 11.3, h), 9, "8a7a62", "Wood", { far = k == 2 })
 		end
 	end
 end
@@ -421,40 +421,46 @@ end
 -- ---------------------------------------------------------------- the ground: the mown grass, the meadow's, the wood's and the scrub's floors, the paths, the fences
 -- (ROBLOX-122) The hole the lawn leaves round the pond (metres), the pond's water level and its walkable core and corridor deck (World/Pond: the backdrop draws none of
 -- its own ground or water over them).
-local PONDHOLE = { x0 = 61, x1 = 79, z0 = 29.25, z1 = 45 }
+local PONDHOLE = { x0 = 48, x1 = 66, z0 = 13, z1 = 28.75 }
 local WATER_M = (Pond.WATER - Preserve.GROUND_Y) / 100
 local function walkable(x0: number, x1: number, z0: number, z1: number): boolean
 	local cx0, cx1 = Pond.CORE.x0 / 100 + Preserve.ORIGIN_X_M, Pond.CORE.x1 / 100 + Preserve.ORIGIN_X_M
 	local cz0, cz1 = Preserve.NORTH_FACE_M - (Pond.CORE.z1 - Preserve.NORTH_FACE_Z) / 100, Preserve.NORTH_FACE_M - (Pond.CORE.z0 - Preserve.NORTH_FACE_Z) / 100
 	local inCore = x1 > cx0 + 1e-6 and x0 < cx1 - 1e-6 and z1 > cz0 + 1e-6 and z0 < cz1 - 1e-6
-	local inWalk = x1 > 60.65 + 1e-6 and x0 < cx0 - 1e-6 and z1 > 29.25 + 1e-6 and z0 < 30.75 - 1e-6
+	local wx = Pond.WALK_X[1] / 100 + Preserve.ORIGIN_X_M
+ local wz0 = Preserve.NORTH_FACE_M - (Pond.DECK_Z.s[2] - Preserve.NORTH_FACE_Z) / 100
+ local wz1 = Preserve.NORTH_FACE_M - (Pond.DECK_Z.n[1] - Preserve.NORTH_FACE_Z) / 100
+ local inWalk = x1 > wx + 1e-6 and x0 < cx0 - 1e-6 and z1 > wz0 + 1e-6 and z0 < wz1 - 1e-6
 	return inCore or inWalk
+end
+
+-- Clip every background floor against the pond after relocation, including
+-- meadow tiles. Special-casing the two old grass tiles left dry ground over water.
+local function cutFloor(out: List,id: string,x0: number,x1: number,z0: number,z1: number,y0: number,y1: number,color: string,material: string,flags: Flags?)
+ local H=PONDHOLE
+ local a,b,c,d=math.max(x0,H.x0),math.min(x1,H.x1),math.max(z0,H.z0),math.min(z1,H.z1)
+ if a>=b or c>=d then block(out,id,x0,x1,z0,z1,y0,y1,color,material,flags);return end
+ local pieces={{x0,a,z0,z1},{b,x1,z0,z1},{a,b,z0,c},{a,b,d,z1}}
+ for i,rect in pieces do
+  if rect[2]-rect[1]>1e-6 and rect[4]-rect[3]>1e-6 then
+   block(out,id.."_"..i,rect[1],rect[2],rect[3],rect[4],y0,y1,color,material,flags)
+  end
+ end
 end
 
 local function groundDecor(out: List, rand: () -> number)
 	-- the mown grass under everything: 5 by 3 tiles of 20 m (a part is at most 2,048 studs), their tops at the ground
 	for i = 0, 4 do
 		for j = 0, 2 do
-			-- (ROBLOX-122: the two tiles over the pond leave a hole round it, x 61..79 and z 29.25..45 (PONDHOLE), where the pond's own ground lies lower)
 			local color = if (i + j) % 2 == 0 then C.mown else "698743"
-			if i == 3 and j == 1 then
-				block(out, `Grass{i}_{j}`, 60, 80, 20, PONDHOLE.z0, -0.02, 0, color, "Grass", { far = true })
-				block(out, `Grass{i}_{j}w`, 60, PONDHOLE.x0, PONDHOLE.z0, 40, -0.02, 0, color, "Grass", { far = true })
-				block(out, `Grass{i}_{j}e`, PONDHOLE.x1, 80, PONDHOLE.z0, 40, -0.02, 0, color, "Grass", { far = true })
-			elseif i == 3 and j == 2 then
-				block(out, `Grass{i}_{j}`, 60, 80, PONDHOLE.z1, 60, -0.02, 0, color, "Grass", { far = true })
-				block(out, `Grass{i}_{j}w`, 60, PONDHOLE.x0, 40, PONDHOLE.z1, -0.02, 0, color, "Grass", { far = true })
-				block(out, `Grass{i}_{j}e`, PONDHOLE.x1, 80, 40, PONDHOLE.z1, -0.02, 0, color, "Grass", { far = true })
-			else
-				block(out, `Grass{i}_{j}`, i * 20, i * 20 + 20, j * 20, j * 20 + 20, -0.02, 0, color, "Grass", { far = true })
-			end
+            cutFloor(out, `Grass{i}_{j}`, i*20, i*20+20, j*20, j*20+20, -0.02, 0, color, "Grass", {far=true})
 		end
 	end
 	-- the floors laid over it (4 mm up): the meadow's tawny ground, the wood's leaf litter, the scrub's
 	for i = 0, 1 do
 		for j = 0, 1 do
 			-- (ROBLOX-119: 2 mm up, under World/Meadow's walkable floor at the meadow's edge, 4 mm up)
-			block(out, `MeadowFloor{i}_{j}`, 25 + i * 17.5, 25 + (i + 1) * 17.5, 18 + j * 15, 18 + (j + 1) * 15, 0, 0.002, C.meadowFloor, "Grass", { far = true })
+			cutFloor(out, `MeadowFloor{i}_{j}`, 25 + i * 17.5, 25 + (i + 1) * 17.5, 18 + j * 15, 18 + (j + 1) * 15, 0, 0.002, C.meadowFloor, "Grass", { far = true })
 		end
 	end
 	for j = 0, 2 do
@@ -503,7 +509,8 @@ local function nearCore(x: number, z: number, r: number): boolean
 	local K = Meadow.CORE
 	local x0, x1 = K.x0 / 100 + Preserve.ORIGIN_X_M, K.x1 / 100 + Preserve.ORIGIN_X_M
 	local z0, z1 = Preserve.NORTH_FACE_M - (K.z1 - Preserve.NORTH_FACE_Z) / 100, Preserve.NORTH_FACE_M - (K.z0 - Preserve.NORTH_FACE_Z) / 100
-	return x + r > x0 and x - r < x1 and z + r > z0 and z - r < z1
+	return (x + r > x0 and x - r < x1 and z + r > z0 and z - r < z1)
+  or (x+r>PONDHOLE.x0 and x-r<PONDHOLE.x1 and z+r>PONDHOLE.z0 and z-r<PONDHOLE.z1)
 end
 local function meadowDecor(out: List, rand: () -> number)
 	local mx, mz = Preserve.MEADOW.x, Preserve.MEADOW.z
@@ -595,7 +602,7 @@ local function pondDecor(out: List, rand: () -> number)
 			local cuts = { { z0, z1 } }
 			if walkable(x, x + 1, z0, z1) then
 				local cz1 = Preserve.NORTH_FACE_M - (Pond.CORE.z0 - Preserve.NORTH_FACE_Z) / 100
-				local over = if x >= 63.999 then cz1 else 30.75
+				local over = if x >= 50.999 then cz1 else 14.5
 				cuts = { { math.max(z0, over), z1 } }
 			end
 			for k, c in cuts do
@@ -629,7 +636,7 @@ local function pondDecor(out: List, rand: () -> number)
 		if z > P.z - P.rz * 0.6 then
 			m += 1
 			local h = between(rand, 1.5, 2.3)
-			blob(out, "Reeds" .. m, x, z, h * 0.42, between(rand, 1.0, 1.9), h, between(rand, 0.8, 1.4), pick(C.reed, rand), { far = m <= 12, full = m > 9 })
+			blob(out, "Reeds" .. m, x, z, h * 0.42, between(rand, 1, 1.9), h, between(rand, 0.8, 1.4), pick(C.reed, rand), { far = m <= 12, full = m > 9 })
 			for c = 1, 2 do
 				post(out, `Cattail{m}_{c}`, x + between(rand, -0.4, 0.4), z + between(rand, -0.3, 0.3), h * 0.62, h * 0.62 + 0.22, 0.03, C.cattail, "Fabric", { full = true })
 			end
@@ -639,27 +646,9 @@ local function pondDecor(out: List, rand: () -> number)
 	-- (ROBLOX-122: from its west end to x 68 it is World/Pond's, walkable: the backdrop's deck lies under its boards there (a stand-in until they are streamed) and its
 	-- posts and seams begin east of it)
 	local deckTop = (Pond.DECK - Pond.BOARD.thick - Preserve.GROUND_Y) / 100 - 0.002
-	block(out, "Boardwalk", 60.65, 79, 29.25, 30.75, deckTop - 0.06, deckTop, C.board, "WoodPlanks", { far = true })
-	for k = 0, 6 do
-		local x = 61.2 + k * 2.93
-		if x > 68.1 then
-			post(out, `WalkPost{k}a`, x, 29.3, 0, deckTop - 0.06, 0.12, C.boardDark, "Wood")
-			post(out, `WalkPost{k}b`, x, 30.7, WATER_M - 0.03, deckTop - 0.06, 0.12, C.boardDark, "Wood", { full = true })
-		end
-	end
-	for k = 1, 14 do
-		local x = 61 + k * 18 / 15
-		if x > 68.05 then block(out, "Seam" .. k, x - 0.006, x + 0.006, 29.26, 30.74, deckTop, deckTop + 0.002, "5a4a38", "WoodPlanks", { full = true }) end
-	end
-	block(out, "Platform", 68, 71, 30.75, 33.25, 0.34, 0.4, C.board, "WoodPlanks", { far = true })
-	-- (ROBLOX-122: open rails, a top rail and a mid rail on posts, where there were solid panels a spider's eye read as walls)
-	for _, x in { 68.03, 70.97 } do
-		block(out, `RailTop{x}`, x - 0.03, x + 0.03, 30.75, 33.25, 0.94, 1.0, C.boardDark, "Wood")
-		block(out, `RailMid{x}`, x - 0.025, x + 0.025, 30.75, 33.25, 0.66, 0.71, C.boardDark, "Wood", { full = true })
-		for _, z in { 30.8, 32.0, 33.2 } do post(out, `RailPost{x}_{z}`, x, z, 0.4, 1.0, 0.07, C.boardDark, "Wood") end
-	end
-	block(out, "RailNorth", 68, 71, 33.19, 33.25, 0.94, 1.0, C.boardDark, "Wood", { far = true })
-	for k, x in { 68.1, 70.9 } do post(out, "PlatformPost" .. k, x, 33.1, WATER_M - 0.2, 0.34, 0.12, C.boardDark, "Wood", { full = true }) end
+	block(out, "Boardwalk", 47.65, 55, 13, 14.5, deckTop - 0.06, deckTop, C.board, "WoodPlanks", { far = true })
+	-- Actual boards, posts and edges come from Pond. Do not draw an enticing
+	-- continuation or dipping platform beyond the playable collision geometry.
 end
 
 -- ---------------------------------------------------------------- the woodland (x 0..18, z 5..55): the bur oak, the maples, the black cherry, the log pile

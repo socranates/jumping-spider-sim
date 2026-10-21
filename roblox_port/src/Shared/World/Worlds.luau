@@ -24,7 +24,7 @@ Worlds.ATTRIBUTE = "World"
 -- as the test garden's). The test garden's is WorldMap.REVISION, as it always was.
 Worlds.LIST = table.freeze({
 	test_garden = table.freeze({ id = "test_garden", name = "The Test Garden", revision = "world-3" }),
-	preserve = table.freeze({ id = "preserve", name = "The Preserve", revision = "preserve-2" }), -- (ROBLOX-118: the path round the east end moved round the back room)
+	preserve = table.freeze({ id = "preserve", name = "The Preserve", revision = "preserve-3" }), -- Compact meadow/pond layout; old saves migrate through CompactMigration.
 }) :: { [string]: World }
 
 -- The ids in a fixed order (the test garden first).

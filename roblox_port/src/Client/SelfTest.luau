@@ -24,7 +24,7 @@
 -- walkable place is the ranger hut's sill, the garden's checks (the line from the outer sill, the bed's prey and woodlice and frames, the wall's moths) give way to
 -- the hut's sill (its boxes whole, the Decor without the test garden's view, the hut's look held whole at the tier's detail) and the backdrop near and far (the
 -- looks planned at the sill hold the hut whole and the railway far; planned at the railway's crest, the railway whole and the hut back to its far look; then
--- planned at the sill again, as they were) and the trains (a pass's cars drawn on the line). The lock is taken with a controller's L2 tap too (ROBLOX-115).
+-- planned at the sill again, as they were) and the trains (a pass's cars drawn on the line). The lock is taken with a controller's L1 creep/lock press too (ROBLOX-127).
 -- ROBLOX-117: in the preserve also the garden's near detail (the patches drawn by the spider in the mulch within the budgets, the dew shown at dawn and gone by noon) and the
 -- garden's rival and mate (each put where it comes into the garden, the spider beside its cell: it walks there, in the garden; both put back after).
 -- ROBLOX-118: in the preserve also the ceiling and the upper walls (up the west wall past 1.3 m, round onto the ceiling's underside, hanging there), the back room (through the
@@ -553,15 +553,15 @@ local function checks(): { Check }
 			ctx.input:simulate("Recenter", true); pause(r, 0); ctx.input:simulate("Recenter", false)
 			need(lock.trackId == nil, "Recentre again did not let go")
 		end
-		-- (ROBLOX-115) a controller's L2: a tap locks onto what the spider sees, a tap again lets go
+		-- (ROBLOX-127) L1 holds creep and locks onto what the spider sees; a second press lets go
 		if waitUntil(r, 3, sees, 0) then
-			ctx.input:simulate("PadLock", true); pause(r, 0); ctx.input:simulate("PadLock", false)
+			ctx.input:simulate("Creep", true, Enum.KeyCode.ButtonL1); need(ctx.input.held.Creep == true, "L1 did not hold creep"); pause(r, 0); ctx.input:simulate("Creep", false, Enum.KeyCode.ButtonL1)
 			pause(r, 0)
-			need(lock.trackId ~= nil, "an L2 tap did not lock onto what the spider sees")
-			ctx.input:simulate("PadLock", true); pause(r, 0); ctx.input:simulate("PadLock", false)
+			need(lock.trackId ~= nil, "an L1 press did not lock onto what the spider sees")
+			ctx.input:simulate("Creep", true, Enum.KeyCode.ButtonL1); need(ctx.input.held.Creep == true, "L1 did not hold creep"); pause(r, 0); ctx.input:simulate("Creep", false, Enum.KeyCode.ButtonL1)
 			pause(r, 0)
-			need(lock.trackId == nil, "an L2 tap again did not let go")
-			say(r, "INFO lock: L2's tap locks and lets go")
+			need(lock.trackId == nil, "a second L1 press did not let go")
+			say(r, "INFO lock: L1 holds creep, locks on press, and lets go on the next press")
 		end
 	end)
 

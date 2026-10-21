@@ -53,6 +53,31 @@ check("the rival comes on day 2 after a meal, walks on its own motor over the si
 	local root = rig:FindFirstChild("Root") or rig:FindFirstChildWhichIsA("BasePart")
 	assert(root and (root.Position - life.rival.position).Magnitude < 1.0, "the drawn rival is not where the rival is")
 end)
+check("the male's display (ROBLOX-127): winding up near the spider it spreads legs I and its chelicerae on the drawn rig, and the simulation's place is untouched", function()
+	local driver = ClientStubs.driver
+	local life = driver.life
+	local r = life.rival
+	assert(r and r.state ~= "dormant" and r.state ~= "consumed", "a rival to watch")
+	local rig = driver.rivalLegs.rig
+	assert(rig ~= nil and driver.rivalLegs.display ~= nil, "the rival's rig has no display")
+	local pos = driver.motor.pos
+	r.state, r.elapsed, r.notice = "windup", 0, 1
+	r.position, r.previous = pos + Vector3.new(2.5, 0, 0), pos + Vector3.new(2.5, 0, 0)
+	r.heading = Vector3.new(-1, 0, 0)
+	frames(1)
+	local seen = {}
+	for _ = 1, 24 do
+		frames(1)
+		seen[driver.rivalLegs.display.phase] = true
+	end
+	local pose = rig.threat
+	assert(pose ~= nil and pose == driver.rivalLegs.display.pose, "the rig is not given the display's pose")
+	assert(seen.spread or seen.retreat or seen.hold, "no display while it wound up: " .. tostring(driver.rivalLegs.display.phase))
+	assert(pose.presence > 0.2 and (pose.legs > 0.2 or pose.lower > 0.2), `the pose barely shows ({pose.presence})`)
+	assert((rig.root.Position - r.position).Magnitude < 1.0, "the drawn rival left the rival's place")
+	r.state, r.elapsed, r.notice = "recover", 0, 0
+	frames(60)
+end)
 check("the wasp takes the rival (ROBLOX-70): it is drawn hanging under the wasp, the spider is not hunted, the rival is gone for the day and comes again next morning", function()
 	local driver = ClientStubs.driver
 	local life = driver.life

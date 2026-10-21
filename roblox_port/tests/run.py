@@ -179,6 +179,7 @@ MODULES = [
     ("Catch", "Data/Catch.luau"),
     ("Feeding", "Prey/Feeding.luau"),
     ("RivalGrip", "Predator/RivalGrip.luau"),
+    ("RivalDisplay", "Predator/RivalDisplay.luau"),
     ("PreyDirector", "Prey/PreyDirector.luau"),
     ("Woodlouse", "Prey/Woodlouse.luau"),
     ("Ladybird", "Prey/Ladybird.luau"),

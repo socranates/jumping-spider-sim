@@ -605,5 +605,51 @@ do -- a grip is its own: the seed carries how many grips this rival has had (kep
  local old=R.new();old.grips=nil;check(R.valid(old),"an older record has none (it means none yet)")
  local used=R.new();used.grips=5;R.renew(used);check(used.grips==0,"a new rival starts again")
 end
+-- ROBLOX-127: the male's contest display (Predator/RivalDisplay): pure, display only, seeded. Each state shows its act; the skitters' rhythm is the same for the same
+-- record and differs between bouts; Reduced Motion has no skitter and no tremor; a backing-off event gives the smaller a retreat and the bigger a hold; and the
+-- display touches nothing of the rival's record (the rules' outcomes are as they were: every check above runs with it absent).
+do
+ local D=require("../src/Shared/Predator/RivalDisplay")
+ local function run(state,dist,seconds,extra)
+  local d=D.new()
+  local i={state=state,distance=dist,event="",smaller=true,seed=914,day=3,contests=0,leg=15,reduced=false}
+  for k,v in extra or {} do i[k]=v end
+  local p,lat,maxLat
+  maxLat=0
+  for f=1,math.floor(seconds*60+.5) do
+   p=D.step(d,1/60,i);i.event=""
+   maxLat=math.max(maxLat,math.abs(p.lateral))
+  end
+  return p,d,maxLat
+ end
+ local p=run("patrol",3,2);check(p.presence==0 and p.phase=="none","a patrolling rival shows no display")
+ p=run("stalk",7,2);check(p.presence==0,"stalking beyond 6 studs: none yet")
+ local f,_,lat=run("stalk",5,2);check(f.phase=="faceoff" and f.legs>0.8 and f.reach<0.01 and f.spread>0.3 and f.spread<0.4 and lat>0.04 and lat<=D.SKITTER.amplitude+1e-9,`the face-off: legs I up and forward, the chelicerae a little open, skitters within {D.SKITTER.amplitude} studs ({lat})`)
+ local w=run("windup",2,1);check(w.phase=="spread" and w.legs>0.99 and w.reach>0.99 and w.spread>0.99 and w.rear>0,"the windup: legs I high and spread, the chelicerae wide, the body raised")
+ local near=run("stalk",4,2);check(near.phase=="spread","stalking within 4.4 studs: the full display")
+ local g=run("lunge",1,0.5);check(g.phase=="grapple" and g.hook>0.99 and g.reach<0.01,"the lunge: legs I forward and down, hooking")
+ local back=run("recover",3,1,{event="sprang"});check(back.phase=="retreat" and back.lower>0.99 and back.legs<0.01 and math.abs(back.yaw)>math.rad(20),"after it sprang clear the smaller backs off: low, legs down, turned away")
+ local hold=run("recover",3,1,{event="missed",smaller=false});check(hold.phase=="hold" and hold.legs>0.5 and hold.lower<0.01,"the bigger holds its ground")
+ local later=run("recover",3,3.5,{event="counter"});check(later.phase=="none","the retreat lasts as long as the recover (3 s)")
+ local quiet,_,ql=run("windup",2,1,{reduced=true});check(ql==0 and quiet.tremor==0 and quiet.legs>0.99,"Reduced Motion: the pose, no skitter or tremor")
+ -- seeded: the same record gives the same skitters; another day or bout another rhythm
+ local function trace(day,bouts)
+  local d=D.new();local out={}
+  local i={state="stalk",distance=5,event="",smaller=true,seed=914,day=day,contests=0,leg=15,reduced=false}
+  for b=1,bouts do
+   i.state="stalk";for _=1,90 do table.insert(out,D.step(d,1/60,i).lateral) end
+   i.state="patrol";for _=1,60 do D.step(d,1/60,i) end
+  end
+  return out,d
+ end
+ local a,da=trace(3,2);local b=trace(3,2);local c=trace(4,2)
+ local same,differs,bouts=true,false,false
+ for k=1,#a do same=same and a[k]==b[k];differs=differs or math.abs(a[k]-c[k])>1e-6 end
+ for k=1,90 do bouts=bouts or math.abs(a[k]-a[k+90])>1e-6 end
+ check(same and differs and bouts and da.bout==2,"the skitters are seeded: the same record repeats them, another day or another bout does not")
+ check(D.stream(914,3,0,15,1):next()==D.stream(914,3,0,15,1):next(),"its stream is a pure function of the record")
+ local r0=R.new();local before=R.valid(r0);local d0=D.new();D.step(d0,1/60,{state=r0.state,distance=1,event="",smaller=true,seed=914,day=2,contests=r0.contests,leg=r0.leg})
+ check(before and R.valid(r0) and r0.state=="dormant" and r0.contests==0,"the display reads the record and changes nothing in it")
+end
 print(`RIVAL passed={passed} failed={failed}`)
 if failed>0 then error("rival tests failed") end

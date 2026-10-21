@@ -96,6 +96,7 @@ type Leg = {
 type Fixed = {
 	part: Part, offset: CFrame, group: number, palp: number?, sweep: number?, glance: boolean?, big: boolean?,
 	pos: Vector3, rot: CFrame, scaled: CFrame, size0: Vector3, size: Vector3,
+	jaw: number?, pivot: Vector3?, -- (ROBLOX-127) a chelicera or a fang: its side, and the point at the chelicera's base it swings out about in the rival's display
 }
 
 -- The parts of one BulkMoveTo and where each goes: a rig makes two a frame, the body's and the hairs' (the hairs' only when they moved).
@@ -422,7 +423,7 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		local offset = CFrame.new(at) * (rot or CFrame.identity)
 		local entry: Fixed = {
 			part = part, offset = offset, group = group, palp = palp, sweep = nil, glance = nil, big = nil,
-			pos = offset.Position, rot = offset.Rotation, scaled = offset, size0 = Vector3.zero, size = Vector3.zero,
+			pos = offset.Position, rot = offset.Rotation, scaled = offset, size0 = Vector3.zero, size = Vector3.zero, jaw = nil, pivot = nil,
 		}
 		table.insert(self._fixed, entry)
 		return entry
@@ -540,6 +541,15 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		eye.Reflectance = e.reflectance
 		eye.CastShadow = false
 		fixed(eye, e.at, nil, G_HEAD).glance = e.principal
+		-- (ROBLOX-127) depth: the lens lets a little light through onto a dark retina set back in the eye (look.eye.ame.lens; the full tier's `retina`)
+		local lens = if e.principal and look.eye.ame then look.eye.ame.lens else nil
+		if lens and cfg.retina then
+			eye.Transparency = lens.transparency
+			local rt = lens.retina
+			local retina = ellipsoid(model, "Retina", e.radii * rt.scale, color(rt.color), fabric)
+			retina.CastShadow = false
+			fixed(retina, e.at + Vector3.new(0, 0, e.radii.Z * rt.depth), nil, G_HEAD).glance = true
+		end
 		if e.principal and cfg.sockets then
 			local socket = ellipsoid(model, "EyeSocket", e.radii * look.eye.ame.socket.scale, SOCKET, fabric)
 			socket.CastShadow = false
@@ -553,10 +563,13 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		fixed(glint, g.at, nil, G_HEAD).glance = tubercle == nil -- (the catchlights of the big front eyes; a tarantula's are on its tubercle's beads)
 	end
 	local cl = look.chelicerae
+	local jawPivot: { [number]: Vector3 } = {}
 	for _, j in A.jaws do
-		local fang = ellipsoid(model, "Chelicera", j.radii, FANG, Enum.Material.Foil)
+		local fang = ellipsoid(model, "Chelicera", j.radii, if cl.color then color(cl.color) else FANG, Enum.Material.Foil) -- (ROBLOX-127: a colour of their own, the bold jumper's green)
 		fang.Reflectance = cl.reflectance
-		fixed(fang, j.at, CFrame.Angles(cl.pitch, 0, j.side * cl.splay), G_HEAD)
+		local entry = fixed(fang, j.at, CFrame.Angles(cl.pitch, 0, j.side * cl.splay), G_HEAD)
+		jawPivot[j.side] = j.at + Vector3.new(0, j.radii.Y * 0.75, j.radii.Z * 0.3) -- the chelicera's base, high at the back, where it joins the face
+		entry.jaw, entry.pivot = j.side, jawPivot[j.side]
 	end
 	-- Fangs (look.fang): chains of dark, glossy ellipsoids hanging from the chelicerae's lower front, each segment turned along its own direction.
 	for _, f in A.fangs do
@@ -564,7 +577,8 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 		local tooth = ellipsoid(model, "Fang", f.radii, if look.fang.color then color(look.fang.color) else FANG, Enum.Material.Foil)
 		tooth.Reflectance = look.fang.reflectance
 		tooth.CastShadow = false
-		fixed(tooth, f.at, CFrame.lookAt(Vector3.zero, f.dir), G_HEAD)
+		local entry = fixed(tooth, f.at, CFrame.lookAt(Vector3.zero, f.dir), G_HEAD)
+		entry.jaw, entry.pivot = f.side, jawPivot[f.side] -- (a fang goes where its chelicera goes)
 	end
 	-- Pedipalps: stalk, pale band, club and pale tip, rotating about a pivot at the base (they drum when the spider stands).
 	local pl = look.palp
@@ -751,6 +765,19 @@ function SpiderRig.new(parent: Instance, worldFolder: Instance, appearanceId: st
 				table.insert(leg.hairs, entry)
 				table.insert(leg.segs[spec.segment].hairs, entry)
 			end
+			-- (ROBLOX-127) the fringe: longer hairs of their own width standing out from the link's sides (look.fuzz.legFringe), one in `every.legFringe` kept
+			local keepFringe = cfg.every.legFringe or 1
+			for n, spec in Setae.legFringe(look, i) do
+				if keepFringe <= 0 or n % keepFringe ~= 0 then continue end
+				local c, sn, lie = math.cos(spec.theta), math.sin(spec.theta), spec.lift or 1
+				local width = spec.width or fuzz.legWidth
+				local entry: LegHair = {
+					part = seta(spec.tone, width, width, spec.length, spec.transparency or fuzz.legTransparency), spec = spec, c = c, s = sn, k = 0.9,
+					dir = Vector3.new(math.cos(lie), math.sin(lie) * c, math.sin(lie) * sn),
+				}
+				table.insert(leg.hairs, entry)
+				table.insert(leg.segs[spec.segment].hairs, entry)
+			end
 		end
 	end
 	if look.legGloss then -- the Greenbottle blue's legs are a little glossy
@@ -858,7 +885,7 @@ function SpiderRig.setSoftness(self: Rig, value: number)
  self._softness=s
  for p,c in self._colors do
   -- The eyes stay dark and readable; pigment returns as the skin hardens.
-  if p.Material~=Enum.Material.Glass and p.Name~="Catchlight" then p.Color=c:Lerp(Color3.new(0.88,0.82,0.69),s*0.72) end
+  if p.Material~=Enum.Material.Glass and p.Name~="Catchlight" and p.Name~="Retina" then p.Color=c:Lerp(Color3.new(0.88,0.82,0.69),s*0.72) end
  end
 end
 function SpiderRig.setCondition(self: Rig, energy: number)
@@ -1064,8 +1091,14 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 	end
 	-- A tarantula's threat display and silk mat (ROBLOX-82): the drawn body pivots about its up axis (the root and the collider do not); what else
 	-- the pose does (rears the prosoma, raises legs I and the palps, swings the spinnerets) is further down.
-	local threatPose = if self._appearance.threat ~= nil then self.threat else nil
+	-- (ROBLOX-127) the rival's contest display (look.contest, a RivalDisplay pose) goes the same way, with a sideways step of the drawn body (`lateral`, studs at scale 1:
+	-- the zigzag), legs I between three places (`reach`, `hook`), the chelicerae spread (`spread`) and a crouch (`lower`).
+	local tc = self._appearance.threat or self._appearance.contest
+	local threatPose = if tc ~= nil then self.threat else nil
 	local threatening = threatPose ~= nil and threatPose.presence > 0
+	if threatening and (threatPose.lateral or 0) ~= 0 then
+		body = body * CFrame.new(threatPose.lateral * self._growth, 0, 0)
+	end
 	if threatening and threatPose.yaw ~= 0 then
 		body = body * CFrame.Angles(0, threatPose.yaw, 0)
 	end
@@ -1243,7 +1276,13 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 	end
 	if threatening then
 		palp1, palp2 = palp1 + threatPose.palps, palp2 + threatPose.palps
+		local sink = (threatPose.lower or 0) * (if tc.lower then tc.lower else 0)
+		if sink ~= 0 then -- backing off: the whole drawn body low to the surface (the planted feet stay where they are)
+			local down = body * CFrame.new(0, -sink * g, 0) * body:Inverse()
+			bodyBase, headBase, abdomenBase, prosoma = down * bodyBase, down * headBase, down * abdomenBase, down * prosoma
+		end
 	end
+	local spreadAngle = if threatening and tc.spreadDeg then math.rad(tc.spreadDeg) * (threatPose.spread or 0) else 0
  if self._hang > 0 and hang ~= nil then -- hanging: the palps are drawn in toward the jaws
   local tuck = -math.rad(hang.palpTuckDeg) * self._hang
   palp1, palp2 = palp1 + tuck, palp2 + tuck
@@ -1279,9 +1318,13 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 		else
 			local offset, edited = f.offset, false
 			if f.glance == true and glanced then offset, edited = CFrame.new(glanceAt) * offset, true end
+			if spreadAngle ~= 0 and f.jaw ~= nil and f.pivot ~= nil then
+				-- The rival's display: each chelicera (and its fang) swings out about its base, the tip outward and a little apart (ROBLOX-127).
+				local side, at = f.jaw, f.pivot
+				offset, edited = CFrame.new(at) * CFrame.Angles(0, -side * spreadAngle * 0.35, side * spreadAngle) * CFrame.new(-at) * offset, true
+			end
 			if sweeping and f.sweep ~= nil then
 				-- A spinneret segment swings side to side about a point just inside the abdomen's rear tip (the second segment farther).
-				local tc = look.threat
 				local at = A.spinneret - Vector3.new(0, 0, tc.sweepBack)
 				offset, edited = CFrame.new(at) * CFrame.Angles(0, threatPose.sweep * (if f.sweep > 1 then tc.tipSweep else 1), 0) * CFrame.new(-at) * offset, true
 			end
@@ -1452,9 +1495,11 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 			knee = knee:Lerp(raisedKnee, antPose.antennae)
 		end
 		-- The threat posture: legs I go up and out in front of the reared prosoma, trembling a little; the planted foot below is untouched.
-		local tc = look.threat
 		if threatening and tc ~= nil and leg.pair == tc.pair and threatPose.legs > 0 then
 			local upAt = Vector3.new(leg.side * tc.up.x, tc.up.y + threatPose.tremor * tc.tremor, tc.up.z)
+			local reach, hook = threatPose.reach or 0, threatPose.hook or 0
+			if reach > 0 and tc.wide then upAt = upAt:Lerp(Vector3.new(leg.side * tc.wide.x, tc.wide.y + threatPose.tremor * tc.tremor, tc.wide.z), reach) end -- (ROBLOX-127: high and spread)
+			if hook > 0 and tc.hook then upAt = upAt:Lerp(Vector3.new(leg.side * tc.hook.x, tc.hook.y, tc.hook.z), hook) end -- (forward and down, grappling)
 			local raised = prosoma:PointToWorldSpace(upAt * g)
 			foot = foot:Lerp(raised, threatPose.legs)
 			local raisedKnee = hip:Lerp(raised, 0.5) + prosoma.RightVector * (leg.side * tc.kneeOut * g) + up * (tc.kneeUp * g)

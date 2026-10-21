@@ -20,7 +20,7 @@ export type Hair = {
 	at: Vector3, dir: Vector3, normal: Vector3, length: number, width: number, thick: number, transparency: number,
 	kind: string, group: string, side: number, tone: string, white: boolean, grey: boolean, frost: boolean,
 }
-export type LegHair = { segment: number, t: number, theta: number, length: number, tone: string, white: boolean, grey: boolean, frost: boolean, lift: number? }
+export type LegHair = { segment: number, t: number, theta: number, length: number, tone: string, white: boolean, grey: boolean, frost: boolean, lift: number?, width: number?, transparency: number? } -- (width, transparency: a fringe's own, ROBLOX-127)
 export type Patch = { x: number, z: number, rx: number, rz: number, angle: number }
 
 local GOLDEN = 2.399963229728653
@@ -350,6 +350,38 @@ function Setae.leg(look: any, legIndex: number): { LegHair }
 				length = f.legLength * (0.7 + 0.6 * hash(i, 5)) * (if segment == 3 then 0.6 elseif front then 1.4 else 1),
 				tone = tone, white = tone == "white", grey = tone == "grey", frost = tone == "frost",
 				lift = if f.legLift then math.rad(between(f.legLift, hash(i, 7))) else nil, -- (legLift: the hair lies at this angle off the leg, toward the foot)
+			})
+		end
+	end
+	return out
+end
+
+-- The fringe on a leg (ROBLOX-127; look.fuzz.legFringe): longer hairs standing out from the sides and underside of a link, leaning toward the foot, the fringes a
+-- bold jumping spider has on its first legs (and a male's heavier and, in the rival, dark). `pairs[pair]` gives the count on the femur, tibia and tarsus; the hairs
+-- are spread over the middle of the link (0.15 to 0.9 of it), one side and then the other between `edge`'s two angles (degrees from the top of the leg). Legs 5 to 8
+-- mirror 1 to 4 as Setae.leg's do. The same LegHair shape: SpiderRig draws them with the leg's own hairs, and a tier keeps one in `every.legFringe`.
+function Setae.legFringe(look: any, legIndex: number): { LegHair }
+	local out: { LegHair } = {}
+	local f = look.fuzz
+	local spec = if f and f.enabled then f.legFringe else nil
+	if spec == nil then return out end
+	local twin = (legIndex - 1) % 4 + 1
+	local mirror = if legIndex > 4 then -1 else 1
+	local counts = spec.pairs[twin]
+	if counts == nil then return out end
+	local bare = if f.hipBare then f.hipBare[twin] else 0
+	for segment = 1, 3 do
+		local n = counts[segment] or 0
+		for k = 1, n do
+			local i = twin * 1000 + segment * 100 + k
+			local t = 0.15 + 0.75 * (k - 0.5) / n
+			if segment == 1 then t = bare + (1 - bare) * t end -- (as the leg's own hairs: none on the femur's bare stretch by the face, where the anterior lateral eyes are)
+			local theta = mirror * (if k % 2 == 0 then 1 else -1) * math.rad(between(spec.edge, hash(i, 51)))
+			table.insert(out, {
+				segment = segment, t = t, theta = theta,
+				length = between(spec.length, hash(i, 53)) * (if segment == 1 then 0.8 else 1),
+				tone = spec.tone, white = spec.tone == "white", grey = spec.tone == "grey", frost = spec.tone == "frost",
+				lift = math.rad(between(spec.lift, hash(i, 57))), width = spec.width, transparency = spec.transparency,
 			})
 		end
 	end

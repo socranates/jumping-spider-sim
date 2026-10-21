@@ -1082,3 +1082,34 @@ in 200). **Nothing of it has run in Studio.**
 - The frog is one of two danger kinds the design names for the pond; the fishing spider (which does run on the water) waits for a later round, as do mayflies, rain and worms.
 - The bank is boxes in steps (strips 20 cm wide, three levels): honest to walk, blocky to look at from close. Meshes from Blender would make it a slope.
 - The mown path is coarse (cut lawn with a few tufts): the design's corridor detail. Say if it should be as rich as the cores.
+
+## The spiders: the first spider's chelicerae, eyes and fringe; the male rival and its display; her male mate (ROBLOX-127, 2026-10-21)
+
+All drawing; no rule, record, outcome or word changed (`docs/DECISIONS.md` ROBLOX-127). The first spider keeps the daughter's pattern exactly and gains black-green
+iridescent chelicerae (the bold jumper's), a see-through front lens over a dark retina (full tier) and a pale fringe on legs I's tibiae (full tier). The rival is now drawn as a
+male tan jumping spider (*Platycryptus undatus*): tan carapace with dark sides, an orange band under the front eyes, a slim dark abdomen with grey chevrons, mottled legs, long dark
+fringed legs I, big forward chelicerae with fangs, white-haired swollen palps, 9.1 mm. It displays as males do (`Predator/RivalDisplay`): a face-off with legs I up within 6 studs,
+the full display (legs I high and spread, chelicerae open, sideways skitters) within 4.4 studs and through its windup, a grapple pose in the lunge, and after a miss, a dodge, a
+bite or a tear-free it backs off low and turned away if it is the smaller, or holds with legs half up if it is the bigger. The first spider's mate is a male with her pattern and
+a male's build. Previews (Godot, not Roblox): the scratchpad's `sp_preview/before` and `sp_preview/after`.
+
+## Your Studio checklist (ROBLOX-127)
+
+1. **The first spider close** (Inspect mode, full tier on a PC): are the chelicerae green where the light catches them and black elsewhere? Do the front eyes look deep (a dark
+   brown inside the glass) or milky? If milky, say so: the lens transparency is one number (`eye.ame.lens.transparency`, 0.32). Can you see the pale fringe on the front legs?
+2. **The rival** (day 2 after a meal, in the hut garden): screenshot it near and at play distance. Does it read as a different, male spider (tan, slim, long dark front legs,
+   orange under the eyes)? Is the grey chevron pattern visible or lost?
+3. **Its display**: let it stalk you. Within about 6 studs its front legs should come up and forward and it should skitter side to side; closer, and in its crouch before the lunge,
+   legs high and spread and its jaws open; in the lunge, legs forward and down. Dodge the lunge (jump away): it should back off, low and turned away. Play the peacock spider (it is
+   smaller than the rival): it should hold its ground instead. Say whether it reads as a contest and whether it is too much or too little.
+4. **The frame**: the self-test's sill frame was 45 to 49 fps; the rival is now 211 parts at the tier it is drawn at (262 before). Note the frame with the rival displaying close.
+5. **The mate** (an adult, fed, after a rest): the male mate should be slimmer with longer, heavier front legs than her.
+
+## Open for Nathan (ROBLOX-127)
+
+- The species for the rival is a choice (the tan jumping spider of walls and trunks, fitting the hut); the male look beyond what its sources say (fringes, chelicerae, leg length)
+  is the general salticid male look, honestly worded. Say if you want a different rival species, or a male bold jumper (which would look like her).
+- The contest is drawn on the rival's rules, not a new rule: the rival still stalks, crouches and lunges as before. A real contest where the smaller backs off *instead of*
+  attacking would change outcomes; say if you want that as a rule (seeded, tested) in a later round.
+- The first spider is the game's female (ROBLOX-79); the sources' contests are male against male. The rival meets her with the same ritual.
+- Her green chelicerae are a new colour beside the daughter's design (her pinned values are unchanged). If she wants them black, it is one line (`chelicerae.color`).

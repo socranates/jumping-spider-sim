@@ -59,6 +59,7 @@ SRC = HERE.parent / "src" / "Shared"
 # Shared modules in dependency order: name -> path under src/Shared.
 MODULES = [
     ("Environment", "World/Environment.luau"),
+    ("AntForage", "World/AntForage.luau"),
     ("DogGait", "Rig/DogGait.luau"),
     ("Appearances", "Data/Appearances.luau"),
     ("Species", "Data/Species.luau"),

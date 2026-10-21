@@ -8,6 +8,7 @@ local DayLight=require(Shared.Habitat.DayLight)
 local DogGait=require(Shared.Rig.DogGait)
 local DogGround=require(Shared.World.DogGround)
 local Meshes=require(Shared.Data.Meshes)
+local AntForage=require(Shared.World.AntForage)
 local LivingWorld={}
 LivingWorld.__index=LivingWorld
 LivingWorld.BUDGET={full=420,low=150}
@@ -51,6 +52,7 @@ function LivingWorld.rig(self: any,kind: string,index: number): any
   ell("Thorax",Vector3.new(.09,.09,.14),"493025")
   ell("Abdomen",Vector3.new(.14,.13,.20),"241b18")
   for j=1,8 do table.insert(r.parts,self:part(folder,if j<=6 then "Leg"..j else "Antenna"..j,Vector3.new(.20,.018,.018),"38241a")) end
+  ell("CarriedFragment",Vector3.new(.10,.07,.12),"b5a57c")
  end
  return r
 end
@@ -269,23 +271,23 @@ function LivingWorld.small(self: any,pos: Vector3,region: any,state: any,reduced
    end
   end
  end
- local hill=Sites.ANTHILLS[region.id]
+ local hill=Sites.nearAnthill(pos)
  for i,r in self.ants do
-  local on=hill~=nil and state.rain<.5 and state.solar.daylight>.15;visible(r,on)
+  local seconds=if reduced then 0 else state.totalHours*75
+  local pose=AntForage.sample(seconds,i);r.pose=pose
+  local on=hill~=nil and state.rain<.5 and state.solar.daylight>.15 and pose.visible;visible(r,on)
   if on then
-   local t=if reduced then i*2 else state.totalHours*30+i*2.3
-   local distance=2+(math.sin(t*.4)+1)*7
-   local dx,dz=math.sin(t*.2+i)*distance,math.cos(t*.2+i)*distance
-   local size=math.max(math.abs(dx),math.abs(dz))
-   local height=if size<2 then 2.2 elseif size<3.5 then 1.6 elseif size<5 then .8 else 0
-   local at=hill.at+Vector3.new(dx,height+.11,dz)
-   local frame=CFrame.lookAt(at,at+Vector3.new(math.cos(t*.2+i),0,-math.sin(t*.2+i)))
+   local at=hill.at+pose.offset+Vector3.new(0,Sites.antHeight(pose.offset)+.11-pose.burrow,0)
+   local frame=CFrame.lookAt(at,at+pose.heading)
    for j=1,3 do r.parts[j].CFrame=frame*CFrame.new(0,0,(j-2)*.13) end
    for j=1,6 do
-    local side=if j%2==0 then 1 else -1;local wave=if reduced then 0 else math.sin(t*13+j)*.18
+    local side=if j%2==0 then 1 else -1;local wave=if reduced or not pose.moving then 0 else math.sin(seconds*TAU*3+j)*.18
     r.parts[j+3].CFrame=frame*CFrame.new(side*.12,-.04,(math.ceil(j/2)-2)*.09)*CFrame.Angles(0,side*.5+wave,side*.3)
    end
-   for j=1,2 do r.parts[9+j].CFrame=frame*CFrame.new((if j==1 then -1 else 1)*.07,.05,-.23)*CFrame.Angles(0,(if j==1 then -.4 else .4),0) end
+   local feel=if reduced or pose.mode~="forage" then 0 else math.sin(seconds*5+i)*.16
+   for j=1,2 do r.parts[9+j].CFrame=frame*CFrame.new((if j==1 then -1 else 1)*.07,.05,-.23)*CFrame.Angles(0,(if j==1 then -.4-feel else .4+feel),0) end
+   r.parts[12].CFrame=frame*CFrame.new(0,.015,-.28)
+   r.parts[12].Transparency=if pose.carrying then 0 else 1
   end
  end
 end

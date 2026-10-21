@@ -2,19 +2,36 @@
 -- Additive, stable landmarks. Existing pieces/retreats never move. One stud is one centimetre.
 -- An empty unbranded can is a hollow climbable shell, not a solid invisible cylinder.
 local Pocket=require(script.Parent.GardenPocket)
+local AntForage=require(script.Parent.AntForage)
 local Sites = {}
 Sites.CANS = table.freeze({
  hut_floor_i = table.freeze({id="ranger_can",at=Vector3.new(124,-70,226),color="647b6d"}),
  room_floor_b = table.freeze({id="volunteer_can",at=Vector3.new(333,-70,36),color="a45c47"}),
 }) :: {[string]: any}
 Sites.ANTHILLS=table.freeze({garden_b1=table.freeze({id="garden_ant_nest",at=Vector3.new(-182,-84.6,-205)})}) :: {[string]: any}
+-- Low overlapping soil caps avoid the old separated pancake silhouette.
+local caps={{10,.5,-.05},{7,.65,.075},{4,.7,.25}}
+function Sites.antHeight(offset: Vector3): number
+ local height=0
+ for _,cap in caps do
+  local radius=cap[1]/2;local q=(offset.X^2+offset.Z^2)/(radius*radius)
+  if q<=1 then height=math.max(height,cap[3]+cap[2]*.5*math.sqrt(1-q)) end
+ end
+ return height
+end
+function Sites.nearAnthill(pos: Vector3): any
+ for _,hill in Sites.ANTHILLS do
+  if math.abs(pos.Y-hill.at.Y)<12 and (Vector3.new(pos.X,hill.at.Y,pos.Z)-hill.at).Magnitude<40 then return hill end
+ end
+ return nil
+end
 function Sites.pieces(region: any): {any}
  if region.id==Pocket.REGION then return Pocket.pieces() end
  local hill=Sites.ANTHILLS[region.id]
  if hill then
   local out: {any}={}
-  for i,layer in {{10,.8},{7,.8},{4,.6}} do
-   local y=if i==1 then 0 elseif i==2 then .8 else 1.6
+  for i,layer in {{10,.2},{4.8,.2},{2.6,.2}} do
+   local y=(i-1)*.2
    table.insert(out,{id=hill.id.."_tier"..i,lo=hill.at+Vector3.new(-layer[1]/2,y,-layer[1]/2),
     hi=hill.at+Vector3.new(layer[1]/2,y+layer[2],layer[1]/2),profile="bare_wood_rough",color=Color3.fromHex("77604a"),material="Ground"})
   end
@@ -49,12 +66,18 @@ function Sites.decor(region: any): {any}
  if hill then
   local out: {any}={}
   for i,p in Sites.pieces(region) do
-   table.insert(out,{id=p.id.."_earth",size=p.hi-p.lo,at=(p.lo+p.hi)*.5,color=p.color,material="Ground",shape="Ellipsoid",shadow=true})
+   local cap=caps[i]
+   table.insert(out,{id=p.id.."_earth",size=Vector3.new(cap[1],cap[2],cap[1]),at=hill.at+Vector3.new(0,cap[3],0),color=p.color,material="Sand",shape="Ellipsoid",shadow=true})
   end
-  table.insert(out,{id=hill.id.."_entrance",size=Vector3.new(.8,.025,.7),at=hill.at+Vector3.new(0,2.215,0),color=Color3.fromHex("241c15"),shape="Ellipsoid"})
+  table.insert(out,{id=hill.id.."_entrance",size=Vector3.new(.8,.025,.7),at=hill.at+Vector3.new(0,.615,0),color=Color3.fromHex("241c15"),shape="Ellipsoid"})
   for i=1,12 do
    local angle=i*2.39996;local radius=2.1+(i%4)*.7
-   table.insert(out,{id=hill.id.."_grain"..i,size=Vector3.new(.22,.17,.27),at=hill.at+Vector3.new(math.cos(angle)*radius,.16,math.sin(angle)*radius),color=Color3.fromHex("8b7151"),shape="Ball",full=true})
+   local offset=Vector3.new(math.cos(angle)*radius,0,math.sin(angle)*radius)
+   table.insert(out,{id=hill.id.."_grain"..i,size=Vector3.new(.22,.17,.27),at=hill.at+offset+Vector3.new(0,Sites.antHeight(offset)+.06,0),color=Color3.fromHex("8b7151"),shape="Ball",full=i>4})
+  end
+  for i=1,8 do
+   local route=AntForage.route(i)
+   table.insert(out,{id=hill.id.."_forage_fragment"..i,size=Vector3.new(.13,.08,.18),at=hill.at+route.direction*route.distance+Vector3.new(0,.04,0),color=Color3.fromHex("b5a57c"),shape="Ellipsoid",full=i>3})
   end
   return out
  end

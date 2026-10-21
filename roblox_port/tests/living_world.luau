@@ -8,6 +8,7 @@ local LivingWorld=require("../src/Client/LivingWorld")
 local Verge=require("../src/Shared/World/Verge")
 local Garden=require("../src/Shared/World/Garden")
 local Pocket=require("../src/Shared/World/GardenPocket")
+local AntForage=require("../src/Shared/World/AntForage")
 local passed,failed=0,0
 local function check(ok,name)
  if ok then passed+=1 else failed+=1;print("FAIL LIVING_WORLD "..name) end
@@ -118,6 +119,94 @@ case("new props are additive and the cans are truly hollow",function()
  check(#Sites.pieces(hill)==3 and #Sites.decor(hill)>3,"garden ant nest has climbable earth and surface detail")
  WorldMap.use("test_garden")
  check(#Sites.pieces(WorldMap.region("sill"))==0,"nursery geometry remains untouched")
+end)
+case("ambient workers forage, carry fragments home and re-enter the nest",function()
+ for index=1,8 do
+  local route=AntForage.route(index)
+  local period=AntForage.sample(0,index).period
+  local modes={};local bounded,continuous,oriented,loads=true,true,true,true
+  local previous=nil;local furthest=0
+  for step=0,math.ceil(period/.025) do
+   local t=step*.025;local p=AntForage.sample(t,index)
+   modes[p.mode]=true;furthest=math.max(furthest,p.offset.Magnitude)
+   bounded=bounded and finite(p.offset.X) and finite(p.offset.Z) and p.offset.Magnitude<15.5
+   if previous and previous.visible and p.visible then continuous=continuous and (p.offset-previous.offset).Magnitude<.065 end
+   if p.moving and p.offset.Magnitude>.4 then
+    local dot=p.heading:Dot(route.direction)
+    oriented=oriented and (if p.mode=="return" then dot<-.9 else dot>.9)
+   end
+   loads=loads and (not p.carrying or (p.mode=="return" and p.visible))
+   previous=p
+  end
+  check(bounded and continuous,"worker stays on a bounded continuous trail")
+  check(oriented and loads,"worker faces its route and only carries food home")
+  check(modes.inside and modes.outbound and modes.forage and modes["return"],"worker has a complete nest/forage cycle")
+  check(math.abs(furthest-route.distance)<.01,"forage pause reaches the authored ground fragment")
+  local a,b=AntForage.sample(7.25,index),AntForage.sample(7.25+period,index)
+  check((a.offset-b.offset).Magnitude<1e-6 and a.mode==b.mode,"restoring the same clock reconstructs the worker")
+ end
+ WorldMap.use("preserve")
+ local region=WorldMap.region("garden_b1");local hill=Sites.ANTHILLS[region.id]
+ local worst=0
+ for x=-5.5,5.5,.25 do for z=-5.5,5.5,.25 do
+  local ground=0
+  for _,p in Sites.pieces(region) do
+   if hill.at.X+x>=p.lo.X and hill.at.X+x<=p.hi.X and hill.at.Z+z>=p.lo.Z and hill.at.Z+z<=p.hi.Z then ground=math.max(ground,p.hi.Y-hill.at.Y) end
+  end
+  worst=math.max(worst,math.abs(ground-Sites.antHeight(Vector3.new(x,0,z))))
+ end end
+ check(worst<.26,"low mound's physical/visible height difference stays below body clearance")
+ local caps={};for _,d in Sites.decor(region) do if string.find(d.id,"_earth",1,true) then table.insert(caps,d) end end
+ local joined=true
+ for x=-5,5,.5 do for z=-5,5,.5 do
+  local top=Sites.antHeight(Vector3.new(x,0,z))
+  for y=.01,top,.025 do
+   local filled=false
+   for _,cap in caps do
+    local q=hill.at+Vector3.new(x,y,z)-cap.at
+    if (q.X/(cap.size.X*.5))^2+(q.Y/(cap.size.Y*.5))^2+(q.Z/(cap.size.Z*.5))^2<=1+1e-6 then filled=true end
+   end
+   joined=joined and filled
+  end
+ end end
+ check(joined,"drawn soil caps join the ground without air gaps between discs")
+ check(Sites.nearAnthill(hill.at+Vector3.new(25,.31,0))==hill,"workers remain visible across nearby region boundaries")
+ check(Sites.nearAnthill(hill.at+Vector3.new(41,.31,0))==nil,"ambient workers stay local")
+ WorldMap.use("test_garden")
+end)
+case("colony renderer shows loads, pauses and weather shelter at both tiers",function()
+ WorldMap.use("preserve")
+ local region=WorldMap.region("garden_b1");local hill=Sites.ANTHILLS[region.id]
+ local root=Instance.new("Folder");root.Parent=workspace;WorldBuild.region(region,root)
+ local pos=hill.at+Vector3.new(8,.31,0)
+ for _,tier in {"full","low"} do
+  local living=LivingWorld.new(workspace,root,tier,WorldMap)
+  local state=Environment.sample(1,12);state.rain=0;state.solar.daylight=1
+  local carried,foraged,hidden=false,false,false
+  local loadsMatch=true
+  for step=0,200 do
+   state.totalHours=step*.25/75;living:small(pos,region,state,false)
+   for _,ant in living.ants do
+    carried=carried or (ant.shown and ant.pose.carrying)
+    foraged=foraged or (ant.shown and ant.pose.mode=="forage")
+    hidden=hidden or (not ant.shown and ant.pose.mode=="inside")
+    if ant.shown then loadsMatch=loadsMatch and ((ant.parts[12].Transparency==0)==ant.pose.carrying) end
+   end
+  end
+  check(carried and foraged and hidden,tier.." actually renders the full foraging story")
+  check(loadsMatch,tier.." fragment is visible only on a returning worker")
+  living:small(pos,region,state,true)
+  local still={};for i,ant in living.ants do still[i]=ant.parts[1].Position end
+  state.totalHours+=1;living:small(pos,region,state,true)
+  for i,ant in living.ants do check((ant.parts[1].Position-still[i]).Magnitude<1e-6,"Reduced Motion freezes worker travel") end
+  state.rain=.8;living:small(pos,region,state,false)
+  for _,ant in living.ants do check(not ant.shown,"workers shelter during heavy rain") end
+  state.rain=0;state.solar.daylight=0;living:small(pos,region,state,false)
+  for _,ant in living.ants do check(not ant.shown,"colony quietens after dark") end
+  check(living.count<=LivingWorld.BUDGET[tier],tier.." added mouth fragments retain renderer budget")
+  living:destroy()
+ end
+ root:Destroy();WorldMap.use("test_garden")
 end)
 case("path shoulders have ground and living populations",function()
  WorldMap.use("preserve")

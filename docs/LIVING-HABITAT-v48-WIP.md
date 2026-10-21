@@ -90,6 +90,12 @@ Working branch: `codex/v48-living-habitat`, based on v47 receipt commit `9d442ff
 - Dust now uses low overlapping clumps and bent horizontal fibres at the same seven/three part cost. The station doorway shares adjoining floor scatter, fixing dust disappearing during an approach across that region boundary.
 - Living-world checks 3,748/0; strict analysis clean; 206/206 compile. Native evidence and explicit limits are in `docs/verification/v48/INTERIOR-REVIEW.md`. Fleas still need a convincing ordinary-play encounter; no v48 release or final performance claim is made.
 
+### Colony and emergence follow-up
+
+- Ambient workers now emerge, forage, carry fragments home and re-enter the nest. The mound is a connected low soil heap with small support steps, grains and an entrance. Nearby region crossings no longer hide its workers. The three support IDs remain; this unreleased prop's heights/inner footprints were refined. Physical/visible height difference is sampled below 0.26 cm.
+- Living-world checks 3,842/0, clean strict analysis and 207/207 compile. Native full-detail inspection shows workers and mouth fragments; a normal-camera grub encounter is captured. See `docs/verification/v48/COLONY-REVIEW.md` for scope and limits.
+- Frozen 55-suite run on `4a828e0` remains in progress at `C:\Users\natha\claude-xfer\v48-full-4a828e0-results`. It has already found mating-client failures and notebook assertions tied to the old moult threshold. This is not a green release gate; investigate before publishing. The frozen run does not include the later colony source.
+
 ## Platform judgment
 
 Roblox limits density, draw calls, memory and simulation cost, especially on phones. The current barren travel and missing ground are implementation/design problems. Compact, authored habitats with reused meshes, bounded active wildlife and selective detail remain a viable direction. No engine migration is needed to address these reported problems.

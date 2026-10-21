@@ -15,7 +15,7 @@ local CatBody = {}
 CatBody.__index = CatBody
 
 -- The recordings (assets/audio/cat_bell.wav, assets/audio/cat_purr.wav from tools/make_cat_sounds.py): "" until Nathan uploads them; no voice is made for an empty id.
-CatBody.SOUNDS = { bell = "", purr = "" } :: { [string]: string }
+CatBody.SOUNDS = { bell = "rbxassetid://78706177142395", purr = "rbxassetid://81495950754571" } :: { [string]: string }
 CatBody.SHADOW = 6 -- parts at least this wide cast a shadow
 
 function CatBody.new(parent: Instance, detail: string): any

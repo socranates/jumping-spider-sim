@@ -191,13 +191,13 @@ end
 
 -- The retreat checkpoint, now (the end of a tick).
 function LifeLoop.makeCheckpoint(self: any): CheckpointResult
-	local result: CheckpointResult = if self.save then self.save() else { ok = false, message = "no checkpoint store" }
+	local result: CheckpointResult = if self.save then self.save() else { ok = false, message = "There is nowhere to keep a rest" }
 	self.checkpointResult = result
 	if result.ok then
 		self.checkpoints += 1
 		self:showNotice(result.message)
 	else
-		self:showNotice("Resting, but the checkpoint was not kept: " .. result.message)
+		self:showNotice("Resting, but this is not kept as your last rest. " .. result.message .. ".") -- (ROBLOX-92: the message is in the game's words, LifeText.restRefusal)
 	end
 	if self.morningText ~= "" then
 		self:showNotice(self.morningText .. "\n" .. self.notice)
@@ -252,7 +252,7 @@ function LifeLoop.load(self: any, r: any): boolean
 	self.morningText = ""
 	self.restoreGrace = LifeLoop.RESTORE_GRACE_TICKS
 	self:applyLight()
-	self:showNotice("Returned to the checkpoint: the sill as it was when you rested in the crack. This is checkpoint recovery, not an exact resume.")
+	self:showNotice("Returned to your last rest: the sill as it was when you rested in the crack. This is a return to the rest, not an exact resume.")
 	return true
 end
 

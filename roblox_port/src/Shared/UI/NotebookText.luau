@@ -4,6 +4,7 @@
 -- so tests/notebook.luau checks them (and the layout at phone, tablet and desktop sizes) without Roblox. Button names come from
 -- ControlText (PlayStation names on a PlayStation controller).
 local ControlText = require(script.Parent.ControlText)
+local TarantulaText = require(script.Parent.TarantulaText)
 
 local NotebookText = {}
 
@@ -15,10 +16,11 @@ NotebookText.PAGES = "Pages"
 NotebookText.MENU_CHOICE = "Notebook"
 NotebookText.BUTTON = "Notebook"
 
--- Fills {reel}, {letGo}, {drop}, {focus} (any ControlText action name) in a page's "In this game" line with the device's name for it.
+-- Fills {reel}, {letGo}, {drop}, {focus}, {display} (any ControlText action name) in a page's "In this game" line with the device's name for it. {display} is the
+-- display key (ROBLOX-92: the tarantula page's rear-up); on touch its button is the tarantulas' own, "Rear up", not the peacock's "Dance".
 function NotebookText.fill(text: string, device: ControlText.Device): string
 	local out = string.gsub(text, "{(%w+)}", function(action: string): string
-		local name = ControlText.name(device, action)
+		local name = if action == "display" and device == "touch" then TarantulaText.touchDisplay(false) else ControlText.name(device, action)
 		return if name ~= "" then name else "{" .. action .. "}"
 	end)
 	return out
@@ -31,6 +33,15 @@ function NotebookText.gameLine(game: string, device: ControlText.Device): string
 	end
 	
 	return NotebookText.GAME .. NotebookText.fill(game, device)
+end
+
+-- ROBLOX-89: the lines the game has added to a page ("Day 4: ..."), under the page's "In this game" line, or nil when there are none.
+NotebookText.SEEN = "Things you saw:"
+function NotebookText.seenText(entries: { { day: number, text: string } }): string?
+	if #entries == 0 then return nil end
+	local lines = { NotebookText.SEEN }
+	for _, e in entries do table.insert(lines, e.text) end
+	return table.concat(lines, "\n")
 end
 
 -- "Source: x" for one source, "Sources:\nx\ny" for several. The links stay in the text as they are.
@@ -118,7 +129,10 @@ NotebookText.TRY = {
  {id="home_before_dark",text="Sleep in the crack through a night."},
  {id="new_skin",text="Eat, then rest when ready to moult."},
  {id="grown_up",text="Grow through three moults."},
- {id="peacock_dance",text="Change to the peacock while resting, then dance outside."},
+ {id="peacock_dance",text="Change to the peacock (in Settings, or while resting), then dance outside."},
+ {id="walking_like_an_ant",text="Change to the ant mimic (in Settings, or while resting), then stand still."},
+ {id="eggs_and_wind",text="Raise a family: court a mate, guard the sac, watch the hatching."},
+ {id="tarantula_cousins",text="Change to a tarantula (in Settings, or while resting), then rear up outside."},
 }
 function NotebookText.checklist(book:any):string
  local lines={}

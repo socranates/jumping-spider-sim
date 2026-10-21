@@ -4,13 +4,18 @@ local OldSkins={}
 OldSkins.__index=OldSkins
 function OldSkins.new(parent: Instance): any
  local folder=Instance.new("Folder");folder.Name="OldSkins";folder.Parent=parent
- return setmetatable({folder=folder,key=""},OldSkins)
+ return setmetatable({folder=folder,last=nil},OldSkins)
 end
+-- Called every frame: the skins are made again only when the list has changed (ROBLOX-113: compared place by place against the last list kept, where a key string
+-- was formatted every frame before; the places are where moults happened and never move).
 function OldSkins.draw(self: any,positions: {Vector3})
- local key=""
- for _,p in positions do key..=string.format("%.5f,%.5f,%.5f;",p.X,p.Y,p.Z) end
- if key==self.key then return end
- self.key=key;self.folder:ClearAllChildren()
+ local last=self.last
+ if last~=nil and #last==#positions then
+  local same=true
+  for i,p in positions do if last[i]~=p then same=false;break end end
+  if same then return end
+ end
+ self.last=table.clone(positions);self.folder:ClearAllChildren()
  for i,p in positions do
   local center=p+Vector3.new((i-2)*0.23,-0.25,0.06*(i-1))
   local function piece(name: string,size: Vector3,cf: CFrame)

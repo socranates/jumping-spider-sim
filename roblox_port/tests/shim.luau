@@ -61,9 +61,19 @@ CFrame.__index = function(c, k)
 	if k == "Rotation" then return cf(Vector3.zero, c._x, c._y, c._z) end
 	return rawget(CFrame, k)
 end
-local function rot(c, v) return c._x * v.X + c._y * v.Y + c._z * v.Z end
+-- c._x * v.X + c._y * v.Y + c._z * v.Z, written out by component (ROBLOX-108: the same sums in the same order, so the same bits, without the four Vector3s
+-- in between; the drawn rigs turn thousands of frames a tick and this was most of the suites' time)
+local function rot(c, v)
+	local x, y, z = c._x, c._y, c._z
+	local a, b, d = v.X, v.Y, v.Z
+	return new(x.X * a + y.X * b + z.X * d, x.Y * a + y.Y * b + z.Y * d, x.Z * a + y.Z * b + z.Z * d)
+end
 CFrame.__mul = function(a, b)
-	if getmetatable(b) == Vector3 then return a._p + rot(a, b) end
+	if getmetatable(b) == Vector3 then
+		local p, x, y, z = a._p, a._x, a._y, a._z
+		local u, w, t = b.X, b.Y, b.Z
+		return new(p.X + (x.X * u + y.X * w + z.X * t), p.Y + (x.Y * u + y.Y * w + z.Y * t), p.Z + (x.Z * u + y.Z * w + z.Z * t))
+	end
 	return cf(a._p + rot(a, b._p), rot(a, b._x), rot(a, b._y), rot(a, b._z))
 end
 CFrame.__add = function(a, v) return cf(a._p + v, a._x, a._y, a._z) end
@@ -153,6 +163,8 @@ end })
 -- ---------------------------------------------------------------- Instances: folders and parts
 local Instance = {}
 local Object = {}
+-- What the engine would be asked to do, counted for the tests that measure the drawn rigs' cost: parts' Size writes, and BulkMoveTo calls and the parts they move.
+local counters = { sizeWrites = 0, bulkCalls = 0, bulkParts = 0 }
 local BASE_PARTS = { Part = true, WedgePart = true, MeshPart = true }
 local HAS_CFRAME = { Part = true, WedgePart = true, MeshPart = true, Camera = true }
 local function children(o) return rawget(o, "_children") end
@@ -163,14 +175,46 @@ local function newSignal()
 	function sig.Wait(_self) return 0 end
 	return sig
 end
-local EVENTS = { InputBegan = true, InputEnded = true, InputChanged = true, Activated = true, MouseButton1Click = true, Changed = true }
+-- ROBLOX-108: the queries' cache (see `boxes` below). `structure` counts the changes to which queryable parts are in the workspace and in what order (a
+-- queryable part, or a container holding one, put in or taken out of the workspace's tree, a part's CanQuery changed there); `entries` holds, for every
+-- queryable part a query has seen, its box ({part, lo, hi}), kept up to date when it moves; a part that moves after it was seen is `mobile` from then on.
+local queryCache = { structure = 0, mobile = 0, rebuilds = 0, filters = 0, queries = 0, entries = setmetatable({}, { __mode = "k" }) :: any, all = nil :: any, allAt = -1, filtered = {} :: any }
+local workspaceRef: any = nil
+local function inWorkspace(o): boolean
+	local p = o
+	while p ~= nil do
+		if p == workspaceRef then return true end
+		p = rawget(p, "_parent")
+	end
+	return false
+end
+local function holdsQueryable(o): boolean
+	local q = rawget(o, "_canQuery")
+	if q ~= nil and q ~= false then return true end -- a queryable part (one that turns queryable later says so through its CanQuery)
+	for _, c in children(o) do if holdsQueryable(c) then return true end end
+	return false
+end
+local function moved(o)
+	local e = queryCache.entries[o]
+	if e == nil then return end
+	local half = o.Size / 2
+	local p = o.Position
+	e.lo, e.hi = p - half, p + half
+	if not e.mobile then e.mobile = true; queryCache.mobile += 1 end
+end
+local EVENTS = { InputBegan = true, InputEnded = true, InputChanged = true, Activated = true, MouseButton1Click = true, Changed = true, OnServerEvent = true }
 Object.__index = function(o, k)
+	if k == "Size" then
+		local s = rawget(o, "_size")
+		if s ~= nil then return s end
+	end
 	if EVENTS[k] then
 		local sig = newSignal()
 		rawset(o, k, sig)
 		return sig
 	end
 	if k == "Parent" then return rawget(o, "_parent") end
+	if k == "CanQuery" then return rawget(o, "_canQuery") end
 	if k == "Position" then local c = rawget(o, "_cframe") return c and c.Position end
 	if k == "CFrame" then return rawget(o, "_cframe") end
 	return rawget(Object, k)
@@ -178,6 +222,7 @@ end
 Object.__newindex = function(o, k, v)
 	if k == "Parent" then
 		local old = rawget(o, "_parent")
+		if old ~= v and (inWorkspace(old) or inWorkspace(v)) and holdsQueryable(o) then queryCache.structure += 1 end
 		if old then
 			local list = children(old)
 			for i, c in list do if c == o then table.remove(list, i) break end end
@@ -187,8 +232,17 @@ Object.__newindex = function(o, k, v)
 	elseif k == "Position" and rawget(o, "_cframe") then -- a part's position; a GUI object's Position is a plain UDim2
 		local c = rawget(o, "_cframe")
 		rawset(o, "_cframe", cf(v, c._x, c._y, c._z))
+		moved(o)
 	elseif k == "CFrame" then
 		rawset(o, "_cframe", v)
+		moved(o)
+	elseif k == "Size" and rawget(o, "_size") ~= nil then -- a part's size: every write is counted (shim.counters, for tests that prove a frame writes none)
+		counters.sizeWrites += 1
+		rawset(o, "_size", v)
+		moved(o)
+	elseif k == "CanQuery" and rawget(o, "_canQuery") ~= nil then -- a part's CanQuery: a change in what the queries see
+		if rawget(o, "_canQuery") ~= v and inWorkspace(o) then queryCache.structure += 1 end
+		rawset(o, "_canQuery", v)
 	else
 		rawset(o, k, v)
 	end
@@ -203,8 +257,8 @@ function Instance.new(className: string)
 		rawset(o, "_cframe", CFrame.new())
 	end
 	if BASE_PARTS[className] then
-		rawset(o, "Size", new(4, 1, 2))
-		rawset(o, "CanQuery", true)
+		rawset(o, "_size", new(4, 1, 2))
+		rawset(o, "_canQuery", true)
 		rawset(o, "CanCollide", true)
 		rawset(o, "Anchored", false)
 		rawset(o, "Transparency", 0)
@@ -249,11 +303,17 @@ function Object.GetAttributeChangedSignal(o, name)
 	return sig
 end
 -- Sound transport only; the shim cannot verify asset loading or audible output.
-function Object.Play(o) o.Playing = true; o.TimePosition = 0 end
+function Object.Play(o) o.Playing = true; o.TimePosition = 0; rawset(o, "plays", (rawget(o, "plays") or 0) + 1) end
 function Object.Pause(o) o.Playing = false end
-function Object.Resume(o) o.Playing = true end
+function Object.Resume(o) o.Playing = true; rawset(o, "plays", (rawget(o, "plays") or 0) + 1) end -- (`plays` counts the asks to play, ROBLOX-100)
 function Object.Stop(o) o.Playing = false; o.TimePosition = 0 end
 function Object.GetAttribute(o, k) return rawget(o, "_attrs")[k] end
+-- A RemoteEvent fired by a client: the arguments are kept, in order, in `fired` (ROBLOX-95: the focus report); nothing reaches a server here.
+function Object.FireServer(o, ...)
+	local list = rawget(o, "fired")
+	if list == nil then list = {}; rawset(o, "fired", list) end
+	table.insert(list, { ... })
+end
 function Object.Destroy(o)
 	o.Parent = nil
 	for _, c in table.clone(children(o)) do c:Destroy() end
@@ -273,24 +333,122 @@ function OverlapParams.new() return { FilterType = Enum.RaycastFilterType.Exclud
 -- ---------------------------------------------------------------- the box world
 local workspace = Instance.new("Workspace")
 workspace.Name = "Workspace"
+-- (ROBLOX-118: the game's default world is the preserve; the CLI suites' place authors the test garden, as a place in Studio may, World/Worlds. A suite that
+-- wants the preserve sets the attribute itself: tests/selftest_preserve.luau.)
+workspace:SetAttribute("World", "test_garden")
+workspaceRef = workspace
 
--- The queryable boxes a query sees (Include or Exclude filters, as the engine): {part, lo, hi}.
+-- The queryable boxes a query sees (Include or Exclude filters, as the engine): {part, lo, hi}, in the workspace's descendant order (a query's ties go
+-- to the first, as they always have).
+-- ROBLOX-108: cached. Walking the whole workspace and every root's ancestry for every ray made tests/world_client.luau take about three hours once the
+-- garden's looks were thousands of parts. The queryable parts in order are kept until the structure changes (`queryCache.structure`), each filter's
+-- list until then too, and a part's box follows it when it moves (`moved`), so every query sees exactly the boxes it saw before, in the same order.
+local function allEntries()
+	if queryCache.allAt == queryCache.structure then return queryCache.all end
+	local list = {}
+	for _, o in workspace:GetDescendants() do
+		if o:IsA("BasePart") and o.CanQuery ~= false then
+			local e = queryCache.entries[o]
+			if e == nil then
+				local half = o.Size / 2
+				local p = o.Position
+				e = { part = o, lo = p - half, hi = p + half, mobile = false }
+				queryCache.entries[o] = e
+			end
+			table.insert(list, e)
+		end
+	end
+	queryCache.all, queryCache.allAt, queryCache.filtered = list, queryCache.structure, {}
+	queryCache.rebuilds += 1
+	return list
+end
 local function boxes(params)
 	local roots = params and params.FilterDescendantsInstances or {}
 	local include = params and params.FilterType == Enum.RaycastFilterType.Include
+	queryCache.queries += 1
+	local all = allEntries()
+	local key = if include then "i" else "e"
+	for _, r in roots do key ..= "|" .. tostring(r) end
+	local hit = queryCache.filtered[key]
+	if hit ~= nil then return hit end
 	local out = {}
-	for _, o in workspace:GetDescendants() do
-		if o:IsA("BasePart") and o.CanQuery ~= false then
-			local inside = false
-			for _, r in roots do if o == r or o:IsDescendantOf(r) then inside = true break end end
-			if inside == include then
-				local half = o.Size / 2
-				local p = o.Position
-				table.insert(out, { part = o, lo = p - half, hi = p + half })
-			end
+	for _, e in all do
+		local o = e.part
+		local inside = false
+		for _, r in roots do if o == r or o:IsDescendantOf(r) then inside = true break end end
+		if inside == include then table.insert(out, e) end
+	end
+	queryCache.filtered[key] = out
+	queryCache.filters += 1
+	return out
+end
+
+-- ROBLOX-108: a grid over a filter's boxes, so a short ray or a small sphere tests only the boxes in the cells it touches. A box is filed in every cell of
+-- GRID_CELL studs it overlaps (a box over more than GRID_SPAN cells, and every box that has moved since the queries first saw it, is tested by every query);
+-- a query over more than GRID_SPAN cells walks the whole list. The boxes a query is given are always every box that could meet it, in the list's order.
+local GRID_CELL = 16
+local GRID_SPAN = 64
+local grids: { [any]: any } = setmetatable({}, { __mode = "k" })
+local function cellOf(x: number): number return math.floor(x / GRID_CELL) end
+local function cellKey(i: number, j: number, k: number): number return ((i + 4096) * 8192 + (j + 4096)) * 8192 + (k + 4096) end
+local function gridOf(list)
+	local g = grids[list]
+	if g ~= nil and g.mobile == queryCache.mobile then return g end
+	g = { cells = {}, always = {}, mobile = queryCache.mobile, stamp = {}, round = 0 }
+	for idx, e in list do
+		local i0, i1 = cellOf(e.lo.X), cellOf(e.hi.X)
+		local j0, j1 = cellOf(e.lo.Y), cellOf(e.hi.Y)
+		local k0, k1 = cellOf(e.lo.Z), cellOf(e.hi.Z)
+		if e.mobile or (i1 - i0 + 1) * (j1 - j0 + 1) * (k1 - k0 + 1) > GRID_SPAN then
+			table.insert(g.always, idx)
+		else
+			for i = i0, i1 do for j = j0, j1 do for k = k0, k1 do
+				local key = cellKey(i, j, k)
+				local cell = g.cells[key]
+				if cell == nil then cell = {}; g.cells[key] = cell end
+				table.insert(cell, idx)
+			end end end
 		end
 	end
+	grids[list] = g
+	return g
+end
+-- The boxes of `params` that could overlap lo..hi (a superset, in order).
+local function near(params, lx: number, ly: number, lz: number, hx: number, hy: number, hz: number)
+	local list = boxes(params)
+	if #list < 32 then return list end
+	if lx ~= lx or ly ~= ly or lz ~= lz or hx ~= hx or hy ~= hy or hz ~= hz then return list end -- (a NaN query is tested against everything, as before)
+	local i0, i1 = cellOf(lx), cellOf(hx)
+	local j0, j1 = cellOf(ly), cellOf(hy)
+	local k0, k1 = cellOf(lz), cellOf(hz)
+	if (i1 - i0 + 1) * (j1 - j0 + 1) * (k1 - k0 + 1) > GRID_SPAN then return list end
+	local g = gridOf(list)
+	g.round += 1
+	local round, stamp = g.round, g.stamp
+	local picked = {}
+	for _, idx in g.always do
+		if stamp[idx] ~= round then stamp[idx] = round; table.insert(picked, idx) end
+	end
+	for i = i0, i1 do for j = j0, j1 do for k = k0, k1 do
+		local cell = g.cells[cellKey(i, j, k)]
+		if cell ~= nil then
+			for _, idx in cell do
+				if stamp[idx] ~= round then stamp[idx] = round; table.insert(picked, idx) end
+			end
+		end
+	end end end
+	table.sort(picked)
+	local out = table.create(#picked)
+	for n, idx in picked do out[n] = list[idx] end
 	return out
+end
+
+-- ROBLOX-108: a box that cannot meet a query is skipped before the exact test: a query whose every possible contact lies in the box lo..hi (grown by `grow`)
+-- only tests the boxes that overlap it. Only ever a superset of the boxes that can be hit, so every answer is the one the full loop gave, in the same order.
+local SKIP_EPS = 1e-4
+local function apart(b, lx, ly, lz, hx, hy, hz): boolean
+	local lo, hi = b.lo, b.hi
+	return hi.X < lx or lo.X > hx or hi.Y < ly or lo.Y > hy or hi.Z < lz or lo.Z > hz
 end
 
 local AXES = { "X", "Y", "Z" }
@@ -329,8 +487,11 @@ function workspace.Raycast(_self, origin, direction, params)
 	if length < 1e-12 then return nil end
 	local d = direction / length
 	local best = nil
-	for _, b in boxes(params) do
-		if not inside(origin, b, 1e-9) then
+	local tip = origin + direction
+	local lx, ly, lz = math.min(origin.X, tip.X) - SKIP_EPS, math.min(origin.Y, tip.Y) - SKIP_EPS, math.min(origin.Z, tip.Z) - SKIP_EPS
+	local hx, hy, hz = math.max(origin.X, tip.X) + SKIP_EPS, math.max(origin.Y, tip.Y) + SKIP_EPS, math.max(origin.Z, tip.Z) + SKIP_EPS
+	for _, b in near(params, lx, ly, lz, hx, hy, hz) do
+		if not apart(b, lx, ly, lz, hx, hy, hz) and not inside(origin, b, 1e-9) then
 			local t, n = rayBox(origin, d, b)
 			if t and t <= length and (not best or t < best.Distance) then
 				best = { Position = origin + d * t, Normal = n, Instance = b.part, Distance = t, Material = Enum.Material.Plastic }
@@ -404,14 +565,33 @@ local function sphereBox(o, d, r, b)
 	return best
 end
 
+-- ROBLOX-107: `slop` widens what counts as "the sphere starts in it" (0 by default, the box world's exact rule). The real engine was seen to let the
+-- body sit 0.07 from the brick face under the outer sill's lip (the Studio self-test, v35); a sweep that begins within a hair of a face it is tangent to
+-- not seeing that face is the box world's way of reproducing it (tests/scenarios.luau sets it for one case and puts it back).
+local spherecastSlop = { value = 0 }
+-- ROBLOX-111: `graze` (0 by default) makes a sweep report a touch at its start, Distance 0, on a box the sphere is within that much of and is not closing on (the
+-- move along or away from it): the engine's tangent touch, which an exact sweep never reports. `every` reports only one such touch in that many (tests/scenarios.luau).
+local spherecastGraze = { value = 0, every = 1, calls = 0 }
 function workspace.Spherecast(_self, origin, radius, direction, params)
 	local length = direction.Magnitude
 	if length < 1e-12 then return nil end
 	local d = direction / length
 	local best = nil
-	for _, b in boxes(params) do
-		if (closest(origin, b) - origin).Magnitude >= radius then -- a box the sphere starts in is not seen
+	local tip = origin + direction
+	local g = radius + spherecastSlop.value + spherecastGraze.value + SKIP_EPS
+	local lx, ly, lz = math.min(origin.X, tip.X) - g, math.min(origin.Y, tip.Y) - g, math.min(origin.Z, tip.Z) - g
+	local hx, hy, hz = math.max(origin.X, tip.X) + g, math.max(origin.Y, tip.Y) + g, math.max(origin.Z, tip.Z) + g
+	for _, b in near(params, lx, ly, lz, hx, hy, hz) do
+		if not apart(b, lx, ly, lz, hx, hy, hz) and (closest(origin, b) - origin).Magnitude >= radius + spherecastSlop.value then -- a box the sphere starts in is not seen
 			local t = sphereBox(origin, d, radius, b)
+			if spherecastGraze.value > 0 then
+				local c = closest(origin, b)
+				local off = origin - c
+				if off.Magnitude < radius + spherecastGraze.value and off.Magnitude > 1e-9 and d:Dot(off.Unit) > -0.05 then
+					spherecastGraze.calls += 1
+					if spherecastGraze.calls % spherecastGraze.every == 0 then t = 0 end
+				end
+			end
 			if t and t <= length and (not best or t < best.Distance) then
 				local centre = origin + d * t
 				local contact = closest(centre, b)
@@ -427,21 +607,25 @@ function workspace.GetPartsInPart(_self, part, params)
 	local r = part.Size.X / 2
 	local centre = part.Position
 	local out = {}
-	for _, b in boxes(params) do
-		if b.part ~= part and (closest(centre, b) - centre).Magnitude < r then table.insert(out, b.part) end
+	local g = r + SKIP_EPS
+	for _, b in near(params, centre.X - g, centre.Y - g, centre.Z - g, centre.X + g, centre.Y + g, centre.Z + g) do
+		if b.part ~= part and not apart(b, centre.X - g, centre.Y - g, centre.Z - g, centre.X + g, centre.Y + g, centre.Z + g) and (closest(centre, b) - centre).Magnitude < r then table.insert(out, b.part) end
 	end
 	return out
 end
 
 function workspace.GetPartBoundsInRadius(_self, centre, r, params)
 	local out = {}
-	for _, b in boxes(params) do
-		if (closest(centre, b) - centre).Magnitude < r then table.insert(out, b.part) end
+	local g = r + SKIP_EPS
+	for _, b in near(params, centre.X - g, centre.Y - g, centre.Z - g, centre.X + g, centre.Y + g, centre.Z + g) do
+		if not apart(b, centre.X - g, centre.Y - g, centre.Z - g, centre.X + g, centre.Y + g, centre.Z + g) and (closest(centre, b) - centre).Magnitude < r then table.insert(out, b.part) end
 	end
 	return out
 end
 
 function workspace.BulkMoveTo(_self, parts, cframes)
+	counters.bulkCalls += 1
+	counters.bulkParts += #parts
 	for i, p in parts do p.CFrame = cframes[i] end
 end
 
@@ -488,7 +672,7 @@ playback.Name = "SilkPlayback"
 rawset(playback, "run", function(driver) client.driver = driver end)
 playback.Parent = client.scriptFolder
 local uis = { MouseBehavior = nil, MouseIconEnabled = true, TouchEnabled = false, KeyboardEnabled = true, GamepadEnabled = false }
-for _, name in { "InputChanged", "InputEnded", "TouchMoved", "WindowFocusReleased", "TextBoxFocused", "GamepadDisconnected", "LastInputTypeChanged" } do
+for _, name in { "InputChanged", "InputEnded", "TouchMoved", "TouchPinch", "TouchStarted", "TouchEnded", "WindowFocusReleased", "TextBoxFocused", "GamepadDisconnected", "LastInputTypeChanged" } do
 	uis[name] = newSignal()
 end
 function uis.GetMouseDelta(_self) return Vector2.zero end
@@ -516,6 +700,8 @@ local game = { GetService = function(_self, name) return services[name] end }
 
 -- Builds axis-aligned parts from {lo, hi, profile, name} pieces into a folder in the workspace.
 local BoxWorld = {}
+BoxWorld.spherecastSlop = spherecastSlop
+BoxWorld.spherecastGraze = spherecastGraze
 function BoxWorld.folder(name: string, pieces)
 	local folder = Instance.new("Folder")
 	folder.Name = name
@@ -534,5 +720,5 @@ end
 
 return { Vector3 = Vector3, CFrame = CFrame, Color3 = Color3, Enum = Enum, Instance = Instance, RaycastParams = RaycastParams,
 	OverlapParams = OverlapParams, workspace = workspace, BoxWorld = BoxWorld, Vector2 = Vector2, game = game, UDim = UDim, UDim2 = UDim2,
-	client = client, services = services, NumberRange = NumberRange, NumberSequence = NumberSequence,
+	client = client, services = services, counters = counters, queryCache = queryCache, NumberRange = NumberRange, NumberSequence = NumberSequence,
 	NumberSequenceKeypoint = NumberSequenceKeypoint, ColorSequence = ColorSequence, ColorSequenceKeypoint = ColorSequenceKeypoint, Font = Font }

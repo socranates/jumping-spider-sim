@@ -27,8 +27,13 @@ C.__mul = function(a, b)
 	if getmetatable(b) == C then return cnew(rot(a, b.p) + a.p, rot(a, b.x), rot(a, b.y), rot(a, b.z)) end
 	return rot(a, b) + a.p
 end
+-- CFrame + Vector3 and CFrame - Vector3 move the frame (the rig places the palps' pivots this way since ROBLOX-87).
+C.__add = function(a, b) return cnew(a.p + b, a.x, a.y, a.z) end
+C.__sub = function(a, b) return cnew(a.p - b, a.x, a.y, a.z) end
 local cm = {}
 function cm.PointToWorldSpace(c, v) return rot(c, v) + c.p end
+function cm.VectorToWorldSpace(c, v) return rot(c, v) end
+function cm.VectorToObjectSpace(c, v) return vnew(v:Dot(c.x), v:Dot(c.y), v:Dot(c.z)) end
 function cm.PointToObjectSpace(c, v) local d = v - c.p; return vnew(d:Dot(c.x), d:Dot(c.y), d:Dot(c.z)) end
 function cm.Inverse(c)
 	local x, y, z = vnew(c.x.X, c.y.X, c.z.X), vnew(c.x.Y, c.y.Y, c.z.Y), vnew(c.x.Z, c.y.Z, c.z.Z)
@@ -40,6 +45,7 @@ C.__index = function(c, k)
 	if k == "UpVector" then return c.y end
 	if k == "LookVector" then return -c.z end
 	if k == "RightVector" then return c.x end
+	if k == "Rotation" then return cnew(vnew(0, 0, 0), c.x, c.y, c.z) end
 	return cm[k]
 end
 local I = cnew(vnew(0, 0, 0), vnew(1, 0, 0), vnew(0, 1, 0), vnew(0, 0, 1))
@@ -71,10 +77,17 @@ Inst.__index = function(t, k)
 	if k == "SetAttribute" then return function(self, a, v) rawset(self, "attr_" .. a, v) end end
 	if k == "GetAttribute" then return function(self, a) return rawget(self, "attr_" .. a) end end
 	if k == "Destroy" then return function() end end
+	if k == "GetChildren" then return function(self) return rawget(self, "_kids") or {} end end -- the rig sizes and colours its parts for growth
+	if k == "IsA" then return function(self, cls) return rawget(self, "ClassName") == cls or (cls == "BasePart" and rawget(self, "ClassName") == "Part") end end
 	return nil
 end
 Inst.__newindex = function(t, k, v)
 	if k == "Parent" and v ~= nil and rawget(t, "ClassName") == "SpecialMesh" then rawset(v, "Mesh", t) end
+	if k == "Parent" and v ~= nil then
+		local kids = rawget(v, "_kids")
+		if kids == nil then kids = {}; rawset(v, "_kids", kids) end
+		table.insert(kids, t)
+	end
 	rawset(t, k, v)
 end
 Instance = { new = function(cls)

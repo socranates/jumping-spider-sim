@@ -178,4 +178,415 @@ fruit.body.radius_wu = 0.18
 fruit.body.capture_radius_wu = 0.42
 fruit.body.prey_kind = "fruit_fly"
 data.fruit_fly_prototype = fruit
+
+-- ROBLOX-96 (W3, garden life): two prey of the bed under the window, derived the same way (game values; no claim that a fungus gnat or an aphid has the house
+-- fly's measured behaviour, only its model with smaller numbers). Both keep the house fly's hover (the perch graph's number) and are drawn smaller.
+-- The fungus gnat: a third of a housefly meal, a weak flier of short flights (half the cruise and flee speeds, flights of at most 10 studs, hops from 1.2), a
+-- shorter sight and a shorter escape, slow short walks; it comes into the bed from the soil (its vents) and rests on the soil and under leaves.
+local gnat = copy(data.fly_like_prototype)
+gnat.body.nutrition = 0.35 / 3 -- a third of a housefly meal
+gnat.body.visual_scale = 0.45
+gnat.body.radius_wu = 0.12
+gnat.body.capture_radius_wu = 0.40
+gnat.body.prey_kind = "fungus_gnat"
+gnat.senses.sight_range_wu = 9.0
+gnat.senses.startle_range_wu = 5.0
+gnat.flight.takeoff_accel_wu_s2 = 40.0
+gnat.flight.flee_speed_wu_s = 7.0
+gnat.flight.cruise_speed_wu_s = 3.5
+gnat.flight.landing_speed_wu_s = 1.2
+gnat.flight.clearance_radius_wu = 0.10
+gnat.flight.lift_wu = 0.5
+gnat.flight.approach_wu = 0.5
+gnat.flight.min_hop_wu = 1.2
+gnat.flight.max_flight_wu = 10.0
+gnat.flight.safe_distance_wu = 6.0
+gnat.flight.perch_avoid_wu = 2.5
+gnat.flight.open_escape_wu = 3.0
+gnat.behavior.reposition_max_wu = 10.0 -- (its whole flight: the bed's perches are farther apart than the sill's)
+gnat.behavior.restless_per_s = 0.06 -- (restless twice as soon as the house fly: a gnat does not sit long)
+gnat.behavior.hysteresis = 0.1 -- (and changes its mind for less: with move_restless 1.0, a restless gnat on open soil flits to the next perch, one under a leaf stays)
+gnat.utility.move_restless = 1.0
+gnat.behavior.walk_distance_wu = { 0.2, 0.8 }
+gnat.behavior.walk_speed_wu_s = { 0.4, 0.9 }
+gnat.behavior.wander_radius_wu = 1.5
+gnat.behavior.wander_flight_chance = 0.3
+gnat.population.vent_min_distance_wu = 8.0
+gnat.population.entry_min_flight_wu = 4.0
+data.fungus_gnat_prototype = gnat
+-- The aphid: a sixth of a housefly meal, and a walker (body.walker): it never flies (Prey/Fly.launch refuses it, so FlyFlight is never used for it), lives on
+-- the plants' stems and leaves (the bed's walker perches, in small groups) and only shuffles about its perch; startled, it freezes.
+local aphid = copy(data.fly_like_prototype)
+aphid.body.nutrition = 0.35 / 6 -- a sixth of a housefly meal
+aphid.body.visual_scale = 0.40
+aphid.body.radius_wu = 0.10
+aphid.body.capture_radius_wu = 0.38
+aphid.body.prey_kind = "aphid"
+aphid.body.walker = true
+aphid.body.feed_rate_per_s = 0.06
+aphid.senses.sight_range_wu = 4.0
+aphid.senses.startle_range_wu = 3.0
+aphid.behavior.walk_distance_wu = { 0.1, 0.4 }
+aphid.behavior.walk_speed_wu_s = { 0.15, 0.35 }
+aphid.behavior.walk_interval_s = { 4.0, 12.0 }
+aphid.behavior.wander_radius_wu = 0.8
+aphid.behavior.perch_radius_wu = 0.25
+aphid.behavior.fidget_distance_wu = { 0.04, 0.1 }
+-- ROBLOX-105 (Nathan's W3 call, "the aphids wander the plant"): now and then, calm, it walks over its plant's faces to another free perch of the same plant,
+-- slowly (Prey/PreyKinds.creep): every 40 to 110 s, at 0.12 to 0.25 studs a second, a walk of at most 24 studs. Game values.
+aphid.body.creep = { every = { 40.0, 110.0 }, speed = { 0.12, 0.25 }, reach = 24.0 }
+data.aphid_prototype = aphid
+-- ROBLOX-101 (W3b part A, the garden's bestiary): four more prey, derived the same way (game values throughout; no claim that any of them has the house fly's
+-- measured behaviour, only its model with other numbers). Read with Prey/PreyKinds, which owns the new behaviours: `body.hop` (a ballistic escape hop on the
+-- reaction model: min and max length, the time in the air, the height of the arc, and the chance of flying on after landing), `body.flightless` (never begins a
+-- flight; it hops or stays), `body.sidestep` (when watched closely it goes round to the far side of its stem or leaf), `body.dusk` / `body.day` (the name of the
+-- same animal's profile for the other part of the day: restless from dusk through the night, still by day), `body.slip_chance` (the first grip on it may fail:
+-- it slips free, once), `body.shed_chance` and `body.shed_after` (in the struggle it may leave a leg and escape, once, that many seconds in), `body.catch_factor`
+-- (Data/Catch.factorFor reads it before the meal, when a prey is harder or easier in the jaws than its meal says). Every one is drawn at its true size
+-- (visual_scale 1, Data/FlyLook.small) and keeps the house fly's hover, the perch graph's number.
+-- The springtail: an eighth of a housefly meal, flightless, and it flicks away from the spider with a hop of 1.5 to 4 studs that takes a sixth of a second; it
+-- reacts fast and sees only a little way; it walks and fidgets in tiny steps about its spot on the soil.
+local springtail = copy(data.fly_like_prototype)
+springtail.body.nutrition = 0.35 / 8
+springtail.body.visual_scale = 1.0
+springtail.body.radius_wu = 0.08
+springtail.body.capture_radius_wu = 0.34
+springtail.body.prey_kind = "springtail"
+springtail.body.flightless = true
+springtail.body.feed_rate_per_s = 0.05
+springtail.body.hop = { min = 1.5, max = 4.0, time = 0.16, apex = 0.7 }
+springtail.senses.sight_range_wu = 3.0
+springtail.senses.startle_range_wu = 2.5
+springtail.reaction.delay_startle_alert_s = { 0.01, 0.03 }
+springtail.reaction.delay_startle_relaxed_s = { 0.02, 0.06 }
+springtail.reaction.delay_startle_grooming_s = { 0.04, 0.09 }
+springtail.flight.clearance_radius_wu = 0.06
+springtail.behavior.walk_interval_s = { 2.0, 6.0 }
+springtail.behavior.walk_distance_wu = { 0.05, 0.3 }
+springtail.behavior.walk_speed_wu_s = { 0.1, 0.3 }
+springtail.behavior.wander_radius_wu = 0.6
+springtail.behavior.perch_radius_wu = 0.2
+springtail.behavior.fidget_distance_wu = { 0.02, 0.06 }
+springtail.population.replenish_delay_s = { 20.0, 40.0 }
+springtail.population.vent_min_distance_wu = 5.0
+data.springtail_prototype = springtail
+-- The leafhopper: half a housefly meal but as hard in the jaws as a house fly (catch_factor 1.0: it kicks), it sits along a stem or a leaf and sidesteps to the
+-- far side when the spider watches it, and when the spider comes close and moves it jumps 3 to 10 studs in under a third of a second, and a third of the time
+-- flies on a short way after landing. Its flights are short; it is restless rarely (it sits for minutes).
+local leafhopper = copy(data.fly_like_prototype)
+leafhopper.body.nutrition = 0.35 / 2
+leafhopper.body.visual_scale = 1.0
+leafhopper.body.radius_wu = 0.15
+leafhopper.body.capture_radius_wu = 0.38
+leafhopper.body.prey_kind = "leafhopper"
+leafhopper.body.catch_factor = 1.0
+leafhopper.body.feed_rate_per_s = 0.08
+leafhopper.body.hop = { min = 3.0, max = 10.0, time = 0.3, apex = 1.8, fly_after = 0.35 }
+leafhopper.body.sidestep = { time = 0.5, rest = 1.5 }
+leafhopper.senses.sight_range_wu = 8.0
+leafhopper.senses.startle_range_wu = 3.5
+leafhopper.reaction.delay_startle_alert_s = { 0.02, 0.06 }
+leafhopper.flight.takeoff_accel_wu_s2 = 50.0
+leafhopper.flight.flee_speed_wu_s = 8.0
+leafhopper.flight.cruise_speed_wu_s = 4.0
+leafhopper.flight.landing_speed_wu_s = 1.2
+leafhopper.flight.clearance_radius_wu = 0.12
+leafhopper.flight.lift_wu = 0.5
+leafhopper.flight.approach_wu = 0.5
+leafhopper.flight.min_hop_wu = 2.0
+leafhopper.flight.max_flight_wu = 8.0
+leafhopper.flight.safe_distance_wu = 6.0
+leafhopper.flight.perch_avoid_wu = 3.0
+leafhopper.flight.open_escape_wu = 3.0
+leafhopper.flight.home_in = true -- (Prey/PreyKinds.homeIn: with no perch in reach it flies toward the nearest)
+leafhopper.behavior.restless_per_s = 0.01
+leafhopper.behavior.reposition_max_wu = 8.0
+leafhopper.behavior.wander_flight_chance = 0.2
+leafhopper.behavior.walk_distance_wu = { 0.05, 0.3 }
+leafhopper.behavior.walk_speed_wu_s = { 0.2, 0.5 }
+leafhopper.behavior.wander_radius_wu = 0.5
+leafhopper.behavior.perch_radius_wu = 0.2
+leafhopper.population.vent_min_distance_wu = 6.0
+data.leafhopper_prototype = leafhopper
+-- The small moth: a housefly meal, slow and fluttering (a cruise of 3, wander loops on most flights, kept near where it flew from: flight.wander_local), resting
+-- flat on the wall or the outer sill by day and restless from dusk through the night (its `dusk` profile), and the first grip on it slips a third of the time.
+local moth = copy(data.fly_like_prototype)
+moth.body.visual_scale = 1.0
+moth.body.radius_wu = 0.3
+moth.body.capture_radius_wu = 0.5
+moth.body.prey_kind = "moth"
+moth.body.slip_chance = 0.35
+moth.body.dusk = "moth_dusk_prototype"
+moth.senses.sight_range_wu = 6.0
+moth.senses.startle_range_wu = 3.0
+moth.flight.takeoff_accel_wu_s2 = 30.0
+moth.flight.flee_speed_wu_s = 6.0
+moth.flight.cruise_speed_wu_s = 3.0
+moth.flight.landing_speed_wu_s = 1.0
+moth.flight.turn_rate_deg_s = 400.0
+moth.flight.clearance_radius_wu = 0.12
+moth.flight.lift_wu = 0.8
+moth.flight.approach_wu = 0.8
+moth.flight.min_hop_wu = 2.0
+moth.flight.max_flight_wu = 14.0
+moth.flight.safe_distance_wu = 7.0
+moth.flight.perch_avoid_wu = 3.0
+moth.flight.open_escape_wu = 4.0
+moth.flight.home_in = true -- (Prey/PreyKinds.homeIn: with no perch in reach it flies toward the nearest)
+moth.flight.wander_local = true
+moth.behavior.restless_per_s = 0.002
+moth.behavior.hysteresis = 0.1
+moth.behavior.reposition_max_wu = 14.0
+moth.behavior.wander_flight_chance = 0.8
+moth.behavior.walk_interval_s = { 8.0, 20.0 }
+moth.behavior.walk_distance_wu = { 0.1, 0.4 }
+moth.behavior.walk_speed_wu_s = { 0.2, 0.5 }
+moth.behavior.wander_radius_wu = 1.0
+moth.utility.move_restless = 1.0
+moth.population.replenish_delay_s = { 40.0, 80.0 }
+moth.population.entry_min_flight_wu = 4.0
+data.moth_prototype = moth
+local mothDusk = copy(moth)
+mothDusk.body.dusk = nil
+mothDusk.body.day = "moth_prototype"
+mothDusk.behavior.restless_per_s = 0.1
+mothDusk.behavior.hysteresis = 0.05
+data.moth_dusk_prototype = mothDusk
+-- The crane fly: two housefly meals and a harder struggle than a house fly (catch_factor 1.25; by its meal it would be 1.6), a slow wobbling flier (a cruise of 1.8, a
+-- turn of 240 degrees a second, wander loops), still by day on the wall and the outer sill and restless from dusk; in the struggle it leaves a leg and escapes
+-- 40% of the time, 0.6 to 1.6 s in, once in its life.
+local crane = copy(data.fly_like_prototype)
+crane.body.nutrition = 0.35 * 2
+crane.body.visual_scale = 1.0
+crane.body.radius_wu = 0.5
+crane.body.capture_radius_wu = 0.6
+crane.body.prey_kind = "crane_fly"
+crane.body.feed_rate_per_s = 0.12
+crane.body.catch_factor = 1.25 -- (by its meal it would be 1.6, the ceiling: a struggle no tapping wins. It is big but weak: a little harder than a house fly)
+crane.body.shed_chance = 0.4
+crane.body.shed_after = { 0.6, 1.6 }
+crane.body.dusk = "crane_fly_dusk_prototype"
+crane.senses.sight_range_wu = 7.0
+crane.senses.startle_range_wu = 3.0
+crane.flight.takeoff_accel_wu_s2 = 15.0
+crane.flight.flee_speed_wu_s = 3.5
+crane.flight.cruise_speed_wu_s = 1.8
+crane.flight.cruise_accel_wu_s2 = 10.0
+crane.flight.landing_speed_wu_s = 0.8
+crane.flight.turn_rate_deg_s = 240.0
+crane.flight.clearance_radius_wu = 0.12
+crane.flight.lift_wu = 1.0
+crane.flight.approach_wu = 1.0
+crane.flight.min_hop_wu = 2.5
+crane.flight.max_flight_wu = 18.0
+crane.flight.takeoff_s = 0.35
+crane.flight.flee_min_s = 1.0
+crane.flight.safe_distance_wu = 6.0
+crane.flight.perch_avoid_wu = 3.0
+crane.flight.open_escape_wu = 3.0
+crane.flight.home_in = true -- (Prey/PreyKinds.homeIn: with no perch in reach it flies toward the nearest)
+crane.flight.wander_local = true
+crane.behavior.restless_per_s = 0.001
+crane.behavior.hysteresis = 0.1
+crane.behavior.reposition_max_wu = 18.0
+crane.behavior.wander_flight_chance = 0.7
+crane.behavior.walk_interval_s = { 10.0, 25.0 }
+crane.behavior.walk_distance_wu = { 0.1, 0.5 }
+crane.behavior.walk_speed_wu_s = { 0.2, 0.4 }
+crane.behavior.wander_radius_wu = 1.0
+crane.utility.move_restless = 1.0
+crane.population.replenish_delay_s = { 60.0, 120.0 }
+crane.population.entry_min_flight_wu = 4.0
+data.crane_fly_prototype = crane
+local craneDusk = copy(crane)
+craneDusk.body.dusk = nil
+craneDusk.body.day = "crane_fly_prototype"
+craneDusk.behavior.restless_per_s = 0.07
+craneDusk.behavior.hysteresis = 0.05
+data.crane_fly_dusk_prototype = craneDusk
+-- ROBLOX-117: the hoverfly (Syrphidae) of the hut garden's flowers: a housefly meal and a half that struggles as a house fly does (catch_factor 1.0), a quick flier that
+-- holds still in the air over the flowers and darts on (Prey/PreyKinds.hover: body.hover, `every` seconds into a calm flight it holds for `hold` seconds, wavering
+-- `waver` studs), sees well and leaves early. Game values; the page says what is the source's.
+local hover = copy(data.fly_like_prototype)
+hover.body.nutrition = 0.35 * 1.5
+hover.body.visual_scale = 1.0
+hover.body.radius_wu = 0.45
+hover.body.capture_radius_wu = 0.6
+hover.body.prey_kind = "hoverfly"
+hover.body.catch_factor = 1.0
+hover.body.feed_rate_per_s = 0.1
+hover.body.hover = { hold = { 1.2, 3.5 }, waver = 0.12, chance = 0.85 }
+hover.senses.sight_range_wu = 10.0
+hover.senses.startle_range_wu = 4.0
+hover.flight.takeoff_accel_wu_s2 = 70.0
+hover.flight.flee_speed_wu_s = 9.0
+hover.flight.cruise_speed_wu_s = 6.0
+hover.flight.cruise_accel_wu_s2 = 40.0
+hover.flight.landing_speed_wu_s = 1.5
+hover.flight.turn_rate_deg_s = 900.0
+hover.flight.clearance_radius_wu = 0.14 -- (ROBLOX-119: under its hover over a perch, 0.16, as every fly's is: at 0.2 its probe met the flower it stood on, and no perch of it was ever good)
+hover.flight.lift_wu = 2.0
+hover.flight.approach_wu = 1.0
+hover.flight.min_hop_wu = 3.0
+hover.flight.max_flight_wu = 30.0
+hover.flight.safe_distance_wu = 8.0
+hover.flight.perch_avoid_wu = 3.0
+hover.flight.open_escape_wu = 5.0
+hover.flight.home_in = true
+hover.flight.wander_local = true
+hover.behavior.restless_per_s = 0.02
+hover.behavior.reposition_max_wu = 30.0
+hover.behavior.wander_flight_chance = 0.9
+hover.behavior.wander_radius_wu = 0.6
+hover.population.replenish_delay_s = { 40.0, 90.0 }
+hover.population.entry_min_flight_wu = 4.0
+data.hoverfly_prototype = hover
+-- ROBLOX-120: the fall field cricket (Gryllus pennsylvanicus) of the meadow's thatch and the hut garden's mulch: three housefly meals in one (an adult is 15 to 25 mm long,
+-- the notebook's page "The field cricket"), drawn at its true size (Data/FlyLook.small.cricket, about 2.2 cm), flightless and a strong jumper (a hop of 8 to 24 studs), and a
+-- hard catch (catch_factor 1.45: by its meal it would be the ceiling, 1.6) whose hind legs kick (body.kick: Prey/PreyKinds.grip, a jolt off the grip every 0.7 to 1.5 s from
+-- its own stream). It hears: a spider moving within `hear.range` studs hushes it (it falls silent and holds still for `hear.hold` seconds, Prey/PreyKinds.hear), and
+-- alert it freezes where it stands (body.freeze) until it jumps. By day it sits still in its shelter; from dusk (its `dusk` profile, the night's) it is restless, walks and
+-- the males chirp (body.chirp). Game values; the page says what is the sources'.
+local cricket = copy(data.fly_like_prototype)
+cricket.body.nutrition = 0.35 * 3
+cricket.body.visual_scale = 1.0
+cricket.body.radius_wu = 0.6
+cricket.body.capture_radius_wu = 0.8
+cricket.body.prey_kind = "cricket"
+cricket.body.flightless = true
+cricket.body.freeze = true
+cricket.body.catch_factor = 1.15
+cricket.body.feed_rate_per_s = 0.15
+cricket.body.hop = { min = 8.0, max = 24.0, time = 0.35, apex = 4.0 }
+cricket.body.kick = { first = { 0.3, 0.8 }, every = { 0.7, 1.5 }, size = 0.1 }
+cricket.body.hear = { range = 30.0, still = 0.5, hold = 6.0 }
+cricket.body.dusk = "cricket_night_prototype"
+cricket.senses.sight_range_wu = 9.0
+cricket.senses.startle_range_wu = 4.0
+cricket.reaction.delay_startle_alert_s = { 0.03, 0.08 }
+cricket.flight.clearance_radius_wu = 0.14 -- (under the hover over a perch, 0.16, as every fly's is: ROBLOX-119)
+cricket.flight.safe_distance_wu = 6.0
+cricket.flight.perch_avoid_wu = 4.0
+cricket.behavior.restless_per_s = 0.0005
+cricket.behavior.walk_interval_s = { 6.0, 18.0 }
+cricket.behavior.walk_distance_wu = { 0.3, 1.5 }
+cricket.behavior.walk_speed_wu_s = { 0.6, 1.5 }
+cricket.behavior.wander_radius_wu = 3.0
+cricket.behavior.perch_radius_wu = 0.5
+cricket.behavior.fidget_distance_wu = { 0.05, 0.15 }
+cricket.population.replenish_delay_s = { 120.0, 240.0 }
+cricket.population.vent_min_distance_wu = 8.0
+data.cricket_prototype = cricket
+local cricketNight = copy(cricket)
+cricketNight.body.dusk = nil
+cricketNight.body.day = "cricket_prototype"
+cricketNight.body.chirp = true
+cricketNight.behavior.restless_per_s = 0.008
+cricketNight.behavior.walk_interval_s = { 3.0, 9.0 }
+data.cricket_night_prototype = cricketNight
+-- ROBLOX-122: the pond's prey (World/Pond.LIFE), the Roblox game's own profiles appended after Godot's (game values; the notebook's pages say what is the sources').
+-- Non-biting midges (Chironomidae): delicate flies of about 5 mm (the sources' 5 to 12.7), a third of a housefly meal as the fungus gnat, resting on the rushes and
+-- the cattails by day and restless from dusk, when they hold in the air over the water as a swarm does, as far as the flight model allows (body.hover: a hold of a
+-- second or two, wavering, then on). Weak fliers, slow to notice.
+local midge = copy(data.fly_like_prototype)
+midge.body.nutrition = 0.35 / 3
+midge.body.visual_scale = 1.0
+midge.body.radius_wu = 0.25
+midge.body.capture_radius_wu = 0.4
+midge.body.prey_kind = "midge"
+midge.body.catch_factor = 0.8
+midge.body.feed_rate_per_s = 0.2
+midge.body.dusk = "midge_dusk_prototype"
+midge.senses.sight_range_wu = 5.0
+midge.senses.startle_range_wu = 2.0
+midge.flight.takeoff_accel_wu_s2 = 20.0
+midge.flight.flee_speed_wu_s = 3.0
+midge.flight.cruise_speed_wu_s = 1.6
+midge.flight.cruise_accel_wu_s2 = 10.0
+midge.flight.landing_speed_wu_s = 0.6
+midge.flight.turn_rate_deg_s = 360.0
+midge.flight.clearance_radius_wu = 0.12
+midge.flight.lift_wu = 1.0
+midge.flight.approach_wu = 0.8
+midge.flight.min_hop_wu = 2.0
+midge.flight.max_flight_wu = 16.0
+midge.flight.safe_distance_wu = 5.0
+midge.flight.perch_avoid_wu = 2.0
+midge.flight.open_escape_wu = 3.0
+midge.flight.home_in = true
+midge.flight.wander_local = true
+midge.behavior.restless_per_s = 0.002
+midge.behavior.hysteresis = 0.1
+midge.behavior.reposition_max_wu = 16.0
+midge.behavior.wander_flight_chance = 0.9
+midge.behavior.wander_radius_wu = 0.6
+midge.population.replenish_delay_s = { 30.0, 70.0 }
+midge.population.entry_min_flight_wu = 3.0
+data.midge_prototype = midge
+local midgeDusk = copy(midge)
+midgeDusk.body.dusk = nil
+midgeDusk.body.day = "midge_prototype"
+midgeDusk.body.hover = { hold = { 0.8, 2.5 }, waver = 0.25, chance = 0.9 }
+midgeDusk.behavior.restless_per_s = 0.12
+midgeDusk.behavior.hysteresis = 0.05
+data.midge_dusk_prototype = midgeDusk
+-- Mosquitoes (Culicidae): about 5 mm of body on long legs, a third of a housefly meal, resting in the rushes by day and out from dusk (the sources: most bite from
+-- just before dark into the night), wavering in the air over the margin as the midges do. Only the drawing says male or female; none bites the spider.
+local mosquito = copy(midge)
+mosquito.body.prey_kind = "mosquito"
+mosquito.body.radius_wu = 0.28
+mosquito.body.dusk = "mosquito_dusk_prototype"
+mosquito.senses.sight_range_wu = 6.0
+mosquito.senses.startle_range_wu = 2.5
+mosquito.flight.cruise_speed_wu_s = 1.4
+data.mosquito_prototype = mosquito
+local mosquitoDusk = copy(mosquito)
+mosquitoDusk.body.dusk = nil
+mosquitoDusk.body.day = "mosquito_prototype"
+mosquitoDusk.body.hover = { hold = { 0.6, 2.0 }, waver = 0.2, chance = 0.8 }
+mosquitoDusk.behavior.restless_per_s = 0.1
+mosquitoDusk.behavior.hysteresis = 0.05
+data.mosquito_dusk_prototype = mosquitoDusk
+-- The eastern forktail (Ischnura verticalis), a damselfly 22 to 30 mm long, perched on the cattails by day with its wings folded over its back. Twice the spider's
+-- length and more: the honest choice is a hard catch (catch_factor 1.45, by its meal it would be the ceiling) whose wings and long abdomen thrash in the jaws
+-- (body.kick, as the cricket's legs), worth two and a half housefly meals; its big eyes see the spider coming from far off, and it flies well.
+local damsel = copy(data.fly_like_prototype)
+damsel.body.nutrition = 0.35 * 2.5
+damsel.body.visual_scale = 1.0
+damsel.body.radius_wu = 0.5
+damsel.body.capture_radius_wu = 0.7
+damsel.body.prey_kind = "damselfly"
+damsel.body.catch_factor = 1.45
+damsel.body.feed_rate_per_s = 0.12
+damsel.body.kick = { first = { 0.2, 0.5 }, every = { 0.5, 1.1 }, size = 0.12 }
+damsel.senses.sight_range_wu = 14.0
+damsel.senses.startle_range_wu = 6.0
+damsel.reaction.delay_startle_alert_s = { 0.03, 0.08 }
+damsel.flight.takeoff_accel_wu_s2 = 40.0
+damsel.flight.flee_speed_wu_s = 6.0
+damsel.flight.cruise_speed_wu_s = 2.5
+damsel.flight.cruise_accel_wu_s2 = 20.0
+damsel.flight.landing_speed_wu_s = 1.0
+damsel.flight.turn_rate_deg_s = 360.0
+damsel.flight.clearance_radius_wu = 0.14
+damsel.flight.lift_wu = 2.0
+damsel.flight.approach_wu = 1.2
+damsel.flight.min_hop_wu = 3.0
+damsel.flight.max_flight_wu = 30.0
+damsel.flight.safe_distance_wu = 10.0
+damsel.flight.perch_avoid_wu = 4.0
+damsel.flight.open_escape_wu = 5.0
+damsel.flight.home_in = true
+damsel.flight.wander_local = true
+damsel.behavior.restless_per_s = 0.006
+damsel.behavior.hysteresis = 0.1
+damsel.behavior.reposition_max_wu = 30.0
+damsel.behavior.wander_flight_chance = 0.8
+damsel.behavior.walk_interval_s = { 12.0, 30.0 }
+damsel.behavior.walk_distance_wu = { 0.1, 0.4 }
+damsel.behavior.walk_speed_wu_s = { 0.2, 0.4 }
+damsel.behavior.wander_radius_wu = 0.8
+damsel.population.replenish_delay_s = { 60.0, 140.0 }
+damsel.population.entry_min_flight_wu = 4.0
+data.damselfly_prototype = damsel
 return table.freeze(data)

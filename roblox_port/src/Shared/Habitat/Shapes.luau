@@ -88,6 +88,23 @@ function Shapes.roundedSlab(parent: Instance, name: string, lo: Vector3, hi: Vec
 	return out
 end
 
+-- Whether a drawn thing may stand at (x, z) on a surface at height `y` (ROBLOX-74): not inside the footprint of a piece that rises from that
+-- height (grown by `margin`), not within SPAWN_CLEAR of the spawn and not in or by the silk retreat. Reads the layout and changes nothing in it.
+Shapes.SPAWN_CLEAR = 4.5
+Shapes.RETREAT_CLEAR = 1.5
+function Shapes.clearAt(x: number, y: number, z: number, margin: number): boolean
+	local spawn = Layout.SPAWN
+	if (x - spawn.X) ^ 2 + (z - spawn.Z) ^ 2 < Shapes.SPAWN_CLEAR ^ 2 then return false end
+	local lo, hi, k = Layout.RETREAT_MIN, Layout.RETREAT_MAX, Shapes.RETREAT_CLEAR
+	if x > lo.X - k and x < hi.X + k and z > lo.Z - k and z < hi.Z + k then return false end
+	for _, p in Layout.PIECES do
+		if p.lo.Y < y + 0.5 and p.hi.Y > y + 0.05 and x > p.lo.X - margin and x < p.hi.X + margin and z > p.lo.Z - margin and z < p.hi.Z + margin then
+			return false
+		end
+	end
+	return true
+end
+
 -- A small deterministic random stream (Park-Miller): the same seed always scatters the same way, in Roblox and under the tests.
 function Shapes.rng(seed: number): () -> number
 	local state = seed % 2147483647

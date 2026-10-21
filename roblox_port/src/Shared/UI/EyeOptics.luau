@@ -314,9 +314,10 @@ end
 
 -- The caption: what the side eyes do, then how to use the principal eyes. `key` is the device's Focus control (ControlText);
 -- `toggled` when Focus is a toggle, which is pressed and not held.
-function EyeOptics.captionText(key: string, toggled: boolean): string
+-- `held` (ROBLOX-115): the key is held even to latch a toggled Focus (a controller's L2, whose tap is the lock), so the words say Hold either way.
+function EyeOptics.captionText(key: string, toggled: boolean, held: boolean?): string
 	local C = Eyes.caption
-	return C.side .. "\n" .. string.format(C.principal, if toggled then C.toggle else C.hold, if key ~= "" then key else "Focus")
+	return C.side .. "\n" .. string.format(C.principal, if toggled and not held then C.toggle else C.hold, if key ~= "" then key else "Focus")
 end
 
 -- A UV layer part's transparency: clear with the side eyes, as visible as its UVOpacity with the principal eyes.

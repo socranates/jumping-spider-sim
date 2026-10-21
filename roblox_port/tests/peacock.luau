@@ -221,11 +221,47 @@ check(not sees, "the dance object passes the setting on (no tremble)")
 check(Choice.start(nil, nil) == "first_spider" and Choice.start("nonsense", 5) == "first_spider", "no choice, or an unknown one, is the first spider")
 check(Choice.start("maratus_volans_male", nil) == "maratus_volans_male" and Choice.start(nil, "maratus_volans_male") == "maratus_volans_male", "the Player or Workspace attribute can preselect the peacock spider")
 check(Choice.start("first_spider", "maratus_volans_male") == "first_spider", "the Player's attribute (kept for the session) wins over the Workspace's")
-check(Choice.next("first_spider") == "maratus_volans_male" and Choice.next("maratus_volans_male") == "first_spider" and Choice.next("junk") == "first_spider", "C cycles between the two")
+check(Choice.next("first_spider") == "maratus_volans_male" and Choice.next("maratus_volans_male") == "myrmarachne_formicaria_female" and Choice.next("myrmarachne_formicaria_female") == "brachypelma_hamorii"
+	and Choice.next("brachypelma_hamorii") == "chromatopelma_cyaneopubescens" and Choice.next("chromatopelma_cyaneopubescens") == "first_spider" and Choice.next("junk") == "first_spider", "C cycles first spider, peacock spider, ant-mimicking spider, Mexican redknee, Greenbottle blue, and round again")
 check(Choice.canDance("maratus_volans_male") and not Choice.canDance("first_spider") and not Choice.canDance("junk"), "only the peacock spider has a dance")
 local allKnown = true
 for _, id in Choice.ORDER do allKnown = allKnown and Appearances.profiles[id] ~= nil end
-check(allKnown and #Choice.ORDER == 2 and Appearances.default == "first_spider", "both spiders are real appearances and the default is still the first")
+check(allKnown and #Choice.ORDER == 5 and Appearances.default == "first_spider" and Choice.ORDER[1] == "first_spider" and Choice.ORDER[4] == "brachypelma_hamorii" and Choice.ORDER[5] == "chromatopelma_cyaneopubescens", "all five spiders are real appearances (the tarantulas last) and the default is still the first")
+check(Choice.packOf("brachypelma_hamorii") == "tarantula_pack" and Choice.packOf("chromatopelma_cyaneopubescens") == "tarantula_pack" and Choice.packOf("first_spider") == nil and Choice.packOf("maratus_volans_male") == nil and Choice.packOf("junk") == nil, "the two tarantulas are in the tarantula pack; the others are in none")
+
+-- Which spiders are the player's to choose (ROBLOX-71): all of them while the add-ons are free (ROBLOX-66), with one hook for ownership later.
+do
+	for _, id in Choice.ORDER do
+		check(Choice.locked(id) == false and Choice.locked(id, {}) == false and Choice.locked(id, { [id] = false }) == false, `{id}: nothing is locked while the add-ons are free`)
+	end
+	check(Choice.locked("junk") == false, "(and an unknown id is not locked either; known() is what refuses it)")
+	check(Choice.step("first_spider", 1) == "maratus_volans_male" and Choice.step("first_spider", -1) == "chromatopelma_cyaneopubescens" and Choice.step("maratus_volans_male", -1) == "first_spider" and Choice.step("brachypelma_hamorii", -1) == "myrmarachne_formicaria_female" and Choice.step("junk", -1) == "first_spider", "step() goes either way round, and from nothing it goes to the first spider")
+	check(Choice.next("first_spider", {}) == "maratus_volans_male", "next() is step(+1)")
+	-- a locked spider is skipped by the crack's key (next) and by the Settings row (step), in both directions
+	local real = Choice.locked
+	Choice.locked = function(id: string, owned: { [string]: boolean }?): boolean return id == "maratus_volans_male" and not (owned ~= nil and owned[id] == true) end
+	check(Choice.next("first_spider") == "myrmarachne_formicaria_female" and Choice.next("chromatopelma_cyaneopubescens") == "first_spider", "the peacock locked: the crack cycle goes first, ant mimic, the tarantulas, first")
+	check(Choice.step("myrmarachne_formicaria_female", -1) == "first_spider" and Choice.step("first_spider", -1) == "chromatopelma_cyaneopubescens", "and the Settings row skips it going back too")
+	check(Choice.next("first_spider", { maratus_volans_male = true }) == "maratus_volans_male", "an owned spider (the table passed down) is open again")
+	Choice.locked = function(id: string): boolean return id ~= "first_spider" end
+	check(Choice.next("first_spider") == "first_spider" and Choice.step("first_spider", -1) == "first_spider", "with everything else locked it stays as it is")
+	check(Choice.next("maratus_volans_male") == "first_spider", "and from a locked spider it goes to the open one")
+	Choice.locked = real
+	check(Choice.next("first_spider") == "maratus_volans_male", "(and the real hook is back)")
+	-- when the Settings row may change the spider
+	local ok = { mode = "attached", seized = false, preparing = false, jumping = false, onLine = false, moulting = false, struggling = false }
+	check(Choice.safeToChange(ok), "standing on a surface with nothing going on: safe")
+	for _, reason in { "seized", "preparing", "jumping", "onLine", "moulting", "struggling" } do
+		local s2 = table.clone(ok) :: any
+		s2[reason] = true
+		check(not Choice.safeToChange(s2), `{reason}: not safe`)
+	end
+	for _, mode in { "airborne", "falling", "line", "" } do
+		local s2 = table.clone(ok) :: any
+		s2.mode = mode
+		check(not Choice.safeToChange(s2), `mode "{mode}": not safe`)
+	end
+end
 
 check(ControlText.name("keyboard", "choose") == "C" and ControlText.name("keyboard", "display") == "X", "keyboard: C changes spider, X dances")
 check(ControlText.name("gamepad", "choose") == "RB" and ControlText.name("gamepad", "display") == "RB" and ControlText.name("touch", "choose") == "Change" and ControlText.name("touch", "display") == "Dance", "controller RB, touch Change and Dance")
@@ -234,12 +270,28 @@ check(ControlText.name("gamepad", "choose") == "R1" and ControlText.name("gamepa
 check(Text.change("gamepad", "first_spider") == "R1: become the peacock spider" and Text.displayHint("gamepad", false) == "R1: courtship dance", "PlayStation words in the prompts")
 check(string.find(Text.helpExtra("gamepad", true), "R1 courtship dance", 1, true) ~= nil, "PlayStation words on the controls card")
 ControlText.setPadStyle("xbox")
-check(Text.change("keyboard", "first_spider") == "C: become the peacock spider" and Text.change("keyboard", "maratus_volans_male") == "C: become the first spider", "the crack's hint names the other spider")
+check(Text.change("keyboard", "first_spider") == "C: become the peacock spider" and Text.change("keyboard", "maratus_volans_male") == "C: become the ant-mimicking spider" and Text.change("keyboard", "myrmarachne_formicaria_female") == "C: become the Mexican redknee"
+	and Text.change("keyboard", "brachypelma_hamorii") == "C: become the Greenbottle blue" and Text.change("keyboard", "chromatopelma_cyaneopubescens") == "C: become the first spider", "the crack's hint names the next spider")
 check(Text.change("touch", "first_spider") == "Change: become the peacock spider" and Text.touchChange() == "Change" and Text.touchDisplay(false) == "Dance" and Text.touchDisplay(true) == "Stop", "touch words")
 check(Text.displayHint("keyboard", false) == "X: courtship dance" and Text.displayHint("keyboard", true) == "X: stop dancing" and Text.dancingLine("keyboard") == "COURTSHIP DANCE    X or move: stop", "the dance's prompt and status line")
 check(Text.changed("maratus_volans_male") == "You are the peacock spider now" and Text.changed("first_spider") == "You are the first spider now", "the toast after a change")
 check(string.find(Text.helpExtra("keyboard", false), "courtship", 1, true) == nil and string.find(Text.helpExtra("keyboard", true), "X courtship dance", 1, true) ~= nil
 	and string.find(Text.helpExtra("keyboard", false), "C change spider", 1, true) ~= nil, "the controls card says nothing of the dance for the first spider")
+-- The Settings row's words and the card's pointer to it (ROBLOX-71)
+check(Text.title("first_spider") == "The first spider" and Text.title("maratus_volans_male") == "The peacock spider" and Text.title("myrmarachne_formicaria_female") == "The ant-mimicking spider" and Text.title("brachypelma_hamorii") == "The Mexican redknee" and Text.title("chromatopelma_cyaneopubescens") == "The Greenbottle blue" and Text.title("junk") == "Junk", "a spider's name for a row starts with a capital")
+check(Text.NOT_NOW == "Your spider will not change now. Stand safely on a surface first" and Text.NOT_NOW ~= Text.NOT_RESTING, "the refusal says it will not change now")
+check(Text.settingsLine("keyboard") == "Spider: change it in Settings (O) when standing safe" and Text.settingsLine("touch") == "Spider: change it in Menu, then Settings", "the card's pointer on a keyboard and on touch")
+check(Text.settingsLine("gamepad") == "Spider: change it in Settings (View, then Settings)", "and on an Xbox controller")
+ControlText.setPadStyle("playstation")
+check(Text.settingsLine("gamepad") == "Spider: change it in Settings (Touchpad, then Settings)", "and a PlayStation controller")
+ControlText.setPadStyle("xbox")
+for _, device in { "keyboard", "gamepad", "touch" } do
+	for _, kind in { false, true, "antennae" } do
+		local card = Text.helpExtra(device :: any, kind :: any)
+		check(string.find(card, Text.settingsLine(device :: any), 1, true) ~= nil and string.find(card, "change spider", 1, true) ~= nil, `{device}: the controls card says the spider can be changed in Settings ({tostring(kind)}), beside the crack's line`)
+		check(#Text.settingsLine(device :: any) <= 60, `{device}: the pointer is one short line`)
+	end
+end
 check(Text.caption(0) == nil and Text.caption(0.01) == nil and (Text.caption(1) :: any).text == "[a fine buzzing through your feet]" and (Text.caption(0.4) :: any).alpha == 0.4, "the felt caption while a rumble-rump is on")
 local prompt = LifeText.prompt(false, true, false, false, "keyboard", Text.change("keyboard", "first_spider")) :: any
 check(prompt.hint == "Move, E or Q to leave.    C: become the peacock spider", "the resting hint carries the choice")
@@ -247,6 +299,60 @@ check((LifeText.prompt(false, true, false, false, "keyboard") :: any).hint == "M
 local buttons = {}
 for _, b in HudLayout.TOUCH_BUTTONS do buttons[b.action] = b end
 check(buttons.Choose ~= nil and buttons.Display ~= nil and not buttons.Choose.right and buttons.Display.right, "touch Change and Dance buttons exist")
+
+-- The whole controls card is at most ten lines at the width the HUD gives it (ROBLOX-92: the card exceeded the review's ten-line rule and the Studio spec measured the wrong string).
+-- ~61 characters to a line (516 px at 15 px GothamMedium), wrapped greedily at spaces; the string is Text.card, the very one the HUD shows, for every device, display key and pad style.
+local function wrappedLines(card: string, width: number): number
+	local n = 0
+	for line in string.gmatch(card .. "\n", "([^\n]*)\n") do
+		local used, lines = 0, 1
+		for word in string.gmatch(line, "%S+") do
+			local len = utf8.len(word) or #word
+			if used == 0 then used = len elseif used + 1 + len <= width then used += 1 + len else lines += 1; used = len end
+		end
+		n += lines
+	end
+	return n
+end
+local cardMax: { [string]: number } = {}
+for _, style in { "xbox", "playstation" } do
+	ControlText.setPadStyle(style :: any)
+	for _, device in { "keyboard", "gamepad", "touch" } do
+		for _, kind in { "none", "dance", "antennae", "threat" } do
+			local card = Text.card(device :: any, if kind == "none" then nil else kind)
+			local n = wrappedLines(card, 61)
+			cardMax[device] = math.max(cardMax[device] or 0, n)
+			check(n <= 10, `{device}/{kind}/{style}: the controls card is {n} lines (at most 10 at 61 characters)`)
+			check(string.find(card, "\n\n", 1, true) == nil and string.sub(card, -1) ~= "\n", `{device}/{kind}/{style}: no empty line in the card`)
+			check(card == ControlText.helpCard(device :: any) .. Text.helpExtra(device :: any, if kind == "none" then nil else kind), `{device}/{kind}: the card is the controls and the extras, nothing more`)
+		end
+		if device ~= "touch" then
+			for line in string.gmatch(ControlText.helpCard(device :: any), "[^\n]+") do
+				check((utf8.len(line) or #line) <= 61, `{device}/{style}: no line of the base card wraps ({#line}): {line}`)
+			end
+		end
+	end
+end
+ControlText.setPadStyle("xbox")
+print(`PEACOCK card lines (the longest of every display key and pad style): keyboard {cardMax.keyboard}, gamepad {cardMax.gamepad}, touch {cardMax.touch}`)
+-- Every action is still discoverable on the card (the base lines and the extras together), by the device's own name for it.
+for _, device in { "keyboard", "gamepad", "touch" } do
+	local card = Text.card(device :: any, "dance")
+	for _, word in { "hop", "aim", "silk", "look", "creep", "rest", "menu", "notebook", "settings", "last rest", "change spider" } do
+		check(string.find(string.lower(card), word, 1, true) ~= nil, `{device}: the card says "{word}"`)
+	end
+	check(string.find(card, "checkpoint", 1, true) == nil and string.find(card, "five spiders", 1, true) == nil, `{device}: no engineer's word, no count of spiders`)
+end
+check(string.find(Text.card("touch", nil), "Change change", 1, true) == nil and string.find(Text.crackLine("touch"), "tap Change", 1, true) ~= nil, "touch: the button's label is not doubled in its own sentence")
+check(Text.crackLine("keyboard") == "In the crack: C change spider (hold C: look closely)" and Text.crackLine("gamepad") == "In the crack: RB change spider (hold RB: look closely)", "the crack's line, the close look folded in, by device")
+
+-- The words are British, like the rest of the game (colour, moult, grey): "recentre" on every card and on the touch button; and the touch card's silk line says what the button does (audit, 2026-10-19).
+for _, device in { "keyboard", "gamepad", "touch" } do
+	local lower = string.lower(Text.card(device :: any, "dance"))
+	check(string.find(lower, "recentre", 1, true) ~= nil and string.find(lower, "recenter", 1, true) == nil, `{device}: the card says recentre`)
+end
+check(ControlText.name("touch", "recenter") == "Recentre" and buttons.Recenter ~= nil and buttons.Recenter.label == "Re-\ncentre", "the touch button says Recentre (the action's id stays Recenter)")
+check(string.find(ControlText.helpCard("touch"), "Silk: lower on a line", 1, true) ~= nil and string.find(ControlText.helpCard("touch"), "Silk lowers", 1, true) == nil, "the touch card's silk line says what the button does")
 
 print(`PEACOCK passed={passed} failed={failed}`)
 if failed > 0 then error("peacock checks failed") end

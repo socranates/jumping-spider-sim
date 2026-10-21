@@ -19,11 +19,18 @@
 --   moult_ready, moulted, adult ... the life loop's events; adult when the moult reaches the adult stage
 --   hungry, well_fed, starving ... the reserve changes to at or under hungryAt, at or over wellFedAt, or to nothing (not on Easy)
 --   wasp, wasp_escaped, wasp_caught ... the director's visit_started, left (it had noticed the spider), caught
+--   antennae ....... the ant-mimicking spider has stood still with its antennae up for AntMimic.noticeSeconds (the client's pose says how long)
+--   garden_bed ..... (ROBLOX-96, the Roblox game's own) the spider's first step onto a bed of the garden: the view's `region` is a region of kind "bed"
+--   look_ladybird, look_millipede, look_snail, look_harvestman ... (ROBLOX-105) the same for the ambient bugs: one of the view's `bugs` of the kind, not
+--                    hidden, within lookWu of the spider
+--   look_springtail, look_leafhopper, look_moth, look_crane_fly ... (ROBLOX-101) the first close look at a prey of that kind: one of the view's flies of the kind
+--                    (Species body.prey_kind, NotebookPages.looks) within lookWu of the spider, perched or flying; distance only, not the sensor's say
 -- Not wired: felt. It answers to Godot's vibration sense (a felt shake through touching surfaces), which the port does not have, so
 -- that page cannot open yet; the notebook never opens a page for something the game does not do.
 -- Checked in tests/notebook.luau.
 
 local Data = require(script.Parent.Parent.Data.NotebookPages)
+local AntMimic = require(script.Parent.Parent.Data.AntMimic)
 
 local NotebookWatch = {}
 NotebookWatch.__index = NotebookWatch
@@ -44,6 +51,8 @@ export type View = {
 	gentle: boolean, -- Easy or free play: it cannot starve
 	spider: Vector3,
 	flies: { any }, -- the flies: .id, .position and :airborne()
+	region: string?, -- ROBLOX-96: the kind of the region the spider is in ("sill", "bed", ...); nil in a world without one
+	bugs: { any }?, -- ROBLOX-105: the ambient bugs about (Prey/PreyWorld.crawlers: .kind, .position, .hidden); nil or none in a world without them
 }
 
 function NotebookWatch.new(book: any): any
@@ -104,6 +113,44 @@ function NotebookWatch.onWasp(self: any, kind: string, escaped: boolean?)
 	end
 end
 
+-- (ROBLOX-118) The ranger's cat noticed the spider (Predator/Cat's "noticed"): the cat's page.
+function NotebookWatch.onCat(self: any)
+	self.book:notice("cat")
+end
+
+-- (ROBLOX-119) The spider came close to a crab spider on its flower (Predator/CrabSpider's "seen"): the crab spider's page.
+function NotebookWatch.onCrab(self: any)
+	self.book:notice("crab_spider")
+end
+
+-- (ROBLOX-122) The green frog noticed the spider, or the spider came close to it: the frog's page.
+function NotebookWatch.onFrog(self: any)
+	self.book:notice("frog")
+end
+
+-- (ROBLOX-122) The green darner passed near the spider: its page.
+function NotebookWatch.onDarner(self: any)
+	self.book:notice("darner")
+end
+
+-- (ROBLOX-122) The spider fell into the water: the page on spiders and water.
+function NotebookWatch.onWater(self: any)
+	self.book:notice("water")
+end
+
+-- (ROBLOX-120) The robin was told to the spider (Predator/Bird: its shadow passed near, it landed near, or it noticed the spider): the robin's page.
+function NotebookWatch.onBird(self: any)
+	self.book:notice("robin")
+end
+
+-- Each rendered frame while the ant-mimicking spider is being played: how long its antennae (legs I) have been fully up. Standing still long
+-- enough for the pose (AntMimic.noticeSeconds) is what opens the walking-like-an-ant page. The client calls this; nothing here reads the pose.
+function NotebookWatch.antennae(self: any, shownSeconds: number)
+	if shownSeconds >= AntMimic.noticeSeconds then
+		self.book:notice("antennae")
+	end
+end
+
 -- Each rendered frame: `seconds` of play (0 while the game waits), whether the eye view is on and how many movement marks it draws.
 function NotebookWatch.frame(self: any, seconds: number, eyeView: boolean, movers: number)
 	if not eyeView then
@@ -156,9 +203,16 @@ function NotebookWatch.step(self: any, v: View)
 			book:notice("well_fed")
 		end
 	end
-	-- A fly taking off near enough to hear.
+	-- ROBLOX-96: the first step onto a garden bed.
+	if v.region == "bed" then
+		book:notice("garden_bed")
+	end
+	-- A fly taking off near enough to hear; (ROBLOX-101) a close look at one of the bestiary's.
 	local seen: { [string]: boolean } = {}
 	for _, f in v.flies do
+		local kind = if f.profile ~= nil and f.profile.body ~= nil then f.profile.body.prey_kind else nil
+		local look = if kind ~= nil then Data.looks[kind] else nil
+		if look ~= nil and (f.position - v.spider).Magnitude <= Data.lookWu then book:notice(look) end
 		local up: boolean = f:airborne()
 		seen[f.id] = up
 		if up and not self.flying[f.id] and (f.position - v.spider).Magnitude <= Data.hearWu then
@@ -166,6 +220,11 @@ function NotebookWatch.step(self: any, v: View)
 		end
 	end
 	self.flying = seen
+	-- (ROBLOX-105) a close look at one of the ambient bugs, out in the open (a woodlouse has no `kind`: its page is the ground's)
+	for _, b in (v.bugs or {}) :: { any } do
+		local look = if b.kind ~= nil then Data.looks[b.kind] else nil
+		if look ~= nil and not b.hidden and (b.position - v.spider).Magnitude <= Data.lookWu then book:notice(look) end
+	end
 end
 
 return NotebookWatch

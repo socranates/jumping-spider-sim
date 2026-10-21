@@ -1,8 +1,8 @@
 --!strict
--- Builds the windowsill (scripts/habitat/windowsill.gd), the drawn world around it (Habitat/Scenery, from Data/Graphics) and the
--- lighting (Habitat/Lit). The spider itself is client-side (StarterPlayerScripts/Client/SpiderClient): one player, one spider,
--- nothing to replicate yet. Lighting Technology (Future) and MaterialService.Use2022Materials are authored in the Rojo projects;
--- runtime scripts cannot set them.
+-- Builds the world: the windowsill (scripts/habitat/windowsill.gd) as region 0 of the map (World/WorldBuild, ROBLOX-94: every region's physical boxes under one `World`
+-- folder), the drawn world around it (Habitat/Scenery, from Data/Graphics) and the lighting (Habitat/Lit). The spider itself is client-side
+-- (StarterPlayerScripts/Client/SpiderClient): one player, one spider, nothing to replicate yet but where the server streams the world to (Server/WorldFocus).
+-- Lighting Technology (Future), MaterialService.Use2022Materials and the Workspace's streaming settings are authored in the Rojo projects; runtime scripts cannot set them.
 
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
@@ -12,8 +12,22 @@ local Workspace = game:GetService("Workspace")
 local Habitat = ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Habitat")
 local Scenery = require(Habitat:WaitForChild("Scenery"))
 local Lit = require(Habitat:WaitForChild("Lit"))
+local World = ReplicatedStorage:WaitForChild("Shared"):WaitForChild("World")
+local WorldMap = require(World:WaitForChild("WorldMap"))
+local Worlds = require(World:WaitForChild("Worlds"))
+local WorldBuild = require(World:WaitForChild("WorldBuild"))
+local Region = require(World:WaitForChild("Region"))
+local WorldFocus = require(script.Parent.WorldFocus)
 
 Players.CharacterAutoLoads = false
+
+-- ROBLOX-115: which world this server runs (World/Worlds): the Workspace attribute World if the place sets it to a world's id (in Studio: "preserve" before Play),
+-- else the default (the test garden until Phase B). The choice is written back to the attribute, which every client reads (Client/WorldClient), so the server's
+-- map, the clients' and the saves agree.
+local worldId = Worlds.choose(Workspace:GetAttribute(Worlds.ATTRIBUTE))
+Workspace:SetAttribute(Worlds.ATTRIBUTE, worldId)
+WorldMap.use(worldId)
+print(`[Windowsill] world: {Worlds.get(worldId).name} ({worldId})`)
 Workspace.Gravity = 35 -- species gravity_wu_s2; used by any unanchored props
 
 -- The sill is what the game needs; the looks are best effort. If the lighting or the decor fails (nothing here has run in Roblox
@@ -27,12 +41,32 @@ else
 	warn("[Windowsill] lighting set-up failed: " .. tostring(sun))
 end
 
-local decorOk, decor, replaced = pcall(Scenery.decor, if litOk and sun.ok then sun.direction else nil)
+local decorOk, decor, replaced = pcall(Scenery.decor, if litOk and sun.ok then sun.direction else nil, worldId)
 if not decorOk then
 	warn("[Windowsill] decor failed, the back wall and the Pilea's pieces stay as they were: " .. tostring(decor))
 end
 
--- Only the pieces whose drawing exists turn invisible (still solid); if the decor failed nothing is hidden.
-local sill = Scenery.sill(if decorOk then replaced else {})
+-- ROBLOX-108: the looks of the regions outside the window are no longer built here. Each client builds them itself near its spider from the same seeded generators
+-- (Client/LookStream, World/LookPlan): nothing to replicate, and a client holds at most LookPlan.BUDGET parts of them instead of all of them everywhere (ROBLOX-95 to
+-- 107 built every one here as a persistent model). The pieces a look stands in for are hidden here as before; a client whose look fails shows its own copies.
+
+-- Only the pieces whose drawing exists turn invisible (still solid); if the sill's decor failed its pieces are not hidden. The sill is region 0 of the world: its
+-- "Windowsill" folder, exactly as it was, now inside the `World` folder with every other region's.
 if decorOk then decor.Parent = Workspace end
-sill.Parent = Workspace
+local hidden: { [string]: boolean } = {}
+if decorOk then for id in replaced do hidden[id] = true end end
+for _, region in WorldMap.regions(WorldMap.SEED) do
+	if region.kind ~= "sill" then for _, id in Region.drawnPieces(region) do hidden[id] = true end end
+end
+WorldBuild.world(Workspace, WorldMap.SEED, hidden)
+
+-- With instance streaming on (Workspace.StreamingEnabled, authored in default.project.json) the server sends a client what is near its replication focus, and a player here
+-- has no character to be the focus: each gets a small invisible part, parked at the home region's spawn (Server/WorldFocus). ROBLOX-95: the spider can leave the sill now, so
+-- the part follows it: the client reports where its spider is through the `WorldFocus` remote (when it has moved 8 studs or every 2 seconds, Client/WorldClient) and the
+-- server moves the part there, if the report is a point inside the world and the player is not reporting more than about ten times a second.
+local foci = Instance.new("Folder")
+foci.Name = "ReplicationFoci"
+foci.Parent = Workspace
+local home = WorldMap.region(WorldMap.HOME) :: WorldMap.Region
+WorldFocus.watch(Players, foci, home.spawn.pos + Vector3.new(0, 0.31, 0))
+WorldFocus.listen(ReplicatedStorage, foci)

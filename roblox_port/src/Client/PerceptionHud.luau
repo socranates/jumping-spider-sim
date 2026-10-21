@@ -4,10 +4,13 @@
 -- an off-screen cue is a chevron of two bars, the Focus ticks are four bars, and a label is white Builder Sans on a dark pill under
 -- the ring it names (above it only when the screen has no room below, so a world billboard over a marker no longer lies on it). The
 -- geometry is Shared/UI/PerceptionShapes. What is drawn, and its words, opacities and timings, are PerceptionView's: this changes
--- how it looks, not what it says.
+-- how it looks, not what it says. ROBLOX-113 (W5) is the one exception: the labels are calmed before they are drawn (Shared/UI/QuietHud.calmLabels), one to an area
+-- of the screen with the newest winning and "lost sight" gone in a breath, since Nathan saw three of them piled on the soil; `view` is still the pure view.
 local Shared = game:GetService("ReplicatedStorage"):WaitForChild("Shared")
 local View = require(Shared.UI.PerceptionView)
 local Shapes = require(Shared.UI.PerceptionShapes)
+local Text = require(Shared.UI.PerceptionText)
+local QuietHud = require(Shared.UI.QuietHud)
 local Hud = {}
 Hud.__index = Hud
 
@@ -100,6 +103,7 @@ function Hud.new(parent: Instance): any
 		pools = { bar = {}, circle = {}, label = {} }, -- every widget made, by kind
 		used = { bar = 0, circle = 0, label = 0 }, -- how many this frame has taken
 		shown = { bar = 0, circle = 0, label = 0 }, -- how many were showing after the last frame
+		labels = {}, -- (ROBLOX-113) the labels drawn this frame: the view's, calmed (UI/QuietHud.calmLabels: one to an area of the screen, "lost sight" gone in a breath)
 	}, Hud)
 end
 
@@ -160,7 +164,9 @@ function Hud._hideSpare(self: any)
 	end
 end
 
-function Hud.draw(self: any, memory: any, camera: Camera, cast: any, focusing: boolean, showMark: boolean?)
+-- ROBLOX-110: `showNoticed` false (the setting "Show what the spider notices") draws none of the memory's rings, marks, labels or edge cues (the
+-- view is still built, for tests); `lock`, the locked thing's place, gets the lock's only cue: four faint ticks round it where it is on screen.
+function Hud.draw(self: any, memory: any, camera: Camera, cast: any, focusing: boolean, showMark: boolean?, showNoticed: boolean?, lock: Vector3?)
 	local used = self.used
 	used.bar, used.circle, used.label = 0, 0, 0
 	local viewport = camera.ViewportSize
@@ -187,12 +193,13 @@ function Hud.draw(self: any, memory: any, camera: Camera, cast: any, focusing: b
 		end,
 	}
 	local view = View.build(memory,adapter,showMark)
-	for _, e in view.edges do
+	local shown = showNoticed ~= false
+	for _, e in (if shown then view.edges else {}) do
 		for _, b in Shapes.chevron(e.pos.X, e.pos.Y, e.dir.X, e.dir.Y) do
 			self:_bar(b, THICKNESS.chevron, e.alpha)
 		end
 	end
-	for _, r in view.rings do
+	for _, r in (if shown then view.rings else {}) do
 		if r.kind == "mark" then
 			-- Twelve dashes; the gaps grow as the sighting ages (r.dash falls from 1 to 0.3).
 			for _, b in Shapes.dashRing(r.pos.X, r.pos.Y, r.radius, r.dash) do
@@ -202,12 +209,23 @@ function Hud.draw(self: any, memory: any, camera: Camera, cast: any, focusing: b
 			self:_circle(r.pos, r.radius, r.alpha)
 		end
 	end
-	for _, l in view.labels do
+	local labels = QuietHud.calmLabels(if shown then view.labels else {}, Text.LOST, self.labels)
+	for _, l in labels do
 		self:_label(l.text, l.pos, l.offset, l.alpha, viewport)
 	end
 	if focusing then
 		for _, b in Shapes.focusTicks(viewport.X * 0.5, viewport.Y * 0.5) do
 			self:_bar(b, THICKNESS.tick, 0.8)
+		end
+	end
+	self.lockShown = false
+	if lock ~= nil then
+		local p = camera:WorldToViewportPoint(lock)
+		if p.Z > 0 and p.X >= 0 and p.Y >= 0 and p.X <= viewport.X and p.Y <= viewport.Y then
+			for _, b in Shapes.lockTicks(p.X, p.Y) do
+				self:_bar(b, THICKNESS.tick, Shapes.LOCK_ALPHA)
+			end
+			self.lockShown = true
 		end
 	end
 	self:_hideSpare()

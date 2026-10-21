@@ -49,22 +49,22 @@ ControlText.DROP_REFUSED = {
 }
 ControlText.DROP_WALK = "To the edge, to let yourself down"
 
--- What each device calls the controls. Godot's input_setup.gd bindings; the port keeps the D-pad for walking, so lowering on
+-- What each device calls the controls. (L1 / LB locks, R2 / RT focuses, L2 / LT runs; the right-stick click recentres.) Godot's input_setup.gd bindings; the port keeps the D-pad for walking, so lowering on
 -- silk is X on a controller (ROBLOX-05). Touch names are the on-screen buttons.
 local NAMES: { [string]: { [string]: string } } = {
 	keyboard = {
 		feed = "E", jump = "Space", cancel = "Q", letGo = "Q", drop = "F", reel = "W", lower = "S", walk = "WASD", look = "Mouse",
-		creep = "Shift", focus = "Right mouse", eye = "V", recenter = "R", slow = "T", reset = "Backspace", help = "H", zoom = "Wheel",
+		creep = "Ctrl", run = "Shift", focus = "Right mouse", eye = "V", recenter = "R", lock = "R", slow = "T", reset = "Backspace", help = "H", zoom = "Wheel",
 		choose = "C", display = "X", menu = "M", notebook = "N", settings = "O",
 	},
 	gamepad = {
 		feed = "Left-stick click", jump = "A", cancel = "B", letGo = "B", drop = "X", reel = "Stick up", lower = "Stick down", walk = "Left stick",
-		look = "Right stick", creep = "LB", focus = "LT", eye = "Y", recenter = "Right-stick click", slow = "RT", reset = "View",
+		look = "Right stick", creep = "LB", run = "LT", focus = "RT", eye = "Y", recenter = "Right-stick click", lock = "LB", slow = "", reset = "View",
 		help = "", zoom = "", choose = "RB", display = "RB", menu = "View", notebook = "View",
 	},
 	touch = {
 		feed = "Eat", jump = "Jump", cancel = "Cancel", letGo = "Let go", drop = "Silk", reel = "↑", lower = "↓", walk = "Arrows",
-		look = "Drag", creep = "Creep", focus = "Focus", eye = "Eye", recenter = "Recenter", slow = "", reset = "", help = "", zoom = "", choose = "Change", display = "Dance", menu = "Menu", notebook = "Notebook",
+		look = "Drag", creep = "Creep", run = "Run", focus = "Focus", eye = "Eye", recenter = "Recentre", lock = "Lock", slow = "", reset = "", help = "", zoom = "", choose = "Change", display = "Dance", menu = "Menu", notebook = "Notebook",
 	},
 }
 
@@ -72,8 +72,8 @@ local NAMES: { [string]: { [string]: string } } = {
 -- calls setPadStyle from UserInputService:GetStringForKeyCode(ButtonA) at start and after each controller input; names not listed
 -- here (sticks) are the same on both.
 local PLAYSTATION: { [string]: string } = {
-	feed = "L3", jump = "Cross", cancel = "Circle", letGo = "Circle", drop = "Square", creep = "L1", focus = "L2", eye = "Triangle",
-	recenter = "R3", slow = "R2", reset = "Touchpad", choose = "R1", display = "R1", menu = "Touchpad", notebook = "Touchpad",
+	feed = "L3", jump = "Cross", cancel = "Circle", letGo = "Circle", drop = "Square", creep = "L1", run = "L2", focus = "R2", eye = "Triangle",
+	recenter = "R3", lock = "L1", slow = "", reset = "Touchpad", choose = "R1", display = "R1", menu = "Touchpad", notebook = "Touchpad",
 }
 local padStyle = "xbox"
 
@@ -204,38 +204,56 @@ function ControlText.edgeWalkHint(device: Device): string
 	return `{ControlText.DROP_WALK}    {ControlText.name(device, "cancel")} or move: stop`
 end
 
+-- Focus can be held or latched with the existing accessibility option.
+function ControlText.focusAgain(device: Device): string
+	return `{ControlText.name(device, "focus")} again to stop`
+end
+
+-- The touch Lock button's words (ROBLOX-110): Lock, or Unlock while a lock holds.
+ControlText.LOCK_LABEL, ControlText.UNLOCK_LABEL = "Lock", "Unlock"
+function ControlText.touchLockLabel(locked: boolean): string
+	return if locked then ControlText.UNLOCK_LABEL else ControlText.LOCK_LABEL
+end
+
 -- The touch Cancel button's words: on the line it is the let-go button (held), elsewhere it cancels.
 function ControlText.touchCancelLabel(onLine: boolean): string
 	return if onLine then "Let go\n(hold)" else "Cancel"
 end
 
--- The controls card (H): the device's own bindings, one action per line pair.
+-- The controls card (H): the device's own bindings, one group of actions to a line. The whole card the player reads is PeacockText.card (this, then the crack's line,
+-- the pointer to the Settings row and the display key's line), and it is at most ten lines at the width the HUD gives it (tests/peacock.luau, the Studio PromptSpec);
+-- each line here is at most 61 characters (the card's width at its text size) so that, on a keyboard or a controller, none wraps. The touch card has the room to wrap.
 function ControlText.helpCard(device: Device): string
 	if device == "gamepad" then
 		local function n(action: string): string return ControlText.name("gamepad", action) end
+		-- L1 locks, R2 focuses, and L2 runs; the right-stick click recentres.
 		return table.concat({
-			`Left stick walk   Right stick look   {n("creep")} creep`,
-			`Tap {n("jump")} hop   Hold {n("jump")} aim, release to leap   {n("cancel")} cancel`,
-			`{n("drop")} lower on silk   On the line: stick up reel, down lower, hold {n("letGo")} let go`,
-			`{n("eye")} spider-eye view   {n("recenter")} recenter   {n("focus")} focus   {n("slow")} slow motion`,
-			`In the crack: L3 rest (sleep from evening)   {n("reset")}: life menu / last rest`,
+			"Left stick: walk/creep   Right stick look, click: recentre",
+			`Tap {n("jump")} hop   Hold {n("jump")} aim, release to leap`,
+			`{n("drop")} lower on silk   {n("cancel")} cancel   {n("eye")} eye view`,
+			`On the line: up reel, down lower, hold {n("letGo")} let go`,
+			`{n("lock")} creep/lock (circle)   {n("focus")} focus   {n("run")} run`,
+			`In the crack: {n("feed")} rest (sleep from evening)`,
+			`{n("menu")}: menu, then last rest, notebook, settings`,
 		}, "\n")
 	elseif device == "touch" then
 		return table.concat({
-			"Arrows walk   Drag to look   Creep (hold)",
+			"Arrows walk   Drag to look   Hold Run or Creep",
 			"Tap Jump hop   Hold Jump aim, release to leap   Cancel",
-			"Silk lowers on silk   On the line: ↑ reel, ↓ lower, hold Let go",
-			"Eye spider-eye view   Recenter",
+			"Silk: lower on a line   On it: ↑ reel, ↓ lower, hold Let go",
+			"Lock (← → circle)   Recentre   Focus   Eye",
 			"In the crack: Rest (Sleep from evening)",
+			"Menu: last rest, notebook, settings, this card",
 		}, "\n")
 	end
 	return table.concat({
-		"WASD walk   Mouse look   Shift creep",
+		"WASD walk   Mouse look   Shift run   Ctrl creep   G gait",
 		"Tap Space hop   Hold Space aim, release to leap   Q cancel",
 		"F lower on silk   On the line: W reel, S lower, hold Q let go",
-		"V spider-eye view   R recenter   Right mouse focus   T slow motion",
-		"In the crack: E rest (sleep from evening)   Backspace: last checkpoint   M: life menu   N: notebook   O: settings",
-		"Wheel zoom   G gait   H hide this",
+		"V eye view   Right mouse focus   T slow motion   H: hide this",
+		"R lock on or recentre   Locked: A/D circle, W/S close in",
+		"In the crack: E rest (sleep from evening)",
+		"Backspace: last rest   M: menu   N: notebook   O: settings",
 	}, "\n")
 end
 

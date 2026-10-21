@@ -4,10 +4,11 @@
 -- be real and jarring, not sensationalized; spec 2 no threat spawning behind the player and no unexplained death; spec 8.3 search,
 -- inspect, approach, strike, disengage). Every number is in Data/Wasp.
 --
--- When. At most one visit a day, in the warm middle of the day, never on the first day, never before the spider has finished its first
--- meal, and never while it rests or moults in the crack. Whether a day has a visit, and when, follows from the world's seed and the day
+-- When. At most one visit a day in the Godot replay (some days only) and two in the game (every day from the second, one in the morning and
+-- one in the afternoon; useGameRules, ROBLOX-75), in the warm part of the day, never on the first day, never before the spider has finished its
+-- first meal, and never while it rests or moults in the crack. Whether a day has a visit, and when, follows from the world's seed and the day
 -- alone, so a return to a checkpoint meets the same wasp (the port's own hash: Godot's cannot be reproduced in Luau, so the same seed
--- does not give the same days as Godot).
+-- does not give the same days as Godot). What a day has had is kept as the day of the last visit and which of the day's visits it was.
 --
 -- Warned. The wasp is heard before it is near: it comes in over the window frame from outside for ARRIVE_S and does not search until it
 -- is on the sill. When it lands the spider feels it. When it has seen the spider it turns toward it and comes to look (INSPECT_S at arm's
@@ -30,8 +31,8 @@
 -- (tests/wasp_reference.json, tools/export_wasp_reference.gd) on an analytic world, and the client gives it the real sill's casts.
 -- Random draws come from `rng` (range, unit, int); the tests hand it a scripted one.
 --
--- Not ported: Gentle rules (the wasp touches the spider and leaves; Godot's round 5 modes): the flag exists and the rule is here, but
--- Roblox has no mode choice yet, so it is never set. The sound is the host's (captions only; no audio assets).
+-- Gentle rules (the wasp touches the spider and leaves; Godot's round 5 modes): the flag is `gentle`; the game sets it for Easy and Free play (and never for the
+-- standard rules). The sound is the host's (captions only; no audio assets).
 
 local Data = require(script.Parent.Parent.Data.Wasp)
 local PreyRandom = require(script.Parent.Parent.Prey.PreyRandom)
@@ -39,7 +40,10 @@ local PreyRandom = require(script.Parent.Parent.Prey.PreyRandom)
 local WaspDirector = {}
 WaspDirector.__index = WaspDirector
 
-WaspDirector.PHASES = table.freeze({ "away", "arriving", "searching", "inspecting", "striking", "carrying", "leaving" })
+-- ("taking", "seizing" and "bearing" are the game's wasp going for the rival male, ROBLOX-70: flying to it and hanging over it, the strike, carrying it off.)
+WaspDirector.MAX_SLOTS = #Data.game.windows -- the most visits a day the record can hold (the game's windows: two)
+
+WaspDirector.PHASES = table.freeze({ "away", "arriving", "searching", "inspecting", "striking", "carrying", "leaving", "taking", "seizing", "bearing" })
 
 export type Rng = {
 	range: (Rng, number, number) -> number, -- a number in [lo, hi)
@@ -60,10 +64,15 @@ export type Spider = {
 	walkSpeed: number,
 	airborne: boolean, -- in a jump
 	falling: boolean, -- let down on its line (or fallen)
+	cover: number?, -- ROBLOX-106: the standard rules' factor on notice (Life/Nature.cover); nil: 1
 }
 -- The life this tick (Godot: the habitat loop and the feeding controller).
-export type Block = { day: number, hour: number, resting: boolean, moulting: boolean, meals: number }
+-- `rival`: the free rival male the wasp may take, if one is on the sill (RivalSpider.target): where it is and which way is up from it.
+export type Block = { day: number, hour: number, resting: boolean, moulting: boolean, meals: number, born: number?, rival: { position: Vector3, up: Vector3, present: boolean }? }
 export type Signal = { kind: string, [string]: any }
+
+-- Godot's one window of the day (the game's two are Data.game.windows).
+local ONE_WINDOW: { { number } } = { { Data.windowFromH, Data.windowToH } }
 
 local UP = Vector3.new(0, 1, 0)
 local DOWN = Vector3.new(0, -1, 0)
@@ -104,12 +113,14 @@ function WaspDirector.new(config: { seed: number, world: World, enabled: boolean
 			mode = "flying", search = 0.0, visible = false, prev = Vector3.new(0, 0, 0),
 		},
 		phase = "away", visitS = 0.0, phaseS = 0.0, searchLeft = 0.0, notice = 0.0, confusedS = 0.0,
-		noticedThisVisit = false, sparedThisVisit = false, gentle = false,
-		lastVisitDay = 0, visits = 0, escapes = 0,
+		noticedThisVisit = false, sparedThisVisit = false, gentle = false, nature = false, lingers = false,
+		lastVisitDay = 0, lastVisitSlot = 0, visits = 0, escapes = 0,
 		events = {} :: { { kind: string, t: number } },
 		signals = {} :: { Signal },
 		-- Where the spider hangs while it is carried (nil otherwise); the host moves the spider there each tick.
 		heldAt = nil :: Vector3?, holding = false,
+		-- The rival male (ROBLOX-70): whether this visit is for it, whether it hangs under the wasp, and where.
+		takeRival = false, holdingRival = false, rivalHeldAt = nil :: Vector3?, rivalNow = nil :: any, takeSub = "fly", takeOpen = Vector3.new(0, 0, 0),
 		-- The visit in progress.
 		rng = nil :: Rng?, path = {} :: { Vector3 }, pathI = 1, speed = Data.flySpeed, point = 1, recent = {} :: { number },
 		sub = "", subS = 0.0, walkDir = Vector3.new(0, 0, 0), stepS = 0.0, openPos = Vector3.new(0, 0, 0), lastSeen = Vector3.new(0, 0, 0),
@@ -119,35 +130,104 @@ function WaspDirector.new(config: { seed: number, world: World, enabled: boolean
 	return self
 end
 
+-- The game's rules (Data/Wasp.game): two visits every day from the second, the longer search of ROBLOX-62 and the rival male's draw. A
+-- director that is never given them replays Godot (one window, some days only, the original rates), which is what the goldens check.
+function WaspDirector.useGameRules(self: any)
+	local g = Data.game
+	self.visitChance, self.searchScale, self.noticeScale, self.inspectScale = g.visitChance, g.searchScale, g.noticeScale, g.inspectScale
+	self.rivalChance = g.takesRival
+	self.windowList, self.minGapH = g.windows, g.minGapH
+end
+
 function WaspDirector.isVisiting(self: any): boolean
 	return self.phase ~= "away"
 end
 
 -- ---------------------------------------------------------------------------------------------------------------- when it comes
 
--- Whether day `day` has a visit, and at what hour: -1 when it has none. From the seed and the day alone.
+-- The windows of the day, as (from, to) hours of the life clock: Godot's one, the game's two.
+function WaspDirector.windows(self: any): { { number } }
+	return self.windowList or ONE_WINDOW
+end
+
+-- ROBLOX-106: the standard rules' wasp (Data.game.nature): the client sets `nature` when the rules are not gentle. A director without it is as it was.
+function WaspDirector.natural(self: any): boolean
+	return self.nature == true and not self.gentle
+end
+
+-- The windows of day `day`: the windows, each slid by its own draw of up to Data.game.nature.shiftH either way in the standard rules (ROBLOX-106).
+function WaspDirector.dayWindows(self: any, day: number): { { number } }
+	local windows = self:windows()
+	if not self:natural() then return windows end
+	local shift = Data.game.nature.shiftH
+	local out: { { number } } = {}
+	for slot, w in windows do
+		local d = -shift + 2 * shift * PreyRandom.mixed(self.seed, day, slot, 47):next()
+		out[slot] = { w[1] + d, w[2] + d }
+	end
+	return out
+end
+
+-- How long visit number `visit` of day `day` searches, as a share of the game's search (1 without the standard rules' draw; ROBLOX-106), and whether it lingers.
+function WaspDirector.visitScale(self: any, day: number, visit: number): (number, boolean)
+	if not self:natural() then return 1.0, false end
+	local n = Data.game.nature
+	local r = PreyRandom.mixed(self.seed, day, visit, 53)
+	if r:next() < n.lingerChance then return r:draw(n.linger), true end
+	return r:draw(n.visit), false
+end
+
+-- Whether each of day `day`'s visits happens, and at what hour: one number for each window, -1 when that visit has none. From the seed, the day
+-- and the visit's place in the day alone (the first visit's stream is the one the Godot replay uses). A visit's hour is in the first part of
+-- its window, up to an hour before the window's end, and not before `minGapH` after the visit before it.
+function WaspDirector.plannedHours(self: any, day: number): { number }
+	local hours: { number } = {}
+	local previous = -math.huge
+	for slot, window in self:dayWindows(day) do
+		local hour = -1.0
+		if day >= Data.firstDay then
+			local r = makeStream(self.seed, day, 6 + slot)
+			if r:unit() < (self.visitChance or Data.visitChance) then
+				local from = math.max(window[1], previous + (self.minGapH or 0.0))
+				hour = r:range(from, math.max(window[2] - 1.0, from))
+				previous = hour
+			end
+		end
+		hours[slot] = hour
+	end
+	return hours
+end
+
+-- Whether day `day` has a visit, and at what hour: -1 when it has none. The day's first visit (the only one in the Godot replay).
 function WaspDirector.plannedHour(self: any, day: number): number
-	if day < Data.firstDay then return -1.0 end
-	local r = makeStream(self.seed, day, 7)
-	if r:unit() >= Data.visitChance then return -1.0 end
-	return r:range(Data.windowFromH, Data.windowToH - 1.0)
+	return self:plannedHours(day)[1]
 end
 
 -- Why a visit could not begin now ("" when it could), apart from the hour.
 function WaspDirector.blocked(_self: any, block: Block): string
-	if block.day < Data.firstDay then return "the first day" end
+	-- (ROBLOX-91: `born` is the day before the family's generation began, 0 for the first, and `meals` its own count: a spiderling of the next generation has its first day and
+	-- first meal protected like a new life, whatever the sill's day counter and the meals of the last family say.)
+	if block.day - (block.born or 0) < Data.firstDay then return "the first day" end
 	if block.meals < 1 then return "no meal yet" end
 	if block.resting or block.moulting then return "resting" end
 	return ""
 end
 
+-- Begins the day's next visit if its hour has come: the first of the day's visits not yet had whose window the hour is in, from its planned
+-- hour to the window's end, and nothing blocks it. A visit whose window passed unused (a rest through all of it) is simply skipped.
 function WaspDirector._maybeBegin(self: any, block: Block)
 	local day = block.day
-	if day == self.lastVisitDay then return end
-	local hour = self:plannedHour(day)
-	if hour < 0.0 or block.hour < hour or block.hour >= Data.windowToH then return end
-	if self:blocked(block) ~= "" then return end
-	self:beginVisit(day)
+	local windows = self:dayWindows(day)
+	local done = if day == self.lastVisitDay then self.lastVisitSlot else 0
+	if done >= #windows then return end
+	local hours = self:plannedHours(day)
+	for slot = done + 1, #windows do
+		local hour = hours[slot]
+		if hour >= 0.0 and block.hour >= hour and block.hour < windows[slot][2] then
+			if self:blocked(block) == "" then self:beginVisit(day, nil, slot) end
+			return
+		end
+	end
 end
 
 -- The index of the search place with this id, nil when there is none.
@@ -159,15 +239,18 @@ function WaspDirector.pointIndex(id: string): number?
 end
 
 -- Brings the wasp now (tests, the test place's attribute). `at`: the id of the place it searches first (nil lets the visit choose). False
--- when it is already here.
+-- when it is already here. It uses up the day's next visit.
 function WaspDirector.force(self: any, day: number, at: string?): boolean
 	if self.phase ~= "away" then return false end
 	self:beginVisit(day, if at then WaspDirector.pointIndex(at) else nil)
 	return true
 end
 
-function WaspDirector.beginVisit(self: any, day: number, first: number?)
+-- `slot`: which of the day's visits this is (nil: the next one not yet had that day, the last when all were).
+function WaspDirector.beginVisit(self: any, day: number, first: number?, slot: number?)
+	local done = if day == self.lastVisitDay then self.lastVisitSlot else 0
 	self.lastVisitDay = day
+	self.lastVisitSlot = slot or math.min(done + 1, #self:windows())
 	self.visits += 1
 	self.rng = if self.makeRng then self.makeRng(day, self.visits) else makeStream(self.seed, day * 1009 + 13, self.visits)
 	self.events = {}
@@ -176,11 +259,16 @@ function WaspDirector.beginVisit(self: any, day: number, first: number?)
 	self.confusedS = 0.0
 	self.noticedThisVisit = false
 	self.sparedThisVisit = false
-	self.searchLeft = Data.searchS * (self.searchScale or 1)
+	local scale, lingers = self:visitScale(day, self.visits)
+	self.lingers = lingers
+	self.searchLeft = Data.searchS * (self.searchScale or 1) * scale
 	self.recent = {}
 	self.lossPos = nil
 	self.holding = false
 	self.heldAt = nil
+	self.holdingRival, self.rivalHeldAt = false, nil
+	-- Whether this visit is for the rival male (the game's wasp only): a draw from a stream of its own, so the other draws are as before.
+	self.takeRival = self.rivalChance ~= nil and makeStream(self.seed, day * 1009 + 29, self.visits):unit() < self.rivalChance
 	self.point = first or self.rng:int(1, #Data.points)
 	local to: Vector3 = Data.points[self.point].hover
 	self.path = { Data.entry, Data.over, Vector3.new(to.X, Data.cruiseY, to.Z), to }
@@ -202,6 +290,7 @@ end
 function WaspDirector.step(self: any, dt: number, spider: Spider, block: Block)
 	self.dt = dt
 	self.spider = spider
+	self.rivalNow = block.rival
 	local phase: string = self.phase
 	if phase == "away" then
 		if self.enabled then self:_maybeBegin(block) end
@@ -212,6 +301,7 @@ function WaspDirector.step(self: any, dt: number, spider: Spider, block: Block)
 	if phase == "arriving" then
 		if self:_advance(dt) then
 			self.openPos = self.wasp.position
+			if self.takeRival and self:_beginTaking() then return end
 			self:_setPhase("searching")
 			self:_log("searching")
 			self.sub = "hover"
@@ -237,6 +327,19 @@ function WaspDirector.step(self: any, dt: number, spider: Spider, block: Block)
 			self:_setPhase("away")
 			self.wasp.visible = false
 			self:_signal({ kind = "carried_off" })
+		end
+	elseif phase == "taking" then
+		self:_take(dt)
+	elseif phase == "seizing" then
+		self:_seize(dt)
+	elseif phase == "bearing" then
+		local done = self:_advance(dt)
+		self:_holdRival()
+		if done then
+			self:_setPhase("away")
+			self.wasp.visible = false
+			self.holdingRival, self.rivalHeldAt, self.takeRival = false, nil, false
+			self:_signal({ kind = "rival_carried_off" })
 		end
 	elseif phase == "leaving" then
 		if self:_advance(dt) then
@@ -373,7 +476,9 @@ function WaspDirector.noticeRate(self: any): number
 	local walk = math.max(s.walkSpeed, 0.1)
 	local motion = math.clamp(s.velocity.Magnitude / walk, 0.0, 1.5)
 	if s.airborne then motion = 1.5 end
-	return (self.noticeScale or 1) * (Data.noticeStill + Data.noticeMoving * motion) * math.max(1.0 - d / Data.sightWu, 0.0)
+	-- (ROBLOX-106: `cover`, the standard rules' cover factor the client hands in with the spider, Life/Nature.cover; absent, 1, as Godot's)
+	local cover = if self:natural() and type(s.cover) == "number" then s.cover else 1
+	return (self.noticeScale or 1) * cover * (Data.noticeStill + Data.noticeMoving * motion) * math.max(1.0 - d / Data.sightWu, 0.0)
 end
 
 function WaspDirector._look(self: any, dt: number)
@@ -471,8 +576,8 @@ function WaspDirector._strike(self: any, dt: number)
 	end
 end
 
--- Gentle rules (Godot round 5: Easy and free play): the wasp touches the spider with its antennae and gives up on it, and leaves. Roblox
--- has no such mode yet, so `gentle` is never set outside the tests.
+-- Gentle rules (Godot round 5: Easy and free play): the wasp touches the spider with its antennae and gives up on it, and leaves. The game sets `gentle`
+-- for Easy and Free play.
 function WaspDirector._spare(self: any)
 	self.sparedThisVisit = true
 	self:_log("spared")
@@ -520,6 +625,100 @@ function WaspDirector._beginLeaving(self: any)
 	self.wasp.search = 0.0
 	self:_setPhase("leaving")
 	self:_log("leaving")
+end
+
+-- ---------------------------------------------------------------------------------------------------------------- the rival male (ROBLOX-70)
+
+-- Sets off for the rival, if there is a free one on the sill out of the retreat and a way to hang over it: true, and the visit is for the rival
+-- (it does not look for the spider, and the spider is spared that day). False: the visit goes on as any other.
+function WaspDirector._beginTaking(self: any): boolean
+	local r = self.rivalNow
+	if r == nil or not r.present or self.world.inRetreat(r.position) then return false end
+	local D = Data.rival
+	local top: Vector3 = r.position + r.up * D.aboveWu
+	local low: Vector3 = r.position + r.up * 0.5
+	for _, off in D.offsets do
+		local c = top + Vector3.new(off[1], 0, off[2])
+		local sky = Vector3.new(c.X, math.max(Data.cruiseY, c.Y), c.Z)
+		if not self.world.inRetreat(c) and self:_clear(sky, c, Data.radius) and self:_clear(c, low, D.clearRadius) then
+			self.path = self:_route(self.wasp.position, c)
+			self.pathI = 2
+			self.speed = D.flySpeed
+			self.takeSub = "fly"
+			self.takeOpen = c
+			self.wasp.mode = "flying"
+			self.wasp.search = 0.0
+			self:_setPhase("taking")
+			self:_log("taking")
+			return true
+		end
+	end
+	return false
+end
+
+-- The rival is gone (the spider caught it, say) before the wasp has it: the visit goes on as a search.
+function WaspDirector._abortTaking(self: any)
+	self.takeRival = false
+	self.openPos = self.takeOpen
+	self.wasp.mode = "flying"
+	self:_setPhase("searching")
+	self:_log("rival gone")
+	self:_nextPoint()
+end
+
+function WaspDirector._take(self: any, dt: number)
+	local r = self.rivalNow
+	if r == nil or not r.present then
+		self:_abortTaking()
+		return
+	end
+	if self.takeSub == "fly" then
+		if self:_advance(dt) then
+			self.takeSub = "hover"
+			self.subS = Data.rival.hoverS
+		end
+		return
+	end
+	local wasp = self.wasp
+	self:_moveTo(wasp.position, r.position - wasp.position, dt)
+	self.subS -= dt
+	if self.subS <= 0.0 then
+		self.strikeFrom = wasp.position
+		self.strikeTo = r.position + r.up * 0.2
+		self:_setPhase("seizing")
+		self:_log("seize")
+	end
+end
+
+function WaspDirector._seize(self: any, dt: number)
+	local r = self.rivalNow
+	if r == nil or not r.present then
+		self:_abortTaking()
+		return
+	end
+	local k = math.clamp(self.phaseS / Data.rival.strikeS, 0.0, 1.0)
+	self:_moveTo(self.strikeFrom:Lerp(self.strikeTo, k), self.strikeTo - self.strikeFrom, dt)
+	if k < 1.0 then return end
+	local wasp = self.wasp
+	if (wasp.position - r.position).Magnitude > Data.rival.catchWu then
+		self:_abortTaking()
+		return
+	end
+	self.holdingRival = true
+	wasp.mode = "holding"
+	wasp.search = 0.0
+	local p: Vector3 = wasp.position
+	self.path = { p, p + UP * 2.5, Data.over }
+	self.pathI = 2
+	self.speed = pathLength(self.path) / Data.carryS
+	self:_setPhase("bearing")
+	self:_log("seized")
+	self:_holdRival()
+	self:_signal({ kind = "rival_seized", at = p })
+end
+
+function WaspDirector._holdRival(self: any)
+	if self.holdingRival then self.rivalHeldAt = self.wasp.position + DOWN * Data.holdBelow end
 end
 
 -- ---------------------------------------------------------------------------------------------------------------- paths and the world
@@ -627,20 +826,23 @@ end
 
 -- ---------------------------------------------------------------------------------------------------------------- checkpoints
 
--- Kept in checkpoints: the day of the last visit, and how many visits and escapes this life has had. A visit going on is not kept,
--- because the spider rests in the crack where the wasp cannot find it.
+-- Kept in checkpoints: the day of the last visit, which of that day's visits it was, and how many visits and escapes this life has had. A
+-- visit going on is not kept, because the spider rests in the crack where the wasp cannot find it. A return to a rest therefore meets the
+-- day's remaining visits and never a repeat of the ones had (their hours come from the seed and the day, so nothing is drawn again).
 function WaspDirector.toRecord(self: any): { [string]: number }
-	return { last_visit_day = self.lastVisitDay, visits = self.visits, escapes = self.escapes }
+	return { last_visit_day = self.lastVisitDay, last_visit_slot = self.lastVisitSlot, visits = self.visits, escapes = self.escapes }
 end
 
 -- The record of a life the wasp has not yet visited.
 function WaspDirector.defaultRecord(): { [string]: number }
-	return { last_visit_day = 0, visits = 0, escapes = 0 }
+	return { last_visit_day = 0, last_visit_slot = 0, visits = 0, escapes = 0 }
 end
 
 -- Puts a record back and ends any visit going on (the wasp is away and the spider is no longer held).
 function WaspDirector.load(self: any, d: any)
 	self.lastVisitDay = math.floor(tonumber(d.last_visit_day) or 0)
+	-- A record from before there were two visits a day does not say which one it was: it counts as the day's last, so no visit is repeated.
+	self.lastVisitSlot = if type(d.last_visit_slot) == "number" then math.floor(d.last_visit_slot) else (if self.lastVisitDay > 0 then WaspDirector.MAX_SLOTS else 0)
 	self.visits = math.floor(tonumber(d.visits) or 0)
 	self.escapes = math.floor(tonumber(d.escapes) or 0)
 	self:clearVisit()
@@ -655,6 +857,7 @@ function WaspDirector.clearVisit(self: any)
 	self.confusedS = 0.0
 	self.holding = false
 	self.heldAt = nil
+	self.holdingRival, self.rivalHeldAt, self.takeRival = false, nil, false
 	self.wasp.visible = false
 	self.signals = {}
 	self.events = {}
@@ -671,6 +874,10 @@ function WaspDirector.problems(d: any): { string }
 		if type(v) ~= "number" or v ~= v or v < 0 or v ~= math.floor(v) then
 			table.insert(out, `wasp: {key} must be a whole number, not negative`)
 		end
+	end
+	local slot = d.last_visit_slot -- optional: a record from before two visits a day has none
+	if slot ~= nil and (type(slot) ~= "number" or slot ~= math.floor(slot) or slot < 0 or slot > WaspDirector.MAX_SLOTS) then
+		table.insert(out, `wasp: last_visit_slot must be a whole number from 0 to {WaspDirector.MAX_SLOTS}`)
 	end
 	if #out == 0 and d.escapes > d.visits then table.insert(out, "wasp: more escapes than visits") end
 	return out

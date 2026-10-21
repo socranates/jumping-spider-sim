@@ -6,14 +6,16 @@
 --
 -- Differences from Godot: the captions say where the hum is, as the flies' "[buzzing, ahead-left]" does (Godot's wasp captions did
 -- not); the second line after a catch does not point to a notebook, which the port does not have yet; with no rest to go back to the
--- one choice is "Back to the start" (Godot offered a new spider as another life, which needs the death rules of round 5, not ported).
+-- one choice is "Back to the start"; with one, the screen also offers another spider as a new life (the client's presentEnd, ROBLOX-91: the sac and the generation are left behind).
 local ControlText = require(script.Parent.ControlText)
 local Data = require(script.Parent.Parent.Data.Wasp)
+local Heard = require(script.Parent.Heard)
 
 local WaspText = {}
 
 WaspText.LINE = "A mud dauber wasp stung the spider and carried it away."
 WaspText.SUB = "Its sting does not kill: it paralyses."
+WaspText.RIVAL_TAKEN = "The wasp seized the other spider and carried it off. It is gone for today."
 WaspText.BACK = "Back to your last rest"
 WaspText.START = "Back to the start"
 
@@ -52,11 +54,21 @@ function WaspText.caption(phase: string, phaseS: number, direction: string): { t
 		return { text = `[a deep, heavy hum outside, {direction}, coming closer]`, alpha = 1.0 }
 	elseif phase == "inspecting" or phase == "striking" then
 		return { text = `[the deep hum turns toward you, {direction}]`, alpha = 1.0 }
+	elseif phase == "taking" or phase == "seizing" then
+		-- (The wasp going for the rival male, ROBLOX-70; the host shows these only when it is near, WaspText.heardRival.)
+		return { text = `[the deep hum drops toward something on the sill, {direction}]`, alpha = 1.0 }
+	elseif phase == "bearing" then
+		return { text = `[a short scuffle, then the deep hum rising away with something, {direction}]`, alpha = 1.0 }
 	elseif phase == "leaving" and phaseS < Data.captionTailS then
 		local left = Data.captionTailS - phaseS
 		return { text = `[the deep hum fades away, {direction}]`, alpha = math.clamp(left / Data.captionFadeS, 0.0, 1.0) }
 	end
 	return nil
+end
+
+-- Whether the player hears or sees the wasp take the rival: it is within earshot of the spider, or in clear sight of it (`seen`) and not too far.
+function WaspText.heardRival(distance: number, seen: boolean): boolean
+	return Heard.within(distance, seen) -- (the rule is UI/Heard's, ROBLOX-92; the mate's notices use it too)
 end
 
 -- What the status says while the wasp visits (nil when it is away). The first visit says what wasps do and how to get away.
@@ -71,6 +83,10 @@ function WaspText.line(phase: string, confused: boolean, visits: number, spared:
 		return "A wasp is searching the sill. Keep still, keep out of sight, or get home to the crack."
 	elseif phase == "inspecting" or phase == "striking" then
 		return "The wasp has seen you! Get away: jump, drop on your line, or reach the crack."
+	elseif phase == "taking" or phase == "seizing" then
+		return "The wasp is after something else on the sill. Keep still or keep out of sight until it goes."
+	elseif phase == "bearing" then
+		return "The wasp has taken something and is leaving with it."
 	elseif phase == "carrying" then
 		return "Stung, the spider cannot move. The wasp carries it away."
 	elseif phase == "leaving" then

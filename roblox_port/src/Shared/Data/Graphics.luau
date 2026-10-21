@@ -17,7 +17,7 @@ Graphics.materials = {
 		upper_ledge = "Wood", garden_step = "Plaster",
 		leaf_garden = "SmoothPlastic", stem_garden = "SmoothPlastic", leaf_high = "SmoothPlastic", stem_high = "SmoothPlastic",
 		sill_floor = "SmoothPlastic", front_lip = "SmoothPlastic",
-		back_frame = "Plaster", left_frame = "Plaster", right_frame = "Plaster",
+		back_frame_west = "Plaster", back_frame_east = "Plaster", back_frame_head = "Plaster", back_frame_rail = "Plaster", left_frame = "Plaster", right_frame = "Plaster",
 		planter = "Plaster", planter_rim = "Plaster",
 		leaf_west = "SmoothPlastic", leaf_middle = "SmoothPlastic", leaf_east = "SmoothPlastic", leaf_tip = "Plaster",
 		stem_west = "SmoothPlastic", stem_middle = "SmoothPlastic", stem_east = "SmoothPlastic",
@@ -42,16 +42,28 @@ Graphics.paint = {
 } :: { [string]: { color: string, reflectance: number? } }
 
 -- ---------------------------------------------------------------- the window
--- The back wall is a solid, climbable box (WindowsillLayout back_frame), so the window is drawn: the physical wall turns
+-- The back wall is solid, climbable boxes (WindowsillLayout back_frame_*), so the window is drawn: the physical wall turns
 -- invisible (still solid, still climbable) and Scenery draws a plaster wall behind its face with an opening for the glass.
 Graphics.window = {
-	hidden = "back_frame", -- the piece that turns invisible
+	-- the pieces that turn invisible: the back frame, in four since the lower sash was raised (ROBLOX-95: WindowsillLayout's back_frame_*)
+	hidden = { "back_frame_west", "back_frame_east", "back_frame_head", "back_frame_rail" } :: { string },
 	slabGap = 0.02, -- the drawn wall sits this far behind the climbable face, so the spider's feet never sink into it
-	left = -27.5, right = 27.5, bottom = 3, top = 13, -- the opening: x from/to, y from/to
+	left = -27.5, right = 27.5, bottom = 3, top = 110.5, -- the opening: x from/to, y from/to (ROBLOX-112: the glass up to y 110.5, 13 before: a real window, 1.1 m)
+	-- ROBLOX-112: the window in true proportion. The frame and the wall round it go up to the head (`head`, y 112.5, where the brick's lintel is) over the back frame's
+	-- 14, standing in for World/Garden's window box above it (`upper`, the region wall_upper's: hidden once drawn here). The sashes meet at the transom (`transom`, its
+	-- bottom, `transomH` tall) across all three lights; the middle light's lower sash, raised 6 cm (`opening`), has its top rail that much over the transom, set back
+	-- in the frame as its bottom rail is, and its glass behind the upper sash's from the transom to there.
+	head = 112.5, upper = "wall_upper_window", transom = 55.5, transomH = 2.5, sashLift = 6,
 	trimWidth = 0.5, trimDepth = 0.10, trimReflectance = 0.04, -- the frame bars around the opening, flush with the climbable face; glossy
 	wallColor = "efe8d8", trimColor = "f4efe3",
 	glass = { color = "cfe3e6", transparency = 0.86, reflectance = 0.12, thickness = 0.04, setback = 0.05 },
 	mullions = { -10, 10 }, mullionWidth = 0.7, -- bars between the panes
+	-- ROBLOX-95: the middle lower sash is raised 6 cm. `opening` is the gap it leaves (the layout's own: back_frame_rail's top to back_frame_head's
+	-- underside, between back_frame_west and back_frame_east), open air from the sill rail up to the sash; the glass over it is gone. The raised sash's
+	-- bottom rail is drawn across the top of the opening (`sashRail` tall, `sashDepth` deep, set back `sashSetback` from the face), the jambs either side
+	-- (`jambWidth`) line the cut through the wall, and the sill rail is trim.
+	opening = { left = -8, right = 8, bottom = 0.7, top = 6 },
+	sashRail = 0.8, sashDepth = 0.45, sashSetback = 0.12, jambWidth = 0.5,
 	-- WindowsillLayout.DECOR entries Scenery draws itself
 	replaces = { window_glass = true, mullion_w = true, mullion_e = true } :: { [string]: boolean },
 }
@@ -61,46 +73,67 @@ Graphics.window = {
 -- item's centre appears on the glass (studs across and up), `depth` how far beyond the glass it really is; Scenery turns
 -- that into world positions and sizes, so every item shows where it should whatever the depth. kind "block": a box w x h
 -- on the glass, `t` deep; "ball": a sphere of diameter w; "roof": a gable (a square turned 45 degrees) w wide with its
--- eave line at v. `full`: dropped in the low tier.
+-- eave line at v; "hill" (ROBLOX-103): a flattened ellipsoid w x h x t; "trunk" (ROBLOX-103): a round upright rod w across and h tall. `full`: dropped in the
+-- low tier.
 Graphics.view = {
 	eye = Vector3.new(0, 2.5, 5),
-	ground = { y = -46, size = 2048, color = "7d8f62" },
+	-- ROBLOX-95: the lawn is at the garden's level now, 0.4 below the soil of the bed under the window (World/WorldMap bed_a, y -90), where the house wall
+	-- meets it; it was at -46 when nothing could be walked outside the glass. Everything below stands on it (the trunks and a house were lengthened to reach it).
+	-- ROBLOX-114 (everything to scale): `beyond`: a second ground of the same size past the first's far edge (z -1748), under the gardens and the houses across the
+	-- way, which stand 21 m from this house's back wall now (a part is at most 2,048 studs: one ground could not reach them)
+	ground = { y = -90.4, size = 2048, color = "7d8f62", beyond = true },
 	sky = true,
 	items = {
-		-- far hills
-		{ id = "hill_w", kind = "ball", u = -20, v = -7.0, depth = 320, w = 22, color = "88a08d", full = false },
-		{ id = "hill_m", kind = "ball", u = 3, v = -6.2, depth = 330, w = 24, color = "92a898", full = true },
-		{ id = "hill_e", kind = "ball", u = 24, v = -6.6, depth = 320, w = 22, color = "8aa28f", full = false },
-		-- roofs of the houses across the way
-		{ id = "house_1", kind = "block", u = -24, v = -2.7, depth = 120, w = 6.0, h = 14, t = 5, color = "d8c9a8", full = false },
-		{ id = "roof_1", kind = "roof", u = -24, v = 4.3, depth = 120, w = 6.5, t = 5.4, color = "8d4a3a", full = false },
-		{ id = "house_2", kind = "block", u = -16.5, v = -3.1, depth = 120, w = 5.0, h = 14, t = 5, color = "c9bba0", full = true },
-		{ id = "roof_2", kind = "roof", u = -16.5, v = 3.9, depth = 120, w = 5.5, t = 5.4, color = "5f6a73", full = true },
-		{ id = "house_3", kind = "block", u = -8.5, v = -2.4, depth = 120, w = 6.4, h = 14, t = 5, color = "e0d3b5", full = false },
-		{ id = "roof_3", kind = "roof", u = -8.5, v = 4.6, depth = 120, w = 7.0, t = 5.4, color = "9a5642", full = false },
-		{ id = "house_4", kind = "block", u = 0.5, v = -3.0, depth = 120, w = 5.3, h = 14, t = 5, color = "cdbfa4", full = true },
-		{ id = "roof_4", kind = "roof", u = 0.5, v = 4.0, depth = 120, w = 5.8, t = 5.4, color = "6a5a52", full = true },
-		{ id = "house_5", kind = "block", u = 9, v = -2.2, depth = 120, w = 6.6, h = 14, t = 5, color = "d6c6a6", full = false },
-		{ id = "roof_5", kind = "roof", u = 9, v = 4.8, depth = 120, w = 7.2, t = 5.4, color = "7b4a3d", full = false },
-		{ id = "house_6", kind = "block", u = 17.5, v = -2.9, depth = 120, w = 5.5, h = 14, t = 5, color = "c4b99f", full = true },
-		{ id = "roof_6", kind = "roof", u = 17.5, v = 4.1, depth = 120, w = 6.0, t = 5.4, color = "58626b", full = true },
-		{ id = "house_7", kind = "block", u = 25, v = -2.5, depth = 120, w = 6.2, h = 14, t = 5, color = "dccfb0", full = false },
-		{ id = "roof_7", kind = "roof", u = 25, v = 4.5, depth = 120, w = 6.8, t = 5.4, color = "93513f", full = false },
-		{ id = "chimney_3", kind = "block", u = -7.3, v = 6.7, depth = 119, w = 0.6, h = 2.4, t = 0.8, color = "8c5a48", full = true },
-		{ id = "chimney_5", kind = "block", u = 10.3, v = 6.85, depth = 119, w = 0.6, h = 2.5, t = 0.8, color = "86553f", full = true },
-		-- a tree on the left, a smaller one on the right
-		{ id = "trunk_a", kind = "block", u = -17, v = -3.2, depth = 72, w = 1.3, h = 23.5, t = 1.3, color = "4a3e30", full = false },
-		{ id = "canopy_a1", kind = "ball", u = -17, v = 10.5, depth = 72, w = 11, color = "3f6238", full = false },
-		{ id = "canopy_a2", kind = "ball", u = -23.5, v = 8.5, depth = 72, w = 8.5, color = "496f40", full = false },
-		{ id = "canopy_a3", kind = "ball", u = -10.5, v = 9.0, depth = 72, w = 8, color = "35552f", full = true },
-		{ id = "canopy_a4", kind = "ball", u = -19.5, v = 13.5, depth = 72, w = 7, color = "446a3b", full = true },
-		{ id = "canopy_a5", kind = "ball", u = -13.5, v = 13.2, depth = 72, w = 6.5, color = "3a5c34", full = true },
-		{ id = "canopy_a6", kind = "ball", u = -26, v = 12, depth = 72, w = 6, color = "4d7544", full = true },
-		{ id = "trunk_b", kind = "block", u = 18.5, v = 1.5, depth = 100, w = 0.9, h = 14, t = 0.9, color = "50443a", full = true },
-		{ id = "canopy_b1", kind = "ball", u = 18.5, v = 7.2, depth = 100, w = 6.5, color = "47703e", full = true },
-		{ id = "canopy_b2", kind = "ball", u = 22, v = 6.2, depth = 100, w = 5, color = "3d6336", full = true },
-		{ id = "canopy_b3", kind = "ball", u = 15, v = 6.0, depth = 100, w = 4.5, color = "4f7746", full = true },
+		-- far hills (ROBLOX-103: kind "hill", a flattened ellipsoid w x h x t on the glass, low and wide, their feet under the horizon; the middle one shows only over
+		-- the roofs; the balls of before stood inside the garden once it could be walked). ROBLOX-114: 36 m off (27 before), behind the bungalows now that those stand
+		-- 21 m from this house; a part is at most 2,048 studs, so Scenery draws a hill bigger than that as a part of 2,048 with its sphere mesh scaled up. They are
+		-- the near rise of the land beyond the houses, not a range kilometres off (no part could stand that far and be seen), and lower than they were (their tops 1.2
+		-- lower on the glass, their feet where they were): at their old height and 36 m off they stood 9 to 11 m tall over the bungalows' 5 m ridges, a dome, not a rise.
+		{ id = "hill_w", kind = "hill", u = -20, v = 4.0, depth = 3600, w = 13.2, h = 4.4, t = 13.2, color = "88a08d", full = false },
+		{ id = "hill_m", kind = "hill", u = 2, v = 3.6, depth = 3600, w = 13.2, h = 3.6, t = 13.2, color = "92a898", full = true },
+		{ id = "hill_e", kind = "hill", u = 22, v = 3.9, depth = 3600, w = 13.2, h = 4.4, t = 13.2, color = "8aa28f", full = false },
+		-- (ROBLOX-103: the seven tall houses that stood 1.2 m beyond the glass are Graphics.view.across's bungalows beyond the back fence)
+		-- a tree on the left, a smaller one on the right. ROBLOX-103: they stood 72 and 100 studs beyond the glass, lollipops a metre tall just past the bed (the
+		-- standards Nathan's "bushes" note was about); now they are real trees in the neighbours' gardens beyond the side fences, 7.4 and 9 m out, the left 5 m tall
+		-- with a crown nearly 5 m across, the right 3.5 m, exactly where they were on the glass; their trunks are round ("trunk": a vertical rod w across, h tall).
+		-- ROBLOX-114 (to scale): at their depths a stud on the glass is 43.4 (the left) and 52.4 (the right) in the garden, so the left tree is 7.2 m tall with a crown
+		-- 9.8 m across (an old apple or a field maple) and the right 5.1 m with one 6.3 m across; their trunks were 56 and 47 cm thick, an oak's, and are 33 and 24 cm
+		-- now (w 0.75 and 0.45), a garden tree's trunk for those heights (a judgement from the trees' proportions, not a measured rule: urban trees vary widely,
+		-- Vaz Monteiro, Doick & Handley 2016, Urban Forestry & Urban Greening).
+		{ id = "trunk_a", kind = "trunk", u = -17, v = 5.43, depth = 742, w = 0.75, h = 10.14, color = "4a3e30", full = false },
+		{ id = "canopy_a1", kind = "ball", u = -17, v = 10.5, depth = 742, w = 11, color = "3f6238", full = false },
+		{ id = "canopy_a2", kind = "ball", u = -23.5, v = 8.5, depth = 742, w = 8.5, color = "496f40", full = false },
+		{ id = "canopy_a3", kind = "ball", u = -10.5, v = 9.0, depth = 742, w = 8, color = "35552f", full = true },
+		{ id = "canopy_a4", kind = "ball", u = -19.5, v = 13.5, depth = 742, w = 7, color = "446a3b", full = true },
+		{ id = "canopy_a5", kind = "ball", u = -13.5, v = 13.2, depth = 742, w = 6.5, color = "3a5c34", full = true },
+		{ id = "canopy_a6", kind = "ball", u = -26, v = 12, depth = 742, w = 6, color = "4d7544", full = true },
+		{ id = "trunk_b", kind = "trunk", u = 18.5, v = 3.96, depth = 900, w = 0.45, h = 6.47, color = "50443a", full = true },
+		{ id = "canopy_b1", kind = "ball", u = 18.5, v = 7.2, depth = 900, w = 6.5, color = "47703e", full = true },
+		{ id = "canopy_b2", kind = "ball", u = 22, v = 6.2, depth = 900, w = 5, color = "3d6336", full = true },
+		{ id = "canopy_b3", kind = "ball", u = 15, v = 6.0, depth = 900, w = 4.5, color = "4f7746", full = true },
 	} :: { { id: string, kind: string, u: number, v: number, depth: number, w: number, h: number?, t: number?, color: string, full: boolean } },
+	-- ROBLOX-103 (W3c, Nathan: "the house a single story"): the houses across the way are bungalows, one storey under a pitched roof, standing where they
+	-- would really stand, in the garden's own studs: their fronts `front` (z) beyond the back fence, `wall` tall (2.6 m), `depth` deep, the roof's front slope
+	-- rising at `pitch` degrees from eaves that overhang `overhang` to a ridge over the middle; one row of windows and a door, so nothing reads as a second floor.
+	-- Each house: `x` its middle, `w` its width, its render and roof colours, how many windows, a door, a chimney (`chimney`: where along the ridge, -0.5 to 0.5).
+	-- The low tier keeps the walls and the roofs. ROBLOX-114 (to scale): their faces stood 40 cm behind the back fence, as if they had no gardens; they stand at z -2150
+	-- now, 21 m from this house's back wall (the usual British least distance between facing windows of one- and two-storey houses: Cheshire East
+	-- Local Plan, policy HOU 13), their gardens 7.3 m deep behind the fence. Ridge 2.6 m + tan 30 x 4.3 m = 5.1 m above the lawn (a bungalow's ridge is about
+	-- 4.5 to 5.5 m).
+	across = {
+		front = -2150, depth = 800, wall = 260, pitch = 30, overhang = 30, ridgeCap = 14,
+		window = { w = 120, h = 115, sill = 95, color = "3c4852", frame = "f1ede4" }, door = { w = 95, h = 205, color = "5b4636" },
+		chimney = { w = 55, h = 120, t = 55, color = "8c5a48" },
+		wallMaterial = "Plaster", roofMaterial = "Slate",
+		houses = {
+			{ id = "bungalow_1", x = -680, w = 600, wall = "d2bf98", roof = "7d3b2c", windows = 2, door = true, chimney = 0.28 },
+			{ id = "bungalow_2", x = 30, w = 760, wall = "dccaa4", roof = "4c4f57", windows = 3, door = false, chimney = -0.3 },
+			{ id = "bungalow_3", x = 720, w = 520, wall = "c9b48f", roof = "8a4532", windows = 2, door = true },
+		} :: { { id: string, x: number, w: number, wall: string, roof: string, windows: number, door: boolean, chimney: number? } },
+	},
+	-- ROBLOX-103: the garden's fences (docs/WORLD_MAP_PLAN.md: 10 m wide, 14 m deep): the back fence at `back` and the two side fences along x `x0`, `x1`, from the
+	-- house's wall to the back fence, `height` tall (1.8 m), weathered boards; posts along the back (full tier).
+	fence = { back = -1420, x0 = -500, x1 = 500, near = -24, height = 180, thick = 4, posts = 6, post = 9, color = "8a6f52", postColor = "6f5841", material = "WoodPlanks" },
 }
 
 -- ---------------------------------------------------------------- small details on the sill (full tier only)

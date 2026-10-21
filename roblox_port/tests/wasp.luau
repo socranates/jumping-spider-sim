@@ -751,4 +751,506 @@ case("live pressure tuning extends search without shortening warning",function()
  local faster=w:noticeRate();w.noticeScale=1
  near(faster/w:noticeRate(),1.2,1e-8,"twenty percent quicker recognition")
 end)
+case("the game's wasp comes every day from the second, twice a day, by day, never in a rest (ROBLOX-67, ROBLOX-75); the Godot replay keeps its some-days rule", function()
+	check(Data.visitChance == 0.6 and Data.firstDay == 2 and Data.game.visitChance == 1.0, "Godot's numbers stay; the game's chance is its own setting")
+	check(Data.windowFromH == 10.0 and Data.windowToH == 15.5, "Godot's one warm window stays")
+	local godot = newDirector()
+	local skipped = 0
+	for day = 2, 41 do if godot:plannedHour(day) < 0 then skipped += 1 end end
+	check(skipped > 0, `an unconfigured director still skips days like Godot ({skipped} of 40)`)
+	local d = newDirector()
+	d:useGameRules()
+	check(d.searchScale == 1.6 and d.noticeScale == 1.2 and d.inspectScale == 0.8, "Chet's live multipliers are still applied")
+	check(d:plannedHour(1) == -1.0 and d:plannedHours(1)[1] == -1.0 and d:plannedHours(1)[2] == -1.0, "never on the first day")
+	local hours, distinct = {}, 0
+	for day = 2, 41 do
+		local h = d:plannedHour(day)
+		check(h >= Data.game.windows[1][1] and h < Data.game.windows[1][2] - 1.0 + 1e-9, `day {day}: a morning visit, in its window ({h} h)`)
+		check(d:plannedHour(day) == h, `day {day}: the same world, the same hour`)
+		if not hours[string.format("%.2f", h)] then hours[string.format("%.2f", h)] = true; distinct += 1 end
+	end
+	check(distinct >= 30, `the hour varies from day to day ({distinct} different hours in 40 days)`)
+	-- A simulated ten days, hour by hour: two visits on each of days 2..10, none on day 1.
+	local s = spiderAt(CRACK)
+	local windows = Data.game.windows
+	local function week(resting: (number, number) -> boolean, meals: number, gentle: boolean?): { [number]: { number } }
+		local w = newDirector()
+		w:useGameRules()
+		w.gentle = gentle == true
+		local started: { [number]: { number } } = {}
+		for day = 1, 10 do
+			started[day] = {}
+			local hour = 0.0
+			while hour < 24.0 do
+				w:step(DT, s, { day = day, hour = hour, resting = resting(day, hour), moulting = false, meals = meals })
+				if w:isVisiting() then
+					local slot = w.lastVisitSlot
+					table.insert(started[day], slot)
+					check(not resting(day, hour), `day {day}: not begun during a rest`)
+					check(hour >= windows[slot][1] and hour < windows[slot][2], `day {day}, visit {slot}: begun by day, in its window ({hour} h)`)
+					local planned = w:plannedHours(day)[slot]
+					check(hour >= planned and (resting(day, planned) or hour < planned + 0.06), `day {day}, visit {slot}: begun at its planned hour {planned} (or when the rest ended), not at {hour}`)
+					w:clearVisit()
+				end
+				hour += 0.05
+			end
+		end
+		return started
+	end
+	local function count(t: { [number]: { number } }, day: number, slot: number): number
+		local n = 0
+		for _, v in t[day] do if v == slot then n += 1 end end
+		return n
+	end
+	local started = week(function() return false end, 1)
+	check(#started[1] == 0, "day 1: no visit")
+	for day = 2, 10 do check(#started[day] == 2 and started[day][1] == 1 and started[day][2] == 2, `day {day}: exactly two visits, the morning's and the afternoon's ({#started[day]})`) end
+	local gentle = week(function() return false end, 1, true)
+	for day = 2, 10 do check(#gentle[day] == 2, `day {day}: Easy and Free get both visits too`) end
+	local none = week(function() return false end, 0)
+	local any = false
+	for day = 1, 10 do any = any or #none[day] > 0 end
+	check(not any, "no visit in a life that has not finished a meal")
+	-- A rest through the planned hour: that visit waits for the spider to come out, still inside its window, and never begins in the rest.
+	local late = week(function(_: number, hour: number): boolean return hour < 11.5 end, 1)
+	for day = 2, 10 do check(#late[day] == 2, `day {day}: a rest in the morning only delays the visit ({#late[day]} visits)`) end
+	-- A rest through a whole window skips that visit and no other.
+	local morningRest = week(function(_: number, hour: number): boolean return hour >= 9.0 and hour < 12.5 end, 1)
+	local afternoonRest = week(function(_: number, hour: number): boolean return hour >= 13.0 and hour < 17.0 end, 1)
+	local allDayRest = week(function(_: number, hour: number): boolean return hour >= 9.0 and hour < 17.0 end, 1)
+	for day = 2, 10 do
+		check(#morningRest[day] == 1 and morningRest[day][1] == 2, `day {day}: resting through the morning window skips the morning visit only`)
+		check(#afternoonRest[day] == 1 and afternoonRest[day][1] == 1, `day {day}: resting through the afternoon window skips the afternoon visit only`)
+		check(#allDayRest[day] == 0, `day {day}: resting through both windows means no visit that day`)
+		check(count(morningRest, day, 1) == 0 and count(afternoonRest, day, 2) == 0, `day {day}: a skipped visit is not made up later`)
+	end
+end)
+
+case("two visits a day: the windows, the hours, the gap, and what a return to a checkpoint keeps (ROBLOX-75)", function()
+	local W = Data.game.windows
+	check(#W == 2 and W[1][1] == 9.5 and W[1][2] == 12.0 and W[2][1] == 13.5 and W[2][2] == 16.5 and Data.game.minGapH == 2.0,
+		"morning 09:30 to 12:00, afternoon 13:30 to 16:30, at least two hours between the planned hours")
+	-- Godot's own director: one window, the same hours as before this change (pinned from the code before it).
+	local godot = newDirector()
+	local pinned = { -1.0, 13.102379009408, -1.0, -1.0, 10.685306863713, -1.0, 10.573925433249, 12.768234718017 }
+	local same = true
+	for day = 1, 8 do same = same and math.abs(godot:plannedHour(day) - pinned[day]) < 1e-9 and #godot:plannedHours(day) == 1 end
+	check(same, "an unconfigured director has one window and the very hours it always had")
+	-- The game's hours: in their windows, first part, a gap, and the same for the same seed and day.
+	local d = newDirector()
+	d:useGameRules()
+	local minGap, mornings, afternoons = math.huge, {}, {}
+	for day = 2, 201 do
+		local h = d:plannedHours(day)
+		check(#h == 2 and h[1] >= W[1][1] and h[1] <= W[1][2] - 1.0 + 1e-9 and h[2] >= W[2][1] and h[2] <= W[2][2] - 1.0 + 1e-9, `day {day}: hours {h[1]} and {h[2]} are in the first part of their windows`)
+		minGap = math.min(minGap, h[2] - h[1])
+		mornings[string.format("%.3f", h[1])] = true
+		afternoons[string.format("%.3f", h[2])] = true
+		local again = d:plannedHours(day)
+		check(again[1] == h[1] and again[2] == h[2], `day {day}: the same hours again`)
+	end
+	check(minGap >= 2.0 and minGap < 8, `the afternoon visit is never planned less than two hours after the morning's (least {string.format("%.2f", minGap)} h in 200 days)`)
+	local m, a = 0, 0
+	for _ in mornings do m += 1 end
+	for _ in afternoons do a += 1 end
+	check(m >= 150 and a >= 150, `the hours vary from day to day ({m} morning hours and {a} afternoon hours in 200 days)`)
+	local other = newDirector()
+	other.seed = 78
+	other:useGameRules()
+	local differ = false
+	for day = 2, 20 do differ = differ or other:plannedHours(day)[2] ~= d:plannedHours(day)[2] end
+	check(differ, "another world has other hours")
+	pinned = { 10.172703594515, 10.904140022771, 10.135576451028, 10.867012879284 }
+	local game = WaspDirector.new({ seed = 914, world = makeWorld({ FLOOR }, ref.retreat) })
+	game:useGameRules()
+	same = true
+	for i = 1, 4 do same = same and math.abs(game:plannedHour(i + 1) - pinned[i]) < 1e-9 end
+	check(same, "the world's seed 914 gives these morning hours on days 2 to 5 (pinned)")
+	-- The gap is enforced, not only a product of the windows: windows that overlap still give a visit two hours after the first.
+	local close = newDirector()
+	close:useGameRules()
+	close.windowList = { { 10.0, 14.0 }, { 10.0, 14.0 } }
+	local closest = math.huge
+	for day = 2, 101 do
+		local h = close:plannedHours(day)
+		if h[2] >= 0 then closest = math.min(closest, h[2] - h[1]) end
+	end
+	check(closest >= 2.0 - 1e-9, `the gap is kept even when the windows would allow less ({string.format("%.2f", closest)} h)`)
+	-- Chance applies to each visit of the day.
+	local unlucky = newDirector()
+	unlucky:useGameRules()
+	unlucky.visitChance = 0.5
+	local both, one, neither = 0, 0, 0
+	for day = 2, 401 do
+		local h = unlucky:plannedHours(day)
+		local n = (if h[1] >= 0 then 1 else 0) + (if h[2] >= 0 then 1 else 0)
+		if n == 2 then both += 1 elseif n == 1 then one += 1 else neither += 1 end
+	end
+	check(both > 60 and one > 120 and neither > 60, `a chance below 1 is drawn for each visit alone ({both} days with both, {one} with one, {neither} with none of 400)`)
+
+	-- Protections: day 1 and the first meal, for either visit.
+	local s = spiderAt(CRACK)
+	local fresh = newDirector()
+	fresh:useGameRules()
+	fresh:step(DT, s, { day = 1, hour = 10.5, resting = false, moulting = false, meals = 1 })
+	fresh:step(DT, s, { day = 1, hour = 14.5, resting = false, moulting = false, meals = 1 })
+	check(not fresh:isVisiting() and fresh.visits == 0, "day 1: neither visit")
+	check(fresh:blocked({ day = 2, hour = 11, resting = false, moulting = false, meals = 0 }) == "no meal yet" and fresh:blocked({ day = 1, hour = 14, resting = false, moulting = false, meals = 3 }) == "the first day",
+		"the first-meal and first-day protections apply to every visit")
+	for _, hour in { 11.9, 16.4 } do
+		local e = newDirector()
+		e:useGameRules()
+		e:step(DT, s, { day = 2, hour = hour, resting = false, moulting = false, meals = 0 })
+		check(not e:isVisiting() and e.lastVisitDay == 0, `day 2, ${hour}: before the first meal nothing comes`)
+	end
+	-- Each visit is a full visit: the warning first, then its own place and its own draw for the rival.
+	local day2 = newDirector()
+	day2:useGameRules()
+	local b = { day = 2, hour = day2:plannedHours(2)[1] + 0.02, resting = false, moulting = false, meals = 1 }
+	day2:step(DT, s, b)
+	check(day2:isVisiting() and day2.phase == "arriving" and day2.lastVisitSlot == 1 and day2.visits == 1, "the morning visit begins with the warning")
+	check(day2.searchLeft == Data.searchS * 1.6, "and has the whole game search")
+	day2:clearVisit()
+	b.hour = day2:plannedHours(2)[2] - 0.02
+	day2:step(DT, s, b)
+	check(not day2:isVisiting(), "between the two, quiet")
+	b.hour = day2:plannedHours(2)[2] + 0.02
+	day2:step(DT, s, b)
+	check(day2:isVisiting() and day2.phase == "arriving" and day2.lastVisitSlot == 2 and day2.visits == 2, "the afternoon visit begins with the warning")
+	day2:clearVisit()
+	b.hour = 15.9
+	day2:step(DT, s, b)
+	check(not day2:isVisiting() and day2.lastVisitDay == 2 and day2.lastVisitSlot == 2, "and that is all for the day")
+	b.day, b.hour = 3, day2:plannedHours(3)[1] + 0.02
+	day2:step(DT, s, b)
+	check(day2:isVisiting() and day2.lastVisitSlot == 1 and day2.lastVisitDay == 3, "the next day starts again with a morning visit")
+	local differ = 0
+	for day = 2, 40 do
+		local p = newDirector(nil, false)
+		p:useGameRules()
+		p:force(day)
+		local first = p.point
+		p:clearVisit()
+		p:force(day)
+		if p.point ~= first then differ += 1 end
+	end
+	check(differ >= 25, `each visit draws its own first place ({differ} of 39 days search a different place in the afternoon than in the morning)`)
+
+	-- The rival draw is per visit: about one in ten of all visits, and a morning that takes the rival does not decide the afternoon.
+	local takenMorning, takenAfternoon, both2, total = 0, 0, 0, 3000
+	for seed = 1, total do
+		local g = newDirector(nil, false)
+		g.seed = seed
+		g:useGameRules()
+		g:force(2, "floor_middle")
+		local first = g.takeRival
+		g:clearVisit()
+		g:force(2, "floor_middle")
+		local second = g.takeRival
+		if first then takenMorning += 1 end
+		if second then takenAfternoon += 1 end
+		if first and second then both2 += 1 end
+	end
+	check(takenMorning / total > 0.085 and takenMorning / total < 0.115 and takenAfternoon / total > 0.085 and takenAfternoon / total < 0.115,
+		`each visit takes the rival about one time in ten (morning {takenMorning}, afternoon {takenAfternoon} of {total})`)
+	check(both2 < total * 0.03, `and the draws are independent ({both2} of {total} took it twice, about 1 in 100)`)
+
+	-- A return to a checkpoint: nothing is repeated and nothing is rerolled.
+	local w = newDirector()
+	w:useGameRules()
+	local plan = w:plannedHours(4)
+	w.lastVisitDay, w.lastVisitSlot, w.visits = 3, 2, 6
+	local early = w:toRecord()
+	w:force(4, "floor_middle") -- the day's first visit
+	check(w.lastVisitDay == 4 and w.lastVisitSlot == 1 and w.visits == 7, "the first visit of the day is the first slot")
+	local after1 = w:toRecord()
+	w:clearVisit()
+	w:force(4, "floor_middle")
+	check(w.lastVisitSlot == 2 and w.visits == 8, "the second is the second")
+	local after2 = w:toRecord()
+	check(after1.last_visit_day == 4 and after1.last_visit_slot == 1 and after2.last_visit_slot == 2, "the record says which visit of the day was the last")
+	local function runDay(rec: { [string]: number }): { number }
+		local r = newDirector()
+		r:useGameRules()
+		r:load(rec)
+		local out = {}
+		local hour = 6.0
+		while hour < 20.0 do
+			r:step(DT, s, { day = 4, hour = hour, resting = false, moulting = false, meals = 1 })
+			if r:isVisiting() then
+				table.insert(out, r.lastVisitSlot)
+				table.insert(out, r.visits)
+				r:clearVisit()
+			end
+			hour += 0.05
+		end
+		return out
+	end
+	local fromEarly, from1, from2 = runDay(early), runDay(after1), runDay(after2)
+	check(#fromEarly == 4 and fromEarly[1] == 1 and fromEarly[3] == 2 and fromEarly[2] == 7 and fromEarly[4] == 8, "back to a rest before the day's visits: both come again, the same two (the same visit numbers, so the same draws)")
+	check(#from1 == 2 and from1[1] == 2 and from1[2] == 8, "back to a rest after the morning visit: the afternoon visit still comes, once, and the morning's does not repeat")
+	check(#from2 == 0, "back to a rest after both: none")
+	check(plan[1] == w:plannedHours(4)[1] and plan[2] == w:plannedHours(4)[2], "the hours are the same every time")
+	-- An older record has no slot: its last visit day counts as full, so a visit is never repeated; a new life has none.
+	local old = newDirector()
+	old:useGameRules()
+	old:load({ last_visit_day = 4, visits = 3, escapes = 1 })
+	check(old.lastVisitSlot == WaspDirector.MAX_SLOTS and #runDay({ last_visit_day = 4, visits = 3, escapes = 1 }) == 0, "a record from before two visits a day: that day's visit is counted as the last")
+	check(#runDay({ last_visit_day = 3, visits = 3, escapes = 1 }) == 4, "and the day after it has both visits")
+	local fresh2 = WaspDirector.defaultRecord()
+	check(fresh2.last_visit_slot == 0 and #WaspDirector.problems(fresh2) == 0, "a life not yet visited has slot 0")
+	-- The record is checked.
+	for _, bad in { -1, 3, 0.5, "x", 1 / 0 } do
+		local rec = { last_visit_day = 2, last_visit_slot = bad, visits = 1, escapes = 0 }
+		check(#WaspDirector.problems(rec) == 1 and string.find(WaspDirector.problems(rec)[1], "last_visit_slot", 1, true) ~= nil, `a slot of {tostring(bad)} is refused`)
+	end
+	check(#WaspDirector.problems({ last_visit_day = 2, visits = 1, escapes = 0 }) == 0 and #WaspDirector.problems({ last_visit_day = 2, last_visit_slot = 2, visits = 1, escapes = 0 }) == 0, "a record without a slot, or with 2, is good")
+	-- The Godot director's one window: a record of one visit that day ends the day, as it always did.
+	local oneWindow = newDirector()
+	oneWindow:load({ last_visit_day = 5, last_visit_slot = 1, visits = 2, escapes = 0 })
+	oneWindow:step(DT, s, { day = 5, hour = 12.0, resting = false, moulting = false, meals = 1 })
+	check(not oneWindow:isVisiting(), "Godot's director has one visit a day")
+end)
+
+-- ------------------------------------------------------------------------------------------------------- the rival male (ROBLOX-70)
+local Rival = require("../src/Shared/Predator/RivalSpider")
+local Route = require("../src/Shared/Predator/RivalRoute")
+local function gameDirector(seed: number?, boxes: { Box }?): any
+	local d = WaspDirector.new({ seed = seed or 77, world = makeWorld(boxes or { FLOOR }, ref.retreat), enabled = false })
+	d:useGameRules()
+	return d
+end
+-- The rival on the open floor, free and still (a wasp visit pauses it).
+local function rivalAt(p: Vector3, up: Vector3?): any
+	return { position = p, up = up or Vector3.yAxis, present = true }
+end
+local RIVAL_AT = Vector3.new(12, 0.31, 3)
+-- Runs a visit: the phases it passes through, its signals, and whether it noticed the spider. `rival` may be a function of the tick.
+local function visit(d: any, spider: any, rival: any, maxTicks: number): ({ string }, { string }, boolean)
+	local phases, kindsSeen = {}, {}
+	local last = ""
+	for tick = 1, maxTicks do
+		local r = if type(rival) == "function" then rival(tick, d) else rival
+		d:step(DT, spider, { day = 2, hour = 12.0, resting = false, moulting = false, meals = 1, rival = r })
+		if d.phase ~= last then table.insert(phases, d.phase); last = d.phase end
+		for _, sig in d:drainSignals() do table.insert(kindsSeen, sig.kind) end
+		if d.holding then spider.position = d.heldAt end
+		if d.phase == "away" and d.visitS > 0 then break end
+	end
+	return phases, kindsSeen, d.noticedThisVisit
+end
+-- A seed whose visit on day 2 is for the rival (the draw is its own stream) / one whose visit is not.
+local function seedWhere(flag: boolean): number
+	for seed = 1, 400 do
+		local d = gameDirector(seed)
+		d:force(2, "floor_middle")
+		if d.takeRival == flag then return seed end
+	end
+	error("no seed")
+end
+
+case("the wasp takes the rival male about one visit in ten, by a draw of its own that moves nothing else (ROBLOX-70)", function()
+	check(Data.game.takesRival == 0.10, "the chance is a setting in Data/Wasp.game")
+	local godot = newDirector()
+	godot:force(2, "floor_middle")
+	check(godot.takeRival == false and godot.rivalChance == nil, "the Godot replay's wasp never goes for a rival")
+	local taken, visits = 0, 4000
+	local same = true
+	for i = 1, visits do
+		local d = gameDirector(i)
+		local plain = newDirector()
+		plain.seed = i
+		d:force(2, "floor_middle")
+		plain:force(2, "floor_middle")
+		if d.takeRival then taken += 1 end
+		if d.point ~= plain.point or d.searchLeft ~= plain.searchLeft * 1.6 then same = false end
+	end
+	local rate = taken / visits
+	check(rate >= 0.085 and rate <= 0.115, `about one visit in ten is for the rival ({taken} of {visits} = {string.format("%.3f", rate)})`)
+	check(same, "the other draws of a visit (its first place, its length) are as without the rival")
+	local a, b = gameDirector(5), gameDirector(5)
+	a:force(2, "floor_middle"); b:force(2, "floor_middle")
+	check(a.takeRival == b.takeRival, "the same world, the same day, the same visit: the same draw")
+	-- Over visits the rival is really there for: the rate among visits that find one.
+	local took = 0
+	for i = 1, 600 do
+		local d = gameDirector(i)
+		d:force(2, "floor_middle")
+		local spider = spiderAt(OPEN)
+		local _, seen = visit(d, spider, rivalAt(RIVAL_AT), 60 * 40)
+		if table.find(seen, "rival_seized") then took += 1 end
+	end
+	check(took >= 36 and took <= 84, `with a rival on the sill, about 10% of 600 visits take it ({took})`)
+end)
+
+case("a visit for the rival: it flies to it, hangs over it, strikes, carries it off; the spider is not hunted and not caught (ROBLOX-70)", function()
+	local seed = seedWhere(true)
+	local d = gameDirector(seed)
+	d:force(2, "floor_middle")
+	local spider = spiderAt(Vector3.new(14, 0.31, 3.5)) -- close to the rival, in the open, and moving
+	spider.velocity = Vector3.new(WALK, 0, 0)
+	local phases, seen, noticed = {}, {}, false
+	local heldHigh, maxNotice = false, 0.0
+	local last = ""
+	local hung = nil :: Vector3?
+	for tick = 1, 60 * 40 do
+		spider.position += spider.velocity * DT * (if (tick // 30) % 2 == 0 then 1 else -1)
+		d:step(DT, spider, { day = 2, hour = 12.0, resting = false, moulting = false, meals = 1, rival = rivalAt(RIVAL_AT) })
+		if d.phase ~= last then table.insert(phases, d.phase); last = d.phase end
+		maxNotice = math.max(maxNotice, d.notice)
+		for _, sig in d:drainSignals() do table.insert(seen, sig.kind) end
+		if d.holdingRival then
+			hung = d.rivalHeldAt
+			check(close(d.rivalHeldAt :: Vector3, d.wasp.position + Vector3.new(0, -Data.holdBelow, 0), 1e-6), "the rival hangs under the wasp like a held spider")
+			if d.rivalHeldAt.Y > 10 then heldHigh = true end
+		end
+		if d.phase == "away" and d.visitS > 0 then break end
+	end
+	check(table.concat(phases, ",") == "arriving,taking,seizing,bearing,away", `arriving, taking, seizing, bearing: {table.concat(phases, ",")}`)
+	check(table.concat(seen, ",") == "visit_started,rival_seized,rival_carried_off", `signals: {table.concat(seen, ",")}`)
+	check(maxNotice == 0.0 and not d.noticedThisVisit and not d.holding and d.heldAt == nil and d.escapes == 0, "it never looked for the spider: no notice, no catch, no escape counted")
+	check(heldHigh and hung ~= nil, "the rival is carried up and away over the frame")
+	check(not d.wasp.visible and not d.holdingRival and d.rivalHeldAt == nil, "and then it is gone")
+	check(d.visitS > Data.arriveS + Data.rival.hoverS + Data.rival.strikeS + Data.carryS - 0.5 and d.visitS < Data.arriveS + 25, `the visit is short ({string.format("%.1f", d.visitS)} s)`)
+	check(d.lastVisitDay == 2 and d.visits == 1, "it counts as that day's visit: no second wasp today")
+	d:step(DT, spider, { day = 2, hour = 13.0, resting = false, moulting = false, meals = 1, rival = rivalAt(RIVAL_AT) })
+	check(not d:isVisiting(), "and none comes later the same day")
+	-- Sat in plain sight right under it, still: not noticed either.
+	local e = gameDirector(seed)
+	e:force(2, "floor_middle")
+	local still = spiderAt(RIVAL_AT + Vector3.new(1.0, 0, 0))
+	local ph, sg, noticed2 = visit(e, still, rivalAt(RIVAL_AT), 60 * 40)
+	check(not noticed2 and not table.find(ph, "inspecting") and not table.find(ph, "striking") and table.find(sg, "rival_seized") ~= nil, "a spider beside the rival is not hunted")
+end)
+
+case("no rival, no taking: with none on the sill, or in the retreat, or out of reach, the visit is the spider's as ever (ROBLOX-70)", function()
+	local seed = seedWhere(true)
+	for name, rival in {
+		none = nil,
+		absent = { position = RIVAL_AT, up = Vector3.yAxis, present = false },
+		crack = rivalAt(Vector3.new(-25, 0.31, 6)),
+	} do
+		local d = gameDirector(seed)
+		d:force(2, "floor_middle")
+		local spider = spiderAt(OPEN)
+		local ph, sg = visit(d, spider, rival, 60 * 30)
+		check(table.find(ph, "taking") == nil and table.find(sg, "rival_seized") == nil, `{name}: it does not go for a rival`)
+		check(table.find(ph, "searching") ~= nil, `{name}: it searches for the spider instead`)
+	end
+	-- A rival under a wide roof, out of reach from above and from the sides: the visit is the spider's.
+	local roof: Box = { min = Vector3.new(-4, 1.0, -4), max = Vector3.new(28, 1.2, 14) }
+	local d = gameDirector(seed, { FLOOR, roof })
+	d:force(2, "floor_middle")
+	local ph, sg = visit(d, spiderAt(Vector3.new(-30, 0.31, 6)), rivalAt(RIVAL_AT), 60 * 30)
+	check(table.find(ph, "taking") == nil and table.find(sg, "rival_seized") == nil and table.find(ph, "searching") ~= nil, "under a roof it cannot get at, it searches")
+	-- A visit not for the rival never looks at one.
+	local other = seedWhere(false)
+	local o = gameDirector(other)
+	o:force(2, "floor_middle")
+	local ph2, sg2 = visit(o, spiderAt(OPEN), rivalAt(RIVAL_AT), 60 * 30)
+	check(table.find(ph2, "taking") == nil and table.find(sg2, "rival_seized") == nil, "a visit that is not for the rival leaves it alone")
+	-- The rival is caught by the spider (or leaves) on the way: the wasp goes on searching, and can still find the spider.
+	local c = gameDirector(seed)
+	c:force(2, "floor_middle")
+	local gone = false
+	local ph3, sg3, noticed3 = visit(c, spiderAt(Vector3.new(2, 0.31, 6)), function(_: number, dir: any): any
+		if dir.phase == "taking" then gone = true end
+		return if gone then { position = RIVAL_AT, up = Vector3.yAxis, present = false } else rivalAt(RIVAL_AT)
+	end, 60 * 60)
+	check(gone and table.find(ph3, "taking") ~= nil and table.find(sg3, "rival_seized") == nil and table.find(ph3, "searching") ~= nil, "a rival that is gone before the strike is not taken; the search goes on")
+	check(c.holdingRival == false and c.rivalHeldAt == nil, "and nothing is held")
+	local _ = noticed3
+end)
+
+case("the wasp can get at most places the rival walks on (ROBLOX-70)", function()
+	local boxes: { Box } = {}
+	for _, piece in Layout.PIECES do table.insert(boxes, { min = piece.lo, max = piece.hi }) end
+	local world = makeWorld(boxes, ref.retreat)
+	world.inRetreat = function(p: Vector3): boolean return Layout.inRetreat(p) end
+	local d = WaspDirector.new({ seed = 77, world = world, enabled = false })
+	d:useGameRules()
+	local drive = require("../src/Shared/Predator/RivalDrive").new({}, function() return true end)
+	local reach, total = 0, 0
+	for _, w in drive.waypoints do
+		total += 1
+		d:clearVisit()
+		d.rivalNow = { position = w.pos + w.up * Route.SEAT, up = w.up, present = true }
+		d.wasp.position = Data.points[1].hover
+		d.openPos = d.wasp.position
+		d.path, d.pathI = { d.wasp.position }, 2
+		if d:_beginTaking() then reach += 1 end
+	end
+	print(string.format("WASP rival reach: %d of %d places the rival patrols to can be reached by the wasp", reach, total))
+	check(total > 80 and reach / total >= 0.6, `the wasp can get at most of them ({reach} of {total})`)
+end)
+
+case("the rival's fate: seized, carried off, gone for today, a new one next morning; the record keeps why (ROBLOX-70)", function()
+	local r = Rival.new()
+	check(Rival.target(r) == nil and not Rival.seize(r), "a rival that has not arrived cannot be taken")
+	r.state = "patrol"
+	r.position = Vector3.new(12, 0.31, 3)
+	check(Rival.target(r) ~= nil and Rival.target(r).present, "a free rival on the sill can")
+	r.state = "lunge"
+	check(Rival.target(r) == nil, "not in the air mid-lunge")
+	r.state = "captured"
+	check(Rival.target(r) == nil and not Rival.seize(r), "not while the spider has it")
+	r.state = "recover"
+	r.position = Vector3.new(-25, 0.31, 6)
+	check(Rival.target(r) == nil, "not in the retreat")
+	r.position = Vector3.new(12, 0.31, 3)
+	check(Rival.seize(r) and r.state == "taken" and Rival.percept(r) == nil, "seized, it is not a percept")
+	local s = { position = Vector3.new(11, 0.31, 3), previous = Vector3.new(11, 0.31, 3), heading = Vector3.xAxis, day = 3, hour = 13, meals = 2, resting = false,
+		safe = false, wasp = true, gentle = false, grounded = true, moving = false, airborne = false, onLine = false, holding = false, striking = true, taken = true }
+	local ev, food = Rival.step(r, DT, s, function() return false end)
+	check(r.state == "taken" and ev == "" and food == 0, "held by the wasp, the spider's strike cannot catch it")
+	r.position = Vector3.new(27, 16, 2) -- carried up over the frame: a valid record
+	check(Rival.valid(r), "a rival hanging under the wasp, outside the play bounds, is a valid record")
+	Rival.carried(r, 3)
+	check(r.state == "consumed" and r.food == 0 and r.day == 3 and r.fate == "taken by the wasp" and Rival.valid(r), "carried off: gone, food for no one, the day and the reason kept")
+	s.wasp, s.taken, s.striking = false, false, false
+	local ev2, food2 = Rival.step(r, DT, s, function() return false end)
+	check(r.state == "consumed" and ev2 == "" and food2 == 0, "the same day nothing new comes")
+	s.day, s.hour = 4, 6.5
+	Rival.step(r, DT, s, function() return false end)
+	check(r.state == "consumed", "nor before the morning")
+	s.hour = 7.2
+	Rival.step(r, DT, s, function() return false end)
+	check(r.state == "patrol" and r.day == nil and r.fate == nil and r.food == Rival.FOOD, "the next morning a new rival is on the sill")
+	-- A record taken while the wasp held the rival: the wasp is gone after a return, so the rival is carried off.
+	local held = Rival.new()
+	held.state, held.position = "patrol", Vector3.new(12, 0.31, 3)
+	Rival.seize(held)
+	s.day, s.hour, s.taken = 5, 12, false
+	local ev3 = Rival.step(held, DT, s, function() return false end)
+	check(ev3 == "taken" and held.state == "consumed" and held.day == 5 and held.fate == "taken by the wasp", "a rival still held when the wasp is no longer there is gone")
+	-- An eaten rival says so; a bad reason is refused.
+	local eaten = Rival.new()
+	eaten.state, eaten.position, eaten.food = "captured", Vector3.new(12, 0.31, 3), 0.001
+	s.position, s.heading, s.moving, s.grounded = Vector3.new(12, 0.31, 3), Vector3.xAxis, false, true
+	for _ = 1, 20 do Rival.step(eaten, DT, s, function() return false end) end
+	check(eaten.state == "consumed" and eaten.fate == "eaten", "an eaten rival is marked eaten")
+	for _, bad in { 3, true, "elf", "" } do
+		eaten.fate = bad
+		check(not Rival.valid(eaten), `a fate of {tostring(bad)} is refused`)
+	end
+	eaten.fate = nil
+	check(Rival.valid(eaten), "and no fate at all (an older record) is fine")
+end)
+
+case("the words of the wasp taking the rival: captions and lines only for a spider that hears or sees (ROBLOX-70)", function()
+	local seized = WaspText.caption("seizing", 0, "ahead-left")
+	check(seized ~= nil and seized.text == "[the deep hum drops toward something on the sill, ahead-left]", "it drops toward something")
+	check(WaspText.caption("taking", 0, "left") ~= nil, "and while it hangs over it")
+	local bearing = WaspText.caption("bearing", 0, "above")
+	check(bearing ~= nil and bearing.text == "[a short scuffle, then the deep hum rising away with something, above]", "and carries it off")
+	for _, phase in { "taking", "seizing", "bearing" } do
+		local c = WaspText.caption(phase, 0, "ahead") :: any
+		check(string.sub(c.text, 1, 8) ~= "[buzzing" and string.find(c.text, "you", 1, true) == nil, "not the flies' words, and not about the spider")
+		check(WaspText.line(phase, false, 1, false, "keyboard" :: any) ~= nil, `a status line for {phase}`)
+	end
+	check(WaspText.heardRival(Data.rival.earshotWu, false) and not WaspText.heardRival(Data.rival.earshotWu + 0.1, false), "heard within earshot")
+	check(WaspText.heardRival(Data.rival.sightWu, true) and not WaspText.heardRival(Data.rival.sightWu + 0.1, true) and not WaspText.heardRival(Data.rival.sightWu, false), "or seen, further")
+	check(string.find(WaspText.RIVAL_TAKEN, "other spider", 1, true) ~= nil, "the notice says what happened")
+end)
+
 print(`WASP passed={passed} failed={failed}`)

@@ -9,6 +9,8 @@ SaveText.TROUBLE = "Having trouble saving. Your progress is kept for now and the
 SaveText.OFF = "Saving is off for this visit: your notebook and rests will last only until you leave."
 SaveText.LOOKING = "Finding your saved game..."
 SaveText.BACK = "Saving is back on."
+-- ROBLOX-92: the client's saving broke (something in it raised): saving is off for the rest of the visit, and the game goes on. The one status line, and the menu's.
+SaveText.BROKEN = "Saving is off"
 
 SaveText.WHY = {
 	offline = "The game could not reach its saving service.",
@@ -36,6 +38,11 @@ function SaveText.menuLine(status: string?, reason: string?): string
 		return SaveText.SAVED
 	end
 	return SaveText.LOOKING
+end
+
+-- The line for the menu once the client's own saving has broken (the server's word no longer matters: nothing more is sent).
+function SaveText.brokenLine(): string
+	return SaveText.OFF .. "\nSomething in the saving broke, so this visit will not be saved."
 end
 
 -- A short toast when the status changes, or "" when nothing needs saying (a plain saving/saved flicker is not announced).

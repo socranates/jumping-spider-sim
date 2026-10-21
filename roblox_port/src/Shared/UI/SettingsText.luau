@@ -15,7 +15,8 @@ SettingsText.LARGE = NotebookText.LARGE
 SettingsText.MIN_TARGET = 44
 -- The widest control cluster of each kind at normal text: a toggle's button; a choice's two arrows and its word; a slider's minus, bar,
 -- number and plus.
-SettingsText.CONTROL = { toggle = 96, choice = 240, slider = 360 } :: { [string]: number }
+-- An action's (ROBLOX-90) is one wider button, for "Look closely".
+SettingsText.CONTROL = { toggle = 96, choice = 240, slider = 360, action = 160 } :: { [string]: number }
 -- A label needs at least this much width beside its control; otherwise the control goes underneath.
 SettingsText.MIN_LABEL = 170
 SettingsText.PAD = 10
@@ -39,7 +40,7 @@ end
 function SettingsText.controls(device: ControlText.Device): string
 	if device == "gamepad" then
 		local n = function(action: string): string return ControlText.name("gamepad", action) end
-		return `Stick or D-pad: choose and change    {n("jump")}: switch    {n("creep")} and {n("choose")}: sections    {n("cancel")}: back`
+		return `Stick or D-pad: choose and change    {n("jump")}: switch    {n("lock")} and {n("choose")}: sections    {n("cancel")}: back`
 	elseif device == "touch" then
 		return "Tap a setting to switch it. Use - and + or drag a bar."
 	end

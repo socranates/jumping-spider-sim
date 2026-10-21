@@ -21,14 +21,14 @@ The sources were found by a web search, but most papers could not be opened, so 
 
 | Topic | What we found | Strength | Source |
 |---|---|---|---|
-| Moults to adult | Males 5–7 in the lab and 6–8 in the field; females 6–8 in the lab and 7–9 in the field (*P. johnsoni*) | Strong (relative) | Jackson 1978, *J. Arachnol.* 6: 1–29 |
+| Moults to adult | Males 5–7 in the lab and 6–8 in the field; females 6–8 in the lab and 7–9 in the field (*P. johnsoni*; the field figures are estimates from measurements, "probably" in the abstract, and only the lab figures are counts) | Strong (relative) | Jackson 1978, *J. Arachnol.* 6: 1–29 |
 | Life length | One generation a year. *P. audax* overwinters as a juvenile, often in the instar before adult, and matures in spring | Strong | Taylor & Peck 1975, *J. Arachnol.* 2: 89–99; Jackson 1978; Penn State Extension |
 | Adult life | About 3–4 months in the lab (*P. johnsoni*) | Strong (relative), excerpt | Jackson 1978 |
 | Moulting | Inside a dense silk nest; about 6 days in the nest before a moult and 2 after (*P. johnsoni*) | Strong (relative), excerpt | Jackson 1979, *J. Arachnol.* 7: 47–58 |
 | Hunting around a moult | Stops for about 12 days around a moult; failed catches before it (*Trite auricoma*) | Weak | Forster 1977, *NZ J. Zool.* 4: 435–443 |
 | Moult duration, soft period | — | Missing | — |
 | Hunger and activity | *P. audax* switches between staying in the nest and going out to hunt by how hungry it is; spiders in nests were hungrier | Strong | Okuyama 2011, *Naturwissenschaften* 98: 15–22 |
-| Going without food | Adult female *P. johnsoni* kept 25–31 days unfed; juveniles in the cold last months | Strong (relative), excerpt | Jackson 1978, 1980 |
+| Going without food | Juveniles in the cold last months (*P. johnsoni*). The "adult female kept 25–31 days unfed" this row used to give could not be found when Jackson 1978's PDF was searched on 2026-10-19, so it is not relied on (docs/NOTEBOOK_SOURCES.md) | Strong (relative) for the cold; the days not found | Jackson 1978 (1980 not seen) |
 | Starvation limit | Other spider families: 208–276 days | Weak | Anderson 1974, *Ecology* 55: 576–585 |
 | Body condition | Abdomen size against the carapace is the usual measure of how well fed a spider is | Weak (general) | Jakob, Marshall & Uetz 1996, *Oikos* 77: 61–67 |
 | Hunger and hunting skill | Food-restricted spiders spent more time out, noticed prey sooner and caught more (*Phintelloides versicolor*) | Weak | Li et al. 2021, *Ecology and Evolution* |

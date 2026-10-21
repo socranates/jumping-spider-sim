@@ -320,7 +320,7 @@ end
 -- HudLayout: prompts never under a touch button, wide enough to read, at phone, tablet and desktop sizes.
 local HudLayout = require("../src/Shared/UI/HudLayout")
 do
-	local sizes = { { 568, 320 }, { 667, 375 }, { 844, 390 }, { 932, 430 }, { 1024, 768 }, { 1180, 820 }, { 1366, 1024 }, { 390, 844 }, { 768, 1024 } }
+	local sizes = { { 480, 320 }, { 568, 320 }, { 640, 360 }, { 667, 375 }, { 844, 390 }, { 932, 430 }, { 1024, 768 }, { 1180, 820 }, { 1366, 1024 }, { 390, 844 }, { 768, 1024 } } -- (ROBLOX-92: 480 x 320 and 640 x 360, the landscape phones that are not 568 wide)
 	local clear, wide, inside, apart, panelInside = true, true, true, true, true
 	for _, sz in sizes do
 		local w, h = sz[1], sz[2]
@@ -346,7 +346,7 @@ end
 -- ROBLOX-50: touch targets and the top strip. Every touch button is at least 48 px each way and a few pixels from the next; the Menu and
 -- Notebook buttons are touch targets too, on screen, clear of each other, of the touch buttons, of the prompt panel and of the status column.
 do
-	local sizes = { { 360, 640 }, { 390, 844 }, { 568, 320 }, { 667, 375 }, { 844, 390 }, { 932, 430 }, { 768, 1024 }, { 1024, 768 }, { 1180, 820 }, { 1280, 720 }, { 1366, 1024 }, { 1920, 1080 }, { 1100, 500 } }
+	local sizes = { { 360, 640 }, { 390, 844 }, { 480, 320 }, { 568, 320 }, { 640, 360 }, { 667, 375 }, { 844, 390 }, { 932, 430 }, { 768, 1024 }, { 1024, 768 }, { 1180, 820 }, { 1280, 720 }, { 1366, 1024 }, { 1920, 1080 }, { 1100, 500 } } -- (ROBLOX-92: 480 x 320 and 640 x 360 added; a short screen is under 450 tall, whatever its width)
 	local small, close, bad, gaps = {}, {}, {}, {}
 	for _, sz in sizes do
 		local w, h = sz[1], sz[2]
@@ -394,6 +394,12 @@ do
 	check(#close == 0, "and at least 4 px from the next one")
 	check(#bad == 0, "Menu and Notebook are touch targets, on screen, and clear of each other, the touch buttons, the prompts and the status lines")
 	check(HudLayout.topLayout(390, 844).stacked == false and HudLayout.topLayout(1280, 720).stacked == true, "a narrow phone has the buttons in a row, a wide screen in a stack")
+	check(HudLayout.isShort(480, 320) and HudLayout.isShort(640, 360) and HudLayout.isShort(1100, 449) and not HudLayout.isShort(1100, 450) and not HudLayout.isShort(360, 640) and not HudLayout.isShort(0, 0), "a short screen is under 450 tall, whatever its width (it was 568 and wider only)")
+	local rows: { [number]: boolean } = {}
+	for _, b in HudLayout.TOUCH_BUTTONS do rows[HudLayout.buttonRect(b, 480, 320).y0] = true end
+	local rowCount = 0
+	for _ in rows do rowCount += 1 end
+	check(rowCount <= 3, `a 480 x 320 phone has the buttons in the three rows of the short layout ({rowCount})`)
 end
 
 
@@ -511,7 +517,7 @@ end
 
 
 ControlText.setPadStyle(ControlText.padStyleFor("ButtonCross"))
-check(ControlText.padStyle() == "playstation" and ControlText.name("gamepad", "jump") == "Cross" and ControlText.name("gamepad", "focus") == "L2"
+check(ControlText.padStyle() == "playstation" and ControlText.name("gamepad", "jump") == "Cross" and ControlText.name("gamepad", "focus") == "R2"
 	and ControlText.name("gamepad", "eye") == "Triangle" and ControlText.name("gamepad", "walk") == "Left stick" and ControlText.name("keyboard", "jump") == "Space"
 	and string.find(ControlText.helpCard("gamepad"), "Hold Cross", 1, true) ~= nil, "a PlayStation controller gets its own button names")
 ControlText.setPadStyle(ControlText.padStyleFor("ButtonA"))

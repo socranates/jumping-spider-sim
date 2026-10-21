@@ -4,9 +4,11 @@
 -- environment), so the pages themselves are checked word for word against a copy of the frozen data/notebook/pages.json
 -- (tests/notebook_reference.json, copied by tools/gen_notebook_pages.py), and nothing is generated from the port under test.
 local NotebookPages = require("../src/Shared/Data/NotebookPages")
+local AntMimic = require("../src/Shared/Data/AntMimic")
 local FieldNotebook = require("../src/Shared/Learning/FieldNotebook")
 local NotebookWatch = require("../src/Shared/Learning/NotebookWatch")
 local NotebookText = require("../src/Shared/UI/NotebookText")
+local TarantulaText = require("../src/Shared/UI/TarantulaText")
 local ControlText = require("../src/Shared/UI/ControlText")
 local HudLayout = require("../src/Shared/UI/HudLayout")
 local SpiderInput = require("../src/Client/SpiderInput")
@@ -29,20 +31,30 @@ end
 
 -- ---------------------------------------------------------------- the pages are Godot's, word for word
 -- Godot: test_every_page_is_complete_short_and_sourced
-local ADAPTED = { "bold_jumper", "dragline", "legs_push", "hearing", "green_uv", "home_before_dark", "hungry_at_home", "new_skin", "grown_up", "mud_dauber", "what_the_wasp_does" }
+local ADAPTED = { "bold_jumper", "dragline", "legs_push", "hearing", "green_uv", "home_before_dark", "hungry_at_home", "new_skin", "grown_up", "mud_dauber", "what_the_wasp_does", "going_without_food" }
+-- The audit of 2026-10-19 corrected one sentence of each of these four texts (the generator's TEXT_FIXES; docs/NOTEBOOK_SOURCES.md says why). Godot's whole text stays as godotText.
+local REVISED = { "grown_up", "mud_dauber", "getting_away", "going_without_food" }
 local STABLE = {
 	"bold_jumper", "dragline", "legs_push", "eight_eyes", "moving_retinas", "motion_first", "hunting_by_sight", "venom", "drinking",
 	"felt", "hearing", "retreat", "depth_blur", "green_uv", "home_before_dark", "hungry_at_home", "full_abdomen", "outgrowing_a_skin",
-	"new_skin", "grown_up", "mud_dauber", "what_the_wasp_does", "getting_away", "going_without_food", "peacock_dance",
+	"new_skin", "grown_up", "mud_dauber", "what_the_wasp_does", "getting_away", "going_without_food", "peacock_dance", "walking_like_an_ant", "eggs_and_wind", "tarantula_cousins",
+	"ground_life", "springtails", "leafhoppers", "small_moths", "crane_flies",
+	"ladybirds", "millipedes", "garden_snails", "harvestmen", -- (ROBLOX-105)
+	"hoverflies", -- (ROBLOX-117)
+	"the_cat", -- (ROBLOX-118)
+	"crab_spider", -- (ROBLOX-119)
+	"robin", "field_crickets", -- (ROBLOX-120)
+	"water", "green_frog", "midges", "mosquitoes", "damselflies", "water_striders", "green_darner", -- (ROBLOX-122)
 }
 do
 	local book = FieldNotebook.new()
 	check(#book.dropped == 0, "no page was left out for a missing field or an unknown trigger")
-	check(#book.pages == #ref.pages + 1 and #ref.pages == 24, `all of Godot's {#ref.pages} pages are here ({#book.pages})`)
+	check(#book.pages == #ref.pages + 25 and #ref.pages == 24, `all of Godot's {#ref.pages} pages are here, then the peacock page, the ant-mimic page, the eggs-and-wind page, the tarantula page, the ground-life page, the bestiary's four (ROBLOX-101), its ambient four (ROBLOX-105), the hoverflies (ROBLOX-117), the cat (ROBLOX-118), the crab spider (ROBLOX-119), the robin and the field cricket (ROBLOX-120), the pond's seven (ROBLOX-122) ({#book.pages})`)
 	check(#book.pages >= 12, "there is a first set of pages")
 	check(same(ids((function() local l = {} for _, p in book.pages do table.insert(l, { id = p.id, title = p.title }) end return l end)()), STABLE), "the page ids are the stable ones, in Godot's order")
 	local seen: { [string]: boolean } = {}
 	local adapted: { string } = {}
+	local revised: { string } = {}
 	local urls, refUrls = 0, 0
 	for i, p in book.pages do
 		local g: any = ref.pages[i] or p
@@ -50,7 +62,14 @@ do
 		check(not seen[p.id], `page ids are unique ({p.id})`)
 		seen[p.id] = true
 		check(#p.text <= 520, `page {p.id} is short enough to read in a moment ({#p.text} characters)`)
-		check(p.id == g.id and p.trigger == g.trigger and p.title == g.title and p.text == (string.gsub(g.text,"You are a bold jumping spider,","The first spider is inspired by the bold jumping spider,")), `page {p.id}: id, trigger, title and text are Godot's, word for word`)
+		local godotText: string = (string.gsub(g.text, "You are a bold jumping spider,", "The first spider is inspired by the bold jumping spider,"))
+		check(p.id == g.id and p.trigger == g.trigger and p.title == g.title, `page {p.id}: id, trigger and title are Godot's, word for word`)
+		if p.text ~= godotText then
+			table.insert(revised, p.id)
+			check(p.godotText == godotText and p.text ~= "", `page {p.id}: Godot's own text is kept as godotText where the game's corrects it`)
+		else
+			check(p.godotText == nil, `page {p.id}: the text is Godot's, word for word, and there is no godotText`)
+		end
 		check(same(p.sources, g.sources), `page {p.id}: the sources are Godot's, word for word`)
 		for _, s in p.sources do
 			check(#s > 20 and string.find(s, "(", 1, true) ~= nil, `page {p.id} names a full source: {s}`)
@@ -67,10 +86,118 @@ do
 	end
 	check(urls == refUrls and urls >= 12, `the source links are all kept ({urls} of {refUrls})`)
 	check(same(adapted, ADAPTED), "exactly these pages have a Roblox 'In this game' line: " .. table.concat(adapted, ", "))
+	check(same(revised, REVISED), "exactly these pages have a corrected text: " .. table.concat(revised, ", "))
 	-- Every trigger a page names is one the notebook has; Godot's list is whole.
-	local triggers = { "start", "jump", "jump_far", "jump_long", "eye_view", "eye_time_20", "eye_time_60", "shimmer", "fly_recognised", "catch", "meal", "felt", "buzz", "rest", "sleep", "hungry", "well_fed", "moult_ready", "moulted", "adult", "wasp", "wasp_escaped", "wasp_caught", "starving", "dance" }
-	check(same(NotebookPages.triggers, triggers), "the trigger list is Godot's")
+	local triggers = { "start", "jump", "jump_far", "jump_long", "eye_view", "eye_time_20", "eye_time_60", "shimmer", "fly_recognised", "catch", "meal", "felt", "buzz", "rest", "sleep", "hungry", "well_fed", "moult_ready", "moulted", "adult", "wasp", "wasp_escaped", "wasp_caught", "starving", "dance", "antennae", "hatched", "tarantula", "garden_bed", "look_springtail", "look_leafhopper", "look_moth", "look_crane_fly", "look_ladybird", "look_millipede", "look_snail", "look_harvestman", "look_hoverfly", "cat", "crab_spider", "robin", "look_cricket",
+		"water", "frog", "look_midge", "look_mosquito", "look_damselfly", "look_skater", "darner" }
+	check(same(NotebookPages.triggers, triggers), "the trigger list is Godot's, then the twenty-five the Roblox game added (dance, antennae, hatched, tarantula, garden_bed, the fourteen close looks, the cat, the crab spider, the robin, the water, the frog and the darner)")
 	for _, p in book.pages do check(table.find(NotebookPages.triggers, p.trigger) ~= nil, `page {p.id} names a trigger the notebook has`) end
+	-- The eggs-and-wind page (ROBLOX-80): its own trigger, honest sources, and the peacock page no longer says there is no mating simulation.
+	do
+		local page: any
+		for _, p in book.pages do if p.id == "eggs_and_wind" then page = p end end
+		check(page ~= nil and page.trigger == "hatched" and page.godotGame == nil, "the eggs-and-wind page opens when the eggs hatch, and is the game's own (no Godot line)")
+		check(page ~= nil and #page.sources == 4 and string.find(page.sources[1], "Journal of Arachnology 6: 1-29", 1, true) ~= nil and string.find(page.sources[3], "10.1079/BER2004350", 1, true) ~= nil and string.find(page.sources[4], "Current Biology 28(14)", 1, true) ~= nil, "its four sources are named in the notebook's style")
+		check(page ~= nil and string.find(page.game, "male", 1, true) ~= nil and string.find(page.game, "fifteen minutes", 1, true) ~= nil and string.find(page.game, "mottled grey-brown", 1, true) ~= nil and string.find(page.game, "plain brown", 1, true) == nil, "the game note says where the game departs from the spiders")
+		local fresh = FieldNotebook.new()
+		check(#fresh:notice("hatched") == 1 and fresh:isOpen("eggs_and_wind") and #fresh:notice("hatched") == 0, "the trigger opens the page, once")
+		for _, p in book.pages do
+			if p.id == "peacock_dance" then check(string.find(p.game, "no mating simulation", 1, true) == nil and string.find(p.game, "court a mate", 1, true) ~= nil, "the peacock page's game note says the dance courts a mate") end
+		end
+	end
+	-- The tarantula page (ROBLOX-83): its own trigger, two sources in the notebook's style, an honest game note, and no claim about the greenbottle's hairs.
+	do
+		local page: any
+		for _, p in book.pages do if p.id == "tarantula_cousins" then page = p end end
+		check(page ~= nil and page.trigger == "tarantula" and page.title == "Velvet cousins (Theraphosidae)" and page.godotGame == nil, "the tarantula page opens on the tarantula trigger, has its title, and is the game's own (no Godot line)")
+		check(page ~= nil and #page.sources == 2 and string.find(page.sources[1], "Foelix, R. F. (2011). Biology of Spiders, 3rd edition. Oxford University Press.", 1, true) == 1 and string.find(page.sources[2], "Bertani, R. & Guadanucci, J. P. L. (2013)", 1, true) == 1 and string.find(page.sources[2], "Zoologia 30(4): 403-418", 1, true) ~= nil and string.find(page.sources[2], "10.1590/S1984-46702013000400006", 1, true) ~= nil, "its two sources are named in the notebook's style")
+		check(page ~= nil and string.find(page.text, "not jumping spiders", 1, true) ~= nil and string.find(page.text, "urticating", 1, true) ~= nil and string.find(page.text, "rears up", 1, true) ~= nil, "the page says tarantulas are not jumping spiders, and what they do")
+		check(page ~= nil and string.find(page.game, "costumes", 1, true) ~= nil and string.find(page.game, "invented angles", 1, true) ~= nil and string.find(page.game, "no silk mat", 1, true) ~= nil and string.find(page.game, "no hairs are cast", 1, true) ~= nil and string.find(page.game, "small cluster of hairs", 1, true) ~= nil and string.find(page.game, "only a colour", 1, true) == nil and string.find(page.game, "five or more centimetres", 1, true) ~= nil, "the game note says where the game departs from the spiders (the redknee's patch is drawn as hairs, none are cast)")
+		local fresh = FieldNotebook.new()
+		check(#fresh:notice("tarantula") == 1 and fresh:isOpen("tarantula_cousins") and #fresh:notice("tarantula") == 0, "the trigger opens the page, once")
+		check(not FieldNotebook.new():isOpen("tarantula_cousins"), "the page is not open at the start")
+	end
+	-- The ground-life page (ROBLOX-96): the bed's gnats, aphids and woodlice, opened by the first step onto a garden bed; five sources in the notebook's style; a game note
+	-- that says what is the game's own; no claim beyond the sources (docs/NOTEBOOK_SOURCES.md).
+	do
+		local page: any
+		for _, p in book.pages do if p.id == "ground_life" then page = p end end
+		check(page ~= nil and page.trigger == "garden_bed" and page.title == "Life on the ground" and page.godotGame == nil and page.godotText == nil, "the ground-life page opens on the garden_bed trigger, has its title, and is the game's own")
+		-- (ROBLOX-101 checked the five: the gnats' fact sheet is of 2003, reviewed 2025, and the woodlice's sentence gains the Kentucky fact sheet it was checked against)
+		check(page ~= nil and #page.sources == 6 and string.find(page.sources[1], "Cranshaw, W. S. & Cloyd, R. A. (2003, reviewed 2025)", 1, true) == 1 and string.find(page.sources[2], "Warren, P. & Schalau, J. (2014)", 1, true) == 1
+			and string.find(page.sources[3], "Jackson, R. R. (1977)", 1, true) == 1 and string.find(page.sources[3], "Journal of Arachnology 5: 145-149", 1, true) ~= nil
+			and string.find(page.sources[4], "Hopkin, S. P. (1991)", 1, true) == 1 and string.find(page.sources[5], "ENTFACT-439", 1, true) ~= nil and string.find(page.sources[6], "10.1098/rsif.2025.0260", 1, true) ~= nil, "its six sources are named in the notebook's style")
+		local function has(s: string, part: string): boolean return string.find(s, part, 1, true) ~= nil end
+		check(page ~= nil and has(page.text, "Fungus gnats") and has(page.text, "damp soil") and has(page.text, "Aphids") and has(page.text, "sap") and has(page.text, "Phidippus johnsoni takes aphids")
+			and has(page.text, "crustaceans, not insects") and has(page.text, "seven pairs of legs") and has(page.text, "puts spiders off") and #page.text <= 520, "the page says what each is and why the spider hunts two and leaves the third")
+		check(page ~= nil and has(page.text, "live in colonies") and not has(page.text, "feed in groups") and has(page.text, "glands on the sides of the body") and not has(page.text, "in their armour"), "ROBLOX-101's corrections: the aphids' colonies, the woodlice's glands where the source puts them")
+		check(page ~= nil and has(page.game, "a third of a housefly meal") and has(page.game, "an aphid a sixth") and has(page.game, "only walk") and has(page.game, "cannot be caught") and has(page.game, "no measured numbers"), "the game note says what is the game's own")
+		local fresh = FieldNotebook.new()
+		check(#fresh:notice("garden_bed") == 1 and fresh:isOpen("ground_life") and #fresh:notice("garden_bed") == 0, "the trigger opens the page, once")
+		check(not FieldNotebook.new():isOpen("ground_life"), "the page is not open at the start")
+	end
+	-- The bestiary's four pages (ROBLOX-101): each the game's own, opened by its close look, with its sources in the notebook's style, under 520 characters, its game
+	-- note saying the numbers are the game's.
+	do
+		local function has(s: string, part: string): boolean return string.find(s, part, 1, true) ~= nil end
+		local want = {
+			{ "springtails", "look_springtail", 3, { "furcula", "Collembola", "10 cm", "spiders" }, { "an eighth of a housefly meal", "the game's" } },
+			{ "leafhoppers", "look_leafhopper", 4, { "Cicadellidae", "sidestep", "other side of the stem or leaf", "3 to 5 thousandths" }, { "half a housefly meal", "the game's" } },
+			{ "small_moths", "look_moth", 4, { "scale-winged", "back toward the light", "sticky silk", "Phidippus johnsoni" }, { "a housefly meal", "the game's borrowing" } },
+			{ "crane_flies", "look_crane_fly", 3, { "Tipulidae", "do not bite", "break off easily", "a quarter to three quarters" }, { "two housefly meals", "leave a leg" } },
+			-- (ROBLOX-105: the ambient four)
+			{ "ladybirds", "look_ladybird", 2, { "warning", "leg joints", "reflex bleeding", "aphids", "alligator" }, { "let it go", "the game's" } },
+			{ "millipedes", "look_millipede", 1, { "two pairs of legs on each segment", "decaying vegetation", "coil", "body armour" }, { "coils", "the game's" } },
+			{ "garden_snails", "look_snail", 2, { "28 to 32 mm", "upper pair bears the eyes", "slimy trail", "nocturnal" }, { "eye stalks", "the game's" } },
+			{ "harvestmen", "look_harvestman", 2, { "not spiders", "two eyes", "no silk or venom glands", "twitching" }, { "takes no notice", "the game's" } },
+			-- (ROBLOX-117: the hoverflies)
+			{ "hoverflies", "look_hoverfly", 2, { "Syrphidae", "do not bite or sting", "single pair of wings", "nectar and pollen", "400" }, { "housefly meal and a half", "the game's" } },
+			{ "the_cat", "cat", 4, { "23 to 25 cm", "1.3 to 4.0 billion birds", "about half as many mammals", "airborne sound" }, { "bell", "the game's" } }, -- (ROBLOX-118)
+			{ "crab_spider", "crab_spider", 3, { "Misumena vatia", "first two pairs of legs held open", "10 to 25 days", "goldenrod" }, { "yarrow", "drop clear", "the game's" } }, -- (ROBLOX-119)
+			{ "robin", "robin", 3, { "20 to 28 cm", "head cocked to one side", "by sight", "spiders", "pick! tut-tut-tut" }, { "shadow", "keeping still", "the game's" } }, -- (ROBLOX-120)
+			{ "field_crickets", "look_cricket", 3, { "Gryllus pennsylvanicus", "15 to 25 mm", "mostly at night", "ears are on its front legs" }, { "three houseflies", "kicks hard", "the game's" } }, -- (ROBLOX-120)
+			-- (ROBLOX-122: the pond's)
+			{ "water", "water", 3, { "166 species", "only two jumping spiders rowed", "ripples" }, { "no place to stand", "drowns", "always pulled out", "the game's" } },
+			{ "green_frog", "frog", 4, { "Lithobates clamitans", "5 to 10 cm", "sitting and waiting", "spiders", "0.07 seconds" }, { "Keep still", "the game's" } },
+			{ "midges", "look_midge", 2, { "Chironomidae", "do not bite", "swarms in the evening", "bloodworms" }, { "a third of a housefly", "the game's" } },
+			{ "mosquitoes", "look_mosquito", 2, { "Only female mosquitoes take blood", "wrigglers", "Evarcha culicivora" }, { "None bites you", "a third of a housefly" } },
+			{ "damselflies", "look_damselfly", 3, { "Ischnura verticalis", "22 to 30 mm", "four wings together", "three times its own length" }, { "two and a half", "thrashes", "the game's" } },
+			{ "water_striders", "look_skater", 3, { "Gerridae", "surface film", "spiders", "ripples" }, { "not your prey" } },
+			{ "green_darner", "darner", 1, { "Anax junius", "6.8 to 8 cm", "catch flying insects" }, { "no danger to you" } },
+		}
+		for _, w in want do
+			local page: any
+			for _, p in book.pages do if p.id == w[1] then page = p end end
+			check(page ~= nil and page.trigger == w[2] and page.godotGame == nil and page.godotText == nil and #page.sources == w[3] and #page.text <= 520, `{w[1]}: its trigger, the game's own, {w[3]} sources, {if page then #page.text else 0} characters`)
+			for _, part in w[4] :: { string } do check(page ~= nil and has(page.text, part), `{w[1]} says "{part}"`) end
+			for _, part in w[5] :: { string } do check(page ~= nil and has(page.game, part), `{w[1]}'s game note says "{part}"`) end
+			local fresh = FieldNotebook.new()
+			check(not fresh:isOpen(w[1]) and #fresh:notice(w[2]) == 1 and fresh:isOpen(w[1]) and #fresh:notice(w[2]) == 0, `{w[1]}: closed at the start, opened once`)
+		end
+		check(NotebookPages.lookWu == 4 and NotebookPages.looks.springtail == "look_springtail" and NotebookPages.looks.crane_fly == "look_crane_fly", "a close look is four studs")
+	end
+	-- The audit of 2026-10-19 (docs/NOTEBOOK_SOURCES.md): what each corrected page now says, and the claim it no longer makes.
+	do
+		local by: { [string]: any } = {}
+		for _, p in book.pages do by[p.id] = p end
+		local function has(s: string, part: string): boolean return string.find(s, part, 1, true) ~= nil end
+		check(has(by.grown_up.text, "In the lab, males of the related Phidippus johnsoni matured after 5 to 7 moults and females after 6 to 8.") and not has(by.grown_up.text, "In the field") and not has(by.grown_up.text, "six to eight"), "Grown up gives Jackson's counts as laboratory counts")
+		check(has(by.going_without_food.text, "In the lab, jumping spiders have survived weeks without food, longer when cold and still.") and not has(by.going_without_food.text, "25 to 31") and not has(by.going_without_food.text, "kept for"), "Going without food claims no figure the cited paper does not give")
+		check(has(by.mud_dauber.text, "It searches by sight, then checks a spider with its antennae before it stings.") and not has(by.mud_dauber.text, "finds a spider by sight"), "A hunter of spiders: sight searches, the antennae check")
+		check(has(by.getting_away.text, "The mud dauber searches by sight and then checks with its antennae, so a spider that stays out of sight is safer.") and not has(by.getting_away.text, "finds its prey by sight") and not has(by.getting_away.text, "matters most"), "Getting away: staying out of sight is safer, not all that matters")
+		check(has(by.legs_push.game, "In this game the spider braces and crouches before a jump, then pushes off with its back legs.") and not has(by.legs_push.game, "does not yet") and by.legs_push.godotGame == "Watch the back legs straighten as the spider leaves the surface.", "Legs that push: the game does show the back legs pushing off")
+		check(has(by.bold_jumper.game, "four growth stages (three moults)") and not has(by.bold_jumper.game, "three growth stages") and has(by.bold_jumper.game, "The peacock spider, the ant mimic and the two tarantulas are costumes on the same body"), "The first page names every costume and the four stages")
+		check(has(by.walking_like_an_ant.text, "about a tenth of a second") and not has(by.walking_like_an_ant.text, "83") and has(by.walking_like_an_ant.game, "83 milliseconds"), "Walking like an ant: the page says a tenth of a second (the paper's abstract), the game note keeps its own 83 ms rule")
+		check(has(by.eggs_and_wind.text, "court mostly by sight, and often by vibration too") and not has(by.eggs_and_wind.text, "court by sight") and #by.eggs_and_wind.text <= 520, "Eggs, silk and wind: courtship is mostly by sight and often by vibration")
+		local tries = 0
+		for _, entry in NotebookText.TRY do
+			if string.sub(entry.text, 1, 9) == "Change to" then
+				tries += 1
+				check(has(entry.text, "(in Settings, or while resting)"), `To try "{entry.id}" names both ways of changing spider`)
+			end
+		end
+		check(tries == 3, "the three spiders' invitations (peacock, ant mimic, tarantula) all say so")
+	end
 	-- The thresholds are Godot's.
 	check(NotebookPages.hungryAt == 0.25 and NotebookPages.wellFedAt == 0.85 and NotebookPages.jumpFarWu == 5.0 and NotebookPages.jumpLongWu == 8.0, "Godot's thresholds")
 	check(NotebookPages.eyeMarks[1] == 20 and NotebookPages.eyeMarks[2] == 60 and NotebookPages.hearWu == 10.0 and NotebookPages.noteSeconds == 6.0, "Godot's eye marks, hearing range and note time")
@@ -177,6 +304,44 @@ end
 local function fresh(): (any, any)
 	local nb = FieldNotebook.new()
 	return nb, NotebookWatch.new(nb)
+end
+do
+	-- ROBLOX-96: the first step onto a garden bed opens the ground-life page; the sill, the wall and a world without regions do not
+	local nb, w = fresh()
+	w:step(view({ region = "sill" }))
+	w:step(view({ region = "house_wall" }))
+	w:step(view())
+	check(not nb:isOpen("ground_life"), "the sill, the wall and no region open nothing")
+	w:step(view({ region = "bed" }))
+	check(nb:isOpen("ground_life"), "the first step onto a bed opens the ground-life page")
+	w:step(view({ region = "bed" }))
+	check(#nb.opened == 2, "once (with the start page)")
+end
+do
+	-- ROBLOX-101: a close look at a bestiary prey opens its kind's page; farther off, or a kind without a page, nothing
+	local nb, w = fresh()
+	local function kindFly(id: string, kind: string?, at: Vector3): any
+		local f = fly(id, at, false)
+		f.profile = { body = { prey_kind = kind } }
+		return f
+	end
+	w:step(view({ spider = Vector3.zero, flies = {} }))
+	w:step(view({ spider = Vector3.zero, flies = { kindFly("s", "springtail", Vector3.new(4.5, 0, 0)), kindFly("g", "fungus_gnat", Vector3.new(1, 0, 0)), kindFly("h", nil, Vector3.new(1, 0, 0)) } }))
+	check(not nb:isOpen("springtails") and #nb.opened == 1, "a springtail four and a half studs off, a gnat and a house fly close by: nothing")
+	w:step(view({ spider = Vector3.zero, flies = { kindFly("s", "springtail", Vector3.new(3.9, 0, 0)), kindFly("c", "crane_fly", Vector3.new(0, 2, 0)) } }))
+	check(nb:isOpen("springtails") and nb:isOpen("crane_flies") and not nb:isOpen("small_moths") and not nb:isOpen("leafhoppers"), "within four studs: the springtail's page and the crane fly's")
+	w:step(view({ spider = Vector3.zero, flies = { kindFly("m", "moth", Vector3.new(0, 0, 4)), kindFly("l", "leafhopper", Vector3.new(0, 0, -1)) } }))
+	check(nb:isOpen("small_moths") and nb:isOpen("leafhoppers") and #nb.opened == 5, "the moth's and the leafhopper's, each once")
+end
+do
+	-- ROBLOX-105: a close look at an ambient bug out in the open opens its kind's page; a hidden one, a far one or a woodlouse (no kind) opens nothing
+	local nb, w = fresh()
+	local function bug(kind: string?, at: Vector3, hidden: boolean?): any return { id = "b", kind = kind, position = at, hidden = hidden == true } end
+	w:step(view({ spider = Vector3.zero }))
+	w:step(view({ spider = Vector3.zero, bugs = { bug("snail", Vector3.new(4.5, 0, 0)), bug("millipede", Vector3.new(1, 0, 0), true), bug(nil, Vector3.new(0.5, 0, 0)) } }))
+	check(#nb.opened == 1, "a snail four and a half studs off, a millipede under a stone, a woodlouse close by: nothing")
+	w:step(view({ spider = Vector3.zero, bugs = { bug("snail", Vector3.new(3.5, 0, 0)), bug("ladybird", Vector3.new(0, 1, 0)), bug("millipede", Vector3.new(1, 0, 0)), bug("harvestman", Vector3.new(0, 0, 2)) } }))
+	check(nb:isOpen("garden_snails") and nb:isOpen("ladybirds") and nb:isOpen("millipedes") and nb:isOpen("harvestmen") and #nb.opened == 5, "within four studs and in the open: each kind's page, once")
 end
 do
 	-- the start waits for a life
@@ -381,12 +546,34 @@ do
 	w:onWasp("visit_started", nil)
 	w:onWasp("left", true)
 	w:onWasp("caught", nil)
+	w:onCat() -- (ROBLOX-118: the ranger's cat noticed the spider)
+	w:onCrab() -- (ROBLOX-119: the spider came close to a crab spider)
+	w:onBird() -- (ROBLOX-120: the robin was told to the spider)
+	w:onFrog() -- (ROBLOX-122: the green frog noticed the spider)
+	w:onWater() -- (ROBLOX-122: the spider fell into the pond)
+	w:onDarner() -- (ROBLOX-122: the green darner passed near)
+	w:antennae(AntMimic.noticeSeconds)
+	w:step(view({ captures = 1, taken = 0.3, energy = 0.0, flies = { flyA }, region = "bed" })) -- (ROBLOX-96: the first step onto a garden bed)
+	do -- (ROBLOX-101: a close look at each of the bestiary's four)
+		local near = {}
+		for i, kind in { "springtail", "leafhopper", "moth", "crane_fly", "hoverfly", "cricket", "midge", "mosquito", "damselfly" } do
+			local f = fly("k" .. i, Vector3.new(1, 0, 0), false)
+			f.profile = { body = { prey_kind = kind } }
+			table.insert(near, f)
+		end
+		w:step(view({ captures = 1, taken = 0.3, energy = 0.0, flies = near, region = "bed" }))
+	end
+	do -- (ROBLOX-105: and at each of the ambient four)
+		local bugs = {}
+		for i, kind in { "ladybird", "millipede", "snail", "harvestman", "skater" } do table.insert(bugs, { id = "a" .. i, kind = kind, position = Vector3.new(1, 0, 0), hidden = false }) end
+		w:step(view({ captures = 1, taken = 0.3, energy = 0.0, flies = { flyA }, region = "bed", bugs = bugs }))
+	end
 	local unopened: { string } = {}
 	for _, p in nb.pages do if not nb:isOpen(p.id) then table.insert(unopened, p.trigger) end end
 	local unwired: { string } = {}
 	for trigger in NotebookWatch.UNWIRED do table.insert(unwired, trigger) end
-	check(same(unopened, { "felt", "dance" }) and same(unwired, { "felt" }), "watcher covers all pages except unwired felt and client-owned dance: left over: " .. table.concat(unopened, ", "))
-	check(#nb.opened == 23, `the long game opened 23 pages ({#nb.opened})`)
+	check(same(unopened, { "felt", "dance", "hatched", "tarantula" }) and same(unwired, { "felt" }), "watcher covers all pages except unwired felt and the client-owned dance, hatching and tarantula: left over: " .. table.concat(unopened, ", "))
+	check(#nb.opened == 45, `the long game opened 45 pages, the bestiary's eight, the hoverflies, the cat, the crab spider, the robin, the cricket and (ROBLOX-122) the pond's seven with them ({#nb.opened})`)
 end
 
 -- ---------------------------------------------------------------- the words and the layout (pure)
@@ -394,10 +581,25 @@ do
 	check(NotebookText.fill("{reel} up, {drop} down", "keyboard") == "W up, F down", "a control is named for the keyboard")
 	check(NotebookText.fill("{reel} up, {drop} down", "touch") == "↑ up, Silk down", "and for touch")
 	ControlText.setPadStyle("xbox")
-	check(NotebookText.fill("{letGo} {drop} {focus}", "gamepad") == "B X LT", "and for an Xbox controller")
+	check(NotebookText.fill("{letGo} {drop} {focus}", "gamepad") == "B X RT", "and for an Xbox controller")
 	ControlText.setPadStyle("playstation")
-	check(NotebookText.fill("{letGo} {drop} {focus}", "gamepad") == "Circle Square L2", "and for a PlayStation controller")
+	check(NotebookText.fill("{letGo} {drop} {focus}", "gamepad") == "Circle Square R2", "and for a PlayStation controller")
 	check(NotebookText.fill("{nonsense} stays", "keyboard") == "{nonsense} stays", "a name nothing knows is left as it was")
+	-- ROBLOX-92: the tarantula page named its key "(X)" for every device; it says {display}, filled with the device's own key (on touch the tarantulas' button, Rear up, not the peacock's Dance)
+	ControlText.setPadStyle("xbox")
+	check(NotebookText.fill("({display})", "keyboard") == "(X)" and NotebookText.fill("({display})", "gamepad") == "(RB)" and NotebookText.fill("({display})", "touch") == "(Rear up)", "{display} is the display key by device")
+	ControlText.setPadStyle("playstation")
+	check(NotebookText.fill("({display})", "gamepad") == "(R1)", "and on a PlayStation controller")
+	do
+		local page: any = nil
+		for _, p in NotebookPages.pages do if p.id == "tarantula_cousins" then page = p end end
+		check(page ~= nil and string.find(page.game, "({display})", 1, true) ~= nil and string.find(page.game, "(X)", 1, true) == nil, "the tarantula page no longer hardcodes the key")
+		check(page ~= nil and string.find(page.game, "no silk mat is laid", 1, true) ~= nil and string.find(TarantulaText.helpLine("keyboard"), "rear up and turn", 1, true) ~= nil and string.find(TarantulaText.helpLine("keyboard"), "silk mat", 1, true) == nil,
+			"the page and the controls card say the same thing: a rear-up and a turn, no silk mat is laid")
+		for _, device in { "keyboard", "gamepad", "touch" } do
+			check(string.find(NotebookText.fill(page.game, device), "{", 1, true) == nil, `{device}: every name on the page is filled`)
+		end
+	end
 	check(NotebookText.gameLine("", "keyboard") == nil, "a page with nothing to say about the game shows no line (Godot)")
 	check(NotebookText.gameLine("Hello.", "keyboard") == "In this game: Hello.", "a line starts 'In this game: '")
 	local dragline = FieldNotebook.new():view("dragline")
@@ -865,7 +1067,12 @@ if loaded and d then
 	check(not book:isOpen("outgrowing_a_skin") and not book:isOpen("new_skin") and not book:isOpen("grown_up"), "no moult pages yet")
 	d.needs.energy = 0.05
 	d.needs:grantEnergy(0.9, "test_meal")
- d.life.mealFood=.9 -- fixture credits three consumed meals, independent of reserve capacity
+ d.life.mealFood=.9 -- three consumed meals: Godot's moult, no longer the game's (ROBLOX-88)
+	frames(3)
+	check(not d.life.growth.ready and d.life.growth.gameRules == true, "three houseflies do not ready a moult in the game: it asks for five")
+	local line = find("SpiderPrompts", "DayLine")
+	check(line ~= nil and string.find(line.Text, "Next moult: 3 of 5 meals", 1, true) ~= nil, `the screen counts the moult out of five ({if line then line.Text else "no line"})`)
+	d.life.mealFood=.6 -- two more: five consumed meals in all, independent of reserve capacity
 	frames(3)
 	check(d.life.growth.ready and book:isOpen("outgrowing_a_skin"), "being ready to moult opens its page")
 	tap("Feed"); frames(3)
@@ -956,6 +1163,44 @@ do
  local result=stubs.actions.WindowsillNotebook("WindowsillNotebook",Enum.UserInputState.Begin,{KeyCode=Enum.KeyCode.N})
  check(panel:isShowing() and result==Enum.ContextActionResult.Pass,"Roblox menu keeps input ownership")
  GuiService.MenuIsOpen=false;panel:close()
+end
+-- ---------------------------------------------------------------- ROBLOX-89: the lines the game adds to a page ("things you saw")
+do
+	local book = FieldNotebook.new()
+	check(not book:addEntry("no_such_page", 3, "Day 3: x") and #book:entriesFor("no_such_page") == 0, "a line for a page the book does not have is nothing")
+	check(not book:addEntry("eggs_and_wind", 3, "   ") and not book:addEntry("eggs_and_wind", -1, "Day -1: x") and not book:addEntry("eggs_and_wind", 0 / 0, "Day nan: x"), "an empty line, a day before the first and a day that is not a number are nothing")
+	check(book:addEntry("eggs_and_wind", 3, "Day 3: A male came to the sill."), "a line for a page the book has is kept, found or not")
+	check(#book:entriesFor("eggs_and_wind") == 0, "but shows nothing until the page is found")
+	check(not book:isOpen("eggs_and_wind"), "(and does not find it)")
+	book:notice("hatched")
+	check(book:isOpen("eggs_and_wind") and #book:entriesFor("eggs_and_wind") == 1 and book:entriesFor("eggs_and_wind")[1].day == 3 and book:entriesFor("eggs_and_wind")[1].text == "Day 3: A male came to the sill.", "once the page is found the line is there")
+	check(not book:addEntry("eggs_and_wind", 3, "Day 3: A male came to the sill."), "the same line twice is once")
+	check(book:addEntry("eggs_and_wind", 3, "Day 3: A second visitor."), "another line the same day is another")
+	for day = 4, 12 do book:addEntry("eggs_and_wind", day, `Day {day}: seen.`) end
+	local list = book:entriesFor("eggs_and_wind")
+	check(#list == FieldNotebook.MAX_ENTRIES and FieldNotebook.MAX_ENTRIES == 6 and list[1].day == 7 and list[#list].day == 12, "at most six to a page, the oldest dropped")
+	list[1].text = "changed"
+	check(book:entriesFor("eggs_and_wind")[1].text ~= "changed", "what is handed out is a copy")
+	local rec = book:toRecord()
+	local again = FieldNotebook.new()
+	again:load(rec)
+	check(#again:entriesFor("eggs_and_wind") == 0 and (rec :: any).entries == nil and (rec :: any).entry == nil, "the lines are the session's: the record does not carry them, and a loaded book has none")
+	check(NotebookText.seenText({}) == nil, "no lines, no words")
+	check(NotebookText.seenText({ { day = 3, text = "Day 3: A." }, { day = 4, text = "Day 4: B." } }) == "Things you saw:\nDay 3: A.\nDay 4: B.", "the words: a heading and the lines")
+	-- on the page
+	local panel, pbook = buildPanel({ "hatched" }, 1280, 720)
+	panel:open("game", "keyboard", 1)
+	check(panel.shown == "eggs_and_wind" and not string.find(panel.game.Text, "Things you saw", 1, true), "a page with no lines shows only the game's note")
+	panel:close()
+	pbook:addEntry("eggs_and_wind", 5, "Day 5: A male came to the sill. The two spiders stayed together a while, and then he went.")
+	panel:open("game", "keyboard", 1)
+	check(panel.game.Visible and string.find(panel.game.Text, "In this game:", 1, true) == 1 and string.find(panel.game.Text, "Things you saw:\nDay 5: A male came to the sill.", 1, true) ~= nil, "the page shows them under the note about the game")
+	check(string.find(panel.game.Text, "In this game:", 1, true) < string.find(panel.game.Text, "Things you saw", 1, true), "after it")
+	panel:close()
+	-- the page's own words are untouched (the reference file pins them)
+	local page
+	for _, pg in NotebookPages.pages do if pg.id == "eggs_and_wind" then page = pg end end
+	check(page ~= nil and not string.find(page.game, "Things you saw", 1, true), "the data holds no lines of its own")
 end
 print(`NOTEBOOK passed={passed} failed={failed}`)
 if failed > 0 then error("notebook failed") end

@@ -21,14 +21,17 @@ function G.add(self: any,id: string,position: Vector3,normal: Vector3,shelter: n
 end
 function G.plan(self: any,start: Vector3,normal: Vector3,target: Perch,threat: Vector3?): {Vector3}?
  self.plans+=1;local p=self.p.flight
+ -- (ROBLOX-119) the band its routes climb in: the sill's 0 to 11 studs unless the graph is told its own (`floor`, `ceiling`: PreyDirector.new from a spec that
+ -- names them, World/Meadow's and World/Hut's flowers and lamps, far over and under the sill); the sill's routes are as they were
+ local floor,ceil=self.floor or 0,self.ceiling or 11
  local rest=self:rest(target);if (start-rest).Magnitude>p.max_flight_wu then return nil end
  local lifted=start+normal*p.lift_wu;local approach=rest+target.normal*p.approach_wu
  if not self:clear(start,lifted) or not self:clear(approach,rest) then return nil end
  local routes: {{Vector3}}={{lifted,approach}};local mid=(lifted+approach)*.5
- for _,h in {2.5,5,8,11} do local y=math.min(mid.Y+h,11)
+ for _,h in {2.5,5,8,11} do local y=math.min(mid.Y+h,ceil)
   if y>mid.Y+.5 then table.insert(routes,{lifted,Vector3.new(mid.X,y,mid.Z),approach}) end
  end
- for _,h in {6,9,11} do local y=math.min(math.max(h,math.max(lifted.Y,approach.Y)+.5),11)
+ for _,h in {6,9,11} do local y=math.min(math.max(floor+h,math.max(lifted.Y,approach.Y)+.5),ceil)
   if y>math.max(lifted.Y,approach.Y)+.3 then table.insert(routes,{lifted,Vector3.new(lifted.X,y,lifted.Z),Vector3.new(approach.X,y,approach.Z),approach}) end
  end
  for _,route in routes do

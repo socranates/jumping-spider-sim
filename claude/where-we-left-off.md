@@ -1,3 +1,33 @@
+# Latest: the audit round (ROBLOX-91..93), then the notebook's science and the documents, 2026-10-19 (not seen in Studio) - Claude
+
+Still **claude/roblox-sill** (one bundle, `claude-playtest/claude-sill.bundle`, carries everything since main ce64498). Two things since the detail round, decisions **ROBLOX-91..93** and a pass of fixes on 2026-10-19; no new decision number, and the detail handoff `docs/HANDOFF-roblox-detail.md` now covers both.
+
+**The audit** looked at the build as it stood after ROBLOX-90 and found 49 things, all fixed in three commits: the sim (91, sixteen), the client (92, seventeen), the drawn rigs and the frame (93, sixteen). Godot's defaults and every golden fixture are untouched. What a player or Chet will notice: Easy and Free play have their own gentle pacing back (drain 1.1 with the half rate, three flies a moult, the rival contest 55/25/20) and their own `easy` rest slot beside main and free; the rival keeps away from courtship and the mating scene, and a rival that tore free of the grip is a contest again; a failing save says "Saving is off" and no longer stops the frame; the controls card is ten lines or fewer (9, 10 and 10 for keyboard, pad and touch) and is the one string the Studio spec measures; "checkpoint" is "last rest" in the words; the mating scene's skip is announced; the first spider is 693 parts at full detail and 265 at low (695 and 267 before, which is what the detail round's notes quote), and a hair is placed again only when the frame it follows has moved.
+
+**The notebook's science and the documents.** Several sentences said more than their sources do, and a good many documents still quoted numbers that had moved. The notebook is fixed through `tools/gen_notebook_pages.py` (Godot's whole text is kept as `godotText` on each page whose sentence changed): the grown-up page gives the lab moult counts (males 5 to 7, females 6 to 8), because Jackson's field counts are estimates; "going without food" no longer says "25 to 31 days", which the paper does not give; the mud dauber is said to search by sight and then check with its antennae (Uma et al. 2013), on its own page and on "getting away"; the ant mimic's stops are "about a tenth of a second"; the eggs page says jumping spiders court "mostly by sight, and often by vibration too" and that the real peacock female is mottled grey-brown; the bold jumper page says the other four spiders are costumes on one body; the redknee's patch is a small cluster of hairs; the jump-push page says plainly what is drawn. `docs/NOTEBOOK_SOURCES.md` now records, source by source, what was opened and what was not (four papers were read in part this time; none in full). Player words: the tarantula help line was checked (it says "rear up and turn" and promises no silk mat), the touch card says "Silk: lower on a line", the notebook's "while resting" invitations also point to Settings, and "Recentre" is spelled so on screen (the code's names are unchanged). Documents: `docs/DECISIONS.md` has dated addenda where an entry's numbers moved (no renumbering), `docs/HARD_MODE_DESIGN.md` is rebased on today's numbers (drain 1.9, five flies a moult, two wasp visits a day), the sill and daily handoffs carry "Superseded numbers" boxes (their history is not rewritten) and the detail handoff has the audit round and a note about the bundle, and `roblox_port/README.md`, `docs/ROBLOX_PORT.md` and `docs/SESSION_LOG.md` are brought up to date. The audio manifest now says the thrum, thud and whoosh are uploaded but not used by the game yet.
+
+All 35 CLI suites were green at the start and are green at the close; strict analysis is clean. Nothing here has run in Studio or on a device, and no publish is recorded after v29. Chet's Studio checks are the detail handoff's checklist (items 7 to 9 are the audit's).
+
+---
+
+# The detail round - the spiders up close, the hang, living motion, pacing, the mating scene, Inspect; v29, 2026-10-18 (not seen in Studio) - Claude
+
+Still **claude/roblox-sill** (one bundle carries everything since main ce64498), decisions **ROBLOX-84..90**, handoff `docs/HANDOFF-roblox-detail.md`, evidence a83e0b69a7a331ce. Nathan asked for detail on the spiders (all four kinds: anatomy, motion, fur/sheen, close-ups; the first spider and the tarantulas first), then a proper web hang, an ending sequence at a successful mating, more food to grow with a harder rival, and a faster hunger bar. Built: real knees/taper/feet/fangs (84), fur that lies along the body and tarantula velvet shells with the greenbottle's palette corrected (85), the body hanging along the dragline with curled legs and a head-up climb (86), `Rig/Living` breathing/grooming/attention/alarm (87), 5 meals a moult, drain 1.9, the rival at 40/32/28 and a 5 taps/s grip (88), a 15 s mating two-shot scene (89), Inspect mode (90). Judged by eye in the previewer (Godot 4.3 back in the VM, with `--hang`/`--cue`/`--focus`); **nothing ran in Studio** - Chet's first checks: frame time at full tier (695 parts + living motion), how Fabric shells and the 0.04 sheen read, the hang, the pacing feel, the rival tap rate on touch. Published v29 from Nathan's PC.
+
+---
+
+# The sill round - picker, feel, a living sill, the mating cycle, tarantulas; v26, then music in v28, 2026-10-18 (not yet seen in Studio) - Claude
+
+Branch **claude/roblox-sill** (contains claude/roblox-daily; one bundle `claude-playtest/claude-sill.bundle` gives Chet everything since main ce64498). Decisions **ROBLOX-71..83**, handoff `docs/HANDOFF-roblox-sill.md`, evidence d865b73033b37e93. Nathan playtested all day and steered live: the Settings spider picker (five spiders; `SpiderChoice.locked` is the single future-sales hook), easier fly taps, the rival contesting the strike (55/25/20 when the round was built; now 40/32/28 on the standard rules, ROBLOX-88, with 55/25/20 kept for Easy and Free play, ROBLOX-91) and pressing harder, the sill dressed (grass to 150 blades, moss, litter, morning dew; decor never collidable), the wasp twice a day, an original ambient loop (approved; **done**: uploaded as asset 114531800455832, wired, mix 0.18, published in v28), the struggle scaled to the meal (fruit fly easy; the rival a real fight that can tear free), the hunger bar (1.55 drain when the round was built; now 1.9 on the standard rules, a day 0.612 energy, ROBLOX-88, and 1.1 with the half rate on Easy and Free play, 0.177 a day, ROBLOX-91), the **complete mating cycle** (mate, courtship with the peacock's dance, egg sac, guard days, the ballooning hatch, "The sill continues", generation+1 in the save), and Perplexity's **tarantula pack** (redknee + greenbottle + threat display + sourced page; pricing one-vs-each is Nathan's open call). Design docs only: `TWO_PLAYER_DESIGN.md` (player 2 is the rival), `EXPANSION_DESIGN.md` (the garden, isopods/crickets/worms/birds, the Steam road). Published **v24, v25, v26** to the playtest from Nathan's PC (Studio+Rojo; Open Cloud 409s). Open: Chet's full Studio pass (mating cycle end to end, tarantula look, PromptSpec ten-line check, frame time), rival-fight tap count on touch, hunger pace feel. (The music upload that was open here is done.)
+
+---
+
+# The rival roams the whole sill and the wasp sometimes takes it, 2026-10-18 (not yet seen in Studio or on a device) - Claude
+
+Branch **claude/roblox-daily** (main ce64498 + the ant mimic merged + the daily wasp and rival + this), decisions ROBLOX-64..66 (ant mimic), 67..68 (a wasp and a rival every day), **69 (the rival stalks the whole sill)** and **70 (the wasp takes the rival about one visit in ten)**, handoff `docs/HANDOFF-roblox-daily.md` (Studio checklist items 1 to 10). Nathan: "The male should stalk the whole environment as well" and "The wasp should kill the rival male like 10 percent of the time." The rival has its own SpiderMotor and walks every face (floor, leaves, stems, planter, frames, wall), notices by movement, stalks, crouches and lunges from any surface, never in or at the crack; the wasp, on one visit in ten when a free reachable rival is on the sill, takes it instead of looking for the spider (visit over, spider spared, rival back next morning). The ant mimic is in this branch too, so Chet needs only this bundle. Open: it has never run in Studio (new `RivalSpec` is unrun); the rival does not hop between surfaces; patrol speed 0.8 wu/s; food balance not retuned.
+
+---
+
 # Chet — 2026-10-18: dragline, cover and predator playtest
 
 Latest handoff: `docs/HANDOFF-roblox-dragline.md`; accepted evidence: `docs/verification/roblox-dragline/RESULTS.md`. Build `2ed6a64d5e6d9d58`. Published **v23** to the existing private playtest. CLI **48,279/48,279**; types clean; **170/170** compile. This handoff and the generated places belong to the same code commit.
@@ -6,11 +36,11 @@ Nathan's new requests are implemented: head-down line suspension and a falling e
 
 Native Windows: 111/111 engine and 29/29 client checks. Real DataStore round-trip skipped in the unpublished local test place; prior cloud acceptance is separate. Physical PlayStation/tablet checks remain Nathan's. The game and daughter's spider stay free; peacock stays free for testing (future cosmetic target about US$0.99). No public access, security or monetization changes.
 
-**Suggested next Claude chunk:** implement the hunger-only Hard profile and separate save slot from `docs/HARD_MODE_DESIGN.md`, including migration and isolated cloud-save acceptance. First respond to Nathan's balance feedback on the longer wasp/rival. Keep the safe crack, warnings and accessibility. Do not raise difficulty further without playtest evidence. Public release still needs complete-life/device playtesting, science review and store presentation. Godot/SPEC stay frozen; preserve twitch and fixed simulation ticks.
+**Suggested next Claude chunk:** implement the hunger-only Hard profile and separate save slot from `docs/HARD_MODE_DESIGN.md`, including migration and isolated cloud-save acceptance. *[Superseded 2026-10-19: the later rounds went elsewhere and Hard mode is still only a design, now rebased on the current numbers; Easy and Free play have their own pacing and their own rest slot since ROBLOX-91, so Hard's save would be a fourth.]* First respond to Nathan's balance feedback on the longer wasp/rival. Keep the safe crack, warnings and accessibility. Do not raise difficulty further without playtest evidence. Public release still needs complete-life/device playtesting, science review and store presentation. Godot/SPEC stay frozen; preserve twitch and fixed simulation ticks.
 
 ---
 
-# Latest: player feedback published v22 — Chet, 2026-10-18
+# Player feedback published v22 — Chet, 2026-10-18
 
 Published to the existing Windowsill place 120119801868085; no audience/security/monetization changes. Added food bar and meal-equivalent moult progress, left-stick jump aim, slightly easier fly captures, a small fruit-fly-inspired prey profile, two plants/new leaves and an upper ledge, more twitch, visible jump bracing/rear-leg push, and a coloured clear eye-view centre with muted edges. Soft skin now slows walking/stalking to 65%; existing 0.7 jump reach remains until hardening and survives rest restore.
 
@@ -20,7 +50,15 @@ Next: Nathan tries v22 in a fresh PlayStation session, especially left-stick aim
 
 ---
 
-# Latest: settings accepted and published v20 — Chet, 2026-10-18
+# The ant-mimicking spider built, 2026-10-18 (not yet seen in Studio or on a device) - Claude
+
+Branch **claude/roblox-antmimic** (from main e4a2b5a, published v20), decisions ROBLOX-64..66, handoff `docs/HANDOFF-roblox-antmimic.md`. The third spider is the female ant-mimicking jumping spider Myrmarachne formicaria (Shamble, Hoy, Cohen and Beatus 2017, doi:10.1098/rspb.2017.0308): 0.5 studs, waist, dark glossy cuticle. In the crack C / RB / R1 / Change cycles first spider, peacock, ant mimic. Standing still raises legs I as antennae; X / RB / Wave raises them higher and waves them faster; walking draws a small yaw and sway on the body, but the path is the first spider's exactly (`tests/client_ant.luau`). Cosmetic only: same motor, collider, speed, jump, senses and wasp. A notebook page, "Walking like an ant", opens after the antennae have been up for a second (26 authored pages, 25 reachable; only felt vibration unwired). Saved appearance accepts the new id (tested). 47,700-odd CLI checks, all failed=0; strict 0 diagnostics; 178/178 compile. Chet's Studio checklist is in the handoff (new `AntMimicSpec`). The ant mimic stays free like the peacock; the planned ~US$0.99 Game Pass for both is not wired and waits for Nathan.
+
+Open: how the 0.5 stud body reads at the camera distance; whether the drawn wobble (12 degrees, 0.04 studs) is right; the display key is artistic (the paper reports none). The default spider and the peacock are untouched.
+
+---
+
+# Settings accepted and published v20 — Chet, 2026-10-18
 
 Claude's settings bundle 9c63783 is integrated. Build **d89045d8f2212cda**: **47,547 CLI checks**, **111/111 Studio engine checks (zero skipped)** and **24/24 live-client checks** pass; strict analysis clean, **167/167** scripts compile. Native tests include real TextService measurements and isolated real DataStore operations. Chet also changed normal-game volume to 75% and enabled large text, stopped and restarted Play, and saw both choices restored from the cloud.
 
@@ -30,7 +68,7 @@ Next chunk: release presentation (icon, thumbnail and accurate description of mo
 
 ---
 
-# Latest: settings and device polish built, 2026-10-18 (not yet run in Studio or on a device)
+# Settings and device polish built, 2026-10-18 (not yet run in Studio or on a device)
 
 Claude's `claude/roblox-settings` (from v19 main 3b8a919): 22 saved settings (sound volumes and captions, look speeds per device, invert X/Y, camera distance and field of view, the line-framing switch, reduced motion, large text, focus toggle, automatic grip, last-seen mark, spider-eye level horizon and grey, control hints, notebook notes), each read live by its real consumer; a modal settings panel (O, or Menu then Settings) for keyboard, controller and touch; PlayerProgress schema 2 with a migration from the seven old toggles; Menu and Notebook are 48 px touch targets laid out with the status lines, Focus and Change no longer overlap the thumb cluster on narrow phones. Decisions ROBLOX-49..52. CLI total **47,545** accepted checks, failed=0 (SETTINGS 923 new; NOTEBOOK 889 -> 813 because its button-place loop became SUMMARY's 13-size matrix, 185 -> 189); strict types 0; compile 172/172; places rebuilt. Nothing published.
 
@@ -38,7 +76,7 @@ Next for Chet: integrate the bundle, run the Studio Runner (new "Settings spec c
 
 ---
 
-# Latest: persistent saves published v19 — Chet, 2026-10-17
+# Persistent saves published v19 — Chet, 2026-10-17
 
 **Price reminder from Nathan:** the peacock appearance and dance are intended as a one-time add-on targeting **US$0.99**, with the Robux/Game Pass price to be checked when sales are implemented (ROBLOX-48). Free for testing is temporary; the first spider and full game stay free. No purchases activated by this reminder.
 
@@ -56,7 +94,7 @@ Branch `claude/roblox-state` (9e8b814 plus docs): the notebook, checklist, Easy 
 
 Waiting on Chet: the Studio checklist in `docs/HANDOFF-roblox-state.md` (enable Studio API access in a saved test place, confirm SaveStoreName, run the Runner's StateSpec, check the lossless-number round trip and the real error messages). Then Nathan: leave, rejoin, notebook still there. Decisions ROBLOX-39..46. Nothing published.
 
-# Latest: merged notebook and optional checklist, 2026-10-17
+# Merged notebook and optional checklist, 2026-10-17
 
 Claude's 657ce9d notebook and Chet's 77ca385 reader are reconciled. Nathan preferred a checklist: Notebook > **To try** offers twelve optional invitations marked from actual observations. The peacock dance has a sourced page. 25 authored pages, 24 reachable; only vibration is unwired. Session-only notes survive new lives and rest recovery.
 
@@ -66,16 +104,16 @@ Read `docs/HANDOFF-roblox-notebook.md`, `docs/verification/roblox-notebook/merge
 
 ---
 
-# Chet â€” 2026-10-17: field notebook
+# Chet — 2026-10-17: field notebook
 
-Read **docs/HANDOFF-roblox-notebook.md** and **docs/verification/roblox-notebook/RESULTS.md** for the exact final evidence and publication. Nathan approved the notebook after the growth/peacock polish. **N** or **Menu â†’ Field notebook** opens discovered biology notes, authored sketches, game simplifications and full citations. Reading pauses the world; large text and directional/shoulder/stick reading controls are supported. Short phone layouts prioritize text over the sketch.
+Read **docs/HANDOFF-roblox-notebook.md** and **docs/verification/roblox-notebook/RESULTS.md** for the exact final evidence and publication. Nathan approved the notebook after the growth/peacock polish. **N** or **Menu → Field notebook** opens discovered biology notes, authored sketches, game simplifications and full citations. Reading pauses the world; large text and directional/shoulder/stick reading controls are supported. Short phone layouts prioritize text over the sketch.
 
 There are **25 pages, 23 currently reachable**, including the peacock dance. Discoveries come from actual events; felt/buzz entries wait for real sensory signals. Notes survive last-rest recovery and new lives in the same session. Discovery notices can be disabled. Godot discovery behavior is compared with 35 exported transitions; the notebook suite has 222 checks. No changes to movement, silk, twitch, free peacock access or privacy.
 
 **Next chunk: persistent saves**, separately. Begin with server ownership and an isolated test store, not a RemoteEvent accepting arbitrary client checkpoints. Keep player notes/cosmetic/preferences/unlocks separate from main/Free world records; protect existing saves on load failure, schema mismatch, reconnect and concurrent sessions. The detailed scope is in the handoff. Current notes/checkpoints/unlocks are still session-only. Physical PlayStation/tablet acceptance remains Nathan's check.
 
 ---
-# Chet â€” 2026-10-17: growth, moulting, closer peacock and quieter ambience
+# Chet — 2026-10-17: growth, moulting, closer peacock and quieter ambience
 
 **Published version 15** to the existing Windowsill place 120119801868085 / universe 10771103250, independently confirmed in Creator Dashboard. Read **docs/HANDOFF-roblox-growth-polish.md** and **docs/verification/roblox-growth-polish/RESULTS.md**. Decisions ROBLOX-35/36. Build **0ee32d97f26bd2fd**; native acceptance **ece0772bc0acda77**, **91/91 engine + 19/19 live-client**. Only four label-encoding repairs followed native acceptance; synchronized release launch/play smoke passed. Windows CLI **45,263/45,263**, strict clean, final **132/132 compile**.
 
@@ -84,7 +122,7 @@ Three growth transitions, resting moults, soft skin/shorter jumps, old skins, sc
 **Next Claude: field notebook**, including event-driven discoveries and retention outside world checkpoints; full scope in the handoff. Server-owned DataStore persistence follows separately. Physical PlayStation/tablet acceptance remains Nathan's playtest. Publishing route: open existing online place, Rojo-sync default project, disconnect/stop server, ordinary Publish. No temporary server remains running. Do not repeat Publish As.
 
 ---
-# Chet â€” 2026-10-16: death/continuing, Free play and rest checked on Windows
+# Chet — 2026-10-16: death/continuing, Free play and rest checked on Windows
 
 Read **docs/HANDOFF-roblox-continuing.md** and **docs/verification/roblox-continuing-windows/RESULTS.md**. ROBLOX-33/34. Final evidence **589d9e7bbe94f6b1**: **85/85 Studio engine, 18/18 live client**, final CLI suite totals **44,819 passed** across the full run and corrected CLIENT 23/23 rerun; strict clean, 127 scripts compile. Actual walk into crack/rest/checkpoint passed. Added near-home guidance without changing the safe box. Normal launch, mouse Begin, M menu, keyboard scrolling and Free play also checked.
 
@@ -95,14 +133,14 @@ Standard starvation/end/recovery/unrelated new spider; separate session-only mai
 **Next chunk: growth and moulting**, including the actual adult event that opens Easy; scope and tests in the handoff. Keep geometry/physics, twitch, senses, sound and peacock display intact. Then notebook and server DataStore persistence, separately. Nathan's physical PlayStation/tablet playtest remains open.
 
 ---
-# Chet â€” 2026-10-16: peacock Windows integration
+# Chet — 2026-10-16: peacock Windows integration
 
 Read **docs/HANDOFF-roblox-peacock-windows.md** and **docs/verification/roblox-peacock-windows/RESULTS.md**. Claude 903bf49 imported; free peacock appearance/dance retained. Added native dance playback and fixed off-screen prompts on short landscape touch layouts (ROBLOX-32). Full Windows CLI **44,721/44,721** before the layout fix; affected reruns recorded separately. Initial native **84/84 engine + 15/15 client**, evidence **e54de70c7907c0a8**. Final build **2c8f574734259bd8** passed **85/85 Studio engine + 15/15 live client**. Strict src clean; 124 scripts compile. No monetization or live publication performed.
 
 **Next Claude:** death and continuing with mode selection; detailed scope in the new handoff. Keep the peacock unlocked until Nathan asks for sales. Physical PlayStation/tablet and close-up visual checks remain open.
 
 ---
-# Claude â€” 2026-10-16: the peacock spider and its courtship dance
+# Claude — 2026-10-16: the peacock spider and its courtship dance
 
 Read **docs/HANDOFF-roblox-peacock.md**. Branch **claude/roblox-peacock** (origin/main 059811b + three commits; `claude-playtest/claude-peacock.bundle`). Ledger **ROBLOX-29** to **ROBLOX-31**. Nathan's design package from another AI (Gemini) was used as source material only and redone: the science re-checked against Girard, Kasumovic and Elias 2011 (PLoS ONE 6(9): e25390), the code not copied.
 
@@ -111,7 +149,7 @@ A second spider, the male peacock spider Maratus volans: a drawn appearance (0.4
 Linux: PEACOCK 80, LOOK 102, CLIENT 19, all other suites unchanged, strict 0. **Not run in Studio.** Next Chet: import the bundle, the checklist in the handoff (fan look and z-fighting, the touch layout, the Prompt and Peacock Studio specs). Next Claude: LIFE death and continuing, or growth and moulting.
 
 ---
-# Chet â€” 2026-10-16: wasp, LIFE, PlayStation prompts and sound accepted on Windows
+# Chet — 2026-10-16: wasp, LIFE, PlayStation prompts and sound accepted on Windows
 
 Read **docs/HANDOFF-roblox-wasp-windows.md**. Claude a483d65 is integrated with the original sound work; the combined build is ready for main. Evidence **52123df9177323c8**: **44,610/44,610 Windows CLI**, **80/80 Studio engine**, **14/14 live-client**, strict src clean and **118/118 compile**. Nathan launched the local test; Chet collected matching structured Studio reports. The wasp recording loaded, the crack stayed safe, and the hum stopped after departure. Sample frame median/p95 **16.96/20.91 ms**, not a full F01 pass.
 
@@ -122,7 +160,7 @@ The new wasp warning uses its original generated recording, heard immediately du
 **Next Claude:** LIFE death and continuing, with Easy/Standard/Gentle selection, then growth/moulting. Preserve audio/captions and the whole-world checkpoint behavior. The notebook is not ported; do not imply persistent notebook retention yet. Gemini's peacock-spider appearance/dance is independent design exploration.
 
 ---
-# Claude â€” 2026-10-16: the mud dauber wasp
+# Claude — 2026-10-16: the mud dauber wasp
 
 Read **docs/HANDOFF-roblox-wasp.md**. Branch **claude/roblox-next** (main b5e78c9 + LIFE + PlayStation names + four wasp commits; bundle `claude-playtest/claude-next.bundle`). Ledger **ROBLOX-26**, **ROBLOX-27**. Roblox only; Godot/SPEC frozen. **Not run in Studio, Windows or devices.**
 - **The director ported and checked against Godot's own** (`tools/export_wasp_reference.gd` runs Godot's real director on a stand-in world in eight seeded scenarios; `tests/wasp.luau` replays them: WASP 15,815 checks; Godot's hand-written `test_life04_wasp` expectations too): at most one visit a day (day 2 on, after the first meal, never while resting), 8 s of warning, a search of 45 s over 15 places by sight (moving noticed fast, still slowly, the crack never), 1.5 s look then 0.35 s lunge, a jump / drop / out of sight breaks it off, the catch and the carry.
@@ -136,17 +174,17 @@ Read **docs/HANDOFF-roblox-wasp.md**. Branch **claude/roblox-next** (main b5e78c
 **Nathan, try:** open TheWindowsill-latest.rbxlx and play. A visit needs day 2 and a first meal: catch and eat a fly, rest in the crack (E) after 18:00 to sleep to "Morning, day 2", then keep playing through midday; on a day with a visit you will see a caption like "[a deep, heavy hum outside, ahead-left, coming closer]" about 8 seconds before the wasp is on the sill (it may not come every day). Move about in the open and it finds you; hide in the crack, jump, or drop on the line to get away. If it catches you, press Return / E / Space (Cross on PlayStation) for "Back to your last rest". To see it at once, Chet can use the test place (`TheWindowsillTests.rbxlx`) with the Workspace attribute `WaspForce` = `floor_middle`.
 
 ---
-# Claude â€” 2026-10-16: LIFE integrated with the new look; PlayStation button names
+# Claude — 2026-10-16: LIFE integrated with the new look; PlayStation button names
 
 Branch **claude/roblox-next** (origin/main b5e78c9 + claude/roblox-life merged + one commit; bundle claude-playtest/claude-next.bundle). Chet was unavailable, so nothing here has been run in Studio or on a PlayStation.
 - **LIFE merged** onto main (clean): all suites pass together (LIFE 20,846, CHECKPOINT 123, SUMMARY 184, ...); strict 0; 113/113 compile; places rebuilt, evidence **478963f45d9a8f40**; claude-playtest/TheWindowsill-latest.rbxlx is this build.
 - **PlayStation names:** ControlText.setPadStyle from UserInputService:GetStringForKeyCode(ButtonA) ("ButtonCross" on PlayStation): Cross, Circle, Square, Triangle, L1, L2, R2, R3, Touchpad in prompts and the controls card. Xbox and keyboard unchanged.
 - Nathan has a private published copy to test on his PlayStation (console must be ticked in Playable Devices; same Roblox account; favorite it on the web to find it on the console).
 
-**Next:** Chet â€” import claude-next.bundle, push, the LIFE Studio checks from docs/HANDOFF-roblox-life.md, a look at the prompts with Studio's PS5 emulation, merge. **Next Claude: the mud dauber wasp** (Nathan's choice): port scripts/predator/wasp_director.gd, wasp.gd, wasp_body.gd with Godot goldens (LIFE-14..18; caught -> back to the last rest checkpoint), a drawn mud dauber, WaspSpec. A first attempt stopped at a usage limit before writing anything.
+**Next:** Chet — import claude-next.bundle, push, the LIFE Studio checks from docs/HANDOFF-roblox-life.md, a look at the prompts with Studio's PS5 emulation, merge. **Next Claude: the mud dauber wasp** (Nathan's choice): port scripts/predator/wasp_director.gd, wasp.gd, wasp_body.gd with Godot goldens (LIFE-14..18; caught -> back to the last rest checkpoint), a drawn mud dauber, WaspSpec. A first attempt stopped at a usage limit before writing anything.
 
 ---
-# Claude â€” 2026-10-16: LIFE clock, hunger by the hour, rest and sleep, day and night, retreat checkpoints
+# Claude — 2026-10-16: LIFE clock, hunger by the hour, rest and sleep, day and night, retreat checkpoints
 
 Read **docs/HANDOFF-roblox-life.md**. Branch **claude/roblox-life** (main b5e78c9, four commits; bundle `claude-playtest/claude-life.bundle`). Ledger **ROBLOX-24**, **ROBLOX-25**. Roblox only; Godot/SPEC frozen.
 - **LIFE round 1 ported** against Godot goldens (`tools/export_life_reference.gd` runs Godot's real habitat loop): the day (9:00 start, ~12 h in 15 min), hunger by the hour (no floor; nothing follows at zero yet), rest in the crack with E, sleep from 18:00 to morning (~8 s a night), "Morning, day N", the eyes' reach 30% at night. NeedsModel now owns energy; Feeding grants into it.
@@ -159,7 +197,7 @@ Read **docs/HANDOFF-roblox-life.md**. Branch **claude/roblox-life** (main b5e78c
 **Nathan, try:** walk to the silk-lined crack at the west end and keep still: press E to rest. Watch the day in the top-left corner. Rest again after 18:00 (or wait for evening) and the spider sleeps through the night to "Morning, day 2". Go hunting, then press Backspace to return to your last rest. Tell us how the evening and night look.
 
 ---
-# Chet â€” 2026-10-15: aesthetics accepted on Windows
+# Chet — 2026-10-15: aesthetics accepted on Windows
 
 Claude's 771324f visual round is integrated. Native fixes: tolerate float32 effect rounding; use a non-refracting transparent window so the flower UV layer is visible. See **ROBLOX-23**, **docs/HANDOFF-roblox-aesthetics.md** (Windows follow-up), and **docs/verification/roblox-aesthetics-windows/RESULTS.md**.
 
@@ -170,17 +208,17 @@ Evidence **ab5e92132d90a1da**: **69/69 Studio, 11/11 live-client**, 7,801 CLI ch
 **Nathan:** reopen roblox_port/TheWindowsill.rbxlx and Play. Explore the new sill, press V, and Focus on the flowers through the glass. Try another hunt and tell us whether the zoom/green view feels comfortable. Controller/tablet unavailable, so those checks remain not run.
 
 ---
-# Claude â€” 2026-10-15: the look of everything, and a science-based spider-eye view
+# Claude — 2026-10-15: the look of everything, and a science-based spider-eye view
 
 Read **docs/HANDOFF-roblox-aesthetics.md**. Branch **claude/roblox-aesthetics** (origin/main d910d1e; bundle claude-playtest/claude-aesthetics.bundle). Nathan: "upgrade the aesthetics of everything and the first person view more scientifically accurate with possible flourish if too dull." Presentation only; no collision, sense or control change.
 - **Eye view (ROBLOX-20):** side eyes wide, green, soft, with movement rings; hold Focus for the principal eyes: 24-degree telephoto, depth of field at what is looked at, reds dark, flowers' UV bullseyes in violet; retina strips at true angular size. Science and citations in Shared/Data/Eyes.luau. Perception HUD redrawn with real shapes.
 - **World (ROBLOX-21) and fly (ROBLOX-22):** painted sill, Pilea leaves, terracotta planter, droplets, outside flower box, silk retreat, props, warmer light, macro depth of field by default; a 39-part house fly.
 - Linux: **7,801 checks pass**, strict 0, 100/100 compile; places rebuilt, evidence **8672e3fc3bd2649f**. Godot-shim previews in docs/verification/roblox-aesthetics (not Roblox). **Not seen in Studio.**
 
-**Next:** Chet â€” import, Studio suite and client playback, the visual checklist in the handoff (tune numbers in Data/Graphics, Data/Eyes, Data/FlyLook), frame time with six flies, merge. Then Claude: your LIFE clock/day-night/range_scale order from the flies handoff.
+**Next:** Chet — import, Studio suite and client playback, the visual checklist in the handoff (tune numbers in Data/Graphics, Data/Eyes, Data/FlyLook), frame time with six flies, merge. Then Claude: your LIFE clock/day-night/range_scale order from the flies handoff.
 
 ---
-# Chet â€” 2026-10-15: perception and flies playable, Windows verified
+# Chet — 2026-10-15: perception and flies playable, Windows verified
 
 Read **docs/HANDOFF-roblox-flies.md** and **docs/verification/roblox-flies/RESULTS.md**. Claude's perception bundle is integrated; real flies now sense, walk, fly, flee, enter unseen, get caught, struggle and feed the spider. The test target is test-place-only by default. Godot remains frozen.
 
@@ -196,7 +234,7 @@ Evidence **e3160a3f6e3f2782**: **7,155 CLI checks, 67/67 Studio, 11/11 live-clie
 Perception part 1 from Claude's 41d1148 is accepted for main. Windows: 182 + 4669 + 15 + 11 + 72 + 71 checks pass; 60/60 Luau files compile. See docs/verification/roblox-perception-windows/RESULTS.md. No new Studio run; playable places unchanged because these modules are not wired in. Preserve the frozen sight-loss boundary. **Next Claude: perception part 2**, as specified in docs/HANDOFF-roblox-perception-1.md; then flies. No visible new gameplay in this merge.
 
 ---
-# Current handoff â€” Claude, 2026-10-15: Roblox perception, part 1 (pure logic)
+# Current handoff — Claude, 2026-10-15: Roblox perception, part 1 (pure logic)
 
 Read **docs/HANDOFF-roblox-perception-1.md**. Branch **claude/roblox-perception** (origin/main 61f2d49, five commits; bundle claude-playtest/claude-perception.bundle). Roblox only; Godot/SPEC/DECISIONS untouched. You asked for "perception, beginning with observation/association/memory fixtures": this is that, with no raycasts, client wiring or presentation.
 - **Ported, pure and strict-typed, in roblox_port/src/Shared/Perception/:** Observation, PerceptionMath (cone and peripheral angles, sight tolerance min(0.05, 0.1 x radius + 1e-5 x ray), classification: movement, possible prey at 0.40 s, fly-like prey at 1.00 s, breaks under 0.15 s keep it), ObservationMemory (6 s linear decay, fixed mark, invalidation, expiry, merge), SensorCore (the sensor's bookkeeping: exposure, the cue, the A-027/D-040 association rule, the 0.40 s empty-spot check). Tuning comes from the species data.
@@ -204,11 +242,11 @@ Read **docs/HANDOFF-roblox-perception-1.md**. Branch **claude/roblox-perception*
 - Linux: **SUMMARY 182, PERCEPTION 4669, BOXWORLD 15, CLIENT 11, LOOK 72, WORLD 71** passed; strict luau-lsp 0 diagnostics; 60/60 compile. **Not run in Studio**; places not rebuilt (nothing in them uses the new modules yet).
 - One Godot boundary kept as it is, for your decision: nine ticks without a sighting start a fresh contact where eight keep the same one (the sensor files before the memory advances).
 
-**Next Claude: part 2** â€” sensor sampling with raycasts (five sample rays, A-024 tolerance, 300 degree field, 30 degree cone, 40 WU, 10 Hz broad scan), the peripheral cue and inspection cone feeding SensorCore, Focus (D-036/D-041), the last-seen mark's presentation, a labeled test target, and P01 in Studio. Rebuild the places with tools/build.py then.
+**Next Claude: part 2** — sensor sampling with raycasts (five sample rays, A-024 tolerance, 300 degree field, 30 degree cone, 40 WU, 10 Hz broad scan), the peripheral cue and inspection cone feeding SensorCore, Focus (D-036/D-041), the last-seen mark's presentation, a labeled test target, and P01 in Studio. Rebuild the places with tools/build.py then.
 
 ---
 
-# Current handoff â€” Chet, 2026-10-14: native Roblox controls/recovery acceptance
+# Current handoff — Chet, 2026-10-14: native Roblox controls/recovery acceptance
 
 Read **docs/HANDOFF-roblox-controls-recovery.md** (Windows follow-up) and **docs/verification/roblox-controls-windows/RESULTS.md**. Imported Claude's bundle 156da67 and pushed his branch. Roblox remains active; Godot/SPEC frozen.
 - Native fixes: wall-lowering contact guard; float32 landing tolerance; protected lighting flags checked at build time.
@@ -219,7 +257,7 @@ Read **docs/HANDOFF-roblox-controls-recovery.md** (Windows follow-up) and **docs
 
 ---
 
-# Current handoff â€” Claude, 2026-10-14: Roblox controls like Godot, recovery camera, a cuter fuzzy spider, better graphics
+# Current handoff — Claude, 2026-10-14: Roblox controls like Godot, recovery camera, a cuter fuzzy spider, better graphics
 
 Nathan: "the controls are not as good on roblox, when jumping you can only hop, V doesnt change the view etc. They were perfect on the godot version." Then: the spider "needs to be cuter", "we need fuzzy spider", and the textures and graphics should improve. Read **docs/HANDOFF-roblox-controls-recovery.md** (section "Cuter spider and graphics" for the new work), **docs/verification/roblox-controls-recovery/RESULTS.md** and **docs/verification/roblox-cute-graphics/RESULTS.md**. Branch **claude/roblox-controls-recovery** (main 432bc53 + Perplexity's 01fe0d1, merged). Roblox only.
 - Merged Chet's safety silk with Perplexity's camera, aiming, eye view and fuzz; places regenerated; Perplexity's ROBLOX-04/05 are now **ROBLOX-06/07**.
@@ -230,11 +268,11 @@ Nathan: "the controls are not as good on roblox, when jumping you can only hop, 
 - **Graphics (ROBLOX-14):** a material per surface (PBR via Use2022Materials), Future lighting, a sun picked to shine in through the window (SunPick, with a fallback), haze, clouds, gentle bloom, a drawn window with a view, dust, light shafts and small details; all decor non-colliding and invisible to rays. Touch-only devices (or Workspace attribute `Detail`) get a lighter tier (decor 76 to 34 parts). No depth of field unless Workspace attribute `DepthOfField`.
 - Linux: pure **182/182**, box world **15/15** (ten misses recovered), client smoke **11/11**, look **72/72**, world **71/71**, strict analysis clean, 52/52 compile, evidence **80504bccb4e8651f**. Before (the first coat) and after renders and a contact sheet are in docs/verification/roblox-cute-graphics (Godot-shim renders, **not Roblox**). **Not run in Studio or on devices; none of the new looks has been seen in Roblox.**
 
-**Next:** Chet â€” Studio suite (50 rows) and client playback (7), the graphics checks (Output line `[Windowsill] sun:`, the window view, low detail on a phone), controller/touch/tablet and frame-time checks, then merge to main. Nathan â€” try the list in the handoff and say how the spider looks. Then perception.
+**Next:** Chet — Studio suite (50 rows) and client playback (7), the graphics checks (Output line `[Windowsill] sun:`, the window view, low detail on a phone), controller/touch/tablet and frame-time checks, then merge to main. Nathan — try the list in the handoff and say how the spider looks. Then perception.
 
 ---
 
-# Current handoff â€” Chet, 2026-10-14: Roblox safety silk
+# Current handoff — Chet, 2026-10-14: Roblox safety silk
 
 Read **docs/HANDOFF-roblox-silk.md** and **docs/verification/roblox-silk/RESULTS.md** first. Roblox-only; Godot/SPEC frozen.
 - Core safety silk implemented: catch, hang, reel, lower, edge approach, one bend/snags and deliberate release. Rebuilt playable/test Studio places.
@@ -245,18 +283,18 @@ Read **docs/HANDOFF-roblox-silk.md** and **docs/verification/roblox-silk/RESULTS
 
 ---
 
-# Current handoff â€” Perplexity Computer, 2026-10-14: Roblox controls, camera and a fuzzy spider
+# Current handoff — Perplexity Computer, 2026-10-14: Roblox controls, camera and a fuzzy spider
 
 Nathan: the Roblox controls were not as good as Godot's (held jumps only hopped, V did nothing) and the spider should be fuzzy. Read **docs/HANDOFF-roblox-controls.md**, DECISIONS **ROBLOX-06/07** (ROBLOX-04/05 on its branch; renumbered ROBLOX-06/07 when merged with Chet's safety silk), **docs/verification/roblox-controls-fuzz/RESULTS.md**.
 - Cause of "only hop": Roblox's stock camera centred the body, so the centre aim ray met the floor just past the feet. Ported Godot's camera rig, jump controller/planner phases, Focus, spider-eye view (V/Y), recenter (R), cancel (Q/B), slow motion (T/RT). **Reset moved from R to Backspace.**
 - Fuzz: about 640 thin hair parts plus two fur shells, all values in Appearances.fuzz; a third of the hairs on touch-only devices.
 - Linux pure **63/63** (11 new camera goldens exported from Godot), strict type check clean, evidence **db36b09b003a6b8d**. **Not run in Roblox Studio.**
 
-**Next:** Chet â€” Studio engine suite and a play check of the list in the handoff, plus frame time with the fuzz. Then safety silk.
+**Next:** Chet — Studio engine suite and a play check of the list in the handoff, plus frame time with the fuzz. Then safety silk.
 
 ---
 
-# Current handoff â€” Chet, 2026-10-14: Roblox only
+# Current handoff — Chet, 2026-10-14: Roblox only
 
 **Nathan: "Let's only work in roblox going forward."** PLATFORM-01 is decided. Roblox in `roblox_port/` is active; Godot at c87ce00 is a frozen runnable reference/golden-data source. No new Godot features; SPEC.md unchanged. Earlier Godot plans below are historical.
 
@@ -269,28 +307,28 @@ Read **docs/HANDOFF-roblox-first.md**, **docs/ROBLOX_PORT.md**, and **docs/verif
 
 ---
 
-# Current handoff â€” Perplexity Computer, 2026-10-14 (VISUAL-01: the drawn spider, Roblox scaffold)
+# Current handoff — Perplexity Computer, 2026-10-14 (VISUAL-01: the drawn spider, Roblox scaffold)
 
 Read **docs/HANDOFF-visual01.md** and DECISIONS **VISUAL-01**. Built on Chet's c2a6ae7.
 - Drawn only: three-segment legs with banded joints, eye face and catchlights, iridescent chelicerae, drumming palps, orange-to-white spots by stage, rim light; filmic tone, wood/brick/leaf grain and dust motes on the sill. No collider, motor, sense, save or settings change.
 - Evidence **87c44d9c8206**: 644/644 (Linux headless, fixed 60 fps); related 36/36 at 30/144. Not run on Windows; frame time unmeasured.
 - `roblox_port/`: Rojo project, data from data/*.json, JumpMath checked against Godot, the sill, a playable client spider. Not yet run in Studio.
 
-**Next:** Chet â€” a Windows look and frame-time check of VISUAL-01 (handoff list). Then LIFE round 6 â€” Nathan, his son and friends play a whole life.
+**Next:** Chet — a Windows look and frame-time check of VISUAL-01 (handoff list). Then LIFE round 6 — Nathan, his son and friends play a whole life.
 
 ---
 
-# Current handoff â€” Chet, 2026-10-13 (whole-life Windows handback)
+# Current handoff — Chet, 2026-10-13 (whole-life Windows handback)
 
 Read **docs/HANDOFF-life-windows.md** and **docs/verification/life06-windows/RESULTS.md**.
 - Windows **644/644**, evidence **2c1c789ef545**; related **27/27 at 30/60/144**.
 - Start/end menu focus, notebook stacking, large-text panels and mode-specific confirmation fixed.
-- Wasp prewarm at load: arrival worst ~108â€“113 ms before, ~20â€“22 ms after. F01 still open.
+- Wasp prewarm at load: arrival worst ~108–113 ms before, ~20–22 ms after. F01 still open.
 - Staged whole-life transitions checked; Windows/Web release menu and Web eye view checked.
 - Game source **7045e8d**. New friend ZIPs: **Downloads/The-Windowsill-Playtest-2026-10-13-Whole-Life**. Source/hashes in friend-builds.json.
 - Hardware controller, sound listening, embedded-browser mouse-look and full-life human play remain. No new mechanics or twitch/SimClock changes.
 
-**Next: LIFE round 6 â€” Nathan, his son and friends play a whole life.** Record feedback in docs/PLAYTEST.md.
+**Next: LIFE round 6 — Nathan, his son and friends play a whole life.** Record feedback in docs/PLAYTEST.md.
 
 ---
 
@@ -311,7 +349,7 @@ Evidence **a4165eb2beb4**: 640/640 (Linux headless, fixed 60 fps). Not run on Wi
 
 ---
 
-# Current handoff â€” Chet, 2026-10-13 (wasp presentation)
+# Current handoff — Chet, 2026-10-13 (wasp presentation)
 
 Read **docs/HANDOFF-wasp-presentation.md** and **docs/verification/wasp-windows/RESULTS.md**.
 - New wasp silhouette, jointed legs, smoky tapered wings and antenna animation.
@@ -346,7 +384,7 @@ Evidence **e962dffc61cb**: 628/628 (Linux headless, fixed 60 fps). Not run on Wi
 
 ---
 
-# Current handoff â€” Chet, 2026-10-12 (drawn growth complete)
+# Current handoff — Chet, 2026-10-12 (drawn growth complete)
 
 Read **docs/HANDOFF-drawn-growth.md** and **docs/verification/growth-windows/RESULTS.md**.
 - Drawn stages now grow 1.0 / 1.15 / 1.32 / 1.50; artistic sizes, unchanged
@@ -355,7 +393,7 @@ Read **docs/HANDOFF-drawn-growth.md** and **docs/verification/growth-windows/RES
   30/60/144 fps. Game source `537d1ce`; subsequent work is docs/evidence.
 - Staged native three-moult adult and silk checks complete. Reel before floor
   landing; landing completes the trail. Underside orbit framing remains rough.
-- Battery moult timing: ~59â€“60 fps, p95 17.58â€“17.88 ms, spikes to 71.50 ms.
+- Battery moult timing: ~59–60 fps, p95 17.58–17.88 ms, spikes to 71.50 ms.
 - Friend ZIPs rebuilt: Downloads/The-Windowsill-Playtest-2026-10-12-Growth.
   Windows launch/web eye/notebook checked; embedded mouse pointer-lock fails.
 - **Next: Claude, mud dauber wasp (LIFE round 4).** Chet pushes main and
@@ -528,11 +566,11 @@ Nathan can play the updated main and judge the gait, particularly short hops, tu
 
 ## Earlier handoffs (historical)
 
-# Where we left off â€” Chet, 2026-10-10 (America/Chicago)
+# Where we left off — Chet, 2026-10-10 (America/Chicago)
 
 **Latest: T10b, scientific eye-view refinement.** Start from `main` and read **docs/HANDOFF-retinal-scan.md** and **docs/VISION_RESEARCH.md** before the older handoffs below. Built on Claude's `2d6ea80`: two narrow principal-eye detail regions sweep together and twist behind fixed lenses; the camera/aim/senses stay unchanged. Removed the blue-as-UV shortcut; the green-weighted picture explicitly says UV is not simulated. Reduced motion freezes scanning; pause stops its clock. Windows full suite **548/548**, evidence **829573aaf835**; normal-speed eye tests **12/12**; native AMD/OpenGL captures in `docs/verification/t10b/`. Research-backed illustration, not a literal spider's colour experience. Nathan's playtest is still needed. The previous live-legs and T10a sections below are historical context.
 
-**Start from `main`.** Nathan approved wiring the leg prototype into the real spider. The live-leg implementation is commit `a51d639`, based on Claude's `eacec52` (T09d controller remapping, assist presets, and Nathan's request to keep the twitch). Read **docs/HANDOFF-live-legs.md** first, then **docs/HANDOFF-chunk-9.md** for T09â€“T09d. Follow the one-agent/start-main/finish-main/laptop-update rule in **docs/SHARED_WORKFLOW.md**.
+**Start from `main`.** Nathan approved wiring the leg prototype into the real spider. The live-leg implementation is commit `a51d639`, based on Claude's `eacec52` (T09d controller remapping, assist presets, and Nathan's request to keep the twitch). Read **docs/HANDOFF-live-legs.md** first, then **docs/HANDOFF-chunk-9.md** for T09–T09d. Follow the one-agent/start-main/finish-main/laptop-update rule in **docs/SHARED_WORKFLOW.md**.
 
 ## Current result
 
@@ -565,7 +603,7 @@ Native AMD Radeon screenshots show the real windowsill spider's corrected legs, 
 
 **Latest (Claude, 2026-10-11, T11a):** one game clock and slow motion (T / RT), an easy first/third-person switch (V / Y, a line on screen, an Esc-menu button), and the playtest checklist `docs/PLAYTEST.md`. Evidence **e530e2f0810d**: 553/553 (Linux headless, fixed 60 fps); not run on Windows. Read `docs/HANDOFF-slow-motion.md`; the plan is `docs/ROADMAP.md`. Nathan's son needs no more help than Most help. The next step is Nathan's playtest.
 
-**Spider-eye view (T10a, Claude, 2026-10-11):** built at Nathan's request. Read `docs/HANDOFF-eye-view.md`. V or Y switches between a first-person view from the principal eyes and the orbit camera. Decisions EYE-01 â€¦ EYE-06. Evidence **7169ecfd3663**: 544/544 (Linux headless, fixed 60 fps); not yet run on Windows or played. Nathan also said: "you can mess with any approved code its ok", and that his laptop is the shared home for him, Chet and Claude ("absolute permission for anything"). Claude itself works in a cloud copy and reaches the laptop only through GitHub and `update.bat`.
+**Spider-eye view (T10a, Claude, 2026-10-11):** built at Nathan's request. Read `docs/HANDOFF-eye-view.md`. V or Y switches between a first-person view from the principal eyes and the orbit camera. Decisions EYE-01 … EYE-06. Evidence **7169ecfd3663**: 544/544 (Linux headless, fixed 60 fps); not yet run on Windows or played. Nathan also said: "you can mess with any approved code its ok", and that his laptop is the shared home for him, Chet and Claude ("absolute permission for anything"). Claude itself works in a cloud copy and reaches the laptop only through GitHub and `update.bat`.
 
 **Cross-device goal (Nathan, 2026-10-10 America/Chicago):** Nathan wants to play on PlayStation and other devices. Keep this in mind during Godot development. Roblox is a possible route, not a selected platform or an authorized port. Nathan, Chet and Claude will decide the approach and timing together. Chet suggested a solid Godot core followed by a small Roblox feasibility prototype before extensive additional content; this is a proposal, not an agreed milestone. See DECISIONS PLATFORM-01.
 

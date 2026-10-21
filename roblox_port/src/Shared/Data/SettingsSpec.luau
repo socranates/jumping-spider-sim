@@ -6,7 +6,8 @@
 -- An id is also the name of the Player attribute that holds the value at run time (the older toggles already were: FocusToggle, ReducedMotion,
 -- ShowLastSeen, AutomaticGrip, NotebookNotes, LargeText, SoundMuted), so a setting nobody has changed is an attribute nobody has set.
 --
--- Kinds: "toggle" (true or false), "slider" (a number from min to max in steps), "choice" (one of the listed options, by id).
+-- Kinds: "toggle" (true or false), "slider" (a number from min to max in steps), "choice" (one of the listed options, by id), and, for a live row only,
+-- "action" (a button that does something when it is switched: Inspect your spider, ROBLOX-90; it has no value).
 -- The words follow the frozen Godot game's settings (scripts/presentation/settings.gd and pause_menu.gd) where a setting matches; the ones
 -- Godot had that the port has no part for (stalk and jump-aim toggles, the jump arc, strike assist, headphones, rumble, slow-motion speed,
 -- remapping keys) are left out on purpose and listed in docs/HANDOFF-roblox-settings.md.
@@ -28,6 +29,7 @@ SettingsSpec.SECTIONS = {
 	{ id = "camera", title = "Camera" },
 	{ id = "comfort", title = "Comfort and accessibility" },
 	{ id = "help", title = "Help and hints" },
+	{ id = "spider", title = "Your spider" },
 } :: { { id: string, title: string } }
 
 -- Units name how a slider's number is shown (SettingsModel.valueText): percent of 1, a plain multiplier, degrees, studs.
@@ -37,6 +39,7 @@ SettingsSpec.LIST = {
 	{ id = "MasterVolume", section = "sound", label = "Volume", kind = "slider", default = 1.0, min = 0.0, max = 1.0, step = 0.05, unit = "percent" },
 	{ id = "AmbienceVolume", section = "sound", label = "Room sounds and birds", kind = "slider", default = 1.0, min = 0.0, max = 1.0, step = 0.05, unit = "percent" },
 	{ id = "CreatureVolume", section = "sound", label = "Flies and the wasp", kind = "slider", default = 1.0, min = 0.0, max = 1.0, step = 0.05, unit = "percent" },
+	{ id = "MusicVolume", section = "sound", label = "Ambient music", kind = "slider", default = 1.0, min = 0.0, max = 1.0, step = 0.05, unit = "percent" },
 	{ id = "Captions", section = "sound", label = "Captions for sounds and vibrations", kind = "choice", default = "normal",
 		options = { { id = "off", label = "Off" }, { id = "normal", label = "Normal" }, { id = "large", label = "Large" } },
 		note = "A line for the wasp's hum and the buzz felt through the feet, with its direction." },
@@ -56,13 +59,27 @@ SettingsSpec.LIST = {
 	{ id = "LargeText", section = "comfort", label = "Large text", kind = "toggle", default = false, note = "Menus, panels and the notebook." },
 	{ id = "FocusToggle", section = "comfort", label = "Focus toggles (press to start and stop)", kind = "toggle", default = false },
 	{ id = "AutomaticGrip", section = "comfort", label = "Struggling prey: hold on automatically", kind = "toggle", default = false },
+	{ id = "ShowNoticed", section = "comfort", label = "Show what the spider notices", kind = "toggle", default = true,
+		note = "The rings, marks and words over what it sees. A lock (R or L1) still follows it." }, -- L1 locks on a controller
 	{ id = "ShowLastSeen", section = "comfort", label = "Show the last-seen mark", kind = "toggle", default = true },
 	{ id = "EyeLevelHorizon", section = "comfort", label = "Spider-eye view: level horizon (no roll on walls)", kind = "toggle", default = false },
 	{ id = "EyeGrey", section = "comfort", label = "Spider-eye view: grey instead of green", kind = "toggle", default = false },
 	-- ---------------------------------------------------------------- help and hints
 	{ id = "ControlHints", section = "help", label = "Show control hints", kind = "toggle", default = true,
-		note = "The controls card and the walking reminder. Prompts that say what a button does right now stay." },
+		note = "The controls card and the walking reminder; in Normal, a life's first day only. Menu, Controls shows the card." },
 	{ id = "NotebookNotes", section = "help", label = "Say when a new notebook page opens", kind = "toggle", default = true },
+} :: { Setting }
+
+-- Rows that show and drive something the game already keeps elsewhere, so they are not saved settings (ROBLOX-71): no Player attribute of the
+-- id, nothing in the save's settings, nothing in Reset to defaults. The spider is kept in the save as `appearance` (Player attribute
+-- `Appearance`), and the client drives it through the panel's Io. `default` is only what an unknown reading says. The options and the words of
+-- a live row come from the part that owns it (the Spider row's from Rig/SpiderChoice and UI/PeacockText, through SettingsModel), not from here.
+SettingsSpec.LIVE = {
+	{ id = "Spider", section = "spider", label = "Spider", kind = "choice", default = "first_spider",
+		note = "Change it anywhere you stand safely. Not while jumping, on silk, moulting or holding prey." },
+	-- ROBLOX-90: a button, not a value. It closes the panel into Inspect mode (a slow, close look at the spider), when the spider stands safely.
+	{ id = "Inspect", section = "spider", label = "Inspect your spider", kind = "action", default = false,
+		note = "A slow, close look from every side. Only while you stand safely. Cancel leaves." },
 } :: { Setting }
 
 -- How big the caption text is for each Captions option, as a multiple of the HUD's caption size (0: no captions of sounds at all).

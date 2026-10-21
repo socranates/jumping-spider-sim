@@ -17,6 +17,11 @@ FieldNotebook.__index = FieldNotebook
 
 export type Page = Data.Page
 export type Record = { opened: { string }, eye_seconds: number }
+export type Entry = { day: number, text: string }
+
+-- ROBLOX-89: dated lines the game adds to a page the book already has ("things you saw"; never a page of their own, and never shown before the page is found): at most
+-- this many to a page, the oldest dropped. They belong to the session, not to the record: `toRecord` and `load` do not carry them (the save has no field for them).
+FieldNotebook.MAX_ENTRIES = 6
 
 -- What is wrong with a page, empty when nothing is (Godot's `problems`): a missing field, an unknown trigger or no source.
 function FieldNotebook.problems(p: any): { string }
@@ -46,6 +51,7 @@ function FieldNotebook.new(pages: { Page }?): any
 		opened = {} :: { string },
 		eyeSeconds = 0.0,
 		dropped = {} :: { string },
+		entries = {} :: { [string]: { Entry } },
 		pageOpened = Signal.new(), -- (id): a page opened now, after it is in `opened`
 		_byId = {} :: { [string]: Page },
 		_open = {} :: { [string]: boolean },
@@ -76,6 +82,29 @@ function FieldNotebook.view(self: any, id: string): Page?
 		return self._byId[id]
 	end
 	return nil
+end
+
+-- A dated line on a page of the book ("Day 4: ..."), kept for the session. Returns whether it was added (a page the book has, a day and some words, and not a line
+-- the page already has).
+function FieldNotebook.addEntry(self: any, id: string, day: number, text: string): boolean
+	if self._byId[id] == nil or type(text) ~= "string" or string.match(text, "^%s*$") then return false end
+	if type(day) ~= "number" or day ~= day or day < 0 or day == math.huge then return false end
+	local list: { Entry } = self.entries[id] or {}
+	for _, e in list do
+		if e.day == day and e.text == text then return false end
+	end
+	table.insert(list, { day = day, text = text })
+	while #list > FieldNotebook.MAX_ENTRIES do table.remove(list, 1) end
+	self.entries[id] = list
+	return true
+end
+
+-- The lines on a page, only once the page is found (a page not yet found shows nothing, its lines included), oldest first.
+function FieldNotebook.entriesFor(self: any, id: string): { Entry }
+	if not self._open[id] then return {} end
+	local out: { Entry } = {}
+	for _, e in self.entries[id] or {} do table.insert(out, { day = e.day, text = e.text }) end
+	return out
 end
 
 -- Found pages as {id, title}, in the order they were found.

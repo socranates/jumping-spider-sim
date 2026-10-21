@@ -1,0 +1,33 @@
+{
+  "build": "v47",
+  "source_commit": "1447d6b74c9aa6b6b4725ad3bdaa6e30d972fd24",
+  "evidence_id": "97cdf8a2827b4734",
+  "place_id": 120119801868085,
+  "universe_id": 10771103250,
+  "published_place_version": 61,
+  "published_at_utc": "2026-10-21T13:50:19Z",
+  "creator_dashboard_confirmed": true,
+  "selftest": {
+    "passed": 245,
+    "failed": 0,
+    "skipped": 0,
+    "elapsed_seconds": 526
+  },
+  "cli": {
+    "suites": 48,
+    "passed": 352162,
+    "failed": 0,
+    "method": "45 unchanged suites from complete frozen run plus 3 corrected-suite reruns; raw complete process exited 1 for four stale button-label assertions"
+  },
+  "compile": {
+    "source_modules": 196,
+    "failed": 0
+  },
+  "typecheck_exit": 0,
+  "live_client_verified": false,
+  "review_driver_removed": true,
+  "selftest_attribute_cleared": true,
+  "rojo_stopped": true,
+  "playable_sha256": "cd2e31a8729cfdb53eff2a06828a31696588c26139442f91500601771372f787",
+  "live_client_limit": "Existing Player automatically updated and opened home; browser Play did not hand off a game session. No manual installer controls used."
+}

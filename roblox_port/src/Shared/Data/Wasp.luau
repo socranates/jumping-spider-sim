@@ -16,6 +16,47 @@ Wasp.visitChance = 0.6
 Wasp.windowFromH = 10.0
 Wasp.windowToH = 15.5
 
+-- The game's own rules, which the Godot replay above does not use (the goldens keep the values above; WaspDirector:useGameRules() applies these):
+-- a visit on every day from firstDay (guaranteed, ROBLOX-67), two a day in two windows of the day (ROBLOX-75), and Chet's longer, slightly
+-- sharper visits (ROBLOX-62). The first-day, first-meal and rest protections do not change.
+Wasp.game = {
+	visitChance = 1.0, -- 1 = every visit of every day from firstDay (Godot: visitChance above, some days only); a visit of the day is drawn against it each
+	-- ROBLOX-75 (Nathan: "the wasp needs to be around more, maybe a couple times through the day"): two visits a day, one in each of these windows
+	-- (from, to; hours of the life clock; Godot has the one window windowFromH to windowToH above). The hour of each is drawn from the world's seed,
+	-- the day and the visit's place in the day, in the window's first part (up to an hour before its end, so a rest can still delay it inside the
+	-- window), and the afternoon's is at least minGapH after the morning's. Every visit is a full one (the warning, the search, its own takesRival
+	-- draw below) and has its own protections: a rest or moult at its hour only delays it to the window's end, and a rest through the whole window
+	-- skips that visit and no other.
+	windows = { { 9.5, 12.0 }, { 13.5, 16.5 } },
+	minGapH = 2.0,
+	searchScale = 1.6, noticeScale = 1.2, inspectScale = 0.8,
+	-- ROBLOX-70 (Nathan: "The wasp should kill the rival male like 10 percent of the time"): the chance, per visit, that a visit is for the rival
+	-- male instead of the spider, when there is a free rival on the sill that is not in the retreat. Drawn from a stream of its own (the visit's
+	-- seed), so the places and times of the other draws do not change. 0 turns it off.
+	takesRival = 0.10,
+	-- ROBLOX-106 (W4, Nathan: "sometimes you worry about starving because a wasp or other thing won't go away"): the standard rules only (WaspDirector `nature`, which
+	-- the client sets when the rules are not gentle). Each day's two windows slide by up to `shiftH` either way (a draw of their own from the seed, the day and the
+	-- window), so the visits do not keep to the clock; each visit's search lasts its usual 72 s times a draw from `visit` (0.6 to 1.5: 43 to 108 s), and with
+	-- `lingerChance` (about one visit in twelve, so one lingering visit every six days or so at two a day) it lingers, `linger` times as long (3 to 5: 3.6 to 6 minutes
+	-- on the sill, five game hours at the most). The draws come from the seed, the day and the visit's number, which the wasp's record keeps, so a return to a rest meets
+	-- the same visits; a visit going on is not kept, as before.
+	nature = { shiftH = 1.0, visit = { 0.6, 1.5 }, lingerChance = 0.08, linger = { 3.0, 5.0 } },
+}
+
+-- How it takes the rival (the game only; Godot's wasp has no rival): it flies to a place just above it and a little aside (the first of these
+-- offsets from which the way down is clear), hangs there, strikes and carries it up and away like a spider.
+Wasp.rival = {
+	aboveWu = 1.3, -- above the rival's surface, where it hovers
+	offsets = { { 0.0, 0.0 }, { 1.5, 0.0 }, { -1.5, 0.0 }, { 0.0, 1.5 }, { 0.0, -1.5 }, { 3.0, 0.0 }, { -3.0, 0.0 }, { 0.0, 3.0 }, { 0.0, -3.0 }, { 2.2, 2.2 }, { -2.2, 2.2 }, { 2.2, -2.2 }, { -2.2, -2.2 } },
+	flySpeed = 5.0, -- it goes straight for it (searching is 4)
+	hoverS = 0.8, -- it hangs over it before it strikes
+	strikeS = 0.35,
+	catchWu = 0.8,
+	clearRadius = 0.3, -- the way down to the rival is checked with this sphere
+	earshotWu = 18.0, -- the player is told what happened (a caption, a notice) when the wasp is this near
+	sightWu = 24.0, -- ... or in clear sight of it, this far
+}
+
 -- A visit (game seconds): heard while it arrives, searching, flying away, carrying the spider off.
 Wasp.arriveS = 8.0
 Wasp.searchS = 45.0

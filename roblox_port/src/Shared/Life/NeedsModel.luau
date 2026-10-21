@@ -10,8 +10,8 @@
 --     stops at ENERGY_FLOOR. Nothing happens at the floor.
 --   * life (lifeMode true; the windowsill, where the life clock runs): energy drains with the game hours LifeLoop reports,
 --     faster awake than asleep, and has no floor. It can run out; the hours at zero are counted (starvingHours, and the streak
---     since the last meal). Nothing follows from them in this port yet: starvation (LIFE round 5) needs the death and
---     continuing rules, which are not ported.
+--     since the last meal). LifeLoop reads the streak: weak (too hungry to sleep) after 24 hours of it and starved after 48, except in the
+--     gentle modes (ROBLOX-91: the streak is Godot's reset by any meal, or, in the game's rules, eased by each meal by the hours it covers).
 --   * gentle (with lifeMode; Godot's Easy and free play) drains at GENTLE_DRAIN of the rate and never falls below GENTLE_FLOOR.
 -- Both drains are integrated at the 2 Hz update (spec 20) over the action time that actually passed, at most MAX_STEP_S a
 -- call, so the same time drains the same energy at any frame rate and a stall cannot drain more than a capped step.
@@ -33,11 +33,32 @@ NeedsModel.REST_RECOVER_PER_S = 0.004
 NeedsModel.UPDATE_PERIOD_S = 0.5
 NeedsModel.MAX_STEP_S = 0.25
 NeedsModel.FULL_AT = 0.98
--- Life mode: a full reserve lasts about three game days without food, and one fly (0.35) feeds the spider for about a day.
+-- Life mode, at Godot's factor 1: a full reserve lasts about three game days without food, and one fly (0.35) feeds the spider for about a day.
 -- A real Phidippus goes much longer without food; the game compresses time on purpose (LIFE-05).
 NeedsModel.LIFE_DRAIN_AWAKE_PER_H = 0.021
 NeedsModel.LIFE_DRAIN_ASLEEP_PER_H = 0.007
-NeedsModel.PLAY_DRAIN = 1.1 -- Nathan: slightly faster energy drain; reference fixtures retain factor 1.
+-- The game's own rules (ROBLOX-78), opt-in like Data/Wasp.game and Data/Catch.game: `drain` multiplies the life-mode drain (awake and asleep alike; the
+-- gentle modes have their own factor, below) of a model that was given them by useGameRules. A model that never is replays Godot (factor 1) and the reference fixtures hold.
+-- The factor is worked out from the constants above: a day is about 11 waking hours and 13 asleep, 11 x 0.021 + 13 x 0.007 = 0.322 energy at factor 1,
+-- so 1.55 cost 0.499, about half the reserve (it was 1.1, 0.354, Chet's ten percent more, ROBLOX-61). ROBLOX-88: 1.9 costs 0.612 a day (11 x 0.021 x 1.9 =
+-- 0.439 awake, 13 x 0.007 x 1.9 = 0.173 asleep): a full reserve lasts 1.63 days, and a housefly (0.35) is 0.57 of a day.
+-- ROBLOX-91: the gentle modes (Easy, Free play) have their own factor, `gentleDrain` 1.1 (ROBLOX-61's, which with the gentle half rate costs 0.177 a day), applied
+-- INSTEAD of `drain` when the model is gentle: ROBLOX-88's hungrier pacing was meant for the standard rules (the gentle day would otherwise have cost 0.306).
+-- `streakDecay`: a meal in the game eases the starving streak by the hours it covers at the current drain (amount / the awake rate) and ends it altogether
+-- only when the reserve rises above `streakEndsAbove` (0.1); Godot's rule, a full reset at any meal, stays the default, so one tiny catch a day at 0% energy
+-- no longer keeps a spider alive for ever.
+NeedsModel.game = { drain = 2.4, gentleDrain = 1.1, streakDecay = true, streakEndsAbove = 0.1 }
+-- ROBLOX-102 (Nathan on v33: "still more difficult with faster life depletion"): 1.9 -> 2.4, a day costs 0.773 (11 x 0.021 x 2.4 + 13 x 0.007 x 2.4); a full reserve lasts
+-- about 1.3 days. Gentle modes keep gentleDrain 1.1.
+-- ROBLOX-106 (W4, Nathan: "movement expends more energy"; "hunger always a major concern"): moving costs energy on top of the clock's drain, in the standard rules only
+-- (a gentle model, Easy and Free play, pays nothing; a model never given the game's rules is Godot's and pays nothing). `moveCost` is per second of action time (the
+-- fixed tick's, so slow motion slows it and the garden's slower clock does not: it is the legs, not the day): walking on a surface `walkPerS`, letting down or reeling in
+-- on the line `linePerS`, and each jump or hop `jump` once as it leaves the surface; standing, hanging still on the line and resting cost nothing extra (the sit-and-wait
+-- economy). The numbers against the 0.773 a day of the drain (11 waking hours, 825 s of play on the sill): a still day 0.773; a typical day (a third of the waking time
+-- walking, 275 s, 30 jumps, a minute on the line) 0.773 + 0.110 + 0.060 + 0.012 = 0.955, about 2.7 houseflies; a restless day (two thirds walking, 550 s, 100 jumps,
+-- three minutes on the line) 0.773 + 0.220 + 0.200 + 0.036 = 1.229, about 3.5 houseflies. A cost the reserve cannot pay is counted as starving time at the awake rate.
+NeedsModel.game.moveCost = { walkPerS = 0.0004, linePerS = 0.0002, jump = 0.002 }
+NeedsModel.PLAY_DRAIN = NeedsModel.game.drain -- (the name the client and tests have used since ROBLOX-61)
 NeedsModel.GENTLE_DRAIN = 0.5
 NeedsModel.GENTLE_FLOOR = 0.1
 NeedsModel.STAGE_ID = "p0_prototype"
@@ -65,6 +86,19 @@ export type Record = {
 }
 
 -- `lifeMode` and `gentle` say which rules apply (see above). Both default to false: the sandbox rules.
+function NeedsModel.useGameRules(self: any)
+	self.drainScale = NeedsModel.game.drain
+	self.gentleDrainScale = NeedsModel.game.gentleDrain
+	self.streakDecay = NeedsModel.game.streakDecay
+	self.moveCosts = true -- (ROBLOX-106: the flag, not the table, so a record carries no copy of the numbers)
+end
+
+-- The factor on the life-mode drain in use: Godot's 1 for a model never given the game's rules, else the game's (the gentle modes have their own).
+function NeedsModel.drainFactor(self: any): number
+	if self.gentle and self.gentleDrainScale ~= nil then return self.gentleDrainScale end
+	return self.drainScale or 1
+end
+
 function NeedsModel.new(lifeMode: boolean?, gentle: boolean?): any
 	return setmetatable({
 		energy = NeedsModel.ENERGY_START, rest = NeedsModel.REST_START,
@@ -95,7 +129,7 @@ end
 function NeedsModel._apply(self: any, period: number, activeShare: number)
 	local before = self.energy
 	if self.lifeMode then
-		local need = (self._accHoursAwake * NeedsModel.LIFE_DRAIN_AWAKE_PER_H + self._accHoursAsleep * NeedsModel.LIFE_DRAIN_ASLEEP_PER_H) * (self.drainScale or 1)
+		local need = (self._accHoursAwake * NeedsModel.LIFE_DRAIN_AWAKE_PER_H + self._accHoursAsleep * NeedsModel.LIFE_DRAIN_ASLEEP_PER_H) * self:drainFactor()
 		local hours = self._accHoursAwake + self._accHoursAsleep
 		self._accHoursAwake = 0.0
 		self._accHoursAsleep = 0.0
@@ -156,6 +190,36 @@ function NeedsModel.addHours(self: any, hours: number, asleep: boolean)
 	end
 end
 
+-- ROBLOX-106: what a movement costs now: `kind` is "walk" or "line" (for `dt` seconds of it) or "jump" (once). Nothing for a model without the game's rules, a gentle
+-- model, a sandbox model or an unknown kind.
+function NeedsModel.moveCostOf(self: any, kind: string, dt: number): number
+	local c = NeedsModel.game.moveCost
+	if self.moveCosts ~= true or self.gentle or not self.lifeMode then return 0.0 end
+	if kind == "jump" then return c.jump or 0.0 end
+	if not finite(dt) or dt <= 0.0 then return 0.0 end
+	if kind == "walk" then return (c.walkPerS or 0.0) * math.min(dt, NeedsModel.MAX_STEP_S) end
+	if kind == "line" then return (c.linePerS or 0.0) * math.min(dt, NeedsModel.MAX_STEP_S) end
+	return 0.0
+end
+
+-- ROBLOX-106: pays for a movement (see moveCostOf) out of the reserve at once. What the reserve cannot pay is starving time at the awake rate, so a restless starving
+-- spider starves sooner than a still one. Returns what was paid from the reserve.
+function NeedsModel.move(self: any, kind: string, dt: number): number
+	local cost = self:moveCostOf(kind, dt)
+	if cost <= 0.0 then return 0.0 end
+	local before = self.energy
+	local paid = math.min(cost, self.energy)
+	self.energy -= paid
+	if cost > paid then
+		local perHour = NeedsModel.LIFE_DRAIN_AWAKE_PER_H * self:drainFactor()
+		local starved = (cost - paid) / perHour
+		self.starvingHours += starved
+		self.starvingStreakH += starved
+	end
+	changed(self, before)
+	return paid
+end
+
 -- Whether the reserve has run out (life mode).
 function NeedsModel.isStarving(self: any): boolean
 	return self.lifeMode and self.energy <= 0.0
@@ -184,9 +248,28 @@ function NeedsModel.grantEnergy(self: any, amount: number, sourceId: string): nu
 	self.grantedTotal += added
 	self.grantedBySource[sourceId] = (self.grantedBySource[sourceId] or 0.0) + added
 	self.grantsMade += 1
-	self.starvingStreakH = 0.0
+	if self.streakDecay then
+		-- The game: the meal covers the hours it feeds (at the awake rate) and the streak only ends when the reserve is really back.
+		local perHour = NeedsModel.LIFE_DRAIN_AWAKE_PER_H * self:drainFactor()
+		self.starvingStreakH = math.max(0.0, self.starvingStreakH - added / perHour)
+		if self.energy > (NeedsModel.game.streakEndsAbove or 0.1) then self.starvingStreakH = 0.0 end
+	else
+		self.starvingStreakH = 0.0
+	end
 	changed(self, before)
 	return added
+end
+
+-- Energy lost to an injury (ROBLOX-73: the rival's counter-bite). Never more than the spider has, and nothing in the gentle modes. Returns what was
+-- lost. It is not time passing, so it leaves the starving hours to the drain; the reserve is already in the record, so nothing else needs keeping.
+function NeedsModel.injure(self: any, amount: number): number
+	if self.gentle or not finite(amount) or amount <= 0.0 then
+		return 0.0
+	end
+	local before = self.energy
+	self.energy = math.max(0.0, self.energy - amount)
+	changed(self, before)
+	return before - self.energy
 end
 
 -- A valid retreat interaction restores rest; it never grants food energy.

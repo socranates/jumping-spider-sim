@@ -6,6 +6,7 @@
 -- keeps clear of the touch buttons (Shared/UI/HudLayout).
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local HudLayout = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("UI"):WaitForChild("HudLayout"))
+local LifeText = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("UI"):WaitForChild("LifeText"))
 
 local Hud = {}
 Hud.__index = Hud
@@ -14,6 +15,16 @@ local TOAST_SECONDS = 2.6
 local CAPTION_TEXT = 15 -- the sound captions' text size at normal; view.captionScale (the Captions setting) multiplies it
 local OK_COLOR = Color3.new(0.92, 0.94, 0.98)
 local WARN_COLOR = Color3.new(1.0, 0.72, 0.1)
+local DANGER_COLOR = Color3.new(1.0, 0.45, 0.36)
+-- The quiet screen (ROBLOX-125, Nathan: "the hud is super intrusive"): words without plates, a thin hunger line, a narrow
+-- column, and the day's words and a comfortable hunger line fading back once they have been read.
+local STROKE = 0.55
+local TOP_WIDTH = 460 -- the status column's widest (the prompt panel keeps HudLayout.MAX_PROMPT_WIDTH)
+local HUNGER_WIDTH = 220
+local SETTLE_SECONDS = 5 -- how long a changed day line or hunger line stays at full strength
+local FADE_SECONDS = 1.5
+local RESTING = 0.8 -- the transparency they settle to (a faint trace, not gone)
+local CALM_FOOD = 0.4 -- above this the hunger line settles; at or below it stays in full
 
 local function corner(parent: Instance, r: number)
 	local c = Instance.new("UICorner")
@@ -33,8 +44,10 @@ local function wrapLabel(name: string, parent: Instance, textSize: number, order
 	local l = Instance.new("TextLabel")
 	l.Name = name
 	l.BackgroundColor3 = Color3.new(0, 0, 0)
-	l.BackgroundTransparency = 0.4
+	l.BackgroundTransparency = 1 -- (ROBLOX-125: no plate; the outline keeps the words readable on the world)
 	l.TextColor3 = Color3.new(1, 1, 1)
+	l.TextStrokeColor3 = Color3.new(0, 0, 0)
+	l.TextStrokeTransparency = STROKE
 	l.Font = Enum.Font.GothamMedium
 	l.TextSize = textSize
 	l.TextWrapped = true
@@ -54,8 +67,10 @@ local function pill(name: string, parent: Instance, textSize: number, order: num
 	local l = Instance.new("TextLabel")
 	l.Name = name
 	l.BackgroundColor3 = Color3.new(0, 0, 0)
-	l.BackgroundTransparency = 0.45
+	l.BackgroundTransparency = 1
 	l.TextColor3 = Color3.new(1, 1, 1)
+	l.TextStrokeColor3 = Color3.new(0, 0, 0)
+	l.TextStrokeTransparency = STROKE
 	l.Font = Enum.Font.GothamMedium
 	l.TextSize = textSize
 	l.TextWrapped = false
@@ -69,7 +84,7 @@ local function pill(name: string, parent: Instance, textSize: number, order: num
 	return l
 end
 
-local function column(name: string, parent: Instance, anchor: Vector2, position: UDim2, align: Enum.VerticalAlignment): Frame
+local function column(name: string, parent: Instance, anchor: Vector2, position: UDim2, align: Enum.VerticalAlignment, maxWidth: number?): Frame
 	local f = Instance.new("Frame")
 	f.Name = name
 	f.BackgroundTransparency = 1
@@ -85,7 +100,7 @@ local function column(name: string, parent: Instance, anchor: Vector2, position:
 	list.Padding = UDim.new(0, 6)
 	list.Parent = f
 	local limit = Instance.new("UISizeConstraint")
-	limit.MaxSize = Vector2.new(HudLayout.MAX_PROMPT_WIDTH, math.huge)
+	limit.MaxSize = Vector2.new(maxWidth or HudLayout.MAX_PROMPT_WIDTH, math.huge)
 	limit.Parent = f
 	f.Parent = parent
 	return f
@@ -148,35 +163,53 @@ function Hud.new(playerGui: Instance): any
 	safe.IgnoreGuiInset = false
 	safe.ScreenInsets = Enum.ScreenInsets.CoreUISafeInsets
 	safe.Parent = playerGui
-	local top = column("Top", safe, Vector2.new(0.5, 0), UDim2.new(0.5, 0, 0, 8), Enum.VerticalAlignment.Top)
-	-- Food reserves, not a damage/health system. Always present during play, even with hints off.
+	local top = column("Top", safe, Vector2.new(0.5, 0), UDim2.new(0.5, 0, 0, 8), Enum.VerticalAlignment.Top, TOP_WIDTH)
+	-- The hunger bar (ROBLOX-78; the energy reserve, full when fed), not a damage/health system. Always present during play, even with hints off.
+	-- (ROBLOX-125) A thin line with its words small above it, no plate: 220 px wide, the line 5 px.
 	local food = Instance.new("Frame")
-	food.Name = "FoodBar"
-	food.Size = UDim2.new(1, 0, 0, 36)
+	food.Name = "HungerBar"
+	food.Size = UDim2.fromOffset(HUNGER_WIDTH, 22)
+	food.AutomaticSize = Enum.AutomaticSize.Y
 	food.LayoutOrder = -2
-	food.BackgroundColor3 = Color3.fromRGB(24, 27, 24)
+	food.BackgroundTransparency = 1
 	food.BorderSizePixel = 0
 	food.Visible = false
 	food.Parent = top
-	corner(food, 6)
+	local foodText = Instance.new("TextLabel")
+	foodText.Name = "HungerText"
+	foodText.BackgroundTransparency = 1
+	foodText.Size = UDim2.new(1, 0, 0, 0)
+	foodText.AutomaticSize = Enum.AutomaticSize.Y
+	foodText.TextColor3 = Color3.new(1, 1, 1)
+	foodText.TextStrokeColor3 = Color3.new(0, 0, 0)
+	foodText.TextStrokeTransparency = STROKE
+	foodText.Font = Enum.Font.GothamMedium
+	foodText.TextSize = 13
+	foodText.Parent = food
+	local track = Instance.new("Frame")
+	track.Name = "HungerTrack"
+	track.AnchorPoint = Vector2.new(0, 1)
+	track.Position = UDim2.fromScale(0, 1)
+	track.Size = UDim2.new(1, 0, 0, 5)
+	track.BackgroundColor3 = Color3.new(0, 0, 0)
+	track.BackgroundTransparency = 0.6
+	track.BorderSizePixel = 0
+	track.Parent = food
+	corner(track, 3)
 	local foodFill = Instance.new("Frame")
-	foodFill.Name = "FoodFill"
+	foodFill.Name = "HungerFill"
 	foodFill.Size = UDim2.fromScale(0, 1)
 	foodFill.BorderSizePixel = 0
-	foodFill.BackgroundColor3 = Color3.fromRGB(53, 103, 61)
-	foodFill.Parent = food
-	corner(foodFill, 6)
-	local foodText = Instance.new("TextLabel")
-	foodText.Name = "FoodText"
-	foodText.BackgroundTransparency = 1
-	foodText.Size = UDim2.fromScale(1, 1)
-	foodText.TextColor3 = Color3.new(1, 1, 1)
-	foodText.Font = Enum.Font.GothamBold
-	foodText.TextSize = 16
-	foodText.Parent = food
+	foodFill.BackgroundColor3 = Color3.fromRGB(120, 170, 110)
+	foodFill.Parent = track
+	corner(foodFill, 3)
 	local grip = Instance.new("Frame")
  grip.Name="GripBar";grip.Size=UDim2.new(.65,0,0,12);grip.LayoutOrder=0;grip.BackgroundColor3=Color3.fromRGB(45,12,12);grip.Visible=false;grip.Parent=top
  local gripFill=Instance.new("Frame");gripFill.Name="Grip";gripFill.Size=UDim2.fromScale(.4,1);gripFill.BackgroundColor3=Color3.fromRGB(245,35,38);gripFill.BorderSizePixel=0;gripFill.Parent=grip
+ -- The courtship meter (ROBLOX-80): the grip bar's style in a warm colour, under it, shown only while a mate can be courted (view.court, 0 to 1).
+ local court = Instance.new("Frame")
+ court.Name="CourtshipBar";court.Size=UDim2.new(.65,0,0,12);court.LayoutOrder=0;court.BackgroundColor3=Color3.fromRGB(48,22,32);court.Visible=false;court.Parent=top
+ local courtFill=Instance.new("Frame");courtFill.Name="Courtship";courtFill.Size=UDim2.fromScale(0,1);courtFill.BackgroundColor3=Color3.fromRGB(226,128,164);courtFill.BorderSizePixel=0;courtFill.Parent=court
  local status = wrapLabel("Status", top, 16, 1)
 	-- The spider-eye view's explanation, the first time (ROBLOX-20): right under the status lines, in the column, so it never covers
 	-- the aim words or the prompts. Shown from view.caption = { text, alpha }.
@@ -224,21 +257,26 @@ function Hud.new(playerGui: Instance): any
 	local promptCue = wrapLabel("PromptCue", panel, 16, 3)
 	promptCue.TextColor3 = WARN_COLOR
 	local self = setmetatable({
-		food = food, foodFill = foodFill, foodText = foodText, grip = grip, gripFill = gripFill, top = top, centre = centre, safe = safe, reticle = reticle, ticks = ticks,
+		food = food, foodFill = foodFill, foodText = foodText, track = track, foodWords = "", foodCalm = 0, dayWords = "", dayCalm = 0, grip = grip, gripFill = gripFill, court = court, courtFill = courtFill, top = top, centre = centre, safe = safe, reticle = reticle, ticks = ticks,
 		aimTitle = aimTitle, aimHint = aimHint, anchorLabel = anchorLabel,
 		status = status, caption = caption, toastLabel = toast, help = help, notice = notice, day = day, dayLine = dayLine, noteLabel = note, noteLeft = 0,
 		panel = panel, promptTitle = promptTitle, promptHint = promptHint, promptCue = promptCue,
-		toastLeft = 0, device = "keyboard", lastSpan = "",
+		toastLeft = 0, toastRank = 0, device = "keyboard", lastSpan = "",
 	}, Hud)
 	return self
 end
 
-function Hud.toast(self: any, text: string, warn: boolean?)
+-- A toast has a priority (ROBLOX-92; there is one label): `level` is false or nil for information, true (or "warn") for a warning and "danger" for something coming at the spider.
+-- A toast of a lower priority than the one on show waits for it to expire and is dropped (a danger toast is kept for its seconds, whatever the game says next); an equal or higher one replaces it.
+function Hud.toast(self: any, text: string, level: (boolean | string)?)
 	if text == "" then return end
+	local rank = if level == "danger" then 2 elseif level == true or level == "warn" then 1 else 0
+	if self.toastLeft > 0 and rank < self.toastRank then return end
 	self.toastLabel.Text = text
-	self.toastLabel.TextColor3 = if warn then WARN_COLOR else OK_COLOR
+	self.toastLabel.TextColor3 = if rank == 2 then DANGER_COLOR elseif rank == 1 then WARN_COLOR else OK_COLOR
 	self.toastLabel.Visible = true
 	self.toastLeft = TOAST_SECONDS
+	self.toastRank = rank
 end
 
 -- The note that a page opened in the notebook, for `seconds`.
@@ -252,6 +290,12 @@ local function show(label: TextLabel, text: string?)
 	local t = text or ""
 	if label.Text ~= t then label.Text = t end
 	label.Visible = t ~= ""
+end
+
+-- How far a line has settled after `calm` seconds unchanged: 0 (full) until SETTLE_SECONDS, then easing to RESTING over FADE_SECONDS.
+function Hud.settle(calm: number): number
+	local t = math.clamp((calm - SETTLE_SECONDS) / FADE_SECONDS, 0, 1)
+	return RESTING * t * t * (3 - 2 * t)
 end
 
 -- Places the prompt panel for the safe area's size and the device (HudLayout.promptSpan).
@@ -279,12 +323,22 @@ function Hud.update(self: any, view: any, dt: number)
 	if self.food.Visible then
 		local food = math.clamp(view.food, 0, 1)
 		self.foodFill.Size = UDim2.fromScale(food, 1)
-		self.foodFill.BackgroundColor3 = if food <= 0.25 then Color3.fromRGB(136, 66, 24) else Color3.fromRGB(53, 103, 61)
-		self.foodText.Text = string.format("Food %d%%", math.floor(food * 100 + 0.5)) .. (if view.foodGentle then " · gentle" elseif food <= 0 then " · starving" elseif food <= 0.25 then " · hungry" else "")
-		self.foodText.TextSize = if view.largeText then 24 else 16
+		self.foodFill.BackgroundColor3 = if food <= 0.25 then Color3.fromRGB(196, 104, 40) else Color3.fromRGB(120, 170, 110)
+		local words = LifeText.hunger(food, view.foodGentle == true)
+		self.foodText.Text = words
+		self.foodText.TextSize = if view.largeText then 24 else 13
+		-- Settles once read: full for SETTLE_SECONDS after the words change, then fades to a trace; never while hungry.
+		if words ~= self.foodWords or food <= CALM_FOOD then self.foodWords = words; self.foodCalm = 0 else self.foodCalm += dt end
+		local a = Hud.settle(self.foodCalm)
+		self.foodText.TextTransparency = a
+		self.foodText.TextStrokeTransparency = STROKE + (1 - STROKE) * a
+		self.foodFill.BackgroundTransparency = a * 0.7
+		self.track.BackgroundTransparency = 0.6 + 0.3 * a
 	end
 	self.grip.Visible = view.grip ~= nil
  if view.grip then self.gripFill.Size = UDim2.fromScale(math.clamp(view.grip,0,1),1) end
+ self.court.Visible = view.court ~= nil
+ if view.court then self.courtFill.Size = UDim2.fromScale(math.clamp(view.court,0,1),1) end
  self.device = view.device
 	self:_place()
 	self.reticle.Visible = view.aiming or view.focus or view.eyeView
@@ -298,13 +352,21 @@ function Hud.update(self: any, view: any, dt: number)
 	show(self.notice, view.notice)
 	show(self.day, view.day)
 	show(self.dayLine, view.dayLine)
+	-- The day's words settle like the hunger line (still there, faint, for a glance).
+	local dayWords = (view.day or "") .. "\n" .. (view.dayLine or "")
+	if dayWords ~= self.dayWords then self.dayWords = dayWords; self.dayCalm = 0 else self.dayCalm += dt end
+	local da = Hud.settle(self.dayCalm)
+	for _, l in { self.day, self.dayLine } do
+		l.TextTransparency = da
+		l.TextStrokeTransparency = STROKE + (1 - STROKE) * da
+	end
 	local caption = view.caption
 	if caption then
 		local size = math.round(CAPTION_TEXT * (view.captionScale or 1))
 		if self.caption.TextSize ~= size then self.caption.TextSize = size end
 		if self.caption.Text ~= caption.text then self.caption.Text = caption.text end
 		self.caption.TextTransparency = 1 - caption.alpha
-		self.caption.BackgroundTransparency = 1 - 0.6 * caption.alpha
+		self.caption.TextStrokeTransparency = 1 - (1 - STROKE) * caption.alpha
 		self.caption.Visible = true
 	else
 		self.caption.Visible = false
@@ -320,7 +382,7 @@ function Hud.update(self: any, view: any, dt: number)
 	end
 	if self.toastLeft > 0 then
 		self.toastLeft -= dt
-		if self.toastLeft <= 0 then self.toastLabel.Visible = false end
+		if self.toastLeft <= 0 then self.toastLabel.Visible = false; self.toastRank = 0 end
 	end
 end
 

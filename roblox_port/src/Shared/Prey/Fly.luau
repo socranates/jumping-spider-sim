@@ -1,10 +1,18 @@
 --!strict
 -- Fly's evidence-owned decisions, reactions, flights, glances and surface bursts.
 -- Sources: frozen fly.gd and fly_mind.gd. Geometry and random stream are explicit dependencies.
+-- ROBLOX-96: a profile whose body says `walker` (the aphid, Data/Species) never launches: `launch` refuses every flight, so FlyFlight is never used for it, and
+-- startled it freezes on its perch instead of turning to face the threat. Godot's profiles have no such field, so nothing of theirs is touched.
+-- ROBLOX-101: the bestiary's behaviours are Prey/PreyKinds', called only for a profile that asks: a `hop` profile flees by a ballistic hop (state HOP, stepped
+-- by PreyKinds.step instead of FlyFlight) and a `flightless` one never begins a flight; a `sidestep` profile goes round its stem when watched; a profile with
+-- `flight.wander_local` keeps its wander loops near the height it flew from (the sill's 0.8 to 10 band is the sill's, and the wall and the bed are far below it).
+-- ROBLOX-117: a `hover` profile (the hoverfly) holds still in the air on a calm flight now and then (PreyKinds.hover) instead of stepping its flight.
+-- ROBLOX-120: a `hear` profile (the field cricket) is hushed by a spider moving near (PreyKinds.hear: it holds still), and a `freeze` one alert freezes as a walker does.
 local M=require(script.Parent.PreyMath)
 local S=require(script.Parent.FlySenses)
 local F=require(script.Parent.FlyFlight)
 local R=require(script.Parent.PreyRandom)
+local K=require(script.Parent.PreyKinds)
 local Fly={};Fly.__index=Fly
 function Fly.new(id: string,serial: number,seed: number,perch: any,graph: any,profile: any,now: number): any
  local f:any=setmetatable({id=id,serial=serial,profile=profile,graph=graph,rng=R.new(seed),senses=S.new(profile.senses),
@@ -79,6 +87,10 @@ function Fly.choose(self: any,kind: string,now: number,threat: number,relaxed: b
  return nil,nil
 end
 function Fly.launch(self: any,kind: string,now: number): boolean
+ if self.profile.body.walker then return false end -- (ROBLOX-96: a walker never flies)
+ if self.hop then return false end -- (ROBLOX-101: in the air on a hop already)
+ if kind=='flee' and self.profile.body.hop and K.hop(self,now) then return true end -- (ROBLOX-101: the escape hop first)
+ if self.profile.body.flightless then return false end
  local target,path=self:choose(kind,now,if kind=='flee' then 1 else 0)
  if not path and kind=='flee' then target,path=self:choose(kind,now,1,true) end
  if not path and kind=='flee' then
@@ -95,7 +107,8 @@ function Fly.launch(self: any,kind: string,now: number): boolean
   for _=1,4 do
    local a=self.rng:next()*math.pi*2;local d=self.rng:draw({2.5,6})
    local w=lifted+Vector3.new(math.cos(a)*d,0,math.sin(a)*d)
-   w=Vector3.new(w.X,math.clamp(lifted.Y+self.rng:draw({.5,3.5}),.8,10),w.Z)
+   local rise=self.rng:draw({.5,3.5})
+   w=Vector3.new(w.X,if self.profile.flight.wander_local then lifted.Y+rise else math.clamp(lifted.Y+rise,.8,10),w.Z)
    if self.graph:clear(self.position,lifted) and self.graph:clear(lifted,w) then
     local tail=self.graph:plan(w,Vector3.zero,target,nil)
     if tail then local loop={self.position,lifted};for _,point in tail do table.insert(loop,point) end
@@ -123,7 +136,9 @@ function Fly.think(self: any,now: number)
  self.nextDecision=now+1/p.behavior.decision_hz
  local threat=M.threat(s.awareness,p.senses.awareness_calm,p.senses.awareness_flee)*self:relevance(now)
  if self:airborne() then
-  if self.state=='SEEK_PERCH' and not self.flight.target then self:launch('move',now) end
+  if self.state=='SEEK_PERCH' and not self.flight.target then
+   if not self:launch('move',now) and self.profile.flight.home_in then K.homeIn(self,now) end -- (ROBLOX-101: no perch in reach, fly toward the nearest)
+  end
   if (self.state=='REPOSITION' or self.state=='SEEK_PERCH') and not self.pending and threat>=p.behavior.interrupt_threat and ev.seen and now-ev.t<=.3 and ev.gain>0 and ev.distance<=p.flight.safe_distance_wu then self:schedule(now,false) end
   return
  end
@@ -142,11 +157,15 @@ function Fly.think(self: any,now: number)
 end
 function Fly.rest(self: any,now: number,dt: number)
  local p=self.profile.behavior
+ if self.profile.body.sidestep and K.sidestep(self,now,dt) then return end -- (ROBLOX-101: round the stem, away from the spider)
+ if self.profile.body.creep and K.creep(self,now,dt) then return end -- (ROBLOX-105: the aphid's walk over its plant to another perch)
  if self.state=='ALERT' then
   self.groomUntil=0;self.fidgetUntil=0;self.glanceTarget=nil
+  if self.profile.body.walker or self.profile.body.freeze then return end -- (ROBLOX-96: a walker freezes; ROBLOX-120: so does a cricket)
   if self.senses.hasLastSeen then local d=self.senses.lastSeenPosition-self.position;local flat=d-self.normal*d:Dot(self.normal);if flat.Magnitude>.001 then self:turn(flat.Unit,dt) end end
   return
  end
+ if self.profile.body.hear and K.hushed(self,now) then self.walkLeft=0;self.glanceTarget=nil;return end -- (ROBLOX-120: hushed, the cricket holds still)
  if now<self.fidgetUntil then
   local t=math.clamp((now-self.fidgetStarted)/(self.fidgetUntil-self.fidgetStarted),0,1)
   self.position=self.fidgetFrom:Lerp(self.fidgetTo,t*t*(3-2*t));return
@@ -199,13 +218,15 @@ function Fly.step(self: any,dt: number,now: number,stimulus: Vector3,radius: num
  self.prevPosition=self.position
  if not self:alive() or not self.enabled then return end
  local p=self.profile
+ if p.body.hear then K.hear(self,now,dt,stimulus) end -- (ROBLOX-120: the cricket's ear)
  if self.senses:shouldCheck(now) then
   local vigilant=if self.state=='ALERT' then p.senses.vigilance_alert elseif now<self.groomUntil then p.senses.vigilance_grooming else p.senses.vigilance_relaxed
   self.senses:update(cast,self.position+self.normal*.1,if self:airborne() and self.velocity.Magnitude>.1 then self.velocity.Unit else self.heading,if self:airborne() then Vector3.yAxis else self.normal,stimulus,radius,now,vigilant,if self.state=='ALERT' then p.senses.decay_alert_per_s else p.senses.decay_relaxed_per_s)
  end
  self:think(now)
- if self:airborne() then self.flight:step(now,dt);self.fatigue=math.min(1,self.fatigue+p.behavior.fatigue_up_per_s*dt)
+ if self:airborne() then if self.hop then K.step(self,now,dt) elseif not (p.body.hover and K.hover(self,now,dt)) then self.flight:step(now,dt) end;self.fatigue=math.min(1,self.fatigue+p.behavior.fatigue_up_per_s*dt)
  else self:rest(now,dt);self.fatigue=math.max(0,self.fatigue-p.behavior.fatigue_down_per_s*dt) end
+ if not self:airborne() and math.abs(self.heading:Dot(self.normal))>.9 then K.upright(self) end -- (ROBLOX-101: landed on a wall facing it; never on the sill's flat perches)
  self.velocity=(self.position-self.prevPosition)/dt
 end
 return Fly

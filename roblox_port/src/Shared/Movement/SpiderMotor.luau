@@ -23,6 +23,7 @@ Motor.__index = Motor
 
 local DT = 1 / 60
 Motor.DT = DT
+Motor.RUN_MULTIPLIER = 2 -- faster ground travel; jumps and the safety line retain their own speeds
 Motor.HEIGHT = 0.31 -- body centre above the support plane: radius 0.3 + skin 0.01 (Godot seat distance)
 local HEIGHT = Motor.HEIGHT
 local SWEEP_RADIUS = 0.303 -- body radius + JumpPlanner.SWEEP_MARGIN
@@ -50,12 +51,14 @@ local FREE_UP_RATE = math.rad(240) -- the drawn up turns to world up while falli
 export type TickInput = {
 	wish: Vector3, -- walking direction on the support plane (unit or zero), from the view
 	creep: boolean,
+	run: boolean?, -- held; creep/lock and an automatic edge walk take priority
 	reel: number, -- on the line: +1 reels in, -1 lowers
 	dropHeld: boolean, -- F / X / Silk held: lowers on the line
 	releaseHeld: boolean, -- Q / B / Let go held: a deliberate let-go after the grace
 	focusPoint: Vector3?, -- Focus held: the body turns toward this point
 	focusDir: Vector3?, -- Focus held: the aim ray's direction, which the gaze tilts toward when the point is within 0.2 WU of the eyes
 	gaze: Vector3?, -- spider-eye view: the body turns to face a gaze beyond 30 degrees
+	face: Vector3?, -- the lock's sidestep (ROBLOX-110, Movement/LockOn): walking, the body keeps facing this point instead of turning to the walk
 }
 
 export type Config = {
@@ -67,6 +70,9 @@ export type Config = {
 	boundsMin: Vector3,
 	boundsMax: Vector3,
 	probeParent: Instance?,
+	-- ROBLOX-95: where the play area is, when it is not one box (the world's regions: the client's WorldClient.inBounds). Out of bounds is then outside the box or
+	-- where this says no; without it, the box alone, as Godot has it.
+	inBounds: ((Vector3) -> boolean)?,
 }
 
 function Motor.idleInput(): TickInput
@@ -223,8 +229,10 @@ function Motor.place(self: any, position: Vector3, up: Vector3?, heading: Vector
 	self.safe = { pos = self.pos, up = self.up, heading = self.heading }
 end
 
-function Motor.respawn(self: any)
-	self:place(self.config.spawn + Vector3.new(0, HEIGHT, 0), Vector3.yAxis, self.config.heading)
+-- Back to the start, standing on the support point `spawn` facing `heading` (the config's own when none is given; ROBLOX-94: a rest from another revision of the world
+-- is put back at its region's spawn, Checkpoint.restore).
+function Motor.respawn(self: any, spawn: Vector3?, heading: Vector3?)
+	self:place((spawn or self.config.spawn) + Vector3.new(0, HEIGHT, 0), Vector3.yAxis, heading or self.config.heading)
 end
 
 -- ---------------------------------------------------------------- the planner (port of jump_planner.gd)
@@ -317,6 +325,11 @@ end
 
 function Motor.setSpeedFactor(self: any, speed: number)
  self.speedFactor=math.clamp(speed,0.1,1)
+end
+
+-- Opt in to the game's own rules on the line (ROBLOX-99, SilkController.game): the let-down at half Godot's reel speed. A motor never given them replays Godot.
+function Motor.useGameRules(self: any)
+ self.silk:useGameRules()
 end
 
 function Motor.aimPlan(self: any): any
@@ -596,7 +609,9 @@ end
 
 function Motor._outOfBounds(self: any, p: Vector3): boolean
 	local lo, hi = self.config.boundsMin, self.config.boundsMax
-	return p.X < lo.X or p.Y < lo.Y or p.Z < lo.Z or p.X > hi.X or p.Y > hi.Y or p.Z > hi.Z
+	if p.X < lo.X or p.Y < lo.Y or p.Z < lo.Z or p.X > hi.X or p.Y > hi.Y or p.Z > hi.Z then return true end
+	local inside = self.config.inBounds
+	return inside ~= nil and not inside(p)
 end
 
 -- Leaving the play area puts the spider back at its last supported spot (Godot _reset_out_of_bounds).
@@ -644,7 +659,9 @@ function Motor._tickAttached(self: any, input: TickInput)
 	end
 	local stalk = input.creep and not silk.walk
 	local speed = (if stalk then self.loco.stalk_speed_wu_s else self.loco.walk_speed_wu_s)*self.speedFactor
-	self.heading = SupportMath.tangentDir(SupportMath.rotateToward(self.heading, dir, TURN_RATE * DT), self.up)
+	if input.run == true and not stalk and not silk.walk then speed *= Motor.RUN_MULTIPLIER end
+	local face = if input.face ~= nil and not silk.walk then SupportMath.tangentDir(input.face - self.pos, self.up) else Vector3.zero
+	self.heading = SupportMath.tangentDir(SupportMath.rotateToward(self.heading, if face ~= Vector3.zero then face else dir, TURN_RATE * DT), self.up) -- (ROBLOX-110: a sidestep faces the locked thing, not the way it walks)
 	local step = dir * speed * DT
 	-- Concave corner: a wall (or a leaf's edge, a stem) ahead becomes the new support.
 	local ahead = self:_ray(self.pos, dir * (HEIGHT + step.Magnitude + 0.02))

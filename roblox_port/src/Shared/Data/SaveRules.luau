@@ -8,8 +8,10 @@ local SaveRules = {}
 SaveRules.STORE_PRODUCTION = "Windowsill_v1"
 SaveRules.STORE_TEST = "WindowsillTest_v1" -- Studio and the test place: Chet's runs never touch a real save
 SaveRules.KEY_PROGRESS = "P_" -- P_<UserId>: the player's progress (small, precious)
-SaveRules.KEY_REST = "R_" -- R_<UserId>_main, R_<UserId>_free: the last rest of each mode (larger, replaceable)
-SaveRules.MODES = { "main", "free" } :: { string }
+SaveRules.KEY_REST = "R_" -- R_<UserId>_main, R_<UserId>_easy, R_<UserId>_free: the last rest of each slot (larger, replaceable)
+-- The slots a rest is filed in (ROBLOX-91): the standard main life ("main": every save made before the Easy slot existed keeps this key, whatever its rules), the main
+-- life on Easy's gentle rules ("easy": it used to share the main slot, so starting Easy wiped the standard rest) and free play ("free").
+SaveRules.MODES = { "main", "free", "easy" } :: { string }
 SaveRules.FORMAT = "the-windowsill save"
 SaveRules.REMOTES_NAME = "SaveRemotes" -- the folder in ReplicatedStorage holding ToServer and ToClient
 
@@ -56,5 +58,12 @@ SaveRules.CLIENT_WAIT_REPLY = 4 -- and this long for the first reply after sayin
 -- ---------------------------------------------------------------- words for statuses
 SaveRules.STATUS = { saved = "saved", saving = "saving", session = "session" } -- session: this visit only
 SaveRules.REASONS = { "offline", "no_api", "load_failed", "other_session", "corrupt", "newer", "write_failed" } :: { string }
+
+-- The slot a life's rests are filed in: free play's own, the main life on the gentle rules (Easy) its own, and the standard main life the key it always had.
+function SaveRules.slotOf(mode: string, rules: string): string
+	if mode == "free" then return "free" end
+	if rules == "gentle" then return "easy" end
+	return "main"
+end
 
 return SaveRules

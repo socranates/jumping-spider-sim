@@ -182,7 +182,7 @@ return function(driver: any)
   assert(not life.resting,"still resting after walking")
   driver.input:simulate("Reset",true);RunService.Heartbeat:Wait();driver.input:simulate("Reset",false);wait(.3)
   assert(life.resting and driver.lifeSpider().inRetreat,"not back resting in the crack")
-  assert(string.find(life.notice,"checkpoint recovery",1,true),life.notice)
+  assert(string.find(life.notice,"a return to the rest",1,true),life.notice)
   driver.input:simulate("Feed",true);RunService.Heartbeat:Wait();driver.input:simulate("Feed",false);wait(.2)
   life.clock.hour=12
  end)
@@ -311,7 +311,7 @@ return function(driver: any)
    -- A staged meal credit; the production loop must read the ledger, not a test-only growth hook.
    driver.needs.energy=0
    assert(driver.needs:grantEnergy(.9,"growth_test_"..stage)>=.9-1e-9)
-   driver.life.mealFood=.9 -- three consumed meals, separate from the energy grant
+   driver.life.mealFood=1.5 -- five consumed meals (ROBLOX-88; it was three, 0.9), separate from the energy grant
    wait(.1);assert(driver.life.growth.ready,"food did not ready a moult")
    press("Feed");assert(driver.life.growth:isMoulting(),"moult didn't start")
    local before=driver.motor.pos
@@ -446,10 +446,10 @@ return function(driver: any)
   driver.place(Vector3.new(-18,.31,6));driver.input:clear()
   local old=driver.needs.energy;local gentle=driver.needs.gentle;driver.needs.gentle=false;driver.needs.energy=.2;wait(.1)
   local gui=player.PlayerGui:FindFirstChild("SpiderPrompts")
-  local bar=gui and gui:FindFirstChild("FoodBar",true)
-  assert(bar and bar.Visible,"food meter missing")
-  local label=bar:FindFirstChild("FoodText") :: TextLabel
-  assert(string.find(label.Text,"Food") and string.find(label.Text,"hungry"),"food words missing")
+  local bar=gui and gui:FindFirstChild("HungerBar",true)
+  assert(bar and bar.Visible,"hunger meter missing")
+  local label=bar:FindFirstChild("HungerText") :: TextLabel
+  assert(string.find(label.Text,"Hunger") and string.find(label.Text,"hungry"),"hunger words missing")
   driver.needs.energy=old;driver.needs.gentle=gentle
   driver.input:simulate("Jump",true);wait(.25)
   assert(driver.jump:isAiming(),"held jump did not aim")
@@ -489,8 +489,13 @@ return function(driver: any)
   driver.life.rival=Rival.new();driver.place(Vector3.new(15,.31,8));wait(.3)
   assert(workspace:FindFirstChild("RivalSpider")~=nil,"rival rig missing")
   driver.life.growth.stage=0;driver.life.growth.fedSinceMoult=0;driver.life.growth.ready=false
+  driver.life.rival.notice=0 -- (it has not seen the spider coming: a strike at one that has is a contest, ROBLOX-73)
   driver.place(driver.life.rival.position);driver.prey.strikeEnd=driver.prey.tick+240
   wait(.2);assert(driver.life.rival.state=="captured","jump contact did not capture rival")
+  -- ROBLOX-77: a caught rival fights the tapping grip first; about 5.5 taps a second subdue it in a few seconds, then the five seconds of eating start.
+  assert(driver.life.rival.subdued==false,"a caught rival is held but not yet subdued")
+  for _=1,160 do if driver.life.rival.subdued then break end;driver.rivalLegs.Grip.tap(driver.rivalLegs.grip);wait(.18) end
+  assert(driver.life.rival.subdued==true,"tapping did not subdue the rival")
   wait(5.3);assert(driver.life.rival.state=="consumed","rival meal did not finish")
   assert(math.abs(driver.life.growth.fedSinceMoult-.6)<.001,"rival should count as two meals")
   local food=driver.needs.grantedFrom(driver.needs,"rival_spider_meal")

@@ -224,10 +224,11 @@ local function storedRest(mode: string): any
 	local memory = ObservationMemory.new()
 	local sensor = Sensor.new(memory)
 	sensor:configureFrom(Species.phidippus_audax_prototype.perception)
-	local needs = NeedsModel.new(true, mode == "free")
+	local needs = NeedsModel.new(true, mode == "free" or mode == "easy")
 	prey.feeding.needs = needs
 	local life = LifeLoop.new(needs, function() return { ok = true, message = "" } end)
 	if mode == "free" then life.mode, life.rules = "free", "gentle" end
+	if mode == "easy" then life.mode, life.rules = "main", "gentle" end
 	motor:place(Vector3.new(-25.5, Layout.SPAWN.Y, 6.0), Vector3.yAxis, Vector3.new(1, 0, 0))
 	local w: any = { motor = motor, prey = prey, sensor = sensor, memory = memory, needs = needs, life = life }
 	return assert(Checkpoint.capture(w, 0))
@@ -314,6 +315,7 @@ case("the real client says plainly when saving is off, and when it is back; the 
 	driver.openMenu()
 	local body = find("SpiderLifeMenu", "Summary")
 	check(body ~= nil and string.find(body.Text, "Saving is off for this visit", 1, true) ~= nil, "the menu says so too")
+	frames(170) -- (a warning toast is kept for its 2.6 seconds over a plainer one, ROBLOX-92)
 	R.deliver({ kind = "status", status = "saving" })
 	frames(3)
 	check(string.find(find("SpiderPrompts", "Toast").Text, "Saving is back on", 1, true) ~= nil, "and when it is back")
@@ -336,6 +338,12 @@ case("the real client uses a later copy of the saved state, but never over what 
 	check(driver.notebook:isOpen("eight_eyes") and driver.notebook:isOpen("bold_jumper") and jumpPage ~= nil and driver.notebook:isOpen(jumpPage), "pages only ever add")
 	check(driver.session.finishedMain == true, "an adult life stays")
 	check(driver.appearance() == "first_spider", "the spider the save names is used when the player has not chosen one")
+	R.deliver({ kind = "loaded", v = 1, status = "saved", progress = SaveProgress.snapshot({ opened = { "eight_eyes" }, eye_seconds = 1 }, false, "myrmarachne_formicaria_female", {}), rests = {} })
+	frames(3)
+	check(driver.appearance() == "myrmarachne_formicaria_female" and lp:GetAttribute("Appearance") == "myrmarachne_formicaria_female" and workspace:FindFirstChild("Spider"):GetAttribute("AppearanceId") == "myrmarachne_formicaria_female", "a save that names the ant-mimicking spider puts it on")
+	R.deliver({ kind = "loaded", v = 1, status = "saved", progress = SaveProgress.snapshot({ opened = { "eight_eyes" }, eye_seconds = 1 }, false, "first_spider", {}), rests = {} })
+	frames(3)
+	check(driver.appearance() == "first_spider", "and a later save that names the first spider puts that back")
 	-- junk from the server changes nothing
 	local pages = #driver.notebook.opened
 	for _, junk in { "x", { kind = "loaded", progress = "nope", rests = 5 }, { kind = "loaded", progress = { notebook = { opened = { "../x" } } } }, { kind = "rest", mode = "main", record = { not_a_rest = true } } } do
@@ -381,6 +389,136 @@ case("settings (ROBLOX-49): saved numbers and choices are applied as Player attr
 	progress = firedOf("progress")
 	last = progress[#progress]
 	check(last ~= nil and last.progress.settings.Captions == nil and last.progress.settings.InvertX == true, "an unclean value is left out of what is sent")
+end)
+
+case("the Easy life rests in its own slot (ROBLOX-91): a rest goes up as easy, the standard rest is untouched, and the menu offers it", function()
+	local driver: any = ClientStubs.driver
+	local before = canon(driver.stores.main:loadBest().record)
+	check(#SaveRest.check("easy", storedRest("easy")) == 0, "a scripted Easy rest passes the easy check")
+	check(#SaveRest.check("easy", storedRest("main")) > 0 and #SaveRest.check("main", storedRest("main")) == 0, "a standard rest is not an Easy one")
+	check(#SaveRest.check("main", storedRest("easy")) == 0, "(and a legacy Easy rest in the main slot is still accepted)")
+	check(#SaveRest.check("free", storedRest("easy")) > 0, "an Easy rest is not a free-play one")
+	check(driver.fresh("main", true, nil), "a new Easy life begins")
+	check(driver.currentStore() == driver.stores.easy and driver.stores.easy ~= driver.stores.main, "it rests in its own store")
+	check(driver.life.rules == "gentle" and driver.life.mode == "main", "with the gentle rules")
+	check(driver.stores.main:loadBest().ok and canon(driver.stores.main:loadBest().record) == before, "the standard life's rest is intact")
+	frames(60)
+	R.fired = {}
+	local r = driver.life.save()
+	check(r.ok, "the Easy rest was kept: " .. tostring(r.message))
+	realWait(SaveRules.CLIENT_PROGRESS_GAP * 3 + 0.1)
+	frames(3)
+	local rests = firedOf("rest")
+	check(#rests == 1 and rests[1].mode == "easy", `one easy rest went up ({#rests}, {rests[1] and rests[1].mode})`)
+	if rests[1] then
+		check(#SaveRest.check("easy", rests[1].record) == 0, "and the server's easy check accepts it: " .. table.concat(SaveRest.check("easy", rests[1].record), "; "))
+		check(driver.life.rules == "gentle", "gentle rules")
+	end
+	check(canon(driver.stores.main:loadBest().record) == before, "the standard rest is still untouched after the Easy rest")
+	-- the gentle goal is three meals, the standard one five, in the hud's own words
+	local function anyText(needle: string): boolean
+		for _, d in gui:GetDescendants() do
+			local ok, t = pcall(function() return (d :: any).Text end)
+			if ok and type(t) == "string" and string.find(t, needle, 1, true) then return true end
+		end
+		return false
+	end
+	frames(5)
+	check(anyText("of 3 meals") and not anyText("of 5 meals"), "Easy: the next moult is at 3 meals in the hud")
+	-- a restore always puts the game's struggle back, whatever the record held
+	local feeding: any = driver.prey.feeding
+	feeding.game, feeding.startGrip = false, 0.123
+	check(driver.life.save().ok, "a rest with another struggle in it is kept")
+	driver.returnToCheckpoint()
+	feeding = driver.prey.feeding
+	check(feeding.game == true and feeding.startGrip ~= 0.123, `the game's struggle is on after a return to the last rest (game {tostring(feeding.game)}, grip {feeding.startGrip})`)
+	driver.openMenu()
+	check(find("SpiderLifeMenu", "ContinueEasy") ~= nil and find("SpiderLifeMenu", "Continue") ~= nil, "the menu offers both Continues")
+	driver.menu:hide()
+	-- a standard life afterwards uses the main slot again
+	check(driver.fresh("main", false, nil) and driver.currentStore() == driver.stores.main and driver.life.rules == "standard", "a standard life goes back to the main slot")
+	frames(5)
+	check(anyText("of 5 meals") and not anyText("of 3 meals"), "standard: the next moult is at 5 meals in the hud")
+end)
+
+case("the menu has a Controls entry that puts the controls card back up and keeps it until H (ROBLOX-92)", function()
+	local driver: any = ClientStubs.driver
+	frames(60 * 22) -- (the card goes by itself after twenty seconds)
+	local card = find("SpiderPrompts", "Controls")
+	check(card ~= nil and card.Visible == false, "(the card has gone)")
+	driver.openMenu()
+	check(find("SpiderLifeMenu", "Controls") ~= nil, "the menu offers Controls")
+	driver.menu.onChoose("Controls")
+	frames(3)
+	check(not driver.menu:isShowing(), "choosing it closes the menu")
+	check(card.Visible == true and string.find(card.Text, "Backspace: last rest", 1, true) ~= nil, "and the card is up, with the last rest in it")
+	frames(60 * 25)
+	check(card.Visible == true, "it stays: the keyboard is not needed to bring it back, and it does not go by itself this time")
+	local fn = ClientStubs.actions["SpiderHelp"]
+	fn("SpiderHelp", Enum.UserInputState.Begin, { KeyCode = Enum.KeyCode.H, UserInputType = Enum.UserInputType.Keyboard, Position = Vector3.zero })
+	fn("SpiderHelp", Enum.UserInputState.End, { KeyCode = Enum.KeyCode.H, UserInputType = Enum.UserInputType.Keyboard, Position = Vector3.zero })
+	frames(3)
+	check(card.Visible == false, "H puts it away")
+end)
+
+case("a saved spider waits for the spider to stand safely, and is dropped if the player chose one meanwhile (ROBLOX-92)", function()
+	local driver: any = ClientStubs.driver
+	lp:SetAttribute("Appearance", "first_spider")
+	driver.spiderPick.touched = false
+	driver.mateLegs.phase = "card" -- something has the spider: a hatching's ending
+	R.deliver({ kind = "loaded", v = 1, status = "saved", progress = SaveProgress.snapshot({ opened = { "eight_eyes" }, eye_seconds = 1 }, false, "maratus_volans_male", {}), rests = {} })
+	frames(5)
+	check(driver.appearance() ~= "maratus_volans_male", "the saved spider is not put on while a scene or the hatching has the spider")
+	driver.mateLegs.phase = ""
+	frames(3)
+	check(driver.appearance() == "maratus_volans_male", "and is put on when the spider stands free again")
+	-- the player chooses another before it could be put on: theirs wins
+	driver.mateLegs.phase = "card"
+	R.deliver({ kind = "loaded", v = 1, status = "saved", progress = SaveProgress.snapshot({ opened = { "eight_eyes" }, eye_seconds = 1 }, false, "first_spider", {}), rests = {} })
+	frames(3)
+	driver.spiderPick.touched = true
+	driver.mateLegs.phase = ""
+	frames(3)
+	check(driver.appearance() == "maratus_volans_male", "a spider the player chose this visit is never replaced by a late save")
+	driver.spiderPick.touched = false
+end)
+
+case("a saving that raises leaves the frame running, says once that saving is off, and sends nothing more (ROBLOX-92)", function()
+	local driver: any = ClientStubs.driver
+	local warns = 0
+	local oldWarn = warn
+	;(getfenv() :: any).warn = function(...: any) warns += 1 end
+	local realToRecord = driver.notebook.toRecord
+	driver.notebook.toRecord = function() error("the book broke") end
+	realWait(SaveRules.CLIENT_PROGRESS_GAP + 0.1)
+	lp:SetAttribute("InvertY", not lp:GetAttribute("InvertY")) -- something to send: the saving builds its message, which raises
+	local ok = pcall(frames, 5)
+	check(ok, "the frame went on")
+	check(driver.saveState.broken == true, "the saving is marked broken")
+	check(warns == 1, `warned once ({warns})`)
+	driver.notebook.toRecord = realToRecord
+	local tick = driver.prey.tick
+	frames(30)
+	check(driver.prey.tick > tick, "the world still runs")
+	check(warns == 1, "and does not warn again")
+	R.fired = {}
+	realWait(SaveRules.CLIENT_PROGRESS_GAP + 0.1)
+	lp:SetAttribute("InvertX", not lp:GetAttribute("InvertX"))
+	driver.life.save()
+	realWait(SaveRules.CLIENT_PROGRESS_GAP + 0.1)
+	frames(5)
+	check(#firedOf("progress") == 0 and #firedOf("rest") == 0, "nothing more is sent")
+	local seen = false
+	for _, d in gui:GetDescendants() do
+		local okText, t = pcall(function() return (d :: any).Text end)
+		if okText and type(t) == "string" and string.find(t, SaveText.BROKEN, 1, true) and d.Visible ~= false then seen = true end
+	end
+	check(seen, "the status line says Saving is off")
+	driver.openMenu()
+	local body = find("SpiderLifeMenu", "Summary")
+	check(body ~= nil and string.find(body.Text, "Something in the saving broke", 1, true) ~= nil, "and the menu says why")
+	driver.menu:hide()
+	;(getfenv() :: any).warn = oldWarn
 end)
 
 print(`STATE_CLIENT passed={passed} failed={failed}`)

@@ -6,7 +6,11 @@ anti-aliasing and the engine's own shading differ, and Roblox Studio was not use
 Usage (from roblox_port/):
   python3 tools/preview/preview.py path/to/luau path/to/godot out_dir [--prefix after_] [--detail full|low]
          [--views front_three_quarter,top,face_closeup,play_distance,side,game_camera] [--idle SECONDS] [--parts parts.json]
+         [--cue groom|alarm] [--focus X,Y,Z]   (the living motion: cue it, or have the spider watch a point, then --idle seconds)
          [--appearance maratus_volans_male] [--dance LOOP_SECONDS]   (the peacock spider, posed at that time of its dance loop)
+         [--appearance rival_spider] [--contest faceoff|spread|grapple|retreat] [--contest-seconds S]   (ROBLOX-127: the male rival's display, S seconds into it)
+         [--appearance myrmarachne_formicaria_female] [--ant stand|display|walk] [--ant-seconds S]   (the ant-mimicking spider: standing with
+         legs I up S seconds after it stopped, the display pose, or mid-walk at 6 studs a second for S seconds, ending at the origin)
 --parts renders an already-dumped part list (for example the "before" list kept next to the images) instead of running the rig."""
 import argparse, json, pathlib, re, subprocess
 HERE = pathlib.Path(__file__).resolve().parent
@@ -21,6 +25,14 @@ ap.add_argument("--idle", type=float, default=0.0, help="seconds of standing idl
 ap.add_argument("--parts", default="")
 ap.add_argument("--appearance", default="", help="an id from Data/Appearances (default: the default spider)")
 ap.add_argument("--dance", type=float, default=-1.0, help="pose the peacock spider at this time (s) of its dance loop; -1: no dance")
+ap.add_argument("--ant", default="", help="the ant-mimicking spider's pose: stand, display or walk")
+ap.add_argument("--ant-seconds", type=float, default=2.0, help="seconds standing before the dump, or seconds walked")
+ap.add_argument("--hang", default="", help="draw the spider suspended on its dragline (ROBLOX-86): drop (hanging from the start) or climb (rising along the line)")
+ap.add_argument("--hang-seconds", type=float, default=1.5, help="seconds hung before the dump (the sway is a damped 2.5 s swing started by the drop)")
+ap.add_argument("--cue", default="", help="a cue to the living motion at the start of --idle (ROBLOX-87): groom (a meal ended) or alarm; the spider has stood 0.5 s by then")
+ap.add_argument("--focus", default="", help="the watched point X,Y,Z (world, studs; the spider stands at the origin facing -Z), for the attention yaw and the eyes' glance")
+ap.add_argument("--contest", default="", help="the rival's contest display (ROBLOX-127): faceoff, spread, grapple or retreat, played --contest-seconds by Predator/RivalDisplay")
+ap.add_argument("--contest-seconds", type=float, default=1.2)
 ap.add_argument("--size", default="960x600")
 args = ap.parse_args()
 out = pathlib.Path(args.out).resolve()
@@ -34,7 +46,7 @@ def plain(text):
 
 def wire(text):
     """The rig's requires become the globals the bundle defines (APPEARANCES, ANATOMY, SETAE, IDLE)."""
-    text = re.sub(r"require\(script\.Parent\.Parent\.Data\.(\w+)\)", lambda m: m.group(1).upper(), text)
+    text = re.sub(r"require\(script\.Parent\.Parent\.(?:Data|Life|Prey)\.(\w+)\)", lambda m: m.group(1).upper(), text)
     return re.sub(r"require\(script\.Parent\.(\w+)\)", lambda m: m.group(1).upper(), text)
 
 
@@ -43,8 +55,10 @@ def chunk(path):
 
 
 # Shared modules the rig requires, in dependency order. A module that does not exist yet (older commits) is skipped.
-LIBS = [("Appearances", "Data/Appearances.luau"), ("Anatomy", "Rig/Anatomy.luau"), ("Setae", "Rig/Setae.luau"), ("Idle", "Rig/Idle.luau"),
-        ("Peacock", "Data/Peacock.luau"), ("PeacockDance", "Rig/PeacockDance.luau")]
+LIBS = [("Appearances", "Data/Appearances.luau"), ("Growth", "Life/Growth.luau"), ("Anatomy", "Rig/Anatomy.luau"), ("Setae", "Rig/Setae.luau"), ("Idle", "Rig/Idle.luau"), ("Living", "Rig/Living.luau"),
+        ("Peacock", "Data/Peacock.luau"), ("PeacockDance", "Rig/PeacockDance.luau"),
+        ("AntMimic", "Data/AntMimic.luau"), ("AntMimicPose", "Rig/AntMimicPose.luau"),
+        ("PreyRandom", "Prey/PreyRandom.luau"), ("RivalDisplay", "Predator/RivalDisplay.luau")]
 libs = [(n, p) for n, p in LIBS if (SRC / p).exists()]
 
 if args.parts:
@@ -57,8 +71,11 @@ else:
     body += "\nSupportMath = " + chunk(SRC / "Movement/SupportMath.luau") + "\nSpiderRig = (function()\n" + rig + "\nend)()\n"
     body += (HERE / "driver.luau").read_text()
     src = out / "bundle.luau"
-    src.write_text(f'MODE = "orbit"\nDETAIL = "{args.detail}"\nIDLE_SECONDS = {args.idle}\nAPPEARANCE = "{args.appearance}"\nDANCE_T = {args.dance}\n' + body)
-    text = subprocess.run([args.luau, str(src)], capture_output=True, text=True, check=True).stdout
+    src.write_text(f'MODE = "orbit"\nDETAIL = "{args.detail}"\nIDLE_SECONDS = {args.idle}\nAPPEARANCE = "{args.appearance}"\nDANCE_T = {args.dance}\nANT_MODE = "{args.ant}"\nANT_SECONDS = {args.ant_seconds}\nHANG_MODE = "{args.hang}"\nHANG_SECONDS = {args.hang_seconds}\nHANG_HEIGHT = 2.0\nCUE = "{args.cue}"\nFOCUS = "{args.focus}"\nCONTEST = "{args.contest}"\nCONTEST_SECONDS = {args.contest_seconds}\n' + body)
+    run = subprocess.run([args.luau, str(src)], capture_output=True, text=True)
+    if run.returncode != 0:
+        raise SystemExit(f"the rig failed under the preview stand-ins (bundle kept at {src}):\n{run.stderr}")
+    text = run.stdout
     src.unlink()
     count_line, _, json_text = text.partition("\n")
     parts_path = out / f"{args.prefix}parts.json"
@@ -88,7 +105,27 @@ VIEWS.update({
     "p_three": (30, -0.55, 0.38, -0.80, 0, 0.14, 0.0),
     "p_game": (65, 0.0, 2.305, 4.755, 0, 0.76, 0.0),
 })
-VIEW_SIZE = {"game_camera": "1920x1080", "p_game": "1920x1080"}
+# The ant-mimicking spider (0.5 studs long, legs I up to 0.35 studs): a_game is the game's own camera.
+VIEWS.update({
+    "a_front": (28, 0.35, 0.42, -0.95, 0, 0.18, -0.03),
+    "a_back": (28, -0.35, 0.45, 0.95, 0, 0.16, 0.0),
+    "a_side": (28, 1.0, 0.26, 0.0, 0, 0.17, 0.0),
+    "a_top": (28, 0.0, 1.05, 0.05, 0, 0.1, 0.0),
+    "a_three": (28, -0.62, 0.40, -0.80, 0, 0.17, 0.0),
+    "a_face": (22, 0.22, 0.24, -0.60, 0, 0.19, -0.22),
+    "a_game": (65, 0.0, 1.687, 2.853, 0, 0.76, 0.0), # the game camera at the small appearance's cameraScale (0.6): 3 studs, not 5
+    "a_close": (40, 0.0, 0.62, 1.0, 0, 0.2, 0.0),
+})
+# The spider hanging on its dragline (--hang): the collider is 2 studs up (driver.luau), the line leaves the spinneret toward +Y. hang_side looks at it
+# from the side (the body's long axis is vertical, the head down), hang_front from in front of the head. The pale strand is the dragline.
+VIEWS.update({
+    "hang_side": (34, 3.0, 2.15, 0.15, 0, 2.0, 0.0),
+    "hang_front": (34, 0.1, 2.1, -3.0, 0, 2.0, 0.0),
+    "hang_three": (34, -2.2, 2.2, -2.2, 0, 2.0, 0.0),
+    "hang_back": (34, -0.1, 2.0, 3.0, 0, 2.0, 0.0),
+    "hang_wide": (50, 3.6, 1.8, 0.2, 0, 1.55, 0.0), # a wider frame, for comparing with the old pose (which hung the body 0.7 studs lower)
+})
+VIEW_SIZE = {"game_camera": "1920x1080", "p_game": "1920x1080", "a_game": "1920x1080"}
 for name in args.views.split(","):
     v = VIEWS[name]
     png = out / f"{args.prefix}{name}.png"

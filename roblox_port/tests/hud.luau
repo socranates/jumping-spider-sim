@@ -7,6 +7,7 @@
 local Shapes = require("../src/Shared/UI/PerceptionShapes")
 local View = require("../src/Shared/UI/PerceptionView")
 local PerceptionHud = require("../src/Client/PerceptionHud")
+local SpiderHud = require("../src/Client/SpiderHud")
 
 local passed, failed = 0, 0
 local function check(ok: boolean, what: string)
@@ -227,7 +228,8 @@ do
 	local lengthFresh = bars[1].Size.X.Offset
 	check(bars[1].Size.Y.Offset == 2 and near(bars[1].BackgroundTransparency, 1 - view.rings[1].alpha, 1e-9), "2 px thick, at the view's opacity")
 	local label = shown(parent, "Label")[1]
-	check(label ~= nil and label.Text == "lost sight" and near(label.TextTransparency, 1 - view.labels[1].alpha, 1e-9) and label.Position.Y.Offset > 360, "and 'lost sight' under it, as faded as the view says")
+	-- (ROBLOX-113: the drawn label is the calmed one, UI/QuietHud.calmLabels: half a second into its one-second fade, where the view's own is a fifth into 2.5 s)
+	check(label ~= nil and label.Text == "lost sight" and near(view.labels[1].alpha, 0.8, 1e-9) and near(hud.labels[1].alpha, 0.5, 1e-9) and near(label.TextTransparency, 1 - hud.labels[1].alpha, 1e-9) and label.Position.Y.Offset > 360, "and 'lost sight' under it, faded by the calm's breath (0.5 at half a second; the view's 0.8)")
 	-- the same mark, older: the same twelve bars, shorter
 	local old = contact({ position = Vector3.new(0, 5, -10), mark = true, stale = 0.9, age = 2.0 })
 	draw(hud, { old })
@@ -242,9 +244,11 @@ do
 	local bs = children(oldBars[1], "UIStroke")
 	check(#children(oldBars[1], "UICorner") == 1 and #bs == 1 and bs[1].Thickness == 1 and bs[1].Transparency < 1, "rounded, with a thin dark edge")
 	-- hidden marks (the ShowLastSeen switch): no dashes, the words stay
+	check(#hud.view.labels == 1 and #shown(parent, "Label") == 0, "two seconds after sight was lost the view still has its words, the screen not: gone in a breath (ROBLOX-113)")
 	draw(hud, { old }, false, false)
 	check(#shown(parent, "Bar") == 0 and #hud.view.rings == 0, "with the last-seen marks switched off there are no dashes")
-	check(#shown(parent, "Label") == 1 and shown(parent, "Label")[1].Text == "lost sight", "and the words stay, as in the view")
+	draw(hud, { fresh }, false, false)
+	check(#shown(parent, "Bar") == 0 and #shown(parent, "Label") == 1 and shown(parent, "Label")[1].Text == "lost sight", "and the words stay, as in the view")
 	-- a mark that is covered is fainter
 	local covered: any = function(_eye: Vector3, _at: Vector3): Vector3? return Vector3.new(0, 5, -3) end
 	hud:draw(memoryOf({ fresh }), camera, covered, false, nil)
@@ -295,7 +299,8 @@ do
 	}
 	draw(hud, list, true)
 	local made = #parent:GetDescendants()
-	check(#shown(parent, "Circle") == 1 and #shown(parent, "Bar") == 12 + 2 + 4 and #shown(parent, "Label") == 2, "a live circle, a dashed mark, a cue and Focus together: 1 circle, 18 bars, 2 labels")
+	-- (ROBLOX-113: the live label and the mark's are in one area of the screen, so one label is drawn: the live one, what the principal eyes hold now)
+	check(#shown(parent, "Circle") == 1 and #shown(parent, "Bar") == 12 + 2 + 4 and #hud.view.labels == 2 and #shown(parent, "Label") == 1 and shown(parent, "Label")[1].Text == "fly-like prey", "a live circle, a dashed mark, a cue and Focus together: 1 circle, 18 bars, and of the 2 labels the live one")
 	for _ = 1, 30 do draw(hud, list, true) end
 	check(#parent:GetDescendants() == made, "thirty more frames make nothing new")
 	draw(hud, { list[1] })
@@ -340,6 +345,103 @@ do
 	check(#direct.rings == 1 and direct.rings[1].alpha == 0.85 and direct.labels[1].text == "fly-like prey" and direct.labels[1].offset == 20, "the pure view is as it was: alpha 0.85, the label's words, the gap radius + 8")
 	draw(hud, { contact({ position = Vector3.new(0, 5, -10), inspected = true }) })
 	check(hud.view.labels[1].text == shown(parent, "Label")[1].Text and hud.view.rings[1].alpha == 0.85, "and the drawer follows it")
+end
+
+-- the hunger bar (ROBLOX-78): the old food bar, renamed; full when fed, emptying as the spider grows hungry
+do
+	local parent = Instance.new("Folder")
+	local hud = SpiderHud.new(parent)
+	local function bar(v: number?, gentle: boolean?, large: boolean?): (any, any, any)
+		hud:update({ device = "keyboard", food = v, foodGentle = gentle, largeText = large }, 0.016)
+		return named(parent, "HungerBar")[1], named(parent, "HungerFill")[1], named(parent, "HungerText")[1]
+	end
+	local b, f, t = bar(1)
+	check(b ~= nil and f ~= nil and t ~= nil and #named(parent, "FoodBar") == 0 and #named(parent, "FoodText") == 0, "the bar is the Hunger bar; no FoodBar is left")
+	check(b.Visible and f.Size.X.Scale == 1 and t.Text == "Hunger 100%", "a fed spider: a full bar that says Hunger 100%")
+	b, f, t = bar(0.55)
+	check(f.Size.X.Scale == 0.55 and t.Text == "Hunger 55%", "the fill is the reserve")
+	b, f, t = bar(0.2)
+	check(t.Text == "Hunger 20% · hungry" and f.BackgroundColor3.R > f.BackgroundColor3.G, "hungry at a quarter, and the fill turns amber-brown")
+	b, f, t = bar(0)
+	check(f.Size.X.Scale == 0 and t.Text == "Hunger 0% · starving", "empty is starving")
+	b, f, t = bar(0, true)
+	check(t.Text == "Hunger 0% · gentle", "gentle play never says starving")
+	b, f, t = bar(0.5, false, true)
+	check(t.TextSize == 24, "large text")
+	-- the quiet screen (ROBLOX-125): a thin line without a plate, settling once read, never while hungry
+	b, f, t = bar(0.8)
+	check(b.BackgroundTransparency == 1 and f.Parent.Size.Y.Offset == 5 and b.Size.X.Offset == 220, "a 5 px line, 220 px wide, no plate")
+	check(t.TextTransparency == 0, "new words at full strength")
+	for _ = 1, 500 do bar(0.8) end
+	check(t.TextTransparency > 0.7 and f.BackgroundTransparency > 0.5, "after eight seconds unchanged the line has settled to a trace")
+	bar(0.75)
+	check(t.TextTransparency == 0, "a change brings it back")
+	bar(0.3); for _ = 1, 500 do bar(0.3) end
+	check(t.TextTransparency == 0, "hungry: it never settles")
+	check(SpiderHud.settle(0) == 0 and SpiderHud.settle(4.9) == 0 and math.abs(SpiderHud.settle(99) - 0.8) < 1e-9, "settle: full, then 0.8 at rest")
+	b = bar(nil)
+	check(not b.Visible, "no reserve in the view: the bar is hidden")
+	for _, d in parent:GetDescendants() do
+		if d.ClassName == "TextLabel" and type(d.Text) == "string" and d.Text ~= "" then check(not string.find(string.lower(d.Text), "food"), "no word 'food' on the screen: " .. d.Text) end
+	end
+end
+
+-- the courtship meter (ROBLOX-80): the grip bar's style, in its own colour, shown only while the view carries a courtship level
+do
+	local parent = Instance.new("Folder")
+	local hud = SpiderHud.new(parent)
+	local function bar(v: number?): (any, any)
+		hud:update({ device = "keyboard", court = v }, 0.016)
+		return named(parent, "CourtshipBar")[1], named(parent, "Courtship")[1]
+	end
+	local b, f = bar(nil)
+	check(b ~= nil and f ~= nil and not b.Visible, "the courtship bar exists and is hidden while there is nothing to court")
+	b, f = bar(0)
+	check(b.Visible and f.Size.X.Scale == 0, "empty: shown, nothing in it")
+	b, f = bar(0.4)
+	check(b.Visible and f.Size.X.Scale == 0.4, "the fill is the meter")
+	b, f = bar(1.7)
+	check(f.Size.X.Scale == 1, "clamped to 1")
+	b, f = bar(-1)
+	check(f.Size.X.Scale == 0, "and to 0")
+	local grip = named(parent, "GripBar")[1]
+	check(b.Size.X.Scale == grip.Size.X.Scale and b.Size.Y.Offset == grip.Size.Y.Offset and b.LayoutOrder == grip.LayoutOrder, "the grip bar's width, height and place in the column")
+	check(f.BackgroundColor3 ~= named(parent, "Grip")[1].BackgroundColor3, "in a colour of its own, not the grip's red")
+	b = bar(nil)
+	check(not b.Visible and not grip.Visible, "gone again, and the grip bar is not the one that shows")
+end
+
+-- the one toast label has priorities (ROBLOX-92): danger over warning over information; a lower one waits out the higher and is dropped, an equal or higher one replaces it,
+-- and once the seconds are over anything may show again
+do
+	local parent = Instance.new("Folder")
+	local hud = SpiderHud.new(parent)
+	local function toast(): any return named(parent, "Toast")[1] end
+	hud:toast("A plain thing", false)
+	check(toast().Text == "A plain thing" and toast().Visible, "information shows")
+	hud:toast("A warning", true)
+	check(toast().Text == "A warning", "a warning replaces information")
+	hud:toast("More information", false)
+	check(toast().Text == "A warning", "information does not replace a warning")
+	hud:toast("Something is coming", "danger")
+	check(toast().Text == "Something is coming", "a danger replaces a warning")
+	local dangerColor = toast().TextColor3
+	hud:toast("A warning again", true)
+	hud:toast("Plain again", false)
+	hud:toast("", "danger")
+	check(toast().Text == "Something is coming", "neither a warning nor information replaces a danger, and an empty text is nothing")
+	for _ = 1, 100 do hud:update({ device = "keyboard" }, 0.016) end -- 1.6 s
+	check(toast().Visible and toast().Text == "Something is coming", "a danger is still there before its seconds are over")
+	hud:toast("Another danger", "danger")
+	check(toast().Text == "Another danger" and toast().TextColor3 == dangerColor, "an equal one replaces it, in the danger colour")
+	for _ = 1, 200 do hud:update({ device = "keyboard" }, 0.016) end -- 3.2 s
+	check(not toast().Visible, "it goes when its seconds are over")
+	hud:toast("Plain at last", false)
+	check(toast().Visible and toast().Text == "Plain at last" and toast().TextColor3 ~= dangerColor, "and then the plainest toast shows again, in its own colour")
+	local warnColor
+	hud:toast("A warning", true)
+	warnColor = toast().TextColor3
+	check(warnColor ~= dangerColor, "a warning and a danger differ in colour")
 end
 
 print(`HUD passed={passed} failed={failed}`)

@@ -15,6 +15,9 @@ return function(check: (string, () -> ()) -> ())
 	local SaveEnvelope = require(Shared.Persistence.SaveEnvelope)
 	local HudLayout = require(Shared.UI.HudLayout)
 	local NotebookText = require(Shared.UI.NotebookText)
+	local SpiderChoice = require(Shared.Rig.SpiderChoice)
+	local PeacockText = require(Shared.UI.PeacockText)
+	local InspectText = require(Shared.UI.InspectText)
 	local Client = game:GetService("StarterPlayer"):WaitForChild("StarterPlayerScripts"):WaitForChild("Client")
 	local SettingsPanel = require(Client:WaitForChild("SettingsPanel")) :: any
 	local devices: { any } = { "keyboard", "gamepad", "touch" }
@@ -26,7 +29,7 @@ return function(check: (string, () -> ()) -> ())
 	end
 
 	check("settings: the table, its defaults and a full set of changes survive the engine's JSON and the saved envelope unchanged", function()
-		assert(#SettingsSpec.LIST == 22, `{#SettingsSpec.LIST} settings`)
+		assert(#SettingsSpec.LIST == 23, `{#SettingsSpec.LIST} settings`)
 		local changed: { [string]: any } = {}
 		for _, s in SettingsSpec.LIST do
 			local v: any = s.default
@@ -59,7 +62,10 @@ return function(check: (string, () -> ()) -> ())
 			for _, scale in scales do
 				local m = SettingsText.metrics(screen.X, screen.Y, scale)
 				local pad = SettingsText.PAD * scale
-				for _, s in SettingsSpec.LIST do
+				-- (ROBLOX-92: the two live rows are rows too: the Spider choice with its longest name, and the Inspect button)
+				local rowsAll: { SettingsSpec.Setting } = table.clone(SettingsSpec.LIST)
+				for _, live in SettingsSpec.LIVE do table.insert(rowsAll, live) end
+				for _, s in rowsAll do
 					local rl = SettingsText.rowLayout(m.bodyW, s.kind, scale)
 					local label = size(s.label, S.label * scale, Enum.Font.GothamMedium, rl.labelW)
 					assert(label.Y <= 5 * S.label * scale * 1.3, `{s.id} at {screen.X}x{screen.Y} x{scale}: the label is {label.Y} tall in {rl.labelW}`)
@@ -69,7 +75,13 @@ return function(check: (string, () -> ()) -> ())
 					end
 					-- the words of the value, widest first
 					local words: { string } = {}
-					if s.kind == "choice" then
+					if SettingsModel.live(s.id) then
+						if s.id == "Spider" then
+							for _, id in SpiderChoice.ORDER do table.insert(words, PeacockText.title(id)) end
+						else
+							words = { InspectText.BUTTON }
+						end
+					elseif s.kind == "choice" then
 						local opts: { SettingsSpec.Option } = s.options :: any
 						for _, o in opts do table.insert(words, o.label) end
 					elseif s.kind == "toggle" then
@@ -80,8 +92,17 @@ return function(check: (string, () -> ()) -> ())
 					local room = if s.kind == "choice" then rl.controlW - 2 * math.floor(SettingsText.MIN_TARGET * scale) - 2 * SettingsText.GAP * scale
 						elseif s.kind == "toggle" then rl.controlW else math.floor(SettingsText.VALUE_WIDTH * scale)
 					for _, wd in words do
-						local one = size(wd, S.value * scale, Enum.Font.GothamMedium, 100000)
-						assert(one.X <= room - 6, `{s.id}: "{wd}" is {one.X} wide in {room} at {screen.X}x{screen.Y} x{scale}`)
+						if SettingsModel.live(s.id) then
+							-- (a live row's word wraps and shrinks to its button, as the panel does: SettingsText.buttonTextSize; the button is a touch target tall)
+							local target = math.floor(SettingsText.MIN_TARGET * scale)
+							local bw2 = if s.kind == "choice" then rl.controlW - 2 * target - 2 * SettingsText.GAP * scale else rl.controlW
+							local fit = SettingsText.buttonTextSize(wd, bw2, target, S.value * scale)
+							local one = size(wd, fit, Enum.Font.GothamMedium, bw2 - 10)
+							assert(fit >= 10 and one.Y <= target, `{s.id}: "{wd}" is {one.Y} tall at {fit} in a button {bw2} x {target} at {screen.X}x{screen.Y} x{scale}`)
+						else
+							local one = size(wd, S.value * scale, Enum.Font.GothamMedium, 100000)
+							assert(one.X <= room - 6, `{s.id}: "{wd}" is {one.X} wide in {room} at {screen.X}x{screen.Y} x{scale}`)
+						end
 					end
 				end
 				for _, device in devices do
@@ -122,8 +143,14 @@ return function(check: (string, () -> ()) -> ())
 		local values: { [string]: any } = {}
 		local closed: { string } = {}
 		local io = {
-			get = function(id: string): any return SettingsModel.get(function(k: string): any return values[k] end, id) end,
-			set = function(id: string, v: any) values[id] = v end,
+			get = function(id: string): any
+				if SettingsModel.live(id) then return "first_spider" end -- (the Spider row reads the client's live appearance, not a setting)
+				return SettingsModel.get(function(k: string): any return values[k] end, id)
+			end,
+			set = function(id: string, v: any): string?
+				if not SettingsModel.live(id) then values[id] = v end
+				return nil
+			end,
 			reset = function() for _, id in SettingsModel.ids() do values[id] = SettingsModel.default(id) end end,
 			status = function(): string? return "saved" end,
 		}
@@ -138,7 +165,13 @@ return function(check: (string, () -> ()) -> ())
 		for _, w in panel.widgets do
 			if w.kind == "header" then headers += 1 elseif w.kind == "setting" then rows += 1 end
 		end
-		assert(headers == 4 and rows == 22, `{headers} headers, {rows} rows`)
+		assert(#SettingsSpec.LIST == 23 and #SettingsSpec.LIVE == 2 and SettingsSpec.LIVE[2].id == "Inspect" and SettingsSpec.LIVE[2].kind == "action", "two live rows: Spider and the Inspect button (ROBLOX-90)")
+		assert(headers == 5 and rows == 25, `{headers} headers, {rows} rows`)
+		local inspect
+		for _, w in panel.widgets do
+			if w.kind == "setting" and w.id == "Inspect" then inspect = w end
+		end
+		assert(inspect ~= nil and inspect.value.Text == "Look closely" and inspect.value.Size.Y.Offset >= SettingsText.MIN_TARGET and inspect.prev == nil and inspect.minus == nil, "the Inspect row is one button, a touch target")
 		assert(panel.list.ScrollingDirection == Enum.ScrollingDirection.Y and panel.list.AutomaticCanvasSize ~= Enum.AutomaticSize.X, "the list scrolls up and down")
 		assert(panel.hint.TextTruncate == Enum.TextTruncate.AtEnd, "the controls line truncates")
 		local target = SettingsText.MIN_TARGET

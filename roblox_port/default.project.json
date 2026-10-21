@@ -2,6 +2,9 @@
   "name": "TheWindowsill",
   "tree": {
     "$className": "DataModel",
+    "ReplicatedFirst": {
+      "$path": "src/First"
+    },
     "ReplicatedStorage": {
       "Shared": {
         "$path": "src/Shared"
@@ -26,7 +29,11 @@
     },
     "Workspace": {
       "$properties": {
-        "Gravity": 35.0
+        "Gravity": 35.0,
+        "StreamingEnabled": true,
+        "StreamingMinRadius": 96,
+        "StreamingTargetRadius": 160,
+        "StreamingIntegrityMode": "Disabled"
       }
     },
     "Lighting": {

@@ -63,9 +63,9 @@ local function stubWorld(): Checkpoint.World
 end
 SaveRest.stubWorld = stubWorld
 
--- Every problem with a rest filed under `mode` ("main" or "free"); an empty list for a good one. Never raises.
+-- Every problem with a rest filed under slot `mode` ("main", "easy" or "free", SaveRules.slotOf); an empty list for a good one. Never raises.
 function SaveRest.check(mode: any, record: any): { string }
-	if mode ~= "main" and mode ~= "free" then return { "unknown mode" } end
+	if mode ~= "main" and mode ~= "free" and mode ~= "easy" then return { "unknown mode" } end
 	if type(record) ~= "table" then return { "the rest is not a table" } end
 	local why = SaveRest.bounded(record, SaveRules.MAX_REST_NODES, SaveRules.MAX_DEPTH)
 	if why then return { why } end
@@ -73,7 +73,10 @@ function SaveRest.check(mode: any, record: any): { string }
 	if not text then return { "cannot be stored: " .. tostring(err) } end
 	if #text > SaveRules.MAX_REST_CHARS then return { `the rest is {#text} characters; the limit is {SaveRules.MAX_REST_CHARS}` } end
 	local rules = record.life_rules
-	if type(rules) ~= "table" or rules.mode ~= mode then return { `the rules in this rest are not {mode}'s` } end
+	-- (the main slot also takes a main life on the gentle rules: an Easy rest saved before the Easy slot existed was filed there)
+	if type(rules) ~= "table" or rules.mode ~= (if mode == "free" then "free" else "main") or (mode == "easy" and rules.rules ~= "gentle") then
+		return { `the rules in this rest are not {mode}'s` }
+	end
 	local ok, result = pcall(function(): { string }
 		local found = Checkpoint.check(record, stubWorld())
 		return found
@@ -91,6 +94,6 @@ function SaveRest.spec(mode: string): SaveEnvelope.Spec
 	}
 end
 
-SaveRest.SPECS = { main = SaveRest.spec("main"), free = SaveRest.spec("free") }
+SaveRest.SPECS = { main = SaveRest.spec("main"), free = SaveRest.spec("free"), easy = SaveRest.spec("easy") }
 
 return SaveRest

@@ -18,7 +18,7 @@ local services = game:GetService("ContextActionService") and ClientStubs
 local frame = ClientStubs.renderSteps.SpiderSim
 local gui = game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui")
 local function frames(n: number) for _ = 1, n do frame(1 / 60) end end
-local KEYS = { Feed = "E", Jump = "Space", Cancel = "Q", Drop = "F", Forward = "W", Back = "S", Eye = "V", Recenter = "R", Creep = "LeftShift", Reset = "Backspace", Choose = "C", Display = "X", Slow = "T" }
+local KEYS = { Feed = "E", Jump = "Space", Cancel = "Q", Drop = "F", Forward = "W", Back = "S", Eye = "V", Recenter = "R", Creep = "LeftControl", Run = "LeftShift", Reset = "Backspace", Choose = "C", Display = "X", Slow = "T" }
 local function key(action: string, down: boolean)
 	local fn = services.actions["Spider" .. action]
 	assert(fn, "no binding for " .. action)
@@ -34,19 +34,38 @@ local function find(screen: string, name: string): any
 	for _, d in g:GetDescendants() do if d.Name == name then return d end end
 	return nil
 end
+-- (ROBLOX-112: the start's save status is settled first, as tests/inspect.luau's is since ROBLOX-110. With no server it turns "offline" after
+-- SaveRules.CLIENT_WAIT_REMOTES seconds of the wall clock, and its toast lands on whichever check is running then: in a full run on a loaded machine it covered the
+-- jump's "Jump cancelled". Settled, and its toast let go by, before any check, the run no longer depends on how fast the machine is.)
+if frame ~= nil then
+	local t0 = os.clock()
+	while ClientStubs.driver ~= nil and ClientStubs.driver.saveState.status == nil and os.clock() - t0 < 10 do frame(1 / 60) end
+	frames(170)
+end
 
 check("the client loads, binds every action and runs 120 frames", function()
 	assert(loaded, "SpiderClient did not load")
 	assert(frame ~= nil, "no render step bound")
 	for _, a in { "Jump", "Cancel", "Drop", "Forward", "Eye", "Recenter", "Focus", "Slow", "Reset", "Help" } do assert(services.actions["Spider" .. a], a) end
 	frames(120)
+	-- (ROBLOX-113: the start's save status is settled here, as tests/inspect.luau does since ROBLOX-110: with no server it turns "offline" after
+	-- SaveRules.CLIENT_WAIT_REMOTES seconds of the wall clock, and its warning toast landed on whichever check was then reading a toast, the aim's "Jump cancelled"
+	-- on this machine at HEAD too; settled before the checks, they no longer depend on how fast the machine is.)
+	local t0 = os.clock()
+	while ClientStubs.driver ~= nil and ClientStubs.driver.saveState.status == nil and os.clock() - t0 < 10 do frame(1 / 60) end
+	frames(170)
 	assert(gui:FindFirstChild("SpiderHud") and gui:FindFirstChild("SpiderPrompts") and gui:FindFirstChild("SpiderTouch"), "HUD missing")
 	assert(math.abs(spider().Y - 0.31) < 0.05, `spawned at {spider()}`)
 end)
-check("with no checkpoint yet, Backspace goes back to the start and says why", function()
+check("the client lets down on its line at half Godot's reel speed and reels in at Godot's (ROBLOX-99)", function()
+	local motor = ClientStubs.driver.motor
+	assert(math.abs(motor.silk.lowerSpeed - 0.75) < 1e-9 and math.abs(motor.silk.speed - 1.5) < 1e-9, `lowerSpeed {motor.silk.lowerSpeed} speed {motor.silk.speed}`)
+end)
+check("with no last rest yet, Backspace goes back to the start and says why", function()
 	key("Reset", true); frames(1); key("Reset", false); frames(2)
-	assert(string.find(find("SpiderPrompts", "Toast").Text, "No checkpoint yet", 1, true), find("SpiderPrompts", "Toast").Text)
+	assert(string.find(find("SpiderPrompts", "Toast").Text, "No last rest yet", 1, true), find("SpiderPrompts", "Toast").Text)
 	assert(math.abs(spider().Y - 0.31) < 0.05, `not at the start: {spider()}`)
+	frames(170) -- (a warning toast is kept its 2.6 seconds over a plainer one, ROBLOX-92: the next checks read the toast of their own)
 end)
 check("W walks the spider along the sill", function()
 	local p0 = spider()
@@ -105,7 +124,7 @@ check("on a leaf: F walks to the edge and lets down; the line's prompts, touch L
 	local driver = ClientStubs.driver
 	assert(driver, "the client did not hand its test driver over")
 	driver.place(Vector3.new(0.5, 4.51, -3.0))
-	frames(5)
+	frames(5 + 170) -- (the warning of the check before is kept its 2.6 seconds over this plainer toast, ROBLOX-92)
 	key("Drop", true); frames(2)
 	assert(find("SpiderPrompts", "Toast").Text == "To the edge, to let yourself down", find("SpiderPrompts", "Toast").Text)
 	assert(string.find(find("SpiderPrompts", "PromptHint").Text, "Q or move: stop", 1, true), find("SpiderPrompts", "PromptHint").Text)
@@ -121,7 +140,8 @@ check("on a leaf: F walks to the edge and lets down; the line's prompts, touch L
 	assert(driver.get().line == "locked" and string.find(find("SpiderPrompts", "PromptCue").Text, "Letting go...", 1, true), "no let-go progress shown")
 	frames(25)
 	key("Cancel", false); frames(2)
-	assert(driver.get().line == "none" and find("SpiderPrompts", "Toast").Text == "You let go of the line", "a held Q did not let go")
+	local said = find("SpiderPrompts", "Toast").Text -- (the snag's warning of a moment ago is kept its 2.6 seconds over the plainer "You let go", ROBLOX-92)
+	assert(driver.get().line == "none" and (said == "You let go of the line" or string.find(said, "caught on a second edge", 1, true) ~= nil), "a held Q did not let go: " .. said .. " / " .. driver.get().line)
 	frames(120)
 	assert(driver.get().mode == "attached" and touch:FindFirstChild("Cancel").Text == "Cancel" and touch:FindFirstChild("Jump").Visible, "touch buttons not restored")
 end)
@@ -161,6 +181,8 @@ check("in the crack E rests; in the evening the spider sleeps until morning, the
 	lighting:SetAttribute("SunPick", "ok: test")
 	assert(life and needs and driver.prey.feeding.needs == needs, "the client did not hand over one life loop and NeedsModel, shared with feeding")
 	assert(needs.lifeMode, "hunger by the hour on the windowsill")
+	local feeding = driver.prey.feeding
+	assert(feeding.startGrip == 0.5 and feeding.tapGain == 0.12 and feeding.jerkScale == 0.8, "the client did not give feeding the game's easier tap (Data/Catch.game, ROBLOX-72)")
 	driver.place(Vector3.new(-25.5, 0.31, 6.0))
 	frames(30)
 	assert(driver.lifeSpider().inRetreat, "the spider is not in the crack")
@@ -186,7 +208,9 @@ check("in the crack E rests; in the evening the spider sleeps until morning, the
 	assert(lighting.ClockTime < dayClock and lighting.Brightness < 2.6, `the light did not dim at night (clock {lighting.ClockTime}, brightness {lighting.Brightness})`)
 	frames(600)
 	assert(life.clock.day == 2 and not life.asleep and life.resting and math.abs(life.clock.hour - 7) < 0.05, `no morning: day {life.clock.day}, {life.clock.hour}`)
-	assert(string.find(find("SpiderPrompts", "Notice").Text, "Morning, day 2", 1, true), find("SpiderPrompts", "Notice").Text)
+	-- (ROBLOX-113: Normal after the first day shows the rest kept and not the morning's own line, which the day line says; the loop's words are as they were)
+	assert(string.find(life.notice, "Morning, day 2", 1, true), life.notice)
+	assert(find("SpiderPrompts", "Notice").Text == "Last rest kept." and string.find(find("SpiderPrompts", "Day").Text, "Day 2, morning", 1, true), find("SpiderPrompts", "Notice").Text)
 	-- Still resting after the morning: when evening comes again the rest becomes sleep by itself; walking wakes the spider.
 	life.clock.hour = 21
 	frames(30)
@@ -194,6 +218,36 @@ check("in the crack E rests; in the evening the spider sleeps until morning, the
 	key("Forward", true); frames(10); key("Forward", false); frames(2)
 	assert(not life.asleep and not life.resting, "walking did not wake the spider")
 	assert(string.find(life.notice, "Awake before morning", 1, true), life.notice)
+end)
+
+check("the morning dew follows the life clock: there at 06:00, fading from 07:30, gone by 10:00 (ROBLOX-74)", function()
+	local life = ClientStubs.driver.life
+	local decor = Instance.new("Folder")
+	decor.Name = "Decor"
+	local dew = Instance.new("Folder")
+	dew.Name = "Dew"
+	dew.Parent = decor
+	local drops = {}
+	for i, lag in { 0.0, 0.3, 0.5 } do
+		local d = Instance.new("Part")
+		d.Name = "Drop" .. i
+		d:SetAttribute("Lag", lag)
+		d:SetAttribute("Base", 0.3)
+		d.Transparency = 1
+		d.Parent = dew
+		table.insert(drops, d)
+	end
+	decor.Parent = workspace
+	life.clock.hour = 6.0
+	frames(2)
+	for _, d in drops do assert(d.Transparency < 1 and math.abs(d.Transparency - 0.3) < 1e-9, `no dew at 06:00 ({d.Transparency})`) end
+	life.clock.hour = 8.6
+	frames(2)
+	assert(drops[1].Transparency < 1 and drops[3].Transparency == 1, `the last drop should be gone first at 08:36 ({drops[1].Transparency}, {drops[3].Transparency})`)
+	life.clock.hour = 10.0
+	frames(2)
+	for _, d in drops do assert(d.Transparency == 1, `dew at 10:00 ({d.Transparency})`) end
+	decor:Destroy()
 end)
 
 check("Backspace returns to the checkpoint kept by a rest, or to the start when there is none", function()
@@ -205,7 +259,7 @@ check("Backspace returns to the checkpoint kept by a rest, or to the start when 
 	frames(30)
 	life.clock.hour = 12
 	key("Feed", true); frames(2); key("Feed", false); frames(2)
-	assert(life.resting and life.notice == "Checkpoint kept.", "no checkpoint: " .. life.notice)
+	assert(life.resting and life.notice == "Last rest kept.", "no last rest: " .. life.notice)
 	local energy, hour, tick = needs.energy, life.clock.hour, prey.tick
 	-- Walk away for a while: the world moves on.
 	key("Forward", true); frames(90); key("Forward", false); frames(60)
@@ -214,7 +268,8 @@ check("Backspace returns to the checkpoint kept by a rest, or to the start when 
 	assert(driver.lifeSpider().inRetreat and life.resting, "not back resting in the crack")
 	assert(math.abs(life.clock.hour - hour) < 0.01 and prey.tick < tick + 10, `not the checkpoint's time (hour {life.clock.hour}, tick {prey.tick})`)
 	assert(needs == driver.needs and prey.feeding.needs == needs and math.abs(needs.energy - energy) < 1e-6, "the reserves did not go back")
-	assert(string.find(find("SpiderPrompts", "Notice").Text, "checkpoint recovery", 1, true), find("SpiderPrompts", "Notice").Text)
+	-- (ROBLOX-113: the return's explanation is the gentle modes' only: Normal's end card says what a return is. The loop's words are as they were.)
+	assert(string.find(life.notice, "a return to the rest", 1, true) and not (find("SpiderPrompts", "Notice").Visible and string.find(find("SpiderPrompts", "Notice").Text, "a return to the rest", 1, true)), find("SpiderPrompts", "Notice").Text)
 end)
 
 
@@ -264,13 +319,18 @@ check("the wasp: heard with a direction, found, caught, carried off; the catch s
 	frames(30)
 	assert(wasp:isVisiting() and wasp.phase == "arriving", `no visit: {wasp.phase}`)
 	assert(workspace:GetAttribute("WaspForce") == nil, "the force attribute was not taken")
+	-- The living motion's cues (ROBLOX-87): the warning raises legs I and freezes the spider for a moment, and the meal counted above is the cue to clean.
+	local living = driver.rig()._living
+	assert(living ~= nil and living.alarmT ~= nil and living.alarmT > 0, "the wasp's warning did not cue the alarm")
+	assert(living.pendingMeal ~= nil or #living.log > 0, "a meal finished did not cue the cleaning")
 	local audioRoot = workspace:FindFirstChild("WindowsillAudio")
 	local hum = audioRoot:FindFirstChild("wasp")
 	assert(hum and hum.Playing and hum.SoundId == "rbxassetid://76049518783466", "arrival warning has no sound")
 	local caption = find("SpiderPrompts", "Caption")
 	assert(caption.Visible and string.find(caption.Text, "[a deep, heavy hum outside, ", 1, true) and string.find(caption.Text, "coming closer]", 1, true), "no heard caption: " .. tostring(caption.Text))
 	local status = find("SpiderPrompts", "Status")
-	assert(string.find(status.Text, "a wasp is coming", 1, true), "no warning line: " .. tostring(status.Text))
+	-- (ROBLOX-113: in Normal the hum is the warning; the status line telling what wasps do and where to hide is the gentle modes' only)
+	assert(not (status.Visible and string.find(status.Text, "wasp", 1, true)), "a wasp line in Normal: " .. tostring(status.Text))
 	assert(wasp:percept() ~= nil and wasp:percept().maxCategory == "movement", "the wasp is not movement to the senses")
 	-- The 8 s of warning are Godot's numbers and the director suite's business; here they are skipped (the wasp flies at once).
 	wasp.speed = 1e6
@@ -284,13 +344,13 @@ check("the wasp: heard with a direction, found, caught, carried off; the catch s
 	frames(2)
 	assert(wasp.phase == "inspecting", `not found: {wasp.phase}`)
 	assert(string.find(find("SpiderPrompts", "Caption").Text, "[the deep hum turns toward you, ", 1, true), "no caption for the look: " .. find("SpiderPrompts", "Caption").Text)
-	assert(string.find(find("SpiderPrompts", "Status").Text, "has seen you", 1, true), find("SpiderPrompts", "Status").Text)
+	assert(not (find("SpiderPrompts", "Status").Visible and string.find(find("SpiderPrompts", "Status").Text, "has seen you", 1, true)), find("SpiderPrompts", "Status").Text)
 	for _ = 1, 60 * 12 do
 		frame(1 / 60)
 		if driver.motor.seized then seized = true break end
 	end
 	assert(seized, `the spider was never caught: {wasp.phase}`)
-	assert(string.find(find("SpiderPrompts", "Status").Text, "Stung", 1, true), find("SpiderPrompts", "Status").Text)
+	assert(not (find("SpiderPrompts", "Status").Visible and string.find(find("SpiderPrompts", "Status").Text, "Stung", 1, true)), find("SpiderPrompts", "Status").Text)
 	wasp.speed = 1e6 -- the carry, skipped
 	for _ = 1, 60 do
 		frame(1 / 60)
@@ -325,6 +385,7 @@ end)
 check("the peacock spider: C in the crack changes spider, X dances, any move, jump or Cancel stops it; the first spider never sees the dance", function()
 	local driver = ClientStubs.driver
 	local life = driver.life
+	life.clock.day = 1 -- (ROBLOX-113: the crack's and the walk's hints read below are the first day's in Normal)
 	local function words(screen: string, name: string): string
 		local d = find(screen, name)
 		return if d and d.Visible then d.Text else ""
@@ -373,8 +434,8 @@ check("the peacock spider: C in the crack changes spider, X dances, any move, ju
 	assert(string.find(words("SpiderPrompts", "Caption"), "[a fine buzzing through your feet]", 1, true), "no felt caption in the rumble-rump: " .. words("SpiderPrompts", "Caption"))
 	assert((spider() - p0).Magnitude < 0.02, "the dance moved the spider")
 	frames(240)
-	local fan = driver.rig()._fan
-	assert(fan ~= nil and driver.rig().dance.fanOpen > 0.9 and fan.front[1].part.Size.X > 0.25, `the fan is not open at {driver.dance().t} s`)
+	local fan = driver.rig()._fan -- (its size at the look's growth: the peacock's first stage is 0.74 since ROBLOX-114)
+	assert(fan ~= nil and driver.rig().dance.fanOpen > 0.9 and fan.front[1].part.Size.X > 0.25 * driver.rig()._growth, `the fan is not open at {driver.dance().t} s`)
 	assert(string.find(words("SpiderPrompts", "Controls"), "courtship dance", 1, true) or not find("SpiderPrompts", "Controls").Visible, "the card")
 	-- Walking stops it at once and the pose is gone 0.2 s later.
 	key("Forward", true); frames(1)
@@ -416,15 +477,21 @@ check("the peacock spider: C in the crack changes spider, X dances, any move, ju
 	life.clock.hour = 12
 	key("Feed", true); frames(2); key("Feed", false); frames(2)
 	assert(life.resting, "no rest")
-	assert(string.find(words("SpiderPrompts", "PromptHint"), "RB: become the first spider", 1, true), words("SpiderPrompts", "PromptHint"))
+	assert(string.find(words("SpiderPrompts", "PromptHint"), "RB: become the ant-mimicking spider", 1, true), words("SpiderPrompts", "PromptHint"))
 	key("Eye", true); key("Eye", false); frames(3)
 	key("Display", true); frames(2); key("Display", false); frames(2)
-	assert(driver.appearance() == "first_spider" and workspace:FindFirstChild("Spider"):GetAttribute("AppearanceId") == "first_spider", "RB in the crack did not change spider")
+	assert(driver.appearance() == "myrmarachne_formicaria_female" and workspace:FindFirstChild("Spider"):GetAttribute("AppearanceId") == "myrmarachne_formicaria_female", "RB in the crack did not change to the ant-mimicking spider")
 	local anyVisible = false
 	for _, d in workspace:FindFirstChild("Spider"):GetChildren() do
 		if d:IsA("BasePart") and d.Name == "Cephalothorax" and d.LocalTransparencyModifier ~= 1 then anyVisible = true end
 	end
 	assert(not anyVisible, "the new rig did not keep the eye view")
+	-- ...and on through the two tarantulas (ROBLOX-81), then round to the first spider.
+	for _, step in { { "RB: become the Mexican redknee", "brachypelma_hamorii" }, { "RB: become the Greenbottle blue", "chromatopelma_cyaneopubescens" }, { "RB: become the first spider", "first_spider" } } do
+		assert(string.find(words("SpiderPrompts", "PromptHint"), step[1], 1, true), words("SpiderPrompts", "PromptHint"))
+		key("Display", true); frames(2); key("Display", false); frames(2)
+		assert(driver.appearance() == step[2] and workspace:FindFirstChild("Spider"):GetAttribute("AppearanceId") == step[2], `RB in the crack did not come on to {step[2]}`)
+	end
 	key("Eye", true); key("Eye", false); frames(3)
 	key("Feed", true); frames(2); key("Feed", false); frames(2)
 	game:GetService("UserInputService").LastInputTypeChanged:Fire(Enum.UserInputType.Keyboard)
@@ -439,6 +506,23 @@ check("wasp hum lasts through arrival, pauses, follows slow motion and silences 
 		s:updateWasp(d, false, 1, false)
 		assert(s.waspHum.Playing and s.waspHum.Parent == s.root and s.waspHum.Volume >= 0.3)
 	end
+	-- ROBLOX-92: the hum is moved to its emitter only when that changes, not every frame (re-parenting a playing sound can restart it): a later sibling stays last
+	local later = Instance.new("Folder")
+	later.Parent = s.root
+	s:updateWasp(d, false, 1, false)
+	local kids = s.root:GetChildren()
+	assert(kids[#kids] == later and s.waspHum.Parent == s.root, "the hum was not re-parented while it stays where it is")
+	later:Destroy()
+	-- ... and a recording that has not loaded is asked to play once, not every frame (ROBLOX-100: the audit's gate on IsLoaded is gone, the engine can leave
+	-- IsLoaded false for audio that plays; Playing is set at once by the one ask, so the next frames ask nothing more)
+	local cold = Soundscape.new(workspace)
+	;(cold.waspHum :: any).IsLoaded = false
+	cold:updateWasp(d, false, 1, false)
+	assert(cold.waspHum.Playing, "an unloaded hum is asked to play, and plays when it loads")
+	local plays = (cold.waspHum :: any).plays
+	cold:updateWasp(d, false, 1, false); cold:updateWasp(d, false, 1, false)
+	assert((cold.waspHum :: any).plays == plays, "a hum already asked to play is not asked again each frame")
+	cold:destroy()
 	s:updateWasp(d, true, 0.5, false); assert(not s.waspHum.Playing)
 	s:updateWasp(d, false, 0.5, false); assert(s.waspHum.Playing and s.waspHum.PlaybackSpeed == 0.5)
 	s:updateWasp(d, false, 1, true); assert(not s.waspHum.Playing)
@@ -505,6 +589,24 @@ check("main and free play keep independent last rests and restore their own rule
  d.openMenu();assert(d.menu:choose("Free"));frames(3)
  assert(d.session.mode=="free" and d.needs.gentle and d.needs.energy<.4)
  assert(d.fresh("main",false,nil))
+end)
+check("Run accepts simultaneous sources and clears on focus loss; no controller key conflict", function()
+	local Input = require("../src/Client/SpiderInput")
+	local seen = {}
+	for action, codes in Input.BINDINGS do
+		for _, code in codes do
+			local k = tostring(code)
+			assert(seen[k] == nil, `binding collision: {action} and {seen[k]} share {k}`)
+			seen[k] = action
+		end
+	end
+	local d = ClientStubs.driver
+	d.input:simulate("Run",true,"keyboard"); d.input:simulate("Run",true,"touch")
+	d.input:simulate("Run",false,"keyboard"); assert(d.input.held.Run, "keyboard release cancelled touch run")
+	d.input:simulate("Run",false,"touch"); assert(not d.input.held.Run, "Run stuck after release")
+	d.input:simulate("Run",true,"gamepad"); game:GetService("UserInputService").WindowFocusReleased:Fire()
+	assert(not d.input.held.Run, "Run stuck on focus loss")
+	assert(find("SpiderTouch","Run") ~= nil, "touch Run button missing")
 end)
 print(`CLIENT passed={passed} failed={failed}`)
 if failed > 0 then error("client smoke failed") end

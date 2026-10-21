@@ -9,6 +9,11 @@
 -- Time is compressed on purpose. A real Phidippus audax lives about a year; one life here is meant to take a few hours to
 -- play (LIFE-03: about 2 to 3 hours over roughly 10 game days).
 -- Checked against Godot's own values in tests/life_reference.json (tools/export_life_reference.gd).
+-- ROBLOX-94: how fast a region's day runs against the sill's is the game's rule, not Godot's: `LifeClock.game.clockScale` multiplies every advance of game
+-- hours (awake, asleep and moulting alike), 1.0 until the client sets it from the region the spider is in each frame (Client/WorldClient, from Shared/World/WorldMap;
+-- the sill is the only region so far and runs at 1.0; a garden region will run slower, docs/OPEN_WORLD_DESIGN.md). The rates above stay Godot's, and the goldens run
+-- at 1.0, which changes nothing, not even the last bit. It is a dial on the module and not a flag on a clock because it is never saved: hours are state, the rate is
+-- not, and a return to a rest builds a new clock that must run at the pace of where the spider now is, not where it rested.
 
 local LifeClock = {}
 LifeClock.__index = LifeClock
@@ -26,6 +31,8 @@ LifeClock.START_H = 9.0
 LifeClock.ACTIVE_HOURS_PER_S = 12.0 / (15.0 * 60.0)
 -- A night of sleep (about 11 hours) in about 8 seconds.
 LifeClock.SLEEP_HOURS_PER_S = 1.4
+-- The game's own rule (ROBLOX-94), not a recorded value: the pace of the day where the spider is now, against the rates above.
+LifeClock.game = { clockScale = 1.0 }
 
 export type Record = { day: number, hour: number, sleeping: boolean }
 
@@ -56,6 +63,15 @@ function LifeClock.new(): any
 	return setmetatable({ day = LifeClock.START_DAY, hour = LifeClock.START_H, sleeping = false }, LifeClock)
 end
 
+-- The dial, as a usable number: anything that is not a positive finite number runs at the sill's pace rather than stop or poison the clock.
+function LifeClock.currentScale(): number
+	local scale = LifeClock.game.clockScale
+	if type(scale) == "number" and scale > 0.0 and finite(scale) then
+		return scale
+	end
+	return 1.0
+end
+
 function LifeClock._addHours(self: any, hours: number)
 	self.hour += hours
 	while self.hour >= 24.0 do
@@ -71,7 +87,7 @@ function LifeClock.advance(self: any, seconds: number, asleep: boolean): number
 		return 0.0
 	end
 	local rate = if asleep then LifeClock.SLEEP_HOURS_PER_S else LifeClock.ACTIVE_HOURS_PER_S
-	local hours = seconds * rate
+	local hours = seconds * rate * LifeClock.currentScale()
 	if asleep then
 		local toMorning = self:hoursUntil(LifeClock.WAKE_H)
 		if toMorning <= hours then
@@ -87,14 +103,14 @@ function LifeClock.advance(self: any, seconds: number, asleep: boolean): number
 	return hours
 end
 
--- A moult passing: the hours run at the sleeping rate and do not stop at morning. Returns the hours that passed. (Moulting
--- itself is not ported yet; the clock keeps Godot's whole interface.)
+-- A moult passing: the hours run at the sleeping rate and do not stop at morning. Returns the hours that passed. (LifeLoop
+-- runs the moult on it.)
 function LifeClock.advanceMoult(self: any, seconds: number): number
 	if not finite(seconds) or seconds <= 0.0 then
 		return 0.0
 	end
 	self.sleeping = false
-	local hours = seconds * LifeClock.SLEEP_HOURS_PER_S
+	local hours = seconds * LifeClock.SLEEP_HOURS_PER_S * LifeClock.currentScale()
 	self:_addHours(hours)
 	return hours
 end

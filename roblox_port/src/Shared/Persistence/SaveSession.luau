@@ -40,16 +40,19 @@ export type Config = {
 function SaveSession.new(cfg: Config): any
 	local sched = SaveScheduler.new()
 	sched:track("progress", SaveRules.PROGRESS_DEBOUNCE)
-	sched:track("rest_main", SaveRules.REST_MIN_INTERVAL)
-	sched:track("rest_free", SaveRules.REST_MIN_INTERVAL)
+	local rkey: { [string]: string } = {}
+	for _, mode in SaveRules.MODES do
+		sched:track("rest_" .. mode, SaveRules.REST_MIN_INTERVAL)
+		rkey[mode] = `{SaveRules.KEY_REST}{cfg.userId}_{mode}`
+	end
 	return setmetatable({
 		cfg = cfg, backend = cfg.backend, id = cfg.sessionId, now = cfg.now, pspec = cfg.progressSpec or SaveProgress.SPEC,
 		pkey = SaveRules.KEY_PROGRESS .. tostring(cfg.userId),
-		rkey = { main = `{SaveRules.KEY_REST}{cfg.userId}_main`, free = `{SaveRules.KEY_REST}{cfg.userId}_free` },
+		rkey = rkey,
 		sched = sched,
 		state = "loading", reason = nil :: string?, canRetry = false, retryAt = 0,
 		progress = SaveProgress.default(), progressTime = 0, storedTime = 0,
-		rests = { main = nil, free = nil } :: { [string]: any },
+		rests = {} :: { [string]: any },
 		restBase = {} :: { [string]: number }, -- updatedAt of the rest this session last read or wrote (nil: unknown)
 		restPending = {} :: { [string]: any }, restPendingTime = {} :: { [string]: number },
 		restLoaded = {} :: { [string]: boolean }, restRetryAt = 0,
@@ -68,6 +71,14 @@ local function lockNow(self: any, now: number): { [string]: any }
 	return { session = self.id, beat = now }
 end
 
+-- Every slot's rest has been read (or found missing) at least once.
+function SaveSession.restsLoaded(self: any): boolean
+	for _, mode in SaveRules.MODES do
+		if not self.restLoaded[mode] then return false end
+	end
+	return true
+end
+
 function SaveSession.isActive(self: any): boolean
 	return self.state == "active"
 end
@@ -75,10 +86,10 @@ end
 function SaveSession.status(self: any): (string, string?)
 	if self.state == "session" then return SaveRules.STATUS.session, self.reason end
 	if self.state == "loading" then return SaveRules.STATUS.saving, nil end
-	if self.busy or self.sched:anyDirty() or not self.restLoaded.main or not self.restLoaded.free then
+	if self.busy or self.sched:anyDirty() or not SaveSession.restsLoaded(self) then
 		local trouble = false
-		for _, name in { "progress", "rest_main", "rest_free" } do
-			if self.sched.items[name].dirty and self.sched.items[name].failures >= 3 then trouble = true end
+		for _, item in self.sched.items do
+			if item.dirty and item.failures >= 3 then trouble = true end
 		end
 		return SaveRules.STATUS.saving, if trouble then "write_failed" else nil
 	end
@@ -251,7 +262,7 @@ function SaveSession.setProgress(self: any, payload: any): boolean
 end
 
 function SaveSession.setRest(self: any, mode: string, record: any): boolean
-	if self.closed or (mode ~= "main" and mode ~= "free") then return false end
+	if self.closed or SaveRest.SPECS[mode] == nil then return false end
 	local problems = SaveRest.check(mode, record)
 	if #problems > 0 then
 		self.counters.rejected += 1
@@ -439,9 +450,10 @@ local function stepInner(self: any): boolean
 			writeProgress(self, false) -- also renews the lock
 		elseif self.sched:heartbeatDue(now) then
 			heartbeat(self)
-		elseif not self.restLoaded.main or not self.restLoaded.free then
+		elseif not SaveSession.restsLoaded(self) then
 			if now >= self.restRetryAt and self.sched:budgetOk(now) then
-				local before = { main = self.rests.main, free = self.rests.free }
+				local before: { [string]: any } = {}
+				for _, mode in SaveRules.MODES do before[mode] = self.rests[mode] end
 				readRests(self)
 				for _, mode in SaveRules.MODES do
 					if self.rests[mode] ~= nil and before[mode] == nil then
@@ -452,12 +464,15 @@ local function stepInner(self: any): boolean
 			else
 				did = false
 			end
-		elseif self.sched:due("rest_main", now) then
-			writeRest(self, "main")
-		elseif self.sched:due("rest_free", now) then
-			writeRest(self, "free")
 		else
 			did = false
+			for _, mode in SaveRules.MODES do
+				if self.sched:due("rest_" .. mode, now) then
+					writeRest(self, mode)
+					did = true
+					break
+				end
+			end
 		end
 	else
 		did = false
@@ -481,7 +496,9 @@ end
 -- The state to hand the client: progress, the rests found, and the status.
 function SaveSession.snapshot(self: any): any
 	local status, reason = self:status()
-	return { status = status, reason = reason, progress = self.progress, rests = { main = self.rests.main, free = self.rests.free } }
+	local rests: { [string]: any } = {}
+	for _, mode in SaveRules.MODES do rests[mode] = self.rests[mode] end
+	return { status = status, reason = reason, progress = self.progress, rests = rests }
 end
 
 -- Leaving/shutdown keeps ownership until the pending records finish; a new visit must not load half a flush.

@@ -24,6 +24,8 @@ local SaveScheduler = require("../src/Shared/Persistence/SaveScheduler")
 local SaveSession = require("../src/Shared/Persistence/SaveSession")
 local DataStoreBackend = require("../src/Server/DataStoreBackend")
 local SaveService = require("../src/Server/SaveService")
+local Appearances = require("../src/Shared/Data/Appearances")
+local SpiderChoice = require("../src/Shared/Rig/SpiderChoice")
 
 local passed, failed = 0, 0
 local STATE_TRACE = false
@@ -63,11 +65,11 @@ local function newWorld(seed: number?, mode: string?): any
 	local memory = ObservationMemory.new()
 	local sensor = Sensor.new(memory)
 	sensor:configureFrom(Species.phidippus_audax_prototype.perception)
-	local needs = NeedsModel.new(true, mode == "free")
+	local needs = NeedsModel.new(true, mode == "free" or mode == "easy")
 	prey.feeding.needs = needs
 	local w: any = { motor = motor, prey = prey, sensor = sensor, memory = memory, needs = needs }
 	w.life = LifeLoop.new(needs, function() return { ok = true, message = "" } end)
-	if mode == "free" then w.life.mode, w.life.rules = "free", "gentle" end
+	if mode == "free" then w.life.mode, w.life.rules = "free", "gentle" elseif mode == "easy" then w.life.mode, w.life.rules = "main", "gentle" end
 	motor:place(HOME, Vector3.yAxis, Vector3.new(1, 0, 0))
 	return w
 end
@@ -189,6 +191,46 @@ case("the rest check refuses what is not a whole, sensible rest, and never raise
 	refused("another windowsill", "main", mutated(function(c) c.content_revision = "windowsill-roblox-0" end))
 	refused("a missing world", "main", mutated(function(c) c.world = nil end))
 	refused("a spider outside the sill", "main", mutated(function(c) c.player.position = { 9999, 0, 0 } end))
+	-- The record of the world the rest was made in (ROBLOX-94): a rest of a place this world does not have, or of changes this game does not know, is refused; one from before the record, or from another
+	-- revision of the world, is not (it is put back at the region's spawn when it is used).
+	refused("a region the world does not have", "main", mutated(function(c) c.world_map.region = "moon" end))
+	refused("a retreat of another region", "main", mutated(function(c) c.world_map.retreat = "garden_hollow" end))
+	refused("a seed that is not a number", "main", mutated(function(c) c.world_map.seed = 0 / 0 end))
+	refused("changes to the world this game does not know", "main", mutated(function(c) c.world_map.diffs = { { id = "stone_1", moved = { 1, 2, 3 } } } end))
+	refused("a world record that is not a table", "main", mutated(function(c) c.world_map = "sill" end))
+	check(#SaveRest.check("main", mutated(function(c) c.world_map = nil end)) == 0, "a rest from before the world record is accepted, as the sill's (of world-1: put back at the spawn when used, ROBLOX-95)")
+	-- ROBLOX-95: the regions outside the window. A rest under the bed's stone is a rest like the crack's; one that says the bed but lies outside it, or names the
+	-- sill's crack, is not.
+	local function inBed(c: any)
+		c.player.position = { 11, -89.69, -50 }
+		c.world_map.region, c.world_map.retreat, c.player.retreat_id = "bed_a", "bed_a_stone", "bed_a_stone"
+	end
+	check(#SaveRest.check("main", mutated(inBed)) == 0, "a rest under the bed's stone is accepted: " .. table.concat(SaveRest.check("main", mutated(inBed)), "; "))
+	refused("a bed rest outside the bed", "main", mutated(function(c) inBed(c); c.player.position = { 11, -89.69, -200 } end))
+	refused("a bed rest in the sill's crack", "main", mutated(function(c) inBed(c); c.world_map.retreat = "sill_crevice"; c.player.retreat_id = "sill_crevice" end))
+	refused("a rest in the bed's stone that says the sill", "main", mutated(function(c) inBed(c); c.world_map.region = "sill" end))
+	check(#SaveRest.check("main", mutated(function(c) c.world_map.revision = "world-0"; c.world_map.seed = 7 end)) == 0, "a rest from another revision or seed of the world is accepted: it is put back at the spawn when used")
+	-- ROBLOX-96: the garden root. An empty one (a world whose bed has not been made yet) is accepted; one naming a region without prey, or a region that is not a record, is refused.
+	local function withGarden(c: any, entries: { any })
+		table.insert(c.world.objects, { e = entries })
+		c.world.roots.garden = { ["$o"] = #c.world.objects }
+	end
+	check(#SaveRest.check("main", mutated(function(c) withGarden(c, {}) end)) == 0, "a rest with an empty garden root is accepted")
+	refused("a garden naming a region the map does not have", "main", mutated(function(c)
+		table.insert(c.world.objects, { e = {} })
+		withGarden(c, { { "moon", { ["$o"] = #c.world.objects } } })
+	end))
+	refused("a garden naming the sill, which has no generated prey", "main", mutated(function(c)
+		table.insert(c.world.objects, { e = {} })
+		withGarden(c, { { "sill", { ["$o"] = #c.world.objects } } })
+	end))
+	refused("a garden whose region is not a record", "main", mutated(function(c) withGarden(c, { { "bed_a", 7 } }) end))
+	refused("a garden whose bed's prey is not a prey director", "main", mutated(function(c)
+		table.insert(c.world.objects, { e = {} })
+		local plain = #c.world.objects
+		table.insert(c.world.objects, { e = { { "prey", { ["$o"] = plain } } } })
+		withGarden(c, { { "bed_a", { ["$o"] = #c.world.objects } } })
+	end))
 	refused("a non-unit normal", "main", mutated(function(c) c.player.normal = { 0, 5, 0 } end))
 	refused("NaN in the pose", "main", mutated(function(c) c.player.position = { 0 / 0, 1, 1 } end))
 	refused("an infinity", "main", mutated(function(c) c.player.gaze_pitch = math.huge end))
@@ -388,6 +430,29 @@ case("progress: a good record is kept, anything out of range or of the wrong typ
 	c.notebook.opened = { "bold_jumper", "a_page_from_a_newer_build" }
 	_, cl = SaveProgress.sanitize(c)
 	check(cl ~= nil and #cl.notebook.opened == 2, "an unknown but well-formed page id is kept")
+end)
+
+case("progress: every spider the game draws is a good appearance, the ant-mimicking spider included (ROBLOX-64)", function()
+	for id in Appearances.profiles do
+		local playable = table.find(SpiderChoice.ORDER, id) ~= nil -- the rival's look is drawn for the other spider and is never put on (ROBLOX-67)
+		local good = prog({ "bold_jumper" }, { appearance = id })
+		local problems, clean = SaveProgress.sanitize(good)
+		check(#problems == 0 and clean ~= nil and clean.appearance == id, `the appearance {id} is accepted and kept`)
+		check(#id <= SaveRules.MAX_ID_CHARS and string.match(id, "^[%w_]+$") ~= nil, `{id} is a short plain name`)
+		check(SpiderChoice.start(clean and clean.appearance, nil) == (if playable then id else "first_spider"), `{id} is {if playable then "a spider the client puts on" else "the rival's look and never put on"}`)
+	end
+	local ant = "myrmarachne_formicaria_female"
+	check(Appearances.profiles[ant] ~= nil and table.find(SpiderChoice.ORDER, ant) ~= nil, "the ant-mimicking spider is drawn and in the crack's cycle")
+	check(SaveProgress.merge(prog({}, { appearance = "first_spider" }), prog({}, { appearance = ant }), 10, 20).appearance == ant, "the newer choice of the ant-mimicking spider wins a merge")
+	check(SaveProgress.merge(prog({}, { appearance = ant }), prog({}, { appearance = "maratus_volans_male" }), 30, 20).appearance == ant, "and an older one does not undo it")
+	-- A spider this build does not draw (from a newer build) is kept in the record, and the client falls back to the first spider.
+	local future = prog({ "bold_jumper" }, { appearance = "a_spider_from_a_newer_build" })
+	local _, kept = SaveProgress.sanitize(future)
+	check(kept ~= nil and kept.appearance == "a_spider_from_a_newer_build" and SpiderChoice.start(kept.appearance, nil) == "first_spider", "an unknown spider id is kept, and not put on")
+	local bad = Json.copy(prog({ "bold_jumper" }, { appearance = ant }))
+	bad.appearance = ant .. "/../x"
+	local p1, c1 = SaveProgress.sanitize(bad)
+	check(#p1 > 0 and c1 == nil, "an appearance that is not a plain name is refused")
 end)
 
 case("progress: merging never loses a page, an adult or the longest eye time; the newer choice wins", function()
@@ -1625,6 +1690,105 @@ case("future settings versions never get silently downgraded", function()
 	run(e, a, 40)
 	a:flush()
 	check(canon(e.backend.data.P_89) == before, "future settings and their version remain byte-for-byte intact")
+end)
+
+-- ---------------------------------------------------------------------------------------------- the audit, part one (ROBLOX-91)
+case("the Easy slot: the main life on the gentle rules has its own rest, so beginning Easy cannot wipe the standard rest", function()
+	check(SaveRules.slotOf("main", "standard") == "main" and SaveRules.slotOf("main", "gentle") == "easy" and SaveRules.slotOf("free", "gentle") == "free", "the slot of each life: standard main keeps its key")
+	check(table.concat(SaveRules.MODES, ",") == "main,free,easy", "the slots, the old two first")
+	local std = realRest(120, "main")
+	local easy = realRest(120, "easy")
+	local free = realRest(120, "free")
+	check(easy.life_rules.mode == "main" and easy.life_rules.rules == "gentle", "(an Easy rest is a main life on the gentle rules)")
+	check(#SaveRest.check("easy", easy) == 0, "an Easy rest passes as the easy slot's: " .. table.concat(SaveRest.check("easy", easy), "; "))
+	check(#SaveRest.check("easy", std) > 0 and #SaveRest.check("easy", free) > 0, "a standard rest and a free one are not the easy slot's")
+	check(#SaveRest.check("free", easy) > 0, "an Easy rest is not a free one")
+	check(#SaveRest.check("main", std) == 0 and #SaveRest.check("free", free) == 0, "the standard slot and the free one are as they were")
+	check(#SaveRest.check("main", easy) == 0, "(an Easy rest saved before the slot existed was filed as main: it is still accepted there)")
+	check(SaveRest.SPECS.easy ~= nil and SaveRest.SPECS.easy.kind == "rest_easy" and #SaveRest.check("weekly", easy) > 0, "its own envelope kind; other names are refused")
+	-- stored apart, under the keys
+	local e = newEnv()
+	local a = newSession(e, 91, "A")
+	a:load()
+	check(a:setRest("main", std) and a:setRest("easy", easy) and a:setRest("free", free), "all three are accepted")
+	check(not a:setRest("easy", std) and not a:setRest("free", easy), "and the wrong slot refuses")
+	run(e, a, 40)
+	check(storedOf(e, "R_91_main", SaveRest.SPECS.main).status == "ok" and storedOf(e, "R_91_easy", SaveRest.SPECS.easy).status == "ok" and storedOf(e, "R_91_free", SaveRest.SPECS.free).status == "ok", "three values, apart")
+	check(canon(storedOf(e, "R_91_main", SaveRest.SPECS.main).payload) == canon(std), "the standard rest is as it was sent")
+	-- an Easy rest sent later does not touch the standard one
+	local easy2 = realRest(240, "easy")
+	a:setRest("easy", easy2)
+	run(e, a, 25)
+	check(canon(storedOf(e, "R_91_main", SaveRest.SPECS.main).payload) == canon(std), "a later Easy rest leaves the standard rest alone")
+	check(canon(storedOf(e, "R_91_easy", SaveRest.SPECS.easy).payload) == canon(easy2), "and replaces the Easy one")
+	check(select(1, a:status()) == "saved", "saved")
+	a:flush()
+	local b = newSession(e, 91, "B")
+	b:load()
+	check(canon(b.rests.main) == canon(std) and canon(b.rests.easy) == canon(easy2) and canon(b.rests.free) == canon(free), "a rejoin gets all three back")
+	local snap = b:snapshot()
+	check(snap.rests.main ~= nil and snap.rests.easy ~= nil and snap.rests.free ~= nil, "and the snapshot for the client has them")
+	-- an old player (two rests, no Easy): the missing slot reads as nothing, and everything else is as it was
+	local e2 = newEnv()
+	local old = newSession(e2, 92, "OLD")
+	old:load()
+	old:setRest("main", std)
+	run(e2, old, 25)
+	old:flush()
+	local back = newSession(e2, 92, "NEW")
+	check(back:load() == "active" and canon(back.rests.main) == canon(std) and back.rests.easy == nil and back.rests.free == nil, "a save with no Easy slot loads, and the standard rest is where it was")
+	check(select(1, back:status()) == "saved", "(and is saved)")
+end)
+
+case("shutdown with a player still loading: the departing count never goes negative, and the load's flush is awaited", function()
+	-- shutdown marks every entry as leaving; the entry whose load had not finished was uncounted by its loading thread without ever having been counted
+	local e = newEnv()
+	local srv = newServer(e)
+	srv.deferSpawn = true
+	local p = player(93)
+	srv.service:addPlayer(p)
+	local entry = srv.service.entries[p]
+	check(entry ~= nil and not entry.loaded, "the load has not run yet")
+	local lowest = 0
+	srv.service.cfg.sleep = function(seconds: number)
+		e.t += seconds
+		srv.drain()
+		lowest = math.min(lowest, srv.service.departing)
+	end
+	srv.service:shutdown()
+	lowest = math.min(lowest, srv.service.departing)
+	check(entry.loaded and entry.session.closed == true, "the load finished and its session was flushed and closed")
+	check(srv.service.departing == 0 and lowest >= 0, `the count ends at 0 and was never below it (lowest {lowest})`)
+	-- a player who leaves while loading, then the shutdown: counted once, uncounted once
+	local e2 = newEnv()
+	local srv2 = newServer(e2)
+	srv2.deferSpawn = true
+	local q = player(94)
+	srv2.service:addPlayer(q)
+	local entry2 = srv2.service.entries[q]
+	srv2.service:removePlayer(q)
+	check(srv2.service.departing == 1 and srv2.service.entries[q] == nil, "leaving while loading counts one departure")
+	srv2.service.cfg.sleep = function(seconds: number) e2.t += seconds; srv2.drain() end
+	srv2.service:shutdown()
+	check(srv2.service.departing == 0 and entry2.session.closed == true, "and the shutdown awaits it: one in, one out")
+	-- two players loading, one leaves: still balanced
+	local e3 = newEnv()
+	local srv3 = newServer(e3)
+	srv3.deferSpawn = true
+	local r1, r2 = player(95), player(96)
+	srv3.service:addPlayer(r1)
+	srv3.service:addPlayer(r2)
+	srv3.service:removePlayer(r1)
+	srv3.service.cfg.sleep = function(seconds: number) e3.t += seconds; srv3.drain() end
+	srv3.service:shutdown()
+	check(srv3.service.departing == 0, "a mix of a leaver and a shutdown: balanced")
+	-- a loaded player: unchanged (the count stays zero)
+	local e4 = newEnv()
+	local srv4 = newServer(e4)
+	local t = player(97)
+	srv4.service:addPlayer(t)
+	srv4.service:shutdown()
+	check(srv4.service.departing == 0, "a loaded player: unchanged")
 end)
 
 print(`STATE passed={passed} failed={failed}`)

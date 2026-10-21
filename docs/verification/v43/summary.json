@@ -1,0 +1,19 @@
+{
+  "source_commit": "f014636e214495e8a829e4005987d06401131113",
+  "build_info": "76c3d3822dfbddda",
+  "input": "immutable git archive",
+  "platform": "Windows",
+  "suite_count": 47,
+  "passed": 351194,
+  "failed": 0,
+  "exit_code": 0,
+  "native_studio": {
+    "passed": 245,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 520
+  },
+  "published_place": "120119801868085",
+  "published_version": 53,
+  "audio_grants_confirmed": true
+}

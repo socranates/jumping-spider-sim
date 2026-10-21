@@ -6,16 +6,38 @@ local Silk = {}
 Silk.__index = Silk
 local HEIGHT, RADIUS = 0.31, 0.30
 local DOWN = Vector3.new(0,-1,0)
+-- The game's own rule (ROBLOX-99), opt-in like NeedsModel.game and Data/Catch.game: how fast the spider lets itself down a line, as a share of Godot's
+-- reel speed (Species silk.reel_speed_wu_s, 1.5 studs a second either way). Nathan: "make the hang just go slower by default". Lowering (the stick back, or
+-- the drop key held) runs at `lowerScale` of it; reeling in keeps Godot's speed, so the climb back is as brisk as it was and the rig's head-up climb
+-- (look.hang.climb.speed) still trips. A controller never given the rule (Silk:useGameRules) replays Godot: the tether goldens and the box-world scenarios.
+-- ROBLOX-96: and how long a line may be. Godot's 20 studs (silk.max_line_length_wu) was never reached on the sill; the garden's first set piece is the let-down from
+-- the outer sill's front edge to the bed, 90 studs of brick, so the game's line is `maxLine` studs (a game value: jumping spiders do descend on draglines far
+-- farther than their body length, but no measured length is claimed here). Everything else about the line (the slack, the hang, the release) is Godot's.
+Silk.game = { lowerScale = 0.5, maxLine = 100 }
 
+-- ROBLOX-111: what the line did, counted for the self-test (a Studio run cannot be stepped through): the ticks on the line, how much line was let out
+-- and how far the body fell, the sweeps that stopped a move and what they took off it, the tangent touches let pass, and the push-outs of the skin. Never reset
+-- (a reader takes a copy and the difference); nothing reads it to decide anything.
+function Silk.newStats()
+	return { ticks = 0, letOut = 0, fell = 0, stops = 0, stopped = 0, grazes = 0, pushes = 0, pushed = 0, pushedUp = 0 }
+end
 function Silk.new(world, surfaces, tuning, gravity: number)
 	local params = RaycastParams.new()
 	params.FilterType = Enum.RaycastFilterType.Include
 	params.FilterDescendantsInstances = {world}
-	return setmetatable({world=world, surfaces=surfaces, params=params, maximum=tuning.max_line_length_wu,
-		speed=tuning.reel_speed_wu_s, gravity=gravity, mode="none", paid=0, rest=0, taut=false,
+	local overlap = OverlapParams.new()
+	overlap.FilterType = Enum.RaycastFilterType.Include
+	overlap.FilterDescendantsInstances = {world}
+	return setmetatable({world=world, surfaces=surfaces, params=params, overlap=overlap, maximum=tuning.max_line_length_wu,
+		speed=tuning.reel_speed_wu_s, lowerSpeed=tuning.reel_speed_wu_s, gravity=gravity, mode="none", paid=0, rest=0, taut=false,
 		anchor=Vector3.zero, normal=Vector3.yAxis, anchorPart=nil, bend=nil, bendPart=nil,
 		lowering=false, snagged=false, block="", message="", release=Math.newRelease(), walk=nil,
-		previous=Vector3.zero},Silk)
+		previous=Vector3.zero, stats=Silk.newStats()},Silk)
+end
+-- Opt in to the game's lowering (Silk.game): the let-down at lowerScale of the reel speed. Reeling in is untouched.
+function Silk.useGameRules(self: any)
+	self.lowerSpeed = self.speed * Silk.game.lowerScale
+	self.maximum = Silk.game.maxLine
 end
 function Silk.profile(self: any, hit)
 	return if hit then self.surfaces[hit.Instance:GetAttribute("ProfileId")] else nil
@@ -138,22 +160,89 @@ function Silk.startDrop(self: any, position: Vector3, up: Vector3, push: Vector3
 	return true
 end
 
+-- ROBLOX-107: the body's skin kept by overlap, not by the sweep alone. The real engine's Spherecast does not see a part the sphere starts in, and a
+-- sweep that begins within a hair of a face it is nearly tangent to can miss it (Studio, v35: the self-test's let-down from the outer sill's front edge hung
+-- 0.07 from the brick face, inside its 0.31 skin, where the box world keeps it at 0.31). Once inside the skin nothing pushed it out. So after each move the
+-- body is pushed out of any box of the world it overlaps, by the shortest way out of the nearest point of that box (never through it: a centre already
+-- inside a box is left alone), and the velocity into it is taken away. A box the body is touching (within a thousandth of its radius) that it could land on
+-- by the sweep's own rule is a landing, as the sweep's contact would have been. Boxes only (a Part whose Shape is Block; the world's walkable pieces are
+-- all boxes). With the box world's exact sweeps the body is never inside its skin, so this changes nothing there.
+local SKIN = RADIUS + 0.01
+function Silk.unstick(self: any, position: Vector3, velocity: Vector3, intent: number): (Vector3, Vector3, any)
+	local p, v = position, velocity
+	local ok, parts = pcall(function() return workspace:GetPartBoundsInRadius(p, SKIN, self.overlap) end)
+	if not ok or parts == nil then return p, v, nil end
+	for _, part in parts do
+		local inst = part :: any
+		local shape = if inst.ClassName == "Part" then inst.Shape else nil
+		if inst:IsA("BasePart") and inst.ClassName == "Part" and (shape == nil or shape == Enum.PartType.Block) then
+			local half = inst.Size * 0.5
+			local localP = inst.CFrame:PointToObjectSpace(p)
+			local near = Vector3.new(math.clamp(localP.X, -half.X, half.X), math.clamp(localP.Y, -half.Y, half.Y), math.clamp(localP.Z, -half.Z, half.Z))
+			local out = localP - near
+			local d = out.Magnitude
+			if d > 1e-6 and d < SKIN - 1e-4 then
+				local n = inst.CFrame:VectorToWorldSpace(out / d)
+				local contact = { Instance = inst, Position = inst.CFrame:PointToWorldSpace(near), Normal = n, Distance = 0 }
+				local stats = self.stats
+				stats.pushes += 1; stats.pushed += SKIN - d; stats.pushedUp += n.Y * (SKIN - d)
+				p += n * (SKIN - d)
+				v -= n * math.min(0, v:Dot(n))
+				if d < RADIUS + 1e-3 and self:landable(contact, p, intent) then return p, Vector3.zero, contact end
+			end
+		end
+	end
+	return p, v, nil
+end
+-- The sweep's landing rule: an attachable surface; while letting down, only ground under the body below the anchor (and not on a reel in).
+function Silk.landable(self: any, hit, p: Vector3, intent: number): boolean
+	local profile = self:profile(hit)
+	local allowed = not self.lowering or intent > 0 or (hit.Normal.Y >= 0.707 and hit.Position.Y <= self.anchor.Y - 0.5 and self:groundUnder(p, hit))
+	return profile ~= nil and profile.attachable == true and allowed
+end
+-- ROBLOX-107: while letting down, a landing needs ground under the body. The sweep can meet the rounded edge of a box that another box covers (the brick
+-- wall's top under the outer sill's slab, y -3: Studio, v35, "left the line 2.0 s into the let-down, at (2.00, -2.70, -24.07)"), with a normal steep enough to
+-- pass the landing rule; the spider then stood on a sliver no one can see. A ray straight down from the body's centre must meet the part it touched
+-- within the legs' reach, as standing on it asks; otherwise it slides on.
+function Silk.groundUnder(self: any, p: Vector3, hit): boolean
+	local under = workspace:Raycast(p, DOWN * (HEIGHT + 0.35), self.params)
+	return under ~= nil and under.Instance == hit.Instance
+end
+
+-- ROBLOX-111: a contact the move could not have reached. A sweep that reports a face the body is moving along or away from, or one nearer the face than the body
+-- now is by less than the move goes into it, is the engine's tangent touch, not a contact: in exact geometry a sphere outside a box meets it only by closing the gap
+-- (the box world's sweeps never report one, so nothing changes there). Studio, v36: the let-down from the outer sill's front edge, the body hanging plumb 0.31 off
+-- the brick face, ran at 0.559 studs a second where the box world's is 0.752; a sweep that stops the body on such a touch loses the tick's whole move (it
+-- slides once, and the slide meets the same face), so a touch on one tick in four is a quarter of the let-down. The skin is kept by the push-out below.
+function Silk.grazing(hit, p: Vector3, motion: Vector3): boolean
+	local n = hit.Normal
+	local into = -motion:Dot(n)
+	if into <= 1e-4 then return true end
+	local gap = (p - hit.Position):Dot(n) - RADIUS
+	return into < gap - 1e-3
+end
 -- Sweep the body, then slide once. Never satisfy a constraint by teleporting through a wall.
 function Silk.move(self: any, position: Vector3, motion: Vector3, velocity: Vector3, intent: number)
 	local p=position
 	local remaining=motion
+	local stopped=false
 	for _=1,2 do
 		if remaining.Magnitude<1e-7 then break end
 		local hit=workspace:Spherecast(p,RADIUS,remaining,self.params)
+		if hit and Silk.grazing(hit,p,remaining) then self.stats.grazes+=1; hit=nil end
 		if not hit then p+=remaining; break end
 		-- Maintain a skin along the contact normal at grazing angles.
 		p=hit.Position+hit.Normal*(RADIUS+0.01)
-		local profile=self:profile(hit)
-		local allowed=not self.lowering or intent>0 or (hit.Normal.Y>=0.707 and hit.Position.Y<=self.anchor.Y-0.5)
-		if profile and profile.attachable and allowed then return p,Vector3.zero,hit end
+		if self:landable(hit,p,intent) then return p,Vector3.zero,hit end
 		local rest=remaining-remaining.Unit*math.min(hit.Distance,remaining.Magnitude)
 		remaining=rest-hit.Normal*rest:Dot(hit.Normal)
+		stopped=true
 		velocity-=hit.Normal*math.min(0,velocity:Dot(hit.Normal))
+	end
+	if stopped then -- (ROBLOX-111: the counts: a stop, and how much of the move along its own direction it took away)
+		local length=motion.Magnitude
+		self.stats.stops+=1
+		if length>1e-9 then self.stats.stopped+=math.max(0,length-(p-position):Dot(motion/length)) end
 	end
 	-- While lowering alongside the launch wall, a nearly tangent native sweep can
 	-- miss a shallow contact. Maintain the wall's skin without grabbing it again.
@@ -168,20 +257,26 @@ function Silk.move(self: any, position: Vector3, motion: Vector3, velocity: Vect
 			end
 		end
 	end
+	local touched
+	p,velocity,touched=self:unstick(p,velocity,intent)
+	if touched then return p,Vector3.zero,touched end
 	return p,velocity,nil
 end
 function Silk.step(self: any, position: Vector3, velocity: Vector3, intent: number, releaseDown: boolean)
 	if self.mode~="locked" or not self:refresh() then return position,velocity,nil end
+	local stats=self.stats
+	stats.ticks+=1
 	if Math.releaseTick(self.release,true,releaseDown) then
 		self:clear(); self.message="Silk released"; return position,velocity,nil
 	end
 	if intent<=0 and self.block=="blocked" then self.block="" end
 	local oldRest=self.rest
-	if intent<0 or (self.block=="" and not self.snagged) then self.rest=Math.reel(self.rest,self:prefix(),self.maximum,intent,self.speed) end
+	-- (ROBLOX-99: letting down runs at the game's lowering speed, reeling in at Godot's; both are the reel speed until useGameRules.)
+	if intent<0 or (self.block=="" and not self.snagged) then self.rest=Math.reel(self.rest,self:prefix(),self.maximum,intent,if intent<0 then self.lowerSpeed else self.speed) end
 	-- "Shortest" only when a reel actually ran and could not shorten (Godot sets it inside its not-snagged reel branch);
 	-- a snag while swinging under a leaf must not leave reeling refused once the line is clear again (ROBLOX-10).
 	if intent>0 and not self.snagged and self.rest>=oldRest-1e-6 and self.block=="" then self.block="shortest" end
-	if intent<0 and self.rest>oldRest then self.block="" end
+	if intent<0 and self.rest>oldRest then self.block=""; stats.letOut+=self.rest-oldRest end
 	local p=position
 	-- A padded bend can leave the shortest line just below the lip. Acquire a nearby
 	-- real face with the legs (0.6 stud reach), never through an intervening obstacle.
@@ -228,6 +323,7 @@ function Silk.step(self: any, position: Vector3, velocity: Vector3, intent: numb
 		local ke=0.5*velocity:Dot(velocity)
 		velocity*=if ke>1e-12 then math.sqrt(math.clamp((energy-self.gravity*p.Y)/ke,0,1)) else 0
 	end
+	stats.fell+=position.Y-p.Y
 	local path=self:path(p)
 	self.paid=math.min(math.max(self.paid,path),self.rest)
 	self.taut=path>=self.rest-0.003

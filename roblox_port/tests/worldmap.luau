@@ -366,14 +366,14 @@ case("the keep-out boxes", function()
 	local leaf = Region.keepOut(a)
 	check(#leaf == 1 and leaf[1].min.X < a.retreats[1].min.X and leaf[1].max.Y > a.retreats[1].max.Y and #Region.keepOut(WorldMap.region("wall_west") :: WorldMap.Region) == 0,
 		"(ROBLOX-107) a chunk of the bushes: the gap under its dead leaf and a margin; the wall west of the window: none")
-	check(not pcall(Region.keepOut, { id = "pond_1", kind = "pond", retreats = {} } :: any), "a kind with no generator has none")
+	check(not pcall(Region.keepOut, { id = "lagoon_1", kind = "lagoon", retreats = {} } :: any), "a kind with no generator has none (ROBLOX-122: the pond is a kind now; the example is a lagoon)")
 end)
 
 case("part budgets", function()
 	check(Region.budget("sill", "full") == 1261 and Region.budget("sill", "low") == 363,
 		"the sill reports what its decor builds now (ROBLOX-103: 1178 and 314 before the bushes, the bungalows and the fences; ROBLOX-112: 1253 and 355 before the window's upper lights; ROBLOX-114: 1260 and 362 before the ground beyond the back fence)")
 	check((Region.budget("sill", "low") :: number) < (Region.budget("sill", "full") :: number) * 0.6, "the low tier is a good deal thinner")
-	check(Region.budget("pond", "full") == nil and Region.budget("sill", "medium") == nil, "a kind with no budget, or a tier that is not one, has none")
+	check(Region.budget("lagoon", "full") == nil and Region.budget("sill", "medium") == nil, "a kind with no budget, or a tier that is not one, has none (ROBLOX-122: the pond is a kind now)")
 	for _, kind in { "outer_sill", "house_wall", "bed", "wall_upper", "eaves", "wall_west", "wall_west_upper", "eaves_west", "shrub", "counter", "kitchen_floor" } do
 		local full, low = Region.budget(kind, "full") :: number, Region.budget(kind, "low") :: number
 		check(full == Garden.BUDGETS[kind].full and low == Garden.BUDGETS[kind].low and low <= full, `{kind}: {full} drawn parts at full, {low} at low`)

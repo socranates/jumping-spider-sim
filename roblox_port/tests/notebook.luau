@@ -44,11 +44,12 @@ local STABLE = {
 	"the_cat", -- (ROBLOX-118)
 	"crab_spider", -- (ROBLOX-119)
 	"robin", "field_crickets", -- (ROBLOX-120)
+	"water", "green_frog", "midges", "mosquitoes", "damselflies", "water_striders", "green_darner", -- (ROBLOX-122)
 }
 do
 	local book = FieldNotebook.new()
 	check(#book.dropped == 0, "no page was left out for a missing field or an unknown trigger")
-	check(#book.pages == #ref.pages + 18 and #ref.pages == 24, `all of Godot's {#ref.pages} pages are here, then the peacock page, the ant-mimic page, the eggs-and-wind page, the tarantula page, the ground-life page, the bestiary's four (ROBLOX-101), its ambient four (ROBLOX-105), the hoverflies (ROBLOX-117), the cat (ROBLOX-118), the crab spider (ROBLOX-119), the robin and the field cricket (ROBLOX-120) ({#book.pages})`)
+	check(#book.pages == #ref.pages + 25 and #ref.pages == 24, `all of Godot's {#ref.pages} pages are here, then the peacock page, the ant-mimic page, the eggs-and-wind page, the tarantula page, the ground-life page, the bestiary's four (ROBLOX-101), its ambient four (ROBLOX-105), the hoverflies (ROBLOX-117), the cat (ROBLOX-118), the crab spider (ROBLOX-119), the robin and the field cricket (ROBLOX-120), the pond's seven (ROBLOX-122) ({#book.pages})`)
 	check(#book.pages >= 12, "there is a first set of pages")
 	check(same(ids((function() local l = {} for _, p in book.pages do table.insert(l, { id = p.id, title = p.title }) end return l end)()), STABLE), "the page ids are the stable ones, in Godot's order")
 	local seen: { [string]: boolean } = {}
@@ -87,8 +88,9 @@ do
 	check(same(adapted, ADAPTED), "exactly these pages have a Roblox 'In this game' line: " .. table.concat(adapted, ", "))
 	check(same(revised, REVISED), "exactly these pages have a corrected text: " .. table.concat(revised, ", "))
 	-- Every trigger a page names is one the notebook has; Godot's list is whole.
-	local triggers = { "start", "jump", "jump_far", "jump_long", "eye_view", "eye_time_20", "eye_time_60", "shimmer", "fly_recognised", "catch", "meal", "felt", "buzz", "rest", "sleep", "hungry", "well_fed", "moult_ready", "moulted", "adult", "wasp", "wasp_escaped", "wasp_caught", "starving", "dance", "antennae", "hatched", "tarantula", "garden_bed", "look_springtail", "look_leafhopper", "look_moth", "look_crane_fly", "look_ladybird", "look_millipede", "look_snail", "look_harvestman", "look_hoverfly", "cat", "crab_spider", "robin", "look_cricket" }
-	check(same(NotebookPages.triggers, triggers), "the trigger list is Godot's, then the eighteen the Roblox game added (dance, antennae, hatched, tarantula, garden_bed, the ten close looks, the cat, the crab spider and the robin)")
+	local triggers = { "start", "jump", "jump_far", "jump_long", "eye_view", "eye_time_20", "eye_time_60", "shimmer", "fly_recognised", "catch", "meal", "felt", "buzz", "rest", "sleep", "hungry", "well_fed", "moult_ready", "moulted", "adult", "wasp", "wasp_escaped", "wasp_caught", "starving", "dance", "antennae", "hatched", "tarantula", "garden_bed", "look_springtail", "look_leafhopper", "look_moth", "look_crane_fly", "look_ladybird", "look_millipede", "look_snail", "look_harvestman", "look_hoverfly", "cat", "crab_spider", "robin", "look_cricket",
+		"water", "frog", "look_midge", "look_mosquito", "look_damselfly", "look_skater", "darner" }
+	check(same(NotebookPages.triggers, triggers), "the trigger list is Godot's, then the twenty-five the Roblox game added (dance, antennae, hatched, tarantula, garden_bed, the fourteen close looks, the cat, the crab spider, the robin, the water, the frog and the darner)")
 	for _, p in book.pages do check(table.find(NotebookPages.triggers, p.trigger) ~= nil, `page {p.id} names a trigger the notebook has`) end
 	-- The eggs-and-wind page (ROBLOX-80): its own trigger, honest sources, and the peacock page no longer says there is no mating simulation.
 	do
@@ -154,6 +156,14 @@ do
 			{ "crab_spider", "crab_spider", 3, { "Misumena vatia", "first two pairs of legs held open", "10 to 25 days", "goldenrod" }, { "yarrow", "drop clear", "the game's" } }, -- (ROBLOX-119)
 			{ "robin", "robin", 3, { "20 to 28 cm", "head cocked to one side", "by sight", "spiders", "pick! tut-tut-tut" }, { "shadow", "keeping still", "the game's" } }, -- (ROBLOX-120)
 			{ "field_crickets", "look_cricket", 3, { "Gryllus pennsylvanicus", "15 to 25 mm", "mostly at night", "ears are on its front legs" }, { "three houseflies", "kicks hard", "the game's" } }, -- (ROBLOX-120)
+			-- (ROBLOX-122: the pond's)
+			{ "water", "water", 3, { "166 species", "only two jumping spiders rowed", "ripples" }, { "no place to stand", "drowns", "always pulled out", "the game's" } },
+			{ "green_frog", "frog", 4, { "Lithobates clamitans", "5 to 10 cm", "sitting and waiting", "spiders", "0.07 seconds" }, { "Keep still", "the game's" } },
+			{ "midges", "look_midge", 2, { "Chironomidae", "do not bite", "swarms in the evening", "bloodworms" }, { "a third of a housefly", "the game's" } },
+			{ "mosquitoes", "look_mosquito", 2, { "Only female mosquitoes take blood", "wrigglers", "Evarcha culicivora" }, { "None bites you", "a third of a housefly" } },
+			{ "damselflies", "look_damselfly", 3, { "Ischnura verticalis", "22 to 30 mm", "four wings together", "three times its own length" }, { "two and a half", "thrashes", "the game's" } },
+			{ "water_striders", "look_skater", 3, { "Gerridae", "surface film", "spiders", "ripples" }, { "not your prey" } },
+			{ "green_darner", "darner", 1, { "Anax junius", "6.8 to 8 cm", "catch flying insects" }, { "no danger to you" } },
 		}
 		for _, w in want do
 			local page: any
@@ -539,11 +549,14 @@ do
 	w:onCat() -- (ROBLOX-118: the ranger's cat noticed the spider)
 	w:onCrab() -- (ROBLOX-119: the spider came close to a crab spider)
 	w:onBird() -- (ROBLOX-120: the robin was told to the spider)
+	w:onFrog() -- (ROBLOX-122: the green frog noticed the spider)
+	w:onWater() -- (ROBLOX-122: the spider fell into the pond)
+	w:onDarner() -- (ROBLOX-122: the green darner passed near)
 	w:antennae(AntMimic.noticeSeconds)
 	w:step(view({ captures = 1, taken = 0.3, energy = 0.0, flies = { flyA }, region = "bed" })) -- (ROBLOX-96: the first step onto a garden bed)
 	do -- (ROBLOX-101: a close look at each of the bestiary's four)
 		local near = {}
-		for i, kind in { "springtail", "leafhopper", "moth", "crane_fly", "hoverfly", "cricket" } do
+		for i, kind in { "springtail", "leafhopper", "moth", "crane_fly", "hoverfly", "cricket", "midge", "mosquito", "damselfly" } do
 			local f = fly("k" .. i, Vector3.new(1, 0, 0), false)
 			f.profile = { body = { prey_kind = kind } }
 			table.insert(near, f)
@@ -552,7 +565,7 @@ do
 	end
 	do -- (ROBLOX-105: and at each of the ambient four)
 		local bugs = {}
-		for i, kind in { "ladybird", "millipede", "snail", "harvestman" } do table.insert(bugs, { id = "a" .. i, kind = kind, position = Vector3.new(1, 0, 0), hidden = false }) end
+		for i, kind in { "ladybird", "millipede", "snail", "harvestman", "skater" } do table.insert(bugs, { id = "a" .. i, kind = kind, position = Vector3.new(1, 0, 0), hidden = false }) end
 		w:step(view({ captures = 1, taken = 0.3, energy = 0.0, flies = { flyA }, region = "bed", bugs = bugs }))
 	end
 	local unopened: { string } = {}
@@ -560,7 +573,7 @@ do
 	local unwired: { string } = {}
 	for trigger in NotebookWatch.UNWIRED do table.insert(unwired, trigger) end
 	check(same(unopened, { "felt", "dance", "hatched", "tarantula" }) and same(unwired, { "felt" }), "watcher covers all pages except unwired felt and the client-owned dance, hatching and tarantula: left over: " .. table.concat(unopened, ", "))
-	check(#nb.opened == 38, `the long game opened 38 pages, the bestiary's eight, the hoverflies, the cat, the crab spider, the robin and the cricket with them ({#nb.opened})`)
+	check(#nb.opened == 45, `the long game opened 45 pages, the bestiary's eight, the hoverflies, the cat, the crab spider, the robin, the cricket and (ROBLOX-122) the pond's seven with them ({#nb.opened})`)
 end
 
 -- ---------------------------------------------------------------- the words and the layout (pure)

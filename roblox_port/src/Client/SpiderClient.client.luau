@@ -143,6 +143,13 @@ local M = {
 	bird = (nil :: any), birdBody = (nil :: any), birdSeen = (nil :: number?),
 	-- ROBLOX-120: the field crickets' song: how loud the nearest singing one is to the spider (0..1, for BirdBody's chirp voice), set by the HUD's caption each frame.
 	PreyKinds = require(Shared.Prey.PreyKinds), chirp = 0.0,
+	-- ROBLOX-122: the pond's edge: the water a spider cannot walk on (Life/Water, its words UI/WaterText; `waterTop` the highest the body was since it last stood,
+	-- for a fall's height), the green frog on its seat (Predator/Frog, its words UI/FrogText; `frogAt` where its tongue last struck), both drawn by Client/PondBodies
+	-- with the green darner (World/Pond.darner); made in the preserve only.
+	Pond = require(Shared.World.Pond),
+	Water = require(Shared.Life.Water), WaterText = require(Shared.UI.WaterText), water = (nil :: any), waterTop = (nil :: number?), waterSafe = (nil :: any),
+	Frog = require(Shared.Predator.Frog), FrogText = require(Shared.UI.FrogText), frog = (nil :: any), frogAt = (nil :: Vector3?),
+	PondBodies = require(script.Parent.PondBodies), pondBodies = (nil :: any),
 }
 M.lock = M.LockOn.new()
 local focusState = FocusState.new()
@@ -248,6 +255,11 @@ local waspBody = WaspBody.new(Workspace)
 if M.World.world == "preserve" then M.cat = M.Cat.new(M.catSeed); M.catBody = M.CatBody.new(Workspace, detail); M.cat.enabled = script.Parent:FindFirstChild("SilkPlayback") == nil end
 if M.World.world == "preserve" then M.crab = M.CrabSpider.new(require(Shared.World.WorldMap).seed(914, "crab_spider")); M.crabBody = M.CrabBody.new(Workspace, detail) end -- (ROBLOX-119)
 if M.World.world == "preserve" then M.bird = M.Bird.new(require(Shared.World.WorldMap).seed(914, "bird")); M.birdBody = M.BirdBody.new(Workspace, detail) end -- (ROBLOX-120)
+if M.World.world == "preserve" then -- (ROBLOX-122)
+	M.water = M.Water.new(require(Shared.World.WorldMap).seed(914, "water"))
+	M.frog = M.Frog.new(require(Shared.World.WorldMap).seed(914, "frog"))
+	M.pondBodies = M.PondBodies.new(Workspace, detail)
+end
 -- LIFE (ROBLOX-24): the windowsill runs the life clock, so hunger runs by its hours (NeedsModel life mode, Standard rules to begin with; Easy and Free play
 -- switch the model to the gentle rules in applyRules, ROBLOX-91). Feeding grants into the same model. The loop keeps the rest, sleep, daylight and the eyes' reach.
 local needs = NeedsModel.new(true, false)
@@ -299,7 +311,7 @@ local function modal(): boolean
 end
 -- S01-C retreat checkpoints (ROBLOX-25): resting in the crack, and each morning, keeps one; Backspace / View returns to it. The
 -- store is DataStore-shaped but in memory only: a checkpoint lasts the session. No live DataStore is written.
-local checkpointWorld: Checkpoint.World = { motor = motor, prey = prey, sensor = sensor, memory = memory, needs = needs, life = life, wasp = wasp, breakaway = breakaway, garden = M.World.garden, cat = M.cat }
+local checkpointWorld: Checkpoint.World = { motor = motor, prey = prey, sensor = sensor, memory = memory, needs = needs, life = life, wasp = wasp, breakaway = breakaway, garden = M.World.garden, cat = M.cat, water = M.water }
 local function newStore(): any
 	return M.CheckpointStore.new(M.CheckpointStore.MemoryDataStore.new(), function(r: any): { string } return (Checkpoint.check(r, checkpointWorld)) end)
 end
@@ -839,8 +851,8 @@ local function presentEnd(immediate: boolean)
  table.insert(choices,{id="Another",text=mateLegs.Text.another(mateLegs.Mating.hasSac(life.mating))}) -- (ROBLOX-91: a new life; the brood is left behind)
  table.insert(choices,{id="Notebook",text=M.NotebookText.MENU_CHOICE})
  -- (ROBLOX-106: in Normal the last line says what the way back costs, the day since the rest, and that another spider is a new life; the night has its own words)
- panel:showChoices(if cause=="starved" then "The spider starved." elseif cause=="rival" then "The other spider caught you." elseif cause=="night" then M.LifeText.NIGHT_LINE elseif cause==M.CatText.CAUSE then M.CatText.LINE elseif cause==M.CrabText.CAUSE then M.CrabText.LINE elseif cause==M.BirdText.CAUSE then M.BirdText.LINE else M.WaspText.LINE,
-  if cause=="starved" then "It went too long without food." elseif cause=="rival" then "A hunter can become prey. You can return to your last rest." elseif cause=="night" then M.LifeText.NIGHT_SUB elseif cause==M.CatText.CAUSE then M.CatText.SUB elseif cause==M.CrabText.CAUSE then M.CrabText.SUB elseif cause==M.BirdText.CAUSE then M.BirdText.SUB else M.WaspText.SUB,
+ panel:showChoices(if cause=="starved" then "The spider starved." elseif cause=="rival" then "The other spider caught you." elseif cause=="night" then M.LifeText.NIGHT_LINE elseif cause==M.CatText.CAUSE then M.CatText.LINE elseif cause==M.CrabText.CAUSE then M.CrabText.LINE elseif cause==M.BirdText.CAUSE then M.BirdText.LINE elseif cause==M.FrogText.CAUSE then M.FrogText.LINE elseif cause==M.WaterText.CAUSE then M.WaterText.LINE else M.WaspText.LINE,
+  if cause=="starved" then "It went too long without food." elseif cause=="rival" then "A hunter can become prey. You can return to your last rest." elseif cause=="night" then M.LifeText.NIGHT_SUB elseif cause==M.CatText.CAUSE then M.CatText.SUB elseif cause==M.CrabText.CAUSE then M.CrabText.SUB elseif cause==M.BirdText.CAUSE then M.BirdText.SUB elseif cause==M.FrogText.CAUSE then M.FrogText.SUB elseif cause==M.WaterText.CAUSE then M.WaterText.SUB else M.WaspText.SUB,
   M.WaspText.summary(rec.hours,rec.meals,rec.wasp_visits,rec.wasp_escapes)..(if session.rules=="standard" then "\n"..M.LifeText.dayLost(hasRest) else ""),choices,immediate)
  panel:setTextScale(if setting("LargeText")==true then 1.5 else 1)
 end
@@ -1558,6 +1570,7 @@ local function updateHud(frameDt: number)
 		if heard then view.caption = heard end
 	end
 	-- (ROBLOX-120) the robin: its shadow sweeping over, and its call as it comes in and goes; the wasp's hum wins
+	if M.water ~= nil and M.water:struggling() and captionScale > 0 then view.caption = { text = M.WaterText.STRUGGLE, alpha = 1 } end -- (ROBLOX-122)
 	if M.bird ~= nil and captionScale > 0 and not wasp:isVisiting() then
 		if M.birdSeen ~= nil then M.birdSeen += frameDt; if M.birdSeen > 3 then M.birdSeen = nil end end
 		local call = M.bird:call(motor.pos)
@@ -1854,6 +1867,71 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 					end
 				end
 			end
+			-- ROBLOX-122: the water. A spider whose body goes under the pond's surface struggles there (held at the surface, the striders drawn by its ripples) and then
+			-- gets out onto what it could reach, or drowns (the standard rules; the gentle ones always pull it out): Life/Water's seeded draw.
+			if M.water ~= nil then
+				M.water.gentle = needs.gentle
+				if motor.mode == "attached" then M.waterTop = motor.pos.Y elseif motor.pos.Y > (M.waterTop or -math.huge) then M.waterTop = motor.pos.Y end
+				if not M.water:struggling() and not motor.seized and not (life.lifeOver or modal()) and M.Pond.inWater(motor.pos) then
+					local boxes = {}
+					local r = M.World.region
+					if r ~= nil then
+						for _, p in M.Region.pieces(r) do table.insert(boxes, p) end
+						for _, n in r.neighbors do
+							local o = mateLegs.WorldMap.region(n.id)
+							if o ~= nil then for _, p in M.Region.pieces(o) do table.insert(boxes, p) end end
+						end
+					end
+					M.waterSafe = motor.safe
+					M.water:fall(motor.pos, math.max(0, (M.waterTop or M.Pond.WATER) - M.Pond.WATER), life.clock.day, boxes, M.Pond.WATER)
+				end
+				M.water:step(DT)
+				for _, signal in M.water:drainSignals() do
+					if signal.kind == "fell" then
+						motor:seize()
+						dropAll()
+						dropStrands(false)
+						M.World.prey.ripple = signal.at
+						watch:onWater()
+					elseif signal.kind == "drowned" then
+						M.World.prey.ripple = nil
+						endLife(M.WaterText.CAUSE)
+					elseif signal.kind == "out" or signal.kind == "pulled" or signal.kind == "lost" then
+						M.World.prey.ripple = nil
+						if signal.to ~= nil then
+							local n = signal.normal or Vector3.yAxis
+							motor:place(signal.to + n * 0.31, n, if n.Y > 0.5 then motor.heading else Vector3.yAxis)
+						elseif M.waterSafe ~= nil then
+							motor:place(M.waterSafe.pos, M.waterSafe.up, M.waterSafe.heading)
+						end
+						M.waterTop = motor.pos.Y
+						life:showNotice(if signal.kind == "out" then M.WaterText.OUT else M.WaterText.PULLED)
+					end
+				end
+				local held = M.water:heldAt()
+				if held ~= nil then motor:hold(held) end
+			end
+			-- ROBLOX-122: the green frog on its stone or its pad: a spider that moves near it is faced, and struck if it is still moving within reach (a death in Normal;
+			-- in the gentle rules the tongue misses). Keeping still, or keeping clear, saves it. Its first close look opens its page.
+			if M.frog ~= nil then
+				M.frog.gentle = needs.gentle
+				if testPlace and Workspace:GetAttribute("Frog") ~= nil then M.frog.enabled = Workspace:GetAttribute("Frog") == true end
+				local spiderNow: any = nil
+				if not (life.lifeOver or modal() or M.water:struggling()) then
+					spiderNow = { pos = motor.pos, speed = if motor.mode == "air" then 10 elseif motor.moving == true then 3 else motor.vel.Magnitude,
+						hidden = M.World:inRetreat(motor.pos) ~= nil or life.resting }
+				end
+				M.frog:step(DT, life.clock.day, spiderNow)
+				for _, signal in M.frog:drainSignals() do
+					if signal.kind == "seen" or signal.kind == "noticed" then watch:onFrog()
+					elseif signal.kind == "struck" then M.frogAt = signal.at; endLife(M.FrogText.CAUSE)
+					elseif signal.kind == "missed" then
+						M.frogAt = signal.at
+						if motor.mode == "attached" then motor:_launch(Vector3.new(motor.pos.X - M.frog.pos.X, 0, motor.pos.Z - M.frog.pos.Z).Unit * 6 + Vector3.yAxis * 6, 40) end
+						life:showNotice(M.FrogText.MISSED)
+					end
+				end
+			end
 			M.Prof.lap("wasp")
 			prey.feeding.auto = setting("AutomaticGrip") == true or mateLegs.couple.active -- (a meal in the legs is held for a player whose hands are the scene's: ROBLOX-89)
 			if life.growth.gameRules ~= true then life.growth:useGameRules(needs.gentle) end -- (a family that carries on has a new growth)
@@ -2096,6 +2174,11 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	soundscape:updateWasp(wasp, soundPaused, soundSpeed, soundMuted)
 	waspBody:draw(wasp.wasp, prey.now)
 	if M.crabBody ~= nil then M.crabBody:draw(M.crab) end -- (ROBLOX-119)
+	if M.pondBodies ~= nil then -- (ROBLOX-122: the frog and the darner)
+		local dAt, dHeading = M.Pond.darner(914, prey.now, life.clock.hour)
+		if dAt ~= nil and (dAt - motor.pos).Magnitude < 150 then watch:onDarner() end
+		M.pondBodies:draw(M.frog, M.frogAt, dAt, dHeading, prey.now)
+	end
 	if M.birdBody ~= nil then M.birdBody:draw(M.bird, frameDt, if soundMuted or soundPaused then 0 else M.bird:call(motor.pos), if soundMuted or soundPaused then 0 else M.chirp) end -- (ROBLOX-120)
 	if M.catBody ~= nil then
 		local bell, purr = M.cat:sound(motor.pos)
@@ -2195,6 +2278,7 @@ M.hooks = function(): any
 			prof = M.Prof, -- (ROBLOX-111: the frame timed by part, for the self-test's frame samples)
 			cat = M.cat, Cat = M.Cat, -- (ROBLOX-118: the ranger's cat, nil in the test garden, and its rules)
 			crab = M.crab, CrabSpider = M.CrabSpider, -- (ROBLOX-119: the crab spiders, nil in the test garden, and their rules)
+			water = M.water, Water = M.Water, frog = M.frog, Frog = M.Frog, Pond = M.Pond, pondBodies = M.pondBodies, -- (ROBLOX-122: the water and the frog, nil in the test garden)
 			bird = M.bird, Bird = M.Bird, -- (ROBLOX-120: the robin, nil in the test garden, and its rules)
 	}
 end

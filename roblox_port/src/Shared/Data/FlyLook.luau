@@ -358,4 +358,97 @@ FlyLook.small.cricket = {
 		crouch = { depth = 0.06, pitch = 0.16 } },
 }
 
+-- ROBLOX-122: the pond's prey, drawn at their true sizes (docs/NOTEBOOK_SOURCES.md, their pages). A non-biting midge (Chironomidae): about 5.5 mm, a slender pale
+-- green body, a humped thorax, the male's feathery antennae, long front legs held up in front, one pair of clear wings shorter than the abdomen.
+FlyLook.small.midge = {
+	colors = { thorax = "7a8a5a", abdomen = "8a9a62", head = "5a6a44", eye = "1a1a14", leg = "6a7450", antenna = "8a8a6a", plume = "b8b89a", wing = "dfe4e6", shadow = "2a241c" },
+	body = {
+		{ name = "Thorax", color = "thorax", at = { 0, 0.0, -0.1 }, size = { 0.11, 0.12, 0.15 } },
+		{ name = "Abdomen", color = "abdomen", at = { 0, -0.02, 0.12 }, size = { 0.055, 0.055, 0.34 } },
+		{ name = "Head", color = "head", at = { 0, -0.01, -0.2 }, size = { 0.06, 0.06, 0.05 } },
+		{ name = "EyeL", color = "eye", at = { -0.028, 0.0, -0.205 }, size = { 0.03, 0.04, 0.03 }, full = true },
+		{ name = "EyeR", color = "eye", at = { 0.028, 0.0, -0.205 }, size = { 0.03, 0.04, 0.03 }, full = true },
+		{ name = "PlumeL", color = "plume", at = { -0.05, 0.03, -0.27 }, size = { 0.07, 0.07, 0.1 }, full = true },
+		{ name = "PlumeR", color = "plume", at = { 0.05, 0.03, -0.27 }, size = { 0.07, 0.07, 0.1 }, full = true },
+	} :: { any },
+	rods = {
+		{ name = "Antenna", color = "antenna", d = 0.008, from = { 0.015, 0.0, -0.22 }, to = { 0.05, 0.04, -0.32 }, mirror = true },
+		-- the long front legs held up and forward, the others splayed
+		{ name = "FrontLeg", color = "leg", d = 0.008, from = { 0.03, -0.04, -0.13 }, to = { 0.08, 0.06, -0.36 }, fly = { { 0.03, -0.04, -0.13 }, { 0.05, -0.14, -0.2 } }, mirror = true },
+		{ name = "MiddleFemur", color = "leg", d = 0.008, from = { 0.035, -0.04, -0.08 }, to = { 0.14, 0.03, -0.06 }, fly = { { 0.035, -0.04, -0.08 }, { 0.06, -0.1, -0.05 } }, mirror = true },
+		{ name = "MiddleTibia", color = "leg", d = 0.006, from = { 0.14, 0.03, -0.06 }, to = { 0.24, -0.16, -0.04 }, fly = { { 0.06, -0.1, -0.05 }, { 0.05, -0.2, 0.02 } }, mirror = true, full = true },
+		{ name = "HindFemur", color = "leg", d = 0.008, from = { 0.03, -0.04, -0.04 }, to = { 0.13, 0.04, 0.06 }, fly = { { 0.03, -0.04, -0.04 }, { 0.05, -0.1, 0.06 } }, mirror = true },
+		{ name = "HindTibia", color = "leg", d = 0.006, from = { 0.13, 0.04, 0.06 }, to = { 0.22, -0.16, 0.16 }, fly = { { 0.05, -0.1, 0.06 }, { 0.04, -0.2, 0.16 } }, mirror = true, full = true },
+	} :: { any },
+	wings = {
+		{ name = "Wing", color = "wing", material = "Glass", root = { 0.03, 0.05, -0.1 }, length = 0.28, width = 0.08, thick = 0.004, yaw = 20, pitch = 2, roll = 0,
+			transparency = 0.55, reflectance = 0.08, fan = { reach = 0.24, span = 0.2, roll = 6, yaw = 25, back = 0.02, rise = 0.01, transparency = 0.85 } },
+	} :: { any },
+	shadow = { size = { 0.14, 0.004, 0.4 }, lift = 0.003, transparency = 0.82, full = true },
+	motion = { gait = { stride = 0.18, swing = 0.3, lift = 0.3, settle = 10, jump = 0.6 }, kick = 6, antenna = { amp = 0.1, hz = 1.4 }, flap = { hz = 40, amp = 0.35 } },
+}
+-- A mosquito (Culicidae): about 5 mm of body, a brown-grey thorax and a banded abdomen, a long straight proboscis, long thin legs, one pair of scaled wings laid
+-- over the back.
+FlyLook.small.mosquito = {
+	colors = { thorax = "5a5248", abdomen = "4a443c", band = "a8a090", head = "3a342e", eye = "141210", leg = "4a4440", proboscis = "2e2a26", antenna = "4a4440", wing = "c8c4bc", shadow = "2a241c" },
+	body = {
+		{ name = "Thorax", color = "thorax", at = { 0, 0.02, -0.08 }, size = { 0.1, 0.11, 0.14 } },
+		{ name = "Abdomen", color = "abdomen", at = { 0, 0.0, 0.14 }, size = { 0.06, 0.055, 0.32 } },
+		{ name = "Band1", color = "band", at = { 0, 0.0, 0.08 }, size = { 0.064, 0.058, 0.025 }, full = true },
+		{ name = "Band2", color = "band", at = { 0, 0.0, 0.16 }, size = { 0.062, 0.056, 0.025 }, full = true },
+		{ name = "Head", color = "head", at = { 0, 0.0, -0.18 }, size = { 0.055, 0.055, 0.05 } },
+		{ name = "EyeL", color = "eye", at = { -0.025, 0.01, -0.185 }, size = { 0.03, 0.04, 0.03 }, full = true },
+		{ name = "EyeR", color = "eye", at = { 0.025, 0.01, -0.185 }, size = { 0.03, 0.04, 0.03 }, full = true },
+	} :: { any },
+	rods = {
+		{ name = "Proboscis", color = "proboscis", d = 0.009, from = { 0, -0.01, -0.2 }, to = { 0, -0.05, -0.4 } },
+		{ name = "Antenna", color = "antenna", d = 0.006, from = { 0.012, 0.01, -0.2 }, to = { 0.05, 0.04, -0.33 }, mirror = true, full = true },
+		{ name = "FrontLeg", color = "leg", d = 0.007, from = { 0.03, -0.03, -0.1 }, to = { 0.16, -0.16, -0.3 }, fly = { { 0.03, -0.03, -0.1 }, { 0.05, -0.2, -0.15 } }, mirror = true },
+		{ name = "MiddleLeg", color = "leg", d = 0.007, from = { 0.035, -0.03, -0.06 }, to = { 0.3, -0.16, -0.02 }, fly = { { 0.035, -0.03, -0.06 }, { 0.06, -0.22, -0.02 } }, mirror = true },
+		-- the hind legs curved up behind, as a resting mosquito holds them
+		{ name = "HindFemur", color = "leg", d = 0.007, from = { 0.03, -0.03, -0.03 }, to = { 0.16, -0.12, 0.12 }, fly = { { 0.03, -0.03, -0.03 }, { 0.05, -0.15, 0.1 } }, mirror = true },
+		{ name = "HindTibia", color = "leg", d = 0.006, from = { 0.16, -0.12, 0.12 }, to = { 0.2, 0.08, 0.34 }, fly = { { 0.05, -0.15, 0.1 }, { 0.04, -0.25, 0.25 } }, mirror = true, full = true },
+	} :: { any },
+	wings = {
+		{ name = "Wing", color = "wing", material = "Glass", root = { 0.02, 0.06, -0.08 }, length = 0.3, width = 0.06, thick = 0.004, yaw = 6, pitch = 2, roll = 0,
+			transparency = 0.45, reflectance = 0.06, fan = { reach = 0.26, span = 0.2, roll = 6, yaw = 25, back = 0.02, rise = 0.01, transparency = 0.85 } },
+	} :: { any },
+	shadow = { size = { 0.3, 0.004, 0.45 }, lift = 0.003, transparency = 0.82, full = true },
+	motion = { gait = { stride = 0.2, swing = 0.3, lift = 0.3, settle = 10, jump = 0.6 }, kick = 6, antenna = { amp = 0.08, hz = 1.2 }, flap = { hz = 40, amp = 0.35 } },
+}
+-- The eastern forktail (Ischnura verticalis), a damselfly about 2.8 cm long: wide-set eyes, a green and black striped thorax, a slender black abdomen ringed pale
+-- with blue on its tip (the male), four clear wings held together over the back at rest; short spiny legs.
+FlyLook.small.damselfly = {
+	colors = { head = "2a3a24", eye = "6a9a3a", thorax = "2a3424", stripe = "7ab04a", abdomen = "1e221c", ring = "8a9a7a", tip = "3a7ac8", leg = "2a2a24", wing = "e2e8ea",
+		stigma = "3a3a34", shadow = "2a241c" },
+	body = {
+		{ name = "Head", color = "head", at = { 0, 0.16, -0.62 }, size = { 0.34, 0.14, 0.12 } },
+		{ name = "EyeL", color = "eye", at = { -0.15, 0.18, -0.62 }, size = { 0.12, 0.13, 0.12 } },
+		{ name = "EyeR", color = "eye", at = { 0.15, 0.18, -0.62 }, size = { 0.12, 0.13, 0.12 } },
+		{ name = "Thorax", color = "thorax", at = { 0, 0.16, -0.38 }, size = { 0.16, 0.2, 0.34 } },
+		{ name = "Stripe", color = "stripe", at = { 0, 0.2, -0.38 }, size = { 0.166, 0.08, 0.3 }, full = true },
+		{ name = "Abdomen", color = "abdomen", at = { 0, 0.15, 0.62 }, size = { 0.075, 0.075, 1.75 } },
+		{ name = "Ring1", color = "ring", at = { 0, 0.15, 0.1 }, size = { 0.08, 0.08, 0.03 }, full = true },
+		{ name = "Ring2", color = "ring", at = { 0, 0.15, 0.4 }, size = { 0.08, 0.08, 0.03 }, full = true },
+		{ name = "Ring3", color = "ring", at = { 0, 0.15, 0.7 }, size = { 0.08, 0.08, 0.03 }, full = true },
+		{ name = "Tip", color = "tip", at = { 0, 0.15, 1.38 }, size = { 0.085, 0.085, 0.16 } },
+	} :: { any },
+	rods = {
+		{ name = "FrontLeg", color = "leg", d = 0.02, from = { 0.05, 0.08, -0.48 }, to = { 0.14, -0.16, -0.55 }, fly = { { 0.05, 0.08, -0.48 }, { 0.06, -0.06, -0.5 } }, mirror = true },
+		{ name = "MiddleLeg", color = "leg", d = 0.02, from = { 0.06, 0.08, -0.4 }, to = { 0.18, -0.16, -0.36 }, fly = { { 0.06, 0.08, -0.4 }, { 0.07, -0.06, -0.38 } }, mirror = true },
+		{ name = "HindLeg", color = "leg", d = 0.02, from = { 0.06, 0.08, -0.32 }, to = { 0.17, -0.16, -0.18 }, fly = { { 0.06, 0.08, -0.32 }, { 0.07, -0.06, -0.24 } }, mirror = true },
+	} :: { any },
+	-- the four wings held together over the abdomen at rest (two pairs, a dark stigma near each tip), a blur in flight
+	wings = {
+		{ name = "Forewing", color = "wing", material = "Glass", root = { 0.02, 0.27, -0.42 }, length = 1.55, width = 0.17, thick = 0.006, yaw = 4, pitch = 3, roll = 70,
+			transparency = 0.6, reflectance = 0.1, fan = { reach = 1.3, span = 0.6, roll = 6, yaw = 80, back = 0.0, rise = 0.02, transparency = 0.8 } },
+		{ name = "Hindwing", color = "wing", material = "Glass", root = { 0.02, 0.27, -0.34 }, length = 1.5, width = 0.17, thick = 0.006, yaw = 2, pitch = 3, roll = 72,
+			transparency = 0.6, reflectance = 0.1, fan = { reach = 1.25, span = 0.6, roll = 6, yaw = 100, back = 0.05, rise = 0.02, transparency = 0.8 } },
+		{ name = "Stigma", color = "stigma", material = "SmoothPlastic", root = { 0.026, 0.27, 0.95 }, length = 0.08, width = 0.05, thick = 0.008, yaw = 4, pitch = 3, roll = 70,
+			transparency = 0, reflectance = 0, hide = true, full = true },
+	} :: { any },
+	shadow = { size = { 0.5, 0.004, 2.6 }, lift = 0.003, transparency = 0.84, full = true },
+	motion = { gait = { stride = 0.2, swing = 0.25, lift = 0.25, settle = 8, jump = 0.8 }, kick = 5, antenna = { amp = 0.02, hz = 0.5 }, flap = { hz = 25, amp = 0.5 } },
+}
+
 return FlyLook

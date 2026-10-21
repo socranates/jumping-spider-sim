@@ -63,7 +63,7 @@ check("the client reads the attribute: the preserve is its world, its looks the 
 	assert(loaded, "SpiderClient did not load: " .. tostring(loadError))
 	assert(WorldMap.world() == "preserve", "the client did not make the preserve the active world")
 	local driver = ClientStubs.driver
-	assert(driver.world.world == "preserve" and #WorldMap.regions() == preserveRegions and preserveRegions == 146, `the client's world is the preserve's ({#WorldMap.regions()} regions)`)
+	assert(driver.world.world == "preserve" and #WorldMap.regions() == preserveRegions and preserveRegions == 207, `the client's world is the preserve's ({#WorldMap.regions()} regions; ROBLOX-122: 207)`)
 	assert(driver.world.hut ~= nil and not driver.world.hut.open and driver.world.hut.sash ~= nil, "the hut's window is shut in a new save")
 	for _ = 1, 30 do frame(1 / 60); simClock += 1 / 60 end
 	local looks = driver.world.looks
@@ -76,6 +76,9 @@ check("the client reads the attribute: the preserve is its world, its looks the 
 	-- (ROBLOX-120) the robin of the open ground: made and drawn (its folder), away at the day's start
 	assert(hooks.bird ~= nil and workspace:FindFirstChild("Robin") ~= nil and not hooks.bird.here, "no robin in the preserve, or not away at night")
 	assert(hooks.crab ~= nil and #hooks.crab.crabs == 2 and workspace:FindFirstChild("CrabSpiders") ~= nil and #(workspace:FindFirstChild("CrabSpiders") :: Instance):GetChildren() == 2, "no crab spiders in the preserve, or not drawn")
+	-- (ROBLOX-122) the pond's edge: the water and the green frog made, the frog on its seat and drawn
+	assert(hooks.water ~= nil and hooks.frog ~= nil and hooks.frog.here and workspace:FindFirstChild("PondAnimals") ~= nil
+		and (workspace:FindFirstChild("PondAnimals") :: Instance):FindFirstChild("GreenFrog") ~= nil, "no water or frog in the preserve, or the frog not drawn")
 end)
 
 check("the self-test runs to END in the preserve, its own checks in place of the garden's, every one passing here", function()
@@ -111,6 +114,7 @@ check("the self-test runs to END in the preserve, its own checks in place of the
 		"the hut by night: the lamp", "the ceiling and the upper walls", "the back room", "the eaves", "the cat", -- (ROBLOX-118)
 		"the bench patch", "the meadow's edge", "the crab spiders", -- (ROBLOX-119)
 		"the robin", "the field crickets", "ballooning's landings", -- (ROBLOX-120)
+		"the mown path and the boardwalk", "the water", "the pond's life", "the green frog", -- (ROBLOX-122)
 		"the nursery: the window put back", "notebook", "rest and checkpoint", "sound", "frame time on the sill", "part counts" }
 	WorldMap.use("preserve")
 	for _, region in WorldMap.regions() do table.insert(want, "region " .. region.id) end
@@ -119,7 +123,7 @@ check("the self-test runs to END in the preserve, its own checks in place of the
 	assert(last == `[SELFTEST] END pass={#want} fail=0 skip=0`, "the END line: " .. last)
 	for _, what in { "world", "the hut's sill", "backdrop", "trains", "lock", "the nursery", "the hut's inside", "the way out", "the hut garden", "the garden's near detail", "the garden's rival and mate", "the hut's homes",
 		"the ceiling", "the back room", "the eaves", "the cat", "the bench patch", "the meadow's edge", "the crab spiders",
-		"the robin", "the field crickets", "ballooning's landings" } do assert(infos[what], "no INFO line for " .. what) end
+		"the robin", "the field crickets", "ballooning's landings", "the mown path and the boardwalk", "the water", "the pond's life", "the green frog" } do assert(infos[what], "no INFO line for " .. what) end
 	local worldLine = false
 	for _, line in lines do if line == "[SELFTEST] INFO world: preserve (revision preserve-2)" then worldLine = true end end
 	assert(worldLine, "the world line names the preserve")

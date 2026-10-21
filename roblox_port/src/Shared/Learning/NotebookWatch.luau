@@ -123,6 +123,21 @@ function NotebookWatch.onCrab(self: any)
 	self.book:notice("crab_spider")
 end
 
+-- (ROBLOX-122) The green frog noticed the spider, or the spider came close to it: the frog's page.
+function NotebookWatch.onFrog(self: any)
+	self.book:notice("frog")
+end
+
+-- (ROBLOX-122) The green darner passed near the spider: its page.
+function NotebookWatch.onDarner(self: any)
+	self.book:notice("darner")
+end
+
+-- (ROBLOX-122) The spider fell into the water: the page on spiders and water.
+function NotebookWatch.onWater(self: any)
+	self.book:notice("water")
+end
+
 -- (ROBLOX-120) The robin was told to the spider (Predator/Bird: its shadow passed near, it landed near, or it noticed the spider): the robin's page.
 function NotebookWatch.onBird(self: any)
 	self.book:notice("robin")

@@ -57,6 +57,7 @@ ap.add_argument("--preserve", action="store_true", help="ROBLOX-115: the preserv
 ap.add_argument("--hut-open", action="store_true", help="ROBLOX-116: with --preserve, the hut's window propped open (the nursery over); shut otherwise")
 ap.add_argument("--preserve-all", action="store_true", help="ROBLOX-115: with --preserve, every zone of the backdrop at the --detail tier's whole detail, not the client's plan")
 ap.add_argument("--night-moths", action="store_true", help="ROBLOX-119: with --preserve, the lamppost's moths in flight round its lantern, as from dusk")
+ap.add_argument("--pond-dusk", action="store_true", help="ROBLOX-122: with --preserve, the pond's midges and mosquitoes in the air over the water, as from dusk")
 ap.add_argument("--robins", default="", help="ROBLOX-120: comma list of the robin's presets to draw (ROBIN_PRESETS: lawn, watch, peck, fly, edge)")
 ap.add_argument("--ride", default="", help="ROBLOX-120: with --preserve, comma list of shares (0..1) of the ballooning ride to --ride-to's spawn: the rider drawn and a view ride_<percent> behind it")
 ap.add_argument("--ride-to", default="meadow_c3", help="ROBLOX-120: the landing region of the --ride frames")
@@ -93,6 +94,11 @@ HUT_SPIDERS = [
     {"name": "medge", "x": -60.0, "y": -84.29, "z": -1110.0, "hx": 0, "hz": -1},
     {"name": "mcone", "x": -79.2, "y": -10.69, "z": -1152.1, "hx": 0.2, "hz": -1},
     {"name": "mbench", "x": -40.0, "y": -37.29, "z": -1052.5, "hx": 0, "hz": 1},
+    # ROBLOX-122: at the boardwalk's north edge looking out over the pond, on a lily pad in pond_b3, on the bank in pond_a1, on the mown path to the pond
+    {"name": "pdeck", "x": 2075.0, "y": -44.69, "z": -2580.0, "hx": 0, "hz": -1},
+    {"name": "ppad", "x": 2050.0, "y": -89.99, "z": -2721.0, "hx": 0.6, "hz": -0.8},
+    {"name": "pbank", "x": 1850.0, "y": -84.29, "z": -2618.0, "hx": 0.5, "hz": -1},
+    {"name": "ppath", "x": 800.0, "y": -84.29, "z": -980.0, "hx": 1, "hz": 0},
 ]
 # ROBLOX-118 (--cats): the ranger's cat where its schedule puts it (Predator/Cat.SPOTS), drawn by Client/CatBody from Rig/CatPose
 CAT_PRESETS = {
@@ -152,7 +158,7 @@ def dump_parts(path):
               f'SPIDERS = {lua(spiders)}\nFLIES = {lua(FLIES)}\nWASPS = {lua(WASPS)}\nWORLD = {lua(args.world)}\n'
               f'LOOKS_AT = {lua([float(c) for c in args.looks_at.split(",")] if args.looks_at else False)}\nLINEUP = {lua(args.lineup)}\n'
               f'PRESERVE = {lua(args.preserve)}\nPRESERVE_ALL = {lua(args.preserve_all)}\nHUT_OPEN = {lua(args.hut_open)}\nCATS = {lua(CATS)}\n'
-              f'NIGHT_MOTHS = {lua(args.night_moths)}\nROBINS = {lua(ROBINS)}\nRIDE = {lua([float(x) for x in args.ride.split(",") if x])}\nRIDE_TO = {lua(args.ride_to)}\n')
+              f'NIGHT_MOTHS = {lua(args.night_moths)}\nPOND_DUSK = {lua(args.pond_dusk)}\nROBINS = {lua(ROBINS)}\nRIDE = {lua([float(x) for x in args.ride.split(",") if x])}\nRIDE_TO = {lua(args.ride_to)}\n')
     with tempfile.NamedTemporaryFile("w", suffix=".luau", encoding="utf-8", delete=False, dir=out) as f:
         f.write(prefix + run.bundle(driver))
     try:
@@ -548,6 +554,24 @@ VIEWS.update({
     "rb_peck": {"fov": 45, "eye": [125.0, -72.0, -120.0], "at": [145.0, -80.0, -104.0], "near": 0.02, "far": 14000, "groups": ["cats"], "shadow": 80},
     "rb_edge": {"fov": 55, "eye": [-10.0, -70.0, -1090.0], "at": [-58.0, -78.0, -1124.0], "near": 0.05, "far": 14000, "groups": ["cats", "flies"], "shadow": 300},
 })
+# ROBLOX-122 (--preserve, with --looks-at where the spider is): the pond's edge and the boardwalk (World/Pond: the core x 1825..2225, z -2441..-2841; the deck's top
+# y -45, the water's -90.6). The pond from the boardwalk at the spider's eye (pd_eye_deck) and its game camera (pd_deck); a cattail stand's leaves (pd_cattail) and their
+# tops (pd_cattail_top); a lily pad with a spider on it (pd_pad); the waterline at the bank with its stones (pd_waterline); the spider on the bank (pd_bank); the pond's edge
+# from a person kneeling on the boardwalk (pd_wide); the mown path at the spider's eye (pd_path); the frog where its day puts it (pd_frog, pd_frog_far: the driver's).
+VIEWS.update({
+    "pd_eye_deck": {"fov": 75, "eye": [2075.0, -34.4, -2589.0], "at": [2110.0, -78.0, -2700.0], "near": 0.02, "far": 14000, "groups": ["flies"], "shadow": 200},
+    "pd_deck": {**game_camera(2075.0, -2580.0, 0, -1), "far": 14000, "groups": ["pdeck", "flies"], "shadow": 60},
+    "pd_cattail": {"fov": 50, "eye": [2100.0, -35.0, -2615.0], "at": [2076.0, -48.0, -2652.0], "near": 0.05, "far": 14000, "groups": ["flies"], "shadow": 120},
+    "pd_cattail_top": {"fov": 55, "eye": [2130.0, 120.0, -2600.0], "at": [2075.0, 80.0, -2652.0], "near": 0.1, "far": 14000, "groups": ["flies"], "shadow": 200},
+    "pd_pad": {**game_camera(2050.0, -2721.0, 0.6, -0.8), "far": 14000, "groups": ["ppad", "flies"], "shadow": 60},
+    "pd_waterline": {"fov": 55, "eye": [1985.0, -82.0, -2615.0], "at": [1958.0, -90.0, -2650.0], "near": 0.03, "far": 14000, "groups": ["flies"], "shadow": 120},
+    "pd_bank": {**game_camera(1850.0, -2618.0, 0.5, -1), "far": 14000, "groups": ["pbank", "flies"], "shadow": 60},
+    "pd_wide": {"fov": 62, "eye": [1880.0, 20.0, -2470.0], "at": [2120.0, -85.0, -2760.0], "near": 0.2, "far": 14000, "groups": ["flies", "pdeck", "ppad", "pbank"], "shadow": 600},
+    "pd_path": {"fov": 75, "eye": [790.0, -83.9, -980.0], "at": [1000.0, -70.0, -985.0], "near": 0.02, "far": 14000, "groups": ["ppath", "flies"], "shadow": 120},
+})
+for _n, _dy in (("pd_deck", -45.0), ("pd_pad", -90.3), ("pd_bank", -84.6)):
+    VIEWS[_n]["eye"][1] += _dy
+    VIEWS[_n]["at"][1] += _dy
 names = [n for n in args.views.split(",") if n]
 for n in names:
     if n not in VIEWS:

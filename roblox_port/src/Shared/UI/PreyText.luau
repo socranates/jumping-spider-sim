@@ -17,6 +17,7 @@ PreyText.REFUSED = {
 	snail = "The snail is far too big, and it has drawn into its shell.",
 	harvestman = "The harvestman gives off a foul smell and stalks on. You let it go.",
 	ant = "The ant turns on you, jaws open. You let it go.", -- (ROBLOX-119: the meadow's ants)
+	skater = "The water strider skates off over the water, out of reach.", -- (ROBLOX-122: the pond's water striders)
 	woodlouse = "The woodlouse's glands give off a secretion spiders avoid. You let it go.",
 } :: { [string]: string }
 

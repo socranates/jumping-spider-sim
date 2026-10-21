@@ -8,7 +8,8 @@
 -- restore never rerolls it. Each zone of ZONES has a weight that falls off with its distance from the hut (WEIGHT_M metres: exp(-d / WEIGHT_M)), so the near zones are
 -- the likely ones and the far ones rare; only a zone that is built (`built`, walkable in the preserve: World/Hut, World/Meadow) can be landed in, the others are listed
 -- for when they are, and drop out of the draw. In a built zone the landing is one of its `landings`, regions whose spawn is a place to stand (a spiderling's thread
--- snags on what stands up, and it comes down there). Now: the hut garden (about three quarters of draws) and the meadow's edge (the rest).
+-- snags on what stands up, and it comes down there). Now: the hut garden (about three quarters of draws), the meadow's edge (most of the rest) and (ROBLOX-122) the
+-- pond's edge, 34 m off, rarely (1 of 200 families).
 --
 -- The ride (`ride`, `at`): RIDE_S seconds from the egg sac in the sill's crack out through the window's sash and up over the garden on the wind, its thread streaming
 -- ahead and above it, then down onto the landing; a seeded drift and a sway, never the same twice for two families and always the same for one.
@@ -33,7 +34,7 @@ end
 Ballooning.ZONES = table.freeze({
 	zone("hut_garden", "the hut garden", true, { "garden_a2", "garden_a4", "garden_b1", "garden_c2", "garden_d2" }),
 	zone("meadow", "the meadow's edge", true, { "meadow_b1", "meadow_b3", "meadow_c3", "meadow_d2", "meadow_d5", "meadow_e3" }),
-	zone("pond_edge", "the pond's edge", false, {}),
+	zone("pond_edge", "the pond's edge", true, { "pond_a1", "pond_b1", "deck_n2", "deck_s3" }), -- (ROBLOX-122: built; its threads snag on the sedge, the rushes and the boardwalk's rail)
 	zone("log_pile", "the log pile", false, {}),
 	zone("veteran_oak", "the old oak", false, {}),
 	zone("stone_wall", "the stone wall", false, {}),

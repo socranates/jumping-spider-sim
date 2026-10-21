@@ -142,6 +142,28 @@ LifeText.HOMES = {
 		way = "Walk in under the litter bin's base, between its feet, then stop to rest.",
 		kept = "Last rest kept, under the bin's lip.",
 	},
+	-- ROBLOX-122: the pond's edge and the boardwalk
+	deck_gap = {
+		name = "the gap in the boardwalk",
+		title = "The gap in the boardwalk",
+		home = "Home: the gap in the boardwalk",
+		way = "Climb down into the wide gap between two of the boardwalk's boards, then stop to rest.",
+		kept = "Last rest kept, in the boardwalk's gap.",
+	},
+	pond_stone = {
+		name = "under the flat stone",
+		title = "Under the flat stone",
+		home = "Home: under the flat stone",
+		way = "Walk in under the flat stone on the pond's bank, then stop to rest.",
+		kept = "Last rest kept, under the flat stone.",
+	},
+	cattail_leaf = {
+		name = "under the dead cattail leaf",
+		title = "Under the dead cattail leaf",
+		home = "Home: under the dead cattail leaf",
+		way = "Walk in under the curled dead cattail leaf on the pond's bank, then stop to rest.",
+		kept = "Last rest kept, under the cattail leaf.",
+	},
 } :: { [string]: { name: string, title: string, home: string, way: string, kept: string } }
 LifeText.DEFAULT_HOME = "sill_crevice"
 local function homeOf(retreat: string?): { name: string, title: string, home: string, way: string, kept: string }

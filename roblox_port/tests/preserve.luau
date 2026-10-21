@@ -51,8 +51,8 @@ case("the map answers for the active world: the preserve's sill is the same sill
 	check(WorldMap.use("preserve") == "test_garden" and WorldMap.world() == "preserve" and WorldMap.revision() == "preserve-2", "the preserve made active (the test garden was)")
 	local regions = WorldMap.regions()
 	local sill = regions[1]
-	check(#regions == 146 and sill.id == "sill" and sill.kind == "sill" and #sill.neighbors == 5,
-		`a hundred and forty-six regions (ROBLOX-118: the ceiling, the back room, the eaves, the path round the back room and on to the meadow, 105; ROBLOX-119: the bench patch and the meadow's edge, 41), the sill first with its five seams into the hut ({#regions}, {#sill.neighbors})`)
+	check(#regions == 207 and sill.id == "sill" and sill.kind == "sill" and #sill.neighbors == 5,
+		`two hundred and seven regions (ROBLOX-118: the ceiling, the back room, the eaves, the path round the back room and on to the meadow, 105; ROBLOX-119: the bench patch and the meadow's edge, 41; ROBLOX-122: the mown path, the boardwalk and the pond's edge, 61), the sill first with its five seams into the hut ({#regions}, {#sill.neighbors})`)
 	check(same(sill.bounds[1], Layout.PLAY_BOUNDS_MIN) and same(sill.bounds[2], Layout.PLAY_BOUNDS_MAX) and same(sill.spawn.pos, Layout.SPAWN) and same(sill.spawn.heading, Layout.SPAWN_HEADING)
 		and sill.clockScale == 1.0 and sill.seed == gardenSill.seed and #sill.retreats == 1 and sill.retreats[1].id == "sill_crevice"
 		and same(sill.retreats[1].min, Layout.RETREAT_MIN) and same(sill.retreats[1].max, Layout.RETREAT_MAX), "its numbers are the layout's, as the test garden's sill's")
@@ -205,7 +205,9 @@ case("the plan in the preserve: near the hut whole, the far preserve its masses,
 		check(p2.railway == top and p2.hut == "far" and t2 <= LookPlan.BUDGET[tier], `{tier}: at the railway's crest the railway {tostring(p2.railway)}, the hut {tostring(p2.hut)}, {t2} parts`)
 		-- a walk the length of the preserve and across it at a spider's height over the ground, a plan every metre: always within the budget
 		-- (ROBLOX-119: on through the bench patch and up the meadow's edge first, the walkable home ranges 8 and 3)
-		local path = { sill.spawn.pos, Preserve.at(45.5, 13, 0.01), Preserve.at(45.15, 14.6, 0.01), Preserve.at(45.15, 20.6, 0.01), Preserve.at(43, 17, 0.01), Preserve.at(20, 20, 0.01), Preserve.at(20, 46, 0.01), Preserve.at(58, 49, 0.01), Preserve.at(70, 30, 0.4), Preserve.at(93, 30, 1.2),
+		-- (ROBLOX-122: then east along the mown path, north to the boardwalk, along it to the pond's edge and down onto its bank)
+		local path = { sill.spawn.pos, Preserve.at(45.5, 13, 0.01), Preserve.at(45.15, 14.6, 0.01), Preserve.at(45.15, 20.6, 0.01), Preserve.at(46.5, 14.64, 0.01),
+			Preserve.at(61.15, 14.64, 0.01), Preserve.at(61.15, 29.2, 0.01), Preserve.at(61.2, 30, 0.41), Preserve.at(67.5, 30, 0.41), Preserve.at(64.5, 31.5, 0.01), Preserve.at(43, 17, 0.01), Preserve.at(20, 20, 0.01), Preserve.at(20, 46, 0.01), Preserve.at(58, 49, 0.01), Preserve.at(70, 30, 0.4), Preserve.at(93, 30, 1.2),
 			Preserve.at(93, 55, 1.2), Preserve.at(50, 62.6, 3.0), Preserve.at(5, 6, 0.01) }
 		local worst, changes, held = 0, 0, nil :: any
 		local ok = true
@@ -334,6 +336,7 @@ end)
 -- ---------------------------------------------------------------- ROBLOX-116: the ranger hut and its garden, walkable (World/Hut)
 local Hut = require("../src/Shared/World/Hut")
 local Meadow = require("../src/Shared/World/Meadow")
+local Pond = require("../src/Shared/World/Pond")
 local Garden = require("../src/Shared/World/Garden")
 local Route = require("../src/Shared/Predator/RivalRoute")
 local Surfaces = require("../src/Shared/Data/Surfaces")
@@ -342,7 +345,7 @@ local Nature = require("../src/Shared/Life/Nature")
 local LifeText = require("../src/Shared/UI/LifeText")
 local SaveProgress = require("../src/Shared/Persistence/SaveProgress")
 
-local SEAMS = 244 -- (ROBLOX-116: 69; ROBLOX-117: 78; ROBLOX-118: the ceiling's, the back room's, the eaves' and the new paths', 180; ROBLOX-119: the bench patch's and the meadow's, 64)
+local SEAMS = 321 -- (ROBLOX-116: 69; ROBLOX-117: 78; ROBLOX-118: the ceiling's, the back room's, the eaves' and the new paths', 180; ROBLOX-119: the bench patch's and the meadow's, 64; ROBLOX-122: the mown path's, the boardwalk's and the pond's, 77)
 local HUT_IDS = "sill,hut_window,hut_outer_sill,hut_desk,hut_board,hut_shelf,hut_chair,hut_door,"
 	.. "hut_door_up,hut_doorway,hut_doorway_up,room_window,room_tv,room_games,room_sofa_w,room_sofa_e," -- (ROBLOX-118: the door's head, the doorway, the back room)
 	.. "hut_floor_a,hut_floor_b,hut_floor_c,hut_floor_d,hut_floor_e,hut_floor_f,hut_floor_g,hut_floor_h,hut_floor_i,"
@@ -356,7 +359,11 @@ local HUT_IDS = "sill,hut_window,hut_outer_sill,hut_desk,hut_board,hut_shelf,hut
 	.. "path_m1,path_m2,path_m3,path_m4," -- (ROBLOX-118: on toward the meadow)
 	.. "bench_w,bench_e,bin,lamp_1,lamp_2,lamp_3,lamp_4,pad_a1,pad_a2,pad_a3,pad_b1,pad_b2,pad_b3,pad_c1,pad_c2,pad_c3," -- (ROBLOX-119: the bench patch)
 	.. "meadow_a1,meadow_a2,meadow_a3,meadow_a4,meadow_a5,meadow_b1,meadow_b2,meadow_b3,meadow_b4,meadow_b5,meadow_c1,meadow_c2,meadow_c3,meadow_c4,meadow_c5,"
-	.. "meadow_d1,meadow_d2,meadow_d3,meadow_d4,meadow_d5,meadow_e1,meadow_e2,meadow_e3,meadow_e4,meadow_e5" -- (ROBLOX-119: the meadow's edge)
+	.. "meadow_d1,meadow_d2,meadow_d3,meadow_d4,meadow_d5,meadow_e1,meadow_e2,meadow_e3,meadow_e4,meadow_e5," -- (ROBLOX-119: the meadow's edge)
+	.. "cattail_1a,cattail_1b,cattail_2a,cattail_2b,walk_s1,walk_n1,walk_s2,walk_n2,walk_s3,walk_n3,walk_s4,walk_n4," -- (ROBLOX-122: the cattails up, the boardwalk)
+	.. "deck_s1,deck_n1,deck_s2,deck_n2,deck_s3,deck_n3,deck_s4,deck_n4,pond_a1,pond_a2,pond_a3,pond_a4,pond_b1,pond_b2,pond_b3,pond_b4,pond_c1,pond_c2,pond_c3,pond_c4,"
+	.. "mown_e1,mown_e2,mown_e3,mown_e4,mown_e5,mown_e6,mown_e7,mown_e8,mown_e9,mown_e10,mown_e11,mown_e12,mown_e13,mown_e14,mown_e15,"
+	.. "mown_n1,mown_n2,mown_n3,mown_n4,mown_n5,mown_n6,mown_n7,mown_n8,mown_n9,mown_n10,mown_n11,mown_n12,mown_n13,mown_n14" -- (ROBLOX-122: the mown path)
 
 case("the hut's regions: the sill, the hut's inside, the way out and the garden's core, in priority order, each with its seed, spawn, retreats and pace", function()
 	WorldMap.use("preserve")
@@ -368,7 +375,7 @@ case("the hut's regions: the sill, the hut's inside, the way out and the garden'
 	for _, r in WorldMap.regions() do
 		local fine = r.seed == WorldMap.seed(WorldMap.SEED, r.id) and not seeds[r.seed] and r.bounds[1].X < r.bounds[2].X and r.bounds[1].Y < r.bounds[2].Y
 			and r.bounds[1].Z < r.bounds[2].Z and WorldMap.at(r.spawn.pos + Vector3.new(0, 0.31, 0)) == r and r.clockScale > 0 and r.clockScale <= 1
-			and (r.kind == "sill" or Hut.knows(r.kind) or Meadow.knows(r.kind)) and table.isfrozen(r) and table.isfrozen(r.neighbors)
+			and (r.kind == "sill" or Hut.knows(r.kind) or Meadow.knows(r.kind) or Pond.knows(r.kind)) and table.isfrozen(r) and table.isfrozen(r.neighbors)
 		for _, t in r.retreats do
 			if WorldMap.at((t.min + t.max) * 0.5) ~= r then fine = false end
 			table.insert(homes, t.id)
@@ -379,8 +386,8 @@ case("the hut's regions: the sill, the hut's inside, the way out and the garden'
 	end
 	check(okAll, "each: its own seed, bounds with volume inside LIMIT, a body on its spawn in it, its retreats in it, a pace in (0, 1], frozen")
 	table.sort(homes)
-	check(table.concat(homes, ",") == "bench_slats,bin_lip,garden_a1_trough,garden_a3_stone,garden_d3_mulch,hut_board_gap,hut_desk_drawer,meadow_b2_leaf,room_sofa_under,sill_crevice",
-		`the homes (ROBLOX-119: the bench's slats, the bin's lip, the meadow's curled leaf): {table.concat(homes, ", ")}`)
+	check(table.concat(homes, ",") == "bench_slats,bin_lip,cattail_leaf,deck_gap,garden_a1_trough,garden_a3_stone,garden_d3_mulch,hut_board_gap,hut_desk_drawer,meadow_b2_leaf,pond_stone,room_sofa_under,sill_crevice",
+		`the homes (ROBLOX-119: the bench's slats, the bin's lip, the meadow's curled leaf; ROBLOX-122: the boardwalk's gap, the flat stone, the cattail leaf): {table.concat(homes, ", ")}`)
 	for _, id in homes do check(LifeText.HOMES[id] ~= nil, `{id} has its words`) end
 	-- the inside keeps the sill's day, the garden the garden's; the night's hunters never come inside
 	local inside, outside = true, true
@@ -389,7 +396,7 @@ case("the hut's regions: the sill, the hut's inside, the way out and the garden'
 		if string.sub(r.id, 1, 9) == "hut_floor" or r.id == "hut_desk" or r.id == "hut_board" or r.id == "hut_shelf" or r.id == "hut_chair" or r.id == "hut_window"
 			or string.sub(r.id, 1, 5) == "room_" or string.sub(r.id, 1, 7) == "hut_up_" or string.sub(r.id, 1, 11) == "hut_doorway" or r.id == "hut_door_up" then
 			if not indoor or r.clockScale ~= 1.0 or Nature.exposed(true, r.kind, false) then inside = false end
-		elseif string.sub(r.id, 1, 7) == "garden_" or r.id == "hut_bench" or r.id == "hut_butt" or Meadow.knows(r.kind) then
+		elseif string.sub(r.id, 1, 7) == "garden_" or r.id == "hut_bench" or r.id == "hut_butt" or Meadow.knows(r.kind) or Pond.knows(r.kind) then
 			if indoor or r.clockScale ~= 0.33 or not Nature.exposed(true, r.kind, false) then outside = false end
 		end
 	end
@@ -482,7 +489,7 @@ end)
 
 case("the hut's looks: within their budgets at both tiers, the same each time, well made", function()
 	WorldMap.use("preserve")
-	local full, low, mfull, mlow = 0, 0, 0, 0
+	local full, low, mfull, mlow, pfull, plow = 0, 0, 0, 0, 0, 0
 	local okAll = true
 	for _, r in WorldMap.regions() do
 		if r.kind ~= "sill" then
@@ -494,7 +501,7 @@ case("the hut's looks: within their budgets at both tiers, the same each time, w
 				if not Materials.known(d.material or "SmoothPlastic") or d.size.X <= 0 or d.size.Y <= 0 or d.size.Z <= 0 then okAll = false; print("  record " .. r.id .. " " .. d.id) end
 			end
 			if B == nil or f > B or l > (Region.budget(r.kind, "low") :: number) or Region.decor(r) ~= list then okAll = false; print(`  {r.id}: {f}/{l}`) end
-			if Hut.knows(r.kind) then full += f; low += l else mfull += f; mlow += l end
+			if Hut.knows(r.kind) then full += f; low += l elseif Pond.knows(r.kind) then pfull += f; plow += l else mfull += f; mlow += l end
 		end
 	end
 	check(okAll, "every region's look within its kind's budget at both tiers, the same list each time, known materials")
@@ -503,6 +510,9 @@ case("the hut's looks: within their budgets at both tiers, the same each time, w
 	check(low <= 80, `the low tier draws little of the hut beyond its boxes ({low} records)`)
 	-- (ROBLOX-119) the meadow's cells keep a mass a clump and the forb's colour at the low tier, the bench patch little more than its boxes
 	check(mlow <= 130 and mfull > 2000, `the meadow and the bench patch: rich at full ({mfull} records), little at the low tier ({mlow})`)
+	-- (ROBLOX-122) the pond's edge rich at full (its water, pads, stands, clumps, stones and the waterline), its corridor coarse; little at the low tier
+	print(`preserve: (ROBLOX-122) the pond's, the boardwalk's and the mown path's looks: {pfull} at full, {plow} at low`)
+	check(plow <= 200 and pfull > 1200, `the pond's edge and its corridor: rich at full ({pfull} records), little at the low tier ({plow})`)
 end)
 
 case("streaming: every hut region whole inside the target radius from anywhere on it, what is near inside the radius always sent, the way down there before it is taken", function()
@@ -616,8 +626,8 @@ case("the hut garden's life: its perches on its boxes' faces, its vents and hide
 			if #a.starts < 1 then fine = false; print("  ambient " .. a.kind .. " in " .. r.id) end
 		end
 	end
-	check(fine and counts.prey == 2 and counts.kinds == 29 and counts.bugs == 2 and counts.ambient == 4,
-		`gnats and aphids in 2 cells, the bestiary's kinds 10 times (ROBLOX-117: with the hoverflies on three cells' flowers, the fruit flies at the caddy, the moth at the lamp; ROBLOX-118: the caddy's flies in the back room, a moth at its window; ROBLOX-119: 25 with the meadow's leafhoppers, hoverflies, house flies and moths, the bin's flies and the lamp's moths; ROBLOX-120: 29 with the four crickets), woodlice in 2, ambient bugs in 4 (ROBLOX-119: the ants) (found {counts.prey}, {counts.kinds}, {counts.bugs}, {counts.ambient}), every perch on a face`)
+	check(fine and counts.prey == 2 and counts.kinds == 34 and counts.bugs == 2 and counts.ambient == 6,
+		`gnats and aphids in 2 cells, the bestiary's kinds 10 times (ROBLOX-117: with the hoverflies on three cells' flowers, the fruit flies at the caddy, the moth at the lamp; ROBLOX-118: the caddy's flies in the back room, a moth at its window; ROBLOX-119: 25 with the meadow's leafhoppers, hoverflies, house flies and moths, the bin's flies and the lamp's moths; ROBLOX-120: 29 with the four crickets; ROBLOX-122: 34 with the pond's midges, mosquitoes and damselflies), woodlice in 2, ambient bugs in 4 (ROBLOX-119: the ants; ROBLOX-122: 6 with the water striders) (found {counts.prey}, {counts.kinds}, {counts.bugs}, {counts.ambient}), every perch on a face`)
 	-- the milkweed as a plant the aphids and the ladybird walk: its nodes are the aphids' leaf perches
 	local c3 = WorldMap.region("garden_c3") :: any
 	local plants = Garden.plants(c3) :: any
@@ -716,12 +726,12 @@ case("the patches: the near detail of the garden and the path, drawn only near t
 	for _, r in WorldMap.regions() do
 		if r.kind == "garden_bed" then cells += 1 elseif r.kind == "hut_path" then paths += 1 end
 	end
-	-- (ROBLOX-119: and the meadow's 25 cells and the bench patch's 9: 544 more)
-	check(#patches >= cells * 16 + 34 * 16 and #patches < 1100, `{#patches} patches over the garden's {cells} cells, the path's {paths} lengths, the meadow's and the bench patch's cells`)
+	-- (ROBLOX-119: and the meadow's 25 cells and the bench patch's 9: 544 more; ROBLOX-122: and the pond's twelve cells, 160 more)
+	check(#patches >= cells * 16 + 34 * 16 + 8 * 16 + 4 * 8 and #patches < 1200, `{#patches} patches over the garden's {cells} cells, the path's {paths} lengths, the meadow's and the bench patch's cells`)
 	local fine, dews, worstFull, worstLow = true, 0, 0, 0
 	local B = Region.budget("patch", "full") :: number
 	for _, p in patches do
-		local parent = (Hut.patchParent(p) or Meadow.patchParent(p)) :: any
+		local parent = (Hut.patchParent(p) or Meadow.patchParent(p) or Pond.patchParent(p)) :: any
 		local plo, phi = p.bounds[1], p.bounds[2]
 		if parent == nil or plo.X < parent.bounds[1].X - 1e-6 or phi.X > parent.bounds[2].X + 1e-6 or plo.Z < parent.bounds[1].Z - 1e-6 or phi.Z > parent.bounds[2].Z + 1e-6 then fine = false end
 		if WorldMap.patch(p.id) ~= p or WorldMap.region(p.id) ~= nil or WorldMap.at(p.origin) == p then fine = false end
@@ -1167,7 +1177,7 @@ case("the meadow's life: leafhoppers on the culms, flies on the flowers and at t
 			end
 		end
 		built:Destroy()
-		check(n == 29 and #idle == 0, `each of the {n} kinds starts with a fly on a good perch (none: {table.concat(idle, ", ")})`)
+		check(n == 34 and #idle == 0, `each of the {n} kinds starts with a fly on a good perch (ROBLOX-122: 34 with the pond's) (none: {table.concat(idle, ", ")})`)
 	end
 	-- the ants: their colony on the meadow's floor round the hill; out by day within their range, in the nest by night, never in a box; a strike refused
 	local b4 = WorldMap.region("meadow_b4") :: any
@@ -1257,7 +1267,7 @@ case("the robin's day: seeded, the same for the same day, four to six visits by 
 	for _, site in Bird.SITES do
 		for i, pt in site.line do
 			local r = WorldMap.at(pt + Vector3.new(0, 0.5, 0))
-			check(r ~= nil and (r.kind == "garden_bed" or r.kind == "pad" or r.kind == "meadow"), `{site.id} point {i} lies in the hut garden, the bench patch or the meadow ({if r then r.id else "none"})`)
+			check(r ~= nil and (r.kind == "garden_bed" or r.kind == "pad" or r.kind == "meadow" or r.kind == "mown_path"), `{site.id} point {i} lies in the hut garden, the bench patch, the meadow or (ROBLOX-122) on the mown path to the pond ({if r then r.id else "none"})`)
 			local inside = false
 			if r ~= nil then for _, b in Region.pieces(r) do if pt.X > b.lo.X and pt.X < b.hi.X and pt.Z > b.lo.Z and pt.Z < b.hi.Z and b.hi.Y > pt.Y + 1 then inside = true end end end
 			check(not inside, `{site.id} point {i} is not inside a box`)
@@ -1484,9 +1494,10 @@ case("ballooning: the wind's draw, seeded, mostly the hut garden, sometimes the 
 			check(Ballooning.valid(z) and z ~= Ballooning.HUT and Ballooning.landsIn(z, r), `{z} is a built zone and {r} one of its landings`)
 		end
 	end
-	local garden, meadow = counts.hut_garden or 0, counts.meadow or 0
-	print(`preserve: ballooning: of 200 families the hut garden {garden}, the meadow's edge {meadow}`)
-	check(garden + meadow == 200 and garden > 120 and garden < 185 and meadow > 15, "mostly the hut garden, sometimes the meadow's edge, nowhere else")
+	local garden, meadow, pond = counts.hut_garden or 0, counts.meadow or 0, counts.pond_edge or 0
+	print(`preserve: ballooning: of 200 families the hut garden {garden}, the meadow's edge {meadow}, the pond's edge {pond}`)
+	check(garden + meadow + pond == 200 and garden > 120 and garden < 185 and meadow > 15 and pond >= 1 and pond < 15,
+		"mostly the hut garden, sometimes the meadow's edge, (ROBLOX-122) rarely the pond's edge, nowhere else")
 	for _, z in Ballooning.ZONES do
 		check(z.built == (#z.landings > 0) and (Ballooning.weight(z) > 0) == z.built, `{z.zone}: landed in only when built`)
 		for _, id in z.landings do
@@ -1522,6 +1533,277 @@ case("ballooning: the wind's draw, seeded, mostly the hut garden, sometimes the 
 		and string.find(MateText.landed("the hut garden"), "in the wild", 1, true) ~= nil, "the card, the choices, the toast and the landing say it")
 	local _, _, plain = MateText.card(9, 12, 0)
 	check(string.find(plain, "carry on as one of them", 1, true) ~= nil, "the test garden's card is as it was")
+end)
+
+-- ---------------------------------------------------------------- ROBLOX-122: the pond's edge, the boardwalk and the mown path to it; the water; the pond's life; the frog
+case("the pond's edge and the boardwalk: home range 4 where the boardwalk meets the pond, the mown path from the meadow to it, walkable at true size, seam to seam", function()
+	WorldMap.use("preserve")
+	local H4 = Preserve.HOME_RANGES[4]
+	local lo, hi = Preserve.box(H4.at[1] - H4.size / 2, H4.at[1] + H4.size / 2, H4.at[2] - H4.size / 2, H4.at[2] + H4.size / 2, 0, 0)
+	local K = Pond.CORE
+	check(H4.id == "pond_edge" and math.abs(lo.X - K.x0) < 1e-6 and math.abs(hi.X - K.x1) < 1e-6 and math.abs(lo.Z - K.z0) < 1e-6 and math.abs(hi.Z - K.z1) < 1e-6,
+		"the pond's edge is home range 4, 4 by 4 m (x 64..68, z 29.25..33.25 m)")
+	local ids = {}
+	for _, r in WorldMap.regions() do if Pond.knows(r.kind) then table.insert(ids, r.id) end end
+	check(#ids == 61, `61 regions: the mown path's 29 cells, the boardwalk's 16, the margin's 12 and the cattails' 4 up ({#ids})`)
+	-- the way: from the bench patch's gravel east and north along the mown path, up the boardwalk's fascia, along it to the core and down to the margin
+	local chain = { "pad_b3", "mown_e1" }
+	for k = 2, 15 do table.insert(chain, `mown_e{k}`) end
+	for k = 1, 14 do table.insert(chain, `mown_n{k}`) end
+	for _, id in { "walk_s1", "walk_s2", "walk_s3", "walk_s4", "deck_s1", "deck_n1", "pond_a1", "pond_b1", "pond_b2", "pond_c2" } do table.insert(chain, id) end
+	local linked = true
+	for i = 1, #chain - 1 do
+		local a = WorldMap.region(chain[i]) :: WorldMap.Region
+		local found = false
+		for _, n in a.neighbors do if n.id == chain[i + 1] then found = true end end
+		if not found then linked = false; print(`  {chain[i]} does not meet {chain[i + 1]}`) end
+	end
+	check(linked, "from the bench patch along the mown path, up onto the boardwalk, along it into the pond's edge and down to the water, seam to seam")
+	local function piecesOf(id: string): { [string]: any }
+		local out = {}
+		for _, p in Region.pieces(WorldMap.region(id) :: any) do out[p.id] = p end
+		return out
+	end
+	-- true sizes: the boards, the deck's height, the posts, the kerb rail
+	local s2, n1 = piecesOf("deck_s2"), piecesOf("deck_n1")
+	local b1, b2 = s2.deck_s2_board_1, s2.deck_s2_board_2
+	check(math.abs((b1.hi.Z - b1.lo.Z) - 14) < 1e-6 and b1.lo.Z - b2.hi.Z > 1.0 and b1.lo.Z - b2.hi.Z < 1.3 and math.abs(b1.hi.Y - Pond.DECK) < 1e-6
+		and math.abs(Pond.DECK - Preserve.GROUND_Y - 40) < 1e-6, "the boards 14 cm wide with a gap of a centimetre and a bit, the deck 40 cm over the lawn")
+	local gap = s2.deck_s2_board_3.lo.Z - s2.deck_s2_board_4.hi.Z
+	check(gap >= 1.5 and WorldMap.inRetreat((WorldMap.retreat("deck_gap") :: any).min + Vector3.new(1, 1, 0.5)) == "deck_gap", string.format("the wide gap between two boards, %.1f cm, a home", gap))
+	local post = n1.deck_n1_post
+	check(post ~= nil and math.abs((post.hi.X - post.lo.X) - 10) < 1e-6 and post.hi.Y < Pond.DECK and n1.deck_n1_kerb.hi.Y - Pond.DECK == 10, "a post 10 cm square under the beam, the kerb rail 10 cm over the deck")
+	-- the water: 6 cm under the lawn, no box on it; the bank's strips end at the waterline; the pads, stones and stems stand in it
+	check(math.abs(Pond.WATER - (Pond.GROUND - 6)) < 1e-6 and Pond.BED < Pond.WATER, "the water 6 cm under the lawn, the bed under it")
+	local surface, landOk, padSizes, stands = 0, true, {}, 0
+	for _, r in WorldMap.regions() do
+		if r.kind == "pond" or r.kind == "boardwalk" or r.kind == "cattail" then
+			for _, p in Region.pieces(r) do
+				if p.lo.Y < Pond.WATER - 0.05 and p.hi.Y > Pond.WATER + 0.05 and p.hi.X - p.lo.X > 60 and p.hi.Z - p.lo.Z > 60 then surface += 1 end -- (a box over open water)
+				local band = string.match(p.id, "_(%a+)_%d+$")
+				if band == "bank" or band == "damp" or band == "wet" then
+					local zw = Pond.waterline((p.lo.X + p.hi.X) / 2)
+					if zw ~= nil and p.lo.Z < zw - 1e-6 then landOk = false; print("  " .. p.id .. " in the water") end
+				end
+				if string.sub(p.id, -4) == "_mid" and string.find(p.id, "_pad_", 1, true) then table.insert(padSizes, (p.hi.X - p.lo.X) / 0.94) end
+			end
+		end
+	end
+	table.sort(padSizes)
+	check(surface == 0 and landOk, "nothing lies on the open water to stand on, and the bank's land ends at the waterline")
+	check(#padSizes >= 15 and padSizes[1] >= 15 - 1e-6 and padSizes[#padSizes] <= 30 + 1e-6, string.format("%d lily pads, %.0f to %.0f cm across (the sources' 15 to 30)", #padSizes, padSizes[1] or 0, padSizes[#padSizes] or 0))
+	-- the cattails: leaves 1.5 cm wide and 1.5 to 2.2 m tall, the brown spike 18 cm long; their upper parts in their own regions
+	local tallest, narrow, spike = 0, true, nil :: any
+	for _, p in Pond.standPieces(1) do
+		if string.find(p.id, "_leaf_", 1, true) then
+			tallest = math.max(tallest, p.hi.Y - Pond.WATER)
+			if math.max(p.hi.X - p.lo.X, p.hi.Z - p.lo.Z) > 2 then narrow = false end
+		elseif string.sub(p.id, -6) == "_spike" then spike = p end
+	end
+	check(narrow and tallest >= 150 and tallest <= 250 and spike ~= nil and math.abs((spike.hi.Y - spike.lo.Y) - 18) < 1e-6, string.format("the cattails' leaves 1.5 cm wide to %.0f cm over the water, the spike 18 cm", tallest))
+	local whole = true
+	for k = 1, 2 do
+		for _, p in Pond.standPieces(k) do
+			local found = 0
+			for _, id in { `pond_{Pond.STANDS[k].cell}`, `cattail_{k}a`, `cattail_{k}b` } do
+				for _, q in Region.pieces(WorldMap.region(id) :: any) do
+					if string.sub(q.id, 1, #p.id) == p.id then found += (q.hi.Y - q.lo.Y) end
+				end
+			end
+			if math.abs(found - (p.hi.Y - p.lo.Y)) > 1e-6 then whole = false; print("  " .. p.id) end
+		end
+	end
+	check(whole, "each stand's every box whole across its cell and its two regions up")
+	-- in the water: under the surface over the water's plan; on a pad, a stone or the bank, out of it
+	local a3 = piecesOf("pond_a3")
+	local pad = a3.pond_a3_pad_1_mid
+	local onPad = Vector3.new((pad.lo.X + pad.hi.X) / 2, pad.hi.Y + 0.31, (pad.lo.Z + pad.hi.Z) / 2)
+	local stone = piecesOf("pond_a2").pond_a2_flat
+	local onStone = Vector3.new((stone.lo.X + stone.hi.X) / 2, stone.hi.Y + 0.31, (stone.lo.Z + stone.hi.Z) / 2)
+	local wet = Vector3.new(onPad.X, Pond.WATER - 0.5, pad.lo.Z - 6)
+	check(Pond.inWater(wet) and not Pond.inWater(onPad) and not Pond.inWater(onStone) and not Pond.inWater(Vector3.new(1840, Pond.GROUND + 0.31, -2620))
+		and not Pond.inWater(Vector3.new(1600, Pond.DECK + 0.31, -2480)), "in the water under its surface; on a pad, the flat stone, the bank or the boardwalk, not")
+	-- the homes
+	for _, id in { "deck_gap", "pond_stone", "cattail_leaf" } do
+		local t = WorldMap.retreat(id) :: any
+		check(t ~= nil and WorldMap.inRetreat((t.min + t.max) * 0.5) == id and t.max.Y - t.min.Y >= 1.3 and math.min(t.max.X - t.min.X, t.max.Z - t.min.Z) >= 1.5 and LifeText.HOMES[id] ~= nil,
+			`{id}: a gap a spider fits in, with its words`)
+	end
+	-- the backdrop: no lawn over the pond's hole, its water lens a hair under the surface, its bank and its lilies never over the walkable core or the corridor's deck
+	local ground = WorldMap.drawnZone("ground") :: any
+	local over = 0
+	for _, d in PreserveLook.records("ground", ground.seed) do
+		if string.sub(d.id, 1, 5) == "Grass" then
+			local hx, hz = d.size.X / 2, d.size.Z / 2
+			local c0, c1 = Preserve.at(61, 29.25), Preserve.at(79, 45)
+			if d.at.X + hx > c0.X + 1e-3 and d.at.X - hx < c1.X - 1e-3 and d.at.Z - hz < c0.Z - 1e-3 and d.at.Z + hz > c1.Z + 1e-3 then over += 1; print("  " .. d.id) end
+		end
+	end
+	local pondZone = WorldMap.drawnZone("pond") :: any
+	local water, onCore = nil :: any, 0
+	for _, d in PreserveLook.records("pond", pondZone.seed) do
+		if d.id == "Water" then water = d end
+		if string.sub(d.id, 1, 4) == "Bank" or string.sub(d.id, 1, 4) == "Lily" then
+			local hx, hz = d.size.X / 2, d.size.Z / 2
+			if string.sub(d.id, 1, 4) == "Lily" then hx, hz = d.size.Y / 2, d.size.Z / 2 end
+			if d.at.X + hx > K.x0 + 1e-3 and d.at.X - hx < K.x1 - 1e-3 and d.at.Z + hz > K.z0 + 1e-3 and d.at.Z - hz < K.z1 - 1e-3 then onCore += 1; print("  " .. d.id) end
+		end
+	end
+	check(over == 0 and water ~= nil and math.abs(water.at.Y + water.size.Y / 2 - (Pond.WATER - 0.3)) < 1e-6 and onCore == 0,
+		"no lawn over the pond, its water lens 3 mm under the surface, nothing of the backdrop's bank or lilies over the walkable core")
+	local cross = nil :: any
+	for _, c in Preserve.CORRIDORS do if c.id == "path_cross" then cross = c end end
+	check(cross.points[1][1] == 46.65 and cross.points[3][2] == 29.25, "the mown path's corridor is the walkable one, from the bench patch to the boardwalk")
+end)
+
+case("the water: a spider in it struggles, then gets out onto what it can reach or drowns (Normal), and is always pulled out in the gentle rules; seeded, never rerolled", function()
+	local Water = require("../src/Shared/Life/Water")
+	local WaterText = require("../src/Shared/UI/WaterText")
+	WorldMap.use("preserve")
+	local boxes = {}
+	for _, id in { "pond_a3", "pond_b3", "cattail_1a" } do for _, p in Region.pieces(WorldMap.region(id) :: any) do table.insert(boxes, p) end end
+	local pad = nil :: any
+	for _, p in boxes do if p.id == "pond_a3_pad_1_mid" then pad = p end end
+	-- a way out: a pad 2 cm off; nothing near in the open water of pond_b3's middle
+	local near = Vector3.new(pad.lo.X - 2, Pond.WATER, (pad.lo.Z + pad.hi.Z) / 2)
+	local b, d, at, n = Water.wayOut(near, Pond.WATER, boxes, Water.REACH)
+	check(b ~= nil and math.abs(d - 2) < 1e-6 and n == Vector3.yAxis and math.abs(at.Y - pad.hi.Y) < 1e-6, "a pad 2 cm off is a way out, onto its top")
+	local open = Vector3.new(2075, Pond.WATER, -2745)
+	local none = Water.wayOut(open, Pond.WATER, boxes, Water.REACH)
+	check(none == nil, "in the open water of the margin nothing is in reach")
+	check(Water.chance(0, 0) == Water.NEAR_CHANCE and Water.chance(Water.REACH, 0) == Water.FAR_CHANCE and Water.chance(1, 30) < Water.chance(1, 5) and Water.chance(Water.REACH + 0.1, 0) == 0,
+		"the chance falls with the distance, halves after a long fall, and is nothing out of reach")
+	local function trial(gentle: boolean, from: Vector3, drop: number, seed: number, day: number): (string, any)
+		local w = Water.new(seed)
+		w.gentle = gentle
+		w:fall(from, drop, day, boxes, Pond.WATER)
+		local got, sig = "", nil
+		for _ = 1, 60 * 4 do
+			w:step(1 / 60)
+			for _, s in w:drainSignals() do if s.kind ~= "fell" then got, sig = s.kind, s end end
+		end
+		return got, sig
+	end
+	local outs, drowned, pulled = 0, 0, 0
+	for seed = 1, 60 do
+		local k = trial(false, near, 0, seed, 3)
+		if k == "out" then outs += 1 elseif k == "drowned" then drowned += 1 end
+		if trial(true, near, 0, seed, 3) ~= "drowned" then pulled += 1 end
+	end
+	print(`preserve: the water: of 60 slips by a pad 2 cm off, {outs} got out and {drowned} drowned in Normal; {pulled} pulled out in the gentle rules`)
+	check(outs > 30 and drowned > 0 and outs + drowned == 60 and pulled == 60, "near a pad most get out in Normal and some drown; the gentle rules always pull it out")
+	local long = 0
+	for seed = 1, 30 do if trial(false, open, 40, seed, 5) == "drowned" then long += 1 end end
+	local kind, sig = trial(true, open, 40, 7, 5)
+	check(long == 30 and kind == "pulled" and sig.to ~= nil, "a long fall into open water drowns in Normal, honestly; the gentle rules carry it to something to climb")
+	local w1, w2 = Water.new(11), Water.new(11)
+	local k1 = trial(false, near, 0, 11, 4)
+	local k2 = trial(false, near, 0, 11, 4)
+	check(k1 == k2 and Water.draw(11, 4, 1) == Water.draw(11, 4, 1) and Water.draw(11, 4, 1) ~= Water.draw(11, 4, 2), "the same fall of the same day draws the same; the next fall draws anew")
+	w1.falls, w1.out = 3, 2
+	w2:load(w1:toRecord())
+	check(w2.falls == 3 and w2.out == 2 and #Water.problems(w1:toRecord()) == 0 and #Water.problems({ falls = 1, out = 2 }) == 1 and #Water.problems({ falls = -1, out = 0 }) == 1
+		and #Water.problems("x") == 1, "its record (the falls counted) kept and put back, a bad one refused")
+	local w = Water.new(1)
+	w:fall(near, 0, 1, boxes, Pond.WATER)
+	local held = w:heldAt() :: Vector3
+	check(w:struggling() and math.abs(held.Y - Pond.WATER) < 0.2 and WaterText.LINE ~= "" and WaterText.CAUSE == Water.CAUSE and string.find(WaterText.SUB, "cannot walk on water", 1, true) ~= nil,
+		"struggling it is held at the surface; its card and its words")
+end)
+
+case("the pond's life: midges and mosquitoes on the rushes and the cattails, swarming from dusk; damselflies on the cattails; water striders on the open water, drawn to ripples", function()
+	local Species = require("../src/Shared/Data/Species")
+	local Skater = require("../src/Shared/Prey/Skater")
+	local PreyText = require("../src/Shared/UI/PreyText")
+	WorldMap.use("preserve")
+	local kinds: { [string]: number } = {}
+	local fine = true
+	for _, r in WorldMap.regions() do
+		if Pond.knows(r.kind) then
+			for _, k in Garden.bestiary(r) or {} do
+				kinds[k.kind] = (kinds[k.kind] or 0) + 1
+				for _, p in k.perches do
+					if not WorldMap.inBounds(p.position + p.normal * 0.31, r.id) or p.position.Y < Pond.WATER + 5 then fine = false; print("  " .. p.id) end
+				end
+			end
+		end
+	end
+	check(fine and kinds.midge == 2 and kinds.mosquito == 2 and kinds.damselfly == 1, `midges in 2 cells, mosquitoes 2, damselflies 1, every perch on a stem over the water ({kinds.midge}, {kinds.mosquito}, {kinds.damselfly})`)
+	local midge, damsel = Species.midge_prototype, Species.damselfly_prototype
+	check(midge.body.dusk == "midge_dusk_prototype" and Species.midge_dusk_prototype.body.hover ~= nil and Species.mosquito_dusk_prototype.body.hover ~= nil
+		and math.abs(midge.body.nutrition - 0.35 / 3) < 1e-9 and damsel.body.catch_factor > 1.4 and damsel.body.kick ~= nil and math.abs(damsel.body.nutrition - 0.35 * 2.5) < 1e-9,
+		"midges and mosquitoes a third of a housefly, restless and hovering from dusk; the damselfly two and a half, a hard catch that thrashes")
+	-- the striders: on the open water of their cells, skating; by a struggling spider's ripples they come
+	local b3 = WorldMap.region("pond_b3") :: any
+	local spec = (Garden.ambient(b3) :: any)[1]
+	local sk = Skater.new(spec, spec.full)
+	local okStart = #sk.items == 4
+	for _, a in sk.items do
+		local zw = Pond.waterline(a.position.X)
+		if zw == nil or a.position.Z >= zw or math.abs(a.position.Y - (Pond.WATER + Skater.HOVER)) > 1e-6 then okStart = false end
+	end
+	check(okStart, "four water striders on the open water of the margin, up on their legs")
+	local ripple = Vector3.new(b3.origin.X, Pond.WATER, b3.origin.Z)
+	local before = 0
+	for _, a in sk.items do before += (a.surface - ripple).Magnitude end
+	for _ = 1, 60 * 12 do sk:step(1 / 60, Vector3.zero, { hour = 12, ripple = ripple }) end
+	local after, inside = 0, true
+	for _, a in sk.items do
+		after += (a.surface - ripple).Magnitude
+		if not sk:free(a.surface) then inside = false end
+	end
+	check(after < before and inside and #sk:problems(b3.bounds[1], b3.bounds[2]) == 0, string.format("by the ripples they skate in (%.0f studs all told to %.0f), never onto a pad or a stem", before, after))
+	check(PreyText.REFUSED.skater ~= nil, "a strike at a strider is refused with its own words")
+end)
+
+case("the green frog: on its stone or its pad by a seeded day, still; what moves near it is faced and struck in the standard rules (missed in the gentle ones); keeping still saves", function()
+	local Frog = require("../src/Shared/Predator/Frog")
+	local FrogText = require("../src/Shared/UI/FrogText")
+	local PondBodies = require("../src/Client/PondBodies")
+	WorldMap.use("preserve")
+	local seed = WorldMap.seed(WorldMap.SEED, "frog")
+	local used = {}
+	for day = 1, 20 do
+		local s = Frog.seatOf(seed, day)
+		used[s] = true
+		check(s == Frog.seatOf(seed, day), "the same seat for the same day")
+	end
+	check(used[1] and used[2], "both seats used over twenty days")
+	local f = Frog.new(seed)
+	f:step(1 / 60, 3, nil)
+	check(f.here and (f.pos - (Frog.seatAt(f.seat) :: Vector3)).Magnitude < 1e-6, "it sits on its seat")
+	local function trial(gentle: boolean, offset: Vector3, speed: number, hidden: boolean): string?
+		local t = Frog.new(seed)
+		t.gentle = gentle
+		t:step(1 / 60, 3, nil)
+		local got = nil
+		for _ = 1, 60 * 3 do
+			t:step(1 / 60, 3, { pos = t.pos + offset, speed = speed, hidden = hidden })
+			for _, s in t:drainSignals() do if s.kind == "struck" or s.kind == "missed" then got = got or s.kind end end
+		end
+		return got
+	end
+	local close = f.rest * 8 + Vector3.new(0, 1, 0)
+	check(trial(false, close, 3, false) == "struck" and trial(true, close, 3, false) == "missed", "a spider moving in front of it within reach: struck in the standard rules, missed in the gentle ones")
+	check(trial(false, close, 0, false) == nil and trial(false, close, 3, true) == nil and trial(false, f.rest * 40, 3, false) == nil,
+		"keeping still, hidden, or out of its reach, nothing")
+	local side = Vector3.new(-f.rest.Z, 0, f.rest.X) * 8 + Vector3.new(0, 1, 0)
+	check(trial(false, side, 3, false) == "struck", "beside it, it turns to face what moved first, then strikes")
+	-- its drawing at true size
+	local parts = PondBodies.frogParts(0.5, 0)
+	local zmin, zmax = math.huge, -math.huge
+	for _, s in parts do
+		local c = s.frame.Position
+		if s.name == "Body" or s.name == "Head" or s.name == "Snout" then zmin, zmax = math.min(zmin, c.Z - s.size.Z / 2), math.max(zmax, c.Z + s.size.Z / 2) end
+	end
+	check(zmax - zmin >= 6.5 and zmax - zmin <= 9.5 and #parts <= 60, string.format("a green frog %.1f cm from snout to vent (the sources' 5 to 10), %d parts", zmax - zmin, #parts))
+	check(FrogText.CAUSE == Frog.CAUSE and FrogText.LINE ~= "" and string.find(FrogText.SUB, "Keeping still", 1, true) ~= nil, "its card and its words")
+	-- the darner: by day over the open water, away by night
+	local at = Pond.darner(914, 12.5, 12)
+	local none = Pond.darner(914, 12.5, 22)
+	local mx, mz = Preserve.metres(at :: Vector3)
+	check(at ~= nil and none == nil and ((mx - Preserve.POND.x) / Preserve.POND.rx) ^ 2 + ((mz - Preserve.POND.z) / Preserve.POND.rz) ^ 2 < 1.2 and (at :: Vector3).Y > Pond.WATER + 60,
+		"the green darner over the pond by day, a metre up; away by night")
 end)
 
 print(`PRESERVE passed={passed} failed={failed}`)

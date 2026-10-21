@@ -1,0 +1,13 @@
+{
+  "package": "C:\\Users\\natha\\claude-xfer\\Windowsill-v48-place137-06be0270d414ffc2.zip",
+  "bytes": 16457293,
+  "sha256": "5cc7174986c244797e98edf61cc4ced680260f1f90ac57056ea860764cdccd34",
+  "files": 607,
+  "source": "1ba2eb3a2b296e72d3cb753e68740b6d62ea8e89",
+  "docs_commit": "cadc30328434d183278d5e78b6413626519df73c",
+  "evidence_id": "06be0270d414ffc2",
+  "published_place_version": 137,
+  "place_id": 120119801868085,
+  "universe_id": 10771103250,
+  "status": "published; final CLI 55/55; native Studio 270/0/0"
+}

@@ -26,7 +26,7 @@ function SaveClient.new(cfg: Config): any
 	local self:any = setmetatable({
 		cfg = cfg, born = now, remotes = nil :: any, phase = "searching", helloAt = -1e9, helloTries = 0,
 		protectedSlots = {} :: {[string]:string}, lifeTokens = {} :: {[string]:string}, lifeRequests = {} :: {[string]:any}, lifeSerial = 0,
-  lastProgress = -1e9, dirty = false, pendingRest = {} :: { [string]: any }, lastRest = {} :: { [string]: number },
+  restPreparing={},restUnsent={},lastProgress = -1e9, dirty = false, pendingRest = {} :: { [string]: any }, lastRest = {} :: { [string]: number },
 		st = nil :: string?, why = nil :: string?, sent = { progress = 0, rest = 0, hello = 0 },
 	}, SaveClient)
  if cfg.continuation then
@@ -114,6 +114,7 @@ function SaveClient.markDirty(self: any)
 end
 
 function SaveClient.beginLife(self: any,mode: string,offerId: string?)
+ self.restPreparing[mode]=nil;self.restUnsent[mode]=nil
  if self.bound then
   self.activeSlot=mode
   if self.legacyTemporary then return false end
@@ -129,8 +130,29 @@ function SaveClient.beginLife(self: any,mode: string,offerId: string?)
  self.lastRest[mode]=nil
 end
 
+function SaveClient.beginRestPreparation(self:any,mode:string,token:any)
+ self.restPreparing[mode]={token=token,request=self.bound and self.bound.requests[mode],epoch=self.bound and self.bound.epoch}
+end
+function SaveClient.prepareRest(self:any,mode:string,record:any,token:any):(() -> boolean)?
+ local p=self.restPreparing[mode]
+ if not p or p.token~=token or not self.bound or p.epoch~=self.bound.epoch or p.request~=self.bound.requests[mode] then return nil end
+ return if not self.legacyTemporary then self.bound:prepareCheckpoint(mode,record) else nil
+end
+function SaveClient.endRestPreparation(self:any,mode:string,token:any,kept:boolean,queued:boolean):boolean
+ local p=self.restPreparing[mode]
+ if not p or p.token~=token then return false end
+ self.restPreparing[mode]=nil
+ if self.bound and p.epoch==self.bound.epoch and p.request==self.bound.requests[mode] then
+  if kept then self.restUnsent[mode]=if not queued then {request=p.request,epoch=p.epoch} else nil end
+ end
+ return true
+end
 function SaveClient.sendRest(self: any, mode: string, record: any)
- if self.bound then return if self.legacyTemporary then false else self.bound:checkpoint(mode,record) end
+ if self.bound then
+  local accepted=not self.legacyTemporary and self.bound:checkpoint(mode,record)
+  if accepted then self.restUnsent[mode]=nil end
+  return accepted
+ end
  if self.protectedSlots[mode] then return end
 	self.pendingRest[mode] = record
 end
@@ -138,7 +160,7 @@ end
 function SaveClient.continueLife(self:any,mode:string,id:string):boolean
  if not self.bound or self.legacyTemporary then return false end
  local accepted=self.bound:choose(mode,"continue",id)
- if accepted then self.activeSlot=mode;self.temporarySlots[mode]=nil elseif self.bound.requests[mode]==nil then self.temporarySlots[mode]=true end
+ if accepted then self.activeSlot=mode;self.temporarySlots[mode]=nil;self.restPreparing[mode]=nil;self.restUnsent[mode]=nil elseif self.bound.requests[mode]==nil then self.temporarySlots[mode]=true end
  return accepted
 end
 -- Cancelling deferred Continue may revoke only that exact local request.
@@ -179,7 +201,16 @@ function SaveClient.status(self: any): (string?, string?)
  if self.bound and (self.bound.epoch~=nil or self.legacyTemporary) then
   if self.legacyTemporary then return "session","unsupported_save" end
   if (self.activeSlot and self.temporarySlots[self.activeSlot]) or (not self.activeSlot and next(self.temporarySlots)~=nil) then return "session","temporary_life" end
-  return self.bound:status(self.activeSlot)
+  local st,why=self.bound:status(self.activeSlot)
+  if st=="saved" then
+   for mode,p in self.restPreparing do
+    if (self.activeSlot==nil or self.activeSlot==mode) and p.epoch==self.bound.epoch and p.request==self.bound.requests[mode] then return "saving",nil end
+   end
+   for mode,p in self.restUnsent do
+    if (self.activeSlot==nil or self.activeSlot==mode) and p.epoch==self.bound.epoch and self.bound.requests[mode]==p.request then return "saving","rest_refused" end
+   end
+  end
+  return st,why
  end
 	if self.st ~= nil then
   if self.st=="saved" then for _,request in self.lifeRequests do if not request.done then return "saving",nil end end end

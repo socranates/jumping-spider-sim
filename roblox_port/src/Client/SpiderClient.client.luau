@@ -327,7 +327,7 @@ local saveClient: any = nil -- persistent saves (ROBLOX-39), made below with the
 -- The saving's state, in one table (the client is at Luau's limit of 200 locals): the settings the player touched this visit, whether a saved value is being applied (not a touch),
 -- the last status and reason told, the last notebook signature and eye seconds sent, when the eye seconds were last looked at; `broken` (ROBLOX-92): the client's saving raised, so it
 -- is off for the visit (the game goes on); `look`: a saved spider waiting for the spider to stand safely.
-local saveState: any = { touched = {} :: { [string]: boolean }, applying = false, status = nil, reason = nil, sig = "", eye = 0.0, eyeCheck = os.clock(), broken = false, look = nil }
+local saveState: any = { touched = {} :: { [string]: boolean }, applying = false, status = nil, reason = nil, sig = "", eye = 0.0, eyeCheck = os.clock(), broken = false, look = nil, worldGeneration=0 }
 -- Whether a modal screen has the game: the world waits and the controls belong to it. At the very start the world also waits (a second or
 -- so at most) for the server to say what is saved, so the start menu shows the right choices; not in the test place unless the Workspace attribute SaveWait is true.
 local function modal(): boolean
@@ -344,6 +344,11 @@ end
 -- rest), and free play.
 local stores = {main=newStore(), free=newStore(), easy=newStore()}
 local checkpoints = stores.main
+function saveState.invalidateRest()
+ saveState.worldGeneration+=1
+ if saveState.rest then saveState.rest:cancel() end
+ life:cancelCheckpoint()
+end
 life.save = function(): LifeLoop.CheckpointResult
 	-- The mating cycle (ROBLOX-80): the night's sleep that reached this morning has made the sac, and a rest by a full-grown, well-fed spider makes a mate come, so
 	-- this checkpoint keeps what the player has seen and a return to it never loses a night.
@@ -353,6 +358,7 @@ life.save = function(): LifeLoop.CheckpointResult
 	-- (ROBLOX-92: a rest that is refused is refused before it changes anything, so the mate's morning is not set by a rest that was not kept; the refusal is in the game's own words)
 	local why = Checkpoint.boundaryProblem(checkpointWorld)
 	if why ~= "" then return { ok = false, message = M.LifeText.restRefusal(why) } end
+ if saveState.rest then saveState.rest:cancel() end
 	-- (ROBLOX-91: a full-grown spider too hungry for a visitor is told so at its rest; the notice rides with the checkpoint's own words)
 	local hungry = if mateLegs.Mating.tooHungry(life) then "\n" .. mateLegs.Text.TOO_HUNGRY else ""
 	mateLegs.Mating.atRest(life, life.clock.day, life.clock.hour)
@@ -361,15 +367,14 @@ life.save = function(): LifeLoop.CheckpointResult
 		warn("[Windowsill] checkpoint: " .. tostring(err))
 		return { ok = false, message = M.LifeText.KEEP_FAILED }
 	end
-	local r = checkpoints:save(record)
-	if not r.ok then warn("[Windowsill] checkpoint: " .. r.message .. ": " .. table.concat(r.errors, "; ")) end
-	if r.ok and saveClient ~= nil and not saveState.broken then
-		local slot: string = "main" -- (the store this life rests in, by its name)
-		for name, st in stores :: { [string]: any } do if st == checkpoints then slot = name end end
-		local sent, problem = pcall(function() saveClient:sendRest(slot, record) end) -- (ROBLOX-92: a failing save never takes the rest with it)
-		if not sent then saveState.fail(problem) end
-	end
-	return { ok = r.ok, message = (if r.ok then M.LifeText.restKept(record.world_map.retreat, r.message) else r.message) .. hungry } -- (ROBLOX-96: a rest under the stone says so)
+ local slot: string="main"
+ for name,st in stores :: {[string]:any} do if st==checkpoints then slot=name end end
+ local result:LifeLoop.CheckpointResult={ok=false,message="",pending=true}
+ life:beginCheckpoint(result)
+ if saveClient then saveClient:beginRestPreparation(slot,result) end
+ saveState.rest:begin(record,{mode=slot,source=checkpoints,revision=checkpoints.store.revision,
+  generation=saveState.worldGeneration,result=result,hungry=hungry,retreat=record.world_map.retreat})
+ return result
 end
 local feedPending, cancelPending = false, false -- this frame's presses, for the next fixed tick (Godot's just_pressed)
 local lifeSpider: LifeLoop.Spider = { inRetreat = false, attached = true, still = true, holding = false, feeding = false }
@@ -773,6 +778,7 @@ end
 -- Backspace / View: back to the retreat checkpoint (the whole sill as it was), or to the start when there is none yet.
 local function returnToCheckpoint(offered: any?, prepared: (() -> (boolean, {string}))?): boolean
  if saveState.restore then saveState.restore:cancel() end
+ saveState.invalidateRest()
 	spiderPick.finish(nil, true) -- (a close look does not survive a return to the last rest)
 	local best = if offered then {ok=true,record=offered} else checkpoints:loadBest()
 	if not best.ok then
@@ -843,6 +849,7 @@ local function fresh(mode: string, easy: boolean, position: Vector3?, displayedO
  if not initialRecord or (easy and not session.finishedMain) then return false end
  if saveClient and saveClient:offerPending(if mode=="free" then "free" elseif easy then "easy" else "main") then return false end
  if saveState.restore then saveState.restore:cancel() end
+ saveState.invalidateRest()
  spiderPick.finish(nil, true)
  local ok=Checkpoint.restore(initialRecord,checkpointWorld)
  if not ok then return false end
@@ -899,7 +906,7 @@ local function presentEnd(immediate: boolean)
  local endingOffer=if saveClient then saveClient:offerInfo(M.SaveRules.slotOf(session.mode,session.rules)) else nil
  saveState.endOfferId=if endingOffer then endingOffer.id else nil
  local choices: {CaughtPanel.Choice}={}
- local hasRest=checkpoints:loadBest().ok
+ local hasRest=checkpoints:hasKnownRest()
  if hasRest then table.insert(choices,{id="Back",text="Back to your last rest"}) end
  table.insert(choices,{id="Another",text=mateLegs.Text.another(mateLegs.Mating.hasSac(life.mating))}) -- (ROBLOX-91: a new life; the brood is left behind)
  table.insert(choices,{id="Notebook",text=M.NotebookText.MENU_CHOICE})
@@ -1094,6 +1101,7 @@ end
 -- Carry on: the next generation is a spiderling again in the crack, the days of the sill go on, the notebook and the look are the player's own. ROBLOX-120: `landed`, a
 -- ride's end (mateLegs.follow): the spiderling begins where the wind set it down, and the life keeps where (`start_zone`, `start_region`); without it, the hut's crack.
 function mateLegs.carryOn(landed: any?)
+ saveState.invalidateRest()
  local generation,day=mateLegs.Mating.carryOn(life,needs,prey.feeding.mealsFinished)
  life.start_zone=if landed~=nil then landed.zone else nil
  life.start_region=if landed~=nil then landed.region else nil
@@ -1395,6 +1403,38 @@ local function applySaved(msg: any)
 	if not setting("ControlHints") and helpUntil ~= math.huge then helpVisible = false end
 	refreshMenu()
 end
+saveState.rest=require(script.Parent.SaveRestore).new({
+ workOptions={budget=.002,maxSeconds=120},
+ prepare=function(record:any,stamp:any):any
+  local nextStore=stamp.source:forkMemory()
+  local saved=nextStore:save(record)
+  if not saved.ok then return nil,saved.message end
+  local admit=if saveClient and not saveState.broken then saveClient:prepareRest(stamp.mode,record,stamp.result) else nil
+  return function():boolean
+   local queued=not saveState.broken and admit~=nil and admit()
+   stores[stamp.mode]=nextStore;checkpoints=nextStore
+   if saveClient then saveClient:endRestPreparation(stamp.mode,stamp.result,true,queued) end
+   return true
+  end
+ end,
+ current=function(stamp:any):boolean
+  return stamp.generation==saveState.worldGeneration and stores[stamp.mode]==stamp.source and checkpoints==stamp.source
+   and stamp.source.store.revision==stamp.revision and life._checkpointPending==stamp.result
+ end,
+ cancelled=function(stamp:any)
+  life:cancelCheckpoint(stamp.result)
+  if saveClient then saveClient:endRestPreparation(stamp.mode,stamp.result,false,false) end
+ end,
+ failed=function(stamp:any,problem:any)
+  if saveClient then saveClient:endRestPreparation(stamp.mode,stamp.result,false,false) end
+  if life:finishCheckpoint(stamp.result,{ok=false,message=M.LifeText.KEEP_FAILED}) then warn("[Windowsill] last rest preparation failed: "..tostring(problem)) end
+ end,
+ completed=function(stamp:any)
+  life:finishCheckpoint(stamp.result,{ok=true,message=M.LifeText.restKept(stamp.retreat,"Last rest kept.")..stamp.hungry})
+  if session.ended and lastEnd~=nil and panel:isShowing() then presentEnd(true) end
+  refreshMenu()
+ end,
+})
 saveState.restore=require(script.Parent.SaveRestore).new({
  workOptions={budget=.002,maxSeconds=120},
  prepare=function(record: any,stamp: any): any
@@ -1509,8 +1549,15 @@ function saveState.fail(err: any)
 	hud:saveNotice(M.SaveText.brokenLine())
 	if menuStarted and menu:isShowing() and confirming == nil then menu.summary.Text = menuBody() end
 end
--- The saving's part of each frame: nothing the saving does can stop the frame (and once it has failed, nothing more is tried).
+-- Saving cannot stop the frame. A failed network path stays off for the visit; local last rests still prepare.
 function saveState.frame()
+ -- Local last rests remain available even if network saving failed this visit.
+ local okRest,restError=pcall(function() saveState.rest:update() end)
+ if not okRest then
+  local token=life._checkpointPending
+  if token then life:finishCheckpoint(token,{ok=false,message=M.LifeText.KEEP_FAILED}) end
+  saveState.rest:cancel();warn("[Windowsill] local rest preparation: "..tostring(restError))
+ end
 	saveState.settleLook()
 	if saveState.broken then return end
 	local ok, err = pcall(function(): any updateSaves();saveState.restore:update(); return nil end)

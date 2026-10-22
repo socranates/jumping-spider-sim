@@ -1,3 +1,4 @@
+local awaitRest=require("./studio/AwaitRest")
 -- A smoke run of the client scripts themselves (SpiderClient, SpiderInput, SpiderHud, SpiderCamera, SpiderRig and the shared
 -- modules) on the box world, with stub Roblox services (tests/shim.luau): keys are pressed through the same
 -- ContextActionService callbacks the engine calls, frames through the bound render step. It catches wiring and runtime
@@ -18,6 +19,12 @@ local services = game:GetService("ContextActionService") and ClientStubs
 local frame = ClientStubs.renderSteps.SpiderSim
 local gui = game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui")
 local function frames(n: number) for _ = 1, n do frame(1 / 60) end end
+-- Settle asynchronous storage without advancing controlled clock/physics fixtures.
+local function settleRest()
+ local d=ClientStubs.driver
+ if d.life.checkpointResult then awaitRest(d.life.checkpointResult,function() frame(0) end) end
+ frame(0)
+end
 local KEYS = { Feed = "E", Jump = "Space", Cancel = "Q", Drop = "F", Forward = "W", Back = "S", Eye = "V", Recenter = "R", Creep = "LeftControl", Run = "LeftShift", Reset = "Backspace", Choose = "C", Display = "X", Slow = "T" }
 local function key(action: string, down: boolean)
 	local fn = services.actions["Spider" .. action]
@@ -193,6 +200,7 @@ check("in the crack E rests; in the evening the spider sleeps until morning, the
 	key("Feed", true); frames(2); key("Feed", false); frames(2)
 	assert(life.resting and not life.asleep, "E did not rest")
 	assert(string.find(find("SpiderPrompts", "PromptTitle").Text, "Resting", 1, true), find("SpiderPrompts", "PromptTitle").Text)
+	settleRest()
 	assert(find("SpiderPrompts", "Notice").Visible, "no notice for the rest")
 	key("Feed", true); frames(2); key("Feed", false); frames(2)
 	assert(not life.resting, "E again did not end the rest")
@@ -208,6 +216,7 @@ check("in the crack E rests; in the evening the spider sleeps until morning, the
 	assert(lighting.ClockTime < dayClock and lighting.Brightness < 2.6, `the light did not dim at night (clock {lighting.ClockTime}, brightness {lighting.Brightness})`)
 	frames(600)
 	assert(life.clock.day == 2 and not life.asleep and life.resting and math.abs(life.clock.hour - 7) < 0.05, `no morning: day {life.clock.day}, {life.clock.hour}`)
+	settleRest()
 	-- (ROBLOX-113: Normal after the first day shows the rest kept and not the morning's own line, which the day line says; the loop's words are as they were)
 	assert(string.find(life.notice, "Morning, day 2", 1, true), life.notice)
 	assert(find("SpiderPrompts", "Notice").Text == "Last rest kept." and string.find(find("SpiderPrompts", "Day").Text, "Day 2, morning", 1, true), find("SpiderPrompts", "Notice").Text)
@@ -253,12 +262,14 @@ end)
 check("Backspace returns to the checkpoint kept by a rest, or to the start when there is none", function()
 	local driver = ClientStubs.driver
 	local life, needs, prey = driver.life, driver.needs, driver.prey
-	assert(driver.checkpoints:loadBest().ok, "the rests above kept no checkpoint")
+	if driver.life.checkpointResult then awaitRest(driver.life.checkpointResult,function() frames(1) end) end
+	assert(driver.currentStore():loadBest().ok, "the rests above kept no checkpoint")
 	-- A new rest at midday keeps a fresh checkpoint.
 	driver.place(Vector3.new(-25.5, 0.31, 6.0))
 	frames(30)
 	life.clock.hour = 12
 	key("Feed", true); frames(2); key("Feed", false); frames(2)
+	settleRest()
 	assert(life.resting and life.notice == "Last rest kept.", "no last rest: " .. life.notice)
 	local energy, hour, tick = needs.energy, life.clock.hour, prey.tick
 	-- Walk away for a while: the world moves on.
@@ -544,6 +555,7 @@ check("walk through the crack entrance and rest, without teleporting inside",fun
  assert(d.lifeSpider().inRetreat,`could not walk into crack: {d.motor.pos}`)
  key("Feed",true);frames(1);key("Feed",false);frames(3)
  assert(d.life.resting,"rest did not begin after entering")
+ settleRest()
  assert(d.currentStore():loadBest().ok,"no checkpoint")
 end)
 check("starvation pauses once, last rest revives, another spider resets world and keeps cosmetic",function()
@@ -579,10 +591,12 @@ check("main and free play keep independent last rests and restore their own rule
  local d=ClientStubs.driver
  assert(d.fresh("main",false,nil));d.place(Vector3.new(-25.5,.31,6));frames(4)
  d.needs.energy=.7;key("Feed",true);frames(1);key("Feed",false);frames(2)
+ settleRest()
  local main=d.currentStore():loadBest();assert(main.ok)
  d.openMenu();assert(d.menu:choose("Free"));frames(3)
  d.place(Vector3.new(-25.5,.31,6));frames(4);d.needs.energy=.3
  key("Feed",true);frames(1);key("Feed",false);frames(2)
+ settleRest()
  assert(d.currentStore():loadBest().ok)
  d.openMenu();assert(d.menu:choose("Continue"));frames(3)
  assert(d.session.mode=="main" and not d.needs.gentle and d.needs.energy>.6)

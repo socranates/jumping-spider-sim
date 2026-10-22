@@ -1,3 +1,4 @@
+local awaitRest=require("./studio/AwaitRest")
 -- Persistent saves, the client's side (ROBLOX-39): the words, SaveClient on a fake clock and fake remotes, and the real SpiderClient on the
 -- shim with a scripted server: it waits for the server's word before the start menu, applies the notebook, the adult life, the spider, the
 -- toggles and the rests it is sent, sends up only what the player changed, says plainly when saving is off, and a rest the real client
@@ -348,7 +349,7 @@ case("a rest the real client captures goes up as a rest the server would accept,
 	local driver: any = ClientStubs.driver
 	frames(60)
 	R.fired = {}
-	local r = driver.life.save()
+	local r = awaitRest(driver.life.save(),function() frames(1) end)
 	check(r.ok, "the checkpoint was kept: " .. tostring(r.message))
 	realWait(SaveRules.CLIENT_PROGRESS_GAP * 2 + 0.1)
 	frames(3)
@@ -452,7 +453,7 @@ case("the Easy life rests in its own slot (ROBLOX-91): a rest goes up as easy, t
 	check(driver.stores.main:loadBest().ok and canon(driver.stores.main:loadBest().record) == before, "the standard life's rest is intact")
 	frames(60)
 	R.fired = {}
-	local r = driver.life.save()
+	local r = awaitRest(driver.life.save(),function() frames(1) end)
 	check(r.ok, "the Easy rest was kept: " .. tostring(r.message))
 	realWait(SaveRules.CLIENT_PROGRESS_GAP * 3 + 0.1)
 	frames(3)
@@ -472,7 +473,7 @@ case("the Easy life rests in its own slot (ROBLOX-91): a rest goes up as easy, t
 	-- a restore always puts the game's struggle back, whatever the record held
 	local feeding: any = driver.prey.feeding
 	feeding.game, feeding.startGrip = false, 0.123
-	check(driver.life.save().ok, "a rest with another struggle in it is kept")
+	check(awaitRest(driver.life.save(),function() frames(1) end).ok, "a rest with another struggle in it is kept")
 	driver.returnToCheckpoint()
 	feeding = driver.prey.feeding
 	check(feeding.game == true and feeding.startGrip ~= 0.123, `the game's struggle is on after a return to the last rest (game {tostring(feeding.game)}, grip {feeding.startGrip})`)
@@ -549,7 +550,7 @@ case("a saving that raises leaves the frame running, says once that saving is of
 	R.fired = {}
 	realWait(SaveRules.CLIENT_PROGRESS_GAP + 0.1)
 	lp:SetAttribute("InvertX", not lp:GetAttribute("InvertX"))
-	driver.life.save()
+	awaitRest(driver.life.save(),function() frames(1) end)
 	realWait(SaveRules.CLIENT_PROGRESS_GAP + 0.1)
 	frames(5)
 	check(#firedOf("progress") == 0 and #firedOf("rest") == 0, "nothing more is sent")

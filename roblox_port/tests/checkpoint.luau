@@ -1704,5 +1704,20 @@ case("known-rest menu hint never substitutes for restore validation",function()
  check(fingerprint(w)==before,"failed load still preserves live world")
 end)
 
+case("pending lifecycle tokens are transient and capture cleanup survives errors",function()
+ local w=newWorld();for _=1,120 do tick(w) end
+ local token=w.life:beginCheckpoint({ok=false,pending=true,message=""})
+ local cpu,ring=w.prey.cpu,w.sensor._ring
+ local record=assert(Checkpoint.capture(w,0))
+ local problems,decoded=Checkpoint.check(record,w)
+ check(#problems==0 and decoded and decoded.roots.life._checkpointPending==nil and decoded.roots.life.checkpointResult==nil,"saved graph contains no pending token or phantom completion")
+ check(w.life._checkpointPending==token and token.pending and w.prey.cpu==cpu and w.sensor._ring==ring,"successful capture restores all live transient fields")
+ local capture=ObjectRecord.capture;ObjectRecord.capture=function() error("synthetic capture error") end
+ local bad,why=Checkpoint.capture(w,0);ObjectRecord.capture=capture
+ check(bad==nil and string.find(why,"synthetic capture error",1,true),"capture error is returned as a refusal")
+ check(w.life._checkpointPending==token and w.life.checkpointResult==token and w.prey.cpu==cpu and w.sensor._ring==ring,"failed capture restores pending token and profiling windows")
+ check(Checkpoint.restore(record,w) and token.cancelled and not token.pending and w.life._checkpointPending==nil,"valid restore finalizes the old external token without restoring transient work")
+end)
+
 print(`CHECKPOINT passed={passed} failed={failed}`)
 if failed > 0 then error("CHECKPOINT failed") end

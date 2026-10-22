@@ -1629,6 +1629,7 @@ local function checks(): { Check }
 		need(ctx.world:inRetreat(ctx.motor.pos) == "sill_crevice", "not in the crack")
 		input:simulate("Feed", true); pause(r, 0); input:simulate("Feed", false)
 		need(waitUntil(r, 2, function() return life.resting end), "no rest in the crack: " .. tostring(life.notice))
+  need(waitUntil(r,120,function() return life.checkpointResult~=nil and not life.checkpointResult.pending end),"last rest preparation did not finish")
 		local best = ctx.currentStore():loadBest()
 		need(best.ok and best.record.world_map.retreat == "sill_crevice", "no checkpoint kept: " .. tostring(best.message))
 		put(r, SelfTest.SILL, nil)

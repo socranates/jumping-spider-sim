@@ -1,3 +1,4 @@
+local awaitRest=require("./studio/AwaitRest")
 -- Actual game/menu with protocol3 scripted replies and a fake save clock; no native/network proof.
 local Layout=require("../src/Shared/Habitat/WindowsillLayout")
 local Json=require("../src/Shared/Persistence/Json")
@@ -88,6 +89,7 @@ assert(loadedOk,"real client failed to load")
 local d=assert(ClientStubs.driver);local time=os.clock();d.saveClient.cfg.now=function() return time end
 local workClock=0
 d.saveState.restore.cfg.workOptions={budget=.0001,maxSeconds=1000,now=function() workClock+=.001;return workClock end}
+d.saveState.rest.cfg.workOptions=d.saveState.restore.cfg.workOptions
 local function settled()
  for _=1,10000 do if not d.saveState.restore.job then return end;frames(1) end
  error("controller preparation did not finish")
@@ -137,7 +139,7 @@ check(d.session.started and d.currentStore()==d.stores.main and d.stores.main:lo
 local pos=d.motor.pos;local sig=assert(Json.canonical(d.stores.main:loadBest().record))
 decide(first,1,"readonly",nil,"other_session");frames(2)
 check((d.motor.pos-pos).Magnitude<.01 and Json.canonical(d.stores.main:loadBest().record)==sig,"decision never restores twice")
-check(d.life.save().ok,"readonly local rest retained");advance();check(#firedOf("rest")==0,"readonly cannot upload")
+check(awaitRest(d.life.save(),function() frames(1) end).ok,"readonly local rest retained");advance();check(#firedOf("rest")==0,"readonly cannot upload")
 decide(first,2,"writable","grant_main");reply({kind="status",status="saved"});advance()
 local xs=firedOf("rest");local rest=xs[#xs]
 check(rest and rest.mode=="main" and rest.credential=="grant_main" and #SaveRest.check("main",rest.record)==0,"grant sends actual controller checkpoint")

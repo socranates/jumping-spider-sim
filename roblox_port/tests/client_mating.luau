@@ -1,3 +1,4 @@
+local awaitRest=require("./studio/AwaitRest")
 -- (the mating cycle's part of the client smoke run, in a file of its own: the whole smoke run is close to the time one check may take)
 -- The mate on the sill and drawn, the courtship meter in the hud, the egg sac, the hatching scene, the ending card and the next generation, through the real
 -- client scripts on the box world with stub Roblox services (tests/shim.luau); the words (Shared/UI/MateText) and the stage's pure plan and pose first.
@@ -319,6 +320,7 @@ local function sleepThrough(d: any)
 	end
 	assert(d.life.clock.day == day + 1 and not d.life.asleep, `no morning: day {d.life.clock.day}`)
 	d.needs.energy = 0.8
+	if d.life.checkpointResult then awaitRest(d.life.checkpointResult,function() frame(0) end) end
 	frames(3) -- (the morning's own tick: the guard day and the hatching are the clock's, read once the hour has come)
 end
 
@@ -577,7 +579,7 @@ check("Carry on: the next generation is a spiderling again in the crack, the day
 	life.clock.hour = 12.0
 	key("Feed", true); frames(2); key("Feed", false); frames(2)
 	assert(life.resting, "and rests")
-	assert(life.checkpointResult ~= nil and life.checkpointResult.ok, "the rest was kept")
+	assert(life.checkpointResult ~= nil and awaitRest(life.checkpointResult,function() frames(1) end).ok, "the rest was kept")
 	local rec = d.currentStore():loadBest()
 	assert(rec.ok and rec.record ~= nil, "a checkpoint of the new generation")
 	-- Returning to it brings the generation back, with no mate or sac.
@@ -766,7 +768,7 @@ check("the scene: the camera eases into a two-shot and orbits a quarter, the con
 	assert(turned > 25 and turned < 80, `the camera has gone round the pair by {turned} degrees between 4.6 s and 9 s`)
 	assert(d.mateLegs.stage.rig ~= nil and legs.couple.focus ~= nil, "the pair look at each other")
 	-- A rest cannot land inside it.
-	local why = life.save()
+	local why = awaitRest(life.save(),function() frames(1) end)
 	assert(not why.ok and string.find(why.message, "together", 1, true) ~= nil, `a rest is refused: {why.message}`)
 	-- A skip after four seconds.
 	assert(legs.couple.t > 4, "(past four seconds)")
@@ -824,7 +826,7 @@ check("the scene played to its end: the notice is held, the walk off is the last
 	assert(mate.state == "leaving" and mate.scene == true and legs.couple.active, "the pause is over and the mate is walking: the last beat")
 	assert(caption() == MateText.SCENE_GOES, `the last caption: "{caption()}"`)
 	assert(life.notice ~= MateText.MATED, "the parting is not told over the scene")
-	local why = life.save()
+	local why = awaitRest(life.save(),function() frames(1) end)
 	assert(not why.ok and string.find(why.message, "together", 1, true), "a rest is refused in the walk off too")
 	local k = 0
 	while legs.couple.active and k < 10 * 8 do wait(0.1); k += 1; life.clock.hour = 9.0 end
@@ -1083,13 +1085,13 @@ check("a rest that is refused says so in the game's words, and does not set the 
 	life.clock.hour = 12.0
 	life.mating = Mating.normalize({ stage = "none" })
 	d.motor.vel = Vector3.new(2, 0, 0) -- (a walking spider's speed is not in `vel`; the checkpoint tests set it the same way)
-	local refused = life.save()
+	local refused = awaitRest(life.save(),function() frames(1) end)
 	d.motor.vel = Vector3.zero
 	assert(not refused.ok and refused.message == "Not now — keep still first", `refused while moving: "{refused.message}"`)
 	assert(life.mating.ready_day == 0, `a refused rest sets no morning for a visitor ({life.mating.ready_day})`)
 	assert(not string.find(string.lower(refused.message), "checkpoint") and not string.find(refused.message, "spider is moving", 1, true), "no engineer's words")
 	wait(1.0)
-	local kept = life.save()
+	local kept = awaitRest(life.save(),function() frames(1) end)
 	assert(kept.ok and life.mating.ready_day > 0, `a rest that is kept does ({kept.message}, ready {life.mating.ready_day})`)
 	assert(not string.find(string.lower(kept.message), "checkpoint"), `and says "rest", not "checkpoint": "{kept.message}"`)
 	life.mating = Mating.normalize({ stage = "none" })
@@ -1250,6 +1252,7 @@ check("a rest too hungry for a visitor says so (ROBLOX-91), and no visitor is se
 	frames(2)
 	key("Feed", true); frames(2); key("Feed", false); frames(2)
 	assert(life.resting, "E did not rest")
+	if life.checkpointResult then awaitRest(life.checkpointResult,function() frame(0) end) end
 	assert(string.find(life.notice, "Too hungry for a visitor to come", 1, true), `the notice: "{life.notice}"`)
 	assert(life.mating.ready_day == 0 and life.mating.stage == "none", "and no morning was set")
 	-- fed, the same rest sets the cycle going and says nothing of hunger

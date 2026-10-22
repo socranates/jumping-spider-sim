@@ -260,6 +260,9 @@ function Checkpoint.capture(world: World, createdAt: number?): ({ [string]: any 
 	local motor = world.motor
 	-- (the live windows are put aside for the capture and put straight back)
 	local prey, sensor = world.prey, world.sensor
+ local pending,previousResult=world.life._checkpointPending,world.life.checkpointResult
+ world.life._checkpointPending=nil
+ if type(previousResult)=="table" and previousResult.pending then world.life.checkpointResult=nil end
 	local cpu, ring = prey.cpu, sensor._ring
 	if cpu ~= nil then prey.cpu = {} end
 	if ring ~= nil then sensor._ring = {} end
@@ -270,10 +273,12 @@ function Checkpoint.capture(world: World, createdAt: number?): ({ [string]: any 
 			for _, d in entry.kinds do if type(d) == "table" and d.cpu ~= nil then gardenCpu[d] = d.cpu; d.cpu = {} end end
 		end
 	end
-	local graph, why = ObjectRecord.capture(liveRoots(world), Checkpoint.CLASSES, Checkpoint.refs(world))
+ local ok,graph,why=pcall(function() return ObjectRecord.capture(liveRoots(world),Checkpoint.CLASSES,Checkpoint.refs(world)) end)
+ world.life._checkpointPending=pending;world.life.checkpointResult=previousResult
 	if cpu ~= nil then prey.cpu = cpu end
 	if ring ~= nil then sensor._ring = ring end
 	for d, window in gardenCpu do d.cpu = window end
+ if not ok then return nil,tostring(graph) end
 	if not graph then return nil, why end
 	local region = WorldMap.at(motor.pos) or WorldMap.region(WorldMap.HOME) :: WorldMap.Region
 	local retreat = WorldMap.inRetreat(motor.pos) or ""
@@ -535,6 +540,7 @@ end
 -- The caller then lets go of anything the motor or the screen held (aims, lines, the camera); SpiderMotor.place already
 -- ends every line, aim and walk.
 local function apply(record: any, world: World, decoded: ObjectRecord.Decoded): (boolean, { string })
+ local previousPending=world.life._checkpointPending
 	local p = record.player
 	local pos, n, h = vec(p.position) :: Vector3, vec(p.normal) :: Vector3, vec(p.heading) :: Vector3
 	if not ObjectRecord.commit(decoded, liveRoots(world)) then
@@ -572,6 +578,9 @@ local function apply(record: any, world: World, decoded: ObjectRecord.Decoded): 
 	-- Godot's apply_record: the rest that was going on goes on, the spider takes a moment to take hold, and the screen says
 	-- this is checkpoint recovery. What was owed or announced at that tick is not done again.
 	local life = world.life
+ if previousPending then previousPending.pending=nil;previousPending.morning=nil;previousPending.noticeRevision=nil;previousPending.ok=false;previousPending.cancelled=true end
+ life._checkpointPending=nil
+ if type(life.checkpointResult)=="table" and life.checkpointResult.pending then life.checkpointResult=nil end
 	local rules = record.life_rules or {mode="main",rules="standard"}
 	life.mode, life.rules, life.lifeOver = rules.mode, rules.rules, false
 	world.needs.gentle = rules.rules == "gentle"

@@ -1,3 +1,4 @@
+local awaitRest=require("./studio/AwaitRest")
 -- Real preserve client: New Life must not inherit another spider's predator reactions.
 local Map=require("../src/Shared/World/WorldMap")
 local Build=require("../src/Shared/World/WorldBuild")
@@ -66,10 +67,10 @@ for _,mode in {"main","free"} do
 end
 -- These three predators keep seeded schedules, not checkpointed combat state.
 -- Returning to a rest must not retain a reaction that happened after that rest.
-local saved=d.life.save()
+local day,hour=d.life.clock.day,d.life.clock.hour
+local saved=awaitRest(d.life.save(),function() frames(1) end)
 check(saved.ok,"the real client keeps a rest for the recovery case: "..tostring(saved.message))
 if saved.ok then
- local day,hour=d.life.clock.day,d.life.clock.hour
  arm()
  for _,row in actors do row[1].enabled=false end
  d.returnToCheckpoint()

@@ -27,7 +27,7 @@ CheckpointStore.MemoryDataStore = MemoryDataStore
 MemoryDataStore.MAX_CHARS = 4194304
 
 function MemoryDataStore.new(): any
-	return setmetatable({ data = {} :: { [string]: any }, writes = 0, failNext = 0, failReads = 0, sizes = {} :: { [string]: number },
+	return setmetatable({ data = {} :: { [string]: any }, writes = 0, revision = 0, failNext = 0, failReads = 0, sizes = {} :: { [string]: number },
 		written = setmetatable({}, { __mode = "k" }) :: any, -- (ROBLOX-108) per table written (weakly held): the store's copy of it and its text
 	}, MemoryDataStore)
 end
@@ -74,13 +74,15 @@ function MemoryDataStore.SetAsync(self: any, key: string, value: any)
 	self.data[key] = copy
 	self.sizes[key] = #text
 	self.writes += 1
+ self.revision += 1
 	if type(value) == "table" then self.written[value] = { copy = copy, text = text :: string } end
 end
 
 function MemoryDataStore.RemoveAsync(self: any, key: string): any
-	local old = self.data[key]
+	local old = Json.copy(self.data[key])
 	self.data[key] = nil
 	self.sizes[key] = nil
+ self.revision += 1
 	return old
 end
 
@@ -106,6 +108,20 @@ local function result(self: any, ok: boolean, message: string, errors: { string 
 	self.last = r
  if ok then self.knownRest=true end
 	return r
+end
+
+-- A private copy-on-write memory store. Stored values are never mutated by
+-- this backend and Get/Remove return copies, so dictionary entries may be shared
+-- read-only. No source data, fault simulator or cache metadata is changed.
+function CheckpointStore.forkMemory(self:any):any
+ assert(getmetatable(self.store)==MemoryDataStore,"only private memory stores can be forked")
+ local memory=MemoryDataStore.new()
+ memory.data=table.clone(self.store.data);memory.sizes=table.clone(self.store.sizes)
+ memory.writes=self.store.writes;memory.revision=self.store.revision
+ local fork=CheckpointStore.new(memory,self.validate,self.key)
+ fork.placed=if self.placed then table.clone(self.placed) else nil
+ fork.knownRest=self.knownRest
+ return fork
 end
 
 -- The entry for a record, or nil and why it cannot be stored (and, ROBLOX-108, the record's canonical text).

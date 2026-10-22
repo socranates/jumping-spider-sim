@@ -1,3 +1,4 @@
+local awaitRest=require("./studio/AwaitRest")
 -- The naturalist's notebook (LEARN-01, ported as ROBLOX-37). NOTEBOOK passed=N failed=M.
 -- Which expectations come from where: Godot's own hand-written tests (tests/integration/test_learn01_notebook.gd) are hand-ported
 -- below, one block each, named for the Godot test. The Godot model could not be exported as goldens here (no Godot in this
@@ -1013,7 +1014,8 @@ if loaded and d then
 	d.life.clock.hour = 12
 	tap("Feed"); frames(2)
 	check(d.life.resting and book:isOpen("retreat"), "a rest opens the retreat page")
-	check(d.checkpoints:loadBest().ok, "and keeps a checkpoint")
+	if d.life.checkpointResult then awaitRest(d.life.checkpointResult,function() frames(1) end) end
+	check(d.currentStore():loadBest().ok, "and keeps a checkpoint")
 	local before = opened()
 	tap("Feed"); frames(2) -- end the rest
 	d.camera.eyeView = false
@@ -1027,7 +1029,8 @@ if loaded and d then
 	frames(30)
 	check(opened() == after, "and the first look afterwards opens nothing")
 	-- the checkpoint record has nothing of the book in it
-	local record = d.checkpoints:loadBest().record
+	if d.life.checkpointResult then awaitRest(d.life.checkpointResult,function() frames(1) end) end
+	local record = d.currentStore():loadBest().record
 	check(record ~= nil, "(the checkpoint has a record)")
 	local function hasKey(t: any, name: string): boolean
 		if type(t) ~= "table" then return false end

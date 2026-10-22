@@ -21,6 +21,8 @@ local Growth = require(script.Parent.Growth)
 
 local LifeLoop = {}
 LifeLoop.__index = LifeLoop
+-- Presentation revisions are private; they must not enter world checkpoints.
+local noticeVersions = setmetatable({}, { __mode = "k" }) :: any
 
 -- The sensor's reach at night, as a share of its daytime reach (jumping spiders hunt by sight, in daylight).
 LifeLoop.NIGHT_SIGHT = 0.3
@@ -44,7 +46,7 @@ export type Spider = {
 	feeding: boolean, -- eating right now
  position: Vector3?, -- old skin location; live client always supplies it
 }
-export type CheckpointResult = { ok: boolean, message: string }
+export type CheckpointResult = { ok: boolean, message: string, pending: boolean?, cancelled: boolean?, morning: string?, noticeRevision: number? }
 export type Event = { kind: string, day: number? }
 
 -- `needs` is the NeedsModel whose hours this loop reports; `save` keeps the retreat checkpoint (nil: none is kept).
@@ -73,6 +75,7 @@ function LifeLoop.canRest(_self: any, s: Spider): boolean
 end
 
 function LifeLoop.showNotice(self: any, text: string)
+	noticeVersions[self] = (noticeVersions[self] or 0) + 1
 	self.notice = text
 	self.noticeSeconds = LifeLoop.NOTICE_S
 end
@@ -195,21 +198,57 @@ function LifeLoop.step(self: any, dt: number, s: Spider, feedPressed: boolean, c
 end
 
 -- The retreat checkpoint, now (the end of a tick).
-function LifeLoop.makeCheckpoint(self: any): CheckpointResult
-	local result: CheckpointResult = if self.save then self.save() else { ok = false, message = "There is nowhere to keep a rest" }
-	self.checkpointResult = result
-	if result.ok then
-		self.checkpoints += 1
-		self:showNotice(result.message)
-	else
-		self:showNotice("Resting, but this is not kept as your last rest. " .. result.message .. ".") -- (ROBLOX-92: the message is in the game's words, LifeText.restRefusal)
-	end
-	if self.morningText ~= "" then
-		self:showNotice(self.morningText .. "\n" .. self.notice)
-		self.morningText = ""
-	end
-	self:_emit("checkpoint")
-	return result
+local function reportCheckpoint(self:any,result:CheckpointResult,morning:string,preserveNotice:boolean?)
+ self.checkpointResult=result
+ if result.ok then
+  self.checkpoints+=1
+  if not preserveNotice then self:showNotice(result.message) end
+ else
+  local failure="Resting, but this is not kept as your last rest. "..result.message.."."
+  self:showNotice(if preserveNotice then self.notice.."\n"..failure else failure)
+ end
+ if morning~="" and not preserveNotice then self:showNotice(morning.."\n"..self.notice) end
+ self:_emit("checkpoint")
+end
+
+-- Tokens stay outside persistence while pending. A cancelled or superseded token
+-- cannot report success against a different rest/life, even if its work finishes.
+function LifeLoop.cancelCheckpoint(self:any,token:CheckpointResult?):boolean
+ local pending=self._checkpointPending
+ if not pending or (token~=nil and pending~=token) then return false end
+ self._checkpointPending=nil
+ pending.pending=nil;pending.morning=nil;pending.noticeRevision=nil;pending.cancelled=true;pending.ok=false
+ if self.checkpointResult==pending then self.checkpointResult=nil end
+ return true
+end
+function LifeLoop.beginCheckpoint(self:any,token:CheckpointResult):CheckpointResult
+ if self._checkpointPending==token then return token end
+ self:cancelCheckpoint()
+ token.pending=true;token.ok=false;token.cancelled=nil
+ token.morning=self.morningText;self.morningText=""
+ token.noticeRevision=noticeVersions[self] or 0
+ self._checkpointPending=token;self.checkpointResult=token
+ return token
+end
+function LifeLoop.finishCheckpoint(self:any,token:CheckpointResult,result:CheckpointResult):boolean
+ if self._checkpointPending~=token or token.pending~=true then return false end
+ self._checkpointPending=nil
+ local morning=token.morning or ""
+ local preserveNotice=self.noticeSeconds>0 and token.noticeRevision~=(noticeVersions[self] or 0)
+ token.pending=nil;token.morning=nil;token.cancelled=nil;token.noticeRevision=nil
+ token.ok,token.message=result.ok,result.message
+ reportCheckpoint(self,token,morning,preserveNotice)
+ return true
+end
+function LifeLoop.makeCheckpoint(self:any):CheckpointResult
+ local result:CheckpointResult=if self.save then self.save() else {ok=false,message="There is nowhere to keep a rest"}
+ if result.pending then
+  if self._checkpointPending~=result then self:beginCheckpoint(result) end
+  return result
+ end
+ local morning=self.morningText;self.morningText=""
+ reportCheckpoint(self,result,morning)
+ return result
 end
 
 -- The loop's part of a checkpoint (Godot's habitat record, with the clock beside it as its "life" field).
@@ -245,6 +284,7 @@ function LifeLoop.load(self: any, r: any): boolean
 	if #LifeLoop.problems(r) > 0 then
 		return false
 	end
+ self:cancelCheckpoint()
 	self.clock:load(r.life)
  self.growth=Growth.new()
  if r.growth then self.growth:load(r.growth) end

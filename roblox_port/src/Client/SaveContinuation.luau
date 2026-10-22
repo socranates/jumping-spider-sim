@@ -268,12 +268,26 @@ end
 function Continuation.refresh(self:any,mode:string)
  if slot(self,mode) then self.refreshes[mode]=true end
 end
+-- Preparation is private and may yield. Admission is a non-yielding fence on
+-- the exact request, epoch and ticket observed before preparation started.
+function Continuation.prepareCheckpoint(self:any,mode:string,record:any):(() -> boolean)?
+ local r=self.requests[mode];local epoch=self.epoch
+ if not r or r.ticket>=self.cfg.rules.MAX_LIFE_SERIAL then return nil end
+ local ticket=r.ticket
+ if not self.cfg.validate(mode,record,false) then return nil end
+ local copy=self.cfg.copy(record);local used=false
+ return function():boolean
+  if used then return false end
+  used=true
+  if self.epoch~=epoch or self.requests[mode]~=r or r.ticket~=ticket then return false end
+  r.ticket+=1
+  r.candidate={serial=r.ticket,record=copy,last=-1e9,stored=false,refused=false,receiptSeq=0,sentCredential=nil}
+  return true
+ end
+end
 function Continuation.checkpoint(self:any,mode:string,record:any):boolean
- local r=self.requests[mode]
- if not r or not self.cfg.validate(mode,record,false) or r.ticket>=self.cfg.rules.MAX_LIFE_SERIAL then return false end
- local copy=self.cfg.copy(record);r.ticket+=1
- r.candidate={serial=r.ticket,record=copy,last=-1e9,stored=false,refused=false,receiptSeq=0,sentCredential=nil}
- return true
+ local admit=self:prepareCheckpoint(mode,record)
+ return admit~=nil and admit()
 end
 function Continuation.status(self:any,mode:string?):(string,string?)
  if self.st==nil then return "session","offline" end

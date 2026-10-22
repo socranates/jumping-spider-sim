@@ -162,7 +162,9 @@ return function(driver: any)
   life.clock.hour=12
   driver.input:simulate("Feed",true);RunService.Heartbeat:Wait();driver.input:simulate("Feed",false);wait(.2)
   assert(life.resting,"E did not rest in the crack")
-  assert(driver.checkpoints:loadBest().ok,"no checkpoint kept: "..life.notice)
+  local pendingDeadline=os.clock()+120
+  while life.checkpointResult and life.checkpointResult.pending and os.clock()<pendingDeadline do RunService.Heartbeat:Wait() end
+  assert(driver.currentStore():loadBest().ok,"no checkpoint kept: "..life.notice)
   driver.input:simulate("Feed",true);RunService.Heartbeat:Wait();driver.input:simulate("Feed",false);wait(.2)
   assert(not life.resting,"E again did not end the rest")
   local Lighting=game:GetService("Lighting");local dayClock=Lighting.ClockTime;local dayBrightness=Lighting.Brightness
@@ -177,7 +179,9 @@ return function(driver: any)
   print("PORT_LIFE_NIGHT "..HttpService:JSONEncode({evidence_id=workspace:GetAttribute("PortEvidence"),day_clock=dayClock,darkest_brightness=darkest,least_reach=reach}))
  end)
  check("LIFE: Backspace returns to the checkpoint; the world goes back with the spider",function()
-  local life=driver.life;assert(driver.checkpoints:loadBest().ok,"no checkpoint") -- the morning's (the last rest's) checkpoint
+  local life=driver.life;local pendingDeadline=os.clock()+120
+  while life.checkpointResult and life.checkpointResult.pending and os.clock()<pendingDeadline do RunService.Heartbeat:Wait() end
+  assert(driver.currentStore():loadBest().ok,"no checkpoint") -- the morning's (the last rest's) checkpoint
   driver.input:simulate("Forward",true);wait(1.5);driver.input:simulate("Forward",false);wait(.3)
   assert(not life.resting,"still resting after walking")
   driver.input:simulate("Reset",true);RunService.Heartbeat:Wait();driver.input:simulate("Reset",false);wait(.3)

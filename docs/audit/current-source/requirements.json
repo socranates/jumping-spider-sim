@@ -1,5 +1,5 @@
 {
-  "as_of_utc": "2026-10-22T21:31:26.584731+00:00",
+  "as_of_utc": "2026-10-22T21:54:20.541817+00:00",
   "source": "e315b3a048fddd1729461fb92502f73b7d8e2b94",
   "evidence_id": "b425324a7f0a8007",
   "goal_complete": false,
@@ -24,13 +24,13 @@
     },
     {
       "id": "cli-and-runner",
-      "status": "linux-full-and-windows-combined-verified",
-      "evidence_boundary": "Sourceab8ca95 Linux39852128734 passes75/444664/0, compile222/strict/runner5. Windows old4ee6aec full75/444661/3 is retained; current corrected self-tests5/0 and7/0, internal41/0/0 and274/0/0. Root verifier binds exact source/workflow/inputs/logs, proving combined75/444664/0 Windows coverage with only SelfTest changed, not a fresh single current full Windows run. Current native save-cost probe10 asserts/223 fingerprints is separate from broader lifecycle/performance proof.",
+      "status": "encoder-adoption-full-gates-running",
+      "evidence_boundary": "Source068a878 adopts one-buffer canonical encoding with exact output/errors.6 focused suites21420/0, compile222/strict/runner5 pass. New permanent compatibility suite20716/0. Immutable Windows28618 and Linux39860574006 are live; Linux static checks pass, expected76/465380/0 unproven. Root verifier refuses pending full gates. Native20738 assertions verifies the exact adopted algorithm in a private paired module against originalab8ca95, not a full adopted-game lifecycle gate. Historicalab8 full Linux75/444664/0 and combined Windows proof remain pinned.",
       "references": [
-        "docs/save-continue/save-cost/verification.json",
-        "docs/save-continue/save-cost/README.md",
-        "docs/save-continue/local-return/failed-ci-39849815798/receipt.json",
-        "docs/save-continue/local-return/receipt.json"
+        "docs/save-continue/json-encoding/README.md",
+        "docs/save-continue/json-encoding/prototype-verification.json",
+        "docs/save-continue/json-encoding/ci-start.json",
+        "docs/save-continue/save-cost/verification.json"
       ]
     },
     {
@@ -151,7 +151,7 @@
     {
       "id": "performance-A08",
       "status": "partial",
-      "evidence_boundary": "Earlier desktop timing matrix remains mixed, no causal whole-game speedup. Currentab8ca95 native save-cost10 assertions/223 exact fingerprints:1.503M chars, capture123/97ms, first/replacement prep1.604/2.579s CPU over12.988/18.010s elapsed, max37/60ms. Native replacement five canonical encodes1.905s, six copies357ms; CLI2.282M record agrees encoding dominates. Wider Heartbeat gaps1.18-1.27s are unexplained, not worker-only attribution. No hard frame budget/typical FPS/physical-device proof. Identical-source prior rig-cache trial gains remain modest/mixed, not adopted. Encoding optimization and broader native/device gates remain open.",
+      "evidence_boundary": "Earlier desktop timing matrix remains mixed, no causal whole-game speedup. Currentab8ca95 native save-cost10 assertions/223 exact fingerprints:1.503M chars, capture123/97ms, first/replacement prep1.604/2.579s CPU over12.988/18.010s elapsed, max37/60ms. Native replacement five canonical encodes1.905s, six copies357ms; CLI2.282M record agrees encoding dominates. Wider Heartbeat gaps1.18-1.27s are unexplained, not worker-only attribution. No hard frame budget/typical FPS/physical-device proof. Identical-source prior rig-cache trial gains remain modest/mixed, not adopted. Encoding optimization and broader native/device gates remain open. Current068a878 adopts an exact-output fragment encoder after20716 CLI differential checks and20738 native paired assertions/all224 fingerprints. Same-record four native pairs average40.27percent lower encoder CPU, lower max step each pair; CLI average31.78percent lower. Heap observations vary, no whole-game FPS/heap gain/hard frame proof. Current full integration and adopted-game end-to-end cost remain pending.",
       "references": [
         "docs/performance-pass/matrix-receipt.json",
         "docs/performance-pass/RESULTS-v6-trial1.md",
@@ -160,7 +160,9 @@
         "docs/save-continue/save-cost/README.md",
         "docs/save-continue/save-cost/native-receipt.json",
         "docs/save-continue/save-cost/preserve/receipt.json",
-        "docs/save-continue/save-cost/rig-prior-evidence.json"
+        "docs/save-continue/save-cost/rig-prior-evidence.json",
+        "docs/save-continue/json-encoding/native-receipt.json",
+        "docs/save-continue/json-encoding/prototype-verification.json"
       ]
     },
     {
@@ -247,11 +249,11 @@
     {
       "id": "repo-and-handoff",
       "status": "partial",
-      "evidence_boundary": "Runtime/testsab8ca95 is pushed on codex/save-continue, current handoff and source-bound CI/Windows/native-cost receipts retained. No production optimization adopted in the attribution round. Release XML/BuildInfo still old; broad audit, publication/laptop synchronization and main integration remain open.",
+      "evidence_boundary": "Source068a878 is pushed on codex/save-continue with byte-compatible encoder and frozen-reference regression suite. Paired native evidence, compile/types/runner and focused checks pass; both full gates are live, no release rebuilt/published. Broad audit/current native lifecycle/online/rejoin/devices, main integration and laptop synchronization remain open.",
       "references": [
         "chet/save-continue.md",
-        "docs/save-continue/save-cost/verification.json",
-        "docs/save-continue/save-cost/README.md"
+        "docs/save-continue/json-encoding/README.md",
+        "docs/save-continue/json-encoding/prototype-verification.json"
       ]
     },
     {
@@ -274,10 +276,10 @@
     }
   ],
   "latest_save_milestone": {
-    "source": "ab8ca9577129e3d9583a0a8ab6824dae1a8cd014",
-    "runtime_behavior_source": "07234cae75b5a62b820dc6dda830dce7e503c36b",
-    "status": "cost-attribution-complete-encoding-optimization-next",
-    "evidence": "docs/save-continue/save-cost/README.md",
+    "source": "068a87891770dbdf291ec3cab0e67480d14c0251",
+    "reference_source": "ab8ca9577129e3d9583a0a8ab6824dae1a8cd014",
+    "status": "encoder-adopted-full-gates-running",
+    "evidence": "docs/save-continue/json-encoding/README.md",
     "goal_complete": false,
     "published": false
   }

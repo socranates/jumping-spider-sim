@@ -3,6 +3,12 @@
 Baseline: v51, source `14e60991c785c4293c3560e6d8b7ecded7e7ac75`, place **140**, evidence `d9ddc5e0ed43d301`.
 Candidate: `codex/foundation-audit`, source `5ee048a791da5fa4f5b99aac53d9769bcd358845`, evidence `c7af2726574c44cc`. Publication is not yet verified.
 
+## Follow-up status, 2026-10-22
+
+The table below records the initial foundation candidate, not the final status of every later branch. Lossless native compression (`codex/save-compaction`), acknowledged life retirement (`codex/life-retirement`) and native callback error propagation (`codex/save-adapter-errors`) have separate source-bound receipts. Read those receipts before treating A02, A05 or A12 as still unaddressed.
+
+A04 is **partially addressed** in unpublished source `3647a94c67f83076a0c7be09d75ef4a60bb0b4d5` (`codex/save-slot-isolation`, evidence `1984fdd8e8dee0ad`): unreadable rest slots remain untouched while progress and other slots can save. Corrupt/newer progress still disables all writes. The old-world ecology migration remains open. See `chet/save-slot-isolation.md` and `docs/save-slot-isolation/receipt.json` for implementation and completed versus outstanding gates. No native or publication result from an earlier candidate applies automatically to this changed source.
+
 This is a current-source audit of the supplied v48 review. A static finding is not a reproduced Studio defect. Tests, probes and remaining native work are distinguished below.
 
 | Rank / ID | Severity | Current finding and evidence | Status / recommendation |

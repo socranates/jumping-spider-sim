@@ -1,0 +1,22 @@
+[
+  {
+    "path": "C:\\Users\\natha\\.codex\\.chatgpt-projects\\g-p-6ac2f32f82a48191b0c7151a11eab0fd\\roblox_tools\\luau\\luau.exe",
+    "sha256": "4e86c0399aca661753d918bb775a152e35fd8f7a788b67076e1e03f81bc43703"
+  },
+  {
+    "path": "C:\\Users\\natha\\.codex\\.chatgpt-projects\\g-p-6ac2f32f82a48191b0c7151a11eab0fd\\roblox_tools\\luau\\luau-compile.exe",
+    "sha256": "74cf7ed3621b8966bac6fec7f1a0caf13616655fa06d346133cd31f6aac439d8"
+  },
+  {
+    "path": "C:\\Users\\natha\\.codex\\.chatgpt-projects\\g-p-6ac2f32f82a48191b0c7151a11eab0fd\\roblox_tools\\lsp\\luau-lsp.exe",
+    "sha256": "3c834f9402c82681ef2b8cc171c769f239eb094028bb31469296e1f0f4c489a6"
+  },
+  {
+    "path": "C:\\Users\\natha\\.codex\\.chatgpt-projects\\g-p-6ac2f32f82a48191b0c7151a11eab0fd\\roblox_tools\\rojo\\rojo.exe",
+    "sha256": "e73e956676b8b27ff43f2c5d80e040121e49c2f9e8cc69fd65123799473cf6d3"
+  },
+  {
+    "path": "C:\\Users\\natha\\.codex\\.chatgpt-projects\\g-p-6ac2f32f82a48191b0c7151a11eab0fd\\roblox_tools\\globalTypes.d.luau",
+    "sha256": "2857efa8245485f8c25c19c018ee1ef9b46afab4efd2ea70fc3257cd3faf7080"
+  }
+]

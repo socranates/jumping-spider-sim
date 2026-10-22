@@ -1,0 +1,134 @@
+{
+  "source_commit": "3647a94c67f83076a0c7be09d75ef4a60bb0b4d5",
+  "evidence_id": "1984fdd8e8dee0ad",
+  "computed_evidence": "1984fdd8e8dee0ad",
+  "source_manifest_matches": true,
+  "compile_matches": true,
+  "strict_clean": true,
+  "runner_regressions_pass": true,
+  "windows_targeted": {
+    "source_commit": "3647a94c67f83076a0c7be09d75ef4a60bb0b4d5",
+    "suites": 4,
+    "passed": 957,
+    "exit_code": 0,
+    "pass_gate": true
+  },
+  "windows_first_full": {
+    "source_commit": "71b634cae272c0fab284be65995e23889c621006",
+    "suites_with_successful_summaries": 61,
+    "passed": 443384,
+    "exit_code": 1,
+    "known_failure": "obsolete all-session-read-only expectation in rest_storage; fixed and targeted rerun passed",
+    "final_source_full_rerun": false
+  },
+  "test_only_changes_after_first_run": [
+    "roblox_port/tests/rest_storage.luau",
+    "roblox_port/tests/studio/BuildInfo.luau"
+  ],
+  "build_preflight": {
+    "path": "C:\\Users\\natha\\windowsill-publish\\roblox_port\\TheWindowsill.rbxlx",
+    "sha256": "830e6249ac9d2b4702bf8b5f570c9e9c680dcf758bc38ce3f7d80ce07b2a0710",
+    "source_commit": "3647a94c67f83076a0c7be09d75ef4a60bb0b4d5",
+    "matched_scripts": 216,
+    "diagnostic_content": false
+  },
+  "linux_ci": {
+    "suites": 62,
+    "passed": 443398,
+    "pass_gate": true,
+    "run": {
+      "id": 39739254321,
+      "head_sha": "3647a94c67f83076a0c7be09d75ef4a60bb0b4d5",
+      "conclusion": "success",
+      "html_url": "https://github.com/socranates/jumping-spider-sim/actions/runs/39739254321",
+      "created_at": "2026-10-22T07:15:34Z",
+      "updated_at": "2026-10-22T07:23:27Z",
+      "jobs": [
+        {
+          "id": 119692223995,
+          "conclusion": "success",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-10-22T07:15:37Z",
+              "completed_at": "2026-10-22T07:15:37Z"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-10-22T07:15:37Z",
+              "completed_at": "2026-10-22T07:15:41Z"
+            },
+            {
+              "name": "Toolchain (luau, luau-lsp, rojo 7.7.1)",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-10-22T07:15:41Z",
+              "completed_at": "2026-10-22T07:15:43Z"
+            },
+            {
+              "name": "Every module compiles",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-10-22T07:15:43Z",
+              "completed_at": "2026-10-22T07:15:43Z"
+            },
+            {
+              "name": "Strict types",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-10-22T07:15:43Z",
+              "completed_at": "2026-10-22T07:15:45Z"
+            },
+            {
+              "name": "All suites",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-10-22T07:15:45Z",
+              "completed_at": "2026-10-22T07:23:25Z"
+            },
+            {
+              "name": "Runner failure and cleanup regressions",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7,
+              "started_at": "2026-10-22T07:23:25Z",
+              "completed_at": "2026-10-22T07:23:25Z"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 14,
+              "started_at": "2026-10-22T07:23:25Z",
+              "completed_at": "2026-10-22T07:23:25Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 15,
+              "started_at": "2026-10-22T07:23:25Z",
+              "completed_at": "2026-10-22T07:23:25Z"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "offline_gates_pass": true,
+  "native_studio_verified": false,
+  "actual_client_rejoin_verified": false,
+  "performance_matrix_complete": false,
+  "publication_ready": false,
+  "published": false
+}

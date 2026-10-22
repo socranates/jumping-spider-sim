@@ -1,0 +1,88 @@
+{
+  "id": 39739254321,
+  "head_sha": "3647a94c67f83076a0c7be09d75ef4a60bb0b4d5",
+  "conclusion": "success",
+  "html_url": "https://github.com/socranates/jumping-spider-sim/actions/runs/39739254321",
+  "created_at": "2026-10-22T07:15:34Z",
+  "updated_at": "2026-10-22T07:23:27Z",
+  "jobs": [
+    {
+      "id": 119692223995,
+      "conclusion": "success",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-22T07:15:37Z",
+          "completed_at": "2026-10-22T07:15:37Z"
+        },
+        {
+          "name": "Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-22T07:15:37Z",
+          "completed_at": "2026-10-22T07:15:41Z"
+        },
+        {
+          "name": "Toolchain (luau, luau-lsp, rojo 7.7.1)",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-22T07:15:41Z",
+          "completed_at": "2026-10-22T07:15:43Z"
+        },
+        {
+          "name": "Every module compiles",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-22T07:15:43Z",
+          "completed_at": "2026-10-22T07:15:43Z"
+        },
+        {
+          "name": "Strict types",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-22T07:15:43Z",
+          "completed_at": "2026-10-22T07:15:45Z"
+        },
+        {
+          "name": "All suites",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-10-22T07:15:45Z",
+          "completed_at": "2026-10-22T07:23:25Z"
+        },
+        {
+          "name": "Runner failure and cleanup regressions",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7,
+          "started_at": "2026-10-22T07:23:25Z",
+          "completed_at": "2026-10-22T07:23:25Z"
+        },
+        {
+          "name": "Post Run actions/checkout@v4",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14,
+          "started_at": "2026-10-22T07:23:25Z",
+          "completed_at": "2026-10-22T07:23:25Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15,
+          "started_at": "2026-10-22T07:23:25Z",
+          "completed_at": "2026-10-22T07:23:25Z"
+        }
+      ]
+    }
+  ]
+}

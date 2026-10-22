@@ -7,6 +7,7 @@ codex/greedy-merge 80b396a7025d67d3dc7a4bb5461bec90e8b49b37
 codex/life-retirement a6146c950dc35cb78244edce5f4210494fc0093b
 codex/memory-trace c7525ee47d6217fb927b69ab834c648687665640
 codex/native-part-churn 88dcacb012c062262e3f78654ae0c1240182aa47
+codex/navigation-startup 8f16a40c3436e94bcd124dcee1b8f0d682c12300
 codex/observed-life-retirement fadcb6f0e2df8b57a5442c7a6d0e65710a972da9
 codex/outdoor-life-reset cdce01dd5549705c56ade15df06be15796c008f0
 codex/preserve-captions b1be9f1d59650463a0cc82c230dae63afdccb687
@@ -16,7 +17,7 @@ codex/save-compaction 64b9fc30eaf3ea867ff6fb45c194c816ab19bb33
 codex/save-error-notices a107dab383029e2038947b3364cef9c2dc3403eb
 codex/save-slot-isolation 50d9b7b209551539d5a27dc0ae5c9e57d377643d
 codex/shadow-stream-cleanup e066c6b8eea848cc0e7de5f5afbba6af47efa6ce
-codex/startup-world-readiness 8e02b5ee5f443ab332cf7e70f5951a304cb89eea
+codex/startup-world-readiness dffb330e5b70849a8d3d1164294c648cdb24902b
 codex/unseen-life-retirement a0f324035214951de59ec7ff8dff0b873348d454
 codex/v47-creatures-controls 9d442ffc2f3601ee9a2a86e1a1cbce3ff93ebd29
 codex/v48-living-habitat c537c066d271fcb383dd38878b500284d4531f23
@@ -44,6 +45,7 @@ github/codex/greedy-merge 80b396a7025d67d3dc7a4bb5461bec90e8b49b37
 github/codex/life-retirement a6146c950dc35cb78244edce5f4210494fc0093b
 github/codex/memory-trace c7525ee47d6217fb927b69ab834c648687665640
 github/codex/native-part-churn 88dcacb012c062262e3f78654ae0c1240182aa47
+github/codex/navigation-startup 8f16a40c3436e94bcd124dcee1b8f0d682c12300
 github/codex/observed-life-retirement fadcb6f0e2df8b57a5442c7a6d0e65710a972da9
 github/codex/outdoor-life-reset cdce01dd5549705c56ade15df06be15796c008f0
 github/codex/packaging-spider-legs bf92fc8d983e5f5ea42bc14b11f886877c8abff3
@@ -61,7 +63,7 @@ github/codex/save-compaction 64b9fc30eaf3ea867ff6fb45c194c816ab19bb33
 github/codex/save-error-notices a107dab383029e2038947b3364cef9c2dc3403eb
 github/codex/save-slot-isolation 50d9b7b209551539d5a27dc0ae5c9e57d377643d
 github/codex/shadow-stream-cleanup e066c6b8eea848cc0e7de5f5afbba6af47efa6ce
-github/codex/startup-world-readiness 8e02b5ee5f443ab332cf7e70f5951a304cb89eea
+github/codex/startup-world-readiness dffb330e5b70849a8d3d1164294c648cdb24902b
 github/codex/unseen-life-retirement a0f324035214951de59ec7ff8dff0b873348d454
 github/codex/v43-release 675879a59294646381187ca143e44d2a51811265
 github/codex/v46-controls 6ba1a3809503ec7814d21781daa239123f0dacb3

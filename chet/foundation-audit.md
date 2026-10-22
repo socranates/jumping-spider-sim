@@ -1,3 +1,5 @@
+> New current implementation: source8f16a40, branch codex/navigation-startup. See [navigation handoff](navigation-startup.md) and ../docs/audit/CURRENT.md.224 focused checks and217 compile/strict/runner gates pass; full Windows2814/Linux39800818953 and native startup remain pending. The older source results below are historical.
+
 # Current foundation health — 2026-10-22
 
 Candidate source `8e02b5ee5f443ab332cf7e70f5951a304cb89eea`, evidence `58063ec00de84212`, branch `codex/startup-world-readiness`. **Not published; not yet reasonably problem-free.** Last publication verified by retained evidence is v51/place140, not a fresh Dashboard check.

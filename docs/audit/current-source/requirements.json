@@ -1,7 +1,7 @@
 {
-  "as_of_utc": "2026-10-22T14:44:23.588692+00:00",
-  "source": "8e02b5ee5f443ab332cf7e70f5951a304cb89eea",
-  "evidence_id": "58063ec00de84212",
+  "as_of_utc": "2026-10-22T15:04:50.333749+00:00",
+  "source": "8f16a40c3436e94bcd124dcee1b8f0d682c12300",
+  "evidence_id": "845ef13d49a92f88",
   "goal_complete": false,
   "published": false,
   "requirements": [
@@ -24,8 +24,8 @@
     },
     {
       "id": "cli-and-runner",
-      "status": "verified-current-source",
-      "evidence_boundary": "Exact source8e02b5e: Windows22326 exited0 and Linux39792121861 succeeded, each64 suites/443869 passed/0 failed. Compile216, strict and runner5 pass;1,235 targeted checks retained. Native and release gates remain separate.",
+      "status": "pending-current-source",
+      "evidence_boundary": "Navigation candidate8f16a40:224 focused checks,217 compiled modules, clean strict analysis and runner5 pass. Full Windows2814 and Linux39800818953 are pending; predecessor8e02b5e full443869 gates remain historical.",
       "references": [
         "docs/startup-world-readiness/receipt.json",
         "docs/startup-world-readiness/progress.json"
@@ -105,13 +105,15 @@
     },
     {
       "id": "determinism-A07",
-      "status": "reproduced-proposed-fix",
-      "evidence_boundary": "Current-source cold RivalDrive component: route readiness ticks403/198/98 at30/60/120Hz. Experimental pre-play preparation gives readiness tick1, movement tick16 and nine matching samples. Controlled StationAir scheduling model: blocked-route readiness1251/626/313 versus1 when prepared.12 isolated traces; not full moving-input/controller/RNG/native replay. Production unchanged; combined yielding startup gate must be integrated and measured.",
+      "status": "implemented-verification-pending",
+      "evidence_boundary": "Navigation gate now prepares all resident surfaces and air before simulation/initial capture/TitleReady, preserves live save handshake and blocks early input.15 startup cases and224 focused checks pass; baseline navigation10pass5fail. Private air construction supports error/owner cancellation. Both full gates, native cold/failure timing and full moving-input creature/RNG replay remain pending.",
       "references": [
         "docs/audit/CODE-REVIEW.md",
         "docs/activation-timing/README.md",
         "docs/activation-timing/receipt.json",
-        "docs/activation-timing/air/receipt.json"
+        "docs/activation-timing/air/receipt.json",
+        "docs/navigation-startup/README.md",
+        "docs/navigation-startup/receipt.json"
       ]
     },
     {

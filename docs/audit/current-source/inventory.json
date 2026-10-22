@@ -1,6 +1,6 @@
 {
-  "source": "8e02b5ee5f443ab332cf7e70f5951a304cb89eea",
-  "branch": "codex/startup-world-readiness",
+  "source": "8f16a40c3436e94bcd124dcee1b8f0d682c12300",
+  "branch": "codex/navigation-startup",
   "baseline": {
     "published": true,
     "release": "v51",
@@ -557,10 +557,10 @@
       ]
     },
     {
-      "sha256": "f1785e3262edc4aaa4f5fc8fafa6d9c183ee463bbd838a51d84f99fc01aa95a3",
+      "sha256": "1baa1f1d07401928e4acb9064aa195c37a1ae2728c31e3f666e4c8f87e6db582",
       "path": "roblox_port/src/Client/SpiderClient.client.luau",
       "name": "SpiderClient.client",
-      "lines": 2405,
+      "lines": 2419,
       "purpose": "The playable spider. Wires one control scheme (SpiderInput: keyboard and mouse, controller and touch together) to the",
       "side": "Client",
       "strict": true,
@@ -612,6 +612,7 @@
         "MatingScene",
         "MealPresentation",
         "Nature",
+        "NavigationPreparation",
         "NeedsModel",
         "NotebookPages",
         "NotebookPanel",
@@ -657,6 +658,7 @@
         "SpiderInput",
         "SpiderMotor",
         "SpiderRig",
+        "StationAir",
         "StationMouse",
         "StationMouseBody",
         "StickCarry",
@@ -686,6 +688,7 @@
         "lock.luau",
         "minimal_hud.luau",
         "nature_client.luau",
+        "navigation_startup.luau",
         "notebook.luau",
         "outdoor_life_reset.luau",
         "perception_client.luau",
@@ -1724,6 +1727,7 @@
       ],
       "tests": [
         "minimal_hud.luau",
+        "navigation_startup.luau",
         "outdoor_life_reset.luau",
         "preserve.luau",
         "save_notice.luau",
@@ -3105,10 +3109,10 @@
       ]
     },
     {
-      "sha256": "4068ac0a145b29739b732f3fc55f5bacc901282dfe8a40848a60f14b70547a9b",
+      "sha256": "d98991e98c3d93b46de7cf0e26c905e43d1828c3e5230e5f14428d1e1b6e00f9",
       "path": "roblox_port/src/Shared/Predator/RivalDrive.luau",
       "name": "RivalDrive",
-      "lines": 498,
+      "lines": 499,
       "purpose": "The rival spider's legs (ROBLOX-69): its own SpiderMotor, the player's proven surface-walking motor with the same collider, drives it over",
       "side": "Shared",
       "strict": true,
@@ -3176,6 +3180,7 @@
         "checkpoint.luau",
         "mating.luau",
         "nature.luau",
+        "navigation_startup.luau",
         "preserve.luau",
         "rivalnav.luau",
         "route_preparation.luau",
@@ -4800,6 +4805,23 @@
       ]
     },
     {
+      "sha256": "ab6c0aeec2351f063a7bb235675be95426d6f72dcbd9736786899cfe4c865174",
+      "path": "roblox_port/src/Shared/World/NavigationPreparation.luau",
+      "name": "NavigationPreparation",
+      "lines": 59,
+      "purpose": "Owns bounded loading work, before the first simulation tick. Surface and air",
+      "side": "Shared",
+      "strict": true,
+      "requires": [],
+      "tests": [
+        "navigation_startup.luau"
+      ],
+      "any_casts": 0,
+      "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau"
+      ]
+    },
+    {
       "sha256": "3a0ab3b343c4f73292b420f3a9faebf03750698b2fabf3d68cc846d06ff00f4f",
       "path": "roblox_port/src/Shared/World/Pond.luau",
       "name": "Pond",
@@ -4944,10 +4966,10 @@
       ]
     },
     {
-      "sha256": "568834f864891d762834b3504edd546a9f1025da8978fbe9a8e24efd83433168",
+      "sha256": "ac0ebc96a183fb7d8409d63ce490d9ceea1f0d6f37f89a7ae9818dc2759d7b05",
       "path": "roblox_port/src/Shared/World/StationAir.luau",
       "name": "StationAir",
-      "lines": 174,
+      "lines": 194,
       "purpose": "Bounded air navigation over the station's actual collision boxes. Grid edges",
       "side": "Shared",
       "strict": true,
@@ -4958,10 +4980,12 @@
         "WorldMap"
       ],
       "tests": [
+        "navigation_startup.luau",
         "station_threats.luau"
       ],
       "any_casts": 0,
       "required_by": [
+        "roblox_port/src/Client/SpiderClient.client.luau",
         "roblox_port/src/Shared/Predator/WaspDirector.luau"
       ]
     },
@@ -4977,6 +5001,7 @@
         "WorldMap"
       ],
       "tests": [
+        "navigation_startup.luau",
         "route_preparation.luau",
         "station_debug.luau",
         "station_threats.luau"
@@ -5035,6 +5060,7 @@
         "living_world.luau",
         "minimal_hud.luau",
         "nature_client.luau",
+        "navigation_startup.luau",
         "outdoor_life_reset.luau",
         "preserve.luau",
         "rare_sightings.luau",
@@ -5083,6 +5109,7 @@
         "minimal_hud.luau",
         "nature.luau",
         "nature_client.luau",
+        "navigation_startup.luau",
         "outdoor_life_reset.luau",
         "preserve.luau",
         "rare_sightings.luau",

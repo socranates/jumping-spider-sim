@@ -33,3 +33,7 @@ The broader foundation audit also retains old-world migration, read-only Continu
 ## Reproduction
 
 From the repository root: python docs/navigation-startup/baseline.py; python docs/navigation-startup/target.py; python docs/navigation-startup/check.py; python docs/navigation-startup/check.py --full-only; python docs/navigation-startup/verify.py. Paired/target runners snapshot source and tests into temporary directories. Preserve raw terminal logs before reruns; do not edit production/default tests while a live non-snapshot full runner bundles remaining suites. Full expected counts65/443884 are not actual results until the gates finish.
+
+## Active full gates and prepared native places
+
+Windows exec2814 and Linux CI39800818953 belong to exact source8f16a40. They remain pending until terminal receipts; do not restart a live handle or mutate source/default suites during full Windows bundling. Prepared native cases live at C:/Users/natha/claude-xfer/Windowsill-navigation-success-v2 and Windowsill-navigation-failure-v2, file Windowsill-navigation-startup-review.rbxlx. Each contains218 fingerprinted scripts (217 production plus diagnostic), production Persistence disabled, and the Studio-only playback hook. Their manifests/guards are retained here; native-probe.luau compiles but has not run. Initial success-v1 construction failed a stale217-versus218 unique-script assertion and was not opened; v2 corrects the diagnostic builder. No production or native success is inferred from that preparation. These are diagnostics and must never be published.

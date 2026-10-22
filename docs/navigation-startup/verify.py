@@ -43,6 +43,15 @@ h=release(ROOT/'roblox_port/TheWindowsill.rbxlx')
 try:release(ROOT/'roblox_port/TheWindowsillTests.rbxlx')
 except AssertionError:pass
 else:raise AssertionError('test artifact accepted as production')
+prepared=[]
+for mode in ['success','failure']:
+ path=HERE/('prepared-'+mode+'-manifest.json')
+ if path.exists():
+  m=json.loads(path.read_text(encoding='utf8'));assert m['source']==SOURCE and m['case']==mode and m['persistence_disabled']
+  scripts={r['path']:r['sha256'] for r in m['scripts']};assert len(scripts)==len(m['scripts'])==218
+  assert {p:scripts[p] for p in expected}==expected
+  assert scripts['StarterPlayer.StarterPlayerScripts.Client.SilkPlayback']==sha((HERE/'native-probe.luau').read_bytes())
+  prepared.append(mode)
 full=False
 if (HERE/'windows-full-process.json').exists():
  assert read('windows-full-process.json')['exit_code']==0
@@ -55,5 +64,5 @@ if ci:
 receipt=dict(source=SOURCE,base=BASE,evidence_id='845ef13d49a92f88',production_modules=217,changed_modules=sorted(changed),
  paired_regression_baseline_pass=10,paired_regression_baseline_fail=5,startup_cases_passed=15,targeted_suites=6,targeted_passed=224,
  compile_passed=217,strict_clean=True,runner_regressions=5,production_sha256=h,test_artifact_rejected=True,
- windows_full_complete=full,linux_ci_verified=bool(ci),native_verified=False,full_controller_moving_input_replay_verified=False,published=False,publication_ready=False)
+ windows_full_complete=full,linux_ci_verified=bool(ci),native_prepared_cases=prepared,native_verified=False,full_controller_moving_input_replay_verified=False,published=False,publication_ready=False)
 (HERE/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n',encoding='utf8',newline='\n');print(json.dumps(receipt,indent=2))

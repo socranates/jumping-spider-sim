@@ -1,0 +1,32 @@
+{
+  "source": "8f16a40c3436e94bcd124dcee1b8f0d682c12300",
+  "base": "8e02b5ee5f443ab332cf7e70f5951a304cb89eea",
+  "evidence_id": "845ef13d49a92f88",
+  "production_modules": 217,
+  "changed_modules": [
+    "roblox_port/src/Client/SpiderClient.client.luau",
+    "roblox_port/src/Shared/Predator/RivalDrive.luau",
+    "roblox_port/src/Shared/World/NavigationPreparation.luau",
+    "roblox_port/src/Shared/World/StationAir.luau"
+  ],
+  "paired_regression_baseline_pass": 10,
+  "paired_regression_baseline_fail": 5,
+  "startup_cases_passed": 15,
+  "targeted_suites": 6,
+  "targeted_passed": 224,
+  "compile_passed": 217,
+  "strict_clean": true,
+  "runner_regressions": 5,
+  "production_sha256": "be8057c50851efc8f68c44c9703c3d5b51d1ec692b070e68a8f8eecd72365484",
+  "test_artifact_rejected": true,
+  "windows_full_complete": false,
+  "linux_ci_verified": false,
+  "native_prepared_cases": [
+    "success",
+    "failure"
+  ],
+  "native_verified": false,
+  "full_controller_moving_input_replay_verified": false,
+  "published": false,
+  "publication_ready": false
+}

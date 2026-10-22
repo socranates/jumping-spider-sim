@@ -1,0 +1,21 @@
+2026-10-22T14:35:47.380Z,515.380798,1148,6,Info [FLog::CreatorOutput] [FOUNDATION_NATIVE_GUARD] 8e02b5ee5f443ab332cf7e70f5951a304cb89eea 217 persistence_disabled
+2026-10-22T14:35:54.545Z,522.545166,7bb0,6,Info [FLog::CreatorOutput] [Windowsill] world: The Preserve (preserve)
+2026-10-22T14:35:54.550Z,522.550171,7bb0,6,Info [FLog::CreatorOutput] [Windowsill] sun: through the window, clock 10, latitude -40.7
+2026-10-22T14:36:01.677Z,529.677612,1148,6,Info [FLog::CreatorOutput] [SHADOW_CLEANUP_CASE] 1792679756682 1 648 hidden whole-folder stream-out releases bindings and accepts fresh visible arrivals
+2026-10-22T14:36:01.677Z,529.677612,1148,6,Info [FLog::CreatorOutput] [SHADOW_CLEANUP_CASE] 1792679756682 2 650 a detached folder's visible parts are released instead of written on a movement pass
+2026-10-22T14:36:01.681Z,529.681641,1148,6,Info [FLog::CreatorOutput] [SHADOW_CLEANUP_CASE] 1792679756682 3 670 hidden and permanently non-casting child replacements release once and preserve flags
+2026-10-22T14:36:01.695Z,529.695679,1148,6,Info [FLog::CreatorOutput] [SHADOW_CLEANUP_CASE] 1792679756682 4 1485 mixed repeated region arrivals do not accumulate obsolete generations
+2026-10-22T14:36:01.704Z,529.704651,1148,6,Info [FLog::CreatorOutput] [SHADOW_CLEANUP_CASE] 1792679756682 5 1495 ignored cleanup has its own bounded budget without consuming visible checks
+2026-10-22T14:36:01.704Z,529.704651,1148,6,Info [FLog::CreatorOutput] [SHADOW_CLEANUP_CASE] 1792679756682 6 1511 release belongs to the original holder when a part moves between region folders
+2026-10-22T14:36:01.705Z,529.705688,1148,6,Info [FLog::CreatorOutput] [SHADOW_CLEANUP_CASE] 1792679756682 7 1513 home-region exclusion also excludes ignored tracking
+2026-10-22T14:36:01.705Z,529.705688,1148,6,Info [FLog::CreatorOutput] [SHADOW_CLEANUP_DONE] 1792679756682 7 1513
+2026-10-22T14:36:01.802Z,529.802368,4f98,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type
+2026-10-22T14:36:02.375Z,530.375793,5fa0,6,Info [FLog::CreatorOutput] [OBSERVED_LIFE_CASE] 1792679756682 1 13 unseen New Life intent survives no foreign save after delayed ownership
+2026-10-22T14:36:02.376Z,530.376770,5fa0,6,Info [FLog::CreatorOutput] [OBSERVED_LIFE_CASE] 1792679756682 2 17 preload New Life on a genuinely empty slot remains usable
+2026-10-22T14:36:02.653Z,530.653564,5fa0,6,Info [FLog::CreatorOutput] [OBSERVED_LIFE_CASE] 1792679756682 3 35 observed New Life cannot retire a different life after lease recovery
+2026-10-22T14:36:02.755Z,530.755920,5fa0,6,Info [FLog::CreatorOutput] [OBSERVED_LIFE_CASE] 1792679756682 4 37 nil legacy life tokens still require the observed rest revision
+2026-10-22T14:36:02.814Z,530.814697,5fa0,6,Info [FLog::CreatorOutput] [OBSERVED_LIFE_CASE] 1792679756682 5 39 unchanged previously observed rest permits explicit retirement after lease recovery
+2026-10-22T14:36:02.816Z,530.816711,5fa0,6,Info [FLog::CreatorOutput] [OBSERVED_LIFE_CASE] 1792679756682 6 42 preload own retirement survives ambiguous response and reacquisition
+2026-10-22T14:36:02.882Z,530.882324,5fa0,6,Info [FLog::CreatorOutput] [OBSERVED_LIFE_CASE] 1792679756682 7 44 equal timestamps and life tokens do not make changed rest contents identical
+2026-10-22T14:36:02.945Z,530.945374,5fa0,6,Info [FLog::CreatorOutput] [OBSERVED_LIFE_CASE] 1792679756682 8 45 write-time revision protects an equal-time foreign update after the slot was read
+2026-10-22T14:36:02.945Z,530.945374,5fa0,6,Info [FLog::CreatorOutput] [OBSERVED_LIFE_DONE] 1792679756682 8 45

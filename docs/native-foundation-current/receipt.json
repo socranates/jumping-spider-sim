@@ -1,0 +1,24 @@
+{
+  "source": "8e02b5ee5f443ab332cf7e70f5951a304cb89eea",
+  "place_sha256": "f40dbf67dbbb442114a41122aa385a5f2e6a4b22e72d65d54b9325f743e51ee8",
+  "scripts": 217,
+  "persistence_disabled": true,
+  "shadow": {
+    "run_id": "1792679756682",
+    "cases": 7,
+    "assertions": 1513
+  },
+  "save": {
+    "run_id": "1792679756682",
+    "cases": 8,
+    "assertions": 45
+  },
+  "output_sha256": "271bfb9d3df78d61c5e0f602e9d04918eadd3745d677685baed453a681e5b781",
+  "creator_errors": 0,
+  "scope": "Real Instance shadow lifecycle and native-captured checkpoint fixtures against synthetic MemoryBackend save sessions",
+  "online_store_accessed": false,
+  "real_client_rejoin_verified": false,
+  "automatic_network_streaming_verified": false,
+  "performance_improvement_verified": false,
+  "published": false
+}

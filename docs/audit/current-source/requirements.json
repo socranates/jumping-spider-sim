@@ -78,11 +78,12 @@
     },
     {
       "id": "life-retirement-A05",
-      "status": "implemented-current-verification-pending",
-      "evidence_boundary": "Acknowledged life identity and observed revision/checksum guards verified in targeted tests and both full CLI gates on6026d6c. These source modules are unchanged by A12; the new whole candidate and actual native/online rejoin still need their own evidence.",
+      "status": "implemented-with-limits",
+      "evidence_boundary": "Current8e02 source passed both full CLI gates443869 each and native8-case/45-assertion synthetic save-session verification with actual game-captured Normal/Free/Easy fixtures. Foreign changes are refused; actual online client rejoin and safe read-only Continue remain open.",
       "references": [
         "docs/life-retirement/receipt.json",
-        "docs/observed-life-retirement/receipt.json"
+        "docs/observed-life-retirement/receipt.json",
+        "docs/native-foundation-current/receipt.json"
       ]
     },
     {
@@ -156,11 +157,12 @@
     },
     {
       "id": "shadow-binding-cleanup",
-      "status": "implemented-current-native-pending",
-      "evidence_boundary": "Bounded visible/ignored owner cleanup passes349 targeted and preceding full gates443816 each. Combined diagnostic6026d6c was prepared, not run; it does not cover this candidate's startup/UI change. No FPS/category-growth fix claim.",
+      "status": "implemented-with-limits",
+      "evidence_boundary": "Current8e02 source passed native7-case/1513-assertion real-Instance owner/cleanup verification and both full CLI gates443869 each. Automatic network streaming, FPS improvement and memory-category-growth resolution are not established.",
       "references": [
         "docs/shadow-stream-retention/receipt.json",
-        "docs/observed-life-retirement/prepared-native-manifest.json"
+        "docs/observed-life-retirement/prepared-native-manifest.json",
+        "docs/native-foundation-current/receipt.json"
       ]
     },
     {

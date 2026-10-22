@@ -1,0 +1,15 @@
+2026-10-22T14:33:31.394Z,379.394257,1148,6,Info [FLog::CreatorOutput] [FOUNDATION_NATIVE_GUARD] 8e02b5ee5f443ab332cf7e70f5951a304cb89eea 217 persistence_disabled
+2026-10-22T14:33:39.920Z,387.920410,5fa0,6,Info [FLog::CreatorOutput] [Windowsill] world: The Preserve (preserve)
+2026-10-22T14:33:39.927Z,387.927032,5fa0,6,Info [FLog::CreatorOutput] [Windowsill] sun: through the window, clock 10, latitude -40.7
+2026-10-22T14:33:49.321Z,397.321228,5710,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type
+2026-10-22T14:33:54.092Z,402.092865,35dc,6,Info [FLog::CreatorOutput] [SHADOW_CLEANUP_CASE] 1792679629244 1 648 hidden whole-folder stream-out releases bindings and accepts fresh visible arrivals
+2026-10-22T14:33:54.093Z,402.093872,35dc,6,Info [FLog::CreatorOutput] [SHADOW_CLEANUP_CASE] 1792679629244 2 650 a detached folder's visible parts are released instead of written on a movement pass
+2026-10-22T14:33:54.096Z,402.096863,35dc,6,Info [FLog::CreatorOutput] [SHADOW_CLEANUP_CASE] 1792679629244 3 670 hidden and permanently non-casting child replacements release once and preserve flags
+2026-10-22T14:33:54.114Z,402.114777,35dc,6,Info [FLog::CreatorOutput] [SHADOW_CLEANUP_CASE] 1792679629244 4 1485 mixed repeated region arrivals do not accumulate obsolete generations
+2026-10-22T14:33:54.123Z,402.123718,35dc,6,Info [FLog::CreatorOutput] [SHADOW_CLEANUP_CASE] 1792679629244 5 1495 ignored cleanup has its own bounded budget without consuming visible checks
+2026-10-22T14:33:54.123Z,402.123718,35dc,6,Info [FLog::CreatorOutput] [SHADOW_CLEANUP_CASE] 1792679629244 6 1511 release belongs to the original holder when a part moves between region folders
+2026-10-22T14:33:54.125Z,402.125519,35dc,6,Info [FLog::CreatorOutput] [SHADOW_CLEANUP_CASE] 1792679629244 7 1513 home-region exclusion also excludes ignored tracking
+2026-10-22T14:33:54.125Z,402.125519,35dc,6,Info [FLog::CreatorOutput] [SHADOW_CLEANUP_DONE] 1792679629244 7 1513
+2026-10-22T14:33:54.512Z,402.512817,35dc,6,Warning [FLog::CreatorWarning] Warning: [OBSERVED_LIFE_FAIL] 1792679629244 Players.socranates.PlayerScripts.Client.SilkPlayback:228: native fixture: the rules in this rest are not easy's
+2026-10-22T14:34:18.605Z,426.605225,5fa0,6,Info [FLog::CreatorOutput] Disconnect from 127.0.0.1|55759
+2026-10-22T14:34:18.606Z,426.606201,5fa0,6,Info [FLog::CreatorOutput] Disconnect from 127.0.0.1|55759

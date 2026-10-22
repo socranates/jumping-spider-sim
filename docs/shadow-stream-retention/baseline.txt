@@ -1,0 +1,5 @@
+C:/Users/natha/AppData/Local/Temp/windowsill-shadow-retention-hs4sh3qk/bundled.luau:55053: shadow manager retains streamed-out hidden instances
+stacktrace:
+[C] function assert
+C:/Users/natha/AppData/Local/Temp/windowsill-shadow-retention-hs4sh3qk/bundled.luau:55053
+SHADOW_STREAM_RETAIN old_parts=3 retained=3 fresh_shadow_off=0 expected_off=3

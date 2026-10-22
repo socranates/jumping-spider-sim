@@ -1106,7 +1106,7 @@ menu=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
   return
  end
  if choice=="New" or choice=="Easy" then
-  if session.started and confirming~=choice then
+  if (session.started or stores[if choice=="Easy" then "easy" else "main"]:loadBest().ok) and confirming~=choice then
    confirming=choice
    menu:showChoices("Begin a new life?",if choice=="Easy" then "This starts a new Easy life and retires its previous last rest when saving succeeds. The standard life's last rest is kept." else "This starts a new standard life and retires its previous last rest when saving succeeds. The Easy life's last rest is kept.","",
     {{id=choice :: string,text="Begin the new life"},{id="CancelNew",text="Keep this life"}},true,"CancelNew")

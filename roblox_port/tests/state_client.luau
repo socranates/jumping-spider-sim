@@ -286,7 +286,11 @@ case("the real client waits for the server before the start menu: the world hold
 	local menuGui = gui:FindFirstChild("SpiderLifeMenu")
 	check(menuGui ~= nil and find("SpiderLifeMenu", "Continue") ~= nil and find("SpiderLifeMenu", "Easy") ~= nil, "the menu offers Continue and Easy")
 	check(find("SpiderLifeMenu", "Summary") ~= nil and string.find(find("SpiderLifeMenu", "Summary").Text, SaveText.SAVED, 1, true) ~= nil, "and says the notebook and rests are saved")
-	driver.menu:hide()
+ driver.menu:choose("New")
+ check(find("SpiderLifeMenu","CancelNew")~=nil and string.find(find("SpiderLifeMenu","Sub").Text,"when saving succeeds",1,true)~=nil,"title-screen replacement of an old rest requires truthful confirmation")
+ driver.menu:choose("CancelNew")
+ check(driver.currentStore():loadBest().ok,"cancelling title-screen New Life keeps the old rest")
+ driver.menu:hide()
 end)
 
 local jumpPage: string? = nil

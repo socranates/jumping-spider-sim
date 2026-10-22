@@ -1958,5 +1958,22 @@ case("real SaveClient and SaveService carry durable intent and same-life rest en
  local rejoined=newSession(e,907,"rejoin");check(rejoined:load()=="active" and rejoined.lifeTokens.main==ack.token,"life identity survives full service leave/rejoin")
 end)
 
+case("identity metadata is included in the admitted checkpoint size",function()
+ local e=newEnv();local a=newSession(e,908,"A");a:load();a:beginLife("main",1);run(e,a,2)
+ local rec=realRest(120,"main");local cap=SaveRules.MAX_REST_CHARS
+ local before=canon(e.backend.data["R_908_main"])
+ SaveRules.MAX_REST_CHARS=#canon(rec)
+ local ok,why=pcall(function()
+  check(#SaveRest.check("main",rec)==0,"raw checkpoint fits exact cap")
+  check(not a:setRestForLife("main",rec,a.lifeTokens.main),"stamped checkpoint over cap is refused before queueing")
+  local hostile=setmetatable({},{__iter=function() error("must not iterate") end,__index=function() error("must not index") end})
+  check(not a:setRestForLife("main",hostile,a.lifeTokens.main),"malformed root cannot execute metatable code during stamping")
+ end)
+ SaveRules.MAX_REST_CHARS=cap
+ check(ok,"size-boundary regression did not raise: "..tostring(why))
+ run(e,a,20)
+ check(canon(e.backend.data["R_908_main"])==before,"valid earlier retirement remains intact")
+end)
+
 print(`STATE passed={passed} failed={failed}`)
 if failed > 0 then error("state checks failed") end

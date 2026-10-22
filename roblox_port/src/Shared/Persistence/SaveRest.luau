@@ -22,7 +22,7 @@ function SaveRest.validLife(token: any): boolean
  return type(token)=="string" and #token>=1 and #token<=SaveRules.MAX_LIFE_TOKEN_CHARS and string.match(token,"^[%w_:%.%-]+$")~=nil
 end
 function SaveRest.isRetired(payload: any): boolean
- return type(payload)=="table" and payload.save_retired==true
+ return type(payload)=="table" and rawget(payload,"save_retired")==true
 end
 local function validateStored(mode: string,payload: any): ({string},any?)
  if SaveRest.isRetired(payload) then
@@ -87,7 +87,7 @@ SaveRest.stubWorld = stubWorld
 function SaveRest.check(mode: any, record: any): { string }
 	if mode ~= "main" and mode ~= "free" and mode ~= "easy" then return { "unknown mode" } end
 	if type(record) ~= "table" then return { "the rest is not a table" } end
- if record.save_retired~=nil or (record.save_life~=nil and not SaveRest.validLife(record.save_life)) then return {"reserved or invalid life identity"} end
+ if rawget(record,"save_retired")~=nil or (rawget(record,"save_life")~=nil and not SaveRest.validLife(rawget(record,"save_life"))) then return {"reserved or invalid life identity"} end
 	local why = SaveRest.bounded(record, SaveRules.MAX_REST_NODES, SaveRules.MAX_DEPTH)
 	if why then return { why } end
 	local text, err = Json.canonical(record)

@@ -303,7 +303,20 @@ function SaveSession.setRestForLife(self: any, mode: string, record: any,lifeTok
   self.counters.rejected+=1
   return false -- never let a late prior-life rest cross a retirement boundary
  end
- local problems = SaveRest.check(mode, record)
+-- Validate the exact stored candidate, including our identity metadata, against both size and node caps.
+ local stamped=record
+ local copyProblem: string?=nil
+ if type(record)=="table" and getmetatable(record)==nil then
+  stamped={}
+  local count=0
+  for key,value in record do
+   count+=1
+   if count>SaveRules.MAX_REST_NODES then copyProblem="too many root values";break end
+   stamped[key]=value
+  end
+  stamped.save_life=self.lifeTokens[mode]
+ end
+ local problems = if copyProblem then {copyProblem} else SaveRest.check(mode, stamped)
 	if #problems > 0 then
 		self.counters.rejected += 1
 		log(self, `the {mode} rest was refused: {problems[1]}`)
@@ -313,9 +326,6 @@ function SaveSession.setRestForLife(self: any, mode: string, record: any,lifeTok
 	end
 	local now = self.now()
 	self.restRejected[mode] = nil
-	local stamped={}
- for key,value in record do stamped[key]=value end
- stamped.save_life=self.lifeTokens[mode]
  self.restPending[mode], self.restPendingTime[mode] = stamped, now
 	self.sched:markDirty("rest_" .. mode, now)
 	self:notify()

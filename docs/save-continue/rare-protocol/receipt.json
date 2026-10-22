@@ -19,7 +19,7 @@
   "native_all_regions_materialized_verified": false,
   "native_record_chars": 1501296,
   "first_offer_cost_resolved": false,
-  "full_current_gates_verified": false,
+  "full_current_gates_verified": true,
   "native_full_feature_verified": false,
   "online_rejoin_verified": false,
   "remote_transfer_measured": false,

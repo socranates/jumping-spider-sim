@@ -1,0 +1,44 @@
+{
+  "source": "955d1eb32319a3eb84375835ab0d7e669a65de70",
+  "run_id": "1792694836637",
+  "assertions": 13,
+  "stages": [
+    {
+      "name": "copy_encode_hash",
+      "steps": 327,
+      "max_step_ms": 13.983,
+      "max_heartbeat_gap_ms": 1010.212,
+      "elapsed_ms": 5572.556
+    },
+    {
+      "name": "full_validation",
+      "steps": 247,
+      "max_step_ms": 34.029,
+      "max_heartbeat_gap_ms": 61.232,
+      "elapsed_ms": 4161.462
+    },
+    {
+      "name": "private_store",
+      "steps": 755,
+      "max_step_ms": 81.467,
+      "max_heartbeat_gap_ms": 88.508,
+      "elapsed_ms": 12914.177
+    }
+  ],
+  "record_canonical_chars": 1501296,
+  "region_initialization_attempts": 233,
+  "resident_regions_measured": false,
+  "creator_errors": 0,
+  "creator_warnings": 1,
+  "persistence_disabled": true,
+  "online_save_accessed": false,
+  "gameplay_worker_enabled": false,
+  "save_stalls_resolved": false,
+  "low_system_resources_warning_seen": true,
+  "hard_frame_budget_proven": false,
+  "typical_fps_proven": false,
+  "place_sha256": "32574e165e518e1a316b22954b32f02e190ee9d877e9365f6fa5eb5e816f2f7e",
+  "probe_sha256": "88f0dec28b5960bec0c59d438140cef76f5aa06e7f5c8483ddb8d3ecfe15f89f",
+  "output_sha256": "120965de0e5a6bcef0d2b96b913dcff61b783c5a45b62b1c7a439b6ed2a5932d",
+  "published": false
+}

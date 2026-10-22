@@ -1,3 +1,11 @@
+# Current save preparation milestone: 955d1eb
+
+The new cooperative preparation foundation passes **14 suites / 2,450 checks**, 221 compilation, strict analysis and runner5. Actual Studio passed13 assertions on an owned1.5M-character record, with all222 scripts fingerprinted and production saving disabled. Byte/hash/graph identity, cancellation and private staging are verified. **Gameplay workers remain disabled**, and some individual native steps still reach81ms; save stalls are not resolved. Nothing published.
+
+Start at [the current preparation notes](cooperative-stage/README.md); root verify.py checks exact source and receipts. Previous fbe4b56 completed both full Windows/Linux gates:69 suites/444391 passed/zero failed. New full gates for955d1eb are running as Windows30175 and Linux39834230975; poll existing runs. Current artifacts/BuildInfo remain old. Online/device/physical-input and broader audit work remain open.
+
+Earlier milestone notes below are historical.
+
 # Current milestone: native cost evidence and rare fixture protocol correction
 
 Sourcefbe4b56 has identical production files to47241c9 and only fixes the rare-history mock reply's protocol fields; its original assertions are unchanged. **12 focused suites/1,856 checks pass**, with220 compilation/strict/runner5 proof bound to identical code. See [current receipt](rare-protocol/receipt.json) and run root verify.py. Older counts/source sections below remain historical.

@@ -1,3 +1,9 @@
+# Latest unpublished milestone: cooperative save preparation, 955d1eb
+
+See [current handoff](../../chet/save-continue.md) and [source-bound worker evidence](../save-continue/cooperative-stage/README.md). 14 focused suites/2450 checks;221 modules compile, strict clean, runner5; actual Studio13 assertions/all222 fingerprints with production saving disabled. Workers are not enabled in gameplay and remaining native steps reach81ms. Nothing published; optimization goal active. Prior fbe4b56 full Windows/Linux gates both69/444391/0. Current source full runs Windows30175/Linux39834230975 are pending; do not substitute earlier evidence. Online/device/broader audit remains open.
+
+Earlier status below is historical.
+
 # Current verification: fbe4b56
 
 12 focused suites/1856 checks pass; production identical to47241c9,220 compile/strict/runner5 bound by hashes. Native13 local-controller assertions completed with large-save stalls; all-region materialization and ordinary performance are unproven. Old69-suite runs on ac898f4 failed only2 rare mock checks on both platforms and are retained. The mock fields are corrected without changing assertions; new full Windows71231/Linux39830933365 are live, not complete. Start at [current status](../save-continue/README.md). No publication; overall goal remains active. Older status sections below keep their historical scope.

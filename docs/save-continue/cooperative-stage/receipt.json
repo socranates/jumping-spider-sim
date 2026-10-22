@@ -1,0 +1,17 @@
+{
+  "source": "955d1eb32319a3eb84375835ab0d7e669a65de70",
+  "modules_compiled": 221,
+  "targeted_suites": 14,
+  "targeted_passed": 2450,
+  "failed": 0,
+  "strict_clean": true,
+  "runner_regressions": 5,
+  "inputs_verified": true,
+  "gameplay_worker_enabled": false,
+  "save_stalls_resolved": false,
+  "native_current_worker_verified": true,
+  "native_assertions": 13,
+  "hard_frame_budget_proven": false,
+  "release_artifact_rebuilt": false,
+  "published": false
+}

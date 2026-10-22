@@ -1,0 +1,10 @@
+2026-10-22T18:46:51.676Z,83.676239,22b8,6,Info [FLog::CreatorOutput] [NATIVE_SAVE_WORK_GUARD] 955d1eb32319a3eb84375835ab0d7e669a65de70 222 persistence_disabled
+2026-10-22T18:47:10.280Z,102.280655,0f5c,6,Info [FLog::CreatorOutput] [Windowsill] world: The Preserve (preserve)
+2026-10-22T18:47:10.290Z,102.290642,0f5c,6,Info [FLog::CreatorOutput] [Windowsill] sun: through the window, clock 10, latitude -40.7
+2026-10-22T18:47:16.334Z,108.334503,7c8c,6,Info [FLog::CreatorOutput] [NATIVE_SAVE_WORK_BEGIN] 1792694836637
+2026-10-22T18:47:17.298Z,109.298668,8528,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type
+2026-10-22T18:47:26.461Z,118.461487,0f5c,6,Info [FLog::CreatorOutput] [NATIVE_SAVE_WORK_RECORD] 1792694836637 233 1501296 resident_regions_unmeasured
+2026-10-22T18:47:32.036Z,124.036407,0f5c,6,Info [FLog::CreatorOutput] [NATIVE_SAVE_WORK_STAGE] 1792694836637 copy_encode_hash 327 13.983 1010.212 5572.556
+2026-10-22T18:47:36.198Z,128.198685,7c8c,6,Info [FLog::CreatorOutput] [NATIVE_SAVE_WORK_STAGE] 1792694836637 full_validation 247 34.029 61.232 4161.462
+2026-10-22T18:47:49.116Z,141.116974,0f5c,6,Info [FLog::CreatorOutput] [NATIVE_SAVE_WORK_STAGE] 1792694836637 private_store 755 81.467 88.508 12914.177
+2026-10-22T18:47:50.159Z,142.159470,0f5c,6,Info [FLog::CreatorOutput] [NATIVE_SAVE_WORK_DONE] 1792694836637 13 preparation_only

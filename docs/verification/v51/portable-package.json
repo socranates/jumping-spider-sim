@@ -1,0 +1,13 @@
+{
+  "source_commit": "14e60991c785c4293c3560e6d8b7ecded7e7ac75",
+  "document_tip": "bf85292556fd35a3b9f8301595a247f2e0fcf217",
+  "evidence_id": "d9ddc5e0ed43d301",
+  "place_version": 140,
+  "scope": "Active Roblox source, builds, tests, assets and v51 handoff/receipts; one frozen notebook JSON input for its generator; no Godot runtime",
+  "path": "C:\\Users\\natha\\claude-xfer\\Windowsill-v51-place140-d9ddc5e0ed43d301.zip",
+  "bytes": 11285394,
+  "file_count": 441,
+  "payload_file_count": 440,
+  "sha256": "d246352a71534147253d868b499e801a1eb0ce7b8d0a66a42104f545bdf54370",
+  "verified_all_payload_sha256": true
+}

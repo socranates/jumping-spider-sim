@@ -1,0 +1,4 @@
+C:/Users/natha/AppData/Local/Temp/tmpq_7btpn1/bundle.luau:57663: actual title menu never became ready
+stacktrace:
+[C] function assert
+C:/Users/natha/AppData/Local/Temp/tmpq_7btpn1/bundle.luau:57663

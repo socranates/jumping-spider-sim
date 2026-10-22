@@ -1,7 +1,7 @@
 {
-  "source": "8f16a40c3436e94bcd124dcee1b8f0d682c12300",
+  "source": "bc7783098ef256d08306eb7f7191015d721c6ad1",
   "base": "8e02b5ee5f443ab332cf7e70f5951a304cb89eea",
-  "evidence_id": "845ef13d49a92f88",
+  "evidence_id": "ab5a28c0ff450435",
   "production_modules": 217,
   "changed_modules": [
     "roblox_port/src/Client/SpiderClient.client.luau",
@@ -12,20 +12,23 @@
   "paired_regression_baseline_pass": 10,
   "paired_regression_baseline_fail": 5,
   "startup_cases_passed": 15,
-  "targeted_suites": 6,
-  "targeted_passed": 224,
+  "targeted_suites": 7,
+  "targeted_passed": 489,
   "compile_passed": 217,
   "strict_clean": true,
   "runner_regressions": 5,
   "production_sha256": "be8057c50851efc8f68c44c9703c3d5b51d1ec692b070e68a8f8eecd72365484",
   "test_artifact_rejected": true,
   "windows_full_complete": false,
-  "linux_ci_verified": false,
+  "linux_ci_verified": true,
   "native_prepared_cases": [
     "success",
     "failure"
   ],
+  "native_startup_paths_verified": true,
+  "native_startup_assertions": 18,
   "native_verified": false,
+  "bounded_controller_replay_verified": true,
   "full_controller_moving_input_replay_verified": false,
   "published": false,
   "publication_ready": false

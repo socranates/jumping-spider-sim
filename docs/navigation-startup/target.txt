@@ -1,7 +1,8 @@
-[Windowsill] navigation startup: C:/Users/natha/AppData/Local/Temp/tmp7g8zxj88.luau:57741: synthetic controller navigation failure
+[Windowsill] navigation startup: C:/Users/natha/AppData/Local/Temp/tmpjea6m632.luau:57741: synthetic controller navigation failure
 NAVIGATION_STARTUP passed=15 failed=0
 OUTDOOR_RESET passed=45 failed=0
 MINIMAL passed=63 failed=0
 SAVE_NOTICE passed=53 failed=0
 CLIENT passed=27 failed=0
 TITLE passed=21 failed=0
+RARE passed=265 failed=0

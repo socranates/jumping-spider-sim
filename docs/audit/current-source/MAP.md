@@ -1,5 +1,5 @@
 # Foundation map
-Current source `8f16a40c3436e94bcd124dcee1b8f0d682c12300`, branch `codex/navigation-startup`. All indexed production bytes match that commit. Last verified published baseline: v51 / place 140, source `14e60991c785c4293c3560e6d8b7ecded7e7ac75`; this index is not publication evidence.
+Current source `bc7783098ef256d08306eb7f7191015d721c6ad1`, branch `codex/navigation-startup`. All indexed production bytes match that commit. Last verified published baseline: v51 / place 140, source `14e60991c785c4293c3560e6d8b7ecded7e7ac75`; this index is not publication evidence.
 
 See `../CURRENT.md` for current verification gaps; `../DATA.md` remains the historical schema discussion. This is a lexical index, not a line-by-line review.
 

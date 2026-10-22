@@ -1,0 +1,993 @@
+{
+  "trials": [
+    {
+      "fps": 30,
+      "loading_frames": 396,
+      "preparation_slices": 1684,
+      "samples": 21,
+      "rng_draws": 377
+    },
+    {
+      "fps": 60,
+      "loading_frames": 360,
+      "preparation_slices": 1624,
+      "samples": 21,
+      "rng_draws": 377
+    },
+    {
+      "fps": 120,
+      "loading_frames": 354,
+      "preparation_slices": 1616,
+      "samples": 21,
+      "rng_draws": 377
+    }
+  ],
+  "comparisons": [
+    {
+      "base_fps": 60,
+      "other_fps": 30,
+      "matching_samples": 0,
+      "matching_gameplay_samples": 21,
+      "samples": [
+        {
+          "second": 0,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 172.29997320100665,
+              "right": 171.19996482506394
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 12,
+              "right": 11
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 12,
+              "right": 11
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 1,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 572.6999952457845,
+              "right": 356.59997956827283
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 773,
+              "right": 1156
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 15472,
+              "right": 16476
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 2,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 117.0000177808106,
+              "right": 62.20000796020031
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1337,
+              "right": 1495
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 31992,
+              "right": 31200
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 3,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 190.79999765381217,
+              "right": 101.69995948672295
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1337,
+              "right": 1495
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 36742,
+              "right": 35284
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 4,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 199.40000493079424,
+              "right": 141.2000274285674
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1337,
+              "right": 1495
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 40145,
+              "right": 38824
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 5,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 170.09995644912124,
+              "right": 84.7000046633184
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1337,
+              "right": 1495
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 46911,
+              "right": 44794
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 6,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 118.49997099488974,
+              "right": 108.80001354962587
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1354,
+              "right": 1495
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 56498,
+              "right": 52758
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 7,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 168.70000399649143,
+              "right": 273.1999848037958
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1354,
+              "right": 1495
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 75531,
+              "right": 69782
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 8,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 140.79996617510915,
+              "right": 99.70000246539712
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1354,
+              "right": 1495
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 89519,
+              "right": 82843
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 9,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 134.99998021870852,
+              "right": 124.70001820474863
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1354,
+              "right": 1495
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 107926,
+              "right": 98716
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 10,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 136.5999924018979,
+              "right": 88.69997691363096
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1354,
+              "right": 1495
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 123135,
+              "right": 113162
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 11,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 238.30001009628177,
+              "right": 179.9999736249447
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1354,
+              "right": 1503
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 131216,
+              "right": 122423
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 12,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 166.199984960258,
+              "right": 83.099992480129
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1354,
+              "right": 1503
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 151179,
+              "right": 138707
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 13,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 103.20002911612391,
+              "right": 125.00002048909664
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1354,
+              "right": 1503
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 164334,
+              "right": 151013
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 14,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 90.90005187317729,
+              "right": 104.10003596916795
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1594,
+              "right": 1503
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 185317,
+              "right": 170548
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 15,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 134.00003081187606,
+              "right": 158.69998605921865
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1594,
+              "right": 1503
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 196591,
+              "right": 178919
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 16,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 130.80000644549727,
+              "right": 148.2999650761485
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1594,
+              "right": 1503
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 213865,
+              "right": 192878
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 17,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 136.19998935610056,
+              "right": 85.10000770911574
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1594,
+              "right": 1503
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 229229,
+              "right": 207171
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 18,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 33.89996709302068,
+              "right": 26.40002639964223
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1594,
+              "right": 1503
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 245848,
+              "right": 220733
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 19,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 122.90000449866056,
+              "right": 112.00003791600466
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1594,
+              "right": 1503
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 262803,
+              "right": 234752
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 20,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 64.99997107312083,
+              "right": 39.20000744983554
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1594,
+              "right": 1503
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 269536,
+              "right": 241431
+            }
+          ],
+          "gameplay_projection_matches": true
+        }
+      ],
+      "rng_sequence_exact_match": true,
+      "base_rng_draws": 377,
+      "other_rng_draws": 377,
+      "first_rng_differences": []
+    },
+    {
+      "base_fps": 60,
+      "other_fps": 120,
+      "matching_samples": 0,
+      "matching_gameplay_samples": 21,
+      "samples": [
+        {
+          "second": 0,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 172.29997320100665,
+              "right": 196.5999836102128
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 12,
+              "right": 13
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 12,
+              "right": 13
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 1,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 572.6999952457845,
+              "right": 399.4000144302845
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 773,
+              "right": 656
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 15472,
+              "right": 13139
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 2,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 117.0000177808106,
+              "right": 118.40002844110131
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1337,
+              "right": 1107
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 31992,
+              "right": 27080
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 3,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 190.79999765381217,
+              "right": 134.29997488856316
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1337,
+              "right": 1107
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 36742,
+              "right": 31347
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 4,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 199.40000493079424,
+              "right": 183.19999799132347
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1337,
+              "right": 1107
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 40145,
+              "right": 34766
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 5,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 170.09995644912124,
+              "right": 106.89999908208847
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1337,
+              "right": 1107
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 46911,
+              "right": 40395
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 6,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 118.49997099488974,
+              "right": 111.69997742399573
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1354,
+              "right": 1295
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 56498,
+              "right": 48892
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 7,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 168.70000399649143,
+              "right": 174.20004587620497
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1354,
+              "right": 1295
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 75531,
+              "right": 64086
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 8,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 140.79996617510915,
+              "right": 172.80003521591425
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1354,
+              "right": 1653
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 89519,
+              "right": 79997
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 9,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 134.99998021870852,
+              "right": 119.10003377124667
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1354,
+              "right": 1653
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 107926,
+              "right": 96241
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 10,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 136.5999924018979,
+              "right": 149.39997345209122
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1354,
+              "right": 1653
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 123135,
+              "right": 110444
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 11,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 238.30001009628177,
+              "right": 232.89996897801757
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1354,
+              "right": 1653
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 131216,
+              "right": 118307
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 12,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 166.199984960258,
+              "right": 101.70001769438386
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1354,
+              "right": 1653
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 151179,
+              "right": 135696
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 13,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 103.20002911612391,
+              "right": 126.20002962648869
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1354,
+              "right": 1653
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 164334,
+              "right": 146669
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 14,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 90.90005187317729,
+              "right": 212.99999207258224
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1594,
+              "right": 1653
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 185317,
+              "right": 163922
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 15,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 134.00003081187606,
+              "right": 110.89997133240104
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1594,
+              "right": 1653
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 196591,
+              "right": 173399
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 16,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 130.80000644549727,
+              "right": 220.69999249652028
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1594,
+              "right": 1653
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 213865,
+              "right": 187848
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 17,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 136.19998935610056,
+              "right": 112.79998579993844
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1594,
+              "right": 1653
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 229229,
+              "right": 200900
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 18,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 33.89996709302068,
+              "right": 31.400006264448166
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1594,
+              "right": 1653
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 245848,
+              "right": 214155
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 19,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 122.90000449866056,
+              "right": 152.900000102818
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1594,
+              "right": 1653
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 262803,
+              "right": 228528
+            }
+          ],
+          "gameplay_projection_matches": true
+        },
+        {
+          "second": 20,
+          "exact_match": false,
+          "first_differences": [
+            {
+              "path": "$.state.checkpoint.world.objects[4].e[0][1]",
+              "left": 64.99997107312083,
+              "right": 40.10001430287957
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[9][1]",
+              "left": 1594,
+              "right": 1653
+            },
+            {
+              "path": "$.state.checkpoint.world.objects[5].e[10][1]",
+              "left": 269536,
+              "right": 234141
+            }
+          ],
+          "gameplay_projection_matches": true
+        }
+      ],
+      "rng_sequence_exact_match": true,
+      "base_rng_draws": 377,
+      "other_rng_draws": 377,
+      "first_rng_differences": []
+    }
+  ],
+  "all_checkpoint_wasp_samples_match": false,
+  "all_class_dispatched_rng_calls_match": true,
+  "scope": "Actual controller on shim, ordinary title menu through SelfTest hook,20 simulated seconds moving/aim-cancel input; canonical checkpoint graph and live wasp graph, observed PreyRandom.next calls only",
+  "all_gameplay_projection_samples_match": true,
+  "excluded_telemetry_fields": {
+    "PreyDirector": [
+      "beforeCost"
+    ],
+    "Sensor": [
+      "cpuUsMax",
+      "cpuUsTotal"
+    ]
+  },
+  "projection_regression_guards": 4,
+  "physical_input": false,
+  "native_verified": false,
+  "online_verified": false,
+  "all_future_seeded_behaviour_proven": false
+}

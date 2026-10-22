@@ -1,14 +1,19 @@
 {
-  "source": "8f16a40c3436e94bcd124dcee1b8f0d682c12300",
-  "evidence_id": "845ef13d49a92f88",
-  "windows_full_session_id": 2814,
-  "linux_ci_run": 39800818953,
-  "targeted_passed": 224,
-  "targeted_suites": 6,
+  "source": "bc7783098ef256d08306eb7f7191015d721c6ad1",
+  "runtime_source": "8f16a40c3436e94bcd124dcee1b8f0d682c12300",
+  "evidence_id": "ab5a28c0ff450435",
+  "windows_full_session_id": 28050,
+  "linux_ci_run": 39803485593,
+  "targeted_passed": 489,
+  "targeted_suites": 7,
+  "native_startup_paths_verified": true,
+  "native_startup_assertions": 18,
+  "bounded_controller_replay_verified": true,
   "native_verified": false,
-  "native_prepared_cases": [
-    "success",
-    "failure"
-  ],
-  "published": false
+  "published": false,
+  "rejected_full_gate": "rejected-full-v1: CI39800818953 failed five obsolete rare-sighting startup fixture checks; Windows2814 intentionally stopped after same failure",
+  "linux_ci_verified": true,
+  "linux_passed": 443884,
+  "linux_failed": 0,
+  "windows_full_complete": false
 }

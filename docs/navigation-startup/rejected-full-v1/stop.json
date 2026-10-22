@@ -1,0 +1,15 @@
+{
+  "source": "8f16a40c3436e94bcd124dcee1b8f0d682c12300",
+  "session": 2814,
+  "tool_exit_code": 1,
+  "agent_stopped": true,
+  "wrapper_pid": 12084,
+  "runner_pid": 9340,
+  "child_pid": 16548,
+  "reason": "Windows already recorded same five rare startup fixture failures as complete Linux CI39800818953; remaining duplicate traversal intentionally stopped before fixing fixture",
+  "windows_complete": false,
+  "ci_suites": 65,
+  "ci_passed": 443879,
+  "ci_failed": 5,
+  "windows_log_sha256": "ce41f98f2e2f17062456be4f468e3d996176a72612e1f807a81650be82e7a160"
+}

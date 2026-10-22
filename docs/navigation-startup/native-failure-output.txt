@@ -1,0 +1,7 @@
+2026-10-22T15:23:32.645Z,330.645721,65f0,6,Info [FLog::CreatorOutput] [NAVIGATION_NATIVE_GUARD] 8f16a40c3436e94bcd124dcee1b8f0d682c12300 218 persistence_disabled
+2026-10-22T15:23:41.149Z,339.149658,7334,6,Info [FLog::CreatorOutput] [Windowsill] world: The Preserve (preserve)
+2026-10-22T15:23:41.154Z,339.154694,7334,6,Info [FLog::CreatorOutput] [Windowsill] sun: through the window, clock 10, latitude -40.7
+2026-10-22T15:23:47.305Z,345.305450,8430,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type
+2026-10-22T15:23:47.384Z,345.384155,920c,6,Info [FLog::CreatorOutput] [NAVIGATION_NATIVE_BEGIN] 1792682627220 failure
+2026-10-22T15:23:47.406Z,345.406250,26e0,6,Warning [FLog::CreatorWarning] Warning: [Windowsill] navigation startup: ReplicatedStorage.Shared.World.NavigationPreparation:41: synthetic native startup route failure
+2026-10-22T15:23:47.581Z,345.581238,26e0,6,Info [FLog::CreatorOutput] [NAVIGATION_NATIVE_DONE] 1792682627220 failure 8 2 0.196492 0 1105 433

@@ -2,7 +2,7 @@ from pathlib import Path
 import tempfile,shutil,subprocess,json,hashlib,sys
 ROOT=Path(__file__).resolve().parents[2];HERE=Path(__file__).resolve().parent
 TOOL=Path(r"C:/Users/natha/.codex/.chatgpt-projects/g-p-6ac2f32f82a48191b0c7151a11eab0fd/roblox_tools/luau/luau.exe")
-suites=sys.argv[1:] or ['navigation_startup.luau','outdoor_life_reset.luau','minimal_hud.luau','save_notice.luau','client_smoke.luau','title.luau']
+suites=sys.argv[1:] or ['navigation_startup.luau','outdoor_life_reset.luau','minimal_hud.luau','save_notice.luau','client_smoke.luau','title.luau','rare_sightings.luau']
 with tempfile.TemporaryDirectory() as folder:
  snap=Path(folder);shutil.copytree(ROOT/'roblox_port/src',snap/'roblox_port/src');shutil.copytree(ROOT/'roblox_port/tests',snap/'roblox_port/tests')
  files=list((snap/'roblox_port/src').rglob('*.luau'))+list((snap/'roblox_port/tests').rglob('*'))

@@ -6,7 +6,8 @@
     "minimal_hud.luau",
     "save_notice.luau",
     "client_smoke.luau",
-    "title.luau"
+    "title.luau",
+    "rare_sightings.luau"
   ],
   "inputs": {
     "roblox_port/src/Client/BirdBody.luau": "e290e574c9064832dd822ab008e9dc247bbb44512b5a381c13b1ea6674b801c7",
@@ -285,7 +286,7 @@
     "roblox_port/tests/prey_reference.json": "2743ef6f09a18eea317ce6cefa9d139322f688f9dba3b0421b9119af28430d85",
     "roblox_port/tests/prey_reference.luau": "e40e447f1ee8dc3e529768344c265280aa66aa5498331b71417d718d2c26addb",
     "roblox_port/tests/quiet.luau": "d4f945a59d7b5426fb7bbb75d39a23a6840d8d213e1e600e83a97f8ae55bd7ab",
-    "roblox_port/tests/rare_sightings.luau": "5525a60eb749aa8be24f6d7dd5e371bb1333adae1c1dda7e2cca8008536422bb",
+    "roblox_port/tests/rare_sightings.luau": "e6a94676f29f2f75102cd3ad18b2c5ba9f53e111f4dd883423104ae10db77acf",
     "roblox_port/tests/rest_compression.luau": "93c92b2d4798422626d5f0f7e3bfb8f4eb2286d22f533e85ec748c6f32b5a7b8",
     "roblox_port/tests/rest_storage.luau": "d818dc46aa55a75efb92f207b1ba8dcd1d92393d9e4bae5b587732fad2ca0165",
     "roblox_port/tests/rival.luau": "ef8159afbf9218a5a0f4af507f6b3111e07c11c6d872d9a305c45ae10ef06df7",
@@ -322,7 +323,7 @@
     "roblox_port/tests/world_client.luau": "e6cc5f2d0dd57105abda5ab736d96e9d25d7fcc5f51fb3f28f619ce916148f56",
     "roblox_port/tests/client/SilkPlayback.luau": "193f53c2796cd12851e1b34a114c714e16bd13d25ac150cb1868abce7543ca8c",
     "roblox_port/tests/studio/AntMimicSpec.luau": "7b1f4a694d542bd999d1571c218c351b62e2be63009e05d88b7eec632dd06130",
-    "roblox_port/tests/studio/BuildInfo.luau": "0c4865a70df316641d4047050626c2f0a2c4409eed0a7dbcd7bb10d46062d373",
+    "roblox_port/tests/studio/BuildInfo.luau": "e720ee57ff971e9f0ae6b7ef15923269a51e1b06b4ce51c22f222fc900a20015",
     "roblox_port/tests/studio/GraphicsSpec.luau": "abb4c770d3199300959a0f50ce12de8f2262b2a3e0d962c32e9ba94aaaf0b8dd",
     "roblox_port/tests/studio/GrowthSpec.luau": "a959da5d6c61e3a7b0610a2a2387152c8fe09e33110eb781489d912764d6b4df",
     "roblox_port/tests/studio/LifeSpec.luau": "8eae44034c4b44a849c62d6aa742704f281d8b6bc0cfb0a93751ca031816f2fa",

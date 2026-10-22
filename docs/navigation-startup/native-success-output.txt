@@ -1,0 +1,6 @@
+2026-10-22T15:19:31.337Z,89.337425,65f0,6,Info [FLog::CreatorOutput] [NAVIGATION_NATIVE_GUARD] 8f16a40c3436e94bcd124dcee1b8f0d682c12300 218 persistence_disabled
+2026-10-22T15:19:51.265Z,109.265617,65f0,6,Info [FLog::CreatorOutput] [Windowsill] world: The Preserve (preserve)
+2026-10-22T15:19:51.304Z,109.304535,65f0,6,Info [FLog::CreatorOutput] [Windowsill] sun: through the window, clock 10, latitude -40.7
+2026-10-22T15:19:58.921Z,116.921509,0e44,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type
+2026-10-22T15:19:59.052Z,117.052940,5c48,6,Info [FLog::CreatorOutput] [NAVIGATION_NATIVE_BEGIN] 1792682398889 success
+2026-10-22T15:20:07.288Z,125.288651,26e0,6,Info [FLog::CreatorOutput] [NAVIGATION_NATIVE_DONE] 1792682398889 success 10 406 8.235772 1526 1105 433

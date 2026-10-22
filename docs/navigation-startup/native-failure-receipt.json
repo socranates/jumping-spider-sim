@@ -1,0 +1,29 @@
+{
+  "release_snapshot": "bc7783098ef256d08306eb7f7191015d721c6ad1",
+  "guarded_runtime_snapshot": "8f16a40c3436e94bcd124dcee1b8f0d682c12300",
+  "production_bytes_identical": true,
+  "run_id": "1792682627220",
+  "mode": "failure",
+  "assertions": 8,
+  "observed_wait_frames": 2,
+  "observed_probe_seconds": 0.196492,
+  "preparation_slices": 0,
+  "viewport": [
+    1105.0,
+    433.0
+  ],
+  "scripts": 218,
+  "persistence_disabled": true,
+  "place_sha256": "2c0ce46d960ae6d32033a04b8d36cb8efbbec88ab7ae32e57f72994982b3766f",
+  "output_sha256": "327f8e2d5a9b0fffe47d90a73861423fb8be00ec356f35cb547c89ea51d7ab98",
+  "creator_errors": 0,
+  "expected_synthetic_warnings": 1,
+  "other_creator_warnings": 1,
+  "native_startup_path_verified": true,
+  "scope": "Studio-only playback hook, actual controller/splash; fixture mode changes and synthetic failure. Timing from hook to probe completion, not full load or representative FPS.",
+  "online_save_accessed": false,
+  "physical_input_verified": false,
+  "phone_verified": false,
+  "automatic_network_streaming_verified": false,
+  "published": false
+}

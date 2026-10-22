@@ -1,13 +1,18 @@
 -- Captured before incremental routing: station-routes-baseline.txt at habitat commit 754f8e3.
+-- v49 intentionally changes four authored regions: desk radio/thermos, floor
+-- boots/pack, shelf first-aid case, and the cracked back-room window/exit seam.
+-- Only those four rows were refreshed from the independent legacy synchronous
+-- Route.graph path (docs/verification/v49/route-geometry-capture.luau); the other
+-- 47 archived fingerprints remain exact. The incremental builder is unchanged.
 return {
  ["hut_board"]={faces=30,seams=6,waypoints=37,fingerprint=887733474},
  ["hut_chair"]={faces=54,seams=2,waypoints=81,fingerprint=940887545},
- ["hut_desk"]={faces=120,seams=6,waypoints=201,fingerprint=1983833500},
+ ["hut_desk"]={faces=156,seams=6,waypoints=240,fingerprint=1876253443},
  ["hut_door"]={faces=42,seams=4,waypoints=69,fingerprint=2097909838},
  ["hut_door_up"]={faces=24,seams=5,waypoints=20,fingerprint=1036166758},
  ["hut_doorway"]={faces=18,seams=3,waypoints=17,fingerprint=1581972070},
  ["hut_doorway_up"]={faces=18,seams=3,waypoints=10,fingerprint=1426485756},
- ["hut_floor_a"]={faces=24,seams=4,waypoints=25,fingerprint=900680253},
+ ["hut_floor_a"]={faces=96,seams=4,waypoints=134,fingerprint=651973589},
  ["hut_floor_b"]={faces=18,seams=6,waypoints=18,fingerprint=1967739552},
  ["hut_floor_c"]={faces=24,seams=5,waypoints=25,fingerprint=884367720},
  ["hut_floor_d"]={faces=18,seams=5,waypoints=15,fingerprint=1699322904},
@@ -16,7 +21,7 @@ return {
  ["hut_floor_g"]={faces=30,seams=4,waypoints=32,fingerprint=1978939394},
  ["hut_floor_h"]={faces=6,seams=4,waypoints=5,fingerprint=1210184202},
  ["hut_floor_i"]={faces=120,seams=4,waypoints=91,fingerprint=1240039620},
- ["hut_shelf"]={faces=222,seams=2,waypoints=318,fingerprint=361879887},
+ ["hut_shelf"]={faces=252,seams=2,waypoints=346,fingerprint=1426064063},
  ["hut_up_a"]={faces=24,seams=4,waypoints=20,fingerprint=1481570897},
  ["hut_up_b"]={faces=36,seams=6,waypoints=35,fingerprint=499777185},
  ["hut_up_c"]={faces=24,seams=4,waypoints=20,fingerprint=225627008},
@@ -49,6 +54,6 @@ return {
  ["room_up_g"]={faces=30,seams=4,waypoints=40,fingerprint=1027673586},
  ["room_up_h"]={faces=24,seams=4,waypoints=25,fingerprint=2042858066},
  ["room_up_i"]={faces=24,seams=3,waypoints=20,fingerprint=696886955},
- ["room_window"]={faces=30,seams=2,waypoints=71,fingerprint=5100395},
+ ["room_window"]={faces=30,seams=3,waypoints=67,fingerprint=927560754},
  ["sill"]={faces=186,seams=7,waypoints=105,fingerprint=278364687},
 }

@@ -347,7 +347,8 @@ function Hut.author(worldSeed: number, seedOf: (number, string) -> number): { Re
 	region("hut_outer_sill", "hut_outer_sill", v(-40, -5, -25.5), v(40, 35, -13.5), v(0, 0, -18), v(0, 0, -1), 1.0)
 	region("hut_desk", "hut_desk", v(31, -69, 12.5), v(R.x1, Hut.WALL_TOP, 80), v(80, 4, 45), v(0, 0, -1), 1.0)
 	region("hut_board", "hut_board", v(R.x0, -69, 12.5), v(-31, Hut.WALL_TOP, 30), v(-90, 20, 16.5), v(0, 1, 0), 1.0)
-	region("hut_shelf", "hut_shelf", v(R.x0, -69, 114), v(-116, 30, 206), v(-132, 10, 160), v(0, 0, -1), 1.0)
+	-- The top books occupy the old shelf-plane spawn. A fallback starts on the upper book.
+	region("hut_shelf", "hut_shelf", v(R.x0, -69, 114), v(-116, 30, 206), v(-132, 14.2, 160), v(0, 0, -1), 1.0)
 	region("hut_chair", "hut_chair", v(64, -69, 86), v(108, 20, 130), v(86, -24, 108), v(0, 0, -1), 1.0)
 	region("hut_door", "hut_door", v(-Hut.DOOR.jamb, -88, R.z1), v(Hut.DOOR.jamb, Hut.DOOR.top, Hut.DOOR.gravel), v(0, FL, 272), v(0, 0, 1), 1.0)
 	-- (ROBLOX-118) the door's leaf and jambs above WALL_TOP's door height to its head, and the wall over it to the ceiling; the doorway to the back room; the back room's
@@ -365,7 +366,9 @@ function Hut.author(worldSeed: number, seedOf: (number, string) -> number): { Re
 	for r = 1, 3 do
 		for c = 1, 3 do
 			local x0, x1, z0, z1 = Hut.COLS[c], Hut.COLS[c + 1], Hut.ROWS[r], Hut.ROWS[r + 1]
-			region(floorCell(c, r), "hut_floor", v(x0, FL - 3, z0), v(x1, Hut.WALL_TOP, z1), v((x0 + x1) / 2, FL, (z0 + z1) / 2), v(0, 0, -1), 1.0)
+			-- The station's boots cover the first cell's centre; keep its fallback beside them.
+   local spawn=v((x0+x1)/2,FL,if c==1 and r==1 then 75 else (z0+z1)/2)
+			region(floorCell(c, r), "hut_floor", v(x0, FL - 3, z0), v(x1, Hut.WALL_TOP, z1), spawn, v(0, 0, -1), 1.0)
 		end
 	end
 	-- (ROBLOX-118) the back room's floor in nine cells, as the hut's

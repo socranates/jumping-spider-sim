@@ -403,7 +403,7 @@ function FlyBodies.pose(self: any, rig: any, flying: boolean)
 		rig.parts[i].Size = pose.size * (rig.scale or 1)
 		-- (the fruit fly: the house fly's template in a fruit fly's colours; ROBLOX-114: known by its kind, not by its golden visual_scale 0.6, which it is no longer drawn at)
 		local fruit = rig.fruit == true
-		rig.parts[i].Transparency = if fruit and string.find(spec.name, "Stripe") then 1 else pose.transparency
+		rig.parts[i].Transparency = if (rig.captured and spec.name == "Shadow") or (fruit and string.find(spec.name, "Stripe")) then 1 else pose.transparency
 		local name = spec.name
 		rig.parts[i].Color = if fruit and (name == "Head" or name == "Thorax" or name == "Abdomen" or name == "Face") then Color3.fromRGB(178, 132, 65)
 			elseif fruit and (name == "EyeL" or name == "EyeR") then Color3.fromRGB(176, 39, 24) else spec.color
@@ -598,10 +598,13 @@ function FlyBodies.draw(self: any, flies: { any }, now: number, cameraAt: Vector
 		rig = rig or self:spawn(fly.id, kind)
 		local template: Template = rig.template or self.template
 		local meal=if heldView and heldView.id==fly.id then heldView else nil
-  local flying = fly:airborne() or (fly.state == "CAPTURED" and (meal==nil or meal.struggling))
+  local captured=fly.state=="CAPTURED"
+  local poseChanged=rig.captured~=captured
+  rig.captured=captured
+  local flying = fly:airborne() or (captured and (meal==nil or meal.struggling))
   local scale = FlyLook.drawnScale(fly.profile)*(if meal then meal.scale else 1)
 		rig.fruit = fly.profile ~= nil and fly.profile.body.prey_kind == "fruit_fly"
-		if flying ~= rig.flying or rig.scale ~= scale then rig.scale = scale; self:pose(rig, flying) end
+		if flying ~= rig.flying or rig.scale ~= scale or poseChanged then rig.scale = scale; self:pose(rig, flying) end
 		-- the far rule: drawn ten times a second beyond FAR.studs of the camera, with all the time since
 		rig.owed += dtAll
 		if rig.drawn and cameraAt ~= nil and (cameraAt - fly.position).Magnitude > FAR.studs and rig.owed < FAR.seconds - 1e-6 then continue end

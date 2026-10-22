@@ -117,6 +117,10 @@ local pulse=meal:pulse(.05,feeding,false);check(pulse>0,"bite animates on actual
 meal:update(.1,feeding,rig:mouthFrame(),false)
 local bodies=FlyBodies.new(workspace,"low");bodies:draw({held},0,nil,false,meal.heldView)
 local size=bodies.rigs.meal.parts[1].Size.Magnitude
+for _,part in bodies.rigs.meal.parts do if part.Name=="Shadow" then check(part.Transparency==1,"held subdued prey has no floating perched shadow") end end
+held.state="PERCHED";bodies:draw({held},.05,nil,false)
+for _,part in bodies.rigs.meal.parts do if part.Name=="Shadow" then check(part.Transparency<1,"released perched prey restores its ground shadow") end end
+held.state="CAPTURED";bodies:draw({held},.06,nil,false,meal.heldView)
 held.nutrition=.01;meal:update(.1,feeding,rig:mouthFrame(),false);bodies:draw({held},.1,nil,false,meal.heldView)
 check(bodies.rigs.meal.parts[1].Size.Magnitude<size,"meal visibly shrinks without changing nutrition")
 held.state="CONSUMED";feeding.held=nil;meal:update(.1,feeding,rig:mouthFrame(),false)

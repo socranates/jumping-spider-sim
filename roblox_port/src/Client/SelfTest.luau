@@ -1662,6 +1662,20 @@ local function checks(): { Check }
 			say(r, `INFO looks outside the window: {looks:parts()} parts held of {looks.planned} planned at the {looks.tier} tier, {looks.made} made and {looks.destroyed} destroyed this session, {looks.plans} plans`)
 		end
 	end)
+	if preserve then add("fallbacks clear the shelf books and station boots", function(r)
+  local c=r.ctx
+  local params=OverlapParams.new();params.FilterType=Enum.RaycastFilterType.Include;params.FilterDescendantsInstances={c.world.root}
+  for _,id in {"hut_shelf","hut_floor_a"} do
+   local region=assert(WorldMap.region(id));local at=region.spawn.pos+Vector3.yAxis*HEIGHT
+   need(holdUntilReady(r,id,at,nil),"fallback region missing: "..id)
+   put(r,at,nil);pause(r,.3)
+   local probe=Instance.new("Part");probe.Anchored=true;probe.CanCollide=false;probe.CanQuery=false;probe.CanTouch=false
+   probe.Transparency=1;probe.Size=Vector3.one*.04;probe.CFrame=Workspace.CurrentCamera.CFrame;probe.Parent=Workspace
+   local parts=Workspace:GetPartsInPart(probe,params);probe:Destroy()
+   need(#parts==0,"fallback camera starts in geometry: "..id)
+   need(c.motor.mode=="attached" and (c.motor.pos-at).Magnitude<.2,"fallback was not supported: "..id)
+  end
+ end) end
 	add("visible meal and contextual controls", function(r)
   local c=r.ctx
   need(c.fresh("main",false),"new Normal life refused")

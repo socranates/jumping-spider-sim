@@ -18,7 +18,7 @@ function P.step(self: any,dt: number,s: any): any
    elseif s.struggling and not s.auto then text=`Tap {if s.device=="touch" then "Grip" else key}: hold your prey`
    elseif s.struggling then text="Holding your prey"
    elseif s.auto then text="Eating - move to pause"
-   else text=`Tap {key}: eat` end
+   else text=if s.device=="touch" then "Tap Eat" else `Tap {key}: eat` end
   elseif night~=nil and not self.dismissed then
    if s.weak then text="Too hungry to sleep; find food."
    elseif s.canRest then text=`{if s.device=="touch" then "Rest" else key}: rest`

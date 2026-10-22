@@ -71,3 +71,25 @@ Performance candidate: CatBody geometry beyond180 studs gets10Hz updates; its
 simulation and audio retain their rates. Source profile attributed substantial
 per-frame allocation to its pose list; keep only if native measurements support
 the tradeoff. Existing scenery budgets, shadows and low-tier lighting retained.
+
+
+Native candidate A full SelfTest completed273/0/0. Source manifest and zip were
+captured before B refinements; its frame samples after01:00 have concurrent CLI
+load and are not final performance evidence. B=9e60bba freezes57 Windows suite
+run in claude-xfer/v50-cli-9e60bba (session55057), still running. Branch pushed.
+
+Candidate B's native meal fixture confirmed actual jaw distance0, scale0.7 at
+0.16 nutrition, keyboard/left-stick/touch prompts, a three-part husk, built-in
+bite audio loaded, dusk words and actual E rest/clear. Its full dry-region
+walk/hop/camera survey is still running (sourceB). Captured full-held-meal.jpg
+shows a perched fly shadow incorrectly floating at the mouth; C hides it while
+captured and restores it on release. Meals85/0 and flies283/0 pass for C.
+
+The survey also found declared fallback spawns inside shelf book1 and boot1's
+sole. C moves the shelf fallback to the upper book surface14.2, and floorA's
+fallback beside the boots atz75. Prop geometry, saved positions and layout
+revision are unchanged. New spawn_clearance suite reproduces both old overlaps
+and checks real motor and camera after stand/walk:20/0. Native SelfTest now adds
+a corresponding check (274 expected), to run on the final source. B's ongoing
+survey is retained and will still report these old two overlaps. Recheck their
+full-tier placements and the complete low-tier survey on C.

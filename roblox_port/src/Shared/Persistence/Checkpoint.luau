@@ -70,6 +70,7 @@ local NeedsModel = require(script.Parent.Parent.Life.NeedsModel)
 local LifeLoop = require(script.Parent.Parent.Life.LifeLoop)
 local LifeClock = require(script.Parent.Parent.Life.LifeClock)
 local Growth = require(script.Parent.Parent.Life.Growth)
+local RareDirector = require(script.Parent.Parent.Life.RareDirector)
 local WorldMap = require(script.Parent.Parent.World.WorldMap)
 local WaspDirector = require(script.Parent.Parent.Predator.WaspDirector)
 local Cat = require(script.Parent.Parent.Predator.Cat)
@@ -333,6 +334,7 @@ local function checkWorld(roots: { [string]: any }, problems: { string }, legacy
  if life.start_zone ~= nil and (not Ballooning.valid(life.start_zone) or life.start_zone == Ballooning.HUT) then bad("life: invalid start zone") end
  if life.start_region ~= nil and (life.start_zone == nil or not Ballooning.landsIn(life.start_zone, life.start_region)) then bad("life: invalid start region") end
  if life.start_zone ~= nil and life.start_region == nil then bad("life: a start zone with no landing") end
+ for _,text in RareDirector.problems(life) do bad("life: "..text) end
  -- ROBLOX-91: where this generation's grace began (Mating.grace); absent in a record from before (the first generation's: the sill's own day and meals).
  for _, k in { "born", "mealsBase" } do
   local v = life[k]

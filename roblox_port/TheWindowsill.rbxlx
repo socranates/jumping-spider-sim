@@ -2604,6 +2604,7 @@ NotebookPages.triggers = {
 	"look_damselfly",
 	"look_skater",
 	"darner",
+	"rare_luna",
 }
 
 -- The reserve at or under hungryAt is "hungry"; at or over wellFedAt, "well fed" (LIFE_DESIGN.md round 1).
@@ -3187,6 +3188,18 @@ NotebookPages.pages = {
 			"Wikipedia (read 2026). Green darner.",
 		},
 	},
+	{
+		id = "rare_luna_moth",
+		trigger = "rare_luna",
+		title = "Rare sighting: luna moth",
+		text = "Actias luna is a native Illinois silk moth, with pale green wings, four eyespots and long hindwing tails. Adults do not feed. In experiments with hunting bats, the spinning tails diverted attacks away from the body. Flight seasons vary across its range; some populations have more than one brood.",
+		game = "A warm, dry night may bring one to the hut's outer windowsill until dawn. It is too large to catch. A wing can bear your spider here: an authored invitation to explore, not a claim about wild moths tolerating a rider.",
+		sources = {
+			"Illinois Department of Natural Resources, Luna moth (species account), https://dnr.illinois.gov/education/wildaboutpages/wildaboutinvertebrates/wildaboutmoths/family-saturniidae/wamblunamoth.html",
+			"University of Florida IFAS, Luna Moth Actias luna (IN737), https://ask.ifas.ufl.edu/publication/IN737",
+			"Barber et al. 2015, Moth tails divert bat attack (abstract, PNAS), https://pubmed.ncbi.nlm.nih.gov/25730869/",
+		},
+	},
 } :: { Page }
 
 return NotebookPages
@@ -3275,6 +3288,24 @@ return Peacock
         </Item>
         <Item class="ModuleScript" referent="21">
           <Properties>
+            <string name="Name">RareSightings</string>
+            <string name="Source"><![CDATA[--!strict
+-- Only finished encounters are registered. The thirteen-creature roadmap is
+-- documentation, never a locked checklist or an exposed list of future pages.
+local Rare = {}
+Rare.luna = {
+ id="luna_moth",page="rare_luna_moth",chance=.35,days=4,
+ -- Authoring bounds for a Midwest spring/summer flight window, not a claim
+ -- that all Illinois populations fly on every date in it. See source audit.
+ firstDay=121,lastDay=243,minTemperature=16,maxRain=.08,
+ at=Vector3.new(18,.45,-20),span=10,
+}
+return Rare
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="22">
+          <Properties>
             <string name="Name">RivalRules</string>
             <string name="Source"><![CDATA[--!strict
 -- When the brown rival spider arrives (ROBLOX-68). Game tuning, not measurements. Predator/RivalSpider reads these; nothing else decides it.
@@ -3336,7 +3367,7 @@ return RivalRules
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="22">
+        <Item class="ModuleScript" referent="23">
           <Properties>
             <string name="Name">SaveRules</string>
             <string name="Source"><![CDATA[--!strict
@@ -3411,7 +3442,7 @@ return SaveRules
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="23">
+        <Item class="ModuleScript" referent="24">
           <Properties>
             <string name="Name">SettingsSpec</string>
             <string name="Source"><![CDATA[--!strict
@@ -3519,7 +3550,7 @@ return SettingsSpec
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="24">
+        <Item class="ModuleScript" referent="25">
           <Properties>
             <string name="Name">Species</string>
             <string name="Source"><![CDATA[--!strict
@@ -4117,7 +4148,7 @@ return table.freeze(data)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="25">
+        <Item class="ModuleScript" referent="26">
           <Properties>
             <string name="Name">Surfaces</string>
             <string name="Source"><![CDATA[--!strict
@@ -4220,7 +4251,7 @@ return table.freeze(data)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="26">
+        <Item class="ModuleScript" referent="27">
           <Properties>
             <string name="Name">Tarantula</string>
             <string name="Source"><![CDATA[--!strict
@@ -4276,7 +4307,7 @@ return Tarantula
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="27">
+        <Item class="ModuleScript" referent="28">
           <Properties>
             <string name="Name">Wasp</string>
             <string name="Source"><![CDATA[--!strict
@@ -4418,7 +4449,7 @@ return Wasp
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="28">
+        <Item class="ModuleScript" referent="29">
           <Properties>
             <string name="Name">WaspLook</string>
             <string name="Source"><![CDATA[--!strict
@@ -4499,7 +4530,7 @@ return WaspLook
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="29">
+        <Item class="ModuleScript" referent="30">
           <Properties>
             <string name="Name">Wear</string>
             <string name="Source"><![CDATA[--!strict
@@ -4593,11 +4624,11 @@ return Wear
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="30">
+      <Item class="Folder" referent="31">
         <Properties>
           <string name="Name">Habitat</string>
         </Properties>
-        <Item class="ModuleScript" referent="31">
+        <Item class="ModuleScript" referent="32">
           <Properties>
             <string name="Name">Breakaway</string>
             <string name="Source"><![CDATA[--!strict
@@ -4674,7 +4705,7 @@ return Breakaway
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="32">
+        <Item class="ModuleScript" referent="33">
           <Properties>
             <string name="Name">DayLight</string>
             <string name="Source"><![CDATA[--!strict
@@ -4822,7 +4853,7 @@ return DayLight
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="33">
+        <Item class="ModuleScript" referent="34">
           <Properties>
             <string name="Name">Dressing</string>
             <string name="Source"><![CDATA[--!strict
@@ -5049,7 +5080,7 @@ return Dressing
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="34">
+        <Item class="ModuleScript" referent="35">
           <Properties>
             <string name="Name">Lit</string>
             <string name="Source"><![CDATA[--!strict
@@ -5180,7 +5211,7 @@ return Lit
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="35">
+        <Item class="ModuleScript" referent="36">
           <Properties>
             <string name="Name">Materials</string>
             <string name="Source"><![CDATA[--!strict
@@ -5218,7 +5249,7 @@ return Materials
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="36">
+        <Item class="ModuleScript" referent="37">
           <Properties>
             <string name="Name">Patina</string>
             <string name="Source"><![CDATA[--!strict
@@ -5342,7 +5373,7 @@ return Patina
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="37">
+        <Item class="ModuleScript" referent="38">
           <Properties>
             <string name="Name">Plants</string>
             <string name="Source"><![CDATA[--!strict
@@ -5868,7 +5899,7 @@ return Plants
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="38">
+        <Item class="ModuleScript" referent="39">
           <Properties>
             <string name="Name">Scenery</string>
             <string name="Source"><![CDATA[--!strict
@@ -6414,7 +6445,7 @@ return Scenery
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="39">
+        <Item class="ModuleScript" referent="40">
           <Properties>
             <string name="Name">Shapes</string>
             <string name="Source"><![CDATA[--!strict
@@ -6565,7 +6596,7 @@ return Shapes
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="40">
+        <Item class="ModuleScript" referent="41">
           <Properties>
             <string name="Name">SunPick</string>
             <string name="Source"><![CDATA[--!strict
@@ -6639,7 +6670,7 @@ return SunPick
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="41">
+        <Item class="ModuleScript" referent="42">
           <Properties>
             <string name="Name">TestTarget</string>
             <string name="Source"><![CDATA[--!strict
@@ -6677,7 +6708,7 @@ return Target
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="42">
+        <Item class="ModuleScript" referent="43">
           <Properties>
             <string name="Name">WindowsillLayout</string>
             <string name="Source"><![CDATA[--!strict
@@ -6779,11 +6810,11 @@ return table.freeze(Layout)
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="43">
+      <Item class="Folder" referent="44">
         <Properties>
           <string name="Name">Learning</string>
         </Properties>
-        <Item class="ModuleScript" referent="44">
+        <Item class="ModuleScript" referent="45">
           <Properties>
             <string name="Name">FieldNotebook</string>
             <string name="Source"><![CDATA[--!strict
@@ -6982,7 +7013,7 @@ return FieldNotebook
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="45">
+        <Item class="ModuleScript" referent="46">
           <Properties>
             <string name="Name">NotebookWatch</string>
             <string name="Source"><![CDATA[--!strict
@@ -7219,11 +7250,11 @@ return NotebookWatch
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="46">
+      <Item class="Folder" referent="47">
         <Properties>
           <string name="Name">Life</string>
         </Properties>
-        <Item class="ModuleScript" referent="47">
+        <Item class="ModuleScript" referent="48">
           <Properties>
             <string name="Name">Ballooning</string>
             <string name="Source"><![CDATA[--!strict
@@ -7382,7 +7413,7 @@ return table.freeze(Ballooning)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="48">
+        <Item class="ModuleScript" referent="49">
           <Properties>
             <string name="Name">Growth</string>
             <string name="Source"><![CDATA[--!strict
@@ -7505,7 +7536,7 @@ return Growth
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="49">
+        <Item class="ModuleScript" referent="50">
           <Properties>
             <string name="Name">LifeClock</string>
             <string name="Source"><![CDATA[--!strict
@@ -7704,7 +7735,7 @@ return LifeClock
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="50">
+        <Item class="ModuleScript" referent="51">
           <Properties>
             <string name="Name">LifeLoop</string>
             <string name="Source"><![CDATA[--!strict
@@ -7974,7 +8005,7 @@ return LifeLoop
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="51">
+        <Item class="ModuleScript" referent="52">
           <Properties>
             <string name="Name">LifeSession</string>
             <string name="Source"><![CDATA[--!strict
@@ -8023,7 +8054,7 @@ return Session
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="52">
+        <Item class="ModuleScript" referent="53">
           <Properties>
             <string name="Name">Mating</string>
             <string name="Source"><![CDATA[--!strict
@@ -8365,7 +8396,7 @@ return Mating
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="53">
+        <Item class="ModuleScript" referent="54">
           <Properties>
             <string name="Name">MatingScene</string>
             <string name="Source"><![CDATA[--!strict
@@ -8533,7 +8564,7 @@ return MatingScene
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="54">
+        <Item class="ModuleScript" referent="55">
           <Properties>
             <string name="Name">Nature</string>
             <string name="Source"><![CDATA[--!strict
@@ -8704,7 +8735,7 @@ return Nature
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="55">
+        <Item class="ModuleScript" referent="56">
           <Properties>
             <string name="Name">NeedsModel</string>
             <string name="Source"><![CDATA[--!strict
@@ -9080,7 +9111,7 @@ return NeedsModel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="56">
+        <Item class="ModuleScript" referent="57">
           <Properties>
             <string name="Name">Nursery</string>
             <string name="Source"><![CDATA[--!strict
@@ -9128,7 +9159,163 @@ return table.freeze(Nursery)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="57">
+        <Item class="ModuleScript" referent="58">
+          <Properties>
+            <string name="Name">RareDirector</string>
+            <string name="Source"><![CDATA[--!strict
+local Ledger=require(script.Parent.RareLedger)
+local Catalog=require(script.Parent.Parent.Data.RareSightings)
+local Environment=require(script.Parent.Parent.World.Environment)
+local Director={}
+-- Optional life fields are part of the existing checkpoint object graph.
+function Director.beginLife(history: Ledger.Record,life: any)
+ life.rareSerial=Ledger.beginLife(history)
+ life.rareGeneration=life.generation or 0;life.rareBorn=life.clock.day;life.rareVisit=nil
+end
+function Director.ensureLife(history: Ledger.Record,life: any)
+ if life.rareSerial==nil then
+  -- Legacy rests get the current high-water mark, not another roll on reload.
+  if history.serial==0 then Ledger.beginLife(history) end
+  life.rareSerial=history.serial;life.rareGeneration=life.generation or 0;life.rareBorn=life.clock.day
+ elseif life.rareGeneration~=(life.generation or 0) then Director.beginLife(history,life) end
+ history.serial=math.max(history.serial,life.rareSerial)
+end
+function Director.plan(seed: number,serial: number,born: number): any?
+ local spec=Catalog.luna
+ if Environment.hash(seed,serial,701)>=spec.chance then return nil end
+ return {id=spec.id,serial=serial,day=born+1+math.floor(Environment.hash(seed,serial,703)*spec.days),
+  hour=20+Environment.hash(seed,serial,709)*2}
+end
+function Director.step(history: Ledger.Record,life: any,seed: number): any?
+ Director.ensureLife(history,life)
+ if life.lifeOver then return nil end
+ local spec=Catalog.luna;local day,hour=life.clock.day,life.clock.hour
+ local now=(day-1)*24+hour
+ local visit=life.rareVisit
+ if visit==nil and not history.blocked and (history.claimed[spec.id] or 0)<life.rareSerial then
+  local plan=Director.plan(seed,life.rareSerial,life.rareBorn)
+  if plan then
+   local at=(plan.day-1)*24+plan.hour;local dawn=plan.day*24+6
+   local doy=Environment.solar(plan.day,plan.hour).dayOfYear
+   if now>=at and now<dawn and doy>=spec.firstDay and doy<=spec.lastDay then
+    -- Weather is sampled at the scheduled arrival, not at the player's reload.
+    local weather=Environment.sample(plan.day,plan.hour,seed)
+    if weather.temperature>=spec.minTemperature and weather.rain<=spec.maxRain then
+     history.claimed[spec.id]=life.rareSerial
+     visit={id=spec.id,serial=life.rareSerial,day=plan.day,hour=plan.hour}
+     life.rareVisit=visit
+    end
+   end
+  end
+ end
+ if visit==nil or visit.serial~=life.rareSerial then return nil end
+ local start=(visit.day-1)*24+visit.hour;local dawn=visit.day*24+6
+ if now<start or now>=dawn then return nil end
+ -- Current weather never rerolls the arrival. Later rain does not erase it.
+ return {id=spec.id,serial=visit.serial,at=spec.at,ageHours=now-start,day=visit.day}
+end
+function Director.problems(life: any): {string}
+ local problems={}
+ local function whole(n: any,minimum: number): boolean
+  return type(n)=="number" and n==n and n>=minimum and n<=Ledger.MAX_SERIAL and n%1==0
+ end
+ if life.rareSerial==nil then
+  if life.rareBorn~=nil or life.rareGeneration~=nil or life.rareVisit~=nil then table.insert(problems,"rare visit without life identity") end
+  return problems
+ end
+ if not whole(life.rareSerial,1) or not whole(life.rareBorn,1) or not whole(life.rareGeneration,0) then
+  table.insert(problems,"invalid rare life identity")
+ end
+ local v=life.rareVisit
+ if v~=nil then
+  if type(v)~="table" or v.id~=Catalog.luna.id or v.serial~=life.rareSerial or not whole(v.day,1)
+   or type(v.hour)~="number" or v.hour~=v.hour or v.hour<20 or v.hour>=22 then
+   table.insert(problems,"invalid rare visit")
+  end
+ end
+ return problems
+end
+return Director
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="59">
+          <Properties>
+            <string name="Name">RareLedger</string>
+            <string name="Source"><![CDATA[--!strict
+-- Player progress, outside rests. High-water marks prevent a rewound rest
+-- creating a second visit; restoring a rest DURING a visit restores that animal.
+local Ledger = {}
+Ledger.LIMIT = 64
+Ledger.MAX_SERIAL = 1000000000
+export type Record = { serial: number, claimed: { [string]: number }, once: { [string]: boolean }, blocked: boolean? }
+function Ledger.new(): Record return {serial=0,claimed={},once={}} end
+local function whole(x: any): boolean
+ return type(x)=="number" and x==x and x>=0 and x<=Ledger.MAX_SERIAL and x%1==0
+end
+function Ledger.clean(raw: any): Record?
+ if type(raw)~="table" or not whole(raw.serial) or type(raw.claimed)~="table" or type(raw.once)~="table" then return nil end
+ local out=Ledger.new();out.serial=raw.serial
+ if raw.blocked~=nil and type(raw.blocked)~="boolean" then return nil end
+ if raw.blocked==true then out.blocked=true end
+ for _,field in {"claimed","once"} do
+  local count=0
+  for id,value in raw[field] do
+   count+=1
+   if count>Ledger.LIMIT or type(id)~="string" or #id<1 or #id>64 or not string.match(id,"^[%w_]+$") then return nil end
+   if field=="claimed" then
+    if not whole(value) or value>raw.serial then return nil end
+    out.claimed[id]=value
+   else
+    if value~=true then return nil end
+    out.once[id]=true
+   end
+  end
+ end
+ return out
+end
+function Ledger.merge(a: Record?,b: Record?): Record
+ local out=Ledger.new()
+ for _,record in {a or Ledger.new(),b or Ledger.new()} do
+  out.serial=math.max(out.serial,record.serial)
+  if record.blocked then out.blocked=true end
+  for id,n in record.claimed do out.claimed[id]=math.max(out.claimed[id] or 0,n) end
+  for id in record.once do out.once[id]=true end
+ end
+ -- Retain a bounded record even when two individually valid maps overflow on
+ -- merge. Fail closed: a discarded claim must never make an animal repeat.
+ for _,field in {"claimed","once"} do
+  local map=(out :: any)[field];local keys={}
+  for id in map do table.insert(keys,id) end
+  table.sort(keys)
+  for i=Ledger.LIMIT+1,#keys do map[keys[i]]=nil;out.blocked=true end
+ end
+ return out
+end
+function Ledger.signature(record: Record): string
+ local sum,count=0,0
+ for _,n in record.claimed do sum+=n end
+ for _ in record.once do count+=1 end
+ return `{record.serial}:{sum}:{count}:{record.blocked==true}`
+end
+function Ledger.same(a: Record?,b: Record?): boolean
+ local x,y=a or Ledger.new(),b or Ledger.new()
+ if x.serial~=y.serial or (x.blocked==true)~=(y.blocked==true) then return false end
+ for _,field in {"claimed","once"} do
+  for id,value in (x :: any)[field] do if (y :: any)[field][id]~=value then return false end end
+  for id,value in (y :: any)[field] do if (x :: any)[field][id]~=value then return false end end
+ end
+ return true
+end
+function Ledger.beginLife(record: Record): number
+ assert(record.serial<Ledger.MAX_SERIAL,"rare life counter exhausted")
+ record.serial+=1;return record.serial
+end
+return Ledger
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="60">
           <Properties>
             <string name="Name">Water</string>
             <string name="Source"><![CDATA[--!strict
@@ -9286,11 +9473,11 @@ return Water
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="58">
+      <Item class="Folder" referent="61">
         <Properties>
           <string name="Name">Movement</string>
         </Properties>
-        <Item class="ModuleScript" referent="59">
+        <Item class="ModuleScript" referent="62">
           <Properties>
             <string name="Name">CameraMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -9588,7 +9775,7 @@ return CameraMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="60">
+        <Item class="ModuleScript" referent="63">
           <Properties>
             <string name="Name">FocusState</string>
             <string name="Source"><![CDATA[--!strict
@@ -9611,7 +9798,7 @@ return Focus
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="61">
+        <Item class="ModuleScript" referent="64">
           <Properties>
             <string name="Name">InputState</string>
             <string name="Source"><![CDATA[--!strict
@@ -9704,7 +9891,7 @@ return InputState
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="62">
+        <Item class="ModuleScript" referent="65">
           <Properties>
             <string name="Name">InspectView</string>
             <string name="Source"><![CDATA[--!strict
@@ -9857,7 +10044,7 @@ return InspectView
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="63">
+        <Item class="ModuleScript" referent="66">
           <Properties>
             <string name="Name">JumpInput</string>
             <string name="Source"><![CDATA[--!strict
@@ -10028,7 +10215,7 @@ return JumpInput
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="64">
+        <Item class="ModuleScript" referent="67">
           <Properties>
             <string name="Name">JumpMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -10186,7 +10373,7 @@ return JumpMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="65">
+        <Item class="ModuleScript" referent="68">
           <Properties>
             <string name="Name">LineFraming</string>
             <string name="Source"><![CDATA[--!strict
@@ -10287,7 +10474,7 @@ return LineFraming
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="66">
+        <Item class="ModuleScript" referent="69">
           <Properties>
             <string name="Name">LockOn</string>
             <string name="Source"><![CDATA[--!strict
@@ -10475,7 +10662,7 @@ return LockOn
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="67">
+        <Item class="ModuleScript" referent="70">
           <Properties>
             <string name="Name">SilkController</string>
             <string name="Source"><![CDATA[--!strict
@@ -10815,7 +11002,7 @@ return Silk
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="68">
+        <Item class="ModuleScript" referent="71">
           <Properties>
             <string name="Name">SpiderMotor</string>
             <string name="Source"><![CDATA[--!strict
@@ -11632,7 +11819,7 @@ return Motor
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="69">
+        <Item class="ModuleScript" referent="72">
           <Properties>
             <string name="Name">StickCarry</string>
             <string name="Source"><![CDATA[--!strict
@@ -11692,7 +11879,7 @@ return StickCarry
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="70">
+        <Item class="ModuleScript" referent="73">
           <Properties>
             <string name="Name">SupportMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -11774,7 +11961,7 @@ return SupportMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="71">
+        <Item class="ModuleScript" referent="74">
           <Properties>
             <string name="Name">TetherMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -11842,7 +12029,7 @@ return T
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="72">
+        <Item class="ModuleScript" referent="75">
           <Properties>
             <string name="Name">TitleShots</string>
             <string name="Source"><![CDATA[--!strict
@@ -12015,11 +12202,11 @@ return TitleShots
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="73">
+      <Item class="Folder" referent="76">
         <Properties>
           <string name="Name">Perception</string>
         </Properties>
-        <Item class="ModuleScript" referent="74">
+        <Item class="ModuleScript" referent="77">
           <Properties>
             <string name="Name">Observation</string>
             <string name="Source"><![CDATA[--!strict
@@ -12176,7 +12363,7 @@ return Observation
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="75">
+        <Item class="ModuleScript" referent="78">
           <Properties>
             <string name="Name">ObservationMemory</string>
             <string name="Source"><![CDATA[--!strict
@@ -12630,7 +12817,7 @@ return ObservationMemory
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="76">
+        <Item class="ModuleScript" referent="79">
           <Properties>
             <string name="Name">PerceptionMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -12807,7 +12994,7 @@ return PerceptionMath
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="77">
+        <Item class="ModuleScript" referent="80">
           <Properties>
             <string name="Name">Sensor</string>
             <string name="Source"><![CDATA[--!strict
@@ -13227,7 +13414,7 @@ return Sensor
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="78">
+        <Item class="ModuleScript" referent="81">
           <Properties>
             <string name="Name">SensorCore</string>
             <string name="Source"><![CDATA[--!strict
@@ -13670,7 +13857,7 @@ return SensorCore
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="79">
+        <Item class="ModuleScript" referent="82">
           <Properties>
             <string name="Name">Signal</string>
             <string name="Source"><![CDATA[--!strict
@@ -13711,11 +13898,11 @@ return Signal
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="80">
+      <Item class="Folder" referent="83">
         <Properties>
           <string name="Name">Persistence</string>
         </Properties>
-        <Item class="ModuleScript" referent="81">
+        <Item class="ModuleScript" referent="84">
           <Properties>
             <string name="Name">Checkpoint</string>
             <string name="Source"><![CDATA[--!strict
@@ -13790,6 +13977,7 @@ local NeedsModel = require(script.Parent.Parent.Life.NeedsModel)
 local LifeLoop = require(script.Parent.Parent.Life.LifeLoop)
 local LifeClock = require(script.Parent.Parent.Life.LifeClock)
 local Growth = require(script.Parent.Parent.Life.Growth)
+local RareDirector = require(script.Parent.Parent.Life.RareDirector)
 local WorldMap = require(script.Parent.Parent.World.WorldMap)
 local WaspDirector = require(script.Parent.Parent.Predator.WaspDirector)
 local Cat = require(script.Parent.Parent.Predator.Cat)
@@ -14053,6 +14241,7 @@ local function checkWorld(roots: { [string]: any }, problems: { string }, legacy
  if life.start_zone ~= nil and (not Ballooning.valid(life.start_zone) or life.start_zone == Ballooning.HUT) then bad("life: invalid start zone") end
  if life.start_region ~= nil and (life.start_zone == nil or not Ballooning.landsIn(life.start_zone, life.start_region)) then bad("life: invalid start region") end
  if life.start_zone ~= nil and life.start_region == nil then bad("life: a start zone with no landing") end
+ for _,text in RareDirector.problems(life) do bad("life: "..text) end
  -- ROBLOX-91: where this generation's grace began (Mating.grace); absent in a record from before (the first generation's: the sill's own day and meals).
  for _, k in { "born", "mealsBase" } do
   local v = life[k]
@@ -14309,7 +14498,7 @@ return Checkpoint
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="82">
+        <Item class="ModuleScript" referent="85">
           <Properties>
             <string name="Name">CheckpointStore</string>
             <string name="Source"><![CDATA[--!strict
@@ -14522,7 +14711,7 @@ return CheckpointStore
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="83">
+        <Item class="ModuleScript" referent="86">
           <Properties>
             <string name="Name">CompactMigration</string>
             <string name="Source"><![CDATA[--!strict
@@ -14636,7 +14825,7 @@ return table.freeze(Migration)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="84">
+        <Item class="ModuleScript" referent="87">
           <Properties>
             <string name="Name">Json</string>
             <string name="Source"><![CDATA[--!strict
@@ -14789,7 +14978,7 @@ return Json
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="85">
+        <Item class="ModuleScript" referent="88">
           <Properties>
             <string name="Name">MemoryBackend</string>
             <string name="Source"><![CDATA[--!strict
@@ -14896,7 +15085,7 @@ return MemoryBackend
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="86">
+        <Item class="ModuleScript" referent="89">
           <Properties>
             <string name="Name">ObjectRecord</string>
             <string name="Source"><![CDATA[--!strict
@@ -15231,7 +15420,7 @@ return ObjectRecord
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="87">
+        <Item class="ModuleScript" referent="90">
           <Properties>
             <string name="Name">SaveEnvelope</string>
             <string name="Source"><![CDATA[--!strict
@@ -15390,7 +15579,7 @@ return SaveEnvelope
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="88">
+        <Item class="ModuleScript" referent="91">
           <Properties>
             <string name="Name">SaveProgress</string>
             <string name="Source"><![CDATA[--!strict
@@ -15413,10 +15602,11 @@ local SaveRules = require(script.Parent.Parent.Data.SaveRules)
 local SaveEnvelope = require(script.Parent.SaveEnvelope)
 local SettingsModel = require(script.Parent.Parent.UI.SettingsModel)
 
+local RareLedger = require(script.Parent.Parent.Life.RareLedger)
 local SaveProgress = {}
 
 SaveProgress.SCHEMA = 2
-export type Payload = { notebook: { opened: { string }, eye_seconds: number }, finished_main: boolean, appearance: string?, settings: { [string]: SettingsModel.Value }, settings_version: number, intro_seen: boolean?, hut_window: boolean? }
+export type Payload = { notebook: { opened: { string }, eye_seconds: number }, finished_main: boolean, appearance: string?, settings: { [string]: SettingsModel.Value }, settings_version: number, intro_seen: boolean?, hut_window: boolean?, rare: RareLedger.Record? }
 
 local function finite(x: any): boolean
 	return type(x) == "number" and x == x and x ~= math.huge and x ~= -math.huge
@@ -15472,6 +15662,10 @@ function SaveProgress.sanitize(raw: any): ({ string }, Payload?)
 	if raw.hut_window ~= nil then
 		if type(raw.hut_window) ~= "boolean" then bad("hut_window is not true or false") elseif raw.hut_window then out.hut_window = true end
 	end
+	if raw.rare~=nil then
+		out.rare=RareLedger.clean(raw.rare)
+		if out.rare==nil then bad("invalid rare encounter history") end
+	end
 	local version = SettingsModel.VERSION
 	if raw.settings_version ~= nil then
 		local sv = raw.settings_version
@@ -15524,6 +15718,7 @@ function SaveProgress.merge(base: Payload, incoming: Payload, baseTime: number, 
 		end
 	end
 	out.notebook.eye_seconds = math.max(base.notebook.eye_seconds, incoming.notebook.eye_seconds)
+	if base.rare or incoming.rare then out.rare=RareLedger.merge(base.rare,incoming.rare) end
 	out.finished_main = base.finished_main or incoming.finished_main
 	if base.intro_seen == true or incoming.intro_seen == true then out.intro_seen = true end
 	if base.hut_window == true or incoming.hut_window == true then out.hut_window = true end
@@ -15537,6 +15732,7 @@ end
 
 -- Whether two payloads say the same thing (for deciding whether a write would change anything).
 function SaveProgress.same(a: Payload, b: Payload): boolean
+	if not RareLedger.same(a.rare,b.rare) then return false end
 	if a.finished_main ~= b.finished_main or a.appearance ~= b.appearance or a.notebook.eye_seconds ~= b.notebook.eye_seconds then return false end
 	if (a.intro_seen == true) ~= (b.intro_seen == true) then return false end
 	if (a.hut_window == true) ~= (b.hut_window == true) then return false end
@@ -15550,7 +15746,7 @@ end
 -- The payload the client sends, built from what it holds. `settings` maps a setting id to its current value or nil (not set); only values
 -- that are clean (SettingsModel.clean) are sent. `introSeen` (ROBLOX-109): the intro of a new life has been shown (left out, or false: not said). `hutWindow`
 -- (ROBLOX-116): the preserve's hut window is open (left out, or false: not said).
-function SaveProgress.snapshot(notebookRecord: any, finishedMain: boolean, appearance: string?, settings: { [string]: any }, introSeen: boolean?, hutWindow: boolean?): Payload
+function SaveProgress.snapshot(notebookRecord: any, finishedMain: boolean, appearance: string?, settings: { [string]: any }, introSeen: boolean?, hutWindow: boolean?, rare: RareLedger.Record?): Payload
 	local out = SaveProgress.default()
 	if type(notebookRecord) == "table" then
 		if type(notebookRecord.opened) == "table" then
@@ -15560,6 +15756,7 @@ function SaveProgress.snapshot(notebookRecord: any, finishedMain: boolean, appea
 		end
 		if finite(notebookRecord.eye_seconds) and notebookRecord.eye_seconds >= 0 then out.notebook.eye_seconds = math.min(notebookRecord.eye_seconds, SaveRules.MAX_EYE_SECONDS) end
 	end
+	if rare and rare.serial>0 then out.rare=RareLedger.clean(rare) end
 	out.finished_main = finishedMain
 	if introSeen == true then out.intro_seen = true end
 	if hutWindow == true then out.hut_window = true end
@@ -15575,7 +15772,7 @@ return SaveProgress
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="89">
+        <Item class="ModuleScript" referent="92">
           <Properties>
             <string name="Name">SaveRest</string>
             <string name="Source"><![CDATA[--!strict
@@ -15680,7 +15877,7 @@ return SaveRest
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="90">
+        <Item class="ModuleScript" referent="93">
           <Properties>
             <string name="Name">SaveScheduler</string>
             <string name="Source"><![CDATA[--!strict
@@ -15806,7 +16003,7 @@ return SaveScheduler
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="91">
+        <Item class="ModuleScript" referent="94">
           <Properties>
             <string name="Name">SaveSession</string>
             <string name="Source"><![CDATA[--!strict
@@ -16354,7 +16551,7 @@ return SaveSession
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="92">
+        <Item class="ModuleScript" referent="95">
           <Properties>
             <string name="Name">SaveStores</string>
             <string name="Source"><![CDATA[--!strict
@@ -16408,11 +16605,11 @@ return SaveStores
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="93">
+      <Item class="Folder" referent="96">
         <Properties>
           <string name="Name">Predator</string>
         </Properties>
-        <Item class="ModuleScript" referent="94">
+        <Item class="ModuleScript" referent="97">
           <Properties>
             <string name="Name">Bird</string>
             <string name="Source"><![CDATA[--!strict
@@ -16796,7 +16993,7 @@ return Bird
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="95">
+        <Item class="ModuleScript" referent="98">
           <Properties>
             <string name="Name">Cat</string>
             <string name="Source"><![CDATA[--!strict
@@ -17348,7 +17545,7 @@ return Cat
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="96">
+        <Item class="ModuleScript" referent="99">
           <Properties>
             <string name="Name">CrabSpider</string>
             <string name="Source"><![CDATA[--!strict
@@ -17499,7 +17696,7 @@ return CrabSpider
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="97">
+        <Item class="ModuleScript" referent="100">
           <Properties>
             <string name="Name">Frog</string>
             <string name="Source"><![CDATA[--!strict
@@ -17673,7 +17870,7 @@ return Frog
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="98">
+        <Item class="ModuleScript" referent="101">
           <Properties>
             <string name="Name">Mate</string>
             <string name="Source"><![CDATA[--!strict
@@ -18049,7 +18246,7 @@ return Mate
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="99">
+        <Item class="ModuleScript" referent="102">
           <Properties>
             <string name="Name">MateDrive</string>
             <string name="Source"><![CDATA[--!strict
@@ -18141,7 +18338,7 @@ return MateDrive
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="100">
+        <Item class="ModuleScript" referent="103">
           <Properties>
             <string name="Name">RivalDisplay</string>
             <string name="Source"><![CDATA[--!strict
@@ -18318,7 +18515,7 @@ return RivalDisplay
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="101">
+        <Item class="ModuleScript" referent="104">
           <Properties>
             <string name="Name">RivalDrive</string>
             <string name="Source"><![CDATA[--!strict
@@ -18822,7 +19019,7 @@ return Drive
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="102">
+        <Item class="ModuleScript" referent="105">
           <Properties>
             <string name="Name">RivalGrip</string>
             <string name="Source"><![CDATA[--!strict
@@ -18905,7 +19102,7 @@ return Grip
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="103">
+        <Item class="ModuleScript" referent="106">
           <Properties>
             <string name="Name">RivalRoute</string>
             <string name="Source"><![CDATA[--!strict
@@ -19740,7 +19937,7 @@ return Route
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="104">
+        <Item class="ModuleScript" referent="107">
           <Properties>
             <string name="Name">RivalSpider</string>
             <string name="Source"><![CDATA[--!strict
@@ -20027,7 +20224,7 @@ return Rival
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="105">
+        <Item class="ModuleScript" referent="108">
           <Properties>
             <string name="Name">WaspDirector</string>
             <string name="Source"><![CDATA[--!strict
@@ -20977,11 +21174,11 @@ return WaspDirector
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="106">
+      <Item class="Folder" referent="109">
         <Properties>
           <string name="Name">Prey</string>
         </Properties>
-        <Item class="ModuleScript" referent="107">
+        <Item class="ModuleScript" referent="110">
           <Properties>
             <string name="Name">Ant</string>
             <string name="Source"><![CDATA[--!strict
@@ -21121,7 +21318,7 @@ return Ants
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="108">
+        <Item class="ModuleScript" referent="111">
           <Properties>
             <string name="Name">Feeding</string>
             <string name="Source"><![CDATA[--!strict
@@ -21216,7 +21413,7 @@ return F
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="109">
+        <Item class="ModuleScript" referent="112">
           <Properties>
             <string name="Name">Fly</string>
             <string name="Source"><![CDATA[--!strict
@@ -21454,7 +21651,7 @@ return Fly
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="110">
+        <Item class="ModuleScript" referent="113">
           <Properties>
             <string name="Name">FlyFlight</string>
             <string name="Source"><![CDATA[--!strict
@@ -21519,7 +21716,7 @@ return F
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="111">
+        <Item class="ModuleScript" referent="114">
           <Properties>
             <string name="Name">FlySenses</string>
             <string name="Source"><![CDATA[--!strict
@@ -21581,7 +21778,7 @@ return S
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="112">
+        <Item class="ModuleScript" referent="115">
           <Properties>
             <string name="Name">Harvestman</string>
             <string name="Source"><![CDATA[--!strict
@@ -21728,7 +21925,7 @@ return Harvestmen
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="113">
+        <Item class="ModuleScript" referent="116">
           <Properties>
             <string name="Name">Ladybird</string>
             <string name="Source"><![CDATA[--!strict
@@ -21929,7 +22126,7 @@ return Ladybirds
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="114">
+        <Item class="ModuleScript" referent="117">
           <Properties>
             <string name="Name">Millipede</string>
             <string name="Source"><![CDATA[--!strict
@@ -22121,7 +22318,7 @@ return Millipedes
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="115">
+        <Item class="ModuleScript" referent="118">
           <Properties>
             <string name="Name">PerchGraph</string>
             <string name="Source"><![CDATA[--!strict
@@ -22174,7 +22371,7 @@ return G
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="116">
+        <Item class="ModuleScript" referent="119">
           <Properties>
             <string name="Name">PlantWalk</string>
             <string name="Source"><![CDATA[--!strict
@@ -22246,7 +22443,7 @@ return PlantWalk
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="117">
+        <Item class="ModuleScript" referent="120">
           <Properties>
             <string name="Name">PreyDirector</string>
             <string name="Source"><![CDATA[--!strict
@@ -22471,7 +22668,7 @@ return D
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="118">
+        <Item class="ModuleScript" referent="121">
           <Properties>
             <string name="Name">PreyKinds</string>
             <string name="Source"><![CDATA[--!strict
@@ -22849,7 +23046,7 @@ return K
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="119">
+        <Item class="ModuleScript" referent="122">
           <Properties>
             <string name="Name">PreyMath</string>
             <string name="Source"><![CDATA[--!strict
@@ -22939,7 +23136,7 @@ return M
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="120">
+        <Item class="ModuleScript" referent="123">
           <Properties>
             <string name="Name">PreyPopulation</string>
             <string name="Source"><![CDATA[--!strict
@@ -22971,7 +23168,7 @@ return P
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="121">
+        <Item class="ModuleScript" referent="124">
           <Properties>
             <string name="Name">PreyRandom</string>
             <string name="Source"><![CDATA[--!strict
@@ -23001,7 +23198,7 @@ return R
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="122">
+        <Item class="ModuleScript" referent="125">
           <Properties>
             <string name="Name">PreyWorld</string>
             <string name="Source"><![CDATA[--!strict
@@ -23398,7 +23595,7 @@ return PreyWorld
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="123">
+        <Item class="ModuleScript" referent="126">
           <Properties>
             <string name="Name">Skater</string>
             <string name="Source"><![CDATA[--!strict
@@ -23527,7 +23724,7 @@ return Skaters
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="124">
+        <Item class="ModuleScript" referent="127">
           <Properties>
             <string name="Name">Snail</string>
             <string name="Source"><![CDATA[--!strict
@@ -23727,7 +23924,7 @@ return Snails
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="125">
+        <Item class="ModuleScript" referent="128">
           <Properties>
             <string name="Name">StationMouse</string>
             <string name="Source"><![CDATA[--!strict
@@ -23780,7 +23977,7 @@ return Mouse
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="126">
+        <Item class="ModuleScript" referent="129">
           <Properties>
             <string name="Name">Woodlouse</string>
             <string name="Source"><![CDATA[--!strict
@@ -23977,11 +24174,11 @@ return Woodlice
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="127">
+      <Item class="Folder" referent="130">
         <Properties>
           <string name="Name">Rig</string>
         </Properties>
-        <Item class="ModuleScript" referent="128">
+        <Item class="ModuleScript" referent="131">
           <Properties>
             <string name="Name">Anatomy</string>
             <string name="Source"><![CDATA[--!strict
@@ -24171,7 +24368,7 @@ return Anatomy
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="129">
+        <Item class="ModuleScript" referent="132">
           <Properties>
             <string name="Name">AntMimicPose</string>
             <string name="Source"><![CDATA[--!strict
@@ -24291,7 +24488,7 @@ return AntMimicPose
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="130">
+        <Item class="ModuleScript" referent="133">
           <Properties>
             <string name="Name">CatPose</string>
             <string name="Source"><![CDATA[--!strict
@@ -24640,7 +24837,7 @@ return table.freeze(CatPose)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="131">
+        <Item class="ModuleScript" referent="134">
           <Properties>
             <string name="Name">DogGait</string>
             <string name="Source"><![CDATA[--!strict
@@ -24726,7 +24923,7 @@ return DogGait
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="132">
+        <Item class="ModuleScript" referent="135">
           <Properties>
             <string name="Name">Idle</string>
             <string name="Source"><![CDATA[--!strict
@@ -24809,7 +25006,7 @@ return Idle
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="133">
+        <Item class="ModuleScript" referent="136">
           <Properties>
             <string name="Name">Living</string>
             <string name="Source"><![CDATA[--!strict
@@ -25131,7 +25328,7 @@ return Living
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="134">
+        <Item class="ModuleScript" referent="137">
           <Properties>
             <string name="Name">PeacockDance</string>
             <string name="Source"><![CDATA[--!strict
@@ -25303,7 +25500,7 @@ return PeacockDance
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="135">
+        <Item class="ModuleScript" referent="138">
           <Properties>
             <string name="Name">Setae</string>
             <string name="Source"><![CDATA[--!strict
@@ -25729,7 +25926,7 @@ return Setae
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="136">
+        <Item class="ModuleScript" referent="139">
           <Properties>
             <string name="Name">SpiderChoice</string>
             <string name="Source"><![CDATA[--!strict
@@ -25844,7 +26041,7 @@ return SpiderChoice
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="137">
+        <Item class="ModuleScript" referent="140">
           <Properties>
             <string name="Name">SpiderRig</string>
             <string name="Source"><![CDATA[--!strict
@@ -27497,7 +27694,7 @@ return SpiderRig
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="138">
+        <Item class="ModuleScript" referent="141">
           <Properties>
             <string name="Name">TarantulaPose</string>
             <string name="Source"><![CDATA[--!strict
@@ -27672,11 +27869,11 @@ return TarantulaPose
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="139">
+      <Item class="Folder" referent="142">
         <Properties>
           <string name="Name">UI</string>
         </Properties>
-        <Item class="ModuleScript" referent="140">
+        <Item class="ModuleScript" referent="143">
           <Properties>
             <string name="Name">AntMimicText</string>
             <string name="Source"><![CDATA[--!strict
@@ -27717,7 +27914,7 @@ return AntMimicText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="141">
+        <Item class="ModuleScript" referent="144">
           <Properties>
             <string name="Name">BirdText</string>
             <string name="Source"><![CDATA[--!strict
@@ -27746,7 +27943,7 @@ return table.freeze(BirdText)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="142">
+        <Item class="ModuleScript" referent="145">
           <Properties>
             <string name="Name">CatText</string>
             <string name="Source"><![CDATA[--!strict
@@ -27776,7 +27973,7 @@ return table.freeze(CatText)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="143">
+        <Item class="ModuleScript" referent="146">
           <Properties>
             <string name="Name">ContextPrompts</string>
             <string name="Source"><![CDATA[--!strict
@@ -27818,7 +28015,7 @@ return P
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="144">
+        <Item class="ModuleScript" referent="147">
           <Properties>
             <string name="Name">ControlText</string>
             <string name="Source"><![CDATA[--!strict
@@ -28092,7 +28289,7 @@ return ControlText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="145">
+        <Item class="ModuleScript" referent="148">
           <Properties>
             <string name="Name">CrabText</string>
             <string name="Source"><![CDATA[--!strict
@@ -28109,7 +28306,7 @@ return table.freeze(CrabText)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="146">
+        <Item class="ModuleScript" referent="149">
           <Properties>
             <string name="Name">EyeOptics</string>
             <string name="Source"><![CDATA[--!strict
@@ -28443,7 +28640,7 @@ return EyeOptics
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="147">
+        <Item class="ModuleScript" referent="150">
           <Properties>
             <string name="Name">FrogText</string>
             <string name="Source"><![CDATA[--!strict
@@ -28460,7 +28657,7 @@ return table.freeze(FrogText)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="148">
+        <Item class="ModuleScript" referent="151">
           <Properties>
             <string name="Name">Heard</string>
             <string name="Source"><![CDATA[--!strict
@@ -28485,7 +28682,7 @@ return Heard
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="149">
+        <Item class="ModuleScript" referent="152">
           <Properties>
             <string name="Name">HudLayout</string>
             <string name="Source"><![CDATA[--!strict
@@ -28645,7 +28842,7 @@ return HudLayout
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="150">
+        <Item class="ModuleScript" referent="153">
           <Properties>
             <string name="Name">InspectText</string>
             <string name="Source"><![CDATA[--!strict
@@ -28698,7 +28895,7 @@ return InspectText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="151">
+        <Item class="ModuleScript" referent="154">
           <Properties>
             <string name="Name">LifeText</string>
             <string name="Source"><![CDATA[--!strict
@@ -28971,7 +29168,7 @@ return LifeText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="152">
+        <Item class="ModuleScript" referent="155">
           <Properties>
             <string name="Name">MateText</string>
             <string name="Source"><![CDATA[--!strict
@@ -29163,7 +29360,7 @@ return MateText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="153">
+        <Item class="ModuleScript" referent="156">
           <Properties>
             <string name="Name">NotebookText</string>
             <string name="Source"><![CDATA[--!strict
@@ -29314,7 +29511,7 @@ return NotebookText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="154">
+        <Item class="ModuleScript" referent="157">
           <Properties>
             <string name="Name">PeacockText</string>
             <string name="Source"><![CDATA[--!strict
@@ -29417,7 +29614,7 @@ return PeacockText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="155">
+        <Item class="ModuleScript" referent="158">
           <Properties>
             <string name="Name">PerceptionShapes</string>
             <string name="Source"><![CDATA[--!strict
@@ -29524,7 +29721,7 @@ return Shapes
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="156">
+        <Item class="ModuleScript" referent="159">
           <Properties>
             <string name="Name">PerceptionText</string>
             <string name="Source"><![CDATA[--!strict
@@ -29540,7 +29737,7 @@ return table.freeze(Text)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="157">
+        <Item class="ModuleScript" referent="160">
           <Properties>
             <string name="Name">PerceptionView</string>
             <string name="Source"><![CDATA[--!strict
@@ -29589,7 +29786,7 @@ return View
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="158">
+        <Item class="ModuleScript" referent="161">
           <Properties>
             <string name="Name">PreyText</string>
             <string name="Source"><![CDATA[--!strict
@@ -29636,7 +29833,7 @@ return PreyText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="159">
+        <Item class="ModuleScript" referent="162">
           <Properties>
             <string name="Name">QuietHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -29832,7 +30029,7 @@ return QuietHud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="160">
+        <Item class="ModuleScript" referent="163">
           <Properties>
             <string name="Name">RivalText</string>
             <string name="Source"><![CDATA[--!strict
@@ -29883,7 +30080,7 @@ return RivalText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="161">
+        <Item class="ModuleScript" referent="164">
           <Properties>
             <string name="Name">SaveText</string>
             <string name="Source"><![CDATA[--!strict
@@ -29955,7 +30152,7 @@ return SaveText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="162">
+        <Item class="ModuleScript" referent="165">
           <Properties>
             <string name="Name">SettingsModel</string>
             <string name="Source"><![CDATA[--!strict
@@ -30228,7 +30425,7 @@ return SettingsModel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="163">
+        <Item class="ModuleScript" referent="166">
           <Properties>
             <string name="Name">SettingsNav</string>
             <string name="Source"><![CDATA[--!strict
@@ -30339,7 +30536,7 @@ return SettingsNav
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="164">
+        <Item class="ModuleScript" referent="167">
           <Properties>
             <string name="Name">SettingsText</string>
             <string name="Source"><![CDATA[--!strict
@@ -30464,7 +30661,7 @@ return SettingsText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="165">
+        <Item class="ModuleScript" referent="168">
           <Properties>
             <string name="Name">TarantulaText</string>
             <string name="Source"><![CDATA[--!strict
@@ -30506,7 +30703,7 @@ return TarantulaText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="166">
+        <Item class="ModuleScript" referent="169">
           <Properties>
             <string name="Name">TitleText</string>
             <string name="Source"><![CDATA[--!strict
@@ -30584,7 +30781,7 @@ return TitleText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="167">
+        <Item class="ModuleScript" referent="170">
           <Properties>
             <string name="Name">WaspText</string>
             <string name="Source"><![CDATA[--!strict
@@ -30718,7 +30915,7 @@ return WaspText
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="168">
+        <Item class="ModuleScript" referent="171">
           <Properties>
             <string name="Name">WaterText</string>
             <string name="Source"><![CDATA[--!strict
@@ -30738,11 +30935,11 @@ return table.freeze(WaterText)
           </Properties>
         </Item>
       </Item>
-      <Item class="Folder" referent="169">
+      <Item class="Folder" referent="172">
         <Properties>
           <string name="Name">World</string>
         </Properties>
-        <Item class="ModuleScript" referent="170">
+        <Item class="ModuleScript" referent="173">
           <Properties>
             <string name="Name">AntForage</string>
             <string name="Source"><![CDATA[--!strict
@@ -30783,7 +30980,7 @@ return table.freeze(AntForage)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="171">
+        <Item class="ModuleScript" referent="174">
           <Properties>
             <string name="Name">DogGround</string>
             <string name="Source"><![CDATA[--!strict
@@ -30831,7 +31028,7 @@ return Ground
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="172">
+        <Item class="ModuleScript" referent="175">
           <Properties>
             <string name="Name">Environment</string>
             <string name="Source"><![CDATA[--!strict
@@ -30981,7 +31178,7 @@ return table.freeze(Environment)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="173">
+        <Item class="ModuleScript" referent="176">
           <Properties>
             <string name="Name">Garden</string>
             <string name="Source"><![CDATA[--!strict
@@ -33707,7 +33904,7 @@ return table.freeze(Garden)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="174">
+        <Item class="ModuleScript" referent="177">
           <Properties>
             <string name="Name">GardenPocket</string>
             <string name="Source"><![CDATA[--!strict
@@ -33808,7 +34005,7 @@ return table.freeze(Pocket)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="175">
+        <Item class="ModuleScript" referent="178">
           <Properties>
             <string name="Name">Hut</string>
             <string name="Source"><![CDATA[--!strict
@@ -36662,7 +36859,7 @@ return Hut
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="176">
+        <Item class="ModuleScript" referent="179">
           <Properties>
             <string name="Name">LivedInSites</string>
             <string name="Source"><![CDATA[--!strict
@@ -36785,7 +36982,7 @@ return table.freeze(Sites)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="177">
+        <Item class="ModuleScript" referent="180">
           <Properties>
             <string name="Name">LookPlan</string>
             <string name="Source"><![CDATA[--!strict
@@ -37055,7 +37252,7 @@ return table.freeze(LookPlan)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="178">
+        <Item class="ModuleScript" referent="181">
           <Properties>
             <string name="Name">Meadow</string>
             <string name="Source"><![CDATA[--!strict
@@ -38332,7 +38529,7 @@ return Meadow
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="179">
+        <Item class="ModuleScript" referent="182">
           <Properties>
             <string name="Name">Pond</string>
             <string name="Source"><![CDATA[--!strict
@@ -39643,7 +39840,7 @@ return Pond
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="180">
+        <Item class="ModuleScript" referent="183">
           <Properties>
             <string name="Name">Preserve</string>
             <string name="Source"><![CDATA[--!strict
@@ -39799,7 +39996,7 @@ return table.freeze(Preserve)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="181">
+        <Item class="ModuleScript" referent="184">
           <Properties>
             <string name="Name">PreserveLook</string>
             <string name="Source"><![CDATA[--!strict
@@ -40808,7 +41005,7 @@ return table.freeze(PreserveLook)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="182">
+        <Item class="ModuleScript" referent="185">
           <Properties>
             <string name="Name">PreserveTrain</string>
             <string name="Source"><![CDATA[--!strict
@@ -40912,7 +41109,7 @@ return table.freeze(PreserveTrain)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="183">
+        <Item class="ModuleScript" referent="186">
           <Properties>
             <string name="Name">Region</string>
             <string name="Source"><![CDATA[--!strict
@@ -41083,7 +41280,7 @@ return table.freeze(Region)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="184">
+        <Item class="ModuleScript" referent="187">
           <Properties>
             <string name="Name">StationAir</string>
             <string name="Source"><![CDATA[--!strict
@@ -41263,7 +41460,7 @@ return table.freeze(Air)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="185">
+        <Item class="ModuleScript" referent="188">
           <Properties>
             <string name="Name">StationTerritory</string>
             <string name="Source"><![CDATA[--!strict
@@ -41298,7 +41495,7 @@ return table.freeze(Station)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="186">
+        <Item class="ModuleScript" referent="189">
           <Properties>
             <string name="Name">Verge</string>
             <string name="Source"><![CDATA[--!strict
@@ -41536,7 +41733,7 @@ return table.freeze(Verge)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="187">
+        <Item class="ModuleScript" referent="190">
           <Properties>
             <string name="Name">WorldBuild</string>
             <string name="Source"><![CDATA[--!strict
@@ -41628,7 +41825,7 @@ return table.freeze(WorldBuild)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="188">
+        <Item class="ModuleScript" referent="191">
           <Properties>
             <string name="Name">WorldMap</string>
             <string name="Source"><![CDATA[--!strict
@@ -42163,7 +42360,7 @@ return table.freeze(WorldMap)
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="189">
+        <Item class="ModuleScript" referent="192">
           <Properties>
             <string name="Name">Worlds</string>
             <string name="Source"><![CDATA[--!strict
@@ -42223,15 +42420,15 @@ return table.freeze(Worlds)
       </Item>
     </Item>
   </Item>
-  <Item class="ServerScriptService" referent="190">
+  <Item class="ServerScriptService" referent="193">
     <Properties>
       <string name="Name">ServerScriptService</string>
     </Properties>
-    <Item class="Folder" referent="191">
+    <Item class="Folder" referent="194">
       <Properties>
         <string name="Name">Server</string>
       </Properties>
-      <Item class="ModuleScript" referent="192">
+      <Item class="ModuleScript" referent="195">
         <Properties>
           <string name="Name">DataStoreBackend</string>
           <string name="Source"><![CDATA[--!strict
@@ -42266,7 +42463,7 @@ return DataStoreBackend
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Script" referent="193">
+      <Item class="Script" referent="196">
         <Properties>
           <string name="Name">Main</string>
           <token name="RunContext">0</token>
@@ -42345,7 +42542,7 @@ WorldFocus.listen(ReplicatedStorage, foci)
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Script" referent="194">
+      <Item class="Script" referent="197">
         <Properties>
           <string name="Name">Persistence</string>
           <token name="RunContext">0</token>
@@ -42439,7 +42636,7 @@ end)
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="195">
+      <Item class="ModuleScript" referent="198">
         <Properties>
           <string name="Name">SaveService</string>
           <string name="Source"><![CDATA[--!strict
@@ -42646,7 +42843,7 @@ return SaveService
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="196">
+      <Item class="ModuleScript" referent="199">
         <Properties>
           <string name="Name">WorldFocus</string>
           <string name="Source"><![CDATA[--!strict
@@ -42770,19 +42967,19 @@ return table.freeze(WorldFocus)
       </Item>
     </Item>
   </Item>
-  <Item class="StarterPlayer" referent="197">
+  <Item class="StarterPlayer" referent="200">
     <Properties>
       <string name="Name">StarterPlayer</string>
     </Properties>
-    <Item class="StarterPlayerScripts" referent="198">
+    <Item class="StarterPlayerScripts" referent="201">
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="Folder" referent="199">
+      <Item class="Folder" referent="202">
         <Properties>
           <string name="Name">Client</string>
         </Properties>
-        <Item class="ModuleScript" referent="200">
+        <Item class="ModuleScript" referent="203">
           <Properties>
             <string name="Name">BirdBody</string>
             <string name="Source"><![CDATA[--!strict
@@ -42996,7 +43193,7 @@ return BirdBody
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="201">
+        <Item class="ModuleScript" referent="204">
           <Properties>
             <string name="Name">BugBodies</string>
             <string name="Source"><![CDATA[--!strict
@@ -43769,7 +43966,7 @@ return BugBodies
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="202">
+        <Item class="ModuleScript" referent="205">
           <Properties>
             <string name="Name">CatBody</string>
             <string name="Source"><![CDATA[--!strict
@@ -43896,7 +44093,7 @@ return CatBody
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="203">
+        <Item class="ModuleScript" referent="206">
           <Properties>
             <string name="Name">CaughtPanel</string>
             <string name="Source"><![CDATA[--!strict
@@ -44083,7 +44280,7 @@ return CaughtPanel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="204">
+        <Item class="ModuleScript" referent="207">
           <Properties>
             <string name="Name">CrabBody</string>
             <string name="Source"><![CDATA[--!strict
@@ -44206,7 +44403,7 @@ return CrabBody
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="205">
+        <Item class="ModuleScript" referent="208">
           <Properties>
             <string name="Name">FlyBodies</string>
             <string name="Source"><![CDATA[--!strict
@@ -44862,7 +45059,7 @@ return FlyBodies
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="206">
+        <Item class="ModuleScript" referent="209">
           <Properties>
             <string name="Name">FrameProfile</string>
             <string name="Source"><![CDATA[--!strict
@@ -45003,7 +45200,7 @@ return FrameProfile
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="207">
+        <Item class="ModuleScript" referent="210">
           <Properties>
             <string name="Name">HutLife</string>
             <string name="Source"><![CDATA[--!strict
@@ -45258,7 +45455,7 @@ return HutLife
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="208">
+        <Item class="ModuleScript" referent="211">
           <Properties>
             <string name="Name">LivingWorld</string>
             <string name="Source"><![CDATA[--!strict
@@ -45746,7 +45943,7 @@ return LivingWorld
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="209">
+        <Item class="ModuleScript" referent="212">
           <Properties>
             <string name="Name">LookStream</string>
             <string name="Source"><![CDATA[--!strict
@@ -46028,7 +46225,7 @@ return LookStream
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="210">
+        <Item class="ModuleScript" referent="213">
           <Properties>
             <string name="Name">MateStage</string>
             <string name="Source"><![CDATA[--!strict
@@ -46382,7 +46579,7 @@ return MateStage
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="211">
+        <Item class="ModuleScript" referent="214">
           <Properties>
             <string name="Name">MealPresentation</string>
             <string name="Source"><![CDATA[--!strict
@@ -46456,7 +46653,7 @@ return Meal
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="212">
+        <Item class="ModuleScript" referent="215">
           <Properties>
             <string name="Name">NotebookArt</string>
             <string name="Source"><![CDATA[--!strict
@@ -46494,7 +46691,7 @@ return Art
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="213">
+        <Item class="ModuleScript" referent="216">
           <Properties>
             <string name="Name">NotebookPanel</string>
             <string name="Source"><![CDATA[--!strict
@@ -46997,7 +47194,7 @@ return NotebookPanel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="214">
+        <Item class="ModuleScript" referent="217">
           <Properties>
             <string name="Name">OldSkins</string>
             <string name="Source"><![CDATA[--!strict
@@ -47042,7 +47239,7 @@ return OldSkins
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="215">
+        <Item class="ModuleScript" referent="218">
           <Properties>
             <string name="Name">PerceptionHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -47282,7 +47479,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="216">
+        <Item class="ModuleScript" referent="219">
           <Properties>
             <string name="Name">PerceptionStage</string>
             <string name="Source"><![CDATA[--!strict
@@ -47327,7 +47524,7 @@ return Stage
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="217">
+        <Item class="ModuleScript" referent="220">
           <Properties>
             <string name="Name">PondBodies</string>
             <string name="Source"><![CDATA[--!strict
@@ -47495,7 +47692,92 @@ return PondBodies
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="218">
+        <Item class="ModuleScript" referent="221">
+          <Properties>
+            <string name="Name">RareBody</string>
+            <string name="Source"><![CDATA[--!strict
+-- One bounded local animal. Supports join the custom motor's world query root;
+-- drawing does not become prey, a lock target, a hazard or a food credit.
+local Workspace=game:GetService("Workspace")
+local Shared=game:GetService("ReplicatedStorage"):WaitForChild("Shared")
+local Shapes=require(Shared.Habitat.Shapes)
+local Body={};Body.__index=Body
+function Body.new(root: Instance): any
+ return setmetatable({root=root,model=nil,supports=nil,serial=nil,position=nil,age=0,leaving=0,seen=0},Body)
+end
+function Body.clear(self: any)
+ if self.model then self.model:Destroy() end
+ if self.supports then self.supports:Destroy() end
+ self.model=nil;self.supports=nil;self.serial=nil;self.position=nil;self.seen=0;self.leaving=0
+end
+local function build(self: any,visitor: any)
+ local model=Instance.new("Folder");model.Name="RareLuna";model.Parent=Workspace;self.model=model
+ local supports=Instance.new("Folder");supports.Name="RareLunaSupport";supports.Parent=self.root;self.supports=supports
+ self.parts={};self.frames={};self.base=visitor.at;self.serial=visitor.serial;self.age=0;self.leaving=0
+ local function ell(name,size,at,color)
+  local p=Shapes.ellipsoid(model,name,size,CFrame.new(visitor.at+at),Color3.fromHex(color),"SmoothPlastic")
+  p.CastShadow=false;table.insert(self.parts,p);table.insert(self.frames,CFrame.new(at))
+ end
+ for _,sign in {-1,1} do
+  ell("Forewing"..sign,Vector3.new(5,.14,4),Vector3.new(sign*2.35,0,-.9),"adc98c")
+  ell("Hindwing"..sign,Vector3.new(3.8,.12,3.2),Vector3.new(sign*1.9,0,1.7),"b5d496")
+  for _,z in {-.9,1.7} do
+   ell("EyeRing"..sign..z,Vector3.new(.8,.05,.65),Vector3.new(sign*2.1,.1,z),"806b50")
+   ell("EyeWindow"..sign..z,Vector3.new(.45,.06,.4),Vector3.new(sign*2.1,.13,z),"d6dfb2")
+  end
+  for i=1,4 do ell("Tail"..sign..i,Vector3.new(.35,.09,1.2),Vector3.new(sign*(2+.16*i),-.04*i,3+i*.75),"adc98c") end
+  ell("Antenna"..sign,Vector3.new(.45,.12,1.25),Vector3.new(sign*.45,.25,-2),"b9a779")
+  local p=Instance.new("Part");p.Name="LunaWing"..sign;p.Anchored=true
+  p.Size=Vector3.new(4,.12,4);p.CFrame=CFrame.new(visitor.at+Vector3.new(sign*2.05,-.1,.3))
+  p.Transparency=1;p.CanCollide=true;p.CanQuery=true;p.CanTouch=false;p.CastShadow=false
+  p:SetAttribute("ProfileId","leaf_dry_prototype");p.Parent=supports
+ end
+ ell("Body",Vector3.new(.7,.65,3.7),Vector3.new(0,.25,0),"ece9d5")
+ ell("Head",Vector3.new(.65,.6,.6),Vector3.new(0,.28,-1.8),"eee9d2")
+ for _,p in supports:GetChildren() do if p:IsA("BasePart") then p.CanCollide=false;p.CanQuery=false end end
+end
+function Body.update(self: any,visitor: any,dt: number,spider: Vector3,anchored: boolean,reduced: boolean)
+ if visitor and self.serial~=visitor.serial then self:clear();build(self,visitor) end
+ if self.model==nil then return end
+ self.age+=dt
+ local occupied=(spider-self.base).Magnitude<7 or anchored
+ if not visitor and not occupied then self.leaving+=dt end
+ if self.leaving>=3 then self:clear();return end
+ local arrival=if visitor then math.clamp(visitor.ageHours/.015,0,1) else 1
+ local offset=Vector3.new(0,12,-18)*(1-arrival)+Vector3.new(0,8,-14)*(self.leaving/3)
+ self.position=self.base+offset
+ local moving=arrival<1 or self.leaving>0
+ if moving or self.drawnPosition~=self.position then
+ for i,p in self.parts do
+  local frame=self.frames[i]
+  local flutter=if arrival<1 or self.leaving>0 then math.sin(self.age*25)*(if reduced then .05 else .22) else 0
+  p.CFrame=CFrame.new(self.position)*frame*CFrame.Angles(0,0,if string.find(p.Name,"wing") then flutter else 0)
+ end
+ self.drawnPosition=self.position
+ end
+ local solid=arrival>=1 and self.leaving==0
+ for _,p in self.supports:GetChildren() do if p.CanCollide~=solid then p.CanCollide=solid;p.CanQuery=solid end end
+end
+-- A real view, a close range and an unblocked world ray; no notebook discovery
+-- through a wall or simply because a remote event is active.
+function Body.observe(self: any,dt: number,camera: Camera,spider: Vector3,book: any)
+ if self.position==nil or self.leaving>0 then self.seen=0;return end
+ local at=self.position+Vector3.yAxis*.3
+ local point,onScreen=camera:WorldToViewportPoint(at)
+ local visible=onScreen and point.Z>0 and (at-spider).Magnitude<=30
+ if visible then
+  local params=RaycastParams.new();params.FilterType=Enum.RaycastFilterType.Include;params.FilterDescendantsInstances={self.root}
+  local hit=Workspace:Raycast(camera.CFrame.Position,at-camera.CFrame.Position,params)
+  visible=hit==nil or hit.Instance:IsDescendantOf(self.supports)
+ end
+ self.seen=if visible then self.seen+dt else 0
+ if self.seen>=.75 then book:notice("rare_luna") end
+end
+return Body
+]]></string>
+          </Properties>
+        </Item>
+        <Item class="ModuleScript" referent="222">
           <Properties>
             <string name="Name">SaveClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -47620,7 +47902,7 @@ return SaveClient
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="219">
+        <Item class="ModuleScript" referent="223">
           <Properties>
             <string name="Name">SelfTest</string>
             <string name="Source"><![CDATA[--!strict
@@ -49430,7 +49712,7 @@ return SelfTest
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="220">
+        <Item class="ModuleScript" referent="224">
           <Properties>
             <string name="Name">SettingsPanel</string>
             <string name="Source"><![CDATA[--!strict
@@ -50131,7 +50413,7 @@ return SettingsPanel
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="221">
+        <Item class="ModuleScript" referent="225">
           <Properties>
             <string name="Name">Soundscape</string>
             <string name="Source"><![CDATA[--!strict
@@ -50332,7 +50614,7 @@ return Soundscape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="222">
+        <Item class="ModuleScript" referent="226">
           <Properties>
             <string name="Name">SpiderCamera</string>
             <string name="Source"><![CDATA[--!strict
@@ -51062,7 +51344,7 @@ return SpiderCamera
 ]]></string>
           </Properties>
         </Item>
-        <Item class="LocalScript" referent="223">
+        <Item class="LocalScript" referent="227">
           <Properties>
             <string name="Name">SpiderClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -51146,6 +51428,9 @@ local Checkpoint = require(Shared.Persistence.Checkpoint)
 local SaveClient = require(script.Parent.SaveClient)
 -- The modules that are only used inside functions, in one table (the client is at Luau's limit of 200 locals, and a script must also compile unoptimised: ROBLOX-92).
 local M = {
+ RareLedger=require(Shared.Life.RareLedger),
+ RareDirector=require(Shared.Life.RareDirector),
+ RareBody=require(script.Parent.RareBody),
 	SettingsPanel = require(script.Parent.SettingsPanel),
 	SettingsSpec = require(Shared.Data.SettingsSpec),
 	SettingsModel = require(Shared.UI.SettingsModel),
@@ -51354,6 +51639,8 @@ prey.feeding.tapToFeed=true
 M.ContextPrompts=require(Shared.UI.ContextPrompts)
 M.contextPrompts=M.ContextPrompts.new()
 M.meal=require(script.Parent.MealPresentation).new(Workspace,M.World.root)
+M.rareHistory=M.RareLedger.new()
+if M.World.world=="preserve" then M.rareBody=M.RareBody.new(M.World.root) end
 M.World.life = life -- (ROBLOX-116: the preserve's nursery rule reads it, Client/HutLife)
 life.growth:useGameRules(needs.gentle) -- five housefly-equivalents to a moult in the standard rules, not Godot's three; three in the gentle modes (ROBLOX-88/91, Growth.game)
 -- The mud dauber wasp (ROBLOX-26): a port of Godot's wasp director (Shared/Predator/WaspDirector). It visits by day from the second day (twice a day in the
@@ -51842,6 +52129,7 @@ local function returnToCheckpoint()
 		hud:toast("The last rest could not be used: " .. (problems[1] or "unknown"), true)
 		return
 	end
+ if M.rareBody then M.rareBody:clear();M.rareVisitor=nil end
 	session.mode, session.rules, session.ended = life.mode or "main", life.rules or "standard", false
 	session.started = true -- (ROBLOX-109: a life is running from a rest too: the title card is over, and the life menu offers Resume)
 	table.clear(M.nature.night) -- (ROBLOX-106: the night's passes are counted again from the restored hour)
@@ -51887,6 +52175,7 @@ local function fresh(mode: string, easy: boolean, position: Vector3?): boolean
  spiderPick.finish(nil, true)
  local ok=Checkpoint.restore(initialRecord,checkpointWorld)
  if not ok then return false end
+ if M.rareBody then M.rareBody:clear();M.rareVisitor=nil;M.RareDirector.beginLife(M.rareHistory,life) end
  mateLegs.reset()
  session:begin(mode,easy);applyRules();motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor())
  sensor:reset();memory:clear();M.LockOn.release(M.lock,"reset");table.clear(M.nature.night)
@@ -52227,6 +52516,7 @@ end
 book.pageOpened:connect(function(id: string)
  local page=book:view(id)
  if nbPanel:isShowing() then nbPanel:refresh() end
+ if string.sub(id,1,5)=="rare_" then return end -- Discover quietly; no rarity toast.
  if page and setting("NotebookNotes") then
   local note=M.NotebookText.note(page.title,device)
   if not M.QuietHud.shows("notebook_open_hint",M.quiet) then note=string.match(note,"^[^\n]+") or note end -- (ROBLOX-113: Normal after the first day: the page's name, not how to open the book)
@@ -52316,7 +52606,7 @@ end
 local function progressSnapshot(): any
 	local settings: { [string]: any } = {}
 	for key in saveState.touched do settings[key] = player:GetAttribute(key) end -- (the snapshot sends only what is clean)
-	return M.SaveProgress.snapshot(book:toRecord(), session.finishedMain, if spiderPick.touched then appearance else nil, settings, M.title.seen, M.World:hutOpen()) -- (ROBLOX-109: the intro seen; ROBLOX-116: the hut's window)
+	return M.SaveProgress.snapshot(book:toRecord(), session.finishedMain, if spiderPick.touched then appearance else nil, settings, M.title.seen, M.World:hutOpen(), M.rareHistory) -- (ROBLOX-109: the intro seen; ROBLOX-116: the hut's window)
 end
 local function adoptRest(mode: string, record: any)
 	if record == nil or stores[mode] == nil then return end
@@ -52328,6 +52618,7 @@ local function applySaved(msg: any)
 	if type(msg) ~= "table" then return end
 	local _, p = M.SaveProgress.sanitize(msg.progress)
 	if p then
+  M.rareHistory=M.RareLedger.merge(M.rareHistory,p.rare)
 		local mine = book:toRecord()
 		local ids: { string } = {}
 		local seen: { [string]: boolean } = {}
@@ -52354,7 +52645,7 @@ local function applySaved(msg: any)
 		adoptRest("free", msg.rests.free)
 		adoptRest("easy", msg.rests.easy)
 	end
-	saveState.sig = `{#book.opened}:{session.finishedMain}:{M.title.seen}:{M.World:hutOpen()}`
+	saveState.sig = `{#book.opened}:{session.finishedMain}:{M.title.seen}:{M.World:hutOpen()}:{M.RareLedger.signature(M.rareHistory)}`
 	saveState.eye = book.eyeSeconds
 	if nbPanel:isShowing() then nbPanel:refresh() end
 	if settingsPanel:isShowing() then settingsPanel:refresh() end
@@ -52375,7 +52666,7 @@ saveClient = SaveClient.new({
 	onStatus = function(_status: string, _reason: string?) end, -- (the status is read each frame below)
 	build = progressSnapshot,
 })
-saveState.sig = `{#book.opened}:{session.finishedMain}:{M.title.seen}:{M.World:hutOpen()}`
+saveState.sig = `{#book.opened}:{session.finishedMain}:{M.title.seen}:{M.World:hutOpen()}:{M.RareLedger.signature(M.rareHistory)}`
 for _, key in M.SettingsModel.ids() do
 	player:GetAttributeChangedSignal(key):Connect(function()
 		if saveState.applying then return end
@@ -52386,7 +52677,7 @@ end
 -- Each frame: the connection, what changed, and the status (a toast when it changes, a fresh menu line).
 local function updateSaves()
 	saveClient:update()
-	local sig = `{#book.opened}:{session.finishedMain}:{M.title.seen}:{M.World:hutOpen()}`
+	local sig = `{#book.opened}:{session.finishedMain}:{M.title.seen}:{M.World:hutOpen()}:{M.RareLedger.signature(M.rareHistory)}`
 	if sig ~= saveState.sig then
 		saveState.sig = sig
 		saveClient:markDirty()
@@ -53178,6 +53469,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
             if modal() then accumulator=0;break end
 			if motor.mode ~= "attached" then focusState:clear() end
 			if stage then stage.target:step(DT); stage.marker.Position = stage.target.position end
+   if M.rareBody then M.rareVisitor=M.RareDirector.step(M.rareHistory,life,914) end
 			M.Prof.lap("life")
 			cam:tick(DT)
 			M.Prof.lap("camera")
@@ -53193,6 +53485,14 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 		M.DayLight.apply(Lighting, M.DayLight.targets(life.daylight, dc), Workspace:FindFirstChild("Decor"))
 		lastLight = life.daylight
 	end
+ if M.rareBody and session.started then
+  local paused=GuiService.MenuIsOpen or modal() or life.resting or life.lifeOver or M.title:holding()
+  if not paused then
+   local anchor=M.rareBody.base and motor:onLine() and (motor.silk:pivot()-M.rareBody.base).Magnitude<7
+   M.rareBody:update(M.rareVisitor,frameDt*(if slow then SLOW_SPEED else 1),motor.pos,anchor==true,setting("ReducedMotion")==true)
+   M.rareBody:observe(frameDt*(if slow then SLOW_SPEED else 1),cam.camera,motor.pos,book)
+  else M.rareBody.seen=0 end
+ end
 	-- The morning dew follows the hour, not the daylight (ROBLOX-74): it is drawn from the clock and keeps its last level on its own folder.
 	M.DayLight.applyDew(Workspace:FindFirstChild("Decor"), life.clock.hour)
 	M.Prof.lap("light")
@@ -53390,6 +53690,7 @@ M.hooks = function(): any
 			prey = prey, flyBodies = flyBodies, waspBody = waspBody, life = life, wasp = wasp, caughtPanel = panel, needs = needs, checkpoints = checkpoints, returnToCheckpoint = function() returnToCheckpoint() end, lifeSpider = function() return lifeSpider end, sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
 			input = controls, rivalLegs = rivalLegs, mateLegs = mateLegs, spiderPick = spiderPick, saveState = saveState, hud = hud,
 			notebook = book, notebookWatch = watch, notebookPanel = nbPanel, openNotebook = openNotebook, settingsPanel = settingsPanel, openSettings = openSettings, setting = setting, cam = cam, soundscape = soundscape, eyes = eyes,
+   rareBody=M.rareBody,rareHistory=M.rareHistory,rareDirector=M.RareDirector,
 			meal=M.meal,contextPrompts=M.contextPrompts,session=session, menu=menu, openMenu=openMenu, endLife=endLife, fresh=fresh, stores=stores, continueAnother=continueAnother, currentStore=function() return checkpoints end,
 			changeSpider = function() changeSpider() end, dance = function() return dance end, ant = function() return ant.state end, antPose = function() return ant.pose end, threat = function() return ant.threat end, threatPose = function() return ant.threatPose end, appearance = function() return appearance end, rig = function() return rig end,
 			drop = function() motor:requestDrop() end,
@@ -53433,7 +53734,7 @@ if RunService:IsStudio() and Workspace:GetAttribute("SelfTest") == true then req
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="224">
+        <Item class="ModuleScript" referent="228">
           <Properties>
             <string name="Name">SpiderEyes</string>
             <string name="Source"><![CDATA[--!strict
@@ -53899,7 +54200,7 @@ return SpiderEyes
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="225">
+        <Item class="ModuleScript" referent="229">
           <Properties>
             <string name="Name">SpiderHud</string>
             <string name="Source"><![CDATA[--!strict
@@ -54319,7 +54620,7 @@ return Hud
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="226">
+        <Item class="ModuleScript" referent="230">
           <Properties>
             <string name="Name">SpiderInput</string>
             <string name="Source"><![CDATA[--!strict
@@ -54588,7 +54889,7 @@ return SpiderInput
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="227">
+        <Item class="ModuleScript" referent="231">
           <Properties>
             <string name="Name">StationMouseBody</string>
             <string name="Source"><![CDATA[--!strict
@@ -54634,7 +54935,7 @@ return Body
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="228">
+        <Item class="ModuleScript" referent="232">
           <Properties>
             <string name="Name">TitleCard</string>
             <string name="Source"><![CDATA[--!strict
@@ -54901,7 +55202,7 @@ return TitleCard
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="229">
+        <Item class="ModuleScript" referent="233">
           <Properties>
             <string name="Name">TrainPass</string>
             <string name="Source"><![CDATA[--!strict
@@ -55044,7 +55345,7 @@ return TrainPass
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="230">
+        <Item class="ModuleScript" referent="234">
           <Properties>
             <string name="Name">WaspBody</string>
             <string name="Source"><![CDATA[--!strict
@@ -55276,7 +55577,7 @@ return WaspBody
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="231">
+        <Item class="ModuleScript" referent="235">
           <Properties>
             <string name="Name">WorldClient</string>
             <string name="Source"><![CDATA[--!strict
@@ -55600,7 +55901,7 @@ return WorldClient
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="232">
+        <Item class="ModuleScript" referent="236">
           <Properties>
             <string name="Name">WorldDetail</string>
             <string name="Source"><![CDATA[--!strict
@@ -55641,7 +55942,7 @@ return WorldDetail
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="233">
+        <Item class="ModuleScript" referent="237">
           <Properties>
             <string name="Name">WorldShadows</string>
             <string name="Source"><![CDATA[--!strict
@@ -55816,7 +56117,7 @@ return WorldShadows
       </Item>
     </Item>
   </Item>
-  <Item class="Workspace" referent="234">
+  <Item class="Workspace" referent="238">
     <Properties>
       <string name="Name">Workspace</string>
       <float name="Gravity">35</float>

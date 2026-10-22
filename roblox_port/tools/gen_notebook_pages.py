@@ -306,6 +306,17 @@ def lua_str(s):
     return '"' + s.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n") + '"'
 
 
+ROBLOX_PAGES.append({
+    "id": "rare_luna_moth", "trigger": "rare_luna", "title": "Rare sighting: luna moth",
+    "text": "Actias luna is a native Illinois silk moth, with pale green wings, four eyespots and long hindwing tails. Adults do not feed. In experiments with hunting bats, the spinning tails diverted attacks away from the body. Flight seasons vary across its range; some populations have more than one brood.",
+    "game": "A warm, dry night may bring one to the hut's outer windowsill until dawn. It is too large to catch. A wing can bear your spider here: an authored invitation to explore, not a claim about wild moths tolerating a rider.",
+    "sources": [
+        "Illinois Department of Natural Resources, Luna moth (species account), https://dnr.illinois.gov/education/wildaboutpages/wildaboutinvertebrates/wildaboutmoths/family-saturniidae/wamblunamoth.html",
+        "University of Florida IFAS, Luna Moth Actias luna (IN737), https://ask.ifas.ufl.edu/publication/IN737",
+        "Barber et al. 2015, Moth tails divert bat attack (abstract, PNAS), https://pubmed.ncbi.nlm.nih.gov/25730869/",
+    ],
+})
+
 def main():
     doc = json.loads(SOURCE.read_text(encoding="utf-8"))
     shutil.copyfile(SOURCE, REFERENCE)
@@ -333,7 +344,7 @@ def main():
                 "moult_ready", "moulted", "adult", "wasp", "wasp_escaped", "wasp_caught", "starving", "dance", "antennae", "hatched", "tarantula", "garden_bed",
                 "look_springtail", "look_leafhopper", "look_moth", "look_crane_fly",
                 "look_ladybird", "look_millipede", "look_snail", "look_harvestman", "look_hoverfly", "cat", "crab_spider", "robin", "look_cricket",
-                "water", "frog", "look_midge", "look_mosquito", "look_damselfly", "look_skater", "darner"]
+                "water", "frog", "look_midge", "look_mosquito", "look_damselfly", "look_skater", "darner", "rare_luna"]
     out += ["\t" + lua_str(t) + "," for t in triggers]
     out += [
         "}",

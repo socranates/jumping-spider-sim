@@ -64,6 +64,7 @@ NotebookPages.triggers = {
 	"look_damselfly",
 	"look_skater",
 	"darner",
+	"rare_luna",
 }
 
 -- The reserve at or under hungryAt is "hungry"; at or over wellFedAt, "well fed" (LIFE_DESIGN.md round 1).
@@ -645,6 +646,18 @@ NotebookPages.pages = {
 		game = "Here a darner patrols over the pond by day. It hunts what flies, not what clings to a stem: it is no danger to you, and you cannot catch it.",
 		sources = {
 			"Wikipedia (read 2026). Green darner.",
+		},
+	},
+	{
+		id = "rare_luna_moth",
+		trigger = "rare_luna",
+		title = "Rare sighting: luna moth",
+		text = "Actias luna is a native Illinois silk moth, with pale green wings, four eyespots and long hindwing tails. Adults do not feed. In experiments with hunting bats, the spinning tails diverted attacks away from the body. Flight seasons vary across its range; some populations have more than one brood.",
+		game = "A warm, dry night may bring one to the hut's outer windowsill until dawn. It is too large to catch. A wing can bear your spider here: an authored invitation to explore, not a claim about wild moths tolerating a rider.",
+		sources = {
+			"Illinois Department of Natural Resources, Luna moth (species account), https://dnr.illinois.gov/education/wildaboutpages/wildaboutinvertebrates/wildaboutmoths/family-saturniidae/wamblunamoth.html",
+			"University of Florida IFAS, Luna Moth Actias luna (IN737), https://ask.ifas.ufl.edu/publication/IN737",
+			"Barber et al. 2015, Moth tails divert bat attack (abstract, PNAS), https://pubmed.ncbi.nlm.nih.gov/25730869/",
 		},
 	},
 } :: { Page }

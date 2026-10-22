@@ -79,6 +79,9 @@ local Checkpoint = require(Shared.Persistence.Checkpoint)
 local SaveClient = require(script.Parent.SaveClient)
 -- The modules that are only used inside functions, in one table (the client is at Luau's limit of 200 locals, and a script must also compile unoptimised: ROBLOX-92).
 local M = {
+ RareLedger=require(Shared.Life.RareLedger),
+ RareDirector=require(Shared.Life.RareDirector),
+ RareBody=require(script.Parent.RareBody),
 	SettingsPanel = require(script.Parent.SettingsPanel),
 	SettingsSpec = require(Shared.Data.SettingsSpec),
 	SettingsModel = require(Shared.UI.SettingsModel),
@@ -287,6 +290,8 @@ prey.feeding.tapToFeed=true
 M.ContextPrompts=require(Shared.UI.ContextPrompts)
 M.contextPrompts=M.ContextPrompts.new()
 M.meal=require(script.Parent.MealPresentation).new(Workspace,M.World.root)
+M.rareHistory=M.RareLedger.new()
+if M.World.world=="preserve" then M.rareBody=M.RareBody.new(M.World.root) end
 M.World.life = life -- (ROBLOX-116: the preserve's nursery rule reads it, Client/HutLife)
 life.growth:useGameRules(needs.gentle) -- five housefly-equivalents to a moult in the standard rules, not Godot's three; three in the gentle modes (ROBLOX-88/91, Growth.game)
 -- The mud dauber wasp (ROBLOX-26): a port of Godot's wasp director (Shared/Predator/WaspDirector). It visits by day from the second day (twice a day in the
@@ -775,6 +780,7 @@ local function returnToCheckpoint()
 		hud:toast("The last rest could not be used: " .. (problems[1] or "unknown"), true)
 		return
 	end
+ if M.rareBody then M.rareBody:clear();M.rareVisitor=nil end
 	session.mode, session.rules, session.ended = life.mode or "main", life.rules or "standard", false
 	session.started = true -- (ROBLOX-109: a life is running from a rest too: the title card is over, and the life menu offers Resume)
 	table.clear(M.nature.night) -- (ROBLOX-106: the night's passes are counted again from the restored hour)
@@ -820,6 +826,7 @@ local function fresh(mode: string, easy: boolean, position: Vector3?): boolean
  spiderPick.finish(nil, true)
  local ok=Checkpoint.restore(initialRecord,checkpointWorld)
  if not ok then return false end
+ if M.rareBody then M.rareBody:clear();M.rareVisitor=nil;M.RareDirector.beginLife(M.rareHistory,life) end
  mateLegs.reset()
  session:begin(mode,easy);applyRules();motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor())
  sensor:reset();memory:clear();M.LockOn.release(M.lock,"reset");table.clear(M.nature.night)
@@ -1160,6 +1167,7 @@ end
 book.pageOpened:connect(function(id: string)
  local page=book:view(id)
  if nbPanel:isShowing() then nbPanel:refresh() end
+ if string.sub(id,1,5)=="rare_" then return end -- Discover quietly; no rarity toast.
  if page and setting("NotebookNotes") then
   local note=M.NotebookText.note(page.title,device)
   if not M.QuietHud.shows("notebook_open_hint",M.quiet) then note=string.match(note,"^[^\n]+") or note end -- (ROBLOX-113: Normal after the first day: the page's name, not how to open the book)
@@ -1249,7 +1257,7 @@ end
 local function progressSnapshot(): any
 	local settings: { [string]: any } = {}
 	for key in saveState.touched do settings[key] = player:GetAttribute(key) end -- (the snapshot sends only what is clean)
-	return M.SaveProgress.snapshot(book:toRecord(), session.finishedMain, if spiderPick.touched then appearance else nil, settings, M.title.seen, M.World:hutOpen()) -- (ROBLOX-109: the intro seen; ROBLOX-116: the hut's window)
+	return M.SaveProgress.snapshot(book:toRecord(), session.finishedMain, if spiderPick.touched then appearance else nil, settings, M.title.seen, M.World:hutOpen(), M.rareHistory) -- (ROBLOX-109: the intro seen; ROBLOX-116: the hut's window)
 end
 local function adoptRest(mode: string, record: any)
 	if record == nil or stores[mode] == nil then return end
@@ -1261,6 +1269,7 @@ local function applySaved(msg: any)
 	if type(msg) ~= "table" then return end
 	local _, p = M.SaveProgress.sanitize(msg.progress)
 	if p then
+  M.rareHistory=M.RareLedger.merge(M.rareHistory,p.rare)
 		local mine = book:toRecord()
 		local ids: { string } = {}
 		local seen: { [string]: boolean } = {}
@@ -1287,7 +1296,7 @@ local function applySaved(msg: any)
 		adoptRest("free", msg.rests.free)
 		adoptRest("easy", msg.rests.easy)
 	end
-	saveState.sig = `{#book.opened}:{session.finishedMain}:{M.title.seen}:{M.World:hutOpen()}`
+	saveState.sig = `{#book.opened}:{session.finishedMain}:{M.title.seen}:{M.World:hutOpen()}:{M.RareLedger.signature(M.rareHistory)}`
 	saveState.eye = book.eyeSeconds
 	if nbPanel:isShowing() then nbPanel:refresh() end
 	if settingsPanel:isShowing() then settingsPanel:refresh() end
@@ -1308,7 +1317,7 @@ saveClient = SaveClient.new({
 	onStatus = function(_status: string, _reason: string?) end, -- (the status is read each frame below)
 	build = progressSnapshot,
 })
-saveState.sig = `{#book.opened}:{session.finishedMain}:{M.title.seen}:{M.World:hutOpen()}`
+saveState.sig = `{#book.opened}:{session.finishedMain}:{M.title.seen}:{M.World:hutOpen()}:{M.RareLedger.signature(M.rareHistory)}`
 for _, key in M.SettingsModel.ids() do
 	player:GetAttributeChangedSignal(key):Connect(function()
 		if saveState.applying then return end
@@ -1319,7 +1328,7 @@ end
 -- Each frame: the connection, what changed, and the status (a toast when it changes, a fresh menu line).
 local function updateSaves()
 	saveClient:update()
-	local sig = `{#book.opened}:{session.finishedMain}:{M.title.seen}:{M.World:hutOpen()}`
+	local sig = `{#book.opened}:{session.finishedMain}:{M.title.seen}:{M.World:hutOpen()}:{M.RareLedger.signature(M.rareHistory)}`
 	if sig ~= saveState.sig then
 		saveState.sig = sig
 		saveClient:markDirty()
@@ -2111,6 +2120,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
             if modal() then accumulator=0;break end
 			if motor.mode ~= "attached" then focusState:clear() end
 			if stage then stage.target:step(DT); stage.marker.Position = stage.target.position end
+   if M.rareBody then M.rareVisitor=M.RareDirector.step(M.rareHistory,life,914) end
 			M.Prof.lap("life")
 			cam:tick(DT)
 			M.Prof.lap("camera")
@@ -2126,6 +2136,14 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 		M.DayLight.apply(Lighting, M.DayLight.targets(life.daylight, dc), Workspace:FindFirstChild("Decor"))
 		lastLight = life.daylight
 	end
+ if M.rareBody and session.started then
+  local paused=GuiService.MenuIsOpen or modal() or life.resting or life.lifeOver or M.title:holding()
+  if not paused then
+   local anchor=M.rareBody.base and motor:onLine() and (motor.silk:pivot()-M.rareBody.base).Magnitude<7
+   M.rareBody:update(M.rareVisitor,frameDt*(if slow then SLOW_SPEED else 1),motor.pos,anchor==true,setting("ReducedMotion")==true)
+   M.rareBody:observe(frameDt*(if slow then SLOW_SPEED else 1),cam.camera,motor.pos,book)
+  else M.rareBody.seen=0 end
+ end
 	-- The morning dew follows the hour, not the daylight (ROBLOX-74): it is drawn from the clock and keeps its last level on its own folder.
 	M.DayLight.applyDew(Workspace:FindFirstChild("Decor"), life.clock.hour)
 	M.Prof.lap("light")
@@ -2323,6 +2341,7 @@ M.hooks = function(): any
 			prey = prey, flyBodies = flyBodies, waspBody = waspBody, life = life, wasp = wasp, caughtPanel = panel, needs = needs, checkpoints = checkpoints, returnToCheckpoint = function() returnToCheckpoint() end, lifeSpider = function() return lifeSpider end, sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
 			input = controls, rivalLegs = rivalLegs, mateLegs = mateLegs, spiderPick = spiderPick, saveState = saveState, hud = hud,
 			notebook = book, notebookWatch = watch, notebookPanel = nbPanel, openNotebook = openNotebook, settingsPanel = settingsPanel, openSettings = openSettings, setting = setting, cam = cam, soundscape = soundscape, eyes = eyes,
+   rareBody=M.rareBody,rareHistory=M.rareHistory,rareDirector=M.RareDirector,
 			meal=M.meal,contextPrompts=M.contextPrompts,session=session, menu=menu, openMenu=openMenu, endLife=endLife, fresh=fresh, stores=stores, continueAnother=continueAnother, currentStore=function() return checkpoints end,
 			changeSpider = function() changeSpider() end, dance = function() return dance end, ant = function() return ant.state end, antPose = function() return ant.pose end, threat = function() return ant.threat end, threatPose = function() return ant.threatPose end, appearance = function() return appearance end, rig = function() return rig end,
 			drop = function() motor:requestDrop() end,

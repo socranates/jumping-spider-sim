@@ -18,10 +18,11 @@ local SaveRules = require(script.Parent.Parent.Data.SaveRules)
 local SaveEnvelope = require(script.Parent.SaveEnvelope)
 local SettingsModel = require(script.Parent.Parent.UI.SettingsModel)
 
+local RareLedger = require(script.Parent.Parent.Life.RareLedger)
 local SaveProgress = {}
 
 SaveProgress.SCHEMA = 2
-export type Payload = { notebook: { opened: { string }, eye_seconds: number }, finished_main: boolean, appearance: string?, settings: { [string]: SettingsModel.Value }, settings_version: number, intro_seen: boolean?, hut_window: boolean? }
+export type Payload = { notebook: { opened: { string }, eye_seconds: number }, finished_main: boolean, appearance: string?, settings: { [string]: SettingsModel.Value }, settings_version: number, intro_seen: boolean?, hut_window: boolean?, rare: RareLedger.Record? }
 
 local function finite(x: any): boolean
 	return type(x) == "number" and x == x and x ~= math.huge and x ~= -math.huge
@@ -77,6 +78,10 @@ function SaveProgress.sanitize(raw: any): ({ string }, Payload?)
 	if raw.hut_window ~= nil then
 		if type(raw.hut_window) ~= "boolean" then bad("hut_window is not true or false") elseif raw.hut_window then out.hut_window = true end
 	end
+	if raw.rare~=nil then
+		out.rare=RareLedger.clean(raw.rare)
+		if out.rare==nil then bad("invalid rare encounter history") end
+	end
 	local version = SettingsModel.VERSION
 	if raw.settings_version ~= nil then
 		local sv = raw.settings_version
@@ -129,6 +134,7 @@ function SaveProgress.merge(base: Payload, incoming: Payload, baseTime: number, 
 		end
 	end
 	out.notebook.eye_seconds = math.max(base.notebook.eye_seconds, incoming.notebook.eye_seconds)
+	if base.rare or incoming.rare then out.rare=RareLedger.merge(base.rare,incoming.rare) end
 	out.finished_main = base.finished_main or incoming.finished_main
 	if base.intro_seen == true or incoming.intro_seen == true then out.intro_seen = true end
 	if base.hut_window == true or incoming.hut_window == true then out.hut_window = true end
@@ -142,6 +148,7 @@ end
 
 -- Whether two payloads say the same thing (for deciding whether a write would change anything).
 function SaveProgress.same(a: Payload, b: Payload): boolean
+	if not RareLedger.same(a.rare,b.rare) then return false end
 	if a.finished_main ~= b.finished_main or a.appearance ~= b.appearance or a.notebook.eye_seconds ~= b.notebook.eye_seconds then return false end
 	if (a.intro_seen == true) ~= (b.intro_seen == true) then return false end
 	if (a.hut_window == true) ~= (b.hut_window == true) then return false end
@@ -155,7 +162,7 @@ end
 -- The payload the client sends, built from what it holds. `settings` maps a setting id to its current value or nil (not set); only values
 -- that are clean (SettingsModel.clean) are sent. `introSeen` (ROBLOX-109): the intro of a new life has been shown (left out, or false: not said). `hutWindow`
 -- (ROBLOX-116): the preserve's hut window is open (left out, or false: not said).
-function SaveProgress.snapshot(notebookRecord: any, finishedMain: boolean, appearance: string?, settings: { [string]: any }, introSeen: boolean?, hutWindow: boolean?): Payload
+function SaveProgress.snapshot(notebookRecord: any, finishedMain: boolean, appearance: string?, settings: { [string]: any }, introSeen: boolean?, hutWindow: boolean?, rare: RareLedger.Record?): Payload
 	local out = SaveProgress.default()
 	if type(notebookRecord) == "table" then
 		if type(notebookRecord.opened) == "table" then
@@ -165,6 +172,7 @@ function SaveProgress.snapshot(notebookRecord: any, finishedMain: boolean, appea
 		end
 		if finite(notebookRecord.eye_seconds) and notebookRecord.eye_seconds >= 0 then out.notebook.eye_seconds = math.min(notebookRecord.eye_seconds, SaveRules.MAX_EYE_SECONDS) end
 	end
+	if rare and rare.serial>0 then out.rare=RareLedger.clean(rare) end
 	out.finished_main = finishedMain
 	if introSeen == true then out.intro_seen = true end
 	if hutWindow == true then out.hut_window = true end

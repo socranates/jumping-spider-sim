@@ -1,6 +1,6 @@
 """Current full Linux gate, exact live bytes; native/Windows scope stays explicit."""
 from pathlib import Path
-import hashlib,io,json,re,runpy,subprocess,tarfile,importlib.util
+import hashlib,io,json,re,runpy,subprocess,tarfile,importlib.util,zipfile
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[2]
 SOURCE='ab8ca9577129e3d9583a0a8ab6824dae1a8cd014'
 BASE='4ee6aecc06f4753a85e40fc98a1487dc5126d27d'
@@ -48,6 +48,9 @@ process=json.loads((HERE/'follow-up.json').read_text(encoding='utf8'))
 assert follow['source']==SOURCE and follow['exit_code']==process['exit_code']==0
 assert follow['suites']==2 and follow['passed']==12 and follow['failed']==0 and follow['internal_checks']==[41,274]
 assert sha((HERE/'selftest.txt').read_bytes())==follow['log_sha256']
+with zipfile.ZipFile(HERE/'windows-raw-cli-outputs.zip') as raw_archive:
+ raw=raw_archive.read(follow['raw_archive_entry'])
+ assert sha(raw)==follow['original_log_sha256'] and raw.replace(b'\r\n',b'\n')==(HERE/'selftest.txt').read_bytes()
 assert sha((HERE/'follow-up.json').read_bytes())==follow['process_sha256']
 for name,digest in process['inputs'].items():assert sha(current[name])==digest,name
 follow_text=(HERE/'selftest.txt').read_text(encoding='utf8')
@@ -64,6 +67,9 @@ for folder,probe in [(HERE,'profile.luau'),(HERE/'preserve','preserve-profile.lu
  body=body.split(marker)[0]+runner.requires((HERE/probe).read_text(encoding='utf8'))
  assert sha(body.encode())==profile['bundle_sha256']
  output=(folder/'output.txt').read_bytes();assert sha(output)==profile['output_sha256']
+ with zipfile.ZipFile(HERE/'windows-raw-cli-outputs.zip') as raw_archive:
+  raw=raw_archive.read(profile['raw_archive_entry'])
+  assert sha(raw)==profile['original_output_sha256'] and raw.replace(b'\r\n',b'\n')==output
  text=output.decode().replace('\r\n','\n');assert text.endswith('PROFILE_PASS\n')
  records=re.findall(r'^PROFILE_REST\s+(first|replacement)\s+(\d+)\s+(\d+)\s+([\d.]+)\s+([\d.]+)\s+(\d+)',text,re.M)
  assert len(records)==2

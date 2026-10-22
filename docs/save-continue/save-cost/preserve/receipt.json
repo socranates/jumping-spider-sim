@@ -228,6 +228,8 @@
   "probe_sha256": "9b23d63dd9b1b7c858c6a0d31a2dba432dc287c121e923375f26ae484b211611",
   "harness_sha256": "43e4897f9d40532854a6c0a8a7fc8aa916062da2b83f3da4cec04f1b77960b7a",
   "bundle_sha256": "0ba5bd87b31e76d65aa79af110cbd5cacd182789f97b34ede2f90d2951d8d8c6",
-  "output_sha256": "445c82469b26962a80bb59e9f44abea829fbe321da74be9a9832a0902ae98013",
-  "scope": "CLI shim; inclusive rows overlap; no native FPS or hard frame budget proof"
+  "output_sha256": "455a8e9908a89866166b6d90e9f2d50151aceedb9a61fbb193791a2a9ef60884",
+  "scope": "CLI shim; inclusive rows overlap; no native FPS or hard frame budget proof",
+  "original_output_sha256": "445c82469b26962a80bb59e9f44abea829fbe321da74be9a9832a0902ae98013",
+  "raw_archive_entry": "preserve-output.txt"
 }

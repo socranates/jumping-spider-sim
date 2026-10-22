@@ -8,6 +8,8 @@
     41,
     274
   ],
-  "log_sha256": "8db243b81076ebcd2008040602c4db727a497b3d7bb036cd6c68b34fa369c69c",
-  "process_sha256": "60c0aec1cbe2c39ff924e10f01ec911176975d3df23513948512ec95583cb9e1"
+  "log_sha256": "95229248d031cec90865d8d955fecfd177588af33182bb737c4042db56136ce2",
+  "process_sha256": "60c0aec1cbe2c39ff924e10f01ec911176975d3df23513948512ec95583cb9e1",
+  "original_log_sha256": "8db243b81076ebcd2008040602c4db727a497b3d7bb036cd6c68b34fa369c69c",
+  "raw_archive_entry": "selftest.txt"
 }

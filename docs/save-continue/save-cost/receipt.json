@@ -226,6 +226,8 @@
   },
   "source": "4f1efdeb123c51c00d53f59bbaa5a2ec9a5ee74c",
   "bundle_sha256": "c80dda0f4e7b5ee7408cca211c8f035fed271579c58a08c6a98aee7510fb67d8",
-  "output_sha256": "cdc8ca1f419dac633a913e48c43e2af35dd5ce39d812fd13e912816eac44f072",
-  "scope": "CLI shim; inclusive rows overlap; no native FPS or hard frame budget proof"
+  "output_sha256": "2d0ad04386284efe63899f7ef83bcd8074619b03841fa75177ed704d50922a31",
+  "scope": "CLI shim; inclusive rows overlap; no native FPS or hard frame budget proof",
+  "original_output_sha256": "cdc8ca1f419dac633a913e48c43e2af35dd5ce39d812fd13e912816eac44f072",
+  "raw_archive_entry": "small-output.txt"
 }

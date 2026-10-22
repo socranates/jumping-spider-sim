@@ -24,6 +24,7 @@ with tempfile.TemporaryDirectory() as folder:
  path=Path(folder)/'profile.luau';path.write_text(source,encoding='utf8',newline='\n')
  with (HERE/'output.txt').open('w',encoding='utf8',newline='\n') as log:
   result=subprocess.run([str(TOOL),str(path)],stdout=log,stderr=subprocess.STDOUT)
+(HERE/'output.txt').write_bytes((HERE/'output.txt').read_bytes().replace(b'\r\n',b'\n'))
 (HERE/'receipt.json').write_text(json.dumps(dict(exit_code=result.returncode,inputs=inputs,
  source=subprocess.check_output(['git','log','-1','--format=%H','--','roblox_port/src','roblox_port/tests'],cwd=ROOT,text=True).strip(),
  probe_sha256=hashlib.sha256(args.probe.read_bytes()).hexdigest(),harness_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),

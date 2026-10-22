@@ -34,6 +34,8 @@ Six preflight CreatorError lines are retained separately. An older lexical costG
 
 native-output.txt contains only bounded guard/probe rows. native-receipt.json and native-close.json retain source, probe/output/place hashes and exact metrics. collect-native.py is a one-time collector and preserves both XML serializations. Full engine/account logs are not retained.
 
+Raw Windows CLI line endings are preserved in windows-raw-cli-outputs.zip. Tracked text uses LF so its receipt hashes survive Git checkout; the verifier checks the raw hashes and exact CRLF-to-LF transformation too. Future profiler output is normalized before hashing.
+
 ## Duplicate rig candidate deferred
 
 The unused new rig-candidate harness duplicated docs/rig-cost's earlier16-case native experiment and was removed, recoverable from Git. Current SpiderRig is byte-identical to that trial's reference, SHA2565e6ee4dbe6a767e8aee987a3806c5d2e0c25f809ec54b356ec4d6a9640e6ad20. The event hash and raw timing means were rechecked. Full player walk gained only0.097ms/3.7percent in that isolated trial, a male case regressed, and probe timings were mixed. That does not justify adoption. See rig-prior-evidence.json and docs/rig-cost/RESULTS-v1e-trial1.md. No rig, fly, feeding or settings code changed.

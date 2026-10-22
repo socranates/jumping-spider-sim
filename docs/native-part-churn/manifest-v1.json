@@ -1,0 +1,20 @@
+{
+  "probe_sha256": "80625effce0353781ce1f1ff17cc91f12a33fdcb10382da5effa98a0d756ca67",
+  "probe_bytes": 5479,
+  "probe_adler32": 3165484155,
+  "scripts": {
+    "StarterPlayer.StarterPlayerScripts.PartChurn": "80625effce0353781ce1f1ff17cc91f12a33fdcb10382da5effa98a0d756ca67"
+  },
+  "place": "C:\\Users\\natha\\claude-xfer\\Windowsill-part-churn-v1\\Windowsill-part-churn-control.rbxlx",
+  "place_sha256": "e2391f3d640306229068c85093d6310e86bd63ef06681eb3f4e6992c2e3976b4",
+  "guard_sha256": "047dd7b7dd191d3fcc1fd278e4f4f12912e2103b2fe766503aed6a3eb78a4762",
+  "parts": 1000,
+  "cycles": 60,
+  "stationary_seconds": 30,
+  "quiet_seconds": 30,
+  "sample_seconds": 5,
+  "scope": "Isolated desktop Studio Part allocation control, not game walking, standalone-client, phone or FPS evidence",
+  "game_source_included": false,
+  "persistence_included": false,
+  "published": false
+}

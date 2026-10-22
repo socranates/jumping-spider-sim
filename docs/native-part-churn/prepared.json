@@ -1,0 +1,13 @@
+{
+  "probe_sha256": "80625effce0353781ce1f1ff17cc91f12a33fdcb10382da5effa98a0d756ca67",
+  "compile_exit_code": 0,
+  "compile_flags": [
+    "-O0",
+    "--null"
+  ],
+  "collector_tests": 8,
+  "native_started": false,
+  "native_complete": false,
+  "game_source_changed": false,
+  "published": false
+}

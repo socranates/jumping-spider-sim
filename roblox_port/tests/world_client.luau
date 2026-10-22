@@ -880,6 +880,7 @@ check("a return to a rest under the stone puts the bed's prey back where it was"
 	key("Feed", true); frames(2); key("Feed", false); frames(2); settleRest()
 	assert(life.resting, "resting under the stone: " .. tostring(life.notice))
 	local d = garden.bed_a.prey
+	local keptTick = d.tick
 	local kept = {}
 	for i, f in d.flies do kept[i] = { id = f.id, pos = f.position, nutrition = f.nutrition, profile = f.profile } end
 	local lice = {}
@@ -891,9 +892,13 @@ check("a return to a rest under the stone puts the bed's prey back where it was"
 	local moved = false
 	for i, f in d.flies do if kept[i] == nil or kept[i].id ~= f.id or (kept[i].pos - f.position).Magnitude > 0.01 then moved = true end end
 	assert(moved, "the prey moved on meanwhile")
-	key("Reset", true); frames(1); key("Reset", false); awaitReturn(ClientStubs.driver,function() frame(0) end); frames(2)
+	key("Reset", true); frames(1); key("Reset", false); awaitReturn(ClientStubs.driver,function() frame(0) end)
+	-- The original synchronous reset advanced three simulation ticks before this
+	-- comparison. Preparation advances none; retain those exact three ticks.
+	frames(3)
 	assert(life.resting and driver.world:inRetreat(driver.motor.pos) == "bed_a_stone", "back under the stone")
 	local d2 = garden.bed_a.prey
+	assert(d2.tick == keptTick, "restored ecology is compared at the same simulation tick")
 	assert(d2 ~= nil and #d2.flies == #kept, "the bed's prey is back")
 	for i, f in d2.flies do
 		local k = kept[i]

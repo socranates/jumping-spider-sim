@@ -1,0 +1,2 @@
+SAVE_ERROR_PROBE broken=true visible=true text=Saving is off for this visit: your notebook and rests will last only until you leave.
+Something in the saving broke, so this visit will not be saved.

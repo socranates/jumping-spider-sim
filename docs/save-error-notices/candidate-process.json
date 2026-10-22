@@ -1,0 +1,8 @@
+{
+  "source": "fab75695ba918eeebe793e6768a08cabe99a70f3",
+  "exit_code": 0,
+  "source_archive_sha256": "9583e7303a833a0a0216b220bb207054942da44f5eb5872979ba640fb4c492fa",
+  "test_sha256": "1c55318ed7c1d1867f567e5b992d0776729d77e44f9f69b4d1f5e6c7cee886fc",
+  "bundle_sha256": "46e145d88dd36aec09e5e13b2fcff47b82088b80274d8117441300ed4aff54ba",
+  "expected_failure": false
+}

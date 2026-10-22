@@ -1,0 +1,8 @@
+{
+  "source": "3c8de801e5fab68598e1e5323e7f5e1c8151b0e6",
+  "exit_code": 1,
+  "source_archive_sha256": "8ab0b9262276d4ced4a14f03a368abd4b9784119c443c4a5294645b6784fe74a",
+  "test_sha256": "1c55318ed7c1d1867f567e5b992d0776729d77e44f9f69b4d1f5e6c7cee886fc",
+  "bundle_sha256": "92a4928ec6238af49ecb32319643372948ae0c675ac21f5c706e38ad6c8e00fa",
+  "expected_failure": true
+}

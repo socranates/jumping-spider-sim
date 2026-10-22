@@ -1,0 +1,5 @@
+C:/Users/natha/AppData/Local/Temp/windowsill-notice-jnfze5al/probe.luau:57417: save failure is hidden by active preserve HUD
+stacktrace:
+[C] function assert
+C:/Users/natha/AppData/Local/Temp/windowsill-notice-jnfze5al/probe.luau:57417
+SAVE_ERROR_PROBE broken=true visible=false text=Saving is off

@@ -1,0 +1,19 @@
+{
+  "source": "fab75695ba918eeebe793e6768a08cabe99a70f3",
+  "evidence_id": "ed58c07d5b24c8ae",
+  "targeted_exit_code": 0,
+  "targeted_passed": 389,
+  "targeted_suites": 5,
+  "targeted_sha256": "f679a40036ceed33237879a25caeb6e37166b3e24f124843c30216e6ea55e536",
+  "native_run": "1792668342799",
+  "native_assertions": 16,
+  "native_events_sha256": "c1ee930643d1181d3186e6ce72623e2c973f3770a4fcfd3200df457003c03d85",
+  "native_log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261022T112407Z_Studio_2CBAF_last.log",
+  "persistence_disabled": true,
+  "windows_full_complete": false,
+  "linux_ci_run": 39770144327,
+  "linux_ci_complete": false,
+  "published": false,
+  "phone_verified": false,
+  "actual_online_rejoin_verified": false
+}

@@ -28,7 +28,7 @@ New Life / Another use the new boundary. Carry On / Follow continue the existing
 
 ## Remaining release gates
 
-All offline CLI/CI/native gates passed against unchanged source. `verify.py` recomputes the evidence hash and checks the receipts; `receipt.json` keeps publication readiness false. Verify real client/server persistence and larger played saves against an isolated online test namespace. Studio API access is still disabled. An Open Cloud key uses a separate external API and does not enable Studio permission; do not read keys from screenshots or paste them into handoffs.
+All offline CLI/CI/native gates passed against unchanged source. `verify.py` recomputes the evidence hash and checks the receipts; `receipt.json` keeps publication readiness false. Verify real client/server persistence and larger played saves against an isolated online test namespace. Studio API access was enabled at Nathan's explicit direction. The real-store probe did not pass its final refusal-status gate: native `UpdateAsync` logs a thrown transform error while the surrounding `pcall` can return `true, nil`. A separate native probe confirmed that behavior and unchanged stored JSON. Prior save/retirement/backup assertions completed. See `online-store-attempt.json` and `online-native.txt`; do not call this a fully verified online save or a real client rejoin. An Open Cloud key uses a separate external API and does not enable Studio permission; do not read keys from screenshots or paste them into handoffs.
 
 The broader audit remains active: legacy-world transfer, overlapping-session Continue UX, deterministic route activation, caption projection, matched performance scenes and long memory/device traces. Native automated checks do not replace manual play and comfort/audio testing. Keep the rare-sightings expansion paused until the foundation is dependable.
 
@@ -36,8 +36,12 @@ The broader audit remains active: legacy-world transfer, overlapping-session Con
 
 `C:\Users\natha\claude-xfer\Windowsill-life-retirement-b3b1-native-review.rbxlx` contains a synthetic fixture and `ChetRetirementNativeSpec` outside the production source roots, with SelfTest/RetirementProbe enabled. **Never publish this review copy.** Release XML is generated independently by `roblox_port/tools/build.py`. Neither the fixture nor helper is part of the production source/build.
 
-Reference: [Roblox Open Cloud DataStores](https://create.roblox.com/docs/cloud/guides/data-stores). The user mentioned an API key open on their laptop; no key was inspected or used.
+Reference: [Roblox Open Cloud DataStores](https://create.roblox.com/docs/cloud/guides/data-stores). The user mentioned an API key open on their laptop; no key was inspected or used. The candidate modules used for the online probe remained in an unparented tree and never entered the cloud edit model. A final read-only guard matched all 215 cloud production scripts to the v51 source, with the edit copy reporting place version 141.
 
 ## Interrupted and current runs
 
 The initial 814995d Windows run (exec 67801) was intentionally stopped, exit -1, to validate stamped size limits and title-screen confirmation. Its log is `cli-before-boundary-fix.txt`. CI 39727205382 was intentionally cancelled (HTTP 202; subsequent API confirmed cancelled). Neither is final acceptance evidence. Final Windows exec **30676** exited 0 and CI **39728136498** succeeded; each covers runtime source 5cf7b4c and passed 62 suites / 443,213 checks.
+
+## Parked for the drawn-part feasibility study
+
+The broader audit is parked per Nathan's greedy-merge prompt; see `docs/audit/PARKED-FOR-GREEDY-MERGE.md`. The native transform-error reporting difference remains unresolved (A12). The existing portable ZIP records the earlier offline-verified state; consult these newer online receipts before any release decision. No candidate was published.

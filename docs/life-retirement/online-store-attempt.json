@@ -1,0 +1,24 @@
+{
+  "source_commit": "5cf7b4c0f212082342574763aaf5b19e00c4e323",
+  "evidence_id": "b3b1a047e958d966",
+  "studio_api_access_enabled": true,
+  "user_explicitly_requested_setting_change": true,
+  "api_key_read": false,
+  "store": "WindowsillTest_v1",
+  "key": "R_chet_life_1792649349123_main",
+  "production_store_touched": false,
+  "candidate_modules_unparented": true,
+  "source_fingerprints": 175,
+  "full_pass": false,
+  "last_completed_stage": "Independent corruption recovery and exact backup; final backend refusal status assertion failed",
+  "native_transform_error_probe": {
+    "pcall_ok": true,
+    "result": null,
+    "callback_entered": true,
+    "stored_json_unchanged": true
+  },
+  "actual_client_rejoin_verified": false,
+  "cloud_edit_place_version": 141,
+  "published_by_this_run": false,
+  "log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261022T060304Z_Studio_FE406_last.log"
+}

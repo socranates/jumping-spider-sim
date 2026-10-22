@@ -1,0 +1,11 @@
+2026-10-22T06:04:20.775Z,76.775520,7560,6,Info [FLog::CreatorOutput] [CHET_CLOUD_CONTEXT] 10771103250 120119801868085 141 false
+2026-10-22T06:09:06.120Z,362.120239,7a40,6,Info [FLog::CreatorOutput] [CHET_LIFE_ONLINE_SOURCE] 175 5cf7b4c0f212082342574763aaf5b19e00c4e323 b3b1a047e958d966
+2026-10-22T06:09:09.200Z,365.200623,15e4,6,Info [FLog::CreatorOutput] [CHET_LIFE_ONLINE_START] WindowsillTest_v1 R_chet_life_1792649349123_main
+2026-10-22T06:10:10.642Z,426.642639,7560,6,Error [FLog::CreatorError] Error: Base64Decode: input is not a base64 string
+2026-10-22T06:10:10.652Z,426.652802,7560,6,Error [FLog::CreatorError] Error: Transform function error Base64Decode: input is not a base64 string
+2026-10-22T06:10:10.664Z,426.664795,7a40,6,Warning [FLog::CreatorWarning] Warning: [CHET_LIFE_ONLINE_FAIL] CommandBar:79: damaged frame reached write callback
+2026-10-22T06:10:10.664Z,426.664795,7a40,6,Error [FLog::CreatorError] Error: CommandBar:79: damaged frame reached write callback
+2026-10-22T06:12:20.073Z,556.073608,7a40,6,Info [FLog::CreatorOutput] [CHET_ONLINE_PROGRESS] 2 2 2186339 true
+2026-10-22T06:12:45.524Z,581.524475,7560,6,Error [FLog::CreatorError] Error: CHET_EXPECTED_TRANSFORM_REFUSAL
+2026-10-22T06:12:45.525Z,581.525513,7560,6,Error [FLog::CreatorError] Error: Transform function error CHET_EXPECTED_TRANSFORM_REFUSAL
+2026-10-22T06:12:45.608Z,581.608276,7a40,6,Info [FLog::CreatorOutput] [CHET_NATIVE_TRANSFORM_REFUSAL] true nil true true

@@ -1,0 +1,34 @@
+{
+  "candidate_source": "5cf7b4c0f212082342574763aaf5b19e00c4e323",
+  "baseline_source": "14e60991c785c4293c3560e6d8b7ecded7e7ac75",
+  "driver_sha256": "c4dec021e04265d657f23af78df661a672f8bba5f2d46d47b5ce64b0ddf587c4",
+  "manifest": "C:/Users/natha/claude-xfer/Windowsill-perf-5cf7b4c-v5/manifest.json",
+  "native_log": "C:/Users/natha/AppData/Local/Roblox/logs/0.744.0.7441077_20261022T054710Z_Studio_180F3_last.log",
+  "smoke": {
+    "run_id": "1792648664200",
+    "complete": true,
+    "comparative": false
+  },
+  "baseline_full": {
+    "run_id": "1792648788994",
+    "warm_seconds": 15,
+    "sample_seconds": 20,
+    "status": "rejected: window lost focus during meadow sample",
+    "module_fingerprints": "216/216, including diagnostic driver",
+    "wrapper": "v3 isolated baseline wrapper; diagnostic driver replaced with v5 and intervals restored to full; all baseline production sources checked unchanged",
+    "receipt": "baseline-full-focus-rejected.json"
+  },
+  "candidate_full": {
+    "status": "not run"
+  },
+  "baseline_low": {
+    "status": "not run"
+  },
+  "candidate_low": {
+    "status": "not run"
+  },
+  "memory_trace_30min": {
+    "status": "not run"
+  },
+  "published": false
+}

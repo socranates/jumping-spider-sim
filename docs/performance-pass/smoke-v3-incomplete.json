@@ -1,0 +1,47 @@
+{
+  "source_log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261022T054710Z_Studio_180F3_last.log",
+  "manifest": "C:\\Users\\natha\\claude-xfer\\Windowsill-perf-5cf7b4c-v3\\manifest.json",
+  "guards": [
+    {
+      "role": "baseline",
+      "source": "14e60991c785c4293c3560e6d8b7ecded7e7ac75",
+      "tier": "full",
+      "passed": true,
+      "modules": 216
+    }
+  ],
+  "source_guard_verified": true,
+  "complete": false,
+  "comparison_config": false,
+  "incomplete": [],
+  "failures": [
+    "2026-10-22T05:49:03.761Z,113.761017,3798,6,Warning [FLog::CreatorWarning] Warning: [CHET_PERF_FAIL] 1792648144057 Players.socranates.PlayerScripts.Client.SilkPlayback:104: cannot start fixture life"
+  ],
+  "records": [
+    {
+      "run": "1792648144057",
+      "kind": "header",
+      "sha256": "982c0b8d2b726207f376498729f87609a3fab820ac69f8cbe273865f8463fa8c",
+      "value": {
+        "source": "14e60991c785c4293c3560e6d8b7ecded7e7ac75",
+        "scope": "seven static scenes plus three actual region crossings; desktop Studio; not phone evidence",
+        "engine": "0.744.0.7441077",
+        "rain": [
+          1,
+          13
+        ],
+        "clock": "normal active simulation; start/end clocks recorded",
+        "role": "baseline",
+        "trace_seconds": 0,
+        "tier": "full",
+        "warm_seconds": 1,
+        "mode": "Free",
+        "viewport": [
+          1,
+          1
+        ],
+        "sample_seconds": 2
+      }
+    }
+  ]
+}

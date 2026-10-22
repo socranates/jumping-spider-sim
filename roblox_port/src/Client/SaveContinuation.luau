@@ -5,7 +5,7 @@ local Continuation={}
 Continuation.__index=Continuation
 export type Config={rules:any,copy:(any)->any,validate:(string,any,boolean)->boolean,
  onLoaded:((any)->())?,onOffer:((string,any)->())?,onDecision:((any)->())?,
- onRestore:((string,any)->boolean?)?,onStatus:((string,string?)->())?}
+ onRestore:((string,any,number)->boolean?)?,onStatus:((string,string?)->())?}
 local function integer(n:any,max:number):boolean
  return type(n)=="number" and n==n and n>=1 and n<=max and n==math.floor(n)
 end
@@ -167,7 +167,7 @@ function Continuation.choose(self:any,mode:string,kind:string,id:string?):boolea
  -- Commit the complete intent before callbacks; a callback can choose another
  -- life immediately. Restore only here, once per explicit user choice.
  if kind=="continue" and self.cfg.onRestore then
-  local ok,result=pcall(self.cfg.onRestore,mode,self.cfg.copy(r.selected))
+  local ok,result=pcall(self.cfg.onRestore,mode,self.cfg.copy(r.selected),r.serial)
   if not ok or result==false then
    if self.requests[mode]==r then self.requests[mode]=nil end
    return false

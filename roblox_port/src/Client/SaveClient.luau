@@ -137,6 +137,14 @@ function SaveClient.continueLife(self:any,mode:string,id:string):boolean
  if accepted then self.activeSlot=mode;self.temporarySlots[mode]=nil elseif self.bound.requests[mode]==nil then self.temporarySlots[mode]=true end
  return accepted
 end
+-- Cancelling deferred Continue may revoke only that exact local request.
+function SaveClient.abortContinue(self:any,mode:string,serial:number,epoch:string?):boolean
+ if epoch~=nil and (not self.bound or self.bound.epoch~=epoch) then return false end
+ local r=self.bound and self.bound.requests[mode]
+ if not r or r.kind~="continue" or r.serial~=serial then return false end
+ self.bound:abandon(mode);self.temporarySlots[mode]=true
+ return true
+end
 function SaveClient.offerInfo(self:any,mode:string):any
  return if self.bound then self.bound:offerInfo(mode) else nil
 end

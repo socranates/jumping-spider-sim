@@ -86,6 +86,12 @@ end
 
 assert(loadedOk,"real client failed to load")
 local d=assert(ClientStubs.driver);local time=os.clock();d.saveClient.cfg.now=function() return time end
+local workClock=0
+d.saveState.restore.cfg.workOptions={budget=.0001,maxSeconds=1000,now=function() workClock+=.001;return workClock end}
+local function settled()
+ for _=1,10000 do if not d.saveState.restore.job then return end;frames(1) end
+ error("controller preparation did not finish")
+end
 local sequence=0
 local function reply(msg) sequence+=1;msg.sequence=sequence;msg.epoch="menu-session";if msg.kind=="loaded" then msg.v=3 end;R.deliver(msg) end
 local function advance() time+=6;frames(2) end
@@ -110,8 +116,16 @@ local refreshCalls=0;local refresh=d.saveClient.refreshOffer
 d.saveClient.refreshOffer=function(self,mode) refreshCalls+=1;return refresh(self,mode) end
 reply({kind="offer",mode="main",offer=offers.main});frames(2)
 check(refreshCalls==0,"render callback never recursively refreshes")
-d.menu:choose("Continue");local first=intent("main")
+d.menu:choose("Continue")
+check(find("SpiderLifeMenu","CancelRestore") and not d.session.started and not d.stores.main:loadBest().ok,"Continue prepares behind a cancellable menu without replacing the live world")
+d.menu:choose("CancelRestore")
+check(d.saveState.restore.job==nil and d.saveClient:decision("main")==nil and d.saveClient:isTemporary("main"),"cancelled Continue revokes only its new upload request")
+check(not d.session.started and not d.stores.main:loadBest().ok,"cancelled Continue leaves original world and slot intact")
+d.menu:choose("Continue")
+local first=intent("main");settled()
 check(first.offerId=="offer_main" and first.intent=="continue","choice binds displayed id")
+check(not d.saveClient:abortContinue("main",first.serial-1,"menu-session") and d.saveClient:decision("main").serial==first.serial,"stale cancellation cannot revoke the newer selection")
+check(not d.saveClient:abortContinue("main",first.serial,"obsolete-epoch") and d.saveClient:decision("main").serial==first.serial,"old session cancellation cannot revoke current authority")
 check(d.session.started and d.currentStore()==d.stores.main and d.stores.main:loadBest().ok,"actual controller restores explicit snapshot")
 local pos=d.motor.pos;local sig=assert(Json.canonical(d.stores.main:loadBest().record))
 decide(first,1,"readonly",nil,"other_session");frames(2)
@@ -135,12 +149,12 @@ check(d.saveClient:decision("main").state=="changed" and Json.canonical(d.stores
 check((d.motor.pos-active).Magnitude<.01,"stale choice preserves running spider")
 d.menu:choose("RemoteMain");d.menu:choose("CancelLoad")
 check(Json.canonical(d.stores.main:loadBest().record)==current,"cancel preserves local world")
-d.menu:choose("RemoteMain");d.menu:choose("RemoteMain");local second=intent("main",first.serial)
+d.menu:choose("RemoteMain");d.menu:choose("RemoteMain");local second=intent("main",first.serial);settled()
 check(second.offerId=="newest_main","new confirmation binds refreshed explicit id")
 for _,pair in {{"easy","ContinueEasy"},{"free","Free"}} do
  local mode,choice=pair[1],pair[2];d.openMenu();d.menu:choose(choice)
  check(find("SpiderLifeMenu","CancelLoad"),mode..": remote switch asks before discarding visit")
- d.menu:choose(if mode=="free" then "RemoteFree" else "ContinueEasy");local r=intent(mode)
+ d.menu:choose(if mode=="free" then "RemoteFree" else "ContinueEasy");local r=intent(mode);settled()
  check(r.offerId=="offer_"..mode,mode..": separate slot binding")
  check(d.currentStore()==d.stores[mode] and d.life.rules=="gentle",mode..": actual slot/rules restored")
 end
@@ -149,10 +163,10 @@ d.openMenu();local mainRequest=d.saveClient:decision("main")
 if mainRequest then decide({mode="main",intent=mainRequest.kind,serial=mainRequest.serial,offerId=mainRequest.offerId},mainRequest.revision+1,"changed",nil,"changed") end
 reply({kind="offer",mode="main",offer={id="failure-main",record=records.main,protected=false}});d.openMenu()
 local beforeStore=d.currentStore();local beforePosition=d.motor.pos
-local restore=Checkpoint.restore;Checkpoint.restore=function() return false,{"synthetic restore failure"} end
+local prepare=Checkpoint.prepare;Checkpoint.prepare=function() return nil,{"synthetic restore failure"} end
 local previousWarn=warn;getfenv().warn=function() end
 d.menu:choose("RemoteMain");d.menu:choose("RemoteMain")
-Checkpoint.restore=restore;getfenv().warn=previousWarn
+settled();Checkpoint.prepare=prepare;getfenv().warn=previousWarn
 check(d.currentStore()==beforeStore and (d.motor.pos-beforePosition).Magnitude<.01,"failed restoration keeps current world and store")
 check(d.saveClient:decision("main")==nil and d.saveClient:isTemporary("main"),"failed restoration cannot leave a credential request behind")
 d.openMenu();check(find("SpiderLifeMenu","RemoteMain"),"failed restore still allows another explicit saved-world choice")

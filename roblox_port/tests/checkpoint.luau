@@ -1674,5 +1674,20 @@ case("cooperative preparation holds a full checkpoint without changing live stat
  check(w.store:loadBest().ok==false and fingerprint(w)==before,"prepared store remains private until caller swaps it")
 end)
 
+case("prepared restore is private, single-use and commits outside its worker",function()
+ local Work=require("../src/Shared/Persistence/SaveWork")
+ local w=newWorld();for _=1,120 do tick(w) end
+ local record=assert(Checkpoint.capture(w,0));local elapsed=w.life.elapsed;for _=1,120 do tick(w) end
+ local before=fingerprint(w);local prepare,problems=Checkpoint.prepare(record,w)
+ check(prepare~=nil and #problems==0 and fingerprint(w)==before,"prepared decoded graph has no live effect")
+ local job=Work.new(function() return prepare() end)
+ job:step();check(job.state=="done" and job:take()[1]==false and fingerprint(w)==before,"worker cannot perform a live restore commit")
+ check(prepare() and w.life.elapsed==elapsed,"prepared graph commits outside worker")
+ local after=fingerprint(w);check(not prepare() and fingerprint(w)==after,"second commit cannot rewind again")
+ local corrupt=Json.copy(record);corrupt.player.position={1e12,0,0}
+ local refused=Checkpoint.prepare(corrupt,w)
+ check(refused==nil and fingerprint(w)==after,"corrupt prepared restore leaves current world intact")
+end)
+
 print(`CHECKPOINT passed={passed} failed={failed}`)
 if failed > 0 then error("CHECKPOINT failed") end

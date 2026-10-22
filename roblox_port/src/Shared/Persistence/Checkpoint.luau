@@ -534,9 +534,7 @@ end
 -- Puts the world back as the record has it, or changes nothing. Returns true, or false and the problems.
 -- The caller then lets go of anything the motor or the screen held (aims, lines, the camera); SpiderMotor.place already
 -- ends every line, aim and walk.
-function Checkpoint.restore(record: any, world: World): (boolean, { string })
-	local problems, decoded = Checkpoint.check(record, world)
-	if not decoded then return false, problems end
+local function apply(record: any, world: World, decoded: ObjectRecord.Decoded): (boolean, { string })
 	local p = record.player
 	local pos, n, h = vec(p.position) :: Vector3, vec(p.normal) :: Vector3, vec(p.heading) :: Vector3
 	if not ObjectRecord.commit(decoded, liveRoots(world)) then
@@ -587,6 +585,27 @@ function Checkpoint.restore(record: any, world: World): (boolean, { string })
 	life:showNotice(if moved then "Returned to your last rest, but the world has changed since you rested, so you stand where a life begins in it. Everything else is as you left it."
 		else "Returned to your last rest: the sill as it was when you rested in the crack. This is a return to the rest, not an exact resume.")
 	return true, {}
+end
+
+-- Preparation may yield inside SaveWork and never touches the live world. The
+-- caller owns/holds the record stable until this single-use commit is consumed.
+-- Call the commit outside a worker, after checking that the selection is current.
+function Checkpoint.prepare(record: any, world: World): ((() -> (boolean, { string }))?, { string })
+ local problems, decoded = Checkpoint.check(record, world)
+ if not decoded then return nil, problems end
+ local used=false
+ return function(): (boolean, { string })
+  if used then return false, {"this prepared rest was already used"} end
+  if Work.pulse() then return false, {"a prepared rest must be committed outside preparation"} end
+  used=true
+  return apply(record,world,decoded)
+ end, {}
+end
+
+function Checkpoint.restore(record: any, world: World): (boolean, { string })
+ local commit, problems=Checkpoint.prepare(record,world)
+ if not commit then return false,problems end
+ return commit()
 end
 
 return Checkpoint

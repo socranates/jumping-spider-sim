@@ -13,6 +13,7 @@
 -- damaged, or made by a newer version, never pushes out a good backup: it is set aside unchanged. Loading never writes: the
 -- current entry is tried, then the backup, and each refusal says why. A newer schema is reported and left as it is.
 local Json = require(script.Parent.Json)
+local Work = require(script.Parent.SaveWork)
 
 local CheckpointStore = {}
 CheckpointStore.__index = CheckpointStore
@@ -40,12 +41,14 @@ function MemoryDataStore.GetAsync(self: any, key: string): any
 end
 
 -- Whether two storable values are the same, value for value.
-local function same(a: any, b: any): boolean
+local function same(a: any, b: any, pulse: ((number?)->())?): boolean
 	if type(a) ~= "table" or type(b) ~= "table" then return a == b end
 	for k, x in a do
-		if not same(x, b[k]) then return false end
+  if pulse then pulse() end
+		if not same(x, b[k], pulse) then return false end
 	end
 	for k in b do
+  if pulse then pulse() end
 		if a[k] == nil then return false end
 	end
 	return true
@@ -60,7 +63,7 @@ function MemoryDataStore.SetAsync(self: any, key: string, value: any)
 	-- had: it is not encoded a second time. The store's own copy of what was written is never handed out, so it cannot have changed.)
 	local text: string?, why: string? = nil, nil
 	local last = if type(value) == "table" then self.written[value] else nil
-	if last ~= nil and same(value, last.copy) then
+	if last ~= nil and same(value, last.copy, Work.pulse()) then
 		text = last.text
 	else
 		text, why = Json.canonical(value)

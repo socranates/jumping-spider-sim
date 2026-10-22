@@ -771,7 +771,8 @@ function spiderPick.touchFrame()
 end
 
 -- Backspace / View: back to the retreat checkpoint (the whole sill as it was), or to the start when there is none yet.
-local function returnToCheckpoint(offered: any?): boolean
+local function returnToCheckpoint(offered: any?, prepared: (() -> (boolean, {string}))?): boolean
+ if saveState.restore then saveState.restore:cancel() end
 	spiderPick.finish(nil, true) -- (a close look does not survive a return to the last rest)
 	local best = if offered then {ok=true,record=offered} else checkpoints:loadBest()
 	if not best.ok then
@@ -782,7 +783,8 @@ local function returnToCheckpoint(offered: any?): boolean
 	end
 	jump:drop(motor)
 	ant.stopDisplay()
-	local ok, problems = Checkpoint.restore(best.record, checkpointWorld)
+	local ok, problems
+ if prepared then ok,problems=prepared() else ok,problems=Checkpoint.restore(best.record, checkpointWorld) end
 	if not ok then
 		warn("[Windowsill] checkpoint refused: " .. table.concat(problems, "; "))
 		hud:toast("The last rest could not be used: " .. (problems[1] or "unknown"), true)
@@ -833,11 +835,13 @@ local function applyRules()
  life.growth:useGameRules(needs.gentle)
 end
 local function closeScreens()
+ if saveState.restore then saveState.restore:cancel() end
  panel:hide();menu:hide();setHudShown(true);controls:clear();dropAll()
  if M.title then M.title:stop() end -- (ROBLOX-109: a new life, a rest or Resume ends an intro that was playing)
 end
 local function fresh(mode: string, easy: boolean, position: Vector3?, displayedOfferId: string?): boolean
  if not initialRecord or (easy and not session.finishedMain) then return false end
+ if saveState.restore then saveState.restore:cancel() end
  spiderPick.finish(nil, true)
  local ok=Checkpoint.restore(initialRecord,checkpointWorld)
  if not ok then return false end
@@ -1115,6 +1119,7 @@ local openMenu: (boolean?) -> ()
 local openSettings: (string?) -> ()
 local confirming: string?=nil
 menu=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
+ if choice=="CancelRestore" then saveState.restore:cancel();openMenu(true);return end
  if choice=="Notebook" then openNotebook("menu");return end
  if choice=="Settings" then openSettings("menu");return end
  if choice=="Resume" then closeScreens();return end
@@ -1184,6 +1189,10 @@ end
 -- exists, a new life, Free play, Settings, and the Notebook once it has pages, the saving note in small type under them. In a life it is the life menu
 -- (the card look), with Resume (the back button's choice) and Controls first. The discovery notes and the text size are in Settings (ROBLOX-49).
 openMenu=function(renderOnly: boolean?)
+ if saveState.restore and saveState.restore.job then
+  menu:showChoices("Returning to the last rest","Preparing the saved spider. Your current spider stays until this finishes.","",{{id="CancelRestore",text="Cancel"}},true,"CancelRestore")
+  return
+ end
  if panel:isShowing() or not initialRecord then return end
  controls:clear();dropAll();setHudShown(false)
  local started=session.started
@@ -1385,6 +1394,31 @@ local function applySaved(msg: any)
 	if not setting("ControlHints") and helpUntil ~= math.huge then helpVisible = false end
 	refreshMenu()
 end
+saveState.restore=require(script.Parent.SaveRestore).new({
+ workOptions={budget=.002,maxSeconds=120},
+ prepare=function(record: any,stamp: any): any
+  local nextStore=newStore();local saved=nextStore:save(record)
+  if not saved.ok then return nil,saved.message end
+  local commit,problems=Checkpoint.prepare(record,checkpointWorld)
+  if not commit then return nil,table.concat(problems,"; ") end
+  return function(): (boolean, string?)
+   if not returnToCheckpoint(record,commit) then return false,"The rest could not be restored" end
+   stores[stamp.mode]=nextStore;checkpoints=nextStore;saveState.restoreError=nil
+   return true,nil
+  end
+ end,
+ current=function(stamp: any): boolean
+  if saveState.broken or not saveClient or saveClient.legacyTemporary or not saveClient.bound or saveClient.bound.epoch~=stamp.epoch then return false end
+  local r=saveClient:decision(stamp.mode)
+  return r~=nil and r.kind=="continue" and r.serial==stamp.serial and r.offerId==stamp.offerId
+ end,
+ cancelled=function(stamp: any) saveClient:abortContinue(stamp.mode,stamp.serial,stamp.epoch) end,
+ failed=function(stamp: any,_problem: any)
+  saveClient:abortContinue(stamp.mode,stamp.serial,stamp.epoch)
+  saveState.restoreError="That rest could not be loaded. Your current spider is kept.";openMenu(true)
+ end,
+ completed=function(_stamp: any) closeScreens() end,
+})
 saveClient = SaveClient.new({
 	rules = M.SaveRules, now = os.clock,
  continuation={copy=M.SaveJson.copy,
@@ -1396,13 +1430,12 @@ saveClient = SaveClient.new({
    -- Size/type/mode and the complete graph are checked once against this world.
    return #M.SaveRest.check(mode,record,checkpointWorld)==0
   end,
-  onRestore=function(mode: string,record: any): boolean
+  onRestore=function(mode: string,record: any,serial: number): boolean
    if mode=="easy" and not session.finishedMain then return false end
-   local nextStore=newStore();local saved=nextStore:save(record)
-   if not saved.ok then return false end
-   if not returnToCheckpoint(record) then return false end
-   stores[mode]=nextStore;checkpoints=nextStore;saveState.restoreError=nil
-   closeScreens();return true
+   local request=saveClient:decision(mode)
+   if not request or request.serial~=serial then return false end
+   saveState.restore:begin(record,{mode=mode,serial=serial,offerId=request.offerId,epoch=saveClient.bound.epoch})
+   openMenu(true);return true
   end,
   onOffer=function(_mode: string,_offer: any) refreshMenu() end,
   onDecision=function(_decision: any) refreshMenu() end,
@@ -1476,8 +1509,8 @@ end
 function saveState.frame()
 	saveState.settleLook()
 	if saveState.broken then return end
-	local ok, err = pcall(function(): any updateSaves(); return nil end)
-	if not ok then saveState.fail(err) end
+	local ok, err = pcall(function(): any updateSaves();saveState.restore:update(); return nil end)
+	if not ok then saveState.restore:cancel();saveState.fail(err) end
 end
 
 controls = SpiderInput.bind({

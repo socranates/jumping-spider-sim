@@ -20,6 +20,8 @@ This is not a real player disconnect/rejoin test. Keep that gate separate.
 
 ## Running verification
 
-Windows exec 24276 and Linux Actions run 39733574738 cover the frozen runtime. Expected totals are 62 suites / 443,235 checks; wait for actual process exits and totals. The local native preserve review passed its 216/216 source guard before Play at 06:30:14Z and is running its full self-test. The native codec/memory-backend probe and final preserve result must be collected before calling all offline gates green.
+Linux Actions run 39733574738 completed successfully for the frozen source: **62 suites / 443,235 checks passed**, with strict analysis, compilation and runner regressions green. The foreground local native preserve run matched 216/216 source fingerprints before Play and completed **274/0/0** at 2026-10-22T06:40:10Z. Its native codec/session probe passed with the full synthetic checkpoint, and no CreatorError or script timeout was recorded in the guarded run. Windows exec **24276** is still live: wait for its actual exit and 62-suite / 443,235-check total.
 
 `runs.json` stores the handles. `verify.py` recomputes source/build evidence and leaves missing gates false. The local review file listed in `native-review.json` contains a diagnostic helper and synthetic fixture and **must never be published**. Production XML is generated separately. The active optimization goal remains open: legacy-world/per-slot safety, overlapping-session UX, route activation, captions and controlled performance/manual checks still need work.
+
+The release preflight also parses the actual production XML, verifies all 216 script sources against the frozen manifest, and refuses diagnostic payloads/authored review attributes. Negative controls confirm it refuses both the Studio-test place and the local diagnostic review place (`build-preflight.json`). It does not publish or establish a destination.

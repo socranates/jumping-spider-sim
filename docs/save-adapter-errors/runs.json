@@ -6,9 +6,11 @@
   "native_window_id": 7539614,
   "native_log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261022T062833Z_Studio_47B12_last.log",
   "native_source_guard": "216/216",
-  "native_self_test": "running; no final result yet",
+  "native_self_test": "274 passed, 0 failed, 0 skipped at 2026-10-22T06:40:10Z",
   "online_store_gate": "passed; see online-store.json",
   "actual_client_rejoin": false,
   "published": false,
-  "native_codec_memory_probe_pass": true
+  "native_codec_memory_probe_pass": true,
+  "ci_result": "success: 62 suites / 443235 checks",
+  "native_window_closed": true
 }

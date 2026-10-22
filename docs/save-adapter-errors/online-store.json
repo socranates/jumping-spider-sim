@@ -12,5 +12,12 @@
   "candidate_modules_unparented": true,
   "actual_client_rejoin_verified": false,
   "scope": "Real DataStoreService with native codec; retirement/backup, uncached reads, stale refusal, independent recovery and failure status; no real player disconnect/rejoin",
-  "log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261022T060304Z_Studio_FE406_last.log"
+  "log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261022T060304Z_Studio_FE406_last.log",
+  "cloud_source_after_probe": {
+    "matched": 215,
+    "total": 215,
+    "runtime_commit": "14e60991c785c4293c3560e6d8b7ecded7e7ac75",
+    "edit_place_version": 141,
+    "time": "2026-10-22T06:28:01Z"
+  }
 }

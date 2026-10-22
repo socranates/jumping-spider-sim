@@ -1,0 +1,19 @@
+{
+  "production": {
+    "path": "C:\\Users\\natha\\windowsill-publish\\roblox_port\\TheWindowsill.rbxlx",
+    "sha256": "f1c35c0d13a7533212edecc5b216a91441106e1787b69e34285ce50c03fc33de",
+    "source_commit": "dc1c4b8640014a5718b6dc17d31044aca070c6d7",
+    "matched_scripts": 216,
+    "diagnostic_content": false
+  },
+  "negative_controls": [
+    {
+      "path": "roblox_port/TheWindowsillTests.rbxlx",
+      "reason": "diagnostic content: ServerScriptService.PortTests, StarterPlayer.StarterPlayerScripts.Client.SilkPlayback"
+    },
+    {
+      "path": "C:\\Users\\natha\\claude-xfer\\Windowsill-save-adapter-e501-native-review\\Windowsill-adapter-review.rbxlx",
+      "reason": "release file unexpectedly contains authored diagnostic/workspace attributes"
+    }
+  ]
+}

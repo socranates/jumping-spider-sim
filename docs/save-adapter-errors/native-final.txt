@@ -1,0 +1,1483 @@
+2026-10-22T06:30:14.478Z,101.478058,4190,6,Info [FLog::CreatorOutput] [CHET_ADAPTER_SOURCE_FINGERPRINTS] 216 216 dc1c4b8640014a5718b6dc17d31044aca070c6d7
+2026-10-22T06:30:14.479Z,101.479057,4190,6,Info [FLog::CreatorOutput] [CHET_ADAPTER_REVIEW_READY] e50104232f063255
+2026-10-22T06:30:18.721Z,105.721642,8890,6 [DFLog::NamedMutex] NamedMutex(000001E785B0F4A0, name:InstallerInfo.log)
+2026-10-22T06:30:18.722Z,105.722641,8890,6 [DFLog::NamedMutex] ~NamedMutex(000001E785B0F4A0, name:InstallerInfo.log)
+2026-10-22T06:30:19.081Z,106.081001,0b38,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 1 sh_count 5 cur_l2ts 0 elapsed_l2b 0
+2026-10-22T06:30:24.979Z,111.979591,1fc4,6,Info [FLog::PlaySoloManager] initiatePlaySolo: PlaceStateTransitionStatus becomes StartingPlayTest
+2026-10-22T06:30:25.007Z,112.007286,8890,6 [telemetryLog] Sending 'OpenPlaceDataModelTaskTelemetry' to 'Event Ingest,Points'
+2026-10-22T06:30:25.007Z,112.007286,8890,6 [telemetryLog] Intro message: DataModel Task Telemetry Summary
+2026-10-22T06:30:25.007Z,112.007286,8890,6 [telemetryLog] 'OpenPlaceDataModelTaskTelemetry' fields logging starts.
+2026-10-22T06:30:25.007Z,112.007286,8890,6 [telemetryLog] cpuIs64Bit: 1
+2026-10-22T06:30:25.009Z,112.009270,8890,6 [telemetryLog] ParallelDmTaskTotalTimeMs: 16
+2026-10-22T06:30:25.009Z,112.009270,8890,6 [telemetryLog] placeid: 0
+2026-10-22T06:30:25.009Z,112.009270,8890,6 [telemetryLog] placeid_fromcontext: 0
+2026-10-22T06:30:25.009Z,112.009270,8890,6 [telemetryLog] cpuCoreCount: 4
+2026-10-22T06:30:25.009Z,112.009270,8890,6 [telemetryLog] cpuMaxFreq: 2289
+2026-10-22T06:30:25.009Z,112.009270,8890,6 [telemetryLog] cpuMinFreq: 0
+2026-10-22T06:30:25.009Z,112.009270,8890,6 [telemetryLog] ramTotalMb: 7418
+2026-10-22T06:30:25.009Z,112.009270,8890,6 [telemetryLog] ramAvailableMb: 796
+2026-10-22T06:30:25.009Z,112.009270,8890,6 [telemetryLog] ParallelDmTaskCount: 1
+2026-10-22T06:30:25.009Z,112.009270,8890,6 [telemetryLog] osversion: 148.10.0.26200
+2026-10-22T06:30:25.009Z,112.009270,8890,6 [telemetryLog] osname: Win64
+2026-10-22T06:30:25.009Z,112.009270,8890,6 [telemetryLog] universeid: 0
+2026-10-22T06:30:25.009Z,112.009270,8890,6 [telemetryLog] cpuSupportedAdvancedVectorExtensions: SSE,AVX,AVX2,SSE41
+2026-10-22T06:30:25.009Z,112.009270,8890,6 [telemetryLog] studioSid: 3BEF4A67-C178-4F5A-AC03-439952EE1A86
+2026-10-22T06:30:25.009Z,112.009270,8890,6 [telemetryLog] clientId: F61C3661-1AF8-4E3D-B2D3-23EDD7E58605
+2026-10-22T06:30:25.009Z,112.009270,8890,6 [telemetryLog] launchIntent: None
+2026-10-22T06:30:25.009Z,112.009270,8890,6 [telemetryLog] DmId: 5B190BDC-7F66-4BA7-BFBB-D3F199B7624C-C:/Users/natha/claude-xfer/Windowsill-save-adapter-e501-native-review/Windowsill-adapter-review.rbxlx-StudioGameStateType_Edit
+2026-10-22T06:30:25.009Z,112.009270,8890,6 [telemetryLog] DmTaskPhase: PrePlaySolo
+2026-10-22T06:30:25.009Z,112.009270,8890,6 [telemetryLog] ParallelDmTaskNames: PlaySoloManager-PlaySoloInit;
+2026-10-22T06:30:25.009Z,112.009270,8890,6 [telemetryLog] PlaceSessionId: 5B190BDC-7F66-4BA7-BFBB-D3F199B7624C-C:/Users/natha/claude-xfer/Windowsill-save-adapter-e501-native-review/Windowsill-adapter-review.rbxlx
+2026-10-22T06:30:25.009Z,112.009270,8890,6 [telemetryLog] PerStateTraceId: 28CAAE57-3A81-428C-8DAC-84A2CAD20226
+2026-10-22T06:30:25.009Z,112.009270,8890,6 [telemetryLog] AllDmTasksSuccess: true
+2026-10-22T06:30:25.009Z,112.009270,8890,6 [telemetryLog] 'OpenPlaceDataModelTaskTelemetry' fields logging ends.
+2026-10-22T06:30:25.010Z,112.010254,7100,6,Info [FLog::WaypointTelemetry] PSMStartPlaySolo (waypoint #0, session #1): 27.912699999987467 ms since last waypoint, 27.912699999987467 ms since start
+2026-10-22T06:30:25.013Z,112.013222,8890,6 [telemetryLog] Sending 'OpenPlacePerStateTelemetry' to 'Event Ingest,Points'
+2026-10-22T06:30:25.013Z,112.013222,8890,6 [telemetryLog] Intro message: PlaceSession PerState Telemetry Summary
+2026-10-22T06:30:25.014Z,112.014214,8890,6 [telemetryLog] 'OpenPlacePerStateTelemetry' fields logging starts.
+2026-10-22T06:30:25.014Z,112.014214,8890,6 [telemetryLog] cpuIs64Bit: 1
+2026-10-22T06:30:25.014Z,112.014214,8890,6 [telemetryLog] TotalTimeInMs: 29
+2026-10-22T06:30:25.014Z,112.014214,8890,6 [telemetryLog] placeid: 0
+2026-10-22T06:30:25.014Z,112.014214,8890,6 [telemetryLog] placeid_fromcontext: 0
+2026-10-22T06:30:25.014Z,112.014214,8890,6 [telemetryLog] cpuCoreCount: 4
+2026-10-22T06:30:25.014Z,112.014214,8890,6 [telemetryLog] cpuMaxFreq: 2289
+2026-10-22T06:30:25.014Z,112.014214,8890,6 [telemetryLog] cpuMinFreq: 0
+2026-10-22T06:30:25.014Z,112.014214,8890,6 [telemetryLog] ramTotalMb: 7418
+2026-10-22T06:30:25.014Z,112.014214,8890,6 [telemetryLog] ramAvailableMb: 802
+2026-10-22T06:30:25.014Z,112.014214,8890,6 [telemetryLog] TaskCount: 5
+2026-10-22T06:30:25.014Z,112.014214,8890,6 [telemetryLog] osversion: 148.10.0.26200
+2026-10-22T06:30:25.014Z,112.014214,8890,6 [telemetryLog] osname: Win64
+2026-10-22T06:30:25.014Z,112.014214,8890,6 [telemetryLog] universeid: 0
+2026-10-22T06:30:25.014Z,112.014214,8890,6 [telemetryLog] cpuSupportedAdvancedVectorExtensions: SSE,AVX,AVX2,SSE41
+2026-10-22T06:30:25.014Z,112.014214,8890,6 [telemetryLog] studioSid: 3BEF4A67-C178-4F5A-AC03-439952EE1A86
+2026-10-22T06:30:25.014Z,112.014214,8890,6 [telemetryLog] clientId: F61C3661-1AF8-4E3D-B2D3-23EDD7E58605
+2026-10-22T06:30:25.014Z,112.014214,8890,6 [telemetryLog] launchIntent: None
+2026-10-22T06:30:25.014Z,112.014214,8890,6 [telemetryLog] PerStateTraceId: 28CAAE57-3A81-428C-8DAC-84A2CAD20226
+2026-10-22T06:30:25.014Z,112.014214,8890,6 [telemetryLog] State: PlaySoloInit
+2026-10-22T06:30:25.014Z,112.014214,8890,6 [telemetryLog] PlaceSessionId: 5B190BDC-7F66-4BA7-BFBB-D3F199B7624C-C:/Users/natha/claude-xfer/Windowsill-save-adapter-e501-native-review/Windowsill-adapter-review.rbxlx
+2026-10-22T06:30:25.014Z,112.014214,8890,6 [telemetryLog] TaskNames: KeepAllReviewableChangesForPlaySolo;AssetDataModelPluginLoaderWaiting - Play solo starting;PlaySoloInit;PlaySoloUiInit;EmitFalse;
+2026-10-22T06:30:25.014Z,112.014214,8890,6 [telemetryLog] StudioStreamingEnabled: false
+2026-10-22T06:30:25.014Z,112.014214,8890,6 [telemetryLog] AllSuccess: true
+2026-10-22T06:30:25.014Z,112.014214,8890,6 [telemetryLog] 'OpenPlacePerStateTelemetry' fields logging ends.
+2026-10-22T06:30:25.099Z,112.099174,8890,6 [FLog::CloseDataModel] Create DataModel - heartbeat(1)
+2026-10-22T06:30:25.131Z,112.131210,8890,6 [FLog::DataModelPatchConfigurer] [_DataModelPatch] Retrieving patch
+2026-10-22T06:30:25.183Z,112.183159,8890,6,Warning [FLog::Output] Hello World CLI-226594
+2026-10-22T06:30:25.183Z,112.183159,8890,6,Warning [FLog::Output] Hello world, CLI-208683!
+2026-10-22T06:30:25.184Z,112.184158,8890,6,Warning [FLog::Output] Hello world, CLI-207485!
+2026-10-22T06:30:25.184Z,112.184158,8890,6,Warning [FLog::Output] Hello again, world 206748!
+2026-10-22T06:30:25.184Z,112.184158,8890,6,Warning [FLog::Output] Hello world CLI-206426!
+2026-10-22T06:30:25.184Z,112.184158,8890,6,Warning [FLog::Output] Hello world ...!
+2026-10-22T06:30:25.184Z,112.184158,8890,6,Warning [FLog::Output] Hello 198367!
+2026-10-22T06:30:25.184Z,112.184158,8890,6,Warning [FLog::Output] Hello World! **CLI-199819**
+2026-10-22T06:30:25.184Z,112.184158,8890,6,Warning [FLog::Output] Hello World! from CLI-206127
+2026-10-22T06:30:25.184Z,112.184158,8890,6,Warning [FLog::Output] Hello World! CLI210530
+2026-10-22T06:30:25.184Z,112.184158,8890,6,Warning [FLog::Output] Hello World CLI-212185!
+2026-10-22T06:30:25.184Z,112.184158,8890,6,Warning [FLog::Output] Hello World! CLI-222132
+2026-10-22T06:30:25.184Z,112.184158,8890,6,Warning [FLog::Output] Hello World <3 CLI-225598
+2026-10-22T06:30:25.184Z,112.184158,8890,6,Warning [FLog::Output] Hello World CLI-226375
+2026-10-22T06:30:25.184Z,112.184158,8890,6,Warning [FLog::Output] Hello World! CLI-226477
+2026-10-22T06:30:25.197Z,112.197166,8890,6,Info [FLog::Audio] InputDevice 0: Microphone Array (AMD Audio Device)([585751b4-2b90-47d3-a6561d9d9754722e]) 48000/2/4
+2026-10-22T06:30:25.197Z,112.197166,8890,6,Info [FLog::Audio] InputDevice 1: Microphone (Steam Streaming Microphone)([e93c6ce5-a20d-418b-9e408524900d900e]) 48000/2/4
+2026-10-22T06:30:25.402Z,112.402214,0b38,6,Info [FLog::DMListenerBridge] registerDataModel dm=0x1e7292de4d0, gst=StudioGameStateType_PlayServer, dmId=3, isOriginalDM=false
+2026-10-22T06:30:25.417Z,112.417252,1fc4,6,Info [FLog::StudioMDI] PlaySoloTabController got server DM created
+2026-10-22T06:30:25.418Z,112.418251,4190,7 [FLog::Network] NetworkServer:Create
+2026-10-22T06:30:25.421Z,112.421257,7100,6 [FLog::StudioDebuggerV2] DebuggerConnection(000001E7216733F0): Service provider changed (old 0000000000000000, new 000001E702800EC0)
+2026-10-22T06:30:25.424Z,112.424263,7100,6 [FLog::StudioDebuggerV2] DAPClient: Invoking method: setExceptionBreakpoints
+2026-10-22T06:30:25.461Z,112.461044,0b38,6 [FLog::StudioDebuggerV2] DAPClient: Response was an error: Failed to send message to server.
+2026-10-22T06:30:25.470Z,112.470039,0b38,6 [FLog::StudioDebuggerV2] DAPClient: Invoking method: initialize
+2026-10-22T06:30:25.485Z,112.485031,8890,6 [telemetryLog] Sending 'OpenPlaceDataModelTaskTelemetry' to 'Event Ingest,Points'
+2026-10-22T06:30:25.485Z,112.485031,8890,6 [telemetryLog] Intro message: DataModel Task Telemetry Summary
+2026-10-22T06:30:25.485Z,112.485031,8890,6 [telemetryLog] 'OpenPlaceDataModelTaskTelemetry' fields logging starts.
+2026-10-22T06:30:25.485Z,112.485031,8890,6 [telemetryLog] cpuIs64Bit: 1
+2026-10-22T06:30:25.485Z,112.485031,8890,6 [telemetryLog] UiDmTaskTotalTimeMs: 8
+2026-10-22T06:30:25.485Z,112.485031,8890,6 [telemetryLog] UiDmTaskScheduleTimeMs: 5
+2026-10-22T06:30:25.485Z,112.485031,8890,6 [telemetryLog] UiDmTaskAcquireLockTimeMs: 0
+2026-10-22T06:30:25.485Z,112.485031,8890,6 [telemetryLog] ParallelDmTaskTotalTimeMs: 75
+2026-10-22T06:30:25.485Z,112.485031,8890,6 [telemetryLog] placeid: 0
+2026-10-22T06:30:25.485Z,112.485031,8890,6 [telemetryLog] placeid_fromcontext: 0
+2026-10-22T06:30:25.485Z,112.485031,8890,6 [telemetryLog] cpuCoreCount: 4
+2026-10-22T06:30:25.485Z,112.485031,8890,6 [telemetryLog] cpuMaxFreq: 2289
+2026-10-22T06:30:25.485Z,112.485031,8890,6 [telemetryLog] cpuMinFreq: 0
+2026-10-22T06:30:25.485Z,112.485031,8890,6 [telemetryLog] ramTotalMb: 7418
+2026-10-22T06:30:25.485Z,112.485031,8890,6 [telemetryLog] ramAvailableMb: 655
+2026-10-22T06:30:25.485Z,112.485031,8890,6 [telemetryLog] UiDmTaskCount: 2
+2026-10-22T06:30:25.485Z,112.485031,8890,6 [telemetryLog] ParallelDmTaskCount: 26
+2026-10-22T06:30:25.485Z,112.485031,8890,6 [telemetryLog] osversion: 148.10.0.26200
+2026-10-22T06:30:25.485Z,112.485031,8890,6 [telemetryLog] osname: Win64
+2026-10-22T06:30:25.485Z,112.485031,8890,6 [telemetryLog] universeid: 0
+2026-10-22T06:30:25.485Z,112.485031,8890,6 [telemetryLog] cpuSupportedAdvancedVectorExtensions: SSE,AVX,AVX2,SSE41
+2026-10-22T06:30:25.485Z,112.485031,8890,6 [telemetryLog] studioSid: 3BEF4A67-C178-4F5A-AC03-439952EE1A86
+2026-10-22T06:30:25.485Z,112.485031,8890,6 [telemetryLog] clientId: F61C3661-1AF8-4E3D-B2D3-23EDD7E58605
+2026-10-22T06:30:25.485Z,112.485031,8890,6 [telemetryLog] launchIntent: None
+2026-10-22T06:30:25.485Z,112.485031,8890,6 [telemetryLog] DmId: 5B190BDC-7F66-4BA7-BFBB-D3F199B7624C-C:/Users/natha/claude-xfer/Windowsill-save-adapter-e501-native-review/Windowsill-adapter-review.rbxlx-StudioGameStateType_PlayServer
+2026-10-22T06:30:25.485Z,112.485031,8890,6 [telemetryLog] DmTaskPhase: PostCreation
+2026-10-22T06:30:25.485Z,112.485031,8890,6 [telemetryLog] UiDmTaskNames: BulkImport;AssetManager;
+2026-10-22T06:30:25.485Z,112.485031,8890,6 [telemetryLog] ParallelDmTaskNames: Default;ExplorerServiceVisibilityPlaceListener-SetPSC;ServiceVisibilityServiceRegister;MarketPlace;TextScraperListenerOnCreatedDataModel;TutorialServicePlaceListener-SetPlaceSessionContext;ScriptCloneTrackerOnCreatedDataModel;PathFinding;Gizmo;LuaFlag;setPlayTestSessionIdForContentProvider;PlaceSessionDataModelListenerOnCreatedDataModel;setPluginRibbonActionHostDm;PluginWidgetsViewOnCreatedDataModel;LegacyStudioBridgeService;SoundJobManager-PostCreation;UsageTrackerPlaceSessionListenerOnCreatedDataModel;ScriptExecutionCounterTrackerOnCreatedDataModel;RobloxDocManagerOnCreatedDataModel;PlaySoloTabControllerOnCreatedDataModel;StudioDockPanelManagerOnCreatedDataModel;Modeling;DeviceEmulatorServicePlaceListener-SetEmulator;DeviceEmulator;DebuggerPlaceSessionListenerOnCreatedDataModel;PlacesServicePlaceListener-SetPlaySoloManager;
+2026-10-22T06:30:25.485Z,112.485031,8890,6 [telemetryLog] PlaceSessionId: 5B190BDC-7F66-4BA7-BFBB-D3F199B7624C-C:/Users/natha/claude-xfer/Windowsill-save-adapter-e501-native-review/Windowsill-adapter-review.rbxlx
+2026-10-22T06:30:25.485Z,112.485031,8890,6 [telemetryLog] PerStateTraceId: 46956D29-CC13-4B87-AB49-06BB0D5FE646
+2026-10-22T06:30:25.485Z,112.485031,8890,6 [telemetryLog] AllDmTasksSuccess: true
+2026-10-22T06:30:25.485Z,112.485031,8890,6 [telemetryLog] 'OpenPlaceDataModelTaskTelemetry' fields logging ends.
+2026-10-22T06:30:25.491Z,112.491028,4190,6,Info [FLog::WaypointTelemetry] PSMServerCreated (waypoint #1, session #1): 480.8509000000072 ms since last waypoint, 508.76359999999465 ms since start
+2026-10-22T06:30:25.496Z,112.496025,8890,6 [FLog::StudioDebuggerV2] DAPClient: Invoking method: configurationDone
+2026-10-22T06:30:25.498Z,112.498024,8890,6 [FLog::CloseDataModel] Create DataModel - heartbeat(1)
+2026-10-22T06:30:25.499Z,112.499023,8890,6 [FLog::DataModelPatchConfigurer] [_DataModelPatch] Retrieving patch
+2026-10-22T06:30:25.505Z,112.505028,8890,6,Warning [FLog::Output] Hello World CLI-226594
+2026-10-22T06:30:25.506Z,112.506027,8890,6,Warning [FLog::Output] Hello world, CLI-208683!
+2026-10-22T06:30:25.506Z,112.506027,8890,6,Warning [FLog::Output] Hello world, CLI-207485!
+2026-10-22T06:30:25.506Z,112.506027,8890,6,Warning [FLog::Output] Hello again, world 206748!
+2026-10-22T06:30:25.506Z,112.506027,8890,6,Warning [FLog::Output] Hello world CLI-206426!
+2026-10-22T06:30:25.506Z,112.506027,8890,6,Warning [FLog::Output] Hello world ...!
+2026-10-22T06:30:25.506Z,112.506027,8890,6,Warning [FLog::Output] Hello 198367!
+2026-10-22T06:30:25.506Z,112.506027,8890,6,Warning [FLog::Output] Hello World! **CLI-199819**
+2026-10-22T06:30:25.506Z,112.506027,8890,6,Warning [FLog::Output] Hello World! from CLI-206127
+2026-10-22T06:30:25.506Z,112.506027,8890,6,Warning [FLog::Output] Hello World! CLI210530
+2026-10-22T06:30:25.506Z,112.506027,8890,6,Warning [FLog::Output] Hello World CLI-212185!
+2026-10-22T06:30:25.506Z,112.506027,8890,6,Warning [FLog::Output] Hello World! CLI-222132
+2026-10-22T06:30:25.506Z,112.506027,8890,6,Warning [FLog::Output] Hello World <3 CLI-225598
+2026-10-22T06:30:25.506Z,112.506027,8890,6,Warning [FLog::Output] Hello World CLI-226375
+2026-10-22T06:30:25.506Z,112.506027,8890,6,Warning [FLog::Output] Hello World! CLI-226477
+2026-10-22T06:30:25.509Z,112.509026,8890,6,Info [FLog::Audio] InputDevice 0: Microphone Array (AMD Audio Device)([585751b4-2b90-47d3-a6561d9d9754722e]) 48000/2/4
+2026-10-22T06:30:25.509Z,112.509026,8890,6,Info [FLog::Audio] InputDevice 1: Microphone (Steam Streaming Microphone)([e93c6ce5-a20d-418b-9e408524900d900e]) 48000/2/4
+2026-10-22T06:30:25.550Z,112.550140,3bc0,6,Info [FLog::DMListenerBridge] registerDataModel dm=0x1e7b16b9cd0, gst=StudioGameStateType_PlayClient, dmId=4, isOriginalDM=false
+2026-10-22T06:30:25.557Z,112.557152,8890,7 [FLog::Network] NetworkClient:Create
+2026-10-22T06:30:25.560Z,112.560150,8890,6 [FLog::StudioDebuggerV2] DebuggerConnection(000001E78C9D2AF0): Service provider changed (old 0000000000000000, new 000001E702800EC0)
+2026-10-22T06:30:25.561Z,112.561150,8890,6 [FLog::StudioDebuggerV2] DAPClient: Invoking method: setExceptionBreakpoints
+2026-10-22T06:30:25.561Z,112.561150,3bc0,6,Info [FLog::WaypointTelemetry] PSMClientCreated (waypoint #2, session #1): 69.28960000000473 ms since last waypoint, 578.0531999999994 ms since start
+2026-10-22T06:30:25.562Z,112.562157,4190,6 [telemetryLog] Sending 'OpenPlaceDataModelTaskTelemetry' to 'Event Ingest,Points'
+2026-10-22T06:30:25.562Z,112.562157,8890,6 [FLog::StudioDebuggerV2] DebuggerConnection(000001E7216733F0): Connected event
+2026-10-22T06:30:25.562Z,112.562157,4190,6 [telemetryLog] Intro message: DataModel Task Telemetry Summary
+2026-10-22T06:30:25.562Z,112.562157,4190,6 [telemetryLog] 'OpenPlaceDataModelTaskTelemetry' fields logging starts.
+2026-10-22T06:30:25.562Z,112.562157,4190,6 [telemetryLog] cpuIs64Bit: 1
+2026-10-22T06:30:25.562Z,112.562157,4190,6 [telemetryLog] UiDmTaskTotalTimeMs: 1
+2026-10-22T06:30:25.562Z,112.562157,4190,6 [telemetryLog] UiDmTaskScheduleTimeMs: 0
+2026-10-22T06:30:25.562Z,112.562157,4190,6 [telemetryLog] UiDmTaskAcquireLockTimeMs: 1
+2026-10-22T06:30:25.562Z,112.562157,4190,6 [telemetryLog] ParallelDmTaskTotalTimeMs: 11
+2026-10-22T06:30:25.562Z,112.562157,4190,6 [telemetryLog] placeid: 0
+2026-10-22T06:30:25.562Z,112.562157,4190,6 [telemetryLog] placeid_fromcontext: 0
+2026-10-22T06:30:25.562Z,112.562157,4190,6 [telemetryLog] cpuCoreCount: 4
+2026-10-22T06:30:25.562Z,112.562157,4190,6 [telemetryLog] cpuMaxFreq: 2289
+2026-10-22T06:30:25.562Z,112.562157,4190,6 [telemetryLog] cpuMinFreq: 0
+2026-10-22T06:30:25.563Z,112.563156,4190,6 [telemetryLog] ramTotalMb: 7418
+2026-10-22T06:30:25.563Z,112.563156,4190,6 [telemetryLog] ramAvailableMb: 625
+2026-10-22T06:30:25.563Z,112.563156,4190,6 [telemetryLog] UiDmTaskCount: 2
+2026-10-22T06:30:25.563Z,112.563156,4190,6 [telemetryLog] ParallelDmTaskCount: 26
+2026-10-22T06:30:25.563Z,112.563156,4190,6 [telemetryLog] osversion: 148.10.0.26200
+2026-10-22T06:30:25.563Z,112.563156,4190,6 [telemetryLog] osname: Win64
+2026-10-22T06:30:25.563Z,112.563156,4190,6 [telemetryLog] universeid: 0
+2026-10-22T06:30:25.563Z,112.563156,4190,6 [telemetryLog] cpuSupportedAdvancedVectorExtensions: SSE,AVX,AVX2,SSE41
+2026-10-22T06:30:25.563Z,112.563156,4190,6 [telemetryLog] studioSid: 3BEF4A67-C178-4F5A-AC03-439952EE1A86
+2026-10-22T06:30:25.563Z,112.563156,4190,6 [telemetryLog] clientId: F61C3661-1AF8-4E3D-B2D3-23EDD7E58605
+2026-10-22T06:30:25.563Z,112.563156,4190,6 [telemetryLog] launchIntent: None
+2026-10-22T06:30:25.563Z,112.563156,4190,6 [telemetryLog] DmId: 5B190BDC-7F66-4BA7-BFBB-D3F199B7624C-C:/Users/natha/claude-xfer/Windowsill-save-adapter-e501-native-review/Windowsill-adapter-review.rbxlx-StudioGameStateType_PlayClient
+2026-10-22T06:30:25.563Z,112.563156,4190,6 [telemetryLog] DmTaskPhase: PostCreation
+2026-10-22T06:30:25.563Z,112.563156,4190,6 [telemetryLog] UiDmTaskNames: BulkImport;AssetManager;
+2026-10-22T06:30:25.563Z,112.563156,4190,6 [telemetryLog] ParallelDmTaskNames: ConnectOnceToCharacterAdded;Default;ExplorerServiceVisibilityPlaceListener-SetPSC;ServiceVisibilityServiceRegister;MarketPlace;TextScraperListenerOnCreatedDataModel;TutorialServicePlaceListener-SetPlaceSessionContext;ScriptCloneTrackerOnCreatedDataModel;PathFinding;Gizmo;LuaFlag;setPlayTestSessionIdForContentProvider;PlaceSessionDataModelListenerOnCreatedDataModel;setPluginRibbonActionHostDm;PluginWidgetsViewOnCreatedDataModel;LegacyStudioBridgeService;SoundJobManager-PostCreation;UsageTrackerPlaceSessionListenerOnCreatedDataModel;ScriptExecutionCounterTrackerOnCreatedDataModel;RobloxDocManagerOnCreatedDataModel;StudioDockPanelManagerOnCreatedDataModel;Modeling;DeviceEmulatorServicePlaceListener-SetEmulator;DeviceEmulator;DebuggerPlaceSessionListenerOnCreatedDataModel;PlacesServicePlaceListener-SetPlaySoloManager;
+2026-10-22T06:30:25.563Z,112.563156,4190,6 [telemetryLog] PlaceSessionId: 5B190BDC-7F66-4BA7-BFBB-D3F199B7624C-C:/Users/natha/claude-xfer/Windowsill-save-adapter-e501-native-review/Windowsill-adapter-review.rbxlx
+2026-10-22T06:30:25.563Z,112.563156,4190,6 [telemetryLog] PerStateTraceId: 46956D29-CC13-4B87-AB49-06BB0D5FE646
+2026-10-22T06:30:25.563Z,112.563156,4190,6 [telemetryLog] AllDmTasksSuccess: true
+2026-10-22T06:30:25.563Z,112.563156,4190,6 [telemetryLog] 'OpenPlaceDataModelTaskTelemetry' fields logging ends.
+2026-10-22T06:30:25.564Z,112.564156,8890,6 [FLog::StudioDebuggerV2] DAPClient: Invoking method: setExceptionBreakpoints
+2026-10-22T06:30:25.566Z,112.566154,8890,6 [FLog::StudioDebuggerV2] DAPClient: Response was an error: Failed to send message to server.
+2026-10-22T06:30:25.573Z,112.573166,1fc4,6,Info [FLog::RobloxViewStudioManager] Clearing view for DM with ID 2 type Edit
+2026-10-22T06:30:25.579Z,112.579170,6edc,6 [FLog::StudioDebuggerV2] DAPClient: Invoking method: initialize
+2026-10-22T06:30:25.579Z,112.579170,1fc4,6,Info [FLog::RenderSchedulerState] Setting asset DataModel nullptr
+2026-10-22T06:30:25.580Z,112.580170,1fc4,6,Info [FLog::RenderSchedulerState] syncDataModels setting to fallback
+2026-10-22T06:30:25.580Z,112.580170,1fc4,6,Info [FLog::RenderSchedulerState] Tearing down for DataModel Edit with fallback Standalone
+2026-10-22T06:30:25.580Z,112.580170,1fc4,6,Info [FLog::RenderSchedulerState] Change RenderJobMode TaskScheduler -> None
+2026-10-22T06:30:25.581Z,112.581169,1fc4,6,Warning [FLog::Graphics] TM2: maxCloudAssetDimension: 4096
+2026-10-22T06:30:25.601Z,112.601189,1fc4,6,Info [FLog::RenderSchedulerState] Setting up for DataModel Standalone with fallback nullptr
+2026-10-22T06:30:25.601Z,112.601189,1fc4,6,Warning [FLog::Graphics] TM2: maxCloudAssetDimension: 4096
+2026-10-22T06:30:25.668Z,112.668854,1fc4,6,Info [FLog::RenderSchedulerState] Change RenderJobMode None -> TaskScheduler
+2026-10-22T06:30:25.669Z,112.669853,7100,6,Debug [FLog::DataModelSoundManager] onDataModelBecameNotCurrent: with shouldMute = true
+2026-10-22T06:30:25.669Z,112.669853,7100,6,Debug [FLog::DataModelSoundManager] DataModelSoundManager::updateSoundState(true)
+2026-10-22T06:30:25.669Z,112.669853,7100,6,Debug [FLog::DataModelSoundManager] soundService->muteAllChannels(true)
+2026-10-22T06:30:25.689Z,112.689972,8890,6 [FLog::StudioDebuggerV2] DAPClient: Invoking method: configurationDone
+2026-10-22T06:30:25.693Z,112.693993,1fc4,6,Info [FLog::StudioDocking] Saving Layout: StudioGameStateType_Edit
+2026-10-22T06:30:25.694Z,112.695000,1fc4,6,Info [StudioQtCategoryLog_qtitan_docking] qtitan.docking: DockPanelManager::saveStateToDevice - Start QBuffer(0xbc0dcf9cc0, name = "Layout_StudioGameStateType_Edit")
+2026-10-22T06:30:25.699Z,112.699020,1fc4,6,Info [StudioQtCategoryLog_qtitan_docking] qtitan.docking: DockPanelManager::saveStateToDevice - End
+2026-10-22T06:30:25.699Z,112.699020,1fc4,6 [FLog::StudioUpdate3DView] StudioDockPanelManager; 3DView visibility after saving layout: true
+2026-10-22T06:30:25.699Z,112.699020,1fc4,6,Info [FLog::DMListenerBridge] setCurrentGameStateTypeAndDmId currentGst=StudioGameStateType_PlayClient, currentDmId=4
+2026-10-22T06:30:25.700Z,112.700027,1fc4,6,Info [FLog::AssetDataModelManager] Setting StudioGameStateType to StudioGameStateType_PlayClient
+2026-10-22T06:30:25.706Z,112.706062,1fc4,6,Debug [FLog::StudioEmbeddedBrowserWebView2] WebView2 Low Memory Mode set to: true
+2026-10-22T06:30:25.718Z,112.718132,1fc4,6,Info [FLog::StudioMDI] GST changed to client, have pending server DM but no server tab, going to create it
+2026-10-22T06:30:25.718Z,112.718132,1fc4,6,Info [FLog::StudioMDI] Creating tab for server view
+2026-10-22T06:30:25.740Z,112.740257,1fc4,6 [FLog::Output] Info: 		RobloxViewStudio::RobloxViewStudio - start
+2026-10-22T06:30:25.740Z,112.740257,1fc4,6 [FLog::Output] Info: 			Marshaller
+2026-10-22T06:30:25.740Z,112.740257,1fc4,6 [FLog::Output] Info: 			BindToWorkspace
+2026-10-22T06:30:25.741Z,112.741257,1fc4,6 [FLog::Output] Info: 		RobloxView::RobloxView - end
+2026-10-22T06:30:25.753Z,112.753174,1fc4,6,Info [FLog::StudioMDI] Created play solo Server tab
+2026-10-22T06:30:25.754Z,112.754173,1fc4,6,Info [FLog::StudioMDI] Activating viewport for PlayClient
+2026-10-22T06:30:25.799Z,112.799370,1fc4,6,Info [FLog::RobloxIDEDoc] RobloxIDEDoc::activate - start
+2026-10-22T06:30:25.822Z,112.822464,4190,6,Info [FLog::WaypointTelemetry] PSMRanPostCreationTasks (waypoint #3, session #1): 259.6743999999944 ms since last waypoint, 837.7275999999938 ms since start
+2026-10-22T06:30:25.823Z,112.823471,4190,6 [telemetryLog] Sending 'OpenPlacePerStateTelemetry' to 'Event Ingest,Points'
+2026-10-22T06:30:25.824Z,112.824471,4190,6 [telemetryLog] Intro message: PlaceSession PerState Telemetry Summary
+2026-10-22T06:30:25.824Z,112.824471,4190,6 [telemetryLog] 'OpenPlacePerStateTelemetry' fields logging starts.
+2026-10-22T06:30:25.824Z,112.824471,4190,6 [telemetryLog] cpuIs64Bit: 1
+2026-10-22T06:30:25.824Z,112.824471,4190,6 [telemetryLog] TotalTimeInMs: 811
+2026-10-22T06:30:25.824Z,112.824471,4190,6 [telemetryLog] placeid: 0
+2026-10-22T06:30:25.824Z,112.824471,4190,6 [telemetryLog] placeid_fromcontext: 0
+2026-10-22T06:30:25.824Z,112.824471,4190,6 [telemetryLog] cpuCoreCount: 4
+2026-10-22T06:30:25.824Z,112.824471,4190,6 [telemetryLog] cpuMaxFreq: 2289
+2026-10-22T06:30:25.824Z,112.824471,4190,6 [telemetryLog] cpuMinFreq: 0
+2026-10-22T06:30:25.824Z,112.824471,4190,6 [telemetryLog] ramTotalMb: 7418
+2026-10-22T06:30:25.824Z,112.824471,4190,6 [telemetryLog] ramAvailableMb: 786
+2026-10-22T06:30:25.824Z,112.824471,4190,6 [telemetryLog] TaskCount: 1
+2026-10-22T06:30:25.824Z,112.824471,4190,6 [telemetryLog] osversion: 148.10.0.26200
+2026-10-22T06:30:25.824Z,112.824471,4190,6 [telemetryLog] osname: Win64
+2026-10-22T06:30:25.824Z,112.824471,4190,6 [telemetryLog] universeid: 0
+2026-10-22T06:30:25.824Z,112.824471,4190,6 [telemetryLog] cpuSupportedAdvancedVectorExtensions: SSE,AVX,AVX2,SSE41
+2026-10-22T06:30:25.824Z,112.824471,4190,6 [telemetryLog] studioSid: 3BEF4A67-C178-4F5A-AC03-439952EE1A86
+2026-10-22T06:30:25.824Z,112.824471,4190,6 [telemetryLog] clientId: F61C3661-1AF8-4E3D-B2D3-23EDD7E58605
+2026-10-22T06:30:25.824Z,112.824471,4190,6 [telemetryLog] launchIntent: None
+2026-10-22T06:30:25.824Z,112.824471,4190,6 [telemetryLog] PerStateTraceId: 46956D29-CC13-4B87-AB49-06BB0D5FE646
+2026-10-22T06:30:25.824Z,112.824471,4190,6 [telemetryLog] State: PlaySoloCreateDataModel
+2026-10-22T06:30:25.824Z,112.824471,4190,6 [telemetryLog] PlaceSessionId: 5B190BDC-7F66-4BA7-BFBB-D3F199B7624C-C:/Users/natha/claude-xfer/Windowsill-save-adapter-e501-native-review/Windowsill-adapter-review.rbxlx
+2026-10-22T06:30:25.824Z,112.824471,4190,6 [telemetryLog] TaskNames: PlaySoloCreateDataModel;
+2026-10-22T06:30:25.824Z,112.824471,4190,6 [telemetryLog] StudioStreamingEnabled: false
+2026-10-22T06:30:25.824Z,112.824471,4190,6 [telemetryLog] AllSuccess: true
+2026-10-22T06:30:25.824Z,112.824471,4190,6 [telemetryLog] 'OpenPlacePerStateTelemetry' fields logging ends.
+2026-10-22T06:30:25.904Z,112.904160,1fc4,6,Info [FLog::D3D11SwapChain] resizeWindowData: swapChain=0x1e775abc220 windowHandle=0x4e10410 dims=825x40
+2026-10-22T06:30:25.905Z,112.905159,1fc4,6,Info [FLog::D3D11SwapChain] resizeSwapchain: ResizeBuffers explicit 825x40 swapChain=0x1e775abc220
+2026-10-22T06:30:25.942Z,112.942169,1fc4,6,Info [FLog::StudioMDI] Toggling to client view because its dock panel was activated
+2026-10-22T06:30:26.014Z,113.014763,6edc,6 [FLog::KeyValueStorage] Secure Storage read failed with message: 'Element not found.'
+2026-10-22T06:30:26.014Z,113.014763,6edc,6 [FLog::KeyValueStorage] Secure Storage read failed with message: 'Element not found.'
+2026-10-22T06:30:26.015Z,113.015755,6edc,6,Error [FLog::SecretsUtils] Failed to parse local secrets
+2026-10-22T06:30:26.019Z,113.019722,0b38,6 [FLog::StudioDebuggerV2] DebuggerConnection(000001E78C9D2AF0): Connected event
+2026-10-22T06:30:26.020Z,113.020714,0b38,6 [FLog::StudioDebuggerV2] DAPClient: Invoking method: setExceptionBreakpoints
+2026-10-22T06:30:26.021Z,113.021706,4190,6 [telemetryLog] Sending 'OpenPlaceDataModelTaskTelemetry' to 'Event Ingest,Points'
+2026-10-22T06:30:26.021Z,113.021706,4190,6 [telemetryLog] Intro message: DataModel Task Telemetry Summary
+2026-10-22T06:30:26.021Z,113.021706,4190,6 [telemetryLog] 'OpenPlaceDataModelTaskTelemetry' fields logging starts.
+2026-10-22T06:30:26.021Z,113.021706,4190,6 [telemetryLog] cpuIs64Bit: 1
+2026-10-22T06:30:26.021Z,113.021706,4190,6 [telemetryLog] ParallelDmTaskTotalTimeMs: 10
+2026-10-22T06:30:26.021Z,113.021706,4190,6 [telemetryLog] placeid: 0
+2026-10-22T06:30:26.021Z,113.021706,4190,6 [telemetryLog] placeid_fromcontext: 0
+2026-10-22T06:30:26.021Z,113.021706,4190,6 [telemetryLog] cpuCoreCount: 4
+2026-10-22T06:30:26.021Z,113.021706,4190,6 [telemetryLog] cpuMaxFreq: 2289
+2026-10-22T06:30:26.021Z,113.021706,4190,6 [telemetryLog] cpuMinFreq: 0
+2026-10-22T06:30:26.021Z,113.021706,4190,6 [telemetryLog] ramTotalMb: 7418
+2026-10-22T06:30:26.021Z,113.021706,4190,6 [telemetryLog] ramAvailableMb: 546
+2026-10-22T06:30:26.021Z,113.021706,4190,6 [telemetryLog] ParallelDmTaskCount: 5
+2026-10-22T06:30:26.021Z,113.021706,4190,6 [telemetryLog] osversion: 148.10.0.26200
+2026-10-22T06:30:26.021Z,113.021706,4190,6 [telemetryLog] osname: Win64
+2026-10-22T06:30:26.021Z,113.021706,4190,6 [telemetryLog] universeid: 0
+2026-10-22T06:30:26.021Z,113.021706,4190,6 [telemetryLog] cpuSupportedAdvancedVectorExtensions: SSE,AVX,AVX2,SSE41
+2026-10-22T06:30:26.021Z,113.021706,4190,6 [telemetryLog] studioSid: 3BEF4A67-C178-4F5A-AC03-439952EE1A86
+2026-10-22T06:30:26.021Z,113.021706,4190,6 [telemetryLog] clientId: F61C3661-1AF8-4E3D-B2D3-23EDD7E58605
+2026-10-22T06:30:26.021Z,113.021706,4190,6 [telemetryLog] launchIntent: None
+2026-10-22T06:30:26.021Z,113.021706,4190,6 [telemetryLog] DmId: 5B190BDC-7F66-4BA7-BFBB-D3F199B7624C-C:/Users/natha/claude-xfer/Windowsill-save-adapter-e501-native-review/Windowsill-adapter-review.rbxlx-StudioGameStateType_PlayServer
+2026-10-22T06:30:26.021Z,113.021706,4190,6 [telemetryLog] DmTaskPhase: PreLoading
+2026-10-22T06:30:26.021Z,113.021706,4190,6 [telemetryLog] ParallelDmTaskNames: RegisterCommandDataBridge;SecretsControllerTaskRegister;RemoteSystemOutputTaskRegister;DebuggerHostAppServices-setupDebugger;StudioTestServiceDMBridgeForClient;
+2026-10-22T06:30:26.021Z,113.021706,4190,6 [telemetryLog] PlaceSessionId: 5B190BDC-7F66-4BA7-BFBB-D3F199B7624C-C:/Users/natha/claude-xfer/Windowsill-save-adapter-e501-native-review/Windowsill-adapter-review.rbxlx
+2026-10-22T06:30:26.021Z,113.021706,4190,6 [telemetryLog] PerStateTraceId: DA67C4CF-B5E5-4FBD-AA2F-B341FB4B7088
+2026-10-22T06:30:26.021Z,113.021706,4190,6 [telemetryLog] AllDmTasksSuccess: true
+2026-10-22T06:30:26.021Z,113.021706,4190,6 [telemetryLog] 'OpenPlaceDataModelTaskTelemetry' fields logging ends.
+2026-10-22T06:30:26.023Z,113.023689,8890,6,Warning [FLog::CloseDataModel] Setting place ID 0
+2026-10-22T06:30:26.327Z,113.327515,8890,6,Info [FLog::TestServiceLog] [onServiceProvider] DebugUTPLauncherWebSocketUri='' wsOptIn=0
+2026-10-22T06:30:26.327Z,113.327515,8890,6,Info [FLog::TestServiceLog] [onServiceProvider] this=0x1e78ca75ad0 dm=0x1e7292de4d0 wsOptIn=0 isStudio=1 isServer=1 isPlayClient=0 isNonNetworkEdit=0
+2026-10-22T06:30:26.402Z,113.402351,8890,6,Info [FLog::ExtractPackageDefinition] No captured package definitions to restore
+2026-10-22T06:30:26.426Z,113.426414,8890,7 [FLog::Network] NetworkServer:Start
+2026-10-22T06:30:26.432Z,113.432434,8890,6 [DFLog::NetworkDetailed] CreateBoundSocket() forcePort=0, socketFamily=2
+2026-10-22T06:30:26.432Z,113.432434,8890,7 [FLog::Network] binding socket on inaddr_any:0
+
+2026-10-22T06:30:26.468Z,113.468193,8890,6,Info [DFLog::NetworkServer] Started Raknet network server 127.0.0.1|60777
+2026-10-22T06:30:26.470Z,113.470192,8890,6,Info [DFLog::RbxTransportRnaExp] Creating listener on 0.0.0.0:0
+2026-10-22T06:30:26.470Z,113.470192,6710,12 [DFLog::HttpTraceError] HttpResponse(#173 0x1e734463ff8) time:51.3ms (net:51.2ms timeInRetryQueue:0.0ms)status:403 Forbidden bodySize:86 url:{ "https://apis.roblox.com/preset-chat/v1/preset-chat-config" } ip:128.116.48.3 external:0 numberOfTimesRetried:0
+2026-10-22T06:30:26.471Z,113.471191,6710,6,Error [DFLog::PresetChatManager] PresetChatManager fetch error: HttpError (status=403)
+2026-10-22T06:30:26.508Z,113.508194,6970,6,Info [DFLog::RbxTransportRnaExp] SharedConnectionRegistry::add: aliveConns=1 entries=1
+2026-10-22T06:30:26.509Z,113.509193,6970,6,Info [DFLog::RbxTransportRnaExpListener] ReadPktInfo socket option is not supported on the current platform. Ignoring this error...
+2026-10-22T06:30:26.511Z,113.511192,8890,6,Info [DFLog::NetworkServer] Started RbxTransport network server 0.0.0.0|60778
+2026-10-22T06:30:26.517Z,113.517197,8890,7 [FLog::Network] Initialized StreamingObserver. Physics: 0.011ms Total: 1.105ms
+2026-10-22T06:30:26.578Z,113.578018,8890,7 [FLog::Network] Time taken to initialize schema = 25.734800 ms
+2026-10-22T06:30:26.596Z,113.596992,8890,6,Info [DFLog::RbxTransportRnaExp] Creating listener on *:60778
+2026-10-22T06:30:26.597Z,113.597992,8890,6,Info [DFLog::RbxTransportDummyServer] Server listening on port 60778
+2026-10-22T06:30:26.597Z,113.597992,8890,6,Info [DFLog::NetworkServer] RbxTransport Dummy Server started successfully on port 60778
+2026-10-22T06:30:26.601Z,113.601982,7100,6,Info [FLog::WaypointTelemetry] PSMServerLoadedCB (waypoint #4, session #1): 779.5492000000053 ms since last waypoint, 1617.2767999999992 ms since start
+2026-10-22T06:30:26.601Z,113.601982,8890,6 [telemetryLog] Sending 'OpenPlaceDataModelTaskTelemetry' to 'Event Ingest,Points'
+2026-10-22T06:30:26.601Z,113.601982,8890,6 [telemetryLog] Intro message: DataModel Task Telemetry Summary
+2026-10-22T06:30:26.601Z,113.601982,8890,6 [telemetryLog] 'OpenPlaceDataModelTaskTelemetry' fields logging starts.
+2026-10-22T06:30:26.601Z,113.601982,8890,6 [telemetryLog] cpuIs64Bit: 1
+2026-10-22T06:30:26.601Z,113.601982,8890,6 [telemetryLog] ParallelDmTaskTotalTimeMs: 0
+2026-10-22T06:30:26.601Z,113.601982,8890,6 [telemetryLog] placeid: 0
+2026-10-22T06:30:26.601Z,113.601982,8890,6 [telemetryLog] placeid_fromcontext: 0
+2026-10-22T06:30:26.601Z,113.601982,8890,6 [telemetryLog] cpuCoreCount: 4
+2026-10-22T06:30:26.601Z,113.601982,8890,6 [telemetryLog] cpuMaxFreq: 2289
+2026-10-22T06:30:26.601Z,113.601982,8890,6 [telemetryLog] cpuMinFreq: 0
+2026-10-22T06:30:26.601Z,113.601982,8890,6 [telemetryLog] ramTotalMb: 7418
+2026-10-22T06:30:26.601Z,113.601982,8890,6 [telemetryLog] ramAvailableMb: 485
+2026-10-22T06:30:26.601Z,113.601982,8890,6 [telemetryLog] ParallelDmTaskCount: 3
+2026-10-22T06:30:26.601Z,113.601982,8890,6 [telemetryLog] osversion: 148.10.0.26200
+2026-10-22T06:30:26.601Z,113.601982,8890,6 [telemetryLog] osname: Win64
+2026-10-22T06:30:26.601Z,113.601982,8890,6 [telemetryLog] universeid: 0
+2026-10-22T06:30:26.601Z,113.601982,8890,6 [telemetryLog] cpuSupportedAdvancedVectorExtensions: SSE,AVX,AVX2,SSE41
+2026-10-22T06:30:26.601Z,113.601982,8890,6 [telemetryLog] studioSid: 3BEF4A67-C178-4F5A-AC03-439952EE1A86
+2026-10-22T06:30:26.601Z,113.601982,8890,6 [telemetryLog] clientId: F61C3661-1AF8-4E3D-B2D3-23EDD7E58605
+2026-10-22T06:30:26.601Z,113.601982,8890,6 [telemetryLog] launchIntent: None
+2026-10-22T06:30:26.601Z,113.601982,8890,6 [telemetryLog] DmId: 5B190BDC-7F66-4BA7-BFBB-D3F199B7624C-C:/Users/natha/claude-xfer/Windowsill-save-adapter-e501-native-review/Windowsill-adapter-review.rbxlx-StudioGameStateType_PlayServer
+2026-10-22T06:30:26.601Z,113.601982,8890,6 [telemetryLog] DmTaskPhase: PostLoading
+2026-10-22T06:30:26.601Z,113.601982,8890,6 [telemetryLog] ParallelDmTaskNames: PatchLiveScriptingSandboxedSources;CaptureDataModelProxyForInstanceCount;DebuggerHostAppServices-onDataModelLoaded;
+2026-10-22T06:30:26.601Z,113.601982,8890,6 [telemetryLog] PlaceSessionId: 5B190BDC-7F66-4BA7-BFBB-D3F199B7624C-C:/Users/natha/claude-xfer/Windowsill-save-adapter-e501-native-review/Windowsill-adapter-review.rbxlx
+2026-10-22T06:30:26.602Z,113.602982,8890,6 [telemetryLog] PerStateTraceId: DA67C4CF-B5E5-4FBD-AA2F-B341FB4B7088
+2026-10-22T06:30:26.602Z,113.602982,8890,6 [telemetryLog] AllDmTasksSuccess: true
+2026-10-22T06:30:26.602Z,113.602982,8890,6 [telemetryLog] 'OpenPlaceDataModelTaskTelemetry' fields logging ends.
+2026-10-22T06:30:26.603Z,113.603981,7100,6 [telemetryLog] Sending 'OpenPlacePerStateTelemetry' to 'Event Ingest,Points'
+2026-10-22T06:30:26.603Z,113.603981,7100,6 [telemetryLog] Intro message: PlaceSession PerState Telemetry Summary
+2026-10-22T06:30:26.603Z,113.603981,7100,6 [telemetryLog] 'OpenPlacePerStateTelemetry' fields logging starts.
+2026-10-22T06:30:26.603Z,113.603981,7100,6 [telemetryLog] cpuIs64Bit: 1
+2026-10-22T06:30:26.603Z,113.603981,7100,6 [telemetryLog] TotalTimeInMs: 781
+2026-10-22T06:30:26.603Z,113.603981,7100,6 [telemetryLog] placeid: 0
+2026-10-22T06:30:26.603Z,113.603981,7100,6 [telemetryLog] placeid_fromcontext: 0
+2026-10-22T06:30:26.603Z,113.603981,7100,6 [telemetryLog] cpuCoreCount: 4
+2026-10-22T06:30:26.603Z,113.603981,7100,6 [telemetryLog] cpuMaxFreq: 2289
+2026-10-22T06:30:26.603Z,113.603981,7100,6 [telemetryLog] cpuMinFreq: 0
+2026-10-22T06:30:26.603Z,113.603981,7100,6 [telemetryLog] ramTotalMb: 7418
+2026-10-22T06:30:26.603Z,113.603981,7100,6 [telemetryLog] ramAvailableMb: 592
+2026-10-22T06:30:26.603Z,113.603981,7100,6 [telemetryLog] TaskCount: 1
+2026-10-22T06:30:26.603Z,113.603981,7100,6 [telemetryLog] osversion: 148.10.0.26200
+2026-10-22T06:30:26.603Z,113.603981,7100,6 [telemetryLog] osname: Win64
+2026-10-22T06:30:26.603Z,113.603981,7100,6 [telemetryLog] universeid: 0
+2026-10-22T06:30:26.603Z,113.603981,7100,6 [telemetryLog] cpuSupportedAdvancedVectorExtensions: SSE,AVX,AVX2,SSE41
+2026-10-22T06:30:26.603Z,113.603981,7100,6 [telemetryLog] studioSid: 3BEF4A67-C178-4F5A-AC03-439952EE1A86
+2026-10-22T06:30:26.603Z,113.603981,7100,6 [telemetryLog] clientId: F61C3661-1AF8-4E3D-B2D3-23EDD7E58605
+2026-10-22T06:30:26.603Z,113.603981,7100,6 [telemetryLog] launchIntent: None
+2026-10-22T06:30:26.603Z,113.603981,7100,6 [telemetryLog] PerStateTraceId: DA67C4CF-B5E5-4FBD-AA2F-B341FB4B7088
+2026-10-22T06:30:26.603Z,113.603981,7100,6 [telemetryLog] State: PlaySoloLoadServer
+2026-10-22T06:30:26.603Z,113.603981,7100,6 [telemetryLog] PlaceSessionId: 5B190BDC-7F66-4BA7-BFBB-D3F199B7624C-C:/Users/natha/claude-xfer/Windowsill-save-adapter-e501-native-review/Windowsill-adapter-review.rbxlx
+2026-10-22T06:30:26.603Z,113.603981,7100,6 [telemetryLog] TaskNames: PlaySoloLoadServer;
+2026-10-22T06:30:26.603Z,113.603981,7100,6 [telemetryLog] StudioStreamingEnabled: false
+2026-10-22T06:30:26.603Z,113.603981,7100,6 [telemetryLog] AllSuccess: true
+2026-10-22T06:30:26.603Z,113.603981,7100,6 [telemetryLog] 'OpenPlacePerStateTelemetry' fields logging ends.
+2026-10-22T06:30:26.614Z,113.614967,8890,6,Info [FLog::AssetAccessDataModelObserver] Connected to ContentProvider assetFetchFailedNoExperienceAccess signal
+2026-10-22T06:30:26.677Z,113.677071,1fc4,6,Info [FLog::StudioPublishServiceDependencies] setComponents: called with a mediator
+2026-10-22T06:30:26.677Z,113.677071,1fc4,6,Info [FLog::StudioPublishServiceDependencies] setComponents: not the edit data model, nothing to do
+2026-10-22T06:30:26.705Z,113.705856,1fc4,6,Info [FLog::RobloxViewStudioManager] Skipping creating RobloxViewStudioManager for server DM as this is an MDI test session
+2026-10-22T06:30:26.712Z,113.712807,4190,6 [telemetryLog] Sending 'OpenPlacePerStateTelemetry' to 'Event Ingest,Points'
+2026-10-22T06:30:26.713Z,113.713799,4190,6 [telemetryLog] Intro message: PlaceSession PerState Telemetry Summary
+2026-10-22T06:30:26.713Z,113.713799,4190,6 [telemetryLog] 'OpenPlacePerStateTelemetry' fields logging starts.
+2026-10-22T06:30:26.713Z,113.713799,4190,6 [telemetryLog] cpuIs64Bit: 1
+2026-10-22T06:30:26.713Z,113.713799,4190,6 [telemetryLog] TotalTimeInMs: 110
+2026-10-22T06:30:26.713Z,113.713799,4190,6 [telemetryLog] placeid: 0
+2026-10-22T06:30:26.713Z,113.713799,4190,6 [telemetryLog] placeid_fromcontext: 0
+2026-10-22T06:30:26.713Z,113.713799,4190,6 [telemetryLog] cpuCoreCount: 4
+2026-10-22T06:30:26.713Z,113.713799,4190,6 [telemetryLog] cpuMaxFreq: 2289
+2026-10-22T06:30:26.713Z,113.713799,4190,6 [telemetryLog] cpuMinFreq: 0
+2026-10-22T06:30:26.713Z,113.713799,4190,6 [telemetryLog] ramTotalMb: 7418
+2026-10-22T06:30:26.713Z,113.713799,4190,6 [telemetryLog] ramAvailableMb: 485
+2026-10-22T06:30:26.713Z,113.713799,4190,6 [telemetryLog] TaskCount: 2
+2026-10-22T06:30:26.713Z,113.713799,4190,6 [telemetryLog] osversion: 148.10.0.26200
+2026-10-22T06:30:26.713Z,113.713799,4190,6 [telemetryLog] osname: Win64
+2026-10-22T06:30:26.713Z,113.713799,4190,6 [telemetryLog] universeid: 0
+2026-10-22T06:30:26.713Z,113.713799,4190,6 [telemetryLog] cpuSupportedAdvancedVectorExtensions: SSE,AVX,AVX2,SSE41
+2026-10-22T06:30:26.713Z,113.713799,4190,6 [telemetryLog] studioSid: 3BEF4A67-C178-4F5A-AC03-439952EE1A86
+2026-10-22T06:30:26.713Z,113.713799,4190,6 [telemetryLog] clientId: F61C3661-1AF8-4E3D-B2D3-23EDD7E58605
+2026-10-22T06:30:26.713Z,113.713799,4190,6 [telemetryLog] launchIntent: None
+2026-10-22T06:30:26.713Z,113.713799,4190,6 [telemetryLog] PerStateTraceId: 36EBBBB5-5E50-49E4-AFD1-F3A84C4950C6
+2026-10-22T06:30:26.713Z,113.713799,4190,6 [telemetryLog] State: PlaySoloEnterDataModelScopeServer
+2026-10-22T06:30:26.713Z,113.713799,4190,6 [telemetryLog] PlaceSessionId: 5B190BDC-7F66-4BA7-BFBB-D3F199B7624C-C:/Users/natha/claude-xfer/Windowsill-save-adapter-e501-native-review/Windowsill-adapter-review.rbxlx
+2026-10-22T06:30:26.713Z,113.713799,4190,6 [telemetryLog] TaskNames: AssetDataModelPluginLoaderWaiting - Server data model ready;PlaySoloEnterDataModelScopeServer;
+2026-10-22T06:30:26.713Z,113.713799,4190,6 [telemetryLog] StudioStreamingEnabled: false
+2026-10-22T06:30:26.713Z,113.713799,4190,6 [telemetryLog] AllSuccess: true
+2026-10-22T06:30:26.713Z,113.713799,4190,6 [telemetryLog] 'OpenPlacePerStateTelemetry' fields logging ends.
+2026-10-22T06:30:27.743Z,114.743752,0598,6,Warning [FLog::CreatorWarning] Warning: [Windowsill] saves: no DataStore service (You must publish this place to the web to access DataStore.); saving stays in memory for this server
+2026-10-22T06:30:27.743Z,114.743752,0598,6,Info [FLog::CreatorOutput] [Windowsill] saves: store WindowsillTest_v1 (memory)
+2026-10-22T06:30:27.777Z,114.777000,0598,6,Info [FLog::CreatorOutput] [Windowsill] world: The Preserve (preserve)
+2026-10-22T06:30:27.783Z,114.783043,0598,6,Info [FLog::CreatorOutput] [Windowsill] sun: through the window, clock 10, latitude -40.7
+2026-10-22T06:30:27.976Z,114.976814,0598,6,Info [FLog::CreatorOutput] [CHET_ADAPTER_NATIVE_READY] e50104232f063255
+2026-10-22T06:30:28.031Z,115.031532,7100,6 [telemetryLog] Sending 'OpenPlaceDataModelTaskTelemetry' to 'Event Ingest,Points'
+2026-10-22T06:30:28.031Z,115.031532,4190,6,Info [DFLog::StudioPerformanceMeasurementsSummary] StudioPerformanceMeasurements summary for StudioStartPlaySolo: 3048ms
+2026-10-22T06:30:28.031Z,115.031532,7100,6 [telemetryLog] Intro message: DataModel Task Telemetry Summary
+2026-10-22T06:30:28.031Z,115.031532,7100,6 [telemetryLog] 'OpenPlaceDataModelTaskTelemetry' fields logging starts.
+2026-10-22T06:30:28.031Z,115.031532,7100,6 [telemetryLog] cpuIs64Bit: 1
+2026-10-22T06:30:28.031Z,115.031532,7100,6 [telemetryLog] placeid: 0
+2026-10-22T06:30:28.031Z,115.031532,7100,6 [telemetryLog] placeid_fromcontext: 0
+2026-10-22T06:30:28.031Z,115.031532,7100,6 [telemetryLog] cpuCoreCount: 4
+2026-10-22T06:30:28.031Z,115.031532,7100,6 [telemetryLog] cpuMaxFreq: 2289
+2026-10-22T06:30:28.031Z,115.031532,7100,6 [telemetryLog] cpuMinFreq: 0
+2026-10-22T06:30:28.031Z,115.031532,7100,6 [telemetryLog] ramTotalMb: 7418
+2026-10-22T06:30:28.031Z,115.031532,7100,6 [telemetryLog] ramAvailableMb: 498
+2026-10-22T06:30:28.031Z,115.031532,4190,6,Info [FLog::WaypointTelemetry] PSMServerRanCB (waypoint #5, session #1): 1431.1585999999893 ms since last waypoint, 3048.4353999999885 ms since start
+2026-10-22T06:30:28.031Z,115.031532,7100,6 [telemetryLog] osversion: 148.10.0.26200
+2026-10-22T06:30:28.032Z,115.032524,0b38,6 [telemetryLog] osname: Win64
+2026-10-22T06:30:28.032Z,115.032524,0b38,6 [telemetryLog] universeid: 0
+2026-10-22T06:30:28.032Z,115.032524,0b38,6 [telemetryLog] cpuSupportedAdvancedVectorExtensions: SSE,AVX,AVX2,SSE41
+2026-10-22T06:30:28.032Z,115.032524,0b38,6 [telemetryLog] studioSid: 3BEF4A67-C178-4F5A-AC03-439952EE1A86
+2026-10-22T06:30:28.032Z,115.032524,0b38,6 [telemetryLog] clientId: F61C3661-1AF8-4E3D-B2D3-23EDD7E58605
+2026-10-22T06:30:28.032Z,115.032524,0b38,6 [telemetryLog] launchIntent: None
+2026-10-22T06:30:28.032Z,115.032524,0b38,6 [telemetryLog] DmId: 5B190BDC-7F66-4BA7-BFBB-D3F199B7624C-C:/Users/natha/claude-xfer/Windowsill-save-adapter-e501-native-review/Windowsill-adapter-review.rbxlx-StudioGameStateType_PlayServer
+2026-10-22T06:30:28.032Z,115.032524,0b38,6 [telemetryLog] DmTaskPhase: PostRunServer
+2026-10-22T06:30:28.032Z,115.032524,0b38,6 [telemetryLog] PlaceSessionId: 5B190BDC-7F66-4BA7-BFBB-D3F199B7624C-C:/Users/natha/claude-xfer/Windowsill-save-adapter-e501-native-review/Windowsill-adapter-review.rbxlx
+2026-10-22T06:30:28.032Z,115.032524,0b38,6 [telemetryLog] PerStateTraceId: 8E22E29F-6971-4BD2-9BA6-C86EDC178E15
+2026-10-22T06:30:28.032Z,115.032524,0b38,6 [telemetryLog] AllDmTasksSuccess: true
+2026-10-22T06:30:28.032Z,115.032524,0b38,6 [telemetryLog] 'OpenPlaceDataModelTaskTelemetry' fields logging ends.
+2026-10-22T06:30:28.052Z,115.052391,8890,6 [telemetryLog] Sending 'OpenPlaceDataModelTaskTelemetry' to 'Event Ingest,Points'
+2026-10-22T06:30:28.052Z,115.052391,8890,6 [telemetryLog] Intro message: DataModel Task Telemetry Summary
+2026-10-22T06:30:28.052Z,115.052391,8890,6 [telemetryLog] 'OpenPlaceDataModelTaskTelemetry' fields logging starts.
+2026-10-22T06:30:28.052Z,115.052391,8890,6 [telemetryLog] cpuIs64Bit: 1
+2026-10-22T06:30:28.052Z,115.052391,8890,6 [telemetryLog] ParallelDmTaskTotalTimeMs: 20
+2026-10-22T06:30:28.052Z,115.052391,8890,6 [telemetryLog] placeid: 0
+2026-10-22T06:30:28.052Z,115.052391,8890,6 [telemetryLog] placeid_fromcontext: 0
+2026-10-22T06:30:28.052Z,115.052391,8890,6 [telemetryLog] cpuCoreCount: 4
+2026-10-22T06:30:28.052Z,115.052391,8890,6 [telemetryLog] cpuMaxFreq: 2289
+2026-10-22T06:30:28.052Z,115.052391,8890,6 [telemetryLog] cpuMinFreq: 0
+2026-10-22T06:30:28.052Z,115.052391,8890,6 [telemetryLog] ramTotalMb: 7418
+2026-10-22T06:30:28.052Z,115.052391,8890,6 [telemetryLog] ramAvailableMb: 503
+2026-10-22T06:30:28.052Z,115.052391,8890,6 [telemetryLog] ParallelDmTaskCount: 6
+2026-10-22T06:30:28.052Z,115.052391,8890,6 [telemetryLog] osversion: 148.10.0.26200
+2026-10-22T06:30:28.052Z,115.052391,8890,6 [telemetryLog] osname: Win64
+2026-10-22T06:30:28.052Z,115.052391,8890,6 [telemetryLog] universeid: 0
+2026-10-22T06:30:28.052Z,115.052391,8890,6 [telemetryLog] cpuSupportedAdvancedVectorExtensions: SSE,AVX,AVX2,SSE41
+2026-10-22T06:30:28.052Z,115.052391,8890,6 [telemetryLog] studioSid: 3BEF4A67-C178-4F5A-AC03-439952EE1A86
+2026-10-22T06:30:28.052Z,115.052391,8890,6 [telemetryLog] clientId: F61C3661-1AF8-4E3D-B2D3-23EDD7E58605
+2026-10-22T06:30:28.052Z,115.052391,8890,6 [telemetryLog] launchIntent: None
+2026-10-22T06:30:28.052Z,115.052391,8890,6 [telemetryLog] DmId: 5B190BDC-7F66-4BA7-BFBB-D3F199B7624C-C:/Users/natha/claude-xfer/Windowsill-save-adapter-e501-native-review/Windowsill-adapter-review.rbxlx-StudioGameStateType_PlayClient
+2026-10-22T06:30:28.052Z,115.052391,8890,6 [telemetryLog] DmTaskPhase: PreLoading
+2026-10-22T06:30:28.052Z,115.052391,8890,6 [telemetryLog] ParallelDmTaskNames: WaitForUserSettingsReady;RegisterCommandDataBridge;RemoteSystemOutputTaskRegister;PlaceSessionMainViewManager-DM-PreLoading;PlaySolo-GameShutdownConnection;StudioTestServiceDMBridgeForClient;
+2026-10-22T06:30:28.052Z,115.052391,8890,6 [telemetryLog] PlaceSessionId: 5B190BDC-7F66-4BA7-BFBB-D3F199B7624C-C:/Users/natha/claude-xfer/Windowsill-save-adapter-e501-native-review/Windowsill-adapter-review.rbxlx
+2026-10-22T06:30:28.052Z,115.052391,8890,6 [telemetryLog] PerStateTraceId: 8E22E29F-6971-4BD2-9BA6-C86EDC178E15
+2026-10-22T06:30:28.052Z,115.052391,8890,6 [telemetryLog] AllDmTasksSuccess: true
+2026-10-22T06:30:28.052Z,115.052391,8890,6 [telemetryLog] 'OpenPlaceDataModelTaskTelemetry' fields logging ends.
+2026-10-22T06:30:28.056Z,115.056442,4190,10 [DFLog::KeyRing] Config is invalid json, can only use old config
+2026-10-22T06:30:28.058Z,115.058464,4190,6,Warning [FLog::CloseDataModel] Setting DataCenter ID 0
+2026-10-22T06:30:28.058Z,115.058464,4190,6,Warning [FLog::CloseDataModel] Setting place ID 0
+2026-10-22T06:30:28.097Z,115.097969,4190,6 [FLog::Output] ! Joining game '00000000-0000-0000-0000-000000000000' place 0 at localhost
+2026-10-22T06:30:28.099Z,115.099991,4190,6,Info [FLog::SessionL2ValidationHelper] onSessionChange sc_count 2 sh_count 5 cur_l2ts 0 elapsed_l2b 0
+2026-10-22T06:30:28.107Z,115.107079,4190,6,Info [FLog::SessionL2ValidationHelper] onSessionChange sc_count 3 sh_count 5 cur_l2ts 0 elapsed_l2b 0
+2026-10-22T06:30:28.117Z,115.117210,4190,6,Warning [FLog::AppMemUsageStatus] 2492914692.1044687361
+2026-10-22T06:30:28.123Z,115.123283,4190,6,Info [DFLog::NetworkClient] Transport selection: useRbxTransportEnabled=true, rbxTransportHasValidPort=true, rbxTransportHasValidAddress=true, rbxTransportHasValidPubKey=true, canUseRbxTransport=true, selectedTransport=RbxTransport, rccPort=60778, DatacenterId=0
+2026-10-22T06:30:28.123Z,115.123283,4190,7 [FLog::Network] Server Address = 127.0.0.1, Port = 60778
+2026-10-22T06:30:28.123Z,115.123283,4190,6,Warning [DFLog::NetworkEmulationUpdater] Using network emulation config from CoreNetworkSettings
+2026-10-22T06:30:28.123Z,115.123283,4190,6,Info [DFLog::RbxTransportRnaExp] Creating connection to 127.0.0.1:60778
+2026-10-22T06:30:28.131Z,115.131386,6970,6,Warning [DFLog::NetworkEmulationUdpSocket] NetworkEmulationUdpSocket updated configuration: sendDropRate 0.00% recvDropRate 0.00% sendLatency 0 sendJitter 0 recvLatency 0 recvJitter 0
+2026-10-22T06:30:28.131Z,115.131386,4190,6 [DFLog::RbxTransportIntegration] Opening channels for new Connection!
+2026-10-22T06:30:28.145Z,115.145271,6970,6,Info [DFLog::RbxTransportRnaExpConnection] 127.0.0.1:60778. Handshake complete. scid=905eb5b5327fa29da6c4363023b70ed09ec6a892, dcid=6eee009e4f5fe8854b1404938f5c2a9701000000
+2026-10-22T06:30:28.154Z,115.154274,6970,6,Info [DFLog::RbxTransportRnaExpListener] onAcceptedConnection: pendingConns=1 claimedConns=0
+2026-10-22T06:30:28.155Z,115.155273,6970,6,Info [DFLog::RbxTransportRnaExp] SharedConnectionRegistry::add: aliveConns=1 entries=1
+2026-10-22T06:30:28.160Z,115.160271,0b38,6,Info [DFLog::RbxTransportRnaExp] Creating connection to 127.0.0.1:60778
+2026-10-22T06:30:28.161Z,115.161270,0b38,6,Info [DFLog::RbxTransportDummyServer] New connection accepted
+2026-10-22T06:30:28.161Z,115.161270,0b38,6,Info [DFLog::RbxTransportDummyServer] New connection added to server
+2026-10-22T06:30:28.161Z,115.161270,0b38,6,Info [DFLog::RbxTransportDummyServer] Connection opened with client
+2026-10-22T06:30:28.164Z,115.164276,4190,6,Info [DFLog::RbxTransportDummyClient] Connected to server at 127.0.0.1:60778
+2026-10-22T06:30:28.164Z,115.164276,4190,6,Info [DFLog::RbxTransportDummyClient] Started ping thread (interval: 1000 ms, payload: 64 bytes)
+2026-10-22T06:30:28.165Z,115.165276,4190,6,Info [DFLog::RbxTransportDummyClient] Started time sync thread (interval: 5000 ms, fast retry interval: 200 ms, max fast retries: 10)
+2026-10-22T06:30:28.383Z,115.383354,7100,6,Info [DFLog::NetworkClient] Connection accepted from 127.0.0.1|60778
+2026-10-22T06:30:28.383Z,115.383354,7de8,7 [FLog::Network] NetworkServer:NewIncomingConnection
+2026-10-22T06:30:28.383Z,115.383354,7de8,6 [FLog::Output] New connection from 127.0.0.1|60779
+2026-10-22T06:30:28.383Z,115.383354,7de8,7 [FLog::Network] assigning peer id = 5
+2026-10-22T06:30:28.383Z,115.383354,7de8,6 [DFLog::RbxTransportIntegration] Opening channels for new Connection!
+2026-10-22T06:30:28.392Z,115.392365,8890,7 [FLog::Network] Replicator created for player 127.0.0.1|60779
+2026-10-22T06:30:28.393Z,115.393364,8890,7 [FLog::Network] Replicator created: 000001E7DD32B2D0
+2026-10-22T06:30:28.402Z,115.402374,7100,7 [FLog::Network] serverId: 127.0.0.1|60778
+2026-10-22T06:30:28.402Z,115.402374,7100,7 [FLog::Network] Replicator created for player 127.0.0.1|60778
+2026-10-22T06:30:28.402Z,115.402374,7100,7 [FLog::Network] Replicator created: 000001E73A637DD0
+2026-10-22T06:30:28.418Z,115.418388,7100,6,Warning [FLog::AppMemUsageStatus] 3748799858.1044687361
+2026-10-22T06:30:28.419Z,115.419388,8890,7 [FLog::Network] ServerReplicator: Start sending join for peer: 5
+2026-10-22T06:30:28.419Z,115.419388,8890,7 [FLog::Network] Sending peer id = 5
+2026-10-22T06:30:28.421Z,115.421394,8890,7 [FLog::Network] Serializing Instances and preparing blobs for JoinDataItemV2
+2026-10-22T06:30:28.441Z,115.441414,8890,6 [FLog::Output] Player 11810098626 added, there are now 1 players total
+2026-10-22T06:30:28.451Z,115.451080,8890,6,Warning [FLog::CreatorWarning] Warning: [Windowsill] saves: [save 11810098626] session-only: no_api
+2026-10-22T06:30:28.461Z,115.461952,8890,7 [FLog::Network] ServerReplicator:InstallRemotePlayer - LoadCharacter
+2026-10-22T06:30:28.462Z,115.462944,8890,7 [FLog::Network] Replicator:SendMarker id(1)
+2026-10-22T06:30:28.485Z,115.485680,9264,12 [DFLog::HttpTraceError] HttpResponse(#181 0x1e7070807f8) time:37.6ms (net:36.6ms timeInRetryQueue:0.0ms)status:403 Forbidden bodySize:86 url:{ "https://apis.roblox.com/user-profile-api/v1/user/profiles/rcc/settings?userId=11810098626" } ip:128.116.48.3 external:0 numberOfTimesRetried:0
+2026-10-22T06:30:28.530Z,115.530174,0b38,7 [FLog::Network] Time taken to initialize schema = 16.259199 ms
+2026-10-22T06:30:28.538Z,115.538086,0b38,7 [FLog::Network] Assigned peer id = 5
+2026-10-22T06:30:28.547Z,115.547234,0b38,6,Info [FLog::TestServiceLog] [onServiceProvider] DebugUTPLauncherWebSocketUri='' wsOptIn=0
+2026-10-22T06:30:28.552Z,115.552284,0b38,6,Info [FLog::TestServiceLog] [onServiceProvider] this=0x1e7b78414d0 dm=0x1e7b16b9cd0 wsOptIn=0 isStudio=1 isServer=0 isPlayClient=1 isNonNetworkEdit=0
+2026-10-22T06:30:28.559Z,115.559349,0b38,7 [FLog::Network] Join snapshot timer: 15.481100
+2026-10-22T06:30:28.579Z,115.579552,3bc0,6 [FLog::DataModelPatchConfigurer] OTAPollingEnabled set to: false
+2026-10-22T06:30:28.595Z,115.595718,0b38,7 [FLog::Network] Replicator:ReadMarker id(1)
+2026-10-22T06:30:28.602Z,115.602783,3eec,12 [DFLog::HttpTraceError] HttpResponse(#183 0x1e724fa31f8) time:145.6ms (net:145.5ms timeInRetryQueue:0.0ms)status:403  bodySize:86 url:{ "https://apis.roblox.com/universe-chat-api/v1/universe-chat-settings?userId=11810098626&universeId=0&rccInstanceId=" } ip:128.116.48.3 external:0 numberOfTimesRetried:0
+2026-10-22T06:30:28.616Z,115.616928,9264,12 [DFLog::HttpTraceError] HttpResponse(#184 0x1e724fa00f8) time:159.8ms (net:157.0ms timeInRetryQueue:0.0ms)status:403  bodySize:86 url:{ "https://apis.roblox.com/universe-chat-api/v1/universe-chat-settings?userId=11810098626&universeId=0&rccInstanceId=" } ip:128.116.48.3 external:0 numberOfTimesRetried:0
+2026-10-22T06:30:28.616Z,115.616928,6710,12 [DFLog::HttpTraceError] HttpResponse(#185 0x1e724fad2f8) time:159.2ms (net:157.0ms timeInRetryQueue:0.0ms)status:403 Forbidden bodySize:86 url:{ "https://apis.roblox.com/user-blocking-api/v1/users/rcc/get-user-blocking-data" } ip:128.116.48.3 external:0 numberOfTimesRetried:0
+2026-10-22T06:30:28.618Z,115.618950,6710,6,Error [DFLog::SocialCounterpartyManager] User blocking API error: HttpError
+2026-10-22T06:30:28.756Z,115.756912,3eec,12 [DFLog::HttpTraceError] HttpResponse(#186 0x1e724fab6f8) time:296.4ms (net:295.5ms timeInRetryQueue:0.0ms)status:403 Forbidden bodySize:86 url:{ "https://apis.roblox.com/access-management/v2/rcc-user-feature-evaluation" } ip:128.116.48.3 external:0 numberOfTimesRetried:0
+2026-10-22T06:30:28.756Z,115.756912,3eec,6,Error [DFLog::SocialAmpFeatureEvaluationManager] AMP feature evaluation error: HttpError
+2026-10-22T06:30:28.757Z,115.757919,6710,12 [DFLog::HttpTraceError] HttpResponse(#187 0x1e70ebc77f8) time:296.6ms (net:295.7ms timeInRetryQueue:0.0ms)status:403 Forbidden bodySize:86 url:{ "https://apis.roblox.com/access-management/v2/rcc-user-feature-evaluation" } ip:128.116.48.3 external:0 numberOfTimesRetried:0
+2026-10-22T06:30:28.757Z,115.757919,6710,6,Error [DFLog::SocialAmpFeatureEvaluationManager] AMP feature evaluation error: HttpError
+2026-10-22T06:30:28.856Z,115.856689,9264,12 [DFLog::HttpTraceError] HttpResponse(#182 0x1e724fa15f8) time:404.4ms (net:404.2ms timeInRetryQueue:0.0ms)status:403 Forbidden bodySize:86 url:{ "https://apis.roblox.com/access-management/v1/rcc-user-feature-access?featureNames=CanUseInExperienceChat&userId=11810098626&nameSpace=user_comm_safety/UserBehavior&extraParameters=W3sibmFtZSI6InJlYWRGcmVzaERhdGEiLCJ0eXBlIjoiQm9vbGVhbiIsInZhbHVlIjpmYWxzZX1d" } ip:128.116.48.3 external:0 numberOfTimesRetried:0
+2026-10-22T06:30:29.273Z,116.273674,8890,6 [FLog::Output] Server RobloxGitHash: b06ed5a2056729e5e96702c5885f912373dc2307
+2026-10-22T06:30:29.274Z,116.274666,8890,6 [FLog::Output] Server Prefix: 0.744.0.7441077_20261022T062833Z_Studio_47B12
+2026-10-22T06:30:29.274Z,116.274666,8890,6,Info [FLog::SessionL2ValidationHelper] onSessionChange sc_count 4 sh_count 5 cur_l2ts 1.1675844139535911 elapsed_l2b 1.1675844139535911
+2026-10-22T06:30:29.364Z,116.364792,7de8,6,Info [FLog::WaypointTelemetry] PSMClientLoadingFinished (waypoint #6, session #1): 1332.064299999999 ms since last waypoint, 4380.499699999988 ms since start
+2026-10-22T06:30:29.364Z,116.364792,8890,6 [telemetryLog] Sending 'OpenPlaceDataModelTaskTelemetry' to 'Event Ingest,Points'
+2026-10-22T06:30:29.364Z,116.364792,8890,6 [telemetryLog] Intro message: DataModel Task Telemetry Summary
+2026-10-22T06:30:29.364Z,116.364792,8890,6 [telemetryLog] 'OpenPlaceDataModelTaskTelemetry' fields logging starts.
+2026-10-22T06:30:29.364Z,116.364792,8890,6 [telemetryLog] cpuIs64Bit: 1
+2026-10-22T06:30:29.364Z,116.364792,8890,6 [telemetryLog] ParallelDmTaskTotalTimeMs: 90
+2026-10-22T06:30:29.364Z,116.364792,8890,6 [telemetryLog] placeid: 0
+2026-10-22T06:30:29.364Z,116.364792,8890,6 [telemetryLog] placeid_fromcontext: 0
+2026-10-22T06:30:29.364Z,116.364792,8890,6 [telemetryLog] cpuCoreCount: 4
+2026-10-22T06:30:29.364Z,116.364792,8890,6 [telemetryLog] cpuMaxFreq: 2289
+2026-10-22T06:30:29.364Z,116.364792,8890,6 [telemetryLog] cpuMinFreq: 0
+2026-10-22T06:30:29.364Z,116.364792,8890,6 [telemetryLog] ramTotalMb: 7418
+2026-10-22T06:30:29.364Z,116.364792,8890,6 [telemetryLog] ramAvailableMb: 589
+2026-10-22T06:30:29.364Z,116.364792,8890,6 [telemetryLog] ParallelDmTaskCount: 3
+2026-10-22T06:30:29.364Z,116.364792,8890,6 [telemetryLog] osversion: 148.10.0.26200
+2026-10-22T06:30:29.364Z,116.364792,8890,6 [telemetryLog] osname: Win64
+2026-10-22T06:30:29.364Z,116.364792,8890,6 [telemetryLog] universeid: 0
+2026-10-22T06:30:29.364Z,116.364792,8890,6 [telemetryLog] cpuSupportedAdvancedVectorExtensions: SSE,AVX,AVX2,SSE41
+2026-10-22T06:30:29.364Z,116.364792,8890,6 [telemetryLog] studioSid: 3BEF4A67-C178-4F5A-AC03-439952EE1A86
+2026-10-22T06:30:29.364Z,116.364792,8890,6 [telemetryLog] clientId: F61C3661-1AF8-4E3D-B2D3-23EDD7E58605
+2026-10-22T06:30:29.364Z,116.364792,8890,6 [telemetryLog] launchIntent: None
+2026-10-22T06:30:29.364Z,116.364792,8890,6 [telemetryLog] DmId: 5B190BDC-7F66-4BA7-BFBB-D3F199B7624C-C:/Users/natha/claude-xfer/Windowsill-save-adapter-e501-native-review/Windowsill-adapter-review.rbxlx-StudioGameStateType_PlayClient
+2026-10-22T06:30:29.364Z,116.364792,8890,6 [telemetryLog] DmTaskPhase: PostLoading
+2026-10-22T06:30:29.364Z,116.364792,8890,6 [telemetryLog] ParallelDmTaskNames: CaptureDataModelProxyForInstanceCount;DebuggerHostAppServices-onDataModelLoaded;PlayTestKickDialog-DisconnectListener;
+2026-10-22T06:30:29.364Z,116.364792,8890,6 [telemetryLog] PlaceSessionId: 5B190BDC-7F66-4BA7-BFBB-D3F199B7624C-C:/Users/natha/claude-xfer/Windowsill-save-adapter-e501-native-review/Windowsill-adapter-review.rbxlx
+2026-10-22T06:30:29.364Z,116.364792,8890,6 [telemetryLog] PerStateTraceId: 8E22E29F-6971-4BD2-9BA6-C86EDC178E15
+2026-10-22T06:30:29.364Z,116.364792,8890,6 [telemetryLog] AllDmTasksSuccess: true
+2026-10-22T06:30:29.364Z,116.364792,8890,6 [telemetryLog] 'OpenPlaceDataModelTaskTelemetry' fields logging ends.
+2026-10-22T06:30:29.369Z,116.369827,3bc0,6 [telemetryLog] Sending 'OpenPlacePerStateTelemetry' to 'Event Ingest,Points'
+2026-10-22T06:30:29.369Z,116.369827,3bc0,6 [telemetryLog] Intro message: PlaceSession PerState Telemetry Summary
+2026-10-22T06:30:29.369Z,116.369827,3bc0,6 [telemetryLog] 'OpenPlacePerStateTelemetry' fields logging starts.
+2026-10-22T06:30:29.369Z,116.369827,3bc0,6 [telemetryLog] cpuIs64Bit: 1
+2026-10-22T06:30:29.369Z,116.369827,3bc0,6 [telemetryLog] TotalTimeInMs: 2657
+2026-10-22T06:30:29.369Z,116.369827,3bc0,6 [telemetryLog] placeid: 0
+2026-10-22T06:30:29.369Z,116.369827,3bc0,6 [telemetryLog] placeid_fromcontext: 0
+2026-10-22T06:30:29.369Z,116.369827,3bc0,6 [telemetryLog] cpuCoreCount: 4
+2026-10-22T06:30:29.369Z,116.369827,3bc0,6 [telemetryLog] cpuMaxFreq: 2289
+2026-10-22T06:30:29.369Z,116.369827,3bc0,6 [telemetryLog] cpuMinFreq: 0
+2026-10-22T06:30:29.371Z,116.371841,3bc0,6 [telemetryLog] ramTotalMb: 7418
+2026-10-22T06:30:29.371Z,116.371841,3bc0,6 [telemetryLog] ramAvailableMb: 481
+2026-10-22T06:30:29.371Z,116.371841,3bc0,6 [telemetryLog] TaskCount: 2
+2026-10-22T06:30:29.371Z,116.371841,3bc0,6 [telemetryLog] osversion: 148.10.0.26200
+2026-10-22T06:30:29.371Z,116.371841,3bc0,6 [telemetryLog] osname: Win64
+2026-10-22T06:30:29.371Z,116.371841,3bc0,6 [telemetryLog] universeid: 0
+2026-10-22T06:30:29.371Z,116.371841,3bc0,6 [telemetryLog] cpuSupportedAdvancedVectorExtensions: SSE,AVX,AVX2,SSE41
+2026-10-22T06:30:29.371Z,116.371841,3bc0,6 [telemetryLog] studioSid: 3BEF4A67-C178-4F5A-AC03-439952EE1A86
+2026-10-22T06:30:29.371Z,116.371841,3bc0,6 [telemetryLog] clientId: F61C3661-1AF8-4E3D-B2D3-23EDD7E58605
+2026-10-22T06:30:29.371Z,116.371841,3bc0,6 [telemetryLog] launchIntent: None
+2026-10-22T06:30:29.371Z,116.371841,3bc0,6 [telemetryLog] PerStateTraceId: 8E22E29F-6971-4BD2-9BA6-C86EDC178E15
+2026-10-22T06:30:29.371Z,116.371841,3bc0,6 [telemetryLog] State: PlaySoloRunServerAndLoadClient
+2026-10-22T06:30:29.371Z,116.371841,3bc0,6 [telemetryLog] PlaceSessionId: 5B190BDC-7F66-4BA7-BFBB-D3F199B7624C-C:/Users/natha/claude-xfer/Windowsill-save-adapter-e501-native-review/Windowsill-adapter-review.rbxlx
+2026-10-22T06:30:29.371Z,116.371841,3bc0,6 [telemetryLog] TaskNames: PlaySoloRunServer;PlaySoloLoadClient;
+2026-10-22T06:30:29.371Z,116.371841,3bc0,6 [telemetryLog] StudioStreamingEnabled: false
+2026-10-22T06:30:29.371Z,116.371841,3bc0,6 [telemetryLog] AllSuccess: true
+2026-10-22T06:30:29.371Z,116.371841,3bc0,6 [telemetryLog] 'OpenPlacePerStateTelemetry' fields logging ends.
+2026-10-22T06:30:29.386Z,116.386955,6edc,6,Info [FLog::AssetAccessDataModelObserver] Connected to ContentProvider assetFetchFailedNoExperienceAccess signal
+2026-10-22T06:30:29.400Z,116.400047,7de8,6,Info [FLog::PluginLoadingEnhanced] sabuiltin_AssetManager.rbxm, sabuiltin_DeviceSimulatorToolbar.rbxm, sabuiltin_AnimationGraphEditor.rbxm, sabuiltin_ActivityFeed.rbxm, sabuiltin_AssetAccess.rbxm, sabuiltin_AssetExport.rbxm, sabuiltin_AssetQualityValidation.rbxm, sabuiltin_Assistant.rbxm, sabuiltin_AttenuationCurveEditor.rbxm, sabuiltin_AudioActions.rbxm, sabuiltin_AudioActivityMonitor.rbxm, sabuiltin_AudioCompressorEditor.rbxm, sabuiltin_AudioEqualizerEditor.rbxm, sabuiltin_AudioPlayerEditor.rbxm, sabuiltin_AudioViewportVisualizations.rbxm, sabuiltin_AvatarSettings.rbxm, sabuiltin_CancellableDialog.rbxm, sabuiltin_CollectionDebugger.rbxm, sabuiltin_CollisionGroupsEditor.rbxm, sabuiltin_ConnectionIndicator.rbxm, sabuiltin_ControlsEmulator.rbxm, sabuiltin_CreatorConfig.rbxm, sabuiltin_Debugger.rbxm, sabuiltin_Dialog.rbxm, sabuiltin_DirectionalCurveEditor.rbxm, sabuiltin_ExplorerPlugin.rbxm, sabuiltin_FindReplaceAll.rbxm, sabuiltin_FlagEditor.rbxm, sabuiltin_Footer.r
+2026-10-22T06:30:29.403Z,116.403069,1fc4,6,Info [FLog::StudioPublishServiceDependencies] setComponents: called with a mediator
+2026-10-22T06:30:29.403Z,116.403069,1fc4,6,Info [FLog::StudioPublishServiceDependencies] setComponents: not the edit data model, nothing to do
+2026-10-22T06:30:29.413Z,116.413139,1fc4,6,Info [FLog::RobloxViewStudioManager] Client's RobloxViewStudioManager will ignore changing to Server as this is an MDI test session
+2026-10-22T06:30:29.413Z,116.413139,1fc4,6,Info [FLog::RobloxViewStudioManager] Setting up view for DM with ID 4 type PlayClient
+2026-10-22T06:30:29.413Z,116.413139,1fc4,6 [FLog::Output] Info: 		RobloxViewStudio::RobloxViewStudio - start
+2026-10-22T06:30:29.413Z,116.413139,1fc4,6 [FLog::Output] Info: 			Marshaller
+2026-10-22T06:30:29.413Z,116.413139,1fc4,6 [FLog::Output] Info: 			BindToWorkspace
+2026-10-22T06:30:29.414Z,116.414146,1fc4,6 [FLog::Output] Info: 		RobloxView::RobloxView - end
+2026-10-22T06:30:29.414Z,116.414146,1fc4,6,Info [FLog::RenderSchedulerState] Setting asset DataModel PlayClient
+2026-10-22T06:30:29.414Z,116.414146,1fc4,6,Info [FLog::RenderSchedulerState] syncDataModels setting to asset
+2026-10-22T06:30:29.414Z,116.414146,1fc4,6,Info [FLog::RenderSchedulerState] Tearing down for DataModel Standalone with fallback nullptr
+2026-10-22T06:30:29.414Z,116.414146,1fc4,6,Info [FLog::RenderSchedulerState] Change RenderJobMode TaskScheduler -> None
+2026-10-22T06:30:29.414Z,116.414146,1fc4,6,Warning [FLog::Graphics] TM2: maxCloudAssetDimension: 4096
+2026-10-22T06:30:29.419Z,116.419182,1fc4,6,Info [FLog::RenderSchedulerState] Setting up for DataModel PlayClient with fallback Standalone
+2026-10-22T06:30:29.422Z,116.422203,1fc4,6,Warning [FLog::Graphics] TM2: maxCloudAssetDimension: 4096
+2026-10-22T06:30:29.442Z,116.442345,7de8,6,Info [FLog::PluginFileRead] Hashing Plugin 'user_RojoManagedPlugin.rbxm' took 1.2057 msec
+2026-10-22T06:30:29.442Z,116.442345,7de8,6,Info [FLog::PluginFileRead] Plugin file read 'user_RojoManagedPlugin.rbxm' took 28.2017 msec
+2026-10-22T06:30:29.443Z,116.443596,7de8,6,Info [FLog::PluginLoadingEnhanced] loadPlugin user_RojoManagedPlugin.rbxm took 40.88140000000351 msec [dm=PlayServer otaVersion=-3]
+2026-10-22T06:30:29.504Z,116.504570,7100,6,Info [FLog::PluginFileRead] Hashing Plugin 'builtin_SelectDragger.rbxm' took 0.2857 msec
+2026-10-22T06:30:29.505Z,116.505569,7100,6,Info [FLog::PluginFileRead] Plugin file read 'builtin_SelectDragger.rbxm' took 94.4423 msec
+2026-10-22T06:30:29.506Z,116.506569,7100,6,Info [FLog::PluginLoadingEnhanced] loadPlugin builtin_SelectDragger.rbxm took 104.86209999999119 msec [dm=PlayServer otaVersion=-3]
+2026-10-22T06:30:29.539Z,116.539551,7de8,6,Info [FLog::PluginFileRead] Hashing Plugin 'builtin_ScaleDragger.rbxm' took 0.2601 msec
+2026-10-22T06:30:29.539Z,116.539551,7de8,6,Info [FLog::PluginFileRead] Plugin file read 'builtin_ScaleDragger.rbxm' took 85.9642 msec
+2026-10-22T06:30:29.547Z,116.547348,7de8,6,Info [FLog::PluginLoadingEnhanced] loadPlugin builtin_ScaleDragger.rbxm took 145.68140000000085 msec [dm=PlayServer otaVersion=-3]
+2026-10-22T06:30:29.694Z,116.694992,7de8,6,Info [FLog::PluginFileRead] Hashing Plugin 'builtin_SimulationStep.rbxm' took 0.0182 msec
+2026-10-22T06:30:29.694Z,116.694992,7de8,6,Info [FLog::PluginFileRead] Plugin file read 'builtin_SimulationStep.rbxm' took 281.8530 msec
+2026-10-22T06:30:29.740Z,116.740883,0b38,6,Info [FLog::PluginFileRead] Hashing Plugin 'sabuiltin_SceneAnalysis.rbxm' took 1.4350 msec
+2026-10-22T06:30:29.744Z,116.744255,0b38,6,Info [FLog::PluginFileRead] Plugin file read 'sabuiltin_SceneAnalysis.rbxm' took 331.1184 msec
+2026-10-22T06:30:29.747Z,116.747261,0b38,6,Info [FLog::PluginLoadingEnhanced] loadPlugin sabuiltin_SceneAnalysis.rbxm took 347.16900000000805 msec [dm=PlayServer otaVersion=-3]
+2026-10-22T06:30:29.756Z,116.756271,0598,6,Info [FLog::PluginLoadingEnhanced] loadPlugin builtin_SimulationStep.rbxm took 354.4653000000011 msec [dm=PlayServer otaVersion=-3]
+2026-10-22T06:30:29.783Z,116.783310,6edc,6,Info [FLog::PluginFileRead] Hashing Plugin 'builtin_RotateDragger.rbxm' took 0.3829 msec
+2026-10-22T06:30:29.784Z,116.784309,6edc,6,Info [FLog::PluginFileRead] Plugin file read 'builtin_RotateDragger.rbxm' took 374.1941 msec
+2026-10-22T06:30:29.786Z,116.786316,6edc,6,Info [FLog::PluginLoadingEnhanced] loadPlugin builtin_RotateDragger.rbxm took 384.5303999999885 msec [dm=PlayServer otaVersion=-3]
+2026-10-22T06:30:29.797Z,116.797333,0598,6,Info [FLog::PluginFileRead] Hashing Plugin 'builtin_MoveDragger.rbxm' took 0.2775 msec
+2026-10-22T06:30:29.797Z,116.797333,0598,6,Info [FLog::PluginFileRead] Plugin file read 'builtin_MoveDragger.rbxm' took 245.9909 msec
+2026-10-22T06:30:29.798Z,116.798332,0598,6,Info [FLog::PluginLoadingEnhanced] loadPlugin builtin_MoveDragger.rbxm took 397.1635000000049 msec [dm=PlayServer otaVersion=-3]
+2026-10-22T06:30:29.813Z,116.813354,7de8,6,Info [FLog::PluginFileRead] Hashing Plugin 'sabuiltin_InputActionManager.rbxm' took 1.2555 msec
+2026-10-22T06:30:29.813Z,116.813354,7de8,6,Info [FLog::PluginFileRead] Plugin file read 'sabuiltin_InputActionManager.rbxm' took 109.3803 msec
+2026-10-22T06:30:29.814Z,116.814354,7de8,6,Info [FLog::PluginLoadingEnhanced] loadPlugin sabuiltin_InputActionManager.rbxm took 414.36099999999954 msec [dm=PlayServer otaVersion=-3]
+2026-10-22T06:30:29.875Z,116.875938,4190,6,Info [FLog::PluginFileRead] Hashing Plugin 'sabuiltin_DirectionalCurveEditor.rbxm' took 1.3105 msec
+2026-10-22T06:30:29.877Z,116.877937,4190,6,Info [FLog::PluginFileRead] Plugin file read 'sabuiltin_DirectionalCurveEditor.rbxm' took 396.3600 msec
+2026-10-22T06:30:29.880Z,116.880928,4190,6,Info [FLog::PluginLoadingEnhanced] loadPlugin sabuiltin_DirectionalCurveEditor.rbxm took 480.8840000000032 msec [dm=PlayServer otaVersion=-3]
+2026-10-22T06:30:29.996Z,116.996971,7de8,6,Info [FLog::PluginFileRead] Hashing Plugin 'sabuiltin_Tutorials.rbxm' took 1.0082 msec
+2026-10-22T06:30:29.997Z,116.997971,0598,6,Info [FLog::PluginFileRead] Hashing Plugin 'sabuiltin_AttenuationCurveEditor.rbxm' took 1.3166 msec
+2026-10-22T06:30:29.997Z,116.997971,7de8,6,Info [FLog::PluginFileRead] Plugin file read 'sabuiltin_Tutorials.rbxm' took 585.8388 msec
+2026-10-22T06:30:29.998Z,116.998970,0598,6,Info [FLog::PluginFileRead] Plugin file read 'sabuiltin_AttenuationCurveEditor.rbxm' took 397.7489 msec
+2026-10-22T06:30:29.998Z,116.998970,7100,6,Info [FLog::PluginFileRead] Hashing Plugin 'sabuiltin_Debugger.rbxm' took 0.9079 msec
+2026-10-22T06:30:29.998Z,116.998970,7100,6,Info [FLog::PluginFileRead] Plugin file read 'sabuiltin_Debugger.rbxm' took 388.7700 msec
+2026-10-22T06:30:30.000Z,117.000969,7de8,6,Info [FLog::PluginLoadingEnhanced] loadPlugin sabuiltin_Tutorials.rbxm took 599.5291999999921 msec [dm=PlayServer otaVersion=-3]
+2026-10-22T06:30:30.000Z,117.000969,0598,6,Info [FLog::PluginLoadingEnhanced] loadPlugin sabuiltin_AttenuationCurveEditor.rbxm took 601.1641999999995 msec [dm=PlayServer otaVersion=-3]
+2026-10-22T06:30:30.007Z,117.007965,7100,6,Info [FLog::PluginLoadingEnhanced] loadPlugin sabuiltin_Debugger.rbxm took 609.0763999999922 msec [dm=PlayServer otaVersion=-3]
+2026-10-22T06:30:30.034Z,117.034958,0598,6,Info [FLog::PluginFileRead] Hashing Plugin 'sabuiltin_PerformanceTools.rbxm' took 1.3710 msec
+2026-10-22T06:30:30.034Z,117.034958,0598,6,Info [FLog::PluginFileRead] Plugin file read 'sabuiltin_PerformanceTools.rbxm' took 482.6227 msec
+2026-10-22T06:30:30.037Z,117.037956,0598,6,Info [FLog::PluginLoadingEnhanced] loadPlugin sabuiltin_PerformanceTools.rbxm took 638.2217999999966 msec [dm=PlayServer otaVersion=-3]
+2026-10-22T06:30:30.066Z,117.066322,7de8,6,Info [FLog::PluginFileRead] Hashing Plugin 'sabuiltin_ExplorerPlugin.rbxm' took 1.6520 msec
+2026-10-22T06:30:30.067Z,117.067322,7de8,6,Info [FLog::PluginFileRead] Plugin file read 'sabuiltin_ExplorerPlugin.rbxm' took 550.7591 msec
+2026-10-22T06:30:30.071Z,117.071335,0598,6,Info [FLog::PluginFileRead] Hashing Plugin 'sabuiltin_ControlsEmulator.rbxm' took 1.0502 msec
+2026-10-22T06:30:30.071Z,117.071335,0598,6,Info [FLog::PluginFileRead] Plugin file read 'sabuiltin_ControlsEmulator.rbxm' took 658.1930 msec
+2026-10-22T06:30:30.073Z,117.073341,7de8,6,Info [FLog::PluginLoadingEnhanced] loadPlugin sabuiltin_ExplorerPlugin.rbxm took 673.073500000001 msec [dm=PlayServer otaVersion=-3]
+2026-10-22T06:30:30.076Z,117.076347,0598,6,Info [FLog::PluginLoadingEnhanced] loadPlugin sabuiltin_ControlsEmulator.rbxm took 675.825599999996 msec [dm=PlayServer otaVersion=-3]
+2026-10-22T06:30:30.077Z,117.077347,7100,6,Info [FLog::PluginFileRead] Hashing Plugin 'sabuiltin_AudioEqualizerEditor.rbxm' took 1.0338 msec
+2026-10-22T06:30:30.077Z,117.077347,7100,6,Info [FLog::PluginFileRead] Plugin file read 'sabuiltin_AudioEqualizerEditor.rbxm' took 663.2018 msec
+2026-10-22T06:30:30.079Z,117.079353,7100,6,Info [FLog::PluginLoadingEnhanced] loadPlugin sabuiltin_AudioEqualizerEditor.rbxm took 679.8904999999991 msec [dm=PlayServer otaVersion=-3]
+2026-10-22T06:30:30.085Z,117.085373,4190,6,Info [FLog::PluginFileRead] Hashing Plugin 'sabuiltin_MultitouchEmulator.rbxm' took 1.1101 msec
+2026-10-22T06:30:30.085Z,117.085373,4190,6,Info [FLog::PluginFileRead] Plugin file read 'sabuiltin_MultitouchEmulator.rbxm' took 475.1691 msec
+2026-10-22T06:30:30.088Z,117.088379,4190,6,Info [FLog::PluginLoadingEnhanced] loadPlugin sabuiltin_MultitouchEmulator.rbxm took 688.1020999999947 msec [dm=PlayServer otaVersion=-3]
+2026-10-22T06:30:30.098Z,117.098404,8890,6,Info [FLog::PluginFileRead] Hashing Plugin 'sabuiltin_FindReplaceAll.rbxm' took 1.1358 msec
+2026-10-22T06:30:30.098Z,117.098404,8890,6,Info [FLog::PluginFileRead] Plugin file read 'sabuiltin_FindReplaceAll.rbxm' took 395.4311 msec
+2026-10-22T06:30:30.100Z,117.100410,8890,6,Info [FLog::PluginLoadingEnhanced] loadPlugin sabuiltin_FindReplaceAll.rbxm took 700.6082000000049 msec [dm=PlayServer otaVersion=-3]
+2026-10-22T06:30:30.283Z,117.283333,8890,6,Info [FLog::PluginFileRead] Hashing Plugin 'sabuiltin_Assistant.rbxm' took 2.2234 msec
+2026-10-22T06:30:30.284Z,117.284332,8890,6,Info [FLog::PluginFileRead] Plugin file read 'sabuiltin_Assistant.rbxm' took 530.0620 msec
+2026-10-22T06:30:30.289Z,117.289322,8890,6,Info [FLog::PluginLoadingEnhanced] loadPlugin sabuiltin_Assistant.rbxm took 889.2661000000004 msec [dm=PlayServer otaVersion=-3]
+2026-10-22T06:30:30.290Z,117.290321,4190,6,Info [FLog::PluginLoadingEnhanced] Loading Plugins in 2 total took 891.0558000000037 msec
+2026-10-22T06:30:30.327Z,117.327255,3bc0,6,Info [FLog::PluginLoadingEnhanced] Running plugin user_RojoManagedPlugin.rbxm took 840.3304999999932 msec
+2026-10-22T06:30:30.693Z,117.693527,8890,6,Info [FLog::PluginLoadingEnhanced] Running plugin builtin_SelectDragger.rbxm took 55.2132000000114 msec
+2026-10-22T06:30:30.697Z,117.697578,8890,6,Info [FLog::PluginLoadingEnhanced] Running plugin builtin_ScaleDragger.rbxm took 2.761000000006675 msec
+2026-10-22T06:30:30.705Z,117.705696,8890,6,Info [FLog::PluginLoadingEnhanced] Running plugin sabuiltin_SceneAnalysis.rbxm took 8.76829999999984 msec
+2026-10-22T06:30:30.708Z,117.708740,0b38,6,Info [FLog::PluginLoadingEnhanced] Running plugin builtin_SimulationStep.rbxm took 2.1660000000025548 msec
+2026-10-22T06:30:30.708Z,117.708740,0b38,6,Info [FLog::PluginLoadingEnhanced] Running plugin builtin_RotateDragger.rbxm took 0.7684999999924003 msec
+2026-10-22T06:30:30.711Z,117.711784,0b38,6,Info [FLog::PluginLoadingEnhanced] Running plugin builtin_MoveDragger.rbxm took 1.502300000012724 msec
+2026-10-22T06:30:30.711Z,117.711784,0b38,6,Info [FLog::PluginLoadingEnhanced] Running plugin sabuiltin_InputActionManager.rbxm took 0.5045000000052369 msec
+2026-10-22T06:30:30.715Z,117.715836,0b38,6,Info [FLog::PluginLoadingEnhanced] Running plugin sabuiltin_DirectionalCurveEditor.rbxm took 3.2786000000015747 msec
+2026-10-22T06:30:30.717Z,117.717865,0b38,6,Info [FLog::PluginLoadingEnhanced] Running plugin sabuiltin_Tutorials.rbxm took 2.388899999999694 msec
+2026-10-22T06:30:30.720Z,117.720909,0b38,6,Info [FLog::PluginLoadingEnhanced] Running plugin sabuiltin_AttenuationCurveEditor.rbxm took 2.62949999999762 msec
+2026-10-22T06:30:30.746Z,117.746391,8890,6,Info [FLog::PluginLoadingEnhanced] Running plugin sabuiltin_Debugger.rbxm took 27.428099999994515 msec
+2026-10-22T06:30:30.748Z,117.748367,8890,6,Info [FLog::PluginLoadingEnhanced] Running plugin sabuiltin_PerformanceTools.rbxm took 3.075199999997835 msec
+2026-10-22T06:30:30.958Z,117.958183,4190,6 [FLog::Output] Flag SimCsgEnableNewStudioButtons referenced from Lua isn't defined in C++ code
+2026-10-22T06:30:30.982Z,117.982956,4190,6 [FLog::Output] Flag UnifyModelPackagePublish3 referenced from Lua isn't defined in C++ code
+2026-10-22T06:30:30.987Z,117.987907,4190,6 [FLog::Output] Flag OpenScriptDocOptionsLua referenced from Lua isn't defined in C++ code
+2026-10-22T06:30:31.000Z,118.000793,4190,6,Info [FLog::PluginLoadingEnhanced] Running plugin sabuiltin_ExplorerPlugin.rbxm took 252.30569999999375 msec
+2026-10-22T06:30:31.004Z,118.004753,4190,6,Info [FLog::PluginLoadingEnhanced] Running plugin sabuiltin_ControlsEmulator.rbxm took 3.5472999999939248 msec
+2026-10-22T06:30:31.007Z,118.007729,4190,6,Info [FLog::PluginLoadingEnhanced] Running plugin sabuiltin_AudioEqualizerEditor.rbxm took 2.5452999999941994 msec
+2026-10-22T06:30:31.009Z,118.009712,8890,6,Info [FLog::PluginLoadingEnhanced] Running plugin sabuiltin_MultitouchEmulator.rbxm took 2.3316999999991594 msec
+2026-10-22T06:30:31.012Z,118.012680,8890,6,Info [FLog::PluginLoadingEnhanced] Running plugin sabuiltin_FindReplaceAll.rbxm took 2.375000000000682 msec
+2026-10-22T06:30:31.434Z,118.434166,8890,6,Warning [FLog::StudioCommands] Unable to find component AssistantPermissionsBridge in histogram map.
+2026-10-22T06:30:31.437Z,118.437149,8890,6,Info [FLog::PluginLoadingEnhanced] Running plugin sabuiltin_Assistant.rbxm took 423.8816999999955 msec
+2026-10-22T06:30:31.760Z,118.760826,4190,6,Info [FLog::AssistantApplication] AssistantVersion: 40c2a76
+2026-10-22T06:30:31.969Z,118.969688,1fc4,6,Info [FLog::RenderSchedulerState] Change RenderJobMode None -> TaskScheduler
+2026-10-22T06:30:31.999Z,118.999733,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] No user input within the last 5000 ms. Allowing auto-save through.
+2026-10-22T06:30:31.999Z,118.999733,7de8,6 [telemetryLog] Sending 'OpenPlacePerStateTelemetry' to 'Event Ingest,Points'
+2026-10-22T06:30:32.003Z,119.003738,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] Time since last auto-save attempt of 62 seconds is < user's set auto-save interval of 300 seconds. Not starting auto-save attempt.
+2026-10-22T06:30:32.003Z,119.003738,0b38,6 [telemetryLog] Intro message: PlaceSession PerState Telemetry Summary
+2026-10-22T06:30:32.003Z,119.003738,0b38,6 [telemetryLog] 'OpenPlacePerStateTelemetry' fields logging starts.
+2026-10-22T06:30:32.003Z,119.003738,0b38,6 [telemetryLog] cpuIs64Bit: 1
+2026-10-22T06:30:32.003Z,119.003738,0b38,6 [telemetryLog] TotalTimeInMs: 2628
+2026-10-22T06:30:32.003Z,119.003738,0b38,6 [telemetryLog] placeid: 0
+2026-10-22T06:30:32.003Z,119.003738,0b38,6 [telemetryLog] placeid_fromcontext: 0
+2026-10-22T06:30:32.003Z,119.003738,0b38,6 [telemetryLog] cpuCoreCount: 4
+2026-10-22T06:30:32.003Z,119.003738,0b38,6 [telemetryLog] cpuMaxFreq: 2289
+2026-10-22T06:30:32.003Z,119.003738,0b38,6 [telemetryLog] cpuMinFreq: 0
+2026-10-22T06:30:32.003Z,119.003738,0b38,6 [telemetryLog] ramTotalMb: 7418
+2026-10-22T06:30:32.003Z,119.003738,0b38,6 [telemetryLog] ramAvailableMb: 575
+2026-10-22T06:30:32.003Z,119.003738,0b38,6 [telemetryLog] TaskCount: 2
+2026-10-22T06:30:32.003Z,119.003738,0b38,6 [telemetryLog] osversion: 148.10.0.26200
+2026-10-22T06:30:32.003Z,119.003738,0b38,6 [telemetryLog] osname: Win64
+2026-10-22T06:30:32.003Z,119.003738,0b38,6 [telemetryLog] universeid: 0
+2026-10-22T06:30:32.003Z,119.003738,0b38,6 [telemetryLog] cpuSupportedAdvancedVectorExtensions: SSE,AVX,AVX2,SSE41
+2026-10-22T06:30:32.003Z,119.003738,0b38,6 [telemetryLog] studioSid: 3BEF4A67-C178-4F5A-AC03-439952EE1A86
+2026-10-22T06:30:32.003Z,119.003738,0b38,6 [telemetryLog] clientId: F61C3661-1AF8-4E3D-B2D3-23EDD7E58605
+2026-10-22T06:30:32.003Z,119.003738,0b38,6 [telemetryLog] launchIntent: None
+2026-10-22T06:30:32.003Z,119.003738,0b38,6 [telemetryLog] PerStateTraceId: 18773E2E-1AF6-48DD-9688-1FE235AF754D
+2026-10-22T06:30:32.003Z,119.003738,0b38,6 [telemetryLog] State: PlaySoloEnterDataModelScopeClient
+2026-10-22T06:30:32.003Z,119.003738,0b38,6 [telemetryLog] PlaceSessionId: 5B190BDC-7F66-4BA7-BFBB-D3F199B7624C-C:/Users/natha/claude-xfer/Windowsill-save-adapter-e501-native-review/Windowsill-adapter-review.rbxlx
+2026-10-22T06:30:32.003Z,119.003738,0b38,6 [telemetryLog] TaskNames: AssetDataModelPluginLoaderWaiting - Client data model ready;PlaySoloEnterDataModelScopeClient;
+2026-10-22T06:30:32.003Z,119.003738,0b38,6 [telemetryLog] StudioStreamingEnabled: false
+2026-10-22T06:30:32.003Z,119.003738,0b38,6 [telemetryLog] AllSuccess: true
+2026-10-22T06:30:32.003Z,119.003738,0b38,6 [telemetryLog] 'OpenPlacePerStateTelemetry' fields logging ends.
+2026-10-22T06:30:32.006Z,119.006744,4190,6,Info [FLog::PluginLoadingEnhanced] sabuiltin_AssetManager.rbxm, sabuiltin_DeviceSimulatorToolbar.rbxm, sabuiltin_AnimationGraphEditor.rbxm, sabuiltin_ActivityFeed.rbxm, sabuiltin_AssetAccess.rbxm, sabuiltin_AssetExport.rbxm, sabuiltin_AssetQualityValidation.rbxm, sabuiltin_Assistant.rbxm, sabuiltin_AttenuationCurveEditor.rbxm, sabuiltin_AudioActions.rbxm, sabuiltin_AudioActivityMonitor.rbxm, sabuiltin_AudioCompressorEditor.rbxm, sabuiltin_AudioEqualizerEditor.rbxm, sabuiltin_AudioPlayerEditor.rbxm, sabuiltin_AudioViewportVisualizations.rbxm, sabuiltin_AvatarSettings.rbxm, sabuiltin_CancellableDialog.rbxm, sabuiltin_CollectionDebugger.rbxm, sabuiltin_CollisionGroupsEditor.rbxm, sabuiltin_ConnectionIndicator.rbxm, sabuiltin_ControlsEmulator.rbxm, sabuiltin_CreatorConfig.rbxm, sabuiltin_Debugger.rbxm, sabuiltin_Dialog.rbxm, sabuiltin_DirectionalCurveEditor.rbxm, sabuiltin_ExplorerPlugin.rbxm, sabuiltin_FindReplaceAll.rbxm, sabuiltin_FlagEditor.rbxm, sabuiltin_Footer.r
+2026-10-22T06:30:32.029Z,119.029785,0598,6,Info [FLog::PluginFileRead] Hashing Plugin 'user_RojoManagedPlugin.rbxm' took 0.3472 msec
+2026-10-22T06:30:32.030Z,119.030785,0598,6,Info [FLog::PluginFileRead] Plugin file read 'user_RojoManagedPlugin.rbxm' took 17.0271 msec
+2026-10-22T06:30:32.030Z,119.030785,0598,6,Info [FLog::PluginLoadingEnhanced] loadPlugin user_RojoManagedPlugin.rbxm took 22.95100000000616 msec [dm=PlayClient otaVersion=-3]
+2026-10-22T06:30:32.280Z,119.280670,7100,6,Info [FLog::PluginFileRead] Hashing Plugin 'sabuiltin_InputActionManager.rbxm' took 1.8577 msec
+2026-10-22T06:30:32.280Z,119.280670,7100,6,Info [FLog::PluginFileRead] Plugin file read 'sabuiltin_InputActionManager.rbxm' took 102.7672 msec
+2026-10-22T06:30:32.281Z,119.281677,7100,6,Info [FLog::PluginLoadingEnhanced] loadPlugin sabuiltin_InputActionManager.rbxm took 109.83030000001293 msec [dm=PlayClient otaVersion=-3]
+2026-10-22T06:30:32.283Z,119.283691,1fc4,6,Debug [FLog::DataModelSoundManager] onDataModelBecameCurrent: with shouldMute after considering application state = false
+2026-10-22T06:30:32.305Z,119.305862,1fc4,6,Warning [FLog::StudioPluginRelay] PluginDockWidgetRelay::initializeFromInfo: pserv_user_RojoManagedPlugin.rbxm_Rojo_soundPlayer - Failed Empty
+2026-10-22T06:30:32.318Z,119.318954,1fc4,6 [FLog::StudioTimingLog] ======== Studio Play Testing Times =======
+2026-10-22T06:30:32.320Z,119.320976,1fc4,6 [FLog::StudioTimingLog] LoadPlaySoloDataModelsTime : 7.3067 sec
+2026-10-22T06:30:32.320Z,119.320976,1fc4,6 [FLog::StudioTimingLog] PlaySoloStartTotalTime     : 7.3315 sec
+2026-10-22T06:30:32.325Z,119.325005,1fc4,6,Info [FLog::WaypointTelemetry] PlaySoloLoadingFinishedStartIDEDoc (waypoint #7, session #1): 2958.731700000001 ms since last waypoint, 7339.231399999989 ms since start
+2026-10-22T06:30:32.334Z,119.334076,1fc4,6,Info [FLog::WaypointTelemetry] PlaySoloLoadingFinishedEndIDEDoc (waypoint #8, session #1): 9.188300000005256 ms since last waypoint, 7348.419699999994 ms since start
+2026-10-22T06:30:32.334Z,119.334076,1fc4,6,Info [FLog::PlaceSessionTaskRegister] PlaceStateTransitionStatus reset in PlaySoloSuccess
+2026-10-22T06:30:32.357Z,119.357620,7100,6,Info [FLog::PluginFileRead] Hashing Plugin 'sabuiltin_ControlsEmulator.rbxm' took 1.8933 msec
+2026-10-22T06:30:32.358Z,119.358604,7100,6,Info [FLog::PluginFileRead] Plugin file read 'sabuiltin_ControlsEmulator.rbxm' took 344.8485 msec
+2026-10-22T06:30:32.361Z,119.361557,7100,6,Info [FLog::PluginLoadingEnhanced] loadPlugin sabuiltin_ControlsEmulator.rbxm took 355.3718999999944 msec [dm=PlayClient otaVersion=-3]
+2026-10-22T06:30:32.496Z,119.496056,4190,6 [telemetryLog] Sending 'OpenPlacePerStateTelemetry' to 'Event Ingest,Points'
+2026-10-22T06:30:32.496Z,119.496056,4190,6 [telemetryLog] Intro message: PlaceSession PerState Telemetry Summary
+2026-10-22T06:30:32.496Z,119.496056,4190,6 [telemetryLog] 'OpenPlacePerStateTelemetry' fields logging starts.
+2026-10-22T06:30:32.496Z,119.496056,4190,6 [telemetryLog] cpuIs64Bit: 1
+2026-10-22T06:30:32.496Z,119.496056,4190,6 [telemetryLog] TotalTimeInMs: 498
+2026-10-22T06:30:32.496Z,119.496056,4190,6 [telemetryLog] placeid: 0
+2026-10-22T06:30:32.496Z,119.496056,4190,6 [telemetryLog] placeid_fromcontext: 0
+2026-10-22T06:30:32.496Z,119.496056,4190,6 [telemetryLog] cpuCoreCount: 4
+2026-10-22T06:30:32.496Z,119.496056,4190,6 [telemetryLog] cpuMaxFreq: 2289
+2026-10-22T06:30:32.496Z,119.496056,4190,6 [telemetryLog] cpuMinFreq: 0
+2026-10-22T06:30:32.497Z,119.497055,4190,6 [telemetryLog] ramTotalMb: 7418
+2026-10-22T06:30:32.497Z,119.497055,4190,6 [telemetryLog] ramAvailableMb: 489
+2026-10-22T06:30:32.497Z,119.497055,4190,6 [telemetryLog] TaskCount: 3
+2026-10-22T06:30:32.497Z,119.497055,4190,6 [telemetryLog] osversion: 148.10.0.26200
+2026-10-22T06:30:32.497Z,119.497055,4190,6 [telemetryLog] osname: Win64
+2026-10-22T06:30:32.497Z,119.497055,4190,6 [telemetryLog] universeid: 0
+2026-10-22T06:30:32.497Z,119.497055,4190,6 [telemetryLog] cpuSupportedAdvancedVectorExtensions: SSE,AVX,AVX2,SSE41
+2026-10-22T06:30:32.497Z,119.497055,4190,6 [telemetryLog] studioSid: 3BEF4A67-C178-4F5A-AC03-439952EE1A86
+2026-10-22T06:30:32.497Z,119.497055,4190,6 [telemetryLog] clientId: F61C3661-1AF8-4E3D-B2D3-23EDD7E58605
+2026-10-22T06:30:32.497Z,119.497055,4190,6 [telemetryLog] launchIntent: None
+2026-10-22T06:30:32.497Z,119.497055,4190,6 [telemetryLog] PerStateTraceId: F812276F-EC95-4BDF-864D-A10C7D27BC2A
+2026-10-22T06:30:32.497Z,119.497055,4190,6 [telemetryLog] State: PlaySoloSuccess
+2026-10-22T06:30:32.497Z,119.497055,4190,6 [telemetryLog] PlaceSessionId: 5B190BDC-7F66-4BA7-BFBB-D3F199B7624C-C:/Users/natha/claude-xfer/Windowsill-save-adapter-e501-native-review/Windowsill-adapter-review.rbxlx
+2026-10-22T06:30:32.497Z,119.497055,4190,6 [telemetryLog] TaskNames: PlaySoloManager-PlaySoloSuccess;PlaySoloSuccess;PlaySoloSuccessFromStudioTestService;
+2026-10-22T06:30:32.497Z,119.497055,4190,6 [telemetryLog] StudioStreamingEnabled: false
+2026-10-22T06:30:32.497Z,119.497055,4190,6 [telemetryLog] AllSuccess: true
+2026-10-22T06:30:32.497Z,119.497055,4190,6 [telemetryLog] 'OpenPlacePerStateTelemetry' fields logging ends.
+2026-10-22T06:30:32.498Z,119.498055,4190,6 [telemetryLog] Sending 'OpenPlacePerStateTelemetry' to 'Event Ingest,Points'
+2026-10-22T06:30:32.498Z,119.498055,4190,6 [telemetryLog] Intro message: PlaceSession PerState Telemetry Summary
+2026-10-22T06:30:32.498Z,119.498055,4190,6 [telemetryLog] 'OpenPlacePerStateTelemetry' fields logging starts.
+2026-10-22T06:30:32.498Z,119.498055,4190,6 [telemetryLog] cpuIs64Bit: 1
+2026-10-22T06:30:32.498Z,119.498055,4190,6 [telemetryLog] TotalTimeInMs: 2
+2026-10-22T06:30:32.498Z,119.498055,4190,6 [telemetryLog] placeid: 0
+2026-10-22T06:30:32.498Z,119.498055,4190,6 [telemetryLog] placeid_fromcontext: 0
+2026-10-22T06:30:32.498Z,119.498055,4190,6 [telemetryLog] cpuCoreCount: 4
+2026-10-22T06:30:32.498Z,119.498055,4190,6 [telemetryLog] cpuMaxFreq: 2289
+2026-10-22T06:30:32.498Z,119.498055,4190,6 [telemetryLog] cpuMinFreq: 0
+2026-10-22T06:30:32.498Z,119.498055,4190,6 [telemetryLog] ramTotalMb: 7418
+2026-10-22T06:30:32.498Z,119.498055,4190,6 [telemetryLog] ramAvailableMb: 435
+2026-10-22T06:30:32.498Z,119.498055,4190,6 [telemetryLog] TaskCount: 0
+2026-10-22T06:30:32.498Z,119.498055,4190,6 [telemetryLog] osversion: 148.10.0.26200
+2026-10-22T06:30:32.498Z,119.498055,4190,6 [telemetryLog] osname: Win64
+2026-10-22T06:30:32.498Z,119.498055,4190,6 [telemetryLog] universeid: 0
+2026-10-22T06:30:32.498Z,119.498055,4190,6 [telemetryLog] cpuSupportedAdvancedVectorExtensions: SSE,AVX,AVX2,SSE41
+2026-10-22T06:30:32.498Z,119.498055,4190,6 [telemetryLog] studioSid: 3BEF4A67-C178-4F5A-AC03-439952EE1A86
+2026-10-22T06:30:32.498Z,119.498055,4190,6 [telemetryLog] clientId: F61C3661-1AF8-4E3D-B2D3-23EDD7E58605
+2026-10-22T06:30:32.498Z,119.498055,4190,6 [telemetryLog] launchIntent: None
+2026-10-22T06:30:32.498Z,119.498055,4190,6 [telemetryLog] PerStateTraceId: D779823A-9986-41AC-B637-5B07F68BB869
+2026-10-22T06:30:32.498Z,119.498055,4190,6 [telemetryLog] State: PlaySoloIdle
+2026-10-22T06:30:32.498Z,119.498055,4190,6 [telemetryLog] PlaceSessionId: 5B190BDC-7F66-4BA7-BFBB-D3F199B7624C-C:/Users/natha/claude-xfer/Windowsill-save-adapter-e501-native-review/Windowsill-adapter-review.rbxlx
+2026-10-22T06:30:32.498Z,119.498055,4190,6 [telemetryLog] StudioStreamingEnabled: false
+2026-10-22T06:30:32.498Z,119.498055,4190,6 [telemetryLog] AllSuccess: true
+2026-10-22T06:30:32.498Z,119.498055,4190,6 [telemetryLog] 'OpenPlacePerStateTelemetry' fields logging ends.
+2026-10-22T06:30:32.500Z,119.500061,6edc,6,Info [FLog::PluginFileRead] Hashing Plugin 'builtin_SimulationStep.rbxm' took 0.0127 msec
+2026-10-22T06:30:32.500Z,119.500061,6edc,6,Info [FLog::PluginFileRead] Plugin file read 'builtin_SimulationStep.rbxm' took 28.0345 msec
+2026-10-22T06:30:32.500Z,119.500061,6edc,6,Info [FLog::PluginLoadingEnhanced] loadPlugin builtin_SimulationStep.rbxm took 33.92920000000288 msec [dm=PlayClient otaVersion=-3]
+2026-10-22T06:30:32.532Z,119.532097,3bc0,6,Info [FLog::PluginFileRead] Hashing Plugin 'builtin_ScaleDragger.rbxm' took 0.3193 msec
+2026-10-22T06:30:32.533Z,119.533096,3bc0,6,Info [FLog::PluginFileRead] Plugin file read 'builtin_ScaleDragger.rbxm' took 103.5903 msec
+2026-10-22T06:30:32.534Z,119.534103,3bc0,6,Info [FLog::PluginLoadingEnhanced] loadPlugin builtin_ScaleDragger.rbxm took 107.72679999999468 msec [dm=PlayClient otaVersion=-3]
+2026-10-22T06:30:32.536Z,119.536102,4190,6,Info [FLog::PluginFileRead] Hashing Plugin 'builtin_RotateDragger.rbxm' took 0.2815 msec
+2026-10-22T06:30:32.536Z,119.536102,4190,6,Info [FLog::PluginFileRead] Plugin file read 'builtin_RotateDragger.rbxm' took 193.9697 msec
+2026-10-22T06:30:32.538Z,119.538109,7100,6,Info [FLog::PluginFileRead] Hashing Plugin 'sabuiltin_AttenuationCurveEditor.rbxm' took 1.6292 msec
+2026-10-22T06:30:32.538Z,119.538109,7100,6,Info [FLog::PluginFileRead] Plugin file read 'sabuiltin_AttenuationCurveEditor.rbxm' took 523.3472 msec
+2026-10-22T06:30:32.541Z,119.541107,7100,6,Info [FLog::PluginLoadingEnhanced] loadPlugin sabuiltin_AttenuationCurveEditor.rbxm took 534.4453999999956 msec [dm=PlayClient otaVersion=-3]
+2026-10-22T06:30:32.538Z,119.538109,4190,6,Info [FLog::PluginLoadingEnhanced] loadPlugin builtin_RotateDragger.rbxm took 201.2146999999942 msec [dm=PlayClient otaVersion=-3]
+2026-10-22T06:30:32.629Z,119.629074,7100,6,Info [FLog::PluginFileRead] Hashing Plugin 'builtin_MoveDragger.rbxm' took 0.3158 msec
+2026-10-22T06:30:32.631Z,119.631073,7100,6,Info [FLog::PluginFileRead] Plugin file read 'builtin_MoveDragger.rbxm' took 286.2566 msec
+2026-10-22T06:30:32.633Z,119.633080,7100,6,Info [FLog::PluginLoadingEnhanced] loadPlugin builtin_MoveDragger.rbxm took 296.3019000000031 msec [dm=PlayClient otaVersion=-3]
+2026-10-22T06:30:32.643Z,119.643906,3bc0,6,Info [FLog::PluginFileRead] Hashing Plugin 'sabuiltin_SceneAnalysis.rbxm' took 1.4351 msec
+2026-10-22T06:30:32.645Z,119.645905,3bc0,6,Info [FLog::PluginFileRead] Plugin file read 'sabuiltin_SceneAnalysis.rbxm' took 419.6246 msec
+2026-10-22T06:30:32.648Z,119.648903,3bc0,6,Info [FLog::PluginLoadingEnhanced] loadPlugin sabuiltin_SceneAnalysis.rbxm took 433.5425000000015 msec [dm=PlayClient otaVersion=-3]
+2026-10-22T06:30:32.657Z,119.657890,7100,6,Info [FLog::PluginFileRead] Hashing Plugin 'sabuiltin_MultitouchEmulator.rbxm' took 1.2909 msec
+2026-10-22T06:30:32.658Z,119.658890,7100,6,Info [FLog::PluginFileRead] Plugin file read 'sabuiltin_MultitouchEmulator.rbxm' took 479.9802 msec
+2026-10-22T06:30:32.659Z,119.659889,3bc0,6,Info [FLog::PluginFileRead] Hashing Plugin 'builtin_SelectDragger.rbxm' took 0.3193 msec
+2026-10-22T06:30:32.659Z,119.659889,3bc0,6,Info [FLog::PluginFileRead] Plugin file read 'builtin_SelectDragger.rbxm' took 211.8935 msec
+2026-10-22T06:30:32.660Z,119.660889,3bc0,6,Info [FLog::PluginLoadingEnhanced] loadPlugin builtin_SelectDragger.rbxm took 217.51390000000015 msec [dm=PlayClient otaVersion=-3]
+2026-10-22T06:30:32.660Z,119.660889,7100,6,Info [FLog::PluginLoadingEnhanced] loadPlugin sabuiltin_MultitouchEmulator.rbxm took 489.06870000000424 msec [dm=PlayClient otaVersion=-3]
+2026-10-22T06:30:32.702Z,119.702835,7de8,6,Info [FLog::PluginFileRead] Hashing Plugin 'sabuiltin_Debugger.rbxm' took 1.0131 msec
+2026-10-22T06:30:32.703Z,119.703835,7de8,6,Info [FLog::PluginFileRead] Plugin file read 'sabuiltin_Debugger.rbxm' took 329.4723 msec
+2026-10-22T06:30:32.705Z,119.705833,7de8,6,Info [FLog::PluginLoadingEnhanced] loadPlugin sabuiltin_Debugger.rbxm took 699.5984999999934 msec [dm=PlayClient otaVersion=-3]
+2026-10-22T06:30:32.720Z,119.720810,3bc0,6,Info [FLog::PluginFileRead] Hashing Plugin 'sabuiltin_Tutorials.rbxm' took 1.2006 msec
+2026-10-22T06:30:32.720Z,119.720810,3bc0,6,Info [FLog::PluginFileRead] Plugin file read 'sabuiltin_Tutorials.rbxm' took 377.6720 msec
+2026-10-22T06:30:32.722Z,119.722809,3bc0,6,Info [FLog::PluginLoadingEnhanced] loadPlugin sabuiltin_Tutorials.rbxm took 390.3768999999926 msec [dm=PlayClient otaVersion=-3]
+2026-10-22T06:30:32.734Z,119.734795,7de8,6,Info [FLog::PluginFileRead] Hashing Plugin 'sabuiltin_FindReplaceAll.rbxm' took 1.3598 msec
+2026-10-22T06:30:32.748Z,119.748970,7de8,6,Info [FLog::PluginFileRead] Plugin file read 'sabuiltin_FindReplaceAll.rbxm' took 575.0994 msec
+2026-10-22T06:30:32.751Z,119.751968,7de8,6,Info [FLog::PluginLoadingEnhanced] loadPlugin sabuiltin_FindReplaceAll.rbxm took 584.5522999999986 msec [dm=PlayClient otaVersion=-3]
+2026-10-22T06:30:32.766Z,119.766975,4190,6,Info [FLog::PluginFileRead] Hashing Plugin 'sabuiltin_AudioEqualizerEditor.rbxm' took 1.6527 msec
+2026-10-22T06:30:32.771Z,119.771980,7100,6,Info [FLog::PluginFileRead] Hashing Plugin 'sabuiltin_ExplorerPlugin.rbxm' took 1.0842 msec
+2026-10-22T06:30:32.777Z,119.777985,7100,6,Info [FLog::PluginFileRead] Plugin file read 'sabuiltin_ExplorerPlugin.rbxm' took 739.1884 msec
+2026-10-22T06:30:32.777Z,119.777985,4190,6,Info [FLog::PluginFileRead] Plugin file read 'sabuiltin_AudioEqualizerEditor.rbxm' took 757.2171 msec
+2026-10-22T06:30:32.779Z,119.779984,7100,6,Info [FLog::PluginLoadingEnhanced] loadPlugin sabuiltin_ExplorerPlugin.rbxm took 748.948299999995 msec [dm=PlayClient otaVersion=-3]
+2026-10-22T06:30:32.782Z,119.782990,4190,6,Info [FLog::PluginLoadingEnhanced] loadPlugin sabuiltin_AudioEqualizerEditor.rbxm took 776.4051000000052 msec [dm=PlayClient otaVersion=-3]
+2026-10-22T06:30:32.786Z,119.786987,8890,6,Info [FLog::PluginFileRead] Hashing Plugin 'sabuiltin_DirectionalCurveEditor.rbxm' took 1.1925 msec
+2026-10-22T06:30:32.786Z,119.786987,8890,6,Info [FLog::PluginFileRead] Plugin file read 'sabuiltin_DirectionalCurveEditor.rbxm' took 769.2268 msec
+2026-10-22T06:30:32.788Z,119.788994,8890,6,Info [FLog::PluginLoadingEnhanced] loadPlugin sabuiltin_DirectionalCurveEditor.rbxm took 783.381200000008 msec [dm=PlayClient otaVersion=-3]
+2026-10-22T06:30:32.806Z,119.806999,6edc,6,Info [FLog::PluginFileRead] Hashing Plugin 'sabuiltin_PerformanceTools.rbxm' took 1.5326 msec
+2026-10-22T06:30:32.807Z,119.807999,6edc,6,Info [FLog::PluginFileRead] Plugin file read 'sabuiltin_PerformanceTools.rbxm' took 627.0765 msec
+2026-10-22T06:30:32.810Z,119.810005,6edc,6,Info [FLog::PluginLoadingEnhanced] loadPlugin sabuiltin_PerformanceTools.rbxm took 636.9230000000101 msec [dm=PlayClient otaVersion=-3]
+2026-10-22T06:30:32.866Z,119.866982,8890,6,Info [FLog::PluginFileRead] Hashing Plugin 'sabuiltin_Assistant.rbxm' took 2.1787 msec
+2026-10-22T06:30:32.867Z,119.867989,8890,6,Info [FLog::PluginFileRead] Plugin file read 'sabuiltin_Assistant.rbxm' took 841.2073 msec
+2026-10-22T06:30:32.873Z,119.873985,8890,6,Info [FLog::PluginLoadingEnhanced] loadPlugin sabuiltin_Assistant.rbxm took 867.2454000000016 msec [dm=PlayClient otaVersion=-3]
+2026-10-22T06:30:32.874Z,119.874985,4190,6,Info [FLog::PluginLoadingEnhanced] Loading Plugins in 1 total took 868.9830000000001 msec
+2026-10-22T06:30:32.997Z,119.997505,1fc4,6,Warning [FLog::StudioPluginRelay] PluginWidgetRelay::updateWidgetTitle: pserv_user_RojoManagedPlugin.rbxm_Rojo_soundPlayer - Failed Empty
+2026-10-22T06:30:33.528Z,120.528000,8890,6,Info [FLog::PluginLoadingEnhanced] Running plugin user_RojoManagedPlugin.rbxm took 535.5157000000048 msec
+2026-10-22T06:30:33.528Z,120.528000,1fc4,6,Warning [FLog::StudioPluginRelay] PluginDockWidgetRelay::initializeFromInfo: play_user_RojoManagedPlugin.rbxm_Rojo_soundPlayer - Failed Empty
+2026-10-22T06:30:33.799Z,120.799797,8890,6,Info [FLog::PluginLoadingEnhanced] Running plugin sabuiltin_InputActionManager.rbxm took 0.5303999999881626 msec
+2026-10-22T06:30:33.806Z,120.806747,8890,6,Info [FLog::PluginLoadingEnhanced] Running plugin sabuiltin_ControlsEmulator.rbxm took 4.309199999994462 msec
+2026-10-22T06:30:33.823Z,120.823608,8890,6,Info [FLog::PluginLoadingEnhanced] Running plugin builtin_SimulationStep.rbxm took 1.2429000000082624 msec
+2026-10-22T06:30:33.825Z,120.825592,8890,6,Info [FLog::PluginLoadingEnhanced] Running plugin builtin_ScaleDragger.rbxm took 1.6971000000012282 msec
+2026-10-22T06:30:33.831Z,120.831551,8890,6,Info [FLog::PluginLoadingEnhanced] Running plugin sabuiltin_AttenuationCurveEditor.rbxm took 3.122700000005807 msec
+2026-10-22T06:30:33.832Z,120.832542,8890,6,Info [FLog::PluginLoadingEnhanced] Running plugin builtin_RotateDragger.rbxm took 1.078100000000859 msec
+2026-10-22T06:30:33.833Z,120.833534,8890,6,Info [FLog::PluginLoadingEnhanced] Running plugin builtin_MoveDragger.rbxm took 1.1521999999928312 msec
+2026-10-22T06:30:33.837Z,120.837502,8890,6,Info [FLog::PluginLoadingEnhanced] Running plugin sabuiltin_SceneAnalysis.rbxm took 3.8109999999988986 msec
+2026-10-22T06:30:33.893Z,120.893799,8890,6,Info [FLog::PluginLoadingEnhanced] Running plugin builtin_SelectDragger.rbxm took 53.77060000000711 msec
+2026-10-22T06:30:33.899Z,120.899857,8890,6,Info [FLog::PluginLoadingEnhanced] Running plugin sabuiltin_MultitouchEmulator.rbxm took 6.063199999999824 msec
+2026-10-22T06:30:33.926Z,120.926125,8890,6,Info [FLog::PluginLoadingEnhanced] Running plugin sabuiltin_Debugger.rbxm took 24.44410000001085 msec
+2026-10-22T06:30:33.929Z,120.929161,8890,6,Info [FLog::PluginLoadingEnhanced] Running plugin sabuiltin_Tutorials.rbxm took 3.845699999999397 msec
+2026-10-22T06:30:33.957Z,120.957199,8890,6,Info [FLog::PluginLoadingEnhanced] Running plugin sabuiltin_FindReplaceAll.rbxm took 3.2570000000049504 msec
+2026-10-22T06:30:34.124Z,121.124413,6710,12 [DFLog::HttpTraceError] HttpResponse(#215 0x1e7999aeef8) time:171.7ms (net:171.3ms timeInRetryQueue:0.0ms)status:400  bodySize:52 url:{ "https://gameinternationalization.roblox.com/v1/supported-languages/games/0/in-experience-language-selection" } ip:128.116.48.3 external:0 numberOfTimesRetried:0
+2026-10-22T06:30:34.179Z,121.179520,8890,6 [FLog::Output] Flag SimCsgEnableNewStudioButtons referenced from Lua isn't defined in C++ code
+2026-10-22T06:30:34.205Z,121.205574,8890,6 [FLog::Output] Flag UnifyModelPackagePublish3 referenced from Lua isn't defined in C++ code
+2026-10-22T06:30:34.207Z,121.207581,8890,6 [FLog::Output] Flag OpenScriptDocOptionsLua referenced from Lua isn't defined in C++ code
+2026-10-22T06:30:34.208Z,121.208580,8890,6,Info [FLog::PluginLoadingEnhanced] Running plugin sabuiltin_ExplorerPlugin.rbxm took 251.44920000001036 msec
+2026-10-22T06:30:34.211Z,121.211586,8890,6,Info [FLog::PluginLoadingEnhanced] Running plugin sabuiltin_AudioEqualizerEditor.rbxm took 2.667400000007092 msec
+2026-10-22T06:30:34.215Z,121.215599,8890,6,Info [FLog::PluginLoadingEnhanced] Running plugin sabuiltin_DirectionalCurveEditor.rbxm took 2.739900000008788 msec
+2026-10-22T06:30:34.216Z,121.216599,8890,6,Info [FLog::PluginLoadingEnhanced] Running plugin sabuiltin_PerformanceTools.rbxm took 2.816899999999123 msec
+2026-10-22T06:30:34.312Z,121.312691,1fc4,6,Warning [FLog::StudioPluginRelay] PluginDockWidgetRelay::removeFromMainWindow: edit_builtin_AnimationClipEditor.rbxm_AnimationClipEditor - Failed Not In Main Window
+2026-10-22T06:30:34.312Z,121.312691,1fc4,6,Warning [FLog::StudioPluginRelay] PluginDockWidgetRelay::removeFromMainWindow: edit_builtin_DraftsWidget.rbxm_Drafts - Failed Not In Main Window
+2026-10-22T06:30:34.312Z,121.312691,1fc4,6,Warning [FLog::StudioPluginRelay] PluginQWidgetRelay::hideForRestoreLater: edit_builtin_ManageCollaborators.rbxm_ Manage Collaborators{b9e04ad9-dcc7-402e-a1bf-c42241c11f52} - Success
+2026-10-22T06:30:34.313Z,121.313698,1fc4,6,Warning [FLog::StudioPluginRelay] PluginQWidgetRelay::hideForRestoreLater: edit_builtin_MaterialPicker.rbxm_MaterialPicker - Success
+2026-10-22T06:30:34.313Z,121.313698,1fc4,6,Warning [FLog::StudioPluginRelay] PluginDockWidgetRelay::removeFromMainWindow: edit_user_RojoManagedPlugin.rbxm_Rojo_soundPlayer - Failed Not In Main Window
+2026-10-22T06:30:34.318Z,121.318741,1fc4,6,Warning [FLog::StudioPluginRelay] PluginDockWidgetRelay::onHideEvent: edit_builtin_Toolbox.rbxm_Toolbox - Failed Wrong DM
+2026-10-22T06:30:34.355Z,121.355789,1fc4,6,Warning [FLog::StudioPluginRelay] PluginDockWidgetRelay::onHideEvent: edit_builtin_TerrainEditor.rbxm_TerrainEditor - Failed Wrong DM
+2026-10-22T06:30:34.417Z,121.417023,1fc4,6,Warning [FLog::StudioPluginRelay] PluginDockWidgetRelay::onHideEvent: edit_user_RojoManagedPlugin.rbxm_Rojo 7.7.1 - Failed Wrong DM
+2026-10-22T06:30:34.530Z,121.530983,8890,6,Warning [FLog::StudioCommands] Unable to find component AssistantPermissionsBridge in histogram map.
+2026-10-22T06:30:34.530Z,121.530983,8890,6,Info [FLog::PluginLoadingEnhanced] Running plugin sabuiltin_Assistant.rbxm took 314.4520999999969 msec
+2026-10-22T06:30:34.531Z,121.531982,8890,6 [FLog::StudioTimingLog] ======== Studio Play Testing Playable Times =======
+2026-10-22T06:30:34.531Z,121.531982,8890,6 [FLog::StudioTimingLog] PlaySoloPlayableTotalTime     : 9.5445 sec
+2026-10-22T06:30:35.321Z,122.321701,1fc4,6,Info [FLog::D3D11SwapChain] validate: resize triggered swapChain=0x1e762f58af0 dims=1105x308 hasFB=true
+2026-10-22T06:30:35.322Z,122.322708,1fc4,6,Info [FLog::D3D11SwapChain] validate: gpu=AMD Radeon(TM) Graphics
+2026-10-22T06:30:35.322Z,122.322708,1fc4,6,Info [FLog::D3D11SwapChain] resizeWindowData: swapChain=0x1e762f58af0 windowHandle=0x8df0a50 dims=1105x308
+2026-10-22T06:30:35.322Z,122.322708,1fc4,6,Info [FLog::D3D11SwapChain] resizeSwapchain: ResizeBuffers explicit 1105x308 swapChain=0x1e762f58af0
+2026-10-22T06:30:35.322Z,122.322708,1fc4,6,Info [FLog::D3D11SwapChain] resizeWindowData: swapChain=0x1e775c3c3a0 windowHandle=0x8e0b84 dims=173x182
+2026-10-22T06:30:35.322Z,122.322708,1fc4,6,Info [FLog::D3D11SwapChain] resizeSwapchain: ResizeBuffers explicit 173x182 swapChain=0x1e775c3c3a0
+2026-10-22T06:30:35.324Z,122.324715,1fc4,6,Info [FLog::D3D11SwapChain] resizeWindowData: swapChain=0x1e775abc220 windowHandle=0x4e10410 dims=1109x40
+2026-10-22T06:30:35.324Z,122.324715,1fc4,6,Info [FLog::D3D11SwapChain] resizeSwapchain: ResizeBuffers explicit 1109x40 swapChain=0x1e775abc220
+2026-10-22T06:30:35.334Z,122.334770,1fc4,6 [FLog::Graphics] Terrain TextureArray (2022) 512x512, arraySize: 36, mip: 10
+2026-10-22T06:30:35.378Z,122.378365,0598,6,Info [FLog::AssistantApplication] AssistantVersion: 40c2a76
+2026-10-22T06:30:35.386Z,122.386368,1fc4,6 [FLog::Graphics] SceneManager: resizing main targets to 1105x308
+2026-10-22T06:30:35.528Z,122.528267,3bc0,6,Debug [FLog::DataModelSoundManager] DataModelSoundManager::updateSoundState(false)
+2026-10-22T06:30:35.529Z,122.529251,3bc0,6,Debug [FLog::DataModelSoundManager] Restoring voice chat mute state (true)
+2026-10-22T06:30:35.550Z,122.550468,1fc4,6,Warning [FLog::StudioPluginRelay] PluginWidgetRelay::updateWidgetTitle: play_user_RojoManagedPlugin.rbxm_Rojo_soundPlayer - Failed Empty
+2026-10-22T06:30:36.529Z,123.529335,1fc4,6,Warning [FLog::StudioPluginRelay] PluginDockWidgetRelay::removeFromMainWindow: edit_builtin_AlignmentTool.rbxm_AlignmentTool - Failed Not In Main Window
+2026-10-22T06:30:36.529Z,123.529335,1fc4,6,Warning [FLog::StudioPluginRelay] PluginDockWidgetRelay::removeFromMainWindow: edit_builtin_AnimationClipEditor.rbxm_AnimationClipEditor - Failed Not In Main Window
+2026-10-22T06:30:36.529Z,123.529335,1fc4,6,Warning [FLog::StudioPluginRelay] PluginDockWidgetRelay::removeFromMainWindow: edit_builtin_AudioDiscovery.rbxm_AudioDiscovery - Failed Not In Main Window
+2026-10-22T06:30:36.529Z,123.529335,1fc4,6,Warning [FLog::StudioPluginRelay] PluginDockWidgetRelay::removeFromMainWindow: edit_builtin_AvatarCompatibilityPreviewer.rbxm_AvatarCompatibilityPreviewer - Failed Not In Main Window
+2026-10-22T06:30:36.529Z,123.529335,1fc4,6,Warning [FLog::StudioPluginRelay] PluginDockWidgetRelay::removeFromMainWindow: edit_builtin_DraftsWidget.rbxm_Drafts - Failed Not In Main Window
+2026-10-22T06:30:36.529Z,123.529335,1fc4,6,Warning [FLog::StudioPluginRelay] PluginDockWidgetRelay::removeFromMainWindow: edit_builtin_LayeredClothingEditor.rbxm_LayeredClothingEditor - Failed Not In Main Window
+2026-10-22T06:30:36.529Z,123.529335,1fc4,6,Warning [FLog::StudioPluginRelay] PluginDockWidgetRelay::removeFromMainWindow: edit_builtin_LocalizationTools.rbxm_LocalizationTools - Failed Not In Main Window
+2026-10-22T06:30:36.529Z,123.529335,1fc4,6,Warning [FLog::StudioPluginRelay] PluginQWidgetRelay::hideForRestoreLater: edit_builtin_ManageCollaborators.rbxm_ Manage Collaborators{b9e04ad9-dcc7-402e-a1bf-c42241c11f52} - Success
+2026-10-22T06:30:36.529Z,123.529335,1fc4,6,Warning [FLog::StudioPluginRelay] PluginDockWidgetRelay::removeFromMainWindow: edit_builtin_MaterialGenerator.rbxm_MaterialGenerator - Failed Not In Main Window
+2026-10-22T06:30:36.529Z,123.529335,1fc4,6,Warning [FLog::StudioPluginRelay] PluginDockWidgetRelay::removeFromMainWindow: edit_builtin_MaterialManager.rbxm_MaterialManager - Failed Not In Main Window
+2026-10-22T06:30:36.529Z,123.529335,1fc4,6,Warning [FLog::StudioPluginRelay] PluginQWidgetRelay::hideForRestoreLater: edit_builtin_MaterialPicker.rbxm_MaterialPicker - Success
+2026-10-22T06:30:36.529Z,123.529335,1fc4,6,Warning [FLog::StudioPluginRelay] PluginDockWidgetRelay::removeFromMainWindow: edit_builtin_SocialPresence.rbxm_SocialPresence - Failed Not In Main Window
+2026-10-22T06:30:36.529Z,123.529335,1fc4,6,Warning [FLog::StudioPluginRelay] PluginDockWidgetRelay::removeFromMainWindow: edit_builtin_StyleEditor.rbxm_StyleEditor - Failed Not In Main Window
+2026-10-22T06:30:36.529Z,123.529335,1fc4,6,Warning [FLog::StudioPluginRelay] PluginDockWidgetRelay::removeFromMainWindow: edit_builtin_TagEditor.rbxm_TagEditor - Failed Not In Main Window
+2026-10-22T06:30:36.529Z,123.529335,1fc4,6,Warning [FLog::StudioPluginRelay] PluginDockWidgetRelay::removeFromMainWindow: edit_builtin_TerrainEditor.rbxm_TerrainEditor - Failed Not In Main Window
+2026-10-22T06:30:36.529Z,123.529335,1fc4,6,Warning [FLog::StudioPluginRelay] PluginDockWidgetRelay::removeFromMainWindow: edit_builtin_Toolbox.rbxm_Toolbox - Failed Not In Main Window
+2026-10-22T06:30:36.529Z,123.529335,1fc4,6,Warning [FLog::StudioPluginRelay] PluginDockWidgetRelay::removeFromMainWindow: edit_user_RojoManagedPlugin.rbxm_Rojo 7.7.1 - Failed Not In Main Window
+2026-10-22T06:30:36.529Z,123.529335,1fc4,6,Warning [FLog::StudioPluginRelay] PluginDockWidgetRelay::removeFromMainWindow: edit_user_RojoManagedPlugin.rbxm_Rojo_soundPlayer - Failed Not In Main Window
+2026-10-22T06:30:37.359Z,124.359901,7de8,6,Info [FLog::CreatorOutput] [SELFTEST] BEGIN the live place's self-test (ROBLOX-104)
+2026-10-22T06:30:37.360Z,124.360916,7de8,6,Info [FLog::CreatorOutput] [SELFTEST] INFO world: preserve (revision preserve-3)
+2026-10-22T06:30:37.735Z,124.735817,2e90,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type
+2026-10-22T06:30:37.736Z,124.736824,8f40,6,Error [DFLog::AssetProvider] AssetResolutionWorkflow to get assetid: https://assetdelivery.roblox.com/v1/asset?id=203785492&contentRepresentationPriorityList=W3siZm9ybWF0Ijoia3R4MiIsIm1ham9yVmVyc2lvbiI6IjdyZG8iLCJmaWRlbGl0eSI6Ii8vLy8vQUU9In1d failed!! adIndividualItemFailureReason: AssetDelivery403InvalidPermission adBatchHttpStatusCode: 0 adBatchHttpErrorCode: OK adIndividualItemCode: 200 contentRepresentationSpecifier:  wasModerated: true adResolutionErrorMessage: Asset type does not match requested type adBatchJsonParsingError:  cdnHttpStatusCode: 0 cdnHttpErrorCode: OK cdnErrorMessage: 
+2026-10-22T06:30:38.719Z,125.719971,4190,6 [DFLog::NamedMutex] NamedMutex(000001E78944F4A0, name:InstallerInfo.log)
+2026-10-22T06:30:38.719Z,125.719971,4190,6 [DFLog::NamedMutex] ~NamedMutex(000001E78944F4A0, name:InstallerInfo.log)
+2026-10-22T06:30:42.539Z,129.539413,1fc4,6,Debug [FLog::StudioEmbeddedBrowserWebView2] Event: CoreWebView2ProcessInfosChanged
+2026-10-22T06:30:42.542Z,129.542450,1fc4,6,Debug [FLog::StudioEmbeddedBrowserWebView2] calling GetProcessExtendedInfos
+2026-10-22T06:30:42.543Z,129.543457,1fc4,6,Debug [FLog::StudioEmbeddedBrowserWebView2] Event: CoreWebView2ProcessInfosChanged
+2026-10-22T06:30:42.543Z,129.543457,1fc4,6,Debug [FLog::StudioEmbeddedBrowserWebView2] calling GetProcessExtendedInfos
+2026-10-22T06:30:42.550Z,129.550491,1fc4,6,Debug [FLog::StudioEmbeddedBrowserWebView2] GetProcessExtendedInfos: result=0
+2026-10-22T06:30:42.551Z,129.551483,1fc4,6,Debug [FLog::StudioEmbeddedBrowserWebView2] GetProcessExtendedInfos: result=0
+2026-10-22T06:30:43.378Z,130.378632,1fc4,6,Debug [FLog::StudioEmbeddedBrowserWebView2] Event: CoreWebView2ProcessInfosChanged
+2026-10-22T06:30:43.379Z,130.379639,1fc4,6,Debug [FLog::StudioEmbeddedBrowserWebView2] calling GetProcessExtendedInfos
+2026-10-22T06:30:43.379Z,130.379639,1fc4,6,Debug [FLog::StudioEmbeddedBrowserWebView2] Event: CoreWebView2ProcessInfosChanged
+2026-10-22T06:30:43.379Z,130.379639,1fc4,6,Debug [FLog::StudioEmbeddedBrowserWebView2] calling GetProcessExtendedInfos
+2026-10-22T06:30:43.380Z,130.380646,1fc4,6,Debug [FLog::StudioEmbeddedBrowserWebView2] GetProcessExtendedInfos: result=0
+2026-10-22T06:30:43.380Z,130.380646,1fc4,6,Debug [FLog::StudioEmbeddedBrowserWebView2] GetProcessExtendedInfos: result=0
+2026-10-22T06:30:44.186Z,131.186646,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] ... new life (7 s in)
+2026-10-22T06:30:44.231Z,131.231323,0ea8,12 [DFLog::HttpTraceError] HttpResponse(#255 0x1ee079ac4f8) time:44.4ms (net:41.7ms timeInRetryQueue:0.0ms)status:400  bodySize:85 url:{ "https://develop.roblox.com/v1/universes/0" } ip:128.116.48.3 external:0 numberOfTimesRetried:0
+2026-10-22T06:30:46.619Z,133.619263,8890,6,Info [FLog::CreatorOutput] [SELFTEST] PASS new life
+2026-10-22T06:30:49.701Z,136.701508,4190,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 6 cur_l2ts 21.59442363495822 elapsed_l2b 20.426839221004627
+2026-10-22T06:30:49.703Z,136.703506,7de8,6,Info [FLog::CreatorOutput] [SELFTEST] ... intro (12 s in)
+2026-10-22T06:30:53.543Z,140.543335,0b38,6,Info [FLog::CreatorOutput] [CHET_ADAPTER_NATIVE_PASS] 2276508 227282 native codec; local memory backend; retirement backup; quit/rejoin; stale rest refused; exact checkpoint
+2026-10-22T06:30:53.549Z,140.549347,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS intro
+2026-10-22T06:30:53.549Z,140.549347,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS world folders
+2026-10-22T06:30:54.775Z,141.775711,7100,6,Info [FLog::CreatorOutput] [SELFTEST] ... region sill (17 s in)
+2026-10-22T06:30:54.775Z,141.775711,7100,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region sill
+2026-10-22T06:30:55.995Z,142.995514,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_window
+2026-10-22T06:30:57.232Z,144.232666,7100,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_outer_sill
+2026-10-22T06:30:58.465Z,145.465302,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_desk
+2026-10-22T06:30:58.717Z,145.717651,8890,6 [DFLog::NamedMutex] NamedMutex(000001E789C8F4A0, name:InstallerInfo.log)
+2026-10-22T06:30:58.718Z,145.718643,8890,6 [DFLog::NamedMutex] ~NamedMutex(000001E789C8F4A0, name:InstallerInfo.log)
+2026-10-22T06:30:59.696Z,146.696075,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_board
+2026-10-22T06:30:59.911Z,146.911789,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] ... region hut_shelf (23 s in)
+2026-10-22T06:31:00.478Z,147.478348,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] No user input within the last 5000 ms. Allowing auto-save through.
+2026-10-22T06:31:00.478Z,147.478348,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] Time since last auto-save attempt of 90 seconds is < user's set auto-save interval of 300 seconds. Not starting auto-save attempt.
+2026-10-22T06:31:00.927Z,147.927704,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_shelf
+2026-10-22T06:31:02.165Z,149.165482,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_chair
+2026-10-22T06:31:03.391Z,150.391907,4190,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_door
+2026-10-22T06:31:04.618Z,151.618561,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_door_up
+2026-10-22T06:31:05.849Z,152.849884,4190,6,Info [FLog::CreatorOutput] [SELFTEST] ... region hut_doorway (28 s in)
+2026-10-22T06:31:05.849Z,152.849884,4190,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_doorway
+2026-10-22T06:31:07.062Z,154.062012,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_doorway_up
+2026-10-22T06:31:08.289Z,155.289551,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_window
+2026-10-22T06:31:09.285Z,156.285049,8890,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 7 cur_l2ts 41.177967949952574 elapsed_l2b 40.01038353599898
+2026-10-22T06:31:09.505Z,156.505188,8890,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_exit
+2026-10-22T06:31:10.729Z,157.729370,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_tv
+2026-10-22T06:31:10.945Z,157.945984,8890,6,Info [FLog::CreatorOutput] [SELFTEST] ... region room_games (34 s in)
+2026-10-22T06:31:11.963Z,158.963654,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_games
+2026-10-22T06:31:13.180Z,160.180252,8890,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_sofa_w
+2026-10-22T06:31:14.407Z,161.407867,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_sofa_e
+2026-10-22T06:31:15.628Z,162.628845,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_floor_a
+2026-10-22T06:31:16.845Z,163.845856,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... region hut_floor_b (39 s in)
+2026-10-22T06:31:16.845Z,163.845856,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_floor_b
+2026-10-22T06:31:18.080Z,165.080109,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_floor_c
+2026-10-22T06:31:18.712Z,165.712982,3bc0,6 [DFLog::NamedMutex] NamedMutex(000001E75A04F4A0, name:InstallerInfo.log)
+2026-10-22T06:31:18.712Z,165.712982,3bc0,6 [DFLog::NamedMutex] ~NamedMutex(000001E75A04F4A0, name:InstallerInfo.log)
+2026-10-22T06:31:19.299Z,166.299850,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_floor_d
+2026-10-22T06:31:20.528Z,167.528412,4190,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_floor_e
+2026-10-22T06:31:21.747Z,168.747284,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_floor_f
+2026-10-22T06:31:21.962Z,168.962479,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] ... region hut_floor_g (45 s in)
+2026-10-22T06:31:22.979Z,169.979813,7100,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_floor_g
+2026-10-22T06:31:24.213Z,171.213837,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_floor_h
+2026-10-22T06:31:25.429Z,172.429062,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_floor_i
+2026-10-22T06:31:26.645Z,173.645782,7de8,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_floor_a
+2026-10-22T06:31:27.878Z,174.878830,8890,6,Info [FLog::CreatorOutput] [SELFTEST] ... region room_floor_b (51 s in)
+2026-10-22T06:31:27.878Z,174.878830,8890,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_floor_b
+2026-10-22T06:31:29.095Z,176.095139,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_floor_c
+2026-10-22T06:31:29.286Z,176.286194,8890,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 8 cur_l2ts 61.17911245998519 elapsed_l2b 60.0115280460316
+2026-10-22T06:31:30.305Z,177.305450,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_floor_d
+2026-10-22T06:31:30.478Z,177.478104,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] No user input within the last 5000 ms. Allowing auto-save through.
+2026-10-22T06:31:30.478Z,177.478104,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] Time since last auto-save attempt of 120 seconds is < user's set auto-save interval of 300 seconds. Not starting auto-save attempt.
+2026-10-22T06:31:31.530Z,178.530930,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_floor_e
+2026-10-22T06:31:32.762Z,179.762497,7100,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_floor_f
+2026-10-22T06:31:32.978Z,179.978897,8890,6,Info [FLog::CreatorOutput] [SELFTEST] ... region room_floor_g (56 s in)
+2026-10-22T06:31:33.982Z,180.982605,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_floor_g
+2026-10-22T06:31:34.570Z,181.570694,1fc4,6 [FLog::Graphics] SceneManager: resizing main targets to 1105x308
+2026-10-22T06:31:35.196Z,182.196518,4190,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_floor_h
+2026-10-22T06:31:36.421Z,183.421722,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_floor_i
+2026-10-22T06:31:37.644Z,184.644165,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_up_a
+2026-10-22T06:31:37.699Z,184.699905,1fc4,6 [FLog::Graphics] SceneManager: resizing main targets to 1105x308
+2026-10-22T06:31:38.726Z,185.726669,7de8,6 [DFLog::NamedMutex] NamedMutex(000001E78B88F4A0, name:InstallerInfo.log)
+2026-10-22T06:31:38.728Z,185.728683,7de8,6 [DFLog::NamedMutex] ~NamedMutex(000001E78B88F4A0, name:InstallerInfo.log)
+2026-10-22T06:31:38.862Z,185.862869,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] ... region hut_up_b (62 s in)
+2026-10-22T06:31:38.862Z,185.862869,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_up_b
+2026-10-22T06:31:40.078Z,187.078583,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_up_c
+2026-10-22T06:31:40.278Z,187.278397,1fc4,6 [FLog::Graphics] SceneManager: resizing main targets to 1105x308
+2026-10-22T06:31:41.327Z,188.327713,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_up_d
+2026-10-22T06:31:42.545Z,189.545502,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_up_e
+2026-10-22T06:31:43.760Z,190.760620,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_up_f
+2026-10-22T06:31:43.967Z,190.967331,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... region hut_up_g (67 s in)
+2026-10-22T06:31:44.978Z,191.978622,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_up_g
+2026-10-22T06:31:46.211Z,193.211914,8890,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_up_h
+2026-10-22T06:31:47.427Z,194.427490,7100,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_up_i
+2026-10-22T06:31:48.656Z,195.656815,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_up_a
+2026-10-22T06:31:49.287Z,196.287415,4190,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 9 cur_l2ts 81.18033847500163 elapsed_l2b 80.01275406104804
+2026-10-22T06:31:49.882Z,196.882004,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... region room_up_b (73 s in)
+2026-10-22T06:31:49.882Z,196.882004,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_up_b
+2026-10-22T06:31:51.100Z,198.100037,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_up_c
+2026-10-22T06:31:52.348Z,199.348480,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_up_d
+2026-10-22T06:31:53.566Z,200.566605,4190,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_up_e
+2026-10-22T06:31:54.777Z,201.777969,7de8,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_up_f
+2026-10-22T06:31:54.993Z,201.993851,4190,6,Info [FLog::CreatorOutput] [SELFTEST] ... region room_up_g (78 s in)
+2026-10-22T06:31:56.009Z,203.009933,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_up_g
+2026-10-22T06:31:57.229Z,204.229675,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_up_h
+2026-10-22T06:31:58.444Z,205.444916,8890,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region room_up_i
+2026-10-22T06:31:58.734Z,205.734940,8890,6 [DFLog::NamedMutex] NamedMutex(000001E782B0F4A0, name:InstallerInfo.log)
+2026-10-22T06:31:58.734Z,205.734940,8890,6 [DFLog::NamedMutex] ~NamedMutex(000001E782B0F4A0, name:InstallerInfo.log)
+2026-10-22T06:31:59.666Z,206.666443,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_wall_mid
+2026-10-22T06:32:00.483Z,207.483414,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] No user input within the last 5000 ms. Allowing auto-save through.
+2026-10-22T06:32:00.483Z,207.483414,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] Time since last auto-save attempt of 150 seconds is < user's set auto-save interval of 300 seconds. Not starting auto-save attempt.
+2026-10-22T06:32:00.885Z,207.885086,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] ... region hut_wall_w (84 s in)
+2026-10-22T06:32:00.885Z,207.885086,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_wall_w
+2026-10-22T06:32:02.115Z,209.115799,4190,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_wall_e
+2026-10-22T06:32:03.333Z,210.333344,4190,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_wall_x1
+2026-10-22T06:32:04.552Z,211.552139,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_wall_x2
+2026-10-22T06:32:05.778Z,212.778000,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_wall_x3
+2026-10-22T06:32:05.987Z,212.987076,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... region hut_eave_w2 (89 s in)
+2026-10-22T06:32:07.000Z,214.000366,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_eave_w2
+2026-10-22T06:32:08.226Z,215.226715,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_eave_w1
+2026-10-22T06:32:09.275Z,216.275711,6edc,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 10 cur_l2ts 101.1686229559657 elapsed_l2b 100.00103854201211
+2026-10-22T06:32:09.461Z,216.461823,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_eave_mid
+2026-10-22T06:32:10.676Z,217.676880,8890,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_eave_e1
+2026-10-22T06:32:11.894Z,218.894531,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... region hut_eave_e2 (95 s in)
+2026-10-22T06:32:11.894Z,218.894531,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_eave_e2
+2026-10-22T06:32:13.118Z,220.118637,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_eave_x1
+2026-10-22T06:32:14.330Z,221.330750,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_eave_x2
+2026-10-22T06:32:15.561Z,222.561905,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_eave_x3
+2026-10-22T06:32:16.776Z,223.776932,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_eave_x4
+2026-10-22T06:32:16.978Z,223.978470,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... region hut_bench (100 s in)
+2026-10-22T06:32:17.981Z,224.981628,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_bench
+2026-10-22T06:32:18.723Z,225.723358,8890,6 [DFLog::NamedMutex] NamedMutex(000001E78168F4A0, name:InstallerInfo.log)
+2026-10-22T06:32:18.724Z,225.724350,8890,6 [DFLog::NamedMutex] ~NamedMutex(000001E78168F4A0, name:InstallerInfo.log)
+2026-10-22T06:32:19.204Z,226.204681,4190,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region hut_butt
+2026-10-22T06:32:20.423Z,227.423859,4190,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_feeder
+2026-10-22T06:32:21.670Z,228.670425,8890,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_pole
+2026-10-22T06:32:22.894Z,229.894806,4190,6,Info [FLog::CreatorOutput] [SELFTEST] ... region garden_a1 (106 s in)
+2026-10-22T06:32:22.894Z,229.894806,4190,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_a1
+2026-10-22T06:32:24.109Z,231.109955,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_a2
+2026-10-22T06:32:25.320Z,232.320801,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_a3
+2026-10-22T06:32:26.540Z,233.540710,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_a4
+2026-10-22T06:32:27.745Z,234.745819,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_b1
+2026-10-22T06:32:27.948Z,234.948700,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... region garden_b2 (111 s in)
+2026-10-22T06:32:28.952Z,235.952454,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_b2
+2026-10-22T06:32:29.294Z,236.294495,4190,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 11 cur_l2ts 121.18741825598002 elapsed_l2b 120.01983384202643
+2026-10-22T06:32:30.185Z,237.185623,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_b3
+2026-10-22T06:32:30.500Z,237.500168,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] No user input within the last 5000 ms. Allowing auto-save through.
+2026-10-22T06:32:30.501Z,237.501175,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] Time since last auto-save attempt of 180 seconds is < user's set auto-save interval of 300 seconds. Not starting auto-save attempt.
+2026-10-22T06:32:31.414Z,238.414551,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_b4
+2026-10-22T06:32:32.639Z,239.639389,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_c1
+2026-10-22T06:32:33.877Z,240.877762,8890,6,Info [FLog::CreatorOutput] [SELFTEST] ... region garden_c2 (117 s in)
+2026-10-22T06:32:33.878Z,240.878769,8890,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_c2
+2026-10-22T06:32:35.109Z,242.109421,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_c3
+2026-10-22T06:32:36.378Z,243.378708,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_c4
+2026-10-22T06:32:37.626Z,244.626923,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_d1
+2026-10-22T06:32:38.729Z,245.729095,8890,6 [DFLog::NamedMutex] NamedMutex(000001E78A64F4A0, name:InstallerInfo.log)
+2026-10-22T06:32:38.731Z,245.731094,8890,6 [DFLog::NamedMutex] ~NamedMutex(000001E78A64F4A0, name:InstallerInfo.log)
+2026-10-22T06:32:38.877Z,245.877182,8890,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_d2
+2026-10-22T06:32:39.090Z,246.090012,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] ... region garden_d3 (122 s in)
+2026-10-22T06:32:40.111Z,247.111267,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_d3
+2026-10-22T06:32:41.331Z,248.331787,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region garden_d4
+2026-10-22T06:32:42.538Z,249.538940,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_s1
+2026-10-22T06:32:43.764Z,250.764816,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_s2
+2026-10-22T06:32:44.995Z,251.995819,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... region path_s3 (128 s in)
+2026-10-22T06:32:44.996Z,251.996826,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_s3
+2026-10-22T06:32:46.262Z,253.262146,8890,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_s4
+2026-10-22T06:32:47.532Z,254.532822,8890,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_s5
+2026-10-22T06:32:48.759Z,255.759827,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_e1
+2026-10-22T06:32:49.287Z,256.287750,4190,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 12 cur_l2ts 141.1806691320165 elapsed_l2b 140.0130847180629
+2026-10-22T06:32:49.987Z,256.987823,4190,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_e2
+2026-10-22T06:32:50.209Z,257.209167,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] ... region path_e3 (133 s in)
+2026-10-22T06:32:51.221Z,258.221710,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_e3
+2026-10-22T06:32:52.433Z,259.433502,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_e4
+2026-10-22T06:32:53.669Z,260.669983,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_e5
+2026-10-22T06:32:54.893Z,261.893616,4190,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_n3
+2026-10-22T06:32:56.113Z,263.113739,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] ... region path_n2 (139 s in)
+2026-10-22T06:32:56.115Z,263.115723,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_n2
+2026-10-22T06:32:57.329Z,264.329102,4190,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_n1
+2026-10-22T06:32:58.554Z,265.554993,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_e6
+2026-10-22T06:32:58.740Z,265.740967,8890,6 [DFLog::NamedMutex] NamedMutex(000001E7764DF4A0, name:InstallerInfo.log)
+2026-10-22T06:32:58.741Z,265.741974,8890,6 [DFLog::NamedMutex] ~NamedMutex(000001E7764DF4A0, name:InstallerInfo.log)
+2026-10-22T06:32:59.791Z,266.791779,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_m1
+2026-10-22T06:33:00.490Z,267.490234,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] No user input within the last 5000 ms. Allowing auto-save through.
+2026-10-22T06:33:00.490Z,267.490234,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] Time since last auto-save attempt of 210 seconds is < user's set auto-save interval of 300 seconds. Not starting auto-save attempt.
+2026-10-22T06:33:01.010Z,268.010071,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_m2
+2026-10-22T06:33:01.225Z,268.225586,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... region path_m3 (144 s in)
+2026-10-22T06:33:02.242Z,269.242737,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_m3
+2026-10-22T06:33:03.476Z,270.476288,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region path_m4
+2026-10-22T06:33:03.521Z,270.521210,1fc4,6,Warning [FLog::CreatorWarning] Warning: [Windowsill] world: the spider is in bench_w, which has not arrived whole; it may fall through where a box should be
+2026-10-22T06:33:04.883Z,271.883453,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region bench_w
+2026-10-22T06:33:06.097Z,273.097321,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region bench_e
+2026-10-22T06:33:06.312Z,273.312225,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] ... region bin (149 s in)
+2026-10-22T06:33:07.313Z,274.313995,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region bin
+2026-10-22T06:33:08.530Z,275.530212,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region lamp_1
+2026-10-22T06:33:09.292Z,276.292236,7100,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 13 cur_l2ts 161.1851579299703 elapsed_l2b 160.0175735160167
+2026-10-22T06:33:09.746Z,276.746979,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region lamp_2
+2026-10-22T06:33:10.963Z,277.963806,8890,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region lamp_3
+2026-10-22T06:33:12.177Z,279.177277,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] ... region lamp_4 (155 s in)
+2026-10-22T06:33:12.177Z,279.177277,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region lamp_4
+2026-10-22T06:33:13.390Z,280.390625,7100,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pad_a1
+2026-10-22T06:33:14.614Z,281.614166,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pad_a2
+2026-10-22T06:33:15.834Z,282.834564,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pad_a3
+2026-10-22T06:33:17.054Z,284.054474,7100,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pad_b1
+2026-10-22T06:33:17.268Z,284.268951,7100,6,Info [FLog::CreatorOutput] [SELFTEST] ... region pad_b2 (160 s in)
+2026-10-22T06:33:18.281Z,285.281494,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pad_b2
+2026-10-22T06:33:18.739Z,285.739685,8890,6 [DFLog::NamedMutex] NamedMutex(000001E7822CF4A0, name:InstallerInfo.log)
+2026-10-22T06:33:18.742Z,285.742615,8890,6 [DFLog::NamedMutex] ~NamedMutex(000001E7822CF4A0, name:InstallerInfo.log)
+2026-10-22T06:33:19.523Z,286.523743,7100,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pad_b3
+2026-10-22T06:33:20.770Z,287.770782,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pad_c1
+2026-10-22T06:33:22.000Z,289.000458,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pad_c2
+2026-10-22T06:33:23.243Z,290.243591,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... region pad_c3 (166 s in)
+2026-10-22T06:33:23.243Z,290.243591,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pad_c3
+2026-10-22T06:33:24.490Z,291.490601,4190,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_a1
+2026-10-22T06:33:25.703Z,292.703369,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_a2
+2026-10-22T06:33:26.935Z,293.935638,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_a3
+2026-10-22T06:33:28.165Z,295.165039,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_a4
+2026-10-22T06:33:28.370Z,295.370605,7100,6,Info [FLog::CreatorOutput] [SELFTEST] ... region meadow_a5 (171 s in)
+2026-10-22T06:33:29.285Z,296.285736,4190,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 14 cur_l2ts 181.17864065798406 elapsed_l2b 180.01105624403047
+2026-10-22T06:33:29.390Z,296.390503,4190,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_a5
+2026-10-22T06:33:30.479Z,297.479034,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] No user input within the last 5000 ms. Allowing auto-save through.
+2026-10-22T06:33:30.479Z,297.479034,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] Time since last auto-save attempt of 240 seconds is < user's set auto-save interval of 300 seconds. Not starting auto-save attempt.
+2026-10-22T06:33:30.670Z,297.670471,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_b1
+2026-10-22T06:33:31.889Z,298.889252,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_b2
+2026-10-22T06:33:33.109Z,300.109955,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_b3
+2026-10-22T06:33:34.339Z,301.339325,4190,6,Info [FLog::CreatorOutput] [SELFTEST] ... region meadow_b4 (177 s in)
+2026-10-22T06:33:34.340Z,301.340302,4190,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_b4
+2026-10-22T06:33:35.569Z,302.569763,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_b5
+2026-10-22T06:33:36.783Z,303.783997,4190,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_c1
+2026-10-22T06:33:37.999Z,304.999817,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_c2
+2026-10-22T06:33:38.593Z,305.593353,1fc4,6,Debug [FLog::StudioEmbeddedBrowserWebView2] calling GetProcessExtendedInfos
+2026-10-22T06:33:38.632Z,305.632294,1fc4,6,Debug [FLog::StudioEmbeddedBrowserWebView2] GetProcessExtendedInfos: result=0
+2026-10-22T06:33:38.748Z,305.748444,8890,6 [DFLog::NamedMutex] NamedMutex(000001E7828CF4A0, name:InstallerInfo.log)
+2026-10-22T06:33:38.748Z,305.748444,8890,6 [DFLog::NamedMutex] ~NamedMutex(000001E7828CF4A0, name:InstallerInfo.log)
+2026-10-22T06:33:39.224Z,306.224243,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_c3
+2026-10-22T06:33:39.439Z,306.439941,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] ... region meadow_c4 (182 s in)
+2026-10-22T06:33:40.447Z,307.447021,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_c4
+2026-10-22T06:33:41.667Z,308.667694,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_c5
+2026-10-22T06:33:42.895Z,309.895447,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_d1
+2026-10-22T06:33:44.105Z,311.105438,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_d2
+2026-10-22T06:33:45.371Z,312.371429,8890,6,Info [FLog::CreatorOutput] [SELFTEST] ... region meadow_d3 (188 s in)
+2026-10-22T06:33:45.372Z,312.372437,8890,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_d3
+2026-10-22T06:33:46.597Z,313.597107,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_d4
+2026-10-22T06:33:47.816Z,314.816833,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_d5
+2026-10-22T06:33:49.024Z,316.024567,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_e1
+2026-10-22T06:33:49.295Z,316.295227,4190,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 15 cur_l2ts 201.1881317439879 elapsed_l2b 200.0205473300343
+2026-10-22T06:33:50.241Z,317.241913,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_e2
+2026-10-22T06:33:50.453Z,317.453217,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] ... region meadow_e3 (193 s in)
+2026-10-22T06:33:51.463Z,318.463104,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_e3
+2026-10-22T06:33:52.680Z,319.680847,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_e4
+2026-10-22T06:33:53.903Z,320.903931,7100,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region meadow_e5
+2026-10-22T06:33:53.940Z,320.940887,1fc4,6,Warning [FLog::CreatorWarning] Warning: [Windowsill] world: the spider is in cattail_1a, which has not arrived whole; it may fall through where a box should be
+2026-10-22T06:33:55.297Z,322.297577,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region cattail_1a
+2026-10-22T06:33:55.502Z,322.502411,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... region cattail_1b (198 s in)
+2026-10-22T06:33:56.518Z,323.518097,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region cattail_1b
+2026-10-22T06:33:57.742Z,324.742554,8890,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region cattail_2a
+2026-10-22T06:33:58.727Z,325.727661,8890,6 [DFLog::NamedMutex] NamedMutex(000001E788CCF4A0, name:InstallerInfo.log)
+2026-10-22T06:33:58.728Z,325.728668,8890,6 [DFLog::NamedMutex] ~NamedMutex(000001E788CCF4A0, name:InstallerInfo.log)
+2026-10-22T06:33:58.957Z,325.957184,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region cattail_2b
+2026-10-22T06:34:00.180Z,327.180908,4190,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region walk_s1
+2026-10-22T06:34:00.492Z,327.492676,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] No user input within the last 5000 ms. Allowing auto-save through.
+2026-10-22T06:34:00.493Z,327.493652,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] Time since last auto-save attempt of 270 seconds is < user's set auto-save interval of 300 seconds. Not starting auto-save attempt.
+2026-10-22T06:34:01.391Z,328.391724,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... region walk_n1 (204 s in)
+2026-10-22T06:34:01.391Z,328.391724,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region walk_n1
+2026-10-22T06:34:02.603Z,329.603882,8890,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region walk_s2
+2026-10-22T06:34:03.841Z,330.841858,4190,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region walk_n2
+2026-10-22T06:34:05.064Z,332.064789,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region walk_s3
+2026-10-22T06:34:06.273Z,333.273987,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region walk_n3
+2026-10-22T06:34:06.491Z,333.491974,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] ... region walk_s4 (209 s in)
+2026-10-22T06:34:07.509Z,334.509155,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region walk_s4
+2026-10-22T06:34:08.725Z,335.725830,4190,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region walk_n4
+2026-10-22T06:34:09.289Z,336.289856,7100,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 16 cur_l2ts 221.18277206196856 elapsed_l2b 220.01518764801497
+2026-10-22T06:34:09.940Z,336.940430,8890,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region deck_s1
+2026-10-22T06:34:11.154Z,338.154266,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region deck_n1
+2026-10-22T06:34:12.390Z,339.390961,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] ... region deck_s2 (215 s in)
+2026-10-22T06:34:12.390Z,339.390961,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region deck_s2
+2026-10-22T06:34:13.606Z,340.606873,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region deck_n2
+2026-10-22T06:34:14.819Z,341.819824,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region deck_s3
+2026-10-22T06:34:16.049Z,343.049713,4190,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region deck_n3
+2026-10-22T06:34:17.252Z,344.252228,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region deck_s4
+2026-10-22T06:34:17.458Z,344.458252,4190,6,Info [FLog::CreatorOutput] [SELFTEST] ... region deck_n4 (220 s in)
+2026-10-22T06:34:18.470Z,345.470612,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region deck_n4
+2026-10-22T06:34:18.748Z,345.748932,8890,6 [DFLog::NamedMutex] NamedMutex(000001E78474F4A0, name:InstallerInfo.log)
+2026-10-22T06:34:18.748Z,345.748932,8890,6 [DFLog::NamedMutex] ~NamedMutex(000001E78474F4A0, name:InstallerInfo.log)
+2026-10-22T06:34:19.688Z,346.688904,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pond_a1
+2026-10-22T06:34:20.906Z,347.906921,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pond_a2
+2026-10-22T06:34:22.122Z,349.122467,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pond_a3
+2026-10-22T06:34:23.338Z,350.338043,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... region pond_a4 (226 s in)
+2026-10-22T06:34:23.338Z,350.338043,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pond_a4
+2026-10-22T06:34:24.552Z,351.552490,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pond_b1
+2026-10-22T06:34:25.792Z,352.792816,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pond_b2
+2026-10-22T06:34:27.009Z,354.009064,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pond_b3
+2026-10-22T06:34:28.239Z,355.239227,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pond_b4
+2026-10-22T06:34:28.443Z,355.443298,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] ... region pond_c1 (231 s in)
+2026-10-22T06:34:29.280Z,356.280548,4190,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 17 cur_l2ts 241.17346867998188 elapsed_l2b 240.0058842660283
+2026-10-22T06:34:29.455Z,356.455597,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pond_c1
+2026-10-22T06:34:30.475Z,357.475891,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] No user input within the last 5000 ms. Allowing auto-save through.
+2026-10-22T06:34:30.476Z,357.476898,1fc4,6,Info [FLog::DataModelAutoSaver] Skipping auto-save because we are in playsolo
+2026-10-22T06:34:30.672Z,357.672882,8890,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pond_c2
+2026-10-22T06:34:31.906Z,358.906525,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pond_c3
+2026-10-22T06:34:33.115Z,360.115845,7de8,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region pond_c4
+2026-10-22T06:34:34.332Z,361.332123,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... region mown_e1 (237 s in)
+2026-10-22T06:34:34.334Z,361.334137,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region mown_e1
+2026-10-22T06:34:35.545Z,362.545074,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region mown_e2
+2026-10-22T06:34:36.770Z,363.770996,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region mown_n1
+2026-10-22T06:34:38.002Z,365.002563,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-400_-1416
+2026-10-22T06:34:38.735Z,365.735352,8890,6 [DFLog::NamedMutex] NamedMutex(000001E78358F4A0, name:InstallerInfo.log)
+2026-10-22T06:34:38.736Z,365.736359,8890,6 [DFLog::NamedMutex] ~NamedMutex(000001E78358F4A0, name:InstallerInfo.log)
+2026-10-22T06:34:39.224Z,366.224182,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-400_-1316
+2026-10-22T06:34:39.438Z,366.438965,7100,6,Info [FLog::CreatorOutput] [SELFTEST] ... region verge_-400_-1216 (242 s in)
+2026-10-22T06:34:40.446Z,367.446045,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-400_-1216
+2026-10-22T06:34:41.663Z,368.663116,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-400_-1116
+2026-10-22T06:34:41.673Z,368.673096,1fc4,6,Debug [FLog::StudioEmbeddedBrowserWebView2] calling GetProcessExtendedInfos
+2026-10-22T06:34:41.760Z,368.760864,1fc4,6,Debug [FLog::StudioEmbeddedBrowserWebView2] GetProcessExtendedInfos: result=0
+2026-10-22T06:34:42.880Z,369.880127,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-400_-1016
+2026-10-22T06:34:44.097Z,371.097931,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-400_-916
+2026-10-22T06:34:45.337Z,372.337799,8890,6,Info [FLog::CreatorOutput] [SELFTEST] ... region verge_-400_-816 (248 s in)
+2026-10-22T06:34:45.338Z,372.338806,8890,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-400_-816
+2026-10-22T06:34:46.566Z,373.566223,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-400_-716
+2026-10-22T06:34:47.771Z,374.771698,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-400_-616
+2026-10-22T06:34:48.989Z,375.989014,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-400_-516
+2026-10-22T06:34:49.282Z,376.282532,4190,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 18 cur_l2ts 261.17544158997885 elapsed_l2b 260.00785717602525
+2026-10-22T06:34:50.221Z,377.221924,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-400_-416
+2026-10-22T06:34:50.426Z,377.426392,8890,6,Info [FLog::CreatorOutput] [SELFTEST] ... region verge_-400_-316 (253 s in)
+2026-10-22T06:34:51.430Z,378.430054,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-400_-316
+2026-10-22T06:34:52.665Z,379.665558,7100,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-400_-216
+2026-10-22T06:34:53.893Z,380.893585,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-400_-116
+2026-10-22T06:34:55.099Z,382.099976,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-300_-1416
+2026-10-22T06:34:56.344Z,383.344574,8890,6,Info [FLog::CreatorOutput] [SELFTEST] ... region verge_-300_-816 (259 s in)
+2026-10-22T06:34:56.345Z,383.345581,8890,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-300_-816
+2026-10-22T06:34:57.568Z,384.568634,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-300_-716
+2026-10-22T06:34:58.739Z,385.739716,8890,6 [DFLog::NamedMutex] NamedMutex(000001E7821CF4A0, name:InstallerInfo.log)
+2026-10-22T06:34:58.739Z,385.739716,8890,6 [DFLog::NamedMutex] ~NamedMutex(000001E7821CF4A0, name:InstallerInfo.log)
+2026-10-22T06:34:58.785Z,385.785706,8890,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-300_-616
+2026-10-22T06:34:59.998Z,386.998077,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-300_-516
+2026-10-22T06:35:00.490Z,387.490692,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] No user input within the last 5000 ms. Allowing auto-save through.
+2026-10-22T06:35:00.490Z,387.490692,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] Time since last auto-save attempt of 30 seconds is < user's set auto-save interval of 300 seconds. Not starting auto-save attempt.
+2026-10-22T06:35:01.232Z,388.232910,4190,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-300_-416
+2026-10-22T06:35:01.432Z,388.432648,4190,6,Info [FLog::CreatorOutput] [SELFTEST] ... region verge_-300_-316 (264 s in)
+2026-10-22T06:35:02.441Z,389.441376,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-300_-316
+2026-10-22T06:35:03.666Z,390.666595,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-300_-216
+2026-10-22T06:35:04.898Z,391.898438,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-300_-116
+2026-10-22T06:35:06.122Z,393.122925,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-200_-1416
+2026-10-22T06:35:07.338Z,394.338593,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... region verge_-200_-516 (270 s in)
+2026-10-22T06:35:07.338Z,394.338593,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-200_-516
+2026-10-22T06:35:08.570Z,395.570374,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-100_-1416
+2026-10-22T06:35:09.290Z,396.290100,4190,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 19 cur_l2ts 281.18302473493213 elapsed_l2b 280.01544032097854
+2026-10-22T06:35:09.796Z,396.796753,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_-100_-516
+2026-10-22T06:35:11.023Z,398.023590,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_0_-1416
+2026-10-22T06:35:12.255Z,399.255402,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_0_-816
+2026-10-22T06:35:12.462Z,399.462189,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... region verge_0_-716 (275 s in)
+2026-10-22T06:35:13.478Z,400.478302,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_0_-716
+2026-10-22T06:35:14.699Z,401.699341,8890,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_0_-616
+2026-10-22T06:35:15.911Z,402.911133,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_0_-516
+2026-10-22T06:35:17.139Z,404.139526,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_100_-1416
+2026-10-22T06:35:18.357Z,405.357910,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] ... region verge_100_-816 (281 s in)
+2026-10-22T06:35:18.359Z,405.359894,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_100_-816
+2026-10-22T06:35:18.735Z,405.735107,8890,6 [DFLog::NamedMutex] NamedMutex(000001E782BCF4A0, name:InstallerInfo.log)
+2026-10-22T06:35:18.736Z,405.736084,8890,6 [DFLog::NamedMutex] ~NamedMutex(000001E782BCF4A0, name:InstallerInfo.log)
+2026-10-22T06:35:19.586Z,406.586700,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_100_-716
+2026-10-22T06:35:20.806Z,407.806885,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_100_-616
+2026-10-22T06:35:22.020Z,409.020905,4190,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_100_-516
+2026-10-22T06:35:23.249Z,410.249786,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_190_-666
+2026-10-22T06:35:23.462Z,410.462677,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... region verge_190_-566 (286 s in)
+2026-10-22T06:35:24.476Z,411.476074,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_190_-566
+2026-10-22T06:35:25.695Z,412.695984,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_290_-866
+2026-10-22T06:35:26.918Z,413.918152,8890,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_290_-766
+2026-10-22T06:35:28.142Z,415.142639,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_290_-666
+2026-10-22T06:35:29.285Z,416.285950,8890,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 20 cur_l2ts 301.17885787398734 elapsed_l2b 300.01127346003375
+2026-10-22T06:35:29.393Z,416.393677,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... region verge_290_-566 (292 s in)
+2026-10-22T06:35:29.394Z,416.394684,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_290_-566
+2026-10-22T06:35:30.504Z,417.504791,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] No user input within the last 5000 ms. Allowing auto-save through.
+2026-10-22T06:35:30.505Z,417.505798,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] Time since last auto-save attempt of 60 seconds is < user's set auto-save interval of 300 seconds. Not starting auto-save attempt.
+2026-10-22T06:35:30.609Z,417.609833,8890,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_390_-866
+2026-10-22T06:35:31.832Z,418.832184,8890,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_390_-766
+2026-10-22T06:35:33.061Z,420.061279,4190,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_390_-666
+2026-10-22T06:35:34.288Z,421.288177,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_390_-566
+2026-10-22T06:35:34.446Z,421.446411,7100,6,Warning [FLog::Output] settingsUrl: https://clientsettingscdn.roblox.com/v2/settings-compressed/application/PCStudioApp.zst
+2026-10-22T06:35:34.481Z,421.481262,9264,6,Warning [FLog::UpdateRequest] Didn't receive 'flagOnly' property for channel. Assuming it's false.
+2026-10-22T06:35:34.487Z,421.487244,0ea8,6,Info [FLog::StudioGuac] GUAC request succeeded
+2026-10-22T06:35:34.495Z,421.495209,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... region verge_490_-866 (297 s in)
+2026-10-22T06:35:34.620Z,421.620667,8890,6,Info [FLog::BackendConfigManager] updateConfig finished getting the config
+2026-10-22T06:35:34.638Z,421.638611,4190,6,Info [FLog::BackendConfigManager] SetCachedStartupConfig result for update true
+2026-10-22T06:35:34.675Z,421.675903,4190,6,Info [FLog::BackendConfigManager] Finished writing cache to SharedMemory and local file in 0 seconds
+2026-10-22T06:35:35.505Z,422.505066,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_490_-866
+2026-10-22T06:35:36.728Z,423.728058,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_490_-766
+2026-10-22T06:35:37.944Z,424.944458,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_490_-666
+2026-10-22T06:35:38.734Z,425.734711,8890,6 [DFLog::NamedMutex] NamedMutex(000001E785A0F4A0, name:InstallerInfo.log)
+2026-10-22T06:35:38.734Z,425.734711,8890,6 [DFLog::NamedMutex] ~NamedMutex(000001E785A0F4A0, name:InstallerInfo.log)
+2026-10-22T06:35:39.169Z,426.169434,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS region verge_490_-566
+2026-10-22T06:35:39.669Z,426.669769,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] ... walk on the sill (302 s in)
+2026-10-22T06:35:42.874Z,429.874847,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] INFO walk: 7.50 studs in 3 s, height 0.31 to 0.31
+2026-10-22T06:35:42.874Z,429.874847,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS walk on the sill
+2026-10-22T06:35:43.877Z,430.877045,8890,6,Info [FLog::CreatorOutput] [SELFTEST] INFO prey on the sill: 4 flies drawn
+2026-10-22T06:35:43.878Z,430.878052,8890,6,Info [FLog::CreatorOutput] [SELFTEST] PASS prey on the sill
+2026-10-22T06:35:44.738Z,431.738861,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] ... lock (307 s in)
+2026-10-22T06:35:45.842Z,432.842957,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] INFO lock: 3.0 studs away, facing it within 2 degrees, a sidestep of 0.64 studs in 1 s
+2026-10-22T06:35:45.946Z,432.946899,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] INFO lock: L1 holds creep, locks on press, and lets go on the next press
+2026-10-22T06:35:45.947Z,432.947906,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS lock
+2026-10-22T06:35:46.456Z,433.456970,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the hut's sill: 156 parts of the hut at the full tier; 1493 parts of the backdrop held of 1493 planned
+2026-10-22T06:35:46.457Z,433.457977,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the hut's sill
+2026-10-22T06:35:46.564Z,433.564606,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] INFO backdrop: at the sill the hut full and the railway far; at the railway's crest the railway full (Base+Full) and the hut far (Far), 563 parts; back at the sill the hut full (Base+Full)
+2026-10-22T06:35:46.564Z,433.564606,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the backdrop near and far
+2026-10-22T06:35:46.566Z,433.566620,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] INFO trains: the pass a commuter of 4 cars at 676 to 688 s; mid-pass 4 cars (12 parts) drawn; the clock at 428 s, the next at 676 s
+2026-10-22T06:35:46.566Z,433.566620,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the trains
+2026-10-22T06:35:49.319Z,436.319672,8890,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 21 cur_l2ts 321.21258921095114 elapsed_l2b 320.04500479699755
+2026-10-22T06:35:49.769Z,436.769684,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] ... the nursery: the window shut (312 s in)
+2026-10-22T06:35:51.140Z,438.140045,7100,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the nursery: a walk at the shut sash came to z -12.19 (the sash's outer face is -13.5); regions sill
+2026-10-22T06:35:51.140Z,438.140045,7100,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the nursery: the window shut
+2026-10-22T06:35:54.811Z,441.811920,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... the nursery: the ranger props the window (317 s in)
+2026-10-22T06:35:57.017Z,444.017670,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the nursery: the ranger's moment took 5.9 s; the wedge at x 6.2..8.0
+2026-10-22T06:35:57.017Z,444.017670,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the nursery: the ranger props the window
+2026-10-22T06:35:58.741Z,445.741943,8890,6 [DFLog::NamedMutex] NamedMutex(000001E78710F4A0, name:InstallerInfo.log)
+2026-10-22T06:35:58.741Z,445.741943,8890,6 [DFLog::NamedMutex] ~NamedMutex(000001E78710F4A0, name:InstallerInfo.log)
+2026-10-22T06:35:59.826Z,446.826416,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... the hut's inside (322 s in)
+2026-10-22T06:36:00.519Z,447.519775,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] No user input within the last 5000 ms. Allowing auto-save through.
+2026-10-22T06:36:00.521Z,447.521759,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] Time since last auto-save attempt of 90 seconds is < user's set auto-save interval of 300 seconds. Not starting auto-save attempt.
+2026-10-22T06:36:04.829Z,451.829315,8890,6,Info [FLog::CreatorOutput] [SELFTEST] ... the hut's inside (327 s in)
+2026-10-22T06:36:09.288Z,456.288727,4190,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 22 cur_l2ts 341.18165317799435 elapsed_l2b 340.01406876404076
+2026-10-22T06:36:09.842Z,456.842346,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... the hut's inside (332 s in)
+2026-10-22T06:36:14.848Z,461.848877,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... the hut's inside (337 s in)
+2026-10-22T06:36:18.725Z,465.725281,8890,6 [DFLog::NamedMutex] NamedMutex(000001E78B14F4A0, name:InstallerInfo.log)
+2026-10-22T06:36:18.725Z,465.725281,8890,6 [DFLog::NamedMutex] ~NamedMutex(000001E78B14F4A0, name:InstallerInfo.log)
+2026-10-22T06:36:19.853Z,466.853821,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... the hut's inside (342 s in)
+2026-10-22T06:36:24.865Z,471.865021,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... the hut's inside (348 s in)
+2026-10-22T06:36:26.704Z,473.704681,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the hut's inside: from the sill's front edge to hut_floor_b at (0.00, -69.61, 14.31); regions hut_floor_b, sill
+2026-10-22T06:36:28.240Z,475.240631,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the hut's inside
+2026-10-22T06:36:29.277Z,476.277802,4190,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 23 cur_l2ts 361.1707238740049 elapsed_l2b 360.00313946005133
+2026-10-22T06:36:29.889Z,476.889160,7100,6,Info [FLog::CreatorOutput] [SELFTEST] ... the way out (353 s in)
+2026-10-22T06:36:30.502Z,477.502777,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] No user input within the last 5000 ms. Allowing auto-save through.
+2026-10-22T06:36:30.503Z,477.503784,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] Time since last auto-save attempt of 120 seconds is < user's set auto-save interval of 300 seconds. Not starting auto-save attempt.
+2026-10-22T06:36:31.594Z,478.594849,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the way out: through the sash to hut_outer_sill at (-3.00, 0.31, -16.10); regions hut_outer_sill, sill
+2026-10-22T06:36:34.903Z,481.903534,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] ... the way out (358 s in)
+2026-10-22T06:36:38.741Z,485.741028,4190,6 [DFLog::NamedMutex] NamedMutex(000001E787DCF4A0, name:InstallerInfo.log)
+2026-10-22T06:36:38.741Z,485.741028,4190,6 [DFLog::NamedMutex] ~NamedMutex(000001E787DCF4A0, name:InstallerInfo.log)
+2026-10-22T06:36:39.907Z,486.907440,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] ... the way out (363 s in)
+2026-10-22T06:36:44.919Z,491.919800,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] ... the way out (368 s in)
+2026-10-22T06:36:49.287Z,496.287262,7100,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 24 cur_l2ts 381.1801678850327 elapsed_l2b 380.0125834710791
+2026-10-22T06:36:49.922Z,496.922150,8890,6,Info [FLog::CreatorOutput] [SELFTEST] ... the way out (373 s in)
+2026-10-22T06:36:53.973Z,500.973328,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the way out: from the outer sill's edge to hut_bench at (-3.00, -39.69, -24.10); regions hut_bench, hut_outer_sill, hut_wall_mid
+2026-10-22T06:36:54.925Z,501.925690,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... the way out (378 s in)
+2026-10-22T06:36:58.744Z,505.744995,8890,6 [DFLog::NamedMutex] NamedMutex(000001E78684F4A0, name:InstallerInfo.log)
+2026-10-22T06:36:58.744Z,505.744995,8890,6 [DFLog::NamedMutex] ~NamedMutex(000001E78684F4A0, name:InstallerInfo.log)
+2026-10-22T06:36:59.927Z,506.927490,8890,6,Info [FLog::CreatorOutput] [SELFTEST] ... the way out (383 s in)
+2026-10-22T06:37:00.503Z,507.503845,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] No user input within the last 5000 ms. Allowing auto-save through.
+2026-10-22T06:37:00.503Z,507.503845,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] Time since last auto-save attempt of 150 seconds is < user's set auto-save interval of 300 seconds. Not starting auto-save attempt.
+2026-10-22T06:37:04.941Z,511.941071,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... the way out (388 s in)
+2026-10-22T06:37:09.291Z,516.291138,4190,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 25 cur_l2ts 401.18405885995185 elapsed_l2b 400.01647444599826
+2026-10-22T06:37:09.948Z,516.948792,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... the way out (393 s in)
+2026-10-22T06:37:14.960Z,521.960205,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... the way out (398 s in)
+2026-10-22T06:37:16.174Z,523.174561,8890,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the way out: down the bench's leg to garden_a2 at (-77.00, -84.29, -61.06); regions garden_a2, hut_bench
+2026-10-22T06:37:16.174Z,523.174561,8890,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the way out
+2026-10-22T06:37:18.736Z,525.736145,8890,6 [DFLog::NamedMutex] NamedMutex(000001E78B88F4A0, name:InstallerInfo.log)
+2026-10-22T06:37:18.737Z,525.737183,8890,6 [DFLog::NamedMutex] ~NamedMutex(000001E78B88F4A0, name:InstallerInfo.log)
+2026-10-22T06:37:20.205Z,527.205505,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... the hut garden (403 s in)
+2026-10-22T06:37:22.230Z,529.230591,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the hut garden: 1 gnats and 3 aphids on the milkweed with a ladybird, 1 leafhoppers on the goldenrod, 4 springtails in the mulch, 3 woodlice by the trough, all drawn
+2026-10-22T06:37:22.230Z,529.230591,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the hut garden
+2026-10-22T06:37:24.763Z,531.763489,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the garden's near detail: 16 patches, 697 parts of them, 1500 parts of looks at full; dew at dawn on 13 of 13 drops
+2026-10-22T06:37:24.764Z,531.764465,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the garden's near detail
+2026-10-22T06:37:25.773Z,532.773743,0598,6,Info [FLog::CreatorOutput] [SELFTEST] ... the station's rival and garden's mate (408 s in)
+2026-10-22T06:37:29.289Z,536.289917,4190,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 26 cur_l2ts 421.18283911598667 elapsed_l2b 420.0152547020331
+2026-10-22T06:37:30.523Z,537.523682,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] No user input within the last 5000 ms. Allowing auto-save through.
+2026-10-22T06:37:30.525Z,537.525696,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] Time since last auto-save attempt of 180 seconds is < user's set auto-save interval of 300 seconds. Not starting auto-save attempt.
+2026-10-22T06:37:30.788Z,537.788696,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... the station's rival and garden's mate (413 s in)
+2026-10-22T06:37:32.778Z,539.778503,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the station's rival and garden's mate: the rival came in at hut_floor_b and walked 3.2 studs, in hut_floor_b; the mate came in at garden_b4, in garden_b4
+2026-10-22T06:37:32.778Z,539.778503,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the station's rival and garden's mate
+2026-10-22T06:37:34.338Z,541.338562,4190,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the hut's homes: hut_desk_drawer, hut_board_gap, garden_a1_trough, garden_a3_stone, garden_d3_mulch
+2026-10-22T06:37:34.338Z,541.338562,4190,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the hut's homes
+2026-10-22T06:37:34.566Z,541.566833,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the hut by night: the lamp
+2026-10-22T06:37:35.801Z,542.801392,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] ... the ceiling and the upper walls (418 s in)
+2026-10-22T06:37:38.738Z,545.738770,8890,6 [DFLog::NamedMutex] NamedMutex(000001E785A4F4A0, name:InstallerInfo.log)
+2026-10-22T06:37:38.739Z,545.739746,8890,6 [DFLog::NamedMutex] ~NamedMutex(000001E785A4F4A0, name:InstallerInfo.log)
+2026-10-22T06:37:40.807Z,547.807373,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] ... the ceiling and the upper walls (423 s in)
+2026-10-22T06:37:41.483Z,548.483765,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the ceiling: up the west wall past WALL_TOP to hut_up_d at (-146.19, 66.00, 134.00); regions hut_floor_d, hut_up_d
+2026-10-22T06:37:45.897Z,552.897949,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] ... the ceiling and the upper walls (429 s in)
+2026-10-22T06:37:46.900Z,553.900391,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the ceiling: head down under the boards at (-146.19, 149.69, 134.00) in hut_up_d
+2026-10-22T06:37:46.901Z,553.901428,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the ceiling and the upper walls
+2026-10-22T06:37:49.277Z,556.277466,4190,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 27 cur_l2ts 441.1703806299844 elapsed_l2b 440.0027962160308
+2026-10-22T06:37:50.902Z,557.902893,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... the back room (434 s in)
+2026-10-22T06:37:55.926Z,562.926331,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] ... the back room (439 s in)
+2026-10-22T06:37:58.733Z,565.733643,8890,6 [DFLog::NamedMutex] NamedMutex(000001E78908F4A0, name:InstallerInfo.log)
+2026-10-22T06:37:58.735Z,565.735596,8890,6 [DFLog::NamedMutex] ~NamedMutex(000001E78908F4A0, name:InstallerInfo.log)
+2026-10-22T06:38:00.506Z,567.506775,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] No user input within the last 5000 ms. Allowing auto-save through.
+2026-10-22T06:38:00.506Z,567.506775,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] Time since last auto-save attempt of 210 seconds is < user's set auto-save interval of 300 seconds. Not starting auto-save attempt.
+2026-10-22T06:38:00.935Z,567.935242,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] ... the back room (444 s in)
+2026-10-22T06:38:05.947Z,572.947754,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... the back room (449 s in)
+2026-10-22T06:38:09.288Z,576.288025,4190,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 28 cur_l2ts 461.18091962600533 elapsed_l2b 460.01333521205174
+2026-10-22T06:38:10.959Z,577.959473,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... the back room (454 s in)
+2026-10-22T06:38:11.425Z,578.425903,0598,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the back room: through the doorway to room_floor_g at (180.01, -69.69, 215.00); regions hut_doorway, hut_floor_i, room_floor_g
+2026-10-22T06:38:13.782Z,580.782104,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the back room
+2026-10-22T06:38:15.965Z,582.965515,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... the eaves (459 s in)
+2026-10-22T06:38:18.731Z,585.731506,8890,6 [DFLog::NamedMutex] NamedMutex(000001E78AC8F4A0, name:InstallerInfo.log)
+2026-10-22T06:38:18.732Z,585.732483,8890,6 [DFLog::NamedMutex] ~NamedMutex(000001E78AC8F4A0, name:InstallerInfo.log)
+2026-10-22T06:38:20.993Z,587.993408,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... the eaves (464 s in)
+2026-10-22T06:38:25.998Z,592.998840,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] ... the eaves (469 s in)
+2026-10-22T06:38:29.255Z,596.255798,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the eaves: along the gutter to hut_eave_e1 at (37.12, 122.81, -54.00) (208 cm over the ground); regions hut_eave_e1, hut_eave_mid
+2026-10-22T06:38:29.255Z,596.255798,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the eaves
+2026-10-22T06:38:29.315Z,596.315186,4190,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 29 cur_l2ts 481.20808695800304 elapsed_l2b 480.04050254404945
+2026-10-22T06:38:30.474Z,597.474976,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the cat: walking from the bowls to the window (walk), moved 60.0 studs in a second; the bell 0.66 at 175 studs
+2026-10-22T06:38:30.499Z,597.499878,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] No user input within the last 5000 ms. Allowing auto-save through.
+2026-10-22T06:38:30.500Z,597.500854,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] Time since last auto-save attempt of 240 seconds is < user's set auto-save interval of 300 seconds. Not starting auto-save attempt.
+2026-10-22T06:38:31.041Z,598.041260,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... the cat (474 s in)
+2026-10-22T06:38:32.249Z,599.249939,4190,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the cat: at its bowls it noticed a spider moving in front of it (true), crouched to pat (true), gave up once it was up on the desk (true); notices 1, pats 0, swats 0
+2026-10-22T06:38:32.250Z,599.250916,4190,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the cat
+2026-10-22T06:38:36.297Z,603.297791,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] ... the bench patch (479 s in)
+2026-10-22T06:38:38.606Z,605.606262,1fc4,6,Debug [FLog::StudioEmbeddedBrowserWebView2] calling GetProcessExtendedInfos
+2026-10-22T06:38:38.650Z,605.650513,1fc4,6,Debug [FLog::StudioEmbeddedBrowserWebView2] GetProcessExtendedInfos: result=0
+2026-10-22T06:38:38.746Z,605.746521,8890,6 [DFLog::NamedMutex] NamedMutex(000001E78314F4A0, name:InstallerInfo.log)
+2026-10-22T06:38:38.747Z,605.747559,8890,6 [DFLog::NamedMutex] ~NamedMutex(000001E78314F4A0, name:InstallerInfo.log)
+2026-10-22T06:38:41.302Z,608.302551,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... the bench patch (484 s in)
+2026-10-22T06:38:43.834Z,610.834473,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the bench patch: walked path_m4 to pad_a2, pad_a2 to pad_b2, pad_c2 to meadow_a3; homes bench_slats, bin_lip, meadow_b2_leaf; the lamppost lit at night (true) and out by day (true)
+2026-10-22T06:38:43.834Z,610.834473,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the bench patch
+2026-10-22T06:38:46.375Z,613.375610,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... the meadow's edge (489 s in)
+2026-10-22T06:38:46.375Z,613.375610,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the meadow's edge: on the coneflower's cone 74 cm over the ground; 1 leafhoppers on the bluestem, 6 ants at the hill (6 drawn)
+2026-10-22T06:38:46.375Z,613.375610,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the meadow's edge
+2026-10-22T06:38:46.436Z,613.436340,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the crab spiders: a yellow one on meadow_e3 and a white one on meadow_d4, 2 drawn; the close look opened its page
+2026-10-22T06:38:46.436Z,613.436340,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the crab spiders
+2026-10-22T06:38:49.289Z,616.289551,4190,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 30 cur_l2ts 501.1824983939639 elapsed_l2b 500.0149139800103
+2026-10-22T06:38:50.215Z,617.215698,8890,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the robin: in on gravel at 6.12 h, its shadow over the spider, landed and drawn (stand); on the sim struck in Normal, missed in the gentle rules
+2026-10-22T06:38:50.215Z,617.215698,8890,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the robin
+2026-10-22T06:38:51.386Z,618.386536,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] ... the field crickets (494 s in)
+2026-10-22T06:38:56.255Z,623.255432,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the field crickets: one in meadow_b2's thatch, drawn, singing at 22:00 once the spider kept still
+2026-10-22T06:38:56.255Z,623.255432,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the field crickets
+2026-10-22T06:38:56.659Z,623.659729,8890,6,Info [FLog::CreatorOutput] [SELFTEST] ... ballooning's landings (499 s in)
+2026-10-22T06:38:58.765Z,625.765808,8890,6 [DFLog::NamedMutex] NamedMutex(000001E784A8F4A0, name:InstallerInfo.log)
+2026-10-22T06:38:58.765Z,625.765808,8890,6 [DFLog::NamedMutex] ~NamedMutex(000001E784A8F4A0, name:InstallerInfo.log)
+2026-10-22T06:39:00.513Z,627.513733,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] No user input within the last 5000 ms. Allowing auto-save through.
+2026-10-22T06:39:00.513Z,627.513733,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] Time since last auto-save attempt of 270 seconds is < user's set auto-save interval of 300 seconds. Not starting auto-save attempt.
+2026-10-22T06:39:01.989Z,628.989319,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... ballooning's landings (505 s in)
+2026-10-22T06:39:02.400Z,629.400391,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] INFO ballooning's landings: stood on 15 (garden_a2, garden_a4, garden_b1, garden_c2, garden_d2, meadow_b1, meadow_b3, meadow_c3, meadow_d2, meadow_d5, meadow_e3, pond_a1, pond_b1, deck_n2, deck_s3)
+2026-10-22T06:39:02.401Z,629.401367,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS ballooning's landings
+2026-10-22T06:39:07.350Z,634.350769,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... the mown path and the boardwalk (510 s in)
+2026-10-22T06:39:09.355Z,636.355164,4190,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 31 cur_l2ts 521.2480570870166 elapsed_l2b 520.080472673063
+2026-10-22T06:39:12.354Z,639.354309,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] ... the mown path and the boardwalk (515 s in)
+2026-10-22T06:39:17.507Z,644.507385,7100,6,Info [FLog::CreatorOutput] [SELFTEST] ... the mown path and the boardwalk (520 s in)
+2026-10-22T06:39:18.735Z,645.735107,8890,6 [DFLog::NamedMutex] NamedMutex(000001E786E0F4A0, name:InstallerInfo.log)
+2026-10-22T06:39:18.736Z,645.736084,8890,6 [DFLog::NamedMutex] ~NamedMutex(000001E786E0F4A0, name:InstallerInfo.log)
+2026-10-22T06:39:22.516Z,649.516357,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] ... the mown path and the boardwalk (525 s in)
+2026-10-22T06:39:27.521Z,654.521973,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... the mown path and the boardwalk (530 s in)
+2026-10-22T06:39:29.292Z,656.292419,4190,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 32 cur_l2ts 541.1853320299572 elapsed_l2b 540.0177476160036
+2026-10-22T06:39:30.507Z,657.507202,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] No user input within the last 5000 ms. Allowing auto-save through.
+2026-10-22T06:39:30.512Z,657.512146,1fc4,6,Info [FLog::DataModelAutoSaver] Skipping auto-save because we are in playsolo
+2026-10-22T06:39:32.535Z,659.535706,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] ... the mown path and the boardwalk (535 s in)
+2026-10-22T06:39:35.003Z,662.003723,7100,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the mown path and the boardwalk: walked pad_b3 to mown_e1, mown_n1 to walk_s1, walk_s4 to deck_s1; homes deck_gap, pond_stone, cattail_leaf
+2026-10-22T06:39:35.004Z,662.004700,7100,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the mown path and the boardwalk
+2026-10-22T06:39:37.550Z,664.550842,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... the water (540 s in)
+2026-10-22T06:39:38.755Z,665.755554,8890,6 [DFLog::NamedMutex] NamedMutex(000001E781E8F4A0, name:InstallerInfo.log)
+2026-10-22T06:39:38.756Z,665.756531,8890,6 [DFLog::NamedMutex] ~NamedMutex(000001E781E8F4A0, name:InstallerInfo.log)
+2026-10-22T06:39:39.129Z,666.129944,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the water: walked off a lily pad's edge, struggled 3 s and got out (the gentle rules for the moment); on the sim a long fall into open water drowned in Normal
+2026-10-22T06:39:39.129Z,666.129944,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the water
+2026-10-22T06:39:41.141Z,668.141174,7100,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the pond's life: 1 midges at dusk on pond_a3's stems; 4 water striders on pond_b3's open water (4 drawn)
+2026-10-22T06:39:41.142Z,668.142700,7100,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the pond's life
+2026-10-22T06:39:41.196Z,668.196899,4190,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the green frog: on pond_a2_flat, drawn, the close look saw it (true); on the sim struck in Normal, missed in the gentle rules, a still spider spared
+2026-10-22T06:39:41.196Z,668.196899,4190,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the green frog
+2026-10-22T06:39:41.507Z,668.507019,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS the nursery: the window put back
+2026-10-22T06:39:41.684Z,668.684631,1fc4,6,Debug [FLog::StudioEmbeddedBrowserWebView2] calling GetProcessExtendedInfos
+2026-10-22T06:39:41.727Z,668.727722,1fc4,6,Debug [FLog::StudioEmbeddedBrowserWebView2] GetProcessExtendedInfos: result=0
+2026-10-22T06:39:42.705Z,669.705750,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... notebook (545 s in)
+2026-10-22T06:39:42.706Z,669.706787,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS notebook
+2026-10-22T06:39:48.838Z,675.838318,8890,6,Info [FLog::CreatorOutput] [SELFTEST] ... rest and checkpoint (551 s in)
+2026-10-22T06:39:50.015Z,677.015686,0b38,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 33 cur_l2ts 561.9085965300334 elapsed_l2b 560.7410121160798
+2026-10-22T06:39:51.536Z,678.536987,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS rest and checkpoint
+2026-10-22T06:39:51.536Z,678.536987,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] INFO sound: music volume 0.128, IsLoaded true
+2026-10-22T06:39:51.536Z,678.536987,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS sound
+2026-10-22T06:39:53.088Z,680.088562,3bc0,6,Info [FLog::StudioPluginOTANew] Download starting for Plugin OTA
+2026-10-22T06:39:53.091Z,680.091614,3bc0,6 [FLog::StudioPluginOTA] checkOTAUpdate check new ota update.
+2026-10-22T06:39:53.092Z,680.092590,3bc0,6,Verbose [FLog::StudioPluginOTANew] Download OTA manifest start
+2026-10-22T06:39:53.181Z,680.181091,8890,6 [FLog::StudioPluginOTA] fetchSuccess Fetch plugin versions success
+2026-10-22T06:39:53.181Z,680.181091,8890,6,Info [FLog::StudioPluginOTANew] Download OTA manifest complete
+2026-10-22T06:39:53.181Z,680.181091,8890,6,Verbose [FLog::StudioPluginOTANew] Selected plugin version: 24803, studio version: 0.744.0.7441077 for plugin SuperTemplate
+2026-10-22T06:39:53.181Z,680.181091,8890,6,Verbose [FLog::StudioPluginOTANew] Selected plugin version: 24687, studio version: 0.744.0.7441077 for plugin DeviceSimulatorToolbar
+2026-10-22T06:39:53.181Z,680.181091,8890,6,Verbose [FLog::StudioPluginOTANew] Selected plugin version: 24782, studio version: 0.744.0.7441077 for plugin AnimationGraphEditor
+2026-10-22T06:39:53.181Z,680.181091,8890,6,Verbose [FLog::StudioPluginOTANew] Selected plugin version: 24794, studio version: 0.744.0.7441077 for plugin AssetManager
+2026-10-22T06:39:53.181Z,680.181091,8890,6,Verbose [FLog::StudioPluginOTANew] Write OTA cache
+2026-10-22T06:39:53.186Z,680.186096,8890,6,Info [FLog::StudioPluginOTANew] Found 0 plugins to download in the manifest
+2026-10-22T06:39:53.186Z,680.186096,8890,6 [FLog::StudioPluginOTA] downloadCompleteSuccess Download complete successfully
+2026-10-22T06:39:53.187Z,680.187134,4190,6,Info [FLog::StudioPluginOTANew] Download completed successfully for Plugin OTA
+2026-10-22T06:39:53.188Z,680.188110,8890,6,Info [FLog::StudioPluginOTANew] Successfully acquired deploy lock for plugin deployment - proceeding with deployment
+2026-10-22T06:39:53.188Z,680.188110,8890,6,Info [FLog::StudioPluginOTANew] Deploy starting for Plugin OTA
+2026-10-22T06:39:53.191Z,680.191101,8890,6,Verbose [FLog::StudioPluginOTANew] Deployed 0 plugins
+2026-10-22T06:39:53.191Z,680.191101,8890,6,Info [FLog::StudioPluginOTANew] Deploy finished successfully for Plugin OTA
+2026-10-22T06:39:53.192Z,680.192139,8890,6,Info [FLog::StudioPluginOTANew] Hot reload attempted but not actually enabled, skipping hot reload
+2026-10-22T06:39:53.192Z,680.192139,4190,6,Info [FLog::StudioPluginOTANew] waiting for 649.7752685546875 seconds to start next OTA download
+2026-10-22T06:39:54.580Z,681.580688,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... frame time on the sill (557 s in)
+2026-10-22T06:39:56.542Z,683.542175,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] INFO frame time on the sill: 280 frames, mean 17.9 ms (56 fps), worst 42.4 ms, physics 60 fps
+2026-10-22T06:39:56.543Z,683.543152,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] INFO profile on the sill: 280 frames, the render step 6.52 ms a frame (worst 12.6): spider rig 2.36/4.6, sound 0.75/1.7, fly bodies 0.45/1.0, camera 0.41/1.4, hud 0.40/0.7, light 0.37/3.8, senses 0.33/1.2, other rigs 0.28/2.1, prey 0.22/0.6, wasp 0.22/0.5, life 0.15/0.5, rival 0.15/0.4, motor 0.09/0.3, looks 0.07/0.9, small 0.28 (mean/worst ms); a frame: spider parts placed 638, fly parts placed 124, bug parts placed 0, camera casts 3, camera overlaps 2, camera rays 0, framing searches 0; allocated 199 KB a frame (percepts 2, senses 2, prey 2, wasp 2, rival 2, life 2, camera 2, light 9, spider rig 73, other rigs 4, hud 4, fly bodies 41, sound 51)
+2026-10-22T06:39:56.544Z,683.544128,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] INFO engine on the sill: memory 542.2 MB, Lua heap 187.2 MB, instances 59946, primitives 6282 (moving 1103), awake parts 0
+2026-10-22T06:39:56.560Z,683.560120,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] INFO census on the sill: 6282 parts, 911 see-through, 1541 casting shadows, 1220 meshed (parts/see-through/shadow/meshed: Cat 62/0/32/52, CrabSpiders 46/0/0/22, Decor 724/149/71/388, Flies 156/52/0/68, JumpArc 34/0/0/0, LivingHabitat 231/32/3/95, PondAnimals 43/4/0/43, RivalSpider 211/112/60/44, Robin 24/0/0/20, Spider 707/514/86/94, Wasp 56/12/0/19, World 2463/1/1224/0, WorldDecor 1499/35/64/359, the rest 26/0/1/16)
+2026-10-22T06:39:56.561Z,683.561096,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] INFO shadows on the sill: 1208 of 1930 visible walkable boxes cast, 722 too small to see at their distance cast none (305 passes, 16298 writes)
+2026-10-22T06:39:58.737Z,685.737549,8890,6 [DFLog::NamedMutex] NamedMutex(000001E752C3F4A0, name:InstallerInfo.log)
+2026-10-22T06:39:58.737Z,685.737549,8890,6 [DFLog::NamedMutex] ~NamedMutex(000001E752C3F4A0, name:InstallerInfo.log)
+2026-10-22T06:39:59.708Z,686.708923,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] ... frame time on the sill (562 s in)
+2026-10-22T06:39:59.709Z,686.709900,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] INFO frame time on the sill without the far preserve: 159 frames, mean 19.9 ms (50 fps), worst 185.4 ms, physics 60 fps
+2026-10-22T06:39:59.709Z,686.709900,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] INFO profile on the sill without the far preserve: 159 frames, the render step 7.09 ms a frame (worst 21.0): spider rig 2.45/4.4, sound 0.79/1.8, light 0.52/3.3, camera 0.45/3.6, fly bodies 0.42/1.1, hud 0.39/0.7, senses 0.37/1.5, other rigs 0.29/2.2, wasp 0.26/5.0, looks 0.24/0.7, prey 0.21/1.1, rival 0.16/1.4, life 0.16/1.4, motor 0.08/0.7, small 0.29 (mean/worst ms); a frame: spider parts placed 665, fly parts placed 124, bug parts placed 0, camera casts 4, camera overlaps 2, camera rays 0, framing searches 0; allocated 209 KB a frame (percepts 3, senses 3, prey 2, motor 1, wasp 8, rival 2, life 2, camera 2, light 11, spider rig 75, other rigs 5, hud 4, fly bodies 38, sound 52)
+2026-10-22T06:39:59.709Z,686.709900,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] INFO engine on the sill without the far preserve: memory 548.7 MB, Lua heap 144.1 MB, instances 57259, primitives 3954 (moving 1190), awake parts 0
+2026-10-22T06:40:00.500Z,687.500854,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] No user input within the last 5000 ms. Allowing auto-save through.
+2026-10-22T06:40:00.500Z,687.500854,1fc4,6,Info [FLog::AutoSaveDelayOnUserInputLog] Time since last auto-save attempt of 30 seconds is < user's set auto-save interval of 300 seconds. Not starting auto-save attempt.
+2026-10-22T06:40:02.755Z,689.755432,4190,6,Info [FLog::CreatorOutput] [SELFTEST] INFO frame time on the sill without shadows: 162 frames, mean 18.8 ms (53 fps), worst 119.0 ms, physics 60 fps
+2026-10-22T06:40:02.756Z,689.756470,4190,6,Info [FLog::CreatorOutput] [SELFTEST] INFO profile on the sill without shadows: 162 frames, the render step 6.92 ms a frame (worst 13.8): spider rig 2.29/4.8, sound 0.84/2.1, fly bodies 0.50/1.1, light 0.44/3.2, camera 0.41/1.5, hud 0.40/0.9, senses 0.34/1.3, other rigs 0.29/2.8, looks 0.26/0.8, prey 0.25/1.7, wasp 0.25/1.3, rival 0.15/0.7, life 0.15/0.7, motor 0.08/0.4, small 0.27 (mean/worst ms); a frame: spider parts placed 644, fly parts placed 124, bug parts placed 0, camera casts 3, camera overlaps 2, camera rays 0, framing searches 0; allocated 207 KB a frame (percepts 3, senses 2, prey 2, wasp 2, rival 2, life 2, camera 2, light 11, spider rig 73, other rigs 5, hud 4, fly bodies 45, sound 52)
+2026-10-22T06:40:02.756Z,689.756470,4190,6,Info [FLog::CreatorOutput] [SELFTEST] INFO engine on the sill without shadows: memory 534.4 MB, Lua heap 176.8 MB, instances 59950, primitives 6285 (moving 1186), awake parts 0
+2026-10-22T06:40:02.756Z,689.756470,4190,6,Info [FLog::CreatorOutput] [SELFTEST] INFO the far preserve on the sill: mean 17.9 ms as it is, 19.9 ms without the far preserve (181 folders, 2334 parts out), 18.8 ms without shadows
+2026-10-22T06:40:02.756Z,689.756470,4190,6,Info [FLog::CreatorOutput] [SELFTEST] PASS frame time on the sill
+2026-10-22T06:40:02.766Z,689.766479,4190,6,Info [FLog::CreatorOutput] [SELFTEST] INFO parts at the full tier: 6285 in the workspace (Cat 62, CrabSpiders 46, Decor 724, Flies 156, FlyClearanceProbe 1, HutLamp 1, JumpArc 34, LivingHabitat 231, PondAnimals 43, ReplicationFoci 1, RivalSpider 211, Robin 24, Spider 707, StationMouse 16, StreetLamp 1, Terrain 1, Wasp 56, WindowsillAudio 5, World 2463, WorldDecor 1502)
+2026-10-22T06:40:02.767Z,689.767456,4190,6,Info [FLog::CreatorOutput] [SELFTEST] INFO looks outside the window: 1493 parts held of 1493 planned at the full tier, 149135 made and 147618 destroyed this session, 527 plans
+2026-10-22T06:40:02.767Z,689.767456,4190,6,Info [FLog::CreatorOutput] [SELFTEST] PASS part counts
+2026-10-22T06:40:03.392Z,690.392883,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] PASS fallbacks clear the shelf books and station boots
+2026-10-22T06:40:05.130Z,692.130737,6edc,6,Info [FLog::CreatorOutput] [SELFTEST] ... visible meal and contextual controls (568 s in)
+2026-10-22T06:40:09.280Z,696.280212,4190,6,Info [FLog::SessionL2ValidationHelper] onSessionHeartbeat sc_count 4 sh_count 34 cur_l2ts 581.1731442439632 elapsed_l2b 580.0055598300096
+2026-10-22T06:40:09.527Z,696.527588,3bc0,6,Info [FLog::CreatorOutput] [SELFTEST] PASS visible meal and contextual controls
+2026-10-22T06:40:10.275Z,697.275513,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] ... Normal starvation reaches the life-ending handler (573 s in)
+2026-10-22T06:40:10.275Z,697.275513,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] PASS Normal starvation reaches the life-ending handler
+2026-10-22T06:40:10.275Z,697.275513,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] INFO took 573 s
+2026-10-22T06:40:10.275Z,697.275513,0b38,6,Info [FLog::CreatorOutput] [SELFTEST] END pass=274 fail=0 skip=0

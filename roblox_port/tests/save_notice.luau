@@ -49,18 +49,26 @@ local decor,replaced=Scenery.decor(nil,"preserve");decor.Parent=workspace
 local hidden={};for id in replaced do hidden[id]=true end
 Build.world(workspace,Map.SEED,hidden)
 local handlers={}
-local function deliver(message) for _,fn in handlers do fn(message) end end
+local sequence=0
+local function deliver(message)
+ sequence+=1;message.epoch="notice-fixture";message.sequence=sequence
+ if message.kind=="loaded" then message.v=3;message.offers={} end
+ for _,fn in handlers do fn(message) end
+end
 local folder=Instance.new("Folder");folder.Name=Rules.REMOTES_NAME
 local server=Instance.new("Folder");server.Name="ToServer"
 rawset(server,"FireServer",function(_self,msg)
- if msg.kind=="begin_life" then deliver({kind="life",mode=msg.mode,serial=msg.serial,token="save-notice-fixture"}) end
+ -- Scripted acknowledgements only; actual durable storage is checked in state.luau.
+ if msg.kind=="life_intent" then deliver({kind="decision",decision={mode=msg.mode,kind=msg.intent,serial=msg.serial,offerId=msg.offerId,revision=1,state="writable",credential="notice-grant",life="notice-life"}})
+ elseif msg.kind=="rest" then deliver({kind="stored",mode=msg.mode,serial=msg.serial,credential=msg.credential,restSerial=msg.restSerial}) end
 end);server.Parent=folder
 local client=Instance.new("Folder");client.Name="ToClient"
 rawset(client,"OnClientEvent",{Connect=function(_self,fn) table.insert(handlers,fn) end});client.Parent=folder
 folder.Parent=game:GetService("ReplicatedStorage")
 assert(pcall(function() require("../src/Client/SpiderClient.client") end),"client did not load")
 local d=assert(ClientStubs.driver);local frame=assert(ClientStubs.renderSteps.SpiderSim)
-local function frames(n) for _=1,n do frame(1/60) end end
+local saveNow=os.clock();d.saveClient.cfg.now=function() return saveNow end
+local function frames(n) for _=1,n do saveNow+=6;frame(1/60) end end
 -- A server cannot answer hello before the client has connected its transport.
 -- Loading navigation now precedes that frame work; await the real connection.
 for _=1,5000 do frames(1);if #handlers>0 then break end end
@@ -69,7 +77,7 @@ deliver({kind="loaded",v=1,status="saved",progress=Progress.default(),rests={}})
 d.title.seen=true
 local ready=false;for _=1,5000 do if d.fresh("free",false,nil) then ready=true;break end;frames(1) end
 assert(ready,"fresh life did not start")
-d.menu:hide();frames(2)
+d.menu:hide();frames(10)
 for _,reason in {"write_failed","rest_refused","rest_protected"} do
  deliver({kind="status",status="saving",reason=reason});frames(2)
  check(d.hud.saveNoticeLabel.Text==Text.menuLine("saving",reason),"real transport reaches save notice: "..reason)

@@ -188,5 +188,17 @@ do
  end)
  check(c:status()=="saved","reentrant newer candidate eventually receives its own receipt")
 end
+do
+ for _,throws in {false,true} do
+  local c=setup({onRestore=function() if throws then error("restore failed") end;return false end})
+  loaded(c,1,"main",1)
+  check(not c:choose("main","continue","a") and c:decision("main")==nil,"failed restore abandons new permission path")
+  local packets=0;c:update(0,function() packets+=1 end)
+  check(packets==0,"failed restore sends no continuation or checkpoint")
+ end
+ local c=setup();loaded(c,1,"main",1)
+ local info=c:offerInfo("main");info.id="mutated"
+ check(c:offerInfo("main").id=="a" and c:offerInfo("main").record==nil,"menu metadata is private and carries no full world copy")
+end
 print(`SAVE_CONTINUATION passed={passed} failed={failed}`)
 assert(failed==0,"continuation failures")

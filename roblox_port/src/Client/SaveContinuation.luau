@@ -5,7 +5,7 @@ local Continuation={}
 Continuation.__index=Continuation
 export type Config={rules:any,copy:(any)->any,validate:(string,any,boolean)->boolean,
  onLoaded:((any)->())?,onOffer:((string,any)->())?,onDecision:((any)->())?,
- onRestore:((string,any)->())?,onStatus:((string,string?)->())?}
+ onRestore:((string,any)->boolean?)?,onStatus:((string,string?)->())?}
 local function integer(n:any,max:number):boolean
  return type(n)=="number" and n==n and n>=1 and n<=max and n==math.floor(n)
 end
@@ -19,6 +19,13 @@ end
 local function offerValue(self:any,mode:string,value:any):any
  if type(value)~="table" or not token(self,value.id) or type(value.protected)~="boolean" or not self.cfg.validate(mode,value.record,true) then return nil end
  return {id=value.id,record=self.cfg.copy(value.record),protected=value.protected}
+end
+function Continuation.offerInfo(self:any,mode:string):any
+ local v=self.offers[mode]
+ return if v then {id=v.id,protected=v.protected,playable=v.record.save_retired~=true} else nil
+end
+function Continuation.abandon(self:any,mode:string)
+ self.requests[mode]=nil
 end
 function Continuation.offer(self:any,mode:string):any
  local v=self.offers[mode];return if v then self.cfg.copy(v) else nil
@@ -151,7 +158,13 @@ function Continuation.choose(self:any,mode:string,kind:string,id:string?):boolea
  self.requests[mode]=r;self.decisionSeq[mode]=0
  -- Commit the complete intent before callbacks; a callback can choose another
  -- life immediately. Restore only here, once per explicit user choice.
- if kind=="continue" then callback(self.cfg.onRestore,mode,self.cfg.copy(r.selected)) end
+ if kind=="continue" and self.cfg.onRestore then
+  local ok,result=pcall(self.cfg.onRestore,mode,self.cfg.copy(r.selected))
+  if not ok or result==false then
+   if self.requests[mode]==r then self.requests[mode]=nil end
+   return false
+  end
+ end
  return true
 end
 function Continuation.refresh(self:any,mode:string)
@@ -169,8 +182,11 @@ function Continuation.status(self:any,mode:string?):(string,string?)
  if self.st=="session" then return self.st,self.why end
  for m,r in self.requests do
   if mode==nil or mode==m then
-   if r.state=="changed" then return "session","other_session" end
-   if r.state~="writable" or not r.credential then return "session",r.reason or "other_session" end
+   if r.state=="changed" then return "session","save_changed" end
+   if r.state~="writable" or not r.credential then
+    if r.reason==nil or r.reason=="revalidating" then return "saving",nil end
+    return "session",r.reason
+   end
    if r.candidate and r.candidate.refused then return "saving","rest_refused" end
    if r.candidate and not r.candidate.stored then return "saving",self.why end
   end

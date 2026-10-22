@@ -88,6 +88,8 @@ local M = {
 	SaveRules = require(Shared.Data.SaveRules),
 	SaveProgress = require(Shared.Persistence.SaveProgress),
 	SaveText = require(Shared.UI.SaveText),
+ SaveRest = require(Shared.Persistence.SaveRest),
+ SaveJson = require(Shared.Persistence.Json),
 	CheckpointStore = require(Shared.Persistence.CheckpointStore),
 	NotebookPages = require(Shared.Data.NotebookPages),
 	FieldNotebook = require(Shared.Learning.FieldNotebook),
@@ -769,14 +771,14 @@ function spiderPick.touchFrame()
 end
 
 -- Backspace / View: back to the retreat checkpoint (the whole sill as it was), or to the start when there is none yet.
-local function returnToCheckpoint()
+local function returnToCheckpoint(offered: any?): boolean
 	spiderPick.finish(nil, true) -- (a close look does not survive a return to the last rest)
-	local best = checkpoints:loadBest()
+	local best = if offered then {ok=true,record=offered} else checkpoints:loadBest()
 	if not best.ok then
 		mateLegs.skip(true) -- (a scene is not left playing round a spider put back at the start: the pair part, ROBLOX-89)
 		backToStart()
 		hud:toast(if best.message == "no last rest to return to" then "No last rest yet: back to the start. Rest in the silk-lined crack to keep one." else "Back to the start: " .. best.message, true)
-		return
+		return false
 	end
 	jump:drop(motor)
 	ant.stopDisplay()
@@ -784,10 +786,11 @@ local function returnToCheckpoint()
 	if not ok then
 		warn("[Windowsill] checkpoint refused: " .. table.concat(problems, "; "))
 		hud:toast("The last rest could not be used: " .. (problems[1] or "unknown"), true)
-		return
+		return false
 	end
  if M.rareBody then M.rareBody:clear();M.rareVisitor=nil end
 	session.mode, session.rules, session.ended = life.mode or "main", life.rules or "standard", false
+	if saveClient then saveClient.activeSlot=M.SaveRules.slotOf(session.mode,session.rules) end
 	session.started = true -- (ROBLOX-109: a life is running from a rest too: the title card is over, and the life menu offers Resume)
 	table.clear(M.nature.night) -- (ROBLOX-106: the night's passes are counted again from the restored hour)
  mateLegs.reset()
@@ -812,6 +815,7 @@ local function returnToCheckpoint()
 	lastLight = nil -- the hour may have changed: set the light again
 	feedPending, cancelPending = false, false
 	watch:resync() -- the world changed under the watcher: it only takes a fresh look
+ return true
 end
 
 -- Player progress is session-only and outside checkpoints. Modes have independent rest stores.
@@ -832,7 +836,7 @@ local function closeScreens()
  panel:hide();menu:hide();setHudShown(true);controls:clear();dropAll()
  if M.title then M.title:stop() end -- (ROBLOX-109: a new life, a rest or Resume ends an intro that was playing)
 end
-local function fresh(mode: string, easy: boolean, position: Vector3?): boolean
+local function fresh(mode: string, easy: boolean, position: Vector3?, displayedOfferId: string?): boolean
  if not initialRecord or (easy and not session.finishedMain) then return false end
  spiderPick.finish(nil, true)
  local ok=Checkpoint.restore(initialRecord,checkpointWorld)
@@ -844,7 +848,7 @@ local function fresh(mode: string, easy: boolean, position: Vector3?): boolean
  local slot=M.SaveRules.slotOf(mode,session.rules)
  stores[slot]=newStore();checkpoints=stores[slot]
  if saveClient~=nil and not saveState.broken then
-  local sent,problem=pcall(function() saveClient:beginLife(slot) end)
+  local sent,problem=pcall(function() saveClient:beginLife(slot,displayedOfferId) end)
   if not sent then saveState.fail(problem) end
  end
  life.resting=false;life.notice="";life.noticeSeconds=0;life.restoreGrace=0
@@ -865,7 +869,7 @@ local function continueAnother()
  local spot=session:another()
  if not spot then return end
  local mode,easy=session.mode,session.rules=="gentle"
- if fresh(mode,easy,spot) then
+ if fresh(mode,easy,spot,saveState.endOfferId) then
   life:showNotice("Another young spider, somewhere new on the sill. It is not related to the last.")
   life.noticeSeconds=12
  end
@@ -887,6 +891,8 @@ local function presentEnd(immediate: boolean)
  local rec=lastEnd
  if not rec then return end
  local cause=rec.cause
+ local endingOffer=if saveClient then saveClient:offerInfo(M.SaveRules.slotOf(session.mode,session.rules)) else nil
+ saveState.endOfferId=if endingOffer then endingOffer.id else nil
  local choices: {CaughtPanel.Choice}={}
  local hasRest=checkpoints:loadBest().ok
  if hasRest then table.insert(choices,{id="Back",text="Back to your last rest"}) end
@@ -1105,7 +1111,7 @@ function mateLegs.carryOn(landed: any?)
  if landed~=nil then mateLegs.say(mateLegs.Text.landed(landed.place));book:addEntry("eggs_and_wind",day,mateLegs.Text.rideEntry(day,landed.place)) end
  if saveClient~=nil then saveClient:markDirty() end
 end
-local openMenu: () -> ()
+local openMenu: (boolean?) -> ()
 local openSettings: (string?) -> ()
 local confirming: string?=nil
 menu=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
@@ -1113,46 +1119,100 @@ menu=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
  if choice=="Settings" then openSettings("menu");return end
  if choice=="Resume" then closeScreens();return end
  if choice=="Controls" then closeScreens();helpVisible,helpUntil=true,math.huge;return end -- (the controls card, kept up until H puts it away: ROBLOX-92)
- if choice=="Continue" then checkpoints=stores.main;closeScreens();returnToCheckpoint();return end
- if choice=="ContinueEasy" then checkpoints=stores.easy;closeScreens();returnToCheckpoint();return end
+ if choice=="Continue" or choice=="ContinueEasy" or choice=="RemoteMain" or choice=="RemoteEasy" or choice=="RemoteFree" then
+  local mode=if choice=="ContinueEasy" or choice=="RemoteEasy" then "easy" elseif choice=="RemoteFree" then "free" else "main"
+  if mode=="easy" and not session.finishedMain then return end
+  local remote=string.sub(choice,1,6)=="Remote" or not stores[mode]:loadBest().ok
+  if remote then
+   if session.started and confirming~=choice then
+    confirming=choice;saveState.confirmOffer=saveState.menuOffers[mode]
+    menu:showChoices("Load the saved spider?","This replaces this visit's spider and its unsaved world with the saved last rest.","",
+     {{id=choice :: string,text="Load the saved spider"},{id="CancelLoad",text="Keep this spider for this visit"}},true,"CancelLoad")
+    return
+   end
+   local id=if confirming==choice then saveState.confirmOffer else saveState.menuOffers[mode]
+   confirming=nil
+   if not id or not saveClient:continueLife(mode,id) then
+    saveState.restoreError="That last rest could not be loaded. This spider and its local rests are kept. Choose again after refreshing."
+    openMenu(true)
+   end
+  else
+   checkpoints=stores[mode]
+   if returnToCheckpoint() then closeScreens() end
+  end
+  return
+ end
  if choice=="Free" then
   local saved=stores.free:loadBest()
-  if saved.ok then checkpoints=stores.free;closeScreens();returnToCheckpoint()
-  elseif fresh("free",false,nil) then M.title:beginIntro(M.title.always(),needs.gentle) end -- (ROBLOX-109: the intro, once in a save)
+  local info=saveClient:offerInfo("free")
+  if saved.ok then checkpoints=stores.free;if returnToCheckpoint() then closeScreens() end
+  elseif info and info.playable then
+   if session.started then
+    confirming="RemoteFree";saveState.confirmOffer=saveState.menuOffers.free
+    menu:showChoices("Load the saved Free play spider?","This replaces this visit's spider and its unsaved world with the saved last rest.","",
+     {{id="RemoteFree",text="Load the saved spider"},{id="CancelLoad",text="Keep this spider for this visit"}},true,"CancelLoad")
+    return
+   end
+   local id=saveState.menuOffers.free
+   if id and saveClient:continueLife("free",id) then return end
+   saveState.restoreError="That Free play rest could not be loaded. Your current spider is kept.";openMenu(true)
+  elseif fresh("free",false,nil,saveState.menuOffers.free) then M.title:beginIntro(M.title.always(),needs.gentle) end
   return
  end
  if choice=="New" or choice=="Easy" then
-  if (session.started or stores[if choice=="Easy" then "easy" else "main"]:loadBest().ok) and confirming~=choice then
-   confirming=choice
+  local slot=if choice=="Easy" then "easy" else "main"
+  if choice=="Easy" and not session.finishedMain then return end
+  local info=saveClient:offerInfo(slot)
+  if (session.started or stores[slot]:loadBest().ok or (info and info.playable)) and confirming~=choice then
+   confirming=choice;saveState.confirmOffer=saveState.menuOffers[slot]
    menu:showChoices("Begin a new life?",if choice=="Easy" then "This starts a new Easy life and retires its previous last rest when saving succeeds. The standard life's last rest is kept." else "This starts a new standard life and retires its previous last rest when saving succeeds. The Easy life's last rest is kept.","",
     {{id=choice :: string,text="Begin the new life"},{id="CancelNew",text="Keep this life"}},true,"CancelNew")
    return
   end
+  local id=if confirming==choice then saveState.confirmOffer else saveState.menuOffers[slot]
   confirming=nil;session:archive()
-  if fresh("main",choice=="Easy",nil) then M.title:beginIntro(M.title.always(),needs.gentle) end -- (ROBLOX-109: the intro, once in a save)
+  if fresh("main",choice=="Easy",nil,id) then M.title:beginIntro(M.title.always(),needs.gentle) end -- (ROBLOX-109: the intro, once in a save)
   return
  end
  confirming=nil;openMenu()
 end,"SpiderLifeMenu")
 -- The start menu's body: the saving line, then the Easy note. Also rewritten in place when the saving status changes under an open menu.
 local function menuBody(): string
- return (if saveState.broken then M.SaveText.brokenLine() else M.SaveText.menuLine(saveClient:status()))..(if session.finishedMain then "" else "\nEasy is not available yet; choose Free play for gentle rules.")
+ return (if saveState.broken then M.SaveText.brokenLine() else M.SaveText.menuLine(saveClient:status()))..(if saveState.restoreError then "\n"..saveState.restoreError else "")..(if session.finishedMain then "" else "\nEasy is not available yet; choose Free play for gentle rules.")
 end
 -- ROBLOX-109: before a life has begun this visit the start menu is the title card (CaughtPanel's "title" look over the drifting camera): Continue when a rest
 -- exists, a new life, Free play, Settings, and the Notebook once it has pages, the saving note in small type under them. In a life it is the life menu
 -- (the card look), with Resume (the back button's choice) and Controls first. The discovery notes and the text size are in Settings (ROBLOX-49).
-openMenu=function()
+openMenu=function(renderOnly: boolean?)
  if panel:isShowing() or not initialRecord then return end
  controls:clear();dropAll();setHudShown(false)
  local started=session.started
+ saveState.menuOffers={}
+ for _,slot in M.SaveRules.MODES do
+  local info=saveClient:offerInfo(slot);saveState.menuOffers[slot]=if info then info.id else nil
+  if not renderOnly then saveClient:refreshOffer(slot) end
+ end
  local choices: {CaughtPanel.Choice}={}
  local function add(id: string) table.insert(choices,{id=id,text=M.TitleText.choice(id,started)}) end
  if started then add("Resume");add("Controls") end
- if stores.main:loadBest().ok then add("Continue") end
- if stores.easy:loadBest().ok then add("ContinueEasy") end
+ for _,slot in {"main","easy","free"} do
+  if slot=="easy" and not session.finishedMain then continue end
+  local info=saveClient:offerInfo(slot);local decision=saveClient:decision(slot)
+  local localRest=stores[slot]:loadBest().ok
+  if slot~="free" and (localRest or (info and info.playable)) then
+   local id=if slot=="main" then "Continue" else "ContinueEasy"
+   local text=M.TitleText.choice(id,started)
+   if not localRest then text="Continue"..(if slot=="easy" then " the Easy life" else "")..(if info and info.protected then " without saving (protected last rest)" else " without saving until this rest is revalidated") end
+   table.insert(choices,{id=id,text=text})
+  end
+  if localRest and info and info.playable and ((decision and decision.state=="changed") or saveClient:isTemporary(slot)) then
+   table.insert(choices,{id=if slot=="main" then "RemoteMain" elseif slot=="easy" then "RemoteEasy" else "RemoteFree",text="Load the saved "..(if slot=="free" then "Free play" elseif slot=="easy" then "Easy" else "standard").." spider instead"})
+  end
+ end
  add("New")
  if session.finishedMain then add("Easy") end
- add("Free")
+ local freeInfo=saveClient:offerInfo("free")
+ table.insert(choices,{id="Free",text=if freeInfo and freeInfo.playable and not stores.free:loadBest().ok then "Continue Free play without saving" else M.TitleText.choice("Free",started)})
  table.insert(choices,{id="Settings",text=M.SettingsSpec.WORDS.menuChoice})
  if started or #book.opened>0 then table.insert(choices,{id="Notebook",text=M.NotebookText.MENU_CHOICE}) end
  menu:setLook(if started then "card" else "title")
@@ -1163,7 +1223,7 @@ end
 local menuButton=Instance.new("TextButton")
 menuButton.Name="LifeMenu";menuButton.Text="Menu";menuButton.TextSize=18
 menuButton.BackgroundColor3=Color3.new(.12,.12,.14);menuButton.TextColor3=Color3.new(1,1,1);menuButton.BackgroundTransparency=.7;menuButton.TextTransparency=.3;menuButton.AutoButtonColor=true -- (ROBLOX-125: quiet, still a 48 px touch target)
-menuButton.Parent=hud.safe;menuButton.Activated:Connect(openMenu)
+menuButton.Parent=hud.safe;menuButton.Activated:Connect(function() openMenu() end)
 
 -- The naturalist's notebook (ROBLOX-37). Opened from the game (N, the button beside Menu), the life menu or the end screen; closing it
 -- goes back to wherever it was opened from. The world waits while it is open (modal()).
@@ -1272,7 +1332,7 @@ M.title.always = function(): boolean return RunService:IsStudio() and Workspace:
 -- retry succeeds later: the notebook and the adult life are only ever added to, the rest of the choices only if the player has not already
 -- made their own this visit.
 local function refreshMenu()
-	if menuStarted and menu:isShowing() and confirming == nil then openMenu() end
+	if menuStarted and menu:isShowing() and confirming == nil then openMenu(true) end
 end
 local function progressSnapshot(): any
 	local settings: { [string]: any } = {}
@@ -1327,6 +1387,23 @@ local function applySaved(msg: any)
 end
 saveClient = SaveClient.new({
 	rules = M.SaveRules, now = os.clock,
+ continuation={copy=M.SaveJson.copy,
+  validate=function(mode: string,record: any,allowRetired: boolean): boolean
+   if M.SaveRest.bounded(record,M.SaveRules.MAX_REST_NODES,M.SaveRules.MAX_DEPTH) then return false end
+   if allowRetired and M.SaveRest.isRetired(record) then return #M.SaveRest.SPECS[mode].validate(record)==0 end
+   return #M.SaveRest.check(mode,record)==0 and #Checkpoint.check(record,checkpointWorld)==0
+  end,
+  onRestore=function(mode: string,record: any): boolean
+   if mode=="easy" and not session.finishedMain then return false end
+   local nextStore=newStore();local saved=nextStore:save(record)
+   if not saved.ok then return false end
+   if not returnToCheckpoint(record) then return false end
+   stores[mode]=nextStore;checkpoints=nextStore;saveState.restoreError=nil
+   closeScreens();return true
+  end,
+  onOffer=function(_mode: string,_offer: any) refreshMenu() end,
+  onDecision=function(_decision: any) refreshMenu() end,
+ },
 	findRemotes = function(): any
 		local folder = ReplicatedStorage:FindFirstChild(M.SaveRules.REMOTES_NAME)
 		if folder == nil then return nil end
@@ -2374,7 +2451,7 @@ end)
 M.hooks = function(): any
 	return {
 			prey = prey, flyBodies = flyBodies, waspBody = waspBody, life = life, wasp = wasp, caughtPanel = panel, needs = needs, checkpoints = checkpoints, returnToCheckpoint = function() returnToCheckpoint() end, lifeSpider = function() return lifeSpider end, sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
-			input = controls, rivalLegs = rivalLegs, navigation = rivalLegs.navigation, mateLegs = mateLegs, spiderPick = spiderPick, saveState = saveState, hud = hud,
+			input = controls, rivalLegs = rivalLegs, navigation = rivalLegs.navigation, mateLegs = mateLegs, spiderPick = spiderPick, saveState = saveState, saveClient = saveClient, hud = hud,
 			notebook = book, notebookWatch = watch, notebookPanel = nbPanel, openNotebook = openNotebook, settingsPanel = settingsPanel, openSettings = openSettings, setting = setting, cam = cam, soundscape = soundscape, eyes = eyes,
    rareBody=M.rareBody,rareHistory=M.rareHistory,rareDirector=M.RareDirector,
 			meal=M.meal,contextPrompts=M.contextPrompts,session=session, menu=menu, openMenu=openMenu, endLife=endLife, fresh=fresh, stores=stores, continueAnother=continueAnother, currentStore=function() return checkpoints end,

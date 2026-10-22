@@ -291,7 +291,7 @@ case("the real client waits for the server before the start menu: the world hold
 	check(driver ~= nil, "the test hook is there")
 	frames(20)
 	local hellos = firedOf("hello")
-	check(#hellos >= 1 and hellos[1].v == SaveRules.PROTOCOL, "hello went up on the first frames")
+	check(#hellos >= 1 and hellos[1].v == SaveRules.OFFER_PROTOCOL, "hello went up on the first frames")
 	check(driver.prey.tick == 0, `the world holds while it waits (tick {driver.prey.tick})`)
 	check(not driver.menu:isShowing(), "and no menu yet")
 	local rest = storedRest("main")
@@ -310,7 +310,7 @@ case("the real client waits for the server before the start menu: the world hold
 	driver.openMenu()
 	local menuGui = gui:FindFirstChild("SpiderLifeMenu")
 	check(menuGui ~= nil and find("SpiderLifeMenu", "Continue") ~= nil and find("SpiderLifeMenu", "Easy") ~= nil, "the menu offers Continue and Easy")
-	check(find("SpiderLifeMenu", "Summary") ~= nil and string.find(find("SpiderLifeMenu", "Summary").Text, SaveText.SAVED, 1, true) ~= nil, "and says the notebook and rests are saved")
+	check(find("SpiderLifeMenu", "Summary") ~= nil and string.find(find("SpiderLifeMenu", "Summary").Text, SaveText.WHY.unsupported_save, 1, true) ~= nil, "and accurately identifies the older server temporary fallback")
  driver.menu:choose("New")
  check(find("SpiderLifeMenu","CancelNew")~=nil and string.find(find("SpiderLifeMenu","Sub").Text,"when saving succeeds",1,true)~=nil,"title-screen replacement of an old rest requires truthful confirmation")
  driver.menu:choose("CancelNew")
@@ -353,7 +353,8 @@ case("a rest the real client captures goes up as a rest the server would accept,
 	realWait(SaveRules.CLIENT_PROGRESS_GAP * 2 + 0.1)
 	frames(3)
 	local rests = firedOf("rest")
-	check(#rests == 1 and rests[1].mode == "main", "one main rest went up")
+	check(#rests==0,"older peer cannot receive a new checkpoint without bound authority")
+ check(#SaveRest.check("main",driver.currentStore():loadBest().record)==0,"temporary main checkpoint remains locally valid")
 	if rests[1] then
 		local problems = SaveRest.check("main", rests[1].record)
 		check(#problems == 0, "and the server's check accepts what the real client captured: " .. table.concat(problems, "; "))
@@ -361,24 +362,16 @@ case("a rest the real client captures goes up as a rest the server would accept,
 	end
 end)
 
-case("the real client says plainly when saving is off, and when it is back; the menu line follows", function()
-	local driver: any = ClientStubs.driver
-	R.deliver({ kind = "status", status = "session", reason = "other_session" })
-	frames(3)
-	local toast = find("SpiderPrompts", "Toast")
-	check(toast ~= nil and string.find(toast.Text, "Saving is off", 1, true) ~= nil and string.find(toast.Text, "open somewhere else", 1, true) ~= nil, "a toast says it: " .. tostring(toast and toast.Text))
-	driver.openMenu()
-	local body = find("SpiderLifeMenu", "Summary")
-	check(body ~= nil and string.find(body.Text, "Saving is off for this visit", 1, true) ~= nil, "the menu says so too")
-	frames(170) -- (a warning toast is kept for its 2.6 seconds over a plainer one, ROBLOX-92)
-	R.deliver({ kind = "status", status = "saving" })
-	frames(3)
-	check(string.find(find("SpiderPrompts", "Toast").Text, "Saving is back on", 1, true) ~= nil, "and when it is back")
-	check(string.find(find("SpiderLifeMenu", "Summary").Text, "Saving...", 1, true) ~= nil, "the open menu's line was refreshed")
-	R.deliver({ kind = "status", status = "saved" })
-	frames(3)
-	check(string.find(find("SpiderLifeMenu", "Summary").Text, SaveText.SAVED, 1, true) ~= nil, "saved")
-	driver.menu:hide()
+case("the real client on an older server remains explicitly temporary despite unbound status messages",function()
+ local driver=ClientStubs.driver
+ for _,status in {"session","saving","saved"} do
+  R.deliver({kind="status",status=status,reason=if status=="session" then "other_session" else nil});frames(3)
+  driver.openMenu()
+  local body=find("SpiderLifeMenu","Summary")
+  check(body and string.find(body.Text,SaveText.WHY.unsupported_save,1,true),"older peer status cannot claim new checkpoint permission: "..status)
+  check(not string.find(body.Text,SaveText.SAVED,1,true),"no false Saved from an unbound older reply")
+ end
+ driver.menu:hide()
 end)
 
 case("the real client uses a later copy of the saved state, but never over what the player chose this visit", function()
@@ -464,7 +457,8 @@ case("the Easy life rests in its own slot (ROBLOX-91): a rest goes up as easy, t
 	realWait(SaveRules.CLIENT_PROGRESS_GAP * 3 + 0.1)
 	frames(3)
 	local rests = firedOf("rest")
-	check(#rests == 1 and rests[1].mode == "easy", `one easy rest went up ({#rests}, {rests[1] and rests[1].mode})`)
+	check(#rests==0,"older peer cannot receive an Easy checkpoint without bound authority")
+ check(#SaveRest.check("easy",driver.currentStore():loadBest().record)==0,"temporary Easy checkpoint remains valid locally")
 	if rests[1] then
 		check(#SaveRest.check("easy", rests[1].record) == 0, "and the server's easy check accepts it: " .. table.concat(SaveRest.check("easy", rests[1].record), "; "))
 		check(driver.life.rules == "gentle", "gentle rules")

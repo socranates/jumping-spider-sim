@@ -31,6 +31,7 @@ function SaveClient.new(cfg: Config): any
 	}, SaveClient)
  if cfg.continuation then
   local opt=cfg.continuation
+  self.temporarySlots={}
   self.bound=SaveContinuation.new({rules=cfg.rules,copy=opt.copy,validate=opt.validate,
    onLoaded=function(msg:any) self.phase="ready";cfg.onLoaded(msg) end,
    onOffer=opt.onOffer,onDecision=opt.onDecision,onRestore=opt.onRestore,onStatus=cfg.onStatus})
@@ -110,8 +111,12 @@ end
 
 function SaveClient.beginLife(self: any,mode: string,offerId: string?)
  if self.bound then
+  self.activeSlot=mode
   if self.legacyTemporary then return false end
-  return self.bound:choose(mode,"new",offerId)
+  self.bound:abandon(mode)
+  local accepted=self.bound:choose(mode,"new",offerId)
+  self.temporarySlots[mode]=not accepted or nil
+  return accepted
  end
  if self.protectedSlots[mode] then self.pendingRest[mode]=nil;return end
  self.lifeSerial+=1
@@ -127,7 +132,19 @@ function SaveClient.sendRest(self: any, mode: string, record: any)
 end
 
 function SaveClient.continueLife(self:any,mode:string,id:string):boolean
- return self.bound~=nil and not self.legacyTemporary and self.bound:choose(mode,"continue",id)
+ if not self.bound or self.legacyTemporary then return false end
+ local accepted=self.bound:choose(mode,"continue",id)
+ if accepted then self.activeSlot=mode;self.temporarySlots[mode]=nil elseif self.bound.requests[mode]==nil then self.temporarySlots[mode]=true end
+ return accepted
+end
+function SaveClient.offerInfo(self:any,mode:string):any
+ return if self.bound then self.bound:offerInfo(mode) else nil
+end
+function SaveClient.isTemporary(self:any,mode:string):boolean
+ return self.bound~=nil and (self.legacyTemporary==true or self.temporarySlots[mode]==true)
+end
+function SaveClient.decision(self:any,mode:string):any
+ return if self.bound then self.bound:decision(mode) else nil
 end
 function SaveClient.offer(self:any,mode:string):any
  return if self.bound then self.bound:offer(mode) else nil
@@ -146,8 +163,9 @@ end
 
 function SaveClient.status(self: any): (string?, string?)
  if self.bound and (self.bound.epoch~=nil or self.legacyTemporary) then
-  if self.legacyTemporary then return "session","offline" end
-  return self.bound:status()
+  if self.legacyTemporary then return "session","unsupported_save" end
+  if (self.activeSlot and self.temporarySlots[self.activeSlot]) or (not self.activeSlot and next(self.temporarySlots)~=nil) then return "session","temporary_life" end
+  return self.bound:status(self.activeSlot)
  end
 	if self.st ~= nil then
   if self.st=="saved" then for _,request in self.lifeRequests do if not request.done then return "saving",nil end end end

@@ -16,6 +16,9 @@ SaveText.BROKEN = "Saving is off"
 
 SaveText.WHY = {
 	offline = "The game could not reach its saving service.",
+ unsupported_save = "This server uses an older saving service. This spider is temporary; its rests cannot replace your saved game.",
+ temporary_life = "This spider is temporary. Its rests are kept for this visit; your earlier saved rest is unchanged.",
+ save_changed = "The saved last rest changed elsewhere. This spider stays temporary. Use the life menu to load the saved spider instead, or keep this one for this visit.",
 	no_api = "Saving is not available here.",
 	load_failed = "Your saved game could not be read just now. It has not been changed, and the game keeps trying.",
 	other_session = "Your game is open somewhere else, and this copy cannot save over it.",
@@ -33,7 +36,10 @@ end
 
 -- The line for the menu: one or two sentences.
 function SaveText.menuLine(status: string?, reason: string?): string
-	if status == "session" then
+	if status=="session" and (reason=="unsupported_save" or reason=="temporary_life" or reason=="save_changed") then
+  return SaveText.WHY[reason :: string]
+ end
+ if status == "session" then
 		local why = because(reason)
 		return SaveText.OFF .. (if why then "\n" .. why else "")
 	elseif status == "saving" then
@@ -66,8 +72,7 @@ function SaveText.toast(oldStatus: string?, oldReason: string?, status: string?,
 		end
 	end
 	if toSession then
-		local why = because(reason)
-		return SaveText.OFF .. (if why then " " .. why else "")
+  return SaveText.menuLine(status,reason)
 	elseif fromSession then
 		return SaveText.BACK
 	elseif newTrouble then

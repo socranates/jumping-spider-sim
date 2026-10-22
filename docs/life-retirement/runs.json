@@ -3,7 +3,7 @@
   "evidence_id": "b3b1a047e958d966",
   "windows_exec_session": 30676,
   "ci_run": 39728136498,
-  "final_results_pending": true,
+  "final_results_pending": false,
   "superseded": {
     "source_commit": "814995da610e0a83f41fb894690e16b65e43edfd",
     "windows_exec_session": 67801,
@@ -18,7 +18,10 @@
     "log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261022T052922Z_Studio_58163_last.log",
     "source_guard": "216/216",
     "retirement_probe_pass": true,
-    "preserve_self_test": "running; no final result yet",
-    "production_store_touched": false
-  }
+    "preserve_self_test": "274 passed, 0 failed, 0 skipped",
+    "production_store_touched": false,
+    "review_window_closed": true
+  },
+  "windows_exit_code": 0,
+  "ci_result": "success"
 }

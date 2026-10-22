@@ -9,16 +9,39 @@
   "compile_fingerprints_match": true,
   "computed_evidence_id": "b3b1a047e958d966",
   "local_cli": {
-    "completed_summaries": 20,
-    "passed": 45969,
+    "completed_summaries": 62,
+    "passed": 443213,
     "failed": 0,
     "failure_lines": []
   },
-  "local_process": null,
-  "ci": null,
-  "native": null,
-  "retirement_probe_pass": false,
-  "offline_gates_pass": false,
+  "local_process": {
+    "source_commit": "5cf7b4c0f212082342574763aaf5b19e00c4e323",
+    "evidence_id": "b3b1a047e958d966",
+    "exec_session": 30676,
+    "exit_code": 0,
+    "observed_at": "2026-10-22T05:58:48.427593+00:00"
+  },
+  "ci": {
+    "id": 39728136498,
+    "head_sha": "5cf7b4c0f212082342574763aaf5b19e00c4e323",
+    "status": "completed",
+    "conclusion": "success",
+    "html_url": "https://github.com/socranates/jumping-spider-sim/actions/runs/39728136498",
+    "created_at": "2026-10-22T05:27:34Z",
+    "updated_at": "2026-10-22T05:38:59Z",
+    "suites": 62,
+    "failed_summary_lines": [],
+    "passed": 443213,
+    "failed": 0
+  },
+  "native": {
+    "passed": 274,
+    "failed": 0,
+    "skipped": 0,
+    "source_guard_matches": true
+  },
+  "retirement_probe_pass": true,
+  "offline_gates_pass": true,
   "online_store_attempt": null,
   "actual_client_rejoin_verified": false,
   "performance_matrix_complete": false,

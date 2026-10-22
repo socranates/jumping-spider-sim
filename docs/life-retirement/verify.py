@@ -35,7 +35,7 @@ if ends:
     a,b,c=map(int,ends[-1]);native=dict(passed=a,failed=b,skipped=c,source_guard_matches=f"[CHET_LIFE_SOURCE_FINGERPRINTS] 216 216 {SOURCE}" in native_text)
 offline=bool(retirement_probe_pass and source_matches and compile_matches and actual==EVIDENCE and len(rows)==62 and len({r[0] for r in rows})==62
     and sum(int(r[1]) for r in rows)==443213 and not failures and process and process.get("exit_code")==0 and process.get("source_commit")==SOURCE
-    and ci and ci["conclusion"]=="success" and ci["head_sha"]==SOURCE and native and native["source_guard_matches"] and native["passed"]==274 and native["failed"]==native["skipped"]==0)
+    and ci and ci["conclusion"]=="success" and ci["head_sha"]==SOURCE and ci.get("suites")==62 and ci.get("passed")==443213 and ci.get("failed")==0 and native and native["source_guard_matches"] and native["passed"]==274 and native["failed"]==native["skipped"]==0)
 online=obj("online-store-attempt.json")
 receipt=dict(candidate=dict(branch="codex/life-retirement",source_commit=SOURCE,evidence_id=EVIDENCE),published=False,
     source_manifest_matches=source_matches,compile_fingerprints_match=compile_matches,computed_evidence_id=actual,
@@ -43,5 +43,5 @@ receipt=dict(candidate=dict(branch="codex/life-retirement",source_commit=SOURCE,
     local_process=process,ci=ci,native=native,retirement_probe_pass=retirement_probe_pass,offline_gates_pass=offline,online_store_attempt=online,
     actual_client_rejoin_verified=False,performance_matrix_complete=False,physical_phone_tested=False,publication_ready=False,
     builds=[dict(path=p.relative_to(ROOT).as_posix(),bytes=p.stat().st_size,sha256=hashlib.sha256(p.read_bytes()).hexdigest()) for p in [port/"TheWindowsill.rbxlx",port/"TheWindowsillTests.rbxlx"]])
-(OUT/"receipt.json").write_text(json.dumps(receipt,indent=2)+"\n")
+(OUT/"receipt.json").write_text(json.dumps(receipt,indent=2)+"\n",encoding="utf-8")
 print(json.dumps({k:receipt[k] for k in ["source_manifest_matches","compile_fingerprints_match","computed_evidence_id","local_cli","native","offline_gates_pass","publication_ready"]},indent=2))

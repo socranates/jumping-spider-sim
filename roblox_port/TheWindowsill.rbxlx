@@ -3420,7 +3420,12 @@ SaveRules.PROGRESS_BURST = 6
 SaveRules.PROGRESS_PER_SECOND = 0.5
 SaveRules.REST_BURST = 2
 SaveRules.REST_PER_SECOND = 0.2
-SaveRules.PROTOCOL = 1 -- the version of the messages between client and server
+SaveRules.LIFE_BURST = 2
+SaveRules.LIFE_PER_SECOND = 0.2
+SaveRules.MAX_LIFE_SERIAL = 1000000000
+SaveRules.MAX_LIFE_TOKEN_CHARS = 160
+SaveRules.CLIENT_LIFE_GAP = 5 -- retry one idempotent retirement intent until durable acknowledgement
+SaveRules.PROTOCOL = 2 -- the version of the messages between client and server
 SaveRules.CLIENT_HELLO_GAP = 2.5 -- the client says hello again this often until the server answers
 SaveRules.CLIENT_HELLO_TRIES = 6
 SaveRules.CLIENT_PROGRESS_GAP = 2 -- the client sends at most one progress message in this time
@@ -15792,7 +15797,27 @@ local SaveEnvelope = require(script.Parent.SaveEnvelope)
 
 local SaveRest = {}
 
-SaveRest.SCHEMA = 1
+-- Schema 2 accepts a checksummed {save_retired=true,save_life=token} marker or a checkpoint with optional save_life.
+-- The identity is storage metadata, not simulation state. Schema 1 migrates without changing its checkpoint.
+-- Older readers must refuse schema 2, preserving the marker and its previous-checkpoint backup.
+SaveRest.SCHEMA = 2
+function SaveRest.validLife(token: any): boolean
+ return type(token)=="string" and #token>=1 and #token<=SaveRules.MAX_LIFE_TOKEN_CHARS and string.match(token,"^[%w_:%.%-]+$")~=nil
+end
+function SaveRest.isRetired(payload: any): boolean
+ return type(payload)=="table" and rawget(payload,"save_retired")==true
+end
+local function validateStored(mode: string,payload: any): ({string},any?)
+ if SaveRest.isRetired(payload) then
+  if not SaveRest.validLife(payload.save_life) then return {"invalid retired life identity"},nil end
+  for key in payload do if key~="save_retired" and key~="save_life" then return {"unknown retirement field"},nil end end
+  return {},payload
+ end
+ if type(payload)=="table" and (payload.save_retired~=nil or (payload.save_life~=nil and not SaveRest.validLife(payload.save_life))) then
+  return {"invalid life identity"},nil
+ end
+ return SaveRest.check(mode,payload),payload
+end
 
 -- Counts the values in `v` and refuses anything that is not a plain string, boolean, finite number or table without a metatable, a
 -- table met twice, or a structure deeper than `maxDepth` or larger than `maxNodes`. Cheap and bounded: a hostile payload is stopped
@@ -15845,6 +15870,7 @@ SaveRest.stubWorld = stubWorld
 function SaveRest.check(mode: any, record: any): { string }
 	if mode ~= "main" and mode ~= "free" and mode ~= "easy" then return { "unknown mode" } end
 	if type(record) ~= "table" then return { "the rest is not a table" } end
+ if rawget(record,"save_retired")~=nil or (rawget(record,"save_life")~=nil and not SaveRest.validLife(rawget(record,"save_life"))) then return {"reserved or invalid life identity"} end
 	local why = SaveRest.bounded(record, SaveRules.MAX_REST_NODES, SaveRules.MAX_DEPTH)
 	if why then return { why } end
 	local text, err = Json.canonical(record)
@@ -15867,8 +15893,8 @@ end
 function SaveRest.spec(mode: string): SaveEnvelope.Spec
 	return {
 		kind = "rest_" .. mode, current = SaveRest.SCHEMA,
-		migrations = {} :: { [number]: (any) -> any },
-		validate = function(payload: any): ({ string }, any?) return SaveRest.check(mode, payload), payload end,
+		migrations = { [1] = function(payload: any): any return payload end } :: { [number]: (any) -> any },
+  validate = function(payload: any): ({ string }, any?) return validateStored(mode,payload) end,
 	}
 end
 
@@ -16042,7 +16068,7 @@ SaveSession.__index = SaveSession
 export type Config = {
 	backend: any, userId: number | string, sessionId: string, now: () -> number,
 	sleep: ((number) -> ())?, log: ((string) -> ())?, progressSpec: SaveEnvelope.Spec?, -- (a test may hand in a later schema)
-	onChange: ((string, string?) -> ())?, onLoaded: ((any) -> ())?, onRest: ((string, any) -> ())?,
+	onChange: ((string, string?) -> ())?, onLoaded: ((any) -> ())?, onRest: ((string, any) -> ())?, onLife: ((string,number,string) -> ())?,
 }
 
 
@@ -16061,7 +16087,7 @@ function SaveSession.new(cfg: Config): any
 		sched = sched,
 		state = "loading", reason = nil :: string?, canRetry = false, retryAt = 0,
 		progress = SaveProgress.default(), progressTime = 0, storedTime = 0,
-		rests = {} :: { [string]: any },
+		rests = {} :: { [string]: any }, lifeTokens = {} :: {[string]:string}, lifeRequests = {} :: {[string]:any},
 		restBase = {} :: { [string]: number }, -- updatedAt of the rest this session last read or wrote (nil: unknown)
 		restPending = {} :: { [string]: any }, restPendingTime = {} :: { [string]: number },
 		restLoaded = {} :: { [string]: boolean }, restRetryAt = 0,
@@ -16187,20 +16213,29 @@ local function readRests(self: any)
 				self.restLoaded[mode] = true
 				if op.status == "ok" or op.status == "migrated" then
 					self.restBase[mode] = op.updatedAt
-					self.rests[mode] = op.payload
+					self.lifeTokens[mode] = op.payload.save_life
+     self.rests[mode] = if SaveRest.isRetired(op.payload) then nil else op.payload
 				elseif op.status == "missing" then
 					self.restBase[mode] = 0
+     self.lifeTokens[mode],self.rests[mode]=nil,nil
 				else
 					-- A readable backup is offered in memory only. Preserve the original unreadable record for recovery.
 					self.restBase[mode] = op.updatedAt or 0
 					local b = op.backup
-					if b and (b.status == "ok" or b.status == "migrated") then self.rests[mode] = b.payload end
+					if b and (b.status == "ok" or b.status == "migrated") and not SaveRest.isRetired(b.payload) then self.rests[mode] = b.payload end
 					log(self, `the {mode} rest is {op.status}: {op.reasons[1] or ""}`)
 					self:demote(if op.status == "newer" then "newer" else "corrupt", false)
 				end
-				-- a rest we hold unsent that is newer than the one stored stays pending; an older one is dropped
+				local request=self.lifeRequests[mode]
+    local queued=self.restPending[mode]
+    if (request and request.done and request.token~=self.lifeTokens[mode])
+     or (queued and not SaveRest.isRetired(queued) and queued.save_life~=self.lifeTokens[mode]) then
+     self:demote("other_session",false) -- another life won while ownership was unavailable; never relabel our queued world
+    end
+    if request and not request.done then self.rests[mode]=nil end
+    -- a rest we hold unsent that is newer than the one stored stays pending; an older one is dropped
 				local pending = self.restPendingTime[mode]
-				if pending ~= nil and (self.restBase[mode] or 0) > pending then
+				if pending ~= nil and not SaveRest.isRetired(self.restPending[mode]) and (self.restBase[mode] or 0) > pending then
 					self.restPending[mode], self.restPendingTime[mode] = nil, nil
 					self.sched.items["rest_" .. mode].dirty = false
 				end
@@ -16272,9 +16307,51 @@ function SaveSession.setProgress(self: any, payload: any): boolean
 	return true
 end
 
-function SaveSession.setRest(self: any, mode: string, record: any): boolean
+-- A session-local increasing intent makes retries idempotent and later New Life choices supersede earlier ones.
+-- The marker goes through the same guarded UpdateAsync and backup path as a rest; never DeleteAsync.
+function SaveSession.beginLife(self: any,mode: string,serial: any): boolean
+ if self.closed or SaveRest.SPECS[mode]==nil or type(serial)~="number" or serial~=serial or serial<1 or serial>SaveRules.MAX_LIFE_SERIAL or serial~=math.floor(serial) then return false end
+ local prior=self.lifeRequests[mode]
+ if prior and serial<prior.serial then return false end
+ if prior and serial==prior.serial then
+  if prior.done and self.cfg.onLife then pcall(self.cfg.onLife,mode,serial,prior.token) end
+  return true
+ end
+ local token=`{self.id}:{mode}:{serial}`
+ if not SaveRest.validLife(token) then return false end
+ self.lifeRequests[mode]={serial=serial,token=token,done=false}
+ self.rests[mode],self.restRejected[mode]=nil,nil
+ self.restPending[mode]={save_retired=true,save_life=token}
+ self.restPendingTime[mode]=self.now()
+ self.sched:markDirty("rest_"..mode,self.now());self:notify()
+ return true
+end
+
+-- Legacy callers intentionally have no life credential; extra Lua return values are ignored here.
+function SaveSession.setRest(self: any,mode: string,record: any): boolean
+ return self:setRestForLife(mode,record,nil)
+end
+function SaveSession.setRestForLife(self: any, mode: string, record: any,lifeToken: string?): boolean
 	if self.closed or SaveRest.SPECS[mode] == nil then return false end
-	local problems = SaveRest.check(mode, record)
+ local request=self.lifeRequests[mode]
+ if (request and not request.done) or lifeToken~=self.lifeTokens[mode] then
+  self.counters.rejected+=1
+  return false -- never let a late prior-life rest cross a retirement boundary
+ end
+-- Validate the exact stored candidate, including our identity metadata, against both size and node caps.
+ local stamped=record
+ local copyProblem: string?=nil
+ if type(record)=="table" and getmetatable(record)==nil then
+  stamped={}
+  local count=0
+  for key,value in record do
+   count+=1
+   if count>SaveRules.MAX_REST_NODES then copyProblem="too many root values";break end
+   stamped[key]=value
+  end
+  stamped.save_life=self.lifeTokens[mode]
+ end
+ local problems = if copyProblem then {copyProblem} else SaveRest.check(mode, stamped)
 	if #problems > 0 then
 		self.counters.rejected += 1
 		log(self, `the {mode} rest was refused: {problems[1]}`)
@@ -16284,7 +16361,7 @@ function SaveSession.setRest(self: any, mode: string, record: any): boolean
 	end
 	local now = self.now()
 	self.restRejected[mode] = nil
-	self.restPending[mode], self.restPendingTime[mode] = record, now
+ self.restPending[mode], self.restPendingTime[mode] = stamped, now
 	self.sched:markDirty("rest_" .. mode, now)
 	self:notify()
 	return true
@@ -16357,18 +16434,27 @@ local function writeRest(self: any, mode: string): boolean
 		self.sched.items[name].dirty = false
 		return true
 	end
-	local now = self.now()
-	local version = self.sched:begin(name, now)
+	if not SaveRest.isRetired(record) and record.save_life~=self.lifeTokens[mode] then
+  self.restPending[mode],self.restPendingTime[mode]=nil,nil
+  self.sched:abandon(name);self:demote("other_session",false)
+  return false
+ end
+ local now = self.now()
+ local version = self.sched:begin(name, now)
 	self.counters.requests += 1
 	local spec = SaveRest.SPECS[mode]
 	local outcome = ""
 	local newTime = now
+ local expectedLife=self.lifeTokens[mode]
 	local ok, _, err = self.backend:update(self.rkey[mode], function(old: any): any
 		outcome = ""
 		local op = SaveEnvelope.open(spec, old, false)
 		if op.status == "newer" then outcome = "newer"; return nil end
 		if op.status == "corrupt" or op.status == "invalid" then outcome = "corrupt"; return nil end
-		local base = self.restBase[mode]
+		if (op.status=="ok" or op.status=="migrated") and op.payload.save_life~=expectedLife and op.session~=self.id then
+   outcome="superseded";return nil -- life identities protect even simultaneous writes with equal timestamps
+  end
+  local base = self.restBase[mode]
 		if (op.status == "ok" or op.status == "migrated") and base ~= nil and (op.updatedAt or 0) > base and op.session ~= self.id then
 			outcome = "superseded"
 			return nil
@@ -16398,8 +16484,14 @@ local function writeRest(self: any, mode: string): boolean
 	end
 	if outcome == "ok" then
 		self.restBase[mode] = newTime
-		self.rests[mode] = record
-		if self.restPending[mode] == record then self.restPending[mode], self.restPendingTime[mode] = nil, nil end
+		self.lifeTokens[mode]=record.save_life
+  self.rests[mode] = if SaveRest.isRetired(record) then nil else record
+  local request=self.lifeRequests[mode]
+  if SaveRest.isRetired(record) and request and request.token==record.save_life then
+   request.done=true
+   if self.cfg.onLife then pcall(self.cfg.onLife,mode,request.serial,request.token) end
+  end
+  if self.restPending[mode] == record then self.restPending[mode], self.restPendingTime[mode] = nil, nil end
 		self.sched:succeeded(name, now, version)
 		self.counters.writes += 1
 		return true
@@ -16511,8 +16603,11 @@ end
 function SaveSession.snapshot(self: any): any
 	local status, reason = self:status()
 	local rests: { [string]: any } = {}
-	for _, mode in SaveRules.MODES do rests[mode] = self.rests[mode] end
-	return { status = status, reason = reason, progress = self.progress, rests = rests }
+	for _, mode in SaveRules.MODES do
+  local request=self.lifeRequests[mode]
+  if not request or request.done then rests[mode]=self.rests[mode] end
+ end
+ return { status = status, reason = reason, progress = self.progress, rests = rests, lives = Json.copy(self.lifeTokens) }
 end
 
 -- Leaving/shutdown keeps ownership until the pending records finish; a new visit must not load half a flush.
@@ -42812,6 +42907,9 @@ return RestCompression
 -- not anti-cheat: it is a solo game with no economy, so a dishonest client can only change its own player's save.
 --
 -- Client to server (ToServer): { kind = "hello", v } | { kind = "progress", progress } | { kind = "rest", mode, record }
+-- New Life: {kind="begin_life",mode,serial}; rest messages carry the acknowledged `life` token.
+-- Server acknowledges {kind="life",mode,serial,token} only after the retirement marker is stored.
+-- Loaded replies include `lives` by slot; retired slots have no rest to offer.
 -- Server to client (ToClient): { kind = "loaded", v, status, reason, progress, rests = { main?, free?, easy? } }
 --                              | { kind = "status", status, reason } | { kind = "rest", mode, record }
 local SaveRules = require(game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Data"):WaitForChild("SaveRules"))
@@ -42857,7 +42955,7 @@ end
 
 local function loadedMessage(session: any): { [string]: any }
 	local snap = session:snapshot()
-	return { kind = "loaded", v = SaveRules.PROTOCOL, status = snap.status, reason = snap.reason, progress = snap.progress, rests = snap.rests }
+	return { kind = "loaded", v = SaveRules.PROTOCOL, status = snap.status, reason = snap.reason, progress = snap.progress, rests = snap.rests, lives = snap.lives }
 end
 
 -- A player arrived: start their session (the load runs in its own thread) and wait for their hello.
@@ -42866,7 +42964,7 @@ function SaveService.addPlayer(self: any, player: Player)
 	self.counter += 1
 	local now = self.cfg.now()
 	local sessionId = `{self.cfg.jobId or "local"}:{math.floor(now)}:{self.counter}`
-	local entry: any = { player = player, hello = false, loaded = false, leaving = false, progressBucket = bucket(SaveRules.PROGRESS_BURST, SaveRules.PROGRESS_PER_SECOND, now), restBucket = bucket(SaveRules.REST_BURST, SaveRules.REST_PER_SECOND, now), helloBucket = bucket(3, 0.2, now) }
+	local entry: any = { player = player, hello = false, loaded = false, leaving = false, progressBucket = bucket(SaveRules.PROGRESS_BURST, SaveRules.PROGRESS_PER_SECOND, now), restBucket = bucket(SaveRules.REST_BURST, SaveRules.REST_PER_SECOND, now), lifeBucket = bucket(SaveRules.LIFE_BURST,SaveRules.LIFE_PER_SECOND,now), helloBucket = bucket(3, 0.2, now) }
 	entry.session = SaveSession.new({
 		backend = self.cfg.backend, userId = if self.cfg.keyOf then self.cfg.keyOf(player) else player.UserId, sessionId = sessionId, now = self.cfg.now, sleep = self.cfg.sleep,
 		log = function(text: string) log(self, text) end,
@@ -42876,7 +42974,10 @@ function SaveService.addPlayer(self: any, player: Player)
 		onLoaded = function(_snap: any)
 			if entry.hello and not entry.leaving then sendTo(self, player, loadedMessage(entry.session)) end
 		end,
-		onRest = function(mode: string, record: any)
+		onLife = function(mode: string,serial: number,token: string)
+   if entry.hello and not entry.leaving then sendTo(self,player,{kind="life",mode=mode,serial=serial,token=token}) end
+  end,
+  onRest = function(mode: string, record: any)
 			if entry.hello and not entry.leaving then sendTo(self, player, { kind = "rest", mode = mode, record = record }) end
 		end,
 	})
@@ -42912,10 +43013,13 @@ local function handle(self: any, entry: any, msg: any)
 	elseif kind == "progress" then
 		if not take(entry.progressBucket, now) then self.stats.limited += 1; return end
 		if not entry.session:setProgress(msg.progress) then self.stats.dropped += 1 end
-	elseif kind == "rest" then
+	elseif kind == "begin_life" then
+  if not take(entry.lifeBucket,now) then self.stats.limited+=1;return end
+  if type(msg.mode)~="string" or not entry.session:beginLife(msg.mode,msg.serial) then self.stats.dropped+=1 end
+ elseif kind == "rest" then
 		if not take(entry.restBucket, now) then self.stats.limited += 1; return end
 		local mode = msg.mode
-		if type(mode) ~= "string" or not entry.session:setRest(mode, msg.record) then self.stats.dropped += 1 end
+		if type(mode) ~= "string" or not entry.session:setRestForLife(mode, msg.record,msg.life) then self.stats.dropped += 1 end
 	else
 		self.stats.dropped += 1
 	end
@@ -47959,6 +48063,7 @@ return Body
 --   * waiting(): the start menu may wait while this is true: the remotes are being looked for (CLIENT_WAIT_REMOTES seconds) or the first reply
 --     is awaited (CLIENT_WAIT_REPLY seconds). It is never true for long.
 --   * status(): ("saved" | "saving" | "session", reason). Before any reply: nil. With no server: ("session", "offline").
+-- beginLife(mode): discard old queued rests, retry a serial intent, and hold new rests until durable acknowledgement.
 -- `cfg.rules` is Data/SaveRules; `cfg.findRemotes()` returns { server, client } (RemoteEvents) or nil; the callbacks hand the server's messages up.
 local SaveClient = {}
 SaveClient.__index = SaveClient
@@ -47973,7 +48078,8 @@ function SaveClient.new(cfg: Config): any
 	local now = cfg.now()
 	return setmetatable({
 		cfg = cfg, born = now, remotes = nil :: any, phase = "searching", helloAt = -1e9, helloTries = 0,
-		lastProgress = -1e9, dirty = false, pendingRest = {} :: { [string]: any }, lastRest = {} :: { [string]: number },
+		lifeTokens = {} :: {[string]:string}, lifeRequests = {} :: {[string]:any}, lifeSerial = 0,
+  lastProgress = -1e9, dirty = false, pendingRest = {} :: { [string]: any }, lastRest = {} :: { [string]: number },
 		st = nil :: string?, why = nil :: string?, sent = { progress = 0, rest = 0, hello = 0 },
 	}, SaveClient)
 end
@@ -47983,12 +48089,20 @@ local function receive(self: any, msg: any)
 	if msg.kind == "loaded" then
 		self.phase = "ready"
 		self.st, self.why = msg.status, msg.reason
-		self.cfg.onLoaded(msg)
+		if type(msg.lives)=="table" then
+   for mode,token in msg.lives do if not self.lifeRequests[mode] and type(token)=="string" then self.lifeTokens[mode]=token end end
+  end
+  self.cfg.onLoaded(msg)
 		self.cfg.onStatus(msg.status, msg.reason)
 	elseif msg.kind == "status" then
 		self.st, self.why = msg.status, msg.reason
 		self.cfg.onStatus(msg.status, msg.reason)
-	elseif msg.kind == "rest" then
+	elseif msg.kind == "life" then
+  local request=self.lifeRequests[msg.mode]
+  if request and request.serial==msg.serial and type(msg.token)=="string" and #msg.token>0 and #msg.token<=self.cfg.rules.MAX_LIFE_TOKEN_CHARS then
+   request.done=true;self.lifeTokens[msg.mode]=msg.token
+  end
+ elseif msg.kind == "rest" then
 		if type(msg.mode) == "string" then self.cfg.onRest(msg.mode, msg.record) end
 	end
 end
@@ -48008,6 +48122,13 @@ function SaveClient.markDirty(self: any)
 	self.dirty = true
 end
 
+function SaveClient.beginLife(self: any,mode: string)
+ self.lifeSerial+=1
+ self.lifeRequests[mode]={serial=self.lifeSerial,done=false,last=-1e9}
+ self.pendingRest[mode]=nil -- an unsent rest belongs to the life being retired
+ self.lastRest[mode]=nil
+end
+
 function SaveClient.sendRest(self: any, mode: string, record: any)
 	self.pendingRest[mode] = record
 end
@@ -48021,7 +48142,10 @@ function SaveClient.waiting(self: any): boolean
 end
 
 function SaveClient.status(self: any): (string?, string?)
-	if self.st ~= nil then return self.st, self.why end
+	if self.st ~= nil then
+  if self.st=="saved" then for _,request in self.lifeRequests do if not request.done then return "saving",nil end end end
+  return self.st,self.why
+ end
 	if self.phase == "searching" and self.cfg.now() - self.born >= self.cfg.rules.CLIENT_WAIT_REMOTES then return "session", "offline" end
 	if self.phase == "hello" and not self:waiting() then return "session", "offline" end
 	return nil, nil
@@ -48057,12 +48181,22 @@ function SaveClient.update(self: any)
 			self.remotes.server:FireServer({ kind = "progress", progress = payload })
 		end
 	end
-	for mode, record in self.pendingRest do
+	if self.phase=="ready" then
+  for mode,request in self.lifeRequests do
+   if not request.done and t-request.last>=rules.CLIENT_LIFE_GAP then
+    request.last=t
+    self.remotes.server:FireServer({kind="begin_life",mode=mode,serial=request.serial})
+   end
+  end
+ end
+ for mode, record in self.pendingRest do
+  local request=self.lifeRequests[mode]
+  if request and not request.done then continue end
 		if t - (self.lastRest[mode] or -1e9) >= rules.CLIENT_PROGRESS_GAP * 2 then
 			self.pendingRest[mode] = nil
 			self.lastRest[mode] = t
 			self.sent.rest += 1
-			self.remotes.server:FireServer({ kind = "rest", mode = mode, record = record })
+			self.remotes.server:FireServer({ kind = "rest", mode = mode, record = record, life = self.lifeTokens[mode] })
 		end
 	end
 end
@@ -52350,6 +52484,10 @@ local function fresh(mode: string, easy: boolean, position: Vector3?): boolean
  sensor:reset();memory:clear();M.LockOn.release(M.lock,"reset");table.clear(M.nature.night)
  local slot=M.SaveRules.slotOf(mode,session.rules)
  stores[slot]=newStore();checkpoints=stores[slot]
+ if saveClient~=nil and not saveState.broken then
+  local sent,problem=pcall(function() saveClient:beginLife(slot) end)
+  if not sent then saveState.fail(problem) end
+ end
  life.resting=false;life.notice="";life.noticeSeconds=0;life.restoreGrace=0
  wasp:load(WaspDirector.defaultRecord());wasp.gentle=needs.gentle
  if M.cat then M.cat:load(M.Cat.defaultRecord()) end -- (ROBLOX-118: a new life meets the cat anew)
@@ -52620,9 +52758,9 @@ menu=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
   return
  end
  if choice=="New" or choice=="Easy" then
-  if session.started and confirming~=choice then
+  if (session.started or stores[if choice=="Easy" then "easy" else "main"]:loadBest().ok) and confirming~=choice then
    confirming=choice
-   menu:showChoices("Begin a new life?",if choice=="Easy" then "This replaces the Easy life's last rest as soon as the new spider rests. The standard life's last rest is kept." else "This replaces the standard life's last rest as soon as the new spider rests. The Easy life's last rest is kept.","",
+   menu:showChoices("Begin a new life?",if choice=="Easy" then "This starts a new Easy life and retires its previous last rest when saving succeeds. The standard life's last rest is kept." else "This starts a new standard life and retires its previous last rest when saving succeeds. The Easy life's last rest is kept.","",
     {{id=choice :: string,text="Begin the new life"},{id="CancelNew",text="Keep this life"}},true,"CancelNew")
    return
   end

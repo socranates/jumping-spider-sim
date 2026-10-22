@@ -1,6 +1,6 @@
 # New Life retirement — candidate verification
 
-Branch `codex/life-retirement`; runtime source `5cf7b4c0f212082342574763aaf5b19e00c4e323`; evidence `b3b1a047e958d966`. Based on the verified, unpublished compression candidate. **Not published**. Live baseline remains v51 / place version 140.
+Branch `codex/life-retirement`; runtime source `5cf7b4c0f212082342574763aaf5b19e00c4e323`; evidence `b3b1a047e958d966`. Based on the verified, unpublished compression candidate. **Not published**. Last verified live baseline is v51 / place version 140; this candidate has not been published.
 
 ## Failure and behavior
 
@@ -18,17 +18,17 @@ New Life / Another use the new boundary. Carry On / Follow continue the existing
 
 ## Verification state
 
-- Targeted exploratory run: **563 state checks, 154 client checks, 44 compression checks passed**. Earlier failing exploratory logs are retained and must not be presented as final acceptance evidence. The final guard also bounds root copying and refuses metatable roots before touching them. Full frozen-source runs are pending.
+- Targeted exploratory run: **563 state checks, 154 client checks, 44 compression checks passed**. Earlier failing exploratory logs are retained and must not be presented as final acceptance evidence. The final guard also bounds root copying and refuses metatable roots before touching them. Full frozen-source results are recorded below.
 - Latest strict analysis clean, with only tool startup/watched-file messages. Five Python runner regressions pass.
 - Frozen source compilation: **216/216**, `-O0`, per-file hashes in `compile.json`.
-- Full Windows run live in `cli-final.txt`; terminal exit and totals pending. Do not count a running suite as passed.
-- Linux run [39728136498](https://github.com/socranates/jumping-spider-sim/actions/runs/39728136498) launched for exact runtime source; final result pending.
-- Final local Studio review copy matched **216/216 source fingerprints** and evidence `b3b1a047e958d966` at 2026-10-22T05:30:20Z. The native codec/retirement probe passed at 2026-10-22T05:30:50Z using the 2,276,508-character actual-engine synthetic checkpoint and a local memory backend (227,282 native stored JSON characters after the new rest). The foreground preserve self-test is running; its final result is pending. The earlier 814995d copy passed its native codec/retirement probe but its full preserve run was stopped for the boundary fix. `native-before-boundary.txt` is historical evidence only.
+- Full Windows run completed with exit **0**: **62 suites, 443,213 checks passed, 0 failed**. `cli-final.txt` and `cli-final-process.json` record its output and observed terminal exit.
+- Linux run [39728136498](https://github.com/socranates/jumping-spider-sim/actions/runs/39728136498) completed successfully for exact runtime source: **62 suites, 443,213 checks passed**; compile/strict and runner checks passed. See `ci-final.json` and `ci-all-suites.txt`.
+- Final local Studio review copy matched **216/216 source fingerprints** and evidence `b3b1a047e958d966` at 2026-10-22T05:30:20Z. The native codec/retirement probe passed at 2026-10-22T05:30:50Z using the 2,276,508-character actual-engine synthetic checkpoint and a local memory backend (227,282 native stored JSON characters after the new rest). The foreground preserve self-test passed **274 / 0 / 0** at 2026-10-22T05:40:09Z. `native-final.txt` preserves its source guard, readiness marker, codec probe, and full run. No CreatorError or script timeout was recorded. The earlier 814995d copy passed its native codec/retirement probe but its full preserve run was stopped for the boundary fix. `native-before-boundary.txt` is historical evidence only.
 - The native probe uses the earlier actual-engine 233-region synthetic checkpoint with the real codec and SaveSession, backed by a local table adapter. It checks legacy read, durable marker/backup, quit/rejoin, stale rest refusal and exact simulation fields. It never accesses DataStoreService and is not online persistence evidence.
 
 ## Remaining release gates
 
-Record full CLI/CI/native outcomes against unchanged source; preserve actual terminal exits and source fingerprints. Verify real client/server persistence and larger played saves against an isolated online test namespace. Studio API access is still disabled. An Open Cloud key uses a separate external API and does not enable Studio permission; do not read keys from screenshots or paste them into handoffs.
+All offline CLI/CI/native gates passed against unchanged source. `verify.py` recomputes the evidence hash and checks the receipts; `receipt.json` keeps publication readiness false. Verify real client/server persistence and larger played saves against an isolated online test namespace. Studio API access is still disabled. An Open Cloud key uses a separate external API and does not enable Studio permission; do not read keys from screenshots or paste them into handoffs.
 
 The broader audit remains active: legacy-world transfer, overlapping-session Continue UX, deterministic route activation, caption projection, matched performance scenes and long memory/device traces. Native automated checks do not replace manual play and comfort/audio testing. Keep the rare-sightings expansion paused until the foundation is dependable.
 
@@ -40,4 +40,4 @@ Reference: [Roblox Open Cloud DataStores](https://create.roblox.com/docs/cloud/g
 
 ## Interrupted and current runs
 
-The initial 814995d Windows run (exec 67801) was intentionally stopped, exit -1, to validate stamped size limits and title-screen confirmation. Its log is `cli-before-boundary-fix.txt`. CI 39727205382 was intentionally cancelled (HTTP 202; subsequent API confirmed cancelled). Neither is final acceptance evidence. Final Windows exec **30676** and CI **39728136498** cover runtime source 5cf7b4c. Expected suite count is 62; wait for actual process exits and totals.
+The initial 814995d Windows run (exec 67801) was intentionally stopped, exit -1, to validate stamped size limits and title-screen confirmation. Its log is `cli-before-boundary-fix.txt`. CI 39727205382 was intentionally cancelled (HTTP 202; subsequent API confirmed cancelled). Neither is final acceptance evidence. Final Windows exec **30676** exited 0 and CI **39728136498** succeeded; each covers runtime source 5cf7b4c and passed 62 suites / 443,213 checks.

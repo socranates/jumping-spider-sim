@@ -1,0 +1,64 @@
+{
+  "source": "47241c994c7b2fbd4eb3fed0c4affd75ece88c10",
+  "run_id": "1792692875948",
+  "assertions": 13,
+  "stages": [
+    {
+      "name": "capture_full_world",
+      "elapsed_ms": 105.888,
+      "frame_samples": 3,
+      "max_frame_gap_ms": 115.359
+    },
+    {
+      "name": "receive_full_offer",
+      "elapsed_ms": 700.966,
+      "frame_samples": 4,
+      "max_frame_gap_ms": 930.924
+    },
+    {
+      "name": "five_immutable_repeats",
+      "elapsed_ms": 0.02,
+      "frame_samples": 4,
+      "max_frame_gap_ms": 45.334
+    },
+    {
+      "name": "actual_menu_continue_restore",
+      "elapsed_ms": 1618.735,
+      "frame_samples": 4,
+      "max_frame_gap_ms": 1629.077
+    },
+    {
+      "name": "actual_local_rest_and_queue",
+      "elapsed_ms": 2639.133,
+      "frame_samples": 4,
+      "max_frame_gap_ms": 2660.579
+    },
+    {
+      "name": "grant_and_actual_upload_copy_local_receipt",
+      "elapsed_ms": 51.857,
+      "frame_samples": 4,
+      "max_frame_gap_ms": 68.41
+    }
+  ],
+  "region_initialization_attempts": 233,
+  "resident_region_count_measured": false,
+  "all_regions_materialized_verified": false,
+  "record_canonical_chars": 1501296,
+  "place_sha256": "e91d5439f3080f0f54486b25332ae2af96b2870bffff010402eac7aff7426930",
+  "probe_sha256": "ed92f5453b0d565182b3213e4f9c2e912afb39065be25a733cd98963f222ee10",
+  "output_sha256": "4edc0075d3b861b4056e2192669a22d351427afae85ee24b1fbe4621d256ee0d",
+  "creator_errors": 0,
+  "creator_warnings": 1,
+  "persistence_disabled": true,
+  "native_controller_local_transport_completed": true,
+  "low_system_resources_warning_seen": true,
+  "concurrent_windows_full_session": 63820,
+  "causal_performance_improvement_proven": false,
+  "typical_frame_rate_proven": false,
+  "remote_transfer_measured": false,
+  "online_save_accessed": false,
+  "online_rejoin_verified": false,
+  "physical_device_verified": false,
+  "published": false,
+  "scope": "Actual Studio controller/local checkpoint path through a large Normal record and injected local transport. Initialization was attempted for233 regions subject to the existing streaming/readiness gates; actual resident/materialized region counts were not measured. Timings were collected under low-resource warning and concurrent CLI test load; not a causal FPS, network, phone or online-rejoin result."
+}

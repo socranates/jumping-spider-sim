@@ -1,0 +1,15 @@
+RARE passed=265 failed=0
+CONTINUATION_MENU passed=32 failed=0
+SAVE_CONTINUATION passed=125 failed=0
+SAVE_INTENT passed=57 failed=0
+SAVE_OBSERVATION passed=50 failed=0
+state: a rest is 17887 characters early and 21599 at most after 3 samples of a long life (cap 5000000, Roblox 4194304)
+slow [random operations, faults and two sessions: stored progress only ever grows, every stored value is a good save, and nothing raises] 8.1 s
+STATE passed=1013 failed=0
+STATE_CLIENT passed=161 failed=0
+STATE_OFFLINE passed=8 failed=0
+REST_STORAGE full_world_chars=2277087 regions=233
+REST_STORAGE passed=14 failed=0
+REST_COMPRESSION passed=57 failed=0
+SAVE_NOTICE passed=53 failed=0
+TITLE passed=21 failed=0

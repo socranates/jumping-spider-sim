@@ -1,0 +1,30 @@
+{
+  "source": "fbe4b56543b0f381306ccc76de88ed317bc98694",
+  "runtime_equivalent_to": "47241c994c7b2fbd4eb3fed0c4affd75ece88c10",
+  "production_modules": 220,
+  "production_changes": [],
+  "test_only_changes": [
+    "roblox_port/tests/rare_sightings.luau"
+  ],
+  "targeted_suites": 12,
+  "targeted_passed": 1856,
+  "rare_passed": 265,
+  "compile_passed": 220,
+  "strict_clean": true,
+  "runner_regressions": 5,
+  "native_controller_local_transport_assertions": 13,
+  "native_runtime_matches_current": true,
+  "native_source_line_endings_normalized": true,
+  "native_region_initialization_attempts": 233,
+  "native_all_regions_materialized_verified": false,
+  "native_record_chars": 1501296,
+  "first_offer_cost_resolved": false,
+  "full_current_gates_verified": false,
+  "native_full_feature_verified": false,
+  "online_rejoin_verified": false,
+  "remote_transfer_measured": false,
+  "physical_device_verified": false,
+  "release_artifact_rebuilt": false,
+  "published": false,
+  "publication_ready": false
+}

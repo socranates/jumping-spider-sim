@@ -1,3 +1,11 @@
+# Current milestone: native cost evidence and rare fixture protocol correction
+
+Sourcefbe4b56 has identical production files to47241c9 and only fixes the rare-history mock reply's protocol fields; its original assertions are unchanged. **12 focused suites/1,856 checks pass**, with220 compilation/strict/runner5 proof bound to identical code. See [current receipt](rare-protocol/receipt.json) and run root verify.py. Older counts/source sections below remain historical.
+
+The actual Studio controller probe completed13 assertions, zero Creator errors, through a large1.5M-character Normal checkpoint and local injected saving transport. Receiving took701ms, menu store/restore1619ms, local rest processing2639ms, and five unchanged repeats0.020ms in this one low-resource/concurrent-test run. Streaming/materialization completeness was not measured. See [native scope and next work](native-cost/README.md); these are not typical FPS/network/device or online-rejoin results. Initial/local-rest work is still a visible performance problem.
+
+Both oldac898f4 full runs are terminal failures with only the two stale rare-fixture checks:69 suites/444365 pass/2 fail each. They are retained, not counted as success. New full gates on fbe4b56 are running: Windows71231, Linux39830933365/job120006543269. No completed current full gate is claimed. Artifacts/BuildInfo remain the prior snapshot; nothing published; overall goal active.
+
 # Save/Continue: repeated-offer cost reduced; first-load cost still open
 
 Active branch `codex/save-continue`, checkout `C:/Users/natha/windowsill-save-continue`, source `47241c994c7b2fbd4eb3fed0c4affd75ece88c10`. Actual game/menu use protocol3. Nothing published; runtime XML/BuildInfo are still the earlier snapshot and must not be published as this source.

@@ -1,3 +1,13 @@
+# Current continuation handoff: fbe4b56
+
+Branchcodex/save-continue, checkout C:/Users/natha/windowsill-save-continue. Start at docs/save-continue/README.md, rare-protocol/README.md and native-cost/README.md. Current production is unchanged from47241c9; only the rare mock's version/epoch/sequence fields changed. Its original history checks remain and all265 pass. Source-bound current focused proof is12 suites/1856,220 compile/strict/runner5. Root verify.py passes.
+
+Native run1792692875948 passed13 controller/local-transport assertions with all221 fingerprints/Persistence disabled/PlaceId0. The large1.5M native snapshot exposed receiving701ms, store/restore1619ms and local rest2639ms; repeats0.020ms. Low-resource warning plus concurrent CLI load prevent typical/causal FPS claims. Streaming readiness/materialization counts were not measured:233 initialization attempts do not prove fully explored ecology. Studio is closed and original diagnostic bytes restored. No online save, physical-input or transfer test.
+
+Old Windows63820 and Linux39827147497 are terminal failure, both69 suites/444365 pass/2 fail, only the obsolete rare mock. Exact failed receipts remain under menu-ready/. New Windows exec71231 and Linux39830933365/job120006543269 are live on fbe4b56; poll existing handles, do not restart on timeout. Neither is finished proof. Next prioritize phase-specific profiling/cooperative local-save/restore preparation with immutable snapshots and atomic commits; native-cost/README.md states invariants. Broader28-item audit/release/network/device/older-world work remains. Nothing published; artifacts/BuildInfo still old.
+
+Earlier handoff below is historical.
+
 # Save/Continue active handoff
 
 Branch `codex/save-continue`, checkout `C:/Users/natha/windowsill-save-continue`, source `47241c994c7b2fbd4eb3fed0c4affd75ece88c10`. Start at `docs/save-continue/README.md`. Actual game/menu protocol3 flow is integrated; current cost-reduction milestone passes11 suites/1,591 checks,220 compilation, strict clean and runner5, with source-bound receipts in cost-reduction/.

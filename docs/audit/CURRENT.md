@@ -1,3 +1,7 @@
+# Current verification: fbe4b56
+
+12 focused suites/1856 checks pass; production identical to47241c9,220 compile/strict/runner5 bound by hashes. Native13 local-controller assertions completed with large-save stalls; all-region materialization and ordinary performance are unproven. Old69-suite runs on ac898f4 failed only2 rare mock checks on both platforms and are retained. The mock fields are corrected without changing assertions; new full Windows71231/Linux39830933365 are live, not complete. Start at [current status](../save-continue/README.md). No publication; overall goal remains active. Older status sections below keep their historical scope.
+
 # Current source:47241c9 repeated-offer optimization
 
 11 focused suites/1,591 checks pass,220 compile/strict/runner5 verified. First full-preserve validation remains roughly0.7s in a CLI sample; native/frame/network and current full gates are not complete. Earlier ac898f4 Windows exec63820 and Linux39827147497 are still live at last poll. Start at [current Save/Continue status](../save-continue/README.md); older status sections below retain their own sources and scope. Nothing published; overall goal remains active.

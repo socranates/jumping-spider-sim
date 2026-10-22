@@ -1,0 +1,13 @@
+2026-10-22T18:14:07.737Z,133.737534,4fc4,6,Info [FLog::CreatorOutput] [NATIVE_SAVE_COST_GUARD] 47241c994c7b2fbd4eb3fed0c4affd75ece88c10 221 persistence_disabled
+2026-10-22T18:14:27.215Z,153.215347,297c,6,Info [FLog::CreatorOutput] [Windowsill] world: The Preserve (preserve)
+2026-10-22T18:14:27.225Z,153.225388,297c,6,Info [FLog::CreatorOutput] [Windowsill] sun: through the window, clock 10, latitude -40.7
+2026-10-22T18:14:35.752Z,161.752151,3d58,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type
+2026-10-22T18:14:35.979Z,161.979675,0884,6,Info [FLog::CreatorOutput] [NATIVE_SAVE_COST_BEGIN] 1792692875948 47241c994c7b2fbd4eb3fed0c4affd75ece88c10
+2026-10-22T18:14:45.575Z,171.575653,7820,6,Info [FLog::CreatorOutput] [NATIVE_SAVE_COST_STAGE] 1792692875948 capture_full_world 105.888 3 115.359
+2026-10-22T18:14:46.493Z,172.493149,7820,6,Info [FLog::CreatorOutput] [NATIVE_SAVE_COST_RECORD] 1792692875948 233 1501296
+2026-10-22T18:14:47.316Z,173.316574,7820,6,Info [FLog::CreatorOutput] [NATIVE_SAVE_COST_STAGE] 1792692875948 receive_full_offer 700.966 4 930.924
+2026-10-22T18:14:47.377Z,173.377319,7820,6,Info [FLog::CreatorOutput] [NATIVE_SAVE_COST_STAGE] 1792692875948 five_immutable_repeats 0.020 4 45.334
+2026-10-22T18:14:49.112Z,175.112808,7820,6,Info [FLog::CreatorOutput] [NATIVE_SAVE_COST_STAGE] 1792692875948 actual_menu_continue_restore 1618.735 4 1629.077
+2026-10-22T18:14:51.847Z,177.847595,7820,6,Info [FLog::CreatorOutput] [NATIVE_SAVE_COST_STAGE] 1792692875948 actual_local_rest_and_queue 2639.133 4 2660.579
+2026-10-22T18:14:51.980Z,177.980011,7820,6,Info [FLog::CreatorOutput] [NATIVE_SAVE_COST_STAGE] 1792692875948 grant_and_actual_upload_copy_local_receipt 51.857 4 68.410
+2026-10-22T18:14:51.980Z,177.980011,7820,6,Info [FLog::CreatorOutput] [NATIVE_SAVE_COST_DONE] 1792692875948 13 local_transport_only

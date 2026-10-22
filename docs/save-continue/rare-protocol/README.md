@@ -1,0 +1,9 @@
+# Rare-history protocol fixture correction and current verification
+
+Sourcefbe4b56543b0f381306ccc76de88ed317bc98694 differs from47241c9 only in the existing rare-sighting mock reply. Production files are identical. The reply now includes protocol3, epoch, sequence, offers and decisions as the actual SaveService does. The two existing history-identity/high-water assertions remain unchanged. All265 rare checks pass;12 focused suites total1,856/0. Compilation220, strict and runner5 evidence is reused only after verifying identical production and runner bytes. verify.py binds every target input to committed source and checks the actual native fingerprints/receipts.
+
+The oldac898f4 full runs completed with exactly the same two fixture failures on both platforms:69 suites/444365 passed/2 failed each. Windows63820 is terminal1; Linux39827147497 is completed failure. Exact logs, source inputs and hashes are retained under menu-ready/. Neither is relabeled green, and the skipped Linux runner step is not claimed.
+
+New sourcefbe4b56 full gates are now running: Windows exec71231 from an immutable snapshot, and Linux run39830933365/job120006543269, verified in_progress. Expected suite count69 and expected check count444391 remain expectations until terminal outputs are inspected. Do not restart these existing handles on observation timeouts. Current focused/native receipts are not completed full-gate proof.
+
+Native-cost/ records13 actual Studio controller assertions with an injected local saving transport, not online saves. The large1.5M-character native record exposed long local processing/restore pauses under low-memory/concurrent-test conditions. Streaming readiness completeness was not measured. Responsive processing and all broader audit/release/native-network/device/old-world requirements remain open. Runtime XML/BuildInfo still represent the prior snapshot; nothing published.

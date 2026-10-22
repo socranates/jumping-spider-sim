@@ -1,0 +1,13 @@
+{
+  "source": "ac898f40e84916ce0862214eb607cbbfba14034d",
+  "suites": 69,
+  "passed": 444365,
+  "failed": 2,
+  "exit_code": 1,
+  "elapsed_seconds": 1347.0674805641174,
+  "log_sha256": "eaef7541d9b340fb0047425361837d9add8b2a1dbdb05da7146438f2520b2df8",
+  "inputs_verified": true,
+  "native": false,
+  "published": false,
+  "scope": "Failed Windows CLI full gate for ac898f4: only rare-history mock protocol failed; newer sources are separate"
+}

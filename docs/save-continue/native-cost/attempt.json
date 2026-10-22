@@ -1,0 +1,18 @@
+{
+  "source": "47241c994c7b2fbd4eb3fed0c4affd75ece88c10",
+  "folder": "C:/Users/natha/claude-xfer/Windowsill-save-cost-47241c9-v2",
+  "place_sha256": "e91d5439f3080f0f54486b25332ae2af96b2870bffff010402eac7aff7426930",
+  "scripts": 221,
+  "persistence_disabled": true,
+  "low_system_resources_warning_seen": true,
+  "concurrent_windows_full_session": 63820,
+  "native_run_complete": true,
+  "causal_performance_improvement_proven": false,
+  "remote_transfer_measured": false,
+  "published": false,
+  "native_run_id": "1792692875948",
+  "assertions": 13,
+  "studio_exited_verified": true,
+  "region_initialization_attempts": 233,
+  "all_regions_materialized_verified": false
+}

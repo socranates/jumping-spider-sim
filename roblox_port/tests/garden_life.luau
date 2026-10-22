@@ -384,7 +384,7 @@ case("the world's prey: the sill's director at home, the bed's made when the bed
 	local garden2 = {}
 	local pw2 = PreyWorld.new(sillDirector(), worldAt("bed_a", { bed_a = false }), garden2, world)
 	pw2:before(DT, Vector3.new(-20, -89.69, -30), observerAt(FAR), s, cast, cameraFar)
-	check(pw2.active[1] == "bed_a" and garden2.bed_a == nil and pw2.made == 3 and #pw2:flies() == 0, "a bed that has not arrived whole has no prey and no woodlice (the wall and, ROBLOX-107, the bushes beside it, whole, have their own)")
+	check(table.find(pw2.active, "bed_a") == nil and garden2.bed_a == nil and pw2.made == 3 and #pw2:flies() == 0, "a bed that has not arrived whole has no prey and no woodlice (the wall and, ROBLOX-107, the bushes beside it, whole, have their own)")
 	pw2.world = worldAt("bed_a")
 	pw2:before(DT, Vector3.new(-20, -89.69, -30), observerAt(FAR), s, cast, cameraFar)
 	check(garden2.bed_a ~= nil and garden2.bed_a.prey ~= nil and garden2.bed_a.kinds ~= nil and garden2.bed_a.kinds.springtail ~= nil and garden2.bed_a.kinds.leafhopper ~= nil and pw2.made == 6, "whole, it has them (W3's and the bestiary's)")
@@ -1650,6 +1650,36 @@ case("under the bushes: woodlice in the litter of every chunk, the first two at 
 		check(Garden.prey(r) == nil and Garden.ambient(r) == nil, `{r.id}: no gnats or aphids, no ambient bugs yet`)
 	end
 	check(pipeFoot ~= nil, "one chunk holds the drainpipe's foot")
+end)
+
+case("cached populations pause through unavailable geometry and resume without reroll",function()
+local Map,Build,Director,Memory=WorldMap,WorldBuild,PreyDirector,ObservationMemory
+Map.use("test_garden");workspace:ClearAllChildren()
+local root=Build.world(workspace);local ready=true;local bed=assert(Map.region("bed_a"))
+local world={home="sill",map=Map,region=bed,regionReady=function(_,id) return id==bed.id and ready end}
+local home=Director.engine(root,Species.fly_like_prototype,914,4,true)
+local garden={};local pw=PreyWorld.new(home,world,garden,root,{probe=home.probe,cast=home.graph.cast,sweep=home.graph.sweep,overlap=home.graph.overlap})
+local sensor=Sensor.new(Memory.new());sensor:configureFrom(Species.phidippus_audax_prototype.perception)
+local at=bed.spawn.pos+Vector3.yAxis*.31
+local observer={eye=at+Vector3.yAxis*.09,gaze=Vector3.zAxis,up=Vector3.yAxis,heading=Vector3.zAxis}
+local camera={CFrame=CFrame.new(at+Vector3.new(0,5,12)),FieldOfView=70,ViewportSize=Vector2.new(1280,720)}
+local cast=Sensor.workspaceCast(home.params or (function() local p=RaycastParams.new();p.FilterType=Enum.RaycastFilterType.Include;p.FilterDescendantsInstances={root};return p end)())
+local motor={mode="attached",events={},pos=at,preparing=false,moving=false,vel=Vector3.zero,heading=Vector3.zAxis,up=Vector3.yAxis,eyePosition=function() return observer.eye end}
+local function tick() pw:before(1/60,at,observer,sensor,cast,camera,12);pw:after(1/60,motor,sensor,cast) end
+tick();local entry=assert(garden.bed_a);local d=assert(entry.prey);local before=d.now;local made=pw.made
+local frozen={}
+for i,f in d.flies do frozen[i]={id=f.id,position=f.position,state=f.state,rng=f.rng.state} end
+ready=false
+for _=1,12 do tick() end
+check(table.find(pw.active,bed.id)==nil,"missing region is still active")
+check(d.now==before,"existing director advanced while geometry unavailable")
+check(#pw:flies()==0 and #pw:percepts()==0 and #pw:crawlers()==0,"unavailable ecology remains visible/perceived")
+local same=true
+for i,f in d.flies do local v=frozen[i];if v==nil or v.id~=f.id or v.position~=f.position or v.state~=f.state or v.rng~=f.rng.state then same=false end end
+check(garden.bed_a==entry and entry.prey==d and pw.made==made and same,"unavailability changed population ownership or RNG")
+ready=true;tick()
+check(garden.bed_a==entry and entry.prey==d and pw.made==made and d.now>before,"complete rearrival did not resume same population")
+workspace:ClearAllChildren()
 end)
 
 print(`GARDEN_LIFE passed={passed} failed={failed}`)

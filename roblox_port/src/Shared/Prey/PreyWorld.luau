@@ -245,6 +245,11 @@ function PreyWorld.before(self: any, dt: number, position: Vector3, observer: an
 	self.clock += dt
 	if hour ~= nil then self.hour = hour end
 	self.active = self:activeAt(position)
+	-- Existing populations survive stream-out, but must not step or be presented
+	-- until their collision geometry is whole again. Preserve order and identity.
+	for i = #self.active, 1, -1 do
+		if not self.world:regionReady(self.active[i]) then table.remove(self.active, i) end
+	end
 	for _, id in self.active do
 		for _, d in self:directors(id) do
 			local dusk = Garden.BESTIARY.dusk

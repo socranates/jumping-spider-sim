@@ -1053,5 +1053,36 @@ check("the looks outside the window are this client's own and follow the spider 
 	end
 end)
 
+-- First-arrival readiness must not survive missing collision. Engine streaming has separate native evidence.
+local function readyBed()
+ workspace:ClearAllChildren();WorldMap.use("test_garden")
+ local root=WorldBuild.world(workspace)
+ local client=WorldClient.new(workspace,Instance.new("Player"),WorldMap)
+ local bed=assert(WorldMap.region("bed_a"));client.region=bed
+ local folder=assert(client:folderOf(bed))
+ assert(client:creatureLive("bed_a") and client.whole.bed_a,"fixture was not first ready")
+ return client,folder,root
+end
+check("stream-out: atomic folder leaves after first arrival",function()
+ local client,folder=readyBed();folder.Parent=nil
+ assert(not client:regionReady("bed_a"),"fixture has not left")
+ assert(not client:creatureLive("bed_a"),"resident still simulates on streamed-out geometry")
+ workspace:ClearAllChildren()
+end)
+check("stream-out: one collision piece leaves after first arrival",function()
+ local client,folder=readyBed();folder:GetChildren()[1].Parent=nil
+ assert(not client:regionReady("bed_a"),"fixture is not partial")
+ assert(not client:creatureLive("bed_a"),"resident still simulates on partial geometry")
+ workspace:ClearAllChildren()
+end)
+check("stream-out: partial rearrival refuses then resumes same creature gate",function()
+ local client,folder,root=readyBed();folder.Parent=nil
+ local part=folder:GetChildren()[1];part.Parent=nil;folder.Parent=root
+ assert(not client:creatureLive("bed_a"),"partial replacement treated as ready")
+ part.Parent=folder
+ assert(client:creatureLive("bed_a"),"complete geometry did not resume")
+ workspace:ClearAllChildren()
+end)
+
 print("WORLD_CLIENT passed=" .. passed .. " failed=" .. failed)
 if failed > 0 then error("WORLD_CLIENT failed") end

@@ -238,9 +238,11 @@ function WorldClient.creatureLive(self: any, regionId: string?): boolean
 		for _, n in here.neighbors do if n.id == regionId then near = true; break end end
 	end
 	if not near then return false end
-	if self.whole[regionId] then return true end
-	if self:regionReady(regionId) then self.whole[regionId] = true; return true end
-	return false
+	-- Non-station models are Atomic, not Persistent: a previously whole region
+	-- can stream out and return partially. First arrival is not current authority.
+	local ready = self:regionReady(regionId)
+	self.whole[regionId] = if ready then true else nil
+	return ready
 end
 
 -- (ROBLOX-117) The box a creature's motor keeps to: the union of the roam's regions (the preserve's rival and mate walk the whole hut garden), else the sill's.

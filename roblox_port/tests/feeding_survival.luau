@@ -13,6 +13,8 @@ local Fly=require("../src/Shared/Prey/Fly")
 local Sound=require("../src/Client/Soundscape")
 local Cat=require("../src/Shared/Predator/Cat")
 local CatBody=require("../src/Client/CatBody")
+local ObjectRecord=require("../src/Shared/Persistence/ObjectRecord")
+local PreyRandom=require("../src/Shared/Prey/PreyRandom")
 local passed,failed=0,0
 local function check(ok,msg) if ok then passed+=1 else failed+=1;print("FAIL MEALS "..msg) end end
 local function near(a,b) return math.abs(a-b)<1e-8 end
@@ -49,6 +51,20 @@ for _=1,200 do auto:step(.1,true,false,function() end) end
 check(auto.mealsFinished==1,"automatic accessibility feeding remains available")
 local legacy=Feeding.new();legacy.held=prey();legacy:press();legacy:step(.1,true,false,function() end)
 check(legacy.taken>0,"frozen controller retains toggle feeding")
+-- A real graph commit clears constructor defaults: reproduce a pre-v50 rest.
+local old=Feeding.new();old.bites=nil;old.biteWindow=nil;old.bitePulse=nil;old.tapToFeed=nil
+local classes={Feeding=Feeding,Needs=Needs,PreyRandom=PreyRandom}
+local graph,why=ObjectRecord.capture({feeding=old},classes,{})
+assert(graph,table.concat(why or {},","))
+local decoded,problems=ObjectRecord.decode(graph,classes,{})
+assert(decoded,table.concat(problems or {},","))
+local restored=Feeding.new()
+assert(ObjectRecord.commit(decoded,{feeding=restored}))
+check(restored.bites==nil,"old record actually removes new constructor defaults")
+restored:useGameRules();restored.tapToFeed=true
+check(restored.bites==0 and restored.biteWindow==0 and restored.bitePulse==0,"live restore initializes absent presentation fields")
+restored.held=prey();restored:press();restored:step(.1,true,false,function() end)
+check(restored.taken>0 and restored.bites==1,"old-rest feeding runs without nil counters")
 
 Clock.game.clockScale=60
 local s={inRetreat=true,attached=true,still=true,holding=false,feeding=false}

@@ -25,6 +25,8 @@ end
 -- Opt in to the game's struggle (Data/Catch.game): an easier tap, and a struggle that scales with the prey caught (applied at each capture).
 function F.useGameRules(self: any)
  apply(self,Catch.scaled(1));self.game=true
+ -- ObjectRecord replaces tables on restore. Older rests have no presentation fields.
+ self.bites=self.bites or 0;self.biteWindow=self.biteWindow or 0;self.bitePulse=self.bitePulse or 0
 end
 -- The rival's struggle (ROBLOX-77): its own numbers (Data/Catch.rival), or in the gentle modes the house fly's with no cap. Not scaled by a profile.
 function F.useRivalRules(self: any,gentle: boolean)
@@ -75,8 +77,8 @@ function F.step(self: any,dt: number,attached: boolean,moving: boolean,escape: (
  end
  if not self.feeding then return end
  -- Pulses only follow valid eating ticks, including the automatic accessibility path.
- self.bitePulse-=eatingDt
- if self.bitePulse<=0 then self.bites+=1;self.bitePulse=.38 end
+ self.bitePulse=(self.bitePulse or 0)-eatingDt
+ if self.bitePulse<=0 then self.bites=(self.bites or 0)+1;self.bitePulse=.38 end
  local take=math.min(f.nutrition,f.profile.body.feed_rate_per_s*eatingDt)
  f.nutrition-=take
  local granted=self.needs:grantEnergy(take,f.captureKey)

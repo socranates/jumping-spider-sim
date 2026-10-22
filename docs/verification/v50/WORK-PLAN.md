@@ -93,3 +93,11 @@ and checks real motor and camera after stand/walk:20/0. Native SelfTest now adds
 a corresponding check (274 expected), to run on the final source. B's ongoing
 survey is retained and will still report these old two overlaps. Recheck their
 full-tier placements and the complete low-tier survey on C.
+
+
+Restore audit found a compatibility hazard before release: ObjectRecord.commit
+clears constructor defaults, so pre-v50 rests omit bite counters. Feeding's live
+rule application now supplies those missing fields; legacy feeding ticks also
+use safe defaults. An actual capture/decode/commit graph roundtrip reproduces
+the absent fields and verifies a subsequent bite. Meals now88/0. This is a
+restore compatibility fix, not a save-schema change or a ledger reset.

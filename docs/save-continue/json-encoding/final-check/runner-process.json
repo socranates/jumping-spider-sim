@@ -1,0 +1,13 @@
+{
+  "exit_code": 0,
+  "command": [
+    "C:\\Users\\natha\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests",
+    "-p",
+    "test_runner.py"
+  ]
+}

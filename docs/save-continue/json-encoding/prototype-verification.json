@@ -1,0 +1,18 @@
+{
+  "reference_source": "ab8ca9577129e3d9583a0a8ab6824dae1a8cd014",
+  "adopted_json_sha256": "9b6599b4c1476c5c5114bacb5106b2a869d799a78988d20688b572c6d0f31384",
+  "adopted_code_matches_tested_candidate": true,
+  "cli_differential_checks": 20716,
+  "cli_paired_samples": 8,
+  "cli_mean_cpu_reduction_percent": 31.776424596951426,
+  "native_assertions": 20738,
+  "native_paired_samples": 8,
+  "native_mean_cpu_reduction_percent": 40.2725629654232,
+  "native_pose_or_fps_claim": false,
+  "hard_frame_budget_proven": false,
+  "heap_gain_proven": false,
+  "full_integration_gates_verified": false,
+  "release_rebuilt": false,
+  "goal_complete": false,
+  "published": false
+}

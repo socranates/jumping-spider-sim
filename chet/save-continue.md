@@ -1,3 +1,15 @@
+# Current handoff: encoding optimization adopted, full gates pending
+
+Only production change: Shared/Persistence/Json.canonical now uses one owned output-fragment buffer, preserving exact output/errors/checksums and validation. [Current evidence and next steps](../docs/save-continue/json-encoding/README.md). CLI prototype20716 differential checks passes, and native20738 assertions/224 exact fingerprints passes. On the same1.503M record, eight alternating native samples give40.27percent lower encoder CPU; every candidate max step is lower. Heap observations vary, no FPS/hard-frame/end-to-end-save improvement claim. The unmodified graph validation, temporary readback/backup, receipt authority and atomic publication remain.
+
+Adopted code matches tested prototype exactly except a comment. A permanent json_encoding suite compares against a frozen ab8ca95 legacy encoder. Adoption6-suite checks21420/0, compile222/222, strict and runner5 pass. Full current Windows/Linux gates must now be started on this committed source, expected76/465380/0 unproven until closed. Root verifier intentionally fails while those gates are pending. verify-prototype.py separately verifies the bounded paired evidence. Source XML/BuildInfo still old; do not publish.
+
+Native comparison v2 window63963396 stopped/saved/closed/exited; original XML/hash restored. Pre-existing rig window94504044 remains. Use explicit globalThis namespace/scoped locals for future UI work to avoid old lexical variables. v2 archive C:/Users/natha/claude-xfer/Windowsill-json-encoding-ab8ca95-v2/Windowsill-json-encoding-review.rbxlx;224 fingerprints/Persistence disabled, never publish. First failed-count package is marked FAILED-BUILD and has no native evidence.
+
+After full gates: verify current receipts and measure actual adopted-game save/return correctness and latency. Do not claim40percent whole-game gain from an isolated encoder test. Broader28-item audit, synchronous capture, lossless older-world restore, actual online/rejoin/devices, whole-game native performance and release/laptop synchronization remain open. Fly, feeding and settings untouched. Goal active.
+
+Earlier handoff below is historical.
+
 # Current handoff: save-cost attribution complete, optimization next
 
 Current runtime/tests sourceab8ca9577129e3d9583a0a8ab6824dae1a8cd014, branch codex/save-continue. [Measured results and safety details](../docs/save-continue/save-cost/README.md). All jobs are terminal. Linux39852128734 passes75 suites/444664/0 plus compile222/strict/runner5. Old Windows87216 closed75/444661/3; corrected Windows67331 self-tests5/0 and7/0, internal41/0/0 and274/0/0. Root verifier binds current inputs and both cohorts; combined Windows coverage is75/444664/0, not a fresh current-source full run.

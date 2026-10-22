@@ -1,6 +1,6 @@
 {
   "source": "ab8ca9577129e3d9583a0a8ab6824dae1a8cd014",
-  "current_workspace_inputs_verified": true,
+  "historical_source_inputs_verified": true,
   "linux_run": 39852128734,
   "linux_suites": 75,
   "linux_passed": 444664,

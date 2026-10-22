@@ -1,6 +1,6 @@
-"""Current full Linux gate, exact live bytes; native/Windows scope stays explicit."""
+"""Historical ab8ca95 attribution gate; compare immutable archived inputs."""
 from pathlib import Path
-import hashlib,io,json,re,runpy,subprocess,tarfile,importlib.util,zipfile
+import hashlib,io,json,re,runpy,subprocess,tarfile,importlib.util,zipfile,tempfile
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[2]
 SOURCE='ab8ca9577129e3d9583a0a8ab6824dae1a8cd014'
 BASE='4ee6aecc06f4753a85e40fc98a1487dc5126d27d'
@@ -12,8 +12,6 @@ def archive(source):
 current=archive(SOURCE);base=archive(BASE)
 assert current.keys()==base.keys()
 assert [name for name in current if current[name]!=base[name]]==['roblox_port/src/Client/SelfTest.luau']
-for name,data in current.items():assert (ROOT/name).read_bytes()==data,name
-assert subprocess.check_output(['git','log','-1','--format=%H','--','roblox_port/src','roblox_port/tests'],cwd=ROOT,text=True).strip()==SOURCE
 # Earlier stage still checks immutable original/corrected focused cohorts and
 # the exact old native fingerprints. It does not claim native proof on SOURCE.
 runpy.run_path(str(HERE.parent/'local-return/verify.py'))
@@ -57,7 +55,10 @@ follow_text=(HERE/'selftest.txt').read_text(encoding='utf8')
 assert re.findall(r'^(SELFTEST(?:_PRESERVE)?) passed=(\d+) failed=(\d+)',follow_text,re.M)==[('SELFTEST','5','0'),('SELFTEST_PRESERVE','7','0')]
 assert '[SELFTEST] END pass=41 fail=0 skip=0' in follow_text and '[SELFTEST] END pass=274 fail=0 skip=0' in follow_text
 assert '[SELFTEST] FAIL' not in follow_text
-spec=importlib.util.spec_from_file_location('save_cost_runner',ROOT/'roblox_port/tests/run.py')
+frozen=tempfile.TemporaryDirectory()
+for name,data in current.items():
+ path=Path(frozen.name)/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(data)
+spec=importlib.util.spec_from_file_location('save_cost_runner',Path(frozen.name)/'roblox_port/tests/run.py')
 runner=importlib.util.module_from_spec(spec);spec.loader.exec_module(runner)
 for folder,probe in [(HERE,'profile.luau'),(HERE/'preserve','preserve-profile.luau')]:
  profile=json.loads((folder/'receipt.json').read_text(encoding='utf8'));assert profile['exit_code']==0
@@ -98,7 +99,7 @@ assert [r['sha256'] for r in manifest['scripts'] if r['path'].endswith('.SilkPla
 closed=json.loads((HERE/'native-close.json').read_text(encoding='utf8'))
 assert closed['playback_stopped'] and closed['place_closed'] and closed['diagnostic_window_closed']
 assert closed['original_restored_sha256']==manifest['place_sha256']==native['place_sha256']
-receipt=dict(source=SOURCE,current_workspace_inputs_verified=True,linux_run=ci['id'],linux_suites=75,linux_passed=444664,failed=0,
+receipt=dict(source=SOURCE,historical_source_inputs_verified=True,linux_run=ci['id'],linux_suites=75,linux_passed=444664,failed=0,
  modules_compiled=222,strict_clean=True,runner_regressions=5,shim_selftest_checks=[41,274],
  native_historical_source='07234cae75b5a62b820dc6dda830dce7e503c36b',native_historical_assertions=22,
  historical_windows_source=BASE,historical_windows_full_suites=75,historical_windows_passed=444661,historical_windows_failed=3,
@@ -107,4 +108,5 @@ receipt=dict(source=SOURCE,current_workspace_inputs_verified=True,linux_run=ci['
  current_source_windows_full_verified=False,save_cost_measurements_pending=False,small_and_large_cli_profiles_verified=True,
  rig_candidate_adopted=False,hard_frame_budget_proven=False,goal_complete=False,published=False)
 (HERE/'verification.json').write_text(json.dumps(receipt,indent=2)+'\n',encoding='utf8',newline='\n')
+frozen.cleanup()
 print(json.dumps(receipt,indent=2))

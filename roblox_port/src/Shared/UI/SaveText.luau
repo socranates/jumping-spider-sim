@@ -76,4 +76,19 @@ function SaveText.toast(oldStatus: string?, oldReason: string?, status: string?,
 	return ""
 end
 
+-- Only operational trouble/recovery enters the minimal screen. Routine saving,
+-- saved, loading and gameplay messages remain quiet. Do not refresh each retry.
+function SaveText.notice(oldStatus: string?, oldReason: string?, status: string?, reason: string?): string
+	if status == oldStatus and reason == oldReason then return "" end
+	if status == "session" then
+		return SaveText.menuLine(status, reason)
+	elseif status == "saving" and (reason == "write_failed" or reason == "rest_refused" or reason == "rest_protected") then
+		return SaveText.menuLine(status, reason)
+	elseif status == "saved" and reason == nil
+		and (oldStatus == "session" or (oldStatus == "saving" and (oldReason == "write_failed" or oldReason == "rest_refused" or oldReason == "rest_protected"))) then
+		return SaveText.BACK
+	end
+	return ""
+end
+
 return SaveText

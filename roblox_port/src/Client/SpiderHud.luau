@@ -12,6 +12,7 @@ local Hud = {}
 Hud.__index = Hud
 
 local TOAST_SECONDS = 2.6
+local SAVE_NOTICE_SECONDS = 12
 local CAPTION_TEXT = 15 -- the sound captions' text size at normal; view.captionScale (the Captions setting) multiplies it
 local OK_COLOR = Color3.new(0.92, 0.94, 0.98)
 local WARN_COLOR = Color3.new(1.0, 0.72, 0.1)
@@ -217,6 +218,8 @@ function Hud.new(playerGui: Instance): any
 	-- The life loop's notices ("Morning, day 2", "Checkpoint kept."), for as long as LifeLoop keeps them (ROBLOX-24).
 	local notice = wrapLabel("Notice", top, 16, 3)
 	local toast = wrapLabel("Toast", top, 17, 4)
+	local saveNotice = wrapLabel("SaveNotice", top, 17, 4)
+	saveNotice.TextColor3 = WARN_COLOR
 	local help = wrapLabel("Controls", top, 15, 5)
 	help.TextXAlignment = Enum.TextXAlignment.Left
 	-- Day/stage and notices share one vertical flow, so longer life labels never overlap checkpoint messages.
@@ -261,7 +264,7 @@ function Hud.new(playerGui: Instance): any
 		aimTitle = aimTitle, aimHint = aimHint, anchorLabel = anchorLabel,
 		status = status, caption = caption, toastLabel = toast, help = help, notice = notice, day = day, dayLine = dayLine, noteLabel = note, noteLeft = 0,
 		panel = panel, promptTitle = promptTitle, promptHint = promptHint, promptCue = promptCue,
-		toastLeft = 0, toastRank = 0, device = "keyboard", lastSpan = "",
+		toastLeft = 0, toastRank = 0, saveNoticeLabel = saveNotice, saveNoticeLeft = 0, device = "keyboard", lastSpan = "",
 	}, Hud)
 	return self
 end
@@ -280,6 +283,15 @@ function Hud.toast(self: any, text: string, level: (boolean | string)?)
 end
 
 -- The note that a page opened in the notebook, for `seconds`.
+-- Preserve save failures use their own channel: gameplay toasts cannot erase
+-- them, and the reading time pauses while a modal screen already shows status.
+-- Legacy worlds keep their existing toast rather than showing the words twice.
+function Hud.saveNotice(self: any, text: string)
+	if text == "" then return end
+	self.saveNoticeLabel.Text = text
+	self.saveNoticeLeft = SAVE_NOTICE_SECONDS
+end
+
 function Hud.setNote(self: any, text: string, seconds: number)
 	self.noteLabel.Text = text
 	self.noteLabel.Visible = text ~= ""
@@ -330,7 +342,7 @@ function Hud.minimalView(view: any): any
 	return {minimal=true,device=view.device,food=view.food,foodGentle=view.foodGentle,dot=view.dot==true,aiming=false,focus=false,eyeView=false,
 		largeText=view.largeText,notice=notice,helpVisible=view.helpVisible and view.helpRequested,
 		helpText=view.helpText,prompt=view.contextPrompt,status={},
-		caption=view.soundCaption,captionScale=view.captionScale}
+		caption=view.soundCaption,captionScale=view.captionScale,saveNoticePaused=view.saveNoticePaused}
 end
 function Hud.update(self: any, view: any, dt: number)
 	local minimal=view.minimal==true
@@ -366,6 +378,9 @@ function Hud.update(self: any, view: any, dt: number)
  if view.court then self.courtFill.Size = UDim2.fromScale(math.clamp(view.court,0,1),1) end
  self.device = view.device
 	self:_place()
+	self.saveNoticeLabel.TextSize = if view.largeText then 24 else 17
+	if not view.saveNoticePaused then self.saveNoticeLeft = math.max(0, self.saveNoticeLeft - dt) end
+	self.saveNoticeLabel.Visible = minimal and not view.saveNoticePaused and self.saveNoticeLeft > 0
 	self.reticle.Visible = view.dot == true or view.aiming or view.focus or view.eyeView
 	self.reticle.Size=UDim2.fromOffset(if minimal then 2 else 6,if minimal then 2 else 6)
 	self.reticleStroke.Thickness=if minimal then .75 else 1.5

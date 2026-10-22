@@ -1360,6 +1360,7 @@ local function updateSaves()
 	local status, reason = saveClient:status()
 	if status ~= nil and (status ~= saveState.status or reason ~= saveState.reason) then
 		local text = M.SaveText.toast(saveState.status, saveState.reason, status, reason)
+		hud:saveNotice(M.SaveText.notice(saveState.status, saveState.reason, status, reason))
 		saveState.status, saveState.reason = status, reason
 		if text ~= "" then hud:toast(text, status == "session") end
 		if menuStarted and menu:isShowing() and confirming == nil then menu.summary.Text = menuBody() end
@@ -1382,6 +1383,7 @@ function saveState.fail(err: any)
 	saveState.broken = true
 	warn("[Windowsill] saving is off for this visit: " .. tostring(err))
 	hud:toast(M.SaveText.BROKEN, true)
+	hud:saveNotice(M.SaveText.brokenLine())
 	if menuStarted and menu:isShowing() and confirming == nil then menu.summary.Text = menuBody() end
 end
 -- The saving's part of each frame: nothing the saving does can stop the frame (and once it has failed, nothing more is tried).
@@ -1755,6 +1757,7 @@ local function updateHud(frameDt: number)
 			prompt = { title = spiderPick.Text.nameLine(appearance), hint = spiderPick.Text.hint(device) } }
 	end
 	view.minimal=M.World.world=="preserve" and not spiderPick.inspecting
+	view.saveNoticePaused=modal() or M.title:holding() or not session.started or life.asleep or life.lifeOver or spiderPick.inspecting
 	view.dot=view.minimal and not modal() and not life.asleep and not life.lifeOver
 	view.helpRequested=helpUntil==math.huge
  view.contextPrompt=M.contextPrompts:step(frameDt,{

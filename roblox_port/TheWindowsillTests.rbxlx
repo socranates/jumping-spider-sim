@@ -15852,6 +15852,7 @@ function SaveSession.new(cfg: Config): any
 		state = "loading", reason = nil :: string?, canRetry = false, retryAt = 0,
 		progress = SaveProgress.default(), progressTime = 0, storedTime = 0,
 		rests = {} :: { [string]: any }, lifeTokens = {} :: {[string]:string}, lifeRequests = {} :: {[string]:any},
+		restRevision = {} :: { [string]: string }, -- checksum of the last successfully read/written envelope
 		restBase = {} :: { [string]: number }, -- updatedAt of the rest this session last read or wrote (nil: unknown)
 		restPending = {} :: { [string]: any }, restPendingTime = {} :: { [string]: number },
 		restLoaded = {} :: { [string]: boolean }, restRetryAt = 0,
@@ -15992,10 +15993,12 @@ local function readRests(self: any)
 				self.restLoaded[mode] = true
 				if op.status == "ok" or op.status == "migrated" then
 					self.restBase[mode] = op.updatedAt
+     self.restRevision[mode] = value.checksum
 					self.lifeTokens[mode] = op.payload.save_life
      self.rests[mode] = if SaveRest.isRetired(op.payload) then nil else op.payload
 				elseif op.status == "missing" then
 					self.restBase[mode] = 0
+     self.restRevision[mode] = nil
      self.lifeTokens[mode],self.rests[mode]=nil,nil
 				else
 					-- A readable backup is offered in memory only. Preserve the original unreadable record for recovery.
@@ -16007,11 +16010,12 @@ local function readRests(self: any)
 					protectRest(self,mode,if op.status == "newer" then "newer" else "corrupt")
 				end
 				local request=self.lifeRequests[mode]
-    -- A local New Life chosen before this slot was ever read is not consent
-    -- to erase a life discovered later, after acquiring a foreign session's lease.
+    -- Bind consent to the life AND revision observed when New Life was chosen.
+    -- Reacquiring a lease must not silently authorize retiring a different save.
     -- Own retirement markers remain idempotent after an ambiguous write response.
-    if request and not request.done and not request.observed
-     and (op.status=="ok" or op.status=="migrated") and op.session~=self.id then
+    if request and not request.done and (op.status=="ok" or op.status=="migrated")
+     and (not request.observed or request.baseLife~=op.payload.save_life
+      or request.baseTime~=(op.updatedAt or 0) or request.baseRevision~=value.checksum) and op.session~=self.id then
      self:demote("other_session",false)
     end
     local queued=self.restPending[mode]
@@ -16107,7 +16111,7 @@ function SaveSession.beginLife(self: any,mode: string,serial: any): boolean
  end
  local token=`{self.id}:{mode}:{serial}`
  if not SaveRest.validLife(token) then return false end
- self.lifeRequests[mode]={serial=serial,token=token,done=false,observed=self.restLoaded[mode]==true}
+ self.lifeRequests[mode]={serial=serial,token=token,done=false,observed=self.restLoaded[mode]==true,baseLife=self.lifeTokens[mode],baseTime=self.restBase[mode] or 0,baseRevision=self.restRevision[mode]}
  self.rests[mode],self.restRejected[mode]=nil,nil
  self.restPending[mode]={save_retired=true,save_life=token}
  self.restPendingTime[mode]=self.now()
@@ -16235,6 +16239,8 @@ local function writeRest(self: any, mode: string): boolean
 	local outcome = ""
 	local newTime = now
  local expectedLife=self.lifeTokens[mode]
+ local expectedRevision=self.restRevision[mode]
+ local writtenRevision: string?=nil
 	local ok, _, err = self.backend:update(self.rkey[mode], function(old: any): any
 		outcome = ""
   if self.restProtected[mode] then outcome="protected";return nil end
@@ -16244,6 +16250,9 @@ local function writeRest(self: any, mode: string): boolean
 		if (op.status=="ok" or op.status=="migrated") and op.payload.save_life~=expectedLife and op.session~=self.id then
    outcome="superseded";return nil -- life identities protect even simultaneous writes with equal timestamps
   end
+  if (op.status=="ok" or op.status=="migrated") and op.session~=self.id and old.checksum~=expectedRevision then
+   outcome="superseded";return nil -- equal timestamps/legacy identities do not prove unchanged contents
+  end
   local base = self.restBase[mode]
 		if (op.status == "ok" or op.status == "migrated") and base ~= nil and (op.updatedAt or 0) > base and op.session ~= self.id then
 			outcome = "superseded"
@@ -16252,12 +16261,15 @@ local function writeRest(self: any, mode: string): boolean
 		if (op.status == "ok") and canonical(op.payload) == canonical(record) then
 			-- already stored (an earlier try whose answer was lost): nothing to write, and the backup must not become a copy of it
 			newTime = op.updatedAt or now
+   writtenRevision=old.checksum
 			outcome = "ok"
 			return nil
 		end
 		newTime = math.max(now, op.updatedAt or 0)
 		outcome = "ok"
-		return SaveEnvelope.make(spec, record, newTime, old, { session = self.id })
+		local made=SaveEnvelope.make(spec, record, newTime, old, { session = self.id })
+  writtenRevision=made.checksum
+  return made
 	end)
 	if not ok then
 		local class = SaveStores.classify(err)
@@ -16274,6 +16286,7 @@ local function writeRest(self: any, mode: string): boolean
 	end
 	if outcome == "ok" then
 		self.restBase[mode] = newTime
+  self.restRevision[mode] = writtenRevision
 		self.lifeTokens[mode]=record.save_life
   self.rests[mode] = if SaveRest.isRetired(record) then nil else record
   local request=self.lifeRequests[mode]
@@ -42478,7 +42491,7 @@ end
         <Properties>
           <string name="Name">BuildInfo</string>
           <string name="Source"><![CDATA[-- Generated by tools/build.py; do not edit.
-return { id = "3ef9d94e5cae48bf" }
+return { id = "95802440d548b8c2" }
 ]]></string>
         </Properties>
       </Item>

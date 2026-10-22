@@ -2115,5 +2115,78 @@ case("preload New Life on a genuinely empty slot remains usable",function()
  check(e.backend.data.R_983_main.payload.save_life==a.lifeTokens.main,"acknowledged identity matches storage")
 end)
 
+case("observed New Life cannot retire a different life after lease recovery",function()
+ for i,mode in {"main","free","easy"} do
+  local e=newEnv();local uid=990+i;local b=newSession(e,uid,"visitor")
+  b:load();b:beginLife(mode,1);run(e,b,15)
+  check(b:setRestForLife(mode,realRest(120,mode),b.lifeTokens[mode]),mode..": visitor stores an observed life")
+  run(e,b,15);local old=b.lifeTokens[mode]
+  e.t+=SaveRules.LOCK_STALE+1
+  local a=newSession(e,uid,"owner");check(a:load()=="active",mode..": owner takes expired lease")
+  a:beginLife(mode,1);run(e,a,15)
+  check(a:setRestForLife(mode,realRest(240,mode),a.lifeTokens[mode]) and a.lifeTokens[mode]~=old,mode..": owner saves a different life")
+  run(e,a,15);b:beginLife(mode,2);run(e,b,1)
+  check(b.state=="session",mode..": visitor discovers lost lease")
+  a:flush(e.t+20);local key="R_"..uid.."_"..mode;local before=canon(e.backend.data[key])
+  run(e,b,45)
+  check(canon(e.backend.data[key])==before,mode..": newer checkpoint and backup remain byte-equivalent")
+  check(not b.lifeRequests[mode].done and b.state=="session" and not b.canRetry,mode..": stale intent never acknowledged")
+ end
+end)
+case("nil legacy life tokens still require the observed rest revision",function()
+ local e=newEnv();local b=newSession(e,995,"visitor");b:load();b:setRest("main",realRest(120,"main"));run(e,b,15)
+ check(b.lifeTokens.main==nil,"legacy rest has no identity token")
+ e.t+=SaveRules.LOCK_STALE+1
+ local a=newSession(e,995,"owner");a:load();a:setRest("main",realRest(240,"main"));run(e,a,15)
+ b:beginLife("main",1);run(e,b,1);a:flush(e.t+20)
+ local before=canon(e.backend.data.R_995_main);run(e,b,45)
+ check(canon(e.backend.data.R_995_main)==before and not b.lifeRequests.main.done,"revision change protects a legacy rest without a token")
+end)
+case("unchanged previously observed rest permits explicit retirement after lease recovery",function()
+ local e=newEnv();local b=newSession(e,996,"visitor");b:load();b:setRest("main",realRest(120,"main"));run(e,b,15)
+ e.t+=SaveRules.LOCK_STALE+1
+ local a=newSession(e,996,"owner");a:load()
+ b:beginLife("main",1);run(e,b,1);a:flush(e.t+20);run(e,b,45)
+ check(b.lifeRequests.main.done and b.state=="active","unchanged observation remains valid")
+ check(e.backend.data.R_996_main.payload.save_retired and e.backend.data.R_996_main.payload.save_life==b.lifeTokens.main,"retirement matches durable acknowledgement")
+end)
+case("preload own retirement survives ambiguous response and reacquisition",function()
+ local e=newEnv();local ack=0;local b=newSession(e,997,"visitor",{onLife=function() ack+=1 end})
+ b:beginLife("main",1);b:load()
+ e.backend:fail({op="update",key="R_997_main",times=1,afterWrite=true,message="lost response"})
+ run(e,b,1)
+ check(ack==0 and not b.lifeRequests.main.done and e.backend.data.R_997_main.payload.save_retired,"retirement stored but acknowledgement lost")
+ local before=canon(e.backend.data.R_997_main)
+ e.t+=SaveRules.LOCK_STALE+1
+ local a=newSession(e,997,"owner");a:load();a:flush(e.t+20)
+ check(b:load()=="active","own ambiguous marker is not a foreign conflict")
+ run(e,b,15)
+ check(ack==1 and b.lifeRequests.main.done and canon(e.backend.data.R_997_main)==before,"retry acknowledges without duplicating backup or changing marker")
+end)
+
+case("equal timestamps and life tokens do not make changed rest contents identical",function()
+ local e=newEnv();local b=newSession(e,998,"visitor");b:load();b:setRest("main",realRest(120,"main"));run(e,b,15)
+ local observed=e.backend.data.R_998_main
+ e.t+=SaveRules.LOCK_STALE+1
+ local a=newSession(e,998,"owner");a:load()
+ -- A valid foreign envelope can have the same revision time and nil legacy token.
+ -- Its intact checksum still distinguishes the changed payload.
+ local changed=SaveEnvelope.make(SaveRest.SPECS.main,realRest(240,"main"),observed.updatedAt,observed,{session="owner"})
+ check(changed.checksum~=observed.checksum,"fixture differs in contents despite equal timestamp/token")
+ e.backend:poke("R_998_main",changed)
+ b:beginLife("main",1);run(e,b,1);a:flush(e.t+20)
+ local before=canon(e.backend.data.R_998_main);run(e,b,45)
+ check(canon(e.backend.data.R_998_main)==before and not b.lifeRequests.main.done,"changed checksum blocks stale consent")
+end)
+case("write-time revision protects an equal-time foreign update after the slot was read",function()
+ local e=newEnv();local a=newSession(e,999,"visitor");a:load();a:setRest("main",realRest(120,"main"));run(e,a,15)
+ local observed=e.backend.data.R_999_main
+ a:beginLife("main",1)
+ local changed=SaveEnvelope.make(SaveRest.SPECS.main,realRest(240,"main"),observed.updatedAt,observed,{session="owner"})
+ e.backend:poke("R_999_main",changed);local before=canon(changed)
+ run(e,a,20)
+ check(canon(e.backend.data.R_999_main)==before and not a.lifeRequests.main.done,"atomic callback refuses the changed observed revision")
+end)
+
 print(`STATE passed={passed} failed={failed}`)
 if failed > 0 then error("state checks failed") end

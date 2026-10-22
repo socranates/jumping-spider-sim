@@ -6,5 +6,11 @@
   "native_verified": false,
   "shadow_native_verified": false,
   "published": false,
-  "foreign_lock_continue_ux_complete": false
+  "foreign_lock_continue_ux_complete": false,
+  "windows_full_complete": true,
+  "windows_full_exit_code": 0,
+  "windows_full_passed": 443833,
+  "linux_ci_complete": true,
+  "linux_ci_status": "success",
+  "superseding_source": "6026d6c45fbad072c2bec14a3b893fb8e7abccc2"
 }

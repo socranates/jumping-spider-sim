@@ -116,10 +116,10 @@ function PreyWorld.director(self: any, id: string): any
 		entry.prey.feeding = self.home.feeding -- (a return to a rest rebuilds the jaws: every director eats with the home's)
 		return entry.prey
 	end
-	if self.root == nil or not self.world:regionReady(id) then return nil end
 	local region = self.world.map.region(id)
 	local spec = if region ~= nil then Garden.prey(region) else nil
 	if spec == nil then return nil end
+	if self.root == nil or not self.world:regionReady(id) then return nil end
 	local d = PreyDirector.engine(self.root, Species.fungus_gnat_prototype, spec.seed, spec.target, false, spec, self.casts)
 	d.feeding = self.home.feeding -- one jaws, one reserve
 	entry = entry or {}
@@ -170,10 +170,10 @@ function PreyWorld.bugs(self: any, id: string): any
 	if id == self.world.home then return nil end
 	local entry = self.garden[id]
 	if entry ~= nil and entry.bugs ~= nil then return entry.bugs end
-	if not self.world:regionReady(id) then return nil end
 	local region = self.world.map.region(id)
 	local spec = if region ~= nil then Garden.bugs(region) else nil
 	if spec == nil then return nil end
+	if not self.world:regionReady(id) then return nil end
 	local soil: any, boxes = nil, {}
 	for _, p in Region.pieces(region) do
 		if p.id == region.id .. "_soil" then soil = { min = p.lo, max = p.hi }

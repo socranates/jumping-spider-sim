@@ -47728,7 +47728,9 @@ local function build(self: any,visitor: any)
   for i=1,4 do ell("Tail"..sign..i,Vector3.new(.35,.09,1.2),Vector3.new(sign*(2+.16*i),-.04*i,3+i*.75),"adc98c") end
   ell("Antenna"..sign,Vector3.new(.45,.12,1.25),Vector3.new(sign*.45,.25,-2),"b9a779")
   local p=Instance.new("Part");p.Name="LunaWing"..sign;p.Anchored=true
-  p.Size=Vector3.new(4,.12,4);p.CFrame=CFrame.new(visitor.at+Vector3.new(sign*2.05,-.1,.3))
+  -- Inset within the overlapping wing silhouettes, with its top at the wing's
+  -- upper face. No invisible ledge at the oval tips and no feet below the leaf.
+  p.Size=Vector3.new(3,.12,3);p.CFrame=CFrame.new(visitor.at+Vector3.new(sign*2.05,.02,.3))
   p.Transparency=1;p.CanCollide=true;p.CanQuery=true;p.CanTouch=false;p.CastShadow=false
   p:SetAttribute("ProfileId","leaf_dry_prototype");p.Parent=supports
  end

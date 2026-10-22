@@ -1,0 +1,11 @@
+{
+  "source_commit": "856c12e3e71d9b79282954013142fa5577fc3f19",
+  "document_tip": "3a205e2811d67fc545151d698f318c789ae4eb09",
+  "evidence_id": "3112f8aa4f3f192f",
+  "place_version": 139,
+  "scope": "Active Roblox source, tests, tools, assets, playable builds and v50 receipts; Godot excluded",
+  "path": "C:\\Users\\natha\\claude-xfer\\Windowsill-v50-place139-3112f8aa4f3f192f.zip",
+  "bytes": 11886564,
+  "file_count": 461,
+  "sha256": "069e45816b0ea26a74ab46b0b0f0f365817a2543904dd4eef7a3e152bd9a6aac"
+}

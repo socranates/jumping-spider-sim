@@ -1,0 +1,29 @@
+{
+  "source": "a5dba50faa8efc2018acba90ad03356eb25ad20c",
+  "base_source": "fab75695ba918eeebe793e6768a08cabe99a70f3",
+  "evidence_id": "e7ee7af50d1b89b3",
+  "changed_production_modules": [
+    "roblox_port/src/Client/WorldShadows.luau"
+  ],
+  "modules_compiled": 216,
+  "strict_clean": true,
+  "runner_regressions": 5,
+  "targeted_suites": 2,
+  "targeted_passed": 349,
+  "same_behavioral_probe_fails_base_passes_candidate": true,
+  "prepared_place_source_verified": true,
+  "native_execution_verified": false,
+  "native_run": null,
+  "native_assertions": null,
+  "windows_full_complete": false,
+  "windows_full_passed": null,
+  "linux_ci_complete": true,
+  "linux_ci_run": 39777487503,
+  "release_sha256": "51611580378ddf8f2ed34b4987236aca2695e747299eb016a0ee40e5cab83636",
+  "test_place_rejected": true,
+  "network_streaming_verified": false,
+  "fps_benefit_claimed": false,
+  "isolated_studio_category_growth_fixed_claim": false,
+  "published": false,
+  "publication_ready": false
+}

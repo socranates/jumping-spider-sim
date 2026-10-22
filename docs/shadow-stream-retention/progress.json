@@ -1,0 +1,16 @@
+{
+  "source": "a5dba50faa8efc2018acba90ad03356eb25ad20c",
+  "evidence_id": "e7ee7af50d1b89b3",
+  "targeted_exit_code": 0,
+  "targeted_passed": 349,
+  "targeted_suites": 2,
+  "targeted_sha256": "1aed92cbdab461bf28b5d9b07ddc0e5c2429a9e68a92fcc588bc191a23173358",
+  "windows_full_session_id": 78583,
+  "linux_ci_run": 39777487503,
+  "native_started": false,
+  "native_verified": false,
+  "native_pending_reason": "Two fresh Studio startup attempts showed Low System Resources. Warnings dismissed without proceeding and unused app sessions closed. More headroom requested asynchronously.",
+  "intermediate_outputs": "candidate-owner-only and targeted-owner-only are earlier uncommitted intermediate source/test versions, not final-source receipts",
+  "published": false,
+  "performance_claim": false
+}

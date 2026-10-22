@@ -1,0 +1,27 @@
+{
+  "kind": "published v49 release",
+  "source_commit": "5e2964d27309c4db5220ed0705e76cb9506b7a02",
+  "last_gameplay_commit": "5938aac41371ca005f73e4c21e7089404496b9a6",
+  "documentation_commit": "85410472467fae271b7ab16bfc1a9a81f0f91f47",
+  "evidence_id": "35bf178f68118c38",
+  "github_branch": "codex/v49-ranger-station",
+  "place_id": 120119801868085,
+  "universe_id": 10771103250,
+  "published_version": 138,
+  "regression": "56 declared suite gates covered by predecessor plus qualified final reruns; not a single final-source full run",
+  "native_selftest": {
+    "source": "1f81d7c",
+    "pass": 271,
+    "fail": 0,
+    "skip": 0
+  },
+  "final_gameplay_low_native": "pass, zero detached route ticks",
+  "compile": "209/209",
+  "strict": "clean",
+  "playable_source_matches": "209/209",
+  "playable_sha256": "66200ccf3b206653385d5254f17f1954bb65aaf38665f81d4d76d5c08309870c",
+  "package": "C:\\Users\\natha\\claude-xfer\\Windowsill-v49-place138-35bf178f68118c38.zip",
+  "sha256": "f6e989d38f774ec8eb73c1a8221e452d60ddefca101e46d422ae22ad2748dd99",
+  "bytes": 11974070,
+  "files": 493
+}

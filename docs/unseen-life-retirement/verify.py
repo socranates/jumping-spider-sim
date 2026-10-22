@@ -1,9 +1,14 @@
 from pathlib import Path
-import hashlib,json,re,sys,xml.etree.ElementTree as ET
+import hashlib,json,re,sys,subprocess,io,tarfile,xml.etree.ElementTree as ET
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[1]
 def read(n):return json.loads((HERE/n).read_text())
 def sha(b):return hashlib.sha256(b).hexdigest()
+SOURCE="5760c67627449de61fc18801007a3739ff0cc75b"
 old=read("baseline-process.json");new=read("candidate-process.json")
+archive=subprocess.check_output(["git","archive","--format=tar",SOURCE,"roblox_port/src","roblox_port/tests/state.luau"],cwd=ROOT)
+with tarfile.open(fileobj=io.BytesIO(archive)) as tree:
+ for item in tree:
+  if item.isfile():assert new["inputs"][item.name]==sha(tree.extractfile(item).read())
 assert old["exit_code"]!=0 and new["exit_code"]==0
 assert old["inputs"].keys()==new["inputs"].keys()
 changed=[p for p in old["inputs"] if old["inputs"][p]!=new["inputs"][p]]
@@ -44,6 +49,10 @@ if (HERE/"windows-full-process.json").exists():
  rows=re.findall(r"^([A-Z_0-9 ]+) passed=(\d+) failed=(\d+)",(HERE/"windows-full.txt").read_text(),re.M)
  assert len(rows)==64 and sum(int(r[1]) for r in rows)==443833 and all(int(r[2])==0 for r in rows)
  full=True
-receipt={"paired_probe_test_hash_matches":True,"baseline_failed":8,"candidate_passed":741,"changed_production_modules":changed,"compiled":216,"strict_clean":True,"runner_regressions":5,"windows_full_complete":full,"windows_full_passed":443833 if full else None,"linux_ci_verified":False,"native_verified":False,"release_sha256":release_hash,"published":False,"publication_ready":False,"foreign_lock_continue_ux_complete":False}
+ci=read("ci-final.json") if (HERE/"ci-final.json").exists() else None
+if ci:
+ assert ci["head_sha"]==SOURCE and ci["conclusion"]=="success" and ci["suites"]==64 and ci["passed"]==443833 and ci["failed"]==0
+ for name,h in ci["logs_sha256"].items():assert sha((HERE/name).read_bytes())==h
+receipt={"source":SOURCE,"paired_probe_test_hash_matches":True,"baseline_failed":8,"candidate_passed":741,"changed_production_modules":changed,"compiled":216,"strict_clean":True,"runner_regressions":5,"windows_full_complete":full,"windows_full_passed":443833 if full else None,"linux_ci_verified":bool(ci),"native_verified":False,"release_sha256":release_hash,"published":False,"publication_ready":False,"foreign_lock_continue_ux_complete":False}
 (HERE/"receipt.json").write_text(json.dumps(receipt,indent=2)+"\n",encoding="utf8",newline="\n")
 print(json.dumps(receipt,indent=2))

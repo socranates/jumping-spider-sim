@@ -1,6 +1,6 @@
 # Refuse retirement of a previously unseen life
 
-Branch `codex/unseen-life-retirement`, based on `e066c6b`; evidence `3ef9d94e5cae48bf`. Unpublished. This follows the shadow-cleanup fix; its preceding native gate is still pending too.
+Branch `codex/unseen-life-retirement`, source `5760c67627449de61fc18801007a3739ff0cc75b`, based on `e066c6b`; evidence `3ef9d94e5cae48bf`. Unpublished. This follows the shadow-cleanup fix; its preceding native gate is still pending too.
 
 A06 includes both the hidden Continue interface and safety after delayed ownership. This patch addresses a reproduced overwrite in the latter; it does **not** finish the Continue interface.
 
@@ -18,7 +18,7 @@ The exact same expanded `state.luau` on the old module reports **733 passed / 8 
 
 `baseline-process.json` and `candidate-process.json` fingerprint all 216 production inputs and the shared test file. `verify.py` checks that only SaveSession differs, the test hashes match, the candidate's actual worktree bytes match, compilation 216/216, strict analysis, five runner checks, production XML fingerprints and rejection of the test artifact. The rebuilt production XML SHA-256 is `d67463411894e09d3fe89ebf82f0c03696e0e2ccdaf656c32421e5268190c79e`.
 
-Full Windows and exact-source Linux CI are separate pending gates. Expected full totals are 64 suites / 443,833 checks (17 more than the preceding source). Do not claim completion until actual output and exit agree. The native gate is unverified; no diagnostic was published and no production DataStore was touched.
+Full Windows exec session **85596** and exact-source Linux CI **39781688244** are live pending gates. Poll the existing handles; do not restart on an observation timeout. Leave source/tests fixed until the Windows runner terminates. Expected full totals are 64 suites / 443,833 checks (17 more than the preceding source). Do not claim completion until actual output and exit agree. The native gate is unverified; no diagnostic was published and no production DataStore was touched.
 
 ## Next
 

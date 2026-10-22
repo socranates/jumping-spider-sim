@@ -1,0 +1,10 @@
+{
+  "source": "5760c67627449de61fc18801007a3739ff0cc75b",
+  "evidence_id": "3ef9d94e5cae48bf",
+  "windows_full_session_id": 85596,
+  "linux_ci_run": 39781688244,
+  "native_verified": false,
+  "shadow_native_verified": false,
+  "published": false,
+  "foreign_lock_continue_ux_complete": false
+}

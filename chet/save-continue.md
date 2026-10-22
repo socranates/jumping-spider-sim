@@ -1,3 +1,18 @@
+# Current handoff: local rest preparation, c4bcc6a
+
+Runtime/tests source133aa60342d03b534f9dbbf5f6399244714b9fc7 is pushed to github/codex/save-continue. [Implementation/evidence](../docs/save-continue/async-rest/README.md). Coherent capture is still synchronous. Private validation/encoding/store writes/network candidate preparation now span frames; commit swaps the store atomically. Retain generation/source/revision/token fences, exact request/epoch/ticket authority, copy-on-write current/backup separation, and no early success notices. Local rests still finish with broken network saving. New gameplay notices survive delayed successful completion; failed preparation remains visible.
+
+Current source compiles222/222 with strict clean and runner5. Studio1792699532277 passed15 assertions,223 exact fingerprints/Persistence disabled/PlaceId0, zero Creator errors. The isolated place was stopped/saved/closed, Studio exited and original diagnostic hash restored. Large record1,501,336 chars: capture139.495ms; first rest693steps/11.691s/max40.284ms; replacement1091steps/18.515s/max52.894ms. Separate fresh-world running case proves prey/lifecycle advance during preparation.233 initialization attempts are subject to streaming readiness; resident counts unmeasured. Low System Resources warning; no typical FPS/hard frame-budget/device/network/rejoin proof.
+
+Focused matrix:23 suites /25,187 passed /zero failures. Original22-suite successes retained; the title fixture now waits for completed storage and independently passes21/0. Root verify.py checks all current input hashes and the test-only correction. Runtime remains133aa60; verification source is c4bcc6a. Full Windows exec98692 uses immutable133aa60 archive; Linux39846269494 is active. Poll, never restart active runs. Expected74/444637 is not a pass until terminal. Prior8db full Windows and Linux each completed72/444582/0. Do not stage the current live windows-full.txt before its process receipt exists.
+
+Next: reduce total preparation/long-step work; queue synchronous local Continue/Backspace/end-screen last-rest returns behind safe cancellable preparation. Coherent capture still139ms in this case. Keep all dormant ecology and save compatibility; do not turn cancellation into data loss or weaken durable receipts. Wider28-item audit remains open. Nothing published; release XML/BuildInfo still old; goal active.
+
+
+Full-gate correction: Windows98692 and Linux39846269494 use133aa60 and retain the known outdated title fixture. Keep their terminal results, but do not claim them as current success. Corrected Linux run 39846956444 checks c4bcc6a. After Windows98692 closes, run async-rest/full-corrected.py once for the corrected source; never overwrite its existing archive receipt. No full current pass is claimed yet.
+
+Earlier handoff below is historical.
+
 # Current handoff: asynchronous owned offers, 8db0f6d
 
 Branch `codex/save-continue`, checkout `C:/Users/natha/windowsill-save-continue`. Source8db0f6d is pushed. Read `docs/save-continue/async-offers/README.md`; root `docs/save-continue/verify.py` verifies exact committed source/target inputs, compile/strict/runner and native fingerprints/receipts.

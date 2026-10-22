@@ -1,3 +1,12 @@
+# Latest unpublished milestone: local rests across frames, c4bcc6a
+
+[Current handoff](../../chet/save-continue.md), [implementation/evidence](../save-continue/async-rest/README.md). Actual Studio15 assertions/223 fingerprints/disabled production persistence passed;222 compile/strict/runner5. Focused23-suite matrix passed25,187/0; current full Windows98692/Linux39846269494 active. Coherent snapshots are captured synchronously, then local preparation runs privately while simulation continues. Previous rest/backup stay intact until atomic publication; obsolete work cannot save across lives, failures do not claim success, and delayed completion keeps newer notices. Large native replacement18.5s/maxupdate52.9ms, capture139.5ms; overall latency/local-return stalls still open. Prior8db full Windows/Linux72/444582/0 is historical. No publication/FPS claim; broader audit/goal active.
+
+
+Full-gate correction: Windows98692 and Linux39846269494 use133aa60 and retain the known outdated title fixture. Keep their terminal results, but do not claim them as current success. Corrected Linux run 39846956444 checks c4bcc6a. After Windows98692 closes, run async-rest/full-corrected.py once for the corrected source; never overwrite its existing archive receipt. No full current pass is claimed yet.
+
+Earlier status below is historical.
+
 # Latest unpublished milestone: owned offer preparation, 8db0f6d
 
 [Current handoff](../../chet/save-continue.md), [implementation/evidence](../save-continue/async-offers/README.md).16 focused suites/2592,222 compile, strict clean, runner5; actual Studio20 assertions/223 fingerprints/Persistence disabled. Protocol3 owned offers now prepare across frames; menu availability no longer decodes saves. Initial receive18ms/replacement5ms/menu7ms inone native1.5M case; worker spikes/overall Continue latency and synchronous local save/return remain. No typical-FPS claim. Current Windows95122/Linux39839306311 live. Prior955 both70/444440/0,5aec Linux71/444474/0 historical. Nothing published; broader audit/goal active.

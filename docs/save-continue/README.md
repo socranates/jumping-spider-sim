@@ -1,3 +1,12 @@
+# Current milestone: local rests prepare across frames, c4bcc6a
+
+[Implementation and evidence](async-rest/README.md). Coherent capture remains synchronous; validation/store/network preparation now runs privately across frames with atomic publication, revision/generation/token fencing, previous-rest backups and no early kept/Saved claim. Local saving survives network failure, and delayed completion preserves newer gameplay notices. Studio15 assertions/all223 fingerprints/Persistence disabled passed; source222 compiles with clean strict analysis and runner5. Focused23-suite matrix passed25,187/0; full Windows98692 and Linux39846269494 are active. Prior8db full Windows/Linux each72/444582/0 is terminal historical evidence. Large native replacement18.5s/maxupdate52.9ms; capture139.5ms. No hard frame-budget/typical-FPS claim. Nothing published; goal active.
+
+
+Full-gate correction: Windows98692 and Linux39846269494 use133aa60 and retain the known outdated title fixture. Keep their terminal results, but do not claim them as current success. Corrected Linux run 39846956444 checks c4bcc6a. After Windows98692 closes, run async-rest/full-corrected.py once for the corrected source; never overwrite its existing archive receipt. No full current pass is claimed yet.
+
+Earlier milestones below are historical.
+
 # Current milestone: owned offers across frames, 8db0f6d
 
 [Current implementation/evidence](async-offers/README.md). Protocol3 network-owned offers now validate privately across frames; status/authority remain immediate, and menu renders use advisory availability rather than decoding full local rests. Current proof:16 suites/2592,222 compilation/strict/runner5; actual Studio20 assertions/all223 fingerprints with production saving disabled.1.5M native initial receive18ms, replacement5ms, populated menu7ms; remaining update spikes/large Continue latency/local-save and local-return stalls remain. No hard-budget/typical-FPS claim. Nothing published; goal active. Root verify.py is current-source-bound.

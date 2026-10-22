@@ -2,13 +2,13 @@ from pathlib import Path
 import hashlib,io,json,re,subprocess,tarfile
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[2]
 sha=lambda b:hashlib.sha256(b).hexdigest()
-source=subprocess.check_output(['git','log','-1','--format=%H','--','roblox_port/src','roblox_port/tests'],cwd=ROOT,text=True).strip()
+source='8db0f6d7b6b91534c3275dff5833cbb3bbe1dab5' # Historical immutable evidence
 raw=subprocess.check_output(['git','archive','--format=tar',source,'roblox_port/src','roblox_port/tests'],cwd=ROOT)
 with tarfile.open(fileobj=io.BytesIO(raw)) as archive:files={m.name:archive.extractfile(m).read() for m in archive if m.isfile()}
 meta=json.loads((HERE/'target-process.json').read_text(encoding='utf8'))
 assert meta['exit_code']==0
 for name,digest in meta['inputs'].items():
- assert sha(files[name])==digest and sha((ROOT/name).read_bytes())==digest,name
+ assert sha(files[name])==digest,name
 rows=re.findall(r'^([A-Z_0-9 ]+) passed=(\d+) failed=(\d+)',(HERE/'target.txt').read_text(encoding='utf8'),re.M)
 assert len(rows)==16 and sum(int(r[1]) for r in rows)==2592 and all(int(r[2])==0 for r in rows),rows
 compiled=json.loads((HERE/'compile.json').read_text(encoding='utf8'))

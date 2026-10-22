@@ -1,0 +1,34 @@
+LOCAL_REST passed=33 failed=0
+LOCAL_REST_CLIENT passed=17 failed=0
+LIFE passed=20922 failed=0
+CLIENT passed=27 failed=0
+CLIENT_MATING passed=29 failed=0
+NOTEBOOK client: after the first 120 frames the book holds: bold_jumper,hunting_by_sight
+NOTEBOOK passed=1517 failed=0
+OUTDOOR_RESET passed=45 failed=0
+SAVE_OFFERS passed=99 failed=0
+SAVE_RESTORE passed=24 failed=0
+SAVE_WORK passed=39 failed=0
+checkpoint: 17947 characters, 87 tables
+CHECKPOINT passed=570 failed=0
+RARE passed=265 failed=0
+CONTINUATION_MENU passed=41 failed=0
+SAVE_CONTINUATION passed=125 failed=0
+SAVE_INTENT passed=57 failed=0
+SAVE_OBSERVATION passed=50 failed=0
+state: a rest is 17887 characters early and 21599 at most after 3 samples of a long life (cap 5000000, Roblox 4194304)
+slow [random operations, faults and two sessions: stored progress only ever grows, every stored value is a good save, and nothing raises] 10 s
+STATE passed=1013 failed=0
+STATE_CLIENT passed=161 failed=0
+STATE_OFFLINE passed=8 failed=0
+REST_STORAGE full_world_chars=2277087 regions=233
+REST_STORAGE passed=14 failed=0
+REST_COMPRESSION passed=57 failed=0
+SAVE_NOTICE passed=53 failed=0
+C:/Users/natha/AppData/Local/Temp/tmp1epor5i5.luau:59562: title failed
+stacktrace:
+[C] function error
+C:/Users/natha/AppData/Local/Temp/tmp1epor5i5.luau:59562
+FAIL title: Continue from the title card begins the life: the drift lets the camera go, and the life menu offers Resume
+    C:/Users/natha/AppData/Local/Temp/tmp1epor5i5.luau:59536: a rest kept
+TITLE passed=20 failed=1

@@ -35,3 +35,7 @@ The next change must bind the intent to both observed life identity and stored r
 ## Linux full gate completed
 
 CI **39781688244** completed successfully for source **5760c67627449de61fc18801007a3739ff0cc75b** at 2026-10-22T13:04:19Z: **64 suites / 443,833 passed / zero failed**, 216 compilations, strict types, all four download checksums and five runner regressions. Actual metadata and raw logs are retained as `ci-final.json` and `ci-*.txt`; the verifier confirms their source and hashes. Windows session **85596** remains live. This green intermediate source does not fix the separately retained known-life reproduction; its follow-up is source **6026d6c45fbad072c2bec14a3b893fb8e7abccc2**, branch `codex/observed-life-retirement`, with its own gates. No release claim.
+
+## Windows gate terminal result
+
+Exec session **85596** completed with exit zero: **64 suites / 443,833 passed / zero failed**. Its closed log was normalized to LF after termination and retained with the actual process receipt. `verify.py` confirms both full Windows and Linux gates for this intermediate source. It is still unpublished, lacks a native result, and retains the separately proven known-life overwrite; the stronger successor source is 6026d6c on `codex/observed-life-retirement`. Do not restart this completed handle or promote its green checks as proof of the successor.

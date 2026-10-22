@@ -1662,6 +1662,45 @@ local function checks(): { Check }
 			say(r, `INFO looks outside the window: {looks:parts()} parts held of {looks.planned} planned at the {looks.tier} tier, {looks.made} made and {looks.destroyed} destroyed this session, {looks.plans} plans`)
 		end
 	end)
+	add("visible meal and contextual controls", function(r)
+  local c=r.ctx
+  need(c.fresh("main",false),"new Normal life refused")
+  if c.title:holding() then c.title:stop() end
+  local region=assert(WorldMap.region("sill"))
+  put(r,region.spawn.pos+Vector3.new(0,HEIGHT,0),nil)
+  pause(r,1)
+  local f=c.prey.flies[1]
+  need(f~=nil,"no living fly for the scripted catch")
+  -- This check starts at capture; spatial hunting has separate motor/strike checks.
+  f.state="CAPTURED";f.captureSerial+=1;f.captureKey=f.id..":"..f.captureSerial;f.velocity=Vector3.zero
+  local feed=c.prey.feeding
+  local auto=feed.auto
+  feed:capture(f);feed.struggling=false;feed.feeding=false
+  pause(r,.1)
+  need(c.meal.heldView.id==f.id,"held prey has no mouth-frame drawing")
+  local full=f.nutrition
+  feed.auto=false
+  c.input:simulate("Feed",true);pause(r,.1);c.input:simulate("Feed",false);pause(r,.5)
+  need(f.nutrition<full and f.nutrition>0,"one tap did not take a partial bite")
+  need(c.meal.heldView.scale<1,"drawn prey did not empty")
+  need(feed.bites>0,"bite animation/sound has no event")
+  need((c.meal.heldView.frame.Position-c.rig():mouthFrame().Position).Magnitude<.15,"held fly is detached from jaws")
+  need(waitUntil(r,20,function()
+   c.input:simulate("Feed",true);pause(r,.05);c.input:simulate("Feed",false);return feed.held==nil
+  end,.4),"meal never finished after taps")
+  need(f.state=="CONSUMED" and c.meal.husk~=nil,"meal did not drop a husk")
+  feed.auto=auto
+ end)
+	add("Normal starvation reaches the life-ending handler", function(r)
+  local c=r.ctx
+  need(c.fresh("main",false),"new Normal life refused")
+  if c.title:holding() then c.title:stop() end
+  need(not c.needs.gentle and c.life.starveAfterH==12,"live Normal survival rules missing")
+  c.needs.energy=0;c.needs.starvingStreakH=12.1
+  need(waitUntil(r,2,function() return c.life.lifeOver and c.session.ended end),"starvation did not end the life")
+  need(c.session.summary~=nil,"death has no lineage/summary record")
+ end)
+
 	return list
 end
 

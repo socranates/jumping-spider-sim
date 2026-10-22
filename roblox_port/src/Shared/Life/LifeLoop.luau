@@ -63,6 +63,11 @@ function LifeLoop.new(needs: any, save: (() -> CheckpointResult)?): any
 	return self
 end
 
+-- Live survival pacing; frozen-reference controllers keep their original 24/48h.
+function LifeLoop.useGameRules(self: any)
+ self.weakAfterH=6;self.starveAfterH=12
+end
+
 function LifeLoop.canRest(_self: any, s: Spider): boolean
 	return s.inRetreat and not s.holding and not s.feeding and s.attached and s.still
 end
@@ -107,11 +112,11 @@ function LifeLoop.applyLight(self: any)
 end
 
 function LifeLoop.tooHungryToSleep(self: any): boolean
-	return not self.needs.gentle and self.needs.starvingStreakH >= LifeLoop.WEAK_AFTER_H
+	return not self.needs.gentle and self.needs.starvingStreakH >= (self.weakAfterH or LifeLoop.WEAK_AFTER_H)
 end
 
 function LifeLoop.starved(self: any): boolean
-	return not self.needs.gentle and self.needs.starvingStreakH >= LifeLoop.STARVE_AFTER_H
+	return not self.needs.gentle and self.needs.starvingStreakH >= (self.starveAfterH or LifeLoop.STARVE_AFTER_H)
 end
 
 function LifeLoop._stepLife(self: any, dt: number, at: Vector3)

@@ -574,7 +574,7 @@ end
 
 -- Places every fly's parts. `now`: the prey's clock (the time of this drawing); `cameraAt` (ROBLOX-103): where the camera is, for the far rule (nil: every body
 -- is near); `reduced`: the player's Reduced Motion setting.
-function FlyBodies.draw(self: any, flies: { any }, now: number, cameraAt: Vector3?, reduced: boolean?)
+function FlyBodies.draw(self: any, flies: { any }, now: number, cameraAt: Vector3?, reduced: boolean?, heldView: any?)
 	local parts: { BasePart } = self.parts
 	local frames: { CFrame } = self.frames
 	table.clear(parts)
@@ -597,8 +597,9 @@ function FlyBodies.draw(self: any, flies: { any }, now: number, cameraAt: Vector
 		end
 		rig = rig or self:spawn(fly.id, kind)
 		local template: Template = rig.template or self.template
-		local flying = fly:airborne() or fly.state == "CAPTURED"
-		local scale = FlyLook.drawnScale(fly.profile)
+		local meal=if heldView and heldView.id==fly.id then heldView else nil
+  local flying = fly:airborne() or (fly.state == "CAPTURED" and (meal==nil or meal.struggling))
+  local scale = FlyLook.drawnScale(fly.profile)*(if meal then meal.scale else 1)
 		rig.fruit = fly.profile ~= nil and fly.profile.body.prey_kind == "fruit_fly"
 		if flying ~= rig.flying or rig.scale ~= scale then rig.scale = scale; self:pose(rig, flying) end
 		-- the far rule: drawn ten times a second beyond FAR.studs of the camera, with all the time since
@@ -615,10 +616,10 @@ function FlyBodies.draw(self: any, flies: { any }, now: number, cameraAt: Vector
 		self:advance(rig, fly, dt, flying, normal)
 		local up = if math.abs(heading.Unit:Dot(normal)) > 0.999 then Vector3.zAxis else normal -- a heading along the normal has no turn to give
 		local position = fly.position - normal * (if flying then 0 else FlyLook.hover * (1 - scale))
-		local body = CFrame.lookAt(position, position + heading, up)
+		local body = if meal then meal.frame else CFrame.lookAt(position, position + heading, up)
 		local M = template.motion
 		local tip = bodyMove(rig, fly, M, flying, still, rig.seed)
-		if tip ~= nil then body *= CFrame.new(tip.Position * scale) * tip.Rotation end
+		if tip ~= nil and meal==nil then body *= CFrame.new(tip.Position * scale) * tip.Rotation end
 		local poses = if flying then template.flightFrames else template.restFrames
 		for i, part in rig.parts do
 			local localFrame = poses[i]

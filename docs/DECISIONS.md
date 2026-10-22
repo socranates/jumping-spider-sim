@@ -2198,3 +2198,35 @@ Nathan requested a run button, selected L2 for it, and specified that L1 must st
 L2/LT, Shift and a new touch Run button hold ground speed at twice walk speed. Ctrl and the touch Creep button creep; a gentle left-stick push also creeps. Creep (including a lock) takes priority when Run is held too. Growth/cold multipliers, jump reach/flight, line reel/lower, automatic edge walks and saved data keep their existing rules. R2/RT now holds Focus immediately; slow motion stays on T. Help cards, the settings' shoulder navigation hint and the README table follow these bindings. Settings navigation itself is unchanged.
 
 This is combined v47, retaining Claude's v46 creatures, v45 milkweed mesh and v44 quiet HUD. No woodland/weather source or habitat layout was edited by Chet. See chet/review-5.md for engine, mesh, publish and performance evidence.
+
+
+## ROBLOX-130 - Contextual meals, dusk and live survival (2026-10-21, Nathan)
+
+Nathan adopted the six-part Claude prompt preserved in
+`docs/reference/chet-prompt-v49.md`. It explicitly supersedes the v48 hunger-only
+screen rule for small feeding and dusk/rest instructions. The wordless150x6
+reserve,2px manual dot, seven/ten full-fly moults, earned Run/lock-on, existing
+movement, manual aim and liked lighting remain. This work builds on published
+v49/place138 as v50; the prompt's v48 baseline and requested v49 release name
+were stale. It does not roll the station back or publish the skipped versions.
+
+The chosen feeding design uses the actual Feed control: E, Xbox left-stick
+click, PlayStation L3, touch Grip/Eat. Grip remains interruptible. After subduing,
+each accepted tap opens a bounded0.38s eating window at the existing feed rate;
+nutrition is consumed only while attached and still. AutomaticGrip also keeps
+automatic eating for accessibility. Drawing follows the animated jaws, depletes
+the body without changing food accounting, and drops a three-part temporary
+noninteractive husk. No new prey credit or save schema is introduced.
+
+ControlHints covers these prompts in every mode, on every catch and each dusk.
+The dusk reminder lasts briefly away from shelter, names the local known home
+(the Crack at the sill), shows the actual rest control when rest is possible,
+clears on rest, and returns next night. It adds no marker or future-unlock hint.
+
+The reproduced v49 Normal starvation deadline was48 empty-reserve hours,
+not immortality. Live rules now use6h weakness/12h death. From a full reserve a
+fresh unfed Normal life is bounded by three game days even at the cheapest
+sleep drain; record roundtrips and rest must not erase the streak. Easy/Free
+remain nonfatal. Legacy pure/Godot reference controllers retain24/48h defaults.
+Nathan's exact prior mode/session was not reproduced. Detailed verification,
+performance candidate retention and release identity belong to the v50 receipt.

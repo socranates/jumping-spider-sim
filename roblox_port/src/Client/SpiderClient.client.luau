@@ -282,6 +282,11 @@ M.World.bugs = M.BugBodies.new(Workspace, detail) -- (ROBLOX-105: the ambient bu
 M.World.prey.tier = detail -- (ROBLOX-101: how many of the bestiary's prey a region holds)
 rivalLegs.grip = rivalLegs.Grip.new(needs) -- the grip on a caught rival (ROBLOX-77): its own controller, so the fly's is never disturbed
 local life = LifeLoop.new(needs, nil)
+life:useGameRules()
+prey.feeding.tapToFeed=true
+M.ContextPrompts=require(Shared.UI.ContextPrompts)
+M.contextPrompts=M.ContextPrompts.new()
+M.meal=require(script.Parent.MealPresentation).new(Workspace,M.World.root)
 M.World.life = life -- (ROBLOX-116: the preserve's nursery rule reads it, Client/HutLife)
 life.growth:useGameRules(needs.gentle) -- five housefly-equivalents to a moult in the standard rules, not Godot's three; three in the gentle modes (ROBLOX-88/91, Growth.game)
 -- The mud dauber wasp (ROBLOX-26): a port of Godot's wasp director (Shared/Predator/WaspDirector). It visits by day from the second day (twice a day in the
@@ -775,6 +780,7 @@ local function returnToCheckpoint()
 	table.clear(M.nature.night) -- (ROBLOX-106: the night's passes are counted again from the restored hour)
  mateLegs.reset()
  needs:useGameRules()
+ life:useGameRules();prey.feeding.tapToFeed=true;M.contextPrompts:reset();M.meal:reset()
  prey.feeding:useGameRules() -- (always: a record from before, or one made by another build, may hold Godot's struggle)
  life.growth:useGameRules(needs.gentle) -- (a record from before has Godot's threshold; Checkpoint.restore has set the record's rules)
  motor:setReachFactor(life.growth:reachFactor());motor:setSpeedFactor(life.growth:speedFactor())
@@ -801,6 +807,7 @@ local function applyRules()
  life.mode,life.rules=session.mode,session.rules
  needs.gentle=session.rules=="gentle";wasp.gentle=needs.gentle
  needs:useGameRules()
+ life:useGameRules();prey.feeding.tapToFeed=true;M.contextPrompts:reset();M.meal:reset()
  prey.feeding:useGameRules()
  life.growth:useGameRules(needs.gentle)
 end
@@ -1723,6 +1730,12 @@ local function updateHud(frameDt: number)
 	view.minimal=M.World.world=="preserve" and not spiderPick.inspecting
 	view.dot=view.minimal and not modal() and not life.asleep and not life.lifeOver
 	view.helpRequested=helpUntil==math.huge
+ view.contextPrompt=M.contextPrompts:step(frameDt,{
+  enabled=setting("ControlHints")==true,device=device,day=clock.day,hour=clock.hour,
+  resting=life.resting,blocked=modal() or life.lifeOver or life.asleep or life.growth:isMoulting() or spiderPick.inspecting,
+  held=prey.feeding.held~=nil,struggling=prey.feeding.struggling,auto=prey.feeding.auto,
+  canEat=motor.mode=="attached" and not motor.moving,canRest=canRest,
+  home=M.World:homeRetreat(motor.pos),weak=life:tooHungryToSleep()})
 	hud:update(view, frameDt)
 end
 
@@ -2183,7 +2196,10 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
  rig.jumpPush=if not motor.seized and motor.mode=="air" and recentJump and recentJump.kind=="launched" then math.clamp(1-(jump.tick-recentJump.tick)/8,0,1) else 0
  local paused=GuiService.MenuIsOpen or modal()
  M.Prof.lap("poses")
+ rig.mealPulse=M.meal:pulse(if paused then 0 else simFrame,prey.feeding,paused)
+ rig.mealHeld=prey.feeding.held~=nil
  rig:update(body, if paused then 0 else simFrame, motor.mode == "attached", motor.moving)
+ M.meal:update(if paused then 0 else simFrame,prey.feeding,rig:mouthFrame(),paused)
  skins:draw(life.growth.exuviae)
  M.Prof.count("spider parts placed", rig.placed or 0)
  M.Prof.lap("spider rig")
@@ -2212,7 +2228,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	updateHud(frameDt)
 	M.Prof.lap("hud")
 	-- (ROBLOX-103: the bodies step, sway and beat by the prey's clock; far ones ten times a second; Reduced Motion stills all but the steps)
-	flyBodies:draw(M.World.prey:flies(),M.World.prey.clock,camera.CFrame.Position,setting("ReducedMotion")==true)
+	flyBodies:draw(M.World.prey:flies(),M.World.prey.clock,camera.CFrame.Position,setting("ReducedMotion")==true,M.meal.heldView)
 	M.Prof.lap("fly bodies")
 	M.Prof.count("fly parts placed", flyBodies.moved or 0)
 	M.World.bugs:draw(M.World.prey:crawlers(),M.World.prey.clock,camera.CFrame.Position,setting("ReducedMotion")==true)
@@ -2225,6 +2241,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	soundscape:setTitle(not testPlace and (not session.started or M.title:holding())) -- (ROBLOX-109: the music under the title card, rising the first time)
 	soundscape:update(frameDt, M.World.prey.view, life.daylight, soundPaused, soundSpeed, soundMuted)
 	soundscape:updateWasp(wasp, soundPaused, soundSpeed, soundMuted)
+ soundscape:updateMeal(prey.feeding.bites,prey.feeding.mealsFinished,soundPaused,soundMuted,soundSpeed)
 	waspBody:draw(wasp.wasp, prey.now)
 	if M.crabBody ~= nil then M.crabBody:draw(M.crab) end -- (ROBLOX-119)
 	if M.mouseBody ~= nil then M.mouseBody:draw(M.mouse,setting("ReducedMotion")==true) end
@@ -2236,7 +2253,7 @@ RunService:BindToRenderStep("SpiderSim", Enum.RenderPriority.Camera.Value + 1, f
 	if M.birdBody ~= nil then M.birdBody:draw(M.bird, frameDt, if soundMuted or soundPaused then 0 else M.bird:call(motor.pos), if soundMuted or soundPaused then 0 else M.chirp) end -- (ROBLOX-120)
 	if M.catBody ~= nil then
 		local bell, purr = M.cat:sound(motor.pos)
-		M.catBody:draw(M.cat, prey.now, frameDt, if soundMuted or soundPaused then 0 else bell, if soundMuted or soundPaused then 0 else purr)
+		M.catBody:draw(M.cat, prey.now, if soundPaused then 0 else simFrame, if soundMuted or soundPaused then 0 else bell, if soundMuted or soundPaused then 0 else purr,camera.CFrame.Position)
 	end
 	M.Prof.lap("sound")
 	local silk = motor.silk
@@ -2306,7 +2323,7 @@ M.hooks = function(): any
 			prey = prey, flyBodies = flyBodies, waspBody = waspBody, life = life, wasp = wasp, caughtPanel = panel, needs = needs, checkpoints = checkpoints, returnToCheckpoint = function() returnToCheckpoint() end, lifeSpider = function() return lifeSpider end, sensor = sensor, memory = memory, focusState = focusState, perceptionHud = perceptionHud, stage = stage,
 			input = controls, rivalLegs = rivalLegs, mateLegs = mateLegs, spiderPick = spiderPick, saveState = saveState, hud = hud,
 			notebook = book, notebookWatch = watch, notebookPanel = nbPanel, openNotebook = openNotebook, settingsPanel = settingsPanel, openSettings = openSettings, setting = setting, cam = cam, soundscape = soundscape, eyes = eyes,
-			session=session, menu=menu, openMenu=openMenu, endLife=endLife, fresh=fresh, stores=stores, continueAnother=continueAnother, currentStore=function() return checkpoints end,
+			meal=M.meal,contextPrompts=M.contextPrompts,session=session, menu=menu, openMenu=openMenu, endLife=endLife, fresh=fresh, stores=stores, continueAnother=continueAnother, currentStore=function() return checkpoints end,
 			changeSpider = function() changeSpider() end, dance = function() return dance end, ant = function() return ant.state end, antPose = function() return ant.pose end, threat = function() return ant.threat end, threatPose = function() return ant.threatPose end, appearance = function() return appearance end, rig = function() return rig end,
 			drop = function() motor:requestDrop() end,
 			jump = jump,

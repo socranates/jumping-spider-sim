@@ -1,0 +1,6 @@
+STARVATION_BEFORE	false	0	elapsed_game_hours	48.3999999999999	energy	0	streak	48.199999999999896	dead	true
+STARVATION_BEFORE	false	0.55	elapsed_game_hours	59.19999999999986	energy	0	streak	48.08730158730149	dead	true
+STARVATION_BEFORE	false	1	elapsed_game_hours	68.39999999999985	energy	0	streak	48.35873015873004	dead	true
+STARVATION_BEFORE	true	0	elapsed_game_hours	120.19999999999976	energy	0	streak	0	dead	false
+STARVATION_BEFORE	true	0.55	elapsed_game_hours	120.19999999999976	energy	0.1	streak	0	dead	false
+STARVATION_BEFORE	true	1	elapsed_game_hours	120.19999999999976	energy	0.1	streak	0	dead	false

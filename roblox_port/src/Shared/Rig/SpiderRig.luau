@@ -169,6 +169,9 @@ export type Rig = typeof(setmetatable(
   _hangCount: number, -- drops so far (the turn alternates its direction)
   _lastPos: Vector3?, _lineSpeed: number, _climbing: boolean, _climb: number, -- the climb: speed along the line, whether it counts, the head-up blend 0..1
   _spinneret: Vector3?,
+  _mouth: CFrame?,
+  mealPulse: number?,
+  mealHeld: boolean?,
   jumpLoad: number,
   jumpPush: number,
   _shownLoad: number,
@@ -1282,7 +1285,14 @@ function SpiderRig.update(self: Rig, collider: CFrame, dt: number, grounded: boo
 			bodyBase, headBase, abdomenBase, prosoma = down * bodyBase, down * headBase, down * abdomenBase, down * prosoma
 		end
 	end
-	local spreadAngle = if threatening and tc.spreadDeg then math.rad(tc.spreadDeg) * (threatPose.spread or 0) else 0
+ -- Feeding follows the drawn head, never the motor or camera. Both tiers use this pose.
+ local bite=(self.mealPulse or 0)*(if self.reducedMotion then .2 else 1)
+ if self.mealHeld then
+  headBase*=CFrame.new(0,-.012*bite*g,-.02*bite*g)*CFrame.Angles(-.035*bite,0,0)
+  palp1-=.16+.1*bite;palp2-=.16+.1*bite
+ end
+ self._mouth=headBase*CFrame.new(((A.jaws[1].at+A.jaws[2].at)*.5+Vector3.new(0,-.015,-.075))*g)
+	local spreadAngle = if threatening and tc.spreadDeg then math.rad(tc.spreadDeg) * (threatPose.spread or 0) else (if self.mealHeld then .05+.08*bite else 0)
  if self._hang > 0 and hang ~= nil then -- hanging: the palps are drawn in toward the jaws
   local tuck = -math.rad(hang.palpTuckDeg) * self._hang
   palp1, palp2 = palp1 + tuck, palp2 + tuck
@@ -1617,8 +1627,9 @@ end
 -- 0.485 and 0.73 for the ant mimic), times the growth stage. Inspect mode (ROBLOX-90) measures its distances in these.
 SpiderRig.BODY_STUDS = 0.97
 function SpiderRig.bodyLength(self: Rig): number
-	return SpiderRig.BODY_STUDS * self._k
+ return SpiderRig.BODY_STUDS * self._k
 end
+
 
 -- Where the dragline leaves the body.
 function SpiderRig.spinneretPoint(self: Rig, body: CFrame): Vector3
@@ -1627,6 +1638,10 @@ end
 
 function SpiderRig.destroy(self: Rig)
 	self.model:Destroy()
+end
+
+function SpiderRig.mouthFrame(self: any): CFrame
+ return self._mouth or self.root.CFrame
 end
 
 return SpiderRig

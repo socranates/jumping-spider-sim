@@ -58,7 +58,8 @@ SettingsSpec.LIST = {
 	{ id = "ReducedMotion", section = "comfort", label = "Reduced motion (a calmer spider body)", kind = "toggle", default = false },
 	{ id = "LargeText", section = "comfort", label = "Large text", kind = "toggle", default = false, note = "Menus, panels and the notebook." },
 	{ id = "FocusToggle", section = "comfort", label = "Focus toggles (press to start and stop)", kind = "toggle", default = false },
-	{ id = "AutomaticGrip", section = "comfort", label = "Struggling prey: hold on automatically", kind = "toggle", default = false },
+	{ id = "AutomaticGrip", section = "comfort", label = "Hold prey and eat automatically", kind = "toggle", default = false,
+  note = "Keeps your grip and takes bites without repeated taps. Moving still pauses eating." },
 	{ id = "ShowNoticed", section = "comfort", label = "Show what the spider notices", kind = "toggle", default = true,
 		note = "The rings, marks and words over what it sees. A lock (R or L1) still follows it." }, -- L1 locks on a controller
 	{ id = "ShowLastSeen", section = "comfort", label = "Show the last-seen mark", kind = "toggle", default = true },
@@ -66,7 +67,7 @@ SettingsSpec.LIST = {
 	{ id = "EyeGrey", section = "comfort", label = "Spider-eye view: grey instead of green", kind = "toggle", default = false },
 	-- ---------------------------------------------------------------- help and hints
 	{ id = "ControlHints", section = "help", label = "Show control hints", kind = "toggle", default = true,
-		note = "The controls card and the walking reminder; in Normal, a life's first day only. Menu, Controls shows the card." },
+		note = "Small feeding and dusk/rest prompts, on every catch and each night. Menu, Controls opens the full controls card." },
 	{ id = "NotebookNotes", section = "help", label = "Say when a new notebook page opens", kind = "toggle", default = true },
 } :: { Setting }
 

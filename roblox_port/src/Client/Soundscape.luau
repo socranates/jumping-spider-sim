@@ -18,6 +18,7 @@ Soundscape.IDS = IDS -- (tests/settings.luau gives the music an id to see its vo
 -- The mix as authored (each voice's own loudness before the player's volumes).
 -- ROBLOX-102 (Nathan on v33: "I hear the music but it is quiet and the hum should just be eliminated for now"): the room tone, a constant low hum, is
 -- silenced (0; the voice is kept so the menu and mute wiring stay as they were, and the wasp's hum, a warning, is untouched), and the music goes 0.18 to 0.32.
+IDS.bite="rbxasset://sounds/volume_slider.ogg"
 local MIX = { room = 0, birds = 0.16, buzz = 0.23, takeoff = 0.22, hum = 0.42, humArriving = 0.32, music = 0.32 }
 -- While the wasp is on the sill the music is this share of itself, reached (and left) over about DUCK_S seconds.
 local DUCK = 0.4
@@ -74,6 +75,7 @@ function Soundscape.new(parent: Instance): any
 	return setmetatable({ root = root, room = voice(root, "room", MIX.room, true),
 		music = music, musicVolume = 1, title = false, rise = 1, risen = false, duck = 1, duckTarget = 1, swell = 1, swellWanted = false, musicAsked = 0, musicWarned = false,
 		waspEmitter = emitter, waspHum = hum, master = 1, ambience = 1, creatures = 1,
+		bite=voice(root,"bite",.045,false),lastBites=0,lastMeals=0,
 		birds = voice(root, "birds", MIX.birds, false), slots = {}, elapsed = 0, nextBird = 8 }, Soundscape)
 end
 -- The mating scene is playing (true) or over (false): the music swells to SWELL of itself over SWELL_S seconds, and comes back. Only music, nothing new: the birds and
@@ -175,6 +177,16 @@ function Soundscape.updateWasp(self: any, director: any, paused: boolean, speed:
 	hum.PlaybackSpeed = speed
 	if not active then hum:Stop()
 	else playing(hum, not paused and not muted) end
+end
+-- One bounded local voice; muted/paused bites are consumed, never replayed on resume.
+function Soundscape.updateMeal(self: any,bites: number,meals: number,paused: boolean,muted: boolean,speed: number)
+ local changed=bites>self.lastBites or meals>self.lastMeals
+ local finished=meals>self.lastMeals
+ self.lastBites,self.lastMeals=bites,meals
+ local s=self.bite
+ s.Volume=if paused or muted then 0 else .045*self.master*self.creatures
+ if paused or muted or s.Volume<=0 then if s.Playing then s:Stop() end;return end
+ if changed then s.PlaybackSpeed=(if finished then .75 else 1.15)*speed;s.TimePosition=0;s:Play() end
 end
 function Soundscape.destroy(self: any)
 	self.root:Destroy()

@@ -16,7 +16,7 @@ local F={};F.__index=F
 function F.new(needs: any?): any
  return setmetatable({held=nil,struggling=false,feeding=false,grip=0,elapsed=0,waiting=0,jerk=0,venom=6,
   swallow=0,needs=needs or NeedsModel.new(),taken=0,granted=0,ledger={},mealsFinished=0,auto=false,tap=false,note='',rng=R.new(513),
-  startGrip=.4,tapGain=.085,jerkScale=1,drainScale=1,tire=.5,cap=12,game=false},F)
+  startGrip=.4,tapGain=.085,jerkScale=1,drainScale=1,tire=.5,cap=12,game=false,tapToFeed=false,biteWindow=0,bites=0,bitePulse=0},F)
 end
 local function apply(self: any,g: any)
  self.startGrip,self.tapGain,self.jerkScale=g.startGrip,g.tapGain,g.jerkScale
@@ -33,12 +33,17 @@ end
 function F.capture(self: any,fly: any)
  if self.game and fly.profile then apply(self,Catch.scaled(Catch.factorFor(fly.profile))) end
  self.held=fly;self.struggling=true;self.feeding=false;self.grip=self.startGrip;self.elapsed=0;self.waiting=0
+ self.biteWindow=0;self.bitePulse=0;self.tap=false
  self.venom=self.rng:draw({6,8});self.jerk=self.rng:draw({.35,.75});self.note='Caught!'
 end
 function F.press(self: any)
- if self.struggling then self.tap=true elseif self.held and self.swallow<=0 then self.feeding=not self.feeding end -- nothing to eat: E is the retreat's (LifeLoop)
+ if self.struggling then self.tap=true
+ elseif self.held and self.tapToFeed and not self.auto then
+  -- A tap opens one bite, never a queue of free nutrition. The fixed tick validates posture.
+  self.biteWindow=.38;self.bitePulse=0;self.feeding=true
+ elseif self.held and self.swallow<=0 then self.feeding=not self.feeding end -- nothing to eat: E is the retreat's (LifeLoop)
 end
-function F.cancel(self: any) self.feeding=false end
+function F.cancel(self: any) self.feeding=false;self.biteWindow=0 end
 -- The struggle after a capture: waits up to a second for a landing, then the grip drains, jerks, rises with taps and ends in escape(f) (it tore
 -- free; held is nil) or subdued (struggling false). Needs nothing of the reserves, so a second controller can run it alone.
 function F.struggle(self: any,dt: number,attached: boolean,escape: (any)->())
@@ -53,17 +58,26 @@ function F.struggle(self: any,dt: number,attached: boolean,escape: (any)->())
  if self.tap then self.grip+=self.tapGain end
  self.tap=false
  if self.grip<=0 then self.held=nil;self.struggling=false;self.note='It tore free!';escape(f)
- elseif self.grip>=1 or self.elapsed>=(self.cap or 12) then self.grip=1;self.struggling=false;self.feeding=true;self.swallow=1;self.note='Subdued.' end
+ elseif self.grip>=1 or self.elapsed>=(self.cap or 12) then self.grip=1;self.struggling=false;self.feeding=not self.tapToFeed or self.auto;self.swallow=if self.tapToFeed and not self.auto then 0 else 1;self.note='Subdued.' end
 end
 function F.step(self: any,dt: number,attached: boolean,moving: boolean,escape: (any)->())
  self.needs:advance(dt,not attached or moving)
  local f=self.held;if not f then self.tap=false;return end
  if self.struggling then self:struggle(dt,attached,escape);return end
  self.swallow=math.max(0,self.swallow-dt)
- if not attached or moving then self.feeding=false;return end
+ if not attached or moving then self.feeding=false;self.biteWindow=0;return end
  if self.swallow>0 then self.feeding=true end
+ local eatingDt=dt
+ if self.tapToFeed and not self.auto then
+  eatingDt=math.min(dt,self.biteWindow)
+  self.biteWindow=math.max(0,self.biteWindow-dt)
+  self.feeding=eatingDt>0
+ end
  if not self.feeding then return end
- local take=math.min(f.nutrition,f.profile.body.feed_rate_per_s*dt)
+ -- Pulses only follow valid eating ticks, including the automatic accessibility path.
+ self.bitePulse-=eatingDt
+ if self.bitePulse<=0 then self.bites+=1;self.bitePulse=.38 end
+ local take=math.min(f.nutrition,f.profile.body.feed_rate_per_s*eatingDt)
  f.nutrition-=take
  local granted=self.needs:grantEnergy(take,f.captureKey)
  self.taken+=take;self.granted+=granted

@@ -82,9 +82,19 @@ function CatBody.state(self: any, cat: any, now: number, dt: number): (CatPose.S
 end
 
 -- Draws it as the sim has it; `bell` and `purr` are how loud each is for the spider's ears (Predator/Cat.sound).
-function CatBody.draw(self: any, cat: any, now: number, dt: number, bell: number?, purr: number?)
-	local state, frame = self:state(cat, now, dt)
-	local list = CatPose.parts(state)
+function CatBody.draw(self: any, cat: any, now: number, dt: number, bell: number?, purr: number?, cameraAt: Vector3?)
+ -- Rebuild the distant pose at 10 Hz, but carry it with the actual body frame
+ -- every render. Travel, senses, swats and audio keep their original rates.
+ self.owed=(self.owed or 0)+dt
+ local draw=not self.drawn or cameraAt==nil or (cameraAt-cat.pos).Magnitude<=180 or self.owed>=.1-1e-6
+ local frame: CFrame
+ if draw then
+  local state
+  state,frame=self:state(cat,now,self.owed)
+  self.poseParts=CatPose.parts(state)
+  self.owed=0;self.drawn=true
+ else frame=CatPose.frame(cat.pos,cat.heading) end
+	local list = self.poseParts
 	local moved, world = self.moved, self.world
 	table.clear(moved)
 	table.clear(world)

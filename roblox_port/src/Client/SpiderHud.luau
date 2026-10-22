@@ -328,7 +328,7 @@ function Hud.minimalView(view: any): any
 	end
 	return {minimal=true,device=view.device,food=view.food,foodGentle=view.foodGentle,dot=view.dot==true,aiming=false,focus=false,eyeView=false,
 		largeText=view.largeText,notice=notice,helpVisible=view.helpVisible and view.helpRequested,
-		helpText=view.helpText,status={}}
+		helpText=view.helpText,prompt=view.contextPrompt,status={}}
 end
 function Hud.update(self: any, view: any, dt: number)
 	local minimal=view.minimal==true

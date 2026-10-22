@@ -158,7 +158,10 @@ rawset(toServer,"FireServer",function() end)
 local loaded,loadError=pcall(function() require("../src/Client/SpiderClient.client") end)
 assert(loaded,loadError)
 local d=assert(ClientStubs.driver);local frame=assert(ClientStubs.renderSteps.SpiderSim)
-for _=1,5 do frame(1/60) end
+-- A new life needs the actual startup capture; five frames was a timing guess.
+local player=game:GetService("Players").LocalPlayer
+for _=1,5000 do frame(1/60);if player:GetAttribute("TitleReady")==true then break end end
+assert(player:GetAttribute("TitleReady")==true,"rare-sighting fixture startup never completed")
 check(d.fresh("free",false),"preserve client starts new life")
 local n=d.life.rareSerial;check(n and d.rareHistory.serial==n,"fresh wired to rare history")
 d.rareHistory.serial=serial-1;d.rareDirector.beginLife(d.rareHistory,d.life)

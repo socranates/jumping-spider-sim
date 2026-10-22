@@ -341,8 +341,10 @@ end)
 
 -- ---------------------------------------------------------------- instance streaming: the sim begins on a whole sill
 -- The late boxes come when the client asks for them (WaitForChild), as streaming brings them; `never` leaves them out for good.
-local function streamed(never: boolean): ({ { name: string, timeout: number } }, { string }, any, { string })
+local function streamed(never: boolean, streaming: boolean?): any
 	workspace:ClearAllChildren()
+ local named=workspace:GetAttribute("World")
+ workspace:SetAttribute("World",WorldMap.world())
 	local world = serverWorld()
 	local sillFolder = world:FindFirstChild("Windowsill") :: Instance
 	local late = { Layout.PIECES[1].id, Layout.PIECES[12].id, Layout.PIECES[#Layout.PIECES].id }
@@ -371,12 +373,17 @@ local function streamed(never: boolean): ({ { name: string, timeout: number } },
 		end
 		return found
 	end)
-	workspace.StreamingEnabled = true
-	local client: any = nil
-	local seen = warnings(function() client = WorldClient.new(workspace, player()) end)
+	workspace.StreamingEnabled = streaming ~= false
+ local client,problem=nil,nil
+ local p=player()
+ local seen=warnings(function()
+  local ok,err=pcall(function() client=WorldClient.new(workspace,p) end)
+  if not ok then problem=tostring(err) end
+ end)
 	workspace.StreamingEnabled = nil
 	rawset(workspace, "WaitForChild", nil)
-	return askedSill, askedWorkspace, client, seen
+	workspace:SetAttribute("World",named)
+ return askedSill, askedWorkspace, client, seen, problem, p
 end
 
 check("with instance streaming on, the client waits for every box of the sill that is not there yet, and for the Decor, before the sim begins", function()
@@ -394,30 +401,55 @@ check("with instance streaming on, the client waits for every box of the sill th
 	workspace:ClearAllChildren()
 end)
 
-check("a box that never streams in is warned of by name, and the sim still begins", function()
-	local askedSill, _, c, seen = streamed(true)
-	assert(#askedSill == 3, `asked for {#askedSill} boxes`)
-	assert(#seen == 3 and string.find(seen[1], Layout.PIECES[1].id, 1, true) ~= nil and string.find(seen[2], Layout.PIECES[12].id, 1, true) ~= nil and string.find(seen[3], Layout.PIECES[#Layout.PIECES].id, 1, true) ~= nil,
-		`a warning for each box that did not come ({#seen})`)
-	assert(c ~= nil and c.sill.Name == "Windowsill" and c.decor == nil, "the client is made, and says the drawn sill is not there")
-	workspace:ClearAllChildren()
+check("missing streamed home collision aborts startup instead of admitting a partial world",function()
+ local asked,_,c,_,problem,p=streamed(true)
+ assert(c==nil and problem~=nil,"a partially collidable home must not reach the controller")
+ assert(#asked==1 and asked[1].timeout>0 and asked[1].timeout<=WorldClient.PIECES_WAIT,"one bounded essential wait, not per-piece extended budgets")
+ assert(string.find(problem,Layout.PIECES[1].id,1,true),"diagnostic identifies the missing collision piece")
+ assert(p:GetAttribute("WorldStartupFailed")==true,"loading screen receives failure")
+ workspace:ClearAllChildren()
 end)
-
-check("without instance streaming (the test places, the box worlds) nothing is waited for", function()
-	workspace:ClearAllChildren()
-	local world = serverWorld()
-	local sillFolder = world:FindFirstChild("Windowsill") :: Instance
-	local missing = sillFolder:FindFirstChild(Layout.PIECES[1].id) :: Instance
-	missing.Parent = nil
-	local waits = 0
-	rawset(sillFolder, "WaitForChild", function(self: Instance, name: string): Instance? waits += 1; return self:FindFirstChild(name) end)
-	local c = WorldClient.new(workspace, player())
-	assert(waits == 0 and c.decor == nil, `waited {waits} times`)
-	workspace.StreamingEnabled = false
-	WorldClient.new(workspace, player())
-	workspace.StreamingEnabled = nil
-	assert(waits == 0, "a place that says streaming is off is not waited on either")
-	workspace:ClearAllChildren()
+check("server-layout home collision is required even without instance streaming",function()
+ local _,_,c,_,problem,p=streamed(true,false)
+ assert(c==nil and problem and p:GetAttribute("WorldStartupFailed")==true,"non-streaming server layout cannot silently admit a missing surface")
+ workspace:ClearAllChildren()
+end)
+check("legacy flat box-world fixtures remain immediate without streaming",function()
+ workspace:ClearAllChildren();local root=flatWorld();local p=player()
+ local missing=root:FindFirstChild(Layout.PIECES[1].id);missing.Parent=nil
+ local waits=0
+ rawset(root,"WaitForChild",function(self,name) waits+=1;return self:FindFirstChild(name) end)
+ workspace.StreamingEnabled=false
+ local c=WorldClient.new(workspace,p)
+ workspace.StreamingEnabled=nil
+ assert(c.root==root and waits==0,"explicit legacy flat fixture remains compatible")
+ workspace:ClearAllChildren()
+end)
+check("missing World and home folders have bounded waits and publish startup failure",function()
+ for _,missingHome in {false,true} do
+  local ws=Instance.new("Folder");ws.Name="FixtureWorkspace"
+  local parent=ws
+  if missingHome then parent=Instance.new("Folder");parent.Name="World";parent.Parent=ws end
+  local timeout=nil
+  rawset(parent,"WaitForChild",function(_,_,seconds) timeout=seconds;return nil end)
+  local p=player();local c=nil
+  local ok,err=pcall(function() c=WorldClient.new(ws,p,mapOf({sill})) end)
+  assert(not ok and c==nil and p:GetAttribute("WorldStartupFailed")==true,"missing essentials fail explicitly")
+  assert(timeout and timeout>0 and timeout<=WorldClient.PIECES_WAIT,"essential folder wait has a deadline")
+  assert(string.find(tostring(err),if missingHome then "Windowsill" else "World",1,true),"diagnostic names the missing folder")
+  ws:Destroy()
+ end
+end)
+check("streaming never guesses a default map when the server identity is missing or unknown",function()
+ for _,named in {false,"not_a_world"} do
+  local ws=Instance.new("Folder");ws.StreamingEnabled=true;ws:SetAttribute("World",if named==false then nil else named)
+  local p=player();local before=WorldMap.world();local c=nil
+  local ok=pcall(function() c=WorldClient.new(ws,p) end)
+  local unchanged=WorldMap.world()==before
+  WorldMap.use(before);ws:Destroy() -- isolate even a failing predecessor from later cases
+  assert(not ok and c==nil and p:GetAttribute("WorldStartupFailed")==true,"unknown replicated identity is not a playable default")
+  assert(unchanged,"failure does not switch the active map")
+ end
 end)
 
 -- ---------------------------------------------------------------- the real client on the folders the server builds

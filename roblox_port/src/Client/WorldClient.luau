@@ -11,11 +11,11 @@
 --   what to stream .......... with instance streaming on, the server sends what is near the player's replication focus. The server parks each player's (Server/WorldFocus): that
 --                            is the focus streaming follows. This also points the player's own ReplicationFocus at the drawn spider's root, when it is made and again after a respawn
 --                            or a return to a rest: a client's write of that property is not expected to reach the server (the docs say to set it there), so it is belt and braces,
---                            not the mechanism; a write that raises is warned about once and the game goes on. None of this has run in Studio yet.
+--                            not the mechanism; a write that raises is warned about once and the game goes on. Real network-streaming behavior needs its own native verification.
 -- The sim must never raycast beyond what is streamed in: StreamingMinRadius (96 studs around the focus) is always there, so a region and its neighbours must fit inside it, and a
 -- creature is only simulated in the region the spider is in or beside.
--- With streaming, the sill's boxes and the drawn sill (the persistent Decor model) arrive after the folders do: `new` waits for every box of the sill and for the Decor, so the
--- sim begins on a whole sill. Without streaming (the test places, the box worlds) everything is there at once and nothing is waited for.
+-- Essential server-layout home collision must arrive before construction returns. Streamed world identity and essential folders/pieces have bounded waits; failure
+-- sets WorldStartupFailed and stops startup. Decor is best effort. Legacy flat non-streaming box fixtures keep their immediate path.
 -- ROBLOX-95 (W2): the window is open and three regions lie outside it (the outer sill, the brick wall, the bed 90 studs below), the bed farther from the sill's spawn than the
 -- radius. So the focus follows the spider: `update` reports the spider's place to the server through the WorldFocus remote (Server/WorldFocus) whenever it has moved more than
 -- REPORT_MOVE studs from the last report or REPORT_EVERY seconds have passed, and the server moves the player's focus part there. And the client knows whether a region it is
@@ -54,7 +54,7 @@ local function tell(message: string)
 	if say ~= nil then say(message) end
 end
 
--- How long, in seconds, the sill may take to arrive under streaming before the sim begins without a missing piece (and says so), and the decor may.
+-- Shared essential-world arrival deadline; failure stops construction before any motor exists. Decor is best effort.
 WorldClient.PIECES_WAIT = 30
 WorldClient.DECOR_WAIT = 10
 -- The focus report (ROBLOX-95): sent when the spider is more than this many studs from where it last reported, or this many seconds after the last report.
@@ -64,46 +64,66 @@ WorldClient.REPORT_EVERY = 2
 WorldClient.REMOTE = "WorldFocus"
 
 -- ROBLOX-115: the world the server runs (World/Worlds) is the Workspace attribute World, which the server writes at startup; with no map handed in, the client makes
--- that world WorldMap's active one before it asks anything (with streaming, it waits up to WORLD_WAIT seconds for the attribute; without it, an absent attribute is
+-- that world WorldMap's active one before it asks anything (with streaming, it waits up to WORLD_WAIT seconds for a known identity and fails if absent/unknown; without it, an absent attribute is
 -- the default world, as in every test place).
 WorldClient.WORLD_WAIT = 10
+WorldClient.FAIL_ATTRIBUTE = "WorldStartupFailed"
 
 -- `ws`: the workspace; `player`: the local player; `map`: the world map (WorldMap, unless a test hands in another with the same functions).
 function WorldClient.new(ws: Instance, player: Instance, map: any?): any
+ local streaming=(ws :: any).StreamingEnabled==true
+ local function unavailable(what: string)
+  pcall(function() player:SetAttribute(WorldClient.FAIL_ATTRIBUTE,true) end)
+  error(`[Windowsill] world startup: {what} did not arrive; the simulation was not started`,0)
+ end
 	if map == nil then
 		local named = ws:GetAttribute(Worlds.ATTRIBUTE)
-		if named == nil and (ws :: any).StreamingEnabled == true then
+		if not Worlds.known(named) and streaming then
 			local deadline = os.clock() + WorldClient.WORLD_WAIT
 			local t: any = task
-			while named == nil and os.clock() < deadline and t ~= nil do
+			while not Worlds.known(named) and os.clock() < deadline and t ~= nil do
 				t.wait(0.1)
 				named = ws:GetAttribute(Worlds.ATTRIBUTE)
 			end
 		end
+  if streaming and not Worlds.known(named) then unavailable("server world identity") end
 		WorldMap.use(Worlds.choose(named))
 	end
 	local m: any = map or WorldMap
 	local home = m.region(m.HOME) :: WorldMap.Region
 	local lo, hi = m.bounds()
 	local name = Region.folderName(home)
+ -- One shared budget for all essential folders/pieces, not a fresh timeout per child.
+ local deadline=os.clock()+WorldClient.PIECES_WAIT
+ local function required(parent: Instance,childName: string): Instance
+  local child=parent:FindFirstChild(childName)
+  if child==nil then
+   local remaining=deadline-os.clock()
+   if remaining>0 then child=parent:WaitForChild(childName,remaining) end
+  end
+  if child==nil or child.Name~=childName then unavailable(childName) end
+  return child :: Instance
+ end
 	local flat = ws:FindFirstChild(name)
 	local root: Instance, sill: Instance
 	if flat ~= nil then
 		root, sill = flat, flat
 	else
-		root = ws:WaitForChild(Region.WORLD_FOLDER)
-		sill = root:WaitForChild(name)
+		root = required(ws,Region.WORLD_FOLDER)
+		sill = required(root,name)
 	end
 	local decor = ws:FindFirstChild("Decor")
-	if (ws :: any).StreamingEnabled == true then
-		local deadline = os.clock() + WorldClient.PIECES_WAIT
-		for _, piece in Region.pieces(home) do
-			if sill:FindFirstChild(piece.id) == nil and sill:WaitForChild(piece.id, math.max(0.1, deadline - os.clock())) == nil then
-				warn(`[Windowsill] world: the sill's {piece.id} never streamed in; the spider may fall through where it should be`)
-			end
-		end
-		if decor == nil then decor = ws:WaitForChild("Decor", WorldClient.DECOR_WAIT) end
-	end
+ -- Legacy flat box-world fixtures intentionally supply only their own geometry.
+ -- A server-layout world (and every streamed world) must have its whole home.
+ if streaming or root~=sill then
+  for _,piece in Region.pieces(home) do
+   local part=required(sill,piece.id)
+   if not part:IsA("BasePart") then unavailable(piece.id.." collision part") end
+  end
+ end
+ if streaming and decor==nil then decor=ws:WaitForChild("Decor",WorldClient.DECOR_WAIT) end
+ pcall(function() player:SetAttribute(WorldClient.FAIL_ATTRIBUTE,false) end)
+
 	return setmetatable({
 		map = m, player = player, root = root, sill = sill, decor = decor, looks = nil :: any, -- (`looks`: the LookStream, once `streamLooks` makes it)
 		home = home.id, region = home,

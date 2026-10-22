@@ -1,25 +1,21 @@
 --!strict
--- The splash (ROBLOX-109): the game's own loading screen, from ReplicatedFirst. Roblox's default loading screen is removed at once and in its place is
--- a dark field; as the world arrives it fades up on the garden in the morning seen from outside, drawing in toward the window (Shared/Movement/TitleShots.drift),
--- with the title and its one line (Shared/UI/TitleText) in the game's serif. When the client's title card is up (the client sets the Player attribute
--- TitleReady when the start menu opens) the splash fades away over it; the camera is the title card's from then (the same drift, from the same clock).
--- No "Loading..." bar: if the wait is long, a small dot pulses in a corner.
---
--- It can never hang the game. Each frame is one pass of a loop with nothing that waits for long; the words and the drift are looked for each frame for
--- SHARED_WAIT_S seconds (they replicate after ReplicatedFirst) and their absence only means a dark field without words; a game that does not say it has
--- loaded within LOADED_WAIT_S is shown anyway; and at READY_WAIT_S the splash goes whatever has happened, leaving the plain start menu (the client opens
--- it on its own, as it always has). The whole run is inside a pcall: an error anywhere takes the splash away and is written to Output once. The camera is
--- only ever written (CameraType Scriptable, as the client's own camera sets it), never handed back to Roblox's: the client's camera takes it over.
---
--- The decisions are pure (SplashScreen.step and SplashScreen.look, over a state and the facts of the frame); `run` draws them through a host (the
--- services, the frame wait, the clock, the module lookup) that tests/title.luau replaces with its own to drive every fallback without an engine.
+-- The startup veil/title drift (ROBLOX-109). Healthy TitleReady fades into the
+-- controller's title card. WorldStartupFailed, readiness timeout or a caught
+-- startup error keeps a self-contained recovery explanation when PlayerGui exists.
+-- Default Roblox loading is removed only after our own screen has been built.
+-- The frame loop is bounded; the static failure screen uses readiness/destruction
+-- listeners so delayed healthy startup can dismiss it without continued rendering.
+-- Pure step/look decisions and the replaceable host are exercised by title.luau.
 local SplashScreen = {}
 
 SplashScreen.GUI_NAME = "WindowsillSplash"
 SplashScreen.READY_ATTRIBUTE = "TitleReady"
+SplashScreen.FAIL_ATTRIBUTE = "WorldStartupFailed"
+-- Emergency text must also work before Shared/UI has replicated.
+SplashScreen.FAILURE_TEXT = "The world hasn't finished loading.\nPlease rejoin."
 SplashScreen.SHARED_WAIT_S = 10 -- the words and the drift: looked for this long, then never again (a dark field without words)
 SplashScreen.LOADED_WAIT_S = 30 -- game:IsLoaded(): after this long the world is shown as it is
-SplashScreen.READY_WAIT_S = 45 -- the title card: after this long the splash goes, and the plain menu is what is left
+SplashScreen.READY_WAIT_S = 45 -- unready deadline: finish the render loop, retain static recovery UI
 SplashScreen.DOT_AFTER_S = 4 -- the waiting dot, only if the wait is this long
 SplashScreen.WORDS_AT_S = 0.6 -- the title begins to come up this long after the start (or when the words arrive)
 SplashScreen.TITLE_IN_S = 1.6
@@ -27,7 +23,7 @@ SplashScreen.REVEAL_S = 2.5 -- the world, from black to the veil's resting shade
 SplashScreen.VEIL_REST = 0.3 -- the veil's resting opacity over the world (the words stay legible on a bright morning)
 SplashScreen.FADE_S = 1.2 -- the splash's going, over the title card
 
-export type Facts = { loaded: boolean, ready: boolean, words: boolean }
+export type Facts = { loaded: boolean, ready: boolean, words: boolean, failed: boolean? }
 export type State = { t: number, phase: string, leaveT: number, loadedT: number?, wordsT: number?, why: string, leaveVeil: number, leaveTitle: number }
 export type Look = { veil: number, title: number, dot: number, drive: boolean }
 
@@ -50,16 +46,17 @@ local function resting(s: State): (number, number)
 end
 
 -- One frame: `dt` seconds have passed and these are the facts. Showing until the title card is ready (why "ready") or READY_WAIT_S has passed ("timeout");
--- then leaving over FADE_S; then done.
+-- healthy readiness fades over FADE_S; failure/timeout finishes the loop and retains a static explanation.
 function SplashScreen.step(s: State, dt: number, facts: Facts): State
 	s.t += math.max(dt, 0)
+ if facts.failed and not facts.ready then s.phase,s.why="done","world";return s end
 	if (facts.loaded or s.t >= SplashScreen.LOADED_WAIT_S) and s.loadedT == nil then s.loadedT = s.t end
 	if facts.words and s.wordsT == nil then s.wordsT = s.t end
 	if s.phase == "showing" then
 		local why = if facts.ready then "ready" elseif s.t >= SplashScreen.READY_WAIT_S then "timeout" else nil
 		if why ~= nil then
 			s.leaveVeil, s.leaveTitle = resting(s)
-			s.phase, s.why, s.leaveT = "leaving", why, s.t
+   s.phase, s.why, s.leaveT = if why=="ready" then "leaving" else "done", why, s.t
 		end
 	elseif s.phase == "leaving" and s.t - s.leaveT >= SplashScreen.FADE_S then
 		s.phase = "done"
@@ -161,15 +158,44 @@ local function dress(ui: any, words: any)
 	end)
 end
 
--- The splash, from the start to its end. Returns why it ended: "ready" (the title card took over), "timeout" (READY_WAIT_S, the plain menu is left) or
--- "failed: <error>" (something raised; the splash is gone and the game goes on).
+-- An unready controller cannot be revealed as a playable empty world. Keep one
+-- static explanation, with bounded work and listeners released on ready/destroy.
+local function keepFailure(ui: any,player: any)
+ ui.veil.BackgroundTransparency=0
+ if ui.title.Text=="" then ui.title.Text="The Windowsill" end
+ ui.title.TextColor3=Color3.new(1,1,1);ui.title.TextTransparency=0;ui.title.TextSize=32
+ ui.sub.Text=SplashScreen.FAILURE_TEXT;ui.sub.TextColor3=Color3.new(1,1,1)
+ ui.sub.TextTransparency=0;ui.sub.TextSize=if player:GetAttribute("LargeText")==true then 24 else 20
+ ui.sub.Size=UDim2.new(.9,0,0,96);ui.dot.BackgroundTransparency=1
+ local readyConnection: any=nil
+ local destroyConnection: any=nil
+ local function disconnect()
+  if readyConnection then readyConnection:Disconnect();readyConnection=nil end
+  if destroyConnection then destroyConnection:Disconnect();destroyConnection=nil end
+ end
+ local function ready()
+  if player:GetAttribute(SplashScreen.READY_ATTRIBUTE)==true then
+   disconnect();if ui.gui.Parent~=nil then ui.gui:Destroy() end
+  end
+ end
+ -- Install owner cleanup first, so a failed player subscription cannot leak.
+ destroyConnection=ui.gui.Destroying:Connect(disconnect)
+ readyConnection=player:GetAttributeChangedSignal(SplashScreen.READY_ATTRIBUTE):Connect(ready)
+ ready() -- cover readiness between the final frame and listener installation
+end
+
+-- Returns ready, timeout, world, or failed:<diagnostic>. Only healthy readiness
+-- removes the veil immediately; other paths retain recovery UI when it can be drawn.
 function SplashScreen.run(): string
 	local h = SplashScreen.host
 	local ui: any = nil
+ local player: any=nil
 	local ok, result = pcall(function(): string
-		pcall(function() h.service("ReplicatedFirst"):RemoveDefaultLoadingScreen() end)
-		local player = h.service("Players").LocalPlayer
-		ui = build(player:WaitForChild("PlayerGui", 10))
+  player=h.service("Players").LocalPlayer
+  local playerGui=player:WaitForChild("PlayerGui",10)
+  assert(playerGui~=nil and playerGui.Name=="PlayerGui","PlayerGui did not arrive")
+  ui=build(playerGui)
+  pcall(function() h.service("ReplicatedFirst"):RemoveDefaultLoadingScreen() end)
 		local workspace = h.service("Workspace")
 		local words, shots = nil, nil
 		local took = false
@@ -183,7 +209,7 @@ function SplashScreen.run(): string
 					dress(ui, words)
 				end
 			end
-			local facts: Facts = { loaded = h.loaded() == true, ready = player:GetAttribute(SplashScreen.READY_ATTRIBUTE) == true, words = words ~= nil }
+			local facts: Facts = { loaded = h.loaded() == true, ready = player:GetAttribute(SplashScreen.READY_ATTRIBUTE) == true, words = words ~= nil, failed = player:GetAttribute(SplashScreen.FAIL_ATTRIBUTE)==true }
 			SplashScreen.step(s, dt, facts)
 			local look = SplashScreen.look(s, facts)
 			ui.veil.BackgroundTransparency = 1 - look.veil
@@ -198,9 +224,17 @@ function SplashScreen.run(): string
 		end
 		return s.why
 	end)
-	if ui ~= nil then pcall(function() ui.gui:Destroy() end) end
+ if ui~=nil then
+  local retained=false
+  if player~=nil and (not ok or result~="ready") then
+   local problem: any=nil
+   retained,problem=pcall(keepFailure,ui,player)
+   if not retained then pcall(h.warn,"[Windowsill] startup explanation failed: "..tostring(problem)) end
+  end
+  if not retained then pcall(function() ui.gui:Destroy() end) end
+ end
 	if not ok then
-		pcall(h.warn, "[Windowsill] splash: " .. tostring(result) .. " (the splash is gone; the game goes on)")
+		pcall(h.warn, "[Windowsill] splash: " .. tostring(result) .. " (startup explanation retained when available)")
 		return "failed: " .. tostring(result)
 	end
 	return result

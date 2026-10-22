@@ -137,12 +137,32 @@ end)
 
 -- ---------------------------------------------------------------- the splash
 local Fake = {}
+-- This local host implements disconnect/destroy notifications explicitly; the
+-- broad CLI shim's signals intentionally do not model those engine semantics.
+local function trackedSignal()
+ local signal={handlers={}}
+ function signal:Connect(fn)
+  local entry={fn=fn,active=true};table.insert(self.handlers,entry)
+  return {Disconnect=function() entry.active=false end}
+ end
+ function signal:Fire(...) for _,entry in table.clone(self.handlers) do if entry.active then entry.fn(...) end end end
+ function signal:live() local n=0;for _,entry in self.handlers do if entry.active then n+=1 end end;return n end
+ return signal
+end
 -- A host for SplashScreen.run: `frames` is how many frames have passed; `wordsAt`, `loadedAt`, `readyAt` the frames those happen at (nil: never).
 local function host(o: any): any
 	local playerGui = Instance.new("Folder")
 	playerGui.Name = "PlayerGui"
 	local player = Instance.new("Player")
 	playerGui.Parent = player
+ local readySignal=trackedSignal()
+ if o.readyConnectRaises then readySignal.Connect=function() error("player subscription failed") end end
+ rawset(player,"_attr_"..SplashScreen.READY_ATTRIBUTE,readySignal)
+ local getSignal=player.GetAttributeChangedSignal
+ rawset(player,"GetAttributeChangedSignal",function(self,name)
+  if name==SplashScreen.READY_ATTRIBUTE then return readySignal end
+  return getSignal(self,name)
+ end)
 	local camera = Instance.new("Camera")
 	camera.FieldOfView = 70
 	local ws = { CurrentCamera = camera }
@@ -154,8 +174,23 @@ local function host(o: any): any
 		if name == "Workspace" then return ws end
 		return nil
 	end
-	h.frame = function(): number
-		h.frames += 1
+ h.readySignal=readySignal
+ h.deferred={};h.destroyCalls=0
+ h.flushDestroying=function() local q=h.deferred;h.deferred={};for _,fn in q do fn() end end
+ h.frame = function(): number
+  h.frames += 1
+  local screen=playerGui:FindFirstChild(SplashScreen.GUI_NAME)
+  if screen and not rawget(screen,"_startupSignals") then
+   rawset(screen,"_startupSignals",true)
+   local dying=trackedSignal();rawset(screen,"Destroying",dying);h.dyingSignal=dying
+   local destroy=screen.Destroy
+   rawset(screen,"Destroy",function(self)
+    h.destroyCalls+=1
+    if o.deferredDestroy then table.insert(h.deferred,function() dying:Fire() end) else dying:Fire() end
+    destroy(self)
+   end)
+  end
+  if o.failedAt and h.frames==o.failedAt then player:SetAttribute("WorldStartupFailed",true) end
 		if o.readyAt ~= nil and h.frames == o.readyAt then player:SetAttribute(SplashScreen.READY_ATTRIBUTE, true) end
 		if playerGui:FindFirstChild(SplashScreen.GUI_NAME) then h.guiSeen = true end
 		if o.raiseAt ~= nil and h.frames == o.raiseAt then error("a fault in a frame") end
@@ -215,23 +250,72 @@ check("the splash's fallbacks: no words (a dark field, no camera), no title card
 	SplashScreen.host = h
 	local why = SplashScreen.run()
 	assert(why == "timeout" and h.frames >= SplashScreen.READY_WAIT_S * 60 and h.frames <= (SplashScreen.READY_WAIT_S + SplashScreen.FADE_S) * 60 + 3, `no title card: {why} after {h.frames} frames`)
-	assert(h.playerGui:FindFirstChild(SplashScreen.GUI_NAME) == nil, "and its screen is gone")
+	assert(h.playerGui:FindFirstChild(SplashScreen.GUI_NAME) ~= nil, "an unfinished client keeps a visible explanation")
 	h = host({ findRaises = true, loadedAt = 1, readyAt = 90 })
 	SplashScreen.host = h
 	assert(SplashScreen.run() == "ready", "a lookup that raises is only no words")
 	h = host({ wordsAt = 1, loadedAt = 1, readyAt = 900, raiseAt = 200 })
 	SplashScreen.host = h
 	why = SplashScreen.run()
-	assert(string.find(why, "failed", 1, true) == 1 and h.frames == 200 and h.playerGui:FindFirstChild(SplashScreen.GUI_NAME) == nil and #h.warned == 1, `a fault: {why}, its screen gone, one warning`)
+	assert(string.find(why, "failed", 1, true) == 1 and h.frames == 200 and h.playerGui:FindFirstChild(SplashScreen.GUI_NAME) ~= nil and #h.warned == 1, `a fault: {why}, its screen gone, one warning`)
 	h = host({ wordsAt = 1, loadedAt = 1, readyAt = 900, cameraRaises = true })
 	SplashScreen.host = h
 	why = SplashScreen.run()
-	assert(string.find(why, "failed", 1, true) == 1 and h.playerGui:FindFirstChild(SplashScreen.GUI_NAME) == nil, "a camera that refuses: failed, gone")
+	assert(string.find(why, "failed", 1, true) == 1 and h.playerGui:FindFirstChild(SplashScreen.GUI_NAME) ~= nil, "a camera that refuses retains an explanation")
 	h = host({ breakService = "Players" })
 	SplashScreen.host = h
 	why = SplashScreen.run()
-	assert(string.find(why, "failed", 1, true) == 1 and h.frames == 0, "no Players: failed at once")
+	assert(string.find(why, "failed", 1, true) == 1 and h.frames == 0 and not h.removed, "no Players: failed at once without removing the default loading screen")
 	SplashScreen.host = realHost
+end)
+
+check("a startup world failure is visible before the ordinary splash timeout",function()
+ local h=host({wordsAt=1,loadedAt=1,failedAt=15});SplashScreen.host=h
+ local why=SplashScreen.run();SplashScreen.host=realHost
+ assert(why=="world" and h.frames<60*SplashScreen.READY_WAIT_S,"explicit failed world does not masquerade as a ready title")
+ local ui=h.playerGui:FindFirstChild(SplashScreen.GUI_NAME)
+ assert(ui and string.find(ui:FindFirstChild("Subtitle").Text,"rejoin",1,true),"failure explains recovery")
+ assert(ui:FindFirstChild("Veil").BackgroundTransparency<.5,"unready world is covered")
+ ui:Destroy()
+end)
+check("timeout without Shared words retains a self-contained error then clears on late readiness",function()
+ local h=host({loadedAt=1});SplashScreen.host=h
+ assert(SplashScreen.run()=="timeout","startup is bounded even if Shared never arrives");SplashScreen.host=realHost
+ local ui=h.playerGui:FindFirstChild(SplashScreen.GUI_NAME)
+ assert(ui and ui:FindFirstChild("Subtitle").Text~="","missing text modules cannot erase failure explanation")
+ local cameraWrites=h.writes
+ h.player:SetAttribute(SplashScreen.READY_ATTRIBUTE,true)
+ assert(h.playerGui:FindFirstChild(SplashScreen.GUI_NAME)==nil,"a delayed healthy client dismisses the stale error")
+ assert(h.readySignal:live()==0 and h.dyingSignal:live()==0,"late readiness releases all temporary listeners")
+ h.player:SetAttribute(SplashScreen.READY_ATTRIBUTE,false);h.player:SetAttribute(SplashScreen.READY_ATTRIBUTE,true)
+ assert(h.writes==cameraWrites,"closed splash does not resume camera writes")
+end)
+check("external failure-screen destruction disconnects its player listener",function()
+ local h=host({wordsAt=1,loadedAt=1});SplashScreen.host=h;SplashScreen.run();SplashScreen.host=realHost
+ local ui=h.playerGui:FindFirstChild(SplashScreen.GUI_NAME);assert(ui,"failure screen remains owned by PlayerGui")
+ ui:Destroy()
+ assert(h.readySignal:live()==0 and h.dyingSignal:live()==0,"destroying the error screen retains no active listener")
+end)
+
+check("deferred destruction and a queued ready signal cannot retain or destroy the error screen twice",function()
+ for _,readyFirst in {false,true} do
+  local h=host({wordsAt=1,loadedAt=1,deferredDestroy=true});SplashScreen.host=h
+  SplashScreen.run();SplashScreen.host=realHost
+  local ui=h.playerGui:FindFirstChild(SplashScreen.GUI_NAME);assert(ui,"unready screen retained")
+  ui:Destroy()
+  if readyFirst then h.player:SetAttribute(SplashScreen.READY_ATTRIBUTE,true) end
+  h.flushDestroying()
+  assert(h.destroyCalls==1,"ready after external destroy does not destroy again")
+  assert(h.readySignal:live()==0 and h.dyingSignal:live()==0,"deferred cleanup releases both listeners")
+ end
+end)
+
+check("a failed readiness subscription cleans its owner connection and reports the fallback failure",function()
+ local h=host({wordsAt=1,loadedAt=1,readyConnectRaises=true});SplashScreen.host=h
+ SplashScreen.run();SplashScreen.host=realHost
+ assert(h.playerGui:FindFirstChild(SplashScreen.GUI_NAME)==nil,"unusable recovery UI is disposed")
+ assert(h.readySignal:live()==0 and h.dyingSignal:live()==0,"partially installed recovery retains no listener")
+ assert(#h.warned==1 and string.find(h.warned[1],"subscription failed",1,true),"recovery error is not swallowed")
 end)
 
 check("the splash's look: black until the world has loaded, then the veil's rest; the title comes up; the dot only on a long wait; the going fades both", function()

@@ -19,6 +19,8 @@ local Json=require("../src/Shared/Persistence/Json")
 local Compression=require("../src/Server/RestCompression")
 local Backend=require("../src/Server/DataStoreBackend")
 local Session=require("../src/Shared/Persistence/SaveSession")
+local Envelope=require("../src/Shared/Persistence/SaveEnvelope")
+local Progress=require("../src/Shared/Persistence/SaveProgress")
 local fullRecord
 local passed=0
 local function check(ok,why) assert(ok,why);passed+=1 end
@@ -100,8 +102,13 @@ stored.data="damaged-current"
 local before=assert(Json.canonical(stored))
 now+=40
 local recovered=visit("recovered")
-check(recovered:load()=="session" and recovered.reason=="corrupt","damaged current was not read-only")
+check(recovered:load()=="active" and recovered.restProtected.main=="corrupt","damaged current slot was not protected independently")
 check(assert(Json.canonical(recovered.rests.main))==assert(Json.canonical(fullRecord)),"valid full-world backup was not offered")
+check(not recovered:beginLife("main",1),"damaged compressed slot accepted retirement")
+local progress=Json.copy(recovered.progress);progress.notebook.opened={"p1","p2"}
+check(recovered:setProgress(progress),"independent notebook update refused")
 recovered:step();recovered:flush()
+local progressStored=Envelope.open(Progress.SPEC,ds.data["P_full-world"])
+check(progressStored.status=="ok" and #progressStored.payload.notebook.opened==2,"damaged compressed slot blocked notebook persistence")
 check(assert(Json.canonical(ds.data["R_full-world_main"]))==before,"recovery overwrote damaged stored bytes")
 print(`REST_STORAGE passed={passed} failed=0`)

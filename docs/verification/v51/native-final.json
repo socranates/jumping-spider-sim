@@ -1,0 +1,20 @@
+{
+  "source_commit": "14e60991c785c4293c3560e6d8b7ecded7e7ac75",
+  "evidence_id": "d9ddc5e0ed43d301",
+  "native_preserve": {
+    "detail": "full",
+    "pass": 274,
+    "fail": 0,
+    "skip": 0,
+    "seconds": 569
+  },
+  "native_rare": {
+    "full_pass": 14,
+    "low_pass": 14
+  },
+  "source_comparison": {
+    "matched": 215,
+    "expected": 215
+  },
+  "scope": "Local Studio place, final source, custom motor and real engine casts; not live DataStore rejoin or phone performance"
+}

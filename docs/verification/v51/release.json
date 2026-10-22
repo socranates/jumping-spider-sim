@@ -1,0 +1,53 @@
+{
+  "published": true,
+  "release": "v51",
+  "place_id": 120119801868085,
+  "universe_id": 10771103250,
+  "place_version": 140,
+  "previous_place_version": 139,
+  "published_at_utc": "2026-10-22T03:07:06.023Z",
+  "branch": "codex/v51-rare-sightings",
+  "source_commit": "14e60991c785c4293c3560e6d8b7ecded7e7ac75",
+  "evidence_id": "d9ddc5e0ed43d301",
+  "implemented_rare_species": [
+    "luna_moth"
+  ],
+  "remaining_species": 12,
+  "native_source_comparison": {
+    "matched": 215,
+    "expected": 215
+  },
+  "native_preserve": {
+    "pass": 274,
+    "fail": 0,
+    "skip": 0
+  },
+  "native_rare": {
+    "full_pass": 14,
+    "low_pass": 14
+  },
+  "windows_cli_rare": {
+    "pass": 265,
+    "fail": 0
+  },
+  "ci_run": 39713498101,
+  "ci_conclusion": "success",
+  "suites_passed": 59,
+  "compile": {
+    "pass": 215,
+    "total": 215
+  },
+  "strict": "clean",
+  "dashboard_proof": "docs/verification/v51/published-place140.png",
+  "dashboard_url": "https://create.roblox.com/dashboard/creations/experiences/10771103250/places/120119801868085/version-history",
+  "builds": [
+    {
+      "path": "roblox_port/TheWindowsill.rbxlx",
+      "sha256": "b386808d049c7c7f3f429ec096f49759cda1c29613206bbebbbd2d704c550240"
+    },
+    {
+      "path": "roblox_port/TheWindowsillTests.rbxlx",
+      "sha256": "6475bedadf36b5abe4ef5242f465b12441e8ecca9c2c1e8e7a331629786ce01d"
+    }
+  ]
+}

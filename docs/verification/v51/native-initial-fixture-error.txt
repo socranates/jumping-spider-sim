@@ -1,0 +1,5 @@
+2026-10-22T02:40:24.263Z,193.263641,77e0,6,Error [FLog::CreatorError] Error: Players.socranates.PlayerScripts.Client.SilkPlayback:13: arrival claim saved outside rest
+2026-10-22T02:40:24.268Z,193.268646,77e0,6,Info [FLog::CreatorOutput] Info: Stack Begin
+2026-10-22T02:40:24.268Z,193.268646,77e0,6,Info [FLog::CreatorOutput] Info: Script 'Players.socranates.PlayerScripts.Client.SilkPlayback', Line 13
+2026-10-22T02:40:24.268Z,193.268646,77e0,6,Info [FLog::CreatorOutput] Info: Script 'Players.socranates.PlayerScripts.Client.SpiderClient', Line 2380
+2026-10-22T02:40:24.268Z,193.268646,77e0,6,Info [FLog::CreatorOutput] Info: Stack End

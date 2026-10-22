@@ -1,10 +1,12 @@
 # The Windowsill — active Roblox project
 
-## Current release — v48, 2026-10-21
+## Current release — v51, 2026-10-21
 
-The living habitat pass is published as **Roblox place version 137**, existing place **120119801868085**, universe **10771103250**. Production source **1ba2eb3** is on GitHub branch `codex/v48-living-habitat`; later receipt commits do not change the game. Final checks: **55/55 CLI suites**, **270/0/0 native Studio**, strict clean and **207/207 source compile**. See [the current handoff](../docs/HANDOFF-living-habitat-v48.md) and [release receipt](../docs/verification/v48/RELEASE-v48-place137.md).
+The first Rare Sightings build is published as **Roblox place version 140**, existing place **120119801868085**, universe **10771103250**. Source **14e6099**, branch `codex/v51-rare-sightings`, evidence **d9ddc5e0ed43d301**. It preserves v50's contextual meals/survival and adds the luna moth, quiet sight-gated notebook discovery and encounter history outside rewindable rests. **One of thirteen** rare creatures is implemented; see the [successive-build plan](../docs/RARE_SIGHTINGS_PLAN.md) and [current handoff](../chet/HANDOFF-v51.md).
 
-Use the rebuilt **place137** transfer package, or run `python tools/build.py /path/to/rojo` before opening a generated place. Tracked `.rbxlx` files may be older than current source. Keep this folder name: `.gdignore` keeps the frozen Godot project from importing it. Scale remains 1 Godot WU = 1 stud; gravity is 35. The dated sections below are historical snapshots, superseded by the current release receipt.
+Final checks: **59/59 CLI suites**, **274/0/0 native preserve**, **14/14 native luna checks at each detail tier**, strict clean, **215/215 source compile** and **215/215 production source fingerprints**. See the [verification ledger](../docs/verification/v51/RESULTS.md) and [release receipt](../docs/verification/v51/release.json).
+
+Use the verified v51 transfer package recorded in `docs/verification/v51/portable-package.json`, or rebuild with `python tools/build.py /path/to/rojo`. Keep this folder name: `.gdignore` keeps the frozen Godot project from importing it. Scale is one stud per centimetre; gravity is 35. The dated sections below are historical snapshots, superseded by the current handoff and receipt. Godot remains frozen.
 
 ## Where it stands (2026-10-19)
 

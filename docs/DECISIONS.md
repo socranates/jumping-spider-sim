@@ -2232,3 +2232,26 @@ sleep drain; record roundtrips and rest must not erase the streak. Easy/Free
 remain nonfatal. Legacy pure/Godot reference controllers retain24/48h defaults.
 Nathan's exact prior mode/session was not reproduced. Detailed verification,
 performance candidate retention and release identity belong to the v50 receipt.
+
+## ROBLOX-131 - Rare Sightings over successive builds (2026-10-21, Nathan)
+
+Nathan supplied `Rare Sightings.md` and explicitly chose: "Add all thirteen over
+successive builds." The original is preserved at `docs/reference/rare-sightings.md`.
+`docs/RARE_SIGHTINGS_PLAN.md` records the full order, with only the luna moth
+implemented in the first release. Future species are not placeholder notebook
+pages or a visible collection list. Encounters are discovered in the habitat,
+and a real unobstructed look opens their sourced page quietly.
+
+The first shared foundation keeps encounter claims in progress outside rests,
+gives each life/generation an identity, and restores a checkpoint made during
+a visit as that same animal. It does not reroll visits on a rewind. A bounded
+once-per-save ledger is reserved for the Atlas moth and cicada brood event.
+Before registering more species, introduce the shared maximum-two appointment
+budget so thirteen independent rolls do not make the preserve a parade.
+
+The luna is a large nonfood visitor. Its wing supports are inset within the
+silhouette and departure waits for a rider or a line attached to an actual wing
+part, including a line bent around something farther away. Supporting a rider
+and delaying departure are explicit game concessions, not biological claims.
+The existing seven/ten full-meal moults, earned abilities, manual jump aiming,
+quiet hunger bar and current lighting are unchanged.

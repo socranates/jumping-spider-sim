@@ -1,0 +1,34 @@
+2026-10-22T02:51:04.204Z,833.204163,3a6c,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_PASS] full absent before scheduled arrival
+2026-10-22T02:51:16.233Z,845.233032,1590,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_PASS] full scheduled animal drawn
+2026-10-22T02:51:16.235Z,845.235046,1590,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_PASS] full 26-part total budget
+2026-10-22T02:51:16.235Z,845.235046,1590,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_PASS] full arrival claim saved outside rest
+2026-10-22T02:51:16.235Z,845.235046,1590,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_PASS] full visible unobstructed encounter opens notebook
+2026-10-22T02:51:16.235Z,845.235046,1590,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_PASS] full settled wing is queryable support
+2026-10-22T02:51:16.235Z,845.235046,1590,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_PASS] full settled wing is queryable support
+2026-10-22T02:51:16.235Z,845.235046,1590,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_PASS] full departure tracks actual wing attachment
+2026-10-22T02:51:18.245Z,847.245239,8be8,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_PASS] full motor settles on wing without falling through
+2026-10-22T02:51:19.041Z,848.041443,1590,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_PASS] full short walk stays on wing
+2026-10-22T02:51:19.041Z,848.041443,1590,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_VIEW] full wing 15.949999809265137, 0.8399999737739563, -19.033344268798828 native screenshot window
+2026-10-22T02:51:22.033Z,851.033875,9620,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_FRAME] full frames 119 mean_ms 25.321903317665853 p95_ms 37.77319937944412
+2026-10-22T02:51:35.036Z,864.036133,57bc,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_PASS] full dawn waits for rider
+2026-10-22T02:51:39.053Z,868.053284,1590,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_PASS] full departure cleans animal and supports
+2026-10-22T02:51:39.053Z,868.053284,1590,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_PASS] full departure retains notebook
+2026-10-22T02:51:39.057Z,868.057312,1590,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_PASS] full new life gets new identity
+2026-10-22T02:51:39.057Z,868.057312,1590,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_END] full pass
+2026-10-22T02:52:47.302Z,936.302917,77e0,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_PASS] low absent before scheduled arrival
+2026-10-22T02:52:59.316Z,948.316711,791c,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_PASS] low scheduled animal drawn
+2026-10-22T02:52:59.316Z,948.316711,791c,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_PASS] low 26-part total budget
+2026-10-22T02:52:59.316Z,948.316711,791c,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_PASS] low arrival claim saved outside rest
+2026-10-22T02:52:59.316Z,948.316711,791c,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_PASS] low visible unobstructed encounter opens notebook
+2026-10-22T02:52:59.316Z,948.316711,791c,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_PASS] low settled wing is queryable support
+2026-10-22T02:52:59.316Z,948.316711,791c,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_PASS] low settled wing is queryable support
+2026-10-22T02:52:59.316Z,948.316711,791c,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_PASS] low departure tracks actual wing attachment
+2026-10-22T02:53:01.333Z,950.333191,1590,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_PASS] low motor settles on wing without falling through
+2026-10-22T02:53:02.101Z,951.101318,1590,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_PASS] low short walk stays on wing
+2026-10-22T02:53:02.103Z,951.103271,1590,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_VIEW] low wing 15.949999809265137, 0.8399999737739563, -19.033344268798828 native screenshot window
+2026-10-22T02:53:05.104Z,954.104248,9620,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_FRAME] low frames 180 mean_ms 16.675952232132357 p95_ms 22.725500166416168
+2026-10-22T02:53:18.142Z,967.142639,1590,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_PASS] low dawn waits for rider
+2026-10-22T02:53:22.148Z,971.148010,1590,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_PASS] low departure cleans animal and supports
+2026-10-22T02:53:22.148Z,971.148987,1590,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_PASS] low departure retains notebook
+2026-10-22T02:53:22.151Z,971.151978,1590,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_PASS] low new life gets new identity
+2026-10-22T02:53:22.153Z,971.153992,1590,6,Info [FLog::CreatorOutput] [CHET_V51_RARE_END] low pass

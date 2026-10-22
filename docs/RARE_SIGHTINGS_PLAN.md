@@ -33,7 +33,7 @@ The full set should average roughly one or two encounters in a life, not thirtee
 
 The progress record has an optional `rare` ledger: `serial`, species `claimed` high-water marks, `once` flags and an optional overflow `blocked` flag. A fresh life allocates a serial; a new generation allocates one too. Legacy rests reuse the current serial, conservatively suppressing a visit if needed. Restoring a checkpoint during a visit restores that same identity; restoring a pre-arrival checkpoint after the visit cannot make another. Maps are capped at 64 entries; merge overflow blocks new visits instead of allowing discarded claims to repeat. Old schema-2 saves remain valid. Do not run an older server implementation that strips this field against production progress.
 
-Next: research Hercules/scarab; implement shared budget and appointment records; add their static/grounded bodies; source pages; test persistence, support, quiet discovery and gamepad/touch; native review, publish, record evidence, then advance. New moving rides and predators require new mechanics tests rather than reusing the luna drawer blindly.
+Next: use `docs/reference/rare-build-2-research.md` for opened Hercules/scarab sources and unresolved range gates; implement shared budget and appointment records; add their static/grounded bodies; source pages; test persistence, support, quiet discovery and gamepad/touch; native review, publish, record evidence, then advance. New moving rides and predators require new mechanics tests rather than reusing the luna drawer blindly.
 
 ## Acceptance for every release
 

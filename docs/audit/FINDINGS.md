@@ -9,6 +9,8 @@ The table below records the initial foundation candidate, not the final status o
 
 A04 is **partially addressed** in unpublished source `3647a94c67f83076a0c7be09d75ef4a60bb0b4d5` (`codex/save-slot-isolation`, evidence `1984fdd8e8dee0ad`): unreadable rest slots remain untouched while progress and other slots can save. Corrupt/newer progress still disables all writes. The old-world ecology migration remains open. See `chet/save-slot-isolation.md` and `docs/save-slot-isolation/receipt.json` for implementation and completed versus outstanding gates. No native or publication result from an earlier candidate applies automatically to this changed source.
 
+A08 is **partially measured**: the first v6b native desktop full/low baseline/candidate matrix completed on source `3647a94`, four trials / 52 records / 44 timed samples including the continuous three-region walk. Results are mixed; no general speedup is established. Read `docs/performance-pass/RESULTS-v6-trial1.md` for hardware, frame-time tables, script costs, engine warnings and limits. The 30-minute memory session, MicroProfiler, emulator/phone, network and startup measurements remain open. No profiling place was published.
+
 This is a current-source audit of the supplied v48 review. A static finding is not a reproduced Studio defect. Tests, probes and remaining native work are distinguished below.
 
 | Rank / ID | Severity | Current finding and evidence | Status / recommendation |

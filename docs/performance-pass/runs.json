@@ -30,5 +30,7 @@
   "memory_trace_30min": {
     "status": "not run"
   },
-  "published": false
+  "published": false,
+  "historical": true,
+  "superseded_by": "matrix-receipt.json (v6b native desktop trials)"
 }

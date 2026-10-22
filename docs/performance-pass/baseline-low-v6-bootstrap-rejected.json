@@ -1,0 +1,26 @@
+{
+  "source_log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261022T082220Z_Studio_8C794_last.log",
+  "manifest": "C:\\Users\\natha\\windowsill-publish\\docs\\performance-pass\\manifest-v6.json",
+  "guards": [
+    {
+      "role": "baseline",
+      "source": "14e60991c785c4293c3560e6d8b7ecded7e7ac75",
+      "tier": "low",
+      "passed": true,
+      "modules": 216,
+      "driver_sha256": "f72b78df9353a6521b62392ac096ae876980ea8ce694ee416d2fe5c304b7bc73"
+    }
+  ],
+  "source_guard_verified": false,
+  "complete": false,
+  "comparison_config": false,
+  "audit_scenes_complete": false,
+  "audit_routes": [],
+  "workload_verified": false,
+  "workloads": [],
+  "incomplete": [],
+  "failures": [
+    "2026-10-22T08:22:55.990Z,35.990833,55b4,6,Error [FLog::CreatorError] Error: Failed to load plugin {type=BuiltIn filepath=MaterialPicker.rbxm} in datamodel Edit"
+  ],
+  "records": []
+}

@@ -1,0 +1,85 @@
+{
+  "source_log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261022T075755Z_Studio_CE848_last.log",
+  "snapshot": "docs\\performance-pass\\candidate-full-v6-trial1.log",
+  "snapshot_sha256": "c77af11d8273a5385a41f096600ef5ec358d78cc4bf9ca7dedffbbef0204422a",
+  "run": "1792656226824",
+  "foreground": true,
+  "other_studio_edit_windows": 1,
+  "notes": "No screenshots or CPU-heavy tests during timing. An unrelated Adobe overlay was visible at candidate startup; its presence during samples was not inspected. One pair does not establish causal performance differences.",
+  "source_log_sha256_at_archive": "e7e5a47433dd5812d0d67302d3df28837e5548aa60ee629cddccb3b4269adebb",
+  "creator_error_count_at_archive": 0,
+  "native_run_interval_utc": {
+    "start": "2026-10-22T08:03:58.303Z",
+    "end": "2026-10-22T08:10:36.285Z"
+  },
+  "engine_error_categories_at_archive": {
+    "Error": {
+      "count": 24,
+      "during_run": 0,
+      "first_utc": "2026-10-22T07:57:58.669Z",
+      "last_utc": "2026-10-22T07:57:58.670Z"
+    },
+    "InterprocessReadWriteLock": {
+      "count": 27,
+      "during_run": 7,
+      "first_utc": "2026-10-22T07:57:59.857Z",
+      "last_utc": "2026-10-22T08:23:03.338Z"
+    },
+    "CreateGraphicsEngine": {
+      "count": 1,
+      "during_run": 0,
+      "first_utc": "2026-10-22T07:58:00.773Z",
+      "last_utc": "2026-10-22T07:58:00.773Z"
+    },
+    "UserHeartbeats": {
+      "count": 2,
+      "during_run": 0,
+      "first_utc": "2026-10-22T07:58:11.418Z",
+      "last_utc": "2026-10-22T08:23:20.053Z"
+    },
+    "AssetProvider": {
+      "count": 2,
+      "during_run": 0,
+      "first_utc": "2026-10-22T07:58:26.220Z",
+      "last_utc": "2026-10-22T08:03:48.340Z"
+    },
+    "RibbonFileSystemHelper": {
+      "count": 1,
+      "during_run": 0,
+      "first_utc": "2026-10-22T07:58:27.870Z",
+      "last_utc": "2026-10-22T07:58:27.870Z"
+    },
+    "SecretsUtils": {
+      "count": 1,
+      "during_run": 0,
+      "first_utc": "2026-10-22T08:03:38.078Z",
+      "last_utc": "2026-10-22T08:03:38.078Z"
+    },
+    "PresetChatManager": {
+      "count": 1,
+      "during_run": 0,
+      "first_utc": "2026-10-22T08:03:38.692Z",
+      "last_utc": "2026-10-22T08:03:38.692Z"
+    },
+    "SocialCounterpartyManager": {
+      "count": 1,
+      "during_run": 0,
+      "first_utc": "2026-10-22T08:03:41.557Z",
+      "last_utc": "2026-10-22T08:03:41.557Z"
+    },
+    "SocialAmpFeatureEvaluationManager": {
+      "count": 2,
+      "during_run": 0,
+      "first_utc": "2026-10-22T08:03:41.557Z",
+      "last_utc": "2026-10-22T08:03:41.560Z"
+    },
+    "PlaceCloser": {
+      "count": 2,
+      "during_run": 0,
+      "first_utc": "2026-10-22T08:22:34.740Z",
+      "last_utc": "2026-10-22T08:22:34.741Z"
+    }
+  },
+  "engine_error_scope": "Entire process log at archive, including startup and shutdown. Categories retain counts and timing; session identifiers and service URLs omitted. CreatorError/script timeouts counted separately.",
+  "snapshot_line_endings": "LF; native records preserved, line separators normalized for portable Git verification"
+}

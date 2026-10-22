@@ -24,4 +24,8 @@ Native Studio verification now passes on this exact source: all 216 production s
 
 ## Remaining foundation work
 
-This isolates the consequences of the historical-world compatibility issue; it does not migrate an old test_garden ecology into the preserve. The remaining audit includes deterministic route activation, foreign-lease Continue UX, caption/error visibility, measured full/low scene profiling and the long memory trace. The greedy-merge analysis is on the separate `codex/greedy-merge` branch and correctly stopped below the requested ten-percent gate; there is no runtime merging to integrate.
+This isolates the consequences of the historical-world compatibility issue; it does not migrate an old test_garden ecology into the preserve. The remaining audit includes deterministic route activation, foreign-lease Continue UX, caption/error visibility, the long memory trace and broader performance checks. The greedy-merge analysis is on the separate `codex/greedy-merge` branch and correctly stopped below the requested ten-percent gate; there is no runtime merging to integrate.
+
+## Desktop measurement follow-up
+
+The first native Studio full/low baseline/candidate matrix is complete on this exact frozen source: four trials, 52 records / 44 timed samples, including uninterrupted three-region walks. Results are mixed; no general speedup is established. See `docs/performance-pass/RESULTS-v6-trial1.md` and `matrix-receipt.json`. The 30-minute memory session, MicroProfiler, mobile/emulator, startup measurements and actual online client disconnect/rejoin are still outstanding. No production source changed during profiling; no publication occurred.

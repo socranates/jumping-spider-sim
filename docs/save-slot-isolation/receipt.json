@@ -128,7 +128,8 @@
   "offline_gates_pass": true,
   "native_studio_verified": true,
   "actual_client_rejoin_verified": false,
-  "performance_matrix_complete": false,
+  "performance_matrix_complete": true,
+  "performance_scope": "Desktop Studio full/low only; one pair per tier, no causal speedup established; broader audit and memory/mobile gates remain open",
   "publication_ready": false,
   "published": false
 }

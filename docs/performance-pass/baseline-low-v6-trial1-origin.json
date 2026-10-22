@@ -1,0 +1,85 @@
+{
+  "source_log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261022T082921Z_Studio_862AE_last.log",
+  "snapshot": "docs\\performance-pass\\baseline-low-v6-trial1.log",
+  "snapshot_sha256": "cfe8fdfa514a8ebe94e7754132bc529960b6e1b31b1d75300f0298b95c3f5544",
+  "run": "1792658084067",
+  "foreground": true,
+  "other_studio_edit_windows": 1,
+  "notes": "No screenshots or CPU-heavy tests during timing; native review window remained stopped in edit mode. Engine OTA download lock contention appeared; no CreatorError or PERF failure. Separate earlier bootstrap failure retained and excluded.",
+  "source_log_sha256_at_archive": "eb8fdaa352bf64a22a8ee89ffd5ef109f16139c0eeaa60c7320126273acab38b",
+  "creator_error_count_at_archive": 0,
+  "native_run_interval_utc": {
+    "start": "2026-10-22T08:34:55.002Z",
+    "end": "2026-10-22T08:41:31.836Z"
+  },
+  "engine_error_categories_at_archive": {
+    "Error": {
+      "count": 24,
+      "during_run": 0,
+      "first_utc": "2026-10-22T08:29:21.860Z",
+      "last_utc": "2026-10-22T08:29:21.861Z"
+    },
+    "InterprocessReadWriteLock": {
+      "count": 15,
+      "during_run": 7,
+      "first_utc": "2026-10-22T08:29:23.127Z",
+      "last_utc": "2026-10-22T08:42:25.443Z"
+    },
+    "CreateGraphicsEngine": {
+      "count": 1,
+      "during_run": 0,
+      "first_utc": "2026-10-22T08:29:23.747Z",
+      "last_utc": "2026-10-22T08:29:23.747Z"
+    },
+    "UserHeartbeats": {
+      "count": 2,
+      "during_run": 0,
+      "first_utc": "2026-10-22T08:29:32.795Z",
+      "last_utc": "2026-10-22T08:42:31.712Z"
+    },
+    "AssetProvider": {
+      "count": 2,
+      "during_run": 0,
+      "first_utc": "2026-10-22T08:29:43.653Z",
+      "last_utc": "2026-10-22T08:34:45.343Z"
+    },
+    "RibbonFileSystemHelper": {
+      "count": 1,
+      "during_run": 0,
+      "first_utc": "2026-10-22T08:29:44.444Z",
+      "last_utc": "2026-10-22T08:29:44.444Z"
+    },
+    "SecretsUtils": {
+      "count": 1,
+      "during_run": 0,
+      "first_utc": "2026-10-22T08:34:35.580Z",
+      "last_utc": "2026-10-22T08:34:35.580Z"
+    },
+    "PresetChatManager": {
+      "count": 1,
+      "during_run": 0,
+      "first_utc": "2026-10-22T08:34:36.195Z",
+      "last_utc": "2026-10-22T08:34:36.195Z"
+    },
+    "SocialCounterpartyManager": {
+      "count": 1,
+      "during_run": 0,
+      "first_utc": "2026-10-22T08:34:38.372Z",
+      "last_utc": "2026-10-22T08:34:38.372Z"
+    },
+    "SocialAmpFeatureEvaluationManager": {
+      "count": 2,
+      "during_run": 0,
+      "first_utc": "2026-10-22T08:34:38.388Z",
+      "last_utc": "2026-10-22T08:34:38.392Z"
+    },
+    "PlaceCloser": {
+      "count": 2,
+      "during_run": 0,
+      "first_utc": "2026-10-22T08:42:18.880Z",
+      "last_utc": "2026-10-22T08:42:18.881Z"
+    }
+  },
+  "engine_error_scope": "Entire process log at archive, including startup and shutdown. Categories retain counts and timing; session identifiers and service URLs omitted. CreatorError/script timeouts counted separately.",
+  "snapshot_line_endings": "LF; native records preserved, line separators normalized for portable Git verification"
+}

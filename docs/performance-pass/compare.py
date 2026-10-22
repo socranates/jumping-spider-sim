@@ -2,7 +2,7 @@
 Usage: python compare.py BASELINE_JSON CANDIDATE_JSON --out NEW_JSON
 """
 from pathlib import Path
-import argparse,json
+import argparse,json,math
 p=argparse.ArgumentParser();p.add_argument('baseline');p.add_argument('candidate');p.add_argument('--out',required=True);a=p.parse_args()
 out=Path(a.out);assert not out.exists(),'choose a new report path'
 b,c=[json.loads(Path(name).read_text(encoding='utf-8')) for name in [a.baseline,a.candidate]]
@@ -27,8 +27,9 @@ for x in c['records']:
  rows.append({'scene':x['kind'],'baseline_frames':left['frames'],'candidate_frames':right['frames'],
  'mean_delta_ms':right['frames']['mean_ms']-left['frames']['mean_ms'],
  'p95_delta_ms':right['frames']['p95_ms']-left['frames']['p95_ms'],
- 'state_differences':diffs,'baseline_callback':left['render_callback'],'candidate_callback':right['render_callback']})
+ "recorded_fixture_deltas":{edge:{"camera_max_component_delta":max(abs(x-y) for x,y in zip(left[edge]["camera"],right[edge]["camera"])),"spider_position_delta":math.dist(left[edge]["pos"],right[edge]["pos"]),"fov_equal":left[edge]["fov"]==right[edge]["fov"],"look_parts_equal":left[edge].get("look_parts")==right[edge].get("look_parts")} for edge in ["before","after"]},
+ 'state_differences':diffs,'baseline_callback' :left['render_callback'],'candidate_callback':right['render_callback']})
 report={'scope':'One paired desktop Studio trial; not a phone or published-player result; repeated trials needed for causal performance claims',
- 'baseline_header':headers[0],'candidate_header':headers[1],'rows':rows,'all_actor_states_match':all(not r['state_differences'] for r in rows)}
+ 'baseline_header':headers[0],'candidate_header':headers[1],'rows':rows,'recorded_actor_summaries_match':all(not r['state_differences'] for r in rows),'actor_comparison_scope':'Region, active-population ids, species counts, enabled flags and predator state labels only; not complete actor poses, RNG or internal route state','causal_speedup_established':False}
 out.write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
-print(json.dumps({'scenes':len(rows),'all_actor_states_match':report['all_actor_states_match'],'scope':report['scope']},indent=2))
+print(json.dumps({'scenes':len(rows),'recorded_actor_summaries_match':report['recorded_actor_summaries_match'],'scope':report['scope']},indent=2))

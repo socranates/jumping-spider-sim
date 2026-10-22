@@ -1,0 +1,90 @@
+{
+  "passed": true,
+  "baseline_source": "14e60991c785c4293c3560e6d8b7ecded7e7ac75",
+  "candidate_source": "3647a94c67f83076a0c7be09d75ef4a60bb0b4d5",
+  "driver_sha256": "f72b78df9353a6521b62392ac096ae876980ea8ce694ee416d2fe5c304b7bc73",
+  "trials": [
+    {
+      "role": "baseline",
+      "tier": "full",
+      "run": "1792655221879",
+      "records": 13,
+      "source": "14e60991c785c4293c3560e6d8b7ecded7e7ac75",
+      "engine": "0.744.0.7441077",
+      "viewport": [
+        1105,
+        433
+      ]
+    },
+    {
+      "role": "candidate",
+      "tier": "full",
+      "run": "1792656226824",
+      "records": 13,
+      "source": "3647a94c67f83076a0c7be09d75ef4a60bb0b4d5",
+      "engine": "0.744.0.7441077",
+      "viewport": [
+        1105,
+        433
+      ]
+    },
+    {
+      "role": "baseline",
+      "tier": "low",
+      "run": "1792658084067",
+      "records": 13,
+      "source": "14e60991c785c4293c3560e6d8b7ecded7e7ac75",
+      "engine": "0.744.0.7441077",
+      "viewport": [
+        1105,
+        433
+      ]
+    },
+    {
+      "role": "candidate",
+      "tier": "low",
+      "run": "1792658657917",
+      "records": 13,
+      "source": "3647a94c67f83076a0c7be09d75ef4a60bb0b4d5",
+      "engine": "0.744.0.7441077",
+      "viewport": [
+        1105,
+        433
+      ]
+    }
+  ],
+  "trial_count": 4,
+  "records": 52,
+  "timed_samples": 44,
+  "scope": "One desktop Studio pair per tier; Free mode; not phone or published-player evidence",
+  "causal_speedup_established": false,
+  "memory_trace_30min_complete": false,
+  "audit_performance_complete": false,
+  "publication_ready": false,
+  "published": false,
+  "files": {
+    "README.md": "0779c719a410ee57accbde7064449669563c05014f7bac3e1cc8dc43b26de1fa",
+    "RESULTS-v6-trial1.md": "c6757c6ece1709c9729c6e750e9d4a34c067c3c63faf0fb05f961cf463419948",
+    "baseline-full-v6-trial1-origin.json": "3a853d72a38d24afe66116a1d5a29dd0f324cd24c3275d01fbc0747744052a81",
+    "baseline-full-v6-trial1.json": "9de6de867e0269ea66c264a83946ae79c7bd52e2444d1c5879acc03a2409f042",
+    "baseline-full-v6-trial1.log": "00cf368299ac6f54567eaf097fa4755d45524c34a76bc974e09e37f98fc04a79",
+    "baseline-low-v6-bootstrap-rejected.json": "1b93590acc8049b8ca0b46c054687df72ceffb7385b982ed8e0b1aab8eb8227f",
+    "baseline-low-v6-trial1-origin.json": "757a85b71141d4a9dc02776b6ad09d176a4fad3221f2a91b829213d040c4a507",
+    "baseline-low-v6-trial1.json": "4aaca793fcaa3aa8611f83561215f97fc00b06200a4a4ed8ebb2cc5c0678b530",
+    "baseline-low-v6-trial1.log": "cfe8fdfa514a8ebe94e7754132bc529960b6e1b31b1d75300f0298b95c3f5544",
+    "candidate-full-v6-trial1-origin.json": "6b7736d927ccddd8d03e71b5553e98582153178e2b405c035f47b124f6396e6a",
+    "candidate-full-v6-trial1.json": "a35e7478c89bd5332fcee5f4cab3a5771e79b3ce249a64bb229c4c7af1067374",
+    "candidate-full-v6-trial1.log": "c77af11d8273a5385a41f096600ef5ec358d78cc4bf9ca7dedffbbef0204422a",
+    "candidate-low-v6-trial1-origin.json": "2478ce037235629dd8e8bf5803c4bcd42f9fb4304223bd64ee1b700456434d25",
+    "candidate-low-v6-trial1.json": "e5afa33ba7bce91c897010a122a0a5ecaf0bb2f973786651a88f56b0e337acfb",
+    "candidate-low-v6-trial1.log": "c10b8b213e9ffa20b33e3e7b43a82f028a77fe61028f5860156790f4a45f6e7c",
+    "collect.py": "0b686c21d62d4f20956437113c166e24d870969f332d98e451ea372bb3821979",
+    "compare.py": "2d21ac69b207c4680632d13c1d59dc0c9ee6d3f5f5618a806f96da43be68a706",
+    "comparison-full-v6-trial1-reviewed.json": "5bd8845ca8a4c0070f1963e0d417190833c22f96cb60443f93283d6feaf60ee6",
+    "comparison-low-v6-trial1-reviewed.json": "dc30aaa067a23ee6559f20c667547883f98c51df82db7d9c421ae8288e08ad5d",
+    "host.json": "44ca949d07819a83676c2ccbb85aad3d3c821e2210b2305381ea8c9eaf4ac2b6",
+    "manifest-v6.json": "ee4b1bd17e2c7ca11089b80e6a5e1aacdf70aafb28e3858e50a04728c7e61a04",
+    "runs.json": "024a973e295e315109e021635a1a10e58f691c40fc07ee4de6be4fe45696f3ba",
+    "verify_matrix.py": "b64ff0f1ba21c70dbe1c4fa6cf617dfbe9d5b1b3166605d0477be14482eff21a"
+  }
+}

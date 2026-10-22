@@ -23,6 +23,7 @@ local SaveRest = require("../src/Shared/Persistence/SaveRest")
 local SaveScheduler = require("../src/Shared/Persistence/SaveScheduler")
 local SaveSession = require("../src/Shared/Persistence/SaveSession")
 local DataStoreBackend = require("../src/Server/DataStoreBackend")
+local RestCompression = require("../src/Server/RestCompression")
 local SaveService = require("../src/Server/SaveService")
 local Appearances = require("../src/Shared/Data/Appearances")
 local SpiderChoice = require("../src/Shared/Rig/SpiderChoice")
@@ -117,7 +118,8 @@ case("measured sizes: a real rest, early and after a long life, against the cap 
 	print(`state: a rest is {n1} characters early and {biggest} at most after {#sizes} samples of a long life (cap {SaveRules.MAX_REST_CHARS}, Roblox {SaveRules.MAX_VALUE_CHARS})`)
 	check(n1 > 5000, `a real size ({n1})`)
 	check(biggest * 4 <= SaveRules.MAX_REST_CHARS, `at least four times headroom under the cap ({biggest} of {SaveRules.MAX_REST_CHARS})`)
-	check(2 * SaveRules.MAX_REST_CHARS + 4096 < SaveRules.MAX_VALUE_CHARS, "a capped rest and its backup fit one stored value")
+	check(RestCompression.MAX_STORED_CHARS < SaveRules.MAX_VALUE_CHARS, "compressed envelope including backup fits one stored value")
+	check(2 * SaveRules.MAX_REST_CHARS + 4096 < RestCompression.MAX_EXPANDED_BYTES, "two capped rests fit the bounded expanded envelope")
 end)
 
 

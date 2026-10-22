@@ -16,10 +16,11 @@ SaveRules.FORMAT = "the-windowsill save"
 SaveRules.REMOTES_NAME = "SaveRemotes" -- the folder in ReplicatedStorage holding ToServer and ToClient
 
 -- ---------------------------------------------------------------- sizes (characters of canonical JSON)
--- Measured: a rest is about 22 thousand characters (tests/state.luau prints the real figures). The cap leaves room for a long life's
--- growth and is far under Roblox's 4,194,304-character limit even with the kept backup inside the same value.
-SaveRules.MAX_REST_CHARS = 262144
-SaveRules.MAX_REST_NODES = 120000 -- values (tables, numbers, strings) a rest may hold, counted before it is encoded
+-- Expanded validation bounds, NOT the stored-value budget. The full preserve initialization is 2.28M characters.
+-- Server/RestCompression bounds the actual compressed envelope INCLUDING its backup to 1.5M stored characters,
+-- and checks its Zstd frame size before expanding (12M maximum). Old uncompressed records remain readable.
+SaveRules.MAX_REST_CHARS = 5000000
+SaveRules.MAX_REST_NODES = 600000 -- values a rest may hold, checked before encoding/checkpoint graph construction
 SaveRules.MAX_DEPTH = 24
 SaveRules.MAX_PROGRESS_CHARS = 16384
 SaveRules.MAX_VALUE_CHARS = 4194304 -- Roblox's own limit on one stored value

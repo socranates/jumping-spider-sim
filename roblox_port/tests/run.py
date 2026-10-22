@@ -231,6 +231,7 @@ MODULES = [
     ("SaveRest", "Persistence/SaveRest.luau"),
     ("SaveScheduler", "Persistence/SaveScheduler.luau"),
     ("SaveSession", "Persistence/SaveSession.luau"),
+    ("RestCompression", "../Server/RestCompression.luau"),
     ("DataStoreBackend", "../Server/DataStoreBackend.luau"),
     ("SaveService", "../Server/SaveService.luau"),
     ("WorldFocus", "../Server/WorldFocus.luau"),
@@ -329,7 +330,7 @@ def main():
     luau = sys.argv[1] if len(sys.argv) > 1 else "luau"
     status = 0
     named = sys.argv[2:]
-    for test_file in named or ["foundation.luau","rare_sightings.luau","spawn_clearance.luau","feeding_survival.luau","run.luau", "perception.luau", "sensor.luau", "prey.luau", "life.luau", "checkpoint.luau", "wasp.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "client_ant.luau", "client_rival.luau", "client_mating.luau", "look.luau", "idle.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "peacock.luau", "antmimic.luau", "tarantula.luau", "continuing.luau", "growth.luau", "notebook.luau", "state.luau", "state_client.luau", "state_offline.luau", "settings.luau", "rival.luau", "rivalnav.luau", "mating.luau", "inspect.luau", "worldmap.luau", "world_client.luau", "garden_life.luau", "selftest.luau", "nature.luau", "nature_client.luau", "title.luau", "lock.luau", "quiet.luau", "preserve.luau", "selftest_preserve.luau", "shadows.luau", "bodies.luau", "living_world.luau", "station_threats.luau", "minimal_hud.luau", "compact_layout.luau", "verge_litter.luau", "route_preparation.luau", "dog_gait.luau", "station_debug.luau"]:
+    for test_file in named or ["rest_compression.luau","rest_storage.luau","foundation.luau","rare_sightings.luau","spawn_clearance.luau","feeding_survival.luau","run.luau", "perception.luau", "sensor.luau", "prey.luau", "life.luau", "checkpoint.luau", "wasp.luau", "gaze.luau", "perception_view.luau", "scenarios.luau", "client_smoke.luau", "perception_client.luau", "client_ant.luau", "client_rival.luau", "client_mating.luau", "look.luau", "idle.luau", "world.luau", "flies.luau", "eyes.luau", "hud.luau", "peacock.luau", "antmimic.luau", "tarantula.luau", "continuing.luau", "growth.luau", "notebook.luau", "state.luau", "state_client.luau", "state_offline.luau", "settings.luau", "rival.luau", "rivalnav.luau", "mating.luau", "inspect.luau", "worldmap.luau", "world_client.luau", "garden_life.luau", "selftest.luau", "nature.luau", "nature_client.luau", "title.luau", "lock.luau", "quiet.luau", "preserve.luau", "selftest_preserve.luau", "shadows.luau", "bodies.luau", "living_world.luau", "station_threats.luau", "minimal_hud.luau", "compact_layout.luau", "verge_litter.luau", "route_preparation.luau", "dog_gait.luau", "station_debug.luau"]:
         if not (HERE / test_file).exists():
             print(f"no such test file: {test_file} (names are relative to tests/, for example look.luau)", file=sys.stderr)
             status = 1

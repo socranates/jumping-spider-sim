@@ -17,6 +17,7 @@ local SaveRules = require(Shared.Data.SaveRules)
 local SaveStores = require(Shared.Persistence.SaveStores)
 local SaveService = require(script.Parent.SaveService)
 local DataStoreBackend = require(script.Parent.DataStoreBackend)
+local RestCompression = require(script.Parent.RestCompression)
 
 local isStudio = RunService:IsStudio()
 local isTestPlace = ServerScriptService:FindFirstChild("PortTests") ~= nil
@@ -24,9 +25,12 @@ local storeName = SaveStores.name(isStudio, isTestPlace, Workspace:GetAttribute(
 
 -- The real DataStore when the service can be asked for one; otherwise an unavailable backend: session-only, never a misleading Saved status.
 local backend: any
-local okStore, store = pcall(function(): any return game:GetService("DataStoreService"):GetDataStore(storeName) end)
+local okStore, store = pcall(function(): any
+	local dataStore=game:GetService("DataStoreService"):GetDataStore(storeName)
+	return DataStoreBackend.new(dataStore,RestCompression.engine())
+end)
 if okStore and store ~= nil then
-	backend = DataStoreBackend.new(store)
+	backend = store
 else
 	warn("[Windowsill] saves: no DataStore service (" .. tostring(store) .. "); saving stays in memory for this server")
 	backend = {

@@ -32,9 +32,21 @@ assert len(rows)==75 and sum(int(r[1]) for r in rows)==444664 and all(int(r[2])=
 assert '[SELFTEST] END pass=41 fail=0 skip=0' in clean
 assert '[SELFTEST] END pass=274 fail=0 skip=0' in clean
 assert not re.search(r'\[SELFTEST\] FAIL|^FAIL|##\[error\]',clean,re.M)
+old_windows=json.loads((HERE.parent/'local-return/windows-full-process.json').read_text(encoding='utf8'))
+old_summary=json.loads((HERE/'prior-windows-full.json').read_text(encoding='utf8'))
+assert old_windows['source']==old_summary['source']==BASE and old_windows['exit_code']==old_summary['exit_code']==1
+for name,digest in old_windows['inputs'].items():assert sha(base[name])==digest,name
+old_text=(HERE.parent/'local-return/windows-full.txt').read_text(encoding='utf8')
+assert sha(old_text.encode())==old_summary['log_sha256']
+old_rows=re.findall(r'^([A-Z_0-9 ]+) passed=(\d+) failed=(\d+)',old_text,re.M)
+assert len(old_rows)==old_summary['suites']==75
+assert sum(int(r[1]) for r in old_rows)==old_summary['passed']==444661
+assert sum(int(r[2]) for r in old_rows)==old_summary['failed']==3
+assert [(r[0],r[1],r[2]) for r in old_rows if int(r[2])]==[('SELFTEST','3','2'),('SELFTEST_PRESERVE','6','1')]
 receipt=dict(source=SOURCE,current_workspace_inputs_verified=True,linux_run=ci['id'],linux_suites=75,linux_passed=444664,failed=0,
  modules_compiled=222,strict_clean=True,runner_regressions=5,shim_selftest_checks=[41,274],
  native_historical_source='07234cae75b5a62b820dc6dda830dce7e503c36b',native_historical_assertions=22,
+ historical_windows_source=BASE,historical_windows_full_suites=75,historical_windows_passed=444661,historical_windows_failed=3,
  current_source_native_verified=False,current_source_windows_full_verified=False,save_cost_measurements_pending=True,
  rig_candidate_adopted=False,hard_frame_budget_proven=False,goal_complete=False,published=False)
 (HERE/'verification.json').write_text(json.dumps(receipt,indent=2)+'\n',encoding='utf8',newline='\n')

@@ -1,0 +1,28 @@
+{
+  "source": "bc7783098ef256d08306eb7f7191015d721c6ad1",
+  "run_id": "1792684286679",
+  "assertions": 10,
+  "observed_wait_frames": 2330,
+  "actual_owner_elapsed_seconds": 40.014088,
+  "probe_seconds": 39.940666,
+  "max_probe_wait_gap_seconds": 0.309478,
+  "preparation_slices": 138078,
+  "viewport": [
+    1105.0,
+    433.0
+  ],
+  "place_sha256": "20abf3e805f7615fb2a7804ea6299fe8ec0378b656a21f755308601267089722",
+  "probe_sha256": "fdb2123252e2745feb6eaca821f47d6c050442044fc2c096e643b0c7a01046e3",
+  "output_sha256": "f5e0164f8c9986080f46aa3f2d6365d891ee6f5955f72087f066fa0fe5a2c94c",
+  "creator_errors": 0,
+  "expected_timeout_warnings": 1,
+  "other_creator_warnings": 1,
+  "production_clock_and_timeout_unchanged": true,
+  "native_elapsed_timeout_verified": true,
+  "persistence_disabled": true,
+  "physical_input_verified": false,
+  "phone_verified": false,
+  "network_streaming_verified": false,
+  "published": false,
+  "scope": "Actual controller elapsed timeout with surface advance deliberately stalled. Real production clock/40-second constant, splash and state hold. One foreground desktop trial; not full load time, representative FPS or background throttle proof."
+}

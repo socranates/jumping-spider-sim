@@ -1,5 +1,5 @@
 {
-  "as_of_utc": "2026-10-22T15:35:06.202168+00:00",
+  "as_of_utc": "2026-10-22T15:53:54.160830+00:00",
   "source": "bc7783098ef256d08306eb7f7191015d721c6ad1",
   "evidence_id": "ab5a28c0ff450435",
   "goal_complete": false,
@@ -24,11 +24,12 @@
     },
     {
       "id": "cli-and-runner",
-      "status": "linux-verified-windows-pending",
-      "evidence_boundary": "bc77830: Linux39803485593 completed65 suites/443884 passed/0 failed,217 compile, strict, runner5 and pinned tool downloads verified.489 focused checks/7 suites pass locally. Windows28050 remains active. Rejected8f16 Linux/partial Windows logs retained; rare fixture corrected265/0.",
+      "status": "verified-current",
+      "evidence_boundary": "bc77830: Windows28050 and Linux39803485593 each completed65 suites/443884 passed/0 failed.217 compile, strict, runner5 and pinned CI tool downloads verified.489 focused checks/7 suites pass. Rejected8f16 Linux/partial Windows logs retained; rare fixture corrected265/0.",
       "references": [
-        "docs/startup-world-readiness/receipt.json",
-        "docs/startup-world-readiness/progress.json"
+        "docs/navigation-startup/receipt.json",
+        "docs/navigation-startup/progress.json",
+        "docs/navigation-startup/ci-final.json"
       ]
     },
     {
@@ -199,7 +200,7 @@
     {
       "id": "code-review-and-startup",
       "status": "partial",
-      "evidence_boundary": "A12 now stops partial home startup and retains recovery UI in targeted tests. Some Shared imports still wait, and a yielding splash dependency lookup is not bounded by the frame-loop deadline. Native cold boot/failure timing remains unverified; exhaustive behavioral review and SpiderClient split remain open.",
+      "evidence_boundary": "A12 now stops partial home startup and retains recovery UI in targeted tests. Some Shared imports still wait, and a yielding splash dependency lookup is not bounded by the frame-loop deadline. Current foreground native controller/recovery and40.014088-second timeout verified; full cold boot/background timing remains open; exhaustive behavioral review and SpiderClient split remain open.",
       "references": [
         "docs/audit/CODE-REVIEW.md",
         "docs/audit/current-source/MAP.md"
@@ -253,10 +254,11 @@
     {
       "id": "startup-A12",
       "status": "implemented-current-verification-pending",
-      "evidence_boundary": "Missing World/home/collision and unknown streamed identity no longer admit a partial playable client. Healthy/legacy flat paths, late readiness, timeout/error visibility, deferred disposal and failed-subscription cleanup pass54 focused checks; client/preserve1181 more. Native timing and legibility remain open. Earlier8e02-source full Windows/Linux gates443869 each and native isolated components12 cases/38 assertions pass. Whole-game cold load, actual streaming, phone layouts and measured timing remain open. Current navigation integration adds native10-success/8-failure assertions, including actual recovery text.40-second navigation timeout is not a native elapsed-time measurement.",
+      "evidence_boundary": "Missing World/home/collision and unknown streamed identity no longer admit a partial playable client. Healthy/legacy flat paths, late readiness, timeout/error visibility, deferred disposal and failed-subscription cleanup pass54 focused checks; client/preserve1181 more. Current desktop recovery legibility is verified; total cold load, other viewports and background timing remain open. Earlier8e02-source full Windows/Linux gates443869 each and native isolated components12 cases/38 assertions pass. Whole-game cold load, actual streaming, phone layouts and measured timing remain open. Current navigation integration adds native10-success/8-failure assertions, including actual recovery text.A separate real-clock native trial passed10 assertions, failing at40.014088 seconds and retaining readable recovery UI; stalled surface fixture, foreground desktop only.",
       "references": [
         "docs/startup-world-readiness/README.md",
-        "docs/startup-world-readiness/receipt.json"
+        "docs/startup-world-readiness/receipt.json",
+        "docs/navigation-startup/native-timeout-receipt.json"
       ]
     }
   ]

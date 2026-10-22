@@ -2,7 +2,7 @@
 from pathlib import Path
 import argparse,hashlib,json,subprocess,zlib,xml.etree.ElementTree as ET
 ROOT=Path(__file__).resolve().parents[2];HERE=Path(__file__).resolve().parent;PORT=ROOT/'roblox_port'
-p=argparse.ArgumentParser();p.add_argument('--source',required=True);p.add_argument('--rojo',required=True);p.add_argument('--out',required=True);p.add_argument('--case',choices=['success','failure'],required=True);a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--source',required=True);p.add_argument('--rojo',required=True);p.add_argument('--out',required=True);p.add_argument('--case',choices=['success','failure','timeout'],required=True);a=p.parse_args()
 out=Path(a.out).resolve();assert not out.exists();out.mkdir(parents=True)
 source=subprocess.check_output(['git','rev-parse',a.source+'^{commit}'],cwd=ROOT,text=True).strip()
 for line in subprocess.check_output(['git','ls-tree','-rz',source,'roblox_port/src'],cwd=ROOT).split(b'\0'):
@@ -16,7 +16,8 @@ def absolute(node):
    if key=='$path':node[key]=str(PORT/value)
    else:absolute(value)
 absolute(project)
-tree=project['tree'];tree['StarterPlayer']['StarterPlayerScripts']['Client']['SilkPlayback']={'$path':str(HERE/'native-probe.luau')}
+probe='timeout-probe.luau' if a.case=='timeout' else 'native-probe.luau'
+tree=project['tree'];tree['StarterPlayer']['StarterPlayerScripts']['Client']['SilkPlayback']={'$path':str(HERE/probe)}
 tree['Workspace']['$attributes']={'World':'preserve','Detail':'full','SelfTest':False,'TestTarget':False,'Wasp':True,'Cat':True,'Bird':True,'Frog':True,'StartupNavigationProbe':True,'StartupNavigationCase':a.case}
 config=out/'native.project.json';config.write_text(json.dumps(project,indent=2),encoding='utf-8',newline='\n')
 place=out/'Windowsill-navigation-startup-review.rbxlx';subprocess.run([a.rojo,'build',str(config),'-o',str(place)],check=True)

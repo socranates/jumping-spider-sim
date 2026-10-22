@@ -15,5 +15,14 @@
   "linux_ci_verified": true,
   "linux_passed": 443884,
   "linux_failed": 0,
-  "windows_full_complete": false
+  "windows_full_complete": true,
+  "windows_passed": 443884,
+  "windows_failed": 0,
+  "windows_suites": 65,
+  "windows_log_sha256": "690e851aa851a7a65ea72ddf83827effe77a7a69c1e249d9e9983d88ab40dc17",
+  "windows_terminal_exit_code": 0,
+  "native_elapsed_timeout_verified": true,
+  "native_elapsed_timeout_assertions": 10,
+  "native_navigation_assertions_total": 28,
+  "studio_closed": true
 }

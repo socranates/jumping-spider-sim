@@ -72,10 +72,13 @@ for mode in ['success','failure']:
    assert '[NAVIGATION_NATIVE_DONE] '+n['run_id']+' '+mode+' '+str(n['assertions'])+' ' in text
    native_modes.append(mode)
 full=False
+windows_log_sha256=None
 if (HERE/'windows-full-process.json').exists():
  assert read('windows-full-process.json')['exit_code']==0
  rows=re.findall(r'^([A-Z_0-9 ]+) passed=(\d+) failed=(\d+)',(HERE/'windows-full.txt').read_text(encoding='utf8'),re.M)
  assert len(rows)==65 and sum(int(r[1]) for r in rows)==443884 and all(int(r[2])==0 for r in rows);full=True
+ windows_log_sha256=sha((HERE/'windows-full.txt').read_bytes())
+ assert read('progress.json')['windows_log_sha256']==windows_log_sha256
 ci=read('ci-final.json') if (HERE/'ci-final.json').exists() else None
 if ci:
  assert ci['head_sha']==SOURCE and ci['conclusion']=='success' and ci['passed']==443884 and ci['suites']==65
@@ -101,8 +104,26 @@ if (HERE/'replay-v2/comparison.json').exists():
    (snap/'roblox_port/tests/controller_replay.luau').write_text(fixture,encoding='utf8',newline='\n')
    assert sha(runner['bundle']('controller_replay.luau').encode())==row['bundle_sha256']
  replay=True
+timeout=False
+if (HERE/'native-timeout-receipt.json').exists():
+ n=read('native-timeout-receipt.json');m=read('prepared-timeout-manifest.json')
+ assert n['source']==SOURCE==m['source'] and m['case']=='timeout' and m['persistence_disabled']
+ scripts={r['path']:r['sha256'] for r in m['scripts']};assert len(scripts)==len(m['scripts'])==218
+ assert {p:scripts[p] for p in expected}==expected
+ assert scripts['StarterPlayer.StarterPlayerScripts.Client.SilkPlayback']==n['probe_sha256']==sha((HERE/'timeout-probe.luau').read_bytes())
+ assert n['place_sha256']==m['place_sha256'] and n['assertions']==10 and n['creator_errors']==0
+ assert n['production_clock_and_timeout_unchanged'] and n['actual_owner_elapsed_seconds']>=40
+ output=(HERE/'native-timeout-output.txt').read_bytes();assert sha(output)==n['output_sha256']
+ text=output.decode();assert '[NAVIGATION_TIMEOUT_FAIL]' not in text and '[FLog::CreatorError]' not in text
+ assert '[NAVIGATION_NATIVE_GUARD] '+SOURCE+' 218 persistence_disabled' in text
+ match=re.search(r'\[NAVIGATION_TIMEOUT_DONE\] '+n['run_id']+r' 10 (\d+) ([0-9.]+) ([0-9.]+) ([0-9.]+) (\d+) ([0-9.]+) ([0-9.]+)',text)
+ assert match and int(match[1])==n['observed_wait_frames'] and float(match[2])==n['actual_owner_elapsed_seconds']
+ assert float(match[3])==n['probe_seconds'] and float(match[4])==n['max_probe_wait_gap_seconds'] and int(match[5])==n['preparation_slices']
+ assert [float(match[6]),float(match[7])]==n['viewport']
+ assert len([s for s in text.splitlines() if '[FLog::CreatorWarning]' in s and 'navigation preparation timed out' in s])==1
+ timeout=True
 receipt=dict(source=SOURCE,base=BASE,evidence_id='ab5a28c0ff450435',production_modules=217,changed_modules=sorted(changed),
  paired_regression_baseline_pass=10,paired_regression_baseline_fail=5,startup_cases_passed=15,targeted_suites=7,targeted_passed=489,
  compile_passed=217,strict_clean=True,runner_regressions=5,production_sha256=h,test_artifact_rejected=True,
- windows_full_complete=full,linux_ci_verified=bool(ci),native_prepared_cases=prepared,native_startup_paths_verified=len(native_modes)==2,native_startup_assertions=18 if len(native_modes)==2 else 0,native_verified=False,bounded_controller_replay_verified=replay,full_controller_moving_input_replay_verified=False,published=False,publication_ready=False)
+ windows_full_complete=full,windows_log_sha256=windows_log_sha256,linux_ci_verified=bool(ci),native_prepared_cases=prepared,native_startup_paths_verified=len(native_modes)==2,native_startup_assertions=18 if len(native_modes)==2 else 0,native_elapsed_timeout_verified=timeout,native_elapsed_timeout_assertions=10 if timeout else 0,native_verified=False,bounded_controller_replay_verified=replay,full_controller_moving_input_replay_verified=False,published=False,publication_ready=False)
 (HERE/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n',encoding='utf8',newline='\n');print(json.dumps(receipt,indent=2))

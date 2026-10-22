@@ -1,0 +1,7 @@
+2026-10-22T15:51:04.552Z,87.552544,92a0,6,Info [FLog::CreatorOutput] [NAVIGATION_NATIVE_GUARD] bc7783098ef256d08306eb7f7191015d721c6ad1 218 persistence_disabled
+2026-10-22T15:51:19.188Z,102.188904,92a0,6,Info [FLog::CreatorOutput] [Windowsill] world: The Preserve (preserve)
+2026-10-22T15:51:19.195Z,102.195930,92a0,6,Info [FLog::CreatorOutput] [Windowsill] sun: through the window, clock 10, latitude -40.7
+2026-10-22T15:51:26.151Z,109.151314,6220,6,Warning [FLog::CreatorWarning] Warning: ContentId: rbxassetid://203785492 failed due to: Asset type does not match requested type
+2026-10-22T15:51:26.269Z,109.269432,49fc,6,Info [FLog::CreatorOutput] [NAVIGATION_TIMEOUT_BEGIN] 1792684286679
+2026-10-22T15:52:06.161Z,149.161606,7744,6,Warning [FLog::CreatorWarning] Warning: [Windowsill] navigation startup: ReplicatedStorage.Shared.World.NavigationPreparation:27: navigation preparation timed out
+2026-10-22T15:52:06.210Z,149.210526,7744,6,Info [FLog::CreatorOutput] [NAVIGATION_TIMEOUT_DONE] 1792684286679 10 2330 40.014088 39.940666 0.309478 138078 1105 433

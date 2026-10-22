@@ -19,7 +19,8 @@
   "runner_regressions": 5,
   "production_sha256": "be8057c50851efc8f68c44c9703c3d5b51d1ec692b070e68a8f8eecd72365484",
   "test_artifact_rejected": true,
-  "windows_full_complete": false,
+  "windows_full_complete": true,
+  "windows_log_sha256": "690e851aa851a7a65ea72ddf83827effe77a7a69c1e249d9e9983d88ab40dc17",
   "linux_ci_verified": true,
   "native_prepared_cases": [
     "success",
@@ -27,6 +28,8 @@
   ],
   "native_startup_paths_verified": true,
   "native_startup_assertions": 18,
+  "native_elapsed_timeout_verified": true,
+  "native_elapsed_timeout_assertions": 10,
   "native_verified": false,
   "bounded_controller_replay_verified": true,
   "full_controller_moving_input_replay_verified": false,

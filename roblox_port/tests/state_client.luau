@@ -31,6 +31,8 @@ case("the words: saved, saving, trouble and off each say what is true, with the 
 	check(SaveText.menuLine("saved", nil) == SaveText.SAVED and string.find(SaveText.SAVED, "saved", 1, true) ~= nil, "saved")
 	check(SaveText.menuLine("saving", nil) == "Saving...", "saving")
 	check(string.find(SaveText.menuLine("saving", "write_failed"), "trouble", 1, true) ~= nil, "trouble")
+	check(SaveText.menuLine("saving", "rest_refused") == SaveText.REST_REFUSED, "rejected rests do not promise an automatic retry")
+	check(SaveText.toast("saved", nil, "saving", "rest_refused") == SaveText.REST_REFUSED and SaveText.toast("saving", "rest_refused", "saving", "rest_refused") == "", "rejected rest is announced once")
 	check(SaveText.menuLine(nil, nil) == SaveText.LOOKING, "not yet known")
 	for _, reason in SaveRules.REASONS do
 		if reason ~= "write_failed" then
@@ -518,3 +520,4 @@ case("a saving that raises leaves the frame running, says once that saving is of
 end)
 
 print(`STATE_CLIENT passed={passed} failed={failed}`)
+if failed > 0 then error("state_client checks failed") end

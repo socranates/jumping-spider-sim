@@ -57,7 +57,7 @@ SaveRules.CLIENT_WAIT_REPLY = 4 -- and this long for the first reply after sayin
 
 -- ---------------------------------------------------------------- words for statuses
 SaveRules.STATUS = { saved = "saved", saving = "saving", session = "session" } -- session: this visit only
-SaveRules.REASONS = { "offline", "no_api", "load_failed", "other_session", "corrupt", "newer", "write_failed" } :: { string }
+SaveRules.REASONS = { "offline", "no_api", "load_failed", "other_session", "corrupt", "newer", "write_failed", "rest_refused" } :: { string }
 
 -- The slot a life's rests are filed in: free play's own, the main life on the gentle rules (Easy) its own, and the standard main life the key it always had.
 function SaveRules.slotOf(mode: string, rules: string): string

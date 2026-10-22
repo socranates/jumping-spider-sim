@@ -56,6 +56,7 @@ function SaveSession.new(cfg: Config): any
 		restBase = {} :: { [string]: number }, -- updatedAt of the rest this session last read or wrote (nil: unknown)
 		restPending = {} :: { [string]: any }, restPendingTime = {} :: { [string]: number },
 		restLoaded = {} :: { [string]: boolean }, restRetryAt = 0,
+		restRejected = {} :: { [string]: boolean }, -- a locally kept rest the server could not accept
 		lockHeld = false, busy = false, closed = false,
 		lastStatus = "", lastReason = "",
 		counters = { requests = 0, writes = 0, rejected = 0 },
@@ -86,6 +87,7 @@ end
 function SaveSession.status(self: any): (string, string?)
 	if self.state == "session" then return SaveRules.STATUS.session, self.reason end
 	if self.state == "loading" then return SaveRules.STATUS.saving, nil end
+	if next(self.restRejected) ~= nil then return SaveRules.STATUS.saving, "rest_refused" end
 	if self.busy or self.sched:anyDirty() or not SaveSession.restsLoaded(self) then
 		local trouble = false
 		for _, item in self.sched.items do
@@ -267,9 +269,12 @@ function SaveSession.setRest(self: any, mode: string, record: any): boolean
 	if #problems > 0 then
 		self.counters.rejected += 1
 		log(self, `the {mode} rest was refused: {problems[1]}`)
+		self.restRejected[mode] = true
+		self:notify()
 		return false
 	end
 	local now = self.now()
+	self.restRejected[mode] = nil
 	self.restPending[mode], self.restPendingTime[mode] = record, now
 	self.sched:markDirty("rest_" .. mode, now)
 	self:notify()

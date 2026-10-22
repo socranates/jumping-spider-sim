@@ -189,6 +189,9 @@ check("Normal after the first day: no walk hint, no card, no crack how-to, no ai
 	assert(words("PromptTitle") == "" and words("PromptHint") == "", `the crack's how-to: {words("PromptTitle")} / {words("PromptHint")}`)
 	press("Feed")
 	assert(life.resting and string.find(words("PromptTitle"), "Resting", 1, true) ~= nil and words("PromptHint") == "", `resting: {words("PromptTitle")} / {words("PromptHint")}`)
+	local awaitRest=require("./studio/AwaitRest")
+	assert(life.checkpointResult and awaitRest(life.checkpointResult,function() frame(0) end).ok,"rest preparation completed")
+	frame(0)
 	assert(words("Notice") == "Last rest kept.", "the rest kept: " .. words("Notice"))
 	press("Feed")
 	-- a notice line by line: ready to moult, short

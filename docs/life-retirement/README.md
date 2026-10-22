@@ -1,4 +1,4 @@
-# New Life retirement â€” candidate verification
+# New Life retirement — candidate verification
 
 Branch `codex/life-retirement`; runtime source `5cf7b4c0f212082342574763aaf5b19e00c4e323`; evidence `b3b1a047e958d966`. Based on the verified, unpublished compression candidate. **Not published**. Live baseline remains v51 / place version 140.
 
@@ -23,7 +23,7 @@ New Life / Another use the new boundary. Carry On / Follow continue the existing
 - Frozen source compilation: **216/216**, `-O0`, per-file hashes in `compile.json`.
 - Full Windows run live in `cli-final.txt`; terminal exit and totals pending. Do not count a running suite as passed.
 - Linux run [39728136498](https://github.com/socranates/jumping-spider-sim/actions/runs/39728136498) launched for exact runtime source; final result pending.
-- Final local Studio review copy is prepared; final source guard, native probe and foreground preserve self-test are pending. The earlier 814995d copy passed its native codec/retirement probe but its full preserve run was stopped for the boundary fix. `native-before-boundary.txt` is historical evidence only.
+- Final local Studio review copy matched **216/216 source fingerprints** and evidence `b3b1a047e958d966` at 2026-10-22T05:30:20Z. The native codec/retirement probe passed at 2026-10-22T05:30:50Z using the 2,276,508-character actual-engine synthetic checkpoint and a local memory backend (227,282 native stored JSON characters after the new rest). The foreground preserve self-test is running; its final result is pending. The earlier 814995d copy passed its native codec/retirement probe but its full preserve run was stopped for the boundary fix. `native-before-boundary.txt` is historical evidence only.
 - The native probe uses the earlier actual-engine 233-region synthetic checkpoint with the real codec and SaveSession, backed by a local table adapter. It checks legacy read, durable marker/backup, quit/rejoin, stale rest refusal and exact simulation fields. It never accesses DataStoreService and is not online persistence evidence.
 
 ## Remaining release gates

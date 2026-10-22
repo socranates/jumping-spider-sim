@@ -1,0 +1,39 @@
+{
+  "candidate": {
+    "branch": "codex/life-retirement",
+    "source_commit": "5cf7b4c0f212082342574763aaf5b19e00c4e323",
+    "evidence_id": "b3b1a047e958d966"
+  },
+  "published": false,
+  "source_manifest_matches": true,
+  "compile_fingerprints_match": true,
+  "computed_evidence_id": "b3b1a047e958d966",
+  "local_cli": {
+    "completed_summaries": 20,
+    "passed": 45969,
+    "failed": 0,
+    "failure_lines": []
+  },
+  "local_process": null,
+  "ci": null,
+  "native": null,
+  "retirement_probe_pass": false,
+  "offline_gates_pass": false,
+  "online_store_attempt": null,
+  "actual_client_rejoin_verified": false,
+  "performance_matrix_complete": false,
+  "physical_phone_tested": false,
+  "publication_ready": false,
+  "builds": [
+    {
+      "path": "roblox_port/TheWindowsill.rbxlx",
+      "bytes": 3091506,
+      "sha256": "e3cdac297a897037d6944e4d39ba34dcef813a0d139c5fdd2fdae09991789b9a"
+    },
+    {
+      "path": "roblox_port/TheWindowsillTests.rbxlx",
+      "bytes": 3293792,
+      "sha256": "e88cf5f3b496a099d8904e24a0863ff3c80f0b104fa4d51b5e9182731fb116e5"
+    }
+  ]
+}

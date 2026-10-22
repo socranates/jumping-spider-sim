@@ -11,5 +11,14 @@
     "ci_run": 39727205382,
     "ci_result": "cancelled",
     "reason": "Stamped size boundary and title-screen confirmation fixes"
+  },
+  "native": {
+    "window_id": 161156708,
+    "review_file": "C:\\Users\\natha\\claude-xfer\\Windowsill-life-retirement-b3b1-native-review.rbxlx",
+    "log": "C:\\Users\\natha\\AppData\\Local\\Roblox\\logs\\0.744.0.7441077_20261022T052922Z_Studio_58163_last.log",
+    "source_guard": "216/216",
+    "retirement_probe_pass": true,
+    "preserve_self_test": "running; no final result yet",
+    "production_store_touched": false
   }
 }

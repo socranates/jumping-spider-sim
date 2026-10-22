@@ -90,16 +90,21 @@ export type Result = { ok: boolean, message: string, errors: { string }, record:
 -- `store` is DataStore-shaped (GetAsync, SetAsync, RemoveAsync). `validate(record)` returns the record's problems (an empty
 -- list for a good one): the world's own checks (Checkpoint.check).
 function CheckpointStore.new(store: any, validate: (any) -> { string }, key: string?): any
-	return setmetatable({ store = store, validate = validate, key = key or "checkpoint", last = nil :: Result?,
+	return setmetatable({ store = store, validate = validate, key = key or "checkpoint", last = nil :: Result?, knownRest = false,
 		placed = nil :: { checksum: string, text: string }?, -- (ROBLOX-108) the entry this store last put in place, by its checksum and its record's text
 	}, CheckpointStore)
 end
+
+-- Advisory menu availability only: a successful local read/write established a
+-- rest. Never use this as validation or authority; load/restore still check it.
+function CheckpointStore.hasKnownRest(self:any):boolean return self.knownRest==true end
 
 local function result(self: any, ok: boolean, message: string, errors: { string }?, extra: { [string]: any }?): Result
 	local r: any = { ok = ok, message = message, errors = errors or {} }
 	local more: { [string]: any } = extra or {}
 	for k, v in more do r[k] = v end
 	self.last = r
+ if ok then self.knownRest=true end
 	return r
 end
 

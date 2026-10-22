@@ -1689,5 +1689,20 @@ case("prepared restore is private, single-use and commits outside its worker",fu
  check(refused==nil and fingerprint(w)==after,"corrupt prepared restore leaves current world intact")
 end)
 
+case("known-rest menu hint never substitutes for restore validation",function()
+ local w=newWorld();for _=1,120 do tick(w) end
+ local record=assert(Checkpoint.capture(w,0));local before=fingerprint(w)
+ check(not w.store:hasKnownRest(),"new local store has no known rest")
+ check(w.store:save(record).ok and w.store:hasKnownRest(),"verified save supplies advisory availability")
+ local validate=w.store.validate;local calls=0
+ w.store.validate=function(r) calls+=1;return validate(r) end
+ for _=1,20 do w.store:hasKnownRest() end
+ check(calls==0,"menu availability never decodes or validates a record")
+ w.dataStore.data.checkpoint.checkpoint.snapshot_tick+=1
+ local loaded=w.store:loadBest()
+ check(not loaded.ok and w.store:hasKnownRest(),"advisory hint cannot make a corrupted entry loadable")
+ check(fingerprint(w)==before,"failed load still preserves live world")
+end)
+
 print(`CHECKPOINT passed={passed} failed={failed}`)
 if failed > 0 then error("CHECKPOINT failed") end

@@ -92,6 +92,11 @@ local function settled()
  for _=1,10000 do if not d.saveState.restore.job then return end;frames(1) end
  error("controller preparation did not finish")
 end
+d.saveClient.bound.cfg.offerWork.options=d.saveState.restore.cfg.workOptions
+local function offersDone()
+ for _=1,10000 do if not d.saveClient:offerPending() then return end;frames(1) end
+ error("controller offer preparation did not finish")
+end
 local sequence=0
 local function reply(msg) sequence+=1;msg.sequence=sequence;msg.epoch="menu-session";if msg.kind=="loaded" then msg.v=3 end;R.deliver(msg) end
 local function advance() time+=6;frames(2) end
@@ -108,7 +113,9 @@ end
 frames(20);check(firedOf("hello")[1].v==3,"actual game negotiates3")
 local records={main=storedRest("main"),free=storedRest("free"),easy=storedRest("easy")}
 local offers={};for _,mode in SaveRules.MODES do offers[mode]={id="offer_"..mode,record=records[mode],protected=false} end
-reply({kind="loaded",status="session",reason="other_session",progress=SaveProgress.snapshot({opened={},eye_seconds=0},true,nil,{}),offers=offers});frames(30);d.session.started=false;d.openMenu()
+reply({kind="loaded",status="session",reason="other_session",progress=SaveProgress.snapshot({opened={},eye_seconds=0},true,nil,{}),offers=offers})
+check(d.saveClient:offerPending() and not d.saveClient:offerInfo("main"),"network offer remains private while queued")
+offersDone();frames(30);d.session.started=false;d.openMenu()
 check(not d.stores.main:loadBest().ok and not d.stores.easy:loadBest().ok,"viewing offers never adopts local rests")
 check(find("SpiderLifeMenu","Continue") and find("SpiderLifeMenu","ContinueEasy"),"remote menu choices")
 check(string.find(find("SpiderLifeMenu","Continue").Text,"without saving",1,true),"temporary continuation described before choice")
@@ -137,9 +144,15 @@ check(rest and rest.mode=="main" and rest.credential=="grant_main" and #SaveRest
 check(d.saveClient:status()=="saving","no Saved before storage receipt")
 reply({kind="stored",mode="main",serial=first.serial,credential="grant_main",restSerial=rest.restSerial});frames(2)
 check(d.saveClient:status()=="saved","durable receipt confirms controller save")
+local CheckpointStore=require("../src/Shared/Persistence/CheckpointStore")
+local load=CheckpointStore.loadBest;local reads=0
+CheckpointStore.loadBest=function(self) reads+=1;return load(self) end
+d.openMenu()
+CheckpointStore.loadBest=load
+check(reads==0 and find("SpiderLifeMenu","Continue"),"menu renders known rest availability without decoding or hashing its record")
 decide(first,3,"changed",nil,"changed")
 local newer=Json.copy(records.main);newer.player.position[1]+=1
-reply({kind="offer",mode="main",offer={id="new_main",record=newer,protected=false}});frames(2);d.openMenu()
+reply({kind="offer",mode="main",offer={id="new_main",record=newer,protected=false}});offersDone();d.openMenu()
 check(find("SpiderLifeMenu","RemoteMain"),"changed recovery offers replacement")
 local current=assert(Json.canonical(d.stores.main:loadBest().record));local active=d.motor.pos
 d.menu:choose("RemoteMain")
@@ -147,7 +160,7 @@ check(find("SpiderLifeMenu","CancelLoad") and string.find(find("SpiderLifeMenu",
 reply({kind="offer",mode="main",offer={id="newest_main",record=records.main,protected=false}});d.menu:choose("RemoteMain")
 check(d.saveClient:decision("main").state=="changed" and Json.canonical(d.stores.main:loadBest().record)==current,"offer change during confirmation cannot silently rebind")
 check((d.motor.pos-active).Magnitude<.01,"stale choice preserves running spider")
-d.menu:choose("RemoteMain");d.menu:choose("CancelLoad")
+offersDone();d.openMenu();d.menu:choose("RemoteMain");d.menu:choose("CancelLoad")
 check(Json.canonical(d.stores.main:loadBest().record)==current,"cancel preserves local world")
 d.menu:choose("RemoteMain");d.menu:choose("RemoteMain");local second=intent("main",first.serial);settled()
 check(second.offerId=="newest_main","new confirmation binds refreshed explicit id")
@@ -161,7 +174,7 @@ end
 -- Restoration failure keeps the current live world/store and removes the new upload path.
 d.openMenu();local mainRequest=d.saveClient:decision("main")
 if mainRequest then decide({mode="main",intent=mainRequest.kind,serial=mainRequest.serial,offerId=mainRequest.offerId},mainRequest.revision+1,"changed",nil,"changed") end
-reply({kind="offer",mode="main",offer={id="failure-main",record=records.main,protected=false}});d.openMenu()
+reply({kind="offer",mode="main",offer={id="failure-main",record=records.main,protected=false}});offersDone();d.openMenu()
 local beforeStore=d.currentStore();local beforePosition=d.motor.pos
 local prepare=Checkpoint.prepare;Checkpoint.prepare=function() return nil,{"synthetic restore failure"} end
 local previousWarn=warn;getfenv().warn=function() end
@@ -174,8 +187,19 @@ d.openMenu();check(find("SpiderLifeMenu","RemoteMain"),"failed restore still all
 d.menu:choose("New")
 check(find("SpiderLifeMenu","CancelNew"),"New asks before replacing a running life")
 reply({kind="offer",mode="main",offer={id="changed-during-new",record=records.main,protected=false}})
+local pendingStore=d.currentStore();local pendingPosition=d.motor.pos
 d.menu:choose("New")
-check(d.saveClient:decision("main")==nil and d.saveClient:isTemporary("main"),"stale New confirmation revokes old permission and starts only a temporary life")
+check(d.currentStore()==pendingStore and (d.motor.pos-pendingPosition).Magnitude<.01,"New cannot replace the world while the displayed offer is unvalidated")
+offersDone()
+d.menu:choose("New");d.menu:choose("New")
+local explicitNew=d.saveClient:decision("main")
+check(explicitNew and explicitNew.kind=="new" and explicitNew.offerId=="changed-during-new" and d.currentStore()~=pendingStore,"after waiting, a fresh explicit confirmation binds the validated observation")
+-- A different observation that finishes while the confirmation is held still
+-- cannot silently replace that displayed id.
+d.openMenu();d.menu:choose("New")
+reply({kind="offer",mode="main",offer={id="changed-after-confirmation",record=records.main,protected=false}})
+offersDone();d.menu:choose("New")
+check(d.saveClient:decision("main")==nil and d.saveClient:isTemporary("main") and d.session.mode=="main","validated stale New confirmation revokes old permission and starts only a temporary life")
 d.session.finishedMain=false;d.openMenu()
 check(find("SpiderLifeMenu","Easy")==nil and find("SpiderLifeMenu","ContinueEasy")==nil,"Easy choices remain locked without the unlock")
 check(not d.menu:choose("Easy"),"locked Easy cannot be activated through menu choice")

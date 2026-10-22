@@ -5,7 +5,7 @@ local Continuation={}
 Continuation.__index=Continuation
 export type Config={rules:any,copy:(any)->any,validate:(string,any,boolean)->boolean,
  onLoaded:((any)->())?,onOffer:((string,any)->())?,onDecision:((any)->())?,
- onRestore:((string,any,number)->boolean?)?,onStatus:((string,string?)->())?}
+ onRestore:((string,any,number)->boolean?)?,onStatus:((string,string?)->())?,offerWork:any?}
 local function integer(n:any,max:number):boolean
  return type(n)=="number" and n==n and n>=1 and n<=max and n==math.floor(n)
 end
@@ -14,7 +14,7 @@ local function token(self:any,t:any):boolean return type(t)=="string" and #t>0 a
 local function callback(f:any,...:any) if f then f(...) end end
 function Continuation.new(cfg:Config):any
  return setmetatable({cfg=cfg,epoch=nil,loadedSeq=0,statusSeq=0,st=nil,why=nil,offers={},offerSeq={},decisionSeq={},requests={},
-  serial=0,buffer={},bufferEpoch=nil,lastLife=-1e9,lastRest=-1e9,lifeCursor=0,restCursor=0,refreshes={}},Continuation)
+  serial=0,buffer={},bufferEpoch=nil,offerJobs={},offerQueue={},offerErrors={},offerCursor=0,lastLife=-1e9,lastRest=-1e9,lifeCursor=0,restCursor=0,refreshes={}},Continuation)
 end
 local function offerValue(self:any,mode:string,value:any):any
  if type(value)~="table" or not token(self,value.id) or type(value.protected)~="boolean" or not self.cfg.validate(mode,value.record,true) then return nil end
@@ -36,20 +36,101 @@ end
 function Continuation.decision(self:any,mode:string):any
  local r=self.requests[mode];return if r then decisionValue(r) else nil
 end
-local function applyOffer(self:any,mode:any,value:any,seq:number,events:any)
- if not slot(self,mode) or seq<=(self.offerSeq[mode] or 0) then return end
+function Continuation.offerPending(self:any,mode:string?):boolean
+ for _,m in self.cfg.rules.MODES do
+  if mode==nil or mode==m then
+   for _,jobs in {self.offerJobs,self.offerQueue} do
+    local j=jobs[m]
+    if j and (self.epoch==nil or j.epoch==self.epoch) and j.seq>(self.offerSeq[m] or 0) then return true end
+   end
+  end
+ end
+ return false
+end
+function Continuation.offerReadProblem(self:any):boolean return next(self.offerErrors)~=nil end
+local function pruneOffers(self:any,mode:string):boolean
+ local changed=false
+ for _,jobs in {self.offerJobs,self.offerQueue} do
+  local j=jobs[mode]
+  if j and ((self.epoch~=nil and j.epoch~=self.epoch) or j.seq<=(self.offerSeq[mode] or 0)) then
+   jobs[mode]=nil;if j.work then j.work:cancel() end;changed=true
+  end
+ end
+ if not self.offerJobs[mode] and self.offerQueue[mode] then
+  self.offerJobs[mode]=self.offerQueue[mode];self.offerQueue[mode]=nil
+ end
+ return changed
+end
+local function publishOffer(self:any,mode:string,v:any,seq:number,events:any)
+ if seq<=(self.offerSeq[mode] or 0) then return end
  local previous=self.offers[mode]
- -- The id names an immutable server observation. Repeated deliveries cannot
- -- replace our already validated private record, even if their body differs.
+ if previous and v and previous.id==v.id then
+  if previous.protected~=v.protected then return end
+  v=previous -- queued repeats cannot redefine an id accepted during preparation
+ end
+ self.offerSeq[mode]=seq;self.offers[mode]=v;self.offerErrors[mode]=nil;pruneOffers(self,mode)
+ table.insert(events,function() if self.offerSeq[mode]==seq then callback(self.cfg.onOffer,mode,self:offerInfo(mode)) end end)
+end
+-- A network delivery transfers a stable record to this queue. Only scalar
+-- envelope fields are retained separately; no borrowed message is queued here.
+-- At most one active and one coalesced replacement per slot; one resume/frame.
+local function queueOffer(self:any,mode:string,value:any,seq:number,epoch:string,events:any):boolean
+ if type(value)~="table" or not token(self,value.id) or type(value.protected)~="boolean" or type(value.record)~="table" then return false end
+ local wasPending=self:offerPending(mode)
+ local a=self.offerJobs[mode];local q=self.offerQueue[mode]
+ if a and (a.seq==seq or (q and q.seq>=seq)) then return true end
+ local j={seq=seq,epoch=epoch,value={id=value.id,protected=value.protected,record=value.record},work=nil}
+ if not a then self.offerJobs[mode]=j else self.offerQueue[mode]=j end
+ if self.epoch~=nil and not wasPending then table.insert(events,function() callback(self.cfg.onOffer,mode,self:offerInfo(mode)) end) end
+ return true
+end
+local function applyOffer(self:any,mode:any,value:any,seq:number,events:any,owned:boolean?)
+ if not slot(self,mode) or seq<=(self.offerSeq[mode] or 0) then return end
+ pruneOffers(self,mode)
+ local previous=self.offers[mode]
+ -- Repeated immutable ids reuse their validated private record, even during
+ -- preparation of a different observation. A newer repeat fences out old work.
  if previous and type(value)=="table" and type(value.record)=="table" and value.id==previous.id then
   if value.protected~=previous.protected then return end
-  self.offerSeq[mode]=seq;return
+  self.offerSeq[mode]=seq;self.offerErrors[mode]=nil
+  if pruneOffers(self,mode) then table.insert(events,function() callback(self.cfg.onOffer,mode,self:offerInfo(mode)) end) end
+  return
  end
+ if owned and self.cfg.offerWork and self.offerWorkClosed then return end
+ if owned and self.cfg.offerWork and value~=nil then queueOffer(self,mode,value,seq,self.epoch,events);return end
  local v=if value~=nil then offerValue(self,mode,value) else nil
  if value~=nil and not v then return end
- if seq<=(self.offerSeq[mode] or 0) then return end
- self.offerSeq[mode]=seq;self.offers[mode]=v
- table.insert(events,function() if self.offerSeq[mode]==seq then callback(self.cfg.onOffer,mode,self:offerInfo(mode)) end end)
+ publishOffer(self,mode,v,seq,events)
+end
+function Continuation.closeOffers(self:any)
+ self.offerWorkClosed=true;self.offerErrors={}
+ for _,jobs in {self.offerJobs,self.offerQueue} do
+  for mode,j in jobs do if j.work then j.work:cancel() end;jobs[mode]=nil end
+ end
+end
+function Continuation.stepOffers(self:any)
+ if not self.cfg.offerWork or self.offerWorkClosed or self.epoch==nil then return end
+ for _=1,#self.cfg.rules.MODES do
+  self.offerCursor=self.offerCursor%#self.cfg.rules.MODES+1
+  local mode=self.cfg.rules.MODES[self.offerCursor]
+  pruneOffers(self,mode)
+  local j=self.offerJobs[mode]
+  if j then
+   if not j.work then j.work=self.cfg.offerWork.new(function() return offerValue(self,mode,j.value) end,self.cfg.offerWork.options) end
+   j.work:step()
+   if self.offerJobs[mode]~=j then return end
+   if j.work.state=="pending" then return end
+   local result=if j.work.state=="done" then j.work:take() else nil
+   self.offerJobs[mode]=self.offerQueue[mode];self.offerQueue[mode]=nil
+   local events={}
+   if j.epoch==self.epoch and j.seq>(self.offerSeq[mode] or 0) and result and result[1] then publishOffer(self,mode,result[1],j.seq,events) end
+   if j.epoch==self.epoch and j.seq>(self.offerSeq[mode] or 0) then self.offerErrors[mode]=true end
+   pruneOffers(self,mode)
+   if #events==0 then table.insert(events,function() callback(self.cfg.onOffer,mode,self:offerInfo(mode)) end) end
+   for _,f in events do f() end
+   return
+  end
+ end
 end
 local function applyDecision(self:any,d:any,seq:number,events:any)
  if type(d)~="table" or not slot(self,d.mode) or seq<=(self.decisionSeq[d.mode] or 0) then return end
@@ -94,14 +175,14 @@ local function applyReceipt(self:any,msg:any,seq:number)
  if msg.kind=="refused" and msg.reason~="invalid_checkpoint" then return end
  c.receiptSeq=seq;c.stored=msg.kind=="stored";c.refused=msg.kind=="refused"
 end
-local function dispatch(self:any,msg:any,events:any)
+local function dispatch(self:any,msg:any,events:any,owned:boolean?)
  local seq=msg.sequence
- if msg.kind=="offer" then applyOffer(self,msg.mode,msg.offer,seq,events)
+ if msg.kind=="offer" then applyOffer(self,msg.mode,msg.offer,seq,events,owned)
  elseif msg.kind=="decision" then applyDecision(self,msg.decision,seq,events)
  elseif msg.kind=="status" then applyStatus(self,msg,seq,events)
  elseif msg.kind=="stored" or msg.kind=="refused" then applyReceipt(self,msg,seq) end
 end
-function Continuation.receive(self:any,msg:any):boolean
+local function receive(self:any,msg:any,owned:boolean?):boolean
  if type(msg)~="table" or not token(self,msg.epoch) or not integer(msg.sequence,self.cfg.rules.MAX_LIFE_SERIAL) then return false end
  local events={}
  if self.epoch==nil then
@@ -115,6 +196,10 @@ function Continuation.receive(self:any,msg:any):boolean
    -- Copy only bounded known shapes, never an unbounded unknown wire packet.
    local v:any=nil
    if msg.kind=="offer" then
+    if owned and self.cfg.offerWork and msg.offer~=nil then
+     if self.offerWorkClosed then return false end
+     return queueOffer(self,msg.mode,msg.offer,msg.sequence,msg.epoch,events)
+    end
     local offer=if msg.offer~=nil then offerValue(self,msg.mode,msg.offer) else nil
     if msg.offer~=nil and not offer then return false end
     v={kind="offer",mode=msg.mode,offer=offer}
@@ -140,7 +225,7 @@ function Continuation.receive(self:any,msg:any):boolean
   self.loadedSeq=msg.sequence
   applyStatus(self,msg,msg.sequence,events)
   for _,mode in self.cfg.rules.MODES do
-   applyOffer(self,mode,if type(msg.offers)=="table" then msg.offers[mode] else nil,msg.sequence,events)
+   applyOffer(self,mode,if type(msg.offers)=="table" then msg.offers[mode] else nil,msg.sequence,events,owned)
    local d=if type(msg.decisions)=="table" then msg.decisions[mode] else nil
    if d then applyDecision(self,d,msg.sequence,events) end
   end
@@ -150,12 +235,17 @@ function Continuation.receive(self:any,msg:any):boolean
   table.insert(events,function() if self.loadedSeq==msg.sequence then callback(self.cfg.onLoaded,{progress=progress}) end end)
   local pending=self.buffer;self.buffer={};self.bufferEpoch=nil
   for _,v in pending do if v.epoch==self.epoch then dispatch(self,v,events) end end
- else dispatch(self,msg,events) end
+ else dispatch(self,msg,events,owned) end
  for _,f in events do f() end
  return true
 end
+-- Borrowed data is validated/copied synchronously before returning.
+function Continuation.receive(self:any,msg:any):boolean return receive(self,msg,false) end
+-- Network-only ownership transfer: caller must not mutate a delivered record.
+function Continuation.receiveOwned(self:any,msg:any):boolean return receive(self,msg,true) end
 function Continuation.choose(self:any,mode:string,kind:string,id:string?):boolean
  if not self.epoch or not slot(self,mode) or (kind~="new" and kind~="continue") or self.serial>=self.cfg.rules.MAX_LIFE_SERIAL then return false end
+ if self:offerPending(mode) then return false end
  local offer=self.offers[mode]
  if id~=nil and (not offer or offer.id~=id) then return false end
  if kind=="continue" and (not offer or offer.id~=id or offer.record.save_retired==true) then return false end

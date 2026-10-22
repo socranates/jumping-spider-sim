@@ -841,6 +841,7 @@ local function closeScreens()
 end
 local function fresh(mode: string, easy: boolean, position: Vector3?, displayedOfferId: string?): boolean
  if not initialRecord or (easy and not session.finishedMain) then return false end
+ if saveClient and saveClient:offerPending(if mode=="free" then "free" elseif easy then "easy" else "main") then return false end
  if saveState.restore then saveState.restore:cancel() end
  spiderPick.finish(nil, true)
  local ok=Checkpoint.restore(initialRecord,checkpointWorld)
@@ -1183,7 +1184,7 @@ menu=CaughtPanel.new(player:WaitForChild("PlayerGui"),function(choice: string)
 end,"SpiderLifeMenu")
 -- The start menu's body: the saving line, then the Easy note. Also rewritten in place when the saving status changes under an open menu.
 local function menuBody(): string
- return (if saveState.broken then M.SaveText.brokenLine() else M.SaveText.menuLine(saveClient:status()))..(if saveState.restoreError then "\n"..saveState.restoreError else "")..(if session.finishedMain then "" else "\nEasy is not available yet; choose Free play for gentle rules.")
+ return (if saveClient:offerPending() then "Reading saved spiders...\n" elseif saveClient:offerReadProblem() then "A saved spider could not be checked. Its saved rest has not been changed; reopen this menu to try again.\n" else "")..(if saveState.broken then M.SaveText.brokenLine() else M.SaveText.menuLine(saveClient:status()))..(if saveState.restoreError then "\n"..saveState.restoreError else "")..(if session.finishedMain then "" else "\nEasy is not available yet; choose Free play for gentle rules.")
 end
 -- ROBLOX-109: before a life has begun this visit the start menu is the title card (CaughtPanel's "title" look over the drifting camera): Continue when a rest
 -- exists, a new life, Free play, Settings, and the Notebook once it has pages, the saving note in small type under them. In a life it is the life menu
@@ -1207,21 +1208,21 @@ openMenu=function(renderOnly: boolean?)
  for _,slot in {"main","easy","free"} do
   if slot=="easy" and not session.finishedMain then continue end
   local info=saveClient:offerInfo(slot);local decision=saveClient:decision(slot)
-  local localRest=stores[slot]:loadBest().ok
-  if slot~="free" and (localRest or (info and info.playable)) then
+  local localRest=stores[slot]:hasKnownRest()
+  if slot~="free" and (localRest or (info and info.playable and not saveClient:offerPending(slot))) then
    local id=if slot=="main" then "Continue" else "ContinueEasy"
    local text=M.TitleText.choice(id,started)
    if not localRest then text="Continue"..(if slot=="easy" then " the Easy life" else "")..(if info and info.protected then " without saving (protected last rest)" else " without saving until this rest is revalidated") end
    table.insert(choices,{id=id,text=text})
   end
-  if localRest and info and info.playable and ((decision and decision.state=="changed") or saveClient:isTemporary(slot)) then
+  if localRest and info and info.playable and not saveClient:offerPending(slot) and ((decision and decision.state=="changed") or saveClient:isTemporary(slot)) then
    table.insert(choices,{id=if slot=="main" then "RemoteMain" elseif slot=="easy" then "RemoteEasy" else "RemoteFree",text="Load the saved "..(if slot=="free" then "Free play" elseif slot=="easy" then "Easy" else "standard").." spider instead"})
   end
  end
- add("New")
- if session.finishedMain then add("Easy") end
+ if not saveClient:offerPending("main") then add("New") end
+ if session.finishedMain and not saveClient:offerPending("easy") then add("Easy") end
  local freeInfo=saveClient:offerInfo("free")
- table.insert(choices,{id="Free",text=if freeInfo and freeInfo.playable and not stores.free:loadBest().ok then "Continue Free play without saving" else M.TitleText.choice("Free",started)})
+ if not saveClient:offerPending("free") then table.insert(choices,{id="Free",text=if freeInfo and freeInfo.playable and not stores.free:hasKnownRest() then "Continue Free play without saving" else M.TitleText.choice("Free",started)}) end
  table.insert(choices,{id="Settings",text=M.SettingsSpec.WORDS.menuChoice})
  if started or #book.opened>0 then table.insert(choices,{id="Notebook",text=M.NotebookText.MENU_CHOICE}) end
  menu:setLook(if started then "card" else "title")
@@ -1421,7 +1422,7 @@ saveState.restore=require(script.Parent.SaveRestore).new({
 })
 saveClient = SaveClient.new({
 	rules = M.SaveRules, now = os.clock,
- continuation={copy=M.SaveJson.copy,
+ continuation={copy=M.SaveJson.copy,offerWork={new=require(Shared.Persistence.SaveWork).new,options={budget=.002,maxSeconds=120}},
   validate=function(mode: string,record: any,allowRetired: boolean): boolean
    if allowRetired and M.SaveRest.isRetired(record) then
     if M.SaveRest.bounded(record,10,3) then return false end
@@ -1431,6 +1432,7 @@ saveClient = SaveClient.new({
    return #M.SaveRest.check(mode,record,checkpointWorld)==0
   end,
   onRestore=function(mode: string,record: any,serial: number): boolean
+   if saveState.broken then return false end
    if mode=="easy" and not session.finishedMain then return false end
    local request=saveClient:decision(mode)
    if not request or request.serial~=serial then return false end
@@ -1500,6 +1502,8 @@ end
 function saveState.fail(err: any)
 	if saveState.broken then return end
 	saveState.broken = true
+ if saveState.restore then saveState.restore:cancel() end
+ if saveClient and saveClient.bound then saveClient.bound:closeOffers() end
 	warn("[Windowsill] saving is off for this visit: " .. tostring(err))
 	hud:toast(M.SaveText.BROKEN, true)
 	hud:saveNotice(M.SaveText.brokenLine())

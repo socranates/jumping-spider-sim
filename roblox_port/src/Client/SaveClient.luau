@@ -34,7 +34,7 @@ function SaveClient.new(cfg: Config): any
   self.temporarySlots={}
   self.bound=SaveContinuation.new({rules=cfg.rules,copy=opt.copy,validate=opt.validate,
    onLoaded=function(msg:any) self.phase="ready";cfg.onLoaded(msg) end,
-   onOffer=opt.onOffer,onDecision=opt.onDecision,onRestore=opt.onRestore,onStatus=cfg.onStatus})
+   offerWork=opt.offerWork,onOffer=opt.onOffer,onDecision=opt.onDecision,onRestore=opt.onRestore,onStatus=cfg.onStatus})
  end
  return self
 end
@@ -53,7 +53,7 @@ local function applyProtected(self: any,value: any)
  self.protectedSlots=nextSlots
 end
 
-local function receive(self: any, msg: any)
+local function receive(self: any, msg: any, owned: boolean?)
 	if type(msg) ~= "table" or type(msg.kind) ~= "string" then return end
  if self.bound then
   if msg.kind=="loaded" and (msg.v==1 or msg.v==self.cfg.rules.PROTOCOL) and self.bound.epoch==nil then
@@ -68,7 +68,9 @@ local function receive(self: any, msg: any)
    end
    self.cfg.onLoaded({progress=msg.progress,rests=rests})
    self.cfg.onStatus("session","offline")
-  elseif not self.legacyTemporary then self.bound:receive(msg) end
+  elseif not self.legacyTemporary then
+   if owned then self.bound:receiveOwned(msg) else self.bound:receive(msg) end
+  end
   return
  end
 	if msg.kind == "loaded" then
@@ -94,13 +96,15 @@ local function receive(self: any, msg: any)
 	end
 end
 SaveClient.receive = receive
+-- Engine delivery owns its decoded tables; no other production listener retains them.
+function SaveClient.receiveOwned(self:any,msg:any) receive(self,msg,true) end
 
 local function connect(self: any, remotes: any)
 	self.remotes = remotes
 	self.phase = "hello"
 	local ev = remotes.client.OnClientEvent
 	ev:Connect(function(msg: any)
-		local ok = pcall(receive, self, msg)
+		local ok = pcall(receive, self, msg, true)
 		if not ok then self.cfg.onStatus("session", "offline") end
 	end)
 end
@@ -145,6 +149,8 @@ function SaveClient.abortContinue(self:any,mode:string,serial:number,epoch:strin
  self.bound:abandon(mode);self.temporarySlots[mode]=true
  return true
 end
+function SaveClient.offerReadProblem(self:any):boolean return self.bound~=nil and self.bound:offerReadProblem() end
+function SaveClient.offerPending(self:any,mode:string?):boolean return self.bound~=nil and self.bound:offerPending(mode) end
 function SaveClient.offerInfo(self:any,mode:string):any
  return if self.bound then self.bound:offerInfo(mode) else nil
 end
@@ -189,6 +195,7 @@ function SaveClient.connected(self: any): boolean
 end
 
 function SaveClient.update(self: any)
+ if self.bound then self.bound:stepOffers() end
 	local t = self.cfg.now()
 	local rules = self.cfg.rules
 	if self.phase == "searching" then

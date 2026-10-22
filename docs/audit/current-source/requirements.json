@@ -1,5 +1,5 @@
 {
-  "as_of_utc": "2026-10-22T13:19:05.550090+00:00",
+  "as_of_utc": "2026-10-22T13:28:08.250815+00:00",
   "source": "6026d6c45fbad072c2bec14a3b893fb8e7abccc2",
   "evidence_id": "95802440d548b8c2",
   "goal_complete": false,
@@ -24,8 +24,8 @@
     },
     {
       "id": "cli-and-runner",
-      "status": "pending",
-      "evidence_boundary": "Current1,010 targeted checks, compile216, strict and runner5 pass. Linux39783315341 passed64 suites/443861 checks/zero failed on6026d6c; Windows55171 remains live. Final repeat/flake and native assessment remain open.",
+      "status": "implemented-with-limits",
+      "evidence_boundary": "Current1,010 targeted checks, compile216, strict and runner5 pass. Both Linux39783315341 and Windows55171 passed64 suites/443861 checks/zero failed on6026d6c: two complete passes, one per platform. This does not prove absence of every flake or native behavior.",
       "references": [
         "docs/observed-life-retirement/receipt.json",
         "docs/observed-life-retirement/progress.json"

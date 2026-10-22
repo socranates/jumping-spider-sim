@@ -25,5 +25,10 @@
   "prior_linux_ci_complete": true,
   "prior_linux_ci_run": 39781688244,
   "linux_ci_complete": true,
-  "linux_ci_passed": 443861
+  "linux_ci_passed": 443861,
+  "current_full_windows_complete": true,
+  "current_full_windows_exit_code": 0,
+  "current_full_windows_passed": 443861,
+  "current_full_windows_suites": 64,
+  "current_full_windows_sha256": "a7e0a9f62b4b936a032237d87dfcb3723a16f4db48e4581136c78a5ad8bb1b8f"
 }

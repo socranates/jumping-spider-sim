@@ -45,3 +45,7 @@ The full Windows run on current source 6026d6c has now started in **exec session
 ## Current-source Linux gate completed
 
 CI **39783315341** completed successfully at 2026-10-22T13:11:14Z for exact source **6026d6c45fbad072c2bec14a3b893fb8e7abccc2**: **64 suites /443,861 passed /zero failed**, checksum verification for all four tool inputs, compilation216, strict analysis and runner5. Actual metadata/logs are retained in `ci-final.json` and `ci-*.txt` and checked by `verify.py`. Windows session **55171** remains live; native execution and publication remain unverified. The broader current audit scope is indexed in `docs/audit/CURRENT.md`; original audit counts are historical.
+
+## Current-source Windows gate completed
+
+Exec session **55171** terminated with exit zero: **64 suites / 443,861 passed / zero failed**, matching Linux CI39783315341 on source6026d6c. The complete closed log was normalized to LF after termination and retained with its actual process result. `verify.py` confirms both full CLI gates; no current full runner remains live and this handle must not be restarted. The source and default tests remained fixed throughout. Native execution, actual online rejoin, current device/performance verification, legacy-world restoration and safe foreign-lease Continue remain incomplete. No publication or overall-completion claim.

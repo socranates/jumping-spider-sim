@@ -2,7 +2,7 @@
 
 Candidate source `6026d6c45fbad072c2bec14a3b893fb8e7abccc2`, evidence `95802440d548b8c2`, branch `codex/observed-life-retirement`. **Not published; not yet reasonably problem-free.** Last publication verified by retained evidence is v51/place140, not a fresh Dashboard check.
 
-The latest save-safety changes pass **1,010** targeted checks. Linux passes **64 suites / 443,861 checks** with zero failures; Windows session 55171 is still running. Compilation **216/216**, strict analysis and five runner checks pass. The current combined native diagnostic is prepared and source-guarded, but has not run because Studio previously warned about low resources. Old native results remain tied to their original source.
+The latest save-safety changes pass **1,010** targeted checks. Linux passes **64 suites / 443,861 checks** with zero failures; Windows session 55171 also completed with **64 suites / 443,861 checks / zero failed**. Compilation **216/216**, strict analysis and five runner checks pass. The current combined native diagnostic is prepared and source-guarded, but has not run because Studio previously warned about low resources. Old native results remain tied to their original source.
 
 The ten most important current findings:
 

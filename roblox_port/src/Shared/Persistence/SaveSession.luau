@@ -56,6 +56,7 @@ function SaveSession.new(cfg: Config): any
 		restBase = {} :: { [string]: number }, -- updatedAt of the rest this session last read or wrote (nil: unknown)
 		restPending = {} :: { [string]: any }, restPendingTime = {} :: { [string]: number },
 		restLoaded = {} :: { [string]: boolean }, restRetryAt = 0,
+		restProtected = {} :: {[string]:string}, -- unreadable rest slots remain read-only for this visit
 		restRejected = {} :: { [string]: boolean }, -- a locally kept rest the server could not accept
 		lockHeld = false, busy = false, closed = false,
 		lastStatus = "", lastReason = "",
@@ -95,13 +96,16 @@ function SaveSession.status(self: any): (string, string?)
 		end
 		return SaveRules.STATUS.saving, if trouble then "write_failed" else nil
 	end
+	if next(self.restProtected) ~= nil then return SaveRules.STATUS.saving, "rest_protected" end
 	return SaveRules.STATUS.saved, nil
 end
 
 function SaveSession.notify(self: any)
 	local status, reason = self:status()
 	local r = reason or ""
-	if status ~= self.lastStatus or r ~= self.lastReason then
+	local protected=canonical(self.restProtected)
+	if status ~= self.lastStatus or r ~= self.lastReason or protected ~= self.lastProtected then
+		self.lastProtected=protected
 		self.lastStatus, self.lastReason = status, r
 		local f = self.cfg.onChange
 		if f then f(status, reason) end
@@ -163,6 +167,17 @@ local function adoptStored(self: any, info: any)
 	end
 end
 
+local function protectRest(self: any,mode: string,reason: string)
+ self.restProtected[mode]=reason
+ self.restPending[mode],self.restPendingTime[mode],self.restRejected[mode]=nil,nil,nil
+ self.sched:abandon("rest_"..mode)
+ -- Retain life request serials so delayed older intents cannot become fresh requests.
+end
+
+function SaveSession.protectedSlots(self: any): {[string]:string}
+ return Json.copy(self.restProtected)
+end
+
 local function readRests(self: any)
 	for _, mode in SaveRules.MODES do
 		if not self.restLoaded[mode] then
@@ -186,15 +201,16 @@ local function readRests(self: any)
 				else
 					-- A readable backup is offered in memory only. Preserve the original unreadable record for recovery.
 					self.restBase[mode] = op.updatedAt or 0
+					self.rests[mode],self.lifeTokens[mode]=nil,nil
 					local b = op.backup
 					if b and (b.status == "ok" or b.status == "migrated") and not SaveRest.isRetired(b.payload) then self.rests[mode] = b.payload end
 					log(self, `the {mode} rest is {op.status}: {op.reasons[1] or ""}`)
-					self:demote(if op.status == "newer" then "newer" else "corrupt", false)
+					protectRest(self,mode,if op.status == "newer" then "newer" else "corrupt")
 				end
 				local request=self.lifeRequests[mode]
     local queued=self.restPending[mode]
-    if (request and request.done and request.token~=self.lifeTokens[mode])
-     or (queued and not SaveRest.isRetired(queued) and queued.save_life~=self.lifeTokens[mode]) then
+    if not self.restProtected[mode] and ((request and request.done and request.token~=self.lifeTokens[mode])
+     or (queued and not SaveRest.isRetired(queued) and queued.save_life~=self.lifeTokens[mode])) then
      self:demote("other_session",false) -- another life won while ownership was unavailable; never relabel our queued world
     end
     if request and not request.done then self.rests[mode]=nil end
@@ -276,6 +292,7 @@ end
 -- The marker goes through the same guarded UpdateAsync and backup path as a rest; never DeleteAsync.
 function SaveSession.beginLife(self: any,mode: string,serial: any): boolean
  if self.closed or SaveRest.SPECS[mode]==nil or type(serial)~="number" or serial~=serial or serial<1 or serial>SaveRules.MAX_LIFE_SERIAL or serial~=math.floor(serial) then return false end
+ if self.restProtected[mode] then self.counters.rejected+=1;return false end
  local prior=self.lifeRequests[mode]
  if prior and serial<prior.serial then return false end
  if prior and serial==prior.serial then
@@ -298,6 +315,7 @@ function SaveSession.setRest(self: any,mode: string,record: any): boolean
 end
 function SaveSession.setRestForLife(self: any, mode: string, record: any,lifeToken: string?): boolean
 	if self.closed or SaveRest.SPECS[mode] == nil then return false end
+ if self.restProtected[mode] then self.counters.rejected+=1;return false end
  local request=self.lifeRequests[mode]
  if (request and not request.done) or lifeToken~=self.lifeTokens[mode] then
   self.counters.rejected+=1
@@ -392,7 +410,7 @@ end
 
 local function writeRest(self: any, mode: string): boolean
 	-- Never overwrite a record whose load failed, including during shutdown.
-	if not self.restLoaded[mode] or self.restBase[mode] == nil then return false end
+	if self.restProtected[mode] or not self.restLoaded[mode] or self.restBase[mode] == nil then return false end
 	local name = "rest_" .. mode
 	local record = self.restPending[mode]
 	if record == nil then
@@ -413,6 +431,7 @@ local function writeRest(self: any, mode: string): boolean
  local expectedLife=self.lifeTokens[mode]
 	local ok, _, err = self.backend:update(self.rkey[mode], function(old: any): any
 		outcome = ""
+  if self.restProtected[mode] then outcome="protected";return nil end
 		local op = SaveEnvelope.open(spec, old, false)
 		if op.status == "newer" then outcome = "newer"; return nil end
 		if op.status == "corrupt" or op.status == "invalid" then outcome = "corrupt"; return nil end
@@ -464,9 +483,9 @@ local function writeRest(self: any, mode: string): boolean
 	if outcome == "superseded" then
 		self:demote("other_session", true)
 	elseif outcome == "newer" then
-		self:demote("newer", false)
+		protectRest(self,mode,"newer")
 	elseif outcome == "corrupt" then
-		self:demote("corrupt", false)
+		protectRest(self,mode,"corrupt")
 	end
 	return false
 end
@@ -572,7 +591,7 @@ function SaveSession.snapshot(self: any): any
   local request=self.lifeRequests[mode]
   if not request or request.done then rests[mode]=self.rests[mode] end
  end
- return { status = status, reason = reason, progress = self.progress, rests = rests, lives = Json.copy(self.lifeTokens) }
+ return { status = status, reason = reason, progress = self.progress, rests = rests, lives = Json.copy(self.lifeTokens), protected = self:protectedSlots() }
 end
 
 -- Leaving/shutdown keeps ownership until the pending records finish; a new visit must not load half a flush.

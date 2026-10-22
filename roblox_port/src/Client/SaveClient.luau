@@ -23,15 +23,30 @@ function SaveClient.new(cfg: Config): any
 	local now = cfg.now()
 	return setmetatable({
 		cfg = cfg, born = now, remotes = nil :: any, phase = "searching", helloAt = -1e9, helloTries = 0,
-		lifeTokens = {} :: {[string]:string}, lifeRequests = {} :: {[string]:any}, lifeSerial = 0,
+		protectedSlots = {} :: {[string]:string}, lifeTokens = {} :: {[string]:string}, lifeRequests = {} :: {[string]:any}, lifeSerial = 0,
   lastProgress = -1e9, dirty = false, pendingRest = {} :: { [string]: any }, lastRest = {} :: { [string]: number },
 		st = nil :: string?, why = nil :: string?, sent = { progress = 0, rest = 0, hello = 0 },
 	}, SaveClient)
 end
 
+local function applyProtected(self: any,value: any)
+ if type(value)~="table" then return end
+ -- Protection is sticky for this visit, including across delayed/repeated loaded messages.
+ local nextSlots=self.protectedSlots
+ for _,mode in self.cfg.rules.MODES do
+  local reason=value[mode]
+  if reason=="newer" or reason=="corrupt" then
+   nextSlots[mode]=reason
+   self.pendingRest[mode],self.lifeRequests[mode]=nil,nil
+  end
+ end
+ self.protectedSlots=nextSlots
+end
+
 local function receive(self: any, msg: any)
 	if type(msg) ~= "table" or type(msg.kind) ~= "string" then return end
 	if msg.kind == "loaded" then
+  applyProtected(self,msg.protected)
 		self.phase = "ready"
 		self.st, self.why = msg.status, msg.reason
 		if type(msg.lives)=="table" then
@@ -40,6 +55,7 @@ local function receive(self: any, msg: any)
   self.cfg.onLoaded(msg)
 		self.cfg.onStatus(msg.status, msg.reason)
 	elseif msg.kind == "status" then
+  applyProtected(self,msg.protected)
 		self.st, self.why = msg.status, msg.reason
 		self.cfg.onStatus(msg.status, msg.reason)
 	elseif msg.kind == "life" then
@@ -68,6 +84,7 @@ function SaveClient.markDirty(self: any)
 end
 
 function SaveClient.beginLife(self: any,mode: string)
+ if self.protectedSlots[mode] then self.pendingRest[mode]=nil;return end
  self.lifeSerial+=1
  self.lifeRequests[mode]={serial=self.lifeSerial,done=false,last=-1e9}
  self.pendingRest[mode]=nil -- an unsent rest belongs to the life being retired
@@ -75,6 +92,7 @@ function SaveClient.beginLife(self: any,mode: string)
 end
 
 function SaveClient.sendRest(self: any, mode: string, record: any)
+ if self.protectedSlots[mode] then return end
 	self.pendingRest[mode] = record
 end
 

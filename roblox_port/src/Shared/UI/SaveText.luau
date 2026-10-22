@@ -7,6 +7,7 @@ SaveText.SAVED = "Your notebook and last rests are saved."
 SaveText.SAVING = "Saving..."
 SaveText.TROUBLE = "Having trouble saving. Your progress is kept for now and the game keeps trying."
 SaveText.REST_REFUSED = "Your latest rest could not be saved online. It is kept for this visit; your earlier saved rest is unchanged."
+SaveText.REST_PROTECTED = "A saved rest is protected and cannot be replaced during this visit. Your notebook and unaffected rest slots can still save."
 SaveText.OFF = "Saving is off for this visit: your notebook and rests will last only until you leave."
 SaveText.LOOKING = "Finding your saved game..."
 SaveText.BACK = "Saving is back on."
@@ -22,6 +23,7 @@ SaveText.WHY = {
 	newer = "Your saved game was made by a newer version of this game, so it was left exactly as it is.",
 	write_failed = "This visit could not be saved. Your earlier saved game is still kept.",
 	rest_refused = SaveText.REST_REFUSED,
+ rest_protected = "A stored rest could not be read safely and was left unchanged.",
 } :: { [string]: string }
 
 local function because(reason: string?): string?
@@ -36,6 +38,7 @@ function SaveText.menuLine(status: string?, reason: string?): string
 		return SaveText.OFF .. (if why then "\n" .. why else "")
 	elseif status == "saving" then
 		if reason == "rest_refused" then return SaveText.REST_REFUSED end
+  if reason == "rest_protected" then return SaveText.REST_PROTECTED end
 		return if reason == "write_failed" then SaveText.TROUBLE else SaveText.SAVING
 	elseif status == "saved" then
 		return SaveText.SAVED
@@ -55,7 +58,13 @@ function SaveText.toast(oldStatus: string?, oldReason: string?, status: string?,
 	local toSession = now == "session" and was ~= "session"
 	local fromSession = was == "session" and (now == "saved" or now == "saving")
 	local newTrouble = now == "saving" and reason == "write_failed" and was ~= "" and not (was == "saving" and oldReason == "write_failed")
-	if now == "saving" and reason == "rest_refused" and not (was == "saving" and oldReason == "rest_refused") then return SaveText.REST_REFUSED end
+	if now == "saving" then
+		if reason == "rest_protected" then
+			if was ~= "saving" or oldReason ~= reason then return SaveText.REST_PROTECTED end
+		elseif reason == "rest_refused" then
+			if was ~= "saving" or oldReason ~= reason then return SaveText.REST_REFUSED end
+		end
+	end
 	if toSession then
 		local why = because(reason)
 		return SaveText.OFF .. (if why then " " .. why else "")

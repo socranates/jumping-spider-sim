@@ -80,6 +80,31 @@ local function newClient(opts: { [string]: any }?): any
 	return c
 end
 
+case("protected rest metadata stops only that slot, including queued retries and late acknowledgements",function()
+ local c=newClient();c.remotes=fakeRemotes();c.advance(0.2)
+ c.remotes.deliver({kind="loaded",status="saved",rests={},progress=SaveProgress.default()})
+ c.client:beginLife("main");local serial=c.client.lifeRequests.main.serial
+ c.client:sendRest("main",{held=true})
+ c.remotes.deliver({kind="status",status="saving",reason="rest_protected",protected={main="corrupt",unknown="newer",free="invalid"}})
+ check(c.client.pendingRest.main==nil and c.client.lifeRequests.main==nil,"queued writes and life retries cleared")
+ c.remotes.deliver({kind="life",mode="main",serial=serial,token="late"})
+ check(c.client.lifeTokens.main~="late","late acknowledgement cannot revive blocked request")
+ c.remotes.deliver({kind="loaded",status="saving",reason="rest_protected",protected={},rests={}})
+ c.client:beginLife("main");c.client:sendRest("main",{blocked=true})
+ check(c.client.lifeRequests.main==nil and c.client.pendingRest.main==nil,"protection is sticky across delayed load")
+ check(c.client.protectedSlots.unknown==nil and c.client.protectedSlots.free==nil,"unknown slots and reasons ignored")
+ c.remotes.fired={};c.client:markDirty();c.client:sendRest("free",{healthy=true});c.advance(8)
+ local progress,rest,blocked=0,0,0
+ for _,msg in c.remotes.fired do
+  if msg.kind=="progress" then progress+=1 end
+  if msg.kind=="rest" and msg.mode=="free" then rest+=1 end
+  if (msg.kind=="rest" or msg.kind=="begin_life") and msg.mode=="main" then blocked+=1 end
+ end
+ check(progress==1 and rest==1 and blocked==0,"notebook and healthy rest keep transmitting without futile blocked retries")
+ check(SaveText.menuLine("saving","rest_protected")==SaveText.REST_PROTECTED,"menu explains partial protection")
+ check(SaveText.toast("saved",nil,"saving","rest_protected")==SaveText.REST_PROTECTED and SaveText.toast("saving","rest_protected","saving","rest_protected")=="","partial warning announced once per transition")
+end)
+
 case("SaveClient: with no remotes the wait is short, then it is offline; remotes that show up later are used", function()
 	local c = newClient()
 	check(c.client:waiting() and select(1, c.client:status()) == nil, "at first: waiting, nothing to say")

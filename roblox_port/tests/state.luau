@@ -797,12 +797,12 @@ case("a record from a newer game is never read past its header or written", func
 	s:flush()
 	check(snapshotAll(e) == before and e.backend.writes == 0, "untouched, including its lock")
 	check(s.reason == "newer" and not s.canRetry, "and it does not keep retrying")
-	-- the rest alone being newer (progress fine): the session goes session-only too
+	-- A newer rest protects only its own slot; unreadable progress above still stops all writes.
 	local e2 = newEnv()
 	e2.backend.data["R_7_free"] = { format = SaveRules.FORMAT, kind = "rest_free", schema = 7, updatedAt = 12, payload = { new = "world" }, checksum = "later" }
 	local s2 = newSession(e2, 7, "S")
 	s2:load()
-	check(s2.state == "session" and s2.reason == "newer", "a newer rest alone also stops saving")
+	check(s2.state == "active" and s2.restProtected.free == "newer", "a newer rest alone protects its own slot")
 	local keep = canon(e2.backend.data["R_7_free"])
 	s2:setRest("free", realRest(120, "free"))
 	run(e2, s2, 100)
@@ -1628,7 +1628,7 @@ case("damaged rests stay intact, including damage discovered on a retry or write
 		run(e, a, 20)
 		a:flush()
 		check(canon(e.backend.data.R_84_main) == canon(damaged), when .. ": damaged record preserved")
-		check(a.reason == "corrupt", when .. ": player is told saving is off")
+		check(a.restProtected.main == "corrupt" and select(2,a:status()) == "rest_protected", when .. ": partial saving is explained")
 	end
 end)
 
@@ -1910,7 +1910,7 @@ case("retirement obeys foreign locks and preserves damaged records",function()
  run(e,b,20);check(canon(e.backend.data["R_904_main"])==before and not b.lifeRequests.main.done,"foreign lease cannot retire another session's life")
  e.backend.data["R_904_main"].checksum="broken";before=canon(e.backend.data["R_904_main"])
  a:beginLife("main",1);run(e,a,20)
- check(canon(e.backend.data["R_904_main"])==before and a.state=="session" and not a.lifeRequests.main.done,"damaged record never replaced by a retirement marker")
+ check(canon(e.backend.data["R_904_main"])==before and a.state=="active" and a.restProtected.main=="corrupt" and not a.lifeRequests.main.done,"damaged record never replaced by a retirement marker")
 end)
 
 case("rest messages cannot forge retirement and foreign epochs cannot race equal timestamps",function()
@@ -2006,6 +2006,82 @@ case("a native-swallowed encoder failure cannot acknowledge retirement or report
  check(acknowledgements==1 and session.lifeRequests.main.done,"a successful retry acknowledges exactly once")
  local opened=SaveEnvelope.open(SaveRest.SPECS.main,ds.data.R_native_main)
  check(opened.status=="ok" and SaveRest.isRetired(opened.payload) and opened.backup~=nil,"retry stores marker with recoverable prior checkpoint")
+end)
+
+case("unreadable rests protect only their own slot, retain backup, and survive a rejoin unchanged", function()
+ local records={main=realRest(120,"main"),easy=realRest(120,"easy"),free=realRest(120,"free")}
+ for _,mode in SaveRules.MODES do
+  for _,damage in {"corrupt","invalid","newer"} do
+   local e=newEnv();local key="R_901_"..mode
+   local backup=SaveEnvelope.make(SaveRest.SPECS[mode],records[mode],20,nil,{session="OLD"})
+   local broken=SaveEnvelope.make(SaveRest.SPECS[mode],records[mode],21,backup,{session="OLD"})
+   if damage=="corrupt" then broken.checksum="damaged"
+   elseif damage=="newer" then broken.schema=99
+   else broken=SaveEnvelope.make(SaveRest.SPECS[mode],{invalid=true},21,backup,{session="OLD"}) end
+   e.backend:poke(key,broken);local original=canon(broken)
+   local a=newSession(e,901,"A");check(a:load()=="active" and a.lockHeld,"progress ownership retained: "..mode..damage)
+   check(a.restProtected[mode]==(if damage=="newer" then "newer" else "corrupt"),"only known unreadable value is protected")
+   if damage~="newer" then check(a.rests[mode]~=nil and canon(a.rests[mode])==canon(records[mode]),"readable backup offered in memory without repair") end
+   local snap=a:snapshot();snap.protected[mode]="tampered"
+   check(a.restProtected[mode]~="tampered","metadata is copied")
+   check(not a:setRest(mode,records[mode]) and not a:beginLife(mode,1),"neither rest nor retirement can replace protected value")
+   a:setProgress(prog({"p1"}))
+   for _,healthy in SaveRules.MODES do if healthy~=mode then check(a:setRest(healthy,records[healthy]),"healthy rest accepted") end end
+   run(e,a,160)
+   check(a.state=="active" and a.lockHeld,"heartbeats remain live")
+   check(select(1,a:status())=="saving" and select(2,a:status())=="rest_protected","no false Saved or global off status")
+   check(#storedOf(e,"P_901",nil).payload.notebook.opened==1,"notebook persisted")
+   for _,healthy in SaveRules.MODES do if healthy~=mode then check(storedOf(e,"R_901_"..healthy,SaveRest.SPECS[healthy]).status=="ok","healthy slot persisted") end end
+   a:flush();check(canon(e.backend.data[key])==original,"damaged envelope and backup byte-equivalent on exit")
+   local rejoin=newSession(e,901,"B");rejoin:load()
+   check(rejoin.state=="active" and rejoin.restProtected[mode]~=nil and #rejoin.progress.notebook.opened==1,"rejoin preserves notebook and protection")
+   check(canon(e.backend.data[key])==original,"rejoin leaves protected storage unchanged")
+  end
+ end
+end)
+
+case("a pending New Life encountering damaged storage gets no acknowledgement while other progress saves",function()
+ for _,damage in {"corrupt","newer"} do
+  local e=newEnv();local acks=0
+  local a=newSession(e,902,"A",{onLife=function() acks+=1 end});a:load()
+  check(a:beginLife("main",1),"intent queued before write discovers damage")
+  local broken=SaveEnvelope.make(SaveRest.SPECS.main,realRest(120,"main"),20,nil,{session="OLD"})
+  if damage=="corrupt" then broken.checksum="damaged" else broken.schema=99 end
+  e.backend:poke("R_902_main",broken);local before=canon(broken)
+  a:setProgress(prog({"p1"}));run(e,a,30)
+  check(a.restProtected.main==damage and acks==0 and not a.lifeRequests.main.done,"no false durable-life acknowledgement")
+  check(a.restPending.main==nil and not a.sched.items.rest_main.dirty,"unwritable work is abandoned")
+  check(a.lifeRequests.main.serial==1 and not a:beginLife("main",2),"serial retained and subsequent intent refused")
+  check(#storedOf(e,"P_902",nil).payload.notebook.opened==1 and a.state=="active","independent progress still written")
+  a:flush();check(canon(e.backend.data.R_902_main)==before,"retirement never touches unreadable data")
+ end
+end)
+
+case("temporary rest read failures retry; protection remains sticky only after actual unreadable data",function()
+ local e=newEnv();e.backend:fail({op="read",key="R_903_main",times=1,message="503: down"})
+ local a=newSession(e,903,"A");a:load()
+ check(a.restProtected.main==nil and not a.restLoaded.main,"API failure is not corruption")
+ run(e,a,30);check(a.restLoaded.main and a.restProtected.main==nil,"normal retry recovers")
+ local broken={invalid=true};e.backend:poke("R_903_main",broken)
+ a:setRest("main",realRest(120,"main"));run(e,a,20)
+ check(a.restProtected.main=="corrupt","actual unreadable rest protected")
+ e.backend:poke("R_903_main",nil);a:load()
+ check(a.restProtected.main=="corrupt" and not a:beginLife("main",1),"reacquisition does not remove visit protection")
+ a:flush();local b=newSession(e,903,"B");b:load()
+ check(b.restProtected.main==nil and b:beginLife("main",1),"fresh visit reevaluates repaired storage")
+end)
+
+case("service transports protected slots and refuses a stale intent without acknowledging it",function()
+ local e=newEnv();e.backend:poke("R_904_main",{invalid=true})
+ local srv=newServer(e);local p=player(904);srv.service:addPlayer(p)
+ srv.service:onMessage(p,{kind="hello",v=SaveRules.PROTOCOL})
+ local loaded=srv.last(p,"loaded")
+ check(loaded and loaded.protected.main=="corrupt","initial load carries protection")
+ srv.service:onMessage(p,{kind="begin_life",mode="main",serial=1})
+ local status=srv.last(p,"status")
+ check(status and status.protected.main=="corrupt","refused intent resends protection")
+ tickServer(e,srv,20)
+ check(srv.count(p,"life")==0 and canon(e.backend.data.R_904_main)==canon({invalid=true}),"no ack or replacement")
 end)
 
 print(`STATE passed={passed} failed={failed}`)

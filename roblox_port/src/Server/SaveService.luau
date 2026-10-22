@@ -57,7 +57,7 @@ end
 
 local function loadedMessage(session: any): { [string]: any }
 	local snap = session:snapshot()
-	return { kind = "loaded", v = SaveRules.PROTOCOL, status = snap.status, reason = snap.reason, progress = snap.progress, rests = snap.rests, lives = snap.lives }
+	return { kind = "loaded", v = SaveRules.PROTOCOL, status = snap.status, reason = snap.reason, progress = snap.progress, rests = snap.rests, lives = snap.lives, protected = snap.protected }
 end
 
 -- A player arrived: start their session (the load runs in its own thread) and wait for their hello.
@@ -71,7 +71,7 @@ function SaveService.addPlayer(self: any, player: Player)
 		backend = self.cfg.backend, userId = if self.cfg.keyOf then self.cfg.keyOf(player) else player.UserId, sessionId = sessionId, now = self.cfg.now, sleep = self.cfg.sleep,
 		log = function(text: string) log(self, text) end,
 		onChange = function(status: string, reason: string?)
-			if entry.loaded and entry.hello and not entry.leaving then sendTo(self, player, { kind = "status", status = status, reason = reason }) end
+			if entry.loaded and entry.hello and not entry.leaving then sendTo(self, player, { kind = "status", status = status, reason = reason, protected = entry.session:protectedSlots() }) end
 		end,
 		onLoaded = function(_snap: any)
 			if entry.hello and not entry.leaving then sendTo(self, player, loadedMessage(entry.session)) end
@@ -117,7 +117,13 @@ local function handle(self: any, entry: any, msg: any)
 		if not entry.session:setProgress(msg.progress) then self.stats.dropped += 1 end
 	elseif kind == "begin_life" then
   if not take(entry.lifeBucket,now) then self.stats.limited+=1;return end
-  if type(msg.mode)~="string" or not entry.session:beginLife(msg.mode,msg.serial) then self.stats.dropped+=1 end
+  if type(msg.mode)~="string" or not entry.session:beginLife(msg.mode,msg.serial) then
+   self.stats.dropped+=1
+   if type(msg.mode)=="string" and entry.session.restProtected[msg.mode] then
+    local status,reason=entry.session:status()
+    sendTo(self,entry.player,{kind="status",status=status,reason=reason,protected=entry.session:protectedSlots()})
+   end
+  end
  elseif kind == "rest" then
 		if not take(entry.restBucket, now) then self.stats.limited += 1; return end
 		local mode = msg.mode

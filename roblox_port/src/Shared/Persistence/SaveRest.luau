@@ -6,6 +6,7 @@
 -- stand-in world that names the same things the real one does, and the rules in the record agreeing with the mode it is filed under.
 -- This is a boundary for corruption safety, not anti-cheat: this is a solo game with no economy, so a client that lies only affects its
 -- own rest. A rest from a newer game build is refused here and, if it is already stored, left alone by SaveSession.
+local Work = require(script.Parent.SaveWork)
 local SaveRules = require(script.Parent.Parent.Data.SaveRules)
 local Species = require(script.Parent.Parent.Data.Species)
 local Json = require(script.Parent.Json)
@@ -40,10 +41,12 @@ end
 -- table met twice, or a structure deeper than `maxDepth` or larger than `maxNodes`. Cheap and bounded: a hostile payload is stopped
 -- before anything encodes it. Returns the problem, or nil.
 function SaveRest.bounded(v: any, maxNodes: number, maxDepth: number): string?
+	local pulse=Work.pulse()
 	local nodes = 0
 	local seen: { [any]: boolean } = {}
 	local problem: string? = nil
 	local function walk(x: any, depth: number)
+  if pulse then pulse() end
 		if problem then return end
 		nodes += 1
 		if nodes > maxNodes then problem = "too many values"; return end

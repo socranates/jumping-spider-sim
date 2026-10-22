@@ -1637,5 +1637,42 @@ case("a rest's save is lighter on the frame it begins (ROBLOX-108): the same ent
 	check(third.ok and w2.dataStore.data["checkpoint.aside.1"] ~= nil and w2.dataStore.data["checkpoint.bak"] == nil, "a current rest changed in the store is set aside, never made the backup")
 end)
 
+case("cooperative preparation holds a full checkpoint without changing live state", function()
+ local Work=require("../src/Shared/Persistence/SaveWork")
+ local SaveRest=require("../src/Shared/Persistence/SaveRest")
+ local w=newWorld()
+ for _=1,120 do tick(w) end
+ local record=assert(Checkpoint.capture(w,0))
+ local before=fingerprint(w)
+ local clock=0
+ local function job(fn)
+  return Work.new(fn,{now=function() clock+=.001;return clock end,budget=.002,maxSeconds=1000})
+ end
+ local function finish(work)
+  for _=1,10000 do if work.state~="pending" then break end;work:step() end
+  check(work.state=="done","whole checkpoint preparation terminates")
+  return assert(work:take())
+ end
+ local work=job(function()
+  local problems,decoded=Checkpoint.check(record,w)
+  return problems,decoded,SaveRest.check("main",record,w)
+ end)
+ work:step()
+ check(work.state=="pending" and fingerprint(w)==before,"paused validation leaves live simulation unchanged")
+ local result=finish(work)
+ check(#result[1]==0 and result[2]~=nil and #result[3]==0 and work.resumes>1,"full world and save boundary validate through cooperative pcall")
+ check(fingerprint(w)==before,"completed preparation makes no live commit")
+ local bad=Json.copy(record);bad.player.position={1e12,0,0}
+ local badResult=finish(job(function() return Checkpoint.check(bad,w) end))
+ check(#badResult[1]>0 and badResult[2]==nil and fingerprint(w)==before,"cooperative corruption refusal retains old world")
+ local staging=CheckpointStore.new(CheckpointStore.MemoryDataStore.new(),function(r) return (Checkpoint.check(r,w)) end)
+ local storeWork=job(function() return staging:save(record) end)
+ storeWork:step();storeWork:cancel()
+ check(w.store:loadBest().ok==false and fingerprint(w)==before,"abandoned private staging store cannot replace live checkpoint")
+ local storeDone=job(function() return staging:save(record) end)
+ check(finish(storeDone)[1].ok and storeDone.resumes>1 and staging:loadBest().ok,"isolated memory store prepares a complete readable checkpoint")
+ check(w.store:loadBest().ok==false and fingerprint(w)==before,"prepared store remains private until caller swaps it")
+end)
+
 print(`CHECKPOINT passed={passed} failed={failed}`)
 if failed > 0 then error("CHECKPOINT failed") end

@@ -4,6 +4,7 @@
 -- number, a list (keys 1..n, no holes) or a table whose keys are all strings, made of storable values, with no table met
 -- twice. Pure; tests/checkpoint.luau checks it.
 
+local Work = require(script.Parent.SaveWork)
 local Json = {}
 
 local function finite(x: number): boolean
@@ -20,9 +21,10 @@ local function quote(s: string): string
 end
 
 -- The kind of table: "list" (keys exactly 1..n; an empty table counts as a list), "object" (all keys strings) or nil.
-local function shape(t: { [any]: any }): string?
+local function shape(t: { [any]: any }, pulse: ((number?)->())?): string?
 	local n, strings, others = 0, 0, 0
 	for k in t do
+  if pulse then pulse() end
 		if type(k) == "string" then
 			strings += 1
 		elseif type(k) == "number" then
@@ -35,6 +37,7 @@ local function shape(t: { [any]: any }): string?
 	if strings == n then return if n == 0 then "list" else "object" end
 	if others == n then
 		for i = 1, n do
+   if pulse then pulse() end
 			if t[i] == nil then return nil end
 		end
 		return "list"
@@ -46,6 +49,7 @@ end
 -- (ROBLOX-108: the path a problem names is kept as a stack of keys and spelt out only when there is a problem; it was a new string for every value, most of the
 -- cost of a checkpoint's save, which runs on the frame the rest begins. The text and every message are as they were.)
 function Json.canonical(v: any): (string?, string?)
+ local pulse=Work.pulse()
 	local seen: { [any]: boolean } = {}
 	local problem: string? = nil
 	local trail: { any } = {}
@@ -57,6 +61,7 @@ function Json.canonical(v: any): (string?, string?)
 		return out
 	end
 	local function enc(x: any): string
+  if pulse then pulse() end
 		if problem then return "" end
 		local t = type(x)
 		if t == "string" then return quote(x) end
@@ -82,7 +87,7 @@ function Json.canonical(v: any): (string?, string?)
 			return ""
 		end
 		seen[x] = true
-		local kind = shape(x)
+		local kind = shape(x,pulse)
 		local depth = #trail + 1
 		if kind == "list" then
 			local parts = table.create(#x)
@@ -94,7 +99,7 @@ function Json.canonical(v: any): (string?, string?)
 			return "[" .. table.concat(parts, ",") .. "]"
 		elseif kind == "object" then
 			local keys: { string } = {}
-			for k in x do table.insert(keys, k) end
+			for k in x do if pulse then pulse() end;table.insert(keys, k) end
 			table.sort(keys)
 			local parts = table.create(#keys)
 			for i, k in keys do
@@ -113,24 +118,29 @@ function Json.canonical(v: any): (string?, string?)
 end
 
 -- A deep copy of a storable value (what a DataStore hands back is never the table that was given to it).
-local function copy(v: any): any
+local function copy(v: any, pulse: ((number?)->())?): any
 	if type(v) ~= "table" then return v end
 	local out = {}
-	for k, x in v do out[k] = if type(x) == "table" then copy(x) else x end
+	for k, x in v do
+  if pulse then pulse() end
+  out[k] = if type(x) == "table" then copy(x,pulse) else x
+ end
 	return out
 end
-Json.copy = copy
+function Json.copy(v: any): any return copy(v,Work.pulse()) end
 
 -- FNV-1a over the text, two independent 32-bit lanes, as 16 hex digits: enough to catch a record cut short or changed.
 -- x * 16777619 (the FNV prime, 2^24 + 403) modulo 2^32, exactly, as ((x % 256) * 2^24 + x * 403) % 2^32: a plain product of two 32-bit numbers can exceed 2^53.
 -- (ROBLOX-108: the bytes are read a block at a time and the multiply is written out in the loop: the same sums as before, one byte at a time, in less time.)
 local BLOCK = 2048
 function Json.checksum(text: string): string
+ local pulse=Work.pulse()
 	local a, b = 0x811c9dc5, 0x050c5d1f
 	local n = #text
 	local bxor = bit32.bxor
 	local i0 = 1
 	while i0 <= n do
+  if pulse then pulse(64) end
 		local i1 = math.min(n, i0 + BLOCK - 1)
 		local bytes = { string.byte(text, i0, i1) }
 		for j, c in bytes do

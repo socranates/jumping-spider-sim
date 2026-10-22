@@ -91,6 +91,7 @@ local Mating = require(script.Parent.Parent.Life.Mating)
 local Breakaway = require(script.Parent.Parent.Habitat.Breakaway)
 local Nature = require(script.Parent.Parent.Life.Nature)
 local CompactMigration = require(script.Parent.CompactMigration)
+local Work = require(script.Parent.SaveWork)
 local Checkpoint = {}
 
 Checkpoint.SCHEMA_VERSION = 3
@@ -296,8 +297,9 @@ end
 
 -- The checks on the rebuilt (fresh, not live) world: what a good world must be.
 local function checkWorld(roots: { [string]: any }, problems: { string }, legacyCompact: boolean?)
+ local pulse=Work.pulse()
 	local function bad(t: string) table.insert(problems, t) end
-	for _, name in Checkpoint.ROOTS do
+	for _, name in Checkpoint.ROOTS do if pulse then pulse() end;
 		if type(roots[name]) ~= "table" then bad(`world: no {name}`) end
 	end
 	if #problems > 0 then return end
@@ -315,18 +317,18 @@ local function checkWorld(roots: { [string]: any }, problems: { string }, legacy
 	-- One needs model: the one feeding grants to is the one the life loop reports hours to.
 	if prey.feeding == nil or prey.feeding.needs ~= needs or life.needs ~= needs then bad("needs: feeding and the life loop do not share the reserves") end
 	-- The clock and the rest.
-	for _, p in LifeClock.problems(if type(life.clock) == "table" then LifeClock.toRecord(life.clock) else nil) do bad(p) end
+	for _, p in LifeClock.problems(if type(life.clock) == "table" then LifeClock.toRecord(life.clock) else nil) do if pulse then pulse() end; bad(p) end
 	if getmetatable(life.clock) ~= LifeClock then bad("life: the clock is not a life clock") end
 	if getmetatable(life.growth) ~= Growth then bad("growth: missing growth state")
  else
-  for _,p in Growth.problems(life.growth:toRecord()) do bad(p) end
+  for _,p in Growth.problems(life.growth:toRecord()) do if pulse then pulse() end; bad(p) end
   if life.growth:isMoulting() and not life.resting then bad("growth: moult outside rest") end
  end
  if not finite(life.grantedSeen) or life.grantedSeen<0 or life.grantedSeen>needs.grantedTotal+1e-6 then bad("growth: invalid food ledger cursor") end
  if not RivalSpider.valid(life.rival) then bad("life: invalid rival state") end
  -- ROBLOX-79: the mate, the mating cycle and the generation. All three are missing in a record from before (a life with no mate, stage none, generation 0).
  if not Mate.valid(life.mate) then bad("life: invalid mate state") end
- for _, text in Mating.problemsWith(life.mating, life.mate) do bad(text) end
+ for _, text in Mating.problemsWith(life.mating, life.mate) do if pulse then pulse() end; bad(text) end
  if not Nature.validCold(life.cold_day) then bad("life: invalid cold morning") end -- (ROBLOX-106: optional, set by a night out in the garden)
  if life.generation ~= nil and not (finite(life.generation) and life.generation >= 0 and life.generation <= 1e6 and life.generation % 1 == 0) then bad("life: invalid generation") end
  -- ROBLOX-120: where this generation began (Life/Ballooning): absent in every record before, and in a generation that stayed at the hut; a zone that can be landed in,
@@ -334,9 +336,9 @@ local function checkWorld(roots: { [string]: any }, problems: { string }, legacy
  if life.start_zone ~= nil and (not Ballooning.valid(life.start_zone) or life.start_zone == Ballooning.HUT) then bad("life: invalid start zone") end
  if life.start_region ~= nil and (life.start_zone == nil or not Ballooning.landsIn(life.start_zone, life.start_region)) then bad("life: invalid start region") end
  if life.start_zone ~= nil and life.start_region == nil then bad("life: a start zone with no landing") end
- for _,text in RareDirector.problems(life) do bad("life: "..text) end
+ for _,text in RareDirector.problems(life) do if pulse then pulse() end; bad("life: "..text) end
  -- ROBLOX-91: where this generation's grace began (Mating.grace); absent in a record from before (the first generation's: the sill's own day and meals).
- for _, k in { "born", "mealsBase" } do
+ for _, k in { "born", "mealsBase" } do if pulse then pulse() end;
   local v = life[k]
   if v ~= nil and not (finite(v) and v >= 0 and v <= 1e9 and v % 1 == 0) then bad("life: invalid " .. k) end
  end
@@ -351,7 +353,7 @@ local function checkWorld(roots: { [string]: any }, problems: { string }, legacy
 			return false
 		end
 		local ids: { [string]: any } = {}
-		for i, f in director.flies do
+		for i, f in director.flies do if pulse then pulse() end;
 			if getmetatable(f) ~= Fly or type(f.id) ~= "string" then
 				bad(`{label}: fly {i} is not a fly`)
 				continue
@@ -366,7 +368,7 @@ local function checkWorld(roots: { [string]: any }, problems: { string }, legacy
 			if f.flight == nil or f.flight.fly ~= f then bad(`{label}: {f.id}'s flight is not its own`) end
 		end
 		if type(director.graph) == "table" and type(director.graph.perches) == "table" then
-			for _, p in director.graph.perches do
+			for _, p in director.graph.perches do if pulse then pulse() end;
 				if p.occupant ~= "" and (ids[p.occupant] == nil or not ids[p.occupant]:alive()) then bad(`{label}: perch {p.id} is held by {p.occupant}, which is not a living fly`) end
 				if p.reserved ~= "" and ids[p.reserved] == nil then bad(`{label}: perch {p.id} is reserved by {p.reserved}, which is not a fly`) end
 			end
@@ -382,7 +384,7 @@ local function checkWorld(roots: { [string]: any }, problems: { string }, legacy
 		if type(garden) ~= "table" or getmetatable(garden) ~= nil then
 			bad("garden: not a record of regions")
 		else
-			for id, entry in garden do
+			for id, entry in garden do if pulse then pulse() end;
 				local region = if type(id) == "string" then (if legacyCompact then CompactMigration.legacyRegion(id) else WorldMap.region(id)) else nil
 				local kinds: any = if region ~= nil then Garden.bestiary(region) else nil
 				if legacyCompact and region~=nil and region.kind=="verge" then kinds={{kind="springtail"},{kind="housefly"}} end
@@ -402,8 +404,8 @@ local function checkWorld(roots: { [string]: any }, problems: { string }, legacy
 					if type(entry.kinds) ~= "table" or getmetatable(entry.kinds) ~= nil then bad(`garden: {id}'s kinds are not a record`)
 					else
 						local known: { [string]: boolean } = {}
-						for _, k in (kinds or {}) :: { any } do known[k.kind] = true end
-						for kind, d in entry.kinds do
+						for _, k in (kinds or {}) :: { any } do if pulse then pulse() end; known[k.kind] = true end
+						for kind, d in entry.kinds do if pulse then pulse() end;
 							if type(kind) ~= "string" or not known[kind] then bad(`garden: {id} has no prey of the kind {tostring(kind)}`)
 							elseif getmetatable(d) ~= PreyDirector then bad(`garden: {id}'s {kind} is not a prey director`)
 							else
@@ -422,9 +424,9 @@ local function checkWorld(roots: { [string]: any }, problems: { string }, legacy
 					if type(entry.ambient) ~= "table" or getmetatable(entry.ambient) ~= nil then bad(`garden: {id}'s ambient bugs are not a record`)
 					else
 						local known: { [string]: boolean } = {}
-						for _, a in (Garden.ambient(region) or {}) :: { any } do known[a.kind] = true end
+						for _, a in (Garden.ambient(region) or {}) :: { any } do if pulse then pulse() end; known[a.kind] = true end
 						local classes = { ladybird = Ladybirds, millipede = Millipedes, snail = Snails, harvestman = Harvestmen, ant = Ants, skater = Skaters } :: { [string]: any }
-						for kind, c in entry.ambient do
+						for kind, c in entry.ambient do if pulse then pulse() end;
 							if type(kind) ~= "string" or not known[kind] then bad(`garden: {id} has no ambient bug of the kind {tostring(kind)}`)
 							elseif getmetatable(c) ~= classes[kind] then bad(`garden: {id}'s {kind} is not a colony of its kind`)
 							else for _, text in c:problems(region.bounds[1], region.bounds[2]) do bad(`garden: {id}: {text}`) end end
@@ -440,7 +442,7 @@ local function checkWorld(roots: { [string]: any }, problems: { string }, legacy
 		if not every[held] or held.state ~= "CAPTURED" then bad("feeding: the prey in the jaws is not a caught fly of this world") end
 	end
 	local sum = 0
-	for _, g in prey.feeding.ledger do
+	for _, g in prey.feeding.ledger do if pulse then pulse() end;
 		if not finite(g) or g < 0 then bad("feeding: a meal's energy is not a number") end
 		sum += if finite(g) then g else 0
 	end

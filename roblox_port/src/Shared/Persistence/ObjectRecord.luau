@@ -17,6 +17,7 @@
 -- with any problem is refused there, with the reasons. `commit` then moves the fresh roots' contents into the live root tables
 -- (so everything else that holds a live root keeps holding the right table) and cannot fail part way.
 
+local Work = require(script.Parent.SaveWork)
 local ObjectRecord = {}
 
 ObjectRecord.FORMAT = "object-record-1"
@@ -50,10 +51,11 @@ end
 -- Records the graph reachable from `roots`. `classes`: name -> metatable. `refs`: name -> value. Returns the record, or nil
 -- and the reason (with the path to the first thing it could not record).
 function ObjectRecord.capture(roots: { [string]: any }, classes: { [string]: any }, refs: { [string]: any }): (Record?, string?)
+ local pulse=Work.pulse()
 	local classOf: { [any]: string } = {}
-	for name, mt in classes do classOf[mt] = name end
+	for name, mt in classes do if pulse then pulse() end; classOf[mt] = name end
 	local refOf: { [any]: string } = {}
-	for name, v in refs do
+	for name, v in refs do if pulse then pulse() end;
 		if refOf[v] == nil then refOf[v] = name end
 	end
 	local index: { [any]: number } = {}
@@ -63,6 +65,7 @@ function ObjectRecord.capture(roots: { [string]: any }, classes: { [string]: any
 	local problem: string? = nil
 
 	local function value(v: any, path: string): any
+  if pulse then pulse() end
 		if problem then return nil end
 		local t = type(v)
 		if t == "string" or t == "boolean" then return v end
@@ -98,9 +101,9 @@ function ObjectRecord.capture(roots: { [string]: any }, classes: { [string]: any
 
 	local out: Record = { format = ObjectRecord.FORMAT, roots = {}, objects = objects }
 	local rootNames: { string } = {}
-	for name in roots do table.insert(rootNames, name) end
+	for name in roots do if pulse then pulse() end; table.insert(rootNames, name) end
 	table.sort(rootNames)
-	for _, name in rootNames do
+	for _, name in rootNames do if pulse then pulse() end;
 		local v = roots[name]
 		if type(v) ~= "table" or refOf[v] ~= nil or isVector3(v) then
 			return nil, `root {name} is not an object`
@@ -108,14 +111,14 @@ function ObjectRecord.capture(roots: { [string]: any }, classes: { [string]: any
 		out.roots[name] = value(v, name)
 	end
 	local q = 1
-	while q <= #queue and not problem do
+	while q <= #queue and not problem do if pulse then pulse() end;
 		local obj = queue[q]
 		q += 1
 		local entries: { any } = {}
 		local path = paths[obj]
 		-- Keys in sorted order, so tables are numbered in the same order whatever the hash order of the live tables.
 		local keys: { any } = {}
-		for k in obj do
+		for k in obj do if pulse then pulse() end;
 			local kt = type(k)
 			if not ((kt == "string") or (kt == "number" and finite(k))) then
 				problem = `{path}: a key that is not a string or a finite number`
@@ -124,7 +127,7 @@ function ObjectRecord.capture(roots: { [string]: any }, classes: { [string]: any
 			table.insert(keys, { k })
 		end
 		table.sort(keys, keyLess)
-		for _, key in keys do
+		for _, key in keys do if pulse then pulse() end;
 			if problem then break end
 			local k = key[1]
 			local enc = value(obj[k], `{path}.{k}`)
@@ -153,14 +156,16 @@ local function decodeNumber(x: any): (number?, string?)
 end
 
 local function only(t: any, key: string): boolean
+ local pulse = Work.pulse()
 	local count = 0
-	for _ in t do count += 1 end
+	for _ in t do if pulse then pulse() end; count += 1 end
 	return count == 1 and t[key] ~= nil
 end
 
 -- Checks `record` and builds every object fresh (nothing live is touched). Returns the fresh objects and roots, or nil and
 -- every problem found.
 function ObjectRecord.decode(record: any, classes: { [string]: any }, refs: { [string]: any }): (Decoded?, { string })
+ local pulse=Work.pulse()
 	local problems: { string } = {}
 	local function bad(text: string)
 		if #problems < 20 then table.insert(problems, text) end
@@ -176,15 +181,16 @@ function ObjectRecord.decode(record: any, classes: { [string]: any }, refs: { [s
 	if n > ObjectRecord.MAX_OBJECTS then
 		return nil, { "too many objects" }
 	end
-	for k in objects do
+	for k in objects do if pulse then pulse() end;
 		if type(k) ~= "number" or k < 1 or k > n or k ~= math.floor(k) then
 			return nil, { "the objects are not a list" }
 		end
 	end
 	local fresh: { any } = table.create(n)
-	for i = 1, n do fresh[i] = {} end
+	for i = 1, n do if pulse then pulse() end; fresh[i] = {} end
 
 	local function value(v: any, where: string): any
+  if pulse then pulse() end
 		local t = type(v)
 		if t == "string" or t == "boolean" then return v end
 		if t == "number" then
@@ -235,7 +241,7 @@ function ObjectRecord.decode(record: any, classes: { [string]: any }, refs: { [s
 		return nil
 	end
 
-	for i = 1, n do
+	for i = 1, n do if pulse then pulse() end;
 		local o = objects[i]
 		local where = `object {i}`
 		if type(o) ~= "table" or type(o.e) ~= "table" then
@@ -249,7 +255,7 @@ function ObjectRecord.decode(record: any, classes: { [string]: any }, refs: { [s
 			end
 		end
 		local target = fresh[i]
-		for j, entry in o.e do
+		for j, entry in o.e do if pulse then pulse() end;
 			if type(entry) ~= "table" or #entry ~= 2 then
 				bad(`{where}, entry {j}: not a key and a value`)
 				continue
@@ -270,7 +276,7 @@ function ObjectRecord.decode(record: any, classes: { [string]: any }, refs: { [s
 		end
 	end
 	local out: { [string]: any } = {}
-	for name, v in roots do
+	for name, v in roots do if pulse then pulse() end;
 		if type(name) ~= "string" then
 			bad("a root without a name")
 			continue
